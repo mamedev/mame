@@ -30,9 +30,13 @@
 
  Example PSRAM:
  * AP Memory APS1604L-SQ (2 MiB)
+ * AP Memory APS1604M-SQ (2 MiB)
  * AP Memory APS3204L-SQ (4 MiB)
+ * AP Memory APS3204M-SQ (4 MiB)
  * AP Memory APS6404L-SQ (8 MiB)
+ * AP Memory APS6404M-SQ (8 MiB)
  * AP Memory APS12804L-SQ (16 MiB)
+ * AP Memory APS12804M-SQ (16 MiB)
  * ISS IS66WVS1M8 (1 MiB)
  * ISS IS66WVS2M8 (2 MiB)
  * ISS IS66WVS8M8 (8 MiB)
@@ -54,30 +58,20 @@
 #include "spi_psram.h"
 
 
-DEFINE_DEVICE_TYPE(SPI_PSRAM, spi_psram_device, "spi_psram", "Generic SPI RAM")
+DEFINE_DEVICE_TYPE(SPI_RAM,   spi_ram_device,   "spi_ram",   "Generic SPI RAM")
+DEFINE_DEVICE_TYPE(SPI_PSRAM, spi_psram_device, "spi_psram", "Generic SPI/QPI Pseudo-SRAM")
 
 
-ALLOW_SAVE_TYPE(spi_psram_device::phase)
-
-enum class spi_psram_device::phase : u8
-{
-	IDLE,
-	COMMAND,
-	ADDRESS,
-	WAIT,
-	READ,
-	WRITE
-};
-
-
-enum spi_psram_device::command : u8
+enum spi_ram_device::command : u8
 {
 	COMMAND_READ            = 0x03,
 	COMMAND_FAST_READ       = 0x0b, // 8 wait cycles in SPI mode, 4 wait cycles in QPI mode
 	COMMAND_FAST_READ_QUAD  = 0xeb, // 6 wait cycles, always 4-bit address and data
+	COMMAND_WRAPPED_READ    = 0x8b, // 8 wait cycles in SPI mode, 5 wait cycles in QPI mode
 
 	COMMAND_WRITE           = 0x02,
 	COMMAND_WRITE_QUAD      = 0x38, // always 4-bit address and data
+	COMMAND_WRAPPED_WRITE   = 0x82,
 
 	COMMAND_QPI_ENTER       = 0x35,
 	COMMAND_QPI_EXIT        = 0xf5,
@@ -100,20 +94,38 @@ enum spi_psram_device::command : u8
 };
 
 
-spi_psram_device::spi_psram_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock) :
-	device_t(mconfig, SPI_PSRAM, tag, owner, clock),
+ALLOW_SAVE_TYPE(spi_ram_device::phase)
+
+enum class spi_ram_device::phase : u8
+{
+	IDLE,
+	COMMAND,
+	ADDRESS,
+	WAIT,
+	READ,
+	WRITE
+};
+
+
+spi_ram_device::spi_ram_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock) :
+	spi_ram_device(mconfig, SPI_RAM, tag, owner, clock)
+{
+}
+
+spi_ram_device::spi_ram_device(machine_config const &mconfig, device_type type, char const *tag, device_t *owner, u32 clock) :
+	device_t(mconfig, type, tag, owner, clock),
 	m_sio_cb(*this),
 	m_ram(),
 	m_size(0)
 {
 }
 
-spi_psram_device::~spi_psram_device()
+spi_ram_device::~spi_ram_device()
 {
 }
 
 
-void spi_psram_device::ce_w(int state)
+void spi_ram_device::ce_w(int state)
 {
 	if (state)
 	{
@@ -130,7 +142,7 @@ void spi_psram_device::ce_w(int state)
 	m_ce = state ? 1 : 0;
 }
 
-void spi_psram_device::sclk_w(int state)
+void spi_ram_device::sclk_w(int state)
 {
 	switch (m_phase)
 	{
@@ -139,12 +151,13 @@ void spi_psram_device::sclk_w(int state)
 	case phase::WRITE:
 		if (state && !m_sclk)
 		{
-			m_buffer = (m_buffer << m_cmd_width) | (m_sio & util::make_bitmask<u8>(m_cmd_width));
+			m_buffer = (m_buffer << m_data_width) | (m_sio & util::make_bitmask<u8>(m_data_width));
 			m_bits -= m_data_width;
 			if (!m_bits)
 			{
 				if (phase::COMMAND == m_phase)
 				{
+					m_phase = phase::IDLE;
 					m_cmd = u8(m_buffer);
 					start_command();
 				}
@@ -187,25 +200,37 @@ void spi_psram_device::sclk_w(int state)
 		}
 		break;
 
+	case phase::WAIT:
+		if (state && !m_sclk)
+		{
+			m_bits -= m_data_width;
+			if (!m_bits)
+			{
+				m_bits = 8;
+				m_phase = m_next_phase;
+			}
+		}
+		break;
+
 	default:
 		break;
 	}
 	m_sclk = state ? 1 : 0;
 }
 
-void spi_psram_device::sio_w(offs_t offset, u8 data, u8 mem_mask)
+void spi_ram_device::sio_w(offs_t offset, u8 data, u8 mem_mask)
 {
 	m_sio = data & 0xf;
 }
 
 
-void spi_psram_device::device_validity_check(validity_checker &valid) const
+void spi_ram_device::device_validity_check(validity_checker &valid) const
 {
 	if (!m_size || (m_size & (m_size - 1)) || (m_size > 0x0100'0000))
 		osd_printf_error("Unsupported size %u (must be a power of 2 not larger than 16M)\n", m_size);
 }
 
-void spi_psram_device::device_resolve_objects()
+void spi_ram_device::device_resolve_objects()
 {
 	m_wrap_mask = util::make_bitmask<u32>(10);
 	m_addr = 0;
@@ -213,15 +238,17 @@ void spi_psram_device::device_resolve_objects()
 	m_cmd_width = 1;
 	m_data_width = 1;
 	m_bits = 0;
+	m_wait = 0;
 
 	m_ce = 1;
 	m_sclk = 0;
 	m_sio = 0xf;
 	m_phase = phase::IDLE;
+	m_next_phase = phase::IDLE;
 	m_cmd = 0;
 }
 
-void spi_psram_device::device_start()
+void spi_ram_device::device_start()
 {
 	if (!m_size || (m_size & (m_size - 1)) || (m_size > 0x0100'0000))
 		osd_printf_error("%s: Unsupported size %u (must be a power of 2 not larger than 16M)\n", tag(), m_size);
@@ -235,64 +262,77 @@ void spi_psram_device::device_start()
 	save_item(NAME(m_cmd_width));
 	save_item(NAME(m_data_width));
 	save_item(NAME(m_bits));
+	save_item(NAME(m_wait));
 	save_item(NAME(m_ce));
 	save_item(NAME(m_sclk));
 	save_item(NAME(m_sio));
 	save_item(NAME(m_phase));
+	save_item(NAME(m_next_phase));
 	save_item(NAME(m_cmd));
 }
 
 
-void spi_psram_device::start_command()
+void spi_ram_device::start_command()
 {
-	switch (m_cmd)
-	{
-	case COMMAND_READ:
-		// FIXME: AP Memory devices don't support this command in QPI mode
-		m_buffer = 0;
-		m_data_width = m_cmd_width;
-		m_bits = 24;
-		m_phase = phase::ADDRESS;
-		break;
-
-	case COMMAND_WRITE:
-		m_buffer = 0;
-		m_data_width = m_cmd_width;
-		m_bits = 24;
-		m_phase = phase::ADDRESS;
-		break;
-
-	default:
-		logerror("unimplemented command 0x%02x\n", m_cmd);
-		m_phase = phase::IDLE;
-	}
-}
-
-void spi_psram_device::address_complete()
-{
-	switch (m_cmd)
+	switch (cmd())
 	{
 	case COMMAND_READ:
 		// FIXME: wait cycles depend on mode and device family
-		m_buffer = m_ram[m_addr];
-		m_data_width = m_cmd_width;
-		m_bits = 8;
-		m_phase = phase::READ;
-		break;
+		start_read(m_cmd_width, 0);
+		return;
 
 	case COMMAND_WRITE:
-		m_buffer = 0;
-		m_data_width = m_cmd_width;
-		m_bits = 8;
-		m_phase = phase::WRITE;
-		break;
+		start_write(m_cmd_width);
+		return;
 
 	default:
-		throw false; // if we get here, there's a bug in the code
+		logerror("unimplemented command 0x%02x in %u-bit mode\n", cmd(), m_cmd_width);
 	}
 }
 
-inline void spi_psram_device::next_address()
+void spi_ram_device::address_complete()
+{
+	if (m_wait)
+	{
+		m_phase = phase::WAIT;
+		m_bits = m_wait;
+	}
+	else
+	{
+		m_buffer = (phase::READ == m_next_phase) ? m_ram[m_addr] : 0;
+		m_bits = 8;
+		m_phase = m_next_phase;
+	}
+}
+
+
+inline void spi_ram_device::set_cmd_width(u8 width)
+{
+	m_cmd_width = width;
+}
+
+inline void spi_ram_device::start_read(u8 width, u8 wait)
+{
+	m_buffer = 0;
+	m_data_width = width;
+	m_bits = 24;
+	m_wait = wait * width;
+	m_phase = phase::ADDRESS;
+	m_next_phase = phase::READ;
+}
+
+inline void spi_ram_device::start_write(u8 width)
+{
+	m_buffer = 0;
+	m_data_width = width;
+	m_bits = 24;
+	m_wait = 0;
+	m_phase = phase::ADDRESS;
+	m_next_phase = phase::WRITE;
+}
+
+
+inline void spi_ram_device::next_address()
 {
 	if (m_wrap_mask)
 	{
@@ -303,4 +343,85 @@ inline void spi_psram_device::next_address()
 	{
 		m_phase = phase::IDLE;
 	}
+}
+
+
+
+spi_psram_device::spi_psram_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock) :
+	spi_ram_device(mconfig, SPI_PSRAM, tag, owner, clock)
+{
+}
+
+spi_psram_device::~spi_psram_device()
+{
+}
+
+
+void spi_psram_device::device_resolve_objects()
+{
+	spi_ram_device::device_resolve_objects();
+
+	m_reset_enable = false;
+}
+
+void spi_psram_device::device_start()
+{
+	spi_ram_device::device_start();
+
+	save_item(NAME(m_reset_enable));
+}
+
+
+void spi_psram_device::start_command()
+{
+	bool const reset_enable(std::exchange(m_reset_enable, false));
+	switch (cmd())
+	{
+	case COMMAND_READ:
+		if (cmd_width() == 4)
+		{
+			// FIXME: AP Memory and Vilsion Technology devices don't support command 0x03 in QPI mode
+			start_read(4, 4);
+			return;
+		}
+		break;
+
+	case COMMAND_FAST_READ:
+		start_read(cmd_width(), (cmd_width() == 4) ? 4 : 8);
+		return;
+
+	case COMMAND_FAST_READ_QUAD:
+		start_read(4, 6);
+		return;
+
+	case COMMAND_WRITE_QUAD:
+		start_write(4);
+		return;
+
+	case COMMAND_QPI_ENTER:
+		if (cmd_width() == 1)
+		{
+			set_cmd_width(4);
+			return;
+		}
+		break;
+
+	case COMMAND_QPI_EXIT:
+		if (cmd_width() == 4)
+		{
+			set_cmd_width(1);
+			return;
+		}
+		break;
+
+	case COMMAND_RESET_ENABLE:
+		m_reset_enable = true;
+		return;
+
+	case COMMAND_RESET:
+		if (reset_enable)
+			set_cmd_width(1);
+		return;
+	}
+	spi_ram_device::start_command();
 }

@@ -93,7 +93,6 @@ private:
 	int reverb_pos;
 
 	int32_t cur_ptr;
-	int cur_limit;
 	uint32_t rom_addr;
 
 	channel channels[8];

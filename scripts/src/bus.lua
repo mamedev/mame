@@ -4844,6 +4844,8 @@ if (BUSES["SPECTRUM"]~=null) then
 		MAME_DIR .. "src/devices/bus/spectrum/mikroplus.h",
 		MAME_DIR .. "src/devices/bus/spectrum/mpoker.cpp",
 		MAME_DIR .. "src/devices/bus/spectrum/mpoker.h",
+		MAME_DIR .. "src/devices/bus/spectrum/musicmachine.cpp",
+		MAME_DIR .. "src/devices/bus/spectrum/musicmachine.h",
 		MAME_DIR .. "src/devices/bus/spectrum/opus.cpp",
 		MAME_DIR .. "src/devices/bus/spectrum/opus.h",
 		MAME_DIR .. "src/devices/bus/spectrum/plus2test.cpp",

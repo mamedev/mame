@@ -327,7 +327,7 @@ extern int i386_parity_table[256];
 #define MMX(n)              (*((MMX_REG *)(&m_x87_reg[(n)].low)))
 #define XMM(n)              m_sse_reg[(n)]
 
-#define FLAG_DIRTY     0x100 // VTLB flag
+#define FLAG_DIRTY          0x100 // VTLB flag
 #define CYCLES_NUM(x)       (m_cycles -= (x))
 
 #define FAULT(fault,error)  {m_ext = 1; i386_trap_with_error(fault,0,0,error); return;}

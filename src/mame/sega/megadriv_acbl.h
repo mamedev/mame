@@ -114,6 +114,7 @@ public:
 	void init_mk3mdb();
 	void init_bk3ssrmb();
 	void init_barekch();
+	void init_srssf2mb();
 
 protected:
 	virtual void machine_start() override ATTR_COLD;

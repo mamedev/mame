@@ -1,7 +1,16 @@
 // license:BSD-3-Clause
-// copyright-holders:
-/*************************************************************************************************************
-Skeleton driver for IBM ThinkPad 600 series.
+// copyright-holders: Angelo Salese
+/**************************************************************************************************
+
+IBM ThinkPad 600 series
+
+TODO:
+- Intel e28f004b5t80 flash ROM;
+- RTC (what's the CMOS here?);
+- keyboard (thru H8/3437);
+
+===================================================================================================
+
 The IBM ThinkPad 600 series was a series of notebook computers introduced in 1998 by IBM as an lighter and
 slimmer alternative to the 770 series. Three models were produced, the 600, 600E, and 600X.
 
@@ -46,9 +55,16 @@ Hardware for the 600 model.
     -TI TCM320AC36C (Voice-Band Audio Processor [VBAPE]).
     -Large BGA chip silkscreened "IPI I8L7360 F27904A".
 
-*************************************************************************************************************/
+**************************************************************************************************/
 
 #include "emu.h"
+
+#include "bus/isa/isa_cards.h"
+#include "bus/rs232/hlemouse.h"
+#include "bus/rs232/null_modem.h"
+#include "bus/rs232/rs232.h"
+#include "bus/rs232/sun_kbd.h"
+#include "bus/rs232/terminal.h"
 #include "cpu/h8/h83337.h"
 #include "cpu/i386/i386.h"
 #include "machine/pci.h"
@@ -58,7 +74,7 @@ Hardware for the 600 model.
 #include "machine/i82371eb_ide.h"
 #include "machine/i82371eb_acpi.h"
 #include "machine/i82371eb_usb.h"
-#include "bus/isa/isa_cards.h"
+#include "machine/pc97338.h"
 
 #include "speaker.h"
 
@@ -85,7 +101,7 @@ private:
 	void main_map(address_map &map);
 	void mcu_map(address_map &map);
 
-	//static void superio_config(device_t *device);
+	static void superio_config(device_t *device);
 };
 
 void thinkpad600_state::main_map(address_map &map)
@@ -101,21 +117,46 @@ void thinkpad600_state::mcu_map(address_map &map)
 static INPUT_PORTS_START(thinkpad600)
 INPUT_PORTS_END
 
+void thinkpad600_state::superio_config(device_t *device)
+{
+	pc97338_device &fdc = *downcast<pc97338_device *>(device);
+//  fdc.set_sysopt_pin(1);
+//  fdc.gp20_reset().set_inputline(":maincpu", INPUT_LINE_RESET);
+//  fdc.gp25_gatea20().set_inputline(":maincpu", INPUT_LINE_A20);
+	fdc.irq1().set(":pci:07.0", FUNC(i82371eb_isa_device::pc_irq1_w));
+	fdc.irq8().set(":pci:07.0", FUNC(i82371eb_isa_device::pc_irq8n_w));
+	fdc.txd1().set(":serport0", FUNC(rs232_port_device::write_txd));
+	fdc.ndtr1().set(":serport0", FUNC(rs232_port_device::write_dtr));
+	fdc.nrts1().set(":serport0", FUNC(rs232_port_device::write_rts));
+	fdc.txd2().set(":serport1", FUNC(rs232_port_device::write_txd));
+	fdc.ndtr2().set(":serport1", FUNC(rs232_port_device::write_dtr));
+	fdc.nrts2().set(":serport1", FUNC(rs232_port_device::write_rts));
+}
+
+static void isa_com(device_slot_interface &device)
+{
+	device.option_add("microsoft_mouse", MSFT_HLE_SERIAL_MOUSE);
+	device.option_add("logitech_mouse", LOGITECH_HLE_SERIAL_MOUSE);
+	device.option_add("wheel_mouse", WHEEL_HLE_SERIAL_MOUSE);
+	device.option_add("msystems_mouse", MSYSTEMS_HLE_SERIAL_MOUSE);
+	device.option_add("rotatable_mouse", ROTATABLE_HLE_SERIAL_MOUSE);
+	device.option_add("terminal", SERIAL_TERMINAL);
+	device.option_add("null_modem", NULL_MODEM);
+	device.option_add("sun_kbd", SUN_KBD_ADAPTOR);
+}
+
+static void isa_internal_devices(device_slot_interface &device)
+{
+	device.option_add("pc97338", PC97338);
+}
+
 void thinkpad600_state::thinkpad600_base(machine_config &config)
 {
 	// TODO: move away, maps on MB resource, bump to H83437
 	h83337_device &mcu(H83337(config, "mcu", XTAL(16'000'000))); // Actually an Hitachi HD64F3437TF, unknown clock
 	mcu.set_addrmap(AS_PROGRAM, &thinkpad600_state::mcu_map);
+//  mcu.set_disable();
 }
-
-//void thinkpad600_state::superio_config(device_t *device)
-//{
-//}
-
-//static void isa_internal_devices(device_slot_interface &device)
-//{
-//  device.option_add("w83787f", W83787F);
-//}
 
 void thinkpad600_state::thinkpad600e(machine_config &config)
 {
@@ -124,7 +165,7 @@ void thinkpad600_state::thinkpad600e(machine_config &config)
 	m_maincpu->set_irq_acknowledge_callback("pci:07.0:pic8259_master", FUNC(pic8259_device::inta_cb));
 	m_maincpu->smiact().set("pci:00.0", FUNC(i82443bx_host_device::smi_act_w));
 
-	// TODO: PCI config space guessed from a Fujitsu Lifebook
+	// TODO: PCI config space guessed from a Fujitsu Lifebook, confirm me for ThinkPad
 	PCI_ROOT(config, "pci", 0);
 	I82443BX_HOST(config, "pci:00.0", 0, "maincpu", 64*1024*1024);
 	i82371eb_isa_device &isa(I82371EB_ISA(config, "pci:07.0", 0, m_maincpu));
@@ -145,7 +186,21 @@ void thinkpad600_state::thinkpad600e(machine_config &config)
 //  TODO: NeoMagic at "pci:14.0" / "pci:14.1" (video & AC'97 integrated sound, likely requires BIOS)
 
 //  TODO: motherboard Super I/O resource here
-//  ISA16_SLOT(config, "board4", 0, "pci:07.0:isabus", isa_internal_devices, "pc97338", true).set_option_machine_config("pc97338", superio_config);
+	ISA16_SLOT(config, "board4", 0, "pci:07.0:isabus", isa_internal_devices, "pc97338", true).set_option_machine_config("pc97338", superio_config);
+
+	rs232_port_device &serport0(RS232_PORT(config, "serport0", isa_com, nullptr));
+	serport0.rxd_handler().set("board4:pc97338", FUNC(pc97338_device::rxd1_w));
+	serport0.dcd_handler().set("board4:pc97338", FUNC(pc97338_device::ndcd1_w));
+	serport0.dsr_handler().set("board4:pc97338", FUNC(pc97338_device::ndsr1_w));
+	serport0.ri_handler().set("board4:pc97338", FUNC(pc97338_device::nri1_w));
+	serport0.cts_handler().set("board4:pc97338", FUNC(pc97338_device::ncts1_w));
+
+	rs232_port_device &serport1(RS232_PORT(config, "serport1", isa_com, nullptr));
+	serport1.rxd_handler().set("board4:pc97338", FUNC(pc97338_device::rxd2_w));
+	serport1.dcd_handler().set("board4:pc97338", FUNC(pc97338_device::ndcd2_w));
+	serport1.dsr_handler().set("board4:pc97338", FUNC(pc97338_device::ndsr2_w));
+	serport1.ri_handler().set("board4:pc97338", FUNC(pc97338_device::nri2_w));
+	serport1.cts_handler().set("board4:pc97338", FUNC(pc97338_device::ncts2_w));
 
 	thinkpad600_base(config);
 }
@@ -155,7 +210,7 @@ void thinkpad600_state::thinkpad600(machine_config &config)
 	PENTIUM2(config, m_maincpu, 300'000'000); // Intel Pentium II 300 Mobile MMC-1 (PMD30005002AA)
 	m_maincpu->set_disable();
 
-	// TODO: fill me, uses earlier AB
+	// TODO: fill me, uses earlier PIIX4 AB
 	PCI_ROOT(config, "pci", 0);
 
 	thinkpad600_base(config);
@@ -163,8 +218,16 @@ void thinkpad600_state::thinkpad600(machine_config &config)
 
 
 ROM_START(thinkpad600e)
-	ROM_REGION( 0x80000, "pci:07.0", 0 )
-	ROM_LOAD( "e28f004b5t80-10l1056_rev15_h0399m.u60", 0x00000, 0x80000, CRC(fba7567b) SHA1(a84e7d4e5740150e78e5002714c9125705f3356a) ) // BIOS
+	ROM_REGION( 0x80000, "bios", 0 )
+	ROM_LOAD( "e28f004b5t80-10l1056_rev15_h0399m.u60", 0x00000, 0x80000, CRC(fba7567b) SHA1(a84e7d4e5740150e78e5002714c9125705f3356a) )
+
+	ROM_REGION( 0x80000, "pci:07.0", ROMREGION_ERASEFF )
+	// TODO: in linear mapping it will boot to a terminal only Flash ROM BIOS programmer
+	// 0x40000-0x5ffff contains standard x86 startup, this hookup needs confirmation later on.
+	ROM_COPY( "bios", 0x40000, 0x60000, 0x20000 )
+	ROM_COPY( "bios", 0x60000, 0x40000, 0x20000 )
+	ROM_COPY( "bios", 0x00000, 0x20000, 0x20000 )
+	ROM_COPY( "bios", 0x20000, 0x00000, 0x20000 )
 
 	ROM_REGION(0x0f780, "mcu", 0)
 	ROM_LOAD( "hd64f3437tf-10l1057_rev04_h0499m.u39",  0x00000, 0x0f780, CRC(c21c928b) SHA1(33e3e6966f003655ffc2f3ac07772d2d3245740d) )
@@ -181,7 +244,7 @@ ROM_END
 
 ROM_START(thinkpad600)
 	ROM_REGION( 0x80000,  "pci:07.0", 0 )
-	ROM_LOAD( "tms28f004b_18l9949_rev16-i2298m.u76",   0x00000, 0x80000, CRC(00a52b32) SHA1(08db425b8edb3a036f22beb588caa6f050fc8eb2) ) // BIOS
+	ROM_LOAD( "tms28f004b_18l9949_rev16-i2298m.u76",   0x00000, 0x80000, CRC(00a52b32) SHA1(08db425b8edb3a036f22beb588caa6f050fc8eb2) )
 
 	ROM_REGION(0x0f780, "mcu", 0)
 	ROM_LOAD( "hd64f3437tf_10l9950_rev08_i2798m.u32",  0x00000, 0x0f780, CRC(546ec51c) SHA1(5d9b4be590307c4059ff11c434d0901819427649) )

@@ -19767,6 +19767,9 @@ gsz80                           // Grant Searle's Simple Z-80 Machine
 @source:homebrew/homez80.cpp
 homez80                         //
 
+@source:homebrew/linux4004.cpp
+lnux4004
+
 @source:homebrew/lft_chiptune.cpp
 powernin                        // Power Ninja Action Challenge, by [lft] (2009)
 hwchiptn                        // The Hardware Chiptune Project, by [lft] and kryo (2007)
@@ -20290,6 +20293,8 @@ genius6b                        // (c) 1997
 happyskl                        // (c) 2000?
 iqblocka                        // (c) 1996
 iqblockf                        // (c) 1996
+jking103a                       // (c) 1999
+jking302us                      // (c) 2000?
 lhzb2                           // (c) 1998
 lhzb2a                          // (c) 1998
 mgcs                            // (c) 1998
@@ -20319,9 +20324,10 @@ amazonia                        // (c) 1999
 amazonkp                        // (c) 1999
 chessc2                         // (c) 200?
 cjddz                           // (c) 200?
+cjddzp                          // (c) 200?
 extradrw                        // (c) 200?
 fruitpar                        // (c) 1999
-fruitpara                       // (c) 1999
+fruitpar206us                   // (c) 1999
 gonefsh2                        // (c) 200?
 jking02                         // (c) 200?
 klxyj                           // (c) 200?
@@ -20333,11 +20339,11 @@ lthy                            // (c) 1999
 luckycrs                        // (c) 200?
 mgcs3                           // (c) 200?
 mgzz                            // (c) 2003
-mgzza                           // (c) 2003
+mgzz100cn                       // (c) 2003
 oceanpar                        //
-oceanpara                       //
+oceanpar101us                   //
 olympic5                        // (c) 2005
-olympic5a                       // (c) 2003
+olympic5107us                   // (c) 2003
 tripslot                        // (c) 2007
 qlgs                            // (c) 1999
 sdwx                            // (c) 2002
@@ -20352,14 +20358,14 @@ mgcs2l
 
 @source:igs/igs_m027xa.cpp
 crzybugs                        // (c) 2009
-crzybugsa                       // (c) 2006
-crzybugsb                       // (c) 2005
-crzybugsj                       // (c) 2007
+crzybugs103jp                   // (c) 2007
+crzybugs200us                   // (c) 2005
+crzybugs202us                   // (c) 2006
 haunthig                        // (c) 2008
-haunthiga                       // (c) 2006
+haunthig101us                   // (c) 2006
 tripfev                         // (c) 2006
-tripfeva                        // (c) 2006
-tripfevb                        // (c) 2006
+tripfev105us                    // (c) 2006
+tripfev107us                    // (c) 2006
 wldfruit                        // (c) 200?
 
 @source:igs/igs_m036.cpp
@@ -20375,6 +20381,7 @@ lhzb3in1                        // (c) 200?
 lhzbgqb                         // (c) 2010
 mghammer                        // (c) 2015
 qhzb                            // (c) 2007
+super70s                        // (c) 200?
 
 @source:igs/igspoker.cpp
 chleague                        // (c) 199? IGS
@@ -25082,6 +25089,8 @@ poly800mdk                      //
 
 @source:korg/polysix.cpp
 polysix                         //
+
+@source:korg/poly61.cpp
 poly61                          //
 
 @source:kurzweil/krz2000.cpp
@@ -27720,6 +27729,9 @@ triviasp                        // (c) 1984
 triviayp                        // (c) 1984
 triviaes4                       // (c) 1988 (Maibesa hardware)
 triviaes5                       // (c) 19?? (Maibesa hardware)
+
+@source:midway/cashline.cpp
+cashline                        // (c) 1981 Bally/Sente
 
 @source:midway/gridlee.cpp
 gridlee                         // [1983 Videa] prototype - no copyright notice
@@ -39385,6 +39397,7 @@ mk3mdb
 sonic2mb
 sonic3mb
 srmdb
+srssf2mb
 ssf2mdb
 twinktmb
 

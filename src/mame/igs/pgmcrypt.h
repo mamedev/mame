@@ -35,6 +35,7 @@ void klxyj_decrypt(running_machine &machine);
 void zhongguo_decrypt(running_machine &machine);
 void gonefsh2_decrypt(running_machine &machine);
 void cjddz_decrypt(running_machine &machine);
+void cjddzp_decrypt(running_machine &machine);
 void lhzb4_decrypt(running_machine &machine);
 void fearless_decrypt(running_machine &machine);
 void superkds_decrypt(running_machine &machine);

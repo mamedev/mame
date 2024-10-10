@@ -1,28 +1,17 @@
 // license:BSD-3-Clause
-// copyright-holders:Angelo Salese, David Haywood
-/*******************************************************************************************
+// copyright-holders:Angelo Salese, David Haywood, Pierpaolo Prazzoli
+/**************************************************************************************************
 
 Best League (c) 1993
 
 A Big Striker Italian bootleg (made by Playmark?) running on a different hardware.
 
-driver by David Haywood & Angelo Salese
-
-Changes 29/03/2005 - Pierpaolo Prazzoli
-- Fixed tilemaps and sprites offset
-- Fixed visible area
-- Fixed dip-switches
-- Added oki banking
-- Added sprites wraparound
-- Added sprites color masking
-
-Dip Locations added according to Service Mode
-
-*******************************************************************************************/
+**************************************************************************************************/
 
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
 #include "sound/okim6295.h"
+
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
@@ -34,19 +23,31 @@ namespace {
 class bestleag_state : public driver_device
 {
 public:
-	bestleag_state(const machine_config &mconfig, device_type type, const char *tag) :
-		driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu"),
-		m_oki(*this, "oki"),
-		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette"),
-		m_bgram(*this, "bgram"),
-		m_fgram(*this, "fgram"),
-		m_txram(*this, "txram"),
-		m_vregs(*this, "vregs"),
-		m_spriteram(*this, "spriteram")
+	bestleag_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag)
+		, m_vregs(*this, "vregs")
+		, m_maincpu(*this, "maincpu")
+		, m_oki(*this, "oki")
+		, m_gfxdecode(*this, "gfxdecode")
+		, m_palette(*this, "palette")
+		, m_bgram(*this, "bgram")
+		, m_fgram(*this, "fgram")
+		, m_txram(*this, "txram")
+		, m_spriteram(*this, "spriteram")
 	{ }
 
+	void bestleag(machine_config &config) ATTR_COLD;
+
+protected:
+	tilemap_t *m_tx_tilemap = nullptr;
+	tilemap_t *m_bg_tilemap = nullptr;
+	tilemap_t *m_fg_tilemap = nullptr;
+	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
+
+	virtual uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	required_shared_ptr<uint16_t> m_vregs;
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<okim6295_device> m_oki;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -55,12 +56,8 @@ public:
 	required_shared_ptr<uint16_t> m_bgram;
 	required_shared_ptr<uint16_t> m_fgram;
 	required_shared_ptr<uint16_t> m_txram;
-	required_shared_ptr<uint16_t> m_vregs;
 	required_shared_ptr<uint16_t> m_spriteram;
 
-	tilemap_t *m_tx_tilemap = nullptr;
-	tilemap_t *m_bg_tilemap = nullptr;
-	tilemap_t *m_fg_tilemap = nullptr;
 
 	void txram_w(offs_t offset, uint16_t data);
 	void bgram_w(offs_t offset, uint16_t data);
@@ -70,20 +67,23 @@ public:
 	TILE_GET_INFO_MEMBER(get_tx_tile_info);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
-	TILEMAP_MAPPER_MEMBER(bsb_bg_scan);
+	TILEMAP_MAPPER_MEMBER(bg_scan);
 
 	virtual void video_start() override ATTR_COLD;
 
-	uint32_t screen_update_bestleag(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	uint32_t screen_update_bestleaw(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void bestleag(machine_config &config);
-	void bestleaw(machine_config &config);
-	void bestleag_map(address_map &map) ATTR_COLD;
+	void main_map(address_map &map) ATTR_COLD;
 };
 
+class bestleaw_state : public bestleag_state
+{
+public:
+	bestleaw_state(const machine_config &mconfig, device_type type, const char *tag)
+		: bestleag_state(mconfig, type, tag)
+	{ }
 
-/* Video Handling */
+protected:
+	virtual uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect) override;
+};
 
 
 TILE_GET_INFO_MEMBER(bestleag_state::get_tx_tile_info)
@@ -116,7 +116,7 @@ TILE_GET_INFO_MEMBER(bestleag_state::get_fg_tile_info)
 			0);
 }
 
-TILEMAP_MAPPER_MEMBER(bestleag_state::bsb_bg_scan)
+TILEMAP_MAPPER_MEMBER(bestleag_state::bg_scan)
 {
 	int offset;
 
@@ -130,22 +130,19 @@ TILEMAP_MAPPER_MEMBER(bestleag_state::bsb_bg_scan)
 void bestleag_state::video_start()
 {
 	m_tx_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(bestleag_state::get_tx_tile_info)), TILEMAP_SCAN_COLS, 8, 8, 256, 32);
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(bestleag_state::get_bg_tile_info)), tilemap_mapper_delegate(*this, FUNC(bestleag_state::bsb_bg_scan)), 16, 16, 128, 64);
-	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(bestleag_state::get_fg_tile_info)), tilemap_mapper_delegate(*this, FUNC(bestleag_state::bsb_bg_scan)), 16, 16, 128, 64);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(bestleag_state::get_bg_tile_info)), tilemap_mapper_delegate(*this, FUNC(bestleag_state::bg_scan)), 16, 16, 128, 64);
+	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(bestleag_state::get_fg_tile_info)), tilemap_mapper_delegate(*this, FUNC(bestleag_state::bg_scan)), 16, 16, 128, 64);
 
 	m_tx_tilemap->set_transparent_pen(15);
 	m_fg_tilemap->set_transparent_pen(15);
 }
 
+/*
+ * Sprites are the same to sslam, but using 16x16 sprites instead of 8x8,
+ * moved start address to 0x16/2?
+ */
 void bestleag_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	/*
-	Sprites are the same to sslam, but using 16x16 sprites instead of 8x8
-
-	Note: sprite chip is different than the other Big Striker sets and they
-	      include several similiarities with other Playmark games (including
-	      the sprite end code and the data being offset (i.e. spriteram starting from 0x16/2))
-	*/
 	for (int offs = 0x16/2; offs < m_spriteram.length() - 3; offs += 4)
 	{
 		int code = m_spriteram[offs+3] & 0xfff;
@@ -189,7 +186,7 @@ void bestleag_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 	}
 }
 
-uint32_t bestleag_state::screen_update_bestleag(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t bestleag_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->set_scrollx(0,(m_vregs[0x00/2] & 0xfff) + (m_vregs[0x08/2] & 0x7) - 3);
 	m_bg_tilemap->set_scrolly(0,m_vregs[0x02/2]);
@@ -205,7 +202,7 @@ uint32_t bestleag_state::screen_update_bestleag(screen_device &screen, bitmap_in
 	return 0;
 }
 
-uint32_t bestleag_state::screen_update_bestleaw(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t bestleaw_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->set_scrollx(0,m_vregs[0x08/2]);
 	m_bg_tilemap->set_scrolly(0,m_vregs[0x0a/2]);
@@ -245,9 +242,8 @@ void bestleag_state::oki_bank_w(uint16_t data)
 }
 
 
-/* Memory Map */
 
-void bestleag_state::bestleag_map(address_map &map)
+void bestleag_state::main_map(address_map &map)
 {
 	map(0x000000, 0x03ffff).rom();
 	map(0x0d2000, 0x0d3fff).noprw(); // left over from the original game (only read / written in memory test)
@@ -346,15 +342,15 @@ static INPUT_PORTS_START( bestleag )
 	PORT_SERVICE_DIPLOC( 0x80, IP_ACTIVE_LOW, "SW.B:8")
 INPUT_PORTS_END
 
-/* GFX Decode */
+
 static const gfx_layout bestleag_charlayout =
 {
 	8,8,
 	RGN_FRAC(1,4),
 	4,
 	{ RGN_FRAC(3,4), RGN_FRAC(2,4), RGN_FRAC(1,4), RGN_FRAC(0,4) },
-	{ 0, 1, 2, 3, 4, 5, 6, 7 },
-	{ 0*8, 2*8, 4*8, 6*8,1*8,3*8,5*8,7*8},
+	{ STEP8(0, 1) },
+	{ 0*8, 2*8, 4*8, 6*8, 1*8, 3*8, 5*8, 7*8},
 	8*8
 };
 
@@ -364,9 +360,8 @@ static const gfx_layout bestleag_char16layout =
 	RGN_FRAC(1,4),
 	4,
 	{ RGN_FRAC(3,4), RGN_FRAC(2,4), RGN_FRAC(1,4), RGN_FRAC(0,4) },
-	{ 0,1,2, 3, 4, 5, 6, 7,
-		128+0,128+1,128+2,128+3,128+4,128+5,128+6,128+7 },
-	{ 0*8,1*8,2*8,3*8,4*8,5*8,6*8,7*8,8*8,9*8,10*8,11*8,12*8,13*8,14*8,15*8 },
+	{ STEP8(0, 1), STEP8(128, 1) },
+	{ STEP16(0, 8) },
 	16*16
 };
 
@@ -379,7 +374,7 @@ GFXDECODE_END
 void bestleag_state::bestleag(machine_config &config)
 {
 	M68000(config, m_maincpu, 12000000);
-	m_maincpu->set_addrmap(AS_PROGRAM, &bestleag_state::bestleag_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &bestleag_state::main_map);
 	m_maincpu->set_vblank_int("screen", FUNC(bestleag_state::irq6_line_hold));
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -387,7 +382,7 @@ void bestleag_state::bestleag(machine_config &config)
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(32*8, 32*8);
 	screen.set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
-	screen.set_screen_update(FUNC(bestleag_state::screen_update_bestleag));
+	screen.set_screen_update(FUNC(bestleag_state::screen_update));
 	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_bestleag);
@@ -401,14 +396,6 @@ void bestleag_state::bestleag(machine_config &config)
 	m_oki->add_route(ALL_OUTPUTS, "rspeaker", 1.00);
 }
 
-void bestleag_state::bestleaw(machine_config &config)
-{
-	bestleag(config);
-	subdevice<screen_device>("screen")->set_screen_update(FUNC(bestleag_state::screen_update_bestleaw));
-}
-
-
-/* Rom Loading */
 
 ROM_START( bestleag )
 	ROM_REGION( 0x40000, "maincpu", 0 ) /* 68000 Code */
@@ -478,7 +465,5 @@ ROM_END
 } // anonymous namespace
 
 
-/* GAME drivers */
-
 GAME( 1993, bestleag, bigstrik, bestleag, bestleag, bestleag_state, empty_init, ROT0, "bootleg", "Best League (bootleg of Big Striker, Italian Serie A)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1993, bestleaw, bigstrik, bestleaw, bestleag, bestleag_state, empty_init, ROT0, "bootleg", "Best League (bootleg of Big Striker, World Cup)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1993, bestleaw, bigstrik, bestleag, bestleag, bestleaw_state, empty_init, ROT0, "bootleg", "Best League (bootleg of Big Striker, World Cup)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )

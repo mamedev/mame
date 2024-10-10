@@ -32,6 +32,7 @@
 #include <algorithm>
 #include <cctype>
 #include <ctime>
+#include <sstream>
 
 
 namespace {
@@ -237,6 +238,19 @@ const struct
 	{ INPUT_STRING_None, "None" },
 };
 
+const char *const input_gm_notes_names[128] = {
+	"C-1", "C-1#", "D-1", "D-1#", "E-1", "F-1", "F-1#", "G-1", "G-1#", "A-1", "A-1#", "B-1",
+	"C0", "C0#", "D0", "D0#", "E0", "F0", "F0#", "G0", "G0#", "A0", "A0#", "B0",
+	"C1", "C1#", "D1", "D1#", "E1", "F1", "F1#", "G1", "G1#", "A1", "A1#", "B1",
+	"C2", "C2#", "D2", "D2#", "E2", "F2", "F2#", "G2", "G2#", "A2", "A2#", "B2",
+	"C3", "C3#", "D3", "D3#", "E3", "F3", "F3#", "G3", "G3#", "A3", "A3#", "B3",
+	"C4", "C4#", "D4", "D4#", "E4", "F4", "F4#", "G4", "G4#", "A4", "A4#", "B4",
+	"C5", "C5#", "D5", "D5#", "E5", "F5", "F5#", "G5", "G5#", "A5", "A5#", "B5",
+	"C6", "C6#", "D6", "D6#", "E6", "F6", "F6#", "G6", "G6#", "A6", "A6#", "B6",
+	"C7", "C7#", "D7", "D7#", "E7", "F7", "F7#", "G7", "G7#", "A7", "A7#", "B7",
+	"C8", "C8#", "D8", "D8#", "E8", "F8", "F8#", "G8", "G8#", "A8", "A8#", "B8",
+	"C9", "C9#", "D9", "D9#", "E9", "F9", "F9#", "G9"
+};
 
 inline bool input_seq_good(running_machine &machine, input_seq const &seq)
 {
@@ -407,15 +421,12 @@ u8 const inp_header::MAGIC[inp_header::OFFS_BASETIME - inp_header::OFFS_MAGIC] =
 //  to the current list
 //-------------------------------------------------
 
-void ioport_list::append(device_t &device, std::string &errorbuf)
+void ioport_list::append(device_t &device, std::ostream &errorbuf)
 {
 	// no constructor, no list
 	ioport_constructor constructor = device.input_ports();
-	if (constructor == nullptr)
+	if (!constructor)
 		return;
-
-	// reset error buffer
-	errorbuf.clear();
 
 	// detokenize into the list
 	(*constructor)(device, *this, errorbuf);
@@ -679,7 +690,7 @@ ioport_setting::ioport_setting(ioport_field &field, ioport_value _value, const c
 //  ioport_diplocation - constructor
 //-------------------------------------------------
 
-ioport_diplocation::ioport_diplocation(const char *name, u8 swnum, bool invert) :
+ioport_diplocation::ioport_diplocation(std::string_view name, u8 swnum, bool invert) :
 	m_name(name),
 	m_number(swnum),
 	m_invert(invert)
@@ -1346,7 +1357,7 @@ float ioport_field::crosshair_read() const
 //  descriptions
 //-------------------------------------------------
 
-void ioport_field::expand_diplocation(const char *location, std::string &errorbuf)
+void ioport_field::expand_diplocation(const char *location, std::ostream &errorbuf)
 {
 	// if nothing present, bail
 	if (!location)
@@ -1355,70 +1366,76 @@ void ioport_field::expand_diplocation(const char *location, std::string &errorbu
 	m_diploclist.clear();
 
 	// parse the string
-	std::string name; // Don't move this variable inside the loop, lastname's lifetime depends on it being outside
-	const char *lastname = nullptr;
+	std::string_view lastname;
 	const char *curentry = location;
 	int entries = 0;
-	while (*curentry != 0)
+	while (*curentry)
 	{
 		// find the end of this entry
 		const char *comma = strchr(curentry, ',');
-		if (comma == nullptr)
+		if (!comma)
 			comma = curentry + strlen(curentry);
 
 		// extract it to tempbuf
-		std::string tempstr(curentry, comma - curentry);
+		std::string_view tempstr(curentry, comma - curentry);
 
 		// first extract the switch name if present
-		const char *number = tempstr.c_str();
-		const char *colon = strchr(tempstr.c_str(), ':');
+		std::string_view::size_type number = 0;
+		std::string_view::size_type const colon = tempstr.find(':');
 
-		if (colon != nullptr)
+		std::string_view name;
+		if (colon != std::string_view::npos)
 		{
 			// allocate and copy the name if it is present
-			lastname = name.assign(number, colon - number).c_str();
+			lastname = tempstr.substr(0, colon);
 			number = colon + 1;
+			if (lastname.empty())
+			{
+				util::stream_format(errorbuf, "Switch location '%s' has empty switch name!\n", location);
+				lastname = "UNK";
+			}
+			name = lastname;
 		}
 		else
 		{
 			// otherwise, just copy the last name
-			if (lastname == nullptr)
+			if (lastname.empty())
 			{
-				errorbuf.append(string_format("Switch location '%s' missing switch name!\n", location));
-				lastname = (char *)"UNK";
+				util::stream_format(errorbuf, "Switch location '%s' missing switch name!\n", location);
+				lastname = "UNK";
 			}
-			name.assign(lastname);
+			name = lastname;
 		}
 
 		// if the number is preceded by a '!' it's active high
-		bool invert = false;
-		if (*number == '!')
-		{
-			invert = true;
-			number++;
-		}
+		bool const invert = tempstr[number] == '!';
+		if (invert)
+			++number;
 
 		// now scan the switch number
 		int swnum = -1;
-		if (sscanf(number, "%d", &swnum) != 1)
-			errorbuf.append(string_format("Switch location '%s' has invalid format!\n", location));
+		if (sscanf(&tempstr[number], "%d", &swnum) != 1)
+			util::stream_format(errorbuf, "Switch location '%s' has invalid format!\n", location);
+		else if (0 >= swnum)
+			util::stream_format(errorbuf, "Switch location '%s' has switch number that is not positive!\n", location);
 
 		// allocate a new entry
-		m_diploclist.emplace_back(name.c_str(), swnum, invert);
+		if (0 < swnum)
+			m_diploclist.emplace_back(name, swnum, invert);
 		entries++;
 
 		// advance to the next item
 		curentry = comma;
-		if (*curentry != 0)
+		if (*curentry)
 			curentry++;
 	}
 
 	// then verify the number of bits in the mask matches
 	int const bits = population_count_32(m_mask);
 	if (bits > entries)
-		errorbuf.append(string_format("Switch location '%s' does not describe enough bits for mask %X\n", location, m_mask));
+		util::stream_format(errorbuf, "Switch location '%s' does not describe enough bits for mask %X\n", location, m_mask);
 	else if (bits < entries)
-		errorbuf.append(string_format("Switch location '%s' describes too many bits for mask %X\n", location, m_mask));
+		util::stream_format(errorbuf, "Switch location '%s' describes too many bits for mask %X\n", location, m_mask);
 }
 
 
@@ -1625,7 +1642,7 @@ void ioport_port::frame_update()
 //  wholly overlapped by other fields
 //-------------------------------------------------
 
-void ioport_port::collapse_fields(std::string &errorbuf)
+void ioport_port::collapse_fields(std::ostream &errorbuf)
 {
 	ioport_value maskbits = 0;
 	int lastmodcount = -1;
@@ -1654,13 +1671,13 @@ void ioport_port::collapse_fields(std::string &errorbuf)
 //  for errors
 //-------------------------------------------------
 
-void ioport_port::insert_field(ioport_field &newfield, ioport_value &disallowedbits, std::string &errorbuf)
+void ioport_port::insert_field(ioport_field &newfield, ioport_value &disallowedbits, std::ostream &errorbuf)
 {
 	// verify against the disallowed bits, but only if we are condition-free
 	if (newfield.condition().none())
 	{
 		if ((newfield.mask() & disallowedbits) != 0)
-			errorbuf.append(string_format("INPUT_TOKEN_FIELD specifies duplicate port bits (port=%s mask=%X)\n", tag(), newfield.mask()));
+			util::stream_format(errorbuf, "INPUT_TOKEN_FIELD specifies duplicate port bits (port=%s mask=%X)\n", tag(), newfield.mask());
 		disallowedbits |= newfield.mask();
 	}
 
@@ -1799,12 +1816,17 @@ time_t ioport_manager::initialize()
 
 	// if we have a token list, proceed
 	device_enumerator iter(machine().root_device());
-	for (device_t &device : iter)
 	{
-		std::string errors;
-		m_portlist.append(device, errors);
-		if (!errors.empty())
-			osd_printf_error("Input port errors:\n%s", errors);
+		std::ostringstream errors;
+		for (device_t &device : iter)
+		{
+			m_portlist.append(device, errors);
+			if (errors.tellp())
+			{
+				osd_printf_error("Input port errors:\n%s", std::move(errors).str());
+				errors.str("");
+			}
+		}
 	}
 
 	// renumber player numbers for controller ports
@@ -3261,7 +3283,7 @@ void ioport_manager::record_port(ioport_port &port)
 //  ioport_configurer - constructor
 //-------------------------------------------------
 
-ioport_configurer::ioport_configurer(device_t &owner, ioport_list &portlist, std::string &errorbuf) :
+ioport_configurer::ioport_configurer(device_t &owner, ioport_list &portlist, std::ostream &errorbuf) :
 	m_owner(owner),
 	m_portlist(portlist),
 	m_errorbuf(errorbuf),
@@ -3271,6 +3293,17 @@ ioport_configurer::ioport_configurer(device_t &owner, ioport_list &portlist, std
 {
 }
 
+//-------------------------------------------------
+//  field_set_gm_note - set a ioport as a general
+//  midi-encoded note number.  Only sets the name
+//  for now
+//-------------------------------------------------
+
+ioport_configurer& ioport_configurer::field_set_gm_note(u8 note)
+{
+	field_set_name(input_gm_notes_names[note]);
+	return *this;
+}
 
 //-------------------------------------------------
 //  string_from_token - convert an

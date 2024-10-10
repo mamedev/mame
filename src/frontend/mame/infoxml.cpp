@@ -36,6 +36,7 @@
 #include <future>
 #include <locale>
 #include <queue>
+#include <sstream>
 #include <type_traits>
 #include <unordered_set>
 #include <utility>
@@ -696,17 +697,19 @@ void output_one(std::ostream &out, driver_enumerator &drivlist, const game_drive
 
 	// allocate input ports and build overall emulation status
 	ioport_list portlist;
-	std::string errors;
 	device_t::feature_type overall_unemulated(driver.type.unemulated_features());
 	device_t::feature_type overall_imperfect(driver.type.imperfect_features());
-	for (device_t &device : iter)
 	{
-		portlist.append(device, errors);
-		overall_unemulated |= device.type().unemulated_features();
-		overall_imperfect |= device.type().imperfect_features();
+		std::ostringstream errors;
+		for (device_t &device : iter)
+		{
+			portlist.append(device, errors);
+			overall_unemulated |= device.type().unemulated_features();
+			overall_imperfect |= device.type().imperfect_features();
 
-		if (devtypes && device.owner())
-			devtypes->insert(&device.type());
+			if (devtypes && device.owner())
+				devtypes->insert(&device.type());
+		}
 	}
 
 	// renumber player numbers for controller ports
@@ -815,24 +818,30 @@ void output_one_device(std::ostream &out, machine_config &config, device_t &devi
 
 	// generate input list and build overall emulation status
 	ioport_list portlist;
-	std::string errors;
 	device_t::feature_type overall_unemulated(device.type().unemulated_features());
 	device_t::feature_type overall_imperfect(device.type().imperfect_features());
-	for (device_t &dev : device_enumerator(device))
 	{
-		portlist.append(dev, errors);
-		overall_unemulated |= dev.type().unemulated_features();
-		overall_imperfect |= dev.type().imperfect_features();
+		std::ostringstream errors;
+		for (device_t &dev : device_enumerator(device))
+		{
+			portlist.append(dev, errors);
+			overall_unemulated |= dev.type().unemulated_features();
+			overall_imperfect |= dev.type().imperfect_features();
+		}
 	}
 
 	// check if the device adds player inputs (other than dsw and configs) to the system
 	for (auto &port : portlist)
+	{
 		for (ioport_field const &field : port.second->fields())
+		{
 			if (field.type() >= IPT_START1 && field.type() < IPT_UI_FIRST)
 			{
 				has_input = true;
 				break;
 			}
+		}
+	}
 
 	// start to output info
 	util::stream_format(out, "\t<%s name=\"%s\"", XML_TOP, normalize_string(device.shortname()));

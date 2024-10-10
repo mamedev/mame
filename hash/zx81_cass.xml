@@ -215,6 +215,19 @@ RAND USR 16530
 		</part>
 	</software>
 
+	<software name="3d3d" supported="no">
+		<description>3D 3D!</description>
+		<year>1981</year>
+		<publisher>dK'Tronics</publisher>
+		<info name="language" value="English" />
+		<info name="usage" value="16K" />
+		<part name="cass1" interface="zx81_cass">
+			<dataarea name="cass" size="12366">
+				<rom name="3D-3D.p" size="12366" crc="572b34bb" sha1="738ad81449bfa32fd05bc0da3a7035f7c9a9728d"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="52kfampak">
 		<description>5-2K Family Pak</description>
 		<year>198?</year>
@@ -584,6 +597,19 @@ RAND USR 16530
 		</part>
 	</software>
 
+	<software name="argolath">
+		<description>Argolath</description>
+		<year>1984</year>
+		<publisher>Loriciels</publisher>
+		<info name="language" value="French" />
+		<info name="usage" value="16K" />
+		<part name="cass1" interface="zx81_cass">
+			<dataarea name="cass" size="15927">
+				<rom name="Argolath.tzx" size="15927" crc="27e2182c" sha1="5911ea1030c19e0d1fba8706b502df335cd711e6"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="arithun8">
 		<description>Arithmetic for the Under 8's</description>
 		<year>1982</year>
@@ -722,6 +748,19 @@ RAND USR 16530
 		<part name="cass1" interface="zx81_cass">
 			<dataarea name="cass" size="6798">
 				<rom name="BankRobber.tzx" size="6798" crc="f9a7ab7d" sha1="40d0fcc8faaf73b0082d4f1937ef16626d289f66"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="barbilla">
+		<description>Bar Billards</description>
+		<year>1983</year>
+		<publisher>Meow Micros</publisher>
+		<info name="language" value="English" />
+		<info name="usage" value="16K" />
+		<part name="cass1" interface="zx81_cass">
+			<dataarea name="cass" size="7435">
+				<rom name="BarBilliards.tzx" size="7435" crc="f345216d" sha1="dc1d8a22a6231aac73555c8b8edb246d469aa8a7"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1084,6 +1123,32 @@ RAND USR 16530
 		</part>
 	</software>
 
+	<software name="budgetfa">
+		<description>Budget Familial</description>
+		<year>1984</year>
+		<publisher>ERE Informatique</publisher>
+		<info name="language" value="French" />
+		<info name="usage" value="16K" />
+		<part name="cass1" interface="zx81_cass">
+			<dataarea name="cass" size="16305">
+				<rom name="BudgetFamilial.tzx" size="16305" crc="b18f734a" sha1="61e4c35c8fa43283e142f84188a2fee27b844492"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="budgetfa_a" cloneof="budgetfa">
+		<description>Budget Familial (alt)</description>
+		<year>1984</year>
+		<publisher>ERE Informatique</publisher>
+		<info name="language" value="French" />
+		<info name="usage" value="16K" />
+		<part name="cass1" interface="zx81_cass">
+			<dataarea name="cass" size="13053">
+				<rom name="BudgetFamilial_2.tzx" size="13053" crc="652027b5" sha1="c0becf556c865df27215bd87a4804b7cec5dc37d"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="budgeter">
 		<description>The Budgeter</description>
 		<year>1982</year>
@@ -1301,6 +1366,26 @@ RAND USR 16530
 			<feature name="part_id" value="Side B"/>
 			<dataarea name="cass" size="42598">
 				<rom name="Cassette50.B.tzx" size="42598" crc="a1ce7f38" sha1="79acd22c7bae0dd030521ba64b183c1eb4444fd0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="casspend">
+		<description>Casse-briques + Pendu</description>
+		<year>1984</year>
+		<publisher>ERE Informatique</publisher>
+		<info name="language" value="French" />
+		<info name="usage" value="16K" />
+		<part name="cass1" interface="zx81_cass">
+			<feature name="part_id" value="A - LOAD &quot;BRIQUES&quot; - LOAD &quot;BRIQUES-C&quot;"/>
+			<dataarea name="cass" size="7487">
+				<rom name="Casse-briques - Pendu - Side 1.tzx" size="7487" crc="6a53082f" sha1="2faa0bd7c4d8bc5f54755bd4d3c358d694ec50a5"/>
+			</dataarea>
+		</part>
+		<part name="cass2" interface="zx81_cass">
+			<feature name="part_id" value="B -  LOAD &quot;PENDU&quot;"/>
+			<dataarea name="cass" size="12780">
+				<rom name="Casse-briques - Pendu - Side 2.tzx" size="12780" crc="b94c7e1d" sha1="f8f20bd0d9048298e0f4bcf67fa94b54b6d94a3e"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1548,6 +1633,26 @@ RAND USR 16530
 			<feature name="part_id" value="Business Relationships"/>
 			<dataarea name="cass" size="10812">
 				<rom name="ChineseAstrology.B.BusinessRelationships.tzx" size="10812" crc="a08a524e" sha1="2b833b77f200fd6a721650c700addf20823facda"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="chiroman">
+		<description>Chiromancie</description>
+		<year>1983</year>
+		<publisher>ERE Informatique</publisher>
+		<info name="language" value="French" />
+		<info name="usage" value="16K" />
+		<part name="cass1" interface="zx81_cass">
+			<feature name="part_id" value="A - Chiromesure"/>
+			<dataarea name="cass" size="4623">
+				<rom name="Chiromancie.p" size="4623" crc="a81a7f08" sha1="4dd5ca5fff0cfa989c25e8bfdea6475af9e300a4"/>
+			</dataarea>
+		</part>
+		<part name="cass2" interface="zx81_cass">
+			<feature name="part_id" value="B - Chirologie"/>
+			<dataarea name="cass" size="15964">
+				<rom name="Chiromancie_2.p" size="15964" crc="3101eedc" sha1="25eb66fa027fbab2e31126206eae1b5b77665f10"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2454,34 +2559,12 @@ RAND USR 16530
 		</part>
 	</software>
 
+	<!-- Also distributed by Timex in the US market -->
 	<software name="flsimul">
 		<description>Flight Simulation</description>
 		<year>1982</year>
 		<publisher>Sinclair Research</publisher>
-		<info name="usage" value="16K" />
-		<part name="cass1" interface="zx81_cass">
-			<dataarea name="cass" size="13855">
-				<rom name="FlightSimulation.tzx" size="13855" crc="945da3c1" sha1="de020d7531c0904a8a152193e7b3d5203e5c1017"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="flsimultx" cloneof="flsimul">
-		<description>The Flight Simulator (Timex)</description>
-		<year>1982</year>
-		<publisher>Timex</publisher>
-		<info name="usage" value="16K" />
-		<part name="cass1" interface="zx81_cass">
-			<dataarea name="cass" size="13855">
-				<rom name="FlightSimulation.tzx" size="13855" crc="945da3c1" sha1="de020d7531c0904a8a152193e7b3d5203e5c1017"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="flugsim" cloneof="flsimul">
-		<description>Flug-Simulation</description>
-		<year>1982</year>
-		<publisher>Sinclair Research</publisher>
+		<info name="alt_title" value="Flug-Simulation" />
 		<info name="usage" value="16K" />
 		<part name="cass1" interface="zx81_cass">
 			<dataarea name="cass" size="13855">
@@ -4030,6 +4113,38 @@ RAND USR 16530
 		</part>
 	</software>
 
+	<software name="jogos3">
+		<description>Jogos 3</description>
+		<year>1982</year>
+		<publisher>LOG</publisher>
+		<info name="language" value="Portuguese" />
+		<info name="usage" value="48K" />
+		<part name="cass1" interface="zx81_cass">
+			<feature name="part_id" value="Bowling"/>
+			<dataarea name="cass" size="7408">
+				<rom name="Bowling.p" size="7408" crc="d66bcb62" sha1="3163d05c05bc9ad1b8258e836aa1d73a88518428"/>
+			</dataarea>
+		</part>
+		<part name="cass2" interface="zx81_cass">
+			<feature name="part_id" value="Samurai"/>
+			<dataarea name="cass" size="3254">
+				<rom name="Samurai.p" size="3254" crc="67c994ad" sha1="7694507c410109369b0bae871f0244bbcf70abab"/>
+			</dataarea>
+		</part>
+		<part name="cass3" interface="zx81_cass">
+			<feature name="part_id" value="Puzzle"/>
+			<dataarea name="cass" size="5213">
+				<rom name="Puzzle.p" size="5213" crc="c99117eb" sha1="ac5be3076b3eb73a1dcc33bfd69d9b66865ab653"/>
+			</dataarea>
+		</part>
+		<part name="cass4" interface="zx81_cass">
+			<feature name="part_id" value="Torres"/>
+			<dataarea name="cass" size="6064">
+				<rom name="Torres.p" size="6064" crc="2598fd22" sha1="4b810ffe306ccbb95d52b386cfb6335543dd4f91"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="junglmath">
 		<description>Jungle Maths</description>
 		<year>1982</year>
@@ -5346,6 +5461,24 @@ RAND USR 16530
 		</part>
 	</software>
 
+	<software name="panique">
+		<description>Panique</description>
+		<year>1983</year>
+		<publisher>ERE Informatique</publisher>
+		<info name="language" value="French" />
+		<info name="usage" value="16K" />
+		<part name="cass1" interface="zx81_cass">
+			<dataarea name="cass" size="10442">
+				<rom name="Panique - Side 1.tzx" size="10442" crc="d35b9d2d" sha1="7c0c96249c38ebd2174849846f0dbe8c637a065d"/>
+			</dataarea>
+		</part>
+		<part name="cass2" interface="zx81_cass">
+			<dataarea name="cass" size="9951">
+				<rom name="Panique - Side 2.tzx" size="9951" crc="22e7c98f" sha1="5303ef13479064390f45d63478161f48c6dc94ad"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="partygms">
 		<description>Party Games</description>
 		<year>1982</year>
@@ -6121,6 +6254,19 @@ RAND USR 16530
 		<part name="cass1" interface="zx81_cass">
 			<dataarea name="cass" size="14952">
 				<rom name="Reversi(Artic).tzx" size="14952" crc="d5796e37" sha1="516f08ceefe2997e183e6f47e774fda4b81d7be3"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rigel">
+		<description>Rigel</description>
+		<year>1984</year>
+		<publisher>ERE Informatique</publisher>
+		<info name="language" value="French" />
+		<info name="usage" value="16K" />
+		<part name="cass1" interface="zx81_cass">
+			<dataarea name="cass" size="15820">
+				<rom name="Rigel.p" size="15820" crc="033b8038" sha1="edc2f6a8e680df5bfe9e6b49209554323ff3a482"/>
 			</dataarea>
 		</part>
 	</software>
@@ -8881,15 +9027,295 @@ RAND USR 16530
 
 <!-- Homebrews -->
 
+	<software name="antattac">
+		<description>Ant Attack</description>
+		<year>2013</year>
+		<publisher>Bob's Stuff</publisher>
+		<info name="language" value="English" />
+		<info name="usage" value="16K" />
+		<part name="cass1" interface="zx81_cass">
+			<dataarea name="cass" size="16167">
+				<rom name="AntAttack.p" size="16167" crc="2e30a8cf" sha1="1b4fc9eb5cd3373a9986fcd395d0117c6b3c4718"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="avalanch">
+		<description>Avalanche</description>
+		<year>2011</year>
+		<publisher>Revival Studios</publisher>
+		<info name="developer" value="Martijn Wenting" />
+		<info name="language" value="English" />
+		<info name="usage" value="16K" />
+		<part name="cass1" interface="zx81_cass">
+			<dataarea name="cass" size="15433">
+				<rom name="Avalanche (2011) - Full Version.p" size="15433" crc="2702a73c" sha1="aed759d4dbcadf89bd24769a5e1c2e3d19074bad"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="boulderl">
+		<description>Boulder Logic</description>
+		<year>2011</year>
+		<publisher>Bob's Stuff</publisher>
+		<info name="language" value="English" />
+		<info name="usage" value="16K" />
+		<part name="cass1" interface="zx81_cass">
+			<dataarea name="cass" size="16240">
+				<rom name="BoulderL.p" size="16240" crc="23cc342f" sha1="3c74569ef70327ecf17db982ef92b4557c17b538"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="biggoil">
+		<description>Bigg Oil</description>
+		<year>2018</year>
+		<publisher>Charlie Robson</publisher>
+		<info name="developer" value="Charlie Robson" />
+		<info name="language" value="English" />
+		<info name="usage" value="16K" />
+		<part name="cass1" interface="zx81_cass">
+			<dataarea name="cass" size="15563">
+				<rom name="BiggOil.p" size="15563" crc="faf5d317" sha1="8e0aa5ff930b678b0cf2be34c3da9cffd0bf1304"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="crozxyrd">
+		<description>Crozxy Road</description>
+		<year>2015</year>
+		<publisher>Bob's Stuff</publisher>
+		<info name="language" value="English" />
+		<info name="usage" value="16K" />
+		<part name="cass1" interface="zx81_cass">
+			<dataarea name="cass" size="16058">
+				<rom name="CrozxyRoad.p" size="16058" crc="38885a68" sha1="98ef4e7a24f87c9d253da0dc68698850dcd2752f"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="domin8tr">
+		<description>Domin8tr1s</description>
+		<year>2010</year>
+		<publisher>Bob's Stuff</publisher>
+		<info name="language" value="English" />
+		<info name="usage" value="16K" />
+		<part name="cass1" interface="zx81_cass">
+			<dataarea name="cass" size="6581">
+				<rom name="Domin8tr1s.p" size="6581" crc="96911e31" sha1="8e8ee9c4fc589f386596ef3b3e8fab9b9ee799ef"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="down">
+		<description>Down!</description>
+		<year>2012</year>
+		<publisher>Revival Studios</publisher>
+		<info name="developer" value="Martijn Wenting" />
+		<info name="language" value="English" />
+		<info name="usage" value="16K" />
+		<part name="cass1" interface="zx81_cass">
+			<dataarea name="cass" size="16189">
+				<rom name="Down (2012) - Full Version.p" size="16189" crc="11b509f9" sha1="e048c10af990ff2ef9086962b89801911e1e8106"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="impact">
+		<description>Impact</description>
+		<year>2012</year>
+		<publisher>Bob's Stuff</publisher>
+		<info name="language" value="English" />
+		<info name="usage" value="16K" />
+		<part name="cass1" interface="zx81_cass">
+			<dataarea name="cass" size="16154">
+				<rom name="Impact.p" size="16154" crc="d6e106b8" sha1="11c5fe8d44763d94a3eedf597b6daf0438364e22"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mayhem">
+		<description>Mayhem</description>
+		<year>2011</year>
+		<publisher>Revival Studios</publisher>
+		<info name="developer" value="Martijn Wenting" />
+		<info name="language" value="English" />
+		<info name="usage" value="16K" />
+		<part name="cass1" interface="zx81_cass">
+			<dataarea name="cass" size="15580">
+				<rom name="Mayhem (2011) - Full Version.p" size="15580" crc="df06cb6d" sha1="ba54287b132a40b02e14b1a5bac085588410edb6"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="minerman">
+		<description>Miner Man</description>
+		<year>2011</year>
+		<publisher>Bob's Stuff</publisher>
+		<info name="language" value="English" />
+		<info name="usage" value="16K" />
+		<part name="cass1" interface="zx81_cass">
+			<dataarea name="cass" size="17282">
+				<rom name="MinerMan.tzx" size="17282" crc="e9e151c5" sha1="73b76ddcda52cc081b18e40c6186d90dd847cf60"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="noirshap">
+		<description>Noir Shapes</description>
+		<year>2012</year>
+		<publisher>Bob's Stuff</publisher>
+		<info name="language" value="English" />
+		<info name="usage" value="16K" />
+		<part name="cass1" interface="zx81_cass">
+			<dataarea name="cass" size="16414">
+				<rom name="NoirShapes.tzx" size="16414" crc="d2cd1aad" sha1="32be2ea837e8618898312ec58526d4e9c30e542c"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="oneghost">
+		<description>One Little Ghost</description>
+		<year>2012</year>
+		<publisher>Bob's Stuff</publisher>
+		<info name="language" value="English" />
+		<info name="usage" value="16K" />
+		<part name="cass1" interface="zx81_cass">
+			<dataarea name="cass" size="15884">
+				<rom name="OneLG.p" size="15884" crc="c6b562c2" sha1="7bd65421239915dad4137206c0c7572f31c6ac5a"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pandemic">
+		<description>Pandemic</description>
+		<year>2014</year>
+		<publisher>Bob's Stuff</publisher>
+		<info name="language" value="English" />
+		<info name="usage" value="16K" />
+		<part name="cass1" interface="zx81_cass">
+			<dataarea name="cass" size="15934">
+				<rom name="Pandemic.p" size="15934" crc="273220fa" sha1="28afa426e660186a1c1c56d74251b604e25bb2a1"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="quack">
+		<description>Quack!</description>
+		<year>2014</year>
+		<publisher>Bob's Stuff</publisher>
+		<info name="language" value="English" />
+		<info name="usage" value="16K" />
+		<part name="cass1" interface="zx81_cass">
+			<dataarea name="cass" size="8383">
+				<rom name="quack.p" size="8383" crc="01e8d775" sha1="d7e40348cc9181d2033c63e17e8fe07589e90c64"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rebound">
+		<description>Rebound</description>
+		<year>2014</year>
+		<publisher>Bob's Stuff</publisher>
+		<info name="language" value="English" />
+		<info name="usage" value="16K" />
+		<part name="cass1" interface="zx81_cass">
+			<dataarea name="cass" size="13897">
+				<rom name="Rebound.p" size="13897" crc="00721ae3" sha1="6abc2d4de5bb40aac8f3703e5c33a9ce3a31be75"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="shrooms">
+		<description>Shrooms</description>
+		<year>2021</year>
+		<publisher>Bob's Stuff</publisher>
+		<info name="language" value="English" />
+		<info name="usage" value="16K" />
+		<info name="version" value="v1.02" />
+		<part name="cass1" interface="zx81_cass">
+			<dataarea name="cass" size="11717">
+				<rom name="Shrooms.p" size="11717" crc="c97ebb83" sha1="34534b51909ae9c45aaf691ad3c57f9f9d10e9fe"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="stairrun">
+		<description>Stairrunner</description>
+		<year>2012</year>
+		<publisher>Revival Studios</publisher>
+		<info name="developer" value="Martijn Wenting" />
+		<info name="language" value="English" />
+		<info name="usage" value="16K" />
+		<part name="cass1" interface="zx81_cass">
+			<dataarea name="cass" size="16080">
+				<rom name="Stairrunner (2012) - Full Version.p" size="16080" crc="f4edfff5" sha1="bf8a7636d20017c83e7caf8b6a819f0cef7392f3"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="steps">
+		<description>Steps</description>
+		<year>2021</year>
+		<publisher>Bob's Stuff</publisher>
+		<info name="language" value="English" />
+		<info name="usage" value="16K" />
+		<part name="cass1" interface="zx81_cass">
+			<dataarea name="cass" size="11196">
+				<rom name="Steps.p" size="11196" crc="6570ef01" sha1="d94e8be7f6ea500ca052421c03b9b5aee9f984e6"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="tuttut">
 		<description>Tut-Tut</description>
 		<year>2019</year>
 		<publisher>ZX81 Keyboard Adventure</publisher>
 		<info name="developer" value="David A. Stephenson" />
+		<info name="language" value="English" />
 		<info name="usage" value="16K" />
 		<part name="cass1" interface="zx81_cass">
 			<dataarea name="cass" size="15746">
 				<rom name="tut-tut.p" size="15746" crc="3af8b76f" sha1="228b11560f2937d7dfed0edc4b120fada36335f8"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ubend">
+		<description>U-Bend</description>
+		<year>2015</year>
+		<publisher>Bob's Stuff</publisher>
+		<info name="language" value="English" />
+		<info name="usage" value="16K" />
+		<part name="cass1" interface="zx81_cass">
+			<dataarea name="cass" size="14905">
+				<rom name="UBend.p" size="14905" crc="c537e261" sha1="17c49e4ac9179ed0d08c18c671f3db5343bad3cc"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="virus">
+		<description>Virus</description>
+		<year>2010</year>
+		<publisher>Bob's Stuff</publisher>
+		<info name="language" value="English" />
+		<info name="usage" value="16K" />
+		<part name="cass1" interface="zx81_cass">
+			<dataarea name="cass" size="17579">
+				<rom name="Virus.tzx" size="17579" crc="f3d316c2" sha1="7be46275f1048dc26216f9ded649e2c2f88083d3"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="zxagon">
+		<description>ZXagon</description>
+		<year>2014</year>
+		<publisher>Bob's Stuff</publisher>
+		<info name="language" value="English" />
+		<info name="usage" value="16K" />
+		<part name="cass1" interface="zx81_cass">
+			<dataarea name="cass" size="15336">
+				<rom name="ZXagon.p" size="15336" crc="d6784677" sha1="59dae098079f00c3e72ec4647ccbd2ed99b979f1"/>
 			</dataarea>
 		</part>
 	</software>
