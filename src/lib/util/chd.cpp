@@ -135,7 +135,7 @@ struct chd_file::metadata_hash
 //  stream in bigendian order
 //-------------------------------------------------
 
-inline util::sha1_t chd_file::be_read_sha1(const uint8_t *base)const
+inline util::sha1_t chd_file::be_read_sha1(const uint8_t *base) const noexcept
 {
 	util::sha1_t result;
 	memcpy(&result.m_raw[0], base, sizeof(result.m_raw));
@@ -148,7 +148,7 @@ inline util::sha1_t chd_file::be_read_sha1(const uint8_t *base)const
 //  stream in bigendian order
 //-------------------------------------------------
 
-inline void chd_file::be_write_sha1(uint8_t *base, util::sha1_t value)
+inline void chd_file::be_write_sha1(uint8_t *base, util::sha1_t value) noexcept
 {
 	memcpy(base, &value.m_raw[0], sizeof(value.m_raw));
 }
@@ -339,7 +339,7 @@ bool chd_file::parent_missing() const noexcept
  * @return  A sha1_t.
  */
 
-util::sha1_t chd_file::sha1()
+util::sha1_t chd_file::sha1() const noexcept
 {
 	try
 	{
@@ -350,7 +350,7 @@ util::sha1_t chd_file::sha1()
 	}
 	catch (std::error_condition const &)
 	{
-		// on failure, return nullptr
+		// on failure, return null
 		return util::sha1_t::null;
 	}
 }
@@ -368,7 +368,7 @@ util::sha1_t chd_file::sha1()
  * @return  A sha1_t.
  */
 
-util::sha1_t chd_file::raw_sha1()
+util::sha1_t chd_file::raw_sha1() const noexcept
 {
 	try
 	{
@@ -383,7 +383,7 @@ util::sha1_t chd_file::raw_sha1()
 	}
 	catch (std::error_condition const &)
 	{
-		// on failure, return nullptr
+		// on failure, return null
 		return util::sha1_t::null;
 	}
 }
@@ -401,7 +401,7 @@ util::sha1_t chd_file::raw_sha1()
  * @return  A sha1_t.
  */
 
-util::sha1_t chd_file::parent_sha1()
+util::sha1_t chd_file::parent_sha1() const noexcept
 {
 	try
 	{
@@ -542,20 +542,34 @@ std::error_condition chd_file::hunk_info(uint32_t hunknum, chd_codec_type &compr
  * @param   rawdata The rawdata.
  */
 
-void chd_file::set_raw_sha1(util::sha1_t rawdata)
+std::error_condition chd_file::set_raw_sha1(util::sha1_t rawdata) noexcept
 {
+	uint64_t const offset = (m_rawsha1_offset != 0) ? m_rawsha1_offset : m_sha1_offset;
+	assert(offset != 0);
+
 	// create a big-endian version
 	uint8_t rawbuf[sizeof(util::sha1_t)];
 	be_write_sha1(rawbuf, rawdata);
 
-	// write to the header
-	uint64_t offset = (m_rawsha1_offset != 0) ? m_rawsha1_offset : m_sha1_offset;
-	assert(offset != 0);
-	file_write(offset, rawbuf, sizeof(rawbuf));
+	try
+	{
+		// write to the header
+		file_write(offset, rawbuf, sizeof(rawbuf));
 
-	// if we have a separate rawsha1_offset, update the full sha1 as well
-	if (m_rawsha1_offset != 0)
-		metadata_update_hash();
+		// if we have a separate rawsha1_offset, update the full sha1 as well
+		if (m_rawsha1_offset != 0)
+			metadata_update_hash();
+	}
+	catch (std::error_condition const &err)
+	{
+		return err;
+	}
+	catch (std::bad_alloc const &)
+	{
+		return std::errc::not_enough_memory;
+	}
+
+	return std::error_condition();
 }
 
 /**
@@ -570,19 +584,23 @@ void chd_file::set_raw_sha1(util::sha1_t rawdata)
  * @param   parent  The parent.
  */
 
-void chd_file::set_parent_sha1(util::sha1_t parent)
+std::error_condition chd_file::set_parent_sha1(util::sha1_t parent) noexcept
 {
 	// if no file, fail
 	if (!m_file)
-		throw std::error_condition(error::INVALID_FILE);
+		return std::error_condition(error::INVALID_FILE);
+
+	assert(m_parentsha1_offset != 0);
 
 	// create a big-endian version
 	uint8_t rawbuf[sizeof(util::sha1_t)];
 	be_write_sha1(rawbuf, parent);
 
 	// write to the header
-	assert(m_parentsha1_offset != 0);
-	file_write(m_parentsha1_offset, rawbuf, sizeof(rawbuf));
+	try { file_write(m_parentsha1_offset, rawbuf, sizeof(rawbuf)); }
+	catch (std::error_condition const &err) { return err; }
+
+	return std::error_condition();
 }
 
 /**
@@ -969,9 +987,9 @@ std::error_condition chd_file::read_hunk(uint32_t hunknum, void *buffer)
 					if (blockoffs != 0)
 						file_read(blockoffs, dest, m_hunkbytes);
 					else if (m_parent_missing)
-						throw std::error_condition(error::REQUIRES_PARENT);
+						return std::error_condition(error::REQUIRES_PARENT);
 					else if (m_parent)
-						m_parent->read_hunk(hunknum, dest);
+						return m_parent->read_hunk(hunknum, dest);
 					else
 						memset(dest, 0, m_hunkbytes);
 					return std::error_condition();
@@ -2608,7 +2626,7 @@ void chd_file::hunk_copy_from_self(uint32_t hunknum, uint32_t otherhunk)
 
 	// only permitted to reference prior hunks
 	if (otherhunk >= hunknum)
-		throw std::error_condition(std::errc::invalid_argument);
+		throw std::error_condition(error::HUNK_OUT_OF_RANGE);
 
 	// update the map entry
 	uint8_t *rawmap = &m_rawmap[hunknum * 12];
@@ -3009,7 +3027,9 @@ std::error_condition chd_file_compressor::compress_continue(double &progress, do
 				osd_work_queue_wait(m_read_queue, 30 * osd_ticks_per_second());
 				if (!compressed())
 					return std::error_condition();
-				set_raw_sha1(m_compsha1.finish());
+				std::error_condition err = set_raw_sha1(m_compsha1.finish());
+				if (err)
+					return err;
 				return compress_v5_map();
 			}
 		}
@@ -3166,23 +3186,26 @@ void chd_file_compressor::async_read()
 	{
 		// do the read
 		uint8_t *dest = &m_work_buffer[0] + (m_read_done_offset % work_buffer_bytes);
-		assert(dest == &m_work_buffer[0] || dest == &m_work_buffer[work_buffer_bytes/2]);
+		assert(dest == &m_work_buffer[0] || dest == &m_work_buffer[work_buffer_bytes / 2]);
 		uint64_t end_offset = m_read_done_offset + numbytes;
 
-		// if walking the parent, read in hunks from the parent CHD
 		if (m_walking_parent)
 		{
+			// if walking the parent, read in hunks from the parent CHD
 			uint8_t *curdest = dest;
 			for (uint64_t curoffs = m_read_done_offset; curoffs < end_offset + 1; curoffs += hunk_bytes())
 			{
-				m_parent->read_hunk(curoffs / hunk_bytes(), curdest);
+				std::error_condition err = m_parent->read_hunk(curoffs / hunk_bytes(), curdest);
+				if (err)
+					throw err;
 				curdest += hunk_bytes();
 			}
 		}
-
-		// otherwise, call the virtual function
 		else
+		{
+			// otherwise, call the virtual function
 			read_data(dest, m_read_done_offset, numbytes);
+		}
 
 		// spawn off work for each hunk
 		for (uint64_t curoffs = m_read_done_offset; curoffs < end_offset; curoffs += hunk_bytes())

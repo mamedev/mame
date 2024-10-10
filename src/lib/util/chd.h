@@ -309,18 +309,18 @@ public:
 	uint32_t hunk_count() const noexcept { return m_hunkcount; }
 	uint32_t unit_bytes() const noexcept { return m_unitbytes; }
 	uint64_t unit_count() const noexcept { return m_unitcount; }
-	bool compressed() const { return (m_compression[0] != CHD_CODEC_NONE); }
+	bool compressed() const noexcept { return (m_compression[0] != CHD_CODEC_NONE); }
 	chd_codec_type compression(int index) const noexcept { return m_compression[index]; }
 	chd_file *parent() const noexcept { return m_parent.get(); }
 	bool parent_missing() const noexcept;
-	util::sha1_t sha1();
-	util::sha1_t raw_sha1();
-	util::sha1_t parent_sha1();
+	util::sha1_t sha1() const noexcept;
+	util::sha1_t raw_sha1() const noexcept;
+	util::sha1_t parent_sha1() const noexcept;
 	std::error_condition hunk_info(uint32_t hunknum, chd_codec_type &compressor, uint32_t &compbytes);
 
 	// setters
-	void set_raw_sha1(util::sha1_t rawdata);
-	void set_parent_sha1(util::sha1_t parent);
+	std::error_condition set_raw_sha1(util::sha1_t rawdata) noexcept;
+	std::error_condition set_parent_sha1(util::sha1_t parent) noexcept;
 
 	// file create
 	std::error_condition create(std::string_view filename, uint64_t logicalbytes, uint32_t hunkbytes, uint32_t unitbytes, const chd_codec_type (&compression)[4]);
@@ -372,8 +372,8 @@ private:
 	struct metadata_hash;
 
 	// inline helpers
-	util::sha1_t be_read_sha1(const uint8_t *base) const;
-	void be_write_sha1(uint8_t *base, util::sha1_t value);
+	util::sha1_t be_read_sha1(const uint8_t *base) const noexcept;
+	void be_write_sha1(uint8_t *base, util::sha1_t value) noexcept;
 	void file_read(uint64_t offset, void *dest, uint32_t length) const;
 	void file_write(uint64_t offset, const void *source, uint32_t length);
 	uint64_t file_append(const void *source, uint32_t length, uint32_t alignment = 0);

@@ -104,8 +104,8 @@ public:
 	static chd_decompressor::ptr new_decompressor(chd_codec_type type, chd_file &file);
 
 	// utilities
-	static bool codec_exists(chd_codec_type type);
-	static const char *codec_name(chd_codec_type type);
+	static bool codec_exists(chd_codec_type type) noexcept;
+	static const char *codec_name(chd_codec_type type) noexcept;
 };
 
 
