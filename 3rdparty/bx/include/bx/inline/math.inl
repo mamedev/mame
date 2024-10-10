@@ -896,7 +896,7 @@ namespace bx
 
 	inline BX_CONST_FUNC Vec3 normalize(const Vec3 _a)
 	{
-		const float invLen = 1.0f/length(_a);
+		const float invLen = rcpSafe(length(_a) );
 		const Vec3 result = mul(_a, invLen);
 		return result;
 	}
@@ -957,14 +957,14 @@ namespace bx
 
 		if (abs(nx) > abs(nz) )
 		{
-			float invLen = 1.0f / sqrt(nx*nx + nz*nz);
+			const float invLen = rcpSafe(sqrt(nx*nx + nz*nz) );
 			_outT.x = -nz * invLen;
 			_outT.y =  0.0f;
 			_outT.z =  nx * invLen;
 		}
 		else
 		{
-			float invLen = 1.0f / sqrt(ny*ny + nz*nz);
+			const float invLen = rcpSafe(sqrt(ny*ny + nz*nz) );
 			_outT.x =  0.0f;
 			_outT.y =  nz * invLen;
 			_outT.z = -ny * invLen;
@@ -1264,7 +1264,7 @@ namespace bx
 			return;
 		}
 
-		const float invSa = 1.0f/sa;
+		const float invSa = rcpSafe(sa);
 
 		_outAxis = { _a.x * invSa, _a.y * invSa, _a.z * invSa };
 	}

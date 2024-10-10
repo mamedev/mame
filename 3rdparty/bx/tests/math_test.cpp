@@ -670,6 +670,8 @@ void mtxCheck(const float* _a, const float* _b)
 
 TEST_CASE("vec3", "[math][vec3]")
 {
+	REQUIRE(bx::isEqual({0.0f, 0.0f, 0.0f}, bx::normalize({0.0f, 0.0f, 0.0f}), 0.0f) );
+
 	bx::Vec3 normalized = bx::normalize({0.0f, 1.0f, 0.0f});
 	REQUIRE(bx::isEqual(normalized, {0.0f, 1.0f, 0.0f}, 0.0f) );
 

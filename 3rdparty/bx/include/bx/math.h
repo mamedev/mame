@@ -355,7 +355,7 @@ namespace bx
 	///
 	BX_CONSTEXPR_FUNC float rcp(float _a);
 
-	/// Returns reciprocal of _a.
+	/// Returns reciprocal of _a. Avoids divide by zero.
 	///
 	BX_CONSTEXPR_FUNC float rcpSafe(float _a);
 
