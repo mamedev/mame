@@ -158,7 +158,7 @@ Notes:
      PAL1      - ICT PEEL18CV8 (DIP20, stamped 'SXX005-5')
      PAL2      - ICT PEEL18CV8 (DIP20, stamped 'SXX011B')
      PAL3      - Lattice GAL16V8D (DIP20)
-                   - Stamped 'MCTL01' on Revision 1 PCB
+                   - Stamped 'MCTL01' on Revision 1 PCB (undumped as of 2024)
                    - no Seibu markings on Revision 2 PCB
      PAL4      - Advanced Micro Devices PALCE20V8H (no Seibu markings, DIP24)
                    - Replaced with ICT PEEL18CV8 (DIP20, stamped 'SXX010B') on Revision 1 PCB
