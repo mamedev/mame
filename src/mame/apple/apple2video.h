@@ -71,6 +71,9 @@ public:
 
 	uint32_t screen_update_GS(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
+	void set_iie_langsw(u8 iie_langsw) { m_iie_langsw = iie_langsw; }
+	u8 get_iie_langsw() const { return m_iie_langsw; }
+
 protected:
 	a2_video_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
 
@@ -121,6 +124,7 @@ private:
 	bool m_80store = false;
 	bool m_monohgr = false;
 	u8 m_GSfg = 0, m_GSbg = 0, m_GSborder = 0, m_newvideo = 0, m_monochrome = 0, m_rgbmode = 0;
+	u8 m_iie_langsw = 0; // language switch/modification on IIe/IIc/IIc+ and clones
 	optional_ioport m_vidconfig;
 };
 

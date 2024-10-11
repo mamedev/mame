@@ -811,9 +811,17 @@ dodo                            // GTAC Do-Do
 
 @source:apple/apple2e.cpp
 apple2c                         // Apr 1984 Apple //c
+apple2cuk                       // Apr 1984 Apple //c (UK)
+apple2cfr                       // Apr 1984 Apple //c (France)
 apple2c0                        // ??? 1985 Apple //c (3.5 ROM)
+apple2c0uk                      // ??? 1985 Apple //c (3.5 ROM) (UK)
+apple2c0fr                      // ??? 1985 Apple //c (3.5 ROM) (France)
 apple2c3                        // Sep 1986 Apple //c (Original Mem. Exp.)
+apple2c3uk                      // Sep 1986 Apple //c (Original Mem. Exp.) (UK)
+apple2c3fr                      // Sep 1986 Apple //c (Original Mem. Exp.) (France)
 apple2c4                        // ??? 198? Apple //c (rev 4)
+apple2c4uk                      // ??? 198? Apple //c (rev 4) (UK)
+apple2c4fr                      // ??? 198? Apple //c (rev 4) (France)
 apple2cp                        // Sep 1988 Apple //c+
 apple2e                         // Jan 1983 Apple //e
 apple2ee                        // Mar 1985 Apple //e Enhanced
@@ -821,7 +829,10 @@ apple2eeuk                      // Mar 1985 Apple //e Enhanced (UK)
 apple2eefr                      // Mar 1985 Apple //e Enhanced (France)
 apple2ees                       // Mar 1985 Apple //e Enhanced (Spain)
 apple2ep                        // Jan 1987 Apple //e Platinum
+apple2epuk                      // Jan 1987 Apple //e Platinum (UK)
+apple2epfr                      // Jan 1987 Apple //e Platinum (France)
 apple2euk                       // Jan 1983 Apple //e (UK)
+apple2efr                       // Jan 1983 Apple //e (France)
 las128e2                        // ??? Laser 128 EX2
 las128ex                        // ??? 1988 Laser 128 EX
 laser128                        // ??? 1987 Laser 128
