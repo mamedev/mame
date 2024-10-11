@@ -6210,6 +6210,49 @@ Includes DOS and Windows installation setup.
 		</part>
 	</software>
 
+	<!-- From the GOG release -->
+	<!-- Matches http://redump.org/disc/2431/ -->
+	<software name="strtrk25">
+		<description>Star Trek: 25th Anniversary (Enhanced CD-ROM)</description>
+		<year>1994</year>
+		<publisher>Interplay</publisher>
+		<info name="copy_protection" value="Manual required for map" />
+		<info name="developer" value="Interplay" />
+		<info name="language" value="English/French/German" />
+		<info name="region" value="Europe" />
+		<sharedfeat name="platform" value="DOS" />
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="star trek 25th anniversary (europe)" sha1="530032767f5475c9f280ee8edf61c179b510960e" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- From the GOG release -->
+	<!-- Matches http://redump.org/disc/66423/ and http://redump.org/disc/2693/ -->
+	<software name="strtrkjr">
+		<description>Star Trek: Judgment Rites (Collector's Edition)</description>
+		<year>1995</year>
+		<publisher>Interplay</publisher>
+		<info name="copy_protection" value="Manual required for map" />
+		<info name="developer" value="Interplay" />
+		<info name="language" value="English" />
+		<info name="region" value="USA" />
+		<sharedfeat name="platform" value="DOS" />
+		<part name="cdrom1" interface="cdrom">
+			<feature name="part_id" value="Game Disc" />
+			<diskarea name="cdrom">
+				<disk name="star trek judgment rites" sha1="a03bf47799dd1610dde1c898d606d2f6e6b7ff3d" />
+			</diskarea>
+		</part>
+		<part name="cdrom2" interface="cdrom">
+			<feature name="part_id" value="Collector's Edition Bonus Disc" />
+			<diskarea name="cdrom">
+				<disk name="star trek judgment rites collectors" sha1="091a9bad83c8a69bb511f404be282861d45caff1" />
+			</diskarea>
+		</part>
+	</software>
+
 	<!-- Source: http://redump.org/disc/45077/ -->
 	<!-- <rom name="Stellar 7 (USA).cue" size="223" crc="9d6c928f" sha1="0fbda630109e0028fe0414a4dc0d918b491c0131"/> -->
 	<!-- <rom name="Stellar 7 (USA) (Track 1).bin" size="23320080" crc="3d4511c1" sha1="98b4d488e816c7f5e3c3f40dd26834ca7aad821a"/> -->
