@@ -125,6 +125,7 @@ void a2bus_suprterminal_device::device_start()
 	m_vram = std::make_unique<u8[]>(0x800); // 4 2114 DRAMs
 	m_fontram = std::make_unique<u8[]>(0x400); // 2 2114 DRAMs
 
+	m_bC800IsRAM = false;
 	m_bRasterRAM = true;
 	m_bCharBank1 = false;
 
