@@ -2,8 +2,6 @@
 // copyright-holders:Aaron Giles
 /***************************************************************************
 
-    chd.h
-
     MAME Compressed Hunks of Data file format
 
 ***************************************************************************/
@@ -374,10 +372,10 @@ private:
 	// inline helpers
 	util::sha1_t be_read_sha1(const uint8_t *base) const noexcept;
 	void be_write_sha1(uint8_t *base, util::sha1_t value) noexcept;
-	void file_read(uint64_t offset, void *dest, uint32_t length) const;
-	void file_write(uint64_t offset, const void *source, uint32_t length);
+	std::error_condition file_read(uint64_t offset, void *dest, uint32_t length) const noexcept;
+	std::error_condition file_write(uint64_t offset, const void *source, uint32_t length) noexcept;
 	uint64_t file_append(const void *source, uint32_t length, uint32_t alignment = 0);
-	uint8_t bits_for_value(uint64_t value);
+	static uint8_t bits_for_value(uint64_t value) noexcept;
 
 	// internal helpers
 	uint32_t guess_unitbytes();
@@ -389,12 +387,12 @@ private:
 	std::error_condition create_common();
 	std::error_condition open_common(bool writeable, const open_parent_func &open_parent);
 	void create_open_common();
-	void verify_proper_compression_append(uint32_t hunknum);
+	std::error_condition verify_proper_compression_append(uint32_t hunknum) const noexcept;
 	void hunk_write_compressed(uint32_t hunknum, int8_t compression, const uint8_t *compressed, uint32_t complength, util::crc16_t crc16);
 	void hunk_copy_from_self(uint32_t hunknum, uint32_t otherhunk);
 	void hunk_copy_from_parent(uint32_t hunknum, uint64_t parentunit);
 	std::error_condition metadata_find(chd_metadata_tag metatag, int32_t metaindex, metadata_entry &metaentry, bool resume = false) const noexcept;
-	void metadata_set_previous_next(uint64_t prevoffset, uint64_t nextoffset);
+	std::error_condition metadata_set_previous_next(uint64_t prevoffset, uint64_t nextoffset) noexcept;
 	void metadata_update_hash();
 	static int CLIB_DECL metadata_hash_compare(const void *elem1, const void *elem2);
 
