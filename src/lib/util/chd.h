@@ -361,11 +361,11 @@ public:
 	std::error_condition codec_configure(chd_codec_type codec, int param, void *config);
 
 	// typing
-	bool is_hd() const;
-	bool is_cd() const;
-	bool is_gd() const;
-	bool is_dvd() const;
-	bool is_av() const;
+	std::error_condition check_is_hd() const noexcept;
+	std::error_condition check_is_cd() const noexcept;
+	std::error_condition check_is_gd() const noexcept;
+	std::error_condition check_is_dvd() const noexcept;
+	std::error_condition check_is_av() const noexcept;
 
 private:
 	struct metadata_entry;
@@ -393,7 +393,7 @@ private:
 	void hunk_write_compressed(uint32_t hunknum, int8_t compression, const uint8_t *compressed, uint32_t complength, util::crc16_t crc16);
 	void hunk_copy_from_self(uint32_t hunknum, uint32_t otherhunk);
 	void hunk_copy_from_parent(uint32_t hunknum, uint64_t parentunit);
-	bool metadata_find(chd_metadata_tag metatag, int32_t metaindex, metadata_entry &metaentry, bool resume = false) const;
+	std::error_condition metadata_find(chd_metadata_tag metatag, int32_t metaindex, metadata_entry &metaentry, bool resume = false) const noexcept;
 	void metadata_set_previous_next(uint64_t prevoffset, uint64_t nextoffset);
 	void metadata_update_hash();
 	static int CLIB_DECL metadata_hash_compare(const void *elem1, const void *elem2);
@@ -466,7 +466,7 @@ private:
 
 		// operations
 		void reset();
-		uint64_t find(util::crc16_t crc16, util::sha1_t sha1);
+		uint64_t find(util::crc16_t crc16, util::sha1_t sha1) const noexcept;
 		void add(uint64_t itemnum, util::crc16_t crc16, util::sha1_t sha1);
 
 		// constants
@@ -563,7 +563,7 @@ private:
 	osd_work_queue *        m_read_queue;       // work queue for reading
 	uint64_t                m_read_queue_offset;// next offset to enqueue
 	uint64_t                m_read_done_offset; // next offset that will complete
-	bool                    m_read_error;       // error during reading?
+	std::error_condition    m_read_error;       // error during reading, if any
 
 	// work item thread
 	static constexpr int WORK_BUFFER_HUNKS = 256;

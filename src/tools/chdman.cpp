@@ -2372,11 +2372,11 @@ static void do_copy(parameters_map &params)
 
 	// process compression; we default to our current preferences using metadata to pick the type
 	chd_codec_type compression[4];
-	if (input_chd.is_hd() || input_chd.is_dvd())
+	if (!input_chd.check_is_hd() || !input_chd.check_is_dvd())
 		parse_compression(params, s_default_hd_compression, output_parent, compression);
-	else if (input_chd.is_av())
+	else if (!input_chd.check_is_av())
 		parse_compression(params, s_default_ld_compression, output_parent, compression);
-	else if (input_chd.is_cd() || input_chd.is_gd())
+	else if (!input_chd.check_is_cd() || !input_chd.check_is_gd())
 		parse_compression(params, s_default_cd_compression, output_parent, compression);
 	else
 		parse_compression(params, s_default_raw_compression, output_parent, compression);
