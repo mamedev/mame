@@ -141,4 +141,37 @@ private:
 };
 
 
+class gameu_handheld_game_state : public gcm394_game_state
+{
+public:
+	gameu_handheld_game_state(const machine_config& mconfig, device_type type, const char* tag) :
+		gcm394_game_state(mconfig, type, tag)
+	{
+	}
+
+	virtual uint16_t cs0_r(offs_t offset) override;
+
+	void gameu(machine_config &config);
+
+	void init_gameu();
+
+protected:
+
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
+private:
+	void gameu_porta_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void gameu_portb_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void gameu_portc_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void gameu_portd_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+
+	uint32_t m_upperbase;
+	uint16_t m_porta_data;
+	uint16_t m_portb_data;
+	uint16_t m_portc_data;
+	uint16_t m_portd_data;
+};
+
+
 #endif // MAME_TVGAMES_SUNPLUS_GCM394_H

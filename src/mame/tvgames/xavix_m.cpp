@@ -265,6 +265,8 @@ INTERRUPT_GEN_MEMBER(xavix_state::interrupt)
 		m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 		m_video_ctrl |= 0x80;
 	}
+
+	xavix_interrupt_extra();
 }
 
 
