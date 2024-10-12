@@ -21,6 +21,7 @@
 #include "strformat.h"
 #include "vbiparse.h"
 
+#include <array>
 #include <cassert>
 #include <cctype>
 #include <cstdio>
@@ -616,11 +617,11 @@ static clock_t lastprogress = 0;
 
 
 // default compressors
-static const chd_codec_type s_no_compression[4] = { CHD_CODEC_NONE, CHD_CODEC_NONE, CHD_CODEC_NONE, CHD_CODEC_NONE };
-static const chd_codec_type s_default_raw_compression[4] = { CHD_CODEC_LZMA, CHD_CODEC_ZLIB, CHD_CODEC_HUFFMAN, CHD_CODEC_FLAC };
-static const chd_codec_type s_default_hd_compression[4] = { CHD_CODEC_LZMA, CHD_CODEC_ZLIB, CHD_CODEC_HUFFMAN, CHD_CODEC_FLAC };
-static const chd_codec_type s_default_cd_compression[4] = { CHD_CODEC_CD_LZMA, CHD_CODEC_CD_ZLIB, CHD_CODEC_CD_FLAC };
-static const chd_codec_type s_default_ld_compression[4] = { CHD_CODEC_AVHUFF };
+static const std::array<chd_codec_type, 4> s_no_compression = { CHD_CODEC_NONE, CHD_CODEC_NONE, CHD_CODEC_NONE, CHD_CODEC_NONE };
+static const std::array<chd_codec_type, 4> s_default_raw_compression = { CHD_CODEC_LZMA, CHD_CODEC_ZLIB, CHD_CODEC_HUFFMAN, CHD_CODEC_FLAC };
+static const std::array<chd_codec_type, 4> s_default_hd_compression = { CHD_CODEC_LZMA, CHD_CODEC_ZLIB, CHD_CODEC_HUFFMAN, CHD_CODEC_FLAC };
+static const std::array<chd_codec_type, 4> s_default_cd_compression = { CHD_CODEC_CD_LZMA, CHD_CODEC_CD_ZLIB, CHD_CODEC_CD_FLAC };
+static const std::array<chd_codec_type, 4> s_default_ld_compression = { CHD_CODEC_AVHUFF };
 
 
 // descriptions for each option
@@ -1302,7 +1303,7 @@ static uint32_t parse_hunk_size(
 //  compression parameter string
 //-------------------------------------------------
 
-static void parse_compression(const parameters_map &params, const chd_codec_type (&defaults)[4], const chd_file &output_parent, chd_codec_type compression[4])
+static void parse_compression(const parameters_map &params, const std::array<chd_codec_type, 4> &defaults, const chd_file &output_parent, chd_codec_type compression[4])
 {
 	// TODO: should we default to the same compression as the output parent?
 	std::copy(std::begin(defaults), std::end(defaults), compression);
@@ -2346,6 +2347,39 @@ static void do_create_ld(parameters_map &params)
 
 
 //-------------------------------------------------
+//  get_compression_defaults - use CHD metadata to
+//  pick the preferred type
+//-------------------------------------------------
+
+static const std::array<chd_codec_type, 4> &get_compression_defaults(chd_file &input_chd)
+{
+	std::error_condition err = input_chd.check_is_hd();
+	if (err == chd_file::error::METADATA_NOT_FOUND)
+		err = input_chd.check_is_dvd();
+	if (!err)
+		return s_default_hd_compression;
+	if (err != chd_file::error::METADATA_NOT_FOUND)
+		throw err;
+
+	err = input_chd.check_is_av();
+	if (!err)
+		return s_default_ld_compression;
+	if (err != chd_file::error::METADATA_NOT_FOUND)
+		throw err;
+
+	err = input_chd.check_is_cd();
+	if (err == chd_file::error::METADATA_NOT_FOUND)
+		err = input_chd.check_is_gd();
+	if (!err)
+		return s_default_cd_compression;
+	if (err != chd_file::error::METADATA_NOT_FOUND)
+		throw err;
+
+	return s_default_raw_compression;
+}
+
+
+//-------------------------------------------------
 //  do_copy - create a new CHD with data from
 //  another CHD
 //-------------------------------------------------
@@ -2372,14 +2406,7 @@ static void do_copy(parameters_map &params)
 
 	// process compression; we default to our current preferences using metadata to pick the type
 	chd_codec_type compression[4];
-	if (!input_chd.check_is_hd() || !input_chd.check_is_dvd())
-		parse_compression(params, s_default_hd_compression, output_parent, compression);
-	else if (!input_chd.check_is_av())
-		parse_compression(params, s_default_ld_compression, output_parent, compression);
-	else if (!input_chd.check_is_cd() || !input_chd.check_is_gd())
-		parse_compression(params, s_default_cd_compression, output_parent, compression);
-	else
-		parse_compression(params, s_default_raw_compression, output_parent, compression);
+	parse_compression(params, get_compression_defaults(input_chd), output_parent, compression);
 
 	// process numprocessors
 	parse_numprocessors(params);
