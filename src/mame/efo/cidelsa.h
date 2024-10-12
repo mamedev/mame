@@ -20,11 +20,11 @@
 #define COP402N_TAG "cop402n"
 #define AY8910_TAG  "ay8910"
 
-#define DESTRYER_CHR1   3579000.0 // unverified
-#define DESTRYER_CHR2   XTAL(5'714'300)
-#define ALTAIR_CHR1     3579000.0 // unverified
-#define ALTAIR_CHR2     cdp1869_device::DOT_CLK_PAL // unverified
-#define DRACO_CHR1      XTAL(4'433'610)
+#define DESTRYER_CHR1   3.579_MHz_XTAL
+#define DESTRYER_CHR2   5.7143_MHz_XTAL
+#define ALTAIR_CHR1     3.579_MHz_XTAL
+#define ALTAIR_CHR2     cdp1869_device::DOT_CLK_PAL
+#define DRACO_CHR1      4.43361_MHz_XTAL
 #define DRACO_CHR2      cdp1869_device::DOT_CLK_PAL // unverified
 #define DRACO_SND_CHR1  XTAL(2'012'160)
 
