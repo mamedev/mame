@@ -171,7 +171,10 @@ u8 a2bus_suprterminal_device::read_c0nx(u8 offset)
 {
 	if (offset < 8)
 	{
-		access_c0nx(offset);
+		if (!machine().side_effects_disabled())
+		{
+			access_c0nx(offset);
+		}
 	}
 	else if (offset == 9)
 	{
