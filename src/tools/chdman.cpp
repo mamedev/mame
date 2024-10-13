@@ -3082,7 +3082,7 @@ static void do_extract_ld(parameters_map &params)
 			input_chd.codec_configure(CHD_CODEC_AVHUFF, AVHUFF_CODEC_DECOMPRESS_CONFIG, &avconfig);
 
 			// read the hunk into the buffers
-			std::error_condition err = input_chd.read_hunk(framenum, nullptr);
+			std::error_condition err = input_chd.codec_process_hunk(framenum);
 			if (err)
 			{
 				uint64_t filepos = ~uint64_t(0);

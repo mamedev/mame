@@ -39,9 +39,12 @@ public:
 		: driver_device(mconfig, type, tag)
 		, m_screen(*this, "screen")
 		, m_last_controls(0)
-		, m_playing(false) { }
+		, m_playing(false)
+	{
+	}
 
-	void ldplayer_ntsc(machine_config &config);
+	template <typename D, typename F>
+	void ldplayer_ntsc(machine_config &config, D &&player, F &&finder);
 
 protected:
 	// device overrides
@@ -107,14 +110,17 @@ class pr8210_state : public ldplayer_state
 public:
 	// construction/destruction
 	pr8210_state(const machine_config &mconfig, device_type type, const char *tag)
-		: ldplayer_state(mconfig, type, tag),
-			m_laserdisc(*this, "laserdisc"),
-			m_command_buffer_in(0),
-			m_command_buffer_out(0) { }
+		: ldplayer_state(mconfig, type, tag)
+		, m_laserdisc(*this, "laserdisc")
+		, m_command_buffer_in(0)
+		, m_command_buffer_out(0)
+	{
+	}
 
-			void pr8210(machine_config &config);
+	void pr8210(machine_config &config);
+
 protected:
-	// device overrides
+	// driver_device implementation
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
 
@@ -122,7 +128,7 @@ protected:
 	virtual void execute_command(int command) override;
 
 	// internal helpers
-	inline void add_command(uint8_t command);
+	void add_command(uint8_t command);
 
 	// timers
 	TIMER_CALLBACK_MEMBER(bit_on);
@@ -144,10 +150,13 @@ class ldv1000_state : public ldplayer_state
 public:
 	// construction/destruction
 	ldv1000_state(const machine_config &mconfig, device_type type, const char *tag)
-		: ldplayer_state(mconfig, type, tag),
-			m_laserdisc(*this, "laserdisc") { }
+		: ldplayer_state(mconfig, type, tag)
+		, m_laserdisc(*this, "laserdisc")
+	{
+	}
 
-			void ldv1000(machine_config &config);
+	void ldv1000(machine_config &config);
+
 protected:
 	required_device<pioneer_ldv1000_device> m_laserdisc;
 
@@ -341,7 +350,7 @@ void ldplayer_state::machine_reset()
  *
  *************************************/
 
-void pr8210_state::add_command(uint8_t command)
+inline void pr8210_state::add_command(uint8_t command)
 {
 	m_command_buffer[m_command_buffer_in++ % std::size(m_command_buffer)] = (command & 0x1f) | 0x20;
 	m_command_buffer[m_command_buffer_in++ % std::size(m_command_buffer)] = 0x00 | 0x20;
@@ -614,36 +623,34 @@ INPUT_PORTS_END
  *
  *************************************/
 
-void ldplayer_state::ldplayer_ntsc(machine_config &config)
+template <typename D, typename F>
+void ldplayer_state::ldplayer_ntsc(machine_config &config, D &&player, F &&finder)
 {
+	player(config, finder);
+	finder->set_get_disc(FUNC(ldplayer_state::get_disc));
+	finder->add_ntsc_screen(config, "screen");
 }
 
 
 void ldv1000_state::ldv1000(machine_config &config)
 {
-	ldplayer_ntsc(config);
-	pioneer_ldv1000_device &laserdisc(PIONEER_LDV1000(config, "laserdisc"));
-	laserdisc.set_get_disc(FUNC(ldv1000_state::get_disc));
-	laserdisc.add_ntsc_screen(config, "screen");
+	ldplayer_ntsc(config, PIONEER_LDV1000, m_laserdisc);
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
-	laserdisc.add_route(0, "lspeaker", 1.0);
-	laserdisc.add_route(1, "rspeaker", 1.0);
+	m_laserdisc->add_route(0, "lspeaker", 1.0);
+	m_laserdisc->add_route(1, "rspeaker", 1.0);
 }
 
 
 void pr8210_state::pr8210(machine_config &config)
 {
-	ldplayer_ntsc(config);
-	pioneer_pr8210_device &laserdisc(PIONEER_PR8210(config, "laserdisc"));
-	laserdisc.set_get_disc(FUNC(pr8210_state::get_disc));
-	laserdisc.add_ntsc_screen(config, "screen");
+	ldplayer_ntsc(config, PIONEER_PR8210, m_laserdisc);
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
-	laserdisc.add_route(0, "lspeaker", 1.0);
-	laserdisc.add_route(1, "rspeaker", 1.0);
+	m_laserdisc->add_route(0, "lspeaker", 1.0);
+	m_laserdisc->add_route(1, "rspeaker", 1.0);
 }
 
 

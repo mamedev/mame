@@ -2,8 +2,6 @@
 // copyright-holders:Aaron Giles
 /***************************************************************************
 
-    chdcodec.h
-
     Codecs used by the CHD format
 
 ***************************************************************************/
@@ -89,6 +87,7 @@ public:
 	using ptr = std::unique_ptr<chd_decompressor>;
 
 	// implementation
+	virtual void process(const uint8_t *src, uint32_t complen);
 	virtual void decompress(const uint8_t *src, uint32_t complen, uint8_t *dest, uint32_t destlen) = 0;
 };
 

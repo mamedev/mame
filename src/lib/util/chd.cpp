@@ -892,6 +892,105 @@ void chd_file::close()
 	m_cachehunk = ~0;
 }
 
+std::error_condition chd_file::codec_process_hunk(uint32_t hunknum)
+{
+	// punt if no file
+	if (UNEXPECTED(!m_file))
+		return std::error_condition(error::NOT_OPEN);
+
+	// return an error if out of range
+	if (UNEXPECTED(hunknum >= m_hunkcount))
+		return std::error_condition(error::HUNK_OUT_OF_RANGE);
+
+	// wrap this for clean reporting
+	try
+	{
+		// get a pointer to the map entry
+		switch (m_version)
+		{
+		// v3/v4 map entries
+		case 3:
+		case 4:
+			{
+				uint8_t const *const rawmap = &m_rawmap[16 * hunknum];
+				uint64_t const blockoffs = get_u64be(&rawmap[0]);
+				switch (rawmap[15] & V34_MAP_ENTRY_FLAG_TYPE_MASK)
+				{
+				case V34_MAP_ENTRY_TYPE_COMPRESSED:
+					{
+						uint32_t const blocklen = get_u16be(&rawmap[12]) | (uint32_t(rawmap[14]) << 16);
+						std::error_condition err = file_read(blockoffs, &m_compressed[0], blocklen);
+						if (UNEXPECTED(err))
+							return err;
+						m_decompressor[0]->process(&m_compressed[0], blocklen);
+						return std::error_condition();
+					}
+
+				case V34_MAP_ENTRY_TYPE_UNCOMPRESSED:
+				case V34_MAP_ENTRY_TYPE_MINI:
+					return std::error_condition(error::UNSUPPORTED_FORMAT);
+
+				case V34_MAP_ENTRY_TYPE_SELF_HUNK:
+					return codec_process_hunk(blockoffs);
+
+				case V34_MAP_ENTRY_TYPE_PARENT_HUNK:
+					if (UNEXPECTED(m_parent_missing))
+						return std::error_condition(error::REQUIRES_PARENT);
+					return m_parent->codec_process_hunk(blockoffs);
+				}
+			}
+			break;
+
+		// v5 map entries
+		case 5:
+			{
+				if (UNEXPECTED(!compressed()))
+					return std::error_condition(error::UNSUPPORTED_FORMAT);
+
+				// compressed case
+				uint8_t const *const rawmap = &m_rawmap[m_mapentrybytes * hunknum];
+				uint32_t const blocklen = get_u24be(&rawmap[1]);
+				uint64_t const blockoffs = get_u48be(&rawmap[4]);
+				switch (rawmap[0])
+				{
+				case COMPRESSION_TYPE_0:
+				case COMPRESSION_TYPE_1:
+				case COMPRESSION_TYPE_2:
+				case COMPRESSION_TYPE_3:
+					{
+						std::error_condition err = file_read(blockoffs, &m_compressed[0], blocklen);
+						if (UNEXPECTED(err))
+							return err;
+						auto &decompressor = *m_decompressor[rawmap[0]];
+						decompressor.process(&m_compressed[0], blocklen);
+						return std::error_condition();
+					}
+
+				case COMPRESSION_NONE:
+					return std::error_condition(error::UNSUPPORTED_FORMAT);
+
+				case COMPRESSION_SELF:
+					return codec_process_hunk(blockoffs);
+
+				case COMPRESSION_PARENT:
+					if (UNEXPECTED(m_parent_missing))
+						return std::error_condition(error::REQUIRES_PARENT);
+					return m_parent->codec_process_hunk(blockoffs / (m_parent->hunk_bytes() / m_parent->unit_bytes()));
+				}
+				break;
+			}
+		}
+
+		// if we get here, the map contained an unsupported block type
+		return std::error_condition(error::INVALID_DATA);
+	}
+	catch (std::error_condition const &err)
+	{
+		// just return errors
+		return err;
+	}
+}
+
 /**
  * @fn  std::error_condition chd_file::read_hunk(uint32_t hunknum, void *buffer)
  *
@@ -1045,7 +1144,7 @@ std::error_condition chd_file::read_hunk(uint32_t hunknum, void *buffer)
 					case COMPRESSION_PARENT:
 						if (UNEXPECTED(m_parent_missing))
 							return std::error_condition(error::REQUIRES_PARENT);
-						return m_parent->read_bytes(uint64_t(blockoffs) * uint64_t(m_parent->unit_bytes()), dest, m_hunkbytes);
+						return m_parent->read_bytes(blockoffs * m_parent->unit_bytes(), dest, m_hunkbytes);
 					}
 				}
 				break;

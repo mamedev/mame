@@ -334,6 +334,7 @@ public:
 	void close();
 
 	// read/write
+	std::error_condition codec_process_hunk(uint32_t hunknum);
 	std::error_condition read_hunk(uint32_t hunknum, void *buffer);
 	std::error_condition write_hunk(uint32_t hunknum, const void *buffer);
 	std::error_condition read_units(uint64_t unitnum, void *buffer, uint32_t count = 1);
