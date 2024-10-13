@@ -63,7 +63,7 @@
             11  Tomas Plarail /TOMY/Japan                                                                       -           -               -           -               -                   -                       -  dumped?
             12  Thomas TV Personal Computer /EPOCH/Japan                                                        -           -               -           -               -                   -                       -
             13  STAR WARS Light Saber Battle /TOMY/Japan                                                        -           -               -           -               -                   -                       -
-            14  Jala Jaland /atlus/Japan                                                                        -           -               -           -               -                   -                       -        (is this the arcade release of Jara-Ja Land /TAKARA/Japan below?, Atlas are an arcade distributor and arcade version is confirmed)
+            14  Jala Jaland /atlus/Japan                                                                        -           -               -           -               -                   -                       -        (is this the arcade release of Jyarajyaland /TAKARA/Japan below?, Atlas are an arcade distributor and arcade version is confirmed)
             15  Star Wars Lightsaber Battle Game /Hasbro/USA                                                    SWSA        x8              48          8M              24C02               SSD 2000 NEC 85605-621  dumped
             16  Gururin World /EPOCH/Japan                                                                      -           x8              -           -               -                   SSD 98 PL7351-181       dumped
             17  Toinohgi Onmyo-daisenki /BANDAI/Japan                                                           -           -               -           -               -                   -                       -
@@ -103,7 +103,7 @@
             10  Evio /TOMY/Japan                                                                                -           -               -           -               -                   -                       dumped (some carts not dumped tho)
             11  Together Minimoni,Jumping Party! /EPOCH/Japan                                                   -           -               -           -               -                   -                       -
             12  Hamutaro TV computer /EPOCH/Japan                                                               -           -               -           -               -                   -                       -
-            13  Jara-Ja Land /TAKARA/Japan                                                                      -           -               -           -               -                   -                       dumped       (is this the home release of Jala Jaland /atlus/Japan above?)
+            13  Jyarajyaland /TAKARA/Japan                                                                      -           -               -           -               -                   -                       dumped       (is this the home release of Jala Jaland /atlus/Japan above?)
             14  Tomika, Draiving by Car navigation system /TOMY/Japan                                           -           -               -           -               -                   -                       dumped
             15  PLAY TV Rescue Heroes /RADICA/USA                                                               73036       x8              48          2M              none                SSD 98 PL7351-181       dumped
             16  PLAY TV Huntin' 2 /RADICA/USA                                                                   73030       x8              none                        none                SSD 98 PL7351-181       dumped
@@ -2425,7 +2425,7 @@ CONS( 2001, tak_gin,   0,          0,  xavix,            tak_gin,  xavix_state, 
 
 // was also distributed by Atlus as an arcade cabinet in 2005, ROM almost certainly different (this one will auto-power off after inactivity, an arcade wouldn't do that)
 // ジャラジャランド
-CONS( 2003, jarajal,   0,          0,  xavix_nv,         jarajal,  xavix_state,          init_xavix,    "Takara / SSD Company LTD",                     "Jara-Ja Land (Japan, home version)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+CONS( 2003, jarajal,   0,          0,  xavix_nv,         jarajal,  xavix_state,          init_xavix,    "Takara / SSD Company LTD",                     "Jyarajyaland (Japan, PlugIt! version)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
 // 射的王
 CONS( 2002, tomshoot, 0,           0,  xavix_i2c_24c02,  tomshoot,xavix_i2c_tomshoot_state,  init_xavix,    "Tomy / SSD Company LTD",                       "Shooting King (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
