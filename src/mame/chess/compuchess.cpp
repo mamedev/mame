@@ -140,8 +140,8 @@ public:
 	void cncchess(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	// devices/pointers
@@ -157,10 +157,10 @@ private:
 	bool m_blink = false;
 
 	// address maps
-	void main_map(address_map &map);
-	void main_io(address_map &map);
-	void cncchess_map(address_map &map);
-	void cncchess_io(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
+	void main_io(address_map &map) ATTR_COLD;
+	void cncchess_map(address_map &map) ATTR_COLD;
+	void cncchess_io(address_map &map) ATTR_COLD;
 
 	TIMER_DEVICE_CALLBACK_MEMBER(beeper_off) { m_beeper->set_state(0); }
 	TIMER_DEVICE_CALLBACK_MEMBER(blink) { m_blink = !m_blink; update_display(); }

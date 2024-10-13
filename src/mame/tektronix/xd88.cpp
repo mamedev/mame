@@ -36,10 +36,10 @@ public:
 	void xd88_01(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
-	void cpu_map(address_map &map);
+	void cpu_map(address_map &map) ATTR_COLD;
 
 private:
 	required_device<mc88100_device> m_cpu;
@@ -72,13 +72,11 @@ void xd88_state::xd88_01(machine_config &config)
 {
 	MC88100(config, m_cpu, 20'000'000);
 	m_cpu->set_addrmap(AS_PROGRAM, &xd88_state::cpu_map);
+	m_cpu->set_cmmu_code([this](u32 const address) -> mc88200_device & { return *m_cmmu[4]; });
+	m_cpu->set_cmmu_data([this](u32 const address) -> mc88200_device & { return *m_cmmu[0]; });
 
 	for (unsigned i = 0; i < std::size(m_cmmu); i++)
 		MC88200(config, m_cmmu[i], 20'000'000, i).set_mbus(m_cpu, AS_PROGRAM);
-
-	// TODO: multiple i&d cmmu's
-	m_cpu->set_cmmu_d(m_cmmu[0]);
-	m_cpu->set_cmmu_i(m_cmmu[4]);
 }
 
 ROM_START(xd88_01)

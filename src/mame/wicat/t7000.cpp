@@ -52,7 +52,7 @@ public:
 	void t7000(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	I8275_DRAW_CHARACTER_MEMBER(display_character);
@@ -66,8 +66,8 @@ private:
 	void vblint_w(int state);
 	void crtc_combined_w(offs_t offset, u8 data);
 
-	void mem_map(address_map &map);
-	void io_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
+	void io_map(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<input_merger_device> m_mainint;

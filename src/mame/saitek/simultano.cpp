@@ -71,8 +71,8 @@ public:
 	void cc2150(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	// devices/pointers
@@ -90,8 +90,8 @@ private:
 	u8 m_select = 0;
 	u8 m_control = 0;
 
-	void simultano_map(address_map &map);
-	void cc2150_map(address_map &map);
+	void simultano_map(address_map &map) ATTR_COLD;
+	void cc2150_map(address_map &map) ATTR_COLD;
 
 	void power_off();
 	void lcd_pwm_w(offs_t offset, u8 data);

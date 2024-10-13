@@ -6,9 +6,9 @@
 CXG Sensor Computachess (CXG-001 or WA-001)
 CXG Portachess, Portachess II, Computachess IV, Sphinx Chess Voyager
 
-Sensor Computachess is White & Allcock's first original chesscomputer. Cassia's
-Chess Mate (aka Computachess) doesn't really count since it was a bootleg of
-Fidelity Chess Challenger 10.
+Sensor Computachess is White and Allcock's first original chess computer.
+Cassia's Chess Mate (aka Computachess) doesn't really count since it was a
+bootleg of Fidelity Chess Challenger 10.
 
 It was programmed by Intelligent Software (formerly known as Philidor Software).
 After loosening ties with SciSys, Intelligent Software provided the software for
@@ -22,12 +22,12 @@ switch which puts the MCU in halt state.
 Hardware notes:
 
 Sensor Computachess:
-- PCB label WA 001 600 002
+- PCB label: WA 001 600 002
 - Hitachi 44801A50 MCU @ ~400kHz
 - buzzer, 16 leds, button sensors chessboard
 
 Portachess II:
-- PCB label CXG223-600-001 (main pcb), CXG 211 600 101 (led pcb taken from
+- PCB label: CXG223-600-001 (main pcb), CXG 211 600 101 (led pcb taken from
   Advanced Star Chess, extra led row unused here)
 - Hitachi HD44801C89 MCU @ ~400kHz (serial 202: from Portachess 1985 version)
 - rest same as above
@@ -91,7 +91,7 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(reset_button) { m_maincpu->set_input_line(INPUT_LINE_RESET, newval ? ASSERT_LINE : CLEAR_LINE); }
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	// devices/pointers
@@ -102,18 +102,15 @@ private:
 	required_ioport m_inputs;
 
 	u8 m_inp_mux = 0;
-	u8 m_led_data = 0;
 
-	void update_display();
 	template<int N> void mux_w(u8 data);
-	void leds_w(u16 data);
+	void control_w(u16 data);
 	u16 input_r();
 };
 
 void computachess_state::machine_start()
 {
 	save_item(NAME(m_inp_mux));
-	save_item(NAME(m_led_data));
 }
 
 
@@ -122,27 +119,21 @@ void computachess_state::machine_start()
     I/O
 *******************************************************************************/
 
-void computachess_state::update_display()
-{
-	m_display->matrix(m_inp_mux, m_led_data);
-}
-
 template<int N>
 void computachess_state::mux_w(u8 data)
 {
-	// R2x,R3x: input mux, led select
+	// R2x,R3x: input mux, led data
 	m_inp_mux = (m_inp_mux & ~(0xf << (N*4))) | (data << (N*4));
-	update_display();
+	m_display->write_mx(m_inp_mux);
 }
 
-void computachess_state::leds_w(u16 data)
+void computachess_state::control_w(u16 data)
 {
-	// D2,D3: led data
-	m_led_data = ~data >> 2 & 3;
-	update_display();
-
 	// D0: speaker out
-	m_dac->write(data & 1);
+	m_dac->write(~data & 1);
+
+	// D2,D3: led select
+	m_display->write_my(~data >> 2 & 3);
 }
 
 u16 computachess_state::input_r()
@@ -169,19 +160,21 @@ u16 computachess_state::input_r()
 
 static INPUT_PORTS_START( scptchess )
 	PORT_START("IN.0")
-	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_S) PORT_NAME("Sound") // only hooked up on 1st version
 	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_R) PORT_NAME("Reverse Play")
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_L) PORT_NAME("Level")
+
+	PORT_START("RESET")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_N) PORT_CHANGED_MEMBER(DEVICE_SELF, computachess_state, reset_button, 0) PORT_NAME("New Game")
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( scptchessa )
 	PORT_INCLUDE( scptchess )
 
 	PORT_MODIFY("IN.0")
-	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_UNUSED)
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_S) PORT_NAME("Sound") // only hooked up on 1st version
 
-	PORT_START("RESET")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_N) PORT_CHANGED_MEMBER(DEVICE_SELF, computachess_state, reset_button, 0) PORT_NAME("New Game")
+	PORT_MODIFY("RESET")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_UNUSED)
 INPUT_PORTS_END
 
 
@@ -193,10 +186,10 @@ INPUT_PORTS_END
 void computachess_state::scptchess(machine_config &config)
 {
 	// basic machine hardware
-	HD44801(config, m_maincpu, 400'000);
+	HD44801(config, m_maincpu, 400'000); // approximation
 	m_maincpu->write_r<2>().set(FUNC(computachess_state::mux_w<0>));
 	m_maincpu->write_r<3>().set(FUNC(computachess_state::mux_w<1>));
-	m_maincpu->write_d().set(FUNC(computachess_state::leds_w));
+	m_maincpu->write_d().set(FUNC(computachess_state::control_w));
 	m_maincpu->read_d().set(FUNC(computachess_state::input_r));
 
 	SENSORBOARD(config, m_board).set_type(sensorboard_device::BUTTONS);
@@ -204,7 +197,7 @@ void computachess_state::scptchess(machine_config &config)
 	m_board->set_delay(attotime::from_msec(150));
 
 	// video hardware
-	PWM_DISPLAY(config, m_display).set_size(8, 2);
+	PWM_DISPLAY(config, m_display).set_size(2, 8);
 	config.set_default_layout(layout_cxg_scptchess);
 
 	// sound hardware
@@ -215,6 +208,8 @@ void computachess_state::scptchess(machine_config &config)
 void computachess_state::scptchessa(machine_config &config)
 {
 	scptchess(config);
+
+	m_maincpu->write_d().set(FUNC(computachess_state::control_w)).exor(1);
 	config.set_default_layout(layout_cxg_scptchessa);
 }
 
@@ -226,12 +221,12 @@ void computachess_state::scptchessa(machine_config &config)
 
 ROM_START( scptchess )
 	ROM_REGION( 0x2000, "maincpu", 0 )
-	ROM_LOAD("white_allcock_44801a50", 0x0000, 0x2000, CRC(c5c53e05) SHA1(8fa9b8e48ca54f08585afd83ae78fb1970fbd382) )
+	ROM_LOAD("202_newcrest_16_hd44801c89", 0x0000, 0x2000, CRC(56b48f70) SHA1(84ec62323c6d3314e0515bccfde2f65f6d753e99) )
 ROM_END
 
 ROM_START( scptchessa )
 	ROM_REGION( 0x2000, "maincpu", 0 )
-	ROM_LOAD("202_newcrest_16_hd44801c89", 0x0000, 0x2000, CRC(56b48f70) SHA1(84ec62323c6d3314e0515bccfde2f65f6d753e99) )
+	ROM_LOAD("white_allcock_44801a50", 0x0000, 0x2000, CRC(c5c53e05) SHA1(8fa9b8e48ca54f08585afd83ae78fb1970fbd382) )
 ROM_END
 
 } // anonymous namespace
@@ -243,5 +238,5 @@ ROM_END
 *******************************************************************************/
 
 //    YEAR  NAME        PARENT     COMPAT  MACHINE     INPUT       CLASS               INIT        COMPANY, FULLNAME, FLAGS
-SYST( 1981, scptchess,  0,         0,      scptchess,  scptchess,  computachess_state, empty_init, "CXG Systems / White & Allcock / Intelligent Software", "Sensor Computachess (1981 version)", MACHINE_SUPPORTS_SAVE )
-SYST( 1985, scptchessa, scptchess, 0,      scptchessa, scptchessa, computachess_state, empty_init, "CXG Systems / Newcrest Technology / Intelligent Software", "Sensor Computachess (1985 version)", MACHINE_SUPPORTS_SAVE )
+SYST( 1985, scptchess,  0,         0,      scptchess,  scptchess,  computachess_state, empty_init, "CXG Systems / Newcrest Technology / Intelligent Chess Software", "Sensor Computachess (1985 version)", MACHINE_SUPPORTS_SAVE )
+SYST( 1981, scptchessa, scptchess, 0,      scptchessa, scptchessa, computachess_state, empty_init, "CXG Systems / White and Allcock / Intelligent Software", "Sensor Computachess (1981 version)", MACHINE_SUPPORTS_SAVE )

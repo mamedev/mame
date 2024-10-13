@@ -17,11 +17,11 @@ public:
 	usb_ohci_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 private:
-	void map(address_map &map);
+	void map(address_map &map) ATTR_COLD;
 };
 
 class usb_uhci_device : public pci_device {
@@ -34,11 +34,11 @@ public:
 	usb_uhci_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 private:
-	void map(address_map &map);
+	void map(address_map &map) ATTR_COLD;
 };
 
 class usb_ehci_device : public pci_device {
@@ -51,11 +51,11 @@ public:
 	usb_ehci_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 private:
-	void map(address_map &map);
+	void map(address_map &map) ATTR_COLD;
 };
 
 DECLARE_DEVICE_TYPE(USB_OHCI, usb_ohci_device)

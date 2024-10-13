@@ -69,8 +69,8 @@ public:
 		m_ram(*this, RAM_TAG),
 		m_swim(*this, "fdc"),
 		m_floppy(*this, "fdc:%d", 0U),
-		m_scsibus1(*this, "scsi1"),
-		m_ncr1(*this, "scsi1:7:ncr53c96"),
+		m_scsibus1(*this, "scsi"),
+		m_ncr1(*this, "scsi:7:ncr53c96"),
 		m_sonic(*this, "sonic"),
 		m_dafb(*this, "dafb"),
 		m_easc(*this, "easc"),
@@ -92,8 +92,8 @@ public:
 	void quadra_base(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	u32 rom_switch_r(offs_t offset);
 	u16 via_r(offs_t offset);
@@ -169,7 +169,7 @@ public:
 	{
 	}
 
-	void quadra700_map(address_map &map);
+	void quadra700_map(address_map &map) ATTR_COLD;
 	void macqd700(machine_config &config);
 
 private:
@@ -196,13 +196,13 @@ public:
 	{
 	}
 
-	void quadra900_map(address_map &map);
+	void quadra900_map(address_map &map) ATTR_COLD;
 	void macqd900(machine_config &config);
 	void macqd950(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	void egret_reset_w(int state);
 	void fdc_hdsel(int state);
@@ -770,17 +770,17 @@ void eclipse_state::via2_out_b_q900(u8 data)
 
 		// SCSI bus and devices
 		NSCSI_BUS(config, m_scsibus1);
-		NSCSI_CONNECTOR(config, "scsi1:0", mac_scsi_devices, nullptr);
-		NSCSI_CONNECTOR(config, "scsi1:1", mac_scsi_devices, nullptr);
-		NSCSI_CONNECTOR(config, "scsi1:2", mac_scsi_devices, nullptr);
-		NSCSI_CONNECTOR(config, "scsi1:3").option_set("cdrom", NSCSI_CDROM_APPLE).machine_config([](device_t *device)
+		NSCSI_CONNECTOR(config, "scsi:0", mac_scsi_devices, nullptr);
+		NSCSI_CONNECTOR(config, "scsi:1", mac_scsi_devices, nullptr);
+		NSCSI_CONNECTOR(config, "scsi:2", mac_scsi_devices, nullptr);
+		NSCSI_CONNECTOR(config, "scsi:3").option_set("cdrom", NSCSI_CDROM_APPLE).machine_config([](device_t *device)
 																								 {
 			device->subdevice<cdda_device>("cdda")->add_route(0, "^^lspeaker", 1.0);
 			device->subdevice<cdda_device>("cdda")->add_route(1, "^^rspeaker", 1.0); });
-		NSCSI_CONNECTOR(config, "scsi1:4", mac_scsi_devices, nullptr);
-		NSCSI_CONNECTOR(config, "scsi1:5", mac_scsi_devices, nullptr);
-		NSCSI_CONNECTOR(config, "scsi1:6", mac_scsi_devices, "harddisk");
-		NSCSI_CONNECTOR(config, "scsi1:7").option_set("ncr53c96", NCR53C96).clock(50_MHz_XTAL / 2).machine_config([this](device_t *device)
+		NSCSI_CONNECTOR(config, "scsi:4", mac_scsi_devices, nullptr);
+		NSCSI_CONNECTOR(config, "scsi:5", mac_scsi_devices, nullptr);
+		NSCSI_CONNECTOR(config, "scsi:6", mac_scsi_devices, "harddisk");
+		NSCSI_CONNECTOR(config, "scsi:7").option_set("ncr53c96", NCR53C96).clock(50_MHz_XTAL / 2).machine_config([this](device_t *device)
 																												  {
 			ncr53c96_device &adapter = downcast<ncr53c96_device &>(*device);
 
@@ -830,6 +830,7 @@ void eclipse_state::via2_out_b_q900(u8 data)
 
 		SOFTWARE_LIST(config, "hdd_list").set_original("mac_hdd");
 		SOFTWARE_LIST(config, "cd_list").set_original("mac_cdrom").set_filter("MC68040");
+		//SOFTWARE_LIST(config, "cd_apple_dev").set_original("apple_devcd");
 		SOFTWARE_LIST(config, "flop_mac35_orig").set_original("mac_flop_orig");
 		SOFTWARE_LIST(config, "flop_mac35_clean").set_original("mac_flop_clcracked");
 		SOFTWARE_LIST(config, "flop35_list").set_original("mac_flop");

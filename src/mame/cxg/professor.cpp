@@ -9,7 +9,7 @@ NOTE: Before exiting MAME, press the OFF button to turn the power off. Otherwise
 NVRAM won't save properly.
 
 The chess engine is by Frans Morsch, similar to the one in Mephisto Europa.
-For some reason, they've put the row leds on the right instead of on the left.
+For some reason, they've put the row LEDs on the right instead of on the left.
 
 Hardware notes:
 - PCB label: 243 600 001
@@ -55,7 +55,7 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(on_button);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	// devices/pointers
@@ -179,11 +179,11 @@ static INPUT_PORTS_START( professor )
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_I) PORT_NAME("Monitor")
 
 	PORT_START("IN.2")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_F) PORT_NAME("Off")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_POWER_OFF)
 	PORT_BIT(0xfe, IP_ACTIVE_HIGH, IPT_UNUSED)
 
 	PORT_START("RESET")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_O) PORT_CHANGED_MEMBER(DEVICE_SELF, professor_state, on_button, 0) PORT_NAME("On")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_POWER_ON) PORT_CHANGED_MEMBER(DEVICE_SELF, professor_state, on_button, 0)
 INPUT_PORTS_END
 
 

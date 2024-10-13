@@ -34,13 +34,13 @@ public:
 protected:
 	// device-level overrides
 	virtual void device_validity_check(validity_checker &valid) const override;
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 	// optional information overrides
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 	void opna_reset_routes_config(machine_config &config);
-	virtual ioport_constructor device_input_ports() const override;
-	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 	void pc9801_86_config(machine_config &config);
 	virtual u16 read_io_base() override;
 
@@ -49,7 +49,7 @@ protected:
 	required_device<pc9801_slot_device> m_bus;
 	required_device<ym2608_device>  m_opna;
 
-	void opna_map(address_map &map);
+	void opna_map(address_map &map) ATTR_COLD;
 
 	u8 opna_r(offs_t offset);
 	void opna_w(offs_t offset, u8 data);
@@ -85,10 +85,10 @@ public:
 	void opna_slave_w(offs_t offset, u8 data);
 
 protected:
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual void device_start() override;
-	virtual void device_reset() override;
-	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 
 private:
 	required_device<ym2608_device>  m_opna_slave;
@@ -106,10 +106,10 @@ public:
 	void opn2c_w(offs_t offset, u8 data);
 
 protected:
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual void device_start() override;
-	virtual void device_reset() override;
-	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 
 private:
 	required_device<ym3438_device>  m_opn2c;

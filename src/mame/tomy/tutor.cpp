@@ -205,8 +205,8 @@ public:
 	void tutor(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	required_device<tms9995_device> m_maincpu;
@@ -238,9 +238,9 @@ private:
 	void write_centronics_busy(int state);
 	[[maybe_unused]] void test_w(offs_t offset, uint8_t data);
 
-	void pyuutajr_mem(address_map &map);
-	void tutor_io(address_map &map);
-	void tutor_memmap(address_map &map);
+	void pyuutajr_mem(address_map &map) ATTR_COLD;
+	void tutor_io(address_map &map) ATTR_COLD;
+	void tutor_memmap(address_map &map) ATTR_COLD;
 };
 
 

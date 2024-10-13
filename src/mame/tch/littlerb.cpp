@@ -123,10 +123,10 @@ public:
 
 	void init_littlerb();
 
-	DECLARE_CUSTOM_INPUT_MEMBER(frame_step_r);
+	ioport_value frame_step_r();
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -146,7 +146,7 @@ private:
 	TIMER_DEVICE_CALLBACK_MEMBER(sound_step_cb);
 	TIMER_DEVICE_CALLBACK_MEMBER(sound_cb);
 
-	void main(address_map &map);
+	void main(address_map &map) ATTR_COLD;
 };
 
 void littlerb_state::machine_start()
@@ -199,7 +199,7 @@ void littlerb_state::main(address_map &map)
 }
 
 // guess according to DASM code and checking the gameplay speed, could be different
-CUSTOM_INPUT_MEMBER(littlerb_state::frame_step_r)
+ioport_value littlerb_state::frame_step_r()
 {
 	uint32_t ret = m_soundframe;
 

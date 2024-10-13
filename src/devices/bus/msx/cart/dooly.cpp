@@ -19,7 +19,7 @@ public:
 protected:
 	// device_t implementation
 	virtual void device_start() override { }
-	virtual void device_reset() override;
+	virtual void device_reset() override ATTR_COLD;
 
 private:
 	void prot_w(u8 data);

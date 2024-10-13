@@ -181,7 +181,7 @@ void debug_qt::wait_for_debugger(device_t &device, bool firststop)
 
 void debug_qt::debugger_update()
 {
-	qApp->processEvents(QEventLoop::AllEvents, 1);
+	qApp->processEvents(QEventLoop::AllEvents);
 }
 
 

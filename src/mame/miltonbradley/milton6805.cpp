@@ -47,7 +47,7 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(volume_changed);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	required_device<m6805_hmos_device> m_maincpu;
@@ -85,7 +85,7 @@ public:
 	milton_filter_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 protected:
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
 
 private:

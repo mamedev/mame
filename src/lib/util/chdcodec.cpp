@@ -553,7 +553,7 @@ const codec_entry f_codec_list[] =
 //  instance of the given type
 //-------------------------------------------------
 
-const codec_entry *find_in_list(chd_codec_type type)
+const codec_entry *find_in_list(chd_codec_type type) noexcept
 {
 	// find in the list and construct the class
 	for (auto & elem : f_codec_list)
@@ -668,7 +668,7 @@ chd_decompressor::ptr chd_codec_list::new_decompressor(chd_codec_type type, chd_
 //  corresponds to a supported codec
 //-------------------------------------------------
 
-bool chd_codec_list::codec_exists(chd_codec_type type)
+bool chd_codec_list::codec_exists(chd_codec_type type) noexcept
 {
 	// find in the list and construct the class
 	return bool(find_in_list(type));
@@ -680,7 +680,7 @@ bool chd_codec_list::codec_exists(chd_codec_type type)
 //  codec
 //-------------------------------------------------
 
-const char *chd_codec_list::codec_name(chd_codec_type type)
+const char *chd_codec_list::codec_name(chd_codec_type type) noexcept
 {
 	// find in the list and construct the class
 	const codec_entry *entry = find_in_list(type);

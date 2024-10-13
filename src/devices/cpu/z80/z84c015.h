@@ -32,7 +32,7 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 	const address_space_config m_program_space_config;
 	const address_space_config m_opcodes_space_config;

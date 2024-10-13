@@ -39,8 +39,8 @@ public:
 	void ultrsprt(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	static const u32 VRAM_PAGES      = 2;
@@ -66,8 +66,8 @@ private:
 
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void sound_map(address_map &map);
-	void main_map(address_map &map);
+	void sound_map(address_map &map) ATTR_COLD;
+	void main_map(address_map &map) ATTR_COLD;
 
 	std::unique_ptr<u32[]> m_vram;
 	u32 m_cpu_vram_page;

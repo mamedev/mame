@@ -56,9 +56,9 @@ public:
 	void carpolo(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	uint8_t m_ball_screen_collision_cause = 0U;
@@ -153,7 +153,7 @@ private:
 	int check_sprite_sprite_collision(int x1, int y1, int code1, int flipy1,
 										int x2, int y2, int code2, int flipy2,
 										int *col_x, int *col_y);
-	void main_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
 
 	required_device_array<netlist_mame_logic_input_device, 4> m_player_crash;
 };

@@ -603,13 +603,13 @@ public:
 protected:
 	using gx700pwfbf_output_delegate = delegate<void (offs_t, uint8_t)>;
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 	virtual void driver_start() override;
 
 	void gx700pwfbf_init(gx700pwfbf_output_delegate &&output_callback_func);
 
-	void konami573a_map(address_map &map);
+	void konami573a_map(address_map &map) ATTR_COLD;
 
 	required_device<psxcpu_device> m_maincpu;
 	required_device<sys573_jvs_host> m_sys573_jvs_host;
@@ -657,14 +657,14 @@ private:
 	void hyprbbc2_cassette_install(device_t *device);
 	void hypbbc2p_cassette_install(device_t *device);
 	static void cr589_config(device_t *device);
-	void fbaitbc_map(address_map &map);
-	void flashbank_map(address_map &map);
-	void gunmania_map(address_map &map);
-	void gbbchmp_map(address_map &map);
-	void konami573_map(address_map &map);
-	void konami573ak_map(address_map &map);
-	void konami573d_map(address_map &map);
-	void konami573k_map(address_map &map);
+	void fbaitbc_map(address_map &map) ATTR_COLD;
+	void flashbank_map(address_map &map) ATTR_COLD;
+	void gunmania_map(address_map &map) ATTR_COLD;
+	void gbbchmp_map(address_map &map) ATTR_COLD;
+	void konami573_map(address_map &map) ATTR_COLD;
+	void konami573ak_map(address_map &map) ATTR_COLD;
+	void konami573d_map(address_map &map) ATTR_COLD;
+	void konami573k_map(address_map &map) ATTR_COLD;
 
 	required_ioport m_analog0;
 	required_ioport m_analog1;
@@ -767,12 +767,12 @@ public:
 	void dsem(machine_config &config);
 	void dsem2(machine_config &config);
 
-	DECLARE_CUSTOM_INPUT_MEMBER( gn845pwbb_read );
+	ioport_value gn845pwbb_read();
 
 	void init_ddr();
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	struct stage_state
@@ -817,8 +817,8 @@ public:
 	required_ioport m_pads;
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	void punchmania_cassette_install(device_t *device);
@@ -1425,7 +1425,7 @@ void ddr_state::gn845pwbb_clk_w( int offset, int data )
 		m_stage_state[ offset ].state, m_stage_state[ offset ].DO, m_stage_state[ offset ].shift, m_stage_state[ offset ].bit, m_stage_mask );
 }
 
-CUSTOM_INPUT_MEMBER( ddr_state::gn845pwbb_read )
+ioport_value ddr_state::gn845pwbb_read()
 {
 	return m_stage->read() & m_stage_mask;
 }

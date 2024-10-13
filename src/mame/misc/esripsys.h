@@ -52,7 +52,7 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(coin_interrupt);
 
 protected:
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_framecpu;
@@ -137,10 +137,10 @@ private:
 	TIMER_CALLBACK_MEMBER(hblank_start_callback);
 	TIMER_CALLBACK_MEMBER(hblank_end_callback);
 	ESRIP_DRAW(esripsys_draw);
-	void frame_cpu_map(address_map &map);
-	void game_cpu_map(address_map &map);
-	void sound_cpu_map(address_map &map);
-	void video_cpu_map(address_map &map);
+	void frame_cpu_map(address_map &map) ATTR_COLD;
+	void game_cpu_map(address_map &map) ATTR_COLD;
+	void sound_cpu_map(address_map &map) ATTR_COLD;
+	void video_cpu_map(address_map &map) ATTR_COLD;
 };
 
 #endif // MAME_MISC_ESRIPSYS_H

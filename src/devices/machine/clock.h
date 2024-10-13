@@ -24,7 +24,7 @@ public:
 	int signal_r() { return m_signal; }
 
 protected:
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override { output(); }
 	virtual void device_clock_changed() override { reinit(); }
 

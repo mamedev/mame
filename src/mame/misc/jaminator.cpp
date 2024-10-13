@@ -64,21 +64,21 @@ public:
 	void jaminator(machine_config &config);
 
 	void input_sel_w(u8 data);
-	DECLARE_CUSTOM_INPUT_MEMBER(input_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(bender_r);
+	ioport_value input_r();
+	ioport_value bender_r();
 
 	// link cable not emulated yet, but output needs to be looped back too (used for starting songs, etc)
 	void link_data_w(u8 data) { m_link_data = data; }
-	DECLARE_CUSTOM_INPUT_MEMBER(link_data_r) { return m_link_data; }
+	ioport_value link_data_r() { return m_link_data; }
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
-	void main_map(address_map &map);
-	void io_map(address_map &map);
-	void sound_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
+	void io_map(address_map &map) ATTR_COLD;
+	void sound_map(address_map &map) ATTR_COLD;
 
 	required_device<i8039_device> m_maincpu;
 	required_device<cf61909_device> m_devo;
@@ -219,7 +219,7 @@ void jaminator_state::input_sel_w(u8 data)
 }
 
 //**************************************************************************
-CUSTOM_INPUT_MEMBER(jaminator_state::input_r)
+ioport_value jaminator_state::input_r()
 {
 	if (m_input_sel < 0x7)
 		return m_inputs[m_input_sel]->read();
@@ -228,7 +228,7 @@ CUSTOM_INPUT_MEMBER(jaminator_state::input_r)
 }
 
 //**************************************************************************
-CUSTOM_INPUT_MEMBER(jaminator_state::bender_r)
+ioport_value jaminator_state::bender_r()
 {
 	// the bender PCB only has 15 contact positions (0-14), but the ROM recognizes 16 values
 	static const u8 bendval[] = {

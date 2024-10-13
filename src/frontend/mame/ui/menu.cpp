@@ -27,6 +27,7 @@
 #include "osdepend.h"
 
 #include <cassert>
+#include <cmath>
 #include <cstdlib>
 #include <limits>
 #include <type_traits>
@@ -978,7 +979,7 @@ void menu::recompute_metrics(uint32_t width, uint32_t height, float aspect)
 
 }
 
-void menu::custom_render(uint32_t flags, void *selectedref, float top, float bottom, float x, float y, float x2, float y2)
+void menu::custom_render(uint32_t flags, void *selectedref, float top, float bottom, float origx1, float origy1, float origx2, float origy2)
 {
 }
 
@@ -1930,7 +1931,7 @@ bool menu::check_metrics()
 	render_target &target(render.ui_target());
 	std::pair<uint32_t, uint32_t> const uisize(target.width(), target.height());
 	float const aspect = render.ui_aspect(&container());
-	if ((uisize == m_last_size) && (aspect == m_last_aspect))
+	if ((uisize == m_last_size) && (std::fabs(1.0F - (aspect / m_last_aspect)) < 1e-6F))
 		return false;
 
 	m_last_size = uisize;

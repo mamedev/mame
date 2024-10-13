@@ -58,13 +58,13 @@ public:
 	void segajw(machine_config &config);
 
 	DECLARE_INPUT_CHANGED_MEMBER(coin_drop_start);
-	DECLARE_CUSTOM_INPUT_MEMBER(coin_sensors_r);
+	ioport_value coin_sensors_r();
 	int hopper_sensors_r();
 
 protected:
 	// driver_device overrides
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	uint8_t coin_counter_r();
@@ -74,11 +74,11 @@ private:
 	void lamps2_w(uint8_t data);
 	void coinlockout_w(uint8_t data);
 
-	void ramdac_map(address_map &map);
-	void segajw_audiocpu_io_map(address_map &map);
-	void segajw_audiocpu_map(address_map &map);
-	void segajw_hd63484_map(address_map &map);
-	void segajw_map(address_map &map);
+	void ramdac_map(address_map &map) ATTR_COLD;
+	void segajw_audiocpu_io_map(address_map &map) ATTR_COLD;
+	void segajw_audiocpu_map(address_map &map) ATTR_COLD;
+	void segajw_hd63484_map(address_map &map) ATTR_COLD;
+	void segajw_map(address_map &map) ATTR_COLD;
 
 	// devices
 	required_device<cpu_device> m_maincpu;
@@ -153,7 +153,7 @@ int segajw_state::hopper_sensors_r()
 	return data;
 }
 
-CUSTOM_INPUT_MEMBER( segajw_state::coin_sensors_r )
+ioport_value segajw_state::coin_sensors_r()
 {
 	uint8_t data = 0;
 

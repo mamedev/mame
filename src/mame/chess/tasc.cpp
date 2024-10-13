@@ -59,8 +59,7 @@ BTANB:
 #include "machine/nvram.h"
 #include "machine/ram.h"
 #include "machine/smartboard.h"
-#include "machine/timer.h"
-#include "sound/spkrdev.h"
+#include "sound/dac.h"
 #include "video/t6963c.h"
 
 #include "speaker.h"
@@ -77,13 +76,13 @@ public:
 	tasc_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
+		m_boot_view(*this, "boot_view"),
 		m_rom(*this, "maincpu"),
 		m_ram(*this, "ram"),
 		m_nvram(*this, "nvram", 0x20000, ENDIANNESS_LITTLE),
 		m_lcd(*this, "lcd"),
 		m_smartboard(*this, "smartboard"),
-		m_speaker(*this, "speaker"),
-		m_disable_bootrom(*this, "disable_bootrom"),
+		m_dac(*this, "dac"),
 		m_inputs(*this, "IN.%u", 0U),
 		m_out_leds(*this, "pled%u", 0U)
 	{ }
@@ -93,30 +92,29 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(change_cpu_freq);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void device_post_load() override { install_bootrom(m_bootrom_enabled); }
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	// devices/pointers
 	required_device<arm_cpu_device> m_maincpu;
+	memory_view m_boot_view;
 	required_region_ptr<u32> m_rom;
 	required_device<ram_device> m_ram;
 	memory_share_creator<u8> m_nvram;
 	required_device<lm24014h_device> m_lcd;
 	required_device<tasc_sb30_device> m_smartboard;
-	required_device<speaker_sound_device> m_speaker;
-	required_device<timer_device> m_disable_bootrom;
+	required_device<dac_2bit_ones_complement_device> m_dac;
 	required_ioport_array<4> m_inputs;
 	output_finder<2> m_out_leds;
 
-	bool m_bootrom_enabled = false;
+	emu_timer *m_boot_timer;
 
 	u32 m_control = 0;
 	u32 m_prev_pc = 0;
 	u64 m_prev_cycle = 0;
 
-	void main_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
 
 	// I/O handlers
 	u32 input_r();
@@ -126,15 +124,23 @@ private:
 	u8 nvram_r(offs_t offset) { return m_nvram[offset]; }
 	void nvram_w(offs_t offset, u8 data) { m_nvram[offset] = data; }
 
-	void install_bootrom(bool enable);
-	TIMER_DEVICE_CALLBACK_MEMBER(disable_bootrom) { install_bootrom(false); }
+	TIMER_CALLBACK_MEMBER(disable_bootrom) { m_boot_view.select(1); }
 };
+
+
+
+/*******************************************************************************
+    Initialization
+*******************************************************************************/
 
 void tasc_state::machine_start()
 {
 	m_out_leds.resolve();
 
-	save_item(NAME(m_bootrom_enabled));
+	m_boot_timer = timer_alloc(FUNC(tasc_state::disable_bootrom), this);
+	m_boot_view[1].install_ram(0, m_ram->size() - 1, m_ram->pointer());
+
+	// register for savestates
 	save_item(NAME(m_control));
 	save_item(NAME(m_prev_pc));
 	save_item(NAME(m_prev_cycle));
@@ -142,7 +148,8 @@ void tasc_state::machine_start()
 
 void tasc_state::machine_reset()
 {
-	install_bootrom(true);
+	m_boot_view.select(0);
+	m_boot_timer->adjust(attotime::never);
 
 	m_prev_pc = m_maincpu->pc();
 	m_prev_cycle = m_maincpu->total_cycles();
@@ -160,27 +167,13 @@ INPUT_CHANGED_MEMBER(tasc_state::change_cpu_freq)
     I/O
 *******************************************************************************/
 
-void tasc_state::install_bootrom(bool enable)
-{
-	address_space &program = m_maincpu->space(AS_PROGRAM);
-	program.unmap_readwrite(0, std::max(m_rom.bytes(), size_t(m_ram->size())) - 1);
-
-	// bootrom bankswitch
-	if (enable)
-		program.install_read_handler(0, m_rom.bytes() - 1, read32sm_delegate(*this, FUNC(tasc_state::rom_r)));
-	else
-		program.install_ram(0, m_ram->size() - 1, m_ram->pointer());
-
-	m_bootrom_enabled = enable;
-}
-
 u32 tasc_state::input_r()
 {
 	if (!machine().side_effects_disabled())
 	{
 		// disconnect bootrom from the bus after next opcode
-		if (m_bootrom_enabled && !m_disable_bootrom->enabled())
-			m_disable_bootrom->adjust(m_maincpu->cycles_to_attotime(10));
+		if (m_boot_timer->remaining().is_never())
+			m_boot_timer->adjust(m_maincpu->cycles_to_attotime(10));
 
 		m_maincpu->set_input_line(ARM_FIRQ_LINE, CLEAR_LINE);
 	}
@@ -212,7 +205,7 @@ void tasc_state::control_w(offs_t offset, u32 data, u32 mem_mask)
 	{
 		m_out_leds[0] = BIT(data, 0);
 		m_out_leds[1] = BIT(data, 1);
-		m_speaker->level_w((data >> 2) & 3);
+		m_dac->write((data >> 2) & 3);
 	}
 
 	COMBINE_DATA(&m_control);
@@ -254,6 +247,9 @@ u32 tasc_state::rom_r(offs_t offset)
 
 void tasc_state::main_map(address_map &map)
 {
+	map(0x00000000, 0x007fffff).view(m_boot_view);
+	m_boot_view[0](0x00000000, 0x0003ffff).r(FUNC(tasc_state::rom_r));
+
 	map(0x01000000, 0x01000003).rw(FUNC(tasc_state::input_r), FUNC(tasc_state::control_w));
 	map(0x02000000, 0x0203ffff).r(FUNC(tasc_state::rom_r));
 	map(0x03000000, 0x0307ffff).rw(FUNC(tasc_state::nvram_r), FUNC(tasc_state::nvram_w)).umask32(0x000000ff);
@@ -308,8 +304,6 @@ void tasc_state::tasc(machine_config &config)
 	const attotime irq_period = attotime::from_hz(32.768_kHz_XTAL / 128); // 256Hz
 	m_maincpu->set_periodic_int(FUNC(tasc_state::irq1_line_assert), irq_period);
 
-	TIMER(config, "disable_bootrom").configure_generic(FUNC(tasc_state::disable_bootrom));
-
 	RAM(config, m_ram).set_extra_options("512K, 1M, 2M, 4M, 8M"); // see driver notes
 	m_ram->set_default_size("512K");
 	m_ram->set_default_value(0);
@@ -326,10 +320,8 @@ void tasc_state::tasc(machine_config &config)
 	config.set_default_layout(layout_tascr30);
 
 	// sound hardware
-	SPEAKER(config, "mono").front_center();
-	static const double speaker_levels[4] = { 0.0, 1.0, -1.0, 0.0 };
-	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.25);
-	m_speaker->set_levels(4, speaker_levels);
+	SPEAKER(config, "speaker").front_center();
+	DAC_2BIT_ONES_COMPLEMENT(config, m_dac).add_route(ALL_OUTPUTS, "speaker", 0.125);
 }
 
 

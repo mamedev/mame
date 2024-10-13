@@ -38,8 +38,8 @@ public:
 	void dcat16_megadriv(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	void screen_vblank_console(int state);
 
@@ -67,7 +67,7 @@ private:
 
 	void dcat16_megadriv_base(machine_config &config);
 
-	void dcat16_megadriv_map(address_map &map);
+	void dcat16_megadriv_map(address_map &map) ATTR_COLD;
 };
 
 
@@ -89,7 +89,7 @@ public:
 
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 };
 
 
@@ -112,7 +112,7 @@ public:
 	void md_32x_scd(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 };
 
 #endif // MAME_SEGACONS_MDCONSOLE_H

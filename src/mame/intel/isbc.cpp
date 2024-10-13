@@ -77,19 +77,19 @@ private:
 	void nmi_mask_w(int state);
 	void bus_intr_out1_w(int state);
 	void bus_intr_out2_w(int state);
-	void isbc2861_mem(address_map &map);
-	void isbc286_io(address_map &map);
-	void isbc286_mem(address_map &map);
-	void isbc8605_io(address_map &map);
-	void isbc8630_io(address_map &map);
-	void isbc86_mem(address_map &map);
-	void isbc_io(address_map &map);
-	void rpc86_io(address_map &map);
-	void rpc86_mem(address_map &map);
-	void sm1810_mem(address_map &map);
-	void sm1810_io(address_map &map);
+	void isbc2861_mem(address_map &map) ATTR_COLD;
+	void isbc286_io(address_map &map) ATTR_COLD;
+	void isbc286_mem(address_map &map) ATTR_COLD;
+	void isbc8605_io(address_map &map) ATTR_COLD;
+	void isbc8630_io(address_map &map) ATTR_COLD;
+	void isbc86_mem(address_map &map) ATTR_COLD;
+	void isbc_io(address_map &map) ATTR_COLD;
+	void rpc86_io(address_map &map) ATTR_COLD;
+	void rpc86_mem(address_map &map) ATTR_COLD;
+	void sm1810_mem(address_map &map) ATTR_COLD;
+	void sm1810_io(address_map &map) ATTR_COLD;
 
-	virtual void machine_reset() override;
+	virtual void machine_reset() override ATTR_COLD;
 
 	static void cfg_fdc_qd(device_t *device);
 

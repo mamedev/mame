@@ -57,11 +57,11 @@ private:
 	u32 m_pa;
 	u16 m_pe;
 
-	void map(address_map &map);
-	void swp30_map(address_map &map);
+	void map(address_map &map) ATTR_COLD;
+	void swp30_map(address_map &map) ATTR_COLD;
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	u32 pa_r();
 	void pa_w(u32 data);

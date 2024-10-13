@@ -455,22 +455,19 @@ void natural_keyboard::post_char(char32_t ch, bool normalize_crlf)
 //  post - post a unicode encoded string
 //-------------------------------------------------
 
-void natural_keyboard::post(const char32_t *text, size_t length, const attotime &rate)
+void natural_keyboard::post(std::u32string_view text, const attotime &rate)
 {
 	// set the fixed rate
 	m_current_rate = rate;
 
-	// 0 length means strlen
-	if (length == 0)
-		for (const char32_t *scan = text; *scan != 0; scan++)
-			length++;
-
 	// iterate over characters or until the buffer is full up
-	while (length > 0 && !full())
+	for (char32_t ch : text)
 	{
+		if (full())
+			break;
+
 		// fetch next character
-		post_char(*text++, true);
-		length--;
+		post_char(ch, true);
 	}
 }
 
@@ -479,21 +476,17 @@ void natural_keyboard::post(const char32_t *text, size_t length, const attotime 
 //  post_utf8 - post a UTF-8 encoded string
 //-------------------------------------------------
 
-void natural_keyboard::post_utf8(const char *text, size_t length, const attotime &rate)
+void natural_keyboard::post_utf8(std::string_view text, const attotime &rate)
 {
 	// set the fixed rate
 	m_current_rate = rate;
 
-	// 0-length means strlen
-	if (length == 0)
-		length = strlen(text);
-
 	// iterate until out of characters
-	while (length > 0)
+	while (!text.empty())
 	{
 		// decode the next character
 		char32_t uc;
-		int count = uchar_from_utf8(&uc, text, length);
+		int count = uchar_from_utf8(&uc, text);
 		if (count < 0)
 		{
 			count = 1;
@@ -502,16 +495,8 @@ void natural_keyboard::post_utf8(const char *text, size_t length, const attotime
 
 		// append to the buffer
 		post_char(uc, true);
-		text += count;
-		length -= count;
+		text.remove_prefix(count);
 	}
-}
-
-
-void natural_keyboard::post_utf8(std::string_view text, const attotime &rate)
-{
-	if (!text.empty())
-		post_utf8(text.data(), text.size(), rate);
 }
 
 
@@ -519,66 +504,62 @@ void natural_keyboard::post_utf8(std::string_view text, const attotime &rate)
 //  post_coded - post a coded string
 //-------------------------------------------------
 
-void natural_keyboard::post_coded(const char *text, size_t length, const attotime &rate)
+void natural_keyboard::post_coded(std::string_view text, const attotime &rate)
 {
+	using namespace std::literals;
 	static const struct
 	{
-		const char *key;
+		std::string_view key;
 		char32_t code;
 	} codes[] =
 	{
-		{ "BACKSPACE",  8 },
-		{ "BS",         8 },
-		{ "BKSP",       8 },
-		{ "DEL",        UCHAR_MAMEKEY(DEL) },
-		{ "DELETE",     UCHAR_MAMEKEY(DEL) },
-		{ "END",        UCHAR_MAMEKEY(END) },
-		{ "ENTER",      13 },
-		{ "ESC",        '\033' },
-		{ "HOME",       UCHAR_MAMEKEY(HOME) },
-		{ "INS",        UCHAR_MAMEKEY(INSERT) },
-		{ "INSERT",     UCHAR_MAMEKEY(INSERT) },
-		{ "PGDN",       UCHAR_MAMEKEY(PGDN) },
-		{ "PGUP",       UCHAR_MAMEKEY(PGUP) },
-		{ "SPACE",      32 },
-		{ "TAB",        9 },
-		{ "F1",         UCHAR_MAMEKEY(F1) },
-		{ "F2",         UCHAR_MAMEKEY(F2) },
-		{ "F3",         UCHAR_MAMEKEY(F3) },
-		{ "F4",         UCHAR_MAMEKEY(F4) },
-		{ "F5",         UCHAR_MAMEKEY(F5) },
-		{ "F6",         UCHAR_MAMEKEY(F6) },
-		{ "F7",         UCHAR_MAMEKEY(F7) },
-		{ "F8",         UCHAR_MAMEKEY(F8) },
-		{ "F9",         UCHAR_MAMEKEY(F9) },
-		{ "F10",        UCHAR_MAMEKEY(F10) },
-		{ "F11",        UCHAR_MAMEKEY(F11) },
-		{ "F12",        UCHAR_MAMEKEY(F12) },
-		{ "QUOTE",      '\"' }
+		{ "BACKSPACE"sv, 8 },
+		{ "BS"sv,       8 },
+		{ "BKSP"sv,     8 },
+		{ "DEL"sv,      UCHAR_MAMEKEY(DEL) },
+		{ "DELETE"sv,   UCHAR_MAMEKEY(DEL) },
+		{ "END"sv,      UCHAR_MAMEKEY(END) },
+		{ "ENTER"sv,    13 },
+		{ "ESC"sv,      '\033' },
+		{ "HOME"sv,     UCHAR_MAMEKEY(HOME) },
+		{ "INS"sv,      UCHAR_MAMEKEY(INSERT) },
+		{ "INSERT"sv,   UCHAR_MAMEKEY(INSERT) },
+		{ "PGDN"sv,     UCHAR_MAMEKEY(PGDN) },
+		{ "PGUP"sv,     UCHAR_MAMEKEY(PGUP) },
+		{ "SPACE"sv,    32 },
+		{ "TAB"sv,      9 },
+		{ "F1"sv,       UCHAR_MAMEKEY(F1) },
+		{ "F2"sv,       UCHAR_MAMEKEY(F2) },
+		{ "F3"sv,       UCHAR_MAMEKEY(F3) },
+		{ "F4"sv,       UCHAR_MAMEKEY(F4) },
+		{ "F5"sv,       UCHAR_MAMEKEY(F5) },
+		{ "F6"sv,       UCHAR_MAMEKEY(F6) },
+		{ "F7"sv,       UCHAR_MAMEKEY(F7) },
+		{ "F8"sv,       UCHAR_MAMEKEY(F8) },
+		{ "F9"sv,       UCHAR_MAMEKEY(F9) },
+		{ "F10"sv,      UCHAR_MAMEKEY(F10) },
+		{ "F11"sv,      UCHAR_MAMEKEY(F11) },
+		{ "F12"sv,      UCHAR_MAMEKEY(F12) },
+		{ "QUOTE"sv,    '\"' }
 	};
 
 	// set the fixed rate
 	m_current_rate = rate;
 
-	// 0-length means strlen
-	if (length == 0)
-		length = strlen(text);
-
 	// iterate through the source string
-	size_t curpos = 0;
-	while (curpos < length)
+	while (!text.empty())
 	{
 		// extract next character
-		char32_t ch = text[curpos];
-		size_t increment = 1;
+		char32_t ch = text.front();
+		std::string_view::size_type increment = 1;
 
 		// look for escape characters
 		if (ch == '{')
 			for (auto & code : codes)
 			{
-				size_t keylen = strlen(code.key);
-				if (curpos + keylen + 2 <= length)
-					if (core_strnicmp(code.key, &text[curpos + 1], keylen) == 0 && text[curpos + keylen + 1] == '}')
+				std::string_view::size_type keylen = code.key.length();
+				if (keylen + 2 <= text.length())
+					if (util::strequpper(text.substr(1, keylen), code.key) && text[keylen + 1] == '}')
 					{
 						ch = code.code;
 						increment = keylen + 2;
@@ -588,15 +569,8 @@ void natural_keyboard::post_coded(const char *text, size_t length, const attotim
 		// if we got a code, post it
 		if (ch != 0)
 			post_char(ch);
-		curpos += increment;
+		text.remove_prefix(increment);
 	}
-}
-
-
-void natural_keyboard::post_coded(std::string_view text, const attotime &rate)
-{
-	if (!text.empty())
-		post_coded(text.data(), text.size(), rate);
 }
 
 

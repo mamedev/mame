@@ -451,9 +451,9 @@ private:
 	uint8_t pb1_r();
 	uint8_t pc1_r();
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 	void aristmk4_palette(palette_device &palette) const;
 	void lions_palette(palette_device &palette) const;
 	uint32_t screen_update_aristmk4(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -463,8 +463,8 @@ private:
 	TIMER_CALLBACK_MEMBER(power_fail);
 	inline void uBackgroundColour();
 
-	void slots_mem(address_map &map);
-	void poker_mem(address_map &map);
+	void slots_mem(address_map &map) ATTR_COLD;
+	void poker_mem(address_map &map) ATTR_COLD;
 };
 
 /* Partial Cashcade protocol */

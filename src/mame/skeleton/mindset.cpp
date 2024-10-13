@@ -73,8 +73,8 @@ protected:
 	void irq_w(int state);
 
 	mindset_module_interface(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 private:
 	devcb_write_line m_irq_cb;
@@ -123,7 +123,7 @@ public:
 
 protected:
 	virtual void device_validity_check(validity_checker &valid) const override;
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 };
 
 DEFINE_DEVICE_TYPE(MINDSET_MODULE, mindset_module,  "mindset_module", "MINDSET module")
@@ -158,14 +158,14 @@ public:
 	mindset_sound_module(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 	virtual ~mindset_sound_module() = default;
 
-	virtual void map(address_map &map) override;
-	virtual void idmap(address_map &map) override;
+	virtual void map(address_map &map) override ATTR_COLD;
+	virtual void idmap(address_map &map) override ATTR_COLD;
 
 protected:
-	virtual const tiny_rom_entry *device_rom_region() const override;
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 private:
 	u8 m_p1 = 0, m_p2 = 0;
@@ -256,11 +256,11 @@ public:
 	mindset_rs232_module(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 	virtual ~mindset_rs232_module() = default;
 
-	virtual void map(address_map &map) override;
-	virtual void idmap(address_map &map) override;
+	virtual void map(address_map &map) override ATTR_COLD;
+	virtual void idmap(address_map &map) override ATTR_COLD;
 
 protected:
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 private:
 	required_device<ins8250_device> m_ins8250;
@@ -352,8 +352,8 @@ protected:
 	static inline u16 msk(int bit) { return (1U << bit) - 1; }
 	static inline u16 sw(u16 data) { return (data >> 8) | (data << 8); }
 
-	void maincpu_mem(address_map &map);
-	void maincpu_io(address_map &map);
+	void maincpu_mem(address_map &map) ATTR_COLD;
+	void maincpu_io(address_map &map) ATTR_COLD;
 
 	void display_mode();
 	void blit(u16 packet_seg, u16 packet_adr);
@@ -399,8 +399,8 @@ protected:
 
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 };
 
 

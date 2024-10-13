@@ -26,7 +26,7 @@ actual speed, overclock V10 and V11 to 230%. This can be done by starting MAME
 with the -cheat option and going to the Slider Controls menu, hold Ctrl and press
 Right to overclock maincpu.
 
-********************************************************************************
+================================================================================
 
 Excel 68000 (model 6094) overview:
 - 16KB RAM(2*SRM2264C-10 @ U8/U9), 64KB ROM(2*AT27C256-15DC @ U6/U7)
@@ -47,7 +47,7 @@ display a ROM checksum.
 fex68km4 continuously tests RAM at boot and displays "512", this is normal.
 To start, hold New Game or Clear.
 
-********************************************************************************
+================================================================================
 
 Elite Avant Garde 2265 (EAG, model 6114)
 ----------------------------------------
@@ -80,7 +80,7 @@ ripple counter/divider). From Q13 output (counter=8192) we obtain the IRQ signal
 applied to IPL1 of 68000 (pin 24) 4,9152 MHz / 8192 = 600 Hz.
 
 The module slot pinout is different from SCC series. The data on those appears
-to be compatible with EAG though and will load fine with an adapter.
+to be compatible with EAG though, and will load fine with an adapter.
 
 The USART allows for a serial connection between the chess computer and another
 device, for example the Fidelity Challenger Printer, or a PC. It expects a baud
@@ -90,6 +90,13 @@ Fidelity released a DOS tool called EAGLINK which featured PC printer support,
 complete I/O control, detailed information while the program is 'thinking', etc.
 It can be enabled with POP3 H3.
 
+The chessboard is the same old wooden Auto Sensory board from EAS / Prestige.
+6502-based EAG can easily be upgraded by swapping the PCB. Fidelity also provided
+support for converting EAS and Prestige, via optional diode D8 next to the USART.
+
+To play with this EAS / Prestige configuration on MAME, the user needs to provide
+external artwork, or copy internal artwork fidel_eas.lay or fidel_pc.lay.
+
 Memory map: (of what is known)
 -----------
 000000-01FFFF: 128KB ROM
@@ -98,12 +105,12 @@ Memory map: (of what is known)
 300000-30000F W hi d0: NE591: 7seg data
 300000-30000F W lo d0: NE591: LED data
 300000-30000F R lo d7: 74259: keypad rows 0-7
-400000-400007 W lo d0: 74259,74145/7442: led/keypad mux, buzzer out
+400000-40000F W lo d0: 74259,74145/7442: led/keypad mux, buzzer out
 400000-4????? R hi: external module slot
 700002-700003 R lo d7: 74251: keypad row 8
 604000-607FFF: 16KB EEPROM
 
-********************************************************************************
+================================================================================
 
 Elite Avant Garde 2325 (EAG, model 6117)
 ----------------------------------------
@@ -174,7 +181,7 @@ V1x Memory map:
 280000-37FFFF: hashtable SRAM
 B0000x-xxxxxx: see V7, -800000
 
-********************************************************************************
+================================================================================
 
 Elite Premiere (model 6131)
 ---------------------------
@@ -259,8 +266,8 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(in1_changed) { update_dsr(); }
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	void eag_base(machine_config &config);
 
@@ -271,23 +278,23 @@ protected:
 	required_device<sensorboard_device> m_board;
 	required_device<pwm_display_device> m_display;
 	required_device<dac_1bit_device> m_dac;
-	optional_ioport_array<3> m_inputs;
+	optional_ioport_array<4> m_inputs;
 
 	u8 m_select = 0;
+	u8 m_inp_mux = 0;
 	u8 m_7seg_data = 0;
 	u8 m_led_data = 0;
 
 	// address maps
-	void eag_map(address_map &map);
-	void eagv7_map(address_map &map);
-	void eagv10_map(address_map &map);
+	void eag_map(address_map &map) ATTR_COLD;
+	void eagv7_map(address_map &map) ATTR_COLD;
+	void eagv10_map(address_map &map) ATTR_COLD;
 
 	// I/O handlers
 	void update_display();
 	void update_dsr();
 	void mux_w(offs_t offset, u8 data);
 	u8 input_r(offs_t offset);
-	virtual u8 board_r() { return m_board->read_rank(m_select, true); }
 	void leds_w(offs_t offset, u8 data);
 	void digit_w(offs_t offset, u8 data);
 };
@@ -296,6 +303,7 @@ void eag_state::machine_start()
 {
 	// register for savestates
 	save_item(NAME(m_select));
+	save_item(NAME(m_inp_mux));
 	save_item(NAME(m_7seg_data));
 	save_item(NAME(m_led_data));
 }
@@ -328,8 +336,8 @@ private:
 	required_device<generic_latch_8_device> m_sublatch;
 
 	// address maps
-	void main_map(address_map &map);
-	void sub_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
+	void sub_map(address_map &map) ATTR_COLD;
 
 	// I/O handlers
 	void reset_subcpu_w(u8 data);
@@ -354,8 +362,8 @@ public:
 	void premiere(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	// devices/pointers
@@ -364,7 +372,7 @@ private:
 	required_memory_bank m_rombank;
 
 	// address maps
-	void main_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
 };
 
 void premiere_state::machine_start()
@@ -381,7 +389,7 @@ void premiere_state::machine_reset()
 	eag_state::machine_reset();
 
 	// program switch directly selects bank
-	const u8 bank = m_inputs[2]->read() & 1;
+	const u8 bank = m_inputs[3]->read() & 1;
 	m_rombank->set_entry(bank);
 	m_nvrambank->set_entry(bank);
 }
@@ -404,13 +412,10 @@ public:
 
 private:
 	// address maps
-	void fex68k_map(address_map &map);
-	void fex68km2_map(address_map &map);
-	void fex68km3_map(address_map &map);
-	void fex68km4_map(address_map &map);
-
-	// I/O handlers
-	virtual u8 board_r() override { return m_board->read_file(m_select); }
+	void fex68k_map(address_map &map) ATTR_COLD;
+	void fex68km2_map(address_map &map) ATTR_COLD;
+	void fex68km3_map(address_map &map) ATTR_COLD;
+	void fex68km4_map(address_map &map) ATTR_COLD;
 };
 
 
@@ -426,14 +431,15 @@ void eag_state::update_display()
 	// Excel 68000: 4*7seg leds, 8*8 chessboard leds
 	// EAG: 8*7seg leds(2 panels), (8+1)*8 chessboard leds
 	u8 seg_data = bitswap<8>(m_7seg_data,0,1,3,2,7,5,6,4);
-	m_display->matrix(1 << m_select, m_led_data << 8 | seg_data);
+	u8 led_data = bitswap<8>(m_led_data,0,1,2,3,4,5,6,7);
+	m_display->matrix(1 << m_inp_mux, led_data << 8 | seg_data);
 }
 
 void eag_state::update_dsr()
 {
-	// USART DSR: 3 more buttons on EAG
+	// USART DSR: 3 more buttons (and optional diode) on EAG
 	if (m_usart != nullptr)
-		m_usart->write_dsr(!BIT(m_inputs[1]->read(), m_select));
+		m_usart->write_dsr(BIT(~m_inputs[1]->read(), m_inp_mux) & (BIT(m_select, 4) | m_inputs[2]->read()));
 }
 
 void eag_state::mux_w(offs_t offset, u8 data)
@@ -442,13 +448,14 @@ void eag_state::mux_w(offs_t offset, u8 data)
 	u8 mask = 1 << offset;
 	m_select = (m_select & ~mask) | ((data & 1) ? mask : 0);
 
-	// 74259 Q0-Q3: 74145 A-D (Q4-Q7 N/C)
-	m_select &= 0xf;
+	// 74259 Q0-Q3: 74145 A-D (Q5-Q7 N/C)
+	// 74259 Q4: optional diode to USART DSR on EAG
+	m_inp_mux = m_select & 0xf;
 	update_dsr();
 
 	// 74145 0-8: input mux, digit/led select
 	// 74145 9: speaker out
-	m_dac->write(BIT(1 << m_select, 9));
+	m_dac->write(BIT(1 << m_inp_mux, 9));
 	update_display();
 }
 
@@ -458,14 +465,20 @@ u8 eag_state::input_r(offs_t offset)
 
 	// a1-a3,d7: multiplexed inputs (active low)
 	// read chessboard sensors
-	if (m_select < 8)
-		data = board_r();
+	if (m_inp_mux < 8)
+	{
+		// EAG chessboard is rotated 90 degrees
+		if (m_inputs[2].read_safe(0) & 1)
+			data = m_board->read_rank(m_inp_mux);
+		else
+			data = m_board->read_file(m_inp_mux, true);
+	}
 
 	// read button panel
-	else if (m_select == 8)
+	else if (m_inp_mux == 8)
 		data = m_inputs[0]->read();
 
-	return (data >> offset & 1) ? 0 : 0x80;
+	return ~data << offset & 0x80;
 }
 
 void eag_state::leds_w(offs_t offset, u8 data)
@@ -560,7 +573,7 @@ void eag_state::eag_map(address_map &map)
 	map(0x104000, 0x107fff).ram();
 	map(0x300000, 0x30000f).mirror(0x000010).w(FUNC(eag_state::digit_w)).umask16(0xff00).nopr();
 	map(0x300000, 0x30000f).mirror(0x000010).rw(FUNC(eag_state::input_r), FUNC(eag_state::leds_w)).umask16(0x00ff);
-	map(0x400000, 0x400007).w(FUNC(eag_state::mux_w)).umask16(0x00ff);
+	map(0x400000, 0x40000f).w(FUNC(eag_state::mux_w)).umask16(0x00ff);
 	map(0x400000, 0x407fff).r("cartslot", FUNC(generic_slot_device::read_rom)).umask16(0xff00);
 	map(0x604000, 0x607fff).ram().share("nvram");
 	map(0x700000, 0x700003).rw(m_usart, FUNC(i8251_device::read), FUNC(i8251_device::write)).umask16(0x00ff);
@@ -588,7 +601,7 @@ void eag_state::eagv7_map(address_map &map)
 	map(0x104000, 0x107fff).ram();
 	map(0x300000, 0x30000f).mirror(0x000010).w(FUNC(eag_state::digit_w)).umask32(0xff00ff00).nopr();
 	map(0x300000, 0x30000f).mirror(0x000010).rw(FUNC(eag_state::input_r), FUNC(eag_state::leds_w)).umask32(0x00ff00ff);
-	map(0x400000, 0x400007).w(FUNC(eag_state::mux_w)).umask32(0x00ff00ff);
+	map(0x400000, 0x40000f).w(FUNC(eag_state::mux_w)).umask32(0x00ff00ff);
 	map(0x400000, 0x407fff).r("cartslot", FUNC(generic_slot_device::read_rom)).umask32(0xff00ff00);
 	map(0x604000, 0x607fff).ram().share("nvram");
 	map(0x700000, 0x700003).rw(m_usart, FUNC(i8251_device::read), FUNC(i8251_device::write)).umask32(0x00ff00ff);
@@ -601,7 +614,7 @@ void eag_state::eagv10_map(address_map &map)
 	map(0x00280000, 0x0037ffff).ram();
 	map(0x00b00000, 0x00b0000f).mirror(0x00000010).w(FUNC(eag_state::digit_w)).umask32(0xff00ff00).nopr();
 	map(0x00b00000, 0x00b0000f).mirror(0x00000010).rw(FUNC(eag_state::input_r), FUNC(eag_state::leds_w)).umask32(0x00ff00ff);
-	map(0x00c00000, 0x00c00007).w(FUNC(eag_state::mux_w)).umask32(0x00ff00ff);
+	map(0x00c00000, 0x00c0000f).w(FUNC(eag_state::mux_w)).umask32(0x00ff00ff);
 	map(0x00c00000, 0x00c07fff).r("cartslot", FUNC(generic_slot_device::read_rom)).umask32(0xff00ff00);
 	map(0x00e04000, 0x00e07fff).ram().share("nvram");
 	map(0x00f00000, 0x00f00003).rw(m_usart, FUNC(i8251_device::read), FUNC(i8251_device::write)).umask32(0x00ff00ff);
@@ -614,7 +627,7 @@ void premiere_state::main_map(address_map &map)
 	map(0x100000, 0x13ffff).ram();
 	map(0x300000, 0x30000f).mirror(0x000010).w(FUNC(premiere_state::digit_w)).umask16(0xff00).nopr();
 	map(0x300000, 0x30000f).mirror(0x000010).rw(FUNC(premiere_state::input_r), FUNC(premiere_state::leds_w)).umask16(0x00ff);
-	map(0x400000, 0x400007).w(FUNC(premiere_state::mux_w)).umask16(0x00ff);
+	map(0x400000, 0x40000f).w(FUNC(premiere_state::mux_w)).umask16(0x00ff);
 	map(0x600000, 0x607fff).mirror(0x008000).bankrw(m_nvrambank);
 	map(0x700000, 0x700003).rw(m_usart, FUNC(i8251_device::read), FUNC(i8251_device::write)).umask16(0x00ff);
 }
@@ -627,37 +640,67 @@ void premiere_state::main_map(address_map &map)
 
 static INPUT_PORTS_START( excel68k )
 	PORT_START("IN.0")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_DEL) PORT_NAME("Clear")
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_1) PORT_CODE(KEYCODE_1_PAD) PORT_NAME("Move / Pawn")
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_2) PORT_CODE(KEYCODE_2_PAD) PORT_NAME("Hint / Knight")
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_3) PORT_CODE(KEYCODE_3_PAD) PORT_NAME("Take Back / Bishop")
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_4) PORT_CODE(KEYCODE_4_PAD) PORT_NAME("Level / Rook")
-	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_5) PORT_CODE(KEYCODE_5_PAD) PORT_NAME("Options / Queen")
-	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_6) PORT_CODE(KEYCODE_6_PAD) PORT_NAME("Verify / King")
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_R) PORT_CODE(KEYCODE_N) PORT_NAME("New Game")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_R) PORT_CODE(KEYCODE_N) PORT_NAME("New Game")
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_6) PORT_CODE(KEYCODE_6_PAD) PORT_NAME("Verify / King")
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_5) PORT_CODE(KEYCODE_5_PAD) PORT_NAME("Options / Queen")
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_4) PORT_CODE(KEYCODE_4_PAD) PORT_NAME("Level / Rook")
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_3) PORT_CODE(KEYCODE_3_PAD) PORT_NAME("Take Back / Bishop")
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_2) PORT_CODE(KEYCODE_2_PAD) PORT_NAME("Hint / Knight")
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_1) PORT_CODE(KEYCODE_1_PAD) PORT_NAME("Move / Pawn")
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_DEL) PORT_CODE(KEYCODE_BACKSPACE) PORT_NAME("Clear")
+INPUT_PORTS_END
+
+// EAG or EAS / Prestige button panel
+#define HOUSING(x) PORT_CONDITION("IN.2", 0x01, EQUALS, x)
+
+static INPUT_PORTS_START( eag_base )
+	PORT_START("IN.0")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) HOUSING(1) PORT_CODE(KEYCODE_V) PORT_NAME("RV")
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) HOUSING(1) PORT_CODE(KEYCODE_O) PORT_NAME("Option")
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) HOUSING(1) PORT_CODE(KEYCODE_1) PORT_CODE(KEYCODE_1_PAD) PORT_NAME("LV / Pawn")
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) HOUSING(1) PORT_CODE(KEYCODE_2) PORT_CODE(KEYCODE_2_PAD) PORT_NAME("TB / Knight")
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) HOUSING(1) PORT_CODE(KEYCODE_3) PORT_CODE(KEYCODE_3_PAD) PORT_NAME("ST / Bishop")
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) HOUSING(1) PORT_CODE(KEYCODE_4) PORT_CODE(KEYCODE_4_PAD) PORT_NAME("TM / Rook")
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) HOUSING(1) PORT_CODE(KEYCODE_5) PORT_CODE(KEYCODE_5_PAD) PORT_NAME("PV / Queen")
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) HOUSING(1) PORT_CODE(KEYCODE_6) PORT_CODE(KEYCODE_6_PAD) PORT_NAME("PB / King")
+
+	PORT_START("IN.1")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) HOUSING(1) PORT_CODE(KEYCODE_DEL) PORT_CODE(KEYCODE_BACKSPACE) PORT_NAME("CL") PORT_CHANGED_MEMBER(DEVICE_SELF, eag_state, in1_changed, 0)
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) HOUSING(1) PORT_CODE(KEYCODE_M) PORT_NAME("DM") PORT_CHANGED_MEMBER(DEVICE_SELF, eag_state, in1_changed, 0)
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) HOUSING(1) PORT_CODE(KEYCODE_R) PORT_CODE(KEYCODE_N) PORT_NAME("New Game") PORT_CHANGED_MEMBER(DEVICE_SELF, eag_state, in1_changed, 0)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( eag )
-	PORT_START("IN.0")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_6) PORT_CODE(KEYCODE_6_PAD) PORT_NAME("PB / King")
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_5) PORT_CODE(KEYCODE_5_PAD) PORT_NAME("PV / Queen")
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_4) PORT_CODE(KEYCODE_4_PAD) PORT_NAME("TM / Rook")
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_3) PORT_CODE(KEYCODE_3_PAD) PORT_NAME("ST / Bishop")
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_2) PORT_CODE(KEYCODE_2_PAD) PORT_NAME("TB / Knight")
-	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_1) PORT_CODE(KEYCODE_1_PAD) PORT_NAME("LV / Pawn")
-	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_O) PORT_NAME("Option")
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_V) PORT_NAME("RV")
+	PORT_INCLUDE( eag_base )
 
-	PORT_START("IN.1")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_DEL) PORT_NAME("CL") PORT_CHANGED_MEMBER(DEVICE_SELF, eag_state, in1_changed, 0)
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_M) PORT_NAME("DM") PORT_CHANGED_MEMBER(DEVICE_SELF, eag_state, in1_changed, 0)
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_R) PORT_CODE(KEYCODE_N) PORT_NAME("New Game") PORT_CHANGED_MEMBER(DEVICE_SELF, eag_state, in1_changed, 0)
+	PORT_MODIFY("IN.0")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) HOUSING(0) PORT_CODE(KEYCODE_R) PORT_CODE(KEYCODE_N) PORT_NAME("New Game")
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) HOUSING(0) PORT_CODE(KEYCODE_O) PORT_NAME("Option")
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) HOUSING(0) PORT_CODE(KEYCODE_1) PORT_CODE(KEYCODE_1_PAD) PORT_NAME("PB / King")
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) HOUSING(0) PORT_CODE(KEYCODE_2) PORT_CODE(KEYCODE_2_PAD) PORT_NAME("PV / Queen")
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) HOUSING(0) PORT_CODE(KEYCODE_3) PORT_CODE(KEYCODE_3_PAD) PORT_NAME("TM / Rook")
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) HOUSING(0) PORT_CODE(KEYCODE_4) PORT_CODE(KEYCODE_4_PAD) PORT_NAME("ST / Bishop")
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) HOUSING(0) PORT_CODE(KEYCODE_5) PORT_CODE(KEYCODE_5_PAD) PORT_NAME("TB / Knight")
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) HOUSING(0) PORT_CODE(KEYCODE_6) PORT_CODE(KEYCODE_6_PAD) PORT_NAME("LV / Pawn")
+
+	PORT_MODIFY("IN.1")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) HOUSING(0) PORT_CODE(KEYCODE_M) PORT_NAME("DM") PORT_CHANGED_MEMBER(DEVICE_SELF, eag_state, in1_changed, 0)
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) HOUSING(0) PORT_CODE(KEYCODE_DEL) PORT_CODE(KEYCODE_BACKSPACE) PORT_NAME("CL") PORT_CHANGED_MEMBER(DEVICE_SELF, eag_state, in1_changed, 0)
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) HOUSING(0) PORT_CODE(KEYCODE_V) PORT_NAME("RV") PORT_CHANGED_MEMBER(DEVICE_SELF, eag_state, in1_changed, 0)
+
+	PORT_START("IN.2") // factory set (diode)
+	PORT_CONFNAME( 0x01, 0x01, "Housing" )
+	PORT_CONFSETTING(    0x00, "Elite A/S / Prestige" )
+	PORT_CONFSETTING(    0x01, "Elite Avant Garde" )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( premiere )
-	PORT_INCLUDE( eag )
+	PORT_INCLUDE( eag_base )
 
-	PORT_START("IN.2")
+	PORT_START("IN.2") // does not work on Vancouver
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_CUSTOM)
+
+	PORT_START("IN.3")
 	PORT_CONFNAME( 0x01, 0x00, "Program" )
 	PORT_CONFSETTING(    0x00, "Vancouver" )
 	PORT_CONFSETTING(    0x01, "2265" )

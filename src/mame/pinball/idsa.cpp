@@ -76,10 +76,10 @@ private:
 	void ay2_a_w(uint8_t data);
 	void ay2_b_w(uint8_t data);
 
-	void maincpu_io_map(address_map &map);
-	void maincpu_map(address_map &map);
+	void maincpu_io_map(address_map &map) ATTR_COLD;
+	void maincpu_map(address_map &map) ATTR_COLD;
 
-	virtual void machine_reset() override;
+	virtual void machine_reset() override ATTR_COLD;
 
 	uint16_t m_irqcnt = 0U;
 	uint8_t m_ppi_data = 0U;

@@ -30,7 +30,7 @@ public:
 	void qs7(machine_config &config);
 
 private:
-	void qs7_prog_map(address_map &map);
+	void qs7_prog_map(address_map &map) ATTR_COLD;
 
 	required_device<h8510_device> m_maincpu;
 };

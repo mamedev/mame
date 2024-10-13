@@ -32,9 +32,9 @@ private:
 	uint8_t fff400_r();
 	SCN2674_DRAW_CHARACTER_MEMBER(draw_character);
 
-	void mem_map(address_map &map);
-	void ramdac_map(address_map &map);
-	void vram_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
+	void ramdac_map(address_map &map) ATTR_COLD;
+	void vram_map(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 };

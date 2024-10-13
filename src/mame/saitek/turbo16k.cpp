@@ -3,7 +3,7 @@
 // thanks-to:Sean Riddle
 /*******************************************************************************
 
-SciSys Turbo 16K family
+SciSys Kasparov Turbo 16K family
 
 These chesscomputers are all on similar hardware. The chess engine is by Julio
 Kaplan and Craig Barnes.
@@ -60,7 +60,7 @@ SX8(A) program is used in:
 #include "cpu/m6800/m6801.h"
 #include "machine/msm5001n.h"
 #include "machine/sensorboard.h"
-#include "sound/spkrdev.h"
+#include "sound/dac.h"
 #include "video/pwm.h"
 
 #include "speaker.h"
@@ -100,14 +100,14 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(change_cpu_freq);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 	// devices/pointers
 	required_device<hd6301y0_cpu_device> m_maincpu;
 	required_device<sensorboard_device> m_board;
 	optional_device_array<msm5001n_device, 2> m_lcd_clock;
 	required_device<pwm_display_device> m_display;
-	required_device<speaker_sound_device> m_dac;
+	required_device<dac_1bit_device> m_dac;
 	required_ioport_array<2> m_inputs;
 	output_finder<2, 4> m_lcd_digits;
 	output_finder<2> m_lcd_colon;
@@ -244,7 +244,7 @@ void turbo16k_state::p6_w(u8 data)
 	update_display();
 
 	// P67: speaker out
-	m_dac->level_w(BIT(~data, 7));
+	m_dac->write(BIT(~data, 7));
 }
 
 
@@ -446,7 +446,7 @@ void turbo16k_state::compan3(machine_config &config)
 
 	// sound hardware
 	SPEAKER(config, "speaker").front_center();
-	SPEAKER_SOUND(config, m_dac).add_route(ALL_OUTPUTS, "speaker", 0.25);
+	DAC_1BIT(config, m_dac).add_route(ALL_OUTPUTS, "speaker", 0.25);
 }
 
 void turbo16k_state::turbo16k(machine_config &config)
@@ -515,8 +515,8 @@ ROM_END
 *******************************************************************************/
 
 //    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT     CLASS           INIT        COMPANY, FULLNAME, FLAGS
-SYST( 1986, turbo16k, 0,        0,      turbo16k, turbo16k, turbo16k_state, empty_init, "SciSys / Heuristic Software", "Turbo 16K", MACHINE_SUPPORTS_SAVE )
-SYST( 1986, compan3,  turbo16k, 0,      compan3,  compan3,  turbo16k_state, empty_init, "SciSys / Heuristic Software", "Companion III", MACHINE_SUPPORTS_SAVE )
+SYST( 1986, turbo16k, 0,        0,      turbo16k, turbo16k, turbo16k_state, empty_init, "SciSys / Heuristic Software", "Kasparov Turbo 16K", MACHINE_SUPPORTS_SAVE )
+SYST( 1986, compan3,  turbo16k, 0,      compan3,  compan3,  turbo16k_state, empty_init, "SciSys / Heuristic Software", "Kasparov Companion III", MACHINE_SUPPORTS_SAVE )
 
 SYST( 1988, conquist, 0,        0,      conquist, conquist, conquist_state, empty_init, "Saitek / Heuristic Software", "Kasparov Conquistador", MACHINE_SUPPORTS_SAVE )
 SYST( 1988, tmate,    conquist, 0,      tmate,    tmate,    conquist_state, empty_init, "Saitek / Heuristic Software", "Kasparov Team-Mate", MACHINE_SUPPORTS_SAVE )

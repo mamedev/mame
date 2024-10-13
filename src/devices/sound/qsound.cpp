@@ -139,6 +139,10 @@ qsound_device::qsound_device(machine_config const &mconfig, char const *tag, dev
 {
 }
 
+qsound_device::~qsound_device()
+{
+}
+
 
 void qsound_device::qsound_w(offs_t offset, u8 data)
 {

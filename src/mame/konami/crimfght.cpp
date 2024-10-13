@@ -47,7 +47,7 @@ public:
 		m_rombank(*this, "rombank")
 	{ }
 
-	DECLARE_CUSTOM_INPUT_MEMBER(system_r);
+	ioport_value system_r();
 	void crimfght(machine_config &config);
 
 private:
@@ -68,16 +68,16 @@ private:
 	void k052109_051960_w(offs_t offset, uint8_t data);
 	IRQ_CALLBACK_MEMBER(audiocpu_irq_ack);
 	void ym2151_ct_w(uint8_t data);
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 	uint32_t screen_update_crimfght(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void volume_callback(uint8_t data);
 	K052109_CB_MEMBER(tile_callback);
 	K051960_CB_MEMBER(sprite_callback);
 	void banking_callback(uint8_t data);
 
-	void bank0000_map(address_map &map);
-	void crimfght_map(address_map &map);
-	void crimfght_sound_map(address_map &map);
+	void bank0000_map(address_map &map) ATTR_COLD;
+	void crimfght_map(address_map &map) ATTR_COLD;
+	void crimfght_sound_map(address_map &map) ATTR_COLD;
 	int m_woco = 0;
 	int m_rmrd = 0;
 	int m_init = 0;
@@ -414,7 +414,7 @@ void crimfght_state::banking_callback(uint8_t data)
 	m_init = BIT(data, 7);
 }
 
-CUSTOM_INPUT_MEMBER( crimfght_state::system_r )
+ioport_value crimfght_state::system_r()
 {
 	uint8_t data = 0;
 

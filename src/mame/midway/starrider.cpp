@@ -345,10 +345,10 @@ private:
 	template <unsigned N> void sound_fifo_or(int state);
 	template <unsigned N> void sound_fifo_flag(int state);
 
-	void main_memory(address_map &map);
-	void main_banks(address_map &map);
-	void pif_memory(address_map &map);
-	void sound_memory(address_map &map);
+	void main_memory(address_map &map) ATTR_COLD;
+	void main_banks(address_map &map) ATTR_COLD;
+	void pif_memory(address_map &map) ATTR_COLD;
+	void sound_memory(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_main_cpu;
 	required_device<pia6821_device> m_main_pia1;
@@ -933,7 +933,99 @@ ROM_START(starridr)
 	ROM_LOAD("rom_34.u45", 0x1'0000, 0x2000, CRC(5b0b9a26) SHA1(3e2f8efa805a797546f984c6538fd353f3f7470b))
 
 	ROM_REGION(0x1000, "pif", 0)
-	ROM_LOAD("rom_26.u3", 0x0000, 0x1000, CRC(04e9d9fc) SHA1(c5531f6acf929bc243b5313bee6627d93dac90b9) BAD_DUMP) // reset vector points to RAM - can't be right
+	ROM_LOAD("rom_26.u3", 0x0000, 0x1000, CRC(2afef78c) SHA1(467d9441927ded3b6dceb9da10917620dfb58a3c))
+
+	ROM_REGION(0x1'0000, "snd", 0)
+	// 0x0000 U8 unpopulated
+	// 0x4000 U9 unpopulated
+	// 0x8000 U10 unpopulated
+	// 0xc000 space for RAM and I/O
+	ROM_LOAD("rom_27.u11", 0xe000, 0x2000, CRC(ffacb56d) SHA1(e6f7984e014a5ace50b0b1428a386ae645b972f5))
+
+	ROM_REGION(0x10'0000, "gfx", 0)
+	ROM_LOAD("rom_1.u4",   0x0'0000, 0x4000, CRC(9655db83) SHA1(50406ea8a4e20dbc7d4ff3ca60d41d142e3d593e))
+	ROM_LOAD("rom_2.u19",  0x0'4000, 0x4000, CRC(8903afe2) SHA1(dce09ab66ad96422e426b8f0eb7bedaad1596be2))
+	ROM_LOAD("rom_3.u5",   0x0'8000, 0x4000, CRC(ac1bdd83) SHA1(a635714d814fea7728e3d62003069873d00536b2))
+	ROM_LOAD("rom_4.u20",  0x0'c000, 0x4000, CRC(3bef2dc3) SHA1(60e8c794d706ea6ef7b4c25f11fd9850f992bafd))
+	ROM_LOAD("rom_5.u6",   0x1'0000, 0x4000, CRC(18470b9c) SHA1(5cf7bbf8c1dfeff9ee570b86d7d02bf7126ad01f))
+	ROM_LOAD("rom_6.u21",  0x1'4000, 0x4000, CRC(3d345e8b) SHA1(77a1faa1b2e48bc51b20b3015007d399f72c5fc9))
+	ROM_LOAD("rom_7.u7",   0x1'8000, 0x4000, CRC(c2f624db) SHA1(f57c6c16a7cf5a03cb1bee7fba841d70fe6a25d9))
+	ROM_LOAD("rom_8.u22",  0x1'c000, 0x4000, CRC(089cc4dd) SHA1(ef15cf517da6ffae9e1063f3fda854ad2ef16e66))
+	ROM_LOAD("rom_9.u8",   0x2'0000, 0x4000, CRC(360938be) SHA1(632194a3d398a7f670bfb05f58c1afd8c17ec288))
+	ROM_LOAD("rom_10.u23", 0x2'4000, 0x4000, CRC(2fc10697) SHA1(205476c13348140a92254d0998d740f18bff7187))
+	ROM_LOAD("rom_11.u9",  0x2'8000, 0x4000, CRC(665a4b07) SHA1(3c57839f65070e2b63b33eaa833370203993dc51))
+	ROM_LOAD("rom_12.u24", 0x2'c000, 0x4000, CRC(e117c9b3) SHA1(0500e6723b973ab672f4479bf1ce45579ef9a9f2))
+	ROM_LOAD("rom_13.u10", 0x3'0000, 0x4000, CRC(3e8cdea4) SHA1(554ddd87d5a5de1b04b81ca6a730682d90f334a1))
+	ROM_LOAD("rom_14.u25", 0x3'4000, 0x4000, CRC(d8260022) SHA1(6eb60d512f6bee3a74950145ab52a6c8bb7054c4))
+	ROM_LOAD("rom_15.u11", 0x3'8000, 0x4000, CRC(bac9b2b4) SHA1(0700debb88f7e001c78407f69d804c4340d602e2))
+	ROM_LOAD("rom_16.u26", 0x3'c000, 0x4000, CRC(111e2f28) SHA1(96904f08d66fed87fcfc0c59be50546f42e27687))
+	ROM_LOAD("rom_17.u12", 0x4'0000, 0x4000, CRC(eb5f96dd) SHA1(2ccd3b1ea12e201306707d8ed95c000c06766b48))
+	ROM_LOAD("rom_18.u27", 0x4'4000, 0x4000, CRC(b87eeeee) SHA1(37d6c360c7557d28bb7cc109ac6617569d7afb18))
+	ROM_LOAD("rom_19.u13", 0x4'8000, 0x4000, CRC(67ffe21b) SHA1(ebfc8f963e852cf5adb14f7f76f60fd738ddbc18))
+	// 0x4'c000 U28 unpopulated
+	// 0x5'0000 U14 unpopulated
+	// 0x5'4000 U29 unpopulated
+	// 0x5'8000 U15 unpopulated
+	// 0x5'c000 U30 unpopulated
+	// 0x6'0000 U33 unpopulated
+	// 0x6'4000 U47 unpopulated
+	// 0x6'8000 U34 unpopulated
+	// 0x6'c000 U48 unpopulated
+	// 0x7'0000 U35 unpopulated
+	// 0x7'4000 U49 unpopulated
+	// 0x7'8000 U36 unpopulated
+	// 0x7'c000 U50 unpopulated
+	// 0x8'0000 U37 unpopulated
+	// 0x8'4000 U51 unpopulated
+	// 0x8'8000 U38 unpopulated
+	// 0x8'c000 U52 unpopulated
+	// 0x9'0000 U39 unpopulated
+	// 0x9'4000 U53 unpopulated
+	// 0x9'8000 U40 unpopulated
+	// 0x9'c000 U54 unpopulated
+	// 0xa'0000 U41 unpopulated
+	// 0xa'4000 U55 unpopulated
+	// 0xa'8000 U42 unpopulated
+	// 0xa'c000 U56 unpopulated
+	// 0xb'0000 U43 unpopulated
+	// 0xb'4000 U57 unpopulated
+	// 0xb'8000 U44 unpopulated
+	// 0xb'c000 U58 unpopulated
+	ROM_LOAD("rom_25.u46", 0xe'4000, 0x2000, CRC(2812097e) SHA1(793ed5ec8b1d1689e856fc2008f46faf963f5045))
+	ROM_RELOAD(0xe'6000, 0x2000)
+
+	ROM_REGION(0x4000, "text", 0)
+	ROM_LOAD("rom_25.u46", 0x0000, 0x2000, CRC(2812097e) SHA1(793ed5ec8b1d1689e856fc2008f46faf963f5045))
+	ROM_RELOAD(0x2000, 0x2000)
+
+	ROM_REGION(0x20, "clkgen", 0)
+	ROM_LOAD("u114.82s123", 0x00, 0x20, CRC(27a6d555) SHA1(988d55092d7d0243a867986873dfd12be67280c7))
+
+	ROM_REGION(0x400, "color", 0)
+	ROMX_LOAD("u10.82s137", 0x000, 0x400, CRC(917e35ca) SHA1(676e2d211c81dbbf911f99a672eac1fd29553a2b), ROM_NIBBLE | ROM_SHIFT_NIBBLE_LO)
+	ROMX_LOAD("u11.82s137", 0x000, 0x400, CRC(917e35ca) SHA1(676e2d211c81dbbf911f99a672eac1fd29553a2b), ROM_NIBBLE | ROM_SHIFT_NIBBLE_HI)
+
+	ROM_REGION(0x200, "horz", 0)
+	ROM_LOAD("u74.6349", 0x000, 0x200, CRC(362ec0f9) SHA1(0304a36d038436e9f5e817dfc2c40b6421953cad))
+
+	DISK_REGION( "ld_pr8210a" )
+	DISK_IMAGE_READONLY( "starrider", 0, NO_DUMP )
+ROM_END
+
+ROM_START(starridrp3)
+	// TODO: ROM labels are illegible in photos
+	ROM_REGION(0x2000, "fixed", 0)
+	ROM_LOAD("rom_35p3.u52", 0x0000, 0x2000, CRC(5ac61ca1) SHA1(027a20cff95d9d444ead5fe7ca9823fc0c1aeff3))
+
+	ROM_REGION(0x1'2000, "banked", 0)
+	ROM_LOAD("rom_30p3.u8",  0x0'0000, 0x4000, CRC(ad9a3a2e) SHA1(95fcf776e6410a7f8081622f0176e5f17732b975))
+	ROM_LOAD("rom_31p3.u15", 0x0'4000, 0x4000, CRC(5ce07944) SHA1(edf98693d880ccebeb770f9e093a67392589ba35))
+	ROM_LOAD("rom_32p3.u26", 0x0'8000, 0x4000, CRC(f31f2faa) SHA1(61413681a308dd0cb2c2d0c70181c15fc9a31403))
+	// 0xc000 U37 unpopulated
+	ROM_LOAD("rom_34p3.u45", 0x1'0000, 0x2000, CRC(6521c9bc) SHA1(2273d9efe12a6a6d40c14ffb39c32ae1d2296956))
+
+	ROM_REGION(0x1000, "pif", 0)
+	ROM_LOAD("rom_26.u3", 0x0000, 0x1000, CRC(2afef78c) SHA1(467d9441927ded3b6dceb9da10917620dfb58a3c))
 
 	ROM_REGION(0x1'0000, "snd", 0)
 	// 0x0000 U8 unpopulated
@@ -1018,4 +1110,5 @@ ROM_END
 /***********************************************************************
     Machine definitions
 ***********************************************************************/
-GAME( 1984, starridr, 0, starrider, starrider, sr_state, empty_init, ROT0, "Williams", "Star Rider", MACHINE_IS_SKELETON )
+GAME( 1984, starridr,   0,        starrider, starrider, sr_state, empty_init, ROT0, "Williams", "Star Rider (REV 1)",   MACHINE_IS_SKELETON )
+GAME( 1984, starridrp3, starridr, starrider, starrider, sr_state, empty_init, ROT0, "Williams", "Star Rider (PROTO 3)", MACHINE_IS_SKELETON )

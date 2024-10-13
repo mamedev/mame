@@ -58,10 +58,10 @@ private:
 	void pb_w(u8 data);
 	u8 pb_r();
 
-	void mu10_map(address_map &map);
+	void mu10_map(address_map &map) ATTR_COLD;
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 };
 
 void mu10_state::machine_start()

@@ -9,22 +9,14 @@
 
   Driver provided by Paul Leaman
 
-To Do:
--   sectionz does "false contacts" on the coin counters, causing them to
-    increment twice per coin.
--   accurate music tempo (audiocpu irq freq)
--   accurate video timing, raw params
+TODO:
+- sectionz does "false contacts" on the coin counters, causing them to
+  increment twice per coin.
+- accurate music tempo (audiocpu irq freq)
+- accurate video timing, raw params
+- verify avengers MCU comms, and redump internal ROM as well (see note
+  in ROM defs under AVENGERS_MCU)
 
-
-Change Log:
-
-FEB-2003 (AT)
-
-- bug fixes:
-
-    avengers061gre: missing sound effects in Avengers
-  avengers37b16gre: screen artifacts in Avengers
-    lwingsc37b7gre: incorrect sprite clipping in all games
 
 Notes:
 
@@ -105,15 +97,15 @@ public:
 	void buraikenb(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	// devices
-	required_device<cpu_device> m_maincpu;
-	required_device<cpu_device> m_soundcpu;
-	optional_device<cpu_device> m_adpcmcpu;
+	required_device<z80_device> m_maincpu;
+	required_device<z80_device> m_soundcpu;
+	optional_device<z80_device> m_adpcmcpu;
 	optional_device<i8751_device> m_mcu;
 	optional_device_array<generic_latch_8_device, 3> m_mculatch;
 	optional_device<msm5205_device> m_msm;
@@ -152,7 +144,6 @@ private:
 	void avengers_adpcm_w(uint8_t data);
 	uint8_t avengers_adpcm_r();
 	void lwings_bankswitch_w(uint8_t data);
-	uint8_t avengers_m1_r(offs_t offset);
 	uint8_t avengers_soundlatch_ack_r();
 	void lwings_fgvideoram_w(offs_t offset, uint8_t data);
 	void lwings_bg1videoram_w(offs_t offset, uint8_t data);
@@ -185,18 +176,17 @@ private:
 	void lwings_draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	void trojan_draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
 
-	void avengers_adpcm_io_map(address_map &map);
-	void avengers_map(address_map &map);
-	void avengers_m1_map(address_map &map);
-	void buraikenb_map(address_map &map);
-	void fball_map(address_map &map);
-	void fball_oki_map(address_map &map);
-	void fball_sound_map(address_map &map);
-	void lwings_map(address_map &map);
-	void lwings_sound_map(address_map &map);
-	void trojan_adpcm_io_map(address_map &map);
-	void trojan_adpcm_map(address_map &map);
-	void trojan_map(address_map &map);
+	void avengers_adpcm_io_map(address_map &map) ATTR_COLD;
+	void avengers_map(address_map &map) ATTR_COLD;
+	void buraikenb_map(address_map &map) ATTR_COLD;
+	void fball_map(address_map &map) ATTR_COLD;
+	void fball_oki_map(address_map &map) ATTR_COLD;
+	void fball_sound_map(address_map &map) ATTR_COLD;
+	void lwings_map(address_map &map) ATTR_COLD;
+	void lwings_sound_map(address_map &map) ATTR_COLD;
+	void trojan_adpcm_io_map(address_map &map) ATTR_COLD;
+	void trojan_adpcm_map(address_map &map) ATTR_COLD;
+	void trojan_map(address_map &map) ATTR_COLD;
 };
 
 /* Avengers runs on hardware almost identical to Trojan, but with a protection
@@ -220,22 +210,24 @@ uint8_t lwings_state::avengers_adpcm_r()
 
 void lwings_state::lwings_bankswitch_w(uint8_t data)
 {
-//  if (data & 0xe0) printf("bankswitch_w %02x\n", data);
-//  Fireball writes 0x20 on startup, maybe reset soundcpu?
-	m_sprbank = (data & 0x10)>>4; // Fireball only
+	// bit 0 is flip screen
+	flip_screen_set(BIT(~data, 0));
 
-	/* bit 0 is flip screen */
-	flip_screen_set(~data & 0x01);
+	// bits 1 and 2 select ROM bank
+	m_bank1->set_entry(data >> 1 & 3);
 
-	/* bits 1 and 2 select ROM bank */
-	m_bank1->set_entry((data & 0x06) >> 1);
+	// bit 3 enables NMI
+	m_nmi_mask = BIT(data, 3);
 
-	/* bit 3 enables NMI */
-	m_nmi_mask = data & 8;
+	// bit 4: sprite bank (fireball only)
+	m_sprbank = BIT(data, 4);
+	
+	// bit 5 resets the sound CPU
+	m_soundcpu->set_input_line(INPUT_LINE_RESET, BIT(data, 5) ? ASSERT_LINE : CLEAR_LINE);
 
-	/* bits 6 and 7 are coin counters */
-	machine().bookkeeping().coin_counter_w(1, data & 0x40);
-	machine().bookkeeping().coin_counter_w(0, data & 0x80);
+	// bits 6 and 7 are coin counters
+	machine().bookkeeping().coin_counter_w(1, BIT(data, 6));
+	machine().bookkeeping().coin_counter_w(0, BIT(data, 7));
 }
 
 void lwings_state::lwings_interrupt(int state)
@@ -299,14 +291,6 @@ void lwings_state::mcu_control_w(uint8_t data)
 	m_mcu_control = data;
 }
 
-uint8_t lwings_state::avengers_m1_r(offs_t offset)
-{
-	// 2 wait states on each M1 access (needed to keep in sync with MCU)
-	if (!machine().side_effects_disabled())
-		m_maincpu->adjust_icount(-2);
-	return m_maincpu_program.read_byte(offset);
-}
-
 uint8_t lwings_state::avengers_soundlatch_ack_r()
 {
 	uint8_t data = m_soundlatch->read() | (m_soundlatch->pending_r() ? 0x80 : 0);
@@ -356,11 +340,6 @@ void lwings_state::avengers_map(address_map &map)
 	map(0xf809, 0xf809).w(m_mculatch[0], FUNC(generic_latch_8_device::write));
 	map(0xf80c, 0xf80c).w(m_mculatch[1], FUNC(generic_latch_8_device::write));
 	map(0xf80d, 0xf80d).r(m_mculatch[2], FUNC(generic_latch_8_device::read));
-}
-
-void lwings_state::avengers_m1_map(address_map &map)
-{
-	map(0x0000, 0xffff).r(FUNC(lwings_state::avengers_m1_r));
 }
 
 void lwings_state::lwings_map(address_map &map)
@@ -448,7 +427,6 @@ void lwings_state::fball_map(address_map &map)
 
 void lwings_state::fball_oki_bank_w(uint8_t data)
 {
-	//printf("fball_oki_bank_w %02x\n", data);
 	m_samplebank->set_entry((data >> 1) & 0x7);
 }
 
@@ -1360,8 +1338,8 @@ void lwings_state::avengers(machine_config &config)
 
 	// basic machine hardware
 	m_maincpu->set_clock(12_MHz_XTAL/2);
+	m_maincpu->z80_set_m1_cycles(4+2); // 2 WAIT states per M1? (needed to keep in sync with MCU)
 	m_maincpu->set_addrmap(AS_PROGRAM, &lwings_state::avengers_map);
-	m_maincpu->set_addrmap(AS_OPCODES, &lwings_state::avengers_m1_map);
 
 	I8751(config, m_mcu, 12_MHz_XTAL/2);
 	m_mcu->port_in_cb<0>().set(FUNC(lwings_state::mcu_p0_r));
@@ -2074,12 +2052,7 @@ It was common for Capcom to use the same ROM label across regional sets but add 
 #define AVENGERS_MCU \
 	ROM_REGION( 0x1000, "mcu", 0 ) /* Intel C8751H - 88 */ \
 	ROM_LOAD( "av.13k", 0x0000, 0x1000, BAD_DUMP CRC(505a0987) SHA1(ea1d855a9870d79d0e00eaa88a23038355a1203a) ) \
-	ROM_FILL(0x0b84, 0x01, 0x02) /* bad code! bit 0x80 was flipped */ \
-	/* these palette entries look wrong, but the low bit is unused, so could just be like that */ \
-	ROM_FILL(0x0481, 0x01, 0x00) \
-	ROM_FILL(0x04e0, 0x01, 0x00) \
-	ROM_FILL(0x0483, 0x01, 0xa0) \
-	ROM_FILL(0x04c3, 0x01, 0x30)
+	ROM_FILL(0x0b84, 0x01, 0x02) /* bad code! bit 0x80 was flipped */
 
 ROM_START( avengers )
 	ROM_REGION( 0x20000, "maincpu", 0 )     /* 64k for code + 3*16k for the banked ROMs images */

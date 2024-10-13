@@ -44,7 +44,7 @@ public:
 
 protected:
 	virtual void machine_start() override { m_lamps.resolve(); }
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	INTERRUPT_GEN_MEMBER(nmi_handler);
@@ -62,10 +62,10 @@ private:
 	void polyplay_characterram_w(offs_t offset, uint8_t data);
 	void polyplay_palette(palette_device &palette) const;
 	uint32_t screen_update_polyplay(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void polyplay_io_zre(address_map &map);
-	void polyplay_io_zrepp(address_map &map);
-	void polyplay_mem_zre(address_map &map);
-	void polyplay_mem_zrepp(address_map &map);
+	void polyplay_io_zre(address_map &map) ATTR_COLD;
+	void polyplay_io_zrepp(address_map &map) ATTR_COLD;
+	void polyplay_mem_zre(address_map &map) ATTR_COLD;
+	void polyplay_mem_zrepp(address_map &map) ATTR_COLD;
 
 	required_shared_ptr<uint8_t> m_videoram;
 	required_shared_ptr<uint8_t> m_characterram;

@@ -4,9 +4,9 @@
 
   Magnolia Microsystems 77316 DD soft-sectored floppy controller
 
-	Supported upto 8 floppy drives
-	- 4 8" drives
-	- 4 5.25" drives
+    Supported upto 8 floppy drives
+    - 4 8" drives
+    - 4 5.25" drives
 
 ****************************************************************************/
 
@@ -151,7 +151,10 @@ u8 mms77316_fdc_device::data_r()
 	{
 		LOGBURST("%s: burst_mode setting wait state\n", FUNCNAME);
 
-		m_wait_cb(ASSERT_LINE);
+		if (!machine().side_effects_disabled())
+		{
+			m_wait_cb(ASSERT_LINE);
+		}
 	}
 	else
 	{

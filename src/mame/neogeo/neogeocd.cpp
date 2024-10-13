@@ -130,15 +130,15 @@ public:
 	std::unique_ptr<uint8_t[]> m_fix_ram;
 
 	void neocd_ntsc(machine_config &config);
-	void neocd_audio_io_map(address_map &map);
-	void neocd_audio_map(address_map &map);
-	void neocd_main_map(address_map &map);
-	void neocd_vector_map(address_map &map);
-	void neocd_ym_map(address_map &map);
+	void neocd_audio_io_map(address_map &map) ATTR_COLD;
+	void neocd_audio_map(address_map &map) ATTR_COLD;
+	void neocd_main_map(address_map &map) ATTR_COLD;
+	void neocd_vector_map(address_map &map) ATTR_COLD;
+	void neocd_ym_map(address_map &map) ATTR_COLD;
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	int32_t SekIdle(int32_t nCycles);
 };

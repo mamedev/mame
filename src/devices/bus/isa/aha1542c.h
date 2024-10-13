@@ -42,18 +42,18 @@ protected:
 	void local_latch_w(u8 data);
 
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// optional information overrides
-	virtual ioport_constructor device_input_ports() const override;
-	virtual const tiny_rom_entry *device_rom_region() const override;
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
 
 private:
-	void z84c0010_mem(address_map &map);
+	void z84c0010_mem(address_map &map) ATTR_COLD;
 };
 
 // ====================> aha1542cf_device
@@ -65,7 +65,7 @@ public:
 	aha1542cf_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 protected:
-	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 };
 
 // ====================> aha1542cp_device
@@ -77,15 +77,15 @@ public:
 	aha1542cp_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 protected:
-	virtual ioport_constructor device_input_ports() const override;
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 
 private:
 	u8 eeprom_r();
 	void eeprom_w(u8 data);
 
-	void local_mem(address_map &map);
+	void local_mem(address_map &map) ATTR_COLD;
 };
 
 // device type definitions

@@ -143,14 +143,14 @@ public:
 	void retofinvb_nomcu(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 	void retofinv_base(machine_config &config);
 
 	void bl_palette(palette_device &palette) const;
 
-	void bootleg_map(address_map &map);
+	void bootleg_map(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<palette_device> m_palette;
@@ -178,8 +178,8 @@ private:
 	INTERRUPT_GEN_MEMBER(main_vblank_irq);
 	INTERRUPT_GEN_MEMBER(sub_vblank_irq);
 
-	void sound_map(address_map &map);
-	void sub_map(address_map &map);
+	void sound_map(address_map &map) ATTR_COLD;
+	void sub_map(address_map &map) ATTR_COLD;
 
 	void draw_sprites(bitmap_ind16 &bitmap);
 
@@ -215,7 +215,7 @@ public:
 private:
 	uint8_t mcu_status_r();
 
-	void main_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
 
 	required_device<taito68705_mcu_device> m_68705;
 };

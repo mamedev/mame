@@ -180,8 +180,8 @@ public:
 	void rom3_init() { m_is_rom3 = true; }
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	required_device<g65816_device> m_maincpu;
@@ -311,10 +311,10 @@ private:
 	void palette_init(palette_device &palette);
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	void apple2gs_map(address_map &map);
-	void vectors_map(address_map &map);
-	void a2gs_es5503_map(address_map &map);
-	void c300bank_map(address_map &map);
+	void apple2gs_map(address_map &map) ATTR_COLD;
+	void vectors_map(address_map &map) ATTR_COLD;
+	void a2gs_es5503_map(address_map &map) ATTR_COLD;
+	void c300bank_map(address_map &map) ATTR_COLD;
 
 	void phases_w(uint8_t phases);
 	void sel35_w(int sel35);

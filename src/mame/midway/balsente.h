@@ -68,7 +68,7 @@ public:
 	void st1002(machine_config &config);
 	void spiker(machine_config &config);
 	void triviamb(machine_config &config);
-	DECLARE_CUSTOM_INPUT_MEMBER(nstocker_bits_r);
+	ioport_value nstocker_bits_r();
 	void init_otwalls();
 	void init_triviaes();
 	void init_triviaes2();
@@ -95,9 +95,9 @@ public:
 	void init_gghost();
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	void random_reset_w(uint8_t data);
@@ -141,18 +141,18 @@ private:
 	void expand_roms(uint8_t cd_rom_mask);
 	inline void config_shooter_adc(uint8_t shooter, uint8_t adc_shift);
 
-	void cpu1_base_map(address_map &map);
-	void cpu1_map(address_map &map);
-	void cpu1_teamht_map(address_map &map);
-	void cpu1_grudge_map(address_map &map);
-	void cpu1_st1002_map(address_map &map);
-	void cpu1_spiker_map(address_map &map);
-	void cpu1_shrike_map(address_map &map);
-	void cpu1_smudge_map(address_map &map);
-	void cpu1_triviamb_map(address_map &map);
-	void cpu2_triviamb_io_map(address_map &map);
-	void cpu2_triviamb_map(address_map &map);
-	void shrike68k_map(address_map &map);
+	void cpu1_base_map(address_map &map) ATTR_COLD;
+	void cpu1_map(address_map &map) ATTR_COLD;
+	void cpu1_teamht_map(address_map &map) ATTR_COLD;
+	void cpu1_grudge_map(address_map &map) ATTR_COLD;
+	void cpu1_st1002_map(address_map &map) ATTR_COLD;
+	void cpu1_spiker_map(address_map &map) ATTR_COLD;
+	void cpu1_shrike_map(address_map &map) ATTR_COLD;
+	void cpu1_smudge_map(address_map &map) ATTR_COLD;
+	void cpu1_triviamb_map(address_map &map) ATTR_COLD;
+	void cpu2_triviamb_io_map(address_map &map) ATTR_COLD;
+	void cpu2_triviamb_map(address_map &map) ATTR_COLD;
+	void shrike68k_map(address_map &map) ATTR_COLD;
 
 	required_device<timer_device> m_scanline_timer;
 

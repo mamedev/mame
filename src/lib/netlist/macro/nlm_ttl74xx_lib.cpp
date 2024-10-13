@@ -1046,7 +1046,7 @@ static NETLIST_START(TTL_7474_DIP)
 //- Package: DIP
 //- NamingConvention: Naming conventions follow National Semiconductor datasheet
 //- FunctionTable:
-//-   https://ia800608.us.archive.org/5/items/bitsavers_nationaldaTTLDatabook_40452765/1976_National_TTL_Databook.pdf
+//-   https://archive.org/download/bitsavers_nationaldaTTLDatabook_40452765/1976_National_TTL_Databook.pdf
 //-
 //-         +---+---++---+----+
 //-         | D | G || Q | QQ |
@@ -1088,7 +1088,7 @@ static NETLIST_START(TTL_7475_DIP)
 //- Package: DIP
 //- NamingConvention: Naming conventions follow National Semiconductor datasheet
 //- FunctionTable:
-//-   https://ia800608.us.archive.org/5/items/bitsavers_nationaldaTTLDatabook_40452765/1976_National_TTL_Databook.pdf
+//-   https://archive.org/download/bitsavers_nationaldaTTLDatabook_40452765/1976_National_TTL_Databook.pdf
 //-
 //-         +---+---++---+----+
 //-         | D | G || Q | QQ |
@@ -2831,7 +2831,7 @@ static NETLIST_START(SN74LS629_DIP)
 //- Package: DIP
 //- NamingConvention: Naming conventions follow National Semiconductor datasheet
 //- FunctionTable:
-//-    https://ia800608.us.archive.org/5/items/bitsavers_nationaldaTTLDatabook_40452765/1976_National_TTL_Databook.pdf
+//-    https://archive.org/download/bitsavers_nationaldaTTLDatabook_40452765/1976_National_TTL_Databook.pdf
 //-
 static NETLIST_START(TTL_9310_DIP)
 {

@@ -65,7 +65,7 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(in1_changed) { update_irq2(); }
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	// devices/pointers

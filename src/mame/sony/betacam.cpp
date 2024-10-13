@@ -40,8 +40,8 @@ public:
 	void betacam(machine_config &config);
 
 private:
-	void system_mem_map(address_map &map);
-	void servo_mem_map(address_map &map);
+	void system_mem_map(address_map &map) ATTR_COLD;
+	void servo_mem_map(address_map &map) ATTR_COLD;
 
 	required_device<v25_device> m_systemcpu;
 	required_device<h8534_device> m_servocpu;

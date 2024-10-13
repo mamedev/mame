@@ -4,7 +4,7 @@
 
 Promise PDC20262 FastTrak66/UDMA66 IDE controller
 
-No documentation, ATA4 complaint
+No documentation, ATA4 compliant
 
 TODO:
 - how it sets compatible/native modes? Subvendor ID list suggests it can switch at will;

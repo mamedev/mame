@@ -159,8 +159,8 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	required_shared_ptr<uint8_t> m_videoram;
 	required_shared_ptr<uint8_t> m_colorram;
@@ -226,9 +226,9 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(set_vr1) { m_ic8j2->set_resistor_value(RES_K(10 + newval / 5.0)); }
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	required_device<ttl74123_device> m_ic8j1;
@@ -248,8 +248,8 @@ private:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	inline void plot_pixel(bitmap_ind16 &bm, int x, int y, int col);
 
-	void m10_main(address_map &map);
-	void m11_main(address_map &map);
+	void m10_main(address_map &map) ATTR_COLD;
+	void m11_main(address_map &map) ATTR_COLD;
 };
 
 class m15_state : public m1x_state
@@ -262,7 +262,7 @@ public:
 	void m15(machine_config &config);
 
 protected:
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	void ctrl_w(uint8_t data);
@@ -271,7 +271,7 @@ private:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(interrupt);
 
-	void main(address_map &map);
+	void main(address_map &map) ATTR_COLD;
 };
 
 

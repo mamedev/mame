@@ -7,9 +7,10 @@
 #pragma once
 
 #include "arm7.h"
-#include "arm7core.h"
+
 #include "machine/gt913_kbd.h"
 #include "machine/vic_pl192.h"
+
 
 /***************************************************************************
     TYPE DEFINITIONS
@@ -29,8 +30,8 @@ public:
 	void control_w(u8);
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	TIMER_CALLBACK_MEMBER(irq_timer_tick);
 
@@ -47,7 +48,7 @@ class upd800468_device : public arm7_cpu_device
 public:
 	upd800468_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t);
 
-	void upd800468_map(address_map &map);
+	void upd800468_map(address_map &map) ATTR_COLD;
 
 	template<offs_t i> auto adc_cb() { return m_adc_cb[i].bind(); }
 
@@ -74,9 +75,9 @@ protected:
 	void port_update(offs_t);
 
 	// device-level overrides
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	virtual space_config_vector memory_space_config() const override;
 

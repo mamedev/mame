@@ -164,7 +164,7 @@ public:
 private:
 	void adpcm_control_w(u8 data);
 
-	void mem_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
 
 	required_device<okim6650_device> m_oki;
 };
@@ -181,9 +181,9 @@ public:
 	void sweethrt(machine_config &config);
 
 private:
-	void drail_mem_map(address_map &map);
-	void mem_map(address_map &map);
-	void sweethrt_mem_map(address_map &map);
+	void drail_mem_map(address_map &map) ATTR_COLD;
+	void mem_map(address_map &map) ATTR_COLD;
+	void sweethrt_mem_map(address_map &map) ATTR_COLD;
 };
 
 class omatsuri_state : public nmkmedal_state
@@ -196,7 +196,7 @@ public:
 	void omatsuri(machine_config &config);
 
 private:
-	void mem_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
 };
 
 

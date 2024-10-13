@@ -85,8 +85,8 @@ public:
 	void init_4() { m_game = 4; } // lucky
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 
 	void dig0_w(u8 data);
@@ -112,7 +112,7 @@ protected:
 	void pia30_ca2_w(int state) { m_io_outputs[19] = state; } //ST4
 	void pia30_cb2_w(int state) { m_io_outputs[18] = state; } //ST3
 	TIMER_DEVICE_CALLBACK_MEMBER(irq);
-	void main_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<input_merger_device> m_mainirq;

@@ -25,7 +25,7 @@ public:
 	template <typename T> void set_ym2413_tag(T &&tag) { m_ym2413.set_tag(std::forward<T>(tag)); }
 
 protected:
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 private:
 	required_device<ym2413_device> m_ym2413;

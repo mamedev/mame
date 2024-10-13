@@ -40,9 +40,9 @@ public:
 	template <int Bit> int dial_r();
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	// devices, pointers
@@ -73,7 +73,7 @@ private:
 	bitmap_ind16 m_helper;
 	emu_timer *m_periodic_timer = nullptr;
 
-	void main_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
 
 	void wolfpack_palette(palette_device &palette) const;
 

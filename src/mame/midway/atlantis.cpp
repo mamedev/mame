@@ -132,8 +132,8 @@ public:
 	void mwskins(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	TIMER_CALLBACK_MEMBER(adc_ready);
 
@@ -188,7 +188,7 @@ private:
 
 	void duart_irq_callback(int state);
 
-	DECLARE_CUSTOM_INPUT_MEMBER(port_mod_r);
+	ioport_value port_mod_r();
 	uint16_t port_ctrl_r(offs_t offset);
 	void port_ctrl_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	uint16_t m_port_data = 0;
@@ -203,10 +203,10 @@ private:
 	uint8_t parallel_r(offs_t offset);
 	void parallel_w(offs_t offset, uint8_t data);
 
-	void map0(address_map &map);
-	void map1(address_map &map);
-	void map2(address_map &map);
-	void map3(address_map &map);
+	void map0(address_map &map) ATTR_COLD;
+	void map1(address_map &map) ATTR_COLD;
+	void map2(address_map &map) ATTR_COLD;
+	void map3(address_map &map) ATTR_COLD;
 };
 
 // Parallel Port

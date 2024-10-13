@@ -64,15 +64,15 @@ public:
 
 
 private:
-	virtual void machine_reset() override;
+	virtual void machine_reset() override ATTR_COLD;
 
 	void int1_enable_w(int state);
 	void int2_enable_w(int state);
 	void watchdog_w(int state);
 	void io_enable_w(int state);
 
-	void jpms80_io_map(address_map &map);
-	void jpms80_map(address_map &map);
+	void jpms80_io_map(address_map &map) ATTR_COLD;
+	void jpms80_map(address_map &map) ATTR_COLD;
 
 	// devices
 	required_device<tms9980a_device> m_maincpu;

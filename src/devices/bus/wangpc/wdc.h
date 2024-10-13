@@ -33,10 +33,10 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
-	virtual const tiny_rom_entry *device_rom_region() const override;
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 	// device_wangpcbus_card_interface overrides
 	virtual uint16_t wangpcbus_mrdc_r(offs_t offset, uint16_t mem_mask) override;
@@ -61,8 +61,8 @@ private:
 	uint8_t ctc_ch3_r();
 	void ctc_ch3_w(uint8_t data);
 
-	void wangpc_wdc_io(address_map &map);
-	void wangpc_wdc_mem(address_map &map);
+	void wangpc_wdc_io(address_map &map) ATTR_COLD;
+	void wangpc_wdc_mem(address_map &map) ATTR_COLD;
 
 	required_device<z80_device> m_maincpu;
 	required_device<z80ctc_device> m_ctc;

@@ -213,9 +213,9 @@ public:
 	void init_rongrong();
 
 	int blitter_irq_r();
-	DECLARE_CUSTOM_INPUT_MEMBER(ddenlovj_blitter_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(nettoqc_special_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(mjflove_blitter_r);
+	ioport_value ddenlovj_blitter_r();
+	ioport_value nettoqc_special_r();
+	ioport_value mjflove_blitter_r();
 
 protected:
 	auto blitter_irq() { return m_blitter_irq_handler.bind(); }
@@ -375,36 +375,36 @@ private:
 	inline void log_draw_error( int src, int cmd );
 	void copylayer(bitmap_rgb32 &bitmap, const rectangle &cliprect, int layer);
 
-	void akamaru_map(address_map &map);
-	void ddenlovj_map(address_map &map);
-	void ddenlovr_map(address_map &map);
-	void ddenlovrk_map(address_map &map);
-	void hginga_map(address_map &map);
-	void hginga_portmap(address_map &map);
-	void hgokbang_portmap(address_map &map);
-	void hgokou_map(address_map &map);
-	void hgokou_portmap(address_map &map);
-	void hparadis_map(address_map &map);
-	void hparadis_portmap(address_map &map);
-	void janshinp_map(address_map &map);
-	void janshinp_portmap(address_map &map);
-	void mjflove_portmap(address_map &map);
-	void mjmyorntr_portmap(address_map &map);
-	void mjmyster_map(address_map &map);
-	void mjmyster_portmap(address_map &map);
-	void mjmywrld_portmap(address_map &map);
-	void mjschuka_portmap(address_map &map);
-	void nettoqc_map(address_map &map);
-	void quiz365_map(address_map &map);
-	void quizchq_map(address_map &map);
-	void quizchq_portmap(address_map &map);
-	void rongrong_map(address_map &map);
-	void rongrong_portmap(address_map &map);
-	void seljan2_map(address_map &map);
-	void seljan2_portmap(address_map &map);
-	void sryudens_map(address_map &map);
-	void sryudens_portmap(address_map &map);
-	void ultrchmp_map(address_map &map);
+	void akamaru_map(address_map &map) ATTR_COLD;
+	void ddenlovj_map(address_map &map) ATTR_COLD;
+	void ddenlovr_map(address_map &map) ATTR_COLD;
+	void ddenlovrk_map(address_map &map) ATTR_COLD;
+	void hginga_map(address_map &map) ATTR_COLD;
+	void hginga_portmap(address_map &map) ATTR_COLD;
+	void hgokbang_portmap(address_map &map) ATTR_COLD;
+	void hgokou_map(address_map &map) ATTR_COLD;
+	void hgokou_portmap(address_map &map) ATTR_COLD;
+	void hparadis_map(address_map &map) ATTR_COLD;
+	void hparadis_portmap(address_map &map) ATTR_COLD;
+	void janshinp_map(address_map &map) ATTR_COLD;
+	void janshinp_portmap(address_map &map) ATTR_COLD;
+	void mjflove_portmap(address_map &map) ATTR_COLD;
+	void mjmyorntr_portmap(address_map &map) ATTR_COLD;
+	void mjmyster_map(address_map &map) ATTR_COLD;
+	void mjmyster_portmap(address_map &map) ATTR_COLD;
+	void mjmywrld_portmap(address_map &map) ATTR_COLD;
+	void mjschuka_portmap(address_map &map) ATTR_COLD;
+	void nettoqc_map(address_map &map) ATTR_COLD;
+	void quiz365_map(address_map &map) ATTR_COLD;
+	void quizchq_map(address_map &map) ATTR_COLD;
+	void quizchq_portmap(address_map &map) ATTR_COLD;
+	void rongrong_map(address_map &map) ATTR_COLD;
+	void rongrong_portmap(address_map &map) ATTR_COLD;
+	void seljan2_map(address_map &map) ATTR_COLD;
+	void seljan2_portmap(address_map &map) ATTR_COLD;
+	void sryudens_map(address_map &map) ATTR_COLD;
+	void sryudens_portmap(address_map &map) ATTR_COLD;
+	void ultrchmp_map(address_map &map) ATTR_COLD;
 
 protected:
 	devcb_write_line m_blitter_irq_handler;
@@ -549,13 +549,13 @@ private:
 
 	void mmpanic_update_leds();
 
-	void funkyfig_map(address_map &map);
-	void funkyfig_portmap(address_map &map);
-	void funkyfig_sound_portmap(address_map &map);
-	void mmpanic_map(address_map &map);
-	void mmpanic_portmap(address_map &map);
-	void mmpanic_sound_map(address_map &map);
-	void mmpanic_sound_portmap(address_map &map);
+	void funkyfig_map(address_map &map) ATTR_COLD;
+	void funkyfig_portmap(address_map &map) ATTR_COLD;
+	void funkyfig_sound_portmap(address_map &map) ATTR_COLD;
+	void mmpanic_map(address_map &map) ATTR_COLD;
+	void mmpanic_portmap(address_map &map) ATTR_COLD;
+	void mmpanic_sound_map(address_map &map) ATTR_COLD;
+	void mmpanic_sound_portmap(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_soundcpu;
 	required_device<generic_latch_8_device> m_soundlatch;
@@ -636,17 +636,17 @@ private:
 
 	void mjchuuka_get_romdata();
 
-	void hanakanz_map(address_map &map);
-	void daimyojn_portmap(address_map &map);
-	void hanakanz_portmap(address_map &map);
-	void hkagerou_portmap(address_map &map);
-	void jongtei_portmap(address_map &map);
-	void jongteia_portmap(address_map &map);
-	void kotbinsp_portmap(address_map &map);
-	void kotbinyo_portmap(address_map &map);
-	void mjchuuka_portmap(address_map &map);
-	void mjgnight_portmap(address_map &map);
-	void mjreach1_portmap(address_map &map);
+	void hanakanz_map(address_map &map) ATTR_COLD;
+	void daimyojn_portmap(address_map &map) ATTR_COLD;
+	void hanakanz_portmap(address_map &map) ATTR_COLD;
+	void hkagerou_portmap(address_map &map) ATTR_COLD;
+	void jongtei_portmap(address_map &map) ATTR_COLD;
+	void jongteia_portmap(address_map &map) ATTR_COLD;
+	void kotbinsp_portmap(address_map &map) ATTR_COLD;
+	void kotbinyo_portmap(address_map &map) ATTR_COLD;
+	void mjchuuka_portmap(address_map &map) ATTR_COLD;
+	void mjgnight_portmap(address_map &map) ATTR_COLD;
+	void mjreach1_portmap(address_map &map) ATTR_COLD;
 
 	memory_share_creator<uint8_t> m_banked_nvram;
 	required_memory_bank m_bank1;
@@ -2094,7 +2094,7 @@ void ddenlovr_state::ddenlovj_coincounter_w(uint8_t data)
 	//                data & 0x80 ?
 }
 
-CUSTOM_INPUT_MEMBER(ddenlovr_state::ddenlovj_blitter_r)
+ioport_value ddenlovr_state::ddenlovj_blitter_r()
 {
 	return m_ddenlovr_blitter_irq_flag ? 0x03 : 0x00;       // bit 4 = 1 -> blitter busy
 }
@@ -2226,7 +2226,7 @@ void ddenlovr_state::ddenlovr_map(address_map &map)
 }
 
 
-CUSTOM_INPUT_MEMBER(ddenlovr_state::nettoqc_special_r)
+ioport_value ddenlovr_state::nettoqc_special_r()
 {
 	return m_ddenlovr_blitter_irq_flag ? 0x03 : 0x00;
 }
@@ -3921,7 +3921,7 @@ uint8_t ddenlovr_state::mjflove_keyb_r(offs_t offset)
 	return val;
 }
 
-CUSTOM_INPUT_MEMBER(ddenlovr_state::mjflove_blitter_r)
+ioport_value ddenlovr_state::mjflove_blitter_r()
 {
 	// bit 7 = 1 -> blitter busy
 	// bit 6 = 0 -> VBLANK?

@@ -84,11 +84,11 @@ public:
 	void init_unkitpkr();
 
 protected:
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 
 private:
-	void unkitpkr_map(address_map &map);
-	void wallc_map(address_map &map);
+	void unkitpkr_map(address_map &map) ATTR_COLD;
+	void wallc_map(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;

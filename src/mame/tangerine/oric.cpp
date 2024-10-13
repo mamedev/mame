@@ -88,16 +88,16 @@ public:
 	void psg_a_w(uint8_t data);
 	TIMER_CALLBACK_MEMBER(update_tape);
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 	uint32_t screen_update_oric(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void vblank_w(int state);
 
 	void oric_common(machine_config &config);
 	void oric(machine_config &config);
 	void prav8d(machine_config &config);
-	void oric_mem(address_map &map);
+	void oric_mem(address_map &map) ATTR_COLD;
 
 protected:
 	required_device<m6502_device> m_maincpu;
@@ -158,11 +158,11 @@ public:
 
 	static void floppy_formats(format_registration &fr);
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	void telstrat(machine_config &config);
-	void telestrat_mem(address_map &map);
+	void telestrat_mem(address_map &map) ATTR_COLD;
 protected:
 	enum {
 		P_IRQEN  = 0x01,

@@ -45,8 +45,8 @@ protected:
 		, m_io_penb(*this, "PENB")
 	{ }
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	offs_t dasm_override(std::ostream &stream, offs_t pc, const util::disasm_interface::data_buffer &opcodes, const util::disasm_interface::data_buffer &params);
 
@@ -81,12 +81,12 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(button_check);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	void palm_base(machine_config &config);
 
-	void mem_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
 
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
@@ -130,12 +130,12 @@ protected:
 		, m_hardware_id(hardware_id)
 	{ }
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	void palmez_base(machine_config &config);
 
-	void mem_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
 
 	void adc_enable_w(int state);
 
@@ -173,7 +173,7 @@ public:
 	void palmiiic(machine_config &config);
 
 protected:
-	void mem_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
 
 	required_device<sed1375_device> m_sed1375;
 };

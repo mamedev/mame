@@ -54,14 +54,14 @@ private:
 	u8 kp_r();
 	TIMER_DEVICE_CALLBACK_MEMBER(kansas_r);
 
-	void io_map(address_map &map);
-	void mem_map(address_map &map);
+	void io_map(address_map &map) ATTR_COLD;
+	void mem_map(address_map &map) ATTR_COLD;
 
 	u8 m_digit_sel = 0U;
 	u8 m_cass_in = 0U;
 	u16 m_cass_data[4]{};
-	virtual void machine_reset() override;
-	virtual void machine_start() override;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void machine_start() override ATTR_COLD;
 	required_device<cpu_device> m_maincpu;
 	required_device<cassette_image_device> m_cass;
 	required_ioport_array<6> m_io_keyboard;
@@ -179,7 +179,7 @@ void pro80_state::machine_start()
 {
 	save_item(NAME(m_digit_sel));
 	save_item(NAME(m_cass_in));
-	save_pointer(NAME(m_cass_data) ,4);
+	save_item(NAME(m_cass_data));
 }
 
 void pro80_state::pro80(machine_config &config)

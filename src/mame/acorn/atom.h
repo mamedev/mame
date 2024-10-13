@@ -75,8 +75,8 @@ protected:
 	required_device<i8255_device> m_ppi;
 	required_device<via6522_device> m_via;
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	void ppi_pa_w(uint8_t data);
 	uint8_t ppi_pb_r();
@@ -102,9 +102,9 @@ protected:
 	std::pair<std::error_condition, std::string> load_cart(device_image_interface &image, generic_slot_device &slot);
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load) { return load_cart(image, *m_cart); }
 	DECLARE_QUICKLOAD_LOAD_MEMBER(quickload_cb);
-	void atom_mem(address_map &map);
-	void atombb_mem(address_map &map);
-	void prophet_mem(address_map &map);
+	void atom_mem(address_map &map) ATTR_COLD;
+	void atombb_mem(address_map &map) ATTR_COLD;
+	void prophet_mem(address_map &map) ATTR_COLD;
 };
 
 class atomeb_state : public atom_state
@@ -121,8 +121,8 @@ public:
 	void atomeb(machine_config &config);
 
 private:
-	void machine_start() override;
-	void machine_reset() override;
+	void machine_start() override ATTR_COLD;
+	void machine_reset() override ATTR_COLD;
 
 	uint8_t eprom_r();
 	void eprom_w(uint8_t data);
@@ -139,7 +139,7 @@ private:
 	template<int I> DECLARE_DEVICE_IMAGE_LOAD_MEMBER(ext_load) { return load_cart(image, *m_ext[I]); }
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(e0_load) { return load_cart(image, *m_e0); }
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(e1_load) { return load_cart(image, *m_e1); }
-	void atomeb_mem(address_map &map);
+	void atomeb_mem(address_map &map) ATTR_COLD;
 };
 
 #endif // MAME_ACORN_ATOM_H

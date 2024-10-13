@@ -258,7 +258,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="enhsidpl">
-		<description>Enhanced SidPlayer (128 Version)</description>
+		<description>Enhanced SidPlayer (128 version)</description>
 		<year>198?</year>
 		<publisher>Compute!</publisher>
 		<info name="protection" value="none" />
@@ -418,7 +418,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="pbw128a" cloneof="pbw128">
-		<description>Paperback Writer 128 (Alt)</description>
+		<description>Paperback Writer 128 (alt)</description>
 		<year>1985</year>
 		<publisher>Digital Solutions</publisher>
 		<info name="protection" value="none" />
@@ -526,7 +526,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="1581demo">
+	<software name="1581demo" supported="no">
 		<description>Commodore 1581 3.5" Disk Drive Demo/Utilities</description>
 		<year>198?</year>
 		<publisher>Commodore</publisher>
@@ -585,7 +585,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="cpma" cloneof="cpm">
-		<description>CP/M Version 3.0 (8 Dec 1985, Alt)</description>
+		<description>CP/M Version 3.0 (8 Dec 1985, alt)</description>
 		<year>1985</year>
 		<publisher>Commodore</publisher>
 		<info name="serial" value="622-598666" />
@@ -627,7 +627,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="cpmc" cloneof="cpm">
-		<description>CP/M Version 3.0 (1 Aug 1985, Alt)</description>
+		<description>CP/M Version 3.0 (1 Aug 1985, alt)</description>
 		<year>1985</year>
 		<publisher>Commodore</publisher>
 		<info name="serial" value="6228151676" />
@@ -648,7 +648,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="cpm86de" cloneof="cpm">
-		<description>CP/M Version 3.0 (1 May 1986, Ger)</description>
+		<description>CP/M Version 3.0 (1 May 1986, Germany)</description>
 		<year>1986</year>
 		<publisher>Commodore</publisher>
 		<info name="serial" value="622-85" />
@@ -690,7 +690,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="cpm87a" cloneof="cpm">
-		<description>CP/M Version 3.0 (28 May 1987, Alt)</description>
+		<description>CP/M Version 3.0 (28 May 1987, alt)</description>
 		<year>1987</year>
 		<publisher>Commodore</publisher>
 		<info name="serial" value="622-3297432" />
@@ -710,7 +710,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="cpm1581">
+	<software name="cpm1581" supported="no">
 		<description>CP/M Version 3.0 (1581)</description>
 		<year>198?</year>
 		<publisher>Commodore</publisher>

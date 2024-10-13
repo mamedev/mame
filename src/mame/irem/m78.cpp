@@ -8,6 +8,13 @@ Black Jack (1992)
 Flyers show this game has a main screen and 5 user screens.
 Is this the main unit or the satellite one?
 
+TODO:
+- I/O section;
+- video registers;
+- Undumped sound ROMs. The sound program is almost identical to the one of irem/shisen.cpp games.
+  Copied over sound handling from there for now;
+- comms;
+
 ===================================================================================================
 
 2-PCB stack with IREM markings
@@ -27,13 +34,6 @@ on sub PCB:
 16 MHz XTAL
 6x 27512 GFX ROM
 6x TMM2064P-10 RAM
-
-TODO:
-- I/O section;
-- video registers;
-- Undumped sound ROMs. The sound program is almost identical to the one of irem/shisen.cpp games.
-  Copied over sound handling from there for now;
-- comms;
 
 **************************************************************************************************/
 
@@ -59,13 +59,13 @@ class m78_state : public driver_device
 {
 public:
 	m78_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu"),
-		m_audiocpu(*this, "audiocpu"),
-		m_gfxdecode(*this, "gfxdecode"),
-		m_tileram(*this, "tileram%u", 0),
-		m_attrram(*this, "attrram%u", 0),
-		m_colorram(*this, "colorram%u", 0)
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_audiocpu(*this, "audiocpu")
+		, m_gfxdecode(*this, "gfxdecode")
+		, m_tileram(*this, "tileram%u", 0)
+		, m_attrram(*this, "attrram%u", 0)
+		, m_colorram(*this, "colorram%u", 0)
 	{}
 
 	void bj92(machine_config &config) ATTR_COLD;
@@ -177,7 +177,6 @@ uint32_t m78_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, c
 	//bitmap.fill(0, cliprect);
 	m_tilemap[1]->draw(screen, bitmap, cliprect, 0, 0);
 	m_tilemap[0]->draw(screen, bitmap, cliprect, 0, 0);
-
 	return 0;
 }
 

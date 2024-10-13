@@ -2,25 +2,27 @@
 // copyright-holders:Peter Trauner, hap
 /*******************************************************************************
 
-Commodore Chessmate / Novag Chess Champion MK II
+Commodore Chessmate (stylized as CHESSmate) / Novag Chess Champion MK II
 Initial driver version by PeT mess@utanet.at September 2000.
 Driver mostly rewritten later.
 
-The hardware is pretty similar to KIM-1. In fact, the chess engine is Peter
-R. Jennings's Microchess, originally made for the KIM-1. Jennings went on to
-co-found Personal Software (later named VisiCorp, known for VisiCalc).
+The hardware is pretty similar to KIM-1. In fact, the chess engine is an improved
+version of Peter R. Jennings's Microchess, originally made for the KIM-1. Jennings
+went on to co-found Personal Software (later named VisiCorp, known for VisiCalc).
 
-Jennings also licensed Chessmate to Novag, and they released it as the MK II.
-The hardware is almost identical and the software is the same(identical ROM labels).
-Two designs were made, one jukebox shape, and one brick shape. The one in MAME came
-from the jukebox, but both models have the same ROMs.
+It was planned to be called "Bobby", pending Bobby Fischer's approval. Although
+the program was stronger than most other chess computers at the time, Fischer
+declined the idea after trying out the prototype.
+
+Commodore also licensed the Chessmate program to Novag, and they released it as
+Chess Champion: MK II. The hardware is almost identical and the software is the
+same (identical ROM labels). Two designs were made, one jukebox shape, and one
+brick shape. The one in MAME came from the jukebox, but both have the same ROMs.
 
 Note that like MK I, although it is a Winkler/Auge production, it doesn't involve
 SciSys company. SciSys was founded by Winkler after MK II.
 
-TODO:
-- is there an older version of chmate? chips on pcb photos are dated 1979, but
-  the game is known to be released in 1978
+TEC Schachcomputer from 1981 is also assumed to have the same ROMs.
 
 ================================================================================
 
@@ -29,16 +31,17 @@ Hardware notes:
 MOS MPS 6504 2179
 MOS MPS 6530 024 1879
  layout of 6530 dumped with my adapter
- 0x1300-0x133f io
- 0x1380-0x13bf ram
- 0x1400-0x17ff rom
+ 0x1300-0x133f I/O
+ 0x1380-0x13bf RAM
+ 0x1400-0x17ff ROM
 
 2*MPS6111 RAM (256x4)
 MOS MPS 6332 005 2179
-74145 bcd to decimal encoder
+Older version has 2 2KB ROMs (identical ROM contents)
 
-4x 7 segment led display
-4 single leds
+74145 bcd to decimal encoder
+4*7-segment LED display
+4 single LEDs
 19 buttons (11 on brick model)
 
 *******************************************************************************/
@@ -78,28 +81,27 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(reset_button);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	// devices/pointers
 	required_device<cpu_device> m_maincpu;
 	required_device<mos6530_device> m_miot;
 	required_device<pwm_display_device> m_display;
-	required_device<dac_1bit_device> m_dac;
+	required_device<dac_2bit_ones_complement_device> m_dac;
 	optional_ioport_array<5> m_inputs;
 
 	u8 m_inp_mux = 0;
 	u8 m_7seg_data = 0;
 	u8 m_led_data = 0;
 
-	// address maps
-	void main_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
 
 	// I/O handlers
 	void update_display();
-	void control_w(u8 data);
-	void digit_w(u8 data);
 	u8 input_r();
+	void digit_w(u8 data);
+	void control_w(u8 data);
 };
 
 void chmate_state::machine_start()
@@ -112,7 +114,7 @@ void chmate_state::machine_start()
 
 INPUT_CHANGED_MEMBER(chmate_state::reset_button)
 {
-	// assume that NEW GAME button is tied to reset pin(s)
+	// NEW GAME button is tied to reset pin(s)
 	m_maincpu->set_input_line(INPUT_LINE_RESET, newval ? ASSERT_LINE : CLEAR_LINE);
 	if (newval)
 		m_miot->reset();
@@ -128,34 +130,15 @@ INPUT_CHANGED_MEMBER(chmate_state::reset_button)
 
 void chmate_state::update_display()
 {
-	m_display->write_row(4, m_led_data);
 	m_display->matrix_partial(0, 4, 1 << m_inp_mux, m_7seg_data);
-}
-
-void chmate_state::control_w(u8 data)
-{
-	// d0-d2: 74145 to input mux/digit select
-	m_inp_mux = data & 7;
-
-	// 74145 Q7: speaker out
-	m_dac->write(BIT(1 << m_inp_mux, 7) & ~m_inputs[4].read_safe(0));
-
-	// d3-d5: leds (direct)
-	m_led_data = data >> 3 & 7;
-	update_display();
-}
-
-void chmate_state::digit_w(u8 data)
-{
-	m_7seg_data = data;
-	update_display();
+	m_display->write_row(4, m_led_data | (m_7seg_data >> 5 & 4));
 }
 
 u8 chmate_state::input_r()
 {
 	u8 data = 0;
 
-	// multiplexed inputs (74145 Q4,Q5)
+	// PA0-PA6: multiplexed inputs (74145 Q4,Q5)
 	if (m_inp_mux == 4 || m_inp_mux == 5)
 	{
 		// note that number/letter buttons are electronically the same
@@ -164,6 +147,28 @@ u8 chmate_state::input_r()
 	}
 
 	return ~data;
+}
+
+void chmate_state::digit_w(u8 data)
+{
+	// PA0-PA6: digit segment data
+	// PA7: lose led
+	m_7seg_data = data;
+	update_display();
+}
+
+void chmate_state::control_w(u8 data)
+{
+	// PB0-PB2: 74145 to input mux/digit select
+	m_inp_mux = data & 7;
+
+	// 74145 Q6,Q7: speaker out
+	bool sound_on = !m_inputs[4].read_safe(0);
+	m_dac->write(sound_on ? ((1 << m_inp_mux) >> 6) : 0);
+
+	// PB3,PB4: leds (direct)
+	m_led_data = data >> 3 & 3;
+	update_display();
 }
 
 
@@ -219,7 +224,7 @@ static INPUT_PORTS_START( chmate )
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_N) PORT_CHANGED_MEMBER(DEVICE_SELF, chmate_state, reset_button, 0) PORT_NAME("New Game")
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( mk2 ) // meaning of black/white reversed
+static INPUT_PORTS_START( mk2a ) // meaning of black/white reversed
 	PORT_INCLUDE( chmate )
 
 	PORT_MODIFY("IN.0")
@@ -230,7 +235,7 @@ static INPUT_PORTS_START( mk2 ) // meaning of black/white reversed
 	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_H) PORT_NAME("H / White")
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( mk2a )
+static INPUT_PORTS_START( mk2 )
 	PORT_START("IN.0")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_6) PORT_CODE(KEYCODE_6_PAD) PORT_CODE(KEYCODE_F) PORT_NAME("6 / F / Level")
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_5) PORT_CODE(KEYCODE_5_PAD) PORT_CODE(KEYCODE_E) PORT_NAME("5 / E / Stop Clock / Rook")
@@ -271,13 +276,13 @@ void chmate_state::chmate(machine_config &config)
 	m_miot->irq_wr_callback().set_inputline(m_maincpu, 0);
 
 	// video hardware
-	PWM_DISPLAY(config, m_display).set_size(4+1, 8);
-	m_display->set_segmask(0xf, 0xff);
+	PWM_DISPLAY(config, m_display).set_size(4+1, 7);
+	m_display->set_segmask(0xf, 0x7f);
 	config.set_default_layout(layout_chessmate);
 
 	// sound hardware
 	SPEAKER(config, "speaker").front_center();
-	DAC_1BIT(config, m_dac).add_route(ALL_OUTPUTS, "speaker", 0.25);
+	DAC_2BIT_ONES_COMPLEMENT(config, m_dac).add_route(ALL_OUTPUTS, "speaker", 0.125);
 }
 
 void chmate_state::mk2(machine_config &config)
@@ -320,5 +325,5 @@ ROM_END
 //    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT        COMPANY, FULLNAME, FLAGS
 SYST( 1978, chmate, 0,      0,      chmate,  chmate, chmate_state, empty_init, "Commodore", "Chessmate", MACHINE_SUPPORTS_SAVE )
 
-SYST( 1979, ccmk2,  chmate, 0,      mk2,     mk2,    chmate_state, empty_init, "Novag Industries", "Chess Champion: MK II (ver. 1)", MACHINE_SUPPORTS_SAVE ) // 1st version (jukebox model), aka version B
-SYST( 1979, ccmk2a, chmate, 0,      mk2a,    mk2a,   chmate_state, empty_init, "Novag Industries", "Chess Champion: MK II (ver. 2)", MACHINE_SUPPORTS_SAVE )
+SYST( 1979, ccmk2,  chmate, 0,      mk2,     mk2,    chmate_state, empty_init, "Novag Industries / Commodore", "Chess Champion: MK II (set 1)", MACHINE_SUPPORTS_SAVE )
+SYST( 1979, ccmk2a, chmate, 0,      mk2a,    mk2a,   chmate_state, empty_init, "Novag Industries / Commodore", "Chess Champion: MK II (set 2)", MACHINE_SUPPORTS_SAVE ) // 1st version (jukebox model), aka version B

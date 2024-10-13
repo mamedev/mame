@@ -12,11 +12,11 @@ TODO:
 Hardware notes:
 
 Fidelity Sensory Chess Challenger "9" (SC9) overview:
-- 8*(8+1) buttons, 8*8+1 LEDs
-- 36-pin edge connector, assume same as SC12
-- 2KB RAM(TMM2016P), 2*8KB ROM(HN48364P)
+- PCB label: 510-1046C01 2-1-82
 - R6502-13, 1.4MHz from resonator, another pcb with the same resonator was measured 1.49MHz*
-- PCB label 510-1046C01 2-1-82
+- 2KB RAM(TMM2016P), 2*8KB ROM(HN48364P)
+- 36-pin edge connector, assume same as SC12
+- 8*(8+1) buttons, 8*8+1 LEDs
 
 *: 2 other boards were measured 1.60MHz and 1.88MHz(newest serial). Online references
 suggest 3 versions of SC9(C01) total: 1.5MHz, 1.6MHz, and 1.9MHz.
@@ -27,7 +27,7 @@ I/O is via TTL, not further documented here
 The Playmatic S was only released in Germany, it's basically a 'deluxe' version of SC9
 with magnet sensors and came with CB9 and CB16.
 
---------------------------------------------------------------------------------
+================================================================================
 
 Starting with SC9, Fidelity added a cartridge slot to their chess computers, meant for
 extra book opening databases and recorded games.
@@ -85,7 +85,7 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(sc9c_change_cpu_freq);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 	// devices/pointers
 	required_device<cpu_device> m_maincpu;
@@ -98,11 +98,10 @@ protected:
 	u8 m_led_data = 0;
 
 	// address maps
-	void sc9_map(address_map &map);
-	void sc9d_map(address_map &map);
+	void sc9_map(address_map &map) ATTR_COLD;
+	void sc9d_map(address_map &map) ATTR_COLD;
 
 	// I/O handlers
-	void update_display();
 	void control_w(u8 data);
 	void led_w(offs_t offset, u8 data);
 	u8 input_r();
@@ -129,21 +128,16 @@ INPUT_CHANGED_MEMBER(sc9_state::sc9c_change_cpu_freq)
     I/O
 *******************************************************************************/
 
-void sc9_state::update_display()
-{
-	// 8*8 chessboard leds + 1 corner led
-	m_display->matrix(1 << m_inp_mux, m_led_data);
-}
-
 void sc9_state::control_w(u8 data)
 {
 	// d0-d3: 74245 P0-P3
 	// 74245 Q0-Q8: input mux, led select
 	m_inp_mux = data & 0xf;
-	update_display();
+	u16 sel = 1 << m_inp_mux;
+	m_display->write_my(sel);
 
 	// 74245 Q9: speaker out
-	m_dac->write(BIT(1 << m_inp_mux, 9));
+	m_dac->write(BIT(sel, 9));
 
 	// d4,d5: ?
 	// d6,d7: N/C
@@ -153,14 +147,14 @@ void sc9_state::led_w(offs_t offset, u8 data)
 {
 	// a0-a2,d0: led data via NE591N
 	m_led_data = (m_led_data & ~(1 << offset)) | ((data & 1) << offset);
-	update_display();
+	m_display->write_mx(m_led_data);
 }
 
 u8 sc9_state::input_r()
 {
+	// d0-d7: multiplexed inputs (active low)
 	u8 data = 0;
 
-	// d0-d7: multiplexed inputs (active low)
 	// read chessboard sensors
 	if (m_inp_mux < 8)
 		data = m_board->read_file(m_inp_mux);
@@ -215,8 +209,8 @@ static INPUT_PORTS_START( sc9 )
 	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_4) PORT_CODE(KEYCODE_4_PAD) PORT_NAME("LV / Rook")
 	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_5) PORT_CODE(KEYCODE_5_PAD) PORT_NAME("PV / Queen")
 	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_6) PORT_CODE(KEYCODE_6_PAD) PORT_NAME("PB / King")
-	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_DEL) PORT_NAME("CL")
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_R) PORT_NAME("RE")
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_DEL) PORT_CODE(KEYCODE_BACKSPACE) PORT_NAME("CL")
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_R) PORT_CODE(KEYCODE_N) PORT_NAME("RE")
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( sc9c )

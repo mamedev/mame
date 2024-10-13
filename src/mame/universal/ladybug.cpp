@@ -78,8 +78,8 @@ public:
 		, m_p2_control(*this, "CONTP2")
 	{ }
 
-	DECLARE_CUSTOM_INPUT_MEMBER(ladybug_p1_control_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(ladybug_p2_control_r);
+	ioport_value ladybug_p1_control_r();
+	ioport_value ladybug_p2_control_r();
 	DECLARE_INPUT_CHANGED_MEMBER(coin1_inserted);
 	DECLARE_INPUT_CHANGED_MEMBER(coin2_inserted);
 	void ladybug(machine_config &config);
@@ -88,7 +88,7 @@ protected:
 	void ladybug_palette(palette_device &palette) const;
 	u32 screen_update_ladybug(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void ladybug_map(address_map &map);
+	void ladybug_map(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 
@@ -113,7 +113,7 @@ public:
 	void dorodon(machine_config &config);
 
 protected:
-	void decrypted_opcodes_map(address_map &map);
+	void decrypted_opcodes_map(address_map &map) ATTR_COLD;
 
 private:
 	required_shared_ptr<u8> m_decrypted_opcodes;
@@ -267,12 +267,12 @@ INPUT_CHANGED_MEMBER(ladybug_state::coin2_inserted)
 		m_maincpu->set_input_line(0, HOLD_LINE);
 }
 
-CUSTOM_INPUT_MEMBER(ladybug_state::ladybug_p1_control_r)
+ioport_value ladybug_state::ladybug_p1_control_r()
 {
 	return m_p1_control->read();
 }
 
-CUSTOM_INPUT_MEMBER(ladybug_state::ladybug_p2_control_r)
+ioport_value ladybug_state::ladybug_p2_control_r()
 {
 	// upright cabinet only uses a single set of controls */
 	return ((m_port_dsw0->read() & 0x20) ? m_p2_control : m_p1_control)->read();

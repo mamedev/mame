@@ -57,12 +57,12 @@ public:
 
 protected:
 	/* Device-level overrides */
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 	/* Optional information overrides */
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual ioport_constructor device_input_ports() const override;
-	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 
 private:
 	void i8237_hreq_w(int state);
@@ -86,8 +86,8 @@ private:
 	uint8_t p39_r();
 	void p50_5f_w(offs_t offset, uint8_t data);
 
-	void pdc_io(address_map &map);
-	void pdc_mem(address_map &map);
+	void pdc_io(address_map &map) ATTR_COLD;
+	void pdc_mem(address_map &map) ATTR_COLD;
 
 	/* Protected variables */
 	//uint32_t fdd_68k_dma_address;

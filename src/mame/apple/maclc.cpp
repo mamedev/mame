@@ -85,8 +85,8 @@ public:
 	void macclas2(machine_config &config);
 	void maccclas(machine_config &config);
 	void mactv(machine_config &config);
-	void maclc_map(address_map &map);
-	void maccclassic_map(address_map &map);
+	void maclc_map(address_map &map) ATTR_COLD;
+	void maccclassic_map(address_map &map) ATTR_COLD;
 
 private:
 	required_device<m68000_musashi_device> m_maincpu;
@@ -103,7 +103,7 @@ private:
 	optional_device<egret_device> m_egret;
 	optional_device<cuda_device> m_cuda;
 
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 	u16 scc_r(offs_t offset)
 	{

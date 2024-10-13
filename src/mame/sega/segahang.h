@@ -72,9 +72,9 @@ public:
 
 private:
 	// driver overrides
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 	TIMER_CALLBACK_MEMBER(i8751_sync);
 	TIMER_CALLBACK_MEMBER(ppi_sync);
@@ -105,17 +105,17 @@ private:
 	// video updates
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void decrypted_opcodes_map(address_map &map);
-	void fd1094_decrypted_opcodes_map(address_map &map);
-	void hangon_map(address_map &map);
-	void mcu_io_map(address_map &map);
-	void sharrier_map(address_map &map);
-	void sound_map_2151(address_map &map);
-	void sound_map_2203(address_map &map);
-	void sound_portmap_2151(address_map &map);
-	void sound_portmap_2203(address_map &map);
-	void sound_portmap_2203x2(address_map &map);
-	void sub_map(address_map &map);
+	void decrypted_opcodes_map(address_map &map) ATTR_COLD;
+	void fd1094_decrypted_opcodes_map(address_map &map) ATTR_COLD;
+	void hangon_map(address_map &map) ATTR_COLD;
+	void mcu_io_map(address_map &map) ATTR_COLD;
+	void sharrier_map(address_map &map) ATTR_COLD;
+	void sound_map_2151(address_map &map) ATTR_COLD;
+	void sound_map_2203(address_map &map) ATTR_COLD;
+	void sound_portmap_2151(address_map &map) ATTR_COLD;
+	void sound_portmap_2203(address_map &map) ATTR_COLD;
+	void sound_portmap_2203x2(address_map &map) ATTR_COLD;
+	void sub_map(address_map &map) ATTR_COLD;
 
 	// devices
 	required_device<m68000_device> m_maincpu;

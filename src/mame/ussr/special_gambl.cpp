@@ -59,19 +59,19 @@ public:
 
 	void dice(machine_config &config);
 
-	DECLARE_CUSTOM_INPUT_MEMBER(boot_r) { return m_cold_boot; }
+	ioport_value boot_r() { return m_cold_boot; }
 	DECLARE_INPUT_CHANGED_MEMBER(ram_test) { m_maincpu->set_input_line(INPUT_LINE_NMI, newval ? ASSERT_LINE : CLEAR_LINE); }
 
 protected:
-	void machine_start() override;
+	void machine_start() override ATTR_COLD;
 
 	TIMER_CALLBACK_MEMBER(update_boot_flag);
 
 	void palette_init(palette_device &palette) const;
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void dice_mem(address_map &map);
-	void dice_io(address_map &map);
+	void dice_mem(address_map &map) ATTR_COLD;
+	void dice_io(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<i8255_device> m_ppi;
@@ -112,7 +112,7 @@ static INPUT_PORTS_START(dice)
 	PORT_SERVICE_NO_TOGGLE(0x02, IP_ACTIVE_LOW)
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_SERVICE1) PORT_NAME("Clear stats")
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_COIN1)
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_READ_LINE_DEVICE_MEMBER("hopper", hopper_device, line_r)
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_CUSTOM) PORT_READ_LINE_DEVICE_MEMBER("hopper", hopper_device, line_r)
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_SERVICE2) PORT_NAME("Reset")
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_UNUSED)
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_UNUSED)
@@ -274,7 +274,7 @@ void dinaris_state::dice(machine_config &config)
 	m_ppi2->out_pc_callback().set(FUNC(dinaris_state::ppi2c_w));
 
 	NVRAM(config, m_nvram, nvram_device::DEFAULT_ALL_0);
-	HOPPER(config, m_hopper, attotime::from_msec(100), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_LOW);
+	HOPPER(config, m_hopper, attotime::from_msec(100));
 }
 
 ROM_START(dindice)

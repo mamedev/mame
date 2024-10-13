@@ -117,7 +117,7 @@ public:
 		return m_kdat_in ^ 0x01U;
 	}
 
-	CUSTOM_INPUT_MEMBER(cols_r)
+	ioport_value cols_r()
 	{
 		ioport_value result(0xffU);
 		for (unsigned i = 0U; m_rows.size() > i; ++i)

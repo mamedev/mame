@@ -75,8 +75,8 @@ protected:
 	namco_c355spr_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock = 0);
 
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_stop() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_stop() override ATTR_COLD;
 
 	c355_obj_code2tile_delegate m_code2tile;
 	c355_priority_delegate m_pri_cb;

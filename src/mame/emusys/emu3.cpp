@@ -65,11 +65,11 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(nmi_button);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
-	void emu3_map(address_map &map);
+	void emu3_map(address_map &map) ATTR_COLD;
 
 	void palette_init(palette_device &palette);
 

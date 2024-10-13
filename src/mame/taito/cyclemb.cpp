@@ -146,12 +146,12 @@ public:
 //  void ym_irq(int state);
 
 	void update_dial(int P);
-	template <int P> DECLARE_CUSTOM_INPUT_MEMBER(dial_r);
+	template <int P> ioport_value dial_r();
 
 	void init_skydest();
 	void init_cyclemb();
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 	void cyclemb_palette(palette_device &palette) const;
 
 	uint32_t screen_update_cyclemb(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -164,11 +164,11 @@ public:
 	void cyclemb_dial_reset();
 	void cyclemb(machine_config &config);
 	void skydest(machine_config &config);
-	void cyclemb_io(address_map &map);
-	void cyclemb_map(address_map &map);
-	void cyclemb_sound_io(address_map &map);
-	void cyclemb_sound_map(address_map &map);
-	void skydest_io(address_map &map);
+	void cyclemb_io(address_map &map) ATTR_COLD;
+	void cyclemb_map(address_map &map) ATTR_COLD;
+	void cyclemb_sound_io(address_map &map) ATTR_COLD;
+	void cyclemb_sound_map(address_map &map) ATTR_COLD;
+	void skydest_io(address_map &map) ATTR_COLD;
 };
 
 
@@ -765,7 +765,7 @@ void cyclemb_state::update_dial(int P)
 }
 
 template <int P>
-CUSTOM_INPUT_MEMBER(cyclemb_state::dial_r)
+ioport_value cyclemb_state::dial_r()
 {
 	return m_dial_status[P].current_value | (m_dial_status[P].reverse ? 0x80 : 0x00);
 }

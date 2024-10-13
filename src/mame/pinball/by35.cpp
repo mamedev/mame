@@ -221,15 +221,15 @@ protected:
 	void u10_ca2_w(int state);
 	void u10_cb2_w(int state);
 	void u11_cb2_w(int state);
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_z_freq);
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_z_pulse);
 	TIMER_DEVICE_CALLBACK_MEMBER(u11_timer);
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_d_pulse);
 
-	void by35_map(address_map &map);
-	void nuovo_map(address_map &map);
+	void by35_map(address_map &map) ATTR_COLD;
+	void nuovo_map(address_map &map) ATTR_COLD;
 
 	uint8_t m_u10a = 0U;
 	uint8_t m_u10b = 0U;

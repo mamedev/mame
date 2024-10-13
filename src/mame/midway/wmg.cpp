@@ -97,11 +97,11 @@ public:
 
 	void wmg(machine_config &config);
 
-	template <int N> DECLARE_CUSTOM_INPUT_MEMBER(wmg_mux_r);
+	template <int N> ioport_value wmg_mux_r();
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	memory_share_creator<uint8_t> m_p_ram;
@@ -123,9 +123,9 @@ private:
 	void wmg_sound_reset_w(u8 data);
 	void wmg_vram_select_w(u8 data);
 
-	void wmg_cpu1(address_map &map);
-	void wmg_cpu2(address_map &map);
-	void wmg_banked_map(address_map &map);
+	void wmg_cpu1(address_map &map) ATTR_COLD;
+	void wmg_cpu2(address_map &map) ATTR_COLD;
+	void wmg_banked_map(address_map &map) ATTR_COLD;
 };
 
 
@@ -442,7 +442,7 @@ void wmg_state::wmg_port_select_w(int state)
 }
 
 template <int N>
-CUSTOM_INPUT_MEMBER(wmg_state::wmg_mux_r)
+ioport_value wmg_state::wmg_mux_r()
 {
 	if (N == 0)
 	{

@@ -250,14 +250,13 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
-	virtual void device_stop() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+	virtual void device_stop() override ATTR_COLD;
 
 	// device_execute_interface overrides
 	virtual uint32_t execute_min_cycles() const noexcept override { return 1; }
 	virtual uint32_t execute_max_cycles() const noexcept override { return 40; }
-	virtual uint32_t execute_input_lines() const noexcept override { return 1; }
 	virtual void execute_run() override;
 	virtual void execute_set_input(int inputnum, int state) override;
 
@@ -693,9 +692,6 @@ private:
 //{
 //public:
 //  ppc403_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-//
-//protected:
-//  virtual uint32_t execute_input_lines() const noexcept { return 8; }
 //};
 //
 //
@@ -703,9 +699,6 @@ private:
 //{
 //public:
 //  ppc405_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-//
-//protected:
-//  virtual uint32_t execute_input_lines() const noexcept { return 8; }
 //};
 
 
@@ -783,11 +776,10 @@ public:
 	uint8_t ppc4xx_spu_r(offs_t offset);
 	void ppc4xx_spu_w(offs_t offset, uint8_t data);
 
-	void internal_ppc4xx(address_map &map);
+	void internal_ppc4xx(address_map &map) ATTR_COLD;
 protected:
 	ppc4xx_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, powerpc_flavor flavor, uint32_t cap, uint32_t tb_divisor);
 
-	virtual uint32_t execute_input_lines() const noexcept override { return 5; }
 	virtual void execute_set_input(int inputnum, int state) override;
 };
 

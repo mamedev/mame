@@ -63,7 +63,7 @@ public:
 	uint8_t read_id(int idx);
 
 	// device-level overrides
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 protected:
 	device_saturn_control_port_interface *m_device;

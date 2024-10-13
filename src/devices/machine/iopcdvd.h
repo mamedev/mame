@@ -33,8 +33,8 @@ public:
 	void write(offs_t offset, uint8_t data);
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	void handle_data_command(uint8_t data);
 	void data_fifo_push(uint8_t data);

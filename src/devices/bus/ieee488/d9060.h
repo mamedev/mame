@@ -39,13 +39,13 @@ protected:
 	d9060_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint32_t variant);
 
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// optional information overrides
-	virtual const tiny_rom_entry *device_rom_region() const override;
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual ioport_constructor device_input_ports() const override;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 
 	// device_ieee488_interface overrides
 	void ieee488_atn(int state) override;
@@ -86,8 +86,8 @@ private:
 	uint8_t m_data;
 
 	int m_variant;
-	void hdc_mem(address_map &map);
-	void main_mem(address_map &map);
+	void hdc_mem(address_map &map) ATTR_COLD;
+	void main_mem(address_map &map) ATTR_COLD;
 };
 
 

@@ -21,16 +21,68 @@
 #include "emu.h"
 #include "sdloader.h"
 
+#include "machine/spi_sdcard.h"
+
 #define LOG_SPI     (1U << 1)
 #define VERBOSE (LOG_GENERAL)
 #include "logmacro.h"
 
 
+namespace {
+
 //**************************************************************************
-//  DEVICE DEFINITIONS
+//  TYPE DEFINITIONS
 //**************************************************************************
 
-DEFINE_DEVICE_TYPE(VTECH_SDLOADER, vtech_sdloader_device, "vtech_sdloader", "BennVenn SD Loader")
+// ======================> vtech_sdloader_device
+
+class vtech_sdloader_device : public vtech_memexp_device
+{
+public:
+	// construction/destruction
+	vtech_sdloader_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+	static constexpr feature_type unemulated_features() { return feature::DISK; }
+
+protected:
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+
+	virtual void mem_map(address_map &map) override ATTR_COLD;
+	virtual void io_map(address_map &map) override ATTR_COLD;
+
+private:
+	required_device<spi_sdcard_device> m_sdcard;
+	required_memory_bank m_dosbank;
+	memory_view m_dosview;
+	memory_bank_creator m_expbank;
+
+	TIMER_CALLBACK_MEMBER(spi_clock);
+	void spi_miso_w(int state);
+
+	void mapper_w(uint8_t data);
+	void sdcfg_w(uint8_t data);
+	uint8_t sdio_r();
+	void sdio_w(uint8_t data);
+	void mode_w(uint8_t data);
+
+	uint8_t exp_ram_r(offs_t offset);
+	void exp_ram_w(offs_t offset, uint8_t data);
+
+	emu_timer *m_spi_clock;
+	bool m_spi_clock_state;
+	bool m_spi_clock_sysclk;
+	int m_spi_clock_cycles;
+	int m_in_bit;
+	uint8_t m_in_latch;
+	uint8_t m_out_latch;
+
+	std::unique_ptr<uint8_t[]> m_ram;
+	bool m_vz300_mode;
+};
+
 
 //-------------------------------------------------
 //  mem_map - memory space address map
@@ -87,6 +139,7 @@ void vtech_sdloader_device::device_add_mconfig(machine_config &config)
 	vtech_memexp_device::device_add_mconfig(config);
 
 	SPI_SDCARD(config, m_sdcard, 0);
+	m_sdcard->set_prefer_sdhc();
 	m_sdcard->spi_miso_callback().set(FUNC(vtech_sdloader_device::spi_miso_w));
 }
 
@@ -279,3 +332,12 @@ void vtech_sdloader_device::exp_ram_w(offs_t offset, uint8_t data)
 	if (!m_vz300_mode || (m_vz300_mode && offset >= 0xb800))
 		reinterpret_cast<uint8_t *>(m_expbank->base())[offset & 0x7fff] = data;
 }
+
+} // anonymous namespace
+
+
+//**************************************************************************
+//  DEVICE DEFINITIONS
+//**************************************************************************
+
+DEFINE_DEVICE_TYPE_PRIVATE(VTECH_SDLOADER, vtech_memexp_device, vtech_sdloader_device, "vtech_sdloader", "BennVenn SD Loader")

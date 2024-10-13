@@ -20,7 +20,7 @@ S1L9223A01-Q0
 SAMSUNG C031
 S5L9284D01-Q0
 
-ASD  AE43BH40I16I-35
+ASD  AE43BH4016I-35
 50G00290919D
 
 F 037B
@@ -66,28 +66,30 @@ public:
 	void kisssite(machine_config &config) ATTR_COLD;
 
 protected:
-	virtual void machine_reset() override;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;
 
-	void mem(address_map &map);
+	void mem(address_map &map) ATTR_COLD;
 };
 
 
 void kisssite_state::machine_reset()
 {
-	m_maincpu->set_state_int(STATE_GENPC, 0xe2cc); // temp, there is code here, but this is unlikely to be the entry point
+	m_maincpu->set_state_int(STATE_GENPC, 0x1cffff80); // might actually be 0x7fffff80 with a ROM mirror
 }
 
 void kisssite_state::mem(address_map &map)
 {
-	map(0x0000000, 0x003ffff).rom();
+	map(0x00000000, 0x0007ffff).ram();
+	map(0x1c000000, 0x1c03ffff).mirror(0x00fc0000).rom().region("maincpu", 0);
+	// registers at 0x20000000-0x2000ffff, ES6008 datasheet could be helpful
 }
 
 void kisssite_state::kisssite(machine_config &config)
 {
-	MIPSX(config, m_maincpu, 60'000'000); // there is MIPS-X code at at around 0xe2e0 in the ROM, 0x60000019 is "r0 + r0 -> r0" which acts as a NOP
+	MIPSX(config, m_maincpu, 60'000'000);
 	m_maincpu->set_addrmap(AS_PROGRAM, &kisssite_state::mem);
 
 	CDROM(config, "cdrom").set_interface("cdrom");

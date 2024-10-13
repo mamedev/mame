@@ -28,7 +28,7 @@ protected:
 	nes_waixing_a_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	// device-level overrides
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 	void set_mirror(uint8_t nt);
 
@@ -202,7 +202,7 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 	virtual void set_prg(int prg_base, int prg_mask) override;
 	uint8_t m_reg[4];
@@ -223,7 +223,7 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 	virtual void set_chr(u8 chr, int chr_base, int chr_mask) override;
 
@@ -248,7 +248,7 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 	uint8_t m_reg;
 };
@@ -268,7 +268,7 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 	uint8_t m_reg[4];
 };
@@ -288,7 +288,7 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 	uint8_t m_reg[2];
 };
@@ -344,7 +344,7 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 	uint8_t m_reg[4];
 };

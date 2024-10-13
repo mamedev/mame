@@ -28,8 +28,8 @@ public:
 	void io_write(offs_t offset, uint8_t data);
 
 private:
-	void mem_map(address_map &map);
-	void io_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
+	void io_map(address_map &map) ATTR_COLD;
 
 	required_device<z80_device> m_maincpu;
 	required_device<z80ctc_device> m_ctc;

@@ -22,13 +22,13 @@ public:
 	void write(offs_t offset, uint8_t data);
 	uint8_t read(offs_t offset);
 
-	void upd7752_ram(address_map &map);
+	void upd7752_ram(address_map &map) ATTR_COLD;
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_stop() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_stop() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
 	virtual space_config_vector memory_space_config() const override;

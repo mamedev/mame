@@ -13,9 +13,6 @@ by Nick Toop. These credits are in the ROM data.
 Mark VI/Philidor was released a year later, it was a plug-in module for the Mark V.
 It's not much stronger than Mark V(retroactively called Mark V/Travemunde).
 
-When using the MAME sensorboard interface with MK VI, reset the board by pressing
-CLEAR before RESET, needed when starting a new game.
-
 Hardware notes:
 - SY6502A @ ~2MHz (19.6608MHz XTAL, bunch of 74113 dividers)
 - 16KB RAM (8*HM4716AP-4N)
@@ -86,8 +83,8 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(cb_enable) { if (!newval) m_display[3]->clear(); }
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	// devices/pointers
@@ -106,11 +103,15 @@ private:
 	u8 m_lcd_rowsel = 0;
 	u8 m_cb_mux = 0;
 
-	emu_timer *m_irqtimer = nullptr;
+	attotime m_board_init_time;
+	emu_timer *m_irqtimer;
+
+	void init_board(u8 data);
+	bool board_active() { return machine().time() > m_board_init_time; }
 
 	// address maps
-	void mark5_map(address_map &map);
-	void mark6_map(address_map &map);
+	void mark5_map(address_map &map) ATTR_COLD;
+	void mark6_map(address_map &map) ATTR_COLD;
 
 	// I/O handlers
 	void nvram_w(offs_t offset, u8 data);
@@ -132,6 +133,12 @@ private:
 	void write_lcd(int state);
 };
 
+
+
+/*******************************************************************************
+    Initialization
+*******************************************************************************/
+
 void mark5_state::machine_start()
 {
 	m_out_x.resolve();
@@ -142,11 +149,19 @@ void mark5_state::machine_start()
 	save_item(NAME(m_lcd_lcd));
 	save_item(NAME(m_lcd_rowsel));
 	save_item(NAME(m_cb_mux));
+	save_item(NAME(m_board_init_time));
 }
 
 void mark5_state::machine_reset()
 {
 	reset_irq_w(0);
+}
+
+void mark5_state::init_board(u8 data)
+{
+	// ccmk6 expects an empty chessboard after a cold boot
+	if (~data & 1)
+		m_board_init_time = machine().time() + attotime::from_msec(1500);
 }
 
 
@@ -272,7 +287,7 @@ void mark5_state::cb_w(u8 data)
 
 u8 mark5_state::cb_r()
 {
-	if (~m_inputs[6]->read() & 0x20)
+	if (~m_inputs[6]->read() & 0x20 || !board_active())
 		return 0xff;
 
 	// read chessboard sensors
@@ -343,8 +358,8 @@ static INPUT_PORTS_START( mark5 )
 
 	PORT_START("IN.3")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_6) PORT_CODE(KEYCODE_6_PAD) PORT_CODE(KEYCODE_F) PORT_NAME("F / 6 / King")
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_7) PORT_CODE(KEYCODE_7_PAD) PORT_CODE(KEYCODE_G) PORT_NAME("G / 7 / Black")
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_8) PORT_CODE(KEYCODE_8_PAD) PORT_CODE(KEYCODE_H) PORT_NAME("H / 8 / White")
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_7) PORT_CODE(KEYCODE_7_PAD) PORT_CODE(KEYCODE_G) PORT_NAME("G / 7 / White")
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_8) PORT_CODE(KEYCODE_8_PAD) PORT_CODE(KEYCODE_H) PORT_NAME("H / 8 / Black")
 	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_9) PORT_CODE(KEYCODE_9_PAD) PORT_CODE(KEYCODE_EQUALS) PORT_CODE(KEYCODE_PLUS_PAD) PORT_NAME("Yes / 9 / CB")
 	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_PGDN) PORT_NAME("Backward")
 	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_PGUP) PORT_NAME("Forward")
@@ -454,6 +469,7 @@ void mark5_state::mark6(machine_config &config)
 
 	SENSORBOARD(config, m_board).set_type(sensorboard_device::MAGNETS);
 	m_board->init_cb().set(m_board, FUNC(sensorboard_device::preset_chess));
+	m_board->init_cb().append(FUNC(mark5_state::init_board));
 	m_board->set_delay(attotime::from_msec(150));
 	m_board->set_nvram_enable(true);
 

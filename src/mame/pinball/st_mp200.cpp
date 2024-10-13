@@ -75,7 +75,6 @@ public:
 		: genpin_class(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_s14001a(*this, "speech")
-		, m_speech(*this, "speech")
 		, m_pia_u10(*this, "pia_u10")
 		, m_pia_u11(*this, "pia_u11")
 		, m_io_test(*this, "TEST")
@@ -105,8 +104,8 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(self_test);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	u8 u10_a_r();
@@ -116,14 +115,13 @@ private:
 	u8 u11_a_r();
 	void u11_a_w(u8 data);
 	void u11_b_w(u8 data);
-	u8 speech_r(offs_t offset);
 	void u10_ca2_w(int state);
 	void u10_cb2_w(int state);
 	void u11_ca2_w(int state);
 	void u11_cb2_w(int state);
 
-	void mem_map(address_map &map);
-	void sam4_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
+	void sam4_map(address_map &map) ATTR_COLD;
 
 	u8 m_u10a = 0U;
 	u8 m_u10b = 0U;
@@ -140,7 +138,6 @@ private:
 	u8 m_last_solenoid = 31U;
 	required_device<m6800_cpu_device> m_maincpu;
 	optional_device<s14001a_device> m_s14001a;
-	optional_region_ptr<u8> m_speech;
 	required_device<pia6821_device> m_pia_u10;
 	required_device<pia6821_device> m_pia_u11;
 	required_ioport m_io_test;
@@ -426,12 +423,10 @@ void st_mp200_state::u11_ca2_w(int state)
 		}
 		else if (BIT(m_u10a, 6))
 		{
-			m_s14001a->force_update();
 			m_s14001a->set_output_gain(0, ((m_u10a >> 3 & 0xf) + 1) / 16.0);
 
 			u8 clock_divisor = 16 - (m_u10a & 0x07);
-
-			m_s14001a->set_clock(S14001_CLOCK / clock_divisor / 8);
+			m_s14001a->set_unscaled_clock(S14001_CLOCK / clock_divisor / 8);
 		}
 	}
 }
@@ -570,11 +565,6 @@ void st_mp200_state::u11_b_w(u8 data)
 	m_last_solenoid = data;
 }
 
-u8 st_mp200_state::speech_r(offs_t offset)
-{
-	return m_speech[offset];
-}
-
 void st_mp200_state::machine_start()
 {
 	genpin_class::machine_start();
@@ -677,7 +667,6 @@ void st_mp200_state::st_mp201(machine_config &config)
 	st_mp200(config);
 	SPEAKER(config, "mono").front_center();
 	S14001A(config, m_s14001a, S14001_CLOCK).add_route(ALL_OUTPUTS, "mono", 1.00);
-	m_s14001a->ext_read().set(FUNC(st_mp200_state::speech_r));
 }
 
 void st_mp200_state::st_sam4(machine_config &config)

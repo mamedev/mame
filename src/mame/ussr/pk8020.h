@@ -48,9 +48,9 @@ public:
 	void pk8020(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	static void floppy_formats(format_registration &fr);
@@ -79,9 +79,9 @@ private:
 	static const char *plm_select_name(uint8_t data);
 	void log_bank_select(uint8_t bank, offs_t start, offs_t end, uint8_t rdecplm, uint8_t wdecplm);
 
-	void pk8020_io(address_map &map);
-	void pk8020_mem(address_map &map);
-	void devices_map(address_map &map);
+	void pk8020_io(address_map &map) ATTR_COLD;
+	void pk8020_mem(address_map &map) ATTR_COLD;
+	void devices_map(address_map &map) ATTR_COLD;
 
 	uint8_t m_bank_select = 0;
 	uint8_t m_color = 0;

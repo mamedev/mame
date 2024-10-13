@@ -249,8 +249,8 @@ public:
 	void init_omegrace();
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -260,10 +260,10 @@ private:
 	output_finder<4> m_leds;
 	required_ioport_array<2> m_spinner;
 
-	void main_map(address_map &map);
-	void port_map(address_map &map);
-	void sound_map(address_map &map);
-	void sound_port(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
+	void port_map(address_map &map) ATTR_COLD;
+	void sound_map(address_map &map) ATTR_COLD;
+	void sound_port(address_map &map) ATTR_COLD;
 
 	TIMER_CALLBACK_MEMBER(periodic_int);
 	uint8_t vg_go_r();

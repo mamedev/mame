@@ -13,7 +13,7 @@ TODO:
 - where does the interrupt come from?
 - Debut-M is an updated version? Or is it the same program as Debut with a redesigned case?
 
-********************************************************************************
+================================================================================
 
 Hardware notes:
 - КР1810ВМ86 (i8086 clone), 16200K XTAL
@@ -79,7 +79,7 @@ public:
 	void debutm(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	// devices/pointers
@@ -95,8 +95,8 @@ private:
 	u8 m_lcd_update = 0;
 
 	// address maps
-	void main_map(address_map &map);
-	void main_io(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
+	void main_io(address_map &map) ATTR_COLD;
 
 	// I/O handlers
 	INTERRUPT_GEN_MEMBER(interrupt);
@@ -211,7 +211,7 @@ static INPUT_PORTS_START( debutm )
 	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_1) PORT_NAME(u8"ИНТ (Switch 1P/2P)")
 	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_P) PORT_NAME(u8"ПОЗ (Position Mode)")
 	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_S) PORT_NAME(u8"ВФ (Select Piece)")
-	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_B) PORT_NAME(u8"ВП (Take Back)")
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_T) PORT_NAME(u8"ВП (Take Back)")
 	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_L) PORT_NAME(u8"УР (Level)")
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_E) PORT_NAME(u8"ВВ (Enter Position)")
 

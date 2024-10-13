@@ -226,6 +226,7 @@ To Do:
 #include "subsino_crypt.h"
 
 #include "cpu/z180/hd647180x.h"
+#include "cpu/z80/z80.h"
 #include "machine/i8255.h"
 #include "machine/nvram.h"
 #include "machine/ticket.h"
@@ -295,10 +296,11 @@ public:
 	void init_newhunterc();
 	void init_sharkpye();
 	void init_tisub();
+	void init_grndprix();
 	void init_mtrainnv();
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	required_shared_ptr<uint8_t> m_colorram;
@@ -348,20 +350,20 @@ private:
 	uint32_t screen_update_reels(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_stbsub_reels(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void crsbingo_map(address_map &map);
-	void dinofmly_map(address_map &map);
-	void mtrainnv_map(address_map &map);
-	void newhunterb_map(address_map &map);
-	void newhunterd_map(address_map &map);
-	void ramdac_map(address_map &map);
-	void sharkpy_map(address_map &map);
-	void srider_map(address_map &map);
-	void stbsub_map(address_map &map);
-	void subsino_iomap(address_map &map);
-	void tisub_base_map(address_map &map);
-	void tisub_map(address_map &map);
-	void victor21_map(address_map &map);
-	void victor5_map(address_map &map);
+	void crsbingo_map(address_map &map) ATTR_COLD;
+	void dinofmly_map(address_map &map) ATTR_COLD;
+	void mtrainnv_map(address_map &map) ATTR_COLD;
+	void newhunterb_map(address_map &map) ATTR_COLD;
+	void newhunterd_map(address_map &map) ATTR_COLD;
+	void ramdac_map(address_map &map) ATTR_COLD;
+	void sharkpy_map(address_map &map) ATTR_COLD;
+	void srider_map(address_map &map) ATTR_COLD;
+	void stbsub_map(address_map &map) ATTR_COLD;
+	void subsino_iomap(address_map &map) ATTR_COLD;
+	void tisub_base_map(address_map &map) ATTR_COLD;
+	void tisub_map(address_map &map) ATTR_COLD;
+	void victor21_map(address_map &map) ATTR_COLD;
+	void victor5_map(address_map &map) ATTR_COLD;
 };
 
 void subsino_state::machine_start()
@@ -1713,7 +1715,7 @@ static INPUT_PORTS_START( stbsub )
 
 	PORT_START("INC")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SLOT_STOP3 )                             PORT_NAME("Small / Black / Stop 3")
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("hopper", ticket_dispenser_device, line_r) // hopper sensor
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("hopper", ticket_dispenser_device, line_r) // hopper sensor
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MEMORY_RESET )                           PORT_NAME("Reset")  // hard reset
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_HIGH )    PORT_CODE(KEYCODE_B)    PORT_NAME("Big / Red")
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -1849,7 +1851,7 @@ static INPUT_PORTS_START( tesorone )
 
 	PORT_START("INC")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SLOT_STOP3 )                             PORT_NAME("Small / Black / Stop 3")
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("hopper", ticket_dispenser_device, line_r) // hopper sensor
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("hopper", ticket_dispenser_device, line_r) // hopper sensor
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MEMORY_RESET )                           PORT_NAME("Reset")  // hard reset
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_HIGH )    PORT_CODE(KEYCODE_B)    PORT_NAME("Big / Red")
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -2271,7 +2273,7 @@ static INPUT_PORTS_START( smoto16 )
 	PORT_START( "INB" ) // d006
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )          PORT_IMPULSE(3) // coin
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("hopper", ticket_dispenser_device, line_r) // hopper sensor
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("hopper", ticket_dispenser_device, line_r) // hopper sensor
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK )                            PORT_NAME("Stats / Test")   // Bookkeeping.
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_GAMBLE_SERVICE )                         PORT_NAME("Settings")   // Game Rate & others.
@@ -2280,7 +2282,7 @@ static INPUT_PORTS_START( smoto16 )
 
 	PORT_START( "INC" ) // d00c
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("hopper", ticket_dispenser_device, line_r) // hopper sensor
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("hopper", ticket_dispenser_device, line_r) // hopper sensor
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MEMORY_RESET )                           PORT_NAME("Reset")  // hard reset
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -2367,7 +2369,7 @@ static INPUT_PORTS_START( smoto20 )
 	PORT_START( "INB" ) // d006
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )          PORT_IMPULSE(3) // coin
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("hopper", ticket_dispenser_device, line_r) // hopper sensor
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("hopper", ticket_dispenser_device, line_r) // hopper sensor
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK )                            PORT_NAME("Stats / Test")   // Bookkeeping.
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_GAMBLE_SERVICE )                         PORT_NAME("Settings")   // Game Rate & others.
@@ -2376,7 +2378,7 @@ static INPUT_PORTS_START( smoto20 )
 
 	PORT_START( "INC" ) // d00c
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("hopper", ticket_dispenser_device, line_r) // hopper sensor
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("hopper", ticket_dispenser_device, line_r) // hopper sensor
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MEMORY_RESET )                           PORT_NAME("Reset")  // hard reset
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -2807,7 +2809,7 @@ void subsino_state::victor21(machine_config &config)
 	ppi.tri_pb_callback().set_constant(0);
 	ppi.in_pc_callback().set_ioport("INC");
 
-	TICKET_DISPENSER(config, m_hopper, attotime::from_msec(200), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_LOW);
+	TICKET_DISPENSER(config, m_hopper, attotime::from_msec(200));
 
 	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -2849,7 +2851,7 @@ void subsino_state::crsbingo(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &subsino_state::crsbingo_map);
 	m_maincpu->set_addrmap(AS_IO, &subsino_state::subsino_iomap);
 
-	TICKET_DISPENSER(config, m_hopper, attotime::from_msec(200), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_LOW);
+	TICKET_DISPENSER(config, m_hopper, attotime::from_msec(200));
 
 	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -2890,7 +2892,7 @@ void subsino_state::srider(machine_config &config)
 	ppi2.in_pb_callback().set_ioport("INA");
 	ppi2.in_pc_callback().set_ioport("INB");
 
-	TICKET_DISPENSER(config, m_hopper, attotime::from_msec(200), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_LOW);
+	TICKET_DISPENSER(config, m_hopper, attotime::from_msec(200));
 
 	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -2953,7 +2955,7 @@ void subsino_state::tisub(machine_config &config)
 	ppi2.in_pb_callback().set_ioport("INA");
 	ppi2.in_pc_callback().set_ioport("INB");
 
-	TICKET_DISPENSER(config, m_hopper, attotime::from_msec(200), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_LOW);
+	TICKET_DISPENSER(config, m_hopper, attotime::from_msec(200));
 
 	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -2987,7 +2989,10 @@ void subsino_state::newhunterd(machine_config &config)
 {
 	tisub(config);
 
+	Z80(config.replace(), m_maincpu, 6'000'000); // unknown clock
 	m_maincpu->set_addrmap(AS_PROGRAM, &subsino_state::newhunterd_map);
+
+	subdevice<screen_device>("screen")->screen_vblank().set_inputline(m_maincpu, 0, HOLD_LINE); // ? (needs some kind of source for IM 1 interrupt)
 }
 
 void subsino_state::stbsub(machine_config &config)
@@ -3008,7 +3013,7 @@ void subsino_state::stbsub(machine_config &config)
 	ppi2.in_pc_callback().set_ioport("INA");
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
-	TICKET_DISPENSER(config, m_hopper, attotime::from_msec(200), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_LOW);
+	TICKET_DISPENSER(config, m_hopper, attotime::from_msec(200));
 
 	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -4231,6 +4236,30 @@ ROM_START( luckyseven )
 	ROM_LOAD( "palce16v8h-25.sw0",   0x00000, 0x00117, CRC(92bb58d6) SHA1(73e0626354738f74d1624d5a430a00b3e6e227d7) ) // Soldered to dip switches bank SW0
 ROM_END
 
+ROM_START( grndprix )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "m27c512.u12", 0x00000, 0x10000, CRC(d624ef87) SHA1(77c03cf4715906d64531abf1e3e85212107f1cde) )
+
+	ROM_REGION( 0x100000, "tilemap", ROMREGION_ERASE00 )
+	ROM_LOAD( "tms27c020.u30", 0x00000, 0x40000, NO_DUMP )
+	ROM_LOAD( "am27c020.u29",  0x40000, 0x40000, CRC(a2ecf811) SHA1(10c1339040f39f63b5d3b706b35b417f244981a6) )
+	ROM_LOAD( "m27c2001.u28",  0x80000, 0x40000, CRC(a923eb32) SHA1(b5da49cab5be7832592633bd4d8a7e37dc545e2a) )
+	ROM_LOAD( "m27c2001.u27",  0xc0000, 0x40000, CRC(822f9138) SHA1(5673796684aa157288fbe02eab75598c61735fa9) )
+
+	ROM_REGION( 0x80000, "reels", 0 )
+	ROM_LOAD( "m27c1001.u25",   0x00000, 0x20000, CRC(42f3bac5) SHA1(33bff2c9904c3188d5d1076363fab4cf1b1f3946) )
+	ROM_LOAD( "tms27c010a.u24", 0x20000, 0x20000, CRC(675a4e94) SHA1(c501e5f53b5c2610212d776341a14d692fc1a175) )
+	ROM_LOAD( "27c010a.u23",    0x40000, 0x20000, CRC(7de68191) SHA1(0ca2869fbe146393bb567e28d937702892e0b2fd) )
+	ROM_LOAD( "27c010a.u22",    0x60000, 0x20000, CRC(ff2c3e13) SHA1(cdaeb16a55487afdc53b4105d3dc653f20b21df4) )
+
+	ROM_REGION( 0xa00, "plds", ROMREGION_ERASE00 )
+	ROM_LOAD( "palce16v8h-25.u1",    0x000, 0x117, CRC(57e44e7e) SHA1(ca92a40f2781ac11ffcfd9a7ef1e852b719fe35c) )
+	ROM_LOAD( "palce16v8h-25.u2",    0x200, 0x117, CRC(8272668f) SHA1(9037f0d9c7625d05d2087e6f2d159dece934a945) )
+	ROM_LOAD( "palce16v8h-25.u18",   0x400, 0x117, CRC(d88c5718) SHA1(80914932b3fd5b200ffb5fb8ac30b8636cfa72de) )
+	ROM_LOAD( "palce16v8h-25.u43",   0x600, 0x117, CRC(cca094fd) SHA1(9c6b10e0c831b7ab5fd0c91bd357be38bc3df020) )
+	ROM_LOAD( "palce20v8h-25pc.u55", 0x800, 0x157, CRC(c6c6fa81) SHA1(05fbd86db3624f67f766817d18f8b7d386d67b74) )
+ROM_END
+
 ROM_START( dinofmly ) // very similar PCB to the smoto set, but instead of 3 PROMs it has a RAMDAC.
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "dino iii tetris_1 ver1.3.u18", 0x00000, 0x10000, CRC(ddf09230) SHA1(1e83b17cfc64b5eba484abfc922a67c9c3e0d1bf) )
@@ -4423,6 +4452,23 @@ void subsino_state::init_tesorone230()
 	}
 }
 
+void subsino_state::init_grndprix()
+{
+#if 1
+	uint8_t *rom = memregion( "maincpu" )->base();
+	rom[0x1464] = 0x18; //patch protection check
+	rom[0x1465] = 0x11;
+	rom[0x7ab] = 0x18; //patch "winning protection" check
+	rom[0x96f] = 0x18; //patch "losing protection" check
+#endif
+
+	for (uint8_t reel = 0; reel < 3; reel++)
+	{
+		m_reel_attr[reel] = std::make_unique<uint8_t[]>(0x200);
+
+		save_pointer(NAME(m_reel_attr[reel]), 0x200, reel);
+	}
+}
 
 void subsino_state::init_mtrainnv()
 {
@@ -4472,6 +4518,7 @@ GAMEL( 1995, tesorone240, stbsub,  stbsub,     tesorone, subsino_state, init_tes
 GAMEL( 1995, tesorone230, stbsub,  stbsub,     tesorone, subsino_state, init_tesorone230, ROT0, "Subsino",         "Tesorone Dell'Isola (Italy, v2.30)",          0,                   layout_stisub   )
 GAMEL( 1995, sevenlnd,    stbsub,  mtrainnv,   stbsub,   subsino_state, init_mtrainnv,    ROT0, "bootleg",         "Seven Land",                                  MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING, layout_stisub   )
 GAMEL( 1995, luckyseven,  stbsub,  mtrainnv,   stbsub,   subsino_state, init_mtrainnv,    ROT0, "bootleg",         "Lucky Seven",                                 MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING, layout_stisub   )
+GAMEL( 1995, grndprix,    stbsub,  mtrainnv,   stbsub,   subsino_state, init_grndprix,    ROT0, "bootleg",         "Grand Prix (Treasure Bonus bootleg)",         MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING, layout_stisub   ) // bad dump of a GFX ROM
 
 GAMEL( 1996, sharkpy,     0,       sharkpy,    sharkpy,  subsino_state, init_sharkpy,     ROT0, "Subsino",         "Shark Party (Italy, v1.3)",                   0,                   layout_sharkpy  ) // missing POST messages?
 GAMEL( 1996, sharkpya,    sharkpy, sharkpy,    sharkpy,  subsino_state, init_sharkpy,     ROT0, "Subsino",         "Shark Party (Italy, v1.6)",                   0,                   layout_sharkpy  ) // missing POST messages?

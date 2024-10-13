@@ -116,7 +116,7 @@ void ima_adpcm_state::compute_tables()
 		// compute the step value
 		int stepval = std::min(floor(16.0 * pow(11.0 / 10.0, (double)step)), 32767.);
 
-        // manual correction of some early values
+		// manual correction of some early values
 		if (step == -5 || step == -4)
 			stepval++;
 

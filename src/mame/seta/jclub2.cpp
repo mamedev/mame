@@ -176,7 +176,7 @@ public:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void jclub2(machine_config &config);
-	void jclub2_map(address_map &map);
+	void jclub2_map(address_map &map) ATTR_COLD;
 protected:
 	required_device<st0020_device> m_st0020;
 };
@@ -214,9 +214,9 @@ public:
 	void init_jclub2o();
 
 	void jclub2o(machine_config &config);
-	void jclub2o_map(address_map &map);
-	void st0016_io(address_map &map);
-	void st0016_mem(address_map &map);
+	void jclub2o_map(address_map &map) ATTR_COLD;
+	void st0016_io(address_map &map) ATTR_COLD;
+	void st0016_mem(address_map &map) ATTR_COLD;
 private:
 	uint8_t m_cmd1;
 	uint8_t m_cmd2;
@@ -244,7 +244,7 @@ public:
 	void darkhorsa(machine_config &config);
 
 protected:
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	void input_sel_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
@@ -260,8 +260,8 @@ private:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void darkhors_map(address_map &map);
-	void darkhorsa_map(address_map &map);
+	void darkhors_map(address_map &map) ATTR_COLD;
+	void darkhorsa_map(address_map &map) ATTR_COLD;
 
 	required_shared_ptr<uint32_t> m_tmapram;
 	required_shared_ptr<uint32_t> m_tmapscroll;
@@ -1168,8 +1168,8 @@ void jclub2o_state::jclub2o(machine_config &config)
 	EEPROM_S29290_16BIT(config, "eeprom");
 	WATCHDOG_TIMER(config, "watchdog");
 
-	TICKET_DISPENSER(config, m_hopper1, attotime::from_msec(200), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH);
-	TICKET_DISPENSER(config, m_hopper2, attotime::from_msec(200), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH);
+	TICKET_DISPENSER(config, m_hopper1, attotime::from_msec(200));
+	TICKET_DISPENSER(config, m_hopper2, attotime::from_msec(200));
 
 	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -1209,8 +1209,8 @@ void jclub2_state::jclub2(machine_config &config)
 	EEPROM_93C46_8BIT(config, "eeprom");
 	WATCHDOG_TIMER(config, "watchdog");
 
-	TICKET_DISPENSER(config, m_hopper1, attotime::from_msec(200), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH);
-	TICKET_DISPENSER(config, m_hopper2, attotime::from_msec(200), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH);
+	TICKET_DISPENSER(config, m_hopper1, attotime::from_msec(200));
+	TICKET_DISPENSER(config, m_hopper2, attotime::from_msec(200));
 
 	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -1253,8 +1253,8 @@ void darkhors_state::darkhors(machine_config &config)
 	EEPROM_93C46_8BIT(config, "eeprom");
 	WATCHDOG_TIMER(config, "watchdog");
 
-	TICKET_DISPENSER(config, m_hopper1, attotime::from_msec(200), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH);
-	TICKET_DISPENSER(config, m_hopper2, attotime::from_msec(200), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH);
+	TICKET_DISPENSER(config, m_hopper1, attotime::from_msec(200));
+	TICKET_DISPENSER(config, m_hopper2, attotime::from_msec(200));
 
 	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));

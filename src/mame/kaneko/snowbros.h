@@ -55,6 +55,7 @@ public:
 	void init_toto();
 	void init_hyperpac();
 	void init_yutnori();
+	void init_sutjarod();
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -109,20 +110,20 @@ private:
 	void sb3_play_music(int data);
 	void sb3_play_sound(int data);
 
-	void finalttr_map(address_map &map);
-	void honeydol_map(address_map &map);
-	void honeydol_sound_io_map(address_map &map);
-	void honeydol_sound_map(address_map &map);
-	void hyperpac_map(address_map &map);
-	void hyperpac_sound_map(address_map &map);
-	void snowbros3_map(address_map &map);
-	void snowbros_map(address_map &map);
-	void sound_io_map(address_map &map);
-	void sound_map(address_map &map);
-	void twinadv_map(address_map &map);
-	void twinadv_sound_io_map(address_map &map);
-	void wintbob_map(address_map &map);
-	void yutnori_map(address_map &map);
+	void finalttr_map(address_map &map) ATTR_COLD;
+	void honeydol_map(address_map &map) ATTR_COLD;
+	void honeydol_sound_io_map(address_map &map) ATTR_COLD;
+	void honeydol_sound_map(address_map &map) ATTR_COLD;
+	void hyperpac_map(address_map &map) ATTR_COLD;
+	void hyperpac_sound_map(address_map &map) ATTR_COLD;
+	void snowbros3_map(address_map &map) ATTR_COLD;
+	void snowbros_map(address_map &map) ATTR_COLD;
+	void sound_io_map(address_map &map) ATTR_COLD;
+	void sound_map(address_map &map) ATTR_COLD;
+	void twinadv_map(address_map &map) ATTR_COLD;
+	void twinadv_sound_io_map(address_map &map) ATTR_COLD;
+	void wintbob_map(address_map &map) ATTR_COLD;
+	void yutnori_map(address_map &map) ATTR_COLD;
 };
 
 #endif // MAME_KANEKO_SNOWBROS_H

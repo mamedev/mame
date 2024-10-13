@@ -141,8 +141,8 @@ private:
 	DECLARE_QUICKLOAD_LOAD_MEMBER(quickload_cb);
 	TIMER_DEVICE_CALLBACK_MEMBER(digit_tick);
 	TIMER_DEVICE_CALLBACK_MEMBER(int_tick);
-	void cosmicos_io(address_map &map);
-	void cosmicos_mem(address_map &map);
+	void cosmicos_io(address_map &map) ATTR_COLD;
+	void cosmicos_mem(address_map &map) ATTR_COLD;
 
 	/* CPU state */
 	int m_wait = 0;
@@ -167,8 +167,8 @@ private:
 	int m_efx = 0;
 	int m_video_on = 0;
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 	required_device<cosmac_device> m_maincpu;
 	required_device<cdp1864_device> m_cti;
 	required_device<dm9368_device> m_led;

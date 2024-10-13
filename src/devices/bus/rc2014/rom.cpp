@@ -24,10 +24,10 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
-	virtual ioport_constructor device_input_ports() const override;
-	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 private:
 	required_memory_region m_rom;
 	required_ioport m_rom_selector;
@@ -116,11 +116,11 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 	virtual void device_post_load() override { update_banks(); }
-	virtual ioport_constructor device_input_ports() const override;
-	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 
 	void reset_bank_w(offs_t, uint8_t) { m_bank = 0; update_banks(); m_bus->page_w(CLEAR_LINE);}
 	void toggle_bank_w(offs_t, uint8_t) { m_bank = m_bank ? 0 : 1; update_banks(); m_bus->page_w(m_bank ? ASSERT_LINE : CLEAR_LINE); }

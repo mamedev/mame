@@ -27,19 +27,19 @@ public:
 	// construction/destruction
 	pc80s31_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	void host_map(address_map &map);
+	void host_map(address_map &map) ATTR_COLD;
 
 protected:
 	pc80s31_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	// device-level overrides
 	//virtual void device_validity_check(validity_checker &valid) const override;
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual void device_start() override;
-	virtual void device_reset() override;
-	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 
-	virtual void fdc_io(address_map &map);
+	virtual void fdc_io(address_map &map) ATTR_COLD;
 
 	TIMER_CALLBACK_MEMBER(tc_zero_tick);
 
@@ -54,7 +54,7 @@ private:
 	required_device<i8255_device> m_ppi_fdc;
 	required_device_array<generic_latch_8_device, 6> m_latch;
 
-	void fdc_map(address_map &map);
+	void fdc_map(address_map &map) ATTR_COLD;
 
 	template <unsigned N> u8 latch_r();
 	template <unsigned N> void latch_w(u8 data);
@@ -75,8 +75,8 @@ public:
 protected:
 	pc80s31k_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual const tiny_rom_entry *device_rom_region() const override;
-	virtual void fdc_io(address_map &map) override;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
+	virtual void fdc_io(address_map &map) override ATTR_COLD;
 
 private:
 	void drive_mode_w(u8 data);
@@ -90,17 +90,17 @@ public:
 	auto int_wr_callback() { return m_write_irq.bind(); }
 	auto drq_wr_callback() { return m_write_drq.bind(); }
 
-	void host_io(address_map &map);
+	void host_io(address_map &map) ATTR_COLD;
 
 	void tc_w(int state) { m_fdc->tc_w(state); }
 	u8 dack_r() { return m_fdc->dma_r(); }
 	void dack_w(u8 data) { m_fdc->dma_w(data); }
 
 protected:
-	virtual const tiny_rom_entry *device_rom_region() const override;
-	virtual void device_start() override;
-	virtual void device_reset() override;
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 private:
 	devcb_write_line    m_write_irq;

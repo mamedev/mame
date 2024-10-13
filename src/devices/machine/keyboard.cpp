@@ -261,6 +261,10 @@ generic_keyboard_device::generic_keyboard_device(
 {
 }
 
+generic_keyboard_device::~generic_keyboard_device()
+{
+}
+
 
 generic_keyboard_device::generic_keyboard_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock)
 	: generic_keyboard_device(mconfig, GENERIC_KEYBOARD, tag, owner, clock)

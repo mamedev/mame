@@ -440,7 +440,7 @@ void turbo_base_state::digit_w(uint8_t data)
  *
  *************************************/
 
-CUSTOM_INPUT_MEMBER(turbo_base_state::pedal_r)
+ioport_value turbo_base_state::pedal_r()
 {
 	// inverted 2-bit Gray code from a pair of optos in mechanical pedal
 	uint8_t pedal = m_pedal->read();

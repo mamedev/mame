@@ -167,7 +167,7 @@ public:
 
 protected:
 	virtual void machine_start() override { m_lamps.resolve(); }
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -189,15 +189,15 @@ private:
 
 	INTERRUPT_GEN_MEMBER(vblank_irq);
 
-	void amuse1_map(address_map &map);
-	void amuse_map(address_map &map);
-	void findout_map(address_map &map);
-	void gepoker_map(address_map &map);
-	void getrivia_map(address_map &map);
-	void gselect_map(address_map &map);
-	void quizvid_map(address_map &map);
-	void sprtauth_map(address_map &map);
-	void suprpokr_map(address_map &map);
+	void amuse1_map(address_map &map) ATTR_COLD;
+	void amuse_map(address_map &map) ATTR_COLD;
+	void findout_map(address_map &map) ATTR_COLD;
+	void gepoker_map(address_map &map) ATTR_COLD;
+	void getrivia_map(address_map &map) ATTR_COLD;
+	void gselect_map(address_map &map) ATTR_COLD;
+	void quizvid_map(address_map &map) ATTR_COLD;
+	void sprtauth_map(address_map &map) ATTR_COLD;
+	void suprpokr_map(address_map &map) ATTR_COLD;
 
 	bitmap_ind16 m_bitmap;
 
@@ -1059,7 +1059,7 @@ void gei_state::getrivia(machine_config &config)
 	m_ppi[1]->out_pb_callback().set(FUNC(gei_state::lamps_w));
 	m_ppi[1]->out_pc_callback().set(FUNC(gei_state::lamps2_w));
 
-	TICKET_DISPENSER(config, m_ticket, attotime::from_msec(100), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH);
+	TICKET_DISPENSER(config, m_ticket, attotime::from_msec(100));
 
 	// sound hardware
 	SPEAKER(config, "speaker").front_center();
@@ -1311,7 +1311,7 @@ ROM_START( gtsers7a ) // Series 7 (Complete - question ROMs dated 7/9)
 	ROM_LOAD( "general_v",   0x14000, 0x4000, CRC(81bf07c7) SHA1(a53f050b4ef8ffc0499b50224d4bbed4af0ca09c) )
 	ROM_LOAD( "kids_korner", 0x18000, 0x4000, CRC(66631b79) SHA1(ec534941add7113c9bb96d00f2e09834275e314b) )
 	ROM_LOAD( "good_guys",   0x1c000, 0x4000, CRC(4d638326) SHA1(2d6d00ae7f02d1607f37eb1cefae31c42797b2cf) )
-	ROM_LOAD( "sex_triv.",   0x20000, 0x4000, CRC(cd0ce4e2) SHA1(2046ee3da94f00bf4a8b3fc62b1190d58e83cc89) ) // Listed as an alternate question set
+	ROM_LOAD( "sex_triv",    0x20000, 0x4000, CRC(cd0ce4e2) SHA1(2046ee3da94f00bf4a8b3fc62b1190d58e83cc89) ) // Listed as an alternate question set
 ROM_END
 
 ROM_START( gtsersa ) // alt or older version questions

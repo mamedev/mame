@@ -497,7 +497,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(skns_state::irq)
 **********************************************************************************/
 
 template <int P>
-CUSTOM_INPUT_MEMBER(skns_state::paddle_r)
+ioport_value skns_state::paddle_r()
 {
 	return m_paddle[P]->read();
 }

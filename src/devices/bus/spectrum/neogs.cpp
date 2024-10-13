@@ -86,17 +86,17 @@ public:
 
 protected:
 	// device_t implementation
-	virtual void device_start() override;
-	virtual void device_reset() override;
-	virtual const tiny_rom_entry *device_rom_region() const override;
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
-	void neogsmap(address_map &map);
+	void neogsmap(address_map &map) ATTR_COLD;
 
 	INTERRUPT_GEN_MEMBER(irq0_line_assert);
 
-	void map_memory(address_map &map);
-	void map_io(address_map &map);
+	void map_memory(address_map &map) ATTR_COLD;
+	void map_io(address_map &map) ATTR_COLD;
 	void update_config();
 
 	required_device<z80_device> m_maincpu;
@@ -106,7 +106,7 @@ protected:
 	memory_bank_creator m_bank_ram;
 	memory_view m_view;
 	required_device_array<dac_word_interface, 2> m_dac;
-	required_device<spi_sdcard_sdhc_device> m_sdcard;
+	required_device<spi_sdcard_device> m_sdcard;
 	output_finder<> m_neogs_led;
 
 private:
@@ -411,6 +411,7 @@ void neogs_device::device_add_mconfig(machine_config &config)
 	m_maincpu->irqack_cb().set_inputline(m_maincpu, INPUT_LINE_IRQ0, CLEAR_LINE);
 
 	SPI_SDCARD(config, m_sdcard, 0);
+	m_sdcard->set_prefer_sdhc();
 	m_sdcard->spi_miso_callback().set([this](int state) { m_spi_data_in_latch <<= 1; m_spi_data_in_latch |= state; });
 
 	SPEAKER(config, "lspeaker").front_left();

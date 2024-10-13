@@ -1284,7 +1284,7 @@ void stv_state::stv_slot(machine_config &config)
 void stv_state::hopper(machine_config &config)
 {
 	stv(config);
-	HOPPER(config, m_hopper, attotime::from_msec(100), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH);
+	HOPPER(config, m_hopper, attotime::from_msec(100));
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &stv_state::hopper_mem);
 	m_slave->set_addrmap(AS_PROGRAM, &stv_state::hopper_mem);

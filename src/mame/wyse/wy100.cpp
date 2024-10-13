@@ -44,7 +44,7 @@ public:
 	void wy100(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	I8275_DRAW_CHARACTER_MEMBER(draw_character);
@@ -55,9 +55,9 @@ private:
 	u8 memory_r(offs_t offset);
 	void memory_w(offs_t offset, u8 data);
 
-	void prg_map(address_map &map);
-	void io_map(address_map &map);
-	void bank_map(address_map &map);
+	void prg_map(address_map &map) ATTR_COLD;
+	void io_map(address_map &map) ATTR_COLD;
+	void bank_map(address_map &map) ATTR_COLD;
 
 	static void printer_devices(device_slot_interface &slot);
 
@@ -203,7 +203,7 @@ public:
 	wy100_loopback_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 	virtual void input_txd(int state) override;
 };

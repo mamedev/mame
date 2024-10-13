@@ -264,10 +264,10 @@ public:
 	void konamigv(machine_config &config);
 
 protected:
-	void konamigv_map(address_map &map);
+	void konamigv_map(address_map &map) ATTR_COLD;
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	void btc_trackball_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
@@ -275,8 +275,8 @@ protected:
 	void scsi_dma_write(uint32_t *p_n_psxram, uint32_t n_address, int32_t n_size);
 	void scsi_drq(int state);
 
-	void btchamp_map(address_map &map);
-	void kdeadeye_map(address_map &map);
+	void btchamp_map(address_map &map) ATTR_COLD;
+	void kdeadeye_map(address_map &map) ATTR_COLD;
 
 	TIMER_CALLBACK_MEMBER(scsi_dma_transfer);
 
@@ -308,12 +308,12 @@ public:
 	void simpbowl(machine_config &config);
 
 private:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 	uint16_t flash_r(offs_t offset);
 	void flash_w(offs_t offset, uint16_t data);
 
-	void simpbowl_map(address_map &map);
+	void simpbowl_map(address_map &map) ATTR_COLD;
 
 	required_device_array<fujitsu_29f016a_device, 4> m_flash8;
 
@@ -342,7 +342,7 @@ public:
 	uint16_t tokimeki_serial_r();
 	void tokimeki_serial_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
-	DECLARE_CUSTOM_INPUT_MEMBER(tokimeki_device_check_r);
+	ioport_value tokimeki_device_check_r();
 	void tokimeki_device_check_w(int state);
 
 private:
@@ -353,12 +353,12 @@ private:
 		PRINTER_PAGE_HEIGHT = 600,
 	};
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	uint32_t printer_screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	void tmosh_map(address_map &map);
+	void tmosh_map(address_map &map) ATTR_COLD;
 
 	TIMER_CALLBACK_MEMBER(heartbeat_timer_tick);
 	TIMER_CALLBACK_MEMBER(printing_status_timeout);
@@ -1122,7 +1122,7 @@ void tokimeki_state::tmoshsp_init()
 	m_printer_is_manual_layout = true;
 }
 
-CUSTOM_INPUT_MEMBER(tokimeki_state::tokimeki_device_check_r)
+ioport_value tokimeki_state::tokimeki_device_check_r()
 {
 	return BIT(m_device_val, 15);
 }

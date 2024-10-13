@@ -110,10 +110,10 @@ private:
 	void pa_w(u8 data) { if (data) sw_sel = data; }
 	u8 sw_in();
 	u16 adc_bkupbat_r() { return 0x2a0; }
-	void mem_map(address_map &map);
-	void lcd_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
+	void lcd_map(address_map &map) ATTR_COLD;
 	void lcd_palette(palette_device &palette) const;
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 };
 
 void qy70_state::machine_start()

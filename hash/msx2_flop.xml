@@ -607,6 +607,30 @@ The following floppies came with the machines.
 		</part>
 	</software>
 
+	<software name="sunride">
+		<description>Sunrise IDE firmware (v2.50)</description>
+		<year>2013</year>
+		<publisher>Jon de Schrijder</publisher>
+		<notes>Handcrafted image containing firmware and tools.</notes>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="sunrise ide v2.50.dsk" size="737280" crc="7a7a505f" sha1="83d4aca1115e6a0a42f7bf481d472e4c4e5eb87d"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sunride240" cloneof="sunride">
+		<description>Sunrise IDE firmware (v2.40)</description>
+		<year>2005</year>
+		<publisher>Jon de Schrijder</publisher>
+		<notes>Handcrafted image containing firmware and tools.</notes>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="sunrise ide v2.40.dsk" size="737280" crc="c2fca42b" sha1="ff8e67d3d5b16ea27d3bd5a6922f1d8af1d3e31a"/>
+			</dataarea>
+		</part>
+	</software>
+
 
 <!-- Disks only -->
 
@@ -13482,18 +13506,7 @@ The following floppies came with the machines.
 		</part>
 	</software>
 
-	<software name="rsystem32">
-		<description>R・SYSTEM 3.2 (Japan)</description>
-		<year>1996</year>
-		<publisher>Syntax</publisher>
-		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size="737280">
-				<rom name="r-system 3.2 - syntax.dsk" size="737280" crc="d714a9b1" sha1="53e792ba8462879bb1a45bf60350e2252800f18a"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="rsystem3" cloneof="rsystem32">
+	<software name="rsystem3">
 		<description>R・SYSTEM Ketteihan (Japan)</description>
 		<year>1994</year>
 		<publisher>Syntax</publisher>
@@ -22145,46 +22158,469 @@ HOMEBREW
 		</part>
 	</software>
 
-	<software name="nvmg9608">
-		<description>NV Magazine 1996-08 (Japan)</description>
-		<year>1996</year>
-		<publisher>&lt;doujin&gt;</publisher>
-		<info name="developer" value="Syntax" />
+	<software name="nvh1">
+		<description>NV Hokkaido Vol. 1 (Japan)</description>
+		<year>1995</year>
+		<publisher>Syntax</publisher>
+		<info name="alt_title" value="NV北海道#1"/>
+		<info name="usage" value="Requires a Japanese system."/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
-				<rom name="nv magazine 1996-08 (syntax, 1996) (disk a).dsk" size="737280" crc="b9a8bd07" sha1="06951d18fa557bf967ff13fff4acc853c922bfce"/>
+				<rom name="nv hokkaido vol 1 - syntax.dsk" size="737280" crc="76dc41e2" sha1="a1d472a4872490c56db506c615879ae750da7356"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="nvmg1">
+		<description>NV Magazine 1-gou (Japan)</description>
+		<year>1992</year>
+		<publisher>Syntax</publisher>
+		<info name="alt_title" value="NVマガジン1号"/>
+		<info name="usage" value="Requires a Japanese system."/>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="nv magazine 1-gou - syntax.dsk" size="737280" crc="7fe2b042" sha1="397ac3feed7da3c58145f362aea3ffbb001f9860"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="nvmg2">
+		<description>NV Magazine 2-gou (Japan)</description>
+		<year>1992</year>
+		<publisher>Syntax</publisher>
+		<info name="alt_title" value="NVマガジン2号"/>
+		<info name="usage" value="Requires a Japanese system."/>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="nv magazine 2-gou - syntax.dsk" size="737280" crc="656259a0" sha1="2b707101e0afd063f17eb67ae6e5d54772a81890"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="nvmg3">
+		<description>NV Magazine #3 (Japan)</description>
+		<year>1992</year>
+		<publisher>Syntax</publisher>
+		<info name="alt_title" value="NVマガジン#3"/>
+		<info name="usage" value="Requires a Japanese system."/>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="nv magazine 3 - syntax.dsk" size="737280" crc="6c142379" sha1="f15b8be0c72ea24f9cbf3ee09311a4f52cb60b48"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="nvmg4">
+		<description>NV Magazine 4 (Japan)</description>
+		<year>1992</year>
+		<publisher>Syntax</publisher>
+		<info name="alt_title" value="NVマガジン#4"/>
+		<info name="usage" value="Requires a Japanese system."/>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="nv magazine 4 - syntax.dsk" size="737280" crc="ccf812c5" sha1="ee5f3d652e33a7d15d6f16134076e0bb9b8a9c93"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="nvmg5">
+		<description>NV Magazine #5 (Japan)</description>
+		<year>1993</year>
+		<publisher>Syntax</publisher>
+		<info name="alt_title" value="NVマガジン#5"/>
+		<info name="usage" value="Requires a Japanese system."/>
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk A"/>
+			<dataarea name="flop" size="737280">
+				<rom name="nv magazine 5 - syntax (disk a).dsk" size="737280" crc="443a52ec" sha1="21a6f915d70284d80df68919c5179011682de1a8"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk B"/>
 			<dataarea name="flop" size="737280">
-				<rom name="nv magazine 1996-08 (syntax, 1996) (disk b).dsk" size="737280" crc="3d968f5b" sha1="be4d0947b14e472d4a99b38280833e3e0ba8e2bf"/>
+				<rom name="nv magazine 5 - syntax (disk b).dsk" size="737280" crc="a14b94c1" sha1="b302d0c70024d589422691517df252377d8af6f3"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="nvmg6">
+		<description>NV Magazine #6 (Japan)</description>
+		<year>1993</year>
+		<publisher>Syntax</publisher>
+		<info name="alt_title" value="NVマガジン#6"/>
+		<info name="usage" value="Requires a Japanese system."/>
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk A"/>
+			<dataarea name="flop" size="737280">
+				<rom name="nv magazine 6 - syntax (disk a).dsk" size="737280" crc="410a6eea" sha1="b18ab4a90a76914012e7a573f8b48ea1377e6546"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk B"/>
+			<dataarea name="flop" size="737280">
+				<rom name="nv magazine 6 - syntax (disk b).dsk" size="737280" crc="90b4f14e" sha1="0d09e5fe113a20cb06026adb1b9985a22109b72f"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="nvmg7">
+		<description>NV Magazine #7 (Japan)</description>
+		<year>1993</year>
+		<publisher>Syntax</publisher>
+		<info name="usage" value="Requires a Japanese system."/>
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk A"/>
+			<dataarea name="flop" size="737280">
+				<rom name="nv magazine 7 - syntax (disk a).dsk" size="737280" crc="4994b859" sha1="c52669cc582baa8cf5615309ae1d1de30f6e3e1e"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk B"/>
+			<dataarea name="flop" size="737280">
+				<rom name="nv magazine 7 - syntax (disk b).dsk" size="737280" crc="55a70366" sha1="b5fa0c5d4a37a69c82101375e4a5e27e54cd39ca"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="nvmg8">
+		<description>NV Magazine #8 (Japan)</description>
+		<year>1993</year>
+		<publisher>Syntax</publisher>
+		<info name="usage" value="Requires a Japanese system."/>
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk A"/>
+			<dataarea name="flop" size="737280">
+				<rom name="nv magazine 8 - syntax (disk a).dsk" size="737280" crc="d527593f" sha1="e3c983bcb6b74a2aa42382c5f80286fbabb037f9"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk B"/>
+			<dataarea name="flop" size="737280">
+				<rom name="nv magazine 8 - syntax (disk b).dsk" size="737280" crc="3311154d" sha1="eb838e75fda087a04fb80f09e29098d57cc853f1"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="nvmg9">
+		<description>NV Magazine #9 (Japan)</description>
+		<year>1993</year>
+		<publisher>Syntax</publisher>
+		<info name="usage" value="Requires a Japanese system."/>
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk A"/>
+			<dataarea name="flop" size="737280">
+				<rom name="nv magazine 9 - syntax (disk a).dsk" size="737280" crc="65ba5d66" sha1="a4360457739b5dcaea2d35d0ef2203e955bdd697"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk B"/>
+			<dataarea name="flop" size="737280">
+				<rom name="nv magazine 9 - syntax (disk b).dsk" size="737280" crc="6db1173a" sha1="1e931e5bc512093e57c4fcd786e525a421f7add0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="nvmg10">
+		<description>NV Magazine #10 (Japan)</description>
+		<year>1993</year>
+		<publisher>Syntax</publisher>
+		<info name="usage" value="Requires a Japanese system."/>
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk A"/>
+			<dataarea name="flop" size="737280">
+				<rom name="nv magazine 10 - syntax (disk a).dsk" size="737280" crc="e23b2255" sha1="fc04b12964293d9ffb28b2203bb3cae72171b470"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk B"/>
+			<dataarea name="flop" size="737280">
+				<rom name="nv magazine 10 - syntax (disk b).dsk" size="737280" crc="78cb9ac0" sha1="4481dcd9467147ac7369fcdd20845793ef630b9e"/>
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Disk C"/>
 			<dataarea name="flop" size="737280">
-				<rom name="nv magazine 1996-08 (syntax, 1996) (disk c).dsk" size="737280" crc="57d18c6c" sha1="a78662916d50229ad6110eb4dcc4f45453ec632f"/>
+				<rom name="nv magazine 10 - syntax (disk c).dsk" size="737280" crc="2891c2e4" sha1="bdceb51891f8ebf101e536e3068f379ce435358b"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="nvmg20">
+		<description>NV Magazine #20 (Japan)</description>
+		<year>1995</year>
+		<publisher>Syntax</publisher>
+		<info name="usage" value="Requires a Japanese system."/>
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk A"/>
+			<dataarea name="flop" size="737280">
+				<rom name="nv magazine 20 - syntax (disk a).dsk" size="737280" crc="2cf55334" sha1="d600b27e6bb0d2f96b35524bd56c7d09d7fb549a"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk B"/>
+			<dataarea name="flop" size="737280">
+				<rom name="nv magazine 20 - syntax (disk b).dsk" size="737280" crc="7f71df6f" sha1="aa71238c1ea9123fe2102f88c9717a913aba7f4e"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Disk C"/>
+			<dataarea name="flop" size="737280">
+				<rom name="nv magazine 20 - syntax (disk c).dsk" size="737280" crc="fb8ba87a" sha1="6c569cfcf4e706297e7c58e32a696274802fe052"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="nvmg21">
+		<description>NV Magazine #21 (Japan)</description>
+		<year>1995</year>
+		<publisher>Syntax</publisher>
+		<info name="usage" value="Requires a Japanese system."/>
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk A"/>
+			<dataarea name="flop" size="737280">
+				<rom name="nv magazine 21 - syntax (disk a).dsk" size="737280" crc="3c580580" sha1="bb15eb4fc12ac877231cc2e829cf9b38ad6b637f"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk B"/>
+			<dataarea name="flop" size="737280">
+				<rom name="nv magazine 21 - syntax (disk b).dsk" size="737280" crc="63146aa7" sha1="f68f4925788f2610335d2c68f384367e89a5e527"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Disk C"/>
+			<dataarea name="flop" size="737280">
+				<rom name="nv magazine 21 - syntax (disk c).dsk" size="737280" crc="c1444bab" sha1="54e7813be4b93b7ac14c0fd4f04af68f5a90b897"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="nvmg22">
+		<description>NV Magazine #22 (Japan)</description>
+		<year>1995</year>
+		<publisher>Syntax</publisher>
+		<info name="usage" value="Requires a Japanese system."/>
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk A"/>
+			<dataarea name="flop" size="737280">
+				<!-- contains a file from 2011 -->
+				<rom name="nv magazine 22 - syntax (disk a).dsk" size="737280" crc="e590eba6" sha1="5d36d40a57e719373ff804fb1a26d8fd2aa6393d" status="baddump"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk B"/>
+			<dataarea name="flop" size="737280">
+				<rom name="nv magazine 22 - syntax (disk b).dsk" size="737280" crc="63d342a8" sha1="c31689cdaa3ce5576ff8bbf372a5573d9930b73f"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Disk C"/>
+			<dataarea name="flop" size="737280">
+				<rom name="nv magazine 22 - syntax (disk c).dsk" size="737280" crc="7495f61d" sha1="d9455b83e9e6bfd76ae8347be7f880223bc07d02"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="nvmg23">
+		<description>NV Magazine #23 (Japan)</description>
+		<year>1995</year>
+		<publisher>Syntax</publisher>
+		<info name="usage" value="Requires a Japanese system."/>
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk A"/>
+			<dataarea name="flop" size="737280">
+				<rom name="nv magazine 23 - syntax (disk a).dsk" size="737280" crc="0e7a2e09" sha1="c09fefe0eb87ffb5b21f51dee295c6f5c5b45b0b"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk B"/>
+			<dataarea name="flop" size="737280">
+				<rom name="nv magazine 23 - syntax (disk b).dsk" size="737280" crc="9fdb0f11" sha1="d452d6d3988c7a58c58e5e109feaf7f48663345a"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Disk C"/>
+			<dataarea name="flop" size="737280">
+				<rom name="nv magazine 23 - syntax (disk c).dsk" size="737280" crc="37b03a6b" sha1="8a4f8cc2c33ede822f86f35e74447100dbb0cb7f"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="nvmg24">
+		<description>NV Magazine #24 (Japan)</description>
+		<year>1995</year>
+		<publisher>Syntax</publisher>
+		<info name="usage" value="Requires a Japanese system."/>
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk A"/>
+			<dataarea name="flop" size="737280">
+				<rom name="nv magazine 24 - syntax (disk a).dsk" size="737280" crc="25e9c673" sha1="4fd988b7d1c96155a61562983660158df38aa964"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk B"/>
+			<dataarea name="flop" size="737280">
+				<rom name="nv magazine 24 - syntax (disk b).dsk" size="737280" crc="6fa97e28" sha1="ccecb8216256b21b25a32a56b30b0b2496df15c0"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Disk C"/>
+			<dataarea name="flop" size="737280">
+				<rom name="nv magazine 24 - syntax (disk c).dsk" size="737280" crc="937e47a4" sha1="e0d829279e67e46036da6fbb6cbbe40028bd9288"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="nvmg25">
+		<description>NV Magazine #25 (Japan)</description>
+		<year>1995</year>
+		<publisher>Syntax</publisher>
+		<info name="usage" value="Requires a Japanese system."/>
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk A"/>
+			<dataarea name="flop" size="737280">
+				<rom name="nv magazine 25 - syntax (disk a).dsk" size="737280" crc="4452f564" sha1="de92ebc3253e0c2547aeb3fd886a46a4440032c5"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk B"/>
+			<dataarea name="flop" size="737280">
+				<rom name="nv magazine 25 - syntax (disk b).dsk" size="737280" crc="34862ae7" sha1="ab982e7a82356241af14e0de0f4acc3442e16547"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Disk C"/>
+			<dataarea name="flop" size="737280">
+				<rom name="nv magazine 25 - syntax (disk c).dsk" size="737280" crc="cd6036ff" sha1="a0110dc92cf990744f24ae044afe30e0eb8af5a3"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="nvmg26">
+		<description>NV Magazine #26 (Japan)</description>
+		<year>1996</year>
+		<publisher>Syntax</publisher>
+		<info name="alt_title" value="NV Magazine 1996-6"/>
+		<info name="usage" value="Requires a Japanese system."/>
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk A"/>
+			<dataarea name="flop" size="737280">
+				<rom name="nv magazine 26 - syntax (disk a).dsk" size="737280" crc="7767df20" sha1="19de17d7d1427c775cc60b9afec94282642461ce"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk B"/>
+			<dataarea name="flop" size="737280">
+				<rom name="nv magazine 26 - syntax (disk b).dsk" size="737280" crc="c63152a7" sha1="0976736e0216c4aab4065c06d5e79af7cf1761b3"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Disk C"/>
+			<dataarea name="flop" size="737280">
+				<rom name="nv magazine 26 - syntax (disk c).dsk" size="737280" crc="9dd21744" sha1="18024328897c881f65d5073bdf30d9dca0bccd04"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="nvmg9607">
+		<description>NV Magazine 1996-7 (Japan)</description>
+		<year>1996</year>
+		<publisher>Syntax</publisher>
+		<info name="alt_title" value="NV Magazine #26 Special"/>
+		<info name="usage" value="Requires a Japanese system."/>
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk A"/>
+			<dataarea name="flop" size="737280">
+				<rom name="nv magazine 1996-7 - syntax (disk a).dsk" size="737280" crc="c5c4e2a2" sha1="fe91e26ac43be3315a0a800b262a4eedc24b059b"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk B"/>
+			<dataarea name="flop" size="737280">
+				<rom name="nnv magazine 1996-7 - syntax (disk b).dsk" size="737280" crc="d1b84048" sha1="dca64b2f6687d6197fcced4097fae6794c3e3626"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Disk C"/>
+			<dataarea name="flop" size="737280">
+				<rom name="nnv magazine 1996-7 - syntax (disk c).dsk" size="737280" crc="ee527bfd" sha1="dbc817a81ce075c19fbcbd5a02b2d06d7726bf41"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="nvmg9608">
+		<description>NV Magazine 1996-8 (Japan)</description>
+		<year>1996</year>
+		<publisher>Syntax</publisher>
+		<info name="alt_title" value="NV Magazine #27"/>
+		<info name="usage" value="Requires a Japanese system."/>
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk A"/>
+			<dataarea name="flop" size="737280">
+				<rom name="nv magazine 1996-8 - syntax (disk a).dsk" size="737280" crc="b9a8bd07" sha1="06951d18fa557bf967ff13fff4acc853c922bfce"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk B"/>
+			<dataarea name="flop" size="737280">
+				<rom name="nv magazine 1996-8 - syntax (disk b).dsk" size="737280" crc="3d968f5b" sha1="be4d0947b14e472d4a99b38280833e3e0ba8e2bf"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Disk C"/>
+			<dataarea name="flop" size="737280">
+				<rom name="nv magazine 1996-8 - syntax (disk c).dsk" size="737280" crc="57d18c6c" sha1="a78662916d50229ad6110eb4dcc4f45453ec632f"/>
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="nvmg9609">
-		<description>NV Magazine 1996-09 (Japan)</description>
+		<description>NV Magazine 1996-9 (Japan)</description>
 		<year>1996</year>
-		<publisher>&lt;doujin&gt;</publisher>
-		<info name="developer" value="Syntax" />
+		<publisher>Syntax</publisher>
+		<info name="alt_title" value="NV Magazine #27"/> <!-- Disk 2 displays #27, same as 1996-8. -->
+		<info name="usage" value="Requires a Japanese system."/>
 		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk A"/>
 			<dataarea name="flop" size="737280">
-				<rom name="nv magazine 1996-09 (syntax, 1996) (disk a).dsk" size="737280" crc="9d1e7da8" sha1="5162e4450a4abe6393e1457006715942b02aadd3"/>
+				<rom name="nv magazine 1996-9 - syntax (disk a).dsk" size="737280" crc="9d1e7da8" sha1="5162e4450a4abe6393e1457006715942b02aadd3"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk B"/>
 			<dataarea name="flop" size="737280">
-				<rom name="nv magazine 1996-09 (syntax, 1996) (disk b).dsk" size="737280" crc="570b274e" sha1="922f545b979e5ca0a1eaee81c535e3a00bc7b016"/>
+				<rom name="nv magazine 1996-9 - syntax (disk b).dsk" size="737280" crc="570b274e" sha1="922f545b979e5ca0a1eaee81c535e3a00bc7b016"/>
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Disk C"/>
 			<dataarea name="flop" size="737280">
-				<rom name="nv magazine 1996-09 (syntax, 1996) (disk c).dsk" size="737280" crc="fcb991c9" sha1="2caf097a91daae04a7f0888ed6116462fd181ec0"/>
+				<rom name="nv magazine 1996-9 - syntax (disk c).dsk" size="737280" crc="fcb991c9" sha1="2caf097a91daae04a7f0888ed6116462fd181ec0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="nvmg9610">
+		<description>NV Magazine 1996-10 (Japan)</description>
+		<year>1996</year>
+		<publisher>Syntax</publisher>
+		<info name="usage" value="Requires a Japanese system."/>
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk A"/>
+			<dataarea name="flop" size="737280">
+				<rom name="nv magazine 1996-10 - syntax (disk a).dsk" size="737280" crc="45e900c9" sha1="338a408ec68d962de50dcc4c476634415febbd81"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk B"/>
+			<dataarea name="flop" size="737280">
+				<rom name="nv magazine 1996-10 - syntax (disk b).dsk" size="737280" crc="ab8f1806" sha1="b3e977557b16fa06d02aebf750a1ee9ea313e41a"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Disk C"/>
+			<dataarea name="flop" size="737280">
+				<rom name="nv magazine 1996-10 - syntax (disk c).dsk" size="737280" crc="39926835" sha1="23cf1de486e6e46cd54e471d8f920be67a43759a"/>
 			</dataarea>
 		</part>
 	</software>
@@ -22192,149 +22628,1121 @@ HOMEBREW
 	<software name="nvmg9611">
 		<description>NV Magazine 1996-11 (Japan)</description>
 		<year>1996</year>
-		<publisher>&lt;doujin&gt;</publisher>
-		<info name="developer" value="Syntax" />
+		<publisher>Syntax</publisher>
+		<info name="usage" value="Requires a Japanese system."/>
 		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk A"/>
 			<dataarea name="flop" size="737280">
-				<rom name="nv magazine 1996-11 (syntax, 1996) (disk a).dsk" size="737280" crc="0d16461b" sha1="9a4e379d6e9311807034ff03b71d8806b457d88a"/>
+				<rom name="nv magazine 1996-11 - syntax (disk a).dsk" size="737280" crc="0d16461b" sha1="9a4e379d6e9311807034ff03b71d8806b457d88a"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk B"/>
 			<dataarea name="flop" size="737280">
-				<rom name="nv magazine 1996-11 (syntax, 1996) (disk b).dsk" size="737280" crc="8239a80b" sha1="e3b581ea00a8ff9d87a019543a362f4175d83ab3"/>
+				<rom name="nv magazine 1996-11 - syntax (disk b).dsk" size="737280" crc="8239a80b" sha1="e3b581ea00a8ff9d87a019543a362f4175d83ab3"/>
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Disk C"/>
 			<dataarea name="flop" size="737280">
-				<rom name="nv magazine 1996-11 (syntax, 1996) (disk c).dsk" size="737280" crc="1bceac1d" sha1="4917e1ac189f4530ed8176576d4b8e31223dd3e2"/>
+				<rom name="nv magazine 1996-11 - syntax (disk c).dsk" size="737280" crc="1bceac1d" sha1="4917e1ac189f4530ed8176576d4b8e31223dd3e2"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="nvmg9612" supported="no">
+		<description>NV Magazine 1996-12 (Japan)</description>
+		<year>1996</year>
+		<publisher>Syntax</publisher>
+		<info name="usage" value="Requires a Japanese system."/>
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk A"/>
+			<dataarea name="flop" size="737280">
+				<rom name="nv magazine 1996-12 - syntax (disk a).dsk" size="737280" crc="9366497e" sha1="6f1fb36bc1fcec13d588d7342600d96545830a51"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk B"/>
+			<dataarea name="flop" size="737280">
+				<rom name="nv magazine 1996-12 - syntax (disk b).dsk" size="737280" crc="b0e75094" sha1="7f50e1d2f53ef0db76b7efb9ae2c31a9746013ba"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Disk C"/>
+			<dataarea name="flop" size="737280">
+				<rom name="nv magazine 1996-12 - syntax (disk c).dsk" size="737280" crc="545ae993" sha1="1cf2d03597e32985e3fa2bb5cce5cdf523273068"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<feature name="part_id" value="Disk D"/>
+			<dataarea name="flop" size="737280">
+				<rom name="nv magazine 1996-12 - syntax (disk d).dsk" size="737280" crc="dcda5a90" sha1="84a1bf9390a1f2ad02e09a93a40ae6e4aeb1f70e"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_3_5">
+			<feature name="part_id" value="Disk E"/>
+			<dataarea name="flop" size="737280">
+				<rom name="nv magazine 1996-12 - syntax (disk e).dsk" size="737280" crc="d714a9b1" sha1="53e792ba8462879bb1a45bf60350e2252800f18a"/>
+			</dataarea>
+		</part>
+		<!-- ディスクカタログ - disk catalogue -->
+		<part name="flop6" interface="floppy_3_5">
+			<feature name="part_id" value="Disk F"/>
+			<dataarea name="flop" size="737280">
+				<rom name="nv magazine 1996-12 - syntax (disk f).dsk" size="737280" status="nodump"/>
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="nvmg9701">
-		<description>NV Magazine 1997-01 (Japan)</description>
+		<description>NV Magazine 1997-1 (Japan)</description>
 		<year>1997</year>
-		<publisher>&lt;doujin&gt;</publisher>
-		<info name="developer" value="Syntax" />
+		<publisher>Syntax</publisher>
+		<info name="usage" value="Requires a Japanese system."/>
 		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk A"/>
 			<dataarea name="flop" size="737280">
-				<rom name="nv magazine 1997-01 (syntax, 1997) (disk a).dsk" size="737280" crc="065c6130" sha1="b06c9b9397914f80610ffb25b3f7c3ddc503b15b"/>
+				<rom name="nv magazine 1997-1 - syntax (disk a).dsk" size="737280" crc="065c6130" sha1="b06c9b9397914f80610ffb25b3f7c3ddc503b15b"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk B"/>
 			<dataarea name="flop" size="737280">
-				<rom name="nv magazine 1997-01 (syntax, 1997) (disk b).dsk" size="737280" crc="27a21ea6" sha1="eec38f441cfb872169f7a7a5068240c4392eb90f"/>
+				<rom name="nv magazine 1997-1 - syntax (disk b).dsk" size="737280" crc="27a21ea6" sha1="eec38f441cfb872169f7a7a5068240c4392eb90f"/>
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Disk C"/>
 			<dataarea name="flop" size="737280">
-				<rom name="nv magazine 1997-01 (syntax, 1997) (disk c).dsk" size="737280" crc="8f0a32b2" sha1="155c0e5f7797f10bafc377537c1e9e3e8a390a08"/>
+				<rom name="nv magazine 1997-1 - syntax (disk c).dsk" size="737280" crc="8f0a32b2" sha1="155c0e5f7797f10bafc377537c1e9e3e8a390a08"/>
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="nvmg9709">
-		<description>NV Magazine 1997-09 (Japan)</description>
+		<description>NV Magazine 1997-9 (Japan)</description>
 		<year>1997</year>
-		<publisher>&lt;doujin&gt;</publisher>
-		<info name="developer" value="Syntax" />
+		<publisher>Syntax</publisher>
+		<info name="usage" value="Requires a Japanese system."/>
 		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk A"/>
 			<dataarea name="flop" size="737280">
-				<rom name="nv magazine 1997-09 (syntax, 1997) (disk a).dsk" size="737280" crc="0298f08f" sha1="47aad68bcb80df6de901a49176e6f5aa90a9e518"/>
+				<rom name="nv magazine 1997-9 - syntax (disk a).dsk" size="737280" crc="0298f08f" sha1="47aad68bcb80df6de901a49176e6f5aa90a9e518"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk B"/>
 			<dataarea name="flop" size="737280">
-				<rom name="nv magazine 1997-09 (syntax, 1997) (disk b).dsk" size="737280" crc="e5121f13" sha1="8de4f2a4a9f563c5c0c1d99c60526b12725d0c5a"/>
+				<rom name="nv magazine 1997-9 - syntax (disk b).dsk" size="737280" crc="e5121f13" sha1="8de4f2a4a9f563c5c0c1d99c60526b12725d0c5a"/>
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Disk C"/>
 			<dataarea name="flop" size="737280">
-				<rom name="nv magazine 1997-09 (syntax, 1997) (disk c).dsk" size="737280" crc="eaf4bb27" sha1="fd5e585617e57d165e3af3e9c417b6633132d1cc"/>
+				<rom name="nv magazine 1997-9 - syntax (disk c).dsk" size="737280" crc="eaf4bb27" sha1="fd5e585617e57d165e3af3e9c417b6633132d1cc"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="nvmg9806">
+		<description>NV Magazine 1998-6 (Japan)</description>
+		<year>1998</year>
+		<publisher>Syntax</publisher>
+		<info name="usage" value="Requires a Japanese system."/>
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk A"/>
+			<dataarea name="flop" size="737280">
+				<rom name="nv magazine 1998-6 - syntax (disk a).dsk" size="737280" crc="bdc09b3e" sha1="f1fbb8f2b509ce402ef78840312b476b6759ec67"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk B"/>
+			<dataarea name="flop" size="737280">
+				<rom name="nv magazine 1998-6 - syntax (disk b).dsk" size="737280" crc="20a47c28" sha1="b666962018fd0ca3fdb9d53a1f00bfe26c9cbc39"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Disk C"/>
+			<dataarea name="flop" size="737280">
+				<rom name="nv magazine 1998-6 - syntax (disk c).dsk" size="737280" crc="773354f1" sha1="4684757cfc1bf493483b301321be605fbbb480fd"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="nvmg9809">
+		<description>NV Magazine 1998-9 (Japan)</description>
+		<year>1998</year>
+		<publisher>Syntax</publisher>
+		<info name="usage" value="Requires a Japanese system."/>
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk A"/>
+			<dataarea name="flop" size="737280">
+				<rom name="nv magazine 1998-9 - syntax (disk a).dsk" size="737280" crc="2099513a" sha1="1a4ee21977200c6534636616dac4874a0bd3e221"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk B"/>
+			<dataarea name="flop" size="737280">
+				<rom name="nv magazine 1998-9 - syntax (disk b).dsk" size="737280" crc="ebb07d34" sha1="5565998afb01e808340c3c0620bd94a33e4f8900"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Disk C"/>
+			<dataarea name="flop" size="737280">
+				<rom name="nv magazine 1998-9 - syntax (disk c).dsk" size="737280" crc="5479605b" sha1="02c288b7a6bb905f5f24056d7406a9b458aed6ef"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="nvmg9810">
+		<description>NV Magazine 1998-10 (Japan)</description>
+		<year>1998</year>
+		<publisher>Syntax</publisher>
+		<info name="usage" value="Requires a Japanese system."/>
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk A"/>
+			<dataarea name="flop" size="737280">
+				<rom name="nv magazine 1998-10 - syntax (disk a).dsk" size="737280" crc="8e29935a" sha1="bf7ef4862767fb46fbd58f3822719aee1d5c6294"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk B"/>
+			<dataarea name="flop" size="737280">
+				<rom name="nv magazine 1998-10 - syntax (disk b).dsk" size="737280" crc="6688adc1" sha1="4e8b3d7c4c888342ea0e6464b328817c7ef87b40"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Disk C"/>
+			<dataarea name="flop" size="737280">
+				<rom name="nv magazine 1998-10 - syntax (disk c).dsk" size="737280" crc="f82cd9f7" sha1="4c2b524fdf8df32aa272c6efb301b5955578da14"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="nvmg9811" supported="no">
+		<description>NV Magazine 1998-11 (Japan)</description>
+		<year>1998</year>
+		<publisher>Syntax</publisher>
+		<info name="usage" value="Requires a Japanese system."/>
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk A"/>
+			<dataarea name="flop" size="737280">
+				<rom name="nv magazine 1998-11 - syntax (disk a).dsk" size="737280" crc="21bb2546" sha1="e0d32dc5220bc924a1ba4cdf611f4ce0c6f67ea7"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk B"/>
+			<dataarea name="flop" size="737280">
+				<rom name="nv magazine 1998-11 - syntax (disk b).dsk" size="737280" crc="a038df4c" sha1="471111da30ad6b4df1c0f1d5e8de82e246b556d4"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Disk C"/>
+			<dataarea name="flop" size="737280">
+				<rom name="nv magazine 1998-11 - syntax (disk c).dsk" size="737280" status="nodump"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="nvmg9901">
+		<description>NV Magazine 1999-1 (Japan)</description>
+		<year>1999</year>
+		<publisher>Syntax</publisher>
+		<info name="usage" value="Requires a Japanese system."/>
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk A"/>
+			<dataarea name="flop" size="737280">
+				<rom name="nv magazine 1999-1 - syntax (disk a).dsk" size="737280" crc="dd511cc5" sha1="ea126b67957c42dc317d2800c202f72347792497"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk B"/>
+			<dataarea name="flop" size="737280">
+				<rom name="nv magazine 1999-1 - syntax (disk b).dsk" size="737280" crc="bfcc0a93" sha1="62a3fa44fbaadaa905c699c3278ecc5d44e83a3b"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Disk C"/>
+			<dataarea name="flop" size="737280">
+				<rom name="nv magazine 1999-1 - syntax (disk c).dsk" size="737280" crc="dc8e79fe" sha1="8017f5e7286628d727f7e47a57cfc2903e33e341"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="nvmg9902">
+		<description>NV Magazine 1999-2 (Japan)</description>
+		<year>1999</year>
+		<publisher>Syntax</publisher>
+		<info name="usage" value="Requires a Japanese system."/>
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk A"/>
+			<dataarea name="flop" size="737280">
+				<rom name="nv magazine 1999-2 - syntax (disk a).dsk" size="737280" crc="d315a5af" sha1="871d34c0099650290bd47a3c490dd9175e767c2d"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk B"/>
+			<dataarea name="flop" size="737280">
+				<rom name="nv magazine 1999-2 - syntax (disk b).dsk" size="737280" crc="fecd41a2" sha1="74574264bc87914c358856390cc3af0021b7095d"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Disk C"/>
+			<dataarea name="flop" size="737280">
+				<rom name="nv magazine 1999-2 - syntax (disk c).dsk" size="737280" crc="a09f4613" sha1="0547ee5d3e024e9c0a4abaa129da2792088e2411"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="nvmg9903">
+		<description>NV Magazine 1999-3 (Japan)</description>
+		<year>1999</year>
+		<publisher>Syntax</publisher>
+		<info name="usage" value="Requires a Japanese system."/>
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk A"/>
+			<dataarea name="flop" size="737280">
+				<rom name="nv magazine 1999-3 - syntax (disk a).dsk" size="737280" crc="08c8940d" sha1="77d5b07f3ba801b58bb71dfcbef2f02a9576a8e4"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk B"/>
+			<dataarea name="flop" size="737280">
+				<rom name="nv magazine 1999-3 - syntax (disk b).dsk" size="737280" crc="a4e67b4c" sha1="75258e7be13088d47df62343297c1b3c4c4d5dda"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Disk C"/>
+			<dataarea name="flop" size="737280">
+				<rom name="nv magazine 1999-3 - syntax (disk c).dsk" size="737280" crc="518265d4" sha1="4731cb7dcce91d86036871428af4c14b24478400"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="nvmg9905">
+		<description>NV Magazine 1999-5 (Japan)</description>
+		<year>1999</year>
+		<publisher>Syntax</publisher>
+		<info name="usage" value="Requires a Japanese system."/>
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk A"/>
+			<dataarea name="flop" size="737280">
+				<rom name="nv magazine 1999-5 - syntax (disk a).dsk" size="737280" crc="05ea4d4a" sha1="c1d0d9ce93ba06aae7d806a6f7648b069d627c89"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk B"/>
+			<dataarea name="flop" size="737280">
+				<rom name="nv magazine 1999-5 - syntax (disk b).dsk" size="737280" crc="8e1bea83" sha1="15bbc708e8dae0fa02768b98784f0e6049c4cef1"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Disk C"/>
+			<dataarea name="flop" size="737280">
+				<rom name="nv magazine 1999-5 - syntax (disk c).dsk" size="737280" crc="dc4b755d" sha1="adcc770b03687bb52e723ab161686459f9e569b5"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="nvmg9906">
+		<description>NV Magazine 1999-6 (Japan)</description>
+		<year>1999</year>
+		<publisher>Syntax</publisher>
+		<info name="usage" value="Requires a Japanese system."/>
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk A"/>
+			<dataarea name="flop" size="737280">
+				<rom name="nv magazine 1999-6 - syntax (disk a).dsk" size="737280" crc="aa62519b" sha1="82ca4a37e63571ed8ffffcc9aed987534e1802d2"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk B"/>
+			<dataarea name="flop" size="737280">
+				<rom name="nv magazine 1999-6 - syntax (disk b).dsk" size="737280" crc="4f554de2" sha1="2e01c13e3dd26137e2aa2240c34b26b7bbe8f301"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Disk C"/>
+			<dataarea name="flop" size="737280">
+				<rom name="nv magazine 1999-6 - syntax (disk c).dsk" size="737280" crc="dc77f6bf" sha1="a568b164293fa097ee448d4a065ae250148d4795"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="nvmg9907">
+		<description>NV Magazine 1999-7 (Japan)</description>
+		<year>1999</year>
+		<publisher>Syntax</publisher>
+		<info name="usage" value="Requires a Japanese system."/>
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk A"/>
+			<dataarea name="flop" size="737280">
+				<rom name="nv magazine 1999-7 - syntax (disk a).dsk" size="737280" crc="8073f546" sha1="796afedd7ef835ec96d95844d2c26ad5648fe24c"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk B"/>
+			<dataarea name="flop" size="737280">
+				<rom name="nv magazine 1999-7 - syntax (disk b).dsk" size="737280" crc="48dbabce" sha1="fc364d03cf7237aebc6ce8770854d1e7873d8d98"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Disk C"/>
+			<dataarea name="flop" size="737280">
+				<rom name="nv magazine 1999-7 - syntax (disk c).dsk" size="737280" crc="0c1111cd" sha1="66b980795c23ac29d1f149ed3aefa578973f2916"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="nvmg9908">
+		<description>NV Magazine 1999-8 (Japan)</description>
+		<year>1999</year>
+		<publisher>Syntax</publisher>
+		<info name="usage" value="Requires a Japanese system."/>
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk A"/>
+			<dataarea name="flop" size="737280">
+				<rom name="nv magazine 1999-8 - syntax (disk a).dsk" size="737280" crc="5c85c3f6" sha1="127b1d82fccf2bc74ba2aa7a5671add5b14adb08"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk B"/>
+			<dataarea name="flop" size="737280">
+				<rom name="nv magazine 1999-8 - syntax (disk b).dsk" size="737280" crc="6bb44e92" sha1="07d22b357efe8ebe7351449b18e2efa60fa89f06"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Disk C"/>
+			<dataarea name="flop" size="737280">
+				<rom name="nv magazine 1999-8 - syntax (disk c).dsk" size="737280" crc="fdf8b5e8" sha1="21ada27b74c4b6b829542ab10cf3e4f629586656"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="nvmg9909">
+		<description>NV Magazine 1999-9 (Japan)</description>
+		<year>1999</year>
+		<publisher>Syntax</publisher>
+		<info name="usage" value="Requires a Japanese system."/>
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk A"/>
+			<dataarea name="flop" size="737280">
+				<rom name="nv magazine 1999-9 - syntax (disk a).dsk" size="737280" crc="f4ee06e0" sha1="009b0ca85b92fc4fcefcd858991b60c18a4f5871"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk B"/>
+			<dataarea name="flop" size="737280">
+				<rom name="nv magazine 1999-9 - syntax (disk b).dsk" size="737280" crc="1fba1263" sha1="5ee4f4cba92a9dfa8a3d531a29deede679ed0b82"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Disk C"/>
+			<dataarea name="flop" size="737280">
+				<rom name="nv magazine 1999-9 - syntax (disk c).dsk" size="737280" crc="6e9cd1c4" sha1="e21f94cce2c764ecdd0671ffffd398477c4203b0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="nvmg9910">
+		<description>NV Magazine 1999-10 (Japan)</description>
+		<year>1999</year>
+		<publisher>Syntax</publisher>
+		<info name="usage" value="Requires a Japanese system."/>
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk A"/>
+			<dataarea name="flop" size="737280">
+				<rom name="nv magazine 1999-10 - syntax (disk a).dsk" size="737280" crc="1aed1acf" sha1="439bc8745ce14b7aa5319d4cfb841e2ac37f0901"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk B"/>
+			<dataarea name="flop" size="737280">
+				<rom name="nv magazine 1999-10 - syntax (disk b).dsk" size="737280" crc="4a84ac1d" sha1="a58f392aa5f2ffb33f6259ee2a3c993a74975a95"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Disk C"/>
+			<dataarea name="flop" size="737280">
+				<rom name="nv magazine 1999-10 - syntax (disk c).dsk" size="737280" crc="184ce00e" sha1="e0f66baf86dbcc8d5aae8816cbad58cd57e7a0c1"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<feature name="part_id" value="Disk D"/>
+			<dataarea name="flop" size="737280">
+				<rom name="nv magazine 1999-10 - syntax (disk d).dsk" size="737280" crc="ab0e39ed" sha1="82b6bab2c21a24a487d42c1056a9dcd6adb922a3"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="nvmg9911">
+		<description>NV Magazine 1999-11 (Japan)</description>
+		<year>1999</year>
+		<publisher>Syntax</publisher>
+		<info name="usage" value="Requires a Japanese system."/>
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk A"/>
+			<dataarea name="flop" size="737280">
+				<rom name="nv magazine 1999-11 - syntax (disk a).dsk" size="737280" crc="1ad80fb4" sha1="4c5e5575415d222350de5835807a60e6a95fa9bb"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk B"/>
+			<dataarea name="flop" size="737280">
+				<rom name="nv magazine 1999-11 - syntax (disk b).dsk" size="737280" crc="e96d1fab" sha1="191d239a70265abd264ac2c95e164319f4c37274"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="nvmg0001">
+		<description>NV Magazine 2000-1 (Japan)</description>
+		<year>2000</year>
+		<publisher>Syntax</publisher>
+		<info name="alt_title" value="NV Magazine #94"/>
+		<info name="usage" value="Requires a Japanese system."/>
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk A"/>
+			<dataarea name="flop" size="737280">
+				<rom name="nv magazine 2000-1 - syntax (disk a).dsk" size="737280" crc="f1b7cb6f" sha1="94bb00089f4564bd1943e4858449d24c90acade6"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk B"/>
+			<dataarea name="flop" size="737280">
+				<rom name="nv magazine 2000-1 - syntax (disk b).dsk" size="737280" crc="6a06fb6b" sha1="62ff8186b63a545a7c04cfffeff12a30a8da0783"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Disk C"/>
+			<dataarea name="flop" size="737280">
+				<rom name="nv magazine 2000-1 - syntax (disk c).dsk" size="737280" crc="9a21d500" sha1="543fd6b28475efef9a32b2e1f3028a782358c314"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="nvmg0002">
+		<description>NV Magazine 2000-2 (Japan)</description>
+		<year>2000</year>
+		<publisher>Syntax</publisher>
+		<info name="alt_title" value="NV Magazine #95"/>
+		<info name="usage" value="Requires a Japanese system."/>
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk A"/>
+			<dataarea name="flop" size="737280">
+				<rom name="nv magazine 2000-2 - syntax (disk a).dsk" size="737280" crc="2d275ead" sha1="6744fda8679d0515e42e202fbbc3921d22c10d82"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk B"/>
+			<dataarea name="flop" size="737280">
+				<rom name="nv magazine 2000-2 - syntax (disk b).dsk" size="737280" crc="9170c6dd" sha1="072d1710971010fdb92d65c4d1532fabce782182"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Disk C"/>
+			<dataarea name="flop" size="737280">
+				<rom name="nv magazine 2000-2 - syntax (disk c).dsk" size="737280" crc="3e0ef677" sha1="c7d3ad8a2132e66d48c2df85d74c17c6e65fd1c7"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="nvmg0003">
+		<description>NV Magazine 2000-3 (Japan)</description>
+		<year>2000</year>
+		<publisher>Syntax</publisher>
+		<info name="alt_title" value="NV Magazine #96"/>
+		<info name="usage" value="Requires a Japanese system."/>
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk A"/>
+			<dataarea name="flop" size="737280">
+				<rom name="nv magazine 2000-3 - syntax (disk a).dsk" size="737280" crc="47611dd8" sha1="8c48529ebea96f646f28c036d41c92554840a99b"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk B"/>
+			<dataarea name="flop" size="737280">
+				<rom name="nv magazine 2000-3 - syntax (disk b).dsk" size="737280" crc="24381cae" sha1="facceb89dd9c56a980a0b8a9f03818997f0f29e7"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Disk C"/>
+			<dataarea name="flop" size="737280">
+				<rom name="nv magazine 2000-3 - syntax (disk c).dsk" size="737280" crc="9da2dc86" sha1="e2f7aaa42722484f6ac0facaf2d4834915b0a394"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="nvmg0004">
+		<description>NV Magazine 2000-4 (Japan)</description>
+		<year>2000</year>
+		<publisher>Syntax</publisher>
+		<info name="alt_title" value="NV Magazine #97"/>
+		<info name="usage" value="Requires a Japanese system."/>
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk A"/>
+			<dataarea name="flop" size="737280">
+				<rom name="nv magazine 2000-4 - syntax (disk a).dsk" size="737280" crc="80c0c217" sha1="1246833d6a33efc440a85f9537a42a7a9ff23a16"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk B"/>
+			<dataarea name="flop" size="737280">
+				<rom name="nv magazine 2000-4 - syntax (disk b).dsk" size="737280" crc="dcc7fa55" sha1="4022c72c7fe9f6d9980102dbc9a24533ceef7432"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Disk C"/>
+			<dataarea name="flop" size="737280">
+				<rom name="nv magazine 2000-4 - syntax (disk c).dsk" size="737280" crc="d982913c" sha1="b24327ecb23ade8061548dc70403d9b735bcb3e5"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="nvmg0005">
+		<description>NV Magazine 2000-5 (Japan)</description>
+		<year>2000</year>
+		<publisher>Syntax</publisher>
+		<info name="usage" value="Requires a Japanese system."/>
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk A"/>
+			<dataarea name="flop" size="737280">
+				<rom name="nv magazine 2000-5 - syntax (disk a).dsk" size="737280" crc="e0328373" sha1="ae8558cca5dd81c5015f67452766219f3f08d18d"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk B"/>
+			<dataarea name="flop" size="737280">
+				<rom name="nv magazine 2000-5 - syntax (disk b).dsk" size="737280" crc="4392bb9d" sha1="e0b90c2f1419656356b786c22ba5c7de8f9c8b3f"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Disk C"/>
+			<dataarea name="flop" size="737280">
+				<rom name="nv magazine 2000-5 - syntax (disk c).dsk" size="737280" crc="d4cc4b9b" sha1="f14d2474c9c1e3059581acb93e3171bfb7bb3c71"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="nvmg0006">
+		<description>NV Magazine 2000-6 (Japan)</description>
+		<year>2000</year>
+		<publisher>Syntax</publisher>
+		<info name="alt_title" value="NV Magazine #99"/>
+		<info name="usage" value="Requires a Japanese system."/>
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk A"/>
+			<dataarea name="flop" size="737280">
+				<rom name="nv magazine 2000-6 - syntax (disk a).dsk" size="737280" crc="a87a0132" sha1="2b8269ec3fc180ed5e1bd88351415573f7269de2"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk B"/>
+			<dataarea name="flop" size="737280">
+				<rom name="nv magazine 2000-6 - syntax (disk b).dsk" size="737280" crc="3f20aa0f" sha1="dbb01d516cbee3b48f0c151bf707058efb74460b"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Disk C"/>
+			<dataarea name="flop" size="737280">
+				<rom name="nv magazine 2000-6 - syntax (disk c).dsk" size="737280" crc="531e7c8f" sha1="85e10b894cd85260854b222c4bd0cd116ba55d7a"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="nvmg0007">
+		<description>NV Magazine 2000-7 (Japan)</description>
+		<year>2000</year>
+		<publisher>Syntax</publisher>
+		<info name="alt_title" value="NV Magazine #100"/>
+		<info name="usage" value="Requires a Japanese system."/>
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk A"/>
+			<dataarea name="flop" size="737280">
+				<rom name="nv magazine 2000-7 - syntax (disk a).dsk" size="737280" crc="81c5fe8a" sha1="f7a310d2979372029bdf78ae17d6259758cba0f3"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk B"/>
+			<dataarea name="flop" size="737280">
+				<rom name="nv magazine 2000-7 - syntax (disk b).dsk" size="737280" crc="f2298ab1" sha1="657a514ca525846ea74ab18af2e82bb04645aa00"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Disk C"/>
+			<dataarea name="flop" size="737280">
+				<rom name="nv magazine 2000-7 - syntax (disk c).dsk" size="737280" crc="1f483907" sha1="288608489a2549cece8512300d8d57b684ddd07a"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="nvmg0008">
+		<description>NV Magazine 2000-8 (Japan)</description>
+		<year>2000</year>
+		<publisher>Syntax</publisher>
+		<info name="alt_title" value="NV Magazine #101"/>
+		<info name="usage" value="Requires a Japanese system."/>
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk A"/>
+			<dataarea name="flop" size="737280">
+				<rom name="nv magazine 2000-8 - syntax (disk a).dsk" size="737280" crc="4cac7230" sha1="057642709f03303316325c6ad3ae4e0cbd22aa22"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk B"/>
+			<dataarea name="flop" size="737280">
+				<rom name="nv magazine 2000-8 - syntax (disk b).dsk" size="737280" crc="92253eaa" sha1="b9322399ca864c18743d4404239c721493772c5f"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Disk C"/>
+			<dataarea name="flop" size="737280">
+				<rom name="nv magazine 2000-8 - syntax (disk c).dsk" size="737280" crc="76e17799" sha1="07e3cb1000f9af856459cda6434b3f2e26eeed4c"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="nvmg0009">
+		<description>NV Magazine 2000-9 (Japan)</description>
+		<year>2000</year>
+		<publisher>Syntax</publisher>
+		<info name="usage" value="Requires a Japanese system."/>
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk A"/>
+			<dataarea name="flop" size="737280">
+				<rom name="nv magazine 2000-9 - syntax (disk a).dsk" size="737280" crc="708dec9f" sha1="61d9802f19abfc1ab4caf1d250503cd805f6634b"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk B"/>
+			<dataarea name="flop" size="737280">
+				<rom name="nv magazine 2000-9 - syntax (disk b).dsk" size="737280" crc="140ee2e1" sha1="46a83968afc15faeb173cee86efeb6f22c33ee5c"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Disk C"/>
+			<dataarea name="flop" size="737280">
+				<rom name="nv magazine 2000-9 - syntax (disk c).dsk" size="737280" crc="0c1f6236" sha1="5b03d9c08c3cbcc76389e9ea3f461bbf12874e1e"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="nvmg0010">
+		<description>NV Magazine 2000-10 (Japan)</description>
+		<year>2000</year>
+		<publisher>Syntax</publisher>
+		<info name="usage" value="Requires a Japanese system."/>
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk A"/>
+			<dataarea name="flop" size="737280">
+				<rom name="nv magazine 2000-10 - syntax (disk a).dsk" size="737280" crc="f4a9ee2e" sha1="ad1a0a0bb246e7a233456e1b53bb5533d553daef"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk B"/>
+			<dataarea name="flop" size="737280">
+				<rom name="nv magazine 2000-10 - syntax (disk b).dsk" size="737280" crc="725800d3" sha1="9ffd0f3ae92405b58c4ef6f36bc6f838e414bf5c"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Disk C"/>
+			<dataarea name="flop" size="737280">
+				<rom name="nv magazine 2000-10 - syntax (disk c).dsk" size="737280" crc="189b247b" sha1="2a40a18af7520cfa0106750a8caaeababf3203c8"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="nvmg0011">
+		<description>NV Magazine 2000-11 (Japan)</description>
+		<year>2000</year>
+		<publisher>Syntax</publisher>
+		<info name="usage" value="Requires a Japanese system."/>
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk A"/>
+			<dataarea name="flop" size="737280">
+				<rom name="nv magazine 2000-11 - syntax (disk a).dsk" size="737280" crc="95195870" sha1="b241e63780ccf10a272a3fd11dd943ca89397f2a"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk B"/>
+			<dataarea name="flop" size="737280">
+				<rom name="nv magazine 2000-11 - syntax (disk b).dsk" size="737280" crc="009e037c" sha1="c8c0d81b381c382a03af7fad9ad3ec63aa119b27"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Disk C"/>
+			<dataarea name="flop" size="737280">
+				<rom name="nv magazine 2000-11 - syntax (disk c).dsk" size="737280" crc="a68fba76" sha1="82f6ec699e88c1dff3f1e91841d5511d5bac4880"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="nvmg0012">
+		<description>NV Magazine 2000-12 (Japan)</description>
+		<year>2000</year>
+		<publisher>Syntax</publisher>
+		<info name="usage" value="Requires a Japanese system."/>
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk A"/>
+			<dataarea name="flop" size="737280">
+				<rom name="nv magazine 2000-12 - syntax (disk a).dsk" size="737280" crc="fcbc3dab" sha1="15559ebebfd1022bb37639666f49338197f8376d"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk B"/>
+			<dataarea name="flop" size="737280">
+				<rom name="nv magazine 2000-12 - syntax (disk b).dsk" size="737280" crc="aa835c56" sha1="9d221c5dcac11236cdb06293154e96bf2991ff1d"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Disk C"/>
+			<dataarea name="flop" size="737280">
+				<rom name="nv magazine 2000-12 - syntax (disk c).dsk" size="737280" crc="c30d018a" sha1="dc243e795a3e7d0429bf8953d8c89c927bcbfe0b"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="nvmg0112" supported="no">
+		<description>NV Magazine 2001-12 (Japan)</description>
+		<year>2001</year>
+		<publisher>Syntax</publisher>
+		<info name="usage" value="Requires a Japanese system."/>
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk A"/>
+			<dataarea name="flop" size="737280">
+				<rom name="nv magazine 2001-12 - syntax (disk a).dsk" size="737280" crc="aedab3f0" sha1="96187c68522dc9e06409c410060e47f01a9cf2c2"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk B"/>
+			<dataarea name="flop" size="737280">
+				<rom name="nv magazine 2001-12 - syntax (disk b).dsk" size="737280" status="nodump"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Disk C"/>
+			<dataarea name="flop" size="737280">
+				<rom name="nv magazine 2001-12 - syntax (disk c).dsk" size="737280" status="nodump"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="nvmg0201">
+		<description>NV Magazine 2002-1 (Japan)</description>
+		<year>2002</year>
+		<publisher>Syntax</publisher>
+		<info name="usage" value="Requires a Japanese system."/>
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk A"/>
+			<dataarea name="flop" size="737280">
+				<rom name="nv magazine 2002-1 - syntax (disk a).dsk" size="737280" crc="8fd1b09d" sha1="c1c04264464a523090e1d21dff9ae85895c174b6"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk B"/>
+			<dataarea name="flop" size="737280">
+				<rom name="nv magazine 2002-1 - syntax (disk b).dsk" size="737280" crc="61d9eef5" sha1="e7b3b7a49decdcbbffd9c6839087d3cebe7317d7"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Disk C"/>
+			<dataarea name="flop" size="737280">
+				<rom name="nv magazine 2002-1 - syntax (disk c).dsk" size="737280" crc="b1815244" sha1="6d6cd7a86f6a7c08aeee90ba3715033345953f3e"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="nvmg0202">
+		<description>NV Magazine 2002-2 (Japan)</description>
+		<year>2002</year>
+		<publisher>Syntax</publisher>
+		<info name="usage" value="Requires a Japanese system."/>
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk A"/>
+			<dataarea name="flop" size="737280">
+				<rom name="nv magazine 2002-2 - syntax (disk a).dsk" size="737280" crc="1476f085" sha1="07f378e0a5bfbf05be491728c646dab31f9b26ea"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk B"/>
+			<dataarea name="flop" size="737280">
+				<rom name="nv magazine 2002-2 - syntax (disk b).dsk" size="737280" crc="463d1565" sha1="846de57c62c05c6fd552c3a649f5bcc38515664d"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Disk C"/>
+			<dataarea name="flop" size="737280">
+				<rom name="nv magazine 2002-2 - syntax (disk c).dsk" size="737280" crc="f78a9a57" sha1="14356c02475741f162cc52b6ed6e51c4dd18a35f"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="nvmg0203" supported="no">
+		<description>NV Magazine 2002-3 (Japan)</description>
+		<year>2002</year>
+		<publisher>Syntax</publisher>
+		<info name="alt_title" value="NV Magazine #120"/>
+		<info name="usage" value="Requires a Japanese system."/>
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk A"/>
+			<dataarea name="flop" size="737280">
+				<rom name="nv magazine 2002-3 - syntax (disk a).dsk" size="737280" crc="0ee53e14" sha1="d6b61208e1bddf11da2b88db0b650cf571e1b0ad"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk B"/>
+			<dataarea name="flop" size="737280">
+				<rom name="nv magazine 2002-3 - syntax (disk b).dsk" size="737280" status="nodump"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Disk C"/>
+			<dataarea name="flop" size="737280">
+				<rom name="nv magazine 2002-3 - syntax (disk c).dsk" size="737280" crc="95d00006" sha1="2177746903a3a7c3150dfae6921d24a184aa7921"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="nvmg0204">
+		<description>NV Magazine 2002-4 (Japan)</description>
+		<year>2002</year>
+		<publisher>Syntax</publisher>
+		<info name="usage" value="Requires a Japanese system."/>
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk A"/>
+			<dataarea name="flop" size="737280">
+				<rom name="nv magazine 2002-4 - syntax (disk a).dsk" size="737280" crc="1ca6f623" sha1="783f9a576c7862733bac23ee8c23d7b839782d7f"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk B"/>
+			<dataarea name="flop" size="737280">
+				<rom name="nv magazine 2002-4 - syntax (disk b).dsk" size="737280" crc="fc4fa22d" sha1="335b3e503e70cc4a84f28ef4eb2d2433b21fa304"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Disk C"/>
+			<dataarea name="flop" size="737280">
+				<rom name="nv magazine 2002-4 - syntax (disk c).dsk" size="737280" crc="687fef96" sha1="a0db634858f57a65f09eb796c57d4be7bcd818bd"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="nvmg0205">
+		<description>NV Magazine 2002-5 (Japan)</description>
+		<year>2002</year>
+		<publisher>Syntax</publisher>
+		<info name="usage" value="Requires a Japanese system."/>
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk A"/>
+			<dataarea name="flop" size="737280">
+				<rom name="nv magazine 2002-5 - syntax (disk a).dsk" size="737280" crc="b37e27fd" sha1="36bff3e494ab6c05ee54e934d86b93e82d6187d5"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk B"/>
+			<dataarea name="flop" size="737280">
+				<rom name="nv magazine 2002-5 - syntax (disk b).dsk" size="737280" crc="d181f954" sha1="166f838a645003eb24bd0cdb09f3d66da66c54b1"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Disk C"/>
+			<dataarea name="flop" size="737280">
+				<rom name="nv magazine 2002-5 - syntax (disk c).dsk" size="737280" crc="3d53ec0c" sha1="009558646bc65ed923b42e2607cab37bcc9fae3b"/>
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="nvmg0206">
-		<description>NV Magazine 2002-06 (Japan)</description>
-		<year>19??</year>
-		<publisher>&lt;doujin&gt;</publisher>
-		<info name="developer" value="Syntax" />
+		<description>NV Magazine 2002-6 (Japan)</description>
+		<year>2002</year>
+		<publisher>Syntax</publisher>
+		<info name="usage" value="Requires a Japanese system."/>
 		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk A"/>
 			<dataarea name="flop" size="737280">
-				<rom name="nv magazine 2002-06 (syntax, 2002) (disk a).dsk" size="737280" crc="2f35c6a6" sha1="44c4eff029dea72b8d0404e0fd5b0afbc373a99d"/>
+				<rom name="nv magazine 2002-6 - syntax (disk a).dsk" size="737280" crc="2f35c6a6" sha1="44c4eff029dea72b8d0404e0fd5b0afbc373a99d"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk B"/>
 			<dataarea name="flop" size="737280">
-				<rom name="nv magazine 2002-06 (syntax, 2002) (disk b).dsk" size="737280" crc="be424044" sha1="7be7376f6112ed550b23c982c0e560284f7ffc50"/>
+				<rom name="nv magazine 2002-6 - syntax (disk b).dsk" size="737280" crc="be424044" sha1="7be7376f6112ed550b23c982c0e560284f7ffc50"/>
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Disk C"/>
 			<dataarea name="flop" size="737280">
-				<rom name="nv magazine 2002-06 (syntax, 2002) (disk c).dsk" size="737280" crc="4ac14b78" sha1="7b27835c6a9e73c6cfc160c166755869c8d14893"/>
+				<rom name="nv magazine 2002-6 - syntax (disk c).dsk" size="737280" crc="4ac14b78" sha1="7b27835c6a9e73c6cfc160c166755869c8d14893"/>
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="nvmg0207">
-		<description>NV Magazine 2002-07 (Japan, incomplete dump)</description>
-		<year>19??</year>
-		<publisher>&lt;doujin&gt;</publisher>
-		<info name="developer" value="Syntax" />
-		<!-- Disk A missing? -->
+	<software name="nvmg0207" supported="no">
+		<description>NV Magazine 2002-7 (Japan)</description>
+		<year>2002</year>
+		<publisher>Syntax</publisher>
+		<info name="usage" value="Requires a Japanese system."/>
 		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk A"/>
 			<dataarea name="flop" size="737280">
-				<rom name="nv magazine 2002-07 (syntax, 2002) (disk b).dsk" size="737280" crc="337f58e6" sha1="8593ffe0105711bc62848822cfee95cc66844b83"/>
+				<rom name="nv magazine 2002-7 - syntax (disk a).dsk" size="737280" status="nodump"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk B"/>
 			<dataarea name="flop" size="737280">
-				<rom name="nv magazine 2002-07 (syntax, 2002) (disk c).dsk" size="737280" crc="a1674342" sha1="53ac371c9d07190e56dad9cd8a4aeeba3f16dd1a"/>
+				<rom name="nv magazine 2002-7 - syntax (disk b).dsk" size="737280" crc="337f58e6" sha1="8593ffe0105711bc62848822cfee95cc66844b83"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Disk C"/>
+			<dataarea name="flop" size="737280">
+				<rom name="nv magazine 2002-7 - syntax (disk c).dsk" size="737280" crc="a1674342" sha1="53ac371c9d07190e56dad9cd8a4aeeba3f16dd1a"/>
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="nvmg0208">
-		<description>NV Magazine 2002-08 (Japan)</description>
-		<year>19??</year>
-		<publisher>&lt;doujin&gt;</publisher>
-		<info name="developer" value="Syntax" />
+		<description>NV Magazine 2002-8 (Japan)</description>
+		<year>2002</year>
+		<publisher>Syntax</publisher>
+		<info name="usage" value="Requires a Japanese system."/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
-				<rom name="nv magazine 2002-08 (syntax, 2002) (disk a).dsk" size="737280" crc="3d54f163" sha1="9ccc86712e0b6ad747df5fb8f385179bad8e5e60"/>
+				<rom name="nv magazine 2002-8 - syntax (disk a).dsk" size="737280" crc="3d54f163" sha1="9ccc86712e0b6ad747df5fb8f385179bad8e5e60"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
-				<rom name="nv magazine 2002-08 (syntax, 2002) (disk b).dsk" size="737280" crc="b7c1fbf8" sha1="03bfe3d38613bd6cccf050d1644aec2cc7be6e0e"/>
+				<rom name="nv magazine 2002-8 - syntax (disk b).dsk" size="737280" crc="b7c1fbf8" sha1="03bfe3d38613bd6cccf050d1644aec2cc7be6e0e"/>
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
-				<rom name="nv magazine 2002-08 (syntax, 2002) (disk c).dsk" size="737280" crc="42e930ba" sha1="43f6c14799aa967a0278e1f9c9bd7a5af8c58cee"/>
+				<rom name="nv magazine 2002-8 - syntax (disk c).dsk" size="737280" crc="42e930ba" sha1="43f6c14799aa967a0278e1f9c9bd7a5af8c58cee"/>
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="nvmgsp26">
-		<description>NV Magazine Special 26 (Japan)</description>
-		<year>1996</year>
-		<publisher>&lt;doujin&gt;</publisher>
-		<info name="developer" value="Syntax" />
+	<software name="nvmgsp2">
+		<description>NV Magazine SP #2 (Japan)</description>
+		<year>1994</year>
+		<publisher>Syntax</publisher>
+		<info name="alt_title" value="NVマガジンSP#2"/>
+		<info name="usage" value="Requires a Japanese system."/>
 		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk A"/>
 			<dataarea name="flop" size="737280">
-				<rom name="nv magazine special 26 (syntax, 1996) (disk a).dsk" size="737280" crc="c5c4e2a2" sha1="fe91e26ac43be3315a0a800b262a4eedc24b059b"/>
+				<rom name="nv magazine sp 2 - syntax (disk a).dsk" size="737280" crc="444e629a" sha1="5285a6d2de9c5d0d666de3e0217e54ed47f3fd21"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk B"/>
 			<dataarea name="flop" size="737280">
-				<rom name="nv magazine special 26 (syntax, 1996) (disk b).dsk" size="737280" crc="d1b84048" sha1="dca64b2f6687d6197fcced4097fae6794c3e3626"/>
+				<rom name="nv magazine sp 2 - syntax (disk b).dsk" size="737280" crc="ef23c13e" sha1="64d78ef52dfe9735b049b826683a4a28e746bd34"/>
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Disk C"/>
 			<dataarea name="flop" size="737280">
-				<rom name="nv magazine special 26 (syntax, 1996) (disk c).dsk" size="737280" crc="ee527bfd" sha1="dbc817a81ce075c19fbcbd5a02b2d06d7726bf41"/>
+				<rom name="nv magazine sp 2 - syntax (disk c).dsk" size="737280" crc="845e49ec" sha1="7b8fd549b9a9e7ee9b917d69dc87714d0c890e55"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="nvmgsp3">
+		<description>NV Magazine Zoukan-gou #3 (Japan)</description>
+		<year>1994</year>
+		<publisher>Syntax</publisher>
+		<info name="alt_title" value="NVマガジン増刊号#3"/>
+		<info name="usage" value="Requires a Japanese system."/>
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk A"/>
+			<dataarea name="flop" size="737280">
+				<rom name="nv magazine zoukan-gou 3 - syntax (disk a).dsk" size="737280" crc="be5237b2" sha1="5c163ab02d9f3d494805f897d82b0ea3cbea0c6c"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk B"/>
+			<dataarea name="flop" size="737280">
+				<rom name="nv magazine zoukan-gou 3 - syntax (disk b).dsk" size="737280" crc="093fcef0" sha1="4727688aa92bc74a28753dd5cde2f084206453d6"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Disk C"/>
+			<dataarea name="flop" size="737280">
+				<rom name="nv magazine zoukan-gou 3 - syntax (disk c).dsk" size="737280" crc="75bb03ff" sha1="00ec48ed3959471d0788fa7baa424c562457be35"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="nvmgsp4">
+		<description>NV Magazine Zoukan-gou #4 (Japan)</description>
+		<year>1995</year>
+		<publisher>Syntax</publisher>
+		<info name="alt_title" value="NVマガジン増刊号#4"/>
+		<info name="usage" value="Requires a Japanese system."/>
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk A"/>
+			<dataarea name="flop" size="737280">
+				<rom name="nv magazine zoukan-gou 4 - syntax (disk a).dsk" size="737280" crc="569577b5" sha1="3f24c4f47b1a653caf3c8a0d9cca3cde5c2db751"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk B"/>
+			<dataarea name="flop" size="737280">
+				<rom name="nv magazine zoukan-gou 4 - syntax (disk b).dsk" size="737280" crc="39ccd684" sha1="0191a460290beef33c83a01fbbac78cb3162f158"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Disk C"/>
+			<dataarea name="flop" size="737280">
+				<rom name="nv magazine zoukan-gou 4 - syntax (disk c).dsk" size="737280" crc="ad4f2dbd" sha1="408d7ef0837925506c915b10c963b25c2f7abc1e"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="nvmgsp6">
+		<description>NV Magazine Zoukan-gou #6 (Japan)</description>
+		<year>1996</year>
+		<publisher>Syntax</publisher>
+		<info name="alt_title" value="NVマガジン増刊号#6"/>
+		<info name="usage" value="Requires a Japanese system."/>
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk A"/>
+			<dataarea name="flop" size="737280">
+				<rom name="nv magazine zoukan-gou 6 - syntax (disk a).dsk" size="737280" crc="b04bfe0b" sha1="5cf0f834657822bdee08d8dd9da3723979281b18"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk B"/>
+			<dataarea name="flop" size="737280">
+				<rom name="nv magazine zoukan-gou 6 - syntax (disk b).dsk" size="737280" crc="01c9d95d" sha1="49309ac340674f8bb0ad7d8a0c36c7e957aa79e8"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Disk C"/>
+			<dataarea name="flop" size="737280">
+				<rom name="nv magazine zoukan-gou 6 - syntax (disk c).dsk" size="737280" crc="5f1051ee" sha1="2a47bf0581706429488a09eb39c35274f9df574d"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="nvrsdm4">
+		<description>NV RSDM #4 (Japan)</description>
+		<year>1995</year>
+		<publisher>Syntax</publisher>
+		<info name="usage" value="Requires a Japanese system."/>
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk A"/>
+			<dataarea name="flop" size="737280">
+				<rom name="nv rsdm 4 - syntax (disk a).dsk" size="737280" crc="dc66c2d4" sha1="7dbf86d3f1a5e2b9970f1960eaf7cd141ac50f3b"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk B"/>
+			<dataarea name="flop" size="737280">
+				<rom name="nv rsdm 4 - syntax (disk b).dsk" size="737280" crc="e3af2485" sha1="7313ee51aa98258390d2fb0fc813d7f3418ac0b7"/>
 			</dataarea>
 		</part>
 	</software>

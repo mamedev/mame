@@ -1,6 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:Luca Elia
-/***************************************************************************
+/*******************************************************************************
 
                             -= Seta Hardware =-
 
@@ -45,10 +45,7 @@ TODO:
 - metafox test grid not aligned when screen flipped
 - tndrcade: lots of flickering sprites
 
-
-***************************************************************************/
-
-/***************************************************************************
+********************************************************************************
 
 Thundercade / Twin Formation
 Taito America Corp./Romstar USA/Seta, 1987
@@ -116,13 +113,11 @@ Notes:
              All ROMs have IC locations, but the PCB also has IC locations so components
              can be referenced with IC# or location. See above diagram for info.
 
-***************************************************************************/
+*******************************************************************************
 
-/***************************************************************************
+Twin Eagle
 
-                                Twin Eagle
-
-M6100326A   Taito (Seta)
+M6100326A Taito (Seta)
 
 ua2-4              68000
 ua2-3
@@ -135,11 +130,9 @@ ua2-9
 ua2-12
 ua2-11              ua2-2
 
-***************************************************************************/
+*******************************************************************************
 
-/***************************************************************************
-
-                                U.S. Classic
+U.S. Classic
 
 M6100430A (Taito 1989)
 
@@ -160,10 +153,9 @@ u75  131                                 u61 004
 
                                          u83 132
 
-***************************************************************************/
-/***************************************************************************
+*******************************************************************************
 
-Caliber 50 (Athena / Seta, 1989)
+Caliber 50 (Seta, 1989)
 Hardware info by Guru
 
 
@@ -251,12 +243,9 @@ UH-002-004.11B /
 Note not all ROMs have IC locations but regardless, the locations that are there are under chips
 and can't be seen unless the chip is removed. Therefore all ROMs are named with x,y locations.
 
-***************************************************************************/
-/***************************************************************************
+*******************************************************************************
 
-                                    Meta Fox
-
-(Seta 1990)
+Meta Fox (Seta 1990)
 
 P0-045A
 
@@ -298,7 +287,7 @@ P1-049-A
               UP-001-005
               x
 
-***************************************************************************/
+*******************************************************************************/
 
 
 #include "emu.h"
@@ -356,7 +345,7 @@ public:
 	void tndrcade(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 	u16 ipl1_ack_r();
 	void ipl1_ack_w(u16 data = 0);
@@ -376,8 +365,8 @@ protected:
 
 	TIMER_DEVICE_CALLBACK_MEMBER(tndrcade_sub_interrupt);
 
-	void tndrcade_map(address_map &map);
-	void tndrcade_sub_map(address_map &map);
+	void tndrcade_map(address_map &map) ATTR_COLD;
+	void tndrcade_sub_map(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_subcpu;
@@ -446,12 +435,12 @@ protected:
 	TIMER_DEVICE_CALLBACK_MEMBER(seta_sub_interrupt);
 	TIMER_DEVICE_CALLBACK_MEMBER(calibr50_interrupt);
 
-	void calibr50_map(address_map &map);
-	void calibr50_sub_map(address_map &map);
-	void downtown_map(address_map &map);
-	void downtown_sub_map(address_map &map);
-	void metafox_sub_map(address_map &map);
-	void twineagl_sub_map(address_map &map);
+	void calibr50_map(address_map &map) ATTR_COLD;
+	void calibr50_sub_map(address_map &map) ATTR_COLD;
+	void downtown_map(address_map &map) ATTR_COLD;
+	void downtown_sub_map(address_map &map) ATTR_COLD;
+	void metafox_sub_map(address_map &map) ATTR_COLD;
+	void twineagl_sub_map(address_map &map) ATTR_COLD;
 
 	required_device<x1_012_device> m_tiles;
 	required_device<x1_010_device> m_x1snd;
@@ -477,11 +466,11 @@ public:
 
 	void usclssic(machine_config &config);
 
-	DECLARE_CUSTOM_INPUT_MEMBER(trackball_x_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(trackball_y_r);
+	ioport_value trackball_x_r();
+	ioport_value trackball_y_r();
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	u16 dsw_r(offs_t offset);
@@ -494,7 +483,7 @@ private:
 
 	void usclssic_set_pens();
 
-	void usclssic_map(address_map &map);
+	void usclssic_map(address_map &map) ATTR_COLD;
 
 	required_device<upd4701_device> m_upd4701;
 	required_device<hc157_device> m_buttonmux;
@@ -869,12 +858,12 @@ u16 usclssic_state::dsw_r(offs_t offset)
 	return 0;
 }
 
-CUSTOM_INPUT_MEMBER(usclssic_state::trackball_x_r)
+ioport_value usclssic_state::trackball_x_r()
 {
 	return m_track_x[m_port_select ? 1 : 0]->read();
 }
 
-CUSTOM_INPUT_MEMBER(usclssic_state::trackball_y_r)
+ioport_value usclssic_state::trackball_y_r()
 {
 	return m_track_y[m_port_select ? 1 : 0]->read();
 }
@@ -2648,20 +2637,20 @@ void downtown_state::init_metafox()
 
 ***************************************************************************/
 
-GAME( 1987, tndrcade,  0,        tndrcade,  tndrcade,  tndrcade_state, empty_init,     ROT270, "Seta (Taito license)",      "Thundercade / Twin Formation" , 0) // Title/License: DSW
-GAME( 1987, tndrcadej, tndrcade, tndrcade,  tndrcadj,  tndrcade_state, empty_init,     ROT270, "Seta (Taito license)",      "Tokusyu Butai U.A.G. (Japan)" , 0) // License: DSW
+GAME( 1987, tndrcade,  0,        tndrcade,  tndrcade,  tndrcade_state, empty_init,     ROT270, "Seta (Taito license)", "Thundercade / Twin Formation", 0) // Title/License: DSW
+GAME( 1987, tndrcadej, tndrcade, tndrcade,  tndrcadj,  tndrcade_state, empty_init,     ROT270, "Seta (Taito license)", "Tokusyu Butai U.A.G. (Japan)", 0) // License: DSW
 
-GAME( 1988, twineagl,  0,        twineagl,  twineagl,  downtown_state, init_twineagl,  ROT270, "Seta (Taito license)",      "Twin Eagle - Revenge Joe's Brother" , 0) // Country/License: DSW
+GAME( 1988, twineagl,  0,        twineagl,  twineagl,  downtown_state, init_twineagl,  ROT270, "Seta (Taito license)", "Twin Eagle - Revenge Joe's Brother", 0) // Country/License: DSW
 
-GAME( 1989, downtown,  0,        downtown,  downtown,  downtown_state, init_downtown,  ROT270, "Seta",                      "DownTown / Mokugeki (set 1)" , 0) // Country/License: DSW
-GAME( 1989, downtown2, downtown, downtown,  downtown,  downtown_state, init_downtown,  ROT270, "Seta",                      "DownTown / Mokugeki (set 2)" , 0) // Country/License: DSW
-GAME( 1989, downtownj, downtown, downtown,  downtown,  downtown_state, init_downtown,  ROT270, "Seta",                      "DownTown / Mokugeki (joystick hack)" , 0) // Country/License: DSW
-GAME( 1989, downtownp, downtown, downtown,  downtown,  downtown_state, init_downtown,  ROT270, "Seta",                      "DownTown / Mokugeki (prototype)" , 0) // Country/License: DSW
+GAME( 1989, downtown,  0,        downtown,  downtown,  downtown_state, init_downtown,  ROT270, "Seta",                 "DownTown / Mokugeki (set 1)", 0) // Country/License: DSW
+GAME( 1989, downtown2, downtown, downtown,  downtown,  downtown_state, init_downtown,  ROT270, "Seta",                 "DownTown / Mokugeki (set 2)", 0) // Country/License: DSW
+GAME( 1989, downtownj, downtown, downtown,  downtown,  downtown_state, init_downtown,  ROT270, "Seta",                 "DownTown / Mokugeki (joystick hack)", 0) // Country/License: DSW
+GAME( 1989, downtownp, downtown, downtown,  downtown,  downtown_state, init_downtown,  ROT270, "Seta",                 "DownTown / Mokugeki (prototype)", 0) // Country/License: DSW
 
-GAME( 1989, usclssic,  0,        usclssic,  usclssic,  usclssic_state, empty_init,     ROT270, "Seta",                      "U.S. Classic" , 0) // Country/License: DSW
+GAME( 1989, usclssic,  0,        usclssic,  usclssic,  usclssic_state, empty_init,     ROT270, "Seta",                 "U.S. Classic", 0) // Country/License: DSW
 
-GAME( 1989, calibr50,  0,        calibr50,  calibr50,  downtown_state, empty_init,     ROT270, "Athena / Seta",             "Caliber 50 (Ver. 1.01)" , 0) // Country/License: DSW
+GAME( 1989, calibr50,  0,        calibr50,  calibr50,  downtown_state, empty_init,     ROT270, "Seta",                 "Caliber 50 (Ver. 1.01)", 0) // Country/License: DSW
 
-GAME( 1989, arbalest,  0,        arbalest,  arbalest,  downtown_state, init_arbalest,  ROT270, "Jordan I.S. / Seta",        "Arbalester" , 0) // Developed by Jordan for Seta, Country/License: DSW
+GAME( 1989, arbalest,  0,        arbalest,  arbalest,  downtown_state, init_arbalest,  ROT270, "Jordan I.S. / Seta",   "Arbalester", 0) // Developed by Jordan for Seta, Country/License: DSW
 
-GAME( 1989, metafox,   0,        metafox,   metafox,   downtown_state, init_metafox,   ROT270, "Jordan I.S. / Seta",        "Meta Fox" , 0) // Developed by Jordan for Seta, Country/License: DSW
+GAME( 1989, metafox,   0,        metafox,   metafox,   downtown_state, init_metafox,   ROT270, "Jordan I.S. / Seta",   "Meta Fox", 0) // Developed by Jordan for Seta, Country/License: DSW

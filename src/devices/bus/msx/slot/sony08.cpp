@@ -38,8 +38,10 @@ void msx_slot_sony08_device::device_start()
 		fatalerror("Memory region '%s' is too small for the SONY08 firmware\n", m_rom_region.finder_tag());
 	}
 
-	m_sram.resize(SRAM_SIZE);
-	m_nvram->set_base(m_sram.data(), SRAM_SIZE);
+	m_sram= std::make_unique<u8[]>(SRAM_SIZE);
+	m_nvram->set_base(&m_sram[0], SRAM_SIZE);
+
+	save_pointer(NAME(m_sram), SRAM_SIZE);
 
 	for (int i = 0; i < 4; i++)
 		m_rombank[i]->configure_entries(0, 0x80, m_rom_region->base() + m_region_offset, 0x2000);
@@ -48,7 +50,7 @@ void msx_slot_sony08_device::device_start()
 
 	page(0)->install_view(0x0000, 0x3fff, m_view[0]);
 	m_view[0][0];
-	m_view[0][1].install_ram(0x0000, 0x3fff, m_sram.data());
+	m_view[0][1].install_ram(0x0000, 0x3fff, &m_sram[0]);
 
 	page(1)->install_read_bank(0x4000, 0x5fff, m_rombank[0]);
 	page(1)->install_write_handler(0x4fff, 0x4fff, emu::rw_delegate(*this, FUNC(msx_slot_sony08_device::bank_w<0>)));

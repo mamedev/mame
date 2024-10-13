@@ -73,11 +73,11 @@ private:
 	void coin_counter_w(uint8_t data);
 
 
-	void a500_mem(address_map &map);
-	void main_map(address_map &map);
-	void overlay_512kb_map(address_map &map);
+	void a500_mem(address_map &map) ATTR_COLD;
+	void main_map(address_map &map) ATTR_COLD;
+	void overlay_512kb_map(address_map &map) ATTR_COLD;
 
-	virtual void machine_reset() override;
+	virtual void machine_reset() override ATTR_COLD;
 
 	required_device<i8255_device> m_ppi;
 };

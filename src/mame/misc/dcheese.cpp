@@ -237,7 +237,7 @@ static INPUT_PORTS_START( dcheese )
 
 	PORT_START("240000")
 	PORT_BIT( 0x001f, IP_ACTIVE_LOW, IPT_UNKNOWN )      /* low 5 bits read as a unit */
-	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("ticket", ticket_dispenser_device, line_r)
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("ticket", ticket_dispenser_device, line_r)
 	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_CUSTOM )     /* sound->main buffer status (0=empty) */
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("soundlatch", generic_latch_8_device, pending_r)
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -287,7 +287,7 @@ static INPUT_PORTS_START( lottof2 )
 
 	PORT_START("240000")
 	PORT_BIT( 0x001f, IP_ACTIVE_LOW, IPT_UNKNOWN )      /* low 5 bits read as a unit */
-	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("ticket", ticket_dispenser_device, line_r)
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("ticket", ticket_dispenser_device, line_r)
 	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_CUSTOM )     /* sound->main buffer status (0=empty) */
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("soundlatch", generic_latch_8_device, pending_r)
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -335,7 +335,7 @@ static INPUT_PORTS_START( fredmem )
 
 	PORT_START("240000")
 	PORT_BIT( 0x001f, IP_ACTIVE_LOW, IPT_UNKNOWN )      /* low 5 bits read as a unit */
-	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("ticket", ticket_dispenser_device, line_r)
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("ticket", ticket_dispenser_device, line_r)
 	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_CUSTOM )     /* sound->main buffer status (0=empty) */
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("soundlatch", generic_latch_8_device, pending_r)
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -388,7 +388,7 @@ void dcheese_state::dcheese(machine_config &config)
 
 	EEPROM_93C46_16BIT(config, "eeprom");
 
-	TICKET_DISPENSER(config, "ticket", attotime::from_msec(200), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_LOW);
+	TICKET_DISPENSER(config, "ticket", attotime::from_msec(200));
 
 	WATCHDOG_TIMER(config, "watchdog");
 

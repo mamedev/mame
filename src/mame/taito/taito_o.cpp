@@ -109,7 +109,7 @@ private:
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(interrupt);
 	u32 draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, u32 start_offset);
-	void prg_map(address_map &map);
+	void prg_map(address_map &map) ATTR_COLD;
 	void hopper_int_cb(int state);
 	void taito_outa_w(offs_t offs, u16 data, u16 mem_mask);
 	void taito_outb_w(offs_t offs, u16 data, u16 mem_mask);
@@ -455,7 +455,7 @@ void taitoo_state::taitoo(machine_config &config)
 	m_tc0080vco->set_bgflip_yoffs(-2);
 	m_tc0080vco->set_palette(m_palette);
 
-	HOPPER(config, m_hopper, attotime::from_msec(100), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH);
+	HOPPER(config, m_hopper, attotime::from_msec(100));
 	m_hopper->dispense_handler().set(FUNC(taitoo_state::hopper_int_cb));
 
 	SPEAKER(config, "mono").front_center();

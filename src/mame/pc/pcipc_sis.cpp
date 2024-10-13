@@ -43,8 +43,8 @@ protected:
 	required_device<i486dx4_device> m_maincpu;
 
 private:
-	void main_io(address_map &map);
-	void main_map(address_map &map);
+	void main_io(address_map &map) ATTR_COLD;
+	void main_map(address_map &map) ATTR_COLD;
 
 	static void winbond_superio_config(device_t *device);
 };

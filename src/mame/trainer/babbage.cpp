@@ -50,7 +50,7 @@ public:
 	void babbage(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	uint8_t pio2_a_r();
@@ -61,8 +61,8 @@ private:
 	void ctc_z2_w(int state);
 	TIMER_DEVICE_CALLBACK_MEMBER(keyboard_callback);
 
-	void babbage_io(address_map &map);
-	void babbage_map(address_map &map);
+	void babbage_io(address_map &map) ATTR_COLD;
+	void babbage_map(address_map &map) ATTR_COLD;
 
 	uint8_t m_seg = 0U;
 	uint8_t m_key = 0U;

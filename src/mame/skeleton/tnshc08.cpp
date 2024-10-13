@@ -50,8 +50,8 @@ public:
 	u8 ppi_r() { return 0x20; }
 
 private:
-	void io_map(address_map &map);
-	void mem_map(address_map &map);
+	void io_map(address_map &map) ATTR_COLD;
+	void mem_map(address_map &map) ATTR_COLD;
 
 	required_device<z80_device> m_maincpu;
 	required_region_ptr<u8> m_rom;

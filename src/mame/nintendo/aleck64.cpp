@@ -208,10 +208,10 @@ private:
 
 	uint32_t screen_update_e90(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	void e90_map(address_map &map);
-	void n64_map(address_map &map);
-	void rsp_imem_map(address_map &map);
-	void rsp_dmem_map(address_map &map);
+	void e90_map(address_map &map) ATTR_COLD;
+	void n64_map(address_map &map) ATTR_COLD;
+	void rsp_imem_map(address_map &map) ATTR_COLD;
+	void rsp_dmem_map(address_map &map) ATTR_COLD;
 	optional_shared_ptr<uint32_t> m_e90_vram;
 	optional_shared_ptr<uint32_t> m_e90_pal;
 

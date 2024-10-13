@@ -219,12 +219,12 @@ public:
 	void gjmovie(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
-	void gj4000_map(address_map &map);
-	void gj5000_map(address_map &map);
-	void gjrstar_map(address_map &map);
+	void gj4000_map(address_map &map) ATTR_COLD;
+	void gj5000_map(address_map &map) ATTR_COLD;
+	void gjrstar_map(address_map &map) ATTR_COLD;
 
 	required_device<m68hc05_device> m_maincpu;
 	required_memory_bank m_rombank;

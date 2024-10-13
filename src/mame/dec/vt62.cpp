@@ -29,14 +29,14 @@ public:
 	void vt62(machine_config &mconfig);
 
 protected:
-	virtual void machine_reset() override;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	void micro_map(address_map &map);
-	void memory_map(address_map &map);
-	void decode_map(address_map &map);
+	void micro_map(address_map &map) ATTR_COLD;
+	void memory_map(address_map &map) ATTR_COLD;
+	void decode_map(address_map &map) ATTR_COLD;
 
 	required_device<vt61_cpu_device> m_maincpu;
 	required_device<ay31015_device> m_uart;

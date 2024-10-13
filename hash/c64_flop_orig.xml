@@ -19,10 +19,13 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="barbaria">
+	<software name="barbaria" supported="no">
 		<description>Barbarian: The Ultimate Warrior</description>
 		<year>1988</year>
 		<publisher>Melbourne House</publisher>
+		<notes><![CDATA[
+Fails to LOAD "$",8
+]]></notes>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="333744">
 				<rom name="barbarian[melbourne_house_1988].g64" size="333744" crc="db28e401" sha1="c8d6027dee3ddfab8adc5e352f201afb0c59d518"/>
@@ -34,6 +37,10 @@ license:CC0-1.0
 		<description>Basil: The Great Mouse Detective</description>
 		<year>1987</year>
 		<publisher>Gremlin Graphics</publisher>
+		<notes><![CDATA[
+LOAD "BASIL",8,1
+Black screen after load, hangs with CIA-2 $DD00 bit 7 stuck high (side effect of protection gone wrong?)
+]]></notes>
 		<info name="protection" value="cyan" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="333744">
@@ -42,10 +49,14 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="bionicco">
+	<software name="bionicco" supported="no">
 		<description>Bionic Commando</description>
 		<year>1988</year>
 		<publisher>Capcom</publisher>
+		<notes><![CDATA[
+LOAD "BIONIC",8,1
+Fails loading
+]]></notes>
 		<info name="video" value="PAL" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="333744">
@@ -58,6 +69,7 @@ license:CC0-1.0
 		<description>Boulder Dash</description>
 		<year>1984</year>
 		<publisher>First Star</publisher>
+		<info name="usage" value="Requires joystick in port 1" />
 		<info name="video" value="PAL" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="333744">
@@ -66,10 +78,15 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="bbsb">
+	<software name="bbsb" supported="no">
 		<description>Bounty Bob Strikes Back! (v1.2)</description>
 		<year>1985</year>
 		<publisher>Big Five</publisher>
+		<notes><![CDATA[
+LOAD "BBSB",8,1
+Fails to LOAD "$",8 first time around, requires LOAD "*",8 first
+Eventually goes "CHECKSUM ERROR! LOAD ABORTED!" on bootstrap
+]]></notes>
 		<info name="protection" value="halftrack" />
 		<sharedfeat name="compatibility" value="NTSC,PAL"/>
 
@@ -82,22 +99,13 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="buddy64">
-		<description>Buddy System 64 v10</description>
-		<year>1992</year>
-		<publisher>Chris Miller</publisher>
-		<info name="protection" value="none" />
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="333744">
-				<rom name="buddy64.g64" size="333744" crc="986d5e3d" sha1="3aeedd8e4e9c7a9412144fa5f7930e3492b79d33" offset="0"/>
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="commando">
 		<description>Commando</description>
 		<year>1985</year>
 		<publisher>Elite</publisher>
+		<notes><![CDATA[
+LOAD "COMMANDO",8,1
+]]></notes>
 		<info name="video" value="PAL" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="333744">
@@ -110,6 +118,10 @@ license:CC0-1.0
 		<description>Defender of the Crown</description>
 		<year>1987</year>
 		<publisher>Cinemaware</publisher>
+		<notes><![CDATA[
+LOAD "*",8,1
+Gets stuck at a "V-MAX!" screen
+]]></notes>
 		<info name="protection" value="vmaxv2" />
 		<sharedfeat name="compatibility" value="NTSC,PAL"/>
 
@@ -128,10 +140,28 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="grnberet">
+	<software name="elktrgld">
+		<!-- Flippy disk, a800 version on side B -->
+		<description>Elektra Glide</description>
+		<year>1986</year>
+		<publisher>Mastertronic</publisher>
+		<info name="serial" value="64712" />
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="287512">
+				<rom name="elektraglide.g64" size="287512" crc="ccb7b7c1" sha1="699bc6111a0f3c26d61c63f7b23eeb7462649461"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="grnberet" supported="no">
 		<description>Green Beret</description>
 		<year>1986</year>
 		<publisher>Ocean</publisher>
+		<notes><![CDATA[
+LOAD "0:*",8,1
+Never leaves BASIC
+]]></notes>
 		<info name="video" value="PAL" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="333744">
@@ -151,6 +181,279 @@ license:CC0-1.0
 			</dataarea>
 		</part>
 	</software>
+
+	<software name="jacknpr" supported="no">
+		<description>Jack the Nipper</description>
+		<year>1986</year>
+		<publisher>Gremlin Graphics</publisher>
+		<notes><![CDATA[
+LOAD "*",8,1
+Punts to BASIC
+]]></notes>
+		<info name="video" value="PAL" />
+		<info name="protection" value="cyan" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="333744">
+				<rom name="jack_the_nipper[gremlin_1986](cyan1)(pal).g64" size="333744" crc="14c6f53d" sha1="6427cc16ed360890034f84182a9db02b2e568f0a"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="miamivic" supported="no">
+		<description>Miami Vice</description>
+		<year>1986</year>
+		<publisher>Ocean</publisher>
+		<notes><![CDATA[
+LOAD "*",8,1
+Punts to BASIC
+]]></notes>
+		<info name="video" value="PAL" />
+		<info name="protection" value="cyan" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="333744">
+				<rom name="miami_vice[ocean_1986](cyan1)(pal).g64" size="333744" crc="b3556e0c" sha1="ed1d290baf83f0ad31424a4e11f4f2aef8515dbb"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mule">
+		<description>M.U.L.E.</description>
+		<year>1983</year>
+		<publisher>Electronic Arts</publisher>
+		<info name="protection" value="fat" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="333744">
+				<rom name="mule[ea_1983].g64" size="333744" crc="9c5adfdd" sha1="8b894a5be8ef2e0cfded4e20cf0c7e6c9c68e369"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rambo2" supported="no">
+		<description>Rambo: First Blood Part II</description>
+		<year>1985</year>
+		<publisher>Ocean</publisher>
+		<notes><![CDATA[
+LOAD "0:*",8,1
+Locks up during boot
+]]></notes>
+		<info name="video" value="PAL" />
+		<info name="protection" value="xrom" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="333744">
+				<rom name="rambo[ocean_1985](pal).g64" size="333744" crc="e9e186dd" sha1="ce2c06cf341c629e75ae6e47887f2aab635f9340"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rambo2n" cloneof="rambo2" supported="no">
+		<description>Rambo: First Blood Part II (NTSC)</description>
+		<year>1985</year>
+		<publisher>Thunder Mountain</publisher>
+		<notes><![CDATA[
+LOAD "0:*",8,1
+Hangs on loading transition between trademarks and title
+]]></notes>
+		<info name="video" value="NTSC" />
+		<info name="protection" value="signature" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="333744">
+				<rom name="rambo_first_blood_part_ii[thunder_mtn_1985](ntsc).g64" size="333744" crc="f1e99142" sha1="8263d6eecd017468d505891b3546b80f7cc4989f"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rambo3" supported="no">
+		<description>Rambo III (PAL)</description>
+		<year>1988</year>
+		<publisher>Ocean</publisher>
+		<notes><![CDATA[
+LOAD "0:*",8,1
+Punts to BASIC
+]]></notes>
+		<info name="video" value="PAL" />
+		<info name="protection" value="ocean" />
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="333744">
+				<rom name="rambo_iii_s1[ocean_1988](pal).g64" size="333744" crc="6f2ea02d" sha1="69ff02b03e4e4b5957b12fba4ea0a4e06172727e"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="333744">
+				<rom name="rambo_iii_s2[ocean_1988](pal).g64" size="333744" crc="82f55d97" sha1="e55bfb001feb2f09c33ec57a1400c659bf1e2e7e"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rambo3n" cloneof="rambo3" supported="no">
+		<description>Rambo III (NTSC)</description>
+		<year>1989</year>
+		<publisher>Taito</publisher>
+		<info name="video" value="NTSC" />
+		<info name="protection" value="vmax3" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="333744">
+				<rom name="rambo_iii[taito_1989](vmax3).g64" size="333744" crc="8e34cbc7" sha1="a83030d9a46a5a7a33b9cfedf6adf0b778f7262b"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sthassle" supported="no">
+		<description>Street Hassle</description>
+		<year>1987</year>
+		<publisher>Melbourne House</publisher>
+		<notes><![CDATA[
+LOAD "*",8,1
+Part of player sprite draws transparent (collisions still works)
+]]></notes>
+		<info name="video" value="PAL" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="333744">
+				<rom name="street_hassle[melbourne_house_1987](pal).g64" size="333744" crc="92c15c93" sha1="a1bc536294ae1d36ffde644798dc25cd1d514c93"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spoker" supported="no">
+		<description>Strip Poker</description>
+		<year>1984</year>
+		<publisher>Artworx</publisher>
+		<notes><![CDATA[
+None of the files on disk leaves BASIC
+]]></notes>
+		<info name="video" value="PAL" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="333744">
+				<rom name="strip_poker[artworx_1984](pal).g64" size="333744" crc="4a66bc83" sha1="68d66ee9f357c3964303e94c625ff9587f5df7c2"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="terramex" supported="no">
+		<description>Terramex</description>
+		<year>1988</year>
+		<publisher>Grand Slam</publisher>
+		<notes><![CDATA[
+LOAD "*",8,1
+Crashes at the end of loading sequence
+]]></notes>
+		<info name="video" value="PAL" />
+		<info name="protection" value="custom_dos" />
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="333744">
+				<rom name="terramex_s1[grandslam_1988].g64" size="333744" crc="cc38f968" sha1="985eb00dcda7cb2499120b1801ca18df5cf2827e"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="333744">
+				<rom name="terramex_s2[grandslam_1988].g64" size="333744" crc="78408a59" sha1="f23fdea7292a95b076cc0a23c81e2e214e42129a"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="toutrun" supported="no">
+		<description>Turbo Out Run</description>
+		<year>1989</year>
+		<publisher>U.S. Gold</publisher>
+		<notes><![CDATA[
+LOAD "*",8,1
+Punts to BASIC
+]]></notes>
+		<info name="video" value="PAL" />
+		<info name="protection" value="sload" />
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="333744">
+				<rom name="turbo_out_run_s1[us_gold_1989](pal).g64" size="333744" crc="3ab79f79" sha1="47ac893f0c53f10c455fb10b4221fc1c51b0f3c5"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="333744">
+				<rom name="turbo_out_run_s2[us_gold_1989](pal).g64" size="333744" crc="fda9e331" sha1="56da1a1a2d88bf63fda41096fc9d839e0cc5877b"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Compilations -->
+
+	<software name="gameset" supported="no">
+		<description>Game Set and Match</description>
+		<year>1987</year>
+		<publisher>Ocean</publisher>
+		<notes><![CDATA[
+LOAD "0:*",8,1
+Fails loading at least first two games
+Not extensively tested
+]]></notes>
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1 Side 1"/>
+			<dataarea name="flop" size="333744">
+				<rom name="game_set_and_match_s1[ocean_1987].g64" size="333744" crc="ca84a09e" sha1="fdd4246db837d74ef136d2c72895c04915384146"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1 Side 2"/>
+			<dataarea name="flop" size="333744">
+				<rom name="game_set_and_match_s2[ocean_1987].g64" size="333744" crc="85ba1688" sha1="b41e55eca81067d4499e0201454ccbaaec70b672"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2 Side 1"/>
+			<dataarea name="flop" size="333744">
+				<rom name="game_set_and_match_s3[ocean_1987].g64" size="333744" crc="c8053e01" sha1="7ae5d1225a8613ea70e8dd2c8d5a3008e3ea4c13"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2 Side 2"/>
+			<dataarea name="flop" size="333744">
+				<rom name="game_set_and_match_s4[ocean_1987].g64" size="333744" crc="d775e8bb" sha1="6df6c56ff5202544a1075d7966e52b046da2dcaf"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Applications -->
+
+	<software name="basickaa">
+		<description>BASIC-kääntäjä (Finland)</description>
+		<year>1984</year>
+		<publisher>Amersoft</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="333744">
+				<rom name="basic-kaantaja[amersoft_1984].g64" size="333744" crc="68ffade3" sha1="951e63d05c0911abcc247ff8327b7239fc0c9e86"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="buddy64">
+		<description>Buddy System 64 (v10)</description>
+		<year>1992</year>
+		<publisher>Chris Miller</publisher>
+		<info name="protection" value="none" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="333744">
+				<rom name="buddy64.g64" size="333744" crc="986d5e3d" sha1="3aeedd8e4e9c7a9412144fa5f7930e3492b79d33" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sprbas64">
+		<description>SuperBase 64 (Finland)</description>
+		<year>1983</year>
+		<publisher>Precision</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="333744">
+				<rom name="superbase_64[precision_1983](finnish).g64" size="333744" crc="83eb8f50" sha1="2cff03d08f15f8d66fad9d20233fc4d87f71395c"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- diskmags -->
 
 	<software name="input64_22">
 		<description>INPUT 64 10/86</description>
@@ -486,240 +789,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="jacknpr" supported="no">
-		<description>Jack the Nipper</description>
-		<year>1986</year>
-		<publisher>Gremlin Graphics</publisher>
-		<info name="video" value="PAL" />
-		<info name="protection" value="cyan" />
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="333744">
-				<rom name="jack_the_nipper[gremlin_1986](cyan1)(pal).g64" size="333744" crc="14c6f53d" sha1="6427cc16ed360890034f84182a9db02b2e568f0a"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="miamivic" supported="no">
-		<description>Miami Vice</description>
-		<year>1986</year>
-		<publisher>Ocean</publisher>
-		<info name="video" value="PAL" />
-		<info name="protection" value="cyan" />
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="333744">
-				<rom name="miami_vice[ocean_1986](cyan1)(pal).g64" size="333744" crc="b3556e0c" sha1="ed1d290baf83f0ad31424a4e11f4f2aef8515dbb"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="mule">
-		<description>M.U.L.E.</description>
-		<year>1983</year>
-		<publisher>Electronic Arts</publisher>
-		<info name="protection" value="fat" />
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="333744">
-				<rom name="mule[ea_1983].g64" size="333744" crc="9c5adfdd" sha1="8b894a5be8ef2e0cfded4e20cf0c7e6c9c68e369"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="rambo2" supported="no">
-		<description>Rambo: First Blood Part II</description>
-		<year>1985</year>
-		<publisher>Ocean</publisher>
-		<info name="video" value="PAL" />
-		<info name="protection" value="xrom" />
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="333744">
-				<rom name="rambo[ocean_1985](pal).g64" size="333744" crc="e9e186dd" sha1="ce2c06cf341c629e75ae6e47887f2aab635f9340"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="rambo2n" cloneof="rambo2" supported="no">
-		<description>Rambo: First Blood Part II (NTSC)</description>
-		<year>1985</year>
-		<publisher>Thunder Mountain</publisher>
-		<info name="video" value="NTSC" />
-		<info name="protection" value="signature" />
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="333744">
-				<rom name="rambo_first_blood_part_ii[thunder_mtn_1985](ntsc).g64" size="333744" crc="f1e99142" sha1="8263d6eecd017468d505891b3546b80f7cc4989f"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="rambo3" supported="no">
-		<description>Rambo III</description>
-		<year>1988</year>
-		<publisher>Ocean</publisher>
-		<info name="video" value="PAL" />
-		<info name="protection" value="ocean" />
-		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Side A"/>
-			<dataarea name="flop" size="333744">
-				<rom name="rambo_iii_s1[ocean_1988](pal).g64" size="333744" crc="6f2ea02d" sha1="69ff02b03e4e4b5957b12fba4ea0a4e06172727e"/>
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Side B"/>
-			<dataarea name="flop" size="333744">
-				<rom name="rambo_iii_s2[ocean_1988](pal).g64" size="333744" crc="82f55d97" sha1="e55bfb001feb2f09c33ec57a1400c659bf1e2e7e"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="rambo3n" cloneof="rambo3" supported="no">
-		<description>Rambo III (NTSC)</description>
-		<year>1989</year>
-		<publisher>Taito</publisher>
-		<info name="video" value="NTSC" />
-		<info name="protection" value="vmax3" />
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="333744">
-				<rom name="rambo_iii[taito_1989](vmax3).g64" size="333744" crc="8e34cbc7" sha1="a83030d9a46a5a7a33b9cfedf6adf0b778f7262b"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="sthassle">
-		<description>Street Hassle</description>
-		<year>1987</year>
-		<publisher>Melbourne House</publisher>
-		<info name="video" value="PAL" />
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="333744">
-				<rom name="street_hassle[melbourne_house_1987](pal).g64" size="333744" crc="92c15c93" sha1="a1bc536294ae1d36ffde644798dc25cd1d514c93"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="spoker">
-		<description>Strip Poker</description>
-		<year>1984</year>
-		<publisher>Artworx</publisher>
-		<info name="video" value="PAL" />
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="333744">
-				<rom name="strip_poker[artworx_1984](pal).g64" size="333744" crc="4a66bc83" sha1="68d66ee9f357c3964303e94c625ff9587f5df7c2"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="terramex" supported="no">
-		<description>Terramex</description>
-		<year>1988</year>
-		<publisher>Grand Slam</publisher>
-		<info name="video" value="PAL" />
-		<info name="protection" value="custom_dos" />
-		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Side A"/>
-			<dataarea name="flop" size="333744">
-				<rom name="terramex_s1[grandslam_1988].g64" size="333744" crc="cc38f968" sha1="985eb00dcda7cb2499120b1801ca18df5cf2827e"/>
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Side B"/>
-			<dataarea name="flop" size="333744">
-				<rom name="terramex_s2[grandslam_1988].g64" size="333744" crc="78408a59" sha1="f23fdea7292a95b076cc0a23c81e2e214e42129a"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="toutrun" supported="no">
-		<description>Turbo Out Run</description>
-		<year>1989</year>
-		<publisher>U.S. Gold</publisher>
-		<info name="video" value="PAL" />
-		<info name="protection" value="sload" />
-		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Side A"/>
-			<dataarea name="flop" size="333744">
-				<rom name="turbo_out_run_s1[us_gold_1989](pal).g64" size="333744" crc="3ab79f79" sha1="47ac893f0c53f10c455fb10b4221fc1c51b0f3c5"/>
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Side B"/>
-			<dataarea name="flop" size="333744">
-				<rom name="turbo_out_run_s2[us_gold_1989](pal).g64" size="333744" crc="fda9e331" sha1="56da1a1a2d88bf63fda41096fc9d839e0cc5877b"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<!-- Compilations -->
-
-	<software name="gameset">
-		<description>Game Set and Match</description>
-		<year>1987</year>
-		<publisher>Ocean</publisher>
-		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 1 Side 1"/>
-			<dataarea name="flop" size="333744">
-				<rom name="game_set_and_match_s1[ocean_1987].g64" size="333744" crc="ca84a09e" sha1="fdd4246db837d74ef136d2c72895c04915384146"/>
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 1 Side 2"/>
-			<dataarea name="flop" size="333744">
-				<rom name="game_set_and_match_s2[ocean_1987].g64" size="333744" crc="85ba1688" sha1="b41e55eca81067d4499e0201454ccbaaec70b672"/>
-			</dataarea>
-		</part>
-		<part name="flop3" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 2 Side 1"/>
-			<dataarea name="flop" size="333744">
-				<rom name="game_set_and_match_s3[ocean_1987].g64" size="333744" crc="c8053e01" sha1="7ae5d1225a8613ea70e8dd2c8d5a3008e3ea4c13"/>
-			</dataarea>
-		</part>
-		<part name="flop4" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 2 Side 2"/>
-			<dataarea name="flop" size="333744">
-				<rom name="game_set_and_match_s4[ocean_1987].g64" size="333744" crc="d775e8bb" sha1="6df6c56ff5202544a1075d7966e52b046da2dcaf"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<!-- Applications -->
-
-	<software name="basickaa">
-		<description>BASIC-kääntäjä (Finland)</description>
-		<year>1984</year>
-		<publisher>Amersoft</publisher>
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="333744">
-				<rom name="basic-kaantaja[amersoft_1984].g64" size="333744" crc="68ffade3" sha1="951e63d05c0911abcc247ff8327b7239fc0c9e86"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="sprbas64">
-		<description>SuperBase 64 (Finland)</description>
-		<year>1983</year>
-		<publisher>Precision</publisher>
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="333744">
-				<rom name="superbase_64[precision_1983](finnish).g64" size="333744" crc="83eb8f50" sha1="2cff03d08f15f8d66fad9d20233fc4d87f71395c"/>
-			</dataarea>
-		</part>
-	</software>
-
 	<!-- Educational -->
-
-	<software name="elktrgld">
-		<!-- Flippy disk, a800 version on side B -->
-		<description>Elektra Glide</description>
-		<year>1986</year>
-		<publisher>Mastertronic</publisher>
-		<info name="serial" value="64712" />
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="287512">
-				<rom name="elektraglide.g64" size="287512" crc="ccb7b7c1" sha1="699bc6111a0f3c26d61c63f7b23eeb7462649461"/>
-			</dataarea>
-		</part>
-	</software>
 
 	<software name="koalapnt">
 		<!-- Flippy disk, a800 version on side B -->

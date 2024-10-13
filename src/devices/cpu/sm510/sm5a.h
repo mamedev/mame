@@ -65,8 +65,8 @@ public:
 protected:
 	sm5a_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, int stack_levels, int o_pins, int prgwidth, address_map_constructor program, int datawidth, address_map_constructor data);
 
-	void program_1_8k(address_map &map);
-	void data_5x13x4(address_map &map);
+	void program_1_8k(address_map &map) ATTR_COLD;
+	void data_5x13x4(address_map &map) ATTR_COLD;
 
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 	virtual void execute_one() override;

@@ -67,7 +67,7 @@ public:
 
 protected:
 	// device_t implementation
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 	device_aquarius_cartridge_interface *m_cart;
 

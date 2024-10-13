@@ -450,12 +450,6 @@ void m72_state::nspirit_sample_trigger_w(offs_t offset, u16 data, u16 mem_mask)
 	if (ACCESSING_BITS_0_7 && (data & 0xff) < 9) m_audio->set_sample_start(a[data & 0xff]);
 }
 
-void m72_state::loht_sample_trigger_w(offs_t offset, u16 data, u16 mem_mask)
-{
-	static const int a[7] = { 0x0000, 0x0020, 0, 0x2c40, 0x4320, 0x7120, 0xb200 };
-	if (ACCESSING_BITS_0_7 && (data & 0xff) < 7) m_audio->set_sample_start(a[data & 0xff]);
-}
-
 void m72_state::dbreedm72_sample_trigger_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	static const int a[9] = { 0x00000, 0x00020, 0x02c40, 0x08160, 0x0c8c0, 0x0ffe0, 0x13000, 0x15820, 0x15f40 };
@@ -471,17 +465,6 @@ void m72_state::dkgenm72_sample_trigger_w(offs_t offset, u16 data, u16 mem_mask)
 		0x153c0, 0x197e0, 0x1af40, 0x1c080 };
 
 	if (ACCESSING_BITS_0_7 && (data & 0xff) < 28) m_audio->set_sample_start(a[data & 0xff]);
-}
-
-void m72_state::gallop_sample_trigger_w(offs_t offset, u16 data, u16 mem_mask)
-{
-	static const int a[31] = {
-		0x00000, 0x00020, 0x00040, 0x01360, 0x02580, 0x04f20, 0x06240, 0x076e0,
-		0x08660, 0x092a0, 0x09ba0, 0x0a560, 0x0cee0, 0x0de20, 0x0e620, 0x0f1c0,
-		0x10200, 0x10220, 0x10240, 0x11380, 0x12760, 0x12780, 0x127a0, 0x13c40,
-		0x140a0, 0x16760, 0x17e40, 0x18ee0, 0x19f60, 0x1bbc0, 0x1cee0 };
-
-	if (ACCESSING_BITS_0_7 && (data & 0xff) < 31) m_audio->set_sample_start(a[data & 0xff]);
 }
 
 
@@ -613,11 +596,6 @@ void m72_state::init_dkgenm72()
 {
 	install_protection_handler(dkgenm72_code,dkgenm72_crc);
 	m_maincpu->space(AS_IO).install_write_handler(0xc0, 0xc1, write16s_delegate(*this, FUNC(m72_state::dkgenm72_sample_trigger_w)));
-}
-
-void m72_state::init_gallop()
-{
-	m_maincpu->space(AS_IO).install_write_handler(0xc0, 0xc1, write16s_delegate(*this, FUNC(m72_state::gallop_sample_trigger_w)));
 }
 
 
@@ -1879,7 +1857,6 @@ void m72_state::m72_dbreed(machine_config &config)
 
 	MCFG_VIDEO_START_OVERRIDE(m72_state,dbreedm72)
 }
-
 
 
 
@@ -3663,7 +3640,7 @@ ROM_START( gallopm72 )
 	ROM_RELOAD(                       0xc0000, 0x20000 )
 
 	ROM_REGION( 0x1000, "mcu", 0 )  // i8751 microcontroller
-	ROM_LOAD( "cc_c-pr-.ic1", 0x0000, 0x1000, NO_DUMP ) // read protected (only used for sample triggering, not supplying code / warning screens)
+	ROM_LOAD( "cc_c-pr-.ic1", 0x0000, 0x1000, CRC(ac4421b1) SHA1(4614acbc4efb26b27f3871b4d22879d74df5e2e0) ) // i8751 MCU labeled  CC C-PR-
 
 	ROM_REGION( 0x080000, "sprites", 0 )  // sprites - same data as the cosmccop/gallop sets
 	ROM_LOAD( "cc_c-00.ic53", 0x00000, 0x20000, CRC(9d99deaa) SHA1(acf16bea0f482306107d2a305c568406b6c21e9a) )   // == cc-b-n0.ic31
@@ -4724,7 +4701,7 @@ GAME( 1989, xmultiplm72, xmultipl, m72_xmultipl, xmultipl,     m72_state, init_m
 GAME( 1989, dbreedm72,   dbreed,   m72_dbreedw,  dbreed,       m72_state, init_dbreedm72,  ROT0,   "Irem", "Dragon Breed (World, M72 hardware)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // missing i8751 MCU code
 GAME( 1989, dbreedjm72,  dbreed,   m72_dbreed,   dbreed,       m72_state, init_m72_8751,   ROT0,   "Irem", "Dragon Breed (Japan, M72 hardware)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 
-GAME( 1991, gallopm72,   cosmccop, m72,          gallop,       m72_state, init_gallop,     ROT0,   "Irem", "Gallop - Armed Police Unit (Japan, M72 hardware)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // missing i8751 MCU code
+GAME( 1991, gallopm72,   cosmccop, m72_airduel,  gallop,       m72_state, init_m72_8751,   ROT0,   "Irem", "Gallop - Armed Police Unit (Japan, M72 hardware)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 
 GAME( 1990, airduelm72,  airduel,  m72_airduel,  airduel,      m72_state, init_m72_8751,   ROT270, "Irem", "Air Duel (World, M72 hardware)", MACHINE_SUPPORTS_SAVE )
 GAME( 1990, airdueljm72, airduel,  m72_airduel,  airduel,      m72_state, init_m72_8751,   ROT270, "Irem", "Air Duel (Japan, M72 hardware)", MACHINE_SUPPORTS_SAVE )

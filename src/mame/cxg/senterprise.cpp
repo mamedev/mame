@@ -76,8 +76,8 @@ public:
 	void senterp(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	// devices/pointers
 	required_device<hd6301y0_cpu_device> m_maincpu;
@@ -89,7 +89,7 @@ protected:
 	emu_timer *m_standbytimer;
 	u8 m_inp_mux = 0;
 
-	void main_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
 
 	// I/O handlers
 	u8 input1_r();
@@ -124,7 +124,7 @@ public:
 	void senterpc(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	required_device<lc7580_device> m_lcd;
@@ -305,7 +305,7 @@ static INPUT_PORTS_START( senterp )
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_CUSTOM) // "
 
 	PORT_START("POWER") // needs to be triggered for nvram to work
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CODE(KEYCODE_F1) PORT_CHANGED_MEMBER(DEVICE_SELF, senterp_state, power_off, 0) PORT_NAME("Power Off")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_POWER_OFF) PORT_CHANGED_MEMBER(DEVICE_SELF, senterp_state, power_off, 0)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( senterpc )
@@ -395,5 +395,5 @@ ROM_END
 *******************************************************************************/
 
 //    YEAR  NAME      PARENT   COMPAT  MACHINE   INPUT     CLASS           INIT        COMPANY, FULLNAME, FLAGS
-SYST( 1986, senterp,  0,       0,      senterp,  senterp,  senterp_state,  empty_init, "CXG Systems / Newcrest Technology", "Super Enterprise (model 210)", MACHINE_SUPPORTS_SAVE )
-SYST( 1986, senterpc, senterp, 0,      senterpc, senterpc, senterpc_state, empty_init, "CXG Systems / Newcrest Technology", "Super Enterprise (model 210.C)", MACHINE_SUPPORTS_SAVE )
+SYST( 1986, senterp,  0,       0,      senterp,  senterp,  senterp_state,  empty_init, "CXG Systems / Newcrest Technology / LogiSoft", "Super Enterprise (model 210)", MACHINE_SUPPORTS_SAVE )
+SYST( 1986, senterpc, senterp, 0,      senterpc, senterpc, senterpc_state, empty_init, "CXG Systems / Newcrest Technology / LogiSoft", "Super Enterprise (model 210.C)", MACHINE_SUPPORTS_SAVE )

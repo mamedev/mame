@@ -21,10 +21,10 @@ public:
 	void bus_error_w(int state) { if (!machine().side_effects_disabled()) m_bus_error = true; }
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
-	void map(address_map &map);
+	void map(address_map &map) ATTR_COLD;
 
 	u32 idr_r() { return m_idr; }
 	u32 scr_r() { return m_scr; }

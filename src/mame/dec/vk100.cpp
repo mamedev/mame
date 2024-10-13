@@ -197,11 +197,11 @@ public:
 	void vk100(machine_config &config);
 
 private:
-	virtual void machine_start() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
-	void vk100_mem(address_map &map);
-	void vk100_io(address_map &map);
+	void vk100_mem(address_map &map) ATTR_COLD;
+	void vk100_io(address_map &map) ATTR_COLD;
 
 	void vgLD_X(offs_t offset, uint8_t data);
 	void vgLD_Y(offs_t offset, uint8_t data);

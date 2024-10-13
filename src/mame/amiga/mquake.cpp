@@ -65,10 +65,10 @@ private:
 	uint16_t coin_chip_r(offs_t offset, uint16_t mem_mask = ~0);
 	void coin_chip_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
-	void a500_mem(address_map &map);
-	void main_map(address_map &map);
-	void mquake_es5503_map(address_map &map);
-	void overlay_512kb_map(address_map &map);
+	void a500_mem(address_map &map) ATTR_COLD;
+	void main_map(address_map &map) ATTR_COLD;
+	void mquake_es5503_map(address_map &map) ATTR_COLD;
+	void overlay_512kb_map(address_map &map) ATTR_COLD;
 
 	required_device<es5503_device> m_es5503;
 	required_region_ptr<uint8_t> m_es5503_rom;
@@ -382,33 +382,84 @@ void mquake_state::mquake(machine_config &config)
  *
  *************************************/
 
+/*
+
+Information compiled from pictures of an eBay auction for a Moon Quake cart:
+
+Cart type:
+
+   (C) 1987
+BALLY SENTE INC
+006-8036-01-0A
+
+
+U09 MC68705P5S - Label detached / fell off
+
+ROMs had handwritten labels and are TMS 27C512:
+
+U08 / QROM3  MQ-ROM3  0  5-28-87
+U07 / QROM2  MQ-ROM2  0  5-28-87
+U06 / QROM1  MQ-ROM1  0  5-28
+U05 / QROM0  MQ-ROM0  0  5-28
+U04 / ROM3H  3H    1.2
+U03 / ROM2H  2H          (1.2 wasn't written on the label)
+U02 / ROM1H  1H    1.2
+U01 / ROM0H  - Label detached / fell off (presumably 0H    1.2)
+
+U11 / ROM4H  4H    1.2
+U12 / ROM5H - Unpopulated -
+U13 / ROM0L  0L    1.2
+U14 / ROM1L  1L    1.2
+U15 / ROM2L  2L    1.2
+U16 / ROM3L  3L    1.2
+U17 / ROM4L  4L    1.2
+U18 / ROM5H - Unpopulated -
+
+U10 PAL10L8CN
+U20 PAL10L8CN
+
+P21 - Power connector
+P20 - Edge connector to connect to Bally Sente Inc 006-8035-01-0A Sound board
+
+Note: The cart was silkscreened with both the chip U location and ROM function / designation.
+      It is assumed from the "1.2" on the ROM labels that the above set is Moon Quake v1.2
+
+006-8035-01-0A major components consist of power connections, misc board connections, ENSONIQ 5503000101
+      sound chip, two NEC D4464C SRAM and three 8 switch On/Off Dip Switch blocks labeled SW1, SW2 & SW3
+
+
+Note: Flyer in the same auction shows a picture of a Moon Quake cart with U12 & U18 (ROM5L/H) populated but
+      the actual cart for sale had these 2 sockets unpopulated. That cart pictured might have been a dev or
+      prototype cart and the production versions were reduced down to not need the extra ROM chips.
+*/
+
 ROM_START( mquake )
 	ROM_REGION16_BE(0x80000, "kickstart", 0)
 	ROM_LOAD16_WORD("315093-01.u2", 0x00000, 0x40000, CRC(a6ce1636) SHA1(11f9e62cf299f72184835b7b2a70a16333fc0d88))
 	ROM_COPY("kickstart", 0x00000, 0x40000, 0x40000)
 
 	ROM_REGION16_BE(0xc0000, "user2", 0)
-	ROM_LOAD16_BYTE( "rom0l.bin",    0x00001, 0x10000, CRC(60c35ec3) SHA1(84fe88af54903cbd46044ef52bb50e8f94a94dcd) )
-	ROM_LOAD16_BYTE( "rom0h.bin",    0x00000, 0x10000, CRC(11551a68) SHA1(bc17e748cc7a4a547de230431ea08f0355c0eec8) )
-	ROM_LOAD16_BYTE( "rom1l.bin",    0x20001, 0x10000, CRC(0128c423) SHA1(b0465069452bd11b67c9a2f2b9021c91788bedbb) )
-	ROM_LOAD16_BYTE( "rom1h.bin",    0x20000, 0x10000, CRC(95119e65) SHA1(29f3c32ca110c9687f38fd03ccb979c1e7c7a87e) )
-	ROM_LOAD16_BYTE( "rom2l.bin",    0x40001, 0x10000, CRC(f8b8624a) SHA1(cb769581f78882a950be418dd4b35bbb6fd78a34) )
-	ROM_LOAD16_BYTE( "rom2h.bin",    0x40000, 0x10000, CRC(46e36e0d) SHA1(0813430137a31d5af2cadbd712a418e9ff339a21) )
-	ROM_LOAD16_BYTE( "rom3l.bin",    0x60001, 0x10000, CRC(c00411a2) SHA1(960d3539914f587c2186ec6eefb81b3cdd9325a0) )
-	ROM_LOAD16_BYTE( "rom3h.bin",    0x60000, 0x10000, CRC(4540c681) SHA1(cb0bc6dc506ed0c9561687964e57299a472c5cd8) )
-	ROM_LOAD16_BYTE( "rom4l.bin",    0x80001, 0x10000, CRC(f48d0730) SHA1(703a8ed47f64b3824bc6e5a4c5bdb2895f8c3d37) )
-	ROM_LOAD16_BYTE( "rom4h.bin",    0x80000, 0x10000, CRC(eee39fec) SHA1(713e24fa5f4ba0a8bc7bf67ed2d9e079fd3aa5d6) )
-	ROM_LOAD16_BYTE( "rom5l.bin",    0xa0001, 0x10000, CRC(7b6ec532) SHA1(e19005269673134431eb55053d650f747f614b89) )
-	ROM_LOAD16_BYTE( "rom5h.bin",    0xa0000, 0x10000, CRC(ed8ec9b7) SHA1(510416bc88382e7a548635dcba53a2b615272e0f) )
+	ROM_LOAD16_BYTE( "rom0l.u13",    0x00001, 0x10000, CRC(60c35ec3) SHA1(84fe88af54903cbd46044ef52bb50e8f94a94dcd) )
+	ROM_LOAD16_BYTE( "rom0h.u01",    0x00000, 0x10000, CRC(11551a68) SHA1(bc17e748cc7a4a547de230431ea08f0355c0eec8) )
+	ROM_LOAD16_BYTE( "rom1l.u14",    0x20001, 0x10000, CRC(0128c423) SHA1(b0465069452bd11b67c9a2f2b9021c91788bedbb) )
+	ROM_LOAD16_BYTE( "rom1h.u02",    0x20000, 0x10000, CRC(95119e65) SHA1(29f3c32ca110c9687f38fd03ccb979c1e7c7a87e) )
+	ROM_LOAD16_BYTE( "rom2l.u15",    0x40001, 0x10000, CRC(f8b8624a) SHA1(cb769581f78882a950be418dd4b35bbb6fd78a34) )
+	ROM_LOAD16_BYTE( "rom2h.u03",    0x40000, 0x10000, CRC(46e36e0d) SHA1(0813430137a31d5af2cadbd712a418e9ff339a21) )
+	ROM_LOAD16_BYTE( "rom3l.u16",    0x60001, 0x10000, CRC(c00411a2) SHA1(960d3539914f587c2186ec6eefb81b3cdd9325a0) )
+	ROM_LOAD16_BYTE( "rom3h.u04",    0x60000, 0x10000, CRC(4540c681) SHA1(cb0bc6dc506ed0c9561687964e57299a472c5cd8) )
+	ROM_LOAD16_BYTE( "rom4l.u17",    0x80001, 0x10000, CRC(f48d0730) SHA1(703a8ed47f64b3824bc6e5a4c5bdb2895f8c3d37) )
+	ROM_LOAD16_BYTE( "rom4h.u11",    0x80000, 0x10000, CRC(eee39fec) SHA1(713e24fa5f4ba0a8bc7bf67ed2d9e079fd3aa5d6) )
+	ROM_LOAD16_BYTE( "rom5l.u18",    0xa0001, 0x10000, CRC(7b6ec532) SHA1(e19005269673134431eb55053d650f747f614b89) )
+	ROM_LOAD16_BYTE( "rom5h.u12",    0xa0000, 0x10000, CRC(ed8ec9b7) SHA1(510416bc88382e7a548635dcba53a2b615272e0f) )
 
 	ROM_REGION( 0x0800, "mcu", 0 )
-	ROM_LOAD( "68705.bin", 0x0000, 0x0800, NO_DUMP )
+	ROM_LOAD( "mc68705p5s.u09", 0x0000, 0x0800, NO_DUMP )
 
 	ROM_REGION(0x040000, "es5503", 0)
-	ROM_LOAD( "qrom0.bin",    0x000000, 0x010000, CRC(753e29b4) SHA1(4c7ccff02d310c7c669aa170e8efb6f2cb996432) )
-	ROM_LOAD( "qrom1.bin",    0x010000, 0x010000, CRC(e9e15629) SHA1(a0aa60357a13703f69a2a13e83f2187c9a1f63c1) )
-	ROM_LOAD( "qrom2.bin",    0x020000, 0x010000, CRC(837294f7) SHA1(99e383998105a63896096629a51b3a0e9eb16b17) )
-	ROM_LOAD( "qrom3.bin",    0x030000, 0x010000, CRC(530fd1a9) SHA1(e3e5969f0880de0a6cdb443a82b85d34ab8ff4f8) )
+	ROM_LOAD( "qrom0.u05",    0x000000, 0x010000, CRC(753e29b4) SHA1(4c7ccff02d310c7c669aa170e8efb6f2cb996432) )
+	ROM_LOAD( "qrom1.u06",    0x010000, 0x010000, CRC(e9e15629) SHA1(a0aa60357a13703f69a2a13e83f2187c9a1f63c1) )
+	ROM_LOAD( "qrom2.u07",    0x020000, 0x010000, CRC(837294f7) SHA1(99e383998105a63896096629a51b3a0e9eb16b17) )
+	ROM_LOAD( "qrom3.u08",    0x030000, 0x010000, CRC(530fd1a9) SHA1(e3e5969f0880de0a6cdb443a82b85d34ab8ff4f8) )
 ROM_END
 
 

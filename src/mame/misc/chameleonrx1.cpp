@@ -34,7 +34,7 @@ public:
 private:
 	required_device<cpu_device> m_maincpu;
 
-	void chameleonrx1_map(address_map &map);
+	void chameleonrx1_map(address_map &map) ATTR_COLD;
 };
 
 

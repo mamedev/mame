@@ -130,12 +130,12 @@ public:
 
 	void imolagp(machine_config &config);
 
-	DECLARE_CUSTOM_INPUT_MEMBER(imolagp_steerlatch_r);
+	ioport_value imolagp_steerlatch_r();
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -166,10 +166,10 @@ private:
 
 	void imolagp_palette(palette_device &palette) const;
 	uint32_t screen_update_imolagp(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void imolagp_master_io(address_map &map);
-	void imolagp_master_map(address_map &map);
-	void imolagp_slave_io(address_map &map);
-	void imolagp_slave_map(address_map &map);
+	void imolagp_master_io(address_map &map) ATTR_COLD;
+	void imolagp_master_map(address_map &map) ATTR_COLD;
+	void imolagp_slave_io(address_map &map) ATTR_COLD;
+	void imolagp_slave_map(address_map &map) ATTR_COLD;
 };
 
 
@@ -416,7 +416,7 @@ void imolagp_state::imolagp_slave_io(address_map &map)
 
 ***************************************************************************/
 
-CUSTOM_INPUT_MEMBER(imolagp_state::imolagp_steerlatch_r)
+ioport_value imolagp_state::imolagp_steerlatch_r()
 {
 	return m_steerlatch & 0xf;
 }

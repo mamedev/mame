@@ -34,7 +34,7 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 	// device_memory_interface overrides
 	virtual space_config_vector memory_space_config() const override;
@@ -70,7 +70,7 @@ private:
 	void set_oe_12v(int state);
 	TIMER_CALLBACK_MEMBER( write_complete );
 
-	void at28c64b_map8(address_map &map);
+	void at28c64b_map8(address_map &map) ATTR_COLD;
 };
 
 

@@ -184,10 +184,10 @@ private:
 
 	void vclk_cb(int state);
 
-	void jngolady_cpu0_map(address_map &map);
-	void jngolady_cpu1_io(address_map &map);
-	void jngolady_cpu1_map(address_map &map);
-	void nsc_map(address_map &map);
+	void jngolady_cpu0_map(address_map &map) ATTR_COLD;
+	void jngolady_cpu1_io(address_map &map) ATTR_COLD;
+	void jngolady_cpu1_map(address_map &map) ATTR_COLD;
+	void nsc_map(address_map &map) ATTR_COLD;
 };
 
 

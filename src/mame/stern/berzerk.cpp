@@ -94,10 +94,10 @@ public:
 	void init_moonwarp();
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 	virtual void sound_reset() override;
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -153,9 +153,9 @@ private:
 	void create_nmi_timer();
 	void start_nmi_timer();
 	void get_pens(rgb_t *pens);
-	void berzerk_io_map(address_map &map);
-	void berzerk_map(address_map &map);
-	void frenzy_map(address_map &map);
+	void berzerk_io_map(address_map &map) ATTR_COLD;
+	void berzerk_map(address_map &map) ATTR_COLD;
+	void frenzy_map(address_map &map) ATTR_COLD;
 };
 
 
@@ -607,7 +607,7 @@ void berzerk_state::audio_w(offs_t offset, uint8_t data)
 			/* clock control - the first LS161 divides the clock by 9 to 16, the 2nd by 8,
 			   giving a final clock from 19.5kHz to 34.7kHz */
 			int clock_divisor = 16 - (data & 0x07);
-			m_s14001a->set_clock(S14001_CLOCK / clock_divisor / 8);
+			m_s14001a->set_unscaled_clock(S14001_CLOCK / clock_divisor / 8);
 			break;
 		}
 

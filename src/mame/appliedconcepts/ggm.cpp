@@ -9,7 +9,8 @@ After a legal dispute with Chafitz, all rights went to Applied Concepts.
 
 Hardware notes:
 - 6502A 2MHz, SYP6522 VIA
-- 2KB battery-backed RAM(4*HM472114AP-2 or 1*M58725P), no ROM on main PCB
+- 2KB RAM (1*M58725P battery-backed, or 4*2114 / 2*2114 + 2*2114L of which
+  only the first 1KB is battery-backed), no ROM on main PCB
 - 2*74164 shift register, 3*6118P VFD driver
 - 8-digit 14seg VFD panel (same one as in Speak & Spell)
 - 5*4 keypad(unlabeled by default), 1-bit sound
@@ -94,11 +95,11 @@ public:
 
 	DECLARE_INPUT_CHANGED_MEMBER(reset_switch) { update_reset(newval); }
 	DECLARE_INPUT_CHANGED_MEMBER(overlay_switch) { update_overlay(); }
-	DECLARE_CUSTOM_INPUT_MEMBER(overlay_r);
+	ioport_value overlay_r();
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	// devices/pointers
@@ -120,7 +121,7 @@ private:
 	bool m_extram_enabled = false;
 	u8 m_overlay = 0;
 
-	void main_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
 
 	void update_reset(ioport_value state);
 	void update_overlay();
@@ -189,7 +190,7 @@ void ggm_state::update_reset(ioport_value state)
     Keypad Overlay
 *******************************************************************************/
 
-CUSTOM_INPUT_MEMBER(ggm_state::overlay_r)
+ioport_value ggm_state::overlay_r()
 {
 	u8 data = m_inputs[5]->read() & 0xf;
 	return (data == 0xf) ? m_overlay : data;

@@ -80,7 +80,7 @@ public:
 		, m_view7(*this, "mem_view7")
 		, m_copper(*this, "copper")
 		, m_ctc(*this, "ctc")
-		, m_dma(*this, "dma")
+		, m_dma(*this, "ndma")
 		, m_i2cmem(*this, "i2cmem")
 		, m_sdcard(*this, "sdcard")
 		, m_ay(*this, "ay%u", 0U)
@@ -107,16 +107,16 @@ protected:
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
 	void reset_hard();
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 	virtual void spectrum_128_update_memory() override {}
 
 	u8 do_m1(offs_t offset);
 	void do_mf_nmi();
 	void leave_nmi(int status);
-	void map_fetch(address_map &map);
-	void map_mem(address_map &map);
-	void map_io(address_map &map);
-	void map_regs(address_map &map);
+	void map_fetch(address_map &map) ATTR_COLD;
+	void map_mem(address_map &map) ATTR_COLD;
+	void map_io(address_map &map) ATTR_COLD;
+	void map_regs(address_map &map) ATTR_COLD;
 	u8 reg_r(offs_t reg);
 	void reg_w(offs_t reg, u8 data);
 	void mmu_w(offs_t bank, u8 data);
@@ -296,7 +296,7 @@ private:
 	required_device<specnext_ctc_device> m_ctc;
 	required_device<specnext_dma_device> m_dma;
 	required_device<i2cmem_device> m_i2cmem;
-	required_device<spi_sdcard_sdhc_device> m_sdcard;
+	required_device<spi_sdcard_device> m_sdcard;
 	required_device_array<ym2149_device, 3> m_ay;
 	required_device_array<dac_byte_interface, 4> m_dac;
 	required_device<device_palette_interface> m_palette;
@@ -2256,6 +2256,7 @@ void specnext_state::nr_1a_ula_clip_y2_w(u8 data)
 
 static const z80_daisy_config z80_daisy_chain[] =
 {
+	{ "ndma" },
 	{ "ctc" },
 	{ nullptr }
 };
@@ -3448,12 +3449,14 @@ void specnext_state::tbblue(machine_config &config)
 	m_maincpu->in_nextreg_cb().set(FUNC(specnext_state::reg_r));
 	m_maincpu->out_retn_seen_cb().set(FUNC(specnext_state::leave_nmi));
 	m_maincpu->nomreq_cb().set_nop();
+	m_maincpu->busack_cb().set(m_dma, FUNC(specnext_dma_device::bai_w));
 
 	SPECNEXT_CTC(config, m_ctc, 28_MHz_XTAL / 8);
 	m_ctc->intr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
 	SPECNEXT_DMA(config, m_dma, 28_MHz_XTAL / 8);
 	m_dma->out_busreq_callback().set_inputline(m_maincpu, Z80_INPUT_LINE_BUSRQ);
+	m_dma->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 	m_dma->in_mreq_callback().set([this](offs_t offset) { return m_program.read_byte(offset); });
 	m_dma->out_mreq_callback().set([this](offs_t offset, u8 data) { m_program.write_byte(offset, data); });
 	m_dma->in_iorq_callback().set([this](offs_t offset) { return m_io.read_byte(offset); });
@@ -3464,6 +3467,7 @@ void specnext_state::tbblue(machine_config &config)
 	I2C_24C01(config, m_i2cmem).set_address(0xd0); // RTC + DEFAULT_ALL_0; confitm size
 
 	SPI_SDCARD(config, m_sdcard, 0);
+	m_sdcard->set_prefer_sdhc();
 	m_sdcard->spi_miso_callback().set(FUNC(specnext_state::spi_miso_w));
 
 	SPEAKER(config, "lspeaker").front_left();

@@ -57,7 +57,7 @@ public:
 
 protected:
 	// device_t overrides
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 private:
 	devcb_write_line m_int_cb;

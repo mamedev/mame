@@ -25,8 +25,8 @@ public:
 	virtual void input_dtr(int state) override { m_dtr = state; }
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// device_serial_interface implementation
 	virtual void tra_callback() override;

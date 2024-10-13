@@ -78,13 +78,13 @@ private:
 	void rx_w(int state);
 	I8275_DRAW_CHARACTER_MEMBER(crtc_update_row);
 
-	void io_map(address_map &map);
-	void prg_map(address_map &map);
+	void io_map(address_map &map) ATTR_COLD;
+	void prg_map(address_map &map) ATTR_COLD;
 
 	bool m_bow = false;
 	bool m_cent_busy = false;
-	virtual void machine_reset() override;
-	virtual void machine_start() override;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void machine_start() override ATTR_COLD;
 	required_shared_ptr<u8> m_p_videoram;
 	required_region_ptr<u8> m_p_chargen;
 	required_device<i8051_device> m_maincpu;

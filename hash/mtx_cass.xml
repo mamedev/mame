@@ -144,7 +144,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="cbakery">
-		<description>Comic Bakery (MSX Conversion)</description>
+		<description>Comic Bakery (MSX conversion)</description>
 		<year>1984</year>
 		<publisher>Konami</publisher>
 
@@ -168,7 +168,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="cbridge2a" cloneof="cbridge2">
-		<description>Contract Bridge II (Alt)</description>
+		<description>Contract Bridge II (alt)</description>
 		<year>1984</year>
 		<publisher>Continental Software</publisher>
 
@@ -243,7 +243,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="jumpjacka" cloneof="jumpjack" supported="no">
-		<description>Jumping Jack Flash (Alt)</description>
+		<description>Jumping Jack Flash (alt)</description>
 		<year>1985</year>
 		<publisher>Syntax Software</publisher>
 
@@ -280,7 +280,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="knucklesa" cloneof="knuckles">
-		<description>Knuckles (Alt)</description>
+		<description>Knuckles (alt)</description>
 		<year>1983</year>
 		<publisher>Continental Software</publisher>
 		<info name="author" value="Ed Hollingshead" />
@@ -332,7 +332,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="alphatroa" cloneof="alphatro">
-		<description>Mission Alphatron (Alt)</description>
+		<description>Mission Alphatron (alt)</description>
 		<year>1984</year>
 		<publisher>Continental Software</publisher>
 		<info name="author" value="Andy Key" />
@@ -409,7 +409,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="omacfarm">
-		<description>Old Mac Farmer (MSX Conversion)</description>
+		<description>Old Mac Farmer (MSX conversion)</description>
 		<year>1984</year>
 		<publisher>Mass Tael</publisher>
 
@@ -421,7 +421,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="pacman" supported="no">
-		<description>Pac-Man (MSX Conversion)</description>
+		<description>Pac-Man (MSX conversion)</description>
 		<year>1984</year>
 		<publisher>Namco</publisher>
 
@@ -446,7 +446,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="phaida" cloneof="phaid">
-		<description>Phaid (Alt)</description>
+		<description>Phaid (alt)</description>
 		<year>1983</year>
 		<publisher>Continental Software</publisher>
 		<info name="author" value="Keith Hook" />
@@ -459,7 +459,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="ppac">
-		<description>Power Pac (Sord M5 Conversion)</description>
+		<description>Power Pac (Sord M5 conversion)</description>
 		<year>1982</year>
 		<publisher>Namco</publisher>
 
@@ -509,7 +509,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="reversia" cloneof="reversi" supported="no">
-		<description>Reversi (Alt)</description>
+		<description>Reversi (alt)</description>
 		<year>1984</year>
 		<publisher>Continental Software</publisher>
 
@@ -521,7 +521,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="sasa">
-		<description>SASA (MSX Conversion)</description>
+		<description>SASA (MSX conversion)</description>
 		<year>1983</year>
 		<publisher>Mass Tael</publisher>
 
@@ -545,7 +545,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="spaceinv">
-		<description>Space Invasion (Coleco Conversion)</description>
+		<description>Space Invasion (Coleco conversion)</description>
 		<year>1998</year>
 		<publisher>John Dondzila</publisher>
 
@@ -557,7 +557,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="spectron">
-		<description>Spectron (Coleco Conversion)</description>
+		<description>Spectron (Coleco conversion)</description>
 		<year>1983</year>
 		<publisher>Spectravideo</publisher>
 
@@ -634,7 +634,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="tbunny">
-		<description>Telebunny (MSX Conversion)</description>
+		<description>Telebunny (MSX conversion)</description>
 		<year>1983</year>
 		<publisher>Mass Tael</publisher>
 

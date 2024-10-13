@@ -156,10 +156,10 @@ public:
 private:
 	uint8_t m_sound_buffer = 0;
 	uint8_t m_psg_latch = 0;
-	virtual void machine_reset() override;
+	virtual void machine_reset() override ATTR_COLD;
 
-	void jpmmps_io_map(address_map &map);
-	void jpmmps_map(address_map &map);
+	void jpmmps_io_map(address_map &map) ATTR_COLD;
+	void jpmmps_map(address_map &map) ATTR_COLD;
 
 	// devices
 	required_device<tms9995_device> m_maincpu;

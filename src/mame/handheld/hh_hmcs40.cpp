@@ -71,28 +71,30 @@ known chips:
  @A89     HD38820  1984, Bandai Pair Match (PT-460) (2/2)
 
   A34     HD44801  1981, SciSys Mini Chess -> saitek/minichess.cpp
-  A50     HD44801  1981, CXG Sensor Computachess -> cxg/scptchess.cpp
+  A50     HD44801  1981, CXG Sensor Computachess -> cxg/computachess.cpp
   A75     HD44801  1982, Alpha 8201 protection MCU -> alpha/alpha8201.*
- *A85     HD44801  1982, SciSys Travel Sensor / Travel Mate / Chesspartner 5000/6000
+  A85     HD44801  1982, SciSys Travel Sensor Chess -> saitek/tschess.cpp
  *A92     HD44801  1982, SciSys Play Bridge Computer
   B35     HD44801  1983, Alpha 8302 protection MCU (see 8201)
   B42     HD44801  1983, Alpha 8303 protection MCU (see 8201)
  *B43     HD44801  1983, Alpha 8304 protection MCU (see 8201)
   C57     HD44801  1985, Alpha 8505 protection MCU (see 8201)
-  C89     HD44801  1985, CXG Portachess (1985 version) -> cxg/scptchess.cpp
+  C89     HD44801  1985, CXG Portachess (1985 version) -> cxg/computachess.cpp
 
  *A86     HD44820  1983, Chess King Pocket Micro / Mighty Midget
+ *B46     HD44820  1984, Chess King Pocket Micro / Mighty Midget
  *B63     HD44820  1985, CXG Pocket Chess (12 buttons)
 
  *A13     HD44840  1982, CXG Computachess II
  *A14     HD44840  1982, CXG Computachess II / Advanced Portachess
 
+  B29     HD44860  1987, Diamond Bridge Computer -> handheld/dbridgec.cpp
  *B55     HD44860  1987, Saitek Pro Bridge 100
 
  *A04     HD44868  1984, SciSys Rapier
- *A07     HD44868  1984, Chess King Pocket Micro Deluxe
- *A12     HD44868  1985, SciSys MK 10 / Pocket Chess / Electronic Trio
- *A14     HD44868  1985, SciSys Kasparov Plus
+  A07     HD44868  1984, Chess King Pocket Micro De-Luxe -> chessking/pmicrodx.cpp
+ *A12     HD44868  1985, SciSys Travel Mate II / Pocket Chess / MK 10 / Electronic Trio
+ *A14     HD44868  1985, SciSys Kasparov Plus / MK 12
  *A16     HD44868  1988, Saitek Pocket Checkers
 
   (* means undumped unless noted, @ denotes it's in this driver)
@@ -165,8 +167,8 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(single_interrupt_line);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	// devices
 	required_device<hmcs40_cpu_device> m_maincpu;
@@ -2428,7 +2430,7 @@ public:
 	void cdkong(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	required_device<filter_volume_device> m_volume;
@@ -3351,7 +3353,7 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(game_speed);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 	required_device<cop411_cpu_device> m_audiocpu;
 

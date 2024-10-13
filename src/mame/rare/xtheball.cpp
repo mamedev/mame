@@ -25,16 +25,17 @@ namespace {
 class xtheball_state : public driver_device
 {
 public:
-	xtheball_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-			m_maincpu(*this, "maincpu"),
-			m_watchdog(*this, "watchdog"),
-			m_tlc34076(*this, "tlc34076"),
-			m_ticket(*this, "ticket"),
-			m_vram_bg(*this, "vrabg"),
-			m_vram_fg(*this, "vrafg"),
-			m_analog_x(*this, "ANALOGX"),
-			m_analog_y(*this, "ANALOGY") { }
+	xtheball_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_watchdog(*this, "watchdog"),
+		m_tlc34076(*this, "tlc34076"),
+		m_ticket(*this, "ticket"),
+		m_vram_bg(*this, "vrabg"),
+		m_vram_fg(*this, "vrafg"),
+		m_analog_x(*this, "ANALOGX"),
+		m_analog_y(*this, "ANALOGY")
+	{ }
 
 	void xtheball(machine_config &config);
 
@@ -56,12 +57,12 @@ private:
 	uint16_t analogx_r();
 	uint16_t analogy_watchdog_r();
 
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 	TMS340X0_TO_SHIFTREG_CB_MEMBER(to_shiftreg);
 	TMS340X0_FROM_SHIFTREG_CB_MEMBER(from_shiftreg);
 	TMS340X0_SCANLINE_RGB32_CB_MEMBER(scanline_update);
-	void main_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
 };
 
 
@@ -319,7 +320,7 @@ void xtheball_state::xtheball(machine_config &config)
 	latch3.q_out_cb<3>().set(FUNC(xtheball_state::foreground_mode_w));
 	// Q3 = video foreground control?
 
-	TICKET_DISPENSER(config, m_ticket, attotime::from_msec(100), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH);
+	TICKET_DISPENSER(config, m_ticket, attotime::from_msec(100));
 
 	WATCHDOG_TIMER(config, m_watchdog);
 

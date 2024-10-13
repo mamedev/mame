@@ -185,12 +185,12 @@ protected:
 	u32 dram_r(offs_t offset, u32 mem_mask = ~0);
 	void dram_w(offs_t offset, u32 data, u32 mem_mask = ~0);
 
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 	static void floppy_formats(format_registration &fr);
 
-	void arm_map(address_map &map);
-	virtual void memc_map(address_map &map);
+	void arm_map(address_map &map) ATTR_COLD;
+	virtual void memc_map(address_map &map) ATTR_COLD;
 
 	void post_debug(int post_state);
 
@@ -227,7 +227,7 @@ public:
 	void aa500d(machine_config &config);
 
 protected:
-	virtual void machine_reset() override;
+	virtual void machine_reset() override ATTR_COLD;
 
 	u32 peripheral5_r(offs_t offset);
 	void peripheral5_w(offs_t offset, u32 data);
@@ -271,7 +271,7 @@ public:
 	void aa3000(machine_config &config);
 
 protected:
-	virtual void machine_reset() override;
+	virtual void machine_reset() override ATTR_COLD;
 
 	u32 peripheral5_r(offs_t offset);
 	void peripheral5_w(offs_t offset, u32 data);
@@ -305,9 +305,9 @@ public:
 	void aa680(machine_config &config);
 
 protected:
-	virtual void machine_reset() override;
+	virtual void machine_reset() override ATTR_COLD;
 
-	virtual void memc_map(address_map &map) override;
+	virtual void memc_map(address_map &map) override ATTR_COLD;
 
 	u32 peripheral5_r(offs_t offset);
 	void peripheral5_w(offs_t offset, u32 data);
@@ -343,9 +343,9 @@ public:
 	required_device<pcf8583_device> m_i2cmem;
 
 protected:
-	virtual void machine_reset() override;
+	virtual void machine_reset() override ATTR_COLD;
 
-	virtual void memc_map(address_map &map) override;
+	virtual void memc_map(address_map &map) override ATTR_COLD;
 
 	u8 ioeb_r(offs_t offset);
 	void ioeb_w(offs_t offset, u8 data);
@@ -371,7 +371,7 @@ public:
 	void aa5000a(machine_config &config);
 
 protected:
-	virtual void memc_map(address_map &map) override;
+	virtual void memc_map(address_map &map) override ATTR_COLD;
 
 	u8 extension_r(offs_t offset);
 
@@ -391,7 +391,7 @@ public:
 	void aa4(machine_config &config);
 
 protected:
-	virtual void memc_map(address_map &map) override;
+	virtual void memc_map(address_map &map) override ATTR_COLD;
 
 private:
 	required_device<acorn_lc_device> m_lc;

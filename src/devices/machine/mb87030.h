@@ -13,7 +13,7 @@ class mb87030_device : public nscsi_device, public nscsi_slot_card_interface
 public:
 	mb87030_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual void map(address_map &map);
+	virtual void map(address_map &map) ATTR_COLD;
 
 	auto out_irq_callback() { return m_irq_handler.bind(); }
 	auto out_dreq_callback() { return m_dreq_handler.bind(); }
@@ -60,8 +60,8 @@ public:
 protected:
 	mb87030_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 private:
 
 	constexpr static uint8_t SCTL_INT_ENABLE = 0x01;
@@ -217,7 +217,7 @@ class mb89351_device : public mb87030_device
 public:
 	mb89351_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual void map(address_map &map) override;
+	virtual void map(address_map &map) override ATTR_COLD;
 };
 
 class mb89352_device : public mb87030_device
@@ -225,7 +225,7 @@ class mb89352_device : public mb87030_device
 public:
 	mb89352_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual void map(address_map &map) override;
+	virtual void map(address_map &map) override ATTR_COLD;
 };
 
 DECLARE_DEVICE_TYPE(MB87030, mb87030_device)

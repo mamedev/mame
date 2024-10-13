@@ -26,7 +26,7 @@ public:
 	void pgm_022_025(machine_config &config);
 	void pgm_022_025_dw3(machine_config &config);
 	void pgm_022_025_killbld(machine_config &config);
-	void killbld_mem(address_map &map);
+	void killbld_mem(address_map &map) ATTR_COLD;
 };
 
 INPUT_PORTS_EXTERN( killbld );

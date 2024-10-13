@@ -113,8 +113,8 @@ protected:
 			u32 clock);
 
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	bool is_selected();
 
@@ -154,7 +154,7 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 };
 
 DEFINE_DEVICE_TYPE(GALGAMES_BIOS_CART, galgames_bios_cart_device, "galgames_bios_cart", "Galaxy Games BIOS Cartridge")
@@ -180,7 +180,7 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 };
 
 DEFINE_DEVICE_TYPE(GALGAMES_STARPAK2_CART, galgames_starpak2_cart_device, "starpak2_cart", "Galaxy Games StarPak 2 Cartridge")
@@ -210,7 +210,7 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 };
 
 DEFINE_DEVICE_TYPE(GALGAMES_STARPAK3_CART, galgames_starpak3_cart_device, "starpak3_cart", "Galaxy Games StarPak 3 Cartridge")
@@ -240,7 +240,7 @@ public:
 	// construction/destruction
 	galgames_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
-	void slot_map(address_map &map);
+	void slot_map(address_map &map) ATTR_COLD;
 
 	u16 read(offs_t offset, u16 mem_mask = ~0)               { return m_space->read_word(offset * 2, mem_mask); }
 	void write(offs_t offset, u16 data, u16 mem_mask = ~0)   { m_space->write_word(offset * 2, data, mem_mask); }
@@ -272,8 +272,8 @@ public:
 protected:
 
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 	virtual space_config_vector memory_space_config() const override;
 
 	address_space_config m_space_config;
@@ -760,12 +760,12 @@ public:
 	void galgbios(machine_config &config);
 	void galgame2(machine_config &config);
 	void galgame3(machine_config &config);
-	void blitter_map(address_map &map);
-	void galgames_map(address_map &map);
-	void oki_map(address_map &map);
+	void blitter_map(address_map &map) ATTR_COLD;
+	void galgames_map(address_map &map) ATTR_COLD;
+	void oki_map(address_map &map) ATTR_COLD;
 
 protected:
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<screen_device> m_screen;

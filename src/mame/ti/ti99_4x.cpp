@@ -167,9 +167,9 @@ private:
 	void video_interrupt_evpc_in(int state);
 	TIMER_CALLBACK_MEMBER(gromclk_tick);
 
-	void crumap(address_map &map);
-	void memmap(address_map &map);
-	void memmap_setaddress(address_map &map);
+	void crumap(address_map &map) ATTR_COLD;
+	void memmap(address_map &map) ATTR_COLD;
+	void memmap_setaddress(address_map &map) ATTR_COLD;
 
 	void    set_keyboard_column(int number, int data);
 	int     m_keyboard_column;

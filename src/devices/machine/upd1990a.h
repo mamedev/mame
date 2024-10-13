@@ -54,7 +54,7 @@ protected:
 	// device-level overrides
 	upd1990a_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint32_t variant);
 
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 	// device_rtc_interface overrides
 	virtual void rtc_clock_updated(int year, int month, int day, int day_of_week, int hour, int minute, int second) override;

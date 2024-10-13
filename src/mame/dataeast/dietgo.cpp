@@ -19,6 +19,10 @@ PAL16L8B 7H
 PAL16L8B 6H
 PAL16R6A 11H
 
+European versions were seen with either the MAY-01 and MAY-02,
+or MAY-04 and MAY-05 sprite ROMs. The latter is more common on newer versions,
+these contain data for alternative title screen graphics enabled with a DIP switch.
+
 */
 
 #include "emu.h"
@@ -78,9 +82,9 @@ private:
 
 	uint16_t ioprot_r(offs_t offset);
 	void ioprot_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-	void decrypted_opcodes_map(address_map &map);
-	void main_map(address_map &map);
-	void sound_map(address_map &map);
+	void decrypted_opcodes_map(address_map &map) ATTR_COLD;
+	void main_map(address_map &map) ATTR_COLD;
+	void sound_map(address_map &map) ATTR_COLD;
 };
 
 
@@ -92,7 +96,7 @@ uint32_t dietgo_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 	m_sprgen->set_flip_screen(BIT(flip, 7));
 	m_deco_tilegen->pf_update(m_pf_rowscroll[0], m_pf_rowscroll[1]);
 
-	bitmap.fill(256, cliprect); /* not verified */
+	bitmap.fill(256, cliprect); // not verified
 
 	m_deco_tilegen->tilemap_2_draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
 	m_deco_tilegen->tilemap_1_draw(screen, bitmap, cliprect, 0, 0);
@@ -130,7 +134,7 @@ void dietgo_state::main_map(address_map &map)
 	map(0x280000, 0x2807ff).ram().share(m_spriteram);
 	map(0x300000, 0x300bff).ram().w("palette", FUNC(palette_device::write16)).share("palette");
 	map(0x340000, 0x343fff).rw(FUNC(dietgo_state::ioprot_r), FUNC(dietgo_state::ioprot_w)).share("prot16ram"); // Protection device
-	map(0x380000, 0x38ffff).ram(); // mainram
+	map(0x380000, 0x38ffff).ram();
 }
 
 void dietgo_state::decrypted_opcodes_map(address_map &map)
@@ -220,11 +224,20 @@ static INPUT_PORTS_START( dietgo )
 	PORT_DIPNAME( 0x2000, 0x2000, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(      0x2000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x4000, 0x4000, DEF_STR( Unknown ) ) // Demo_Sounds ) )
+	PORT_DIPNAME( 0x4000, 0x4000, DEF_STR( Unknown ) ) // Demo_Sounds
 	PORT_DIPSETTING(      0x4000, DEF_STR( Off ) ) // Players don't move in attract mode if on!?
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 	PORT_DIPNAME( 0x8000, 0x8000, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(      0x8000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( dietgon ) // New European version with optional alternative graphics
+	PORT_INCLUDE( dietgo )
+
+	PORT_MODIFY("DSW")
+	PORT_DIPNAME( 0x2000, 0x2000, "Alternative graphics" )
+	PORT_DIPSETTING(      0x2000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 INPUT_PORTS_END
 
@@ -267,12 +280,12 @@ DECO16IC_BANK_CB_MEMBER(dietgo_state::bank_callback)
 void dietgo_state::dietgo(machine_config &config)
 {
 	// basic machine hardware
-	M68000(config, m_maincpu, XTAL(28'000'000) / 2); // DE102 (verified on PCB)
+	M68000(config, m_maincpu, 28_MHz_XTAL / 2); // DE102 (verified on PCB)
 	m_maincpu->set_addrmap(AS_PROGRAM, &dietgo_state::main_map);
 	m_maincpu->set_addrmap(AS_OPCODES, &dietgo_state::decrypted_opcodes_map);
 	m_maincpu->set_vblank_int("screen", FUNC(dietgo_state::irq6_line_hold));
 
-	H6280(config, m_audiocpu, XTAL(32'220'000) / 4 / 3);  // Custom chip 45; XIN is 32.220MHZ/4, verified on PCB
+	H6280(config, m_audiocpu, 32.22_MHz_XTAL / 4 / 3); // Custom chip 45; XIN is 32.220MHZ/4, verified on PCB
 	m_audiocpu->set_addrmap(AS_PROGRAM, &dietgo_state::sound_map);
 	m_audiocpu->add_route(ALL_OUTPUTS, "mono", 0); // internal sound unused
 
@@ -315,15 +328,38 @@ void dietgo_state::dietgo(machine_config &config)
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
-	ym2151_device &ymsnd(YM2151(config, "ymsnd", XTAL(32'220'000) / 9)); // verified on PCB
+	ym2151_device &ymsnd(YM2151(config, "ymsnd", 32.22_MHz_XTAL / 9)); // verified on PCB
 	ymsnd.irq_handler().set_inputline(m_audiocpu, 1); // IRQ2
 	ymsnd.add_route(ALL_OUTPUTS, "mono", 0.45);
 
-	OKIM6295(config, "oki", XTAL(32'220'000) / 32, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 0.60); // verified on PCB
+	OKIM6295(config, "oki", 32.22_MHz_XTAL / 32, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 0.60); // verified on PCB
 }
 
+ROM_START( dietgo ) // same version 1.1 and same program ROMs as dietgoe but newer sprite ROMs
+	ROM_REGION( 0x80000, "maincpu", 0 ) // DE102 code (encrypted)
+	ROM_LOAD16_BYTE( "jy_00-3.4h", 0x000001, 0x040000, CRC(a863ad0c) SHA1(61bf2fe5dce92e3995791a7e9ef813d64bcc2b93) )
+	ROM_LOAD16_BYTE( "jy_01-3.5h", 0x000000, 0x040000, CRC(ef243eda) SHA1(b8efbb80c5bf40ef6c26a06fc7232d6e63596cb4) )
 
-ROM_START( dietgo ) // same version 1.1 and same date as dietgoe but newer version in rom labels
+	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_LOAD( "jy_02.14m", 0x00000, 0x10000, CRC(4e3492a5) SHA1(5f302bdbacbf95ea9f3694c48545a1d6bba4b019) )
+
+	ROM_REGION( 0x100000, "tiles", 0 )
+	ROM_LOAD( "may-00.10a", 0x00000, 0x100000, CRC(234d1f8d) SHA1(42d23aad20df20cbd2359cc12bdd47636b2027d3) )
+
+	ROM_REGION( 0x200000, "sprites", 0 )
+	ROM_LOAD( "may-04_w78_9235kd011.14a", 0x000000, 0x100000, CRC(dedd2dd3) SHA1(c1021edb0b377a030ab9593c838083f0f3b996b2) )
+	ROM_LOAD( "may-05_w79_9235kd019.16a", 0x100000, 0x100000, CRC(cb23835f) SHA1(c504ff99f9029355f69e7fd7e9528d647bd491bf) )
+
+	ROM_REGION( 0x80000, "oki", 0 )
+	ROM_LOAD( "may-03.11l", 0x00000, 0x80000, CRC(b6e42bae) SHA1(c282cdf7db30fb63340cc609bf00f5ab63a75583) )
+
+	ROM_REGION( 0x0600, "plds", 0 )
+	ROM_LOAD( "pal16l8b_vd-00.6h",  0x0000, 0x0104, NO_DUMP ) // PAL is read protected
+	ROM_LOAD( "pal16l8b_vd-01.7h",  0x0200, 0x0104, NO_DUMP ) // PAL is read protected
+	ROM_LOAD( "pal16r6a_vd-02.11h", 0x0400, 0x0104, NO_DUMP ) // PAL is read protected
+ROM_END
+
+ROM_START( dietgoe ) // same version 1.1 and same date as dietgoea but newer version in ROM labels
 	ROM_REGION( 0x80000, "maincpu", 0 ) // DE102 code (encrypted)
 	ROM_LOAD16_BYTE( "jy_00-3.4h", 0x000001, 0x040000, CRC(a863ad0c) SHA1(61bf2fe5dce92e3995791a7e9ef813d64bcc2b93) )
 	ROM_LOAD16_BYTE( "jy_01-3.5h", 0x000000, 0x040000, CRC(ef243eda) SHA1(b8efbb80c5bf40ef6c26a06fc7232d6e63596cb4) )
@@ -347,7 +383,7 @@ ROM_START( dietgo ) // same version 1.1 and same date as dietgoe but newer versi
 	ROM_LOAD( "pal16r6a_vd-02.11h", 0x0400, 0x0104, NO_DUMP ) // PAL is read protected
 ROM_END
 
-ROM_START( dietgoe ) // weird, still version 1.1 and same date
+ROM_START( dietgoea ) // weird, still version 1.1 and same date
 	ROM_REGION( 0x80000, "maincpu", 0 ) // DE102 code (encrypted)
 	ROM_LOAD16_BYTE( "jy_00-2.4h", 0x000001, 0x040000, CRC(014dcf62) SHA1(1a28ce4a643ec8b6f062b1200342ed4dc6db38a1) )
 	ROM_LOAD16_BYTE( "jy_01-2.5h", 0x000000, 0x040000, CRC(793ebd83) SHA1(b9178f18ce6e9fca848cbbf9dce3f3856672bf94) )
@@ -371,7 +407,7 @@ ROM_START( dietgoe ) // weird, still version 1.1 and same date
 	ROM_LOAD( "pal16r6a_vd-02.11h", 0x0400, 0x0104, NO_DUMP ) // PAL is read protected
 ROM_END
 
-ROM_START( dietgoea ) // weird, still version 1.1 but different (earlier) date
+ROM_START( dietgoeb ) // weird, still version 1.1 but different (earlier) date
 	ROM_REGION( 0x80000, "maincpu", 0 ) // DE102 code (encrypted)
 	ROM_LOAD16_BYTE( "jy_00-1.4h", 0x000001, 0x040000, CRC(8bce137d) SHA1(55f5b1c89330803c6147f9656f2cabe8d1de8478) )
 	ROM_LOAD16_BYTE( "jy_01-1.5h", 0x000000, 0x040000, CRC(eca50450) SHA1(1a24117e3b1b66d7dbc5484c94cc2c627d34e6a3) )
@@ -453,8 +489,9 @@ void dietgo_state::init_dietgo()
 } // Anonymous namespace
 
 
-GAME( 1992, dietgo,   0,      dietgo, dietgo, dietgo_state, init_dietgo, ROT0, "Data East Corporation", "Diet Go Go (Europe v1.1 1992.09.26 v3)", MACHINE_SUPPORTS_SAVE )
-GAME( 1992, dietgoe,  dietgo, dietgo, dietgo, dietgo_state, init_dietgo, ROT0, "Data East Corporation", "Diet Go Go (Europe v1.1 1992.09.26 v2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1992, dietgoea, dietgo, dietgo, dietgo, dietgo_state, init_dietgo, ROT0, "Data East Corporation", "Diet Go Go (Europe v1.1 1992.08.04)", MACHINE_SUPPORTS_SAVE )
-GAME( 1992, dietgou,  dietgo, dietgo, dietgo, dietgo_state, init_dietgo, ROT0, "Data East Corporation", "Diet Go Go (USA v1.1 1992.09.26)", MACHINE_SUPPORTS_SAVE )
-GAME( 1992, dietgoj,  dietgo, dietgo, dietgo, dietgo_state, init_dietgo, ROT0, "Data East Corporation", "Diet Go Go (Japan v1.1 1992.09.26)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, dietgo,   0,      dietgo, dietgon, dietgo_state, init_dietgo, ROT0, "Data East Corporation", "Diet Go Go (Europe v1.1 1992.09.26, set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, dietgoe,  dietgo, dietgo, dietgo,  dietgo_state, init_dietgo, ROT0, "Data East Corporation", "Diet Go Go (Europe v1.1 1992.09.26, set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, dietgoea, dietgo, dietgo, dietgo,  dietgo_state, init_dietgo, ROT0, "Data East Corporation", "Diet Go Go (Europe v1.1 1992.09.26, set 3)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, dietgoeb, dietgo, dietgo, dietgo,  dietgo_state, init_dietgo, ROT0, "Data East Corporation", "Diet Go Go (Europe v1.1 1992.08.04)",        MACHINE_SUPPORTS_SAVE )
+GAME( 1992, dietgou,  dietgo, dietgo, dietgo,  dietgo_state, init_dietgo, ROT0, "Data East Corporation", "Diet Go Go (USA v1.1 1992.09.26)",           MACHINE_SUPPORTS_SAVE )
+GAME( 1992, dietgoj,  dietgo, dietgo, dietgo,  dietgo_state, init_dietgo, ROT0, "Data East Corporation", "Diet Go Go (Japan v1.1 1992.09.26)",         MACHINE_SUPPORTS_SAVE )

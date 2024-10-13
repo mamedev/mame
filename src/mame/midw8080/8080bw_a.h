@@ -26,9 +26,9 @@ public:
 	void sn76477_dis_w(u8 data);
 
 protected:
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual ioport_constructor device_input_ports() const override;
-	virtual void device_start() override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
+	virtual void device_start() override ATTR_COLD;
 
 private:
 	TIMER_DEVICE_CALLBACK_MEMBER(vco_voltage_timer);

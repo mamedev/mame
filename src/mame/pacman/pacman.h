@@ -40,34 +40,34 @@ public:
 	{ }
 
 protected:
-	void _8bpm_portmap(address_map &map);
-	void alibaba_map(address_map &map);
-	void bigbucks_map(address_map &map);
-	void bigbucks_portmap(address_map &map);
-	void birdiy_map(address_map &map);
-	void cannonbp_map(address_map &map);
-	void crushs_map(address_map &map);
-	void crushs_portmap(address_map &map);
-	void dremshpr_map(address_map &map);
-	void dremshpr_portmap(address_map &map);
-	void drivfrcp_portmap(address_map &map);
-	void mspacii_portmap(address_map &map);
-	void mschamp_map(address_map &map);
-	void mschamp_portmap(address_map &map);
-	void mspacman_map(address_map &map);
-	void nmouse_portmap(address_map &map);
-	void numcrash_map(address_map &map);
-	void pacman_map(address_map &map);
-	void pengojpm_map(address_map &map);
-	void piranha_portmap(address_map &map);
-	void porky_portmap(address_map &map);
-	void rocktrv2_map(address_map &map);
-	void s2650games_dataport(address_map &map);
-	void s2650games_map(address_map &map);
-	void superabc_map(address_map &map);
-	void vanvan_portmap(address_map &map);
-	void woodpek_map(address_map &map);
-	void writeport(address_map &map);
+	void _8bpm_portmap(address_map &map) ATTR_COLD;
+	void alibaba_map(address_map &map) ATTR_COLD;
+	void bigbucks_map(address_map &map) ATTR_COLD;
+	void bigbucks_portmap(address_map &map) ATTR_COLD;
+	void birdiy_map(address_map &map) ATTR_COLD;
+	void cannonbp_map(address_map &map) ATTR_COLD;
+	void crushs_map(address_map &map) ATTR_COLD;
+	void crushs_portmap(address_map &map) ATTR_COLD;
+	void dremshpr_map(address_map &map) ATTR_COLD;
+	void dremshpr_portmap(address_map &map) ATTR_COLD;
+	void drivfrcp_portmap(address_map &map) ATTR_COLD;
+	void mspacii_portmap(address_map &map) ATTR_COLD;
+	void mschamp_map(address_map &map) ATTR_COLD;
+	void mschamp_portmap(address_map &map) ATTR_COLD;
+	void mspacman_map(address_map &map) ATTR_COLD;
+	void nmouse_portmap(address_map &map) ATTR_COLD;
+	void numcrash_map(address_map &map) ATTR_COLD;
+	void pacman_map(address_map &map) ATTR_COLD;
+	void pengojpm_map(address_map &map) ATTR_COLD;
+	void piranha_portmap(address_map &map) ATTR_COLD;
+	void porky_portmap(address_map &map) ATTR_COLD;
+	void rocktrv2_map(address_map &map) ATTR_COLD;
+	void s2650games_dataport(address_map &map) ATTR_COLD;
+	void s2650games_map(address_map &map) ATTR_COLD;
+	void superabc_map(address_map &map) ATTR_COLD;
+	void vanvan_portmap(address_map &map) ATTR_COLD;
+	void woodpek_map(address_map &map) ATTR_COLD;
+	void writeport(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	optional_device<ls259_device> m_mainlatch;
@@ -242,11 +242,11 @@ public:
 	void piranha(machine_config &config);
 
 private:
-	// pacplus.c
+	// pacplus.cpp
 	uint8_t pacplus_decrypt(int addr, uint8_t e);
 	void pacplus_decode();
 
-	// jumpshot.c
+	// jumpshot.cpp
 	uint8_t jumpshot_decrypt(int addr, uint8_t e);
 	void jumpshot_decode();
 };
@@ -261,7 +261,9 @@ public:
 	void theglobp(machine_config &config);
 	void eeekkp(machine_config &config);
 
-protected:
+	void init_sprglobp2();
+
+private:
 	uint8_t epos_decryption_w(offs_t offset);
 	DECLARE_MACHINE_START(theglobp);
 	DECLARE_MACHINE_RESET(theglobp);
@@ -270,8 +272,8 @@ protected:
 	DECLARE_MACHINE_START(acitya);
 	DECLARE_MACHINE_RESET(acitya);
 
-	void epos_map(address_map &map);
-	void epos_portmap(address_map &map);
+	void epos_map(address_map &map) ATTR_COLD;
+	void epos_portmap(address_map &map) ATTR_COLD;
 };
 
 class clubpacm_state : public pacman_state
@@ -285,12 +287,12 @@ public:
 
 	void clubpacm(machine_config &config);
 
-	DECLARE_CUSTOM_INPUT_MEMBER(clubpacm_input_r);
+	ioport_value clubpacm_input_r();
 
 	void init_clubpacma();
 
 protected:
-	void clubpacm_map(address_map &map);
+	void clubpacm_map(address_map &map) ATTR_COLD;
 
 	required_device<generic_latch_8_device> m_sublatch;
 	required_ioport_array<2> m_players;
@@ -316,8 +318,8 @@ private:
 	required_device<screen_device> m_screen;
 
 protected:
-	void mspactwin_map(address_map &map);
-	void mspactwin_decrypted_map(address_map &map);
+	void mspactwin_map(address_map &map) ATTR_COLD;
+	void mspactwin_decrypted_map(address_map &map) ATTR_COLD;
 
 	void mspactwin_videoram_w(offs_t offset, uint8_t data);
 

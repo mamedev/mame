@@ -75,8 +75,8 @@ public:
 	void mm1(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override { m_reset = true; }
 
 private:
 	// devices/pointers
@@ -89,9 +89,9 @@ private:
 	u8 m_kp_mux = 0;
 
 	// address maps
-	void mirage_map(address_map &map);
-	void mm1_map(address_map &map);
-	void mm1_io(address_map &map);
+	void mirage_map(address_map &map) ATTR_COLD;
+	void mm1_map(address_map &map) ATTR_COLD;
+	void mm1_io(address_map &map) ATTR_COLD;
 
 	// I/O handlers
 	void update_display();
@@ -107,11 +107,6 @@ void mm1_state::machine_start()
 	// register for savestates
 	save_item(NAME(m_reset));
 	save_item(NAME(m_kp_mux));
-}
-
-void mm1_state::machine_reset()
-{
-	m_reset = true;
 }
 
 
@@ -319,8 +314,8 @@ ROM_END
     Drivers
 *******************************************************************************/
 
-//    YEAR  NAME     PARENT  COMPAT  MACHINE INPUT   CLASS      INIT        COMPANY, FULLNAME, FLAGS
-SYST( 1983, mm1,     0,      0,      mm1,    mm1,    mm1_state, empty_init, "Hegener + Glaser", "Mephisto MM I (ver. B)", MACHINE_SUPPORTS_SAVE )
-SYST( 1983, mm1a,    mm1,    0,      mm1,    mm1,    mm1_state, empty_init, "Hegener + Glaser", "Mephisto MM I (ver. A)", MACHINE_SUPPORTS_SAVE )
+//    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT   CLASS      INIT        COMPANY, FULLNAME, FLAGS
+SYST( 1983, mm1,     0,      0,      mm1,     mm1,    mm1_state, empty_init, "Hegener + Glaser", "Mephisto MM I (ver. B)", MACHINE_SUPPORTS_SAVE )
+SYST( 1983, mm1a,    mm1,    0,      mm1,     mm1,    mm1_state, empty_init, "Hegener + Glaser", "Mephisto MM I (ver. A)", MACHINE_SUPPORTS_SAVE )
 
-SYST( 1984, mmirage, 0,      0,      mirage, mirage, mm1_state, empty_init, "Hegener + Glaser", "Mephisto Mirage", MACHINE_SUPPORTS_SAVE )
+SYST( 1984, mmirage, 0,      0,      mirage,  mirage, mm1_state, empty_init, "Hegener + Glaser", "Mephisto Mirage", MACHINE_SUPPORTS_SAVE )

@@ -289,7 +289,7 @@ void segas32_state::device_start()
 	memset(m_videoram, 0x00, 0x20000);
 	m_videoram[0x1ff00/2] = 0x8000;
 
-	memset(m_mixer_control, 0xff, sizeof(m_mixer_control[0][0]) * 0x80 );
+	memset(m_mixer_control, 0xff, sizeof(m_mixer_control[0][0]) * 0x80);
 
 	/* needs to be initialized to 0xff, otherwise f1en has bad sound (MT04531) */
 	if (m_soundram)

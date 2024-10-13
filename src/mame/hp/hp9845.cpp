@@ -762,8 +762,8 @@ public:
 private:
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	virtual uint16_t graphic_r(offs_t offset) override;
 	virtual void graphic_w(offs_t offset, uint16_t data) override;
@@ -1290,8 +1290,8 @@ class hp9845ct_base_state : public hp9845_base_state
 public:
 	hp9845ct_base_state(const machine_config &mconfig, device_type type, const char *tag);
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
@@ -1990,8 +1990,8 @@ public:
 	void hp9845c(machine_config &config);
 
 private:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	virtual uint16_t graphic_r(offs_t offset) override;
 	virtual void graphic_w(offs_t offset, uint16_t data) override;
@@ -2706,8 +2706,8 @@ public:
 	void hp9845t(machine_config &config);
 
 private:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	virtual uint16_t graphic_r(offs_t offset) override;
 	virtual void graphic_w(offs_t offset, uint16_t data) override;

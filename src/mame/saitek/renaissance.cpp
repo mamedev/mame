@@ -41,7 +41,7 @@ TODO:
 #include "machine/input_merger.h"
 #include "machine/nvram.h"
 #include "machine/sensorboard.h"
-#include "sound/spkrdev.h"
+#include "sound/dac.h"
 #include "video/pwm.h"
 #include "video/sed1500.h"
 
@@ -79,8 +79,8 @@ public:
 	void ren(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	// devices/pointers
@@ -91,7 +91,7 @@ private:
 	required_device<pwm_display_device> m_display;
 	required_device<pwm_display_device> m_lcd_pwm;
 	required_device<sed1502_device> m_lcd;
-	required_device<speaker_sound_device> m_dac;
+	required_device<dac_1bit_device> m_dac;
 	required_device<rs232_port_device> m_rs232;
 	required_ioport_array<8+1> m_inputs;
 	output_finder<16, 34> m_out_lcd;
@@ -101,7 +101,7 @@ private:
 	u8 m_inp_mux = 0;
 	u8 m_led_data[2] = { };
 
-	void main_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
 
 	void lcd_pwm_w(offs_t offset, u8 data);
 	void lcd_output_w(offs_t offset, u64 data);
@@ -215,7 +215,7 @@ void ren_state::leds_w(u8 data)
 void ren_state::control_w(u8 data)
 {
 	// d1: speaker out
-	m_dac->level_w(BIT(data, 1));
+	m_dac->write(BIT(data, 1));
 
 	// d2: comm led
 	m_led_data[1] = (m_led_data[1] & ~0x4) | (~data & 0x4);
@@ -433,7 +433,7 @@ void ren_state::ren(machine_config &config)
 
 	// sound hardware
 	SPEAKER(config, "speaker").front_center();
-	SPEAKER_SOUND(config, m_dac).add_route(ALL_OUTPUTS, "speaker", 0.25);
+	DAC_1BIT(config, m_dac).add_route(ALL_OUTPUTS, "speaker", 0.25);
 
 	// expansion module (configure after video)
 	SAITEKOSA_EXPANSION(config, m_expansion, saitekosa_expansion_modules);

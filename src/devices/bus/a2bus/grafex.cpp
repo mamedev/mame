@@ -51,8 +51,8 @@ public:
 protected:
 	a2bus_grafex_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual void device_start() override;
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 	// overrides of standard a2bus slot functions
 	virtual uint8_t read_c0nx(uint8_t offset) override;
@@ -64,7 +64,7 @@ private:
 
 	UPD7220_DISPLAY_PIXELS_MEMBER(hgdc_display_pixels);
 
-	void upd7220_map(address_map &map);
+	void upd7220_map(address_map &map) ATTR_COLD;
 
 	rgb_t m_bg, m_fg;
 };

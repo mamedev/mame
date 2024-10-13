@@ -50,11 +50,14 @@
 
 #include "emu.h"
 #include "bus/a2gameio/gameio.h"
+#include "bus/a2gameio/brightpen.h"
 #include "bus/a2gameio/joystick.h"
 #include "bus/a2gameio/joyport.h"
+#include "bus/a2gameio/joyport_paddles.h"
 #include "bus/a2gameio/computereyes.h"
 #include "bus/a2gameio/paddles.h"
 #include "bus/a2gameio/gizmo.h"
+#include "bus/a2gameio/wico_joystick.h"
 
 //**************************************************************************
 //  CONNECTOR DEVICE IMPLEMENTATION
@@ -66,6 +69,7 @@ DEFINE_DEVICE_TYPE(APPLE2_GAMEIO, apple2_gameio_device, "a2gameio", "Apple II Ga
 apple2_gameio_device::apple2_gameio_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, APPLE2_GAMEIO, tag, owner, clock)
 	, device_single_card_slot_interface<device_a2gameio_interface>(mconfig, *this)
+	, m_screen(*this, finder_base::DUMMY_TAG)
 	, m_intf(nullptr)
 	, m_sw_pullups(false)
 {
@@ -76,8 +80,11 @@ void apple2_gameio_device::iiandplus_options(device_slot_interface &slot)
 	slot.option_add("joy", APPLE2_JOYSTICK);
 	slot.option_add("paddles", APPLE2_PADDLES);
 	slot.option_add("joyport", APPLE2_JOYPORT);
+	slot.option_add("joyport_paddles", APPLE2_JOYPORT_PADDLES);
 	slot.option_add("gizmo", APPLE2_GIZMO);
 	slot.option_add("compeyes", APPLE2_COMPUTEREYES);
+	slot.option_add("wicojoy", APPLE2_WICO_JOYSTICK);
+	slot.option_add("brightpen", APPLE2_BRIGHTPEN);
 }
 
 void apple2_gameio_device::default_options(device_slot_interface &slot)
@@ -101,8 +108,10 @@ void apple2_gameio_device::device_config_complete()
 
 void apple2_gameio_device::device_resolve_objects()
 {
-	if (m_intf)
+	if (m_intf) {
 		m_intf->m_connector = this;
+		m_intf->set_screen(m_screen);
+	}
 }
 
 void apple2_gameio_device::device_start()

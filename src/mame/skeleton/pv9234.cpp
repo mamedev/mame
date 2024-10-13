@@ -47,10 +47,10 @@ private:
 
 	uint32_t screen_update_pv9234(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void pv9234_map(address_map &map);
+	void pv9234_map(address_map &map) ATTR_COLD;
 
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 	required_shared_ptr<uint32_t> m_p_ram;
 	required_device<cpu_device> m_maincpu;

@@ -45,7 +45,7 @@ public:
 	int read_line_adc083x_sars();
 
 protected:
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 	devcb_write_line m_dsr_handler;
 
@@ -99,8 +99,8 @@ public:
 protected:
 	konami573_cassette_x_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual void device_start() override;
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 	required_device<x76f041_device> m_x76f041;
 };
@@ -125,7 +125,7 @@ public:
 	double punchmania_inputs_callback(uint8_t input);
 
 protected:
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 private:
 	required_device<ds2401_device> m_ds2401;
@@ -163,8 +163,8 @@ public:
 protected:
 	konami573_cassette_y_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual void device_start() override;
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 	required_device<x76f100_device> m_x76f100;
 
@@ -191,7 +191,7 @@ public:
 	virtual void write_line_d4(int state) override;
 
 protected:
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 private:
 	required_device<ds2401_device> m_ds2401;
@@ -214,8 +214,8 @@ public:
 	virtual void write_line_zs01_sda(int state) override;
 
 protected:
-	virtual void device_start() override;
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 private:
 	required_device<zs01_device> m_zs01;

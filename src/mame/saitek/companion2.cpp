@@ -6,7 +6,8 @@
 SciSys Chess Companion II family
 CXG Enterprise "S" family
 
-The chess engine is LogiChess (ported from Z80 to 6801), by Kaare Danielsen.
+The chess engine is LogiChess (ported from Z80 to 6801), by Kaare Danielsen,
+after founding the company LogiSoft ApS.
 
 NOTE: It triggers an NMI when the power switch is changed from ON to MEMORY.
 If this is not done, NVRAM won't save properly.
@@ -14,9 +15,9 @@ If this is not done, NVRAM won't save properly.
 TODO:
 - if/when MAME supports an exit callback, hook up power-off switch to that
 
-********************************************************************************
+================================================================================
 
-Hardware notes:
+SciSys Chess Companion II family hardware notes:
 
 Chess Companion II:
 - PCB label: YO1B-01 REV.B
@@ -50,7 +51,7 @@ is either VCC or GND to distinguish between the two.
 
 The Tandy clones run at a lower clock frequency, 3MHz and 6MHz respectively.
 
-********************************************************************************
+================================================================================
 
 CXG Enterprise "S" / Star Chess is on very similar hardware, so it's emulated
 in this driver too.
@@ -108,8 +109,8 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(change_cpu_freq);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	// devices/pointers
@@ -283,7 +284,7 @@ static INPUT_PORTS_START( enterp )
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_UNUSED)
 
 	PORT_START("POWER") // needs to be triggered for nvram to work
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CODE(KEYCODE_F1) PORT_CHANGED_MEMBER(DEVICE_SELF, compan2_state, power_off, 0) PORT_NAME("Power Off")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_POWER_OFF) PORT_CHANGED_MEMBER(DEVICE_SELF, compan2_state, power_off, 0)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( expchess )
@@ -413,7 +414,7 @@ ROM_END
 *******************************************************************************/
 
 //    YEAR  NAME      PARENT   COMPAT  MACHINE   INPUT     CLASS          INIT        COMPANY, FULLNAME, FLAGS
-SYST( 1983, compan2,  0,       0,      compan2,  compan2,  compan2_state, empty_init, "SciSys", "Chess Companion II", MACHINE_SUPPORTS_SAVE )
-SYST( 1983, expchess, compan2, 0,      expchess, expchess, compan2_state, empty_init, "SciSys", "Explorer Chess", MACHINE_SUPPORTS_SAVE )
+SYST( 1983, compan2,  0,       0,      compan2,  compan2,  compan2_state, empty_init, "SciSys / LogiSoft", "Chess Companion II", MACHINE_SUPPORTS_SAVE )
+SYST( 1983, expchess, compan2, 0,      expchess, expchess, compan2_state, empty_init, "SciSys / LogiSoft", "Explorer Chess", MACHINE_SUPPORTS_SAVE )
 
-SYST( 1984, enterp,   0,       0,      enterp,   enterp,   compan2_state, empty_init, "CXG Systems / Newcrest Technology", "Enterprise \"S\"", MACHINE_SUPPORTS_SAVE )
+SYST( 1984, enterp,   0,       0,      enterp,   enterp,   compan2_state, empty_init, "CXG Systems / Newcrest Technology / LogiSoft", "Enterprise \"S\"", MACHINE_SUPPORTS_SAVE )

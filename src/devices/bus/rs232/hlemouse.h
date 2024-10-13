@@ -30,8 +30,8 @@ public:
 protected:
 	hle_msmouse_device_base(machine_config const &mconfig, device_type type, char const *tag, device_t *owner, uint32_t clock);
 
-	virtual void device_resolve_objects() override;
-	virtual void device_start() override;
+	virtual void device_resolve_objects() override ATTR_COLD;
+	virtual void device_start() override ATTR_COLD;
 
 	virtual void input_dtr(int state) override;
 	virtual void input_rts(int state) override;
@@ -68,7 +68,7 @@ public:
 	hle_msft_mouse_device(machine_config const &mconfig, char const *tag, device_t *owner, uint32_t clock);
 
 protected:
-	virtual ioport_constructor device_input_ports() const override;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 
 private:
 	virtual void reset_and_identify() override;
@@ -86,7 +86,7 @@ public:
 	hle_logitech_mouse_device(machine_config const &mconfig, char const *tag, device_t *owner, uint32_t clock);
 
 protected:
-	virtual ioport_constructor device_input_ports() const override;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 
 private:
 	virtual void reset_and_identify() override;
@@ -104,8 +104,8 @@ public:
 	hle_wheel_mouse_device(machine_config const &mconfig, char const *tag, device_t *owner, uint32_t clock);
 
 protected:
-	virtual ioport_constructor device_input_ports() const override;
-	virtual void device_start() override;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
+	virtual void device_start() override ATTR_COLD;
 
 	virtual bool read_inputs() override;
 
@@ -131,7 +131,7 @@ public:
 protected:
 	hle_msystems_device_base(machine_config const &mconfig, device_type type, char const *tag, device_t *owner, uint32_t clock);
 
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 	virtual void tra_callback() override;
 	virtual void tra_complete() override;
@@ -162,8 +162,8 @@ public:
 protected:
 	hle_msystems_mouse_device(machine_config const &mconfig, device_type type, char const *tag, device_t *owner, uint32_t clock);
 
-	virtual ioport_constructor device_input_ports() const override;
-	virtual void device_start() override;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
+	virtual void device_start() override ATTR_COLD;
 
 private:
 	virtual bool read_inputs() override;
@@ -190,8 +190,8 @@ public:
 	hle_rotatable_mouse_device(machine_config const &mconfig, char const *tag, device_t *owner, uint32_t clock);
 
 protected:
-	virtual ioport_constructor device_input_ports() const override;
-	virtual void device_start() override;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
+	virtual void device_start() override ATTR_COLD;
 
 private:
 	virtual bool read_inputs() override;
@@ -217,7 +217,7 @@ public:
 	hle_sgi_mouse_device(machine_config const &mconfig, char const *tag, device_t *owner, uint32_t clock);
 
 protected:
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 };
 
 } // namespace bus::rs232

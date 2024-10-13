@@ -183,9 +183,9 @@ public:
 		return screen;
 	}
 
-	virtual void io_map(address_map &map);
-	virtual void char_map(address_map &map);
-	virtual void page_map(address_map &map);
+	virtual void io_map(address_map &map) ATTR_COLD;
+	virtual void char_map(address_map &map) ATTR_COLD;
+	virtual void page_map(address_map &map) ATTR_COLD;
 
 	void out3_w(uint8_t data);
 	void out4_w(offs_t offset);
@@ -204,11 +204,11 @@ public:
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	void cdp1869(address_map &map);
+	void cdp1869(address_map &map) ATTR_COLD;
 protected:
 	// device-level overrides
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual void device_start() override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual void device_start() override ATTR_COLD;
 	virtual void device_post_load() override;
 
 	// device_memory_interface overrides

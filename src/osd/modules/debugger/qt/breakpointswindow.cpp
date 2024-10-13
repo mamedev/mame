@@ -3,9 +3,6 @@
 #include "emu.h"
 #include "breakpointswindow.h"
 
-#include "debug/debugcon.h"
-#include "debug/debugcpu.h"
-
 #include "util/xmlfile.h"
 
 #if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)

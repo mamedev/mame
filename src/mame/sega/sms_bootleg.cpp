@@ -271,8 +271,8 @@ public:
 	void init_sms_supergame();
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	virtual void refresh_banks();
 	required_memory_bank_array<3> m_game_bank;
@@ -287,8 +287,8 @@ private:
 	void port08_w(uint8_t data);
 	void port18_w(uint8_t data);
 
-	void sms_supergame_io(address_map &map);
-	void sms_supergame_map(address_map &map);
+	void sms_supergame_io(address_map &map) ATTR_COLD;
+	void sms_supergame_map(address_map &map) ATTR_COLD;
 };
 
 class smsbootleg_a_state : public smsbootleg_state

@@ -54,11 +54,11 @@ public:
 
 	void tail2nos(machine_config &config);
 
-	template <int N> DECLARE_CUSTOM_INPUT_MEMBER(analog_in_r);
+	template <int N> ioport_value analog_in_r();
 
 protected:
-	virtual void machine_start() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	// memory pointers
@@ -95,9 +95,9 @@ private:
 	void postload();
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	K051316_CB_MEMBER(zoom_callback);
-	void main_map(address_map &map);
-	void sound_map(address_map &map);
-	void sound_port_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
+	void sound_map(address_map &map) ATTR_COLD;
+	void sound_port_map(address_map &map) ATTR_COLD;
 };
 
 
@@ -326,7 +326,7 @@ void tail2nos_state::sound_port_map(address_map &map)
 }
 
 template <int N>
-CUSTOM_INPUT_MEMBER(tail2nos_state::analog_in_r)
+ioport_value tail2nos_state::analog_in_r()
 {
 	int delta = m_analog[N]->read();
 

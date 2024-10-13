@@ -40,8 +40,8 @@ Test Paste:
 #include "cpu/m6809/m6809.h"
 #include "imagedev/cassette.h"
 #include "machine/6821pia.h"
-#include "speaker.h"
 #include "video/pwm.h"
+#include "speaker.h"
 
 #include "mkit09.lh"
 
@@ -70,8 +70,8 @@ protected:
 	u8 pb_r();
 	u8 m_digit = 0U;
 	u8 m_seg = 0U;
-	void machine_reset() override;
-	void machine_start() override;
+	void machine_reset() override ATTR_COLD;
+	void machine_start() override ATTR_COLD;
 	required_device<pia6821_device> m_pia;
 	required_device<cassette_image_device> m_cass;
 	required_device<cpu_device> m_maincpu;
@@ -81,7 +81,7 @@ protected:
 private:
 	void pa_w(u8 data);
 	void pb_w(u8 data);
-	void mkit09_mem(address_map &map);
+	void mkit09_mem(address_map &map) ATTR_COLD;
 };
 
 class mkit09a_state : public mkit09_state
@@ -94,7 +94,7 @@ public:
 private:
 	void pa_w(u8 data);
 	void pb_w(u8 data);
-	void mkit09a_mem(address_map &map);
+	void mkit09a_mem(address_map &map) ATTR_COLD;
 };
 
 

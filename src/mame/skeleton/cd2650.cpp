@@ -78,9 +78,9 @@ public:
 	void cd2650(machine_config &config);
 
 private:
-	void data_map(address_map &map);
-	void io_map(address_map &map);
-	void mem_map(address_map &map);
+	void data_map(address_map &map) ATTR_COLD;
+	void io_map(address_map &map) ATTR_COLD;
+	void mem_map(address_map &map) ATTR_COLD;
 	u8 keyin_r();
 	void kbd_put(u8 data);
 	void tape_deck_on_w(int state);
@@ -93,8 +93,8 @@ private:
 	bool m_cassbit = 0;
 	bool m_cassold = 0;
 	u8 m_cass_data[4]{};
-	void machine_reset() override;
-	void machine_start() override;
+	void machine_reset() override ATTR_COLD;
+	void machine_start() override ATTR_COLD;
 	required_device<s2650_device> m_maincpu;
 	required_shared_ptr<u8> m_p_videoram;
 	required_region_ptr<u8> m_p_chargen;

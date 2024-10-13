@@ -47,13 +47,13 @@ public:
 	void spg110_base(machine_config &config);
 	void spg110_spdmo(machine_config& config);
 
-	DECLARE_CUSTOM_INPUT_MEMBER(plunger_r);
+	ioport_value plunger_r();
 
 protected:
 	required_device<spg110_device> m_maincpu;
 	required_device<screen_device> m_screen;
 
-	virtual void mem_map(address_map &map);
+	virtual void mem_map(address_map &map) ATTR_COLD;
 };
 
 class spg110_sstarkar_game_state : public spg110_game_state
@@ -68,14 +68,14 @@ public:
 	void sstarkar(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	required_device<generic_slot_device> m_cart;
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load);
 	optional_memory_bank m_cartrom;
 
-	void mem_map_cart(address_map &map);
+	void mem_map_cart(address_map &map) ATTR_COLD;
 };
 
 /*************************
@@ -247,7 +247,7 @@ static INPUT_PORTS_START( jak_capb )
 INPUT_PORTS_END
 
 
-CUSTOM_INPUT_MEMBER(spg110_game_state::plunger_r)
+ioport_value spg110_game_state::plunger_r()
 {
 	// this is only needed because our PORT_CENTERDELTA doesn't work if set > 255 (and is limited in the menu to that) such a value that doesn't center quickly enough for the plunger to be effective
 	return ioport("JOYY_REAL")->read()<<2;

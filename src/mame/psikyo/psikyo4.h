@@ -36,8 +36,8 @@ public:
 	void ps4big(machine_config &config);
 	void ps4small(machine_config &config);
 
-	DECLARE_CUSTOM_INPUT_MEMBER(system_r);
-	template <int P> DECLARE_CUSTOM_INPUT_MEMBER(mahjong_ctrl_r);
+	ioport_value system_r();
+	template <int P> ioport_value mahjong_ctrl_r();
 
 private:
 	/* memory pointers */
@@ -73,12 +73,12 @@ private:
 	void ymf_bank_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	void io_select_w(uint8_t data);
 	void eeprom_w(offs_t offset, uint8_t data, uint8_t mem_mask = ~0);
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 	template<int Screen> uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(interrupt);
 	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, uint32_t scr);
-	void ps4_map(address_map &map);
-	void ps4_ymf_map(address_map &map);
+	void ps4_map(address_map &map) ATTR_COLD;
+	void ps4_ymf_map(address_map &map) ATTR_COLD;
 };

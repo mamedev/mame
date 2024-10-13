@@ -46,7 +46,7 @@ public:
 	void voyager(machine_config &config);
 
 private:
-	void voyager_map(address_map &map);
+	void voyager_map(address_map &map) ATTR_COLD;
 
 	required_device<pentium3_device> m_maincpu;
 };

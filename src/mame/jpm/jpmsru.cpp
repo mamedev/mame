@@ -113,7 +113,7 @@ public:
 
 	template <unsigned N> int opto_r() { return m_opto[N]; }
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 	virtual void device_post_load() override;
 
 	template <unsigned N> void opto_cb(int state) { m_opto[N] = state; }
@@ -148,20 +148,20 @@ protected:
 	void out_50p_lockout_w(offs_t offset, uint8_t data);
 	void out_logicext_w(offs_t offset, uint8_t data);
 
-	void jpmsru_3k_map(address_map &map);
-	void jpmsru_4k_map(address_map &map);
-	void jpmsru_6k_map(address_map &map);
-	void jpmsru_io(address_map &map);
-	void jpmsru_busext_io(address_map &map);
-	void outputs_ewn(address_map &map);
-	void outputs_ewn2(address_map &map);
-	void outputs_ndu(address_map &map);
-	void outputs_dud(address_map &map);
-	void outputs_lan(address_map &map);
-	void outputs_super2(address_map &map);
-	void outputs_ews(address_map &map);
-	void outputs_sup2p(address_map &map);
-	void outputs_lal(address_map &map);
+	void jpmsru_3k_map(address_map &map) ATTR_COLD;
+	void jpmsru_4k_map(address_map &map) ATTR_COLD;
+	void jpmsru_6k_map(address_map &map) ATTR_COLD;
+	void jpmsru_io(address_map &map) ATTR_COLD;
+	void jpmsru_busext_io(address_map &map) ATTR_COLD;
+	void outputs_ewn(address_map &map) ATTR_COLD;
+	void outputs_ewn2(address_map &map) ATTR_COLD;
+	void outputs_ndu(address_map &map) ATTR_COLD;
+	void outputs_dud(address_map &map) ATTR_COLD;
+	void outputs_lan(address_map &map) ATTR_COLD;
+	void outputs_super2(address_map &map) ATTR_COLD;
+	void outputs_ews(address_map &map) ATTR_COLD;
+	void outputs_sup2p(address_map &map) ATTR_COLD;
+	void outputs_lal(address_map &map) ATTR_COLD;
 
 	uint8_t m_int1;
 	uint8_t m_int2;
@@ -200,7 +200,7 @@ public:
 	void lc(machine_config &config);
 
 private:
-	void outputs_lc(address_map &map);
+	void outputs_lc(address_map &map) ATTR_COLD;
 
 	required_device<dac_1bit_device> m_dac;
 };

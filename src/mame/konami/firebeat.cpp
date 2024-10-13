@@ -192,8 +192,8 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// device_sound_interface-level overrides
 	void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
@@ -417,16 +417,16 @@ public:
 	void firebeat(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void device_resolve_objects() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void device_resolve_objects() override ATTR_COLD;
 
 	uint32_t screen_update_firebeat_0(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void init_firebeat();
 
-	void firebeat_map(address_map &map);
-	void ymz280b_map(address_map &map);
+	void firebeat_map(address_map &map) ATTR_COLD;
+	void ymz280b_map(address_map &map) ATTR_COLD;
 
 	void init_lights(write32s_delegate out1, write32s_delegate out2, write32s_delegate out3);
 	void lamp_output_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
@@ -493,14 +493,14 @@ public:
 	{ }
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void device_resolve_objects() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void device_resolve_objects() override ATTR_COLD;
 
 	void firebeat_spu_base(machine_config &config);
-	void firebeat_spu_map(address_map &map);
-	void spu_map(address_map &map);
-	void rf5c400_map(address_map& map);
+	void firebeat_spu_map(address_map &map) ATTR_COLD;
+	void spu_map(address_map &map) ATTR_COLD;
+	void rf5c400_map(address_map &map) ATTR_COLD;
 
 	void spu_ata_dmarq(int state);
 	void spu_ata_interrupt(int state);
@@ -557,9 +557,9 @@ public:
 	void init_ppp_overseas();
 
 private:
-	virtual void device_resolve_objects() override;
+	virtual void device_resolve_objects() override ATTR_COLD;
 
-	void firebeat_ppp_map(address_map &map);
+	void firebeat_ppp_map(address_map &map) ATTR_COLD;
 
 	uint16_t sensor_r(offs_t offset);
 
@@ -602,9 +602,9 @@ public:
 	void firebeat_kbm(machine_config &config);
 
 private:
-	virtual void device_resolve_objects() override;
+	virtual void device_resolve_objects() override ATTR_COLD;
 
-	void firebeat_kbm_map(address_map &map);
+	void firebeat_kbm_map(address_map &map) ATTR_COLD;
 
 	void init_keyboard();
 
@@ -652,7 +652,7 @@ public:
 	void init_bm3();
 
 private:
-	void firebeat_bm3_map(address_map &map);
+	void firebeat_bm3_map(address_map &map) ATTR_COLD;
 
 	uint8_t spectrum_analyzer_r(offs_t offset);
 	uint16_t sensor_r(offs_t offset);

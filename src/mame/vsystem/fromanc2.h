@@ -31,8 +31,8 @@ protected:
 		, m_in_key(*this, "KEY%u", 0U)
 	{ }
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	void sndcmd_w(uint16_t data);
 	void portselect_w(uint16_t data);
@@ -43,8 +43,8 @@ protected:
 	uint32_t screen_update_left(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_right(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void sound_io_map(address_map &map);
-	void sound_map(address_map &map);
+	void sound_io_map(address_map &map) ATTR_COLD;
+	void sound_map(address_map &map) ATTR_COLD;
 
 	// devices
 	required_device<cpu_device> m_maincpu;
@@ -92,8 +92,8 @@ public:
 	int subcpu_nmi_r();
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	void subcpu_w(uint16_t data);
@@ -129,10 +129,10 @@ private:
 	void fromancr_vram_w(offs_t offset, uint16_t data, uint16_t mem_mask, int layer);
 	void fromancr_gfxbank_w(int data);
 
-	void fromanc2_main_map(address_map &map);
-	void fromanc2_sub_io_map(address_map &map);
-	void fromanc2_sub_map(address_map &map);
-	void fromancr_main_map(address_map &map);
+	void fromanc2_main_map(address_map &map) ATTR_COLD;
+	void fromanc2_sub_io_map(address_map &map) ATTR_COLD;
+	void fromanc2_sub_map(address_map &map) ATTR_COLD;
+	void fromancr_main_map(address_map &map) ATTR_COLD;
 
 	// devices
 	required_device<cpu_device> m_subcpu;
@@ -164,7 +164,7 @@ public:
 	void init_fromanc4();
 
 protected:
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 
 	void fromanc4_videoram_0_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	void fromanc4_videoram_1_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
@@ -175,7 +175,7 @@ protected:
 
 	void fromanc4_vram_w(offs_t offset, uint16_t data, uint16_t mem_mask, int layer);
 
-	void fromanc4_main_map(address_map &map);
+	void fromanc4_main_map(address_map &map) ATTR_COLD;
 
 	// devices
 	required_device<ns16550_device> m_uart;

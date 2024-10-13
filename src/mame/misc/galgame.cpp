@@ -58,13 +58,13 @@ private:
 	uint16_t y_r();
 	void y_w(uint16_t data);
 	void clk_w(uint16_t data);
-	virtual void machine_reset() override;
+	virtual void machine_reset() override ATTR_COLD;
 	uint32_t screen_update_galaxygame(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(galaxygame_irq);
 	uint8_t galaxygame_irq_callback(offs_t offset);
 	required_device<t11_device> m_maincpu;
 	required_device<palette_device> m_palette;
-	void galaxygame_map(address_map &map);
+	void galaxygame_map(address_map &map) ATTR_COLD;
 };
 
 /*************************************

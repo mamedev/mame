@@ -277,8 +277,8 @@ void pvga1a_vga_device::video_control_w(offs_t offset, u8 data)
 /*
  * [0x0f] PR5 Lock/Status
  *
- * xxxx ---- MD7/MD4 config reads
- * ---- x--- MD8 config read (on later chipsets)
+ * xxxx ---- CNF(7)-CNF(4) / MD7/MD4 config reads
+ * ---- x--- CNF(8) / MD8 config read (on later chipsets)
  * ---- -xxx lock register
  * ---- -101 unlock, any other value locks r/w to the extensions
  */
@@ -301,7 +301,10 @@ void pvga1a_vga_device::ext_gc_unlock_w(offs_t offset, u8 data)
 
 wd90c00_vga_device::wd90c00_vga_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: pvga1a_vga_device(mconfig, type, tag, owner, clock)
-	, m_ext_crtc_view(*this, "ext_crtc_view")
+	, m_cnf15_read_cb(*this, 1)
+	, m_cnf14_read_cb(*this, 1)
+	, m_cnf13_read_cb(*this, 1)
+	, m_cnf12_read_cb(*this, 1)
 {
 	m_crtc_space_config = address_space_config("crtc_regs", ENDIANNESS_LITTLE, 8, 8, 0, address_map_constructor(FUNC(wd90c00_vga_device::crtc_map), this));
 }
@@ -316,34 +319,65 @@ void wd90c00_vga_device::device_reset()
 	pvga1a_vga_device::device_reset();
 
 	m_pr10_scratch = 0;
+	m_ext_crtc_read_unlock = false;
 	m_ext_crtc_write_unlock = false;
-	m_ext_crtc_view.select(0);
-	m_egasw = 0xf0;
+	// egasw
+	m_pr11 = (m_cnf15_read_cb() << 7) | (m_cnf14_read_cb() << 6) | m_cnf13_read_cb() << 5 | m_cnf12_read_cb() << 4;
 	m_interlace_start = 0;
 	m_interlace_end = 0;
 	m_interlace_mode = false;
 	m_pr15 = 0;
 }
 
+ioport_value wd90c00_vga_device::egasw1_r() { return BIT(m_pr11, 4); }
+ioport_value wd90c00_vga_device::egasw2_r() { return BIT(m_pr11, 5); }
+ioport_value wd90c00_vga_device::egasw3_r() { return BIT(m_pr11, 6); }
+ioport_value wd90c00_vga_device::egasw4_r() { return BIT(m_pr11, 7); }
+
+static INPUT_PORTS_START(paradise_vga_sense)
+	PORT_START("VGA_SENSE")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(wd90c00_vga_device, egasw1_r)
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(wd90c00_vga_device, egasw2_r)
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(wd90c00_vga_device, egasw3_r)
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(wd90c00_vga_device, egasw4_r)
+INPUT_PORTS_END
+
+ioport_constructor wd90c00_vga_device::device_input_ports() const
+{
+	return INPUT_PORTS_NAME(paradise_vga_sense);
+}
+
+u8 wd90c00_vga_device::crtc_data_r(offs_t offset)
+{
+	if (!m_ext_crtc_read_unlock && vga.crtc.index >= 0x2a && !machine().side_effects_disabled())
+	{
+		LOGLOCKED("Attempt to read ext. CRTC register offset %02x while locked\n", vga.crtc.index);
+		return 0xff;
+	}
+	return svga_device::crtc_data_r(offset);
+}
+
+void wd90c00_vga_device::crtc_data_w(offs_t offset, u8 data)
+{
+	if (!m_ext_crtc_write_unlock && vga.crtc.index >= 0x2a && !machine().side_effects_disabled())
+	{
+		LOGLOCKED("Attempt to write ext. CRTC register offset [%02x] <- %02x while locked\n", vga.crtc.index, data);
+		return;
+	}
+	svga_device::crtc_data_w(offset, data);
+}
+
 void wd90c00_vga_device::crtc_map(address_map &map)
 {
 	pvga1a_vga_device::crtc_map(map);
 	map(0x29, 0x29).rw(FUNC(wd90c00_vga_device::ext_crtc_status_r), FUNC(wd90c00_vga_device::ext_crtc_unlock_w));
-	map(0x2a, 0x3f).view(m_ext_crtc_view);
-	m_ext_crtc_view[0](0x2a, 0x3f).lr8(
-		NAME([this] (offs_t offset) {
-			if (!machine().side_effects_disabled())
-				LOGLOCKED("Attempt to R ext. CRTC register offset %02x while locked\n", offset + 0x2a);
-			return 0xff;
-		})
-	);
-	m_ext_crtc_view[1](0x2a, 0x2a).rw(FUNC(wd90c00_vga_device::egasw_r), FUNC(wd90c00_vga_device::egasw_w));
-	m_ext_crtc_view[1](0x2b, 0x2b).ram(); // PR12 scratch pad
-	m_ext_crtc_view[1](0x2c, 0x2d).rw(FUNC(wd90c00_vga_device::interlace_r), FUNC(wd90c00_vga_device::interlace_w));
-	m_ext_crtc_view[1](0x2e, 0x2e).rw(FUNC(wd90c00_vga_device::misc_control_1_r), FUNC(wd90c00_vga_device::misc_control_1_w));
-//  m_ext_crtc_view[1](0x2f, 0x2f) PR16 Misc Control 2
-//  m_ext_crtc_view[1](0x30, 0x30) PR17 Misc Control 3
-//  m_ext_crtc_view[1](0x31, 0x3f) <reserved>
+	map(0x2a, 0x2a).rw(FUNC(wd90c00_vga_device::egasw_r), FUNC(wd90c00_vga_device::egasw_w));
+	map(0x2b, 0x2b).ram(); // PR12 scratch pad
+	map(0x2c, 0x2d).rw(FUNC(wd90c00_vga_device::interlace_r), FUNC(wd90c00_vga_device::interlace_w));
+	map(0x2e, 0x2e).rw(FUNC(wd90c00_vga_device::misc_control_1_r), FUNC(wd90c00_vga_device::misc_control_1_w));
+//  map(0x2f, 0x2f) PR16 Misc Control 2
+//  map(0x30, 0x30) PR17 Misc Control 3
+//  map(0x31, 0x3f) <reserved>, may still read device ASCII ID like later variants?
 }
 
 void wd90c00_vga_device::recompute_params()
@@ -385,16 +419,18 @@ void wd90c00_vga_device::recompute_params()
  */
 u8 wd90c00_vga_device::ext_crtc_status_r(offs_t offset)
 {
-	return m_pr10_scratch | (m_ext_crtc_write_unlock ? 0x05 : 0x00);
+	return (m_ext_crtc_read_unlock ? 0x80 : 0x00) | m_pr10_scratch | (m_ext_crtc_write_unlock ? 0x05 : 0x00);
 }
 
 void wd90c00_vga_device::ext_crtc_unlock_w(offs_t offset, u8 data)
 {
+	m_ext_crtc_read_unlock = (data & 0x88) == 0x80;
 	m_ext_crtc_write_unlock = (data & 0x7) == 5;
-	LOGLOCKED("PR10 %s state (%02x)\n", m_ext_crtc_write_unlock ? "unlock" : "lock", data);
-	// TODO: read unlock
-	//m_ext_crtc_read_unlock = (data & 0x88) == 0x80;
-	m_ext_crtc_view.select(m_ext_crtc_write_unlock);
+	LOGLOCKED("PR10 read %s write %s state (%02x)\n"
+		, m_ext_crtc_read_unlock ? "unlock" : "lock"
+		, m_ext_crtc_write_unlock ? "unlock" : "lock"
+		, data
+	);
 	m_pr10_scratch = data & 0x70;
 }
 
@@ -402,6 +438,7 @@ void wd90c00_vga_device::ext_crtc_unlock_w(offs_t offset, u8 data)
  * [0x2a] PR11 EGA Switches
  *
  * xxxx ---- EGA switches (MD15-MD12), latches high if written to.
+ *           CONF15-12 on 'C26 for panel support. Pulling up will latch high these pins.
  * ---- x--- EGA emulation on Analog Display
  * ---- -x-- Lock Clock Select (disables external chip select for VCLK1)
  * ---- --x- Locks GC $5 bits 6:5, sequencer $1 bits 5:2, sequencer $3 bits 5:0
@@ -409,15 +446,14 @@ void wd90c00_vga_device::ext_crtc_unlock_w(offs_t offset, u8 data)
  */
 u8 wd90c00_vga_device::egasw_r(offs_t offset)
 {
-	const u8 ega_config = (m_input_sense->read() << 4);
-	LOG("PR11 EGA Switch R (%02x | %02x)\n", ega_config, m_egasw);
-	return (ega_config | m_egasw);
+	LOG("PR11 EGA Switch R (%02x)\n", m_pr11);
+	return m_pr11;
 }
 
 void wd90c00_vga_device::egasw_w(offs_t offset, u8 data)
 {
 	LOG("PR11 EGA Switch W %02x\n", data);
-	m_egasw = data & 0xff;
+	m_pr11 = data & 0xff;
 }
 
 /*
@@ -624,10 +660,10 @@ void wd90c30_vga_device::device_reset()
 void wd90c30_vga_device::crtc_map(address_map &map)
 {
 	wd90c11a_vga_device::crtc_map(map);
-//  m_ext_crtc_view[1](0x20, 0x21) Signature read data
-//  m_ext_crtc_view[1](0x3d, 0x3d) PR1A CRTC Shadow Register Control
-	m_ext_crtc_view[1](0x3e, 0x3e).rw(FUNC(wd90c30_vga_device::vert_timing_overflow_r), FUNC(wd90c30_vga_device::vert_timing_overflow_w));
-//  m_ext_crtc_view[1](0x3f, 0x3f) PR19 Signature Analyzer Control
+//  map(0x20, 0x21) Signature read data
+//  map(0x3d, 0x3d) PR1A CRTC Shadow Register Control
+	map(0x3e, 0x3e).rw(FUNC(wd90c30_vga_device::vert_timing_overflow_r), FUNC(wd90c30_vga_device::vert_timing_overflow_w));
+//  map(0x3f, 0x3f) PR19 Signature Analyzer Control
 }
 
 void wd90c30_vga_device::sequencer_map(address_map &map)

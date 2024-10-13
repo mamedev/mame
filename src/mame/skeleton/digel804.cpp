@@ -93,8 +93,8 @@ public:
 	void digel804(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	void op00(uint8_t data);
 	uint8_t ip40();
@@ -120,8 +120,8 @@ protected:
 	void acia_irq_w(int state);
 	void da_w(int state);
 
-	void z80_mem_804_1_4(address_map &map);
-	void z80_io_1_4(address_map &map);
+	void z80_mem_804_1_4(address_map &map) ATTR_COLD;
+	void z80_io_1_4(address_map &map) ATTR_COLD;
 
 	required_device<ram_device> m_ram;
 	required_device<cpu_device> m_maincpu;
@@ -166,8 +166,8 @@ public:
 protected:
 	void ep804_acia_irq_w(int state);
 
-	void z80_mem_804_1_2(address_map &map);
-	void z80_io_1_2(address_map &map);
+	void z80_mem_804_1_2(address_map &map) ATTR_COLD;
+	void z80_io_1_2(address_map &map) ATTR_COLD;
 };
 
 

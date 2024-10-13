@@ -96,8 +96,8 @@ public:
 protected:
 	deco_146_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
 
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	u16 read_protport(u16 address);
 	virtual void write_protport(u16 address, u16 data, u16 mem_mask);

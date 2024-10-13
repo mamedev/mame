@@ -47,8 +47,8 @@ public:
 	void photon2(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -73,8 +73,8 @@ private:
 	void screen_vblank_spectrum(int state);
 
 	TIMER_DEVICE_CALLBACK_MEMBER(spec_interrupt_hack);
-	void spectrum_io(address_map &map);
-	void spectrum_mem(address_map &map);
+	void spectrum_io(address_map &map) ATTR_COLD;
+	void spectrum_mem(address_map &map) ATTR_COLD;
 };
 
 

@@ -46,18 +46,18 @@ protected:
 	static constexpr u8 ROM_PAGE_SYS = 2;
 	static constexpr u8 ROM_PAGE_DOS = 3;
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 	bool dos()    const { return m_beta->is_active(); }
 	bool romram() const { return BIT(m_port_1ffd_data, 0); }
 	bool rom1()   const { return BIT(m_port_7ffd_data, 4); }
 
-	void scorpion_io(address_map &map);
-	void scorpion_mem(address_map &map);
-	void scorpion_switch(address_map &map);
-	virtual void scorpion_ioext(address_map &map);
+	void scorpion_io(address_map &map) ATTR_COLD;
+	void scorpion_mem(address_map &map) ATTR_COLD;
+	void scorpion_switch(address_map &map) ATTR_COLD;
+	virtual void scorpion_ioext(address_map &map) ATTR_COLD;
 	u8 port_ff_r();
 	void port_7ffd_w(u8 data);
 	void port_1ffd_w(u8 data);
@@ -102,11 +102,11 @@ public:
 	INPUT_CHANGED_MEMBER(turbo_changed);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
-	virtual void scorpion_ioext(address_map &map) override;
+	virtual void scorpion_ioext(address_map &map) override ATTR_COLD;
 	virtual void ay_address_w(u8 data) override;
 
 	virtual void scorpion_update_memory() override;
@@ -132,11 +132,11 @@ public:
 	void scorpiongmx(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
-	virtual void scorpion_ioext(address_map &map) override;
+	virtual void scorpion_ioext(address_map &map) override ATTR_COLD;
 	void global_cfg_w(u8 data);
 	u8 port_78fd_r();
 	u8 port_7afd_r();

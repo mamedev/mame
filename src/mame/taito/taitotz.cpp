@@ -576,9 +576,9 @@ public:
 	required_device<screen_device> m_screen;
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	required_device<ppc_device> m_maincpu;
@@ -637,9 +637,9 @@ private:
 	void init_taitotz_152();
 	void init_taitotz_111a();
 
-	void landhigh_tlcs900h_mem(address_map &map);
-	void ppc603e_mem(address_map &map);
-	void tlcs900h_mem(address_map &map);
+	void landhigh_tlcs900h_mem(address_map &map) ATTR_COLD;
+	void ppc603e_mem(address_map &map) ATTR_COLD;
+	void tlcs900h_mem(address_map &map) ATTR_COLD;
 };
 
 class taitotz_renderer : public poly_manager<float, taitotz_polydata, 6>
@@ -2918,6 +2918,8 @@ ROM_START( batlgr2 )
 	ROM_REGION( 0x10000, "sound_cpu", 0 ) /* Internal ROM :( */
 	ROM_LOAD( "e68-01.ic7", 0x000000, 0x010000, NO_DUMP )
 
+	// BATTLE GEAR 2 M9005023A VER.2.04J
+	// FUJITSU MPE3064AT
 	DISK_REGION( "ata:0:hdd" )
 	DISK_IMAGE( "bg2_204j", 0, SHA1(7ac100fba39ae0b93980c0af2f0212a731106912) )
 ROM_END
@@ -3051,7 +3053,7 @@ ROM_START( dendego3 )
 	DISK_IMAGE( "ddg3", 0, SHA1(468d699e02ef0a0242de4e7038613cc5d0545591) )
 ROM_END
 
-} // Anonymous namespace
+} // anonymous namespace
 
 
 GAME( 1999, taitotz,   0,        taitotz,  taitotz,  taitotz_state, empty_init,    ROT0, "Taito", "Type Zero BIOS", MACHINE_NO_SOUND|MACHINE_NOT_WORKING|MACHINE_IS_BIOS_ROOT )

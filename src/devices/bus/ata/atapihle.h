@@ -51,8 +51,8 @@ public:
 protected:
 	atapi_hle_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	virtual int sector_length() override { return ATAPI_BUFFER_LENGTH; }
 	virtual void process_buffer() override;

@@ -92,21 +92,21 @@ private:
 	uint32_t screen_update_striv(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_joinem(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 	INTERRUPT_GEN_MEMBER(joinem_vblank_irq);
 	void jack_draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	void joinem_draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	void treahunt_decode(  );
-	void decrypted_opcodes_map(address_map &map);
-	void jack_map(address_map &map);
-	void joinem_map(address_map &map);
-	void sound_io_map(address_map &map);
-	void sound_map(address_map &map);
-	void striv_map(address_map &map);
-	void unclepoo_map(address_map &map);
+	void decrypted_opcodes_map(address_map &map) ATTR_COLD;
+	void jack_map(address_map &map) ATTR_COLD;
+	void joinem_map(address_map &map) ATTR_COLD;
+	void sound_io_map(address_map &map) ATTR_COLD;
+	void sound_map(address_map &map) ATTR_COLD;
+	void striv_map(address_map &map) ATTR_COLD;
+	void unclepoo_map(address_map &map) ATTR_COLD;
 };
 
 #endif // MAME_CINEMATRONICS_JACK_H

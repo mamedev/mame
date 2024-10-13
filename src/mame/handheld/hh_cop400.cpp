@@ -74,8 +74,8 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(power_button);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	// devices
 	required_device<cop400_cpu_device> m_maincpu;
@@ -600,7 +600,7 @@ public:
 	int motor_switch_r();
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	output_finder<> m_motor_pos_out;
@@ -1115,11 +1115,11 @@ public:
 	void mbaskb2(machine_config &config);
 	void msoccer2(machine_config &config);
 
-	DECLARE_CUSTOM_INPUT_MEMBER(switch_r);
+	ioport_value switch_r();
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	required_device<cop400_cpu_device> m_subcpu;
@@ -1188,7 +1188,7 @@ u8 mbaskb2_state::sub_read_in()
 
 // inputs
 
-CUSTOM_INPUT_MEMBER(mbaskb2_state::switch_r)
+ioport_value mbaskb2_state::switch_r()
 {
 	// The power switch is off-1-2, and the game relies on power-on starting at 1,
 	// otherwise msoccer2 boots up to what looks like a factory test mode.
@@ -2314,7 +2314,7 @@ public:
 	void scat(machine_config &config);
 
 private:
-	void main_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
 
 	void update_display();
 	void write_d(u8 data);

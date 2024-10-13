@@ -96,8 +96,8 @@ public:
 	{ }
 
 protected:
-	virtual void video_start() override;
-	virtual void video_reset() override;
+	virtual void video_start() override ATTR_COLD;
+	virtual void video_reset() override ATTR_COLD;
 
 	static void set_pal_color(palette_device &palette, uint8_t offset, uint8_t data); // TODO: convert to an RGB converter and set_format
 
@@ -124,11 +124,11 @@ public:
 
 	void tristar8000(machine_config &config);
 
-	DECLARE_CUSTOM_INPUT_MEMBER(coin_r) { return m_coin_latch; }
+	ioport_value coin_r() { return m_coin_latch; }
 	DECLARE_INPUT_CHANGED_MEMBER(coin_switch) { if (newval) m_coin_latch |= param; }
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	// I/O
@@ -139,8 +139,8 @@ private:
 	void coin_reset_w(uint8_t data) { m_coin_latch = 0; }
 	void palette(palette_device &palette) const;
 
-	void io_map(address_map &map);
-	void prg_map(address_map &map);
+	void io_map(address_map &map) ATTR_COLD;
+	void prg_map(address_map &map) ATTR_COLD;
 };
 
 class tristar9000_state : public epos_base_state
@@ -158,8 +158,8 @@ public:
 	void init_tristar9000();
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	required_memory_bank_array<2> m_mainbank;
@@ -178,8 +178,8 @@ private:
 	uint8_t ay_porta_mpx_r();
 	void flip_screen_w(uint8_t data);
 	void pal_w(offs_t offset, uint8_t data);
-	void io_map(address_map &map);
-	void prg_map(address_map &map);
+	void io_map(address_map &map) ATTR_COLD;
+	void prg_map(address_map &map) ATTR_COLD;
 };
 
 

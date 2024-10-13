@@ -60,7 +60,7 @@ private:
 	void status_w(offs_t offset, u8 data);
 	u8 status_r(offs_t offset);
 
-	void mem_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 

@@ -188,25 +188,66 @@ struct mame_ui_manager::active_pointer
 };
 
 
-struct mame_ui_manager::pointer_options
+class mame_ui_manager::pointer_options
 {
+public:
 	pointer_options()
-		: timeout(std::chrono::seconds(3))
-		, hide_inactive(true)
-		, timeout_set(false)
-		, hide_inactive_set(false)
+		: m_initial_timeout(std::chrono::seconds(3))
+		, m_timeout(std::chrono::seconds(3))
+		, m_initial_hide_inactive(true)
+		, m_hide_inactive(true)
+		, m_timeout_set(false)
+		, m_hide_inactive_set(false)
 	{
 	}
 
-	bool options_set() const
+	std::chrono::steady_clock::duration timeout() const noexcept { return m_timeout; }
+	bool hide_inactive() const noexcept { return m_hide_inactive; }
+	bool timeout_set() const noexcept { return m_timeout_set; }
+	bool hide_inactive_set() const noexcept { return m_hide_inactive_set; }
+	bool options_set() const noexcept { return m_timeout_set || m_hide_inactive_set; }
+
+	void set_initial_timeout(std::chrono::steady_clock::duration value) noexcept
 	{
-		return timeout_set || hide_inactive_set;
+		m_initial_timeout = value;
+		if (!m_timeout_set)
+			m_timeout = value;
 	}
 
-	std::chrono::steady_clock::duration timeout;
-	bool hide_inactive;
-	bool timeout_set;
-	bool hide_inactive_set;
+	void set_initial_hide_inactive(bool value) noexcept
+	{
+		m_initial_hide_inactive = value;
+		if (!m_hide_inactive_set)
+			m_hide_inactive = value;
+	}
+
+	void set_timeout(std::chrono::steady_clock::duration value) noexcept
+	{
+		m_timeout = value;
+		m_timeout_set = true;
+	}
+
+	void set_hide_inactive(bool value) noexcept
+	{
+		m_hide_inactive = value;
+		m_hide_inactive_set = true;
+	}
+
+	void restore_initial() noexcept
+	{
+		m_timeout = m_initial_timeout;
+		m_hide_inactive = m_initial_hide_inactive;
+		m_timeout_set = false;
+		m_hide_inactive_set = false;
+	}
+
+private:
+	std::chrono::steady_clock::duration m_initial_timeout;
+	std::chrono::steady_clock::duration m_timeout;
+	bool m_initial_hide_inactive;
+	bool m_hide_inactive;
+	bool m_timeout_set;
+	bool m_hide_inactive_set;
 };
 
 
@@ -450,19 +491,21 @@ void mame_ui_manager::config_load_pointers(
 			{
 				auto const timeout(targetnode->get_attribute_float("activity_timeout", -1.0F));
 				auto const ms(std::lround(timeout * 1000.0F));
-				if ((100 <= ms) && (10'000 >= ms))
+				if ((0 <= ms) && (10'000 >= ms))
 				{
-					m_pointer_options[index].timeout = std::chrono::milliseconds(ms);
 					if (config_type::SYSTEM == cfg_type)
-						m_pointer_options[index].timeout_set = true;
+						m_pointer_options[index].set_timeout(std::chrono::milliseconds(ms));
+					else
+						m_pointer_options[index].set_initial_timeout(std::chrono::milliseconds(ms));
 				}
 
 				auto const hide(targetnode->get_attribute_int("hide_inactive", -1));
 				if (0 <= hide)
 				{
-					m_pointer_options[index].hide_inactive = hide != 0;
 					if (config_type::SYSTEM == cfg_type)
-						m_pointer_options[index].hide_inactive_set = true;
+						m_pointer_options[index].set_hide_inactive(hide != 0);
+					else
+						m_pointer_options[index].set_initial_hide_inactive(hide != 0);
 				}
 			}
 		}
@@ -495,13 +538,13 @@ void mame_ui_manager::config_save_pointers(
 				if (targetnode)
 				{
 					targetnode->set_attribute_int("index", i);
-					if (options.timeout_set)
+					if (options.timeout_set())
 					{
-						auto const ms(std::chrono::duration_cast<std::chrono::milliseconds>(options.timeout));
+						auto const ms(std::chrono::duration_cast<std::chrono::milliseconds>(options.timeout()));
 						targetnode->set_attribute_float("activity_timeout", float(ms.count()) * 0.001F);
 					}
-					if (options.hide_inactive_set)
-						targetnode->set_attribute_int("hide_inactive", options.hide_inactive);
+					if (options.hide_inactive_set())
+						targetnode->set_attribute_int("hide_inactive", options.hide_inactive());
 				}
 			}
 		}
@@ -1518,8 +1561,8 @@ uint32_t mame_ui_manager::handler_ingame(render_container &container)
 		{
 			target = pointer.target;
 			view = &target->current_view();
-			hide_inactive = m_pointer_options[target->index()].hide_inactive && view->hide_inactive_pointers();
-			expiry = now - m_pointer_options[target->index()].timeout;
+			hide_inactive = m_pointer_options[target->index()].hide_inactive() && view->hide_inactive_pointers();
+			expiry = now - m_pointer_options[target->index()].timeout();
 		}
 		if (view->show_pointers())
 		{
@@ -1735,10 +1778,7 @@ void mame_ui_manager::set_pointer_activity_timeout(int target, std::chrono::stea
 {
 	assert((0 <= target) && (m_pointer_options.size() > target));
 	if ((0 <= target) && (m_pointer_options.size() > target))
-	{
-		m_pointer_options[target].timeout = timeout;
-		m_pointer_options[target].timeout_set = true;
-	}
+		m_pointer_options[target].set_timeout(timeout);
 }
 
 
@@ -1751,10 +1791,20 @@ void mame_ui_manager::set_hide_inactive_pointers(int target, bool hide) noexcept
 {
 	assert((0 <= target) && (m_pointer_options.size() > target));
 	if ((0 <= target) && (m_pointer_options.size() > target))
-	{
-		m_pointer_options[target].hide_inactive = hide;
-		m_pointer_options[target].hide_inactive_set = true;
-	}
+		m_pointer_options[target].set_hide_inactive(hide);
+}
+
+
+//-------------------------------------------------
+//  restore_initial_pointer_options - restore
+//  initial per-target pointer settings
+//-------------------------------------------------
+
+void mame_ui_manager::restore_initial_pointer_options(int target) noexcept
+{
+	assert((0 <= target) && (m_pointer_options.size() > target));
+	if ((0 <= target) && (m_pointer_options.size() > target))
+		m_pointer_options[target].restore_initial();
 }
 
 
@@ -1767,11 +1817,10 @@ std::chrono::steady_clock::duration mame_ui_manager::pointer_activity_timeout(in
 {
 	assert((0 <= target) && (m_pointer_options.size() > target));
 	if ((0 <= target) && (m_pointer_options.size() > target))
-		return m_pointer_options[target].timeout;
+		return m_pointer_options[target].timeout();
 	else
-		return pointer_options().timeout;
+		return pointer_options().timeout();
 }
-
 
 
 //-------------------------------------------------
@@ -1783,9 +1832,9 @@ bool mame_ui_manager::hide_inactive_pointers(int target) const noexcept
 {
 	assert((0 <= target) && (m_pointer_options.size() > target));
 	if ((0 <= target) && (m_pointer_options.size() > target))
-		return m_pointer_options[target].hide_inactive;
+		return m_pointer_options[target].hide_inactive();
 	else
-		return pointer_options().hide_inactive;
+		return pointer_options().hide_inactive();
 }
 
 

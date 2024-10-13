@@ -25,7 +25,7 @@ public:
 		MSM665XX_R0, MSM665XX_R1, MSM665XX_R2, MSM665XX_R3,
 		MSM665XX_R4, MSM665XX_R5, MSM665XX_R6, MSM665XX_R7,
 		MSM665XX_CSR, MSM665XX_DSR, MSM665XX_TSR,
-		MSM665XX_ROMWIN
+		MSM665XX_ROMWIN, MSM665XX_MEMSCON
 	};
 
 	// TODO: port callbacks
@@ -33,8 +33,8 @@ public:
 protected:
 	msm665xx_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, address_map_constructor mem_map, address_map_constructor data_map);
 
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 
@@ -58,6 +58,9 @@ protected:
 	void tsr_w(u8 data);
 	u8 romwin_r();
 	void romwin_w(u8 data);
+	void memsacp_w(u8 data);
+	u8 memscon_r();
+	void memscon_w(u8 data);
 
 private:
 	address_space_config m_program_config;
@@ -77,6 +80,7 @@ private:
 	u8 m_dsr;
 	u8 m_tsr;
 	u8 m_romwin;
+	u8 m_memscon;
 	s32 m_icount;
 };
 
@@ -88,7 +92,7 @@ public:
 	msm66573_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 private:
-	void data_map(address_map &map);
+	void data_map(address_map &map) ATTR_COLD;
 };
 
 

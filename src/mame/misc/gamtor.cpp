@@ -50,8 +50,8 @@ public:
 	virtual void mem_linear_w(offs_t offset,uint8_t data) override;
 
 protected:
-	virtual void io_3cx_map(address_map &map) override;
-	virtual void io_3bx_3dx_map(address_map &map) override;
+	virtual void io_3cx_map(address_map &map) override ATTR_COLD;
+	virtual void io_3bx_3dx_map(address_map &map) override ATTR_COLD;
 
 	virtual uint16_t offset() override;
 };
@@ -124,7 +124,7 @@ public:
 	void gaminator(machine_config &config);
 
 private:
-	void gaminator_map(address_map &map);
+	void gaminator_map(address_map &map) ATTR_COLD;
 
 	void gamtor_unk_w(uint32_t data);
 

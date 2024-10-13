@@ -3,21 +3,25 @@
 // thanks-to:Berger
 /*******************************************************************************
 
-SciSys / Novag Chess Champion: Super System III (aka MK III), distributed by
-both SciSys and Novag. Which company was responsible for which part of the
-manufacturing chain is unknown. The software is by SciSys (no mention of Novag
-in the ROM, it has "COPYRIGHT SCISYS LTD 1979").
+SciSys / Novag Chess Champion: Super System III (aka MK III)
+
+It was distributed by both SciSys and Novag. Which company was responsible for
+which part of the production chain is unknown. The copyright was assigned to SciSys
+(no mention of Novag in the ROM, it has "COPYRIGHT SCISYS LTD 1979").
 
 This is their 1st original product. MK II was licensed from Peter Jennings, and
-MK I was, to put it bluntly, a bootleg. The chess engine is by Mike Johnson,
-with support from David Levy.
+MK I was, to put it bluntly, a bootleg. The chess engine is by Mike Johnson, with
+support from David Levy, Philidor Software.
 
-Hardware notes (Master Unit):
+Hardware notes:
+
+Master Unit:
+- PCB label: 201041 (Rev.A to Rev.E)
 - Synertek 6502A @ 2MHz (4MHz XTAL)
 - Synertek 6522 VIA
 - 8KB ROM (2*Synertek 2332)
 - 1KB RAM (2*HM472114P-3)
-- MD4332BE + a bunch of TTL for the LCD
+- MD4332BE or HLCD0438 + a bunch of TTL for the LCD
 - 13 buttons, 4 switches, no leds or sensorboard
 - connectors for: PSU, Power Pack, Chess Unit, Printer Unit
 
@@ -49,7 +53,8 @@ TODO:
 - LCD TC pin? connects to the display, source is a 50hz timer(from power supply),
   probably to keep refreshing the LCD when inactive, there is no need to emulate it
 - dump/add printer unit
-- dump/add ssystem3 1980 program revision, were the BTANB fixed?
+- dump/add other ssystem3 program revisions, were the BTANB fixed in the 1980 version?
+  known undumped: C19081 + C19082 (instead of C19081E), C45000 + C45012
 - ssystem4 softwarelist if a prototype cartridge is ever dumped
 
 BTANB (ssystem3):
@@ -112,7 +117,7 @@ public:
 	void init_ssystem3() { m_xor_kludge = true; }
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	// devices/pointers
@@ -138,9 +143,9 @@ private:
 	bool m_xor_kludge = false;
 
 	// address maps
-	void ssystem3_map(address_map &map);
-	void ssystem4_map(address_map &map);
-	void chessunit_map(address_map &map);
+	void ssystem3_map(address_map &map) ATTR_COLD;
+	void ssystem4_map(address_map &map) ATTR_COLD;
+	void chessunit_map(address_map &map) ATTR_COLD;
 
 	// I/O handlers
 	void lcd1_output_w(u32 data) { m_lcd1_data = data; }
@@ -568,5 +573,6 @@ ROM_END
 *******************************************************************************/
 
 //    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS           INIT           COMPANY, FULLNAME, FLAGS
-SYST( 1979, ssystem3, 0,      0,      ssystem3, ssystem3, ssystem3_state, init_ssystem3, "SciSys / Novag Industries", "Chess Champion: Super System III", MACHINE_SUPPORTS_SAVE )
-SYST( 1980, ssystem4, 0,      0,      ssystem4, ssystem4, ssystem3_state, empty_init,    "SciSys", "Chess Champion: Super System IV", MACHINE_SUPPORTS_SAVE )
+SYST( 1979, ssystem3, 0,      0,      ssystem3, ssystem3, ssystem3_state, init_ssystem3, "SciSys / Novag Industries / Philidor Software", "Chess Champion: Super System III", MACHINE_SUPPORTS_SAVE )
+
+SYST( 1980, ssystem4, 0,      0,      ssystem4, ssystem4, ssystem3_state, empty_init,    "SciSys / Philidor Software", "Chess Champion: Super System IV", MACHINE_SUPPORTS_SAVE )

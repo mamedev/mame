@@ -271,13 +271,13 @@ void wwfwfest_state::wwfwfest_priority_w(uint8_t data)
 
 /* DIPs are spread across the other input ports */
 template <int N>
-CUSTOM_INPUT_MEMBER(wwfwfest_state::dsw_3f_r)
+ioport_value wwfwfest_state::dsw_3f_r()
 {
 	return m_dsw[N]->read() & 0x3f;
 }
 
 template <int N>
-CUSTOM_INPUT_MEMBER(wwfwfest_state::dsw_c0_r)
+ioport_value wwfwfest_state::dsw_c0_r()
 {
 	return (m_dsw[N]->read() & 0xc0) >> 6;
 }

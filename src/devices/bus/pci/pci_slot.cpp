@@ -14,6 +14,8 @@
 #include "ess_maestro.h"
 #include "geforce.h"
 #include "mga2064w.h"
+#include "ncr53c825.h"
+#include "neon250.h"
 #include "opti82c861.h"
 #include "oti_spitfire.h"
 #include "pdc20262.h"
@@ -115,6 +117,7 @@ void pci_cards(device_slot_interface &device)
 
 	// 0x01 - mass storage controllers
 	device.option_add("aha2940au",      AHA2940AU);
+	device.option_add("ncr53c825",      NCR53C825_PCI);
 	device.option_add("pdc20262",       PDC20262);
 
 	// 0x02 - network controllers
@@ -162,6 +165,7 @@ void pci_cards(device_slot_interface &device)
 // assume all natively with class code 03
 void agp_cards(device_slot_interface &device)
 {
+	// nVidia
 	device.option_add("riva128",        RIVA128);
 	device.option_add("riva128zx",      RIVA128ZX);
 	device.option_add("rivatnt",        RIVATNT);
@@ -172,6 +176,10 @@ void agp_cards(device_slot_interface &device)
 	device.option_add("geforce256",     GEFORCE256);
 	device.option_add("geforce256_ddr", GEFORCE256_DDR);
 	device.option_add("quadro",         QUADRO);
+	// Cirrus Logic
 	device.option_add("laguna3d",       GD5465_LAGUNA3D);
+	// PowerVR VideoLogic
+	device.option_add("neon250",        NEON250);
+	// SiS
 	device.option_add("sis6326_agp",    SIS6326_AGP);
 }

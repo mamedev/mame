@@ -12,24 +12,38 @@ Grandmaster and FCC are verified to be the same PCB + ROMs as UVC. So even thoug
 they have a large wooden chessboard attached instead of a small plastic one, from
 MAME's perspective there's nothing to emulate on top of UVC.
 
-********************************************************************************
+TODO:
+- add low-pass filters to sound? but when using flt_rc, it does not sound like
+  recordings from a real VCC, maybe use a netlist or is it overkill? (same goes
+  for newer Fidelity chess computers with this speech chip)
+
+BTANB:
+- with the English voice ROM, the letter D is barely distinguishable from E,
+  Fidelity never updated the ROM later, and it sounds fine with other languages
+
+================================================================================
 
 RE notes by Kevin Horton
 
-The CPU is a Z80 running at 4MHz.  The TSI chip runs at around 25KHz, using a
-470K / 100pf RC network.  This system is very very basic, and is composed of just
+The CPU is a Z80 running at 4MHz. The TSI chip runs at around 25KHz, using a
+470K / 100pf RC network. This system is very very basic, and is composed of just
 the Z80, 4 ROMs, the TSI chip, and an 8255.
 
 The Z80's interrupt inputs are all pulled to VCC, so no interrupts are used.
 
 Reset is connected to a power-on reset circuit and a button on the keypad (marked RE).
 
-The TSI chip connects to a 4K ROM.  All of the 'Voiced' Chess Challengers
-use this same ROM  (three or four).  The later chess boards use a slightly different part
-number, but the contents are identical.
+The TSI chip connects to a 4K ROM. All of the 'Voiced' Chess Challengers
+use this same ROM  (three or four). The later chess boards use a slightly different
+part number, but the contents are identical.
+
+The speech chip analog out (pin 11) goes to a PNP transistor, followed by two
+cascaded low-pass filters (18K+5nf and 18K+20nf), an LM386N amplifier, and a
+speaker. Newer Fidelity chess computers with this chip have a similar configuration,
+with an additional volume filter before the LM386N.
 
 Memory map (VCC):
------------
+-----------------
 0000-0FFF: 4K 2332 ROM VCC1 or 101-32013
 1000-1FFF: 4K 2332 ROM VCC2
 2000-2FFF: 4K 2332 ROM VCC3
@@ -37,7 +51,7 @@ Memory map (VCC):
 6000-FFFF: empty
 
 Memory map (UVC):
------------
+-----------------
 0000-1FFF: 8K 2364 ROM 101-64017
 2000-2FFF: 4K 2332 ROM 101-32010 or VCC3
 4000-5FFF: 1K RAM (2114 SRAM x2)
@@ -64,7 +78,7 @@ PB.2 - digit 0, bottom dot (W)
 PB.3 - digit 1, top dot (W)
 PB.4 - digit 2 (W)
 PB.5 - digit 3 (W)
-PB.6 - enable language switches (W, see below)
+PB.6 - enable language jumpers (W, see below)
 PB.7 - TSI BUSY line (R)
 
 (button rows pulled up to 5V through 2.2K resistors)
@@ -77,28 +91,28 @@ PC.5 - button column B (W)
 PC.6 - button column C (W)
 PC.7 - button column D (W)
 
-language switches:
-------------------
-When PB.6 is pulled low, the language switches can be read.  There are four.
-They connect to the button rows.  When enabled, the row(s) will read low if
-the jumper is present.  English only VCC's do not have the 367 or any pads stuffed.
+Language jumpers:
+-----------------
+When PB.6 is pulled low, the language jumpers can be read. There are four.
+They connect to the button rows. When enabled, the row(s) will read low if
+the jumper is present. English only VCC's do not have the 367 or any pads stuffed.
 The jumpers are labeled: French, German, Spanish, and special.
 
-language latch:
+Language latch:
 ---------------
-There's an unstuffed 7474 on the board that connects to PA.6 and PA.7.  It allows
-one to latch the state of A12 to the speech ROM.  The English version has the chip
-missing, and a jumper pulling "A12" to ground.  This line is really a negative
+There's an unstuffed 7474 on the board that connects to PA.6 and PA.7. It allows
+one to latch the state of A12 to the speech ROM. The English version has the chip
+missing, and a jumper pulling "A12" to ground. This line is really a negative
 enable.
 
 To make the VCC multi-language, one would install the 74367 (note: it must be a 74367
-or possibly a 74LS367.  A 74HC367 would not work since they rely on the input current
+or possibly a 74LS367. A 74HC367 would not work since they rely on the input current
 to keep the inputs pulled up), solder a piggybacked ROM to the existing English
 speech ROM, and finally install a 7474 dual flipflop.
 
-This way, the game can then detect which secondary language is present, and then it can
-automatically select the correct ROM(s).  I have to test whether it will do automatic
-determination and give you a language option on power up or something.
+This way, the game can then detect which secondary language is present, and then
+it can automatically select the correct ROM(s). I have to test whether it will do
+automatic determination and give you a language option on power up or something.
 
 *******************************************************************************/
 
@@ -126,7 +140,6 @@ public:
 		m_ppi8255(*this, "ppi8255"),
 		m_display(*this, "display"),
 		m_speech(*this, "speech"),
-		m_speech_rom(*this, "speech"),
 		m_language(*this, "language"),
 		m_inputs(*this, "IN.%u", 0)
 	{ }
@@ -138,7 +151,7 @@ public:
 	void vcc(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	// devices/pointers
@@ -146,22 +159,19 @@ private:
 	required_device<i8255_device> m_ppi8255;
 	required_device<pwm_display_device> m_display;
 	required_device<s14001a_device> m_speech;
-	required_region_ptr<u8> m_speech_rom;
 	required_region_ptr<u8> m_language;
 	required_ioport_array<4> m_inputs;
 
 	u8 m_led_select = 0;
 	u8 m_7seg_data = 0;
 	u8 m_inp_mux = 0;
-	u8 m_speech_bank = 0;
 
 	// address maps
-	void main_map(address_map &map);
-	void main_io(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
+	void main_io(address_map &map) ATTR_COLD;
 
 	// I/O handlers
 	void update_display();
-	u8 speech_r(offs_t offset);
 	void ppi_porta_w(u8 data);
 	u8 ppi_portb_r();
 	void ppi_portb_w(u8 data);
@@ -175,7 +185,6 @@ void vcc_state::machine_start()
 	save_item(NAME(m_led_select));
 	save_item(NAME(m_7seg_data));
 	save_item(NAME(m_inp_mux));
-	save_item(NAME(m_speech_bank));
 
 	// game relies on RAM filled with FF at power-on
 	for (int i = 0; i < 0x400; i++)
@@ -188,8 +197,6 @@ void vcc_state::machine_start()
     I/O
 *******************************************************************************/
 
-// misc handlers
-
 void vcc_state::update_display()
 {
 	// 4 7seg leds (note: sel d0 for extra leds)
@@ -197,44 +204,33 @@ void vcc_state::update_display()
 	m_display->matrix(m_led_select >> 2 & 0xf, outdata);
 }
 
-u8 vcc_state::speech_r(offs_t offset)
-{
-	return m_speech_rom[m_speech_bank << 12 | offset];
-}
-
-
-// I8255 PPI
-
 void vcc_state::ppi_porta_w(u8 data)
 {
 	// d0-d6: digit segment data, bits are xABCDEFG
 	m_7seg_data = bitswap<8>(data,7,0,1,2,3,4,5,6);
 	update_display();
 
-	// d0-d5: TSI C0-C5
-	// d7: TSI START line
-	m_speech->data_w(data & 0x3f);
-	m_speech->start_w(data >> 7 & 1);
-
 	// d6: language latch data
 	// d7: language latch clock (latch on high)
 	if (data & 0x80)
-	{
-		m_speech->force_update(); // update stream to now
-		m_speech_bank = data >> 6 & 1;
-	}
+		m_speech->set_rom_bank(BIT(data, 6));
+
+	// d0-d5: S14001A C0-C5
+	// d7: S14001A start pin
+	m_speech->data_w(data & 0x3f);
+	m_speech->start_w(BIT(data, 7));
 }
 
 u8 vcc_state::ppi_portb_r()
 {
-	// d7: TSI BUSY line
+	// d7: S14001A busy pin
 	return (m_speech->busy_r()) ? 0x80 : 0x00;
 }
 
 void vcc_state::ppi_portb_w(u8 data)
 {
 	// d0,d2-d5: digit/led select
-	// _d6: enable language switches
+	// _d6: enable language jumpers
 	m_led_select = data;
 	update_display();
 }
@@ -248,8 +244,8 @@ u8 vcc_state::ppi_portc_r()
 		if (BIT(m_inp_mux, i))
 			data |= m_inputs[i]->read();
 
-	// also language switches, hardwired with 4 jumpers
-	// 0(none wired): English, 1: German, 2: French, 4: Spanish, 8:Special(unused)
+	// also language jumpers (hardwired)
+	// 0(no jumper): English, 1: German, 2: French, 4: Spanish, 8: Special(unused)
 	if (~m_led_select & 0x40)
 		data |= *m_language;
 
@@ -346,7 +342,6 @@ void vcc_state::vcc(machine_config &config)
 	// sound hardware
 	SPEAKER(config, "speaker").front_center();
 	S14001A(config, m_speech, 25000); // R/C circuit, around 25khz
-	m_speech->ext_read().set(FUNC(vcc_state::speech_r));
 	m_speech->add_route(ALL_OUTPUTS, "speaker", 0.75);
 }
 
@@ -410,7 +405,7 @@ ROM_START( vcca )
 	ROMX_LOAD("101-64106", 0x0000, 0x2000, CRC(8766e128) SHA1(78c7413bf240159720b131ab70bfbdf4e86eb1e9), ROM_BIOS(3) )
 ROM_END
 
-ROM_START( uvc )
+ROM_START( avcc )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD("101-64017", 0x0000, 0x2000, CRC(f1133abf) SHA1(09dd85051c4e7d364d43507c1cfea5c2d08d37f4) ) // MOS // 101-64017 // 3880
 	ROM_LOAD("101-32010", 0x2000, 0x1000, CRC(624f0cd5) SHA1(7c1a4f4497fe5882904de1d6fecf510c07ee6fc6) ) // NEC P9Z021 // D2332C 228 // 101-32010, == cn19175n_vcc3 on vcc
@@ -448,4 +443,4 @@ ROM_END
 SYST( 1979, vcc,  0,      0,      vcc,     vcc,   vcc_state, empty_init, "Fidelity Electronics", "Voice Chess Challenger (set 1)", MACHINE_SUPPORTS_SAVE )
 SYST( 1979, vcca, vcc,    0,      vcc,     vcc,   vcc_state, empty_init, "Fidelity Electronics", "Voice Chess Challenger (set 2)", MACHINE_SUPPORTS_SAVE )
 
-SYST( 1980, uvc,  vcc,    0,      vcc,     vcc,   vcc_state, empty_init, "Fidelity Electronics", "Advanced Voice Chess Challenger", MACHINE_SUPPORTS_SAVE )
+SYST( 1980, avcc, vcc,    0,      vcc,     vcc,   vcc_state, empty_init, "Fidelity Electronics", "Advanced Voice Chess Challenger", MACHINE_SUPPORTS_SAVE )

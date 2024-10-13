@@ -39,8 +39,8 @@ private:
 	uint8_t ext_r(offs_t offset);
 	void ext_w(offs_t offset, uint8_t data);
 
-	void i8031_mem(address_map &map);
-	void i8031_ext_mem(address_map &map);
+	void i8031_mem(address_map &map) ATTR_COLD;
+	void i8031_ext_mem(address_map &map) ATTR_COLD;
 };
 
 void dynamoah_state::p1_w(uint8_t data)

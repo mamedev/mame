@@ -43,15 +43,15 @@ public:
 	void tim100(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	u8 dma_r(offs_t offset);
 	void sod_w(int state);
 	I8275_DRAW_CHARACTER_MEMBER( crtc_display_pixels );
 
-	void mem_map(address_map &map);
-	void mem_xfer_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
+	void mem_xfer_map(address_map &map) ATTR_COLD;
 
 	required_region_ptr<uint8_t> m_charmap;
 	required_device<i8085a_cpu_device> m_maincpu;

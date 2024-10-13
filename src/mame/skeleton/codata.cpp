@@ -32,8 +32,8 @@ public:
 	void codata(machine_config &config);
 
 private:
-	void mem_map(address_map &map);
-	virtual void machine_reset() override;
+	void mem_map(address_map &map) ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 	required_shared_ptr<u16> m_ram;
 	required_device<cpu_device> m_maincpu;
 };

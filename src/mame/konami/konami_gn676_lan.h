@@ -23,8 +23,8 @@ public:
 protected:
 	konami_gn676_lan_device(const machine_config &mconfig, const device_type type, const char *tag, device_t *owner, uint32_t clock = 0);
 
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	optional_device<x76f041_device> m_x76f041;
 
@@ -65,7 +65,7 @@ public:
 	konami_gn676b_lan_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 protected:
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 };
 
 DECLARE_DEVICE_TYPE(KONAMI_GN676A_LAN, konami_gn676a_lan_device)

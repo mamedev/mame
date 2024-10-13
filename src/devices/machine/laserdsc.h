@@ -208,9 +208,9 @@ protected:
 	virtual void player_overlay(bitmap_yuy16 &bitmap) = 0;
 
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_stop() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_stop() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 	virtual void device_validity_check(validity_checker &valid) const override;
 
 	// device_sound_interface overrides

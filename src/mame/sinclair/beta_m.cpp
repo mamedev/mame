@@ -208,13 +208,16 @@ void beta_disk_device::motors_control()
 void beta_disk_device::floppy_formats(format_registration &fr)
 {
 	fr.add_mfm_containers();
+	fr.add_pc_formats();
 	fr.add(FLOPPY_TRD_FORMAT);
 }
 
 static void beta_disk_floppies(device_slot_interface &device)
 {
+	device.option_add("525hd", FLOPPY_525_HD);
 	device.option_add("525qd", FLOPPY_525_QD);
 	device.option_add("35hd", FLOPPY_35_HD);
+	device.option_add("35dd", FLOPPY_35_DD);
 }
 
 

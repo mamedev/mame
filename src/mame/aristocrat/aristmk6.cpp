@@ -156,10 +156,10 @@ private:
 	uint64_t hwver_r();
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	virtual void video_start() override;
-	virtual void machine_reset() override;
-	void aristmk6_map(address_map &map);
-	void aristmk6_port(address_map &map);
+	virtual void video_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	void aristmk6_map(address_map &map) ATTR_COLD;
+	void aristmk6_port(address_map &map) ATTR_COLD;
 
 	u8 irl0pend = 0, irl0en = 0;
 	u8 irl1pend = 0, irl1en = 0;

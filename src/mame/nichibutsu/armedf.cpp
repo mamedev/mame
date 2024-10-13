@@ -1330,6 +1330,7 @@ void bigfghtr_state::bigfghtr(machine_config &config)
 	sound_config_3812(config);
 }
 
+
 /*************************************
  *
  *  ROM definition(s)

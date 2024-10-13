@@ -111,10 +111,10 @@ private:
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( cart_load );
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	virtual void machine_reset() override;
-	virtual void machine_start() override;
-	void rx78_io(address_map &map);
-	void rx78_mem(address_map &map);
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void machine_start() override ATTR_COLD;
+	void rx78_io(address_map &map) ATTR_COLD;
+	void rx78_mem(address_map &map) ATTR_COLD;
 
 	u8 m_vram_read_bank = 0U;
 	u8 m_vram_write_bank = 0U;
@@ -459,7 +459,7 @@ void rx78_state::machine_start()
 	save_pointer(NAME(m_vram), 0xc000);
 	save_item(NAME(m_vram_read_bank));
 	save_item(NAME(m_vram_write_bank));
-	save_pointer(NAME(m_pal_reg), 7);
+	save_item(NAME(m_pal_reg));
 	save_item(NAME(m_pri_mask));
 	save_item(NAME(m_key_mux));
 	save_item(NAME(m_background));

@@ -3969,6 +3969,19 @@ LZ93A13 (32 pin) - 8KB banks
 		</part>
 	</software>
 
+	<software name="arkanoah">
+		<description>Ark-A-Noah</description>
+		<year>2014</year>
+		<publisher>Matra</publisher>
+		<info name="serial" value="VGC3303"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="0"/>
+			<dataarea name="rom" size="0x10000">
+				<rom name="ark-a-noah - matra.rom" size="0x10000" crc="e6abc354" sha1="f5dcc5d5ea152f081fa8239457a992991c08a711"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="barbduel">
 		<description>Barbarian the Duel</description>
 		<year>2019</year>

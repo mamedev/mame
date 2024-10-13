@@ -157,8 +157,8 @@ private:
 	void txen_w(offs_t offset, uint8_t data) { LOGIO("%s %02x = %02x\n", FUNCNAME, offset, data); }
 	void kbd_reset_w(offs_t offset, uint8_t data) { LOGIO("%s %02x = %02x\n", FUNCNAME, offset, data); }
 	void dreq_w(offs_t offset, uint8_t data) { LOGIO("%s %02x = %02x\n", FUNCNAME, offset, data); }
-	void kron180_iomap(address_map &map);
-	void kron180_mem(address_map &map);
+	void kron180_iomap(address_map &map) ATTR_COLD;
+	void kron180_mem(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	required_region_ptr<uint8_t> m_chargen;

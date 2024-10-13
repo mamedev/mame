@@ -25,6 +25,28 @@ class h8_device;
 class h8_device : public cpu_device, public device_nvram_interface {
 public:
 	enum {
+		H8_PC = 1,
+		H8_R0,
+		H8_R1,
+		H8_R2,
+		H8_R3,
+		H8_R4,
+		H8_R5,
+		H8_R6,
+		H8_R7,
+		H8_E0,
+		H8_E1,
+		H8_E2,
+		H8_E3,
+		H8_E4,
+		H8_E5,
+		H8_E6,
+		H8_E7,
+		H8_CCR,
+		H8_EXR
+	};
+
+	enum {
 		STATE_RESET              = 0x10000,
 		STATE_IRQ                = 0x10001,
 		STATE_TRACE              = 0x10002,
@@ -66,7 +88,8 @@ public:
 	void do_sci_tx(int sci, int state) { m_sci_tx[sci](state); }
 	void do_sci_clk(int sci, int state) { m_sci_clk[sci](state); }
 
-	u64 now_as_cycles() const { return machine().time().as_ticks(clock()) - m_cycles_base; }
+	u64 system_clock() const { return execute_clocks_to_cycles(clock()); }
+	u64 now_as_cycles() const { return machine().time().as_ticks(system_clock()) - m_cycles_base; }
 
 protected:
 	enum {
@@ -113,14 +136,13 @@ protected:
 
 	// device_t implementation
 	virtual void device_config_complete() override;
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// device_execute_interface implementation
 	virtual bool cpu_is_interruptible() const override { return true; }
 	virtual u32 execute_min_cycles() const noexcept override { return 2; }
 	virtual u32 execute_max_cycles() const noexcept override { return 12; }
-	virtual u32 execute_input_lines() const noexcept override { return 0; }
 	virtual bool execute_input_edge_triggered(int inputnum) const noexcept override { return inputnum == INPUT_LINE_NMI; }
 	virtual void execute_run() override;
 
@@ -435,28 +457,6 @@ protected:
 	O(state_irq);
 	O(state_dma);
 #undef O
-};
-
-enum {
-	H8_PC = 1,
-	H8_R0,
-	H8_R1,
-	H8_R2,
-	H8_R3,
-	H8_R4,
-	H8_R5,
-	H8_R6,
-	H8_R7,
-	H8_E0,
-	H8_E1,
-	H8_E2,
-	H8_E3,
-	H8_E4,
-	H8_E5,
-	H8_E6,
-	H8_E7,
-	H8_CCR,
-	H8_EXR
 };
 
 #endif // MAME_CPU_H8_H8_H

@@ -178,8 +178,8 @@ public:
 
 	void init_kenseim();
 
-	DECLARE_CUSTOM_INPUT_MEMBER(cmd_1234_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(cmd_5678_r);
+	ioport_value cmd_1234_r();
+	ioport_value cmd_5678_r();
 	int cmd_9_r();
 	int cmd_req_r();
 	int cmd_LVm_r();
@@ -233,8 +233,8 @@ private:
 
 	void set_leds(uint32_t ledstates);
 
-	void kenseim_io_map(address_map &map);
-	void kenseim_map(address_map &map);
+	void kenseim_io_map(address_map &map) ATTR_COLD;
+	void kenseim_map(address_map &map) ATTR_COLD;
 
 	uint8_t m_to_68k_cmd_low;
 	uint8_t m_to_68k_cmd_d9;
@@ -374,12 +374,12 @@ void kenseim_state::cpu_portc_w(uint8_t data)
 
 /* 68k side COMMS reads */
 
-CUSTOM_INPUT_MEMBER(kenseim_state::cmd_1234_r)
+ioport_value kenseim_state::cmd_1234_r()
 {
 	return (m_to_68k_cmd_low & 0x0f) >> 0;
 }
 
-CUSTOM_INPUT_MEMBER(kenseim_state::cmd_5678_r)
+ioport_value kenseim_state::cmd_5678_r()
 {
 	return (m_to_68k_cmd_low & 0xf0) >> 4;
 }

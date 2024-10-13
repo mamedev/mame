@@ -56,8 +56,8 @@ public:
 	int m_dma_channel = 0; // TODO: move to private once possible
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	required_device_array<ppc_device, 2> m_ppc;
@@ -128,8 +128,8 @@ private:
 
 	pci_connector_device & add_pci_slot(machine_config &config, const char *tag, size_t index, const char *default_tag);
 
-	void main_mem(address_map &map);
-	void slave_mem(address_map &map);
+	void main_mem(address_map &map) ATTR_COLD;
+	void slave_mem(address_map &map) ATTR_COLD;
 
 	[[maybe_unused]] uint32_t scsi53c810_pci_read(int function, int offset, uint32_t mem_mask);
 	[[maybe_unused]] void scsi53c810_pci_write(int function, int offset, uint32_t data, uint32_t mem_mask);

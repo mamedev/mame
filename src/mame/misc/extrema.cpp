@@ -53,8 +53,8 @@ public:
 
 private:
 	required_device<cpu_device> m_maincpu;
-	void extrema_map(address_map &map);
-	void extrema_portmap(address_map &map);
+	void extrema_map(address_map &map) ATTR_COLD;
+	void extrema_portmap(address_map &map) ATTR_COLD;
 };
 
 

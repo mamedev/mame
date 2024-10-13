@@ -7,31 +7,6 @@
 
 #include "mc10_cart.h"
 
-//**************************************************************************
-//  TYPE DEFINITIONS
-//**************************************************************************
-
-// ======================> mc10_pak_device
-
-class mc10_pak_device :
-		public device_t,
-		public device_mc10cart_interface
-{
-public:
-	// construction/destruction
-	mc10_pak_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
-
-	virtual int max_rom_length() const override;
-	virtual std::pair<std::error_condition, std::string> load() override;
-
-protected:
-	mc10_pak_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
-
-	// device_t implementation
-	virtual void device_start() override;
-};
-
-// device type definitions
-DECLARE_DEVICE_TYPE(MC10_PAK, mc10_pak_device)
+DECLARE_DEVICE_TYPE(MC10_PAK, device_mc10cart_interface)
 
 #endif // MAME_BUS_MC10_MC10_PAK_H

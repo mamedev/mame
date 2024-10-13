@@ -90,15 +90,15 @@ private:
 	I8275_DRAW_CHARACTER_MEMBER(display_pixels);
 	TIMER_DEVICE_CALLBACK_MEMBER(kansas_r);
 
-	void io_map(address_map &map);
-	void mem_map(address_map &map);
+	void io_map(address_map &map) ATTR_COLD;
+	void mem_map(address_map &map) ATTR_COLD;
 
 	u8 m_4c = 0U;
 	u8 m_4e = 0U;
 	bool m_txe = false, m_txd = false, m_rts = false, m_casspol = false;
 	u8 m_cass_data[4]{};
-	virtual void machine_reset() override;
-	virtual void machine_start() override;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void machine_start() override ATTR_COLD;
 	std::unique_ptr<u8[]> m_vram;
 	memory_passthrough_handler m_rom_shadow_tap;
 	required_device<cpu_device> m_maincpu;

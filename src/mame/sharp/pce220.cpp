@@ -105,9 +105,9 @@ protected:
 	uint8_t m_port18;
 	uint8_t m_battery_sel;
 
-	virtual void device_resolve_objects() override;
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void device_resolve_objects() override ATTR_COLD;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	TIMER_DEVICE_CALLBACK_MEMBER(pce220_timer_callback);
 
@@ -134,9 +134,9 @@ protected:
 	void irq_mask_w(uint8_t data);
 	void install_bootrom();
 
-	void pce220_io_common(address_map &map);
-	void pce220_io(address_map &map);
-	void pce220_mem(address_map &map);
+	void pce220_io_common(address_map &map) ATTR_COLD;
+	void pce220_io(address_map &map) ATTR_COLD;
+	void pce220_mem(address_map &map) ATTR_COLD;
 };
 
 
@@ -159,7 +159,7 @@ private:
 	void lcdc_data_w(uint8_t data);
 	HD61202_UPDATE_CB(hd61202_1_update);
 	HD61202_UPDATE_CB(hd61202_2_update);
-	void pcg815_io(address_map &map);
+	void pcg815_io(address_map &map) ATTR_COLD;
 };
 
 
@@ -173,8 +173,8 @@ public:
 	void pcg850v(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	uint8_t m_g850v_bank_num = 0;
@@ -183,7 +183,7 @@ private:
 	uint8_t g850v_bank_r();
 	void g850v_rom_bank_w(uint8_t data);
 	void g850v_bank_w(uint8_t data);
-	void pcg850v_io(address_map &map);
+	void pcg850v_io(address_map &map) ATTR_COLD;
 };
 
 

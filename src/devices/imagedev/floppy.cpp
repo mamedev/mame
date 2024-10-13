@@ -45,16 +45,17 @@
 
 #define PITCH_SEEK_SAMPLES 1
 
-#define FLUX_SCREEN 0
-
 #define FLOPSND_TAG "floppysound"
 
 // device type definition
 DEFINE_DEVICE_TYPE(FLOPPY_CONNECTOR, floppy_connector, "floppy_connector", "Floppy drive connector abstraction")
 
 // generic 3" drives
-DEFINE_DEVICE_TYPE(FLOPPY_3_SSDD, floppy_3_ssdd, "floppy_3_ssdd", "3\" single-sided floppy drive")
-DEFINE_DEVICE_TYPE(FLOPPY_3_DSDD, floppy_3_dsdd, "floppy_3_dsdd", "3\" double-sided floppy drive")
+DEFINE_DEVICE_TYPE(FLOPPY_3_SSSD, floppy_3_sssd, "floppy_3_sssd", "3\" single-sided single density floppy drive")
+DEFINE_DEVICE_TYPE(FLOPPY_3_DSSD, floppy_3_dssd, "floppy_3_dssd", "3\" double-sided single density floppy drive")
+DEFINE_DEVICE_TYPE(FLOPPY_3_SSDD, floppy_3_ssdd, "floppy_3_ssdd", "3\" single-sided double density floppy drive")
+DEFINE_DEVICE_TYPE(FLOPPY_3_DSDD, floppy_3_dsdd, "floppy_3_dsdd", "3\" double-sided double density floppy drive")
+DEFINE_DEVICE_TYPE(FLOPPY_3_DSQD, floppy_3_dsqd, "floppy_3_dsqd", "3\" double-sided quad density floppy drive")
 
 // generic 3.5" drives
 DEFINE_DEVICE_TYPE(FLOPPY_35_SSDD, floppy_35_ssdd, "floppy_35_ssdd", "3.5\" single-sided double density floppy drive")
@@ -160,7 +161,6 @@ format_registration::format_registration()
 
 void format_registration::add_fm_containers()
 {
-	add(FLOPPY_HFE_FORMAT);
 	add(FLOPPY_MFM_FORMAT);
 	add(FLOPPY_TD0_FORMAT);
 	add(FLOPPY_IMD_FORMAT);
@@ -212,7 +212,8 @@ floppy_connector::floppy_connector(const machine_config &mconfig, const char *ta
 	device_t(mconfig, FLOPPY_CONNECTOR, tag, owner, clock),
 	device_slot_interface(mconfig, *this),
 	formats(nullptr),
-	m_enable_sound(false)
+	m_enable_sound(false),
+	m_sectoring_type(floppy_image::SOFT)
 {
 }
 
@@ -231,6 +232,7 @@ void floppy_connector::device_config_complete()
 	{
 		dev->set_formats(formats);
 		dev->enable_sound(m_enable_sound);
+		dev->set_sectoring_type(m_sectoring_type);
 	}
 }
 
@@ -253,6 +255,7 @@ floppy_image_device::floppy_image_device(const machine_config &mconfig, device_t
 		m_tracks(0),
 		m_sides(0),
 		m_form_factor(0),
+		m_sectoring_type(floppy_image::SOFT),
 		m_motor_always_on(false),
 		m_dskchg_writable(false),
 		m_has_trk00_sensor(true),
@@ -268,8 +271,7 @@ floppy_image_device::floppy_image_device(const machine_config &mconfig, device_t
 		m_track_dirty(false),
 		m_ready_counter(0),
 		m_make_sound(false),
-		m_sound_out(nullptr),
-		m_flux_screen(*this, "flux")
+		m_sound_out(nullptr)
 {
 	m_extension_list[0] = '\0';
 }
@@ -362,6 +364,72 @@ void floppy_image_device::register_formats()
 	}
 }
 
+void floppy_image_device::add_variant(uint32_t variant)
+{
+	uint32_t actual_variant = variant;
+
+	if (m_sectoring_type == floppy_image::H10) {
+		switch (variant) {
+		case floppy_image::SSSD:
+			actual_variant = floppy_image::SSSD10;
+			break;
+		case floppy_image::SSDD:
+			actual_variant = floppy_image::SSDD10;
+			break;
+		case floppy_image::SSQD:
+			actual_variant = floppy_image::SSQD10;
+			break;
+		case floppy_image::DSSD:
+			actual_variant = floppy_image::DSSD10;
+			break;
+		case floppy_image::DSDD:
+			actual_variant = floppy_image::DSDD10;
+			break;
+		case floppy_image::DSQD:
+			actual_variant = floppy_image::DSQD10;
+			break;
+		}
+	} else if (m_sectoring_type == floppy_image::H16) {
+		switch (variant) {
+		case floppy_image::SSSD:
+			actual_variant = floppy_image::SSDD16;
+			break;
+		case floppy_image::SSDD:
+			actual_variant = floppy_image::SSSD16;
+			break;
+		case floppy_image::SSQD:
+			actual_variant = floppy_image::SSQD16;
+			break;
+		case floppy_image::DSSD:
+			actual_variant = floppy_image::DSSD16;
+			break;
+		case floppy_image::DSDD:
+			actual_variant = floppy_image::DSDD16;
+			break;
+		case floppy_image::DSQD:
+			actual_variant = floppy_image::DSQD16;
+			break;
+		}
+	} else if (m_sectoring_type == floppy_image::H32) {
+		switch (variant) {
+		case floppy_image::SSSD:
+			actual_variant = floppy_image::SSSD32;
+			break;
+		case floppy_image::SSDD:
+			actual_variant = floppy_image::SSDD32;
+			break;
+		case floppy_image::DSSD:
+			actual_variant = floppy_image::DSSD32;
+			break;
+		case floppy_image::DSDD:
+			actual_variant = floppy_image::DSDD32;
+			break;
+		}
+	}
+
+	m_variants.push_back(actual_variant);
+}
+
 void floppy_image_device::set_formats(std::function<void (format_registration &fr)> formats)
 {
 	m_format_registration_cb = formats;
@@ -387,6 +455,16 @@ void floppy_image_device::set_rpm(float _rpm)
 	m_angular_speed = m_rpm/60.0*2e8;
 }
 
+void floppy_image_device::set_sectoring_type(uint32_t sectoring_type)
+{
+	m_sectoring_type = sectoring_type;
+}
+
+uint32_t floppy_image_device::get_sectoring_type()
+{
+	return m_sectoring_type;
+}
+
 void floppy_image_device::setup_write(const floppy_image_format_t *_output_format)
 {
 	m_output_format = _output_format;
@@ -396,11 +474,6 @@ void floppy_image_device::setup_write(const floppy_image_format_t *_output_forma
 
 void floppy_image_device::commit_image()
 {
-	if(FLUX_SCREEN && m_track_dirty) {
-		flux_image_compute_for_track(((m_cyl << 2) | m_subcyl) >> (2 - m_image->get_resolution()), m_ss);
-		m_track_dirty = false;
-	}
-
 	m_image_dirty = false;
 	if(!m_output_format || !m_output_format->supports_save())
 		return;
@@ -494,29 +567,6 @@ void floppy_image_device::device_start()
 	save_item(NAME(m_image_dirty));
 	save_item(NAME(m_ready_counter));
 	save_item(NAME(m_phases));
-
-	if(FLUX_SCREEN) {
-		m_flux_per_pixel_infos.resize(flux_screen_sx*flux_screen_sy);
-		flux_per_pixel_info *ppi = m_flux_per_pixel_infos.data();
-		for(int y = 0; y != flux_screen_sy; y++) {
-			int head = y >= flux_screen_sy / 2 ? 1 : 0;
-			int yc = (flux_screen_sy/2-1)/2 + (flux_screen_sy/2)*head;
-			int dy = y - yc;
-			for(int x = 0; x != flux_screen_sx; x++) {
-				const int xc = (flux_screen_sx - 1)/2;
-				int dx = x - xc;
-				int r = int(sqrt(dx*dx + dy*dy) + 0.5);
-				ppi->m_r = r;
-				if(r > flux_max_r || r < flux_min_r)
-					ppi->m_position = 0xffffffff;
-				else
-					ppi->m_position = int((200e6 / 2 / M_PI) * atan2(dy, dx) + 100000000.5) % 200000000;
-				ppi->m_combined_track = 0;
-				ppi->m_color = 0;
-				ppi ++;
-			}
-		}
-	}
 }
 
 void floppy_image_device::device_reset()
@@ -623,145 +673,7 @@ std::pair<std::error_condition, std::string> floppy_image_device::call_load()
 	if (!m_cur_load_cb.isnull())
 		m_cur_load_cb(this);
 
-	flux_image_prepare();
-
 	return std::make_pair(std::error_condition(), std::string());
-}
-
-void floppy_image_device::flux_image_prepare()
-{
-	if(!FLUX_SCREEN)
-		return;
-
-	int tracks = 0, heads = 0, rez = 0;
-	m_image->get_maximal_geometry(tracks, heads);
-	rez = m_image->get_resolution();
-
-	int trackm = (tracks - 1) << rez;
-	int tmask = (1 << rez) - 1;
-
-	m_flux_per_combined_track_infos.clear();
-	m_flux_per_combined_track_infos.resize(trackm+1);
-	for(int track = 0; track <= trackm; track++) {
-		int refr = 200 + (trackm - 0.5 - track) * 290 / (trackm+1) + 200;
-		int span = int((200e6 / 2 / M_PI) / refr);
-		m_flux_per_combined_track_infos[track].m_span = span;
-		m_flux_per_combined_track_infos[track].m_track = track >> rez;
-		m_flux_per_combined_track_infos[track].m_subtrack = track & tmask;
-	}
-
-	flux_per_pixel_info *ppi = m_flux_per_pixel_infos.data();
-	for(int head = 0; head != heads; head++)
-		for(unsigned int i=0; i != flux_screen_sx*flux_screen_sy/2; i++) {
-			if(ppi->m_position != 0xffffffff) {
-				int trk = (trackm + 1) * (flux_max_r - ppi->m_r) / (flux_max_r - flux_min_r + 1);
-				ppi->m_combined_track = trk;
-				m_flux_per_combined_track_infos[trk].m_pixels[head].push_back(ppi);
-			}
-			ppi++;
-		}
-
-	for(auto &t : m_flux_per_combined_track_infos) {
-		std::sort(t.m_pixels[0].begin(), t.m_pixels[0].end(), [](const flux_per_pixel_info *a, const flux_per_pixel_info *b) -> bool { return a->m_position < b->m_position; });
-		if(heads == 2)
-			std::sort(t.m_pixels[1].begin(), t.m_pixels[1].end(), [](const flux_per_pixel_info *a, const flux_per_pixel_info *b) -> bool { return a->m_position < b->m_position; });
-	}
-
-	for(int head = 0; head != heads; head++)
-		for(int track = 0; track <= trackm; track++)
-			flux_image_compute_for_track(track, head);
-}
-
-void floppy_image_device::flux_image_compute_for_track(int track, int head)
-{
-	auto *pcti = m_flux_per_combined_track_infos.data() + track;
-	const std::vector<uint32_t> &buffer = m_image->get_buffer(pcti->m_track, head, pcti->m_subtrack);
-	int sz = buffer.size();
-	if(!sz) {
-		for(flux_per_pixel_info *p : m_flux_per_combined_track_infos[track].m_pixels[head])
-			p->m_color = 255;
-		return;
-	}
-
-	int spos = pcti->m_pixels[head][0]->m_position - pcti->m_span + 200000000;
-	int bpos = sz;
-	while(bpos && (buffer[bpos-1] & floppy_image::TIME_MASK) < spos)
-		bpos --;
-	if(bpos == sz)
-		bpos = 0;
-
-	int pspos = spos;
-	for(flux_per_pixel_info *p : m_flux_per_combined_track_infos[track].m_pixels[head]) {
-		int spos = p->m_position - pcti->m_span;
-		int epos = p->m_position + pcti->m_span;
-		if(spos < 0)
-			spos += 200000000;
-		if(epos >= 200000000)
-			epos -= 200000000;
-
-		if(spos < pspos)
-			bpos = 0;
-		while(bpos != sz-1 && (buffer[bpos+1] & floppy_image::TIME_MASK) < spos)
-			bpos ++;
-
-		int bpos2 = spos < epos ? bpos : 0;
-		while(bpos2 != sz-1 && (buffer[bpos2+1] & floppy_image::TIME_MASK) < epos)
-			bpos2 ++;
-
-		int count;
-		if(bpos <= bpos2)
-			count = bpos2 - bpos;
-		else {
-			count = (sz - 1 - bpos) + bpos2;
-			if((buffer[0] ^ buffer[sz-1]) & floppy_image::MG_MASK)
-				count ++;
-		}
-
-		count *= 5;
-		if(count > 255)
-			count = 255;
-		p->m_color = 255 - count;
-		pspos = spos;
-	}
-}
-
-uint32_t floppy_image_device::flux_screen_update(screen_device &device, bitmap_rgb32 &bitmap, const rectangle &cliprect)
-{
-	if(m_image.get()) {
-		int ctrack = ((m_cyl << 2) | m_subcyl) >> (2 - m_image->get_resolution());
-		if(m_mon)
-			ctrack = -1;
-		for(int y = cliprect.min_y; y <= cliprect.max_y; y++) {
-			int head = y >= flux_screen_sy / 2;
-			flux_per_pixel_info *ppi = m_flux_per_pixel_infos.data() + y * flux_screen_sx + cliprect.min_x;
-			uint32_t *p = &bitmap.pix(y, cliprect.min_x);
-			for(int x = cliprect.min_x; x <= cliprect.max_x; x++) {
-				if(ppi->m_position == 0xffffffff)
-					*p++ = 0;
-				else {
-					u32 color = 0x010101 * ppi->m_color;
-					if(ppi->m_combined_track == ctrack && head == m_ss)
-						color &= 0x0000ff;
-					*p++ = color;
-				}
-				ppi++;
-			}
-		}
-	} else {
-		for(int y = cliprect.min_y; y <= cliprect.max_y; y++) {
-			flux_per_pixel_info *ppi = m_flux_per_pixel_infos.data() + y * flux_screen_sx + cliprect.min_x;
-			uint32_t *p = &bitmap.pix(y, cliprect.min_x);
-			for(int x = cliprect.min_x; x <= cliprect.max_x; x++) {
-				if(ppi->m_position == 0xffffffff)
-					*p++ = 0;
-				else
-					*p++ = 0x404040;
-				ppi++;
-			}
-		}
-	}
-
-	return 0;
 }
 
 void floppy_image_device::call_unload()
@@ -818,8 +730,6 @@ std::pair<std::error_condition, std::string> floppy_image_device::call_create(in
 	}
 
 	init_floppy_load(true);
-
-	flux_image_prepare();
 
 	return std::make_pair(std::error_condition(), std::string());
 }
@@ -916,13 +826,20 @@ TIMER_CALLBACK_MEMBER(floppy_image_device::index_resync)
 	}
 	int position = int(delta.as_double()*m_angular_speed + 0.5);
 
-	int new_idx = position < 2000000;
+	uint32_t last_index = 0, next_index = 200000000;
+	// if hard-sectored floppy, has extra IDX pulses
+	if(m_image)
+		m_image->find_index_hole(position, last_index, next_index);
+	int new_idx = position - last_index < 2000000;
 
 	if(new_idx) {
-		attotime index_up_time = attotime::from_double(2000000/m_angular_speed);
+		uint32_t index_up = last_index + 2000000;
+		attotime index_up_time = attotime::from_double(index_up/m_angular_speed);
 		m_index_timer->adjust(index_up_time - delta);
-	} else
-		m_index_timer->adjust(m_rev_time - delta);
+	} else {
+		attotime next_index_time = next_index >= 200000000 ? m_rev_time : attotime::from_double(next_index/m_angular_speed);
+		m_index_timer->adjust(next_index_time - delta);
+	}
 
 	if(new_idx != m_idx) {
 		m_idx = new_idx;
@@ -960,11 +877,6 @@ void floppy_image_device::check_led()
 		m_cur_led_cb(this, (m_ds == m_drive_index) && !m_ready ? 1 : 0);
 }
 
-double floppy_image_device::get_pos()
-{
-	return m_index_timer->elapsed().as_double();
-}
-
 bool floppy_image_device::twosid_r()
 {
 	int tracks = 0, heads = 0;
@@ -972,6 +884,22 @@ bool floppy_image_device::twosid_r()
 	if (m_image) m_image->get_actual_geometry(tracks, heads);
 
 	return heads == 1;
+}
+
+bool floppy_image_device::floppy_is_hd()
+{
+	if (!m_image)
+		return false;
+	u32 const variant = m_image->get_variant();
+	return variant == floppy_image::DSHD;
+}
+
+bool floppy_image_device::floppy_is_ed()
+{
+	if (!m_image)
+		return false;
+	u32 const variant = m_image->get_variant();
+	return variant == floppy_image::DSED;
 }
 
 void floppy_image_device::track_changed()
@@ -989,11 +917,6 @@ void floppy_image_device::stp_w(int state)
 		cache_clear();
 		m_stp = state;
 		if ( m_stp == 0 ) {
-			if(FLUX_SCREEN && m_track_dirty) {
-				flux_image_compute_for_track(((m_cyl << 2) | m_subcyl) >> (2 - m_image->get_resolution()), m_ss);
-				m_track_dirty = false;
-			}
-
 			int ocyl = m_cyl;
 			if ( m_dir ) {
 				if ( m_cyl ) m_cyl--;
@@ -1049,11 +972,6 @@ void floppy_image_device::seek_phase_w(int _phases)
 		next_pos = 0;
 	else if(next_pos > (m_tracks-1)*4)
 		next_pos = (m_tracks-1)*4;
-
-	if(FLUX_SCREEN && m_track_dirty) {
-		flux_image_compute_for_track(((m_cyl << 2) | m_subcyl) >> (2 - m_image->get_resolution()), m_ss);
-		m_track_dirty = false;
-	}
 
 	m_cyl = next_pos >> 2;
 	m_subcyl = next_pos & 3;
@@ -1785,14 +1703,6 @@ void floppy_image_device::device_add_mconfig(machine_config &config)
 {
 	SPEAKER(config, FLOPSPK).front_center();
 	FLOPPYSOUND(config, FLOPSND_TAG, 44100).add_route(ALL_OUTPUTS, FLOPSPK, 0.5);
-
-	if (FLUX_SCREEN)
-	{
-		SCREEN(config, m_flux_screen, SCREEN_TYPE_RASTER);
-		m_flux_screen->set_screen_update(FUNC(floppy_image_device::flux_screen_update));
-		m_flux_screen->set_raw(30*(flux_screen_sx+1)*(flux_screen_sy+1), flux_screen_sx+1, 0, flux_screen_sx, flux_screen_sy+1, 0, flux_screen_sy);
-		m_flux_screen->set_physical_aspect(1, 2);
-	}
 }
 
 
@@ -1802,6 +1712,53 @@ DEFINE_DEVICE_TYPE(FLOPPYSOUND, floppy_sound_device, "flopsnd", "Floppy sound")
 //**************************************************************************
 //  GENERIC FLOPPY DRIVE DEFINITIONS
 //**************************************************************************
+
+//-------------------------------------------------
+//  3" single-sided single density
+//-------------------------------------------------
+
+floppy_3_sssd::floppy_3_sssd(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	floppy_image_device(mconfig, FLOPPY_3_SSSD, tag, owner, clock)
+{
+}
+
+floppy_3_sssd::~floppy_3_sssd()
+{
+}
+
+void floppy_3_sssd::setup_characteristics()
+{
+	m_form_factor = floppy_image::FF_3;
+	m_tracks = 42;
+	m_sides = 1;
+	set_rpm(300);
+
+	add_variant(floppy_image::SSSD);
+}
+
+//-------------------------------------------------
+//  3" double-sided single density
+//-------------------------------------------------
+
+floppy_3_dssd::floppy_3_dssd(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	floppy_image_device(mconfig, FLOPPY_3_DSSD, tag, owner, clock)
+{
+}
+
+floppy_3_dssd::~floppy_3_dssd()
+{
+}
+
+void floppy_3_dssd::setup_characteristics()
+{
+	m_form_factor = floppy_image::FF_3;
+	m_tracks = 42;
+	m_sides = 2;
+	set_rpm(300);
+
+	add_variant(floppy_image::SSSD);
+	add_variant(floppy_image::DSSD);
+}
 
 //-------------------------------------------------
 //  3" single-sided double density
@@ -1823,7 +1780,8 @@ void floppy_3_ssdd::setup_characteristics()
 	m_sides = 1;
 	set_rpm(300);
 
-	m_variants.push_back(floppy_image::SSDD);
+	add_variant(floppy_image::SSSD);
+	add_variant(floppy_image::SSDD);
 }
 
 //-------------------------------------------------
@@ -1846,8 +1804,37 @@ void floppy_3_dsdd::setup_characteristics()
 	m_sides = 2;
 	set_rpm(300);
 
-	m_variants.push_back(floppy_image::SSDD);
-	m_variants.push_back(floppy_image::DSDD);
+	add_variant(floppy_image::SSSD);
+	add_variant(floppy_image::DSSD);
+	add_variant(floppy_image::SSDD);
+	add_variant(floppy_image::DSDD);
+}
+
+//-------------------------------------------------
+//  3" double-sided quad density
+//-------------------------------------------------
+
+floppy_3_dsqd::floppy_3_dsqd(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	floppy_image_device(mconfig, FLOPPY_3_DSQD, tag, owner, clock)
+{
+}
+
+floppy_3_dsqd::~floppy_3_dsqd()
+{
+}
+
+void floppy_3_dsqd::setup_characteristics()
+{
+	m_form_factor = floppy_image::FF_3;
+	m_tracks = 84;
+	m_sides = 2;
+	set_rpm(300);
+
+	add_variant(floppy_image::SSSD);
+	add_variant(floppy_image::DSSD);
+	add_variant(floppy_image::SSDD);
+	add_variant(floppy_image::DSDD);
+	add_variant(floppy_image::DSQD);
 }
 
 //-------------------------------------------------
@@ -1870,8 +1857,8 @@ void floppy_35_ssdd::setup_characteristics()
 	m_sides = 1;
 	set_rpm(300);
 
-	m_variants.push_back(floppy_image::SSSD);
-	m_variants.push_back(floppy_image::SSDD);
+	add_variant(floppy_image::SSSD);
+	add_variant(floppy_image::SSDD);
 }
 
 //-------------------------------------------------
@@ -1894,9 +1881,9 @@ void floppy_35_dd::setup_characteristics()
 	m_sides = 2;
 	set_rpm(300);
 
-	m_variants.push_back(floppy_image::SSSD);
-	m_variants.push_back(floppy_image::SSDD);
-	m_variants.push_back(floppy_image::DSDD);
+	add_variant(floppy_image::SSSD);
+	add_variant(floppy_image::SSDD);
+	add_variant(floppy_image::DSDD);
 }
 
 //-------------------------------------------------
@@ -1919,10 +1906,10 @@ void floppy_35_hd::setup_characteristics()
 	m_sides = 2;
 	set_rpm(300);
 
-	m_variants.push_back(floppy_image::SSSD);
-	m_variants.push_back(floppy_image::SSDD);
-	m_variants.push_back(floppy_image::DSDD);
-	m_variants.push_back(floppy_image::DSHD);
+	add_variant(floppy_image::SSSD);
+	add_variant(floppy_image::SSDD);
+	add_variant(floppy_image::DSDD);
+	add_variant(floppy_image::DSHD);
 }
 
 //-------------------------------------------------
@@ -1945,11 +1932,11 @@ void floppy_35_ed::setup_characteristics()
 	m_sides = 2;
 	set_rpm(300);
 
-	m_variants.push_back(floppy_image::SSSD);
-	m_variants.push_back(floppy_image::SSDD);
-	m_variants.push_back(floppy_image::DSDD);
-	m_variants.push_back(floppy_image::DSHD);
-	m_variants.push_back(floppy_image::DSED);
+	add_variant(floppy_image::SSSD);
+	add_variant(floppy_image::SSDD);
+	add_variant(floppy_image::DSDD);
+	add_variant(floppy_image::DSHD);
+	add_variant(floppy_image::DSED);
 }
 
 //-------------------------------------------------
@@ -1972,7 +1959,7 @@ void floppy_525_sssd_35t::setup_characteristics()
 	m_sides = 1;
 	set_rpm(300);
 
-	m_variants.push_back(floppy_image::SSSD);
+	add_variant(floppy_image::SSSD);
 }
 
 //-------------------------------------------------
@@ -1995,8 +1982,8 @@ void floppy_525_sd_35t::setup_characteristics()
 	m_sides = 2;
 	set_rpm(300);
 
-	m_variants.push_back(floppy_image::SSSD);
-	m_variants.push_back(floppy_image::DSSD);
+	add_variant(floppy_image::SSSD);
+	add_variant(floppy_image::DSSD);
 }
 
 //-------------------------------------------------
@@ -2020,7 +2007,7 @@ void floppy_525_vtech::setup_characteristics()
 	m_sides = 1;
 	set_rpm(85);
 
-	m_variants.push_back(floppy_image::SSSD);
+	add_variant(floppy_image::SSSD);
 }
 
 //-------------------------------------------------
@@ -2043,7 +2030,7 @@ void floppy_525_sssd::setup_characteristics()
 	m_sides = 1;
 	set_rpm(300);
 
-	m_variants.push_back(floppy_image::SSSD);
+	add_variant(floppy_image::SSSD);
 }
 
 //-------------------------------------------------
@@ -2066,7 +2053,7 @@ void floppy_525_sd::setup_characteristics()
 	m_sides = 2;
 	set_rpm(300);
 
-	m_variants.push_back(floppy_image::SSSD);
+	add_variant(floppy_image::SSSD);
 }
 
 //-------------------------------------------------
@@ -2089,8 +2076,8 @@ void floppy_525_ssdd::setup_characteristics()
 	m_sides = 1;
 	set_rpm(300);
 
-	m_variants.push_back(floppy_image::SSSD);
-	m_variants.push_back(floppy_image::SSDD);
+	add_variant(floppy_image::SSSD);
+	add_variant(floppy_image::SSDD);
 }
 
 //-------------------------------------------------
@@ -2113,9 +2100,9 @@ void floppy_525_dd::setup_characteristics()
 	m_sides = 2;
 	set_rpm(300);
 
-	m_variants.push_back(floppy_image::SSSD);
-	m_variants.push_back(floppy_image::SSDD);
-	m_variants.push_back(floppy_image::DSDD);
+	add_variant(floppy_image::SSSD);
+	add_variant(floppy_image::SSDD);
+	add_variant(floppy_image::DSDD);
 }
 
 //-------------------------------------------------
@@ -2138,9 +2125,9 @@ void floppy_525_ssqd::setup_characteristics()
 	m_sides = 1;
 	set_rpm(300);
 
-	m_variants.push_back(floppy_image::SSSD);
-	m_variants.push_back(floppy_image::SSDD);
-	m_variants.push_back(floppy_image::SSQD);
+	add_variant(floppy_image::SSSD);
+	add_variant(floppy_image::SSDD);
+	add_variant(floppy_image::SSQD);
 }
 
 //-------------------------------------------------
@@ -2163,12 +2150,12 @@ void floppy_525_qd::setup_characteristics()
 	m_sides = 2;
 	set_rpm(300);
 
-	m_variants.push_back(floppy_image::SSSD);
-	m_variants.push_back(floppy_image::SSDD);
-	m_variants.push_back(floppy_image::SSQD);
-	m_variants.push_back(floppy_image::DSSD);
-	m_variants.push_back(floppy_image::DSDD);
-	m_variants.push_back(floppy_image::DSQD);
+	add_variant(floppy_image::SSSD);
+	add_variant(floppy_image::SSDD);
+	add_variant(floppy_image::SSQD);
+	add_variant(floppy_image::DSSD);
+	add_variant(floppy_image::DSDD);
+	add_variant(floppy_image::DSQD);
 }
 
 //-------------------------------------------------
@@ -2191,12 +2178,12 @@ void floppy_525_hd::setup_characteristics()
 	m_sides = 2;
 	set_rpm(360);
 
-	m_variants.push_back(floppy_image::SSSD);
-	m_variants.push_back(floppy_image::SSDD);
-	m_variants.push_back(floppy_image::SSQD);
-	m_variants.push_back(floppy_image::DSDD);
-	m_variants.push_back(floppy_image::DSQD);
-	m_variants.push_back(floppy_image::DSHD);
+	add_variant(floppy_image::SSSD);
+	add_variant(floppy_image::SSDD);
+	add_variant(floppy_image::SSQD);
+	add_variant(floppy_image::DSDD);
+	add_variant(floppy_image::DSQD);
+	add_variant(floppy_image::DSHD);
 }
 
 //-------------------------------------------------
@@ -2220,7 +2207,7 @@ void floppy_8_sssd::setup_characteristics()
 	m_motor_always_on = true;
 	set_rpm(360);
 
-	m_variants.push_back(floppy_image::SSSD);
+	add_variant(floppy_image::SSSD);
 }
 
 //-------------------------------------------------
@@ -2244,8 +2231,8 @@ void floppy_8_dssd::setup_characteristics()
 	m_motor_always_on = true;
 	set_rpm(360);
 
-	m_variants.push_back(floppy_image::SSSD);
-	m_variants.push_back(floppy_image::DSSD);
+	add_variant(floppy_image::SSSD);
+	add_variant(floppy_image::DSSD);
 }
 
 //-------------------------------------------------
@@ -2269,8 +2256,8 @@ void floppy_8_ssdd::setup_characteristics()
 	m_motor_always_on = true;
 	set_rpm(360);
 
-	m_variants.push_back(floppy_image::SSSD);
-	m_variants.push_back(floppy_image::SSDD);
+	add_variant(floppy_image::SSSD);
+	add_variant(floppy_image::SSDD);
 }
 
 //-------------------------------------------------
@@ -2294,9 +2281,9 @@ void floppy_8_dsdd::setup_characteristics()
 	m_motor_always_on = true;
 	set_rpm(360);
 
-	m_variants.push_back(floppy_image::SSSD);
-	m_variants.push_back(floppy_image::SSDD);
-	m_variants.push_back(floppy_image::DSDD);
+	add_variant(floppy_image::SSSD);
+	add_variant(floppy_image::SSDD);
+	add_variant(floppy_image::DSDD);
 }
 
 
@@ -2330,8 +2317,8 @@ void epson_smd_165::setup_characteristics()
 	m_sides = 2;
 	set_rpm(300);
 
-	m_variants.push_back(floppy_image::SSSD);
-	m_variants.push_back(floppy_image::DSSD);
+	add_variant(floppy_image::SSSD);
+	add_variant(floppy_image::DSSD);
 }
 
 //-------------------------------------------------
@@ -2377,9 +2364,9 @@ void epson_sd_320::setup_characteristics()
 	m_sides = 2;
 	set_rpm(300);
 
-	m_variants.push_back(floppy_image::SSSD);
-	m_variants.push_back(floppy_image::SSDD);
-	m_variants.push_back(floppy_image::DSDD);
+	add_variant(floppy_image::SSSD);
+	add_variant(floppy_image::SSDD);
+	add_variant(floppy_image::DSDD);
 }
 
 //-------------------------------------------------
@@ -2405,9 +2392,9 @@ void epson_sd_321::setup_characteristics()
 	m_sides = 2;
 	set_rpm(300);
 
-	m_variants.push_back(floppy_image::SSSD);
-	m_variants.push_back(floppy_image::SSDD);
-	m_variants.push_back(floppy_image::DSDD);
+	add_variant(floppy_image::SSSD);
+	add_variant(floppy_image::SSDD);
+	add_variant(floppy_image::DSDD);
 }
 
 
@@ -2438,9 +2425,9 @@ void pana_ju_363::setup_characteristics()
 	m_dskchg_writable = true;
 	set_rpm(300);
 
-	m_variants.push_back(floppy_image::SSSD);
-	m_variants.push_back(floppy_image::SSDD);
-	m_variants.push_back(floppy_image::DSDD);
+	add_variant(floppy_image::SSSD);
+	add_variant(floppy_image::SSDD);
+	add_variant(floppy_image::DSDD);
 }
 
 //-------------------------------------------------
@@ -2470,8 +2457,8 @@ void sony_oa_d31v::setup_characteristics()
 	m_dskchg_writable = true;
 	set_rpm(600);
 
-	m_variants.push_back(floppy_image::SSSD);
-	m_variants.push_back(floppy_image::SSDD);
+	add_variant(floppy_image::SSSD);
+	add_variant(floppy_image::SSDD);
 }
 
 //-------------------------------------------------
@@ -2502,9 +2489,9 @@ void sony_oa_d32w::setup_characteristics()
 	m_dskchg_writable = true;
 	set_rpm(600);
 
-	m_variants.push_back(floppy_image::SSSD);
-	m_variants.push_back(floppy_image::SSDD);
-	m_variants.push_back(floppy_image::DSDD);
+	add_variant(floppy_image::SSSD);
+	add_variant(floppy_image::SSDD);
+	add_variant(floppy_image::DSDD);
 }
 
 //-------------------------------------------------
@@ -2535,8 +2522,8 @@ void sony_oa_d32v::setup_characteristics()
 	m_dskchg_writable = true;
 	set_rpm(600);
 
-	m_variants.push_back(floppy_image::SSSD);
-	m_variants.push_back(floppy_image::SSDD);
+	add_variant(floppy_image::SSSD);
+	add_variant(floppy_image::SSDD);
 }
 
 //-------------------------------------------------
@@ -2565,7 +2552,7 @@ void teac_fd_30a::setup_characteristics()
 	m_sides = 1;
 	set_rpm(300);
 
-	m_variants.push_back(floppy_image::SSDD);
+	add_variant(floppy_image::SSDD);
 }
 
 //-------------------------------------------------
@@ -2594,8 +2581,8 @@ void teac_fd_55a::setup_characteristics()
 	m_sides = 1;
 	set_rpm(300);
 
-	m_variants.push_back(floppy_image::SSSD);
-	m_variants.push_back(floppy_image::SSDD);
+	add_variant(floppy_image::SSSD);
+	add_variant(floppy_image::SSDD);
 }
 
 //-------------------------------------------------
@@ -2624,10 +2611,10 @@ void teac_fd_55b::setup_characteristics()
 	m_sides = 2;
 	set_rpm(300);
 
-	m_variants.push_back(floppy_image::SSSD);
-	m_variants.push_back(floppy_image::SSDD);
-	m_variants.push_back(floppy_image::DSSD);
-	m_variants.push_back(floppy_image::DSDD);
+	add_variant(floppy_image::SSSD);
+	add_variant(floppy_image::SSDD);
+	add_variant(floppy_image::DSSD);
+	add_variant(floppy_image::DSDD);
 }
 
 //-------------------------------------------------
@@ -2656,9 +2643,9 @@ void teac_fd_55e::setup_characteristics()
 	m_sides = 1;
 	set_rpm(300);
 
-	m_variants.push_back(floppy_image::SSSD);
-	m_variants.push_back(floppy_image::SSDD);
-	m_variants.push_back(floppy_image::SSQD);
+	add_variant(floppy_image::SSSD);
+	add_variant(floppy_image::SSDD);
+	add_variant(floppy_image::SSQD);
 }
 
 //-------------------------------------------------
@@ -2687,12 +2674,12 @@ void teac_fd_55f::setup_characteristics()
 	m_sides = 2;
 	set_rpm(300);
 
-	m_variants.push_back(floppy_image::SSSD);
-	m_variants.push_back(floppy_image::SSDD);
-	m_variants.push_back(floppy_image::SSQD);
-	m_variants.push_back(floppy_image::DSSD);
-	m_variants.push_back(floppy_image::DSDD);
-	m_variants.push_back(floppy_image::DSQD);
+	add_variant(floppy_image::SSSD);
+	add_variant(floppy_image::SSDD);
+	add_variant(floppy_image::SSQD);
+	add_variant(floppy_image::DSSD);
+	add_variant(floppy_image::DSDD);
+	add_variant(floppy_image::DSQD);
 }
 
 //-------------------------------------------------
@@ -2721,12 +2708,12 @@ void teac_fd_55g::setup_characteristics()
 	m_sides = 2;
 	set_rpm(360);
 
-	m_variants.push_back(floppy_image::SSSD);
-	m_variants.push_back(floppy_image::SSDD);
-	m_variants.push_back(floppy_image::SSQD);
-	m_variants.push_back(floppy_image::DSDD);
-	m_variants.push_back(floppy_image::DSQD);
-	m_variants.push_back(floppy_image::DSHD);
+	add_variant(floppy_image::SSSD);
+	add_variant(floppy_image::SSDD);
+	add_variant(floppy_image::SSQD);
+	add_variant(floppy_image::DSDD);
+	add_variant(floppy_image::DSQD);
+	add_variant(floppy_image::DSHD);
 }
 
 //-------------------------------------------------
@@ -2752,7 +2739,7 @@ void alps_3255190x::setup_characteristics()
 	set_rpm(300);
 	m_cyl = 34;
 
-	m_variants.push_back(floppy_image::SSSD);
+	add_variant(floppy_image::SSSD);
 }
 
 //-------------------------------------------------
@@ -2777,7 +2764,7 @@ void ibm_6360::setup_characteristics()
 	m_has_trk00_sensor = false;
 	set_rpm(360);
 
-	m_variants.push_back(floppy_image::SSSD);
+	add_variant(floppy_image::SSSD);
 }
 
 
@@ -3019,7 +3006,7 @@ void oa_d34v_device::setup_characteristics()
 	m_sides = 1;
 	set_rpm(394);
 
-	m_variants.push_back(floppy_image::SSDD);
+	add_variant(floppy_image::SSDD);
 }
 
 bool oa_d34v_device::is_2m() const
@@ -3045,8 +3032,8 @@ void mfd51w_device::setup_characteristics()
 	m_sides = 2;
 	set_rpm(394);
 
-	m_variants.push_back(floppy_image::SSDD);
-	m_variants.push_back(floppy_image::DSDD);
+	add_variant(floppy_image::SSDD);
+	add_variant(floppy_image::DSDD);
 }
 
 bool mfd51w_device::is_2m() const
@@ -3066,9 +3053,9 @@ void mfd75w_device::setup_characteristics()
 	m_sides = 2;
 	set_rpm(300);
 
-	m_variants.push_back(floppy_image::SSDD);
-	m_variants.push_back(floppy_image::DSDD);
-	m_variants.push_back(floppy_image::DSHD);
+	add_variant(floppy_image::SSDD);
+	add_variant(floppy_image::DSDD);
+	add_variant(floppy_image::DSHD);
 }
 
 bool mfd75w_device::is_2m() const

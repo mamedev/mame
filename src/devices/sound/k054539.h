@@ -60,9 +60,9 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 	virtual void device_clock_changed() override;
-	virtual void device_reset() override;
+	virtual void device_reset() override ATTR_COLD;
 	virtual void device_post_load() override;
 
 	// device_sound_interface overrides
@@ -93,7 +93,6 @@ private:
 	int reverb_pos;
 
 	int32_t cur_ptr;
-	int cur_limit;
 	uint32_t rom_addr;
 
 	channel channels[8];

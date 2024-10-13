@@ -10,6 +10,8 @@
 
 STATUS:
         It runs, keyboard works, you can enter data.
+        Serial console works. You can make it visible by setting Video
+        Options in settings.
 
 Meaning of LEDs:
         PWR = power is turned on
@@ -50,6 +52,7 @@ Official test program from pages 4 to 8 of the operator's manual:
 #include "machine/i8251.h"
 #include "machine/clock.h"
 #include "machine/timer.h"
+#include "bus/rs232/rs232.h"
 #include "imagedev/cassette.h"
 #include "sound/beep.h"
 #include "speaker.h"
@@ -66,6 +69,7 @@ public:
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_uart(*this, "uart")
+		, m_console(*this, "console")
 		, m_cass(*this, "cassette")
 		, m_beep(*this, "beeper")
 		, m_io_keyboard(*this, "X%u", 0U)
@@ -81,8 +85,8 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(button_0);
 
 protected:
-	virtual void machine_reset() override;
-	virtual void machine_start() override;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	u8 portf0_r();
@@ -90,12 +94,13 @@ private:
 	void portf1_w(u8 data);
 	void h8_status_callback(u8 data);
 	void h8_inte_callback(int state);
+	void h8_level3_irq_callback(int state);
 	TIMER_DEVICE_CALLBACK_MEMBER(h8_irq_pulse);
 	TIMER_DEVICE_CALLBACK_MEMBER(kansas_r);
 	TIMER_DEVICE_CALLBACK_MEMBER(kansas_w);
 
-	void io_map(address_map &map);
-	void mem_map(address_map &map);
+	void io_map(address_map &map) ATTR_COLD;
+	void mem_map(address_map &map) ATTR_COLD;
 
 	u8 m_digit = 0U;
 	u8 m_segment = 0U;
@@ -112,6 +117,7 @@ private:
 
 	required_device<i8080_cpu_device> m_maincpu;
 	required_device<i8251_device> m_uart;
+	required_device<i8251_device> m_console;
 	required_device<cassette_image_device> m_cass;
 	required_device<beep_device> m_beep;
 	required_ioport_array<2> m_io_keyboard;
@@ -122,6 +128,16 @@ private:
 	output_finder<> m_run_led;
 };
 
+// The usual baud rate is 600. The H8 supported baud rates from 110 to
+// 9600. You can change the baud rate if it is changed here and in the
+// other places that specify 600 baud.
+static DEVICE_INPUT_DEFAULTS_START(terminal)
+	DEVICE_INPUT_DEFAULTS("RS232_RXBAUD", 0xff, RS232_BAUD_600)
+	DEVICE_INPUT_DEFAULTS("RS232_TXBAUD", 0xff, RS232_BAUD_600)
+	DEVICE_INPUT_DEFAULTS("RS232_DATABITS", 0xff, RS232_DATABITS_8)
+	DEVICE_INPUT_DEFAULTS("RS232_PARITY", 0xff, RS232_PARITY_NONE)
+	DEVICE_INPUT_DEFAULTS("RS232_STOPBITS", 0xff, RS232_STOPBITS_1)
+DEVICE_INPUT_DEFAULTS_END
 
 TIMER_DEVICE_CALLBACK_MEMBER(h8_state::h8_irq_pulse)
 {
@@ -211,8 +227,8 @@ void h8_state::io_map(address_map &map)
 	map(0xf0, 0xf0).rw(FUNC(h8_state::portf0_r), FUNC(h8_state::portf0_w));
 	map(0xf1, 0xf1).w(FUNC(h8_state::portf1_w));
 	map(0xf8, 0xf9).rw(m_uart, FUNC(i8251_device::read), FUNC(i8251_device::write));
-	// optional connection to a serial terminal @ 600 baud
-	//map(0xfa, 0xfb).rw("uart1", FUNC(i8251_device::read), FUNC(i8251_device::write));
+	// Connection to a serial terminal @ 600 baud
+	map(0xfa, 0xfb).rw(m_console, FUNC(i8251_device::read), FUNC(i8251_device::write));
 }
 
 /* Input ports */
@@ -320,6 +336,13 @@ But, all of this can only occur if bit 4 of port F0 is low. */
 	m_run_led = state;
 }
 
+void h8_state::h8_level3_irq_callback(int state)
+{
+	if (state) {
+		m_maincpu->set_input_line_and_vector(INPUT_LINE_IRQ0, ASSERT_LINE, 0xdf); // RST3
+	}
+}
+
 TIMER_DEVICE_CALLBACK_MEMBER(h8_state::kansas_w)
 {
 	m_cass_data[3]++;
@@ -370,9 +393,27 @@ void h8_state::h8(machine_config &config)
 	I8251(config, m_uart, 0);
 	m_uart->txd_handler().set([this] (bool state) { m_cassbit = state; });
 
+	I8251(config, m_console, 0);
+	m_console->txd_handler().set("rs232", FUNC(rs232_port_device::write_txd));
+	m_console->rts_handler().set("rs232", FUNC(rs232_port_device::write_rts));
+	m_console->dtr_handler().set("rs232", FUNC(rs232_port_device::write_dtr));
+	// The RxRdy pin on the 8251 USART is normally jumpered to generate a level 3 i/o interrupt.
+	m_console->rxrdy_handler().set(FUNC(h8_state::h8_level3_irq_callback));
+
+	rs232_port_device &rs232(RS232_PORT(config, "rs232", default_rs232_devices, "terminal"));
+	rs232.rxd_handler().set(m_console, FUNC(i8251_device::write_rxd));
+	rs232.cts_handler().set(m_console, FUNC(i8251_device::write_cts));
+	rs232.dsr_handler().set(m_console, FUNC(i8251_device::write_dsr));
+	rs232.set_option_device_input_defaults("terminal", DEVICE_INPUT_DEFAULTS_NAME(terminal));
+
 	clock_device &cassette_clock(CLOCK(config, "cassette_clock", 4800));
 	cassette_clock.signal_handler().set(m_uart, FUNC(i8251_device::write_txc));
 	cassette_clock.signal_handler().append(m_uart, FUNC(i8251_device::write_rxc));
+
+	// Console UART clock is 16X the baud rate.
+	clock_device &console_clock(CLOCK(config, "console_clock", 600*16));
+	console_clock.signal_handler().set(m_console, FUNC(i8251_device::write_txc));
+	console_clock.signal_handler().append(m_console, FUNC(i8251_device::write_rxc));
 
 	CASSETTE(config, m_cass);
 	m_cass->set_formats(h8_cassette_formats);
@@ -413,5 +454,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT    CLASS,    INIT          COMPANY           FULLNAME                      FLAGS */
+//    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT    CLASS,    INIT        COMPANY          FULLNAME                        FLAGS
 COMP( 1977, h8,   0,      0,      h8,      h8,      h8_state, empty_init, "Heath Company", "Heathkit H8 Digital Computer", MACHINE_SUPPORTS_SAVE )

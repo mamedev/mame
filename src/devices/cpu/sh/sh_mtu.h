@@ -125,8 +125,8 @@ protected:
 	bool m_channel_active;
 	std::array<int, 8> m_count_types;
 
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 	void update_counter(u64 cur_time = 0);
 	void recalc_event(u64 cur_time = 0);
 };
@@ -172,8 +172,8 @@ protected:
 	u8 m_tstr, m_tsyr, m_toer, m_tocr, m_tgcr;
 	u16 m_tcdr, m_tddr, m_tcnts, m_tcbr;
 
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 };
 
 DECLARE_DEVICE_TYPE(SH_MTU, sh_mtu_device)

@@ -581,17 +581,6 @@ uint32_t m6805_base_device::execute_max_cycles() const noexcept
 }
 
 
-//-------------------------------------------------
-//  execute_input_lines - return the number of
-//  input/interrupt lines
-//-------------------------------------------------
-
-uint32_t m6805_base_device::execute_input_lines() const noexcept
-{
-	return 9;
-}
-
-
 /* execute instructions on this CPU until icount expires */
 void m6805_base_device::execute_run()
 {

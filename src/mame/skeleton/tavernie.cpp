@@ -91,7 +91,7 @@ protected:
 	void pa_w(u8 data);
 	void pb_w(u8 data);
 	TIMER_DEVICE_CALLBACK_MEMBER(kansas_r);
-	void cpu09_mem(address_map &map);
+	void cpu09_mem(address_map &map) ATTR_COLD;
 	u8 m_pa = 0U;
 	bool m_cassold = false;
 	required_device<cpu_device> m_maincpu;
@@ -101,8 +101,8 @@ protected:
 	required_device<ptm6840_device> m_ptm;
 
 private:
-	virtual void machine_reset() override;
-	virtual void machine_start() override;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void machine_start() override ATTR_COLD;
 };
 
 class ivg09_state : public cpu09_state
@@ -122,10 +122,10 @@ public:
 	void ivg09(machine_config &config);
 
 private:
-	virtual void machine_reset() override;
-	virtual void machine_start() override;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void machine_start() override ATTR_COLD;
 	void ivg09_palette(palette_device &palette) const;
-	void ivg09_mem(address_map &map);
+	void ivg09_mem(address_map &map) ATTR_COLD;
 	void pa_ivg_w(u8 data);
 	u8 pb_ivg_r();
 	void vram_w(offs_t offset, u8 data);

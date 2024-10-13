@@ -42,16 +42,16 @@ public:
 	void pss680(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	u8 busy_r();
 	void bank_w(u8 data);
 
-	void common_map(address_map &map);
-	void psr16_map(address_map &map);
-	void psr36_map(address_map &map);
-	void pss680_map(address_map &map);
+	void common_map(address_map &map) ATTR_COLD;
+	void psr16_map(address_map &map) ATTR_COLD;
+	void psr36_map(address_map &map) ATTR_COLD;
+	void pss680_map(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	optional_memory_bank m_rombank;

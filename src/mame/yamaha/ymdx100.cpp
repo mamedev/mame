@@ -273,12 +273,12 @@ public:
 	void dx100(machine_config &config);
 
 	void led_w(int state)                  { m_led = state; }
-	DECLARE_CUSTOM_INPUT_MEMBER(midi_in_r) { return m_midi_in; }
+	ioport_value midi_in_r() { return m_midi_in; }
 
 protected:
 	virtual void driver_start() override;
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	HD44780_PIXEL_UPDATE(lcd_pixel_update);
@@ -286,7 +286,7 @@ private:
 
 	void p22_w(int state);
 
-	void mem_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
 
 	required_device<hd6303x_cpu_device> m_maincpu;
 	required_device<m58990_device> m_adc;

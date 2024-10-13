@@ -95,8 +95,8 @@ protected:
 	riscii_series_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, unsigned addrbits, unsigned pcbits, unsigned bankbits, u8 maxbank, u8 post_id_mask, address_map_constructor regs);
 
 	// device_t implementation
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// device_execute_interface implementation
 	virtual void execute_run() override;
@@ -108,7 +108,7 @@ protected:
 	// device_state_interface implementation
 	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
 
-	void core_regs_map(address_map &map);
+	void core_regs_map(address_map &map) ATTR_COLD;
 
 	// register handlers
 	u8 fsr0_r();
@@ -399,7 +399,7 @@ protected:
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 
 private:
-	void regs_map(address_map &map);
+	void regs_map(address_map &map) ATTR_COLD;
 };
 
 DECLARE_DEVICE_TYPE(EPG3231, epg3231_device)

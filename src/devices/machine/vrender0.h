@@ -34,14 +34,14 @@ public:
 	// construction/destruction
 	vr0uart_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	void regs_map(address_map &map);
+	void regs_map(address_map &map) ATTR_COLD;
 	void set_channel_num(int ch) { m_channel_num = ch; }
 	void set_parent(vrender0soc_device *parent) { m_parent = parent; }
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 private:
 	uint32_t control_r();
@@ -81,10 +81,10 @@ public:
 	// construction/destruction
 	vrender0soc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	void regs_map(address_map &map);
-	void audiovideo_map(address_map &map);
-	void texture_map(address_map &map);
-	void frame_map(address_map &map);
+	void regs_map(address_map &map) ATTR_COLD;
+	void audiovideo_map(address_map &map) ATTR_COLD;
+	void texture_map(address_map &map) ATTR_COLD;
+	void frame_map(address_map &map) ATTR_COLD;
 	template<class T> void set_host_cpu_tag(T &&tag) { m_host_cpu.set_tag(std::forward<T>(tag)); }
 	void set_external_vclk(const uint32_t vclk) { m_ext_vclk = vclk; }
 	void set_external_vclk(const XTAL vclk) { m_ext_vclk = vclk.value(); }
@@ -100,9 +100,9 @@ public:
 protected:
 	// device-level overrides
 	//virtual void device_validity_check(validity_checker &valid) const override;
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 private:
 	required_device <se3208_device> m_host_cpu;

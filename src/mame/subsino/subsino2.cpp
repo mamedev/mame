@@ -149,7 +149,7 @@ public:
 	void init_tbonusal();
 
 protected:
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	void ss9601_byte_lo_w(uint8_t data);
@@ -227,17 +227,17 @@ private:
 	TILE_GET_INFO_MEMBER(ss9601_get_tile_info_1);
 	uint32_t screen_update_subsino2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void bishjan_map(address_map &map);
-	void mtrain_io(address_map &map);
-	void mtrain_base_map(address_map &map);
-	void mtrain_map(address_map &map);
-	void tbonusal_map(address_map &map);
-	void new2001_map(address_map &map);
-	void ramdac_map(address_map &map);
-	void saklove_io(address_map &map);
-	void saklove_map(address_map &map);
-	void xplan_io(address_map &map);
-	void xplan_map(address_map &map);
+	void bishjan_map(address_map &map) ATTR_COLD;
+	void mtrain_io(address_map &map) ATTR_COLD;
+	void mtrain_base_map(address_map &map) ATTR_COLD;
+	void mtrain_map(address_map &map) ATTR_COLD;
+	void tbonusal_map(address_map &map) ATTR_COLD;
+	void new2001_map(address_map &map) ATTR_COLD;
+	void ramdac_map(address_map &map) ATTR_COLD;
+	void saklove_io(address_map &map) ATTR_COLD;
+	void saklove_map(address_map &map) ATTR_COLD;
+	void xplan_io(address_map &map) ATTR_COLD;
+	void xplan_map(address_map &map) ATTR_COLD;
 
 	virtual void machine_start() override { m_leds.resolve(); }
 
@@ -2787,7 +2787,7 @@ void subsino2_state::bishjan(machine_config &config)
 	io.in_port_callback<9>().set_ioport("RESET");
 	io.out_port_callback<9>().set(FUNC(subsino2_state::bishjan_outputs_w));
 
-	TICKET_DISPENSER(config, m_hopper, attotime::from_msec(200), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH);
+	TICKET_DISPENSER(config, m_hopper, attotime::from_msec(200));
 
 	DS2430A(config, m_eeprom).set_timing_scale(0.24);
 
@@ -3028,14 +3028,14 @@ void subsino2_state::xtrain(machine_config &config)
 	io.out_port_callback<8>().set(FUNC(subsino2_state::xtrain_out_b_w)); // B
 	io.out_port_callback<9>().set(FUNC(subsino2_state::xtrain_out_a_w)); // A
 
-	HOPPER(config, m_hopper, attotime::from_msec(200), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH);
+	HOPPER(config, m_hopper, attotime::from_msec(200));
 }
 
 void subsino2_state::ptrain(machine_config &config)
 {
 	xtrain(config);
 
-	TICKET_DISPENSER(config, m_ticket, attotime::from_msec(200), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH);
+	TICKET_DISPENSER(config, m_ticket, attotime::from_msec(200));
 }
 
 void subsino2_state::expcard(machine_config &config)

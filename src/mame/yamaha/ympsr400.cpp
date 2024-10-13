@@ -28,13 +28,13 @@ public:
 
 protected:
 	virtual void driver_start() override;
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	TIMER_CALLBACK_MEMBER(interrupt_hack);
 
-	void program_map(address_map &map);
-	void data_map(address_map &map);
+	void program_map(address_map &map) ATTR_COLD;
+	void data_map(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_mpscpu;

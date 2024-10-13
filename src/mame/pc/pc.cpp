@@ -91,12 +91,12 @@ private:
 	static void cfg_single_360K(device_t *device);
 	static void cfg_single_720K(device_t *device);
 
-	void pc16_io(address_map &map);
-	void pc16_map(address_map &map);
-	void pc8_io(address_map &map);
-	void pc8_map(address_map &map);
-	void pc8_flash_map(address_map &map);
-	void zenith_map(address_map &map);
+	void pc16_io(address_map &map) ATTR_COLD;
+	void pc16_map(address_map &map) ATTR_COLD;
+	void pc8_io(address_map &map) ATTR_COLD;
+	void pc8_map(address_map &map) ATTR_COLD;
+	void pc8_flash_map(address_map &map) ATTR_COLD;
+	void zenith_map(address_map &map) ATTR_COLD;
 };
 
 void pc_state::pc8_map(address_map &map)

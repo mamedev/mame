@@ -56,7 +56,7 @@ public:
 
 private:
 
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 	uint8_t keypad_r(offs_t offset);
 	void display_w(offs_t offset, uint8_t data);
@@ -66,7 +66,7 @@ private:
 	uint8_t pia_br();
 	void pia_bw(uint8_t data);
 
-	void mem_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<pia6821_device> m_pia;

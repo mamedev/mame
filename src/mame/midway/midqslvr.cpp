@@ -320,7 +320,7 @@ private:
 	// optional for debugging ...
 	optional_device<voodoo_2_pci_device> m_voodoo2;
 
-	void midqslvr_map(address_map &map);
+	void midqslvr_map(address_map &map) ATTR_COLD;
 
 	static void superio_config(device_t *device);
 };
@@ -338,7 +338,7 @@ public:
 private:
 	required_device<pentium3_device> m_maincpu;
 
-	void graphite_map(address_map &map);
+	void graphite_map(address_map &map) ATTR_COLD;
 };
 
 

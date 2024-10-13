@@ -15,7 +15,7 @@ TODO:
 - hook up csce I/O properly, it doesn't have PIAs
 - verify super9cc maskrom dump
 
-********************************************************************************
+================================================================================
 
 Champion Sensory Chess Challenger (CSC)
 ---------------------------------------
@@ -158,7 +158,7 @@ The lone LED is connected to digit 1 common
 
 All three of the above are called "segment H".
 
-********************************************************************************
+================================================================================
 
 Elite Champion Challenger (ELITE)
 This is a limited-release chess computer based on the CSC. They removed the PIAs
@@ -172,7 +172,7 @@ The "Fidelity X" that won the 1981 Travemünde contest is also on this hardware,
 a 5MHz CPU and 32KB total ROM size. In the 90s, Wilfried Bucke provided an upgrade
 kit for csce to make it similar to this version, CPU was changed to a R65C02P4.
 
-********************************************************************************
+================================================================================
 
 Super 9 Sensory Chess Challenger (SU9/DS9)
 This is basically the Fidelity Elite A/S program on CSC hardware.
@@ -188,7 +188,7 @@ See CSC description above for more information.
 
 Like with EAS, the new game command for SU9 is: RE -> D6 (or D8) -> CL.
 
-********************************************************************************
+================================================================================
 
 Reversi Sensory Challenger (RSC)
 The 1st version came out in 1980, a program revision was released in 1981.
@@ -238,7 +238,6 @@ public:
 		m_display(*this, "display"),
 		m_dac(*this, "dac"),
 		m_speech(*this, "speech"),
-		m_speech_rom(*this, "speech"),
 		m_language(*this, "language"),
 		m_inputs(*this, "IN.%u", 0)
 	{ }
@@ -254,7 +253,7 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(rsc_init_board);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 	// devices/pointers
 	required_device<cpu_device> m_maincpu;
@@ -263,26 +262,23 @@ protected:
 	required_device<pwm_display_device> m_display;
 	required_device<dac_1bit_device> m_dac;
 	optional_device<s14001a_device> m_speech;
-	optional_region_ptr<u8> m_speech_rom;
 	optional_region_ptr<u8> m_language;
 	optional_ioport_array<9> m_inputs;
 
 	u8 m_led_data = 0;
 	u8 m_7seg_data = 0;
 	u8 m_inp_mux = 0;
-	u8 m_speech_bank = 0;
 
 	// address maps
-	void csc_map(address_map &map);
-	void csce_map(address_map &map);
-	void rsc_map(address_map &map);
+	void csc_map(address_map &map) ATTR_COLD;
+	void csce_map(address_map &map) ATTR_COLD;
+	void rsc_map(address_map &map) ATTR_COLD;
 
 	// I/O handlers
 	u16 read_inputs();
 	void update_inputs();
 	void update_display();
 	void update_sound();
-	u8 speech_r(offs_t offset);
 
 	u8 pia0_read(offs_t offset);
 	void pia0_write(offs_t offset, u8 data);
@@ -303,7 +299,6 @@ void csc_state::machine_start()
 	save_item(NAME(m_led_data));
 	save_item(NAME(m_7seg_data));
 	save_item(NAME(m_inp_mux));
-	save_item(NAME(m_speech_bank));
 }
 
 INPUT_CHANGED_MEMBER(csc_state::su9_change_cpu_freq)
@@ -390,11 +385,6 @@ void csc_state::update_sound()
 	m_dac->write(BIT(1 << m_inp_mux, 9));
 }
 
-u8 csc_state::speech_r(offs_t offset)
-{
-	return m_speech_rom[m_speech_bank << 12 | offset];
-}
-
 
 // 6821 PIA 0
 
@@ -452,7 +442,7 @@ void csc_state::pia0_ca2_w(int state)
 
 void csc_state::pia1_pa_w(u8 data)
 {
-	// d0-d5: TSI C0-C5
+	// d0-d5: S14001A C0-C5
 	m_speech->data_w(data & 0x3f);
 
 	// d0-d7: data for the 4 7seg leds, bits are ABFGHCDE (H is extra led)
@@ -463,13 +453,12 @@ void csc_state::pia1_pa_w(u8 data)
 void csc_state::pia1_pb_w(u8 data)
 {
 	// d0: speech ROM A12
-	m_speech->force_update(); // update stream to now
-	m_speech_bank = data & 1;
+	m_speech->set_rom_bank(data & 1);
 
-	// d1: TSI START line
-	m_speech->start_w(data >> 1 & 1);
+	// d1: S14001A start pin
+	m_speech->start_w(BIT(data, 1));
 
-	// d4: lower TSI volume
+	// d4: lower S14001A volume
 	m_speech->set_output_gain(0, (data & 0x10) ? 0.25 : 1.0);
 }
 
@@ -478,14 +467,14 @@ u8 csc_state::pia1_pb_r()
 	// d2: printer?
 	u8 data = 0x04;
 
-	// d3: TSI BUSY line
+	// d3: S14001A busy pin
 	if (m_speech->busy_r())
 		data |= 0x08;
 
 	// d5: button row 8
 	data |= (read_inputs() >> 3 & 0x20);
 
-	// d6,d7: language switches(hardwired with 2 resistors/jumpers)
+	// d6,d7: language jumpers (hardwired)
 	return data | (*m_language << 6 & 0xc0);
 }
 
@@ -517,7 +506,7 @@ void csc_state::csce_map(address_map &map)
 	map.unmap_value_high();
 	map(0x0000, 0x0fff).ram();
 	map(0x1000, 0x1003).rw(m_pia[1], FUNC(pia6821_device::read), FUNC(pia6821_device::write));
-	map(0x1800, 0x1803).w(m_pia[0], FUNC(pia6821_device::write)).r(FUNC(csc_state::pia0_read));
+	map(0x1800, 0x1803).rw(FUNC(csc_state::pia0_read), FUNC(csc_state::pia0_write));
 	map(0x2000, 0x3fff).rom();
 	map(0xa000, 0xffff).rom();
 }
@@ -526,7 +515,7 @@ void csc_state::rsc_map(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x0000, 0x03ff).ram();
-	map(0x2000, 0x2003).w(m_pia[0], FUNC(pia6821_device::write)).r(FUNC(csc_state::pia0_read));
+	map(0x2000, 0x2003).rw(FUNC(csc_state::pia0_read), FUNC(csc_state::pia0_write));
 	map(0xf000, 0xffff).rom();
 }
 
@@ -562,8 +551,8 @@ static INPUT_PORTS_START( csc )
 	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_4) PORT_CODE(KEYCODE_4_PAD) PORT_NAME("Bishop")
 	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_5) PORT_CODE(KEYCODE_5_PAD) PORT_NAME("Queen")
 	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_6) PORT_CODE(KEYCODE_6_PAD) PORT_NAME("King")
-	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_DEL) PORT_NAME("CL")
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_R) PORT_NAME("RE")
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_DEL) PORT_CODE(KEYCODE_BACKSPACE) PORT_NAME("CL")
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_R) PORT_CODE(KEYCODE_N) PORT_NAME("RE")
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( su9 )
@@ -593,7 +582,7 @@ static INPUT_PORTS_START( rsc )
 	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_5) PORT_CODE(KEYCODE_5_PAD) PORT_NAME("LV")
 	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_6) PORT_CODE(KEYCODE_6_PAD) PORT_NAME("PV")
 	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_SPACE) PORT_NAME("Speaker")
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_R) PORT_NAME("RE")
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_R) PORT_CODE(KEYCODE_N) PORT_NAME("RE")
 
 	PORT_START("BOARD")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CHANGED_MEMBER(DEVICE_SELF, csc_state, rsc_init_board, 0) PORT_NAME("Board Reset A")
@@ -641,7 +630,6 @@ void csc_state::csc(machine_config &config)
 	// sound hardware
 	SPEAKER(config, "speaker").front_center();
 	S14001A(config, m_speech, 25000); // R/C circuit, around 25khz
-	m_speech->ext_read().set(FUNC(csc_state::speech_r));
 	m_speech->add_route(ALL_OUTPUTS, "speaker", 0.75);
 
 	DAC_1BIT(config, m_dac).add_route(ALL_OUTPUTS, "speaker", 0.25);

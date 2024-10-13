@@ -281,7 +281,7 @@ public:
 private:
 	required_device<cpu_device> m_maincpu;
 
-	void globalvr_map(address_map &map);
+	void globalvr_map(address_map &map) ATTR_COLD;
 };
 
 

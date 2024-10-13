@@ -113,11 +113,11 @@ private:
 	uint16_t in_r(offs_t offset);
 	void output_w(uint16_t data);
 	void output2_w(uint16_t data);
-	void feversoc_map(address_map &map);
+	void feversoc_map(address_map &map) ATTR_COLD;
 	uint32_t screen_update_feversoc(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void feversoc_irq(int state);
 	void feversoc_irq_ack(uint16_t data);
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 	required_shared_ptr<uint32_t> m_mainram1;
 	required_shared_ptr<uint32_t> m_mainram2;
@@ -323,7 +323,7 @@ void feversoc_state::feversoc(machine_config &config)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	TICKET_DISPENSER(config, m_hopper, attotime::from_msec(60), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH);
+	TICKET_DISPENSER(config, m_hopper, attotime::from_msec(60));
 }
 
 /***************************************************************************

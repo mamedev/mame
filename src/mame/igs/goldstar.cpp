@@ -333,29 +333,29 @@ public:
 	void goldfrui(machine_config &config);
 	void goldstar(machine_config &config);
 	void goldstbl(machine_config &config);
-	void bonusch_portmap(address_map &map);
-	void feverch_portmap(address_map &map);
-	void cm_map(address_map &map);
-	void crazybon_portmap(address_map &map);
-	void flaming7_map(address_map &map);
-	void goldstar_map(address_map &map);
-	void goldstar_readport(address_map &map);
-	void kkotnoli_map(address_map &map);
-	void ladylinr_map(address_map &map);
-	void lucky8_map(address_map &map);
-	void common_decrypted_opcodes_map(address_map &map);
-	void super972_decrypted_opcodes_map(address_map &map);
-	void mbstar_map(address_map &map);
-	void megaline_portmap(address_map &map);
-	void ncb3_readwriteport(address_map &map);
-	void nfm_map(address_map &map);
-	void jkrmast_map(address_map &map);
-	void jkrmast_portmap(address_map &map);
-	void pkrmast_portmap(address_map &map);
-	void ramdac_map(address_map &map);
-	void wcat3_map(address_map &map);
-	void wcherry_map(address_map &map);
-	void wcherry_readwriteport(address_map &map);
+	void bonusch_portmap(address_map &map) ATTR_COLD;
+	void feverch_portmap(address_map &map) ATTR_COLD;
+	void cm_map(address_map &map) ATTR_COLD;
+	void crazybon_portmap(address_map &map) ATTR_COLD;
+	void flaming7_map(address_map &map) ATTR_COLD;
+	void goldstar_map(address_map &map) ATTR_COLD;
+	void goldstar_readport(address_map &map) ATTR_COLD;
+	void kkotnoli_map(address_map &map) ATTR_COLD;
+	void ladylinr_map(address_map &map) ATTR_COLD;
+	void lucky8_map(address_map &map) ATTR_COLD;
+	void common_decrypted_opcodes_map(address_map &map) ATTR_COLD;
+	void super972_decrypted_opcodes_map(address_map &map) ATTR_COLD;
+	void mbstar_map(address_map &map) ATTR_COLD;
+	void megaline_portmap(address_map &map) ATTR_COLD;
+	void ncb3_readwriteport(address_map &map) ATTR_COLD;
+	void nfm_map(address_map &map) ATTR_COLD;
+	void jkrmast_map(address_map &map) ATTR_COLD;
+	void jkrmast_portmap(address_map &map) ATTR_COLD;
+	void pkrmast_portmap(address_map &map) ATTR_COLD;
+	void ramdac_map(address_map &map) ATTR_COLD;
+	void wcat3_map(address_map &map) ATTR_COLD;
+	void wcherry_map(address_map &map) ATTR_COLD;
+	void wcherry_readwriteport(address_map &map) ATTR_COLD;
 
 protected:
 	virtual void machine_start() override { m_lamps.resolve(); }
@@ -452,6 +452,7 @@ public:
 	void init_cmtetriskr();
 	void init_ll3();
 	void init_hamhouse();
+	void init_hamhouse9();
 	void init_cmast91();
 	void init_cll();
 	void init_animalhs();
@@ -480,22 +481,22 @@ public:
 	void super7(machine_config &config);
 	void animalhs(machine_config &config);
 	void eldoraddoa(machine_config &config);
-	void animalhs_map(address_map &map);
-	void animalhs_portmap(address_map &map);
-	void amcoe1_portmap(address_map &map);
-	void amcoe2_portmap(address_map &map);
-	void cm_portmap(address_map &map);
-	void cm97_portmap(address_map &map);
-	void cmast91_portmap(address_map &map);
-	void cmast92_map(address_map &map);
-	void cmast92_portmap(address_map &map);
-	void cmtetrisb_portmap(address_map &map);
-	void cmtetriskr_portmap(address_map &map);
-	void cmv4zg_portmap(address_map &map);
-	void eldoraddoa_portmap(address_map &map);
-	void super7_portmap(address_map &map);
-	void chryangl_decrypted_opcodes_map(address_map &map);
-	void ss2001_portmap(address_map &map);
+	void animalhs_map(address_map &map) ATTR_COLD;
+	void animalhs_portmap(address_map &map) ATTR_COLD;
+	void amcoe1_portmap(address_map &map) ATTR_COLD;
+	void amcoe2_portmap(address_map &map) ATTR_COLD;
+	void cm_portmap(address_map &map) ATTR_COLD;
+	void cm97_portmap(address_map &map) ATTR_COLD;
+	void cmast91_portmap(address_map &map) ATTR_COLD;
+	void cmast92_map(address_map &map) ATTR_COLD;
+	void cmast92_portmap(address_map &map) ATTR_COLD;
+	void cmtetrisb_portmap(address_map &map) ATTR_COLD;
+	void cmtetriskr_portmap(address_map &map) ATTR_COLD;
+	void cmv4zg_portmap(address_map &map) ATTR_COLD;
+	void eldoraddoa_portmap(address_map &map) ATTR_COLD;
+	void super7_portmap(address_map &map) ATTR_COLD;
+	void chryangl_decrypted_opcodes_map(address_map &map) ATTR_COLD;
+	void ss2001_portmap(address_map &map) ATTR_COLD;
 
 protected:
 	// installed by various driver init handlers to get stuff to work
@@ -522,6 +523,7 @@ public:
 	void init_lucky8a();
 	void init_lucky8f();
 	void init_lucky8l();
+	void init_lucky8m();
 	void init_magoddsc();
 	void init_flaming7();
 	void init_flam7_tw();
@@ -553,7 +555,7 @@ public:
 	void bingownga(machine_config &config);
 	void mbstar(machine_config &config);
 	void flam7_tw(machine_config &config);
-	void magodds_map(address_map &map);
+	void magodds_map(address_map &map) ATTR_COLD;
 
 protected:
 	TILE_GET_INFO_MEMBER(get_magical_fg_tile_info);
@@ -565,7 +567,7 @@ private:
 	uint8_t m_nmi_enable = 0U;
 	uint8_t m_vidreg = 0U;
 
-	void nd8lines_map(address_map &map);
+	void nd8lines_map(address_map &map) ATTR_COLD;
 };
 
 
@@ -581,6 +583,7 @@ public:
 	void init_cb3c();
 	void init_cb3e();
 	void init_cb3f();
+	void init_cb3g();
 	void init_cherrys();
 	void init_chrygld();
 	void init_chry10();
@@ -591,9 +594,9 @@ public:
 	void cb3c(machine_config &config);
 	void cb3e(machine_config &config);
 	void ncb3(machine_config &config);
-	void ncb3_map(address_map &map);
-	void chryangla_map(address_map &map);
-	void chryangla_decrypted_opcodes_map(address_map &map);
+	void ncb3_map(address_map &map) ATTR_COLD;
+	void chryangla_map(address_map &map) ATTR_COLD;
+	void chryangla_decrypted_opcodes_map(address_map &map) ATTR_COLD;
 
 protected:
 	void do_blockswaps(uint8_t *rom);
@@ -627,8 +630,8 @@ public:
 	uint32_t screen_update_sangho(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	void star100(machine_config &config);
-	void star100_map(address_map &map);
-	void star100_readport(address_map &map);
+	void star100_map(address_map &map) ATTR_COLD;
+	void star100_readport(address_map &map) ATTR_COLD;
 protected:
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
@@ -678,11 +681,11 @@ public:
 	void feverch(machine_config &config);
 	void rolling(machine_config &config);
 
-	void bonusch_map(address_map &map);
-	void feverch_map(address_map &map);
-	void megaline_map(address_map &map);
-	void unkch_map(address_map &map);
-	void unkch_portmap(address_map &map);
+	void bonusch_map(address_map &map) ATTR_COLD;
+	void feverch_map(address_map &map) ATTR_COLD;
+	void megaline_map(address_map &map) ATTR_COLD;
+	void unkch_map(address_map &map) ATTR_COLD;
+	void unkch_portmap(address_map &map) ATTR_COLD;
 protected:
 	TILE_GET_INFO_MEMBER(get_reel1_tile_info);
 	TILE_GET_INFO_MEMBER(get_reel2_tile_info);
@@ -5181,6 +5184,17 @@ static INPUT_PORTS_START( ns8linew )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( animalw )
+	PORT_INCLUDE( ns8linew)
+
+	// expects the following two bits ACTIVE_HIGH or it won't boot
+	PORT_MODIFY("IN2")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+
+	PORT_MODIFY("IN4")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+INPUT_PORTS_END
+
 static INPUT_PORTS_START( nd8lines ) // TODO: need to be done once palette is figured out and effects can be verified
 	PORT_START("IN0") // b800
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )
@@ -7529,7 +7543,7 @@ static INPUT_PORTS_START( unkch_controls )
 	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )  /* Trips "call attendant" state if activated while credited - something to do with hopper out? */
 	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("tickets", ticket_dispenser_device, line_r)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("tickets", ticket_dispenser_device, line_r)
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT )
 	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
@@ -11211,7 +11225,7 @@ void unkch_state::unkch(machine_config &config)
 	aysnd.add_route(ALL_OUTPUTS, "mono", 0.50);
 
 	/* payout hardware */
-	TICKET_DISPENSER(config, m_ticket_dispenser, attotime::from_msec(200), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_LOW);
+	TICKET_DISPENSER(config, m_ticket_dispenser, attotime::from_msec(200));
 }
 
 void unkch_state::rolling(machine_config &config)
@@ -12101,6 +12115,36 @@ ROM_START( cb3f ) // original Wing W4 PCB + subboard with Z80, ROM, RAM and encr
 
 	ROM_REGION( 0x20, "unkprom2", 0 )
 	ROM_LOAD( "dm74s288.d12", 0x0000, 0x0020, CRC(6df3f972) SHA1(0096a7f7452b70cac6c0752cb62e24b643015b5c) )
+ROM_END
+
+
+ // original Wing W4 PCB + Dyna D9005 subboard with Z80, ROM, RAM and Dyna DP 1200-5 custom. GFX ROMs are identical to many other sets.
+ROM_START( cb3g )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "cb3-s4.ic5", 0x00000, 0x10000, CRC(ad0fa0b7) SHA1(29b43e764ca2712406b37d24d942c90992ea46e1) ) // encrypted, on subboard
+
+	ROM_REGION( 0x18000, "gfx1", 0 )
+	ROM_LOAD( "cb3-5.7h",  0x00000, 0x08000, CRC(83650a94) SHA1(e79420ab559d3f74013708767ca3f238fd333fb7) )
+	ROM_LOAD( "cb3-6.8h",  0x08000, 0x08000, CRC(2f46a3f5) SHA1(3e6022ee8f84039e48f41aea5e68ee28aabdc556) )
+	ROM_LOAD( "cb3-7.10h", 0x10000, 0x08000, CRC(dcf97517) SHA1(0a29696e0464c8878c499b1786a17080fd088a72) )
+
+	ROM_REGION( 0x8000, "gfx2", 0 )
+	ROM_LOAD( "cb3-1.1h", 0x00000, 0x02000, CRC(7cc6d26b) SHA1(de33e8985affce7bd3ead89463117c9aaa93d5e4) )
+	ROM_LOAD( "cb3-2.3h", 0x02000, 0x02000, CRC(e73ea4e3) SHA1(c9fd56461f6986d6bc170403d298fcc408a524e9) )
+	ROM_LOAD( "cb3-3.4h", 0x04000, 0x02000, CRC(91162010) SHA1(3acc21e7074602b247f2f392eb181802092d2f21) )
+	ROM_LOAD( "cb3-4.5h", 0x06000, 0x02000, CRC(cbcc6bfb) SHA1(5bafc934fef1f50d8c182c39d3a7ce795c89d175) )
+
+	// all the PROMs weren't dumped for this set, marking bad as precaution
+	ROM_REGION( 0x0200, "proms", 0 )
+	ROM_LOAD_NIB_LOW(  "n82s129.13g",  0x0000, 0x0100, BAD_DUMP CRC(59ac98e4) SHA1(5fc0f1a48c49c956cdb8826e20663dc57a9175e4) )   // 1st bank colors, low 4 bits.
+	ROM_LOAD_NIB_HIGH( "n82s129.14g",  0x0000, 0x0100, BAD_DUMP CRC(0d8f35bd) SHA1(0c2a0145cdaaf9beabdce241731a36b0c65f18a2) )   // 1st bank colors, high 4 bits.
+	ROM_LOAD(          "dm74s288.13d", 0x0080, 0x0020, BAD_DUMP CRC(77a85e21) SHA1(3b41e0ab7cc55c5d78914d23e8289383f5bd5654) )   // 2nd bank colors
+
+	ROM_REGION( 0x100, "unkprom", 0 )
+	ROM_LOAD( "82s129.f3", 0x0000, 0x0100, BAD_DUMP CRC(1d668d4a) SHA1(459117f78323ea264d3a29f1da2889bbabe9e4be) )
+
+	ROM_REGION( 0x20, "unkprom2", 0 )
+	ROM_LOAD( "dm74s288.d12", 0x0000, 0x0020, BAD_DUMP CRC(6df3f972) SHA1(0096a7f7452b70cac6c0752cb62e24b643015b5c) )
 ROM_END
 
 /* Cherry Gold I (bootleg)
@@ -13722,7 +13766,7 @@ ROM_START( cmast91 )
 	ROM_LOAD( "4.bin",  0x00000, 0x8000, CRC(0dbabaa2) SHA1(44235b19dac1c996e2166672b03f6e3888ecbefa) )
 	ROM_LOAD( "3.bin",  0x08000, 0x8000, CRC(dc77d04a) SHA1(d8656130cde54d4bb96307899f6d607867e49e6c) )
 	ROM_LOAD( "1.bin",  0x10000, 0x8000, CRC(71bdab69) SHA1(d2c594ed88d6368df15b623c48eecc1c219b839e) )
-	ROM_LOAD( "2.bin",  0x18000, 0x8000, CRC(fccd48d7) SHA1(af564f5ef9ff5b6363897ce6bdf0b21123911fd4) )
+	ROM_LOAD( "2.bin",  0x18000, 0x8000, CRC(201d1e90) SHA1(c3c5224646b777f98ee35d146136788029b1782d) )
 
 	ROM_REGION( 0x40000, "user1", 0 ) // girls GFX
 	ROM_LOAD( "9.bin",  0x00000, 0x40000, CRC(92342276) SHA1(f9436752f2ec67cf873fd01c729c7c113dc18be0) )
@@ -14442,6 +14486,38 @@ ROM_START( lucky8l )
 	ROM_LOAD( "w4.d12", 0x0000, 0x0117, CRC(41b55fb0) SHA1(f31a31dc2c0789d08957785e8c8f804690133450) ) // GAL16V8D
 ROM_END
 
+// original Wing PCB with a small riser board for CPU, logic and 2 8-DIP banks. GFX ROMs are identical to many other sets.
+ROM_START( lucky8m )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "28r.b12",   0x0000, 0x4000, CRC(9d7bc7f8) SHA1(93c0297dbe1579b6326d43d743d2b95264e7e0aa) )
+	ROM_LOAD( "29r.b14",   0x4000, 0x4000, CRC(7b2b0c0c) SHA1(1acb20be5fbfdf6813f8a5257f9bd771b37504ea) )
+
+	ROM_REGION( 0x18000, "gfx1", 0 )
+	ROM_LOAD( "eagle-5.h7",   0x00000, 0x8000, CRC(59026af3) SHA1(3d7f7e78968ca26275635aeaa0e994468a3da575) )
+	ROM_LOAD( "eagle-6.h8",   0x08000, 0x8000, CRC(67a073c1) SHA1(36194d57d0dc0601fa1fdf2e6806f11b2ea6da36) )
+	ROM_LOAD( "eagle-7.h10",  0x10000, 0x8000, CRC(c415b9d0) SHA1(fd558fe8a116c33bbd712a639224d041447a45c1) )
+
+	ROM_REGION( 0x8000, "gfx2", 0 )
+	ROM_LOAD( "eagle-1.h1",   0x0000, 0x2000, CRC(29d6f197) SHA1(1542ca457594f6b7fe8f28f7d78023edd7021bc8) )
+	ROM_LOAD( "eagle-2.h3",   0x2000, 0x2000, CRC(5f812e65) SHA1(70d9ea82f9337936bf21f82b6961768d436f3a6f) )
+	ROM_LOAD( "eagle-3.h4",   0x4000, 0x2000, CRC(898b9ed5) SHA1(11b7d1cfcf425d00d086c74e0dbcb72068dda9fe) )
+	ROM_LOAD( "eagle-4.h5",   0x6000, 0x2000, CRC(4f7cfb35) SHA1(0617cf4419be00d9bacc78724089cb8af4104d68) )
+
+	// all the PROMs weren't dumped for this set, marking bad as precaution
+	ROM_REGION( 0x200, "proms", 0 )
+	ROM_LOAD( "d12",   0x0000, 0x0100, BAD_DUMP CRC(23e81049) SHA1(78071dae70fad870e972d944642fb3a2374be5e4) )
+	ROM_LOAD( "prom4", 0x0100, 0x0100, BAD_DUMP CRC(526cf9d3) SHA1(eb779d70f2507d0f26d225ac8f5de8f2243599ca) )
+
+	ROM_REGION( 0x20, "proms2", 0 )
+	ROM_LOAD( "d13", 0x0000, 0x0020, BAD_DUMP CRC(c6b41352) SHA1(d7c3b5aa32e4e456c9432a13bede1db6d62eb270) )
+
+	ROM_REGION( 0x100, "unkprom", 0 )
+	ROM_LOAD( "g14", 0x0000, 0x0100, BAD_DUMP CRC(bd48de71) SHA1(e4fa1e774af1499bc568be5b2deabb859d8c8172) )
+
+	ROM_REGION( 0x20, "unkprom2", 0 )
+	ROM_LOAD( "g13", 0x0000, 0x0020, BAD_DUMP CRC(6df3f972) SHA1(0096a7f7452b70cac6c0752cb62e24b643015b5c) )
+ROM_END
+
 ROM_START( animalw ) // according to the dumper: runs on the same HW as lucky8 but at the two 8255 has some shorts
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "rom8.bin",  0x0000, 0x8000, CRC(8826e4e7) SHA1(70cff8c5ce75ab0f568e8cdf39ef9165b73fa2c0) )
@@ -14533,6 +14609,39 @@ ROM_START( hamhouse )
 	ROM_REGION( 0x400, "plds", 0 )
 	ROM_LOAD( "atf16v8b.u15",       0x00000, 0x00117, CRC(9a62f369) SHA1(c027a7e3dc12506ed45ed936b9f650549651be4f) )
 	ROM_LOAD( "atf16v8b.u35",       0x00200, 0x00117, CRC(a883a133) SHA1(d0b1ee535d60bffdc03a8ce94e6a0274ae6621d5) )
+ROM_END
+
+ROM_START( hamhouse9 ) // basically same PCB as above but this has standard PROMs
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "am27c512.u33", 0x00000, 0x10000, CRC(9d0653b6) SHA1(81a015b0b78c75f7c998064fa4eb337da19d0df0) )
+
+	ROM_REGION( 0x18000, "gfx1", 0 )
+	ROM_LOAD( "m27c256b.u28",  0x00000, 0x08000, CRC(e8d6be2b) SHA1(95ba907e4f969816638d5021606348d69a45fedc) )
+	ROM_LOAD( "tms27c256.u42", 0x08000, 0x08000, CRC(f83d5131) SHA1(3848efd58e3c5a54a947de3a3ea4e96265cd8af8) )
+	ROM_LOAD( "m27256.u43",    0x10000, 0x08000, CRC(a5105928) SHA1(ea3a4fb7a0ca3e14da001beb5aca03bfbd43410d) )
+
+	ROM_REGION( 0x08000, "gfx2", 0 )
+	ROM_LOAD( "intel27128.u24", 0x00000, 0x02000, CRC(36486029) SHA1(8b0b7e7ad0252a049c0d3d66f102198a31151991) ) // 1ST AND 2ND HALF IDENTICAL
+	ROM_IGNORE( 0x2000 )
+	ROM_LOAD( "hn4827128g.u26", 0x02000, 0x02000, CRC(6ba11862) SHA1(ce34727190689df8d591147dc342fe7bf230ce26) ) // 1ST AND 2ND HALF IDENTICAL
+	ROM_IGNORE( 0x2000 )
+	ROM_LOAD( "am27c128.u10",   0x04000, 0x02000, CRC(69ce2859) SHA1(68cb0c81a471d09f173d8534d94877f3f5c276f4) ) // 1ST AND 2ND HALF IDENTICAL
+	ROM_IGNORE( 0x2000 )
+	ROM_LOAD( "tms27c128.u11",  0x06000, 0x02000, CRC(61a17c65) SHA1(b1212c45c9c98aba50aeed6a38e17960f868ccd3) ) // 1ST AND 2ND HALF IDENTICAL
+	ROM_IGNORE( 0x2000 )
+
+	ROM_REGION( 0x10000, "user1", ROMREGION_ERASE00 )
+
+	ROM_REGION( 0x200, "proms", 0 )
+	ROM_LOAD( "am27s21.u55", 0x0000, 0x0100, CRC(161d189e) SHA1(5e13133871522e5d4c295fa7a02727da95d74e44) )
+	ROM_LOAD( "am27s21.u56", 0x0100, 0x0100, CRC(21eb5b19) SHA1(9b8425bdb97f11f4855c998c7792c3291fd07470) )
+
+	ROM_REGION( 0x100, "proms2", 0 )
+	ROM_LOAD( "am27s21.u39", 0x0000, 0x0100, CRC(50ec383b) SHA1(ae95b92bd3946b40134bcdc22708d5c6b0f4c23e) )
+
+	ROM_REGION( 0x400, "plds", ROMREGION_ERASE00 )
+	ROM_LOAD( "atf16v8b.u15", 0x000, 0x117, CRC(9a62f369) SHA1(c027a7e3dc12506ed45ed936b9f650549651be4f) )
+	ROM_LOAD( "atf16v8b.u35", 0x200, 0x117, CRC(a883a133) SHA1(d0b1ee535d60bffdc03a8ce94e6a0274ae6621d5) )
 ROM_END
 
 /*
@@ -20884,6 +20993,19 @@ void cmaster_state::init_hamhouse()
 	m_palette->update();
 }
 
+void cmaster_state::init_hamhouse9()
+{
+	init_cmv4();
+
+	uint8_t *rom = memregion("maincpu")->base();
+	std::vector<uint8_t> buffer(0x10000);
+
+	memcpy(&buffer[0], rom, 0x10000);
+
+	for (int i = 0; i < 0x10000; i++)
+		rom[i] = buffer[bitswap<24>(i, 23, 22, 21, 20, 19, 18, 17, 16, 15, 13, 12, 14, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0)];
+}
+
 void cmaster_state::init_cmpacmanb()
 {
 	uint8_t *rom = memregion("maincpu")->base();
@@ -21196,6 +21318,44 @@ void wingco_state::init_lucky8l()
 	}
 
 	m_palette->update();
+}
+
+void wingco_state::init_lucky8m()
+{
+	uint8_t *rom = memregion("maincpu")->base();
+
+	for (int i = 0; i < 0x8000; i++)
+	{
+		m_decrypted_opcodes[i] = rom[i];
+
+		// only the opcodes in the first 0x400 bytes and over 0x6200 are encrypted
+		if (i < 0x400 || (i >= 0x6200 && i < 0x6400) || i >= 0x7c00)
+		{
+			uint8_t x = rom[i];
+
+			switch(i & 0x1e)
+			{
+				case 0x00: x = bitswap<8>(x ^ 0x72, 5, 3, 7, 2, 6, 4, 0, 1); break;
+				case 0x02: x = bitswap<8>(x ^ 0x14, 0, 2, 1, 6, 4, 3, 5, 7); break;
+				case 0x04: x = bitswap<8>(x ^ 0x7e, 5, 6, 7, 4, 3, 2, 0, 1); break;
+				case 0x06: x = bitswap<8>(x ^ 0x5c, 0, 6, 1, 4, 3, 2, 5, 7); break;
+				case 0x08: x = bitswap<8>(x ^ 0xd9, 7, 4, 1, 6, 3, 2, 5, 0); break;
+				case 0x0a: x = bitswap<8>(x ^ 0x02, 1, 6, 7, 4, 3, 2, 0, 5); break;
+				case 0x0c: x = bitswap<8>(x ^ 0xd9, 7, 4, 1, 6, 3, 2, 5, 0); break;
+				case 0x0e: x = bitswap<8>(x ^ 0x02, 1, 6, 7, 4, 3, 2, 0, 5); break;
+				case 0x10: x = bitswap<8>(x ^ 0x50, 7, 3, 5, 2, 6, 4, 1, 0); break;
+				case 0x12: x = bitswap<8>(x ^ 0x14, 7, 2, 5, 6, 4, 3, 1, 0); break;
+				case 0x14: x = bitswap<8>(x ^ 0x5c, 7, 6, 5, 4, 3, 2, 1, 0); break;
+				case 0x16: x = bitswap<8>(x ^ 0x5c, 7, 6, 5, 4, 3, 2, 1, 0); break;
+				case 0x18: x = bitswap<8>(x ^ 0xd9, 7, 4, 1, 6, 3, 2, 5, 0); break;
+				case 0x1a: x = bitswap<8>(x ^ 0x02, 1, 6, 7, 4, 3, 2, 0, 5); break;
+				case 0x1c: x = bitswap<8>(x ^ 0xd9, 7, 4, 1, 6, 3, 2, 5, 0); break;
+				case 0x1e: x = bitswap<8>(x ^ 0x02, 1, 6, 7, 4, 3, 2, 0, 5); break;
+			}
+
+			m_decrypted_opcodes[i] = x;
+		}
+	}
 }
 
 void wingco_state::init_nd8lines()
@@ -21665,6 +21825,18 @@ void cb3_state::init_cb3f()
 		rom[i] = cb3f_decrypt(rom[i], i);
 }
 
+void cb3_state::init_cb3g()
+{
+	uint8_t *rom = memregion("maincpu")->base();
+
+	std::vector<uint8_t> buffer(0x10000);
+
+	memcpy(&buffer[0], rom, 0x10000);
+
+	for (int i = 0; i < 0x10000; i++)
+		rom[i] = buffer[bitswap<24>(i, 23, 22, 21, 20, 19, 18, 17, 16, 15, 13, 12, 14, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0)];
+}
+
 /* todo: remove these patches! */
 void unkch_state::init_unkch1()
 {
@@ -22021,6 +22193,7 @@ GAME(  199?, cb3c,       ncb3,     cb3c,     chrygld,  cb3_state,      init_cb3c
 GAMEL( 199?, cb3d,       ncb3,     ncb3,     ncb3,     cb3_state,      empty_init,     ROT0, "bootleg",           "Cherry Bonus III (set 3)",                    0,                 layout_cherryb3 )
 GAMEL( 199?, cb3e,       ncb3,     cb3e,     chrygld,  cb3_state,      init_cb3e,      ROT0, "bootleg",           "Cherry Bonus III (set 4, encrypted bootleg)", 0,                 layout_chrygld )
 GAMEL( 199?, cb3f,       ncb3,     ncb3,     ncb3,     cb3_state,      init_cb3f,      ROT0, "bootleg (Cleco)",   "Cherry Bonus III (set 5, encrypted bootleg)", MACHINE_NOT_WORKING, layout_chrygld ) // partially decrypted, stops at 'call attendant'
+GAMEL( 199?, cb3g,       ncb3,     ncb3,     ncb3,     cb3_state,      init_cb3g,      ROT0, "Dyna",              "Cherry Bonus III (ver.1.40, set 6)",          0,                 layout_cherryb3 )
 GAMEL( 199?, chryglda,   ncb3,     cb3e,     chrygld,  cb3_state,      init_cb3e,      ROT0, "bootleg",           "Cherry Gold I (set 2, encrypted bootleg)",    0,                 layout_chrygld )  // Runs in CB3e hardware.
 GAME(  1994, chryangla,  ncb3,     chryangla,ncb3,     cb3_state,      init_chryangl,  ROT0, "bootleg (G.C.I.)",  "Cherry Angel (encrypted, W-4 hardware)",      MACHINE_NOT_WORKING ) // DYNA CB3  V1.40 string, decrypted but only test screens work
 
@@ -22067,6 +22240,7 @@ GAMEL( 1991, srmagic,    cmv4,     cm,       cmv4,     cmaster_state,  empty_ini
 GAMEL( 1991, cmv4zg,     cmv4,     cmv4zg,   cmv4,     cmaster_state,  empty_init,     ROT0, "hack",              "Cherry Bonus III (Ziogas V4.1 hack, set 1)",  MACHINE_NOT_WORKING, layout_cmv4 ) // needs correct I/O, maybe slightly protected
 GAMEL( 1991, cmv4zga,    cmv4,     cmv4zg,   cmv4,     cmaster_state,  empty_init,     ROT0, "hack",              "Cherry Bonus III (Ziogas V4.1 hack, set 2)",  MACHINE_NOT_WORKING, layout_cmv4 ) // needs correct I/O, maybe slightly protected
 GAMEL( 199?, hamhouse,   cmaster,  cm,       cmaster,  cmaster_state,  init_hamhouse,  ROT0, "bootleg",           "Hamburger House",                             MACHINE_NOT_WORKING, layout_cmaster ) // needs correct I/O
+GAMEL( 199?, hamhouse9,  cmaster,  cm,       cmaster,  cmaster_state,  init_hamhouse9, ROT0, "bootleg",           "Hamburger House 9",                           MACHINE_NOT_WORKING, layout_cmaster ) // needs correct I/O
 
 GAMEL( 1991, tonypok,    0,        cm,       tonypok,  cmaster_state,  init_tonypok,   ROT0, "Corsica",           "Poker Master (Tony-Poker V3.A, hack?)",       0 ,                layout_tonypok )
 GAME(  1998, jkrmast,    0,        jkrmast,  jkrmast,  goldstar_state, init_jkrmast,   ROT0, "Pick-A-Party USA",  "Joker Master 2000 Special Edition (V515)",    MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_COLORS | MACHINE_NOT_WORKING ) // needs correct FG colors and controls
@@ -22106,6 +22280,7 @@ GAMEL( 1989, lucky8i,    lucky8,   lucky8,   lucky8,   wingco_state,   empty_ini
 GAMEL( 199?, lucky8j,    lucky8,   lucky8,   lucky8,   wingco_state,   empty_init,     ROT0, "<unknown>",         "New Lucky 8 Lines Crown Turbo (Hack)",                     MACHINE_NOT_WORKING,   layout_lucky8 )    // 2 control sets...
 GAMEL( 1989, lucky8k,    lucky8,   lucky8k,  lucky8,   wingco_state,   empty_init,     ROT0, "Wing Co., Ltd.",    "New Lucky 8 Lines (set 10, W-4, encrypted NEC D315-5136)", 0,                     layout_lucky8 )    // 2 control sets...
 GAMEL( 1989, lucky8l,    lucky8,   lucky8,   lucky8,   wingco_state,   init_lucky8l,   ROT0, "Wing Co., Ltd.",    "New Lucky 8 Lines (set 11, W-4)",                          MACHINE_WRONG_COLORS,  layout_lucky8 )    // uses a strange mix of PLDs and PROMs for colors
+GAMEL( 1989, lucky8m,    lucky8,   lucky8f,  lucky8,   wingco_state,   init_lucky8m,   ROT0, "Wing Co., Ltd.",    "New Lucky 8 Lines (set 12, W-4, encrypted)",               0,                     layout_lucky8 )
 GAMEL( 198?, ns8lines,   0,        lucky8,   lucky8b,  wingco_state,   empty_init,     ROT0, "<unknown>",         "New Lucky 8 Lines / New Super 8 Lines (W-4)",              0,                     layout_lucky8p1 )  // only 1 control set...
 GAMEL( 1985, ns8linesa,  ns8lines, lucky8,   lucky8b,  wingco_state,   empty_init,     ROT0, "Yamate (bootleg)",  "New Lucky 8 Lines / New Super 8 Lines (W-4, Lucky97 HW)",  0,                     layout_lucky8p1 )  // only 1 control set...
 GAMEL( 198?, ns8linew,   ns8lines, lucky8,   ns8linew, wingco_state,   empty_init,     ROT0, "<unknown>",         "New Lucky 8 Lines / New Super 8 Lines (F-5, Witch Bonus)", 0,                     layout_lucky8 )    // 2 control sets...
@@ -22121,7 +22296,7 @@ GAME(  198?, ladylinrc,  ladylinr, ladylinrb,ladylinr, goldstar_state, init_lady
 GAME(  198?, ladylinrd,  ladylinr, ladylinrb,ladylinr, goldstar_state, init_ladylinrd, ROT0, "TAB Austria",       "Lady Liner (encrypted, set 3)",                            0 )
 GAME(  198?, ladylinre,  ladylinr, ladylinrb,ladylinr, goldstar_state, init_ladylinre, ROT0, "TAB Austria",       "Lady Liner (encrypted, set 4)",                            0 )
 GAME(  1995, wcat3,      0,        wcat3,    lucky8,   wingco_state,   init_wcat3,     ROT0, "E.A.I.",            "Wild Cat 3",                                               MACHINE_NOT_WORKING | MACHINE_WRONG_COLORS ) // decryption partially wrong, needs soft resets before running. Bad PROM decode
-GAMEL( 199?, animalw,    0,        lucky8,   lucky8,   wingco_state,   empty_init,     ROT0, "bootleg",           "Animal Wonders (ver A900)",                                MACHINE_NOT_WORKING,    layout_lucky8 )    // not looked at yet
+GAMEL( 199?, animalw,    0,        lucky8,   animalw,  wingco_state,   empty_init,     ROT0, "bootleg",           "Animal Wonders (ver A900)",                                MACHINE_NOT_WORKING,    layout_lucky8 )    // inputs / DIPs need to be checked
 
 GAME(  1985, luckylad,   0,        luckylad, luckylad, wingco_state,   empty_init,     ROT0, "Wing Co., Ltd.",    "Lucky Lady (Wing, encrypted)",                             MACHINE_NOT_WORKING | MACHINE_WRONG_COLORS )  // controls / dips, colors not correctly decoded
 GAME(  1991, megaline,   0,        megaline, megaline, unkch_state,    empty_init,     ROT0, "Fun World",         "Mega Lines",                                               MACHINE_NOT_WORKING )

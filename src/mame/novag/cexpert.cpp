@@ -50,13 +50,12 @@ public:
 		m_inputs(*this, "IN.%u", 0)
 	{ }
 
-	// machine configs
 	void cexpert(machine_config &config);
 
 	DECLARE_INPUT_CHANGED_MEMBER(change_cpu_freq);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	// devices/pointers
@@ -67,13 +66,10 @@ private:
 	required_ioport_array<8> m_inputs;
 
 	u8 m_inp_mux = 0;
-	u8 m_led_select = 0;
 
-	// address maps
-	void main_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
 
 	// I/O handlers
-	void update_display();
 	void mux_w(u8 data);
 	void control_w(u8 data);
 	u8 input1_r();
@@ -82,9 +78,7 @@ private:
 
 void cexpert_state::machine_start()
 {
-	// register for savestates
 	save_item(NAME(m_inp_mux));
-	save_item(NAME(m_led_select));
 }
 
 INPUT_CHANGED_MEMBER(cexpert_state::change_cpu_freq)
@@ -99,16 +93,11 @@ INPUT_CHANGED_MEMBER(cexpert_state::change_cpu_freq)
     I/O
 *******************************************************************************/
 
-void cexpert_state::update_display()
-{
-	m_display->matrix(1 << m_led_select, m_inp_mux);
-}
-
 void cexpert_state::mux_w(u8 data)
 {
 	// d0-d7: input mux, led data
 	m_inp_mux = data;
-	update_display();
+	m_display->write_mx(data);
 }
 
 void cexpert_state::control_w(u8 data)
@@ -116,11 +105,11 @@ void cexpert_state::control_w(u8 data)
 	// d0-d2: clock/printer?
 
 	// d3: enable beeper
-	m_beeper->set_state(data >> 3 & 1);
+	m_beeper->set_state(BIT(data, 3));
 
 	// d4-d7: 74145 to led select
-	m_led_select = data >> 4 & 0xf;
-	update_display();
+	u8 sel = data >> 4 & 0xf;
+	m_display->write_my(1 << sel);
 }
 
 u8 cexpert_state::input1_r()
@@ -145,7 +134,6 @@ u8 cexpert_state::input2_r()
 			data |= m_inputs[i]->read() << 6;
 
 	// other: ?
-
 	return ~data;
 }
 
@@ -264,4 +252,4 @@ ROM_END
 *******************************************************************************/
 
 //    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS          INIT        COMPANY, FULLNAME, FLAGS
-SYST( 1985, cexpert, 0,      0,      cexpert, cexpert, cexpert_state, empty_init, "Novag Industries", "Constellation Expert", MACHINE_SUPPORTS_SAVE )
+SYST( 1985, cexpert, 0,      0,      cexpert, cexpert, cexpert_state, empty_init, "Novag Industries / Intelligent Heuristic Programming", "Constellation Expert", MACHINE_SUPPORTS_SAVE )

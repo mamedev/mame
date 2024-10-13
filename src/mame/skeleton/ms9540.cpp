@@ -48,12 +48,12 @@ private:
 	uint8_t latch_1f001_r();
 	void latch_1f001_w(u8 data);
 	void kbd_put(u8 data);
-	void mem_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
 	uint8_t m_term_data = 0U;
 	uint8_t m_latch_1e001 = 0U;
 	uint8_t m_latch_1f001 = 0U;
-	void machine_reset() override;
-	void machine_start() override;
+	void machine_reset() override ATTR_COLD;
+	void machine_start() override ATTR_COLD;
 	required_shared_ptr<uint16_t> m_ram;
 	required_device<cpu_device> m_maincpu;
 	required_device<generic_terminal_device> m_terminal;

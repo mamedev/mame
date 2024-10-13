@@ -53,19 +53,19 @@ public:
 	void init_radio86();
 
 protected:
-	void machine_reset() override;
-	void machine_start() override;
+	void machine_reset() override ATTR_COLD;
+	void machine_start() override ATTR_COLD;
 
 	void radio86_init_keyboard();
 
-	void impuls03_mem(address_map &map);
-	void mikron2_mem(address_map &map);
-	void radio86_16_mem(address_map &map);
-	void radio86_io(address_map &map);
-	void radio86_mem(address_map &map);
-	void radio86ram_mem(address_map &map);
-	void radio86rom_mem(address_map &map);
-	void rk7007_io(address_map &map);
+	void impuls03_mem(address_map &map) ATTR_COLD;
+	void mikron2_mem(address_map &map) ATTR_COLD;
+	void radio86_16_mem(address_map &map) ATTR_COLD;
+	void radio86_io(address_map &map) ATTR_COLD;
+	void radio86_mem(address_map &map) ATTR_COLD;
+	void radio86ram_mem(address_map &map) ATTR_COLD;
+	void radio86rom_mem(address_map &map) ATTR_COLD;
+	void rk7007_io(address_map &map) ATTR_COLD;
 
 	uint8_t m_tape_value;
 	uint8_t radio_cpu_state_r();

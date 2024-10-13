@@ -61,7 +61,7 @@ public:
 protected:
 	required_device<input_merger_device> m_irq_merger;
 	u8 m_slot_id;
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 };
 
 DECLARE_DEVICE_TYPE(MTU130_EXTENSION, mtu130_extension_device)

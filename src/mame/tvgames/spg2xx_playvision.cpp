@@ -27,7 +27,7 @@ public:
 	int pvmil_p4buttons_r();
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 	virtual void porta_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0) override;
 	virtual void portb_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0) override;

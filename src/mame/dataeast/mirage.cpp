@@ -76,19 +76,19 @@ public:
 	void init_mirage();
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
-	void mjmux_w(uint16_t data);
-	uint16_t mjmux_r();
+	void key_matrix_w(uint16_t data);
+	uint16_t key_matrix_r();
 	void okim1_rombank_w(uint16_t data);
 	void okim0_rombank_w(uint16_t data);
 	DECOSPR_PRIORITY_CB_MEMBER(pri_callback);
 
-	uint32_t screen_update_mirage(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	DECO16IC_BANK_CB_MEMBER(bank_callback);
-	void mirage_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
 
 	/* devices */
 	required_device<m68000_device> m_maincpu;
@@ -105,11 +105,11 @@ private:
 	required_ioport_array<5> m_io_key;
 
 	/* misc */
-	uint8_t m_mux_data = 0;
+	uint8_t m_key_matrix_select = 0;
 
 };
 
-uint32_t miragemj_state::screen_update_mirage(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t miragemj_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	uint16_t const flip = m_deco_tilegen->pf_control_r(0);
 
@@ -128,17 +128,17 @@ uint32_t miragemj_state::screen_update_mirage(screen_device &screen, bitmap_rgb3
 }
 
 
-void miragemj_state::mjmux_w(uint16_t data)
+void miragemj_state::key_matrix_w(uint16_t data)
 {
-	m_mux_data = data & 0x1f;
+	m_key_matrix_select = data & 0x1f;
 }
 
-uint16_t miragemj_state::mjmux_r()
+uint16_t miragemj_state::key_matrix_r()
 {
 	uint16_t result = 0xffff;
 	for (int i = 0; m_io_key.size() > i; ++i)
 	{
-		if (BIT(m_mux_data, i))
+		if (BIT(m_key_matrix_select, i))
 			result &= m_io_key[i]->read();
 	}
 	return result;
@@ -159,7 +159,7 @@ void miragemj_state::okim0_rombank_w(uint16_t data)
 	m_oki_bgm->set_rom_bank(data & 0x7);
 }
 
-void miragemj_state::mirage_map(address_map &map)
+void miragemj_state::main_map(address_map &map)
 {
 	map(0x000000, 0x07ffff).rom();
 	/* tilemaps */
@@ -177,8 +177,8 @@ void miragemj_state::mirage_map(address_map &map)
 	map(0x16a000, 0x16a001).nopw();
 	map(0x16c000, 0x16c001).w(FUNC(miragemj_state::okim1_rombank_w));
 	map(0x16c002, 0x16c003).w(FUNC(miragemj_state::okim0_rombank_w));
-	map(0x16c004, 0x16c005).w(FUNC(miragemj_state::mjmux_w));
-	map(0x16c006, 0x16c007).r(FUNC(miragemj_state::mjmux_r));
+	map(0x16c004, 0x16c005).w(FUNC(miragemj_state::key_matrix_w));
+	map(0x16c006, 0x16c007).r(FUNC(miragemj_state::key_matrix_r));
 	map(0x16e000, 0x16e001).nopw();
 	map(0x16e002, 0x16e003).portr("SYSTEM_IN");
 	map(0x170000, 0x173fff).ram();
@@ -281,19 +281,19 @@ DECO16IC_BANK_CB_MEMBER(miragemj_state::bank_callback)
 
 void miragemj_state::machine_start()
 {
-	save_item(NAME(m_mux_data));
+	save_item(NAME(m_key_matrix_select));
 }
 
 void miragemj_state::machine_reset()
 {
-	m_mux_data = 0;
+	m_key_matrix_select = 0;
 }
 
 void miragemj_state::mirage(machine_config &config)
 {
 	/* basic machine hardware */
 	M68000(config, m_maincpu, 28000000/2);
-	m_maincpu->set_addrmap(AS_PROGRAM, &miragemj_state::mirage_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &miragemj_state::main_map);
 	m_maincpu->set_vblank_int("screen", FUNC(miragemj_state::irq6_line_hold));
 
 	EEPROM_93C46_16BIT(config, "eeprom");  // 93C45
@@ -306,7 +306,7 @@ void miragemj_state::mirage(machine_config &config)
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(529));
 	screen.set_size(40*8, 32*8);
 	screen.set_visarea(0*8, 40*8-1, 1*8, 31*8-1);
-	screen.set_screen_update(FUNC(miragemj_state::screen_update_mirage));
+	screen.set_screen_update(FUNC(miragemj_state::screen_update));
 	screen.screen_vblank().set(m_spriteram, FUNC(buffered_spriteram16_device::vblank_copy_rising));
 
 	GFXDECODE(config, "gfxdecode", "palette", gfx_mirage);

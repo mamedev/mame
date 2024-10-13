@@ -9,8 +9,9 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "debugger.h"
 #include "dvbpoints.h"
+
+#include "debugcpu.h"
 #include "points.h"
 
 #include <algorithm>

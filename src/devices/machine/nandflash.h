@@ -57,8 +57,8 @@ protected:
 	nand_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	// device_t implementation
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	optional_memory_region m_region;
 
@@ -148,6 +148,12 @@ public:
 	samsung_k9f2g08u0m_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 };
 
+class toshiba_tc58256aft_device : public nand_device
+{
+public:
+	toshiba_tc58256aft_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+};
+
 // device type definition
 DECLARE_DEVICE_TYPE(NAND, nand_device)
 DECLARE_DEVICE_TYPE(SAMSUNG_K9F5608U0D, samsung_k9f5608u0d_device)
@@ -158,5 +164,6 @@ DECLARE_DEVICE_TYPE(SAMSUNG_K9F1G08U0B, samsung_k9f1g08u0b_device)
 DECLARE_DEVICE_TYPE(SAMSUNG_K9F1G08U0M, samsung_k9f1g08u0m_device)
 DECLARE_DEVICE_TYPE(SAMSUNG_K9LAG08U0M, samsung_k9lag08u0m_device)
 DECLARE_DEVICE_TYPE(SAMSUNG_K9F2G08U0M, samsung_k9f2g08u0m_device)
+DECLARE_DEVICE_TYPE(TOSHIBA_TC58256AFT, toshiba_tc58256aft_device)
 
 #endif // MAME_MACHINE_NANDFLASH_H

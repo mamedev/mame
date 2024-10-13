@@ -104,7 +104,7 @@ public:
 	}
 
 protected:
-	virtual void machine_reset() override;
+	virtual void machine_reset() override ATTR_COLD;
 	void common(machine_config &config);
 
 	u8 mcu_r();
@@ -146,7 +146,7 @@ public:
 	void initialise();
 
 private:
-	void map(address_map &map);
+	void map(address_map &map) ATTR_COLD;
 
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, rectangle const &cliprect);
 
@@ -169,7 +169,7 @@ public:
 	void initialise();
 
 private:
-	void map(address_map &map);
+	void map(address_map &map) ATTR_COLD;
 
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, rectangle const &cliprect);
 
@@ -194,7 +194,7 @@ public:
 	void initialise();
 
 private:
-	void map(address_map &map);
+	void map(address_map &map) ATTR_COLD;
 
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, rectangle const &cliprect);
 

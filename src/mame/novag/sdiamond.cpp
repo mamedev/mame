@@ -3,7 +3,7 @@
 // thanks-to:Berger
 /*******************************************************************************
 
-Novag (Perfect Technology*) Star Diamond
+Novag (Perfect Technology*) Star Diamond (model 1004)
 
 *: Novag Industries dissolved in 2000. The Novag brand continued for a few years
 under Perfect Technology, Ltd., established by the daughter of Novag's founder.
@@ -17,9 +17,12 @@ Hardware notes:
 - Hitachi H8S/2312 12312VTE25V, 25MHz XTAL
 - 512KB Flash ROM (SST 39VF400A), only 192KB used
 - 256KB RAM (2*Hynix HY62V8100B)
-- LCD with 6 7segs and custom segments
+- LCD with 6 7segs and custom segments (same as Sapphire II)
 - RJ-12 port for Novag Super System (always 57600 baud)
 - piezo, 16 LEDs, button sensors chessboard
+
+Other than 2 checksum bytes, the opening book data (0x10000-0x2ffff) is identical
+to the Diamond II / Sapphire II 060597 EPROM.
 
 TODO:
 - it does a cold boot at every reset, so nvram won't work properly unless MAME
@@ -65,7 +68,7 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(power_switch);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override { set_power(true); }
 
 private:
@@ -85,7 +88,7 @@ private:
 	u16 m_lcd_segs = 0;
 	u8 m_lcd_com = 0;
 
-	void main_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
 
 	// I/O handlers
 	void standby(int state);
@@ -180,7 +183,6 @@ void sdiamond_state::lcd_segs_w(u8 data)
 		m_lcd_segs = m_lcd_segs << 1 | BIT(data, 4);
 		update_lcd();
 	}
-
 	m_lcd_sclk = BIT(data, 5);
 }
 
@@ -359,7 +361,7 @@ ROM_START( sdiamond ) // ID = H8S/SD V1.04
 	ROM_LOAD16_WORD_SWAP("39vf400a.ic3", 0x00000, 0x80000, CRC(ee9a4fee) SHA1(b86e5efa5b7b9ddbe9fe1dabfe8cbc2bc40809b8) )
 
 	ROM_REGION( 72533, "screen", 0 )
-	ROM_LOAD("sdiamond.svg", 0, 72533, CRC(34944b61) SHA1(4a0536ac07790cced9f9bf15522b17ebc375ff8a) )
+	ROM_LOAD("sapphire2.svg", 0, 72533, CRC(34944b61) SHA1(4a0536ac07790cced9f9bf15522b17ebc375ff8a) )
 ROM_END
 
 } // anonymous namespace
@@ -371,4 +373,4 @@ ROM_END
 *******************************************************************************/
 
 //    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS           INIT        COMPANY, FULLNAME, FLAGS
-SYST( 2003, sdiamond, 0,      0,      sdiamond, sdiamond, sdiamond_state, empty_init, "Perfect Technology", "Star Diamond (v1.04)", MACHINE_SUPPORTS_SAVE )
+SYST( 2003, sdiamond, 0,      0,      sdiamond, sdiamond, sdiamond_state, empty_init, "Perfect Technology / Intelligent Heuristic Programming", "Star Diamond", MACHINE_SUPPORTS_SAVE )

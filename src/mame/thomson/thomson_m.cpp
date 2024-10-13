@@ -224,19 +224,6 @@ void thomson_state::thom_irq_reset()
 
 
 
-/* ------------ 6850 defines ------------ */
-
-#define ACIA_6850_RDRF  0x01    /* Receive data register full */
-#define ACIA_6850_TDRE  0x02    /* Transmit data register empty */
-#define ACIA_6850_dcd   0x04    /* Data carrier detect, active low */
-#define ACIA_6850_cts   0x08    /* Clear to send, active low */
-#define ACIA_6850_FE    0x10    /* Framing error */
-#define ACIA_6850_OVRN  0x20    /* Receiver overrun */
-#define ACIA_6850_PE    0x40    /* Parity error */
-#define ACIA_6850_irq   0x80    /* Interrupt request, active low */
-
-
-
 /***************************** TO7 / T9000 *************************/
 
 DEVICE_IMAGE_LOAD_MEMBER( thomson_state::to7_cartridge )
@@ -1689,451 +1676,11 @@ void to9_state::to9_update_ram_bank_postload()
 }
 
 
-
-/* ------------ keyboard (6850 ACIA + 6805 CPU) ------------ */
-
-/* The 6805 chip scans the keyboard and sends ASCII codes to the 6909.
-   Data between the 6809 and 6805 is serialized at 9600 bauds.
-   On the 6809 side, a 6850 ACIA is used.
-   We do not emulate the seral line but pass bytes directly between the
-   keyboard and the 6850 registers.
-   Note that the keyboard protocol uses the parity bit as an extra data bit.
-*/
-
-
-
-/* normal mode: polling interval */
-#define TO9_KBD_POLL_PERIOD  attotime::from_msec( 10 )
-
-/* peripheral mode: time between two bytes, and after last byte */
-#define TO9_KBD_BYTE_SPACE   attotime::from_usec( 300 )
-#define TO9_KBD_END_SPACE    attotime::from_usec( 9100 )
-
-/* first and subsequent repeat periods, in TO9_KBD_POLL_PERIOD units */
-#define TO9_KBD_REPEAT_DELAY  80 /* 800 ms */
-#define TO9_KBD_REPEAT_PERIOD  7 /*  70 ms */
-
-
-
-/* quick keyboard scan */
-int to9_state::to9_kbd_ktest()
-{
-	int line, bit;
-	uint8_t port;
-
-	for ( line = 0; line < 10; line++ )
-	{
-		port = m_io_keyboard[line]->read();
-
-		if ( line == 7 || line == 9 )
-			port |= 1; /* shift & control */
-
-		for ( bit = 0; bit < 8; bit++ )
-		{
-			if ( ! (port & (1 << bit)) )
-				return 1;
-		}
-	}
-	return 0;
-}
-
-
-
-void to9_state::to9_kbd_update_irq()
-{
-	if ( (m_to9_kbd_intr & 4) && (m_to9_kbd_status & ACIA_6850_RDRF) )
-		m_to9_kbd_status |= ACIA_6850_irq; /* byte received interrupt */
-
-	if ( (m_to9_kbd_intr & 4) && (m_to9_kbd_status & ACIA_6850_OVRN) )
-		m_to9_kbd_status |= ACIA_6850_irq; /* overrun interrupt */
-
-	if ( (m_to9_kbd_intr & 3) == 1 && (m_to9_kbd_status & ACIA_6850_TDRE) )
-		m_to9_kbd_status |= ACIA_6850_irq; /* ready to transmit interrupt */
-
-	m_mainirq->in_w<3>( m_to9_kbd_status & ACIA_6850_irq );
-}
-
-
-
-uint8_t to9_state::to9_kbd_r(offs_t offset)
-{
-	/* ACIA 6850 registers */
-
-	switch ( offset )
-	{
-	case 0: /* get status */
-		/* bit 0:     data received */
-		/* bit 1:     ready to transmit data (always 1) */
-		/* bit 2:     data carrier detect (ignored) */
-		/* bit 3:     clear to send (ignored) */
-		/* bit 4:     framing error (ignored) */
-		/* bit 5:     overrun */
-		/* bit 6:     parity error */
-		/* bit 7:     interrupt */
-
-		LOGMASKED(LOG_KBD, "$%04x %f to9_kbd_r: status $%02X (rdrf=%i, tdre=%i, ovrn=%i, pe=%i, irq=%i)\n",
-				m_maincpu->pc(), machine().time().as_double(), m_to9_kbd_status,
-				(m_to9_kbd_status & ACIA_6850_RDRF) ? 1 : 0,
-				(m_to9_kbd_status & ACIA_6850_TDRE) ? 1 : 0,
-				(m_to9_kbd_status & ACIA_6850_OVRN) ? 1 : 0,
-				(m_to9_kbd_status & ACIA_6850_PE) ? 1 : 0,
-				(m_to9_kbd_status & ACIA_6850_irq) ? 1 : 0 );
-		return m_to9_kbd_status;
-
-	case 1: /* get input data */
-		if ( !machine().side_effects_disabled() )
-		{
-			m_to9_kbd_status &= ~(ACIA_6850_irq | ACIA_6850_PE);
-			if ( m_to9_kbd_overrun )
-				m_to9_kbd_status |= ACIA_6850_OVRN;
-			else
-				m_to9_kbd_status &= ~(ACIA_6850_OVRN | ACIA_6850_RDRF);
-			m_to9_kbd_overrun = 0;
-			LOGMASKED(LOG_KBD, "$%04x %f to9_kbd_r: read data $%02X\n", m_maincpu->pc(), machine().time().as_double(), m_to9_kbd_in);
-			to9_kbd_update_irq();
-		}
-		return m_to9_kbd_in;
-
-	default:
-		LOGMASKED(LOG_ERRORS, "$%04x to9_kbd_r: invalid offset %i\n", m_maincpu->pc(), offset);
-		return 0;
-	}
-}
-
-
-
-void to9_state::to9_kbd_w(offs_t offset, uint8_t data)
-{
-	/* ACIA 6850 registers */
-
-	switch ( offset )
-	{
-	case 0: /* set control */
-		/* bits 0-1: clock divide (ignored) or reset */
-		if ( (data & 3) == 3 )
-		{
-			/* reset */
-			m_to9_kbd_overrun = 0;
-			m_to9_kbd_status = ACIA_6850_TDRE;
-			m_to9_kbd_intr = 0;
-			LOGMASKED(LOG_KBD, "$%04x %f to9_kbd_w: reset (data=$%02X)\n", m_maincpu->pc(), machine().time().as_double(), data);
-		}
-		else
-		{
-			/* bits 2-4: parity */
-			if ( (data & 0x18) == 0x10 )
-				m_to9_kbd_parity = 2;
-			else
-				m_to9_kbd_parity = (data >> 2) & 1;
-			/* bits 5-6: interrupt on transmit */
-			/* bit 7:    interrupt on receive */
-			m_to9_kbd_intr = data >> 5;
-
-			LOGMASKED(LOG_KBD, "$%04x %f to9_kbd_w: set control to $%02X (parity=%i, intr in=%i out=%i)\n",
-					m_maincpu->pc(), machine().time().as_double(),
-					data, m_to9_kbd_parity, m_to9_kbd_intr >> 2,
-					(m_to9_kbd_intr & 3) ? 1 : 0);
-		}
-		to9_kbd_update_irq();
-		break;
-
-	case 1: /* output data */
-		m_to9_kbd_status &= ~(ACIA_6850_irq | ACIA_6850_TDRE);
-		to9_kbd_update_irq();
-		/* TODO: 1 ms delay here ? */
-		m_to9_kbd_status |= ACIA_6850_TDRE; /* data transmit ready again */
-		to9_kbd_update_irq();
-
-		switch ( data )
-		{
-		case 0xF8:
-			/* reset */
-			m_to9_kbd_caps = 1;
-			m_to9_kbd_periph = 0;
-			m_to9_kbd_pad = 0;
-			break;
-
-		case 0xF9: m_to9_kbd_caps = 1;   break;
-		case 0xFA: m_to9_kbd_caps = 0;   break;
-		case 0xFB: m_to9_kbd_pad = 1;    break;
-		case 0xFC: m_to9_kbd_pad = 0;    break;
-		case 0xFD: m_to9_kbd_periph = 1; break;
-		case 0xFE: m_to9_kbd_periph = 0; break;
-
-		default:
-			LOGMASKED(LOG_ERRORS, "$%04x %f to9_kbd_w: unknown kbd command %02X\n", m_maincpu->pc(), machine().time().as_double(), data);
-		}
-
-		m_caps_led = !m_to9_kbd_caps;
-
-		LOG("$%04x %f to9_kbd_w: kbd command %02X (caps=%i, pad=%i, periph=%i)\n",
-				m_maincpu->pc(), machine().time().as_double(), data,
-				m_to9_kbd_caps, m_to9_kbd_pad, m_to9_kbd_periph);
-
-		break;
-
-	default:
-		LOGMASKED(LOG_ERRORS, "$%04x to9_kbd_w: invalid offset %i (data=$%02X) \n", m_maincpu->pc(), offset, data);
-	}
-}
-
-
-
-/* send a key to the CPU, 8-bit + parity bit (0=even, 1=odd)
-   note: parity is not used as a checksum but to actually transmit a 9-th bit
-   of information!
-*/
-void to9_state::to9_kbd_send( uint8_t data, int parity )
-{
-	if ( m_to9_kbd_status & ACIA_6850_RDRF )
-	{
-		/* overrun will be set when the current valid byte is read */
-		m_to9_kbd_overrun = 1;
-		LOGMASKED(LOG_KBD, "%f to9_kbd_send: overrun => drop data=$%02X, parity=%i\n", machine().time().as_double(), data, parity);
-	}
-	else
-	{
-		/* valid byte */
-		m_to9_kbd_in = data;
-		m_to9_kbd_status |= ACIA_6850_RDRF; /* raise data received flag */
-		if ( m_to9_kbd_parity == 2 || m_to9_kbd_parity == parity )
-			m_to9_kbd_status &= ~ACIA_6850_PE; /* parity OK */
-		else
-			m_to9_kbd_status |= ACIA_6850_PE;  /* parity error */
-		LOGMASKED(LOG_KBD, "%f to9_kbd_send: data=$%02X, parity=%i, status=$%02X\n", machine().time().as_double(), data, parity, m_to9_kbd_status);
-	}
-	to9_kbd_update_irq();
-}
-
-
-
-/* keycode => TO9 code (extended ASCII), shifted and un-shifted */
-static const int to9_kbd_code[80][2] =
-{
-	{ 145, 150 }, { '_', '6' }, { 'Y', 'Y' }, { 'H', 'H' },
-	{ 11, 11 }, { 9, 9 }, { 30, 12 }, { 'N', 'N' },
-
-	{ 146, 151 }, { '(', '5' }, { 'T', 'T' }, { 'G', 'G' },
-	{ '=', '+' }, { 8, 8 }, { 28, 28 }, { 'B', 'B' },
-
-	{ 147, 152 }, { '\'', '4' }, { 'R', 'R' }, { 'F', 'F' },
-	{ 22, 22 },  { 155, 155 }, { 29, 127 }, { 'V', 'V' },
-
-	{ 148, 153 }, { '"', '3' }, { 'E', 'E' }, { 'D', 'D' },
-	{ 161, 161 }, { 158, 158 },
-	{ 154, 154 }, { 'C', 'C' },
-
-	{ 144, 149 }, { 128, '2' }, { 'Z', 'Z' }, { 'S', 'S' },
-	{ 162, 162 }, { 156, 156 },
-	{ 164, 164 }, { 'X', 'X' },
-
-	{ '#', '@' }, { '*', '1' }, { 'A', 'A' }, { 'Q', 'Q' },
-	{ '[', '{' }, { 159, 159 }, { 160, 160 }, { 'W', 'W' },
-
-	{ 2, 2 }, { 129, '7' }, { 'U', 'U' }, { 'J', 'J' },
-	{ ' ', ' ' }, { 163, 163 }, { 165, 165 },
-	{ ',', '?' },
-
-	{ 0, 0 }, { '!', '8' }, { 'I', 'I' }, { 'K', 'K' },
-	{ '$', '&' }, { 10, 10 }, { ']', '}' },  { ';', '.' },
-
-	{ 0, 0 }, { 130, '9' }, { 'O', 'O' }, { 'L', 'L' },
-	{ '-', '\\' }, { 132, '%' }, { 13, 13 }, { ':', '/' },
-
-	{ 0, 0 }, { 131, '0' }, { 'P', 'P' }, { 'M', 'M' },
-	{ ')', 134 }, { '^', 133 }, { 157, 157 }, { '>', '<' }
-};
-
-
-
-/* returns the ASCII code for the key, or 0 for no key */
-int to9_state::to9_kbd_get_key()
-{
-	int control = ! (m_io_keyboard[7]->read() & 1);
-	int shift   = ! (m_io_keyboard[9]->read() & 1);
-	int key = -1, line, bit;
-	uint8_t port;
-
-	for ( line = 0; line < 10; line++ )
-	{
-		port = m_io_keyboard[line]->read();
-
-		if ( line == 7 || line == 9 )
-			port |= 1; /* shift & control */
-
-		/* TODO: correct handling of simultaneous keystokes:
-		   return the new key preferably & disable repeat
-		*/
-		for ( bit = 0; bit < 8; bit++ )
-		{
-			if ( ! (port & (1 << bit)) )
-				key = line * 8 + bit;
-		}
-	}
-
-	if ( key == -1 )
-	{
-		m_to9_kbd_last_key = 0xff;
-		m_to9_kbd_key_count = 0;
-		return 0;
-	}
-	else if ( key == 64 )
-	{
-		/* caps lock */
-		if ( m_to9_kbd_last_key == key )
-			return 0; /* no repeat */
-
-		m_to9_kbd_last_key = key;
-		m_to9_kbd_caps = !m_to9_kbd_caps;
-		m_caps_led = !m_to9_kbd_caps;
-		return 0;
-	}
-	else
-	{
-		int asc;
-		asc = to9_kbd_code[key][shift];
-		if ( ! asc ) return 0;
-
-		/* keypad */
-		if ( ! m_to9_kbd_pad ) {
-			if ( asc >= 154 && asc <= 163 )
-				asc += '0' - 154;
-			else if ( asc == 164 )
-				asc = '.';
-			else if ( asc == 165 )
-				asc = 13;
-		}
-
-		/* shifted letter */
-		if ( asc >= 'A' && asc <= 'Z' && ( ! m_to9_kbd_caps ) && ( ! shift ) )
-			asc += 'a' - 'A';
-
-		/* control */
-		if ( control )
-			asc &= ~0x40;
-
-		if ( key == m_to9_kbd_last_key )
-		{
-			/* repeat */
-			m_to9_kbd_key_count++;
-			if ( m_to9_kbd_key_count < TO9_KBD_REPEAT_DELAY || (m_to9_kbd_key_count - TO9_KBD_REPEAT_DELAY) % TO9_KBD_REPEAT_PERIOD )
-				return 0;
-			LOGMASKED(LOG_KBD, "to9_kbd_get_key: repeat key $%02X '%c'\n", asc, asc);
-			return asc;
-		}
-		else
-		{
-			m_to9_kbd_last_key = key;
-			m_to9_kbd_key_count = 0;
-			LOGMASKED(LOG_KBD, "to9_kbd_get_key: key down $%02X '%c'\n", asc, asc);
-			return asc;
-		}
-	}
-}
-
-
-
-TIMER_CALLBACK_MEMBER(to9_state::to9_kbd_timer_cb)
-{
-	if ( m_to9_kbd_periph )
-	{
-		/* peripheral mode: every 10 ms we send 4 bytes */
-
-		switch ( m_to9_kbd_byte_count )
-		{
-		case 0: /* key */
-			to9_kbd_send( to9_kbd_get_key(), 0 );
-			break;
-
-		case 1: /* x axis */
-		{
-			int newx = m_io_mouse_x->read();
-			uint8_t data = ( (newx - m_to9_mouse_x) & 0xf ) - 8;
-			to9_kbd_send( data, 1 );
-			m_to9_mouse_x = newx;
-			break;
-		}
-
-		case 2: /* y axis */
-		{
-			int newy = m_io_mouse_y->read();
-			uint8_t data = ( (newy - m_to9_mouse_y) & 0xf ) - 8;
-			to9_kbd_send( data, 1 );
-			m_to9_mouse_y = newy;
-			break;
-		}
-
-		case 3: /* axis overflow & buttons */
-		{
-			int b = m_io_mouse_button->read();
-			uint8_t data = 0;
-			if ( b & 1 ) data |= 1;
-			if ( b & 2 ) data |= 4;
-			to9_kbd_send( data, 1 );
-			break;
-		}
-
-		}
-
-		m_to9_kbd_byte_count = ( m_to9_kbd_byte_count + 1 ) & 3;
-		m_to9_kbd_timer->adjust(m_to9_kbd_byte_count ? TO9_KBD_BYTE_SPACE : TO9_KBD_END_SPACE);
-	}
-	else
-	{
-		int key = to9_kbd_get_key();
-		/* keyboard mode: send a byte only if a key is down */
-		if ( key )
-			to9_kbd_send( key, 0 );
-		m_to9_kbd_timer->adjust(TO9_KBD_POLL_PERIOD);
-	}
-}
-
-
-
-void to9_state::to9_kbd_reset()
-{
-	LOG("to9_kbd_reset called\n");
-	m_to9_kbd_overrun = 0;  /* no byte lost */
-	m_to9_kbd_status = ACIA_6850_TDRE;  /* clear to transmit */
-	m_to9_kbd_intr = 0;     /* interrupt disabled */
-	m_to9_kbd_caps = 1;
-	m_to9_kbd_periph = 0;
-	m_to9_kbd_pad = 0;
-	m_to9_kbd_byte_count = 0;
-	m_caps_led = !m_to9_kbd_caps;
-	m_to9_kbd_key_count = 0;
-	m_to9_kbd_last_key = 0xff;
-	to9_kbd_update_irq();
-	m_to9_kbd_timer->adjust(TO9_KBD_POLL_PERIOD);
-}
-
-
-
-void to9_state::to9_kbd_init()
-{
-	LOG("to9_kbd_init called\n");
-	m_to9_kbd_timer = timer_alloc(FUNC(to9_state::to9_kbd_timer_cb), this);
-	save_item(NAME(m_to9_kbd_parity));
-	save_item(NAME(m_to9_kbd_intr));
-	save_item(NAME(m_to9_kbd_in));
-	save_item(NAME(m_to9_kbd_status));
-	save_item(NAME(m_to9_kbd_overrun));
-	save_item(NAME(m_to9_kbd_last_key));
-	save_item(NAME(m_to9_kbd_key_count));
-	save_item(NAME(m_to9_kbd_caps));
-	save_item(NAME(m_to9_kbd_periph));
-	save_item(NAME(m_to9_kbd_pad));
-	save_item(NAME(m_to9_kbd_byte_count));
-	save_item(NAME(m_to9_mouse_x));
-	save_item(NAME(m_to9_mouse_y));
-}
-
-
 /* ------------ system PIA 6821 ------------ */
 
 uint8_t to9_state::to9_sys_porta_in()
 {
-	uint8_t ktest = to9_kbd_ktest();
+	uint8_t ktest = m_to9_kbd->ktest_r();
 
 	LOGMASKED(LOG_KBD, "to9_sys_porta_in: ktest=%i\n", ktest);
 
@@ -2192,7 +1739,6 @@ MACHINE_RESET_MEMBER( to9_state, to9 )
 	/* subsystems */
 	thom_irq_reset();
 	to7_game_reset();
-	to9_kbd_reset();
 
 	m_extension->rom_map(m_maincpu->space(AS_PROGRAM), 0xe000, 0xe7bf);
 	m_extension->io_map (m_maincpu->space(AS_PROGRAM), 0xe7c0, 0xe7ff);
@@ -2221,6 +1767,7 @@ MACHINE_RESET_MEMBER( to9_state, to9 )
 
 MACHINE_START_MEMBER( to9_state, to9 )
 {
+	uint8_t* mem = memregion("maincpu")->base();
 	uint8_t* cartmem = &m_cart_rom[0];
 	uint8_t* ram = m_ram->pointer();
 
@@ -2228,7 +1775,6 @@ MACHINE_START_MEMBER( to9_state, to9 )
 
 	/* subsystems */
 	to7_game_init();
-	to9_kbd_init();
 	to9_palette_init();
 
 	m_extension->rom_map(m_maincpu->space(AS_PROGRAM), 0xe000, 0xe7bf);
@@ -2238,7 +1784,8 @@ MACHINE_START_MEMBER( to9_state, to9 )
 	m_thom_vram = ram;
 	m_thom_cart_bank = 0;
 	m_vrambank->configure_entries( 0,  2, m_thom_vram, 0x2000 );
-	m_cartbank->configure_entries( 0, 12, cartmem, 0x4000 );
+	m_cartbank->configure_entries( 0,  4, cartmem, 0x4000 );
+	m_cartbank->configure_entries( 4,  8, mem + 0x10000, 0x4000 );
 	m_basebank->configure_entry( 0,  ram + 0x4000);
 	m_rambank->configure_entries( 0, 10, ram + 0x8000, 0x4000 );
 	m_vrambank->set_entry( 0 );
@@ -2260,318 +1807,6 @@ MACHINE_START_MEMBER( to9_state, to9 )
 
 
 /***************************** TO8 *************************/
-
-
-/* ------------ keyboard (6804) ------------ */
-
-/* The 6804 chip scans the keyboard and sends keycodes to the 6809.
-   Data is serialized using variable pulse length encoding.
-   Unlike the TO9, there is no decoding chip on the 6809 side, only
-   1-bit PIA ports (6821 & 6846). The 6809 does the decoding.
-
-   We do not emulate the 6804 but pass serialized data directly through the
-   PIA ports.
-
-   Note: if we conform to the (scarce) documentation the CPU tend to lock
-   waiting for keyboard input.
-   The protocol documentation is pretty scarce and does not account for these
-   behaviors!
-   The emulation code contains many hacks (delays, timeouts, spurious
-   pulses) to improve the stability.
-   This works well, but is not very accurate.
-*/
-
-
-
-/* polling interval */
-#define TO8_KBD_POLL_PERIOD  attotime::from_msec( 1 )
-
-/* first and subsequent repeat periods, in TO8_KBD_POLL_PERIOD units */
-#define TO8_KBD_REPEAT_DELAY  800 /* 800 ms */
-#define TO8_KBD_REPEAT_PERIOD  70 /*  70 ms */
-
-/* timeout waiting for CPU */
-#define TO8_KBD_TIMEOUT  attotime::from_msec( 100 )
-
-
-
-/* quick keyboard scan */
-int to9_state::to8_kbd_ktest()
-{
-	int line, bit;
-	uint8_t port;
-
-	if ( m_io_config->read() & 2 )
-		return 0; /* disabled */
-
-	for ( line = 0; line < 10; line++ )
-	{
-		port = m_io_keyboard[line]->read();
-
-		if ( line == 7 || line == 9 )
-			port |= 1; /* shift & control */
-
-		for ( bit = 0; bit < 8; bit++ )
-		{
-			if ( ! (port & (1 << bit)) )
-				return 1;
-		}
-	}
-
-	return 0;
-}
-
-
-
-/* keyboard scan & return keycode (or -1) */
-int to9_state::to8_kbd_get_key()
-{
-	int control = (m_io_keyboard[7]->read() & 1) ? 0 : 0x100;
-	int shift   = (m_io_keyboard[9]->read() & 1) ? 0 : 0x080;
-	int key = -1, line, bit;
-	uint8_t port;
-
-	if ( m_io_config->read() & 2 )
-		return -1; /* disabled */
-
-	for ( line = 0; line < 10; line++ )
-	{
-		port = m_io_keyboard[line]->read();
-
-		if ( line == 7 || line == 9 )
-			port |= 1; /* shift & control */
-
-		/* TODO: correct handling of simultaneous keystokes:
-		   return the new key preferably & disable repeat
-		*/
-		for ( bit = 0; bit < 8; bit++ )
-		{
-			if ( ! (port & (1 << bit)) )
-				key = line * 8 + bit;
-		}
-	}
-
-	if ( key == -1 )
-	{
-		m_to8_kbd_last_key = 0xff;
-		m_to8_kbd_key_count = 0;
-		return -1;
-	}
-	else if ( key == 64 )
-	{
-		/* caps lock */
-		if ( m_to8_kbd_last_key == key )
-			return -1; /* no repeat */
-		m_to8_kbd_last_key = key;
-		m_to8_kbd_caps = !m_to8_kbd_caps;
-		if ( m_to8_kbd_caps )
-			key |= 0x080; /* auto-shift */
-		m_caps_led = !m_to8_kbd_caps;
-		return key;
-	}
-	else if ( key == m_to8_kbd_last_key )
-	{
-		/* repeat */
-		m_to8_kbd_key_count++;
-		if ( m_to8_kbd_key_count < TO8_KBD_REPEAT_DELAY || (m_to8_kbd_key_count - TO8_KBD_REPEAT_DELAY) % TO8_KBD_REPEAT_PERIOD )
-			return -1;
-		return key | shift | control;
-	}
-	else
-	{
-		m_to8_kbd_last_key = key;
-		m_to8_kbd_key_count = 0;
-		return key | shift | control;
-	}
-}
-
-
-/* steps:
-   0     = idle, key polling
-   1     = wait for ack to go down (key to send)
-   99-117 = key data transmit
-   91-117 = signal
-   255    = timeout
-*/
-
-/* keyboard automaton */
-void to9_state::to8_kbd_timer_func()
-{
-	attotime d;
-
-	LOGMASKED(LOG_KBD, "%f to8_kbd_timer_cb: step=%i ack=%i data=$%03X\n", machine().time().as_double(), m_to8_kbd_step, m_to8_kbd_ack, m_to8_kbd_data);
-
-	if( ! m_to8_kbd_step )
-	{
-		/* key polling */
-		int k = to8_kbd_get_key();
-		/* if not in transfer, send pulse from time to time
-		   (helps avoiding CPU lock)
-		*/
-		if ( ! m_to8_kbd_ack )
-			m_mc6846->set_input_cp1(0);
-		m_mc6846->set_input_cp1(1);
-
-		if ( k == -1 )
-			d = TO8_KBD_POLL_PERIOD;
-		else
-		{
-			/* got key! */
-			LOGMASKED(LOG_KBD, "to8_kbd_timer_cb: got key $%03X\n", k);
-			m_to8_kbd_data = k;
-			m_to8_kbd_step = 1;
-			d = attotime::from_usec( 100 );
-		}
-	}
-	else if ( m_to8_kbd_step == 255 )
-	{
-		/* timeout */
-		m_to8_kbd_last_key = 0xff;
-		m_to8_kbd_key_count = 0;
-		m_to8_kbd_step = 0;
-		m_mc6846->set_input_cp1(1);
-		d = TO8_KBD_POLL_PERIOD;
-	}
-	else if ( m_to8_kbd_step == 1 )
-	{
-		/* schedule timeout waiting for ack to go down */
-		m_mc6846->set_input_cp1(0);
-		m_to8_kbd_step = 255;
-		d = TO8_KBD_TIMEOUT;
-	}
-	else if ( m_to8_kbd_step == 117 )
-	{
-		/* schedule timeout  waiting for ack to go up */
-		m_mc6846->set_input_cp1(0);
-		m_to8_kbd_step = 255;
-		d = TO8_KBD_TIMEOUT;
-	}
-	else if ( m_to8_kbd_step & 1 )
-	{
-		/* send silence between bits */
-		m_mc6846->set_input_cp1(0);
-		d = attotime::from_usec( 100 );
-		m_to8_kbd_step++;
-	}
-	else
-	{
-		/* send bit */
-		int bpos = 8 - ( (m_to8_kbd_step - 100) / 2);
-		int bit = (m_to8_kbd_data >> bpos) & 1;
-		m_mc6846->set_input_cp1(1);
-		d = attotime::from_usec( bit ? 56 : 38 );
-		m_to8_kbd_step++;
-	}
-	m_to8_kbd_timer->adjust(d);
-}
-
-
-
-TIMER_CALLBACK_MEMBER(to9_state::to8_kbd_timer_cb)
-{
-	to8_kbd_timer_func();
-}
-
-
-
-/* cpu <-> keyboard hand-check */
-void to9_state::to8_kbd_set_ack( int data )
-{
-	if ( data == m_to8_kbd_ack )
-		return;
-	m_to8_kbd_ack = data;
-
-	if ( data )
-	{
-		double len = m_to8_kbd_signal->elapsed( ).as_double() * 1000. - 2.;
-		LOGMASKED(LOG_KBD, "%f to8_kbd_set_ack: CPU end ack, len=%f\n", machine().time().as_double(), len);
-		if ( m_to8_kbd_data == 0xfff )
-		{
-			/* end signal from CPU */
-			if ( len >= 0.6 && len <= 0.8 )
-			{
-				LOG("%f to8_kbd_set_ack: INIT signal\n", machine().time().as_double());
-				m_to8_kbd_last_key = 0xff;
-				m_to8_kbd_key_count = 0;
-				m_to8_kbd_caps = 1;
-				/* send back signal: TODO returned codes ? */
-				m_to8_kbd_data = 0;
-				m_to8_kbd_step = 0;
-				m_to8_kbd_timer->adjust(attotime::from_msec( 1 ));
-			}
-			else
-			{
-				m_to8_kbd_step = 0;
-				m_to8_kbd_timer->adjust(TO8_KBD_POLL_PERIOD);
-				if ( len >= 1.2 && len <= 1.4 )
-				{
-					LOG("%f to8_kbd_set_ack: CAPS on signal\n", machine().time().as_double());
-					m_to8_kbd_caps = 1;
-				}
-				else if ( len >= 1.8 && len <= 2.0 )
-				{
-					LOG("%f to8_kbd_set_ack: CAPS off signal\n", machine().time().as_double());
-					m_to8_kbd_caps = 0;
-				}
-			}
-			m_caps_led = !m_to8_kbd_caps;
-		}
-		else
-		{
-			/* end key transmission */
-			m_to8_kbd_step = 0;
-			m_to8_kbd_timer->adjust(TO8_KBD_POLL_PERIOD);
-		}
-	}
-
-	else
-	{
-		if ( m_to8_kbd_step == 255 )
-		{
-			/* CPU accepts key */
-			m_to8_kbd_step = 99;
-			m_to8_kbd_timer->adjust(attotime::from_usec( 400 ));
-		}
-		else
-		{
-			/* start signal from CPU */
-			m_to8_kbd_data = 0xfff;
-			m_to8_kbd_step = 91;
-			m_to8_kbd_timer->adjust(attotime::from_usec( 400 ));
-			m_to8_kbd_signal->adjust(attotime::never);
-		}
-		LOGMASKED(LOG_KBD, "%f to8_kbd_set_ack: CPU ack, data=$%03X\n", machine().time().as_double(), m_to8_kbd_data);
-	}
-}
-
-
-
-void to9_state::to8_kbd_reset()
-{
-	m_to8_kbd_last_key = 0xff;
-	m_to8_kbd_key_count = 0;
-	m_to8_kbd_step = 0;
-	m_to8_kbd_data = 0;
-	m_to8_kbd_ack = 1;
-	m_to8_kbd_caps = 1;
-	m_caps_led = !m_to8_kbd_caps;
-	to8_kbd_timer_func();
-}
-
-
-
-void to9_state::to8_kbd_init()
-{
-	m_to8_kbd_timer = timer_alloc(FUNC(to9_state::to8_kbd_timer_cb), this);
-	m_to8_kbd_signal = machine().scheduler().timer_alloc(timer_expired_delegate());
-	save_item(NAME(m_to8_kbd_ack));
-	save_item(NAME(m_to8_kbd_data));
-	save_item(NAME(m_to8_kbd_step));
-	save_item(NAME(m_to8_kbd_last_key));
-	save_item(NAME(m_to8_kbd_key_count));
-	save_item(NAME(m_to8_kbd_caps));
-}
-
 
 
 /* ------------ RAM / ROM banking ------------ */
@@ -3004,7 +2239,7 @@ void to9_state::to8_vreg_w(offs_t offset, uint8_t data)
 
 uint8_t to9_state::to8_sys_porta_in()
 {
-	int ktest = to8_kbd_ktest();
+	int ktest = m_to8_kbd->ktest_r();
 
 	LOGMASKED(LOG_KBD, "$%04x %f: to8_sys_porta_in ktest=%i\n", m_maincpu->pc(), machine().time().as_double(), ktest);
 
@@ -3040,7 +2275,7 @@ uint8_t to9_state::to8_timer_port_in()
 	int lightpen = (m_io_lightpen_button->read() & 1) ? 2 : 0;
 	int cass = to7_get_cassette() ? 0x80 : 0;
 	int dtr = m_centronics_busy << 6;
-	int lock = m_to8_kbd_caps ? 0 : 8; /* undocumented! */
+	int lock = m_to8_kbd->caps_r() ? 0 : 8; /* undocumented! */
 	return lightpen | cass | dtr | lock;
 }
 
@@ -3054,7 +2289,7 @@ void to9_state::to8_timer_port_out(uint8_t data)
 	m_biosbank->set_entry( m_to8_bios_bank );
 	m_to8_soft_select = (data & 0x04) ? 1 : 0; /* bit 2: internal ROM select */
 	to8_update_cart_bank();
-	to8_kbd_set_ack(ack);
+	m_to8_kbd->set_ack(ack);
 }
 
 
@@ -3094,7 +2329,6 @@ MACHINE_RESET_MEMBER( to9_state, to8 )
 	/* subsystems */
 	thom_irq_reset();
 	to7_game_reset();
-	to8_kbd_reset();
 
 	/* gate-array */
 	m_to7_lightpen = 0;
@@ -3139,7 +2373,6 @@ MACHINE_START_MEMBER( to9_state, to8 )
 
 	/* subsystems */
 	to7_game_init();
-	to8_kbd_init();
 	to9_palette_init();
 
 	m_extension->rom_map(m_maincpu->space(AS_PROGRAM), 0xe000, 0xe7bf);
@@ -3168,7 +2401,7 @@ MACHINE_START_MEMBER( to9_state, to8 )
 	m_vrambank->configure_entries( 0,  2, ram, 0x2000 );
 	m_syslobank->configure_entry( 0,  ram + 0x6000);
 	m_syshibank->configure_entry( 0,  ram + 0x4000);
-	m_biosbank->configure_entries( 0,  2, mem + 0x20800, 0x2000 );
+	m_biosbank->configure_entries( 0,  2, mem + 0x20000, 0x2000 );
 	m_cartbank->set_entry( 0 );
 	m_vrambank->set_entry( 0 );
 	m_syslobank->set_entry( 0 );
@@ -3239,7 +2472,6 @@ MACHINE_RESET_MEMBER( to9_state, to9p )
 	/* subsystems */
 	thom_irq_reset();
 	to7_game_reset();
-	to9_kbd_reset();
 
 	/* gate-array */
 	m_to7_lightpen = 0;
@@ -3283,7 +2515,6 @@ MACHINE_START_MEMBER( to9_state, to9p )
 
 	/* subsystems */
 	to7_game_init();
-	to9_kbd_init();
 	to9_palette_init();
 
 	m_extension->rom_map(m_maincpu->space(AS_PROGRAM), 0xe000, 0xe7bf);
@@ -3300,7 +2531,7 @@ MACHINE_START_MEMBER( to9_state, to9p )
 	m_syshibank->configure_entry( 0,  ram + 0x4000 );
 	m_datalobank->configure_entries( 0, 32, ram + 0x2000, 0x4000 );
 	m_datahibank->configure_entries( 0, 32, ram + 0x0000, 0x4000 );
-	m_biosbank->configure_entries( 0,  2, mem + 0x20800, 0x2000 );
+	m_biosbank->configure_entries( 0,  2, mem + 0x20000, 0x2000 );
 	m_cartbank->set_entry( 0 );
 	m_vrambank->set_entry( 0 );
 	m_syslobank->set_entry( 0 );

@@ -17,8 +17,8 @@ class ata_hle_device_base : public device_t
 protected:
 	ata_hle_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	TIMER_CALLBACK_MEMBER(busy_tick);
 	TIMER_CALLBACK_MEMBER(empty_tick);
@@ -240,6 +240,7 @@ private:
 	void start_diagnostic();
 	void finished_diagnostic();
 	void finished_busy(int32_t param);
+	void clear_dma_modes();
 	bool set_dma_mode(int word);
 
 	int m_csel;

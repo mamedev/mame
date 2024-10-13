@@ -42,8 +42,8 @@ public:
 
 private:
 	void output_digits();
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 	void ctrl_w(uint8_t data);
 	void port3_w(uint8_t data);
 	void led_strobe_w(uint8_t data);
@@ -58,9 +58,9 @@ private:
 	uint8_t   m_ctrl = 0;
 	uint8_t   m_lcd_latch = 0;
 	uint32_t  m_digit_latch = 0;
-	void piggypas_io(address_map &map);
-	void piggypas_map(address_map &map);
-	void fidlstix_io(address_map &map);
+	void piggypas_io(address_map &map) ATTR_COLD;
+	void piggypas_map(address_map &map) ATTR_COLD;
+	void fidlstix_io(address_map &map) ATTR_COLD;
 };
 
 
@@ -235,7 +235,7 @@ void piggypas_state::piggypas(machine_config &config)
 	ppi.out_pb_callback().set(FUNC(piggypas_state::ctrl_w));
 	ppi.in_pc_callback().set_ioport("IN0");
 
-	TICKET_DISPENSER(config, "ticket", attotime::from_msec(100), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH);
+	TICKET_DISPENSER(config, "ticket", attotime::from_msec(100));
 }
 
 void piggypas_state::fidlstix(machine_config &config)

@@ -184,15 +184,15 @@ protected:
 	void save_state();
 
 	virtual void machine_start() override { m_lamps.resolve(); }
-	virtual void machine_reset() override;
+	virtual void machine_reset() override ATTR_COLD;
 	INTERRUPT_GEN_MEMBER(timer_irq);
 	void sc1_common_init(int reels, int decrypt, int defaultbank);
 	void Scorpion1_SetSwitchState(int strobe, int data, int state);
 	int sc1_find_project_string();
 
-	void sc1_adder2(address_map &map);
-	void sc1_base(address_map &map);
-	void sc1_viper(address_map &map);
+	void sc1_adder2(address_map &map) ATTR_COLD;
+	void sc1_base(address_map &map) ATTR_COLD;
+	void sc1_viper(address_map &map) ATTR_COLD;
 
 private:
 	int m_mmtr_latch = 0;
@@ -3173,7 +3173,7 @@ GAME( 198?, sc1fruit, 0,        scorpion1, scorpion1, bfm_sc1_state, init_lotse,
 GAME( 198?, sc1frtln, sc1fruit, scorpion1, scorpion1, bfm_sc1_state, init_lotse, 0, "BFM/ELAM", "Fruit Lines (Dutch) (Bellfruit) (set 2) (Scorpion 1)", GAME_FLAGS )
 
 // PROJECT NUMBER 6048  GRAND PRIX  GAME No 39-370-805 - 26-MAR-1993 11:26:08
-GAME( 198?, sc1gprix, 0, scorpion1, scorpion1, bfm_sc1_state, init_nocrypt, 0, "BFM/ELAM", "Grand Prix (Dutch) (Dutch) (Bellfruit) (Scorpion 1)", GAME_FLAGS )
+GAME( 198?, sc1gprix, 0, scorpion1, scorpion1, bfm_sc1_state, init_nocrypt, 0, "BFM/ELAM", "Grand Prix (Dutch) (Bellfruit) (Scorpion 1)", GAME_FLAGS )
 
 // PROJECT NUMBER 5957  Impact  GAME No 95-750-769 - 02-JUL-1996 12:10:32
 GAME( 198?, sc1impc, 0, scorpion1, scorpion1, bfm_sc1_state, init_lotse, 0, "BFM/ELAM", "Impact (Dutch) (Bellfruit) (Scorpion 1)", GAME_FLAGS )

@@ -38,7 +38,7 @@ public:
 	void pcm_in(uint8_t data);
 
 protected:
-	void device_start() override;
+	void device_start() override ATTR_COLD;
 	void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
 
 private:
@@ -108,7 +108,7 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(wakeup);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 	required_device<psion_asic9_device> m_asic9;
 	required_device<ram_device> m_ram;
@@ -154,7 +154,7 @@ public:
 	void psion3c(machine_config &config);
 
 protected:
-	virtual void machine_reset() override;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	required_device<psion_condor_device> m_condor;

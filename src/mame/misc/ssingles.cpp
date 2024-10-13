@@ -187,10 +187,10 @@ public:
 	void ssingles(machine_config &config);
 	void atamanot(machine_config &config);
 
-	DECLARE_CUSTOM_INPUT_MEMBER(controls_r);
+	ioport_value controls_r();
 
 protected:
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -222,10 +222,10 @@ private:
 	MC6845_UPDATE_ROW(ssingles_update_row);
 	MC6845_UPDATE_ROW(atamanot_update_row);
 
-	void atamanot_io_map(address_map &map);
-	void atamanot_map(address_map &map);
-	void ssingles_io_map(address_map &map);
-	void ssingles_map(address_map &map);
+	void atamanot_io_map(address_map &map) ATTR_COLD;
+	void atamanot_map(address_map &map) ATTR_COLD;
+	void ssingles_io_map(address_map &map) ATTR_COLD;
+	void ssingles_map(address_map &map) ATTR_COLD;
 };
 
 //fake palette
@@ -329,7 +329,7 @@ void ssingles_state::c001_w(uint8_t data)
 	m_prot_data ^= data ^ 0x11;
 }
 
-CUSTOM_INPUT_MEMBER(ssingles_state::controls_r)
+ioport_value ssingles_state::controls_r()
 {
 	int data = 7;
 	switch (m_extra->read())     //multiplexed

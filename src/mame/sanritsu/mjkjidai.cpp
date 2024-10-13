@@ -67,12 +67,12 @@ public:
 
 	void mjkjidai(machine_config &config);
 
-	DECLARE_CUSTOM_INPUT_MEMBER(keyboard_r);
+	ioport_value keyboard_r();
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -104,8 +104,8 @@ private:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void vblank_irq(int state);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void io_map(address_map &map);
-	void prg_map(address_map &map);
+	void io_map(address_map &map) ATTR_COLD;
+	void prg_map(address_map &map) ATTR_COLD;
 };
 
 
@@ -254,7 +254,7 @@ void mjkjidai_state::adpcm_int(int state)
 	}
 }
 
-CUSTOM_INPUT_MEMBER(mjkjidai_state::keyboard_r)
+ioport_value mjkjidai_state::keyboard_r()
 {
 	int res = 0x3f;
 

@@ -114,6 +114,7 @@ Notes:
 *************************************************************************************************************/
 
 #include "emu.h"
+
 #include "cpu/z80/kl5c80a12.h"
 #include "cpu/z80/ky80.h"
 #include "machine/74165.h"
@@ -126,6 +127,7 @@ Notes:
 #include "sound/okim9810.h"
 #include "sound/ymz280b.h"
 #include "video/bufsprite.h"
+
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
@@ -150,7 +152,7 @@ public:
 	{ }
 
 protected:
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 
 	// TODO: unify these handlers
 	void vregs_w(offs_t offset, uint8_t data);
@@ -218,9 +220,9 @@ protected:
 
 	INTERRUPT_GEN_MEMBER(sigmab98_vblank_interrupt);
 
-	void dodghero_mem_map(address_map &map);
-	void gegege_io_map(address_map &map);
-	void gegege_mem_map(address_map &map);
+	void dodghero_mem_map(address_map &map) ATTR_COLD;
+	void gegege_io_map(address_map &map) ATTR_COLD;
+	void gegege_mem_map(address_map &map) ATTR_COLD;
 
 	virtual void machine_start() override { m_leds.resolve(); }
 
@@ -273,8 +275,8 @@ private:
 	TIMER_DEVICE_CALLBACK_MEMBER(lufykzku_irq);
 	TIMER_DEVICE_CALLBACK_MEMBER(rockman_timer_irq);
 
-	void lufykzku_io_map(address_map &map);
-	void lufykzku_mem_map(address_map &map);
+	void lufykzku_io_map(address_map &map) ATTR_COLD;
+	void lufykzku_mem_map(address_map &map) ATTR_COLD;
 
 	uint8_t m_vblank_vector = 0;
 	uint8_t m_timer0_vector = 0;
@@ -328,13 +330,13 @@ private:
 	uint8_t eeprom_r();
 	void eeprom_w(uint8_t data);
 
-	void animalc_io(address_map &map);
-	void animalc_map(address_map &map);
-	void gocowboy_io(address_map &map);
-	void gocowboy_map(address_map &map);
-	void haekaka_map(address_map &map);
-	void itazuram_map(address_map &map);
-	void tdoboon_map(address_map &map);
+	void animalc_io(address_map &map) ATTR_COLD;
+	void animalc_map(address_map &map) ATTR_COLD;
+	void gocowboy_io(address_map &map) ATTR_COLD;
+	void gocowboy_map(address_map &map) ATTR_COLD;
+	void haekaka_map(address_map &map) ATTR_COLD;
+	void itazuram_map(address_map &map) ATTR_COLD;
+	void tdoboon_map(address_map &map) ATTR_COLD;
 
 	// Required devices
 	required_device<kl5c80a12_device> m_maincpu;
@@ -734,7 +736,7 @@ void sigmab98_state::show_outputs()
 void sigmab98_state::eeprom_w(uint8_t data)
 {
 	// latch the bit
-	m_eeprom->di_write((data & 0x40) >> 6);
+	m_eeprom->di_write(BIT(data, 6));
 
 	// reset line asserted: reset.
 //  if ((m_c0 ^ data) & 0x20)
@@ -765,9 +767,9 @@ void sigmab98_state::c4_w(uint8_t data)
 // 20 led? (starts blinking after coin in)
 void sigmab98_state::c6_w(uint8_t data)
 {
-	machine().bookkeeping().coin_lockout_w(0, (~data) & 0x02);
+	machine().bookkeeping().coin_lockout_w(0, BIT(~data, 1));
 
-	machine().bookkeeping().coin_counter_w(0,   data  & 0x04);
+	machine().bookkeeping().coin_counter_w(0, BIT(data, 2));
 
 	if ((data & 0x08) && !(m_c6 & 0x08))
 		m_buffered_spriteram->copy();
@@ -784,7 +786,7 @@ void sigmab98_state::c6_w(uint8_t data)
 // 02 hopper motor on (active low)?
 void sigmab98_state::c8_w(uint8_t data)
 {
-	m_hopper->motor_w((!(data & 0x02) && (data & 0x01)) ? 0 : 1);
+	m_hopper->motor_w(~data >> 1 & data & 1);
 
 	m_c8 = data;
 	show_outputs();
@@ -819,7 +821,7 @@ void sigmab98_state::gegege_io_map(address_map &map)
 	map(0xc6, 0xc6).w(FUNC(sigmab98_state::c6_w));
 	map(0xc8, 0xc8).w(FUNC(sigmab98_state::c8_w));
 
-	map(0xe5, 0xe5).nopr();   // during irq
+	map(0xe5, 0xe5).nopr(); // during irq
 }
 
 
@@ -1201,19 +1203,19 @@ GFXDECODE_END
 // 1 button (plus bet and payout)
 static INPUT_PORTS_START( sigma_1b )
 	PORT_START("EEPROM")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM )                       // Related to d013. Must be 0
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM  )                       // Related to d013. Must be 0
 	PORT_BIT( 0x02, IP_ACTIVE_LOW,  IPT_CUSTOM  ) PORT_VBLANK("screen") // Related to d013. Must be 0
 	PORT_BIT( 0x04, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW,  IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM )   PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM  ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
 
 	PORT_START("BUTTON")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW,  IPT_COIN2   ) PORT_IMPULSE(5)   // ? (coin error, pulses mask 4 of port c6)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW,  IPT_COIN1   ) PORT_IMPULSE(5) PORT_NAME("Medal")    // coin/medal in (coin error)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("hopper", ticket_dispenser_device, line_r)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW,  IPT_CUSTOM  ) PORT_READ_LINE_DEVICE_MEMBER("hopper", ticket_dispenser_device, line_r)
 	PORT_SERVICE( 0x08, IP_ACTIVE_LOW )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_GAMBLE_BET ) PORT_CODE(KEYCODE_1)  // bet / select in test menu
 	PORT_BIT( 0x20, IP_ACTIVE_LOW,  IPT_BUTTON1 )
@@ -1289,7 +1291,7 @@ static INPUT_PORTS_START( lufykzku )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("hopper", ticket_dispenser_device, line_r)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW,  IPT_CUSTOM  ) PORT_READ_LINE_DEVICE_MEMBER("hopper", ticket_dispenser_device, line_r)
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
 	PORT_START("PAYOUT")
@@ -1365,14 +1367,14 @@ static INPUT_PORTS_START( sammymdl )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("COIN")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW,  IPT_COIN1   ) PORT_IMPULSE(5)   // coin1 in
-	PORT_BIT( 0x02, IP_ACTIVE_LOW,  IPT_COIN2   ) PORT_IMPULSE(5)   // coin2 in
-	PORT_BIT( 0x04, IP_ACTIVE_LOW,  IPT_COIN3   ) PORT_IMPULSE(5) PORT_NAME("Medal")    // medal in
-	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_SERVICE )   // test sw
-	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_UNKNOWN )
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("hopper", ticket_dispenser_device, line_r)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW,  IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_UNKNOWN )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1   ) PORT_IMPULSE(5)   // coin1 in
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2   ) PORT_IMPULSE(5)   // coin2 in
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN3   ) PORT_IMPULSE(5) PORT_NAME("Medal")    // medal in
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE )   // test sw
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_CUSTOM  ) PORT_READ_LINE_DEVICE_MEMBER("hopper", ticket_dispenser_device, line_r)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( haekaka )
@@ -1387,22 +1389,22 @@ static INPUT_PORTS_START( haekaka )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("COIN")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW,  IPT_UNKNOWN  )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW,  IPT_UNKNOWN  )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW,  IPT_UNKNOWN  )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_SERVICE  )  // test sw
-	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_BUTTON1  )  // button
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_CUSTOM  ) PORT_READ_LINE_DEVICE_MEMBER("hopper", ticket_dispenser_device, line_r)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW,  IPT_SERVICE1 )  // service coin / set in test mode
-	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_UNKNOWN  )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN  )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN  )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN  )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE  )  // test sw
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1  )  // button
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_CUSTOM   ) PORT_READ_LINE_DEVICE_MEMBER("hopper", ticket_dispenser_device, line_r)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE1 )  // service coin / set in test mode
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN  )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( gocowboy )
 	PORT_START("BUTTON")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1  ) // shoot
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN1    ) PORT_IMPULSE(20) // coin
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("hopper_small", ticket_dispenser_device, line_r) // 1/2' pay sensor (small)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("hopper_large", ticket_dispenser_device, line_r) // 3/4' pay sensor (large)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_CUSTOM   ) PORT_READ_LINE_DEVICE_MEMBER("hopper_small", ticket_dispenser_device, line_r) // 1/2' pay sensor (small)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_CUSTOM   ) PORT_READ_LINE_DEVICE_MEMBER("hopper_large", ticket_dispenser_device, line_r) // 3/4' pay sensor (large)
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_NAME("Meter Switch") // capsule test (pressed while booting) / next in test mode
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE2 ) PORT_NAME("Reset Switch") // reset backup ram (pressed while booting) / previous in test mode
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE  )                           // test mode (keep pressed in game) / select in test mode / service coin
@@ -1444,7 +1446,7 @@ void sigmab98_state::sigmab98(machine_config &config)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 	EEPROM_93C46_16BIT(config, "eeprom");
 
-	TICKET_DISPENSER(config, m_hopper, attotime::from_msec(200), TICKET_MOTOR_ACTIVE_LOW, TICKET_STATUS_ACTIVE_LOW );
+	TICKET_DISPENSER(config, m_hopper, attotime::from_msec(200));
 
 	// video hardware
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
@@ -1516,7 +1518,7 @@ void lufykzku_state::lufykzku(machine_config &config)
 	// No EEPROM
 
 	MB3773(config, m_watchdog, 0);
-	TICKET_DISPENSER(config, m_hopper, attotime::from_msec(200), TICKET_MOTOR_ACTIVE_LOW, TICKET_STATUS_ACTIVE_LOW );
+	TICKET_DISPENSER(config, m_hopper, attotime::from_msec(200));
 
 	// 2 x 8-bit parallel/serial converters
 	TTL165(config, m_dsw_shifter[0]);
@@ -1593,7 +1595,7 @@ void sammymdl_state::sammymdl(machine_config &config)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);   // battery backed RAM
 	EEPROM_93C46_8BIT(config, "eeprom");
 
-	TICKET_DISPENSER(config, m_hopper, attotime::from_msec(200), TICKET_MOTOR_ACTIVE_LOW, TICKET_STATUS_ACTIVE_LOW );
+	TICKET_DISPENSER(config, m_hopper, attotime::from_msec(200));
 
 	WATCHDOG_TIMER(config, "watchdog");
 
@@ -1640,8 +1642,8 @@ void sammymdl_state::gocowboy(machine_config &config)
 	TIMER(config, "scantimer").configure_scanline(FUNC(sammymdl_state::gocowboy_int), "screen", 0, 1);
 
 	config.device_remove("hopper");
-	TICKET_DISPENSER(config, m_hopper_small, attotime::from_msec(200), TICKET_MOTOR_ACTIVE_LOW, TICKET_STATUS_ACTIVE_LOW );
-	TICKET_DISPENSER(config, m_hopper_large, attotime::from_msec(200), TICKET_MOTOR_ACTIVE_LOW, TICKET_STATUS_ACTIVE_LOW );
+	TICKET_DISPENSER(config, m_hopper_small, attotime::from_msec(200));
+	TICKET_DISPENSER(config, m_hopper_large, attotime::from_msec(200));
 
 	m_screen->screen_vblank().set_nop();
 }

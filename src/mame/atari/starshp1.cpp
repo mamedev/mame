@@ -71,12 +71,12 @@ public:
 
 	void starshp1(machine_config &config);
 
-	DECLARE_CUSTOM_INPUT_MEMBER(analog_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(collision_latch_r);
+	ioport_value analog_r();
+	ioport_value collision_latch_r();
 
 protected:
-	virtual void machine_start() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -150,7 +150,7 @@ private:
 	int spaceship_collision(bitmap_ind16 &bitmap, const rectangle &rect);
 	int point_in_circle(int x, int y, int center_x, int center_y, int r);
 	int circle_collision(const rectangle &rect);
-	void program_map(address_map &map);
+	void program_map(address_map &map) ATTR_COLD;
 };
 
 
@@ -562,7 +562,7 @@ void starshp1_state::collision_reset_w(uint8_t data)
 }
 
 
-CUSTOM_INPUT_MEMBER(starshp1_state::analog_r)
+ioport_value starshp1_state::analog_r()
 {
 	int val = 0;
 
@@ -586,7 +586,7 @@ CUSTOM_INPUT_MEMBER(starshp1_state::analog_r)
 }
 
 
-CUSTOM_INPUT_MEMBER(starshp1_state::collision_latch_r)
+ioport_value starshp1_state::collision_latch_r()
 {
 	return m_collision_latch & 0x0f;
 }

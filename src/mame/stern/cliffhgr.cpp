@@ -109,8 +109,8 @@ public:
 	void cliffhgr(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	void test_led_w(offs_t offset, uint8_t data);
@@ -137,8 +137,8 @@ private:
 	output_finder<> m_led;
 	required_ioport_array<7> m_banks;
 
-	void mainmem(address_map &map);
-	void mainport(address_map &map);
+	void mainmem(address_map &map) ATTR_COLD;
+	void mainport(address_map &map) ATTR_COLD;
 };
 
 

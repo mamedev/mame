@@ -199,7 +199,7 @@ license:CC0-1.0
 	What's Going On                             Marvin Gaye
 	-->
 	<software name="karamsc1" supported="no">
-		<description>KaraokeMicro Star Cartouche 1</description>
+		<description>KaraokeMicro Star Cartouche 1 (France)</description>
 		<year>2003</year>
 		<publisher>IVL Technologies / Lexibook</publisher>
 		<part name="cart" interface="easy_karaoke_cart">
@@ -225,7 +225,7 @@ license:CC0-1.0
 	Vacances j'oublie tout                      Elegance
 	-->
 	<software name="karamsc2" supported="no">
-		<description>KaraokeMicro Star Cartouche 2</description>
+		<description>KaraokeMicro Star Cartouche 2 (France)</description>
 		<year>2003</year>
 		<publisher>IVL Technologies / Lexibook</publisher>
 		<part name="cart" interface="easy_karaoke_cart">
@@ -251,12 +251,116 @@ license:CC0-1.0
 	Toutes les femmes de ta vie                 L5
 	-->
 	<software name="karamsc3" supported="no">
-		<description>KaraokeMicro Star Cartouche 3</description>
+		<description>KaraokeMicro Star Cartouche 3 (France)</description>
 		<year>2004</year>
 		<publisher>IVL Technologies / Lexibook</publisher>
 		<part name="cart" interface="easy_karaoke_cart">
 			<dataarea name="rom" size="0x80000">
 				<rom name="27V40.u3" size="0x80000" crc="33047ac7" sha1="bea9197646ba5a9f8c842363149b1b1ec7b9aada" />
+			</dataarea>
+			<dataarea name="mcu" size="0x2000">
+				<rom name="IC89LV52A-24PQ.U1" size="0x2000" status="nodump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!--
+	Η ΑΓΑΠΗ ΘΕΛΕΙ ΔΥΟ                           Αλίκη Βουγιουκλάκη, Δημ
+	ΚΑΡΔΙΑ ΜΟΥ ΜΗΝ ΑΝΗΣΥΧΕΙ                     Αντώνης Ρέμος
+	ΜΑΡΤΥΡΙΟ                                    Άννα Βίσση, Γιάννης Πάρ
+	ΠΑΛΙΟΚΑΙΡΟΣ                                 Πασχάλης Τερζής
+	ΣΥΓΧΑΡΗΤΗΡΙΑ                                Άννα Βίσση
+	ΤΡΑΒΑ ΕΜΠΡΟΣ                                Αλίκη Βουγιουκλάκη
+	ΥΠΟΦΕΡΩ                                     Δέσποινα Βανδή
+	ΧΙΛΙΑ ΠΕΡΙΣΤΕΡΙΑ                            Γιώργος Ζαμπέτας
+	ΟΛΑ ΚΑΛΑ                                    Σάκης Ρουβάς
+	ΟΛΑ ΤΑ ΛΕΦΤΑ                                Άννα Βίσση
+	-->
+	<software name="k50gri" supported="no">
+		<description>Karaoke Microphone Pro Cartridge 1 (Greece)</description>
+		<year>2003</year>
+		<publisher>IVL Technologies / Lexibook / Imago</publisher>
+		<part name="cart" interface="easy_karaoke_cart">
+			<dataarea name="rom" size="0x80000">
+				<rom name="ivl_ics0325-a.u3" size="0x80000" crc="43fb1253" sha1="aaf999003cb9a57ee29db6892ca4f171d17e68e8" />
+			</dataarea>
+			<dataarea name="mcu" size="0x2000">
+				<rom name="IC89LV52A-24PQ.U1" size="0x2000" status="nodump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!--
+	A Spoonful of Sugar                         Mary Poppins
+	Beauty And The Beast                        Beauty and the Beast
+	Bella Notte                                 Lady And The Tramp
+	Can You Feel The Love Tonight               The Lion King
+	I I Can't Love Her                          Beauty and the Beast - Musical
+	In A World Of My Own                        Alice In Wonderland
+	It's What's Inside that Counts              Cinderella
+	Les Poissons                                The Little Mermaid
+	The Work Song                               Cinderella
+	Yo Ho! (A Pirate's Life For Me)             Pirates of the Caribbean
+	-->
+	<software name="dkp1" supported="no">
+		<description>Disney Princess 10-Song Karaoke Cartridge I (DK-P1)</description>
+		<year>2003</year>
+		<publisher>IVL Technologies / Memcorp Inc / Disney</publisher>
+		<part name="cart" interface="easy_karaoke_cart">
+			<dataarea name="rom" size="0x80000">
+				<rom name="dk-p1.bin" size="0x80000" crc="c333148f" sha1="e713e7d41649bf9095a1ea3d4ee9eb175d25413a" />
+			</dataarea>
+			<dataarea name="mcu" size="0x2000">
+				<rom name="IC89LV52A-24PQ.U1" size="0x2000" status="nodump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!--
+	Bare Necessities                            The Jungle Book
+	Call Me, Beep Me                            Kim Possible
+	Hakuna Matata                               The Lion King
+	Home                                        Beauty and the Beast - Musical
+	Oo-De-Lally                                 Robin Hood
+	Put It Together                             Cinderella
+	So This Is Love                             Cinderella
+	What Dreams Are Made Of                     Lizzie McGuire
+	You Can Fly! You Can Fly! You Can Fly!      Peter Pan
+	You'll Be In My Heart                       Tarzan
+	-->
+	<software name="dkp2" supported="no">
+		<description>Disney Princess 10-Song Karaoke Cartridge II (DK-P2)</description>
+		<year>2003</year>
+		<publisher>IVL Technologies / Memcorp Inc / Disney</publisher>
+		<part name="cart" interface="easy_karaoke_cart">
+			<dataarea name="rom" size="0x80000">
+				<rom name="dk-p2.bin" size="0x80000" crc="d9d340c5" sha1="da906d7f22a2ea8bc62171c833985b81d71410a3" />
+			</dataarea>
+			<dataarea name="mcu" size="0x2000">
+				<rom name="IC89LV52A-24PQ.U1" size="0x2000" status="nodump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!--
+	Cruella De Vil                              101 Dalmations
+	He's A Tramp                                Lady And The Tramp
+	I Wan'na Be Like You (The Monkey Song)      The Jungle Book
+	If I Didn't Have You                        Monsters Inc.
+	It's A Small World                          New York World's Fair
+	Open Your Eyes (To Love)                    Lizzie McGuire
+	Part Of Your World                          The Little Mermaid
+	Something There                             Beauty and the Beast
+	You've Got A Friend In Me                   Toy Story
+	Zip-A-Dee-Do-Dah                            Song of the South
+	-->
+	<software name="dkp3" supported="no">
+		<description>Disney Princess 10-Song Karaoke Cartridge III (DK-P3)</description>
+		<year>2003</year>
+		<publisher>IVL Technologies / Memcorp Inc / Disney</publisher>
+		<part name="cart" interface="easy_karaoke_cart">
+			<dataarea name="rom" size="0x80000">
+				<rom name="dk-p3.bin" size="0x80000" crc="2c9ec515" sha1="0efb1b7f513cc27084a3ef7c18290456f903decd" />
 			</dataarea>
 			<dataarea name="mcu" size="0x2000">
 				<rom name="IC89LV52A-24PQ.U1" size="0x2000" status="nodump" />

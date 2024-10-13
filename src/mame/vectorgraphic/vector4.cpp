@@ -87,9 +87,9 @@ public:
 	void vector4(machine_config &config);
 
 private:
-	void vector4_io(address_map &map);
-	void vector4_z80mem(address_map &map);
-	void vector4_8088mem(address_map &map);
+	void vector4_io(address_map &map) ATTR_COLD;
+	void vector4_z80mem(address_map &map) ATTR_COLD;
+	void vector4_8088mem(address_map &map) ATTR_COLD;
 	void spr_w(uint8_t data);
 	uint8_t msc_r();
 	void msc_w(uint8_t data) { machine_reset(); }
@@ -99,8 +99,8 @@ private:
 	int ppi_pc_r() { return m_ppi_pc; }
 	uint8_t s100_r(offs_t offset) { return m_s100->sinp_r(offset+0x20); }
 	void s100_w(offs_t offset, uint8_t data) { m_s100->sout_w(offset+0x20, data); }
-	void machine_start() override;
-	void machine_reset() override;
+	void machine_start() override ATTR_COLD;
+	void machine_reset() override ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_8088cpu;

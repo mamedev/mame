@@ -74,10 +74,10 @@ protected:
 	uint16_t unknown_r(offs_t offset, uint16_t mem_mask = ~0);
 	void coin_w(uint8_t data);
 
-	void zn_base_map(address_map &map);
-	void zn_rom_base_map(address_map &map);
+	void zn_base_map(address_map &map) ATTR_COLD;
+	void zn_rom_base_map(address_map &map) ATTR_COLD;
 
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 	void ATTR_PRINTF(3,4) verboselog( int n_level, const char *s_fmt, ... );
 	static uint16_t psxreadword( uint32_t *p_n_psxram, uint32_t n_address );
@@ -118,8 +118,8 @@ public:
 	void zn_base(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	required_memory_region m_bankedroms;
 	required_memory_bank m_rombank;
@@ -128,9 +128,9 @@ protected:
 	required_memory_bank m_soundbank;
 
 private:
-	void main_map(address_map &map);
-	void qsound_map(address_map &map);
-	void qsound_portmap(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
+	void qsound_map(address_map &map) ATTR_COLD;
+	void qsound_portmap(address_map &map) ATTR_COLD;
 
 	uint16_t kickharness_r(offs_t offset, uint16_t mem_mask = ~0);
 	void bank_w(uint8_t data);
@@ -159,7 +159,7 @@ public:
 	}
 
 private:
-	virtual void machine_reset() override;
+	virtual void machine_reset() override ATTR_COLD;
 };
 
 class zn2_state : public capcom_zn_state
@@ -188,7 +188,7 @@ public:
 	void coh1000a(machine_config &config);
 
 protected:
-	void coh1000a_map(address_map &map);
+	void coh1000a_map(address_map &map) ATTR_COLD;
 
 private:
 	void acpsx_00_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
@@ -211,8 +211,8 @@ public:
 
 private:
 	virtual void driver_start() override;
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	void bank_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	void sound_80_w(uint16_t data);
@@ -220,8 +220,8 @@ private:
 	uint16_t sound_08_r(offs_t offset, uint16_t mem_mask = ~0);
 	uint16_t sound_80_r(offs_t offset, uint16_t mem_mask = ~0);
 
-	void main_map(address_map &map);
-	void bank_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
+	void bank_map(address_map &map) ATTR_COLD;
 
 	std::unique_ptr<uint8_t[]> m_sram;
 	uint32_t m_curr_rombank[2]{};
@@ -247,9 +247,9 @@ public:
 	int gun_mux_r();
 
 private:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
-	void main_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
 
 	void vblank(int state);
 
@@ -277,14 +277,14 @@ public:
 	void coh1001l(machine_config &config);
 
 private:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	void bank_w(uint8_t data);
 	void sound_unk_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
-	void main_map(address_map &map);
-	void sound_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
+	void sound_map(address_map &map) ATTR_COLD;
 
 	required_memory_region m_bankedroms;
 	required_memory_bank m_rombank;
@@ -309,12 +309,12 @@ public:
 	void coh1002v(machine_config &config);
 
 private:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	void bank_w(uint8_t data);
 
-	void main_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
 
 	required_memory_region m_bankedroms;
 	required_memory_bank m_rombank;
@@ -339,11 +339,11 @@ public:
 	void coh1002e(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
-	void main_map(address_map &map);
-	void psarc_sound_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
+	void psarc_sound_map(address_map &map) ATTR_COLD;
 
 	void bank_w(offs_t offset, uint8_t data, uint8_t mem_mask = ~0);
 	void sound_irq_w(uint8_t data);
@@ -366,11 +366,11 @@ public:
 	void beastrzrb(machine_config &config);
 
 private:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
-	void sound_map(address_map &map);
-	void oki_map(address_map &map);
+	void sound_map(address_map &map) ATTR_COLD;
+	void oki_map(address_map &map) ATTR_COLD;
 
 	required_memory_bank m_okibank;
 };
@@ -388,10 +388,10 @@ public:
 	void bam2(machine_config &config);
 
 private:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
-	void main_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
 
 	uint16_t m_mcu_command = 0;
 
@@ -419,8 +419,8 @@ public:
 	}
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	void bank_w(offs_t offset, uint8_t data, uint8_t mem_mask = ~0);
 
@@ -442,11 +442,11 @@ public:
 	void coh1000ta(machine_config &config);
 
 private:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
-	void main_map(address_map &map);
-	void sound_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
+	void sound_map(address_map &map) ATTR_COLD;
 
 	void sound_bankswitch_w(uint8_t data);
 
@@ -468,9 +468,9 @@ public:
 	void coh1000tb(machine_config &config);
 
 private:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
-	void main_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
 
 	void fram_w(offs_t offset, uint8_t data);
 	uint8_t fram_r(offs_t offset);
@@ -508,9 +508,9 @@ public:
 	void coh1000w(machine_config &config);
 
 private:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
-	void main_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
 
 	void dma_read(uint32_t *p_n_psxram, uint32_t n_address, int32_t n_size);
 	void dma_write(uint32_t *p_n_psxram, uint32_t n_address, int32_t n_size);
@@ -543,14 +543,14 @@ public:
 	void coh1002ml(machine_config &config);
 
 protected:
-	void base_map(address_map &map);
+	void base_map(address_map &map) ATTR_COLD;
 
 private:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
-	void link_map(address_map &map);
-	void link_port_map(address_map &map);
+	void link_map(address_map &map) ATTR_COLD;
+	void link_port_map(address_map &map) ATTR_COLD;
 
 	void bank_w(offs_t offset, uint8_t data, uint8_t mem_mask = ~0);
 
@@ -571,10 +571,10 @@ public:
 	void cbaj(machine_config &config);
 
 private:
-	void main_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
 
-	void z80_map(address_map &map);
-	void z80_port_map(address_map &map);
+	void z80_map(address_map &map) ATTR_COLD;
+	void z80_port_map(address_map &map) ATTR_COLD;
 
 	uint8_t sound_main_status_r();
 	uint8_t sound_z80_status_r();

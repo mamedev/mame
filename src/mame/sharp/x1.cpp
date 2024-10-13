@@ -2214,6 +2214,8 @@ void x1_state::x1(machine_config &config)
 	m_screen->set_size(640, 480);
 	m_screen->set_visarea(0, 640-1, 0, 480-1);
 	m_screen->set_screen_update(FUNC(x1_state::screen_update_x1));
+	// add a saner default for both interlace and progressive modes
+	m_screen->set_default_position(1.100, 0.050, 1.100, 0.050);
 
 	HD6845S(config, m_crtc, (VDP_CLOCK/48)); //unknown divider
 	m_crtc->set_screen(m_screen);
@@ -2263,6 +2265,7 @@ void x1turbo_state::x1turbo(machine_config &config)
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &x1turbo_state::x1turbo_mem);
 	m_maincpu->set_daisy_config(x1turbo_daisy);
+	m_maincpu->busack_cb().set(m_dma, FUNC(z80dma_device::bai_w));
 
 	m_iobank->set_map(&x1turbo_state::x1turbo_io_banks);
 
@@ -2270,7 +2273,7 @@ void x1turbo_state::x1turbo(machine_config &config)
 	sio.out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
 	Z80DMA(config, m_dma, MAIN_CLOCK/4);
-	m_dma->out_busreq_callback().set_inputline(m_maincpu, INPUT_LINE_HALT);
+	m_dma->out_busreq_callback().set_inputline(m_maincpu, Z80_INPUT_LINE_BUSRQ);
 	m_dma->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 	m_dma->in_mreq_callback().set(FUNC(x1turbo_state::memory_read_byte));
 	m_dma->out_mreq_callback().set(FUNC(x1turbo_state::memory_write_byte));

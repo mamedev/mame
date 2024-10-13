@@ -37,12 +37,14 @@
 ****************************************************************************/
 
 #include "emu.h"
+
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
 #include "machine/nvram.h"
 #include "machine/ticket.h"
 #include "sound/bsmt2000.h"
 #include "video/mc6845.h"
+
 #include "screen.h"
 #include "speaker.h"
 
@@ -70,6 +72,10 @@ public:
 	void tapatune(machine_config &config);
 	void tapatune_base(machine_config &config);
 
+protected:
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+
 private:
 	required_device<cpu_device> m_maincpu;
 	optional_device<cpu_device> m_videocpu;
@@ -77,22 +83,19 @@ private:
 
 	optional_shared_ptr<uint16_t> m_videoram;
 
-	uint8_t   m_paletteram[0x300]{};
-	uint16_t  m_palette_write_addr = 0;
-	rgb_t   m_pens[0x100];
-	uint8_t   m_controls_mux = 0;
-	uint8_t   m_z80_to_68k_index = 0;
-	uint8_t   m_z80_to_68k_data = 0;
-	uint8_t   m_68k_to_z80_index = 0;
-	uint8_t   m_68k_to_z80_data = 0;
-	uint8_t   m_z80_data_available = 0;
-	uint8_t   m_68k_data_available = 0;
-	uint8_t   m_bsmt_data_l = 0;
-	uint8_t   m_bsmt_data_h = 0;
-	bool    m_bsmt_reset = false;
-
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	uint8_t m_paletteram[0x300]{};
+	uint16_t m_palette_write_addr = 0;
+	rgb_t m_pens[0x100];
+	uint8_t m_controls_mux = 0;
+	uint8_t m_z80_to_68k_index = 0;
+	uint8_t m_z80_to_68k_data = 0;
+	uint8_t m_68k_to_z80_index = 0;
+	uint8_t m_68k_to_z80_data = 0;
+	uint8_t m_z80_data_available = 0;
+	uint8_t m_68k_data_available = 0;
+	uint8_t m_bsmt_data_l = 0;
+	uint8_t m_bsmt_data_h = 0;
+	bool m_bsmt_reset = false;
 
 	void crtc_vsync(int state);
 
@@ -117,9 +120,9 @@ private:
 	MC6845_BEGIN_UPDATE(crtc_begin_update);
 	MC6845_UPDATE_ROW(crtc_update_row);
 
-	void maincpu_io_map(address_map &map);
-	void maincpu_map(address_map &map);
-	void video_map(address_map &map);
+	void maincpu_io_map(address_map &map) ATTR_COLD;
+	void maincpu_map(address_map &map) ATTR_COLD;
+	void video_map(address_map &map) ATTR_COLD;
 };
 
 
@@ -505,7 +508,7 @@ static INPUT_PORTS_START( tapatune )
 	PORT_START("COINS")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("ticket", ticket_dispenser_device, line_r)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("ticket", ticket_dispenser_device, line_r)
 	PORT_BIT( 0xf8, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("BUTTONS")
@@ -536,7 +539,7 @@ void tapatune_state::tapatune_base(machine_config &config)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	TICKET_DISPENSER(config, "ticket", attotime::from_msec(100), TICKET_MOTOR_ACTIVE_LOW, TICKET_STATUS_ACTIVE_LOW);
+	TICKET_DISPENSER(config, "ticket", attotime::from_msec(100));
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();

@@ -65,8 +65,8 @@ public:
 	void chessmstdm(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	required_device<z80_device> m_maincpu;
@@ -85,8 +85,8 @@ private:
 	int m_digit_dot = 0;
 	u16 m_digit_data = 0;
 
-	void chessmstdm_mem(address_map &map);
-	void chessmstdm_io(address_map &map);
+	void chessmstdm_mem(address_map &map) ATTR_COLD;
+	void chessmstdm_io(address_map &map) ATTR_COLD;
 
 	void reset_w(u8 data = 0);
 	u8 reset_r();

@@ -7,6 +7,7 @@ Banpresto medal games with Seibu customs
 Confirmed games (but there are probably several more):
 Terebi Denwa Doraemon
 Terebi Denwa Super Mario World
+Terebi Denwa Thomas the Tank Engine and Friends
 Mario Undoukai
 
 The following is from Mario Undoukai PCB pics:
@@ -76,8 +77,8 @@ public:
 	void init_oki();
 
 protected:
-	virtual void machine_start() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -108,8 +109,8 @@ private:
 	uint32_t pri_cb(uint8_t pri, uint8_t ext);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void prg_map(address_map &map);
-	void oki_map(address_map &map);
+	void prg_map(address_map &map) ATTR_COLD;
+	void oki_map(address_map &map) ATTR_COLD;
 };
 
 
@@ -412,7 +413,7 @@ void banprestoms_state::banprestoms(machine_config &config)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	TICKET_DISPENSER(config, m_ticket, attotime::from_msec(100), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH); // TODO: period is guessed
+	TICKET_DISPENSER(config, m_ticket, attotime::from_msec(100)); // TODO: period is guessed
 
 	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER)); // TODO: copied from other drivers using the same CRTC
@@ -512,6 +513,40 @@ ROM_START( tvdenwam )
 	ROM_LOAD( "sc006.u248", 0x800, 0x117, NO_DUMP ) // gal16v8a
 ROM_END
 
+ROM_START( tvdenwat )
+	ROM_REGION( 0x100000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "s72_b02.u15",  0x00000, 0x20000, CRC(db713202) SHA1(4883152273925207929757da0eae333ac18aa585) )
+	ROM_LOAD16_BYTE( "s72_b01.u14",  0x00001, 0x20000, CRC(fe4e48ff) SHA1(2a31520ddd3c4a61daf2868114cfd1f1a5f3f201) )
+
+	ROM_REGION( 0x80000, "spr_gfx", 0 )
+	ROM_LOAD( "s72_a05.u119", 0x00000, 0x80000, CRC(9fda5789) SHA1(5d1e37d42c9f255253bcb3714be8fd04238b47fa) )
+
+	ROM_REGION( 0x80000, "gfx_tiles", 0 )
+	ROM_LOAD( "s72_a04.u18", 0x00000, 0x80000, CRC(66fbbf66) SHA1(4d46204661282c311ace3c749d9484c2e3e69500) )
+
+	ROM_REGION( 0x80000, "bg_gfx", 0 )
+	ROM_COPY( "gfx_tiles" , 0x00000, 0x00000, 0x80000)
+
+	ROM_REGION( 0x80000, "md_gfx", 0 )
+	ROM_COPY( "gfx_tiles" , 0x00000, 0x00000, 0x80000)
+
+	ROM_REGION( 0x80000, "fg_gfx", 0 )
+	ROM_COPY( "gfx_tiles" , 0x00000, 0x00000, 0x80000)
+
+	ROM_REGION( 0x80000, "tx_gfx", 0 )
+	ROM_COPY( "gfx_tiles" , 0x00000, 0x00000, 0x80000)
+
+	ROM_REGION( 0x100000, "oki", 0 )
+	ROM_LOAD( "s72_a03.u17", 0x000000, 0x100000, CRC(e7d09642) SHA1(0cee5193497698239f44ef457d92f1d1d042c42b) )
+
+	ROM_REGION( 0xa00, "plds", 0 )
+	ROM_LOAD( "sc001.u110", 0x000, 0x104, NO_DUMP ) // tibpal16l8-25cn
+	ROM_LOAD( "sc002.u235", 0x200, 0x104, NO_DUMP ) // tibpal16l8-25cn
+	ROM_LOAD( "sc003.u36",  0x400, 0x155, NO_DUMP ) // 18cv8pc-25
+	ROM_LOAD( "sc004c.u68", 0x600, 0x117, NO_DUMP ) // gal16v8a
+	ROM_LOAD( "sc006.u248", 0x800, 0x117, NO_DUMP ) // gal16v8a
+ROM_END
+
 ROM_START( marioun )
 	ROM_REGION( 0x100000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "s98_b02.u15",  0x00000, 0x20000, CRC(d88eecfc) SHA1(5a15a1f925ae10e439e5aee8f3ef5a2fa956b80f) )
@@ -580,6 +615,7 @@ void banprestoms_state::init_oki() // The Oki mask ROM is in an unusual format, 
 } // Anonymous namespace
 
 
-GAME( 1991, tvdenwad, 0, banprestoms, tvdenwad, banprestoms_state, init_oki, ROT0, "Banpresto", "Terebi Denwa Doraemon",              MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1992, tvdenwam, 0, banprestoms, tvdenwad, banprestoms_state, init_oki, ROT0, "Banpresto", "Terebi Denwa Super Mario World",     MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1993, marioun,  0, banprestoms, marioun,  banprestoms_state, init_oki, ROT0, "Banpresto", "Super Mario World - Mario Undoukai", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1991, tvdenwad, 0, banprestoms, tvdenwad, banprestoms_state, init_oki, ROT0, "Banpresto", "Terebi Denwa Doraemon",                            MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1992, tvdenwam, 0, banprestoms, tvdenwad, banprestoms_state, init_oki, ROT0, "Banpresto", "Terebi Denwa Super Mario World",                   MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1992, tvdenwat, 0, banprestoms, tvdenwad, banprestoms_state, init_oki, ROT0, "Banpresto", "Terebi Denwa Thomas the Tank Engine and Friends",  MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1993, marioun,  0, banprestoms, marioun,  banprestoms_state, init_oki, ROT0, "Banpresto", "Super Mario World - Mario Undoukai",               MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )

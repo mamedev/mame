@@ -92,9 +92,9 @@ public:
 	void sectznt(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -133,10 +133,10 @@ private:
 
 	void dac_w(uint8_t data);
 
-	void main_map(address_map &map);
-	void main_portmap(address_map &map);
-	void mcu_no_nvram_map(address_map &map);
-	void mcu_nvram_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
+	void main_portmap(address_map &map) ATTR_COLD;
+	void mcu_no_nvram_map(address_map &map) ATTR_COLD;
+	void mcu_nvram_map(address_map &map) ATTR_COLD;
 };
 
 

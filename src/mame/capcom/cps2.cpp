@@ -718,13 +718,13 @@ private:
 	uint32_t screen_update_cps2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	DECLARE_MACHINE_START(cps2);
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 
-	void cps2_map(address_map &map);
-	void cps2_comm_map(address_map &map);
-	void dead_cps2_map(address_map &map);
-	void dead_cps2_comm_map(address_map &map);
-	void decrypted_opcodes_map(address_map &map);
+	void cps2_map(address_map &map) ATTR_COLD;
+	void cps2_comm_map(address_map &map) ATTR_COLD;
+	void dead_cps2_map(address_map &map) ATTR_COLD;
+	void dead_cps2_comm_map(address_map &map) ATTR_COLD;
+	void decrypted_opcodes_map(address_map &map) ATTR_COLD;
 
 	void init_cps2_video();
 	void init_cps2crypt();
@@ -4728,6 +4728,35 @@ ROM_START( hsf2j )
 ROM_END
 
 ROM_START( hsf2j1 )
+	ROM_REGION( CODE_SIZE, "maincpu", 0 ) // 68000 code
+	ROM_LOAD16_WORD_SWAP( "hs2j.03a", 0x000000, 0x80000, CRC(76c7d980) SHA1(792e798833eac653e8e464122c76fd53aace3cea) )
+	ROM_LOAD16_WORD_SWAP( "hs2j.04a", 0x080000, 0x80000, CRC(3d1f5d9b) SHA1(2a9703ac4e5f7e1b3486d453d3a75aae106a7443) )
+	ROM_LOAD16_WORD_SWAP( "hs2.05",   0x100000, 0x80000, CRC(dde34a35) SHA1(f5be2d2916db6e86e0886d61d55bddf138273ebc) )
+	ROM_LOAD16_WORD_SWAP( "hs2.06",   0x180000, 0x80000, CRC(f4e56dda) SHA1(c6490707c2a416ab88612c2d73abbe5853d8cb92) )
+	ROM_LOAD16_WORD_SWAP( "hs2.07",   0x200000, 0x80000, CRC(ee4420fc) SHA1(06cf76660b0c794d2460c52d9fe8334fff51e9de) )
+	ROM_LOAD16_WORD_SWAP( "hs2.08",   0x280000, 0x80000, CRC(c9441533) SHA1(bf178fac1f060fcce3ff9118333c8517dadc9429) )
+	ROM_LOAD16_WORD_SWAP( "hs2.09",   0x300000, 0x80000, CRC(3fc638a8) SHA1(2a42877b26c8abc437da46225701f0bba6e40058) )
+	ROM_LOAD16_WORD_SWAP( "hs2.10",   0x380000, 0x80000, CRC(20d0f9e4) SHA1(80a5eeef9472e327b0d4ee26434bad109a9434ea) )
+
+	ROM_REGION( 0x2000000, "gfx", 0 )
+	ROM_LOAD64_WORD( "hs2.13m",   0x0000000, 0x800000, CRC(a6ecab17) SHA1(6749a4c8dc81f4b10f910c31c82cf6674e2a44eb) )
+	ROM_LOAD64_WORD( "hs2.15m",   0x0000002, 0x800000, CRC(10a0ae4d) SHA1(701b4900fbc8bef20efa1a706891c8df4bf14641) )
+	ROM_LOAD64_WORD( "hs2.17m",   0x0000004, 0x800000, CRC(adfa7726) SHA1(8d36ec125a8c91abfe5213893d794f8bc11c8acd) )
+	ROM_LOAD64_WORD( "hs2.19m",   0x0000006, 0x800000, CRC(bb3ae322) SHA1(ecd289d7a0fe365fdd7c5527cb17796002beb553) )
+
+	ROM_REGION( QSOUND_SIZE, "audiocpu", 0 ) // 64k for the audio CPU (+banks)
+	ROM_LOAD( "hs2.01",   0x00000, 0x08000, CRC(c1a13786) SHA1(c7392c7efb15ea4042e75bd9007e974293d8935d) )
+	ROM_CONTINUE(         0x10000, 0x18000 )
+	ROM_LOAD( "hs2.02",   0x28000, 0x20000, CRC(2d8794aa) SHA1(c634affdc2568020cce6af97b4fa79925d9943f3) )
+
+	ROM_REGION( 0x800000, "qsound", 0 ) // QSound samples
+	ROM_LOAD16_WORD_SWAP( "hs2.11m",   0x000000, 0x800000, CRC(0e15c359) SHA1(176108b0d76d821a849324680aba0cd04b5016c1) )
+
+	ROM_REGION( 0x20, "key", 0 )
+	ROM_LOAD( "hsf2j.key",    0x000000, 0x000014, CRC(19455a93) SHA1(925cee29b37cb7a4048383ac715ad96f83280d37) )
+ROM_END
+
+ROM_START( hsf2j2 )
 	ROM_REGION( CODE_SIZE, "maincpu", 0 ) // 68000 code
 	ROM_LOAD16_WORD_SWAP( "hs2j.03",  0x000000, 0x80000, CRC(00738f73) SHA1(99947a621f21a88dc4c425d9bfbc30b3c5f76ecd) )
 	ROM_LOAD16_WORD_SWAP( "hs2j.04",  0x080000, 0x80000, CRC(40072c4a) SHA1(85b95bd3c907b4276a31777e092b8c40d3763257) )
@@ -10495,6 +10524,39 @@ ROM_END
 
 ROM_START( xmvsfj )
 	ROM_REGION( CODE_SIZE, "maincpu", 0 ) // 68000 code
+	ROM_LOAD16_WORD_SWAP( "xvsj.03m", 0x000000, 0x80000, CRC(e2944372) SHA1(5ad99eb3f1fa1266a7310e8a39f4cb86105e8d5e) )
+	ROM_LOAD16_WORD_SWAP( "xvsj.04m", 0x080000, 0x80000, CRC(c20B8524) SHA1(1297332c94f4cad725c83a453baa63c1fa25d854) )
+	ROM_LOAD16_WORD_SWAP( "xvs.05a",  0x100000, 0x80000, CRC(7db6025d) SHA1(2d74f48f83f45359bfaca28ab686625766af12ee) )
+	ROM_LOAD16_WORD_SWAP( "xvs.06a",  0x180000, 0x80000, CRC(e8e2c75c) SHA1(929408cb5d98e95cec75ea58e4701b0cbdbcd016) )
+	ROM_LOAD16_WORD_SWAP( "xvs.07",   0x200000, 0x80000, CRC(08f0abed) SHA1(ef16c376232dba63b0b9bc3aa0640f9001ccb68a) )
+	ROM_LOAD16_WORD_SWAP( "xvs.08",   0x280000, 0x80000, CRC(81929675) SHA1(19cf7afbc1daaefec40195e40ba74970f3906a1c) )
+	ROM_LOAD16_WORD_SWAP( "xvs.09",   0x300000, 0x80000, CRC(9641f36b) SHA1(dcba3482d1ba37ccfb30d402793ee063c6621aed) )
+
+	ROM_REGION( 0x2000000, "gfx", 0 )
+	ROM_LOAD64_WORD( "xvs.13m",   0x0000000, 0x400000, CRC(f6684efd) SHA1(c0a2f3a9e82ab8b084a500aec71ac633e947328c) )
+	ROM_LOAD64_WORD( "xvs.15m",   0x0000002, 0x400000, CRC(29109221) SHA1(898b8f678fd03c462ce0d8eb7fb3441ef601085b) )
+	ROM_LOAD64_WORD( "xvs.17m",   0x0000004, 0x400000, CRC(92db3474) SHA1(7b6f4c8ebfdac167b25f35029068b6253c141fe6) )
+	ROM_LOAD64_WORD( "xvs.19m",   0x0000006, 0x400000, CRC(3733473c) SHA1(6579da7145c95b3ad00844a5fc8c2e22c23365e2) )
+	ROM_LOAD64_WORD( "xvs.14m",   0x1000000, 0x400000, CRC(bcac2e41) SHA1(838ff24f7e8543a787a55a5d592c9517ce3b8b93) )
+	ROM_LOAD64_WORD( "xvs.16m",   0x1000002, 0x400000, CRC(ea04a272) SHA1(cd7c79037b5b4a39bef5156433e984dc4dc2c081) )
+	ROM_LOAD64_WORD( "xvs.18m",   0x1000004, 0x400000, CRC(b0def86a) SHA1(da3a6705ea7050fc5c2c10d33400ed67be9f455d) )
+	ROM_LOAD64_WORD( "xvs.20m",   0x1000006, 0x400000, CRC(4b40ff9f) SHA1(9a981d442132efff09a27408d74646ba357c7357) )
+
+	ROM_REGION( QSOUND_SIZE, "audiocpu", 0 ) // 64k for the audio CPU (+banks)
+	ROM_LOAD( "xvs.01",   0x00000, 0x08000, CRC(3999e93a) SHA1(fefcff8a9a5c83df7655a16187cf9ba3e7efbb25) )
+	ROM_CONTINUE(         0x10000, 0x18000 )
+	ROM_LOAD( "xvs.02",   0x28000, 0x20000, CRC(101bdee9) SHA1(75920e88bf46fcd33a7957777a1d799818ffb0d6) )
+
+	ROM_REGION( 0x400000, "qsound", 0 ) // QSound samples
+	ROM_LOAD16_WORD_SWAP( "xvs.11m",   0x000000, 0x200000, CRC(9cadcdbc) SHA1(64d3bd53b04daec84c9af4aa3ff010867b3d306d) )
+	ROM_LOAD16_WORD_SWAP( "xvs.12m",   0x200000, 0x200000, CRC(7b11e460) SHA1(a581c84acaaf0ce056841c15a6f36889e88be68d) )
+
+	ROM_REGION( 0x20, "key", 0 )
+	ROM_LOAD( "xmvsfj.key",   0x000000, 0x000014, CRC(87576cda) SHA1(65905400f4462c175baa93b43e015e8596def31b) )
+ROM_END
+
+ROM_START( xmvsfjr1 )
+	ROM_REGION( CODE_SIZE, "maincpu", 0 ) // 68000 code
 	ROM_LOAD16_WORD_SWAP( "xvsj.03k", 0x000000, 0x80000, CRC(2a167526) SHA1(779d1be2149b1feb2c5f710ed70b162e11bd0de4) )
 	ROM_LOAD16_WORD_SWAP( "xvsj.04k", 0x080000, 0x80000, CRC(d993436b) SHA1(b3279f4fe3728700adf086bf27133c5a74c6302c) )
 	ROM_LOAD16_WORD_SWAP( "xvs.05a",  0x100000, 0x80000, CRC(7db6025d) SHA1(2d74f48f83f45359bfaca28ab686625766af12ee) )
@@ -10526,7 +10588,7 @@ ROM_START( xmvsfj )
 	ROM_LOAD( "xmvsfj.key",   0x000000, 0x000014, CRC(87576cda) SHA1(65905400f4462c175baa93b43e015e8596def31b) )
 ROM_END
 
-ROM_START( xmvsfjr1 )
+ROM_START( xmvsfjr2 )
 	ROM_REGION( CODE_SIZE, "maincpu", 0 ) // 68000 code
 	ROM_LOAD16_WORD_SWAP( "xvsj.03i", 0x000000, 0x80000, CRC(ef24da96) SHA1(8f4a2a626a059bcf36048770153a9ffc85bba304) )
 	ROM_LOAD16_WORD_SWAP( "xvsj.04i", 0x080000, 0x80000, CRC(70a59b35) SHA1(786d9b243373024735848f785503c6aa883b1c2f) )
@@ -10559,7 +10621,7 @@ ROM_START( xmvsfjr1 )
 	ROM_LOAD( "xmvsfj.key",   0x000000, 0x000014, CRC(87576cda) SHA1(65905400f4462c175baa93b43e015e8596def31b) )
 ROM_END
 
-ROM_START( xmvsfjr2 )
+ROM_START( xmvsfjr3 )
 	ROM_REGION( CODE_SIZE, "maincpu", 0 ) // 68000 code
 	ROM_LOAD16_WORD_SWAP( "xvsj.03d", 0x000000, 0x80000, CRC(beb81de9) SHA1(fce0d43b193a521d026be6508a91be6e2d03f480) )
 	ROM_LOAD16_WORD_SWAP( "xvsj.04d", 0x080000, 0x80000, CRC(23d11271) SHA1(45e4ac52001f0c2b6cd6e07413b5e503c2b90329) )
@@ -10592,7 +10654,7 @@ ROM_START( xmvsfjr2 )
 	ROM_LOAD( "xmvsfj.key",   0x000000, 0x000014, CRC(87576cda) SHA1(65905400f4462c175baa93b43e015e8596def31b) )
 ROM_END
 
-ROM_START( xmvsfjr3 )
+ROM_START( xmvsfjr4 )
 	ROM_REGION( CODE_SIZE, "maincpu", 0 ) // 68000 code
 	ROM_LOAD16_WORD_SWAP( "xvsj.03c", 0x000000, 0x80000, CRC(180656a1) SHA1(aec2dfcfe8bcab03a48f749977e6f08fc21558bc) )
 	ROM_LOAD16_WORD_SWAP( "xvsj.04c", 0x080000, 0x80000, CRC(5832811c) SHA1(e900b343241310d4dd1b45f42573e1e90f2dcbda) )
@@ -12691,10 +12753,11 @@ GAME( 1996, xmvsfr1,    xmvsf,    cps2,     cps2_2p6b, cps2_state, init_cps2,   
 GAME( 1996, xmvsfu,     xmvsf,    cps2,     cps2_2p6b, cps2_state, init_cps2,     ROT0,   "Capcom", "X-Men Vs. Street Fighter (USA 961023)",                                         MACHINE_SUPPORTS_SAVE )
 GAME( 1996, xmvsfur1,   xmvsf,    cps2,     cps2_2p6b, cps2_state, init_cps2,     ROT0,   "Capcom", "X-Men Vs. Street Fighter (USA 961004)",                                         MACHINE_SUPPORTS_SAVE )
 GAME( 1996, xmvsfur2,   xmvsf,    cps2,     cps2_2p6b, cps2_state, init_cps2,     ROT0,   "Capcom", "X-Men Vs. Street Fighter (USA 960910)",                                         MACHINE_SUPPORTS_SAVE )
-GAME( 1996, xmvsfj,     xmvsf,    cps2,     cps2_2p6b, cps2_state, init_cps2,     ROT0,   "Capcom", "X-Men Vs. Street Fighter (Japan 961023)",                                       MACHINE_SUPPORTS_SAVE )
-GAME( 1996, xmvsfjr1,   xmvsf,    cps2,     cps2_2p6b, cps2_state, init_cps2,     ROT0,   "Capcom", "X-Men Vs. Street Fighter (Japan 961004)",                                       MACHINE_SUPPORTS_SAVE )
-GAME( 1996, xmvsfjr2,   xmvsf,    cps2,     cps2_2p6b, cps2_state, init_cps2,     ROT0,   "Capcom", "X-Men Vs. Street Fighter (Japan 960910)",                                       MACHINE_SUPPORTS_SAVE )
-GAME( 1996, xmvsfjr3,   xmvsf,    cps2,     cps2_2p6b, cps2_state, init_cps2,     ROT0,   "Capcom", "X-Men Vs. Street Fighter (Japan 960909)",                                       MACHINE_SUPPORTS_SAVE )
+GAME( 1996, xmvsfj,     xmvsf,    cps2,     cps2_2p6b, cps2_state, init_cps2,     ROT0,   "Capcom", "X-Men Vs. Street Fighter (Japan 970113)",                                       MACHINE_SUPPORTS_SAVE )
+GAME( 1996, xmvsfjr1,   xmvsf,    cps2,     cps2_2p6b, cps2_state, init_cps2,     ROT0,   "Capcom", "X-Men Vs. Street Fighter (Japan 961023)",                                       MACHINE_SUPPORTS_SAVE )
+GAME( 1996, xmvsfjr2,   xmvsf,    cps2,     cps2_2p6b, cps2_state, init_cps2,     ROT0,   "Capcom", "X-Men Vs. Street Fighter (Japan 961004)",                                       MACHINE_SUPPORTS_SAVE )
+GAME( 1996, xmvsfjr3,   xmvsf,    cps2,     cps2_2p6b, cps2_state, init_cps2,     ROT0,   "Capcom", "X-Men Vs. Street Fighter (Japan 960910)",                                       MACHINE_SUPPORTS_SAVE )
+GAME( 1996, xmvsfjr4,   xmvsf,    cps2,     cps2_2p6b, cps2_state, init_cps2,     ROT0,   "Capcom", "X-Men Vs. Street Fighter (Japan 960909)",                                       MACHINE_SUPPORTS_SAVE )
 GAME( 1996, xmvsfa,     xmvsf,    cps2,     cps2_2p6b, cps2_state, init_cps2,     ROT0,   "Capcom", "X-Men Vs. Street Fighter (Asia 961023)",                                        MACHINE_SUPPORTS_SAVE )
 GAME( 1996, xmvsfar1,   xmvsf,    cps2,     cps2_2p6b, cps2_state, init_cps2,     ROT0,   "Capcom", "X-Men Vs. Street Fighter (Asia 961004)",                                        MACHINE_SUPPORTS_SAVE )
 GAME( 1996, xmvsfar2,   xmvsf,    cps2,     cps2_2p6b, cps2_state, init_cps2,     ROT0,   "Capcom", "X-Men Vs. Street Fighter (Asia 960919)",                                        MACHINE_SUPPORTS_SAVE )
@@ -12761,7 +12824,8 @@ GAME( 1999, jyangoku,   0,        cps2,     cps2_1p2b, cps2_state, init_cps2,   
 GAME( 2004, hsf2,       0,        cps2,     cps2_2p6b, cps2_state, init_cps2,     ROT0,   "Capcom", "Hyper Street Fighter II: The Anniversary Edition (USA 040202)",                 MACHINE_SUPPORTS_SAVE )
 GAME( 2004, hsf2a,      hsf2,     cps2,     cps2_2p6b, cps2_state, init_cps2,     ROT0,   "Capcom", "Hyper Street Fighter II: The Anniversary Edition (Asia 040202)",                MACHINE_SUPPORTS_SAVE )
 GAME( 2004, hsf2j,      hsf2,     cps2,     cps2_2p6b, cps2_state, init_cps2,     ROT0,   "Capcom", "Hyper Street Fighter II: The Anniversary Edition (Japan 040202)",               MACHINE_SUPPORTS_SAVE )
-GAME( 2004, hsf2j1,     hsf2,     cps2,     cps2_2p6b, cps2_state, init_cps2,     ROT0,   "Capcom", "Hyper Street Fighter II: The Anniversary Edition (Japan 031222)",               MACHINE_SUPPORTS_SAVE )
+GAME( 2004, hsf2j1,     hsf2,     cps2,     cps2_2p6b, cps2_state, init_cps2,     ROT0,   "Capcom", "Hyper Street Fighter II: The Anniversary Edition (Japan 040123)",               MACHINE_SUPPORTS_SAVE )
+GAME( 2004, hsf2j2,     hsf2,     cps2,     cps2_2p6b, cps2_state, init_cps2,     ROT0,   "Capcom", "Hyper Street Fighter II: The Anniversary Edition (Japan 031222)",               MACHINE_SUPPORTS_SAVE )
 
 // Games released on CPS-2 hardware by Takumi
 

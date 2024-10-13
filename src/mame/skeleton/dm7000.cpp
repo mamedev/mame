@@ -94,10 +94,10 @@ private:
 	uint16_t          m_enet_regs[32]{};
 
 	uint32_t          dcr[1024]{};
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 	uint32_t screen_update_dm7000(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	void dm7000_mem(address_map &map);
+	void dm7000_mem(address_map &map) ATTR_COLD;
 };
 
 /* */

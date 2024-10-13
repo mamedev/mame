@@ -74,7 +74,7 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 	device_colecovision_control_port_interface *m_device;
 

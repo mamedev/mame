@@ -114,11 +114,11 @@ public:
 	void zorba(machine_config &config);
 
 private:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
-	void zorba_io(address_map &map);
-	void zorba_mem(address_map &map);
+	void zorba_io(address_map &map) ATTR_COLD;
+	void zorba_mem(address_map &map) ATTR_COLD;
 
 	// Memory banking control
 	uint8_t ram_r();
@@ -132,7 +132,6 @@ private:
 	template <unsigned N> void irq_w(int state);
 
 	// DMA controller handlers
-	void busreq_w(int state);
 	uint8_t memory_read_byte(offs_t offset);
 	void memory_write_byte(offs_t offset, uint8_t data);
 	uint8_t io_read_byte(offs_t offset);
@@ -160,7 +159,7 @@ private:
 	required_memory_bank                m_bank1;
 	required_region_ptr<uint8_t>        m_p_chargen;
 
-	required_device<cpu_device>         m_maincpu;
+	required_device<z80_device>         m_maincpu;
 	required_device<z80dma_device>      m_dma;
 	required_device<i8251_device>       m_uart0;
 	required_device<i8251_device>       m_uart1;
@@ -257,6 +256,7 @@ void zorba_state::zorba(machine_config &config)
 	Z80(config, m_maincpu, 24_MHz_XTAL / 6);
 	m_maincpu->set_addrmap(AS_PROGRAM, &zorba_state::zorba_mem);
 	m_maincpu->set_addrmap(AS_IO, &zorba_state::zorba_io);
+	m_maincpu->busack_cb().set(m_dma, FUNC(z80dma_device::bai_w));
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -276,8 +276,7 @@ void zorba_state::zorba(machine_config &config)
 
 	/* devices */
 	Z80DMA(config, m_dma, 24_MHz_XTAL / 6);
-	// busack on cpu connects to bai pin
-	m_dma->out_busreq_callback().set(FUNC(zorba_state::busreq_w));  //connects to busreq on cpu
+	m_dma->out_busreq_callback().set_inputline(m_maincpu, Z80_INPUT_LINE_BUSRQ);
 	m_dma->out_int_callback().set("irq0", FUNC(input_merger_device::in_w<0>));
 	//ba0 - not connected
 	m_dma->in_mreq_callback().set(FUNC(zorba_state::memory_read_byte));
@@ -494,13 +493,6 @@ template <unsigned N> void zorba_state::irq_w(int state)
 //-------------------------------------------------
 //  DMA controller handlers
 //-------------------------------------------------
-
-void zorba_state::busreq_w(int state)
-{
-// since our Z80 has no support for BUSACK, we assume it is granted immediately
-	m_maincpu->set_input_line(Z80_INPUT_LINE_BUSRQ, state);
-	m_dma->bai_w(state); // tell dma that bus has been granted
-}
 
 uint8_t zorba_state::memory_read_byte(offs_t offset)
 {

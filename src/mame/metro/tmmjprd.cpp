@@ -67,8 +67,8 @@ public:
 	void tmpdoki(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -123,7 +123,7 @@ private:
 	void draw_tile(bitmap_ind16 &bitmap, const rectangle &cliprect, int x,int y,int sizex,int sizey, uint32_t tiledata, uint8_t* rom);
 	void draw_tilemap(bitmap_ind16 &bitmap, const rectangle &cliprect, uint32_t*tileram, uint32_t*tileregs, uint8_t*rom );
 
-	void main_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
 };
 
 template<uint8_t Tilemap>

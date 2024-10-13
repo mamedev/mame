@@ -74,11 +74,11 @@ protected:
 
 	std::unique_ptr<bitmap_ind16> m_tmp_bitmap;
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
-	void main_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
 };
 
 void alphasmart3k_state::machine_start()

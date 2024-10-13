@@ -237,7 +237,7 @@ MACHINE_START_MEMBER(_8080bw_state,extra_8080bw)
 /*                                                     */
 /*******************************************************/
 
-CUSTOM_INPUT_MEMBER(invaders_clone_state::sicv_in2_control_r)
+ioport_value invaders_clone_state::sicv_in2_control_r()
 {
 	return m_player_controls[is_cabinet_cocktail() ? 1 : 0]->read() | ioport("P2GATE")->read();
 }
@@ -404,12 +404,12 @@ INPUT_PORTS_END
 /*                                                     */
 /*******************************************************/
 
-CUSTOM_INPUT_MEMBER(invaders_clone_state::invadpt2_in1_control_r)
+ioport_value invaders_clone_state::invadpt2_in1_control_r()
 {
 	return m_player_controls[0]->read() | (m_player_controls[1]->read() & ~m_cabinet_type->read());
 }
 
-CUSTOM_INPUT_MEMBER(invaders_clone_state::invadpt2_in2_control_r)
+ioport_value invaders_clone_state::invadpt2_in2_control_r()
 {
 	return m_player_controls[1]->read() | (m_player_controls[0]->read() & ~m_cabinet_type->read());
 }
@@ -1504,7 +1504,7 @@ INPUT_PORTS_END
 /*                                                     */
 /*******************************************************/
 
-CUSTOM_INPUT_MEMBER(rollingc_state::game_select_r)
+ioport_value rollingc_state::game_select_r()
 {
 	// need the joystick left/right inputs to show in two places
 	return bitswap<2>(m_player_controls[0]->read(), 1, 2);
@@ -5158,6 +5158,27 @@ ROM_START( lrescuem2 )
 	ROM_LOAD( "cv02-7643.1c",   0x0400, 0x0400, CRC(2bdf83a0) SHA1(01ffbd43964c41987e7d44816271308f9a70802b) )
 ROM_END
 
+// still shows Taito copyright, but on Artic PCB
+ROM_START( lrescueabl )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "2708_1.1",    0x0000, 0x0400, CRC(e3796dec) SHA1(454558672f6959b8efe7d52e26796ad8c0b0da6c) )
+	ROM_LOAD( "2708_2.2",    0x0400, 0x0400, CRC(8067c036) SHA1(a9dd756c44ee80d5e6d646f1f48e9341297751cf) )
+	ROM_LOAD( "2708_3.3",    0x0800, 0x0400, CRC(90179fee) SHA1(35059f7399229b8d9588d34f79073fa4d3301614) )
+	ROM_LOAD( "2708_4.4",    0x0c00, 0x0400, CRC(1d197d87) SHA1(21e049f9c2a0fe1c0403d9d1a2dc695c4ee764f9) )
+	ROM_LOAD( "2708_5.5",    0x1000, 0x0400, CRC(4326d338) SHA1(ac31645bdf292f28dfcfcb9d5e158e5df7a6f95d) )
+	ROM_LOAD( "2708_6.6",    0x1400, 0x0400, CRC(3b272372) SHA1(39b807c810d093d7a34b102eec16f3d9baeb21f1) )
+	ROM_LOAD( "2708_7.7",    0x1800, 0x0400, CRC(06fc1ecc) SHA1(b5b04b32f3bd122329d0282628db197b0c39c8cb) )
+	ROM_LOAD( "2708_8.8",    0x1c00, 0x0400, CRC(b3a3f24e) SHA1(c084e7d891c76b9f6949490d48288df0da8c2af7) )
+	ROM_LOAD( "2708_9.9",    0x4000, 0x0400, CRC(3398798f) SHA1(d7dd9e65a1048df8edd217f4206b19cd01f143f4) )
+	ROM_LOAD( "2708_10.10",  0x4400, 0x0400, CRC(37c5bfc6) SHA1(b0aec85e6f979cdf7a3a985830c8530302804837) )
+	ROM_LOAD( "2708_11.11",  0x4800, 0x0400, CRC(1b7a5644) SHA1(d26530ea11ada86f7c99b11d6faf4416a8f5a9eb) )
+	ROM_LOAD( "2708_12.12",  0x4c00, 0x0400, CRC(c342b907) SHA1(327da029420c4eedabc2a0534199a008a3f341b8) )
+
+	ROM_REGION( 0x0800, "proms", 0 )  // not dumped for this set, but present
+	ROM_LOAD( "cv01-7643.2c",   0x0000, 0x0400, BAD_DUMP CRC(aac24f34) SHA1(ad110e776547fb48baac568bb50d61854537ca34) )
+	ROM_LOAD( "cv02-7643.1c",   0x0400, 0x0400, BAD_DUMP CRC(2bdf83a0) SHA1(01ffbd43964c41987e7d44816271308f9a70802b) )
+ROM_END
+
 
 /*
 Cosmo
@@ -6003,6 +6024,7 @@ GAME( 1979, grescue,     lrescue,  lrescue,   lrescue,   _8080bw_state,  empty_i
 GAME( 1980, mlander,     lrescue,  lrescue,   lrescue,   _8080bw_state,  empty_init,    ROT270, "bootleg (Leisure Time Electronics)", "Moon Lander (bootleg of Lunar Rescue)",                           MACHINE_SUPPORTS_SAVE )
 GAME( 1979, lrescuem,    lrescue,  lrescue,   lrescue,   _8080bw_state,  empty_init,    ROT270, "bootleg (Model Racing)",             "Lunar Rescue (Model Racing bootleg, set 1)",                      MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
 GAME( 1979, lrescuem2,   lrescue,  lrescuem2, lrescue,   _8080bw_state,  empty_init,    ROT270, "bootleg (Model Racing)",             "Lunar Rescue (Model Racing bootleg, set 2)",                      MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
+GAME( 1979, lrescueabl,  lrescue,  lrescue,   lrescue,   _8080bw_state,  empty_init,    ROT270, "bootleg (Artic)",                    "Lunar Rescue (Artic bootleg)",                                    MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
 GAME( 1979, desterth,    lrescue,  lrescue,   lrescue,   _8080bw_state,  empty_init,    ROT270, "bootleg",                            "Destination Earth (bootleg of Lunar Rescue)",                     MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
 GAMEL(1980, escmars,     lrescue,  escmars,   lrescue,   _8080bw_state,  empty_init,    ROT270, "bootleg",                            "Escape from Mars (bootleg of Lunar Rescue)",                      MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND, layout_escmars )
 GAMEL(1980, resclunar,   lrescue,  escmars,   lrescue,   _8080bw_state,  empty_init,    ROT270, "bootleg (Niemer S.A.)",              "Rescate Lunar (Spanish bootleg of Lunar Rescue)",                 MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND, layout_escmars )

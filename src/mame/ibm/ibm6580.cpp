@@ -219,8 +219,8 @@ public:
 	void ibm6580(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	void pic_latch_w(uint16_t data);
@@ -254,11 +254,11 @@ private:
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void ibm6580_io(address_map &map);
-	void ibm6580_mem(address_map &map);
+	void ibm6580_io(address_map &map) ATTR_COLD;
+	void ibm6580_mem(address_map &map) ATTR_COLD;
 
-	void mcu_io(address_map &map);
-	void mcu_mem(address_map &map);
+	void mcu_io(address_map &map) ATTR_COLD;
+	void mcu_mem(address_map &map) ATTR_COLD;
 
 	uint16_t m_gate = 0;
 	uint8_t m_dma0pg = 0;

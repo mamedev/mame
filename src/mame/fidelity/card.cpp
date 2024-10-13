@@ -27,7 +27,7 @@ TODO:
 - the VFD scrolls around 30% too slow compared to the real one, probably depends
   on how many T1 clock edges the 8041 can detect (see mcu_t1_r)
 
-********************************************************************************
+================================================================================
 
 Voice Bridge Challenger (Model VBRC, later reissued as Model 7002/BV2)
 and Bridge Challenger 3 (Model 7014)
@@ -41,7 +41,7 @@ added.
 RE notes by Kevin Horton
 
 This unit is similar in construction kinda to the chess challengers, however it
-has an 8041 which does ALL of the system I/O.  The Z80 has NO IO AT ALL other than
+has an 8041 which does ALL of the system I/O. The Z80 has NO IO AT ALL other than
 what is performed through the 8041!
 
 The main CPU is a Z80 running at 2.5MHz
@@ -61,10 +61,10 @@ Memory Map:
 8000-DFFF: unused
 E000-FFFF: write to TSI chip
 
-NOTE: when the TSI chip is written to, the CPU IS STOPPED.  The CPU will run again
-when the word is done being spoken.  This is because D0-D5 run to the TSI chip directly.
+NOTE: when the TSI chip is written to, the CPU IS STOPPED. The CPU will run again
+when the word is done being spoken. This is because D0-D5 run to the TSI chip directly.
 
-The TSI chip's ROM is 4K, and is marked 101-32118.  The clock is the same as the Chess
+The TSI chip's ROM is 4K, and is marked 101-32118. The clock is the same as the Chess
 Challengers- 470K/100pf which gives a frequency around 25KHz or so.
 
 Port Map:
@@ -115,12 +115,12 @@ P6.1 - segment B
 P6.2 - segment F
 P6.3 - segment G
 
-P7.0 - LED enable (high = LEDs can be lit.  low = LEDs will not light)
+P7.0 - LED enable (high = LEDs can be lit. low = LEDs will not light)
 P7.1 - goes through inverter, to pads that are not used
 P7.2 - segment C
 P7.3 - segment H
 
-button matrix:
+Button matrix:
 --------------
 the matrix is composed of 8 columns by 4 rows.
 
@@ -155,7 +155,7 @@ E*  *  *  *  *C
        D
 
 The digits of the display are numbered left to right, 0 through 7 and are controlled
-by the grids.  hi = grid on, hi = segment on.
+by the grids. hi = grid on, hi = segment on.
 
 A detailed description of the hardware can be found also in the patent 4,373,719.
 
@@ -214,7 +214,7 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(start_scan);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	void brc_base(machine_config &config);
@@ -233,8 +233,8 @@ private:
 	u8 m_inp_mux = 0;
 
 	// address maps
-	void main_map(address_map &map);
-	void main_io(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
+	void main_io(address_map &map) ATTR_COLD;
 
 	TIMER_DEVICE_CALLBACK_MEMBER(barcode_shift) { m_barcode >>= 1; }
 

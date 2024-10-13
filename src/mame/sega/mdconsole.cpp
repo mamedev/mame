@@ -323,6 +323,48 @@ ROM_START(dcat16)
 	ROM_REGION( 0x10000, "soundcpu", ROMREGION_ERASEFF)
 ROM_END
 
+
+ROM_START(mahg156)
+	ROM_REGION(0x8000000, "mainrom", ROMREGION_ERASEFF)
+	ROM_LOAD16_WORD_SWAP( "md156.u3", 0x0000,  0x8000000, CRC(665fc68c) SHA1(6b765f96716c4a0abf3d27252ec82be6b0d9a985) )
+
+	ROM_REGION(0x8000000, "maincpu", ROMREGION_ERASEFF)
+//  the Megadrive ROMs for the most part appear to be hacked versions of the games / old scene dumps
+//  some are region locked to differing regions (not all games present in ROM appear on the menu)
+//  ROM_COPY( "mainrom", 0x0000000, 0, 0x080000) // FORGOTTEN WORLDS
+//  ROM_COPY( "mainrom", 0x0080000, 0, 0x080000) // FIRE PRO WRESTLING
+//  ROM_COPY( "mainrom", 0x0100000, 0, 0x080000) // GHOST BUSTERS
+//  ROM_COPY( "mainrom", 0x0180000, 0, 0x080000) // DICK TRACY
+//  ROM_COPY( "mainrom", 0x0200000, 0, 0x080000) // DEVIL CRASH
+//  ROM_COPY( "mainrom", 0x0280000, 0, 0x080000) // DECAP ATTACK
+//  ROM_COPY( "mainrom", 0x0300000, 0, 0x080000) // DARWIN 4081
+//  ROM_COPY( "mainrom", 0x0380000, 0, 0x080000) // CRACK DOWN
+//  ROM_COPY( "mainrom", 0x0400000, 0, 0x080000) // CAPTAIN PLANET
+//  ROM_COPY( "mainrom", 0x0480000, 0, 0x080000) // CALIFORNIA GAMES
+//  ROM_COPY( "mainrom", 0x0500000, 0, 0x080000) // CADASH
+//  ROM_COPY( "mainrom", 0x0580000, 0, 0x080000) // BOOGIE WOOGIE BOWLING
+//  ROM_COPY( "mainrom", 0x0600000, 0, 0x080000) // BIMINI RUN
+//  ROM_COPY( "mainrom", 0x0700000, 0, 0x080000) // BATTLE TOADS
+//  ROM_COPY( "mainrom", 0x0780000, 0, 0x080000) // TROUBLE SHOOTER
+//  ROM_COPY( "mainrom", 0x0800000, 0, 0x080000) // BURNING FORCE
+//  ROM_COPY( "mainrom", 0x0880000, 0, 0x080000) // FAERY TALE ADVENTURE
+//  ROM_COPY( "mainrom", 0x0900000, 0, 0x080000) // E-SWAT
+//  ROM_COPY( "mainrom", 0x0980000, 0, 0x080000) // ELEMENTAL MASTER
+//  ROM_COPY( "mainrom", 0x0a00000, 0, 0x080000) // EA HOCKEY
+//  ROM_COPY( "mainrom", 0x0a80000, 0, 0x080000) // DARK CASTLE
+//  ROM_COPY( "mainrom", 0x0b00000, 0, 0x080000) // CYBORG JUSTICE (CENSOR)
+//  ROM_COPY( "mainrom", 0x0b80000, 0, 0x080000) // LITTLE MERMAID
+//  ROM_COPY( "mainrom", 0x0c00000, 0, 0x080000) // DORAEMON
+//  ROM_COPY( "mainrom", 0x0c80000, 0, 0x080000) // SONIC
+//  ROM_COPY( "mainrom", 0x0d00000, 0, 0x080000) // WANI WANI WORLD
+//  ROM_COPY( "mainrom", 0x0d80000, 0, 0x080000) // GOLDEN AXE 2
+//  etc.
+	ROM_COPY( "mainrom", 0x7800000, 0x00000, 0x200000) // DMC RedKid (Menu, requires unusual rendering mode?)
+
+	ROM_REGION( 0x10000, "soundcpu", ROMREGION_ERASEFF)
+ROM_END
+
+
 ROM_START(megajet)
 	ROM_REGION(MD_CPU_REGION_SIZE, "maincpu", ROMREGION_ERASEFF)
 	ROM_REGION( 0x10000, "soundcpu", ROMREGION_ERASEFF)
@@ -1043,3 +1085,5 @@ CONS( 1993, laseractj,    laseract, 0,      mdj_scd,         md,       md_cons_c
 
 /* clone hardware - not sure if this hardware is running some kind of emulator, or enhanced MD clone, or just custom banking */
 CONS( 200?, dcat16,       0,        0,      dcat16_megadriv, md,       md_cons_slot_state, init_genesis, "Firecore",   "D-CAT16 (Mega Drive handheld)",  MACHINE_NOT_WORKING )
+// seems to be based on the AT games units, requires custom mode for menu?
+CONS( 201?, mahg156,      0,        0,      dcat16_megadriv, md,       md_cons_slot_state, init_genesis, "<unknown>",   "Mini Arcade Handheld Game Console 2.8 Inch Screen Built in 156 Retro Games (Mega Drive handheld)",  MACHINE_NOT_WORKING )

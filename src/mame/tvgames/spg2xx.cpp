@@ -485,6 +485,19 @@ static INPUT_PORTS_START( spg2xx ) // base structure for easy debugging / figuri
 	PORT_DIPSETTING(      0x8000, "8000" )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( drumsups )
+	PORT_INCLUDE( spg2xx )
+
+	PORT_MODIFY("P1")
+	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_START1 ) PORT_NAME("Start / Enter")
+	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Drum pad 1: Blue")
+	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Drum pad 2: Yellow")
+	PORT_BIT( 0x0200, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("Drum pad 3: Purple")
+	PORT_BIT( 0x2000, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_NAME("Drum pad 4: Red")
+	PORT_BIT( 0x4000, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_NAME("Drum pad 5: Green")
+
+INPUT_PORTS_END
+
 static INPUT_PORTS_START( lexiart )
 	PORT_INCLUDE( spg2xx )
 
@@ -777,12 +790,12 @@ static INPUT_PORTS_START( doyousud )
 INPUT_PORTS_END
 
 
-CUSTOM_INPUT_MEMBER(spg2xx_game_fordrace_state::wheel_r)
+ioport_value spg2xx_game_fordrace_state::wheel_r()
 {
 	return ioport("WHEEL_REAL")->read() >> 1;
 }
 
-CUSTOM_INPUT_MEMBER(spg2xx_game_fordrace_state::wheel2_r)
+ioport_value spg2xx_game_fordrace_state::wheel2_r()
 {
 //  return 0x0800;
 	uint16_t dat = ioport("WHEEL_REAL")->read();
@@ -1321,6 +1334,28 @@ static INPUT_PORTS_START( virtten )
 	PORT_MODIFY("P3")
 INPUT_PORTS_END
 
+
+static INPUT_PORTS_START( ddr33v )
+	PORT_INCLUDE( spg2xx )
+
+	PORT_MODIFY("P1")
+	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_16WAY
+	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_16WAY
+	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_16WAY
+	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_16WAY
+	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_BUTTON1 ) // quits out of songs
+	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_START1 )
+	PORT_BIT( 0xffc0, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_MODIFY("P2")
+	PORT_BIT( 0xffff, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_MODIFY("P3")
+	PORT_BIT( 0xffff, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+INPUT_PORTS_END
+
+
 void spg2xx_game_state::machine_start()
 {
 	if (m_bank)
@@ -1532,6 +1567,19 @@ void spg2xx_game_state::tvsprt10(machine_config &config)
 	m_maincpu->portb_in().set(FUNC(spg2xx_game_state::base_portb_r));
 	m_maincpu->portc_in().set(FUNC(spg2xx_game_state::base_portc_r));
 }
+
+void spg2xx_game_state::spg28x(machine_config &config)
+{
+	SPG28X(config, m_maincpu, XTAL(27'000'000), m_screen);
+	m_maincpu->set_addrmap(AS_PROGRAM, &spg2xx_game_state::mem_map_4m);
+
+	spg2xx_base(config);
+
+	m_maincpu->porta_in().set(FUNC(spg2xx_game_state::base_porta_r));
+	m_maincpu->portb_in().set(FUNC(spg2xx_game_state::base_portb_r));
+	m_maincpu->portc_in().set(FUNC(spg2xx_game_state::base_portc_r));
+}
+
 
 uint16_t spg2xx_game_tmntmutm_state::guny_r()
 {
@@ -1824,7 +1872,6 @@ void spg2xx_game_lexiart_state::lexiart(machine_config &config)
 	m_maincpu->portc_in().set(FUNC(spg2xx_game_lexiart_state::base_portc_r));
 }
 
-
 void spg2xx_game_senwfit_state::portc_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	int bank = 0;
@@ -2013,6 +2060,12 @@ void spg2xx_game_doraphone_state::doraphonep(machine_config &config)
 	m_screen->set_refresh_hz(50);
 }
 
+void spg2xx_game_ddr33v_state::init_ddr33v()
+{
+	// what is this checking? timer? battery state? protection? it goes to a blank screen after the boot logo otherwise
+	uint16_t* rom = (uint16_t*)memregion("maincpu")->base();
+	rom[0x208055] = 0x4440;
+}
 
 ROM_START( rad_skat )
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
@@ -2107,6 +2160,12 @@ ROM_START( guitarssa )
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD16_WORD_SWAP( "guitar_superstar_flying_v.bin", 0x000000, 0x800000, CRC(af0c837c) SHA1(f04c9a4292f811d92311d19fb35dcee3f1649a14) )
 ROM_END
+
+ROM_START( drumsups )
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "drumsuperstar.bin", 0x000000, 0x800000, CRC(f3d5fd6d) SHA1(4d0c9ba7531b3df68bd9c020e46d07445301adf9) )
+ROM_END
+
 
 ROM_START( tmntbftc )
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
@@ -2261,6 +2320,16 @@ ROM_START( virtten )
 	ROM_LOAD16_WORD_SWAP( "virttennis.bin", 0x000000, 0x400000, CRC(e665bea9) SHA1(8c2c9f879c929e224cd885165ed60aed8baeb19d) )
 ROM_END
 
+ROM_START( ddr33v )
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "ddr33v.bin", 0x000000, 0x800000, CRC(56c7015c) SHA1(a1faef2ab6eb191dea1497f8cfd4ccbd8c504e6d) )
+ROM_END
+
+ROM_START( anpantv )
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "anpanman_tv.bin", 0x000000, 0x800000, CRC(5e32dc1a) SHA1(bae260ffc56f5315cdafd5bc40966ec6d31e267f) )
+ROM_END
+
 void spg2xx_game_state::init_crc()
 {
 	// several games have a byte sum checksum listed at the start of ROM, this little helper function logs what it should match.
@@ -2364,11 +2433,13 @@ CONS( 200?, decathlna,  decathln, 0, tvsprt10,  decathln,  spg2xx_game_state,   
 CONS( 2007, guitarfv,   0,        0, guitarfv,  guitarfv,  spg2xx_game_state,          empty_init,    "Advance Bright Ltd",                                     "Guitar Fever (2007.07.03 Ver 2.7)",                                     MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
 // The box for these has 'YOU take the stage' text, but unlike the sequel, it is not part of the ingame title screen, this sometimes causes confusion
-CONS( 200?, guitarss,   0,        0, spg2xx,    guitarss,  spg2xx_game_state,          empty_init,    "Senario",                                                "Guitar Super Star ('Fender Stratocaster' style)",                       MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-CONS( 200?, guitarssa,  guitarss, 0, spg2xx,    guitarss,  spg2xx_game_state,          empty_init,    "Senario",                                                "Guitar Super Star (red 'Gibson Flying V' style)",                       MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 200?, guitarss,   0,        0, spg28x,    guitarss,  spg2xx_game_state,          empty_init,    "Senario",                                                "Guitar Super Star ('Fender Stratocaster' style)",                       MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 200?, guitarssa,  guitarss, 0, spg28x,    guitarss,  spg2xx_game_state,          empty_init,    "Senario",                                                "Guitar Super Star (red 'Gibson Flying V' style)",                       MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
 // The sequel has 'You Take The Stage' on both the box and title screen
 CONS( 2009, gssytts,    0,        0, gssytts,   guitarss,  spg2xx_game_gssytts_state,  empty_init,    "Senario",                                                "Guitar Super Star: You Take The Stage",                                 MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+
+CONS( 2007, drumsups,   0,        0, spg28x,    drumsups,  spg2xx_game_state,          empty_init,    "Senario",                                                "Drum Super Star",                                                       MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
 CONS( 2009, senwfit,    0,        0, gssytts,   senwfit,   spg2xx_game_senwfit_state,  init_senwfit,  "Senario",                                                "Wireless Fitness / Dance Fit (Senario)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
@@ -2432,3 +2503,10 @@ CONS( 2005, doyousud,   0,        0, spg2xx,    doyousud,  spg2xx_game_state,   
 
 CONS( 200?, virtbb,     0,        0, spg2xx,    virtbb,    spg2xx_game_state,          empty_init,    "VTG Interactive",                                        "Virtual Baseball (VTG)",                                                MACHINE_NOT_WORKING ) // motion controls not fully understood
 CONS( 200?, virtten,    0,        0, spg2xx,    virtten,   spg2xx_game_state,          empty_init,    "VTG Interactive",                                        "Virtual Tennis (VTG)",                                                  MACHINE_NOT_WORKING ) // motion controls not fully understood
+
+// 2007 ingame, 2008 on box.  Hyperkin is mentioned as being the registered trademark holder alongside DDRGame on the box.
+// Songs "composed by Kenneth Baylon"
+CONS( 2008, ddr33v,     0,        0, spg2xx,    ddr33v,    spg2xx_game_ddr33v_state,   init_ddr33v,   "DDRGame / Hyperkin",                                    "16-bit TV Dance Pad with 15 songs / Dance Dance Party Mix (DDRGame)",   MACHINE_IMPERFECT_SOUND )
+
+// PCB has 'Anpanman TV 2006 Ver 1.4' printed on it, ROM has SPG260 header.  Uses custom built-in keyboard, no display built into the unit.
+CONS( 2006, anpantv,    0,        0, spg2xx,    spg2xx,    spg2xx_game_state,          empty_init,    "Bandai",                                                "Anpanman TV (Japan)",                                                   MACHINE_NOT_WORKING )

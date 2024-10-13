@@ -58,15 +58,15 @@ public:
 		m_lamps(*this, "lamp%u", 0U)
 	{ }
 
-	DECLARE_CUSTOM_INPUT_MEMBER(tape_headpos_r);
+	ioport_value tape_headpos_r();
 	DECLARE_INPUT_CHANGED_MEMBER(category_select);
 	void init_quizshow();
 	void quizshow(machine_config &config);
 
 protected:
 	virtual void machine_start() override { m_lamps.resolve(); }
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	required_device<s2650_device> m_maincpu;
@@ -78,7 +78,7 @@ private:
 	required_device<cassette_image_device> m_cass;
 	output_finder<11> m_lamps;
 
-	void mem_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
 
 	void lamps1_w(uint8_t data);
 	void lamps2_w(uint8_t data);
@@ -271,7 +271,7 @@ void quizshow_state::mem_map(address_map &map)
 
 ***************************************************************************/
 
-CUSTOM_INPUT_MEMBER(quizshow_state::tape_headpos_r)
+ioport_value quizshow_state::tape_headpos_r()
 {
 	return 1 << m_tape_head_pos;
 }

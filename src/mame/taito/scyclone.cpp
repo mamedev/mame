@@ -94,14 +94,14 @@ private:
 	INTERRUPT_GEN_MEMBER(irq);
 
 
-	void scyclone_iomap(address_map &map);
-	void scyclone_map(address_map &map);
-	void scyclone_sub_iomap(address_map &map);
-	void scyclone_sub_map(address_map &map);
+	void scyclone_iomap(address_map &map) ATTR_COLD;
+	void scyclone_map(address_map &map) ATTR_COLD;
+	void scyclone_sub_iomap(address_map &map) ATTR_COLD;
+	void scyclone_sub_map(address_map &map) ATTR_COLD;
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;

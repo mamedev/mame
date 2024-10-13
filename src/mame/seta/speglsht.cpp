@@ -103,6 +103,8 @@ Notes:
       U70     : 16M mask ROM (DIP42, PCB labelled 'ZPRO0')
       *       : Unpopulated position for 16M DIP42 mask ROM (PCB labelled 'ZPRO1')
 
+TODO:
+- Transparent color is wrong at title screen animation
 */
 
 #include "emu.h"
@@ -133,9 +135,9 @@ public:
 	void init_speglsht();
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	required_device<palette_device> m_palette;
@@ -161,9 +163,9 @@ private:
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	void st0016_rom_bank_w(uint8_t data);
-	void speglsht_mem(address_map &map);
-	void st0016_io(address_map &map);
-	void st0016_mem(address_map &map);
+	void speglsht_mem(address_map &map) ATTR_COLD;
+	void st0016_io(address_map &map) ATTR_COLD;
+	void st0016_mem(address_map &map) ATTR_COLD;
 };
 
 

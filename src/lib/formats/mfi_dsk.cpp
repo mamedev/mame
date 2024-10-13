@@ -42,8 +42,10 @@
   - 2, MG_D -> Damaged zone, reads as neutral but cannot be changed by writing
   - 3, MG_E -> End of zone
 
-  Tracks data is aligned so that the index pulse is at the start,
-  whether the disk is hard-sectored or not.
+  Tracks data is aligned so that the index pulse is at the start for soft-
+  sectored disks. For hard-sectored disks, the sector hole for the first
+  sector is at the start and the index hole is half a sector from the end
+  of the track.
 
   The position is the angular position in units of 1/200,000,000th of
   a turn.  A size in such units, not coincidentally at all, is also
@@ -59,7 +61,9 @@
   if you try to rewrite a physical disk with the data.  Some
   preservation formats encode that information, it is guessed for
   others.  The write track function of fdcs should set it.  The
-  representation is the angular position relative to the index.
+  representation is the angular position relative to the index, for
+  soft-sectored disks, and the first sector hole for hard-sectored
+  disks.
 
   The media type is divided in two parts.  The first half
   indicate the physical form factor, i.e. all medias with that

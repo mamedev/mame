@@ -50,13 +50,13 @@ public:
 	void ramdac_rgb666_w(offs_t offset, uint8_t data);
 	void ramdac_rgb888_w(offs_t offset, uint8_t data);
 
-	void ramdac_palram(address_map &map);
+	void ramdac_palram(address_map &map) ATTR_COLD;
 
 protected:
 	// device-level overrides
 	virtual void device_validity_check(validity_checker &valid) const override;
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 	virtual space_config_vector memory_space_config() const override;
 
 private:

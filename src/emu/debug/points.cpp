@@ -10,8 +10,10 @@
 
 #include "emu.h"
 #include "points.h"
+
 #include "debugger.h"
 #include "debugcon.h"
+#include "debugcpu.h"
 
 
 //**************************************************************************

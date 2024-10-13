@@ -17458,7 +17458,8 @@ User/save disks that can be created from the game itself are not included.
 		</part>
 	</software>
 
-	<software name="mcosm">
+	<!-- requires cheat to reduce cpu clock on 16Mhz model to 75% to avoid hang -->
+	<software name="mcosm" supported="partial">
 		<!--
 		Origin: redump.org
 		<rom name="Microcosm (Japan) (Rev A) (Track 1).bin" size="423007200" crc="dce333fc" sha1="63daf9e93740a007cdfc59c9105b108a924dee68"/>

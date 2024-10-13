@@ -397,26 +397,26 @@ private:
 
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 
-	void bios_io_map(address_map &map);
-	void bios_map(address_map &map);
-	void ppu_map(address_map &map);
-	void cart_map(address_map &map);
-	void cart_a_map(address_map &map);
-	void cart_b_map(address_map &map);
-	void cart_c_map(address_map &map);
-	void cart_d_map(address_map &map);
-	void cart_d2_map(address_map &map);
-	void cart_e_map(address_map &map);
-	void cart_f_map(address_map &map);
-	void cart_f2_map(address_map &map);
-	void cart_g_map(address_map &map);
-	void cart_h_map(address_map &map);
-	void cart_i_map(address_map &map);
-	void cart_k_map(address_map &map);
+	void bios_io_map(address_map &map) ATTR_COLD;
+	void bios_map(address_map &map) ATTR_COLD;
+	void ppu_map(address_map &map) ATTR_COLD;
+	void cart_map(address_map &map) ATTR_COLD;
+	void cart_a_map(address_map &map) ATTR_COLD;
+	void cart_b_map(address_map &map) ATTR_COLD;
+	void cart_c_map(address_map &map) ATTR_COLD;
+	void cart_d_map(address_map &map) ATTR_COLD;
+	void cart_d2_map(address_map &map) ATTR_COLD;
+	void cart_e_map(address_map &map) ATTR_COLD;
+	void cart_f_map(address_map &map) ATTR_COLD;
+	void cart_f2_map(address_map &map) ATTR_COLD;
+	void cart_g_map(address_map &map) ATTR_COLD;
+	void cart_h_map(address_map &map) ATTR_COLD;
+	void cart_i_map(address_map &map) ATTR_COLD;
+	void cart_k_map(address_map &map) ATTR_COLD;
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 	struct chr_bank
 	{

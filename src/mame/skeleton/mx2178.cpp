@@ -50,10 +50,10 @@ public:
 private:
 	MC6845_UPDATE_ROW(crtc_update_row);
 
-	void io_map(address_map &map);
-	void mem_map(address_map &map);
+	void io_map(address_map &map) ATTR_COLD;
+	void mem_map(address_map &map) ATTR_COLD;
 
-	virtual void machine_reset() override;
+	virtual void machine_reset() override ATTR_COLD;
 	required_device<palette_device> m_palette;
 	required_shared_ptr<u8> m_p_videoram;
 	required_device<z80_device> m_maincpu;

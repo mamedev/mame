@@ -32,7 +32,7 @@ Open Computer Chess Championship.
 
 MM IV TurboKit 18MHz - (mm4tk)
 This is a replacement ROM combining the TurboKit initial ROM with the original MM IV.
-The TurboKit powers up to it's tiny ROM, copies itself to RAM, banks in normal ROM,
+The TurboKit powers up to its tiny ROM, copies itself to RAM, banks in normal ROM,
 copies that to faster SRAM, then patches the checksum and the LED blink delays.
 
 There is an undumped MM V TurboKit, which will be the exact same except for location
@@ -148,7 +148,7 @@ public:
 	void bup(machine_config &config);
 
 protected:
-	virtual void machine_reset() override;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -157,11 +157,11 @@ private:
 	required_ioport_array<2> m_keys;
 	required_ioport m_reset;
 
-	void bup_mem(address_map &map);
-	void mm2_mem(address_map &map);
-	void mm4_mem(address_map &map);
-	void mm5p_mem(address_map &map);
-	void rebel5_mem(address_map &map);
+	void bup_mem(address_map &map) ATTR_COLD;
+	void mm2_mem(address_map &map) ATTR_COLD;
+	void mm4_mem(address_map &map) ATTR_COLD;
+	void mm5p_mem(address_map &map) ATTR_COLD;
+	void rebel5_mem(address_map &map) ATTR_COLD;
 
 	void lcd_irqack_w(u8 data);
 	u8 keys_r(offs_t offset);

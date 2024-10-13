@@ -26,7 +26,7 @@ public:
 	virtual int get_fixed_bank_type() override { return 0; }
 
 protected:
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 private:
 	required_device<cmc_prot_device> m_cmc_prot;
@@ -50,7 +50,7 @@ public:
 	virtual int get_fixed_bank_type() override { return 0; }
 
 protected:
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 private:
 	required_device<cmc_prot_device> m_cmc_prot;
@@ -73,7 +73,7 @@ public:
 	virtual int get_fixed_bank_type() override { return 0; }
 
 protected:
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 private:
 	required_device<cmc_prot_device> m_cmc_prot;

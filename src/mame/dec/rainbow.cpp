@@ -508,14 +508,14 @@ public:
 	void rainbow_base(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	TIMER_CALLBACK_MEMBER(command_tick);
 	TIMER_CALLBACK_MEMBER(switch_off_tick);
 
-	void rainbow8088_base_map(address_map &map);
-	void rainbow8088_base_io(address_map &map);
+	void rainbow8088_base_map(address_map &map) ATTR_COLD;
+	void rainbow8088_base_io(address_map &map) ATTR_COLD;
 
 	uint8_t ext_ram_r(offs_t offset);
 
@@ -599,9 +599,9 @@ protected:
 	void vram_w(offs_t offset, uint16_t data);
 	void GDC_vblank_irq(int state);
 
-	void rainbowz80_io(address_map &map);
-	void rainbowz80_mem(address_map &map);
-	void upd7220_map(address_map &map);
+	void rainbowz80_io(address_map &map) ATTR_COLD;
+	void rainbowz80_mem(address_map &map) ATTR_COLD;
+	void upd7220_map(address_map &map) ATTR_COLD;
 	enum
 	{   // LOWEST PRIORITY
 		// Mnemonic - - - - - -  TYPE  ADDRESS - Source
@@ -760,10 +760,10 @@ public:
 	void rainbow_modela(machine_config &config);
 
 private:
-	virtual void machine_reset() override;
+	virtual void machine_reset() override ATTR_COLD;
 
-	void rainbow8088_map(address_map &map);
-	void rainbow8088_io(address_map &map);
+	void rainbow8088_map(address_map &map) ATTR_COLD;
+	void rainbow8088_io(address_map &map) ATTR_COLD;
 
 	void ext_ram_w(offs_t offset, uint8_t data);
 	uint8_t rtc_r(offs_t offset);
@@ -782,10 +782,10 @@ public:
 	void rainbow_modelb(machine_config &config);
 
 private:
-	virtual void machine_reset() override;
+	virtual void machine_reset() override ATTR_COLD;
 
-	void rainbow8088_map(address_map &map);
-	void rainbow8088_io(address_map &map);
+	void rainbow8088_map(address_map &map) ATTR_COLD;
+	void rainbow8088_io(address_map &map) ATTR_COLD;
 
 	void ext_ram_w(offs_t offset, uint8_t data);
 	uint8_t rtc_r(offs_t offset);
@@ -3301,7 +3301,6 @@ void rainbow_base_state::rainbow_base(machine_config &config)
 
 	m_comm_port->option_add("microsoft_mouse", MSFT_HLE_SERIAL_MOUSE);
 	m_comm_port->option_add("logitech_mouse", LOGITECH_HLE_SERIAL_MOUSE);
-	m_comm_port->option_add("msystems_mouse", MSYSTEMS_HLE_SERIAL_MOUSE);
 	m_comm_port->set_default_option("logitech_mouse");
 
 	printer.set_default_option("printer");

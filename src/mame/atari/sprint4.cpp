@@ -57,11 +57,11 @@ public:
 	template <int N> int collision_flipflop_r();
 
 private:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
-	void cpu_map(address_map &map);
+	void cpu_map(address_map &map) ATTR_COLD;
 
 	uint8_t wram_r(offs_t offset);
 	uint8_t analog_r(offs_t offset);

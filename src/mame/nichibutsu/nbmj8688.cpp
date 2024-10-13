@@ -3937,28 +3937,28 @@ ROM_END
 
 
 /* 8-bit palette */
-GAME( 1986, crystalg, 0,        crystalg,        crystalg, nbmj8688_state, empty_init,    ROT0, "Nichibutsu",     "Crystal Gal (Japan 860512)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, crystalg, 0,        crystalg,        crystalg, nbmj8688_state, empty_init,    ROT0, "Nichibutsu",     "Crystal Gal (Japan 860512)", MACHINE_SUPPORTS_SAVE ) // クリスタルギャル
 GAME( 1986, crystal2, 0,        crystal2,        crystal2, nbmj8688_state, empty_init,    ROT0, "Nichibutsu",     "Crystal Gal 2 (Japan 860620)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, nightlov, 0,        nightlov,        nightlov, nbmj8688_state, empty_init,    ROT0, "Central Denshi", "Night Love (Japan 860705)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-GAME( 1986, apparel,  0,        apparel,         apparel,  nbmj8688_state, empty_init,    ROT0, "Central Denshi", "Apparel Night (Japan 860929)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, nightlov, 0,        nightlov,        nightlov, nbmj8688_state, empty_init,    ROT0, "Central Denshi", "Night Love (Japan 860705)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // ナイトラブ
+GAME( 1986, apparel,  0,        apparel,         apparel,  nbmj8688_state, empty_init,    ROT0, "Central Denshi", "Apparel Night (Japan 860929)", MACHINE_SUPPORTS_SAVE ) // アパレルナイト
 GAME( 1988, bikkuri,  0,        bikkuri,         bikkuri,  nbmj8688_state, empty_init,    ROT0, "Nichibutsu",     "Bikkuri Pro Wrestling (Japan 881221, Ver 1.05)", MACHINE_SUPPORTS_SAVE )
 
 /* hybrid 12-bit palette */
-GAME( 1986, citylove, 0,        citylove,        citylove, nbmj8688_state, empty_init,    ROT0, "Nichibutsu",     "City Love (Japan 860908)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, citylove, 0,        citylove,        citylove, nbmj8688_state, empty_init,    ROT0, "Nichibutsu",     "City Love (Japan 860908)", MACHINE_SUPPORTS_SAVE ) // シティラブ
 GAME( 1986, mcitylov, citylove, mcitylov,        mcitylov, nbmj8688_state, empty_init,    ROT0, "Nichibutsu",     "City Love (Japan 860904, medal)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, secolove, 0,        secolove,        secolove, nbmj8688_state, empty_init,    ROT0, "Nichibutsu",     "Second Love (Japan 861201)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, secolove, 0,        secolove,        secolove, nbmj8688_state, empty_init,    ROT0, "Nichibutsu",     "Second Love (Japan 861201)", MACHINE_SUPPORTS_SAVE ) // セカンドラブ
 GAME( 1988, barline,  0,        barline,         barline,  nbmj8688_state, empty_init,    ROT180, "Nichibutsu",   "Barline (Japan?)",  MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 
 /* hybrid 16-bit palette */
 GAME( 1987, seiha,    0,        seiha,           seiha,    nbmj8688_state, empty_init,    ROT0, "Nichibutsu",     "Seiha (Japan 870725)", MACHINE_SUPPORTS_SAVE )
 GAME( 1987, seiham,   seiha,    seiham,          seiham,   nbmj8688_state, empty_init,    ROT0, "Nichibutsu",     "Seiha (Japan 870723, medal)", MACHINE_SUPPORTS_SAVE )
 GAME( 1987, mjgaiden, 0,        mjgaiden,        ojousan,  nbmj8688_state, empty_init,    ROT0, "Central Denshi", "Mahjong Gaiden (Japan 870803)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, iemoto,   0,        iemoto,          iemoto,   nbmj8688_state, empty_init,    ROT0, "Nichibutsu",     "Iemoto (Japan 871020)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, iemoto,   0,        iemoto,          iemoto,   nbmj8688_state, empty_init,    ROT0, "Nichibutsu",     "Iemoto (Japan 871020)", MACHINE_SUPPORTS_SAVE ) // 家元
 GAME( 1987, iemotom,  iemoto,   iemotom,         iemotom,  nbmj8688_state, empty_init,    ROT0, "Nichibutsu",     "Iemoto (Japan 871118, medal)", MACHINE_SUPPORTS_SAVE )
 GAME( 1987, ryuuha,   iemoto,   ryuuha,          ryuuha,   nbmj8688_state, empty_init,    ROT0, "Central Denshi", "Ryuuha (Japan 871027)", MACHINE_SUPPORTS_SAVE )
 GAME( 1987, ojousan,  0,        ojousan,         ojousan,  nbmj8688_state, empty_init,    ROT0, "Nichibutsu",     "Ojousan (Japan 871204)", MACHINE_SUPPORTS_SAVE )
 GAME( 1987, ojousanm, ojousan,  ojousanm,        ojousanm, nbmj8688_state, empty_init,    ROT0, "Nichibutsu",     "Ojousan (Japan 870108, medal)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, swinggal, 0,        swinggal,        ryuuha,   nbmj8688_state, empty_init,    ROT0, "Digital Denshi", "Swing Gal (Japan 871221)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, swinggal, 0,        swinggal,        ryuuha,   nbmj8688_state, empty_init,    ROT0, "Digital Denshi", "Swing Gal (Japan 871221)", MACHINE_SUPPORTS_SAVE ) // スウィングギャル
 GAME( 1988, korinai,  0,        korinai,         korinai,  nbmj8688_state, empty_init,    ROT0, "Nichibutsu",     "Mahjong-zukino Korinai Menmen (Japan 880425)", MACHINE_SUPPORTS_SAVE )
 GAME( 1988, korinaim, korinai,  korinaim,        korinaim, nbmj8688_state, empty_init,    ROT0, "Nichibutsu",     "Mahjong-zukino Korinai Menmen (Japan 880920, medal)", MACHINE_SUPPORTS_SAVE )
 
@@ -3986,5 +3986,5 @@ GAME( 1988, mjsikakb, mjsikaku, mjsikaku,        mjsikaku, nbmj8688_state, empty
 GAME( 1988, mjsikakc, mjsikaku, mjsikaku,        mjsikaku, nbmj8688_state, empty_init,    ROT0, "Nichibutsu",     "Mahjong Shikaku (Japan 880806)", MACHINE_SUPPORTS_SAVE )
 GAME( 1988, mjsikakd, mjsikaku, mjsikaku,        mjsikaku, nbmj8688_state, empty_init,    ROT0, "Nichibutsu",     "Mahjong Shikaku (Japan 880802)", MACHINE_SUPPORTS_SAVE )
 GAME( 1988, mmsikaku, mjsikaku, mmsikaku,        mmsikaku, nbmj8688_state, empty_init,    ROT0, "Nichibutsu",     "Mahjong Shikaku (Japan 880929, medal)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, otonano,  0,        otonano,         otonano,  nbmj8688_state, empty_init,    ROT0, "Apple",          "Otona no Mahjong (Japan 880628)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, otonano,  0,        otonano,         otonano,  nbmj8688_state, empty_init,    ROT0, "Apple",          "Otona no Mahjong (Japan 880628)", MACHINE_SUPPORTS_SAVE ) // おとなの麻雀
 GAME( 1988, mjcamera, 0,        mjcamera,        mjcamera, nbmj8688_state, init_mjcamera, ROT0, "Miki Syouji",    "Mahjong Camera Kozou (set 1) (Japan 881109)", MACHINE_SUPPORTS_SAVE )

@@ -55,8 +55,8 @@ private:
 	void ki_1_w(uint8_t data);
 	void ki_2_w(uint8_t data);
 	void FD_w(uint8_t data);
-	void machine_reset() override;
-	void machine_start() override;
+	void machine_reset() override ATTR_COLD;
+	void machine_start() override ATTR_COLD;
 	DECLARE_MACHINE_RESET(primob);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void vblank_irq(int state);
@@ -67,11 +67,11 @@ private:
 	DECLARE_SNAPSHOT_LOAD_MEMBER(snapshot_cb);
 	DECLARE_QUICKLOAD_LOAD_MEMBER(quickload_cb);
 
-	void primo32_mem(address_map &map);
-	void primo48_mem(address_map &map);
-	void primo64_mem(address_map &map);
-	void primoa_io(address_map &map);
-	void primob_io(address_map &map);
+	void primo32_mem(address_map &map) ATTR_COLD;
+	void primo48_mem(address_map &map) ATTR_COLD;
+	void primo64_mem(address_map &map) ATTR_COLD;
+	void primoa_io(address_map &map) ATTR_COLD;
+	void primob_io(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cbm_iec_device> m_iec;

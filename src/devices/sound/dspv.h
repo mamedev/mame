@@ -15,14 +15,13 @@ class dspv_device : public cpu_device, public device_sound_interface
 public:
 	dspv_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 22579200);
 
-	void map(address_map &map);
+	void map(address_map &map) ATTR_COLD;
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 	virtual uint32_t execute_min_cycles() const noexcept override;
 	virtual uint32_t execute_max_cycles() const noexcept override;
-	virtual uint32_t execute_input_lines() const noexcept override;
 	virtual void execute_run() override;
 	virtual space_config_vector memory_space_config() const override;
 	virtual void state_import(const device_state_entry &entry) override;
@@ -63,9 +62,9 @@ private:
 	u16 snd_r(offs_t offset);
 	void snd_w(offs_t offset, u16 data);
 
-	void prg1_map(address_map &map);
-	void prg2_map(address_map &map);
-	void data_map(address_map &map);
+	void prg1_map(address_map &map) ATTR_COLD;
+	void prg2_map(address_map &map) ATTR_COLD;
+	void data_map(address_map &map) ATTR_COLD;
 };
 
 DECLARE_DEVICE_TYPE(DSPV, dspv_device)

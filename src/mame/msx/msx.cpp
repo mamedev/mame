@@ -278,7 +278,7 @@ void msx_state::machine_start()
 void msx_state::driver_start()
 {
 	m_maincpu->set_input_line_vector(0, 0xff); // Z80
-	m_maincpu->z80_set_m1_cycles(5);
+	m_maincpu->z80_set_m1_cycles(4+1); // 1 WAIT CLK per M1
 
 	save_item(NAME(m_psg_b));
 	save_item(NAME(m_kanji_latch));
@@ -730,9 +730,14 @@ void msx2p_base_state::machine_start()
 {
 	msx2_base_state::machine_start();
 
-	m_boot_flags = m_cold_boot_flags;
 	save_item(NAME(m_boot_flags));
 	save_item(NAME(m_vdp_mode));
+}
+
+void msx2p_base_state::machine_reset()
+{
+	msx2_base_state::machine_reset();
+	m_boot_flags = m_cold_boot_flags;
 }
 
 void msx2p_base_state::msx2plus_io_map(address_map &map)

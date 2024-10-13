@@ -79,7 +79,7 @@ R8 mkII doesn't seem to store the tone list in the program ROM.
 #include "bus/generic/slot.h"
 #include "cpu/upd78k/upd78k2.h"
 #include "machine/nvram.h"
-#include "sound/rolandpcm.h"
+#include "sound/roland_lp.h"
 
 #include "softlist_dev.h"
 #include "speaker.h"
@@ -115,8 +115,8 @@ public:
 	void init_r8();
 
 protected:
-	void mk1_map(address_map &map);
-	void mk2_map(address_map &map);
+	void mk1_map(address_map &map) ATTR_COLD;
+	void mk2_map(address_map &map) ATTR_COLD;
 
 	std::pair<std::error_condition, std::string> pcmrom_load(generic_slot_device* pcmcard, int card_id, device_image_interface &image);
 	void pcmrom_unload(int card_id);

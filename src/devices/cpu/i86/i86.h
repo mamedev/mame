@@ -111,8 +111,8 @@ protected:
 	i8086_common_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// device_execute_interface overrides
 	virtual uint32_t execute_min_cycles() const noexcept override { return 1; }
@@ -139,6 +139,7 @@ protected:
 	virtual uint8_t read_port_byte(uint16_t port);
 	virtual uint16_t read_port_word(uint16_t port);
 	virtual void write_port_byte(uint16_t port, uint8_t data);
+	virtual void write_port_byte_al(uint16_t port);
 	virtual void write_port_word(uint16_t port, uint16_t data);
 
 	// Executing instructions
@@ -357,8 +358,7 @@ protected:
 	i8086_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int data_bus_size);
 
 	virtual void execute_run() override;
-	virtual void device_start() override;
-	virtual uint32_t execute_input_lines() const noexcept override { return 1; }
+	virtual void device_start() override ATTR_COLD;
 	virtual uint8_t fetch() override;
 	inline address_space *sreg_to_space(int sreg) const;
 	virtual uint8_t read_byte(uint32_t addr) override;

@@ -18,11 +18,11 @@ public:
 	virtual void map_extra(uint64_t memory_window_start, uint64_t memory_window_end, uint64_t memory_offset, address_space *memory_space,
 							uint64_t io_window_start, uint64_t io_window_end, uint64_t io_offset, address_space *io_space) override;
 
-	virtual void config_map(address_map &map) override;
+	virtual void config_map(address_map &map) override ATTR_COLD;
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 private:
 	required_device<lpc_acpi_device> acpi;
@@ -30,7 +30,7 @@ private:
 	required_device<lpc_pit_device> pit;
 	required_memory_region m_region;
 
-	void internal_io_map(address_map &map);
+	void internal_io_map(address_map &map) ATTR_COLD;
 
 	uint32_t pmbase, gpio_base, fwh_sel1, gen_cntl, etr1, rst_cnt2, gpi_rout;
 	uint16_t bios_cntl, pci_dma_cfg, gen1_dec, lpc_en, gen2_dec, fwh_sel2, func_dis, gen_pmcon_1;
@@ -146,11 +146,11 @@ public:
 	i6300esb_watchdog_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 private:
-	void map(address_map &map);
+	void map(address_map &map) ATTR_COLD;
 };
 
 DECLARE_DEVICE_TYPE(I6300ESB_LPC,      i6300esb_lpc_device)

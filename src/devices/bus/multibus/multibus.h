@@ -95,7 +95,7 @@ public:
 
 protected:
 	// device_t overrides
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 	// device_memory_interface overrides
 	virtual space_config_vector memory_space_config() const override;
@@ -127,8 +127,8 @@ public:
 	}
 
 protected:
-	virtual void device_start() override;
-	virtual void device_resolve_objects() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_resolve_objects() override ATTR_COLD;
 
 private:
 	required_device<multibus_device> m_bus;

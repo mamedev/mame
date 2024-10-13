@@ -686,7 +686,7 @@ INPUT_PORTS_END
 ***************************************************************************/
 
 template <int Player>
-CUSTOM_INPUT_MEMBER(fantland_state::wheelrun_wheel_r)
+ioport_value fantland_state::wheelrun_wheel_r()
 {
 	int delta = m_wheel[Player]->read();
 	delta = (delta & 0x7f) - (delta & 0x80) + 4;

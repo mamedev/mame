@@ -116,15 +116,15 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(input_changed);
 
 private:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 	virtual void device_reset_after_children() override;
 
-	void tandy2k_mem(address_map &map);
-	void tandy2k_io(address_map &map);
-	void tandy2k_hd_io(address_map &map);
-	void vpac_mem(address_map &map);
-	void vrambank_mem(address_map &map);
+	void tandy2k_mem(address_map &map) ATTR_COLD;
+	void tandy2k_io(address_map &map) ATTR_COLD;
+	void tandy2k_hd_io(address_map &map) ATTR_COLD;
+	void vpac_mem(address_map &map) ATTR_COLD;
+	void vrambank_mem(address_map &map) ATTR_COLD;
 
 	TIMER_CALLBACK_MEMBER(update_mouse);
 	TIMER_CALLBACK_MEMBER(mcu_delay_cb);

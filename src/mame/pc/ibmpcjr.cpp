@@ -52,13 +52,13 @@ public:
 	void ibmpcjr(machine_config &config);
 
 private:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
-	void ibmpcjr_io(address_map &map);
-	void ibmpcjr_map(address_map &map);
-	void ibmpcjx_io(address_map &map);
-	void ibmpcjx_map(address_map &map);
+	void ibmpcjr_io(address_map &map) ATTR_COLD;
+	void ibmpcjr_map(address_map &map) ATTR_COLD;
+	void ibmpcjx_io(address_map &map) ATTR_COLD;
+	void ibmpcjx_map(address_map &map) ATTR_COLD;
 
 	TIMER_CALLBACK_MEMBER(delayed_irq);
 	TIMER_CALLBACK_MEMBER(watchdog_expired);

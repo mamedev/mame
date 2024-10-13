@@ -89,11 +89,11 @@ public:
 	int shot_standby_r();
 	int not_shot_arrive_r();
 	int motor_not_ready_r();
-	DECLARE_CUSTOM_INPUT_MEMBER(get_rng);
+	ioport_value get_rng();
 
 protected:
-	virtual void machine_start() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	uint8_t vert_pos_r();
@@ -122,7 +122,7 @@ private:
 	void update_artwork();
 	void move_motor();
 
-	void main_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<ls259_device> m_outlatch;
@@ -645,7 +645,7 @@ void stactics_state::move_motor()
  *
  *************************************/
 
-CUSTOM_INPUT_MEMBER(stactics_state::get_rng)
+ioport_value stactics_state::get_rng()
 {
 	// this is a 555 timer, but cannot read one of the resistor values
 	return machine().rand() & 0x07;

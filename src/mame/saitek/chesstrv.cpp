@@ -78,7 +78,7 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(battery) { update_display(); }
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	// devices/pointers
@@ -93,8 +93,8 @@ private:
 	u8 m_inp_mux = 0;
 	u8 m_7seg_data = 0;
 
-	void chesstrv_mem(address_map &map);
-	void chesstrv_io(address_map &map);
+	void chesstrv_mem(address_map &map) ATTR_COLD;
+	void chesstrv_io(address_map &map) ATTR_COLD;
 
 	TIMER_DEVICE_CALLBACK_MEMBER(computing) { m_computing = 1; }
 
@@ -313,5 +313,5 @@ ROM_END
 *******************************************************************************/
 
 //    YEAR  NAME       PARENT  COMPAT  MACHINE    INPUT      CLASS           INIT        COMPANY, FULLNAME, FLAGS
-SYST( 1980, chesstrv,  0,      0,      chesstrv,  chesstrv,  chesstrv_state, empty_init, "SciSys / Novag Industries", "Chess Traveler", MACHINE_NO_SOUND_HW | MACHINE_SUPPORTS_SAVE )
-SYST( 1982, chesstrvi, 0,      0,      chesstrvi, chesstrvi, chesstrv_state, empty_init, "SciSys", "Chess Intercontinental Traveler", MACHINE_NO_SOUND_HW | MACHINE_SUPPORTS_SAVE )
+SYST( 1980, chesstrv,  0,      0,      chesstrv,  chesstrv,  chesstrv_state, empty_init, "SciSys / Novag Industries / Philidor Software", "Chess Traveler", MACHINE_NO_SOUND_HW | MACHINE_SUPPORTS_SAVE )
+SYST( 1982, chesstrvi, 0,      0,      chesstrvi, chesstrvi, chesstrv_state, empty_init, "SciSys / Philidor Software", "Chess Intercontinental Traveler", MACHINE_NO_SOUND_HW | MACHINE_SUPPORTS_SAVE )

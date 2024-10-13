@@ -81,8 +81,8 @@ public:
 	void excali64(machine_config &config);
 
 protected:
-	virtual void machine_reset() override;
-	virtual void machine_start() override;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	void excali64_palette(palette_device &palette);
@@ -97,7 +97,6 @@ private:
 	void portec_w(u8 data);
 	static void floppy_formats(format_registration &fr);
 	void cent_busy_w(int state);
-	void busreq_w(int state);
 	u8 memory_read_byte(offs_t offset);
 	void memory_write_byte(offs_t offset, u8 data);
 	u8 io_read_byte(offs_t offset);
@@ -107,8 +106,8 @@ private:
 	void crtc_vs(int state);
 	void motor_w(int state);
 
-	void io_map(address_map &map);
-	void mem_map(address_map &map);
+	void io_map(address_map &map) ATTR_COLD;
+	void mem_map(address_map &map) ATTR_COLD;
 
 	u8 m_sys_status = 0U;
 	u8 m_kbdrow = 0U;
@@ -299,13 +298,6 @@ void excali64_state::portec_w(u8 data)
 {
 	m_fdc->enmf_w(BIT(data, 1));
 	m_fdc->dden_w(BIT(data, 2));
-}
-
-void excali64_state::busreq_w(int state)
-{
-// since our Z80 has no support for BUSACK, we assume it is granted immediately
-	m_maincpu->set_input_line(Z80_INPUT_LINE_BUSRQ, state);
-	m_dma->bai_w(state); // tell dma that bus has been granted
 }
 
 u8 excali64_state::memory_read_byte(offs_t offset)
@@ -592,6 +584,7 @@ void excali64_state::excali64(machine_config &config)
 	Z80(config, m_maincpu, 16_MHz_XTAL / 4);
 	m_maincpu->set_addrmap(AS_PROGRAM, &excali64_state::mem_map);
 	m_maincpu->set_addrmap(AS_IO, &excali64_state::io_map);
+	m_maincpu->busack_cb().set(m_dma, FUNC(z80dma_device::bai_w));
 
 	I8251(config, "uart", 0);
 	//uart.txd_handler().set("rs232", FUNC(rs232_port_device::write_txd));
@@ -643,7 +636,7 @@ void excali64_state::excali64(machine_config &config)
 	FLOPPY_CONNECTOR(config, "fdc:1", excali64_floppies, "525qd", excali64_state::floppy_formats).enable_sound(true);
 
 	Z80DMA(config, m_dma, 16_MHz_XTAL / 4);
-	m_dma->out_busreq_callback().set(FUNC(excali64_state::busreq_w));
+	m_dma->out_busreq_callback().set_inputline(m_maincpu, Z80_INPUT_LINE_BUSRQ);
 	m_dma->in_mreq_callback().set(FUNC(excali64_state::memory_read_byte));
 	m_dma->out_mreq_callback().set(FUNC(excali64_state::memory_write_byte));
 	m_dma->in_iorq_callback().set(FUNC(excali64_state::io_read_byte));

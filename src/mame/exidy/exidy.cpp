@@ -209,12 +209,12 @@ public:
 	void mtrap(machine_config &config);
 	void pepper2(machine_config &config);
 
-	DECLARE_CUSTOM_INPUT_MEMBER(intsource_coins_r);
+	ioport_value intsource_coins_r();
 	DECLARE_INPUT_CHANGED_MEMBER(coin_count_w);
 
 protected:
-	virtual void machine_start() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 	required_ioport m_dsw;
 	required_ioport m_in0;
@@ -231,7 +231,7 @@ protected:
 
 	uint8_t exidy_interrupt_r();
 
-	void exidy_map(address_map &map);
+	void exidy_map(address_map &map) ATTR_COLD;
 
 private:
 	required_shared_ptr<uint8_t> m_videoram;
@@ -268,9 +268,9 @@ private:
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void check_collision();
 
-	void venture_map(address_map &map);
-	void mtrap_map(address_map &map);
-	void pepper2_map(address_map &map);
+	void venture_map(address_map &map) ATTR_COLD;
+	void mtrap_map(address_map &map) ATTR_COLD;
+	void pepper2_map(address_map &map) ATTR_COLD;
 };
 
 
@@ -289,14 +289,14 @@ public:
 	void rallys(machine_config &config);
 	void phantoma(machine_config &config);
 
-	DECLARE_CUSTOM_INPUT_MEMBER(spectar_coins_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(rallys_coin1_r);
+	ioport_value spectar_coins_r();
+	ioport_value rallys_coin1_r();
 
 	void init_sidetrac();
 	void init_spectar();
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 	void set_max_freq(int freq) { m_max_freq = freq; }
 
@@ -317,10 +317,10 @@ private:
 	uint8_t m_tone_freq = 0;
 	uint8_t m_tone_active = 0;
 
-	void sidetrac_map(address_map &map);
-	void spectar_map(address_map &map);
-	void rallys_map(address_map &map);
-	void phantoma_map(address_map &map);
+	void sidetrac_map(address_map &map) ATTR_COLD;
+	void spectar_map(address_map &map) ATTR_COLD;
+	void rallys_map(address_map &map) ATTR_COLD;
+	void phantoma_map(address_map &map) ATTR_COLD;
 };
 
 
@@ -338,7 +338,7 @@ public:
 	void init_targ();
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 	void targ_audio_1_w(uint8_t data);
 	void targ_audio_2_w(uint8_t data);
@@ -349,7 +349,7 @@ private:
 	uint8_t m_port_2_last = 0;
 	uint8_t m_tone_pointer = 0;
 
-	void targ_map(address_map &map);
+	void targ_map(address_map &map) ATTR_COLD;
 };
 
 
@@ -364,10 +364,10 @@ public:
 
 	void teetert(machine_config &config);
 
-	DECLARE_CUSTOM_INPUT_MEMBER(teetert_input_r);
+	ioport_value teetert_input_r();
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	required_ioport m_dial;
@@ -387,14 +387,14 @@ public:
 	void fax(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	required_memory_bank m_rom_bank;
 
 	void fax_bank_select_w(uint8_t data);
 
-	void fax_map(address_map &map);
+	void fax_map(address_map &map) ATTR_COLD;
 };
 
 
@@ -404,26 +404,26 @@ private:
  *
  *************************************/
 
-CUSTOM_INPUT_MEMBER(exidy_state::intsource_coins_r)
+ioport_value exidy_state::intsource_coins_r()
 {
 	uint8_t const dsw = m_dsw->read();
 	uint8_t const in0 = m_in0->read();
 	return (BIT(~in0, 7) << 1) | BIT(dsw, 0);
 }
 
-CUSTOM_INPUT_MEMBER(spectar_state::spectar_coins_r)
+ioport_value spectar_state::spectar_coins_r()
 {
 	uint8_t const dsw = m_dsw->read();
 	uint8_t const in0 = m_in0->read();
 	return (BIT(~in0, 7) << 1) | BIT(~dsw, 0);
 }
 
-CUSTOM_INPUT_MEMBER(spectar_state::rallys_coin1_r)
+ioport_value spectar_state::rallys_coin1_r()
 {
 	return BIT(m_in0->read(), 7);
 }
 
-CUSTOM_INPUT_MEMBER(teetert_state::teetert_input_r)
+ioport_value teetert_state::teetert_input_r()
 {
 	uint8_t const dial = m_dial->read();
 

@@ -68,7 +68,7 @@ public:
 	void exzisus(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_cpuc;
@@ -86,10 +86,10 @@ private:
 	void cpuc_reset_w(uint8_t data);
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void cpua_map(address_map &map);
-	void cpub_map(address_map &map);
-	void cpuc_map(address_map &map);
-	void sound_map(address_map &map);
+	void cpua_map(address_map &map) ATTR_COLD;
+	void cpub_map(address_map &map) ATTR_COLD;
+	void cpuc_map(address_map &map) ATTR_COLD;
+	void sound_map(address_map &map) ATTR_COLD;
 };
 
 

@@ -27,8 +27,8 @@ public:
 	void k1m(machine_config &config);
 
 private:
-	void k1_map(address_map &map);
-	void k1m_map(address_map &map);
+	void k1_map(address_map &map) ATTR_COLD;
+	void k1m_map(address_map &map) ATTR_COLD;
 
 	required_device<upd78310_device> m_mpu;
 };

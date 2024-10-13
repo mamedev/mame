@@ -6,22 +6,24 @@
 SciSys Chess Partner 2000, also sold by Novag with the same name.
 It's probably the last SciSys / Novag collaboration.
 
+Entering moves is not as friendly as newer sensory games. The player is expected
+to press ENTER after their own move, but if they (accidentally) press it after
+doing the computer's move, the computer takes your turn.
+
+Capturing pieces is also unintuitive, having to press the destination square twice.
+
 Hardware notes:
 - 3850PK CPU at ~2.77MHz(averaged), 3853PK memory interface
 - 4KB ROM, 256 bytes RAM(2*2111N)
 - 4-digit 7seg panel, sensory chessboard
 
 3850 is officially rated 2MHz, and even the CP2000 manual says it runs at 2MHz,
-but tests show that the chesscomputer runs at a much higher speed. Three individual
-CP2000 were measured, by timing move calculation, and one recording to verify
-beeper pitch and display blinking rate. Real CP2000 CPU frequency is in the
-2.63MHz to 2.91MHz range.
+but tests show that it runs at a much higher speed. Three individual CP2000 were
+measured, by timing move calculation, and one recording to verify beeper pitch and
+display blinking rate. Real CP2000 CPU frequency is in the 2.63MHz-2.91MHz range.
 
-Entering moves is not as friendly as newer sensory games. The player is expected
-to press ENTER after their own move, but if they (accidentally) press it after
-doing the computer's move, the computer takes your turn.
-
-Capturing pieces is also unintuitive, having to press the destination square twice.
+The 'sequels' CP3000-CP6000 are on HMCS40 (see minichess.cpp and trsensor.cpp),
+Chess Partner 1000 does not exist.
 
 *******************************************************************************/
 
@@ -53,11 +55,10 @@ public:
 		m_inputs(*this, "IN.%u", 0)
 	{ }
 
-	// machine configs
 	void cp2000(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	// devices/pointers
@@ -67,16 +68,14 @@ private:
 	required_device<dac_1bit_device> m_dac;
 	required_ioport_array<4> m_inputs;
 
-	u16 m_inp_mux = 0;
 	u8 m_select = 0;
-	u8 m_7seg_data = 0;
+	u16 m_inp_mux = 0;
 
 	// address maps
-	void main_map(address_map &map);
-	void main_io(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
+	void main_io(address_map &map) ATTR_COLD;
 
 	// I/O handlers
-	void update_display();
 	void control_w(u8 data);
 	void digit_w(u8 data);
 	u8 input_r();
@@ -87,7 +86,6 @@ void cp2000_state::machine_start()
 	// register for savestates
 	save_item(NAME(m_select));
 	save_item(NAME(m_inp_mux));
-	save_item(NAME(m_7seg_data));
 }
 
 
@@ -96,20 +94,12 @@ void cp2000_state::machine_start()
     I/O
 *******************************************************************************/
 
-// 3850 ports
-
-void cp2000_state::update_display()
-{
-	m_display->matrix(m_select, m_7seg_data);
-}
-
 void cp2000_state::control_w(u8 data)
 {
 	// d0-d3: digit select
-	m_select = ~data;
-	update_display();
-
 	// d4: keypad/chessboard select
+	m_select = ~data;
+	m_display->write_my(m_select);
 
 	// d5: speaker out
 	m_dac->write(BIT(~data, 5));
@@ -133,13 +123,13 @@ u8 cp2000_state::input_r()
 	{
 		// d0-d3: multiplexed inputs from d4-d7
 		for (int i = 0; i < 4; i++)
-			if (BIT(m_inp_mux, i+4))
+			if (BIT(m_inp_mux, i + 4))
 				data |= m_inputs[i]->read();
 
 		// d4-d7: multiplexed inputs from d0-d3
 		for (int i = 0; i < 4; i++)
 			if (m_inp_mux & m_inputs[i]->read())
-				data |= 1 << (i+4);
+				data |= 0x10 << i;
 	}
 
 	return data;
@@ -152,8 +142,7 @@ void cp2000_state::digit_w(u8 data)
 	m_inp_mux = data;
 
 	// also digit segment data
-	m_7seg_data = bitswap<8>(data,0,2,1,3,4,5,6,7);
-	update_display();
+	m_display->write_mx(bitswap<8>(data,0,2,1,3,4,5,6,7));
 }
 
 
@@ -258,4 +247,4 @@ ROM_END
 *******************************************************************************/
 
 //    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT        COMPANY, FULLNAME, FLAGS
-SYST( 1980, cp2000, 0,      0,      cp2000,  cp2000, cp2000_state, empty_init, "SciSys / Novag Industries", "Chess Partner 2000", MACHINE_SUPPORTS_SAVE )
+SYST( 1980, cp2000, 0,      0,      cp2000,  cp2000, cp2000_state, empty_init, "SciSys / Novag Industries / Philidor Software", "Chess Partner 2000", MACHINE_SUPPORTS_SAVE )

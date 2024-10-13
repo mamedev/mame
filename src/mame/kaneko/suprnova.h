@@ -66,7 +66,7 @@ public:
 	void init_galpani4();
 	void init_ryouran();
 
-	template <int P> DECLARE_CUSTOM_INPUT_MEMBER(paddle_r);
+	template <int P> ioport_value paddle_r();
 
 private:
 	struct hit_t
@@ -163,10 +163,10 @@ private:
 	uint32_t sengekis_speedup_r();
 	uint32_t sengekij_speedup_r();
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
-	virtual void video_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
+	virtual void video_reset() override ATTR_COLD;
 	DECLARE_MACHINE_RESET(sknsa);
 	DECLARE_MACHINE_RESET(sknsj);
 	DECLARE_MACHINE_RESET(sknsu);
@@ -189,7 +189,7 @@ private:
 	void init_drc();
 	void set_drc_pcflush(uint32_t addr);
 
-	void skns_map(address_map &map);
+	void skns_map(address_map &map) ATTR_COLD;
 };
 
 #endif // MAME_KANEKO_SUPRNOVA_H

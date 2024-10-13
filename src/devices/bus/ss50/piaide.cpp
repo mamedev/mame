@@ -59,8 +59,8 @@ public:
 
 protected:
 	// device-specific overrides
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual void device_start() override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual void device_start() override ATTR_COLD;
 
 	// interface-specific overrides
 	virtual uint8_t register_read(offs_t offset) override;

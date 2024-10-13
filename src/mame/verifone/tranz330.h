@@ -45,8 +45,8 @@ public:
 	void tranz330(machine_config &config);
 
 private:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	void syncb_w(int state);
 	void clock_w(int state);
@@ -57,8 +57,8 @@ private:
 	uint8_t pio_b_r();
 	uint8_t card_r();
 
-	void tranz330_mem(address_map &map);
-	void tranz330_io(address_map &map);
+	void tranz330_mem(address_map &map) ATTR_COLD;
+	void tranz330_io(address_map &map) ATTR_COLD;
 
 	required_device<z80_device>             m_cpu;
 	required_device<z80ctc_device>          m_ctc;

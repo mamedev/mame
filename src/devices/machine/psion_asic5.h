@@ -31,8 +31,6 @@ public:
 
 	psion_asic5_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
-	static constexpr feature_type imperfect_features() { return feature::COMMS; }
-
 	void set_mode(pc6_state mode) { m_mode = mode; }
 
 	auto readpa_handler() { return m_in_a_handler.bind(); }
@@ -64,8 +62,8 @@ public:
 protected:
 	// device_t overrides
 	virtual void device_validity_check(validity_checker &valid) const override;
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// device_serial overrides
 	virtual void rcv_callback() override;

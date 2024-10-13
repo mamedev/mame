@@ -105,8 +105,8 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(reset_button);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	void round_leds_w(offs_t offset, u8 data);
@@ -117,8 +117,8 @@ private:
 	TIMER_DEVICE_CALLBACK_MEMBER(kansas_r);
 	void kansas_w(int state);
 
-	void io_map(address_map &map);
-	void mem_map(address_map &map);
+	void io_map(address_map &map) ATTR_COLD;
+	void mem_map(address_map &map) ATTR_COLD;
 
 	u8 m_cass_data[4]{};
 	bool m_cassinbit = 0, m_cassoutbit = 0, m_cassold = 0;

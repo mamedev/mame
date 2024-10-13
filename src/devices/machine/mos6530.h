@@ -91,8 +91,8 @@ protected:
 	mos6530_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, u32 rsize);
 
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	enum
 	{
@@ -177,9 +177,9 @@ public:
 	// construction/destruction
 	mos6530_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual void rom_map(address_map &map);
-	virtual void ram_map(address_map &map);
-	virtual void io_map(address_map &map);
+	virtual void rom_map(address_map &map) ATTR_COLD;
+	virtual void ram_map(address_map &map) ATTR_COLD;
+	virtual void io_map(address_map &map) ATTR_COLD;
 
 protected:
 	// device-level overrides
@@ -195,8 +195,8 @@ public:
 	// construction/destruction
 	mos6532_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual void ram_map(address_map &map);
-	virtual void io_map(address_map &map);
+	virtual void ram_map(address_map &map) ATTR_COLD;
+	virtual void io_map(address_map &map) ATTR_COLD;
 };
 
 

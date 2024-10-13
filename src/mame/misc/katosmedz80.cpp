@@ -272,12 +272,12 @@ public:
 		m_pos(*this, "mpos%u", 0U)
 	{ }
 
-	DECLARE_CUSTOM_INPUT_MEMBER(arm_sensors_r);
+	ioport_value arm_sensors_r();
 	void dnbanban(machine_config &config) ATTR_COLD;
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -290,8 +290,8 @@ private:
 	output_finder<8> m_ledsp8;
 	output_finder<4> m_pos;
 
-	void program_map(address_map &map);
-	void io_map(address_map &map);
+	void program_map(address_map &map) ATTR_COLD;
+	void io_map(address_map &map) ATTR_COLD;
 
 	void port8_w(uint8_t data);
 
@@ -372,7 +372,7 @@ void katosmedz80_state::io_map(address_map &map)
 
 */
 
-CUSTOM_INPUT_MEMBER(katosmedz80_state::arm_sensors_r)
+ioport_value katosmedz80_state::arm_sensors_r()
 {
 	return m_sensors;
 }

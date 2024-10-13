@@ -49,7 +49,7 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 private:
 	device_sk1100_printer_port_interface *m_device;

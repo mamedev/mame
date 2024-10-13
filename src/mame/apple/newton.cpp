@@ -22,7 +22,6 @@
 
 #include "emu.h"
 #include "cpu/arm7/arm7.h"
-#include "cpu/arm7/arm7core.h"
 #include "machine/ram.h"
 #include "emupal.h"
 #include "screen.h"
@@ -48,7 +47,7 @@ public:
 	void mp2100(machine_config &config);
 
 protected:
-	void mem_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
 
 	uint32_t tick_count_r();
 

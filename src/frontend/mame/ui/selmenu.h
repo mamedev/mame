@@ -137,7 +137,7 @@ protected:
 	void launch_system(game_driver const &driver, ui_software_info const &swinfo, std::string const &part) { launch_system(ui(), driver, &swinfo, &part, nullptr); }
 
 	virtual void recompute_metrics(uint32_t width, uint32_t height, float aspect) override;
-	virtual void custom_render(u32 flags, void *selectedref, float top, float bottom, float x, float y, float x2, float y2) override;
+	virtual void custom_render(uint32_t flags, void *selectedref, float top, float bottom, float origx1, float origy1, float origx2, float origy2) override;
 	virtual void menu_activated() override;
 	virtual void menu_deactivated() override;
 

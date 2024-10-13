@@ -14,7 +14,6 @@
 #include "emu.h"
 
 #include "cpu/arm7/arm7.h"
-#include "cpu/arm7/arm7core.h"
 #include "machine/intelfsh.h"
 #include "video/pcd8544.h"
 
@@ -51,8 +50,8 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(key_irq);
 
 private:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	PCD8544_SCREEN_UPDATE(pcd8544_screen_update);
 
@@ -73,7 +72,7 @@ private:
 	uint16_t dsp_ram_r(offs_t offset);
 	void dsp_ram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
-	void noki3310_map(address_map &map);
+	void noki3310_map(address_map &map) ATTR_COLD;
 
 	void assert_fiq(int num);
 	void assert_irq(int num);
@@ -242,7 +241,7 @@ void noki3310_state::machine_reset()
 {
 	// according to the boot rom disassembly here http://www.nokix.pasjagsm.pl/help/blacksphere/sub_100hardware/sub_arm/sub_bootrom.htm
 	// flash entry point is at 0x200040, we can probably reassemble the above code, but for now this should be enough.
-	m_maincpu->set_state_int(ARM7_R15, 0x200040);
+	m_maincpu->set_state_int(arm7_cpu_device::ARM7_R15, 0x200040);
 
 	memset(m_mad2_regs, 0, 0x100);
 	m_mad2_regs[0x01] = 0x01;   // power-on flag

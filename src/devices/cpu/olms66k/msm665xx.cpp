@@ -19,7 +19,7 @@ DEFINE_DEVICE_TYPE(MSM66573, msm66573_device, "msm66573", "Oki MSM66573")
 msm665xx_device::msm665xx_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, address_map_constructor mem_map, address_map_constructor data_map)
 	: cpu_device(mconfig, type, tag, owner, clock)
 	, m_program_config("program", ENDIANNESS_LITTLE, 8, 20, 0, mem_map)
-	, m_data_config("iram", ENDIANNESS_LITTLE, 16, 20, 0, data_map)
+	, m_data_config("data", ENDIANNESS_LITTLE, 16, 20, 0, data_map)
 	, m_acc(0)
 	, m_pc(0)
 	, m_ppc(0)
@@ -30,6 +30,7 @@ msm665xx_device::msm665xx_device(const machine_config &mconfig, device_type type
 	, m_dsr(0)
 	, m_tsr(0)
 	, m_romwin(0x30)
+	, m_memscon(0)
 	, m_icount(0)
 {
 }
@@ -64,6 +65,8 @@ void msm66573_device::data_map(address_map &map)
 	map(0x00008, 0x00008).rw(FUNC(msm66573_device::tsr_r), FUNC(msm66573_device::tsr_w));
 	map(0x00009, 0x00009).rw(FUNC(msm66573_device::dsr_r), FUNC(msm66573_device::dsr_w));
 	map(0x0000b, 0x0000b).rw(FUNC(msm66573_device::romwin_r), FUNC(msm66573_device::romwin_w));
+	map(0x00010, 0x00010).w(FUNC(msm66573_device::memsacp_w));
+	map(0x00011, 0x00011).rw(FUNC(msm66573_device::memscon_r), FUNC(msm66573_device::memscon_w));
 	// TODO: many, many other SFRs
 	map(0x00200, 0x011ff).ram().share("internal");
 }
@@ -90,7 +93,7 @@ void msm665xx_device::device_start()
 		[this](u32 data) { m_csr = (data >> 16) & 0x0f; m_pc = data & 0xffff; m_ppc = data & 0xfffff; }
 	).mask(0xfffff).noshow();
 	state_add(MSM665XX_PSW, "PSW", m_psw);
-	//state_add(STATE_GENFLAGS, "FLAGS", m_psw).formatstr("%9s").noshow(); // TODO
+	state_add(STATE_GENFLAGS, "FLAGS", m_psw).formatstr("%8s").noshow();
 	state_add(MSM665XX_LRB, "LRB", m_lrb);
 	state_add(MSM665XX_SSP, "SSP", m_ssp);
 	u16 *fixed = static_cast<u16 *>(memshare("internal")->ptr());
@@ -99,6 +102,8 @@ void msm665xx_device::device_start()
 			[this, fixed, n]() { return fixed[(m_psw & 0x07) << 2 | n]; },
 			[this, fixed, n](u16 data) { fixed[(m_psw & 0x07) << 2 | n] = data; }
 		);
+	// NOTE: This assumes internal RAM is large enough (≥2KB) to provide all 256 register banks.
+	// While most nX-8/500S MCUs have that much internal RAM, ML66514 has only 1KB.
 	for (int n = 0; n < 4; n++)
 		state_add<u16>(MSM665XX_ER0 + n, util::string_format("ER%d", n).c_str(),
 			[this, fixed, n]() { return fixed[(m_lrb & 0x00ff) << 2 | n]; },
@@ -113,6 +118,7 @@ void msm665xx_device::device_start()
 	state_add(MSM665XX_DSR, "DSR", m_dsr).mask(0x0f);
 	state_add(MSM665XX_TSR, "TSR", m_tsr).mask(0x0f);
 	state_add(MSM665XX_ROMWIN, "ROMWIN", m_romwin);
+	state_add(MSM665XX_MEMSCON, "MEMSCON", m_memscon).mask(0x03);
 
 	// save state
 	save_item(NAME(m_acc));
@@ -136,6 +142,7 @@ void msm665xx_device::device_reset()
 	m_csr = 0;
 	m_dsr = 0;
 	m_tsr = 0;
+	m_memscon = 0;
 }
 
 
@@ -186,6 +193,8 @@ u8 msm665xx_device::dsr_r()
 
 void msm665xx_device::dsr_w(u8 data)
 {
+	if (!BIT(m_memscon, 0))
+		logerror("%02X:%04X: Writing %02X to DSR without data memory space expansion\n", m_csr, m_pc, data);
 	m_dsr = data & 0x0f;
 }
 
@@ -196,6 +205,8 @@ u8 msm665xx_device::tsr_r()
 
 void msm665xx_device::tsr_w(u8 data)
 {
+	if (!BIT(m_memscon, 1))
+		logerror("%02X:%04X: Writing %02X to TSR without program memory space expansion\n", m_csr, m_pc, data);
 	m_tsr = data & 0x0f;
 }
 
@@ -208,6 +219,22 @@ void msm665xx_device::romwin_w(u8 data)
 {
 	// ROMWIN is only supposed to be written once after reset
 	m_romwin = data | 0x30;
+}
+
+void msm665xx_device::memsacp_w(u8 data)
+{
+	logerror("%02X:%04X: Writing %02X to MEMSCAP\n", m_csr, m_pc, data);
+}
+
+u8 msm665xx_device::memscon_r()
+{
+	return m_memscon | 0xfc;
+}
+
+void msm665xx_device::memscon_w(u8 data)
+{
+	// FIXME: may be written only once after reset after double write to MEMSACP
+	m_memscon = data & 0x03;
 }
 
 
@@ -227,7 +254,15 @@ void msm665xx_device::state_string_export(const device_state_entry &entry, std::
 	switch (entry.index())
 	{
 	case STATE_GENFLAGS:
-		// TODO
+		str = util::string_format("%c%c%c%c%c%c%c%c",
+						BIT(m_psw, 15) ? 'C' : '.',
+						BIT(m_psw, 14) ? 'Z' : '.',
+						BIT(m_psw, 13) ? 'H' : '.',
+						BIT(m_psw, 12) ? 'D' : '.',
+						BIT(m_psw, 11) ? 'S' : '.',
+						BIT(m_psw, 10) ? 'P' : '.',
+						BIT(m_psw, 9)  ? 'V' : '.',
+						BIT(m_psw, 8)  ? 'I' : '.');
 		break;
 	}
 }

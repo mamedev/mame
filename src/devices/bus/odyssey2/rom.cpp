@@ -21,7 +21,7 @@ public:
 	o2_rom_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 protected:
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 	virtual void cart_init() override;
 

@@ -43,7 +43,7 @@ public:
 
 	memory_bank_creator m_cavelon_bank_object;
 
-	DECLARE_CUSTOM_INPUT_MEMBER(darkplnt_dial_r);
+	ioport_value darkplnt_dial_r();
 	uint8_t hncholms_prot_r();
 	uint8_t scramble_soundram_r(offs_t offset);
 	uint8_t mars_ppi8255_0_r(offs_t offset);
@@ -115,25 +115,25 @@ public:
 	void triplep(machine_config &config);
 	void newsin7(machine_config &config);
 	void mrkougb(machine_config &config);
-	void ad2083_map(address_map &map);
-	void ad2083_sound_io_map(address_map &map);
-	void ad2083_sound_map(address_map &map);
-	void decrypted_opcodes_map(address_map &map);
-	void harem_map(address_map &map);
-	void harem_sound_io_map(address_map &map);
-	void harem_sound_map(address_map &map);
-	void hotshock_map(address_map &map);
-	void hotshock_sound_io_map(address_map &map);
-	void hunchbks_map(address_map &map);
-	void hunchbks_readport(address_map &map);
-	void mars_map(address_map &map);
-	void mrkougar_map(address_map &map);
-	void newsin7_map(address_map &map);
-	void scramble_map(address_map &map);
-	void scramble_sound_io_map(address_map &map);
-	void scramble_sound_map(address_map &map);
-	void triplep_io_map(address_map &map);
-	void triplep_map(address_map &map);
+	void ad2083_map(address_map &map) ATTR_COLD;
+	void ad2083_sound_io_map(address_map &map) ATTR_COLD;
+	void ad2083_sound_map(address_map &map) ATTR_COLD;
+	void decrypted_opcodes_map(address_map &map) ATTR_COLD;
+	void harem_map(address_map &map) ATTR_COLD;
+	void harem_sound_io_map(address_map &map) ATTR_COLD;
+	void harem_sound_map(address_map &map) ATTR_COLD;
+	void hotshock_map(address_map &map) ATTR_COLD;
+	void hotshock_sound_io_map(address_map &map) ATTR_COLD;
+	void hunchbks_map(address_map &map) ATTR_COLD;
+	void hunchbks_readport(address_map &map) ATTR_COLD;
+	void mars_map(address_map &map) ATTR_COLD;
+	void mrkougar_map(address_map &map) ATTR_COLD;
+	void newsin7_map(address_map &map) ATTR_COLD;
+	void scramble_map(address_map &map) ATTR_COLD;
+	void scramble_sound_io_map(address_map &map) ATTR_COLD;
+	void scramble_sound_map(address_map &map) ATTR_COLD;
+	void triplep_io_map(address_map &map) ATTR_COLD;
+	void triplep_map(address_map &map) ATTR_COLD;
 
 private:
 	void cavelon_banksw();

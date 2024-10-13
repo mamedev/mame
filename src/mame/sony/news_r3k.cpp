@@ -2,52 +2,44 @@
 // copyright-holders:Patrick Mackinlay
 
 /*
- * Sony NEWS R3000 systems.
+ * Sony NEWS R3000 single-processor systems.
  *
  * Sources:
  *   - https://github.com/robohack/ucb-csrg-bsd/blob/master/sys/news3400/
  *   - https://www.mmcc.it/resources/docs/NWS-3410_3460_ServiceManual_MMCC.PDF
  *   - https://www.mmcc.it/resources/docs/Sony_NEWS_NWS-3260_ROM_Monitor_User_Guide_r2.pdf
+ *   - http://bitsavers.org/pdf/sony/news/Sony_NEWS_Technical_Manual_3ed_199103.pdf
  *
  * TODO:
- *   - lcd controller
- *   - screen params
+ *   - LCD controller
+ *   - screen timing parameters
  *   - floppy density/eject
- *   - centronics port
+ *   - Centronics port
  *   - sound
  *   - other models, including slots/cards
  */
 
 #include "emu.h"
 
-#include "cpu/mips/mips1.h"
-
-// memory
-#include "machine/ram.h"
-
-// various hardware
-#include "machine/timekpr.h"
-#include "machine/z80scc.h"
-#include "machine/am79c90.h"
-#include "machine/upd765.h"
 #include "dmac_0448.h"
 #include "news_hid.h"
-#include "machine/cxd1185.h"
 
-// video
-#include "screen.h"
-
-// audio
-#include "sound/spkrdev.h"
-#include "speaker.h"
-
-// busses and connectors
-#include "machine/nscsi_bus.h"
 #include "bus/nscsi/cd.h"
 #include "bus/nscsi/hd.h"
 #include "bus/rs232/rs232.h"
-
+#include "cpu/mips/mips1.h"
 #include "imagedev/floppy.h"
+#include "machine/am79c90.h"
+#include "machine/cxd1185.h"
+#include "machine/nscsi_bus.h"
+#include "machine/ram.h"
+#include "machine/timekpr.h"
+#include "machine/upd765.h"
+#include "machine/z80scc.h"
+#include "sound/spkrdev.h"
+
+#include "screen.h"
+#include "speaker.h"
 
 #define VERBOSE 0
 #include "logmacro.h"
@@ -77,11 +69,11 @@ public:
 
 protected:
 	// driver_device overrides
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	// address maps
-	void cpu_map(address_map &map);
+	void cpu_map(address_map &map) ATTR_COLD;
 
 	// machine config
 	void common(machine_config &config);
@@ -164,9 +156,9 @@ public:
 	void nws3260(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
-	void nws3260_map(address_map &map);
+	void nws3260_map(address_map &map) ATTR_COLD;
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, rectangle const &cliprect);
 
 	required_device<screen_device> m_lcd;
@@ -176,20 +168,21 @@ protected:
 	bool m_lcd_dim = false;
 };
 
-class nws3410_state : public news_r3k_base_state
+class news_r3k_desktop_state : public news_r3k_base_state
 {
 public:
 	static constexpr feature_type unemulated_features() { return feature::GRAPHICS; }
 
-	nws3410_state(machine_config const &mconfig, device_type type, char const *tag)
+	news_r3k_desktop_state(machine_config const &mconfig, device_type type, char const *tag)
 		: news_r3k_base_state(mconfig, type, tag)
 	{
 	}
 
 	void nws3410(machine_config &config);
+	void nws3720(machine_config &config);
 
 protected:
-	void nws3410_map(address_map &map);
+	void desktop_cpu_map(address_map &map) ATTR_COLD;
 };
 
 void nws3260_state::machine_start()
@@ -249,9 +242,14 @@ void nws3260_state::nws3260_map(address_map &map)
 	map(0x1ff60000, 0x1ff6001b).lw8([this] (offs_t offset, u8 data) { LOG("crtc offset %x 0x%02x\n", offset, data); }, "lfbm_crtc_w"); // TODO: HD64646FS
 }
 
-void nws3410_state::nws3410_map(address_map &map)
+void news_r3k_desktop_state::desktop_cpu_map(address_map &map)
 {
 	cpu_map(map);
+
+	// LCD framebuffer memory regions - without bus errors, the framebuffer probe logic in NEWS-OS will think there is an LCD attached
+	// While this doesn't break anything, it does cause the device to be exposed when it isn't present.
+	map(0x10000000, 0x1021ffff).r(FUNC(news_r3k_desktop_state::bus_error));
+	map(0x1ff50000, 0x1ff6001b).r(FUNC(news_r3k_desktop_state::bus_error));
 }
 
 void news_r3k_base_state::cpu_map(address_map &map)
@@ -270,7 +268,7 @@ void news_r3k_base_state::cpu_map(address_map &map)
 	// 1fcc0000 // cstrobe?
 	// 1fcc0002 // sccstatus0?
 	map(0x1fcc0003, 0x1fcc0003).rw(FUNC(news_r3k_base_state::debug_r), FUNC(news_r3k_base_state::debug_w));
-	// 1fcc0007 // sccvect?
+	map(0x1fcc0007, 0x1fcc0007).lr8([this] () { return m_scc->m1_r(); }, "sccvect_r");
 
 	map(0x1fd00000, 0x1fd00007).m(m_hid, FUNC(news_hid_hle_device::map));
 	map(0x1fd40000, 0x1fd40003).noprw(); // FIXME: ignore buzzer for now
@@ -323,7 +321,7 @@ static INPUT_PORTS_START(nws3260)
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_UNKNOWN)
 INPUT_PORTS_END
 
-static INPUT_PORTS_START(nws3410)
+static INPUT_PORTS_START(nws_r3k_desktop)
 	PORT_START("SW2")
 	PORT_DIPNAME(0x07000000, 0x02000000, "Console") PORT_DIPLOCATION("SW2:1,2,3")
 	PORT_DIPSETTING(0x00000000, "Serial")
@@ -570,11 +568,11 @@ void nws3260_state::nws3260(machine_config &config)
 	m_lcd->set_screen_update(FUNC(nws3260_state::screen_update));
 }
 
-void nws3410_state::nws3410(machine_config &config)
+void news_r3k_desktop_state::nws3410(machine_config &config)
 {
 	R3000A(config, m_cpu, 20_MHz_XTAL, 65536, 65536);
 	m_cpu->set_fpu(mips1_device_base::MIPS_R3010Av4);
-	m_cpu->set_addrmap(AS_PROGRAM, &nws3410_state::nws3410_map);
+	m_cpu->set_addrmap(AS_PROGRAM, &news_r3k_desktop_state::desktop_cpu_map);
 
 	// Per the service manual, one or more NWA-029 4MB expansion kits can be used to increase from the base 8M up to 16M
 	RAM(config, m_ram);
@@ -585,9 +583,24 @@ void nws3410_state::nws3410(machine_config &config)
 	m_serial[0]->set_default_option("terminal"); // No framebuffer emulation yet
 }
 
+void news_r3k_desktop_state::nws3720(machine_config &config)
+{
+	R3000A(config, m_cpu, 20_MHz_XTAL, 65536, 65536);
+	m_cpu->set_fpu(mips1_device_base::MIPS_R3010Av4);
+	m_cpu->set_addrmap(AS_PROGRAM, &news_r3k_desktop_state::desktop_cpu_map);
+
+	// 16MB expandable to 128MB (unknown increments)
+	RAM(config, m_ram);
+	m_ram->set_default_size("16M");
+	m_ram->set_extra_options("128MB");
+	common(config);
+
+	m_serial[0]->set_default_option("terminal"); // No framebuffer emulation yet
+}
+
 ROM_START(nws3260)
 	ROM_REGION32_BE(0x20000, "eprom", 0)
-	ROM_SYSTEM_BIOS(0, "nws3260", "NWS-3260 v2.0A")
+	ROM_SYSTEM_BIOS(0, "nws3260", "SONY NET WORK STATION R3000 Monitor Release 2.0A")
 	ROMX_LOAD("mpu-16__ver.2.0a__1990_sony.ic64", 0x00000, 0x20000, CRC(61222991) SHA1(076fab0ad0682cd7dacc7094e42efe8558cbaaa1), ROM_BIOS(0))
 
 	// 2 x MB834200A-20 (4Mb mask ROM)
@@ -613,16 +626,26 @@ ROM_END
 
 ROM_START(nws3410)
 	ROM_REGION32_BE(0x20000, "eprom", 0)
-	ROM_SYSTEM_BIOS(0, "nws3410", "NWS-3410 v2.0")
+	ROM_SYSTEM_BIOS(0, "nws3410", "SONY NET WORK STATION R3000 Monitor Release 2.0")
 	ROMX_LOAD("sony_nws-3410_mpu-12_v2_rom.bin", 0x00000, 0x20000, CRC(48a726c4) SHA1(5c6e9e6bccaaa3d63bc136355a436c17c49c9876), ROM_BIOS(0))
 
 	ROM_REGION32_BE(0x100, "idrom", 0)
 	ROM_LOAD("idrom.bin", 0x000, 0x100, CRC(661e2516) SHA1(f0dca34174747321dad6f48c466e1c549b797d2e) BAD_DUMP)
 ROM_END
 
+ROM_START(nws3720)
+	ROM_REGION32_BE(0x20000, "eprom", 0)
+	ROM_SYSTEM_BIOS(0, "nws3720", "SONY NET WORK STATION R3000 Monitor Release 2.0A")
+	ROMX_LOAD("sony_nws-3720.bin", 0x00000, 0x20000, CRC(61222991) SHA1(076fab0ad0682cd7dacc7094e42efe8558cbaaa1), ROM_BIOS(0))
+
+	ROM_REGION32_BE(0x100, "idrom", 0)
+	ROM_LOAD("idrom.bin", 0x000, 0x100, CRC(6ec5860e) SHA1(612d2c2f149b34551b5fd9392dd6f9b1612417b5) BAD_DUMP)
+ROM_END
+
 } // anonymous namespace
 
 
-/*   YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS          INIT         COMPANY  FULLNAME    FLAGS */
-COMP(1991, nws3260, 0,      0,      nws3260, nws3260, nws3260_state, init_common, "Sony",  "NWS-3260", MACHINE_NO_SOUND)
-COMP(1991, nws3410, 0,      0,      nws3410, nws3410, nws3410_state, init_common, "Sony",  "NWS-3410", MACHINE_NO_SOUND)
+/*   YEAR  NAME     PARENT   COMPAT  MACHINE  INPUT            CLASS                   INIT         COMPANY  FULLNAME    FLAGS */
+COMP(1991, nws3260, 0,       0,      nws3260, nws3260,         nws3260_state,          init_common, "Sony",  "NWS-3260", MACHINE_NO_SOUND)
+COMP(1991, nws3410, 0,       0,      nws3410, nws_r3k_desktop, news_r3k_desktop_state, init_common, "Sony",  "NWS-3410", MACHINE_NO_SOUND)
+COMP(1991, nws3720, 0,       0,      nws3720, nws_r3k_desktop, news_r3k_desktop_state, init_common, "Sony",  "NWS-3720", MACHINE_NO_SOUND)

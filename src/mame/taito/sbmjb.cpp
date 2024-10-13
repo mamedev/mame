@@ -78,9 +78,9 @@ private:
 	void screen_vblank(int state);
 
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline_callback);
-	void main_map(address_map &map);
-	void sound_map(address_map &map);
-	void tc0091lvc_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
+	void sound_map(address_map &map) ATTR_COLD;
+	void tc0091lvc_map(address_map &map) ATTR_COLD;
 };
 
 

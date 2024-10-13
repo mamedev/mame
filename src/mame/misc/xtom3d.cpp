@@ -177,8 +177,8 @@ public:
 	template <typename T> void set_rom_tag(T &&tag) { m_flash_rom.set_tag(std::forward<T>(tag)); }
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 private:
 	required_memory_region m_flash_rom;
@@ -309,11 +309,11 @@ public:
 protected:
 	isa16_xtom3d_io_sound(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
-	virtual ioport_constructor device_input_ports() const override;
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 private:
 	required_device<ymz280b_device> m_ymz;
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
@@ -323,7 +323,7 @@ private:
 	required_ioport m_in2;
 
 	void remap(int space_id, offs_t start, offs_t end) override;
-	void io_map(address_map &map);
+	void io_map(address_map &map) ATTR_COLD;
 };
 
 class isa16_pumpitup_io_sound : public isa16_xtom3d_io_sound
@@ -332,7 +332,7 @@ public:
 	isa16_pumpitup_io_sound(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
-	virtual ioport_constructor device_input_ports() const override;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 };
 
 DEFINE_DEVICE_TYPE(ISA16_XTOM3D_IO_SOUND, isa16_xtom3d_io_sound, "isa16_xtom3d_io_sound", "ISA16 X-Tom 3d I/O & Sound board")
@@ -539,14 +539,14 @@ public:
 	required_device<kbdc8042_device> m_kbdc;
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 private:
 	void remap(int space_id, offs_t start, offs_t end) override;
 
-	void device_map(address_map &map);
+	void device_map(address_map &map) ATTR_COLD;
 };
 
 DEFINE_DEVICE_TYPE(ISA16_OKSAN_LPC, isa16_oksan_lpc, "isa16_oksan_lpc", "ISA16 Oksan Virtual LPC")
@@ -630,8 +630,8 @@ private:
 	required_device<i82371eb_isa_device> m_pci_isa;
 	required_device<i82371eb_ide_device> m_pci_ide;
 
-	void xtom3d_map(address_map &map);
-//  void xtom3d_io(address_map &map);
+	void xtom3d_map(address_map &map) ATTR_COLD;
+//  void xtom3d_io(address_map &map) ATTR_COLD;
 
 //  void vblank_assert(int state);
 

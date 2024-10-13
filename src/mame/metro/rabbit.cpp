@@ -114,8 +114,8 @@ public:
 	void rabbit(machine_config &config);
 
 private:
-	virtual void machine_start() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 	TIMER_CALLBACK_MEMBER(blit_done);
 
@@ -132,7 +132,7 @@ private:
 	void blitter_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 	void eeprom_write(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 
-	void rabbit_map(address_map &map);
+	void rabbit_map(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<eeprom_serial_93cxx_device> m_eeprom;

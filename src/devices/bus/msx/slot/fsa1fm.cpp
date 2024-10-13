@@ -32,15 +32,15 @@ void msx_slot_fsa1fm2_device::device_start()
 		fatalerror("Memory region '%s' is not the correct size for the FS-A1FM firmware\n", m_rom_region.finder_tag());
 	}
 
-	m_ram.resize(RAM_SIZE);
-	m_empty_bank.resize(8 * 1024);
+	m_ram = std::make_unique<u8[]>(RAM_SIZE);
+	m_empty_bank = std::make_unique<u8[]>(8 * 1024);
 	for (int i = 0; i < 8 * 1024; i++)
 		m_empty_bank[i] = 0xff;
 
 	save_item(NAME(m_selected_bank));
 	save_item(NAME(m_control));
 	save_item(NAME(m_ram_active));
-	save_pointer(m_ram.data(), "ram", RAM_SIZE);
+	save_pointer(NAME(m_ram), m_size);
 
 	for (int i = 0; i < 6; i++)
 	{
@@ -48,10 +48,10 @@ void msx_slot_fsa1fm2_device::device_start()
 		m_bank[i]->configure_entries(0x80, 0x80, m_rom_region->base() + m_region_offset, 0x2000);
 		for (int j = 0; j < 4; j++)
 		{
-			m_bank[i]->configure_entry(0x80 + j, m_empty_bank.data());  // 0x80-0x83 empty
-			m_bank[i]->configure_entry(0x84 + j, m_ram.data());  // 0x84-0x87 ram
-			m_bank[i]->configure_entry(0x88 + j, m_empty_bank.data());  // 0x88-0x8b empty
-			m_bank[i]->configure_entry(0x8c + j, m_ram.data());  // 0x8c-0x8f ram
+			m_bank[i]->configure_entry(0x80 + j, &m_empty_bank[0]);  // 0x80-0x83 empty
+			m_bank[i]->configure_entry(0x84 + j, &m_ram[0]);  // 0x84-0x87 ram
+			m_bank[i]->configure_entry(0x88 + j, &m_empty_bank[0]);  // 0x88-0x8b empty
+			m_bank[i]->configure_entry(0x8c + j, &m_ram[0]);  // 0x8c-0x8f ram
 		}
 	}
 
@@ -182,14 +182,16 @@ void msx_slot_fsa1fm_device::device_start()
 		fatalerror("Memory region '%s' is not the correct size for the FS-A1FM firmware\n", m_rom_region.finder_tag());
 	}
 
-	m_sram.resize(SRAM_SIZE);
-	m_nvram->set_base(m_sram.data(), SRAM_SIZE);
+	m_sram = std::make_unique<u8[]>(SRAM_SIZE);
+	m_nvram->set_base(&m_sram[0], SRAM_SIZE);
+
+	save_pointer(NAME(m_sram), SRAM_SIZE);
 
 	m_rombank->configure_entries(0, 16, m_rom_region->base(), 0x2000);
 
 	page(1)->install_read_bank(0x4000, 0x5fff, m_rombank);
 	// SRAM is always visible?
-	page(1)->install_ram(0x6000, 0x7fff, m_sram.data());
+	page(1)->install_ram(0x6000, 0x7fff, &m_sram[0]);
 	page(1)->install_write_handler(0x7fc0, 0x7fc0, emu::rw_delegate(*m_i8251, FUNC(i8251_device::data_w)));
 	page(1)->install_read_handler(0x7fc0, 0x7fc0, emu::rw_delegate(*m_i8251, FUNC(i8251_device::data_r)));
 	page(1)->install_write_handler(0x7fc1, 0x7fc1, emu::rw_delegate(*m_i8251, FUNC(i8251_device::control_w)));

@@ -8,7 +8,6 @@
 
 #include "emu.h"
 #include "cpu/arm7/arm7.h"
-#include "cpu/arm7/arm7core.h"
 #include "machine/m950x0.h"
 #include "machine/sa1110.h"
 #include "machine/sa1111.h"
@@ -149,13 +148,13 @@ public:
 
 protected:
 	// driver_device overrides
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 	virtual void device_reset_after_children() override;
 
 	static constexpr u32 SA1110_CLOCK = 206000000;
 
-	void main_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
 
 	void cpu_rts_to_mcu(int state);
 	void mcu_assemble_touch_data();

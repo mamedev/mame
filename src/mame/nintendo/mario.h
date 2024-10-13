@@ -26,25 +26,25 @@
  * 7C -> 100 => 256 - 124 = 132 ==> 264 Scanlines
  */
 
-#define MASTER_CLOCK            XTAL(24'000'000)
-#define PIXEL_CLOCK             (MASTER_CLOCK / 4)
-#define CLOCK_1H                (MASTER_CLOCK / 8)
-#define CLOCK_16H               (CLOCK_1H / 16)
-#define CLOCK_1VF               ((CLOCK_16H) / 12 / 2)
-#define CLOCK_2VF               ((CLOCK_1VF) / 2)
+#define MASTER_CLOCK        XTAL(24'000'000)
+#define PIXEL_CLOCK         (MASTER_CLOCK / 4)
+#define CLOCK_1H            (MASTER_CLOCK / 8)
+#define CLOCK_16H           (CLOCK_1H / 16)
+#define CLOCK_1VF           ((CLOCK_16H) / 12 / 2)
+#define CLOCK_2VF           ((CLOCK_1VF) / 2)
 
-#define HTOTAL                  (384)
-#define HBSTART                 (256)
-#define HBEND                   (0)
-#define VTOTAL                  (264)
-#define VBSTART                 (240)
-#define VBEND                   (16)
+#define HTOTAL              (384)
+#define HBSTART             (256)
+#define HBEND               (0)
+#define VTOTAL              (264)
+#define VBSTART             (240)
+#define VBEND               (16)
 
-#define Z80_MASTER_CLOCK        XTAL(8'000'000)
-#define Z80_CLOCK               (Z80_MASTER_CLOCK / 2) /* verified on pcb */
+#define Z80_MASTER_CLOCK    XTAL(8'000'000)
+#define Z80_CLOCK           (Z80_MASTER_CLOCK / 2) /* verified on pcb */
 
-#define I8035_MASTER_CLOCK      XTAL(11'000'000) /* verified on pcb: 730Khz */
-#define I8035_CLOCK             (I8035_MASTER_CLOCK)
+#define MCU_MASTER_CLOCK    XTAL(11'000'000) /* verified on pcb: 730Khz */
+#define MCU_CLOCK           (MCU_MASTER_CLOCK)
 
 class mario_state : public driver_device
 {
@@ -56,6 +56,7 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
 		m_z80dma(*this, "z80dma"),
+		m_soundrom(*this, "soundrom"),
 		m_soundlatch(*this, "soundlatch"),
 		m_soundlatch2(*this, "soundlatch2"),
 		m_soundlatch3(*this, "soundlatch3"),
@@ -69,8 +70,7 @@ public:
 		m_audio_dac(*this, "snd_nl:dac"),
 #endif
 		m_spriteram(*this, "spriteram"),
-		m_videoram(*this, "videoram"),
-		m_monitor(0)
+		m_videoram(*this, "videoram")
 	{ }
 
 	void mario_base(machine_config &config);
@@ -86,6 +86,7 @@ private:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 	required_device<z80dma_device> m_z80dma;
+	optional_region_ptr<uint8_t> m_soundrom;
 	optional_device<generic_latch_8_device> m_soundlatch;
 	optional_device<generic_latch_8_device> m_soundlatch2;
 	optional_device<generic_latch_8_device> m_soundlatch3;
@@ -104,19 +105,18 @@ private:
 	required_shared_ptr<uint8_t> m_videoram;
 
 	/* sound state */
-	uint8_t   m_last = 0;
-	uint8_t   m_portT = 0;
-	const char *m_eabank = nullptr;
+	uint8_t m_last = 0;
+	uint8_t m_portT = 0;
 
 	/* video state */
-	uint8_t   m_gfx_bank = 0;
-	uint8_t   m_palette_bank = 0;
-	uint16_t  m_gfx_scroll = 0;
-	uint8_t   m_flip = 0;
+	uint8_t m_gfx_bank = 0;
+	uint8_t m_palette_bank = 0;
+	uint16_t m_gfx_scroll = 0;
+	uint8_t m_flip = 0;
 	tilemap_t *m_bg_tilemap = nullptr;
-	int m_monitor;
+	int m_monitor = 0;
 
-	bool      m_nmi_mask = false;
+	bool m_nmi_mask = false;
 	void nmi_mask_w(int state);
 	void coin_counter_1_w(int state);
 	void coin_counter_2_w(int state);
@@ -136,7 +136,7 @@ private:
 	void mario_sh_tuneselect_w(uint8_t data);
 	void mario_sh3_w(offs_t offset, uint8_t data);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 	virtual void sound_start() override;
 	virtual void sound_reset() override;
 	void mario_palette(palette_device &palette) const;
@@ -149,12 +149,12 @@ private:
 	void memory_write_byte(offs_t offset, uint8_t data);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void set_ea(int ea);
-	void mario_io_map(address_map &map);
-	void mario_map(address_map &map);
-	void mario_sound_io_map(address_map &map);
-	void mario_sound_map(address_map &map);
-	void masao_map(address_map &map);
-	void masao_sound_map(address_map &map);
+	void mario_io_map(address_map &map) ATTR_COLD;
+	void mario_map(address_map &map) ATTR_COLD;
+	void mario_sound_io_map(address_map &map) ATTR_COLD;
+	void mario_sound_map(address_map &map) ATTR_COLD;
+	void masao_map(address_map &map) ATTR_COLD;
+	void masao_sound_map(address_map &map) ATTR_COLD;
 };
 
 #endif // MAME_NINTENDO_MARIO_H

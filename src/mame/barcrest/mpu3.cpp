@@ -197,7 +197,7 @@ public:
 	void init_mpu3();
 
 protected:
-	void mpu3_basemap(address_map &map);
+	void mpu3_basemap(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 
@@ -234,8 +234,8 @@ private:
 	void ic21_output(int data);
 	void ic21_setup();
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	int m_triac_ic3 = 0;
 	int m_triac_ic4 = 0;
@@ -295,8 +295,8 @@ public:
 	void mpu3_chr_c000(machine_config &config);
 
 private:
-	void mpu3_map_chr_3000(address_map &map);
-	void mpu3_map_chr_c000(address_map &map);
+	void mpu3_map_chr_3000(address_map &map) ATTR_COLD;
+	void mpu3_map_chr_c000(address_map &map) ATTR_COLD;
 
 	required_device<mpu4_characteriser_pal> m_characteriser;
 };

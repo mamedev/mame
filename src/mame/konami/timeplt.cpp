@@ -84,8 +84,8 @@ public:
 	void timeplt(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<ls259_device> m_mainlatch;
@@ -103,7 +103,7 @@ protected:
 	// video-related
 	tilemap_t *m_bg_tilemap = nullptr;
 
-	void main_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
 
 private:
 	// misc
@@ -130,12 +130,12 @@ public:
 	void psurge(machine_config &config);
 
 protected:
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	uint8_t protection_r();
 
-	void main_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
 };
 
 class bikkuric_state : public timeplt_state
@@ -148,12 +148,12 @@ public:
 	int hopper_status_r();
 
 protected:
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	TILE_GET_INFO_MEMBER(get_tile_info);
 
-	void main_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
 };
 
 class chkun_state : public bikkuric_state

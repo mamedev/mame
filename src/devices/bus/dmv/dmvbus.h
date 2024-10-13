@@ -69,7 +69,7 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 	// internal state
 	devcb_read8                     m_prog_read_cb;

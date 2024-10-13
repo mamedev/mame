@@ -554,9 +554,10 @@ void sorcerer_state::sorcererb(machine_config &config)
 {
 	sorcerer(config);
 	m_maincpu->set_addrmap(AS_IO, &sorcerer_state::sorcererb_io);
+	m_maincpu->busack_cb().set(m_dma, FUNC(z80dma_device::bai_w));
 
 	Z80DMA(config, m_dma, ES_CPU_CLOCK);
-	m_dma->out_busreq_callback().set([this] (bool state) {sorcerer_state::busreq_w(state); });
+	m_dma->out_busreq_callback().set_inputline(m_maincpu, Z80_INPUT_LINE_BUSRQ);
 	m_dma->in_mreq_callback().set(FUNC(sorcerer_state::memory_read_byte));
 	m_dma->out_mreq_callback().set(FUNC(sorcerer_state::memory_write_byte));
 	m_dma->in_iorq_callback().set(FUNC(sorcerer_state::io_read_byte));

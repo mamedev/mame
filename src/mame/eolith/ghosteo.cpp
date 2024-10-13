@@ -59,7 +59,6 @@ ToDo: verify QS1000 hook-up
 #include "emu.h"
 
 #include "cpu/arm7/arm7.h"
-#include "cpu/arm7/arm7core.h"
 #include "machine/gen_latch.h"
 #include "machine/i2cmem.h"
 //#include "machine/nandflash.h"

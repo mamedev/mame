@@ -128,8 +128,8 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(switch_sensor_type) { set_sbtype(newval); }
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	// devices/pointers
@@ -143,13 +143,13 @@ private:
 	u8 m_bav_data = 0;
 
 	// address maps
-	void alm16_mem(address_map &map);
-	void alm32_mem(address_map &map);
-	void port16_mem(address_map &map);
-	void port32_mem(address_map &map);
-	void van16_mem(address_map &map);
-	void van32_mem(address_map &map);
-	void gen32_mem(address_map &map);
+	void alm16_mem(address_map &map) ATTR_COLD;
+	void alm32_mem(address_map &map) ATTR_COLD;
+	void port16_mem(address_map &map) ATTR_COLD;
+	void port32_mem(address_map &map) ATTR_COLD;
+	void van16_mem(address_map &map) ATTR_COLD;
+	void van32_mem(address_map &map) ATTR_COLD;
+	void gen32_mem(address_map &map) ATTR_COLD;
 
 	// I/O handlers
 	u32 rom_r(offs_t offset);

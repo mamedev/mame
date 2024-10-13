@@ -145,6 +145,10 @@ s2350_device::s2350_device(const machine_config &mconfig, const char *tag, devic
 {
 }
 
+s2350_device::~s2350_device()
+{
+}
+
 void s2350_device::device_start()
 {
 	save_item(NAME(m_transmit_buffer_empty));

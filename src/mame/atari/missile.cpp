@@ -393,8 +393,8 @@ public:
 	int vblank_r();
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	inline int scanline_to_v(int scanline);
@@ -420,14 +420,14 @@ private:
 	void output_w(uint8_t data);
 	void palette_w(offs_t offset, uint8_t data);
 
-	void trampoline_map(address_map &map);
+	void trampoline_map(address_map &map) ATTR_COLD;
 	u8 trampoline_r(offs_t offset);
 	void trampoline_w(offs_t offset, uint8_t data);
 
-	void base_map(address_map &map);
-	void missile_map(address_map &map);
-	void missilea_map(address_map &map);
-	void mcombat_map(address_map &map);
+	void base_map(address_map &map) ATTR_COLD;
+	void missile_map(address_map &map) ATTR_COLD;
+	void missilea_map(address_map &map) ATTR_COLD;
+	void mcombat_map(address_map &map) ATTR_COLD;
 
 	required_device<m6502_device> m_maincpu;
 	required_device<address_map_bank_device> m_mainmap;
@@ -1018,12 +1018,12 @@ void missile_state::missileb(machine_config &config)
  *
  *************************************/
 
-ROM_START( missile )
+ROM_START( missile ) // A035467-02 or A035467-04 PCBs
 	ROM_REGION( 0x8000, "maincpu", 0 )
 	ROM_LOAD( "035820-02.h1",  0x5000, 0x0800, CRC(7a62ce6a) SHA1(9a39978138dc28fdefe193bfae1b226391e471db) )
 	ROM_LOAD( "035821-02.jk1", 0x5800, 0x0800, CRC(df3bd57f) SHA1(0916925d3c94d766d33f0e4badf6b0add835d748) )
 	ROM_LOAD( "035822-03e.kl1",0x6000, 0x0800, CRC(1a2f599a) SHA1(2deb1219223032a9c83114e4e8b2fc11a570754c) )
-	ROM_LOAD( "035823-02.ln1", 0x6800, 0x0800, CRC(82e552bb) SHA1(d0f22894f779c74ceef644c9f03d840d9545efea) )
+	ROM_LOAD( "035823-02.lm1", 0x6800, 0x0800, CRC(82e552bb) SHA1(d0f22894f779c74ceef644c9f03d840d9545efea) )
 	ROM_LOAD( "035824-02.np1", 0x7000, 0x0800, CRC(606e42e0) SHA1(9718f84a73c66b4e8ef7805a7ab638a7380624e1) )
 	ROM_LOAD( "035825-02.r1",  0x7800, 0x0800, CRC(f752eaeb) SHA1(0339a6ce6744d2091cc7e07675e509b202b0f380) )
 
@@ -1032,12 +1032,31 @@ ROM_START( missile )
 ROM_END
 
 
-ROM_START( missile2 )
+ROM_START( missilea ) // A035467-01 or A035467-03 PCBs
+	ROM_REGION( 0x8000, "maincpu", 0 )
+	ROM_LOAD( "35808-02.h1",  0x5000, 0x0400, CRC(3dba5e7c) SHA1(7931bcf52826e4393c34694288b7ee231e35fa97) )
+	ROM_LOAD( "35809-02.d1",  0x5400, 0x0400, CRC(ee31d94f) SHA1(9ef47be54ce2ad6a514abab14ce0d532b97f5a79) )
+	ROM_LOAD( "35810-02.jk1", 0x5800, 0x0400, CRC(add717eb) SHA1(b4faee7e1432ad2a46a415dffd26e1b7a8c79e7c) )
+	ROM_LOAD( "35811-02.e1",  0x5c00, 0x0400, CRC(5888fbb7) SHA1(ef06f154c7cedf29922b21c112e3b26d152e52aa) )
+	ROM_LOAD( "35812-03e.kl1",0x6000, 0x0400, CRC(6ee5b7a7) SHA1(c25bbe121c495c12ee4e0f0a511dc89910cc083e) )
+	ROM_LOAD( "35813-03e.f1", 0x6400, 0x0400, CRC(51c32f08) SHA1(7971b88adf2ec91ebdfc5162109cab70d44c7bcc) )
+	ROM_LOAD( "35823-02.lm1", 0x6800, 0x0800, CRC(82e552bb) SHA1(d0f22894f779c74ceef644c9f03d840d9545efea) )
+	ROM_LOAD( "35816-02.np1", 0x7000, 0x0400, CRC(a376f3b8) SHA1(4187e763c4273286256b595a33fcf6d61a0a715a) )
+	ROM_LOAD( "35817-02.mn1", 0x7400, 0x0400, CRC(3fa77d31) SHA1(1436fd3c198951a954f269ff7c421eb31dd48cb3) )
+	ROM_LOAD( "35818-02.r1",  0x7800, 0x0400, CRC(32c526c5) SHA1(a907fa3879d1e3b945aca9492a993d770c566cbb) )
+	ROM_LOAD( "35819-02.r3",  0x7c00, 0x0400, CRC(533bcbdc) SHA1(387297f85a1f5abe6be4bf71fc88a9e59c280019) )
+
+	ROM_REGION( 0x0020, "proms", 0 )
+	ROM_LOAD( "035826-01.l6", 0x0000, 0x0020, CRC(86a22140) SHA1(2beebf7855e29849ada1823eae031fc98220bc43) )
+ROM_END
+
+
+ROM_START( missile2 ) // A035467-02 or A035467-04 PCBs
 	ROM_REGION( 0x8000, "maincpu", 0 )
 	ROM_LOAD( "035820-02.h1",  0x5000, 0x0800, CRC(7a62ce6a) SHA1(9a39978138dc28fdefe193bfae1b226391e471db) )
 	ROM_LOAD( "035821-02.jk1", 0x5800, 0x0800, CRC(df3bd57f) SHA1(0916925d3c94d766d33f0e4badf6b0add835d748) )
 	ROM_LOAD( "035822-02.kl1", 0x6000, 0x0800, CRC(a1cd384a) SHA1(a1dd0953423750a0fbc6e3dccbf2ca64ef5a1f54) )
-	ROM_LOAD( "035823-02.ln1", 0x6800, 0x0800, CRC(82e552bb) SHA1(d0f22894f779c74ceef644c9f03d840d9545efea) )
+	ROM_LOAD( "035823-02.lm1", 0x6800, 0x0800, CRC(82e552bb) SHA1(d0f22894f779c74ceef644c9f03d840d9545efea) )
 	ROM_LOAD( "035824-02.np1", 0x7000, 0x0800, CRC(606e42e0) SHA1(9718f84a73c66b4e8ef7805a7ab638a7380624e1) )
 	ROM_LOAD( "035825-02.r1",  0x7800, 0x0800, CRC(f752eaeb) SHA1(0339a6ce6744d2091cc7e07675e509b202b0f380) )
 
@@ -1046,14 +1065,52 @@ ROM_START( missile2 )
 ROM_END
 
 
-ROM_START( missile1 )
+ROM_START( missile2a ) // A035467-01 or A035467-03 PCBs
+	ROM_REGION( 0x8000, "maincpu", 0 )
+	ROM_LOAD( "35808-02.h1",  0x5000, 0x0400, CRC(3dba5e7c) SHA1(7931bcf52826e4393c34694288b7ee231e35fa97) )
+	ROM_LOAD( "35809-02.d1",  0x5400, 0x0400, CRC(ee31d94f) SHA1(9ef47be54ce2ad6a514abab14ce0d532b97f5a79) )
+	ROM_LOAD( "35810-02.jk1", 0x5800, 0x0400, CRC(add717eb) SHA1(b4faee7e1432ad2a46a415dffd26e1b7a8c79e7c) )
+	ROM_LOAD( "35811-02.e1",  0x5c00, 0x0400, CRC(5888fbb7) SHA1(ef06f154c7cedf29922b21c112e3b26d152e52aa) )
+	ROM_LOAD( "35812-02.kl1", 0x6000, 0x0400, CRC(d8784c0b) SHA1(f468fedf95450071afdead5865b0a0ae1776357d) )
+	ROM_LOAD( "35813-02.f1",  0x6400, 0x0400, CRC(3b129db6) SHA1(e1546cee172c12340d3e3394b023128e54d0ffe4) )
+	ROM_LOAD( "35823-02.lm1", 0x6800, 0x0800, CRC(82e552bb) SHA1(d0f22894f779c74ceef644c9f03d840d9545efea) )
+	ROM_LOAD( "35816-02.np1", 0x7000, 0x0400, CRC(a376f3b8) SHA1(4187e763c4273286256b595a33fcf6d61a0a715a) )
+	ROM_LOAD( "35817-02.mn1", 0x7400, 0x0400, CRC(3fa77d31) SHA1(1436fd3c198951a954f269ff7c421eb31dd48cb3) )
+	ROM_LOAD( "35818-02.r1",  0x7800, 0x0400, CRC(32c526c5) SHA1(a907fa3879d1e3b945aca9492a993d770c566cbb) )
+	ROM_LOAD( "35819-02.r3",  0x7c00, 0x0400, CRC(533bcbdc) SHA1(387297f85a1f5abe6be4bf71fc88a9e59c280019) )
+
+	ROM_REGION( 0x0020, "proms", 0 )
+	ROM_LOAD( "035826-01.l6", 0x0000, 0x0020, CRC(86a22140) SHA1(2beebf7855e29849ada1823eae031fc98220bc43) )
+ROM_END
+
+
+ROM_START( missile1 ) // A035467-02 PCBs
 	ROM_REGION( 0x8000, "maincpu", 0 )
 	ROM_LOAD( "35820-01.h1",  0x5000, 0x0800, CRC(41cbb8f2) SHA1(5dcb58276c08d75d36baadb6cefe30d4916de9b0) )
 	ROM_LOAD( "35821-01.jk1", 0x5800, 0x0800, CRC(728702c8) SHA1(6f25af7133d3ec79029117162649f94e93f36e0e) )
 	ROM_LOAD( "35822-01.kl1", 0x6000, 0x0800, CRC(28f0999f) SHA1(eb52b11c6757c8dc3be88b276ea4dc7dfebf7cf7) )
-	ROM_LOAD( "35823-01.ln1", 0x6800, 0x0800, CRC(bcc93c94) SHA1(f0daa5d2835a856e2038612e755dc7ded28fc923) )
+	ROM_LOAD( "35823-01.lm1", 0x6800, 0x0800, CRC(bcc93c94) SHA1(f0daa5d2835a856e2038612e755dc7ded28fc923) )
 	ROM_LOAD( "35824-01.np1", 0x7000, 0x0800, CRC(0ca089c8) SHA1(7f69ee990fd4fa1f2fceca7fc66fcaa02e4d2314) )
 	ROM_LOAD( "35825-01.r1",  0x7800, 0x0800, CRC(428cf0d5) SHA1(03cabbef50c33852fbbf38dd3eecaf70a82df82f) )
+
+	ROM_REGION( 0x0020, "proms", 0 )
+	ROM_LOAD( "035826-01.l6", 0x0000, 0x0020, CRC(86a22140) SHA1(2beebf7855e29849ada1823eae031fc98220bc43) )
+ROM_END
+
+
+ROM_START( missile1a ) // A035467-01 PCBs
+	ROM_REGION( 0x8000, "maincpu", 0 )
+	ROM_LOAD( "35808-01.h1",  0x5000, 0x0400, CRC(21320369) SHA1(7edb499a400f1f04145546f83449c8c0c60fe187) )
+	ROM_LOAD( "35809-01.d1",  0x5400, 0x0400, CRC(b5b3eae3) SHA1(7fe5a92f395633dd0d1765286d2ec9db766159cf) )
+	ROM_LOAD( "35810-01.jk1", 0x5800, 0x0400, CRC(25c99f25) SHA1(e4341cf550b180d9671ae735911922941fd5f29d) )
+	ROM_LOAD( "35811-01.e1",  0x5c00, 0x0400, CRC(60d74ab4) SHA1(a52e21a15e5906c5dcc5069d7df73a02ea14d6f5) )
+	ROM_LOAD( "35812-01.kl1", 0x6000, 0x0400, CRC(8c72e527) SHA1(f61abcf1fce6136b6ab4b352323deb71a826a002) )
+	ROM_LOAD( "35813-01.f1",  0x6400, 0x0400, CRC(250756e3) SHA1(bd2370836833ff2bd016e4cff2cb92d3a173e2df) )
+	ROM_LOAD( "35823-01.lm1", 0x6800, 0x0800, CRC(bcc93c94) SHA1(f0daa5d2835a856e2038612e755dc7ded28fc923) )
+	ROM_LOAD( "35816-01.np1", 0x7000, 0x0400, CRC(7c360f1f) SHA1(1c50a5e48778e6cf96a503d91ccbf92ae3936187) )
+	ROM_LOAD( "35817-01.mn1", 0x7400, 0x0400, CRC(6ab741b8) SHA1(2c271eefcb689982dd08cc0674c55d0173a416e7) )
+	ROM_LOAD( "35818-01.r1",  0x7800, 0x0400, CRC(ff9a6655) SHA1(2513f643275e75e76c4ec2c628e5e7840e0396fb) )
+	ROM_LOAD( "35819-01.r3",  0x7c00, 0x0400, CRC(3aaaa411) SHA1(50dcb685f0af58d04583dc48214b7c9e65e9c775) )
 
 	ROM_REGION( 0x0020, "proms", 0 )
 	ROM_LOAD( "035826-01.l6", 0x0000, 0x0020, CRC(86a22140) SHA1(2beebf7855e29849ada1823eae031fc98220bc43) )
@@ -1079,14 +1136,14 @@ ROM_START( suprmatk )
 ROM_END
 
 
-ROM_START( suprmatkd )
+ROM_START( suprmatkd ) // A035467-02 or A035467-04 PCBs
 	ROM_REGION( 0x8000, "maincpu", 0 )
-	ROM_LOAD( "035820.sma",   0x5000, 0x0800, CRC(75f01b87) SHA1(32ed71b6a869d7b361f244c384bbe6f407f6c6d7) )
-	ROM_LOAD( "035821.sma",   0x5800, 0x0800, CRC(3320d67e) SHA1(5bb04b985421af6309818b94676298f4b90495cf) )
-	ROM_LOAD( "035822.sma",   0x6000, 0x0800, CRC(e6be5055) SHA1(43912cc565cb43256a9193594cf36abab1c85d6f) )
-	ROM_LOAD( "035823.sma",   0x6800, 0x0800, CRC(a6069185) SHA1(899cd8b378802eb6253d4bca7432797168595d53) )
-	ROM_LOAD( "035824.sma",   0x7000, 0x0800, CRC(90a06be8) SHA1(f46fd6847bc9836d11ea0042df19fbf33ddab0db) )
-	ROM_LOAD( "035825.sma",   0x7800, 0x0800, CRC(1298213d) SHA1(c8e4301704e3700c339557f2a833e70f6a068d5e) )
+	ROM_LOAD( "035820_sma.h1",  0x5000, 0x0800, CRC(75f01b87) SHA1(32ed71b6a869d7b361f244c384bbe6f407f6c6d7) )
+	ROM_LOAD( "035821_sma.jk1", 0x5800, 0x0800, CRC(3320d67e) SHA1(5bb04b985421af6309818b94676298f4b90495cf) )
+	ROM_LOAD( "035822_sma.kl1", 0x6000, 0x0800, CRC(e6be5055) SHA1(43912cc565cb43256a9193594cf36abab1c85d6f) )
+	ROM_LOAD( "035823_sma.lm1", 0x6800, 0x0800, CRC(a6069185) SHA1(899cd8b378802eb6253d4bca7432797168595d53) )
+	ROM_LOAD( "035824_sma.np1", 0x7000, 0x0800, CRC(90a06be8) SHA1(f46fd6847bc9836d11ea0042df19fbf33ddab0db) )
+	ROM_LOAD( "035825_sma.r1",  0x7800, 0x0800, CRC(1298213d) SHA1(c8e4301704e3700c339557f2a833e70f6a068d5e) )
 
 	ROM_REGION( 0x0020, "proms", 0 )
 	ROM_LOAD( "035826-01.l6", 0x0000, 0x0020, CRC(86a22140) SHA1(2beebf7855e29849ada1823eae031fc98220bc43) )
@@ -1196,7 +1253,7 @@ Others
 2x 8x2 switches DIP(8R,10R)
 */
 
-ROM_START( missilea )
+ROM_START( missilebl )
 	ROM_REGION( 0x8000, "maincpu", 0 )
 	ROM_LOAD( "1.1h", 0x5000, 0x0800, CRC(49d66ca1) SHA1(59e20a048ac76aff5843dc8253fe61cdb65f94fb) )
 	ROM_LOAD( "2.1j", 0x5800, 0x0800, CRC(8008918d) SHA1(a72ce8997ba66c0f51d94e4f2cb3cf2734612ac9) )
@@ -1344,20 +1401,23 @@ void missile_state::init_missilem()
  *
  *************************************/
 
-GAME( 1980, missile,  0,       missile, missile,   missile_state, empty_init,    ROT0, "Atari", "Missile Command (rev 3)", MACHINE_SUPPORTS_SAVE )
-GAME( 1980, missile2, missile, missile, missile,   missile_state, empty_init,    ROT0, "Atari", "Missile Command (rev 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1980, missile1, missile, missile, missile,   missile_state, empty_init,    ROT0, "Atari", "Missile Command (rev 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1981, suprmatk, missile, missile, suprmatk,  missile_state, init_suprmatk, ROT0, "Atari / General Computer Corporation", "Super Missile Attack (for rev 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1981, suprmatkd,missile, missile, suprmatk,  missile_state, empty_init,    ROT0, "Atari / General Computer Corporation", "Super Missile Attack (not encrypted)", MACHINE_SUPPORTS_SAVE )
+GAME( 1980, missile,    0,       missile, missile,   missile_state, empty_init,    ROT0, "Atari", "Missile Command (rev 3, A035467-02/04 PCBs)", MACHINE_SUPPORTS_SAVE )
+GAME( 1980, missilea,   missile, missile, missile,   missile_state, empty_init,    ROT0, "Atari", "Missile Command (rev 3, A035467-01/03 PCBs)", MACHINE_SUPPORTS_SAVE )
+GAME( 1980, missile2,   missile, missile, missile,   missile_state, empty_init,    ROT0, "Atari", "Missile Command (rev 2, A035467-02/04 PCBs)", MACHINE_SUPPORTS_SAVE )
+GAME( 1980, missile2a,  missile, missile, missile,   missile_state, empty_init,    ROT0, "Atari", "Missile Command (rev 2, A035467-01/03 PCBs)", MACHINE_SUPPORTS_SAVE )
+GAME( 1980, missile1,   missile, missile, missile,   missile_state, empty_init,    ROT0, "Atari", "Missile Command (rev 1, A035467-02 PCBs)", MACHINE_SUPPORTS_SAVE )
+GAME( 1980, missile1a,  missile, missile, missile,   missile_state, empty_init,    ROT0, "Atari", "Missile Command (rev 1, A035467-01 PCBs)", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, suprmatk,   missile, missile, suprmatk,  missile_state, init_suprmatk, ROT0, "Atari / General Computer Corporation", "Super Missile Attack (for rev 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, suprmatkd,  missile, missile, suprmatk,  missile_state, empty_init,    ROT0, "Atari / General Computer Corporation", "Super Missile Attack (not encrypted)", MACHINE_SUPPORTS_SAVE )
 
 // the following bootleg has extremely similar program ROMs to missile1, but has different unknown sound hardware and 2 more ROMs
-GAME( 1981, missilea, missile, missilea, missile,  missile_state, empty_init,    ROT0, "bootleg (U.Games)", "Missile Attack (U.Games bootleg of Missile Command)", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1981, missilebl,  missile, missilea, missile,  missile_state, empty_init,    ROT0, "bootleg (U.Games)", "Missile Attack (U.Games bootleg of Missile Command)", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
 
 // the following bootleg has different unknown sound hardware (sound chip had been removed from the PCB the dump comes from)
-GAME( 1981, x80wc,    missile, missilea, missile,  missile_state, empty_init,    ROT0, "bootleg (ManilaMatic)", "X80 - War Command (ManilaMatic bootleg of Missile Command)", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1981, x80wc,      missile, missilea, missile,  missile_state, empty_init,    ROT0, "bootleg (ManilaMatic)", "X80 - War Command (ManilaMatic bootleg of Missile Command)", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
 
 // the following bootlegs are on different hardware and don't work
-GAME( 1980, mcombat,  missile, missileb, missileb, missile_state, empty_init,    ROT0, "bootleg (Videotron)", "Missile Combat (Videotron bootleg, set 1)", MACHINE_NOT_WORKING )
-GAME( 1980, mcombata, missile, missileb, missileb, missile_state, empty_init,    ROT0, "bootleg (Videotron)", "Missile Combat (Videotron bootleg, set 2)", MACHINE_NOT_WORKING )
-GAME( 1980, mcombats, missile, missileb, missileb, missile_state, empty_init,    ROT0, "bootleg (Sidam)", "Missile Combat (Sidam bootleg)", MACHINE_NOT_WORKING )
-GAME( 2005, missilem, missile, missile,  missile,  missile_state, init_missilem, ROT0, "hack (Braze Technologies)", "Missile Command Multigame", MACHINE_NOT_WORKING )
+GAME( 1980, mcombat,    missile, missileb, missileb, missile_state, empty_init,    ROT0, "bootleg (Videotron)", "Missile Combat (Videotron bootleg, set 1)", MACHINE_NOT_WORKING )
+GAME( 1980, mcombata,   missile, missileb, missileb, missile_state, empty_init,    ROT0, "bootleg (Videotron)", "Missile Combat (Videotron bootleg, set 2)", MACHINE_NOT_WORKING )
+GAME( 1980, mcombats,   missile, missileb, missileb, missile_state, empty_init,    ROT0, "bootleg (Sidam)", "Missile Combat (Sidam bootleg)", MACHINE_NOT_WORKING )
+GAME( 2005, missilem,   missile, missile,  missile,  missile_state, init_missilem, ROT0, "hack (Braze Technologies)", "Missile Command Multigame", MACHINE_NOT_WORKING )

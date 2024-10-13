@@ -380,15 +380,15 @@ public:
 	void init_sf2049();
 	void init_sf2049se();
 
-	DECLARE_CUSTOM_INPUT_MEMBER(i40_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(gauntleg_p12_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(gauntleg_p34_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(keypad_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(gearshift_r);
+	ioport_value i40_r();
+	ioport_value gauntleg_p12_r();
+	ioport_value gauntleg_p34_r();
+	ioport_value keypad_r();
+	ioport_value gearshift_r();
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	static constexpr unsigned SYSTEM_CLOCK = 100000000;
@@ -468,13 +468,13 @@ private:
 
 	std::string sioIRQString(uint8_t data);
 
-	void vegas_cs2_map(address_map &map);
-	void vegas_cs3_map(address_map &map);
-	void vegas_cs4_map(address_map &map);
-	void vegas_cs5_map(address_map &map);
-	void vegas_cs6_map(address_map &map);
-	void vegas_cs7_map(address_map &map);
-	void vegas_cs8_map(address_map &map);
+	void vegas_cs2_map(address_map &map) ATTR_COLD;
+	void vegas_cs3_map(address_map &map) ATTR_COLD;
+	void vegas_cs4_map(address_map &map) ATTR_COLD;
+	void vegas_cs5_map(address_map &map) ATTR_COLD;
+	void vegas_cs6_map(address_map &map) ATTR_COLD;
+	void vegas_cs7_map(address_map &map) ATTR_COLD;
+	void vegas_cs8_map(address_map &map) ATTR_COLD;
 
 	static void hdd_config(device_t *device);
 };
@@ -1062,7 +1062,7 @@ void vegas_state::i40_w(uint32_t data)
 	m_i40_data = data;
 }
 
-CUSTOM_INPUT_MEMBER(vegas_state::i40_r)
+ioport_value vegas_state::i40_r()
 {
 	if (m_io_dips->read() & 0x100) {
 		// 8 way joysticks
@@ -1117,7 +1117,7 @@ CUSTOM_INPUT_MEMBER(vegas_state::i40_r)
 /*************************************
 * Gauntlet Player 1 & 2 control read
 *************************************/
-CUSTOM_INPUT_MEMBER(vegas_state::gauntleg_p12_r)
+ioport_value vegas_state::gauntleg_p12_r()
 {
 	if (m_io_dips->read() & 0x2000) {
 		// 8 way joysticks
@@ -1133,7 +1133,7 @@ CUSTOM_INPUT_MEMBER(vegas_state::gauntleg_p12_r)
 /*************************************
 * Gauntlet Player 3 & 4 control read
 *************************************/
-CUSTOM_INPUT_MEMBER(vegas_state::gauntleg_p34_r)
+ioport_value vegas_state::gauntleg_p34_r()
 {
 	if (m_io_dips->read() & 0x2000) {
 		// 8 way joysticks
@@ -1182,7 +1182,7 @@ void vegas_state::wheel_board_w(uint32_t data)
 	}
 }
 
-CUSTOM_INPUT_MEMBER(vegas_state::keypad_r)
+ioport_value vegas_state::keypad_r()
 {
 	int row_sel;
 	for (row_sel=0; row_sel<4; row_sel++)
@@ -1204,7 +1204,7 @@ CUSTOM_INPUT_MEMBER(vegas_state::keypad_r)
 *  Gearshift
 *
 *************************************/
-DECLARE_CUSTOM_INPUT_MEMBER(vegas_state::gearshift_r)
+ioport_value vegas_state::gearshift_r()
 {
 	// Check for gear change and save gear selection
 	uint32_t gear = m_io_gearshift->read();
