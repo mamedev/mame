@@ -262,6 +262,7 @@ void cadr_iob_device::device_start()
 	save_item(NAME(m_chaos_receive));
 
 	m_clock_timer = timer_alloc(FUNC(cadr_iob_device::clock_callback), this);
+	m_transmit_timer = timer_alloc(FUNC(cadr_iob_device::transmit_callback), this);
 }
 
 
@@ -285,6 +286,23 @@ void cadr_iob_device::device_reset()
 	m_chaos_receive = 0;
 	m_speaker_data = 0;
 	m_speaker->level_w(m_speaker_data);
+}
+
+
+void cadr_iob_device::chaos_transmit_start()
+{
+	m_chaos_csr &= ~CHAOSNET_TRANSMIT_DONE;
+	// TODO transmit the data
+	// TODO set proper timing
+	m_transmit_timer->adjust(attotime::from_msec(10));
+}
+
+
+TIMER_CALLBACK_MEMBER(cadr_iob_device::transmit_callback)
+{
+	m_chaos_csr |= CHAOSNET_TRANSMIT_DONE;
+	if (BIT(m_chaos_csr, CHAOSNET_TRANSMIT_IRQ_ENABLE_BIT))
+		m_irq_vector_cb(IRQ_VECTOR_CHAOS_TRANSMIT);
 }
 
 
@@ -343,9 +361,9 @@ void cadr_iob_device::write(offs_t offset, u16 data)
 			m_chaos_csr = m_chaos_csr & ~(CHAOSNET_RECEIVE_DONE | CHAOSNET_RECEIVE_IRQ_ENABLE | CHAOSNET_TRANSMIT_IRQ_ENABLE);
 		}
 		break;
-	case 0x12: // store word in transmit buffer
+	case 0x11: // store word in transmit buffer
 		m_chaos_transmit = data;
-		m_chaos_csr &= ~CHAOSNET_TRANSMIT_DONE;
+		chaos_transmit_start();
 		break;
 	default:
 		break;
@@ -401,7 +419,7 @@ u16 cadr_iob_device::read(offs_t offset)
 		// -------- -----x-- Match any destination
 		// -------- ------x- Loopback
 		// -------- -------x Timer interrupt enable (not implemented)
-		return m_chaos_csr & ~CHAOSNET_TRANSMIT_DONE; // sys300 does not boot if transmit done stays enabled
+		return m_chaos_csr /*& ~CHAOSNET_TRANSMIT_DONE*/; // sys300 does not boot if transmit done stays enabled
 	case 0x11: // chaos net my address
 		// TODO: Address is configured using dip switches
 		return 0x101;
@@ -410,8 +428,7 @@ u16 cadr_iob_device::read(offs_t offset)
 	case 0x13: // count of bits remaining in the receive buffer
 		break;
 	case 0x15: // host number of this interface
-		// TODO Start transmission
-		m_chaos_csr &= ~CHAOSNET_TRANSMIT_DONE;
+		chaos_transmit_start();
 		return 0x101;
 	}
 	return 0xffffffff;

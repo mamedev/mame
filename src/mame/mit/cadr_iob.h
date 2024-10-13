@@ -38,6 +38,8 @@ private:
 	static constexpr u16 IRQ_VECTOR_MOUSE = 0xb4;
 	static constexpr u16 IRQ_VECTOR_CHAOSNET = 0xb8;
 	static constexpr u16 IRQ_VECTOR_CLOCK = 0xbc;
+	static constexpr u16 IRQ_VECTOR_CHAOS_TRANSMIT = 0x100;
+	static constexpr u16 IRQ_VECTOR_CHAOS_RECEIVE = 0x104;
 
 	static constexpr int CSR_REMOTE_MOUSE_ENABLE_BIT = 0;
 	static constexpr int CSR_MOUSE_IRQ_ENABLE_BIT = 1;
@@ -76,6 +78,8 @@ private:
 	void mcu_p1_w(u8 data);
 	u8 mcu_p2_r();
 	TIMER_CALLBACK_MEMBER(clock_callback);
+	TIMER_CALLBACK_MEMBER(transmit_callback);
+	void chaos_transmit_start();
 
 	required_device<i8748_device> m_i8748;
 	devcb_write16 m_irq_vector_cb;
@@ -85,6 +89,7 @@ private:
 	required_ioport m_mouse_buttons;
 	required_device<speaker_sound_device> m_speaker;
 	emu_timer *m_clock_timer;
+	emu_timer *m_transmit_timer;
 	u8 m_p1;
 	u32 m_bus;
 	u32 m_keyboard_data;
