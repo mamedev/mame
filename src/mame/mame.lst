@@ -38796,8 +38796,10 @@ rm380zf                         // 1978 RM380z with COS 4.0/F firmware
 rm380zfhrg                      // 1978 RM380z with COS 4.0/F and HRG
 rm380z34d                       // 1978 RM380z with COS 3.4/F firmware and casette
 rm380z34e                       // 1978 RM380z with COS 3.4/M firmware and casette
-rm480z                          // 1981 RM480z
-rm480za                         // 1981 RM480z
+
+@source:rm/rm480z.cpp
+rm480z                          // 1981 RM480z with ROS 2.2
+rm480za                         // 1981 RM480z with ROS 1.2
 
 @source:rm/rmnimbus.cpp
 nimbus                          // RM Nimbus 186
