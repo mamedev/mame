@@ -395,7 +395,7 @@ CONS( 201?, mc_cb203,      0,       0,      bbl380,   bbl380, bbl380_state, empt
 
 // newer releases (more heavily censored, for export markets?) internal ROM was changed for these
 
-CONS( 201?, dphh8630,      0,       0,      bbl380,   bbl380, bbl380_state, empty_init, "<unknown>", "Digital Pocket Hand Held System 230-in-1 - Model 8630 / Model 8633", MACHINE_NOT_WORKING ) // sometimes sold as PCP.  Model 8630/8633 are same ROM, different case
+CONS( 201?, dphh8630,      0,       0,      bbl380,   bbl380, bbl380_state, empty_init, "<unknown>", "Digital Pocket Hand Held System 230-in-1 - Model 8630 / Model 8633", MACHINE_IMPERFECT_SOUND ) // sometimes sold as PCP.  Model 8630/8633 are same ROM, different case
 
 CONS( 201?, rhhc152,       0,       0,      bbl380,   bbl380, bbl380_state, empty_init, "Orb", "Retro Handheld Console 152-in-1", MACHINE_IMPERFECT_SOUND ) // looks like a mini GameBoy - 'Over 150 games' on box
 
