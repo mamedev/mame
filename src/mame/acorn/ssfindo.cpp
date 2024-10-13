@@ -152,6 +152,8 @@ public:
 		, m_i2cmem(*this, "i2cmem")
 		, m_flashrom(*this, "flash")
 		, m_qs1000(*this, "qs1000")
+		, m_in(*this, "IN%u", 0U)
+		, m_dsw(*this, "DSW")
 		{ }
 
 	void ssfindo(machine_config &config);
@@ -167,6 +169,8 @@ protected:
 	optional_device<i2cmem_device> m_i2cmem;
 	required_region_ptr<uint16_t> m_flashrom;
 	required_device<qs1000_device> m_qs1000;
+	required_ioport_array<2> m_in;
+	required_ioport m_dsw;
 
 	void init_common();
 	virtual void machine_start() override ATTR_COLD;
@@ -389,10 +393,10 @@ void ssfindo_state::ssfindo_map(address_map &map)
 	map(0x03012ff4, 0x03012ff7).nopw().r(FUNC(ssfindo_state::ff4_r)); //status flag ?
 	map(0x03012ff8, 0x03012fff).noprw();
 	map(0x03200000, 0x032001ff).m(m_iomd, FUNC(arm7500fe_iomd_device::map));
-	map(0x03240000, 0x03240003).portr("IN0").nopw();
-	map(0x03241000, 0x03241003).portr("IN1").nopw();
+	map(0x03240000, 0x03240003).portr(m_in[0]).nopw();
+	map(0x03241000, 0x03241003).portr(m_in[1]).nopw();
 	map(0x03242000, 0x03242003).r(FUNC(ssfindo_state::io_r)).w(FUNC(ssfindo_state::io_w));
-	map(0x03243000, 0x03243003).portr("DSW").nopw();
+	map(0x03243000, 0x03243003).portr(m_dsw).nopw();
 	map(0x03245002, 0x03245002).w(FUNC(ssfindo_state::sound_w));
 	map(0x0324f000, 0x0324f003).r(FUNC(ssfindo_state::SIMPLEIO_r));
 	map(0x03400000, 0x037fffff).w(m_vidc, FUNC(arm_vidc20_device::write));
@@ -404,11 +408,11 @@ void ssfindo_state::ppcar_map(address_map &map)
 	map(0x00000000, 0x000fffff).rom();
 	//map(0x03012be0, 0x03012be0).w(FUNC(ssfindo_state::sound_w)); // once the internal ROM is dumped
 	map(0x03012bf4, 0x03012bf7).r(FUNC(ssfindo_state::randomized_r)).nopw();
-	map(0x03012de0, 0x03012de3).portr("DSW");
+	map(0x03012de0, 0x03012de3).portr(m_dsw);
 	map(0x03012e60, 0x03012e67).nopw();
-	map(0x03012ff8, 0x03012ffb).portr("IN0").nopw();
+	map(0x03012ff8, 0x03012ffb).portr(m_in[0]).nopw();
 	map(0x03200000, 0x032001ff).m(m_iomd, FUNC(arm7500fe_iomd_device::map));
-	map(0x032c0000, 0x032c0003).portr("IN1").nopw();
+	map(0x032c0000, 0x032c0003).portr(m_in[1]).nopw();
 	map(0x03340000, 0x03340007).nopw();
 	map(0x03341000, 0x0334101f).nopw();
 	map(0x033c0000, 0x033c0003).r(FUNC(ssfindo_state::io_r)).w(FUNC(ssfindo_state::io_w));
@@ -427,9 +431,9 @@ void tetfight_state::tetfight_map(address_map &map)
 {
 	map(0x00000000, 0x001fffff).rom();
 	map(0x03200000, 0x032001ff).m(m_iomd, FUNC(arm7500fe_iomd_device::map));
-	map(0x03240000, 0x03240003).portr("IN0");
-	map(0x03240004, 0x03240007).portr("IN1");
-	map(0x03240008, 0x0324000b).portr("DSW2");
+	map(0x03240000, 0x03240003).portr(m_in[0]);
+	map(0x03240004, 0x03240007).portr(m_in[1]);
+	map(0x03240008, 0x0324000b).portr(m_dsw);
 	map(0x03240020, 0x03240023).r(FUNC(tetfight_state::tetfight_unk_r));
 	map(0x03240020, 0x03240020).w(FUNC(tetfight_state::sound_w));
 	map(0x03400000, 0x037fffff).w(m_vidc, FUNC(arm_vidc20_device::write));
@@ -578,7 +582,7 @@ static INPUT_PORTS_START( tetfight )
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON2    ) PORT_PLAYER(2)
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_BUTTON3    ) PORT_PLAYER(2)
 
-	PORT_START("DSW2")
+	PORT_START("DSW")
 	PORT_DIPNAME( 0x01, 0x01, "Test Mode" )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )

@@ -93,6 +93,7 @@ private:
 	required_device_array<floppy_connector, 2> m_floppy;
 	required_memory_region m_rom;
 	required_device<centronics_device> m_centronics;
+	required_ioport m_flap;
 
 	output_finder<> m_led;
 

@@ -75,7 +75,7 @@ void wangpc_rtc_device::wangpc_rtc_io(address_map &map)
 	map(0x20, 0x23).rw(m_ctc0, FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
 	map(0x30, 0x30); //.w(FUNC(wangpc_rtc_device::clear_char_w));
 	map(0x31, 0x31); //.w(FUNC(wangpc_rtc_device::set_char_w));
-	map(0x40, 0x40).portr("SW1"); //.w(FUNC(wangpc_rtc_device::control_w));
+	map(0x40, 0x40).portr(m_sw1); //.w(FUNC(wangpc_rtc_device::control_w));
 	map(0x44, 0x44); //.rw(FUNC(wangpc_rtc_device::i8086_status_r), FUNC(wangpc_rtc_device::reset_w));
 	map(0x48, 0x48); //.w(FUNC(wangpc_rtc_device::dte_ready_w));
 	map(0x4c, 0x4c); //.rw(FUNC(wangpc_rtc_device::8232_acu_r), FUNC(wangpc_rtc_device::8232_acu_w));
@@ -186,7 +186,8 @@ wangpc_rtc_device::wangpc_rtc_device(const machine_config &mconfig, const char *
 	m_ctc0(*this, Z80CTC_0_TAG),
 	m_ctc1(*this, Z80CTC_1_TAG),
 	m_sio(*this, Z80SIO_TAG),
-	m_char_ram(*this, "char_ram", 0x100, ENDIANNESS_LITTLE)
+	m_char_ram(*this, "char_ram", 0x100, ENDIANNESS_LITTLE),
+	m_sw1(*this, "SW1")
 {
 }
 

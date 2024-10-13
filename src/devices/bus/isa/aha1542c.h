@@ -51,6 +51,7 @@ protected:
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
+	required_ioport m_switches;
 
 private:
 	void z84c0010_mem(address_map &map) ATTR_COLD;

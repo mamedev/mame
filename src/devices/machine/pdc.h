@@ -106,6 +106,8 @@ private:
 	/* Callbacks */
 	devcb_read8 m_m68k_r_cb;
 	devcb_write8 m_m68k_w_cb;
+
+	required_ioport m_sw1, m_sw2;
 };
 
 /* Device type */

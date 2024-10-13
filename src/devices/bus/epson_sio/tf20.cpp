@@ -41,7 +41,7 @@ void epson_tf20_device::cpu_io(address_map &map)
 	map.global_mask(0xff);
 	map(0xf0, 0xf3).rw(m_mpsc, FUNC(upd7201_device::ba_cd_r), FUNC(upd7201_device::ba_cd_w));
 	map(0xf6, 0xf6).r(FUNC(epson_tf20_device::rom_disable_r));
-	map(0xf7, 0xf7).portr("tf20_dip");
+	map(0xf7, 0xf7).portr(m_tf20_dip);
 	map(0xf8, 0xf8).rw(FUNC(epson_tf20_device::upd765_tc_r), FUNC(epson_tf20_device::fdc_control_w));
 	map(0xfa, 0xfb).m("5a", FUNC(upd765a_device::map));
 }
@@ -133,6 +133,7 @@ epson_tf20_device::epson_tf20_device(const machine_config &mconfig, const char *
 	m_mpsc(*this, "3a"),
 	m_sio_output(*this, "sio"),
 	m_fd(*this, "5a:%u", 0U),
+	m_tf20_dip(*this, "tf20_dip"),
 	m_timer_serial(nullptr), m_timer_tc(nullptr),
 	m_rxc(1), m_txda(0), m_dtra(0), m_pinc(0)
 {

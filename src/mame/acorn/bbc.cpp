@@ -155,7 +155,7 @@ void bbc_state::bbc_base(address_map &map)
 	map(0xfe01, 0xfe01).mirror(0x06).rw(m_hd6845, FUNC(hd6845s_device::register_r), FUNC(hd6845s_device::register_w));
 	map(0xfe08, 0xfe0f).rw(m_acia, FUNC(acia6850_device::read), FUNC(acia6850_device::write));                        //    fe08-fe0f  6850 ACIA      Serial controller
 	map(0xfe10, 0xfe17).w(FUNC(bbc_state::serial_ula_w));                                                             //    fe10-fe17  Serial ULA     Serial system chip
-	map(0xfe18, 0xfe1f).portr("STATID");                                                                              //    fe18-fe1f  INTOFF/STATID  ECONET Interrupt Off / ID No.
+	map(0xfe18, 0xfe1f).portr(m_statid);                                                                              //    fe18-fe1f  INTOFF/STATID  ECONET Interrupt Off / ID No.
 	map(0xfe20, 0xfe2f).w(FUNC(bbc_state::video_ula_w));                                                              // W: fe20-fe2f  Video ULA      Video system chip
 	map(0xfe40, 0xfe5f).m(m_via6522_0, FUNC(via6522_device::map));                                                    //    fe40-fe5f  6522 VIA       SYSTEM VIA
 	map(0xfe60, 0xfe7f).m(m_via6522_1, FUNC(via6522_device::map));                                                    //    fe60-fe7f  6522 VIA       USER VIA

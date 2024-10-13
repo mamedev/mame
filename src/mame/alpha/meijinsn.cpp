@@ -88,7 +88,10 @@ public:
 		m_videoram(*this, "videoram"),
 		m_shared_ram(*this, "shared_ram"),
 		m_coins(*this, "COINS"),
-		m_dsw(*this, "DSW")
+		m_dsw(*this, "DSW"),
+		m_p1(*this, "P1"),
+		m_p2(*this, "P2")
+		
 	{ }
 
 	void meijinsn(machine_config &config);
@@ -112,6 +115,7 @@ private:
 	required_shared_ptr<uint16_t> m_shared_ram;
 	required_ioport m_coins;
 	required_ioport m_dsw;
+	required_ioport m_p1, m_p2;
 
 	// misc
 	uint8_t m_deposits1 = 0;
@@ -198,8 +202,8 @@ void meijinsn_state::main_map(address_map &map)
 	map(0x180000, 0x180dff).ram();
 	map(0x180e00, 0x180fff).ram().share(m_shared_ram);
 	map(0x181000, 0x181fff).ram();
-	map(0x1c0000, 0x1c0001).portr("P2");
-	map(0x1a0000, 0x1a0001).portr("P1");
+	map(0x1c0000, 0x1c0001).portr(m_p2);
+	map(0x1a0000, 0x1a0001).portr(m_p1);
 	map(0x1a0001, 0x1a0001).w("soundlatch", FUNC(generic_latch_8_device::write));
 }
 

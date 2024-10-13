@@ -64,6 +64,7 @@ private:
 	required_device<screen_device> m_screen;
 	required_shared_ptr<u8> m_vram;
 	required_region_ptr<u8> m_cg_rom;
+	required_ioport m_in;
 
 	u8 m_rx_state = 0;
 
@@ -89,7 +90,8 @@ nss_tvinterface_device::nss_tvinterface_device(const machine_config &mconfig, co
 	m_palette(*this, "palette"),
 	m_screen(*this, "screen"),
 	m_vram(*this, "vram"),
-	m_cg_rom(*this, "cg_rom")
+	m_cg_rom(*this, "cg_rom"),
+	m_in(*this, "IN")
 { }
 
 void nss_tvinterface_device::device_start()
@@ -168,7 +170,7 @@ void nss_tvinterface_device::main_map(address_map &map)
 {
 	map(0x8000, 0x87ff).ram().share(m_vram);
 
-	map(0xa3bd, 0xa3bd).portr("IN.0");
+	map(0xa3bd, 0xa3bd).portr(m_in);
 	map(0xa3be, 0xa3be).w(FUNC(nss_tvinterface_device::unknown_w));
 
 	map(0xa3d0, 0xa3d0).mirror(0x0006).w(m_crtc, FUNC(mc6845_device::address_w));
@@ -187,7 +189,7 @@ void nss_tvinterface_device::main_map(address_map &map)
 //-------------------------------------------------
 
 static INPUT_PORTS_START( nss_tvinterface )
-	PORT_START("IN.0")
+	PORT_START("IN")
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_UNUSED)
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_BUTTON1) PORT_NAME("Select")
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_BUTTON2) PORT_NAME("Change")

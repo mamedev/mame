@@ -110,7 +110,7 @@ void abc77_device::abc77_map(address_map &map)
 void abc77_device::abc77_io(address_map &map)
 {
 	map(0x00, 0x00).mirror(0xff).w(FUNC(abc77_device::j3_w));
-	map(0x00, 0x00).mirror(0xff).portr("DSW");
+	map(0x00, 0x00).mirror(0xff).portr(m_dsw);
 }
 
 

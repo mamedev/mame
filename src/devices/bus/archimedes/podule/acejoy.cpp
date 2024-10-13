@@ -34,12 +34,13 @@ protected:
 	virtual void ioc_map(address_map &map) override
 	{
 		map(0x0000, 0x1fff).lr8(NAME([this](offs_t offset) { return m_podule_rom->base()[offset]; })).umask32(0x000000ff);
-		map(0x2008, 0x200b).portr("JOY0");
-		map(0x200c, 0x200f).portr("JOY1");
+		map(0x2008, 0x200b).portr(m_joy[0]);
+		map(0x200c, 0x200f).portr(m_joy[1]);
 	}
 
 private:
 	required_memory_region m_podule_rom;
+	required_ioport_array<2> m_joy;
 };
 
 
@@ -107,6 +108,7 @@ arc_acejoy_device::arc_acejoy_device(const machine_config &mconfig, const char *
 	: device_t(mconfig, ARC_ACEJOY, tag, owner, clock)
 	, device_archimedes_podule_interface(mconfig, *this)
 	, m_podule_rom(*this, "podule_rom")
+	, m_joy(*this, "JOY%u", 0U)
 {
 }
 

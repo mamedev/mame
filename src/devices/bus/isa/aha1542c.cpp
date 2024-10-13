@@ -232,7 +232,7 @@ void aha1542c_device::z84c0010_mem(address_map &map)
 {
 	map(0x0000, 0x7fff).rom().region(Z84C0010_TAG, 0);
 	map(0x8000, 0x9fff).ram();        // 2kb RAM chip
-	map(0xa000, 0xa000).portr("SWITCHES");
+	map(0xa000, 0xa000).portr(m_switches);
 	map(0xb000, 0xb000).w(FUNC(aha1542c_device::local_latch_w));
 	map(0xe000, 0xe0ff).ram();        // probably PC<->Z80 communication area
 	map(0xe003, 0xe003).lr8(NAME([] () { return 0x20; }));
@@ -255,7 +255,7 @@ void aha1542cp_device::local_mem(address_map &map)
 {
 	map(0x0000, 0x7fff).rom().region(Z84C0010_TAG, 0);
 	map(0x8000, 0x9fff).ram();
-	map(0xc000, 0xc000).portr("SWITCHES");
+	map(0xc000, 0xc000).portr(m_switches);
 	map(0xc001, 0xc001).rw(FUNC(aha1542cp_device::eeprom_r), FUNC(aha1542cp_device::eeprom_w));
 	map(0xe003, 0xe003).nopr();
 }
@@ -362,6 +362,7 @@ aha1542c_device::aha1542c_device(const machine_config &mconfig, device_type type
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_isa16_card_interface(mconfig, *this)
 	, m_eeprom(*this, "eeprom")
+	, m_switches(*this, "SWITCHES")
 {
 }
 
