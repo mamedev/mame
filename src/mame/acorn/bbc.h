@@ -257,7 +257,7 @@ protected:
 	optional_memory_bank m_bank2; //           bbcbp bbcbp128 bbcm
 	optional_device<address_map_bank_device> m_bankdev; //    bbcm
 	optional_ioport m_bbcconfig;
-	required_ioport m_statid;
+	optional_ioport m_statid;
 
 	output_finder<> m_motor_led;
 

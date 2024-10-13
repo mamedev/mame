@@ -349,7 +349,7 @@ public:
 		m_screen(*this, "screen"),
 		m_alpha_8201(*this, "alpha_8201"),
 		m_mainlatch(*this, "mainlatch"),
-		m_in(*this, "IN%U", 0U),
+		m_in(*this, "IN%u", 0U),
 		m_bg_videoram(*this, "bg_videoram"),
 		m_fg_videoram(*this, "fg_videoram", 0x800, ENDIANNESS_BIG),
 		m_spriteram(*this, "spriteram")
