@@ -42,6 +42,7 @@
 #include "concept_kbd.h"
 
 #include "cpu/m68000/m68000.h"
+#include "cpu/m6800/m6801.h"
 #include "bus/a2bus/a2corvus.h"
 #include "bus/a2bus/corvfdc01.h"
 #include "bus/a2bus/corvfdc02.h"
@@ -112,6 +113,8 @@ void concept_state::corvus_concept(machine_config &config)
 	/* basic machine hardware */
 	M68000(config, m_maincpu, 16.364_MHz_XTAL / 2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &concept_state::concept_memmap);
+
+	M6801(config, "omni", 10_MHz_XTAL / 2).set_disable();
 
 	config.set_maximum_quantum(attotime::from_hz(60));
 
@@ -205,9 +208,6 @@ ROM_START( concept )
 	ROMX_LOAD("cc06h", 0x010000, 0x1000, CRC(66b6b259) SHA1(1199a38ef3e94f695e8da6a7c80c6432da3cb80c), ROM_BIOS(2) | ROM_SKIP(1))
 	ROMX_LOAD("cc06l", 0x010001, 0x1000, CRC(600940d3) SHA1(c3278bf23b3b1c35ea1e3da48a05e877862a8345), ROM_BIOS(2) | ROM_SKIP(1))
 
-	ROM_REGION(0x400, "proms", 0)
-	ROM_LOAD("map04a.bin", 0x000, 0x400, CRC(1ae0db9b) SHA1(cdb6f63bb08072b454b4704e62de51c483ede734) )
-
 #if 0
 	// version 1 lvl 7 release
 	ROM_LOAD16_BYTE("bootl17h", 0x010000, 0x1000, CRC(6dd9718f))    // where does this come from?
@@ -217,6 +217,12 @@ ROM_START( concept )
 	// the source code)
 	ROM_LOAD16_WORD("cc.prm", 0x010000, 0x2000, CRC(b5a87dab) SHA1(0da59af6cfeeb38672f71731527beac323d9c3d6))
 #endif
+
+	ROM_REGION(0x1000, "omni", 0)
+	ROM_LOAD("sc85180l_3265-02762.u302", 0x0000, 0x1000, NO_DUMP)
+
+	ROM_REGION(0x400, "proms", 0)
+	ROM_LOAD("map04a.bin", 0x000, 0x400, CRC(1ae0db9b) SHA1(cdb6f63bb08072b454b4704e62de51c483ede734) )
 
 	ROM_REGION16_BE(0x2000, "macsbug", 0)
 	ROM_LOAD16_BYTE( "mb20h.bin",    0x000000, 0x001000, CRC(aa357112) SHA1(88211e5f59887928c557c27cdea674f48bf8eaf7) )
