@@ -29,16 +29,16 @@ private:
 	required_device<floppy_connector> m_floppy0;
 	required_device<floppy_connector> m_floppy1;
 
-	const tiny_rom_entry *device_rom_region() const override;
-	void device_add_mconfig(machine_config &config) override;
-	void device_start() override;
+	const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
+	void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	void device_start() override ATTR_COLD;
 
 	void input_txd(int state) override;
 	void input_rts(int state) override;
 	void input_dtr(int state) override;
 
-	void rmMQ2_mem(address_map &map);
-	void rmMQ2_io(address_map &map);
+	void rmMQ2_mem(address_map &map) ATTR_COLD;
+	void rmMQ2_io(address_map &map) ATTR_COLD;
 	void port0_w(uint8_t data);
 	void port1_w(uint8_t data);
 	uint8_t status_r();

@@ -127,9 +127,9 @@ private:
 	TIMER_DEVICE_CALLBACK_MEMBER(kbd_scan);
 	void vblank_callback(screen_device &screen, bool vblank_state);
 
-	void rm480z_io(address_map &map);
-	void rm480z_MK1_mem(address_map &map);
-	void rm480z_MK2_mem(address_map &map);
+	void rm480z_io(address_map &map) ATTR_COLD;
+	void rm480z_MK1_mem(address_map &map) ATTR_COLD;
+	void rm480z_MK2_mem(address_map &map) ATTR_COLD;
 
 	uint8_t status_port_read(offs_t offset);
 	void control_port_write(offs_t offset, uint8_t data);
@@ -138,7 +138,7 @@ private:
 	uint8_t hrg_port_read(offs_t offset);
 	void hrg_port_write(offs_t offset, uint8_t data);
 
-	void machine_reset() override;
+	void machine_reset() override ATTR_COLD;
 	uint32_t screen_update_rm480z(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void update_screen(bitmap_ind16 &bitmap) const;
 	void putChar(int charnum, int x, int y, bitmap_ind16 &bitmap, bool bMonochrome) const;
