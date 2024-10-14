@@ -455,7 +455,7 @@ typedef enum {
 
 // Reply codes for CART_CMD_WIFI_GET_NAME:
 #define CART_WIFI_OK    0x0000
-#define CART_WIFI_INVALID   0x0001
+#define CART_WIFI_INVALID   0xFFFF
 
 #define NEON_FPGA_RAM_SIZE 40	// In words
 #define NEON_RAM_DATA_MAX (NEON_FPGA_RAM_SIZE - 1)	// First word is always used by echo
@@ -473,6 +473,14 @@ uint16_t neon_mcu_to_game_ram[NEON_FPGA_RAM_SIZE];
 uint32_t neon_sw_rng_next = 1;
 bool neon_debug_enabled = false;	// MAME-only debug
 neon_wifi_status_t neon_status_wifi = NEON_WIFI_DISCONNECTED;
+
+typedef struct {
+	char name[40]; 		//max len of ssid is 32, but adding space for goofyness
+	char password[70]; 	//max len of password is 64
+} accessPoint_t;
+
+accessPoint_t accessPoints[50]; //max 50 in csv for testing
+uint16_t accessPointsCount;
 
 uint16_t neon_save_ram(uint16_t save_number) {
     uint16_t result = CART_SAVE_OK; //CART_SAVE_ERR
@@ -549,6 +557,45 @@ uint16_t neon_load_ram(uint16_t save_number) {
 	}
 
     return result;
+}
+
+uint16_t neon_load_wifi_list() {
+    size_t count = 0;
+
+    std::string filename = string_format("nvram%sneon_wifi_list.csv", PATH_SEPARATOR);
+    const char* filenamePointer = filename.c_str(); 
+
+    FILE *file_ptr;
+    file_ptr = fopen(filenamePointer, "r");
+
+    if (file_ptr == NULL) {
+		if (neon_debug_enabled) {
+			printf("Could not open ram file :%s\n", filename.c_str());
+		}
+        return 0;
+    }
+
+    while (fscanf(file_ptr, " %[^,],%[^\n]", accessPoints[count].name, accessPoints[count].password) == 2) {
+        count++;
+		
+		if (count > 50) {
+			break;
+		}
+    }
+
+	if (neon_debug_enabled) {
+		printf("WIFI Networks\n");
+		printf("--------------------------------\n");
+		for (uint16_t i = 0; i < count; i++) {
+			printf("Name :%s\n", accessPoints[i].name);
+			printf("Pass :%s\n", accessPoints[i].password);
+		}
+		printf("--------------------------------\n");
+	}
+
+    fclose(file_ptr);
+
+	return count;
 }
 
 void neogeo_cart_slot_device::neon_enable_debug_w(offs_t offset, uint16_t data, uint16_t mem_mask) {
@@ -747,7 +794,9 @@ void neogeo_cart_slot_device::neon_irq_w(offs_t offset, uint16_t data, uint16_t 
 			break;
 
 		case CART_CMD_WIFI_REFRESH:		// List WiFi access points
-			data_out[0] = 1;	// Found one access point
+			accessPointsCount = neon_load_wifi_list();
+			
+			data_out[0] = accessPointsCount; // Found one access point
 			
 			if (neon_debug_enabled) {
 				printf("mcu WIFI_REFRESH\n");
@@ -756,21 +805,22 @@ void neogeo_cart_slot_device::neon_irq_w(offs_t offset, uint16_t data, uint16_t 
 		
 		case CART_CMD_WIFI_GET_NAME:	// Get infos about a previously listed WiFi access point
 			index = data_in[0];
+			accessPointsCount = neon_load_wifi_list();
 			
-			if (index > 0) {
+			if (accessPointsCount == 0 || index > accessPointsCount) {
 				printf("mcu WIFI_GET_NAME index %d out of bounds\n", index);
-				data_out[0] = CART_SAVE_ERR;	// Valid, but return error code
+				data_out[0] = CART_WIFI_INVALID;
 				break;
 			}
 			
-			data_out[0] = CART_WIFI_OK;
-			data_out[1] = (30 << 8) | 3;	// rssi = 30, authmode = WIFI_AUTH_WPA2_PSK
-			data_out[2] = 11 << 8;			// Channel 11
-			data_out[3] = 0x5465;			// "Test AP"
-			data_out[4] = 0x7374;
-			data_out[5] = 0x2041;
-			data_out[6] = 0x5000;
-			
+		  //data_out[0] = CART_WIFI_OK;
+			data_out[0] = (30 << 8) | 3;	// rssi = 30, authmode = WIFI_AUTH_WPA2_PSK
+			data_out[1] = 11 << 8;			// Channel 11
+
+			for (int i=0; i<18; i++) { data_out[2 + i] = 0x00; }
+			memcpy((char *)&data_out[2], accessPoints[index].name, 32);
+			for (int i=0; i<16; i++) { data_out[2 + i] = __builtin_bswap16(data_out[2 + i]); }
+
 			if (neon_debug_enabled) {
 				printf("mcu WIFI_GET_NAME(%d)\n", index);
 			}
@@ -778,8 +828,9 @@ void neogeo_cart_slot_device::neon_irq_w(offs_t offset, uint16_t data, uint16_t 
 			
 		case CART_CMD_WIFI_CONNECT:		// Connected to previously listed WiFi access point
 			index = data_in[0];
+			accessPointsCount = neon_load_wifi_list();
 			
-			if (index > 0) {
+			if (accessPointsCount == 0 || index > accessPointsCount) {
 				printf("mcu WIFI_CONNECT index %d out of bounds\n", index);
 				data_out[0] = CART_SAVE_ERR;	// Valid, but return error code
 				break;
@@ -787,12 +838,20 @@ void neogeo_cart_slot_device::neon_irq_w(offs_t offset, uint16_t data, uint16_t 
 			
 			memcpy(pwd, (uint8_t*)&data_in[1], 64);
 			pwd[64] = 0;
-			
-			neon_status_wifi = NEON_WIFI_CONNECTED;
-			
-			if (neon_debug_enabled) {
-				printf("mcu WIFI_CONNECT(%d) with pwd \"%s\"\n", index, pwd);
-			}
+
+			if (strcmp(pwd, accessPoints[index].password) == 0) {
+				neon_status_wifi = NEON_WIFI_CONNECTED;
+				data_out[0] = CART_WIFI_OK;
+				if (neon_debug_enabled) {
+					printf("mcu WIFI_CONNECT(%d) to \"%s\" succeeded with pwd \"%s\"\n", index, accessPoints[index].name, pwd);
+				}
+			} else {
+				neon_status_wifi = NEON_WIFI_DISCONNECTED;
+				data_out[0] = CART_WIFI_INVALID;
+				if (neon_debug_enabled) {
+					printf("mcu WIFI_CONNECT(%d) to \"%s\" failed with pwd \"%s\"\n", index, accessPoints[index].name, pwd);
+				}
+			}		
 			break;
 		
 		case CART_CMD_TEST: // MCU test -- Returns 16-bit word sum of data words
