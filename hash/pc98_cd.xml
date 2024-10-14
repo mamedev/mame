@@ -5004,7 +5004,6 @@ Fussy with HIMEM.SYS and EMM386.EXE as suggested by manual, use VEM486 instead.
 		</part>
 	</software>
 
-	<!-- Black screen on boot -->
 	<software name="ppersia2" supported="no">
 		<!--
 		Origin: redump.org
@@ -5014,6 +5013,10 @@ Fussy with HIMEM.SYS and EMM386.EXE as suggested by manual, use VEM486 instead.
 		<description>Prince of Persia 2 - The Shadow &amp; The Flame</description>
 		<year>1995</year>
 		<publisher>インタープログ (Interprog)</publisher>
+		<notes><![CDATA[
+Mangles boot disk creation, doesn't make it bootable
+With .fdi disk, will either black screen or respond to user presses, eventually bringing in gameplay with no sound
+]]></notes>
 		<info name="release" value="19950108" />
 		<info name="serial" value="IP-047"/>
 		<info name="alt_title" value="プリンス・オブ・ペルシャ２ ザ・シャドウ アンド ザ・フレーム" />
