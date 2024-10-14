@@ -217,7 +217,6 @@ u8 compan2_state::input2_r()
 
 	// P23: button configuration
 	data |= m_inputs[2]->read() << 3 & 8;
-
 	return ~data;
 }
 
@@ -307,8 +306,8 @@ static INPUT_PORTS_START( expchess )
 	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_6) PORT_CODE(KEYCODE_6_PAD) PORT_NAME("Pawn")
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_2) PORT_CODE(KEYCODE_2_PAD) PORT_NAME("Queen")
 
-	PORT_MODIFY("IN.2")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_CUSTOM) // button config
+	PORT_MODIFY("IN.2") // button config
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_CUSTOM)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( compan2 )
@@ -324,7 +323,7 @@ static INPUT_PORTS_START( compan2 )
 	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_E) PORT_NAME("Enter Position")
 
 	PORT_MODIFY("IN.2")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_CUSTOM) // button config
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_CUSTOM)
 
 	PORT_START("CPU")
 	PORT_CONFNAME( 0x01, 0x00, "CPU Frequency" ) PORT_CHANGED_MEMBER(DEVICE_SELF, compan2_state, change_cpu_freq, 0) // factory set

@@ -16652,8 +16652,8 @@ quasara                         // (c) 1980 Zelco Games Italy
 ch2001
 
 @source:cxg/computachess.cpp
-scptchess
-scptchessa
+scpchess
+scpchessa
 
 @source:cxg/dominator.cpp
 scmder

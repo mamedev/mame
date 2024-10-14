@@ -64,6 +64,7 @@ private:
 	u8 m_lcd_com = 0;
 	u64 m_lcd_segs = 0;
 
+	// I/O handlers
 	void update_lcd();
 	template<int N> void seg_w(u8 data);
 	u8 read_buttons();
@@ -74,6 +75,7 @@ private:
 
 void pmicrodx_state::machine_start()
 {
+	// register for savestates
 	save_item(NAME(m_inp_mux));
 	save_item(NAME(m_lcd_com));
 	save_item(NAME(m_lcd_segs));

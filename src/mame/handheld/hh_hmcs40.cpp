@@ -79,7 +79,7 @@ known chips:
   B42     HD44801  1983, Alpha 8303 protection MCU (see 8201)
  *B43     HD44801  1983, Alpha 8304 protection MCU (see 8201)
   C57     HD44801  1985, Alpha 8505 protection MCU (see 8201)
-  C89     HD44801  1985, CXG Portachess (1985 version) -> cxg/computachess.cpp
+  C89     HD44801  1985, CXG Sensor Computachess (1985 version) -> cxg/computachess.cpp
 
  *A86     HD44820  1983, Chess King Pocket Micro / Mighty Midget
  *B46     HD44820  1984, Chess King Pocket Micro / Mighty Midget
@@ -93,8 +93,8 @@ known chips:
 
  *A04     HD44868  1984, SciSys Rapier
   A07     HD44868  1984, Chess King Pocket Micro De-Luxe -> chessking/pmicrodx.cpp
- *A12     HD44868  1985, SciSys Travel Mate II / Pocket Chess / MK 10 / Electronic Trio
- *A14     HD44868  1985, SciSys Kasparov Plus / MK 12
+ *A12     HD44868  1985, SciSys Electronic Trio / Kasparov Pocket Chess
+ *A14     HD44868  1986, SciSys Kasparov Mk 12 / Kasparov Pocket Plus
  *A16     HD44868  1988, Saitek Pocket Checkers
 
   (* means undumped unless noted, @ denotes it's in this driver)

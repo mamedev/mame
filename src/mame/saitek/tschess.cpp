@@ -12,7 +12,7 @@ Computachess (see cxg/computachess.cpp).
 Hardware notes:
 - PCB label: SCISYS TC-A, 201148
 - Hitachi 44801A85 MCU @ ~400kHz (R=91K) or ~350Hz (R=150K)
-- piezo, 21 leds, button sensors chessboard
+- piezo, 21 LEDs, button sensors chessboard
 
 44801A85 MCU is used in:
 - SciSys Travel Sensor Chess

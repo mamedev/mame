@@ -75,7 +75,6 @@ public:
 	// assume that RESET button is tied to CPU RESET pin
 	DECLARE_INPUT_CHANGED_MEMBER(reset_button) { m_maincpu->set_input_line(INPUT_LINE_RESET, newval ? ASSERT_LINE : CLEAR_LINE); }
 
-	// machine configs
 	void debutm(machine_config &config);
 
 protected:
@@ -107,7 +106,6 @@ private:
 
 void debut_state::machine_start()
 {
-	// resolve handlers
 	m_out_digit.resolve();
 
 	// register for savestates

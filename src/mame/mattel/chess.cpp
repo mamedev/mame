@@ -77,7 +77,6 @@ private:
 
 void mchess_state::machine_start()
 {
-	// resolve handlers
 	m_out_x.resolve();
 
 	// register for savestates
