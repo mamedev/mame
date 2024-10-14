@@ -21,7 +21,9 @@ jobs:
   validate:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@master
+    - uses: actions/checkout@main
+      with:
+        fetch-depth: 0
     - name: Install dependencies
       run: |
         sudo apt-get update
