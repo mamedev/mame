@@ -112,14 +112,16 @@ void pc9801_state::draw_text(bitmap_rgb32 &bitmap, uint32_t addr, int y, int wd,
 			// Trusted with alice, animjv3, akitsuka, apros ...
 			//kanji_lr = (knj_tile & 0x80) >> 7;
 			//kanji_lr |= (tile & 0x80) >> 7; // tokisg3
+			// ... but then ginga and gage expects working LR for PCG depending on the attribute.
+			// beast3 uses tile bit 7 for the heart shaped char displayed on first screen.
+			const u8 pcg_lr = (BIT(knj_tile, 7) || BIT(tile, 7));
 			tile &= 0x7f;
 			tile <<= 8;
 			tile |= (knj_tile & 0x7f);
 			kanji_sel = 1;
-			// ginga and gage wants to dispatch PCG depending on the attribute
-			if((tile & 0xfe00) == 0x5600)
+			if((tile & 0x7e00) == 0x5600)
 			{
-				tile_lr = knj_tile & 0x80 ? 1 : 0;
+				tile_lr = pcg_lr;
 				x_step = 1;
 			}
 			else if((tile & 0x7c00) == 0x0800)  // 8x16 charset selector
