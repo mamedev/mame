@@ -29,8 +29,6 @@
  TODO:
  * I/O for remaining games
  * Coin lockout (zhongguo displays a coin error on unexpected coins)
- * Verify I/O hasn't changed between versions of lhzb3 (current based on V400CN).
-  (once the other versions work)
 */
 
 #include "emu.h"
@@ -87,6 +85,8 @@ public:
 
 	template <unsigned N> void counter_w(int state);
 
+	INPUT_CHANGED_MEMBER(lhzb3sjb_io_select_0_w);
+
 	template <bool Xor> void m027_noppi(machine_config &config) ATTR_COLD;
 	template <bool Xor> void m027_1ppi(machine_config &config) ATTR_COLD;
 	template <bool Xor> void m027_2ppis(machine_config &config) ATTR_COLD;
@@ -95,7 +95,7 @@ public:
 	void qlgs(machine_config &config) ATTR_COLD;
 	void lhdmg(machine_config &config) ATTR_COLD;
 	void lhzb3106c5m(machine_config &config) ATTR_COLD;
-	void lhzb3300c5(machine_config &config) ATTR_COLD;
+	void lhzb3sjb(machine_config &config) ATTR_COLD;
 	void cjddz(machine_config &config) ATTR_COLD;
 	void lhzb4(machine_config &config) ATTR_COLD;
 	void lthyp(machine_config &config) ATTR_COLD;
@@ -744,6 +744,42 @@ INPUT_PORTS_START( lhzb3 )
 	PORT_DIPSETTING(    0x00, DEF_STR(Off) )                                                  // 无         (game title not shown)
 	PORT_DIPSETTING(    0x04, DEF_STR(On) )                                                   // 有
 	PORT_DIPUNKNOWN_DIPLOC( 0x08, 0x08, "SW2:4" )                                             // not shown in test mode
+INPUT_PORTS_END
+
+INPUT_PORTS_START( lhzb3sjb )
+	PORT_INCLUDE(mahjong_kbd)
+	PORT_INCLUDE(slqz3_dip_switches)
+
+	PORT_MODIFY("TEST")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("hopper", hopper_device, line_r) // 哈巴
+	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNKNOWN )         PORT_CONDITION("DSW2", 0x08, EQUALS, 0x08)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON3 )         PORT_CONDITION("DSW2", 0x08, EQUALS, 0x00)  // 功能
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON2 )         PORT_CONDITION("DSW2", 0x08, EQUALS, 0x00)  // 押注
+
+	PORT_START("JOY")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0xfc, IP_ACTIVE_HIGH, IPT_CUSTOM )         PORT_CONDITION("DSW2", 0x08, EQUALS, 0x08)  PORT_CUSTOM_MEMBER(igs_m027_state, kbd_ioport_r)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START1 )          PORT_CONDITION("DSW2", 0x08, EQUALS, 0x00)  // 开始
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )     PORT_CONDITION("DSW2", 0x08, EQUALS, 0x00)  // 上
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )   PORT_CONDITION("DSW2", 0x08, EQUALS, 0x00)  // 下
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )   PORT_CONDITION("DSW2", 0x08, EQUALS, 0x00)  // 左
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT )  PORT_CONDITION("DSW2", 0x08, EQUALS, 0x00)  // 右
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 )         PORT_CONDITION("DSW2", 0x08, EQUALS, 0x00)  // 摸／舍
+
+	PORT_START("PPIC")
+	PORT_BIT( 0x0b, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_CONDITION("DSW2", 0x08, EQUALS, 0x08) PORT_CHANGED_MEMBER(DEVICE_SELF, igs_m027_state, lhzb3sjb_io_select_0_w, 0)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_CONDITION("DSW2", 0x08, EQUALS, 0x00) PORT_WRITE_LINE_MEMBER(igs_m027_state, counter_w<0>) // coin or key-in
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_CONDITION("DSW2", 0x08, EQUALS, 0x00) PORT_WRITE_LINE_MEMBER(igs_m027_state, counter_w<1>) // hopper or key-out
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OUTPUT )                                            PORT_WRITE_LINE_DEVICE_MEMBER("hopper", hopper_device, motor_w)
+
+	PORT_MODIFY("DSW2")
+	PORT_DIPNAME( 0x04, 0x04, "Show Title" )               PORT_DIPLOCATION("SW2:3")          // 机种名称
+	PORT_DIPSETTING(    0x00, DEF_STR(Off) )                                                  // 无         (game title not shown)
+	PORT_DIPSETTING(    0x04, DEF_STR(On) )                                                   // 有
+	PORT_DIPNAME( 0x08, 0x08, "Control Panel" )            PORT_DIPLOCATION("SW2:4")          // 操作配线
+	PORT_DIPSETTING(    0x08, "Mahjong" )                                                     // 麻将
+	PORT_DIPSETTING(    0x00, DEF_STR(Joystick) )                                             // 娱乐
 INPUT_PORTS_END
 
 INPUT_PORTS_START( lhzb4 )
@@ -1732,6 +1768,11 @@ void igs_m027_state::counter_w(int state)
 	machine().bookkeeping().coin_counter_w(N, state);
 }
 
+INPUT_CHANGED_MEMBER(igs_m027_state::lhzb3sjb_io_select_0_w)
+{
+	m_io_select[0] = ~(u8(1) << bitswap<3>(newval, 3, 1, 0));
+}
+
 
 template <bool Xor>
 void igs_m027_state::m027_noppi(machine_config &config)
@@ -1843,11 +1884,21 @@ void igs_m027_state::lhzb3106c5m(machine_config &config)
 	m_maincpu->in_port().set(FUNC(igs_m027_state::lhzb3106c5m_gpio_r));
 }
 
-void igs_m027_state::lhzb3300c5(machine_config &config)
+void igs_m027_state::lhzb3sjb(machine_config &config)
 {
-	lhdmg(config);
+	m027_1ppi<true>(config);
 
-	m_maincpu->in_port().set(FUNC(igs_m027_state::slqz3_gpio_r));
+	m_maincpu->in_port().set(FUNC(igs_m027_state::slqz3_gpio_r)); // what lives here?
+
+	m_ppi[0]->in_pa_callback().set_ioport("TEST");
+	m_ppi[0]->in_pb_callback().set_ioport("JOY");
+	m_ppi[0]->out_pc_callback().set_ioport("PPIC");
+
+	m_igs017_igs031->in_pa_callback().set_ioport("DSW1");
+	m_igs017_igs031->in_pb_callback().set_ioport("DSW2");
+	m_igs017_igs031->in_pc_callback().set_constant(0xff);
+
+	HOPPER(config, m_hopper, attotime::from_msec(50));
 }
 
 void igs_m027_state::cjddz(machine_config &config)
@@ -2409,7 +2460,8 @@ ROM_END
 // It's clear this is a 027A replacement. The PCB still has the silk-screening for the pin numbers on the 027A but no QFP pads for it.
 // Only the QFP128 chip is there. With external program ROM removed and powered on, it only shows garbage.
 // In general the PCB seems a bit cheaply done if compared to other, almost bootleg-ish.
-ROM_START( lhzb3300c5 ) // sent as Long Hu Zheng Ba 3 Upgrade Version
+// 龙虎争霸Ⅲ  升级版 (Lóng Hǔ Zhēngbà III Shēngjí Bǎn)
+ROM_START( lhzb3sjb )
 	ROM_REGION( 0x04000, "maincpu", 0 )
 	// Internal ROM of IGS027A sub
 	ROM_LOAD( "lhzb3unk2_igs027a", 0x00000, 0x4000, CRC(c713e8c6) SHA1(b0c57173b693ae54bd820a24fede1d008f90dd28) )
@@ -3256,8 +3308,8 @@ GAME(  1999, qlgs,          0,        qlgs,         qlgs,          igs_m027_stat
 GAME(  1999, lhdmg,         0,        lhdmg,        lhdmg,         igs_m027_state, init_lhdmg,    ROT0, "IGS", "Long Hu Da Manguan (V102C3M)", 0 )
 GAME(  1999, lhdmgp,        0,        lhdmg,        lhdmg,         igs_m027_state, init_lhdmg,    ROT0, "IGS", "Long Hu Da Manguan Duizhan Jiaqiang Ban (V400C3M)", 0 )
 GAME(  1999, lhzb3,         0,        lhdmg,        lhzb3,         igs_m027_state, init_lhdmg,    ROT0, "IGS", "Long Hu Zhengba III (V400CN)", 0 )
-GAME(  1999, lhzb3106c5m,   lhzb3,    lhzb3106c5m,  lhzb3,         igs_m027_state, init_slqz3,    ROT0, "IGS", "Long Hu Zhengba III (V106C5M)", MACHINE_NOT_WORKING ) // needs I/O verifying
-GAME(  1999, lhzb3300c5,    lhzb3,    lhzb3300c5,   lhzb3,         igs_m027_state, init_slqz3,    ROT0, "IGS", "Long Hu Zhengba III (V300C5)", MACHINE_NOT_WORKING ) // needs I/O verifying
+GAME(  1999, lhzb3106c5m,   lhzb3,    lhzb3106c5m,  lhzb3,         igs_m027_state, init_slqz3,    ROT0, "IGS", "Long Hu Zhengba III (V106C5M)", 0 )
+GAME(  1999, lhzb3sjb,      0,        lhzb3sjb,     lhzb3sjb,      igs_m027_state, init_slqz3,    ROT0, "IGS", "Long Hu Zhengba III Shengji Ban (V300C5)", 0 )
 GAME(  2004, lhzb4,         0,        lhzb4,        lhzb4,         igs_m027_state, init_lhzb4,    ROT0, "IGS", "Long Hu Zhengba 4 (V104CN)", 0 )
 GAME(  2004, lhzb4dhb,      0,        lhzb4,        lhzb4,         igs_m027_state, init_lhzb4,    ROT0, "IGS", "Long Hu Zhengba 4 Dui Hua Ban (V203CN)", 0 )
 GAME(  1999, lthyp,         0,        lthyp,        lthyp,         igs_m027_state, init_lthyp,    ROT0, "IGS", "Long Teng Hu Yao Duizhan Jiaqiang Ban (S104CN)", MACHINE_NODEVICE_LAN )
