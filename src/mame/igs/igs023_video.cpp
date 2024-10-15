@@ -16,6 +16,7 @@ igs023_video_device::igs023_video_device(const machine_config &mconfig, const ch
 	, m_gfx_region(*this, DEVICE_SELF)
 	, m_adata(*this, "sprcol")
 	, m_bdata(*this, "sprmask")
+	, m_readspriteram_cb(*this, 0)
 {
 }
 
@@ -571,33 +572,39 @@ void igs023_video_device::draw_sprites(bitmap_ind16& spritebitmap, const rectang
            -------x xxxxxxxx Sprite height (1 pixel each)
 
 */
-void igs023_video_device::get_sprites(u16* ram)
+void igs023_video_device::get_sprites()
 {
 	m_sprite_ptr_pre = m_spritelist.get();
 
-	u16 *sprite_source = &ram[0];
-	const u16 *finish = &ram[0xa00 / 2];
 	const u16* sprite_zoomtable = &m_videoregs[0x1000 / 2];
 
-	while (sprite_source < finish)
+	int sprite_num = 0;
+
+	while (sprite_num < 0xa00/2)
 	{
-		if (!sprite_source[4]) break; /* is this right? */
+		const u16 spr4 = m_readspriteram_cb(sprite_num + 4);
+		if (!spr4) break; /* is this right? */
 
-		int xzom =                 (sprite_source[0] & 0x7800) >> 11;
-		const bool xgrow =         (sprite_source[0] & 0x8000) >> 15;
-		m_sprite_ptr_pre->x =      (sprite_source[0] & 0x03ff) - (sprite_source[0] & 0x0400);
+		const u16 spr0 = m_readspriteram_cb(sprite_num + 0);
+		int xzom =                 (spr0 & 0x7800) >> 11;
+		const bool xgrow =         (spr0 & 0x8000) >> 15;
+		m_sprite_ptr_pre->x =      (spr0 & 0x03ff) - (spr0 & 0x0400);
 
-		int yzom =                 (sprite_source[1] & 0x7800) >> 11;
-		const bool ygrow =         (sprite_source[1] & 0x8000) >> 15;
-		m_sprite_ptr_pre->y =      (sprite_source[1] & 0x01ff) - (sprite_source[1] & 0x0200);
+		const u16 spr1 = m_readspriteram_cb(sprite_num + 1);
+		int yzom =                 (spr1 & 0x7800) >> 11;
+		const bool ygrow =         (spr1 & 0x8000) >> 15;
+		m_sprite_ptr_pre->y =      (spr1 & 0x01ff) - (spr1 & 0x0200);
 
-		m_sprite_ptr_pre->flip =   (sprite_source[2] & 0x6000) >> 13;
-		m_sprite_ptr_pre->color =  (sprite_source[2] & 0x1f00) >> 8;
-		m_sprite_ptr_pre->pri =    (sprite_source[2] & 0x0080) >>  7;
-		m_sprite_ptr_pre->offs =  ((sprite_source[2] & 0x007f) << 16) | (sprite_source[3] & 0xffff);
+		const u16 spr2 = m_readspriteram_cb(sprite_num + 2);
+		const u16 spr3 = m_readspriteram_cb(sprite_num + 3);
 
-		m_sprite_ptr_pre->width =  (sprite_source[4] & 0x7e00) >> 9;
-		m_sprite_ptr_pre->height =  sprite_source[4] & 0x01ff;
+		m_sprite_ptr_pre->flip =   (spr2 & 0x6000) >> 13;
+		m_sprite_ptr_pre->color =  (spr2 & 0x1f00) >> 8;
+		m_sprite_ptr_pre->pri =    (spr2 & 0x0080) >>  7;
+		m_sprite_ptr_pre->offs =  ((spr2 & 0x007f) << 16) | (spr3 & 0xffff);
+
+		m_sprite_ptr_pre->width =  (spr4 & 0x7e00) >> 9;
+		m_sprite_ptr_pre->height =  spr4 & 0x01ff;
 
 		if (xgrow)
 		{
@@ -618,7 +625,7 @@ void igs023_video_device::get_sprites(u16* ram)
 		m_sprite_ptr_pre->xgrow = xgrow;
 		m_sprite_ptr_pre->ygrow = ygrow;
 		m_sprite_ptr_pre++;
-		sprite_source += 5;
+		sprite_num += 5;
 	}
 }
 

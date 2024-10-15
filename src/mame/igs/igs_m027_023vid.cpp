@@ -81,8 +81,13 @@ private:
 	TIMER_DEVICE_CALLBACK_MEMBER(interrupt);
 
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	u16 sprites_r(offs_t offset);
+	void screen_vblank(int state);
 
 	void m027_map(address_map &map) ATTR_COLD;
+
+	u32 unk0_r() { return 0xffffffff; }
+	u32 unk1_r() { return 0xffffffff; }
 };
 
 void igs_m027_023vid_state::machine_start()
@@ -96,6 +101,16 @@ void igs_m027_023vid_state::machine_start()
 u32 igs_m027_023vid_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	return m_video->screen_update(screen, bitmap, cliprect);
+}
+
+void igs_m027_023vid_state::screen_vblank(int state)
+{
+	// rising edge
+	if (state)
+	{
+		/* first 0xa00 of main ram = sprites, seems to be buffered, DMA? */
+		m_video->get_sprites();
+	}
 }
 
 
@@ -113,14 +128,19 @@ void igs_m027_023vid_state::m027_map(address_map &map)
 		
 	map(0x3890'0000, 0x3890'7fff).rw(m_video, FUNC(igs023_video_device::videoram_r), FUNC(igs023_video_device::videoram_w)).umask32(0xffffffff);
 
-	map(0x38a0'0000, 0x38a0'11ff).ram().w(m_palette, FUNC(palette_device::write32)).share("palette");
+	map(0x38a0'0000, 0x38a0'11ff).ram();// .w(m_palette, FUNC(palette_device::write32)).share("palette");
 	map(0x38b0'0000, 0x38b0'ffff).rw(m_video, FUNC(igs023_video_device::videoregs_r), FUNC(igs023_video_device::videoregs_w)).umask32(0xffffffff);
+
+	map(0x4000'0008, 0x4000'000b).nopw();
+
+	map(0x4800'0000, 0x4800'0003).r(FUNC(igs_m027_023vid_state::unk0_r));
+	map(0x4800'0004, 0x4800'0007).r(FUNC(igs_m027_023vid_state::unk1_r));
 
 	map(0x5000'0000, 0x5000'03ff).umask32(0x0000'00ff).w(FUNC(igs_m027_023vid_state::xor_table_w)); // uploads XOR table to external ROM here
 
 	map(0x5800'0000, 0x5800'0007).rw("ics", FUNC(ics2115_device::read), FUNC(ics2115_device::write)).umask32(0x00ff00ff);
 
-
+	map(0x7000'0108, 0x7000'010b).nopw();
 }
 
 
@@ -250,6 +270,22 @@ TIMER_DEVICE_CALLBACK_MEMBER(igs_m027_023vid_state::interrupt)
 }
 
 
+u16 igs_m027_023vid_state::sprites_r(offs_t offset)
+{
+	// there does seem to be a spritelist at the start of mainram like PGM, but the data ordering is
+	// uncertain, maybe this isn't where it comes from here
+	u16 retdat;
+
+	if (offset & 1)
+		retdat = (m_nvram[offset>>1] & 0xffff0000) >> 16;
+	else
+		retdat = (m_nvram[offset>>1] & 0x0000ffff) >> 0;
+
+	retdat = ((retdat & 0xff00) >> 8) | ((retdat & 0x00ff) << 8);
+
+	return retdat;
+}
+
 void igs_m027_023vid_state::m027_023vid(machine_config &config)
 {
 	IGS027A(config, m_maincpu, 33_MHz_XTAL);
@@ -259,11 +295,12 @@ void igs_m027_023vid_state::m027_023vid(machine_config &config)
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(60);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(1000));
 	m_screen->set_size(512, 256);
 	m_screen->set_visarea(0, 512-1, 0, 240-1);
 	m_screen->set_screen_update(FUNC(igs_m027_023vid_state::screen_update));
 	m_screen->set_palette("palette");
+	m_screen->screen_vblank().set(FUNC(igs_m027_023vid_state::screen_vblank));
 
 	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 0x1200/2);
 
@@ -272,6 +309,7 @@ void igs_m027_023vid_state::m027_023vid(machine_config &config)
 	// PGM video
 	IGS023_VIDEO(config, m_video, 0);
 	m_video->set_palette(m_palette);
+	m_video->read_spriteram_callback().set(FUNC(igs_m027_023vid_state::sprites_r));
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();

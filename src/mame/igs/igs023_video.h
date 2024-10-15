@@ -12,6 +12,8 @@ class igs023_video_device : public device_t, public device_gfx_interface
 public:
 	igs023_video_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
+	auto read_spriteram_callback() { return m_readspriteram_cb.bind(); }
+
 	u16 videoram_r(offs_t offset);
 	void videoram_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 	u16 videoregs_r(offs_t offset);
@@ -19,7 +21,7 @@ public:
 
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void get_sprites(u16* ram);
+	void get_sprites();
 
 protected:
 	virtual void device_start() override ATTR_COLD;
@@ -57,6 +59,8 @@ private:
 
 	std::unique_ptr<uint16_t []> m_videoregs;
 	std::unique_ptr<uint16_t []> m_videoram;
+
+	devcb_read16    m_readspriteram_cb;
 
 	inline void pgm_draw_pix(int xdrawpos, int pri, u16* dest, u8* destpri, const rectangle &cliprect, u16 srcdat);
 	inline void pgm_draw_pix_nopri(int xdrawpos, u16* dest, u8* destpri, const rectangle &cliprect, u16 srcdat);

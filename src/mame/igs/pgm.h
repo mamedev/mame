@@ -95,6 +95,7 @@ private:
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void screen_vblank(int state);
 	TIMER_DEVICE_CALLBACK_MEMBER(interrupt);
+	u16 sprites_r(offs_t offset);
 
 	void pgm_basic_mem(address_map &map) ATTR_COLD;
 	void pgm_z80_io(address_map &map) ATTR_COLD;

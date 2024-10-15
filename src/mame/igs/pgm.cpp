@@ -448,6 +448,33 @@ void pgm_state::machine_reset()
 	m_soundcpu->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
 }
 
+u16 pgm_state::sprites_r(offs_t offset)
+{
+	return m_mainram[offset];
+}
+
+void pgm_state::video_start()
+{
+}
+
+u32 pgm_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	return m_video->screen_update(screen, bitmap, cliprect);
+}
+
+void pgm_state::screen_vblank(int state)
+{
+	// rising edge
+	if (state)
+	{
+		/* first 0xa00 of main ram = sprites, seems to be buffered, DMA? */
+		m_video->get_sprites();
+
+		// vblank start interrupt
+		m_maincpu->set_input_line(M68K_IRQ_6, HOLD_LINE);
+	}
+}
+
 void pgm_state::pgmbase(machine_config &config)
 {
 	/* basic machine hardware */
@@ -481,6 +508,7 @@ void pgm_state::pgmbase(machine_config &config)
 
 	IGS023_VIDEO(config, m_video, 0);
 	m_video->set_palette(m_palette);
+	m_video->read_spriteram_callback().set(FUNC(pgm_state::sprites_r));
 
 	ICS2115(config, m_ics, 33.8688_MHz_XTAL);
 	m_ics->irq().set_inputline("soundcpu", 0);
