@@ -29,10 +29,8 @@
  TODO:
  * I/O for remaining games
  * Coin lockout (zhongguo displays a coin error on unexpected coins)
- * Verify I/O hasn't changed between versions of cjddz (current based on V215CN)
  * Verify I/O hasn't changed between versions of lhzb3 (current based on V400CN).
   (once the other versions work)
- * Verify I/O hasn't changed between versions of lhzb4 (current based on V104CN)
 */
 
 #include "emu.h"
@@ -129,6 +127,7 @@ public:
 	void init_tripslot() ATTR_COLD;
 	void init_extradrw() ATTR_COLD;
 	void init_chessc2() ATTR_COLD;
+	void init_cjddzlf() ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -2365,8 +2364,7 @@ ROM_END
 ROM_START( lhzb3unk )
 	ROM_REGION( 0x04000, "maincpu", 0 )
 	// Internal ROM of IGS027A type G ARM based MCU
-	// stickered u10. Doesn't seem to be compatible with the lhzb3 dump. Needs trojan.
-	ROM_LOAD( "u10_027a.bin", 0x00000, 0x4000, NO_DUMP )
+	ROM_LOAD( "u10_027a.bin", 0x00000, 0x4000, CRC(19df9d4f) SHA1(d7e5be300220674ea6244242e06fb1929cbbb54f) ) // u10 is the sticker, not the location
 
 	ROM_REGION32_LE( 0x200000, "user1", 0 ) // external ARM data / prg
 	ROM_LOAD( "106c5n.u27", 0x000000, 0x200000, CRC(86031487) SHA1(d7bfe102ef4248e692d653edd479392ed7e20c28) ) // 11xxxxxxxxxxxxxxxxxxx = 0xFF
@@ -2381,14 +2379,15 @@ ROM_START( lhzb3unk )
 	ROM_LOAD( "igs_s2402.u26", 0x000000, 0x200000, CRC(84bc2f3e) SHA1(49dcf5eaa39accd5c6bf01782fd4221298cb43ed) ) // 1ST AND 2ND HALF IDENTICAL
 ROM_END
 
-// This board is a bit different to the others. Main osc is 22.1184MHz
+// This board is a bit different to the others. Main OSC is 22.1184MHz.
 // Everything is the same except no IGS027A. Instead there is a QFP128 chip in the place where the 027A would be.
 // It's clear this is a 027A replacement. The PCB still has the silk-screening for the pin numbers on the 027A but no QFP pads for it.
 // Only the QFP128 chip is there. With external program ROM removed and powered on, it only shows garbage.
+// In general the PCB seems a bit cheaply done if compared to other, almost bootleg-ish.
 ROM_START( lhzb3unk2 ) // sent as Long Hu Zheng Ba 3 Upgrade Version
 	ROM_REGION( 0x04000, "maincpu", 0 )
-	// Internal ROM of IGS027A sub (if there is one)
-	ROM_LOAD( "lhzb3unk2_igs027a", 0x00000, 0x4000, NO_DUMP )
+	// Internal ROM of IGS027A sub
+	ROM_LOAD( "lhzb3unk2_igs027a", 0x00000, 0x4000, CRC(c713e8c6) SHA1(b0c57173b693ae54bd820a24fede1d008f90dd28) )
 
 	ROM_REGION32_LE( 0x200000, "user1", 0 ) // external ARM data / prg
 	ROM_LOAD( "igs_p2401.u10", 0x000000, 0x80000, CRC(47d26b39) SHA1(85016799ee9cd2ccb905262a9ec7f0dee0d6537e) ) // 11xxxxxxxxxxxxxxxxxxx = 0xFF
@@ -2901,7 +2900,7 @@ ROM_END
 ROM_START( cjddzlf )
 	ROM_REGION( 0x04000, "maincpu", 0 )
 	// Internal ROM of IGS027A ARM based MCU
-	ROM_LOAD( "cjddz215cn_igs027a", 0x00000, 0x4000, CRC(124f4bee) SHA1(bf9785516ef36290c2a7bac307bb2d849f2045ae) ) // unknown sticker
+	ROM_LOAD( "j1_igs027a", 0x00000, 0x4000, CRC(9f6e0207) SHA1(8c3dd1fdb847353060b55108431b8ef1649ed266) )
 
 	ROM_REGION32_LE( 0x80000, "user1", 0 ) // external ARM data / prg
 	ROM_LOAD( "igs_l2405.u17", 0x000000, 0x80000, CRC(ec310408) SHA1(acf7998017b86fff8b515f239459fff0c1eb43b6) )
@@ -3209,6 +3208,14 @@ void igs_m027_state::init_chessc2()
 	ROM2[(0x168/4)] ^= 0x10000000;
 }
 
+void igs_m027_state::init_cjddzlf()
+{
+	cjddzlf_decrypt(machine());
+
+	m_igs017_igs031->sdwx_gfx_decrypt();
+	m_igs017_igs031->tarzan_decrypt_sprites(0x400000, 0x400000);
+}
+
 } // anonymous namespace
 
 
@@ -3224,6 +3231,8 @@ GAME(  1999, qlgs,          0,        qlgs,         qlgs,          igs_m027_stat
 GAME(  1999, lhdmg,         0,        lhdmg,        lhdmg,         igs_m027_state, init_lhdmg,    ROT0, "IGS", "Long Hu Da Manguan (V102C3M)", 0 )
 GAME(  1999, lhdmgp,        0,        lhdmg,        lhdmg,         igs_m027_state, init_lhdmg,    ROT0, "IGS", "Long Hu Da Manguan Duizhan Jiaqiang Ban (V400C3M)", 0 )
 GAME(  1999, lhzb3,         0,        lhdmg,        lhzb3,         igs_m027_state, init_lhdmg,    ROT0, "IGS", "Long Hu Zhengba III (V400CN)", 0 )
+GAME(  1999, lhzb3unk,      lhzb3,    lhdmg,        lhzb3,         igs_m027_state, init_slqz3,    ROT0, "IGS", "Long Hu Zhengba III (unknown version, set 1)", MACHINE_NOT_WORKING ) // decryption masks not totally correct?
+GAME(  1999, lhzb3unk2,     lhzb3,    lhdmg,        lhzb3,         igs_m027_state, init_slqz3,    ROT0, "IGS", "Long Hu Zhengba III (unknown version, set 2)", MACHINE_NOT_WORKING ) // decryption masks not totally correct?
 GAME(  2004, lhzb4,         0,        lhzb4,        lhzb4,         igs_m027_state, init_lhzb4,    ROT0, "IGS", "Long Hu Zhengba 4 (V104CN)", 0 )
 GAME(  2004, lhzb4dhb,      0,        lhzb4,        lhzb4,         igs_m027_state, init_lhzb4,    ROT0, "IGS", "Long Hu Zhengba 4 Dui Hua Ban (V203CN)", 0 )
 GAME(  1999, lthyp,         0,        lthyp,        lthyp,         igs_m027_state, init_lthyp,    ROT0, "IGS", "Long Teng Hu Yao Duizhan Jiaqiang Ban (S104CN)", MACHINE_NODEVICE_LAN )
@@ -3240,6 +3249,7 @@ GAME(  200?, cjddz,         0,        cjddz,        cjddz,         igs_m027_stat
 GAME(  200?, cjddz217cn,    cjddz,    cjddz,        cjddz,         igs_m027_state, init_cjddz,    ROT0, "IGS", "Chaoji Dou Dizhu (V217CN)", 0 )
 GAME(  200?, cjddz215cn,    cjddz,    cjddz,        cjddz,         igs_m027_state, init_cjddz,    ROT0, "IGS", "Chaoji Dou Dizhu (V215CN)", 0 )
 GAME(  200?, cjddzp,        0,        cjddz,        cjddzp,        igs_m027_state, init_cjddzp,   ROT0, "IGS", "Chaoji Dou Dizhu Jiaqiang Ban (S300CN)", MACHINE_NODEVICE_LAN )
+GAME(  200?, cjddzlf,       0,        cjddz,        cjddz,         igs_m027_state, init_cjddzlf,  ROT0, "IGS", "Chaoji Dou Dizhu Liang Fu Pai (V109CN)", MACHINE_NOT_WORKING ) // needs I/O correcting
 GAMEL( 2007, tripslot,      0,        tripslot,     tripslot,      igs_m027_state, init_tripslot, ROT0, "IGS", "Triple Slot (V200VE)", 0, layout_tripslot ) // 2007 date in internal ROM at least, could be later, default settings password is all 'start 1'
 // this has a 2nd 8255
 GAME(  2001, extradrw,      0,        extradrw,     base,          igs_m027_state, init_extradrw, ROT0, "IGS", "Extra Draw (V100VE)", MACHINE_NOT_WORKING )
@@ -3255,8 +3265,5 @@ GAME(  200?, luckycrs,      0,        m027_1ppi<false>, base,     igs_m027_state
 GAME(  2003, amazoni2,      0,        m027_1ppi<false>, base,     igs_m027_state, init_amazoni2, ROT0, "IGS", "Amazonia King II (V202BR)", MACHINE_NOT_WORKING )
 GAME(  2002, sdwx,          0,        m027_1ppi<false>, base,     igs_m027_state, init_sdwx,     ROT0, "IGS", "Sheng Dan Wu Xian", MACHINE_NOT_WORKING ) // aka Christmas 5 Line? (or Amazonia King II, shares roms at least?)
 GAME(  200?, klxyj,         0,        m027_1ppi<false>, base,     igs_m027_state, init_klxyj,    ROT0, "IGS", "Kuai Le Xi You Ji", MACHINE_NOT_WORKING )
-GAME(  1999, lhzb3unk,      lhzb3,    m027_1ppi<false>, base,     igs_m027_state, empty_init,    ROT0, "IGS", "Long Hu Zhengba III (unknown version, set 1)", MACHINE_NOT_WORKING )
-GAME(  1999, lhzb3unk2,     lhzb3,    m027_1ppi<false>, base,     igs_m027_state, empty_init,    ROT0, "IGS", "Long Hu Zhengba III (unknown version, set 2)", MACHINE_NOT_WORKING )
-GAME(  200?, cjddzlf,       0,        m027_1ppi<false>, base,     igs_m027_state, empty_init,    ROT0, "IGS", "Chaoji Dou Dizhu Liang Fu Pai", MACHINE_NOT_WORKING )
 // these have an IGS025 protection device instead of the 8255
 GAME(  200?, gonefsh2,      0,        m027_noppi<false>,base,     igs_m027_state, init_gonefsh2, ROT0, "IGS", "Gone Fishing 2", MACHINE_NOT_WORKING )
