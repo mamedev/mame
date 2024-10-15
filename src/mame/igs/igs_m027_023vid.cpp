@@ -76,6 +76,8 @@ private:
 
 	void xor_table_w(offs_t offset, u8 data);
 
+	TIMER_DEVICE_CALLBACK_MEMBER(interrupt);
+
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void m027_map(address_map &map) ATTR_COLD;
@@ -106,14 +108,11 @@ void igs_m027_023vid_state::m027_map(address_map &map)
 	map(0x0800'0000, 0x0807'ffff).r(FUNC(igs_m027_023vid_state::external_rom_r)); // Game ROM
 
 	map(0x1800'0000, 0x1800'7fff).ram().mirror(0x0000f'8000).share(m_nvram);
-
-	
+		
 	map(0x3890'0000, 0x3890'7fff).rw(m_video, FUNC(igs023_video_device::videoram_r), FUNC(igs023_video_device::videoram_w)).umask32(0xffffffff);
 
-	map(0x38a0'0000, 0x38a0'0fff).ram();
-	map(0x38a0'1000, 0x38a0'1fff).ram();
+	map(0x38a0'0000, 0x38a0'11ff).ram().w(m_palette, FUNC(palette_device::write32)).share("palette");
 	map(0x38b0'0000, 0x38b0'ffff).rw(m_video, FUNC(igs023_video_device::videoregs_r), FUNC(igs023_video_device::videoregs_w)).umask32(0xffffffff);
-
 
 	map(0x5000'0000, 0x5000'03ff).umask32(0x0000'00ff).w(FUNC(igs_m027_023vid_state::xor_table_w)); // uploads XOR table to external ROM here
 }
@@ -232,6 +231,19 @@ void igs_m027_023vid_state::xor_table_w(offs_t offset, u8 data)
 }
 
 
+TIMER_DEVICE_CALLBACK_MEMBER(igs_m027_023vid_state::interrupt)
+{
+	int scanline = param;
+
+	switch (scanline)
+	{
+	case 0:
+		m_maincpu->pulse_input_line(arm7_cpu_device::ARM7_FIRQ_LINE, m_maincpu->minimum_quantum_time()); // vbl?
+		break;
+	}
+}
+
+
 void igs_m027_023vid_state::m027_023vid(machine_config &config)
 {
 	IGS027A(config, m_maincpu, 33_MHz_XTAL);
@@ -248,6 +260,8 @@ void igs_m027_023vid_state::m027_023vid(machine_config &config)
 	m_screen->set_palette("palette");
 
 	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 0x1200/2);
+
+	TIMER(config, "scantimer").configure_scanline(FUNC(igs_m027_023vid_state::interrupt), "screen", 0, 1);
 
 	// PGM video
 	IGS023_VIDEO(config, m_video, 0);
@@ -292,7 +306,7 @@ ROM_END
 
 void igs_m027_023vid_state::init_mxsqy()
 {
-	luckycrs_decrypt(machine());
+	mxsqy_decrypt(machine());
 }
 
 } // anonymous namespace
@@ -304,4 +318,5 @@ void igs_m027_023vid_state::init_mxsqy()
 
 ***************************************************************************/
 
-GAME( 200?, mxsqy, 0, m027_023vid, base, igs_m027_023vid_state, init_mxsqy, ROT0, "IGS", "Ming Xing San Que Yi (China)", MACHINE_IS_SKELETON )
+// internal ROM is 2003
+GAME( 2003, mxsqy, 0, m027_023vid, base, igs_m027_023vid_state, init_mxsqy, ROT0, "IGS", "Ming Xing San Que Yi (China)", MACHINE_IS_SKELETON )
