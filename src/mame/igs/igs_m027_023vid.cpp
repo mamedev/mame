@@ -126,7 +126,9 @@ void igs_m027_023vid_state::m027_map(address_map &map)
 {
 	map(0x0800'0000, 0x0807'ffff).r(FUNC(igs_m027_023vid_state::external_rom_r)); // Game ROM
 
-	map(0x1800'0000, 0x1800'7fff).ram().mirror(0x0000f'8000).share(m_nvram);
+	map(0x1800'0000, 0x1800'7fff).ram().share(m_nvram);
+
+	map(0x2800'0000, 0x2800'0fff).ram();
 
 	map(0x3890'0000, 0x3890'7fff).rw(m_video, FUNC(igs023_video_device::videoram_r), FUNC(igs023_video_device::videoram_w)).umask32(0xffffffff);
 
@@ -279,12 +281,12 @@ TIMER_DEVICE_CALLBACK_MEMBER(igs_m027_023vid_state::interrupt)
 
 u16 igs_m027_023vid_state::sprites_r(offs_t offset)
 {
-	// there does seem to be a spritelist at the start of mainram like PGM, but the data ordering is
-	// uncertain, maybe this isn't where it comes from here
+	// there does seem to be a spritelist at the start of mainram like PGM
+	// it is also copied to a secondary RAM area, which seems to be our datasource in this case
 
 	address_space& mem = m_maincpu->space(AS_PROGRAM);
-	u16 ram = mem.read_word(0x18000000 + 8 + offset * 2);
-	return ram;
+	u16 sprdata = mem.read_word(0x28000000 + offset * 2);
+	return sprdata;
 }
 
 
@@ -306,7 +308,7 @@ void igs_m027_023vid_state::m027_023vid(machine_config &config)
 	m_screen->set_refresh_hz(60);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(1000));
 	m_screen->set_size(512, 256);
-	m_screen->set_visarea(0, 512-1, 0, 240-1);
+	m_screen->set_visarea(0, 448-1, 0, 224-1);
 	m_screen->set_screen_update(FUNC(igs_m027_023vid_state::screen_update));
 	m_screen->set_palette("palette");
 	m_screen->screen_vblank().set(FUNC(igs_m027_023vid_state::screen_vblank));
