@@ -419,7 +419,7 @@ INPUT_PORTS_END
 INPUT_PORTS_START( mahjong_test )
 	PORT_START("TEST")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_TILT )           PORT_NAME("Hopper Switch")  // 哈巴
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE1 )       PORT_NAME("Clear")          // 清除
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE1 )       PORT_NAME("Show Credits")   // 清除    (hold to show credits/bets/wins when hidden)
 	PORT_SERVICE_NO_TOGGLE( 0x04, IP_ACTIVE_LOW )                                   // 测试
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK )                                // 查帐
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN1 )                                      // 投币
@@ -669,7 +669,7 @@ INPUT_PORTS_START( qlgs )
 	PORT_SERVICE_NO_TOGGLE( 0x04, IP_ACTIVE_LOW )                                                                                      // 測試
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK )                                                                                   // 査帳
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )               PORT_CONDITION("DSW2", 0x01, EQUALS, 0x01)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE1 )              PORT_CONDITION("DSW2", 0x01, EQUALS, 0x01)  PORT_NAME("Clear")          // 清除
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE1 )              PORT_CONDITION("DSW2", 0x01, EQUALS, 0x01)  PORT_NAME("Show Credits")   // 清除  (hold to show credits/bets/wins when hidden)
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN1 )                 PORT_CONDITION("DSW2", 0x01, EQUALS, 0x00)                              // 投幣
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )               PORT_CONDITION("DSW2", 0x01, EQUALS, 0x00)
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )                                                                                   // 上
@@ -693,7 +693,7 @@ INPUT_PORTS_START( qlgs )
 	PORT_BIT( 0x00040, IP_ACTIVE_LOW, IPT_UNKNOWN )            PORT_CONDITION("DSW2", 0x01, EQUALS, 0x00)
 	PORT_BIT( 0x0ff80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x10000, IP_ACTIVE_LOW, IPT_UNKNOWN )            PORT_CONDITION("DSW2", 0x01, EQUALS, 0x01)
-	PORT_BIT( 0x10000, IP_ACTIVE_LOW, IPT_SERVICE1 )           PORT_CONDITION("DSW2", 0x01, EQUALS, 0x00)  PORT_NAME("Clear")          // 清除
+	PORT_BIT( 0x10000, IP_ACTIVE_LOW, IPT_SERVICE1 )           PORT_CONDITION("DSW2", 0x01, EQUALS, 0x00)  PORT_NAME("Show Credits")   // 清除  (hold to show credits/bets/wins when hidden)
 	PORT_BIT( 0x20000, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT )                                                                              // 退幣
 	PORT_BIT( 0xc0000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
