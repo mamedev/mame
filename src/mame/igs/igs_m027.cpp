@@ -94,6 +94,8 @@ public:
 	void jking02(machine_config &config) ATTR_COLD;
 	void qlgs(machine_config &config) ATTR_COLD;
 	void lhdmg(machine_config &config) ATTR_COLD;
+	void lhzb3106c5m(machine_config &config) ATTR_COLD;
+	void lhzb3300c5(machine_config &config) ATTR_COLD;
 	void cjddz(machine_config &config) ATTR_COLD;
 	void lhzb4(machine_config &config) ATTR_COLD;
 	void lthyp(machine_config &config) ATTR_COLD;
@@ -177,6 +179,7 @@ private:
 
 	u32 slqz3_gpio_r();
 	u32 lhdmg_gpio_r();
+	u32 lhzb3106c5m_gpio_r();
 	void unk2_w(u32 data);
 
 	TIMER_DEVICE_CALLBACK_MEMBER(interrupt);
@@ -1707,6 +1710,16 @@ u32 igs_m027_state::lhdmg_gpio_r()
 		return 0xfffff ^ 0x80000;
 }
 
+u32 igs_m027_state::lhzb3106c5m_gpio_r()
+{
+	logerror("%s: lhzb3106c5m_gpio_r\n", machine().describe_context());
+
+	if (m_io_select[1] & 1)
+		return 0xfffff;
+	else
+		return 0xfffff ^ 0x8000;
+}
+
 
 ioport_value igs_m027_state::kbd_ioport_r()
 {
@@ -1821,6 +1834,20 @@ void igs_m027_state::lhdmg(machine_config &config)
 	m_igs017_igs031->in_pc_callback().set(NAME((&igs_m027_state::kbd_r<0, 3, 0>)));
 
 	HOPPER(config, m_hopper, attotime::from_msec(50));
+}
+
+void igs_m027_state::lhzb3106c5m(machine_config &config)
+{
+	lhdmg(config);
+
+	m_maincpu->in_port().set(FUNC(igs_m027_state::lhzb3106c5m_gpio_r));
+}
+
+void igs_m027_state::lhzb3300c5(machine_config &config)
+{
+	lhdmg(config);
+
+	m_maincpu->in_port().set(FUNC(igs_m027_state::slqz3_gpio_r));
 }
 
 void igs_m027_state::cjddz(machine_config &config)
@@ -2359,7 +2386,7 @@ ROM_START( lhzb3 )
 	ROM_LOAD( "s2402.u14", 0x00000, 0x100000, CRC(56083fe2) SHA1(62afd651809bf5e639bfda6e5579dbf4b903b664) )
 ROM_END
 
-ROM_START( lhzb3unk )
+ROM_START( lhzb3106c5m )
 	ROM_REGION( 0x04000, "maincpu", 0 )
 	// Internal ROM of IGS027A type G ARM based MCU
 	ROM_LOAD( "u10_027a.bin", 0x00000, 0x4000, CRC(19df9d4f) SHA1(d7e5be300220674ea6244242e06fb1929cbbb54f) ) // u10 is the sticker, not the location
@@ -2382,13 +2409,13 @@ ROM_END
 // It's clear this is a 027A replacement. The PCB still has the silk-screening for the pin numbers on the 027A but no QFP pads for it.
 // Only the QFP128 chip is there. With external program ROM removed and powered on, it only shows garbage.
 // In general the PCB seems a bit cheaply done if compared to other, almost bootleg-ish.
-ROM_START( lhzb3unk2 ) // sent as Long Hu Zheng Ba 3 Upgrade Version
+ROM_START( lhzb3300c5 ) // sent as Long Hu Zheng Ba 3 Upgrade Version
 	ROM_REGION( 0x04000, "maincpu", 0 )
 	// Internal ROM of IGS027A sub
 	ROM_LOAD( "lhzb3unk2_igs027a", 0x00000, 0x4000, CRC(c713e8c6) SHA1(b0c57173b693ae54bd820a24fede1d008f90dd28) )
 
-	ROM_REGION32_LE( 0x200000, "user1", 0 ) // external ARM data / prg
-	ROM_LOAD( "igs_p2401.u10", 0x000000, 0x80000, CRC(47d26b39) SHA1(85016799ee9cd2ccb905262a9ec7f0dee0d6537e) ) // 11xxxxxxxxxxxxxxxxxxx = 0xFF
+	ROM_REGION32_LE( 0x80000, "user1", 0 ) // external ARM data / prg
+	ROM_LOAD( "igs_p2401.u10", 0x00000, 0x80000, CRC(47d26b39) SHA1(85016799ee9cd2ccb905262a9ec7f0dee0d6537e) )
 
 	ROM_REGION( 0x080000, "igs017_igs031:tilemaps", 0 )
 	ROM_LOAD( "igs_m2403.u9",  0x000000, 0x080000, CRC(a82398a9) SHA1(4d2987f57096b7f24ce6571ed3be6dcb33bce88d) )
@@ -3229,8 +3256,8 @@ GAME(  1999, qlgs,          0,        qlgs,         qlgs,          igs_m027_stat
 GAME(  1999, lhdmg,         0,        lhdmg,        lhdmg,         igs_m027_state, init_lhdmg,    ROT0, "IGS", "Long Hu Da Manguan (V102C3M)", 0 )
 GAME(  1999, lhdmgp,        0,        lhdmg,        lhdmg,         igs_m027_state, init_lhdmg,    ROT0, "IGS", "Long Hu Da Manguan Duizhan Jiaqiang Ban (V400C3M)", 0 )
 GAME(  1999, lhzb3,         0,        lhdmg,        lhzb3,         igs_m027_state, init_lhdmg,    ROT0, "IGS", "Long Hu Zhengba III (V400CN)", 0 )
-GAME(  1999, lhzb3unk,      lhzb3,    lhdmg,        lhzb3,         igs_m027_state, init_slqz3,    ROT0, "IGS", "Long Hu Zhengba III (unknown version, set 1)", MACHINE_NOT_WORKING ) // decryption masks not totally correct?
-GAME(  1999, lhzb3unk2,     lhzb3,    lhdmg,        lhzb3,         igs_m027_state, init_slqz3,    ROT0, "IGS", "Long Hu Zhengba III (unknown version, set 2)", MACHINE_NOT_WORKING ) // decryption masks not totally correct?
+GAME(  1999, lhzb3106c5m,   lhzb3,    lhzb3106c5m,  lhzb3,         igs_m027_state, init_slqz3,    ROT0, "IGS", "Long Hu Zhengba III (V106C5M)", MACHINE_NOT_WORKING ) // needs I/O verifying
+GAME(  1999, lhzb3300c5,    lhzb3,    lhzb3300c5,   lhzb3,         igs_m027_state, init_slqz3,    ROT0, "IGS", "Long Hu Zhengba III (V300C5)", MACHINE_NOT_WORKING ) // needs I/O verifying
 GAME(  2004, lhzb4,         0,        lhzb4,        lhzb4,         igs_m027_state, init_lhzb4,    ROT0, "IGS", "Long Hu Zhengba 4 (V104CN)", 0 )
 GAME(  2004, lhzb4dhb,      0,        lhzb4,        lhzb4,         igs_m027_state, init_lhzb4,    ROT0, "IGS", "Long Hu Zhengba 4 Dui Hua Ban (V203CN)", 0 )
 GAME(  1999, lthyp,         0,        lthyp,        lthyp,         igs_m027_state, init_lthyp,    ROT0, "IGS", "Long Teng Hu Yao Duizhan Jiaqiang Ban (S104CN)", MACHINE_NODEVICE_LAN )
