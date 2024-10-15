@@ -86,6 +86,8 @@ private:
 
 	void m027_map(address_map &map) ATTR_COLD;
 
+	u32 gpio_r();
+
 	u32 unk0_r() { return 0xffffffff; }
 	u32 unk1_r() { return 0xffffffff; }
 };
@@ -128,7 +130,7 @@ void igs_m027_023vid_state::m027_map(address_map &map)
 
 	map(0x3890'0000, 0x3890'7fff).rw(m_video, FUNC(igs023_video_device::videoram_r), FUNC(igs023_video_device::videoram_w)).umask32(0xffffffff);
 
-	map(0x38a0'0000, 0x38a0'11ff).ram();// .w(m_palette, FUNC(palette_device::write32)).share("palette");
+	map(0x38a0'0000, 0x38a0'11ff).ram().w(m_palette, FUNC(palette_device::write32)).share("palette");
 	map(0x38b0'0000, 0x38b0'ffff).rw(m_video, FUNC(igs023_video_device::videoregs_r), FUNC(igs023_video_device::videoregs_w)).umask32(0xffffffff);
 
 	map(0x4000'0008, 0x4000'000b).nopw();
@@ -266,6 +268,11 @@ TIMER_DEVICE_CALLBACK_MEMBER(igs_m027_023vid_state::interrupt)
 	case 0:
 		m_maincpu->pulse_input_line(arm7_cpu_device::ARM7_FIRQ_LINE, m_maincpu->minimum_quantum_time()); // vbl?
 		break;
+
+	case 128: // unknown source, needed for palette uploads
+		m_maincpu->pulse_input_line(arm7_cpu_device::ARM7_IRQ_LINE, m_maincpu->minimum_quantum_time());
+		break;
+
 	}
 }
 
@@ -274,15 +281,24 @@ u16 igs_m027_023vid_state::sprites_r(offs_t offset)
 {
 	// there does seem to be a spritelist at the start of mainram like PGM, but the data ordering is
 	// uncertain, maybe this isn't where it comes from here
+
 	address_space& mem = m_maincpu->space(AS_PROGRAM);
 	u16 ram = mem.read_word(0x18000000 + 8 + offset * 2);
 	return ram;
 }
 
+
+u32 igs_m027_023vid_state::gpio_r()
+{
+	return machine().rand();
+}
+
+
 void igs_m027_023vid_state::m027_023vid(machine_config &config)
 {
 	IGS027A(config, m_maincpu, 33_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &igs_m027_023vid_state::m027_map);
+	m_maincpu->in_port().set(FUNC(igs_m027_023vid_state::gpio_r));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
@@ -308,7 +324,7 @@ void igs_m027_023vid_state::m027_023vid(machine_config &config)
 	SPEAKER(config, "mono").front_center();
 
 	ICS2115(config, m_ics, 33.8688_MHz_XTAL);
-	m_ics->irq().set_inputline(m_maincpu, arm7_cpu_device::ARM7_IRQ_LINE); // wrong
+	//m_ics->irq().set_inputline(m_maincpu, arm7_cpu_device::ARM7_IRQ_LINE); // wrong (maybe doesn't trigger an IRQ)
 	m_ics->add_route(ALL_OUTPUTS, "mono", 5.0);
 }
 
