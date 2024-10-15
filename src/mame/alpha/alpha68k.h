@@ -44,6 +44,11 @@ public:
 		m_spriteram(*this, "spriteram"),
 		m_videoram(*this, "videoram"),
 		m_in(*this, "IN%u", 0U),
+		m_p1(*this, "P1"),
+		m_p2(*this, "P2"),
+		m_system(*this, "SYSTEM"),
+		m_dsw1(*this, "DSW1"),
+		m_dsw2(*this, "DSW2"),
 		m_audiobank(*this, "audiobank")
 	{ }
 
@@ -62,6 +67,7 @@ protected:
 	optional_shared_ptr<u16> m_videoram;
 
 	optional_ioport_array<7> m_in;
+	optional_ioport m_p1, m_p2, m_system, m_dsw1, m_dsw2;
 	optional_memory_bank m_audiobank;
 
 	int           m_flipscreen = 0;

@@ -91,6 +91,7 @@ public:
 		m_screen(*this, "screen"),
 		m_alpha_8201(*this, "alpha_8201"),
 		m_mainlatch(*this, "mainlatch"),
+		m_in(*this, "IN%u", 0U),
 		m_bg_videoram(*this, "bg_videoram"),
 		m_fg_videoram(*this, "fg_videoram", 0x800, ENDIANNESS_BIG),
 		m_spriteram(*this, "spriteram%u", 1U),
@@ -112,6 +113,7 @@ private:
 	required_device<screen_device> m_screen;
 	required_device<alpha_8201_device> m_alpha_8201;
 	required_device<ls259_device> m_mainlatch;
+	required_ioport_array<2> m_in;
 
 	// memory pointers
 	required_shared_ptr<uint16_t> m_bg_videoram;
@@ -465,8 +467,8 @@ void splendor_state::splndrbt_map(address_map &map)
 	map.unmap_value_high();
 	map(0x000000, 0x00ffff).rom();
 	map(0x040000, 0x040fff).ram();
-	map(0x080000, 0x080001).portr("IN0");
-	map(0x0c0000, 0x0c0001).portr("IN1");
+	map(0x080000, 0x080001).portr(m_in[0]);
+	map(0x0c0000, 0x0c0001).portr(m_in[1]);
 	map(0x0c0000, 0x0c0000).select(0x020000).w(FUNC(splendor_state::bgcolor_w));
 	map(0x0c0001, 0x0c0001).select(0x03c000).lw8(NAME([this] (offs_t offset, u8 data) { m_mainlatch->write_a3(offset >> 14); }));
 	map(0x100000, 0x100001).w(FUNC(splendor_state::bg_scrollx_w));

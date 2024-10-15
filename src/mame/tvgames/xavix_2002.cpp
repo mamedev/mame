@@ -591,11 +591,14 @@ CONS( 2007, domstepc, 0, 0, xavix2002_i2c_jmat, xavixp, xavix_i2c_jmat_state, in
 
 // some DIS games run on XaviX 2 instead, see xavix2.cpp for Domyos Fitness Adventure and Domyos Bike Concept
 
+// Let's!TVプレイ 魔法戦隊マジレンジャー マジマットでダンス＆バトル 
 CONS( 2005, mrangbat, 0, 0, xavix2002_i2c_mrangbat, mrangbat,   xavix_i2c_state, init_xavix, "Bandai / SSD Company LTD", "Let's! TV Play Mahou Taiketsu Magiranger - Magimat de Dance & Battle (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 
+// エキサイトスポーツ　テニス×フィットネス
 CONS( 2004, epo_tfit, 0, 0, xavix2002_i2c_24c04,    epo_tfit,   xavix_i2c_state, init_xavix, "Epoch / SSD Company LTD",  "Excite Sports Tennis x Fitness (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND ) // Epoch Tennis and Fitness has 24LC04
 
 // TODO: does it have an SEEPROM? why does it hang? full title?
+// それいけトーマス ソドー島のなかまたち
 CONS( 2005, tmy_thom, 0, 0, xavix2002_i2c_24c04,    xavix_i2c,  xavix_i2c_state, init_xavix, "Tomy / SSD Company LTD",   "Thomas and Friends (Tomy)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 
 // has HT24LC16

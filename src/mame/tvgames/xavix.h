@@ -85,6 +85,7 @@ public:
 		m_mouse0y(*this, "MOUSE0Y"),
 		m_mouse1x(*this, "MOUSE1X"),
 		m_mouse1y(*this, "MOUSE1Y"),
+		m_lightgun(*this, "GUN1_%u", 0U),
 		m_maincpu(*this, "maincpu"),
 		m_nvram(*this, "nvram"),
 		m_screen(*this, "screen"),
@@ -133,6 +134,8 @@ public:
 	void ioevent_trg02(int state);
 	void ioevent_trg04(int state);
 	void ioevent_trg08(int state);
+
+	virtual void xavix_interrupt_extra() { }
 
 	int m_rgnlen = 0;
 	uint8_t* m_rgn = nullptr;
@@ -202,6 +205,7 @@ protected:
 	optional_ioport m_mouse0y;
 	optional_ioport m_mouse1x;
 	optional_ioport m_mouse1y;
+	optional_ioport_array<2> m_lightgun;
 	required_device<xavix_device> m_maincpu;
 	optional_device<nvram_device> m_nvram;
 	required_device<screen_device> m_screen;
@@ -419,6 +423,8 @@ private:
 
 	uint8_t pal_ntsc_r();
 
+	virtual uint8_t lightgun_r(offs_t offset) { logerror("%s: unhandled lightgun_r %d\n", machine().describe_context(), offset); return 0xff;  }
+
 	uint8_t xavix_memoryemu_txarray_r(offs_t offset);
 	void xavix_memoryemu_txarray_w(offs_t offset, uint8_t data);
 	uint8_t m_txarray[3]{};
@@ -633,6 +639,62 @@ protected:
 	required_device<i2cmem_device> m_i2cmem;
 };
 
+class xavix_i2c_lotr_state : public xavix_i2c_state
+{
+public:
+	xavix_i2c_lotr_state(const machine_config &mconfig, device_type type, const char *tag)
+		: xavix_i2c_state(mconfig, type, tag)
+	{ }
+
+	int camera_r();
+
+protected:
+	//virtual void write_io1(uint8_t data, uint8_t direction) override;
+};
+
+class xavix_duelmast_state : public xavix_i2c_state
+{
+public:
+	xavix_duelmast_state(const machine_config &mconfig, device_type type, const char *tag)
+		: xavix_i2c_state(mconfig, type, tag)
+	{ }
+
+protected:
+	virtual uint8_t read_io1(uint8_t direction) override;
+};
+
+class xavix_i2c_tomshoot_state : public xavix_i2c_state
+{
+public:
+	xavix_i2c_tomshoot_state(const machine_config& mconfig, device_type type, const char* tag)
+		: xavix_i2c_state(mconfig, type, tag)
+	{ }
+
+	void xavix_interrupt_extra() override
+	{
+		ioevent_trg01(1); // causes reads from the lightgun 1 port
+		//ioevent_trg02(1); // causes reads from the lightgun 2 port
+	}
+
+
+private:
+	virtual uint8_t lightgun_r(offs_t offset) override
+	{
+		uint16_t ret = m_lightgun[offset>>1]->read();
+
+		if (offset & 1)
+			ret >>= 8;
+		else
+			ret &= 0xff;
+
+		if (offset == 0)
+			ret += 0x20;
+
+		return ret;
+	}
+
+};
+
 class xavix_i2c_ltv_tam_state : public xavix_i2c_state
 {
 public:
@@ -651,24 +713,6 @@ private:
 	uint8_t tam_anport2_r() { return m_mouse1x->read()^0x7f; }
 	uint8_t tam_anport3_r() { return m_mouse1y->read()^0x7f; }
 };
-
-
-
-class xavix_i2c_lotr_state : public xavix_i2c_state
-{
-public:
-	xavix_i2c_lotr_state(const machine_config &mconfig, device_type type, const char *tag)
-		: xavix_i2c_state(mconfig, type, tag)
-	{ }
-
-	int camera_r();
-
-protected:
-	//virtual void write_io1(uint8_t data, uint8_t direction) override;
-};
-
-
-
 
 class xavix_mtrk_state : public xavix_state
 {
@@ -1009,17 +1053,6 @@ protected:
 	required_ioport m_extra2;
 	required_ioport m_extra3;
 
-};
-
-class xavix_duelmast_state : public xavix_i2c_state
-{
-public:
-	xavix_duelmast_state(const machine_config &mconfig, device_type type, const char *tag)
-		: xavix_i2c_state(mconfig, type, tag)
-	{ }
-
-protected:
-	virtual uint8_t read_io1(uint8_t direction) override;
 };
 
 

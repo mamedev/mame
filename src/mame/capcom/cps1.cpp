@@ -14955,7 +14955,7 @@ GAME( 1991, knights,     0,        cps1_10MHz, knights,  cps_state, init_cps1,  
 GAME( 1991, knightsu,    knights,  cps1_10MHz, knights,  cps_state, init_cps1,     ROT0,   "Capcom", "Knights of the Round (USA 911127)", MACHINE_SUPPORTS_SAVE )
 GAME( 1991, knightsj,    knights,  cps1_10MHz, knights,  cps_state, init_cps1,     ROT0,   "Capcom", "Knights of the Round (Japan 911127, B-Board 91634B-2)", MACHINE_SUPPORTS_SAVE )
 GAME( 1991, knightsja,   knights,  cps1_10MHz, knights,  cps_state, init_cps1,     ROT0,   "Capcom", "Knights of the Round (Japan 911127, B-Board 89625B-1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1991, knightsb2,   knights,  cps1_10MHz, knights,  cps_state, init_cps1,     ROT0,   "Capcom", "Knights of the Round (bootleg, World 911127)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // i.e. player selection screen problems
+GAME( 1991, knightsb2,   knights,  cps1_10MHz, knights,  cps_state, init_cps1,     ROT0,   "bootleg", "Knights of the Round (bootleg, World 911127)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // i.e. player selection screen problems
 GAME( 1992, sf2ce,       0,        cps1_12MHz, sf2,      cps_state, init_cps1,     ROT0,   "Capcom", "Street Fighter II': Champion Edition (World 920513)", MACHINE_SUPPORTS_SAVE )   // "ETC"
 GAME( 1992, sf2ceea,     sf2ce,    cps1_12MHz, sf2,      cps_state, init_cps1,     ROT0,   "Capcom", "Street Fighter II': Champion Edition (World 920313)", MACHINE_SUPPORTS_SAVE )   // "ETC"
 GAME( 1992, sf2ceec,     sf2ce,    cps1_12MHz, sf2,      cps_state, init_cps1,     ROT0,   "Capcom", "Street Fighter II': Champion Edition (World 920803)", MACHINE_SUPPORTS_SAVE )   // "ETC"

@@ -121,6 +121,7 @@ public:
 	void set_emmu_enable(bool enable);
 	bool get_pmmu_enable() const {return m_pmmu_enabled;}
 	void set_fpu_enable(bool enable);
+	bool get_fpu_enable() const { return m_has_fpu; }
 	void set_buserror_details(u32 fault_addr, u8 rw, u8 fc, bool rerun = false);
 	void restart_this_instruction();
 
@@ -171,7 +172,7 @@ protected:
 	bool m_pmmu_enabled; /* Indicates if the PMMU is enabled */
 	int m_hmmu_enabled;  /* Indicates if the HMMU is enabled */
 	bool m_emmu_enabled; /* Indicates if external MMU is enabled */
-	bool m_instruction_restart; /* Save DA regs for potential instruction restart */
+	bool m_can_instruction_restart; /* Save DA regs for potential instruction restart */
 	bool m_fpu_just_reset; /* Indicates the FPU was just reset */
 	bool m_restart_instruction; /* Indicates the instruction should be restarted */
 
@@ -219,7 +220,9 @@ protected:
 	void init8(address_space &space, address_space &ospace);
 	void init16(address_space &space, address_space &ospace);
 	void init32(address_space &space, address_space &ospace);
+	void init32_no_smear(address_space &space, address_space &ospace);
 	void init32mmu(address_space &space, address_space &ospace);
+	void init32mmu_no_smear(address_space &space, address_space &ospace);
 	void init32hmmu(address_space &space, address_space &ospace);
 
 	std::function<u16 (offs_t)> m_readimm16;      // Immediate read 16 bit

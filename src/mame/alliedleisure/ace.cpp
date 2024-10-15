@@ -62,7 +62,8 @@ public:
 		m_ram2(*this, "ram2"),
 		m_characterram(*this, "characterram"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette")
+		m_palette(*this, "palette"),
+		m_in(*this, "IN%u", 0U)
 	{ }
 
 	void ace(machine_config &config);
@@ -87,6 +88,7 @@ private:
 	required_shared_ptr<uint8_t> m_characterram;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+	required_ioport_array<13> m_in;
 
 	/* input-related */
 	int m_objpos[8];
@@ -162,27 +164,27 @@ void aceal_state::main_map(address_map &map)
 	map(0xc000, 0xc005).w(FUNC(aceal_state::ace_objpos_w));
 
 	/* players inputs */
-	map(0xc008, 0xc008).portr("c008");
-	map(0xc009, 0xc009).portr("c009");
-	map(0xc00a, 0xc00a).portr("c00a");
-	map(0xc00b, 0xc00b).portr("c00b");
-	map(0xc00c, 0xc00c).portr("c00c");
-	map(0xc00d, 0xc00d).portr("c00d");
-	map(0xc00e, 0xc00e).portr("c00e");
-	map(0xc00f, 0xc00f).portr("c00f");
-	map(0xc010, 0xc010).portr("c010");
-	map(0xc011, 0xc011).portr("c011");
+	map(0xc008, 0xc008).portr(m_in[0]);
+	map(0xc009, 0xc009).portr(m_in[1]);
+	map(0xc00a, 0xc00a).portr(m_in[2]);
+	map(0xc00b, 0xc00b).portr(m_in[3]);
+	map(0xc00c, 0xc00c).portr(m_in[4]);
+	map(0xc00d, 0xc00d).portr(m_in[5]);
+	map(0xc00e, 0xc00e).portr(m_in[6]);
+	map(0xc00f, 0xc00f).portr(m_in[7]);
+	map(0xc010, 0xc010).portr(m_in[8]);
+	map(0xc011, 0xc011).portr(m_in[9]);
 
 	map(0xc012, 0xc012).r(FUNC(aceal_state::unk_r));
 
 	/* vblank */
-	map(0xc014, 0xc014).portr("c014");
+	map(0xc014, 0xc014).portr(m_in[10]);
 
 	/* coin */
-	map(0xc015, 0xc015).portr("c015");
+	map(0xc015, 0xc015).portr(m_in[11]);
 
 	/* start (must read 1 at least once to make the game run) */
-	map(0xc016, 0xc016).portr("c016");
+	map(0xc016, 0xc016).portr(m_in[12]);
 
 	map(0xc017, 0xc017).r(FUNC(aceal_state::unk_r));
 	map(0xc018, 0xc018).r(FUNC(aceal_state::unk_r));
@@ -199,45 +201,45 @@ void aceal_state::main_map(address_map &map)
 
 
 static INPUT_PORTS_START( ace )
-	PORT_START("c008")  /* player thrust */
+	PORT_START("IN0")  /* player thrust */
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_2WAY PORT_PLAYER(1) PORT_NAME("P1 Thrust")
 
-	PORT_START("c009")  /* player slowdown */
+	PORT_START("IN1")  /* player slowdown */
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_2WAY PORT_PLAYER(1) PORT_NAME("P1 Slowdown")
 
-	PORT_START("c00a")  /* player left */
+	PORT_START("IN2")  /* player left */
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_2WAY PORT_PLAYER(1)
 
-	PORT_START("c00b")  /* player right */
+	PORT_START("IN3")  /* player right */
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_2WAY PORT_PLAYER(1)
 
-	PORT_START("c00c")  /* player fire */
+	PORT_START("IN4")  /* player fire */
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(1) PORT_NAME("P1 Fire")
 
-	PORT_START("c00d")  /* enemy thrust */
+	PORT_START("IN5")  /* enemy thrust */
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_2WAY PORT_PLAYER(2) PORT_NAME("P2 Thrust")
 
-	PORT_START("c00e")  /* enemy slowdown */
+	PORT_START("IN6")  /* enemy slowdown */
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_2WAY PORT_PLAYER(2) PORT_NAME("P2 Slowdown")
 
-	PORT_START("c00f")  /* enemy left  */
+	PORT_START("IN7")  /* enemy left  */
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_2WAY PORT_PLAYER(2)
 
-	PORT_START("c010")  /* enemy right */
+	PORT_START("IN8")  /* enemy right */
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_2WAY PORT_PLAYER(2)
 
-	PORT_START("c011")  /* enemy fire */
+	PORT_START("IN9")  /* enemy fire */
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(2) PORT_NAME("P2 Fire")
 
 	//c012
 
-	PORT_START("c014")  /* VBLANK??? */
+	PORT_START("IN10")  /* VBLANK??? */
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
 
-	PORT_START("c015")  /* coin input */
+	PORT_START("IN11")  /* coin input */
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 )
 
-	PORT_START("c016")  /* game start */
+	PORT_START("IN12")  /* game start */
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_START1 )
 INPUT_PORTS_END
 

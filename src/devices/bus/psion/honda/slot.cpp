@@ -112,13 +112,15 @@ void psion_honda_slot_device::write_rts(int state)
 //-------------------------------------------------
 
 // slot devices
-//#include "parallel.h"
-//#include "pclink.h"
+//#include "cyclone.h"
+#include "parallel.h"
+#include "pclink.h"
 #include "ssd.h"
 
 void psion_honda_devices(device_slot_interface &device)
 {
-	//device.option_add("parallel", PSION_PARALLEL);              // Psion Parallel Printer Link cable
-	//device.option_add("pclink", PSION_PCLINK);                  // Psion PC Link cable
+	//device.option_add("cyclone", PSION_HONDA_CYCLONE);          // Cyclone Floppy Drive (Honda)
+	device.option_add("parallel", PSION_PARALLEL);              // Psion Parallel Printer Link cable
+	device.option_add("pclink", PSION_PCLINK);                  // Psion PC Link cable
 	device.option_add("ssd", PSION_SIENA_SSD);                  // Psion Siena SSD Drive
 }

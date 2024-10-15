@@ -296,23 +296,38 @@ ROM_START( duelmast )
 	ROM_LOAD("duelmasters.u4", 0x000000, 0x200000, CRC(2f11fcd7) SHA1(d8849c74833e77b8b309e845523f2cdc7ac68054) )
 ROM_END
 
+ROM_START( tom_dpgm )
+	ROM_REGION(0x400000, "bios", ROMREGION_ERASE00)
+	ROM_LOAD("disney.bin", 0x000000, 0x400000, CRC(1dc181b3) SHA1(fa30069d17705f27e4ff45e7f6ccf06986e138f3) )
+ROM_END
+
 
 // doesn't use extra opcodes?
+// K.O.しようぜ！エキサイトボクシング
 CONS( 2002, epo_ebox, 0, 0, xavix2000_nv,        epo_ebox,    xavix_state,             init_xavix, "Epoch / SSD Company LTD",       "Excite Boxing (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND ) // doesn't use XaviX2000 extra opcodes, but had that type of CPU
- // die not confirmed, but uses extra opcodes.  (hangs on title screen due to combination of freq_timer_done nested interrupts tripping, and waiting on bits in input ports to change
+
+// die not confirmed, but uses extra opcodes.  (hangs on title screen due to combination of freq_timer_done nested interrupts tripping, and waiting on bits in input ports to change
+// ストライクきめるぜ！ エキサイトボウリング
 CONS( 2002, epo_bowl, 0, 0, xavix2000_i2c_24c04, epo_bowl,    xavix_i2c_state,         init_xavix, "Epoch / SSD Company LTD",       "Excite Bowling (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
 // takes a long time to boot to a card scanner error
 // This is a product in the Duel Masters line called Duel Station; the boot up screen calls it Duel Station, title logo is Duel Masters
 // It also has a cartridge slot in addition to the card scanner and at least 1 ROM cartridge was produced "デュエルマスターズ　デュエルステーション専用カートリッジ　Ver.1"
+// デュエルステーション
 CONS( 2003, duelmast, 0, 0, xavix2000_i2c_24c04, duelmast,    xavix_duelmast_state,    init_xavix, "Takara / SSD Company LTD",      "Duel Masters: Duel Station (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
+// スーパーダッシュボール
 CONS( 2004, epo_sdb,  0, 0, xavix2000_nv_sdb,    epo_sdb,     xavix_2000_nv_sdb_state, init_xavix, "Epoch / SSD Company LTD",       "Super Dash Ball (Japan)",  MACHINE_IMPERFECT_SOUND )
 
 CONS( 2005, ttv_sw,   0, 0, xavix2000_i2c_24c02, ttv_lotr,    xavix_i2c_lotr_state,    init_xavix, "Tiger / SSD Company LTD",       "Star Wars Saga Edition - Lightsaber Battle Game", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 CONS( 2005, ttv_lotr, 0, 0, xavix2000_i2c_24c02, ttv_lotr,    xavix_i2c_lotr_state,    init_xavix, "Tiger / SSD Company LTD",       "Lord Of The Rings - Warrior of Middle-Earth", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 CONS( 2005, ttv_mx,   0, 0, xavix2000_i2c_24c04, ttv_mx,      xavix_i2c_state,         init_xavix, "Tiger / SSD Company LTD",       "MX Dirt Rebel", MACHINE_IMPERFECT_SOUND )
+// 剣神ドラゴンクエスト 甦りし伝説の剣 
 CONS( 2003, drgqst,   0, 0, xavix2000_i2c_24c08, ttv_lotr,    xavix_i2c_lotr_state,    init_xavix, "Square Enix / SSD Company LTD", "Kenshin Dragon Quest: Yomigaerishi Densetsu no Ken", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
 // hangs after starting a game, check why
+// Let’s！TV プレイ　体感格闘ワンピースパンチバトル 　～海賊王にキミがなる！～ 
 CONS( 2004, ban_onep, 0, 0, xavix2000_i2c_24c04, ttv_lotr,    xavix_i2c_lotr_state, init_xavix, "Bandai / SSD Company LTD",         "Let's! TV Play One Piece Punch Battle (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+
+// ディズニープリンセス　キラキラ魔法のレッスン
+CONS( 2004, tom_dpgm, 0, 0, xavix2000_i2c_24c08, ttv_lotr,    xavix_i2c_lotr_state, init_xavix, "Tomy / SSD Company LTD",         "Disney Princess Kirakira Mahou no Lesson (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )

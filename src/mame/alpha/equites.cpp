@@ -349,6 +349,7 @@ public:
 		m_screen(*this, "screen"),
 		m_alpha_8201(*this, "alpha_8201"),
 		m_mainlatch(*this, "mainlatch"),
+		m_in(*this, "IN%u", 0U),
 		m_bg_videoram(*this, "bg_videoram"),
 		m_fg_videoram(*this, "fg_videoram", 0x800, ENDIANNESS_BIG),
 		m_spriteram(*this, "spriteram")
@@ -366,6 +367,7 @@ protected:
 	required_device<screen_device> m_screen;
 	required_device<alpha_8201_device> m_alpha_8201;
 	required_device<ls259_device> m_mainlatch;
+	required_ioport_array<2> m_in;
 
 	// memory pointers
 	required_shared_ptr<uint16_t> m_bg_videoram;
@@ -635,9 +637,9 @@ void equites_state::common_map(address_map &map)
 	map(0x100000, 0x1001ff).ram().share("spriteram");
 	map(0x100000, 0x100001).r(FUNC(equites_state::spriteram_kludge_r));
 	map(0x140000, 0x1407ff).rw(m_alpha_8201, FUNC(alpha_8201_device::ext_ram_r), FUNC(alpha_8201_device::ext_ram_w)).umask16(0x00ff);
-	map(0x180000, 0x180001).portr("IN1");
+	map(0x180000, 0x180001).portr(m_in[1]);
 	map(0x180000, 0x180000).select(0x03c000).lw8(NAME([this] (offs_t offset, u8 data) { m_mainlatch->write_a3(offset >> 14); }));
-	map(0x1c0000, 0x1c0001).portr("IN0").w(FUNC(equites_state::scrollreg_w));
+	map(0x1c0000, 0x1c0001).portr(m_in[0]).w(FUNC(equites_state::scrollreg_w));
 	map(0x380000, 0x380000).w(FUNC(equites_state::bgcolor_w));
 	map(0x780000, 0x780001).w("watchdog", FUNC(watchdog_timer_device::reset16_w));
 }

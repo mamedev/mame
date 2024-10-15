@@ -2325,6 +2325,10 @@ ROM_START( ddr33v )
 	ROM_LOAD16_WORD_SWAP( "ddr33v.bin", 0x000000, 0x800000, CRC(56c7015c) SHA1(a1faef2ab6eb191dea1497f8cfd4ccbd8c504e6d) )
 ROM_END
 
+ROM_START( anpantv )
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "anpanman_tv.bin", 0x000000, 0x800000, CRC(5e32dc1a) SHA1(bae260ffc56f5315cdafd5bc40966ec6d31e267f) )
+ROM_END
 
 void spg2xx_game_state::init_crc()
 {
@@ -2503,3 +2507,6 @@ CONS( 200?, virtten,    0,        0, spg2xx,    virtten,   spg2xx_game_state,   
 // 2007 ingame, 2008 on box.  Hyperkin is mentioned as being the registered trademark holder alongside DDRGame on the box.
 // Songs "composed by Kenneth Baylon"
 CONS( 2008, ddr33v,     0,        0, spg2xx,    ddr33v,    spg2xx_game_ddr33v_state,   init_ddr33v,   "DDRGame / Hyperkin",                                    "16-bit TV Dance Pad with 15 songs / Dance Dance Party Mix (DDRGame)",   MACHINE_IMPERFECT_SOUND )
+
+// PCB has 'Anpanman TV 2006 Ver 1.4' printed on it, ROM has SPG260 header.  Uses custom built-in keyboard, no display built into the unit.
+CONS( 2006, anpantv,    0,        0, spg2xx,    spg2xx,    spg2xx_game_state,          empty_init,    "Bandai",                                                "Anpanman TV (Japan)",                                                   MACHINE_NOT_WORKING )

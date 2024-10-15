@@ -71,6 +71,7 @@ private:
 	required_device<upd7201_device> m_mpsc;
 	required_device<epson_sio_device> m_sio_output;
 	required_device_array<floppy_connector, 2> m_fd;
+	required_ioport m_tf20_dip;
 
 	emu_timer *m_timer_serial;
 	emu_timer *m_timer_tc;

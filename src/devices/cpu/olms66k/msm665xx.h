@@ -25,7 +25,7 @@ public:
 		MSM665XX_R0, MSM665XX_R1, MSM665XX_R2, MSM665XX_R3,
 		MSM665XX_R4, MSM665XX_R5, MSM665XX_R6, MSM665XX_R7,
 		MSM665XX_CSR, MSM665XX_DSR, MSM665XX_TSR,
-		MSM665XX_ROMWIN
+		MSM665XX_ROMWIN, MSM665XX_MEMSCON
 	};
 
 	// TODO: port callbacks
@@ -58,6 +58,9 @@ protected:
 	void tsr_w(u8 data);
 	u8 romwin_r();
 	void romwin_w(u8 data);
+	void memsacp_w(u8 data);
+	u8 memscon_r();
+	void memscon_w(u8 data);
 
 private:
 	address_space_config m_program_config;
@@ -77,6 +80,7 @@ private:
 	u8 m_dsr;
 	u8 m_tsr;
 	u8 m_romwin;
+	u8 m_memscon;
 	s32 m_icount;
 };
 

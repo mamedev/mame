@@ -769,6 +769,12 @@ public:
 		, m_p1(*this, "P1")
 		, m_p2(*this, "P2")
 		, m_extra_ports(*this, "EXTRA")
+		, m_p3(*this, "P3")
+		, m_p4(*this, "P4")
+		, m_p5(*this, "P5")
+		, m_p6(*this, "P6")
+		, m_dsw1(*this, "DSW1")
+		, m_dsw2(*this, "DSW2")
 		, m_lamps(*this, "lamp%u", 0U)
 	 { }
 
@@ -831,6 +837,7 @@ private:
 	required_ioport m_p1;
 	required_ioport m_p2;
 	required_ioport m_extra_ports;
+	optional_ioport m_p3, m_p4, m_p5, m_p6, m_dsw1, m_dsw2;
 
 	output_finder<64> m_lamps;
 
@@ -1197,11 +1204,11 @@ void aristmk5_state::aristmk5_map(address_map &map)
 
 	map(0x03010480, 0x0301049f).rw("uart_0a", FUNC(ins8250_uart_device::ins8250_r), FUNC(ins8250_uart_device::ins8250_w)).umask32(0x000000ff);
 	map(0x03010500, 0x0301051f).rw("uart_0b", FUNC(ins8250_uart_device::ins8250_r), FUNC(ins8250_uart_device::ins8250_w)).umask32(0x000000ff);
-	map(0x03010580, 0x03010583).portr("P3");
+	map(0x03010580, 0x03010583).portr(m_p3);
 	map(0x03010600, 0x0301061f).rw("uart_1a", FUNC(ins8250_uart_device::ins8250_r), FUNC(ins8250_uart_device::ins8250_w)).umask32(0x000000ff);
 	map(0x03010680, 0x0301069f).rw("uart_1b", FUNC(ins8250_uart_device::ins8250_r), FUNC(ins8250_uart_device::ins8250_w)).umask32(0x000000ff);
 
-	map(0x03010700, 0x03010703).portr("P6");
+	map(0x03010700, 0x03010703).portr(m_p6);
 	map(0x03010800, 0x03010800).r(FUNC(aristmk5_state::eeprom_r));
 	map(0x03010810, 0x03010813).rw("watchdog", FUNC(watchdog_timer_device::reset32_r), FUNC(watchdog_timer_device::reset32_w)); //MK-5 specific, watchdog
 
@@ -1226,15 +1233,15 @@ void aristmk5_state::aristmk5_usa_map(address_map &map)
 	map(0x03010440, 0x03010440).w(FUNC(aristmk5_state::rtc_usa_w));
 	map(0x03010450, 0x03010450).w(FUNC(aristmk5_state::eeprom_usa_w));
 
-	map(0x03012000, 0x03012003).portr("P1");
-	map(0x03012010, 0x03012013).portr("P2");
-	map(0x03012200, 0x03012203).portr("DSW1");
-	map(0x03012210, 0x03012213).portr("DSW2");
-	map(0x03010584, 0x03010587).portr("P4");
+	map(0x03012000, 0x03012003).portr(m_p1);
+	map(0x03012010, 0x03012013).portr(m_p2);
+	map(0x03012200, 0x03012203).portr(m_dsw1);
+	map(0x03012210, 0x03012213).portr(m_dsw2);
+	map(0x03010584, 0x03010587).portr(m_p4);
 
 	map(0x03012020, 0x03012020).r(FUNC(aristmk5_state::ldor_r));
 	map(0x03012070, 0x03012070).w(FUNC(aristmk5_state::ldor_clk_w));
-	map(0x03012184, 0x03012187).portr("P5");
+	map(0x03012184, 0x03012187).portr(m_p5);
 
 	map(0x03012000, 0x0301201f).w(FUNC(aristmk5_state::buttons_lamps_w)).umask32(0x000000ff);
 	map(0x03012030, 0x0301203f).w(FUNC(aristmk5_state::other_lamps_w)).umask32(0x000000ff);

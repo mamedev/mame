@@ -23,7 +23,9 @@ jobs:
     - uses: msys2/setup-msys2@v2
       with:
         install: git make mingw-w64-x86_64-gcc mingw-w64-x86_64-python mingw-w64-x86_64-libc++
-    - uses: actions/checkout@master
+    - uses: actions/checkout@main
+      with:
+        fetch-depth: 0
     - name: Prevent make from rebuilding GLSL parser source
       run: |
         touch 3rdparty/bgfx/3rdparty/glsl-optimizer/src/glsl/glcpp/glcpp-lex.c
@@ -35,7 +37,8 @@ jobs:
       env:
         MINGW64: "/mingw64"
       run: make shaders
-    - uses: actions/upload-artifact@master
+    - uses: actions/upload-artifact@main
       with:
         name: mame-bgfx-${{ github.sha }}
         path: bgfx/shaders
+        if-no-files-found: error

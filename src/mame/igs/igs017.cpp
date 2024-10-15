@@ -671,6 +671,7 @@ public:
 	void init_mgdh();
 	void init_mgdha();
 	void init_sdmg2();
+	void init_sdmg2a();
 	void init_sdmg2p();
 	void init_slqz2();
 	void init_spkrform();
@@ -1446,6 +1447,57 @@ void igs017_state::init_sdmg2()
 		else
 		{
 			if (!(i & 0x400/2))
+			{
+				x ^= 0x0200;
+			}
+		}
+
+		// bit 12 xor layer
+		if (i & 0x20000/2)
+		{
+			x ^= 0x1000;
+		}
+
+		rom[i] = x;
+	}
+}
+
+//
+void igs017_state::init_sdmg2a()
+{
+	const int rom_size = memregion("maincpu")->bytes();
+	u16 * const rom = (u16 *)memregion("maincpu")->base();
+
+	for (int i = 0; i < rom_size / 2; i++)
+	{
+		u16 x = rom[i];
+
+		// bit 0 xor layer
+
+		if (i & 0x20/2)
+		{
+			if (i & 0x02/2)
+			{
+				x ^= 0x0001;
+			}
+		}
+
+		if (!(i & 0x4000/2))
+		{
+			if (!(i & 0x300/2))
+			{
+				x ^= 0x0001;
+			}
+		}
+
+		// bit 9 xor layer
+		if (i & 0x20000/2)
+		{
+			x ^= 0x0200;
+		}
+		else
+		{
+			if (!(i & 0x200/2))
 			{
 				x ^= 0x0200;
 			}
@@ -5387,6 +5439,21 @@ ROM_START( sdmg2 )
 	ROM_LOAD( "s0903.u15", 0x00000, 0x80000, CRC(ae5a441c) SHA1(923774ef73ab0f70e0db1738a4292dcbd70d2384) )
 ROM_END
 
+ROM_START( sdmg2a ) // supposedly earlier / easier, but reports same version as the other set
+	ROM_REGION( 0x80000, "maincpu", 0 )
+	ROM_LOAD16_WORD_SWAP( "p0900.u25", 0x00000, 0x80000,CRC(1afc95d8) SHA1(924e198437359beec2abe6ee42a985f63d70b7e3) ) // SLDH
+
+	ROM_REGION( 0x280000, "igs017_igs031:sprites", 0 )
+	ROM_LOAD( "m0901.u5", 0x000000, 0x200000, CRC(9699db24) SHA1(50fc2f173c20b48d10595f01f1e9545f1b13a61b) ) // FIXED BITS (xxxxxxxx0xxxxxxx)
+	ROM_LOAD( "m0902.u4", 0x200000, 0x080000, CRC(3298b13b) SHA1(13b21ddeed368b7f4fea1408c8fc511244342faf) ) // FIXED BITS (xxxxxxxx0xxxxxxx)
+
+	ROM_REGION( 0x20000, "igs017_igs031:tilemaps", 0 )
+	ROM_LOAD( "text.u6", 0x000000, 0x020000, CRC(cb34cbc0) SHA1(ceedbdda085fd1acc9a575502bdf7cf998f54f05) )
+
+	ROM_REGION( 0x80000, "oki", 0 )
+	ROM_LOAD( "s0903.u15", 0x00000, 0x80000, CRC(ae5a441c) SHA1(923774ef73ab0f70e0db1738a4292dcbd70d2384) )
+ROM_END
+
 /***************************************************************************
 
 Maque Wangchao / Chaoji Damanguan 2 - Jiaqiang Ban
@@ -6094,7 +6161,8 @@ GAME ( 1996,  iqblocka,   iqblock,  iqblocka,   iqblocka, igs017_state, init_iqb
 GAME ( 1997,  iqblockf,   iqblock,  iqblockf,   iqblockf, igs017_state, init_iqblocka,   ROT0, "IGS", "IQ Block (V113FR, gambling)",                                       0 )
 GAME ( 1997,  mgdh,       0,        mgdh,       mgdh,     igs017_state, init_mgdh,       ROT0, "IGS", "Manguan Daheng (Taiwan, V125T1)",                                   MACHINE_IMPERFECT_COLORS | MACHINE_UNEMULATED_PROTECTION) // 滿貫大亨, wrong colors in betting screen, game id check (patched out)
 GAME ( 1997,  mgdha,      mgdh,     mgdha,      mgdh,     igs017_state, init_mgdha,      ROT0, "IGS", "Manguan Daheng (Taiwan, V123T1)",                                   0 ) // 滿貫大亨
-GAME ( 1997,  sdmg2,      0,        sdmg2,      sdmg2,    igs017_state, init_sdmg2,      ROT0, "IGS", "Chaoji Damanguan II (China, V754C)",                                0 ) // 超級大滿貫II
+GAME ( 1997,  sdmg2,      0,        sdmg2,      sdmg2,    igs017_state, init_sdmg2,      ROT0, "IGS", "Chaoji Damanguan II (China, V754C, set 1)",                         0 ) // 超級大滿貫II
+GAME ( 1997,  sdmg2a,     sdmg2,    sdmg2,      sdmg2,    igs017_state, init_sdmg2a,     ROT0, "IGS", "Chaoji Damanguan II (China, V754C, set 2)",                         0 ) // 超級大滿貫II
 GAME ( 1997,  tjsb,       0,        tjsb,       tjsb,     igs017_state, init_tjsb,       ROT0, "IGS", "Tian Jiang Shen Bing (China, V137C)",                               MACHINE_UNEMULATED_PROTECTION ) // 天將神兵, fails the bonus round protection check (if enabled via DSW), see e.g. demo mode
 GAME ( 1998,  genius6,    0,        genius6,    genius6,  igs017_state, init_iqblocka,   ROT0, "IGS", "Genius 6 (V110F)",                                                  0 ) // shows Chinese text in puzzle game
 GAME ( 1997,  genius6a,   genius6,  genius6,    genius6,  igs017_state, init_iqblocka,   ROT0, "IGS", "Genius 6 (V133F)",                                                  0 ) // clone because it has older copyright year

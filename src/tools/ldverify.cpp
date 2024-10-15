@@ -252,7 +252,7 @@ static int read_chd(void *file, int frame, bitmap_yuy16 &bitmap, int16_t *lsound
 		chdfile->codec_configure(CHD_CODEC_AVHUFF, AVHUFF_CODEC_DECOMPRESS_CONFIG, &avconfig);
 
 		// read the frame
-		std::error_condition chderr = chdfile->read_hunk(frame * interlace_factor + fieldnum, nullptr);
+		std::error_condition chderr = chdfile->codec_process_hunk(frame * interlace_factor + fieldnum);
 		if (chderr)
 			return false;
 

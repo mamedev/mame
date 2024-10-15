@@ -27,7 +27,7 @@ Dragon 64 FLEX floppy disks
 	</software>
 
 	<software name="dbasica" cloneof="dbasic">
-		<description>DBASIC (Alt)</description>
+		<description>DBASIC (alt)</description>
 		<year>1984</year>
 		<publisher>Compusense</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -302,7 +302,7 @@ Dragon 64 FLEX floppy disks
 	</software>
 
 	<software name="utilsa" cloneof="utils">
-		<description>Utilities (Alt)</description>
+		<description>Utilities (alt)</description>
 		<year>198?</year>
 		<publisher>Compusense</publisher>
 		<part name="flop1" interface="floppy_5_25">

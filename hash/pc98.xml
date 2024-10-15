@@ -1619,9 +1619,12 @@ TODO:
 	</software>
 
 	<software name="iomega" supported="no">
-		<description>Iomega Zip 5.1J</description>
-		<year>19??</year>
-		<publisher>&lt;Iomega&gt;</publisher>
+		<description>Iomega Zip-drive Tools (Version 5.1J)</description>
+		<year>1996</year>
+		<publisher>Iomega</publisher>
+		<notes><![CDATA[
+Japanese version of ibm5170:iomega
+]]></notes>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1261568">
 				<rom name="iomega_zip_5.1j_pc98_install.hdm" size="1261568" crc="0e3452c9" sha1="f2206e6a7f5d9f420d2bbb08aa9c0e22b95a0e9f" offset="0" />
@@ -2516,14 +2519,13 @@ TODO:
 		</part>
 	</software>
 
-	<!-- no sound on VM class (regression?) -->
-	<!-- eventually hangs on gameplay with no drawn text -->
-	<!-- loading save box doesn't draw on RS class and UX class (and hangs) -->
-	<!-- TODO: sometimes it throws an error during MEGDOS boot, translate message -->
-	<software name="38man" supported="no">
+	<software name="38man" supported="partial">
 		<description>38 Man Kilo no Kokuu</description>
 		<year>1989</year>
 		<publisher>システムサコム (System Sacom)</publisher>
+		<notes><![CDATA[
+No sound on VM class (regression?)
+]]></notes>
 		<info name="alt_title" value="３８万キロの虚空" />
 		<info name="release" value="198912xx" />
 		<!-- baddump: contains non-factory saves -->
@@ -2916,11 +2918,13 @@ TODO:
 		</part>
 	</software>
 
-	<!-- MAME fails to mount the image with "Incorrect layout on track 0 head 0, expected_size=100000, current_size=134624" -->
 	<software name="98lespro" supported="no">
 		<description>98 Lesson Pro</description>
 		<year>1990</year>
 		<publisher>エニックス (Enix)</publisher>
+		<notes><![CDATA[
+"Incorrect layout on track 0 head 0, expected_size=100000, current_size=134624"
+]]></notes>
 		<info name="alt_title" value="98レッスンプロ" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1132208">
@@ -3106,11 +3110,13 @@ TODO:
 		</part>
 	</software>
 
-	<!-- Can't select any options in the menu. It doesn't seem to be an emulation bug. -->
 	<software name="aressh3oms" cloneof="aressh3" supported="no">
 		<description>A Ressha de Ikou III - Original Meitetsu Sharyou Disk</description>
 		<year>1991</year>
 		<publisher>アートディンク (Artdink)</publisher>
+		<notes><![CDATA[
+Can't select any options in the menu.
+]]></notes>
 		<info name="alt_title" value="Ａ列車で行こう３ オリジナルデータ集「名鉄」" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
@@ -3165,12 +3171,14 @@ TODO:
 		</part>
 	</software>
 
-	<!-- MAME fails to mount the system disk image with "Incorrect layout on track 7 head 0, expected_size=166666, current_size=172992" error -->
 	<software name="aressh4m" supported="no">
 		<!-- Origin: Neo Kobe Collection -->
 		<description>A Ressha de Ikou 4 ~ Take the A-Train IV - Map Construction + Power Up Kit</description>
 		<year>1994</year>
 		<publisher>アートディンク (Artdink)</publisher>
+		<notes><![CDATA[
+"Incorrect layout on track 7 head 0, expected_size=166666, current_size=172992"
+]]></notes>
 		<info name="alt_title" value="Ａ列車で行こう４" />
 		<info name="release" value="19931203" />
 		<part name="flop1" interface="floppy_5_25">
@@ -3247,8 +3255,7 @@ TODO:
 		</part>
 	</software>
 
-	<!-- Black screen on boot -->
-	<software name="abunaten" supported="no">
+	<software name="abunaten" supported="yes">
 		<description>Abunai Tengu Densetsu - Yomigaetta Tengu ga Yozora o Mau</description>
 		<year>1989</year>
 		<publisher>アリスソフト (AliceSoft)</publisher>
@@ -3325,11 +3332,29 @@ TODO:
 		</part>
 	</software>
 
-	<!-- Black screen on boot -->
+	<software name="adrecon" supported="no">
+		<description>Adrenalin Connection</description>
+		<year>1987</year>
+		<publisher>ビクター音楽産業 (Victor Musical Industries)</publisher>
+		<notes><![CDATA[
+Hangs after name entry with illegal opcode 0f 0e at PC=FF2C3
+]]></notes>
+		<info name="alt_title" value="アドレナリン・コネクション" />
+		<info name="release" value="19870821" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261568">
+				<rom name="adrenalin connection.hdm" size="1261568" crc="6686d44c" sha1="b23dab777e7e4a7e1c7418cfd047c9811d03d2c9" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="adrecona" cloneof="adrecon" supported="no">
 		<description>Adrenalin Connection (fix?)</description>
 		<year>1987</year>
 		<publisher>ビクター音楽産業 (Victor Musical Industries)</publisher>
+		<notes><![CDATA[
+Hangs after entering name on VM class
+]]></notes>
 		<info name="alt_title" value="アドレナリン・コネクション" />
 		<info name="release" value="19870821" />
 		<part name="flop1" interface="floppy_5_25">
@@ -3476,12 +3501,13 @@ TODO:
 		</part>
 	</software>
 
-	<!-- 2d disk -->
-	<!-- Black screen on boot -->
 	<software name="advland" supported="no">
 		<description>Adventureland</description>
 		<year>1984</year>
 		<publisher>スタークラフト (Starcraft)</publisher>
+		<notes><![CDATA[
+2D disk, requires [PC80S31] interface
+]]></notes>
 		<info name="alt_title" value="アドベンチャーランド" />
 		<info name="release" value="198407xx" />
 		<part name="flop1" interface="floppy_5_25">
@@ -3494,17 +3520,10 @@ TODO:
 				<rom name="adventureland.d88" size="344496" crc="eb33a2b4" sha1="63c84329954624c0d1b61c303412353418820b99" offset="0" />
 			</dataarea>
 		</part>
-		<!-- hacked (and working since it's 2hd floppy) set, not going to be supported however
-		<part name="flop3" interface="floppy_5_25">
-		    <dataarea name="flop" size="0x1093f0">
-		        <rom name="adventureland 2hd.d88" size="0x1093f0" crc="dfe46669" sha1="ee0e6fae3553f8b60d515ba5c0bfdbe56cb7df16" offset="0" />
-		    </dataarea>
-		</part>
-		-->
 	</software>
 
 	<software name="advlanda" cloneof="advland">
-		<description>Adventureland (alt)</description>
+		<description>Adventureland (unofficial 2HD disk)</description>
 		<year>1984</year>
 		<publisher>スタークラフト (Starcraft)</publisher>
 		<notes>Unofficial conversion to high density</notes>
@@ -4124,12 +4143,13 @@ TODO:
 		</part>
 	</software>
 
-	<!-- Fails to boot with "初期データが設定できません" (cannot set initial data) error -->
-	<!-- (regressed, was working with RS class at some point) -->
 	<software name="akitsuka" supported="no">
 		<description>Aki to Tsukasa no Fushigi no Kabe</description>
 		<year>1988</year>
 		<publisher>ニューシステムハウスオー！ (New System House Oh!)</publisher>
+		<notes><![CDATA[
+[DAC1BIT] speech is way too fast on VM class, downclock CPU to 50% makes it more reasonable
+]]></notes>
 		<info name="alt_title" value="亜紀とつかさの不思議の壁" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
@@ -5833,9 +5853,7 @@ Has a [DAC1BIT] sampling tester on boot, needs +18 [tempo]/low [volume] on RS cl
 		</part>
 	</software>
 
-	<!-- boot OK, randomly locks up (stuck note) -->
-	<!-- On selection menu selected jigsaw doesn't show proper naming, kanji issue? -->
-	<software name="artjigs1" supported="no">
+	<software name="artjigs1" supported="yes">
 		<description>Art Jigsaw - Vol. 1 Super Weapons</description>
 		<year>1992</year>
 		<publisher>システムソフト (SystemSoft)</publisher>
@@ -6277,17 +6295,17 @@ Has a [DAC1BIT] sampling tester on boot, needs +18 [tempo]/low [volume] on RS cl
 		</part>
 	</software>
 
-	<!-- Fails to boot with "Disk I/O Error" on cyan "Please Wait!" screen -->
-	<software name="azusa108" supported="no">
+	<software name="azusa108" supported="yes">
 		<description>Azusa 108 Jimusho</description>
 		<year>1988</year>
 		<publisher>アグミックス (Agumix)</publisher>
 		<info name="alt_title" value="あずさ１０８事務所" />
 		<info name="release" value="198811xx" />
+		<!-- baddump: contains '94 COMMAND.COM, non-factory saves -->
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk A"/>
 			<dataarea name="flop" size="1265664">
-				<rom name="azusaja.fdi" size="1265664" crc="17c18836" sha1="cd10cdd54b225b6df94b66952bfd746b79214c23" offset="0" />
+				<rom name="azusaja.fdi" size="1265664" crc="17c18836" sha1="cd10cdd54b225b6df94b66952bfd746b79214c23" offset="0" status="baddump" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
@@ -6368,11 +6386,14 @@ Has a [DAC1BIT] sampling tester on boot, needs +18 [tempo]/low [volume] on RS cl
 		</part>
 	</software>
 
-	<!-- Error on the title screen: 正常なシステムの状態ではありません (the system state is not correct). Doesn't happen on real hardware. -->
 	<software name="bakendo" supported="no">
 		<description>Bakendou - Horse Racing Analyzer</description>
 		<year>1991</year>
 		<publisher>Real Softs</publisher>
+		<notes><![CDATA[
+TODO: wants flop5 to boot, then disk swapped with Program Disk (what's Opening for?)
+Not extensively tested
+]]></notes>
 		<info name="alt_title" value="馬券道" />
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Opening Disk"/>
@@ -6414,12 +6435,12 @@ Has a [DAC1BIT] sampling tester on boot, needs +18 [tempo]/low [volume] on RS cl
 		<publisher>アスキー (ASCII)</publisher>
 		<info name="alt_title" value="バランス オブ パワー" />
 		<info name="release" value="198810xx" />
-		<!-- 1988 game but runs DOS 6.20, lolwut? -->
+		<!-- baddump: 1988 game but runs DOS 6.20 -->
 		<!-- disk A may be just an user disk created with disk B via SETUP.EXE -->
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk A"/>
 			<dataarea name="flop" size="1281968">
-				<rom name="balance a.d88" size="1281968" crc="33088daa" sha1="fbae2979aff913bf6e9e8b40f15e992f1975ffe9" offset="0" />
+				<rom name="balance a.d88" size="1281968" crc="33088daa" sha1="fbae2979aff913bf6e9e8b40f15e992f1975ffe9" offset="0" status="baddump" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
@@ -6438,11 +6459,11 @@ Has a [DAC1BIT] sampling tester on boot, needs +18 [tempo]/low [volume] on RS cl
 		<publisher>アスキー (ASCII)</publisher>
 		<info name="alt_title" value="バランス オブ パワー" />
 		<info name="release" value="198810xx" />
-		<!-- again 1988 but DOS 6.20 -->
+		<!-- baddump: again 1988 but DOS 6.20 -->
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk A"/>
 			<dataarea name="flop" size="1281968">
-				<rom name="balance of power (1985)(ascii)(disk 1 of 2).d88" size="1281968" crc="8d141809" sha1="7169df114bc0524aa75f56a7a3eacaa218e1f941" offset="0" />
+				<rom name="balance of power (1985)(ascii)(disk 1 of 2).d88" size="1281968" crc="8d141809" sha1="7169df114bc0524aa75f56a7a3eacaa218e1f941" offset="0" status="baddump" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
@@ -6536,12 +6557,14 @@ Has a [DAC1BIT] sampling tester on boot, needs +18 [tempo]/low [volume] on RS cl
 		</part>
 	</software>
 
-	<!-- Can't play any music. It recognizes the MIDI interface correctly, but complains about the interrupt line settings not being correct. -->
-	<!-- Supported MIDI interfaces according to menu: Roland MT-32, Roland D-10/D-110, Kawai MSB-98, Korg M1 -->
 	<software name="bandkun" supported="no">
 		<description>Band-kun - Sound Entertainment</description>
 		<year>1990</year>
 		<publisher>光栄 (Koei)</publisher>
+		<notes><![CDATA[
+Requires MIDI connection from any of the supported devices (Roland MT-32, Roland D-10/D-110, Kawai MSB-98, Korg M1)
+Never output any sound
+]]></notes>
 		<info name="alt_title" value="バンドくん" />
 		<info name="release" value="199011xx" />
 		<info name="usage" value="Requires a MIDI interface. Run KOEI.COM from DOS to boot, or BKINST.EXE to install to HDD." />
@@ -6739,11 +6762,14 @@ Has a [DAC1BIT] sampling tester on boot, needs +18 [tempo]/low [volume] on RS cl
 		</part>
 	</software>
 
-	<!-- Hangs during the intro (first dialogue) -->
 	<software name="skinpan" supported="no">
 		<description>Battle Skin Panic 9821</description>
 		<year>1993</year>
 		<publisher>ガイナックス (Gainax)</publisher>
+		<notes><![CDATA[
+Hangs during the intro (first dialogue)
+Draws Gainax logo with half height
+]]></notes>
 		<info name="alt_title" value="バトルスキンパニック ９８２１" />
 		<info name="release" value="19930921" />
 		<info name="usage" value="Runs on PC-9821 only" />
@@ -6954,8 +6980,7 @@ Has a [DAC1BIT] sampling tester on boot, needs +18 [tempo]/low [volume] on RS cl
 		</part>
 	</software>
 
-	<!-- Black screen on boot (FDC keeps reading command sense) -->
-	<software name="beast" supported="no">
+	<software name="beast" supported="yes">
 		<description>Beast - Injuu no Yakata</description>
 		<year>1990</year>
 		<publisher>バーディーソフト (Birdy Soft)</publisher>
@@ -6981,7 +7006,6 @@ Has a [DAC1BIT] sampling tester on boot, needs +18 [tempo]/low [volume] on RS cl
 		</part>
 	</software>
 
-	<!-- boot OK -->
 	<software name="beast2" supported="yes">
 		<description>Beast 2 - Incubuster</description>
 		<year>1991</year>
@@ -7014,8 +7038,7 @@ Has a [DAC1BIT] sampling tester on boot, needs +18 [tempo]/low [volume] on RS cl
 		</part>
 	</software>
 
-	<!-- Doesn't display any graphics, only text -->
-	<software name="beast3" supported="no">
+	<software name="beast3" supported="yes">
 		<description>Beast III</description>
 		<year>1993</year>
 		<publisher>バーディーソフト (Birdy Soft)</publisher>
@@ -7107,11 +7130,13 @@ Has a [DAC1BIT] sampling tester on boot, needs +18 [tempo]/low [volume] on RS cl
 		</part>
 	</software>
 
-	<!-- Hangs at the Fuga System logo -->
-	<software name="beatvice" supported="no">
+	<software name="beatvice" supported="partial">
 		<description>BeatVice</description>
 		<year>1989</year>
 		<publisher>風雅システム (Fuga System)</publisher>
+		<notes><![CDATA[
+Leaves [bitmap layer] trails on edges during shmup gameplay
+]]></notes>
 		<info name="alt_title" value="ビートバイス" />
 		<info name="release" value="19891215" />
 		<info name="usage" value="Insert disk 1 on drive 2 and run SI.BAT to copy DOS files, or run HI.BAT to install to HDD." />
@@ -10108,8 +10133,7 @@ Has a [DAC1BIT] sampling tester on boot, needs +18 [tempo]/low [volume] on RS cl
 		</part>
 	</software>
 
-	<!-- Asks for Disk 1 just after boot. None of the disks work. -->
-	<software name="cherryb" supported="no">
+	<software name="cherryb" supported="yes">
 		<description>Cherry Bomb - Chou Ojousama Sayaka-chan Nanpa Daisakusen</description>
 		<year>1994</year>
 		<publisher>ペパーミント・Ｋｉｄｓ (Peppermint Kids)</publisher>
@@ -10234,12 +10258,14 @@ Randomly crashes during gameplay with stuck note
 		</part>
 	</software>
 
-	<!-- Doesn't recognize disk changes - cannot get past the opening sequence -->
-	<software name="ikochan" supported="no">
+	<software name="ikochan" supported="partial">
 		<!-- Origin: Neo Kobe Collection -->
 		<description>Chikyuu Bouei Shoujo Iko-chan - UFO Daisakusen</description>
 		<year>1992</year>
 		<publisher>グラムス (Glams)</publisher>
+		<notes><![CDATA[
+Corrupt [PCG] kanji draws on karaoke style opening sequence
+]]></notes>
 		<info name="alt_title" value="地球防衛少女イコちゃん ～ＵＦＯ大作戦～" />
 		<info name="release" value="19921204" />
 		<part name="flop1" interface="floppy_5_25">
@@ -10308,11 +10334,13 @@ Randomly crashes during gameplay with stuck note
 		</part>
 	</software>
 
-	<!-- This probably requires 3.5" floppy emulation -->
 	<software name="chittyt" supported="no">
 		<description>Chitty Chitty Train</description>
 		<year>1993</year>
 		<publisher>ビッツー (Bit²)</publisher>
+		<notes><![CDATA[
+Requires 3.5" floppy emulation
+]]></notes>
 		<info name="alt_title" value="チキチキトレイン" />
 		<info name="release" value="19930811" />
 		<part name="flop1" interface="floppy_3_5">
@@ -11317,10 +11345,13 @@ Fails user disk creation (will ask for a disk swap for disk 1 that will fail)
 		</part>
 	</software>
 
-	<software name="constgp">
+	<software name="constgp" supported="yes">
 		<description>Constructors Grand Prix</description>
 		<year>1992</year>
 		<publisher>ソフトスタジオWING (Soft Studio Wing)</publisher>
+		<notes><![CDATA[
+Course names draws a full square kanji block between nation and "GP" (verify)
+]]></notes>
 		<info name="alt_title" value="コンストラクターズグランプリ" />
 		<info name="release" value="199209xx" />
 		<part name="flop1" interface="floppy_5_25">
@@ -11638,11 +11669,13 @@ Fails user disk creation (will ask for a disk swap for disk 1 that will fail)
 		</part>
 	</software>
 
-	<!-- Fails to boot with "E4" error -->
 	<software name="blassty" supported="no">
 		<description>Cruise Chaser Blassty</description>
 		<year>1986</year>
 		<publisher>スクウェア (Square)</publisher>
+		<notes><![CDATA[
+Fails to boot with "E4" error (2dd disks?)
+]]></notes>
 		<info name="alt_title" value="クルーズ チェイサー ブラスティー" />
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk A"/>
@@ -13283,12 +13316,14 @@ Fails user disk creation (will ask for a disk swap for disk 1 that will fail)
 		</part>
 	</software>
 
-	<!-- MAME fails to mount the image with "Incorrect layout on track 1 head 0, expected_size=166666, current_size=174464" error -->
 	<software name="dambustr" supported="no">
 		<!-- Origin: Neo Kobe Collection -->
 		<description>Dam Busters</description>
 		<year>1986</year>
 		<publisher>アポロテクニカ (Apollo Technica)</publisher>
+		<notes><![CDATA[
+"Incorrect layout on track 1 head 0, expected_size=166666, current_size=174464"
+]]></notes>
 		<info name="alt_title" value="ダムバスターズ" />
 		<info name="release" value="198601xx" />
 		<part name="flop1" interface="floppy_5_25">
@@ -17816,13 +17851,15 @@ Fails user disk creation (will ask for a disk swap for disk 1 that will fail)
 		</part>
 	</software>
 
-	<!-- Doesn't recognize disk changes (regressed) -->
-	<!-- has gfx glitch when intro scrolls to top-left -->
-	<!-- user disk creation screen is offset -->
 	<software name="edge" supported="no">
 		<description>Edge</description>
 		<year>1993</year>
 		<publisher>テイジイエル (TGL)</publisher>
+		<notes><![CDATA[
+Doesn't recognize disk changes (regressed)
+Has gfx glitch when intro scrolls to top-left
+User disk creation screen is offset
+]]></notes>
 		<info name="alt_title" value="エッジ" />
 		<info name="release" value="19930115" />
 		<part name="flop1" interface="floppy_5_25">
@@ -50227,22 +50264,6 @@ Doesn't recognize [FDC] disk 3 swap after title screen
 		</part>
 	</software>
 
-	<software name="adrecon" supported="no">
-		<description>Adrenalin Connection</description>
-		<year>1987</year>
-		<publisher>ビクター音楽産業 (Victor Musical Industries)</publisher>
-		<notes><![CDATA[
-Hangs after name entry with illegal opcode 0f 0e at PC=FF2C3
-]]></notes>
-		<info name="alt_title" value="アドレナリン・コネクション" />
-		<info name="release" value="19870821" />
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="1261568">
-				<rom name="adrenalin connection.hdm" size="1261568" crc="6686d44c" sha1="b23dab777e7e4a7e1c7418cfd047c9811d03d2c9" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
 	<!-- unsupported ".fix" format -->
 	<software name="aigo3" supported="no">
 		<description>AI Go 3</description>
@@ -52512,10 +52533,13 @@ Hangs after name entry with illegal opcode 0f 0e at PC=FF2C3
 		</part>
 	</software>
 
-	<software name="kids" supported="no">
+	<software name="kids" supported="partial">
 		<description>Kids - SAP 2nd. File</description>
 		<year>1991</year>
 		<publisher>グレイト (Great)</publisher>
+		<notes><![CDATA[
+Draws "Muaplay98" with half kanji width on boot
+]]></notes>
 		<info name="alt_title" value="ＫＩＤＳ ＳＡＰ 特殊行動警察 ２ｎｄ ＦＩＬＥ" />
 		<info name="release" value="199109xx" />
 		<part name="flop1" interface="floppy_5_25">
@@ -52538,12 +52562,13 @@ Hangs after name entry with illegal opcode 0f 0e at PC=FF2C3
 		</part>
 	</software>
 
-	<software name="kiwamedd" supported="no">
+	<software name="kiwamedd" supported="yes">
 		<description>Kiwame Daidougi</description>
 		<year>1995</year>
 		<publisher>毎日コミュニケーションズ (Mainichi Communications)</publisher>
 		<info name="alt_title" value="極 大道棋" />
 		<info name="release" value="19951010" />
+		<info name="usage" value="Needs a DOS install from HDD" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1261568">
 				<rom name="kiwamed.hdm" size="1261568" crc="f7b78b9e" sha1="2bf5375dbd63c1daeff481f598b3aacef604f23a" offset="0" />
@@ -52555,8 +52580,12 @@ Hangs after name entry with illegal opcode 0f 0e at PC=FF2C3
 		<description>Knights of the Sky</description>
 		<year>1993</year>
 		<publisher>マイクロプローズジャパン (MicroProse Japan)</publisher>
+		<notes><![CDATA[
+Not extensively tested
+]]></notes>
 		<info name="alt_title" value="ナイツ・オブ・ザ・スカイ 大空の騎士" />
 		<info name="release" value="19930612" />
+		<info name="usage" value="Sports manual copy protection (Squadron Identification)" />
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="1261568">
@@ -52581,6 +52610,9 @@ Hangs after name entry with illegal opcode 0f 0e at PC=FF2C3
 		<description>Kon'yamo Asamade Powerful Mahjong 2</description>
 		<year>1988</year>
 		<publisher>デービーソフト (dB-Soft)</publisher>
+		<notes><![CDATA[
+Black screen, keeps swapping between [FDC] 2dd and 2hd modes
+]]></notes>
 		<info name="alt_title" value="今夜も朝までパワフルまあじゃん２" />
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 1"/>
@@ -52612,6 +52644,9 @@ Hangs after name entry with illegal opcode 0f 0e at PC=FF2C3
 		<description>Kudokikata Oshiemasu II - Kind Gal's</description>
 		<year>1987</year>
 		<publisher>ハード (Hard)</publisher>
+		<notes><![CDATA[
+"Unable to identify image file format"
+]]></notes>
 		<info name="alt_title" value="カインドゥギャルズ ～口説き方教えます２～" />
 		<info name="release" value="198712xx" />
 		<part name="flop1" interface="floppy_5_25">
@@ -52632,6 +52667,9 @@ Hangs after name entry with illegal opcode 0f 0e at PC=FF2C3
 		<description>Kyou mo Campus Hana Ranman</description>
 		<year>1991</year>
 		<publisher>コンピューターブレイン (Computer Brain)</publisher>
+		<notes><![CDATA[
+Black screen, keeps swapping between [FDC] 2dd and 2hd modes
+]]></notes>
 		<info name="alt_title" value="今日もキャンパス花乱満" />
 		<info name="release" value="19910610" />
 		<part name="flop1" interface="floppy_5_25">
@@ -52664,6 +52702,9 @@ Hangs after name entry with illegal opcode 0f 0e at PC=FF2C3
 		<description>Kyuukyoku Mahjong - Idol Graphic</description>
 		<year>1993</year>
 		<publisher>ドット企画 (Dott Plan)</publisher>
+		<notes><![CDATA[
+Black screen, keeps hitting an empty divide by zero exception at PC=1fcb6
+]]></notes>
 		<info name="alt_title" value="究極麻雀アイドルグラフィック" />
 		<info name="release" value="19930115" />
 		<part name="flop1" interface="floppy_5_25">
@@ -52990,7 +53031,7 @@ Hangs after name entry with illegal opcode 0f 0e at PC=FF2C3
 		</part>
 	</software>
 
-	<software name="logicald" cloneof="logical" supported="no">
+	<software name="logicald" cloneof="logical" supported="yes">
 		<description>Logical (demo)</description>
 		<year>1993</year>
 		<publisher>アスキー (ASCII)</publisher>
@@ -53396,8 +53437,7 @@ Hangs after name entry with illegal opcode 0f 0e at PC=FF2C3
 		</part>
 	</software>
 
-	<!-- Doesn't display GFXs properly, gameplay is blacked out etc. -->
-	<software name="loopz" supported="no">
+	<software name="loopz" supported="yes">
 		<description>Loopz</description>
 		<year>1991</year>
 		<publisher>ブロダーバンドジャパン (Brøderbund Japan)</publisher>
@@ -56361,7 +56401,7 @@ F-15 EAGLE           Ｉ／Ｏ
 倉庫番               THINKING RABBIT
 芸者
 PUZZLE-16
-将棋名人             Apolo Technica
+将棋名人             Apollo Technica
 花札狂               HUDSON
 グラフィック野球拳
 セーラー服と野球拳
@@ -69716,6 +69756,9 @@ Has XA and LT support according to spine card
 		<description>Prince of Persia 2 - The Shadow And The Flame</description>
 		<year>1995</year>
 		<publisher>インタープログ (Interprog)</publisher>
+		<notes><![CDATA[
+DOS Boot disk for ppersia2:cdrom, to be removed.
+]]></notes>
 		<info name="alt_title" value="プリンス オブ ペルシャ２" />
 		<info name="release" value="19950108" />
 		<part name="flop1" interface="floppy_5_25">

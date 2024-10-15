@@ -123,11 +123,11 @@ void paddlemania_state::main_map(address_map &map)
 	map(0x000000, 0x03ffff).rom();                    // main program
 	map(0x080000, 0x083fff).ram();                    // work RAM
 	map(0x100000, 0x103fff).ram().share("spriteram"); // video RAM
-	map(0x180000, 0x180001).portr("IN3").nopw();      // LSB: DSW0, MSB: watchdog(?)
-	map(0x180008, 0x180009).portr("IN4");             // LSB: DSW1
-	map(0x300000, 0x300001).portr("IN0");             // joy1, joy2
-	map(0x340000, 0x340001).portr("IN1");             // coin, start, service
-	map(0x380000, 0x380001).portr("IN2");
+	map(0x180000, 0x180001).portr(m_in[3]).nopw();    // LSB: DSW0, MSB: watchdog(?)
+	map(0x180008, 0x180009).portr(m_in[4]);           // LSB: DSW1
+	map(0x300000, 0x300001).portr(m_in[0]);           // joy1, joy2
+	map(0x340000, 0x340001).portr(m_in[1]);           // coin, start, service
+	map(0x380000, 0x380001).portr(m_in[2]);
 	map(0x380001, 0x380001).w(m_soundlatch, FUNC(generic_latch_8_device::write)); // LSB: sound latch write and RST38 trigger, joy3, joy4
 }
 
@@ -137,12 +137,12 @@ void thenextspace_state::main_map(address_map &map)
 	map(0x070000, 0x073fff).ram();
 	map(0x0a0000, 0x0a3fff).ram().share("spriteram");
 	map(0x0d0000, 0x0d0001).nopw(); // unknown write port (0)
-	map(0x0e0000, 0x0e0001).portr("P1");
-	map(0x0e0002, 0x0e0003).portr("P2");
-	map(0x0e0004, 0x0e0005).portr("SYSTEM");
+	map(0x0e0000, 0x0e0001).portr(m_p1);
+	map(0x0e0002, 0x0e0003).portr(m_p2);
+	map(0x0e0004, 0x0e0005).portr(m_system);
 	map(0x0e0006, 0x0e0007).nopw(); // unknown write port (0)
-	map(0x0e0008, 0x0e0009).portr("DSW1");
-	map(0x0e000a, 0x0e000b).portr("DSW2");
+	map(0x0e0008, 0x0e0009).portr(m_dsw1);
+	map(0x0e000a, 0x0e000b).portr(m_dsw2);
 	map(0x0e000e, 0x0e000f).nopw(); // unknown write port (0)
 	map(0x0e0018, 0x0e0019).r(FUNC(thenextspace_state::sound_cpu_r));
 	map(0x0f0000, 0x0f0001).w(FUNC(thenextspace_state::tnextspc_unknown_w));

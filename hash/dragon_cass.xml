@@ -141,7 +141,7 @@ This list was compiled from the archive at http://archive.worldofdragon.org/arch
 	</software>
 
 	<software name="6809expc" cloneof="6809exp">
-		<description>6809 Express [cracked]</description>
+		<description>6809 Express (cracked)</description>
 		<year>1985</year>
 		<publisher>Quickbeam</publisher>
 		<part name="cass1" interface="dragon_cass">
@@ -174,7 +174,7 @@ This list was compiled from the archive at http://archive.worldofdragon.org/arch
 	</software>
 
 	<software name="acontar">
-		<description>A Contar (Spa)</description>
+		<description>A Contar (Spain)</description>
 		<year>198?</year>
 		<publisher>Eurohard S.A.</publisher>
 		<part name="cass1" interface="dragon_cass">
@@ -513,7 +513,7 @@ This list was compiled from the archive at http://archive.worldofdragon.org/arch
 	</software>
 
 	<software name="astrologys" cloneof="astrology">
-		<description>Astrology (Spa)</description>
+		<description>Astrology (Spain)</description>
 		<year>198?</year>
 		<publisher>Eurohard S.A.</publisher>
 		<info name="serial" value="M30892" />
@@ -719,7 +719,7 @@ This list was compiled from the archive at http://archive.worldofdragon.org/arch
 	</software>
 
 	<software name="banditoa" cloneof="bandito">
-		<description>Bandito (Alt)</description>
+		<description>Bandito (alt)</description>
 		<year>1984</year>
 		<publisher>Pocket Money Software</publisher>
 		<part name="cass1" interface="dragon_cass">
@@ -1015,7 +1015,7 @@ This list was compiled from the archive at http://archive.worldofdragon.org/arch
 	</software>
 
 	<software name="bonkaa" cloneof="bonka">
-		<description>Bonka (Alt)</description>
+		<description>Bonka (alt)</description>
 		<year>1983</year>
 		<publisher>J.Morrison Micros</publisher>
 		<part name="cass1" interface="dragon_cass">
@@ -1070,7 +1070,7 @@ This list was compiled from the archive at http://archive.worldofdragon.org/arch
 	</software>
 
 	<software name="brockgdma" cloneof="brockgdm">
-		<description>Brocks Kingdom (Alt)</description>
+		<description>Brocks Kingdom (alt)</description>
 		<year>1984</year>
 		<publisher>Blaby Computer Games</publisher>
 		<part name="cass1" interface="dragon_cass">
@@ -1148,7 +1148,7 @@ This list was compiled from the archive at http://archive.worldofdragon.org/arch
 	</software>
 
 	<software name="bumperss" cloneof="bumpers">
-		<description>Bumpers (Spa)</description>
+		<description>Bumpers (Spain)</description>
 		<year>1984</year>
 		<publisher>Eurohard S.A.</publisher>
 		<part name="cass1" interface="dragon_cass">
@@ -1203,7 +1203,7 @@ This list was compiled from the archive at http://archive.worldofdragon.org/arch
 	</software>
 
 	<software name="buzzbaitc" cloneof="buzzbait">
-		<description>Buzzard Bait [cracked]</description>
+		<description>Buzzard Bait (cracked)</description>
 		<year>1984</year>
 		<publisher>Tom Mix Software</publisher>
 		<part name="cass1" interface="dragon_cass">
@@ -1581,7 +1581,7 @@ This list was compiled from the archive at http://archive.worldofdragon.org/arch
 	</software>
 
 	<software name="chuckiegga" cloneof="chuckiegg">
-		<description>Chuckie Egg (Alt)</description>
+		<description>Chuckie Egg (alt)</description>
 		<year>1985</year>
 		<publisher>A&amp;F</publisher>
 		<part name="cass1" interface="dragon_cass">
@@ -1626,7 +1626,7 @@ This list was compiled from the archive at http://archive.worldofdragon.org/arch
 	</software>
 
 	<software name="circusadvs" cloneof="circusadv">
-		<description>Circus Adventure (Spa)</description>
+		<description>Circus Adventure (Spain)</description>
 		<year>198?</year>
 		<publisher>Eurohard S.A.</publisher>
 		<part name="cass1" interface="dragon_cass">
@@ -1807,7 +1807,7 @@ This list was compiled from the archive at http://archive.worldofdragon.org/arch
 	</software>
 
 	<software name="contabili">
-		<description>Contabilidad Personal (Spa)</description>
+		<description>Contabilidad Personal (Spain)</description>
 		<year>198?</year>
 		<publisher>IDS</publisher>
 		<part name="cass1" interface="dragon_cass">
@@ -1917,7 +1917,7 @@ This list was compiled from the archive at http://archive.worldofdragon.org/arch
 	</software>
 
 	<software name="cosmcruisa" cloneof="cosmcruis">
-		<description>Cosmic Cruiser (Alt)</description>
+		<description>Cosmic Cruiser (alt)</description>
 		<year>1984</year>
 		<publisher>Imagine</publisher>
 		<part name="cass1" interface="dragon_cass">
@@ -2155,7 +2155,7 @@ This list was compiled from the archive at http://archive.worldofdragon.org/arch
 	</software>
 
 	<software name="cuthcoolra" cloneof="cuthcoolr">
-		<description>Cuthbert in the Cooler (Alt)</description>
+		<description>Cuthbert in the Cooler (alt)</description>
 		<year>1985</year>
 		<publisher>Microdeal</publisher>
 		<part name="cass1" interface="dragon_cass">
@@ -2400,7 +2400,7 @@ This list was compiled from the archive at http://archive.worldofdragon.org/arch
 	</software>
 
 	<software name="deathholef" cloneof="deathhole">
-		<description>Death's Head Hole [fixed]</description>
+		<description>Death's Head Hole (fixed)</description>
 		<year>1983</year>
 		<publisher>Peaksoft</publisher>
 		<part name="cass1" interface="dragon_cass">
@@ -2598,7 +2598,7 @@ This list was compiled from the archive at http://archive.worldofdragon.org/arch
 	</software>
 
 	<software name="diggem">
-		<description>Diggem-Manybody (Spa)</description>
+		<description>Diggem-Manybody (Spain)</description>
 		<year>198?</year>
 		<publisher>IDS</publisher>
 		<part name="cass1" interface="dragon_cass">
@@ -2645,7 +2645,7 @@ This list was compiled from the archive at http://archive.worldofdragon.org/arch
 	</software>
 
 	<software name="dominoesa" cloneof="dominoes">
-		<description>Dominoes (Alt)</description>
+		<description>Dominoes (alt)</description>
 		<year>1983</year>
 		<publisher>Oasis Software</publisher>
 		<part name="cass1" interface="dragon_cass">
@@ -2984,7 +2984,7 @@ This list was compiled from the archive at http://archive.worldofdragon.org/arch
 	</software>
 
 	<software name="drgnsel1s" cloneof="drgnsel1">
-		<description>Dragon Selection 1 (Spa)</description>
+		<description>Dragon Selection 1 (Spain)</description>
 		<year>198?</year>
 		<publisher>Eurohard S.A.</publisher>
 		<part name="cass1" interface="dragon_cass">
@@ -3007,7 +3007,7 @@ This list was compiled from the archive at http://archive.worldofdragon.org/arch
 	</software>
 
 	<software name="drgnsel2s" cloneof="drgnsel2">
-		<description>Dragon Selection 2 (Spa)</description>
+		<description>Dragon Selection 2 (Spain)</description>
 		<year>198?</year>
 		<publisher>Eurohard S.A.</publisher>
 		<info name="serial" value="N30501" />
@@ -3030,7 +3030,7 @@ This list was compiled from the archive at http://archive.worldofdragon.org/arch
 	</software>
 
 	<software name="drgnsel4s" cloneof="drgnsel4">
-		<description>Dragon Selection 4 (Spa)</description>
+		<description>Dragon Selection 4 (Spain)</description>
 		<year>198?</year>
 		<publisher>Eurohard S.A.</publisher>
 		<part name="cass1" interface="dragon_cass">
@@ -3625,7 +3625,7 @@ This list was compiled from the archive at http://archive.worldofdragon.org/arch
 	</software>
 
 	<software name="fabrica">
-		<description>Fabrica de Chicles (Spa)</description>
+		<description>Fabrica de Chicles (Spain)</description>
 		<year>198?</year>
 		<publisher>Eurohard S.A.</publisher>
 		<part name="cass1" interface="dragon_cass">
@@ -3736,7 +3736,7 @@ This list was compiled from the archive at http://archive.worldofdragon.org/arch
 	</software>
 
 	<software name="fincdowns" cloneof="fincdown">
-		<description>Final Countdown (Spa)</description>
+		<description>Final Countdown (Spain)</description>
 		<year>198?</year>
 		<publisher>Eurohard S.A.</publisher>
 		<info name="serial" value="A0523" />
@@ -3781,7 +3781,7 @@ This list was compiled from the archive at http://archive.worldofdragon.org/arch
 	</software>
 
 	<software name="fireforcc" cloneof="fireforc">
-		<description>Fire Force [cracked]</description>
+		<description>Fire Force (cracked)</description>
 		<year>1986</year>
 		<publisher>Quickbeam</publisher>
 		<part name="cass1" interface="dragon_cass">
@@ -3826,7 +3826,7 @@ This list was compiled from the archive at http://archive.worldofdragon.org/arch
 	</software>
 
 	<software name="flags" cloneof="flag">
-		<description>Flag (Spa)</description>
+		<description>Flag (Spain)</description>
 		<year>198?</year>
 		<publisher>Eurohard S.A.</publisher>
 		<part name="cass1" interface="dragon_cass">
@@ -3892,7 +3892,7 @@ This list was compiled from the archive at http://archive.worldofdragon.org/arch
 	</software>
 
 	<software name="flights" cloneof="flight">
-		<description>Flight (Spa)</description>
+		<description>Flight (Spain)</description>
 		<year>198?</year>
 		<publisher>Eurohard S.A.</publisher>
 		<part name="cass1" interface="dragon_cass">
@@ -4213,7 +4213,7 @@ This list was compiled from the archive at http://archive.worldofdragon.org/arch
 	</software>
 
 	<software name="galxattxs" cloneof="galxattx">
-		<description>Galax Attax (Spa)</description>
+		<description>Galax Attax (Spain)</description>
 		<year>198?</year>
 		<publisher>Eurohard S.A.</publisher>
 		<part name="cass1" interface="dragon_cass">
@@ -4472,7 +4472,7 @@ This list was compiled from the archive at http://archive.worldofdragon.org/arch
 	</software>
 
 	<software name="goldbatna" cloneof="goldbatn">
-		<description>The Golden Baton (Alt)</description>
+		<description>The Golden Baton (alt)</description>
 		<year>1984</year>
 		<publisher>Channel 8 Software</publisher>
 		<part name="cass1" interface="dragon_cass">
@@ -5297,7 +5297,7 @@ This list was compiled from the archive at http://archive.worldofdragon.org/arch
 	</software>
 
 	<software name="jswc" cloneof="jsw">
-		<description>Jet Set Willy [cracked]</description>
+		<description>Jet Set Willy (cracked)</description>
 		<year>1985</year>
 		<publisher>Software Projects</publisher>
 		<part name="cass1" interface="dragon_cass">
@@ -5657,7 +5657,7 @@ This list was compiled from the archive at http://archive.worldofdragon.org/arch
 	</software>
 
 	<software name="leccion11">
-		<description>Leccion 11 Diagramas de Flujo U Organigramas (Spa)</description>
+		<description>Leccion 11 Diagramas de Flujo U Organigramas (Spain)</description>
 		<year>198?</year>
 		<publisher>Software AMM</publisher>
 		<part name="cass1" interface="dragon_cass">
@@ -5959,7 +5959,7 @@ This list was compiled from the archive at http://archive.worldofdragon.org/arch
 	</software>
 
 	<software name="mminera">
-		<description>Manic Miner (Alt2)</description>
+		<description>Manic Miner (alt 2)</description>
 		<year>1984</year>
 		<publisher>Software Projects</publisher>
 		<part name="cass1" interface="dragon_cass">
@@ -5970,7 +5970,7 @@ This list was compiled from the archive at http://archive.worldofdragon.org/arch
 	</software>
 
 	<software name="mminera2">
-		<description>Manic Miner (Alt)</description>
+		<description>Manic Miner (alt)</description>
 		<year>1984</year>
 		<publisher>Software Projects</publisher>
 		<part name="cass1" interface="dragon_cass">
@@ -5981,7 +5981,7 @@ This list was compiled from the archive at http://archive.worldofdragon.org/arch
 	</software>
 
 	<software name="mminerc" cloneof="mminer">
-		<description>Manic Miner [cracked]</description>
+		<description>Manic Miner (cracked)</description>
 		<year>1984</year>
 		<publisher>Software Projects</publisher>
 		<part name="cass1" interface="dragon_cass">
@@ -6026,7 +6026,7 @@ This list was compiled from the archive at http://archive.worldofdragon.org/arch
 	</software>
 
 	<software name="mansiondms" cloneof="mansiondm">
-		<description>Mansion of Doom (Spa)</description>
+		<description>Mansion of Doom (Spain)</description>
 		<year>198?</year>
 		<publisher>Eurohard S.A.</publisher>
 		<info name="serial" value="A0524" />
@@ -6776,7 +6776,7 @@ This list was compiled from the archive at http://archive.worldofdragon.org/arch
 	</software>
 
 	<software name="numpuzzls" cloneof="numpuzzl">
-		<description>Number Puzzler (Spa)</description>
+		<description>Number Puzzler (Spain)</description>
 		<year>198?</year>
 		<publisher>Eurohard S.A.</publisher>
 		<part name="cass1" interface="dragon_cass">
@@ -7107,7 +7107,7 @@ This list was compiled from the archive at http://archive.worldofdragon.org/arch
 	</software>
 
 	<software name="pettidiarya" cloneof="pettidiary">
-		<description>Pettigrews Diary (Alt)</description>
+		<description>Pettigrews Diary (alt)</description>
 		<year>1983</year>
 		<publisher>Shards Software</publisher>
 		<part name="cass1" interface="dragon_cass">
@@ -7210,7 +7210,7 @@ This list was compiled from the archive at http://archive.worldofdragon.org/arch
 	</software>
 
 	<software name="pimaniaa2" cloneof="pimania">
-		<description>Pimania (Alt2)</description>
+		<description>Pimania (alt 2)</description>
 		<year>1982</year>
 		<publisher>Automata</publisher>
 		<part name="cass1" interface="dragon_cass">
@@ -7221,7 +7221,7 @@ This list was compiled from the archive at http://archive.worldofdragon.org/arch
 	</software>
 
 	<software name="pimaniaa" cloneof="pimania">
-		<description>Pimania (Alt1)</description>
+		<description>Pimania (alt)</description>
 		<year>1982</year>
 		<publisher>Automata</publisher>
 		<part name="cass1" interface="dragon_cass">
@@ -7402,7 +7402,7 @@ This list was compiled from the archive at http://archive.worldofdragon.org/arch
 	</software>
 
 	<software name="procestxt">
-		<description>Procesador de Textos (Spa)</description>
+		<description>Procesador de Textos (Spain)</description>
 		<year>198?</year>
 		<publisher>Investronica</publisher>
 		<part name="cass1" interface="dragon_cass">
@@ -8064,7 +8064,7 @@ This list was compiled from the archive at http://archive.worldofdragon.org/arch
 	</software>
 
 	<software name="seaquests" cloneof="seaquest">
-		<description>Sea Quest (Spa)</description>
+		<description>Sea Quest (Spain)</description>
 		<year>1984</year>
 		<publisher>Eurohard S.A.</publisher>
 		<info name="serial" value="M30944" />
@@ -8184,7 +8184,7 @@ This list was compiled from the archive at http://archive.worldofdragon.org/arch
 	</software>
 
 	<software name="shapera" cloneof="shaper">
-		<description>Shaper (Alt)</description>
+		<description>Shaper (alt)</description>
 		<year>1984</year>
 		<publisher>Shards Software</publisher>
 		<part name="cass1" interface="dragon_cass">
@@ -8218,7 +8218,7 @@ This list was compiled from the archive at http://archive.worldofdragon.org/arch
 	</software>
 
 	<software name="shenanigs" cloneof="shenanig">
-		<description>Shenanigans (Spa)</description>
+		<description>Shenanigans (Spain)</description>
 		<year>1984</year>
 		<publisher>Eurohard S.A.</publisher>
 		<info name="serial" value="M30943" />
@@ -8286,7 +8286,7 @@ This list was compiled from the archive at http://archive.worldofdragon.org/arch
 	</software>
 
 	<software name="shuttlzaps" cloneof="shuttlzap">
-		<description>Shuttle Zap (Spa)</description>
+		<description>Shuttle Zap (Spain)</description>
 		<year>198?</year>
 		<publisher>Eurohard S.A.</publisher>
 		<part name="cass1" interface="dragon_cass">
@@ -8884,7 +8884,7 @@ This list was compiled from the archive at http://archive.worldofdragon.org/arch
 	</software>
 
 	<software name="sbascomp11a" cloneof="sbascomp11">
-		<description>Sprint Basic Compiler v1.1 (Alt)</description>
+		<description>Sprint Basic Compiler v1.1 (alt)</description>
 		<year>1984</year>
 		<publisher>Oasis Software</publisher>
 		<part name="cass1" interface="dragon_cass">
@@ -9312,7 +9312,7 @@ This list was compiled from the archive at http://archive.worldofdragon.org/arch
 	</software>
 
 	<software name="superkidc" cloneof="superkid">
-		<description>Superkid [cracked]</description>
+		<description>Superkid (cracked)</description>
 		<year>198?</year>
 		<publisher>Quickbeam</publisher>
 		<part name="cass1" interface="dragon_cass">
@@ -9441,7 +9441,7 @@ This list was compiled from the archive at http://archive.worldofdragon.org/arch
 	</software>
 
 	<software name="teatimef" cloneof="teatime">
-		<description>Tea Time [fixed]</description>
+		<description>Tea Time (fixed)</description>
 		<year>1984</year>
 		<publisher>Pocket Money Software</publisher>
 		<part name="cass1" interface="dragon_cass">
@@ -9989,7 +9989,7 @@ This list was compiled from the archive at http://archive.worldofdragon.org/arch
 	</software>
 
 	<software name="timebandta" cloneof="timebandt">
-		<description>Time Bandit (Alt)</description>
+		<description>Time Bandit (alt)</description>
 		<year>1984</year>
 		<publisher>Microdeal</publisher>
 		<part name="cass1" interface="dragon_cass">
@@ -10274,7 +10274,7 @@ This list was compiled from the archive at http://archive.worldofdragon.org/arch
 	</software>
 
 	<software name="tubearmyc" cloneof="tubearmy">
-		<description>Tube Way Army [cracked]</description>
+		<description>Tube Way Army (cracked)</description>
 		<year>1984</year>
 		<publisher>Crystal Computing</publisher>
 		<part name="cass1" interface="dragon_cass">
@@ -10606,7 +10606,7 @@ This list was compiled from the archive at http://archive.worldofdragon.org/arch
 	</software>
 
 	<software name="vikings" cloneof="viking">
-		<description>Viking (Spa)</description>
+		<description>Viking (Spain)</description>
 		<year>198?</year>
 		<publisher>Eurohard S.A.</publisher>
 		<info name="serial" value="M30879" />
@@ -10928,7 +10928,7 @@ This list was compiled from the archive at http://archive.worldofdragon.org/arch
 	</software>
 
 	<software name="zakssona" cloneof="zaksson">
-		<description>Zak's Son (Alt)</description>
+		<description>Zak's Son (alt)</description>
 		<year>1984</year>
 		<publisher>Cable Software</publisher>
 		<part name="cass1" interface="dragon_cass">
@@ -10970,7 +10970,7 @@ This list was compiled from the archive at http://archive.worldofdragon.org/arch
 	<!-- Magazines -->
 
 	<software name="drgnsoft1">
-		<description>Dragon Software No.1 (Spa)</description>
+		<description>Dragon Software No.1 (Spain)</description>
 		<year>198?</year>
 		<publisher>GTS</publisher>
 		<part name="cass1" interface="dragon_cass">
@@ -11036,7 +11036,7 @@ This list was compiled from the archive at http://archive.worldofdragon.org/arch
 	</software>
 
 	<software name="drgnsoft2">
-		<description>Dragon Software No.2 (Spa)</description>
+		<description>Dragon Software No.2 (Spain)</description>
 		<year>1985</year>
 		<publisher>GTS</publisher>
 		<part name="cass1" interface="dragon_cass">
@@ -11102,7 +11102,7 @@ This list was compiled from the archive at http://archive.worldofdragon.org/arch
 	</software>
 
 	<software name="drgnsoft3">
-		<description>Dragon Software No.3 (Spa)</description>
+		<description>Dragon Software No.3 (Spain)</description>
 		<year>1985</year>
 		<publisher>GTS</publisher>
 		<part name="cass1" interface="dragon_cass">
@@ -11174,7 +11174,7 @@ This list was compiled from the archive at http://archive.worldofdragon.org/arch
 	</software>
 
 	<software name="drgnsoft4">
-		<description>Dragon Software No.4 (Spa)</description>
+		<description>Dragon Software No.4 (Spain)</description>
 		<year>1985</year>
 		<publisher>GTS</publisher>
 		<part name="cass1" interface="dragon_cass">
@@ -11240,7 +11240,7 @@ This list was compiled from the archive at http://archive.worldofdragon.org/arch
 	</software>
 
 	<software name="drgnsoft5">
-		<description>Dragon Software No.5 (Spa)</description>
+		<description>Dragon Software No.5 (Spain)</description>
 		<year>1985</year>
 		<publisher>GTS</publisher>
 		<part name="cass1" interface="dragon_cass">
@@ -11312,7 +11312,7 @@ This list was compiled from the archive at http://archive.worldofdragon.org/arch
 	</software>
 
 	<software name="drgnsoft6">
-		<description>Dragon Software No.6 (Spa)</description>
+		<description>Dragon Software No.6 (Spain)</description>
 		<year>198?</year>
 		<publisher>GTS</publisher>
 		<part name="cass1" interface="dragon_cass">
@@ -11378,7 +11378,7 @@ This list was compiled from the archive at http://archive.worldofdragon.org/arch
 	</software>
 
 	<software name="drgnsoft7">
-		<description>Dragon Software No.7 (Spa)</description>
+		<description>Dragon Software No.7 (Spain)</description>
 		<year>1986</year>
 		<publisher>GTS</publisher>
 		<part name="cass1" interface="dragon_cass">
@@ -11444,7 +11444,7 @@ This list was compiled from the archive at http://archive.worldofdragon.org/arch
 	</software>
 
 	<software name="drgnsoft8">
-		<description>Dragon Software No.8 (Spa)</description>
+		<description>Dragon Software No.8 (Spain)</description>
 		<year>1986</year>
 		<publisher>GTS</publisher>
 		<part name="cass1" interface="dragon_cass">
@@ -11510,7 +11510,7 @@ This list was compiled from the archive at http://archive.worldofdragon.org/arch
 	</software>
 
 	<software name="drgnsoft9">
-		<description>Dragon Software No.9 (Spa)</description>
+		<description>Dragon Software No.9 (Spain)</description>
 		<year>1986</year>
 		<publisher>GTS</publisher>
 		<part name="cass1" interface="dragon_cass">
@@ -11564,7 +11564,7 @@ This list was compiled from the archive at http://archive.worldofdragon.org/arch
 	</software>
 
 	<software name="drgnsoft10">
-		<description>Dragon Software No.10 (Spa)</description>
+		<description>Dragon Software No.10 (Spain)</description>
 		<year>198?</year>
 		<publisher>GTS</publisher>
 		<part name="cass1" interface="dragon_cass">
@@ -11630,7 +11630,7 @@ This list was compiled from the archive at http://archive.worldofdragon.org/arch
 	</software>
 
 	<software name="drgnsoft11">
-		<description>Dragon Software No.11 (Spa)</description>
+		<description>Dragon Software No.11 (Spain)</description>
 		<year>198?</year>
 		<publisher>GTS</publisher>
 		<part name="cass1" interface="dragon_cass">
@@ -11678,7 +11678,7 @@ This list was compiled from the archive at http://archive.worldofdragon.org/arch
 	</software>
 
 	<software name="drgnsoft12">
-		<description>Dragon Software No.12 (Spa)</description>
+		<description>Dragon Software No.12 (Spain)</description>
 		<year>198?</year>
 		<publisher>GTS</publisher>
 		<part name="cass1" interface="dragon_cass">
@@ -11726,7 +11726,7 @@ This list was compiled from the archive at http://archive.worldofdragon.org/arch
 	</software>
 
 	<software name="drgnsoft13">
-		<description>Dragon Software No.13 (Spa)</description>
+		<description>Dragon Software No.13 (Spain)</description>
 		<year>1986</year>
 		<publisher>GTS</publisher>
 		<part name="cass1" interface="dragon_cass">
@@ -11780,7 +11780,7 @@ This list was compiled from the archive at http://archive.worldofdragon.org/arch
 	</software>
 
 	<software name="drgnsoft15">
-		<description>Dragon Software No.15: Meteorit Patrol (Spa)</description>
+		<description>Dragon Software No.15: Meteorit Patrol (Spain)</description>
 		<year>198?</year>
 		<publisher>GTS</publisher>
 		<part name="cass1" interface="dragon_cass">
@@ -11792,7 +11792,7 @@ This list was compiled from the archive at http://archive.worldofdragon.org/arch
 	</software>
 
 	<software name="drgnsoft16">
-		<description>Dragon Software No.16: Mania Persecutoria (Spa)</description>
+		<description>Dragon Software No.16: Mania Persecutoria (Spain)</description>
 		<year>1986</year>
 		<publisher>GTS</publisher>
 		<part name="cass1" interface="dragon_cass">
@@ -11828,7 +11828,7 @@ This list was compiled from the archive at http://archive.worldofdragon.org/arch
 	</software>
 
 	<software name="drgnsoft17">
-		<description>Dragon Software No.17 (Spa)</description>
+		<description>Dragon Software No.17 (Spain)</description>
 		<year>198?</year>
 		<publisher>GTS</publisher>
 		<part name="cass1" interface="dragon_cass">
@@ -11840,7 +11840,7 @@ This list was compiled from the archive at http://archive.worldofdragon.org/arch
 	</software>
 
 	<software name="drgnsoft18">
-		<description>Dragon Software No.18 (Spa)</description>
+		<description>Dragon Software No.18 (Spain)</description>
 		<year>1986</year>
 		<publisher>GTS</publisher>
 		<part name="cass1" interface="dragon_cass">
@@ -11852,7 +11852,7 @@ This list was compiled from the archive at http://archive.worldofdragon.org/arch
 	</software>
 
 	<software name="drgnsoft19">
-		<description>Dragon Software No.19: Laberinto (Spa)</description>
+		<description>Dragon Software No.19: Laberinto (Spain)</description>
 		<year>1986</year>
 		<publisher>GTS</publisher>
 		<part name="cass1" interface="dragon_cass">
@@ -11870,7 +11870,7 @@ This list was compiled from the archive at http://archive.worldofdragon.org/arch
 	</software>
 
 	<software name="drgnsoft20">
-		<description>Dragon Software No.20 (Spa)</description>
+		<description>Dragon Software No.20 (Spain)</description>
 		<year>198?</year>
 		<publisher>GTS</publisher>
 		<part name="cass1" interface="dragon_cass">
@@ -11882,7 +11882,7 @@ This list was compiled from the archive at http://archive.worldofdragon.org/arch
 	</software>
 
 	<software name="drgnsoft21">
-		<description>Dragon Software No.21: S.O.S. (Spa)</description>
+		<description>Dragon Software No.21: S.O.S. (Spain)</description>
 		<year>1986</year>
 		<publisher>GTS</publisher>
 		<part name="cass1" interface="dragon_cass">
@@ -11906,7 +11906,7 @@ This list was compiled from the archive at http://archive.worldofdragon.org/arch
 	</software>
 
 	<software name="drgnsoft22">
-		<description>Dragon Software No.22: Super D (Spa)</description>
+		<description>Dragon Software No.22: Super D (Spain)</description>
 		<year>1986</year>
 		<publisher>GTS</publisher>
 		<part name="cass1" interface="dragon_cass">
@@ -11936,7 +11936,7 @@ This list was compiled from the archive at http://archive.worldofdragon.org/arch
 	</software>
 
 	<software name="drgnsoft23">
-		<description>Dragon Software No.23: Defender (Spa)</description>
+		<description>Dragon Software No.23: Defender (Spain)</description>
 		<year>198?</year>
 		<publisher>GTS</publisher>
 		<part name="cass1" interface="dragon_cass">
@@ -11947,7 +11947,7 @@ This list was compiled from the archive at http://archive.worldofdragon.org/arch
 	</software>
 
 	<software name="drgnsoft24">
-		<description>Dragon Software No.24 (Spa)</description>
+		<description>Dragon Software No.24 (Spain)</description>
 		<year>198?</year>
 		<publisher>GTS</publisher>
 		<part name="cass1" interface="dragon_cass">
@@ -11995,7 +11995,7 @@ This list was compiled from the archive at http://archive.worldofdragon.org/arch
 	</software>
 
 	<software name="viddrgn1">
-		<description>Video Dragon Issue 1 (Spa)</description>
+		<description>Video Dragon Issue 1 (Spain)</description>
 		<year>1985</year>
 		<publisher>Software Editores</publisher>
 		<part name="cass1" interface="dragon_cass">
@@ -12085,7 +12085,7 @@ This list was compiled from the archive at http://archive.worldofdragon.org/arch
 	</software>
 
 	<software name="viddrgn2">
-		<description>Video Dragon Issue 2 (Spa)</description>
+		<description>Video Dragon Issue 2 (Spain)</description>
 		<year>1985</year>
 		<publisher>Software Editores</publisher>
 		<part name="cass1" interface="dragon_cass">
@@ -12193,7 +12193,7 @@ This list was compiled from the archive at http://archive.worldofdragon.org/arch
 	</software>
 
 	<software name="viddrgn3">
-		<description>Video Dragon Issue 3 (Spa)</description>
+		<description>Video Dragon Issue 3 (Spain)</description>
 		<year>1985</year>
 		<publisher>Software Editores</publisher>
 		<part name="cass1" interface="dragon_cass">
@@ -12211,7 +12211,7 @@ This list was compiled from the archive at http://archive.worldofdragon.org/arch
 	</software>
 
 	<software name="viddrgn6">
-		<description>Video Dragon Issue 6 (Spa)</description>
+		<description>Video Dragon Issue 6 (Spain)</description>
 		<year>1986</year>
 		<publisher>Software Editores</publisher>
 		<part name="cass1" interface="dragon_cass">

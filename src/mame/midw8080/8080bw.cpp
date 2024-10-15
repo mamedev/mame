@@ -2365,7 +2365,7 @@ INPUT_PORTS_END
 
 /*******************************************************/
 /*                                                     */
-/* Jatre Specter (Taito?)                              */
+/* Jatre "Jatre Specter"                               */
 /*                                                     */
 /*******************************************************/
 
@@ -5999,8 +5999,8 @@ GAMEL(1979, supinvsion,  invaders, invaders,  searthin,  invaders_state, empty_i
 GAMEL(1980, searthie,    invaders, invaders,  searthin,  invaders_state, empty_init,    ROT270, "bootleg (Electrocoin)",              "Super Earth Invasion (set 3)",                                    MACHINE_SUPPORTS_SAVE, layout_invaders )
 GAMEL(19??, alieninv,    invaders, invaders,  alieninv,  invaders_state, empty_init,    ROT270, "bootleg (Margamatics)",              "Alien Invasion",                                                  MACHINE_SUPPORTS_SAVE, layout_invaders )
 GAMEL(19??, alieninvp2,  invaders, invaders,  searthin,  invaders_state, empty_init,    ROT270, "bootleg",                            "Alien Invasion Part II",                                          MACHINE_SUPPORTS_SAVE, layout_invaders )
-GAMEL(1979, jspecter,    invaders, invaders,  jspecter,  invaders_state, empty_init,    ROT270, "bootleg (Jatre)",                    "Jatre Specter (set 1)",                                           MACHINE_SUPPORTS_SAVE, layout_invaders )
-GAMEL(1979, jspecter2,   invaders, invaders,  jspecter,  invaders_state, empty_init,    ROT270, "bootleg (Jatre)",                    "Jatre Specter (set 2)",                                           MACHINE_SUPPORTS_SAVE, layout_invaders )
+GAMEL(1979, jspecter,    invaders, invaders,  jspecter,  invaders_state, empty_init,    ROT270, "Taito / Jatre",                      "Jatre Specter (set 1)",                                           MACHINE_SUPPORTS_SAVE, layout_invaders )
+GAMEL(1979, jspecter2,   invaders, invaders,  jspecter,  invaders_state, empty_init,    ROT270, "Taito / Jatre",                      "Jatre Specter (set 2)",                                           MACHINE_SUPPORTS_SAVE, layout_invaders )
 GAMEL(1978, spacewr3,    invaders, spcewars,  sicv,      _8080bw_state,  empty_init,    ROT270, "bootleg",                            "Space War Part 3",                                                MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_invaders ) // Bootleg of Sanritsu's Space War
 GAMEL(1978, swipeout,    invaders, spcewars,  sicv,      _8080bw_state,  empty_init,    ROT270, "bootleg (Beyer and Brown)",          "Space Wipeout",                                                   MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_invaders ) // Bootleg of Sanritsu's Space War
 GAME( 1978, darthvdr,    invaders, darthvdr,  darthvdr,  darthvdr_state, empty_init,    ROT270, "bootleg",                            "Darth Vader (bootleg of Space Invaders)",                         MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )

@@ -72,6 +72,7 @@ private:
 
 void dbridgec_state::machine_start()
 {
+	// register for savestates
 	save_item(NAME(m_inp_mux));
 	save_item(NAME(m_lcd_com));
 	save_item(NAME(m_lcd_segs));

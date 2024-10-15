@@ -63,7 +63,7 @@ protected:
 
 void hh_smc1k_state::machine_start()
 {
-	// resolve handlers
+	// resolve outputs
 	m_out_x.resolve();
 
 	// register for savestates

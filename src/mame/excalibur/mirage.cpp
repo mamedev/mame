@@ -144,7 +144,7 @@ void mirage_state::machine_start()
 {
 	init_motors();
 
-	// resolve handlers
+	// resolve outputs
 	m_out_lcd.resolve();
 	m_piece_hand.resolve();
 	m_out_motor.resolve();

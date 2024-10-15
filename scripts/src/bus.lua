@@ -2399,6 +2399,10 @@ if (BUSES["PSION_HONDA"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/bus/psion/honda/slot.cpp",
 		MAME_DIR .. "src/devices/bus/psion/honda/slot.h",
+		MAME_DIR .. "src/devices/bus/psion/honda/parallel.cpp",
+		MAME_DIR .. "src/devices/bus/psion/honda/parallel.h",
+		MAME_DIR .. "src/devices/bus/psion/honda/pclink.cpp",
+		MAME_DIR .. "src/devices/bus/psion/honda/pclink.h",
 		MAME_DIR .. "src/devices/bus/psion/honda/ssd.cpp",
 		MAME_DIR .. "src/devices/bus/psion/honda/ssd.h",
 	}
@@ -2414,6 +2418,8 @@ if (BUSES["PSION_MODULE"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/bus/psion/module/slot.cpp",
 		MAME_DIR .. "src/devices/bus/psion/module/slot.h",
+		MAME_DIR .. "src/devices/bus/psion/module/serpar.cpp",
+		MAME_DIR .. "src/devices/bus/psion/module/serpar.h",
 	}
 end
 

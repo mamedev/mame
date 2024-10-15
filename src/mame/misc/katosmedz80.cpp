@@ -312,7 +312,7 @@ private:
 
 void katosmedz80_state::machine_start()
 {
-	// resolve handlers
+	// resolve outputs
 	m_ledsp2.resolve();
 	m_ledsp3.resolve();
 	m_ledsp5.resolve();

@@ -127,7 +127,7 @@ private:
 
 void stratos_base_state::machine_start()
 {
-	// resolve handlers
+	// resolve outputs
 	m_out_digit.resolve();
 	m_out_lcd.resolve();
 

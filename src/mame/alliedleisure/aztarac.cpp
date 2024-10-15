@@ -44,7 +44,9 @@ public:
 		m_soundlatch(*this, "soundlatch"),
 		m_vectorram(*this, "vectorram"),
 		m_sticky(*this, "STICKY"),
-		m_stickz(*this, "STICKZ")
+		m_stickz(*this, "STICKZ"),
+		m_inputs(*this, "INPUTS"),
+		m_dial(*this, "DIAL")
 	{ }
 
 	void aztarac(machine_config &config);
@@ -66,6 +68,8 @@ private:
 
 	required_ioport m_sticky;
 	required_ioport m_stickz;
+	required_ioport m_inputs;
+	required_ioport m_dial;
 
 	uint8_t m_sound_status = 0;
 	uint32_t m_xcenter = 0;
@@ -280,9 +284,9 @@ void aztarac_state::main_map(address_map &map)
 	map(0x021000, 0x021001).w(FUNC(aztarac_state::nvram_store_w));
 	map(0x022000, 0x0221ff).rw(m_nvram, FUNC(x2212_device::read), FUNC(x2212_device::write)).umask16(0x00ff);
 	map(0x027000, 0x027001).r(FUNC(aztarac_state::joystick_r));
-	map(0x027004, 0x027005).portr("INPUTS");
+	map(0x027004, 0x027005).portr(m_inputs);
 	map(0x027009, 0x027009).rw(FUNC(aztarac_state::sound_r), FUNC(aztarac_state::sound_w));
-	map(0x02700c, 0x02700d).portr("DIAL");
+	map(0x02700c, 0x02700d).portr(m_dial);
 	map(0x02700e, 0x02700f).r("watchdog", FUNC(watchdog_timer_device::reset16_r));
 	map(0xff8000, 0xffafff).ram().share(m_vectorram);
 	map(0xffb000, 0xffb001).nopr();

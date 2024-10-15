@@ -16,9 +16,9 @@ fidelity/dames.cpp. It will give an error beep if the user removes a captured
 piece from the board, but it doesn't matter.
 
 Two versions were sold, each should have the same MCU and ROM: a tabletop model
-(Electronic Dames, 8MHz or 12MHz), and a portable model (Compact Dames Computer,
-8MHz). As with SciSys/Saitek chess computers, they were also licensed to Tandy.
-The program engine is DIOS by Eric van Riet Paap.
+(Electronic Dames, 8MHz or 12MHz, model 660), and a portable model (Compact Dames
+Computer, 8MHz, model 661). As with SciSys/Saitek chess computers, they were also
+licensed to Tandy. The program engine is DIOS by Eric van Riet Paap.
 
 According to the second hand market, the tabletop French version is much more
 common than the English one. The manual and a LED label incorrectly call crowned

@@ -2286,11 +2286,15 @@ void mcompgin_state::mcompgin(machine_config &config)
 	m_maincpu->write_e().set(FUNC(mcompgin_state::lcd_w));
 
 	// video hardware
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
+	screen.set_refresh_hz(60);
+	screen.set_size(1920, 743);
+	screen.set_visarea_full();
+
 	HLCD0530(config, m_lcd, 500); // C=0.01uF
 	m_lcd->write_cols().set(FUNC(mcompgin_state::lcd_output_w));
 
 	PWM_DISPLAY(config, m_display).set_size(8, 24);
-
 	config.set_default_layout(layout_mcompgin);
 
 	// no sound!
@@ -2301,6 +2305,9 @@ void mcompgin_state::mcompgin(machine_config &config)
 ROM_START( mcompgin )
 	ROM_REGION( 0x0800, "maincpu", 0 )
 	ROM_LOAD( "d650c_060", 0x0000, 0x0800, CRC(985e6da6) SHA1(ea4102a10a5741f06297c5426156e4b2f0d85a68) )
+
+	ROM_REGION( 331033, "screen", 0)
+	ROM_LOAD( "mcompgin.svg", 0, 331033, CRC(b432b13c) SHA1(6117e30897fcc92de09c69a8d7ede7068e26e43f) )
 ROM_END
 
 

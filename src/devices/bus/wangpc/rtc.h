@@ -53,6 +53,7 @@ private:
 	required_device<z80ctc_device> m_ctc1;
 	required_device<z80sio_device> m_sio;
 	memory_share_creator<uint8_t> m_char_ram;
+	required_ioport m_sw1;
 
 	void wangpc_rtc_io(address_map &map) ATTR_COLD;
 	void wangpc_rtc_mem(address_map &map) ATTR_COLD;

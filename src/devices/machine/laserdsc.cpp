@@ -2,8 +2,6 @@
 // copyright-holders:Aaron Giles
 /*************************************************************************
 
-    laserdsc.c
-
     Core laserdisc player implementation.
 
 *************************************************************************/
@@ -321,15 +319,15 @@ void laserdisc_device::device_start()
 void laserdisc_device::device_stop()
 {
 	// make sure all async operations have completed
-	if (m_disc != nullptr)
+	if (m_disc)
 		osd_work_queue_wait(m_work_queue, osd_ticks_per_second() * 10);
 
 	// free any textures and palettes
-	if (m_videotex != nullptr)
+	if (m_videotex)
 		machine().render().texture_free(m_videotex);
-	if (m_videopalette != nullptr)
+	if (m_videopalette)
 		m_videopalette->deref();
-	if (m_overtex != nullptr)
+	if (m_overtex)
 		machine().render().texture_free(m_overtex);
 }
 
@@ -343,7 +341,7 @@ void laserdisc_device::device_reset()
 	// attempt to wire up the audio
 	m_stream->set_sample_rate(m_samplerate);
 
-	// set up the general ld
+	// set up the general LD
 	m_audiosquelch = 3;
 	m_videosquelch = 1;
 	m_fieldnum = 0;
@@ -729,10 +727,10 @@ void laserdisc_device::init_disc()
 	m_fps_times_1million = 59940000;
 	m_samplerate = 48000;
 
-	// get the disc metadata and extract the ld
+	// get the disc metadata and extract the LD
 	m_chdtracks = 0;
 	m_maxtrack = VIRTUAL_LEAD_IN_TRACKS + MAX_TOTAL_TRACKS + VIRTUAL_LEAD_OUT_TRACKS;
-	if (m_disc != nullptr)
+	if (m_disc)
 	{
 		// require the A/V codec and nothing else
 		if (m_disc->compression(0) != CHD_CODEC_AVHUFF || m_disc->compression(1) != CHD_CODEC_NONE)
@@ -1078,7 +1076,7 @@ void laserdisc_device::read_track_data()
 void *laserdisc_device::read_async_static(void *param, int threadid)
 {
 	laserdisc_device &ld = *reinterpret_cast<laserdisc_device *>(param);
-	ld.m_readresult = ld.m_disc->read_hunk(ld.m_queued_hunknum, nullptr);
+	ld.m_readresult = ld.m_disc->codec_process_hunk(ld.m_queued_hunknum);
 	return nullptr;
 }
 

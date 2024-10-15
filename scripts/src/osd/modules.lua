@@ -16,7 +16,7 @@ end
 function addlibfromstring(str)
 	if (str==nil) then return  end
 	for w in str:gmatch("%S+") do
-		if string.starts(w,"-l")==true then
+		if string.starts(w,"-l") then
 			links {
 				string.sub(w,3)
 			}
@@ -27,7 +27,7 @@ end
 function addoptionsfromstring(str)
 	if (str==nil) then return  end
 	for w in str:gmatch("%S+") do
-		if string.starts(w,"-l")==false then
+		if not string.starts(w,"-l") then
 			linkoptions {
 				w
 			}
@@ -384,12 +384,16 @@ function qtdebuggerbuild()
 			if _OPTIONS["QT_HOME"]~=nil then
 				MOCTST = backtick(_OPTIONS["QT_HOME"] .. "/bin/moc --version 2>/dev/null")
 				if (MOCTST=='') then
-					MOCTST = backtick(_OPTIONS["QT_HOME"] .. "/libexec/moc --version 2>/dev/null")
-					if (MOCTST=='') then
+					local qt_host_libexecs = backtick(_OPTIONS["QT_HOME"] .. "/bin/qmake -query QT_HOST_LIBEXECS")
+					if not string.starts(qt_host_libexecs,"/") then
+						qt_host_libexecs = _OPTIONS["QT_HOME"] .. "/libexec"
+					end
+					MOCTST = backtick(qt_host_libexecs .. "/moc --version 2>/dev/null")
+					if MOCTST=='' then
 						print("Qt's Meta Object Compiler (moc) wasn't found!")
 						os.exit(1)
 					else
-						MOC = _OPTIONS["QT_HOME"] .. "/libexec/moc"
+						MOC = qt_host_libexecs .. "/moc"
 					end
 				else
 					MOC = _OPTIONS["QT_HOME"] .. "/bin/moc"
@@ -399,7 +403,7 @@ function qtdebuggerbuild()
 				if (MOCTST=='') then
 					MOCTST = backtick("which moc 2>/dev/null")
 				end
-				if (MOCTST=='') then
+				if MOCTST=='' then
 					print("Qt's Meta Object Compiler (moc) wasn't found!")
 					os.exit(1)
 				end

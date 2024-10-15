@@ -17,10 +17,13 @@ jobs:
   build-language:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@master
+    - uses: actions/checkout@main
+      with:
+        fetch-depth: 0
     - name: Compile message catalogs
       run: for x in language/*/*.po ; do python scripts/build/msgfmt.py --output-file "`dirname "$x"`/`basename "$x" .po`.mo" "$x" ; done
-    - uses: actions/upload-artifact@master
+    - uses: actions/upload-artifact@main
       with:
         name: mame-language-${{ github.sha }}
         path: language/*/*.mo
+        if-no-files-found: error

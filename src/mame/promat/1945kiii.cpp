@@ -6,28 +6,30 @@ what is this HW cloned from? I doubt it's an original design
 
 Promat / Oriental Soft SPR800E driver
 
-1945K-III (Newer)    2000   Oriental Soft
-1945K-III (Older)    1999   Oriental Soft
+1945K III (Newer)    2000   Oriental Soft
+1945K III (Older)    1999   Oriental Soft
+1945K III            1999   Promat
 Solite Spirits       1999   Promat
 '96 Flag Rally       1996   Promat???
 
 NOTES
 -----
-1945K-III is clearly a retooled Solite Spirtis. There are spots in 1945K-III where it shows "SOLITE SPIRITS"
+1945K III is clearly a retooled Solite Spirits. There are spots in 1945K III where it shows "SOLITE SPIRITS"
   such as the ship selection screen's background and after the continue countdown expires, but before the high score table.
   It's unknown if the changes were specifically meant for an Export version or if Promat was trying to capitalized
   on Psikyo's Striker 1945 series and it's name.
-  Older version of 1945K-III there's no dipswitches for Demo Sound or Allow Continue - Demo sounds always OFF
+  In the olders version of 1945K III there's no dipswitches for Demo Sound or Allow Continue - Demo sounds always OFF
+  The Promat license has the same sound test for service mode & P1 graphics error for P2 player select as Solite Spirits
 
 Solite Spirit:
   Demo loop is extremely short and only shows one area
-  The test screen is basically just for sound test (in 1945K-III you get inputs, then press P1 & P2 start to test sounds)
-  In 2 player games when selecting ships, "player 2" uses the same "P1" graphic (fixed in 1945K-III)
+  The test screen is basically just for sound test (in 1945K III you get inputs, then press P1 & P2 start to test sounds)
+  In 2 player games when selecting ships, "player 2" uses the same "P1" graphic (fixed in newer 1945K III sets)
   No "Lives", Demo Sound or Allow Continue dipswitches - Demo sounds always ON
 
 ---------------
 
-1945K-III
+1945K III
 Oriental, 2000
 
 This game is a straight rip-off of Psikyo's Strikers 1945 III.
@@ -94,7 +96,7 @@ Other: QuickLogic QL2003-XPL84C, SPR800E
 
 * denotes unpopulated socket
 
-SPR800E on the 1945K-III OPCX1 PCB silkscreened  ORIENTAL  OP-CX1  SPR800E  9937E
+SPR800E on the 1945K III OPCX1 PCB silkscreened  ORIENTAL  OP-CX1  SPR800E  9937E
 SPR800E on the Solite Spirits PCB silkscreened  PROMAT  SPR800E  ES928
 */
 
@@ -514,8 +516,8 @@ static INPUT_PORTS_START( k3old )
 	PORT_DIPSETTING(      0x0020, "4" )
 	PORT_DIPSETTING(      0x0000, "5" )
 	PORT_SERVICE_DIPLOC(  0x0080, IP_ACTIVE_LOW, "SW1:8" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x0100, 0x0100, "SW2:1" )   // In newer 1945K-III sets this is Demo_Sounds - Demo Sounds always OFF here!
-	PORT_DIPUNKNOWN_DIPLOC( 0x0200, 0x0200, "SW2:2" )   // In newer 1945K-III sets this is Allow_Continue - Always Continue
+	PORT_DIPUNKNOWN_DIPLOC( 0x0100, 0x0100, "SW2:1" )   // In newer 1945K III sets this is Demo_Sounds - Demo Sounds always OFF here!
+	PORT_DIPUNKNOWN_DIPLOC( 0x0200, 0x0200, "SW2:2" )   // In newer 1945K III sets this is Allow_Continue - Always Continue
 	PORT_DIPUNKNOWN_DIPLOC( 0x0400, 0x0400, "SW2:3" )
 	PORT_DIPUNKNOWN_DIPLOC( 0x0800, 0x0800, "SW2:4" )
 	PORT_DIPUNKNOWN_DIPLOC( 0x1000, 0x1000, "SW2:5" )
@@ -566,11 +568,11 @@ static INPUT_PORTS_START( solite )
 	PORT_DIPSETTING(      0x0008, DEF_STR( Normal ) )
 	PORT_DIPSETTING(      0x0010, DEF_STR( Hard ) )
 	PORT_DIPSETTING(      0x0018, DEF_STR( Hardest ) )
-	PORT_DIPUNKNOWN_DIPLOC( 0x0020, 0x0020, "SW1:6" )   // In 1945K-III sets 6&7 are Lives
-	PORT_DIPUNKNOWN_DIPLOC( 0x0040, 0x0040, "SW1:7" )   // In 1945K-III sets 6&7 are Lives
+	PORT_DIPUNKNOWN_DIPLOC( 0x0020, 0x0020, "SW1:6" )   // In 1945K III sets 6&7 are Lives
+	PORT_DIPUNKNOWN_DIPLOC( 0x0040, 0x0040, "SW1:7" )   // In 1945K III sets 6&7 are Lives
 	PORT_SERVICE_DIPLOC(  0x0080, IP_ACTIVE_LOW, "SW1:8" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x0100, 0x0100, "SW2:1" )   // In newer 1945K-III sets this is Demo_Sounds - Demo Sounds always ON here!
-	PORT_DIPUNKNOWN_DIPLOC( 0x0200, 0x0200, "SW2:2" )   // In newer 1945K-III sets this is Allow_Continue - Always Continue
+	PORT_DIPUNKNOWN_DIPLOC( 0x0100, 0x0100, "SW2:1" )   // In newer 1945K III sets this is Demo_Sounds - Demo Sounds always ON here!
+	PORT_DIPUNKNOWN_DIPLOC( 0x0200, 0x0200, "SW2:2" )   // In newer 1945K III sets this is Allow_Continue - Always Continue
 	PORT_DIPUNKNOWN_DIPLOC( 0x0400, 0x0400, "SW2:3" )
 	PORT_DIPUNKNOWN_DIPLOC( 0x0800, 0x0800, "SW2:4" )
 	PORT_DIPUNKNOWN_DIPLOC( 0x1000, 0x1000, "SW2:5" )
@@ -679,7 +681,7 @@ void k3_state::k3(machine_config &config)
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &k3_state::k3_map);
 
-	OKIM6295(config, m_oki[1], MASTER_CLOCK/16, okim6295_device::PIN7_HIGH);  // dividers?
+	OKIM6295(config, m_oki[1], MASTER_CLOCK/16, okim6295_device::PIN7_HIGH);  // NOTE: OPCX2 PCB is 16.0000MHz / 16 - OPCX1 PCB is 4.000MHz / 4
 	m_oki[1]->add_route(ALL_OUTPUTS, "mono", 1.0);
 
 	m_screen->set_raw(XTAL(27'000'000)/4, 432, 0, 320, 262, 0, 224); // ~60Hz
@@ -764,6 +766,38 @@ ROM_START( 1945kiiio )
 	ROM_LOAD32_BYTE( "8.u105", 0x000003, 0x80000, CRC(2c3895d5) SHA1(ab5837d996c1bb70071db02f07412c182d7547f8) )
 ROM_END
 
+ROM_START( 1945kiiipt ) // Promat copyright, 1945K III title, earlier PCB - ROMs had no labels
+	ROM_REGION( 0x100000, "maincpu", 0 ) // 68000 Code
+	ROM_LOAD16_BYTE( "u34", 0x00001, 0x80000, CRC(d4efcdf4) SHA1(e53ea3a5d8a44d4adf5e58865f99548d3476d1f5) )
+	ROM_LOAD16_BYTE( "u35", 0x00000, 0x80000, CRC(4381341d) SHA1(518c1b303d6286a794faf6d5731fbe7c51936b86) )
+
+	ROM_REGION( 0x080000, "oki2", 0 ) // Samples
+	ROM_LOAD( "su5", 0x00000, 0x80000, CRC(9d96fd55) SHA1(80025cc2c44e8cd938620818e0b0974026377f5c) ) // Sound data matches other 1945K III sets
+
+	ROM_REGION( 0x080000, "oki1", 0 ) // Samples
+	ROM_LOAD( "su4", 0x00000, 0x80000, CRC(d45aec3b) SHA1(fc182a10e19687eb2f2f4a1d2ad976814185f0fc)  )
+
+	ROM_REGION( 0x400000, "sprites", 0 )
+	ROM_LOAD32_BYTE( "u5",  0x000000, 0x080000, CRC(4742aa38) SHA1(6e8d53afe7a6a5d60c135dd6a283d5bb47821f48) ) // these 4 match Solite Spirit
+	ROM_LOAD32_BYTE( "u6",  0x000001, 0x080000, CRC(c137fb33) SHA1(6798bc4569bdcab02c2b16315c8827268e5674eb) )
+	ROM_LOAD32_BYTE( "u7",  0x000002, 0x080000, CRC(d0593a03) SHA1(544e345e0849239b8156df8c50568bb2e2685bd3) )
+	ROM_LOAD32_BYTE( "u8",  0x000003, 0x080000, CRC(baa9eeb1) SHA1(12d905143c707bc0ff6997b89816b7bce40bd9aa) )
+
+	ROM_LOAD32_BYTE( "u58", 0x200000, 0x080000, CRC(eb586bd6) SHA1(1050021a663421be455c215cb9e724463e1fc425) ) // first 3 match Solite Spirit
+	ROM_LOAD32_BYTE( "u59", 0x200001, 0x080000, CRC(abc8b869) SHA1(aea3e2bb447b6b9ac0dd19cac7922cc9bee6afb8) )
+	ROM_LOAD32_BYTE( "u60", 0x200002, 0x080000, CRC(31f9b034) SHA1(d3224d9f11236fcaa65d477b87c46bea8a69db01) )
+	ROM_LOAD32_BYTE( "u61", 0x200003, 0x080000, CRC(f13e609b) SHA1(03ab2ee368d086a927d2b6412db5f6dfd066b08f) ) // this one is VERY different
+
+	ROM_REGION( 0x200000, "tiles", 0 )
+	ROM_LOAD32_BYTE( "u102", 0x000000, 0x80000, CRC(ddca369b) SHA1(66c3daf55cbe5d5f73482eff566c52fe1e509164) ) // These 4 are unique to this set
+	ROM_LOAD32_BYTE( "u103", 0x000001, 0x80000, CRC(32f58186) SHA1(9eab278ce69387e04c90b660686e93e3d7c80439) )
+	ROM_LOAD32_BYTE( "u104", 0x000002, 0x80000, CRC(2031c42e) SHA1(f7132862ac0b908da298d67802266b96f809ff49) )
+	ROM_LOAD32_BYTE( "u105", 0x000003, 0x80000, CRC(8428b693) SHA1(ee9d1a295159c5bbf5c0a59cf3cd23889aa293f7) )
+
+	ROM_REGION( 0x117, "plds", 0 )
+	ROM_LOAD( "gal16v8.u22", 0x000, 0x117, NO_DUMP ) // a dump done via 020 dumper exists, but needs to be reduced
+ROM_END
+
 ROM_START( slspirit )
 	ROM_REGION( 0x100000, "maincpu", 0 ) // 68000 Code
 	ROM_LOAD16_BYTE( "3.u34", 0x00001, 0x40000, CRC(b5ac3272) SHA1(da223ef3b006be03a11559e00ae9d7bbd2d06ee5) )
@@ -823,9 +857,10 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 2000, 1945kiii,  0,        k3,       k3,       k3_state, empty_init, ROT270, "Oriental Soft", "1945k III (newer, OPCX2 PCB)", MACHINE_SUPPORTS_SAVE )
-GAME( 2000, 1945kiiin, 1945kiii, k3,       k3,       k3_state, empty_init, ROT270, "Oriental Soft", "1945k III (newer, OPCX1 PCB)", MACHINE_SUPPORTS_SAVE )
-GAME( 1999, 1945kiiio, 1945kiii, k3,       k3old,    k3_state, empty_init, ROT270, "Oriental Soft", "1945k III (older, OPCX1 PCB)", MACHINE_SUPPORTS_SAVE )
-GAME( 1999, slspirit,  0,        k3,       solite,   k3_state, empty_init, ROT270, "Promat",        "Solite Spirits",               MACHINE_SUPPORTS_SAVE )
+GAME( 2000, 1945kiii,   0,        k3,       k3,       k3_state, empty_init, ROT270, "Oriental Soft", "1945k III (newer, OPCX2 PCB)",          MACHINE_SUPPORTS_SAVE )
+GAME( 2000, 1945kiiin,  1945kiii, k3,       k3,       k3_state, empty_init, ROT270, "Oriental Soft", "1945k III (newer, OPCX1 PCB)",          MACHINE_SUPPORTS_SAVE )
+GAME( 1999, 1945kiiio,  1945kiii, k3,       k3old,    k3_state, empty_init, ROT270, "Oriental Soft", "1945k III (older, OPCX1 PCB)",          MACHINE_SUPPORTS_SAVE )
+GAME( 1999, 1945kiiipt, 1945kiii, k3,       solite,   k3_state, empty_init, ROT270, "Promat",        "1945k III (Promat license, OPCX1 PCB)", MACHINE_SUPPORTS_SAVE )
+GAME( 1999, slspirit,   0,        k3,       solite,   k3_state, empty_init, ROT270, "Promat",        "Solite Spirits",                        MACHINE_SUPPORTS_SAVE )
 
-GAME( 1996, flagrall,  0,        flagrall, flagrall, k3_state, empty_init, ROT0,   "Promat?",       "'96 Flag Rally",               MACHINE_SUPPORTS_SAVE )
+GAME( 1996, flagrall,   0,        flagrall, flagrall, k3_state, empty_init, ROT0,   "Promat?",       "'96 Flag Rally",                        MACHINE_SUPPORTS_SAVE )

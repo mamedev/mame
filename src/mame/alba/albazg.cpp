@@ -71,6 +71,7 @@ public:
 		, m_gfxdecode(*this, "gfxdecode")
 		, m_key_in(*this, "P1_IN%u", 0U)
 		, m_coin_in(*this, "COIN")
+		, m_eepromout(*this, "EEPROMOUT")
 	{ }
 
 	virtual void yumefuda(machine_config &config);
@@ -108,6 +109,7 @@ private:
 
 	required_ioport_array<6> m_key_in;
 	required_ioport m_coin_in;
+	required_ioport m_eepromout;
 };
 
 TILE_GET_INFO_MEMBER(albazg_state::get_tile_info)
@@ -221,7 +223,7 @@ void albazg_state::main_map(address_map &map)
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0x9fff).bankr(m_rombank);
 	map(0xa7fc, 0xa7fc).w(FUNC(albazg_state::prot_lock_w));
-	map(0xa7ff, 0xa7ff).portw("EEPROMOUT");
+	map(0xa7ff, 0xa7ff).portw(m_eepromout);
 	map(0xaf80, 0xafff).rw(FUNC(albazg_state::custom_ram_r), FUNC(albazg_state::custom_ram_w)).share(m_custom_ram);
 	map(0xb000, 0xb07f).ram().w("palette", FUNC(palette_device::write8)).share("palette");
 	map(0xb080, 0xb0ff).ram().w("palette", FUNC(palette_device::write8_ext)).share("palette_ext");

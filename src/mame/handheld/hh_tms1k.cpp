@@ -419,7 +419,7 @@ protected:
 
 void hh_tms1k_state::machine_start()
 {
-	// resolve handlers
+	// resolve outputs
 	m_out_power.resolve();
 
 	// register for savestates
@@ -1003,7 +1003,7 @@ void bcheetah_state::machine_start()
 {
 	hh_tms1k_state::machine_start();
 
-	// resolve handlers
+	// resolve outputs
 	m_motor1.resolve();
 	m_motor2_left.resolve();
 	m_motor2_right.resolve();
@@ -9772,7 +9772,7 @@ void bigtrak_state::machine_start()
 {
 	hh_tms1k_state::machine_start();
 
-	// resolve handlers
+	// resolve outputs
 	m_left_motor_forward.resolve();
 	m_left_motor_reverse.resolve();
 	m_right_motor_forward.resolve();
@@ -10000,7 +10000,7 @@ void mbdtower_state::machine_start()
 {
 	hh_tms1k_state::machine_start();
 
-	// resolve handlers
+	// resolve outputs
 	m_motor_pos_out.resolve();
 	m_card_pos_out.resolve();
 	m_motor_on_out.resolve();

@@ -2,8 +2,6 @@
 // copyright-holders:Aaron Giles
 /*************************************************************************
 
-    laserdsc.h
-
     Core laserdisc player implementation.
 
 *************************************************************************/
@@ -15,8 +13,9 @@
 
 #include "emupal.h"
 #include "screen.h"
-#include "vbiparse.h"
+
 #include "avhuff.h"
+#include "vbiparse.h"
 
 #include <algorithm>
 #include <system_error>
@@ -98,7 +97,7 @@ protected:
 
 public:
 	// delegates
-	typedef device_delegate<chd_file *(void)> get_disc_delegate;
+	typedef device_delegate<chd_file * ()> get_disc_delegate;
 	typedef device_delegate<void (int samplerate, int samples, const int16_t *ch0, const int16_t *ch1)> audio_delegate;
 
 	laserdisc_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);

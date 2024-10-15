@@ -187,6 +187,10 @@ public:
 		, m_palette(*this, "palette")
 		, m_screen(*this, "screen")
 		, m_k054321(*this, "k054321")
+		, m_system(*this, "SYSTEM")
+		, m_p1(*this, "P1")
+		, m_p2(*this, "P2")
+		, m_eeprom(*this, "EEPROM")
 	{
 	}
 
@@ -231,6 +235,7 @@ private:
 	required_device<palette_device> m_palette;
 	required_device<screen_device> m_screen;
 	required_device<k054321_device> m_k054321;
+	required_ioport m_system, m_p1, m_p2, m_eeprom;
 
 	uint16_t spriteram_mirror_r(offs_t offset);
 	void spriteram_mirror_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
@@ -580,10 +585,10 @@ void xexex_state::main_map(address_map &map)
 	map(0x0d4000, 0x0d4001).w(FUNC(xexex_state::sound_irq_w));
 	map(0x0d6000, 0x0d601f).m(m_k054321, FUNC(k054321_device::main_map)).umask16(0x00ff);
 	map(0x0d8000, 0x0d8007).w(m_k056832, FUNC(k056832_device::b_word_w));                // VSCCS regs
-	map(0x0da000, 0x0da001).portr("P1");
-	map(0x0da002, 0x0da003).portr("P2");
-	map(0x0dc000, 0x0dc001).portr("SYSTEM");
-	map(0x0dc002, 0x0dc003).portr("EEPROM");
+	map(0x0da000, 0x0da001).portr(m_p1);
+	map(0x0da002, 0x0da003).portr(m_p2);
+	map(0x0dc000, 0x0dc001).portr(m_system);
+	map(0x0dc002, 0x0dc003).portr(m_eeprom);
 	map(0x0de000, 0x0de001).rw(FUNC(xexex_state::control2_r), FUNC(xexex_state::control2_w));
 	map(0x100000, 0x17ffff).rom();
 	map(0x180000, 0x181fff).rw(m_k056832, FUNC(k056832_device::ram_word_r), FUNC(k056832_device::ram_word_w));

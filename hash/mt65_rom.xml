@@ -65,7 +65,7 @@ license:CC0-1.0
 	<software name="dasm" supported="partial">
 		<description>DASM</description>
 		<year>1984</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>Tangerine Users Group</publisher>
 		<info name="usage" value="GC000 (Video 80/82 card)" />
 		<part name="rom1" interface="rom_c000">
 			<dataarea name="rom" size="4096">
@@ -189,7 +189,7 @@ license:CC0-1.0
 		<year>1980</year>
 		<publisher>Tangerine</publisher>
 		<part name="rom" interface="rom_f000">
-			<dataarea name="snap" size="2048">
+			<dataarea name="rom" size="2048">
 				<rom name="xbug.rom" size="2048" crc="4a875dda" sha1="9f2626e09e7604ae6e8aa55c4f3a8ace3667348b"/>
 			</dataarea>
 		</part>
@@ -201,7 +201,7 @@ license:CC0-1.0
 		<publisher>Microtan Owners User Group</publisher>
 		<!-- Documented in TANDOC Issue 1 - Page 5 -->
 		<part name="rom" interface="rom_f000">
-			<dataarea name="snap" size="2048">
+			<dataarea name="rom" size="2048">
 				<rom name="xbug_1.5mhz.rom" size="2048" crc="9fd233ee" sha1="7b0be2d0402229ec80b062f7a0bed793686bcbf9"/>
 			</dataarea>
 		</part>
@@ -212,7 +212,7 @@ license:CC0-1.0
 		<year>1980</year>
 		<publisher>Tangerine</publisher>
 		<part name="rom" interface="rom_f000">
-			<dataarea name="snap" size="2048">
+			<dataarea name="rom" size="2048">
 				<rom name="xbug53.rom" size="2048" crc="28dc4646" sha1="968d60428a63ddf8d8656b8bef2c456ec8e86622"/>
 			</dataarea>
 		</part>
