@@ -133,9 +133,7 @@ class m68010_tekmmu_device : public m68010_device
 		m_mmu_tmp_fc = fc;
 		m_mmu_tmp_sz = sz;
 
-		if (!m_mmu_tmp_buserror_occurred)
-		if ((fc & 4) == 0)				// only in User mode
-		if (BIT(*m_map_control, MAP_VM_ENABLE))
+		if (!m_mmu_tmp_buserror_occurred && ((fc & 4) == 0) && (BIT(*m_map_control, MAP_VM_ENABLE)))
 		{
 			LOG("mmu_translate_address: map %08x => paddr(%08x) fc(%d) pc(%08x)\n",(address), BIT(address, 0, 12) | (BIT(m_map[address >> 12], 0, 11) << 12), fc, pc());
 
@@ -157,7 +155,7 @@ class m68010_tekmmu_device : public m68010_device
 
 				LOG("mmu_translate_address: bus error: PID(%d) != %d %08x fc(%d) pc(%08x)\n", BIT(m_map[address >> 12], 11, 3), (*m_map_control & 7), address, fc, pc());
 				set_buserror_details(address, rw, fc, true);
-				m_restart_instruction = true;
+				restart_this_instruction();
 				set_input_line(M68K_LINE_BUSERROR, ASSERT_LINE);
 				set_input_line(M68K_LINE_BUSERROR, CLEAR_LINE);
 				return address;
@@ -639,7 +637,7 @@ u16 tek440x_state::memory_r(offs_t offset, u16 mem_mask)
 			m_map_control &= ~(1 << MAP_CPU_WR);
 
 			// selftest expects fail if page.pid != map_control.pid
-			if (BIT(m_map[offset >> 11], 11, 3) != (m_map_control & 7))
+			if ((BIT(m_map[offset >> 11], 11, 3)==0) || BIT(m_map[offset >> 11], 11, 3) != (m_map_control & 7))
 			{
 				m_map_control &= ~(1 << MAP_BLOCK_ACCESS);
 
