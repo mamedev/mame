@@ -91,7 +91,7 @@ void igs_m027_023vid_state::machine_start()
 
 u32 igs_m027_023vid_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	return 0;
+	return m_video->screen_update(screen, bitmap, cliprect);
 }
 
 
@@ -108,10 +108,11 @@ void igs_m027_023vid_state::m027_map(address_map &map)
 	map(0x1800'0000, 0x1800'7fff).ram().mirror(0x0000f'8000).share(m_nvram);
 
 	
-	map(0x3890'4000, 0x3890'5fff).ram();
+	map(0x3890'0000, 0x3890'7fff).rw(m_video, FUNC(igs023_video_device::videoram_r), FUNC(igs023_video_device::videoram_w)).umask32(0xffffffff);
 
 	map(0x38a0'0000, 0x38a0'0fff).ram();
 	map(0x38a0'1000, 0x38a0'1fff).ram();
+	map(0x38b0'0000, 0x38b0'ffff).rw(m_video, FUNC(igs023_video_device::videoregs_r), FUNC(igs023_video_device::videoregs_w)).umask32(0xffffffff);
 
 
 	map(0x5000'0000, 0x5000'03ff).umask32(0x0000'00ff).w(FUNC(igs_m027_023vid_state::xor_table_w)); // uploads XOR table to external ROM here
