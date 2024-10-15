@@ -529,13 +529,13 @@ INPUT_PORTS_START( slqz3_dip_switches )
 	PORT_DIPNAME( 0x10, 0x10, "Double Up Game" )           PORT_DIPLOCATION("SW2:5")          // 比倍游戏
 	PORT_DIPSETTING(    0x00, DEF_STR(Off) )                                                  // 无         (no double up game on win but can still play double up game by pressing button 3 at the bet screen)
 	PORT_DIPSETTING(    0x10, DEF_STR(On) )                                                   // 有
-	PORT_DIPNAME( 0x20, 0x20, "Double Up/Continue Play" )  PORT_DIPLOCATION("SW2:6")          // 比倍续玩   (changes name for double up game)
-	PORT_DIPSETTING(    0x20, "Double Up" )                                                   // 比倍       (比倍)
-	PORT_DIPSETTING(    0x00, "Continue Play" )                                               // 续玩       (续玩)
+	PORT_DIPNAME( 0x20, 0x20, "Double Up Game Name" )      PORT_DIPLOCATION("SW2:6")          // 比倍续玩
+	PORT_DIPSETTING(    0x20, "Double Up" )                                                   // 比倍
+	PORT_DIPSETTING(    0x00, "Continue Play" )                                               // 续玩
 	PORT_DIPNAME( 0x40, 0x40, "Number Type" )              PORT_DIPLOCATION("SW2:7")          // 数字型态   (affects credit and bet display)
 	PORT_DIPSETTING(    0x40, "Numbers" )                                                     // 数字       (text and digits)
 	PORT_DIPSETTING(    0x00, "Blocks" )                                                      // 方块       (pigs for credit, apples for bet, mahjong tong tiles for numbers)
-	PORT_DIPNAME( 0x80, 0x80, "Hidden Function" )          PORT_DIPLOCATION("SW2:8")          // 隐分功能   (hides credits and bets, game plays normally)
+	PORT_DIPNAME( 0x80, 0x80, "Hide Credits" )             PORT_DIPLOCATION("SW2:8")          // 隐分功能   (hides credits/bets/wins, game plays normally)
 	PORT_DIPSETTING(    0x80, DEF_STR(Off) )                                                  // 无
 	PORT_DIPSETTING(    0x00, DEF_STR(On) )                                                   // 有
 INPUT_PORTS_END
@@ -904,13 +904,13 @@ INPUT_PORTS_START( zhongguo )
 	PORT_DIPNAME( 0x10, 0x10, "Double Up Game" )           PORT_DIPLOCATION("SW2:5")    // 比倍功能
 	PORT_DIPSETTING(    0x00, DEF_STR(Off) )                                            // 无
 	PORT_DIPSETTING(    0x10, DEF_STR(On) )                                             // 有
-	PORT_DIPNAME( 0x20, 0x20, "Double Up/Continue Play" )  PORT_DIPLOCATION("SW2:6")    // 比倍续玩   (changes names for double up game and Double Up/Big/Small buttons)
+	PORT_DIPNAME( 0x20, 0x20, "Double Up Game Name" )      PORT_DIPLOCATION("SW2:6")    // 比倍续玩   (changes names for double up game and Double Up/Big/Small buttons)
 	PORT_DIPSETTING(    0x20, "Double Up" )                                             // 比倍       (比倍/大/小)
 	PORT_DIPSETTING(    0x00, "Continue Play" )                                         // 续玩       (续玩/左/右)
 	PORT_DIPNAME( 0x40, 0x40, "Credit Display" )           PORT_DIPLOCATION("SW2:7")    // 萤屏计分
 	PORT_DIPSETTING(    0x40, "Numbers" )                                               // 数字       (text and digits)
 	PORT_DIPSETTING(    0x00, "Circle Tiles" )                                          // 筒子       (pigs for credits, apples for bet, mahjong tong tiles for numbers)
-	PORT_DIPNAME( 0x80, 0x80, "Hidden Function" )          PORT_DIPLOCATION("SW2:8")    // 隐分功能   (hides credits and bets, game plays normally)
+	PORT_DIPNAME( 0x80, 0x80, "Hide Credits" )             PORT_DIPLOCATION("SW2:8")    // 隐分功能   (hides credits/bets/wins, game plays normally)
 	PORT_DIPSETTING(    0x80, DEF_STR(Off) )                                            // 无
 	PORT_DIPSETTING(    0x00, DEF_STR(On) )                                             // 有
 INPUT_PORTS_END
@@ -958,7 +958,7 @@ INPUT_PORTS_START( mgzz101cn )
 	PORT_DIPSETTING(    0x02, "20" )
 	PORT_DIPSETTING(    0x01, "30" )
 	PORT_DIPSETTING(    0x00, "50" )
-	PORT_DIPNAME( 0x04, 0x04, "Continue Immediately" )     PORT_DIPLOCATION("SW2:3")    // 直接續玩
+	PORT_DIPNAME( 0x04, 0x04, "Initial Double Up" )        PORT_DIPLOCATION("SW2:3")    // 直接續玩   (sets whether you can play the double up game by pressing A or button 1 at the bet screen)
 	PORT_DIPSETTING(    0x04, DEF_STR(Off) )                                            // 無
 	PORT_DIPSETTING(    0x00, DEF_STR(On) )                                             // 有
 	PORT_DIPUNKNOWN_DIPLOC( 0x08, 0x08, "SW2:4" )                                       // remaining DIP switches not shown in test mode
@@ -1120,9 +1120,9 @@ INPUT_PORTS_START( cjddz )
 	PORT_DIPSETTING(    0x02, DEF_STR(Joystick) )                                             // 娱乐
 	PORT_DIPSETTING(    0x00, "Mahjong" )                                                     // 麻将
 	PORT_DIPNAME( 0x04, 0x04, "Double Up Game" )           PORT_DIPLOCATION("SW1:3")          // 续玩游戏
-	PORT_DIPSETTING(    0x00, DEF_STR(Off) )                                                  // 无
+	PORT_DIPSETTING(    0x00, DEF_STR(Off) )                                                  // 无         (no double up game on win but can still play double up game by pressing C or button 3 at the bet screen)
 	PORT_DIPSETTING(    0x04, DEF_STR(On) )                                                   // 有
-	PORT_DIPNAME( 0x08, 0x08, "Siren Sound" )              PORT_DIPLOCATION("SW1:4")          // 报警音效
+	PORT_DIPNAME( 0x08, 0x08, "Siren Sound" )              PORT_DIPLOCATION("SW1:4")          // 报警音效   (lets you disable police siren sound effect when player or CPU has five cards remaining)
 	PORT_DIPSETTING(    0x00, DEF_STR(Off) )                                                  // 无
 	PORT_DIPSETTING(    0x08, DEF_STR(On) )                                                   // 有
 	PORT_DIPNAME( 0x10, 0x10, "Auto Pass" )                PORT_DIPLOCATION("SW1:5")          // 自动PASS
@@ -1221,9 +1221,9 @@ INPUT_PORTS_START( cjddzp )
 	PORT_DIPSETTING(    0x02, DEF_STR(Joystick) )                                             // 娱乐
 	PORT_DIPSETTING(    0x00, "Mahjong" )                                                     // 麻将
 	PORT_DIPNAME( 0x04, 0x04, "Double Up Game" )           PORT_DIPLOCATION("SW2:3")          // 续玩游戏
-	PORT_DIPSETTING(    0x00, DEF_STR(Off) )                                                  // 无
+	PORT_DIPSETTING(    0x00, DEF_STR(Off) )                                                  // 无         (no double up game on win but can still play double up game by pressing C or button 3 at the bet screen)
 	PORT_DIPSETTING(    0x04, DEF_STR(On) )                                                   // 有
-	PORT_DIPNAME( 0x08, 0x08, "Siren Sound" )              PORT_DIPLOCATION("SW2:4")          // 报警音效
+	PORT_DIPNAME( 0x08, 0x08, "Siren Sound" )              PORT_DIPLOCATION("SW2:4")          // 报警音效   (lets you disable police siren sound effect when player or CPU has five cards remaining)
 	PORT_DIPSETTING(    0x00, DEF_STR(Off) )                                                  // 无
 	PORT_DIPSETTING(    0x08, DEF_STR(On) )                                                   // 有
 	PORT_DIPNAME( 0x10, 0x10, "Auto Pass" )                PORT_DIPLOCATION("SW2:5")          // 自动PASS
@@ -2593,7 +2593,7 @@ ROM_END
 
 /*********************************************************************************
 
-龙腾虎跃 (Lóng Téng Hǔ Yuè), IGS 1999
+龙腾虎跃 对战加强版 (Lóng Téng Hǔ Yào Jiāqiáng Bǎn), IGS 1999
 
 PCB Layout
 ----------
@@ -2938,7 +2938,7 @@ ROM_START( lhzb4 )
 	ROM_LOAD( "w05502.u5", 0x00000, 0x200000, CRC(467f677e) SHA1(63927c0d606176c0e22db89ea3a9777ed702abbd) )
 ROM_END
 
-// 龙虎争霸4对花版 (Lóng Hǔ Zhēngbà 4 Duì Huā Bǎn)
+// 龙虎争霸4 对花版 (Lóng Hǔ Zhēngbà 4 Duì Huā Bǎn)
 ROM_START( lhzb4dhb ) // Only 2 DIP switch banks are populated.
 	ROM_REGION( 0x04000, "maincpu", 0 )
 	// Internal ROM of IGS027A ARM based MCU
@@ -3226,7 +3226,7 @@ GAME(  1999, lhdmgp,        0,        lhdmg,        lhdmg,         igs_m027_stat
 GAME(  1999, lhzb3,         0,        lhdmg,        lhzb3,         igs_m027_state, init_lhdmg,    ROT0, "IGS", "Long Hu Zhengba III (V400CN)", 0 )
 GAME(  2004, lhzb4,         0,        lhzb4,        lhzb4,         igs_m027_state, init_lhzb4,    ROT0, "IGS", "Long Hu Zhengba 4 (V104CN)", 0 )
 GAME(  2004, lhzb4dhb,      0,        lhzb4,        lhzb4,         igs_m027_state, init_lhzb4,    ROT0, "IGS", "Long Hu Zhengba 4 Dui Hua Ban (V203CN)", 0 )
-GAME(  1999, lthyp,         0,        lthyp,        lthyp,         igs_m027_state, init_lthyp,    ROT0, "IGS", "Long Teng Hu Yue Duizhan Jiaqiang Ban (S104CN)", MACHINE_NODEVICE_LAN )
+GAME(  1999, lthyp,         0,        lthyp,        lthyp,         igs_m027_state, init_lthyp,    ROT0, "IGS", "Long Teng Hu Yao Duizhan Jiaqiang Ban (S104CN)", MACHINE_NODEVICE_LAN )
 GAME(  2000, zhongguo,      0,        zhongguo,     zhongguo,      igs_m027_state, init_zhongguo, ROT0, "IGS", "Zhongguo Chu Da D (V102C)", 0 )
 GAMEL( 200?, jking02,       0,        jking02,      jking02,       igs_m027_state, init_jking02,  ROT0, "IGS", "Jungle King 2002 (V209US)", MACHINE_NODEVICE_LAN, layout_jking02 ) // shows V212US in bookkeeping menu
 GAME(  2003, mgzz,          0,        mgzz,         mgzz101cn,     igs_m027_state, init_mgzz,     ROT0, "IGS", "Manguan Zhizun (V101CN)", 0 )
