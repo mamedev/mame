@@ -53,14 +53,10 @@ private:
 	u8 m_abit = 0;
 	u32 m_boffset = 0;
 
-	u16 *                    m_bg_videoram = nullptr;
-	u16 *                    m_tx_videoram = nullptr;
-	u16 *                    m_rowscrollram = nullptr;
-
 	std::unique_ptr<uint16_t []> m_videoregs;
 	std::unique_ptr<uint16_t []> m_videoram;
 
-	devcb_read16    m_readspriteram_cb;
+	devcb_read16 m_readspriteram_cb; // for reading spritelist from mainram
 
 	inline void pgm_draw_pix(int xdrawpos, int pri, u16* dest, u8* destpri, const rectangle &cliprect, u16 srcdat);
 	inline void pgm_draw_pix_nopri(int xdrawpos, u16* dest, u8* destpri, const rectangle &cliprect, u16 srcdat);
@@ -79,6 +75,11 @@ private:
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 
 	DECLARE_GFXDECODE_MEMBER(gfxinfo);
+
+	// working variables, don't need saving
+	u16 *m_bg_videoram = nullptr;
+	u16 *m_tx_videoram = nullptr;
+	u16 *m_rowscrollram = nullptr;
 };
 
 DECLARE_DEVICE_TYPE(IGS023_VIDEO, igs023_video_device)

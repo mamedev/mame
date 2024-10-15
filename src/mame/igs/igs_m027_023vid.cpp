@@ -125,7 +125,7 @@ void igs_m027_023vid_state::m027_map(address_map &map)
 	map(0x0800'0000, 0x0807'ffff).r(FUNC(igs_m027_023vid_state::external_rom_r)); // Game ROM
 
 	map(0x1800'0000, 0x1800'7fff).ram().mirror(0x0000f'8000).share(m_nvram);
-		
+
 	map(0x3890'0000, 0x3890'7fff).rw(m_video, FUNC(igs023_video_device::videoram_r), FUNC(igs023_video_device::videoram_w)).umask32(0xffffffff);
 
 	map(0x38a0'0000, 0x38a0'11ff).ram();// .w(m_palette, FUNC(palette_device::write32)).share("palette");
