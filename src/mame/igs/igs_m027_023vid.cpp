@@ -271,10 +271,10 @@ TIMER_DEVICE_CALLBACK_MEMBER(igs_m027_023vid_state::interrupt)
 		m_maincpu->pulse_input_line(arm7_cpu_device::ARM7_FIRQ_LINE, m_maincpu->minimum_quantum_time()); // vbl?
 		break;
 
-	case 128: // unknown source, needed for palette uploads
+	case 128: // unknown source(s), needed for palette uploads, in some cases even twice a frame (probably triggers + missing src register somewhere?)
+	case 192: 
 		m_maincpu->pulse_input_line(arm7_cpu_device::ARM7_IRQ_LINE, m_maincpu->minimum_quantum_time());
 		break;
-
 	}
 }
 
