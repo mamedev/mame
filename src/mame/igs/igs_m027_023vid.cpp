@@ -51,7 +51,8 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
-		m_video(*this, "igs023")
+		m_video(*this, "igs023"),
+		m_ics(*this, "ics")
 	{ }
 
 	void m027_023vid(machine_config &config) ATTR_COLD;
@@ -69,6 +70,7 @@ private:
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 	required_device<igs023_video_device> m_video;
+	required_device<ics2115_device> m_ics;
 
 	u32 m_xor_table[0x100];
 
@@ -115,6 +117,10 @@ void igs_m027_023vid_state::m027_map(address_map &map)
 	map(0x38b0'0000, 0x38b0'ffff).rw(m_video, FUNC(igs023_video_device::videoregs_r), FUNC(igs023_video_device::videoregs_w)).umask32(0xffffffff);
 
 	map(0x5000'0000, 0x5000'03ff).umask32(0x0000'00ff).w(FUNC(igs_m027_023vid_state::xor_table_w)); // uploads XOR table to external ROM here
+
+	map(0x5800'0000, 0x5800'0007).rw("ics", FUNC(ics2115_device::read), FUNC(ics2115_device::write)).umask32(0x00ff00ff);
+
+
 }
 
 
@@ -267,11 +273,12 @@ void igs_m027_023vid_state::m027_023vid(machine_config &config)
 	IGS023_VIDEO(config, m_video, 0);
 	m_video->set_palette(m_palette);
 
-
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
-	ICS2115(config, "ics", 33_MHz_XTAL);
+	ICS2115(config, m_ics, 33.8688_MHz_XTAL);
+	m_ics->irq().set_inputline(m_maincpu, arm7_cpu_device::ARM7_IRQ_LINE); // wrong
+	m_ics->add_route(ALL_OUTPUTS, "mono", 5.0);
 }
 
 
