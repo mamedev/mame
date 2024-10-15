@@ -274,16 +274,9 @@ u16 igs_m027_023vid_state::sprites_r(offs_t offset)
 {
 	// there does seem to be a spritelist at the start of mainram like PGM, but the data ordering is
 	// uncertain, maybe this isn't where it comes from here
-	u16 retdat;
-
-	if (offset & 1)
-		retdat = (m_nvram[offset>>1] & 0xffff0000) >> 16;
-	else
-		retdat = (m_nvram[offset>>1] & 0x0000ffff) >> 0;
-
-	retdat = ((retdat & 0xff00) >> 8) | ((retdat & 0x00ff) << 8);
-
-	return retdat;
+	address_space& mem = m_maincpu->space(AS_PROGRAM);
+	u16 ram = mem.read_word(0x18000000 + 8 + offset * 2);
+	return ram;
 }
 
 void igs_m027_023vid_state::m027_023vid(machine_config &config)
