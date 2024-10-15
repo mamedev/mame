@@ -121,7 +121,6 @@ public:
 	void init_mgzz() ATTR_COLD;
 	void init_mgcs3() ATTR_COLD;
 	void init_jking02() ATTR_COLD;
-	void init_lhdmg() ATTR_COLD;
 	void init_lthyp() ATTR_COLD;
 	void init_luckycrs() ATTR_COLD;
 	void init_olympic5() ATTR_COLD;
@@ -3262,12 +3261,6 @@ void igs_m027_state::init_olympic5()
 	pgm_create_dummy_internal_arm_region();
 }
 
-void igs_m027_state::init_lhdmg()
-{
-	lhdmg_decrypt(machine());
-	m_igs017_igs031->set_text_reverse_bits(false);
-}
-
 void igs_m027_state::init_tripslot()
 {
 	tripslot_decrypt(machine());
@@ -3306,9 +3299,9 @@ void igs_m027_state::init_chessc2()
 // Complete dumps
 GAME(  1999, slqz3,         0,        slqz3,        slqz3,         igs_m027_state, init_slqz3,    ROT0, "IGS", "Shuang Long Qiang Zhu 3 (China, VS107C)", 0 ) // shows V107C5J in service mode
 GAME(  1999, qlgs,          0,        qlgs,         qlgs,          igs_m027_state, init_qlgs,     ROT0, "IGS", "Que Long Gaoshou (S501CN)", MACHINE_NODEVICE_LAN )
-GAME(  1999, lhdmg,         0,        lhdmg,        lhdmg,         igs_m027_state, init_lhdmg,    ROT0, "IGS", "Long Hu Da Manguan (V102C3M)", 0 )
-GAME(  1999, lhdmgp,        0,        lhdmg,        lhdmg,         igs_m027_state, init_lhdmg,    ROT0, "IGS", "Long Hu Da Manguan Duizhan Jiaqiang Ban (V400C3M)", 0 )
-GAME(  1999, lhzb3,         0,        lhdmg,        lhzb3,         igs_m027_state, init_lhdmg,    ROT0, "IGS", "Long Hu Zhengba III (V400CN)", 0 )
+GAME(  1999, lhdmg,         0,        lhdmg,        lhdmg,         igs_m027_state, init_slqz3,    ROT0, "IGS", "Long Hu Da Manguan (V102C3M)", 0 )
+GAME(  1999, lhdmgp,        0,        lhdmg,        lhdmg,         igs_m027_state, init_slqz3,    ROT0, "IGS", "Long Hu Da Manguan Duizhan Jiaqiang Ban (V400C3M)", 0 )
+GAME(  1999, lhzb3,         0,        lhdmg,        lhzb3,         igs_m027_state, init_slqz3,    ROT0, "IGS", "Long Hu Zhengba III (V400CN)", 0 )
 GAME(  1999, lhzb3106c5m,   lhzb3,    lhzb3106c5m,  lhzb3,         igs_m027_state, init_slqz3,    ROT0, "IGS", "Long Hu Zhengba III (V106C5M)", 0 )
 GAME(  1999, lhzb3sjb,      0,        lhzb3sjb,     lhzb3sjb,      igs_m027_state, init_slqz3,    ROT0, "IGS", "Long Hu Zhengba III Shengji Ban (V300C5)", 0 )
 GAME(  2004, lhzb4,         0,        lhzb4,        lhzb4,         igs_m027_state, init_lhzb4,    ROT0, "IGS", "Long Hu Zhengba 4 (V104CN)", 0 )

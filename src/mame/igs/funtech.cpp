@@ -21,6 +21,11 @@ and an unpopulated position for a YM2413 or UM3567
 poker21 runs on a simplified PCB (83330 13 P2IN1 - 1994 © FUN TECH), with no reels support.
 It has a K-665 (Oki M6295 clone) instead of the unpopulated YM2413 / UM3567 and a WF19054 instead of the
 equivalent M5255. Moreover, it has a 12 MHz XTAL instead of 10 MHz.
+
+TODO (poker21):
+- complete DIPs
+- correct lamps / layout
+- analyze unknown read / writes (protection?)
 */
 
 #include "emu.h"
@@ -88,6 +93,8 @@ private:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void io_map(address_map &map) ATTR_COLD;
+
+	u8 m_nmi_enable = 0;
 };
 
 class reels_state : public fun_tech_corp_state
@@ -237,7 +244,7 @@ uint32_t reels_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 
 INTERRUPT_GEN_MEMBER(fun_tech_corp_state::vblank_interrupt)
 {
-//  if (m_nmi_enable)
+	if (m_nmi_enable)
 		device.execute().pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
@@ -278,7 +285,8 @@ void fun_tech_corp_state::lamps_w(uint8_t data)
 		m_lamps[i] = BIT(data, i);
 
 	// bit 6 (0x40) is set when displaying a hand in poker, but there are only six lamp outputs
-	// bit 7 (0x80) is always set
+	// bit 7 (0x80) is for NMI enable (cleared during service)
+	m_nmi_enable = BIT(data, 7);
 }
 
 void fun_tech_corp_state::coins_w(uint8_t data)
@@ -340,6 +348,12 @@ void fun_tech_corp_state::io_map(address_map &map)
 	map(0x12, 0x12).w("aysnd", FUNC(ay8910_device::address_w));
 
 	map(0x1a, 0x1a).w(FUNC(fun_tech_corp_state::vreg_w));
+	map(0x1b, 0x1b).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	// TODO: 0x1c and 0x1f checked in vblank service
+	map(0x1c, 0x1c).ram();
+	map(0x1d, 0x1d).ram(); // TODO: checked at gameover
+	map(0x1e, 0x1e).ram();
+	map(0x1f, 0x1f).ram();
 }
 
 void reels_state::io_map(address_map &map)
@@ -494,32 +508,35 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( poker21 )
 	PORT_START("IN0")
 	// the buttons are all multi-purpose as it's a 2-in-1.
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_POKER_HOLD5 )   PORT_NAME("Hold 5, Bet")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_POKER_HOLD3 )   PORT_NAME("Hold 3, Bet, Hit")
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN1 )         PORT_NAME("Coin A")
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN3 )         PORT_NAME("Coin C")
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN4 )         PORT_NAME("Coin D")
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_POKER_HOLD1 )   PORT_NAME("Hold 1, Take Score, Odds, Left Stop") // shows odds in 8-liner game
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_POKER_HOLD4 )   PORT_NAME("Hold 4, Double-Up") // manual suggests this shows odds, but it doesn't
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_POKER_HOLD3 )   PORT_NAME("Hold 3, Small, Right Stop")
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_POKER_HOLD2 )   PORT_NAME("Hold 2, Big, Center Stop")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_POKER_HOLD2 )   PORT_NAME("Hold 2, Take Score")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_POKER_HOLD1 )   PORT_NAME("Hold 1, Double-Up")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_POKER_HOLD4 )   PORT_NAME("Hold 4, Small")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_POKER_HOLD5 )   PORT_NAME("Hold 5, Big")
 
-	PORT_START("IN1") // port 0x13
-	PORT_DIPUNKNOWN_DIPLOC( 0x01, 0x01, "SW4:1" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x02, 0x02, "SW4:2" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x04, 0x04, "SW4:3" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x08, 0x08, "SW4:4" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x10, 0x10, "SW4:5" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x20, 0x20, "SW4:6" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x40, 0x40, "SW4:7" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x80, 0x80, "SW4:8" )
+	PORT_START("IN1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("hopper", ticket_dispenser_device, line_r)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT ) PORT_NAME("Credit Out")
+	PORT_DIPNAME( 0x10, 0x10, "IN1-10" )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_SERVICE_NO_TOGGLE(   0x20, IP_ACTIVE_LOW )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START1 ) PORT_NAME("Start, Stand")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_GAMBLE_KEYIN )  PORT_NAME("Keyin B")
 
 	// the board contains 4 banks of 8 dipswitches
 	PORT_START("DSW1")
-	PORT_DIPNAME( 0x03, 0x03, "Hopper Limit" )                PORT_DIPLOCATION("NO. 1:1,2")
-	PORT_DIPSETTING(    0x00, "300" )
-	PORT_DIPSETTING(    0x02, "500" )
-	PORT_DIPSETTING(    0x01, "1000" )
-	PORT_DIPSETTING(    0x03, "Unlimited" )
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )             PORT_DIPLOCATION("NO. 1:1")
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )             PORT_DIPLOCATION("NO. 1:2")
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x1c, 0x1c, "Credit Limit" )                PORT_DIPLOCATION("NO. 1:3,4,5")
 	PORT_DIPSETTING(    0x00, "5,000" )
 	PORT_DIPSETTING(    0x10, "10,000" )
@@ -538,7 +555,7 @@ static INPUT_PORTS_START( poker21 )
 	PORT_DIPSETTING(    0x80, DEF_STR( 1C_5C ) )
 	PORT_DIPSETTING(    0x00, "1 Coin/10 Credits" )
 
-	PORT_START("DSW2")
+	PORT_START("DSW2") // ok
 	PORT_DIPNAME( 0x07, 0x07, "Keyin B Rate" )                PORT_DIPLOCATION("NO. 2:1,2,3")
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( 1C_2C ) )
@@ -564,57 +581,53 @@ static INPUT_PORTS_START( poker21 )
 	PORT_DIPSETTING(    0xe0, "1 Coin/50 Credits" )
 
 	PORT_START("DSW3")
-	PORT_DIPNAME( 0x0f, 0x0f, "Main Game Pay Rate" )          PORT_DIPLOCATION("NO. 3:1,2,3,4")
-	PORT_DIPSETTING(    0x00, "50%" )
-	PORT_DIPSETTING(    0x08, "53%" )
-	PORT_DIPSETTING(    0x04, "56%" )
-	PORT_DIPSETTING(    0x0c, "59%" )
-	PORT_DIPSETTING(    0x02, "62%" )
-	PORT_DIPSETTING(    0x0a, "65%" )
-	PORT_DIPSETTING(    0x06, "68%" )
-	PORT_DIPSETTING(    0x0e, "71%" )
-	PORT_DIPSETTING(    0x01, "74%" )
-	PORT_DIPSETTING(    0x09, "77%" )
-	PORT_DIPSETTING(    0x05, "80%" )
-	PORT_DIPSETTING(    0x0d, "83%" )
-	PORT_DIPSETTING(    0x03, "86%" )
-	PORT_DIPSETTING(    0x0b, "89%" )
-	PORT_DIPSETTING(    0x07, "92%" )
-	PORT_DIPSETTING(    0x0f, "95%" )
-	PORT_DIPNAME( 0x10, 0x10, "Double Up Game" )              PORT_DIPLOCATION("NO. 3:5")
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, "Double Up Pay Rate" )          PORT_DIPLOCATION("NO. 3:6")
-	PORT_DIPSETTING(    0x00, "80%" )
-	PORT_DIPSETTING(    0x20, "90%" )
-	PORT_DIPNAME( 0x40, 0x40, "Double Up 7 Player Value" )    PORT_DIPLOCATION("NO. 3:7")
-	PORT_DIPSETTING(    0x40, "Loss" )
-	PORT_DIPSETTING(    0x00, "Draw" )
-	PORT_DIPNAME( 0x80, 0x80, "Double Up Girl Display" )      PORT_DIPLOCATION("NO. 3:8") // if set to No girl remains clothed when winning
-	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Yes ) )
-
-	PORT_START("DSW4")
-	PORT_DIPNAME( 0x01, 0x01, "Reel Speed" )                  PORT_DIPLOCATION("NO. 4:1")
-	PORT_DIPSETTING(    0x01, "Low" )
-	PORT_DIPSETTING(    0x00, "High" )
-	PORT_DIPNAME( 0x06, 0x06, "Max Bet" )                     PORT_DIPLOCATION("NO. 4:2,3")
-	PORT_DIPSETTING(    0x00, "8" )
-	PORT_DIPSETTING(    0x04, "16" )
-	PORT_DIPSETTING(    0x02, "32" )
-	PORT_DIPSETTING(    0x06, "64" )
-	PORT_DIPNAME( 0x08, 0x08, "Min Bet for Any Bonus" )       PORT_DIPLOCATION("NO. 4:4")
-	PORT_DIPSETTING(    0x00, "8" )
-	PORT_DIPSETTING(    0x08, "16" )
-	PORT_DIPNAME( 0x30, 0x30, "Bonus Games Entry Condition" ) PORT_DIPLOCATION("NO. 4:5,6")
-	PORT_DIPSETTING(    0x00, "1-3-1-5-1" )
-	PORT_DIPSETTING(    0x20, "1-4-1-6-1" )
-	PORT_DIPSETTING(    0x10, "1-5-1-7-1" )
-	PORT_DIPSETTING(    0x30, "1-6-1-8-1" )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unused ) )             PORT_DIPLOCATION("NO. 4:7") // unused according to manual
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )             PORT_DIPLOCATION("NO. 3:1")
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )             PORT_DIPLOCATION("NO. 3:2")
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )             PORT_DIPLOCATION("NO. 3:3")
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )             PORT_DIPLOCATION("NO. 3:4")
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )             PORT_DIPLOCATION("NO. 3:5")
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )             PORT_DIPLOCATION("NO. 3:6")
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )             PORT_DIPLOCATION("NO. 3:7")
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unused ) )             PORT_DIPLOCATION("NO. 4:8") // unused according to manual
+	PORT_DIPNAME( 0x80, 0x80, "Background Color" )             PORT_DIPLOCATION("NO. 3:8")
+	PORT_DIPSETTING(    0x80, "Blue" )
+	PORT_DIPSETTING(    0x00, "Green" )
+
+	PORT_START("DSW4")
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )             PORT_DIPLOCATION("NO. 4:1")
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )             PORT_DIPLOCATION("NO. 4:2")
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )             PORT_DIPLOCATION("NO. 4:3")
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )             PORT_DIPLOCATION("NO. 4:4")
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x30, 0x30, "Jackpot" )             PORT_DIPLOCATION("NO. 4:5,6")
+	PORT_DIPSETTING(    0x30, "100" )
+	PORT_DIPSETTING(    0x10, "200" )
+	PORT_DIPSETTING(    0x20, "300" )
+	PORT_DIPSETTING(    0x00, "400" )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )             PORT_DIPLOCATION("NO. 4:7")
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )             PORT_DIPLOCATION("NO. 4:8")
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
@@ -648,6 +661,7 @@ void fun_tech_corp_state::machine_start()
 	m_lamps.resolve();
 
 	save_item(NAME(m_vreg));
+	save_item(NAME(m_nmi_enable));
 }
 
 
@@ -740,4 +754,4 @@ ROM_END
 
 
 GAMEL( 1993, fts2in1, 0, funtech, fts2in1, reels_state,         empty_init, ROT0, "Fun Tech Corporation", "Super Two In One", MACHINE_SUPPORTS_SAVE, layout_fts2in1 )
-GAME(  1994, poker21, 0, poker21, poker21, fun_tech_corp_state, empty_init, ROT0, "Fun Tech Corporation", "Poker & 21",       MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // doesn't like interrupts
+GAME(  1994, poker21, 0, poker21, poker21, fun_tech_corp_state, empty_init, ROT0, "Fun Tech Corporation", "Poker & 21",       MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE )

@@ -10,6 +10,7 @@ Undumped games on similar hardware (ES-9402 or ES-9410):
 * Angel Fever
 * Gold Strike
 * Lucky Pierrot / Wonder Circus
+* Miracle Seven
 * Miracle Seven - Heaven's Gate Turbo
 * Multi Spin
 * Royal Choice Poker
@@ -733,6 +734,6 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 1994, lastbank, 0, lastbank, lastbank, lastbank_state, empty_init, ROT0, "Excellent System", "Last Bank (v1.16)",                         MACHINE_SUPPORTS_SAVE )
-GAME( 1995, fever13,  0, lastbank, fever13,  fever13_state,  empty_init, ROT0, "Excellent System", "Fever 13 (Japan, v1.3)",                    MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
-GAME( 1996, mir7hg,   0, lastbank, mir7hg,   fever13_state,  empty_init, ROT0, "Excellent System", "Miracle 7 - Heaven's Gate (Japan, v1.0.2)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
+GAME( 1994, lastbank, 0, lastbank, lastbank, lastbank_state, empty_init, ROT0, "Excellent System", "Last Bank (v1.16)",                             MACHINE_SUPPORTS_SAVE )
+GAME( 1995, fever13,  0, lastbank, fever13,  fever13_state,  empty_init, ROT0, "Excellent System", "Fever 13 (Japan, v1.3)",                        MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
+GAME( 1996, mir7hg,   0, lastbank, mir7hg,   fever13_state,  empty_init, ROT0, "Excellent System", "Miracle Seven - Heaven's Gate (Japan, v1.0.2)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )

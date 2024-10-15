@@ -57,7 +57,6 @@ void icescape_decrypt(running_machine &machine);
 void tripfev_decrypt(running_machine &machine);
 void wldfruit_decrypt(running_machine &machine);
 void lthyp_decrypt(running_machine &machine);
-void lhdmg_decrypt(running_machine &machine);
 void tripslot_decrypt(running_machine &machine);
 void extradrw_decrypt(running_machine &machine);
 void cjddzlf_decrypt(running_machine &machine);
