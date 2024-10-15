@@ -118,6 +118,7 @@ const gfx_layout name = { width, height, RGN_FRAC(1,1), 8, { GFX_RAW }, { 0 }, {
 #define GFXDECODE_DEVICE_RAM(region,offset,layout,start,colors) { region, offset, &layout, start, colors, GFXENTRY_DEVICE | GFXENTRY_RAM },
 #define GFXDECODE_SCALE(region,offset,layout,start,colors,x,y) { region, offset, &layout, start, colors, GFXENTRY_XSCALE(x) | GFXENTRY_YSCALE(y) },
 #define GFXDECODE_REVERSEBITS(region,offset,layout,start,colors) { region, offset, &layout, start, colors, GFXENTRY_REVERSE },
+#define GFXDECODE_DEVICE_REVERSEBITS(region,offset,layout,start,colors) { region, offset, &layout, start, colors, GFXENTRY_DEVICE | GFXENTRY_REVERSE },
 
 
 

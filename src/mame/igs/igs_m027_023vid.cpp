@@ -18,6 +18,7 @@ Main components for the PCB-0457-03-GS are:
 
 #include "emu.h"
 
+#include "igs023_video.h"
 #include "igs027a.h"
 #include "mahjong.h"
 #include "pgmcrypt.h"
@@ -48,7 +49,9 @@ public:
 		m_external_rom(*this, "user1"),
 		m_nvram(*this, "nvram"),
 		m_maincpu(*this, "maincpu"),
-		m_screen(*this, "screen")
+		m_screen(*this, "screen"),
+		m_palette(*this, "palette"),
+		m_video(*this, "igs023")
 	{ }
 
 	void m027_023vid(machine_config &config) ATTR_COLD;
@@ -64,6 +67,8 @@ private:
 
 	required_device<igs027a_cpu_device> m_maincpu;
 	required_device<screen_device> m_screen;
+	required_device<palette_device> m_palette;
+	required_device<igs023_video_device> m_video;
 
 	u32 m_xor_table[0x100];
 
@@ -101,6 +106,13 @@ void igs_m027_023vid_state::m027_map(address_map &map)
 	map(0x0800'0000, 0x0807'ffff).r(FUNC(igs_m027_023vid_state::external_rom_r)); // Game ROM
 
 	map(0x1800'0000, 0x1800'7fff).ram().mirror(0x0000f'8000).share(m_nvram);
+
+	
+	map(0x3890'4000, 0x3890'5fff).ram();
+
+	map(0x38a0'0000, 0x38a0'0fff).ram();
+	map(0x38a0'1000, 0x38a0'1fff).ram();
+
 
 	map(0x5000'0000, 0x5000'03ff).umask32(0x0000'00ff).w(FUNC(igs_m027_023vid_state::xor_table_w)); // uploads XOR table to external ROM here
 }
@@ -234,9 +246,12 @@ void igs_m027_023vid_state::m027_023vid(machine_config &config)
 	m_screen->set_screen_update(FUNC(igs_m027_023vid_state::screen_update));
 	m_screen->set_palette("palette");
 
-	PALETTE(config, "palette", palette_device::BLACK).set_format(palette_device::xRGB_555, 0x1200/2);
+	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 0x1200/2);
 
 	// PGM video
+	IGS023_VIDEO(config, m_video, 0);
+	m_video->set_palette(m_palette);
+
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
@@ -260,13 +275,13 @@ ROM_START( mxsqy )
 	ROM_REGION32_LE( 0x80000, "user1", 0 ) // external ARM data / prg
 	ROM_LOAD( "igs_m2401.u39", 0x000000, 0x80000, CRC(32e69540) SHA1(e5bc44700ba965fae433c3b39afa95bc753e3f2a) )
 
-	ROM_REGION( 0x80000, "tiles",  0 )
+	ROM_REGION( 0x80000, "igs023",  0 )
 	ROM_LOAD( "igs_l2405.u38", 0x00000, 0x80000, CRC(2f20eade) SHA1(aa11d26cb51483af5fdd4b181dff0f222baeaaff) )
 
-	ROM_REGION16_LE( 0x400000, "sprcol", 0 )
+	ROM_REGION16_LE( 0x400000, "igs023:sprcol", 0 )
 	ROM_LOAD( "igs_l2404.u23", 0x000000, 0x400000, CRC(dc8ff7ae) SHA1(4609b5543d8bea7a8dea4e744f81c407688a96ee) ) // FIXED BITS (xxxxxxxx0xxxxxxx)
 
-	ROM_REGION16_LE( 0x400000, "sprmask", 0 )
+	ROM_REGION16_LE( 0x400000, "igs023:sprmask", 0 )
 	ROM_LOAD( "igs_m2403.u22", 0x000000, 0x400000, CRC(53940332) SHA1(3c703cbdc51dfb100f3ce10452a81091305dee01) )
 
 	ROM_REGION( 0x400000, "ics", 0 )
