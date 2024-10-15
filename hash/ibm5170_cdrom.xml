@@ -7217,38 +7217,1272 @@ Incredibly slow in tearing down even on pcipcs7 (bypass with fast forward)
 		</part>
 	</software>
 
-	<software name="winnt31w">
-		<description>Windows NT 3.1 Workstation (3.10.511.1)</description>
+	<software name="winnt31">
+		<description>Windows NT 3.1 (3.10.528.1, MSDN, en-US)</description> <!-- This SKU became "Workstation" in 3.5, 3.51, and 4.0 -->
+		<year>1994</year>
+		<publisher>Microsoft</publisher>
+		<notes><![CDATA[
+		This floppy image is actually connected to the 1993 release, but it works.
+		None of the files changed on the CD are part of the floppy disk.
+		]]></notes>
+		<info name="language" value="English"/>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="en-us windows nt 3.10.528.1 1994" sha1="2076b06f7a975903265a1498b69e7fe4932d196e"/>
+			</diskarea>
+		</part>
+		<part name="flop" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="en-us windows nt 3.10.528.1 3.5.img" size="1474560" crc="1e2c946b" sha1="7928d1cd298b32e724fc33731184b2a7dbd55b7e"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="winnt31o1" cloneof="winnt31">
+		<description>Windows NT 3.1 (3.10.528.1, en-US)</description>
 		<year>1993</year>
 		<publisher>Microsoft</publisher>
+		<info name="language" value="English"/>
 		<part name="cdrom" interface="cdrom">
-			<!-- Origin: WinWorld -->
 			<diskarea name="cdrom">
-				<disk name="en_winnt_3_1_wks" sha1="0a542add03b6c9ab130421d24f94731c4992e0a7"/>
+				<disk name="en-us windows nt 3.10.528.1" sha1="1601864708df96e3f4ff57329bc6e384cd000494"/>
+			</diskarea>
+		</part>
+		<part name="flop" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="en-us windows nt 3.10.528.1 3.5.img" size="1474560" crc="1e2c946b" sha1="7928d1cd298b32e724fc33731184b2a7dbd55b7e"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="winnt31o2" cloneof="winnt31">
+		<description>Windows NT 3.1 (3.10.511.1, en-US)</description>
+		<year>1993</year>
+		<publisher>Microsoft</publisher>
+		<info name="language" value="English"/>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="en-us windows nt 3.10.511.1" sha1="ce0cd139bf0b022e9d46d530b11cf0a7b32fa22b"/>
+			</diskarea>
+		</part>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="en-us windows nt 3.10.511.1 3.5.img" size="1474560" crc="6501bf63" sha1="386d83a2e9fd758272cbbd0beb4148f9e238626e"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="1228800">
+				<rom name="en-us windows nt 3.10.511.1 5.25.img" size="1228800" crc="e1c5ab56" sha1="da770baa202d5ef0dc1800bb73bc836c1f0d6730"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="winnt31as" cloneof="winnt31">
+		<description>Windows NT Advanced Server 3.1 (3.10.528.1, en-US)</description>
+		<year>1993</year>
+		<publisher>Microsoft</publisher>
+		<notes><![CDATA[
+		While the standard (“Workstation”) edition was included in the MSDN 1994 set,
+		Advanced Server was not.  An updated Advanced Server build may not exist.
+		]]></notes>
+		<info name="language" value="English"/>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="en-us windows nt advanced server 3.10.528.1" sha1="ccdc9056a1343198d95d6513e90f6037f73c7507"/>
 			</diskarea>
 		</part>
 	</software>
 
-	<software name="winnt351w">
-		<description>Windows NT 3.51 Workstation (3.51.1057.1)</description>
+	<software name="winnt31aso" cloneof="winnt31">
+		<description>Windows NT Advanced Server 3.1 (3.10.511.1, en-US)</description>
+		<year>1993</year>
+		<publisher>Microsoft</publisher>
+		<info name="language" value="English"/>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="en-us windows nt advanced server 3.10.511.1" sha1="afe907bfd1593a4d86a189ea1dd168cc803b0385"/>
+			</diskarea>
+		</part>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="en-us windows nt advanced server 3.10.511.1 3.5.img" size="1474560" crc="986a1b8e" sha1="7a9a549e25a504957523575970c3e01529647d7a"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="1228800">
+				<rom name="en-us windows nt advanced server 3.10.511.1 5.25.img" size="1228800" crc="5e0a8239" sha1="989a4721e4f57c75131b4c3c746f8e86e73863ec"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Language variants of the client version -->
+	<software name="winnt31_dadk" cloneof="winnt31">
+		<description>Windows NT 3.1 (3.10.528.1, MSDN, da-DK)</description>
+		<year>1993</year>
+		<publisher>Microsoft</publisher>
+		<info name="language" value="Danish"/>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="da-dk windows nt 3.10.528.1" sha1="ae88ac0bbea68565189b6fdafe86f8e66ff9e9b4"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="winnt31_dede" cloneof="winnt31">
+		<description>Windows NT 3.1 (3.10.511.1, MSDN, de-DE)</description>
+		<year>1994</year>
+		<publisher>Microsoft</publisher>
+		<info name="language" value="German"/>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="de-de windows nt 3.10.511.1" sha1="5ea4098f8b0bf00bdb00af9d56a0ee2df01fdb13"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="winnt31_eses" cloneof="winnt31">
+		<description>Windows NT 3.1 (3.10.511.1, MSDN, es-ES)</description>
+		<year>1994</year>
+		<publisher>Microsoft</publisher>
+		<info name="language" value="Spanish"/>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="es-es windows nt 3.10.511.1" sha1="ff032060d15982d3724ea17b683faab8c4c07e27"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="winnt31_fifi" cloneof="winnt31">
+		<description>Windows NT 3.1 (3.10.528.1, MSDN, fi-fi)</description>
+		<year>1994</year>
+		<publisher>Microsoft</publisher>
+		<info name="language" value="Finnish"/>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="fi-fi windows nt 3.10.528.1" sha1="9249745d9f6ed9bfd0a10e31e53b886adf6c4991"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="winnt31_frfr" cloneof="winnt31">
+		<description>Windows NT 3.1 (3.10.511.1, MSDN, fr-FR)</description>
+		<year>1994</year>
+		<publisher>Microsoft</publisher>
+		<info name="language" value="French"/>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="fr-fr windows nt 3.10.511.1" sha1="9a6a6ade986a9ebaf2d84d0b47cb904496656e38"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="winnt31_itit" cloneof="winnt31">
+		<description>Windows NT 3.1 (3.10.511.1, MSDN, it-IT)</description>
+		<year>1994</year>
+		<publisher>Microsoft</publisher>
+		<info name="language" value="Italian"/>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="it-it windows nt 3.10.511.1" sha1="4756551eddc21f000194a63e7659078e945367d7"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="winnt31_nlnl" cloneof="winnt31">
+		<description>Windows NT 3.1 (3.10.511.1, MSDN, nl-NL)</description>
+		<year>1993</year>
+		<publisher>Microsoft</publisher>
+		<info name="language" value="Dutch"/>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="nl-nl windows nt 3.10.511.1" sha1="572eb82f0c2c964798857b117f96438630ddb99c"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="winnt31_nono" cloneof="winnt31">
+		<description>Windows NT 3.1 (3.10.528.1, MSDN, no-NO)</description>
+		<year>1993</year>
+		<publisher>Microsoft</publisher>
+		<info name="language" value="Norwegian"/>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="no-no windows nt 3.10.528.1" sha1="fd3c6c2156510b5128da4aba2aa6bad7821bdf30"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="winnt31_ptbr" cloneof="winnt31">
+		<description>Windows NT 3.1 (3.10.528.1, MSDN, pt-BR)</description>
+		<year>1994</year>
+		<publisher>Microsoft</publisher>
+		<info name="language" value="Portuguese (Brazil)"/>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="pt-br windows nt 3.10.528.1" sha1="20d3cb0168629c019c33a493b1cc8c976c79523f"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="winnt31_svse" cloneof="winnt31">
+		<description>Windows NT 3.1 (3.10.511.1, MSDN, sv-SE)</description>
+		<year>1993</year>
+		<publisher>Microsoft</publisher>
+		<info name="language" value="Swedish"/>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="sv-se windows nt 3.10.511.1" sha1="1b184f2c14e14a43161201af8a5054fcda886c38"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="winnt35">
+		<description>Windows NT Workstation 3.5 (3.50.807.1)</description>
+		<year>1994</year>
+		<publisher>Microsoft</publisher>
+		<notes><![CDATA[
+		This version often gets mislabeled as 3.50.800.1 even though no such build exists.
+		]]></notes>
+		<info name="language" value="English"/>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="en-us windows nt workstation 3.50.807.1" sha1="aa5bb83088f0bc7638bceba6aafb2da37c3bfc84"/>
+			</diskarea>
+		</part>
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="1474560">
+				<!-- Created via "winnt /ox" and sanitized timestamps. Needs to be resourced from original media. -->
+				<rom name="en-us windows nt workstation 3.50.807.1 3.5-1.img" size="1474560" crc="0c986718" sha1="c24cb01bfc8fe427c395e40d44b2a1f6e7c8cdb0" status="baddump"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 2"/>
+			<dataarea name="flop" size="1474560">
+				<!-- Created via "winnt /ox" and sanitized timestamps. Needs to be resourced from original media. -->
+				<rom name="en-us windows nt workstation 3.50.807.1 3.5-2.img" size="1474560" crc="ebbcbf4f" sha1="431a3ce499505434565c317638f00805ac1f64ff" status="baddump"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 3"/>
+			<dataarea name="flop" size="1474560">
+				<!-- Created via "winnt /ox" and sanitized timestamps. Needs to be resourced from original media. -->
+				<rom name="en-us windows nt workstation 3.50.807.1 3.5-3.img" size="1474560" crc="7ad56677" sha1="cb7b2f996014db65f60f6f0e9495b95c037bbef4" status="baddump"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="1228800">
+				<rom name="en-us windows nt workstation 3.50.807.1 5.25-1.img" size="1228800" crc="d3c8c12b" sha1="5fe2ab57474ed0edda9d16185446787f2891f721"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2"/>
+			<dataarea name="flop" size="1228800">
+				<rom name="en-us windows nt workstation 3.50.807.1 5.25-2.img" size="1228800" crc="604f9763" sha1="02380c23156dc73962f2afcd8a5ff02405f55df1"/>
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 3"/>
+			<dataarea name="flop" size="1228800">
+				<rom name="en-us windows nt workstation 3.50.807.1 5.25-3.img" size="1228800" crc="32dc2810" sha1="fa08ad00538a58f69eb52bdf162d8a0f526fb076"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="winnt35s" cloneof="winnt35">
+		<description>Windows NT Server 3.5 (3.50.807.1)</description>
+		<year>1994</year>
+		<publisher>Microsoft</publisher>
+		<notes><![CDATA[
+		This version often gets mislabeled as 3.50.800.1 even though no such build exists.
+		]]></notes>
+		<info name="language" value="English"/>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="en-us windows nt server 3.50.807.1" sha1="36f00cb5b6fbca8c78fd1a1f8af0f74fb885523a"/>
+			</diskarea>
+		</part>
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="1474560">
+				<rom name="en-us windows nt server 3.50.807.1 3.5-1.img" size="1474560" crc="c0e12038" sha1="fc8c954bce54dfffb6d4307a6b324eae7dcf025b"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 2"/>
+			<dataarea name="flop" size="1474560">
+				<rom name="en-us windows nt server 3.50.807.1 3.5-2.img" size="1474560" crc="cc364c47" sha1="ab153db91fe2e3ced86da095efd60d4002a2bf4b"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 3"/>
+			<dataarea name="flop" size="1474560">
+				<rom name="en-us windows nt server 3.50.807.1 3.5-3.img" size="1474560" crc="2680e894" sha1="dc4803a6d929d828b878a3116341e2fb999b9dc6"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="1228800">
+				<rom name="en-us windows nt server 3.50.807.1 5.25-1.img" size="1228800" crc="0f6a9a7f" sha1="9a2d1ac530de4769569443cf0d950820788cbdfd"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2"/>
+			<dataarea name="flop" size="1228800">
+				<rom name="en-us windows nt server 3.50.807.1 5.25-2.img" size="1228800" crc="ed51e1e0" sha1="19b2b75673af0315634d52987ae6cacf4ce86f0c"/>
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 3"/>
+			<dataarea name="flop" size="1228800">
+				<rom name="en-us windows nt server 3.50.807.1 5.25-3.img" size="1228800" crc="cc4c2dde" sha1="0db508bf14dcdfda09a6d13a8ff85953999fdcd2"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="winnt351">
+		<description>Windows NT Workstation 3.51 (3.51.1057.1)</description>
 		<year>1995</year>
 		<publisher>Microsoft</publisher>
 		<part name="cdrom" interface="cdrom">
-			<!-- Origin: WinWorld -->
 			<diskarea name="cdrom">
-				<disk name="en_winnt_3_51_wks" sha1="5a5d3cf9d244b6b24b007271be478b94a9c349f4"/>
+				<disk name="en-us windows nt workstation 3.51.1057.1" sha1="3e6cde1107d08e129d5dcdfa223b67ff9717e391"/>
+			</diskarea>
+		</part>
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="1474560">
+				<rom name="en-us windows nt workstation 3.51.1057.1 3.5-1.img" size="1474560" crc="b3a0b20a" sha1="dd2b80bdf13995ce8cd48fc88654906c5f06ee21"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 2"/>
+			<dataarea name="flop" size="1474560">
+				<rom name="en-us windows nt workstation 3.51.1057.1 3.5-2.img" size="1474560" crc="a35a0e6c" sha1="8b9cd9629f1218a1a2b5e493c47255109dfb8ecc"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 3"/>
+			<dataarea name="flop" size="1474560">
+				<rom name="en-us windows nt workstation 3.51.1057.1 3.5-3.img" size="1474560" crc="0ccc605e" sha1="41e8fa3baf2a80015a0af959be6792a24f260c35"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="winnt351s" cloneof="winnt351">
+		<description>Windows NT Server 3.51 (3.51.1057.1)</description>
+		<year>1995</year>
+		<publisher>Microsoft</publisher>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="en-us windows nt server 3.51.1057.1" sha1="0d2eb5f3b58b911b4add1c5e34b8de4bc7f10da0"/>
+			</diskarea>
+		</part>
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="1474560">
+				<rom name="en-us windows nt server 3.51.1057.1 3.5-1.img" size="1474560" crc="e452d769" sha1="51d1cb1d37dc7ebcef766e7f6999ec7274e8f9bd"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 2"/>
+			<dataarea name="flop" size="1474560">
+				<rom name="en-us windows nt server 3.51.1057.1 3.5-2.img" size="1474560" crc="1024fe42" sha1="2caaefdfb2561ddcbb43bcdf1d6a703a6cf9a224"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 3"/>
+			<dataarea name="flop" size="1474560">
+				<rom name="en-us windows nt server 3.51.1057.1 3.5-3.img" size="1474560" crc="25a33e8e" sha1="29e8fd4ce305182a4f7b5ca2cef1f78363d95466"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="winnt40">
+		<description>Windows NT Workstation 4.0 with Service Pack 1 (4.0.1381.2)</description>
+		<year>1996</year>
+		<publisher>Microsoft</publisher>
+		<notes><![CDATA[
+		This release gets frequently mis-identified online as RTM, but it is actually Service Pack 1.
+		]]></notes>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="en-us windows nt workstation 4.0.1381.2" sha1="fe7fa62edebcf2484b5ed0da4ea258498f6f36e0"/>
+			</diskarea>
+		</part>
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="1474560">
+				<rom name="en-us windows nt workstation 4.0.1381.2 3.5-1.img" size="1474560" crc="e20df9ac" sha1="42ab0a34ca8ce959481e17b5c3ce8d547c8983c4"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 2"/>
+			<dataarea name="flop" size="1474560">
+				<rom name="en-us windows nt workstation 4.0.1381.2 3.5-2.img" size="1474560" crc="a0700c68" sha1="fac8607b5f616ca2a8428d772de95f7ffd079c63"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 3"/>
+			<dataarea name="flop" size="1474560">
+				<rom name="en-us windows nt workstation 4.0.1381.2 3.5-3.img" size="1474560" crc="fb4b6ae7" sha1="b1f0aef09c2355602bc04c81dbaac90ef3c7dba8"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="winnt40o" cloneof="winnt40">
+		<description>Windows NT Workstation 4.0 (4.0.1381.1)</description>
+		<year>1996</year>
+		<publisher>Microsoft</publisher>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="en-us windows nt workstation 4.0.1381.1" sha1="250083b2b150b6930bc544f5b1dc135a6387f669"/>
+			</diskarea>
+		</part>
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="1474560">
+				<rom name="en-us windows nt workstation 4.0.1381.1 3.5-1.img" size="1474560" crc="3ba4b1a5" sha1="01807d518f1873e126fc3c7ac71e80886059a242"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 2"/>
+			<dataarea name="flop" size="1474560">
+				<rom name="en-us windows nt workstation 4.0.1381.1 3.5-2.img" size="1474560" crc="da4a4f16" sha1="a404f347dec15f99f602d973198311da10207e05"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 3"/>
+			<dataarea name="flop" size="1474560">
+				<rom name="en-us windows nt workstation 4.0.1381.1 3.5-3.img" size="1474560" crc="fb4b6ae7" sha1="b1f0aef09c2355602bc04c81dbaac90ef3c7dba8"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="winnt40s" cloneof="winnt40">
+		<description>Windows NT Server 4.0 with Service Pack 1 (4.0.1381.2)</description>
+		<year>1996</year>
+		<publisher>Microsoft</publisher>
+		<notes><![CDATA[
+		This release gets frequently mis-identified online as RTM, but it is actually Service Pack 1.
+		]]></notes>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="en-us windows nt server 4.0.1381.2" sha1="88d1b561763834b822fbcd28c3d3b32ad28b24c5"/>
+			</diskarea>
+		</part>
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="1474560">
+				<rom name="en-us windows nt server 4.0.1381.2 3.5-1.img" size="1474560" crc="d03beabe" sha1="cf8dc3ae32989a10001bd68717265cb57aec8162"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 2"/>
+			<dataarea name="flop" size="1474560">
+				<rom name="en-us windows nt server 4.0.1381.2 3.5-2.img" size="1474560" crc="7fe218e5" sha1="5285e45771616eeb9267f666c0f15eaf94f5c4d4"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 3"/>
+			<dataarea name="flop" size="1474560">
+				<rom name="en-us windows nt server 4.0.1381.2 3.5-3.img" size="1474560" crc="877dd676" sha1="3716aca680ab79d340d49291ecda05dc5387b19c"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="winnt40so" cloneof="winnt40">
+		<description>Windows NT Server 4.0 (4.0.1381.1)</description>
+		<year>1996</year>
+		<publisher>Microsoft</publisher>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="en-us windows nt server 4.0.1381.1" sha1="c9d25d4abcb72653929624545c24f3ce7e09b63e"/>
+			</diskarea>
+		</part>
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="1474560">
+				<rom name="en-us windows nt server 4.0.1381.1 3.5-1.img" size="1474560" crc="e2a1a411" sha1="1d4729f72f25c1087ffb6edc86b5d2b5ee7bf646"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 2"/>
+			<dataarea name="flop" size="1474560">
+				<rom name="en-us windows nt server 4.0.1381.1 3.5-2.img" size="1474560" crc="2ea2f59c" sha1="3574421f7339e7e83b0a931b29e8ebdae7511634"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 3"/>
+			<dataarea name="flop" size="1474560">
+				<rom name="en-us windows nt server 4.0.1381.1 3.5-3.img" size="1474560" crc="20fcc1c3" sha1="8d2e25e083c82b57b007ae034869b8d11292e690"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="winnt40ts" cloneof="winnt40">
+		<description>Windows NT Server, Terminal Server Edition 4.0 (4.0.419.1)</description>
+		<year>1998</year>
+		<publisher>Microsoft</publisher>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="en-us windows nt terminal server 4.0.419.1" sha1="31b87bdf7ad173ba1643c2b11acb08a45fa17ae1"/>
+			</diskarea>
+		</part>
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="1474560">
+				<rom name="en-us windows nt terminal server 4.0.419.1 3.5-1.img" size="1474560" crc="d49a1246" sha1="b23acea288d91b0ef4b40ed0f68a336561de2ad1"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 2"/>
+			<dataarea name="flop" size="1474560">
+				<rom name="en-us windows nt terminal server 4.0.419.1 3.5-2.img" size="1474560" crc="61b8e332" sha1="bfe47d04d39bba2ae53afab83d6a939be624ed40"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 3"/>
+			<dataarea name="flop" size="1474560">
+				<rom name="en-us windows nt terminal server 4.0.419.1 3.5-3.img" size="1474560" crc="89fd5fb4" sha1="1bd3648bbe1c081d2694b1450fed5dbd8e056d02"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="winnt40e" cloneof="winnt40">
+		<description>Windows NT Server, Enterpise Edition 4.0 (4.0.1381.4)</description>
+		<year>1997</year>
+		<publisher>Microsoft</publisher>
+		<notes><![CDATA[
+		This installs as 4.0.1381.2 (SP1), but immediately prompts to install
+		Service Pack 3 to bring it to 4.0.1381.4. Let's go with that number.
+		]]></notes>
+		<part name="cdrom1" interface="cdrom">
+			<feature name="part_id" value="Operating System"/>
+			<diskarea name="cdrom">
+				<disk name="en-us windows nt enterprise server 4.0.1381.4 disc 1" sha1="35f1693e9f40dee0d9019a0db3dbaa01812d596d"/>
+			</diskarea>
+		</part>
+		<part name="cdrom2" interface="cdrom">
+			<feature name="part_id" value="Components"/>
+			<diskarea name="cdrom">
+				<disk name="en-us windows nt enterprise server 4.0.1381.4 disc 2" sha1="80e4aebb1808a1c3ea43b2f401874612d0ff0394"/>
 			</diskarea>
 		</part>
 	</software>
 
-	<software name="win2kps4">
-		<description>Windows 2000 Professional (with Service Pack 4) (en 5.00.2195.6717)</description>
-		<year>1999</year>
+	<!-- Did Service Pack 1 ever have a CD-ROM release? -->
+	<software name="winnt40sp2">
+		<description>Windows NT 4.0 Service Pack 2</description>
+		<year>1996</year>
 		<publisher>Microsoft</publisher>
-
+		<info name="release" value="19961213" />
+		<info name="language" value="English" />
+		<info name="usage" value="This updates the operating system, but is not the operating system installer itself." />
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
-				<disk name="en_win2000_pro_sp4" sha1="9344cce041f092f0194944bdc690af7df7185cf6" />
+				<disk name="en-us windows nt 4.0 service pack 2" sha1="e07721ee9bae4ca89af067b46115a65926c0c8ba" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="winnt40sp3">
+		<description>Windows NT 4.0 Service Pack 3</description>
+		<year>1997</year>
+		<publisher>Microsoft</publisher>
+		<info name="release" value="19970512" />
+		<info name="language" value="English" />
+		<info name="usage" value="This updates the operating system, but is not the operating system installer itself." />
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="en-us windows nt 4.0 service pack 3" sha1="c23ad3b3d1fb8f1f9f81ed70e6c717b56344da04" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="winnt40sp4">
+		<description>Windows NT 4.0 Service Pack 4</description>
+		<year>1998</year>
+		<publisher>Microsoft</publisher>
+		<info name="release" value="19981015" />
+		<info name="language" value="English" />
+		<info name="usage" value="This updates the operating system, but is not the operating system installer itself." />
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="en-us windows nt 4.0 service pack 4" sha1="10d1b7ce191612ca9412baa8e45eaa07737f7bd4" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="winnt40sp5">
+		<description>Windows NT 4.0 Service Pack 5</description>
+		<year>1999</year>
+		<publisher>Microsoft</publisher>
+		<notes><![CDATA[
+		ISO file CRC32 hash is not 0xffffffff.  Microsoft actually shipped this image, it's an exception. :-)
+		]]></notes>
+		<info name="release" value="19990526" />
+		<info name="language" value="English" />
+		<info name="usage" value="This updates the operating system, but is not the operating system installer itself." />
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="en-us windows nt 4.0 service pack 5" sha1="528de2cb8b9a08cb5f599e49042430b6f16138e4" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Does the plain "Service Pack 6" (not 6a) exist anywhere? -->
+	<software name="winnt40sp6">
+		<description>Windows NT 4.0 Service Pack 6a</description>
+		<year>2000</year>
+		<publisher>Microsoft</publisher>
+		<info name="release" value="20000801" />
+		<info name="language" value="English" />
+		<info name="usage" value="This updates the operating system, but is not the operating system installer itself." />
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="en-us windows nt 4.0 service pack 6a" sha1="8a08d51c2a131940fe7d02656bb71ca968e61835" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Windows 2000 floppy images are on the CD-ROM in the \bootdisk directory.
+
+	In an effort of making the list not balloon out, only "Select" editions are here.  They do not require key entry. -->
+	<software name="win2k">
+		<description>Windows 2000 Professional with Service Pack 4 (5.00.2195.6717)</description>
+		<year>2003</year>
+		<publisher>Microsoft</publisher>
+		<info name="release" value="20030620" />
+		<info name="language" value="English" />
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="en-us windows 2000 professional 5.00.2195.6717" sha1="55a64fdf08d705e93e6e14adcb566268bf979cf1" />
+			</diskarea>
+		</part>
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 1" />
+			<dataarea name="flop" size="1474560">
+				<rom name="cdboot1.img" size="1474560" crc="3c5b1fec" sha1="4f7fbaad03c7222b253d7630c7d282ef59ba3528" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 2" />
+			<dataarea name="flop" size="1474560">
+				<rom name="cdboot2.img" size="1474560" crc="b5e1310f" sha1="56d8f20df7a909e9a001f0c3b6111f9283e455a2" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 3" />
+			<dataarea name="flop" size="1474560">
+				<rom name="cdboot3.img" size="1474560" crc="b496ec46" sha1="8adce4ba81e5cf8e4fb3d301f7db910ae22c826b" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 4" />
+			<dataarea name="flop" size="1474560">
+				<rom name="cdboot4.img" size="1474560" crc="cbb4b809" sha1="fc2e69462b567a2e5e145be375fb7cd6322465a3" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="win2ks" cloneof="win2k">
+		<description>Windows 2000 Server with Service Pack 4 (5.00.2195.6717)</description>
+		<year>2003</year>
+		<publisher>Microsoft</publisher>
+		<info name="release" value="20030620" />
+		<info name="language" value="English" />
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="en-us windows 2000 server 5.00.2195.6717" sha1="baa3f26c07ef4e0c4a69e18c10cc971050e40241" />
+			</diskarea>
+		</part>
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 1" />
+			<dataarea name="flop" size="1474560">
+				<rom name="cdboot1.img" size="1474560" crc="378a88d0" sha1="692be993863d6bf57651318b61909837a7518f03" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 2" />
+			<dataarea name="flop" size="1474560">
+				<rom name="cdboot2.img" size="1474560" crc="8f297764" sha1="ce23ce51f2d9f5e387d00afd610df446d8a934b7" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 3" />
+			<dataarea name="flop" size="1474560">
+				<rom name="cdboot3.img" size="1474560" crc="c4ce3602" sha1="e54839938225be924137f1a684294d20659b8ca7" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 4" />
+			<dataarea name="flop" size="1474560">
+				<rom name="cdboot4.img" size="1474560" crc="6595fbbf" sha1="ef58c630547658e03072161b76eb20dd26ddfe86" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="win2kas" cloneof="win2k">
+		<description>Windows 2000 Advanced Server with Service Pack 4 (5.00.2195.6717)</description>
+		<year>2003</year>
+		<publisher>Microsoft</publisher>
+		<info name="release" value="20030620" />
+		<info name="language" value="English" />
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="en-us windows 2000 advanced server 5.00.2195.6717" sha1="92a3db4d4e05571ae04477e60d391446856b7d17" />
+			</diskarea>
+		</part>
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 1" />
+			<dataarea name="flop" size="1474560">
+				<rom name="cdboot1.img" size="1474560" crc="043e7af0" sha1="7d71583ecc67dac29b2db7b40822382575824ff2" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 2" />
+			<dataarea name="flop" size="1474560">
+				<rom name="cdboot2.img" size="1474560" crc="d7fafbf4" sha1="bd730185216594ccac76a19c140f584695673d74" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 3" />
+			<dataarea name="flop" size="1474560">
+				<rom name="cdboot3.img" size="1474560" crc="976c2173" sha1="003822755f7b90d0c784be68468ba84d765799c5" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 4" />
+			<dataarea name="flop" size="1474560">
+				<rom name="cdboot4.img" size="1474560" crc="0abbc946" sha1="5c16fd0c466a4a81d06e6ebf4e78963bcea26b7b" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="win2ksp3" cloneof="win2k">
+		<description>Windows 2000 Professional with Service Pack 3 (5.00.2195.5438)</description>
+		<year>2002</year>
+		<publisher>Microsoft</publisher>
+		<info name="release" value="20020724" />
+		<info name="language" value="English" />
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="en-us windows 2000 professional 5.00.2195.5438" sha1="2d63937cde0844b2eaf4e41d914c268e0ebaa7b3" />
+			</diskarea>
+		</part>
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 1" />
+			<dataarea name="flop" size="1474560">
+				<rom name="cdboot1.img" size="1474560" crc="79ce57d2" sha1="c7071344702e08cfb5ac0e0ccf117d2e605c359c" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 2" />
+			<dataarea name="flop" size="1474560">
+				<rom name="cdboot2.img" size="1474560" crc="dc6b9b0c" sha1="52ad07313f5a52160ac0ea6d0daeca8d6a3c9eef" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 3" />
+			<dataarea name="flop" size="1474560">
+				<rom name="cdboot3.img" size="1474560" crc="7e97a224" sha1="ab0d3b6d4e49f62e4bb8e3d78c8aac1caf7ce267" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 4" />
+			<dataarea name="flop" size="1474560">
+				<rom name="cdboot4.img" size="1474560" crc="14e45011" sha1="a8ca818a93a1c5124301d863cba5a03f822539b5" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="win2kssp3" cloneof="win2k">
+		<description>Windows 2000 Server with Service Pack 3 (5.00.2195.5438)</description>
+		<year>2002</year>
+		<publisher>Microsoft</publisher>
+		<notes><![CDATA[
+		Suspected bad dump: Official Microsoft images are crafted to
+		have a CRC-32 hash of 0xffffffff.  This image does not fit the pattern.
+		]]></notes>
+		<info name="release" value="20020724" />
+		<info name="language" value="English" />
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="en-us windows 2000 server 5.00.2195.5438" sha1="530d52950c6cdde155aff2f499d957a7703b9f36" status="baddump" />
+			</diskarea>
+		</part>
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 1" />
+			<dataarea name="flop" size="1474560">
+				<rom name="cdboot1.img" size="1474560" crc="5d55ed41" sha1="145670a62517a0f93512c95f69c0ccf84c1687f7" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 2" />
+			<dataarea name="flop" size="1474560">
+				<rom name="cdboot2.img" size="1474560" crc="5cbeab3c" sha1="d7010db2b4ea28a93725f24f04ac0f676fda2d14" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 3" />
+			<dataarea name="flop" size="1474560">
+				<rom name="cdboot3.img" size="1474560" crc="b7c332a8" sha1="66dcae56b1ca176ad12d6411e3f6f48ed3fb4ac4" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 4" />
+			<dataarea name="flop" size="1474560">
+				<rom name="cdboot4.img" size="1474560" crc="e2ba86cd" sha1="82e50ce205f3994162e7ee5f8afab20325e0cbab" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="win2kassp3" cloneof="win2k">
+		<description>Windows 2000 Advanced Server with Service Pack 3 (5.00.2195.5438)</description>
+		<year>2002</year>
+		<publisher>Microsoft</publisher>
+		<info name="release" value="20020724" />
+		<info name="language" value="English" />
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="en-us windows 2000 advanced server 5.00.2195.5438" sha1="202fe920a853f8844556ce428c886f5a9477475c" />
+			</diskarea>
+		</part>
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 1" />
+			<dataarea name="flop" size="1474560">
+				<rom name="cdboot1.img" size="1474560" crc="119ddac0" sha1="f92183e23d3e6e69609fb85dc053c2e8f60c6e75" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 2" />
+			<dataarea name="flop" size="1474560">
+				<rom name="cdboot2.img" size="1474560" crc="ff7b9d54" sha1="9c0306aa5cac68f365ded2b0d408c278746e8c78" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 3" />
+			<dataarea name="flop" size="1474560">
+				<rom name="cdboot3.img" size="1474560" crc="dc9a9179" sha1="8a876c563b06ac654a6e96aa407e94ae56d321ac" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 4" />
+			<dataarea name="flop" size="1474560">
+				<rom name="cdboot4.img" size="1474560" crc="e0ba386a" sha1="b4f427ce801b466b79e7c83f82adc6cbf7d374c1" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="win2ksp2" cloneof="win2k">
+		<description>Windows 2000 Professional with Service Pack 2 (5.00.2195.2951)</description>
+		<year>2001</year>
+		<publisher>Microsoft</publisher>
+		<info name="release" value="20010508" />
+		<info name="language" value="English" />
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="en-us windows 2000 professional 5.00.2195.2951" sha1="7a3aa70e7215e0542b40f320294a25bc6582091d" />
+			</diskarea>
+		</part>
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 1" />
+			<dataarea name="flop" size="1474560">
+				<rom name="cdboot1.img" size="1474560" crc="2a9d0b21" sha1="e9e452f028873b37e7153fcc333e9ce9112f1fa5" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 2" />
+			<dataarea name="flop" size="1474560">
+				<rom name="cdboot2.img" size="1474560" crc="dd6a4d23" sha1="2c5f49e0cde88d2bf82c8b0d993b52743a4b0065" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 3" />
+			<dataarea name="flop" size="1474560">
+				<rom name="cdboot3.img" size="1474560" crc="f8cfdfc9" sha1="173f0d1b63ff52b3fa08afd5f3b5cb9fb38e6eb9" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 4" />
+			<dataarea name="flop" size="1474560">
+				<rom name="cdboot4.img" size="1474560" crc="b92e0bbd" sha1="0ce83829f8c70f86db3dcf12873b3153241e1147" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="win2kssp2" cloneof="win2k">
+		<description>Windows 2000 Server with Service Pack 2 (5.00.2195.2951)</description>
+		<year>2001</year>
+		<publisher>Microsoft</publisher>
+		<info name="release" value="20010508" />
+		<info name="language" value="English" />
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="en-us windows 2000 server 5.00.2195.2951" sha1="28f813c25c08118b3a40c9d64b79e61ed9cadaa8" />
+			</diskarea>
+		</part>
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 1" />
+			<dataarea name="flop" size="1474560">
+				<rom name="cdboot1.img" size="1474560" crc="e2417102" sha1="736f7fb900fc67865949f734d7424bd4b6e013f3" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 2" />
+			<dataarea name="flop" size="1474560">
+				<rom name="cdboot2.img" size="1474560" crc="dc3c512d" sha1="0200b7d4cce4524907a1625d1fd3f4b1e23d1d35" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 3" />
+			<dataarea name="flop" size="1474560">
+				<rom name="cdboot3.img" size="1474560" crc="8ed707fb" sha1="02f51957985f0c3a8f7128a8d9791b18832543ad" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 4" />
+			<dataarea name="flop" size="1474560">
+				<rom name="cdboot4.img" size="1474560" crc="38e8d150" sha1="672342740962d79b4e00f824d5ce7c6f7e5b3a28" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="win2kassp2" cloneof="win2k">
+		<description>Windows 2000 Advanced Server with Service Pack 2 (5.00.2195.2951)</description>
+		<year>2001</year>
+		<publisher>Microsoft</publisher>
+		<info name="release" value="20010508" />
+		<info name="language" value="English" />
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="en-us windows 2000 advanced server 5.00.2195.2951" sha1="3d8b9e8b2014eba2baaaac8103f5226d8841da70" />
+			</diskarea>
+		</part>
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 1" />
+			<dataarea name="flop" size="1474560">
+				<rom name="cdboot1.img" size="1474560" crc="572b78a6" sha1="f343c8b421bf0b6badde4961ec4ac7bdff7627c0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 2" />
+			<dataarea name="flop" size="1474560">
+				<rom name="cdboot2.img" size="1474560" crc="5695f76f" sha1="2292678acfcd2e1b736160c3c4b5bb39edb1087e" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 3" />
+			<dataarea name="flop" size="1474560">
+				<rom name="cdboot3.img" size="1474560" crc="f82f7e00" sha1="6c8a20350928157b9015642f18a5b5afdb9d7769" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 4" />
+			<dataarea name="flop" size="1474560">
+				<rom name="cdboot4.img" size="1474560" crc="834274a4" sha1="488a69517ccbcbdc382d13317e5865e7a2a78f55" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="win2ksp1" cloneof="win2k">
+		<description>Windows 2000 Professional with Service Pack 1 (5.00.2195.1620)</description>
+		<year>2000</year>
+		<publisher>Microsoft</publisher>
+		<info name="release" value="20000726" />
+		<info name="language" value="English" />
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="en-us windows 2000 professional 5.00.2195.1620" sha1="7aad8c6353117dcc69f2d9254245d56ff1c783df" />
+			</diskarea>
+		</part>
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 1" />
+			<dataarea name="flop" size="1474560">
+				<rom name="cdboot1.img" size="1474560" crc="1de27214" sha1="043f76daffd7ffbb5abd399538a1ee874fe30d17" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 2" />
+			<dataarea name="flop" size="1474560">
+				<rom name="cdboot2.img" size="1474560" crc="1c31a0d1" sha1="7d67e5c34053704703f89ad3e93b049531dabc61" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 3" />
+			<dataarea name="flop" size="1474560">
+				<rom name="cdboot3.img" size="1474560" crc="89c578e1" sha1="3d6b8c20f4d90c90667ed280ed4e0e5ccf71d5d2" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 4" />
+			<dataarea name="flop" size="1474560">
+				<rom name="cdboot4.img" size="1474560" crc="5b28b6e4" sha1="fbb6ac9d574e629d2200d8cf5904fd16cc71312b" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="win2kssp1" cloneof="win2k">
+		<description>Windows 2000 Server with Service Pack 1 (5.00.2195.1620)</description>
+		<year>2000</year>
+		<publisher>Microsoft</publisher>
+		<info name="release" value="20000726" />
+		<info name="language" value="English" />
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="en-us windows 2000 server 5.00.2195.1620" sha1="52f1f84be8d1a2e9ef47d7646fc2ed15b6e921ee" />
+			</diskarea>
+		</part>
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 1" />
+			<dataarea name="flop" size="1474560">
+				<rom name="cdboot1.img" size="1474560" crc="fa28d640" sha1="c8204ee30c7323c534d6a58a4e5656f71da2e5ce" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 2" />
+			<dataarea name="flop" size="1474560">
+				<rom name="cdboot2.img" size="1474560" crc="f4c70001" sha1="a69bca64344a3666fb91147f8db3640556ebf9d2" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 3" />
+			<dataarea name="flop" size="1474560">
+				<rom name="cdboot3.img" size="1474560" crc="a9abf665" sha1="4bcaf835388c5030e9488c03b8032601821ae1a3" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 4" />
+			<dataarea name="flop" size="1474560">
+				<rom name="cdboot4.img" size="1474560" crc="3c927d67" sha1="2eb8fc4971015a76f1d53a5a66b174dfe0568536" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="win2kasp1" cloneof="win2k">
+		<description>Windows 2000 Advanced Server with Service Pack 1 (5.00.2195.1620)</description>
+		<year>2000</year>
+		<publisher>Microsoft</publisher>
+		<info name="release" value="20000726" />
+		<info name="language" value="English" />
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="en-us windows 2000 advanced server 5.00.2195.1620" sha1="3ca0bf76b00587ddaaba171d57ce8717fd88ec39" />
+			</diskarea>
+		</part>
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 1" />
+			<dataarea name="flop" size="1474560">
+				<rom name="cdboot1.img" size="1474560" crc="159562b5" sha1="2d66a53bab27e5f5f535118532e23fed04faea70" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 2" />
+			<dataarea name="flop" size="1474560">
+				<rom name="cdboot2.img" size="1474560" crc="0d16caaa" sha1="4982be8d5ee567757c6579bca6cd07893cb759b3" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 3" />
+			<dataarea name="flop" size="1474560">
+				<rom name="cdboot3.img" size="1474560" crc="99dae296" sha1="5e1d9865c40ba12670731810b8ad0a5b452551e7" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 4" />
+			<dataarea name="flop" size="1474560">
+				<rom name="cdboot4.img" size="1474560" crc="6ed35e11" sha1="f0f1e7741a910010f5679e0ac0c4a09fabc42040" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="win2krtm" cloneof="win2k">
+		<description>Windows 2000 Professional (5.00.2195.1)</description>
+		<year>1999</year>
+		<publisher>Microsoft</publisher>
+		<info name="release" value="19991207" />
+		<info name="language" value="English" />
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="en-us windows 2000 professional 5.00.2195.1" sha1="0d3caafa9ed602146cc4e76ddf65cb89d3cd9176" />
+			</diskarea>
+		</part>
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 1" />
+			<dataarea name="flop" size="1474560">
+				<rom name="cdboot1.img" size="1474560" crc="b65ce241" sha1="1fdd1b81c21e4d21b3a9ff5d25e1882172b6c9ed" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 2" />
+			<dataarea name="flop" size="1474560">
+				<rom name="cdboot2.img" size="1474560" crc="5f6915aa" sha1="868533c3c8f1151c9d385de7ae4f4fb9aa7a37a1" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 3" />
+			<dataarea name="flop" size="1474560">
+				<rom name="cdboot3.img" size="1474560" crc="ff582488" sha1="f5f5e8d2c59636b5aed9addcf65b97d815450afa" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 4" />
+			<dataarea name="flop" size="1474560">
+				<rom name="cdboot4.img" size="1474560" crc="569b2e9f" sha1="6ba98fa022f48aa333384eea43499d9a6cae9941" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="win2ksrtm" cloneof="win2k">
+		<description>Windows 2000 Server (5.00.2195.1)</description>
+		<year>1999</year>
+		<publisher>Microsoft</publisher>
+		<info name="release" value="19991207" />
+		<info name="language" value="English" />
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="en-us windows 2000 server 5.00.2195.1" sha1="b2d40c42c9ec233e8dc254fcef26f8f0963a2fed" />
+			</diskarea>
+		</part>
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 1" />
+			<dataarea name="flop" size="1474560">
+				<rom name="cdboot1.img" size="1474560" crc="0c40c310" sha1="edd1ca86abae4c3bc5b112bb815ff61ffa49a291" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 2" />
+			<dataarea name="flop" size="1474560">
+				<rom name="cdboot2.img" size="1474560" crc="1395222c" sha1="4370db12ceb7cc694be975db4cb032dbea741ea6" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 3" />
+			<dataarea name="flop" size="1474560">
+				<rom name="cdboot3.img" size="1474560" crc="31bde04a" sha1="9c555b58b3a428282de15a219c282ae4bf83cacc" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 4" />
+			<dataarea name="flop" size="1474560">
+				<rom name="cdboot4.img" size="1474560" crc="5131cd71" sha1="1d4933be795a89a86d633177c7904a2a1a7a0fac" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="win2kasrtm" cloneof="win2k">
+		<description>Windows 2000 Advanced Server (5.00.2195.1)</description>
+		<year>1999</year>
+		<publisher>Microsoft</publisher>
+		<info name="release" value="19991207" />
+		<info name="language" value="English" />
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="en-us windows 2000 advanced server 5.00.2195.1" sha1="ffbf49eadafb69a6f0e776f9b714fed82ad04bb9" />
+			</diskarea>
+		</part>
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 1" />
+			<dataarea name="flop" size="1474560">
+				<rom name="cdboot1.img" size="1474560" crc="0350fd4a" sha1="94dc08e1c62f414a6d52f50732698018e522f000" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 2" />
+			<dataarea name="flop" size="1474560">
+				<rom name="cdboot2.img" size="1474560" crc="43a242f6" sha1="e9d6ed7c38c872ff35547e037d38faedab4fb977" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 3" />
+			<dataarea name="flop" size="1474560">
+				<rom name="cdboot3.img" size="1474560" crc="7acf7198" sha1="60bdddcab0bd48257da1b11248b3df481e3059fc" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 4" />
+			<dataarea name="flop" size="1474560">
+				<rom name="cdboot4.img" size="1474560" crc="9f9c1cf8" sha1="c462c5ebc246ddf4eb1910c0a5281594c0014cfc" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="win2kmui">
+		<description>Windows 2000 MultiLanguage Version</description>
+		<year>2000</year>
+		<publisher>Microsoft</publisher>
+		<info name="release" value="20000518" />
+		<info name="language" value="Arabic/Chinese (Simplified)/Chinese (Traditional)/Czech/Danish/Dutch/French/Finnish/German/Hebrew/Hungarian/Italian/Japanese/Korean/Norwegian/Polish/Portuguese (Brazil)/Portuguese (Europe)/Russian/Spanish/Swedish/Turkish" />
+		<info name="usage" value="Installs on the US-English version of Windows 2000; disc 1 is the Windows 2000 install disc" />
+		<part name="cdrom2" interface="cdrom">
+			<feature name="part_id" value="Disc 2" />
+			<diskarea name="cdrom">
+				<disk name="windows 2000 multilingual version disc 2" sha1="69fe0a8ad0541fdf0c1717917f96b6533731070f" />
+			</diskarea>
+		</part>
+		<part name="cdrom3" interface="cdrom">
+			<feature name="part_id" value="Disc 3" />
+			<diskarea name="cdrom">
+				<disk name="windows 2000 multilingual version disc 3" sha1="fedf796b2248f5a3a7c66d0b57dacdd402bc35d0" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- The service pack installers are all official CD-ROM images from Microsoft. -->
+	<software name="win2ksp1inst">
+		<description>Windows 2000 Service Pack 1</description>
+		<year>2000</year>
+		<publisher>Microsoft</publisher>
+		<info name="language" value="English" />
+		<info name="release" value="20000721" />
+		<info name="usage" value="This updates the operating system, but is not the operating system installer itself." />
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="en-us windows 2000 service pack 1" sha1="ac0b396dcb548cc207582dfe59f971df9296d2d4" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="win2ksp2inst">
+		<description>Windows 2000 Service Pack 2</description>
+		<year>2001</year>
+		<publisher>Microsoft</publisher>
+		<info name="language" value="English" />
+		<info name="release" value="20010504" />
+		<info name="usage" value="This updates the operating system, but is not the operating system installer itself." />
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="en-us windows 2000 service pack 2" sha1="8ba97c1942fe94685fd44cfd037e212c27b76144" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="win2ksp3inst">
+		<description>Windows 2000 Service Pack 3</description>
+		<year>2002</year>
+		<publisher>Microsoft</publisher>
+		<info name="language" value="English" />
+		<info name="release" value="20020723" />
+		<info name="usage" value="This updates the operating system, but is not the operating system installer itself." />
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="en-us windows 2000 service pack 3" sha1="9b94fe6b3c5af4476ce1ee089a82b1ad5bec7a50" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="win2ksp4inst">
+		<description>Windows 2000 Service Pack 4</description>
+		<year>2003</year>
+		<publisher>Microsoft</publisher>
+		<info name="language" value="English" />
+		<info name="release" value="20030620" />
+		<info name="usage" value="This updates the operating system, but is not the operating system installer itself." />
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="en-us windows 2000 service pack 4" sha1="e4590130e9a8908e58e070ca70c901e34b7c7ca1" />
 			</diskarea>
 		</part>
 	</software>
