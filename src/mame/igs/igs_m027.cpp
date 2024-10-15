@@ -85,8 +85,6 @@ public:
 
 	template <unsigned N> void counter_w(int state);
 
-	INPUT_CHANGED_MEMBER(lhzb3sjb_io_select_0_w);
-
 	template <bool Xor> void m027_noppi(machine_config &config) ATTR_COLD;
 	template <bool Xor> void m027_1ppi(machine_config &config) ATTR_COLD;
 	template <bool Xor> void m027_2ppis(machine_config &config) ATTR_COLD;
@@ -171,6 +169,7 @@ private:
 
 	template <unsigned Start> void lamps_w(u8 data);
 	void mahjong_output_w(u8 data);
+	void lhzb3sjb_output_w(u8 data);
 	void jking02_output_w(u8 data);
 	void oceanpar_output_w(u8 data);
 	void tripslot_misc_w(u8 data);
@@ -768,10 +767,8 @@ INPUT_PORTS_START( lhzb3sjb )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 )         PORT_CONDITION("DSW2", 0x08, EQUALS, 0x00)  // 摸／舍
 
 	PORT_START("PPIC")
-	PORT_BIT( 0x0b, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_CONDITION("DSW2", 0x08, EQUALS, 0x08) PORT_CHANGED_MEMBER(DEVICE_SELF, igs_m027_state, lhzb3sjb_io_select_0_w, 0)
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_CONDITION("DSW2", 0x08, EQUALS, 0x00) PORT_WRITE_LINE_MEMBER(igs_m027_state, counter_w<0>) // coin or key-in
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_CONDITION("DSW2", 0x08, EQUALS, 0x00) PORT_WRITE_LINE_MEMBER(igs_m027_state, counter_w<1>) // hopper or key-out
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OUTPUT )                                            PORT_WRITE_LINE_DEVICE_MEMBER("hopper", hopper_device, motor_w)
 
 	PORT_MODIFY("DSW2")
 	PORT_DIPNAME( 0x04, 0x04, "Show Title" )               PORT_DIPLOCATION("SW2:3")          // 机种名称
@@ -1683,6 +1680,14 @@ void igs_m027_state::mahjong_output_w(u8 data)
 	m_oki->set_rom_bank(data >> 6);
 }
 
+void igs_m027_state::lhzb3sjb_output_w(u8 data)
+{
+	m_io_select[0] = ~(u8(1) << bitswap<3>(data, 3, 1, 0));
+	m_hopper->motor_w(BIT(data, 2));
+
+	m_oki->set_rom_bank(data >> 6);
+}
+
 void igs_m027_state::jking02_output_w(u8 data)
 {
 	machine().bookkeeping().coin_counter_w(0, BIT(data, 0)); // one pulse per coin 1 accepted (36+10)
@@ -1766,11 +1771,6 @@ template <unsigned N>
 void igs_m027_state::counter_w(int state)
 {
 	machine().bookkeeping().coin_counter_w(N, state);
-}
-
-INPUT_CHANGED_MEMBER(igs_m027_state::lhzb3sjb_io_select_0_w)
-{
-	m_io_select[0] = ~(u8(1) << bitswap<3>(newval, 3, 1, 0));
 }
 
 
@@ -1893,6 +1893,7 @@ void igs_m027_state::lhzb3sjb(machine_config &config)
 	m_ppi[0]->in_pa_callback().set_ioport("TEST");
 	m_ppi[0]->in_pb_callback().set_ioport("JOY");
 	m_ppi[0]->out_pc_callback().set_ioport("PPIC");
+	m_ppi[0]->out_pc_callback().append(FUNC(igs_m027_state::lhzb3sjb_output_w));
 
 	m_igs017_igs031->in_pa_callback().set_ioport("DSW1");
 	m_igs017_igs031->in_pb_callback().set_ioport("DSW2");
