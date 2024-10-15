@@ -7,10 +7,12 @@ Last Bank (c) 1994 Excellent System
 Uses a TC0091LVC, a variant of the one used on Taito L HW
 
 Undumped games on similar hardware (ES-9402 or ES-9410):
+* Angel Fever
 * Gold Strike
 * Lucky Pierrot / Wonder Circus
-* Miracle Seven - Heaven's Gate
 * Miracle Seven - Heaven's Gate Turbo
+* Multi Spin
+* Royal Choice Poker
 * Ukiyo Box
 
 TODO:
@@ -568,6 +570,36 @@ static INPUT_PORTS_START( fever13 )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( mir7hg )
+	PORT_INCLUDE( fever13 )
+
+	PORT_MODIFY("DSW1")
+	PORT_DIPNAME( 0x03, 0x03, "Max Bet" ) PORT_DIPLOCATION("DSW1:1,2")
+	PORT_DIPSETTING(    0x03, "10" )
+	PORT_DIPSETTING(    0x02, "20" )
+	PORT_DIPSETTING(    0x01, "40" )
+	PORT_DIPSETTING(    0x00, "50" )
+
+	PORT_MODIFY("DSW2")
+	PORT_DIPNAME( 0x01, 0x01, "Minimum Bet" ) PORT_DIPLOCATION("DSW2:1")
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x60, 0x60, "Pool Limit" ) PORT_DIPLOCATION("DSW2:6,7")
+	PORT_DIPSETTING(    0x60, "1000" )
+	PORT_DIPSETTING(    0x40, "2000" )
+	PORT_DIPSETTING(    0x20, "4000" )
+	PORT_DIPSETTING(    0x00, "5000" )
+
+	PORT_MODIFY("DSW4")
+	PORT_DIPNAME( 0x40, 0x40, "Hopper Access" ) PORT_DIPLOCATION("DSW4:7")
+	PORT_DIPSETTING(    0x00, "Slow" )
+	PORT_DIPSETTING(    0x40, "Fast" )
+	PORT_DIPNAME( 0x80, 0x80, "Illegal Check" ) PORT_DIPLOCATION("DSW4:8")
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+INPUT_PORTS_END
+
+
 TIMER_DEVICE_CALLBACK_MEMBER(lastbank_state::scanline_cb)
 {
 	int const scanline = param;
@@ -660,8 +692,8 @@ ROM_START( lastbank )
 	ROM_LOAD( "7.u60", 0x00000, 0x80000, CRC(41be7146) SHA1(00f1c0d5809efccf888e27518a2a5876c4b633d8) )
 ROM_END
 
- // ES-9410 PCB (TC0090LVC marked ES9402LA, Z80, ES8712, 14'318'181 MHz XTAL,
- // OKI M6295 with 1000J resonator, MSM6585 with 640J resonator)
+// ES-9410 PCB (TC0090LVC marked ES9402LA, Z80, ES8712, 14'318'181 MHz XTAL,
+// OKI M6295 with 1000J resonator, MSM6585 with 640J resonator)
 ROM_START( fever13 )
 	ROM_REGION( 0x40000, "maincpu", 0 )
 	ROM_LOAD( "9.u9", 0x00000, 0x40000, CRC(a17a6a9c) SHA1(b2bff250d1ea879bcdd9bea92537975a168babc8) )
@@ -680,8 +712,27 @@ ROM_START( fever13 )
 	ROM_LOAD( "2.u60", 0x00000, 0x80000, CRC(4e0da568) SHA1(6cd4d3facf8f05747d6cff03617bdfc91b5e9d67) )
 ROM_END
 
-} // Anonymous namespace
+// ES-9410 PCB
+ROM_START( mir7hg ) // v1.0.2 Feb 19 1996 15:05:17
+	ROM_REGION( 0x40000, "maincpu", 0 )
+	ROM_LOAD( "1.u9", 0x00000, 0x40000, CRC(efbd17aa) SHA1(387314504a9ce23221d868c7b042250cc9643d9c) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_LOAD( "3.u48", 0x00000, 0x10000, CRC(895da366) SHA1(4e82e2ee9b6a91453b8dca9f313714ef846dec56) ) // 11111xxxxxxxxxxx = 0xFF
+
+	ROM_REGION( 0x80000, "maincpu:gfx", 0 )
+	ROM_LOAD( "2.u11", 0x00000, 0x80000, CRC(ddb65010) SHA1(f5af9f63f353023d2ce8e8787a13ec090158ac25) )
+
+	ROM_REGION( 0x40000, "oki", 0 )
+	ROM_LOAD( "4.u55", 0x00000, 0x40000, CRC(04114b83) SHA1(d1b4fcb0a2dc81a938c1e63dab5a43c2e628542e) ) // 1xxxxxxxxxxxxxxxxx = 0xFF
+
+	ROM_REGION( 0x80000, "essnd", 0 ) // Samples
+	ROM_LOAD( "5.u60", 0x00000, 0x80000, CRC(13d8c30a) SHA1(1a2dc0c97992e9e1d73c5f3f713db8599d2d2285) ) // 11xxxxxxxxxxxxxxxxx = 0xFF
+ROM_END
+
+} // anonymous namespace
 
 
-GAME( 1994, lastbank, 0, lastbank, lastbank, lastbank_state, empty_init, ROT0, "Excellent System", "Last Bank (v1.16)",        MACHINE_SUPPORTS_SAVE )
-GAME( 1995, fever13,  0, lastbank, fever13,  fever13_state,  empty_init, ROT0, "Excellent System", "Fever 13 (Japan, v1.3)",   MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
+GAME( 1994, lastbank, 0, lastbank, lastbank, lastbank_state, empty_init, ROT0, "Excellent System", "Last Bank (v1.16)",                         MACHINE_SUPPORTS_SAVE )
+GAME( 1995, fever13,  0, lastbank, fever13,  fever13_state,  empty_init, ROT0, "Excellent System", "Fever 13 (Japan, v1.3)",                    MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
+GAME( 1996, mir7hg,   0, lastbank, mir7hg,   fever13_state,  empty_init, ROT0, "Excellent System", "Miracle 7 - Heaven's Gate (Japan, v1.0.2)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
