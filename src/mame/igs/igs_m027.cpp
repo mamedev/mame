@@ -21,6 +21,11 @@
  for Chaoji Dou Dizhu Jiaqiang Ban).  The non-volatile RAM content must
  be cleared in order for changes to these settings to apply.
 
+ Some of these games (e.g. Chaoji Dou Dizhu) refer to the Mahjong Double
+ Up button as 续玩 (literally "Continue Play"), so settings like
+ 续玩游戏 are referring to the double-up game rather than what's usually
+ called a "continue" feature.
+
  TODO:
  * I/O for remaining games
  * Coin lockout (zhongguo displays a coin error on unexpected coins)
@@ -522,11 +527,11 @@ INPUT_PORTS_START( slqz3_dip_switches )
 	PORT_DIPSETTING(    0x04, "1" )
 	PORT_DIPSETTING(    0x00, "1" )
 	PORT_DIPNAME( 0x10, 0x10, "Double Up Game" )           PORT_DIPLOCATION("SW2:5")          // 比倍游戏
-	PORT_DIPSETTING(    0x00, DEF_STR(Off) )                                                  // 无
+	PORT_DIPSETTING(    0x00, DEF_STR(Off) )                                                  // 无         (no double up game on win but can still play double up game by pressing button 3 at the bet screen)
 	PORT_DIPSETTING(    0x10, DEF_STR(On) )                                                   // 有
-	PORT_DIPNAME( 0x20, 0x20, "Double Up/Continue Play" )  PORT_DIPLOCATION("SW2:6")          // 比倍续玩
-	PORT_DIPSETTING(    0x20, "Double Up" )                                                   // 比倍
-	PORT_DIPSETTING(    0x00, "Continue Play" )                                               // 续玩
+	PORT_DIPNAME( 0x20, 0x20, "Double Up/Continue Play" )  PORT_DIPLOCATION("SW2:6")          // 比倍续玩   (changes name for double up game)
+	PORT_DIPSETTING(    0x20, "Double Up" )                                                   // 比倍       (比倍)
+	PORT_DIPSETTING(    0x00, "Continue Play" )                                               // 续玩       (续玩)
 	PORT_DIPNAME( 0x40, 0x40, "Number Type" )              PORT_DIPLOCATION("SW2:7")          // 数字型态   (affects credit and bet display)
 	PORT_DIPSETTING(    0x40, "Numbers" )                                                     // 数字       (text and digits)
 	PORT_DIPSETTING(    0x00, "Blocks" )                                                      // 方块       (pigs for credit, apples for bet, mahjong tong tiles for numbers)
@@ -822,13 +827,6 @@ INPUT_PORTS_START( lhzb4 )
 	PORT_DIPUNKNOWN_DIPLOC( 0x80, 0x80, "SW3:8" )
 INPUT_PORTS_END
 
-INPUT_PORTS_START( lhzb4_todo )
-	PORT_INCLUDE(lhzb4)
-
-	PORT_MODIFY("DSW1")
-	PORT_DIPUNKNOWN_DIPLOC( 0x01, 0x01, "SW1:1" )
-INPUT_PORTS_END
-
 INPUT_PORTS_START( lthyp )
 	PORT_INCLUDE(mahjong_kbd_joy)
 
@@ -903,12 +901,12 @@ INPUT_PORTS_START( zhongguo )
 	PORT_DIPNAME( 0x08, 0x08, "Double Up Jackpot" )        PORT_DIPLOCATION("SW2:4")    // 比倍爆机
 	PORT_DIPSETTING(    0x08, "1000" )
 	PORT_DIPSETTING(    0x00, "2000" )
-	PORT_DIPNAME( 0x10, 0x10, "Double Up Function" )       PORT_DIPLOCATION("SW2:5")    // 比倍功能
+	PORT_DIPNAME( 0x10, 0x10, "Double Up Game" )           PORT_DIPLOCATION("SW2:5")    // 比倍功能
 	PORT_DIPSETTING(    0x00, DEF_STR(Off) )                                            // 无
 	PORT_DIPSETTING(    0x10, DEF_STR(On) )                                             // 有
-	PORT_DIPNAME( 0x20, 0x20, "Double Up/Continue Play" )  PORT_DIPLOCATION("SW2:6")    // 比倍续玩
-	PORT_DIPSETTING(    0x20, "Double Up" )                                             // 比倍
-	PORT_DIPSETTING(    0x00, "Continue Play" )                                         // 续玩
+	PORT_DIPNAME( 0x20, 0x20, "Double Up/Continue Play" )  PORT_DIPLOCATION("SW2:6")    // 比倍续玩   (changes names for double up game and Double Up/Big/Small buttons)
+	PORT_DIPSETTING(    0x20, "Double Up" )                                             // 比倍       (比倍/大/小)
+	PORT_DIPSETTING(    0x00, "Continue Play" )                                         // 续玩       (续玩/左/右)
 	PORT_DIPNAME( 0x40, 0x40, "Credit Display" )           PORT_DIPLOCATION("SW2:7")    // 萤屏计分
 	PORT_DIPSETTING(    0x40, "Numbers" )                                               // 数字       (text and digits)
 	PORT_DIPSETTING(    0x00, "Circle Tiles" )                                          // 筒子       (pigs for credits, apples for bet, mahjong tong tiles for numbers)
@@ -1121,7 +1119,7 @@ INPUT_PORTS_START( cjddz )
 	PORT_DIPNAME( 0x02, 0x02, "Control Panel" )            PORT_DIPLOCATION("SW1:2")          // 配线方式
 	PORT_DIPSETTING(    0x02, DEF_STR(Joystick) )                                             // 娱乐
 	PORT_DIPSETTING(    0x00, "Mahjong" )                                                     // 麻将
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR(Allow_Continue) )    PORT_DIPLOCATION("SW1:3")          // 续玩游戏
+	PORT_DIPNAME( 0x04, 0x04, "Double Up Game" )           PORT_DIPLOCATION("SW1:3")          // 续玩游戏
 	PORT_DIPSETTING(    0x00, DEF_STR(Off) )                                                  // 无
 	PORT_DIPSETTING(    0x04, DEF_STR(On) )                                                   // 有
 	PORT_DIPNAME( 0x08, 0x08, "Siren Sound" )              PORT_DIPLOCATION("SW1:4")          // 报警音效
@@ -1153,17 +1151,6 @@ INPUT_PORTS_START( cjddz )
 	PORT_DIPUNKNOWN_DIPLOC( 0x20, 0x20, "SW3:6" )
 	PORT_DIPUNKNOWN_DIPLOC( 0x40, 0x40, "SW3:7" )
 	PORT_DIPUNKNOWN_DIPLOC( 0x80, 0x80, "SW3:8" )
-INPUT_PORTS_END
-
-INPUT_PORTS_START( cjddz_todo )
-	PORT_INCLUDE(cjddz)
-
-	PORT_MODIFY("DSW1")
-	PORT_DIPUNKNOWN_DIPLOC( 0x01, 0x01, "SW1:1" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x02, 0x02, "SW1:2" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x04, 0x04, "SW1:3" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x08, 0x08, "SW1:4" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x10, 0x10, "SW1:5" )
 INPUT_PORTS_END
 
 INPUT_PORTS_START( cjddzp )
@@ -1233,7 +1220,7 @@ INPUT_PORTS_START( cjddzp )
 	PORT_DIPNAME( 0x02, 0x02, "Control Panel" )            PORT_DIPLOCATION("SW2:2")          // 配线方式
 	PORT_DIPSETTING(    0x02, DEF_STR(Joystick) )                                             // 娱乐
 	PORT_DIPSETTING(    0x00, "Mahjong" )                                                     // 麻将
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR(Allow_Continue) )    PORT_DIPLOCATION("SW2:3")          // 续玩游戏
+	PORT_DIPNAME( 0x04, 0x04, "Double Up Game" )           PORT_DIPLOCATION("SW2:3")          // 续玩游戏
 	PORT_DIPSETTING(    0x00, DEF_STR(Off) )                                                  // 无
 	PORT_DIPSETTING(    0x04, DEF_STR(On) )                                                   // 有
 	PORT_DIPNAME( 0x08, 0x08, "Siren Sound" )              PORT_DIPLOCATION("SW2:4")          // 报警音效
@@ -2932,7 +2919,27 @@ ROM_START( cjddzlf )
 ROM_END
 
 // 龙虎争霸4 (Lóng Hǔ Zhēngbà 4)
-ROM_START( lhzb4 ) // was sent as 'Flower Version'. Only 2 DIP banks are populated.
+ROM_START( lhzb4 )
+	ROM_REGION( 0x04000, "maincpu", 0 )
+	// Internal ROM of IGS027A ARM based MCU
+	ROM_LOAD( "lhzb4_igs027a", 0x00000, 0x4000, CRC(de12c918) SHA1(87c1cf92a95565d78c6fe7629c19729f5fb5c2a5) ) // unknown sticker
+
+	ROM_REGION32_LE( 0x80000, "user1", 0 ) // external ARM data / prg
+	ROM_LOAD( "lhzb4_104.u17", 0x000000, 0x80000, CRC(6f349bbb) SHA1(54cf895889ef0f208637ba732ede696ca3603ee0) )
+
+	ROM_REGION( 0x80000, "igs017_igs031:tilemaps", 0 )
+	ROM_LOAD16_WORD_SWAP( "lhzb4_text.u27", 0x000000, 0x80000, CRC(8488b039) SHA1(59bc9eccba810fcac2a53866b2da1e71bfd8a6e7) )
+
+	ROM_REGION( 0x400000, "igs017_igs031:sprites", 0 )
+	ROM_LOAD( "a05501.u28", 0x000000, 0x400000, CRC(f78b3714) SHA1(c73d8e50b04126bc4f91783384713624ed133ee2) )
+
+	// OKI, sample tables are every 0x20000 starting at 0x140000
+	ROM_REGION( 0x200000, "oki", 0 )
+	ROM_LOAD( "w05502.u5", 0x00000, 0x200000, CRC(467f677e) SHA1(63927c0d606176c0e22db89ea3a9777ed702abbd) )
+ROM_END
+
+// 龙虎争霸4对花版 (Lóng Hǔ Zhēngbà 4 Duì Huā Bǎn)
+ROM_START( lhzb4dhb ) // Only 2 DIP switch banks are populated.
 	ROM_REGION( 0x04000, "maincpu", 0 )
 	// Internal ROM of IGS027A ARM based MCU
 	// stickered F12. Using the dump for lhzb4104cn which works, waiting for trojan
@@ -2950,25 +2957,6 @@ ROM_START( lhzb4 ) // was sent as 'Flower Version'. Only 2 DIP banks are populat
 	// OKI, sample tables are every 0x20000 starting at 0x140000
 	ROM_REGION( 0x200000, "oki", 0 )
 	ROM_LOAD( "igs_w05502b016_45d1_756d.u5", 0x00000, 0x200000, CRC(467f677e) SHA1(63927c0d606176c0e22db89ea3a9777ed702abbd) )
-ROM_END
-
-ROM_START( lhzb4104cn )
-	ROM_REGION( 0x04000, "maincpu", 0 )
-	// Internal ROM of IGS027A ARM based MCU
-	ROM_LOAD( "lhzb4_igs027a", 0x00000, 0x4000, CRC(de12c918) SHA1(87c1cf92a95565d78c6fe7629c19729f5fb5c2a5) ) // unknown sticker
-
-	ROM_REGION32_LE( 0x80000, "user1", 0 ) // external ARM data / prg
-	ROM_LOAD( "lhzb4_104.u17", 0x000000, 0x80000, CRC(6f349bbb) SHA1(54cf895889ef0f208637ba732ede696ca3603ee0) )
-
-	ROM_REGION( 0x80000, "igs017_igs031:tilemaps", 0 )
-	ROM_LOAD16_WORD_SWAP( "lhzb4_text.u27", 0x000000, 0x80000, CRC(8488b039) SHA1(59bc9eccba810fcac2a53866b2da1e71bfd8a6e7) )
-
-	ROM_REGION( 0x400000, "igs017_igs031:sprites", 0 )
-	ROM_LOAD( "a05501.u28", 0x000000, 0x400000, CRC(f78b3714) SHA1(c73d8e50b04126bc4f91783384713624ed133ee2) )
-
-	// OKI, sample tables are every 0x20000 starting at 0x140000
-	ROM_REGION( 0x200000, "oki", 0 )
-	ROM_LOAD( "w05502.u5", 0x00000, 0x200000, CRC(467f677e) SHA1(63927c0d606176c0e22db89ea3a9777ed702abbd) )
 ROM_END
 
 // 雀龙高手 (Què Lóng Gāoshǒu) (IGS, 1999)
@@ -3236,8 +3224,8 @@ GAME(  1999, qlgs,          0,        qlgs,         qlgs,          igs_m027_stat
 GAME(  1999, lhdmg,         0,        lhdmg,        lhdmg,         igs_m027_state, init_lhdmg,    ROT0, "IGS", "Long Hu Da Manguan (V102C3M)", 0 )
 GAME(  1999, lhdmgp,        0,        lhdmg,        lhdmg,         igs_m027_state, init_lhdmg,    ROT0, "IGS", "Long Hu Da Manguan Duizhan Jiaqiang Ban (V400C3M)", 0 )
 GAME(  1999, lhzb3,         0,        lhdmg,        lhzb3,         igs_m027_state, init_lhdmg,    ROT0, "IGS", "Long Hu Zhengba III (V400CN)", 0 )
-GAME(  2004, lhzb4,         0,        lhzb4,        lhzb4_todo,    igs_m027_state, init_lhzb4,    ROT0, "IGS", "Long Hu Zhengba 4 (V203CN)", MACHINE_NOT_WORKING ) // needs I/O verifying
-GAME(  2004, lhzb4104cn,    lhzb4,    lhzb4,        lhzb4,         igs_m027_state, init_lhzb4,    ROT0, "IGS", "Long Hu Zhengba 4 (V104CN)", 0 )
+GAME(  2004, lhzb4,         0,        lhzb4,        lhzb4,         igs_m027_state, init_lhzb4,    ROT0, "IGS", "Long Hu Zhengba 4 (V104CN)", 0 )
+GAME(  2004, lhzb4dhb,      0,        lhzb4,        lhzb4,         igs_m027_state, init_lhzb4,    ROT0, "IGS", "Long Hu Zhengba 4 Dui Hua Ban (V203CN)", 0 )
 GAME(  1999, lthyp,         0,        lthyp,        lthyp,         igs_m027_state, init_lthyp,    ROT0, "IGS", "Long Teng Hu Yue Duizhan Jiaqiang Ban (S104CN)", MACHINE_NODEVICE_LAN )
 GAME(  2000, zhongguo,      0,        zhongguo,     zhongguo,      igs_m027_state, init_zhongguo, ROT0, "IGS", "Zhongguo Chu Da D (V102C)", 0 )
 GAMEL( 200?, jking02,       0,        jking02,      jking02,       igs_m027_state, init_jking02,  ROT0, "IGS", "Jungle King 2002 (V209US)", MACHINE_NODEVICE_LAN, layout_jking02 ) // shows V212US in bookkeeping menu
@@ -3248,8 +3236,8 @@ GAMEL( 1999, oceanpar,      0,        oceanpar,     oceanpar105us, igs_m027_stat
 GAMEL( 1999, oceanpar101us, oceanpar, oceanpar,     oceanpar101us, igs_m027_state, init_oceanpar, ROT0, "IGS", "Ocean Paradise (V101US)", 0, layout_oceanpar ) // 1999 copyright in ROM
 GAMEL( 1999, fruitpar,      0,        oceanpar,     oceanpar105us, igs_m027_state, init_fruitpar, ROT0, "IGS", "Fruit Paradise (V214US)", 0, layout_oceanpar )
 GAMEL( 1999, fruitpar206us, fruitpar, oceanpar,     fruitpar206us, igs_m027_state, init_fruitpar, ROT0, "IGS", "Fruit Paradise (V206US)", 0, layout_oceanpar )
-GAME(  200?, cjddz,         0,        cjddz,        cjddz_todo,    igs_m027_state, init_cjddz,    ROT0, "IGS", "Chaoji Dou Dizhu (V219CN)", MACHINE_NOT_WORKING ) // needs I/O verifying
-GAME(  200?, cjddz217cn,    cjddz,    cjddz,        cjddz_todo,    igs_m027_state, init_cjddz,    ROT0, "IGS", "Chaoji Dou Dizhu (V217CN)", MACHINE_NOT_WORKING ) // needs I/O verifying
+GAME(  200?, cjddz,         0,        cjddz,        cjddz,         igs_m027_state, init_cjddz,    ROT0, "IGS", "Chaoji Dou Dizhu (V219CN)", 0 )
+GAME(  200?, cjddz217cn,    cjddz,    cjddz,        cjddz,         igs_m027_state, init_cjddz,    ROT0, "IGS", "Chaoji Dou Dizhu (V217CN)", 0 )
 GAME(  200?, cjddz215cn,    cjddz,    cjddz,        cjddz,         igs_m027_state, init_cjddz,    ROT0, "IGS", "Chaoji Dou Dizhu (V215CN)", 0 )
 GAME(  200?, cjddzp,        0,        cjddz,        cjddzp,        igs_m027_state, init_cjddzp,   ROT0, "IGS", "Chaoji Dou Dizhu Jiaqiang Ban (S300CN)", MACHINE_NODEVICE_LAN )
 GAMEL( 2007, tripslot,      0,        tripslot,     tripslot,      igs_m027_state, init_tripslot, ROT0, "IGS", "Triple Slot (V200VE)", 0, layout_tripslot ) // 2007 date in internal ROM at least, could be later, default settings password is all 'start 1'
