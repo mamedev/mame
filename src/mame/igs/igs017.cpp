@@ -11,28 +11,28 @@ Video: IGS017 or IGS031 (2 tilemaps, variable size sprites, protection)
 Other: IGS025 (8255), IGS022 (protection, MCU), IGS029 (protection)
 Sound: M6295(K668/AR17961) + [YM2413(U3567)]
 
--------------------------------------------------------------------------------------------------------------
-Year + Game                                   PCB        CPU    Sound           Custom                Other
--------------------------------------------------------------------------------------------------------------
-96  Shuzi Leyuan (V127M)                      NO-0131-4  Z180   AR17961 U3567   IGS017 8255           Battery
-97  Chaoji Damanguan II (V754C)               NO-0147-6  68000  K668            IGS031 8255           Battery
-97  Tian Jiang Shen Bing (V137C)              NO-0157-2  Z180   AR17961 U3567   IGS017 IGS025         Battery
-97  Manguan Daheng (V123T1)                   NO-0252    68000  M6295           IGS031 IGS025 IGS???* Battery
-98  Genius 6 (V110F)                          NO-0131-4  Z180   K668    U3567   IGS017 IGS003c        Battery
-98  Long Hu Zhengba 2 (set 1)                 NO-0206    68000  K668            IGS031 IGS025 IGS022* Battery
-98  Shuang Long Qiang Zhu 2 VS (VS203J)       NO-0207    68000  K668            IGS031 IGS025 IGS022  Battery
-98  Manguan Caishen (V103CS)                  NO-0192-1  68000  K668            IGS017 IGS025 IGS029  Battery
-98  Manguan Caishen (V106CS)                  NO-0208    68000  M6295           IGS031 IGS025 IGS029  Battery
-99  Tarzan (V107)                             NO-0228?   Z180   U6295           IGS031 IGS025 IGS029  Battery
-99  Tarzan (V109C)                            NO-0248-1  Z180   U6295           IGS031 IGS025         Battery
-00  Chaoji Damanguan 2 - Jiaqiang Ban (V100C) NO-0271    68000  K668            IGS031 IGS025         Battery
-00? Jungle King (V103A)                       NO-0230-1  Z180   U6295           IGS031 IGS025 (N9)    Battery
-00? Super Tarzan (V100I)                      NO-0230-1  Z180   K668            IGS031 IGS025         Battery
-00? Happy Skill (V611IT)                      NO-0281    Z180   K668            IGS031 IGS025         Battery
-00? Champion Poker 2 (V100A)                  unreadable Z180   M6295           IGS031 IGS025         Battery
-00? Super Poker (V100xD03) / Formosa          NO-0187    Z180   K668    U3567   IGS017 IGS025         Battery
-00? Jungle King (V302US)                      NO-0214-7  68000  K668            IGS031 IGS025 IGS029  Battery
--------------------------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------------------------------------
+Year + Game                                    PCB        CPU    Sound           Custom                Other
+--------------------------------------------------------------------------------------------------------------
+96  Shuzi Leyuan (V127M)                       NO-0131-4  Z180   AR17961 U3567   IGS017 8255           Battery
+97  Chaoji Da Manguan II (V754C)               NO-0147-6  68000  K668            IGS031 8255           Battery
+97  Tian Jiang Shen Bing (V137C)               NO-0157-2  Z180   AR17961 U3567   IGS017 IGS025         Battery
+97  Manguan Daheng (V123T1)                    NO-0252    68000  M6295           IGS031 IGS025 IGS???* Battery
+98  Genius 6 (V110F)                           NO-0131-4  Z180   K668    U3567   IGS017 IGS003c        Battery
+98  Long Hu Zhengba 2 (set 1)                  NO-0206    68000  K668            IGS031 IGS025 IGS022* Battery
+98  Shuang Long Qiang Zhu 2 VS (VS203J)        NO-0207    68000  K668            IGS031 IGS025 IGS022  Battery
+98  Manguan Caishen (V103CS)                   NO-0192-1  68000  K668            IGS017 IGS025 IGS029  Battery
+98  Manguan Caishen (V106CS)                   NO-0208    68000  M6295           IGS031 IGS025 IGS029  Battery
+99  Tarzan (V107)                              NO-0228?   Z180   U6295           IGS031 IGS025 IGS029  Battery
+99  Tarzan (V109C)                             NO-0248-1  Z180   U6295           IGS031 IGS025         Battery
+00  Chaoji Da manguan 2 - Jiaqiang Ban (V100C) NO-0271    68000  K668            IGS031 IGS025         Battery
+00? Jungle King (V103A)                        NO-0230-1  Z180   U6295           IGS031 IGS025 (N9)    Battery
+00? Super Tarzan (V100I)                       NO-0230-1  Z180   K668            IGS031 IGS025         Battery
+00? Happy Skill (V611IT)                       NO-0281    Z180   K668            IGS031 IGS025         Battery
+00? Champion Poker 2 (V100A)                   unreadable Z180   M6295           IGS031 IGS025         Battery
+00? Super Poker (V100xD03) / Formosa           NO-0187    Z180   K668    U3567   IGS017 IGS025         Battery
+00? Jungle King (V302US)                       NO-0214-7  68000  K668            IGS031 IGS025 IGS029  Battery
+--------------------------------------------------------------------------------------------------------------
                                                                          not present in another set *
 To Do:
 
@@ -3429,85 +3429,63 @@ static INPUT_PORTS_START( mgcs )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( sdmg2 )
+static INPUT_PORTS_START( sdmg2_common )
 	PORT_START("DSW1")
-	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coinage ) ) PORT_DIPLOCATION("SW1:1,2")
+	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coinage ) )                      PORT_DIPLOCATION("SW1:1,2")   // 投幣比率
 	PORT_DIPSETTING(    0x03, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( 1C_3C ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_5C ) )
-	PORT_DIPNAME( 0x0c, 0x0c, "Credits Per Note" ) PORT_DIPLOCATION("SW1:3,4")
+	PORT_DIPNAME( 0x0c, 0x0c, "Key-In Rate" )                           PORT_DIPLOCATION("SW1:3,4")   // 開分比率
 	PORT_DIPSETTING(    0x0c, "10" )
 	PORT_DIPSETTING(    0x08, "20" )
 	PORT_DIPSETTING(    0x04, "50" )
 	PORT_DIPSETTING(    0x00, "100" )
-	PORT_DIPNAME( 0x10, 0x10, "Max Note Credits" ) PORT_DIPLOCATION("SW1:5")
+	PORT_DIPNAME( 0x10, 0x10, "Credit Limit" )                          PORT_DIPLOCATION("SW1:5")     // 進分上限
 	PORT_DIPSETTING(    0x10, "2000" )
-	PORT_DIPSETTING(    0x00, "29999" )
-	PORT_DIPNAME( 0x20, 0x20, "Money Type" ) PORT_DIPLOCATION("SW1:6")
-	PORT_DIPSETTING(    0x20, "Coins" )
-	PORT_DIPSETTING(    0x00, "Notes" )
-	PORT_DIPNAME( 0x40, 0x40, "Pay Out Type" ) PORT_DIPLOCATION("SW1:7")
-	PORT_DIPSETTING(    0x40, "Coins" )
-	PORT_DIPSETTING(    0x00, "Notes" )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SW1:8")
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x00, "Unlimited" )                                                           // 無限制     (seems to be limited to 19,999 trying to exceed this gives "RECORD ERROR 10")
+	PORT_DIPNAME( 0x20, 0x20, "Credit Mode" )                           PORT_DIPLOCATION("SW1:6")     // 進分方式   (sets coin input function)
+	PORT_DIPSETTING(    0x20, "Coin Acceptor" )                                                       // 投幣
+	PORT_DIPSETTING(    0x00, "Key-In" )                                                              // 開分
+	PORT_DIPNAME( 0x40, 0x40, "Payout Mode" )                           PORT_DIPLOCATION("SW1:7")     // 退分方式
+	PORT_DIPSETTING(    0x40, "Return Coins" )                                                        // 投幣
+	PORT_DIPSETTING(    0x00, "Key-Out" )                                                             // 洗分
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Demo_Sounds ) )                  PORT_DIPLOCATION("SW1:8")     // 示範音樂
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )                                                        // 無
+	PORT_DIPSETTING(    0x80, DEF_STR( On ) )                                                         // 有
 
 	PORT_START("DSW2")
-	PORT_DIPNAME( 0x03, 0x03, "Minimum Bet" ) PORT_DIPLOCATION("SW2:1,2")
+	PORT_DIPNAME( 0x03, 0x03, "Double Up Jackpot" )                     PORT_DIPLOCATION("SW2:1,2")   // 比倍爆機
 	PORT_DIPSETTING(    0x03, "500" )
 	PORT_DIPSETTING(    0x02, "1000" )
 	PORT_DIPSETTING(    0x01, "1500" )
 	PORT_DIPSETTING(    0x00, "2000" )
-	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW2:3,4")
+	PORT_DIPNAME( 0x0c, 0x0c, "Minimum Bet" )                           PORT_DIPLOCATION("SW2:3,4")   // 最小押注
 	PORT_DIPSETTING(    0x0c, "1" )
 	PORT_DIPSETTING(    0x08, "2" )
 	PORT_DIPSETTING(    0x04, "3" )
 	PORT_DIPSETTING(    0x00, "5" )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW2:5")
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW2:6")
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Controls ) ) PORT_DIPLOCATION("SW2:7")
-	PORT_DIPSETTING(    0x40, "Keyboard" )
+	PORT_DIPNAME( 0x10, 0x10, "Double Up Game" )                        PORT_DIPLOCATION("SW2:5")     // 續玩
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )                                                        // 無
+	PORT_DIPSETTING(    0x10, DEF_STR( On ) )                                                         // 有
+	PORT_DIPNAME( 0x20, 0x20, "Double Up Game Name" )                   PORT_DIPLOCATION("SW2:6")     // 比倍續玩   (changes names for double up game and Double Up/Big/Small buttons)
+	PORT_DIPSETTING(    0x20, "Continue Play" )                                                       // 續玩       (续玩/左/右)
+	PORT_DIPSETTING(    0x00, "Double Up" )                                                           // 比倍       (比倍/大/小)
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Controls ) )                     PORT_DIPLOCATION("SW2:7")     // 操作方式
+	PORT_DIPSETTING(    0x40, "Mahjong" )                                                             // 按鍵
 	PORT_DIPSETTING(    0x00, DEF_STR( Joystick ) )
-	PORT_DIPNAME( 0x80, 0x80, "Number Type" ) PORT_DIPLOCATION("SW2:8")
-	PORT_DIPSETTING(    0x80, "Number" )
-	PORT_DIPSETTING(    0x00, "Tile" )
-
-	PORT_START("COINS")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW,  IPT_CUSTOM      ) PORT_READ_LINE_DEVICE_MEMBER("hopper", hopper_device, line_r) // hopper switch
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_SERVICE1    ) PORT_NAME("Hide Gambling") // shown in test mode as "clear" (清除), does not work in game?
-	PORT_SERVICE_NO_TOGGLE( 0x04,   IP_ACTIVE_LOW   ) // keep pressed while booting
-	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_GAMBLE_BOOK )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_COIN1       )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW,  IPT_OTHER       ) PORT_NAME("Pay Out") PORT_CODE(KEYCODE_O)
-	// Keyboard mode:
-	PORT_BIT( 0x40, IP_ACTIVE_LOW,  IPT_SERVICE3    ) PORT_CONDITION("DSW2",0x40,EQUALS,0x40) // shown in test mode ('O' appears, or it might be a 0)
-	// Joystick mode:
-	PORT_BIT( 0x40, IP_ACTIVE_LOW,  IPT_BUTTON3     ) PORT_CONDITION("DSW2",0x40,EQUALS,0x00)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_UNKNOWN     )
-
-	PORT_START("JOY")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON2 )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN ) // related to joystick BUTTON3
+	PORT_DIPNAME( 0x80, 0x80, "Number Type" )                           PORT_DIPLOCATION("SW2:8")     // 數字形態
+	PORT_DIPSETTING(    0x80, "Numbers" )                                                             // 數字
+	PORT_DIPSETTING(    0x00, "Blocks" )                                                              // 方塊       (apples for bet, mahjong tong tiles for numbers)
 
 	PORT_START("KEY0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_A )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_E )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_I )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_M )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_KAN )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_KAN )          PORT_CONDITION("DSW2", 0x40, EQUALS, 0x40)  // 槓
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START1 )               PORT_CONDITION("DSW2", 0x40, EQUALS, 0x40)  // 開始
+	PORT_BIT( 0x30, IP_ACTIVE_LOW, IPT_UNKNOWN )              PORT_CONDITION("DSW2", 0x40, EQUALS, 0x00)
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
@@ -3516,8 +3494,9 @@ static INPUT_PORTS_START( sdmg2 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_F )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_J )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_N )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_REACH )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_MAHJONG_BET )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_REACH )        PORT_CONDITION("DSW2", 0x40, EQUALS, 0x40)  // 聽
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_MAHJONG_BET )          PORT_CONDITION("DSW2", 0x40, EQUALS, 0x40)  // 押
+	PORT_BIT( 0x30, IP_ACTIVE_LOW, IPT_UNKNOWN )              PORT_CONDITION("DSW2", 0x40, EQUALS, 0x00)
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
@@ -3525,8 +3504,9 @@ static INPUT_PORTS_START( sdmg2 )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_C )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_G )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_K )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_CHI )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_RON )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_CHI )          PORT_CONDITION("DSW2", 0x40, EQUALS, 0x40)  // 吃
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_RON )          PORT_CONDITION("DSW2", 0x40, EQUALS, 0x40)  // 胡
+	PORT_BIT( 0x18, IP_ACTIVE_LOW, IPT_UNKNOWN )              PORT_CONDITION("DSW2", 0x40, EQUALS, 0x00)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -3535,72 +3515,70 @@ static INPUT_PORTS_START( sdmg2 )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_D )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_H )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_L )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_PON )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_PON )          PORT_CONDITION("DSW2", 0x40, EQUALS, 0x40)  // 碰
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )              PORT_CONDITION("DSW2", 0x40, EQUALS, 0x00)
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("KEY4")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_LAST_CHANCE )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_SCORE )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_DOUBLE_UP )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_LAST_CHANCE )  PORT_CONDITION("DSW2", 0x40, EQUALS, 0x40)  // 海底
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_SCORE )        PORT_CONDITION("DSW2", 0x40, EQUALS, 0x40)  // 得分
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_DOUBLE_UP )    PORT_CONDITION("DSW2", 0x40, EQUALS, 0x40)  // 比倍
+	PORT_BIT( 0x07, IP_ACTIVE_LOW, IPT_UNKNOWN )              PORT_CONDITION("DSW2", 0x40, EQUALS, 0x00)
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_BIG )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_MAHJONG_SMALL )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_BIG )          PORT_CONDITION("DSW2", 0x40, EQUALS, 0x40)  // 大
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_MAHJONG_SMALL )        PORT_CONDITION("DSW2", 0x40, EQUALS, 0x40)  // 小
+	PORT_BIT( 0x07, IP_ACTIVE_LOW, IPT_UNKNOWN )              PORT_CONDITION("DSW2", 0x40, EQUALS, 0x00)
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( sdmg2p )
-	PORT_START("DSW1")
-	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coinage ) ) PORT_DIPLOCATION("SW1:1,2")
-	PORT_DIPSETTING(    0x03, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( 1C_2C ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( 1C_3C ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( 1C_5C ) )
-	PORT_DIPNAME( 0x0c, 0x0c, "Credits Per Note" ) PORT_DIPLOCATION("SW1:3,4")
-	PORT_DIPSETTING(    0x0c, "10" )
-	PORT_DIPSETTING(    0x08, "20" )
-	PORT_DIPSETTING(    0x04, "50" )
-	PORT_DIPSETTING(    0x00, "100" )
-	PORT_DIPNAME( 0x10, 0x10, "Max Note Credits" ) PORT_DIPLOCATION("SW1:5")
-	PORT_DIPSETTING(    0x10, "2000" )
-	PORT_DIPSETTING(    0x00, "29999" )
-	PORT_DIPNAME( 0x20, 0x20, "Money Type" ) PORT_DIPLOCATION("SW1:6")
-	PORT_DIPSETTING(    0x20, "Coins" )
-	PORT_DIPSETTING(    0x00, "Notes" )
-	PORT_DIPNAME( 0x40, 0x40, "Pay Out Type" ) PORT_DIPLOCATION("SW1:7")
-	PORT_DIPSETTING(    0x40, "Coins" )
-	PORT_DIPSETTING(    0x00, "Notes" )
-	PORT_DIPNAME( 0x80, 0x80, "Hidden Function" ) PORT_DIPLOCATION("SW1:8") // 隐分功能 (Yǐnfēn Gōngnéng) TODO: determine what this does
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+static INPUT_PORTS_START( sdmg2 )
+	PORT_INCLUDE(sdmg2_common)
 
-	PORT_START("DSW2")
-	PORT_DIPNAME( 0x01, 0x01, "Game Title" ) PORT_DIPLOCATION("SW2:1") // 機種名稱 (Jīzhǒng Míngchēng)
-	PORT_DIPSETTING(    0x01, "Maque Wangchao" )
-	PORT_DIPSETTING(    0x00, "Chaoji Damanguan 2 - Jiaqiang Ban" ) // actually abbreviated in 超二加強 (Chāo èr jiāqiáng)
-	PORT_DIPNAME( 0x02, 0x02, "Double Up Limit" ) PORT_DIPLOCATION("SW2:2")
+	PORT_START("COINS")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("hopper", hopper_device, line_r) // 哈巴
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE1 )             PORT_CONDITION("DSW2", 0x40, EQUALS, 0x40)  PORT_NAME("Clear")  // 清除
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )              PORT_CONDITION("DSW2", 0x40, EQUALS, 0x00)
+	PORT_SERVICE_NO_TOGGLE( 0x04,  IP_ACTIVE_LOW )                                                        // 測試      (hold on start for input test)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK )                                                      // 查帳
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN1 )                PORT_CONDITION("DSW1", 0x20, EQUALS, 0x20)  // 投幣
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_KEYIN )         PORT_CONDITION("DSW1", 0x20, EQUALS, 0x00)  // 投幣
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT )        PORT_CONDITION("DSW1", 0x40, EQUALS, 0x40)  // 退幣
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT )        PORT_CONDITION("DSW1", 0x40, EQUALS, 0x00)  // 退幣
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE3 )             PORT_CONDITION("DSW2", 0x40, EQUALS, 0x40)  //           shown in test mode ('O' appears, or it might be a 0)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON3 )              PORT_CONDITION("DSW2", 0x40, EQUALS, 0x00)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("JOY")
+	PORT_BIT( 0x7f, IP_ACTIVE_LOW, IPT_UNKNOWN )              PORT_CONDITION("DSW2", 0x40, EQUALS, 0x40)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )               PORT_CONDITION("DSW2", 0x40, EQUALS, 0x00)  // 開始
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )          PORT_CONDITION("DSW2", 0x40, EQUALS, 0x00)  // 上
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )        PORT_CONDITION("DSW2", 0x40, EQUALS, 0x00)  // 下
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )        PORT_CONDITION("DSW2", 0x40, EQUALS, 0x00)  // 左
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT )       PORT_CONDITION("DSW2", 0x40, EQUALS, 0x00)  // 右
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 )              PORT_CONDITION("DSW2", 0x40, EQUALS, 0x00)  // 摸捨
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON2 )              PORT_CONDITION("DSW2", 0x40, EQUALS, 0x00)  // 押注
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )                                                          //           related to joystick BUTTON3
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( sdmg2p )
+	PORT_INCLUDE(sdmg2_common)
+
+	PORT_MODIFY("DSW1")
+	PORT_DIPNAME( 0x80, 0x80, "Hide Credits" )                          PORT_DIPLOCATION("SW1:8")     // 隐分功能   (hides credits/bets/wins, game plays normally)
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )                                                        // 無
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )                                                         // 有
+
+	PORT_MODIFY("DSW2")
+	PORT_DIPNAME( 0x01, 0x01, "Game Title" )                            PORT_DIPLOCATION("SW2:1")     // 機種名稱
+	PORT_DIPSETTING(    0x01, "Maque Wangchao" )                                                      // 麻雀王朝   (Máquè wángcháo)
+	PORT_DIPSETTING(    0x00, "Chaoji Da Manguan 2 - Jiaqiang Ban" )                                  // 超二加強   (abbreviated to Chāo èr jiāqiáng)
+	PORT_DIPNAME( 0x02, 0x02, "Double Up Jackpot" )                     PORT_DIPLOCATION("SW2:2")     // 比倍爆機
 	PORT_DIPSETTING(    0x02, "500" )
 	PORT_DIPSETTING(    0x00, "1000" )
-	PORT_DIPNAME( 0x0c, 0x0c, "Minimum Bet" ) PORT_DIPLOCATION("SW2:3,4")
-	PORT_DIPSETTING(    0x0c, "1" )
-	PORT_DIPSETTING(    0x08, "2" )
-	PORT_DIPSETTING(    0x04, "3" )
-	PORT_DIPSETTING(    0x00, "5" )
-	PORT_DIPNAME( 0x10, 0x10, "Double Up" ) PORT_DIPLOCATION("SW2:5")
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, "Double-up/Continue" ) PORT_DIPLOCATION("SW2:6") // 比倍續玩 TODO: determine what this does
-	PORT_DIPSETTING(    0x20, "Double Up" ) // 比倍
-	PORT_DIPSETTING(    0x00, "Continue Game" ) // 續玩
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Controls ) ) PORT_DIPLOCATION("SW2:7")
-	PORT_DIPSETTING(    0x40, "Keyboard" )
-	PORT_DIPSETTING(    0x00, DEF_STR( Joystick ) )
-	PORT_DIPNAME( 0x80, 0x80, "Number Type" ) PORT_DIPLOCATION("SW2:8")
-	PORT_DIPSETTING(    0x80, "Number" )
-	PORT_DIPSETTING(    0x00, "Tile" )
 
 	PORT_START("DSW3")
 	PORT_DIPUNKNOWN_DIPLOC( 0x01, IP_ACTIVE_LOW, "SW3:1" )
@@ -3613,90 +3591,40 @@ static INPUT_PORTS_START( sdmg2p )
 	PORT_DIPUNKNOWN_DIPLOC( 0x80, IP_ACTIVE_LOW, "SW3:8" )
 
 	PORT_START("COINS")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN     )
-	// Joystick mode only?:
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON3     ) PORT_CONDITION("DSW2",0x40,EQUALS,0x00)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN     ) PORT_CONDITION("DSW2",0x40,EQUALS,0x40)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER       ) PORT_NAME("Pay Out") PORT_CODE(KEYCODE_O)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN1       )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK )
-	PORT_SERVICE_NO_TOGGLE( 0x20,  IP_ACTIVE_LOW   ) // also keep pressed while booting
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN     )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN     )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )              PORT_CONDITION("DSW2", 0x40, EQUALS, 0x40)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON3 )              PORT_CONDITION("DSW2", 0x40, EQUALS, 0x00)  // 功能
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT )        PORT_CONDITION("DSW1", 0x40, EQUALS, 0x40)  // 退幣
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT )        PORT_CONDITION("DSW1", 0x40, EQUALS, 0x00)  // 退幣
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN1 )                PORT_CONDITION("DSW1", 0x20, EQUALS, 0x20)  // 投幣
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_KEYIN )         PORT_CONDITION("DSW1", 0x20, EQUALS, 0x00)  // 投幣
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK )                                                      // 查帳
+	PORT_SERVICE_NO_TOGGLE( 0x20,  IP_ACTIVE_LOW )                                                        // 測試      (hold on start for input test)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("JOY")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START1 )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 )
-
-	PORT_START("KEY0")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_A )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_E )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_I )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_M )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_KAN )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START1 )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
-	PORT_START("KEY1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_B )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_F )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_J )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_N )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_REACH )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_MAHJONG_BET )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
-	PORT_START("KEY2")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_C )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_G )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_K )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_CHI )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_RON )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
-	PORT_START("KEY3")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_D )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_H )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_L )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_PON )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
-	PORT_START("KEY4")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_LAST_CHANCE )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_SCORE )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_DOUBLE_UP )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_BIG )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_MAHJONG_SMALL )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0xfc, IP_ACTIVE_LOW, IPT_UNKNOWN )              PORT_CONDITION("DSW2", 0x40, EQUALS, 0x40)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START1 )               PORT_CONDITION("DSW2", 0x40, EQUALS, 0x00)  // 開始
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )          PORT_CONDITION("DSW2", 0x40, EQUALS, 0x00)  // 上
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )        PORT_CONDITION("DSW2", 0x40, EQUALS, 0x00)  // 下
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )        PORT_CONDITION("DSW2", 0x40, EQUALS, 0x00)  // 左
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT )       PORT_CONDITION("DSW2", 0x40, EQUALS, 0x00)  // 右
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 )              PORT_CONDITION("DSW2", 0x40, EQUALS, 0x00)  // 摸捨
 
 	PORT_START("BUTTONS")
-	// Joystick mode only:
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_CONDITION("DSW2",0x40,EQUALS,0x00)
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN ) PORT_CONDITION("DSW2",0x40,EQUALS,0x40)
-	// Keyboard mode only:
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_CONDITION("DSW2",0x40,EQUALS,0x40) PORT_NAME("Hide Gambling") // shown in test mode as "clear" (清除)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN ) PORT_CONDITION("DSW2",0x40,EQUALS,0x00)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )              PORT_CONDITION("DSW2", 0x40, EQUALS, 0x40)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE1 )             PORT_CONDITION("DSW2", 0x40, EQUALS, 0x40)  PORT_NAME("Clear")  // 清除
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON2 )              PORT_CONDITION("DSW2", 0x40, EQUALS, 0x00)  // 押注
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )              PORT_CONDITION("DSW2", 0x40, EQUALS, 0x00)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("hopper", hopper_device, line_r) // hopper switch, TODO: verify
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("hopper", hopper_device, line_r) // 哈巴
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( mgdh )
@@ -5382,7 +5310,7 @@ ROM_END
 
 /***************************************************************************
 
-Chaoji Damanguan II (China, V754C)
+Chaoji Da Manguan II (China, V754C)
 超級大滿貫 (Chāojí Dàmǎnguàn)
 IGS, 1997
 
@@ -5456,7 +5384,7 @@ ROM_END
 
 /***************************************************************************
 
-Maque Wangchao / Chaoji Damanguan 2 - Jiaqiang Ban
+Maque Wangchao / Chaoji Da Manguan 2 - Jiaqiang Ban
 麻雀王朝 / 超級大滿貫 2 -加強版 (Mahjong Dynasty / Super Grand Slam 2 - Enhanced Edition)
 
 IGS 2000
@@ -6157,30 +6085,30 @@ ROM_END
 
 } // anonymous namespace
 
-GAME ( 1996,  iqblocka,   iqblock,  iqblocka,   iqblocka, igs017_state, init_iqblocka,   ROT0, "IGS", "Shuzi Leyuan (China, V127M, gambling)",                             0 ) // 數字樂園
-GAME ( 1997,  iqblockf,   iqblock,  iqblockf,   iqblockf, igs017_state, init_iqblocka,   ROT0, "IGS", "IQ Block (V113FR, gambling)",                                       0 )
-GAME ( 1997,  mgdh,       0,        mgdh,       mgdh,     igs017_state, init_mgdh,       ROT0, "IGS", "Manguan Daheng (Taiwan, V125T1)",                                   MACHINE_IMPERFECT_COLORS | MACHINE_UNEMULATED_PROTECTION) // 滿貫大亨, wrong colors in betting screen, game id check (patched out)
-GAME ( 1997,  mgdha,      mgdh,     mgdha,      mgdh,     igs017_state, init_mgdha,      ROT0, "IGS", "Manguan Daheng (Taiwan, V123T1)",                                   0 ) // 滿貫大亨
-GAME ( 1997,  sdmg2,      0,        sdmg2,      sdmg2,    igs017_state, init_sdmg2,      ROT0, "IGS", "Chaoji Damanguan II (China, V754C, set 1)",                         0 ) // 超級大滿貫II
-GAME ( 1997,  sdmg2a,     sdmg2,    sdmg2,      sdmg2,    igs017_state, init_sdmg2a,     ROT0, "IGS", "Chaoji Damanguan II (China, V754C, set 2)",                         0 ) // 超級大滿貫II
-GAME ( 1997,  tjsb,       0,        tjsb,       tjsb,     igs017_state, init_tjsb,       ROT0, "IGS", "Tian Jiang Shen Bing (China, V137C)",                               MACHINE_UNEMULATED_PROTECTION ) // 天將神兵, fails the bonus round protection check (if enabled via DSW), see e.g. demo mode
-GAME ( 1998,  genius6,    0,        genius6,    genius6,  igs017_state, init_iqblocka,   ROT0, "IGS", "Genius 6 (V110F)",                                                  0 ) // shows Chinese text in puzzle game
-GAME ( 1997,  genius6a,   genius6,  genius6,    genius6,  igs017_state, init_iqblocka,   ROT0, "IGS", "Genius 6 (V133F)",                                                  0 ) // clone because it has older copyright year
-GAME ( 1997,  genius6b,   genius6,  genius6,    genius6,  igs017_state, init_iqblocka,   ROT0, "IGS", "Genius 6 (V132F)",                                                  0 ) // "
-GAME ( 1998,  mgcs,       0,        mgcs,       mgcs,     igs017_state, init_mgcs,       ROT0, "IGS", "Manguan Caishen (China, V103CS)",                                   MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION ) // 满贯财神, finish IGS029 protection
-GAME ( 1998,  mgcsa,      mgcs,     mgcsa,      mgcs,     igs017_state, init_mgcsa,      ROT0, "IGS", "Manguan Caishen (China, V106CS)",                                   MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION ) // 满贯财神, finish IGS029 protection
-GAME ( 1998,  lhzb2,      0,        lhzb2,      lhzb2,    igs017_state, init_lhzb2,      ROT0, "IGS", "Long Hu Zhengba 2 (China, set 1)",                                  MACHINE_UNEMULATED_PROTECTION ) // 龙虎争霸2, finish IGS022 protection
-GAME ( 1998,  lhzb2a,     lhzb2,    lhzb2a,     lhzb2a,   igs017_state, init_lhzb2a,     ROT0, "IGS", "Long Hu Zhengba 2 (China, VS221M)",                                 0 ) // 龙虎争霸2
-GAME ( 1998,  slqz2,      0,        slqz2,      slqz2,    igs017_state, init_slqz2,      ROT0, "IGS", "Shuang Long Qiang Zhu 2 VS (China, VS203J)",                        MACHINE_UNEMULATED_PROTECTION ) // 双龙抢珠, finish IGS022 protection
-GAME ( 1998,  slqz2a,     slqz2,    slqz2,      slqz2,    igs017_state, init_slqz2,      ROT0, "IGS", "Shuang Long Qiang Zhu 2 VS (China, set 2)",                         MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION ) // 双龙抢珠, misses program ROM dump, finish IGS022 protection
-GAME ( 1999,  tarzanc,    0,        tarzan,     tarzan,   igs017_state, init_tarzanc,    ROT0, "IGS", "Tarzan Chuang Tian Guan (China, V109C, set 1)",                     0 ) // 泰山闯天关
-GAME ( 1999,  tarzan,     tarzanc,  tarzan,     tarzan,   igs017_state, init_tarzan,     ROT0, "IGS", "Tarzan Chuang Tian Guan (China, V109C, set 2)",                     MACHINE_NOT_WORKING ) // missing sprites and sound rom, imperfect tiles decryption
-GAME ( 1999,  tarzana,    tarzanc,  tarzan,     tarzan,   igs017_state, init_tarzana,    ROT0, "IGS", "Tarzan (V107)",                                                     MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION ) // missing IGS029 protection, missing sprites and sound rom
-GAME ( 1999,  tarzanb,    tarzanc,  tarzan,     tarzan,   igs017_state, init_tarzanc,    ROT0, "IGS", "Tarzan Chuang Tian Guan (China, V110)",                             0 )
-GAME ( 2000,  sdmg2p,     0,        sdmg2p,     sdmg2p,   igs017_state, init_sdmg2p,     ROT0, "IGS", "Maque Wangchao / Chaoji Damanguan 2 - Jiaqiang Ban (China, V100C)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING ) // 麻雀王朝 / 超級大滿貫 2 -加強版 protection kicks in after starting game, hopper isn't hooked up correctly
-GAMEL( 2000?, starzan,    0,        starzan,    starzan,  igs017_state, init_starzan,    ROT0, "IGS (G.F. Gioca license)", "Super Tarzan (Italy, V100I)",                  0, layout_igsslot  )
-GAMEL( 2000?, jking103a,  starzan,  starzan,    starzan,  igs017_state, init_jking103a,  ROT0, "IGS", "Jungle King (V103A)",                                               0, layout_igsslot )
-GAMEL( 2000?, happyskl,   0,        happyskl,   happyskl, igs017_state, init_happyskl,   ROT0, "IGS", "Happy Skill (Italy, V611IT)",                                       0, layout_igspoker )
-GAMEL( 2000?, cpoker2,    0,        cpoker2,    cpoker2,  igs017_state, init_cpoker2,    ROT0, "IGS", "Champion Poker 2 (V100A)",                                          0, layout_igspoker )
-GAME ( 2000?, spkrform,   spk306us, spkrform,   spkrform, igs017_state, init_spkrform,   ROT0, "IGS", "Super Poker (V100xD03) / Formosa",                                  MACHINE_UNEMULATED_PROTECTION ) // poker game enabling forced with a patch. Parent spk306us in driver spoker.cpp
-GAME ( 2000?, jking302us, 0,        jking302us, starzan,  igs017_state, init_jking302us, ROT0, "IGS", "Jungle King (V302US)",                                              MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION ) // missing IGS025 and IGS029 protection
+GAME ( 1996,  iqblocka,   iqblock,  iqblocka,   iqblocka, igs017_state, init_iqblocka,   ROT0, "IGS", "Shuzi Leyuan (China, V127M, gambling)",                              0 ) // 數字樂園
+GAME ( 1997,  iqblockf,   iqblock,  iqblockf,   iqblockf, igs017_state, init_iqblocka,   ROT0, "IGS", "IQ Block (V113FR, gambling)",                                        0 )
+GAME ( 1997,  mgdh,       0,        mgdh,       mgdh,     igs017_state, init_mgdh,       ROT0, "IGS", "Manguan Daheng (Taiwan, V125T1)",                                    MACHINE_IMPERFECT_COLORS | MACHINE_UNEMULATED_PROTECTION) // 滿貫大亨, wrong colors in betting screen, game id check (patched out)
+GAME ( 1997,  mgdha,      mgdh,     mgdha,      mgdh,     igs017_state, init_mgdha,      ROT0, "IGS", "Manguan Daheng (Taiwan, V123T1)",                                    0 ) // 滿貫大亨
+GAME ( 1997,  sdmg2,      0,        sdmg2,      sdmg2,    igs017_state, init_sdmg2,      ROT0, "IGS", "Chaoji Da Manguan II (China, V754C, set 1)",                         0 ) // 超級大滿貫II
+GAME ( 1997,  sdmg2a,     sdmg2,    sdmg2,      sdmg2,    igs017_state, init_sdmg2a,     ROT0, "IGS", "Chaoji Da Manguan II (China, V754C, set 2)",                         0 ) // 超級大滿貫II
+GAME ( 1997,  tjsb,       0,        tjsb,       tjsb,     igs017_state, init_tjsb,       ROT0, "IGS", "Tian Jiang Shen Bing (China, V137C)",                                MACHINE_UNEMULATED_PROTECTION ) // 天將神兵, fails the bonus round protection check (if enabled via DSW), see e.g. demo mode
+GAME ( 1998,  genius6,    0,        genius6,    genius6,  igs017_state, init_iqblocka,   ROT0, "IGS", "Genius 6 (V110F)",                                                   0 ) // shows Chinese text in puzzle game
+GAME ( 1997,  genius6a,   genius6,  genius6,    genius6,  igs017_state, init_iqblocka,   ROT0, "IGS", "Genius 6 (V133F)",                                                   0 ) // clone because it has older copyright year
+GAME ( 1997,  genius6b,   genius6,  genius6,    genius6,  igs017_state, init_iqblocka,   ROT0, "IGS", "Genius 6 (V132F)",                                                   0 ) // "
+GAME ( 1998,  mgcs,       0,        mgcs,       mgcs,     igs017_state, init_mgcs,       ROT0, "IGS", "Manguan Caishen (China, V103CS)",                                    MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION ) // 满贯财神, finish IGS029 protection
+GAME ( 1998,  mgcsa,      mgcs,     mgcsa,      mgcs,     igs017_state, init_mgcsa,      ROT0, "IGS", "Manguan Caishen (China, V106CS)",                                    MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION ) // 满贯财神, finish IGS029 protection
+GAME ( 1998,  lhzb2,      0,        lhzb2,      lhzb2,    igs017_state, init_lhzb2,      ROT0, "IGS", "Long Hu Zhengba 2 (China, set 1)",                                   MACHINE_UNEMULATED_PROTECTION ) // 龙虎争霸2, finish IGS022 protection
+GAME ( 1998,  lhzb2a,     lhzb2,    lhzb2a,     lhzb2a,   igs017_state, init_lhzb2a,     ROT0, "IGS", "Long Hu Zhengba 2 (China, VS221M)",                                  0 ) // 龙虎争霸2
+GAME ( 1998,  slqz2,      0,        slqz2,      slqz2,    igs017_state, init_slqz2,      ROT0, "IGS", "Shuang Long Qiang Zhu 2 VS (China, VS203J)",                         MACHINE_UNEMULATED_PROTECTION ) // 双龙抢珠, finish IGS022 protection
+GAME ( 1998,  slqz2a,     slqz2,    slqz2,      slqz2,    igs017_state, init_slqz2,      ROT0, "IGS", "Shuang Long Qiang Zhu 2 VS (China, set 2)",                          MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION ) // 双龙抢珠, misses program ROM dump, finish IGS022 protection
+GAME ( 1999,  tarzanc,    0,        tarzan,     tarzan,   igs017_state, init_tarzanc,    ROT0, "IGS", "Tarzan Chuang Tian Guan (China, V109C, set 1)",                      0 ) // 泰山闯天关
+GAME ( 1999,  tarzan,     tarzanc,  tarzan,     tarzan,   igs017_state, init_tarzan,     ROT0, "IGS", "Tarzan Chuang Tian Guan (China, V109C, set 2)",                      MACHINE_NOT_WORKING ) // missing sprites and sound rom, imperfect tiles decryption
+GAME ( 1999,  tarzana,    tarzanc,  tarzan,     tarzan,   igs017_state, init_tarzana,    ROT0, "IGS", "Tarzan (V107)",                                                      MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION ) // missing IGS029 protection, missing sprites and sound rom
+GAME ( 1999,  tarzanb,    tarzanc,  tarzan,     tarzan,   igs017_state, init_tarzanc,    ROT0, "IGS", "Tarzan Chuang Tian Guan (China, V110)",                              0 )
+GAME ( 2000,  sdmg2p,     0,        sdmg2p,     sdmg2p,   igs017_state, init_sdmg2p,     ROT0, "IGS", "Maque Wangchao / Chaoji Da Manguan 2 - Jiaqiang Ban (China, V100C)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING ) // 麻雀王朝 / 超級大滿貫 2 -加強版 protection kicks in after starting game, hopper isn't hooked up correctly
+GAMEL( 2000?, starzan,    0,        starzan,    starzan,  igs017_state, init_starzan,    ROT0, "IGS (G.F. Gioca license)", "Super Tarzan (Italy, V100I)",                   0, layout_igsslot  )
+GAMEL( 2000?, jking103a,  starzan,  starzan,    starzan,  igs017_state, init_jking103a,  ROT0, "IGS", "Jungle King (V103A)",                                                0, layout_igsslot )
+GAMEL( 2000?, happyskl,   0,        happyskl,   happyskl, igs017_state, init_happyskl,   ROT0, "IGS", "Happy Skill (Italy, V611IT)",                                        0, layout_igspoker )
+GAMEL( 2000?, cpoker2,    0,        cpoker2,    cpoker2,  igs017_state, init_cpoker2,    ROT0, "IGS", "Champion Poker 2 (V100A)",                                           0, layout_igspoker )
+GAME ( 2000?, spkrform,   spk306us, spkrform,   spkrform, igs017_state, init_spkrform,   ROT0, "IGS", "Super Poker (V100xD03) / Formosa",                                   MACHINE_UNEMULATED_PROTECTION ) // poker game enabling forced with a patch. Parent spk306us in driver spoker.cpp
+GAME ( 2000?, jking302us, 0,        jking302us, starzan,  igs017_state, init_jking302us, ROT0, "IGS", "Jungle King (V302US)",                                               MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION ) // missing IGS025 and IGS029 protection

@@ -109,6 +109,7 @@ public:
 	void init_gonefsh2() ATTR_COLD;
 	void init_cjddz() ATTR_COLD;
 	void init_cjddzp() ATTR_COLD;
+	void init_cjddzlf() ATTR_COLD;
 	void init_zhongguo() ATTR_COLD;
 	void init_klxyj() ATTR_COLD;
 	void init_slqz3() ATTR_COLD;
@@ -127,7 +128,6 @@ public:
 	void init_tripslot() ATTR_COLD;
 	void init_extradrw() ATTR_COLD;
 	void init_chessc2() ATTR_COLD;
-	void init_cjddzlf() ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -917,14 +917,12 @@ INPUT_PORTS_END
 INPUT_PORTS_START( mgzz101cn )
 	PORT_INCLUDE(mahjong_kbd_joy)
 
-	// TODO: missing HP input shown in test mode for joystick mode
-
 	PORT_MODIFY("KEY4")
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_GAMBLE_KEYIN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT ) // TODO: default assignment clashes with mahjong I, using it hangs waiting for hopper to respond
 
 	PORT_MODIFY("TEST")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("hopper", hopper_device, line_r) // 哈巴
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("hopper", hopper_device, line_r) // HPSW/HP
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT )
 
 	PORT_START("DSW1")
@@ -2876,7 +2874,7 @@ ROM_START( cjddz215cn )
 	ROM_LOAD( "ddz_sp.u4", 0x00000, 0x200000, CRC(7ef65d95) SHA1(345c587cd449d6d06908e9687480be76b2cb2d28) )
 ROM_END
 
-// 超级斗地主加强版 (Chāojí Dòu Dìzhǔ Jiāqiáng Bǎn)
+// 超级斗地主 加强版 (Chāojí Dòu Dìzhǔ Jiāqiáng Bǎn)
 ROM_START( cjddzp )
 	ROM_REGION( 0x04000, "maincpu", 0 )
 	// Internal ROM of IGS027A ARM based MCU
@@ -2896,7 +2894,7 @@ ROM_START( cjddzp )
 	ROM_LOAD( "cjddzp_sp-1.u4", 0x00000, 0x200000, CRC(7ef65d95) SHA1(345c587cd449d6d06908e9687480be76b2cb2d28) )
 ROM_END
 
-// Chaoji Dou Dizhu Liang Fu Pai
+// 超级斗地主 两副牌 (Chāojí Dòu Dìzhǔ Liǎng Fù Pái)
 ROM_START( cjddzlf )
 	ROM_REGION( 0x04000, "maincpu", 0 )
 	// Internal ROM of IGS027A ARM based MCU
@@ -3080,6 +3078,14 @@ void igs_m027_state::init_cjddzp()
 	m_igs017_igs031->tarzan_decrypt_sprites(0x400000, 0x400000);
 }
 
+void igs_m027_state::init_cjddzlf()
+{
+	cjddzlf_decrypt(machine());
+
+	m_igs017_igs031->sdwx_gfx_decrypt();
+	m_igs017_igs031->tarzan_decrypt_sprites(0x400000, 0x400000);
+}
+
 void igs_m027_state::init_gonefsh2()
 {
 	gonefsh2_decrypt(machine());
@@ -3208,14 +3214,6 @@ void igs_m027_state::init_chessc2()
 	ROM2[(0x168/4)] ^= 0x10000000;
 }
 
-void igs_m027_state::init_cjddzlf()
-{
-	cjddzlf_decrypt(machine());
-
-	m_igs017_igs031->sdwx_gfx_decrypt();
-	m_igs017_igs031->tarzan_decrypt_sprites(0x400000, 0x400000);
-}
-
 } // anonymous namespace
 
 
@@ -3249,7 +3247,7 @@ GAME(  200?, cjddz,         0,        cjddz,        cjddz,         igs_m027_stat
 GAME(  200?, cjddz217cn,    cjddz,    cjddz,        cjddz,         igs_m027_state, init_cjddz,    ROT0, "IGS", "Chaoji Dou Dizhu (V217CN)", 0 )
 GAME(  200?, cjddz215cn,    cjddz,    cjddz,        cjddz,         igs_m027_state, init_cjddz,    ROT0, "IGS", "Chaoji Dou Dizhu (V215CN)", 0 )
 GAME(  200?, cjddzp,        0,        cjddz,        cjddzp,        igs_m027_state, init_cjddzp,   ROT0, "IGS", "Chaoji Dou Dizhu Jiaqiang Ban (S300CN)", MACHINE_NODEVICE_LAN )
-GAME(  200?, cjddzlf,       0,        cjddz,        cjddz,         igs_m027_state, init_cjddzlf,  ROT0, "IGS", "Chaoji Dou Dizhu Liang Fu Pai (V109CN)", MACHINE_NOT_WORKING ) // needs I/O correcting
+GAME(  200?, cjddzlf,       0,        cjddz,        cjddz,         igs_m027_state, init_cjddzlf,  ROT0, "IGS", "Chaoji Dou Dizhu Liang Fu Pai (V109CN)", 0 )
 GAMEL( 2007, tripslot,      0,        tripslot,     tripslot,      igs_m027_state, init_tripslot, ROT0, "IGS", "Triple Slot (V200VE)", 0, layout_tripslot ) // 2007 date in internal ROM at least, could be later, default settings password is all 'start 1'
 // this has a 2nd 8255
 GAME(  2001, extradrw,      0,        extradrw,     base,          igs_m027_state, init_extradrw, ROT0, "IGS", "Extra Draw (V100VE)", MACHINE_NOT_WORKING )
