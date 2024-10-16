@@ -14,6 +14,9 @@
 
 #include "flopimg.h"
 
+// workaround for conflict with glibc/bits/endian.h
+#undef BIG_ENDIAN
+
 class _86f_format : public floppy_image_format_t
 {
 public:
