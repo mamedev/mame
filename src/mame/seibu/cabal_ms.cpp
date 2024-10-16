@@ -11,7 +11,7 @@
     More information and PCB pictures: https://www.recreativas.org/modular-system-cabal-553-ervisa
 
     MOD-6/1  - MC68000P10, 6 ROMs, RAMs, 20 MHz XTAL.
-    MOD 1/4  - Sound board (Z8400BB1, 2 x YM2203C, 2 x Y3014B), one EPROM, two 8 dip switches b4anks, a small sub board with OKI M5205.
+    MOD 1/4  - Sound board (Z8400BB1, 2 x YM2203C, 2 x Y3014B), one EPROM, two 8 dip switches banks, a small sub board with OKI M5205.
     MOD 4/2a - Tilemap board, has logic + 4 ROMs, long thin sub-board (C0466-1) with no chips, just routing along one edge.
     MOD 4/3  - Tilemap board, has logic + 2 ROMs, long thin sub-board (C0465-1) with no chips, just routing along one edge.
     MOD 21/1 - Logic, 2 PROMs, 28.000 MHz XTAL.
