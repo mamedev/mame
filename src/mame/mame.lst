@@ -43810,6 +43810,7 @@ retofinvb                       // bootleg
 retofinvb1                      // bootleg
 retofinvb2                      // bootleg
 retofinvb3                      // bootleg
+retofinvbv                      // bootleg (Video Dens)
 
 @source:taito/rollrace.cpp
 fightrol                        // (c) 1983 Taito
