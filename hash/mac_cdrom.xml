@@ -52,6 +52,21 @@ PPC750 - PowerPC 750 (G3) CPU
 			</diskarea>
 		</part>
 	</software>
+	<software name="idanthol">
+		<description>id Anthology</description>
+		<year>1996</year>
+		<publisher>id Software</publisher>
+		<notes><![CDATA[
+		Discs 1, 2, 3 are in the ibm5170_cdrom.xml software list as they are PC software.
+		]]></notes>
+		<info name="language" value="English" />
+		<info name="region" value="USA" />
+		<part name="cdrom4" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="id Anthology (USA) (Disc 4) (Mac)" sha1="d9c3e998e17fa56fcb5abbdd0a924de78dacb2e8" />
+			</diskarea>
+		</part>
+	</software>
 	<software name="mac70a9">
 		<description>System Software 7.0a9 ("Big Bang" pre-release)</description>
 		<year>1991</year>
