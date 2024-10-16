@@ -63,10 +63,15 @@ public:
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_oki(*this, "oki")
+		, m_palette(*this, "palette")
 		, m_hopper(*this, "hopper")
 		, m_mainram(*this, "mainram")
 	//  , m_vram(*this, "vram")
-		, m_palette(*this, "palette")
+		, m_mux_9e(*this, "MUX_9E")
+		, m_mux_9d(*this, "MUX_9D")
+		, m_mux_9b(*this, "MUX_9B")
+		, m_mux_97(*this, "MUX_97")
+		, m_mux_8f(*this, "MUX_8F")
 	{
 	}
 
@@ -80,83 +85,57 @@ protected:
 	virtual void video_start() override ATTR_COLD;
 
 private:
-	/* devices */
+	// devices
 	required_device<e132xt_device> m_maincpu;
 	required_device<okim6295_device> m_oki;
+	required_device<palette_device> m_palette;
 	required_device<ticket_dispenser_device> m_hopper;
 
 	required_shared_ptr<uint32_t> m_mainram;
 //  required_shared_ptr<uint32_t> m_vram;
-	uint8_t m_pal[0x200] = { };
-	uint32_t m_vram0[0x20000 / 4] = { };
-	uint32_t m_vram1[0x20000 / 4] = { };
+
+	required_ioport m_mux_9e;
+	required_ioport m_mux_9d;
+	required_ioport m_mux_9b;
+	required_ioport m_mux_97;
+	required_ioport m_mux_8f;
+
+	std::unique_ptr<uint16_t[]> m_vram[2];
 	uint8_t m_control = 0;
 	uint8_t m_mux = 0;
-
-	uint8_t palette_low_r(offs_t offset);
-	uint8_t palette_high_r(offs_t offset);
-	void palette_low_w(offs_t offset, uint8_t data);
-	void palette_high_w(offs_t offset, uint8_t data);
-	void set_palette(int offset);
 
 	void control_w(uint8_t data);
 	void mux_w(uint8_t data);
 
 	uint32_t muxed_inputs_r();
 
-	uint32_t mjsenpu_speedup_r();
+	uint32_t speedup_r();
 
-	uint32_t vram_r(offs_t offset);
-	void vram_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint16_t vram_r(offs_t offset);
+	void vram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
-	uint32_t screen_update_mjsenpu(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	static rgb_t mjsenpu_B6G5R5(uint32_t raw);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	required_device<palette_device> m_palette;
-	void mjsenpu_32bit_map(address_map &map) ATTR_COLD;
-	void mjsenpu_io(address_map &map) ATTR_COLD;
+	void main_map(address_map &map) ATTR_COLD;
+	void main_portmap(address_map &map) ATTR_COLD;
 };
 
 
-uint8_t mjsenpu_state::palette_low_r(offs_t offset)
+rgb_t mjsenpu_state::mjsenpu_B6G5R5(uint32_t raw)
 {
-	return m_pal[(offset * 2) + 0];
+	return rgb_t(pal5bit(raw >> 0), pal5bit(raw >> 5), pal6bit(raw >> 10));
 }
 
 
-uint8_t mjsenpu_state::palette_high_r(offs_t offset)
+uint16_t mjsenpu_state::vram_r(offs_t offset)
 {
-	return m_pal[(offset * 2) + 1];
+	return m_vram[BIT(m_control, 0)][offset];
 }
 
-void mjsenpu_state::set_palette(int offset)
+void mjsenpu_state::vram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
-	uint16_t paldata = (m_pal[(offset * 2) + 0] << 8) | (m_pal[(offset * 2) + 1]);
-	m_palette->set_pen_color(offset, pal5bit(paldata >> 0), pal5bit(paldata >> 5), pal6bit(paldata >> 10));
-}
-
-void mjsenpu_state::palette_low_w(offs_t offset, uint8_t data)
-{
-	m_pal[(offset * 2)+0] = data;
-	set_palette(offset);
-}
-
-void mjsenpu_state::palette_high_w(offs_t offset, uint8_t data)
-{
-	m_pal[(offset * 2)+1] = data;
-	set_palette(offset);
-}
-
-
-uint32_t mjsenpu_state::vram_r(offs_t offset)
-{
-	if (m_control & 0x01) return m_vram1[offset];
-	else return m_vram0[offset];
-}
-
-void mjsenpu_state::vram_w(offs_t offset, uint32_t data, uint32_t mem_mask)
-{
-	if (m_control & 0x01) COMBINE_DATA(&m_vram1[offset]);
-	else COMBINE_DATA(&m_vram0[offset]);
+	COMBINE_DATA(&m_vram[BIT(m_control, 0)][offset]);
 }
 
 void mjsenpu_state::control_w(uint8_t data)
@@ -181,7 +160,7 @@ void mjsenpu_state::control_w(uint8_t data)
 	m_control = data;
 
 //  if (data &~0x9e)
-//      printf("control_w %02x\n", data);
+//      logerror("control_w %02x\n", data);
 }
 
 void mjsenpu_state::mux_w(uint8_t data)
@@ -192,7 +171,7 @@ void mjsenpu_state::mux_w(uint8_t data)
 		(data != 0x9b) &&
 		(data != 0x97) &&
 		(data != 0x8f))
-			printf("mux_w %02x\n", data);
+			logerror("mux_w %02x\n", data);
 
 	m_mux = data;
 }
@@ -205,43 +184,45 @@ uint32_t mjsenpu_state::muxed_inputs_r()
 		break;
 
 	case 0x9e:
-		return ioport("MUX_9E")->read();
+		return m_mux_9e->read();
 
 	case 0x9d:
-		return ioport("MUX_9D")->read();
+		return m_mux_9d->read();
 
 	case 0x9b:
-		return ioport("MUX_9B")->read();
+		return m_mux_9b->read();
 
 	case 0x97:
-		return ioport("MUX_97")->read();
+		return m_mux_97->read();
 
 	case 0x8f:
-		return ioport("MUX_8F")->read();
+		return m_mux_8f->read();
 	}
 
-	logerror("muxed_inputs_r with %02x\n", m_mux);
+	if (!machine().side_effects_disabled())
+		logerror("muxed_inputs_r with %02x\n", m_mux);
 
 	return 0x00000000;// 0xffffffff;
 }
 
-void mjsenpu_state::mjsenpu_32bit_map(address_map &map)
+
+void mjsenpu_state::main_map(address_map &map)
 {
-	map(0x00000000, 0x001fffff).ram().share("mainram");
-	map(0x40000000, 0x401fffff).rom().region("user2", 0); // main game rom
+	map(0x00000000, 0x001fffff).ram().share(m_mainram);
+	map(0x40000000, 0x401fffff).rom().region("maindata", 0); // main game rom
 
 	map(0x80000000, 0x8001ffff).rw(FUNC(mjsenpu_state::vram_r), FUNC(mjsenpu_state::vram_w));
 
-	map(0xffc00000, 0xffc000ff).rw(FUNC(mjsenpu_state::palette_low_r), FUNC(mjsenpu_state::palette_low_w));
-	map(0xffd00000, 0xffd000ff).rw(FUNC(mjsenpu_state::palette_high_r), FUNC(mjsenpu_state::palette_high_w));
+	map(0xffc00000, 0xffc000ff).rw(m_palette, FUNC(palette_device::read8_ext), FUNC(palette_device::write8_ext)).share("palette_ext");
+	map(0xffd00000, 0xffd000ff).rw(m_palette, FUNC(palette_device::read8), FUNC(palette_device::write8)).share("palette");
 
 	map(0xffe00000, 0xffe007ff).ram().share("nvram");
 
-	map(0xfff80000, 0xffffffff).rom().region("user1", 0); // boot rom
+	map(0xfff80000, 0xffffffff).rom().region("mainboot", 0); // boot rom
 }
 
 
-void mjsenpu_state::mjsenpu_io(address_map &map)
+void mjsenpu_state::main_portmap(address_map &map)
 {
 	map(0x4000, 0x4003).r(FUNC(mjsenpu_state::muxed_inputs_r));
 	map(0x4010, 0x4013).portr("IN1");
@@ -325,9 +306,6 @@ static INPUT_PORTS_START( mjsenpu )
 	PORT_DIPSETTING(          0x00000000, DEF_STR( On ) )
 	PORT_BIT( 0xffffff00, IP_ACTIVE_LOW, IPT_UNUSED )
 
-
-
-
 	PORT_START("DSW1")
 	PORT_DIPNAME( 0x00000003, 0x00000003, DEF_STR( Coin_A ) )
 	PORT_DIPSETTING(          0x00000000, DEF_STR( 2C_1C ) )
@@ -408,32 +386,30 @@ INPUT_PORTS_END
 
 void mjsenpu_state::video_start()
 {
+	for (int i = 0; i < 2; i++)
+	{
+		uint32_t const vram_size = 0x20000 / 2;
+		m_vram[i] = make_unique_clear<uint16_t[]>(vram_size);
+
+		save_pointer(NAME(m_vram[i]), vram_size, i);
+	}
 }
 
 
-
-uint32_t mjsenpu_state::screen_update_mjsenpu(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t mjsenpu_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	uint32_t const *const vram = (m_control & 0x01) ? m_vram0 : m_vram1;
+	uint16_t const *const vram = m_vram[BIT(~m_control, 0)].get();
 
-	int count = 0;
-	for (int y=0;y < 256;y++)
+	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
-		for (int x=0;x < 512/4;x++)
+		offs_t count = (y << 8) | (cliprect.min_x >> 1);
+		for (int x = (cliprect.min_x >> 1); x <= ((cliprect.max_x + 1) >> 1); x++)
 		{
-			int color;
+			uint8_t color = vram[count] & 0x00ff;
+			bitmap.pix(y, x*2 + 0) = color;
 
-			color = vram[count] & 0x000000ff;
-			bitmap.pix(y, x*4 + 2) = color;
-
-			color = (vram[count] & 0x0000ff00) >> 8;
-			bitmap.pix(y, x*4 + 3) = color;
-
-			color = (vram[count] & 0x00ff0000) >> 16;
-			bitmap.pix(y, x*4 + 0) = color;
-
-			color = (vram[count] & 0xff000000) >> 24;
-			bitmap.pix(y, x*4 + 1) = color;
+			color = (vram[count] & 0xff00) >> 8;
+			bitmap.pix(y, x*2 + 1) = color;
 
 			count++;
 		}
@@ -444,9 +420,6 @@ uint32_t mjsenpu_state::screen_update_mjsenpu(screen_device &screen, bitmap_ind1
 
 void mjsenpu_state::machine_start()
 {
-	save_item(NAME(m_pal));
-	save_item(NAME(m_vram0));
-	save_item(NAME(m_vram1));
 	save_item(NAME(m_control));
 	save_item(NAME(m_mux));
 }
@@ -466,10 +439,10 @@ following clocks are on the PCB
 
 void mjsenpu_state::mjsenpu(machine_config &config)
 {
-	/* basic machine hardware */
-	E132XT(config, m_maincpu, 27000000*2); /* ?? Mhz */
-	m_maincpu->set_addrmap(AS_PROGRAM, &mjsenpu_state::mjsenpu_32bit_map);
-	m_maincpu->set_addrmap(AS_IO, &mjsenpu_state::mjsenpu_io);
+	// basic machine hardware
+	E132XT(config, m_maincpu, 27000000*2); // ?? Mhz
+	m_maincpu->set_addrmap(AS_PROGRAM, &mjsenpu_state::main_map);
+	m_maincpu->set_addrmap(AS_IO, &mjsenpu_state::main_portmap);
 	m_maincpu->set_vblank_int("screen", FUNC(mjsenpu_state::irq0_line_hold));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
@@ -477,28 +450,29 @@ void mjsenpu_state::mjsenpu(machine_config &config)
 	// more likely coins out?
 	TICKET_DISPENSER(config, m_hopper, attotime::from_msec(50));
 
-	/* video hardware */
+	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(512, 256);
 	screen.set_visarea(0, 512-1, 0, 256-16-1);
-	screen.set_screen_update(FUNC(mjsenpu_state::screen_update_mjsenpu));
+	screen.set_screen_update(FUNC(mjsenpu_state::screen_update));
 	screen.set_palette(m_palette);
 
-	PALETTE(config, m_palette).set_entries(0x100);
+	PALETTE(config, m_palette).set_format(2, &mjsenpu_state::mjsenpu_B6G5R5, 0x100);
+	m_palette->set_membits(8);
 
 	SPEAKER(config, "mono").front_center();
 
-	OKIM6295(config, m_oki, 1000000, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 1.00); /* 1 Mhz? */
+	OKIM6295(config, m_oki, 1000000, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 1.00); // 1 Mhz?
 }
 
 
 ROM_START( mjsenpu )
-	ROM_REGION32_BE( 0x80000, "user1", 0 ) /* Hyperstone CPU Code */
+	ROM_REGION32_BE( 0x80000, "mainboot", 0 ) // Hyperstone CPU Code
 	ROM_LOAD( "u1", 0x000000, 0x080000, CRC(ebfb1079) SHA1(9d676c635d5ee464df5730518399e141ebc515ed) )
 
-	ROM_REGION32_BE( 0x200000, "user2", 0 ) /* Hyperstone CPU Code */
+	ROM_REGION32_BE( 0x200000, "maindata", 0 ) // Hyperstone CPU Code
 	ROM_LOAD16_WORD_SWAP( "u13", 0x000000, 0x200000, CRC(a803c5a5) SHA1(61c7386a1bb6224b788de01293697d0e896839a8) )
 
 	ROM_REGION( 0x080000, "oki", 0 )
@@ -507,9 +481,9 @@ ROM_END
 
 
 
-uint32_t mjsenpu_state::mjsenpu_speedup_r()
+uint32_t mjsenpu_state::speedup_r()
 {
-	int pc = m_maincpu->pc();
+	offs_t const pc = m_maincpu->pc();
 
 	if (pc == 0xadb8)
 	{
@@ -517,7 +491,7 @@ uint32_t mjsenpu_state::mjsenpu_speedup_r()
 	}
 	else
 	{
-	//  printf("%08x\n", pc);
+	//  logerror("%08x\n", pc);
 	}
 
 	return m_mainram[0x23468/4];
@@ -539,10 +513,10 @@ void mjsenpu_state::init_mjsenpu()
    (loops for 744256 instructions)
 */
 	// not especially effective, might be wrong.
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x23468, 0x2346b, read32smo_delegate(*this, FUNC(mjsenpu_state::mjsenpu_speedup_r)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x23468, 0x2346b, read32smo_delegate(*this, FUNC(mjsenpu_state::speedup_r)));
 }
 
 } // anonymous namespace
 
-
-GAME( 2002, mjsenpu, 0, mjsenpu, mjsenpu, mjsenpu_state, init_mjsenpu, ROT0, "Oriental Soft", "Mahjong Senpu", 0 )
+// Japanese text (excluding test mode), Chinese voice and test mode texts
+GAME( 2002, mjsenpu, 0, mjsenpu, mjsenpu, mjsenpu_state, init_mjsenpu, ROT0, "Oriental Soft", "Mahjong Senpu (Japan)", 0 )
