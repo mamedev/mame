@@ -557,6 +557,11 @@ ROM_START( suprtvpchk )
 	ROM_CONTINUE(0x000000, 0x200000)
 	ROM_CONTINUE(0x600000, 0x200000)
 	ROM_CONTINUE(0x400000, 0x200000)
+
+	// The area at 0x400000 in the ROM is 0xff filled, probably the system maps RAM, not ROM here as there are also writes.
+	// Replacing it with 0x00 as a hack allows the machine to get to the 'desktop' but in reality some of the memory bypass
+	// speedups will need removing and RAM mapping
+	ROM_FILL(0x600000, 0x80000,0x00)
 ROM_END
 
 ROM_START( suprtvpcdo )
@@ -565,6 +570,9 @@ ROM_START( suprtvpcdo )
 	ROM_CONTINUE(0x000000, 0x200000)
 	ROM_CONTINUE(0x600000, 0x200000)
 	ROM_CONTINUE(0x400000, 0x200000)
+
+	// see note in suprtvpchk set
+	ROM_FILL(0x600000, 0x80000,0x00)
 ROM_END
 
 
