@@ -39027,6 +39027,13 @@ ccdelta1
 @source:saitek/edames.cpp
 edames
 
+@source:saitek/electrio.cpp
+electrio
+mk12
+pcheckers
+pchess
+pplus
+
 @source:saitek/exechess.cpp
 exechess
 

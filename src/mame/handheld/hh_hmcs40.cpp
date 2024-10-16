@@ -93,9 +93,9 @@ known chips:
 
  *A04     HD44868  1984, SciSys Rapier
   A07     HD44868  1984, Chess King Pocket Micro De-Luxe -> chessking/pmicrodx.cpp
- *A12     HD44868  1985, SciSys Electronic Trio / Kasparov Pocket Chess
- *A14     HD44868  1986, SciSys Kasparov Mk 12 / Kasparov Pocket Plus
- *A16     HD44868  1988, Saitek Pocket Checkers
+  A12     HD44868  1985, SciSys Electronic Trio / Kasparov Pocket Chess -> saitek/electrio.cpp
+  A14     HD44868  1986, SciSys Kasparov Mk 12 / Kasparov Pocket Plus -> saitek/electrio.cpp
+  A16     HD44868  1988, Saitek Pocket Checkers -> saitek/electrio.cpp
 
   (* means undumped unless noted, @ denotes it's in this driver)
 
