@@ -110,6 +110,7 @@ public:
 	void init_cjddz() ATTR_COLD;
 	void init_cjddzp() ATTR_COLD;
 	void init_cjddzlf() ATTR_COLD;
+	void init_stljp() ATTR_COLD;
 	void init_zhongguo() ATTR_COLD;
 	void init_klxyj() ATTR_COLD;
 	void init_slqz3() ATTR_COLD;
@@ -2994,6 +2995,27 @@ ROM_START( cjddzlf )
 	ROM_LOAD( "igs_l2404.u5", 0x00000, 0x200000, CRC(55f6dfac) SHA1(876bec8db5aa3dfd10869ecdcd98bccb2ef860ef) )
 ROM_END
 
+// Super Tuo La Ji Plus
+
+ROM_START( stljp )
+	ROM_REGION( 0x04000, "maincpu", 0 )
+	// Internal ROM of IGS027A ARM based MCU
+	ROM_LOAD( "t5_igs027a", 0x00000, 0x4000, CRC(351d8658) SHA1(10d3aac884c43a2f9c58550887cd055576a354cd) )
+
+	ROM_REGION32_LE( 0x80000, "user1", 0 ) // external ARM data / prg
+	ROM_LOAD( "igs_p2401.u17", 0x000000, 0x80000, CRC(e72d28c0) SHA1(146c64fd326658f9847f20ea1760df2006c27f33) )
+
+	ROM_REGION( 0x80000, "igs017_igs031:tilemaps", 0 )
+	ROM_LOAD16_WORD_SWAP( "igs_m2403.u27", 0x000000, 0x80000, CRC(bb1ec620) SHA1(4c4a5ea2e0fb5a043532beaf2ec65f76e7e61d97) )
+
+	ROM_REGION( 0x400000, "igs017_igs031:sprites", 0 )
+	ROM_LOAD( "igs_m2404.u28", 0x000000, 0x400000, CRC(c48f7cab) SHA1(5af8d0b95a6335b29861796262a6074729fbcb27) ) // FIXED BITS (xxxxxxx0xxxxxxxx)
+
+	// OKI, sample tables are every 0x20000 starting at 0x140000
+	ROM_REGION( 0x200000, "oki", 0 )
+	ROM_LOAD( "igs_s2402.u5", 0x00000, 0x200000, CRC(de294c8d) SHA1(7ee145a68533a90dac91f34422934b7be939fdd5) )
+ROM_END
+
 // 龙虎争霸4 (Lóng Hǔ Zhēngbà 4)
 ROM_START( lhzb4 )
 	ROM_REGION( 0x04000, "maincpu", 0 )
@@ -3165,6 +3187,13 @@ void igs_m027_state::init_cjddzlf()
 	m_igs017_igs031->tarzan_decrypt_sprites(0x400000, 0x400000);
 }
 
+void igs_m027_state::init_stljp()
+{
+	stljp_decrypt(machine());
+	m_igs017_igs031->sdwx_gfx_decrypt();
+	m_igs017_igs031->tarzan_decrypt_sprites(0, 0);
+}
+
 void igs_m027_state::init_gonefsh2()
 {
 	gonefsh2_decrypt(machine());
@@ -3321,6 +3350,7 @@ GAME(  200?, cjddz217cn,    cjddz,    cjddz,        cjddz,         igs_m027_stat
 GAME(  200?, cjddz215cn,    cjddz,    cjddz,        cjddz,         igs_m027_state, init_cjddz,    ROT0, "IGS", "Chaoji Dou Dizhu (V215CN)", 0 )
 GAME(  200?, cjddzp,        0,        cjddz,        cjddzp,        igs_m027_state, init_cjddzp,   ROT0, "IGS", "Chaoji Dou Dizhu Jiaqiang Ban (S300CN)", MACHINE_NODEVICE_LAN )
 GAME(  200?, cjddzlf,       0,        cjddz,        cjddz,         igs_m027_state, init_cjddzlf,  ROT0, "IGS", "Chaoji Dou Dizhu Liang Fu Pai (V109CN)", 0 )
+GAME(  2005, stljp,         0,        cjddz,        cjddz,         igs_m027_state, init_stljp,    ROT0, "IGS", "Super Tuo La Ji Plus (V206CN)", MACHINE_NOT_WORKING ) // 2005 date in internal ROM
 GAMEL( 2007, tripslot,      0,        tripslot,     tripslot,      igs_m027_state, init_tripslot, ROT0, "IGS", "Triple Slot (V200VE)", 0, layout_tripslot ) // 2007 date in internal ROM at least, could be later, default settings password is all 'start 1'
 // this has a 2nd 8255
 GAME(  2001, extradrw,      0,        extradrw,     base,          igs_m027_state, init_extradrw, ROT0, "IGS", "Extra Draw (V100VE)", MACHINE_NOT_WORKING )

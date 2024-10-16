@@ -61,5 +61,6 @@ void tripslot_decrypt(running_machine &machine);
 void extradrw_decrypt(running_machine &machine);
 void cjddzlf_decrypt(running_machine &machine);
 void mxsqy_decrypt(running_machine& machine);
+void stljp_decrypt(running_machine& machine);
 
 #endif // MAME_IGS_PGMCRYPT_H
