@@ -1897,7 +1897,7 @@ void cjddzlf_decrypt(running_machine &machine)
 	}
 }
 
-void mxsqy_decrypt(running_machine &machine)
+void cjtljp_decrypt(running_machine &machine)
 {
 	memory_region *const region = machine.root_device().memregion("user1");
 	auto const src = util::little_endian_cast<u16>(reinterpret_cast<u32 *>(region->base()));
@@ -1907,8 +1907,7 @@ void mxsqy_decrypt(running_machine &machine)
 	{
 		uint16_t x = 0;
 
-		// this part is the same as luckycrs
-		IGS27_CRYPT1_ALT
+		IGS27_CRYPT1
 		IGS27_CRYPT2
 		IGS27_CRYPT3
 		IGS27_CRYPT4_ALT
@@ -1921,7 +1920,7 @@ void mxsqy_decrypt(running_machine &machine)
 	}
 }
 
-void stljp_decrypt(running_machine &machine)
+void mxsqy_decrypt(running_machine &machine)
 {
 	memory_region *const region = machine.root_device().memregion("user1");
 	auto const src = util::little_endian_cast<u16>(reinterpret_cast<u32 *>(region->base()));
@@ -1931,7 +1930,8 @@ void stljp_decrypt(running_machine &machine)
 	{
 		uint16_t x = 0;
 
-		IGS27_CRYPT1
+		// this part is the same as luckycrs
+		IGS27_CRYPT1_ALT
 		IGS27_CRYPT2
 		IGS27_CRYPT3
 		IGS27_CRYPT4_ALT
