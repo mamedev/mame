@@ -104,7 +104,7 @@ I/O Ports:
 Interrupts:
     NMI - 20ms (50HZ), can be disbled/enabled by I/O write
 
-ToDO:
+TODO:
 - primoc64 works, but it seems it should be used with a commodore 64
   disk drive. This isn't emulated.
 
@@ -125,7 +125,7 @@ void primo_state::primoa_io(address_map &map)
 {
 	map.global_mask(0xff);
 	map(0x00, 0x3f).rw(FUNC(primo_state::be_1_r), FUNC(primo_state::ki_1_w));
-	map(0xfd, 0xfd).w(FUNC(primo_state::FD_w));
+	map(0xfd, 0xfd).w(FUNC(primo_state::fd_w));
 }
 
 void primo_state::primob_io(address_map &map)
@@ -133,7 +133,7 @@ void primo_state::primob_io(address_map &map)
 	map.global_mask(0xff);
 	map(0x00, 0x3f).rw(FUNC(primo_state::be_1_r), FUNC(primo_state::ki_1_w));
 	map(0x40, 0x7f).rw(FUNC(primo_state::be_2_r), FUNC(primo_state::ki_2_w));
-	map(0xfd, 0xfd).w(FUNC(primo_state::FD_w));
+	map(0xfd, 0xfd).w(FUNC(primo_state::fd_w));
 }
 
 void primo_state::primo32_mem(address_map &map)
@@ -161,9 +161,9 @@ static INPUT_PORTS_START( primo )
 		PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_Y)       PORT_CHAR('y') PORT_CHAR('Y')
 		PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_UP)      PORT_CHAR(UCHAR_MAMEKEY(UP))
 		PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_S)       PORT_CHAR('s') PORT_CHAR('S')
-		PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("SHIFT") PORT_CODE(KEYCODE_LSHIFT) PORT_CODE(KEYCODE_RSHIFT)     PORT_CHAR(UCHAR_SHIFT_1)
+		PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("SHIFT") PORT_CODE(KEYCODE_LSHIFT) PORT_CODE(KEYCODE_RSHIFT) PORT_CHAR(UCHAR_SHIFT_1)
 		PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_E)       PORT_CHAR('e') PORT_CHAR('E')
-		PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("UPPER") PORT_CODE(KEYCODE_LALT)     PORT_CHAR(UCHAR_MAMEKEY(LALT))
+		PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("UPPER") PORT_CODE(KEYCODE_LALT) PORT_CHAR(UCHAR_MAMEKEY(LALT))
 		PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_W)       PORT_CHAR('w') PORT_CHAR('W')
 		PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("CTR")   PORT_CODE(KEYCODE_LCONTROL) PORT_CHAR(UCHAR_MAMEKEY(LCONTROL))
 		PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_D)       PORT_CHAR('d') PORT_CHAR('D')
@@ -203,7 +203,7 @@ static INPUT_PORTS_START( primo )
 		PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_J)       PORT_CHAR('j') PORT_CHAR('J')
 		PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_HOME)    PORT_CHAR('>') PORT_CHAR('<')
 		PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_L)       PORT_CHAR('l') PORT_CHAR('L')
-		PORT_BIT( 0x0200, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_SLASH)   PORT_CHAR('-') PORT_CHAR('|')
+		PORT_BIT( 0x0200, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_SLASH)   PORT_CHAR('-') PORT_CHAR(U'í')
 		PORT_BIT( 0x0400, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_K)       PORT_CHAR('k') PORT_CHAR('K')
 		PORT_BIT( 0x0800, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_STOP)    PORT_CHAR('.') PORT_CHAR(':')
 		PORT_BIT( 0x1000, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_M)       PORT_CHAR('m') PORT_CHAR('M')
@@ -212,22 +212,22 @@ static INPUT_PORTS_START( primo )
 		PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_COMMA)   PORT_CHAR(',') PORT_CHAR(';')
 
 	PORT_START( "IN3" )
-		PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("?") PORT_CODE(KEYCODE_EQUALS)       PORT_CHAR(UCHAR_MAMEKEY(F2))
+		PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_EQUALS)                      PORT_CHAR(U'ü') PORT_CHAR(U'Ü')
 		PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_BACKSLASH)                   PORT_CHAR('*') PORT_CHAR('\'')
 		PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_P)                           PORT_CHAR('p') PORT_CHAR('P')
-		PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("\xC2\xA3") PORT_CODE(KEYCODE_END)   PORT_CHAR(UCHAR_MAMEKEY(F3))
+		PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_END)                         PORT_CHAR(U'ú') PORT_CHAR(U'ű')
 		PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_O)                           PORT_CHAR('o') PORT_CHAR('O')
-		PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("CLS") PORT_CODE(KEYCODE_BACKSPACE)  PORT_CHAR(UCHAR_MAMEKEY(BACKSPACE))
+		PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("CLS") PORT_CODE(KEYCODE_BACKSPACE)  PORT_CHAR(8)
 		PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_UNUSED )
-		PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("RETURN") PORT_CODE(KEYCODE_ENTER)   PORT_CHAR(UCHAR_MAMEKEY(ENTER))
+		PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("RETURN") PORT_CODE(KEYCODE_ENTER)   PORT_CHAR(13)
 		PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_UNUSED )
 		PORT_BIT( 0x0200, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_LEFT)                        PORT_CHAR(UCHAR_MAMEKEY(LEFT))
-		PORT_BIT( 0x0400, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("\xE2\x80\x9A") PORT_CODE(KEYCODE_COLON) PORT_CHAR(UCHAR_MAMEKEY(F4))
-		PORT_BIT( 0x0800, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("\xC2\xA2") PORT_CODE(KEYCODE_CLOSEBRACE) PORT_CHAR(UCHAR_MAMEKEY(F5))
-		PORT_BIT( 0x1000, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("\xC2\xA0") PORT_CODE(KEYCODE_QUOTE) PORT_CHAR(UCHAR_MAMEKEY(F6))
+		PORT_BIT( 0x0400, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_COLON)                       PORT_CHAR(U'é') PORT_CHAR(U'É')
+		PORT_BIT( 0x0800, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_CLOSEBRACE)                  PORT_CHAR(U'ó') PORT_CHAR(U'ő')
+		PORT_BIT( 0x1000, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_QUOTE)                       PORT_CHAR(U'á') PORT_CHAR(U'Á')
 		PORT_BIT( 0x2000, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_RIGHT)                       PORT_CHAR(UCHAR_MAMEKEY(RIGHT))
-		PORT_BIT( 0x4000, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("\xE2\x80\x9D") PORT_CODE(KEYCODE_OPENBRACE) PORT_CHAR(UCHAR_MAMEKEY(F7))
-		PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("BRK")   PORT_CODE(KEYCODE_ESC)      PORT_CHAR(UCHAR_MAMEKEY(ESC))
+		PORT_BIT( 0x4000, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_OPENBRACE)                   PORT_CHAR(U'ö') PORT_CHAR(U'Ö')
+		PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("BRK") PORT_CODE(KEYCODE_ESC)        PORT_CHAR(27)
 
 	PORT_START( "RESET" )
 		PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Reset") PORT_CODE(KEYCODE_F1)         PORT_CHAR(UCHAR_MAMEKEY(F1))
@@ -244,7 +244,8 @@ static INPUT_PORTS_START( primo )
 		PORT_CONFSETTING(   0x01, DEF_STR( Off ) )
 INPUT_PORTS_END
 
-static const cassette_image::Options primo_cassette_options = {
+static const cassette_image::Options primo_cassette_options =
+{
 	1,      /* channels */
 	16,     /* bits per sample */
 	22050   /* sample frequency */
@@ -307,32 +308,24 @@ void primo_state::primob32(machine_config &config)
 {
 	primoa32(config);
 	m_maincpu->set_addrmap(AS_IO, &primo_state::primob_io);
-
-	MCFG_MACHINE_RESET_OVERRIDE(primo_state, primob)
 }
 
 void primo_state::primob48(machine_config &config)
 {
 	primoa48(config);
 	m_maincpu->set_addrmap(AS_IO, &primo_state::primob_io);
-
-	MCFG_MACHINE_RESET_OVERRIDE(primo_state, primob)
 }
 
 void primo_state::primob64(machine_config &config)
 {
 	primoa64(config);
 	m_maincpu->set_addrmap(AS_IO, &primo_state::primob_io);
-
-	MCFG_MACHINE_RESET_OVERRIDE(primo_state, primob)
 }
 
 void primo_state::primoc64(machine_config &config)
 {
 	primoa64(config);
 	m_maincpu->set_addrmap(AS_IO, &primo_state::primob_io);
-
-	MCFG_MACHINE_RESET_OVERRIDE(primo_state, primob)
 }
 
 ROM_START( primoa32 )
@@ -371,7 +364,7 @@ ROM_END
 
 ROM_START( primob64 )
 	ROM_REGION( 0x4000, "maincpu", 0 )
-	ROM_SYSTEM_BIOS(0, "standard", "Standard")
+	ROM_SYSTEM_BIOS(0, "std", "Standard")
 	ROMX_LOAD( "b64.rom",     0x0000, 0x4000, CRC(cea28188) SHA1(a77e42e97402e601b78ab3751eac1e85d0bbb4a0), ROM_BIOS(0) )
 	ROM_SYSTEM_BIOS(1, "cdos", "CDOS")
 	ROMX_LOAD( "b64cdos.rom", 0x0000, 0x4000, CRC(73305e4d) SHA1(c090c3430cdf19eed8363377b981e1c21a4ed169), ROM_BIOS(1) )
@@ -386,10 +379,10 @@ ROM_START( primoc64 )
 ROM_END
 
 //    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT  CLASS        INIT        COMPANY     FULLNAME      FLAGS
-COMP( 1984, primoa32, 0,        0,      primoa32, primo, primo_state, init_primo, "Microkey", "Primo A-32", MACHINE_SUPPORTS_SAVE )
-COMP( 1984, primoa48, primoa32, 0,      primoa48, primo, primo_state, init_primo, "Microkey", "Primo A-48", MACHINE_SUPPORTS_SAVE )
-COMP( 1984, primoa64, primoa32, 0,      primoa64, primo, primo_state, init_primo, "Microkey", "Primo A-64", MACHINE_SUPPORTS_SAVE )
-COMP( 1984, primob32, primoa32, 0,      primob32, primo, primo_state, init_primo, "Microkey", "Primo B-32", MACHINE_SUPPORTS_SAVE )
-COMP( 1984, primob48, primoa32, 0,      primob48, primo, primo_state, init_primo, "Microkey", "Primo B-48", MACHINE_SUPPORTS_SAVE )
-COMP( 1984, primob64, primoa32, 0,      primob64, primo, primo_state, init_primo, "Microkey", "Primo B-64", MACHINE_SUPPORTS_SAVE )
-COMP( 1984, primoc64, primoa32, 0,      primoc64, primo, primo_state, init_primo, "Microkey", "Primo C-64", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+COMP( 1984, primoa32, 0,        0,      primoa32, primo, primo_state, empty_init, "Microkey", "Primo A-32", MACHINE_SUPPORTS_SAVE )
+COMP( 1984, primoa48, primoa32, 0,      primoa48, primo, primo_state, empty_init, "Microkey", "Primo A-48", MACHINE_SUPPORTS_SAVE )
+COMP( 1984, primoa64, primoa32, 0,      primoa64, primo, primo_state, empty_init, "Microkey", "Primo A-64", MACHINE_SUPPORTS_SAVE )
+COMP( 1984, primob32, primoa32, 0,      primob32, primo, primo_state, empty_init, "Microkey", "Primo B-32", MACHINE_SUPPORTS_SAVE )
+COMP( 1984, primob48, primoa32, 0,      primob48, primo, primo_state, empty_init, "Microkey", "Primo B-48", MACHINE_SUPPORTS_SAVE )
+COMP( 1984, primob64, primoa32, 0,      primob64, primo, primo_state, empty_init, "Microkey", "Primo B-64", MACHINE_SUPPORTS_SAVE )
+COMP( 1984, primoc64, primoa32, 0,      primoc64, primo, primo_state, empty_init, "Microkey", "Primo C-64", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
