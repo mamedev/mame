@@ -20,6 +20,7 @@ Year + Game                                    PCB        CPU    Sound          
 97  Manguan Daheng (V123T1)                    NO-0252    68000  M6295           IGS031 IGS025 IGS???* Battery
 98  Genius 6 (V110F)                           NO-0131-4  Z180   K668    U3567   IGS017 IGS003c        Battery
 98  Long Hu Zhengba 2 (set 1)                  NO-0206    68000  K668            IGS031 IGS025 IGS022* Battery
+98  Long Hu Zhengba 2 (VS105M)                 NO-0182-2  68000  M6295           IGS031 IGS025 IGS022  Battery
 98  Shuang Long Qiang Zhu 2 VS (VS203J)        NO-0207    68000  K668            IGS031 IGS025 IGS022  Battery
 98  Manguan Caishen (V103CS)                   NO-0192-1  68000  K668            IGS017 IGS025 IGS029  Battery
 98  Manguan Caishen (V106CS)                   NO-0208    68000  M6295           IGS031 IGS025 IGS029  Battery
@@ -5458,6 +5459,54 @@ ROM_START( lhzb2a )
 	ROM_LOAD( "lhzb2_string.key", 0x00, 0xec, CRC(c964dc35) SHA1(81036e0dfa9abad123701ae8939d0d5b6f91b015) )
 ROM_END
 
+/*
+PCB NO-0182-2
+IGS025 sticker is D2
+Custom - IGS022, IGS017
+Osc - 8MHz near IGS022, 22MHz near IGS017
+2 banks of 8 DIP switches
+Oki M6295
+*/
+ROM_START( lhzb2b )
+	ROM_REGION( 0x80000, "maincpu", 0 )
+	ROM_LOAD16_WORD_SWAP( "rom.u25", 0x00000, 0x80000, CRC(46f5df48) SHA1(da35b0cfaef34179a8e2a019c472ff14d831c753) )
+
+	ROM_REGION( 0x10000, "igs022", 0 )
+	ROM_LOAD( "rom.u12",0x0000, 0x10000, CRC(794d0276) SHA1(ac903d2faa3fb315438dc8da22c5337611a8790d) )
+
+	ROM_REGION( 0x200000, "igs017_igs031:sprites", 0 )
+	ROM_LOAD16_WORD_SWAP( "m1101.u13", 0x000000, 0x200000, CRC(fed09cd6) SHA1(0658a97983f8ba408126e79889cc58323f2d99ba) ) // FIXED BITS (0xxxxxxxxxxxxxxx)
+
+	ROM_REGION( 0x80000, "igs017_igs031:tilemaps", 0 )
+	ROM_LOAD16_WORD_SWAP( "rom.u15", 0x00000, 0x80000, CRC(5d28287b) SHA1(441f7f301f9d5f1d817f907ec4cedf274a6801d4) )
+
+	ROM_REGION( 0x80000, "oki", 0 )
+	ROM_LOAD( "rom.u22", 0x00000, 0x80000, CRC(51ffe245) SHA1(849011b186096add657ab20d49d260ec23363ef3) )
+
+	ROM_REGION( 0xec, "igs_string", 0 )
+	ROM_LOAD( "lhzb2_string.key", 0x00, 0xec, CRC(c964dc35) SHA1(81036e0dfa9abad123701ae8939d0d5b6f91b015) )
+ROM_END
+
+ROM_START( lhzb2c ) // PCB NO-0182-2, very minor code differences if compared to lhzb2b.
+	ROM_REGION( 0x80000, "maincpu", 0 )
+	ROM_LOAD16_WORD_SWAP( "rom.u25", 0x00000, 0x80000, CRC(2fd43fea) SHA1(6215655ae49c75cece33a359a359b0e7980a2c1c) )
+
+	ROM_REGION( 0x10000, "igs022", 0 )
+	ROM_LOAD( "rom.u12",0x0000, 0x10000, CRC(794d0276) SHA1(ac903d2faa3fb315438dc8da22c5337611a8790d) )
+
+	ROM_REGION( 0x200000, "igs017_igs031:sprites", 0 )
+	ROM_LOAD16_WORD_SWAP( "m1101.u13", 0x000000, 0x200000, CRC(fed09cd6) SHA1(0658a97983f8ba408126e79889cc58323f2d99ba) ) // FIXED BITS (0xxxxxxxxxxxxxxx)
+
+	ROM_REGION( 0x80000, "igs017_igs031:tilemaps", 0 )
+	ROM_LOAD16_WORD_SWAP( "rom.u15", 0x00000, 0x80000, CRC(5d28287b) SHA1(441f7f301f9d5f1d817f907ec4cedf274a6801d4) )
+
+	ROM_REGION( 0x80000, "oki", 0 )
+	ROM_LOAD( "rom.u22", 0x00000, 0x80000, CRC(51ffe245) SHA1(849011b186096add657ab20d49d260ec23363ef3) )
+
+	ROM_REGION( 0xec, "igs_string", 0 )
+	ROM_LOAD( "lhzb2_string.key", 0x00, 0xec, CRC(c964dc35) SHA1(81036e0dfa9abad123701ae8939d0d5b6f91b015) )
+ROM_END
+
 /***************************************************************************
 
 Shuang Long Qiang Zhu 2 VS (China, VS203J)
@@ -6029,8 +6078,10 @@ GAME ( 1998,  mgcs,       0,        mgcs,       mgcs,     igs017_state, init_mgc
 GAME ( 1998,  mgcsa,      mgcs,     mgcsa,      mgcs,     igs017_state, init_mgcsa,      ROT0, "IGS", "Manguan Caishen (China, V106CS)",                                    MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION ) // 满贯财神, finish IGS029 protection
 GAME ( 1998,  lhzb2,      0,        lhzb2,      lhzb2,    igs017_state, init_lhzb2,      ROT0, "IGS", "Long Hu Zhengba 2 (China, set 1)",                                   MACHINE_UNEMULATED_PROTECTION ) // 龙虎争霸2, finish IGS022 protection
 GAME ( 1998,  lhzb2a,     lhzb2,    lhzb2a,     lhzb2a,   igs017_state, init_lhzb2a,     ROT0, "IGS", "Long Hu Zhengba 2 (China, VS221M)",                                  0 ) // 龙虎争霸2
+GAME ( 1998,  lhzb2b,     lhzb2,    lhzb2,      lhzb2,    igs017_state, init_lhzb2,      ROT0, "IGS", "Long Hu Zhengba 2 (China, VS105M, set 1)",                           MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION ) // 龙虎争霸2, correct GFX decryption, finish IGS022 protection
+GAME ( 1998,  lhzb2c,     lhzb2,    lhzb2,      lhzb2,    igs017_state, init_lhzb2,      ROT0, "IGS", "Long Hu Zhengba 2 (China, VS105M, set 2)",                           MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION ) // 龙虎争霸2, correct GFX decryption, finish IGS022 protection
 GAME ( 1998,  slqz2,      0,        slqz2,      slqz2,    igs017_state, init_slqz2,      ROT0, "IGS", "Shuang Long Qiang Zhu 2 VS (China, VS203J)",                         MACHINE_UNEMULATED_PROTECTION ) // 双龙抢珠, finish IGS022 protection
-GAME ( 1998,  slqz2a,     slqz2,    slqz2,      slqz2,    igs017_state, init_slqz2,      ROT0, "IGS", "Shuang Long Qiang Zhu 2 VS (China, set 2)",                          MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION ) // 双龙抢珠, misses program ROM dump, finish IGS022 protection
+GAME ( 1998,  slqz2a,     slqz2,    slqz2,      slqz2,    igs017_state, init_slqz2,      ROT0, "IGS", "Shuang Long Qiang Zhu 2 VS (China, set 2)",                          MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION ) // 双龙抢珠, misses program ROM dump, finish IGS022 protectionING | MACHINE_UNEMULATED_PROTECTION ) // IGS022 and IGS025 protection
 GAME ( 1999,  tarzanc,    0,        tarzan,     tarzan,   igs017_state, init_tarzanc,    ROT0, "IGS", "Tarzan Chuang Tian Guan (China, V109C, set 1)",                      0 ) // 泰山闯天关
 GAME ( 1999,  tarzan,     tarzanc,  tarzan,     tarzan,   igs017_state, init_tarzan,     ROT0, "IGS", "Tarzan Chuang Tian Guan (China, V109C, set 2)",                      MACHINE_NOT_WORKING ) // missing sprites and sound rom, imperfect tiles decryption
 GAME ( 1999,  tarzana,    tarzanc,  tarzan,     tarzan,   igs017_state, init_tarzana,    ROT0, "IGS", "Tarzan (V107)",                                                      MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION ) // missing IGS029 protection, missing sprites and sound rom
