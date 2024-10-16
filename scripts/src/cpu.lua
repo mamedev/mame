@@ -4115,6 +4115,23 @@ if opt_tool(CPUS, "HT1130") then
 end
 
 --------------------------------------------------
+-- UPD777
+--@src/devices/cpu/upd777/upd777.h,CPUS["UPD777"] = true
+--------------------------------------------------
+
+if CPUS["UPD777"] then
+	files {
+		MAME_DIR .. "src/devices/cpu/upd777/upd777.cpp",
+		MAME_DIR .. "src/devices/cpu/upd777/upd777.h",
+	}
+end
+
+if opt_tool(CPUS, "UPD777") then
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/upd777/upd777dasm.cpp")
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/upd777/upd777dasm.h")
+end
+
+--------------------------------------------------
 -- Epson C33 STD, C33 ADV, etc.
 --@src/devices/cpu/c33/c33common.h,CPUS["C33"] = true
 --------------------------------------------------
