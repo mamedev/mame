@@ -214,26 +214,6 @@ Notes:
 
 #define LOGZ80(...) LOGMASKED(LOG_Z80, __VA_ARGS__)
 
-u16 pgm_state::videoram_r(offs_t offset)
-{
-	if (offset < 0x4000 / 2)
-		return m_bg_videoram[offset & 0x7ff];
-	else if (offset < 0x7000 / 2)
-		return m_tx_videoram[offset & 0xfff];
-	else
-		return m_videoram[offset];
-}
-
-void pgm_state::videoram_w(offs_t offset, u16 data, u16 mem_mask)
-{
-	if (offset < 0x4000 / 2)
-		bg_videoram_w(offset & 0x7ff, data, mem_mask);
-	else if (offset < 0x7000 / 2)
-		tx_videoram_w(offset & 0xfff, data, mem_mask);
-	else
-		COMBINE_DATA(&m_videoram[offset]);
-}
-
 void pgm_state::coin_counter_w(u16 data)
 {
 	machine().bookkeeping().coin_counter_w(0, data & 0x0001);
@@ -319,9 +299,9 @@ void pgm_state::pgm_base_mem(address_map &map)
 
 	map(0x800000, 0x81ffff).ram().mirror(0x0e0000).share("sram"); /* Main Ram */
 
-	map(0x900000, 0x907fff).mirror(0x0f8000).rw(FUNC(pgm_state::videoram_r), FUNC(pgm_state::videoram_w)).share("videoram"); /* IGS023 VIDEO CHIP */
+	map(0x900000, 0x907fff).mirror(0x0f8000).rw(m_video, FUNC(igs023_video_device::videoram_r), FUNC(igs023_video_device::videoram_w)); /* IGS023 VIDEO CHIP */
 	map(0xa00000, 0xa011ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
-	map(0xb00000, 0xb0ffff).ram().share("videoregs"); /* Video Regs inc. Zoom Table */
+	map(0xb00000, 0xb0ffff).rw(m_video, FUNC(igs023_video_device::videoregs_r), FUNC(igs023_video_device::videoregs_w)); /* Video Regs inc. Zoom Table */
 	//map(0xb01000, 0xb0103f) Zoom/Shrink table for sprites
 	//map(0xb02000, 0xb02001) Background scroll Y
 	//map(0xb03000, 0xb03001) Background scroll X
@@ -446,28 +426,6 @@ INPUT_PORTS_START( pgm )
 INPUT_PORTS_END
 
 
-/*** GFX Decodes *************************************************************/
-
-/* We can't decode the sprite data like this because it isn't tile based.
-   Note that the bit indexes are reversed compared to usual gfx layouts
-   (0-7 = LSB to MSB) */
-
-static const gfx_layout pgm32_charlayout =
-{
-	32,32,
-	RGN_FRAC(1,1),
-	5,
-	{ 4, 3, 2, 1, 0 },
-	{ STEP32(0,5) },
-	{ STEP32(0,5*32) },
-	32*32*5
-};
-
-GFXDECODE_START( gfx_pgm )
-	GFXDECODE_ENTRY(       "tiles", 0, gfx_8x8x4_packed_lsb, 0x800, 32 ) /* 8x8x4 Tiles */
-	GFXDECODE_REVERSEBITS( "tiles", 0, pgm32_charlayout,     0x400, 32 ) /* 32x32x5 Tiles */
-GFXDECODE_END
-
 /*** Machine Driver **********************************************************/
 
 /* most games require IRQ4 for inputs to work, Puzzli 2 is explicit about not wanting it tho
@@ -488,6 +446,33 @@ TIMER_DEVICE_CALLBACK_MEMBER(pgm_state::interrupt)
 void pgm_state::machine_reset()
 {
 	m_soundcpu->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
+}
+
+u16 pgm_state::sprites_r(offs_t offset)
+{
+	return m_mainram[offset];
+}
+
+void pgm_state::video_start()
+{
+}
+
+u32 pgm_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	return m_video->screen_update(screen, bitmap, cliprect);
+}
+
+void pgm_state::screen_vblank(int state)
+{
+	// rising edge
+	if (state)
+	{
+		/* first 0xa00 of main ram = sprites, seems to be buffered, DMA? */
+		m_video->get_sprites();
+
+		// vblank start interrupt
+		m_maincpu->set_input_line(M68K_IRQ_6, HOLD_LINE);
+	}
 }
 
 void pgm_state::pgmbase(machine_config &config)
@@ -512,7 +497,6 @@ void pgm_state::pgmbase(machine_config &config)
 	screen.screen_vblank().set(FUNC(pgm_state::screen_vblank));
 	screen.set_palette(m_palette);
 
-	GFXDECODE(config, m_gfxdecode, m_palette, gfx_pgm);
 	PALETTE(config, m_palette, palette_device::BLACK).set_format(palette_device::xRGB_555, 0x1200/2);
 
 	/*sound hardware */
@@ -521,6 +505,10 @@ void pgm_state::pgmbase(machine_config &config)
 	GENERIC_LATCH_8(config, m_soundlatch);
 	GENERIC_LATCH_8(config, "soundlatch2");
 	GENERIC_LATCH_8(config, m_soundlatch3);
+
+	IGS023_VIDEO(config, m_video, 0);
+	m_video->set_palette(m_palette);
+	m_video->read_spriteram_callback().set(FUNC(pgm_state::sprites_r));
 
 	ICS2115(config, m_ics, 33.8688_MHz_XTAL);
 	m_ics->irq().set_inputline("soundcpu", 0);
@@ -535,7 +523,7 @@ void pgm_state::pgm(machine_config &config)
 
 /*** ROM Loading *************************************************************/
 
-/* take note of "sprmask" needed for expanding the Sprite Colour Data */
+/* take note of "igs023:sprmask" needed for expanding the Sprite Colour Data */
 
 #define ROM_LOAD16_WORD_SWAP_BIOS(bios,name,offset,length,hash) \
 		ROMX_LOAD(name, offset, length, hash, ROM_GROUPWORD | ROM_REVERSE | ROM_BIOS(bios))
@@ -555,14 +543,14 @@ ROM_START( pgm )
 	ROM_REGION( 0x600000, "maincpu", 0 ) /* 68000 Code */
 	PGM_68K_BIOS
 
-	ROM_REGION( 0x280000, "tiles", 0 ) /* 8x8 Text Layer Tiles */
+	ROM_REGION( 0x280000, "igs023", 0 ) /* 8x8 Text Layer Tiles */
 	PGM_VIDEO_BIOS
 
 	ROM_REGION( 0x200000, "ics", 0 ) /* Samples - (8 bit mono 11025Hz) - */
 	PGM_AUDIO_BIOS
 
-	ROM_REGION16_LE( 0x1000000, "sprcol", ROMREGION_ERASEFF ) /* Sprite Colour Data */
-	ROM_REGION16_LE( 0x1000000, "sprmask", ROMREGION_ERASEFF ) /* Sprite Masks + Colour Indexes */
+	ROM_REGION16_LE( 0x1000000, "igs023:sprcol", ROMREGION_ERASEFF ) /* Sprite Colour Data */
+	ROM_REGION16_LE( 0x1000000, "igs023:sprmask", ROMREGION_ERASEFF ) /* Sprite Masks + Colour Indexes */
 ROM_END
 
 ROM_START( orlegend )
@@ -570,11 +558,11 @@ ROM_START( orlegend )
 	PGM_68K_BIOS
 	ROM_LOAD16_WORD_SWAP( "p0103.rom",    0x100000, 0x200000, CRC(d5e93543) SHA1(f081edc26514ca8354c13c7f6f89aba8e4d3e7d2) )
 
-	ROM_REGION( 0xa00000, "tiles",  0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
+	ROM_REGION( 0xa00000, "igs023",  0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
 	PGM_VIDEO_BIOS
 	ROM_LOAD( "pgm_t0100.u8",     0x180000, 0x400000, CRC(61425e1e) SHA1(20753b86fc12003cfd763d903f034dbba8010b32) )
 
-	ROM_REGION16_LE( 0x2000000, "sprcol", 0 ) /* Sprite Colour Data */
+	ROM_REGION16_LE( 0x2000000, "igs023:sprcol", 0 ) /* Sprite Colour Data */
 	ROM_LOAD( "pgm_a0100.u5",     0x0000000, 0x400000, CRC(8b3bd88a) SHA1(42db3a60c6ba9d83ebe2008c8047d094027f65a7) )
 	ROM_LOAD( "pgm_a0101.u6",     0x0400000, 0x400000, CRC(3b9e9644) SHA1(5b95ec1d25c3bc3504c93547f5adb5ce24376405) )
 	ROM_LOAD( "pgm_a0102.u7",     0x0800000, 0x400000, CRC(069e2c38) SHA1(9bddca8c2f5bd80f4abe4e1f062751736dc151dd) )
@@ -582,7 +570,7 @@ ROM_START( orlegend )
 	ROM_LOAD( "pgm_a0104.u11",    0x1000000, 0x400000, CRC(5f8abb56) SHA1(6c1ddc0309862a141aa0c0f63b641aec9257aaee) )
 	ROM_LOAD( "pgm_a0105.u12",    0x1400000, 0x400000, CRC(a17a7147) SHA1(44eeb43c6b0ebb829559a20ae357383fbdeecd82) )
 
-	ROM_REGION16_LE( 0x1000000, "sprmask", 0 ) /* Sprite Masks + Colour Indexes */
+	ROM_REGION16_LE( 0x1000000, "igs023:sprmask", 0 ) /* Sprite Masks + Colour Indexes */
 	ROM_LOAD( "pgm_b0100.u9",     0x0000000, 0x400000, CRC(69d2e48c) SHA1(5b5f759007264c07b3b39be8e03a713698e1fc2a) )
 	ROM_LOAD( "pgm_b0101.u10",    0x0400000, 0x400000, CRC(0d587bf3) SHA1(5347828b0a6e4ddd7a263663d2c2604407e4d49c) )
 	ROM_LOAD( "pgm_b0102.u15",    0x0800000, 0x400000, CRC(43823c1e) SHA1(e10a1a9a81b51b11044934ff702e35d8d7ab1b08) )
@@ -597,11 +585,11 @@ ROM_START( orlegende )
 	PGM_68K_BIOS
 	ROM_LOAD16_WORD_SWAP( "pgm_p0102.u2",    0x100000, 0x200000, CRC(4d0f6cc5) SHA1(8d41f0a712fb11a1da865f5159e5e27447b4388a) )
 
-	ROM_REGION( 0xa00000, "tiles",  0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
+	ROM_REGION( 0xa00000, "igs023",  0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
 	PGM_VIDEO_BIOS
 	ROM_LOAD( "pgm_t0100.u8",     0x180000, 0x400000, CRC(61425e1e) SHA1(20753b86fc12003cfd763d903f034dbba8010b32) )
 
-	ROM_REGION16_LE( 0x2000000, "sprcol", 0 ) /* Sprite Colour Data */
+	ROM_REGION16_LE( 0x2000000, "igs023:sprcol", 0 ) /* Sprite Colour Data */
 	ROM_LOAD( "pgm_a0100.u5",     0x0000000, 0x400000, CRC(8b3bd88a) SHA1(42db3a60c6ba9d83ebe2008c8047d094027f65a7) )
 	ROM_LOAD( "pgm_a0101.u6",     0x0400000, 0x400000, CRC(3b9e9644) SHA1(5b95ec1d25c3bc3504c93547f5adb5ce24376405) )
 	ROM_LOAD( "pgm_a0102.u7",     0x0800000, 0x400000, CRC(069e2c38) SHA1(9bddca8c2f5bd80f4abe4e1f062751736dc151dd) )
@@ -609,7 +597,7 @@ ROM_START( orlegende )
 	ROM_LOAD( "pgm_a0104.u11",    0x1000000, 0x400000, CRC(5f8abb56) SHA1(6c1ddc0309862a141aa0c0f63b641aec9257aaee) )
 	ROM_LOAD( "pgm_a0105.u12",    0x1400000, 0x400000, CRC(a17a7147) SHA1(44eeb43c6b0ebb829559a20ae357383fbdeecd82) )
 
-	ROM_REGION16_LE( 0x1000000, "sprmask", 0 ) /* Sprite Masks + Colour Indexes */
+	ROM_REGION16_LE( 0x1000000, "igs023:sprmask", 0 ) /* Sprite Masks + Colour Indexes */
 	ROM_LOAD( "pgm_b0100.u9",     0x0000000, 0x400000, CRC(69d2e48c) SHA1(5b5f759007264c07b3b39be8e03a713698e1fc2a) )
 	ROM_LOAD( "pgm_b0101.u10",    0x0400000, 0x400000, CRC(0d587bf3) SHA1(5347828b0a6e4ddd7a263663d2c2604407e4d49c) )
 	ROM_LOAD( "pgm_b0102.u15",    0x0800000, 0x400000, CRC(43823c1e) SHA1(e10a1a9a81b51b11044934ff702e35d8d7ab1b08) )
@@ -624,11 +612,11 @@ ROM_START( orlegendc )
 	PGM_68K_BIOS
 	ROM_LOAD16_WORD_SWAP( "pgm_p0101.u2",    0x100000, 0x200000, CRC(b24f0c1e) SHA1(a2cf75d739681f091c24ef78ed6fc13aa8cfe0c6) )
 
-	ROM_REGION( 0xa00000, "tiles",  0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
+	ROM_REGION( 0xa00000, "igs023",  0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
 	PGM_VIDEO_BIOS
 	ROM_LOAD( "pgm_t0100.u8",     0x180000, 0x400000, CRC(61425e1e) SHA1(20753b86fc12003cfd763d903f034dbba8010b32) )
 
-	ROM_REGION16_LE( 0x2000000, "sprcol", 0 ) /* Sprite Colour Data */
+	ROM_REGION16_LE( 0x2000000, "igs023:sprcol", 0 ) /* Sprite Colour Data */
 	/* Different labels comparing to others sets except for PGM B0102 in U15 and PGM M0100 in U1; it probably needs to be dumped */
 	ROM_LOAD( "pgm_a0100-1.u5",   0x0000000, 0x400000, BAD_DUMP CRC(8b3bd88a) SHA1(42db3a60c6ba9d83ebe2008c8047d094027f65a7) )
 	ROM_LOAD( "pgm_a0101-1.u6",   0x0400000, 0x400000, BAD_DUMP CRC(3b9e9644) SHA1(5b95ec1d25c3bc3504c93547f5adb5ce24376405) )
@@ -637,7 +625,7 @@ ROM_START( orlegendc )
 	ROM_LOAD( "pgm_a0104-1.u11",  0x1000000, 0x400000, BAD_DUMP CRC(5f8abb56) SHA1(6c1ddc0309862a141aa0c0f63b641aec9257aaee) )
 	ROM_LOAD( "pgm_a0105-1.u12",  0x1400000, 0x400000, BAD_DUMP CRC(a17a7147) SHA1(44eeb43c6b0ebb829559a20ae357383fbdeecd82) )
 
-	ROM_REGION16_LE( 0x1000000, "sprmask", 0 ) /* Sprite Masks + Colour Indexes */
+	ROM_REGION16_LE( 0x1000000, "igs023:sprmask", 0 ) /* Sprite Masks + Colour Indexes */
 	ROM_LOAD( "pgm_b0100-1.u9",   0x0000000, 0x400000, BAD_DUMP CRC(69d2e48c) SHA1(5b5f759007264c07b3b39be8e03a713698e1fc2a) )
 	ROM_LOAD( "pgm_b0101-1.u10",  0x0400000, 0x400000, BAD_DUMP CRC(0d587bf3) SHA1(5347828b0a6e4ddd7a263663d2c2604407e4d49c) )
 	ROM_LOAD( "pgm_b0102.u15",    0x0800000, 0x400000, CRC(43823c1e) SHA1(e10a1a9a81b51b11044934ff702e35d8d7ab1b08) )
@@ -652,11 +640,11 @@ ROM_START( orlegendca )
 	PGM_68K_BIOS
 	ROM_LOAD16_WORD_SWAP( "p0101.102",    0x100000, 0x200000, CRC(7a22e1cb) SHA1(4fe0fde00521b0915146334ea7213f3eb7e2affc) )
 
-	ROM_REGION( 0xa00000, "tiles",  0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
+	ROM_REGION( 0xa00000, "igs023",  0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
 	PGM_VIDEO_BIOS
 	ROM_LOAD( "pgm_t0100.u8",     0x180000, 0x400000, CRC(61425e1e) SHA1(20753b86fc12003cfd763d903f034dbba8010b32) )
 
-	ROM_REGION16_LE( 0x2000000, "sprcol", 0 ) /* Sprite Colour Data */
+	ROM_REGION16_LE( 0x2000000, "igs023:sprcol", 0 ) /* Sprite Colour Data */
 	ROM_LOAD( "pgm_a0100.u5",     0x0000000, 0x400000, CRC(8b3bd88a) SHA1(42db3a60c6ba9d83ebe2008c8047d094027f65a7) )
 	ROM_LOAD( "pgm_a0101.u6",     0x0400000, 0x400000, CRC(3b9e9644) SHA1(5b95ec1d25c3bc3504c93547f5adb5ce24376405) )
 	ROM_LOAD( "pgm_a0102.u7",     0x0800000, 0x400000, CRC(069e2c38) SHA1(9bddca8c2f5bd80f4abe4e1f062751736dc151dd) )
@@ -664,7 +652,7 @@ ROM_START( orlegendca )
 	ROM_LOAD( "pgm_a0104.u11",    0x1000000, 0x400000, CRC(5f8abb56) SHA1(6c1ddc0309862a141aa0c0f63b641aec9257aaee) )
 	ROM_LOAD( "pgm_a0105.u12",    0x1400000, 0x400000, CRC(a17a7147) SHA1(44eeb43c6b0ebb829559a20ae357383fbdeecd82) )
 
-	ROM_REGION16_LE( 0x1000000, "sprmask", 0 ) /* Sprite Masks + Colour Indexes */
+	ROM_REGION16_LE( 0x1000000, "igs023:sprmask", 0 ) /* Sprite Masks + Colour Indexes */
 	ROM_LOAD( "pgm_b0100.u9",     0x0000000, 0x400000, CRC(69d2e48c) SHA1(5b5f759007264c07b3b39be8e03a713698e1fc2a) )
 	ROM_LOAD( "pgm_b0101.u10",    0x0400000, 0x400000, CRC(0d587bf3) SHA1(5347828b0a6e4ddd7a263663d2c2604407e4d49c) )
 	ROM_LOAD( "pgm_b0102.u15",    0x0800000, 0x400000, CRC(43823c1e) SHA1(e10a1a9a81b51b11044934ff702e35d8d7ab1b08) )
@@ -718,11 +706,11 @@ ROM_START( orlegend111c )
 	ROM_LOAD16_BYTE( "olv_111_china_u7.u7",     0x200001, 0x080000, CRC(6ee79faf) SHA1(039b4b07b8577f0d3022ae01210c00375624cb3c) )
 	ROM_LOAD16_BYTE( "olv_111_china_u11.u11",   0x200000, 0x080000, CRC(b80ddd3c) SHA1(55c700ce71ffdee392e03fd9d4719542c3527132) )
 
-	ROM_REGION( 0xa00000, "tiles",  0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
+	ROM_REGION( 0xa00000, "igs023",  0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
 	PGM_VIDEO_BIOS
 	ROM_LOAD( "pgm_t0100.u8",     0x180000, 0x400000, CRC(61425e1e) SHA1(20753b86fc12003cfd763d903f034dbba8010b32) )
 
-	ROM_REGION16_LE( 0x2000000, "sprcol", 0 ) /* Sprite Colour Data */
+	ROM_REGION16_LE( 0x2000000, "igs023:sprcol", 0 ) /* Sprite Colour Data */
 	ROM_LOAD( "pgm_a0100.u5",     0x0000000, 0x400000, CRC(8b3bd88a) SHA1(42db3a60c6ba9d83ebe2008c8047d094027f65a7) )
 	ROM_LOAD( "pgm_a0101.u6",     0x0400000, 0x400000, CRC(3b9e9644) SHA1(5b95ec1d25c3bc3504c93547f5adb5ce24376405) )
 	ROM_LOAD( "pgm_a0102.u7",     0x0800000, 0x400000, CRC(069e2c38) SHA1(9bddca8c2f5bd80f4abe4e1f062751736dc151dd) )
@@ -730,7 +718,7 @@ ROM_START( orlegend111c )
 	ROM_LOAD( "pgm_a0104.u11",    0x1000000, 0x400000, CRC(5f8abb56) SHA1(6c1ddc0309862a141aa0c0f63b641aec9257aaee) )
 	ROM_LOAD( "pgm_a0105.u12",    0x1400000, 0x400000, CRC(a17a7147) SHA1(44eeb43c6b0ebb829559a20ae357383fbdeecd82) )
 
-	ROM_REGION16_LE( 0x1000000, "sprmask", 0 ) /* Sprite Masks + Colour Indexes */
+	ROM_REGION16_LE( 0x1000000, "igs023:sprmask", 0 ) /* Sprite Masks + Colour Indexes */
 	ROM_LOAD( "pgm_b0100.u9",     0x0000000, 0x400000, CRC(69d2e48c) SHA1(5b5f759007264c07b3b39be8e03a713698e1fc2a) )
 	ROM_LOAD( "pgm_b0101.u10",    0x0400000, 0x400000, CRC(0d587bf3) SHA1(5347828b0a6e4ddd7a263663d2c2604407e4d49c) )
 	ROM_LOAD( "pgm_b0102.u15",    0x0800000, 0x400000, CRC(43823c1e) SHA1(e10a1a9a81b51b11044934ff702e35d8d7ab1b08) )
@@ -783,11 +771,11 @@ ROM_START( orlegend111t )
 	ROM_LOAD16_BYTE( "olv_111_taiwan_u7.u7",     0x200001, 0x080000, CRC(27628e87) SHA1(a0effd83dc57ac72ba4f110737a075705d78e798) )
 	ROM_LOAD16_BYTE( "olv_111_taiwan_u11.u11",    0x200000, 0x080000, CRC(23f33bc9) SHA1(f24490370d40d905afe8b716a3953b4e9f0aada4) )
 
-	ROM_REGION( 0xa00000, "tiles",  0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
+	ROM_REGION( 0xa00000, "igs023",  0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
 	PGM_VIDEO_BIOS
 	ROM_LOAD( "pgm_t0100.u8",     0x180000, 0x400000, CRC(61425e1e) SHA1(20753b86fc12003cfd763d903f034dbba8010b32) )
 
-	ROM_REGION16_LE( 0x2000000, "sprcol", 0 ) /* Sprite Colour Data */
+	ROM_REGION16_LE( 0x2000000, "igs023:sprcol", 0 ) /* Sprite Colour Data */
 	/* Different labels comparing to others sets except for PGM B0102 in U2 and PGM M0100 in U1; it probably needs to be dumped */
 	ROM_LOAD( "pgm_a0100b.u5",    0x0000000, 0x400000, BAD_DUMP CRC(8b3bd88a) SHA1(42db3a60c6ba9d83ebe2008c8047d094027f65a7) )
 	ROM_LOAD( "pgm_a0101b.u8",    0x0400000, 0x400000, BAD_DUMP CRC(3b9e9644) SHA1(5b95ec1d25c3bc3504c93547f5adb5ce24376405) )
@@ -796,7 +784,7 @@ ROM_START( orlegend111t )
 	ROM_LOAD( "pgm_a0104b.u7",    0x1000000, 0x400000, BAD_DUMP CRC(5f8abb56) SHA1(6c1ddc0309862a141aa0c0f63b641aec9257aaee) )
 	ROM_LOAD( "pgm_a0105b.u10",   0x1400000, 0x400000, BAD_DUMP CRC(a17a7147) SHA1(44eeb43c6b0ebb829559a20ae357383fbdeecd82) )
 
-	ROM_REGION16_LE( 0x1000000, "sprmask", 0 ) /* Sprite Masks + Colour Indexes */
+	ROM_REGION16_LE( 0x1000000, "igs023:sprmask", 0 ) /* Sprite Masks + Colour Indexes */
 	ROM_LOAD( "pgm_b0100b.u11",   0x0000000, 0x400000, BAD_DUMP CRC(69d2e48c) SHA1(5b5f759007264c07b3b39be8e03a713698e1fc2a) )
 	ROM_LOAD( "pgm_b0101b.u12",   0x0400000, 0x400000, BAD_DUMP CRC(0d587bf3) SHA1(5347828b0a6e4ddd7a263663d2c2604407e4d49c) )
 	ROM_LOAD( "pgm_b0102.u2",    0x0800000, 0x400000, CRC(43823c1e) SHA1(e10a1a9a81b51b11044934ff702e35d8d7ab1b08) )
@@ -850,11 +838,11 @@ ROM_START( orlegend111k )
 	ROM_LOAD16_BYTE( "olv_111_korea_u7.u7",     0x200001, 0x080000, CRC(27628e87) SHA1(a0effd83dc57ac72ba4f110737a075705d78e798) )
 	ROM_LOAD16_BYTE( "olv_111_korea_u11.u11",   0x200000, 0x080000, CRC(23f33bc9) SHA1(f24490370d40d905afe8b716a3953b4e9f0aada4) )
 
-	ROM_REGION( 0xa00000, "tiles",  0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
+	ROM_REGION( 0xa00000, "igs023",  0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
 	PGM_VIDEO_BIOS
 	ROM_LOAD( "pgm_t0100.u8",     0x180000, 0x400000, CRC(61425e1e) SHA1(20753b86fc12003cfd763d903f034dbba8010b32) )
 
-	ROM_REGION16_LE( 0x2000000, "sprcol", 0 ) /* Sprite Colour Data */
+	ROM_REGION16_LE( 0x2000000, "igs023:sprcol", 0 ) /* Sprite Colour Data */
 	ROM_LOAD( "pgm_a0100.u5",     0x0000000, 0x400000, CRC(8b3bd88a) SHA1(42db3a60c6ba9d83ebe2008c8047d094027f65a7) )
 	ROM_LOAD( "pgm_a0101.u6",     0x0400000, 0x400000, CRC(3b9e9644) SHA1(5b95ec1d25c3bc3504c93547f5adb5ce24376405) )
 	ROM_LOAD( "pgm_a0102.u7",     0x0800000, 0x400000, CRC(069e2c38) SHA1(9bddca8c2f5bd80f4abe4e1f062751736dc151dd) )
@@ -862,7 +850,7 @@ ROM_START( orlegend111k )
 	ROM_LOAD( "pgm_a0104.u11",    0x1000000, 0x400000, CRC(5f8abb56) SHA1(6c1ddc0309862a141aa0c0f63b641aec9257aaee) )
 	ROM_LOAD( "pgm_a0105.u12",    0x1400000, 0x400000, CRC(a17a7147) SHA1(44eeb43c6b0ebb829559a20ae357383fbdeecd82) )
 
-	ROM_REGION16_LE( 0x1000000, "sprmask", 0 ) /* Sprite Masks + Colour Indexes */
+	ROM_REGION16_LE( 0x1000000, "igs023:sprmask", 0 ) /* Sprite Masks + Colour Indexes */
 	ROM_LOAD( "pgm_b0100.u9",     0x0000000, 0x400000, CRC(69d2e48c) SHA1(5b5f759007264c07b3b39be8e03a713698e1fc2a) )
 	ROM_LOAD( "pgm_b0101.u10",    0x0400000, 0x400000, CRC(0d587bf3) SHA1(5347828b0a6e4ddd7a263663d2c2604407e4d49c) )
 	ROM_LOAD( "pgm_b0102.u15",    0x0800000, 0x400000, CRC(43823c1e) SHA1(e10a1a9a81b51b11044934ff702e35d8d7ab1b08) )
@@ -916,11 +904,11 @@ ROM_START( orlegend105t )
 	ROM_LOAD16_BYTE( "olv_105_taiwan_u7.u7",     0x200001, 0x080000, CRC(5712facc) SHA1(2d95ebd1703874e89ac3a206f8c1f0ece6e833e0) )
 	ROM_LOAD16_BYTE( "olv_105_taiwan_u11.u11",   0x200000, 0x080000, CRC(40ae4d9e) SHA1(62d7a96438b7fe93f74753333f50e077d417971e) )
 
-	ROM_REGION( 0xa00000, "tiles",  0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
+	ROM_REGION( 0xa00000, "igs023",  0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
 	PGM_VIDEO_BIOS
 	ROM_LOAD( "pgm_t0100.u8",     0x180000, 0x400000, CRC(61425e1e) SHA1(20753b86fc12003cfd763d903f034dbba8010b32) )
 
-	ROM_REGION16_LE( 0x2000000, "sprcol", 0 ) /* Sprite Colour Data */
+	ROM_REGION16_LE( 0x2000000, "igs023:sprcol", 0 ) /* Sprite Colour Data */
 	ROM_LOAD( "pgm_a0100.u5",     0x0000000, 0x400000, CRC(8b3bd88a) SHA1(42db3a60c6ba9d83ebe2008c8047d094027f65a7) )
 	ROM_LOAD( "pgm_a0101.u6",     0x0400000, 0x400000, CRC(3b9e9644) SHA1(5b95ec1d25c3bc3504c93547f5adb5ce24376405) )
 	ROM_LOAD( "pgm_a0102.u7",     0x0800000, 0x400000, CRC(069e2c38) SHA1(9bddca8c2f5bd80f4abe4e1f062751736dc151dd) )
@@ -928,7 +916,7 @@ ROM_START( orlegend105t )
 	ROM_LOAD( "pgm_a0104.u11",    0x1000000, 0x400000, CRC(5f8abb56) SHA1(6c1ddc0309862a141aa0c0f63b641aec9257aaee) )
 	ROM_LOAD( "pgm_a0105.u12",    0x1400000, 0x400000, CRC(a17a7147) SHA1(44eeb43c6b0ebb829559a20ae357383fbdeecd82) )
 
-	ROM_REGION16_LE( 0x1000000, "sprmask", 0 ) /* Sprite Masks + Colour Indexes */
+	ROM_REGION16_LE( 0x1000000, "igs023:sprmask", 0 ) /* Sprite Masks + Colour Indexes */
 	ROM_LOAD( "pgm_b0100.u9",     0x0000000, 0x400000, CRC(69d2e48c) SHA1(5b5f759007264c07b3b39be8e03a713698e1fc2a) )
 	ROM_LOAD( "pgm_b0101.u10",    0x0400000, 0x400000, CRC(0d587bf3) SHA1(5347828b0a6e4ddd7a263663d2c2604407e4d49c) )
 	ROM_LOAD( "pgm_b0102.u15",    0x0800000, 0x400000, CRC(43823c1e) SHA1(e10a1a9a81b51b11044934ff702e35d8d7ab1b08) )
@@ -982,11 +970,11 @@ ROM_START( orlegend105k )
 	ROM_LOAD16_BYTE( "olv_105_korea_u7.u7",     0x200001, 0x080000, CRC(5712facc) SHA1(2d95ebd1703874e89ac3a206f8c1f0ece6e833e0) )
 	ROM_LOAD16_BYTE( "olv_105_korea_u11.u11",   0x200000, 0x080000, CRC(40ae4d9e) SHA1(62d7a96438b7fe93f74753333f50e077d417971e) )
 
-	ROM_REGION( 0xa00000, "tiles",  0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
+	ROM_REGION( 0xa00000, "igs023",  0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
 	PGM_VIDEO_BIOS
 	ROM_LOAD( "pgm_t0100.u8",     0x180000, 0x400000, CRC(61425e1e) SHA1(20753b86fc12003cfd763d903f034dbba8010b32) )
 
-	ROM_REGION16_LE( 0x2000000, "sprcol", 0 ) /* Sprite Colour Data */
+	ROM_REGION16_LE( 0x2000000, "igs023:sprcol", 0 ) /* Sprite Colour Data */
 	ROM_LOAD( "pgm_a0100.u5",     0x0000000, 0x400000, CRC(8b3bd88a) SHA1(42db3a60c6ba9d83ebe2008c8047d094027f65a7) )
 	ROM_LOAD( "pgm_a0101.u6",     0x0400000, 0x400000, CRC(3b9e9644) SHA1(5b95ec1d25c3bc3504c93547f5adb5ce24376405) )
 	ROM_LOAD( "pgm_a0102.u7",     0x0800000, 0x400000, CRC(069e2c38) SHA1(9bddca8c2f5bd80f4abe4e1f062751736dc151dd) )
@@ -994,7 +982,7 @@ ROM_START( orlegend105k )
 	ROM_LOAD( "pgm_a0104.u11",    0x1000000, 0x400000, CRC(5f8abb56) SHA1(6c1ddc0309862a141aa0c0f63b641aec9257aaee) )
 	ROM_LOAD( "pgm_a0105.u12",    0x1400000, 0x400000, CRC(a17a7147) SHA1(44eeb43c6b0ebb829559a20ae357383fbdeecd82) )
 
-	ROM_REGION16_LE( 0x1000000, "sprmask", 0 ) /* Sprite Masks + Colour Indexes */
+	ROM_REGION16_LE( 0x1000000, "igs023:sprmask", 0 ) /* Sprite Masks + Colour Indexes */
 	ROM_LOAD( "pgm_b0100.u9",     0x0000000, 0x400000, CRC(69d2e48c) SHA1(5b5f759007264c07b3b39be8e03a713698e1fc2a) )
 	ROM_LOAD( "pgm_b0101.u10",    0x0400000, 0x400000, CRC(0d587bf3) SHA1(5347828b0a6e4ddd7a263663d2c2604407e4d49c) )
 	ROM_LOAD( "pgm_b0102.u15",    0x0800000, 0x400000, CRC(43823c1e) SHA1(e10a1a9a81b51b11044934ff702e35d8d7ab1b08) )
@@ -1076,14 +1064,14 @@ ROM_START( drgw2 )
 	PGM_68K_BIOS
 	ROM_LOAD16_WORD_SWAP( "dragon_ii_v-110x.u2",    0x100000, 0x080000, CRC(1978106b) SHA1(af8a13d7783b755a58762c98bdc32cab845b2251) )
 
-	ROM_REGION( 0xa00000, "tiles",  0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
+	ROM_REGION( 0xa00000, "igs023",  0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
 	PGM_VIDEO_BIOS
 	ROM_LOAD( "pgm_t0200.u7",    0x180000, 0x400000, CRC(b0f6534d) SHA1(174cacd81169a0e0d14790ac06d03caed737e05d) )
 
-	ROM_REGION16_LE( 0x0400000, "sprcol", 0 ) /* Sprite Colour Data */
+	ROM_REGION16_LE( 0x0400000, "igs023:sprcol", 0 ) /* Sprite Colour Data */
 	ROM_LOAD( "pgm_a0200.u5",    0x0000000, 0x400000, CRC(13b95069) SHA1(4888b06002afb18eab81c010e9362629045767af) )
 
-	ROM_REGION16_LE( 0x0400000, "sprmask", 0 ) /* Sprite Masks + Colour Indexes */
+	ROM_REGION16_LE( 0x0400000, "igs023:sprmask", 0 ) /* Sprite Masks + Colour Indexes */
 	ROM_LOAD( "pgm_b0200.u9",    0x0000000, 0x400000, CRC(932d0f13) SHA1(4b8e008f9c617cb2b95effeb81abc065b30e5c86) )
 
 	ROM_REGION( 0x400000, "ics", 0 ) /* Samples - (8 bit mono 11025Hz) - */
@@ -1095,14 +1083,14 @@ ROM_START( drgw2100x )
 	PGM_68K_BIOS
 	ROM_LOAD16_WORD_SWAP( "dragon_ii_v-100x.u2",    0x100000, 0x080000,  CRC(5e71851d) SHA1(62052469f69daec88efd26652c1b893d6f981912) )
 
-	ROM_REGION( 0xa00000, "tiles",  0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
+	ROM_REGION( 0xa00000, "igs023",  0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
 	PGM_VIDEO_BIOS
 	ROM_LOAD( "pgm_t0200.u7",    0x180000, 0x400000, CRC(b0f6534d) SHA1(174cacd81169a0e0d14790ac06d03caed737e05d) )
 
-	ROM_REGION16_LE( 0x0400000, "sprcol", 0 ) /* Sprite Colour Data */
+	ROM_REGION16_LE( 0x0400000, "igs023:sprcol", 0 ) /* Sprite Colour Data */
 	ROM_LOAD( "pgm_a0200.u5",    0x0000000, 0x400000, CRC(13b95069) SHA1(4888b06002afb18eab81c010e9362629045767af) )
 
-	ROM_REGION16_LE( 0x0400000, "sprmask", 0 ) /* Sprite Masks + Colour Indexes */
+	ROM_REGION16_LE( 0x0400000, "igs023:sprmask", 0 ) /* Sprite Masks + Colour Indexes */
 	ROM_LOAD( "pgm_b0200.u9",    0x0000000, 0x400000, CRC(932d0f13) SHA1(4b8e008f9c617cb2b95effeb81abc065b30e5c86) )
 
 	ROM_REGION( 0x400000, "ics", 0 ) /* Samples - (8 bit mono 11025Hz) - */
@@ -1114,14 +1102,14 @@ ROM_START( drgw2101c )
 	PGM_68K_BIOS
 	ROM_LOAD16_WORD_SWAP( "dragon_ii_v-101c.u2",    0x100000, 0x080000, CRC(b0c592fa) SHA1(87ccfdb940303ebcf42cb2952aecae97648c1e0d) )
 
-	ROM_REGION( 0xa00000, "tiles",  0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
+	ROM_REGION( 0xa00000, "igs023",  0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
 	PGM_VIDEO_BIOS
 	ROM_LOAD( "pgm_t0200.u7",    0x180000, 0x400000, CRC(b0f6534d) SHA1(174cacd81169a0e0d14790ac06d03caed737e05d) )
 
-	ROM_REGION16_LE( 0x0400000, "sprcol", 0 ) /* Sprite Colour Data */
+	ROM_REGION16_LE( 0x0400000, "igs023:sprcol", 0 ) /* Sprite Colour Data */
 	ROM_LOAD( "pgm_a0200.u5",    0x0000000, 0x400000, CRC(13b95069) SHA1(4888b06002afb18eab81c010e9362629045767af) )
 
-	ROM_REGION16_LE( 0x0400000, "sprmask", 0 ) /* Sprite Masks + Colour Indexes */
+	ROM_REGION16_LE( 0x0400000, "igs023:sprmask", 0 ) /* Sprite Masks + Colour Indexes */
 	ROM_LOAD( "pgm_b0200.u9",    0x0000000, 0x400000, CRC(932d0f13) SHA1(4b8e008f9c617cb2b95effeb81abc065b30e5c86) )
 
 	ROM_REGION( 0x400000, "ics", 0 ) /* Samples - (8 bit mono 11025Hz) - */
@@ -1133,14 +1121,14 @@ ROM_START( drgw2100c )
 	PGM_68K_BIOS
 	ROM_LOAD16_WORD_SWAP( "dragon_ii_v-100c.u2",    0x100000, 0x080000, CRC(67467981) SHA1(58af01a3871b6179fe42ff471cc39a2161940043) )
 
-	ROM_REGION( 0xa00000, "tiles",  0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
+	ROM_REGION( 0xa00000, "igs023",  0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
 	PGM_VIDEO_BIOS
 	ROM_LOAD( "pgm_t0200.u7",    0x180000, 0x400000, CRC(b0f6534d) SHA1(174cacd81169a0e0d14790ac06d03caed737e05d) )
 
-	ROM_REGION16_LE( 0x0400000, "sprcol", 0 ) /* Sprite Colour Data */
+	ROM_REGION16_LE( 0x0400000, "igs023:sprcol", 0 ) /* Sprite Colour Data */
 	ROM_LOAD( "pgm_a0200.u5",    0x0000000, 0x400000, CRC(13b95069) SHA1(4888b06002afb18eab81c010e9362629045767af) )
 
-	ROM_REGION16_LE( 0x0400000, "sprmask", 0 ) /* Sprite Masks + Colour Indexes */
+	ROM_REGION16_LE( 0x0400000, "igs023:sprmask", 0 ) /* Sprite Masks + Colour Indexes */
 	ROM_LOAD( "pgm_b0200.u9",    0x0000000, 0x400000, CRC(932d0f13) SHA1(4b8e008f9c617cb2b95effeb81abc065b30e5c86) )
 
 	ROM_REGION( 0x400000, "ics", 0 ) /* Samples - (8 bit mono 11025Hz) - */
@@ -1154,14 +1142,14 @@ ROM_START( drgw2100j )
 	// A cart has been found with same contents but ROM label on sticker is DRAGON II V101J.
 	// Is this correct or wrong sticker applied?
 
-	ROM_REGION( 0xa00000, "tiles",  0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
+	ROM_REGION( 0xa00000, "igs023",  0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
 	PGM_VIDEO_BIOS
 	ROM_LOAD( "pgm_t0200.u7",    0x180000, 0x400000, CRC(b0f6534d) SHA1(174cacd81169a0e0d14790ac06d03caed737e05d) )
 
-	ROM_REGION16_LE( 0x0400000, "sprcol", 0 ) /* Sprite Colour Data */
+	ROM_REGION16_LE( 0x0400000, "igs023:sprcol", 0 ) /* Sprite Colour Data */
 	ROM_LOAD( "pgm_a0200.u5",    0x0000000, 0x400000, CRC(13b95069) SHA1(4888b06002afb18eab81c010e9362629045767af) )
 
-	ROM_REGION16_LE( 0x0400000, "sprmask", 0 ) /* Sprite Masks + Colour Indexes */
+	ROM_REGION16_LE( 0x0400000, "igs023:sprmask", 0 ) /* Sprite Masks + Colour Indexes */
 	ROM_LOAD( "pgm_b0200.u9",    0x0000000, 0x400000, CRC(932d0f13) SHA1(4b8e008f9c617cb2b95effeb81abc065b30e5c86) )
 
 	ROM_REGION( 0x400000, "ics", 0 ) /* Samples - (8 bit mono 11025Hz) - */
@@ -1173,14 +1161,14 @@ ROM_START( drgw2100hk ) // the IGS025 has a "DRAGON-II 0004-1" sticker, the IGS0
 	PGM_68K_BIOS
 	ROM_LOAD16_WORD_SWAP( "dragon_ii_v-100-h.u2",    0x100000, 0x080000, CRC(c6e2e6ec) SHA1(84145dfb26857ea20efb233363f175bc9bb25b0c) )
 
-	ROM_REGION( 0xa00000, "tiles",  0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
+	ROM_REGION( 0xa00000, "igs023",  0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
 	PGM_VIDEO_BIOS
 	ROM_LOAD( "pgm_t0200.u7",    0x180000, 0x400000, CRC(b0f6534d) SHA1(174cacd81169a0e0d14790ac06d03caed737e05d) )
 
-	ROM_REGION16_LE( 0x0400000, "sprcol", 0 ) /* Sprite Colour Data */
+	ROM_REGION16_LE( 0x0400000, "igs023:sprcol", 0 ) /* Sprite Colour Data */
 	ROM_LOAD( "pgm_a0200.u5",    0x0000000, 0x400000, CRC(13b95069) SHA1(4888b06002afb18eab81c010e9362629045767af) )
 
-	ROM_REGION16_LE( 0x0400000, "sprmask", 0 ) /* Sprite Masks + Colour Indexes */
+	ROM_REGION16_LE( 0x0400000, "igs023:sprmask", 0 ) /* Sprite Masks + Colour Indexes */
 	ROM_LOAD( "pgm_b0200.u9",    0x0000000, 0x400000, CRC(932d0f13) SHA1(4b8e008f9c617cb2b95effeb81abc065b30e5c86) )
 
 	ROM_REGION( 0x400000, "ics", 0 ) /* Samples - (8 bit mono 11025Hz) - */
@@ -1225,15 +1213,15 @@ ROM_START( drgw3 )
 	ROM_REGION( 0x010000, "igs022", 0 ) /* Protection Data - is it correct for this set? */
 	ROM_LOAD( "dw3_text_u15.u15", 0x000000, 0x010000, CRC(03dc4fdf) SHA1(b329b04325d4f725231b1bb7862eedef2319b652) )
 
-	ROM_REGION( 0xa00000, "tiles", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
+	ROM_REGION( 0xa00000, "igs023", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
 	PGM_VIDEO_BIOS
 	ROM_LOAD( "pgm_t0400.u18",   0x180000, 0x400000, CRC(b70f3357) SHA1(8733969d7d21f540f295a9f747a4bb8f0d325cf0) )
 
-	ROM_REGION16_LE( 0x2000000, "sprcol", 0 ) /* Sprite Colour Data */
+	ROM_REGION16_LE( 0x2000000, "igs023:sprcol", 0 ) /* Sprite Colour Data */
 	ROM_LOAD( "pgm_a0400.u9",     0x0000000, 0x400000, CRC(dd7bfd40) SHA1(fb7ec5bf89a413c5208716083762a725ff63f5db) ) // FIXED BITS (xxxxxxxx1xxxxxxx)
 	ROM_LOAD( "pgm_a0401.u10",    0x0400000, 0x400000, CRC(cab6557f) SHA1(1904dd86645eea27ac1ab8a2462b20f6531356f8) ) // FIXED BITS (xxxxxxxx1xxxxxxx)
 
-	ROM_REGION16_LE( 0x1000000, "sprmask", 0 ) /* Sprite Masks + Colour Indexes */
+	ROM_REGION16_LE( 0x1000000, "igs023:sprmask", 0 ) /* Sprite Masks + Colour Indexes */
 	ROM_LOAD( "pgm_b0400.u13",    0x0000000, 0x400000,  CRC(4bb87cc0) SHA1(71b2dc43fd11f7a6dffaba501e4e344b843583d8) ) // FIXED BITS (xxxxxxxx1xxxxxxx)
 
 	ROM_REGION( 0x800000, "ics", 0 ) /* Samples - (8 bit mono 11025Hz) - */
@@ -1251,15 +1239,15 @@ ROM_START( drgw3105 )
 	ROM_REGION( 0x010000, "igs022", 0 ) /* Protection Data - is it correct for this set? */
 	ROM_LOAD( "dw3_v100_u15.u15", 0x000000, 0x010000, CRC(03dc4fdf) SHA1(b329b04325d4f725231b1bb7862eedef2319b652) )
 
-	ROM_REGION( 0xa00000, "tiles", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
+	ROM_REGION( 0xa00000, "igs023", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
 	PGM_VIDEO_BIOS
 	ROM_LOAD( "pgm_t0400.u18",   0x180000, 0x400000, CRC(b70f3357) SHA1(8733969d7d21f540f295a9f747a4bb8f0d325cf0) )
 
-	ROM_REGION16_LE( 0x2000000, "sprcol", 0 ) /* Sprite Colour Data */
+	ROM_REGION16_LE( 0x2000000, "igs023:sprcol", 0 ) /* Sprite Colour Data */
 	ROM_LOAD( "pgm_a0400.u9",     0x0000000, 0x400000, CRC(dd7bfd40) SHA1(fb7ec5bf89a413c5208716083762a725ff63f5db) ) // FIXED BITS (xxxxxxxx1xxxxxxx)
 	ROM_LOAD( "pgm_a0401.u10",    0x0400000, 0x400000, CRC(cab6557f) SHA1(1904dd86645eea27ac1ab8a2462b20f6531356f8) ) // FIXED BITS (xxxxxxxx1xxxxxxx)
 
-	ROM_REGION16_LE( 0x1000000, "sprmask", 0 ) /* Sprite Masks + Colour Indexes */
+	ROM_REGION16_LE( 0x1000000, "igs023:sprmask", 0 ) /* Sprite Masks + Colour Indexes */
 	ROM_LOAD( "pgm_b0400.u13",    0x0000000, 0x400000,  CRC(4bb87cc0) SHA1(71b2dc43fd11f7a6dffaba501e4e344b843583d8) ) // FIXED BITS (xxxxxxxx1xxxxxxx)
 
 	ROM_REGION( 0x800000, "ics", 0 ) /* Samples - (8 bit mono 11025Hz) - */
@@ -1276,15 +1264,15 @@ ROM_START( drgw3103 )
 	ROM_REGION( 0x010000, "igs022", 0 ) /* Protection Data */
 	ROM_LOAD( "dw3_v100_u15.u15", 0x000000, 0x010000, CRC(03dc4fdf) SHA1(b329b04325d4f725231b1bb7862eedef2319b652) )
 
-	ROM_REGION( 0xa00000, "tiles", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
+	ROM_REGION( 0xa00000, "igs023", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
 	PGM_VIDEO_BIOS
 	ROM_LOAD( "pgm_t0400.u18",   0x180000, 0x400000, CRC(b70f3357) SHA1(8733969d7d21f540f295a9f747a4bb8f0d325cf0) )
 
-	ROM_REGION16_LE( 0x2000000, "sprcol", 0 ) /* Sprite Colour Data */
+	ROM_REGION16_LE( 0x2000000, "igs023:sprcol", 0 ) /* Sprite Colour Data */
 	ROM_LOAD( "pgm_a0400.u9",     0x0000000, 0x400000, CRC(dd7bfd40) SHA1(fb7ec5bf89a413c5208716083762a725ff63f5db) ) // FIXED BITS (xxxxxxxx1xxxxxxx)
 	ROM_LOAD( "pgm_a0401.u10",    0x0400000, 0x400000, CRC(cab6557f) SHA1(1904dd86645eea27ac1ab8a2462b20f6531356f8) ) // FIXED BITS (xxxxxxxx1xxxxxxx)
 
-	ROM_REGION16_LE( 0x1000000, "sprmask", 0 ) /* Sprite Masks + Colour Indexes */
+	ROM_REGION16_LE( 0x1000000, "igs023:sprmask", 0 ) /* Sprite Masks + Colour Indexes */
 	ROM_LOAD( "pgm_b0400.u13",    0x0000000, 0x400000,  CRC(4bb87cc0) SHA1(71b2dc43fd11f7a6dffaba501e4e344b843583d8) ) // FIXED BITS (xxxxxxxx1xxxxxxx)
 
 	ROM_REGION( 0x800000, "ics", 0 ) /* Samples - (8 bit mono 11025Hz) - */
@@ -1343,15 +1331,15 @@ ROM_START( drgw3100 )
 	ROM_REGION( 0x010000, "igs022", 0 ) /* Protection Data */
 	ROM_LOAD( "dw3_v100_u15.u15", 0x000000, 0x010000, CRC(03dc4fdf) SHA1(b329b04325d4f725231b1bb7862eedef2319b652) )
 
-	ROM_REGION( 0xa00000, "tiles", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
+	ROM_REGION( 0xa00000, "igs023", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
 	PGM_VIDEO_BIOS
 	ROM_LOAD( "pgm_t0400.u18",   0x180000, 0x400000, CRC(b70f3357) SHA1(8733969d7d21f540f295a9f747a4bb8f0d325cf0) )
 
-	ROM_REGION16_LE( 0x2000000, "sprcol", 0 ) /* Sprite Colour Data */
+	ROM_REGION16_LE( 0x2000000, "igs023:sprcol", 0 ) /* Sprite Colour Data */
 	ROM_LOAD( "pgm_a0400.u9",     0x0000000, 0x400000, CRC(dd7bfd40) SHA1(fb7ec5bf89a413c5208716083762a725ff63f5db) ) // FIXED BITS (xxxxxxxx1xxxxxxx)
 	ROM_LOAD( "pgm_a0401.u10",    0x0400000, 0x400000, CRC(cab6557f) SHA1(1904dd86645eea27ac1ab8a2462b20f6531356f8) ) // FIXED BITS (xxxxxxxx1xxxxxxx)
 
-	ROM_REGION16_LE( 0x1000000, "sprmask", 0 ) /* Sprite Masks + Colour Indexes */
+	ROM_REGION16_LE( 0x1000000, "igs023:sprmask", 0 ) /* Sprite Masks + Colour Indexes */
 	ROM_LOAD( "pgm_b0400.u13",    0x0000000, 0x400000,  CRC(4bb87cc0) SHA1(71b2dc43fd11f7a6dffaba501e4e344b843583d8) ) // FIXED BITS (xxxxxxxx1xxxxxxx)
 
 	ROM_REGION( 0x800000, "ics", 0 ) /* Samples - (8 bit mono 11025Hz) - */
@@ -1395,15 +1383,15 @@ ROM_START( dwex )
 	ROM_REGION( 0x010000, "igs022", 0 ) /* Protection Data */
 	ROM_LOAD( "dwiii_data_u15.u15", 0x000000, 0x010000, CRC(03dc4fdf) SHA1(b329b04325d4f725231b1bb7862eedef2319b652) )
 
-	ROM_REGION( 0x500000, "tiles", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
+	ROM_REGION( 0x500000, "igs023", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
 	PGM_VIDEO_BIOS
 	ROM_LOAD( "pgm_t0400.u18", 0x180000, 0x200000, CRC(9ecc950d) SHA1(fd97f43818a3eb18254636166871fa09bd0d6c07) )
 
-	ROM_REGION16_LE( 0x2000000, "sprcol", 0 ) /* Sprite Colour Data */
+	ROM_REGION16_LE( 0x2000000, "igs023:sprcol", 0 ) /* Sprite Colour Data */
 	ROM_LOAD( "pgm_a0400.u9",     0x0000000, 0x400000, CRC(dd7bfd40) SHA1(fb7ec5bf89a413c5208716083762a725ff63f5db) )
 	ROM_LOAD( "pgm_a0401.u10",    0x0400000, 0x200000, CRC(d36c06a4) SHA1(f192e8bfdfbe3d82a49d8f0d3cb0603e39719773) )
 
-	ROM_REGION16_LE( 0x1000000, "sprmask", 0 ) /* Sprite Masks + Colour Indexes */
+	ROM_REGION16_LE( 0x1000000, "igs023:sprmask", 0 ) /* Sprite Masks + Colour Indexes */
 	ROM_LOAD( "pgm_b0400.u13",    0x0000000, 0x400000,  CRC(4bb87cc0) SHA1(71b2dc43fd11f7a6dffaba501e4e344b843583d8) )
 
 	ROM_REGION( 0x800000, "ics", 0 ) /* Samples - (8 bit mono 11025Hz) - */
@@ -1420,15 +1408,15 @@ ROM_START( dwex101cn )
 	ROM_REGION( 0x010000, "igs022", 0 ) /* Protection Data */
 	ROM_LOAD( "dwiii_data_u15.u15", 0x000000, 0x010000, CRC(03dc4fdf) SHA1(b329b04325d4f725231b1bb7862eedef2319b652) )
 
-	ROM_REGION( 0x500000, "tiles", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
+	ROM_REGION( 0x500000, "igs023", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
 	PGM_VIDEO_BIOS
 	ROM_LOAD( "pgm_t0400.u18", 0x180000, 0x200000, CRC(9ecc950d) SHA1(fd97f43818a3eb18254636166871fa09bd0d6c07) )
 
-	ROM_REGION16_LE( 0x2000000, "sprcol", 0 ) /* Sprite Colour Data */
+	ROM_REGION16_LE( 0x2000000, "igs023:sprcol", 0 ) /* Sprite Colour Data */
 	ROM_LOAD( "pgm_a0400.u9",     0x0000000, 0x400000, CRC(dd7bfd40) SHA1(fb7ec5bf89a413c5208716083762a725ff63f5db) )
 	ROM_LOAD( "pgm_a0401.u10",    0x0400000, 0x200000, CRC(d36c06a4) SHA1(f192e8bfdfbe3d82a49d8f0d3cb0603e39719773) )
 
-	ROM_REGION16_LE( 0x1000000, "sprmask", 0 ) /* Sprite Masks + Colour Indexes */
+	ROM_REGION16_LE( 0x1000000, "igs023:sprmask", 0 ) /* Sprite Masks + Colour Indexes */
 	ROM_LOAD( "pgm_b0400.u13",    0x0000000, 0x400000,  CRC(4bb87cc0) SHA1(71b2dc43fd11f7a6dffaba501e4e344b843583d8) )
 
 	ROM_REGION( 0x800000, "ics", 0 ) /* Samples - (8 bit mono 11025Hz) - */
@@ -1474,17 +1462,17 @@ ROM_START( kov )
 	ROM_REGION( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom */
 	ROM_LOAD( "kov_igs027a.bin", 0x000000, 0x04000, NO_DUMP )
 
-	ROM_REGION( 0xa00000, "tiles", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
+	ROM_REGION( 0xa00000, "igs023", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
 	PGM_VIDEO_BIOS
 	ROM_LOAD( "pgm_t0600.u11",    0x180000, 0x800000, CRC(4acc1ad6) SHA1(0668dbd5e856c2406910c6b7382548b37c631780) )
 
-	ROM_REGION16_LE( 0x2000000, "sprcol", 0 ) /* Sprite Colour Data */
+	ROM_REGION16_LE( 0x2000000, "igs023:sprcol", 0 ) /* Sprite Colour Data */
 	ROM_LOAD( "pgm_a0600.u2",    0x0000000, 0x0800000, CRC(d8167834) SHA1(fa55a99629d03b2ea253392352f70d2c8639a991) ) // FIXED BITS (xxxxxxxx1xxxxxxx)
 	ROM_LOAD( "pgm_a0601.u4",    0x0800000, 0x0800000, CRC(ff7a4373) SHA1(7def9fca7513ad5a117da230bebd2e3c78679041) ) // FIXED BITS (xxxxxxxx1xxxxxxx)
 	ROM_LOAD( "pgm_a0602.u6",    0x1000000, 0x0800000, CRC(e7a32959) SHA1(3d0ed684dc5b269238890836b2ce7ef46aa5265b) ) // FIXED BITS (xxxxxxxx1xxxxxxx)
 	ROM_LOAD( "pgm_a0603.u9",    0x1800000, 0x0400000, CRC(ec31abda) SHA1(ee526655369bae63b0ef0730e9768b765c9950fc) )
 
-	ROM_REGION16_LE( 0x1000000, "sprmask", 0 ) /* Sprite Masks + Colour Indexes */
+	ROM_REGION16_LE( 0x1000000, "igs023:sprmask", 0 ) /* Sprite Masks + Colour Indexes */
 	ROM_LOAD( "pgm_b0600.u5",    0x0000000, 0x0800000, CRC(7d3cd059) SHA1(00cf994b63337e0e4ebe96453daf45f24192af1c) )
 	ROM_LOAD( "pgm_b0601.u7",    0x0800000, 0x0400000, CRC(a0bb1c2f) SHA1(0542348c6e27779e0a98de16f04f9c18158f2b28) )
 
@@ -1501,17 +1489,17 @@ ROM_START( kov115 )
 	ROM_REGION( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom */
 	ROM_LOAD( "kov_igs027a.bin", 0x000000, 0x04000, NO_DUMP )
 
-	ROM_REGION( 0xa00000, "tiles", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
+	ROM_REGION( 0xa00000, "igs023", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
 	PGM_VIDEO_BIOS
 	ROM_LOAD( "pgm_t0600.u11",    0x180000, 0x800000, CRC(4acc1ad6) SHA1(0668dbd5e856c2406910c6b7382548b37c631780) )
 
-	ROM_REGION16_LE( 0x2000000, "sprcol", 0 ) /* Sprite Colour Data */
+	ROM_REGION16_LE( 0x2000000, "igs023:sprcol", 0 ) /* Sprite Colour Data */
 	ROM_LOAD( "pgm_a0600.u2",    0x0000000, 0x0800000, CRC(d8167834) SHA1(fa55a99629d03b2ea253392352f70d2c8639a991) ) // FIXED BITS (xxxxxxxx1xxxxxxx)
 	ROM_LOAD( "pgm_a0601.u4",    0x0800000, 0x0800000, CRC(ff7a4373) SHA1(7def9fca7513ad5a117da230bebd2e3c78679041) ) // FIXED BITS (xxxxxxxx1xxxxxxx)
 	ROM_LOAD( "pgm_a0602.u6",    0x1000000, 0x0800000, CRC(e7a32959) SHA1(3d0ed684dc5b269238890836b2ce7ef46aa5265b) ) // FIXED BITS (xxxxxxxx1xxxxxxx)
 	ROM_LOAD( "pgm_a0603.u9",    0x1800000, 0x0400000, CRC(ec31abda) SHA1(ee526655369bae63b0ef0730e9768b765c9950fc) )
 
-	ROM_REGION16_LE( 0x1000000, "sprmask", 0 ) /* Sprite Masks + Colour Indexes */
+	ROM_REGION16_LE( 0x1000000, "igs023:sprmask", 0 ) /* Sprite Masks + Colour Indexes */
 	ROM_LOAD( "pgm_b0600.u5",    0x0000000, 0x0800000, CRC(7d3cd059) SHA1(00cf994b63337e0e4ebe96453daf45f24192af1c) )
 	ROM_LOAD( "pgm_b0601.u7",    0x0800000, 0x0400000, CRC(a0bb1c2f) SHA1(0542348c6e27779e0a98de16f04f9c18158f2b28) )
 
@@ -1565,17 +1553,17 @@ ROM_START( kov114 )
 	ROM_REGION( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom */
 	ROM_LOAD( "kov_igs027.bin", 0x000000, 0x04000, NO_DUMP ) // IGS 027 55857E 100 9901 HONG KONG
 
-	ROM_REGION( 0xa00000, "tiles", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
+	ROM_REGION( 0xa00000, "igs023", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
 	PGM_VIDEO_BIOS
 	ROM_LOAD( "pgm_t0600.u11",    0x180000, 0x800000, CRC(4acc1ad6) SHA1(0668dbd5e856c2406910c6b7382548b37c631780) )
 
-	ROM_REGION16_LE( 0x2000000, "sprcol", 0 ) /* Sprite Colour Data */
+	ROM_REGION16_LE( 0x2000000, "igs023:sprcol", 0 ) /* Sprite Colour Data */
 	ROM_LOAD( "pgm_a0600.u2",    0x0000000, 0x0800000, CRC(d8167834) SHA1(fa55a99629d03b2ea253392352f70d2c8639a991) ) // FIXED BITS (xxxxxxxx1xxxxxxx)
 	ROM_LOAD( "pgm_a0601.u4",    0x0800000, 0x0800000, CRC(ff7a4373) SHA1(7def9fca7513ad5a117da230bebd2e3c78679041) ) // FIXED BITS (xxxxxxxx1xxxxxxx)
 	ROM_LOAD( "pgm_a0602.u6",    0x1000000, 0x0800000, CRC(e7a32959) SHA1(3d0ed684dc5b269238890836b2ce7ef46aa5265b) ) // FIXED BITS (xxxxxxxx1xxxxxxx)
 	ROM_LOAD( "pgm_a0603.u9",    0x1800000, 0x0400000, CRC(ec31abda) SHA1(ee526655369bae63b0ef0730e9768b765c9950fc) )
 
-	ROM_REGION16_LE( 0x1000000, "sprmask", 0 ) /* Sprite Masks + Colour Indexes */
+	ROM_REGION16_LE( 0x1000000, "igs023:sprmask", 0 ) /* Sprite Masks + Colour Indexes */
 	ROM_LOAD( "pgm_b0600.u5",    0x0000000, 0x0800000, CRC(7d3cd059) SHA1(00cf994b63337e0e4ebe96453daf45f24192af1c) )
 	ROM_LOAD( "pgm_b0601.u7",    0x0800000, 0x0400000, CRC(a0bb1c2f) SHA1(0542348c6e27779e0a98de16f04f9c18158f2b28) )
 
@@ -1630,17 +1618,17 @@ ROM_START( kov111 )
 	ROM_REGION( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom */
 	ROM_LOAD( "kov_igs027a.bin", 0x000000, 0x04000, NO_DUMP )
 
-	ROM_REGION( 0xa00000, "tiles", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
+	ROM_REGION( 0xa00000, "igs023", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
 	PGM_VIDEO_BIOS
 	ROM_LOAD( "pgm_t0600.u11",    0x180000, 0x800000, CRC(4acc1ad6) SHA1(0668dbd5e856c2406910c6b7382548b37c631780) )
 
-	ROM_REGION16_LE( 0x2000000, "sprcol", 0 ) /* Sprite Colour Data */
+	ROM_REGION16_LE( 0x2000000, "igs023:sprcol", 0 ) /* Sprite Colour Data */
 	ROM_LOAD( "pgm_a0600.u2",    0x0000000, 0x0800000, CRC(d8167834) SHA1(fa55a99629d03b2ea253392352f70d2c8639a991) ) // FIXED BITS (xxxxxxxx1xxxxxxx)
 	ROM_LOAD( "pgm_a0601.u4",    0x0800000, 0x0800000, CRC(ff7a4373) SHA1(7def9fca7513ad5a117da230bebd2e3c78679041) ) // FIXED BITS (xxxxxxxx1xxxxxxx)
 	ROM_LOAD( "pgm_a0602.u6",    0x1000000, 0x0800000, CRC(e7a32959) SHA1(3d0ed684dc5b269238890836b2ce7ef46aa5265b) ) // FIXED BITS (xxxxxxxx1xxxxxxx)
 	ROM_LOAD( "pgm_a0603.u9",    0x1800000, 0x0400000, CRC(ec31abda) SHA1(ee526655369bae63b0ef0730e9768b765c9950fc) )
 
-	ROM_REGION16_LE( 0x1000000, "sprmask", 0 ) /* Sprite Masks + Colour Indexes */
+	ROM_REGION16_LE( 0x1000000, "igs023:sprmask", 0 ) /* Sprite Masks + Colour Indexes */
 	ROM_LOAD( "pgm_b0600.u5",    0x0000000, 0x0800000, CRC(7d3cd059) SHA1(00cf994b63337e0e4ebe96453daf45f24192af1c) )
 	ROM_LOAD( "pgm_b0601.u7",    0x0800000, 0x0400000, CRC(a0bb1c2f) SHA1(0542348c6e27779e0a98de16f04f9c18158f2b28) )
 
@@ -1657,17 +1645,17 @@ ROM_START( kovplus )
 	ROM_REGION( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom */
 	ROM_LOAD( "kov_igs027a.bin", 0x000000, 0x04000, NO_DUMP )
 
-	ROM_REGION( 0xa00000, "tiles", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
+	ROM_REGION( 0xa00000, "igs023", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
 	PGM_VIDEO_BIOS
 	ROM_LOAD( "pgm_t0600.u11",    0x180000, 0x800000, CRC(4acc1ad6) SHA1(0668dbd5e856c2406910c6b7382548b37c631780) )
 
-	ROM_REGION16_LE( 0x2000000, "sprcol", 0 ) /* Sprite Colour Data */
+	ROM_REGION16_LE( 0x2000000, "igs023:sprcol", 0 ) /* Sprite Colour Data */
 	ROM_LOAD( "pgm_a0600.u2",    0x0000000, 0x0800000, CRC(d8167834) SHA1(fa55a99629d03b2ea253392352f70d2c8639a991) ) // FIXED BITS (xxxxxxxx1xxxxxxx)
 	ROM_LOAD( "pgm_a0601.u4",    0x0800000, 0x0800000, CRC(ff7a4373) SHA1(7def9fca7513ad5a117da230bebd2e3c78679041) ) // FIXED BITS (xxxxxxxx1xxxxxxx)
 	ROM_LOAD( "pgm_a0602.u6",    0x1000000, 0x0800000, CRC(e7a32959) SHA1(3d0ed684dc5b269238890836b2ce7ef46aa5265b) ) // FIXED BITS (xxxxxxxx1xxxxxxx)
 	ROM_LOAD( "pgm_a0603.u9",    0x1800000, 0x0400000, CRC(ec31abda) SHA1(ee526655369bae63b0ef0730e9768b765c9950fc) )
 
-	ROM_REGION16_LE( 0x1000000, "sprmask", 0 ) /* Sprite Masks + Colour Indexes */
+	ROM_REGION16_LE( 0x1000000, "igs023:sprmask", 0 ) /* Sprite Masks + Colour Indexes */
 	ROM_LOAD( "pgm_b0600.u5",    0x0000000, 0x0800000, CRC(7d3cd059) SHA1(00cf994b63337e0e4ebe96453daf45f24192af1c) )
 	ROM_LOAD( "pgm_b0601.u7",    0x0800000, 0x0400000, CRC(a0bb1c2f) SHA1(0542348c6e27779e0a98de16f04f9c18158f2b28) )
 
@@ -1720,17 +1708,17 @@ ROM_START( kovplusa )
 	ROM_REGION( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom */
 	ROM_LOAD( "kov_igs027a.bin", 0x000000, 0x04000, NO_DUMP )
 
-	ROM_REGION( 0xa00000, "tiles", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
+	ROM_REGION( 0xa00000, "igs023", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
 	PGM_VIDEO_BIOS
 	ROM_LOAD( "pgm_t0600.u11",    0x180000, 0x800000, CRC(4acc1ad6) SHA1(0668dbd5e856c2406910c6b7382548b37c631780) )
 
-	ROM_REGION16_LE( 0x2000000, "sprcol", 0 ) /* Sprite Colour Data */
+	ROM_REGION16_LE( 0x2000000, "igs023:sprcol", 0 ) /* Sprite Colour Data */
 	ROM_LOAD( "pgm_a0600.u2",    0x0000000, 0x0800000, CRC(d8167834) SHA1(fa55a99629d03b2ea253392352f70d2c8639a991) ) // FIXED BITS (xxxxxxxx1xxxxxxx)
 	ROM_LOAD( "pgm_a0601.u4",    0x0800000, 0x0800000, CRC(ff7a4373) SHA1(7def9fca7513ad5a117da230bebd2e3c78679041) ) // FIXED BITS (xxxxxxxx1xxxxxxx)
 	ROM_LOAD( "pgm_a0602.u6",    0x1000000, 0x0800000, CRC(e7a32959) SHA1(3d0ed684dc5b269238890836b2ce7ef46aa5265b) ) // FIXED BITS (xxxxxxxx1xxxxxxx)
 	ROM_LOAD( "pgm_a0603.u9",    0x1800000, 0x0400000, CRC(ec31abda) SHA1(ee526655369bae63b0ef0730e9768b765c9950fc) )
 
-	ROM_REGION16_LE( 0x1000000, "sprmask", 0 ) /* Sprite Masks + Colour Indexes */
+	ROM_REGION16_LE( 0x1000000, "igs023:sprmask", 0 ) /* Sprite Masks + Colour Indexes */
 	ROM_LOAD( "pgm_b0600.u5",    0x0000000, 0x0800000, CRC(7d3cd059) SHA1(00cf994b63337e0e4ebe96453daf45f24192af1c) )
 	ROM_LOAD( "pgm_b0601.u7",    0x0800000, 0x0400000, CRC(a0bb1c2f) SHA1(0542348c6e27779e0a98de16f04f9c18158f2b28) )
 
@@ -1747,17 +1735,17 @@ ROM_START( kovsgqyz )
 	ROM_REGION( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom */
 	ROM_LOAD( "kovsgqyz_igs027a.bin", 0x000000, 0x04000, NO_DUMP ) // bootleg is probably a different device
 
-	ROM_REGION( 0xa00000, "tiles", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
+	ROM_REGION( 0xa00000, "igs023", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
 	PGM_VIDEO_BIOS
 	ROM_LOAD( "pgm_t0600.u11",    0x180000, 0x800000, CRC(4acc1ad6) SHA1(0668dbd5e856c2406910c6b7382548b37c631780) )
 
-	ROM_REGION16_LE( 0x2000000, "sprcol", 0 ) /* Sprite Colour Data */
+	ROM_REGION16_LE( 0x2000000, "igs023:sprcol", 0 ) /* Sprite Colour Data */
 	ROM_LOAD( "pgm_a0600.u2",    0x0000000, 0x0800000, CRC(d8167834) SHA1(fa55a99629d03b2ea253392352f70d2c8639a991) ) // FIXED BITS (xxxxxxxx1xxxxxxx)
 	ROM_LOAD( "pgm_a0601.u4",    0x0800000, 0x0800000, CRC(ff7a4373) SHA1(7def9fca7513ad5a117da230bebd2e3c78679041) ) // FIXED BITS (xxxxxxxx1xxxxxxx)
 	ROM_LOAD( "pgm_a0602.u6",    0x1000000, 0x0800000, CRC(e7a32959) SHA1(3d0ed684dc5b269238890836b2ce7ef46aa5265b) ) // FIXED BITS (xxxxxxxx1xxxxxxx)
 	ROM_LOAD( "qyza0603.rom",    0x1800000, 0x0800000, CRC(c8b92220) SHA1(4f9c43970d92ac8a8f1563021022797ae8e32012) )
 
-	ROM_REGION16_LE( 0x1000000, "sprmask", 0 ) /* Sprite Masks + Colour Indexes */
+	ROM_REGION16_LE( 0x1000000, "igs023:sprmask", 0 ) /* Sprite Masks + Colour Indexes */
 	ROM_LOAD( "pgm_b0600.u5",    0x0000000, 0x0800000, CRC(7d3cd059) SHA1(00cf994b63337e0e4ebe96453daf45f24192af1c) )
 	ROM_LOAD( "qyzb0601.rom",    0x0800000, 0x0800000, CRC(64f55882) SHA1(ab9ac1396587c3d78d06f6ec83cab61d6a9faacd) )
 
@@ -1774,17 +1762,17 @@ ROM_START( kovsgqyza )
 	ROM_REGION( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom */
 	ROM_LOAD( "kovsgqyza_igs027a.bin", 0x000000, 0x04000, NO_DUMP ) // bootleg is probably a different device
 
-	ROM_REGION( 0xa00000, "tiles", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
+	ROM_REGION( 0xa00000, "igs023", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
 	PGM_VIDEO_BIOS
 	ROM_LOAD( "pgm_t0600.u11",    0x180000, 0x800000, CRC(4acc1ad6) SHA1(0668dbd5e856c2406910c6b7382548b37c631780) )
 
-	ROM_REGION16_LE( 0x2000000, "sprcol", 0 ) /* Sprite Colour Data */
+	ROM_REGION16_LE( 0x2000000, "igs023:sprcol", 0 ) /* Sprite Colour Data */
 	ROM_LOAD( "pgm_a0600.u2",    0x0000000, 0x0800000, CRC(d8167834) SHA1(fa55a99629d03b2ea253392352f70d2c8639a991) ) // FIXED BITS (xxxxxxxx1xxxxxxx)
 	ROM_LOAD( "pgm_a0601.u4",    0x0800000, 0x0800000, CRC(ff7a4373) SHA1(7def9fca7513ad5a117da230bebd2e3c78679041) ) // FIXED BITS (xxxxxxxx1xxxxxxx)
 	ROM_LOAD( "pgm_a0602.u6",    0x1000000, 0x0800000, CRC(e7a32959) SHA1(3d0ed684dc5b269238890836b2ce7ef46aa5265b) ) // FIXED BITS (xxxxxxxx1xxxxxxx)
 	ROM_LOAD( "qyza0603.rom",    0x1800000, 0x0800000, CRC(c8b92220) SHA1(4f9c43970d92ac8a8f1563021022797ae8e32012) )
 
-	ROM_REGION16_LE( 0x1000000, "sprmask", 0 ) /* Sprite Masks + Colour Indexes */
+	ROM_REGION16_LE( 0x1000000, "igs023:sprmask", 0 ) /* Sprite Masks + Colour Indexes */
 	ROM_LOAD( "pgm_b0600.u5",    0x0000000, 0x0800000, CRC(7d3cd059) SHA1(00cf994b63337e0e4ebe96453daf45f24192af1c) )
 	ROM_LOAD( "qyzb0601.rom",    0x0800000, 0x0800000, CRC(64f55882) SHA1(ab9ac1396587c3d78d06f6ec83cab61d6a9faacd) )
 
@@ -1801,17 +1789,17 @@ ROM_START( kovsgqyzb )
 	ROM_REGION( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom */
 	ROM_LOAD( "kovsgqyzb_igs027a.bin", 0x000000, 0x04000, NO_DUMP ) // bootleg is probably a different device
 
-	ROM_REGION( 0xa00000, "tiles", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
+	ROM_REGION( 0xa00000, "igs023", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
 	PGM_VIDEO_BIOS
 	ROM_LOAD( "pgm_t0600.u11",    0x180000, 0x800000, CRC(4acc1ad6) SHA1(0668dbd5e856c2406910c6b7382548b37c631780) )
 
-	ROM_REGION16_LE( 0x2000000, "sprcol", 0 ) /* Sprite Colour Data */
+	ROM_REGION16_LE( 0x2000000, "igs023:sprcol", 0 ) /* Sprite Colour Data */
 	ROM_LOAD( "pgm_a0600.u2",    0x0000000, 0x0800000, CRC(d8167834) SHA1(fa55a99629d03b2ea253392352f70d2c8639a991) ) // FIXED BITS (xxxxxxxx1xxxxxxx)
 	ROM_LOAD( "pgm_a0601.u4",    0x0800000, 0x0800000, CRC(ff7a4373) SHA1(7def9fca7513ad5a117da230bebd2e3c78679041) ) // FIXED BITS (xxxxxxxx1xxxxxxx)
 	ROM_LOAD( "pgm_a0602.u6",    0x1000000, 0x0800000, CRC(e7a32959) SHA1(3d0ed684dc5b269238890836b2ce7ef46aa5265b) ) // FIXED BITS (xxxxxxxx1xxxxxxx)
 	ROM_LOAD( "qyza0603.rom",    0x1800000, 0x0800000, CRC(c8b92220) SHA1(4f9c43970d92ac8a8f1563021022797ae8e32012) )
 
-	ROM_REGION16_LE( 0x1000000, "sprmask", 0 ) /* Sprite Masks + Colour Indexes */
+	ROM_REGION16_LE( 0x1000000, "igs023:sprmask", 0 ) /* Sprite Masks + Colour Indexes */
 	ROM_LOAD( "pgm_b0600.u5",    0x0000000, 0x0800000, CRC(7d3cd059) SHA1(00cf994b63337e0e4ebe96453daf45f24192af1c) )
 	ROM_LOAD( "qyzb0601.rom",    0x0800000, 0x0800000, CRC(64f55882) SHA1(ab9ac1396587c3d78d06f6ec83cab61d6a9faacd) )
 
@@ -1829,19 +1817,19 @@ ROM_START( kovsh )
 	ROM_REGION( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom */
 	ROM_LOAD( "kovsh_v100_china.asic", 0x000000, 0x04000,  CRC(0f09a5c1) SHA1(621b38c05f33277608d58b49822aebc930ae4870) )
 
-	ROM_REGION( 0xa00000, "tiles", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
+	ROM_REGION( 0xa00000, "igs023", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
 	PGM_VIDEO_BIOS
 	ROM_LOAD( "pgm_t0600.u11",      0x180000, 0x800000, CRC(4acc1ad6) SHA1(0668dbd5e856c2406910c6b7382548b37c631780) )
 
 	/* all roms below need checking to see if they're the same on this board */
-	ROM_REGION16_LE( 0x2000000, "sprcol", 0 ) /* Sprite Colour Data */
+	ROM_REGION16_LE( 0x2000000, "igs023:sprcol", 0 ) /* Sprite Colour Data */
 	ROM_LOAD( "pgm_a0600.u1",       0x0000000, 0x0800000, CRC(d8167834) SHA1(fa55a99629d03b2ea253392352f70d2c8639a991) ) // FIXED BITS (xxxxxxxx1xxxxxxx)
 	ROM_LOAD( "pgm_a0601.u3",       0x0800000, 0x0800000, CRC(ff7a4373) SHA1(7def9fca7513ad5a117da230bebd2e3c78679041) ) // FIXED BITS (xxxxxxxx1xxxxxxx)
 	ROM_LOAD( "pgm_a0602.u5",       0x1000000, 0x0800000, CRC(e7a32959) SHA1(3d0ed684dc5b269238890836b2ce7ef46aa5265b) ) // FIXED BITS (xxxxxxxx1xxxxxxx)
 	ROM_LOAD( "pgm_a0613.u7",       0x1800000, 0x0400000, CRC(ec31abda) SHA1(ee526655369bae63b0ef0730e9768b765c9950fc) )
 	ROM_LOAD( "pgm_a0604_v200.u9",  0x1a00000, 0x0400000, CRC(26b59fd3) SHA1(53219376056f4766dc5236735599d982ceb56b84) )
 
-	ROM_REGION16_LE( 0x1000000, "sprmask", 0 ) /* Sprite Masks + Colour Indexes */
+	ROM_REGION16_LE( 0x1000000, "igs023:sprmask", 0 ) /* Sprite Masks + Colour Indexes */
 	ROM_LOAD( "pgm_b0600.u6",       0x0000000, 0x0800000, CRC(7d3cd059) SHA1(00cf994b63337e0e4ebe96453daf45f24192af1c) )
 	ROM_LOAD( "pgm_b0601.u8",       0x0800000, 0x0400000, CRC(a0bb1c2f) SHA1(0542348c6e27779e0a98de16f04f9c18158f2b28) )
 	ROM_LOAD( "pgm_b0602_v200.u10", 0x0c00000, 0x0100000, CRC(9df77934) SHA1(99a3fe337c13702c9aa2373bcd1bb1befd0e2a13) )
@@ -1859,19 +1847,19 @@ ROM_START( kovsh103 )
 	ROM_REGION( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom */
 	ROM_LOAD( "kovsh_v100_china.asic", 0x000000, 0x04000,  CRC(0f09a5c1) SHA1(621b38c05f33277608d58b49822aebc930ae4870) )
 
-	ROM_REGION( 0xa00000, "tiles", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
+	ROM_REGION( 0xa00000, "igs023", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
 	PGM_VIDEO_BIOS
 	ROM_LOAD( "pgm_t0600.u11",      0x180000, 0x800000, CRC(4acc1ad6) SHA1(0668dbd5e856c2406910c6b7382548b37c631780) )
 
 	/* all roms below need checking to see if they're the same on this board */
-	ROM_REGION16_LE( 0x2000000, "sprcol", 0 ) /* Sprite Colour Data */
+	ROM_REGION16_LE( 0x2000000, "igs023:sprcol", 0 ) /* Sprite Colour Data */
 	ROM_LOAD( "pgm_a0600.u1",       0x0000000, 0x0800000, CRC(d8167834) SHA1(fa55a99629d03b2ea253392352f70d2c8639a991) ) // FIXED BITS (xxxxxxxx1xxxxxxx)
 	ROM_LOAD( "pgm_a0601.u3",       0x0800000, 0x0800000, CRC(ff7a4373) SHA1(7def9fca7513ad5a117da230bebd2e3c78679041) ) // FIXED BITS (xxxxxxxx1xxxxxxx)
 	ROM_LOAD( "pgm_a0602.u5",       0x1000000, 0x0800000, CRC(e7a32959) SHA1(3d0ed684dc5b269238890836b2ce7ef46aa5265b) ) // FIXED BITS (xxxxxxxx1xxxxxxx)
 	ROM_LOAD( "pgm_a0613.u7",       0x1800000, 0x0400000, CRC(ec31abda) SHA1(ee526655369bae63b0ef0730e9768b765c9950fc) )
 	ROM_LOAD( "pgm_a0604_v200.u9",  0x1a00000, 0x0400000, CRC(26b59fd3) SHA1(53219376056f4766dc5236735599d982ceb56b84) )
 
-	ROM_REGION16_LE( 0x1000000, "sprmask", 0 ) /* Sprite Masks + Colour Indexes */
+	ROM_REGION16_LE( 0x1000000, "igs023:sprmask", 0 ) /* Sprite Masks + Colour Indexes */
 	ROM_LOAD( "pgm_b0600.u6",       0x0000000, 0x0800000, CRC(7d3cd059) SHA1(00cf994b63337e0e4ebe96453daf45f24192af1c) )
 	ROM_LOAD( "pgm_b0601.u8",       0x0800000, 0x0400000, CRC(a0bb1c2f) SHA1(0542348c6e27779e0a98de16f04f9c18158f2b28) )
 	ROM_LOAD( "pgm_b0602_v200.u10", 0x0c00000, 0x0100000, CRC(9df77934) SHA1(99a3fe337c13702c9aa2373bcd1bb1befd0e2a13) )
@@ -1889,19 +1877,19 @@ ROM_START( kovsh102 )
 	ROM_REGION( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom */
 	ROM_LOAD( "kovsh_v100_china.asic", 0x000000, 0x04000,  CRC(0f09a5c1) SHA1(621b38c05f33277608d58b49822aebc930ae4870) )
 
-	ROM_REGION( 0xa00000, "tiles", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
+	ROM_REGION( 0xa00000, "igs023", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
 	PGM_VIDEO_BIOS
 	ROM_LOAD( "pgm_t0600.u11",      0x180000, 0x800000, CRC(4acc1ad6) SHA1(0668dbd5e856c2406910c6b7382548b37c631780) )
 
 	/* all roms below need checking to see if they're the same on this board */
-	ROM_REGION16_LE( 0x2000000, "sprcol", 0 ) /* Sprite Colour Data */
+	ROM_REGION16_LE( 0x2000000, "igs023:sprcol", 0 ) /* Sprite Colour Data */
 	ROM_LOAD( "pgm_a0600.u1",       0x0000000, 0x0800000, CRC(d8167834) SHA1(fa55a99629d03b2ea253392352f70d2c8639a991) ) // FIXED BITS (xxxxxxxx1xxxxxxx)
 	ROM_LOAD( "pgm_a0601.u3",       0x0800000, 0x0800000, CRC(ff7a4373) SHA1(7def9fca7513ad5a117da230bebd2e3c78679041) ) // FIXED BITS (xxxxxxxx1xxxxxxx)
 	ROM_LOAD( "pgm_a0602.u5",       0x1000000, 0x0800000, CRC(e7a32959) SHA1(3d0ed684dc5b269238890836b2ce7ef46aa5265b) ) // FIXED BITS (xxxxxxxx1xxxxxxx)
 	ROM_LOAD( "pgm_a0613.u7",       0x1800000, 0x0400000, CRC(ec31abda) SHA1(ee526655369bae63b0ef0730e9768b765c9950fc) )
 	ROM_LOAD( "pgm_a0604_v200.u9",  0x1a00000, 0x0400000, CRC(26b59fd3) SHA1(53219376056f4766dc5236735599d982ceb56b84) )
 
-	ROM_REGION16_LE( 0x1000000, "sprmask", 0 ) /* Sprite Masks + Colour Indexes */
+	ROM_REGION16_LE( 0x1000000, "igs023:sprmask", 0 ) /* Sprite Masks + Colour Indexes */
 	ROM_LOAD( "pgm_b0600.u6",       0x0000000, 0x0800000, CRC(7d3cd059) SHA1(00cf994b63337e0e4ebe96453daf45f24192af1c) )
 	ROM_LOAD( "pgm_b0601.u8",       0x0800000, 0x0400000, CRC(a0bb1c2f) SHA1(0542348c6e27779e0a98de16f04f9c18158f2b28) )
 	ROM_LOAD( "pgm_b0602_v200.u10", 0x0c00000, 0x0100000, CRC(9df77934) SHA1(99a3fe337c13702c9aa2373bcd1bb1befd0e2a13) )
@@ -1919,19 +1907,19 @@ ROM_START( kovsh101 )
 	ROM_REGION( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom */
 	ROM_LOAD( "kovsh_v100_china.asic", 0x000000, 0x04000,  CRC(0f09a5c1) SHA1(621b38c05f33277608d58b49822aebc930ae4870) )
 
-	ROM_REGION( 0xa00000, "tiles", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
+	ROM_REGION( 0xa00000, "igs023", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
 	PGM_VIDEO_BIOS
 	ROM_LOAD( "pgm_t0600.u11",      0x180000, 0x800000, CRC(4acc1ad6) SHA1(0668dbd5e856c2406910c6b7382548b37c631780) )
 
 	/* all roms below need checking to see if they're the same on this board */
-	ROM_REGION16_LE( 0x2000000, "sprcol", 0 ) /* Sprite Colour Data */
+	ROM_REGION16_LE( 0x2000000, "igs023:sprcol", 0 ) /* Sprite Colour Data */
 	ROM_LOAD( "pgm_a0600.u1",       0x0000000, 0x0800000, CRC(d8167834) SHA1(fa55a99629d03b2ea253392352f70d2c8639a991) ) // FIXED BITS (xxxxxxxx1xxxxxxx)
 	ROM_LOAD( "pgm_a0601.u3",       0x0800000, 0x0800000, CRC(ff7a4373) SHA1(7def9fca7513ad5a117da230bebd2e3c78679041) ) // FIXED BITS (xxxxxxxx1xxxxxxx)
 	ROM_LOAD( "pgm_a0602.u5",       0x1000000, 0x0800000, CRC(e7a32959) SHA1(3d0ed684dc5b269238890836b2ce7ef46aa5265b) ) // FIXED BITS (xxxxxxxx1xxxxxxx)
 	ROM_LOAD( "pgm_a0613.u7",       0x1800000, 0x0400000, CRC(ec31abda) SHA1(ee526655369bae63b0ef0730e9768b765c9950fc) )
 	ROM_LOAD( "pgm_a0604_v200.u9",  0x1a00000, 0x0400000, CRC(26b59fd3) SHA1(53219376056f4766dc5236735599d982ceb56b84) )
 
-	ROM_REGION16_LE( 0x1000000, "sprmask", 0 ) /* Sprite Masks + Colour Indexes */
+	ROM_REGION16_LE( 0x1000000, "igs023:sprmask", 0 ) /* Sprite Masks + Colour Indexes */
 	ROM_LOAD( "pgm_b0600.u6",       0x0000000, 0x0800000, CRC(7d3cd059) SHA1(00cf994b63337e0e4ebe96453daf45f24192af1c) )
 	ROM_LOAD( "pgm_b0601.u8",       0x0800000, 0x0400000, CRC(a0bb1c2f) SHA1(0542348c6e27779e0a98de16f04f9c18158f2b28) )
 	ROM_LOAD( "pgm_b0602_v200.u10", 0x0c00000, 0x0100000, CRC(9df77934) SHA1(99a3fe337c13702c9aa2373bcd1bb1befd0e2a13) )
@@ -1949,19 +1937,19 @@ ROM_START( kovsh100 )
 	ROM_REGION( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom */
 	ROM_LOAD( "kovsh_v100_china.asic", 0x000000, 0x04000,  CRC(0f09a5c1) SHA1(621b38c05f33277608d58b49822aebc930ae4870) )
 
-	ROM_REGION( 0xa00000, "tiles", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
+	ROM_REGION( 0xa00000, "igs023", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
 	PGM_VIDEO_BIOS
 	ROM_LOAD( "pgm_t0600.u11",      0x180000, 0x800000, CRC(4acc1ad6) SHA1(0668dbd5e856c2406910c6b7382548b37c631780) )
 
 	/* all roms below need checking to see if they're the same on this board */
-	ROM_REGION16_LE( 0x2000000, "sprcol", 0 ) /* Sprite Colour Data */
+	ROM_REGION16_LE( 0x2000000, "igs023:sprcol", 0 ) /* Sprite Colour Data */
 	ROM_LOAD( "pgm_a0600.u1",       0x0000000, 0x0800000, CRC(d8167834) SHA1(fa55a99629d03b2ea253392352f70d2c8639a991) ) // FIXED BITS (xxxxxxxx1xxxxxxx)
 	ROM_LOAD( "pgm_a0601.u3",       0x0800000, 0x0800000, CRC(ff7a4373) SHA1(7def9fca7513ad5a117da230bebd2e3c78679041) ) // FIXED BITS (xxxxxxxx1xxxxxxx)
 	ROM_LOAD( "pgm_a0602.u5",       0x1000000, 0x0800000, CRC(e7a32959) SHA1(3d0ed684dc5b269238890836b2ce7ef46aa5265b) ) // FIXED BITS (xxxxxxxx1xxxxxxx)
 	ROM_LOAD( "pgm_a0613.u7",       0x1800000, 0x0400000, CRC(ec31abda) SHA1(ee526655369bae63b0ef0730e9768b765c9950fc) )
 	ROM_LOAD( "pgm_a0604_v200.u9",  0x1a00000, 0x0400000, CRC(26b59fd3) SHA1(53219376056f4766dc5236735599d982ceb56b84) )
 
-	ROM_REGION16_LE( 0x1000000, "sprmask", 0 ) /* Sprite Masks + Colour Indexes */
+	ROM_REGION16_LE( 0x1000000, "igs023:sprmask", 0 ) /* Sprite Masks + Colour Indexes */
 	ROM_LOAD( "pgm_b0600.u6",       0x0000000, 0x0800000, CRC(7d3cd059) SHA1(00cf994b63337e0e4ebe96453daf45f24192af1c) )
 	ROM_LOAD( "pgm_b0601.u8",       0x0800000, 0x0400000, CRC(a0bb1c2f) SHA1(0542348c6e27779e0a98de16f04f9c18158f2b28) )
 	ROM_LOAD( "pgm_b0602_v200.u10", 0x0c00000, 0x0100000, CRC(9df77934) SHA1(99a3fe337c13702c9aa2373bcd1bb1befd0e2a13) )
@@ -1979,17 +1967,17 @@ ROM_START( kovqhsgs )
 	ROM_REGION( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom */
 	ROM_LOAD( "qhsg_prot.c51", 0x000000, 0x04000, BAD_DUMP CRC(0f09a5c1) SHA1(621b38c05f33277608d58b49822aebc930ae4870) )
 
-	ROM_REGION( 0xa00000, "tiles",  0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
+	ROM_REGION( 0xa00000, "igs023",  0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
 	PGM_VIDEO_BIOS
 	ROM_LOAD( "lsqh2_t01.rom",0x180000, 0x800000, CRC(d498d97f) SHA1(97a7b6d2ed1170449e7c2899448af7cbbca4c94f) )
 	ROM_IGNORE( 0x800000 )  // second half identical
 
-	ROM_REGION16_LE( 0x4000000, "sprcol", 0 ) /* Sprite Colour Data */
+	ROM_REGION16_LE( 0x4000000, "igs023:sprcol", 0 ) /* Sprite Colour Data */
 	ROM_LOAD( "lsqh2_a01.rom", 0x0000000, 0x1000000, CRC(25ae3efd) SHA1(083d977602ddb5ad54fbdcba000cd4287de8d463) )
 	ROM_LOAD( "lsqh2_a23.rom", 0x1000000, 0x1000000, CRC(7a779112) SHA1(0a7d36b3715063d8eac629b95a9bb3ecd8e54fca) )
 	ROM_LOAD( "lsqh2_a45.rom", 0x2000000, 0x1000000, CRC(5d7de052) SHA1(7663b6cf09f65c4644661005a38f9aba84a32913) )
 
-	ROM_REGION16_LE( 0x1000000, "sprmask", 0 ) /* Sprite Masks + Colour Indexes */
+	ROM_REGION16_LE( 0x1000000, "igs023:sprmask", 0 ) /* Sprite Masks + Colour Indexes */
 	ROM_LOAD( "lsqh2_b01.rom", 0x0000000, 0x1000000, CRC(df7ca696) SHA1(7af3d27957a39de7e4873867c9972c05af7e7964) )
 
 	ROM_REGION( 0xc00000, "ics", 0 ) /* Samples - (8 bit mono 11025Hz) - */
@@ -2020,16 +2008,16 @@ ROM_START( photoy2k )
 	ROM_REGION( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom */
 	ROM_LOAD( "igs027a_photoy2k_v100_china.asic", 0x000000, 0x04000, CRC(1a0b68f6) SHA1(290441ed652f54b26ace8f59a26220881fb62084) ) // 3 bytes differ from the read in the other sets.  I think this one is GOOD and the other is bad.  This always gives the same read, so unless the actual chips is bad... TBC
 
-	ROM_REGION( 0x280000, "tiles", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
+	ROM_REGION( 0x280000, "igs023", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
 	PGM_VIDEO_BIOS
 	ROM_LOAD( "pgm_t0700.u11",   0x180000, 0x080000, CRC(93943b4d) SHA1(3b439903853727d45d62c781af6073024eb3c5a3) )
 
-	ROM_REGION16_LE( 0x2000000, "sprcol", 0 ) /* Sprite Colour Data */
+	ROM_REGION16_LE( 0x2000000, "igs023:sprcol", 0 ) /* Sprite Colour Data */
 	ROM_LOAD( "pgm_a0700.u2",    0x0000000, 0x0800000, CRC(503c855b) SHA1(aa910cc33a23ac8f1c91f88da388ed92e49fa1b8) )
 	ROM_LOAD( "pgm_a0701.u4",    0x0800000, 0x0800000, CRC(845e11a8) SHA1(9e35d0e6620acd023eba83f86d970e9895204767) )
 	ROM_LOAD( "pgm_a0702.u3",    0x1000000, 0x0080000, CRC(42239e1b) SHA1(2b6d20958abf8a67ce525d5c8964b6d225ccaeda) )
 
-	ROM_REGION16_LE( 0x1000000, "sprmask", 0 ) /* Sprite Masks + Colour Indexes */
+	ROM_REGION16_LE( 0x1000000, "igs023:sprmask", 0 ) /* Sprite Masks + Colour Indexes */
 	ROM_LOAD( "pgm_b0700.u7",            0x0000000, 0x0800000, CRC(8cd027f6) SHA1(e377c64facbf657f58b8567d8b483ca067967fc0) )
 	ROM_LOAD( "photo_y2k_cg_v101_u6.u6", 0x0800000, 0x0020000, CRC(da02ec3e) SHA1(7ee21d748c9b932f53e790a9040167f904fecefc) )
 
@@ -2047,16 +2035,16 @@ ROM_START( photoy2k104 )
 	ROM_REGION( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom */
 	ROM_LOAD( "igs027a_photoy2k_v100_china_alt.asic", 0x000000, 0x04000,  CRC(6dd7f257) SHA1(1984f98a282d8b3264674f231c3b7def1757cf72) )
 
-	ROM_REGION( 0x280000, "tiles", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
+	ROM_REGION( 0x280000, "igs023", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
 	PGM_VIDEO_BIOS
 	ROM_LOAD( "pgm_t0700.u11",   0x180000, 0x080000, CRC(93943b4d) SHA1(3b439903853727d45d62c781af6073024eb3c5a3) )
 
-	ROM_REGION16_LE( 0x2000000, "sprcol", 0 ) /* Sprite Colour Data */
+	ROM_REGION16_LE( 0x2000000, "igs023:sprcol", 0 ) /* Sprite Colour Data */
 	ROM_LOAD( "pgm_a0700.u2",    0x0000000, 0x0800000, CRC(503c855b) SHA1(aa910cc33a23ac8f1c91f88da388ed92e49fa1b8) )
 	ROM_LOAD( "pgm_a0701.u4",    0x0800000, 0x0800000, CRC(845e11a8) SHA1(9e35d0e6620acd023eba83f86d970e9895204767) )
 	ROM_LOAD( "pgm_a0702.u3",    0x1000000, 0x0080000, CRC(42239e1b) SHA1(2b6d20958abf8a67ce525d5c8964b6d225ccaeda) )
 
-	ROM_REGION16_LE( 0x1000000, "sprmask", 0 ) /* Sprite Masks + Colour Indexes */
+	ROM_REGION16_LE( 0x1000000, "igs023:sprmask", 0 ) /* Sprite Masks + Colour Indexes */
 	ROM_LOAD( "pgm_b0700.u7",            0x0000000, 0x0800000, CRC(8cd027f6) SHA1(e377c64facbf657f58b8567d8b483ca067967fc0) )
 	ROM_LOAD( "photo_y2k_cg_v101_u6.u6", 0x0800000, 0x0020000, CRC(da02ec3e) SHA1(7ee21d748c9b932f53e790a9040167f904fecefc) )
 
@@ -2077,16 +2065,16 @@ ROM_START( photoy2k103j )
 	ROM_REGION( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom */
 	ROM_LOAD( "igs027a_photoy2k_v100_china.asic", 0x000000, 0x04000, CRC(1a0b68f6) SHA1(290441ed652f54b26ace8f59a26220881fb62084) )
 
-	ROM_REGION( 0x280000, "tiles", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
+	ROM_REGION( 0x280000, "igs023", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
 	PGM_VIDEO_BIOS
 	ROM_LOAD( "pgm_t0700.u11",   0x180000, 0x080000, CRC(93943b4d) SHA1(3b439903853727d45d62c781af6073024eb3c5a3) )
 
-	ROM_REGION16_LE( 0x2000000, "sprcol", 0 ) /* Sprite Colour Data */
+	ROM_REGION16_LE( 0x2000000, "igs023:sprcol", 0 ) /* Sprite Colour Data */
 	ROM_LOAD( "pgm_a0700.u2",            0x0000000, 0x0800000, CRC(503c855b) SHA1(aa910cc33a23ac8f1c91f88da388ed92e49fa1b8) )
 	ROM_LOAD( "pgm_a0701.u4",            0x0800000, 0x0800000, CRC(845e11a8) SHA1(9e35d0e6620acd023eba83f86d970e9895204767) )
 	ROM_LOAD( "photo_yk2_cg_v101_u3.u3", 0x1000000, 0x0080000, CRC(42239e1b) SHA1(2b6d20958abf8a67ce525d5c8964b6d225ccaeda) )
 
-	ROM_REGION16_LE( 0x1000000, "sprmask", 0 ) /* Sprite Masks + Colour Indexes */
+	ROM_REGION16_LE( 0x1000000, "igs023:sprmask", 0 ) /* Sprite Masks + Colour Indexes */
 	ROM_LOAD( "pgm_b0700.u7",            0x0000000, 0x0800000, CRC(8cd027f6) SHA1(e377c64facbf657f58b8567d8b483ca067967fc0) )
 	ROM_LOAD( "photo_y2k_cg_v101_u6.u6", 0x0800000, 0x0020000, CRC(da02ec3e) SHA1(7ee21d748c9b932f53e790a9040167f904fecefc) )
 
@@ -2137,16 +2125,16 @@ ROM_START( photoy2k102j )
 	ROM_REGION( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom */
 	ROM_LOAD( "igs027a_photoy2k_v100_china_alt.asic", 0x000000, 0x04000,  CRC(6dd7f257) SHA1(1984f98a282d8b3264674f231c3b7def1757cf72) )
 
-	ROM_REGION( 0x280000, "tiles", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
+	ROM_REGION( 0x280000, "igs023", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
 	PGM_VIDEO_BIOS
 	ROM_LOAD( "pgm_t0700.u11",   0x180000, 0x080000, CRC(93943b4d) SHA1(3b439903853727d45d62c781af6073024eb3c5a3) )
 
-	ROM_REGION16_LE( 0x2000000, "sprcol", 0 ) /* Sprite Colour Data */
+	ROM_REGION16_LE( 0x2000000, "igs023:sprcol", 0 ) /* Sprite Colour Data */
 	ROM_LOAD( "pgm_a0700.u2",    0x0000000, 0x0800000, CRC(503c855b) SHA1(aa910cc33a23ac8f1c91f88da388ed92e49fa1b8) )
 	ROM_LOAD( "pgm_a0701.u4",    0x0800000, 0x0800000, CRC(845e11a8) SHA1(9e35d0e6620acd023eba83f86d970e9895204767) )
 	ROM_LOAD( "pgm_a0702.u3",    0x1000000, 0x0080000, CRC(42239e1b) SHA1(2b6d20958abf8a67ce525d5c8964b6d225ccaeda) )
 
-	ROM_REGION16_LE( 0x1000000, "sprmask", 0 ) /* Sprite Masks + Colour Indexes */
+	ROM_REGION16_LE( 0x1000000, "igs023:sprmask", 0 ) /* Sprite Masks + Colour Indexes */
 	ROM_LOAD( "pgm_b0700.u7",            0x0000000, 0x0800000, CRC(8cd027f6) SHA1(e377c64facbf657f58b8567d8b483ca067967fc0) )
 	ROM_LOAD( "photo_y2k_cg_v101_u6.u6", 0x0800000, 0x0020000, CRC(da02ec3e) SHA1(7ee21d748c9b932f53e790a9040167f904fecefc) )
 
@@ -2183,17 +2171,17 @@ ROM_START( py2k2 )
 	ROM_REGION( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom */
 	ROM_LOAD( "igs027a_photoy2k2.asic", 0x000000, 0x04000, NO_DUMP )
 
-	ROM_REGION( 0x280000, "tiles", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
+	ROM_REGION( 0x280000, "igs023", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
 	PGM_VIDEO_BIOS
 	/* no extra tilemap rom */
 
-	ROM_REGION16_LE( 0x2000000, "sprcol", 0 ) /* Sprite Colour Data */
+	ROM_REGION16_LE( 0x2000000, "igs023:sprcol", 0 ) /* Sprite Colour Data */
 	ROM_LOAD( "pgm_a1100.u6",    0x0000000, 0x0800000, CRC(e32ce499) SHA1(f84c7daa55c25a05da467b5654ebf432b7ce1754) )
 	ROM_LOAD( "pgm_a1101.u7",    0x0800000, 0x0800000, CRC(4e7568bc) SHA1(bf9cc453191bd5ec9fbcce62891809f253a44267) )
 	ROM_LOAD( "pgm_a1102.u8",    0x1000000, 0x0800000, CRC(6da7c143) SHA1(9408ba7722bfc8013f851aadea5e2819f5263129) )
 	ROM_LOAD( "pgm_a1103.u9",    0x1800000, 0x0800000, CRC(0ebebfdc) SHA1(4faad7f97c7e734f179ec934a37e75d8d6adccf4) )
 
-	ROM_REGION16_LE( 0x1000000, "sprmask", 0 ) /* Sprite Masks + Colour Indexes */
+	ROM_REGION16_LE( 0x1000000, "igs023:sprmask", 0 ) /* Sprite Masks + Colour Indexes */
 	ROM_LOAD( "pgm_b1100.u4",    0x0000000, 0x0800000,  CRC(fa53d6f6) SHA1(c2da55f4b7e721fa1c63bd7f9528f261643164e8) )
 	ROM_LOAD( "pgm_b1101.u5",    0x0800000, 0x0800000, CRC(001e4c81) SHA1(21119055f8fd7f831529e73ff9c97bca3987a1dc))
 
@@ -2210,17 +2198,17 @@ ROM_START( py2k2100 )
 	ROM_REGION( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom */
 	ROM_LOAD( "igs027a_photoy2k2.asic", 0x000000, 0x04000, NO_DUMP )
 
-	ROM_REGION( 0x280000, "tiles", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
+	ROM_REGION( 0x280000, "igs023", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
 	PGM_VIDEO_BIOS
 	/* no extra tilemap rom */
 
-	ROM_REGION16_LE( 0x2000000, "sprcol", 0 ) /* Sprite Colour Data */
+	ROM_REGION16_LE( 0x2000000, "igs023:sprcol", 0 ) /* Sprite Colour Data */
 	ROM_LOAD( "pgm_a1100.u6",    0x0000000, 0x0800000, CRC(e32ce499) SHA1(f84c7daa55c25a05da467b5654ebf432b7ce1754) )
 	ROM_LOAD( "pgm_a1101.u7",    0x0800000, 0x0800000, CRC(4e7568bc) SHA1(bf9cc453191bd5ec9fbcce62891809f253a44267) )
 	ROM_LOAD( "pgm_a1102.u8",    0x1000000, 0x0800000, CRC(6da7c143) SHA1(9408ba7722bfc8013f851aadea5e2819f5263129) )
 	ROM_LOAD( "pgm_a1103.u9",    0x1800000, 0x0800000, CRC(0ebebfdc) SHA1(4faad7f97c7e734f179ec934a37e75d8d6adccf4) )
 
-	ROM_REGION16_LE( 0x1000000, "sprmask", 0 ) /* Sprite Masks + Colour Indexes */
+	ROM_REGION16_LE( 0x1000000, "igs023:sprmask", 0 ) /* Sprite Masks + Colour Indexes */
 	ROM_LOAD( "pgm_b1100.u4",    0x0000000, 0x0800000,  CRC(fa53d6f6) SHA1(c2da55f4b7e721fa1c63bd7f9528f261643164e8) )
 	ROM_LOAD( "pgm_b1101.u5",    0x0800000, 0x0800000, CRC(001e4c81) SHA1(21119055f8fd7f831529e73ff9c97bca3987a1dc))
 
@@ -2240,18 +2228,18 @@ ROM_START( pgm3in1 )
 
 	/* No external ARM rom */
 
-	ROM_REGION( 0x500000, "tiles", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
+	ROM_REGION( 0x500000, "igs023", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
 	PGM_VIDEO_BIOS
 	ROM_LOAD( "u5.u5",    0x180000, 0x200000, CRC(da375a50) SHA1(62cd2fd3dfc1897528eaa38d243d7a9526eac71b) )
 
-	ROM_REGION16_LE( 0x4000000, "sprcol", 0 ) /* Sprite Colour Data */
+	ROM_REGION16_LE( 0x4000000, "igs023:sprcol", 0 ) /* Sprite Colour Data */
 	ROM_LOAD( "pgm_a1100.u4",    0x0000000, 0x0800000, CRC(e32ce499) SHA1(f84c7daa55c25a05da467b5654ebf432b7ce1754) ) // == y2k2_a1100.u6
 	ROM_LOAD( "pgm_a1101.u5",    0x0800000, 0x0800000, CRC(4e7568bc) SHA1(bf9cc453191bd5ec9fbcce62891809f253a44267) ) // == y2k2_a1101.u7
 	ROM_LOAD( "pgm_a1102.u6",    0x1000000, 0x0800000, CRC(6da7c143) SHA1(9408ba7722bfc8013f851aadea5e2819f5263129) ) // == y2k2_a1102.u8
 	ROM_LOAD( "pgm_a1103.u7",    0x1800000, 0x0800000, CRC(0ebebfdc) SHA1(4faad7f97c7e734f179ec934a37e75d8d6adccf4) ) // == y2k2_a1103.u9
 	ROM_LOAD( "ext_bit_cg.u20",  0x2000000, 0x0400000, CRC(fe314754) SHA1(ae3e8bbdce852a3fa39806a5221c053dee5abfd4) )
 
-	ROM_REGION16_LE( 0x1000000, "sprmask", ROMREGION_ERASE00 ) /* Sprite Masks + Colour Indexes */
+	ROM_REGION16_LE( 0x1000000, "igs023:sprmask", ROMREGION_ERASE00 ) /* Sprite Masks + Colour Indexes */
 	ROM_LOAD( "pgm_b1100.u8",    0x0000000, 0x0800000, CRC(fa53d6f6) SHA1(c2da55f4b7e721fa1c63bd7f9528f261643164e8) ) // == y2k2_b1100.u4
 	ROM_LOAD( "pgm_b1101.u9",    0x0800000, 0x0800000, CRC(001e4c81) SHA1(21119055f8fd7f831529e73ff9c97bca3987a1dc) ) // == y2k2_b1101.u5
 	ROM_LOAD( "ext_bit_map.u21", 0x0f00000, 0x0100000, CRC(fe31dca6) SHA1(825bab7342c944794514fc7fe3e41779de3b5cd4) ) // yes this loads over the empty part of u9
@@ -2274,18 +2262,18 @@ ROM_START( pgm3in1c100 )
 
 	/* No external ARM rom */
 
-	ROM_REGION( 0x500000, "tiles", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
+	ROM_REGION( 0x500000, "igs023", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
 	PGM_VIDEO_BIOS
 	ROM_LOAD( "u5.u5",    0x180000, 0x200000, CRC(da375a50) SHA1(62cd2fd3dfc1897528eaa38d243d7a9526eac71b) )
 
-	ROM_REGION16_LE( 0x4000000, "sprcol", 0 ) /* Sprite Colour Data */
+	ROM_REGION16_LE( 0x4000000, "igs023:sprcol", 0 ) /* Sprite Colour Data */
 	ROM_LOAD( "pgm_a1100.u4",    0x0000000, 0x0800000, CRC(e32ce499) SHA1(f84c7daa55c25a05da467b5654ebf432b7ce1754) ) // == y2k2_a1100.u6
 	ROM_LOAD( "pgm_a1101.u5",    0x0800000, 0x0800000, CRC(4e7568bc) SHA1(bf9cc453191bd5ec9fbcce62891809f253a44267) ) // == y2k2_a1101.u7
 	ROM_LOAD( "pgm_a1102.u6",    0x1000000, 0x0800000, CRC(6da7c143) SHA1(9408ba7722bfc8013f851aadea5e2819f5263129) ) // == y2k2_a1102.u8
 	ROM_LOAD( "pgm_a1103.u7",    0x1800000, 0x0800000, CRC(0ebebfdc) SHA1(4faad7f97c7e734f179ec934a37e75d8d6adccf4) ) // == y2k2_a1103.u9
 	ROM_LOAD( "ext_bit_cg.u20",  0x2000000, 0x0400000, CRC(fe314754) SHA1(ae3e8bbdce852a3fa39806a5221c053dee5abfd4) )
 
-	ROM_REGION16_LE( 0x1000000, "sprmask", ROMREGION_ERASE00 ) /* Sprite Masks + Colour Indexes */
+	ROM_REGION16_LE( 0x1000000, "igs023:sprmask", ROMREGION_ERASE00 ) /* Sprite Masks + Colour Indexes */
 	ROM_LOAD( "pgm_b1100.u8",    0x0000000, 0x0800000, CRC(fa53d6f6) SHA1(c2da55f4b7e721fa1c63bd7f9528f261643164e8) ) // == y2k2_b1100.u4
 	ROM_LOAD( "pgm_b1101.u9",    0x0800000, 0x0800000, CRC(001e4c81) SHA1(21119055f8fd7f831529e73ff9c97bca3987a1dc) ) // == y2k2_b1101.u5
 	ROM_LOAD( "ext_bit_map.u21", 0x0f00000, 0x0100000, CRC(fe31dca6) SHA1(825bab7342c944794514fc7fe3e41779de3b5cd4) ) // yes this loads over the empty part of u9
@@ -2392,11 +2380,11 @@ ROM_START( killbld )
 	ROM_REGION( 0x010000, "igs022", 0 ) /* Protection Data */
 	ROM_LOAD( "kb_u2_v109.u2", 0x000000, 0x010000,  CRC(de3eae63) SHA1(03af767ef764055bda528b5cc6a24b9e1218cca8) )
 
-	ROM_REGION( 0xa00000, "tiles", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
+	ROM_REGION( 0xa00000, "igs023", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
 	PGM_VIDEO_BIOS
 	ROM_LOAD( "pgm_t0300.u14",    0x180000, 0x400000, CRC(0922f7d9) SHA1(4302b4b7369e13f315fad14f7d6cad1321101d24) )
 
-	ROM_REGION16_LE( 0x2000000, "sprcol", 0 ) /* Sprite Colour Data */
+	ROM_REGION16_LE( 0x2000000, "igs023:sprcol", 0 ) /* Sprite Colour Data */
 	ROM_LOAD( "pgm_a0300.u9",   0x0000000, 0x0400000,  CRC(3f9455d3) SHA1(3718ce00ad93975383aafc14e5a74dc297b011a1) )
 	ROM_LOAD( "pgm_a0301.u10",  0x0400000, 0x0400000,  CRC(92776889) SHA1(6d677837fefff47bfd1c6166322f69f89989a5e2) )
 	ROM_LOAD( "pgm_a0303.u11",  0x0800000, 0x0400000,  CRC(33f5cc69) SHA1(9cacd5058d4bb25b77f71658bbbbd4b38d0a6b6a) )
@@ -2406,7 +2394,7 @@ ROM_START( killbld )
 //  ROM_LOAD( "pgm_a0304.u4",   0x1600000, 0x0200000,  CRC(3096de1c) SHA1(d010990d21cfda9cb8ab5b4bc0e329c23b7719f5) ) // from lord of gun! unused..
 //  ROM_LOAD( "pgm_a0305.u5",   0x1800000, 0x0200000,  CRC(2234531e) SHA1(58a82e31a1c0c1a4dd026576319f4e7ecffd140e) ) // from lord of gun! unused..
 
-	ROM_REGION16_LE( 0x1000000, "sprmask", 0 ) /* Sprite Masks + Colour Indexes */
+	ROM_REGION16_LE( 0x1000000, "igs023:sprmask", 0 ) /* Sprite Masks + Colour Indexes */
 	ROM_LOAD( "pgm_b0300.u13",    0x0000000, 0x0400000, CRC(7f876981) SHA1(43555a200929ad5ecc42137fc9aeb42dc4f50d20) )
 	ROM_LOAD( "pgm_b0302.u14",    0x0400000, 0x0400000, CRC(eea9c502) SHA1(04b3972c7111ea59a3cceab6ad124080c4ce3520) )
 	ROM_LOAD( "pgm_b0303.u15",    0x0800000, 0x0200000, CRC(77a9652e) SHA1(2342f643d37945fbda224a5034c013796e5134ca) )
@@ -2428,11 +2416,11 @@ ROM_START( killbld104 )
 	ROM_REGION( 0x010000, "igs022", 0 ) /* Protection Data */
 	ROM_LOAD( "kb_u2_v104.u2", 0x000000, 0x010000,  CRC(c970f6d5) SHA1(399fc6f80262784c566363c847dc3fdc4fb37494) )
 
-	ROM_REGION( 0xa00000, "tiles", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
+	ROM_REGION( 0xa00000, "igs023", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
 	PGM_VIDEO_BIOS
 	ROM_LOAD( "pgm_t0300.u14",    0x180000, 0x400000, CRC(0922f7d9) SHA1(4302b4b7369e13f315fad14f7d6cad1321101d24) )
 
-	ROM_REGION16_LE( 0x2000000, "sprcol", 0 ) /* Sprite Colour Data */
+	ROM_REGION16_LE( 0x2000000, "igs023:sprcol", 0 ) /* Sprite Colour Data */
 	ROM_LOAD( "pgm_a0300.u9",   0x0000000, 0x0400000,  CRC(3f9455d3) SHA1(3718ce00ad93975383aafc14e5a74dc297b011a1) )
 	ROM_LOAD( "pgm_a0301.u10",  0x0400000, 0x0400000,  CRC(92776889) SHA1(6d677837fefff47bfd1c6166322f69f89989a5e2) )
 	ROM_LOAD( "pgm_a0303.u11",  0x0800000, 0x0400000,  CRC(33f5cc69) SHA1(9cacd5058d4bb25b77f71658bbbbd4b38d0a6b6a) )
@@ -2442,7 +2430,7 @@ ROM_START( killbld104 )
 //  ROM_LOAD( "pgm_a0304.u4",   0x1600000, 0x0200000,  CRC(3096de1c) SHA1(d010990d21cfda9cb8ab5b4bc0e329c23b7719f5) ) // from lord of gun! unused..
 //  ROM_LOAD( "pgm_a0305.u5",   0x1800000, 0x0200000,  CRC(2234531e) SHA1(58a82e31a1c0c1a4dd026576319f4e7ecffd140e) ) // from lord of gun! unused..
 
-	ROM_REGION16_LE( 0x1000000, "sprmask", 0 ) /* Sprite Masks + Colour Indexes */
+	ROM_REGION16_LE( 0x1000000, "igs023:sprmask", 0 ) /* Sprite Masks + Colour Indexes */
 	ROM_LOAD( "pgm_b0300.u13",    0x0000000, 0x0400000, CRC(7f876981) SHA1(43555a200929ad5ecc42137fc9aeb42dc4f50d20) )
 	ROM_LOAD( "pgm_b0302.u14",    0x0400000, 0x0400000, CRC(eea9c502) SHA1(04b3972c7111ea59a3cceab6ad124080c4ce3520) )
 	ROM_LOAD( "pgm_b0303.u15",    0x0800000, 0x0200000, CRC(77a9652e) SHA1(2342f643d37945fbda224a5034c013796e5134ca) )
@@ -2464,11 +2452,11 @@ ROM_START( killbld106 )
 	ROM_REGION( 0x010000, "igs022", 0 ) /* Protection Data */
 	ROM_LOAD( "kb_u2_v106.u2", 0x000000, 0x010000,  CRC(5df8cf51) SHA1(d82e281a43015da653fc37e97f52943e03a07112) )
 
-	ROM_REGION( 0xa00000, "tiles", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
+	ROM_REGION( 0xa00000, "igs023", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
 	PGM_VIDEO_BIOS
 	ROM_LOAD( "pgm_t0300.u14",    0x180000, 0x400000, CRC(0922f7d9) SHA1(4302b4b7369e13f315fad14f7d6cad1321101d24) )
 
-	ROM_REGION16_LE( 0x2000000, "sprcol", 0 ) /* Sprite Colour Data */
+	ROM_REGION16_LE( 0x2000000, "igs023:sprcol", 0 ) /* Sprite Colour Data */
 	ROM_LOAD( "pgm_a0300.u9",   0x0000000, 0x0400000,  CRC(3f9455d3) SHA1(3718ce00ad93975383aafc14e5a74dc297b011a1) )
 	ROM_LOAD( "pgm_a0301.u10",  0x0400000, 0x0400000,  CRC(92776889) SHA1(6d677837fefff47bfd1c6166322f69f89989a5e2) )
 	ROM_LOAD( "pgm_a0303.u11",  0x0800000, 0x0400000,  CRC(33f5cc69) SHA1(9cacd5058d4bb25b77f71658bbbbd4b38d0a6b6a) )
@@ -2478,7 +2466,7 @@ ROM_START( killbld106 )
 //  ROM_LOAD( "pgm_a0304.u4",   0x1600000, 0x0200000,  CRC(3096de1c) SHA1(d010990d21cfda9cb8ab5b4bc0e329c23b7719f5) ) // from lord of gun! unused..
 //  ROM_LOAD( "pgm_a0305.u5",   0x1800000, 0x0200000,  CRC(2234531e) SHA1(58a82e31a1c0c1a4dd026576319f4e7ecffd140e) ) // from lord of gun! unused..
 
-	ROM_REGION16_LE( 0x1000000, "sprmask", 0 ) /* Sprite Masks + Colour Indexes */
+	ROM_REGION16_LE( 0x1000000, "igs023:sprmask", 0 ) /* Sprite Masks + Colour Indexes */
 	ROM_LOAD( "pgm_b0300.u13",    0x0000000, 0x0400000, CRC(7f876981) SHA1(43555a200929ad5ecc42137fc9aeb42dc4f50d20) )
 	ROM_LOAD( "pgm_b0302.u14",    0x0400000, 0x0400000, CRC(eea9c502) SHA1(04b3972c7111ea59a3cceab6ad124080c4ce3520) )
 	ROM_LOAD( "pgm_b0303.u15",    0x0800000, 0x0200000, CRC(77a9652e) SHA1(2342f643d37945fbda224a5034c013796e5134ca) )
@@ -2500,11 +2488,11 @@ ROM_START( killbld100 ) // was dumped from a Taiwanese board
 	ROM_REGION( 0x010000, "igs022", 0 ) /* Protection Data */
 	ROM_LOAD( "kb_u2_v100.u2", 0x000000, 0x010000,  CRC(6fbbdcb7) SHA1(2928b66cd605d38a5d4e5876890e52af89dfadc4) )
 
-	ROM_REGION( 0xa00000, "tiles", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
+	ROM_REGION( 0xa00000, "igs023", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
 	PGM_VIDEO_BIOS
 	ROM_LOAD( "pgm_t0300.u14",    0x180000, 0x400000, CRC(0922f7d9) SHA1(4302b4b7369e13f315fad14f7d6cad1321101d24) )
 
-	ROM_REGION16_LE( 0x2000000, "sprcol", 0 ) /* Sprite Colour Data */
+	ROM_REGION16_LE( 0x2000000, "igs023:sprcol", 0 ) /* Sprite Colour Data */
 	ROM_LOAD( "pgm_a0300.u9",   0x0000000, 0x0400000,  CRC(3f9455d3) SHA1(3718ce00ad93975383aafc14e5a74dc297b011a1) )
 	ROM_LOAD( "pgm_a0301.u10",  0x0400000, 0x0400000,  CRC(92776889) SHA1(6d677837fefff47bfd1c6166322f69f89989a5e2) )
 	ROM_LOAD( "pgm_a0303.u11",  0x0800000, 0x0400000,  CRC(33f5cc69) SHA1(9cacd5058d4bb25b77f71658bbbbd4b38d0a6b6a) )
@@ -2514,7 +2502,7 @@ ROM_START( killbld100 ) // was dumped from a Taiwanese board
 //  ROM_LOAD( "pgm_a0304.u4",   0x1600000, 0x0200000,  CRC(3096de1c) SHA1(d010990d21cfda9cb8ab5b4bc0e329c23b7719f5) ) // from lord of gun! unused..
 //  ROM_LOAD( "pgm_a0305.u5",   0x1800000, 0x0200000,  CRC(2234531e) SHA1(58a82e31a1c0c1a4dd026576319f4e7ecffd140e) ) // from lord of gun! unused..
 
-	ROM_REGION16_LE( 0x1000000, "sprmask", 0 ) /* Sprite Masks + Colour Indexes */
+	ROM_REGION16_LE( 0x1000000, "igs023:sprmask", 0 ) /* Sprite Masks + Colour Indexes */
 	ROM_LOAD( "pgm_b0300.u13",    0x0000000, 0x0400000, CRC(7f876981) SHA1(43555a200929ad5ecc42137fc9aeb42dc4f50d20) )
 	ROM_LOAD( "pgm_b0302.u14",    0x0400000, 0x0400000, CRC(eea9c502) SHA1(04b3972c7111ea59a3cceab6ad124080c4ce3520) )
 	ROM_LOAD( "pgm_b0303.u15",    0x0800000, 0x0200000, CRC(77a9652e) SHA1(2342f643d37945fbda224a5034c013796e5134ca) )
@@ -2586,14 +2574,14 @@ ROM_START( puzlstar ) // V100MG 09/30/99 11:39:23
 	ROM_REGION( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom */
 	ROM_LOAD( "puzlstar_igs027a.bin", 0x000000, 0x04000, NO_DUMP )
 
-	ROM_REGION( 0x500000, "tiles", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
+	ROM_REGION( 0x500000, "igs023", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
 	PGM_VIDEO_BIOS
 	ROM_LOAD( "pgm_t0800.u5",    0x180000, 0x200000, CRC(f9d84e59) SHA1(80ec77025ac5bf355b1a60f2a678dd4c56071f6b) )
 
-	ROM_REGION16_LE( 0x2000000, "sprcol", 0 ) /* Sprite Colour Data */
+	ROM_REGION16_LE( 0x2000000, "igs023:sprcol", 0 ) /* Sprite Colour Data */
 	ROM_LOAD( "pgm_a0800.u1",    0x0000000, 0x0400000, CRC(e1e6ec40) SHA1(390432431f144ef63424a426582b311765a61771) )
 
-	ROM_REGION16_LE( 0x1000000, "sprmask", 0 ) /* Sprite Masks + Colour Indexes */
+	ROM_REGION16_LE( 0x1000000, "igs023:sprmask", 0 ) /* Sprite Masks + Colour Indexes */
 	ROM_LOAD( "pgm_b0800.u3",    0x0000000, 0x0200000, CRC(52e7bef5) SHA1(a678251b7e46a1016d0afc1d8d5c9928008ad5b1) )
 
 	ROM_REGION( 0x800000, "ics", 0 ) /* Samples - (8 bit mono 11025Hz) - */
@@ -2610,14 +2598,14 @@ ROM_START( puzlstara ) // V100MG 09/20/99 15:16:02
 	ROM_REGION( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom */
 	ROM_LOAD( "puzlstar_igs027a.bin", 0x000000, 0x04000, NO_DUMP )
 
-	ROM_REGION( 0x500000, "tiles", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
+	ROM_REGION( 0x500000, "igs023", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
 	PGM_VIDEO_BIOS
 	ROM_LOAD( "pgm_t0800.u5",    0x180000, 0x200000, CRC(f9d84e59) SHA1(80ec77025ac5bf355b1a60f2a678dd4c56071f6b) )
 
-	ROM_REGION16_LE( 0x2000000, "sprcol", 0 ) /* Sprite Colour Data */
+	ROM_REGION16_LE( 0x2000000, "igs023:sprcol", 0 ) /* Sprite Colour Data */
 	ROM_LOAD( "pgm_a0800.u1",    0x0000000, 0x0400000, CRC(e1e6ec40) SHA1(390432431f144ef63424a426582b311765a61771) )
 
-	ROM_REGION16_LE( 0x1000000, "sprmask", 0 ) /* Sprite Masks + Colour Indexes */
+	ROM_REGION16_LE( 0x1000000, "igs023:sprmask", 0 ) /* Sprite Masks + Colour Indexes */
 	ROM_LOAD( "pgm_b0800.u3",    0x0000000, 0x0200000, CRC(52e7bef5) SHA1(a678251b7e46a1016d0afc1d8d5c9928008ad5b1) )
 
 	ROM_REGION( 0x800000, "ics", 0 ) /* Samples - (8 bit mono 11025Hz) - */
@@ -2686,12 +2674,12 @@ ROM_START( olds103t )
 	PGM_68K_BIOS
 	ROM_LOAD16_WORD_SWAP( "p0500.v103",0x100000, 0x400000, CRC(17e32e14) SHA1(b8f731087af2c59fe5b1da31f1cb055d35c8b440) )
 
-	ROM_REGION( 0xa00000, "tiles",  0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
+	ROM_REGION( 0xa00000, "igs023",  0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
 	PGM_VIDEO_BIOS
 	ROM_LOAD( "pgm_t0500.u18",   0x180000, 0x400000, CRC(d881726c) SHA1(a82517e665996f7b7017c940f1fcf016fccb65c2) )
 	ROM_LOAD( "pgm_t0501.u19",   0x580000, 0x200000, CRC(d2106864) SHA1(65d827135b87d82196433aea3279608ee263feca) )
 
-	ROM_REGION16_LE( 0x2000000, "sprcol", 0 ) /* Sprite Colour Data */
+	ROM_REGION16_LE( 0x2000000, "igs023:sprcol", 0 ) /* Sprite Colour Data */
 	ROM_LOAD( "pgm_a0500.u5",    0x0000000, 0x400000, CRC(80a59197) SHA1(7d0108e2f0d0347d43ace2d96c0388202c05fdfb) )
 	ROM_LOAD( "pgm_a0501.u6",    0x0400000, 0x400000, CRC(98c931b1) SHA1(9b70d1a7beb4c3a0c1436c25fd1fb76e47539538) )
 	ROM_LOAD( "pgm_a0502.u7",    0x0800000, 0x400000, CRC(c3fcdf1d) SHA1(107585fd103fcd0af0fb7db283be4f7c7058aef7) )
@@ -2700,7 +2688,7 @@ ROM_START( olds103t )
 	ROM_LOAD( "pgm_a0505.u12",   0x1400000, 0x400000, CRC(5b8cf3a5) SHA1(856d1e47b5d9a66dcfbdc74a51ed646fd7d96a35) )
 	ROM_LOAD( "pgm_a0506.u13",   0x1800000, 0x400000, CRC(087ac60c) SHA1(3d5bf7dd40c8a3c1224cf82e12410ca904c0c5db) )
 
-	ROM_REGION16_LE( 0x1000000, "sprmask", 0 ) /* Sprite Masks + Colour Indexes */
+	ROM_REGION16_LE( 0x1000000, "igs023:sprmask", 0 ) /* Sprite Masks + Colour Indexes */
 	ROM_LOAD( "pgm_b0500.u9",    0x0000000, 0x400000, CRC(cde07f74) SHA1(1fe90db7c57faa28f3a054b2c07909bef89e3efb) )
 	ROM_LOAD( "pgm_b0501.u10",   0x0400000, 0x400000, CRC(1546c2e9) SHA1(a7b9c8b44203db54a59d49fe469bb52bba807ba2) )
 	ROM_LOAD( "pgm_b0502.u15",   0x0800000, 0x400000, CRC(e97b31c3) SHA1(1a7ca4f6c8644e84a33ae41cd4637f21046b14c5) )
@@ -2727,12 +2715,12 @@ ROM_START( olds )
 	// clearly not for this revision
 	ROM_LOAD( "ram_dump", 0x000000, 0x04000, CRC(280cfb4e) SHA1(cd2bdcaa21347952c2bf38b105a204d327fde39e) )
 
-	ROM_REGION( 0xa00000, "tiles",  0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
+	ROM_REGION( 0xa00000, "igs023",  0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
 	PGM_VIDEO_BIOS
 	ROM_LOAD( "pgm_t0500.u18",   0x180000, 0x400000, CRC(d881726c) SHA1(a82517e665996f7b7017c940f1fcf016fccb65c2) )
 	ROM_LOAD( "pgm_t0501.u19",   0x580000, 0x200000, CRC(d2106864) SHA1(65d827135b87d82196433aea3279608ee263feca) )
 
-	ROM_REGION16_LE( 0x2000000, "sprcol", 0 ) /* Sprite Colour Data */
+	ROM_REGION16_LE( 0x2000000, "igs023:sprcol", 0 ) /* Sprite Colour Data */
 	ROM_LOAD( "pgm_a0500.u5",    0x0000000, 0x400000, CRC(80a59197) SHA1(7d0108e2f0d0347d43ace2d96c0388202c05fdfb) )
 	ROM_LOAD( "pgm_a0501.u6",    0x0400000, 0x400000, CRC(98c931b1) SHA1(9b70d1a7beb4c3a0c1436c25fd1fb76e47539538) )
 	ROM_LOAD( "pgm_a0502.u7",    0x0800000, 0x400000, CRC(c3fcdf1d) SHA1(107585fd103fcd0af0fb7db283be4f7c7058aef7) )
@@ -2741,7 +2729,7 @@ ROM_START( olds )
 	ROM_LOAD( "pgm_a0505.u12",   0x1400000, 0x400000, CRC(5b8cf3a5) SHA1(856d1e47b5d9a66dcfbdc74a51ed646fd7d96a35) )
 	ROM_LOAD( "pgm_a0506.u13",   0x1800000, 0x400000, CRC(087ac60c) SHA1(3d5bf7dd40c8a3c1224cf82e12410ca904c0c5db) )
 
-	ROM_REGION16_LE( 0x1000000, "sprmask", 0 ) /* Sprite Masks + Colour Indexes */
+	ROM_REGION16_LE( 0x1000000, "igs023:sprmask", 0 ) /* Sprite Masks + Colour Indexes */
 	ROM_LOAD( "pgm_b0500.u9",    0x0000000, 0x400000, CRC(cde07f74) SHA1(1fe90db7c57faa28f3a054b2c07909bef89e3efb) )
 	ROM_LOAD( "pgm_b0501.u10",   0x0400000, 0x400000, CRC(1546c2e9) SHA1(a7b9c8b44203db54a59d49fe469bb52bba807ba2) )
 	ROM_LOAD( "pgm_b0502.u15",   0x0800000, 0x400000, CRC(e97b31c3) SHA1(1a7ca4f6c8644e84a33ae41cd4637f21046b14c5) )
@@ -2768,12 +2756,12 @@ ROM_START( olds100 )
 	ROM_REGION32_LE( 0x010000, "user1", 0 ) /* IGS028 Protection Data */
 	ROM_LOAD( "sp_v100_u6.u6", 0x000000, 0x010000,  CRC(e7613dda) SHA1(0d7c043b90e2f9a36a45066f22e3e305dc716676) )
 
-	ROM_REGION( 0xa00000, "tiles",  0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
+	ROM_REGION( 0xa00000, "igs023",  0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
 	PGM_VIDEO_BIOS
 	ROM_LOAD( "pgm_t0500.u18",   0x180000, 0x400000, CRC(d881726c) SHA1(a82517e665996f7b7017c940f1fcf016fccb65c2) )
 	ROM_LOAD( "pgm_t0501.u19",   0x580000, 0x200000, CRC(d2106864) SHA1(65d827135b87d82196433aea3279608ee263feca) )
 
-	ROM_REGION16_LE( 0x2000000, "sprcol", 0 ) /* Sprite Colour Data */
+	ROM_REGION16_LE( 0x2000000, "igs023:sprcol", 0 ) /* Sprite Colour Data */
 	ROM_LOAD( "pgm_a0500.u5",    0x0000000, 0x400000, CRC(80a59197) SHA1(7d0108e2f0d0347d43ace2d96c0388202c05fdfb) )
 	ROM_LOAD( "pgm_a0501.u6",    0x0400000, 0x400000, CRC(98c931b1) SHA1(9b70d1a7beb4c3a0c1436c25fd1fb76e47539538) )
 	ROM_LOAD( "pgm_a0502.u7",    0x0800000, 0x400000, CRC(c3fcdf1d) SHA1(107585fd103fcd0af0fb7db283be4f7c7058aef7) )
@@ -2782,7 +2770,7 @@ ROM_START( olds100 )
 	ROM_LOAD( "pgm_a0505.u12",   0x1400000, 0x400000, CRC(5b8cf3a5) SHA1(856d1e47b5d9a66dcfbdc74a51ed646fd7d96a35) )
 	ROM_LOAD( "pgm_a0506.u13",   0x1800000, 0x400000, CRC(087ac60c) SHA1(3d5bf7dd40c8a3c1224cf82e12410ca904c0c5db) )
 
-	ROM_REGION16_LE( 0x1000000, "sprmask", 0 ) /* Sprite Masks + Colour Indexes */
+	ROM_REGION16_LE( 0x1000000, "igs023:sprmask", 0 ) /* Sprite Masks + Colour Indexes */
 	ROM_LOAD( "pgm_b0500.u9",    0x0000000, 0x400000, CRC(cde07f74) SHA1(1fe90db7c57faa28f3a054b2c07909bef89e3efb) )
 	ROM_LOAD( "pgm_b0501.u10",   0x0400000, 0x400000, CRC(1546c2e9) SHA1(a7b9c8b44203db54a59d49fe469bb52bba807ba2) )
 	ROM_LOAD( "pgm_b0502.u15",   0x0800000, 0x400000, CRC(e97b31c3) SHA1(1a7ca4f6c8644e84a33ae41cd4637f21046b14c5) )
@@ -2808,12 +2796,12 @@ ROM_START( olds100a )
 	// used to simulate encrypted DMA protection device for now ..
 	ROM_LOAD( "ram_dump", 0x000000, 0x04000, CRC(280cfb4e) SHA1(cd2bdcaa21347952c2bf38b105a204d327fde39e) )
 
-	ROM_REGION( 0xa00000, "tiles",  0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
+	ROM_REGION( 0xa00000, "igs023",  0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
 	PGM_VIDEO_BIOS
 	ROM_LOAD( "pgm_t0500.u18",   0x180000, 0x400000, CRC(d881726c) SHA1(a82517e665996f7b7017c940f1fcf016fccb65c2) )
 	ROM_LOAD( "pgm_t0501.u19",   0x580000, 0x200000, CRC(d2106864) SHA1(65d827135b87d82196433aea3279608ee263feca) )
 
-	ROM_REGION16_LE( 0x2000000, "sprcol", 0 ) /* Sprite Colour Data */
+	ROM_REGION16_LE( 0x2000000, "igs023:sprcol", 0 ) /* Sprite Colour Data */
 	ROM_LOAD( "pgm_a0500.u5",    0x0000000, 0x400000, CRC(80a59197) SHA1(7d0108e2f0d0347d43ace2d96c0388202c05fdfb) )
 	ROM_LOAD( "pgm_a0501.u6",    0x0400000, 0x400000, CRC(98c931b1) SHA1(9b70d1a7beb4c3a0c1436c25fd1fb76e47539538) )
 	ROM_LOAD( "pgm_a0502.u7",    0x0800000, 0x400000, CRC(c3fcdf1d) SHA1(107585fd103fcd0af0fb7db283be4f7c7058aef7) )
@@ -2822,7 +2810,7 @@ ROM_START( olds100a )
 	ROM_LOAD( "pgm_a0505.u12",   0x1400000, 0x400000, CRC(5b8cf3a5) SHA1(856d1e47b5d9a66dcfbdc74a51ed646fd7d96a35) )
 	ROM_LOAD( "pgm_a0506.u13",   0x1800000, 0x400000, CRC(087ac60c) SHA1(3d5bf7dd40c8a3c1224cf82e12410ca904c0c5db) )
 
-	ROM_REGION16_LE( 0x1000000, "sprmask", 0 ) /* Sprite Masks + Colour Indexes */
+	ROM_REGION16_LE( 0x1000000, "igs023:sprmask", 0 ) /* Sprite Masks + Colour Indexes */
 	ROM_LOAD( "pgm_b0500.u9",    0x0000000, 0x400000, CRC(cde07f74) SHA1(1fe90db7c57faa28f3a054b2c07909bef89e3efb) )
 	ROM_LOAD( "pgm_b0501.u10",   0x0400000, 0x400000, CRC(1546c2e9) SHA1(a7b9c8b44203db54a59d49fe469bb52bba807ba2) )
 	ROM_LOAD( "pgm_b0502.u15",   0x0800000, 0x400000, CRC(e97b31c3) SHA1(1a7ca4f6c8644e84a33ae41cd4637f21046b14c5) )
@@ -2845,18 +2833,18 @@ ROM_START( kov2 )
 	ROM_REGION32_LE( 0x400000, "user1", 0 ) /* Protection Data (encrypted external ARM data) */
 	ROM_LOAD( "v102_u19.u19",   0x000000, 0x200000,   CRC(462e2980) SHA1(3da7c3d2c65b59f50c78be1c25922b71d40f6080) )
 
-	ROM_REGION( 0xa00000, "tiles", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
+	ROM_REGION( 0xa00000, "igs023", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
 	PGM_VIDEO_BIOS
 	ROM_LOAD( "pgm_t1200.u27",  0x180000, 0x800000, CRC(d7e26609) SHA1(bdad810f82fcf1d50a8791bdc495374ec5a309c6) )
 
-	ROM_REGION16_LE( 0x4000000, "sprcol", 0 ) /* Sprite Colour Data */
+	ROM_REGION16_LE( 0x4000000, "igs023:sprcol", 0 ) /* Sprite Colour Data */
 	ROM_LOAD( "pgm_a1200.u1",   0x0000000, 0x0800000, CRC(ceeb81d8) SHA1(5476729443fc1bc9593ae10fbf7cbc5d7290b017) )
 	ROM_LOAD( "pgm_a1201.u4",   0x0800000, 0x0800000, CRC(21063ca7) SHA1(cf561b44902425a920d5cbea5bf65dd9530b2289) )
 	ROM_LOAD( "pgm_a1202.u6",   0x1000000, 0x0800000, CRC(4bb92fae) SHA1(f0b6d72ed425de1c69dc8f8d5795ea760a4a59b0) )
 	ROM_LOAD( "pgm_a1203.u8",   0x1800000, 0x0800000, CRC(e73cb627) SHA1(4c6e48b845a5d1e8f9899010fbf273d54c2b8899) )
 	ROM_LOAD( "pgm_a1204.u10",  0x2000000, 0x0200000, CRC(14b4b5bb) SHA1(d7db5740eec971f2782fb2885ee3af8f2a796550) )
 
-	ROM_REGION16_LE( 0x1000000, "sprmask", 0 ) /* Sprite Masks + Colour Indexes */
+	ROM_REGION16_LE( 0x1000000, "igs023:sprmask", 0 ) /* Sprite Masks + Colour Indexes */
 	ROM_LOAD( "pgm_b1200.u5",   0x0000000, 0x0800000,  CRC(bed7d994) SHA1(019dfba8154256d64cd249eb0fa4c451edce34b8) )
 	ROM_LOAD( "pgm_b1201.u7",   0x0800000, 0x0800000,  CRC(f251eb57) SHA1(56a5fc14ab7822f83379cecb26638e5bb266349a) )
 
@@ -2876,18 +2864,18 @@ ROM_START( kov2106 )
 	ROM_REGION32_LE( 0x400000, "user1", 0 ) /* Protection Data (encrypted external ARM data) */
 	ROM_LOAD( "v102_u19.u19",   0x000000, 0x200000,   CRC(462e2980) SHA1(3da7c3d2c65b59f50c78be1c25922b71d40f6080) )
 
-	ROM_REGION( 0xa00000, "tiles", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
+	ROM_REGION( 0xa00000, "igs023", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
 	PGM_VIDEO_BIOS
 	ROM_LOAD( "pgm_t1200.u27",  0x180000, 0x800000, CRC(d7e26609) SHA1(bdad810f82fcf1d50a8791bdc495374ec5a309c6) )
 
-	ROM_REGION16_LE( 0x4000000, "sprcol", 0 ) /* Sprite Colour Data */
+	ROM_REGION16_LE( 0x4000000, "igs023:sprcol", 0 ) /* Sprite Colour Data */
 	ROM_LOAD( "pgm_a1200.u1",   0x0000000, 0x0800000, CRC(ceeb81d8) SHA1(5476729443fc1bc9593ae10fbf7cbc5d7290b017) )
 	ROM_LOAD( "pgm_a1201.u4",   0x0800000, 0x0800000, CRC(21063ca7) SHA1(cf561b44902425a920d5cbea5bf65dd9530b2289) )
 	ROM_LOAD( "pgm_a1202.u6",   0x1000000, 0x0800000, CRC(4bb92fae) SHA1(f0b6d72ed425de1c69dc8f8d5795ea760a4a59b0) )
 	ROM_LOAD( "pgm_a1203.u8",   0x1800000, 0x0800000, CRC(e73cb627) SHA1(4c6e48b845a5d1e8f9899010fbf273d54c2b8899) )
 	ROM_LOAD( "pgm_a1204.u10",  0x2000000, 0x0200000, CRC(14b4b5bb) SHA1(d7db5740eec971f2782fb2885ee3af8f2a796550) )
 
-	ROM_REGION16_LE( 0x1000000, "sprmask", 0 ) /* Sprite Masks + Colour Indexes */
+	ROM_REGION16_LE( 0x1000000, "igs023:sprmask", 0 ) /* Sprite Masks + Colour Indexes */
 	ROM_LOAD( "pgm_b1200.u5",   0x0000000, 0x0800000,  CRC(bed7d994) SHA1(019dfba8154256d64cd249eb0fa4c451edce34b8) )
 	ROM_LOAD( "pgm_b1201.u7",   0x0800000, 0x0800000,  CRC(f251eb57) SHA1(56a5fc14ab7822f83379cecb26638e5bb266349a) )
 
@@ -2907,18 +2895,18 @@ ROM_START( kov2104 )
 	ROM_REGION32_LE( 0x400000, "user1", 0 ) /* Protection Data (encrypted external ARM data) */
 	ROM_LOAD( "v102_u19.u19",   0x000000, 0x200000,   CRC(462e2980) SHA1(3da7c3d2c65b59f50c78be1c25922b71d40f6080) )
 
-	ROM_REGION( 0xa00000, "tiles", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
+	ROM_REGION( 0xa00000, "igs023", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
 	PGM_VIDEO_BIOS
 	ROM_LOAD( "pgm_t1200.u27",  0x180000, 0x800000, CRC(d7e26609) SHA1(bdad810f82fcf1d50a8791bdc495374ec5a309c6) )
 
-	ROM_REGION16_LE( 0x4000000, "sprcol", 0 ) /* Sprite Colour Data */
+	ROM_REGION16_LE( 0x4000000, "igs023:sprcol", 0 ) /* Sprite Colour Data */
 	ROM_LOAD( "pgm_a1200.u1",   0x0000000, 0x0800000, CRC(ceeb81d8) SHA1(5476729443fc1bc9593ae10fbf7cbc5d7290b017) )
 	ROM_LOAD( "pgm_a1201.u4",   0x0800000, 0x0800000, CRC(21063ca7) SHA1(cf561b44902425a920d5cbea5bf65dd9530b2289) )
 	ROM_LOAD( "pgm_a1202.u6",   0x1000000, 0x0800000, CRC(4bb92fae) SHA1(f0b6d72ed425de1c69dc8f8d5795ea760a4a59b0) )
 	ROM_LOAD( "pgm_a1203.u8",   0x1800000, 0x0800000, CRC(e73cb627) SHA1(4c6e48b845a5d1e8f9899010fbf273d54c2b8899) )
 	ROM_LOAD( "pgm_a1204.u10",  0x2000000, 0x0200000, CRC(14b4b5bb) SHA1(d7db5740eec971f2782fb2885ee3af8f2a796550) )
 
-	ROM_REGION16_LE( 0x1000000, "sprmask", 0 ) /* Sprite Masks + Colour Indexes */
+	ROM_REGION16_LE( 0x1000000, "igs023:sprmask", 0 ) /* Sprite Masks + Colour Indexes */
 	ROM_LOAD( "pgm_b1200.u5",   0x0000000, 0x0800000,  CRC(bed7d994) SHA1(019dfba8154256d64cd249eb0fa4c451edce34b8) )
 	ROM_LOAD( "pgm_b1201.u7",   0x0800000, 0x0800000,  CRC(f251eb57) SHA1(56a5fc14ab7822f83379cecb26638e5bb266349a) )
 
@@ -2938,18 +2926,18 @@ ROM_START( kov2103 )
 	ROM_REGION32_LE( 0x400000, "user1", 0 ) /* Protection Data (encrypted external ARM data) */
 	ROM_LOAD( "v101_u19.u19",   0x000000, 0x200000, CRC(8c35f2fe) SHA1(d4858f97fcfad0f342fccbc9cf1590276cc3c69c) )
 
-	ROM_REGION( 0xa00000, "tiles", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
+	ROM_REGION( 0xa00000, "igs023", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
 	PGM_VIDEO_BIOS
 	ROM_LOAD( "pgm_t1200.u27",  0x180000, 0x800000, CRC(d7e26609) SHA1(bdad810f82fcf1d50a8791bdc495374ec5a309c6) )
 
-	ROM_REGION16_LE( 0x4000000, "sprcol", 0 ) /* Sprite Colour Data */
+	ROM_REGION16_LE( 0x4000000, "igs023:sprcol", 0 ) /* Sprite Colour Data */
 	ROM_LOAD( "pgm_a1200.u1",   0x0000000, 0x0800000, CRC(ceeb81d8) SHA1(5476729443fc1bc9593ae10fbf7cbc5d7290b017) )
 	ROM_LOAD( "pgm_a1201.u4",   0x0800000, 0x0800000, CRC(21063ca7) SHA1(cf561b44902425a920d5cbea5bf65dd9530b2289) )
 	ROM_LOAD( "pgm_a1202.u6",   0x1000000, 0x0800000, CRC(4bb92fae) SHA1(f0b6d72ed425de1c69dc8f8d5795ea760a4a59b0) )
 	ROM_LOAD( "pgm_a1203.u8",   0x1800000, 0x0800000, CRC(e73cb627) SHA1(4c6e48b845a5d1e8f9899010fbf273d54c2b8899) )
 	ROM_LOAD( "pgm_a1204.u10",  0x2000000, 0x0200000, CRC(14b4b5bb) SHA1(d7db5740eec971f2782fb2885ee3af8f2a796550) )
 
-	ROM_REGION16_LE( 0x1000000, "sprmask", 0 ) /* Sprite Masks + Colour Indexes */
+	ROM_REGION16_LE( 0x1000000, "igs023:sprmask", 0 ) /* Sprite Masks + Colour Indexes */
 	ROM_LOAD( "pgm_b1200.u5",   0x0000000, 0x0800000,  CRC(bed7d994) SHA1(019dfba8154256d64cd249eb0fa4c451edce34b8) )
 	ROM_LOAD( "pgm_b1201.u7",   0x0800000, 0x0800000,  CRC(f251eb57) SHA1(56a5fc14ab7822f83379cecb26638e5bb266349a) )
 
@@ -2969,18 +2957,18 @@ ROM_START( kov21022 )
 	ROM_REGION32_LE( 0x400000, "user1", 0 ) /* Protection Data (encrypted external ARM data) */
 	ROM_LOAD( "v102_u19.u19",   0x000000, 0x200000,   CRC(462e2980) SHA1(3da7c3d2c65b59f50c78be1c25922b71d40f6080) )
 
-	ROM_REGION( 0xa00000, "tiles", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
+	ROM_REGION( 0xa00000, "igs023", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
 	PGM_VIDEO_BIOS
 	ROM_LOAD( "pgm_t1200.u27",  0x180000, 0x800000, CRC(d7e26609) SHA1(bdad810f82fcf1d50a8791bdc495374ec5a309c6) )
 
-	ROM_REGION16_LE( 0x4000000, "sprcol", 0 ) /* Sprite Colour Data */
+	ROM_REGION16_LE( 0x4000000, "igs023:sprcol", 0 ) /* Sprite Colour Data */
 	ROM_LOAD( "pgm_a1200.u1",   0x0000000, 0x0800000, CRC(ceeb81d8) SHA1(5476729443fc1bc9593ae10fbf7cbc5d7290b017) )
 	ROM_LOAD( "pgm_a1201.u4",   0x0800000, 0x0800000, CRC(21063ca7) SHA1(cf561b44902425a920d5cbea5bf65dd9530b2289) )
 	ROM_LOAD( "pgm_a1202.u6",   0x1000000, 0x0800000, CRC(4bb92fae) SHA1(f0b6d72ed425de1c69dc8f8d5795ea760a4a59b0) )
 	ROM_LOAD( "pgm_a1203.u8",   0x1800000, 0x0800000, CRC(e73cb627) SHA1(4c6e48b845a5d1e8f9899010fbf273d54c2b8899) )
 	ROM_LOAD( "pgm_a1204.u10",  0x2000000, 0x0200000, CRC(14b4b5bb) SHA1(d7db5740eec971f2782fb2885ee3af8f2a796550) )
 
-	ROM_REGION16_LE( 0x1000000, "sprmask", 0 ) /* Sprite Masks + Colour Indexes */
+	ROM_REGION16_LE( 0x1000000, "igs023:sprmask", 0 ) /* Sprite Masks + Colour Indexes */
 	ROM_LOAD( "pgm_b1200.u5",   0x0000000, 0x0800000,  CRC(bed7d994) SHA1(019dfba8154256d64cd249eb0fa4c451edce34b8) )
 	ROM_LOAD( "pgm_b1201.u7",   0x0800000, 0x0800000,  CRC(f251eb57) SHA1(56a5fc14ab7822f83379cecb26638e5bb266349a) )
 
@@ -3000,18 +2988,18 @@ ROM_START( kov2102 )
 	ROM_REGION32_LE( 0x400000, "user1", 0 ) /* Protection Data (encrypted external ARM data) */
 	ROM_LOAD( "v101_u19.u19",   0x000000, 0x200000, CRC(8c35f2fe) SHA1(d4858f97fcfad0f342fccbc9cf1590276cc3c69c) )
 
-	ROM_REGION( 0xa00000, "tiles", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
+	ROM_REGION( 0xa00000, "igs023", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
 	PGM_VIDEO_BIOS
 	ROM_LOAD( "pgm_t1200.u27",  0x180000, 0x800000, CRC(d7e26609) SHA1(bdad810f82fcf1d50a8791bdc495374ec5a309c6) )
 
-	ROM_REGION16_LE( 0x4000000, "sprcol", 0 ) /* Sprite Colour Data */
+	ROM_REGION16_LE( 0x4000000, "igs023:sprcol", 0 ) /* Sprite Colour Data */
 	ROM_LOAD( "pgm_a1200.u1",   0x0000000, 0x0800000, CRC(ceeb81d8) SHA1(5476729443fc1bc9593ae10fbf7cbc5d7290b017) )
 	ROM_LOAD( "pgm_a1201.u4",   0x0800000, 0x0800000, CRC(21063ca7) SHA1(cf561b44902425a920d5cbea5bf65dd9530b2289) )
 	ROM_LOAD( "pgm_a1202.u6",   0x1000000, 0x0800000, CRC(4bb92fae) SHA1(f0b6d72ed425de1c69dc8f8d5795ea760a4a59b0) )
 	ROM_LOAD( "pgm_a1203.u8",   0x1800000, 0x0800000, CRC(e73cb627) SHA1(4c6e48b845a5d1e8f9899010fbf273d54c2b8899) )
 	ROM_LOAD( "pgm_a1204.u10",  0x2000000, 0x0200000, CRC(14b4b5bb) SHA1(d7db5740eec971f2782fb2885ee3af8f2a796550) )
 
-	ROM_REGION16_LE( 0x1000000, "sprmask", 0 ) /* Sprite Masks + Colour Indexes */
+	ROM_REGION16_LE( 0x1000000, "igs023:sprmask", 0 ) /* Sprite Masks + Colour Indexes */
 	ROM_LOAD( "pgm_b1200.u5",   0x0000000, 0x0800000,  CRC(bed7d994) SHA1(019dfba8154256d64cd249eb0fa4c451edce34b8) )
 	ROM_LOAD( "pgm_b1201.u7",   0x0800000, 0x0800000,  CRC(f251eb57) SHA1(56a5fc14ab7822f83379cecb26638e5bb266349a) )
 
@@ -3031,18 +3019,18 @@ ROM_START( kov2101 )
 	ROM_REGION32_LE( 0x400000, "user1", 0 ) /* Protection Data (encrypted external ARM data) */
 	ROM_LOAD( "v101_u19.u19",   0x000000, 0x200000, CRC(8c35f2fe) SHA1(d4858f97fcfad0f342fccbc9cf1590276cc3c69c) )
 
-	ROM_REGION( 0xa00000, "tiles", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
+	ROM_REGION( 0xa00000, "igs023", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
 	PGM_VIDEO_BIOS
 	ROM_LOAD( "pgm_t1200.u27",  0x180000, 0x800000, CRC(d7e26609) SHA1(bdad810f82fcf1d50a8791bdc495374ec5a309c6) )
 
-	ROM_REGION16_LE( 0x4000000, "sprcol", 0 ) /* Sprite Colour Data */
+	ROM_REGION16_LE( 0x4000000, "igs023:sprcol", 0 ) /* Sprite Colour Data */
 	ROM_LOAD( "pgm_a1200.u1",   0x0000000, 0x0800000, CRC(ceeb81d8) SHA1(5476729443fc1bc9593ae10fbf7cbc5d7290b017) )
 	ROM_LOAD( "pgm_a1201.u4",   0x0800000, 0x0800000, CRC(21063ca7) SHA1(cf561b44902425a920d5cbea5bf65dd9530b2289) )
 	ROM_LOAD( "pgm_a1202.u6",   0x1000000, 0x0800000, CRC(4bb92fae) SHA1(f0b6d72ed425de1c69dc8f8d5795ea760a4a59b0) )
 	ROM_LOAD( "pgm_a1203.u8",   0x1800000, 0x0800000, CRC(e73cb627) SHA1(4c6e48b845a5d1e8f9899010fbf273d54c2b8899) )
 	ROM_LOAD( "pgm_a1204.u10",  0x2000000, 0x0200000, CRC(14b4b5bb) SHA1(d7db5740eec971f2782fb2885ee3af8f2a796550) )
 
-	ROM_REGION16_LE( 0x1000000, "sprmask", 0 ) /* Sprite Masks + Colour Indexes */
+	ROM_REGION16_LE( 0x1000000, "igs023:sprmask", 0 ) /* Sprite Masks + Colour Indexes */
 	ROM_LOAD( "pgm_b1200.u5",   0x0000000, 0x0800000,  CRC(bed7d994) SHA1(019dfba8154256d64cd249eb0fa4c451edce34b8) )
 	ROM_LOAD( "pgm_b1201.u7",   0x0800000, 0x0800000,  CRC(f251eb57) SHA1(56a5fc14ab7822f83379cecb26638e5bb266349a) )
 
@@ -3062,18 +3050,18 @@ ROM_START( kov2100 )
 	ROM_REGION32_LE( 0x400000, "user1", 0 ) /* Protection Data (encrypted external ARM data) */
 	ROM_LOAD( "v100_u19.u19",   0x000000, 0x200000,   CRC(edd59922) SHA1(09b14f20f685944a93292c83e5830849aade42c9) )
 
-	ROM_REGION( 0xa00000, "tiles", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
+	ROM_REGION( 0xa00000, "igs023", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
 	PGM_VIDEO_BIOS
 	ROM_LOAD( "pgm_t1200.u27",  0x180000, 0x800000, CRC(d7e26609) SHA1(bdad810f82fcf1d50a8791bdc495374ec5a309c6) )
 
-	ROM_REGION16_LE( 0x4000000, "sprcol", 0 ) /* Sprite Colour Data */
+	ROM_REGION16_LE( 0x4000000, "igs023:sprcol", 0 ) /* Sprite Colour Data */
 	ROM_LOAD( "pgm_a1200.u1",   0x0000000, 0x0800000, CRC(ceeb81d8) SHA1(5476729443fc1bc9593ae10fbf7cbc5d7290b017) )
 	ROM_LOAD( "pgm_a1201.u4",   0x0800000, 0x0800000, CRC(21063ca7) SHA1(cf561b44902425a920d5cbea5bf65dd9530b2289) )
 	ROM_LOAD( "pgm_a1202.u6",   0x1000000, 0x0800000, CRC(4bb92fae) SHA1(f0b6d72ed425de1c69dc8f8d5795ea760a4a59b0) )
 	ROM_LOAD( "pgm_a1203.u8",   0x1800000, 0x0800000, CRC(e73cb627) SHA1(4c6e48b845a5d1e8f9899010fbf273d54c2b8899) )
 	ROM_LOAD( "pgm_a1204.u10",  0x2000000, 0x0200000, CRC(14b4b5bb) SHA1(d7db5740eec971f2782fb2885ee3af8f2a796550) )
 
-	ROM_REGION16_LE( 0x1000000, "sprmask", 0 ) /* Sprite Masks + Colour Indexes */
+	ROM_REGION16_LE( 0x1000000, "igs023:sprmask", 0 ) /* Sprite Masks + Colour Indexes */
 	ROM_LOAD( "pgm_b1200.u5",   0x0000000, 0x0800000,  CRC(bed7d994) SHA1(019dfba8154256d64cd249eb0fa4c451edce34b8) )
 	ROM_LOAD( "pgm_b1201.u7",   0x0800000, 0x0800000,  CRC(f251eb57) SHA1(56a5fc14ab7822f83379cecb26638e5bb266349a) )
 
@@ -3094,18 +3082,18 @@ ROM_START( kov2p )
 	ROM_REGION32_LE( 0x400000, "user1", 0 ) /* Protection Data (encrypted external ARM data) */
 	ROM_LOAD( "v200_16m.u23",   0x000000, 0x200000,  CRC(16a0c11f) SHA1(ce449cef76ebd5657d49b57951e2eb0f132e203e) )
 
-	ROM_REGION( 0xa00000, "tiles", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
+	ROM_REGION( 0xa00000, "igs023", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
 	PGM_VIDEO_BIOS
 	ROM_LOAD( "pgm_t1200.u21",  0x180000, 0x800000, CRC(d7e26609) SHA1(bdad810f82fcf1d50a8791bdc495374ec5a309c6) )
 
-	ROM_REGION16_LE( 0x4000000, "sprcol", 0 ) /* Sprite Colour Data */
+	ROM_REGION16_LE( 0x4000000, "igs023:sprcol", 0 ) /* Sprite Colour Data */
 	ROM_LOAD( "pgm_a1200.u1",   0x0000000, 0x0800000, CRC(ceeb81d8) SHA1(5476729443fc1bc9593ae10fbf7cbc5d7290b017) )
 	ROM_LOAD( "pgm_a1201.u4",   0x0800000, 0x0800000, CRC(21063ca7) SHA1(cf561b44902425a920d5cbea5bf65dd9530b2289) )
 	ROM_LOAD( "pgm_a1202.u6",   0x1000000, 0x0800000, CRC(4bb92fae) SHA1(f0b6d72ed425de1c69dc8f8d5795ea760a4a59b0) )
 	ROM_LOAD( "pgm_a1203.u8",   0x1800000, 0x0800000, CRC(e73cb627) SHA1(4c6e48b845a5d1e8f9899010fbf273d54c2b8899) )
 	ROM_LOAD( "pgm_a1204.u10",  0x2000000, 0x0200000, CRC(14b4b5bb) SHA1(d7db5740eec971f2782fb2885ee3af8f2a796550) )
 
-	ROM_REGION16_LE( 0x1000000, "sprmask", 0 ) /* Sprite Masks + Colour Indexes */
+	ROM_REGION16_LE( 0x1000000, "igs023:sprmask", 0 ) /* Sprite Masks + Colour Indexes */
 	ROM_LOAD( "pgm_b1200.u5",   0x0000000, 0x0800000,  CRC(bed7d994) SHA1(019dfba8154256d64cd249eb0fa4c451edce34b8) )
 	ROM_LOAD( "pgm_b1201.u7",   0x0800000, 0x0800000,  CRC(f251eb57) SHA1(56a5fc14ab7822f83379cecb26638e5bb266349a) )
 
@@ -3125,18 +3113,18 @@ ROM_START( kov2p204 )
 	ROM_REGION32_LE( 0x400000, "user1", 0 ) /* Protection Data (encrypted external ARM data) */
 	ROM_LOAD( "v200_16m.u23",   0x000000, 0x200000,  CRC(16a0c11f) SHA1(ce449cef76ebd5657d49b57951e2eb0f132e203e) )
 
-	ROM_REGION( 0xa00000, "tiles", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
+	ROM_REGION( 0xa00000, "igs023", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
 	PGM_VIDEO_BIOS
 	ROM_LOAD( "pgm_t1200.u21",  0x180000, 0x800000, CRC(d7e26609) SHA1(bdad810f82fcf1d50a8791bdc495374ec5a309c6) )
 
-	ROM_REGION16_LE( 0x4000000, "sprcol", 0 ) /* Sprite Colour Data */
+	ROM_REGION16_LE( 0x4000000, "igs023:sprcol", 0 ) /* Sprite Colour Data */
 	ROM_LOAD( "pgm_a1200.u1",   0x0000000, 0x0800000, CRC(ceeb81d8) SHA1(5476729443fc1bc9593ae10fbf7cbc5d7290b017) )
 	ROM_LOAD( "pgm_a1201.u4",   0x0800000, 0x0800000, CRC(21063ca7) SHA1(cf561b44902425a920d5cbea5bf65dd9530b2289) )
 	ROM_LOAD( "pgm_a1202.u6",   0x1000000, 0x0800000, CRC(4bb92fae) SHA1(f0b6d72ed425de1c69dc8f8d5795ea760a4a59b0) )
 	ROM_LOAD( "pgm_a1203.u8",   0x1800000, 0x0800000, CRC(e73cb627) SHA1(4c6e48b845a5d1e8f9899010fbf273d54c2b8899) )
 	ROM_LOAD( "pgm_a1204.u10",  0x2000000, 0x0200000, CRC(14b4b5bb) SHA1(d7db5740eec971f2782fb2885ee3af8f2a796550) )
 
-	ROM_REGION16_LE( 0x1000000, "sprmask", 0 ) /* Sprite Masks + Colour Indexes */
+	ROM_REGION16_LE( 0x1000000, "igs023:sprmask", 0 ) /* Sprite Masks + Colour Indexes */
 	ROM_LOAD( "pgm_b1200.u5",   0x0000000, 0x0800000,  CRC(bed7d994) SHA1(019dfba8154256d64cd249eb0fa4c451edce34b8) )
 	ROM_LOAD( "pgm_b1201.u7",   0x0800000, 0x0800000,  CRC(f251eb57) SHA1(56a5fc14ab7822f83379cecb26638e5bb266349a) )
 
@@ -3156,18 +3144,18 @@ ROM_START( kov2p203 )
 	ROM_REGION32_LE( 0x400000, "user1", 0 ) /* Protection Data (encrypted external ARM data) */
 	ROM_LOAD( "v200_16m.u23",   0x000000, 0x200000,  CRC(16a0c11f) SHA1(ce449cef76ebd5657d49b57951e2eb0f132e203e) )
 
-	ROM_REGION( 0xa00000, "tiles", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
+	ROM_REGION( 0xa00000, "igs023", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
 	PGM_VIDEO_BIOS
 	ROM_LOAD( "pgm_t1200.u21",  0x180000, 0x800000, CRC(d7e26609) SHA1(bdad810f82fcf1d50a8791bdc495374ec5a309c6) )
 
-	ROM_REGION16_LE( 0x4000000, "sprcol", 0 ) /* Sprite Colour Data */
+	ROM_REGION16_LE( 0x4000000, "igs023:sprcol", 0 ) /* Sprite Colour Data */
 	ROM_LOAD( "pgm_a1200.u1",   0x0000000, 0x0800000, CRC(ceeb81d8) SHA1(5476729443fc1bc9593ae10fbf7cbc5d7290b017) )
 	ROM_LOAD( "pgm_a1201.u4",   0x0800000, 0x0800000, CRC(21063ca7) SHA1(cf561b44902425a920d5cbea5bf65dd9530b2289) )
 	ROM_LOAD( "pgm_a1202.u6",   0x1000000, 0x0800000, CRC(4bb92fae) SHA1(f0b6d72ed425de1c69dc8f8d5795ea760a4a59b0) )
 	ROM_LOAD( "pgm_a1203.u8",   0x1800000, 0x0800000, CRC(e73cb627) SHA1(4c6e48b845a5d1e8f9899010fbf273d54c2b8899) )
 	ROM_LOAD( "pgm_a1204.u10",  0x2000000, 0x0200000, CRC(14b4b5bb) SHA1(d7db5740eec971f2782fb2885ee3af8f2a796550) )
 
-	ROM_REGION16_LE( 0x1000000, "sprmask", 0 ) /* Sprite Masks + Colour Indexes */
+	ROM_REGION16_LE( 0x1000000, "igs023:sprmask", 0 ) /* Sprite Masks + Colour Indexes */
 	ROM_LOAD( "pgm_b1200.u5",   0x0000000, 0x0800000,  CRC(bed7d994) SHA1(019dfba8154256d64cd249eb0fa4c451edce34b8) )
 	ROM_LOAD( "pgm_b1201.u7",   0x0800000, 0x0800000,  CRC(f251eb57) SHA1(56a5fc14ab7822f83379cecb26638e5bb266349a) )
 
@@ -3187,18 +3175,18 @@ ROM_START( kov2p202 )
 	ROM_REGION32_LE( 0x400000, "user1", 0 ) /* Protection Data (encrypted external ARM data) */
 	ROM_LOAD( "v200_16m.u23",   0x000000, 0x200000,  CRC(16a0c11f) SHA1(ce449cef76ebd5657d49b57951e2eb0f132e203e) )
 
-	ROM_REGION( 0xa00000, "tiles", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
+	ROM_REGION( 0xa00000, "igs023", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
 	PGM_VIDEO_BIOS
 	ROM_LOAD( "pgm_t1200.u21",  0x180000, 0x800000, CRC(d7e26609) SHA1(bdad810f82fcf1d50a8791bdc495374ec5a309c6) )
 
-	ROM_REGION16_LE( 0x4000000, "sprcol", 0 ) /* Sprite Colour Data */
+	ROM_REGION16_LE( 0x4000000, "igs023:sprcol", 0 ) /* Sprite Colour Data */
 	ROM_LOAD( "pgm_a1200.u1",   0x0000000, 0x0800000, CRC(ceeb81d8) SHA1(5476729443fc1bc9593ae10fbf7cbc5d7290b017) )
 	ROM_LOAD( "pgm_a1201.u4",   0x0800000, 0x0800000, CRC(21063ca7) SHA1(cf561b44902425a920d5cbea5bf65dd9530b2289) )
 	ROM_LOAD( "pgm_a1202.u6",   0x1000000, 0x0800000, CRC(4bb92fae) SHA1(f0b6d72ed425de1c69dc8f8d5795ea760a4a59b0) )
 	ROM_LOAD( "pgm_a1203.u8",   0x1800000, 0x0800000, CRC(e73cb627) SHA1(4c6e48b845a5d1e8f9899010fbf273d54c2b8899) )
 	ROM_LOAD( "pgm_a1204.u10",  0x2000000, 0x0200000, CRC(14b4b5bb) SHA1(d7db5740eec971f2782fb2885ee3af8f2a796550) )
 
-	ROM_REGION16_LE( 0x1000000, "sprmask", 0 ) /* Sprite Masks + Colour Indexes */
+	ROM_REGION16_LE( 0x1000000, "igs023:sprmask", 0 ) /* Sprite Masks + Colour Indexes */
 	ROM_LOAD( "pgm_b1200.u5",   0x0000000, 0x0800000,  CRC(bed7d994) SHA1(019dfba8154256d64cd249eb0fa4c451edce34b8) )
 	ROM_LOAD( "pgm_b1201.u7",   0x0800000, 0x0800000,  CRC(f251eb57) SHA1(56a5fc14ab7822f83379cecb26638e5bb266349a) )
 
@@ -3218,18 +3206,18 @@ ROM_START( kov2p200 )
 	ROM_REGION32_LE( 0x400000, "user1", 0 ) /* Protection Data (encrypted external ARM data) */
 	ROM_LOAD( "v200_16m.u23",   0x000000, 0x200000,  CRC(16a0c11f) SHA1(ce449cef76ebd5657d49b57951e2eb0f132e203e) )
 
-	ROM_REGION( 0xa00000, "tiles", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
+	ROM_REGION( 0xa00000, "igs023", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
 	PGM_VIDEO_BIOS
 	ROM_LOAD( "pgm_t1200.u21",  0x180000, 0x800000, CRC(d7e26609) SHA1(bdad810f82fcf1d50a8791bdc495374ec5a309c6) )
 
-	ROM_REGION16_LE( 0x4000000, "sprcol", 0 ) /* Sprite Colour Data */
+	ROM_REGION16_LE( 0x4000000, "igs023:sprcol", 0 ) /* Sprite Colour Data */
 	ROM_LOAD( "pgm_a1200.u1",   0x0000000, 0x0800000, CRC(ceeb81d8) SHA1(5476729443fc1bc9593ae10fbf7cbc5d7290b017) )
 	ROM_LOAD( "pgm_a1201.u4",   0x0800000, 0x0800000, CRC(21063ca7) SHA1(cf561b44902425a920d5cbea5bf65dd9530b2289) )
 	ROM_LOAD( "pgm_a1202.u6",   0x1000000, 0x0800000, CRC(4bb92fae) SHA1(f0b6d72ed425de1c69dc8f8d5795ea760a4a59b0) )
 	ROM_LOAD( "pgm_a1203.u8",   0x1800000, 0x0800000, CRC(e73cb627) SHA1(4c6e48b845a5d1e8f9899010fbf273d54c2b8899) )
 	ROM_LOAD( "pgm_a1204.u10",  0x2000000, 0x0200000, CRC(14b4b5bb) SHA1(d7db5740eec971f2782fb2885ee3af8f2a796550) )
 
-	ROM_REGION16_LE( 0x1000000, "sprmask", 0 ) /* Sprite Masks + Colour Indexes */
+	ROM_REGION16_LE( 0x1000000, "igs023:sprmask", 0 ) /* Sprite Masks + Colour Indexes */
 	ROM_LOAD( "pgm_b1200.u5",   0x0000000, 0x0800000,  CRC(bed7d994) SHA1(019dfba8154256d64cd249eb0fa4c451edce34b8) )
 	ROM_LOAD( "pgm_b1201.u7",   0x0800000, 0x0800000,  CRC(f251eb57) SHA1(56a5fc14ab7822f83379cecb26638e5bb266349a) )
 
@@ -3285,13 +3273,13 @@ Some logic IC's, resistors, caps etc.
 #define DDP2_COMMON_ROMS \
 	ROM_REGION32_LE( 0x400000, "user1", 0 ) /* Protection Data (encrypted external ARM data) */ \
 	ROM_LOAD( "v100_210.u23",   0x000000, 0x20000, CRC(06c3dd29) SHA1(20c9479f158467fc2037dcf162b6c6be18c91d46) ) \
-	ROM_REGION( 0xa00000, "tiles", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */ \
+	ROM_REGION( 0xa00000, "igs023", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */ \
 	PGM_VIDEO_BIOS \
 	ROM_LOAD( "pgm_t1300.u21",  0x180000, 0x800000, CRC(e748f0cb) SHA1(5843bee3a17c33648ce904af2b98c6a90aff7393) ) \
-	ROM_REGION16_LE( 0x1000000, "sprcol", 0 ) /* Sprite Colour Data */ \
+	ROM_REGION16_LE( 0x1000000, "igs023:sprcol", 0 ) /* Sprite Colour Data */ \
 	ROM_LOAD( "pgm_a1300.u1",   0x0000000, 0x0800000, CRC(fc87a405) SHA1(115c21ecc56997652e527c92654076870bc9fa51) ) /* FIXED BITS (xxxxxxxx1xxxxxxx) */ \
 	ROM_LOAD( "pgm_a1301.u2",   0x0800000, 0x0800000, CRC(0c8520da) SHA1(390317857ae5baa94a4cc042874b00a811f06a63) ) /* FIXED BITS (xxxxxxxx1xxxxxxx) */ \
-	ROM_REGION16_LE( 0x0800000, "sprmask", 0 ) /* Sprite Masks + Colour Indexes */ \
+	ROM_REGION16_LE( 0x0800000, "igs023:sprmask", 0 ) /* Sprite Masks + Colour Indexes */ \
 	ROM_LOAD( "pgm_b1300.u7",   0x0000000, 0x0800000,  CRC(ef646604) SHA1(d737ff513792962f18df88c2caa9dd71de449079) ) \
 	ROM_REGION( 0x800000, "ics", ROMREGION_ERASE00 ) /* Samples - (8 bit mono 11025Hz) - */ \
 	PGM_AUDIO_BIOS \
@@ -3457,15 +3445,15 @@ ROM_START( dw2001 )
 	ROM_REGION32_LE( 0x4000000, "user1", ROMREGION_ERASEFF )
 	ROM_LOAD( "dw2001_u12.u12", 0x000000, 0x80000, CRC(973db1ab) SHA1(cc35e1a8534fa5d59d888f530769bae4e08c62ca) ) // external ARM data rom (encrypted)
 
-	ROM_REGION( 0x500000, "tiles", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
+	ROM_REGION( 0x500000, "igs023", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
 	PGM_VIDEO_BIOS
 	ROM_LOAD( "dw2001_u11.u11",    0x180000, 0x200000, CRC(b27cf093) SHA1(7c5736a3d72b89742da1c92b2604d66e48b95e56) )
 
-	ROM_REGION16_LE( 0x0400000, "sprcol", 0 ) /* Sprite Colour Data */
+	ROM_REGION16_LE( 0x0400000, "igs023:sprcol", 0 ) /* Sprite Colour Data */
 	ROM_LOAD( "dw2001_u2.u2",    0x000000, 0x200000, CRC(d11c733c) SHA1(8faad32e8e215631a2263bdd51a9ae434540d028) )
 	ROM_LOAD( "dw2001_u3.u3",    0x200000, 0x200000, CRC(1435aef2) SHA1(582eb9f6415c89418401be7ebad041adeb600515) )
 
-	ROM_REGION16_LE( 0x0200000, "sprmask", 0 ) /* Sprite Masks + Colour Indexes */
+	ROM_REGION16_LE( 0x0200000, "igs023:sprmask", 0 ) /* Sprite Masks + Colour Indexes */
 	ROM_LOAD( "dw2001_u9.u9",    0x000000, 0x200000, CRC(ccbca572) SHA1(4d3512e82cb65e5cdfcc6cb18deec9f4a6dd350a) )
 
 	ROM_REGION( 0x1000000, "ics", 0 ) /* Samples - (8 bit mono 11025Hz) - */
@@ -3485,15 +3473,15 @@ ROM_START( dwpc )
 	ROM_REGION32_LE( 0x4000000, "user1", ROMREGION_ERASEFF )
 	ROM_LOAD( "dwpc_v110cn_u12.u12", 0x000000, 0x80000, CRC(5bb1ee6a) SHA1(7844e7eb8c10a5aeb18c6057d9dc2fee7ff822ba) ) // external ARM data rom (encrypted)
 
-	ROM_REGION( 0xa00000, "tiles", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
+	ROM_REGION( 0xa00000, "igs023", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
 	PGM_VIDEO_BIOS
 	ROM_LOAD( "dwpc_v110cn_u11.u11",    0x180000, 0x400000, CRC(db219cb8) SHA1(8af5a8dac8db93a7720675c64212293d7eab106d) )
 
-	ROM_REGION16_LE( 0x0400000, "sprcol", 0 ) /* Sprite Colour Data */
+	ROM_REGION16_LE( 0x0400000, "igs023:sprcol", 0 ) /* Sprite Colour Data */
 	ROM_LOAD( "dwpc_v101xx_u2.u2",    0x000000, 0x200000, CRC(48b2f407) SHA1(9b3c0f315805aaca72c9dc3a35406f775856a8bb) )
 	ROM_LOAD( "dwpc_v101xx_u3.u3",    0x200000, 0x200000, CRC(3bb45a97) SHA1(5c5cd5a241ed25dbb83690cb879472b60cd03260) )
 
-	ROM_REGION16_LE( 0x0200000, "sprmask", 0 ) /* Sprite Masks + Colour Indexes */
+	ROM_REGION16_LE( 0x0200000, "igs023:sprmask", 0 ) /* Sprite Masks + Colour Indexes */
 	ROM_LOAD( "dwpc_v101xx_u9.u9",    0x000000, 0x200000, CRC(481b89b1) SHA1(6a241dc3b4a53ce320f3f17e972ffffe46adda4f) )
 
 	ROM_REGION( 0x1000000, "ics", 0 ) /* Samples - (8 bit mono 11025Hz) - */
@@ -3513,15 +3501,15 @@ ROM_START( dwpc101j )
 	ROM_REGION32_LE( 0x4000000, "user1", ROMREGION_ERASEFF )
 	ROM_LOAD( "dwpc_v100jp_u12.u12", 0x000000, 0x80000, CRC(0d112126) SHA1(2b569b8ef974d1d9906cc052eee63b869c8d4fa4) ) // external ARM data rom (encrypted)
 
-	ROM_REGION( 0xa00000, "tiles", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
+	ROM_REGION( 0xa00000, "igs023", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
 	PGM_VIDEO_BIOS
 	ROM_LOAD( "dwpc_v100jp_u11.u11",    0x180000, 0x400000, CRC(c29d8831) SHA1(0ae93ef31fffc244111f636d47e5762d3ba23fe5) )
 
-	ROM_REGION16_LE( 0x0400000, "sprcol", 0 ) /* Sprite Colour Data */
+	ROM_REGION16_LE( 0x0400000, "igs023:sprcol", 0 ) /* Sprite Colour Data */
 	ROM_LOAD( "dwpc_v100jp_u2.u2",    0x000000, 0x200000, CRC(e7115763) SHA1(f1bf06e9434a3b962166849f51b9dc3a74d7f2a4) )
 	ROM_LOAD( "dwpc_v100jp_u3.u3",    0x200000, 0x200000, CRC(49c184a4) SHA1(320504adf596c38db56247e9cef02e7c7a363ccb) )
 
-	ROM_REGION16_LE( 0x0200000, "sprmask", 0 ) /* Sprite Masks + Colour Indexes */
+	ROM_REGION16_LE( 0x0200000, "igs023:sprmask", 0 ) /* Sprite Masks + Colour Indexes */
 	ROM_LOAD( "dwpc_v100jp_u9.u9",    0x000000, 0x200000, CRC(412b9913) SHA1(52fc42a966575e02991aa92382b855744f44854a) )
 
 	ROM_REGION( 0x1000000, "ics", 0 ) /* Samples - (8 bit mono 11025Hz) - */
@@ -3591,14 +3579,14 @@ ROM_START( puzzli2 )
 	ROM_REGION( 0x4000, "prot", ROMREGION_ERASEFF ) /* ARM protection ASIC - internal rom */
 	ROM_LOAD( "puzzli2_igs027a.bin", 0x000000, 0x04000, NO_DUMP )
 
-	ROM_REGION( 0x500000, "tiles", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
+	ROM_REGION( 0x500000, "igs023", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
 	PGM_VIDEO_BIOS
 	ROM_LOAD( "pgm_t0900.u9",    0x180000, 0x200000, CRC(70615611) SHA1(a46d4aa71396947b427f9ba4ba0e636876c09d6b) )
 
-	ROM_REGION16_LE( 0x0400000, "sprcol", 0 ) /* Sprite Colour Data */
+	ROM_REGION16_LE( 0x0400000, "igs023:sprcol", 0 ) /* Sprite Colour Data */
 	ROM_LOAD( "pgm_a0900.u3",    0x0000000, 0x0400000, CRC(14911251) SHA1(e0d10ef50c408dbcf0907f81d4f0e49aeb651a6c) ) // FIXED BITS (xxxxxxxx1xxxxxxx)
 
-	ROM_REGION16_LE( 0x0200000, "sprmask", 0 ) /* Sprite Masks + Colour Indexes */
+	ROM_REGION16_LE( 0x0200000, "igs023:sprmask", 0 ) /* Sprite Masks + Colour Indexes */
 	ROM_LOAD( "pgm_b0900.u4",    0x0000000, 0x0200000,  CRC(6f0638b6) SHA1(14b315fe9e80b3314bb63487e6ea9ce04c9703bd) )
 
 	ROM_REGION( 0x1000000, "ics", 0 ) /* Samples - (8 bit mono 11025Hz) - */
@@ -3616,14 +3604,14 @@ ROM_START( puzzli2s )
 	ROM_REGION( 0x4000, "prot", ROMREGION_ERASEFF ) /* ARM protection ASIC - internal rom */
 	ROM_LOAD( "puzzli2_igs027a.bin", 0x000000, 0x04000, NO_DUMP )
 
-	ROM_REGION( 0x500000, "tiles", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
+	ROM_REGION( 0x500000, "igs023", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
 	PGM_VIDEO_BIOS
 	ROM_LOAD( "pgm_t0900.u9",    0x180000, 0x200000, CRC(70615611) SHA1(a46d4aa71396947b427f9ba4ba0e636876c09d6b) )
 
-	ROM_REGION16_LE( 0x0400000, "sprcol", 0 ) /* Sprite Colour Data */
+	ROM_REGION16_LE( 0x0400000, "igs023:sprcol", 0 ) /* Sprite Colour Data */
 	ROM_LOAD( "pgm_a0900.u3",    0x0000000, 0x0400000, CRC(14911251) SHA1(e0d10ef50c408dbcf0907f81d4f0e49aeb651a6c) ) // FIXED BITS (xxxxxxxx1xxxxxxx)
 
-	ROM_REGION16_LE( 0x0200000, "sprmask", 0 ) /* Sprite Masks + Colour Indexes */
+	ROM_REGION16_LE( 0x0200000, "igs023:sprmask", 0 ) /* Sprite Masks + Colour Indexes */
 	ROM_LOAD( "pgm_b0900.u4",    0x0000000, 0x0200000,  CRC(6f0638b6) SHA1(14b315fe9e80b3314bb63487e6ea9ce04c9703bd) )
 
 	ROM_REGION( 0x1000000, "ics", 0 ) /* Samples - (8 bit mono 11025Hz) - */
@@ -3702,18 +3690,18 @@ ROM_START( martmast )
 	ROM_REGION32_LE( 0x400000, "user1", 0 ) /* Protection Data (encrypted external ARM data) */
 	ROM_LOAD( "v102_16m.u10",    0x000000, 0x200000,  CRC(18b745e6) SHA1(7bcb58dd3a2d6072f492cf0dd7181cb061c1f49d) ) // maybe incorrect size, probably needs redump
 
-	ROM_REGION( 0xa00000, "tiles", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
+	ROM_REGION( 0xa00000, "igs023", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
 	PGM_VIDEO_BIOS
 	ROM_LOAD( "pgm_t1000.u3",    0x180000, 0x800000, CRC(bbf879b5) SHA1(bd9a6aea34ad4001e89e62ff4b7a2292eb833c00) )
 
-	ROM_REGION16_LE( 0x4000000, "sprcol", 0 ) /* Sprite Colour Data */
+	ROM_REGION16_LE( 0x4000000, "igs023:sprcol", 0 ) /* Sprite Colour Data */
 	ROM_LOAD( "pgm_a1000.u3",    0x0000000, 0x0800000, CRC(43577ac8) SHA1(6eea8b455985d5bac74dcc9943cdc3c0902de6cc) )
 	ROM_LOAD( "pgm_a1001.u4",    0x0800000, 0x0800000, CRC(fe7a476f) SHA1(a8c7f1f0dd3e53141aed6d927eb88a3ceebb81e4) )
 	ROM_LOAD( "pgm_a1002.u6",    0x1000000, 0x0800000, CRC(62e33d38) SHA1(96163d583e25073594f8413ce263e56b66bd69a1) )
 	ROM_LOAD( "pgm_a1003.u8",    0x1800000, 0x0800000, CRC(b2c4945a) SHA1(7b18287a2db56db3651cfd4deb607af53522fefd) )
 	ROM_LOAD( "pgm_a1004.u10",   0x2000000, 0x0400000, CRC(9fd3f5fd) SHA1(057531f91062be51589c6cf8f4170089b9be6380) )
 
-	ROM_REGION16_LE( 0x1000000, "sprmask", 0 ) /* Sprite Masks + Colour Indexes */
+	ROM_REGION16_LE( 0x1000000, "igs023:sprmask", 0 ) /* Sprite Masks + Colour Indexes */
 	ROM_LOAD( "pgm_b1000.u9",    0x0000000, 0x0800000,  CRC(c5961f6f) SHA1(a68060b10edbd084cbde79d2ed1c9084777beb10) )
 	ROM_LOAD( "pgm_b1001.u11",   0x0800000, 0x0800000,  CRC(0b7e1c06) SHA1(545e15e0087f8621d593fecd8b4013f7ca311686) )
 
@@ -3734,18 +3722,18 @@ ROM_START( martmast104c )
 	ROM_REGION32_LE( 0x400000, "user1", 0 ) /* Protection Data (encrypted external ARM data) */
 	ROM_LOAD( "v102_16m.u10",    0x000000, 0x200000,  CRC(18b745e6) SHA1(7bcb58dd3a2d6072f492cf0dd7181cb061c1f49d) ) // maybe incorrect size, probably needs redump
 
-	ROM_REGION( 0xa00000, "tiles", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
+	ROM_REGION( 0xa00000, "igs023", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
 	PGM_VIDEO_BIOS
 	ROM_LOAD( "pgm_t1000.u3",    0x180000, 0x800000, CRC(bbf879b5) SHA1(bd9a6aea34ad4001e89e62ff4b7a2292eb833c00) )
 
-	ROM_REGION16_LE( 0x4000000, "sprcol", 0 ) /* Sprite Colour Data */
+	ROM_REGION16_LE( 0x4000000, "igs023:sprcol", 0 ) /* Sprite Colour Data */
 	ROM_LOAD( "pgm_a1000.u3",    0x0000000, 0x0800000, CRC(43577ac8) SHA1(6eea8b455985d5bac74dcc9943cdc3c0902de6cc) )
 	ROM_LOAD( "pgm_a1001.u4",    0x0800000, 0x0800000, CRC(fe7a476f) SHA1(a8c7f1f0dd3e53141aed6d927eb88a3ceebb81e4) )
 	ROM_LOAD( "pgm_a1002.u6",    0x1000000, 0x0800000, CRC(62e33d38) SHA1(96163d583e25073594f8413ce263e56b66bd69a1) )
 	ROM_LOAD( "pgm_a1003.u8",    0x1800000, 0x0800000, CRC(b2c4945a) SHA1(7b18287a2db56db3651cfd4deb607af53522fefd) )
 	ROM_LOAD( "pgm_a1004.u10",   0x2000000, 0x0400000, CRC(9fd3f5fd) SHA1(057531f91062be51589c6cf8f4170089b9be6380) )
 
-	ROM_REGION16_LE( 0x1000000, "sprmask", 0 ) /* Sprite Masks + Colour Indexes */
+	ROM_REGION16_LE( 0x1000000, "igs023:sprmask", 0 ) /* Sprite Masks + Colour Indexes */
 	ROM_LOAD( "pgm_b1000.u9",    0x0000000, 0x0800000,  CRC(c5961f6f) SHA1(a68060b10edbd084cbde79d2ed1c9084777beb10) )
 	ROM_LOAD( "pgm_b1001.u11",   0x0800000, 0x0800000,  CRC(0b7e1c06) SHA1(545e15e0087f8621d593fecd8b4013f7ca311686) )
 
@@ -3766,18 +3754,18 @@ ROM_START( martmast103c )
 	ROM_REGION32_LE( 0x400000, "user1", 0 ) /* Protection Data (encrypted external ARM data) */
 	ROM_LOAD( "v102_16m.u10",    0x000000, 0x200000,  CRC(18b745e6) SHA1(7bcb58dd3a2d6072f492cf0dd7181cb061c1f49d) ) // maybe incorrect size, probably needs redump
 
-	ROM_REGION( 0xa00000, "tiles", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
+	ROM_REGION( 0xa00000, "igs023", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
 	PGM_VIDEO_BIOS
 	ROM_LOAD( "pgm_t1000.u3",    0x180000, 0x800000, CRC(bbf879b5) SHA1(bd9a6aea34ad4001e89e62ff4b7a2292eb833c00) )
 
-	ROM_REGION16_LE( 0x4000000, "sprcol", 0 ) /* Sprite Colour Data */
+	ROM_REGION16_LE( 0x4000000, "igs023:sprcol", 0 ) /* Sprite Colour Data */
 	ROM_LOAD( "pgm_a1000.u3",    0x0000000, 0x0800000, CRC(43577ac8) SHA1(6eea8b455985d5bac74dcc9943cdc3c0902de6cc) )
 	ROM_LOAD( "pgm_a1001.u4",    0x0800000, 0x0800000, CRC(fe7a476f) SHA1(a8c7f1f0dd3e53141aed6d927eb88a3ceebb81e4) )
 	ROM_LOAD( "pgm_a1002.u6",    0x1000000, 0x0800000, CRC(62e33d38) SHA1(96163d583e25073594f8413ce263e56b66bd69a1) )
 	ROM_LOAD( "pgm_a1003.u8",    0x1800000, 0x0800000, CRC(b2c4945a) SHA1(7b18287a2db56db3651cfd4deb607af53522fefd) )
 	ROM_LOAD( "pgm_a1004.u10",   0x2000000, 0x0400000, CRC(9fd3f5fd) SHA1(057531f91062be51589c6cf8f4170089b9be6380) )
 
-	ROM_REGION16_LE( 0x1000000, "sprmask", 0 ) /* Sprite Masks + Colour Indexes */
+	ROM_REGION16_LE( 0x1000000, "igs023:sprmask", 0 ) /* Sprite Masks + Colour Indexes */
 	ROM_LOAD( "pgm_b1000.u9",    0x0000000, 0x0800000,  CRC(c5961f6f) SHA1(a68060b10edbd084cbde79d2ed1c9084777beb10) )
 	ROM_LOAD( "pgm_b1001.u11",   0x0800000, 0x0800000,  CRC(0b7e1c06) SHA1(545e15e0087f8621d593fecd8b4013f7ca311686) )
 
@@ -3798,18 +3786,18 @@ ROM_START( martmast102c )
 	ROM_REGION32_LE( 0x400000, "user1", 0 ) /* Protection Data (encrypted external ARM data) */
 	ROM_LOAD( "mm_v101_u10.u10", 0x000000, 0x400000,   CRC(41b9497c) SHA1(a941abbb938fb769112eaad374cc513a71aaa556) ) // double size wrt to other sets
 
-	ROM_REGION( 0xa00000, "tiles", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
+	ROM_REGION( 0xa00000, "igs023", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
 	PGM_VIDEO_BIOS
 	ROM_LOAD( "pgm_t1000.u3",    0x180000, 0x800000, CRC(bbf879b5) SHA1(bd9a6aea34ad4001e89e62ff4b7a2292eb833c00) )
 
-	ROM_REGION16_LE( 0x4000000, "sprcol", 0 ) /* Sprite Colour Data */
+	ROM_REGION16_LE( 0x4000000, "igs023:sprcol", 0 ) /* Sprite Colour Data */
 	ROM_LOAD( "pgm_a1000.u3",    0x0000000, 0x0800000, CRC(43577ac8) SHA1(6eea8b455985d5bac74dcc9943cdc3c0902de6cc) )
 	ROM_LOAD( "pgm_a1001.u4",    0x0800000, 0x0800000, CRC(fe7a476f) SHA1(a8c7f1f0dd3e53141aed6d927eb88a3ceebb81e4) )
 	ROM_LOAD( "pgm_a1002.u6",    0x1000000, 0x0800000, CRC(62e33d38) SHA1(96163d583e25073594f8413ce263e56b66bd69a1) )
 	ROM_LOAD( "pgm_a1003.u8",    0x1800000, 0x0800000, CRC(b2c4945a) SHA1(7b18287a2db56db3651cfd4deb607af53522fefd) )
 	ROM_LOAD( "pgm_a1004.u10",   0x2000000, 0x0400000, CRC(9fd3f5fd) SHA1(057531f91062be51589c6cf8f4170089b9be6380) )
 
-	ROM_REGION16_LE( 0x1000000, "sprmask", 0 ) /* Sprite Masks + Colour Indexes */
+	ROM_REGION16_LE( 0x1000000, "igs023:sprmask", 0 ) /* Sprite Masks + Colour Indexes */
 	ROM_LOAD( "pgm_b1000.u9",    0x0000000, 0x0800000,  CRC(c5961f6f) SHA1(a68060b10edbd084cbde79d2ed1c9084777beb10) )
 	ROM_LOAD( "pgm_b1001.u11",   0x0800000, 0x0800000,  CRC(0b7e1c06) SHA1(545e15e0087f8621d593fecd8b4013f7ca311686) )
 
@@ -3881,16 +3869,16 @@ ROM_START( dmnfrnt ) // same romset has also been found on a single PCB board (s
 	ROM_REGION32_LE( 0x800000, "user1", 0 ) /* Protection Data (encrypted external ARM data, internal missing) */
 	ROM_LOAD( "v105_32m.u26", 0x000000, 0x400000,  CRC(c798c2ef) SHA1(91e364c33b935293fa765ca521cdb67ac45ec70f) )
 
-	ROM_REGION( 0xa00000, "tiles", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
+	ROM_REGION( 0xa00000, "igs023", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
 	PGM_VIDEO_BIOS
 	ROM_LOAD( "igs_t04501w064.u29",    0x180000, 0x800000, CRC(900eaaac) SHA1(4033cb7b28fcadb92d5af3ea7fdd1c22747618fd) )
 
-	ROM_REGION16_LE( 0x2000000, "sprcol", 0 ) /* Sprite Colour Data */
+	ROM_REGION16_LE( 0x2000000, "igs023:sprcol", 0 ) /* Sprite Colour Data */
 	ROM_LOAD( "igs_a04501w064.u3",     0x0000000, 0x0800000, CRC(9741bea6) SHA1(e3e904249be228628c8c2bd3495cda23586dc048) )
 	ROM_LOAD( "igs_a04502w064.u4",     0x0800000, 0x0800000, CRC(e104f405) SHA1(124b3deed3e838f8bae6c7d78bdd788859597585) )
 	ROM_LOAD( "igs_a04503w064.u6",     0x1000000, 0x0800000, CRC(bfd5cfe3) SHA1(fbe4c0a2987c2036df707b86597d78124ee2e665) )
 
-	ROM_REGION16_LE( 0x1000000, "sprmask", 0 ) /* Sprite Masks + Colour Indexes */
+	ROM_REGION16_LE( 0x1000000, "igs023:sprmask", 0 ) /* Sprite Masks + Colour Indexes */
 	ROM_LOAD( "igs_b04501w064.u9",     0x0000000, 0x0800000,  CRC(29320b7d) SHA1(59c78805e666f912df201c34616744f46057937b) )
 	ROM_LOAD( "igs_b04502w016.u11",    0x0800000, 0x0200000,  CRC(578c00e9) SHA1(14235cc8b0f8c7dd659512f017a2d4aacd91d89d) )
 
@@ -3910,16 +3898,16 @@ ROM_START( dmnfrnt103 )
 	ROM_REGION32_LE( 0x800000, "user1", 0 ) /* Protection Data (encrypted external ARM data, internal missing) */
 	ROM_LOAD( "v103_32m.u26", 0x000000, 0x400000, CRC(e78383a3) SHA1(7ae99e93489e79fb1e4240124d22b6002fb7fe18) )
 
-	ROM_REGION( 0xa00000, "tiles", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
+	ROM_REGION( 0xa00000, "igs023", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
 	PGM_VIDEO_BIOS
 	ROM_LOAD( "igs_t04501w064.u29",    0x180000, 0x800000, CRC(900eaaac) SHA1(4033cb7b28fcadb92d5af3ea7fdd1c22747618fd) )
 
-	ROM_REGION16_LE( 0x2000000, "sprcol", 0 ) /* Sprite Colour Data */
+	ROM_REGION16_LE( 0x2000000, "igs023:sprcol", 0 ) /* Sprite Colour Data */
 	ROM_LOAD( "igs_a04501w064.u3",     0x0000000, 0x0800000, CRC(9741bea6) SHA1(e3e904249be228628c8c2bd3495cda23586dc048) )
 	ROM_LOAD( "igs_a04502w064.u4",     0x0800000, 0x0800000, CRC(e104f405) SHA1(124b3deed3e838f8bae6c7d78bdd788859597585) )
 	ROM_LOAD( "igs_a04503w064.u6",     0x1000000, 0x0800000, CRC(bfd5cfe3) SHA1(fbe4c0a2987c2036df707b86597d78124ee2e665) )
 
-	ROM_REGION16_LE( 0x1000000, "sprmask", 0 ) /* Sprite Masks + Colour Indexes */
+	ROM_REGION16_LE( 0x1000000, "igs023:sprmask", 0 ) /* Sprite Masks + Colour Indexes */
 	ROM_LOAD( "igs_b04501w064.u9",     0x0000000, 0x0800000,  CRC(29320b7d) SHA1(59c78805e666f912df201c34616744f46057937b) )
 	ROM_LOAD( "igs_b04502w016.u11",    0x0800000, 0x0200000,  CRC(578c00e9) SHA1(14235cc8b0f8c7dd659512f017a2d4aacd91d89d) )
 
@@ -3939,16 +3927,16 @@ ROM_START( dmnfrnt102 )
 	ROM_REGION32_LE( 0x800000, "user1", 0 ) /* Protection Data (encrypted external ARM data, internal missing) */
 	ROM_LOAD( "v101_32m.u26", 0x000000, 0x400000,  CRC(93965281) SHA1(89da198aaa7ca759cb96b5f18859a477e55fd590) )
 
-	ROM_REGION( 0xa00000, "tiles", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
+	ROM_REGION( 0xa00000, "igs023", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
 	PGM_VIDEO_BIOS
 	ROM_LOAD( "igs_t04501w064.u29",    0x180000, 0x800000, CRC(900eaaac) SHA1(4033cb7b28fcadb92d5af3ea7fdd1c22747618fd) )
 
-	ROM_REGION16_LE( 0x2000000, "sprcol", 0 ) /* Sprite Colour Data */
+	ROM_REGION16_LE( 0x2000000, "igs023:sprcol", 0 ) /* Sprite Colour Data */
 	ROM_LOAD( "igs_a04501w064.u3",     0x0000000, 0x0800000, CRC(9741bea6) SHA1(e3e904249be228628c8c2bd3495cda23586dc048) )
 	ROM_LOAD( "igs_a04502w064.u4",     0x0800000, 0x0800000, CRC(e104f405) SHA1(124b3deed3e838f8bae6c7d78bdd788859597585) )
 	ROM_LOAD( "igs_a04503w064.u6",     0x1000000, 0x0800000, CRC(bfd5cfe3) SHA1(fbe4c0a2987c2036df707b86597d78124ee2e665) )
 
-	ROM_REGION16_LE( 0x1000000, "sprmask", 0 ) /* Sprite Masks + Colour Indexes */
+	ROM_REGION16_LE( 0x1000000, "igs023:sprmask", 0 ) /* Sprite Masks + Colour Indexes */
 	ROM_LOAD( "igs_b04501w064.u9",     0x0000000, 0x0800000,  CRC(29320b7d) SHA1(59c78805e666f912df201c34616744f46057937b) )
 	ROM_LOAD( "igs_b04502w016.u11",    0x0800000, 0x0200000,  CRC(578c00e9) SHA1(14235cc8b0f8c7dd659512f017a2d4aacd91d89d) )
 
@@ -3968,16 +3956,16 @@ ROM_START( dmnfrntpcb )
 	ROM_REGION32_LE( 0x800000, "user1", 0 ) /* Protection Data (encrypted external ARM data, internal missing) */
 	ROM_LOAD( "demon_front_v107kr_u62.u62",     0x000000, 0x400000, CRC(cb94772e) SHA1(4213600be41fd9ea295dd308920b1d89b635724f) )
 
-	ROM_REGION( 0xa00000, "tiles", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
+	ROM_REGION( 0xa00000, "igs023", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
 	PGM_VIDEO_BIOS
 	ROM_LOAD( "igs_t04501w064.u71",    0x180000, 0x800000, CRC(900eaaac) SHA1(4033cb7b28fcadb92d5af3ea7fdd1c22747618fd) )
 
-	ROM_REGION16_LE( 0x2000000, "sprcol", 0 ) /* Sprite Colour Data */
+	ROM_REGION16_LE( 0x2000000, "igs023:sprcol", 0 ) /* Sprite Colour Data */
 	ROM_LOAD( "igs_a04501w064.u30",    0x0000000, 0x0800000, CRC(9741bea6) SHA1(e3e904249be228628c8c2bd3495cda23586dc048) )
 	ROM_LOAD( "igs_a04502w064.u31",    0x0800000, 0x0800000, CRC(e104f405) SHA1(124b3deed3e838f8bae6c7d78bdd788859597585) )
 	ROM_LOAD( "igs_a04503w064.u32",    0x1000000, 0x0800000, CRC(bfd5cfe3) SHA1(fbe4c0a2987c2036df707b86597d78124ee2e665) )
 
-	ROM_REGION16_LE( 0x1000000, "sprmask", 0 ) /* Sprite Masks + Colour Indexes */
+	ROM_REGION16_LE( 0x1000000, "igs023:sprmask", 0 ) /* Sprite Masks + Colour Indexes */
 	ROM_LOAD( "igs_b04501w064.u40",    0x0000000, 0x0800000,  CRC(29320b7d) SHA1(59c78805e666f912df201c34616744f46057937b) )
 	ROM_LOAD( "igs_b04502w016.u41",   0x0800000, 0x0200000,  CRC(578c00e9) SHA1(14235cc8b0f8c7dd659512f017a2d4aacd91d89d) )
 
@@ -4003,16 +3991,16 @@ ROM_START( theglad )
 	ROM_REGION32_LE( 0x800000, "user1", 0 ) /* Protection Data (encrypted external ARM data, internal missing) */
 	ROM_LOAD( "v107_u26.u26", 0x000000, 0x200000,  CRC(f7c61357) SHA1(52d31c464dfc83c5371b078cb6b73c0d0e0d57e3) ) // 06/06/03 16:17:27 V107
 
-	ROM_REGION( 0xa00000, "tiles", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
+	ROM_REGION( 0xa00000, "igs023", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
 	PGM_VIDEO_BIOS
 	ROM_LOAD( "igs_t04601w64m.u33",   0x180000, 0x800000, CRC(e5dab371) SHA1(2e3c93958eb0326b6b84b95c2168626f26bbac76) )
 
-	ROM_REGION16_LE( 0x2000000, "sprcol", 0 ) /* Sprite Colour Data */
+	ROM_REGION16_LE( 0x2000000, "igs023:sprcol", 0 ) /* Sprite Colour Data */
 	ROM_LOAD( "igs_a04601w64m.u2",    0x0000000, 0x0800000,  CRC(d9b2e004) SHA1(8e1882b800fe9f12d7d49303e7417ba5b6f8ef85) )
 	ROM_LOAD( "igs_a04602w64m.u4",    0x0800000, 0x0800000,  CRC(14f22308) SHA1(7fad54704e8c97eab723f53dfb50fb3e7bb606d2) )
 	ROM_LOAD( "igs_a04603w64m.u6",    0x1000000, 0x0800000,  CRC(8f621e17) SHA1(b0f87f378e0115d0c95017ca0f1b0d508827a7c6) )
 
-	ROM_REGION16_LE( 0x1000000, "sprmask", 0 ) /* Sprite Masks + Colour Indexes */
+	ROM_REGION16_LE( 0x1000000, "igs023:sprmask", 0 ) /* Sprite Masks + Colour Indexes */
 	ROM_LOAD( "igs_b04601w64m.u11",   0x0000000, 0x0800000, CRC(ee72bccf) SHA1(73c25fe659f6c903447066e4ef83d2f580449d76) )
 	ROM_LOAD( "igs_b04602w32m.u12",   0x0800000, 0x0400000, CRC(7dba9c38) SHA1(a03d509274e8f6a500a7ebe2da5aab8bed4e7f2f) )
 
@@ -4033,16 +4021,16 @@ ROM_START( theglad100 ) // is this actually a pre-v100 proto?
 	ROM_REGION32_LE( 0x800000, "user1", 0 ) /* Protection Data (encrypted external ARM data, internal missing) */
 	ROM_LOAD( "u2.rom", 0x000000, 0x200000,  CRC(c7bcf2ae) SHA1(10bc012c83987f594d5375a51bc4be2e17568a81) ) // 01/16/03 10:39:25 V100
 
-	ROM_REGION( 0xa00000, "tiles", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
+	ROM_REGION( 0xa00000, "igs023", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
 	PGM_VIDEO_BIOS
 	ROM_LOAD( "igs_t04601w64m.u33",   0x180000, 0x800000, CRC(e5dab371) SHA1(2e3c93958eb0326b6b84b95c2168626f26bbac76) )
 
-	ROM_REGION16_LE( 0x2000000, "sprcol", 0 ) /* Sprite Colour Data */
+	ROM_REGION16_LE( 0x2000000, "igs023:sprcol", 0 ) /* Sprite Colour Data */
 	ROM_LOAD( "igs_a04601w64m.u2",    0x0000000, 0x0800000,  CRC(d9b2e004) SHA1(8e1882b800fe9f12d7d49303e7417ba5b6f8ef85) )
 	ROM_LOAD( "igs_a04602w64m.u4",    0x0800000, 0x0800000,  CRC(14f22308) SHA1(7fad54704e8c97eab723f53dfb50fb3e7bb606d2) )
 	ROM_LOAD( "igs_a04603w64m.u6",    0x1000000, 0x0800000,  CRC(8f621e17) SHA1(b0f87f378e0115d0c95017ca0f1b0d508827a7c6) )
 
-	ROM_REGION16_LE( 0x1000000, "sprmask", 0 ) /* Sprite Masks + Colour Indexes */
+	ROM_REGION16_LE( 0x1000000, "igs023:sprmask", 0 ) /* Sprite Masks + Colour Indexes */
 	ROM_LOAD( "igs_b04601w64m.u11",   0x0000000, 0x0800000, CRC(ee72bccf) SHA1(73c25fe659f6c903447066e4ef83d2f580449d76) )
 	ROM_LOAD( "igs_b04602w32m.u12",   0x0800000, 0x0400000, CRC(7dba9c38) SHA1(a03d509274e8f6a500a7ebe2da5aab8bed4e7f2f) )
 
@@ -4064,16 +4052,16 @@ ROM_START( theglad101 )
 	ROM_REGION32_LE( 0x800000, "user1", 0 ) /* Protection Data (encrypted external ARM data, internal missing) */
 	ROM_LOAD( "v101.u26", 0x000000, 0x200000, CRC(23faec02) SHA1(9065d55c2a14e6889e735a452bbc32530056645a) ) // 03/13/03 14:06:44 V101
 
-	ROM_REGION( 0xa00000, "tiles", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
+	ROM_REGION( 0xa00000, "igs023", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
 	PGM_VIDEO_BIOS
 	ROM_LOAD( "igs_t04601w64m.u33",   0x180000, 0x800000, CRC(e5dab371) SHA1(2e3c93958eb0326b6b84b95c2168626f26bbac76) )
 
-	ROM_REGION16_LE( 0x2000000, "sprcol", 0 ) /* Sprite Colour Data */
+	ROM_REGION16_LE( 0x2000000, "igs023:sprcol", 0 ) /* Sprite Colour Data */
 	ROM_LOAD( "igs_a04601w64m.u2",    0x0000000, 0x0800000,  CRC(d9b2e004) SHA1(8e1882b800fe9f12d7d49303e7417ba5b6f8ef85) )
 	ROM_LOAD( "igs_a04602w64m.u4",    0x0800000, 0x0800000,  CRC(14f22308) SHA1(7fad54704e8c97eab723f53dfb50fb3e7bb606d2) )
 	ROM_LOAD( "igs_a04603w64m.u6",    0x1000000, 0x0800000,  CRC(8f621e17) SHA1(b0f87f378e0115d0c95017ca0f1b0d508827a7c6) )
 
-	ROM_REGION16_LE( 0x1000000, "sprmask", 0 ) /* Sprite Masks + Colour Indexes */
+	ROM_REGION16_LE( 0x1000000, "igs023:sprmask", 0 ) /* Sprite Masks + Colour Indexes */
 	ROM_LOAD( "igs_b04601w64m.u11",   0x0000000, 0x0800000, CRC(ee72bccf) SHA1(73c25fe659f6c903447066e4ef83d2f580449d76) )
 	ROM_LOAD( "igs_b04602w32m.u12",   0x0800000, 0x0400000, CRC(7dba9c38) SHA1(a03d509274e8f6a500a7ebe2da5aab8bed4e7f2f) )
 
@@ -4094,16 +4082,16 @@ ROM_START( theglad104 )
 	ROM_REGION32_LE( 0x800000, "user1", 0 ) /* Protection Data (encrypted external ARM data, internal missing) */
 	ROM_LOAD( "v104_u26.u26", 0x000000, 0x200000,  CRC(81b5df6d) SHA1(63ab9806be458cfe9e5561606fd200c599dcb527) ) // 04/02/03 09:39:46 V104
 
-	ROM_REGION( 0xa00000, "tiles", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
+	ROM_REGION( 0xa00000, "igs023", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
 	PGM_VIDEO_BIOS
 	ROM_LOAD( "igs_t04601w64m.u33",   0x180000, 0x800000, CRC(e5dab371) SHA1(2e3c93958eb0326b6b84b95c2168626f26bbac76) )
 
-	ROM_REGION16_LE( 0x2000000, "sprcol", 0 ) /* Sprite Colour Data */
+	ROM_REGION16_LE( 0x2000000, "igs023:sprcol", 0 ) /* Sprite Colour Data */
 	ROM_LOAD( "igs_a04601w64m.u2",    0x0000000, 0x0800000,  CRC(d9b2e004) SHA1(8e1882b800fe9f12d7d49303e7417ba5b6f8ef85) )
 	ROM_LOAD( "igs_a04602w64m.u4",    0x0800000, 0x0800000,  CRC(14f22308) SHA1(7fad54704e8c97eab723f53dfb50fb3e7bb606d2) )
 	ROM_LOAD( "igs_a04603w64m.u6",    0x1000000, 0x0800000,  CRC(8f621e17) SHA1(b0f87f378e0115d0c95017ca0f1b0d508827a7c6) )
 
-	ROM_REGION16_LE( 0x1000000, "sprmask", 0 ) /* Sprite Masks + Colour Indexes */
+	ROM_REGION16_LE( 0x1000000, "igs023:sprmask", 0 ) /* Sprite Masks + Colour Indexes */
 	ROM_LOAD( "igs_b04601w64m.u11",   0x0000000, 0x0800000, CRC(ee72bccf) SHA1(73c25fe659f6c903447066e4ef83d2f580449d76) )
 	ROM_LOAD( "igs_b04602w32m.u12",   0x0800000, 0x0400000, CRC(7dba9c38) SHA1(a03d509274e8f6a500a7ebe2da5aab8bed4e7f2f) )
 
@@ -4124,16 +4112,16 @@ ROM_START( thegladpcb )
 	ROM_REGION32_LE( 0x800000, "user1", 0 ) /* Protection Data (encrypted external ARM data, internal missing) */
 	ROM_LOAD( "v101_u62.u62", 0x000000, 0x200000, CRC(23faec02) SHA1(9065d55c2a14e6889e735a452bbc32530056645a) ) // 03/13/03 14:06:44 V101
 
-	ROM_REGION( 0xa00000, "tiles", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
+	ROM_REGION( 0xa00000, "igs023", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
 	ROM_LOAD( "pgm_t01s.u72",         0x000000, 0x200000, CRC(1a7123a0) SHA1(cc567f577bfbf45427b54d6695b11b74f2578af3) ) // standard PGM tx bios
 	ROM_LOAD( "igs_t04601w64m.u71",   0x180000, 0x800000, CRC(e5dab371) SHA1(2e3c93958eb0326b6b84b95c2168626f26bbac76) )
 
-	ROM_REGION16_LE( 0x2000000, "sprcol", 0 ) /* Sprite Colour Data */
+	ROM_REGION16_LE( 0x2000000, "igs023:sprcol", 0 ) /* Sprite Colour Data */
 	ROM_LOAD( "igs_a04601w64m.u30",   0x0000000, 0x0800000,  CRC(d9b2e004) SHA1(8e1882b800fe9f12d7d49303e7417ba5b6f8ef85) )
 	ROM_LOAD( "igs_a04602w64m.u31",   0x0800000, 0x0800000,  CRC(14f22308) SHA1(7fad54704e8c97eab723f53dfb50fb3e7bb606d2) )
 	ROM_LOAD( "igs_a04603w64m.u32",   0x1000000, 0x0800000,  CRC(8f621e17) SHA1(b0f87f378e0115d0c95017ca0f1b0d508827a7c6) )
 
-	ROM_REGION16_LE( 0x1000000, "sprmask", 0 ) /* Sprite Masks + Colour Indexes */
+	ROM_REGION16_LE( 0x1000000, "igs023:sprmask", 0 ) /* Sprite Masks + Colour Indexes */
 	ROM_LOAD( "igs_b04601w64m.u40",   0x0000000, 0x0800000, CRC(ee72bccf) SHA1(73c25fe659f6c903447066e4ef83d2f580449d76) )
 	ROM_LOAD( "igs_b04602w32m.u41",   0x0800000, 0x0400000, CRC(7dba9c38) SHA1(a03d509274e8f6a500a7ebe2da5aab8bed4e7f2f) )
 
@@ -4155,16 +4143,16 @@ ROM_START( thegladpcba )
 	ROM_REGION32_LE( 0x800000, "user1", 0 ) /* Protection Data (encrypted external ARM data, internal missing) */
 	ROM_LOAD( "v100_u62.u62", 0x000000, 0x200000, CRC(0f3f511e) SHA1(28dd8d27495cec86e968a3ea549c5b30513dbb6e) ) // 02/25/03 16:32:21 V100
 
-	ROM_REGION( 0xa00000, "tiles", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
+	ROM_REGION( 0xa00000, "igs023", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
 	ROM_LOAD( "pgm_t01s.u72",         0x000000, 0x200000, CRC(1a7123a0) SHA1(cc567f577bfbf45427b54d6695b11b74f2578af3) ) // standard PGM tx bios
 	ROM_LOAD( "igs_t04601w64m.u71",   0x180000, 0x800000, CRC(e5dab371) SHA1(2e3c93958eb0326b6b84b95c2168626f26bbac76) )
 
-	ROM_REGION16_LE( 0x2000000, "sprcol", 0 ) /* Sprite Colour Data */
+	ROM_REGION16_LE( 0x2000000, "igs023:sprcol", 0 ) /* Sprite Colour Data */
 	ROM_LOAD( "igs_a04601w64m.u30",   0x0000000, 0x0800000,  CRC(d9b2e004) SHA1(8e1882b800fe9f12d7d49303e7417ba5b6f8ef85) )
 	ROM_LOAD( "igs_a04602w64m.u31",   0x0800000, 0x0800000,  CRC(14f22308) SHA1(7fad54704e8c97eab723f53dfb50fb3e7bb606d2) )
 	ROM_LOAD( "igs_a04603w64m.u32",   0x1000000, 0x0800000,  CRC(8f621e17) SHA1(b0f87f378e0115d0c95017ca0f1b0d508827a7c6) )
 
-	ROM_REGION16_LE( 0x1000000, "sprmask", 0 ) /* Sprite Masks + Colour Indexes */
+	ROM_REGION16_LE( 0x1000000, "igs023:sprmask", 0 ) /* Sprite Masks + Colour Indexes */
 	ROM_LOAD( "igs_b04601w64m.u40",   0x0000000, 0x0800000, CRC(ee72bccf) SHA1(73c25fe659f6c903447066e4ef83d2f580449d76) )
 	ROM_LOAD( "igs_b04602w32m.u41",   0x0800000, 0x0400000, CRC(7dba9c38) SHA1(a03d509274e8f6a500a7ebe2da5aab8bed4e7f2f) )
 
@@ -4184,17 +4172,17 @@ ROM_START( oldsplus )
 
 	ROM_REGION32_LE( 0x800000, "user1", ROMREGION_ERASE00 )
 
-	ROM_REGION( 0xa00000, "tiles", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
+	ROM_REGION( 0xa00000, "igs023", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
 	PGM_VIDEO_BIOS
 	ROM_LOAD( "igs_t05301w064.u2",   0x180000, 0x800000, CRC(8257bbb0) SHA1(b48067b7e7081a15fddf21739b641d677c2df3d9) )
 
-	ROM_REGION16_LE( 0x2000000, "sprcol", 0 ) /* Sprite Colour Data */
+	ROM_REGION16_LE( 0x2000000, "igs023:sprcol", 0 ) /* Sprite Colour Data */
 	ROM_LOAD( "igs_a05301w064.u3",   0x0000000, 0x0800000, CRC(57946fd2) SHA1(5d79bc71a1881f3099821a9b255a5f271e0eeff6) ) // FIXED BITS (xxxxxxxx1xxxxxxx)
 	ROM_LOAD( "igs_a05302w064.u4",   0x0800000, 0x0800000, CRC(3459a0b8) SHA1(94ab6f980b5582f1db9bb12019d03f0b6e0a06df) ) // FIXED BITS (xxxxxxxx1xxxxxxx)
 	ROM_LOAD( "igs_a05303w064.u6",   0x1000000, 0x0800000, CRC(13475d85) SHA1(4683a3bf304fdc15ffb1c61b7957ad68b023fa33) ) // FIXED BITS (xxxxxxxx1xxxxxxx)
 	ROM_LOAD( "igs_a05304w064.u8",   0x1800000, 0x0800000, CRC(f03ef7a6) SHA1(c18b1b622b430d5e031e65daa6819b84c3e12ef5) )
 
-	ROM_REGION16_LE( 0x1000000, "sprmask", 0 ) /* Sprite Masks + Colour Indexes */
+	ROM_REGION16_LE( 0x1000000, "igs023:sprmask", 0 ) /* Sprite Masks + Colour Indexes */
 	ROM_LOAD( "igs_b05301w064.u9",   0x0000000, 0x0800000, CRC(fd98f503) SHA1(02046ab1aa89f63bff149003d9d61776e025a92a) )
 	ROM_LOAD( "igs_b05302w064.u11",  0x0800000, 0x0800000, CRC(9f6094a8) SHA1(69f6f2003ab975eae13ea6b5c2ffa40df6e6bdf6) )
 
@@ -4213,17 +4201,17 @@ ROM_START( oldsplus203 ) // only program ROM provided for this set
 
 	ROM_REGION32_LE( 0x800000, "user1", ROMREGION_ERASE00 )
 
-	ROM_REGION( 0xa00000, "tiles", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
+	ROM_REGION( 0xa00000, "igs023", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
 	PGM_VIDEO_BIOS
 	ROM_LOAD( "igs_t05301w064.u2",   0x180000, 0x800000, CRC(8257bbb0) SHA1(b48067b7e7081a15fddf21739b641d677c2df3d9) )
 
-	ROM_REGION16_LE( 0x2000000, "sprcol", 0 ) /* Sprite Colour Data */
+	ROM_REGION16_LE( 0x2000000, "igs023:sprcol", 0 ) /* Sprite Colour Data */
 	ROM_LOAD( "igs_a05301w064.u3",   0x0000000, 0x0800000, CRC(57946fd2) SHA1(5d79bc71a1881f3099821a9b255a5f271e0eeff6) ) // FIXED BITS (xxxxxxxx1xxxxxxx)
 	ROM_LOAD( "igs_a05302w064.u4",   0x0800000, 0x0800000, CRC(3459a0b8) SHA1(94ab6f980b5582f1db9bb12019d03f0b6e0a06df) ) // FIXED BITS (xxxxxxxx1xxxxxxx)
 	ROM_LOAD( "igs_a05303w064.u6",   0x1000000, 0x0800000, CRC(13475d85) SHA1(4683a3bf304fdc15ffb1c61b7957ad68b023fa33) ) // FIXED BITS (xxxxxxxx1xxxxxxx)
 	ROM_LOAD( "igs_a05304w064.u8",   0x1800000, 0x0800000, CRC(f03ef7a6) SHA1(c18b1b622b430d5e031e65daa6819b84c3e12ef5) )
 
-	ROM_REGION16_LE( 0x1000000, "sprmask", 0 ) /* Sprite Masks + Colour Indexes */
+	ROM_REGION16_LE( 0x1000000, "igs023:sprmask", 0 ) /* Sprite Masks + Colour Indexes */
 	ROM_LOAD( "igs_b05301w064.u9",   0x0000000, 0x0800000, CRC(fd98f503) SHA1(02046ab1aa89f63bff149003d9d61776e025a92a) )
 	ROM_LOAD( "igs_b05302w064.u11",  0x0800000, 0x0800000, CRC(9f6094a8) SHA1(69f6f2003ab975eae13ea6b5c2ffa40df6e6bdf6) )
 
@@ -4240,20 +4228,20 @@ ROM_START( kovshp )
 	ROM_REGION( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom */
 	ROM_LOAD( "kovsh_v100_china.asic", 0x000000, 0x04000, BAD_DUMP CRC(0f09a5c1) SHA1(621b38c05f33277608d58b49822aebc930ae4870) ) // this is the kovsh ARM rom, we intercept and modify protection calls
 
-	ROM_REGION( 0xa00000, "tiles", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
+	ROM_REGION( 0xa00000, "igs023", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
 	PGM_VIDEO_BIOS
 	ROM_LOAD( "pgm_t0600.u2",       0x180000, 0x800000, CRC(4acc1ad6) SHA1(0668dbd5e856c2406910c6b7382548b37c631780) )
 	// also seen split in 2 smaller ROMs
 	// "s&k_fntcg_u3.u3" - t0600.rom    [1/2]  IDENTICAL - CRC(164b3c94) SHA1(f00ea66886ca6bff74bbeaa49e7f5c75c275d5d7)
 	// "s&k_fntcg_u7.u7" - t0600.rom    [2/2]  IDENTICAL - CRC(b1fae5e8) SHA1(88b84879b5ce9c29081647186b3a1b003efe6dcc)
 
-	ROM_REGION16_LE( 0x2000000, "sprcol", 0 ) /* Sprite Colour Data */
+	ROM_REGION16_LE( 0x2000000, "igs023:sprcol", 0 ) /* Sprite Colour Data */
 	ROM_LOAD( "pgm_a0600.u3",       0x0000000, 0x0800000, CRC(d8167834) SHA1(fa55a99629d03b2ea253392352f70d2c8639a991) ) // FIXED BITS (xxxxxxxx1xxxxxxx)
 	ROM_LOAD( "pgm_a0601.u4",       0x0800000, 0x0800000, CRC(ff7a4373) SHA1(7def9fca7513ad5a117da230bebd2e3c78679041) ) // FIXED BITS (xxxxxxxx1xxxxxxx)
 	ROM_LOAD( "pgm_a0602.u6",       0x1000000, 0x0800000, CRC(e7a32959) SHA1(3d0ed684dc5b269238890836b2ce7ef46aa5265b) ) // FIXED BITS (xxxxxxxx1xxxxxxx)
 	ROM_LOAD( "igs_a05401w064.u8",  0x1800000, 0x0800000, CRC(4fd3413e) SHA1(5e8f3e421342bf558c77e59635f9b5d713e825c2) )
 
-	ROM_REGION16_LE( 0x1000000, "sprmask", 0 ) /* Sprite Masks + Colour Indexes */
+	ROM_REGION16_LE( 0x1000000, "igs023:sprmask", 0 ) /* Sprite Masks + Colour Indexes */
 	ROM_LOAD( "pgm_b0600.u9",       0x0000000, 0x0800000, CRC(7d3cd059) SHA1(00cf994b63337e0e4ebe96453daf45f24192af1c) )
 	ROM_LOAD( "igs_b05401w064.u11", 0x0800000, 0x0800000, CRC(60999757) SHA1(118cf058e67858958bcb931e14f5d160c7de87cc) )
 
@@ -4270,17 +4258,17 @@ ROM_START( kovshp100 )
 	ROM_REGION( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom */
 	ROM_LOAD( "kovsh_v100_china.asic", 0x000000, 0x04000, BAD_DUMP CRC(0f09a5c1) SHA1(621b38c05f33277608d58b49822aebc930ae4870) ) // this is the kovsh ARM rom, we intercept and modify protection calls
 
-	ROM_REGION( 0xa00000, "tiles", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
+	ROM_REGION( 0xa00000, "igs023", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
 	PGM_VIDEO_BIOS
 	ROM_LOAD( "pgm_t0600.u2",       0x180000, 0x800000, CRC(4acc1ad6) SHA1(0668dbd5e856c2406910c6b7382548b37c631780) )
 
-	ROM_REGION16_LE( 0x2000000, "sprcol", 0 ) /* Sprite Colour Data */
+	ROM_REGION16_LE( 0x2000000, "igs023:sprcol", 0 ) /* Sprite Colour Data */
 	ROM_LOAD( "pgm_a0600.u3",       0x0000000, 0x0800000, CRC(d8167834) SHA1(fa55a99629d03b2ea253392352f70d2c8639a991) ) // FIXED BITS (xxxxxxxx1xxxxxxx)
 	ROM_LOAD( "pgm_a0601.u4",       0x0800000, 0x0800000, CRC(ff7a4373) SHA1(7def9fca7513ad5a117da230bebd2e3c78679041) ) // FIXED BITS (xxxxxxxx1xxxxxxx)
 	ROM_LOAD( "pgm_a0602.u6",       0x1000000, 0x0800000, CRC(e7a32959) SHA1(3d0ed684dc5b269238890836b2ce7ef46aa5265b) ) // FIXED BITS (xxxxxxxx1xxxxxxx)
 	ROM_LOAD( "igs_a05401w064.u8",  0x1800000, 0x0800000, CRC(4fd3413e) SHA1(5e8f3e421342bf558c77e59635f9b5d713e825c2) )
 
-	ROM_REGION16_LE( 0x1000000, "sprmask", 0 ) /* Sprite Masks + Colour Indexes */
+	ROM_REGION16_LE( 0x1000000, "igs023:sprmask", 0 ) /* Sprite Masks + Colour Indexes */
 	ROM_LOAD( "pgm_b0600.u9",       0x0000000, 0x0800000, CRC(7d3cd059) SHA1(00cf994b63337e0e4ebe96453daf45f24192af1c) )
 	ROM_LOAD( "igs_b05401w064.u11", 0x0800000, 0x0800000, CRC(60999757) SHA1(118cf058e67858958bcb931e14f5d160c7de87cc) )
 
@@ -4299,17 +4287,17 @@ ROM_START( kovytzy )
 	ROM_REGION( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom */
 	ROM_LOAD( "kovsh_v100_china.asic", 0x000000, 0x04000, BAD_DUMP CRC(0f09a5c1) SHA1(621b38c05f33277608d58b49822aebc930ae4870) ) // this is the kovsh ARM rom, we intercept and modify protection calls
 
-	ROM_REGION( 0xa00000, "tiles", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
+	ROM_REGION( 0xa00000, "igs023", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
 	PGM_VIDEO_BIOS
 	ROM_LOAD( "pgm_t0600.u2",       0x180000, 0x800000, CRC(4acc1ad6) SHA1(0668dbd5e856c2406910c6b7382548b37c631780) )
 
-	ROM_REGION16_LE( 0x2000000, "sprcol", 0 ) /* Sprite Colour Data */
+	ROM_REGION16_LE( 0x2000000, "igs023:sprcol", 0 ) /* Sprite Colour Data */
 	ROM_LOAD( "pgm_a0600.u3",       0x0000000, 0x0800000, CRC(d8167834) SHA1(fa55a99629d03b2ea253392352f70d2c8639a991) ) // FIXED BITS (xxxxxxxx1xxxxxxx)
 	ROM_LOAD( "pgm_a0601.u4",       0x0800000, 0x0800000, CRC(ff7a4373) SHA1(7def9fca7513ad5a117da230bebd2e3c78679041) ) // FIXED BITS (xxxxxxxx1xxxxxxx)
 	ROM_LOAD( "pgm_a0602.u6",       0x1000000, 0x0800000, CRC(e7a32959) SHA1(3d0ed684dc5b269238890836b2ce7ef46aa5265b) ) // FIXED BITS (xxxxxxxx1xxxxxxx)
 	ROM_LOAD( "igs_a05401w064.u8",  0x1800000, 0x0800000, CRC(4fd3413e) SHA1(5e8f3e421342bf558c77e59635f9b5d713e825c2) )
 
-	ROM_REGION16_LE( 0x1000000, "sprmask", 0 ) /* Sprite Masks + Colour Indexes */
+	ROM_REGION16_LE( 0x1000000, "igs023:sprmask", 0 ) /* Sprite Masks + Colour Indexes */
 	ROM_LOAD( "pgm_b0600.u9",       0x0000000, 0x0800000, CRC(7d3cd059) SHA1(00cf994b63337e0e4ebe96453daf45f24192af1c) )
 	ROM_LOAD( "igs_b05401w064.u11", 0x0800000, 0x0800000, CRC(60999757) SHA1(118cf058e67858958bcb931e14f5d160c7de87cc) )
 
@@ -4326,17 +4314,17 @@ ROM_START( kovshxas )
 	ROM_REGION( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom */
 	ROM_LOAD( "kovsh_v100_china.asic", 0x000000, 0x04000, BAD_DUMP CRC(0f09a5c1) SHA1(621b38c05f33277608d58b49822aebc930ae4870) ) // this is the kovsh ARM rom, we intercept and modify protection calls
 
-	ROM_REGION( 0xa00000, "tiles", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
+	ROM_REGION( 0xa00000, "igs023", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
 	PGM_VIDEO_BIOS
 	ROM_LOAD( "t0600.rom",    0x180000, 0x800000, CRC(4acc1ad6) SHA1(0668dbd5e856c2406910c6b7382548b37c631780) )
 
-	ROM_REGION16_LE( 0x2000000, "sprcol", 0 ) /* Sprite Colour Data */
+	ROM_REGION16_LE( 0x2000000, "igs023:sprcol", 0 ) /* Sprite Colour Data */
 	ROM_LOAD( "a0600.rom",    0x0000000, 0x0800000, CRC(d8167834) SHA1(fa55a99629d03b2ea253392352f70d2c8639a991) ) // FIXED BITS (xxxxxxxx1xxxxxxx)
 	ROM_LOAD( "a0601.rom",    0x0800000, 0x0800000, CRC(ff7a4373) SHA1(7def9fca7513ad5a117da230bebd2e3c78679041) ) // FIXED BITS (xxxxxxxx1xxxxxxx)
 	ROM_LOAD( "a0602.rom",    0x1000000, 0x0800000, CRC(e7a32959) SHA1(3d0ed684dc5b269238890836b2ce7ef46aa5265b) ) // FIXED BITS (xxxxxxxx1xxxxxxx)
 	ROM_LOAD( "a0603as.rom",    0x1800000, 0x0800000, CRC(7057b37e) SHA1(85a19f23303b4d581c4fa315b2c204af92fcb424) )
 
-	ROM_REGION16_LE( 0x1000000, "sprmask", 0 ) /* Sprite Masks + Colour Indexes */
+	ROM_REGION16_LE( 0x1000000, "igs023:sprmask", 0 ) /* Sprite Masks + Colour Indexes */
 	ROM_LOAD( "b0600.rom",    0x0000000, 0x0800000, CRC(7d3cd059) SHA1(00cf994b63337e0e4ebe96453daf45f24192af1c) )
 	ROM_LOAD( "b0601as.rom",    0x0800000, 0x0800000, CRC(3784fb49) SHA1(7e85fe5b5fb8746f1321c03ad2350d2a58969d7a) )
 
@@ -4354,17 +4342,17 @@ ROM_START( kovlsqh )
 	ROM_REGION( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom */
 	ROM_LOAD( "kovsh_v100_china.asic", 0x000000, 0x04000, BAD_DUMP CRC(0f09a5c1) SHA1(621b38c05f33277608d58b49822aebc930ae4870) ) // this is the kovsh ARM rom, we intercept and modify protection calls
 
-	ROM_REGION( 0xa00000, "tiles",  0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
+	ROM_REGION( 0xa00000, "igs023",  0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
 	PGM_VIDEO_BIOS
 	ROM_LOAD( "lsqh2_t01.rom",0x180000, 0x800000, CRC(d498d97f) SHA1(97a7b6d2ed1170449e7c2899448af7cbbca4c94f) )
 	ROM_IGNORE( 0x800000 )  // second half identical
 
-	ROM_REGION16_LE( 0x4000000, "sprcol", 0 ) /* Sprite Colour Data */
+	ROM_REGION16_LE( 0x4000000, "igs023:sprcol", 0 ) /* Sprite Colour Data */
 	ROM_LOAD( "lsqh2_a01.rom", 0x0000000, 0x1000000, CRC(25ae3efd) SHA1(083d977602ddb5ad54fbdcba000cd4287de8d463) )
 	ROM_LOAD( "lsqh2_a23.rom", 0x1000000, 0x1000000, CRC(7a779112) SHA1(0a7d36b3715063d8eac629b95a9bb3ecd8e54fca) )
 	ROM_LOAD( "lsqh2_a45.rom", 0x2000000, 0x1000000, CRC(5d7de052) SHA1(7663b6cf09f65c4644661005a38f9aba84a32913) )
 
-	ROM_REGION16_LE( 0x1000000, "sprmask", 0 ) /* Sprite Masks + Colour Indexes */
+	ROM_REGION16_LE( 0x1000000, "igs023:sprmask", 0 ) /* Sprite Masks + Colour Indexes */
 	ROM_LOAD( "lsqh2_b01.rom", 0x0000000, 0x1000000, CRC(df7ca696) SHA1(7af3d27957a39de7e4873867c9972c05af7e7964) )
 
 	ROM_REGION( 0xc00000, "ics", 0 ) /* Samples - (8 bit mono 11025Hz) - */
@@ -4383,17 +4371,17 @@ ROM_START( kovlsqh2 )
 	ROM_REGION( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom */
 	ROM_LOAD( "kovsh_v100_china.asic", 0x000000, 0x04000, BAD_DUMP CRC(0f09a5c1) SHA1(621b38c05f33277608d58b49822aebc930ae4870) ) // this is the kovsh ARM rom, we intercept and modify protection calls
 
-	ROM_REGION( 0xa00000, "tiles",  0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
+	ROM_REGION( 0xa00000, "igs023",  0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
 	PGM_VIDEO_BIOS
 	ROM_LOAD( "lsqh2_t01.rom",0x180000, 0x800000, CRC(d498d97f) SHA1(97a7b6d2ed1170449e7c2899448af7cbbca4c94f) )
 	ROM_IGNORE( 0x800000 )  // second half identical
 
-	ROM_REGION16_LE( 0x4000000, "sprcol", 0 ) /* Sprite Colour Data */
+	ROM_REGION16_LE( 0x4000000, "igs023:sprcol", 0 ) /* Sprite Colour Data */
 	ROM_LOAD( "lsqh2_a01.rom", 0x0000000, 0x1000000, CRC(25ae3efd) SHA1(083d977602ddb5ad54fbdcba000cd4287de8d463) )
 	ROM_LOAD( "lsqh2_a23.rom", 0x1000000, 0x1000000, CRC(7a779112) SHA1(0a7d36b3715063d8eac629b95a9bb3ecd8e54fca) )
 	ROM_LOAD( "lsqh2_a45.rom", 0x2000000, 0x1000000, CRC(5d7de052) SHA1(7663b6cf09f65c4644661005a38f9aba84a32913) )
 
-	ROM_REGION16_LE( 0x1000000, "sprmask", 0 ) /* Sprite Masks + Colour Indexes */
+	ROM_REGION16_LE( 0x1000000, "igs023:sprmask", 0 ) /* Sprite Masks + Colour Indexes */
 	ROM_LOAD( "lsqh2_b01.rom", 0x0000000, 0x1000000, CRC(df7ca696) SHA1(7af3d27957a39de7e4873867c9972c05af7e7964) )
 
 	ROM_REGION( 0xc00000, "ics", 0 ) /* Samples - (8 bit mono 11025Hz) - */
@@ -4413,17 +4401,17 @@ ROM_START( kovlsjb )
 	ROM_REGION( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom */
 	ROM_LOAD( "kovsh_v100_china.asic", 0x000000, 0x04000, BAD_DUMP CRC(0f09a5c1) SHA1(621b38c05f33277608d58b49822aebc930ae4870) ) // this is the kovsh ARM rom, we intercept and modify protection calls
 
-	ROM_REGION( 0xa00000, "tiles",  0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
+	ROM_REGION( 0xa00000, "igs023",  0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
 	PGM_VIDEO_BIOS
 	ROM_LOAD( "lsqh2_t01.rom",0x180000, 0x800000, CRC(d498d97f) SHA1(97a7b6d2ed1170449e7c2899448af7cbbca4c94f) )
 	ROM_IGNORE( 0x800000 )  // second half identical
 
-	ROM_REGION16_LE( 0x4000000, "sprcol", 0 ) /* Sprite Colour Data */
+	ROM_REGION16_LE( 0x4000000, "igs023:sprcol", 0 ) /* Sprite Colour Data */
 	ROM_LOAD( "lsqh2_a01.rom", 0x0000000, 0x1000000, CRC(25ae3efd) SHA1(083d977602ddb5ad54fbdcba000cd4287de8d463) )
 	ROM_LOAD( "lsqh2_a23.rom", 0x1000000, 0x1000000, CRC(7a779112) SHA1(0a7d36b3715063d8eac629b95a9bb3ecd8e54fca) )
 	ROM_LOAD( "lsqh2_a45.rom", 0x2000000, 0x1000000, CRC(5d7de052) SHA1(7663b6cf09f65c4644661005a38f9aba84a32913) )
 
-	ROM_REGION16_LE( 0x1000000, "sprmask", 0 ) /* Sprite Masks + Colour Indexes */
+	ROM_REGION16_LE( 0x1000000, "igs023:sprmask", 0 ) /* Sprite Masks + Colour Indexes */
 	ROM_LOAD( "lsqh2_b01.rom", 0x0000000, 0x1000000, CRC(df7ca696) SHA1(7af3d27957a39de7e4873867c9972c05af7e7964) )
 
 	ROM_REGION( 0xc00000, "ics", 0 ) /* Samples - (8 bit mono 11025Hz) - */
@@ -4442,17 +4430,17 @@ ROM_START( kovlsjba )
 	ROM_REGION( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom */
 	ROM_LOAD( "kovsh_v100_china.asic", 0x000000, 0x04000, BAD_DUMP CRC(0f09a5c1) SHA1(621b38c05f33277608d58b49822aebc930ae4870) ) // this is the kovsh ARM rom, we intercept and modify protection calls
 
-	ROM_REGION( 0xa00000, "tiles",  0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
+	ROM_REGION( 0xa00000, "igs023",  0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
 	PGM_VIDEO_BIOS
 	ROM_LOAD( "lsqh2_t01.rom",0x180000, 0x800000, CRC(d498d97f) SHA1(97a7b6d2ed1170449e7c2899448af7cbbca4c94f) )
 	ROM_IGNORE( 0x800000 )  // second half identical
 
-	ROM_REGION16_LE( 0x4000000, "sprcol", 0 ) /* Sprite Colour Data */
+	ROM_REGION16_LE( 0x4000000, "igs023:sprcol", 0 ) /* Sprite Colour Data */
 	ROM_LOAD( "lsqh2_a01.rom", 0x0000000, 0x1000000, CRC(25ae3efd) SHA1(083d977602ddb5ad54fbdcba000cd4287de8d463) )
 	ROM_LOAD( "lsqh2_a23.rom", 0x1000000, 0x1000000, CRC(7a779112) SHA1(0a7d36b3715063d8eac629b95a9bb3ecd8e54fca) )
 	ROM_LOAD( "lsqh2_a45.rom", 0x2000000, 0x1000000, CRC(5d7de052) SHA1(7663b6cf09f65c4644661005a38f9aba84a32913) )
 
-	ROM_REGION16_LE( 0x1000000, "sprmask", 0 ) /* Sprite Masks + Colour Indexes */
+	ROM_REGION16_LE( 0x1000000, "igs023:sprmask", 0 ) /* Sprite Masks + Colour Indexes */
 	ROM_LOAD( "lsqh2_b01.rom", 0x0000000, 0x1000000, CRC(df7ca696) SHA1(7af3d27957a39de7e4873867c9972c05af7e7964) )
 
 	ROM_REGION( 0xc00000, "ics", 0 ) /* Samples - (8 bit mono 11025Hz) - */
@@ -4478,16 +4466,16 @@ ROM_START( killbldp )
 	ROM_REGION32_LE( 0x800000, "user1", 0 ) /* Protection Data (encrypted external ARM data) */
 	ROM_LOAD( "v300xx_u26.u26", 0x000000, 0x200000,  CRC(144388c8) SHA1(d7469df077c1a674129f18210584ba4d05a61888) ) // 05-09-16 23:52:32 V300
 
-	ROM_REGION( 0xa00000, "tiles", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
+	ROM_REGION( 0xa00000, "igs023", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
 	PGM_VIDEO_BIOS
 	ROM_LOAD( "igs_t05701w032.u33", 0x180000, 0x400000, CRC(567c714f) SHA1(b25b20e1ec9f077d6f7b9d41723a68d0d461bef2) )
 
-	ROM_REGION16_LE( 0x2000000, "sprcol", 0 ) /* Sprite Colour Data */
+	ROM_REGION16_LE( 0x2000000, "igs023:sprcol", 0 ) /* Sprite Colour Data */
 	ROM_LOAD( "igs_a05701w064.u3",  0x0000000, 0x0800000, CRC(8c0c992c) SHA1(28391e50ca4400060676f1524bd49ede373292da) )
 	ROM_LOAD( "igs_a05702w064.u4",  0x0800000, 0x0800000, CRC(7e5b0f27) SHA1(9e8d69f34c30216925fcb7af87f8b37f703317e7) )
 	ROM_LOAD( "igs_a05703w064.u6",  0x1000000, 0x0800000, CRC(accbdb44) SHA1(d59b2452c7a5b4e666473dc973b73a0f2b4edc13) )
 
-	ROM_REGION16_LE( 0x1000000, "sprmask", 0 ) /* Sprite Masks + Colour Indexes */
+	ROM_REGION16_LE( 0x1000000, "igs023:sprmask", 0 ) /* Sprite Masks + Colour Indexes */
 	ROM_LOAD( "igs_b05701w064.u9",  0x0000000, 0x0800000, CRC(a20cdcef) SHA1(029a49971adf1e72ab556a207172bdfbd0b86b03) )
 	ROM_LOAD( "igs_b05702w016.u11", 0x0800000, 0x0200000, CRC(fe7457df) SHA1(d66b1b31102b0210f9faf40e1473cd1511ccaf1f) )
 
@@ -4510,17 +4498,17 @@ ROM_START( svg )
 	ROM_LOAD( "epr.u26", 0x000000, 0x400000, CRC(46826ec8) SHA1(ad1daf6f615fb8d748ce7f98f19dd3bf22f79fba) ) // 10/11/05 10:07:20 V201
 	ROM_LOAD( "epr.u36", 0x400000, 0x400000, CRC(fa5f3901) SHA1(8ab7c6763df4f752b50ed2197063f58046b32ddb) )
 
-	ROM_REGION( 0x500000, "tiles", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
+	ROM_REGION( 0x500000, "igs023", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
 	PGM_VIDEO_BIOS
 	ROM_LOAD( "igs_t05601w016.u29", 0x180000, 0x200000, CRC(03e110dc) SHA1(41c8f286e9303b24ba6235b341371c298226fb6a) )
 
-	ROM_REGION16_LE( 0x2000000, "sprcol", 0 ) /* Sprite Colour Data */
+	ROM_REGION16_LE( 0x2000000, "igs023:sprcol", 0 ) /* Sprite Colour Data */
 	ROM_LOAD( "igs_a05601w064.u3",  0x0000000, 0x0800000, CRC(ea6453e4) SHA1(b5c82edafa8008ad59b5f2219511947d078d446e) )
 	ROM_LOAD( "igs_a05602w064.u4",  0x0800000, 0x0800000, CRC(6d00621b) SHA1(55a4bc357e14b975b0234a9cd49e2224f509dad9) )
 	ROM_LOAD( "igs_a05603w064.u6",  0x1000000, 0x0800000, CRC(7b71c64f) SHA1(bec7c7edf0634cf8351a54abb867c56af08ad2c3) )
 	ROM_LOAD( "igs_a05604w032.u8",  0x1800000, 0x0400000, CRC(9452a567) SHA1(01fdb8e1f131603843ef4c49ab76d7a56b2d6414) )
 
-	ROM_REGION16_LE( 0x1000000, "sprmask", 0 ) /* Sprite Masks + Colour Indexes */
+	ROM_REGION16_LE( 0x1000000, "igs023:sprmask", 0 ) /* Sprite Masks + Colour Indexes */
 	ROM_LOAD( "igs_b05601w064.u9",  0x0000000, 0x0800000, CRC(35c0a489) SHA1(a7d5527da01f8eaa7499fb6785b57094521bce97) )
 	ROM_LOAD( "igs_b05602w064.u11", 0x0800000, 0x0800000, CRC(8aad3f85) SHA1(da6996d901d42b3a2ba7019ad014bb938a5e328b) )
 
@@ -4543,17 +4531,17 @@ ROM_START( svgtw )
 	ROM_LOAD( "v101tw_u26.u26", 0x000000, 0x400000, CRC(cc24f542) SHA1(623ed398d2eeea229833d92eb4fb6492133202b3) ) // 06/20/05 11:36:15 V100
 	ROM_LOAD( "v101tw_u36.u36", 0x400000, 0x400000, CRC(f18283e2) SHA1(15323c5f816a0bf6f510311eb49d485ccf713cf7) )
 
-	ROM_REGION( 0x500000, "tiles", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
+	ROM_REGION( 0x500000, "igs023", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
 	PGM_VIDEO_BIOS
 	ROM_LOAD( "igs_t05601w016.u29", 0x180000, 0x200000, CRC(03e110dc) SHA1(41c8f286e9303b24ba6235b341371c298226fb6a) )
 
-	ROM_REGION16_LE( 0x2000000, "sprcol", 0 ) /* Sprite Colour Data */
+	ROM_REGION16_LE( 0x2000000, "igs023:sprcol", 0 ) /* Sprite Colour Data */
 	ROM_LOAD( "igs_a05601w064.u3",  0x0000000, 0x0800000, CRC(ea6453e4) SHA1(b5c82edafa8008ad59b5f2219511947d078d446e) )
 	ROM_LOAD( "igs_a05602w064.u4",  0x0800000, 0x0800000, CRC(6d00621b) SHA1(55a4bc357e14b975b0234a9cd49e2224f509dad9) )
 	ROM_LOAD( "igs_a05603w064.u6",  0x1000000, 0x0800000, CRC(7b71c64f) SHA1(bec7c7edf0634cf8351a54abb867c56af08ad2c3) )
 	ROM_LOAD( "igs_a05604w032.u8",  0x1800000, 0x0400000, CRC(9452a567) SHA1(01fdb8e1f131603843ef4c49ab76d7a56b2d6414) )
 
-	ROM_REGION16_LE( 0x1000000, "sprmask", 0 ) /* Sprite Masks + Colour Indexes */
+	ROM_REGION16_LE( 0x1000000, "igs023:sprmask", 0 ) /* Sprite Masks + Colour Indexes */
 	ROM_LOAD( "igs_b05601w064.u9",  0x0000000, 0x0800000, CRC(35c0a489) SHA1(a7d5527da01f8eaa7499fb6785b57094521bce97) )
 	ROM_LOAD( "igs_b05602w064.u11", 0x0800000, 0x0800000, CRC(8aad3f85) SHA1(da6996d901d42b3a2ba7019ad014bb938a5e328b) )
 
@@ -4576,17 +4564,17 @@ ROM_START( svghk )
 	ROM_LOAD( "v101hk_u26.u26", 0x000000, 0x400000, CRC(42b0d5a9) SHA1(1dd2b6530f982dbb720e4c017fca7f90cf441f57) ) // 06/20/05 11:36:15 V100
 	ROM_LOAD( "v101hk_u36.u36", 0x400000, 0x400000, CRC(bf15a47a) SHA1(822aadb222d4f0278b2e2375cb59d8b35667f5ef) )
 
-	ROM_REGION( 0x500000, "tiles", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
+	ROM_REGION( 0x500000, "igs023", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
 	PGM_VIDEO_BIOS
 	ROM_LOAD( "igs_t05601w016.u29", 0x180000, 0x200000, CRC(03e110dc) SHA1(41c8f286e9303b24ba6235b341371c298226fb6a) )
 
-	ROM_REGION16_LE( 0x2000000, "sprcol", 0 ) /* Sprite Colour Data */
+	ROM_REGION16_LE( 0x2000000, "igs023:sprcol", 0 ) /* Sprite Colour Data */
 	ROM_LOAD( "igs_a05601w064.u3",  0x0000000, 0x0800000, CRC(ea6453e4) SHA1(b5c82edafa8008ad59b5f2219511947d078d446e) )
 	ROM_LOAD( "igs_a05602w064.u4",  0x0800000, 0x0800000, CRC(6d00621b) SHA1(55a4bc357e14b975b0234a9cd49e2224f509dad9) )
 	ROM_LOAD( "igs_a05603w064.u6",  0x1000000, 0x0800000, CRC(7b71c64f) SHA1(bec7c7edf0634cf8351a54abb867c56af08ad2c3) )
 	ROM_LOAD( "igs_a05604w032.u8",  0x1800000, 0x0400000, CRC(9452a567) SHA1(01fdb8e1f131603843ef4c49ab76d7a56b2d6414) )
 
-	ROM_REGION16_LE( 0x1000000, "sprmask", 0 ) /* Sprite Masks + Colour Indexes */
+	ROM_REGION16_LE( 0x1000000, "igs023:sprmask", 0 ) /* Sprite Masks + Colour Indexes */
 	ROM_LOAD( "igs_b05601w064.u9",  0x0000000, 0x0800000, CRC(35c0a489) SHA1(a7d5527da01f8eaa7499fb6785b57094521bce97) )
 	ROM_LOAD( "igs_b05602w064.u11", 0x0800000, 0x0800000, CRC(8aad3f85) SHA1(da6996d901d42b3a2ba7019ad014bb938a5e328b) )
 
@@ -4609,17 +4597,17 @@ ROM_START( svgpcb )
 	ROM_LOAD( "svg_v100jp_u64.u64", 0x000000, 0x400000, CRC(399d4a8b) SHA1(b120e8386a259e6fd7941acf3c33cf288eda616c) ) // 05/12/05 15:31:35 V100
 	ROM_LOAD( "svg_v100jp_u65.u65", 0x400000, 0x400000, CRC(6e1c33b1) SHA1(66f26b2f4c0b3dcf6d1bb1df48e2ddbcc9d9432d) )
 
-	ROM_REGION( 0x500000, "tiles", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
+	ROM_REGION( 0x500000, "igs023", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
 	PGM_VIDEO_BIOS // IGS PGM T01S 1B8558A1 M002146
 	ROM_LOAD( "igs_t05601w016.u70", 0x180000, 0x200000, CRC(03e110dc) SHA1(41c8f286e9303b24ba6235b341371c298226fb6a) ) // IGS T05601W016 2C35 B270 2L464103 B050924
 
-	ROM_REGION16_LE( 0x2000000, "sprcol", 0 ) /* Sprite Colour Data */
+	ROM_REGION16_LE( 0x2000000, "igs023:sprcol", 0 ) /* Sprite Colour Data */
 	ROM_LOAD( "igs_a05601w064.u44", 0x0000000, 0x0800000, CRC(ea6453e4) SHA1(b5c82edafa8008ad59b5f2219511947d078d446e) ) // IGS A05601W064 44BF 2ECD 2E153602A1 S050914
 	ROM_LOAD( "igs_a05602w064.u45", 0x0800000, 0x0800000, CRC(6d00621b) SHA1(55a4bc357e14b975b0234a9cd49e2224f509dad9) ) // IGS A05602W064 85C1 8A1F 2E153602A2 S050914
 	ROM_LOAD( "igs_a05603w064.u46", 0x1000000, 0x0800000, CRC(7b71c64f) SHA1(bec7c7edf0634cf8351a54abb867c56af08ad2c3) ) // IGS A05603W064 8EC7 329A 2E153602A3 S050914
 	ROM_LOAD( "igs_a05604w032.u47", 0x1800000, 0x0400000, CRC(9452a567) SHA1(01fdb8e1f131603843ef4c49ab76d7a56b2d6414) ) // IGS A05604W032 55F5 4CDB SL529808 S050912
 
-	ROM_REGION16_LE( 0x1000000, "sprmask", 0 ) /* Sprite Masks + Colour Indexes */
+	ROM_REGION16_LE( 0x1000000, "igs023:sprmask", 0 ) /* Sprite Masks + Colour Indexes */
 	ROM_LOAD( "igs_b05601w064.u61", 0x0000000, 0x0800000, CRC(35c0a489) SHA1(a7d5527da01f8eaa7499fb6785b57094521bce97) ) // IGS B05601W064 EED5 E656 2E350003A1 S050914
 	ROM_LOAD( "igs_b05602w064.u62", 0x0800000, 0x0800000, CRC(8aad3f85) SHA1(da6996d901d42b3a2ba7019ad014bb938a5e328b) ) // IGS B05602W064 DD65 3D89 2E350004A2 S050914
 
@@ -4645,15 +4633,15 @@ ROM_START( happy6 )
 	ROM_REGION32_LE( 0x800000, "user1", 0 ) /* Protection Data (encrypted external ARM data) */
 	ROM_LOAD( "v-102cn_u26.u26", 0x000000, 0x400000, CRC(310510fb) SHA1(e0e80a04e9f7bf27e6581a8935c960bad33bb6de) ) // 03/16/04 14:29:17 V102
 
-	ROM_REGION( 0xa00000, "tiles", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
+	ROM_REGION( 0xa00000, "igs023", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
 	PGM_VIDEO_BIOS
 	ROM_LOAD( "t01w64m_u29.u29", 0x180000, 0x800000, CRC(2d3feb8b) SHA1(9832b1c46b1ee73febf5c5c8913859f4e0581665) )
 
-	ROM_REGION16_LE( 0x2000000, "sprcol", 0 ) /* Sprite Colour Data */
+	ROM_REGION16_LE( 0x2000000, "igs023:sprcol", 0 ) /* Sprite Colour Data */
 	ROM_LOAD( "a01w64m_u5.u5",   0x0000000, 0x0800000, CRC(bbaa3df3) SHA1(a72268d3989e96d571242279922291d0dc72db28) )
 	ROM_LOAD( "a02w64m_u6.u6",   0x0800000, 0x0800000, CRC(f8c9cd36) SHA1(d9613a83bcc2364492fa922fde1c4f0d07b3009c) )
 
-	ROM_REGION16_LE( 0x1000000, "sprmask", 0 ) /* Sprite Masks + Colour Indexes */
+	ROM_REGION16_LE( 0x1000000, "igs023:sprmask", 0 ) /* Sprite Masks + Colour Indexes */
 	ROM_LOAD( "b01w64m_u19.u19", 0x0000000, 0x0800000, CRC(73f5f225) SHA1(507126fa96dcec967bdbc0978d79fbce9d25db37) )
 
 	ROM_REGION( 0x1000000, "ics", 0 ) /* Samples - (8 bit mono 11025Hz) - */
@@ -4676,15 +4664,15 @@ ROM_START( happy6101 )
 	ROM_REGION32_LE( 0x800000, "user1", 0 ) /* Protection Data (encrypted external ARM data) */
 	ROM_LOAD( "v101cn_u26.u26", 0x000000, 0x400000, CRC(4a48ca1c) SHA1(3bebc091787903d45cb84c7302046602a903f59c) ) // 01/09/04 19:51:11 V101
 
-	ROM_REGION( 0xa00000, "tiles", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
+	ROM_REGION( 0xa00000, "igs023", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
 	PGM_VIDEO_BIOS
 	ROM_LOAD( "t01w64m_u29.u29", 0x180000, 0x800000, CRC(2d3feb8b) SHA1(9832b1c46b1ee73febf5c5c8913859f4e0581665) )
 
-	ROM_REGION16_LE( 0x2000000, "sprcol", 0 ) /* Sprite Colour Data */
+	ROM_REGION16_LE( 0x2000000, "igs023:sprcol", 0 ) /* Sprite Colour Data */
 	ROM_LOAD( "a01w64m_u5.u5",   0x0000000, 0x0800000, CRC(bbaa3df3) SHA1(a72268d3989e96d571242279922291d0dc72db28) )
 	ROM_LOAD( "a02w64m_u6.u6",   0x0800000, 0x0800000, CRC(f8c9cd36) SHA1(d9613a83bcc2364492fa922fde1c4f0d07b3009c) )
 
-	ROM_REGION16_LE( 0x1000000, "sprmask", 0 ) /* Sprite Masks + Colour Indexes */
+	ROM_REGION16_LE( 0x1000000, "igs023:sprmask", 0 ) /* Sprite Masks + Colour Indexes */
 	ROM_LOAD( "b01w64m_u19.u19", 0x0000000, 0x0800000, CRC(73f5f225) SHA1(507126fa96dcec967bdbc0978d79fbce9d25db37) )
 
 	ROM_REGION( 0x1000000, "ics", 0 ) /* Samples - (8 bit mono 11025Hz) - */
@@ -4707,15 +4695,15 @@ ROM_START( happy6100hk )
 	ROM_REGION32_LE( 0x800000, "user1", 0 ) /* Protection Data (encrypted external ARM data) */
 	ROM_LOAD( "v100hk_u26.u26", 0x000000, 0x400000, CRC(8f2feb1f) SHA1(acbc6620a296e8a6819bf088886bcbfc329f286d) ) // 12/22/03 11:28:36 V100
 
-	ROM_REGION( 0xa00000, "tiles", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
+	ROM_REGION( 0xa00000, "igs023", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
 	PGM_VIDEO_BIOS
 	ROM_LOAD( "t01w64m_u29.u29", 0x180000, 0x800000, CRC(2d3feb8b) SHA1(9832b1c46b1ee73febf5c5c8913859f4e0581665) )
 
-	ROM_REGION16_LE( 0x2000000, "sprcol", 0 ) /* Sprite Colour Data */
+	ROM_REGION16_LE( 0x2000000, "igs023:sprcol", 0 ) /* Sprite Colour Data */
 	ROM_LOAD( "a01w64m_u5.u5",   0x0000000, 0x0800000, CRC(bbaa3df3) SHA1(a72268d3989e96d571242279922291d0dc72db28) )
 	ROM_LOAD( "a02w64m_u6.u6",   0x0800000, 0x0800000, CRC(f8c9cd36) SHA1(d9613a83bcc2364492fa922fde1c4f0d07b3009c) )
 
-	ROM_REGION16_LE( 0x1000000, "sprmask", 0 ) /* Sprite Masks + Colour Indexes */
+	ROM_REGION16_LE( 0x1000000, "igs023:sprmask", 0 ) /* Sprite Masks + Colour Indexes */
 	ROM_LOAD( "b01w64m_u19.u19", 0x0000000, 0x0800000, CRC(73f5f225) SHA1(507126fa96dcec967bdbc0978d79fbce9d25db37) )
 
 	ROM_REGION( 0x1000000, "ics", 0 ) /* Samples - (8 bit mono 11025Hz) - */
@@ -4738,15 +4726,15 @@ ROM_START( happy6100cn )
 	ROM_REGION32_LE( 0x800000, "user1", 0 ) /* Protection Data (encrypted external ARM data) */
 	ROM_LOAD( "v100cn_u26.u26", 0x000000, 0x400000, CRC(9c29e482) SHA1(17a054cb4ab0663e3eba9661c3a9d4dfb7dad010) ) // 12/22/03 11:28:36 V100
 
-	ROM_REGION( 0xa00000, "tiles", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
+	ROM_REGION( 0xa00000, "igs023", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
 	PGM_VIDEO_BIOS
 	ROM_LOAD( "t01w64m_u29.u29", 0x180000, 0x800000, CRC(2d3feb8b) SHA1(9832b1c46b1ee73febf5c5c8913859f4e0581665) )
 
-	ROM_REGION16_LE( 0x2000000, "sprcol", 0 ) /* Sprite Colour Data */
+	ROM_REGION16_LE( 0x2000000, "igs023:sprcol", 0 ) /* Sprite Colour Data */
 	ROM_LOAD( "a01w64m_u5.u5",   0x0000000, 0x0800000, CRC(bbaa3df3) SHA1(a72268d3989e96d571242279922291d0dc72db28) )
 	ROM_LOAD( "a02w64m_u6.u6",   0x0800000, 0x0800000, CRC(f8c9cd36) SHA1(d9613a83bcc2364492fa922fde1c4f0d07b3009c) )
 
-	ROM_REGION16_LE( 0x1000000, "sprmask", 0 ) /* Sprite Masks + Colour Indexes */
+	ROM_REGION16_LE( 0x1000000, "igs023:sprmask", 0 ) /* Sprite Masks + Colour Indexes */
 	ROM_LOAD( "b01w64m_u19.u19", 0x0000000, 0x0800000, CRC(73f5f225) SHA1(507126fa96dcec967bdbc0978d79fbce9d25db37) )
 
 	ROM_REGION( 0x1000000, "ics", 0 ) /* Samples - (8 bit mono 11025Hz) - */
@@ -4764,15 +4752,15 @@ ROM_START( ket )
 	ROM_REGION( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom */
 	ROM_LOAD( "ket_igs027a.bin", 0x000000, 0x04000, NO_DUMP )
 
-	ROM_REGION( 0xa00000, "tiles", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
+	ROM_REGION( 0xa00000, "igs023", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
 	ROM_LOAD( "pgm_t01s.rom", 0x000000, 0x200000, CRC(1a7123a0) SHA1(cc567f577bfbf45427b54d6695b11b74f2578af3) ) // same as standard PGM text bios - surface scratched to remove details
 	ROM_LOAD( "cave_t04701w064.u19",   0x180000, 0x800000, CRC(2665b041) SHA1(fb1107778b66f2af0de77ac82e1ee2902f53a959) ) //text-1
 
-	ROM_REGION16_LE( 0x1000000, "sprcol", 0 ) /* Sprite Colour Data */
+	ROM_REGION16_LE( 0x1000000, "igs023:sprcol", 0 ) /* Sprite Colour Data */
 	ROM_LOAD( "cave_a04701w064.u7",    0x0000000, 0x0800000, CRC(5ef1b94b) SHA1(f10dfa46e0a4d297c3a856aea5b49d648f98935c) ) //image-1
 	ROM_LOAD( "cave_a04702w064.u8",    0x0800000, 0x0800000, CRC(26d6da7f) SHA1(f20e07a7994f41b5ed917f8b0119dc5542f3541c) ) //image-2
 
-	ROM_REGION16_LE( 0x0800000, "sprmask", 0 ) /* Sprite Masks + Colour Indexes */
+	ROM_REGION16_LE( 0x0800000, "igs023:sprmask", 0 ) /* Sprite Masks + Colour Indexes */
 	ROM_LOAD( "cave_b04701w064.u1",    0x0000000, 0x0800000, CRC(1bec008d) SHA1(07d117dc2eebb35727fb18a7c563acbaf25a8d36) ) //bitmap-1
 
 	ROM_REGION( 0x800000, "ics", ROMREGION_ERASE00 ) /* Samples - (8 bit mono 11025Hz) - */
@@ -4791,15 +4779,15 @@ ROM_START( ket1 ) // only difference between this and ket1 is the rom fill on th
 	ROM_REGION( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom */
 	ROM_LOAD( "ket_igs027a.bin", 0x000000, 0x04000, NO_DUMP )
 
-	ROM_REGION( 0xa00000, "tiles", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
+	ROM_REGION( 0xa00000, "igs023", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
 	ROM_LOAD( "pgm_t01s.rom", 0x000000, 0x200000, CRC(1a7123a0) SHA1(cc567f577bfbf45427b54d6695b11b74f2578af3) ) // same as standard PGM text bios - surface scratched to remove details
 	ROM_LOAD( "cave_t04701w064.u19",   0x180000, 0x800000, CRC(2665b041) SHA1(fb1107778b66f2af0de77ac82e1ee2902f53a959) ) //text-1
 
-	ROM_REGION16_LE( 0x1000000, "sprcol", 0 ) /* Sprite Colour Data */
+	ROM_REGION16_LE( 0x1000000, "igs023:sprcol", 0 ) /* Sprite Colour Data */
 	ROM_LOAD( "cave_a04701w064.u7",    0x0000000, 0x0800000, CRC(5ef1b94b) SHA1(f10dfa46e0a4d297c3a856aea5b49d648f98935c) ) //image-1
 	ROM_LOAD( "cave_a04702w064.u8",    0x0800000, 0x0800000, CRC(26d6da7f) SHA1(f20e07a7994f41b5ed917f8b0119dc5542f3541c) ) //image-2
 
-	ROM_REGION16_LE( 0x0800000, "sprmask", 0 ) /* Sprite Masks + Colour Indexes */
+	ROM_REGION16_LE( 0x0800000, "igs023:sprmask", 0 ) /* Sprite Masks + Colour Indexes */
 	ROM_LOAD( "cave_b04701w064.u1",    0x0000000, 0x0800000, CRC(1bec008d) SHA1(07d117dc2eebb35727fb18a7c563acbaf25a8d36) ) //bitmap-1
 
 	ROM_REGION( 0x800000, "ics", ROMREGION_ERASE00 ) /* Samples - (8 bit mono 11025Hz) - */
@@ -4818,15 +4806,15 @@ ROM_START( keta )
 	ROM_REGION( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom */
 	ROM_LOAD( "ket_igs027a.bin", 0x000000, 0x04000, NO_DUMP )
 
-	ROM_REGION( 0xa00000, "tiles", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
+	ROM_REGION( 0xa00000, "igs023", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
 	ROM_LOAD( "pgm_t01s.rom", 0x000000, 0x200000, CRC(1a7123a0) SHA1(cc567f577bfbf45427b54d6695b11b74f2578af3) ) // same as standard PGM text bios - surface scratched to remove details
 	ROM_LOAD( "cave_t04701w064.u19",   0x180000, 0x800000, CRC(2665b041) SHA1(fb1107778b66f2af0de77ac82e1ee2902f53a959) ) //text-1
 
-	ROM_REGION16_LE( 0x1000000, "sprcol", 0 ) /* Sprite Colour Data */
+	ROM_REGION16_LE( 0x1000000, "igs023:sprcol", 0 ) /* Sprite Colour Data */
 	ROM_LOAD( "cave_a04701w064.u7",    0x0000000, 0x0800000, CRC(5ef1b94b) SHA1(f10dfa46e0a4d297c3a856aea5b49d648f98935c) ) //image-1
 	ROM_LOAD( "cave_a04702w064.u8",    0x0800000, 0x0800000, CRC(26d6da7f) SHA1(f20e07a7994f41b5ed917f8b0119dc5542f3541c) ) //image-2
 
-	ROM_REGION16_LE( 0x0800000, "sprmask", 0 ) /* Sprite Masks + Colour Indexes */
+	ROM_REGION16_LE( 0x0800000, "igs023:sprmask", 0 ) /* Sprite Masks + Colour Indexes */
 	ROM_LOAD( "cave_b04701w064.u1",    0x0000000, 0x0800000, CRC(1bec008d) SHA1(07d117dc2eebb35727fb18a7c563acbaf25a8d36) ) //bitmap-1
 
 	ROM_REGION( 0x800000, "ics", ROMREGION_ERASE00 ) /* Samples - (8 bit mono 11025Hz) - */
@@ -4845,15 +4833,15 @@ ROM_START( ketb )
 	ROM_REGION( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom */
 	ROM_LOAD( "ket_igs027a.bin", 0x000000, 0x04000, NO_DUMP )
 
-	ROM_REGION( 0xa00000, "tiles", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
+	ROM_REGION( 0xa00000, "igs023", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
 	ROM_LOAD( "pgm_t01s.rom", 0x000000, 0x200000, CRC(1a7123a0) SHA1(cc567f577bfbf45427b54d6695b11b74f2578af3) ) // same as standard PGM text bios - surface scratched to remove details
 	ROM_LOAD( "cave_t04701w064.u19",   0x180000, 0x800000, CRC(2665b041) SHA1(fb1107778b66f2af0de77ac82e1ee2902f53a959) ) //text-1
 
-	ROM_REGION16_LE( 0x1000000, "sprcol", 0 ) /* Sprite Colour Data */
+	ROM_REGION16_LE( 0x1000000, "igs023:sprcol", 0 ) /* Sprite Colour Data */
 	ROM_LOAD( "cave_a04701w064.u7",    0x0000000, 0x0800000, CRC(5ef1b94b) SHA1(f10dfa46e0a4d297c3a856aea5b49d648f98935c) ) //image-1
 	ROM_LOAD( "cave_a04702w064.u8",    0x0800000, 0x0800000, CRC(26d6da7f) SHA1(f20e07a7994f41b5ed917f8b0119dc5542f3541c) ) //image-2
 
-	ROM_REGION16_LE( 0x0800000, "sprmask", 0 ) /* Sprite Masks + Colour Indexes */
+	ROM_REGION16_LE( 0x0800000, "igs023:sprmask", 0 ) /* Sprite Masks + Colour Indexes */
 	ROM_LOAD( "cave_b04701w064.u1",    0x0000000, 0x0800000, CRC(1bec008d) SHA1(07d117dc2eebb35727fb18a7c563acbaf25a8d36) ) //bitmap-1
 
 	ROM_REGION( 0x800000, "ics", ROMREGION_ERASE00 ) /* Samples - (8 bit mono 11025Hz) - */
@@ -4873,15 +4861,15 @@ ROM_START( ketarr10 )
 	ROM_REGION( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom */
 	ROM_LOAD( "ket_igs027a.bin", 0x000000, 0x04000, NO_DUMP )
 
-	ROM_REGION( 0xa00000, "tiles", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
+	ROM_REGION( 0xa00000, "igs023", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
 	ROM_LOAD( "pgm_t01s.rom", 0x000000, 0x200000, CRC(1a7123a0) SHA1(cc567f577bfbf45427b54d6695b11b74f2578af3) ) // same as standard PGM text bios - surface scratched to remove details
 	ROM_LOAD( "cave_t04701w064.u19",   0x180000, 0x800000, CRC(2665b041) SHA1(fb1107778b66f2af0de77ac82e1ee2902f53a959) ) //text-1
 
-	ROM_REGION16_LE( 0x1000000, "sprcol", 0 ) /* Sprite Colour Data */
+	ROM_REGION16_LE( 0x1000000, "igs023:sprcol", 0 ) /* Sprite Colour Data */
 	ROM_LOAD( "cave_a04701w064.u7",    0x0000000, 0x0800000, CRC(5ef1b94b) SHA1(f10dfa46e0a4d297c3a856aea5b49d648f98935c) ) //image-1
 	ROM_LOAD( "cave_a04702w064.u8",    0x0800000, 0x0800000, CRC(26d6da7f) SHA1(f20e07a7994f41b5ed917f8b0119dc5542f3541c) ) //image-2
 
-	ROM_REGION16_LE( 0x0800000, "sprmask", 0 ) /* Sprite Masks + Colour Indexes */
+	ROM_REGION16_LE( 0x0800000, "igs023:sprmask", 0 ) /* Sprite Masks + Colour Indexes */
 	ROM_LOAD( "cave_b04701w064.u1",    0x0000000, 0x0800000, CRC(1bec008d) SHA1(07d117dc2eebb35727fb18a7c563acbaf25a8d36) ) //bitmap-1
 
 	ROM_REGION( 0x800000, "ics", ROMREGION_ERASE00 ) /* Samples - (8 bit mono 11025Hz) - */
@@ -4901,15 +4889,15 @@ ROM_START( ketarrf )
 	ROM_REGION( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom */
 	ROM_LOAD( "ket_igs027a.bin", 0x000000, 0x04000, NO_DUMP )
 
-	ROM_REGION( 0xa00000, "tiles", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
+	ROM_REGION( 0xa00000, "igs023", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
 	ROM_LOAD( "pgm_t01s.rom", 0x000000, 0x200000, CRC(1a7123a0) SHA1(cc567f577bfbf45427b54d6695b11b74f2578af3) ) // same as standard PGM text bios - surface scratched to remove details
 	ROM_LOAD( "cave_t04701w064.u19",   0x180000, 0x800000, CRC(2665b041) SHA1(fb1107778b66f2af0de77ac82e1ee2902f53a959) ) //text-1
 
-	ROM_REGION16_LE( 0x1000000, "sprcol", 0 ) /* Sprite Colour Data */
+	ROM_REGION16_LE( 0x1000000, "igs023:sprcol", 0 ) /* Sprite Colour Data */
 	ROM_LOAD( "cave_a04701w064.u7",    0x0000000, 0x0800000, CRC(5ef1b94b) SHA1(f10dfa46e0a4d297c3a856aea5b49d648f98935c) ) //image-1
 	ROM_LOAD( "cave_a04702w064.u8",    0x0800000, 0x0800000, CRC(26d6da7f) SHA1(f20e07a7994f41b5ed917f8b0119dc5542f3541c) ) //image-2
 
-	ROM_REGION16_LE( 0x0800000, "sprmask", 0 ) /* Sprite Masks + Colour Indexes */
+	ROM_REGION16_LE( 0x0800000, "igs023:sprmask", 0 ) /* Sprite Masks + Colour Indexes */
 	ROM_LOAD( "cave_b04701w064.u1",    0x0000000, 0x0800000, CRC(1bec008d) SHA1(07d117dc2eebb35727fb18a7c563acbaf25a8d36) ) //bitmap-1
 
 	ROM_REGION( 0x800000, "ics", ROMREGION_ERASE00 ) /* Samples - (8 bit mono 11025Hz) - */
@@ -4928,15 +4916,15 @@ ROM_START( ketarr15 )
 	ROM_REGION( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom */
 	ROM_LOAD( "ket_igs027a.bin", 0x000000, 0x04000, NO_DUMP )
 
-	ROM_REGION( 0xa00000, "tiles", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
+	ROM_REGION( 0xa00000, "igs023", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
 	ROM_LOAD( "pgm_t01s.rom", 0x000000, 0x200000, CRC(1a7123a0) SHA1(cc567f577bfbf45427b54d6695b11b74f2578af3) ) // same as standard PGM text bios - surface scratched to remove details
 	ROM_LOAD( "cave_t04701w064.u19",   0x180000, 0x800000, CRC(2665b041) SHA1(fb1107778b66f2af0de77ac82e1ee2902f53a959) ) //text-1
 
-	ROM_REGION16_LE( 0x1000000, "sprcol", 0 ) /* Sprite Colour Data */
+	ROM_REGION16_LE( 0x1000000, "igs023:sprcol", 0 ) /* Sprite Colour Data */
 	ROM_LOAD( "cave_a04701w064.u7",    0x0000000, 0x0800000, CRC(5ef1b94b) SHA1(f10dfa46e0a4d297c3a856aea5b49d648f98935c) ) //image-1
 	ROM_LOAD( "cave_a04702w064.u8",    0x0800000, 0x0800000, CRC(26d6da7f) SHA1(f20e07a7994f41b5ed917f8b0119dc5542f3541c) ) //image-2
 
-	ROM_REGION16_LE( 0x0800000, "sprmask", 0 ) /* Sprite Masks + Colour Indexes */
+	ROM_REGION16_LE( 0x0800000, "igs023:sprmask", 0 ) /* Sprite Masks + Colour Indexes */
 	ROM_LOAD( "cave_b04701w064.u1",    0x0000000, 0x0800000, CRC(1bec008d) SHA1(07d117dc2eebb35727fb18a7c563acbaf25a8d36) ) //bitmap-1
 
 	ROM_REGION( 0x800000, "ics", ROMREGION_ERASE00 ) /* Samples - (8 bit mono 11025Hz) - */
@@ -4955,15 +4943,15 @@ ROM_START( ketarrs15 )
 	ROM_REGION( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom */
 	ROM_LOAD( "ket_igs027a.bin", 0x000000, 0x04000, NO_DUMP )
 
-	ROM_REGION( 0xa00000, "tiles", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
+	ROM_REGION( 0xa00000, "igs023", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
 	ROM_LOAD( "pgm_t01s.rom", 0x000000, 0x200000, CRC(1a7123a0) SHA1(cc567f577bfbf45427b54d6695b11b74f2578af3) ) // same as standard PGM text bios - surface scratched to remove details
 	ROM_LOAD( "cave_t04701w064.u19",   0x180000, 0x800000, CRC(2665b041) SHA1(fb1107778b66f2af0de77ac82e1ee2902f53a959) ) //text-1
 
-	ROM_REGION16_LE( 0x1000000, "sprcol", 0 ) /* Sprite Colour Data */
+	ROM_REGION16_LE( 0x1000000, "igs023:sprcol", 0 ) /* Sprite Colour Data */
 	ROM_LOAD( "cave_a04701w064.u7",    0x0000000, 0x0800000, CRC(5ef1b94b) SHA1(f10dfa46e0a4d297c3a856aea5b49d648f98935c) ) //image-1
 	ROM_LOAD( "cave_a04702w064.u8",    0x0800000, 0x0800000, CRC(26d6da7f) SHA1(f20e07a7994f41b5ed917f8b0119dc5542f3541c) ) //image-2
 
-	ROM_REGION16_LE( 0x0800000, "sprmask", 0 ) /* Sprite Masks + Colour Indexes */
+	ROM_REGION16_LE( 0x0800000, "igs023:sprmask", 0 ) /* Sprite Masks + Colour Indexes */
 	ROM_LOAD( "cave_b04701w064.u1",    0x0000000, 0x0800000, CRC(1bec008d) SHA1(07d117dc2eebb35727fb18a7c563acbaf25a8d36) ) //bitmap-1
 
 	ROM_REGION( 0x800000, "ics", ROMREGION_ERASE00 ) /* Samples - (8 bit mono 11025Hz) - */
@@ -4982,15 +4970,15 @@ ROM_START( ketarr151 )
 	ROM_REGION( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom */
 	ROM_LOAD( "ket_igs027a.bin", 0x000000, 0x04000, NO_DUMP )
 
-	ROM_REGION( 0xa00000, "tiles", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
+	ROM_REGION( 0xa00000, "igs023", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
 	ROM_LOAD( "pgm_t01s.rom", 0x000000, 0x200000, CRC(1a7123a0) SHA1(cc567f577bfbf45427b54d6695b11b74f2578af3) ) // same as standard PGM text bios - surface scratched to remove details
 	ROM_LOAD( "cave_t04701w064.u19",   0x180000, 0x800000, CRC(2665b041) SHA1(fb1107778b66f2af0de77ac82e1ee2902f53a959) ) //text-1
 
-	ROM_REGION16_LE( 0x1000000, "sprcol", 0 ) /* Sprite Colour Data */
+	ROM_REGION16_LE( 0x1000000, "igs023:sprcol", 0 ) /* Sprite Colour Data */
 	ROM_LOAD( "cave_a04701w064.u7",    0x0000000, 0x0800000, CRC(5ef1b94b) SHA1(f10dfa46e0a4d297c3a856aea5b49d648f98935c) ) //image-1
 	ROM_LOAD( "cave_a04702w064.u8",    0x0800000, 0x0800000, CRC(26d6da7f) SHA1(f20e07a7994f41b5ed917f8b0119dc5542f3541c) ) //image-2
 
-	ROM_REGION16_LE( 0x0800000, "sprmask", 0 ) /* Sprite Masks + Colour Indexes */
+	ROM_REGION16_LE( 0x0800000, "igs023:sprmask", 0 ) /* Sprite Masks + Colour Indexes */
 	ROM_LOAD( "cave_b04701w064.u1",    0x0000000, 0x0800000, CRC(1bec008d) SHA1(07d117dc2eebb35727fb18a7c563acbaf25a8d36) ) //bitmap-1
 
 	ROM_REGION( 0x800000, "ics", ROMREGION_ERASE00 ) /* Samples - (8 bit mono 11025Hz) - */
@@ -5009,15 +4997,15 @@ ROM_START( ketarrs151 )
 	ROM_REGION( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom */
 	ROM_LOAD( "ket_igs027a.bin", 0x000000, 0x04000, NO_DUMP )
 
-	ROM_REGION( 0xa00000, "tiles", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
+	ROM_REGION( 0xa00000, "igs023", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
 	ROM_LOAD( "pgm_t01s.rom", 0x000000, 0x200000, CRC(1a7123a0) SHA1(cc567f577bfbf45427b54d6695b11b74f2578af3) ) // same as standard PGM text bios - surface scratched to remove details
 	ROM_LOAD( "cave_t04701w064.u19",   0x180000, 0x800000, CRC(2665b041) SHA1(fb1107778b66f2af0de77ac82e1ee2902f53a959) ) //text-1
 
-	ROM_REGION16_LE( 0x1000000, "sprcol", 0 ) /* Sprite Colour Data */
+	ROM_REGION16_LE( 0x1000000, "igs023:sprcol", 0 ) /* Sprite Colour Data */
 	ROM_LOAD( "cave_a04701w064.u7",    0x0000000, 0x0800000, CRC(5ef1b94b) SHA1(f10dfa46e0a4d297c3a856aea5b49d648f98935c) ) //image-1
 	ROM_LOAD( "cave_a04702w064.u8",    0x0800000, 0x0800000, CRC(26d6da7f) SHA1(f20e07a7994f41b5ed917f8b0119dc5542f3541c) ) //image-2
 
-	ROM_REGION16_LE( 0x0800000, "sprmask", 0 ) /* Sprite Masks + Colour Indexes */
+	ROM_REGION16_LE( 0x0800000, "igs023:sprmask", 0 ) /* Sprite Masks + Colour Indexes */
 	ROM_LOAD( "cave_b04701w064.u1",    0x0000000, 0x0800000, CRC(1bec008d) SHA1(07d117dc2eebb35727fb18a7c563acbaf25a8d36) ) //bitmap-1
 
 	ROM_REGION( 0x800000, "ics", ROMREGION_ERASE00 ) /* Samples - (8 bit mono 11025Hz) - */
@@ -5035,15 +5023,15 @@ ROM_START( ketarr )
 	ROM_REGION( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom */
 	ROM_LOAD( "ket_igs027a.bin", 0x000000, 0x04000, NO_DUMP )
 
-	ROM_REGION( 0xa00000, "tiles", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
+	ROM_REGION( 0xa00000, "igs023", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
 	ROM_LOAD( "pgm_t01s.rom", 0x000000, 0x200000, CRC(1a7123a0) SHA1(cc567f577bfbf45427b54d6695b11b74f2578af3) ) // same as standard PGM text bios - surface scratched to remove details
 	ROM_LOAD( "cave_t04701w064.u19",   0x180000, 0x800000, CRC(2665b041) SHA1(fb1107778b66f2af0de77ac82e1ee2902f53a959) ) //text-1
 
-	ROM_REGION16_LE( 0x1000000, "sprcol", 0 ) /* Sprite Colour Data */
+	ROM_REGION16_LE( 0x1000000, "igs023:sprcol", 0 ) /* Sprite Colour Data */
 	ROM_LOAD( "cave_a04701w064.u7",    0x0000000, 0x0800000, CRC(5ef1b94b) SHA1(f10dfa46e0a4d297c3a856aea5b49d648f98935c) ) //image-1
 	ROM_LOAD( "cave_a04702w064.u8",    0x0800000, 0x0800000, CRC(26d6da7f) SHA1(f20e07a7994f41b5ed917f8b0119dc5542f3541c) ) //image-2
 
-	ROM_REGION16_LE( 0x0800000, "sprmask", 0 ) /* Sprite Masks + Colour Indexes */
+	ROM_REGION16_LE( 0x0800000, "igs023:sprmask", 0 ) /* Sprite Masks + Colour Indexes */
 	ROM_LOAD( "cave_b04701w064.u1",    0x0000000, 0x0800000, CRC(1bec008d) SHA1(07d117dc2eebb35727fb18a7c563acbaf25a8d36) ) //bitmap-1
 
 	ROM_REGION( 0x800000, "ics", ROMREGION_ERASE00 ) /* Samples - (8 bit mono 11025Hz) - */
@@ -5080,15 +5068,15 @@ ROM_START( ketbl ) // this assumes a Dodonpachi 2 Bee Storm cart was used
 	ROM_REGION32_LE( 0x400000, "user1", 0 ) /* Protection Data (encrypted external ARM data) */ // leftover from original game
 	ROM_LOAD( "v100.u23", 0x000000, 0x20000, CRC(06c3dd29) SHA1(20c9479f158467fc2037dcf162b6c6be18c91d46) )
 
-	ROM_REGION( 0xa00000, "tiles", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
+	ROM_REGION( 0xa00000, "igs023", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
 	PGM_VIDEO_BIOS
 	ROM_LOAD( "t04701w064.u19",   0x180000, 0x800000, CRC(2665b041) SHA1(fb1107778b66f2af0de77ac82e1ee2902f53a959) ) //text-1
 
-	ROM_REGION16_LE( 0x1000000, "sprcol", 0 ) /* Sprite Colour Data */
+	ROM_REGION16_LE( 0x1000000, "igs023:sprcol", 0 ) /* Sprite Colour Data */
 	ROM_LOAD( "a04701w064.u7",    0x0000000, 0x0800000, CRC(5ef1b94b) SHA1(f10dfa46e0a4d297c3a856aea5b49d648f98935c) ) //image-1
 	ROM_LOAD( "a04702w064.u8",    0x0800000, 0x0800000, CRC(26d6da7f) SHA1(f20e07a7994f41b5ed917f8b0119dc5542f3541c) ) //image-2
 
-	ROM_REGION16_LE( 0x0800000, "sprmask", 0 ) /* Sprite Masks + Colour Indexes */
+	ROM_REGION16_LE( 0x0800000, "igs023:sprmask", 0 ) /* Sprite Masks + Colour Indexes */
 	ROM_LOAD( "b04701w064.u1",    0x0000000, 0x0800000, CRC(1bec008d) SHA1(07d117dc2eebb35727fb18a7c563acbaf25a8d36) ) //bitmap-1
 
 	ROM_REGION( 0x800000, "ics", ROMREGION_ERASE00 ) /* Samples - (8 bit mono 11025Hz) - */
@@ -5104,15 +5092,15 @@ ROM_START( espgal )
 	ROM_REGION( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom */
 	ROM_LOAD( "espgal_igs027a.bin", 0x000000, 0x04000, NO_DUMP )
 
-	ROM_REGION( 0xa00000, "tiles", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
+	ROM_REGION( 0xa00000, "igs023", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
 	ROM_LOAD( "t01s.u18", 0x000000, 0x200000, CRC(1a7123a0) SHA1(cc567f577bfbf45427b54d6695b11b74f2578af3) ) // same as standard PGM text bios - surface scratched to remove details
 	ROM_LOAD( "cave_t04801w064.u19",   0x180000, 0x800000, CRC(6021c79e) SHA1(fbc340dafb18aa3094de29b881318a5a9794e4bc) ) //text-1
 
-	ROM_REGION16_LE( 0x1000000, "sprcol", 0 ) /* Sprite Colour Data */
+	ROM_REGION16_LE( 0x1000000, "igs023:sprcol", 0 ) /* Sprite Colour Data */
 	ROM_LOAD( "cave_a04801w064.u7",    0x0000000, 0x0800000, CRC(26dd4932) SHA1(9bbabb5a53cb5ba88397cc2c258980f3b70314ce) ) //image-1
 	ROM_LOAD( "cave_a04802w064.u8",    0x0800000, 0x0800000, CRC(0e6bf7a9) SHA1(a7541e2b5a0df2bc62a5b347e54dbc2ed1922db2) ) //image-2
 
-	ROM_REGION16_LE( 0x0800000, "sprmask", 0 ) /* Sprite Masks + Colour Indexes */
+	ROM_REGION16_LE( 0x0800000, "igs023:sprmask", 0 ) /* Sprite Masks + Colour Indexes */
 	ROM_LOAD( "cave_b04801w064.u1",    0x0000000, 0x0800000, CRC(98dce13a) SHA1(61d48b7117459f7babc022b68231f6928177a71d) ) //bitmap-1
 
 	ROM_REGION( 0x800000, "ics", ROMREGION_ERASE00 ) /* Samples - (8 bit mono 11025Hz) - */
@@ -5132,15 +5120,15 @@ ROM_START( espgalbl ) // this assumes a Dodonpachi 2 Bee Storm cart was used
 	ROM_REGION32_LE( 0x400000, "user1", 0 ) /* Protection Data (encrypted external ARM data) */ // leftover from original game
 	ROM_LOAD( "v100.u23", 0x000000, 0x20000, CRC(06c3dd29) SHA1(20c9479f158467fc2037dcf162b6c6be18c91d46) )
 
-	ROM_REGION( 0xa00000, "tiles", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
+	ROM_REGION( 0xa00000, "igs023", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
 	PGM_VIDEO_BIOS
 	ROM_LOAD( "t04801w064.u19",   0x180000, 0x800000, CRC(6021c79e) SHA1(fbc340dafb18aa3094de29b881318a5a9794e4bc) ) //text-1
 
-	ROM_REGION16_LE( 0x1000000, "sprcol", 0 ) /* Sprite Colour Data */
+	ROM_REGION16_LE( 0x1000000, "igs023:sprcol", 0 ) /* Sprite Colour Data */
 	ROM_LOAD( "a04801w064.u7",    0x0000000, 0x0800000, CRC(26dd4932) SHA1(9bbabb5a53cb5ba88397cc2c258980f3b70314ce) ) //image-1
 	ROM_LOAD( "a04802w064.u8",    0x0800000, 0x0800000, CRC(0e6bf7a9) SHA1(a7541e2b5a0df2bc62a5b347e54dbc2ed1922db2) ) //image-2
 
-	ROM_REGION16_LE( 0x0800000, "sprmask", 0 ) /* Sprite Masks + Colour Indexes */
+	ROM_REGION16_LE( 0x0800000, "igs023:sprmask", 0 ) /* Sprite Masks + Colour Indexes */
 	ROM_LOAD( "b04801w064.u1",    0x0000000, 0x0800000, CRC(98dce13a) SHA1(61d48b7117459f7babc022b68231f6928177a71d) ) //bitmap-1
 
 	ROM_REGION( 0x800000, "ics", ROMREGION_ERASE00 ) /* Samples - (8 bit mono 11025Hz) - */
@@ -5157,15 +5145,15 @@ ROM_START( ddp3 )
 	ROM_REGION( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom */
 	ROM_LOAD( "ddp3_igs027a.bin", 0x000000, 0x04000, NO_DUMP )
 
-	ROM_REGION( 0xa00000, "tiles", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
+	ROM_REGION( 0xa00000, "igs023", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
 	ROM_LOAD( "pgm_t01s.rom", 0x000000, 0x200000, CRC(1a7123a0) SHA1(cc567f577bfbf45427b54d6695b11b74f2578af3) ) // same as standard PGM bios
 	ROM_LOAD( "cave_t04401w064.u19", 0x180000, 0x800000, CRC(3a95f19c) SHA1(fd3c47cf0b8b1e20c6bec4be68a089fc8bbf4dbe) ) //text-1
 
-	ROM_REGION16_LE( 0x2000000, "sprcol", 0 ) /* Sprite Colour Data */
+	ROM_REGION16_LE( 0x2000000, "igs023:sprcol", 0 ) /* Sprite Colour Data */
 	ROM_LOAD( "cave_a04401w064.u7",  0x0000000, 0x0800000, CRC(ed229794) SHA1(1cf1863495a18c7c7d277a9be43ec116b00960b0) ) //image-1
 	ROM_LOAD( "cave_a04402w064.u8",  0x0800000, 0x0800000, CRC(752167b0) SHA1(c33c3398dd8e479c9d5bd348924958a6aecbf0fc) ) //image-2
 
-	ROM_REGION16_LE( 0x1000000, "sprmask", 0 ) /* Sprite Masks + Colour Indexes */
+	ROM_REGION16_LE( 0x1000000, "igs023:sprmask", 0 ) /* Sprite Masks + Colour Indexes */
 	ROM_LOAD( "cave_b04401w064.u1",  0x0000000, 0x0800000, CRC(17731c9d) SHA1(0e0aa0ec01035323985ac8e08228a0fd6edf6689) ) //bitmap-1
 
 	ROM_REGION( 0x1000000, "ics", 0 ) /* Samples - (8 bit mono 11025Hz) - */
@@ -5184,15 +5172,15 @@ ROM_START( ddpdoj )
 	ROM_REGION( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom */
 	ROM_LOAD( "ddp3_igs027a.bin", 0x000000, 0x04000, NO_DUMP )
 
-	ROM_REGION( 0xa00000, "tiles", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
+	ROM_REGION( 0xa00000, "igs023", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
 	ROM_LOAD( "pgm_t01s.rom", 0x000000, 0x200000, CRC(1a7123a0) SHA1(cc567f577bfbf45427b54d6695b11b74f2578af3) ) // same as standard PGM bios
 	ROM_LOAD( "cave_t04401w064.u19", 0x180000, 0x800000, CRC(3a95f19c) SHA1(fd3c47cf0b8b1e20c6bec4be68a089fc8bbf4dbe) ) //text-1
 
-	ROM_REGION16_LE( 0x2000000, "sprcol", 0 ) /* Sprite Colour Data */
+	ROM_REGION16_LE( 0x2000000, "igs023:sprcol", 0 ) /* Sprite Colour Data */
 	ROM_LOAD( "cave_a04401w064.u7",  0x0000000, 0x0800000, CRC(ed229794) SHA1(1cf1863495a18c7c7d277a9be43ec116b00960b0) ) //image-1
 	ROM_LOAD( "cave_a04402w064.u8",  0x0800000, 0x0800000, CRC(752167b0) SHA1(c33c3398dd8e479c9d5bd348924958a6aecbf0fc) ) //image-2
 
-	ROM_REGION16_LE( 0x1000000, "sprmask", 0 ) /* Sprite Masks + Colour Indexes */
+	ROM_REGION16_LE( 0x1000000, "igs023:sprmask", 0 ) /* Sprite Masks + Colour Indexes */
 	ROM_LOAD( "cave_b04401w064.u1",  0x0000000, 0x0800000, CRC(17731c9d) SHA1(0e0aa0ec01035323985ac8e08228a0fd6edf6689) ) //bitmap-1
 
 	ROM_REGION( 0x1000000, "ics", 0 ) /* Samples - (8 bit mono 11025Hz) - */
@@ -5212,15 +5200,15 @@ ROM_START( ddpdoja )
 	ROM_REGION( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom */
 	ROM_LOAD( "ddp3_igs027a.bin", 0x000000, 0x04000, NO_DUMP )
 
-	ROM_REGION( 0xa00000, "tiles", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
+	ROM_REGION( 0xa00000, "igs023", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
 	ROM_LOAD( "pgm_t01s.rom", 0x000000, 0x200000, CRC(1a7123a0) SHA1(cc567f577bfbf45427b54d6695b11b74f2578af3) ) // same as standard PGM bios
 	ROM_LOAD( "cave_t04401w064.u19", 0x180000, 0x800000, CRC(3a95f19c) SHA1(fd3c47cf0b8b1e20c6bec4be68a089fc8bbf4dbe) ) //text-1
 
-	ROM_REGION16_LE( 0x2000000, "sprcol", 0 ) /* Sprite Colour Data */
+	ROM_REGION16_LE( 0x2000000, "igs023:sprcol", 0 ) /* Sprite Colour Data */
 	ROM_LOAD( "cave_a04401w064.u7",  0x0000000, 0x0800000, CRC(ed229794) SHA1(1cf1863495a18c7c7d277a9be43ec116b00960b0) ) //image-1
 	ROM_LOAD( "cave_a04402w064.u8",  0x0800000, 0x0800000, CRC(752167b0) SHA1(c33c3398dd8e479c9d5bd348924958a6aecbf0fc) ) //image-2
 
-	ROM_REGION16_LE( 0x1000000, "sprmask", 0 ) /* Sprite Masks + Colour Indexes */
+	ROM_REGION16_LE( 0x1000000, "igs023:sprmask", 0 ) /* Sprite Masks + Colour Indexes */
 	ROM_LOAD( "cave_b04401w064.u1",  0x0000000, 0x0800000, CRC(17731c9d) SHA1(0e0aa0ec01035323985ac8e08228a0fd6edf6689) ) //bitmap-1
 
 	ROM_REGION( 0x1000000, "ics", 0 ) /* Samples - (8 bit mono 11025Hz) - */
@@ -5239,15 +5227,15 @@ ROM_START( ddpdojb )
 	ROM_REGION( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom */
 	ROM_LOAD( "ddp3_igs027a.bin", 0x000000, 0x04000, NO_DUMP )
 
-	ROM_REGION( 0xa00000, "tiles", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
+	ROM_REGION( 0xa00000, "igs023", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
 	ROM_LOAD( "pgm_t01s.rom", 0x000000, 0x200000, CRC(1a7123a0) SHA1(cc567f577bfbf45427b54d6695b11b74f2578af3) ) // same as standard PGM bios
 	ROM_LOAD( "cave_t04401w064.u19", 0x180000, 0x800000, CRC(3a95f19c) SHA1(fd3c47cf0b8b1e20c6bec4be68a089fc8bbf4dbe) ) //text-1
 
-	ROM_REGION16_LE( 0x2000000, "sprcol", 0 ) /* Sprite Colour Data */
+	ROM_REGION16_LE( 0x2000000, "igs023:sprcol", 0 ) /* Sprite Colour Data */
 	ROM_LOAD( "cave_a04401w064.u7",  0x0000000, 0x0800000, CRC(ed229794) SHA1(1cf1863495a18c7c7d277a9be43ec116b00960b0) ) //image-1
 	ROM_LOAD( "cave_a04402w064.u8",  0x0800000, 0x0800000, CRC(752167b0) SHA1(c33c3398dd8e479c9d5bd348924958a6aecbf0fc) ) //image-2
 
-	ROM_REGION16_LE( 0x1000000, "sprmask", 0 ) /* Sprite Masks + Colour Indexes */
+	ROM_REGION16_LE( 0x1000000, "igs023:sprmask", 0 ) /* Sprite Masks + Colour Indexes */
 	ROM_LOAD( "cave_b04401w064.u1",  0x0000000, 0x0800000, CRC(17731c9d) SHA1(0e0aa0ec01035323985ac8e08228a0fd6edf6689) ) //bitmap-1
 
 	ROM_REGION( 0x1000000, "ics", 0 ) /* Samples - (8 bit mono 11025Hz) - */
@@ -5263,18 +5251,18 @@ ROM_START( ddpdojp )
 	ROM_LOAD16_WORD_SWAP( "pgmbios.u20.27c210",    0x00000, 0x020000, CRC(1d2a7c15) SHA1(025a9f2bb64887699bf7ccab0f2ccfc55c3ad75c) )
 	ROM_LOAD16_WORD_SWAP( "ca008.cod_prom.u13.27c322",  0x100000, 0x400000, CRC(2ba7fa3b) SHA1(c4c5425a2455cb95555d94bbf8afc83cf0b140e8) )
 
-	ROM_REGION( 0xa00000, "tiles", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
+	ROM_REGION( 0xa00000, "igs023", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
 	ROM_LOAD( "pgm_t01s.rom", 0x000000, 0x200000, CRC(1a7123a0) SHA1(cc567f577bfbf45427b54d6695b11b74f2578af3) ) // same as standard PGM bios
 	ROM_LOAD( "fnt_cg.0_cgrom0.u8.27c322",   0x180000, 0x0400000, CRC(1805e198) SHA1(23db96eddfb47dfef9dcfab52ae2582ad3c0fc90) )
 	ROM_LOAD( "fnt_cg.1_cgrom1.u10.27c322",  0x580000, 0x0400000, CRC(f06ce99c) SHA1(24482e2bb2485855e300b6b3e07962d4f0a6ab83) )
 
-	ROM_REGION16_LE( 0x2000000, "sprcol", 0 ) /* Sprite Colour Data */
+	ROM_REGION16_LE( 0x2000000, "igs023:sprcol", 0 ) /* Sprite Colour Data */
 	ROM_LOAD( "sp_cg.0_imcs0.u11.27c322",  0x0000000, 0x0400000, CRC(c66bdd8e) SHA1(dde26821a3ef8ad5c3c29e11c55f8f6953c085dd) )
 	ROM_LOAD( "sp_cg.1_imcs1.u13.27c322",  0x0400000, 0x0400000, CRC(d30eac89) SHA1(78b18ff71136df0ffadb87fc53b60943dd62bcdd) )
 	ROM_LOAD( "sp_cg.2_imcs2.u15.27c322",  0x0800000, 0x0400000, CRC(f31b010e) SHA1(1987e9cd2abcf57be990853fbd305474e58da5b8) )
 	ROM_LOAD( "sp_cg.3_imcs3.u17.27c322",  0x0c00000, 0x0400000, CRC(01ec23f5) SHA1(ff22642f914b0f8911a221df1e9073bdc9434660) )
 
-	ROM_REGION16_LE( 0x1000000, "sprmask", 0 ) /* Sprite Masks + Colour Indexes */
+	ROM_REGION16_LE( 0x1000000, "igs023:sprmask", 0 ) /* Sprite Masks + Colour Indexes */
 	ROM_LOAD( "sp_mp.0_bitcs0.u5.27c322",  0x0000000, 0x0400000, CRC(e30494a4) SHA1(12d216252a916be4fd8d77b89497cee9b04861e5) )
 	ROM_LOAD( "sp_mp.1_bitcs1.u6.27c322",  0x0400000, 0x0400000, CRC(0239daec) SHA1(506c4d8a4bfa988d81565c47f742f1b06175915e) )
 
@@ -5298,15 +5286,15 @@ ROM_START( ddpdojblk )
 	ROM_REGION( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom */
 	ROM_LOAD( "ddp3_igs027a.bin", 0x000000, 0x04000, NO_DUMP )
 
-	ROM_REGION( 0xa00000, "tiles", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
+	ROM_REGION( 0xa00000, "igs023", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
 	ROM_LOAD( "pgm_t01s.rom", 0x000000, 0x200000, CRC(1a7123a0) SHA1(cc567f577bfbf45427b54d6695b11b74f2578af3) ) // same as standard PGM bios
 	ROM_LOAD( "cave_t04401w064.u19", 0x180000, 0x800000, CRC(3a95f19c) SHA1(fd3c47cf0b8b1e20c6bec4be68a089fc8bbf4dbe) ) //text-1
 
-	ROM_REGION16_LE( 0x2000000, "sprcol", 0 ) /* Sprite Colour Data */
+	ROM_REGION16_LE( 0x2000000, "igs023:sprcol", 0 ) /* Sprite Colour Data */
 	ROM_LOAD( "cave_a04401w064.u7",  0x0000000, 0x0800000, CRC(ed229794) SHA1(1cf1863495a18c7c7d277a9be43ec116b00960b0) ) //image-1
 	ROM_LOAD( "cave_a04402w064.u8",  0x0800000, 0x0800000, CRC(752167b0) SHA1(c33c3398dd8e479c9d5bd348924958a6aecbf0fc) ) //image-2
 
-	ROM_REGION16_LE( 0x1000000, "sprmask", 0 ) /* Sprite Masks + Colour Indexes */
+	ROM_REGION16_LE( 0x1000000, "igs023:sprmask", 0 ) /* Sprite Masks + Colour Indexes */
 	ROM_LOAD( "cave_b04401w064.u1",  0x0000000, 0x0800000, CRC(17731c9d) SHA1(0e0aa0ec01035323985ac8e08228a0fd6edf6689) ) //bitmap-1
 
 	ROM_REGION( 0x1000000, "ics", 0 ) /* Samples - (8 bit mono 11025Hz) - */
@@ -5325,15 +5313,15 @@ ROM_START( ddpdojblka )
 	ROM_REGION( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom */
 	ROM_LOAD( "ddp3_igs027a.bin", 0x000000, 0x04000, NO_DUMP )
 
-	ROM_REGION( 0xa00000, "tiles", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
+	ROM_REGION( 0xa00000, "igs023", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
 	ROM_LOAD( "pgm_t01s.rom", 0x000000, 0x200000, CRC(1a7123a0) SHA1(cc567f577bfbf45427b54d6695b11b74f2578af3) ) // same as standard PGM bios
 	ROM_LOAD( "cave_t04401w064.u19", 0x180000, 0x800000, CRC(3a95f19c) SHA1(fd3c47cf0b8b1e20c6bec4be68a089fc8bbf4dbe) ) //text-1
 
-	ROM_REGION16_LE( 0x2000000, "sprcol", 0 ) /* Sprite Colour Data */
+	ROM_REGION16_LE( 0x2000000, "igs023:sprcol", 0 ) /* Sprite Colour Data */
 	ROM_LOAD( "cave_a04401w064.u7",  0x0000000, 0x0800000, CRC(ed229794) SHA1(1cf1863495a18c7c7d277a9be43ec116b00960b0) ) //image-1
 	ROM_LOAD( "cave_a04402w064.u8",  0x0800000, 0x0800000, CRC(752167b0) SHA1(c33c3398dd8e479c9d5bd348924958a6aecbf0fc) ) //image-2
 
-	ROM_REGION16_LE( 0x1000000, "sprmask", 0 ) /* Sprite Masks + Colour Indexes */
+	ROM_REGION16_LE( 0x1000000, "igs023:sprmask", 0 ) /* Sprite Masks + Colour Indexes */
 	ROM_LOAD( "cave_b04401w064.u1",  0x0000000, 0x0800000, CRC(17731c9d) SHA1(0e0aa0ec01035323985ac8e08228a0fd6edf6689) ) //bitmap-1
 
 	ROM_REGION( 0x1000000, "ics", 0 ) /* Samples - (8 bit mono 11025Hz) - */
@@ -5352,15 +5340,15 @@ ROM_START( ddpdojblkb )
 	ROM_REGION( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom */
 	ROM_LOAD( "ddp3_igs027a.bin", 0x000000, 0x04000, NO_DUMP )
 
-	ROM_REGION( 0xa00000, "tiles", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
+	ROM_REGION( 0xa00000, "igs023", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
 	ROM_LOAD( "pgm_t01s.rom", 0x000000, 0x200000, CRC(1a7123a0) SHA1(cc567f577bfbf45427b54d6695b11b74f2578af3) ) // same as standard PGM bios
 	ROM_LOAD( "cave_t04401w064.u19", 0x180000, 0x800000, CRC(3a95f19c) SHA1(fd3c47cf0b8b1e20c6bec4be68a089fc8bbf4dbe) ) //text-1
 
-	ROM_REGION16_LE( 0x2000000, "sprcol", 0 ) /* Sprite Colour Data */
+	ROM_REGION16_LE( 0x2000000, "igs023:sprcol", 0 ) /* Sprite Colour Data */
 	ROM_LOAD( "cave_a04401w064.u7",  0x0000000, 0x0800000, CRC(ed229794) SHA1(1cf1863495a18c7c7d277a9be43ec116b00960b0) ) //image-1
 	ROM_LOAD( "cave_a04402w064.u8",  0x0800000, 0x0800000, CRC(752167b0) SHA1(c33c3398dd8e479c9d5bd348924958a6aecbf0fc) ) //image-2
 
-	ROM_REGION16_LE( 0x1000000, "sprmask", 0 ) /* Sprite Masks + Colour Indexes */
+	ROM_REGION16_LE( 0x1000000, "igs023:sprmask", 0 ) /* Sprite Masks + Colour Indexes */
 	ROM_LOAD( "cave_b04401w064.u1",  0x0000000, 0x0800000, CRC(17731c9d) SHA1(0e0aa0ec01035323985ac8e08228a0fd6edf6689) ) //bitmap-1
 
 	ROM_REGION( 0x1000000, "ics", 0 ) /* Samples - (8 bit mono 11025Hz) - */
@@ -5380,15 +5368,15 @@ ROM_START( ddpdojblkbl )
 	ROM_REGION( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom */
 	ROM_LOAD( "kovsh_v100_china.asic", 0x000000, 0x04000,  CRC(0f09a5c1) SHA1(621b38c05f33277608d58b49822aebc930ae4870) )
 
-	ROM_REGION( 0xa00000, "tiles", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
+	ROM_REGION( 0xa00000, "igs023", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
 	PGM_VIDEO_BIOS
 	ROM_LOAD( "t04401w064.u19",0x180000, 0x800000, CRC(3a95f19c) SHA1(fd3c47cf0b8b1e20c6bec4be68a089fc8bbf4dbe) ) //text-1
 
-	ROM_REGION16_LE( 0x2000000, "sprcol", 0 ) /* Sprite Colour Data */
+	ROM_REGION16_LE( 0x2000000, "igs023:sprcol", 0 ) /* Sprite Colour Data */
 	ROM_LOAD( "a04401w064.u7",  0x0000000, 0x0800000, CRC(ed229794) SHA1(1cf1863495a18c7c7d277a9be43ec116b00960b0) ) //image-1
 	ROM_LOAD( "a04402w064.u8",  0x0800000, 0x0800000, CRC(752167b0) SHA1(c33c3398dd8e479c9d5bd348924958a6aecbf0fc) ) //image-2
 
-	ROM_REGION16_LE( 0x1000000, "sprmask", 0 ) /* Sprite Masks + Colour Indexes */
+	ROM_REGION16_LE( 0x1000000, "igs023:sprmask", 0 ) /* Sprite Masks + Colour Indexes */
 	ROM_LOAD( "b04401w064_corrupt.u1",  0x0000000, 0x0800000, CRC(8cbff066) SHA1(eef1cd566bc70ebf45f047e56026803d5c1dac43) ) //bitmap-1 - bootlegs were based off a corrupt dump of the ROM
 
 	ROM_REGION( 0x1000000, "ics", 0 ) /* Samples - (8 bit mono 11025Hz) - */
@@ -5403,10 +5391,6 @@ void pgm_state::pgm_basic_init(bool set_bank)
 {
 	u8 *ROM = memregion("maincpu")->base();
 	if (set_bank) membank("bank1")->set_base(&ROM[0x100000]);
-
-	m_bg_videoram = &m_videoram[0];
-	m_tx_videoram = &m_videoram[0x4000/2];
-	m_rowscrollram = &m_videoram[0x7000/2];
 }
 
 void pgm_state::init_pgm()
