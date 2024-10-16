@@ -20,6 +20,9 @@ Namco H-5 CPU PCB (8830970101 - 8830960101)
 - D24OP8I XTAL
 - Epson SED1351F0A
 - 2x TC55257DFL-70L
+
+Cool Gunman is thought to run on similar hardware, it probably belongs here
+
 */
 
 #include "emu.h"
@@ -152,15 +155,21 @@ void qncrash_state::qncrash(machine_config &config)
 	EEPROM_93C66_16BIT(config, "eeprom");
 
 	// video hardware
-	// TODO: 2 LED screens (one for shots left / level infos, one for time left)
+	// TODO: 
+	// - a 96x16 dot matrix LED display
+	// - a 5 digit 7 segment display for time
+	// These should be implemented in a layout,
+	// not as video output.
 
 	// sound hardware
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "gun_speaker").front_center();
+	SPEAKER(config, "target_speaker").front_center();
 
 	okim9810_device &oki(OKIM9810(config, "oki", 4'096'000)); // no evident XTAL on PCB
-	oki.add_route(0, "lspeaker", 1.00);
-	oki.add_route(1, "rspeaker", 1.00);
+
+	// May need to be swapped. The announcer should come from gun_speaker
+	oki.add_route(0, "gun_speaker", 1.00);
+	oki.add_route(1, "target_speaker", 1.00);
 }
 
 
@@ -204,8 +213,32 @@ ROM_START( qncrasha )
 	ROM_LOAD( "j4155.ic5", 0x400, 0x155, NO_DUMP )
 ROM_END
 
+ROM_START( qncrashb ) // source: https://forums.arcade-museum.com/threads/namco-quick-crash-any-other-owners.269913/page-3#post-2940122
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "qc3_mpro.bin", 0x00000, 0x10000, CRC(42c54dec) SHA1(0f6ca4bec7ae4f60b1943dad756933d02cd660c4) )
+
+	ROM_REGION( 0x20000, "dotcpu", 0 )
+	ROM_LOAD( "qc3_dot0.bin", 0x00000, 0x20000, CRC(97d8c117) SHA1(61a8b52c61abae8cbeccf6dd23e3ee0b4c2e443d) )
+
+	ROM_REGION( 0x800000, "oki", 0 )
+	ROM_LOAD( "qc1_snd0.ic12", 0x000000, 0x400000, CRC(d72713d2) SHA1(556a0be2bb08fc9b4a2476b0ce8a23aa66858809) )
+	ROM_LOAD( "qc1_snd1.ic13", 0x400000, 0x400000, CRC(70e472a1) SHA1(df06270cede1d00e2ec231276e5e5466ab549794) ) // 1xxxxxxxxxxxxxxxxxxxxx = 0xFF
+
+	ROM_REGION16_BE( 0x200, "eeprom", 0 )
+	ROM_LOAD( "93c66n.ic5", 0x000, 0x200, CRC(1ba66a58) SHA1(adb7f1685cf81585ed30613adc39e9091e63af84) )
+
+	ROM_REGION( 0x600, "dot_plds", ROMREGION_ERASE00 ) // all 18CV8P
+	ROM_LOAD( "j4153.ic2", 0x000, 0x155, NO_DUMP )
+	ROM_LOAD( "j4154.ic3", 0x200, 0x155, NO_DUMP )
+	ROM_LOAD( "j4155.ic5", 0x400, 0x155, NO_DUMP )
+ROM_END
+
+
+
 } // anonymous namespace
 
 
 GAME( 1999, qncrash,  0,       qncrash, qncrash, qncrash_state, empty_init, ROT0, "Namco", "Quick & Crash (set 1, V2.200)", MACHINE_IS_SKELETON_MECHANICAL ) // version listed at 0xa97a in program ROM
 GAME( 1999, qncrasha, qncrash, qncrash, qncrash, qncrash_state, empty_init, ROT0, "Namco", "Quick & Crash (set 2)",         MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 1999, qncrashb, qncrash, qncrash, qncrash, qncrash_state, empty_init, ROT0, "Namco", "Quick & Crash (set 3)",         MACHINE_IS_SKELETON_MECHANICAL )
+
