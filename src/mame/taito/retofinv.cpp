@@ -1045,7 +1045,7 @@ ROM_START( retofinvbv ) // Spanish bootleg from Video Dens
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "03.bin", 0x0000, 0x2000, CRC(a5cfa153) SHA1(9b2fc22c2f8ccb2dbee9043470b128e718c0ed74) ) // unique
 	ROM_LOAD( "02.bin", 0x2000, 0x2000, CRC(3379f930) SHA1(c67d687a10b6240bd6e2fbdb15e1b7d276e6fc07) )
-	ROM_LOAD( "01.bin", 0x4000, 0x2000, BAD_DUMP CRC(3ae7c530) SHA1(5d1be375494fa07124071067661c4bfc2d724d54) ) // Bad on this PCB, borrowed from 'retofinvb2'
+	ROM_LOAD( "01.bin", 0x4000, 0x2000, CRC(3ae7c530) SHA1(5d1be375494fa07124071067661c4bfc2d724d54) )
 
 	ROM_REGION( 0x10000, "sub", 0 )
 	ROM_LOAD( "04.bin", 0x0000, 0x2000, CRC(d2899cc1) SHA1(fdbec743b06f4cdcc134ef863e4e71337ad0b2c5) )
