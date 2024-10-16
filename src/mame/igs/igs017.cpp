@@ -5467,15 +5467,15 @@ Osc - 8MHz near IGS022, 22MHz near IGS017
 2 banks of 8 DIP switches
 Oki M6295
 */
-ROM_START( lhzb2b )
+ROM_START( lhzb )
 	ROM_REGION( 0x80000, "maincpu", 0 )
 	ROM_LOAD16_WORD_SWAP( "rom.u25", 0x00000, 0x80000, CRC(46f5df48) SHA1(da35b0cfaef34179a8e2a019c472ff14d831c753) )
 
 	ROM_REGION( 0x10000, "igs022", 0 )
 	ROM_LOAD( "rom.u12",0x0000, 0x10000, CRC(794d0276) SHA1(ac903d2faa3fb315438dc8da22c5337611a8790d) )
 
-	ROM_REGION( 0x200000, "igs017_igs031:sprites", 0 )
-	ROM_LOAD16_WORD_SWAP( "m1101.u13", 0x000000, 0x200000, CRC(fed09cd6) SHA1(0658a97983f8ba408126e79889cc58323f2d99ba) ) // FIXED BITS (0xxxxxxxxxxxxxxx)
+	ROM_REGION( 0x400000, "igs017_igs031:sprites", 0 )
+	ROM_LOAD16_WORD_SWAP( "m1101.u13", 0x000000, 0x400000, CRC(0114e9d1) SHA1(5b16170d3cd8b8e1662c949b7234fbdd2ca927f7) ) // FIXED BITS (0xxxxxxxxxxxxxxx)
 
 	ROM_REGION( 0x80000, "igs017_igs031:tilemaps", 0 )
 	ROM_LOAD16_WORD_SWAP( "rom.u15", 0x00000, 0x80000, CRC(5d28287b) SHA1(441f7f301f9d5f1d817f907ec4cedf274a6801d4) )
@@ -5487,15 +5487,15 @@ ROM_START( lhzb2b )
 	ROM_LOAD( "lhzb2_string.key", 0x00, 0xec, CRC(c964dc35) SHA1(81036e0dfa9abad123701ae8939d0d5b6f91b015) )
 ROM_END
 
-ROM_START( lhzb2c ) // PCB NO-0182-2, very minor code differences if compared to lhzb2b.
+ROM_START( lhzba ) // PCB NO-0182-2, very minor code differences if compared to lhzb.
 	ROM_REGION( 0x80000, "maincpu", 0 )
 	ROM_LOAD16_WORD_SWAP( "rom.u25", 0x00000, 0x80000, CRC(2fd43fea) SHA1(6215655ae49c75cece33a359a359b0e7980a2c1c) )
 
 	ROM_REGION( 0x10000, "igs022", 0 )
 	ROM_LOAD( "rom.u12",0x0000, 0x10000, CRC(794d0276) SHA1(ac903d2faa3fb315438dc8da22c5337611a8790d) )
 
-	ROM_REGION( 0x200000, "igs017_igs031:sprites", 0 )
-	ROM_LOAD16_WORD_SWAP( "m1101.u13", 0x000000, 0x200000, CRC(fed09cd6) SHA1(0658a97983f8ba408126e79889cc58323f2d99ba) ) // FIXED BITS (0xxxxxxxxxxxxxxx)
+	ROM_REGION( 0x400000, "igs017_igs031:sprites", 0 )
+	ROM_LOAD16_WORD_SWAP( "m1101.u13", 0x000000, 0x400000, CRC(0114e9d1) SHA1(5b16170d3cd8b8e1662c949b7234fbdd2ca927f7) ) // FIXED BITS (0xxxxxxxxxxxxxxx)
 
 	ROM_REGION( 0x80000, "igs017_igs031:tilemaps", 0 )
 	ROM_LOAD16_WORD_SWAP( "rom.u15", 0x00000, 0x80000, CRC(5d28287b) SHA1(441f7f301f9d5f1d817f907ec4cedf274a6801d4) )
@@ -6076,10 +6076,10 @@ GAME ( 1997,  genius6a,   genius6,  genius6,    genius6,  igs017_state, init_iqb
 GAME ( 1997,  genius6b,   genius6,  genius6,    genius6,  igs017_state, init_iqblocka,   ROT0, "IGS", "Genius 6 (V132F)",                                                   0 ) // "
 GAME ( 1998,  mgcs,       0,        mgcs,       mgcs,     igs017_state, init_mgcs,       ROT0, "IGS", "Manguan Caishen (China, V103CS)",                                    MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION ) // 满贯财神, finish IGS029 protection
 GAME ( 1998,  mgcsa,      mgcs,     mgcsa,      mgcs,     igs017_state, init_mgcsa,      ROT0, "IGS", "Manguan Caishen (China, V106CS)",                                    MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION ) // 满贯财神, finish IGS029 protection
+GAME ( 1998,  lhzb,       0,        lhzb2,      lhzb2,    igs017_state, init_lhzb2,      ROT0, "IGS", "Long Hu Zhengba (China, VS105M, set 1)",                             MACHINE_UNEMULATED_PROTECTION ) // 龙虎争霸, finish IGS022 protection
+GAME ( 1998,  lhzba,      lhzb,     lhzb2,      lhzb2,    igs017_state, init_lhzb2,      ROT0, "IGS", "Long Hu Zhengba (China, VS105M, set 2)",                             MACHINE_UNEMULATED_PROTECTION ) // 龙虎争霸, finish IGS022 protection
 GAME ( 1998,  lhzb2,      0,        lhzb2,      lhzb2,    igs017_state, init_lhzb2,      ROT0, "IGS", "Long Hu Zhengba 2 (China, set 1)",                                   MACHINE_UNEMULATED_PROTECTION ) // 龙虎争霸2, finish IGS022 protection
 GAME ( 1998,  lhzb2a,     lhzb2,    lhzb2a,     lhzb2a,   igs017_state, init_lhzb2a,     ROT0, "IGS", "Long Hu Zhengba 2 (China, VS221M)",                                  0 ) // 龙虎争霸2
-GAME ( 1998,  lhzb2b,     lhzb2,    lhzb2,      lhzb2,    igs017_state, init_lhzb2,      ROT0, "IGS", "Long Hu Zhengba 2 (China, VS105M, set 1)",                           MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION ) // 龙虎争霸2, correct GFX decryption, finish IGS022 protection
-GAME ( 1998,  lhzb2c,     lhzb2,    lhzb2,      lhzb2,    igs017_state, init_lhzb2,      ROT0, "IGS", "Long Hu Zhengba 2 (China, VS105M, set 2)",                           MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION ) // 龙虎争霸2, correct GFX decryption, finish IGS022 protection
 GAME ( 1998,  slqz2,      0,        slqz2,      slqz2,    igs017_state, init_slqz2,      ROT0, "IGS", "Shuang Long Qiang Zhu 2 VS (China, VS203J)",                         MACHINE_UNEMULATED_PROTECTION ) // 双龙抢珠, finish IGS022 protection
 GAME ( 1998,  slqz2a,     slqz2,    slqz2,      slqz2,    igs017_state, init_slqz2,      ROT0, "IGS", "Shuang Long Qiang Zhu 2 VS (China, set 2)",                          MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION ) // 双龙抢珠, misses program ROM dump, finish IGS022 protection
 GAME ( 1999,  tarzanc,    0,        tarzan,     tarzan,   igs017_state, init_tarzanc,    ROT0, "IGS", "Tarzan Chuang Tian Guan (China, V109C, set 1)",                      0 ) // 泰山闯天关
