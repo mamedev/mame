@@ -465,17 +465,17 @@ static INPUT_PORTS_START( famibox )
 	PORT_DIPSETTING(    0xc0, "FREEPLAY" )
 
 	PORT_START("KEYSWITCH")
-	PORT_DIPNAME( 0x3f, 0x01, "Key switch" ) PORT_CHANGED_MEMBER(DEVICE_SELF, famibox_state, famibox_keyswitch_changed, 0)
+	PORT_DIPNAME( 0x3f, 0x01, "Key switch" ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(famibox_state::famibox_keyswitch_changed), 0)
 	PORT_DIPSETTING(    0x20, "Game Count" )
 	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( Free_Play ) )
 	PORT_DIPSETTING(    0x08, "Self Test" )
 	PORT_DIPSETTING(    0x10, DEF_STR( Unused ) )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(famibox_state, coin_r)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(famibox_state::coin_r))
 
 	PORT_START("COIN")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, famibox_state, coin_inserted, 0)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(famibox_state::coin_inserted), 0)
 INPUT_PORTS_END
 
 /******************************************************

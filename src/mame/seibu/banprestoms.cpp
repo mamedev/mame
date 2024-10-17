@@ -261,7 +261,7 @@ static INPUT_PORTS_START( tvdenwad )
 	PORT_START("IN2")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON13 ) // Card Emp in switch test
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_BUTTON14 ) // Card Pos in switch test
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("ticket", ticket_dispenser_device, line_r) // Card Pay in switch test
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("ticket", FUNC(ticket_dispenser_device::line_r)) // Card Pay in switch test
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_START )
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_UNUSED ) // ?
 	PORT_SERVICE( 0x0020, IP_ACTIVE_LOW )
@@ -325,7 +325,7 @@ static INPUT_PORTS_START( marioun ) // inputs defined as IPT_UNKNOWN don't show 
 	PORT_START("IN2")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON7 ) // Card Emp
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_BUTTON8 ) // Card Pos
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("ticket", ticket_dispenser_device, line_r) // Card Pay
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("ticket", FUNC(ticket_dispenser_device::line_r)) // Card Pay
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_SERVICE1 )

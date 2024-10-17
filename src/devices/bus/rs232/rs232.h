@@ -35,7 +35,7 @@
 
 #define PORT_RS232_BAUD(_tag, _default_baud, _description, _class, _write_line) \
 	PORT_START(_tag) \
-	PORT_CONFNAME(0xff, _default_baud, _description) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, _class, _write_line) \
+	PORT_CONFNAME(0xff, _default_baud, _description) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, FUNC(_class::_write_line)) \
 	PORT_CONFSETTING( RS232_BAUD_50, "50") \
 	PORT_CONFSETTING( RS232_BAUD_75, "75") \
 	PORT_CONFSETTING( RS232_BAUD_110, "110") \
@@ -67,7 +67,7 @@
 
 #define PORT_RS232_DATABITS(_tag, _default_databits, _description, _class, _write_line) \
 	PORT_START(_tag) \
-	PORT_CONFNAME(0xff, _default_databits, _description) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, _class, _write_line) \
+	PORT_CONFNAME(0xff, _default_databits, _description) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, FUNC(_class::_write_line)) \
 	PORT_CONFSETTING( RS232_DATABITS_5, "5") \
 	PORT_CONFSETTING( RS232_DATABITS_6, "6") \
 	PORT_CONFSETTING( RS232_DATABITS_7, "7") \
@@ -81,7 +81,7 @@
 
 #define PORT_RS232_PARITY(_tag, _default_parity, _description, _class, _write_line) \
 	PORT_START(_tag) \
-	PORT_CONFNAME(0xff, _default_parity, "Parity") PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, _class, _write_line) \
+	PORT_CONFNAME(0xff, _default_parity, "Parity") PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, FUNC(_class::_write_line)) \
 	PORT_CONFSETTING( RS232_PARITY_NONE, "None") \
 	PORT_CONFSETTING( RS232_PARITY_ODD, "Odd") \
 	PORT_CONFSETTING( RS232_PARITY_EVEN, "Even") \
@@ -95,7 +95,7 @@
 
 #define PORT_RS232_STOPBITS(_tag, _default_stopbits, _description, _class, _write_line) \
 	PORT_START(_tag) \
-	PORT_CONFNAME(0xff, 0x01, _description) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, _class, _write_line) \
+	PORT_CONFNAME(0xff, 0x01, _description) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, FUNC(_class::_write_line)) \
 	PORT_CONFSETTING( RS232_STOPBITS_0, "0") \
 	PORT_CONFSETTING( RS232_STOPBITS_1, "1") \
 	PORT_CONFSETTING( RS232_STOPBITS_1_5, "1.5") \

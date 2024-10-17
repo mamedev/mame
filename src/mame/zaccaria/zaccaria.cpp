@@ -271,7 +271,7 @@ static INPUT_PORTS_START( monymony )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN3 )
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("audiopcb", zac1b11142_audio_device, acs_r)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("audiopcb", FUNC(zac1b11142_audio_device::acs_r))
 	// other bits come from a protection device
 INPUT_PORTS_END
 

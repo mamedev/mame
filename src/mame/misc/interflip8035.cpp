@@ -1125,7 +1125,7 @@ static INPUT_PORTS_START( interflip )
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START2 )  PORT_NAME("Auxiliary Lever")                     // auxiliary lever
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_GAMBLE_DOOR )                                             // door
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_CUSTOM )  PORT_READ_LINE_DEVICE_MEMBER("hopper", ticket_dispenser_device, line_r)  // payout
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_CUSTOM )  PORT_READ_LINE_DEVICE_MEMBER("hopper", FUNC(ticket_dispenser_device::line_r))  // payout
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START1 )  PORT_NAME("Lever")                               // lever
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )                                                   // unused
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER )   PORT_NAME("Display Reset") PORT_CODE(KEYCODE_8)  // display reset
@@ -1139,16 +1139,16 @@ static INPUT_PORTS_START( interflip )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("OPTOS_A")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(interflip8035_state, reel_opto_r<0>)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(interflip8035_state, reel_opto_r<1>)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(interflip8035_state, reel_opto_r<2>)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(interflip8035_state, reel_opto_r<3>)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(interflip8035_state::reel_opto_r<0>))
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(interflip8035_state::reel_opto_r<1>))
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(interflip8035_state::reel_opto_r<2>))
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(interflip8035_state::reel_opto_r<3>))
 
 	PORT_START("OPTOS_B")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(interflip8035_state, symbol_opto_r<0>)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(interflip8035_state, symbol_opto_r<1>)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(interflip8035_state, symbol_opto_r<2>)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(interflip8035_state, symbol_opto_r<3>)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(interflip8035_state::symbol_opto_r<0>))
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(interflip8035_state::symbol_opto_r<1>))
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(interflip8035_state::symbol_opto_r<2>))
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(interflip8035_state::symbol_opto_r<3>))
 
 //  Test mode selection has lower priority. If DSW5, DSW6 and DSW7 are all Off, DSW5 is selected, and so on.
 //  To select Game Mode all DSW5, DSW6 and DSW7 must be On. All others are ignored.

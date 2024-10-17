@@ -19,7 +19,7 @@
 
 
 #define PORT_CHANGED_CB(x) \
-	PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, x, 0)
+	PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(hh_sm510_state::x), 0)
 
 
 class hh_sm510_state : public driver_device

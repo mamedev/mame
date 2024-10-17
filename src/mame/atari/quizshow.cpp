@@ -287,7 +287,7 @@ INPUT_CHANGED_MEMBER(quizshow_state::category_select)
 
 static INPUT_PORTS_START( quizshow )
 	PORT_START("IN0") // ADR strobe 0
-	PORT_BIT( 0x0f, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(quizshow_state, tape_headpos_r)
+	PORT_BIT( 0x0f, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(FUNC(quizshow_state::tape_headpos_r))
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_START1 )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_START2 )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_COIN1 )
@@ -352,7 +352,7 @@ static INPUT_PORTS_START( quizshow )
 	PORT_BIT( 0xf0, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("CAT")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_NAME("Category Select") PORT_CHANGED_MEMBER(DEVICE_SELF, quizshow_state, category_select, 0)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_NAME("Category Select") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(quizshow_state::category_select), 0)
 
 INPUT_PORTS_END
 

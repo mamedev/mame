@@ -334,7 +334,7 @@ void flipjack_state::sound_io_map(address_map &map)
 
 static INPUT_PORTS_START( flipjack )
 	PORT_START("COIN")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, flipjack_state, coin_nmi_w) // not mapped in P1/P2/P3?
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_WRITE_LINE_MEMBER(FUNC(flipjack_state::coin_nmi_w)) // not mapped in P1/P2/P3?
 
 	PORT_START("P1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("P1 Shoot")

@@ -547,7 +547,7 @@ static INPUT_PORTS_START( crshrace )
     PORT_DIPSETTING(      0x0e00, "5" )
     PORT_DIPSETTING(      0x0f00, "5" )
 */
-	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("soundlatch", generic_latch_8_device, pending_r) // pending sound command
+	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("soundlatch", FUNC(generic_latch_8_device::pending_r)) // pending sound command
 INPUT_PORTS_END
 
 // Same as 'crshrace', but additional "unknown" Dip Switch (see notes)

@@ -67,8 +67,8 @@ INPUT_PORTS_START( badlands )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_CUSTOM )   /* self test */
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("mainlatch", generic_latch_8_device, pending_r)   /* response buffer full */
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("soundlatch", generic_latch_8_device, pending_r)    /* command buffer full */
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("mainlatch", FUNC(generic_latch_8_device::pending_r))   /* response buffer full */
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("soundlatch", FUNC(generic_latch_8_device::pending_r))    /* command buffer full */
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM )   /* self test */
 
 	PORT_START("PEDALS")    /* fake for pedals */

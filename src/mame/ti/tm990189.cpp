@@ -884,7 +884,7 @@ ROM_END
 static INPUT_PORTS_START(tm990_189)
 
 	PORT_START( "LOADINT")
-		PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Load interrupt") PORT_CODE(KEYCODE_PRTSCR) PORT_CHANGED_MEMBER(DEVICE_SELF, tm990189_state, load_interrupt, 1)
+		PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Load interrupt") PORT_CODE(KEYCODE_PRTSCR) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(tm990189_state::load_interrupt), 1)
 
 	/* 45-key calculator-like alphanumeric keyboard... */
 	PORT_START("LINE0")    /* row 0 */

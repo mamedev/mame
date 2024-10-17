@@ -433,7 +433,7 @@ private:
 
 static INPUT_PORTS_START(double_ram_mode_switch)
 	PORT_START("MODE")
-	PORT_CONFNAME(0x01, 0x01, "Mode") PORT_CHANGED_MEMBER(DEVICE_SELF, msx_cart_double_ram_device, mode_callback, 0)
+	PORT_CONFNAME(0x01, 0x01, "Mode") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(msx_cart_double_ram_device::mode_callback), 0)
 	PORT_CONFSETTING(0x00, "Memory Mapper")
 	PORT_CONFSETTING(0x01, "MegaRAM")
 INPUT_PORTS_END

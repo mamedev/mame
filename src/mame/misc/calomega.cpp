@@ -1619,7 +1619,7 @@ static INPUT_PORTS_START( gdrwpkrd )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("IN0-1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("hopper", ticket_dispenser_device, line_r)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("hopper", FUNC(ticket_dispenser_device::line_r))
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_DOOR )  PORT_NAME("Door Open")
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE )      PORT_NAME("Test Mode")                      // in some games you need to open the door first
@@ -2127,7 +2127,7 @@ static INPUT_PORTS_START( comg074 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("IN0-1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER )        PORT_READ_LINE_DEVICE_MEMBER("hopper", ticket_dispenser_device, line_r)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER )        PORT_READ_LINE_DEVICE_MEMBER("hopper", FUNC(ticket_dispenser_device::line_r))
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_DOOR )  PORT_NAME("Door Open")
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE )      PORT_NAME("Test Mode")  // in some games you need to open the door first
@@ -3762,7 +3762,7 @@ static INPUT_PORTS_START( stand906 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("IN0-1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_CUSTOM )        PORT_READ_LINE_DEVICE_MEMBER("hopper", ticket_dispenser_device, line_r)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_CUSTOM )        PORT_READ_LINE_DEVICE_MEMBER("hopper", FUNC(ticket_dispenser_device::line_r))
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE )       PORT_CODE(KEYCODE_H) PORT_NAME("Hopper Weight") PORT_TOGGLE
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_DOOR )                        PORT_NAME("Door")          PORT_TOGGLE
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE )       PORT_CODE(KEYCODE_9) PORT_NAME("Menu")
@@ -3871,7 +3871,7 @@ static INPUT_PORTS_START( cas21iwc )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("IN0-1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_CUSTOM )        PORT_READ_LINE_DEVICE_MEMBER("hopper", ticket_dispenser_device, line_r)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_CUSTOM )        PORT_READ_LINE_DEVICE_MEMBER("hopper", FUNC(ticket_dispenser_device::line_r))
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE )       PORT_CODE(KEYCODE_H) PORT_NAME("Hopper Height (Peso Tolva)") PORT_TOGGLE
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_DOOR )                        PORT_NAME("Door (Puerta)")              PORT_TOGGLE
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE )       PORT_CODE(KEYCODE_9) PORT_NAME("Menu")
@@ -3979,7 +3979,7 @@ static INPUT_PORTS_START( pokeriwc )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("IN0-1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_CUSTOM )        PORT_READ_LINE_DEVICE_MEMBER("hopper", ticket_dispenser_device, line_r)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_CUSTOM )        PORT_READ_LINE_DEVICE_MEMBER("hopper", FUNC(ticket_dispenser_device::line_r))
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE )       PORT_CODE(KEYCODE_H) PORT_NAME("Hopper Weight (Peso Tolva)") PORT_TOGGLE
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_DOOR )                        PORT_NAME("Door (Puerta Abierta)")      PORT_TOGGLE
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE )       PORT_CODE(KEYCODE_9) PORT_NAME("Menu")

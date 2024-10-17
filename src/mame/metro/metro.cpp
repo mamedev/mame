@@ -1156,7 +1156,7 @@ void vmetal_state::main_map(address_map &map)
 	PORT_BIT(  0x0010, IP_ACTIVE_LOW,  IPT_START1   ) \
 	PORT_BIT(  0x0020, IP_ACTIVE_LOW,  IPT_START2   ) \
 	PORT_BIT(  0x0040, IP_ACTIVE_HIGH, IPT_UNKNOWN  ) \
-	PORT_BIT(  0x0080, IP_ACTIVE_HIGH, IPT_CUSTOM  ) PORT_READ_LINE_MEMBER(metro_upd7810_state, custom_soundstatus_r)   /* From Sound CPU */
+	PORT_BIT(  0x0080, IP_ACTIVE_HIGH, IPT_CUSTOM  ) PORT_READ_LINE_MEMBER(FUNC(metro_upd7810_state::custom_soundstatus_r))   /* From Sound CPU */
 
 
 #define COINAGE_SERVICE_LOC(DIPBANK) \
@@ -1734,7 +1734,7 @@ static INPUT_PORTS_START( daitorid )
 	PORT_INCLUDE( daitoa )
 
 	PORT_MODIFY("IN0") // $c00000
-	PORT_BIT(  0x0080, IP_ACTIVE_HIGH, IPT_CUSTOM  ) PORT_READ_LINE_MEMBER(metro_upd7810_state, custom_soundstatus_r)   // From Sound CPU
+	PORT_BIT(  0x0080, IP_ACTIVE_HIGH, IPT_CUSTOM  ) PORT_READ_LINE_MEMBER(FUNC(metro_upd7810_state::custom_soundstatus_r))   // From Sound CPU
 INPUT_PORTS_END
 
 

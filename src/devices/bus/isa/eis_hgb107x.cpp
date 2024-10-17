@@ -580,7 +580,7 @@ static INPUT_PORTS_START( epc_mda )
 	PORT_DIPUNUSED_DIPLOC(0x02, 0x02, "S1:2")
 
 	PORT_START( "MONITOR" )
-	PORT_CONFNAME( 0x01, 0x00, "Ericsson Monochrome HR Monitors") PORT_CHANGED_MEMBER( DEVICE_SELF, isa8_epc_mda_device, monitor_changed, 0 )
+	PORT_CONFNAME( 0x01, 0x00, "Ericsson Monochrome HR Monitors") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(isa8_epc_mda_device::monitor_changed), 0)
 	PORT_CONFSETTING(    0x00, "Amber 3111")
 	PORT_CONFSETTING(    0x01, "B&W 3712/3715")
 INPUT_PORTS_END

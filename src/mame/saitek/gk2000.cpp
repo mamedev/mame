@@ -325,7 +325,7 @@ static INPUT_PORTS_START( gk2000 )
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_B) PORT_CODE(KEYCODE_RIGHT) PORT_NAME("Black / Right")
 
 	PORT_START("IN.2")
-	PORT_CONFNAME( 0xff, 0x02, "CPU Frequency" ) PORT_CHANGED_MEMBER(DEVICE_SELF, gk2000_state, gk2000_change_cpu_freq, 0) // factory set
+	PORT_CONFNAME( 0xff, 0x02, "CPU Frequency" ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(gk2000_state::gk2000_change_cpu_freq), 0) // factory set
 	PORT_CONFSETTING(    0x01, "8MHz (unofficial)" )
 	PORT_CONFSETTING(    0x00, "14MHz (Travel Champion 2080)" )
 	PORT_CONFSETTING(    0x02, "20MHz (GK 2000, GK 2100)" )
@@ -334,7 +334,7 @@ static INPUT_PORTS_START( gk2000 )
 	PORT_CONFSETTING(    0x10, "32MHz (unofficial)" )
 
 	PORT_START("IN.3")
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_G) PORT_CHANGED_MEMBER(DEVICE_SELF, gk2000_state, go_button, 0) PORT_NAME("Go / Stop")
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_G) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(gk2000_state::go_button), 0) PORT_NAME("Go / Stop")
 	PORT_BIT(0xef, IP_ACTIVE_HIGH, IPT_UNUSED)
 INPUT_PORTS_END
 
@@ -351,7 +351,7 @@ static INPUT_PORTS_START( cougar )
 
 	PORT_MODIFY("IN.2") // configuration diodes
 	PORT_BIT(0x27, 0x00, IPT_CUSTOM) // __Lnb
-	PORT_CONFNAME( 0x18, 0x08, "CPU Frequency" ) PORT_CHANGED_MEMBER(DEVICE_SELF, gk2000_state, centurion_change_cpu_freq, 0)
+	PORT_CONFNAME( 0x18, 0x08, "CPU Frequency" ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(gk2000_state::centurion_change_cpu_freq), 0)
 	PORT_CONFSETTING(    0x18, "10MHz (Centurion, Cosmos)" )
 	PORT_CONFSETTING(    0x00, "12MHz (Mephisto Mystery)" )
 	PORT_CONFSETTING(    0x10, "14MHz (unofficial)" )
@@ -369,7 +369,7 @@ static INPUT_PORTS_START( centurion )
 
 	PORT_MODIFY("IN.2") // change defaults
 	PORT_BIT(0x27, 0x23, IPT_CUSTOM) // StLn_
-	PORT_CONFNAME( 0x18, 0x18, "CPU Frequency" ) PORT_CHANGED_MEMBER(DEVICE_SELF, gk2000_state, centurion_change_cpu_freq, 0)
+	PORT_CONFNAME( 0x18, 0x18, "CPU Frequency" ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(gk2000_state::centurion_change_cpu_freq), 0)
 	PORT_CONFSETTING(    0x18, "10MHz (Centurion, Cosmos)" )
 	PORT_CONFSETTING(    0x00, "12MHz (Mephisto Mystery)" )
 	PORT_CONFSETTING(    0x10, "14MHz (unofficial)" )

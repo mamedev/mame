@@ -34,13 +34,13 @@ DEFINE_DEVICE_TYPE(PCCARD_SRAM_CENTENNIAL_4M, pccard_centennial_sl04m_15_11194_d
 
 static INPUT_PORTS_START( card )
 	PORT_START("switches")
-	PORT_CONFNAME(0x01, 0x01, "Battery Failed") PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, pccard_sram_device, battery_voltage_1_w)
+	PORT_CONFNAME(0x01, 0x01, "Battery Failed") PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, FUNC(pccard_sram_device::battery_voltage_1_w))
 	PORT_CONFSETTING(   0x00, DEF_STR(Yes))
 	PORT_CONFSETTING(   0x01, DEF_STR(No))
-	PORT_CONFNAME(0x02, 0x02, "Battery Low")    PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, pccard_sram_device, battery_voltage_2_w)
+	PORT_CONFNAME(0x02, 0x02, "Battery Low")    PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, FUNC(pccard_sram_device::battery_voltage_2_w))
 	PORT_CONFSETTING(   0x00, DEF_STR(Yes))
 	PORT_CONFSETTING(   0x02, DEF_STR(No))
-	PORT_CONFNAME(0x04, 0x00, "Write Protect")  PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, pccard_sram_device, write_protect_w)
+	PORT_CONFNAME(0x04, 0x00, "Write Protect")  PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, FUNC(pccard_sram_device::write_protect_w))
 	PORT_CONFSETTING(   0x04, DEF_STR(Yes))
 	PORT_CONFSETTING(   0x00, DEF_STR(No))
 INPUT_PORTS_END

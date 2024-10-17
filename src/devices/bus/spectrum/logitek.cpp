@@ -36,7 +36,7 @@ DEFINE_DEVICE_TYPE(SPECTRUM_PROCEED, spectrum_proceed_device, "spectrum_proceed"
 
 INPUT_PORTS_START(proceed)
 	PORT_START("BUTTON")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_BUTTON1) PORT_NAME("NMI Button") PORT_CODE(KEYCODE_MINUS_PAD) PORT_CHANGED_MEMBER(DEVICE_SELF, spectrum_proceed_device, nmi_button, 0)
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_BUTTON1) PORT_NAME("NMI Button") PORT_CODE(KEYCODE_MINUS_PAD) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(spectrum_proceed_device::nmi_button), 0)
 INPUT_PORTS_END
 
 //-------------------------------------------------

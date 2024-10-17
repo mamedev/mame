@@ -767,7 +767,7 @@ static INPUT_PORTS_START( pitnrun )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )       // also enables bootup test
 
 	PORT_START("TILT")
-	PORT_BIT( 1, IP_ACTIVE_HIGH, IPT_TILT ) PORT_WRITE_LINE_MEMBER(pitnrun_state, tilt_w)
+	PORT_BIT( 1, IP_ACTIVE_HIGH, IPT_TILT ) PORT_WRITE_LINE_MEMBER(FUNC(pitnrun_state::tilt_w))
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( jumpkun )

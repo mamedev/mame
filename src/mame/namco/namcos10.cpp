@@ -3352,8 +3352,8 @@ static INPUT_PORTS_START( mgexio_medal )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_TILT )
 
 	PORT_START("MGEXIO_COIN")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_NAME("Coin Sensor(L)") PORT_CHANGED_MEMBER(DEVICE_SELF, namcos10_state, mgexio_coin_start, 0)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_NAME("Coin Sensor(R)") PORT_CHANGED_MEMBER(DEVICE_SELF, namcos10_state, mgexio_coin_start, 1)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_NAME("Coin Sensor(L)") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(namcos10_state::mgexio_coin_start), 0)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_NAME("Coin Sensor(R)") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(namcos10_state::mgexio_coin_start), 1)
 
 INPUT_PORTS_END
 

@@ -1043,7 +1043,7 @@ static INPUT_PORTS_START( showhand )
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW,  IPT_POKER_HOLD3   ) PORT_NAME("Look / Small") // HOLD5 in full test mode
 	PORT_SERVICE_NO_TOGGLE( 0x0020,   IP_ACTIVE_LOW     ) // settings
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW,  IPT_UNKNOWN       )
-	PORT_BIT( 0x0080, IP_ACTIVE_LOW,  IPT_CUSTOM        ) PORT_READ_LINE_DEVICE_MEMBER("ticket", hopper_device, line_r)
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW,  IPT_CUSTOM        ) PORT_READ_LINE_DEVICE_MEMBER("ticket", FUNC(hopper_device::line_r))
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW,  IPT_POKER_HOLD2   ) PORT_NAME("Yes / Big") // HOLD4 in full test mode
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW,  IPT_GAMBLE_PAYOUT ) // HOLD1 in full test mode
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW,  IPT_POKER_HOLD1   ) PORT_NAME("Select") // HOLD2 in full test mode
@@ -1051,16 +1051,16 @@ static INPUT_PORTS_START( showhand )
 	PORT_BIT( 0x1000, IP_ACTIVE_LOW,  IPT_MEMORY_RESET  ) // press with keyout if eeprom error (green screen) or to reset settings
 	PORT_BIT( 0x2000, IP_ACTIVE_LOW,  IPT_UNKNOWN       )
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW,  IPT_GAMBLE_KEYIN  )
-	PORT_BIT( 0x8000, IP_ACTIVE_LOW,  IPT_CUSTOM        ) PORT_READ_LINE_DEVICE_MEMBER("hopper", hopper_device, line_r)
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW,  IPT_CUSTOM        ) PORT_READ_LINE_DEVICE_MEMBER("hopper", FUNC(hopper_device::line_r))
 
 	PORT_START( "EEPROM_IN" )
 	PORT_BIT( 0xfff7, IP_ACTIVE_LOW,  IPT_UNUSED )
-	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
+	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", FUNC(eeprom_serial_93cxx_device::do_read))
 
 	PORT_START( "EEPROM_OUT" )
-	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, di_write)
-	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, clk_write)
-	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, cs_write)
+	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", FUNC(eeprom_serial_93cxx_device::di_write))
+	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", FUNC(eeprom_serial_93cxx_device::clk_write))
+	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", FUNC(eeprom_serial_93cxx_device::cs_write))
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( showhanc )
@@ -1081,7 +1081,7 @@ static INPUT_PORTS_START( showhanc )
 	PORT_BIT( 0x0800, IP_ACTIVE_LOW,  IPT_POKER_HOLD2   ) PORT_NAME("Yes / Big") // HOLD4 in full test mode
 	PORT_BIT( 0x1000, IP_ACTIVE_LOW,  IPT_MEMORY_RESET  ) // press with keyout if eeprom error (green screen) or to reset settings. "DOOR OPEN" error in-game.
 	PORT_BIT( 0x2000, IP_ACTIVE_HIGH, IPT_UNKNOWN       ) // must be 0 for payout/lamps to work, might be a hopper empty sense?
-	PORT_BIT( 0x4000, IP_ACTIVE_LOW,  IPT_CUSTOM        ) PORT_READ_LINE_DEVICE_MEMBER("hopper", hopper_device, line_r)
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW,  IPT_CUSTOM        ) PORT_READ_LINE_DEVICE_MEMBER("hopper", FUNC(hopper_device::line_r))
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW,  IPT_GAMBLE_KEYIN  )
 INPUT_PORTS_END
 
@@ -1103,9 +1103,9 @@ static INPUT_PORTS_START( skilldrp )
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW,  IPT_UNKNOWN       )
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW,  IPT_UNKNOWN       )
 	PORT_BIT( 0x0800, IP_ACTIVE_LOW,  IPT_GAMBLE_BET    ) PORT_NAME("Play")
-	PORT_BIT( 0x1000, IP_ACTIVE_LOW,  IPT_CUSTOM        ) PORT_READ_LINE_DEVICE_MEMBER("ticket", hopper_device, line_r)
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW,  IPT_CUSTOM        ) PORT_READ_LINE_DEVICE_MEMBER("ticket", FUNC(hopper_device::line_r))
 	PORT_BIT( 0x2000, IP_ACTIVE_LOW,  IPT_GAMBLE_BOOK   )
-	PORT_BIT( 0x4000, IP_ACTIVE_LOW,  IPT_CUSTOM        ) PORT_READ_LINE_DEVICE_MEMBER("hopper", hopper_device, line_r)
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW,  IPT_CUSTOM        ) PORT_READ_LINE_DEVICE_MEMBER("hopper", FUNC(hopper_device::line_r))
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW,  IPT_GAMBLE_KEYIN  )
 INPUT_PORTS_END
 
@@ -1127,18 +1127,18 @@ static INPUT_PORTS_START( magibombd )
 
 	PORT_MODIFY( "EEPROM_IN" )
 	PORT_BIT( 0xfffb, IP_ACTIVE_LOW,  IPT_UNUSED )
-	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
+	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", FUNC(eeprom_serial_93cxx_device::do_read))
 
 	PORT_START( "CPUCODE_IN" )
 	PORT_BIT( 0xfffb, IP_ACTIVE_LOW,  IPT_UNUSED )
-	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_READ_LINE_DEVICE_MEMBER("astro_cpucode", astro_cpucode_device, do_read)
+	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_READ_LINE_DEVICE_MEMBER("astro_cpucode", FUNC(astro_cpucode_device::do_read))
 
 	PORT_MODIFY( "EEPROM_OUT" )
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW,  IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, cs_write)
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW,  IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", FUNC(eeprom_serial_93cxx_device::cs_write))
 
 	PORT_START( "CPUCODE_OUT" )
-	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("astro_cpucode", astro_cpucode_device, clk_write)
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW,  IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("astro_cpucode", astro_cpucode_device, cs_write)
+	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("astro_cpucode", FUNC(astro_cpucode_device::clk_write))
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW,  IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("astro_cpucode", FUNC(astro_cpucode_device::cs_write))
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( magibombg )
@@ -1146,11 +1146,11 @@ static INPUT_PORTS_START( magibombg )
 
 	PORT_START( "CPUCODE_IN" )
 	PORT_BIT( 0xfff7, IP_ACTIVE_LOW,  IPT_UNUSED )
-	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_READ_LINE_DEVICE_MEMBER("astro_cpucode", astro_cpucode_device, do_read)
+	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_READ_LINE_DEVICE_MEMBER("astro_cpucode", FUNC(astro_cpucode_device::do_read))
 
 	PORT_START( "CPUCODE_OUT" )
-	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("astro_cpucode", astro_cpucode_device, clk_write)
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW,  IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("astro_cpucode", astro_cpucode_device, cs_write)
+	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("astro_cpucode", FUNC(astro_cpucode_device::clk_write))
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW,  IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("astro_cpucode", FUNC(astro_cpucode_device::cs_write))
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( dinodino )
@@ -1169,18 +1169,18 @@ static INPUT_PORTS_START( dinodino )
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW,  IPT_SLOT_STOP_ALL ) PORT_NAME("Auto")
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW,  IPT_SLOT_STOP2    ) PORT_NAME("Odds")
 	PORT_BIT( 0x0800, IP_ACTIVE_LOW,  IPT_GAMBLE_BET    ) PORT_NAME("Play")
-	PORT_BIT( 0x1000, IP_ACTIVE_LOW,  IPT_CUSTOM        ) PORT_READ_LINE_DEVICE_MEMBER("ticket", hopper_device, line_r)
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW,  IPT_CUSTOM        ) PORT_READ_LINE_DEVICE_MEMBER("ticket", FUNC(hopper_device::line_r))
 	PORT_BIT( 0x2000, IP_ACTIVE_LOW,  IPT_GAMBLE_BOOK   )
-	PORT_BIT( 0x4000, IP_ACTIVE_LOW,  IPT_CUSTOM        ) PORT_READ_LINE_DEVICE_MEMBER("hopper", hopper_device, line_r)
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW,  IPT_CUSTOM        ) PORT_READ_LINE_DEVICE_MEMBER("hopper", FUNC(hopper_device::line_r))
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW,  IPT_GAMBLE_KEYIN  )
 
 	PORT_START( "CPUCODE_IN" )
 	PORT_BIT( 0xfff7, IP_ACTIVE_LOW,  IPT_UNUSED )
-	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_READ_LINE_DEVICE_MEMBER("astro_cpucode", astro_cpucode_device, do_read)
+	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_READ_LINE_DEVICE_MEMBER("astro_cpucode", FUNC(astro_cpucode_device::do_read))
 
 	PORT_START( "CPUCODE_OUT" )
-	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("astro_cpucode", astro_cpucode_device, clk_write)
-	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("astro_cpucode", astro_cpucode_device, cs_write)
+	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("astro_cpucode", FUNC(astro_cpucode_device::clk_write))
+	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("astro_cpucode", FUNC(astro_cpucode_device::cs_write))
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( winbingo )
@@ -1212,7 +1212,7 @@ static INPUT_PORTS_START( astoneag )
 	PORT_BIT( 0x0800, IP_ACTIVE_LOW,  IPT_GAMBLE_BET    )
 	PORT_BIT( 0x1000, IP_ACTIVE_LOW,  IPT_OTHER         ) PORT_NAME("Reserve Switch") // shown in test mode
 	PORT_BIT( 0x2000, IP_ACTIVE_LOW,  IPT_GAMBLE_BOOK   )
-	PORT_BIT( 0x4000, IP_ACTIVE_LOW,  IPT_CUSTOM        ) PORT_READ_LINE_DEVICE_MEMBER("hopper", hopper_device, line_r)
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW,  IPT_CUSTOM        ) PORT_READ_LINE_DEVICE_MEMBER("hopper", FUNC(hopper_device::line_r))
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW,  IPT_GAMBLE_KEYIN  )
 INPUT_PORTS_END
 

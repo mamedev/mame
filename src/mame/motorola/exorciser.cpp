@@ -282,12 +282,12 @@ void exorciser_state::mem_map(address_map &map)
 static INPUT_PORTS_START( exorciser )
 
 	PORT_START("ABORT_KEY")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Abort") PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, exorciser_state, abort_key_w)
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Abort") PORT_WRITE_LINE_MEMBER(FUNC(exorciser_state::abort_key_w))
 
 	// The EXORciser I supported 1MHz, and the EXORciser II also supported
 	// 1.5 and 2.0MHz.
 	PORT_START("MAINCPU_CLOCK")
-	PORT_CONFNAME(0xffffff, 1000000, "CPU clock") PORT_CHANGED_MEMBER(DEVICE_SELF, exorciser_state, maincpu_clock_change, 0)
+	PORT_CONFNAME(0xffffff, 1000000, "CPU clock") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(exorciser_state::maincpu_clock_change), 0)
 	PORT_CONFSETTING(1000000, "1.0 MHz")
 	PORT_CONFSETTING(2000000, "1.5 MHz")
 	PORT_CONFSETTING(4000000, "2.0 MHz")

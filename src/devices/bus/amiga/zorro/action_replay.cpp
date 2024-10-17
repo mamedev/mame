@@ -35,7 +35,7 @@ namespace bus::amiga::zorro {
 
 static INPUT_PORTS_START( ar_button )
 	PORT_START("freeze")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Freeze") PORT_CODE(KEYCODE_F12) PORT_CHANGED_MEMBER(DEVICE_SELF, action_replay_device_base, freeze, 0)
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Freeze") PORT_CODE(KEYCODE_F12) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(action_replay_device_base::freeze), 0)
 INPUT_PORTS_END
 
 ioport_constructor action_replay_device_base::device_input_ports() const

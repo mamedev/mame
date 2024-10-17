@@ -282,7 +282,7 @@ void saitekosa_analyst_device::main_map(address_map &map)
 
 static INPUT_PORTS_START( maestro )
 	PORT_START("CPU")
-	PORT_CONFNAME( 0x07, 0x04, "CPU Frequency" ) PORT_CHANGED_MEMBER(DEVICE_SELF, saitekosa_maestro_device, change_cpu_freq, 0) // factory set
+	PORT_CONFNAME( 0x07, 0x04, "CPU Frequency" ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(saitekosa_maestro_device::change_cpu_freq), 0) // factory set
 	PORT_CONFSETTING(    0x00, "4MHz" )
 	PORT_CONFSETTING(    0x01, "5.67MHz" )
 	PORT_CONFSETTING(    0x02, "6MHz" )

@@ -325,11 +325,11 @@ static INPUT_PORTS_START( kopunch )
 
 	PORT_START("SYSTEM")
 	PORT_BIT( 0x07, IP_ACTIVE_HIGH, IPT_CUSTOM ) // punch strength (high 3 bits)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_CHANGED_MEMBER(DEVICE_SELF, kopunch_state, right_coin_inserted, 0)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(kopunch_state::right_coin_inserted), 0)
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_CUSTOM ) // sensor
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_CUSTOM ) // sensor
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_CUSTOM ) // sensor
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, kopunch_state, left_coin_inserted, 0)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(kopunch_state::left_coin_inserted), 0)
 
 	PORT_START("DSW")
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )

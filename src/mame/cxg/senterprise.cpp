@@ -305,7 +305,7 @@ static INPUT_PORTS_START( senterp )
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_CUSTOM) // "
 
 	PORT_START("POWER") // needs to be triggered for nvram to work
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_POWER_OFF) PORT_CHANGED_MEMBER(DEVICE_SELF, senterp_state, power_off, 0)
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_POWER_OFF) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(senterp_state::power_off), 0)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( senterpc )

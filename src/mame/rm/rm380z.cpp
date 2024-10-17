@@ -176,7 +176,7 @@ INPUT_PORTS_END
 INPUT_PORTS_START( rm380zhrg )
 
 	PORT_START("display_type")
-	PORT_CONFNAME( 0x01, 0x00, "Monitor" ) PORT_CHANGED_MEMBER(DEVICE_SELF, rm380z_state_cos40_hrg, monitor_changed, 0)
+	PORT_CONFNAME( 0x01, 0x00, "Monitor" ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(rm380z_state_cos40_hrg::monitor_changed), 0)
 	PORT_CONFSETTING( 0x00, "Colour Monitor" )
 	PORT_CONFSETTING( 0x01, "Monochrome b/w Monitor" )
 

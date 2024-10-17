@@ -281,13 +281,13 @@ ioport_value ladybug_state::ladybug_p2_control_r()
 
 static INPUT_PORTS_START( ladybug )
 	PORT_START("IN0")
-	PORT_BIT( 0x1f, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(ladybug_state, ladybug_p1_control_r)
+	PORT_BIT( 0x1f, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(FUNC(ladybug_state::ladybug_p1_control_r))
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_TILT )
 
 	PORT_START("IN1")
-	PORT_BIT( 0x1f, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(ladybug_state, ladybug_p2_control_r)
+	PORT_BIT( 0x1f, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(FUNC(ladybug_state::ladybug_p2_control_r))
 	// This should be connected to the 4V clock. I don't think the game uses it.
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	// Note that there are TWO VBlank inputs, one is active low, the other active
@@ -351,8 +351,8 @@ static INPUT_PORTS_START( ladybug )
 	/* settings 0x00 through 0x50 all give 1 Coin/1 Credit */
 
 	PORT_START("COIN")  /* FAKE */
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, ladybug_state,coin1_inserted, 0)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 ) PORT_CHANGED_MEMBER(DEVICE_SELF, ladybug_state,coin2_inserted, 0)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(ladybug_state::coin1_inserted), 0)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(ladybug_state::coin2_inserted), 0)
 
 	PORT_START("CONTP1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_4WAY
@@ -451,8 +451,8 @@ static INPUT_PORTS_START( snapjack )
 	/* settings 0x00 through 0x04 all give 1 Coin/1 Credit */
 
 	PORT_START("COIN")  /* FAKE */
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, ladybug_state,coin1_inserted, 0)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 ) PORT_CHANGED_MEMBER(DEVICE_SELF, ladybug_state,coin2_inserted, 0)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(ladybug_state::coin1_inserted), 0)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(ladybug_state::coin2_inserted), 0)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( cavenger )
@@ -535,8 +535,8 @@ static INPUT_PORTS_START( cavenger )
 	/* settings 0x00 through 0x50 all give 1 Coin/1 Credit */
 
 	PORT_START("COIN")  /* FAKE */
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, ladybug_state,coin1_inserted, 0)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 ) PORT_CHANGED_MEMBER(DEVICE_SELF, ladybug_state,coin2_inserted, 0)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(ladybug_state::coin1_inserted), 0)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(ladybug_state::coin2_inserted), 0)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( dorodon )
@@ -619,8 +619,8 @@ static INPUT_PORTS_START( dorodon )
 	/* settings 0x00 through 0x50 all give 1 Coin/1 Credit */
 
 	PORT_START("COIN")  /* FAKE */
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, ladybug_state,coin1_inserted, 0)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 ) PORT_CHANGED_MEMBER(DEVICE_SELF, ladybug_state,coin2_inserted, 0)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(ladybug_state::coin1_inserted), 0)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(ladybug_state::coin2_inserted), 0)
 INPUT_PORTS_END
 
 

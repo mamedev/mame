@@ -684,7 +684,7 @@ static INPUT_PORTS_START( kurukuru )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN2 )   PORT_NAME(u8"¥10 In")                                 // edge connector pin 16 bottom
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )                                                        // edge connector pin 17 top (active)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN3 )   PORT_NAME(u8"¥100 In") PORT_IMPULSE(2)                // edge connector pin 17 bottom
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("hopper", ticket_dispenser_device, line_r)    // hopper feedback, edge connector pin 24 top
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("hopper", FUNC(ticket_dispenser_device::line_r))    // hopper feedback, edge connector pin 24 top
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT )                                                 // edge connector pin 24 bottom
 
 	PORT_START("DSW1")  // found in the PCB: 11111111
@@ -764,7 +764,7 @@ static INPUT_PORTS_START( ppj )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN2 )   PORT_NAME(u8"¥10 In")                                 // edge connector pin 16 bottom
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )                                                        // edge connector pin 17 top (active)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN3 )   PORT_NAME(u8"¥100 In") PORT_IMPULSE(2)                // edge connector pin 17 bottom
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("hopper", ticket_dispenser_device, line_r)  // hopper feedback, edge connector pin 24 top
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("hopper", FUNC(ticket_dispenser_device::line_r))  // hopper feedback, edge connector pin 24 top
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT )                                                 // edge connector pin 24 bottom
 
 	PORT_START("DSW1")  // found in the PCB: 00000000 (arranged for sale since they are uncommon settings)

@@ -4689,7 +4689,7 @@ static INPUT_PORTS_START( ddenlovj )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME(DEF_STR( Test )) PORT_CODE(KEYCODE_F1)   // Test
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_CUSTOM )   // blitter busy flag
-	PORT_BIT( 0x60, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(ddenlovr_state, ddenlovj_blitter_r)  // blitter irq flag? (bit 5) & RTC (bit 6)
+	PORT_BIT( 0x60, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(FUNC(ddenlovr_state::ddenlovj_blitter_r))  // blitter irq flag? (bit 5) & RTC (bit 6)
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM )
 
 	PORT_START("DSW1")
@@ -4795,7 +4795,7 @@ static INPUT_PORTS_START( ddenlovr )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME(DEF_STR( Test )) PORT_CODE(KEYCODE_F1)   // Test
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_CUSTOM )    // ? quiz365
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(ddenlovr_state, blitter_irq_r)  // blitter irq flag
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(ddenlovr_state::blitter_irq_r))  // blitter irq flag
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM )   // blitter busy flag
 
 	PORT_START("DSW")
@@ -4850,7 +4850,7 @@ static INPUT_PORTS_START( nettoqc )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME(DEF_STR( Test )) PORT_CODE(KEYCODE_F1)   // Test
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_CUSTOM )   // blitter busy flag
-	PORT_BIT( 0x60, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(ddenlovr_state, nettoqc_special_r)  // ? (bit 5) & blitter irq flag (bit 6)
+	PORT_BIT( 0x60, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(FUNC(ddenlovr_state::nettoqc_special_r))  // ? (bit 5) & blitter irq flag (bit 6)
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM )
 
 	PORT_START("DSW1")
@@ -4948,7 +4948,7 @@ static INPUT_PORTS_START( ultrchmp )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME(DEF_STR( Test )) PORT_CODE(KEYCODE_F1)   // Test
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(ddenlovr_state, blitter_irq_r)  // blitter irq flag
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(ddenlovr_state::blitter_irq_r))  // blitter irq flag
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM )   // blitter busy flag
 
 	PORT_START("DSW")
@@ -5126,7 +5126,7 @@ static INPUT_PORTS_START( quiz365 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME(DEF_STR( Test )) PORT_CODE(KEYCODE_F1)   // Test
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_CUSTOM )    // ? quiz365
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(ddenlovr_state, blitter_irq_r)  // blitter irq flag
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(ddenlovr_state::blitter_irq_r))  // blitter irq flag
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM )   // blitter busy flag
 
 	PORT_START("DSW1")
@@ -8219,7 +8219,7 @@ static INPUT_PORTS_START( mjflove )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME(DEF_STR( Test )) PORT_CODE(KEYCODE_F1)   PORT_TOGGLE
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x60, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(ddenlovr_state, mjflove_blitter_r)  // RTC (bit 5) & blitter irq flag (bit 6)
+	PORT_BIT( 0x60, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(FUNC(ddenlovr_state::mjflove_blitter_r))  // RTC (bit 5) & blitter irq flag (bit 6)
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM )   // blitter busy flag
 
 	PORT_START("KEY0")

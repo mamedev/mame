@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders: XingXing, David Haywood
+// copyright-holders: XingXing, Vas Crabb, David Haywood
 
 /* IGS ARM7 (IGS027A) based Mahjong / Gambling platform(s)
  Driver by XingXing
@@ -348,15 +348,15 @@ void igs_m027_state::oki_128k_map(address_map &map)
 		PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON2 )                                                           /* S2   */ \
 		PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON1 )                                                           /* S1   */ \
 		PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_START1 )                                                            /* 开始 */ \
-		PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_CUSTOM )                PORT_CONDITION(port, mask, EQUALS, mask)    PORT_READ_LINE_DEVICE_MEMBER("hopper", hopper_device, line_r) /* HPSW./HP */ \
+		PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_CUSTOM )                PORT_CONDITION(port, mask, EQUALS, mask)    PORT_READ_LINE_DEVICE_MEMBER("hopper", FUNC(hopper_device::line_r)) /* HPSW./HP */ \
 		PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )               PORT_CONDITION(port, mask, EQUALS, mask) \
 		PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )               PORT_CONDITION(port, mask, EQUALS, 0x00) \
 		PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 )                 PORT_CONDITION(port, mask, EQUALS, 0x00)    /* 投币 */ \
 		PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT )                                                    /* 右   */ \
 		PORT_START("PLAYER") \
-		PORT_BIT( 0x0003f, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(igs_m027_state, kbd_ioport_r) \
+		PORT_BIT( 0x0003f, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(FUNC(igs_m027_state::kbd_ioport_r)) \
 		PORT_BIT( 0x00040, IP_ACTIVE_LOW, IPT_UNKNOWN )            PORT_CONDITION(port, mask, EQUALS, mask) \
-		PORT_BIT( 0x00040, IP_ACTIVE_LOW, IPT_CUSTOM )             PORT_CONDITION(port, mask, EQUALS, 0x00)    PORT_READ_LINE_DEVICE_MEMBER("hopper", hopper_device, line_r) /* HPSW./HP */ \
+		PORT_BIT( 0x00040, IP_ACTIVE_LOW, IPT_CUSTOM )             PORT_CONDITION(port, mask, EQUALS, 0x00)    PORT_READ_LINE_DEVICE_MEMBER("hopper", FUNC(hopper_device::line_r)) /* HPSW./HP */ \
 		PORT_BIT( 0x00080, IP_ACTIVE_LOW, IPT_UNKNOWN ) \
 		PORT_BIT( 0x00100, IP_ACTIVE_LOW, IPT_GAMBLE_KEYIN )                                                   /* 开分 */ \
 		PORT_BIT( 0x0fe00, IP_ACTIVE_LOW, IPT_UNKNOWN ) \
@@ -366,14 +366,14 @@ void igs_m027_state::oki_128k_map(address_map &map)
 		PORT_START("CLEARMEM") \
 		PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MEMORY_RESET ) PORT_TOGGLE \
 		PORT_START("PPIB") \
-		PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_CONDITION(port, mask, EQUALS, mask) PORT_WRITE_LINE_MEMBER(igs_m027_state, counter_w<1>) /* key-out */ \
-		PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_CONDITION(port, mask, EQUALS, mask) PORT_WRITE_LINE_MEMBER(igs_m027_state, counter_w<2>) /* hopper  */ \
-		PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_CONDITION(port, mask, EQUALS, mask) PORT_WRITE_LINE_MEMBER(igs_m027_state, counter_w<0>) /* key-in  */ \
-		PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_CONDITION(port, mask, EQUALS, 0x00) PORT_WRITE_LINE_DEVICE_MEMBER("hopper", hopper_device, motor_w) \
+		PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_CONDITION(port, mask, EQUALS, mask) PORT_WRITE_LINE_MEMBER(FUNC(igs_m027_state::counter_w<1>)) /* key-out */ \
+		PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_CONDITION(port, mask, EQUALS, mask) PORT_WRITE_LINE_MEMBER(FUNC(igs_m027_state::counter_w<2>)) /* hopper  */ \
+		PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_CONDITION(port, mask, EQUALS, mask) PORT_WRITE_LINE_MEMBER(FUNC(igs_m027_state::counter_w<0>)) /* key-in  */ \
+		PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_CONDITION(port, mask, EQUALS, 0x00) PORT_WRITE_LINE_DEVICE_MEMBER("hopper", FUNC(hopper_device::motor_w)) \
 		PORT_START("PPIC") \
-		PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_CONDITION(port, mask, EQUALS, mask) PORT_WRITE_LINE_DEVICE_MEMBER("hopper", hopper_device, motor_w) \
-		PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_CONDITION(port, mask, EQUALS, 0x00) PORT_WRITE_LINE_MEMBER(igs_m027_state, counter_w<0>) /* coin or key-in    */ \
-		PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_CONDITION(port, mask, EQUALS, 0x00) PORT_WRITE_LINE_MEMBER(igs_m027_state, counter_w<1>) /* hopper or key-out */
+		PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_CONDITION(port, mask, EQUALS, mask) PORT_WRITE_LINE_DEVICE_MEMBER("hopper", FUNC(hopper_device::motor_w)) \
+		PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_CONDITION(port, mask, EQUALS, 0x00) PORT_WRITE_LINE_MEMBER(FUNC(igs_m027_state::counter_w<0>)) /* coin or key-in    */ \
+		PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_CONDITION(port, mask, EQUALS, 0x00) PORT_WRITE_LINE_MEMBER(FUNC(igs_m027_state::counter_w<1>)) /* hopper or key-out */
 
 
 INPUT_PORTS_START( base )
@@ -514,7 +514,7 @@ INPUT_PORTS_START( three_reel )
 	PORT_START("PORTC")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_KEYIN )
 	PORT_BIT( 0x1e, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("hopper", hopper_device, line_r) // HPSW
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("hopper", FUNC(hopper_device::line_r)) // HPSW
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
@@ -529,7 +529,7 @@ INPUT_PORTS_START( three_reel )
 	PORT_BIT( 0x00080, IP_ACTIVE_LOW, IPT_GAMBLE_BET )        PORT_NAME("Play")
 	PORT_BIT( 0x00700, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x00800, IP_ACTIVE_LOW, IPT_BUTTON2 )           PORT_NAME("Ticket") // TICKET
-	PORT_BIT( 0x01000, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("ticket", ticket_dispenser_device, line_r) // TKSW
+	PORT_BIT( 0x01000, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("ticket", FUNC(ticket_dispenser_device::line_r)) // TKSW
 	PORT_BIT( 0x02000, IP_ACTIVE_LOW, IPT_COIN2 )             // COINC
 	PORT_BIT( 0xf0000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
@@ -696,7 +696,7 @@ INPUT_PORTS_START( slqz3 )
 	PORT_INCLUDE(slqz3_dip_switches)
 
 	PORT_MODIFY("TEST")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("hopper", hopper_device, line_r) // 哈巴
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("hopper", FUNC(hopper_device::line_r)) // 哈巴
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON3 )               // 功能
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON2 )               // 押注
 
@@ -739,7 +739,7 @@ INPUT_PORTS_START( qlgs )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT )                                                                                // 右
 
 	PORT_START("PLAYER")
-	PORT_BIT( 0x0003f, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(igs_m027_state, kbd_ioport_r)
+	PORT_BIT( 0x0003f, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(FUNC(igs_m027_state::kbd_ioport_r))
 	PORT_BIT( 0x00040, IP_ACTIVE_LOW, IPT_TILT )               PORT_CONDITION("DSW2", 0x01, EQUALS, 0x01)  PORT_NAME("Hopper Switch")  // 哈巴
 	PORT_BIT( 0x00040, IP_ACTIVE_LOW, IPT_UNKNOWN )            PORT_CONDITION("DSW2", 0x01, EQUALS, 0x00)
 	PORT_BIT( 0x0ff80, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -782,7 +782,7 @@ INPUT_PORTS_START( lhdmg )
 	PORT_INCLUDE(slqz3_dip_switches)
 
 	PORT_MODIFY("TEST")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("hopper", hopper_device, line_r) // 哈巴
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("hopper", FUNC(hopper_device::line_r)) // 哈巴
 INPUT_PORTS_END
 
 INPUT_PORTS_START( lhzb3 )
@@ -800,7 +800,7 @@ INPUT_PORTS_START( lhzb3sjb )
 	PORT_INCLUDE(slqz3_dip_switches)
 
 	PORT_MODIFY("TEST")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("hopper", hopper_device, line_r) // 哈巴
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("hopper", FUNC(hopper_device::line_r)) // 哈巴
 	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNKNOWN )         PORT_CONDITION("DSW2", 0x08, EQUALS, 0x08)
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON3 )         PORT_CONDITION("DSW2", 0x08, EQUALS, 0x00)  // 功能
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON2 )         PORT_CONDITION("DSW2", 0x08, EQUALS, 0x00)  // 押注
@@ -808,7 +808,7 @@ INPUT_PORTS_START( lhzb3sjb )
 	PORT_START("JOY")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0xfc, IP_ACTIVE_HIGH, IPT_CUSTOM )         PORT_CONDITION("DSW2", 0x08, EQUALS, 0x08)  PORT_CUSTOM_MEMBER(igs_m027_state, kbd_ioport_r)
+	PORT_BIT( 0xfc, IP_ACTIVE_HIGH, IPT_CUSTOM )         PORT_CONDITION("DSW2", 0x08, EQUALS, 0x08)  PORT_CUSTOM_MEMBER(FUNC(igs_m027_state::kbd_ioport_r))
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START1 )          PORT_CONDITION("DSW2", 0x08, EQUALS, 0x00)  // 开始
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )     PORT_CONDITION("DSW2", 0x08, EQUALS, 0x00)  // 上
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )   PORT_CONDITION("DSW2", 0x08, EQUALS, 0x00)  // 下
@@ -817,8 +817,8 @@ INPUT_PORTS_START( lhzb3sjb )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 )         PORT_CONDITION("DSW2", 0x08, EQUALS, 0x00)  // 摸／舍
 
 	PORT_START("PPIC")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_CONDITION("DSW2", 0x08, EQUALS, 0x00) PORT_WRITE_LINE_MEMBER(igs_m027_state, counter_w<0>) // coin or key-in
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_CONDITION("DSW2", 0x08, EQUALS, 0x00) PORT_WRITE_LINE_MEMBER(igs_m027_state, counter_w<1>) // hopper or key-out
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_CONDITION("DSW2", 0x08, EQUALS, 0x00) PORT_WRITE_LINE_MEMBER(FUNC(igs_m027_state::counter_w<0>)) // coin or key-in
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_CONDITION("DSW2", 0x08, EQUALS, 0x00) PORT_WRITE_LINE_MEMBER(FUNC(igs_m027_state::counter_w<1>)) // hopper or key-out
 
 	PORT_MODIFY("DSW2")
 	PORT_DIPNAME( 0x04, 0x04, "Show Title" )               PORT_DIPLOCATION("SW2:3")          // 机种名称
@@ -902,7 +902,7 @@ INPUT_PORTS_START( zhongguo )
 	PORT_INCLUDE(mahjong_credit_dip_switches)
 
 	PORT_MODIFY("TEST")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("hopper", hopper_device, line_r) // 哈巴
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("hopper", FUNC(hopper_device::line_r)) // 哈巴
 
 	PORT_START("DSW2")
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR(Controls) )          PORT_DIPLOCATION("SW2:1")    // 操作模式
@@ -938,7 +938,7 @@ INPUT_PORTS_START( mgzz101cn )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT ) // TODO: default assignment clashes with mahjong I, using it hangs waiting for hopper to respond
 
 	PORT_MODIFY("TEST")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("hopper", hopper_device, line_r) // HPSW/HP
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("hopper", FUNC(hopper_device::line_r)) // HPSW/HP
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT )
 
 	PORT_START("DSW1")
@@ -1008,16 +1008,16 @@ INPUT_PORTS_START( mgcs3 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON2 )                                                                                       // S2
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON1 )                                                                                       // S1
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_START1 )                                                                                        // 开始
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_CUSTOM )                PORT_CONDITION("DSW2", 0x01, EQUALS, 0x01)  PORT_READ_LINE_DEVICE_MEMBER("hopper", hopper_device, line_r) // HP
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_CUSTOM )                PORT_CONDITION("DSW2", 0x01, EQUALS, 0x01)  PORT_READ_LINE_DEVICE_MEMBER("hopper", FUNC(hopper_device::line_r)) // HP
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )               PORT_CONDITION("DSW2", 0x01, EQUALS, 0x01)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )               PORT_CONDITION("DSW2", 0x01, EQUALS, 0x00)
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 )                 PORT_CONDITION("DSW2", 0x01, EQUALS, 0x00)                              // 投币
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT )                                                                                // 右
 
 	PORT_START("PLAYER")
-	PORT_BIT( 0x0003f, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(igs_m027_state, kbd_ioport_r)
+	PORT_BIT( 0x0003f, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(FUNC(igs_m027_state::kbd_ioport_r))
 	PORT_BIT( 0x00040, IP_ACTIVE_LOW, IPT_UNKNOWN )            PORT_CONDITION("DSW2", 0x01, EQUALS, 0x01)
-	PORT_BIT( 0x00040, IP_ACTIVE_LOW, IPT_CUSTOM )             PORT_CONDITION("DSW2", 0x01, EQUALS, 0x00)  PORT_READ_LINE_DEVICE_MEMBER("hopper", hopper_device, line_r) // HP
+	PORT_BIT( 0x00040, IP_ACTIVE_LOW, IPT_CUSTOM )             PORT_CONDITION("DSW2", 0x01, EQUALS, 0x00)  PORT_READ_LINE_DEVICE_MEMBER("hopper", FUNC(hopper_device::line_r)) // HP
 	PORT_BIT( 0x00080, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x00100, IP_ACTIVE_LOW, IPT_GAMBLE_KEYIN )                                                                               // 开分
 	PORT_BIT( 0x0fe00, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -1029,15 +1029,15 @@ INPUT_PORTS_START( mgcs3 )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MEMORY_RESET ) PORT_TOGGLE
 
 	PORT_START("PPIB")
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_CONDITION("DSW2", 0x01, EQUALS, 0x01) PORT_WRITE_LINE_MEMBER(igs_m027_state, counter_w<1>) // key-out
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_CONDITION("DSW2", 0x01, EQUALS, 0x01) PORT_WRITE_LINE_MEMBER(igs_m027_state, counter_w<2>) // hopper
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_CONDITION("DSW2", 0x01, EQUALS, 0x01) PORT_WRITE_LINE_MEMBER(igs_m027_state, counter_w<0>) // key-in
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_CONDITION("DSW2", 0x01, EQUALS, 0x00) PORT_WRITE_LINE_DEVICE_MEMBER("hopper", hopper_device, motor_w)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_CONDITION("DSW2", 0x01, EQUALS, 0x01) PORT_WRITE_LINE_MEMBER(FUNC(igs_m027_state::counter_w<1>)) // key-out
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_CONDITION("DSW2", 0x01, EQUALS, 0x01) PORT_WRITE_LINE_MEMBER(FUNC(igs_m027_state::counter_w<2>)) // hopper
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_CONDITION("DSW2", 0x01, EQUALS, 0x01) PORT_WRITE_LINE_MEMBER(FUNC(igs_m027_state::counter_w<0>)) // key-in
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_CONDITION("DSW2", 0x01, EQUALS, 0x00) PORT_WRITE_LINE_DEVICE_MEMBER("hopper", FUNC(hopper_device::motor_w))
 
 	PORT_START("PPIC")
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_CONDITION("DSW2", 0x01, EQUALS, 0x01) PORT_WRITE_LINE_DEVICE_MEMBER("hopper", hopper_device, motor_w)
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_CONDITION("DSW2", 0x01, EQUALS, 0x00) PORT_WRITE_LINE_MEMBER(igs_m027_state, counter_w<0>) // coin or key-in
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_CONDITION("DSW2", 0x01, EQUALS, 0x00) PORT_WRITE_LINE_MEMBER(igs_m027_state, counter_w<1>) // hopper or key-out
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_CONDITION("DSW2", 0x01, EQUALS, 0x01) PORT_WRITE_LINE_DEVICE_MEMBER("hopper", FUNC(hopper_device::motor_w))
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_CONDITION("DSW2", 0x01, EQUALS, 0x00) PORT_WRITE_LINE_MEMBER(FUNC(igs_m027_state::counter_w<0>)) // coin or key-in
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_CONDITION("DSW2", 0x01, EQUALS, 0x00) PORT_WRITE_LINE_MEMBER(FUNC(igs_m027_state::counter_w<1>)) // hopper or key-out
 
 	PORT_START("DSW1")
 	PORT_DIPNAME( 0x01, 0x00, DEF_STR(Demo_Sounds) )       PORT_DIPLOCATION("SW1:1")          // 示范音乐
@@ -1246,7 +1246,7 @@ INPUT_PORTS_START( tripslot )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )                 PORT_CONDITION("DSW1", 0x02, EQUALS, 0x02)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT )           PORT_CONDITION("DSW1", 0x02, EQUALS, 0x02)
 	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNKNOWN )                 PORT_CONDITION("DSW1", 0x02, EQUALS, 0x02)
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_CUSTOM )                  PORT_CONDITION("DSW1", 0x02, EQUALS, 0x00)  PORT_READ_LINE_DEVICE_MEMBER("hopper", hopper_device, line_r)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_CUSTOM )                  PORT_CONDITION("DSW1", 0x02, EQUALS, 0x00)  PORT_READ_LINE_DEVICE_MEMBER("hopper", FUNC(hopper_device::line_r))
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SLOT_STOP4 )              PORT_CONDITION("DSW1", 0x02, EQUALS, 0x00)  PORT_NAME("Stop Reel 4 / Take Score")
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK )             PORT_CONDITION("DSW1", 0x02, EQUALS, 0x00)  // also provides access to game setup (coinage, etc.)
 	PORT_SERVICE_NO_TOGGLE( 0x08, IP_ACTIVE_LOW )                PORT_CONDITION("DSW1", 0x02, EQUALS, 0x00)  // shows DIP switch settings
@@ -1258,7 +1258,7 @@ INPUT_PORTS_START( tripslot )
 	PORT_START("PORTC")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_KEYIN )            PORT_CONDITION("DSW1", 0x02, EQUALS, 0x02)
 	PORT_BIT( 0x1e, IP_ACTIVE_LOW, IPT_UNKNOWN )                 PORT_CONDITION("DSW1", 0x02, EQUALS, 0x02)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_CUSTOM )                  PORT_CONDITION("DSW1", 0x02, EQUALS, 0x02)  PORT_READ_LINE_DEVICE_MEMBER("hopper", hopper_device, line_r)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_CUSTOM )                  PORT_CONDITION("DSW1", 0x02, EQUALS, 0x02)  PORT_READ_LINE_DEVICE_MEMBER("hopper", FUNC(hopper_device::line_r))
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT )           PORT_CONDITION("DSW1", 0x02, EQUALS, 0x02)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_GAMBLE_KEYIN )            PORT_CONDITION("DSW1", 0x02, EQUALS, 0x02)
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SLOT_STOP5 )              PORT_CONDITION("DSW1", 0x02, EQUALS, 0x00)  PORT_NAME("Stop Reel 5 / Bet")
@@ -1287,18 +1287,18 @@ INPUT_PORTS_START( tripslot )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MEMORY_RESET ) PORT_TOGGLE
 
 	PORT_START("PPIB")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_CONDITION("DSW1", 0x02, EQUALS, 0x02) PORT_WRITE_LINE_MEMBER(igs_m027_state, counter_w<0>) // coin 1
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_CONDITION("DSW1", 0x02, EQUALS, 0x02) PORT_WRITE_LINE_MEMBER(igs_m027_state, counter_w<2>) // key-in
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_CONDITION("DSW1", 0x02, EQUALS, 0x02) PORT_WRITE_LINE_MEMBER(igs_m027_state, counter_w<1>) // coin 2
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_CONDITION("DSW1", 0x02, EQUALS, 0x02) PORT_WRITE_LINE_MEMBER(igs_m027_state, counter_w<3>) // coin 2
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_CONDITION("DSW1", 0x02, EQUALS, 0x02) PORT_WRITE_LINE_MEMBER(igs_m027_state, counter_w<4>) // hopper
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_CONDITION("DSW1", 0x02, EQUALS, 0x02) PORT_WRITE_LINE_MEMBER(FUNC(igs_m027_state::counter_w<0>)) // coin 1
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_CONDITION("DSW1", 0x02, EQUALS, 0x02) PORT_WRITE_LINE_MEMBER(FUNC(igs_m027_state::counter_w<2>)) // key-in
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_CONDITION("DSW1", 0x02, EQUALS, 0x02) PORT_WRITE_LINE_MEMBER(FUNC(igs_m027_state::counter_w<1>)) // coin 2
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_CONDITION("DSW1", 0x02, EQUALS, 0x02) PORT_WRITE_LINE_MEMBER(FUNC(igs_m027_state::counter_w<3>)) // coin 2
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_CONDITION("DSW1", 0x02, EQUALS, 0x02) PORT_WRITE_LINE_MEMBER(FUNC(igs_m027_state::counter_w<4>)) // hopper
 
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_CONDITION("DSW1", 0x02, EQUALS, 0x00) PORT_WRITE_LINE_MEMBER(igs_m027_state, counter_w<0>) // coin 1
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_CONDITION("DSW1", 0x02, EQUALS, 0x00) PORT_WRITE_LINE_MEMBER(igs_m027_state, counter_w<4>) // key-out
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_CONDITION("DSW1", 0x02, EQUALS, 0x00) PORT_WRITE_LINE_DEVICE_MEMBER("hopper", hopper_device, motor_w)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_CONDITION("DSW1", 0x02, EQUALS, 0x00) PORT_WRITE_LINE_MEMBER(FUNC(igs_m027_state::counter_w<0>)) // coin 1
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_CONDITION("DSW1", 0x02, EQUALS, 0x00) PORT_WRITE_LINE_MEMBER(FUNC(igs_m027_state::counter_w<4>)) // key-out
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_CONDITION("DSW1", 0x02, EQUALS, 0x00) PORT_WRITE_LINE_DEVICE_MEMBER("hopper", FUNC(hopper_device::motor_w))
 
 	PORT_START("MISC")
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_CONDITION("DSW1", 0x02, EQUALS, 0x02) PORT_WRITE_LINE_DEVICE_MEMBER("hopper", hopper_device, motor_w)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_CONDITION("DSW1", 0x02, EQUALS, 0x02) PORT_WRITE_LINE_DEVICE_MEMBER("hopper", FUNC(hopper_device::motor_w))
 	// bit 5 does something as well
 
 	PORT_START("DSW1")

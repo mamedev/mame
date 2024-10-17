@@ -419,7 +419,7 @@ static INPUT_PORTS_START( bmjr )
 
 	PORT_START("BREAK")
 	PORT_BIT(0x7f, IP_ACTIVE_HIGH, IPT_UNKNOWN ) // TODO: read by timer irq service
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Break") PORT_CHANGED_MEMBER(DEVICE_SELF, bmjr_state, break_key_pressed, 0)
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Break") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(bmjr_state::break_key_pressed), 0)
 INPUT_PORTS_END
 
 static const gfx_layout bmjr_charlayout =

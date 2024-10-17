@@ -488,7 +488,7 @@ ioport_value suprridr_state::control_r()
 
 static INPUT_PORTS_START( suprridr )
 	PORT_START("INPUTS")
-	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(suprridr_state, control_r)
+	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(FUNC(suprridr_state::control_r))
 
 	PORT_START("SYSTEM")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 )

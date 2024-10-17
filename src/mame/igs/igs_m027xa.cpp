@@ -183,7 +183,7 @@ INPUT_PORTS_START( base )
 
 	PORT_START("TEST2")
 	PORT_BIT( 0x001ff, IP_ACTIVE_LOW, IPT_UNUSED )      // IGS031 interrupt in bit 8 - see gpio_r
-	PORT_BIT( 0x00200, IP_ACTIVE_LOW, IPT_CUSTOM )      PORT_READ_LINE_DEVICE_MEMBER("xa", igs_xa_mcu_subcpu_device, irq_r)
+	PORT_BIT( 0x00200, IP_ACTIVE_LOW, IPT_CUSTOM )      PORT_READ_LINE_DEVICE_MEMBER("xa", FUNC(igs_xa_mcu_subcpu_device::irq_r))
 	PORT_BIT( 0xffc00, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("DSW1")
@@ -226,7 +226,7 @@ INPUT_PORTS_START( crzybugs )
 
 	PORT_MODIFY("TEST1")
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START1 )         PORT_NAME("Start / Stop All Reels")
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_CUSTOM )         PORT_READ_LINE_DEVICE_MEMBER("ticket", ticket_dispenser_device, line_r)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_CUSTOM )         PORT_READ_LINE_DEVICE_MEMBER("ticket", FUNC(ticket_dispenser_device::line_r))
 
 	PORT_MODIFY("TEST2")
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SLOT_STOP2 )     PORT_NAME("Stop Reel 2 / Small")
@@ -321,7 +321,7 @@ INPUT_PORTS_START( tripfev )
 	PORT_MODIFY("TEST1")
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START1 )         PORT_NAME("Start / Stop All Reels")
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT )  PORT_NAME("Ticket")
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_CUSTOM )         PORT_READ_LINE_DEVICE_MEMBER("ticket", ticket_dispenser_device, line_r)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_CUSTOM )         PORT_READ_LINE_DEVICE_MEMBER("ticket", FUNC(ticket_dispenser_device::line_r))
 
 	PORT_MODIFY("TEST2")
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SLOT_STOP3 )     PORT_NAME("Stop Reel 3 / Small")

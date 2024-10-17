@@ -143,7 +143,7 @@ static INPUT_PORTS_START( ssc )
 	PORT_DIPNAME( 0x02, 0x02, "End of Line" ) PORT_DIPLOCATION("SW2:5")
 	PORT_DIPSETTING(    0x00, "Add LF after CR")
 	PORT_DIPSETTING(    0x02, "Don't add LF after CR")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("rs232", rs232_port_device, cts_r)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("rs232", FUNC(rs232_port_device::cts_r))
 
 	PORT_START("DSWX") // Non-memory-mapped DIP switches
 	PORT_DIPNAME( 0x04, 0x04, "Interrupts" ) PORT_DIPLOCATION("SW2:6")
@@ -238,7 +238,7 @@ static INPUT_PORTS_START( ssi )
 	PORT_DIPNAME( 0x02, 0x00, "MSB Output" ) PORT_DIPLOCATION("SW2:5") PORT_CONDITION("DSW1", 0x100, EQUALS, 0x100)
 	PORT_DIPSETTING(    0x02, "Clear 8th Bit" )
 	PORT_DIPSETTING(    0x00, "Pass 8th Bit" )
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("rs232", rs232_port_device, cts_r) // TBD: implemented on SSI or not?
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("rs232", FUNC(rs232_port_device::cts_r)) // TBD: implemented on SSI or not?
 
 	PORT_START("DSWX")
 	PORT_DIPNAME( 0x04, 0x04, "Interrupts" ) PORT_DIPLOCATION("SW2:6")

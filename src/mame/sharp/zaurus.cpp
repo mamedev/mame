@@ -1518,7 +1518,7 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( zaurus_pxa )
 	PORT_START("PWR")
-	PORT_BIT( 0x00000001, IP_ACTIVE_HIGH, IPT_START1 ) PORT_NAME("Start System") PORT_CHANGED_MEMBER(DEVICE_SELF, zaurus_pxa_state, system_start, 0)
+	PORT_BIT( 0x00000001, IP_ACTIVE_HIGH, IPT_START1 ) PORT_NAME("Start System") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(zaurus_pxa_state::system_start), 0)
 INPUT_PORTS_END
 
 void zaurus_state::machine_start()

@@ -178,7 +178,7 @@ void bridgeb_state::main_io(address_map &map)
 *******************************************************************************/
 
 #define PORT_CHANGED_CB(x) \
-	PORT_CHANGED_MEMBER(DEVICE_SELF, bridgeb_state, x, 0)
+	PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(bridgeb_state::x), 0)
 
 static INPUT_PORTS_START( bridgeb )
 	PORT_START("IN.0")
