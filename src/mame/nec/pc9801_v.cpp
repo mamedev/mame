@@ -189,21 +189,21 @@ void pc9801_state::draw_text(bitmap_rgb32 &bitmap, uint32_t addr, int y, int wd,
 
 					if(!secret)
 					{
-						/* TODO: priority */
-						if(gfx_mode)
+						// kanji select will override semigraphics
+						// beatvice wants this for bitmap masking on edges during gameplay
+						if(kanji_sel)
+							tile_data = (m_kanji_rom[tile*0x20+yi*2+kanji_lr+tile_lr]);
+						else if(gfx_mode)
 						{
+							// gfx strip mode (semigraphics)
+							// number refers to the bit number in the tile data.
+							// This mode is identical to the one seen in PC-8001
+							// 00004444
+							// 11115555
+							// 22226666
+							// 33337777
+
 							tile_data = 0;
-
-							/*
-							    gfx strip mode:
-
-							    number refers to the bit number in the tile data.
-							    This mode is identical to the one seen in PC-8801
-							    00004444
-							    11115555
-							    22226666
-							    33337777
-							*/
 
 							int gfx_bit;
 							gfx_bit = (xi & 4);
@@ -212,8 +212,6 @@ void pc9801_state::draw_text(bitmap_rgb32 &bitmap, uint32_t addr, int y, int wd,
 
 							tile_data = ((tile >> gfx_bit) & 1) ? 0xff : 0x00;
 						}
-						else if(kanji_sel)
-							tile_data = (m_kanji_rom[tile*0x20+yi*2+kanji_lr+tile_lr]);
 						else
 							tile_data = (m_char_rom[tile*char_size+m_video_ff[FONTSEL_REG]*0x800+yi]);
 					}
