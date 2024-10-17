@@ -96,6 +96,8 @@ void pc9801_state::draw_text(bitmap_rgb32 &bitmap, uint32_t addr, int y, int wd,
 	int scroll_end = scroll_start + m_txt_scroll_reg[5];
 	int scroll = m_txt_scroll_reg[3] % 20;
 	int line = y / lr;
+	// TODO: accurate blink rate
+	const bool is_blink_rate = m_screen->frame_number() & 0x10;
 
 	for(int x=0;x<pitch;x+=x_step)
 	{
@@ -223,18 +225,19 @@ void pc9801_state::draw_text(bitmap_rgb32 &bitmap, uint32_t addr, int y, int wd,
 					}
 					if(v_line)  { tile_data|=8; }
 
-					/* TODO: proper blink rate for these two */
-					if(cursor_on && cursor_addr == tile_addr && m_screen->frame_number() & 0x10)
+					if(cursor_on && cursor_addr == tile_addr && is_blink_rate)
 						tile_data^=0xff;
 
-					if(blink && m_screen->frame_number() & 0x10)
+					if(blink && is_blink_rate)
 						tile_data = 0;
 
 					if(reverse) { tile_data^=0xff; }
 
 					int pen;
+					// daremo wants to mask during intro with reverse attribute only
+					// using color is a guess: may just be black.
 					if(yi >= char_size)
-						pen = -1;
+						pen = reverse ? color : -1;
 					else
 						pen = (tile_data >> (7-xi) & 1) ? color : -1;
 
