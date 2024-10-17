@@ -1041,11 +1041,46 @@ ROM_START( retofinvb3 ) // Italian bootleg PCB. Only maincpu ROMs differ from pa
 	ROM_LOAD_NIB_LOW ( "6353-1.c",  0x0400, 0x0400, CRC(77a7aaf6) SHA1(61a474f1ad09b89ff8302f2d903b86a90823116c) )
 ROM_END
 
+ROM_START( retofinvbv ) // Spanish bootleg from Video Dens
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "03.bin", 0x0000, 0x2000, CRC(a5cfa153) SHA1(9b2fc22c2f8ccb2dbee9043470b128e718c0ed74) ) // unique
+	ROM_LOAD( "02.bin", 0x2000, 0x2000, CRC(3379f930) SHA1(c67d687a10b6240bd6e2fbdb15e1b7d276e6fc07) )
+	ROM_LOAD( "01.bin", 0x4000, 0x2000, CRC(3ae7c530) SHA1(5d1be375494fa07124071067661c4bfc2d724d54) )
+
+	ROM_REGION( 0x10000, "sub", 0 )
+	ROM_LOAD( "04.bin", 0x0000, 0x2000, CRC(d2899cc1) SHA1(fdbec743b06f4cdcc134ef863e4e71337ad0b2c5) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_LOAD( "05.bin", 0x0000, 0x2000, CRC(9025abea) SHA1(2f03e8572f23624d7cd1215a55109e97fd66e271) )
+
+	ROM_REGION( 0x02000, "fgtiles", 0 )
+	ROM_LOAD( "16.bin", 0x0000, 0x2000, CRC(4e3f501c) SHA1(2d832f4038ae65bfdeedfab870f6f1176ec6b676) )
+
+	ROM_REGION( 0x08000, "sprites", 0 )
+	ROM_LOAD( "10.bin", 0x0000, 0x2000, CRC(6afdeec8) SHA1(782fe0a8aea48c3c270318b7ba011fc6fce0db7a) )
+	ROM_LOAD( "11.bin", 0x2000, 0x2000, CRC(d3dc9da3) SHA1(0d98d6e993b5a4845a23802751023b7a593dce29) )
+	ROM_LOAD( "12.bin", 0x4000, 0x2000, CRC(d10b2eed) SHA1(3809a0adf935a119f9ee0d4c24f1456c35d2a6fa) )
+	ROM_LOAD( "13.bin", 0x6000, 0x2000, CRC(00ca6b3d) SHA1(08ce5b13d5ebc79cc803949f4ba9e630e6cd92b8) )
+
+	ROM_REGION( 0x04000, "bgtiles", 0 )
+	ROM_LOAD( "14.bin", 0x0000, 0x2000, CRC(ef7f8651) SHA1(2d91057501e5e9c4255e0d55fff0d99c2a5be7e8) )
+	ROM_LOAD( "15.bin", 0x2000, 0x2000, CRC(03b40905) SHA1(c10d87796e8a6e6a2a37c6fb713821cc87299cc8) )
+
+	ROM_REGION( 0x0300, "palette", 0 )
+	ROM_LOAD( "74s287.b",  0x0000, 0x0100, BAD_DUMP CRC(e9643b8b) SHA1(7bbb92a42e7c3effb701fc7b2c24f2470f31b063) ) // not dumped on this set
+	ROM_LOAD( "74s287.c",  0x0100, 0x0100, BAD_DUMP CRC(e8f34e11) SHA1(8f438561b8d46ffff00747ed8baf0ebb6a081615) ) // not dumped on this set
+	ROM_LOAD( "74s287.a",  0x0200, 0x0100, BAD_DUMP CRC(50030af0) SHA1(e748ae0b8702b7d20fb65c254dceee23246b3d13) ) // not dumped on this set
+
+	ROM_REGION( 0x0800, "clut", 0 )
+	ROM_LOAD( "82s191n",   0x0000, 0x0800, BAD_DUMP CRC(93c891e3) SHA1(643a0107717b6a434432dda73a0102e6e8adbca7) ) // not dumped on this set
+ROM_END
+
 } // anonymous namespace
 
 
-GAME( 1985, retofinv,   0,        retofinv,         retofinv, retofinv_mcu_state, empty_init, ROT90, "Taito Corporation", "Return of the Invaders",                        MACHINE_SUPPORTS_SAVE )
-GAME( 1985, retofinvb,  retofinv, retofinvb1,       retofinv, retofinv_mcu_state, empty_init, ROT90, "bootleg",           "Return of the Invaders (bootleg w/MCU)",        MACHINE_SUPPORTS_SAVE )
-GAME( 1985, retofinvb1, retofinv, retofinvb1_nomcu, retofinv, retofinv_state,     empty_init, ROT90, "bootleg",           "Return of the Invaders (bootleg no MCU set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, retofinvb2, retofinv, retofinvb1_nomcu, retofin2, retofinv_state,     empty_init, ROT90, "bootleg",           "Return of the Invaders (bootleg no MCU set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, retofinvb3, retofinv, retofinvb_nomcu,  retofinv, retofinv_state,     empty_init, ROT90, "bootleg",           "Return of the Invaders (bootleg no MCU set 3)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, retofinv,   0,        retofinv,         retofinv, retofinv_mcu_state, empty_init, ROT90, "Taito Corporation",    "Return of the Invaders",                                   MACHINE_SUPPORTS_SAVE )
+GAME( 1985, retofinvb,  retofinv, retofinvb1,       retofinv, retofinv_mcu_state, empty_init, ROT90, "bootleg",              "Return of the Invaders (bootleg, with MCU)",               MACHINE_SUPPORTS_SAVE )
+GAME( 1985, retofinvb1, retofinv, retofinvb1_nomcu, retofinv, retofinv_state,     empty_init, ROT90, "bootleg",              "Return of the Invaders (bootleg, without MCU, set 1)",     MACHINE_SUPPORTS_SAVE )
+GAME( 1985, retofinvb2, retofinv, retofinvb1_nomcu, retofin2, retofinv_state,     empty_init, ROT90, "bootleg",              "Return of the Invaders (bootleg, without MCU, set 2)",     MACHINE_SUPPORTS_SAVE )
+GAME( 1985, retofinvb3, retofinv, retofinvb_nomcu,  retofinv, retofinv_state,     empty_init, ROT90, "bootleg",              "Return of the Invaders (bootleg, without MCU, set 3)",     MACHINE_SUPPORTS_SAVE )
+GAME( 1985, retofinvbv, retofinv, retofinvb1_nomcu, retofinv, retofinv_state,     empty_init, ROT90, "bootleg (Video Dens)", "Return of the Invaders (Video Dens bootleg, without MCU)", MACHINE_SUPPORTS_SAVE )
