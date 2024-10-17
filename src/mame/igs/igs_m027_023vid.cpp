@@ -73,6 +73,7 @@ private:
 	required_device<ics2115_device> m_ics;
 
 	u32 m_xor_table[0x100];
+	bool m_irq_source;
 
 	u32 external_rom_r(offs_t offset);
 
@@ -86,6 +87,8 @@ private:
 
 	void m027_map(address_map &map) ATTR_COLD;
 
+	template <unsigned N>
+	void irq_w(int state);
 	u32 gpio_r();
 
 	u32 unk0_r() { return 0xffffffff; }
@@ -95,8 +98,10 @@ private:
 void igs_m027_023vid_state::machine_start()
 {
 	std::fill(std::begin(m_xor_table), std::end(m_xor_table), 0);
+	m_irq_source = 0;
 
 	save_item(NAME(m_xor_table));
+	save_item(NAME(m_irq_source));
 }
 
 
@@ -271,9 +276,8 @@ TIMER_DEVICE_CALLBACK_MEMBER(igs_m027_023vid_state::interrupt)
 		m_maincpu->pulse_input_line(arm7_cpu_device::ARM7_FIRQ_LINE, m_maincpu->minimum_quantum_time()); // vbl?
 		break;
 
-	case 128: // unknown source(s), needed for palette uploads, in some cases even twice a frame (probably triggers + missing src register somewhere?)
 	case 192: 
-		m_maincpu->pulse_input_line(arm7_cpu_device::ARM7_IRQ_LINE, m_maincpu->minimum_quantum_time());
+		igs_m027_023vid_state::irq_w<0>(ASSERT_LINE);
 		break;
 	}
 }
@@ -289,10 +293,24 @@ u16 igs_m027_023vid_state::sprites_r(offs_t offset)
 	return sprdata;
 }
 
+template <unsigned N>
+void igs_m027_023vid_state::irq_w(int state)
+{
+	if (state)
+	{
+		m_irq_source = N;
+		m_maincpu->pulse_input_line(arm7_cpu_device::ARM7_IRQ_LINE, m_maincpu->minimum_quantum_time());
+	}
+}
 
 u32 igs_m027_023vid_state::gpio_r()
 {
-	return machine().rand();
+	u32 ret = -1;
+	if (!m_irq_source)
+	{
+		ret ^= 2;
+	}
+	return ret;
 }
 
 
@@ -326,7 +344,7 @@ void igs_m027_023vid_state::m027_023vid(machine_config &config)
 	SPEAKER(config, "mono").front_center();
 
 	ICS2115(config, m_ics, 33.8688_MHz_XTAL);
-	//m_ics->irq().set_inputline(m_maincpu, arm7_cpu_device::ARM7_IRQ_LINE); // wrong (maybe doesn't trigger an IRQ)
+	m_ics->irq().set(FUNC(igs_m027_023vid_state::irq_w<1>));
 	m_ics->add_route(ALL_OUTPUTS, "mono", 5.0);
 }
 
