@@ -6,8 +6,8 @@
 
 **********************************************************************/
 
-#ifndef MAME_SOUND_DAVE_H
-#define MAME_SOUND_DAVE_H
+#ifndef MAME_ENTERPRISE_DAVE_H
+#define MAME_ENTERPRISE_DAVE_H
 
 #pragma once
 
@@ -24,6 +24,7 @@ class dave_device : public device_t,
 {
 public:
 	dave_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	virtual ~dave_device();
 
 	auto irq_wr() { return m_write_irq.bind(); }
 	auto lh_wr() { return m_write_lh.bind(); }
@@ -39,14 +40,14 @@ public:
 	void program_map(address_map &map) ATTR_COLD;
 
 protected:
-	// device-level overrides
+	// device_t implentation
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
 
-	// device_memory_interface overrides
+	// device_memory_interface implentation
 	virtual space_config_vector memory_space_config() const override;
 
-	// sound stream update overrides
+	// sound stream update implentation
 	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
 
 	TIMER_CALLBACK_MEMBER(update_1hz_timer);
@@ -111,7 +112,7 @@ private:
 };
 
 
-// device type definition
+// device type declaration
 DECLARE_DEVICE_TYPE(DAVE, dave_device)
 
-#endif // MAME_SOUND_DAVE_H
+#endif // MAME_ENTERPRISE_DAVE_H

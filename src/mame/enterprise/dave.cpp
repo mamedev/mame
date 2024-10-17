@@ -70,6 +70,10 @@ dave_device::dave_device(const machine_config &mconfig, const char *tag, device_
 {
 }
 
+dave_device::~dave_device()
+{
+}
+
 
 //-------------------------------------------------
 //  device_start - device-specific startup

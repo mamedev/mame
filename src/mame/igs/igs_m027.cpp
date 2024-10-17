@@ -30,6 +30,11 @@
  续玩游戏 are referring to the double-up game rather than what's usually
  called a "continue" feature.
 
+ Chaoji Tuolaji Jiaqiang Ban doesn't show Kan, Pon, Chi, Reach, Ron,
+ Take Score, Double Up, Big or Small in test mode.  However the game
+ does use Kan and Ron to play cards (出牌) and cancel all (全部取消) as
+ shown on the instructions screen.
+
  TODO:
  * I/O for remaining games
  * Coin lockout (zhongguo displays a coin error on unexpected coins)
@@ -1821,7 +1826,8 @@ void igs_m027_state::cjtljp(machine_config &config)
 {
 	cjddz(config);
 
-	m_oki->set_clock(1'500'000);
+	m_oki->set_clock(2'000'000);
+	m_oki->config_pin7(okim6295_device::PIN7_LOW);
 }
 
 void igs_m027_state::lthyp(machine_config &config)
