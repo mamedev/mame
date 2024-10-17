@@ -1,10 +1,74 @@
 // license:BSD-3-Clause
-// copyright-holders:David Haywood, ElSemi
-/*** Video *******************************************************************/
-/* see drivers/pgm.c for notes on where improvements can be made */
+// copyright-holders:David Haywood
+
+// IGS023 (PGM) style video
+
 
 #include "emu.h"
-#include "pgm.h"
+#include "igs023_video.h"
+
+
+DEFINE_DEVICE_TYPE(IGS023_VIDEO, igs023_video_device, "igs023", "IGS023 Video System")
+
+igs023_video_device::igs023_video_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: device_t(mconfig, IGS023_VIDEO, tag, owner, clock)
+	, device_gfx_interface(mconfig, *this, gfxinfo)
+	, m_gfx_region(*this, DEVICE_SELF)
+	, m_adata(*this, "sprcol")
+	, m_bdata(*this, "sprmask")
+	, m_readspriteram_cb(*this, 0)
+{
+}
+
+static const gfx_layout pgm32_charlayout =
+{
+	32,32,
+	RGN_FRAC(1,1),
+	5,
+	{ 4, 3, 2, 1, 0 },
+	{ STEP32(0,5) },
+	{ STEP32(0,5*32) },
+	32*32*5
+};
+
+GFXDECODE_MEMBER( igs023_video_device::gfxinfo )
+	GFXDECODE_DEVICE(            DEVICE_SELF, 0, gfx_8x8x4_packed_lsb, 0x800, 32 ) /* 8x8x4 Tiles */
+	GFXDECODE_DEVICE_REVERSEBITS(DEVICE_SELF, 0, pgm32_charlayout,     0x400, 32 ) /* 32x32x5 Tiles */
+GFXDECODE_END
+
+
+
+u16 igs023_video_device::videoregs_r(offs_t offset)
+{
+	return m_videoregs[offset];
+}
+
+void igs023_video_device::videoregs_w(offs_t offset, u16 data, u16 mem_mask)
+{
+	COMBINE_DATA(&m_videoregs[offset]);
+}
+
+u16 igs023_video_device::videoram_r(offs_t offset)
+{
+	if (offset < 0x4000 / 2)
+		return m_bg_videoram[offset & 0x7ff];
+	else if (offset < 0x7000 / 2)
+		return m_tx_videoram[offset & 0xfff];
+	else
+		return m_videoram[offset];
+}
+
+void igs023_video_device::videoram_w(offs_t offset, u16 data, u16 mem_mask)
+{
+	if (offset < 0x4000 / 2)
+		bg_videoram_w(offset & 0x7ff, data, mem_mask);
+	else if (offset < 0x7000 / 2)
+		tx_videoram_w(offset & 0xfff, data, mem_mask);
+	else
+		COMBINE_DATA(&m_videoram[offset]);
+}
+
+
 
 #include "screen.h"
 
@@ -24,7 +88,7 @@
 static constexpr bool get_flipy(u8 flip) { return BIT(flip, 1); }
 static constexpr bool get_flipx(u8 flip) { return BIT(flip, 0); }
 
-inline void pgm_state::pgm_draw_pix(int xdrawpos, int pri, u16* dest, u8* destpri, const rectangle &cliprect, u16 srcdat)
+inline void igs023_video_device::pgm_draw_pix(int xdrawpos, int pri, u16* dest, u8* destpri, const rectangle &cliprect, u16 srcdat)
 {
 	if ((xdrawpos >= cliprect.min_x) && (xdrawpos <= cliprect.max_x))
 	{
@@ -47,7 +111,7 @@ inline void pgm_state::pgm_draw_pix(int xdrawpos, int pri, u16* dest, u8* destpr
 	}
 }
 
-inline void pgm_state::pgm_draw_pix_nopri(int xdrawpos, u16* dest, u8* destpri, const rectangle &cliprect, u16 srcdat)
+inline void igs023_video_device::pgm_draw_pix_nopri(int xdrawpos, u16* dest, u8* destpri, const rectangle &cliprect, u16 srcdat)
 {
 	if ((xdrawpos >= cliprect.min_x) && (xdrawpos <= cliprect.max_x))
 	{
@@ -59,7 +123,7 @@ inline void pgm_state::pgm_draw_pix_nopri(int xdrawpos, u16* dest, u8* destpri, 
 	}
 }
 
-inline void pgm_state::pgm_draw_pix_pri(int xdrawpos, u16* dest, u8* destpri, const rectangle &cliprect, u16 srcdat)
+inline void igs023_video_device::pgm_draw_pix_pri(int xdrawpos, u16* dest, u8* destpri, const rectangle &cliprect, u16 srcdat)
 {
 	if ((xdrawpos >= cliprect.min_x) && (xdrawpos <= cliprect.max_x))
 	{
@@ -74,7 +138,7 @@ inline void pgm_state::pgm_draw_pix_pri(int xdrawpos, u16* dest, u8* destpri, co
 	}
 }
 
-inline u8 pgm_state::get_sprite_pix()
+inline u8 igs023_video_device::get_sprite_pix()
 {
 	const u8 srcdat = ((m_adata[m_aoffset & (m_adata.length() - 1)] >> m_abit) & 0x1f);
 	m_abit += 5; // 5 bit per pixel, 3 pixels in each word; 15 bit used
@@ -91,7 +155,7 @@ inline u8 pgm_state::get_sprite_pix()
   for complex zoomed cases
 *************************************************************************/
 
-void pgm_state::draw_sprite_line(int wide, u16* dest, u8* destpri, const rectangle &cliprect, int xzoom, bool xgrow, int flip, int xpos, int pri, int realxsize, int palt, bool draw)
+void igs023_video_device::draw_sprite_line(int wide, u16* dest, u8* destpri, const rectangle &cliprect, int xzoom, bool xgrow, int flip, int xpos, int pri, int realxsize, int palt, bool draw)
 {
 	int xoffset = 0;
 	int xdrawpos = 0;
@@ -167,7 +231,7 @@ void pgm_state::draw_sprite_line(int wide, u16* dest, u8* destpri, const rectang
 	}
 }
 
-void pgm_state::draw_sprite_new_zoomed(int wide, int high, int xpos, int ypos, int palt, int flip, bitmap_ind16 &bitmap, const rectangle &cliprect, bitmap_ind8 &priority_bitmap, u32 xzoom, bool xgrow, u32 yzoom, bool ygrow, int pri)
+void igs023_video_device::draw_sprite_new_zoomed(int wide, int high, int xpos, int ypos, int palt, int flip, bitmap_ind16 &bitmap, const rectangle &cliprect, bitmap_ind8 &priority_bitmap, u32 xzoom, bool xgrow, u32 yzoom, bool ygrow, int pri)
 {
 	int ydrawpos;
 	int xcnt = 0;
@@ -320,7 +384,7 @@ void pgm_state::draw_sprite_new_zoomed(int wide, int high, int xpos, int ypos, i
 }
 
 
-void pgm_state::draw_sprite_line_basic(int wide, u16* dest, u8* destpri, const rectangle &cliprect, int flip, int xpos, int pri, int realxsize, int palt, bool draw)
+void igs023_video_device::draw_sprite_line_basic(int wide, u16* dest, u8* destpri, const rectangle &cliprect, int flip, int xpos, int pri, int realxsize, int palt, bool draw)
 {
 	int xdrawpos = 0;
 	int xcntdraw = 0;
@@ -404,7 +468,7 @@ void pgm_state::draw_sprite_line_basic(int wide, u16* dest, u8* destpri, const r
   simplified version for non-zoomed cases, a bit faster
 *************************************************************************/
 
-void pgm_state::draw_sprite_new_basic(int wide, int high, int xpos, int ypos, int palt, int flip, bitmap_ind16 &bitmap, const rectangle &cliprect, bitmap_ind8 &priority_bitmap, int pri)
+void igs023_video_device::draw_sprite_new_basic(int wide, int high, int xpos, int ypos, int palt, int flip, bitmap_ind16 &bitmap, const rectangle &cliprect, bitmap_ind8 &priority_bitmap, int pri)
 {
 	int ydrawpos;
 
@@ -456,7 +520,7 @@ void pgm_state::draw_sprite_new_basic(int wide, int high, int xpos, int ypos, in
 }
 
 
-void pgm_state::draw_sprites(bitmap_ind16& spritebitmap, const rectangle &cliprect, bitmap_ind8& priority_bitmap)
+void igs023_video_device::draw_sprites(bitmap_ind16& spritebitmap, const rectangle &cliprect, bitmap_ind8& priority_bitmap)
 {
 	struct sprite_t *sprite_ptr = m_sprite_ptr_pre;
 	while (sprite_ptr != m_spritelist.get())
@@ -508,33 +572,39 @@ void pgm_state::draw_sprites(bitmap_ind16& spritebitmap, const rectangle &clipre
            -------x xxxxxxxx Sprite height (1 pixel each)
 
 */
-void pgm_state::get_sprites()
+void igs023_video_device::get_sprites()
 {
 	m_sprite_ptr_pre = m_spritelist.get();
 
-	u16 *sprite_source = &m_mainram[0];
-	const u16 *finish = &m_mainram[0xa00 / 2];
 	const u16* sprite_zoomtable = &m_videoregs[0x1000 / 2];
 
-	while (sprite_source < finish)
+	int sprite_num = 0;
+
+	while (sprite_num < 0xa00/2)
 	{
-		if (!sprite_source[4]) break; /* is this right? */
+		const u16 spr4 = m_readspriteram_cb(sprite_num + 4);
+		if (!spr4) break; /* is this right? */
 
-		int xzom =                 (sprite_source[0] & 0x7800) >> 11;
-		const bool xgrow =         (sprite_source[0] & 0x8000) >> 15;
-		m_sprite_ptr_pre->x =      (sprite_source[0] & 0x03ff) - (sprite_source[0] & 0x0400);
+		const u16 spr0 = m_readspriteram_cb(sprite_num + 0);
+		int xzom =                 (spr0 & 0x7800) >> 11;
+		const bool xgrow =         (spr0 & 0x8000) >> 15;
+		m_sprite_ptr_pre->x =      (spr0 & 0x03ff) - (spr0 & 0x0400);
 
-		int yzom =                 (sprite_source[1] & 0x7800) >> 11;
-		const bool ygrow =         (sprite_source[1] & 0x8000) >> 15;
-		m_sprite_ptr_pre->y =      (sprite_source[1] & 0x01ff) - (sprite_source[1] & 0x0200);
+		const u16 spr1 = m_readspriteram_cb(sprite_num + 1);
+		int yzom =                 (spr1 & 0x7800) >> 11;
+		const bool ygrow =         (spr1 & 0x8000) >> 15;
+		m_sprite_ptr_pre->y =      (spr1 & 0x01ff) - (spr1 & 0x0200);
 
-		m_sprite_ptr_pre->flip =   (sprite_source[2] & 0x6000) >> 13;
-		m_sprite_ptr_pre->color =  (sprite_source[2] & 0x1f00) >> 8;
-		m_sprite_ptr_pre->pri =    (sprite_source[2] & 0x0080) >>  7;
-		m_sprite_ptr_pre->offs =  ((sprite_source[2] & 0x007f) << 16) | (sprite_source[3] & 0xffff);
+		const u16 spr2 = m_readspriteram_cb(sprite_num + 2);
+		const u16 spr3 = m_readspriteram_cb(sprite_num + 3);
 
-		m_sprite_ptr_pre->width =  (sprite_source[4] & 0x7e00) >> 9;
-		m_sprite_ptr_pre->height =  sprite_source[4] & 0x01ff;
+		m_sprite_ptr_pre->flip =   (spr2 & 0x6000) >> 13;
+		m_sprite_ptr_pre->color =  (spr2 & 0x1f00) >> 8;
+		m_sprite_ptr_pre->pri =    (spr2 & 0x0080) >>  7;
+		m_sprite_ptr_pre->offs =  ((spr2 & 0x007f) << 16) | (spr3 & 0xffff);
+
+		m_sprite_ptr_pre->width =  (spr4 & 0x7e00) >> 9;
+		m_sprite_ptr_pre->height =  spr4 & 0x01ff;
 
 		if (xgrow)
 		{
@@ -555,18 +625,18 @@ void pgm_state::get_sprites()
 		m_sprite_ptr_pre->xgrow = xgrow;
 		m_sprite_ptr_pre->ygrow = ygrow;
 		m_sprite_ptr_pre++;
-		sprite_source += 5;
+		sprite_num += 5;
 	}
 }
 
 /* TX Layer */
-void pgm_state::tx_videoram_w(offs_t offset, u16 data, u16 mem_mask)
+void igs023_video_device::tx_videoram_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	m_tx_videoram[offset] = data;
 	m_tx_tilemap->mark_tile_dirty(offset / 2);
 }
 
-TILE_GET_INFO_MEMBER(pgm_state::get_tx_tile_info)
+TILE_GET_INFO_MEMBER(igs023_video_device::get_tx_tile_info)
 {
 /* 0x904000 - 0x90ffff is the Text Overlay Ram (pgm_tx_videoram)
     each tile uses 4 bytes, the tilemap is 64x128?
@@ -591,13 +661,13 @@ TILE_GET_INFO_MEMBER(pgm_state::get_tx_tile_info)
 
 /* BG Layer */
 
-void pgm_state::bg_videoram_w(offs_t offset, u16 data, u16 mem_mask)
+void igs023_video_device::bg_videoram_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	m_bg_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset / 2);
 }
 
-TILE_GET_INFO_MEMBER(pgm_state::get_bg_tile_info)
+TILE_GET_INFO_MEMBER(igs023_video_device::get_bg_tile_info)
 {
 	/* pretty much the same as tx layer */
 
@@ -610,10 +680,18 @@ TILE_GET_INFO_MEMBER(pgm_state::get_bg_tile_info)
 
 
 
-/*** Video - Start / Update ****************************************************/
-
-void pgm_state::video_start()
+void igs023_video_device::device_start()
 {
+	m_videoram = make_unique_clear<uint16_t []>(0x8000/2);
+	m_videoregs = make_unique_clear<uint16_t []>(0x10000/2);
+
+	save_pointer(NAME(m_videoram), 0x8000/2);
+	save_pointer(NAME(m_videoregs), 0x10000/2);
+
+	m_bg_videoram = &m_videoram[0];
+	m_tx_videoram = &m_videoram[0x4000/2];
+	m_rowscrollram = &m_videoram[0x7000/2];
+
 	// assumes it can make an address mask with .length() - 1 on these
 	assert(!(m_adata.length() & (m_adata.length() - 1)));
 	assert(!(m_bdata.length() & (m_bdata.length() - 1)));
@@ -625,15 +703,20 @@ void pgm_state::video_start()
 	m_abit = 0;
 	m_boffset = 0;
 
-	m_tx_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(pgm_state::get_tx_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
+	m_tx_tilemap = &machine().tilemap().create(*this, tilemap_get_info_delegate(*this, FUNC(igs023_video_device::get_tx_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
 	m_tx_tilemap->set_transparent_pen(15);
 
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(pgm_state::get_bg_tile_info)), TILEMAP_SCAN_ROWS, 32, 32, 64, 16);
+	m_bg_tilemap = &machine().tilemap().create(*this, tilemap_get_info_delegate(*this, FUNC(igs023_video_device::get_bg_tile_info)), TILEMAP_SCAN_ROWS, 32, 32, 64, 16);
 	m_bg_tilemap->set_transparent_pen(31);
 	m_bg_tilemap->set_scroll_rows(16 * 32);
 }
 
-u32 pgm_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+void igs023_video_device::device_reset()
+{
+}
+
+
+u32 igs023_video_device::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(0x3ff, cliprect); // ddp2 igs logo needs 0x3ff
 
@@ -654,17 +737,4 @@ u32 pgm_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const 
 	m_tx_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 
 	return 0;
-}
-
-void pgm_state::screen_vblank(int state)
-{
-	// rising edge
-	if (state)
-	{
-		/* first 0xa00 of main ram = sprites, seems to be buffered, DMA? */
-		get_sprites();
-
-		// vblank start interrupt
-		m_maincpu->set_input_line(M68K_IRQ_6, HOLD_LINE);
-	}
 }

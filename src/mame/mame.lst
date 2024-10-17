@@ -20296,6 +20296,8 @@ iqblocka                        // (c) 1996
 iqblockf                        // (c) 1996
 jking103a                       // (c) 1999
 jking302us                      // (c) 2000?
+lhzb                            // (c) 1998
+lhzba                           // (c) 1998
 lhzb2                           // (c) 1998
 lhzb2a                          // (c) 1998
 mgcs                            // (c) 1998
@@ -20330,6 +20332,7 @@ cjddz215cn                      // (c) 200?
 cjddz217cn                      // (c) 200?
 cjddzlf                         // (c) 200?
 cjddzp                          // (c) 200?
+cjtljp                          // (c) 2005
 extradrw                        // (c) 200?
 fruitpar                        // (c) 1999
 fruitpar206us                   // (c) 1999
@@ -39023,6 +39026,13 @@ ccdelta1
 
 @source:saitek/edames.cpp
 edames
+
+@source:saitek/electrio.cpp
+electrio
+mk12
+pcheckers
+pchess
+pplus
 
 @source:saitek/exechess.cpp
 exechess

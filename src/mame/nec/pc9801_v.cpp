@@ -23,6 +23,7 @@ void pc9801_state::video_start()
 
 	std::fill(std::begin(m_ex_video_ff), std::end(m_ex_video_ff), 0);
 	std::fill(std::begin(m_video_ff), std::end(m_video_ff), 0);
+	save_pointer(NAME(m_video_ff), 8);
 }
 
 uint32_t pc9801_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
@@ -89,6 +90,7 @@ void pc9801_state::draw_text(bitmap_rgb32 &bitmap, uint32_t addr, int y, int wd,
 
 	uint8_t x_step;
 	uint8_t lastul = 0;
+	uint16_t lasttile = -1;
 
 	int scroll_start = 33 - (m_txt_scroll_reg[4] & 0x1f);
 	int scroll_end = scroll_start + m_txt_scroll_reg[5];
@@ -121,7 +123,13 @@ void pc9801_state::draw_text(bitmap_rgb32 &bitmap, uint32_t addr, int y, int wd,
 			kanji_sel = 1;
 			if((tile & 0x7e00) == 0x5600)
 			{
-				tile_lr = pcg_lr;
+				if(lasttile == tile)
+				{
+					tile_lr = 1;
+					lasttile = -1;
+				}
+				else
+					tile_lr = pcg_lr;
 				x_step = 1;
 			}
 			else if((tile & 0x7c00) == 0x0800)  // 8x16 charset selector
@@ -132,6 +140,7 @@ void pc9801_state::draw_text(bitmap_rgb32 &bitmap, uint32_t addr, int y, int wd,
 		}
 		else
 			x_step = 1;
+		lasttile = tile;
 
 		for(kanji_lr=0;kanji_lr<x_step;kanji_lr++)
 		{

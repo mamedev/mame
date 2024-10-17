@@ -11478,7 +11478,6 @@ Course names draws a full square kanji block between nation and "GP" (verify)
 		</part>
 	</software>
 
-	<!-- The original version comes in 2DD disks and boots to a black screen. The single-disk 2HD conversion is probably unofficial, but it works in MAME. -->
 	<software name="cranston" supported="no">
 		<!-- Origin: Neo Kobe Collection -->
 		<description>Cranston Manor</description>
@@ -11505,9 +11504,9 @@ Course names draws a full square kanji block between nation and "GP" (verify)
 		</part>
 	</software>
 
-	<software name="cranstonh" cloneof="cranston">
+	<software name="cranstonh" cloneof="cranston" supported="yes">
 		<!-- Origin: Neo Kobe Collection -->
-		<description>Cranston Manor (2HD conversion)</description>
+		<description>Cranston Manor (unofficial 2HD disk)</description>
 		<year>1983</year>
 		<publisher>スタークラフト (Starcraft)</publisher>
 		<info name="release" value="198310xx" />
@@ -13333,10 +13332,13 @@ Fails to boot with "E4" error (2dd disks?)
 		</part>
 	</software>
 
-	<software name="danchits">
+	<software name="danchits" supported="partial">
 		<description>Danchi Tsuma no Yuwaku</description>
 		<year>1983</year>
 		<publisher>光栄 (Koei)</publisher>
+		<notes><![CDATA[
+Hangs during BASIC boot with vanilla class (works on VM)
+]]></notes>
 		<info name="alt_title" value="団地妻の誘惑" />
 		<info name="release" value="198306xx" />
 		<part name="flop1" interface="floppy_5_25">
@@ -13442,11 +13444,14 @@ Fails to boot with "E4" error (2dd disks?)
 		</part>
 	</software>
 
-	<!-- Black screen on boot -->
-	<software name="daremo" supported="no">
+	<software name="daremo" supported="partial">
 		<description>Dare mo Shiranai... Ushinawareta Kioku no Tobira</description>
 		<year>1994</year>
 		<publisher>エクシィーズ (Xyz)</publisher>
+		<notes><![CDATA[
+Intro has masking issues (semigraphics?)
+Boots with NAX.EXE -T -BFF -Q -FC
+]]></notes>
 		<info name="alt_title" value="誰も知らない・・・ 失われた記憶の扉" />
 		<info name="release" value="19940418" />
 		<part name="flop1" interface="floppy_5_25">
@@ -24272,11 +24277,14 @@ Draws garbage GVRAM during install (verify)
 		</part>
 	</software>
 
-	<software name="hldrun">
+	<software name="hldrun" supported="partial">
 		<!-- remake, converted to DOS 3.30, has original ldrun levels + extra mode -->
 		<description>Hozonban Lode Runner</description>
 		<year>1989</year>
 		<publisher>システムソフト (SystemSoft)</publisher>
+		<notes><![CDATA[
+Keyboard keys stays stuck in one direction even after release (verify)
+]]></notes>
 		<info name="alt_title" value="保存版ロードランナー" />
 		<info name="release" value="198907xx" />
 		<!-- was mislabeled as panicbom -->
@@ -24287,11 +24295,14 @@ Draws garbage GVRAM during install (verify)
 		</part>
 	</software>
 
-	<software name="ldrun" cloneof="hldrun">
+	<software name="ldrun" supported="partial">
 		<!-- original version, compiled in N88-Basic 2.0 -->
 		<description>Lode Runner</description>
 		<year>1983</year>
 		<publisher>システムソフト (SystemSoft)</publisher>
+		<notes><![CDATA[
+Keyboard keys stays stuck in one direction even after release (verify)
+]]></notes>
 		<info name="alt_title" value="ロードランナー" />
 		<info name="release" value="1983xxxx" />
 		<part name="flop1" interface="floppy_5_25">
@@ -24383,6 +24394,7 @@ Draws garbage GVRAM during install (verify)
 				<rom name="hydlide 3.fdi" size="1186816" crc="76e64f06" sha1="c48a5fb06b091105ebcfed6e8a4c55eae60294c8" offset="0" />
 			</dataarea>
 		</part>
+		<!-- baddump: not part of the set -->
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="User Disk"/>
 			<dataarea name="flop" size="1186816">
@@ -24398,7 +24410,7 @@ Draws garbage GVRAM during install (verify)
 		<info name="alt_title" value="漂流" />
 		<info name="release" value="19960913" />
 		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 3"/>
+			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="1265664">
 				<rom name="disk1.fdi" size="1265664" crc="dc27c814" sha1="73972e03e8d532904d3c2a59e550091d034419ba" offset="0" />
 			</dataarea>
@@ -50264,11 +50276,13 @@ Doesn't recognize [FDC] disk 3 swap after title screen
 		</part>
 	</software>
 
-	<!-- unsupported ".fix" format -->
 	<software name="aigo3" supported="no">
 		<description>AI Go 3</description>
 		<year>1990</year>
 		<publisher>サムシンググッド (Something Good)</publisher>
+		<notes><![CDATA[
+unsupported .fix format
+]]></notes>
 		<info name="alt_title" value="ＡＩ囲碁３" />
 		<info name="release" value="19901101" />
 		<part name="flop1" interface="floppy_5_25">
@@ -50522,12 +50536,14 @@ Doesn't recognize [FDC] disk 3 swap after title screen
 		</part>
 	</software>
 
-	<!-- unsupported ".fix" format -->
-	<!-- This probably requires 3.5" floppy emulation -->
 	<software name="beastlr2" supported="no">
 		<description>Beast Lord II</description>
 		<year>1992</year>
 		<publisher>ホビージャパン (Hobby Japan)</publisher>
+		<notes><![CDATA[
+unsupported .fix format
+May require 3.5" floppy drive
+]]></notes>
 		<info name="alt_title" value="ビーストロード２" />
 		<info name="release" value="19921217" />
 		<part name="flop1" interface="floppy_5_25">
@@ -51545,11 +51561,13 @@ Doesn't recognize [FDC] disk 3 swap after title screen
 		</part>
 	</software>
 
-	<!-- Black screen on boot -->
 	<software name="flashb" supported="no">
 		<description>Flashback</description>
 		<year>1994</year>
 		<publisher>ビクターエンタテインメント (Victor Entertainment)</publisher>
+		<notes><![CDATA[
+Black screen, around PC=1fc76 (copy protection?)
+]]></notes>
 		<info name="alt_title" value="フラッシュバック" />
 		<info name="release" value="19940422" />
 		<part name="flop1" interface="floppy_5_25">
@@ -51593,7 +51611,7 @@ Doesn't recognize [FDC] disk 3 swap after title screen
 		</part>
 	</software>
 
-	<software name="gsenr" supported="no">
+	<software name="gsenr" supported="yes">
 		<description>G Senryaku</description>
 		<year>1991</year>
 		<publisher>グレイト (Great)</publisher>
@@ -51617,6 +51635,9 @@ Doesn't recognize [FDC] disk 3 swap after title screen
 		<description>Gai Flame</description>
 		<year>1987</year>
 		<publisher>NCS</publisher>
+		<notes><![CDATA[
+Black screen, 2dd disk?
+]]></notes>
 		<info name="alt_title" value="ガイフレーム" />
 		<info name="release" value="19871216" />
 		<part name="flop1" interface="floppy_5_25">
@@ -51633,26 +51654,29 @@ Doesn't recognize [FDC] disk 3 swap after title screen
 		</part>
 	</software>
 
-	<software name="gaialord" supported="no">
+	<software name="gaialord" supported="partial">
 		<description>Gaias Lord</description>
 		<year>1993</year>
 		<publisher>オレンジハウス (Orange House)</publisher>
+		<notes><![CDATA[
+Has non working optional RS-MIDI thru SQS -S CLI switch (will hang game if used)
+]]></notes>
 		<info name="alt_title" value="ガイアスロード" />
 		<info name="release" value="19931119" />
 		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 1"/>
+			<feature name="part_id" value="Disk A"/>
 			<dataarea name="flop" size="1329680">
 				<rom name="gaias_lord_1.nfd" size="1329680" crc="76d645e6" sha1="5127f10def1538d1a956d2dc19265e620810c224" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 2"/>
+			<feature name="part_id" value="Disk B"/>
 			<dataarea name="flop" size="1329680">
 				<rom name="gaias_lord_2.nfd" size="1329680" crc="f6969d60" sha1="7d41f7c78d47796e80372a52dde2b200667df117" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 3"/>
+			<feature name="part_id" value="Disk C"/>
 			<dataarea name="flop" size="1329680">
 				<rom name="gaias_lord_3.nfd" size="1329680" crc="374bce70" sha1="9a023fde75caf65dfedddcba28dc068371d841cd" offset="0" />
 			</dataarea>
@@ -51837,11 +51861,13 @@ Doesn't recognize [FDC] disk 3 swap after title screen
 		</part>
 	</software>
 
-	<!-- unsupported ".fix" format -->
 	<software name="golemstr" supported="no">
 		<description>The Golem Master</description>
 		<year>1993</year>
 		<publisher>シュールド・ウェーブ (Sur De Wave)</publisher>
+		<notes><![CDATA[
+unsupported .fix format
+]]></notes>
 		<info name="alt_title" value="ゴーレムマスター" />
 		<info name="release" value="19930521" />
 		<part name="flop1" interface="floppy_5_25">
@@ -52127,6 +52153,9 @@ Doesn't recognize [FDC] disk 3 swap after title screen
 		<description>Hydlide</description>
 		<year>1985</year>
 		<publisher>ティーアンドイーソフト (T&amp;E Soft)</publisher>
+		<notes><![CDATA[
+Black screen, 2dd disk?
+]]></notes>
 		<info name="alt_title" value="ハイドライド" />
 		<info name="release" value="198511xx" />
 		<part name="flop1" interface="floppy_5_25">
@@ -52136,11 +52165,13 @@ Doesn't recognize [FDC] disk 3 swap after title screen
 		</part>
 	</software>
 
-	<!-- unsupported ".fix" format -->
 	<software name="hypermj" supported="no">
 		<description>Hyper Mahjong Mangan Zenseki</description>
 		<year>1993</year>
 		<publisher>河合楽器制作所 (Kawai Gakki Seisakushou)</publisher>
+		<notes><![CDATA[
+unsupported .fix format
+]]></notes>
 		<info name="alt_title" value="ハイパー麻雀 満貫全席" />
 		<info name="release" value="19931101" />
 		<part name="flop1" interface="floppy_5_25">
@@ -52259,11 +52290,13 @@ Doesn't recognize [FDC] disk 3 swap after title screen
 		</part>
 	</software>
 
-	<!-- unsupported ".fix" format -->
 	<software name="jlwave" supported="no">
 		<description>J. League Hyper Soccer - Wave no Arashi</description>
 		<year>1993</year>
 		<publisher>C^2 World</publisher>
+		<notes><![CDATA[
+unsupported .fix format
+]]></notes>
 		<info name="alt_title" value="Ｊリーグハイパーサッカー ウェーブの嵐" />
 		<info name="release" value="19930605" />
 		<part name="flop1" interface="floppy_5_25">
@@ -54032,12 +54065,14 @@ Black screen, keeps hitting an empty divide by zero exception at PC=1fcb6
 		</part>
 	</software>
 
-	<!-- unsupported ".fix" format -->
-	<!-- This probably requires 3.5" floppy emulation -->
 	<software name="cessna" supported="no">
 		<description>Nihon Juudan Cessna Flight</description>
 		<year>1988</year>
 		<publisher>コムパック (Compac)</publisher>
+		<notes><![CDATA[
+unsupported .fix format
+May require 3.5" floppy drive
+]]></notes>
 		<info name="alt_title" value="日本縦断セスナ・フライト" />
 		<info name="release" value="198806xx" />
 		<part name="flop1" interface="floppy_5_25">
@@ -55363,11 +55398,13 @@ unsupported .fix format
 		</part>
 	</software>
 
-	<!-- unsupported ".fix" format -->
 	<software name="solitaira" cloneof="solitair" supported="no">
 		<description>Solitaire Royale (alt format)</description>
 		<year>1988</year>
 		<publisher>ゲームアーツ (Game Arts)</publisher>
+		<notes><![CDATA[
+unsupported .fix format
+]]></notes>
 		<info name="alt_title" value="ソリティアロイヤル" />
 		<info name="release" value="19880624" />
 		<part name="flop1" interface="floppy_5_25">
@@ -55458,11 +55495,13 @@ unsupported .fix format
 		</part>
 	</software>
 
-	<!-- unsupported ".fix" format -->
 	<software name="starcomm" supported="no">
 		<description>Star Command</description>
 		<year>1989</year>
 		<publisher>ヒューリンクス (Hulinks)</publisher>
+		<notes><![CDATA[
+unsupported .fix format
+]]></notes>
 		<info name="alt_title" value="スターコマンド" />
 		<info name="release" value="19890420" />
 		<part name="flop1" interface="floppy_5_25">
@@ -56035,11 +56074,13 @@ unsupported .fix format
 		</part>
 	</software>
 
-	<!-- unsupported ".fix" format -->
 	<software name="vermilna" cloneof="vermiln" supported="no">
 		<description>Vermilion (alt format)</description>
 		<year>1990</year>
 		<publisher>グレイト (Great)</publisher>
+		<notes><![CDATA[
+unsupported .fix format
+]]></notes>
 		<info name="alt_title" value="バーミリオン" />
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk A"/>
