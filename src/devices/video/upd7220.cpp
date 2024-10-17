@@ -320,6 +320,12 @@ inline void upd7220_device::dequeue(uint8_t *data, int *flag)
 		if (m_fifo_ptr == -1)
 			m_sr &= ~UPD7220_SR_DATA_READY;
 	}
+	else
+	{
+		// TODO: underflow details
+		// pc9821:skinpan does SR checks over the wrong port during intro ...
+		*data = 0xff;
+	}
 }
 
 

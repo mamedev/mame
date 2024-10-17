@@ -6767,8 +6767,10 @@ Never output any sound
 		<year>1993</year>
 		<publisher>ガイナックス (Gainax)</publisher>
 		<notes><![CDATA[
-Hangs during the intro (first dialogue)
+Hangs during the intro (first dialogue), [7220] FIFO underflows, worked around.
+Several [7220] invalid commands 0x05
 Draws Gainax logo with half height
+Title screen oddly keeps scrolling (verify)
 ]]></notes>
 		<info name="alt_title" value="バトルスキンパニック ９８２１" />
 		<info name="release" value="19930921" />
