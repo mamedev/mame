@@ -41145,6 +41145,9 @@ cabalukj                        // (c) 1988 Tad + Electrocoin license
 cabalus                         // (c) 1988 Tad + Fabtek license
 cabalus2                        // (c) 1988 Tad + Fabtek license
 
+@source:seibu/cabal_ms.cpp
+cabalm                          // bootleg
+
 @source:seibu/darkmist.cpp
 darkmist                        // (c) 1986 Taito
 
