@@ -329,7 +329,7 @@ inline void upd7220_device::dequeue(uint8_t *data, int *flag)
 
 inline void upd7220_device::update_vsync_timer(int state)
 {
-	int next_y = state ? m_vs : 0;
+	int next_y = state ? (m_vs + m_vbp) : 0;
 
 	attotime duration = screen().time_until_pos(next_y, 0);
 
