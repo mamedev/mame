@@ -189,8 +189,9 @@ void pc9801_state::draw_text(bitmap_rgb32 &bitmap, uint32_t addr, int y, int wd,
 
 					if(!secret)
 					{
-						// kanji select will override semigraphics
+						// kanji select takes over semigraphics
 						// beatvice wants this for bitmap masking on edges during gameplay
+						// (uses fully opaque PCG tiles)
 						if(kanji_sel)
 							tile_data = (m_kanji_rom[tile*0x20+yi*2+kanji_lr+tile_lr]);
 						else if(gfx_mode)

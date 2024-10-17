@@ -7130,13 +7130,10 @@ Draws Gainax logo with half height
 		</part>
 	</software>
 
-	<software name="beatvice" supported="partial">
+	<software name="beatvice" supported="yes">
 		<description>BeatVice</description>
 		<year>1989</year>
 		<publisher>風雅システム (Fuga System)</publisher>
-		<notes><![CDATA[
-Leaves [bitmap layer] trails on edges during shmup gameplay
-]]></notes>
 		<info name="alt_title" value="ビートバイス" />
 		<info name="release" value="19891215" />
 		<info name="usage" value="Insert disk 1 on drive 2 and run SI.BAT to copy DOS files, or run HI.BAT to install to HDD." />
@@ -11673,7 +11670,8 @@ Course names draws a full square kanji block between nation and "GP" (verify)
 		<year>1986</year>
 		<publisher>スクウェア (Square)</publisher>
 		<notes><![CDATA[
-Fails to boot with "E4" error (2dd disks?)
+Fails to boot with "E4" error, access [FDC] chrn=(0, 0, 1, 512)
+Throws "E>" error with chrn=(0, 1, 1, 512) in 2dd mode
 ]]></notes>
 		<info name="alt_title" value="クルーズ チェイサー ブラスティー" />
 		<part name="flop1" interface="floppy_5_25">
@@ -13449,8 +13447,7 @@ Hangs during BASIC boot with vanilla class (works on VM)
 		<year>1994</year>
 		<publisher>エクシィーズ (Xyz)</publisher>
 		<notes><![CDATA[
-Intro has masking issues (semigraphics?)
-Boots with NAX.EXE -T -BFF -Q -FC
+Boots with NAX.EXE -T -BFF -Q -FC, accesses optional extra ports
 ]]></notes>
 		<info name="alt_title" value="誰も知らない・・・ 失われた記憶の扉" />
 		<info name="release" value="19940418" />
@@ -16039,11 +16036,13 @@ Boots with NAX.EXE -T -BFF -Q -FC
 		</part>
 	</software>
 
-	<!-- Black screen on boot. Could be related to the disk format, since it's a 2DD disk. -->
 	<software name="dokkinm" supported="no">
 		<description>Dokkin Minako-sensei</description>
 		<year>1988</year>
 		<publisher>テクトハウス (Tect House)</publisher>
+		<notes><![CDATA[
+Black screen, 2dd disk? [FDC] keeps accessing chrn=(0, 1, 17, 256) in 2HD mode
+]]></notes>
 		<info name="alt_title" value="ドッキン美奈子先生" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="659456">
@@ -16367,13 +16366,16 @@ Boots with NAX.EXE -T -BFF -Q -FC
 		</part>
 	</software>
 
-	<!-- Fails to boot with a "Disk I/O Error" -->
-	<software name="doordoor" supported="no">
+	<software name="doordoor" supported="partial">
 		<description>Door Door</description>
 		<year>1984</year>
 		<publisher>エニックス (Enix)</publisher>
+		<notes><![CDATA[
+Slightly too fast for VM class
+]]></notes>
 		<info name="alt_title" value="ドアドア" />
 		<info name="release" value="" />
+		<info name="usage" value="Needs floppy 2DD density select dip enabled" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="697008">
 				<rom name="door door (j).d88" size="697008" crc="ed48e06e" sha1="20d4758150bf663ec6c26502912af9882f15254f" offset="0" />
@@ -16593,11 +16595,13 @@ Boots with NAX.EXE -T -BFF -Q -FC
 		</part>
 	</software>
 
-	<!-- MAME fails to mount the images with "Fatal error: Incorrect layout on track 0 head 0, expected_size=166666, current_size=167648" error -->
 	<software name="dokyuse2sp" cloneof="dokyuse2" supported="no">
 		<description>Doukyuusei 2 HD Senyou Ban - Special Disk</description>
 		<year>1995</year>
 		<publisher>エルフ (Elf)</publisher>
+		<notes><![CDATA[
+"Incorrect layout on track 0 head 0, expected_size=166666, current_size=167648"
+]]></notes>
 		<info name="alt_title" value="同級生２ ＨＤ専用版 スペシャルディスク" />
 		<info name="usage" value="Requires &quot;Doukyuusei 2&quot; to work" />
 		<part name="flop1" interface="floppy_5_25">
@@ -18029,8 +18033,7 @@ User disk creation screen is offset
 		</part>
 	</software>
 
-	<!-- Black screen on boot -->
-	<software name="eiyuden" supported="no">
+	<software name="eiyuden" supported="yes">
 		<description>Eiyuu Densetsu Saga</description>
 		<year>1984</year>
 		<publisher>マイクロキャビン (Micro Cabin)</publisher>
@@ -18787,12 +18790,13 @@ User disk creation screen is offset
 		</part>
 	</software>
 
-	<!-- Black screen on boot -->
-	<!-- [Never goes past initial reading from floppy, may require a 2DD exclusive setting/BIOS] -->
 	<software name="executiv" supported="no">
 		<description>Executive e no Michi</description>
 		<year>1987</year>
 		<publisher>チャンピオンソフト (Champion Soft)</publisher>
+		<notes><![CDATA[
+Black screen, [FDC] keeps reading chrn=(3, 0, 3, 256) in 2dd mode
+]]></notes>
 		<info name="alt_title" value="エグゼクティブへの道" />
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 1"/>
@@ -19160,8 +19164,7 @@ User disk creation screen is offset
 		</part>
 	</software>
 
-	<!-- Disk I/O Error -->
-	<software name="faires" supported="no">
+	<software name="faires" supported="yes">
 		<description>Fairie's Residence</description>
 		<year>1984</year>
 		<publisher>チャンピオンソフト (Champion Soft)</publisher>
@@ -19201,12 +19204,13 @@ User disk creation screen is offset
 		</part>
 	</software>
 
-	<!-- Black screen on boot -->
-	<!-- [Never goes past initial reading from floppy, may require a 2DD exclusive setting/BIOS] -->
 	<software name="fairytal" supported="no">
 		<description>Fairytale</description>
 		<year>1987</year>
 		<publisher>フェアリーテール (Fairytale)</publisher>
+		<notes><![CDATA[
+Black screen [FDC] keeps reading chrn=(0, 0, 3, 256) in 2dd mode
+]]></notes>
 		<info name="alt_title" value="ふぇありぃてぃる" />
 		<info name="release" value="198705xx" />
 		<part name="flop1" interface="floppy_5_25">
@@ -19310,11 +19314,13 @@ User disk creation screen is offset
 		</part>
 	</software>
 
-	<!-- Fatal error: Incorrect layout on track 1 head 0, expected_size=100000, current_size=103104 -->
 	<software name="fantsian" supported="no">
 		<description>Fantasian</description>
 		<year>1985</year>
 		<publisher>クリスタルソフト (Xtal Soft)</publisher>
+		<notes><![CDATA[
+"Incorrect layout on track 1 head 0, expected_size=100000, current_size=103104"
+]]></notes>
 		<info name="alt_title" value="ファンタジアン" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="716304">
@@ -19323,8 +19329,7 @@ User disk creation screen is offset
 		</part>
 	</software>
 
-	<!-- Black screen on boot -->
-	<software name="farce" supported="no">
+	<software name="farce" supported="yes">
 		<description>Farce - Yuuwaku Hakusho</description>
 		<year>1994</year>
 		<publisher>ソフトウェアハウスぱせり (Software House Parsley)</publisher>
@@ -20268,11 +20273,13 @@ User disk creation screen is offset
 		</part>
 	</software>
 
-	<!-- Fatal error: Incorrect layout on track 48 head 0, expected_size=100000, current_size=325920 -->
 	<software name="flhawaii" supported="no">
 		<description>Flight in Hawaii</description>
 		<year>1986</year>
 		<publisher>キャリーラボ (Carry Lab)</publisher>
+		<notes><![CDATA[
+"Incorrect layout on track 48 head 0, expected_size=100000, current_size=325920"
+]]></notes>
 		<info name="alt_title" value="フライト・イン・ハワイ" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="709936">
@@ -20772,11 +20779,13 @@ User disk creation screen is offset
 		</part>
 	</software>
 
-	<!-- Address 20 line error -->
 	<software name="funny" supported="no">
 		<description>Funny</description>
 		<year>19??</year>
 		<publisher>アスキー (ASCII)</publisher>
+		<notes><![CDATA[
+Reset machine after selecting option 1 "FUNNY start"
+]]></notes>
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="1086448">
@@ -20787,7 +20796,7 @@ User disk creation screen is offset
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 2"/>
 			<dataarea name="flop" size="1086448">
-				<rom name="funny2s.d88" size="1086448" crc="8da076e5" sha1="1aa7bd53707b9039d0a09e8e715ab0dc98f65fd6" offset="0" />
+				<rom name="funny2s.d88" size="1086448" crc="8da076e5" sha1="1aa7bd53707b9039d0a09e8e715ab0dc98f65fd6" offset="0" status="baddump" />
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_5_25">
@@ -28631,12 +28640,13 @@ Keyboard keys stays stuck in one direction even after release (verify)
 		</part>
 	</software>
 
-	<!-- Black screen on boot -->
-	<!-- [Never goes past initial reading from floppy, may require a 2DD exclusive setting/BIOS] -->
 	<software name="lovechas" supported="no">
 		<description>Love Chaser</description>
 		<year>1987</year>
 		<publisher>チャンピオンソフト (Champion Soft)</publisher>
+		<notes><![CDATA[
+Black screen [FDC] keeps reading chrn=(0, 0, 3, 256) in 2dd mode
+]]></notes>
 		<info name="alt_title" value="ラブチェイサー" />
 		<info name="release" value="198709xx" />
 		<part name="flop1" interface="floppy_5_25">
@@ -29055,12 +29065,14 @@ Keyboard keys stays stuck in one direction even after release (verify)
 		</part>
 	</software>
 
-	<!-- Throws "error code 34" on boot -->
-	<!-- mixed 5'25/3'5 dump? Looks extremely unlikely -->
 	<software name="mjclinic" supported="no">
 		<description>Mahjong Clinic Zoukan-gou</description>
 		<year>1990</year>
 		<publisher>ホームデータ (Home Data)</publisher>
+		<notes><![CDATA[
+Throws "error code 34" on boot
+Mixed 5'25/3'5 dump? Looks extremely unlikely
+]]></notes>
 		<info name="alt_title" value="麻雀クリニック増刊号" />
 		<info name="release" value="19901226" />
 		<part name="flop1" interface="floppy_5_25">
@@ -29836,7 +29848,7 @@ Keyboard keys stays stuck in one direction even after release (verify)
 		</part>
 	</software>
 
-	<software name="marchenp" supported="no">
+	<software name="marchenp" supported="yes">
 		<description>Märchen Paradise</description>
 		<year>1990</year>
 		<publisher>グレイト (Great)</publisher>
@@ -29870,11 +29882,13 @@ Keyboard keys stays stuck in one direction even after release (verify)
 		</part>
 	</software>
 
-<!-- TODO: check master floppy, size looks suspicious -->
 	<software name="marchen2" supported="no">
 		<description>Märchen Veil II</description>
 		<year>1986</year>
 		<publisher>システムサコム (System Sacom)</publisher>
+		<notes><![CDATA[
+TODO: check master floppy, size looks suspicious
+]]></notes>
 		<info name="alt_title" value="メルヘン・ヴェール２" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="823296">
@@ -31255,12 +31269,13 @@ Keyboard keys stays stuck in one direction even after release (verify)
 		</part>
 	</software>
 
-	<software name="mightyhd" supported="no">
+	<software name="mightyhd" supported="partial">
 		<description>Mighty Head</description>
 		<year>1986</year>
 		<publisher>アポロテクニカ (Apollo Technica)</publisher>
 		<notes><![CDATA[
-Black screen, wants 2DD dip ON?
+Has [PCG] LR issues during gameplay (score digits)
+Should screen mask bottom edge of screen
 ]]></notes>
 		<info name="alt_title" value="マイティーヘッド" />
 		<info name="release" value="198608xx" />
@@ -33250,10 +33265,13 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 		</part>
 	</software>
 
-	<software name="nobunaga">
+	<software name="nobunaga" supported="partial">
 		<description>Nobunaga no Yabou</description>
 		<year>1983</year>
 		<publisher>光栄 (Koei)</publisher>
+		<notes><![CDATA[
+Requires kanji board, currently missing from vanilla class (use VM)
+]]></notes>
 		<info name="alt_title" value="信長の野望" />
 		<info name="release" value="198311xx" />
 		<part name="flop1" interface="floppy_5_25">
@@ -38485,8 +38503,7 @@ No [PC9801-86] sound
 		</part>
 	</software>
 
-	<!-- 2DD image, won't boot in vanilla class with 2DD BIOS enabled -->
-	<software name="rogue" supported="no">
+	<software name="rogue" supported="yes">
 		<description>Rogue</description>
 		<year>1986</year>
 		<publisher>アスキー (ASCII)</publisher>
@@ -41168,13 +41185,16 @@ Cannot install, gets stuck at "please insert disk and press mouse" prompt
 		</part>
 	</software>
 
-	<!-- 2dd images, attempt to map them on 9801F (in drive 2 + BIOS enabled in Machine Config) causes access violation -->
-	<!-- [On RS class with FDC set as 2HD it never completes sub-routine at PC=0x1fc99] -->
-	<!-- [Jumps off the weed with 2DD mode, never initializes 0x1fc00 onward.] -->
 	<software name="sorcer" supported="no">
 		<description>Sorcerian</description>
 		<year>1988</year>
 		<publisher>日本ファルコム (Nihon Falcom)</publisher>
+		<notes><![CDATA[
+2dd images? attempt to map them on 9801F (in drive 2 + BIOS enabled in Machine Config) causes access violation
+On RS class with FDC set as 2HD it never completes sub-routine at PC=0x1fc99
+Jumps off the weed with 2DD mode, never initializes 0x1fc00 onward.
+Enables [FDC] XTMASK irq
+]]></notes>
 		<info name="alt_title" value="ソーサリアン" />
 		<info name="release" value="19880325" />
 		<part name="flop1" interface="floppy_5_25">
@@ -41209,7 +41229,7 @@ Cannot install, gets stuck at "please insert disk and press mouse" prompt
 		</part>
 	</software>
 
-	<software name="sorcerexp" cloneof="sorcer">
+	<software name="sorcerexp" cloneof="sorcer" supported="no">
 		<description>Sorcerian Tsuika Scenario</description>
 		<year>1988</year>
 		<publisher>日本ファルコム (Nihon Falcom)</publisher>
@@ -41223,10 +41243,13 @@ Cannot install, gets stuck at "please insert disk and press mouse" prompt
 		</part>
 	</software>
 
-	<software name="sorcerexp2" cloneof="sorcer">
+	<software name="sorcerexp2" cloneof="sorcer" supported="no">
 		<description>Sorcerian Tsuika Scenario 2 - Sengoku Sorcerian</description>
 		<year>1988</year>
 		<publisher>日本ファルコム (Nihon Falcom)</publisher>
+		<notes><![CDATA[
+Wants user to hold F1/F2/F3 key at startup, doesn't work
+]]></notes>
 		<info name="alt_title" value="ソーサリアン 追加シナリオ Ｖｏｌ．２ 戦国ソーサリアン" />
 		<info name="release" value="19881021" />
 		<info name="usage" value="Requires &quot;Sorcerian&quot; to work" />
@@ -41237,7 +41260,7 @@ Cannot install, gets stuck at "please insert disk and press mouse" prompt
 		</part>
 	</software>
 
-	<software name="sorcerexp3" cloneof="sorcer">
+	<software name="sorcerexp3" cloneof="sorcer" supported="no">
 		<description>Sorcerian Tsuika Scenario 3 - Pyramid Sorcerian</description>
 		<year>1988</year>
 		<publisher>日本ファルコム (Nihon Falcom)</publisher>
@@ -41251,7 +41274,7 @@ Cannot install, gets stuck at "please insert disk and press mouse" prompt
 		</part>
 	</software>
 
-	<software name="sorcerexp4" cloneof="sorcer">
+	<software name="sorcerexp4" cloneof="sorcer" supported="no">
 		<description>Sorcerian Tsuika Scenario 4 - Uchuu kara no Houmonsha</description>
 		<year>1989</year>
 		<publisher>アモルファス (Amorphous)</publisher>
@@ -41265,7 +41288,7 @@ Cannot install, gets stuck at "please insert disk and press mouse" prompt
 		</part>
 	</software>
 
-	<software name="sorcerexp4a" cloneof="sorcer">
+	<software name="sorcerexp4a" cloneof="sorcer" supported="no">
 		<description>Sorcerian Tsuika Scenario 4 - Uchuu kara no Houmonsha (alt)</description>
 		<year>1989</year>
 		<publisher>アモルファス (Amorphous)</publisher>
@@ -41279,7 +41302,7 @@ Cannot install, gets stuck at "please insert disk and press mouse" prompt
 		</part>
 	</software>
 
-	<software name="sorcerutil" cloneof="sorcer">
+	<software name="sorcerutil" cloneof="sorcer" supported="no">
 		<description>Sorcerian Utility Disk Vol.1</description>
 		<year>1988</year>
 		<publisher>日本ファルコム (Nihon Falcom)</publisher>
@@ -45222,7 +45245,7 @@ Eventually hangs with stuck [PC9801-26] sound note
 		<year>1994</year>
 		<publisher>日本クリエイト (Nihon Create)</publisher>
 		<notes><![CDATA[
-Throws "Protection check error, please reset" after logos, [FDC] CHRN=(1, 0, -1, 512)
+Throws "Protection check error, please reset" after logos, [FDC] chrn=(1, 0, 1, 1024)
 ]]></notes>
 		<info name="alt_title" value="トラぶるＣＨＡＳＥＲ 第１話 トラブルは空から未来から" />
 		<info name="release" value="19941202" />
@@ -45245,7 +45268,7 @@ Throws "Protection check error, please reset" after logos, [FDC] CHRN=(1, 0, -1,
 		<year>1995</year>
 		<publisher>日本クリエイト (Nihon Create)</publisher>
 		<notes><![CDATA[
-Throws "Protection check error, please reset" after logos, [FDC] CHRN=(1, 0, -1, 512)
+Throws "Protection check error, please reset" after logos, [FDC] chrn=(1, 0, 1, 1024)
 ]]></notes>
 		<info name="alt_title" value="トラぶるＣＨＡＳＥＲ 第２話 ２人目のチェイサー" />
 		<info name="release" value="19950218" />
@@ -45533,13 +45556,13 @@ Accesses [OPN] at $288?
 		</part>
 	</software>
 
-	<!-- 2dd images, attempt to map them on 9801F (in drive 2 + BIOS enabled in Machine Config) causes access violation -->
-	<software name="twiligh3" supported="no">
+	<software name="twiligh3" supported="yes">
 		<description>Twilight Zone III - Nagakute Amai Yoru</description>
 		<year>1989</year>
 		<publisher>グレイト (Great)</publisher>
 		<info name="alt_title" value="トワイライトゾーン３ 長くて甘い夜" />
 		<info name="release" value="198907xx" />
+		<info name="usage" value="Needs floppy 2DD density select dip enabled" />
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk A"/>
 			<dataarea name="flop" size="697008">
@@ -48568,7 +48591,7 @@ Accesses [OPN] at $288?
 		<publisher>日本ファルコム (Nihon Falcom)</publisher>
 		<notes><![CDATA[
 Shows a title screen on vanilla class, black screen afterwards
-Black screen on VM class
+Black screen on VM class, keeps reading [FDC] command sense drive status
 Is this a data disk for missing main game dump?
 ]]></notes>
 		<info name="alt_title" value="ザナドゥ" />
@@ -50236,11 +50259,14 @@ Doesn't recognize [FDC] disk 3 swap after title screen
 	</software>
 
 
-	<!-- Black screen on boot -->
 	<software name="aressha" supported="no">
 		<description>A Ressha de Ikou 98 ~ Take the A Train.</description>
 		<year>1987</year>
 		<publisher>アートディンク (Artdink)</publisher>
+		<notes><![CDATA[
+Draws bitmap layer with half height
+Fails booting with normal display dip setting "Illegal function call 1830" in BASIC (verify)
+]]></notes>
 		<info name="alt_title" value="Ａ列車で行こう" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1089808">
@@ -50249,8 +50275,7 @@ Doesn't recognize [FDC] disk 3 swap after title screen
 		</part>
 	</software>
 
-	<!-- Black screen on boot -->
-	<software name="abunatena" cloneof="abunaten" supported="no">
+	<software name="abunatena" cloneof="abunaten" supported="yes">
 		<description>Abunai Tengu Densetsu - Yomigaetta Tengu ga Yozora o Mau (alt format)</description>
 		<year>1989</year>
 		<publisher>アリスソフト (AliceSoft)</publisher>
@@ -50296,6 +50321,9 @@ unsupported .fix format
 		<description>Alantia (alt format)</description>
 		<year>1988</year>
 		<publisher>ビクター音楽産業 (Victor Musical Industries)</publisher>
+		<notes><![CDATA[
+Hangs at Cross Media Soft logo, triggers [FDC] XTMASK irq
+]]></notes>
 		<info name="alt_title" value="アランティア" />
 		<info name="release" value="19881121" />
 		<part name="flop1" interface="floppy_5_25">
@@ -51631,12 +51659,12 @@ Black screen, around PC=1fc76 (copy protection?)
 		</part>
 	</software>
 
-	<software name="gaiflame" supported="no">
+	<software name="gaiflame" supported="partial">
 		<description>Gai Flame</description>
 		<year>1987</year>
 		<publisher>NCS</publisher>
 		<notes><![CDATA[
-Black screen, 2dd disk?
+No sound
 ]]></notes>
 		<info name="alt_title" value="ガイフレーム" />
 		<info name="release" value="19871216" />
@@ -51765,9 +51793,7 @@ Has non working optional RS-MIDI thru SQS -S CLI switch (will hang game if used)
 		</part>
 	</software>
 
-	<!-- Black screen on boot -->
-	<!-- "Bad allocation table" by issuing a files command in a Disk BASIC -->
-	<software name="gandhara" supported="no">
+	<software name="gandhara" supported="yes">
 		<description>Gandhara</description>
 		<year>1988</year>
 		<publisher>エニックス (Enix)</publisher>
@@ -52154,7 +52180,7 @@ unsupported .fix format
 		<year>1985</year>
 		<publisher>ティーアンドイーソフト (T&amp;E Soft)</publisher>
 		<notes><![CDATA[
-Black screen, 2dd disk?
+Black screen, wants [FDC] XTMASK irq
 ]]></notes>
 		<info name="alt_title" value="ハイドライド" />
 		<info name="release" value="198511xx" />
@@ -54044,6 +54070,9 @@ Black screen, keeps hitting an empty divide by zero exception at PC=1fcb6
 		<description>Mystery House (Microcabin)</description>
 		<year>1983</year>
 		<publisher>マイクロキャビン (Micro Cabin)</publisher>
+		<notes><![CDATA[
+Black screen, wants 2DD dip ON?
+]]></notes>
 		<info name="alt_title" value="ミステリーハウス" />
 		<info name="release" value="198307xx" />
 		<part name="flop1" interface="floppy_5_25">
@@ -66997,7 +67026,7 @@ doujin?!?
 		<year>19??</year>
 		<publisher>&lt;doujin&gt;</publisher>   <!-- is this really a doujin soft? -->
 		<notes><![CDATA[
-Black screen [FDC] 2DD disk
+Black screen [FDC] keeps reading chrn=(0, 0, 3, 256) in 2dd mode
 Has XA and LT support according to spine card
 ]]></notes>
 		<info name="author" value="Fancy Soft" />
