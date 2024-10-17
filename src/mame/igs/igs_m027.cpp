@@ -32,8 +32,11 @@
 
  Chaoji Tuolaji Jiaqiang Ban doesn't show Kan, Pon, Chi, Reach, Ron,
  Take Score, Double Up, Big or Small in test mode.  However the game
- does use Kan and Ron to play cards (出牌) and cancel all (全部取消) as
- shown on the instructions screen.
+ does use Kan to play cards (出牌) and Ron to cancel all (全部取消) as
+ shown on the instructions screen, and Take Score, Big and Small can be
+ used in the double-up game.  Start, G, A and E can be used in place of
+ Ron, Take Score, Big and Small, respectively (as shown on-screen), but
+ there doesn't seem to be an alternate button to cancel all.
 
  TODO:
  * I/O for remaining games

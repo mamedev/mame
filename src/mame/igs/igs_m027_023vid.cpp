@@ -276,7 +276,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(igs_m027_023vid_state::interrupt)
 		m_maincpu->pulse_input_line(arm7_cpu_device::ARM7_FIRQ_LINE, m_maincpu->minimum_quantum_time()); // vbl?
 		break;
 
-	case 192: 
+	case 192:
 		igs_m027_023vid_state::irq_w<0>(ASSERT_LINE);
 		break;
 	}

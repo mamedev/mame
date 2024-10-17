@@ -45,12 +45,30 @@ To Do:
 Notes:
 
 - Test mode is usually accessed by keeping test (F2) pressed during boot.
-- iqblocka: keep start (1) pressed during boot for DSWs & input test. Keep test (F2) pressed for book-keeping / setup [pass: press deal (2)].
+- The sound test is often accessed by holding test (F2) and bookkeeping (0) at the I/O test screen.
+- iqblocka: keep start (1) pressed during boot for DSWs & input test. Keep test (F2) pressed for bookkeeping / setup [pass: press deal (2)].
 - iqblockf/genius6: press service1 (9) then press deal (2) eight times to switch to gambling. Then test (F2) enters book-keeping / setup.
 - lhzb2, mgcs, slqz2, tjsb: press test (F2) + book (0) during inputs test for sound test.
 - mgdh, sdmg2: press keys A + B during test mode for sound test (B1 + B2 + B3 when using a joystick in mgdh).
 - spkrform: to switch from poker to Formosa press service1 (9). To switch back, press in sequence:
             service3 (right of 0) then Bet (M) then press "Hold 1".."Hold 5" (Z, X, C, V, B)
+- Tarzan Chuang Tian Guan controls:
+  Start         Start       Stop All    Take Score
+  Mahjong Bet   Bet
+  Mahjong A     Show Odds   Stop 1      Double Up (twice winnings)
+  Mahjong B                 Stop 2
+  Mahjong C                 Stop 3      Double Up (winnings)
+  Mahjong D                 Stop 4
+  Mahjong E                             Double Up (half winnings)
+  Mahjong K                 Big
+  Mahjong M                 Small
+  Up                        Stop 1
+  Down                      Stop 2
+  Left                      Stop 3
+  Right                     Stop 4
+  Button 1      Show Odds   Big         Double Up (twice winnings)
+  Button 2      Bet                     Double Up (winnings)
+  Button 3                  Small       Double Up (half winnings)
 
 ************************************************************************************************************/
 
@@ -3935,17 +3953,17 @@ static INPUT_PORTS_START( tarzan )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT )          PORT_CONDITION("DSW3", 0x20, EQUALS, 0x00)  // 洗分
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE1 )               PORT_NAME("Show Credits")                   // 清除      (hold to show credits/bets/wins when hidden)
 	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNKNOWN )                PORT_CONDITION("DSW3", 0x01, EQUALS, 0x01)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON2 )                PORT_CONDITION("DSW3", 0x01, EQUALS, 0x00)  // B
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON3 )                PORT_CONDITION("DSW3", 0x01, EQUALS, 0x00)  // C
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_GAMBLE_BET )             PORT_CONDITION("DSW3", 0x01, EQUALS, 0x00)  PORT_NAME("Button B / Bet / Double Up")                      // B
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_GAMBLE_LOW )             PORT_CONDITION("DSW3", 0x01, EQUALS, 0x00)  PORT_NAME("Button C / Small / Double Up (half)")             // C
 
 	PORT_START("MATRIX")
 	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_CUSTOM )                PORT_CONDITION("DSW3", 0x01, EQUALS, 0x01) PORT_CUSTOM_MEMBER(NAME((&igs017_state::keys_ipt_r<ioport_value, 3>)))
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )                 PORT_CONDITION("DSW3", 0x01, EQUALS, 0x00)  // 开始
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )            PORT_CONDITION("DSW3", 0x01, EQUALS, 0x00)  // 上
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )          PORT_CONDITION("DSW3", 0x01, EQUALS, 0x00)  // 下
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )          PORT_CONDITION("DSW3", 0x01, EQUALS, 0x00)  // 左
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT )         PORT_CONDITION("DSW3", 0x01, EQUALS, 0x00)  // 右
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 )                PORT_CONDITION("DSW3", 0x01, EQUALS, 0x00)  // A
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )                 PORT_CONDITION("DSW3", 0x01, EQUALS, 0x00)  PORT_NAME("Start / Stop All")                                // 开始
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SLOT_STOP1 )             PORT_CONDITION("DSW3", 0x01, EQUALS, 0x00)  PORT_NAME("Up / Stop 1")                                     // 上
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SLOT_STOP2 )             PORT_CONDITION("DSW3", 0x01, EQUALS, 0x00)  PORT_NAME("Down / Stop 2")                                   // 下
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SLOT_STOP3 )             PORT_CONDITION("DSW3", 0x01, EQUALS, 0x00)  PORT_NAME("Left / Stop 3")                                   // 左
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SLOT_STOP4 )             PORT_CONDITION("DSW3", 0x01, EQUALS, 0x00)  PORT_NAME("Right / Stop 4")                                  // 右
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_GAMBLE_HIGH )            PORT_CONDITION("DSW3", 0x01, EQUALS, 0x00)  PORT_NAME("Button A / Big / Double Up (double) / Show Odds") // A
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )                PORT_CONDITION("DSW3", 0x01, EQUALS, 0x00)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )                PORT_CONDITION("DSW3", 0x01, EQUALS, 0x00)
 
