@@ -37,6 +37,7 @@ public:
 
 	void io_map(address_map &map) ATTR_COLD;
 	void program_map(address_map &map) ATTR_COLD;
+
 protected:
 	// device-level overrides
 	virtual void device_start() override ATTR_COLD;
@@ -105,9 +106,6 @@ private:
 
 	/* these are the current channel volumes in MAME form */
 	int m_mame_volumes[8];
-
-	/* update step */
-	//int m_update_step;
 
 	sound_stream *m_sound_stream_var;
 };

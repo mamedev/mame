@@ -1467,18 +1467,6 @@ if (SOUNDS["MM5837"]~=null) then
 end
 
 ---------------------------------------------------
--- Intelligent Designs DAVE
---@src/devices/sound/dave.h,SOUNDS["DAVE"] = true
----------------------------------------------------
-
-if (SOUNDS["DAVE"]~=null) then
-	files {
-		MAME_DIR .. "src/devices/sound/dave.cpp",
-		MAME_DIR .. "src/devices/sound/dave.h",
-	}
-end
-
----------------------------------------------------
 -- Toshiba TA7630
 --@src/devices/sound/ta7630.h,SOUNDS["TA7630"] = true
 ---------------------------------------------------
