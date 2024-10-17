@@ -5,14 +5,18 @@
  Driver by XingXing
 
  These games use the IGS027A processor.  This is an ARM7 with internal
- ROM (also used on later PGM games).
+ ROM (also used on later PGM games). The IGS027A is usually covered by
+ a holographic sticker with an alphanumerical code. It has been
+ confirmed that it doesn't correspond to a specific internal ROM (i.e.
+ two B6-stickered IGS027As have been found to contain different internal
+ ROM, while 3 differently stickered IGS027As have been found to contain
+ the same internal ROM).
 
  In some cases the first part of the internal ROM is execute only, and
- cannot be read out with a trojan.  It hasn't been confirmed if these
- games make use of that feature.
+ cannot be read out with a trojan. No games in this driver make use of
+ this feature.
 
- To emulate these games the internal ROM will need dumping.
- There are at least 20 other games on this and similar platforms.
+ There are several more games on this and similar platforms.
 
  Hold service on boot to access input test and sound test when
  implemented.
@@ -2786,8 +2790,7 @@ ROM_END
 ROM_START( cjddz ) // PCB-0489-05-FM-1
 	ROM_REGION( 0x04000, "maincpu", 0 )
 	// Internal ROM of IGS027A ARM based MCU
-	 // stickered B6 but doesn't work with other B6 dumps. Using the dump for cjddz215cn which works, waiting for trojan
-	ROM_LOAD( "cjddz_igs027a", 0x00000, 0x4000, BAD_DUMP CRC(124f4bee) SHA1(bf9785516ef36290c2a7bac307bb2d849f2045ae) )
+	ROM_LOAD( "b6_igs027a", 0x00000, 0x4000, CRC(124f4bee) SHA1(bf9785516ef36290c2a7bac307bb2d849f2045ae) )
 
 	ROM_REGION32_LE( 0x80000, "user1", 0 ) // external ARM data / prg
 	ROM_LOAD( "p1.u17", 0x000000, 0x80000, CRC(81bc6ff6) SHA1(ca07b9becf6dd8724be339d8eee29c908dc10422) )
@@ -2807,8 +2810,7 @@ ROM_END
 ROM_START( cjddz217cn ) // PCB-0489-05-FM-1
 	ROM_REGION( 0x04000, "maincpu", 0 )
 	// Internal ROM of IGS027A ARM based MCU
-	 // stickered s12. Using the dump for cjddz215cn which works, waiting for trojan
-	ROM_LOAD( "cjddz217cn_igs027a", 0x00000, 0x4000, BAD_DUMP CRC(124f4bee) SHA1(bf9785516ef36290c2a7bac307bb2d849f2045ae) )
+	ROM_LOAD( "s12_igs027a", 0x00000, 0x4000, CRC(124f4bee) SHA1(bf9785516ef36290c2a7bac307bb2d849f2045ae) )
 
 	ROM_REGION32_LE( 0x80000, "user1", 0 ) // external ARM data / prg
 	ROM_LOAD( "v-217cn.u17", 0x000000, 0x80000, CRC(42df949c) SHA1(262237d8219d41b04a99156289858fc63f9614dd) )
@@ -2930,8 +2932,7 @@ ROM_END
 ROM_START( lhzb4dhb ) // Only 2 DIP switch banks are populated.
 	ROM_REGION( 0x04000, "maincpu", 0 )
 	// Internal ROM of IGS027A ARM based MCU
-	// stickered F12. Using the dump for lhzb4104cn which works, waiting for trojan
-	ROM_LOAD( "f12_igs027a", 0x00000, 0x4000, CRC(de12c918) SHA1(87c1cf92a95565d78c6fe7629c19729f5fb5c2a5) ) // F12
+	ROM_LOAD( "f12_igs027a", 0x00000, 0x4000, CRC(de12c918) SHA1(87c1cf92a95565d78c6fe7629c19729f5fb5c2a5) )
 
 	ROM_REGION32_LE( 0x200000, "user1", 0 ) // external ARM data / prg
 	ROM_LOAD( "v-203cn.u46", 0x000000, 0x200000, CRC(96d0cb19) SHA1(e5a450a9767327f5ceb0611400fe40b3582c0e8d) )
@@ -3227,7 +3228,7 @@ GAME(  2004, lhzb4,         0,        lhzb4,        lhzb4,         igs_m027_stat
 GAME(  2004, lhzb4dhb,      0,        lhzb4,        lhzb4,         igs_m027_state, init_lhzb4,    ROT0, "IGS", "Long Hu Zhengba 4 Dui Hua Ban (V203CN)", 0 )
 GAME(  1999, lthyp,         0,        lthyp,        lthyp,         igs_m027_state, init_lthyp,    ROT0, "IGS", "Long Teng Hu Yao Duizhan Jiaqiang Ban (S104CN)", MACHINE_NODEVICE_LAN )
 GAME(  2000, zhongguo,      0,        zhongguo,     zhongguo,      igs_m027_state, init_zhongguo, ROT0, "IGS", "Zhongguo Chu Da D (V102C)", 0 )
-GAMEL( 200?, jking02,       0,        jking02,      jking02,       igs_m027_state, init_jking02,  ROT0, "IGS", "Jungle King 2002 (V209US)", MACHINE_NODEVICE_LAN, layout_jking02 ) // shows V212US in bookkeeping menu
+GAMEL( 2001, jking02,       0,        jking02,      jking02,       igs_m027_state, init_jking02,  ROT0, "IGS", "Jungle King 2002 (V209US)", MACHINE_NODEVICE_LAN, layout_jking02 ) // shows V212US in bookkeeping menu
 GAME(  2003, mgzz,          0,        mgzz,         mgzz101cn,     igs_m027_state, init_mgzz,     ROT0, "IGS", "Manguan Zhizun (V101CN)", 0 )
 GAME(  2003, mgzz100cn,     mgzz,     mgzz,         mgzz100cn,     igs_m027_state, init_mgzz,     ROT0, "IGS", "Manguan Zhizun (V100CN)", 0 )
 GAME(  2007, mgcs3,         0,        lhzb4,        mgcs3,         igs_m027_state, init_mgcs3,    ROT0, "IGS", "Manguan Caishen 3 (V101CN)", 0 )
@@ -3235,11 +3236,11 @@ GAMEL( 1999, oceanpar,      0,        oceanpar,     oceanpar105us, igs_m027_stat
 GAMEL( 1999, oceanpar101us, oceanpar, oceanpar,     oceanpar101us, igs_m027_state, init_oceanpar, ROT0, "IGS", "Ocean Paradise (V101US)", 0, layout_oceanpar ) // 1999 copyright in ROM
 GAMEL( 1999, fruitpar,      0,        oceanpar,     oceanpar105us, igs_m027_state, init_fruitpar, ROT0, "IGS", "Fruit Paradise (V214US)", 0, layout_oceanpar )
 GAMEL( 1999, fruitpar206us, fruitpar, oceanpar,     fruitpar206us, igs_m027_state, init_fruitpar, ROT0, "IGS", "Fruit Paradise (V206US)", 0, layout_oceanpar )
-GAME(  200?, cjddz,         0,        cjddz,        cjddz,         igs_m027_state, init_cjddz,    ROT0, "IGS", "Chaoji Dou Dizhu (V219CN)", 0 )
-GAME(  200?, cjddz217cn,    cjddz,    cjddz,        cjddz,         igs_m027_state, init_cjddz,    ROT0, "IGS", "Chaoji Dou Dizhu (V217CN)", 0 )
-GAME(  200?, cjddz215cn,    cjddz,    cjddz,        cjddz,         igs_m027_state, init_cjddz,    ROT0, "IGS", "Chaoji Dou Dizhu (V215CN)", 0 )
-GAME(  200?, cjddzp,        0,        cjddz,        cjddzp,        igs_m027_state, init_cjddzp,   ROT0, "IGS", "Chaoji Dou Dizhu Jiaqiang Ban (S300CN)", MACHINE_NODEVICE_LAN )
-GAME(  200?, cjddzlf,       0,        cjddz,        cjddz,         igs_m027_state, init_cjddzlf,  ROT0, "IGS", "Chaoji Dou Dizhu Liang Fu Pai (V109CN)", 0 )
+GAME(  2004, cjddz,         0,        cjddz,        cjddz,         igs_m027_state, init_cjddz,    ROT0, "IGS", "Chaoji Dou Dizhu (V219CN)", 0 ) // 2004 date in internal ROM
+GAME(  2004, cjddz217cn,    cjddz,    cjddz,        cjddz,         igs_m027_state, init_cjddz,    ROT0, "IGS", "Chaoji Dou Dizhu (V217CN)", 0 ) // 2004 date in internal ROM
+GAME(  2004, cjddz215cn,    cjddz,    cjddz,        cjddz,         igs_m027_state, init_cjddz,    ROT0, "IGS", "Chaoji Dou Dizhu (V215CN)", 0 ) // 2004 date in internal ROM
+GAME(  2004, cjddzp,        0,        cjddz,        cjddzp,        igs_m027_state, init_cjddzp,   ROT0, "IGS", "Chaoji Dou Dizhu Jiaqiang Ban (S300CN)", MACHINE_NODEVICE_LAN ) // 2004 date in internal ROM
+GAME(  2005, cjddzlf,       0,        cjddz,        cjddz,         igs_m027_state, init_cjddzlf,  ROT0, "IGS", "Chaoji Dou Dizhu Liang Fu Pai (V109CN)", 0 ) // 2005 date in internal ROM
 GAME(  2005, cjtljp,        0,        cjtljp,       lhzb4,         igs_m027_state, init_cjtljp,   ROT0, "IGS", "Chaoji Tuolaji Jiaqiang Ban (V206CN)", 0 ) // 2005 date in internal ROM
 GAMEL( 2007, tripslot,      0,        tripslot,     tripslot,      igs_m027_state, init_tripslot, ROT0, "IGS", "Triple Slot (V200VE)", 0, layout_tripslot ) // 2007 date in internal ROM at least, could be later, default settings password is all 'start 1'
 // this has a 2nd 8255

@@ -179,7 +179,7 @@ const uint32_t igs036_decryptor::triggers[16][2] = {
 // * There are quite a number of functionally equivalent ways to implement
 //   those boolean functions, so the given implementation (by multiplexing
 //   over some simple functions) shouldn't be taken too seriously: while it's
-//   functionally correct, it doesn't neccesarily represent the way the hardware
+//   functionally correct, it doesn't necessarily represent the way the hardware
 //   is calculating them.
 
 static int unknown(int address) { return 0; }
