@@ -928,7 +928,8 @@ void xavix_state::spritefragment_dma_trg_w(uint8_t data)
 
 	if (unk)
 	{
-		fatalerror("m_spritefragment_dmaparam2[1] != 0x00 (is %02x)\n", m_spritefragment_dmaparam2[1]);
+		// tak_chq triggers this, but probably due to bad xavix2000 opcodes, as many things look invalid
+		logerror("m_spritefragment_dmaparam2[1] != 0x00 (is %02x)\n", m_spritefragment_dmaparam2[1]);
 	}
 
 	if (len == 0x00)

@@ -45914,17 +45914,19 @@ domfitad                        //
 dombikec                        //
 
 @source:tvgames/xavix_2000.cpp
+ban_onep                        //
+drgqst                          //
 duelmast                        //
-epo_ebox                        //
 epo_bowl                        //
+epo_ebox                        //
+epo_mini                        //
 epo_sdb                         //
+tak_chq                         //
 tom_dpgm                        //
-ttv_sw                          //
-ttv_swj                         //
 ttv_lotr                        //
 ttv_mx                          //
-drgqst                          //
-ban_onep                        //
+ttv_sw                          //
+ttv_swj                         //
 
 @source:tvgames/xavix_2002.cpp
 domdance                        //
