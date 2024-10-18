@@ -1376,9 +1376,19 @@ void upd7220_device::process_fifo()
 		break;
 
 	case COMMAND_PITCH: /* pitch specification */
-		if (flag == FIFO_PARAMETER)
+		// pc9801:burai writes a spurious extra value during intro, effectively ignored
+		// (only first value matters)
+		if (flag == FIFO_PARAMETER && m_param_ptr == 2)
 		{
 			m_pitch = (m_pitch & 0x100) | data;
+
+			if (m_pitch < 2)
+			{
+				// TODO: a pitch of zero will lead to a MAME crash in draw_graphics_line
+				// Coerce a fail-safe minimum, what should really happen is to be verified ...
+				popmessage("%s pitch == 0!", this->tag());
+				m_pitch = 2;
+			}
 
 			LOG("uPD7220 PITCH: %u\n", m_pitch);
 		}
