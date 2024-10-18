@@ -27,7 +27,6 @@ Main components for the PCB-0457-03-GS are:
 #include "machine/nvram.h"
 #include "machine/ticket.h"
 #include "machine/timer.h"
-
 #include "sound/ics2115.h"
 
 #include "emupal.h"
@@ -110,7 +109,6 @@ private:
 
 	TIMER_DEVICE_CALLBACK_MEMBER(interrupt);
 
-	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	u16 sprites_r(offs_t offset);
 	void screen_vblank(int state);
 
@@ -148,17 +146,12 @@ void igs_m027_023vid_state::machine_reset()
 }
 
 
-u32 igs_m027_023vid_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
-{
-	return m_video->screen_update(screen, bitmap, cliprect);
-}
-
 void igs_m027_023vid_state::screen_vblank(int state)
 {
 	// rising edge
 	if (state)
 	{
-		/* first 0xa00 of main ram = sprites, seems to be buffered, DMA? */
+		// first 0xa00 of main ram = sprites, seems to be buffered, DMA?
 		m_video->get_sprites();
 	}
 }
@@ -344,7 +337,7 @@ void igs_m027_023vid_state::gpio_out_w(u8 data)
 
 TIMER_DEVICE_CALLBACK_MEMBER(igs_m027_023vid_state::interrupt)
 {
-	int scanline = param;
+	int const scanline = param;
 
 	switch (scanline)
 	{
@@ -365,7 +358,7 @@ u16 igs_m027_023vid_state::sprites_r(offs_t offset)
 	// it is also copied to a secondary RAM area, which seems to be our datasource in this case
 
 	address_space &mem = m_maincpu->space(AS_PROGRAM);
-	u16 sprdata = mem.read_word(0x28000000 + offset * 2);
+	u16 const sprdata = mem.read_word(0x28000000 + offset * 2);
 	return sprdata;
 }
 
@@ -404,7 +397,7 @@ void igs_m027_023vid_state::m027_023vid(machine_config &config)
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(1000));
 	m_screen->set_size(512, 256);
 	m_screen->set_visarea(0, 448-1, 0, 224-1);
-	m_screen->set_screen_update(FUNC(igs_m027_023vid_state::screen_update));
+	m_screen->set_screen_update(m_video, FUNC(igs023_video_device::screen_update));
 	m_screen->set_palette(m_palette);
 	m_screen->screen_vblank().set(FUNC(igs_m027_023vid_state::screen_vblank));
 
