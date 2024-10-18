@@ -38,9 +38,46 @@
  Ron, Take Score, Big and Small, respectively (as shown on-screen), but
  there doesn't seem to be an alternate button to cancel all.
 
+ Most of the games with joystick controls show instructions after
+ coining up.  The controls are fairly consistent between games.
+
+ Mahjong joystick controls:
+ Left         select tile to draw/discard       选择要摸舍的牌
+ Right        select tile to draw/discard       选择要摸舍的牌
+ Up           select chi/pon/kan/reach/ron      选择吃碰杠听胡
+ Down         select chi/pon/kan/reach/ron      选择吃碰杠听胡
+ Start        start                             开始
+              take score                        得分键
+ Button 1     draw/discard                      摸/舍键
+              double up (×2)                    双续玩
+              big                               猜大
+ Button 2     bet                               押注键
+              double up (×1)                    续玩
+ Button 3     confirm (chi/pon/kan/reach/ron)   确认键(吃碰杠听胡)
+              double up (×½)                    半续玩
+              small                             猜小
+
+ Dou Dizhu joystick controls:
+ Left         choose card
+ Right        choose card
+ Start        start                             开始
+              play cards
+              take score                        得分
+ Button 1     select/deselect card
+              double up (×2)                    双续玩
+              confirm                           确定
+              big                               猜大
+ Button 2     bet
+              bid 1                             一倍
+              deselect all
+              double up (×1)                    续玩
+ Button 3     pass
+              double up (×½)                    半续玩
+              small                             猜小
+              cancel                            放弃
+
  TODO:
  * I/O for remaining games
- * Coin lockout (zhongguo displays a coin error on unexpected coins)
 */
 
 #include "emu.h"
