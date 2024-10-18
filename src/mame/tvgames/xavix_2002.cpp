@@ -557,6 +557,22 @@ ROM_START( suprtvpchk )
 	ROM_CONTINUE(0x000000, 0x200000)
 	ROM_CONTINUE(0x600000, 0x200000)
 	ROM_CONTINUE(0x400000, 0x200000)
+
+	// The area at 0x400000 in the ROM is 0xff filled, probably the system maps RAM, not ROM here as there are also writes.
+	// Replacing it with 0x00 as a hack allows the machine to get to the 'desktop' but in reality some of the memory bypass
+	// speedups will need removing and RAM mapping
+	ROM_FILL(0x600000, 0x80000,0x00)
+ROM_END
+
+ROM_START( suprtvpcdo )
+	ROM_REGION(0x800000, "bios", ROMREGION_ERASE00) // inverted line?
+	ROM_LOAD("supertvpc_doreamon.u4", 0x200000, 0x200000, CRC(8e7039dc) SHA1(44ffecc8195614e56c289a028c2140c24ad74171) )
+	ROM_CONTINUE(0x000000, 0x200000)
+	ROM_CONTINUE(0x600000, 0x200000)
+	ROM_CONTINUE(0x400000, 0x200000)
+
+	// see note in suprtvpchk set
+	ROM_FILL(0x600000, 0x80000,0x00)
 ROM_END
 
 
@@ -608,6 +624,6 @@ CONS( 2008, udance,   0, 0, xavix2002, xavix, xavix_state, init_xavix, "Tiger / 
 // this one (pet themed) boots to the desktop (as do the 'hamtaro' 'eccjr' cartridges)
 CONS( 2004, suprtvpc,    0,        0, xavix2002_super_tv_pc,    xavix,      xavix2002_super_tv_pc_state, init_xavix, "Epoch / SSD Company LTD", "Super TV-PC", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 // hangs after 'loading' sequence
-CONS( 200?, suprtvpchk,  suprtvpc, 0, xavix2002_super_tv_pc,    xavix,      xavix2002_super_tv_pc_state, init_xavix, "Epoch / SSD Company LTD", "Super TV-PC - Hello Kitty", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-// A Doraemon themed Super TV PC units also exist, likely with different internal ROM
+CONS( 2006, suprtvpchk,  suprtvpc, 0, xavix2002_super_tv_pc,    xavix,      xavix2002_super_tv_pc_state, init_xavix, "Epoch / SSD Company LTD", "Super TV-PC - Hello Kitty", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+CONS( 2006, suprtvpcdo,  suprtvpc, 0, xavix2002_super_tv_pc,    xavix,      xavix2002_super_tv_pc_state, init_xavix, "Epoch / SSD Company LTD", "Super TV-PC - Doraemon", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 

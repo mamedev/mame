@@ -229,7 +229,7 @@ void st22xx_bbl338_state::st22xx_dphh8213_map(address_map &map)
 void st22xx_bbl338_state::st22xx_bbl338_map(address_map &map)
 {
 	//map(0x0000000, 0x0003fff).rom().region("internal", 0); // not dumped, so ensure any accesses here are logged
-	map(0x1000000, 0x11fffff).rom().region("maincpu", 0);
+	map(0x1000000, 0x13fffff).rom().region("maincpu", 0);
 
 	map(0x0600000, 0x0600000).w(m_lcdc, FUNC(bl_handhelds_lcdc_device::lcdc_command_w));
 	map(0x0604000, 0x0604000).rw(m_lcdc, FUNC(bl_handhelds_lcdc_device::lcdc_data_r), FUNC(bl_handhelds_lcdc_device::lcdc_data_w));
@@ -368,23 +368,24 @@ ROM_START( bbl338 )
 	ROM_REGION( 0x4000, "internal", ROMREGION_ERASEFF )
 	ROM_LOAD( "internal.rom", 0x000000, 0x4000, NO_DUMP ) // unsure of exact size for this model
 
-	ROM_REGION( 0x200000, "maincpu", 0 )
+	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD( "en29lv160ab.u1", 0x000000, 0x200000, CRC(2c73e16c) SHA1(e2c69b3534e32ef384c0c2f5618118a419326e3a) )
+ROM_END
+
+ROM_START( class200 )
+	ROM_REGION( 0x4000, "internal", ROMREGION_ERASEFF )
+	ROM_LOAD( "internal.rom", 0x000000, 0x4000, NO_DUMP ) // unsure of exact size for this model
+
+	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD( "m29w320eb.bin", 0x000000, 0x400000, CRC(3067b5f6) SHA1(9a159b16898054a74cfb32b5c597b505132f004e) )
 ROM_END
 
 ROM_START( dphh8213 )
 	// internal area not used
 
-	ROM_REGION( 0x200000, "maincpu", 0 )
+	ROM_REGION( 0x200000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD( "mx29lv160cb.u1", 0x000000, 0x200000, CRC(c8e7e355) SHA1(726f28c2c9ab012a6842f9f30a0a71538741ba14) )
 	ROM_FILL( 0x00009f, 2, 0xea ) // NOP out SPI check
-ROM_END
-
-ROM_START( class200 )
-	// uncertain if internal area is used
-
-	ROM_REGION( 0x400000, "maincpu", 0 )
-	ROM_LOAD( "m29w320eb.bin", 0x000000, 0x400000, CRC(3067b5f6) SHA1(9a159b16898054a74cfb32b5c597b505132f004e) )
 ROM_END
 
 } // anonymous namespace
@@ -393,7 +394,7 @@ ROM_END
 // this is uses a higher resolution display than the common units, but not as high as the SunPlus based ones
 COMP( 201?, bbl338,   0,      0,      st22xx_bbl338, dphh8213, st22xx_bbl338_sim_state, empty_init, "BaoBaoLong", "Portable Game Player BBL-338 (BaoBaoLong, 48-in-1)", MACHINE_IS_SKELETON )
 // also appears to be the higher resolution display
-COMP( 201?, class200, 0,      0,      st22xx_dphh8213, dphh8213, st22xx_bbl338_state, empty_init, "<unknown>", "Color LCD Classic Game 200-in-1", MACHINE_IS_SKELETON ) // no manufacturer name or product code anywhere
+COMP( 201?, class200, 0,      0,      st22xx_bbl338, dphh8213, st22xx_bbl338_sim_state, empty_init, "<unknown>", "Color LCD Classic Game 200-in-1", MACHINE_IS_SKELETON ) // no manufacturer name or product code anywhere
 
 // Language controlled by port bit, set at factory, low resolution
 COMP( 201?, dphh8213, 0,      0,      st22xx_dphh8213, dphh8213, st22xx_bbl338_state, empty_init, "<unknown>", "Digital Pocket Hand Held System 20-in-1 - Model 8213", MACHINE_IS_SKELETON )

@@ -212,6 +212,8 @@ protected:
 	required_device<address_map_bank_device> m_lowbus;
 	address_space* m_cpuspace = nullptr;
 
+	bool m_disable_timer_irq_hack = false; // hack for epo_mini which floods timer IRQs to the point it won't do anything else
+
 private:
 
 	// screen updates
@@ -647,6 +649,10 @@ public:
 	{ }
 
 	int camera_r();
+
+	void init_epo_mini();
+
+	u8 unknown_rnd_r() { return machine().rand(); }
 
 protected:
 	//virtual void write_io1(uint8_t data, uint8_t direction) override;
