@@ -50309,6 +50309,7 @@ Fails booting with normal display dip setting "Illegal function call 1830" in BA
 		<publisher>サムシンググッド (Something Good)</publisher>
 		<notes><![CDATA[
 unsupported .fix format
+jumps into weeds when converted to d88
 ]]></notes>
 		<info name="alt_title" value="ＡＩ囲碁３" />
 		<info name="release" value="19901101" />
@@ -50570,22 +50571,18 @@ Hangs at Cross Media Soft logo, triggers [FDC] XTMASK irq
 		<description>Beast Lord II</description>
 		<year>1992</year>
 		<publisher>ホビージャパン (Hobby Japan)</publisher>
-		<notes><![CDATA[
-unsupported .fix format
-May require 3.5" floppy drive
-]]></notes>
 		<info name="alt_title" value="ビーストロード２" />
 		<info name="release" value="19921217" />
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Program"/>
-			<dataarea name="flop" size="1439334">
-				<rom name="beast lord 2_pgm.fix" size="1439334" crc="43ef19d5" sha1="33888c263fa5b1c71bd4ef4752b3ef4629e546b9" offset="0" />
+			<dataarea name="flop" size="1281968">
+				<rom name="beast lord 2_pgm.d88" size="1281968" crc="19479e34" sha1="5e367822c5564f27938e3b4c1a0dc85c2cae89ca" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="Data"/>
-			<dataarea name="flop" size="1439334">
-				<rom name="beast lord 2_data.fix" size="1439334" crc="093bc144" sha1="f6b83f627f9b0b2ca366aaf677f494f939e1866c" offset="0" />
+			<dataarea name="flop" size="1281968">
+				<rom name="beast lord 2_data.d88" size="1281968" crc="9a4b0c7d" sha1="f6b83f627f9b0b2ca366aaf677f494f939e1866c" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -51893,27 +51890,24 @@ Has non working optional RS-MIDI thru SQS -S CLI switch (will hang game if used)
 		<description>The Golem Master</description>
 		<year>1993</year>
 		<publisher>シュールド・ウェーブ (Sur De Wave)</publisher>
-		<notes><![CDATA[
-unsupported .fix format
-]]></notes>
 		<info name="alt_title" value="ゴーレムマスター" />
 		<info name="release" value="19930521" />
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 0"/>
-			<dataarea name="flop" size="1439334">
-				<rom name="gm_0.fix" size="1439334" crc="448e2737" sha1="5465749985990be5c66e53e520f65631bcc42015" offset="0" />
+			<dataarea name="flop" size="1281968">
+				<rom name="gm_0.d88" size="1281968" crc="757aec0c" sha1="0789be0d7b9248df438436c0f3187582f7865d4d" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 1"/>
-			<dataarea name="flop" size="1439334">
-				<rom name="gm_1.fix" size="1439334" crc="a193c759" sha1="7674b3e4b69d90ca67f3dea841f7d3d60f29dfcf" offset="0" />
+			<dataarea name="flop" size="1281968">
+				<rom name="gm_1.d88" size="1281968" crc="1711bae0" sha1="b301cdb3eefb404508e9306ee9e24e586dc409d0" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 2"/>
-			<dataarea name="flop" size="1439334">
-				<rom name="gm_2.fix" size="1439334" crc="eb8680ac" sha1="0f0d48c16a13aaf02dfa455b3d5fab8fbf089cfa" offset="0" />
+			<dataarea name="flop" size="1281968">
+				<rom name="gm_2.d88" size="1281968" crc="ef1e5bbd" sha1="4228632090a1b8e016d7372b6673bd29cda9a684" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -52197,21 +52191,18 @@ Black screen, wants [FDC] XTMASK irq
 		<description>Hyper Mahjong Mangan Zenseki</description>
 		<year>1993</year>
 		<publisher>河合楽器制作所 (Kawai Gakki Seisakushou)</publisher>
-		<notes><![CDATA[
-unsupported .fix format
-]]></notes>
 		<info name="alt_title" value="ハイパー麻雀 満貫全席" />
 		<info name="release" value="19931101" />
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 1"/>
-			<dataarea name="flop" size="1439334">
-				<rom name="hmmz_1.fix" size="1439334" crc="9752a028" sha1="28ec1fd327038a3b1da23c8483de04b986c29924" offset="0" />
+			<dataarea name="flop" size="1281968">
+				<rom name="hmmz_1.d88" size="1281968" crc="e7f9166d" sha1="f163f7b197baa5c333356ceb427abaef15fb33e8" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 2"/>
-			<dataarea name="flop" size="1439334">
-				<rom name="hmmz_2.fix" size="1439334" crc="d7a9c284" sha1="35d835b5ca375e3b1619ffb07f2c90db919f3ff2" offset="0" />
+			<dataarea name="flop" size="1281968">
+				<rom name="hmmz_2.d88" size="1281968" crc="38dd9a97" sha1="3b4e7025128de6289df59b116cb687f5fdd916b8" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -52322,21 +52313,18 @@ unsupported .fix format
 		<description>J. League Hyper Soccer - Wave no Arashi</description>
 		<year>1993</year>
 		<publisher>C^2 World</publisher>
-		<notes><![CDATA[
-unsupported .fix format
-]]></notes>
 		<info name="alt_title" value="Ｊリーグハイパーサッカー ウェーブの嵐" />
 		<info name="release" value="19930605" />
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 1"/>
-			<dataarea name="flop" size="1439334">
-				<rom name="wave_a1.fix" size="1439334" crc="aa7b5cbf" sha1="f5e37ef32829fa314546008dd3c72958785dcf85" offset="0" />
+			<dataarea name="flop" size="1281968">
+				<rom name="wave_a1.d88" size="1281968" crc="18186fc1" sha1="be648afb43d4aa04d2d435cc553e2aa3160f88ae" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 2"/>
-			<dataarea name="flop" size="1439334">
-				<rom name="wave_a2.fix" size="1439334" crc="4194d97f" sha1="da1610764f38b784780df98ad4ff46593f3a610a" offset="0" />
+			<dataarea name="flop" size="1281968">
+				<rom name="wave_a2.d88" size="1281968" crc="024d139c" sha1="c78588946dbe4c3e569023f65ed1d6b48a97fda7" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -54100,22 +54088,18 @@ Black screen, wants 2DD dip ON?
 		<description>Nihon Juudan Cessna Flight</description>
 		<year>1988</year>
 		<publisher>コムパック (Compac)</publisher>
-		<notes><![CDATA[
-unsupported .fix format
-May require 3.5" floppy drive
-]]></notes>
 		<info name="alt_title" value="日本縦断セスナ・フライト" />
 		<info name="release" value="198806xx" />
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk A"/>
-			<dataarea name="flop" size="1439334">
-				<rom name="disk_a.fix" size="1439334" crc="4a6f0b7f" sha1="5f2fd47ab015b3320b504a0e5af98972a2f748a8" offset="0" />
+			<dataarea name="flop" size="1281968">
+				<rom name="disk_a.d88" size="1281968" crc="71d15a79" sha1="07b919fb53bf822f5b28242410a651de01f89fc5" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="Disk B"/>
-			<dataarea name="flop" size="1439334">
-				<rom name="disk_b.fix" size="1439334" crc="24be51bb" sha1="ac9ae6a83b63dc195368c3b3b1608bd34bc63626" offset="0" />
+			<dataarea name="flop" size="1281968">
+				<rom name="disk_b.d88" size="1281968" crc="d8fd0be3" sha1="577dff7a924267ebbb9d1a7919f11b370d70df69" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -54155,13 +54139,10 @@ May require 3.5" floppy drive
 		<description>Okuman Chouja</description>
 		<year>1988</year>
 		<publisher>コスモス・コンピュータ (Cosmos Computer)</publisher>
-		<notes><![CDATA[
-unsupported .fix format
-]]></notes>
 		<info name="alt_title" value="億万長者" />
 		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="1382414">
-				<rom name="okuman chouja.fix" size="1382414" crc="d3cf1e37" sha1="1946743facfd608454395d718c7b524e041e7ec7" offset="0" />
+			<dataarea name="flop" size="1086448">
+				<rom name="okuman chouja.d88" size="1086448" crc="5fa35ee5" sha1="4623c684f8424397b91446ed383d0a270e73362d" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -55336,18 +55317,21 @@ unsupported .fix format
 		<description>Slip Stream '92</description>
 		<year>1992</year>
 		<publisher>ビットタウン (Bit Town)</publisher>
+		<notes><![CDATA[
+hand repaired copy protection, looks for deleted sector -8 and -9 on track 76
+]]></notes>
 		<info name="alt_title" value="スリップストリーム＇９２" />
 		<info name="release" value="19920812" />
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="System"/>
-			<dataarea name="flop" size="1430562">
-				<rom name="slip92_s.fix" size="1430562" crc="4e5c9505" sha1="c5b22b622a774b431a85d0af2a87a8fd8992c8b2" offset="0" />
+			<dataarea name="flop" size="1281968">
+				<rom name="slip92_s.d88" size="1281968" crc="edd68693" sha1="06d4b8c2e6d704791e2189719d4ffc744b4483a5" offset="0" status="baddump" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="Data"/>
-			<dataarea name="flop" size="1430562">
-				<rom name="slip92_d.fix" size="1430562" crc="2a913a46" sha1="e8a69d31660ea8c809ff023952783a070c8f10e8" offset="0" />
+			<dataarea name="flop" size="1281968">
+				<rom name="slip92_d.d88" size="1281968" crc="525a497a" sha1="6ca88041b4f498727257cf62a0c2c04ebf855f64" offset="0" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -55434,13 +55418,13 @@ unsupported .fix format
 		<year>1988</year>
 		<publisher>ゲームアーツ (Game Arts)</publisher>
 		<notes><![CDATA[
-unsupported .fix format
+doesn't boot on 386+ machines due to use of illegal lock mov insn
 ]]></notes>
 		<info name="alt_title" value="ソリティアロイヤル" />
 		<info name="release" value="19880624" />
 		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="1431634">
-				<rom name="solitaire royale.fix" size="1431634" crc="f2d16ece" sha1="90f280ed868d7d084983c58b9c31be853dfae4ea" offset="0" />
+			<dataarea name="flop" size="1220368">
+				<rom name="solitaire royale.d88" size="1220368" crc="f1c99758" sha1="90f280ed868d7d084983c58b9c31be853dfae4ea" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -55530,21 +55514,18 @@ unsupported .fix format
 		<description>Star Command</description>
 		<year>1989</year>
 		<publisher>ヒューリンクス (Hulinks)</publisher>
-		<notes><![CDATA[
-unsupported .fix format
-]]></notes>
 		<info name="alt_title" value="スターコマンド" />
 		<info name="release" value="19890420" />
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk A"/>
-			<dataarea name="flop" size="1439334">
-				<rom name="star command_a.fix" size="1439334" crc="4a11fa54" sha1="fa947d4770d6be73aab2bbdc0dca9b1ed210f788" offset="0" />
+			<dataarea name="flop" size="1281968">
+				<rom name="star command_a.d88" size="1281968" crc="d969e391" sha1="91c4e5890037f708bb060e0efcd2bcf72e3c5b54" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="Disk B"/>
-			<dataarea name="flop" size="1439334">
-				<rom name="star command_b.fix" size="1439334" crc="b3c90894" sha1="dc5a5a0c38ea0589adc7482367e210d141b84e0a" offset="0" />
+			<dataarea name="flop" size="1281968">
+				<rom name="star command_b.d88" size="1281968" crc="e83dcab4" sha1="478bf4c2ca28b0c6c1727798c253fd864267da74" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -56111,6 +56092,7 @@ unsupported .fix format
 		<publisher>グレイト (Great)</publisher>
 		<notes><![CDATA[
 unsupported .fix format
+doesn't boot when converted to d88 (2DD)
 ]]></notes>
 		<info name="alt_title" value="バーミリオン" />
 		<part name="flop1" interface="floppy_5_25">
