@@ -206,7 +206,13 @@ uint8_t mpu401_device::asic_r(offs_t offset)
 {
 	if (offset == 0)
 	{
-		m_gatearrstat &= ~STAT_TX_FULL;
+		if (!machine().side_effects_disabled())
+		{
+			m_gatearrstat &= ~STAT_TX_FULL;
+			// pc98:gaialord expects an ACK byte at driver init time
+			// for the command (0xff) it sends.
+			m_mpudata = 0xfe;
+		}
 		return m_command;
 	}
 	else if (offset == 1)
