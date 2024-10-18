@@ -45844,6 +45844,7 @@ epo_epp                         //
 epo_epp2
 epo_epp3                        //
 epo_eppk                        //
+epo_epps                        //
 epo_esdx                        //
 epo_esht                        //
 epo_guru                        //
@@ -45920,6 +45921,7 @@ epo_bowl                        //
 epo_sdb                         //
 tom_dpgm                        //
 ttv_sw                          //
+ttv_swj                         //
 ttv_lotr                        //
 ttv_mx                          //
 drgqst                          //
@@ -45933,6 +45935,7 @@ domstepc                        //
 epo_tfit
 mrangbat
 suprtvpc
+suprtvpcdo
 suprtvpchk
 tmy_thom                        //
 udance

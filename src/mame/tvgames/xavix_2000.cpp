@@ -271,6 +271,12 @@ ROM_START( ttv_sw )
 	ROM_LOAD( "jedi.bin", 0x000000, 0x800000, CRC(51cae5fd) SHA1(1ed8d556f31b4182259ca8c766d60c824d8d9744) )
 ROM_END
 
+ROM_START( ttv_swj )
+	ROM_REGION( 0x800000, "bios", ROMREGION_ERASE00 )
+	ROM_LOAD( "lightsaber.bin", 0x000000, 0x800000, CRC(a5c22ed0) SHA1(406f0bccb01cd4a26fe4a5675d7ebecc78c58147) )
+ROM_END
+
+
 ROM_START( ttv_lotr )
 	ROM_REGION( 0x800000, "bios", ROMREGION_ERASE00 )
 	ROM_LOAD( "lotr.bin", 0x000000, 0x800000, CRC(a034ecd5) SHA1(264a9d4327af0a075841ad6129db67d82cf741f1) )
@@ -319,11 +325,12 @@ CONS( 2003, duelmast, 0, 0, xavix2000_i2c_24c04, duelmast,    xavix_duelmast_sta
 // スーパーダッシュボール
 CONS( 2004, epo_sdb,  0, 0, xavix2000_nv_sdb,    epo_sdb,     xavix_2000_nv_sdb_state, init_xavix, "Epoch / SSD Company LTD",       "Super Dash Ball (Japan)",  MACHINE_IMPERFECT_SOUND )
 
-CONS( 2005, ttv_sw,   0, 0, xavix2000_i2c_24c02, ttv_lotr,    xavix_i2c_lotr_state,    init_xavix, "Tiger / SSD Company LTD",       "Star Wars Saga Edition - Lightsaber Battle Game", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
-CONS( 2005, ttv_lotr, 0, 0, xavix2000_i2c_24c02, ttv_lotr,    xavix_i2c_lotr_state,    init_xavix, "Tiger / SSD Company LTD",       "Lord Of The Rings - Warrior of Middle-Earth", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
-CONS( 2005, ttv_mx,   0, 0, xavix2000_i2c_24c04, ttv_mx,      xavix_i2c_state,         init_xavix, "Tiger / SSD Company LTD",       "MX Dirt Rebel", MACHINE_IMPERFECT_SOUND )
+CONS( 2005, ttv_sw,   0,      0, xavix2000_i2c_24c02, ttv_lotr,    xavix_i2c_lotr_state,    init_xavix, "Tiger / SSD Company LTD",       "Star Wars Saga Edition - Lightsaber Battle Game", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+CONS( 2005, ttv_swj,  ttv_sw, 0, xavix2000_i2c_24c02, ttv_lotr,    xavix_i2c_lotr_state,    init_xavix, "Tomy / SSD Company LTD",        "Star Wars Saga Edition - Lightsaber Battle Game (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+CONS( 2005, ttv_lotr, 0,      0, xavix2000_i2c_24c02, ttv_lotr,    xavix_i2c_lotr_state,    init_xavix, "Tiger / SSD Company LTD",       "Lord Of The Rings - Warrior of Middle-Earth", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+CONS( 2005, ttv_mx,   0,      0, xavix2000_i2c_24c04, ttv_mx,      xavix_i2c_state,         init_xavix, "Tiger / SSD Company LTD",       "MX Dirt Rebel", MACHINE_IMPERFECT_SOUND )
 // 剣神ドラゴンクエスト 甦りし伝説の剣 
-CONS( 2003, drgqst,   0, 0, xavix2000_i2c_24c08, ttv_lotr,    xavix_i2c_lotr_state,    init_xavix, "Square Enix / SSD Company LTD", "Kenshin Dragon Quest: Yomigaerishi Densetsu no Ken", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+CONS( 2003, drgqst,   0,      0, xavix2000_i2c_24c08, ttv_lotr,    xavix_i2c_lotr_state,    init_xavix, "Square Enix / SSD Company LTD", "Kenshin Dragon Quest: Yomigaerishi Densetsu no Ken (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
 // hangs after starting a game, check why
 // Let’s！TV プレイ　体感格闘ワンピースパンチバトル 　～海賊王にキミがなる！～ 
