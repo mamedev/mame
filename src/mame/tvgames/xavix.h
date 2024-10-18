@@ -635,10 +635,6 @@ public:
 	void xavix2002_i2c_24c04(machine_config &config);
 	void xavix2002_i2c_mrangbat(machine_config& config);
 
-	void init_epo_mini();
-
-	u8 unknown_rnd_r() { return machine().rand(); }
-
 protected:
 	virtual void write_io1(uint8_t data, uint8_t direction) override;
 
@@ -653,6 +649,10 @@ public:
 	{ }
 
 	int camera_r();
+
+	void init_epo_mini();
+
+	u8 unknown_rnd_r() { return machine().rand(); }
 
 protected:
 	//virtual void write_io1(uint8_t data, uint8_t direction) override;

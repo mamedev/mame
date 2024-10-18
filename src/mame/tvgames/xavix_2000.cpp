@@ -111,13 +111,6 @@ static INPUT_PORTS_START( xavix_i2c )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("i2cmem", i2cmem_device, read_sda)
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( epo_mini )
-	PORT_INCLUDE(xavix)
-
-	PORT_MODIFY("IN1")
-	PORT_BIT( 0x06, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(xavix_i2c_state, unknown_rnd_r) // unknown, needed to boot
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("i2cmem", i2cmem_device, read_sda)
-INPUT_PORTS_END
 
 static INPUT_PORTS_START( epo_ebox )
 	PORT_INCLUDE(xavix)
@@ -194,6 +187,14 @@ static INPUT_PORTS_START( ttv_lotr )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("i2cmem", i2cmem_device, read_sda)
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( epo_mini )
+	PORT_INCLUDE(xavix)
+
+	PORT_MODIFY("IN1")
+	PORT_BIT( 0x06, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(xavix_i2c_lotr_state, unknown_rnd_r) // unknown, needed to boot
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("i2cmem", i2cmem_device, read_sda)
+INPUT_PORTS_END
+
 static INPUT_PORTS_START( ttv_mx )
 	PORT_INCLUDE(xavix_i2c)
 
@@ -257,11 +258,7 @@ void xavix_i2c_state::xavix2000_i2c_24c02(machine_config &config)
 	I2C_24C02(config, "i2cmem", 0);
 }
 
-void xavix_i2c_state::init_epo_mini()
-{
-	init_xavix();
-	m_disable_timer_irq_hack = true;
-}
+
 
 
 ROM_START( epo_sdb )
@@ -331,6 +328,13 @@ ROM_START( tom_dpgm )
 ROM_END
 
 
+void xavix_i2c_lotr_state::init_epo_mini()
+{
+	init_xavix();
+	m_disable_timer_irq_hack = true;
+}
+
+
 // doesn't use extra opcodes?
 // K.O.しようぜ！エキサイトボクシング
 CONS( 2002, epo_ebox, 0, 0, xavix2000_nv,        epo_ebox,    xavix_state,             init_xavix, "Epoch / SSD Company LTD",       "Excite Boxing (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND ) // doesn't use XaviX2000 extra opcodes, but had that type of CPU
@@ -341,7 +345,7 @@ CONS( 2002, epo_bowl, 0, 0, xavix2000_i2c_24c04, epo_bowl,    xavix_i2c_state,  
 
 // ミニモニ。パーティ！リズムでぴょん！
 // needs timer irq hack to boot
-CONS( 2003, epo_mini, 0,       0, xavix2000_i2c_24c08, epo_mini,   xavix_i2c_state,         init_epo_mini, "Epoch / SSD Company LTD",        "mini-moni Party! Jump With the Rhythm! (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+CONS( 2003, epo_mini, 0,       0, xavix2000_i2c_24c08, epo_mini,   xavix_i2c_lotr_state, init_epo_mini, "Epoch / SSD Company LTD",        "mini-moni Party! Jump With the Rhythm! (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
 // takes a long time to boot to a card scanner error
 // This is a product in the Duel Masters line called Duel Station; the boot up screen calls it Duel Station, title logo is Duel Masters
