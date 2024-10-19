@@ -16,7 +16,7 @@ license:CC0-1.0
 
 Compatibility notes:
 - \(.*\) for additional testing notes (btanb moniker goes here);
-- \[.*\] for extended developer info;
+- \[.*\] searchable aids for device chip tags;
 
 TODO:
 - Verify disk labels, several are mislabeled (i.e. has numbers instead of letters and viceversa);
@@ -38,7 +38,7 @@ TODO:
 -->
 
 
-<!-- System disks & Utils -->
+<!-- Operating System disks -->
 
 	<!-- Heavy GFX glitches on VM class, on RS class it has minor GFX layer clearance issues -->
 	<!-- TODO: Does the disk requires 98DO+ specifically? -->
@@ -64,17 +64,6 @@ TODO:
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="system install disk.fdi" size="1265664" crc="963126cd" sha1="9e7c6dec4a454e630cb7c40dea3f40206e6b4cfb" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="cddriver">
-		<description>CD-ROM Driver</description>
-		<year>19??</year>
-		<publisher>NEC</publisher>
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="1265664">
-				<rom name="cd-rom driver.fdi" size="1265664" crc="eae95078" sha1="bc55f59e5c60f5a3d296d79ca2413eaaf7369e2f" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -121,6 +110,30 @@ TODO:
 			<feature name="part_id" value="Disk 3"/>
 			<dataarea name="flop" size="1265664">
 				<rom name="dos33-3.fdi" size="1265664" crc="55b83ae6" sha1="276bac7d7ee8a5eb9cf553da10fafb5ef2c77875" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="msdos33d" cloneof="msdos33" supported="yes">
+		<description>MS-DOS 3.30D (alt)</description>
+		<year>1991</year>
+		<publisher>NEC / Microsoft</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="1261568">
+				<rom name="ms-dos_3.3d_disk1.hdm" size="1261568" crc="b8a6911e" sha1="8cf600eaf809c4095c49f5d00de1dfad71ecf5cd" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2"/>
+			<dataarea name="flop" size="1261568">
+				<rom name="ms-dos_3.3d_disk2.hdm" size="1261568" crc="152a5976" sha1="ed6de79e1fd54b4a9e1269bd516fd4ed8a22241f" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 3"/>
+			<dataarea name="flop" size="1261568">
+				<rom name="ms-dos_3.3d_disk3.hdm" size="1261568" crc="e5a9f0d0" sha1="eecf65349c0ae2be8ccb7554e7e0a86aafe407d7" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -313,6 +326,23 @@ TODO:
 			<feature name="part_id" value="Disk 2"/>
 			<dataarea name="flop" size="1265664">
 				<rom name="dos62ex2.fdi" size="1265664" crc="bded4e42" sha1="ca3fca8c9a24ccd4f5d13a87c55d59c306f4e5ee" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="epdiag" supported="partial">
+		<description>EPSON Jiko Shindan Program (v1.10)</description>
+		<year>1991</year>
+		<publisher>EPSON</publisher>
+		<notes><![CDATA[
+Diagnostic disk, does anything depend on Epson specific features? (verify)
+Several unsupported features, has misaligned vertical lines on GFX boxes
+On VM class FM sound test runs way too fast
+]]></notes>
+		<info name="alt_title" value="自己診断プログラム" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261568">
+				<rom name="epson self-diagnostic program.hdm" size="1261568" crc="3e0c36d7" sha1="9ce4d5a0369ed3af732230890c90915984c0ff20" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1071,26 +1101,70 @@ TODO:
 		</part>
 	</software>
 
-	<software name="dostools">
-		<description>ASCII MS-DOS Software Tools</description>
-		<year>19??</year>
-		<publisher>アスキー (ASCII)</publisher>
+<!-- Programming IDEs -->
+<!-- TODO: technically the various RPG makers would belong to this section as well -->
+
+	<software name="cobol">
+		<description>Level II COBOL V2.1</description>
+		<year>1984</year>
+		<publisher>Micro Focus</publisher>
 		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="1261568">
+				<rom name="lebel 2 cobol.dsk" size="1261568" crc="09d3f7e7" sha1="71067543b229f996f6cea08b36de3f0ec6f17921" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="quickbas">
+		<description>QuickBASIC v45</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Start Disk"/>
 			<dataarea name="flop" size="1265664">
-				<rom name="dostools_1.fdi" size="1265664" crc="7e3dcfb9" sha1="e354d3315fdad96cac3ccb87c4ebda731b0b43c3" offset="0" />
+				<rom name="quickbasic_start.fdi" size="1265664" crc="bee9eefc" sha1="605e15d5d3657b00c0c9df4f129bf84a51ae5173" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 2"/>
+			<feature name="part_id" value="Work Disk"/>
 			<dataarea name="flop" size="1265664">
-				<rom name="dostools_2.fdi" size="1265664" crc="12201fff" sha1="88fa0664d95505d8196545b8ba1c3fdc2416f511" offset="0" />
+				<rom name="quickbasic_work.fdi" size="1265664" crc="29e34557" sha1="0c88a05cd46c179d754786ef7b99ee1942eb1b3e" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 3"/>
+			<feature name="part_id" value="Advisor Disk"/>
 			<dataarea name="flop" size="1265664">
-				<rom name="dostools_3.fdi" size="1265664" crc="f58faec6" sha1="6e436dce2adc3f29c56878457c2d86f38e43dcc5" offset="0" />
+				<rom name="quickbasic_advisor.fdi" size="1265664" crc="6c308ead" sha1="ae834b5e4f8e9eecf92cca2cb878e637e4d718a2" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="quickc">
+		<description>QuickC v20</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Setup Disk"/>
+			<dataarea name="flop" size="1265664">
+				<rom name="quickc_setup.fdi" size="1265664" crc="0a854b3c" sha1="1e2577c7eb40d2ebfda31d70e4fc7e28affa4b2c" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Library Disk"/>
+			<dataarea name="flop" size="1265664">
+				<rom name="quickc_library.fdi" size="1265664" crc="d51530ab" sha1="493d1d26a339087b0b5305c8fa19573666b41117" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Utility Disk"/>
+			<dataarea name="flop" size="1265664">
+				<rom name="quickc_utility.fdi" size="1265664" crc="e590aea4" sha1="5ad8088b96b5fe896d6b17eb8c0f5b6d702e4d94" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Advisor Disk"/>
+			<dataarea name="flop" size="1265664">
+				<rom name="quickc_advisor.fdi" size="1265664" crc="5c7f49c9" sha1="f606bb8fa628dee0ba8c25450f7d16574781311f" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1193,158 +1267,39 @@ TODO:
 		</part>
 	</software>
 
-	<software name="cobol">
-		<description>Level II COBOL V2.1</description>
-		<year>1984</year>
-		<publisher>Micro Focus</publisher>
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="1261568">
-				<rom name="lebel 2 cobol.dsk" size="1261568" crc="09d3f7e7" sha1="71067543b229f996f6cea08b36de3f0ec6f17921" offset="0" />
-			</dataarea>
-		</part>
-	</software>
+<!-- MS-DOS Applications -->
 
-	<software name="quickbas">
-		<description>QuickBASIC v45</description>
+	<software name="dostools">
+		<description>ASCII MS-DOS Software Tools</description>
 		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Start Disk"/>
-			<dataarea name="flop" size="1265664">
-				<rom name="quickbasic_start.fdi" size="1265664" crc="bee9eefc" sha1="605e15d5d3657b00c0c9df4f129bf84a51ae5173" offset="0" />
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Work Disk"/>
-			<dataarea name="flop" size="1265664">
-				<rom name="quickbasic_work.fdi" size="1265664" crc="29e34557" sha1="0c88a05cd46c179d754786ef7b99ee1942eb1b3e" offset="0" />
-			</dataarea>
-		</part>
-		<part name="flop3" interface="floppy_5_25">
-			<feature name="part_id" value="Advisor Disk"/>
-			<dataarea name="flop" size="1265664">
-				<rom name="quickbasic_advisor.fdi" size="1265664" crc="6c308ead" sha1="ae834b5e4f8e9eecf92cca2cb878e637e4d718a2" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="quickc">
-		<description>QuickC v20</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Setup Disk"/>
-			<dataarea name="flop" size="1265664">
-				<rom name="quickc_setup.fdi" size="1265664" crc="0a854b3c" sha1="1e2577c7eb40d2ebfda31d70e4fc7e28affa4b2c" offset="0" />
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Library Disk"/>
-			<dataarea name="flop" size="1265664">
-				<rom name="quickc_library.fdi" size="1265664" crc="d51530ab" sha1="493d1d26a339087b0b5305c8fa19573666b41117" offset="0" />
-			</dataarea>
-		</part>
-		<part name="flop3" interface="floppy_5_25">
-			<feature name="part_id" value="Utility Disk"/>
-			<dataarea name="flop" size="1265664">
-				<rom name="quickc_utility.fdi" size="1265664" crc="e590aea4" sha1="5ad8088b96b5fe896d6b17eb8c0f5b6d702e4d94" offset="0" />
-			</dataarea>
-		</part>
-		<part name="flop4" interface="floppy_5_25">
-			<feature name="part_id" value="Advisor Disk"/>
-			<dataarea name="flop" size="1265664">
-				<rom name="quickc_advisor.fdi" size="1265664" crc="5c7f49c9" sha1="f606bb8fa628dee0ba8c25450f7d16574781311f" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="copyaid">
-		<description>Copy Aid 98 II v2.20</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="1156336">
-				<rom name="copyaid_ver2.20.d88" size="1156336" crc="31c824bd" sha1="46e7e7b890a0f160471720fcac748596b15b41d3" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="mifes">
-		<description>MIFES 5.0</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="1265664">
-				<rom name="mifes 5.0.fdi" size="1265664" crc="b8d57d4f" sha1="137f0cd823707ff3a7a42dacb4e80f0ff94cadd6" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="elecom">
-		<description>Ele Command (5.25&quot; Disk)</description>
-		<year>19??</year>
-		<publisher>Elecom</publisher>
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="1265664">
-				<rom name="elecommand_5in.fdi" size="1265664" crc="85736046" sha1="73264a5593148b0f29e3713b0badfa903ce3cab3" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<!-- This probably requires 3.5" floppy emulation -->
-	<software name="elecom35" cloneof="elecom" supported="no">
-		<description>Ele Command (3.5&quot; Disk)</description>
-		<year>19??</year>
-		<publisher>Elecom</publisher>
-		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size="1265664">
-				<rom name="elecommand_3in.fdi" size="1265664" crc="7bb15517" sha1="9ec66efa7c75a08d403dea1fa55e855dc8f015d0" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="eosys30">
-		<description>EO System 3.0 (v1.17 installer)</description>
-		<year>1995</year>
-		<publisher>ICM</publisher>
-		<info name="usage" value="Run INST.EXE to install to HDD" />
+		<publisher>アスキー (ASCII)</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="1265664">
-				<rom name="eo30d1.fdi" size="1265664" crc="6098850c" sha1="d98aaea863381c453623fe10413b0ef05dd781ac" offset="0" />
+				<rom name="dostools_1.fdi" size="1265664" crc="7e3dcfb9" sha1="e354d3315fdad96cac3ccb87c4ebda731b0b43c3" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 2"/>
 			<dataarea name="flop" size="1265664">
-				<rom name="eo30d2.fdi" size="1265664" crc="6906852e" sha1="749201c2304e37d5623a7f462e438f40c64a252f" offset="0" />
+				<rom name="dostools_2.fdi" size="1265664" crc="12201fff" sha1="88fa0664d95505d8196545b8ba1c3fdc2416f511" offset="0" />
 			</dataarea>
 		</part>
-	</software>
-
-	<software name="eosys30i10" cloneof="eosys30">
-		<description>EO System 3.0 (v1.10 installer)</description>
-		<year>1995</year>
-		<publisher>ICM</publisher>
-		<info name="usage" value="Run INST.EXE to install to HDD" />
-		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 1"/>
-			<dataarea name="flop" size="1261568">
-				<rom name="eo system 3 (v1.10) (disk 1).hdm" size="1261568" crc="c1d22678" sha1="0480cf848f05e3bf1ddd225de2c2b63378dc146e" offset="0" />
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 2"/>
-			<dataarea name="flop" size="1261568">
-				<rom name="eo system 3 (v1.10) (disk 2).hdm" size="1261568" crc="39122ba0" sha1="e96cb528bc981d3c5f6d34aea88415aaf998fe68" offset="0" />
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 3"/>
+			<dataarea name="flop" size="1265664">
+				<rom name="dostools_3.fdi" size="1265664" crc="f58faec6" sha1="6e436dce2adc3f29c56878457c2d86f38e43dcc5" offset="0" />
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="nortonut" supported="no">
-		<description>Norton Utilities</description>
-		<year>19??</year>
+		<description>Norton Utilities (v6.50)</description>
+		<year>1994</year>
 		<publisher>Symantec</publisher>
+		<notes><![CDATA[
+Untested
+]]></notes>
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Install"/>
 			<dataarea name="flop" size="1261568">
@@ -1371,10 +1326,12 @@ TODO:
 		</part>
 	</software>
 
+<!-- Office suites -->
+
 	<software name="ichitaro">
 		<description>Ichitaro Ver.5 (r1?)</description>
 		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>ジャストシステム (Just System)</publisher>
 		<info name="alt_title" value="一太郎 ver 5 r 1" />
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 1"/>
@@ -1465,7 +1422,7 @@ TODO:
 	<software name="ichitaroa" cloneof="ichitaro" supported="no">
 		<description>Ichitaro Ver.5</description>
 		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>ジャストシステム (Just System)</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="1261568">
@@ -1555,7 +1512,7 @@ TODO:
 	<software name="ichita5d" supported="no">
 		<description>Ichitaro Ver.5'</description>
 		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>ジャストシステム (Just System)</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk A"/>
 			<dataarea name="flop" size="1261568">
@@ -1579,7 +1536,7 @@ TODO:
 	<software name="ichitar4">
 		<description>Ichitaro Ver.4</description>
 		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>ジャストシステム (Just System)</publisher>
 		<info name="alt_title" value="一太郎 ver.4" />
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="System 1"/>
@@ -1607,10 +1564,10 @@ TODO:
 		</part>
 	</software>
 
-	<software name="ichihana" supported="no">
+	<software name="ichihana" supported="yes">
 		<description>Ichitaro ver4.0 + Hanako Ver2.0 (demo)</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1990?</year>
+		<publisher>ジャストシステム (Just System)</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1261568">
 				<rom name="ichitaro_and_hanako_demo.hdm" size="1261568" crc="cdf2450b" sha1="115634774a5bd52bf24d293203000e02e302dd55" offset="0" />
@@ -1618,58 +1575,47 @@ TODO:
 		</part>
 	</software>
 
-	<software name="iomega" supported="no">
-		<description>Iomega Zip-drive Tools (Version 5.1J)</description>
-		<year>1996</year>
-		<publisher>Iomega</publisher>
-		<notes><![CDATA[
-Japanese version of ibm5170:iomega
-]]></notes>
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="1261568">
-				<rom name="iomega_zip_5.1j_pc98_install.hdm" size="1261568" crc="0e3452c9" sha1="f2206e6a7f5d9f420d2bbb08aa9c0e22b95a0e9f" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="jg" supported="no">
+	<software name="jg" supported="partial">
 		<description>JG Ver3.0</description>
 		<year>1992</year>
 		<publisher>Zeit</publisher>
+		<notes><![CDATA[
+Not extensively tested
+]]></notes>
 		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Gain? Disk"/> <!-- 得 -->
-			<dataarea name="flop" size="1261568">
-				<rom name="jg01.hdm" size="1261568" crc="5d4bfc19" sha1="a5d5906407666454dd247bb9a6b5c9b1196987f3" offset="0" />
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="VJE-β Disk"/>
-			<dataarea name="flop" size="1261568">
-				<rom name="jg02.hdm" size="1261568" crc="2d62b9c1" sha1="91dc3d6a54f162818e27266c7e17c349ae52f39b" offset="0" />
-			</dataarea>
-		</part>
-		<part name="flop3" interface="floppy_5_25">
-			<feature name="part_id" value="Update Disk 1"/>  <!-- アップデート -->
-			<dataarea name="flop" size="1261568">
-				<rom name="jg03.hdm" size="1261568" crc="37da7606" sha1="b577b3f6bb7e36d4f30fa3303ff1066a8be8d72b" offset="0" />
-			</dataarea>
-		</part>
-		<part name="flop4" interface="floppy_5_25">
-			<feature name="part_id" value="Update Disk 2"/>  <!-- アップデート -->
-			<dataarea name="flop" size="1261568">
-				<rom name="jg04.hdm" size="1261568" crc="3ad12e91" sha1="eaa25fc6deff04b406a1877e1e7ce2e911baac54" offset="0" />
-			</dataarea>
-		</part>
-		<part name="flop5" interface="floppy_5_25">
 			<feature name="part_id" value="System Disk A"/>   <!-- システム -->
 			<dataarea name="flop" size="1261568">
 				<rom name="jg05.hdm" size="1261568" crc="2a50ec5a" sha1="0983a0577570e8e00853338a71d0e734662a8e86" offset="0" />
 			</dataarea>
 		</part>
-		<part name="flop6" interface="floppy_5_25">
+		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="System Disk B"/>   <!-- システム -->
 			<dataarea name="flop" size="1261568">
 				<rom name="jg06.hdm" size="1261568" crc="c029d88d" sha1="332d7043ac27e5812563eee44e213430696b6fd8" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Gain? Disk"/> <!-- 得 -->
+			<dataarea name="flop" size="1261568">
+				<rom name="jg01.hdm" size="1261568" crc="5d4bfc19" sha1="a5d5906407666454dd247bb9a6b5c9b1196987f3" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="VJE-β Disk"/>
+			<dataarea name="flop" size="1261568">
+				<rom name="jg02.hdm" size="1261568" crc="2d62b9c1" sha1="91dc3d6a54f162818e27266c7e17c349ae52f39b" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_5_25">
+			<feature name="part_id" value="Update Disk 1"/>  <!-- アップデート -->
+			<dataarea name="flop" size="1261568">
+				<rom name="jg03.hdm" size="1261568" crc="37da7606" sha1="b577b3f6bb7e36d4f30fa3303ff1066a8be8d72b" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_5_25">
+			<feature name="part_id" value="Update Disk 2"/>  <!-- アップデート -->
+			<dataarea name="flop" size="1261568">
+				<rom name="jg04.hdm" size="1261568" crc="3ad12e91" sha1="eaa25fc6deff04b406a1877e1e7ce2e911baac54" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop7" interface="floppy_5_25">
@@ -1740,137 +1686,6 @@ Japanese version of ibm5170:iomega
 		</part>
 	</software>
 
-	<software name="wiz98">
-		<description>Wizard98 v3</description>
-		<year>19??</year>
-		<publisher>ウエストサイド (WestSide)</publisher>
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="1350240">
-				<rom name="wizard98-v3 systemdisk.nfd" size="1350240" crc="4419e57c" sha1="ea69af5e51174ba545fe689b5d9597b9e3ea5a56" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="wiz98r8">
-		<description>Wizard98 v3r8</description>
-		<year>19??</year>
-		<publisher>ウエストサイド (WestSide)</publisher>
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="1265664">
-				<rom name="wizard98r8.fdi" size="1265664" crc="507a66ac" sha1="145056248f4cb6ce2522168f9122902eb93e4820" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="wiz98r5">
-		<description>Wizard98 v3r5</description>
-		<year>19??</year>
-		<publisher>ウエストサイド (WestSide)</publisher>
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="1265664">
-				<rom name="wizard98r5.fdi" size="1265664" crc="4c68b6fe" sha1="f245c0268a34211fa810cdc1d363627c5cc3b22d" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="wiz98r4">
-		<description>Wizard98 v3r4</description>
-		<year>19??</year>
-		<publisher>ウエストサイド (WestSide)</publisher>
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="1265664">
-				<rom name="wizard98r4.fdi" size="1265664" crc="65fe0008" sha1="87afd9e86014263ae013fcb7e072dbc298ef9d44" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="wiz98r3">
-		<description>Wizard98 v3r3</description>
-		<year>19??</year>
-		<publisher>ウエストサイド (WestSide)</publisher>
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="1265664">
-				<rom name="wizard98r3.fdi" size="1265664" crc="54775a20" sha1="46a2961e535c9b0b9c778271da2a8e1ec7cfc68f" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-<!-- related to Wizard98 -->
-	<software name="chankonb" supported="no">
-		<description>Chanko Nabe</description>
-		<year>19??</year>
-		<publisher>ウエストサイド (WestSide)</publisher>
-		<info name="alt_title" value="ちゃんこ鍋" />
-		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Disk A"/>
-			<dataarea name="flop" size="1334720">
-				<rom name="chanko_nabe a-disk.nfd" size="1334720" crc="973e80e8" sha1="9c30fa64d1811922df591723108cd07020d8cd7f" offset="0" />
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Disk B"/>
-			<dataarea name="flop" size="1334720">
-				<rom name="chanko_nabe b-disk.nfd" size="1334720" crc="e98efd7f" sha1="01df48ea31dfa8d6b1236d750c56d1b5156f72c2" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-<!-- related to Wizard98 -->
-	<software name="yutoufu">
-		<description>Yutoufu</description>
-		<year>19??</year>
-		<publisher>ウエストサイド (WestSide)</publisher>
-		<info name="alt_title" value="ゆどうふ" />
-		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 1"/>
-			<dataarea name="flop" size="1265664">
-				<rom name="wiz98yutoufu1.fdi" size="1265664" crc="50abaa75" sha1="d391297c0ac978419239c390d7fdfb4a49a86063" offset="0" />
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 2"/>
-			<dataarea name="flop" size="1265664">
-				<rom name="wiz98yutoufu2.fdi" size="1265664" crc="aa8a2275" sha1="c87ee9d1cba718cbbb29329605cadd2e86fd9494" offset="0" />
-			</dataarea>
-		</part>
-		<part name="flop3" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 3"/>
-			<dataarea name="flop" size="1265664">
-				<rom name="wiz98yutoufu3.fdi" size="1265664" crc="4dd12f80" sha1="95aa13b0293d637777bd2b64772476143c4d8dd8" offset="0" />
-			</dataarea>
-		</part>
-		<part name="flop4" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 4"/>
-			<dataarea name="flop" size="1265664">
-				<rom name="wiz98yutoufu4.fdi" size="1265664" crc="41f65557" sha1="213b583a6cb3677db8c16d114d0209af7cf3a136" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="msdos33d" cloneof="msdos33" supported="no">
-		<description>MS-DOS 3.30D (alt)</description>
-		<year>1991</year>
-		<publisher>NEC / Microsoft</publisher>
-		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 1"/>
-			<dataarea name="flop" size="1261568">
-				<rom name="ms-dos_3.3d_disk1.hdm" size="1261568" crc="b8a6911e" sha1="8cf600eaf809c4095c49f5d00de1dfad71ecf5cd" offset="0" />
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 2"/>
-			<dataarea name="flop" size="1261568">
-				<rom name="ms-dos_3.3d_disk2.hdm" size="1261568" crc="152a5976" sha1="ed6de79e1fd54b4a9e1269bd516fd4ed8a22241f" offset="0" />
-			</dataarea>
-		</part>
-		<part name="flop3" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 3"/>
-			<dataarea name="flop" size="1261568">
-				<rom name="ms-dos_3.3d_disk3.hdm" size="1261568" crc="e5a9f0d0" sha1="eecf65349c0ae2be8ccb7554e7e0a86aafe407d7" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="asscalc">
 		<description>Assist Calc</description>
 		<year>1990</year>
@@ -1891,27 +1706,16 @@ Japanese version of ibm5170:iomega
 		</part>
 	</software>
 
-	<!-- boot OK -->
-	<!-- several unsupported features, has misaligned vertical lines on GFX boxes -->
-	<!-- on VM class FM sound test runs way too fast -->
-	<software name="epdiag" supported="partial">
-		<description>EPSON Jiko Shindan Program (v1.10)</description>
-		<year>1991</year>
-		<publisher>EPSON</publisher>
-		<info name="alt_title" value="自己診断プログラム" />
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="1261568">
-				<rom name="epson self-diagnostic program.hdm" size="1261568" crc="3e0c36d7" sha1="9ce4d5a0369ed3af732230890c90915984c0ff20" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<!-- "Disk I/O Error" on boot (btanb, needs Epson class machine) -->
 	<software name="epinstal" supported="no">
 		<description>EPSON Software Installation Program (v3.02)</description>
 		<year>19??</year>
 		<publisher>EPSON</publisher>
+		<notes><![CDATA[
+Disk for pc9801_epson.cpp machines
+Untested
+]]></notes>
 		<info name="alt_title" value="ソフトウェア・インストレーション・プログラム" />
+		<info name="usage" value="Needs floppy 2DD density select dip enabled" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="697008">
 				<rom name="epson software installation program (v3.02).d88" size="697008" crc="1f594ec1" sha1="f9c59924380fff8012b259b5857e3aead506d028" offset="0" />
@@ -1923,6 +1727,10 @@ Japanese version of ibm5170:iomega
 		<description>EPSON Software Installation Program (v2.17)</description>
 		<year>19??</year>
 		<publisher>EPSON</publisher>
+		<notes><![CDATA[
+Disk for pc9801_epson.cpp machines
+Untested
+]]></notes>
 		<info name="alt_title" value="ソフトウェア・インストレーション・プログラム" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="697008">
@@ -1935,6 +1743,10 @@ Japanese version of ibm5170:iomega
 		<description>EPSON Software Installation Program (v2.23)</description>
 		<year>19??</year>
 		<publisher>EPSON</publisher>
+		<notes><![CDATA[
+Disk for pc9801_epson.cpp machines
+Untested
+]]></notes>
 		<info name="alt_title" value="ソフトウェア・インストレーション・プログラム" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="697008">
@@ -1947,6 +1759,10 @@ Japanese version of ibm5170:iomega
 		<description>EPSON Software Installation Program (v2.27)</description>
 		<year>19??</year>
 		<publisher>EPSON</publisher>
+		<notes><![CDATA[
+Disk for pc9801_epson.cpp machines
+Untested
+]]></notes>
 		<info name="alt_title" value="ソフトウェア・インストレーション・プログラム" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="697008">
@@ -1955,13 +1771,13 @@ Japanese version of ibm5170:iomega
 		</part>
 	</software>
 
-	<!-- boot OK -->
-	<!-- Utility disk file "BMENU." sports ugly GFX cyan fills -->
-	<!-- (especially noticeable when clearing them, leaving black trails) -->
 	<software name="epsonb2" supported="partial">
 		<description>EPSON Nihongo Disk BASIC v2.0</description>
 		<year>1988</year>
 		<publisher>EPSON</publisher>
+		<notes><![CDATA[
+Utility disk file "BMENU." sports ugly GFX cyan fills (especially noticeable when clearing them, leaving black trails)
+]]></notes>
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="System"/>
 			<dataarea name="flop" size="1086448">
@@ -1976,13 +1792,13 @@ Japanese version of ibm5170:iomega
 		</part>
 	</software>
 
-	<!-- boot OK -->
-	<!-- Utility disk file "BMENU." sports ugly GFX cyan fills -->
-	<!-- (especially noticeable when clearing them, leaving black trails) -->
 	<software name="epsonb5" supported="partial">
 		<description>EPSON Nihongo Disk BASIC v5.0</description>
 		<year>1990</year>
 		<publisher>EPSON</publisher>
+		<notes><![CDATA[
+Utility disk file "BMENU." sports ugly GFX cyan fills (especially noticeable when clearing them, leaving black trails)
+]]></notes>
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="System"/>
 			<dataarea name="flop" size="1089776">
@@ -1996,404 +1812,6 @@ Japanese version of ibm5170:iomega
 			</dataarea>
 		</part>
 	</software>
-
-	<software name="wrp91021" supported="no">
-		<description>Wizard98 Report Vol 91.2-1</description>
-		<year>1991</year>
-		<publisher>Westside Softhouse</publisher>
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="1334720">
-				<rom name="report 91-02-1.nfd" size="1334720" crc="e6c09bd9" sha1="4c49c9cc4474669c14c6595ef2a2de7bace769cf" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="wrp91051" supported="no">
-		<description>Wizard98 Report Vol 91.5-1</description>
-		<year>1991</year>
-		<publisher>Westside Softhouse</publisher>
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="1284704">
-				<rom name="report 91-05-1.nfd" size="1284704" crc="788442e0" sha1="ef763777cea84ff0de68a629da3a1fc1083561e8" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="wrp91072" supported="no">
-		<description>Wizard98 Report Vol 91.7-2</description>
-		<year>1991</year>
-		<publisher>Westside Softhouse</publisher>
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="1284704">
-				<rom name="report 91-07-2.nfd" size="1284704" crc="a3f6d06f" sha1="e00e9ed7c3c51e3c03e35edac184261a0a3636d8" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="wrp91101" supported="no">
-		<description>Wizard98 Report Vol 91.10-1</description>
-		<year>1991</year>
-		<publisher>Westside Softhouse</publisher>
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="1284704">
-				<rom name="report 91-10-1.nfd" size="1284704" crc="c26b7473" sha1="42fac5a6440efaf2e891fa21f3a1ff3247bcc6a9" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="wrp92011" supported="no">
-		<description>Wizard98 Report Vol 92.1-1</description>
-		<year>1992</year>
-		<publisher>Westside Softhouse</publisher>
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="1284704">
-				<rom name="report 92-01-1.nfd" size="1284704" crc="506d0448" sha1="5e1fa273ac86a16749bd21e0ffe2a67b8a257725" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="wrp92014" supported="no">
-		<description>Wizard98 Report Vol 92.1-4</description>
-		<year>1992</year>
-		<publisher>Westside Softhouse</publisher>
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="1284704">
-				<rom name="report 92-01-4.nfd" size="1284704" crc="eca1c4b5" sha1="d49dfa05a164e58cb99264fd404fe658b561c6ed" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="wrp92023" supported="no">
-		<description>Wizard98 Report Vol 92.2-3</description>
-		<year>1992</year>
-		<publisher>Westside Softhouse</publisher>
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="1327232">
-				<rom name="report 92-02-3.nfd" size="1327232" crc="f9728009" sha1="f98db99a773816be4cb0b58fb39e8f32bed50037" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="wrp92061" supported="no">
-		<description>Wizard98 Report Vol 92.6-1</description>
-		<year>1992</year>
-		<publisher>Westside Softhouse</publisher>
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="1284704">
-				<rom name="report 92-06-1.nfd" size="1284704" crc="d5b3c4dd" sha1="c9814dddb522dcaa0c0e1203fe7e69bbb28bf5e4" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="wrp92064" supported="no">
-		<description>Wizard98 Report Vol 92.6-4</description>
-		<year>1992</year>
-		<publisher>Westside Softhouse</publisher>
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="1284704">
-				<rom name="report 92-06-4.nfd" size="1284704" crc="7576cb77" sha1="9edb25923306f75ed3d019bcc0c464b86bddd43d" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="wrp92081" supported="no">
-		<description>Wizard98 Report Vol 92.8-1</description>
-		<year>1992</year>
-		<publisher>Westside Softhouse</publisher>
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="1294032">
-				<rom name="report 92-08-1.nfd" size="1294032" crc="3763b0dc" sha1="11d960268928b40eab92a8165488e533452376d5" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="wrp92092" supported="no">
-		<description>Wizard98 Report Vol 92.9-2</description>
-		<year>1992</year>
-		<publisher>Westside Softhouse</publisher>
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="1895584">
-				<rom name="report 92-09-2.nfd" size="1895584" crc="f3b9aebb" sha1="59860e753522d7ae34ce53f96c0066c81a5572b4" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="wrp92114" supported="no">
-		<description>Wizard98 Report Vol 92.11-4</description>
-		<year>1992</year>
-		<publisher>Westside Softhouse</publisher>
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="1284704">
-				<rom name="report 92-11-4.nfd" size="1284704" crc="311627ec" sha1="6bc093371756863d0966bb906fc4cd67cec098e6" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="wrp93011" supported="no">
-		<description>Wizard98 Report Vol 93.1-1</description>
-		<year>1993</year>
-		<publisher>Westside Softhouse</publisher>
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="1284704">
-				<rom name="report 93-01-1.nfd" size="1284704" crc="e60e6916" sha1="4478d5f5f9297db5866ccd6aa88557c0f222255c" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="wrp93021" supported="no">
-		<description>Wizard98 Report Vol 93.2-1</description>
-		<year>1993</year>
-		<publisher>Westside Softhouse</publisher>
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="1284704">
-				<rom name="report 93-02-1.nfd" size="1284704" crc="776a9739" sha1="b6356723c397edabe5b9a025f1d4b419cdc6dc8b" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="wrp93034" supported="no">
-		<description>Wizard98 Report Vol 93.3-4</description>
-		<year>1993</year>
-		<publisher>Westside Softhouse</publisher>
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="1284704">
-				<rom name="report 93-03-4.nfd" size="1284704" crc="66429194" sha1="7f35ab5bff327e5e9c6b69fe7c6f184acbaa7b6a" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="wrp93072" supported="no">
-		<description>Wizard98 Report Vol 93.7-2</description>
-		<year>1993</year>
-		<publisher>Westside Softhouse</publisher>
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="1327232">
-				<rom name="report 93-07-2.nfd" size="1327232" crc="454ee24f" sha1="2635659b9983afba0a70f750289ce9cfd68dcf1d" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="wrp93094" supported="no">
-		<description>Wizard98 Report Vol 93.9-4</description>
-		<year>1993</year>
-		<publisher>Westside Softhouse</publisher>
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="1284704">
-				<rom name="report 93-09-4.nfd" size="1284704" crc="8b17c00b" sha1="d835c786231037b5fe291760f7fa5eed0d77cc32" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="wrp93105" supported="no">
-		<description>Wizard98 Report Vol 91.10-5</description>
-		<year>1993</year>
-		<publisher>Westside Softhouse</publisher>
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="1285728">
-				<rom name="report 93-10-5.nfd" size="1285728" crc="290878eb" sha1="b675cef5fdec39e6c7b35bcd7894116425542cbc" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="wrp94024" supported="no">
-		<description>Wizard98 Report Vol 94.2-4</description>
-		<year>1994</year>
-		<publisher>Westside Softhouse</publisher>
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="1418624">
-				<rom name="report 94-02-4.nfd" size="1418624" crc="b8a45537" sha1="2fc4cc393749d9f565d2958144b0d8406f3b27b7" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="wrp94041" supported="no">
-		<description>Wizard98 Report Vol 94.4-1</description>
-		<year>1994</year>
-		<publisher>Westside Softhouse</publisher>
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="1581472">
-				<rom name="report 94-04-1.nfd" size="1581472" crc="9b116d7f" sha1="1d3b2ca300b3704f927593a91f73e97260fd8b0e" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="wrp94071" supported="no">
-		<description>Wizard98 Report Vol 94.7-1</description>
-		<year>1994</year>
-		<publisher>Westside Softhouse</publisher>
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="1313472">
-				<rom name="report 94-07-1.nfd" size="1313472" crc="1b899fef" sha1="c0334b42dd5a69c3b8522b4e79af68c94b52ab22" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="wrp95033" supported="no">
-		<description>Wizard98 Report Vol 95.3-3</description>
-		<year>1995</year>
-		<publisher>Westside Softhouse</publisher>
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="1270720">
-				<rom name="report 95-03-3.nfd" size="1270720" crc="b2def29c" sha1="0b2313fce65614e44eff3f42c099728652cd1795" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="wrp96084" supported="no">
-		<description>Wizard98 Report Vol 96.8-4</description>
-		<year>1996</year>
-		<publisher>Westside Softhouse</publisher>
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="1328256">
-				<rom name="report 96-08-4.nfd" size="1328256" crc="e8e294f9" sha1="9fa3c3edbb1851c4550c03565738945071b9ba61" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="wizaf01">
-		<description>Wizard98 All-Filers No.1</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="1284704">
-				<rom name="all-filers no1.nfd" size="1284704" crc="a150f80d" sha1="a78b4b62967e35a03272f170692ed5918ec557cb" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="wizaf02">
-		<description>Wizard98 All-Filers No.2</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="1313056">
-				<rom name="all-filers no2.nfd" size="1313056" crc="716c5dda" sha1="1bdbc4fd650e23979364eba2ab5f23d90b21873c" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="wizaf09">
-		<description>Wizard98 All-Filers No.9</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="1265664">
-				<rom name="all-filers no9.fdi" size="1265664" crc="fe1c8928" sha1="b2535891aed6f65585c0f5ec7afbbb7a0ca6c768" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="wizaf12">
-		<description>Wizard98 All-Filers No.12</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="1265664">
-				<rom name="all-filers no12.fdi" size="1265664" crc="6ec7cf2c" sha1="51b46f4d23de7cdba1579e7822fc122a4cc1493e" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="wizaf13">
-		<description>Wizard98 All-Filers No.13</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="1265664">
-				<rom name="all-filers no13.fdi" size="1265664" crc="804b8b1d" sha1="901fc12f26eefb850acb975372addbd3299ecd84" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="wizaf14">
-		<description>Wizard98 All-Filers No.14</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="1265664">
-				<rom name="all-filers no14.fdi" size="1265664" crc="2fcf38ee" sha1="b9ba4f2399b888b3c6d7722b297b0d91ac763602" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="wizaf15">
-		<description>Wizard98 All-Filers No.15</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="1265664">
-				<rom name="all-filers no15.fdi" size="1265664" crc="76d34331" sha1="7a549b16feaf87003b839b08e11429298e04a4e9" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="wizaf16">
-		<description>Wizard98 All-Filers No.16</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="1265664">
-				<rom name="all-filers no16.fdi" size="1265664" crc="667373e6" sha1="d0308a29c8367cfe4526b2f10b9981b32c60729f" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="wizaf17">
-		<description>Wizard98 All-Filers No.17</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="1265664">
-				<rom name="all-filers no17.fdi" size="1265664" crc="9a7ed485" sha1="0c83692bd5c9e0e5ecb14b1a7d42f2256cdda21e" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="wizaf18">
-		<description>Wizard98 All-Filers No.18</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="1265664">
-				<rom name="all-filers no18.fdi" size="1265664" crc="8aa56345" sha1="f18819012222a39918ac9034389fcfc75af9d5b4" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="wizfo1">
-		<description>Wizard98 Filers-Oden No.1</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="1307744">
-				<rom name="filer-oden no1.nfd" size="1307744" crc="54afe365" sha1="3d0fe8c05e20e506beb21a4ed8b569f18ae1ff35" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="wizfo2">
-		<description>Wizard98 Filers-Oden No.2</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="1307744">
-				<rom name="filer-oden no2.nfd" size="1307744" crc="f60d7bfd" sha1="67ec8c1bd9efa1116ac78678df6a70832504ea02" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="wizfo3">
-		<description>Wizard98 Filers-Oden No.3</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="1307744">
-				<rom name="filer-oden no3.nfd" size="1307744" crc="5711ab27" sha1="47414ca7148ac4aa8570111f8820afb5a8cf2469" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-
 
 <!-- Games and programs -->
 
@@ -3699,7 +3117,6 @@ Hangs after entering name on VM class
 		</part>
 	</software>
 
-	<!-- This probably requires 3.5" floppy emulation -->
 	<software name="aishogi" supported="no">
 		<description>AI Shogi</description>
 		<year>1993</year>
@@ -4785,12 +4202,14 @@ Hangs after entering name on VM class
 		</part>
 	</software>
 
-	<!-- Erratic mouse movement. Cannot be played with the keyboard. -->
-	<software name="ami" supported="no">
+	<software name="ami" supported="yes">
 		<!-- Origin: Neo Kobe Collection -->
 		<description>Ami - Kaze Tachinu</description>
 		<year>1994</year>
 		<publisher>フェアリーダスト (Fairy Dust)</publisher>
+		<notes><![CDATA[
+Uses [DAC1BIT] for voice samples
+]]></notes>
 		<info name="alt_title" value="亜美 ～風立ちぬ～" />
 		<info name="usage" value="Boot with disk 0 in drive A and a DOS disk in drive B, let it copy the system files, insert disk 6 in drive B and reboot" />
 		<part name="flop1" interface="floppy_5_25">
@@ -4855,7 +4274,7 @@ Hangs after entering name on VM class
 		</part>
 	</software>
 
-	<software name="amidaext">
+	<software name="amidaext" supported="yes">
 		<description>Amida Extra</description>
 		<year>1991</year>
 		<publisher>日本ソフテック (Nihon Softec)</publisher>
@@ -5113,8 +4532,7 @@ Every kanji character has one line of corruption
 		</part>
 	</software>
 
-	<!-- randomly hangs with stuck note -->
-	<software name="annivers" supported="no">
+	<software name="annivers" supported="yes">
 		<description>Anniversary - Memories of Summer Vacation - Natsuyasumi no Omoide</description>
 		<year>1993</year>
 		<publisher>ジャニス (Janis)</publisher>
@@ -5866,9 +5284,7 @@ Has a [DAC1BIT] sampling tester on boot, needs +18 [tempo]/low [volume] on RS cl
 		</part>
 	</software>
 
-	<!-- boot OK, randomly locks up (stuck note) -->
-	<!-- On selection menu selected jigsaw doesn't show proper naming, kanji issue? -->
-	<software name="artjigs2" supported="no">
+	<software name="artjigs2" supported="yes">
 		<description>Art Jigsaw - Vol. 2 Pretty Girls</description>
 		<year>1992</year>
 		<publisher>システムソフト (SystemSoft)</publisher>
@@ -5888,18 +5304,16 @@ Has a [DAC1BIT] sampling tester on boot, needs +18 [tempo]/low [volume] on RS cl
 		</part>
 	</software>
 
-	<!-- boot OK, randomly locks up (stuck note) -->
-	<!-- On selection menu selected jigsaw doesn't show proper naming, kanji issue? -->
-	<!-- Last selectable puzzle shows up garbled on selection and in-game -->
-	<software name="artjigs3" supported="no">
+	<software name="artjigs3" supported="yes">
 		<description>Art Jigsaw - Vol. 3 Fantastic</description>
 		<year>1992</year>
 		<publisher>システムソフト (SystemSoft)</publisher>
 		<info name="alt_title" value="アートジグソー Ｖｏｌ．３ ファンタスティック" />
 		<info name="release" value="19920410" />
+		<!-- baddump: Last selectable puzzle shows up garbled on selection and in-game -->
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1281968">
-				<rom name="main.d88" size="1281968" crc="22550fbf" sha1="c3ba4b4700ff0e43a47b2bad840b70e00c54f77a" offset="0" />
+				<rom name="main.d88" size="1281968" crc="22550fbf" sha1="c3ba4b4700ff0e43a47b2bad840b70e00c54f77a" offset="0" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -6347,13 +5761,13 @@ Has a [DAC1BIT] sampling tester on boot, needs +18 [tempo]/low [volume] on RS cl
 		</part>
 	</software>
 
-	<!-- Hangs with stuck note on title screen display after intro -->
-	<software name="bacta2" supported="no">
+	<software name="bacta2" supported="yes">
 		<description>Bacta 2</description>
 		<year>1994</year>
 		<publisher>姫屋ソフト (Himeya Soft)</publisher>
 		<info name="alt_title" value="バクタ２" />
 		<info name="release" value="19940205" />
+		<info name="usage" value="On non-9821 class machines needs sound port base to be 0x088 to avoid hang at sound card select" />
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk A"/>
 			<dataarea name="flop" size="1265664">
@@ -6557,13 +5971,13 @@ Not extensively tested
 		</part>
 	</software>
 
-	<software name="bandkun" supported="no">
+	<software name="bandkun" supported="partial">
 		<description>Band-kun - Sound Entertainment</description>
 		<year>1990</year>
 		<publisher>光栄 (Koei)</publisher>
 		<notes><![CDATA[
 Requires MIDI connection from any of the supported devices (Roland MT-32, Roland D-10/D-110, Kawai MSB-98, Korg M1)
-Never output any sound
+Can be played with MU50 set with C/M compatibility mode
 ]]></notes>
 		<info name="alt_title" value="バンドくん" />
 		<info name="release" value="199011xx" />
@@ -7551,7 +6965,7 @@ Title screen oddly keeps scrolling (verify)
 	</software>
 
 	<software name="bshashsc">
-		<description>Bishoujo Shashinkan - Studio Cut</description>
+		<description>Bishoujo Shashinkan - Studio Cut (2HD)</description>
 		<year>1987</year>
 		<publisher>ハード (Hard)</publisher>
 		<info name="alt_title" value="美少女写真館 スタジオ・カット" />
@@ -7563,13 +6977,13 @@ Title screen oddly keeps scrolling (verify)
 		</part>
 	</software>
 
-<!-- is this a different Bishoujo Shashinkan game? -->
-	<software name="bshashsca" cloneof="bshashsc" supported="no">
-		<description>Bishoujo Shashinkan - Studio Cut (alt)</description>
+	<software name="bshashsca" cloneof="bshashsc" supported="yes">
+		<description>Bishoujo Shashinkan - Studio Cut (2DD)</description>
 		<year>1987</year>
 		<publisher>ハード (Hard)</publisher>
 		<info name="alt_title" value="美少女写真館 スタジオ・カット" />
 		<info name="release" value="198701xx" />
+		<info name="usage" value="Needs floppy 2DD density select dip enabled" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="697008">
 				<rom name="studio cut.d88" size="697008" crc="73515443" sha1="245539375abb3549aae2ed618a1e9379ab0f98c0" offset="0" />
@@ -7603,11 +7017,13 @@ Title screen oddly keeps scrolling (verify)
 		</part>
 	</software>
 
-	<!-- Doesn't recognize disk A properly -->
 	<software name="bishoten" supported="no">
 		<description>Bishoujo Tengoku</description>
 		<year>1994</year>
 		<publisher>ひょうたんプロダクション (Gourd Production)</publisher>
+		<notes><![CDATA[
+Errors with "Put the retail disk A into the drive", [FDC] chrn=(2, 1, -17, 512)
+]]></notes>
 		<info name="alt_title" value="美少女天国" />
 		<info name="release" value="19941214" />
 		<part name="flop1" interface="floppy_5_25">
@@ -7807,11 +7223,13 @@ Title screen oddly keeps scrolling (verify)
 		</part>
 	</software>
 
-	<!-- Black screen on boot -->
 	<software name="blackpol" supported="no">
 		<description>The Blade of Blackpoole</description>
 		<year>1984</year>
 		<publisher>スタークラフト (Starcraft)</publisher>
+		<notes><![CDATA[
+2D disk, requires [PC80S31] interface
+]]></notes>
 		<info name="alt_title" value="ブラックプールの剣" />
 		<info name="release" value="198401xx" />
 		<part name="flop1" interface="floppy_5_25">
@@ -8379,91 +7797,93 @@ Title screen oddly keeps scrolling (verify)
 		</part>
 	</software>
 
-	<!-- After creating the program disk and booting from it, the game asks for "disk 3", but none of the disks included here work -->
-	<software name="brand2pb" supported="no">
+	<software name="brand2pb" supported="yes">
 		<description>Brandish 2 - The Planet Buster</description>
 		<year>1993</year>
 		<publisher>日本ファルコム (Nihon Falcom)</publisher>
 		<info name="alt_title" value="ブランディッシュ２ ザ プラネット バスター" />
 		<info name="release" value="19930312" />
+		<info name="usage" value="Disk 0 is for creating an user disk, boot from disk 1 if saving isn't priority" />
+		<!-- NOTE: Repetition actually reflects what's printed on disk labels -->
 		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Master Program"/>
+			<feature name="part_id" value="Master Program Disk / Disk 0"/>
 			<dataarea name="flop" size="1265664">
 				<rom name="masterprogram.fdi" size="1265664" crc="d4fad96a" sha1="67a353cbfd5274b9c6af4e2781d312e19cee59d7" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Program"/>
+			<feature name="part_id" value="Program Disk / Disk 1"/>
 			<dataarea name="flop" size="1265664">
 				<rom name="program.fdi" size="1265664" crc="d381cceb" sha1="c05328237ab820f144d1fc7f07d7cd131b7b5caa" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_5_25">
-			<feature name="part_id" value="Data 1"/>
-			<dataarea name="flop" size="1265664">
-				<rom name="data1.fdi" size="1265664" crc="d8efe13d" sha1="d46b2da251369410116a7649b297e8143807d34f" offset="0" />
-			</dataarea>
-		</part>
-		<part name="flop4" interface="floppy_5_25">
-			<feature name="part_id" value="Data 2"/>
-			<dataarea name="flop" size="1265664">
-				<rom name="data2.fdi" size="1265664" crc="7065abc4" sha1="f4add5a0922425359a1b0f3f760d3cd8918dae9c" offset="0" />
-			</dataarea>
-		</part>
-		<part name="flop5" interface="floppy_5_25">
-			<feature name="part_id" value="Data 3"/>
-			<dataarea name="flop" size="1265664">
-				<rom name="data3.fdi" size="1265664" crc="0a54db67" sha1="45cae8508a8db65fe25634dc1269b9405865722a" offset="0" />
-			</dataarea>
-		</part>
-		<part name="flop6" interface="floppy_5_25">
-			<feature name="part_id" value="Opening"/>
+			<feature name="part_id" value="Opening Disk / Disk 2"/>
 			<dataarea name="flop" size="1265664">
 				<rom name="opening.fdi" size="1265664" crc="feac475b" sha1="fee6c9e507e1fa7a452283cbf4e3a2be0bf52556" offset="0" />
 			</dataarea>
 		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Data Disk 1 / Disk 3"/>
+			<dataarea name="flop" size="1265664">
+				<rom name="data1.fdi" size="1265664" crc="d8efe13d" sha1="d46b2da251369410116a7649b297e8143807d34f" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_5_25">
+			<feature name="part_id" value="Data Disk 2 / Disk 4"/>
+			<dataarea name="flop" size="1265664">
+				<rom name="data2.fdi" size="1265664" crc="7065abc4" sha1="f4add5a0922425359a1b0f3f760d3cd8918dae9c" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_5_25">
+			<feature name="part_id" value="Data Disk 3 / Disk 5"/>
+			<dataarea name="flop" size="1265664">
+				<rom name="data3.fdi" size="1265664" crc="0a54db67" sha1="45cae8508a8db65fe25634dc1269b9405865722a" offset="0" />
+			</dataarea>
+		</part>
 	</software>
 
-	<software name="brand2pba" cloneof="brand2pb" supported="no">
+	<software name="brand2pba" cloneof="brand2pb" supported="yes">
 		<description>Brandish 2 - The Planet Buster (alt Program disk)</description>
 		<year>1993</year>
 		<publisher>日本ファルコム (Nihon Falcom)</publisher>
 		<info name="alt_title" value="ブランディッシュ２ ザ プラネット バスター" />
 		<info name="release" value="19930312" />
 		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Master Program"/>
+			<feature name="part_id" value="Master Program Disk / Disk 0"/>
 			<dataarea name="flop" size="1265664">
 				<rom name="masterprogram.fdi" size="1265664" crc="d4fad96a" sha1="67a353cbfd5274b9c6af4e2781d312e19cee59d7" offset="0" />
 			</dataarea>
 		</part>
+		<!-- baddump: contains non-factory save -->
 		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Program"/>
+			<feature name="part_id" value="Program Disk / Disk 1"/>
 			<dataarea name="flop" size="1265664">
-				<rom name="program_alt.fdi" size="1265664" crc="d38a28fc" sha1="340c29ae7c7e5c29d1d4f15688603ddf53a3b417" offset="0" />
+				<rom name="program_alt.fdi" size="1265664" crc="d38a28fc" sha1="340c29ae7c7e5c29d1d4f15688603ddf53a3b417" offset="0" status="baddump" />
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_5_25">
-			<feature name="part_id" value="Data 1"/>
+			<feature name="part_id" value="Opening Disk / Disk 2"/>
+			<dataarea name="flop" size="1265664">
+				<rom name="opening.fdi" size="1265664" crc="feac475b" sha1="fee6c9e507e1fa7a452283cbf4e3a2be0bf52556" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Data Disk 1 / Disk 3"/>
 			<dataarea name="flop" size="1265664">
 				<rom name="data1.fdi" size="1265664" crc="d8efe13d" sha1="d46b2da251369410116a7649b297e8143807d34f" offset="0" />
 			</dataarea>
 		</part>
-		<part name="flop4" interface="floppy_5_25">
-			<feature name="part_id" value="Data 2"/>
+		<part name="flop5" interface="floppy_5_25">
+			<feature name="part_id" value="Data Disk 2 / Disk 4"/>
 			<dataarea name="flop" size="1265664">
 				<rom name="data2.fdi" size="1265664" crc="7065abc4" sha1="f4add5a0922425359a1b0f3f760d3cd8918dae9c" offset="0" />
 			</dataarea>
 		</part>
-		<part name="flop5" interface="floppy_5_25">
-			<feature name="part_id" value="Data 3"/>
+		<part name="flop6" interface="floppy_5_25">
+			<feature name="part_id" value="Data Disk 3 / Disk 5"/>
 			<dataarea name="flop" size="1265664">
 				<rom name="data3.fdi" size="1265664" crc="0a54db67" sha1="45cae8508a8db65fe25634dc1269b9405865722a" offset="0" />
-			</dataarea>
-		</part>
-		<part name="flop6" interface="floppy_5_25">
-			<feature name="part_id" value="Opening"/>
-			<dataarea name="flop" size="1265664">
-				<rom name="opening.fdi" size="1265664" crc="feac475b" sha1="fee6c9e507e1fa7a452283cbf4e3a2be0bf52556" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -9076,13 +8496,13 @@ Title screen oddly keeps scrolling (verify)
 		</part>
 	</software>
 
-	<!-- During the intro the graphics become corrupted and eventually disappear completely, while the music keeps playing -->
-	<software name="burai" supported="no">
+	<software name="burai" supported="yes">
 		<description>Burai Joukan</description>
 		<year>1989</year>
 		<publisher>リバーヒルソフト (Riverhill Soft)</publisher>
 		<info name="alt_title" value="ブライ 上巻" />
 		<info name="release" value="19891206" />
+		<info name="usage" value="Boot with disk 2 to actually start a game or create an user disk" />
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="1265664">
@@ -9213,8 +8633,7 @@ Title screen oddly keeps scrolling (verify)
 		</part>
 	</software>
 
-	<!-- Black screen on boot -->
-	<software name="cal" supported="no">
+	<software name="cal" supported="yes">
 		<description>Cal</description>
 		<year>1990</year>
 		<publisher>バーディーソフト (Birdy Soft)</publisher>
@@ -9234,8 +8653,7 @@ Title screen oddly keeps scrolling (verify)
 		</part>
 	</software>
 
-	<!-- Black screen on boot -->
-	<software name="cal2" supported="no">
+	<software name="cal2" supported="yes">
 		<description>Cal II</description>
 		<year>1991</year>
 		<publisher>バーディーソフト (Birdy Soft)</publisher>
@@ -9591,13 +9009,13 @@ Title screen oddly keeps scrolling (verify)
 		</part>
 	</software>
 
-	<!-- Black screen on boot, but works if installed to HDD -->
-	<software name="cardbust" supported="no">
-		<description>Card Buster</description>
-		<year>1993</year>
+	<software name="cardbust" supported="yes">
+		<description>Card Buster (Vol 2.00)</description>
+		<!-- 1994 June-->
+		<year>1994</year>
 		<publisher>F-88</publisher>
 		<info name="alt_title" value="カードバスター" />
-		<info name="usage" value="Run HDINST.BAT to install to HDD" />
+		<info name="usage" value="Run HDINST.BAT to install to HDD, INSTALL.BAT for a bootable MS-DOS cfr. README.DOC" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="cbuster1.fdi" size="1265664" crc="e0e6e4a5" sha1="baebdace730a63f5d796e5f2397531911721edc9" offset="0" />
@@ -9624,34 +9042,33 @@ Title screen oddly keeps scrolling (verify)
 		</part>
 	</software>
 
-	<!-- Runs only on 286-class and older machines (e.g. PC-9801F, PC-9801UX), otherwise gives a "Packed file is corrupt" error. -->
-	<software name="carmnjpn" supported="partial">
+	<software name="carmnjpn" supported="yes">
 		<description>Carmen Sandiego in Japan - Hannin Sagashite Nihon Zenkoku</description>
 		<year>1989</year>
 		<publisher>ブロダーバンドジャパン (Brøderbund Japan)</publisher>
 		<info name="alt_title" value="カルメン サンディエゴ イン ジャパン ～犯人探して日本全国～" />
 		<info name="release" value="19891121" />
 		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 1"/>
+			<feature name="part_id" value="System Disk 1"/>
 			<dataarea name="flop" size="1265664">
 				<rom name="csijapn1.fdi" size="1265664" crc="3f3baa31" sha1="35c455b54a4bd5e1e8f88a9ee8f630c6098d55c1" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 2"/>
+			<feature name="part_id" value="System Disk 2"/>
 			<dataarea name="flop" size="1265664">
 				<rom name="csijapn2.fdi" size="1265664" crc="ea5a0a61" sha1="42de3a6becb49ebed8373df29064293ec999f703" offset="0" />
 			</dataarea>
 		</part>
 	</software>
 
-	<!-- Runs too fast on anything except (presumably) a 8086 CPU, but it doesn't boot on the PC-9801F -->
-	<software name="carmine" supported="partial">
+	<software name="carmine" supported="yes">
 		<description>Carmine</description>
 		<year>1986</year>
 		<publisher>マイクロキャビン (Microcabin)</publisher>
 		<info name="alt_title" value="カーマイン" />
 		<info name="release" value="198601xx" />
+		<info name="usage" value="Requires VM class or earlier, otherwise will run too fast" />
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="1265664">
@@ -9814,13 +9231,13 @@ Title screen oddly keeps scrolling (verify)
 		</part>
 	</software>
 
-	<!-- "データ・ファイルが見つかりません" (data file not found) on PC-9801UX, "Packed file is corrupt" on anything else -->
-	<!-- boot OK by running CENTURIO.EXE from MSDOS -->
-	<software name="centurio" supported="no">
+	<software name="centurio" supported="yes">
 		<!-- Origin: Neo Kobe Collection -->
 		<description>Centurion - Defender of Rome</description>
 		<year>1993</year>
 		<publisher>エレクトロニック・アーツ・ビクター (Electronic Arts Victor)</publisher>
+		<info name="alt_title" value="センチュリオン DEFENDER OF ROME" />
+		<info name="usage" value="Requires RS class for sound to work" />
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="1261568">
@@ -9835,13 +9252,13 @@ Title screen oddly keeps scrolling (verify)
 		</part>
 	</software>
 
-	<!-- Hardlocks MAME on PC-9801UX, "Packed file is corrupt" on anything else -->
-	<!-- boot OK by running CENTURIO.EXE from MSDOS -->
-	<software name="centurioa" cloneof="centurio" supported="no">
+	<software name="centurioa" cloneof="centurio" supported="yes">
 		<!-- Origin: Neo Kobe Collection -->
 		<description>Centurion - Defender of Rome (alt)</description>
 		<year>1993</year>
 		<publisher>エレクトロニック・アーツ・ビクター (Electronic Arts Victor)</publisher>
+		<info name="alt_title" value="センチュリオン DEFENDER OF ROME" />
+		<info name="usage" value="Requires RS class for sound to work" />
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="1261568">
@@ -9882,12 +9299,13 @@ Title screen oddly keeps scrolling (verify)
 		</part>
 	</software>
 
-	<!-- Can't change disks, so it's not possible to save or load characters -->
-	<!-- randomly locks up -->
-	<software name="ckrynn" supported="no">
+	<software name="ckrynn" supported="partial">
 		<description>Champions of Krynn</description>
 		<year>1992</year>
 		<publisher>ポニーキャニオン (Pony Canyon)</publisher>
+		<notes><![CDATA[
+Has optional [RS-MIDI] sound support
+]]></notes>
 		<info name="alt_title" value="ＡＤ＆Ｄ チャンピオン オブ クリン" />
 		<info name="release" value="19921021" />
 		<part name="flop1" interface="floppy_5_25">
@@ -10228,13 +9646,10 @@ Title screen oddly keeps scrolling (verify)
 		</part>
 	</software>
 
-	<software name="fsmoon" supported="no">
+	<software name="fsmoon" supported="yes">
 		<description>Chikyuu Bouei Gun II - The Earth Self Defense Force - Far Side Moon</description>
 		<year>1989</year>
 		<publisher>アートディンク (Artdink)</publisher>
-		<notes><![CDATA[
-Randomly crashes during gameplay with stuck note
-]]></notes>
 		<info name="alt_title" value="ファーサイドムーン 地球防衛軍２" />
 		<info name="release" value="198912xx" />
 		<part name="flop1" interface="floppy_5_25">
@@ -10257,14 +9672,11 @@ Randomly crashes during gameplay with stuck note
 		</part>
 	</software>
 
-	<software name="ikochan" supported="partial">
+	<software name="ikochan" supported="yes">
 		<!-- Origin: Neo Kobe Collection -->
 		<description>Chikyuu Bouei Shoujo Iko-chan - UFO Daisakusen</description>
 		<year>1992</year>
 		<publisher>グラムス (Glams)</publisher>
-		<notes><![CDATA[
-Corrupt [PCG] kanji draws on karaoke style opening sequence
-]]></notes>
 		<info name="alt_title" value="地球防衛少女イコちゃん ～ＵＦＯ大作戦～" />
 		<info name="release" value="19921204" />
 		<part name="flop1" interface="floppy_5_25">
@@ -10305,11 +9717,15 @@ Corrupt [PCG] kanji draws on karaoke style opening sequence
 		</part>
 	</software>
 
-	<!-- Seems to be missing a disk labeled Data 3 -->
 	<software name="chimesq" supported="no">
 		<description>Chime's Quest</description>
 		<year>1992</year>
 		<publisher>ログインソフト (Login Soft)</publisher>
+		<notes><![CDATA[
+Looks a RPG maker tool
+Seems to be missing a disk labeled Data 3
+Not extensively tested, running game start will moan about missing files
+]]></notes>
 		<info name="alt_title" value="チャイムズクエスト" />
 		<info name="release" value="199202xx" />
 		<info name="usage" value="Run INSTALL.EXE from DOS to create a bootable disk or install to HDD" />
@@ -10653,7 +10069,7 @@ Requires 3.5" floppy emulation
 		<year>1986</year>
 		<publisher>パソコンショップ高知 (PSK)</publisher>
 		<notes><![CDATA[
-Missing [7220] text selector for choices
+Missing [7220] text selector for choices (btanb? May just require specific keys, need manual)
 ]]></notes>
 		<info name="alt_title" value="クリスチーヌ" />
 		<info name="release" value="198610xx" />
@@ -10920,15 +10336,18 @@ Missing [7220] text selector for choices
 		</part>
 	</software>
 
-	<!-- Asks for a "game disk" after booting - is it missing a disk? -->
 	<software name="classrod" supported="no">
-		<description>Classic Road</description>
+		<description>Classic Road 1</description>
 		<year>1992</year>
 		<publisher>ビクター音楽産業 (Victor Musical Industries)</publisher>
-		<info name="alt_title" value="クラシック・ロード" />
+		<notes><![CDATA[
+Game is in two disks, one is missing.
+]]></notes>
+		<info name="alt_title" value="クラシック・ロード1" />
 		<info name="release" value="19920508" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1281968">
+				<!-- TODO: actually boots if inserted in drive 2, "Game Disk"? -->
 				<rom name="croad.d88" size="1281968" crc="af777e28" sha1="d08efd66b5f231afb5715e69b0a5f90b0e5faa40" offset="0" />
 			</dataarea>
 		</part>
@@ -10962,11 +10381,13 @@ Missing [7220] text selector for choices
 		</part>
 	</software>
 
-	<!-- Hangs while booting -->
 	<software name="classro3" supported="no">
 		<description>Classic Road 3</description>
 		<year>1994</year>
 		<publisher>ビクターエンタテインメント (Victor Entertainment)</publisher>
+		<notes><![CDATA[
+Hangs during MEGDOS booting, [FDC] chrn=(77, 0, -8, 2048)
+]]></notes>
 		<info name="alt_title" value="クラシック・ロード３" />
 		<info name="release" value="19941209" />
 		<part name="flop1" interface="floppy_5_25">
@@ -11262,12 +10683,12 @@ Missing [7220] text selector for choices
 		</part>
 	</software>
 
-	<software name="company" supported="no">
+	<software name="company" supported="partial">
 		<description>Company</description>
 		<year>1993</year>
 		<publisher>ジーエーエム (GAM)</publisher>
 		<notes><![CDATA[
-Fails user disk creation (will ask for a disk swap for disk 1 that will fail)
+Very minor [GRCG] layer clearance misses (verify)
 ]]></notes>
 		<info name="alt_title" value="カンパニー" />
 		<info name="release" value="19930411" />
@@ -11305,23 +10726,13 @@ Fails user disk creation (will ask for a disk swap for disk 1 that will fail)
 		</part>
 	</software>
 
-	<!-- This is a driver disk for a PC-9801-86-compatible PCMCIA sound card -->
-	<software name="fmc98drv" supported="no">
-		<!-- Origin: Neo Kobe Collection -->
-		<description>Computer Technica FMC-98 Sound Card Driver Utility</description>
-		<year>1995?</year>
-		<publisher>コンピュータテクニカ (Computer Technica)</publisher>
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="1261568">
-				<rom name="computer technica fmc-98 sound card driver utility.hdm" size="1261568" crc="7bc24877" sha1="50e0bd8568c3705c7911c1f66d80dd9c7d9b4bca" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="concert">
 		<description>Concert</description>
 		<year>1994</year>
 		<publisher>アーヴォリオ (Aypio)</publisher>
+		<notes><![CDATA[
+Boots with NAX.COM -o20 -b80 -q -0 -f9 -t
+]]></notes>
 		<info name="alt_title" value="コンサート" />
 		<info name="release" value="19940415" />
 		<part name="flop1" interface="floppy_5_25">
@@ -11369,19 +10780,6 @@ Course names draws a full square kanji block between nation and "GP" (verify)
 			<feature name="part_id" value="Course Data Disk"/>
 			<dataarea name="flop" size="1265664">
 				<rom name="disk_3.fdi" size="1265664" crc="f49df6d7" sha1="e2e54c54c6787d360c4697a270471d75417a31c9" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<!-- This is a driver disk for a memory expansion board -->
-	<software name="superems" supported="no">
-		<!-- Origin: Neo Kobe Collection -->
-		<description>Contec Super EMS</description>
-		<year>1991?</year>
-		<publisher>Contec</publisher>
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="1261568">
-				<rom name="contec super ems.hdm" size="1261568" crc="7268cb3d" sha1="96268d65624519a16dd0737f6042c6c30e75c671" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -51592,7 +50990,7 @@ Hangs at Cross Media Soft logo, triggers [FDC] XTMASK irq
 		<year>1994</year>
 		<publisher>ビクターエンタテインメント (Victor Entertainment)</publisher>
 		<notes><![CDATA[
-Black screen, around PC=1fc76 (copy protection?)
+Black screen, around PC=1fc76. Extensively uses 9821 PEGC MMIO.
 ]]></notes>
 		<info name="alt_title" value="フラッシュバック" />
 		<info name="release" value="19940422" />
@@ -70292,5 +69690,660 @@ Same as Police Quest 2 - Quest for Glory stand-alone disks
     </software>
 -->
 
+<!-- Driver Disks -->
+	<software name="cddriver">
+		<description>CD-ROM Driver</description>
+		<year>19??</year>
+		<publisher>NEC</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1265664">
+				<rom name="cd-rom driver.fdi" size="1265664" crc="eae95078" sha1="bc55f59e5c60f5a3d296d79ca2413eaaf7369e2f" offset="0" />
+			</dataarea>
+		</part>
+	</software>
 
+	<software name="fmc98drv" supported="no">
+		<!-- Origin: Neo Kobe Collection -->
+		<description>FMC-98 Sound Card Driver Utility</description>
+		<year>1995?</year>
+		<publisher>コンピュータテクニカ (Computer Technica)</publisher>
+		<notes><![CDATA[
+Driver disk for a PC-9801-86-compatible PCMCIA sound card
+]]></notes>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261568">
+				<rom name="computer technica fmc-98 sound card driver utility.hdm" size="1261568" crc="7bc24877" sha1="50e0bd8568c3705c7911c1f66d80dd9c7d9b4bca" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="superems" supported="no">
+		<!-- Origin: Neo Kobe Collection -->
+		<description>Super EMS-98</description>
+		<year>1991?</year>
+		<publisher>Contec</publisher>
+		<notes><![CDATA[
+Super EMS(98) driver disk
+]]></notes>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261568">
+				<rom name="contec super ems.hdm" size="1261568" crc="7268cb3d" sha1="96268d65624519a16dd0737f6042c6c30e75c671" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="iomega" supported="no">
+		<description>Iomega Zip-drive Tools (Version 5.1J)</description>
+		<year>1996</year>
+		<publisher>Iomega</publisher>
+		<notes><![CDATA[
+Japanese version of ibm5170:iomega
+]]></notes>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261568">
+				<rom name="iomega_zip_5.1j_pc98_install.hdm" size="1261568" crc="0e3452c9" sha1="f2206e6a7f5d9f420d2bbb08aa9c0e22b95a0e9f" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+
+<!-- Disk copiers -->
+
+	<software name="copyaid">
+		<description>Copy Aid 98 II v2.20</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1156336">
+				<rom name="copyaid_ver2.20.d88" size="1156336" crc="31c824bd" sha1="46e7e7b890a0f160471720fcac748596b15b41d3" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mifes">
+		<description>MIFES 5.0</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1265664">
+				<rom name="mifes 5.0.fdi" size="1265664" crc="b8d57d4f" sha1="137f0cd823707ff3a7a42dacb4e80f0ff94cadd6" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="elecom">
+		<description>Ele Command (5.25&quot; Disk)</description>
+		<!-- 1992/07/17 -->
+		<year>1992</year>
+		<publisher>Elecom</publisher>
+		<!-- TODO: understand what is this for -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1265664">
+				<rom name="elecommand_5in.fdi" size="1265664" crc="85736046" sha1="73264a5593148b0f29e3713b0badfa903ce3cab3" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="elecom35" cloneof="elecom" supported="no">
+		<description>Ele Command (3.5&quot; Disk)</description>
+		<!-- 1992/07/17 -->
+		<year>1992</year>
+		<publisher>Elecom</publisher>
+		<notes><![CDATA[
+Can be accessed from DOS if interface is changed to 5.25" (???)
+Looks same as elecom with extra non-autobootable COMMAND.COM copy
+]]></notes>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1265664">
+				<rom name="elecommand_3in.fdi" size="1265664" crc="7bb15517" sha1="9ec66efa7c75a08d403dea1fa55e855dc8f015d0" offset="0" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="eosys30">
+		<description>EO System 3.0 (v1.17 installer)</description>
+		<year>1995</year>
+		<publisher>ICM</publisher>
+		<info name="usage" value="Run INST.EXE to install to HDD" />
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="1265664">
+				<rom name="eo30d1.fdi" size="1265664" crc="6098850c" sha1="d98aaea863381c453623fe10413b0ef05dd781ac" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2"/>
+			<dataarea name="flop" size="1265664">
+				<rom name="eo30d2.fdi" size="1265664" crc="6906852e" sha1="749201c2304e37d5623a7f462e438f40c64a252f" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="eosys30i10" cloneof="eosys30">
+		<description>EO System 3.0 (v1.10 installer)</description>
+		<year>1995</year>
+		<publisher>ICM</publisher>
+		<info name="usage" value="Run INST.EXE to install to HDD" />
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="1261568">
+				<rom name="eo system 3 (v1.10) (disk 1).hdm" size="1261568" crc="c1d22678" sha1="0480cf848f05e3bf1ddd225de2c2b63378dc146e" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2"/>
+			<dataarea name="flop" size="1261568">
+				<rom name="eo system 3 (v1.10) (disk 2).hdm" size="1261568" crc="39122ba0" sha1="e96cb528bc981d3c5f6d34aea88415aaf998fe68" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wiz98">
+		<description>Wizard98 v3</description>
+		<year>19??</year>
+		<publisher>ウエストサイド (WestSide)</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1350240">
+				<rom name="wizard98-v3 systemdisk.nfd" size="1350240" crc="4419e57c" sha1="ea69af5e51174ba545fe689b5d9597b9e3ea5a56" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wiz98r8">
+		<description>Wizard98 v3r8</description>
+		<year>19??</year>
+		<publisher>ウエストサイド (WestSide)</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1265664">
+				<rom name="wizard98r8.fdi" size="1265664" crc="507a66ac" sha1="145056248f4cb6ce2522168f9122902eb93e4820" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wiz98r5">
+		<description>Wizard98 v3r5</description>
+		<year>19??</year>
+		<publisher>ウエストサイド (WestSide)</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1265664">
+				<rom name="wizard98r5.fdi" size="1265664" crc="4c68b6fe" sha1="f245c0268a34211fa810cdc1d363627c5cc3b22d" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wiz98r4">
+		<description>Wizard98 v3r4</description>
+		<year>19??</year>
+		<publisher>ウエストサイド (WestSide)</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1265664">
+				<rom name="wizard98r4.fdi" size="1265664" crc="65fe0008" sha1="87afd9e86014263ae013fcb7e072dbc298ef9d44" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wiz98r3">
+		<description>Wizard98 v3r3</description>
+		<year>19??</year>
+		<publisher>ウエストサイド (WestSide)</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1265664">
+				<rom name="wizard98r3.fdi" size="1265664" crc="54775a20" sha1="46a2961e535c9b0b9c778271da2a8e1ec7cfc68f" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="chankonb" supported="no">
+		<description>Chanko Nabe</description>
+		<year>1990?</year>
+		<publisher>ウエストサイド (WestSide)</publisher>
+		<notes><![CDATA[
+Contains several .w3f / .w3m files, all in katakana filenames
+Related to Wizard98
+]]></notes>
+		<info name="alt_title" value="ちゃんこ鍋" />
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk A"/>
+			<dataarea name="flop" size="1334720">
+				<rom name="chanko_nabe a-disk.nfd" size="1334720" crc="973e80e8" sha1="9c30fa64d1811922df591723108cd07020d8cd7f" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk B"/>
+			<dataarea name="flop" size="1334720">
+				<rom name="chanko_nabe b-disk.nfd" size="1334720" crc="e98efd7f" sha1="01df48ea31dfa8d6b1236d750c56d1b5156f72c2" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="yutoufu" supported="no">
+		<description>Yutoufu</description>
+		<year>19??</year>
+		<publisher>ウエストサイド (WestSide)</publisher>
+		<notes><![CDATA[
+Contains several .w3f / .w3m files, all in katakana filenames
+Related to Wizard98
+]]></notes>
+		<info name="alt_title" value="ゆどうふ" />
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="1265664">
+				<rom name="wiz98yutoufu1.fdi" size="1265664" crc="50abaa75" sha1="d391297c0ac978419239c390d7fdfb4a49a86063" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2"/>
+			<dataarea name="flop" size="1265664">
+				<rom name="wiz98yutoufu2.fdi" size="1265664" crc="aa8a2275" sha1="c87ee9d1cba718cbbb29329605cadd2e86fd9494" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 3"/>
+			<dataarea name="flop" size="1265664">
+				<rom name="wiz98yutoufu3.fdi" size="1265664" crc="4dd12f80" sha1="95aa13b0293d637777bd2b64772476143c4d8dd8" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 4"/>
+			<dataarea name="flop" size="1265664">
+				<rom name="wiz98yutoufu4.fdi" size="1265664" crc="41f65557" sha1="213b583a6cb3677db8c16d114d0209af7cf3a136" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wrp91021" supported="no">
+		<description>Wizard98 Report Vol 91.2-1</description>
+		<year>1991</year>
+		<publisher>Westside Softhouse</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1334720">
+				<rom name="report 91-02-1.nfd" size="1334720" crc="e6c09bd9" sha1="4c49c9cc4474669c14c6595ef2a2de7bace769cf" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wrp91051" supported="no">
+		<description>Wizard98 Report Vol 91.5-1</description>
+		<year>1991</year>
+		<publisher>Westside Softhouse</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1284704">
+				<rom name="report 91-05-1.nfd" size="1284704" crc="788442e0" sha1="ef763777cea84ff0de68a629da3a1fc1083561e8" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wrp91072" supported="no">
+		<description>Wizard98 Report Vol 91.7-2</description>
+		<year>1991</year>
+		<publisher>Westside Softhouse</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1284704">
+				<rom name="report 91-07-2.nfd" size="1284704" crc="a3f6d06f" sha1="e00e9ed7c3c51e3c03e35edac184261a0a3636d8" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wrp91101" supported="no">
+		<description>Wizard98 Report Vol 91.10-1</description>
+		<year>1991</year>
+		<publisher>Westside Softhouse</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1284704">
+				<rom name="report 91-10-1.nfd" size="1284704" crc="c26b7473" sha1="42fac5a6440efaf2e891fa21f3a1ff3247bcc6a9" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wrp92011" supported="no">
+		<description>Wizard98 Report Vol 92.1-1</description>
+		<year>1992</year>
+		<publisher>Westside Softhouse</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1284704">
+				<rom name="report 92-01-1.nfd" size="1284704" crc="506d0448" sha1="5e1fa273ac86a16749bd21e0ffe2a67b8a257725" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wrp92014" supported="no">
+		<description>Wizard98 Report Vol 92.1-4</description>
+		<year>1992</year>
+		<publisher>Westside Softhouse</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1284704">
+				<rom name="report 92-01-4.nfd" size="1284704" crc="eca1c4b5" sha1="d49dfa05a164e58cb99264fd404fe658b561c6ed" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wrp92023" supported="no">
+		<description>Wizard98 Report Vol 92.2-3</description>
+		<year>1992</year>
+		<publisher>Westside Softhouse</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1327232">
+				<rom name="report 92-02-3.nfd" size="1327232" crc="f9728009" sha1="f98db99a773816be4cb0b58fb39e8f32bed50037" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wrp92061" supported="no">
+		<description>Wizard98 Report Vol 92.6-1</description>
+		<year>1992</year>
+		<publisher>Westside Softhouse</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1284704">
+				<rom name="report 92-06-1.nfd" size="1284704" crc="d5b3c4dd" sha1="c9814dddb522dcaa0c0e1203fe7e69bbb28bf5e4" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wrp92064" supported="no">
+		<description>Wizard98 Report Vol 92.6-4</description>
+		<year>1992</year>
+		<publisher>Westside Softhouse</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1284704">
+				<rom name="report 92-06-4.nfd" size="1284704" crc="7576cb77" sha1="9edb25923306f75ed3d019bcc0c464b86bddd43d" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wrp92081" supported="no">
+		<description>Wizard98 Report Vol 92.8-1</description>
+		<year>1992</year>
+		<publisher>Westside Softhouse</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1294032">
+				<rom name="report 92-08-1.nfd" size="1294032" crc="3763b0dc" sha1="11d960268928b40eab92a8165488e533452376d5" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wrp92092" supported="no">
+		<description>Wizard98 Report Vol 92.9-2</description>
+		<year>1992</year>
+		<publisher>Westside Softhouse</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1895584">
+				<rom name="report 92-09-2.nfd" size="1895584" crc="f3b9aebb" sha1="59860e753522d7ae34ce53f96c0066c81a5572b4" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wrp92114" supported="no">
+		<description>Wizard98 Report Vol 92.11-4</description>
+		<year>1992</year>
+		<publisher>Westside Softhouse</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1284704">
+				<rom name="report 92-11-4.nfd" size="1284704" crc="311627ec" sha1="6bc093371756863d0966bb906fc4cd67cec098e6" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wrp93011" supported="no">
+		<description>Wizard98 Report Vol 93.1-1</description>
+		<year>1993</year>
+		<publisher>Westside Softhouse</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1284704">
+				<rom name="report 93-01-1.nfd" size="1284704" crc="e60e6916" sha1="4478d5f5f9297db5866ccd6aa88557c0f222255c" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wrp93021" supported="no">
+		<description>Wizard98 Report Vol 93.2-1</description>
+		<year>1993</year>
+		<publisher>Westside Softhouse</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1284704">
+				<rom name="report 93-02-1.nfd" size="1284704" crc="776a9739" sha1="b6356723c397edabe5b9a025f1d4b419cdc6dc8b" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wrp93034" supported="no">
+		<description>Wizard98 Report Vol 93.3-4</description>
+		<year>1993</year>
+		<publisher>Westside Softhouse</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1284704">
+				<rom name="report 93-03-4.nfd" size="1284704" crc="66429194" sha1="7f35ab5bff327e5e9c6b69fe7c6f184acbaa7b6a" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wrp93072" supported="no">
+		<description>Wizard98 Report Vol 93.7-2</description>
+		<year>1993</year>
+		<publisher>Westside Softhouse</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1327232">
+				<rom name="report 93-07-2.nfd" size="1327232" crc="454ee24f" sha1="2635659b9983afba0a70f750289ce9cfd68dcf1d" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wrp93094" supported="no">
+		<description>Wizard98 Report Vol 93.9-4</description>
+		<year>1993</year>
+		<publisher>Westside Softhouse</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1284704">
+				<rom name="report 93-09-4.nfd" size="1284704" crc="8b17c00b" sha1="d835c786231037b5fe291760f7fa5eed0d77cc32" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wrp93105" supported="no">
+		<description>Wizard98 Report Vol 91.10-5</description>
+		<year>1993</year>
+		<publisher>Westside Softhouse</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1285728">
+				<rom name="report 93-10-5.nfd" size="1285728" crc="290878eb" sha1="b675cef5fdec39e6c7b35bcd7894116425542cbc" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wrp94024" supported="no">
+		<description>Wizard98 Report Vol 94.2-4</description>
+		<year>1994</year>
+		<publisher>Westside Softhouse</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1418624">
+				<rom name="report 94-02-4.nfd" size="1418624" crc="b8a45537" sha1="2fc4cc393749d9f565d2958144b0d8406f3b27b7" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wrp94041" supported="no">
+		<description>Wizard98 Report Vol 94.4-1</description>
+		<year>1994</year>
+		<publisher>Westside Softhouse</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1581472">
+				<rom name="report 94-04-1.nfd" size="1581472" crc="9b116d7f" sha1="1d3b2ca300b3704f927593a91f73e97260fd8b0e" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wrp94071" supported="no">
+		<description>Wizard98 Report Vol 94.7-1</description>
+		<year>1994</year>
+		<publisher>Westside Softhouse</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1313472">
+				<rom name="report 94-07-1.nfd" size="1313472" crc="1b899fef" sha1="c0334b42dd5a69c3b8522b4e79af68c94b52ab22" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wrp95033" supported="no">
+		<description>Wizard98 Report Vol 95.3-3</description>
+		<year>1995</year>
+		<publisher>Westside Softhouse</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1270720">
+				<rom name="report 95-03-3.nfd" size="1270720" crc="b2def29c" sha1="0b2313fce65614e44eff3f42c099728652cd1795" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wrp96084" supported="no">
+		<description>Wizard98 Report Vol 96.8-4</description>
+		<year>1996</year>
+		<publisher>Westside Softhouse</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1328256">
+				<rom name="report 96-08-4.nfd" size="1328256" crc="e8e294f9" sha1="9fa3c3edbb1851c4550c03565738945071b9ba61" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wizaf01">
+		<description>Wizard98 All-Filers No.1</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1284704">
+				<rom name="all-filers no1.nfd" size="1284704" crc="a150f80d" sha1="a78b4b62967e35a03272f170692ed5918ec557cb" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wizaf02">
+		<description>Wizard98 All-Filers No.2</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1313056">
+				<rom name="all-filers no2.nfd" size="1313056" crc="716c5dda" sha1="1bdbc4fd650e23979364eba2ab5f23d90b21873c" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wizaf09">
+		<description>Wizard98 All-Filers No.9</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1265664">
+				<rom name="all-filers no9.fdi" size="1265664" crc="fe1c8928" sha1="b2535891aed6f65585c0f5ec7afbbb7a0ca6c768" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wizaf12">
+		<description>Wizard98 All-Filers No.12</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1265664">
+				<rom name="all-filers no12.fdi" size="1265664" crc="6ec7cf2c" sha1="51b46f4d23de7cdba1579e7822fc122a4cc1493e" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wizaf13">
+		<description>Wizard98 All-Filers No.13</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1265664">
+				<rom name="all-filers no13.fdi" size="1265664" crc="804b8b1d" sha1="901fc12f26eefb850acb975372addbd3299ecd84" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wizaf14">
+		<description>Wizard98 All-Filers No.14</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1265664">
+				<rom name="all-filers no14.fdi" size="1265664" crc="2fcf38ee" sha1="b9ba4f2399b888b3c6d7722b297b0d91ac763602" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wizaf15">
+		<description>Wizard98 All-Filers No.15</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1265664">
+				<rom name="all-filers no15.fdi" size="1265664" crc="76d34331" sha1="7a549b16feaf87003b839b08e11429298e04a4e9" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wizaf16">
+		<description>Wizard98 All-Filers No.16</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1265664">
+				<rom name="all-filers no16.fdi" size="1265664" crc="667373e6" sha1="d0308a29c8367cfe4526b2f10b9981b32c60729f" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wizaf17">
+		<description>Wizard98 All-Filers No.17</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1265664">
+				<rom name="all-filers no17.fdi" size="1265664" crc="9a7ed485" sha1="0c83692bd5c9e0e5ecb14b1a7d42f2256cdda21e" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wizaf18">
+		<description>Wizard98 All-Filers No.18</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1265664">
+				<rom name="all-filers no18.fdi" size="1265664" crc="8aa56345" sha1="f18819012222a39918ac9034389fcfc75af9d5b4" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wizfo1">
+		<description>Wizard98 Filers-Oden No.1</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1307744">
+				<rom name="filer-oden no1.nfd" size="1307744" crc="54afe365" sha1="3d0fe8c05e20e506beb21a4ed8b569f18ae1ff35" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wizfo2">
+		<description>Wizard98 Filers-Oden No.2</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1307744">
+				<rom name="filer-oden no2.nfd" size="1307744" crc="f60d7bfd" sha1="67ec8c1bd9efa1116ac78678df6a70832504ea02" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wizfo3">
+		<description>Wizard98 Filers-Oden No.3</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1307744">
+				<rom name="filer-oden no3.nfd" size="1307744" crc="5711ab27" sha1="47414ca7148ac4aa8570111f8820afb5a8cf2469" offset="0" />
+			</dataarea>
+		</part>
+	</software>
 </softwarelist>
