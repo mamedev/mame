@@ -949,7 +949,8 @@ template <unsigned port> u8 pc9801vm_state::fdc_2hd_2dd_ctrl_r()
 
 TIMER_CALLBACK_MEMBER(pc9801vm_state::fdc_trigger)
 {
-	// TODO: sorcer definitely expects this irq to be taken
+	// TODO: sorcer/hydlide definitely expects the XTMASK irq to be taken
+	// NOTE: should probably trigger the FDC irq depending on mode, i.e. use fdc_irq_w fn
 	if (BIT(m_fdc_2hd_ctrl, 2))
 	{
 		m_pic2->ir2_w(0);
@@ -978,6 +979,7 @@ template <unsigned port> void pc9801vm_state::fdc_2hd_2dd_ctrl_w(u8 data)
 	}
 
 	// TODO: this looks awfully similar to pc88va DMA mode, including same bits for trigger and irq mask.
+	// NOTE: 100 msec too slow
 	if (port == 0 && !prev_trig && cur_trig)
 	{
 		m_fdc_timer->reset();
@@ -2376,6 +2378,10 @@ void pc9801vm_state::pc9801rs(machine_config &config)
 
 	m_fdc_2hd->intrq_wr_callback().set(FUNC(pc9801vm_state::fdc_irq_w));
 	m_fdc_2hd->drq_wr_callback().set(FUNC(pc9801vm_state::fdc_drq_w));
+	// ch. 3 used when in 2DD mode (mightyhd, rogue)
+	// TODO: should lock as everything else depending on mode bit 0
+	m_dmac->in_ior_callback<3>().set(m_fdc_2hd, FUNC(upd765a_device::dma_r));
+	m_dmac->out_iow_callback<3>().set(m_fdc_2hd, FUNC(upd765a_device::dma_w));
 
 	m_hgdc[1]->set_addrmap(0, &pc9801vm_state::upd7220_grcg_2_map);
 

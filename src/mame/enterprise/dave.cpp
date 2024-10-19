@@ -57,16 +57,20 @@ void dave_device::io_map(address_map &map)
 //  dave_device - constructor
 //-------------------------------------------------
 
-dave_device::dave_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, DAVE, tag, owner, clock),
-		device_memory_interface(mconfig, *this),
-		device_sound_interface(mconfig, *this),
-		m_program_space_config("program", ENDIANNESS_LITTLE, 8, 22, 0, address_map_constructor(FUNC(dave_device::program_map), this)),
-		m_io_space_config("io", ENDIANNESS_LITTLE, 8, 16, 0, address_map_constructor(FUNC(dave_device::io_map), this)),
-		m_write_irq(*this),
-		m_write_lh(*this),
-		m_write_rh(*this),
-		m_irq_status(0)
+dave_device::dave_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, DAVE, tag, owner, clock),
+	device_memory_interface(mconfig, *this),
+	device_sound_interface(mconfig, *this),
+	m_program_space_config("program", ENDIANNESS_LITTLE, 8, 22, 0, address_map_constructor(FUNC(dave_device::program_map), this)),
+	m_io_space_config("io", ENDIANNESS_LITTLE, 8, 16, 0, address_map_constructor(FUNC(dave_device::io_map), this)),
+	m_write_irq(*this),
+	m_write_lh(*this),
+	m_write_rh(*this),
+	m_irq_status(0)
+{
+}
+
+dave_device::~dave_device()
 {
 }
 
@@ -501,7 +505,6 @@ void dave_device::io_w(offs_t offset, uint8_t data)
 				}
 				break;
 			}
-
 
 
 			/* turn L.H audio output into D/A, outputting value in R8 */

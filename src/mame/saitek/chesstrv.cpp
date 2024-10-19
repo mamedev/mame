@@ -223,7 +223,7 @@ static INPUT_PORTS_START( chesstrv )
 	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_UNUSED)
 
 	PORT_START("IN.4")
-	PORT_CONFNAME( 0x01, 0x00, "Battery Status" ) PORT_CHANGED_MEMBER(DEVICE_SELF, chesstrv_state, battery, 0)
+	PORT_CONFNAME( 0x01, 0x00, "Battery Status" ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(chesstrv_state::battery), 0)
 	PORT_CONFSETTING(    0x01, "Low" )
 	PORT_CONFSETTING(    0x00, DEF_STR( Normal ) )
 INPUT_PORTS_END

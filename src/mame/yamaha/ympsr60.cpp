@@ -328,10 +328,10 @@ void psr60_state::machine_reset()
 
 #define DRVIF_PORT(num, sw1, sw2, sw3, sw4) \
 	PORT_START("DRVIF_" #num) \
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME(sw1) PORT_CHANGED_MEMBER(DEVICE_SELF, psr60_state, drvif_changed, num) \
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME(sw2) PORT_CHANGED_MEMBER(DEVICE_SELF, psr60_state, drvif_changed, num) \
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME(sw3) PORT_CHANGED_MEMBER(DEVICE_SELF, psr60_state, drvif_changed, num) \
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME(sw4) PORT_CHANGED_MEMBER(DEVICE_SELF, psr60_state, drvif_changed, num)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME(sw1) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(psr60_state::drvif_changed), num) \
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME(sw2) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(psr60_state::drvif_changed), num) \
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME(sw3) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(psr60_state::drvif_changed), num) \
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME(sw4) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(psr60_state::drvif_changed), num)
 
 #define RYP4_PORT(num, defval, name) \
 	PORT_START("RYP4_" #num) \
@@ -456,13 +456,13 @@ static INPUT_PORTS_START(psr60)
 	RYP4_PORT( 4, 50, "Rhythm Tempo")
 	RYP4_PORT( 5, 75, "Chord Volume")
 	RYP4_PORT( 6, 75, "Bass Volume")
-	RYP4_PORT( 7,  0, "Sustain") PORT_CUSTOM_MEMBER(psr60_state, sustain_fuzz)
+	RYP4_PORT( 7,  0, "Sustain") PORT_CUSTOM_MEMBER(FUNC(psr60_state::sustain_fuzz))
 	RYP4_PORT( 8,  0, "Unused8")
 	RYP4_PORT( 9,  0, "Unused9")
 	RYP4_PORT(10,  0, "Unused10")
 
 	PORT_START("MASTERVOL")
-	PORT_ADJUSTER(50, "PSR Master Volume") PORT_CHANGED_MEMBER(DEVICE_SELF, psr60_state, mastervol_changed, 0)
+	PORT_ADJUSTER(50, "PSR Master Volume") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(psr60_state::mastervol_changed), 0)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START(psr70)
@@ -596,13 +596,13 @@ static INPUT_PORTS_START(psr70)
 	RYP4_PORT( 4, 50, "Rhythm Tempo")
 	RYP4_PORT( 5, 75, "Chord Volume")
 	RYP4_PORT( 6, 75, "Bass Volume")
-	RYP4_PORT( 7,  0, "Sustain") PORT_CUSTOM_MEMBER(psr60_state, sustain_fuzz)
+	RYP4_PORT( 7,  0, "Sustain") PORT_CUSTOM_MEMBER(FUNC(psr60_state::sustain_fuzz))
 	RYP4_PORT( 8,  0, "Unused8")
 	RYP4_PORT( 9,  0, "Unused9")
 	RYP4_PORT(10,  0, "Unused10")
 
 	PORT_START("MASTERVOL")
-	PORT_ADJUSTER(50, "PSR Master Volume") PORT_CHANGED_MEMBER(DEVICE_SELF, psr60_state, mastervol_changed, 0)
+	PORT_ADJUSTER(50, "PSR Master Volume") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(psr60_state::mastervol_changed), 0)
 INPUT_PORTS_END
 
 void psr60_state::psr_common(machine_config &config)

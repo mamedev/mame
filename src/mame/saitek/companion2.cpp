@@ -283,7 +283,7 @@ static INPUT_PORTS_START( enterp )
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_UNUSED)
 
 	PORT_START("POWER") // needs to be triggered for nvram to work
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_POWER_OFF) PORT_CHANGED_MEMBER(DEVICE_SELF, compan2_state, power_off, 0)
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_POWER_OFF) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(compan2_state::power_off), 0)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( expchess )
@@ -326,7 +326,7 @@ static INPUT_PORTS_START( compan2 )
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_CUSTOM)
 
 	PORT_START("CPU")
-	PORT_CONFNAME( 0x01, 0x00, "CPU Frequency" ) PORT_CHANGED_MEMBER(DEVICE_SELF, compan2_state, change_cpu_freq, 0) // factory set
+	PORT_CONFNAME( 0x01, 0x00, "CPU Frequency" ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(compan2_state::change_cpu_freq), 0) // factory set
 	PORT_CONFSETTING(    0x00, "4MHz (original)" )
 	PORT_CONFSETTING(    0x01, "7.2MHz (Concord)" )
 INPUT_PORTS_END

@@ -413,7 +413,7 @@ static INPUT_PORTS_START( mark6 )
 	PORT_INCLUDE( mark5 )
 
 	PORT_MODIFY("IN.6")
-	PORT_CONFNAME( 0x20, 0x20, "Sensory Board" ) PORT_CHANGED_MEMBER(DEVICE_SELF, mark5_state, cb_enable, 0)
+	PORT_CONFNAME( 0x20, 0x20, "Sensory Board" ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(mark5_state::cb_enable), 0)
 	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x20, DEF_STR( On ) )
 INPUT_PORTS_END

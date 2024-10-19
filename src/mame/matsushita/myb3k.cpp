@@ -606,7 +606,7 @@ static INPUT_PORTS_START( myb3k )
 	PORT_CONFSETTING(    0x08, "Centronics Ack")
 
 	PORT_START("MONITOR")
-	PORT_CONFNAME( 0x01, 0x00, "Monitor") PORT_CHANGED_MEMBER(DEVICE_SELF, myb3k_state, monitor_changed, 0)
+	PORT_CONFNAME( 0x01, 0x00, "Monitor") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(myb3k_state::monitor_changed), 0)
 	PORT_CONFSETTING(    0x00, "Color")
 	PORT_CONFSETTING(    0x01, "Monochrome")
 

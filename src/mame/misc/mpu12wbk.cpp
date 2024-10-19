@@ -796,7 +796,7 @@ static INPUT_PORTS_START( mpu12wbk )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )                                          // DSW#2 OFF = Change; DSW#2 ON = Coin2
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER )   PORT_NAME("0-4") PORT_CODE(KEYCODE_S)  // unknown
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER )   PORT_READ_LINE_DEVICE_MEMBER("hopper", ticket_dispenser_device, line_r)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER )   PORT_READ_LINE_DEVICE_MEMBER("hopper", FUNC(ticket_dispenser_device::line_r))
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN3 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Supervisor Key") PORT_CODE(KEYCODE_8) PORT_TOGGLE   // key in / other features
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Service")        PORT_CODE(KEYCODE_0)               // all settings
@@ -862,7 +862,7 @@ static INPUT_PORTS_START( goldnjkr )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )                                          // DSW#2 OFF = Change; DSW#2 ON = Coin2
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER )   PORT_NAME("0-4") PORT_CODE(KEYCODE_S)  // unknown
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER )   PORT_READ_LINE_DEVICE_MEMBER("hopper", ticket_dispenser_device, line_r)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER )   PORT_READ_LINE_DEVICE_MEMBER("hopper", FUNC(ticket_dispenser_device::line_r))
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN3 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Supervisor Key") PORT_CODE(KEYCODE_8) PORT_TOGGLE   // key in / other features
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Service")        PORT_CODE(KEYCODE_0)               // all settings

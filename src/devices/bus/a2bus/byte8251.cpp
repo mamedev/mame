@@ -106,7 +106,7 @@ void a2bus_byte8251_device::write_c0nx(u8 offset, u8 data)
 
 static INPUT_PORTS_START(byte8251)
 	PORT_START("SWITCHES") // “A dual in line pin-type switch may be used”
-	PORT_DIPNAME(0xf, 0xf, "Data Rate") PORT_DIPLOCATION("S:1,2,3,4") PORT_CHANGED_MEMBER(DEVICE_SELF, a2bus_byte8251_device, rate_changed, 0)
+	PORT_DIPNAME(0xf, 0xf, "Data Rate") PORT_DIPLOCATION("S:1,2,3,4") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(a2bus_byte8251_device::rate_changed), 0)
 	PORT_DIPSETTING(0x1, "50 bps")
 	PORT_DIPSETTING(0x2, "75 bps")
 	PORT_DIPSETTING(0x3, "110 bps")

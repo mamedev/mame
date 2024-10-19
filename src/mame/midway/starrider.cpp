@@ -916,7 +916,7 @@ INPUT_PORTS_START(starrider)
 
 	PORT_START("SW1")
 	PORT_BIT(0x01, IP_ACTIVE_LOW,  IPT_SERVICE3)                 PORT_NAME("Sound Test")
-													 PORT_CHANGED_MEMBER(DEVICE_SELF, sr_state, sound_sw1_changed, 0)
+													 PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(sr_state::sound_sw1_changed), 0)
 INPUT_PORTS_END
 
 

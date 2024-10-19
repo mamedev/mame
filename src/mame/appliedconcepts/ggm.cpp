@@ -540,10 +540,10 @@ static INPUT_PORTS_START( ggm )
 	PORT_CONFNAME( 0x01, 0x00, "Version" ) // factory-set
 	PORT_CONFSETTING(    0x00, "GGM (Applied Concepts)" )
 	PORT_CONFSETTING(    0x01, "MGS (Chafitz)" )
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CODE(KEYCODE_F1) PORT_TOGGLE PORT_CHANGED_MEMBER(DEVICE_SELF, ggm_state, reset_switch, 0) PORT_NAME("Memory Switch")
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CODE(KEYCODE_F1) PORT_TOGGLE PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(ggm_state::reset_switch), 0) PORT_NAME("Memory Switch")
 
 	PORT_START("IN.5")
-	PORT_CONFNAME( 0x0f, 0x0f, "Keypad Overlay" ) PORT_CHANGED_MEMBER(DEVICE_SELF, ggm_state, overlay_switch, 0)
+	PORT_CONFNAME( 0x0f, 0x0f, "Keypad Overlay" ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(ggm_state::overlay_switch), 0)
 	PORT_CONFSETTING(    0x00, "None" )
 	PORT_CONFSETTING(    0x0f, "Auto" ) // get param from softwarelist
 	PORT_CONFSETTING(    0x01, "Boris 2.5" )
@@ -553,7 +553,7 @@ static INPUT_PORTS_START( ggm )
 	PORT_CONFSETTING(    0x03, "Steinitz" )
 
 	PORT_START("IN.6")
-	PORT_BIT(0x0f, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_CUSTOM_MEMBER(ggm_state, overlay_r)
+	PORT_BIT(0x0f, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_CUSTOM_MEMBER(FUNC(ggm_state::overlay_r))
 INPUT_PORTS_END
 
 

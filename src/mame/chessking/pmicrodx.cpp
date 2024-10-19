@@ -157,7 +157,7 @@ void pmicrodx_state::control_w(u16 data)
 *******************************************************************************/
 
 #define INPUT_CHANGED(x) \
-	PORT_CHANGED_MEMBER(DEVICE_SELF, pmicrodx_state, input_changed, x)
+	PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(pmicrodx_state::input_changed), x)
 
 static INPUT_PORTS_START( pmicrodx )
 	PORT_START("IN.0")

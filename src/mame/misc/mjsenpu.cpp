@@ -314,7 +314,7 @@ static INPUT_PORTS_START( mjsenpu )
 	PORT_START("IN1")
 	PORT_BIT(                 0x00000001, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT(                 0x00000002, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT )
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("hopper", ticket_dispenser_device, line_r) // might be coin out
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("hopper", FUNC(ticket_dispenser_device::line_r)) // might be coin out
 	PORT_BIT(                 0x00000008, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK )
 	PORT_SERVICE_NO_TOGGLE(   0x00000010, IP_ACTIVE_LOW )
 	PORT_BIT(                 0x00000020, IP_ACTIVE_LOW, IPT_MEMORY_RESET ) // clears stats in bookkeeping

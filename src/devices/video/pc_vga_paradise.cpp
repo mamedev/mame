@@ -336,10 +336,10 @@ ioport_value wd90c00_vga_device::egasw4_r() { return BIT(m_pr11, 7); }
 
 static INPUT_PORTS_START(paradise_vga_sense)
 	PORT_START("VGA_SENSE")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(wd90c00_vga_device, egasw1_r)
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(wd90c00_vga_device, egasw2_r)
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(wd90c00_vga_device, egasw3_r)
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(wd90c00_vga_device, egasw4_r)
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(FUNC(wd90c00_vga_device::egasw1_r))
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(FUNC(wd90c00_vga_device::egasw2_r))
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(FUNC(wd90c00_vga_device::egasw3_r))
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(FUNC(wd90c00_vga_device::egasw4_r))
 INPUT_PORTS_END
 
 ioport_constructor wd90c00_vga_device::device_input_ports() const

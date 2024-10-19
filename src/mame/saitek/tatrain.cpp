@@ -196,7 +196,7 @@ static INPUT_PORTS_START( tatrain )
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_C) PORT_NAME("Color")
 
 	PORT_START("IN.2")
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_G) PORT_CHANGED_MEMBER(DEVICE_SELF, tatrain_state, go_button, 0) PORT_NAME("Go / Stop")
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_G) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(tatrain_state::go_button), 0) PORT_NAME("Go / Stop")
 	PORT_BIT(0xef, IP_ACTIVE_HIGH, IPT_UNUSED)
 
 	PORT_START("FREQ")
@@ -207,7 +207,7 @@ static INPUT_PORTS_START( tatraina )
 	PORT_INCLUDE( tatrain )
 
 	PORT_MODIFY("FREQ")
-	PORT_CONFNAME( 0x03, 0x00, "CPU Frequency" ) PORT_CHANGED_MEMBER(DEVICE_SELF, tatrain_state, tatraina_change_cpu_freq, 0) // factory set
+	PORT_CONFNAME( 0x03, 0x00, "CPU Frequency" ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(tatrain_state::tatraina_change_cpu_freq), 0) // factory set
 	PORT_CONFSETTING(    0x02, "14Mhz (Champion Advanced Trainer)" )
 	PORT_CONFSETTING(    0x01, "16MHz (unofficial)" )
 	PORT_CONFSETTING(    0x00, "20Mhz (Turbo Advanced Trainer, Virtuoso)" )

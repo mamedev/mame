@@ -152,7 +152,7 @@ void m82_state::m82_ppu_map(address_map &map)
 
 static INPUT_PORTS_START( nes_m82 )
 	PORT_START("CN13")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Game Select") PORT_CODE( KEYCODE_0 ) PORT_CHANGED_MEMBER(DEVICE_SELF, m82_state, m82_game_select, 0)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Game Select") PORT_CODE( KEYCODE_0 ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(m82_state::m82_game_select), 0)
 
 	PORT_START("CN12")
 	PORT_CONFNAME( 0x0f, 0x08, "Play Time Limit" )

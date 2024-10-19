@@ -3937,7 +3937,7 @@ license:CC0-1.0
 		<year>1998</year>
 		<publisher>QNX Software Systems</publisher>
 		<info name="version" value="4.25" />
-		<info name="user_notes" value="Type 'install' at the boot prompt" />
+		<info name="usage" value="Type 'install' at the boot prompt" />
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Boot disk"/>
 			<dataarea name="flop" size = "1474560">
@@ -3981,7 +3981,7 @@ license:CC0-1.0
 		<year>1997</year>
 		<publisher>QNX Software Systems</publisher>
 		<info name="version" value="4.24" />
-		<info name="user_notes" value="Type 'install' at the boot prompt" />
+		<info name="usage" value="Type 'install' at the boot prompt" />
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Boot disk"/>
 			<dataarea name="flop" size = "1474560">
@@ -4025,7 +4025,7 @@ license:CC0-1.0
 		<year>1996</year>
 		<publisher>QNX Software Systems</publisher>
 		<info name="version" value="4.23" />
-		<info name="user_notes" value="Type 'install' at the boot prompt" />
+		<info name="usage" value="Type 'install' at the boot prompt" />
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Boot disk"/>
 			<dataarea name="flop" size = "1474560">
@@ -4063,7 +4063,7 @@ license:CC0-1.0
 		<year>1997</year>
 		<publisher>QNX Software Systems</publisher>
 		<info name="version" value="1.0a" />
-		<info name="user_notes" value="8MB RAM required" />
+		<info name="usage" value="8MB RAM required" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
 				<!-- source image is only 1469440 bytes, added 0xF6 padding -->
@@ -4077,7 +4077,7 @@ license:CC0-1.0
 		<year>1997</year>
 		<publisher>QNX Software Systems</publisher>
 		<info name="version" value="1.0a" />
-		<info name="user_notes" value="8MB RAM required" />
+		<info name="usage" value="8MB RAM required" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
 				<!-- source image is only 1469440 bytes, added 0xF6 padding -->
@@ -4091,7 +4091,7 @@ license:CC0-1.0
 		<year>1997</year>
 		<publisher>QNX Software Systems</publisher>
 		<info name="version" value="1.0" />
-		<info name="user_notes" value="8MB RAM required" />
+		<info name="usage" value="8MB RAM required" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
 				<!-- source image is only 1469440 bytes, added 0xF6 padding -->
@@ -4105,7 +4105,7 @@ license:CC0-1.0
 		<year>1998</year>
 		<publisher>QNX Software Systems</publisher>
 		<info name="version" value="1.1" />
-		<info name="user_notes" value="8MB RAM required" />
+		<info name="usage" value="8MB RAM required" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
 				<!-- source image is only 1469440 bytes, added 0xF6 padding -->
@@ -4119,7 +4119,7 @@ license:CC0-1.0
 		<year>1999</year>
 		<publisher>QNX Software Systems</publisher>
 		<info name="version" value="4.05" />
-		<info name="user_notes" value="8MB RAM required" />
+		<info name="usage" value="8MB RAM required" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
 				<rom name="qnxdemo modem v405.dat" size="1474560" crc="1449909a" sha1="e35b2822eb2391ebcac04cb5f3ec8a284f601bb8"/>
@@ -4132,7 +4132,7 @@ license:CC0-1.0
 		<year>1999</year>
 		<publisher>QNX Software Systems</publisher>
 		<info name="version" value="4.00" />
-		<info name="user_notes" value="8MB RAM required" />
+		<info name="usage" value="8MB RAM required" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
 				<rom name="qnxdemo modem v400.dat" size="1474560" crc="7cc3be15" sha1="3ded9ef17784b18f1c356e2bfeacfd9ecef4f716"/>
@@ -4145,7 +4145,7 @@ license:CC0-1.0
 		<year>1998</year>
 		<publisher>QNX Software Systems</publisher>
 		<info name="version" value="3.03" />
-		<info name="user_notes" value="8MB RAM required" />
+		<info name="usage" value="8MB RAM required" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
 				<rom name="qnxdemo modem v303.dat" size="1474560" crc="de42476d" sha1="b330dc04a920886f2243377c9edd80c23bc3e90a"/>
@@ -4158,7 +4158,7 @@ license:CC0-1.0
 		<year>1999</year>
 		<publisher>QNX Software Systems</publisher>
 		<info name="version" value="4.05" />
-		<info name="user_notes" value="8MB RAM required" />
+		<info name="usage" value="8MB RAM required" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
 				<rom name="qnxdemo network v405.dat" size="1474560" crc="315a822c" sha1="c8baa52161c069dae25410ce09a3b1c095961323"/>
@@ -4171,7 +4171,7 @@ license:CC0-1.0
 		<year>1999</year>
 		<publisher>QNX Software Systems</publisher>
 		<info name="version" value="4.00" />
-		<info name="user_notes" value="8MB RAM required" />
+		<info name="usage" value="8MB RAM required" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
 				<rom name="qnxdemo network v400.dat" size="1474560" crc="72d7de91" sha1="bcc589a419500376cf5101ddf80d416ee43c0c1d"/>
@@ -4184,7 +4184,7 @@ license:CC0-1.0
 		<year>1998</year>
 		<publisher>QNX Software Systems</publisher>
 		<info name="version" value="3.03" />
-		<info name="user_notes" value="8MB RAM required" />
+		<info name="usage" value="8MB RAM required" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
 				<rom name="qnxdemo network v303.dat" size="1474560" crc="694a0448" sha1="d1bb83273ae2da9fb1fe93ae08c951ec91d6ea3f"/>
@@ -4197,7 +4197,7 @@ license:CC0-1.0
 		<year>1998</year>
 		<publisher>QNX Software Systems</publisher>
 		<info name="version" value="2.0" />
-		<info name="user_notes" value="8MB RAM required" />
+		<info name="usage" value="8MB RAM required" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
 				<rom name="qnxdemo network v20.dat" size="1474560" crc="2026021a" sha1="a8a49d60accc19f67b09e8fe5b84ae6c3c18806e"/>

@@ -217,7 +217,7 @@ namespace {
 
 INPUT_PORTS_START( zorba )
 	PORT_START("CNF")
-	PORT_CONFNAME(0x01, 0x00, "Parallel Printer") PORT_CHANGED_MEMBER(DEVICE_SELF, zorba_state, printer_type, 0)
+	PORT_CONFNAME(0x01, 0x00, "Parallel Printer") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(zorba_state::printer_type), 0)
 	PORT_CONFSETTING(0x00, "Centronics")
 	PORT_CONFSETTING(0x01, "Prowriter")
 INPUT_PORTS_END

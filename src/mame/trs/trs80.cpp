@@ -331,7 +331,7 @@ static INPUT_PORTS_START( trs80 )
 	PORT_BIT(0xfe, 0x00, IPT_UNUSED)
 
 	PORT_START("RESET") // special button
-	PORT_BIT(0x01, 0x00, IPT_OTHER) PORT_NAME("Reset") PORT_CODE(KEYCODE_DEL) PORT_WRITE_LINE_DEVICE_MEMBER("nmigate", input_merger_device, in_w<0>)
+	PORT_BIT(0x01, 0x00, IPT_OTHER) PORT_NAME("Reset") PORT_CODE(KEYCODE_DEL) PORT_WRITE_LINE_DEVICE_MEMBER("nmigate", FUNC(input_merger_device::in_w<0>))
 INPUT_PORTS_END
 
 static INPUT_PORTS_START(trs80l2)

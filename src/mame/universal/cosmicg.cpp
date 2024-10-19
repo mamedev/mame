@@ -283,7 +283,7 @@ static INPUT_PORTS_START( cosmicg )
 	PORT_DIPSETTING(    0x80, "5" )
 
 	PORT_START("IN2")   /* Hard wired settings */
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, cosmicg_state, coin_inserted, 0)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(cosmicg_state::coin_inserted), 0)
 
 	/* This dip switch is not read by the program at any time   */
 	/* but is wired to enable or disable the flip screen output */

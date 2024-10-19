@@ -282,7 +282,7 @@ static INPUT_PORTS_START( addocalc )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("IN.7") // INT1
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_POWER_ON ) PORT_CHANGED_MEMBER(DEVICE_SELF, addocalc_state, power_button, true) PORT_NAME("ON/OFF")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_POWER_ON ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(addocalc_state::power_button), true) PORT_NAME("ON/OFF")
 INPUT_PORTS_END
 
 // config
@@ -388,7 +388,7 @@ static INPUT_PORTS_START( ftri1 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Swing / S2 V")
 
 	PORT_START("RESET")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_POWER_ON ) PORT_CHANGED_MEMBER(DEVICE_SELF, ftri1_state, reset_button, 0) PORT_NAME("Game Reset")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_POWER_ON ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(ftri1_state::reset_button), 0) PORT_NAME("Game Reset")
 INPUT_PORTS_END
 
 // config
@@ -654,13 +654,13 @@ static INPUT_PORTS_START( dunksunk )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )
 
 	PORT_START("IN.1")
-	PORT_CONFNAME( 0x03, 0x00, DEF_STR( Difficulty ) ) PORT_CHANGED_MEMBER(DEVICE_SELF, dunksunk_state, difficulty_switch, 0)
+	PORT_CONFNAME( 0x03, 0x00, DEF_STR( Difficulty ) ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(dunksunk_state::difficulty_switch), 0)
 	PORT_CONFSETTING(    0x00, "1" ) // INT0
 	PORT_CONFSETTING(    0x01, "2" ) // PI4
 	PORT_CONFSETTING(    0x03, "3" )
 
 	PORT_START("IN.2") // INT1
-	PORT_CONFNAME( 0x01, 0x01, "Game Select" ) PORT_CHANGED_MEMBER(DEVICE_SELF, dunksunk_state, game_switch, 0)
+	PORT_CONFNAME( 0x01, 0x01, "Game Select" ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(dunksunk_state::game_switch), 0)
 	PORT_CONFSETTING(    0x01, "Basketball" )
 	PORT_CONFSETTING(    0x00, "Submarine Chase" )
 INPUT_PORTS_END
@@ -804,7 +804,7 @@ static INPUT_PORTS_START( memoquiz )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_C) PORT_NAME("CD")
 
 	PORT_START("IN.4")
-	PORT_CONFNAME( 0x03, 0x01, "Digits" ) PORT_CHANGED_MEMBER(DEVICE_SELF, memoquiz_state, digits_switch, 0)
+	PORT_CONFNAME( 0x03, 0x01, "Digits" ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(memoquiz_state::digits_switch), 0)
 	PORT_CONFSETTING(    0x01, "3" ) // INT0, Vdd when closed, pulled to GND when open
 	PORT_CONFSETTING(    0x02, "4" ) // INT1, GND when closed, pulled to Vdd when open
 	PORT_CONFSETTING(    0x00, "5" )
@@ -1620,7 +1620,7 @@ static INPUT_PORTS_START( scrabsen )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_K) PORT_CHAR('K')
 
 	PORT_START("IN.5") // INT0
-	PORT_CONFNAME( 0x01, 0x01, "Players" ) PORT_CHANGED_MEMBER(DEVICE_SELF, scrabsen_state, players_switch, 0)
+	PORT_CONFNAME( 0x01, 0x01, "Players" ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(scrabsen_state::players_switch), 0)
 	PORT_CONFSETTING(    0x01, "1" ) // single
 	PORT_CONFSETTING(    0x00, "2" ) // double
 INPUT_PORTS_END
@@ -1758,7 +1758,7 @@ static INPUT_PORTS_START( rdqa )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_ENTER) PORT_CODE(KEYCODE_ENTER_PAD) PORT_NAME("Enter")
 
 	PORT_START("IN.4") // INT0
-	PORT_CONFNAME( 0x01, 0x01, "Players" ) PORT_CHANGED_MEMBER(DEVICE_SELF, rdqa_state, players_switch, 0)
+	PORT_CONFNAME( 0x01, 0x01, "Players" ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(rdqa_state::players_switch), 0)
 	PORT_CONFSETTING(    0x01, "1" ) // single
 	PORT_CONFSETTING(    0x00, "2" ) // double
 INPUT_PORTS_END

@@ -654,8 +654,8 @@ static INPUT_PORTS_START( zerohour )
 	// The coin slots are not memory mapped. Coin Left causes a NMI,
 	// Coin Right an IRQ. This fake input port is used by the interrupt
 	// handler to be notified of coin insertions.
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, zerohour_state, left_coin_inserted, 0)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 ) PORT_CHANGED_MEMBER(DEVICE_SELF, zerohour_state, right_coin_inserted, 0)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(zerohour_state::left_coin_inserted), 0)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(zerohour_state::right_coin_inserted), 0)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( redclash )

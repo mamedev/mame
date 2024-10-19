@@ -209,7 +209,7 @@ static INPUT_PORTS_START( sc12 )
 	PORT_INCLUDE( sc12_base )
 
 	PORT_START("CPU")
-	PORT_CONFNAME( 0x03, 0x00, "CPU Frequency" ) PORT_CHANGED_MEMBER(DEVICE_SELF, sc12_state, change_cpu_freq, 0) // factory set
+	PORT_CONFNAME( 0x03, 0x00, "CPU Frequency" ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(sc12_state::change_cpu_freq), 0) // factory set
 	PORT_CONFSETTING(    0x00, "3MHz (SC12)" )
 	PORT_CONFSETTING(    0x01, "3.57MHz (SE12)" )
 	PORT_CONFSETTING(    0x02, "4MHz (6086)" )
@@ -220,7 +220,7 @@ static INPUT_PORTS_START( sc12b )
 	PORT_INCLUDE( sc12_base )
 
 	PORT_START("CPU")
-	PORT_CONFNAME( 0x03, 0x02, "CPU Frequency" ) PORT_CHANGED_MEMBER(DEVICE_SELF, sc12_state, change_cpu_freq, 0) // factory set
+	PORT_CONFNAME( 0x03, 0x02, "CPU Frequency" ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(sc12_state::change_cpu_freq), 0) // factory set
 	PORT_CONFSETTING(    0x00, "3MHz (SC12)" )
 	PORT_CONFSETTING(    0x01, "3.57MHz (SE12)" )
 	PORT_CONFSETTING(    0x02, "4MHz (6086)" )

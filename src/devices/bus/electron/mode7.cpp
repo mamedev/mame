@@ -44,7 +44,7 @@ ROM_END
 
 static INPUT_PORTS_START( mode7 )
 	PORT_START("BUTTON")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_BUTTON1) PORT_NAME("Mode 7 Break") PORT_CODE(KEYCODE_HOME) PORT_CHANGED_MEMBER(DEVICE_SELF, electron_mode7_device, break_button, 0)
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_BUTTON1) PORT_NAME("Mode 7 Break") PORT_CODE(KEYCODE_HOME) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(electron_mode7_device::break_button), 0)
 INPUT_PORTS_END
 
 //-------------------------------------------------

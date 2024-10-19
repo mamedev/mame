@@ -211,7 +211,7 @@ void pn8800fxb_state::io_map(address_map &map)
 static INPUT_PORTS_START( pn8800fxb )
 	PORT_START("misc")
 	// 0x01 sp3
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_CUSTOM) PORT_READ_LINE_MEMBER(pn8800fxb_state, floppy_index_r)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_CUSTOM) PORT_READ_LINE_MEMBER(FUNC(pn8800fxb_state::floppy_index_r))
 	PORT_CONFNAME(0x04, 0x00, "AC Adaptor")
 	PORT_CONFSETTING(   0x00, "Good")
 	PORT_CONFSETTING(   0x04, "Not Good")

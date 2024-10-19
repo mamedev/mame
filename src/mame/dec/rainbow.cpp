@@ -1151,7 +1151,7 @@ static INPUT_PORTS_START(rainbow100b_in)
 	PORT_DIPNAME(0x01, 0x00, "W18 (FACTORY TEST D, LEAVE OFF) (8251A: DSR)") PORT_TOGGLE
 	PORT_DIPSETTING(0x00, DEF_STR(Off))
 	PORT_DIPSETTING(0x01, DEF_STR(On))
-	PORT_WRITE_LINE_DEVICE_MEMBER("kbdser", i8251_device, write_dsr)
+	PORT_WRITE_LINE_DEVICE_MEMBER("kbdser", FUNC(i8251_device::write_dsr))
 
 	// J17 jumper on FDC controller board shifts drive select (experimental) -
 	PORT_START("J17")

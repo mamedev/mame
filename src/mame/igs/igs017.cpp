@@ -45,12 +45,36 @@ To Do:
 Notes:
 
 - Test mode is usually accessed by keeping test (F2) pressed during boot.
-- iqblocka: keep start (1) pressed during boot for DSWs & input test. Keep test (F2) pressed for book-keeping / setup [pass: press deal (2)].
+- The sound test is often accessed by holding test (F2) and bookkeeping (0) at the I/O test screen.
+- The default bookkeeping password is often Start eight times.
+- Some games (e.g. Tarzan Chuan Tian Guan) refer to the double-up game as 续玩 (literally "Continue Play"),
+  so settings like 续玩有无 refer to the double-up game, not a conventional "continue" feature.
+- iqblocka: keep start (1) pressed during boot for DSWs & input test. Keep test (F2) pressed for bookkeeping / setup [pass: press deal (2)].
 - iqblockf/genius6: press service1 (9) then press deal (2) eight times to switch to gambling. Then test (F2) enters book-keeping / setup.
 - lhzb2, mgcs, slqz2, tjsb: press test (F2) + book (0) during inputs test for sound test.
 - mgdh, sdmg2: press keys A + B during test mode for sound test (B1 + B2 + B3 when using a joystick in mgdh).
 - spkrform: to switch from poker to Formosa press service1 (9). To switch back, press in sequence:
             service3 (right of 0) then Bet (M) then press "Hold 1".."Hold 5" (Z, X, C, V, B)
+- Tarzan Chuang Tian Guan mahjong controls:
+  Mahjong keyboard:
+    Start         Start       Stop All    Take Score
+    Mahjong Bet   Bet
+    Mahjong A     Show Odds   Stop 1      Double Up (twice winnings)
+    Mahjong B                 Stop 2
+    Mahjong C                 Stop 3      Double Up (winnings)
+    Mahjong D                 Stop 4
+    Mahjong E                             Double Up (half winnings)
+    Mahjong K                 Big
+    Mahjong M                 Small
+  Joystick:
+    Up                        Stop 1
+    Down                      Stop 2
+    Left                      Stop 3
+    Right                     Stop 4
+    Start         Start       Stop All    Take Score
+    Button 1      Show Odds   Big         Double Up (twice winnings)
+    Button 2      Bet                     Double Up (winnings)
+    Button 3                  Small       Double Up (half winnings)
 
 ************************************************************************************************************/
 
@@ -826,7 +850,6 @@ private:
 	void starzan_counter_w(u8 data);
 	void starzan_lamps_sound_w(u8 data);
 
-	u8 tarzan_keys_joy_r();
 	void tarzan_counter_w(u8 data);
 	void tarzan_dsw_sound_w(u8 data);
 	void tarzan_incdec_remap_addr_w(offs_t offset, u8 data);
@@ -2232,19 +2255,6 @@ void igs017_state::tarzan_io(address_map &map)
 	map(0x2010, 0x2011).w(FUNC(igs017_state::tarzan_incdec_remap_addr_w));
 }
 
-u8 igs017_state::tarzan_keys_joy_r()
-{
-	if (BIT(m_input_select, 3, 5) == 0x1f)  return m_io_joy->read(); // f8 (joystick mode)
-
-	u8 ret = 0xff;
-	if (!BIT(m_input_select, 3))    ret &= m_io_key[0]->read();      // f0 (keyboard mode)
-	if (!BIT(m_input_select, 4))    ret &= m_io_key[1]->read();      // e8 ""
-	if (!BIT(m_input_select, 5))    ret &= m_io_key[2]->read();      // d8 ""
-	if (!BIT(m_input_select, 6))    ret &= m_io_key[3]->read();      // b8 ""
-	if (!BIT(m_input_select, 7))    ret &= m_io_key[4]->read();      // 78 "" (unused)
-	return ret;
-}
-
 void igs017_state::tarzan_counter_w(u8 data)
 {
 	m_hopper->motor_w(                        BIT(data, 1)); // hopper
@@ -2604,7 +2614,7 @@ void igs017_state::mgdh_counter_w(u8 data)
 
 void igs017_state::mgdha_mux_map(address_map &map)
 {
-	map(0x00, 0x00).r(NAME((&igs017_state::keys_ipt_r<u8, 2>))).w(FUNC(igs017_state::mgdh_counter_w));
+	map(0x00, 0x00).portr("MATRIX").w(FUNC(igs017_state::mgdh_counter_w));
 	map(0x01, 0x01).portr("BUTTONS").w(FUNC(igs017_state::mgdh_keys_hopper_w));
 	map(0x02, 0x02).lr8(NAME([this](){ return bitswap<8>(m_io_dsw[1]->read(), 0,1,2,3,4,5,6,7); }));
 	map(0x03, 0x03).portr("COINS").w(NAME((&igs017_state::oki_sound_bank_w<6, 0x3f>))); // bit 7? always on
@@ -3308,8 +3318,8 @@ static INPUT_PORTS_START( lhzb2 )
 	PORT_INCLUDE( lhzb2_common )
 
 	PORT_START("COINS")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("hopper", hopper_device, line_r) // 哈巴
-	PORT_SERVICE_NO_TOGGLE( 0x02,  IP_ACTIVE_LOW )                                                          // 测试      (hold on start for input test)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("hopper", FUNC(hopper_device::line_r)) // 哈巴
+	PORT_SERVICE_NO_TOGGLE( 0x02, IP_ACTIVE_LOW )                                                           // 测试      (hold on start for input test)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK )                                                        // 査帐
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(5)  PORT_CONDITION("DSW1", 0x20, EQUALS, 0x20)  // 投币
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_KEYIN )           PORT_CONDITION("DSW1", 0x20, EQUALS, 0x00)  // 投币
@@ -3325,8 +3335,8 @@ static INPUT_PORTS_START( lhzb2a )
 
 	PORT_START("COINS")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("hopper", hopper_device, line_r) // 哈巴
-	PORT_SERVICE_NO_TOGGLE( 0x04,  IP_ACTIVE_LOW )                                                          // 测试      (hold on start for input test)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("hopper", FUNC(hopper_device::line_r)) // 哈巴
+	PORT_SERVICE_NO_TOGGLE( 0x04, IP_ACTIVE_LOW )                                                           // 测试      (hold on start for input test)
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK )                                                        // 査帐
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(5)  PORT_CONDITION("DSW1", 0x20, EQUALS, 0x20)  // 投币
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_KEYIN )           PORT_CONDITION("DSW1", 0x20, EQUALS, 0x00)  // 投币
@@ -3334,6 +3344,18 @@ static INPUT_PORTS_START( lhzb2a )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT )          PORT_CONDITION("DSW1", 0x40, EQUALS, 0x00)  // 退币
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE1 )               PORT_NAME("Show Credits")                   // 清除      (hold to show credits/bets/wins when hidden)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( lhzb )
+	PORT_INCLUDE(lhzb2)
+
+	PORT_MODIFY("DSW2")
+	PORT_DIPNAME( 0x0c, 0x0c, "Minimum Bet" )                           PORT_DIPLOCATION("SW2:3,4")   // 最小押注
+	PORT_DIPSETTING(    0x0c, "1" )
+	PORT_DIPSETTING(    0x08, "2" )
+	PORT_DIPSETTING(    0x04, "3" )
+	PORT_DIPSETTING(    0x00, "5" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x80, 0x80, "SW2:8" )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( mgcs )
@@ -3384,8 +3406,8 @@ static INPUT_PORTS_START( mgcs )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )            PORT_CONDITION("DSW2", 0x10, EQUALS, 0x00)  // 上
 
 	PORT_START("COINS")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("hopper", hopper_device, line_r) // 哈巴
-	PORT_SERVICE_NO_TOGGLE( 0x02,  IP_ACTIVE_LOW )                                                          // 測試      (hold on start for input test)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("hopper", FUNC(hopper_device::line_r)) // 哈巴
+	PORT_SERVICE_NO_TOGGLE( 0x02, IP_ACTIVE_LOW )                                                           // 測試      (hold on start for input test)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK )                                                        // 查帳
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(5)  PORT_CONDITION("DSW1", 0x20, EQUALS, 0x20)  // 投幣
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_KEYIN )           PORT_CONDITION("DSW1", 0x20, EQUALS, 0x00)  // 投幣
@@ -3440,10 +3462,10 @@ static INPUT_PORTS_START( sdmg2 )
 	PORT_INCLUDE(sdmg2_common)
 
 	PORT_START("COINS")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("hopper", hopper_device, line_r) // 哈巴
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("hopper", FUNC(hopper_device::line_r)) // 哈巴
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE1 )             PORT_CONDITION("DSW2", 0x40, EQUALS, 0x40)  PORT_NAME("Show Credits")  // 清除  (hold to show credits/bets/wins when hidden)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )              PORT_CONDITION("DSW2", 0x40, EQUALS, 0x00)
-	PORT_SERVICE_NO_TOGGLE( 0x04,  IP_ACTIVE_LOW )                                                        // 測試      (hold on start for input test)
+	PORT_SERVICE_NO_TOGGLE( 0x04, IP_ACTIVE_LOW )                                                         // 測試      (hold on start for input test)
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK )                                                      // 查帳
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN1 )                PORT_CONDITION("DSW1", 0x20, EQUALS, 0x20)  // 投幣
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_KEYIN )         PORT_CONDITION("DSW1", 0x20, EQUALS, 0x00)  // 投幣
@@ -3454,7 +3476,7 @@ static INPUT_PORTS_START( sdmg2 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("MATRIX")
-	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_CUSTOM )              PORT_CONDITION("DSW2", 0x40, EQUALS, 0x40) PORT_CUSTOM_MEMBER(igs017_state, keys_ipt_r<>)
+	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_CUSTOM )              PORT_CONDITION("DSW2", 0x40, EQUALS, 0x40) PORT_CUSTOM_MEMBER(FUNC(igs017_state::keys_ipt_r<>))
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )               PORT_CONDITION("DSW2", 0x40, EQUALS, 0x00)  // 開始
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )          PORT_CONDITION("DSW2", 0x40, EQUALS, 0x00)  // 上
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )        PORT_CONDITION("DSW2", 0x40, EQUALS, 0x00)  // 下
@@ -3500,7 +3522,7 @@ static INPUT_PORTS_START( sdmg2p )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN1 )                PORT_CONDITION("DSW1", 0x20, EQUALS, 0x20)  // 投幣
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_KEYIN )         PORT_CONDITION("DSW1", 0x20, EQUALS, 0x00)  // 投幣
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK )                                                      // 查帳
-	PORT_SERVICE_NO_TOGGLE( 0x20,  IP_ACTIVE_LOW )                                                        // 測試      (hold on start for input test)
+	PORT_SERVICE_NO_TOGGLE( 0x20, IP_ACTIVE_LOW )                                                         // 測試      (hold on start for input test)
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
@@ -3525,7 +3547,7 @@ static INPUT_PORTS_START( sdmg2p )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("hopper", hopper_device, line_r) // 哈巴
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("hopper", FUNC(hopper_device::line_r)) // 哈巴
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( mgdh )
@@ -3577,8 +3599,8 @@ static INPUT_PORTS_START( mgdh )
 	PORT_DIPSETTING(    0x00, "10 Coins/1 Credit" )
 
 	PORT_START("COINS")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("hopper", hopper_device, line_r) // 哈巴
-	PORT_SERVICE_NO_TOGGLE( 0x02,  IP_ACTIVE_LOW )                                                          // 測試      (hold on start for input test)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("hopper", FUNC(hopper_device::line_r)) // 哈巴
+	PORT_SERVICE_NO_TOGGLE( 0x02, IP_ACTIVE_LOW )                                                           // 測試      (hold on start for input test)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK )                                                        // 查帳
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(5)  PORT_CONDITION("DSW1", 0x10, EQUALS, 0x10)  // 投幣
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_KEYIN )           PORT_CONDITION("DSW1", 0x10, EQUALS, 0x00)  // 投幣
@@ -3588,220 +3610,143 @@ static INPUT_PORTS_START( mgdh )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START("KEY0")
-	// Keyboard mode:
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_A      ) PORT_CONDITION("DSW2",0x02,EQUALS,0x02)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_E      ) PORT_CONDITION("DSW2",0x02,EQUALS,0x02)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_I      ) PORT_CONDITION("DSW2",0x02,EQUALS,0x02)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_M      ) PORT_CONDITION("DSW2",0x02,EQUALS,0x02)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_KAN    ) PORT_CONDITION("DSW2",0x02,EQUALS,0x02)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START1         ) PORT_CONDITION("DSW2",0x02,EQUALS,0x02)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN        ) PORT_CONDITION("DSW2",0x02,EQUALS,0x02)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN        ) PORT_CONDITION("DSW2",0x02,EQUALS,0x02)
-	// Joystick mode:
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1         ) PORT_CONDITION("DSW2",0x02,EQUALS,0x00)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_UP    ) PORT_CONDITION("DSW2",0x02,EQUALS,0x00)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN  ) PORT_CONDITION("DSW2",0x02,EQUALS,0x00)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT  ) PORT_CONDITION("DSW2",0x02,EQUALS,0x00)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_CONDITION("DSW2",0x02,EQUALS,0x00)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1        ) PORT_CONDITION("DSW2",0x02,EQUALS,0x00)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN        ) PORT_CONDITION("DSW2",0x02,EQUALS,0x00)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN        ) PORT_CONDITION("DSW2",0x02,EQUALS,0x00)
-
-	PORT_START("KEY1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_B )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_F )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_J )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_N )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_REACH )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_MAHJONG_BET )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
-	PORT_START("KEY2")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_C )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_G )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_K )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_CHI )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_RON )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
-	PORT_START("KEY3")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_D )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_H )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_L )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_PON )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
-	PORT_START("KEY4")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_LAST_CHANCE )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_SCORE )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_DOUBLE_UP )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_BIG )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_MAHJONG_SMALL )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_START("MATRIX")
+	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_CUSTOM )                PORT_CONDITION("DSW2", 0x02, EQUALS, 0x02) PORT_CUSTOM_MEMBER(NAME((&igs017_state::keys_ipt_r<ioport_value, 2>)))
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )                 PORT_CONDITION("DSW2", 0x02, EQUALS, 0x00)  // 開始
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )            PORT_CONDITION("DSW2", 0x02, EQUALS, 0x00)  // 上
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )          PORT_CONDITION("DSW2", 0x02, EQUALS, 0x00)  // 下
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )          PORT_CONDITION("DSW2", 0x02, EQUALS, 0x00)  // 左
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT )         PORT_CONDITION("DSW2", 0x02, EQUALS, 0x00)  // 右
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 )                PORT_CONDITION("DSW2", 0x02, EQUALS, 0x00)  // 摸捨
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )                PORT_CONDITION("DSW2", 0x02, EQUALS, 0x00)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )                PORT_CONDITION("DSW2", 0x02, EQUALS, 0x00)
 
 	PORT_START("BUTTONS")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON3 )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )                PORT_CONDITION("DSW2", 0x02, EQUALS, 0x02)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON3 )                PORT_CONDITION("DSW2", 0x02, EQUALS, 0x00)  // 功能
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON2 )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )                PORT_CONDITION("DSW2", 0x02, EQUALS, 0x02)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON2 )                PORT_CONDITION("DSW2", 0x02, EQUALS, 0x00)  // 押注
+
+	MAHJONG_MATRIX_CONDITIONAL("DSW2", 0x02)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( slqz2 )
 	PORT_START("DSW1")
-	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coinage ) ) PORT_DIPLOCATION("SW1:1,2")
-	PORT_DIPSETTING(    0x03, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( 1C_2C ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( 1C_3C ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( 1C_5C ) )
-	PORT_DIPNAME( 0x0c, 0x0c, "Credits Per Note" ) PORT_DIPLOCATION("SW1:3,4")
-	PORT_DIPSETTING(    0x0c, "10" )
-	PORT_DIPSETTING(    0x08, "20" )
-	PORT_DIPSETTING(    0x04, "50" )
-	PORT_DIPSETTING(    0x00, "100" )
-	PORT_DIPNAME( 0x10, 0x10, "Max Note Credits" ) PORT_DIPLOCATION("SW1:5")
+	CREDIT_SETTINGS_COMMON
+	PORT_DIPNAME( 0x10, 0x10, "Credit Limit" )                          PORT_DIPLOCATION("SW1:5")     // 进分上限
 	PORT_DIPSETTING(    0x10, "1000" )
 	PORT_DIPSETTING(    0x00, "2000" )
-	PORT_DIPNAME( 0x20, 0x20, "Money Type" ) PORT_DIPLOCATION("SW1:6")
-	PORT_DIPSETTING(    0x20, "Coins" )
-	PORT_DIPSETTING(    0x00, "Notes" )
-	PORT_DIPNAME( 0x40, 0x40, "Pay Out Type" ) PORT_DIPLOCATION("SW1:7")
-	PORT_DIPSETTING(    0x40, "Coins" )
-	PORT_DIPSETTING(    0x00, "Notes" )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SW1:8")
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Demo_Sounds ) )                  PORT_DIPLOCATION("SW1:8")     // 示范音乐
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )                                                        // 无
+	PORT_DIPSETTING(    0x80, DEF_STR( On ) )                                                         // 有
 
 	PORT_START("DSW2")
-	PORT_DIPNAME( 0x03, 0x03, "Double Up Limit" ) PORT_DIPLOCATION("SW2:1,2")
+	PORT_DIPNAME( 0x03, 0x03, "Double Up Jackpot" )                     PORT_DIPLOCATION("SW2:1,2")   // 比倍爆机
 	PORT_DIPSETTING(    0x03, "500" )
 	PORT_DIPSETTING(    0x02, "1000" )
 	PORT_DIPSETTING(    0x01, "1500" )
 	PORT_DIPSETTING(    0x00, "2000" )
-	PORT_DIPNAME( 0x0c, 0x0c, "Minimum Bet" ) PORT_DIPLOCATION("SW2:3,4")
-	PORT_DIPSETTING(    0x0c, "1" )
-	PORT_DIPSETTING(    0x08, "2" )
-	PORT_DIPSETTING(    0x04, "3" )
-	PORT_DIPSETTING(    0x00, "5" )
-	PORT_DIPNAME( 0x10, 0x10, "Bonus Round" ) PORT_DIPLOCATION("SW2:5")
-	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Yes ) )
-	PORT_DIPNAME( 0x20, 0x20, "Number Type" ) PORT_DIPLOCATION("SW2:6")
-	PORT_DIPSETTING(    0x20, "Number" )
-	PORT_DIPSETTING(    0x00, "Dice" )
-	PORT_DIPNAME( 0x40, 0x40, "Symbols" ) PORT_DIPLOCATION("SW2:7")
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) ) // pigs, apples
-	PORT_DIPNAME( 0x80, 0x80, "Hide Gambling" ) PORT_DIPLOCATION("SW2:8") // press "Hide Gambling" to hide credits and bets
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0c, 0x0c, "Minimum Bet" )                           PORT_DIPLOCATION("SW2:3,4")   // 最小押注
+	PORT_DIPSETTING(    0x0c, "1 (1)" )
+	PORT_DIPSETTING(    0x08, "1 (2)" )
+	PORT_DIPSETTING(    0x04, "1 (3)" )
+	PORT_DIPSETTING(    0x00, "1 (4)" )
+	PORT_DIPNAME( 0x10, 0x10, "Double Up Game" )                        PORT_DIPLOCATION("SW2:5")     // 比倍游戏
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )                                                        // 无
+	PORT_DIPSETTING(    0x10, DEF_STR( On ) )                                                         // 有
+	PORT_DIPNAME( 0x20, 0x20, "Double Up Game Name" )                   PORT_DIPLOCATION("SW2:6")     // 比倍续玩
+	PORT_DIPSETTING(    0x20, "Continue Play" )                                                       // 续玩
+	PORT_DIPSETTING(    0x00, "Double Up" )                                                           // 比倍
+	PORT_DIPNAME( 0x40, 0x40, "Number Type" )                           PORT_DIPLOCATION("SW2:7")     // 数字型态
+	PORT_DIPSETTING(    0x40, "Numbers" )                                                             // 数字
+	PORT_DIPSETTING(    0x00, "Blocks" )                                                              // 方块       (pigs for credit, apples for bet, mahjong tong tiles for numbers)
+	PORT_DIPNAME( 0x80, 0x80, "Show Credits" )                          PORT_DIPLOCATION("SW2:8")     // 数字有无   (hides credits/bets/wins, game plays normally)
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )                                                        // 无
+	PORT_DIPSETTING(    0x80, DEF_STR( On ) )                                                         // 有
 
 	PORT_START("COINS")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW,  IPT_CUSTOM      ) PORT_READ_LINE_DEVICE_MEMBER("hopper", hopper_device, line_r) // hopper switch
-	PORT_SERVICE_NO_TOGGLE( 0x02,   IP_ACTIVE_LOW   ) // test mode (keep pressed during boot too)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW,  IPT_GAMBLE_BOOK ) // press with the above for sound test
-	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_COIN1       ) PORT_IMPULSE(5) // coin error otherwise
-	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_OTHER       ) PORT_NAME("Pay Out") PORT_CODE(KEYCODE_O)
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNKNOWN     ) // needs to be 0 for "clear" input below to work
-	PORT_BIT( 0x40, IP_ACTIVE_LOW,  IPT_BUTTON2     )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_BUTTON3     )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("hopper", FUNC(hopper_device::line_r)) // 哈巴
+	PORT_SERVICE_NO_TOGGLE( 0x02, IP_ACTIVE_LOW )                                                           // 测试      (hold on start for input test)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK )                                                        // 査帐
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(5)  PORT_CONDITION("DSW1", 0x20, EQUALS, 0x20)  // 投币
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_KEYIN )           PORT_CONDITION("DSW1", 0x20, EQUALS, 0x00)  // 投币
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT )          PORT_CONDITION("DSW1", 0x40, EQUALS, 0x40)  // 退币
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT )          PORT_CONDITION("DSW1", 0x40, EQUALS, 0x00)  // 退币
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE1 )               PORT_NAME("Show Credits")                   // 清除      (hold to show credits/bets/wins when hidden)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON2 )                                                            // 押注
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON3 )                                                            // 功能
 
 	PORT_START("PLAYER1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1         ) PORT_NAME("Start / Don Den")
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_UP    )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN  )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT  )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1        ) PORT_NAME("Help / Big")
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN        )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN        )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )                                                             // 开始
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )                                                        // 上
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )                                                      // 下
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )                                                      // 左
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT )                                                     // 右
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 )                                                            // 摸/舍
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("PLAYER2")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW,  IPT_UNKNOWN       )
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_SERVICE1      ) PORT_NAME("Hide Gambling") // shown in test mode as "clear" (清除)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW,  IPT_UNKNOWN       )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_UNKNOWN       )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_UNKNOWN       )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW,  IPT_UNKNOWN       )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW,  IPT_UNKNOWN       )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_UNKNOWN       )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE1 )               PORT_NAME("Show Credits")                   // 清除      (hold to show credits/bets/wins when hidden)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( tjsb )
 	PORT_START("DSW1")
-	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coinage ) ) PORT_DIPLOCATION("SW1:1,2")
-	PORT_DIPSETTING(    0x03, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( 1C_2C ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( 1C_3C ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( 1C_5C ) )
-	PORT_DIPNAME( 0x0c, 0x0c, "Credits Per Note" ) PORT_DIPLOCATION("SW1:3,4")
-	PORT_DIPSETTING(    0x0c, "10" )
-	PORT_DIPSETTING(    0x08, "20" )
-	PORT_DIPSETTING(    0x04, "50" )
-	PORT_DIPSETTING(    0x00, "100" )
-	PORT_DIPNAME( 0x10, 0x10, "Max Note Credits" ) PORT_DIPLOCATION("SW1:5")
+	CREDIT_SETTINGS_COMMON
+	PORT_DIPNAME( 0x10, 0x10, "Credit Limit" )                          PORT_DIPLOCATION("SW1:5")     // 進分上限
 	PORT_DIPSETTING(    0x10, "1000" )
 	PORT_DIPSETTING(    0x00, "5000" )
-	PORT_DIPNAME( 0x20, 0x20, "Money Type" ) PORT_DIPLOCATION("SW1:6")
-	PORT_DIPSETTING(    0x20, "Coins" )
-	PORT_DIPSETTING(    0x00, "Notes" )
-	PORT_DIPNAME( 0x40, 0x40, "Pay Out Type" ) PORT_DIPLOCATION("SW1:7") // 2/4
-	PORT_DIPSETTING(    0x40, "Coins" )
-	PORT_DIPSETTING(    0x00, "Notes" )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SW1:8")
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Demo_Sounds ) )                  PORT_DIPLOCATION("SW1:8")     // 示範音樂
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )                                                        // 無
+	PORT_DIPSETTING(    0x80, DEF_STR( On ) )                                                         // 有
 
 	PORT_START("DSW2")
-	PORT_DIPNAME( 0x03, 0x03, "Minimum Bet" ) PORT_DIPLOCATION("SW2:1,2")
+	PORT_DIPNAME( 0x03, 0x03, "Double Up Jackpot" )                     PORT_DIPLOCATION("SW2:1,2")   // 比倍爆機
 	PORT_DIPSETTING(    0x03, "1000" )
 	PORT_DIPSETTING(    0x02, "2000" )
 	PORT_DIPSETTING(    0x01, "3000" )
 	PORT_DIPSETTING(    0x00, "4000" )
-	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW2:3,4")
+	PORT_DIPNAME( 0x0c, 0x0c, "Minimum Bet" )                           PORT_DIPLOCATION("SW2:3,4")   // 最小押注
 	PORT_DIPSETTING(    0x0c, "1" )
 	PORT_DIPSETTING(    0x08, "3" )
 	PORT_DIPSETTING(    0x04, "5" )
 	PORT_DIPSETTING(    0x00, "10" )
-	PORT_DIPNAME( 0x10, 0x10, "Bonus Round" ) PORT_DIPLOCATION("SW2:5") // show bonus round in demo mode -> protection check
-	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Yes ) )
-	PORT_DIPNAME( 0x20, 0x20, "Number Type" ) PORT_DIPLOCATION("SW2:6")
-	PORT_DIPSETTING(    0x20, "Number" )
-	PORT_DIPSETTING(    0x00, "Dice" )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW2:7")
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW2:8")
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, "Double Up Game" )                        PORT_DIPLOCATION("SW2:5")     // 比倍遊戲
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )                                                        // 無
+	PORT_DIPSETTING(    0x10, DEF_STR( On ) )                                                         // 有
+	PORT_DIPNAME( 0x20, 0x20, "Number Type" )                           PORT_DIPLOCATION("SW2:6")     // 數字型態   (always uses pigs for credit and coins for bet)
+	PORT_DIPSETTING(    0x20, "Numbers" )                                                             // 數字
+	PORT_DIPSETTING(    0x00, "Blocks" )                                                              // 方塊       (dots for numbers)
+	PORT_DIPUNKNOWN_DIPLOC(0x40, 0x40, "SW2:7")
+	PORT_DIPUNKNOWN_DIPLOC(0x80, 0x80, "SW2:8")
 
 	PORT_START("DSW3") // the protection check is skipped if (DSW3 ^ 0xff) & 0x9a == 0x0a
-	PORT_DIPNAME( 0xff, 0xf5, "Bonus Round Protection Check" ) PORT_DIPLOCATION("SW3:1,2,3,4,5,6,7,8")
+	PORT_DIPNAME( 0xff, 0xf5, "Double Up Game Protection Check" ) PORT_DIPLOCATION("SW3:1,2,3,4,5,6,7,8")
 	PORT_DIPSETTING(    0xf5, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0xff, DEF_STR( On ) )
 
 	PORT_START("PLAYER1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1         ) PORT_NAME("Start / Don Den")
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_UP    )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN  )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT  )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1        ) // choose
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON2        ) // bet
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN        )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )                                                           // 開始
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )                                                      // 上
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )                                                    // 下
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )                                                    // 左
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT )                                                   // 右
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 )                                                          // 摸/舍
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON2 )                                                          // 押注
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("PLAYER2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -3814,24 +3759,26 @@ static INPUT_PORTS_START( tjsb )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("COINS")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK )
-	PORT_SERVICE_NO_TOGGLE( 0x02,  IP_ACTIVE_LOW   ) // keep pressed while booting
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN     )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN     )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN     )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN     )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN     )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1       )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK )                                                        // 查帳
+	PORT_SERVICE_NO_TOGGLE( 0x02, IP_ACTIVE_LOW )                                                           // 測試      (hold on start for input test)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 )                  PORT_CONDITION("DSW1", 0x20, EQUALS, 0x20)  // 投幣
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_GAMBLE_KEYIN )           PORT_CONDITION("DSW1", 0x20, EQUALS, 0x00)  // 投幣
 
 	PORT_START("BUTTONS")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW,  IPT_BUTTON3  )
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_NAME("Hide Gambling") // shown in test mode as "clear" (清除), does not work in game?
-	PORT_BIT( 0x04, IP_ACTIVE_LOW,  IPT_UNKNOWN  )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_UNKNOWN  )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_OTHER    ) PORT_NAME("Pay Out") PORT_CODE(KEYCODE_O)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW,  IPT_CUSTOM   ) PORT_READ_LINE_DEVICE_MEMBER("hopper", hopper_device, line_r) // hopper switch
-	PORT_BIT( 0x40, IP_ACTIVE_LOW,  IPT_UNKNOWN  )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_UNKNOWN  )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON3 )                                                            // 功能
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE1 )               PORT_NAME("Show Credits")                   // 清除      (hold to show credits/bets/wins when hidden - seems to be no setting to hide in DIP switches or bookkeeping menu)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT )          PORT_CONDITION("DSW1", 0x40, EQUALS, 0x40)  // 退幣
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT )          PORT_CONDITION("DSW1", 0x40, EQUALS, 0x00)  // 退幣
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("hopper", FUNC(hopper_device::line_r)) // 哈巴
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( spkrform )
@@ -3923,7 +3870,7 @@ static INPUT_PORTS_START( spkrform )
 	PORT_START("BUTTONS")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1          ) PORT_IMPULSE(5) // coin 1 (impulse prevents coin error in gambling mode)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2          ) PORT_IMPULSE(5) // coin 2 ""
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_CUSTOM         ) PORT_READ_LINE_DEVICE_MEMBER("hopper", hopper_device, line_r) // hopper switch
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_CUSTOM         ) PORT_READ_LINE_DEVICE_MEMBER("hopper", FUNC(hopper_device::line_r)) // hopper switch
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT  ) // payout
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE3       ) PORT_NAME("Return To Gambling (From Formosa). Then Bet, Hold 1..5") // To switch back to poker from Formosa, start the sequence pressing this key (memory $f4a3 holds the sequence number)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK    ) // book
@@ -3933,34 +3880,34 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( tarzan )
 	PORT_START("DSW1")
-	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SW1:1")
-	PORT_DIPSETTING( 0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING( 0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0e, 0x0e, "Coin Value" ) PORT_DIPLOCATION("SW1:2,3,4")
-	PORT_DIPSETTING( 0x0e, "1" )
-	PORT_DIPSETTING( 0x0c, "2" )
-	PORT_DIPSETTING( 0x0a, "4" )
-	PORT_DIPSETTING( 0x08, "5" )
-	PORT_DIPSETTING( 0x06, "10" )
-	PORT_DIPSETTING( 0x04, "20" )
-	PORT_DIPSETTING( 0x02, "50" )
-	PORT_DIPSETTING( 0x00, "100" )
-	PORT_DIPNAME( 0x30, 0x30, "Key Value" ) PORT_DIPLOCATION("SW1:5,6")
+	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Demo_Sounds ) )                  PORT_DIPLOCATION("SW1:1")     // 示范音乐
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )                                                        // 无
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )                                                         // 有
+	PORT_DIPNAME( 0x0e, 0x0e, DEF_STR(Coinage) )                        PORT_DIPLOCATION("SW1:2,3,4") // 投币比率
+	PORT_DIPSETTING( 0x0e, DEF_STR(1C_1C) )
+	PORT_DIPSETTING( 0x0c, DEF_STR(1C_2C) )
+	PORT_DIPSETTING( 0x0a, DEF_STR(1C_4C) )
+	PORT_DIPSETTING( 0x08, DEF_STR(1C_5C) )
+	PORT_DIPSETTING( 0x06, "1 Coin/10 Credits" )
+	PORT_DIPSETTING( 0x04, "1 Coin/20 Credits" )
+	PORT_DIPSETTING( 0x02, "1 Coin/50 Credits" )
+	PORT_DIPSETTING( 0x00, "1 Coin/100 Credits" )
+	PORT_DIPNAME( 0x30, 0x30, "Key-In Rate" )                           PORT_DIPLOCATION("SW1:5,6")   // 开分比率
 	PORT_DIPSETTING( 0x30, "100" )
 	PORT_DIPSETTING( 0x20, "200" )
 	PORT_DIPSETTING( 0x10, "500" )
 	PORT_DIPSETTING( 0x00, "1000" )
-	PORT_DIPNAME( 0xc0, 0xc0, "Point Value" ) PORT_DIPLOCATION("SW1:7,8")
+	PORT_DIPNAME( 0xc0, 0xc0, "Key-out Rate" )                          PORT_DIPLOCATION("SW1:7,8")   // 洗分比率
 	PORT_DIPSETTING( 0xc0, "1" )
 	PORT_DIPSETTING( 0x80, "10" )
 	PORT_DIPSETTING( 0x40, "100" )
 	PORT_DIPSETTING( 0x00, "100 (2)" )
 
 	PORT_START("DSW2")
-	PORT_DIPNAME( 0x01, 0x01, "Coin Type" ) PORT_DIPLOCATION("SW2:1")
-	PORT_DIPSETTING( 0x01, "Coin" )
-	PORT_DIPSETTING( 0x00, "Key" )
-	PORT_DIPNAME( 0x0e, 0x0e, "Minimum Bet" ) PORT_DIPLOCATION("SW2:2,3,4")
+	PORT_DIPNAME( 0x01, 0x01, "Credit Mode" )                           PORT_DIPLOCATION("SW2:1")     // 进分方式   (sets coin input function)
+	PORT_DIPSETTING(    0x01, "Coin Acceptor" )                                                       // 投币       (uses coin rate)
+	PORT_DIPSETTING(    0x00, "Key-In" )                                                              // 开分       (uses key-in rate)
+	PORT_DIPNAME( 0x0e, 0x0e, "Minimum Bet" )                           PORT_DIPLOCATION("SW2:2,3,4") // 最小押注
 	PORT_DIPSETTING( 0x0e, "5" )
 	PORT_DIPSETTING( 0x0c, "25" )
 	PORT_DIPSETTING( 0x0a, "50" )
@@ -3969,113 +3916,67 @@ static INPUT_PORTS_START( tarzan )
 	PORT_DIPSETTING( 0x04, "125" )
 	PORT_DIPSETTING( 0x02, "125 (2)" )
 	PORT_DIPSETTING( 0x00, "125 (3)" )
-	PORT_DIPNAME( 0x30, 0x30, "Bonus Bet" ) PORT_DIPLOCATION("SW2:5,6")
+	PORT_DIPNAME( 0x30, 0x30, "Bonus Bet" )                             PORT_DIPLOCATION("SW2:5,6")   // 赠奖押注
 	PORT_DIPSETTING( 0x30, "75" )
 	PORT_DIPSETTING( 0x20, "125" )
 	PORT_DIPSETTING( 0x10, "200" )
 	PORT_DIPSETTING( 0x00, "250" )
-	PORT_DIPNAME( 0xc0, 0xc0, "Continue To Play" ) PORT_DIPLOCATION("SW2:7,8")
-	PORT_DIPSETTING( 0xc0, "50k" )
-	PORT_DIPSETTING( 0x80, "100k" )
-	PORT_DIPSETTING( 0x40, "150k" )
-	PORT_DIPSETTING( 0x00, "200k" )
+	PORT_DIPNAME( 0xc0, 0xc0, "Double Up Jackpot" )                     PORT_DIPLOCATION("SW2:7,8")   // 续玩爆机
+	PORT_DIPSETTING( 0xc0, "50,000" )
+	PORT_DIPSETTING( 0x80, "100,000" )
+	PORT_DIPSETTING( 0x40, "150,000" )
+	PORT_DIPSETTING( 0x00, "200,000" )
 
 	PORT_START("DSW3")
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Controls ) ) PORT_DIPLOCATION("SW3:1")
-	PORT_DIPSETTING( 0x01, "Keyboard" )
-	PORT_DIPSETTING( 0x00, DEF_STR( Joystick ) )
-	PORT_DIPNAME( 0x02, 0x00, "Back Color" ) PORT_DIPLOCATION("SW3:2")
-	PORT_DIPSETTING( 0x02, "Black" )
-	PORT_DIPSETTING( 0x00, "Color" )
-	PORT_DIPNAME( 0x04, 0x04, "Hide Gambling" ) PORT_DIPLOCATION("SW3:3") // Press "Hide Gambling" to hide credits and bets
-	PORT_DIPSETTING( 0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING( 0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, "Number Type" ) PORT_DIPLOCATION("SW3:4")
-	PORT_DIPSETTING( 0x08, "Number" )
-	PORT_DIPSETTING( 0x00, "Mahjong Tile" )
-	PORT_DIPNAME( 0x10, 0x10, "Continue To Play" ) PORT_DIPLOCATION("SW3:5")
-	PORT_DIPSETTING( 0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING( 0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, "Payout" ) PORT_DIPLOCATION("SW3:6")
-	PORT_DIPSETTING( 0x20, "Hopper" )
-	PORT_DIPSETTING( 0x00, "Points" )
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Controls ) )                     PORT_DIPLOCATION("SW3:1")     // 操作界面
+	PORT_DIPSETTING(    0x01, "Mahjong" )                                                             // 麻雀键盘
+	PORT_DIPSETTING(    0x00, DEF_STR( Joystick ) )                                                   // 摇杆
+	PORT_DIPNAME( 0x02, 0x02, "Background Color" )                      PORT_DIPLOCATION("SW3:2")     // 底色模式
+	PORT_DIPSETTING(    0x02, "Black and White" )                                                     // 黑白
+	PORT_DIPSETTING(    0x00, "Color" )                                                               // 彩色
+	PORT_DIPNAME( 0x04, 0x04, "Hide Credits" )                          PORT_DIPLOCATION("SW3:3")     // 隐分功能   (hides credits/bets/wins, game plays normally)
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, "Number Type" )                           PORT_DIPLOCATION("SW3:4")     // 数字型态
+	PORT_DIPSETTING(    0x08, "Numbers" )                                                             // 数字
+	PORT_DIPSETTING(    0x00, "Circle Tiles" )                                                        // 筒子       (mahjong tong tiles)
+	PORT_DIPNAME( 0x10, 0x10, "Double Up Game" )                        PORT_DIPLOCATION("SW3:5")     // 续玩有无
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )                                                        // 无
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )                                                         // 有
+	PORT_DIPNAME( 0x20, 0x20, "Payout Mode" )                           PORT_DIPLOCATION("SW3:6")     // 退分方式
+	PORT_DIPSETTING(    0x20, "Return Coins" )                                                        // 退币       (uses hopper to pay out credits)
+	PORT_DIPSETTING(    0x00, "Key-Out" )                                                             // 洗分       (just clears credits)
 	PORT_DIPUNUSED_DIPLOC(0x40, 0x40, "SW3:7")
 	PORT_DIPUNUSED_DIPLOC(0x80, 0x80, "SW3:8")
 
 	PORT_START("COINS")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_CUSTOM         ) PORT_READ_LINE_DEVICE_MEMBER("hopper", hopper_device, line_r) // hopper switch
-	PORT_SERVICE_NO_TOGGLE( 0x02, IP_ACTIVE_LOW       ) // Service
-	PORT_BIT( 0x04, IP_ACTIVE_LOW,  IPT_GAMBLE_BOOK   ) // Book
-	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_COIN1         ) PORT_IMPULSE(5) // Coin/Key in (coin error in coin mode)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_OTHER         ) PORT_NAME("Pay Out") PORT_CODE(KEYCODE_O) // Coin/Key out
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_SERVICE1      ) PORT_NAME("Hide Gambling") // shown in test mode as "clear" (清除)
-	// Keyboard mode:
-	PORT_BIT( 0x40, IP_ACTIVE_LOW,  IPT_UNKNOWN       ) PORT_CONDITION("DSW3",0x01,EQUALS,0x01)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_UNKNOWN       ) PORT_CONDITION("DSW3",0x01,EQUALS,0x01)
-	// Joystick mode:
-	PORT_BIT( 0x40, IP_ACTIVE_LOW,  IPT_BUTTON2       ) PORT_CONDITION("DSW3",0x01,EQUALS,0x00) PORT_NAME("%p Button 2 / Bet / Same Double Up"  ) // Button B (test mode)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_BUTTON3       ) PORT_CONDITION("DSW3",0x01,EQUALS,0x00) PORT_NAME("%p Button 3 / Small / Half Double Up") // Button C (test mode)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("hopper", FUNC(hopper_device::line_r)) // 哈巴
+	PORT_SERVICE_NO_TOGGLE( 0x02, IP_ACTIVE_LOW )                                                           // 测试      (hold on start for input test)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK )                                                        // 査帐
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(5)  PORT_CONDITION("DSW2", 0x01, EQUALS, 0x01)  // 投币
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_KEYIN )           PORT_CONDITION("DSW2", 0x01, EQUALS, 0x00)  // 投币
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT )          PORT_CONDITION("DSW3", 0x20, EQUALS, 0x20)  // 洗分
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT )          PORT_CONDITION("DSW3", 0x20, EQUALS, 0x00)  // 洗分
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE1 )               PORT_NAME("Show Credits")                   // 清除      (hold to show credits/bets/wins when hidden)
+	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNKNOWN )                PORT_CONDITION("DSW3", 0x01, EQUALS, 0x01)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_GAMBLE_BET )             PORT_CONDITION("DSW3", 0x01, EQUALS, 0x00)  PORT_NAME("Button B / Bet / Double Up")                      // B
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_GAMBLE_LOW )             PORT_CONDITION("DSW3", 0x01, EQUALS, 0x00)  PORT_NAME("Button C / Small / Double Up (half)")             // C
 
-	PORT_START("JOY")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1         ) PORT_NAME("Start / Take") // Exit (test mode)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_UP    ) // Up    (test mode)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN  ) // Down  (test mode)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT  ) // Left  (test mode)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) // Right (test mode)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1        ) PORT_NAME("%p Button 1 / Help / Big / Double Up") // Button A (test mode)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN        )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN        )
+	PORT_START("MATRIX")
+	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_CUSTOM )                PORT_CONDITION("DSW3", 0x01, EQUALS, 0x01) PORT_CUSTOM_MEMBER(NAME((&igs017_state::keys_ipt_r<ioport_value, 3>)))
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )                 PORT_CONDITION("DSW3", 0x01, EQUALS, 0x00)  PORT_NAME("Start / Stop All / Take Score")                   // 开始
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SLOT_STOP1 )             PORT_CONDITION("DSW3", 0x01, EQUALS, 0x00)  PORT_NAME("Up / Stop 1")                                     // 上
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SLOT_STOP2 )             PORT_CONDITION("DSW3", 0x01, EQUALS, 0x00)  PORT_NAME("Down / Stop 2")                                   // 下
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SLOT_STOP3 )             PORT_CONDITION("DSW3", 0x01, EQUALS, 0x00)  PORT_NAME("Left / Stop 3")                                   // 左
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SLOT_STOP4 )             PORT_CONDITION("DSW3", 0x01, EQUALS, 0x00)  PORT_NAME("Right / Stop 4")                                  // 右
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_GAMBLE_HIGH )            PORT_CONDITION("DSW3", 0x01, EQUALS, 0x00)  PORT_NAME("Button A / Big / Double Up (double) / Show Odds") // A
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )                PORT_CONDITION("DSW3", 0x01, EQUALS, 0x00)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )                PORT_CONDITION("DSW3", 0x01, EQUALS, 0x00)
 
-	PORT_START("KEY0")
-	// Keyboard mode:
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_A   ) PORT_NAME("%p Mahjong A / Help / Double Up")
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_E   )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_I   )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_M   ) PORT_NAME("%p Mahjong M / Small")
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_KAN )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START       ) PORT_NAME("%p Mahjong Start / Take")
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN     )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN     )
+	MAHJONG_MATRIX_CONDITIONAL("DSW3", 0x01)
 
-	PORT_START("KEY1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_B ) // B (test mode)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_F )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_J )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_N )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_REACH )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_MAHJONG_BET ) // Bet
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
-	PORT_START("KEY2")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_C ) PORT_NAME("%p Mahjong C / Half Double Up")
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_G )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_K ) PORT_NAME("%p Mahjong K / Big")
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_CHI )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_RON )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
-	PORT_START("KEY3")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_D )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_H )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_L )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_PON )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
-	PORT_START("KEY4") // never read and not shown in test mode
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_LAST_CHANCE )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_SCORE )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_DOUBLE_UP )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_BIG )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_MAHJONG_SMALL )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_MODIFY("KEY4") // never read and not shown in test mode
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( starzan )
@@ -4128,7 +4029,7 @@ static INPUT_PORTS_START( starzan )
 	PORT_DIPUNUSED_DIPLOC(0x80, 0x80, "SW3:8")
 
 	PORT_START("PLAYER1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_CUSTOM        ) PORT_READ_LINE_DEVICE_MEMBER("hopper", hopper_device, line_r) // hopper switch
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_CUSTOM        ) PORT_READ_LINE_DEVICE_MEMBER("hopper", FUNC(hopper_device::line_r)) // hopper switch
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN       ) // no effects in key test
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN       ) // no effects in key test
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN       ) // no effects in key test
@@ -4226,7 +4127,7 @@ static INPUT_PORTS_START( happyskl )
 	PORT_DIPUNUSED_DIPLOC(0x80, 0x80, "SW3:8")
 
 	PORT_START("PLAYER1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_CUSTOM        ) PORT_READ_LINE_DEVICE_MEMBER("hopper", hopper_device, line_r) // hopper switch
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_CUSTOM        ) PORT_READ_LINE_DEVICE_MEMBER("hopper", FUNC(hopper_device::line_r)) // hopper switch
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN       ) // no effects in key test
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN       ) // no effects in key test
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN       ) // no effects in key test
@@ -4419,11 +4320,11 @@ void igs017_state::tarzan(machine_config &config)
 	m_maincpu->set_addrmap(AS_OPCODES, &igs017_state::decrypted_opcodes_map);
 	TIMER(config, "scantimer").configure_scanline(FUNC(igs017_state::iqblocka_interrupt), "screen", 0, 1);
 
-	// i/o
+	// I/O
 	m_igs_mux->set_addrmap(0, &igs017_state::tarzan_mux_map);
 
 	m_igs017_igs031->in_pa_callback().set_ioport("COINS");
-	m_igs017_igs031->in_pb_callback().set(FUNC(igs017_state::tarzan_keys_joy_r));
+	m_igs017_igs031->in_pb_callback().set_ioport("MATRIX");
 
 	HOPPER(config, m_hopper, attotime::from_msec(50));
 
@@ -6046,8 +5947,8 @@ GAME ( 1997,  genius6a,   genius6,  genius6,    genius6,  igs017_state, init_iqb
 GAME ( 1997,  genius6b,   genius6,  genius6,    genius6,  igs017_state, init_iqblocka,   ROT0, "IGS", "Genius 6 (V132F)",                                                   0 ) // "
 GAME ( 1998,  mgcs,       0,        mgcs,       mgcs,     igs017_state, init_mgcs,       ROT0, "IGS", "Manguan Caishen (China, V103CS)",                                    MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION ) // 满贯财神, finish IGS029 protection
 GAME ( 1998,  mgcsa,      mgcs,     mgcsa,      mgcs,     igs017_state, init_mgcsa,      ROT0, "IGS", "Manguan Caishen (China, V106CS)",                                    MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION ) // 满贯财神, finish IGS029 protection
-GAME ( 1998,  lhzb,       0,        lhzb2,      lhzb2,    igs017_state, init_lhzb2,      ROT0, "IGS", "Long Hu Zhengba (China, VS105M, set 1)",                             MACHINE_UNEMULATED_PROTECTION ) // 龙虎争霸, finish IGS022 protection
-GAME ( 1998,  lhzba,      lhzb,     lhzb2,      lhzb2,    igs017_state, init_lhzb2,      ROT0, "IGS", "Long Hu Zhengba (China, VS105M, set 2)",                             MACHINE_UNEMULATED_PROTECTION ) // 龙虎争霸, finish IGS022 protection
+GAME ( 1998,  lhzb,       0,        lhzb2,      lhzb,     igs017_state, init_lhzb2,      ROT0, "IGS", "Long Hu Zhengba (China, VS105M, set 1)",                             MACHINE_UNEMULATED_PROTECTION ) // 龙虎争霸, finish IGS022 protection
+GAME ( 1998,  lhzba,      lhzb,     lhzb2,      lhzb,     igs017_state, init_lhzb2,      ROT0, "IGS", "Long Hu Zhengba (China, VS105M, set 2)",                             MACHINE_UNEMULATED_PROTECTION ) // 龙虎争霸, finish IGS022 protection
 GAME ( 1998,  lhzb2,      0,        lhzb2,      lhzb2,    igs017_state, init_lhzb2,      ROT0, "IGS", "Long Hu Zhengba 2 (China, set 1)",                                   MACHINE_UNEMULATED_PROTECTION ) // 龙虎争霸2, finish IGS022 protection
 GAME ( 1998,  lhzb2a,     lhzb2,    lhzb2a,     lhzb2a,   igs017_state, init_lhzb2a,     ROT0, "IGS", "Long Hu Zhengba 2 (China, VS221M)",                                  0 ) // 龙虎争霸2
 GAME ( 1998,  slqz2,      0,        slqz2,      slqz2,    igs017_state, init_slqz2,      ROT0, "IGS", "Shuang Long Qiang Zhu 2 VS (China, VS203J)",                         MACHINE_UNEMULATED_PROTECTION ) // 双龙抢珠, finish IGS022 protection

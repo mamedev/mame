@@ -20,6 +20,7 @@
 #include "machine/timer.h"
 #include "machine/v3021.h"
 #include "sound/ics2115.h"
+
 #include "emupal.h"
 #include "tilemap.h"
 
@@ -54,28 +55,28 @@ protected:
 	virtual void machine_reset() override ATTR_COLD;
 	virtual void video_start() override ATTR_COLD;
 
-	/* memory pointers */
+	// memory pointers
 	required_shared_ptr<u16> m_mainram;
 
 	optional_ioport m_region;
 	optional_ioport m_regionhack;
 
-	/* devices */
+	// devices
 	required_device<cpu_device> m_maincpu;
 
-	/* hack */
+	// hack
 	int m_irq4_disabled = 0;
 
 	void pgm_base_mem(address_map &map) ATTR_COLD;
 	void pgm_mem(address_map &map) ATTR_COLD;
 
 private:
-	/* memory pointers */
+	// memory pointers
 	required_shared_ptr<u8>  m_z80_mainram;
 
 
 
-	/* devices */
+	// devices
 	required_device<cpu_device>             m_soundcpu;
 	required_device<palette_device>         m_palette;
 	required_device<generic_latch_8_device> m_soundlatch;
@@ -83,7 +84,6 @@ private:
 	required_device<ics2115_device>         m_ics;
 	required_device<igs023_video_device>    m_video;
 
-	/* used by rendering */
 	void coin_counter_w(u16 data);
 	u8 z80_ram_r(offs_t offset);
 	void z80_ram_w(offs_t offset, u8 data);
@@ -92,7 +92,6 @@ private:
 	void m68k_l1_w(u8 data);
 	void z80_l3_w(u8 data);
 
-	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void screen_vblank(int state);
 	TIMER_DEVICE_CALLBACK_MEMBER(interrupt);
 	u16 sprites_r(offs_t offset);
@@ -104,10 +103,8 @@ private:
 
 
 
-/*----------- defined in drivers/pgm.cpp -----------*/
+//----------- defined in igs/pgm.cpp -----------
 
 INPUT_PORTS_EXTERN(pgm);
-
-extern gfx_decode_entry const gfx_pgm[];
 
 #endif // MAME_IGS_PGM_H

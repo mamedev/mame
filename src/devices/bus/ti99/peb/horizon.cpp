@@ -559,12 +559,12 @@ INPUT_PORTS_START( horizon )
 		PORT_DIPSETTING(    0x01, "Geneve mode" )
 
 	PORT_START( "HIDESW2" )
-	PORT_DIPNAME( 0x01, 0x00, "SW2 Hideswitch" ) PORT_CHANGED_MEMBER(DEVICE_SELF, horizon_ramdisk_device, hs_changed, 0)
+	PORT_DIPNAME( 0x01, 0x00, "SW2 Hideswitch" ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(horizon_ramdisk_device::hs_changed), 0)
 		PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 		PORT_DIPSETTING(    0x01, DEF_STR( On ) )
 
 	PORT_START( "PHOENIX" )
-	PORT_DIPNAME( 0x01, 0x00, "JP2 Phoenix split" ) PORT_CHANGED_MEMBER(DEVICE_SELF, horizon_ramdisk_device, hs_changed, 1)
+	PORT_DIPNAME( 0x01, 0x00, "JP2 Phoenix split" ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(horizon_ramdisk_device::hs_changed), 1)
 		PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 		PORT_DIPSETTING(    0x01, DEF_STR( On ) )
 

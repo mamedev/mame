@@ -54,7 +54,7 @@ void c128_partner_cartridge_device::nmi_w(int state)
 
 static INPUT_PORTS_START( c128_partner )
 	PORT_START("NMI")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Menu") PORT_CODE(KEYCODE_END) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, c128_partner_cartridge_device, nmi_w)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Menu") PORT_CODE(KEYCODE_END) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, FUNC(c128_partner_cartridge_device::nmi_w))
 INPUT_PORTS_END
 
 

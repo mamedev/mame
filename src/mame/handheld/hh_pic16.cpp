@@ -422,7 +422,7 @@ static INPUT_PORTS_START( pabball )
 	PORT_CONFSETTING(    0x20, "2" )
 
 	PORT_START("RESET")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_CHANGED_MEMBER(DEVICE_SELF, pabball_state, reset_button, 0) PORT_NAME("P1 Reset")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(pabball_state::reset_button), 0) PORT_NAME("P1 Reset")
 INPUT_PORTS_END
 
 // config
@@ -560,8 +560,8 @@ static INPUT_PORTS_START( sfxphasor )
 	PORT_CONFNAME( 0x02, 0x02, "Auto Power Off" ) // MCU pin, not a switch
 	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x02, DEF_STR( On ) )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_F1) PORT_NAME("On / Sounds") PORT_CHANGED_MEMBER(DEVICE_SELF, sfxphasor_state, power_button, true)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_F2) PORT_NAME("On / Music") PORT_CHANGED_MEMBER(DEVICE_SELF, sfxphasor_state, power_button, true)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_F1) PORT_NAME("On / Sounds") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(sfxphasor_state::power_button), true)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_F2) PORT_NAME("On / Music") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(sfxphasor_state::power_button), true)
 INPUT_PORTS_END
 
 // config
@@ -1102,7 +1102,7 @@ static INPUT_PORTS_START( matchme )
 	PORT_CONFSETTING(    0x00, "Professional" ) // PRO
 
 	PORT_START("CPU") // another fake
-	PORT_CONFNAME( 0x01, 0x00, "Speed" ) PORT_CHANGED_MEMBER(DEVICE_SELF, matchme_state, speed_switch, 0)
+	PORT_CONFNAME( 0x01, 0x00, "Speed" ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(matchme_state::speed_switch), 0)
 	PORT_CONFSETTING(    0x00, DEF_STR( Low ) )
 	PORT_CONFSETTING(    0x01, DEF_STR( High ) )
 

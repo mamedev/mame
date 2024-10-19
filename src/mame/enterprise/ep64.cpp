@@ -159,7 +159,8 @@ Notes: (All IC's shown)
 #include "cpu/z80/z80.h"
 #include "imagedev/cassette.h"
 #include "machine/ram.h"
-#include "sound/dave.h"
+
+#include "dave.h"
 #include "nick.h"
 
 #include "softlist_dev.h"
@@ -595,6 +596,7 @@ void ep64_state::ep64(machine_config &config)
 	// sound hardware
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
+
 	DAVE(config, m_dave, XTAL(8'000'000));
 	m_dave->set_addrmap(AS_PROGRAM, &ep64_state::dave_64k_mem);
 	m_dave->set_addrmap(AS_IO, &ep64_state::dave_io);

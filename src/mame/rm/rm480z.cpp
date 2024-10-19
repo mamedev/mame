@@ -258,7 +258,7 @@ INPUT_PORTS_START( rm480z )
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("@ `")             PORT_CODE(KEYCODE_ASTERISK)
 
 	PORT_START("display_type")
-	PORT_CONFNAME( 0x01, 0x00, "Monitor" ) PORT_CHANGED_MEMBER(DEVICE_SELF, rm480z_state, monitor_changed, 0)
+	PORT_CONFNAME( 0x01, 0x00, "Monitor" ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(rm480z_state::monitor_changed), 0)
 	PORT_CONFSETTING( 0x00, "TTL RGB Colour Monitor" )
 	PORT_CONFSETTING( 0x01, "Monochrome b/w Monitor" )
 INPUT_PORTS_END

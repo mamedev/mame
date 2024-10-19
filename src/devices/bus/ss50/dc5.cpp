@@ -132,7 +132,7 @@ static INPUT_PORTS_START( dc5 )
 	// generally needs the 'ready' line forced and Flex9 can use the index
 	// pulse detection to determine if disks are present.
 	PORT_START("FORCE_READY")
-	PORT_CONFNAME(0x1, 0, "Force ready") PORT_CHANGED_MEMBER(DEVICE_SELF, ss50_dc5_device, force_ready_change, 0)
+	PORT_CONFNAME(0x1, 0, "Force ready") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(ss50_dc5_device::force_ready_change), 0)
 	PORT_CONFSETTING(0, DEF_STR(No))
 	PORT_CONFSETTING(1, DEF_STR(Yes))
 
@@ -148,7 +148,7 @@ static INPUT_PORTS_START( dc5 )
 	// 3.5" HD  -  2.0MHz
 	// 8" 360rpm  -  2.4MHz
 	PORT_START("EXPECTED_CLOCK")
-	PORT_CONFNAME(0xf, 0, "FDC expected clock rate") PORT_CHANGED_MEMBER(DEVICE_SELF, ss50_dc5_device, expected_clock_change, 0)
+	PORT_CONFNAME(0xf, 0, "FDC expected clock rate") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(ss50_dc5_device::expected_clock_change), 0)
 	PORT_CONFSETTING(0, "-")
 	PORT_CONFSETTING(12, "1.0 MHz")
 	PORT_CONFSETTING(10, "1.2 MHz")
@@ -161,7 +161,7 @@ static INPUT_PORTS_START( dc5 )
 	// drive selection. These drivers need to be corrected, but this
 	// option helps identify this issue and work around it.
 	PORT_START("CTRL_REG_BIT7_SIDE_SELECT")
-	PORT_CONFNAME(0x1, 0, "Control register bit 7") PORT_CHANGED_MEMBER(DEVICE_SELF, ss50_dc5_device, ctrl_reg_bit7_side_select_change, 0)
+	PORT_CONFNAME(0x1, 0, "Control register bit 7") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(ss50_dc5_device::ctrl_reg_bit7_side_select_change), 0)
 	PORT_CONFSETTING(0, "Inhibits drive selection")
 	PORT_CONFSETTING(1, "Erroneous side select")
 

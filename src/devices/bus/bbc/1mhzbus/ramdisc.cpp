@@ -28,7 +28,7 @@ DEFINE_DEVICE_TYPE(BBC_RAMDISC, bbc_ramdisc_device, "bbc_ramdisc", "Morley Elect
 
 static INPUT_PORTS_START(ramdisc)
 	PORT_START("POWER")
-	PORT_CONFNAME(0x01, 0x01, "Power") PORT_CHANGED_MEMBER(DEVICE_SELF, bbc_ramdisc_device, power_changed, 0)
+	PORT_CONFNAME(0x01, 0x01, "Power") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(bbc_ramdisc_device::power_changed), 0)
 	PORT_CONFSETTING(0x00, DEF_STR(Off))
 	PORT_CONFSETTING(0x01, DEF_STR(On))
 	PORT_START("SIZE")

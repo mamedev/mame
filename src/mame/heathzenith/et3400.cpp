@@ -203,10 +203,10 @@ static INPUT_PORTS_START( et3400 )
 	PORT_DIPSETTING(    0x02, "9600" )
 
 	PORT_START("RESET") // RESET is directly next to 0, but electrically separate from key matrix
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_NAME("RESET") PORT_CODE(KEYCODE_STOP) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, et3400_state, reset_key_w)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_NAME("RESET") PORT_CODE(KEYCODE_STOP) PORT_WRITE_LINE_MEMBER(FUNC(et3400_state::reset_key_w))
 
 	PORT_START("TEST") // No input mechanism for "Segment Test" defined other than shorting pins together
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Segment Test") PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, et3400_state, segment_test_w)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Segment Test") PORT_WRITE_LINE_MEMBER(FUNC(et3400_state::segment_test_w))
 INPUT_PORTS_END
 
 

@@ -40,7 +40,7 @@ INPUT_PORTS_START(datacentre)
 	PORT_CONFSETTING(0x04, DEF_STR(Yes))
 
 	PORT_START("NVREST")
-	PORT_CONFNAME(0x01, 0x00, "Import NVRAM Restore Utility") PORT_CHANGED_MEMBER(DEVICE_SELF, bbc_datacentre_device, import_nvrest, 0)
+	PORT_CONFNAME(0x01, 0x00, "Import NVRAM Restore Utility") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(bbc_datacentre_device::import_nvrest), 0)
 	PORT_CONFSETTING(0x00, DEF_STR(No))
 	PORT_CONFSETTING(0x01, DEF_STR(Yes))
 INPUT_PORTS_END

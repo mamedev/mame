@@ -130,8 +130,8 @@ void vreadere_state::prog_map(address_map &map)
 
 static INPUT_PORTS_START(vreadere)
 	PORT_START("POWER")
-	PORT_BIT(1, IP_ACTIVE_LOW, IPT_POWER_ON) PORT_WRITE_LINE_MEMBER(vreadere_state, power_on_w)
-	PORT_BIT(2, IP_ACTIVE_LOW, IPT_POWER_OFF) PORT_WRITE_LINE_MEMBER(vreadere_state, power_off_w)
+	PORT_BIT(1, IP_ACTIVE_LOW, IPT_POWER_ON) PORT_WRITE_LINE_MEMBER(FUNC(vreadere_state::power_on_w))
+	PORT_BIT(2, IP_ACTIVE_LOW, IPT_POWER_OFF) PORT_WRITE_LINE_MEMBER(FUNC(vreadere_state::power_off_w))
 INPUT_PORTS_END
 
 void vreadere_state::palette_init(palette_device &palette)

@@ -320,6 +320,12 @@ inline void upd7220_device::dequeue(uint8_t *data, int *flag)
 		if (m_fifo_ptr == -1)
 			m_sr &= ~UPD7220_SR_DATA_READY;
 	}
+	else
+	{
+		// TODO: underflow details
+		// pc9821:skinpan does SR checks over the wrong port during intro ...
+		*data = 0xff;
+	}
 }
 
 
@@ -1370,9 +1376,19 @@ void upd7220_device::process_fifo()
 		break;
 
 	case COMMAND_PITCH: /* pitch specification */
-		if (flag == FIFO_PARAMETER)
+		// pc9801:burai writes a spurious extra value during intro, effectively ignored
+		// (only first value matters)
+		if (flag == FIFO_PARAMETER && m_param_ptr == 2)
 		{
 			m_pitch = (m_pitch & 0x100) | data;
+
+			if (m_pitch < 2)
+			{
+				// TODO: a pitch of zero will lead to a MAME crash in draw_graphics_line
+				// Coerce a fail-safe minimum, what should really happen is to be verified ...
+				popmessage("%s pitch == 0!", this->tag());
+				m_pitch = 2;
+			}
 
 			LOG("uPD7220 PITCH: %u\n", m_pitch);
 		}
