@@ -652,8 +652,6 @@ public:
 
 	void init_epo_mini();
 
-	u8 unknown_rnd_r() { return machine().rand(); }
-
 protected:
 	//virtual void write_io1(uint8_t data, uint8_t direction) override;
 };
