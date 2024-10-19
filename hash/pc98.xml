@@ -50038,7 +50038,7 @@ Hangs at Cross Media Soft logo, triggers [FDC] XTMASK irq
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="Data"/>
 			<dataarea name="flop" size="1281968">
-				<rom name="beast lord 2_data.d88" size="1281968" crc="9a4b0c7d" sha1="f6b83f627f9b0b2ca366aaf677f494f939e1866c" offset="0" />
+				<rom name="beast lord 2_data.d88" size="1281968" crc="9a4b0c7d" sha1="7c22e672003c83ef87c5774420aa687747aeb9dd" offset="0" />
 			</dataarea>
 		</part>
 	</software>
