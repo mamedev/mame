@@ -24536,7 +24536,8 @@ sys573                          //
 
 @source:konami/labyrunr.cpp
 labyrunr                        // GX771 (c) 1987 (Japan)
-labyrunrk                       // GX771 (c) 1987 (Japan)
+labyrunrf                       // GX771 (c) 1987 (World)
+labyrunrk                       // GX771 (c) 1987 (World)
 tricktrp                        // GX771 (c) 1987
 
 @source:konami/lethal.cpp
