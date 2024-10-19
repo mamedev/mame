@@ -269,6 +269,11 @@ ROM_START( epo_bowl )
 	ROM_LOAD("bowling.bin", 0x000000, 0x200000, CRC(d34f8d9e) SHA1(ebe3792172dc43904b9226beb27f1da89d2388cc) )
 ROM_END
 
+ROM_START( epo_golf ) // GLFJ MAIN-03
+	ROM_REGION(0x400000, "bios", ROMREGION_ERASE00)
+	ROM_LOAD("golf.bin", 0x000000, 0x400000, CRC(d1f231cf) SHA1(9421836a6bc4af9ee1fc7a402d62b2fb4dbcdefc) )
+ROM_END
+
 ROM_START( ttv_sw )
 	ROM_REGION( 0x800000, "bios", ROMREGION_ERASE00 )
 	ROM_LOAD( "jedi.bin", 0x000000, 0x800000, CRC(51cae5fd) SHA1(1ed8d556f31b4182259ca8c766d60c824d8d9744) )
@@ -335,6 +340,10 @@ CONS( 2002, epo_ebox, 0, 0, xavix2000_nv,        epo_ebox,    xavix_state,      
 // die not confirmed, but uses extra opcodes.  (hangs on title screen due to combination of freq_timer_done nested interrupts tripping, and waiting on bits in input ports to change
 // ストライクきめるぜ！ エキサイトボウリング
 CONS( 2002, epo_bowl, 0, 0, xavix2000_i2c_24c04, epo_bowl,    xavix_i2c_state,         init_xavix, "Epoch / SSD Company LTD",       "Excite Bowling (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+
+// スーパーショット！ エキサイトゴルフ
+// needs timer irq hack to boot, fails to draw main menu properly (buggy xavix2000 opcodes?)
+CONS( 2003, epo_golf, 0,       0, xavix2000_i2c_24c04, ttv_lotr,   xavix_i2c_lotr_state, init_epo_mini, "Epoch / SSD Company LTD",       "Excite Golf (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
 // ミニモニ。パーティ！リズムでぴょん！
 // needs timer irq hack to boot
