@@ -9,7 +9,6 @@ project "bimg"
 	includedirs {
 		path.join(BIMG_DIR, "include"),
 		path.join(BIMG_DIR, "3rdparty/astc-encoder/include"),
-		path.join(BIMG_DIR, "3rdparty/tinyexr/deps/miniz"),
 	}
 
 	files {
@@ -19,8 +18,6 @@ project "bimg"
 
 		path.join(BIMG_DIR, "3rdparty/astc-encoder/source/**.cpp"),
 		path.join(BIMG_DIR, "3rdparty/astc-encoder/source/**.h"),
-
-		path.join(BIMG_DIR, "3rdparty/tinyexr/deps/miniz/miniz.*"),
 	}
 
 	using_bx()

@@ -25,6 +25,7 @@ project "bimg_decode"
 	files {
 		path.join(BIMG_DIR, "include/**"),
 		path.join(BIMG_DIR, "src/image_decode.*"),
+		path.join(BIMG_DIR, "3rdparty/tinyexr/deps/miniz/miniz.*"),
 	}
 
 	if _OPTIONS["with-libheif"] then
