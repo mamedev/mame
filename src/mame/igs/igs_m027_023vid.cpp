@@ -14,6 +14,17 @@ Main components for the PCB-0457-03-GS are:
 - IGS 026B I/O chip
 - 3 banks of 8 DIP switches
 
+Notes:
+- Press Bookkeeping (0) while the game is running to access the
+  bookkeeping and setup menus (default password is Start eight times).
+- Press Test (F2) while the game is running to view DIP switch settings.
+- Hold Test (F2) while the game boots to access the I/O test.
+- Press Test (F2) and Bookkeeping (0) simultaneously at the I/O test to
+  access the sound test (Button 1/A to increment, Button 2/B to
+  decrement, Button 3/C to toggle looping, Start to play sound).
+- Press Test (F2) and Bookkeeping (0) simultaneously at the sound test
+  to access the display test (Button 1/A to cycle pattern type,
+  Button 2/B to cycle pattern variant, Start to return to I/O test).
 */
 
 #include "emu.h"
@@ -105,7 +116,7 @@ private:
 	u16 dsw_r();
 	void kbd_w(u16 data);
 
-	void gpio_out_w(u8 data);
+	void gpio_w(u8 data);
 
 	TIMER_DEVICE_CALLBACK_MEMBER(interrupt);
 
@@ -327,10 +338,22 @@ void igs_m027_023vid_state::kbd_w(u16 data)
 }
 
 
-void igs_m027_023vid_state::gpio_out_w(u8 data)
+u32 igs_m027_023vid_state::gpio_r()
+{
+	// The function that reads this only looks at the low eight bits.
+	// If bit 0 is clear, the FIQ handler sits in a tight loop at
+	// 0x0000'3154 waiting for it to be set.
+	// The IRQ handler checks bit 1.
+	return
+			0xffffc | // unused
+			(m_irq_source ? 0x00002 : 0x00000) | // checked by IRQ handler - clear for scan line interrupt?
+			0x00001; // FIQ handler sits in a loop if this is clear
+}
+
+void igs_m027_023vid_state::gpio_w(u8 data)
 {
 	// bits 0-2 select DIP switch banks 1-3, respectively
-	// the game constantly toggles bit 3
+	// the game pulses bit 3 after every IRQ
 	m_gpio_out = data;
 }
 
@@ -372,23 +395,13 @@ void igs_m027_023vid_state::irq_w(int state)
 	}
 }
 
-u32 igs_m027_023vid_state::gpio_r()
-{
-	u32 ret = -1;
-	if (!m_irq_source)
-	{
-		ret ^= 2;
-	}
-	return ret;
-}
-
 
 void igs_m027_023vid_state::m027_023vid(machine_config &config)
 {
 	IGS027A(config, m_maincpu, 33_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &igs_m027_023vid_state::m027_map);
 	m_maincpu->in_port().set(FUNC(igs_m027_023vid_state::gpio_r));
-	m_maincpu->out_port().set(FUNC(igs_m027_023vid_state::gpio_out_w));
+	m_maincpu->out_port().set(FUNC(igs_m027_023vid_state::gpio_w));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
@@ -466,4 +479,4 @@ void igs_m027_023vid_state::init_mxsqy()
 ***************************************************************************/
 
 // internal ROM is 2003
-GAME( 2003, mxsqy, 0, m027_023vid, mxsqy, igs_m027_023vid_state, init_mxsqy, ROT0, "IGS", "Mingxing San Que Yi (China, V201CN)", MACHINE_IS_SKELETON )
+GAME( 2003, mxsqy, 0, m027_023vid, mxsqy, igs_m027_023vid_state, init_mxsqy, ROT0, "IGS", "Mingxing San Que Yi (China, V201CN)", MACHINE_IMPERFECT_GRAPHICS )
