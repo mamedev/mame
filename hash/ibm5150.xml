@@ -73,8 +73,7 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 		<description>One Hundred and One Monochrome Mazes</description>
 		<year>1983</year>
 		<publisher>IBM</publisher>
-		<info name="user_notes" value="Needs a Monchrome Screen" />
-		<info name="usage" value="PC Booter" />
+		<info name="usage" value="PC Booter, needs a monochrome screen" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="163840">
 				<rom name="1502177.img" size="163840" crc="baa2ed6e" sha1="3633c9b344db7b091e82502464be1fc331cdbc14"/>
@@ -8733,7 +8732,7 @@ Corrupt graphics on [CGA]
 		<description>The Adventures of Captain Comic</description>
 		<year>1988</year>
 		<publisher>Michael Denio</publisher>
-		<info name="user_notes" value="Requires EGA" />
+		<info name="usage" value="Requires EGA capable card" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "737280">
 				<rom name="[PC] The Adventures of Captain Comic [3.5DD] [Disk 1 of 1].img" size="737280" crc="d6e6c920" sha1="57b2273a52f3b519768027fcf603ca6fce981e4a"/>

@@ -24,9 +24,11 @@ license:CC0-1.0
 		<description>Donkey Kong 64</description>
 		<year>1999</year>
 		<publisher>Nintendo</publisher>
+   		<notes><![CDATA[
+Will crash unless you let it run up until the intro song starts to play.
+]]></notes>
 		<info name="serial" value="ndog00"/>
 		<info name="usage" value="Requires 16k EEPROM." />
-		<info name="user_notes" value="Will crash unless you let it run up until the intro song starts to play." />
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="0x2000000">
 				<rom name="ndog00.z64" size="0x2000000" crc="acba2248" sha1="f39476827ccf7f03707de5d79949559a4dac390b" status="baddump"/>
