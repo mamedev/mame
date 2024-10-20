@@ -343,11 +343,11 @@ CONS( 2002, epo_bowl, 0, 0, xavix2000_i2c_24c04, epo_bowl,    xavix_i2c_state,  
 
 // スーパーショット！ エキサイトゴルフ
 // needs timer irq hack to boot, fails to draw main menu properly (buggy xavix2000 opcodes?)
-CONS( 2003, epo_golf, 0,       0, xavix2000_i2c_24c04, ttv_lotr,   xavix_i2c_lotr_state, init_epo_mini, "Epoch / SSD Company LTD",       "Excite Golf (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+CONS( 2003, epo_golf, 0,       0, xavix2000_i2c_24c04, ttv_lotr,   xavix_i2c_lotr_state, init_epo_mini, "Epoch / SSD Company LTD",       "Super Shot! Excite Golf (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
 // ミニモニ。パーティ！リズムでぴょん！
 // needs timer irq hack to boot
-CONS( 2003, epo_mini, 0,       0, xavix2000_i2c_24c08, ttv_lotr,   xavix_i2c_lotr_state, init_epo_mini, "Epoch / SSD Company LTD",        "mini-moni Party! Jump With the Rhythm! (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+CONS( 2003, epo_mini, 0,       0, xavix2000_i2c_24c08, ttv_lotr,   xavix_i2c_lotr_state, init_epo_mini, "Epoch / SSD Company LTD",        "mini-moni Party! Rhythm de Pyon! (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
 // takes a long time to boot to a card scanner error
 // This is a product in the Duel Masters line called Duel Station; the boot up screen calls it Duel Station, title logo is Duel Masters
