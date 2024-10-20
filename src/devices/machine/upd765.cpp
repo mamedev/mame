@@ -1615,7 +1615,13 @@ void upd765_family_device::recalibrate_start(floppy_info &fi)
 	fi.dir = 1;
 	fi.counter = recalibrate_steps;
 	fi.ready = get_ready(command[1] & 3);
-	fi.st0 = (fi.ready ? 0 : ST0_NR);
+	fi.st0 = command[1] & 7;
+	if(!fi.ready)
+	{
+		fi.st0 |= ST0_NR | ST0_FAIL;
+		command_end(fi, false);
+		return;
+	}
 	seek_continue(fi);
 }
 
@@ -1626,7 +1632,13 @@ void upd765_family_device::seek_start(floppy_info &fi)
 	fi.sub_state = SEEK_WAIT_STEP_TIME_DONE;
 	fi.dir = fi.pcn > command[2] ? 1 : 0;
 	fi.ready = get_ready(command[1] & 3);
-	fi.st0 = (fi.ready ? 0 : ST0_NR);
+	fi.st0 = command[1] & 7;
+	if(!fi.ready)
+	{
+		fi.st0 |= ST0_NR | ST0_FAIL;
+		command_end(fi, false);
+		return;
+	}
 	seek_continue(fi);
 }
 
