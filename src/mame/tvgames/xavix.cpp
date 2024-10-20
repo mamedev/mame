@@ -554,6 +554,19 @@ static INPUT_PORTS_START( epo_mms )
 
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( tak_hamr )
+	PORT_INCLUDE(xavix_i2c)
+
+	PORT_MODIFY("IN0")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(1) PORT_NAME("Player 1 - Green (Left)")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(1) PORT_NAME("Player 1 - Yellow (Middle)")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_PLAYER(1) PORT_NAME("Player 1 - Red (Right)")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(2) PORT_NAME("Player 2 - Green (Left)")
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(2) PORT_NAME("Player 2 - Yellow (Middle)")
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_PLAYER(2) PORT_NAME("Player 2 - Red (Right)")
+
+INPUT_PORTS_END
+
 static INPUT_PORTS_START( tomshoot )
 	PORT_INCLUDE(xavix_i2c)
 
@@ -2311,6 +2324,10 @@ ROM_START( tak_gin ) // dumped from a PCB with 1x ROM Glob with TSOP pads, 1x un
 	ROM_LOAD( "snowboard.bin", 0x000000, 0x200000, CRC(79fdeae3) SHA1(ab08790e95cdccf3541ecbddb87ebf0dedb3718b) )
 ROM_END
 
+ROM_START( tak_hamr ) // HAMJ MAIN on PCB
+	ROM_REGION(0x400000, "bios", ROMREGION_ERASE00 )
+	ROM_LOAD( "hamj.u4", 0x000000, 0x400000, CRC(2f4f5270) SHA1(dfb75f0d20247cf1c886840149c7cf91780ae1b9) )
+ROM_END
 
 
 /* XaviX hardware titles (1st Generation)
@@ -2447,6 +2464,9 @@ CONS( 2001, tak_comt,  0,          0,  xavix_nv,         tak_comt,  xavix_state,
 
 // 爆進スノボ ギンギンボーダーズ
 CONS( 2001, tak_gin,   0,          0,  xavix,            tak_gin,  xavix_state,          init_xavix,    "Takara / SSD Company LTD",                     "Bakushin Sno-Bo - Gingin Boarders (Japan)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_COLORS )
+
+// ぽこぽこハンマーズ 
+CONS( 2002, tak_hamr,  0,          0,  xavix_i2c_24c02,  tak_hamr, xavix_i2c_state,      init_xavix,    "Takara / SSD Company LTD",                     "Poko Poko Hammers (Japan)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_COLORS )
 
 // was also distributed by Atlus as an arcade cabinet in 2005, ROM almost certainly different (this one will auto-power off after inactivity, an arcade wouldn't do that)
 // ジャラジャランド
