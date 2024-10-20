@@ -746,7 +746,7 @@ void i386_device::i386_trap(int irq, int irq_gate, int trap_level)
 		catch(uint64_t e)
 		{
 			REG32(ESP) = tempSP;
-			throw e;
+			throw emu_fatalerror("i386_trap: %llx", e);
 		}
 		if(SetRPL != 0)
 			segment = (segment & ~0x03) | m_CPL;
@@ -1770,7 +1770,7 @@ void i386_device::i386_protected_mode_call(uint16_t seg, uint32_t off, int indir
 	catch(uint64_t e)
 	{
 		REG32(ESP) = tempSP;
-		throw e;
+		throw emu_fatalerror("i386_protected_mode_call: %llx", e);
 	}
 
 	CHANGE_PC(m_eip);
