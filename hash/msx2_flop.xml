@@ -384,7 +384,7 @@ The following floppies came with the machines.
 		<year>1987</year>
 		<publisher>HAL Kenkyuujo</publisher>
 		<info name="serial" value="HNS-100"/>
-		<info name="gtin" value="04988610111018"/>
+		<info name="barcode" value="4988610111018"/>
 		<!-- Released with either 1 or 2 floppies; if there were 2 they were identical. -->
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
@@ -473,7 +473,7 @@ The following floppies came with the machines.
 		<publisher>Konami</publisher>
 		<info name="alt_title" value="スナッチャー"/>
 		<info name="serial" value="RA004"/>
-		<info name="gtin" value="04988602541298"/>
+		<info name="barcode" value="4988602541298"/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="シナリオ ディスク 1"/>
 			<dataarea name="flop" size="737280">
@@ -508,7 +508,7 @@ The following floppies came with the machines.
 		<publisher>Konami</publisher>
 		<info name="alt_title" value="スナッチャー"/>
 		<info name="serial" value="RA004"/>
-		<info name="gtin" value="04988602541298"/>
+		<info name="barcode" value="4988602541298"/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Scenario Disk 1 (シナリオ ディスク 1)"/>
 			<dataarea name="flop" size="737280">
@@ -543,7 +543,7 @@ The following floppies came with the machines.
 		<publisher>Konami</publisher>
 		<info name="alt_title" value="ＳＤスナッチャー"/>
 		<info name="serial" value="RA011"/>
-		<info name="gtin" value="04988602554120"/>
+		<info name="barcode" value="4988602554120"/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Scenario Disk 1"/>
 			<dataarea name="flop" size="737280">
@@ -578,7 +578,7 @@ The following floppies came with the machines.
 		<publisher>Konami</publisher>
 		<info name="alt_title" value="ＳＤスナッチャー"/>
 		<info name="serial" value="RA011"/>
-		<info name="gtin" value="04988602554120"/>
+		<info name="barcode" value="4988602554120"/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Scenario Disk 1"/>
 			<dataarea name="flop" size="737280">
@@ -719,7 +719,7 @@ The following floppies came with the machines.
 		<year>1989</year>
 		<publisher>Alicesoft</publisher>
 		<info name="alt_title" value="あぶないてんぐ伝説"/>
-		<info name="gtin" value="04988650300168"/>
+		<info name="barcode" value="4988650300168"/>
 		<info name="usage" value="Requires a Japanese system."/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk A"/>
@@ -809,7 +809,7 @@ The following floppies came with the machines.
 		<publisher>Winky Soft</publisher>
 		<info name="alt_title" value="あかんべドラゴン"/>
 		<info name="serial" value="MXWS12001"/>
-		<info name="gtin" value="04988157120016"/>
+		<info name="barcode" value="4988157120016"/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="akanbe dragon (1988)(winky soft)(jp).dsk" size="737280" crc="8ba799b1" sha1="b97b17acd1b603ff90caf95f348625a22e50a4e3"/>
@@ -823,7 +823,7 @@ The following floppies came with the machines.
 		<publisher>Winky Soft</publisher>
 		<info name="alt_title" value="あかんべドラゴン"/>
 		<info name="serial" value="MXWS12001"/>
-		<info name="gtin" value="04988157120016"/>
+		<info name="barcode" value="4988157120016"/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="akanbe dragon (1988)(winky soft)(jp)[a].dsk" size="737280" crc="dfbfb489" sha1="2a39e835b942ab4232c714e5cbce80615becf7cd"/>
@@ -837,7 +837,7 @@ The following floppies came with the machines.
 		<publisher>Winky Soft</publisher>
 		<info name="alt_title" value="あかんべドラゴン"/>
 		<info name="serial" value="MXWS12001"/>
-		<info name="gtin" value="04988157120016"/>
+		<info name="barcode" value="4988157120016"/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="akanbe dragon (1988)(winky soft)(jp)[a2].dsk" size="737280" crc="21e24db3" sha1="db405dfd53f26b7dd459423269f81b726cda1336"/>
@@ -850,7 +850,7 @@ The following floppies came with the machines.
 		<year>1989</year>
 		<publisher>Telenet Japan</publisher>
 		<info name="alt_title" value="アルバトロスIIマスターズヒストリー"/>
-		<info name="gtin" value="04988624920163"/>
+		<info name="barcode" value="4988624920163"/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk A"/>
 			<dataarea name="flop" size="737280">
@@ -876,7 +876,7 @@ The following floppies came with the machines.
 		<year>1989</year>
 		<publisher>Telenet Japan</publisher>
 		<info name="alt_title" value="アルバトロスIIマスターズヒストリー"/>
-		<info name="gtin" value="04988624920163"/>
+		<info name="barcode" value="4988624920163"/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk A"/>
 			<dataarea name="flop" size="737280">
@@ -905,7 +905,7 @@ The following floppies came with the machines.
 		<notes>Small graphics glitch between status bar and playfield.</notes>
 		<info name="alt_title" value="アレスタ２"/>
 		<info name="serial" value="IA-8904"/>
-		<info name="gtin" value="04988161900123"/>
+		<info name="barcode" value="4988161900123"/>
 		<info name="usage" value="Requires a Japanese system."/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="1 - Demo"/>
@@ -934,7 +934,7 @@ The following floppies came with the machines.
 		<notes>Small graphics glitch between status bar and playfield.</notes>
 		<info name="alt_title" value="アレスタ２"/>
 		<info name="serial" value="IA-8904"/>
-		<info name="gtin" value="04988161900123"/>
+		<info name="barcode" value="4988161900123"/>
 		<info name="usage" value="Requires a Japanese system."/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="1 - Demo"/>
@@ -963,7 +963,7 @@ The following floppies came with the machines.
 		<notes>Small graphics glitch between status bar and playfield.</notes>
 		<info name="alt_title" value="アレスタ２"/>
 		<info name="serial" value="IA-8904"/>
-		<info name="gtin" value="04988161900123"/>
+		<info name="barcode" value="4988161900123"/>
 		<info name="usage" value="Requires a Japanese system."/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="1 - Demo"/>
@@ -1015,7 +1015,7 @@ The following floppies came with the machines.
 		<year>1988</year>
 		<publisher>Kogado</publisher>
 		<info name="alt_title" value="アルギースの翼"/>
-		<info name="gtin" value="04988606202737"/>
+		<info name="barcode" value="4988606202737"/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="arguis no tsubasa (1988)(kogado)(jp).dsk" size="737280" crc="196060e2" sha1="5407acd7fbc642819f653f0b184e248cb6811d38"/>
@@ -1028,7 +1028,7 @@ The following floppies came with the machines.
 		<year>1988</year>
 		<publisher>Kogado</publisher>
 		<info name="alt_title" value="アルギースの翼"/>
-		<info name="gtin" value="04988606202737"/>
+		<info name="barcode" value="4988606202737"/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="arugisu no yoku. wings of arugisu (1988)(kogado)(jp).dsk" size="737280" crc="6e8e99c1" sha1="ab405ec621eeafbb527e0bd4b62a5e1e5887f87a"/>
@@ -1052,7 +1052,7 @@ The following floppies came with the machines.
 		<year>1989</year>
 		<publisher>Winky Soft</publisher>
 		<info name="alt_title" value="アメリカン・サクセス"/>
-		<info name="gtin" value="04988157120023"/>
+		<info name="barcode" value="4988157120023"/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Game Disk"/>
 			<dataarea name="flop" size="737280">
@@ -1072,7 +1072,7 @@ The following floppies came with the machines.
 		<year>1989</year>
 		<publisher>Winky Soft</publisher>
 		<info name="alt_title" value="アメリカン・サクセス"/>
-		<info name="gtin" value="04988157120023"/>
+		<info name="barcode" value="4988157120023"/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Game Disk"/>
 			<dataarea name="flop" size="737280">
@@ -1121,7 +1121,7 @@ The following floppies came with the machines.
 		<publisher>Enix</publisher>
 		<info name="alt_title" value="アンジェラス"/>
 		<info name="serial" value="E-G222"/>
-		<info name="gtin" value="04988601002226"/>
+		<info name="barcode" value="4988601002226"/>
 		<info name="usage" value="Requires a Japanese system."/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="No. 1"/>
@@ -1150,7 +1150,7 @@ The following floppies came with the machines.
 		<publisher>Enix</publisher>
 		<info name="alt_title" value="アンジェラス"/>
 		<info name="serial" value="E-G222"/>
-		<info name="gtin" value="04988601002226"/>
+		<info name="barcode" value="4988601002226"/>
 		<info name="usage" value="Requires a Japanese system."/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="No. 1"/>
@@ -1178,7 +1178,7 @@ The following floppies came with the machines.
 		<publisher>Tokyo Shoseki</publisher>
 		<info name="alt_title" value="暗黒神話 ヤマトタケル伝説"/>
 		<info name="serial" value="MXTS-32002"/>
-		<info name="gtin" value="04961355677032"/>
+		<info name="barcode" value="4961355677032"/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="ankoku shinwa - yamato takeru densetsu. dark myth climax takeru legend (1988)(tokyo shoseki)(jp).dsk" size="737280" crc="6d040b6b" sha1="7c052e38014d2c20fdd17a4ad3030cf093770042"/>
@@ -1192,7 +1192,7 @@ The following floppies came with the machines.
 		<publisher>Tokyo Shoseki</publisher>
 		<info name="alt_title" value="暗黒神話 ヤマトタケル伝説"/>
 		<info name="serial" value="MXTS-32002"/>
-		<info name="gtin" value="04961355677032"/>
+		<info name="barcode" value="4961355677032"/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="ankoku shinwa - yamato takeru densetsu. dark myth climax takeru legend (1988)(tokyo shoseki)(jp)[a].dsk" size="737280" crc="f091b725" sha1="3e4da8ae03773faafda35ed09e1cb10879bf636f"/>
@@ -1205,7 +1205,7 @@ The following floppies came with the machines.
 		<year>1992</year>
 		<publisher>Koei</publisher>
 		<info name="alt_title" value="蒼き狼と白き牝鹿・元朝秘史"/>
-		<info name="gtin" value="049886150038775"/>
+		<info name="barcode" value="49886150038775"/>
 		<info name="usage" value="Start with CTRL pressed. Requires a Japanese system."/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk A"/>
@@ -1226,7 +1226,7 @@ The following floppies came with the machines.
 		<year>1992</year>
 		<publisher>Koei</publisher>
 		<info name="alt_title" value="蒼き狼と白き牝鹿・元朝秘史"/>
-		<info name="gtin" value="049886150038775"/>
+		<info name="barcode" value="49886150038775"/>
 		<info name="usage" value="Start with CTRL pressed. Requires a Japanese system."/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk A"/>
@@ -1249,7 +1249,7 @@ The following floppies came with the machines.
 		<publisher>Koei</publisher>
 		<info name="alt_title" value="蒼き狼と白き牝鹿・ジンギスカン"/>
 		<info name="serial" value="MXKN12004"/>
-		<info name="gtin" value="04988615000133"/>
+		<info name="barcode" value="4988615000133"/>
 		<info name="usage" value="Start with CTRL pressed. Requires a Japanese system."/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk A"/>
@@ -1272,7 +1272,7 @@ The following floppies came with the machines.
 		<publisher>Koei</publisher>
 		<info name="alt_title" value="蒼き狼と白き牝鹿・ジンギスカン"/>
 		<info name="serial" value="MXKN12004"/>
-		<info name="gtin" value="04988615000133"/>
+		<info name="barcode" value="4988615000133"/>
 		<info name="usage" value="Start with CTRL pressed. Requires a Japanese system."/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk A"/>
@@ -1293,7 +1293,7 @@ The following floppies came with the machines.
 		<year>1988</year>
 		<publisher>WolfTeam</publisher>
 		<info name="alt_title" value="アークス"/>
-		<info name="gtin" value="04988160920023"/>
+		<info name="barcode" value="4988160920023"/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk I"/>
 			<dataarea name="flop" size="737280">
@@ -1319,7 +1319,7 @@ The following floppies came with the machines.
 		<year>1988</year>
 		<publisher>WolfTeam</publisher>
 		<info name="alt_title" value="アークス"/>
-		<info name="gtin" value="04988160920023"/>
+		<info name="barcode" value="4988160920023"/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk I"/>
 			<dataarea name="flop" size="737280">
@@ -1345,7 +1345,7 @@ The following floppies came with the machines.
 		<year>1988</year>
 		<publisher>WolfTeam</publisher>
 		<info name="alt_title" value="アークス"/>
-		<info name="gtin" value="04988160920023"/>
+		<info name="barcode" value="4988160920023"/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk I"/>
 			<dataarea name="flop" size="737280">
@@ -1371,7 +1371,7 @@ The following floppies came with the machines.
 		<year>1989</year>
 		<publisher>WolfTeam</publisher>
 		<info name="alt_title" value="アークスII"/>
-		<info name="gtin" value="04988160920139"/>
+		<info name="barcode" value="4988160920139"/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk I"/>
 			<dataarea name="flop" size="737280">
@@ -1404,7 +1404,7 @@ The following floppies came with the machines.
 		<year>1989</year>
 		<publisher>WolfTeam</publisher>
 		<info name="alt_title" value="アークスII"/>
-		<info name="gtin" value="04988160920139"/>
+		<info name="barcode" value="4988160920139"/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk I"/>
 			<dataarea name="flop" size="737280">
@@ -1437,7 +1437,7 @@ The following floppies came with the machines.
 		<publisher>WolfTeam</publisher>
 		<info name="alt_title" value="あーくしゅ［アークス番外編］"/>
 		<info name="serial" value="HG13"/>
-		<info name="gtin" value="04988160920146"/>
+		<info name="barcode" value="4988160920146"/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="System Disk"/>
 			<dataarea name="flop" size="737280">
@@ -1452,7 +1452,7 @@ The following floppies came with the machines.
 		<publisher>WolfTeam</publisher>
 		<info name="alt_title" value="あーくしゅ［アークス番外編］"/>
 		<info name="serial" value="HG13"/>
-		<info name="gtin" value="04988160920146"/>
+		<info name="barcode" value="4988160920146"/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="System Disk"/>
 			<dataarea name="flop" size="737280">
@@ -1565,7 +1565,7 @@ The following floppies came with the machines.
 		<year>1988</year>
 		<publisher>ASCII</publisher>
 		<info name="serial" value="2059204"/>
-		<info name="gtin" value="04988606203154"/>
+		<info name="barcode" value="4988606203154"/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="balance of power (1988)(ascii)(jp).dsk" size="737280" crc="6f64b720" sha1="1c4ba0690ae49c82f0dba84b1e99c7a423c9d1ad"/>
@@ -1578,7 +1578,7 @@ The following floppies came with the machines.
 		<year>1988</year>
 		<publisher>ASCII</publisher>
 		<info name="serial" value="2059204"/>
-		<info name="gtin" value="04988606203154"/>
+		<info name="barcode" value="4988606203154"/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="balance of power (1988)(ascii)(jp)[a].dsk" size="737280" crc="cace7b25" sha1="fb858b036fc0ec46dc1af7980a04ab1ac676b438"/>
@@ -1666,7 +1666,7 @@ The following floppies came with the machines.
 		<publisher>Namcot</publisher>
 		<info name="alt_title" value="バルンバ"/>
 		<info name="serial" value="NMX-900727"/>
-		<info name="gtin" value="04907892030237"/>
+		<info name="barcode" value="4907892030237"/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="barunba (1990)(namcot)(jp).dsk" size="737280" crc="c63f04ad" sha1="2a86772d933bf6f073cc9002ccfc7ed8507036a2"/>
@@ -1681,7 +1681,7 @@ The following floppies came with the machines.
 		<publisher>Namcot</publisher>
 		<info name="alt_title" value="バルンバ"/>
 		<info name="serial" value="NMX-900727"/>
-		<info name="gtin" value="04907892030237"/>
+		<info name="barcode" value="4907892030237"/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="barunba (1990)(namcot)(jp)[a].dsk" size="737280" crc="ec47c43e" sha1="5f2c8dcb07639ef65b188c9067bdeca94cbce8a4"/>
@@ -1696,7 +1696,7 @@ The following floppies came with the machines.
 		<publisher>Namcot</publisher>
 		<info name="alt_title" value="バルンバ"/>
 		<info name="serial" value="NMX-900727"/>
-		<info name="gtin" value="04907892030237"/>
+		<info name="barcode" value="4907892030237"/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="barunba (1990)(namcot)(jp)[a2].dsk" size="737280" crc="d015fc72" sha1="cb1b40c8fb511365cd7e7c3d41a7484af12d8548"/>
@@ -1710,7 +1710,7 @@ The following floppies came with the machines.
 		<publisher>Namcot</publisher>
 		<info name="alt_title" value="バルンバ"/>
 		<info name="serial" value="NMX-900727"/>
-		<info name="gtin" value="04907892030237"/>
+		<info name="barcode" value="4907892030237"/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="barunba (1990)(namcot)(jp)[a3].dsk" size="737280" crc="95160af1" sha1="7a0d2c7994f23cf5371aec831d7f1f60088dd7e8"/>
@@ -1840,7 +1840,7 @@ The following floppies came with the machines.
 		<year>1989</year>
 		<publisher>Hard</publisher>
 		<info name="alt_title" value="美少女コントロール"/>
-		<info name="gtin" value="04988694000697"/>
+		<info name="barcode" value="4988694000697"/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="girl's control (1989)(hard)(jp).dsk" size="737280" crc="78e62ae7" sha1="520f9df85fd8eadcd1e7cd31c50e7f0f639c1c07"/>
@@ -1853,7 +1853,7 @@ The following floppies came with the machines.
 		<year>1989</year>
 		<publisher>Hard</publisher>
 		<info name="alt_title" value="美少女コントロール"/>
-		<info name="gtin" value="04988694000697"/>
+		<info name="barcode" value="4988694000697"/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="girl's control (1989)(hard)(jp)[a].dsk" size="737280" crc="a00d89f6" sha1="c07cb5de04ef47f0ae036b5f8664dde6a5955b4d"/>
@@ -1969,7 +1969,7 @@ The following floppies came with the machines.
 		<year>1989</year>
 		<publisher>Riverhill Soft</publisher>
 		<info name="alt_title" value="ＢＵＲＡＩ上巻"/>
-		<info name="gtin" value="04967652102284"/>
+		<info name="barcode" value="4967652102284"/>
 		<info name="usage" value="Requires a system with Kanji ROM."/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1"/>
@@ -2014,7 +2014,7 @@ The following floppies came with the machines.
 		<year>1989</year>
 		<publisher>Riverhill Soft</publisher>
 		<info name="alt_title" value="ＢＵＲＡＩ上巻"/>
-		<info name="gtin" value="04967652102284"/>
+		<info name="barcode" value="4967652102284"/>
 		<info name="usage" value="Requires a system with Kanji ROM."/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1"/>
@@ -2185,7 +2185,7 @@ The following floppies came with the machines.
 		<year>1991</year>
 		<publisher>Birdy Soft</publisher>
 		<info name="alt_title" value="キャル"/>
-		<info name="gtin" value="04959087200345"/>
+		<info name="barcode" value="4959087200345"/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk A"/>
 			<dataarea name="flop" size="737280">
@@ -2211,7 +2211,7 @@ The following floppies came with the machines.
 		<year>1992</year>
 		<publisher>Birdy Soft</publisher>
 		<info name="alt_title" value="キャルII"/>
-		<info name="gtin" value="04959087200444"/>
+		<info name="barcode" value="4959087200444"/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk A"/>
 			<dataarea name="flop" size="737280">
@@ -2338,8 +2338,7 @@ The following floppies came with the machines.
 		<year>1989</year>
 		<publisher>ASCII</publisher>
 		<info name="alt_title" value="カオスエンジェルス"/>
-		<info name="gtin" value="04988606203604"/>
-		<info name="isbn" value="4750108105"/>
+		<info name="barcode" value="4988606203604"/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk A"/>
 			<dataarea name="flop" size="737280">
@@ -2359,8 +2358,7 @@ The following floppies came with the machines.
 		<year>1989</year>
 		<publisher>ASCII</publisher>
 		<info name="alt_title" value="カオスエンジェルス"/>
-		<info name="gtin" value="04988606203604"/>
-		<info name="isbn" value="4750108105"/>
+		<info name="barcode" value="4988606203604"/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk A"/>
 			<dataarea name="flop" size="737280">
@@ -2380,8 +2378,7 @@ The following floppies came with the machines.
 		<year>1989</year>
 		<publisher>ASCII</publisher>
 		<info name="alt_title" value="カオスエンジェルス"/>
-		<info name="gtin" value="04988606203604"/>
-		<info name="isbn" value="4750108105"/>
+		<info name="barcode" value="4988606203604"/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk A"/>
 			<dataarea name="flop" size="737280">
@@ -2492,7 +2489,7 @@ The following floppies came with the machines.
 		<publisher>Hot-B</publisher>
 		<info name="alt_title" value="中華大仙"/>
 		<info name="serial" value="MXHB-22002"/>
-		<info name="gtin" value="04967948000225"/>
+		<info name="barcode" value="4967948000225"/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="chuka taisen (1988)(hot-b)(jp).dsk" size="737280" crc="a0eb58c2" sha1="b8056cd9fe89b0252b51f690cfe7aeff2f5cc39e"/>
@@ -2506,7 +2503,7 @@ The following floppies came with the machines.
 		<publisher>Hot-B</publisher>
 		<info name="alt_title" value="中華大仙"/>
 		<info name="serial" value="MXHB-22002"/>
-		<info name="gtin" value="04967948000225"/>
+		<info name="barcode" value="4967948000225"/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="chuka taisen (1988)(hot-b)(jp)[a].dsk" size="737280" crc="f61d7dbd" sha1="49f15ca4541883298b1380c729b02d6247fdeaa8"/>
@@ -2520,7 +2517,7 @@ The following floppies came with the machines.
 		<publisher>Hot-B</publisher>
 		<info name="alt_title" value="中華大仙"/>
 		<info name="serial" value="MXHB-22002"/>
-		<info name="gtin" value="04967948000225"/>
+		<info name="barcode" value="4967948000225"/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="chuka taisen (1988)(hot-b)(jp)[a2].dsk" size="737280" crc="a27b525c" sha1="e00d8a19cb62f2192ceba27a42165830884a9fd6"/>
@@ -2561,7 +2558,7 @@ The following floppies came with the machines.
 		<year>1990</year>
 		<publisher>Telenet Japan</publisher>
 		<info name="alt_title" value="コラムス"/>
-		<info name="gtin" value="04988624920293"/>
+		<info name="barcode" value="4988624920293"/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="columns (1990)(telenet japan)(jp).dsk" size="737280" crc="e3a5ed45" sha1="2c9eb82993ae4406013d945db9643a290f1d491f"/>
@@ -2574,7 +2571,7 @@ The following floppies came with the machines.
 		<year>1990</year>
 		<publisher>Telenet Japan</publisher>
 		<info name="alt_title" value="コラムス"/>
-		<info name="gtin" value="04988624920293"/>
+		<info name="barcode" value="4988624920293"/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="columns (1990)(telenet japan)(jp)[a].dsk" size="737280" crc="95f6a036" sha1="cf6b89dabc4ee2ad697caa36980f969d608f3f5e"/>
@@ -2588,7 +2585,7 @@ The following floppies came with the machines.
 		<year>1990</year>
 		<publisher>Telenet Japan</publisher>
 		<info name="alt_title" value="コラムス"/>
-		<info name="gtin" value="04988624920293"/>
+		<info name="barcode" value="4988624920293"/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="columns (1990)(telenet japan)(jp)[a2].dsk" size="737280" crc="cf48d143" sha1="440bf3625f39ce831ac8a2cbe8736d46abc27223"/>
@@ -2602,7 +2599,7 @@ The following floppies came with the machines.
 		<year>1990</year>
 		<publisher>Telenet Japan</publisher>
 		<info name="alt_title" value="コラムス"/>
-		<info name="gtin" value="04988624920293"/>
+		<info name="barcode" value="4988624920293"/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="columns (1990)(telenet japan)(jp)[a3].dsk" size="737280" crc="e81f4979" sha1="8e7f3a9f8fa547340004775a3fd47fdc0b7e1ee7"/>
@@ -2852,7 +2849,7 @@ The following floppies came with the machines.
 		<publisher>XtalSoft</publisher>
 		<info name="alt_title" value="クリムゾンII"/>
 		<info name="serial" value="MXXA-12001"/>
-		<info name="gtin" value="04956059101020"/>
+		<info name="barcode" value="4956059101020"/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="No.1"/>
 			<dataarea name="flop" size="737280">
@@ -2873,7 +2870,7 @@ The following floppies came with the machines.
 		<publisher>XtalSoft</publisher>
 		<info name="alt_title" value="クリムゾンII"/>
 		<info name="serial" value="MXXA-12001"/>
-		<info name="gtin" value="04956059101020"/>
+		<info name="barcode" value="4956059101020"/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="No.1"/>
 			<dataarea name="flop" size="737280">
@@ -2894,7 +2891,7 @@ The following floppies came with the machines.
 		<publisher>XtalSoft</publisher>
 		<info name="alt_title" value="クリムゾンIII"/>
 		<info name="serial" value="MXXA-12002"/>
-		<info name="gtin" value="04956059101051"/>
+		<info name="barcode" value="4956059101051"/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="A - Main disk (メイン)"/>
 			<dataarea name="flop" size="737280">
@@ -2921,7 +2918,7 @@ The following floppies came with the machines.
 		<publisher>XtalSoft</publisher>
 		<info name="alt_title" value="クリムゾンIII"/>
 		<info name="serial" value="MXXA-12002"/>
-		<info name="gtin" value="04956059101051"/>
+		<info name="barcode" value="4956059101051"/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="A - Main disk (メイン)"/>
 			<dataarea name="flop" size="737280">
@@ -2947,7 +2944,7 @@ The following floppies came with the machines.
 		<year>1988</year>
 		<publisher>Techno Soft</publisher>
 		<info name="alt_title" value="ディーダッシュ"/>
-		<info name="gtin" value="04907095000129"/>
+		<info name="barcode" value="4907095000129"/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="d'. dixdaef (1988)(tecno soft).dsk" size="737280" crc="50c0f438" sha1="264fc719460e130b22361ce3b702e53e601f35a1"/>
@@ -2960,7 +2957,7 @@ The following floppies came with the machines.
 		<year>1988</year>
 		<publisher>Techno Soft</publisher>
 		<info name="alt_title" value="ディーダッシュ"/>
-		<info name="gtin" value="04907095000129"/>
+		<info name="barcode" value="4907095000129"/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="d'. dixdaef (1988)(tecno soft)[a].dsk" size="737280" crc="e06dc530" sha1="a4172999d9bca1591599207d9cd78fe9c16c16bd"/>
@@ -2973,7 +2970,7 @@ The following floppies came with the machines.
 		<year>1988</year>
 		<publisher>Techno Soft</publisher>
 		<info name="alt_title" value="ディーダッシュ"/>
-		<info name="gtin" value="04907095000129"/>
+		<info name="barcode" value="4907095000129"/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="d'. dixdaef (1988)(tecno soft)[a2].dsk" size="737280" crc="676209e5" sha1="15fe30aef27110fcf517a54d4c07b5883997eeea"/>
@@ -3000,7 +2997,7 @@ The following floppies came with the machines.
 		<publisher>Koei</publisher>
 		<info name="alt_title" value="大航海時代"/>
 		<info name="serial" value="KN10040040"/>
-		<info name="gtin" value="04988615001833"/>
+		<info name="barcode" value="4988615001833"/>
 		<info name="usage" value="Boot with CTRL pressed. Requires a Japanese system."/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
@@ -3019,7 +3016,7 @@ The following floppies came with the machines.
 		<year>1992</year>
 		<publisher>Micro Cabin</publisher>
 		<info name="alt_title" value="キャンペーン版大戦略II"/>
-		<info name="gtin" value="04988608132445"/>
+		<info name="barcode" value="4988608132445"/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="System Disk"/>
 			<dataarea name="flop" size="737280">
@@ -3039,7 +3036,7 @@ The following floppies came with the machines.
 		<year>1992</year>
 		<publisher>Micro Cabin</publisher>
 		<info name="alt_title" value="キャンペーン版大戦略II"/>
-		<info name="gtin" value="04988608132445"/>
+		<info name="barcode" value="4988608132445"/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="System Disk"/>
 			<dataarea name="flop" size="737280">
@@ -3080,7 +3077,7 @@ The following floppies came with the machines.
 		<year>1987</year>
 		<publisher>Micro Cabin</publisher>
 		<info name="alt_title" value="大戦略"/>
-		<info name="gtin" value="04988608711428"/>
+		<info name="barcode" value="4988608711428"/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="daisenryaku. risk (1987)(micro cabin)(jp).dsk" size="737280" crc="667a2bff" sha1="92dc00bf437935e6270d53fa4017eb13f2aaf577"/>
@@ -3093,7 +3090,7 @@ The following floppies came with the machines.
 		<year>1987</year>
 		<publisher>Micro Cabin</publisher>
 		<info name="alt_title" value="大戦略"/>
-		<info name="gtin" value="04988608711428"/>
+		<info name="barcode" value="4988608711428"/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="368640">
 				<rom name="daisenryaku. risk (1987)(micro cabin)(jp)[a].dsk" size="368640" crc="296e8f52" sha1="9347b1f7b98e9b44c2b576d59e3923b402154a80"/>
@@ -3106,7 +3103,7 @@ The following floppies came with the machines.
 		<year>1987</year>
 		<publisher>Micro Cabin</publisher>
 		<info name="alt_title" value="大戦略"/>
-		<info name="gtin" value="04988608711428"/>
+		<info name="barcode" value="4988608711428"/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="368640">
 				<rom name="daisenryaku. risk (1987)(micro cabin)(jp)[a2].dsk" size="368640" crc="7759e25c" sha1="286c5880eb89d10a954b245a18efc70d75caa560"/>
@@ -3120,7 +3117,7 @@ The following floppies came with the machines.
 		<year>1987</year>
 		<publisher>Micro Cabin</publisher>
 		<info name="alt_title" value="大戦略"/>
-		<info name="gtin" value="04988608711428"/>
+		<info name="barcode" value="4988608711428"/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="daisenryaku. risk (1987)(micro cabin)(jp)[a3].dsk" size="737280" crc="2292123c" sha1="deff5e055d32f8e08de09e7fbd3bb7ae12525426"/>
@@ -3149,7 +3146,7 @@ The following floppies came with the machines.
 		<publisher>T&amp;E Soft</publisher>
 		<info name="alt_title" value="ディーヴァ ストーリー5·ソーマの杯" />
 		<info name="serial" value="TEM-73"/>
-		<info name="gtin" value="04988604100738"/>
+		<info name="barcode" value="4988604100738"/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="daiva story 5 - the cup of soma (1987)(t&amp;e soft)(jp).dsk" size="737280" crc="c55c9b66" sha1="c68acf155b1245dd341641fb0ebcfcd90a3cf16c"/>
@@ -3163,7 +3160,7 @@ The following floppies came with the machines.
 		<publisher>T&amp;E Soft</publisher>
 		<info name="alt_title" value="ディーヴァ ストーリー5·ソーマの杯" />
 		<info name="serial" value="TEM-73"/>
-		<info name="gtin" value="04988604100738"/>
+		<info name="barcode" value="4988604100738"/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="daiva story 5 - the cup of soma (1987)(t&amp;e soft)(jp)[a].dsk" size="737280" crc="458c3e5a" sha1="bc4cfc1872463fdf5d1c273bc2234f552705cc0c"/>
@@ -3178,7 +3175,7 @@ The following floppies came with the machines.
 		<publisher>T&amp;E Soft</publisher>
 		<info name="alt_title" value="ディーヴァ ストーリー5·ソーマの杯" />
 		<info name="serial" value="TEM-73"/>
-		<info name="gtin" value="04988604100738"/>
+		<info name="barcode" value="4988604100738"/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="daiva story 5 - the cup of soma (1987)(t&amp;e soft)(jp)[a2].dsk" size="737280" crc="ea46013d" sha1="41137570dce216a7c136f532c2aab3fe5526b795"/>
@@ -3191,7 +3188,7 @@ The following floppies came with the machines.
 		<year>1991</year>
 		<publisher>Fairytale</publisher>
 		<info name="alt_title" value="舞☆MAI"/>
-		<info name="gtin" value="04988715001382"/>
+		<info name="barcode" value="4988715001382"/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk.A"/>
 			<dataarea name="flop" size="737280">
@@ -3353,7 +3350,7 @@ The following floppies came with the machines.
 		<year>1990</year>
 		<publisher>Elf</publisher>
 		<info name="alt_title" value="デ・ジャ"/>
-		<info name="gtin" value="04988720890490"/>
+		<info name="barcode" value="4988720890490"/>
 		<info name="usage" value="Boot with CTRL pressed. Requires a Japanese system."/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk A"/>
@@ -3398,7 +3395,7 @@ The following floppies came with the machines.
 		<year>1992</year>
 		<publisher>Fairytale</publisher>
 		<info name="alt_title" value="デッドオブザブレイン"/>
-		<info name="gtin" value="04988715002129"/>
+		<info name="barcode" value="4988715002129"/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk A"/>
 			<dataarea name="flop" size="737280">
@@ -3424,7 +3421,7 @@ The following floppies came with the machines.
 		<year>1992</year>
 		<publisher>Fairytale</publisher>
 		<info name="alt_title" value="デッドオブザブレイン"/>
-		<info name="gtin" value="04988715002129"/>
+		<info name="barcode" value="4988715002129"/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk A"/>
 			<dataarea name="flop" size="737280">
@@ -3511,7 +3508,7 @@ The following floppies came with the machines.
 		<year>1990</year>
 		<publisher>Gainax</publisher>
 		<info name="alt_title" value="電脳学園シナリオ１"/>
-		<info name="gtin" value="04984841080123"/>
+		<info name="barcode" value="4984841080123"/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="A-Disk (System)"/>
 			<dataarea name="flop" size="737280">
@@ -3531,7 +3528,7 @@ The following floppies came with the machines.
 		<year>1990</year>
 		<publisher>Gainax</publisher>
 		<info name="alt_title" value="電脳学園シナリオ１"/>
-		<info name="gtin" value="04984841080123"/>
+		<info name="barcode" value="4984841080123"/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="A-Disk (System)"/>
 			<dataarea name="flop" size="737280">
@@ -3551,7 +3548,7 @@ The following floppies came with the machines.
 		<year>1990</year>
 		<publisher>Gainax</publisher>
 		<info name="alt_title" value="電脳学園シナリオ１"/>
-		<info name="gtin" value="04984841080123"/>
+		<info name="barcode" value="4984841080123"/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="A-Disk (System)"/>
 			<dataarea name="flop" size="737280">
@@ -3571,7 +3568,7 @@ The following floppies came with the machines.
 		<year>1990</year>
 		<publisher>Gainax</publisher>
 		<info name="alt_title" value="電脳学園シナリオ２ハイウェイバスター！！"/>
-		<info name="gtin" value="04984841080222"/>
+		<info name="barcode" value="4984841080222"/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="A-Disk"/>
 			<dataarea name="flop" size="737280">
@@ -3597,7 +3594,7 @@ The following floppies came with the machines.
 		<year>1990</year>
 		<publisher>Gainax</publisher>
 		<info name="alt_title" value="電脳学園シナリオ２ハイウェイバスター！！"/>
-		<info name="gtin" value="04984841080222"/>
+		<info name="barcode" value="4984841080222"/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="A-Disk"/>
 			<dataarea name="flop" size="737280">
@@ -3623,7 +3620,7 @@ The following floppies came with the machines.
 		<year>1990</year>
 		<publisher>Gainax</publisher>
 		<info name="alt_title" value="電脳学園シナリオ２ハイウェイバスター！！"/>
-		<info name="gtin" value="04984841080222"/>
+		<info name="barcode" value="4984841080222"/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="A-Disk"/>
 			<dataarea name="flop" size="737280">
@@ -3649,7 +3646,7 @@ The following floppies came with the machines.
 		<year>1990</year>
 		<publisher>Gainax</publisher>
 		<info name="alt_title" value="電脳学園シナリオ３トップをねらえ！"/>
-		<info name="gtin" value="04984841080321"/>
+		<info name="barcode" value="4984841080321"/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="A-Disk"/>
 			<dataarea name="flop" size="737280">
@@ -3675,7 +3672,7 @@ The following floppies came with the machines.
 		<year>1990</year>
 		<publisher>Gainax</publisher>
 		<info name="alt_title" value="電脳学園シナリオ３トップをねらえ！"/>
-		<info name="gtin" value="04984841080321"/>
+		<info name="barcode" value="4984841080321"/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="A-Disk"/>
 			<dataarea name="flop" size="737280">
@@ -3767,7 +3764,7 @@ The following floppies came with the machines.
 		<year>1989</year>
 		<publisher>Artec</publisher>
 		<info name="alt_title" value="ディガンの魔石"/>
-		<info name="gtin" value="04961531000043"/>
+		<info name="barcode" value="4961531000043"/>
 		<info name="usage" value="Requires a Japanese system."/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1"/>
@@ -3819,7 +3816,7 @@ The following floppies came with the machines.
 		<year>1989</year>
 		<publisher>Artec</publisher>
 		<info name="alt_title" value="ディガンの魔石"/>
-		<info name="gtin" value="04961531000043"/>
+		<info name="barcode" value="4961531000043"/>
 		<info name="usage" value="Requires a Japanese system."/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1"/>
@@ -4039,7 +4036,7 @@ The following floppies came with the machines.
 		<publisher>Compile</publisher>
 		<info name="alt_title" value="ディスクステーション創刊準備号"/>
 		<info name="serial" value="IA-8802"/>
-		<info name="gtin" value="04988161800027"/>
+		<info name="barcode" value="4988161800027"/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="disc station - issue 00 (1988)(compile)(jp).dsk" size="737280" crc="c7f7a8fc" sha1="04aa8d26e07aafc0a9a7b63cdc54284a82ab71cd"/>
@@ -4054,7 +4051,7 @@ The following floppies came with the machines.
 		<publisher>Compile</publisher>
 		<info name="alt_title" value="ディスクステーション創刊号"/>
 		<info name="serial" value="IA-8803"/>
-		<info name="gtin" value="04988161800034"/>
+		<info name="barcode" value="4988161800034"/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="disc station - issue 01 (1988)(compile)(jp).dsk" size="737280" crc="28252d07" sha1="6f52a71d8bd0e72a7e58086efded9f3e04cb87ca"/>
@@ -4068,7 +4065,7 @@ The following floppies came with the machines.
 		<publisher>Compile</publisher>
 		<info name="alt_title" value="ディスクステーション第２号"/>
 		<info name="serial" value="1A-8804"/>
-		<info name="gtin" value="049881618000041"/>
+		<info name="barcode" value="49881618000041"/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="737280">
@@ -4089,7 +4086,7 @@ The following floppies came with the machines.
 		<publisher>Compile</publisher>
 		<info name="alt_title" value="ディスクステーション３号"/>
 		<info name="serial" value="1A-8901"/>
-		<info name="gtin" value="04988161900017"/>
+		<info name="barcode" value="4988161900017"/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="737280">
@@ -4110,7 +4107,7 @@ The following floppies came with the machines.
 		<publisher>Compile</publisher>
 		<info name="alt_title" value="ディスクステーション４号"/>
 		<info name="serial" value="DS#4"/>
-		<info name="gtin" value="04988161900031"/>
+		<info name="barcode" value="4988161900031"/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="737280">
@@ -4131,7 +4128,7 @@ The following floppies came with the machines.
 		<publisher>Compile</publisher>
 		<info name="alt_title" value="ディスクステーション５号"/>
 		<info name="serial" value="DS#5"/>
-		<info name="gtin" value="04988161900055"/>
+		<info name="barcode" value="4988161900055"/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="737280">
@@ -4152,7 +4149,7 @@ The following floppies came with the machines.
 		<publisher>Compile</publisher>
 		<info name="alt_title" value="ディスクステーション６号"/>
 		<info name="serial" value="DS#6"/>
-		<info name="gtin" value="04988161900079"/>
+		<info name="barcode" value="4988161900079"/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="737280">
@@ -4179,7 +4176,7 @@ The following floppies came with the machines.
 		<publisher>Compile</publisher>
 		<info name="alt_title" value="ディスクステーション７号"/>
 		<info name="serial" value="DS#7"/>
-		<info name="gtin" value="04988161900093"/>
+		<info name="barcode" value="4988161900093"/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="737280">
@@ -4201,7 +4198,7 @@ The following floppies came with the machines.
 		<publisher>Compile</publisher>
 		<info name="alt_title" value="ディスクステーション８号"/>
 		<info name="serial" value="DS#8"/>
-		<info name="gtin" value="04988161900130"/>
+		<info name="barcode" value="4988161900130"/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="737280">
@@ -4228,7 +4225,7 @@ The following floppies came with the machines.
 		<publisher>Compile</publisher>
 		<info name="alt_title" value="ディスクステーション２月号"/>
 		<info name="serial" value="DS#9"/>
-		<info name="gtin" value="04899161000014"/>
+		<info name="barcode" value="4899161000014"/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="737280">
@@ -4249,7 +4246,7 @@ The following floppies came with the machines.
 		<publisher>Compile</publisher>
 		<info name="alt_title" value="ディスクステーション３月号"/>
 		<info name="serial" value="DS#10"/>
-		<info name="gtin" value="04899161000021"/>
+		<info name="barcode" value="4899161000021"/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="737280">
@@ -4270,7 +4267,7 @@ The following floppies came with the machines.
 		<publisher>Compile</publisher>
 		<info name="alt_title" value="ディスクステーション４月号"/>
 		<info name="serial" value="DS#11"/>
-		<info name="gtin" value="04899161000038"/>
+		<info name="barcode" value="4899161000038"/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="737280">
@@ -4291,7 +4288,7 @@ The following floppies came with the machines.
 		<publisher>Compile</publisher>
 		<info name="alt_title" value="ディスクステーション５月号"/>
 		<info name="serial" value="DS#12"/>
-		<info name="gtin" value="04988161000045"/>
+		<info name="barcode" value="4988161000045"/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="737280">
@@ -4312,7 +4309,7 @@ The following floppies came with the machines.
 		<publisher>Compile</publisher>
 		<info name="alt_title" value="ディスクステーション６月号"/>
 		<info name="serial" value="DS#13"/>
-		<info name="gtin" value="04988161000069"/>
+		<info name="barcode" value="4988161000069"/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="737280">
@@ -4333,7 +4330,7 @@ The following floppies came with the machines.
 		<publisher>Compile</publisher>
 		<info name="alt_title" value="ディスクステーション７月号"/>
 		<info name="serial" value="DS#14"/>
-		<info name="gtin" value="04988161000076"/>
+		<info name="barcode" value="4988161000076"/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="737280">
@@ -4354,7 +4351,7 @@ The following floppies came with the machines.
 		<publisher>Compile</publisher>
 		<info name="alt_title" value="ディスクステーション８月号"/>
 		<info name="serial" value="DS#15"/>
-		<info name="gtin" value="04988161000090"/>
+		<info name="barcode" value="4988161000090"/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="737280">
@@ -4375,7 +4372,7 @@ The following floppies came with the machines.
 		<publisher>Compile</publisher>
 		<info name="alt_title" value="ディスクステーション９月号"/>
 		<info name="serial" value="DS#16"/>
-		<info name="gtin" value="04988161000113"/>
+		<info name="barcode" value="4988161000113"/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="737280">
@@ -4396,7 +4393,7 @@ The following floppies came with the machines.
 		<publisher>Compile</publisher>
 		<info name="alt_title" value="ディスクステーション１０月号"/>
 		<info name="serial" value="DS#17"/>
-		<info name="gtin" value="04988161000120"/>
+		<info name="barcode" value="4988161000120"/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="737280">
@@ -4417,7 +4414,7 @@ The following floppies came with the machines.
 		<publisher>Compile</publisher>
 		<info name="alt_title" value="ディスクステーション１１月号"/>
 		<info name="serial" value="DS#18"/>
-		<info name="gtin" value="04988161000151"/>
+		<info name="barcode" value="4988161000151"/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="737280">
@@ -4438,7 +4435,7 @@ The following floppies came with the machines.
 		<publisher>Compile</publisher>
 		<info name="alt_title" value="ディスクステーション１２月号"/>
 		<info name="serial" value="DS#19"/>
-		<info name="gtin" value="04988161000175"/>
+		<info name="barcode" value="4988161000175"/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="737280">
@@ -4459,7 +4456,7 @@ The following floppies came with the machines.
 		<publisher>Compile</publisher>
 		<info name="alt_title" value="ディスクステーション２０号"/>
 		<info name="serial" value="DS#20"/>
-		<info name="gtin" value="04988161000182"/>
+		<info name="barcode" value="4988161000182"/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="737280">
@@ -4486,7 +4483,7 @@ The following floppies came with the machines.
 		<publisher>Compile</publisher>
 		<info name="alt_title" value="ディスクステーション２１号"/>
 		<info name="serial" value="DS#21"/>
-		<info name="gtin" value="04988161000229"/>
+		<info name="barcode" value="4988161000229"/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="737280">
@@ -4508,7 +4505,7 @@ The following floppies came with the machines.
 		<publisher>Compile</publisher>
 		<info name="alt_title" value="ディスクステーション２２号"/>
 		<info name="serial" value="DS#22"/>
-		<info name="gtin" value="04988161100011"/>
+		<info name="barcode" value="4988161100011"/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="737280">
@@ -4529,7 +4526,7 @@ The following floppies came with the machines.
 		<publisher>Compile</publisher>
 		<info name="alt_title" value="ディスクステーション２３号"/>
 		<info name="serial" value="DS#23"/>
-		<info name="gtin" value="04988161100042"/>
+		<info name="barcode" value="4988161100042"/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="737280">
@@ -4550,7 +4547,7 @@ The following floppies came with the machines.
 		<publisher>Compile</publisher>
 		<info name="alt_title" value="ディスクステーション２４号"/>
 		<info name="serial" value="DS#24"/>
-		<info name="gtin" value="04988161100073"/>
+		<info name="barcode" value="4988161100073"/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="737280">
@@ -4572,7 +4569,7 @@ The following floppies came with the machines.
 		<publisher>Compile</publisher>
 		<info name="alt_title" value="ディスクステーション２５号"/>
 		<info name="serial" value="DS#25"/>
-		<info name="gtin" value="04988161100127"/>
+		<info name="barcode" value="4988161100127"/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="737280">
@@ -4594,7 +4591,7 @@ The following floppies came with the machines.
 		<publisher>Compile</publisher>
 		<info name="alt_title" value="ディスクステーション２６号"/>
 		<info name="serial" value="DS#26"/>
-		<info name="gtin" value="04988161100165"/>
+		<info name="barcode" value="4988161100165"/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="737280">
@@ -4615,7 +4612,7 @@ The following floppies came with the machines.
 		<publisher>Compile</publisher>
 		<info name="alt_title" value="ディスクステーション２７号"/>
 		<info name="serial" value="DS#27"/>
-		<info name="gtin" value="04988161100196"/>
+		<info name="barcode" value="4988161100196"/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="737280">
@@ -4637,7 +4634,7 @@ The following floppies came with the machines.
 		<publisher>Compile</publisher>
 		<info name="alt_title" value="ディスクステーション２８号"/>
 		<info name="serial" value="DS#28"/>
-		<info name="gtin" value="04988161100240"/>
+		<info name="barcode" value="4988161100240"/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="737280">
@@ -4658,7 +4655,7 @@ The following floppies came with the machines.
 		<publisher>Compile</publisher>
 		<info name="alt_title" value="ディスクステーション２９号"/>
 		<info name="serial" value="DS#29"/>
-		<info name="gtin" value="04988161100271"/>
+		<info name="barcode" value="4988161100271"/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="737280">
@@ -4679,7 +4676,7 @@ The following floppies came with the machines.
 		<publisher>Compile</publisher>
 		<info name="alt_title" value="ディスクステーション３０号"/>
 		<info name="serial" value="DS#30"/>
-		<info name="gtin" value="04988161100318"/>
+		<info name="barcode" value="4988161100318"/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="737280">
@@ -4700,7 +4697,7 @@ The following floppies came with the machines.
 		<publisher>Compile</publisher>
 		<info name="alt_title" value="ディスクステーション３１号"/>
 		<info name="serial" value="DS#31"/>
-		<info name="gtin" value="04988161100356"/>
+		<info name="barcode" value="4988161100356"/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="737280">
@@ -4722,7 +4719,7 @@ The following floppies came with the machines.
 		<publisher>Compile</publisher>
 		<info name="alt_title" value="ディスクステーション３２号"/>
 		<info name="serial" value="DS#32"/>
-		<info name="gtin" value="04988161100417"/>
+		<info name="barcode" value="4988161100417"/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="737280">
@@ -4756,7 +4753,7 @@ The following floppies came with the machines.
 		<publisher>Compile</publisher>
 		<info name="alt_title" value="ディスクステーションデラックス１号ルーンマスターII"/>
 		<info name="serial" value="DSDX#1"/>
-		<info name="gtin" value="04988161000052"/>
+		<info name="barcode" value="4988161000052"/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1 - Rune Master II"/>
 			<dataarea name="flop" size="737280">
@@ -4772,7 +4769,7 @@ The following floppies came with the machines.
 		<publisher>Compile</publisher>
 		<info name="alt_title" value="ディスクステーションデラックス２号魔導師ラルバ総集編"/>
 		<info name="serial" value="DSDX#2"/>
-		<info name="gtin" value="04988161000106"/>
+		<info name="barcode" value="4988161000106"/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1 - Madoushi Lulba"/>
 			<dataarea name="flop" size="737280">
@@ -4913,7 +4910,7 @@ The following floppies came with the machines.
 		<publisher>Compile</publisher>
 		<info name="alt_title" value="ディスクステーションスペシャルクリスマス号"/>
 		<info name="serial" value="DS-SP5"/>
-		<info name="gtin" value="049881619002109"/>
+		<info name="barcode" value="49881619002109"/>
 		<part name="flop1" interface="floppy_3_5">
 			<!-- Runemaster -->
 			<feature name="part_id" value="Disk 1"/>
@@ -5000,7 +4997,7 @@ The following floppies came with the machines.
 		<description>Doki Doki Card League (Japan)</description>
 		<year>1990</year>
 		<publisher>Great</publisher>
-		<info name="gtin" value="04958725122629"/>
+		<info name="barcode" value="4958725122629"/>
 		<info name="usage" value="Requires a Japanese system."/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Vo. A"/>
@@ -5020,7 +5017,7 @@ The following floppies came with the machines.
 		<description>Doki Doki Card League (Japan, alt)</description>
 		<year>1990</year>
 		<publisher>Great</publisher>
-		<info name="gtin" value="04958725122629"/>
+		<info name="barcode" value="4958725122629"/>
 		<info name="usage" value="Requires a Japanese system."/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Vo. A"/>
@@ -5061,7 +5058,7 @@ The following floppies came with the machines.
 		<year>1989</year>
 		<publisher>T&amp;E Soft</publisher>
 		<info name="serial" value="TEM-99"/>
-		<info name="gtin" value="04988604090992"/>
+		<info name="barcode" value="4988604090992"/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="dot designer's club (1989)(t&amp;e soft)(jp).dsk" size="737280" crc="9feb34bb" sha1="3ab3ff68a051599f5fa8cdc4cdccfbcfb964762e"/>
@@ -5075,7 +5072,7 @@ The following floppies came with the machines.
 		<year>1989</year>
 		<publisher>T&amp;E Soft</publisher>
 		<info name="serial" value="TEM-99"/>
-		<info name="gtin" value="04988604090992"/>
+		<info name="barcode" value="4988604090992"/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="dot designer's club (1989)(t&amp;e soft)(jp)[a].dsk" size="737280" crc="eeb7a37a" sha1="109917ba9ddc8583266f5fb096a8a0019e06ba73"/>
@@ -5089,7 +5086,7 @@ The following floppies came with the machines.
 		<year>1989</year>
 		<publisher>T&amp;E Soft</publisher>
 		<info name="serial" value="TEM-99"/>
-		<info name="gtin" value="04988604090992"/>
+		<info name="barcode" value="4988604090992"/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="dot designer's club (1989)(t&amp;e soft)(jp)[a2].dsk" size="737280" crc="4c28d8a0" sha1="db56eb86e160fd516f2f03cd6ecc19c21c6a6ff9"/>
@@ -5102,7 +5099,7 @@ The following floppies came with the machines.
 		<year>1990</year>
 		<publisher>Alicesoft</publisher>
 		<info name="alt_title" value="ドクターストップ！"/>
-		<info name="gtin" value="04988650300236"/>
+		<info name="barcode" value="4988650300236"/>
 		<info name="usage" value="Requires a system with Kanji ROM."/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk A"/>
@@ -5135,7 +5132,7 @@ The following floppies came with the machines.
 		<year>1990</year>
 		<publisher>Alicesoft</publisher>
 		<info name="alt_title" value="ドクターストップ！"/>
-		<info name="gtin" value="04988650300236"/>
+		<info name="barcode" value="4988650300236"/>
 		<info name="usage" value="Requires a system with Kanji ROM."/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk A"/>
@@ -5192,7 +5189,7 @@ The following floppies came with the machines.
 		<year>1991</year>
 		<publisher>Fairytale</publisher>
 		<info name="alt_title" value="ドラゴンシティＸ指定"/>
-		<info name="gtin" value="04988715000873"/>
+		<info name="barcode" value="4988715000873"/>
 		<info name="usage" value="Boot with CTRL pressed. Requires a Japanese system."/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk A"/>
@@ -5225,7 +5222,7 @@ The following floppies came with the machines.
 		<year>1991</year>
 		<publisher>Fairytale</publisher>
 		<info name="alt_title" value="ドラゴンシティＸ指定"/>
-		<info name="gtin" value="04988715000873"/>
+		<info name="barcode" value="4988715000873"/>
 		<info name="usage" value="Boot with CTRL pressed. Requires a Japanese system."/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk A"/>
@@ -5289,7 +5286,7 @@ The following floppies came with the machines.
 		<year>1990</year>
 		<publisher>Elf</publisher>
 		<info name="alt_title" value="ドラゴンナイト"/>
-		<info name="gtin" value="04988720890414"/>
+		<info name="barcode" value="4988720890414"/>
 		<info name="usage" value="Boot with CTRL pressed. Requires a Japanese system."/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk A"/>
@@ -5322,7 +5319,7 @@ The following floppies came with the machines.
 		<year>1990</year>
 		<publisher>Elf</publisher>
 		<info name="alt_title" value="ドラゴンナイト"/>
-		<info name="gtin" value="04988720890414"/>
+		<info name="barcode" value="4988720890414"/>
 		<info name="usage" value="Boot with CTRL pressed. Requires a Japanese system."/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk A"/>
@@ -5481,7 +5478,7 @@ The following floppies came with the machines.
 		<publisher>Compile</publisher>
 		<info name="alt_title" value="ドラゴンクイズ"/>
 		<info name="serial" value="IA-9105"/>
-		<info name="gtin" value="04988161100288"/>
+		<info name="barcode" value="4988161100288"/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk A"/>
 			<dataarea name="flop" size="737280">
@@ -5502,7 +5499,7 @@ The following floppies came with the machines.
 		<publisher>Compile</publisher>
 		<info name="alt_title" value="ドラゴンクイズ"/>
 		<info name="serial" value="IA-9105"/>
-		<info name="gtin" value="04988161100288"/>
+		<info name="barcode" value="4988161100288"/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk A"/>
 			<dataarea name="flop" size="737280">
@@ -5523,7 +5520,7 @@ The following floppies came with the machines.
 		<publisher>Falcom</publisher>
 		<info name="alt_title" value="ドラゴンスレイヤー英雄伝説"/>
 		<info name="serial" value="NW10011020"/>
-		<info name="gtin" value="04956027090585"/>
+		<info name="barcode" value="4956027090585"/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Game Disk (プログラム)"/>
 			<dataarea name="flop" size="737280">
@@ -5620,7 +5617,7 @@ The following floppies came with the machines.
 		<year>1989</year>
 		<publisher>Alicesoft</publisher>
 		<info name="alt_title" value="ドリーム プログラム システム"/>
-		<info name="gtin" value="04988650300175"/>
+		<info name="barcode" value="4988650300175"/>
 		<info name="usage" value="Requires a system with Kanji ROM."/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk A"/>
@@ -5641,7 +5638,7 @@ The following floppies came with the machines.
 		<year>1989</year>
 		<publisher>Alicesoft</publisher>
 		<info name="alt_title" value="ドリーム プログラム システム"/>
-		<info name="gtin" value="04988650300175"/>
+		<info name="barcode" value="4988650300175"/>
 		<info name="usage" value="Requires a system with Kanji ROM."/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk A"/>
@@ -5662,7 +5659,7 @@ The following floppies came with the machines.
 		<year>1989</year>
 		<publisher>Alicesoft</publisher>
 		<info name="alt_title" value="ドリーム プログラム システム"/>
-		<info name="gtin" value="04988650300175"/>
+		<info name="barcode" value="4988650300175"/>
 		<info name="usage" value="Requires a system with Kanji ROM."/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk A"/>
@@ -5682,7 +5679,7 @@ The following floppies came with the machines.
 		<description>D.P.S. SG - Dream Program System SG (Japan)</description>
 		<year>1990</year>
 		<publisher>Alicesoft</publisher>
-		<info name="gtin" value="04988650300182"/>
+		<info name="barcode" value="4988650300182"/>
 		<info name="usage" value="Requires a system with Kanji ROM."/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="System Disk (システム)"/>
@@ -5714,7 +5711,7 @@ The following floppies came with the machines.
 		<description>D.P.S. SG - Dream Program System SG (Japan, alt)</description>
 		<year>1990</year>
 		<publisher>Alicesoft</publisher>
-		<info name="gtin" value="04988650300182"/>
+		<info name="barcode" value="4988650300182"/>
 		<info name="usage" value="Requires a system with Kanji ROM."/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="System Disk (システム)"/>
@@ -5746,7 +5743,7 @@ The following floppies came with the machines.
 		<description>D.P.S. SG 2 - Dream Program System SG Set 2 (Japan)</description>
 		<year>1990</year>
 		<publisher>Alicesoft</publisher>
-		<info name="gtin" value="04988650300205"/>
+		<info name="barcode" value="4988650300205"/>
 		<info name="usage" value="Requires a system with Kanji ROM."/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="System Disk (システム)"/>
@@ -5778,7 +5775,7 @@ The following floppies came with the machines.
 		<description>D.P.S. SG 3 - Dream Program System SG Set 3 (Japan)</description>
 		<year>1990</year>
 		<publisher>Alicesoft</publisher>
-		<info name="gtin" value="04988650300229"/>
+		<info name="barcode" value="4988650300229"/>
 		<info name="usage" value="Requires a system with Kanji ROM."/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="System Disk (システム)"/>
@@ -5810,7 +5807,7 @@ The following floppies came with the machines.
 		<description>D.P.S. SG 3 - Dream Program System SG Set 3 (Japan, alt)</description>
 		<year>1990</year>
 		<publisher>Alicesoft</publisher>
-		<info name="gtin" value="04988650300229"/>
+		<info name="barcode" value="4988650300229"/>
 		<info name="usage" value="Requires a system with Kanji ROM."/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="System Disk (システム)"/>
@@ -5842,7 +5839,7 @@ The following floppies came with the machines.
 		<description>D.P.S. SG 3 - Dream Program System SG Set 3 (Japan, alt 2)</description>
 		<year>1990</year>
 		<publisher>Alicesoft</publisher>
-		<info name="gtin" value="04988650300229"/>
+		<info name="barcode" value="4988650300229"/>
 		<info name="usage" value="Requires a system with Kanji ROM."/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="System Disk (システム)"/>
@@ -5887,7 +5884,7 @@ The following floppies came with the machines.
 		<year>1989</year>
 		<publisher>Data West</publisher>
 		<info name="alt_title" value="デュアル・ターゲット −第４のユニット３−"/>
-		<info name="gtin" value="04988708010308"/>
+		<info name="barcode" value="4988708010308"/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk A"/>
 			<dataarea name="flop" size="737280">
@@ -6148,7 +6145,7 @@ The following floppies came with the machines.
 		<year>1990</year>
 		<publisher>Glodia</publisher>
 		<info name="alt_title" value="エメラルドドラゴン"/>
-		<info name="gtin" value="04994117029008"/>
+		<info name="barcode" value="4994117029008"/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Visual Disk A"/>
 			<dataarea name="flop" size="737280">
@@ -6186,7 +6183,7 @@ The following floppies came with the machines.
 		<year>1990</year>
 		<publisher>Glodia</publisher>
 		<info name="alt_title" value="エメラルドドラゴン"/>
-		<info name="gtin" value="04994117029008"/>
+		<info name="barcode" value="4994117029008"/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Visual Disk A"/>
 			<dataarea name="flop" size="737280">
@@ -6225,7 +6222,7 @@ The following floppies came with the machines.
 		<publisher>Koei</publisher>
 		<info name="alt_title" value="ランペルール"/>
 		<info name="serial" value="KN10031040"/>
-		<info name="gtin" value="04988615002083"/>
+		<info name="barcode" value="4988615002083"/>
 		<info name="usage" value="Boot with CTRL pressed. Requires a Japanese system."/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk A"/>
@@ -6247,7 +6244,7 @@ The following floppies came with the machines.
 		<publisher>Koei</publisher>
 		<info name="alt_title" value="ランペルール"/>
 		<info name="serial" value="KN10031040"/>
-		<info name="gtin" value="04988615002083"/>
+		<info name="barcode" value="4988615002083"/>
 		<info name="usage" value="Boot with CTRL pressed. Requires a Japanese system."/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk A"/>
@@ -6339,7 +6336,7 @@ The following floppies came with the machines.
 		<publisher>Koei</publisher>
 		<info name="alt_title" value="ヨーロッパ戦線"/>
 		<info name="serial" value="KN10221040"/>
-		<info name="gtin" value="04988615003295"/>
+		<info name="barcode" value="4988615003295"/>
 		<info name="usage" value="Boot with CTRL pressed. Requires a Japanese system."/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk A"/>
@@ -6361,7 +6358,7 @@ The following floppies came with the machines.
 		<publisher>Koei</publisher>
 		<info name="alt_title" value="ヨーロッパ戦線"/>
 		<info name="serial" value="KN10221040"/>
-		<info name="gtin" value="04988615003295"/>
+		<info name="barcode" value="4988615003295"/>
 		<info name="usage" value="Boot with CTRL pressed. Requires a Japanese system."/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk A"/>
@@ -6487,7 +6484,7 @@ The following floppies came with the machines.
 		<publisher>Namcot</publisher>
 		<info name="alt_title" value="Ｆ１道中記"/>
 		<info name="serial" value="NMX-901127"/>
-		<info name="gtin" value="04907892030244"/>
+		<info name="barcode" value="4907892030244"/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="f1 douchuuki (1990)(namcot)(jp).dsk" size="737280" crc="5ff14518" sha1="f892df4f43cfadbff44ea2863d91051fc1a8d51c"/>
@@ -6586,7 +6583,7 @@ The following floppies came with the machines.
 		<publisher>Bit²</publisher>
 		<info name="alt_title" value="ファミクルパロディック２"/>
 		<info name="serial" value="BM-004"/>
-		<info name="gtin" value="04988655430105"/>
+		<info name="barcode" value="4988655430105"/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk A"/>
 			<dataarea name="flop" size="737280">
@@ -6618,7 +6615,7 @@ The following floppies came with the machines.
 		<publisher>Tecno Soft</publisher>
 		<info name="alt_title" value="フィードバック"/>
 		<info name="serial" value="MXTJ12004"/>
-		<info name="gtin" value="04907095000242"/>
+		<info name="barcode" value="4907095000242"/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="feedback (1988)(tecno soft)(jp).dsk" size="737280" crc="bb4d0906" sha1="4eed2980fe391870cfd16bfcdf579eda766e281a"/>
@@ -6632,7 +6629,7 @@ The following floppies came with the machines.
 		<publisher>Tecno Soft</publisher>
 		<info name="alt_title" value="フィードバック"/>
 		<info name="serial" value="MXTJ12004"/>
-		<info name="gtin" value="04907095000242"/>
+		<info name="barcode" value="4907095000242"/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="feedback (1988)(tecno soft)(jp)[a].dsk" size="737280" crc="0adb57ef" sha1="3c638f89bcd35739f10e6f0271d9a2828b2acce9"/>
@@ -6647,7 +6644,7 @@ The following floppies came with the machines.
 		<publisher>Tecno Soft</publisher>
 		<info name="alt_title" value="フィードバック"/>
 		<info name="serial" value="MXTJ12004"/>
-		<info name="gtin" value="04907095000242"/>
+		<info name="barcode" value="4907095000242"/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="feedback (1988)(tecno soft)(jp)[a2].dsk" size="737280" crc="c279feb1" sha1="6b84983cbf68800bd66e0744d0bbac22f6ea3411"/>
@@ -6661,7 +6658,7 @@ The following floppies came with the machines.
 		<publisher>Technopolis Soft</publisher>
 		<info name="alt_title" value="単騎狼・ウルフ・ＡＴ"/>
 		<info name="serial" value="TKPO-60009 / MXTC-32008"/>
-		<info name="gtin" value="04988008003291"/>
+		<info name="barcode" value="4988008003291"/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="fighting wolf at, the (1990)(technopolis soft)(jp).dsk" size="737280" crc="8627e034" sha1="116d2ba69e5828e2229ff32f444d285475d8eec4"/>
@@ -6675,7 +6672,7 @@ The following floppies came with the machines.
 		<publisher>Technopolis Soft</publisher>
 		<info name="alt_title" value="単騎狼・ウルフ・ＡＴ"/>
 		<info name="serial" value="TKPO-60009 / MXTC-32008"/>
-		<info name="gtin" value="04988008003291"/>
+		<info name="barcode" value="4988008003291"/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="fighting wolf at, the (1990)(technopolis soft)(jp)[a].dsk" size="737280" crc="9c9bf64d" sha1="024b0197b7ba75c231fd739e021d4bd26b0d4a5b"/>
@@ -6689,7 +6686,7 @@ The following floppies came with the machines.
 		<publisher>Technopolis Soft</publisher>
 		<info name="alt_title" value="単騎狼・ウルフ・ＡＴ"/>
 		<info name="serial" value="TKPO-60009 / MXTC-32008"/>
-		<info name="gtin" value="04988008003291"/>
+		<info name="barcode" value="4988008003291"/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="fighting wolf at, the (1990)(technopolis soft)(jp)[a2].dsk" size="737280" crc="da853142" sha1="626863248fe5d68d3943c006b4d384eb97452ef8"/>
@@ -6728,7 +6725,7 @@ The following floppies came with the machines.
 		<publisher>Micro Cabin</publisher>
 		<info name="alt_title" value="ファイナルファンタジー"/>
 		<info name="serial" value="93144"/>
-		<info name="gtin" value="04988608931444"/>
+		<info name="barcode" value="4988608931444"/>
 		<info name="usage" value="Boot with CTRL pressed. Requires a Japanese system."/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Game Disk"/>
@@ -6750,7 +6747,7 @@ The following floppies came with the machines.
 		<publisher>Micro Cabin</publisher>
 		<info name="alt_title" value="ファイナルファンタジー"/>
 		<info name="serial" value="93144"/>
-		<info name="gtin" value="04988608931444"/>
+		<info name="barcode" value="4988608931444"/>
 		<info name="usage" value="Boot with CTRL pressed. Requires a Japanese system."/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Game Disk"/>
@@ -6772,7 +6769,7 @@ The following floppies came with the machines.
 		<publisher>Micro Cabin</publisher>
 		<info name="alt_title" value="ファイナルファンタジー"/>
 		<info name="serial" value="93144"/>
-		<info name="gtin" value="04988608931444"/>
+		<info name="barcode" value="4988608931444"/>
 		<info name="usage" value="Boot with CTRL pressed. Requires a Japanese system."/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Game Disk"/>
@@ -6794,7 +6791,7 @@ The following floppies came with the machines.
 		<publisher>Micro Cabin</publisher>
 		<info name="alt_title" value="ファイナルファンタジー"/>
 		<info name="serial" value="93144"/>
-		<info name="gtin" value="04988608931444"/>
+		<info name="barcode" value="4988608931444"/>
 		<info name="usage" value="Boot with CTRL pressed. Requires a Japanese system."/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Game Disk"/>
@@ -6827,7 +6824,7 @@ The following floppies came with the machines.
 		<year>1989</year>
 		<publisher>Game Arts</publisher>
 		<info name="alt_title" value="ファイアーホークテクザー２"/>
-		<info name="gtin" value="04988649902113"/>
+		<info name="barcode" value="4988649902113"/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="737280">
@@ -6847,7 +6844,7 @@ The following floppies came with the machines.
 		<year>1989</year>
 		<publisher>Game Arts</publisher>
 		<info name="alt_title" value="ファイアーホークテクザー２"/>
-		<info name="gtin" value="04988649902113"/>
+		<info name="barcode" value="4988649902113"/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="737280">
@@ -6868,7 +6865,7 @@ The following floppies came with the machines.
 		<year>1989</year>
 		<publisher>Game Arts</publisher>
 		<info name="alt_title" value="ファイアーホークテクザー２"/>
-		<info name="gtin" value="04988649902113"/>
+		<info name="barcode" value="4988649902113"/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="737280">
@@ -6888,7 +6885,7 @@ The following floppies came with the machines.
 		<year>1989</year>
 		<publisher>Game Arts</publisher>
 		<info name="alt_title" value="ファイアーホークテクザー２"/>
-		<info name="gtin" value="04988649902113"/>
+		<info name="barcode" value="4988649902113"/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="737280">
@@ -6908,7 +6905,7 @@ The following floppies came with the machines.
 		<year>1989</year>
 		<publisher>Game Arts</publisher>
 		<info name="alt_title" value="ファイアーホークテクザー２"/>
-		<info name="gtin" value="04988649902113"/>
+		<info name="barcode" value="4988649902113"/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="737280">
@@ -7003,7 +7000,7 @@ The following floppies came with the machines.
 		<publisher>Micro Cabin</publisher>
 		<info name="alt_title" value="フレイサーク外伝"/>
 		<info name="serial" value="02244"/>
-		<info name="gtin" value="04988608022449"/>
+		<info name="barcode" value="4988608022449"/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Opening Disk 0"/>
 			<dataarea name="flop" size="737280">
@@ -7036,7 +7033,7 @@ The following floppies came with the machines.
 		<publisher>Micro Cabin</publisher>
 		<info name="alt_title" value="フレイサーク外伝"/>
 		<info name="serial" value="02244"/>
-		<info name="gtin" value="04988608022449"/>
+		<info name="barcode" value="4988608022449"/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Opening Disk 0"/>
 			<dataarea name="flop" size="737280">
@@ -7069,7 +7066,7 @@ The following floppies came with the machines.
 		<publisher>Micro Cabin</publisher>
 		<info name="alt_title" value="フレイサーク外伝"/>
 		<info name="serial" value="02244"/>
-		<info name="gtin" value="04988608022449"/>
+		<info name="barcode" value="4988608022449"/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Opening Disk 0"/>
 			<dataarea name="flop" size="737280">
@@ -7136,7 +7133,7 @@ The following floppies came with the machines.
 		<year>1988</year>
 		<publisher>Champion Soft</publisher>
 		<info name="alt_title" value="学園戦記"/>
-		<info name="gtin" value="04988650300083"/>
+		<info name="barcode" value="4988650300083"/>
 		<info name="usage" value="Requires a Japanese system."/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk A"/>
@@ -7176,7 +7173,7 @@ The following floppies came with the machines.
 		<year>1989</year>
 		<publisher>Xain Soft</publisher>
 		<info name="alt_title" value="ガルフストリーム"/>
-		<info name="gtin" value="04988636601364"/>
+		<info name="barcode" value="4988636601364"/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="737280">
@@ -7209,7 +7206,7 @@ The following floppies came with the machines.
 		<publisher>Sony</publisher>
 		<info name="alt_title" value="ガルフォース創世の序曲"/>
 		<info name="serial" value="HBS-G065D"/>
-		<info name="gtin" value="04901780069460"/>
+		<info name="barcode" value="4901780069460"/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="gall force - eternal story (1987)(sony)(jp).dsk" size="737280" crc="e36f38a0" sha1="2cb582cead2e3236b2f57a816b6d5da7e7b0434e"/>
@@ -7223,7 +7220,7 @@ The following floppies came with the machines.
 		<publisher>Sony</publisher>
 		<info name="alt_title" value="ガルフォース創世の序曲"/>
 		<info name="serial" value="HBS-G065D"/>
-		<info name="gtin" value="04901780069460"/>
+		<info name="barcode" value="4901780069460"/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="gall force - eternal story (1987)(sony)(jp)[a].dsk" size="737280" crc="7b150865" sha1="17d879e61f69de55bde0ae4b2b306e9d79ec451f"/>
@@ -7318,7 +7315,7 @@ The following floppies came with the machines.
 		<publisher>Enix</publisher>
 		<info name="alt_title" value="ガンダーラ仏陀の聖戦"/>
 		<info name="serial" value="E-G214"/>
-		<info name="gtin" value="04988601002141"/>
+		<info name="barcode" value="4988601002141"/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk A"/>
 			<dataarea name="flop" size="737280">
@@ -7339,7 +7336,7 @@ The following floppies came with the machines.
 		<publisher>Enix</publisher>
 		<info name="alt_title" value="ガンダーラ仏陀の聖戦"/>
 		<info name="serial" value="E-G214"/>
-		<info name="gtin" value="04988601002141"/>
+		<info name="barcode" value="4988601002141"/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk A"/>
 			<dataarea name="flop" size="737280">
@@ -7360,7 +7357,7 @@ The following floppies came with the machines.
 		<publisher>Enix</publisher>
 		<info name="alt_title" value="ガンダーラ仏陀の聖戦"/>
 		<info name="serial" value="E-G214"/>
-		<info name="gtin" value="04988601002141"/>
+		<info name="barcode" value="4988601002141"/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk A"/>
 			<dataarea name="flop" size="737280">
@@ -7510,7 +7507,7 @@ The following floppies came with the machines.
 		<publisher>Bothtec</publisher>
 		<info name="alt_title" value="銀河英雄伝説"/>
 		<info name="serial" value="LD-8928"/>
-		<info name="gtin" value="04988609028082"/>
+		<info name="barcode" value="4988609028082"/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk A"/>
 			<dataarea name="flop" size="737280">
@@ -7531,7 +7528,7 @@ The following floppies came with the machines.
 		<publisher>Bothtec</publisher>
 		<info name="alt_title" value="銀河英雄伝説"/>
 		<info name="serial" value="LD-8928"/>
-		<info name="gtin" value="04988609028082"/>
+		<info name="barcode" value="4988609028082"/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk A"/>
 			<dataarea name="flop" size="737280">
@@ -7552,7 +7549,7 @@ The following floppies came with the machines.
 		<publisher>Bothtec</publisher>
 		<info name="alt_title" value="銀河英雄伝説II"/>
 		<info name="serial" value="LD-9038"/>
-		<info name="gtin" value="04988671038187"/>
+		<info name="barcode" value="4988671038187"/>
 		<info name="usage" value="Boot with CTRL pressed."/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk A"/>
@@ -7593,7 +7590,7 @@ The following floppies came with the machines.
 		<publisher>Bothtec</publisher>
 		<info name="alt_title" value="銀河英雄伝説II"/>
 		<info name="serial" value="LD-9038"/>
-		<info name="gtin" value="04988671038187"/>
+		<info name="barcode" value="4988671038187"/>
 		<info name="usage" value="Boot with CTRL pressed."/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk A"/>
@@ -7634,7 +7631,7 @@ The following floppies came with the machines.
 		<publisher>Bothtec</publisher>
 		<info name="alt_title" value="銀河英雄伝説IIＤＸｋｉｔ"/>
 		<info name="serial" value="LD-9141"/>
-		<info name="gtin" value="04988671041187"/>
+		<info name="barcode" value="4988671041187"/>
 		<info name="usage" value="Requires &quot;Ginga Eiyuu Densetsu II&quot; to work. Boot with CTRL pressed." />
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk A"/>
@@ -7737,7 +7734,7 @@ The following floppies came with the machines.
 		<publisher>Micronet</publisher>
 		<info name="alt_title" value="極道陣取り"/>
 		<info name="serial" value="41512"/>
-		<info name="gtin" value="04957227415123"/>
+		<info name="barcode" value="4957227415123"/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="gokudo jintori (1989)(micronet)(jp).dsk" size="737280" crc="b8f942bd" sha1="bce77b7a3d7e73cfcc8fb22899dc2ed73df78516"/>
@@ -7751,7 +7748,7 @@ The following floppies came with the machines.
 		<publisher>Pack In Video</publisher>
 		<info name="alt_title" value="ザ・ゴルフ"/>
 		<info name="serial" value="MS-22"/>
-		<info name="gtin" value="04988110800221"/>
+		<info name="barcode" value="4988110800221"/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="golf, the (1988)(pack in video)(jp).dsk" size="737280" crc="5e1430d6" sha1="81629c2157e13175599c6efb52533da6f2f65576"/>
@@ -7765,7 +7762,7 @@ The following floppies came with the machines.
 		<publisher>Pack In Video</publisher>
 		<info name="alt_title" value="ザ・ゴルフ"/>
 		<info name="serial" value="MS-22"/>
-		<info name="gtin" value="04988110800221"/>
+		<info name="barcode" value="4988110800221"/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="golf, the (1988)(pack in video)(jp)[a].dsk" size="737280" crc="19ca09a0" sha1="5f869a7728e9334585d2a8dcb32918cacd4cec30"/>
@@ -7779,7 +7776,7 @@ The following floppies came with the machines.
 		<publisher>Pack In Video</publisher>
 		<info name="alt_title" value="ザ・ゴルフ"/>
 		<info name="serial" value="MS-22"/>
-		<info name="gtin" value="04988110800221"/>
+		<info name="barcode" value="4988110800221"/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="golf, the (1988)(pack in video)(jp)[a2].dsk" size="737280" crc="5b307b02" sha1="bcc361a1d3d628a7ac79c34579eacf6d012b289c"/>
@@ -7793,7 +7790,7 @@ The following floppies came with the machines.
 		<publisher>Pack In Video</publisher>
 		<info name="alt_title" value="ザ・ゴルフ・コース集"/>
 		<info name="serial" value="MS-28"/>
-		<info name="gtin" value="04988110800283"/>
+		<info name="barcode" value="4988110800283"/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="golf course collection, the (1988)(pack in video)(jp).dsk" size="737280" crc="f0fbe79f" sha1="5fc57fbb3a05c9c3804bd2934de91e02c0044282"/>
@@ -7807,7 +7804,7 @@ The following floppies came with the machines.
 		<publisher>Pack In Video</publisher>
 		<info name="alt_title" value="ザ・ゴルフ・コース集"/>
 		<info name="serial" value="MS-28"/>
-		<info name="gtin" value="04988110800283"/>
+		<info name="barcode" value="4988110800283"/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="golf course collection, the (1988)(pack in video)(jp)[a].dsk" size="737280" crc="6377cadc" sha1="6204ef7f35708001dd1d1986d1114c1fd9438567"/>
@@ -7821,7 +7818,7 @@ The following floppies came with the machines.
 		<publisher>Compile</publisher>
 		<info name="alt_title" value="ゴルビーのパイプライン大作戦"/>
 		<info name="serial" value="IA-9101"/>
-		<info name="gtin" value="04988161100080"/>
+		<info name="barcode" value="4988161100080"/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="gorby's pipeline (1991)(compile).dsk" size="737280" crc="b974b932" sha1="b42d7acbf3c7b563eb4b56ab314d59e81438fe83"/>
@@ -7834,7 +7831,7 @@ The following floppies came with the machines.
 		<year>1989</year>
 		<publisher>Dot Plan</publisher>
 		<info name="alt_title" value="グラムキャッツ"/>
-		<info name="gtin" value="04959087300014"/>
+		<info name="barcode" value="4959087300014"/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="737280">
@@ -7895,7 +7892,7 @@ The following floppies came with the machines.
 		<publisher>Bit²</publisher>
 		<info name="alt_title" value="グラフ サウルス"/>
 		<info name="serial" value="BM-021"/>
-		<info name="gtin" value="04988655132108"/>
+		<info name="barcode" value="4988655132108"/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="graph saurus v1.0 (1989)(bit2)(jp).dsk" size="737280" crc="a063b2fa" sha1="fd287012ea29ae725e5150f11a34748551ab91fb"/>
@@ -7909,7 +7906,7 @@ The following floppies came with the machines.
 		<publisher>Bit²</publisher>
 		<info name="alt_title" value="グラフ サウルス version 2.0"/>
 		<info name="serial" value="BM-124"/>
-		<info name="gtin" value="04988655632219"/>
+		<info name="barcode" value="4988655632219"/>
 		<info name="usage" value="Requires a Japanese system."/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="System disk"/>
@@ -7931,7 +7928,7 @@ The following floppies came with the machines.
 		<publisher>Bit²</publisher>
 		<info name="alt_title" value="グラフサウルスＶｅｒ．２．０"/>
 		<info name="serial" value="BM-124"/>
-		<info name="gtin" value="04988655632219"/>
+		<info name="barcode" value="4988655632219"/>
 		<info name="usage" value="Requires a Japanese system."/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="System disk"/>
@@ -7954,7 +7951,7 @@ The following floppies came with the machines.
 		<publisher>Bit²</publisher>
 		<info name="alt_title" value="グラフサウルスＶｅｒ．２．０"/>
 		<info name="serial" value="BM-124"/>
-		<info name="gtin" value="04988655632219"/>
+		<info name="barcode" value="4988655632219"/>
 		<info name="usage" value="Requires a Japanese system."/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="System disk"/>
@@ -7977,7 +7974,7 @@ The following floppies came with the machines.
 		<publisher>Bit²</publisher>
 		<info name="alt_title" value="グラフサウルスＶｅｒ．２．０"/>
 		<info name="serial" value="BM-124"/>
-		<info name="gtin" value="04988655632219"/>
+		<info name="barcode" value="4988655632219"/>
 		<info name="usage" value="Requires a Japanese system."/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="System disk"/>
@@ -8015,7 +8012,7 @@ The following floppies came with the machines.
 		<year>1988</year>
 		<publisher>T&amp;E Soft</publisher>
 		<info name="serial" value="TEM-94"/>
-		<info name="gtin" value="04988604090947"/>
+		<info name="barcode" value="4988604090947"/>
 		<info name="usage" value="Requires a Japanese system."/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1"/>
@@ -8036,7 +8033,7 @@ The following floppies came with the machines.
 		<year>1988</year>
 		<publisher>T&amp;E Soft</publisher>
 		<info name="serial" value="TEM-94"/>
-		<info name="gtin" value="04988604090947"/>
+		<info name="barcode" value="4988604090947"/>
 		<info name="usage" value="Requires a Japanese system."/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1"/>
@@ -8057,7 +8054,7 @@ The following floppies came with the machines.
 		<year>1988</year>
 		<publisher>T&amp;E Soft</publisher>
 		<info name="serial" value="TEM-94"/>
-		<info name="gtin" value="04988604090947"/>
+		<info name="barcode" value="4988604090947"/>
 		<info name="usage" value="Requires a Japanese system."/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1"/>
@@ -8129,7 +8126,7 @@ The following floppies came with the machines.
 		<publisher>Pack In Video</publisher>
 		<info name="alt_title" value="軍人将棋"/>
 		<info name="serial" value="MS-15"/>
-		<info name="gtin" value="04988110800153"/>
+		<info name="barcode" value="4988110800153"/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="gunjin shougi. military chess (1988)(pack in video)(jp).dsk" size="737280" crc="32b24227" sha1="55c1d35c11f77f44e4e4e65df0957319f97b5d8f"/>
@@ -8143,7 +8140,7 @@ The following floppies came with the machines.
 		<publisher>Microprose Japan</publisher>
 		<info name="alt_title" value="ガンシップ"/>
 		<info name="serial" value="MXMP42001"/>
-		<info name="gtin" value="04981488022134"/>
+		<info name="barcode" value="4981488022134"/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="gunship (1989)(microprose japan).dsk" size="737280" crc="26a325d5" sha1="fe53c4481d85a519dde74eae7e05f682de027a5a"/>
@@ -8157,7 +8154,7 @@ The following floppies came with the machines.
 		<publisher>Microprose Japan</publisher>
 		<info name="alt_title" value="ガンシップ"/>
 		<info name="serial" value="MXMP42001"/>
-		<info name="gtin" value="04981488022134"/>
+		<info name="barcode" value="4981488022134"/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="gunship (1989)(microprose japan)[a].dsk" size="737280" crc="9605dad4" sha1="da96933de0d2b2d68202ffc9e07165845d2c7b3c"/>
@@ -8171,7 +8168,7 @@ The following floppies came with the machines.
 		<publisher>Microprose Japan</publisher>
 		<info name="alt_title" value="ガンシップ"/>
 		<info name="serial" value="MXMP42001"/>
-		<info name="gtin" value="04981488022134"/>
+		<info name="barcode" value="4981488022134"/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="368640">
 				<rom name="gunship (1989)(microprose japan)[a2].dsk" size="368640" crc="f3c10313" sha1="cc96ae60202462f6de6164444a86e1ed61f33526"/>
@@ -8633,7 +8630,7 @@ The following floppies came with the machines.
 		<year>1989</year>
 		<publisher>Hertz</publisher>
 		<info name="alt_title" value="ハイディフォス"/>
-		<info name="gtin" value="04980425010029"/>
+		<info name="barcode" value="4980425010029"/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk I"/>
 			<dataarea name="flop" size="737280">
@@ -8654,7 +8651,7 @@ The following floppies came with the machines.
 		<year>1989</year>
 		<publisher>Hertz</publisher>
 		<info name="alt_title" value="ハイディフォス"/>
-		<info name="gtin" value="04980425010029"/>
+		<info name="barcode" value="4980425010029"/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk I"/>
 			<dataarea name="flop" size="737280">
@@ -8674,7 +8671,7 @@ The following floppies came with the machines.
 		<year>1989</year>
 		<publisher>Hertz</publisher>
 		<info name="alt_title" value="ハイディフォス"/>
-		<info name="gtin" value="04980425010029"/>
+		<info name="barcode" value="4980425010029"/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk I"/>
 			<dataarea name="flop" size="737280">
@@ -8806,7 +8803,7 @@ The following floppies came with the machines.
 		<publisher>Koei</publisher>
 		<info name="alt_title" value="伊忍道打倒信長"/>
 		<info name="serial" value="KN10181040"/>
-		<info name="gtin" value="04988615003011"/>
+		<info name="barcode" value="4988615003011"/>
 		<info name="usage" value="Boot with CTRL pressed. Requires a Japanese system."/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk A"/>
@@ -8834,7 +8831,7 @@ The following floppies came with the machines.
 		<publisher>Koei</publisher>
 		<info name="alt_title" value="伊忍道打倒信長"/>
 		<info name="serial" value="KN10181040"/>
-		<info name="gtin" value="04988615003011"/>
+		<info name="barcode" value="4988615003011"/>
 		<info name="usage" value="Boot with CTRL pressed. Requires a Japanese system."/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk A"/>
@@ -8861,7 +8858,7 @@ The following floppies came with the machines.
 		<year>1989</year>
 		<publisher>Alicesoft</publisher>
 		<info name="alt_title" value="桜屋敷の探索"/>
-		<info name="gtin" value="04988650300137"/>
+		<info name="barcode" value="4988650300137"/>
 		<info name="usage" value="Requires a Japanese system."/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
@@ -8912,7 +8909,7 @@ The following floppies came with the machines.
 		<publisher>Koei</publisher>
 		<info name="alt_title" value="維新の嵐"/>
 		<info name="serial" value="MXKN12015"/>
-		<info name="gtin" value="04988615001161"/>
+		<info name="barcode" value="4988615001161"/>
 		<info name="usage" value="Boot with CTRL pressed. Requires a Japanese system."/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
@@ -8958,7 +8955,7 @@ The following floppies came with the machines.
 		<publisher>Riverhill Soft</publisher>
 		<info name="alt_title" value="マンハッタンレクイエム"/>
 		<info name="serial" value="MXRH-12001"/>
-		<info name="gtin" value="04967652101034"/>
+		<info name="barcode" value="4967652101034"/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="j.b. harold 2 - manhattan requiem - angels flying in the dark (1988)(riverhill soft)(jp).dsk" size="737280" crc="6a3ec7ce" sha1="00422d4b82dfdac398063a0937b169275f0c656b"/>
@@ -8972,7 +8969,7 @@ The following floppies came with the machines.
 		<publisher>Victor</publisher>
 		<info name="alt_title" value="ジャックニクラウスチャンピオンシップゴルフ"/>
 		<info name="serial" value="M-3505~6"/>
-		<info name="gtin" value="04988002199235"/>
+		<info name="barcode" value="4988002199235"/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="System disk (システム・ディスク)"/>
 			<dataarea name="flop" size="737280">
@@ -8993,7 +8990,7 @@ The following floppies came with the machines.
 		<publisher>Victor</publisher>
 		<info name="alt_title" value="ジャックニクラウスチャンピオンシップゴルフ"/>
 		<info name="serial" value="M-3505~6"/>
-		<info name="gtin" value="04988002199235"/>
+		<info name="barcode" value="4988002199235"/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="System disk (システム・ディスク)"/>
 			<dataarea name="flop" size="737280">
@@ -9014,7 +9011,7 @@ The following floppies came with the machines.
 		<publisher>Victor</publisher>
 		<info name="alt_title" value="ジャックニクラウスチャンピオンシップゴルフ"/>
 		<info name="serial" value="M-3505~6"/>
-		<info name="gtin" value="04988002199235"/>
+		<info name="barcode" value="4988002199235"/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="System disk (システム・ディスク)"/>
 			<dataarea name="flop" size="737280">
@@ -9049,7 +9046,7 @@ The following floppies came with the machines.
 		<publisher>Enix</publisher>
 		<info name="alt_title" value="ジーザス"/>
 		<info name="serial" value="HBJ-G063D / EG196"/>
-		<info name="gtin" value="04901780069484"/>
+		<info name="barcode" value="4901780069484"/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk No.1"/>
 			<dataarea name="flop" size="737280">
@@ -9075,7 +9072,7 @@ The following floppies came with the machines.
 		<year>1989</year>
 		<publisher>Kogado</publisher>
 		<info name="alt_title" value="時空の花嫁"/>
-		<info name="gtin" value="04959067898500"/>
+		<info name="barcode" value="4959067898500"/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Opening Disk"/>
 			<dataarea name="flop" size="737280">
@@ -9095,7 +9092,7 @@ The following floppies came with the machines.
 		<year>1989</year>
 		<publisher>Kogado</publisher>
 		<info name="alt_title" value="時空の花嫁"/>
-		<info name="gtin" value="04959067898500"/>
+		<info name="barcode" value="4959067898500"/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Opening Disk"/>
 			<dataarea name="flop" size="737280">
@@ -9127,7 +9124,7 @@ The following floppies came with the machines.
 		<year>1988</year>
 		<publisher>Birdy Soft</publisher>
 		<info name="alt_title" value="ジョーカー"/>
-		<info name="gtin" value="04959087200543"/>
+		<info name="barcode" value="4959087200543"/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk A"/>
 			<dataarea name="flop" size="737280">
@@ -9153,7 +9150,7 @@ The following floppies came with the machines.
 		<year>1988</year>
 		<publisher>Birdy Soft</publisher>
 		<info name="alt_title" value="ジョーカー"/>
-		<info name="gtin" value="04959087200543"/>
+		<info name="barcode" value="4959087200543"/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk A"/>
 			<dataarea name="flop" size="737280">
@@ -9178,7 +9175,7 @@ The following floppies came with the machines.
 		<description>Joker II (Japan)</description>
 		<year>1989</year>
 		<publisher>Birdy Soft</publisher>
-		<info name="gtin" value="04959087200635"/>
+		<info name="barcode" value="4959087200635"/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk A"/>
 			<dataarea name="flop" size="737280">
@@ -9209,7 +9206,7 @@ The following floppies came with the machines.
 		<description>Joker II (Japan, alt)</description>
 		<year>1989</year>
 		<publisher>Birdy Soft</publisher>
-		<info name="gtin" value="04959087200635"/>
+		<info name="barcode" value="4959087200635"/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk A"/>
 			<dataarea name="flop" size="737280">
@@ -9241,7 +9238,7 @@ The following floppies came with the machines.
 		<year>1988</year>
 		<publisher>Xain</publisher>
 		<info name="serial" value="MXZS-12010"/>
-		<info name="gtin" value="04988636405313"/>
+		<info name="barcode" value="4988636405313"/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="jotunn (1988)(xain)(jp).dsk" size="737280" crc="3b5b618c" sha1="b4f255ece6c68f693fa59a379058673abf383511"/>
@@ -9255,7 +9252,7 @@ The following floppies came with the machines.
 		<year>1988</year>
 		<publisher>Xain</publisher>
 		<info name="serial" value="MXZS-12010"/>
-		<info name="gtin" value="04988636405313"/>
+		<info name="barcode" value="4988636405313"/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="jotunn (1988)(xain)(jp)[a].dsk" size="737280" crc="411f1071" sha1="def06b748a713347c1f07fcaa44073fd8d02d87b"/>
@@ -9269,7 +9266,7 @@ The following floppies came with the machines.
 		<publisher>Heart Soft</publisher>
 		<info name="alt_title" value="帰ってきた探偵団Ｘ"/>
 		<info name="serial" value="HDM-03"/>
-		<info name="gtin" value="04988641006246"/>
+		<info name="barcode" value="4988641006246"/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk A"/>
 			<dataarea name="flop" size="737280">
@@ -9296,7 +9293,7 @@ The following floppies came with the machines.
 		<publisher>Heart Soft</publisher>
 		<info name="alt_title" value="陽炎迷宮"/>
 		<info name="serial" value="HDM-04"/>
-		<info name="gtin" value="04988641007243"/>
+		<info name="barcode" value="4988641007243"/>
 		<info name="usage" value="Boot with CTRL pressed. Requires a Japanese system."/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk A"/>
@@ -9395,7 +9392,7 @@ The following floppies came with the machines.
 		<year>1988</year>
 		<publisher>Micro Cabin</publisher>
 		<info name="alt_title" value="きまぐれオレンジ☆ロード"/>
-		<info name="gtin" value="04988608843440"/>
+		<info name="barcode" value="4988608843440"/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="kimagure. orange road (1988)(micro cabin)(jp).dsk" size="737280" crc="61958d0d" sha1="5a0fa905cfb7a843481c722f5d692c063a0e544d"/>
@@ -9408,7 +9405,7 @@ The following floppies came with the machines.
 		<year>1988</year>
 		<publisher>Micro Cabin</publisher>
 		<info name="alt_title" value="きまぐれオレンジ☆ロード"/>
-		<info name="gtin" value="04988608843440"/>
+		<info name="barcode" value="4988608843440"/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="kimagure. orange road (1988)(micro cabin)(jp)[a].dsk" size="737280" crc="c3a56c3f" sha1="a2c07ed808381404866e680031cbb62a11785507"/>
@@ -9588,7 +9585,7 @@ The following floppies came with the machines.
 		<publisher>Konami</publisher>
 		<info name="alt_title" value="コナミゲームコレクション番外編"/>
 		<info name="serial" value="RA010"/>
-		<info name="gtin" value="04988602550228"/>
+		<info name="barcode" value="4988602550228"/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="konami_game_collection_extra_(1989)_(konami).dsk" size="737280" crc="faacf3a6" sha1="aa6d3b96dee37beaf7b4c544a12a76a0e7bc0fe0"/>
@@ -9641,7 +9638,7 @@ The following floppies came with the machines.
 		<publisher>Bit²</publisher>
 		<info name="alt_title" value="秘録 首斬り館"/>
 		<info name="serial" value="BM-901"/>
-		<info name="gtin" value="04988655130197"/>
+		<info name="barcode" value="4988655130197"/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="kubikiri yakata - sachan ghyan (1989)(bit2)(jp)(disk 1 of 5)[mouse].dsk" size="737280" crc="73f59c09" sha1="d545be6242e7f4f9d470bf133bd54863aad499f9"/>
@@ -9675,7 +9672,7 @@ The following floppies came with the machines.
 		<publisher>Bit²</publisher>
 		<info name="alt_title" value="秘録 首斬り館"/>
 		<info name="serial" value="BM-901"/>
-		<info name="gtin" value="04988655130197"/>
+		<info name="barcode" value="4988655130197"/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="kubikiri yakata - sachan ghyan (1989)(bit2)(jp)(disk 1 of 5)[a][mouse].dsk" size="737280" crc="08ce0296" sha1="cac854319cf1ca2cfaa623243cd3960176cd8326"/>
@@ -9762,7 +9759,7 @@ The following floppies came with the machines.
 		<publisher>Pony Canyon</publisher>
 		<info name="alt_title" value="孔雀王"/>
 		<info name="serial" value="L58Y5113"/>
-		<info name="gtin" value="04988013013797"/>
+		<info name="barcode" value="4988013013797"/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="kujaku oh (1988)(pony canyon)(jp).dsk" size="737280" crc="d541f24a" sha1="d05e85f8c93f8e4c6dcd434c973c416c99e4baa3"/>
@@ -9808,7 +9805,7 @@ The following floppies came with the machines.
 		<year>1989</year>
 		<publisher>Kogado</publisher>
 		<info name="alt_title" value="魔晶伝紀 La Valeur"/>
-		<info name="gtin" value="04959067900500"/>
+		<info name="barcode" value="4959067900500"/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk A"/>
 			<dataarea name="flop" size="737280">
@@ -9828,7 +9825,7 @@ The following floppies came with the machines.
 		<year>1989</year>
 		<publisher>Kogado</publisher>
 		<info name="alt_title" value="魔晶伝紀 La Valeur"/>
-		<info name="gtin" value="04959067900500"/>
+		<info name="barcode" value="4959067900500"/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk A"/>
 			<dataarea name="flop" size="737280">
@@ -9849,7 +9846,7 @@ The following floppies came with the machines.
 		<year>1989</year>
 		<publisher>Humming Bird Soft</publisher>
 		<info name="alt_title" value="ラプラスの魔"/>
-		<info name="gtin" value="04960695104222"/>
+		<info name="barcode" value="4960695104222"/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="laplace no ma (1989)(humming bird soft)(jp).dsk" size="737280" crc="e2042b77" sha1="90728df52767c6a5528d7eceebef148460dd3bdb"/>
@@ -9875,7 +9872,7 @@ The following floppies came with the machines.
 		<publisher>Brain Grey</publisher>
 		<info name="alt_title" value="ラスト・ハルマゲドン"/>
 		<info name="serial" value="BG10001"/>
-		<info name="gtin" value="04988652420017"/>
+		<info name="barcode" value="4988652420017"/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk A"/>
 			<dataarea name="flop" size="737280">
@@ -10220,7 +10217,7 @@ The following floppies came with the machines.
 		<description>M.U.L.E. (Japan)</description>
 		<year>1988</year>
 		<publisher>BPS</publisher>
-		<info name="gtin" value="04988627100029"/>
+		<info name="barcode" value="4988627100029"/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="m.u.l.e. (1988)(bps)(jp).dsk" size="737280" crc="2ec63dad" sha1="4103b0dc3d4d6c92806b7d5d7182d0203ca92a83"/>
@@ -10361,7 +10358,7 @@ The following floppies came with the machines.
 		<year>1990</year>
 		<publisher>Nihon Bussan</publisher>
 		<info name="alt_title" value="麻雀刺客"/>
-		<info name="gtin" value="04960641010010"/>
+		<info name="barcode" value="4960641010010"/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="737280">
@@ -10387,7 +10384,7 @@ The following floppies came with the machines.
 		<year>1990</year>
 		<publisher>Nihon Bussan</publisher>
 		<info name="alt_title" value="麻雀刺客"/>
-		<info name="gtin" value="04960641010010"/>
+		<info name="barcode" value="4960641010010"/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="737280">
@@ -10727,7 +10724,7 @@ The following floppies came with the machines.
 		<description>Mid-Garts Side A (Japan)</description>
 		<year>1989</year>
 		<publisher>WolfTeam</publisher>
-		<info name="gtin" value="04988160920054"/>
+		<info name="barcode" value="4988160920054"/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk I"/>
 			<dataarea name="flop" size="737280">
@@ -10753,7 +10750,7 @@ The following floppies came with the machines.
 		<description>Mid-Garts Side A (Japan, alt disk 1)</description>
 		<year>1989</year>
 		<publisher>WolfTeam</publisher>
-		<info name="gtin" value="04988160920054"/>
+		<info name="barcode" value="4988160920054"/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk I"/>
 			<dataarea name="flop" size="737280">
@@ -10779,7 +10776,7 @@ The following floppies came with the machines.
 		<description>Mid-Garts Side B (Japan)</description>
 		<year>1989</year>
 		<publisher>WolfTeam</publisher>
-		<info name="gtin" value="04988160920061"/>
+		<info name="barcode" value="4988160920061"/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="middogarutsu. mid-garts side b (1989)(wolfteam)(jp)(disk 1 of 3).dsk" size="737280" crc="176cd9da" sha1="971c63626b3b140f5185175d52b6f1858e34cb2f"/>
@@ -10802,7 +10799,7 @@ The following floppies came with the machines.
 		<description>Mid-Garts Side B (Japan, alt)</description>
 		<year>1989</year>
 		<publisher>WolfTeam</publisher>
-		<info name="gtin" value="04988160920061"/>
+		<info name="barcode" value="4988160920061"/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="middogarutsu. mid-garts side b (1989)(wolfteam)(jp)(disk 1 of 3)[a].dsk" size="737280" crc="b05574af" sha1="2aa339cdf84d7935a7a048940837fc87ef78ebc9"/>
@@ -10824,7 +10821,7 @@ The following floppies came with the machines.
 		<description>Mid-Garts Dual Side (Japan)</description>
 		<year>1989</year>
 		<publisher>WolfTeam</publisher>
-		<info name="gtin" value="04988160920054"/><!-- Re-use of Side A box (and barcode) for the Dual Side edition? -->
+		<info name="barcode" value="4988160920054"/><!-- Re-use of Side A box (and barcode) for the Dual Side edition? -->
 		<info name="alt_title" value="ミッドガルツ" />
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1"/>
@@ -10894,7 +10891,7 @@ The following floppies came with the machines.
 		<year>1989</year>
 		<publisher>Starcraft</publisher>
 		<info name="alt_title" value="マイト・アンド・マジックブック２"/>
-		<info name="gtin" value="04988702401034"/>
+		<info name="barcode" value="4988702401034"/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="might and magic ii - gates to another world (1989)(starcraft)(jp)(disk 1 of 2).dsk" size="737280" crc="92457076" sha1="4365e8ed1536de4581e7c6beed58888d0e045bd0"/>
@@ -10912,7 +10909,7 @@ The following floppies came with the machines.
 		<year>1989</year>
 		<publisher>Starcraft</publisher>
 		<info name="alt_title" value="マイト・アンド・マジックブック２"/>
-		<info name="gtin" value="04988702401034"/>
+		<info name="barcode" value="4988702401034"/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="might and magic ii - gates to another world (1989)(starcraft)(jp)(disk 1 of 2)[a].dsk" size="737280" crc="15c86844" sha1="9b1df504e9aa20ec638923b73fa4f131549834f4"/>
@@ -10930,7 +10927,7 @@ The following floppies came with the machines.
 		<year>1993</year>
 		<publisher>Gainax</publisher>
 		<info name="alt_title" value="ＭＩＧＨＴＹバトルスキンパニック"/>
-		<info name="gtin" value="04984841081229"/>
+		<info name="barcode" value="4984841081229"/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="737280">
@@ -10962,7 +10959,7 @@ The following floppies came with the machines.
 		<year>1993</year>
 		<publisher>Gainax</publisher>
 		<info name="alt_title" value="ＭＩＧＨＴＹバトルスキンパニック"/>
-		<info name="gtin" value="04984841081229"/>
+		<info name="barcode" value="4984841081229"/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="737280">
@@ -10994,7 +10991,7 @@ The following floppies came with the machines.
 		<year>1993</year>
 		<publisher>Gainax</publisher>
 		<info name="alt_title" value="ＭＩＧＨＴＹバトルスキンパニック"/>
-		<info name="gtin" value="04984841081229"/>
+		<info name="barcode" value="4984841081229"/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="737280">
@@ -11026,7 +11023,7 @@ The following floppies came with the machines.
 		<year>1993</year>
 		<publisher>Gainax</publisher>
 		<info name="alt_title" value="ＭＩＧＨＴＹバトルスキンパニック"/>
-		<info name="gtin" value="04984841081229"/>
+		<info name="barcode" value="4984841081229"/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="737280">
@@ -11058,7 +11055,7 @@ The following floppies came with the machines.
 		<year>1988</year>
 		<publisher>Family Soft</publisher>
 		<info name="alt_title" value="ＭＳフィールド機動戦士ガンダム"/>
-		<info name="gtin" value="04988709029989"/>
+		<info name="barcode" value="4988709029989"/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="mobile suit field gundam (1988)(family soft)(jp).dsk" size="737280" crc="0609e85d" sha1="89392c0acf277f271d9f53231685004c9565ba47"/>
@@ -11364,7 +11361,7 @@ The following floppies came with the machines.
 		<description>MSX Train (Japan)</description>
 		<year>1993</year>
 		<publisher>Family Soft</publisher>
-		<info name="gtin" value="04988709029927"/>
+		<info name="barcode" value="4988709029927"/>
 		<info name="usage" value="Requires a systen with Kanji ROM."/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1"/>
@@ -11492,7 +11489,7 @@ The following floppies came with the machines.
 		<year>1989</year>
 		<publisher>Kogado</publisher>
 		<info name="alt_title" value="ナビチューンドラゴン航海記"/>
-		<info name="gtin" value="04959067891501"/>
+		<info name="barcode" value="4959067891501"/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Game Disk"/>
 			<dataarea name="flop" size="737280">
@@ -11603,7 +11600,7 @@ The following floppies came with the machines.
 		<year>1991</year>
 		<publisher>WolfTeam</publisher>
 		<info name="alt_title" value="ＮＩＫＯ２～ニコニコ～"/>
-		<info name="gtin" value="04988624920675"/>
+		<info name="barcode" value="4988624920675"/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="niko2. niko niko (1991)(wolfteam)(jp).dsk" size="737280" crc="c35a55d0" sha1="4c921d0722a6278abfc415d846563503743958e6"/>
@@ -11616,7 +11613,7 @@ The following floppies came with the machines.
 		<year>1991</year>
 		<publisher>WolfTeam</publisher>
 		<info name="alt_title" value="ＮＩＫＯ２～ニコニコ～"/>
-		<info name="gtin" value="04988624920675"/>
+		<info name="barcode" value="4988624920675"/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="niko2. niko niko (1991)(wolfteam)(jp)[a].dsk" size="737280" crc="46236b17" sha1="a5b07b1b46c3a72237a40dc94764fcee88f9ec06"/>
@@ -11712,7 +11709,7 @@ The following floppies came with the machines.
 		<publisher>Koei</publisher>
 		<info name="alt_title" value="信長の野望・戦国群雄伝"/>
 		<info name="serial" value="MXKN12007?"/>
-		<info name="gtin" value="04988615000805"/>
+		<info name="barcode" value="4988615000805"/>
 		<info name="usage" value="Boot with CTRL pressed. Requires a Japanese system."/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
@@ -11728,7 +11725,7 @@ The following floppies came with the machines.
 		<publisher>Koei</publisher>
 		<info name="alt_title" value="信長の野望・戦国群雄伝"/>
 		<info name="serial" value="MXKN12007?"/>
-		<info name="gtin" value="04988615000805"/>
+		<info name="barcode" value="4988615000805"/>
 		<info name="usage" value="Boot with CTRL pressed. Requires a Japanese system."/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
@@ -11743,7 +11740,7 @@ The following floppies came with the machines.
 		<publisher>Koei</publisher>
 		<info name="alt_title" value="信長の野望・武将風雲録"/>
 		<info name="serial" value="KN10111050"/>
-		<info name="gtin" value="04988615002434"/>
+		<info name="barcode" value="4988615002434"/>
 		<info name="usage" value="Boot with CTRL pressed. Requires a Japanese system."/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk A"/>
@@ -11765,7 +11762,7 @@ The following floppies came with the machines.
 		<publisher>Koei</publisher>
 		<info name="alt_title" value="信長の野望・武将風雲録"/>
 		<info name="serial" value="KN10111050"/>
-		<info name="gtin" value="04988615002434"/>
+		<info name="barcode" value="4988615002434"/>
 		<info name="usage" value="Boot with CTRL pressed. Requires a Japanese system."/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk A"/>
@@ -11865,7 +11862,7 @@ The following floppies came with the machines.
 		<publisher>Bit²</publisher>
 		<info name="alt_title" value="激走ニャンクル"/>
 		<info name="serial" value="SW-M005"/>
-		<info name="gtin" value="04902704840042"/>
+		<info name="barcode" value="4902704840042"/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="nyancle racing (1988)(bit2)(jp).dsk" size="737280" crc="f86ce067" sha1="f04abb4b149db20a860984062fc66d207e852538"/>
@@ -11879,7 +11876,7 @@ The following floppies came with the machines.
 		<publisher>Bit²</publisher>
 		<info name="alt_title" value="激走ニャンクル"/>
 		<info name="serial" value="SW-M005"/>
-		<info name="gtin" value="04902704840042"/>
+		<info name="barcode" value="4902704840042"/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="nyancle racing (1988)(bit2)(jp)[a].dsk" size="737280" crc="2009827c" sha1="1ed7015ecd3f60c77638a0af7c161a3bce4bc737"/>
@@ -11893,7 +11890,7 @@ The following floppies came with the machines.
 		<publisher>Bit²</publisher>
 		<info name="alt_title" value="激走ニャンクル"/>
 		<info name="serial" value="SW-M005"/>
-		<info name="gtin" value="04902704840042"/>
+		<info name="barcode" value="4902704840042"/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="nyancle racing (1988)(bit2)(jp)[a2].dsk" size="737280" crc="b99d78ef" sha1="cb2ef6028e50eb10cfda676224f8a86fc4e83151"/>
@@ -11906,7 +11903,7 @@ The following floppies came with the machines.
 		<year>1988</year>
 		<publisher>Software Studio WING</publisher>
 		<info name="alt_title" value="怨霊戦記"/>
-		<info name="gtin" value="04988705101030"/>
+		<info name="barcode" value="4988705101030"/>
 		<info name="usage" value="Requires a system with Kanji ROM."/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Main Disk"/>
@@ -11993,7 +11990,7 @@ The following floppies came with the machines.
 		<year>1989</year>
 		<publisher>Namcot</publisher>
 		<info name="alt_title" value="パックマニア"/>
-		<info name="gtin" value="04907892030176"/>
+		<info name="barcode" value="4907892030176"/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="pac-mania (1989)(namcot)(jp).dsk" size="737280" crc="0a86a84e" sha1="e1370dc01c427c0811efb6ca960e23d2eb873fac"/>
@@ -12006,7 +12003,7 @@ The following floppies came with the machines.
 		<year>1989</year>
 		<publisher>Namcot</publisher>
 		<info name="alt_title" value="パックマニア"/>
-		<info name="gtin" value="04907892030176"/>
+		<info name="barcode" value="4907892030176"/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="pac-mania (1989)(namcot)(jp)[a].dsk" size="737280" crc="7f34fb80" sha1="8a80ef7b1b51adfda38a4f12f962e0ff7b5c9c87"/>
@@ -12089,7 +12086,7 @@ The following floppies came with the machines.
 		<description>Les Passagers du Vent (France)</description>
 		<year>1986</year>
 		<publisher>Infogrames</publisher>
-		<info name="gtin" value="09872737800009"/>
+		<info name="barcode" value="9872737800009"/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="passagers du vent, les (1986)(infogrames)(fr).dsk" size="737280" crc="4b43f166" sha1="302b1960b29af77ff4ce887931ac8d31202c7e89"/>
@@ -12130,7 +12127,7 @@ The following floppies came with the machines.
 		<publisher>Momonoki House</publisher>
 		<info name="alt_title" value="ピーチアップ創刊号"/>
 		<info name="serial" value="PU-89001"/>
-		<info name="gtin" value="04988749890013"/>
+		<info name="barcode" value="4988749890013"/>
 		<info name="usage" value="Requires a Japanese system."/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1"/>
@@ -12152,7 +12149,7 @@ The following floppies came with the machines.
 		<publisher>Momonoki House</publisher>
 		<info name="alt_title" value="ピーチアップ２"/>
 		<info name="serial" value="PU-9001"/>
-		<info name="gtin" value="04988749900019"/>
+		<info name="barcode" value="4988749900019"/>
 		<info name="usage" value="Requires a Japanese system."/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1"/>
@@ -12174,7 +12171,7 @@ The following floppies came with the machines.
 		<publisher>Momonoki House</publisher>
 		<info name="alt_title" value="ピーチアップ３"/>
 		<info name="serial" value="PU-9002"/>
-		<info name="gtin" value="04988749900026"/>
+		<info name="barcode" value="4988749900026"/>
 		<info name="usage" value="Requires a Japanese system."/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1"/>
@@ -12196,7 +12193,7 @@ The following floppies came with the machines.
 		<publisher>Momonoki House</publisher>
 		<info name="alt_title" value="ピーチアップ４"/>
 		<info name="serial" value="PU-9003"/>
-		<info name="gtin" value="04988749900033"/>
+		<info name="barcode" value="4988749900033"/>
 		<info name="usage" value="Requires a Japanese system."/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1"/>
@@ -12218,7 +12215,7 @@ The following floppies came with the machines.
 		<publisher>Momonoki House</publisher>
 		<info name="alt_title" value="ピーチアップ５"/>
 		<info name="serial" value="PU-9004"/>
-		<info name="gtin" value="04988749900040"/>
+		<info name="barcode" value="4988749900040"/>
 		<info name="usage" value="Requires a Japanese system."/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1"/>
@@ -12240,7 +12237,7 @@ The following floppies came with the machines.
 		<publisher>Momonoki House</publisher>
 		<info name="alt_title" value="ピーチアップ６"/>
 		<info name="serial" value="PU-9005"/>
-		<info name="gtin" value="04988749900057"/>
+		<info name="barcode" value="4988749900057"/>
 		<info name="usage" value="Requires a Japanese system."/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1"/>
@@ -12262,7 +12259,7 @@ The following floppies came with the machines.
 		<publisher>Momonoki House</publisher>
 		<info name="alt_title" value="ピーチアップ７"/>
 		<info name="serial" value="PU-9006"/>
-		<info name="gtin" value="04988749900064"/>
+		<info name="barcode" value="4988749900064"/>
 		<info name="usage" value="Requires a Japanese system."/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1"/>
@@ -12284,7 +12281,7 @@ The following floppies came with the machines.
 		<publisher>Momonoki House</publisher>
 		<info name="alt_title" value="ピーチアップ８"/>
 		<info name="serial" value="PU-9007"/>
-		<info name="gtin" value="04988749900071"/>
+		<info name="barcode" value="4988749900071"/>
 		<info name="usage" value="Requires a Japanese system."/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1"/>
@@ -12306,7 +12303,7 @@ The following floppies came with the machines.
 		<publisher>Momonoki House</publisher>
 		<info name="alt_title" value="ピーチアップ総集編"/>
 		<info name="serial" value="PU-9101"/>
-		<info name="gtin" value="04988749910018"/>
+		<info name="barcode" value="4988749910018"/>
 		<info name="usage" value="Requires a Japanese system."/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1"/>
@@ -12340,7 +12337,7 @@ The following floppies came with the machines.
 		<publisher>Momonoki House</publisher>
 		<info name="alt_title" value="ピーチアップ総集編II（笑）"/>
 		<info name="serial" value="PU-9102"/>
-		<info name="gtin" value="04988749910025"/>
+		<info name="barcode" value="4988749910025"/>
 		<info name="usage" value="Requires a Japanese system."/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk A"/>
@@ -12373,7 +12370,7 @@ The following floppies came with the machines.
 		<year>1988</year>
 		<publisher>Bothtec</publisher>
 		<info name="alt_title" value="ファンタジージェルノアの章"/>
-		<info name="gtin" value="04988609024084"/>
+		<info name="barcode" value="4988609024084"/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="phantasie (1988)(bothtec)(jp).dsk" size="737280" crc="b397793a" sha1="00f86b4baa57b2378ae60c4cb66207a026e111be"/>
@@ -12388,7 +12385,7 @@ The following floppies came with the machines.
 		<publisher>Bothtec</publisher>
 		<info name="alt_title" value="ファンタジーIIフェロンラの章"/>
 		<info name="serial" value="LD-8825"/>
-		<info name="gtin" value="04988609025081"/>
+		<info name="barcode" value="4988609025081"/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Game disk (ゲームディスク)"/>
 			<dataarea name="flop" size="737280">
@@ -12406,7 +12403,7 @@ The following floppies came with the machines.
 		<publisher>Bothtec</publisher>
 		<info name="alt_title" value="ファンタジーIIIニカデモスの怒り"/>
 		<info name="serial" value="LD-8930"/>
-		<info name="gtin" value="04988609030085"/>
+		<info name="barcode" value="4988609030085"/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Scenario Disk"/>
 			<dataarea name="flop" size="737280">
@@ -12427,7 +12424,7 @@ The following floppies came with the machines.
 		<publisher>Starcraft</publisher>
 		<info name="alt_title" value="ファンタジーIV英雄の血脈"/>
 		<info name="serial" value="CF02ZMF35"/>
-		<info name="gtin" value="04988702401072"/>
+		<info name="barcode" value="4988702401072"/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Scenario Disk"/>
 			<dataarea name="flop" size="737280">
@@ -12449,7 +12446,7 @@ The following floppies came with the machines.
 		<publisher>Starcraft</publisher>
 		<info name="alt_title" value="ファンタジーIV英雄の血脈"/>
 		<info name="serial" value="CF02ZMF35"/>
-		<info name="gtin" value="04988702401072"/>
+		<info name="barcode" value="4988702401072"/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Scenario Disk"/>
 			<dataarea name="flop" size="737280">
@@ -12514,7 +12511,7 @@ The following floppies came with the machines.
 		<publisher>Wendy Magazine</publisher>
 		<info name="alt_title" value="ピンクソックス"/>
 		<info name="serial" value="WDM-103"/>
-		<info name="gtin" value="04988751330200"/>
+		<info name="barcode" value="4988751330200"/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="pink sox - issue 01 (1989)(wendy magazine)(jp).dsk" size="737280" crc="41310476" sha1="cbe5fe4e600d7e963072a47b9f34a8784b4a4d28"/>
@@ -12528,7 +12525,7 @@ The following floppies came with the machines.
 		<publisher>Wendy Magazine</publisher>
 		<info name="alt_title" value="ピンクソックス２"/>
 		<info name="serial" value="WDM-102"/>
-		<info name="gtin" value="04988751230203"/>
+		<info name="barcode" value="4988751230203"/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="pink sox - issue 02 (1990)(wendy magazine)(jp).dsk" size="737280" crc="2b0ffa6d" sha1="f3a52fe98ac320387529a208de43d495b790380f"/>
@@ -12542,7 +12539,7 @@ The following floppies came with the machines.
 		<publisher>Wendy Magazine</publisher>
 		<info name="alt_title" value="ピンクソックス３"/>
 		<info name="serial" value="WDM-105"/>
-		<info name="gtin" value="04988751530204"/>
+		<info name="barcode" value="4988751530204"/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="pink sox - issue 03 (1990)(wendy magazine)(jp).dsk" size="737280" crc="52d4b1cb" sha1="f7e6473afbc6e071479daa5b176617a61afee194"/>
@@ -12556,7 +12553,7 @@ The following floppies came with the machines.
 		<publisher>Wendy Magazine</publisher>
 		<info name="alt_title" value="ピンクソックス４"/>
 		<info name="serial" value="WDM-108"/>
-		<info name="gtin" value="04988751130206"/>
+		<info name="barcode" value="4988751130206"/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="pink sox - issue 04 (1991)(wendy magazine)(jp)(disk 1 of 2).dsk" size="737280" crc="430de116" sha1="1bfd64c062632c4db57e06198d82a52d783cd6de"/>
@@ -12576,7 +12573,7 @@ The following floppies came with the machines.
 		<publisher>Wendy Magazine</publisher>
 		<info name="alt_title" value="ピンクソックス５"/>
 		<info name="serial" value="WDM-109"/>
-		<info name="gtin" value="04988751330217"/>
+		<info name="barcode" value="4988751330217"/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 5A"/>
 			<dataarea name="flop" size="737280">
@@ -12597,7 +12594,7 @@ The following floppies came with the machines.
 		<publisher>Wendy Magazine</publisher>
 		<info name="alt_title" value="ピンクソックス６"/>
 		<info name="serial" value="WDM-110"/>
-		<info name="gtin" value="04988751630218"/>
+		<info name="barcode" value="4988751630218"/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 6A"/>
 			<dataarea name="flop" size="737280">
@@ -12618,7 +12615,7 @@ The following floppies came with the machines.
 		<publisher>Wendy Magazine</publisher>
 		<info name="alt_title" value="ピンクソックス７"/>
 		<info name="serial" value="WDM-111"/>
-		<info name="gtin" value="04988751830212"/>
+		<info name="barcode" value="4988751830212"/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 7A"/>
 			<dataarea name="flop" size="737280">
@@ -12639,7 +12636,7 @@ The following floppies came with the machines.
 		<publisher>Wendy Magazine</publisher>
 		<info name="alt_title" value="ピンクソックス８"/>
 		<info name="serial" value="WDM-116"/>
-		<info name="gtin" value="04988751430221"/>
+		<info name="barcode" value="4988751430221"/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk A"/>
 			<dataarea name="flop" size="737280">
@@ -12710,7 +12707,7 @@ The following floppies came with the machines.
 		<publisher>Wendy Magazine</publisher>
 		<info name="alt_title" value="PSマニア3"/>
 		<info name="serial" value="WDM-119"/>
-		<info name="gtin" value="04988751733230"/>
+		<info name="barcode" value="4988751733230"/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk A"/>
 			<dataarea name="flop" size="737280">
@@ -12736,7 +12733,7 @@ The following floppies came with the machines.
 		<year>1989</year>
 		<publisher>Elf</publisher>
 		<info name="alt_title" value="ぴんきぃ・ぽんきぃ第1集"/>
-		<info name="gtin" value="04988720890261"/>
+		<info name="barcode" value="4988720890261"/>
 		<info name="usage" value="Requires a Japanese system."/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk A"/>
@@ -12797,7 +12794,7 @@ The following floppies came with the machines.
 		<year>1989</year>
 		<publisher>Sony</publisher>
 		<info name="serial" value="HBS-G058D"/>
-		<info name="gtin" value="04901780088201"/>
+		<info name="barcode" value="4901780088201"/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="play ball iii (1989)(sony)(jp).dsk" size="737280" crc="adb81a26" sha1="45ffe0ce66df5c6fdc9fbb39e6d32d11adf341cf"/>
@@ -12810,7 +12807,7 @@ The following floppies came with the machines.
 		<year>1989</year>
 		<publisher>Sony</publisher>
 		<info name="serial" value="HBS-G058D"/>
-		<info name="gtin" value="04901780088201"/>
+		<info name="barcode" value="4901780088201"/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="play ball iii (1989)(sony)(jp)[a].dsk" size="737280" crc="cc1c881e" sha1="25c1f8f63ddb9423fadf854efab7a39dac117705"/>
@@ -12823,7 +12820,7 @@ The following floppies came with the machines.
 		<year>1989</year>
 		<publisher>Sony</publisher>
 		<info name="serial" value="HBS-G058D"/>
-		<info name="gtin" value="04901780088201"/>
+		<info name="barcode" value="4901780088201"/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="play ball iii (1989)(sony)(jp)[a2].dsk" size="737280" crc="d129d838" sha1="ae5ba99a9516b08f22935feeea4103c174b0db81"/>
@@ -12836,7 +12833,7 @@ The following floppies came with the machines.
 		<year>1989</year>
 		<publisher>Pony Tail Soft</publisher>
 		<info name="alt_title" value="ポッキー"/>
-		<info name="gtin" value="04988691732119"/>
+		<info name="barcode" value="4988691732119"/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk NO.1"/>
 			<dataarea name="flop" size="737280">
@@ -12863,7 +12860,7 @@ The following floppies came with the machines.
 		<year>1989</year>
 		<publisher>Pony Tail Soft</publisher>
 		<info name="alt_title" value="ポッキー"/>
-		<info name="gtin" value="04988691732119"/>
+		<info name="barcode" value="4988691732119"/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk NO.1"/>
 			<dataarea name="flop" size="737280">
@@ -12918,7 +12915,7 @@ The following floppies came with the machines.
 		<publisher>dB-Soft</publisher>
 		<info name="alt_title" value="今夜も朝までパワフルまあじゃん２"/>
 		<info name="serial" value="MXDF-12003 / MS2-G5120-P1"/>
-		<info name="gtin" value="04988605000150"/>
+		<info name="barcode" value="4988605000150"/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk A (MS2-G5120-L1)"/>
 			<dataarea name="flop" size="737280">
@@ -12952,7 +12949,7 @@ The following floppies came with the machines.
 		<publisher>dB-Soft</publisher>
 		<info name="alt_title" value="今夜も朝までパワフルまあじゃん２"/>
 		<info name="serial" value="MXDF-12003 / MS2-G5120-P1"/>
-		<info name="gtin" value="04988605000150"/>
+		<info name="barcode" value="4988605000150"/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk A (MS2-G5120-L1)"/>
 			<dataarea name="flop" size="368640">
@@ -12986,7 +12983,7 @@ The following floppies came with the machines.
 		<publisher>Micro Cabin</publisher>
 		<info name="alt_title" value="プリンセスメーカー"/>
 		<info name="serial" value="21144"/>
-		<info name="gtin" value="04988608211447"/>
+		<info name="barcode" value="4988608211447"/>
 		<info name="usage" value="Requires a system with Kanji ROM."/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk NO.1"/>
@@ -13039,7 +13036,7 @@ The following floppies came with the machines.
 		<publisher>Micro Cabin</publisher>
 		<info name="alt_title" value="プリンセスメーカー"/>
 		<info name="serial" value="21144"/>
-		<info name="gtin" value="04988608211447"/>
+		<info name="barcode" value="4988608211447"/>
 		<info name="usage" value="Requires a system with Kanji ROM."/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk NO.1"/>
@@ -13093,7 +13090,7 @@ The following floppies came with the machines.
 		<publisher>Micro Cabin</publisher>
 		<info name="alt_title" value="プリンセスメーカー"/>
 		<info name="serial" value="21144"/>
-		<info name="gtin" value="04988608211447"/>
+		<info name="barcode" value="4988608211447"/>
 		<info name="usage" value="Requires a system with Kanji ROM."/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk NO.1"/>
@@ -13247,7 +13244,7 @@ The following floppies came with the machines.
 		<publisher>T&amp;E Soft</publisher>
 		<info name="alt_title" value="サイオブレード"/>
 		<info name="serial" value="TEM-89 / MXTR12009"/>
-		<info name="gtin" value="04988604090893"/>
+		<info name="barcode" value="4988604090893"/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Program Disk"/>
 			<dataarea name="flop" size="737280">
@@ -13278,7 +13275,7 @@ The following floppies came with the machines.
 		<publisher>T&amp;E Soft</publisher>
 		<info name="alt_title" value="サイオブレード"/>
 		<info name="serial" value="TEM-89 / MXTR12009"/>
-		<info name="gtin" value="04988604090893"/>
+		<info name="barcode" value="4988604090893"/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Program Disk"/>
 			<dataarea name="flop" size="737280">
@@ -13309,7 +13306,7 @@ The following floppies came with the machines.
 		<publisher>T&amp;E Soft</publisher>
 		<info name="alt_title" value="サイオブレード"/>
 		<info name="serial" value="TEM-89 / MXTR12009"/>
-		<info name="gtin" value="04988604090893"/>
+		<info name="barcode" value="4988604090893"/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Program Disk"/>
 			<dataarea name="flop" size="737280">
@@ -13338,7 +13335,7 @@ The following floppies came with the machines.
 		<year>1988</year>
 		<publisher>Hertz</publisher>
 		<info name="alt_title" value="サイコワールド"/>
-		<info name="gtin" value="04980425010012"/>
+		<info name="barcode" value="4980425010012"/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="psycho world (1988)(hertz)(jp).dsk" size="737280" crc="a95b26b4" sha1="105317da4cad0b47b55389eba099384f39606720"/>
@@ -13351,7 +13348,7 @@ The following floppies came with the machines.
 		<year>1988</year>
 		<publisher>Hertz</publisher>
 		<info name="alt_title" value="サイコワールド"/>
-		<info name="gtin" value="04980425010012"/>
+		<info name="barcode" value="4980425010012"/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="psycho world (1988)(hertz)(jp)[a].dsk" size="737280" crc="5167e5c9" sha1="55b6d124c7ca3ebd1fdc537fc596532090164a55"/>
@@ -13364,7 +13361,7 @@ The following floppies came with the machines.
 		<year>1988</year>
 		<publisher>Hertz</publisher>
 		<info name="alt_title" value="サイコワールド"/>
-		<info name="gtin" value="04980425010012"/>
+		<info name="barcode" value="4980425010012"/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="psycho world (1988)(hertz)(jp)[a2].dsk" size="737280" crc="6eb74148" sha1="9482eda5ebbbaf6e3ef3e992c5e00882a48a9730"/>
@@ -13378,7 +13375,7 @@ The following floppies came with the machines.
 		<publisher>Compile</publisher>
 		<info name="alt_title" value="ぷよぷよ"/>
 		<info name="serial" value="IA-9106"/>
-		<info name="gtin" value="04988161100349"/>
+		<info name="barcode" value="4988161100349"/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="puyo puyo (1991)(compile).dsk" size="737280" crc="fafd2686" sha1="5a105f111b744dfbf847adc4fb0f639c41496c30"/>
@@ -13417,7 +13414,7 @@ The following floppies came with the machines.
 		<publisher>Bit²</publisher>
 		<info name="alt_title" value="クインプル"/>
 		<info name="serial" value="BM-802D"/>
-		<info name="gtin" value="04988655230286"/>
+		<info name="barcode" value="4988655230286"/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="quinpl (1988)(bit2)(jp).dsk" size="737280" crc="c793829f" sha1="b96445ff9ec43ffa74074257f6e0bf3f33cc219c"/>
@@ -13431,7 +13428,7 @@ The following floppies came with the machines.
 		<publisher>Bit²</publisher>
 		<info name="alt_title" value="クインプル"/>
 		<info name="serial" value="BM-802D"/>
-		<info name="gtin" value="04988655230286"/>
+		<info name="barcode" value="4988655230286"/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="quinpl (1988)(bit2)(jp)[a].dsk" size="737280" crc="4ccbbdd3" sha1="3829be847ab17fc142b769a7d3ec6f7543ee5ddd"/>
@@ -13445,7 +13442,7 @@ The following floppies came with the machines.
 		<publisher>Bit²</publisher>
 		<info name="alt_title" value="クインプル"/>
 		<info name="serial" value="BM-802D"/>
-		<info name="gtin" value="04988655230286"/>
+		<info name="barcode" value="4988655230286"/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="quinpl (1988)(bit2)(jp)[a2].dsk" size="737280" crc="c14a8b04" sha1="6db2182db5f98c60db70cb79bfe8fb0ccb297c58"/>
@@ -13587,7 +13584,7 @@ The following floppies came with the machines.
 		<year>1990</year>
 		<publisher>Alicesoft</publisher>
 		<info name="alt_title" value="RANCE II - 反逆の少女達"/>
-		<info name="gtin" value="04988650300199"/>
+		<info name="barcode" value="4988650300199"/>
 		<info name="usage" value="Requires a system with Kanji ROM."/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk A"/>
@@ -13627,7 +13624,7 @@ The following floppies came with the machines.
 		<publisher>Compile</publisher>
 		<info name="alt_title" value="ランダーの冒険III ～闇に魅せられた魔術師～"/>
 		<info name="serial" value="IA-9002"/>
-		<info name="gtin" value="04988161000137"/>
+		<info name="barcode" value="4988161000137"/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="737280">
@@ -13666,7 +13663,7 @@ The following floppies came with the machines.
 		<publisher>Compile</publisher>
 		<info name="alt_title" value="ランダーの冒険III ～闇に魅せられた魔術師～"/>
 		<info name="serial" value="IA-9002"/>
-		<info name="gtin" value="04988161000137"/>
+		<info name="barcode" value="4988161000137"/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="737280">
@@ -13706,7 +13703,7 @@ The following floppies came with the machines.
 		<publisher>Compile</publisher>
 		<info name="alt_title" value="ランダーの冒険III ～闇に魅せられた魔術師～"/>
 		<info name="serial" value="IA-9002"/>
-		<info name="gtin" value="04988161000137"/>
+		<info name="barcode" value="4988161000137"/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="737280">
@@ -13743,7 +13740,7 @@ The following floppies came with the machines.
 		<description>Ray Gun (Japan)</description>
 		<year>1991</year>
 		<publisher>Elf</publisher>
-		<info name="gtin" value="04988720890537"/>
+		<info name="barcode" value="4988720890537"/>
 		<info name="usage" value="Boot with CTRL pressed. Requires a Japanese system."/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk A"/>
@@ -13787,7 +13784,7 @@ The following floppies came with the machines.
 		<description>Ray Gun (Japan, alt)</description>
 		<year>1991</year>
 		<publisher>Elf</publisher>
-		<info name="gtin" value="04988720890537"/>
+		<info name="barcode" value="4988720890537"/>
 		<info name="usage" value="Boot with CTRL pressed. Requires a Japanese system."/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk A"/>
@@ -13832,7 +13829,7 @@ The following floppies came with the machines.
 		<year>1989</year>
 		<publisher>Humming Bird Soft</publisher>
 		<info name="alt_title" value="ロードス島戦記灰色の魔女"/>
-		<info name="gtin" value="04960695134229"/>
+		<info name="barcode" value="4960695134229"/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Opening Disk"/>
 			<dataarea name="flop" size="737280">
@@ -13871,7 +13868,7 @@ The following floppies came with the machines.
 		<year>1989</year>
 		<publisher>Humming Bird Soft</publisher>
 		<info name="alt_title" value="ロードス島戦記"/>
-		<info name="gtin" value="04960695134229"/>
+		<info name="barcode" value="4960695134229"/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Opening Disk"/>
 			<dataarea name="flop" size="737280">
@@ -13910,7 +13907,7 @@ The following floppies came with the machines.
 		<year>1990</year>
 		<publisher>Humming Bird Soft</publisher>
 		<info name="alt_title" value="ロードス島戦記福神漬"/>
-		<info name="gtin" value="04960695164226"/>
+		<info name="barcode" value="4960695164226"/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="record of lodoss war pack (1990)(humming bird soft)(jp).dsk" size="737280" crc="1f7067d0" sha1="8227ea797c8bb0b131d9f0078309008d7ef98a4d"/>
@@ -14047,7 +14044,7 @@ The following floppies came with the machines.
 		<year>1990</year>
 		<publisher>System Soft</publisher>
 		<info name="alt_title" value="ロボクラッシュ"/>
-		<info name="gtin" value="04988697690017"/>
+		<info name="barcode" value="4988697690017"/>
 		<info name="usage" value="Requires a Japanese system."/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Game Disk 1"/>
@@ -14068,7 +14065,7 @@ The following floppies came with the machines.
 		<year>1990</year>
 		<publisher>System Soft</publisher>
 		<info name="alt_title" value="ロボクラッシュ"/>
-		<info name="gtin" value="04988697690017"/>
+		<info name="barcode" value="4988697690017"/>
 		<info name="usage" value="Requires a Japanese system."/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Game Disk 1"/>
@@ -14089,7 +14086,7 @@ The following floppies came with the machines.
 		<year>1990</year>
 		<publisher>System Soft</publisher>
 		<info name="alt_title" value="ロボクラッシュ"/>
-		<info name="gtin" value="04988697690017"/>
+		<info name="barcode" value="4988697690017"/>
 		<info name="usage" value="Requires a Japanese system."/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Game Disk 1"/>
@@ -14110,7 +14107,7 @@ The following floppies came with the machines.
 		<year>1989</year>
 		<publisher>Starcraft</publisher>
 		<info name="alt_title" value="ローグアライアンス"/>
-		<info name="gtin" value="04988702401041"/>
+		<info name="barcode" value="4988702401041"/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="rogue alliance (1989)(starcraft)(jp).dsk" size="737280" crc="e98c1182" sha1="41de575bba36a147de98e89e84278b8b3d10ca08"/>
@@ -14173,7 +14170,7 @@ The following floppies came with the machines.
 		<year>1991</year>
 		<publisher>Koei</publisher>
 		<info name="alt_title" value="ロイヤルブラッド"/>
-		<info name="gtin" value="04988615003080"/>
+		<info name="barcode" value="4988615003080"/>
 		<info name="usage" value="Boot with CTRL pressed. Requires a Japanese system."/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk A"/>
@@ -14201,7 +14198,7 @@ The following floppies came with the machines.
 		<year>1991</year>
 		<publisher>Koei</publisher>
 		<info name="alt_title" value="ロイヤルブラッド"/>
-		<info name="gtin" value="04988615003080"/>
+		<info name="barcode" value="4988615003080"/>
 		<info name="usage" value="Boot with CTRL pressed. Requires a Japanese system."/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk A"/>
@@ -14299,7 +14296,7 @@ The following floppies came with the machines.
 		<publisher>T&amp;E Soft</publisher>
 		<info name="alt_title" value="ルーンワース黒衣の貴公子"/>
 		<info name="serial" value="TEM-101"/>
-		<info name="gtin" value="04988604091012"/>
+		<info name="barcode" value="4988604091012"/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Start Disk"/>
 			<dataarea name="flop" size="737280">
@@ -14333,7 +14330,7 @@ The following floppies came with the machines.
 		<publisher>T&amp;E Soft</publisher>
 		<info name="alt_title" value="ルーンワース黒衣の貴公子"/>
 		<info name="serial" value="TEM-101"/>
-		<info name="gtin" value="04988604091012"/>
+		<info name="barcode" value="4988604091012"/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Start Disk"/>
 			<dataarea name="flop" size="737280">
@@ -14391,7 +14388,7 @@ The following floppies came with the machines.
 		<publisher>Banpresto</publisher>
 		<info name="alt_title" value="ＳＤガンダムガチャポン戦士２カプセル戦記"/>
 		<info name="serial" value="104017-30005-8600"/>
-		<info name="gtin" value="04983164300055"/>
+		<info name="barcode" value="4983164300055"/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="sd gundam - gachapon senshi 2. capsule senki 2 (1990)(banpresto)(jp).dsk" size="737280" crc="a6728515" sha1="6adf607783a7d8db753d042f56df3e5572c28d2c"/>
@@ -14405,7 +14402,7 @@ The following floppies came with the machines.
 		<publisher>Banpresto</publisher>
 		<info name="alt_title" value="ＳＤガンダムガチャポン戦士２カプセル戦記"/>
 		<info name="serial" value="104017-30005-8600"/>
-		<info name="gtin" value="04983164300055"/>
+		<info name="barcode" value="4983164300055"/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="sd gundam - gachapon senshi 2. capsule senki 2 (1990)(banpresto)(jp)[a].dsk" size="737280" crc="ca9a24f8" sha1="675fb35919e8f01d744a22553876ed2be807300c"/>
@@ -14418,7 +14415,7 @@ The following floppies came with the machines.
 		<year>1988</year>
 		<publisher>Telenet Japan</publisher>
 		<info name="alt_title" value="紫醜罹"/>
-		<info name="gtin" value="04988624922082"/>
+		<info name="barcode" value="4988624922082"/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="sa-zi-ri. saziri (1988)(telenet japan)(jp).dsk" size="737280" crc="5e4c9dff" sha1="c035e1ac3af6969ef0b2ac9bbf7aa51b948cb0ce"/>
@@ -14431,7 +14428,7 @@ The following floppies came with the machines.
 		<year>1988</year>
 		<publisher>Telenet Japan</publisher>
 		<info name="alt_title" value="紫醜罹"/>
-		<info name="gtin" value="04988624922082"/>
+		<info name="barcode" value="4988624922082"/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="sa-zi-ri. saziri (1988)(telenet japan)(jp)[a].dsk" size="737280" crc="eae0dbae" sha1="147a8fbca7ee9e278bd5a687d3b270f84dfa8e02"/>
@@ -14532,7 +14529,7 @@ The following floppies came with the machines.
 		<publisher>Koei</publisher>
 		<info name="alt_title" value="三國志II"/>
 		<info name="serial" value="MXKN 12009"/>
-		<info name="gtin" value="04988615001444"/>
+		<info name="barcode" value="4988615001444"/>
 		<info name="usage" value="Boot with CTRL pressed. Requires a Japanese system."/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk A"/>
@@ -14561,7 +14558,7 @@ The following floppies came with the machines.
 		<publisher>Koei</publisher>
 		<info name="alt_title" value="三國志II"/>
 		<info name="serial" value="MXKN 12009"/>
-		<info name="gtin" value="04988615001444"/>
+		<info name="barcode" value="4988615001444"/>
 		<info name="usage" value="Boot with CTRL pressed. Requires a Japanese system."/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk A"/>
@@ -14650,7 +14647,7 @@ The following floppies came with the machines.
 		<year>1989</year>
 		<publisher>Kogado</publisher>
 		<info name="alt_title" value="狂嵐の銀河 シュヴァルツシルト"/>
-		<info name="gtin" value="04959067897503"/>
+		<info name="barcode" value="4959067897503"/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk A"/>
 			<dataarea name="flop" size="737280">
@@ -14670,7 +14667,7 @@ The following floppies came with the machines.
 		<year>1989</year>
 		<publisher>Kogado</publisher>
 		<info name="alt_title" value="狂嵐の銀河 シュヴァルツシルト"/>
-		<info name="gtin" value="04959067897503"/>
+		<info name="barcode" value="4959067897503"/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk A"/>
 			<dataarea name="flop" size="737280">
@@ -14690,7 +14687,7 @@ The following floppies came with the machines.
 		<year>1990</year>
 		<publisher>Kogado</publisher>
 		<info name="alt_title" value="シュヴァルツシルト II 帝國ノ背信"/>
-		<info name="gtin" value="04959067909503"/>
+		<info name="barcode" value="4959067909503"/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk A"/>
 			<dataarea name="flop" size="737280">
@@ -14710,7 +14707,7 @@ The following floppies came with the machines.
 		<year>1990</year>
 		<publisher>Kogado</publisher>
 		<info name="alt_title" value="シュヴァルツシルト II 帝國ノ背信"/>
-		<info name="gtin" value="04959067909503"/>
+		<info name="barcode" value="4959067909503"/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk A"/>
 			<dataarea name="flop" size="737280">
@@ -14743,7 +14740,7 @@ The following floppies came with the machines.
 		<publisher>Nihon Bussan</publisher>
 		<info name="alt_title" value="制覇"/>
 		<info name="serial" value="NM-01"/>
-		<info name="gtin" value="04960641010003"/>
+		<info name="barcode" value="4960641010003"/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="nihongo kotora striptease. conquest (1988)(nihon bussan)(jp).dsk" size="737280" crc="2a9026f5" sha1="33d763a858c2dbf35eab1f65ad8f6064ecf5cda9"/>
@@ -14757,7 +14754,7 @@ The following floppies came with the machines.
 		<publisher>Nihon Bussan</publisher>
 		<info name="alt_title" value="制覇"/>
 		<info name="serial" value="NM-01"/>
-		<info name="gtin" value="04960641010003"/>
+		<info name="barcode" value="4960641010003"/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="nihongo kotora striptease. conquest (1988)(nihon bussan)(jp)[a].dsk" size="737280" crc="ce0ce536" sha1="ca807c3cd44e4738551db0ad21d8d3877a3cdf26"/>
@@ -14782,7 +14779,7 @@ The following floppies came with the machines.
 		<year>1988</year>
 		<publisher>Micro Cabin</publisher>
 		<info name="alt_title" value="セイレーン"/>
-		<info name="gtin" value="04988608733444"/>
+		<info name="barcode" value="4988608733444"/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="737280">
@@ -14997,7 +14994,7 @@ The following floppies came with the machines.
 		<publisher>Technopolis Soft</publisher>
 		<info name="alt_title" value="シェナンドラゴン"/>
 		<info name="serial" value="TKPO-80018 / TC30041010"/>
-		<info name="gtin" value="04988008004496"/>
+		<info name="barcode" value="4988008004496"/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk A"/>
 			<dataarea name="flop" size="737280">
@@ -15017,7 +15014,7 @@ The following floppies came with the machines.
 		<year>1990</year>
 		<publisher>Scaptrust</publisher>
 		<info name="alt_title" value="紫禁城"/>
-		<info name="gtin" value="04988660521126"/>
+		<info name="barcode" value="4988660521126"/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Game Disk"/>
 			<dataarea name="flop" size="737280">
@@ -15038,7 +15035,7 @@ The following floppies came with the machines.
 		<year>1990</year>
 		<publisher>Scaptrust</publisher>
 		<info name="alt_title" value="紫禁城"/>
-		<info name="gtin" value="04988660521126"/>
+		<info name="barcode" value="4988660521126"/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Game Disk"/>
 			<dataarea name="flop" size="737280">
@@ -15127,7 +15124,7 @@ The following floppies came with the machines.
 		<publisher>Techno Soft</publisher>
 		<info name="alt_title" value="新九玉伝"/>
 		<info name="serial" value="MXJT12005"/>
-		<info name="gtin" value="04907095000266"/>
+		<info name="barcode" value="4907095000266"/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk I"/>
 			<dataarea name="flop" size="737280">
@@ -15148,7 +15145,7 @@ The following floppies came with the machines.
 		<publisher>Tecno Soft</publisher>
 		<info name="alt_title" value="新九玉伝"/>
 		<info name="serial" value="MXJT12005"/>
-		<info name="gtin" value="04907095000266"/>
+		<info name="barcode" value="4907095000266"/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk I"/>
 			<dataarea name="flop" size="737280">
@@ -15302,7 +15299,7 @@ The following floppies came with the machines.
 		<publisher>Micro Cabin</publisher>
 		<info name="alt_title" value="倉庫番パーフェクト"/>
 		<info name="serial" value="94144"/>
-		<info name="gtin" value="04988608941443"/>
+		<info name="barcode" value="4988608941443"/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="perfect soukoban (1989)(micro cabin)(disk 1 of 2).dsk" size="737280" crc="fa5b174b" sha1="4dc15e702ab172ebb4ce7b9b7f023575742bd910"/>
@@ -15322,7 +15319,7 @@ The following floppies came with the machines.
 		<publisher>Micro Cabin</publisher>
 		<info name="alt_title" value="倉庫番パーフェクト"/>
 		<info name="serial" value="94144"/>
-		<info name="gtin" value="04988608941443"/>
+		<info name="barcode" value="4988608941443"/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="perfect soukoban (1989)(micro cabin)(disk 1 of 2)[a].dsk" size="737280" crc="94e03a91" sha1="fe5e2b5ae24d2cd7d9d58f7f4dc3452e1c06441c"/>
@@ -15343,7 +15340,7 @@ The following floppies came with the machines.
 		<publisher>Micro Cabin</publisher>
 		<info name="alt_title" value="倉庫番パーフェクト"/>
 		<info name="serial" value="94144"/>
-		<info name="gtin" value="04988608941443"/>
+		<info name="barcode" value="4988608941443"/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="perfect soukoban (1989)(micro cabin)(disk 1 of 2)[a2].dsk" size="737280" crc="84c5ae09" sha1="d803edfb0e2852490b38510fd585cc97fcf73c20"/>
@@ -15422,7 +15419,7 @@ The following floppies came with the machines.
 		<year>1987</year>
 		<publisher>Falcom</publisher>
 		<info name="alt_title" value="ソーサリアン"/>
-		<info name="gtin" value="04977766090155"/>
+		<info name="barcode" value="4977766090155"/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Game Disk"/>
 			<dataarea name="flop" size="737280">
@@ -15460,7 +15457,7 @@ The following floppies came with the machines.
 		<year>1987</year>
 		<publisher>Falcom</publisher>
 		<info name="alt_title" value="ソーサリアン"/>
-		<info name="gtin" value="04977766090155"/>
+		<info name="barcode" value="4977766090155"/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Game Disk"/>
 			<dataarea name="flop" size="737280">
@@ -15555,7 +15552,7 @@ The following floppies came with the machines.
 		<year>1990</year>
 		<publisher>D.O.</publisher>
 		<info name="alt_title" value="星の砂物語"/>
-		<info name="gtin" value="04988703010440"/>
+		<info name="barcode" value="4988703010440"/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk A"/>
 			<dataarea name="flop" size="737280">
@@ -15600,7 +15597,7 @@ The following floppies came with the machines.
 		<publisher>Scaptrust</publisher>
 		<info name="alt_title" value="スターシップランデブー"/>
 		<info name="serial" value="EE-1806"/>
-		<info name="gtin" value="04988660551062"/>
+		<info name="barcode" value="4988660551062"/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="737280">
@@ -15621,7 +15618,7 @@ The following floppies came with the machines.
 		<publisher>Scaptrust</publisher>
 		<info name="alt_title" value="スターシップランデブー"/>
 		<info name="serial" value="EE-1806"/>
-		<info name="gtin" value="04988660551062"/>
+		<info name="barcode" value="4988660551062"/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="737280">
@@ -15642,7 +15639,7 @@ The following floppies came with the machines.
 		<publisher>Scaptrust</publisher>
 		<info name="alt_title" value="スターシップランデブー"/>
 		<info name="serial" value="EE-1806"/>
-		<info name="gtin" value="04988660551062"/>
+		<info name="barcode" value="4988660551062"/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="737280">
@@ -15688,7 +15685,7 @@ The following floppies came with the machines.
 		<publisher>Koei</publisher>
 		<info name="alt_title" value="水滸伝・天命の誓い"/>
 		<info name="serial" value="MXKN12011"/>
-		<info name="gtin" value="04988615000904"/>
+		<info name="barcode" value="4988615000904"/>
 		<info name="usage" value="Boot with CRTL pressed. Requires a Japanese system."/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
@@ -15704,7 +15701,7 @@ The following floppies came with the machines.
 		<publisher>Koei</publisher>
 		<info name="alt_title" value="水滸伝・天命の誓い"/>
 		<info name="serial" value="MXKN12011"/>
-		<info name="gtin" value="04988615000904"/>
+		<info name="barcode" value="4988615000904"/>
 		<info name="usage" value="Boot with CRTL pressed. Requires a Japanese system."/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
@@ -15718,7 +15715,7 @@ The following floppies came with the machines.
 		<year>1988</year>
 		<publisher>Micro Cabin</publisher>
 		<info name="alt_title" value="スーパー大戦略"/>
-		<info name="gtin" value="04988608851445"/>
+		<info name="barcode" value="4988608851445"/>
 		<info name="usage" value="Requires a Japanese system."/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
@@ -15746,7 +15743,7 @@ The following floppies came with the machines.
 		<publisher>Wendy Magazine</publisher>
 		<info name="alt_title" value="スーパーピンクソックス"/>
 		<info name="serial" value="WDM-107"/>
-		<info name="gtin" value="04988751930202"/>
+		<info name="barcode" value="4988751930202"/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="super pink sox - issue 01 (1990)(wendy magazine)(jp)(disk 1 of 2).dsk" size="737280" crc="cc372940" sha1="b0043404ff8d6d213a8505534106d75e8d934861"/>
@@ -15765,7 +15762,7 @@ The following floppies came with the machines.
 		<publisher>Wendy Magazine</publisher>
 		<info name="alt_title" value="スーパーピンクソックス"/>
 		<info name="serial" value="WDM-107"/>
-		<info name="gtin" value="04988751930202"/>
+		<info name="barcode" value="4988751930202"/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="super pink sox - issue 01 (1990)(wendy magazine)(jp)(disk 1 of 2)[a].dsk" size="737280" crc="7bfb63ad" sha1="1389aa297fd3cfb810836422fa51d8c192b6ecbf"/>
@@ -15784,7 +15781,7 @@ The following floppies came with the machines.
 		<publisher>Wendy Magazine</publisher>
 		<info name="alt_title" value="スーパーピンクソックス2 -ゆかのフシギな体験-"/>
 		<info name="serial" value="WDM-117"/>
-		<info name="gtin" value="04988751030124"/>
+		<info name="barcode" value="4988751030124"/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk A"/>
 			<dataarea name="flop" size="737280">
@@ -15906,7 +15903,7 @@ The following floppies came with the machines.
 		<publisher>Bit²</publisher>
 		<info name="alt_title" value="シンセサウルス version 2.0"/>
 		<info name="serial" value="BM-912"/>
-		<info name="gtin" value="04988655231191"/>
+		<info name="barcode" value="4988655231191"/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="synth saurus v2.0 - bit2 (v2.03).dsk" size="737280" crc="2f056983" sha1="fcbff56b458c48e8df5573c749ce1c5684581a50"/>
@@ -15921,7 +15918,7 @@ The following floppies came with the machines.
 		<publisher>Bit²</publisher>
 		<info name="alt_title" value="シンセサウルス version 2.0"/>
 		<info name="serial" value="BM-912"/>
-		<info name="gtin" value="04988655231191"/>
+		<info name="barcode" value="4988655231191"/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="synth saurus v2.0 (1989)(bit2)(jp).dsk" size="737280" crc="56996c4a" sha1="7b2c8090c0199e03d7c91bf056e0369328df520d"/>
@@ -15978,7 +15975,7 @@ The following floppies came with the machines.
 		<description>TNT (France)</description>
 		<year>1987</year>
 		<publisher>Infogrames</publisher>
-		<info name="gtin" value="09782737800160"/>
+		<info name="barcode" value="9782737800160"/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="t.n.t. (1987)(infogrames)(fr).dsk" size="737280" crc="187ca0ea" sha1="e53de8fba9c25cd61e804d05a0fde67712591c25"/>
@@ -15991,7 +15988,7 @@ The following floppies came with the machines.
 		<description>TNT (France, alt)</description>
 		<year>1987</year>
 		<publisher>Infogrames</publisher>
-		<info name="gtin" value="09782737800160"/>
+		<info name="barcode" value="9782737800160"/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="t.n.t. (1987)(infogrames)(fr)[a].dsk" size="737280" crc="3a1693fb" sha1="eea1d25eecf9c209dc1e1f62a61028b40d84afc4"/>
@@ -16004,7 +16001,7 @@ The following floppies came with the machines.
 		<description>TNT (France, alt 2)</description>
 		<year>1987</year>
 		<publisher>Infogrames</publisher>
-		<info name="gtin" value="09782737800160"/>
+		<info name="barcode" value="9782737800160"/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="t.n.t. (1987)(infogrames)(fr)[a2].dsk" size="737280" crc="ddfc07c5" sha1="1244ba7bb1d4aad606216314ef11cf91f9120523"/>
@@ -16296,7 +16293,7 @@ The following floppies came with the machines.
 		<publisher>BPS</publisher>
 		<info name="alt_title" value="テトリス"/>
 		<info name="serial" value="MXBP-12002"/>
-		<info name="gtin" value="04988627100104"/>
+		<info name="barcode" value="4988627100104"/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="tetris (1988)(bps)(jp).dsk" size="737280" crc="01610e9d" sha1="6641aa6bbdc456e5bd2004a47172b9a5ddfa7032"/>
@@ -16310,7 +16307,7 @@ The following floppies came with the machines.
 		<publisher>BPS</publisher>
 		<info name="alt_title" value="テトリス"/>
 		<info name="serial" value="MXBP-12002"/>
-		<info name="gtin" value="04988627100104"/>
+		<info name="barcode" value="4988627100104"/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="tetris v2 (1988)(bps)(jp).dsk" size="737280" crc="6ffb0c50" sha1="e23259d6d941db9e0ff62da503a3a8087e9ed36e"/>
@@ -16324,7 +16321,7 @@ The following floppies came with the machines.
 		<publisher>Micro Cabin</publisher>
 		<info name="alt_title" value="THE TOWER? OF CABIN～キャビンパニック～"/>
 		<info name="serial" value="25244"/>
-		<info name="gtin" value="04988608252440"/>
+		<info name="barcode" value="4988608252440"/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk NO.1"/>
 			<dataarea name="flop" size="737280">
@@ -16352,7 +16349,7 @@ The following floppies came with the machines.
 		<publisher>Micro Cabin</publisher>
 		<info name="alt_title" value="THE TOWER? OF CABIN～キャビンパニック～"/>
 		<info name="serial" value="25244"/>
-		<info name="gtin" value="04988608252440"/>
+		<info name="barcode" value="4988608252440"/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk NO.1"/>
 			<dataarea name="flop" size="737280">
@@ -16379,7 +16376,7 @@ The following floppies came with the machines.
 		<publisher>Micro Cabin</publisher>
 		<info name="alt_title" value="THE TOWER? OF CABIN～キャビンパニック～"/>
 		<info name="serial" value="25244"/>
-		<info name="gtin" value="04988608252440"/>
+		<info name="barcode" value="4988608252440"/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk NO.1"/>
 			<dataarea name="flop" size="737280">
@@ -16468,7 +16465,7 @@ The following floppies came with the machines.
 		<year>1990</year>
 		<publisher>System Soft</publisher>
 		<info name="alt_title" value="禁断の塔ティル・ナ・ノーグ"/>
-		<info name="gtin" value="04988697620113"/>
+		<info name="barcode" value="4988697620113"/>
 		<info name="usage" value="Requires a Japanese system."/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1"/>
@@ -16495,7 +16492,7 @@ The following floppies came with the machines.
 		<year>1990</year>
 		<publisher>System Soft</publisher>
 		<info name="alt_title" value="禁断の塔ティル・ナ・ノーグ"/>
-		<info name="gtin" value="04988697620113"/>
+		<info name="barcode" value="4988697620113"/>
 		<info name="usage" value="Requires a Japanese system."/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1"/>
@@ -16589,7 +16586,7 @@ The following floppies came with the machines.
 		<publisher>Xain Soft</publisher>
 		<info name="alt_title" value="トリトーン２"/>
 		<info name="serial" value="MXZS-12012"/>
-		<info name="gtin" value="04988636610272"/>
+		<info name="barcode" value="4988636610272"/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk A"/>
 			<dataarea name="flop" size="737280">
@@ -16623,7 +16620,7 @@ The following floppies came with the machines.
 		<publisher>Xain Soft</publisher>
 		<info name="alt_title" value="トリトーン２"/>
 		<info name="serial" value="MXZS-12012"/>
-		<info name="gtin" value="04988636610272"/>
+		<info name="barcode" value="4988636610272"/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk A"/>
 			<dataarea name="flop" size="737280">
@@ -16667,7 +16664,7 @@ The following floppies came with the machines.
 		<year>1990</year>
 		<publisher>Alicesoft</publisher>
 		<info name="alt_title" value="闘神都市"/>
-		<info name="gtin" value="04988650300212"/>
+		<info name="barcode" value="4988650300212"/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk A"/>
 			<dataarea name="flop" size="737280">
@@ -16723,7 +16720,7 @@ The following floppies came with the machines.
 		<year>1990</year>
 		<publisher>Alicesoft</publisher>
 		<info name="alt_title" value="闘神都市"/>
-		<info name="gtin" value="04988650300212"/>
+		<info name="barcode" value="4988650300212"/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk A"/>
 			<dataarea name="flop" size="737280">
@@ -16779,7 +16776,7 @@ The following floppies came with the machines.
 		<year>1990</year>
 		<publisher>Alicesoft</publisher>
 		<info name="alt_title" value="闘神都市"/>
-		<info name="gtin" value="04988650300212"/>
+		<info name="barcode" value="4988650300212"/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk A"/>
 			<dataarea name="flop" size="737280">
@@ -16967,7 +16964,7 @@ The following floppies came with the machines.
 		<publisher>Pony Canyon</publisher>
 		<info name="alt_title" value="ウルティマIV"/>
 		<info name="serial" value="L118Y5551"/>
-		<info name="gtin" value="04988013012295"/>
+		<info name="barcode" value="4988013012295"/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="737280">
@@ -17000,7 +16997,7 @@ The following floppies came with the machines.
 		<publisher>T&amp;E Soft</publisher>
 		<info name="alt_title" value="アンデッドライン"/>
 		<info name="serial" value="TEM-98"/>
-		<info name="gtin" value="04988604090985"/>
+		<info name="barcode" value="4988604090985"/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="undeadline (1989)(t&amp;e soft)(jp).dsk" size="737280" crc="44acb4db" sha1="64a79efb84d42248666a53ae80b8d267fdc7bb4f"/>
@@ -17014,7 +17011,7 @@ The following floppies came with the machines.
 		<publisher>T&amp;E Soft</publisher>
 		<info name="alt_title" value="アンデッドライン"/>
 		<info name="serial" value="TEM-98"/>
-		<info name="gtin" value="04988604090985"/>
+		<info name="barcode" value="4988604090985"/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="undeadline (1989)(t&amp;e soft)(jp)[a].dsk" size="737280" crc="1feb7277" sha1="9eff907fab1ba3c3c24c297d5d23f5b7c0083466"/>
@@ -17028,7 +17025,7 @@ The following floppies came with the machines.
 		<publisher>T&amp;E Soft</publisher>
 		<info name="alt_title" value="アンデッドライン"/>
 		<info name="serial" value="TEM-98"/>
-		<info name="gtin" value="04988604090985"/>
+		<info name="barcode" value="4988604090985"/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="undeadline (1989)(t&amp;e soft)(jp)[a2].dsk" size="737280" crc="3afef6a7" sha1="b980f2cc0601a8a1d8f30673b7819423205b1fea"/>
@@ -17089,7 +17086,7 @@ The following floppies came with the machines.
 		<publisher>Konami</publisher>
 		<info name="alt_title" value="コナミの占いセンセーション"/>
 		<info name="serial" value="RA003"/>
-		<info name="gtin" value="04988602541311"/>
+		<info name="barcode" value="4988602541311"/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="uranai sensation. fortune teller (1988)(konami)(jp).dsk" size="737280" crc="59a11ccb" sha1="ed476ec5e77b39a2d9ba4df3b5eca50938131a48"/>
@@ -17104,7 +17101,7 @@ The following floppies came with the machines.
 		<publisher>Konami</publisher>
 		<info name="alt_title" value="コナミの占いセンセーション"/>
 		<info name="serial" value="RA003"/>
-		<info name="gtin" value="04988602541311"/>
+		<info name="barcode" value="4988602541311"/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="uranai sensation. fortune teller (1988)(konami)(jp)[a].dsk" size="737280" crc="a0a21a84" sha1="19da8aa252837efa51bc801703d399ca2fdc7aaf"/>
@@ -17205,7 +17202,7 @@ The following floppies came with the machines.
 		<year>1989</year>
 		<publisher>Telenet Japan</publisher>
 		<info name="alt_title" value="夢幻戦士ヴァリスII"/>
-		<info name="gtin" value="04988624920156"/>
+		<info name="barcode" value="4988624920156"/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk A"/>
 			<dataarea name="flop" size="737280">
@@ -17238,7 +17235,7 @@ The following floppies came with the machines.
 		<year>1989</year>
 		<publisher>Telenet Japan</publisher>
 		<info name="alt_title" value="夢幻戦士ヴァリスII"/>
-		<info name="gtin" value="04988624920156"/>
+		<info name="barcode" value="4988624920156"/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk A"/>
 			<dataarea name="flop" size="737280">
@@ -17298,7 +17295,7 @@ The following floppies came with the machines.
 		<publisher>Victor</publisher>
 		<info name="alt_title" value="死霊戦線２"/>
 		<info name="serial" value="M-3501-2"/>
-		<info name="gtin" value="04988110007019"/>
+		<info name="barcode" value="4988110007019"/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="shiryou sensen 2. war of the dead 2 (1990)(victor)(jp)(disk 1 of 2).dsk" size="737280" crc="bbe61f63" sha1="fd9aa0eb8e5451fd0cb51a8296cb1004692dc727"/>
@@ -17317,7 +17314,7 @@ The following floppies came with the machines.
 		<publisher>Victor</publisher>
 		<info name="alt_title" value="死霊戦線２"/>
 		<info name="serial" value="M-3501-2"/>
-		<info name="gtin" value="04988110007019"/>
+		<info name="barcode" value="4988110007019"/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="shiryou sensen 2. war of the dead 2 (1990)(victor)(jp)(disk 1 of 2)[a].dsk" size="737280" crc="da14c892" sha1="c8aaab60bdd3a28db183fef601f483635f988406"/>
@@ -17336,7 +17333,7 @@ The following floppies came with the machines.
 		<publisher>Victor</publisher>
 		<info name="alt_title" value="死霊戦線２"/>
 		<info name="serial" value="M-3501-2"/>
-		<info name="gtin" value="04988110007019"/>
+		<info name="barcode" value="4988110007019"/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="shiryou sensen 2. war of the dead 2 (1990)(victor)(jp)(disk 1 of 2).dsk" size="737280" crc="bbe61f63" sha1="fd9aa0eb8e5451fd0cb51a8296cb1004692dc727"/>
@@ -17379,7 +17376,7 @@ The following floppies came with the machines.
 		<publisher>Compile</publisher>
 		<info name="alt_title" value="笑ゥせぇるすまん"/>
 		<info name="serial" value="IA-9108"/>
-		<info name="gtin" value="04988161100424"/>
+		<info name="barcode" value="4988161100424"/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="737280">
@@ -17412,7 +17409,7 @@ The following floppies came with the machines.
 		<year>1991</year>
 		<publisher>Fairytale</publisher>
 		<info name="alt_title" value="私をゴルフに連れてって"/>
-		<info name="gtin" value="04988715000828"/>
+		<info name="barcode" value="4988715000828"/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk A"/>
 			<dataarea name="flop" size="737280">
@@ -17450,7 +17447,7 @@ The following floppies came with the machines.
 		<year>1989</year>
 		<publisher>Micro Cabin</publisher>
 		<info name="alt_title" value="ホワッツマイケル"/>
-		<info name="gtin" value="04988608863448"/>
+		<info name="barcode" value="4988608863448"/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="737280">
@@ -17471,7 +17468,7 @@ The following floppies came with the machines.
 		<publisher>Enix</publisher>
 		<info name="alt_title" value="ウイングマンスペシャル"/>
 		<info name="serial" value="E-G217"/>
-		<info name="gtin" value="04988601002172"/>
+		<info name="barcode" value="4988601002172"/>
 		<info name="usage" value="Requires a Japanese system."/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk NO.1"/>
@@ -17493,7 +17490,7 @@ The following floppies came with the machines.
 		<publisher>Enix</publisher>
 		<info name="alt_title" value="ウイングマンスペシャル"/>
 		<info name="serial" value="E-G217"/>
-		<info name="gtin" value="04988601002172"/>
+		<info name="barcode" value="4988601002172"/>
 		<info name="usage" value="Requires a Japanese system."/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk NO.1"/>
@@ -17684,7 +17681,7 @@ The following floppies came with the machines.
 		<publisher>Enix</publisher>
 		<info name="alt_title" value="ワールドゴルフII"/>
 		<info name="serial" value="E-G215"/>
-		<info name="gtin" value="04988601002158"/>
+		<info name="barcode" value="4988601002158"/>
 		<info name="usage" value="Requires a Japanese system."/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk NO.1"/>
@@ -17706,7 +17703,7 @@ The following floppies came with the machines.
 		<publisher>Enix</publisher>
 		<info name="alt_title" value="ワールドゴルフII"/>
 		<info name="serial" value="E-G215"/>
-		<info name="gtin" value="04988601002158"/>
+		<info name="barcode" value="4988601002158"/>
 		<info name="usage" value="Requires a Japanese system."/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk NO.1"/>
@@ -17728,7 +17725,7 @@ The following floppies came with the machines.
 		<publisher>Enix</publisher>
 		<info name="alt_title" value="ワールドゴルフII"/>
 		<info name="serial" value="E-G215"/>
-		<info name="gtin" value="04988601002158"/>
+		<info name="barcode" value="4988601002158"/>
 		<info name="usage" value="Requires a Japanese system."/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk NO.1"/>
@@ -17749,7 +17746,7 @@ The following floppies came with the machines.
 		<year>1991</year>
 		<publisher>Fairytale</publisher>
 		<info name="alt_title" value="キサナ"/>
-		<info name="gtin" value="04988715000729"/>
+		<info name="barcode" value="4988715000729"/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk A"/>
 			<dataarea name="flop" size="737280">
@@ -17787,7 +17784,7 @@ The following floppies came with the machines.
 		<year>1991</year>
 		<publisher>Fairytale</publisher>
 		<info name="alt_title" value="キサナ"/>
-		<info name="gtin" value="04988715000729"/>
+		<info name="barcode" value="4988715000729"/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk A"/>
 			<dataarea name="flop" size="737280">
@@ -17826,7 +17823,7 @@ The following floppies came with the machines.
 		<publisher>Micro Cabin</publisher>
 		<info name="alt_title" value="サーク"/>
 		<info name="serial" value="91544"/>
-		<info name="gtin" value="04988608915444"/>
+		<info name="barcode" value="4988608915444"/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Opening Disk"/>
 			<dataarea name="flop" size="737280">
@@ -17853,7 +17850,7 @@ The following floppies came with the machines.
 		<publisher>Micro Cabin</publisher>
 		<info name="alt_title" value="サーク"/>
 		<info name="serial" value="91544"/>
-		<info name="gtin" value="04988608915444"/>
+		<info name="barcode" value="4988608915444"/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Opening Disk"/>
 			<dataarea name="flop" size="737280">
@@ -17880,7 +17877,7 @@ The following floppies came with the machines.
 		<publisher>Micro Cabin</publisher>
 		<info name="alt_title" value="サーク"/>
 		<info name="serial" value="91544"/>
-		<info name="gtin" value="04988608915444"/>
+		<info name="barcode" value="4988608915444"/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Opening Disk"/>
 			<dataarea name="flop" size="737280">
@@ -17931,7 +17928,7 @@ The following floppies came with the machines.
 		<publisher>Micro Cabin</publisher>
 		<info name="alt_title" value="サークII"/>
 		<info name="serial" value="01344"/>
-		<info name="gtin" value="04988608013447"/>
+		<info name="barcode" value="4988608013447"/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Opening Disk"/>
 			<dataarea name="flop" size="737280">
@@ -17978,7 +17975,7 @@ The following floppies came with the machines.
 		<publisher>Micro Cabin</publisher>
 		<info name="alt_title" value="サークII"/>
 		<info name="serial" value="01344"/>
-		<info name="gtin" value="04988608013447"/>
+		<info name="barcode" value="4988608013447"/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Opening Disk"/>
 			<dataarea name="flop" size="737280">
@@ -18025,7 +18022,7 @@ The following floppies came with the machines.
 		<publisher>Micro Cabin</publisher>
 		<info name="alt_title" value="サークII"/>
 		<info name="serial" value="01344"/>
-		<info name="gtin" value="04988608013447"/>
+		<info name="barcode" value="4988608013447"/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Opening Disk"/>
 			<dataarea name="flop" size="737280">
@@ -18071,7 +18068,7 @@ The following floppies came with the machines.
 		<publisher>Micro Cabin</publisher>
 		<info name="alt_title" value="サークII"/>
 		<info name="serial" value="01344"/>
-		<info name="gtin" value="04988608013447"/>
+		<info name="barcode" value="4988608013447"/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Opening Disk"/>
 			<dataarea name="flop" size="737280">
@@ -18117,7 +18114,7 @@ The following floppies came with the machines.
 		<publisher>Micro Cabin</publisher>
 		<info name="alt_title" value="サークガゼルの塔"/>
 		<info name="serial" value="11344"/>
-		<info name="gtin" value="04988608113444"/>
+		<info name="barcode" value="4988608113444"/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Opening Disk"/>
 			<dataarea name="flop" size="737280">
@@ -18150,7 +18147,7 @@ The following floppies came with the machines.
 		<publisher>Micro Cabin</publisher>
 		<info name="alt_title" value="サークガゼルの塔"/>
 		<info name="serial" value="11344"/>
-		<info name="gtin" value="04988608113444"/>
+		<info name="barcode" value="4988608113444"/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Opening Disk"/>
 			<dataarea name="flop" size="737280">
@@ -18183,7 +18180,7 @@ The following floppies came with the machines.
 		<publisher>Sony</publisher>
 		<info name="alt_title" value="ザナドゥ"/>
 		<info name="serial" value="HBJ-G056D"/>
-		<info name="gtin" value="04901780054190"/>
+		<info name="barcode" value="4901780054190"/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="dragon slayer 2 - xanadu (1987)(falcom)(disk 1 of 2).dsk" size="737280" crc="2e4ed64d" sha1="8ef34cbe7afc425772b0e26b0b9385ec069d8b22"/>
@@ -18204,7 +18201,7 @@ The following floppies came with the machines.
 		<publisher>Sony</publisher>
 		<info name="alt_title" value="ザナドゥ"/>
 		<info name="serial" value="HBJ-G056D"/>
-		<info name="gtin" value="04901780054190"/>
+		<info name="barcode" value="4901780054190"/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="dragon slayer 2 - xanadu (1987)(falcom)(disk 1 of 2)[a].dsk" size="737280" crc="dfca54e6" sha1="cebabb7683949c16179406b21a2d873e9c35c8b6"/>
@@ -18282,7 +18279,7 @@ The following floppies came with the machines.
 		<year>1988</year>
 		<publisher>Telenet Japan</publisher>
 		<info name="alt_title" value="エグザイルII完結編"/>
-		<info name="gtin" value="04988624922112"/>
+		<info name="barcode" value="4988624922112"/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk A"/>
 			<dataarea name="flop" size="737280">
@@ -18303,7 +18300,7 @@ The following floppies came with the machines.
 		<year>1988</year>
 		<publisher>Telenet Japan</publisher>
 		<info name="alt_title" value="エグザイルII完結編"/>
-		<info name="gtin" value="04988624922112"/>
+		<info name="barcode" value="4988624922112"/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk A"/>
 			<dataarea name="flop" size="737280">
@@ -18324,7 +18321,7 @@ The following floppies came with the machines.
 		<year>1988</year>
 		<publisher>Telenet Japan</publisher>
 		<info name="alt_title" value="エグザイルII完結編"/>
-		<info name="gtin" value="04988624922112"/>
+		<info name="barcode" value="4988624922112"/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk A"/>
 			<dataarea name="flop" size="737280">
@@ -18345,7 +18342,7 @@ The following floppies came with the machines.
 		<publisher>Victor</publisher>
 		<info name="alt_title" value="やじうまペナントレース"/>
 		<info name="serial" value="M-3504"/>
-		<info name="gtin" value="04988002179534"/>
+		<info name="barcode" value="4988002179534"/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="yajiuma pennant race (1989)(victor)(jp).dsk" size="737280" crc="fb5918bc" sha1="e559c9a94f7e91292b2c78923ab0431aa9d0ec0e"/>
@@ -18400,7 +18397,7 @@ The following floppies came with the machines.
 		<year>1990</year>
 		<publisher>Nihon Create</publisher>
 		<info name="alt_title" value="野球道II"/>
-		<info name="gtin" value="04977766090070"/>
+		<info name="barcode" value="4977766090070"/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk A"/>
 			<dataarea name="flop" size="737280">
@@ -18493,7 +18490,7 @@ The following floppies came with the machines.
 		<publisher>Nippon Dexter</publisher>
 		<info name="alt_title" value="妖魔降臨"/>
 		<info name="serial" value="ND-30"/>
-		<info name="gtin" value="04957358903209"/>
+		<info name="barcode" value="4957358903209"/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="youma kourin (1989)(nippon dexter)(jp).dsk" size="737280" crc="795f4444" sha1="febfe11997b6d4c58a0e999f1f1463bf1137b355"/>
@@ -18507,7 +18504,7 @@ The following floppies came with the machines.
 		<publisher>Nippon Dexter</publisher>
 		<info name="alt_title" value="妖魔降臨"/>
 		<info name="serial" value="ND-30"/>
-		<info name="gtin" value="04957358903209"/>
+		<info name="barcode" value="4957358903209"/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="youma kourin (1989)(nippon dexter)(jp)[a].dsk" size="737280" crc="7936b2a0" sha1="8564aa21ab90acdf64d1fdc155b8f41c40949498"/>
@@ -18521,7 +18518,7 @@ The following floppies came with the machines.
 		<publisher>Nippon Dexter</publisher>
 		<info name="alt_title" value="妖魔降臨"/>
 		<info name="serial" value="ND-30"/>
-		<info name="gtin" value="04957358903209"/>
+		<info name="barcode" value="4957358903209"/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="youma kourin (1989)(nippon dexter)(jp)[a2].dsk" size="737280" crc="0a2d0d6d" sha1="323e6dad366fb8e0657d6bf27260eda6789fedc6"/>
@@ -18535,7 +18532,7 @@ The following floppies came with the machines.
 		<publisher>Sony</publisher>
 		<info name="alt_title" value="イース"/>
 		<info name="serial" value="HBJ-G062D"/>
-		<info name="gtin" value="04901780069477"/>
+		<info name="barcode" value="4901780069477"/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="ancient ys vanished - omen (1987)(falcom)(jp).dsk" size="737280" crc="7bb17eed" sha1="f2071f6f7e8fb96a7fb3a3daa69a46be82347255"/>
@@ -18549,7 +18546,7 @@ The following floppies came with the machines.
 		<publisher>Sony</publisher>
 		<info name="alt_title" value="イース"/>
 		<info name="serial" value="HBJ-G062D"/>
-		<info name="gtin" value="04901780069477"/>
+		<info name="barcode" value="4901780069477"/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="ancient ys vanished - omen (1987)(falcom)(jp)[a].dsk" size="737280" crc="339dd09c" sha1="39fba8282b36ba1247aea586740d30c0ee6123de"/>
@@ -18563,7 +18560,7 @@ The following floppies came with the machines.
 		<publisher>Sony</publisher>
 		<info name="alt_title" value="イース"/>
 		<info name="serial" value="HBJ-G062D"/>
-		<info name="gtin" value="04901780069477"/>
+		<info name="barcode" value="4901780069477"/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="ancient ys vanished - omen (1987)(falcom)(jp)[a2].dsk" size="737280" crc="1f84c0d0" sha1="c4649b88e1b44990c0110e570fdcda473b221fe2"/>
@@ -18577,7 +18574,7 @@ The following floppies came with the machines.
 		<publisher>Sony</publisher>
 		<info name="alt_title" value="イース"/>
 		<info name="serial" value="HBJ-G062D"/>
-		<info name="gtin" value="04901780069477"/>
+		<info name="barcode" value="4901780069477"/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="ancient ys vanished - omen (1987)(falcom)(jp)[a3].dsk" size="737280" crc="dce166b2" sha1="6c7672ba7602e2e1c7e09309b7fa8776b1b5a904"/>
@@ -18591,7 +18588,7 @@ The following floppies came with the machines.
 		<publisher>Sony</publisher>
 		<info name="alt_title" value="イース"/>
 		<info name="serial" value="HBJ-G062D"/>
-		<info name="gtin" value="04901780069477"/>
+		<info name="barcode" value="4901780069477"/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="ancient ys vanished - omen (1987)(falcom)(jp)[a4].dsk" size="737280" crc="7cd359e3" sha1="648a260c492b3278d687d010072d9e90e583f459"/>
@@ -18668,7 +18665,7 @@ The following floppies came with the machines.
 		<publisher>Falcom</publisher>
 		<info name="alt_title" value="ワンダラーズ・フロム・イース"/>
 		<info name="serial" value="MXNW12003"/>
-		<info name="gtin" value="04956027050534"/>
+		<info name="barcode" value="4956027050534"/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Game Disk"/>
 			<dataarea name="flop" size="737280">
@@ -18707,7 +18704,7 @@ The following floppies came with the machines.
 		<publisher>Falcom</publisher>
 		<info name="alt_title" value="ワンダラーズ・フロム・イース"/>
 		<info name="serial" value="MXNW12003"/>
-		<info name="gtin" value="04956027050534"/>
+		<info name="barcode" value="4956027050534"/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Game Disk"/>
 			<dataarea name="flop" size="737280">
