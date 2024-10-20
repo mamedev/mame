@@ -625,6 +625,38 @@ static INPUT_PORTS_START( tomplc )
 
 	// are you expected to say something when this is held? game makes a crackle and doesn't act like you said anything
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_NAME("Speak")
+
+	PORT_MODIFY("AN0")
+	// all bits in this port seem to be the microphone input, the game just needs to register a large enough value when the button is pressed
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_BUTTON6 ) PORT_NAME("Microphone In")
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( tomthr )
+	PORT_INCLUDE(xavix)
+
+	PORT_MODIFY("IN0")
+	// not an actual joystick, this is a forward / backwards level, and a digital wheel
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_NAME("Move Forwards")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_NAME("Move Backwards")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_NAME("Steer Left") // steering is digital?
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_NAME("Steer Right")
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Horn / Select")
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Ignition Key")
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("Map")
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_NAME("Wipers")
+
+	PORT_MODIFY("IN1")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_NAME("Headlights")
+
+	PORT_MODIFY("AN0")
+	// all bits in this port seem to be the microphone input, the game just needs to register a large enough value when the button is pressed
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_BUTTON6 ) PORT_NAME("Microphone In")
+
+	PORT_MODIFY("AN5")
+	// read during attract demo
+
+	PORT_MODIFY("AN7")
+	// battery status?
 INPUT_PORTS_END
 
 
@@ -2485,7 +2517,8 @@ CONS( 2003, tomcpin,   0,          0,  xavix_i2c_24c08,  tomcpin,  xavix_i2c_sta
 CONS( 2004, tomplc,    0,          0,  xavix_i2c_24c02_43mhz,tomplc,xavix_i2c_state,     init_xavix,    "Tomy / SSD Company LTD",                       "Nihon Isshuu - Boku wa Plarail Untenshi (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 
 // テレビで遊び隊 ハイパーレスキュー ぼくは救助隊！
-CONS( 2006, tomthr,    0,          0,  xavix_43mhz,      xavix,    xavix_state,          init_xavix,    "Takara Tomy / SSD Company LTD",                "Play Team Hyper Rescue on TV I'm A Rescue Team! (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+// the demos in attract mode end instantly as if a button was being held, but not sure where it's read
+CONS( 2006, tomthr,    0,          0,  xavix_43mhz,      tomthr,   xavix_state,          init_xavix,    "Takara Tomy / SSD Company LTD",                "Play Team Hyper Rescue on TV I'm A Rescue Team! (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
 // ガンガンアドベンチャー 
 CONS( 2001, gungunad,  0,          0,  xavix_nv,         xavix,    xavix_state,          init_xavix,    "Takara / SSD Company LTD",                     "Gun Gun Adventure (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )

@@ -614,7 +614,6 @@ private:
 	uint8_t guru_anport2_r() { uint8_t ret = m_mouse1x->read()-0x10; return ret; }
 };
 
-
 class xavix_i2c_state : public xavix_state
 {
 public:
