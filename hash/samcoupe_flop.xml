@@ -26,7 +26,7 @@ license:CC0-1.0
 <softwarelist name="samcoupe_flop" description="SAM Coupé floppy disks">
 
 	<software name="manic">
-		<description>Manic Miner (2 Level Demo)</description>
+		<description>Manic Miner (2 level demo)</description>
 		<year>1991</year>
 		<publisher>Revelation Software / Software Projects</publisher>
 		<part name="flop1" interface="floppy_3_5">
@@ -80,6 +80,17 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="boggbubb">
+		<description>Boggle Bubble</description>
+		<year>1992</year>
+		<publisher>Silver Sword Software</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="819200">
+				<rom name="BoggleBubble.dsk" size="819200" crc="98b070d2" sha1="b2e6d0d969c36e01e0e346d251963efadac86ec3"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="castle">
 		<description>Castle</description>
 		<year>1991</year>
@@ -92,7 +103,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="defenders">
-		<description>Defenders Of The Earth</description>
+		<description>Defenders of the Earth</description>
 		<year>1990</year>
 		<publisher>Enigma Variations</publisher>
 		<part name="flop1" interface="floppy_3_5">
@@ -151,6 +162,17 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="hexagoni">
+		<description>Hexagonia</description>
+		<year>1991</year>
+		<publisher>Revelation Software</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="819200">
+				<rom name="AtomixII-Hexagonia.dsk" size="819200" crc="bddea22f" sha1="2335a4b43bd71e2c282925162f09efd867073ad8"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="lemmings">
 		<description>Lemmings</description>
 		<year>1993</year>
@@ -180,18 +202,6 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="860416">
 				<rom name="QuizBall.dsk" size="860416" crc="20661bbc" sha1="33dd733d50a6ff82ce876299fd15853c9dc411d6"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="rickdang">
-		<description>Rick Dangerous</description>
-		<year>2021</year>
-		<publisher>D.T.A. Software Studio</publisher>
-		<info name="developer" value="Anton Javorček" />
-		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size="860416">
-				<rom name="DTA_RickDangerous.dsk" size="860416" crc="deb55b68" sha1="d34dd9e1d63f8a07b91eba8a4773b34d773a4133"/>
 			</dataarea>
 		</part>
 	</software>
@@ -248,6 +258,87 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="860416">
 				<rom name="splat.dsk" size="860416" crc="4b429c21" sha1="71963862173fff0b5b1bafe3145e50d8fe5e90ac"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="waterwrk">
+		<description>WaterWorks</description>
+		<year>1993</year>
+		<publisher>FRED Publishing</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="819200">
+				<rom name="WaterWorks (19xx)(FRED Publishing).dsk" size="819200" crc="07024f2a" sha1="1ad9b147ee75449c9dcde8b38d63be036ffa6f33"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wopgamma">
+		<description>Wop Gamma (pre-release version)</description>
+		<year>1993</year>
+		<publisher>Revelation Software</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="819200">
+				<rom name="WopGamma.dsk" size="819200" crc="467961ba" sha1="116bb29d309427dfb6c96e156dac92cea5655160"/>
+			</dataarea>
+		</part>
+	</software>
+
+
+<!-- Homebrews -->
+
+	<software name="infuriat">
+		<description>Dave Infuriators</description>
+		<year>2012</year>
+		<publisher>Black Jet</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="819200">
+				<rom name="Infuriators.dsk" size="819200" crc="be461487" sha1="a855f2887d9ecbdc5cad16c11b86ca785cd2bd54"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="invaders">
+		<description>Dave Invaders</description>
+		<year>2012</year>
+		<publisher>Black Jet</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="819200">
+				<rom name="dave-invaders.dsk" size="819200" crc="87e49746" sha1="db55d53a11fc925991005d024255112b44ea0ef4"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lostsam">
+		<description>Lost Disks of Sam</description>
+		<year>2012</year>
+		<publisher>Black Jet</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="819200">
+				<rom name="lost-disks-of-sam.dsk" size="819200" crc="b8eb59c0" sha1="0c17fff87341e113bab4b412772ef2d5be20f49f"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mobydx">
+		<description>Moby DX</description>
+		<year>2012</year>
+		<publisher>Black Jet</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="819200">
+				<rom name="mobydx.dsk" size="819200" crc="b0ad2736" sha1="662c06bc839dcddb14bf7d02dc53e96fb38c5ceb"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rickdang">
+		<description>Rick Dangerous</description>
+		<year>2021</year>
+		<publisher>D.T.A. Software Studio</publisher>
+		<info name="developer" value="Anton Javorček" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="860416">
+				<rom name="DTA_RickDangerous.dsk" size="860416" crc="deb55b68" sha1="d34dd9e1d63f8a07b91eba8a4773b34d773a4133"/>
 			</dataarea>
 		</part>
 	</software>

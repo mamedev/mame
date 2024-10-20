@@ -283,8 +283,8 @@ public:
 	void init_thrilld();
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	// TODO: Needs verification on real hardware
@@ -326,10 +326,10 @@ private:
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	void ppc_map(address_map &map);
-	void sharc0_map(address_map &map);
-	void sharc1_map(address_map &map);
-	void sound_memmap(address_map &map);
+	void ppc_map(address_map &map) ATTR_COLD;
+	void sharc0_map(address_map &map) ATTR_COLD;
+	void sharc1_map(address_map &map) ATTR_COLD;
+	void sound_memmap(address_map &map) ATTR_COLD;
 };
 
 void nwktr_state::paletteram32_w(offs_t offset, uint32_t data, uint32_t mem_mask)

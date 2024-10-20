@@ -100,22 +100,22 @@ public:
 	void bigrun_d65006(machine_config &config);
 	void cischeat_gs88000(machine_config &config);
 
-	void bigrun_map(address_map &map);
-	void bigrun_map2(address_map &map);
-	void bigrun_map3(address_map &map);
-	void bigrun_sound_map(address_map &map);
-	void cischeat_map(address_map &map);
-	void cischeat_map2(address_map &map);
-	void cischeat_map3(address_map &map);
-	void cischeat_sound_map(address_map &map);
-	void f1gpstar_map(address_map &map);
-	void f1gpstar_map2(address_map &map);
-	void f1gpstar_map3(address_map &map);
-	void f1gpstar_sound_map(address_map &map);
-	void f1gpstr2_io_map(address_map &map);
-	void f1gpstr2_map(address_map &map);
-	void f1gpstr2_sound_map(address_map &map);
-	void scudhamm_map(address_map &map);
+	void bigrun_map(address_map &map) ATTR_COLD;
+	void bigrun_map2(address_map &map) ATTR_COLD;
+	void bigrun_map3(address_map &map) ATTR_COLD;
+	void bigrun_sound_map(address_map &map) ATTR_COLD;
+	void cischeat_map(address_map &map) ATTR_COLD;
+	void cischeat_map2(address_map &map) ATTR_COLD;
+	void cischeat_map3(address_map &map) ATTR_COLD;
+	void cischeat_sound_map(address_map &map) ATTR_COLD;
+	void f1gpstar_map(address_map &map) ATTR_COLD;
+	void f1gpstar_map2(address_map &map) ATTR_COLD;
+	void f1gpstar_map3(address_map &map) ATTR_COLD;
+	void f1gpstar_sound_map(address_map &map) ATTR_COLD;
+	void f1gpstr2_io_map(address_map &map) ATTR_COLD;
+	void f1gpstr2_map(address_map &map) ATTR_COLD;
+	void f1gpstr2_sound_map(address_map &map) ATTR_COLD;
+	void scudhamm_map(address_map &map) ATTR_COLD;
 
 protected:
 	virtual void machine_start() override
@@ -123,7 +123,7 @@ protected:
 		m_leds.resolve(); m_scudhamm_motor_command = 0;
 	}
 
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 
 	optional_device_array<megasys1_tilemap_device, 3> m_tmap;
 	required_shared_ptr<uint16_t> m_ram;
@@ -181,11 +181,11 @@ public:
 	void output_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
 	void armchmp2(machine_config &config);
-	void armchmp2_map(address_map &map);
+	void armchmp2_map(address_map &map) ATTR_COLD;
 	TIMER_DEVICE_CALLBACK_MEMBER(armchamp2_scanline);
-	DECLARE_CUSTOM_INPUT_MEMBER(left_sensor_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(right_sensor_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(center_sensor_r);
+	ioport_value left_sensor_r();
+	ioport_value right_sensor_r();
+	ioport_value center_sensor_r();
 
 private:
 	u16 m_arm_motor_command;
@@ -201,12 +201,12 @@ public:
 
 	uint16_t *m_buffer_spriteram = nullptr;
 	std::unique_ptr<uint16_t[]> m_allocated_spriteram;
-	void wildplt_map(address_map &map);
+	void wildplt_map(address_map &map) ATTR_COLD;
 	void wildplt(machine_config &config);
 	void sprite_dma_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
 protected:
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	uint16_t m_sprite_dma_reg = 0U;
@@ -232,12 +232,12 @@ public:
 
 	void captflag(machine_config &config);
 	template <int N> int motor_busy_r();
-	template <int N> DECLARE_CUSTOM_INPUT_MEMBER(motor_pos_r);
+	template <int N> ioport_value motor_pos_r();
 	void init_captflag();
 	void init_vscaptfl();
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	void motor_command_right_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
@@ -249,9 +249,9 @@ private:
 
 	TIMER_DEVICE_CALLBACK_MEMBER(captflag_scanline);
 
-	void captflag_map(address_map &map);
-	void oki1_map(address_map &map);
-	void oki2_map(address_map &map);
+	void captflag_map(address_map &map) ATTR_COLD;
+	void oki1_map(address_map &map) ATTR_COLD;
+	void oki2_map(address_map &map) ATTR_COLD;
 
 	required_device<ticket_dispenser_device> m_hopper;
 

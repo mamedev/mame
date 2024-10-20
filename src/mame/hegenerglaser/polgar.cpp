@@ -39,14 +39,14 @@ public:
 		m_keys(*this, "KEY")
 	{ }
 
-	void polgar10(machine_config &config);
 	void polgar(machine_config &config);
+	void polgar10(machine_config &config);
 
 private:
 	required_device<cpu_device> m_maincpu;
 	required_ioport m_keys;
 
-	void polgar_mem(address_map &map);
+	void polgar_mem(address_map &map) ATTR_COLD;
 
 	u8 keys_r(offs_t offset);
 };

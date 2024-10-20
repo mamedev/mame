@@ -7,8 +7,6 @@
     H8/325 family emulation
 
     TODO:
-    - serial controllers are slightly different, has 3 interrupt sources
-      instead of 4
     - HCSR @ 0xfffe (port 3 handshake)
     - FNCR @ 0xffff (16-bit timer noise canceler)
 
@@ -115,17 +113,24 @@ void h8325_device::map(address_map &map)
 	map(0xffd2, 0xffd3).rw(m_timer8[1], FUNC(h8_timer8_channel_device::tcor_r), FUNC(h8_timer8_channel_device::tcor_w));
 	map(0xffd4, 0xffd4).rw(m_timer8[1], FUNC(h8_timer8_channel_device::tcnt_r), FUNC(h8_timer8_channel_device::tcnt_w));
 
-	map(0xffd8, 0xffd8).rw(m_sci[0], FUNC(h8_sci_device::smr_r), FUNC(h8_sci_device::smr_w));
+	map(0xffd8, 0xffd8).lr8(NAME([this]() { return m_sci[0]->smr_r() | 0x04; }));
+	map(0xffd8, 0xffd8).lw8(NAME([this](u8 data) { m_sci[0]->smr_w(data & ~0x04); }));
 	map(0xffd9, 0xffd9).rw(m_sci[0], FUNC(h8_sci_device::brr_r), FUNC(h8_sci_device::brr_w));
-	map(0xffda, 0xffda).rw(m_sci[0], FUNC(h8_sci_device::scr_r), FUNC(h8_sci_device::scr_w));
+	map(0xffda, 0xffda).lr8(NAME([this]() { return m_sci[0]->scr_r() | 0x0c; }));
+	map(0xffda, 0xffda).lw8(NAME([this](u8 data) { m_sci[0]->scr_w(data & ~0x0c); }));
 	map(0xffdb, 0xffdb).rw(m_sci[0], FUNC(h8_sci_device::tdr_r), FUNC(h8_sci_device::tdr_w));
-	map(0xffdc, 0xffdc).rw(m_sci[0], FUNC(h8_sci_device::ssr_r), FUNC(h8_sci_device::ssr_w));
+	map(0xffdc, 0xffdc).lr8(NAME([this]() { return m_sci[0]->ssr_r() | 0x07; }));
+	map(0xffdc, 0xffdc).lw8(NAME([this](u8 data) { m_sci[0]->ssr_w(data & ~0x07); }));
 	map(0xffdd, 0xffdd).r(m_sci[0], FUNC(h8_sci_device::rdr_r));
-	map(0xffe0, 0xffe0).rw(m_sci[1], FUNC(h8_sci_device::smr_r), FUNC(h8_sci_device::smr_w));
+
+	map(0xffe0, 0xffe0).lr8(NAME([this]() { return m_sci[1]->smr_r() | 0x04; }));
+	map(0xffe0, 0xffe0).lw8(NAME([this](u8 data) { m_sci[1]->smr_w(data & ~0x04); }));
 	map(0xffe1, 0xffe1).rw(m_sci[1], FUNC(h8_sci_device::brr_r), FUNC(h8_sci_device::brr_w));
-	map(0xffe2, 0xffe2).rw(m_sci[1], FUNC(h8_sci_device::scr_r), FUNC(h8_sci_device::scr_w));
+	map(0xffe2, 0xffe2).lr8(NAME([this]() { return m_sci[1]->scr_r() | 0x0c; }));
+	map(0xffe2, 0xffe2).lw8(NAME([this](u8 data) { m_sci[1]->scr_w(data & ~0x0c); }));
 	map(0xffe3, 0xffe3).rw(m_sci[1], FUNC(h8_sci_device::tdr_r), FUNC(h8_sci_device::tdr_w));
-	map(0xffe4, 0xffe4).rw(m_sci[1], FUNC(h8_sci_device::ssr_r), FUNC(h8_sci_device::ssr_w));
+	map(0xffe4, 0xffe4).lr8(NAME([this]() { return m_sci[1]->ssr_r() | 0x07; }));
+	map(0xffe4, 0xffe4).lw8(NAME([this](u8 data) { m_sci[1]->ssr_w(data & ~0x07); }));
 	map(0xffe5, 0xffe5).r(m_sci[1], FUNC(h8_sci_device::rdr_r));
 }
 

@@ -94,13 +94,13 @@ protected:
 
 	TIMER_CALLBACK_MEMBER(sprite_tick);
 
-	void main_map(address_map &map);
-	void sound_map(address_map &map);
-	void sub_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
+	void sound_map(address_map &map) ATTR_COLD;
+	void sub_map(address_map &map) ATTR_COLD;
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 	virtual void tile_get_info(tile_data &tileinfo, uint16_t data, int color_base);
 
@@ -126,9 +126,9 @@ private:
 	void fround_CPU_register_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	void gfx_bank_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
-	void fround_map(address_map &map);
+	void fround_map(address_map &map) ATTR_COLD;
 
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 	virtual void tile_get_info(tile_data &tileinfo, uint16_t data, int color_base) override;
 
 	uint8_t m_gfx_bank[4]{};
@@ -148,7 +148,7 @@ public:
 private:
 	void nvram_bank_w(uint8_t data);
 
-	void cuebrickj_main_map(address_map &map);
+	void cuebrickj_main_map(address_map &map) ATTR_COLD;
 	uint16_t m_nvram[0x400 * 0x20 / 2]{};
 };
 

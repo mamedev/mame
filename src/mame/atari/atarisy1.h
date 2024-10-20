@@ -67,9 +67,9 @@ public:
 	void init_indytemp();
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
@@ -149,9 +149,9 @@ protected:
 	void add_speech(machine_config &config);
 	void atarisy1(machine_config &config);
 
-	void main_map(address_map &map);
-	void sound_map(address_map &map);
-	void sound_ext_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
+	void sound_map(address_map &map) ATTR_COLD;
+	void sound_ext_map(address_map &map) ATTR_COLD;
 
 	void init_slapstic();
 };

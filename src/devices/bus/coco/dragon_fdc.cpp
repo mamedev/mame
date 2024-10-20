@@ -103,7 +103,7 @@ namespace
 		virtual u8 cts_read(offs_t offset) override;
 		virtual u8 scs_read(offs_t offset) override;
 		virtual void scs_write(offs_t offset, u8 data) override;
-		virtual void device_add_mconfig(machine_config &config) override;
+		virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 		virtual void update_lines() override;
 
 	private:
@@ -125,7 +125,7 @@ namespace
 		virtual u8 cts_read(offs_t offset) override;
 		virtual u8 scs_read(offs_t offset) override;
 		virtual void scs_write(offs_t offset, u8 data) override;
-		virtual void device_add_mconfig(machine_config &config) override;
+		virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 		virtual void update_lines() override;
 
 	private:

@@ -21,10 +21,10 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 	// reading and writing
 	virtual u8 read_l(offs_t offset) override;
@@ -178,7 +178,7 @@ private:
 	void sa1_lo_w(offs_t offset, u8 data);
 	void sa1_hi_w(offs_t offset, u8 data);
 
-	void sa1_map(address_map &map);
+	void sa1_map(address_map &map) ATTR_COLD;
 };
 
 

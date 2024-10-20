@@ -43,6 +43,7 @@
 #define OSDCOMMAND_LIST_NETWORK_ADAPTERS "listnetwork"
 
 #define OSDOPTION_DEBUGGER              "debugger"
+#define OSDOPTION_DEBUGGER_HOST         "debugger_host"
 #define OSDOPTION_DEBUGGER_PORT         "debugger_port"
 #define OSDOPTION_DEBUGGER_FONT         "debugger_font"
 #define OSDOPTION_DEBUGGER_FONT_SIZE    "debugger_font_size"
@@ -119,6 +120,7 @@ public:
 
 	// debugging options
 	const char *debugger() const { return value(OSDOPTION_DEBUGGER); }
+	const char *debugger_host() const { return value(OSDOPTION_DEBUGGER_HOST); }
 	int debugger_port() const { return int_value(OSDOPTION_DEBUGGER_PORT); }
 	const char *debugger_font() const { return value(OSDOPTION_DEBUGGER_FONT); }
 	float debugger_font_size() const { return float_value(OSDOPTION_DEBUGGER_FONT_SIZE); }

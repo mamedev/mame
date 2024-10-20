@@ -53,12 +53,12 @@ protected:
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 
 	// device-level overrides
-	virtual void device_reset() override;
+	virtual void device_reset() override ATTR_COLD;
 
 	virtual void execute_one() override;
 	virtual u16 decode_digit(u8 data) override;
 
-	void program_512x8(address_map &map);
+	void program_512x8(address_map &map) ATTR_COLD;
 
 	// opcode handlers
 	virtual void op_tkbs() override;

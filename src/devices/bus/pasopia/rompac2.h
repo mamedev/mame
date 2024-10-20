@@ -23,8 +23,8 @@ public:
 
 protected:
 	// device-level overrides
-	virtual const tiny_rom_entry *device_rom_region() const override;
-	virtual void device_start() override;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
+	virtual void device_start() override ATTR_COLD;
 
 	// pac2_card_interface overrides
 	virtual u8 pac2_read(offs_t offset) override;

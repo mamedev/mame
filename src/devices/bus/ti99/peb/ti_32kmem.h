@@ -32,8 +32,8 @@ public:
 	void cruwrite(offs_t offset, uint8_t data) override { }
 
 protected:
-	void device_start() override;
-	virtual void device_add_mconfig(machine_config &config) override;
+	void device_start() override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 private:
 	required_device<ram_device> m_ram;

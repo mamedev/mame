@@ -2,13 +2,7 @@
 // copyright-holders:Luca Elia
 /*************************************************************************************************************
 
-    Toshiba TLCS-90 Series MCU's
-
-    emulation by Luca Elia, based on the Z80 core by Juergen Buchmueller
-
-    ChangeLog:
-
-    20150517 Fixed TRUN bit masking (timers start/stop handling) [Rainer Keuchel]
+    Toshiba TLCS-90 Series MCU's disassembler
 
 *************************************************************************************************************/
 
@@ -28,9 +22,21 @@ protected:
 	tlcs90_disassembler(uint16_t iobase, const char *const ir_names[]);
 
 private:
-	enum _e_op {    UNKNOWN,    NOP,    EX,     EXX,    LD,     LDW,    LDA,    LDI,    LDIR,   LDD,    LDDR,   CPI,    CPIR,   CPD,    CPDR,   PUSH,   POP,    JP,     JR,     CALL,   CALLR,      RET,    RETI,   HALT,   DI,     EI,     SWI,    DAA,    CPL,    NEG,    LDAR,   RCF,    SCF,    CCF,    TSET,   BIT,    SET,    RES,    INC,    DEC,    INCX,   DECX,   INCW,   DECW,   ADD,    ADC,    SUB,    SBC,    AND,    XOR,    OR,     CP,     RLC,    RRC,    RL,     RR,     SLA,    SRA,    SLL,    SRL,    RLD,    RRD,    DJNZ,   MUL,    DIV     };
+	enum _e_op
+	{
+		UNKNOWN,
+		NOP,    EX,     EXX,    LD,     LDW,    LDA,    LDI,    LDIR,
+		LDD,    LDDR,   CPI,    CPIR,   CPD,    CPDR,   PUSH,   POP,
+		JP,     JR,     CALL,   CALLR,  RET,    RETI,   HALT,   DI,
+		EI,     SWI,    DAA,    CPL,    NEG,    LDAR,   RCF,    SCF,
+		CCF,    TSET,   BIT,    SET,    RES,    INC,    DEC,    INCX,
+		DECX,   INCW,   DECW,   ADD,    ADC,    SUB,    SBC,    AND,
+		XOR,    OR,     CP,     RLC,    RRC,    RL,     RR,     SLA,
+		SRA,    SLL,    SRL,    RLD,    RRD,    DJNZ,   MUL,    DIV
+	};
 
-	enum class e_mode : u8 {
+	enum class e_mode : u8
+	{
 		NONE,   BIT8,   CC,
 		I8,     D8,     R8,
 		I16,    D16,    R16,
@@ -46,18 +52,18 @@ private:
 	const uint16_t m_iobase;
 	const char *const *m_ir_names;
 
-	uint8_t        m_op;
+	uint8_t m_op;
 
-	e_mode  m_mode1;
-	uint16_t  m_r1,m_r1b;
+	e_mode m_mode1;
+	uint16_t m_r1, m_r1b;
 
-	e_mode  m_mode2;
-	uint16_t  m_r2,m_r2b;
+	e_mode m_mode2;
+	uint16_t m_r2, m_r2b;
 
 	offs_t m_addr;
 	const data_buffer *m_opcodes;
 
-	inline uint8_t  READ8();
+	inline uint8_t READ8();
 	inline uint16_t READ16();
 	void decode();
 

@@ -47,8 +47,8 @@ public:
 	int timer_expired_r();
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -66,7 +66,7 @@ private:
 	void serial_io_w(offs_t offset, u8 data);
 	u8 kb_r(offs_t offset);
 
-	void mem_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<input_merger_device> m_mainirq;
@@ -396,7 +396,7 @@ static INPUT_PORTS_START(teleray10)
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_TOGGLE PORT_NAME("Local")
 
 	PORT_START("KINT")
-	PORT_BIT(1, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Interrupt") PORT_WRITE_LINE_MEMBER(teleray10_state, key_interrupt_w)
+	PORT_BIT(1, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Interrupt") PORT_WRITE_LINE_MEMBER(FUNC(teleray10_state::key_interrupt_w))
 
 	PORT_START("SW1A")
 	PORT_DIPNAME(0x01, 0x00, "Xmit ETX") PORT_DIPLOCATION("7A:3")
@@ -413,7 +413,7 @@ static INPUT_PORTS_START(teleray10)
 	PORT_DIPSETTING(0x00, "Even")
 	PORT_DIPSETTING(0x10, "Odd")
 	PORT_DIPSETTING(0x30, "None/High")
-	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_READ_LINE_MEMBER(teleray10_state, timer_expired_r)
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_READ_LINE_MEMBER(FUNC(teleray10_state::timer_expired_r))
 	PORT_DIPNAME(0x80, 0x00, "Stop Bits") PORT_DIPLOCATION("6A:7")
 	PORT_DIPSETTING(0x00, "1")
 	PORT_DIPSETTING(0x80, "2")

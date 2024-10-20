@@ -19,7 +19,7 @@ public:
 	astrocade_blueram_4k_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// device-level overrides
-	virtual ioport_constructor device_input_ports() const override;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 
 	// reading and writing
 	virtual uint8_t read(offs_t offset) override;
@@ -37,7 +37,7 @@ protected:
 
 	virtual void device_start() override { m_ram.resize(0x1000); save_item(NAME(m_ram)); }
 	virtual void device_reset() override { }
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 	std::vector<uint8_t> m_ram;
 	required_ioport m_write_prot;
@@ -76,7 +76,7 @@ public:
 	astrocade_viper_sys1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// device-level overrides
-	virtual ioport_constructor device_input_ports() const override;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 
 	// reading and writing
 	virtual uint8_t read(offs_t offset) override;
@@ -100,7 +100,7 @@ public:
 	astrocade_whiteram_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// device-level overrides
-	virtual ioport_constructor device_input_ports() const override;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 
 	// reading and writing
 	virtual uint8_t read(offs_t offset) override;
@@ -124,7 +124,7 @@ public:
 	astrocade_rl64ram_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// device-level overrides
-	virtual ioport_constructor device_input_ports() const override;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 
 	// reading and writing
 	virtual uint8_t read(offs_t offset) override;

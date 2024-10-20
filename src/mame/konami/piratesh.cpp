@@ -70,13 +70,13 @@ public:
 
 	void piratesh(machine_config &config);
 
-	DECLARE_CUSTOM_INPUT_MEMBER(helm_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(battery_r);
+	ioport_value helm_r();
+	ioport_value battery_r();
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -116,7 +116,7 @@ private:
 	TIMER_DEVICE_CALLBACK_MEMBER(piratesh_interrupt);
 	K056832_CB_MEMBER(piratesh_tile_callback);
 	K055673_CB_MEMBER(piratesh_sprite_callback);
-	void piratesh_map(address_map &map);
+	void piratesh_map(address_map &map) ATTR_COLD;
 };
 
 
@@ -443,7 +443,7 @@ void piratesh_state::k054539_nmi_gen(int state)
 	m_sound_intck = state;
 }
 
-CUSTOM_INPUT_MEMBER(piratesh_state::helm_r)
+ioport_value piratesh_state::helm_r()
 {
 	// Appears to be a quadrature encoder
 	uint8_t xa, xb;
@@ -455,7 +455,7 @@ CUSTOM_INPUT_MEMBER(piratesh_state::helm_r)
 	return (xb << 1) | xa;
 }
 
-CUSTOM_INPUT_MEMBER(piratesh_state::battery_r)
+ioport_value piratesh_state::battery_r()
 {
 	// .x MB3790 /ALARM1
 	// x. MB3790 /ALARM2
@@ -485,9 +485,9 @@ static INPUT_PORTS_START( piratesh )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME(DEF_STR( Test )) PORT_CODE(KEYCODE_F2)
 
 	PORT_START("SPECIAL")
-	PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("k053250", k053250ps_device, dmairq_r)
+	PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("k053250", FUNC(k053250ps_device::dmairq_r))
 	PORT_BIT( 0x0200, IP_ACTIVE_HIGH, IPT_UNKNOWN ) // FIXME: NCPU from 053246 (DMA)
-	PORT_BIT( 0x0c00, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(piratesh_state, battery_r)
+	PORT_BIT( 0x0c00, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(FUNC(piratesh_state::battery_r))
 
 	PORT_START("HELM")
 	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(25) PORT_KEYDELTA(1)
@@ -502,9 +502,9 @@ static INPUT_PORTS_START( piratesh )
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("ticket", ticket_dispenser_device, line_r)
-	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("hopper", ticket_dispenser_device, line_r)
-	PORT_BIT( 0x1800, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(piratesh_state, helm_r)
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("ticket", FUNC(ticket_dispenser_device::line_r))
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("hopper", FUNC(ticket_dispenser_device::line_r))
+	PORT_BIT( 0x1800, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(FUNC(piratesh_state::helm_r))
 	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -610,8 +610,8 @@ void piratesh_state::piratesh(machine_config &config)
 	K053252(config, m_k053252, XTAL(32'000'000)/4);
 	m_k053252->set_offsets(40, 16); // TODO
 
-	TICKET_DISPENSER(config, "ticket", attotime::from_msec(200), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH);
-	HOPPER(config, "hopper", attotime::from_msec(200), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH);
+	TICKET_DISPENSER(config, "ticket", attotime::from_msec(200));
+	HOPPER(config, "hopper", attotime::from_msec(200));
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));

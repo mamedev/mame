@@ -91,8 +91,8 @@ public:
 	void sprachmg(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	required_device<z80_device> m_maincpu;
@@ -109,8 +109,8 @@ private:
 	output_finder<> m_led_morse;
 	output_finder<> m_led_standard;
 
-	void mem_map(address_map &map);
-	void io_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
+	void io_map(address_map &map) ATTR_COLD;
 
 	void display_data_w(uint8_t data);
 	void display_column_w(uint8_t data);
@@ -200,16 +200,16 @@ static INPUT_PORTS_START( sprachmg )
 
 	PORT_START("special")
 	PORT_BIT(0x1f, IP_ACTIVE_LOW, IPT_UNUSED)
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CODE(KEYCODE_S) PORT_NAME("STA/STP") PORT_WRITE_LINE_DEVICE_MEMBER("pio0", z80pio_device, pb5_w)
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CODE(KEYCODE_S) PORT_NAME("STA/STP") PORT_WRITE_LINE_DEVICE_MEMBER("pio0", FUNC(z80pio_device::pb5_w))
 	PORT_BIT(0xc0, IP_ACTIVE_LOW, IPT_UNUSED)
 
 	PORT_START("remote")
 	PORT_BIT(0x3f, IP_ACTIVE_LOW, IPT_UNUSED)
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("STA/STP (Remote)") PORT_WRITE_LINE_DEVICE_MEMBER("pio0", z80pio_device, pb6_w)
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("STA/STP (Remote)") PORT_WRITE_LINE_DEVICE_MEMBER("pio0", FUNC(z80pio_device::pb6_w))
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_UNUSED)
 
 	PORT_START("reset")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CODE(KEYCODE_R) PORT_NAME("RES") PORT_CHANGED_MEMBER(DEVICE_SELF, sprachmg_state, keypad_res, 0)
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CODE(KEYCODE_R) PORT_NAME("RES") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(sprachmg_state::keypad_res), 0)
 INPUT_PORTS_END
 
 

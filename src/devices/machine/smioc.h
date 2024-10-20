@@ -103,11 +103,11 @@ public:
 
 protected:
 	/* Device-level overrides */
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 	/* Optional information overrides */
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 
 	TIMER_CALLBACK_MEMBER(raise_drq);
 	TIMER_CALLBACK_MEMBER(raise_int1);
@@ -129,7 +129,7 @@ private:
 
 	u8 m_logic_ram[4096]; // 4kb of ram in the 0x4xxxx window, mainly used by the board's logic to proxy command parameters and data.
 
-	void smioc_mem(address_map &map);
+	void smioc_mem(address_map &map) ATTR_COLD;
 
 	void update_and_log(u16& reg, u16 newValue, const char* register_name);
 

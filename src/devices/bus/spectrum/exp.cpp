@@ -167,6 +167,7 @@ void spectrum_expansion_slot_device::mreq_w(offs_t offset, uint8_t data)
 #include "mgt.h"
 #include "mikroplus.h"
 #include "mpoker.h"
+#include "musicmachine.h"
 #include "opus.h"
 #include "plus2test.h"
 #include "protek.h"
@@ -215,6 +216,7 @@ void spectrum_expansion_devices(device_slot_interface &device)
 	device.option_add("mikroplus", SPECTRUM_MIKROPLUS);
 	device.option_add("mpoker", SPECTRUM_MPOKER);
 	device.option_add("mprint", SPECTRUM_MPRINT);
+	device.option_add("musicmachine", SPECTRUM_MUSICMACHINE);
 	device.option_add("opus", SPECTRUM_OPUS);
 	device.option_add("plusd", SPECTRUM_PLUSD);
 	device.option_add("proceed", SPECTRUM_PROCEED);
@@ -244,6 +246,7 @@ void spec128_expansion_devices(device_slot_interface &device)
 	device.option_add("mface128", SPECTRUM_MFACE128);
 	device.option_add("mikroplus", SPECTRUM_MIKROPLUS);
 	device.option_add("mprint", SPECTRUM_MPRINT);
+	device.option_add("musicmachine", SPECTRUM_MUSICMACHINE);
 	device.option_add("opus", SPECTRUM_OPUS);
 	device.option_add("plusd", SPECTRUM_PLUSD);
 	device.option_add("plus2test", SPECTRUM_PLUS2TEST);
@@ -259,5 +262,6 @@ void specpls3_expansion_devices(device_slot_interface &device)
 {
 	device.option_add("kempjoy", SPECTRUM_KEMPJOY);
 	device.option_add("mface3", SPECTRUM_MFACE3);
+	device.option_add("musicmachine", SPECTRUM_MUSICMACHINE);
 }
 

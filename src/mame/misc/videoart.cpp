@@ -65,7 +65,7 @@ public:
 	void videoart(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	required_device<m6805r2_device> m_maincpu;
@@ -92,7 +92,7 @@ private:
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void palette(palette_device &palette) const;
 
-	void vram_map(address_map &map);
+	void vram_map(address_map &map) ATTR_COLD;
 	void vram_w(offs_t offset, u8 data);
 	u8 vram_r(offs_t offset);
 	void msl_w(u8 data) { m_pixel_offset = data & 7; }

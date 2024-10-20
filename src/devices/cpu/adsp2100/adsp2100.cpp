@@ -1161,27 +1161,6 @@ uint32_t adsp21xx_device::execute_max_cycles() const noexcept
 }
 
 
-//-------------------------------------------------
-//  execute_input_lines - return the number of
-//  input/interrupt lines
-//-------------------------------------------------
-
-uint32_t adsp2100_device::execute_input_lines() const noexcept
-{
-	return 4;
-}
-
-uint32_t adsp2101_device::execute_input_lines() const noexcept
-{
-	return 5;
-}
-
-uint32_t adsp2181_device::execute_input_lines() const noexcept
-{
-	return 9;
-}
-
-
 void adsp21xx_device::execute_set_input(int inputnum, int state)
 {
 	// update the latched state

@@ -71,7 +71,7 @@ public:
 	void init_m4test();
 
 private:
-	void mpu4_memmap_characteriser_rtc(address_map &map);
+	void mpu4_memmap_characteriser_rtc(address_map &map) ATTR_COLD;
 
 	void ay8912_outport_w(uint8_t data);
 };

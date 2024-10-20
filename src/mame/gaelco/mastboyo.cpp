@@ -37,8 +37,8 @@ public:
 	void mastboyo(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	tilemap_t *m_fg_tilemap;
@@ -50,8 +50,8 @@ private:
 	required_region_ptr<uint8_t> m_questionrom;
 	required_region_ptr<uint8_t> m_paletterom;
 
-	void mastboyo_map(address_map &map);
-	void mastboyo_portmap(address_map &map);
+	void mastboyo_map(address_map &map) ATTR_COLD;
+	void mastboyo_portmap(address_map &map) ATTR_COLD;
 
 	template<uint8_t Which> void fgram_w(offs_t offset, uint8_t data);
 	void rombank_w(uint8_t data);

@@ -62,10 +62,9 @@ public:
 	void csprint(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void device_post_load() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	void update_interrupts();
@@ -127,9 +126,6 @@ private:
 	INTERRUPT_GEN_MEMBER(sound_irq_gen);
 	void sound_irq_ack_w(uint8_t data);
 	void bankselect_w(offs_t offset, uint16_t data);
-	uint16_t switch_r();
-	uint8_t switch_6502_r();
-	void switch_6502_w(uint8_t data);
 	uint8_t leta_r(offs_t offset);
 	void mixer_w(uint8_t data);
 	void sndrst_6502_w(uint8_t data);
@@ -139,6 +135,7 @@ private:
 	void tms5220_w(uint8_t data);
 	void tms5220_strobe_w(offs_t offset, uint8_t data);
 	void coincount_w(uint8_t data);
+	void switch_6502_w(uint8_t data);
 
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline_update);
 
@@ -156,6 +153,6 @@ private:
 	static rgb_t RRRRGGGGBBBBIIII(uint32_t raw);
 
 	static const atari_motion_objects_config s_mob_config;
-	void main_map(address_map &map);
-	void sound_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
+	void sound_map(address_map &map) ATTR_COLD;
 };

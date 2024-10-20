@@ -84,7 +84,7 @@ public:
 	int ttl74123_output_r();
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	required_shared_ptr<uint8_t> m_videoram;
@@ -118,8 +118,8 @@ private:
 
 	MC6845_UPDATE_ROW(crtc_update_row);
 
-	void r2dtank_audio_map(address_map &map);
-	void r2dtank_main_map(address_map &map);
+	void r2dtank_audio_map(address_map &map) ATTR_COLD;
+	void r2dtank_main_map(address_map &map) ATTR_COLD;
 };
 
 
@@ -374,7 +374,7 @@ static INPUT_PORTS_START( r2dtank )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START2 )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(r2dtank_state, ttl74123_output_r)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(r2dtank_state::ttl74123_output_r))
 
 	PORT_START("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_COCKTAIL

@@ -331,12 +331,12 @@ private:
 	required_device<m68000_device> m_gfxcpu;
 	required_device<i80286_cpu_device> m_convcpu;
 
-	void convcpu_mem(address_map &map);
-	void gfxcpu_mem(address_map &map);
-	void maincpu_mem(address_map &map);
-	void pmccpu_mem(address_map &map);
+	void convcpu_mem(address_map &map) ATTR_COLD;
+	void gfxcpu_mem(address_map &map) ATTR_COLD;
+	void maincpu_mem(address_map &map) ATTR_COLD;
+	void pmccpu_mem(address_map &map) ATTR_COLD;
 
-	virtual void machine_reset() override;
+	virtual void machine_reset() override ATTR_COLD;
 };
 
 void fanucs15_state::maincpu_mem(address_map &map)

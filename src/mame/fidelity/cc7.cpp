@@ -4,7 +4,7 @@
 /*******************************************************************************
 
 Fidelity Chess Challenger 7 (BCC)
-------------------------
+---------------------------------
 It was Fidelity's most sold chess computer. The first version was released in
 1979, and a newer PCB revision was produced in 1980.
 
@@ -31,7 +31,7 @@ Memory map:
 4000-FFFF: Z80 A14/A15 not connected
 
 Port map (Write):
----------
+-----------------
 D0-D3: digit select and keypad mux
 D4: CHECK led
 D5: LOSE led
@@ -41,7 +41,7 @@ NE591 Q0-Q6: digit segments A-G
 NE591 Q7: buzzer
 
 Port map (Read):
----------
+----------------
 D0-D3: keypad row
 
 *******************************************************************************/
@@ -55,16 +55,16 @@ D0-D3: keypad row
 #include "speaker.h"
 
 // internal artwork
-#include "fidel_bcc.lh"
 #include "fidel_bkc.lh"
+#include "fidel_cc7.lh"
 
 
 namespace {
 
-class bcc_state : public driver_device
+class cc7_state : public driver_device
 {
 public:
-	bcc_state(const machine_config &mconfig, device_type type, const char *tag) :
+	cc7_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_display(*this, "display"),
@@ -73,11 +73,11 @@ public:
 	{ }
 
 	// machine configs
-	void bcc(machine_config &config);
+	void cc7(machine_config &config);
 	void bkc(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	// devices/pointers
@@ -90,15 +90,15 @@ private:
 	u8 m_7seg_data = 0;
 
 	// address maps
-	void main_map(address_map &map);
-	void main_io(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
+	void main_io(address_map &map) ATTR_COLD;
 
 	// I/O handlers
 	u8 input_r();
 	void control_w(offs_t offset, u8 data);
 };
 
-void bcc_state::machine_start()
+void cc7_state::machine_start()
 {
 	// register for savestates
 	save_item(NAME(m_inp_mux));
@@ -111,7 +111,7 @@ void bcc_state::machine_start()
     I/O
 *******************************************************************************/
 
-void bcc_state::control_w(offs_t offset, u8 data)
+void cc7_state::control_w(offs_t offset, u8 data)
 {
 	// a0-a2,d7: digit segment data via NE591
 	u8 mask = 1 << (offset & 7);
@@ -127,7 +127,7 @@ void bcc_state::control_w(offs_t offset, u8 data)
 	m_inp_mux = data & 0xf;
 }
 
-u8 bcc_state::input_r()
+u8 cc7_state::input_r()
 {
 	u8 data = 0;
 
@@ -145,7 +145,7 @@ u8 bcc_state::input_r()
     Address Maps
 *******************************************************************************/
 
-void bcc_state::main_map(address_map &map)
+void cc7_state::main_map(address_map &map)
 {
 	map.unmap_value_high();
 	map.global_mask(0x3fff);
@@ -153,10 +153,10 @@ void bcc_state::main_map(address_map &map)
 	map(0x3000, 0x30ff).mirror(0x0f00).ram();
 }
 
-void bcc_state::main_io(address_map &map)
+void cc7_state::main_io(address_map &map)
 {
 	map.global_mask(0x07);
-	map(0x00, 0x07).rw(FUNC(bcc_state::input_r), FUNC(bcc_state::control_w));
+	map(0x00, 0x07).rw(FUNC(cc7_state::input_r), FUNC(cc7_state::control_w));
 }
 
 
@@ -165,7 +165,7 @@ void bcc_state::main_io(address_map &map)
     Input Ports
 *******************************************************************************/
 
-static INPUT_PORTS_START( bcc )
+static INPUT_PORTS_START( cc7 )
 	PORT_START("IN.0")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("EN") PORT_CODE(KEYCODE_ENTER) PORT_CODE(KEYCODE_ENTER_PAD)
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("PV") PORT_CODE(KEYCODE_V)
@@ -223,12 +223,12 @@ INPUT_PORTS_END
     Machine Configs
 *******************************************************************************/
 
-void bcc_state::bkc(machine_config &config)
+void cc7_state::bkc(machine_config &config)
 {
 	// basic machine hardware
 	Z80(config, m_maincpu, 3.579545_MHz_XTAL);
-	m_maincpu->set_addrmap(AS_PROGRAM, &bcc_state::main_map);
-	m_maincpu->set_addrmap(AS_IO, &bcc_state::main_io);
+	m_maincpu->set_addrmap(AS_PROGRAM, &cc7_state::main_map);
+	m_maincpu->set_addrmap(AS_IO, &cc7_state::main_io);
 
 	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(6, 8);
@@ -236,10 +236,10 @@ void bcc_state::bkc(machine_config &config)
 	config.set_default_layout(layout_fidel_bkc);
 }
 
-void bcc_state::bcc(machine_config &config)
+void cc7_state::cc7(machine_config &config)
 {
 	bkc(config);
-	config.set_default_layout(layout_fidel_bcc);
+	config.set_default_layout(layout_fidel_cc7);
 
 	// sound hardware
 	SPEAKER(config, "speaker").front_center();
@@ -277,7 +277,7 @@ ROM_END
 *******************************************************************************/
 
 //    YEAR  NAME      PARENT  COMPAT  MACHINE  INPUT  CLASS      INIT        COMPANY, FULLNAME, FLAGS
-SYST( 1980, cc7,      0,      0,      bcc,     bcc,   bcc_state, empty_init, "Fidelity Electronics", "Chess Challenger \"7\" (set 1)", MACHINE_SUPPORTS_SAVE )
-SYST( 1979, cc7a,     cc7,    0,      bcc,     bcc,   bcc_state, empty_init, "Fidelity Electronics", "Chess Challenger \"7\" (set 2)", MACHINE_SUPPORTS_SAVE )
+SYST( 1980, cc7,      0,      0,      cc7,     cc7,   cc7_state, empty_init, "Fidelity Electronics", "Chess Challenger \"7\" (set 1)", MACHINE_SUPPORTS_SAVE )
+SYST( 1979, cc7a,     cc7,    0,      cc7,     cc7,   cc7_state, empty_init, "Fidelity Electronics", "Chess Challenger \"7\" (set 2)", MACHINE_SUPPORTS_SAVE )
 
-SYST( 1979, backgamc, 0,      0,      bkc,     bkc,   bcc_state, empty_init, "Fidelity Electronics", "Backgammon Challenger", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
+SYST( 1979, backgamc, 0,      0,      bkc,     bkc,   cc7_state, empty_init, "Fidelity Electronics", "Backgammon Challenger", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )

@@ -769,6 +769,12 @@ public:
 		, m_p1(*this, "P1")
 		, m_p2(*this, "P2")
 		, m_extra_ports(*this, "EXTRA")
+		, m_p3(*this, "P3")
+		, m_p4(*this, "P4")
+		, m_p5(*this, "P5")
+		, m_p6(*this, "P6")
+		, m_dsw1(*this, "DSW1")
+		, m_dsw2(*this, "DSW2")
 		, m_lamps(*this, "lamp%u", 0U)
 	 { }
 
@@ -782,8 +788,8 @@ public:
 	void init_aristmk5();
 
 	INPUT_CHANGED_MEMBER(coin_start);
-	CUSTOM_INPUT_MEMBER(coin_r);
-	CUSTOM_INPUT_MEMBER(coin_usa_r);
+	ioport_value coin_r();
+	ioport_value coin_usa_r();
 	int hopper_r();
 
 private:
@@ -810,15 +816,15 @@ private:
 	void spi_int_ack_w(uint8_t data);
 	uint8_t spi_data_r();
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 	TIMER_CALLBACK_MEMBER(mk5_2KHz_callback);
 	TIMER_CALLBACK_MEMBER(spi_timer);
 
-	void aristmk5_arm_map(address_map &map);
-	void aristmk5_drame_map(address_map &map);
-	void aristmk5_map(address_map &map);
-	void aristmk5_usa_map(address_map &map);
+	void aristmk5_arm_map(address_map &map) ATTR_COLD;
+	void aristmk5_drame_map(address_map &map) ATTR_COLD;
+	void aristmk5_map(address_map &map) ATTR_COLD;
+	void aristmk5_usa_map(address_map &map) ATTR_COLD;
 
 	required_device<arm_cpu_device> m_maincpu;
 	required_device<acorn_ioc_device> m_ioc;
@@ -831,6 +837,7 @@ private:
 	required_ioport m_p1;
 	required_ioport m_p2;
 	required_ioport m_extra_ports;
+	optional_ioport m_p3, m_p4, m_p5, m_p6, m_dsw1, m_dsw2;
 
 	output_finder<64> m_lamps;
 
@@ -1094,7 +1101,7 @@ uint8_t aristmk5_state::ldor_r()
 	if (m_extra_ports->read() & 0x01)
 		m_ldor_shift_reg = 0;   // open the Logic door clears the shift register
 
-	return (m_ldor_shift_reg & 0x80) | 0x60 | ((m_hopper_test && m_hopper->line_r()) ? 0x10 : 0x00);
+	return (m_ldor_shift_reg & 0x80) | 0x60 | ((m_hopper_test && !m_hopper->line_r()) ? 0x10 : 0x00);
 }
 
 void aristmk5_state::ldor_clk_w(uint8_t data)
@@ -1197,11 +1204,11 @@ void aristmk5_state::aristmk5_map(address_map &map)
 
 	map(0x03010480, 0x0301049f).rw("uart_0a", FUNC(ins8250_uart_device::ins8250_r), FUNC(ins8250_uart_device::ins8250_w)).umask32(0x000000ff);
 	map(0x03010500, 0x0301051f).rw("uart_0b", FUNC(ins8250_uart_device::ins8250_r), FUNC(ins8250_uart_device::ins8250_w)).umask32(0x000000ff);
-	map(0x03010580, 0x03010583).portr("P3");
+	map(0x03010580, 0x03010583).portr(m_p3);
 	map(0x03010600, 0x0301061f).rw("uart_1a", FUNC(ins8250_uart_device::ins8250_r), FUNC(ins8250_uart_device::ins8250_w)).umask32(0x000000ff);
 	map(0x03010680, 0x0301069f).rw("uart_1b", FUNC(ins8250_uart_device::ins8250_r), FUNC(ins8250_uart_device::ins8250_w)).umask32(0x000000ff);
 
-	map(0x03010700, 0x03010703).portr("P6");
+	map(0x03010700, 0x03010703).portr(m_p6);
 	map(0x03010800, 0x03010800).r(FUNC(aristmk5_state::eeprom_r));
 	map(0x03010810, 0x03010813).rw("watchdog", FUNC(watchdog_timer_device::reset32_r), FUNC(watchdog_timer_device::reset32_w)); //MK-5 specific, watchdog
 
@@ -1226,15 +1233,15 @@ void aristmk5_state::aristmk5_usa_map(address_map &map)
 	map(0x03010440, 0x03010440).w(FUNC(aristmk5_state::rtc_usa_w));
 	map(0x03010450, 0x03010450).w(FUNC(aristmk5_state::eeprom_usa_w));
 
-	map(0x03012000, 0x03012003).portr("P1");
-	map(0x03012010, 0x03012013).portr("P2");
-	map(0x03012200, 0x03012203).portr("DSW1");
-	map(0x03012210, 0x03012213).portr("DSW2");
-	map(0x03010584, 0x03010587).portr("P4");
+	map(0x03012000, 0x03012003).portr(m_p1);
+	map(0x03012010, 0x03012013).portr(m_p2);
+	map(0x03012200, 0x03012203).portr(m_dsw1);
+	map(0x03012210, 0x03012213).portr(m_dsw2);
+	map(0x03010584, 0x03010587).portr(m_p4);
 
 	map(0x03012020, 0x03012020).r(FUNC(aristmk5_state::ldor_r));
 	map(0x03012070, 0x03012070).w(FUNC(aristmk5_state::ldor_clk_w));
-	map(0x03012184, 0x03012187).portr("P5");
+	map(0x03012184, 0x03012187).portr(m_p5);
 
 	map(0x03012000, 0x0301201f).w(FUNC(aristmk5_state::buttons_lamps_w)).umask32(0x000000ff);
 	map(0x03012030, 0x0301203f).w(FUNC(aristmk5_state::other_lamps_w)).umask32(0x000000ff);
@@ -1280,10 +1287,10 @@ void aristmk5_state::aristmk5_drame_map(address_map &map)
 
 int aristmk5_state::hopper_r()
 {
-	return (m_hopper_test && m_hopper->line_r()) ? 0 : 1;
+	return (m_hopper_test && !m_hopper->line_r()) ? 0 : 1;
 }
 
-CUSTOM_INPUT_MEMBER(aristmk5_state::coin_usa_r)
+ioport_value aristmk5_state::coin_usa_r()
 {
 	//  ---x  Coin Acceptor
 	//  --x-  Credit Sense
@@ -1313,7 +1320,7 @@ CUSTOM_INPUT_MEMBER(aristmk5_state::coin_usa_r)
 	return data;
 }
 
-CUSTOM_INPUT_MEMBER(aristmk5_state::coin_r)
+ioport_value aristmk5_state::coin_r()
 {
 	uint8_t data = 0x01;
 
@@ -1456,7 +1463,7 @@ static INPUT_PORTS_START( aristmk5_usa )
 	PORT_BIT(0x00000080, IP_ACTIVE_HIGH, IPT_GAMBLE_DOOR)  PORT_CODE(KEYCODE_C) PORT_TOGGLE PORT_NAME("Cashbox door")
 
 	PORT_START("P4")
-	PORT_BIT(0x00000078, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_CUSTOM_MEMBER(aristmk5_state, coin_usa_r)
+	PORT_BIT(0x00000078, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_CUSTOM_MEMBER(FUNC(aristmk5_state::coin_usa_r))
 
 	PORT_START("P5")
 	PORT_BIT(0x00000008, IP_ACTIVE_LOW,  IPT_OTHER)   // Meters
@@ -1466,7 +1473,7 @@ static INPUT_PORTS_START( aristmk5_usa )
 
 	PORT_START("EXTRA")
 	PORT_BIT(0x00000001, IP_ACTIVE_HIGH, IPT_OTHER)   PORT_TOGGLE PORT_CODE(KEYCODE_L)   PORT_NAME("Logic door")
-	PORT_BIT(0x00000002, IP_ACTIVE_HIGH, IPT_COIN1)   PORT_CHANGED_MEMBER(DEVICE_SELF, aristmk5_state, coin_start, 0)
+	PORT_BIT(0x00000002, IP_ACTIVE_HIGH, IPT_COIN1)   PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(aristmk5_state::coin_start), 0)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( aristmk5 )
@@ -1510,14 +1517,14 @@ static INPUT_PORTS_START( aristmk5 )
 	PORT_BIT(0x00c00000, IP_ACTIVE_HIGH, IPT_UNUSED)  // Unused mechanical security switch
 
 PORT_START("P3")
-	PORT_BIT(0x00000002, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_READ_LINE_MEMBER(aristmk5_state, hopper_r)
-	PORT_BIT(0x000000f8, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_CUSTOM_MEMBER(aristmk5_state, coin_r)
+	PORT_BIT(0x00000002, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_READ_LINE_MEMBER(FUNC(aristmk5_state::hopper_r))
+	PORT_BIT(0x000000f8, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_CUSTOM_MEMBER(FUNC(aristmk5_state::coin_r))
 
 	PORT_START("P6")
 	PORT_BIT(0x00000002, IP_ACTIVE_LOW, IPT_OTHER)    // Battery
 
 	PORT_START("EXTRA")
-	PORT_BIT(0x00000001, IP_ACTIVE_HIGH, IPT_COIN1)   PORT_CHANGED_MEMBER(DEVICE_SELF, aristmk5_state, coin_start, 0)
+	PORT_BIT(0x00000001, IP_ACTIVE_HIGH, IPT_COIN1)   PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(aristmk5_state::coin_start), 0)
 INPUT_PORTS_END
 
 /********** Game-specific button labels **********/
@@ -2422,7 +2429,7 @@ void aristmk5_state::aristmk5(machine_config &config)
 
 	DS1302(config, m_rtc, 32.768_kHz_XTAL);
 
-	HOPPER(config, m_hopper, attotime::from_msec(100), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_LOW);
+	HOPPER(config, m_hopper, attotime::from_msec(100));
 
 	// some games (jungjuic, penpir2) use the IOC KART interface for debug
 	rs232_port_device &rs232(RS232_PORT(config, "kart", default_rs232_devices, nullptr));

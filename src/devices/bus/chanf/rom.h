@@ -45,8 +45,8 @@ public:
 	chanf_maze_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// reading and writing
 	virtual uint8_t read_ram(offs_t offset) override { return common_read_2102(offset); }
@@ -63,8 +63,8 @@ public:
 	chanf_hangman_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// reading and writing
 	virtual uint8_t read_ram(offs_t offset) override { return common_read_2102(offset); }
@@ -95,8 +95,8 @@ public:
 	chanf_multi_old_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// reading and writing
 	virtual uint8_t read_rom(offs_t offset) override;
@@ -118,8 +118,8 @@ public:
 	chanf_multi_final_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// reading and writing
 	virtual uint8_t read_rom(offs_t offset) override;

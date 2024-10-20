@@ -222,8 +222,8 @@ public:
 	{
 	}
 
-	virtual void machine_reset() override;
-	virtual void machine_start() override;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void machine_start() override ATTR_COLD;
 
 	void set_interrupt(int cpunum, int level, int state);
 
@@ -338,12 +338,12 @@ public:
 	template<int Channel> void channel_irq(int state);
 
 	void cmi2x(machine_config &config);
-	void cmi07cpu_map(address_map &map);
-	void maincpu1_map(address_map &map);
-	void maincpu2_map(address_map &map);
-	void midicpu_map(address_map &map);
+	void cmi07cpu_map(address_map &map) ATTR_COLD;
+	void maincpu1_map(address_map &map) ATTR_COLD;
+	void maincpu2_map(address_map &map) ATTR_COLD;
+	void midicpu_map(address_map &map) ATTR_COLD;
 
-	template <int CpuNum> void cpu_periphs_map(address_map &map);
+	template <int CpuNum> void cpu_periphs_map(address_map &map) ATTR_COLD;
 
 protected:
 	required_device<mc6809e_device> m_maincpu1;

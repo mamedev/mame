@@ -46,7 +46,6 @@ Viking's Fun Mill
 #include "emu.h"
 
 #include "cpu/arm7/arm7.h"
-#include "cpu/arm7/arm7core.h"
 #include "machine/acorn_vidc.h"
 #include "machine/arm_iomd.h"
 
@@ -73,7 +72,7 @@ private:
 	required_device<arm_vidc20_device> m_vidc;
 	required_device<arm7500fe_iomd_device> m_iomd;
 
-	void program_map(address_map &map);
+	void program_map(address_map &map) ATTR_COLD;
 };
 
 void belatra_state::program_map(address_map &map)

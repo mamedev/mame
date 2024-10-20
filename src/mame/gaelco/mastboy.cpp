@@ -478,9 +478,9 @@ public:
 	void mastboy(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	uint8_t vram_r(offs_t offset);
@@ -498,9 +498,9 @@ private:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void vblank_irq(int state);
-	void bank_c000_map(address_map &map);
-	void mastboy_io_map(address_map &map);
-	void mastboy_map(address_map &map);
+	void bank_c000_map(address_map &map) ATTR_COLD;
+	void mastboy_io_map(address_map &map) ATTR_COLD;
+	void mastboy_map(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<msm5205_device> m_msm;

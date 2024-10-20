@@ -10,7 +10,7 @@
 
 #pragma once
 
-#include "cpu/z80/z80.h"
+#include "cpu/z80/nsc800.h"
 #include "sound/beep.h"
 #include "machine/nvram.h"
 #include "machine/ram.h"
@@ -195,8 +195,8 @@ private:
 	required_device<cassette_image_device> m_cassette;
 	required_device<generic_slot_device> m_card;
 
-	void machine_start() override;
-	void machine_reset() override;
+	void machine_start() override ATTR_COLD;
+	void machine_reset() override ATTR_COLD;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint8_t x07_io_r(offs_t offset);
 	void x07_io_w(offs_t offset, uint8_t data);
@@ -290,8 +290,8 @@ private:
 	TIMER_CALLBACK_MEMBER(beep_stop);
 	TIMER_DEVICE_CALLBACK_MEMBER(blink_timer);
 
-	void x07_io(address_map &map);
-	void x07_mem(address_map &map);
+	void x07_io(address_map &map) ATTR_COLD;
+	void x07_mem(address_map &map) ATTR_COLD;
 };
 
 #endif // MAME_CANON_X07_H

@@ -101,8 +101,8 @@ public:
 	void srmp6(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 	virtual void device_post_load() override { m_gfxdecode->gfx(0)->mark_all_dirty(); }
 
 private:
@@ -139,7 +139,7 @@ private:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 	required_device<buffered_spriteram16_device> m_sprram;
-	void srmp6_map(address_map &map);
+	void srmp6_map(address_map &map) ATTR_COLD;
 };
 
 #define VERBOSE 0

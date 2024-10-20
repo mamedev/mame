@@ -74,8 +74,8 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(power_button);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	// devices
 	required_device<cop400_cpu_device> m_maincpu;
@@ -600,7 +600,7 @@ public:
 	int motor_switch_r();
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	output_finder<> m_motor_pos_out;
@@ -694,7 +694,7 @@ static INPUT_PORTS_START( lchicken )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(lchicken_state, motor_switch_r)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(lchicken_state::motor_switch_r))
 INPUT_PORTS_END
 
 // config
@@ -926,7 +926,7 @@ static INPUT_PORTS_START( funrlgl )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("RESET")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_START ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_cop400_state, reset_button, 0)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_START ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(hh_cop400_state::reset_button), 0)
 INPUT_PORTS_END
 
 // config
@@ -1115,11 +1115,11 @@ public:
 	void mbaskb2(machine_config &config);
 	void msoccer2(machine_config &config);
 
-	DECLARE_CUSTOM_INPUT_MEMBER(switch_r);
+	ioport_value switch_r();
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	required_device<cop400_cpu_device> m_subcpu;
@@ -1188,7 +1188,7 @@ u8 mbaskb2_state::sub_read_in()
 
 // inputs
 
-CUSTOM_INPUT_MEMBER(mbaskb2_state::switch_r)
+ioport_value mbaskb2_state::switch_r()
 {
 	// The power switch is off-1-2, and the game relies on power-on starting at 1,
 	// otherwise msoccer2 boots up to what looks like a factory test mode.
@@ -1211,7 +1211,7 @@ static INPUT_PORTS_START( mbaskb2 )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2) PORT_NAME("Defense: Man")
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2) PORT_NAME("Defense: Zone")
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2) PORT_NAME("Defense: Press")
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(mbaskb2_state, switch_r)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(FUNC(mbaskb2_state::switch_r))
 
 	PORT_START("IN.3")
 	PORT_CONFNAME( 0x01, 0x01, DEF_STR( Difficulty ) )
@@ -2314,7 +2314,7 @@ public:
 	void scat(machine_config &config);
 
 private:
-	void main_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
 
 	void update_display();
 	void write_d(u8 data);
@@ -2772,7 +2772,7 @@ static INPUT_PORTS_START( lilcomp )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_2) PORT_CODE(KEYCODE_2_PAD) PORT_NAME("Code 2")
 
 	PORT_START("IN.3")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_POWER_ON ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_cop400_state, power_button, true)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_POWER_ON ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(hh_cop400_state::power_button), true)
 INPUT_PORTS_END
 
 // config

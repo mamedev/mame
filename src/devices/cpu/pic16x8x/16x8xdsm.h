@@ -1,11 +1,11 @@
 // license:BSD-3-Clause
-// copyright-holders: Grull Osgo
+// copyright-holders:Tony La Porta, Grull Osgo
 /*
 
   Microchip PIC16X8x Emulator
 
   Based on MAME's PIC16C5x cpu_device dissasm developed by Tony La Porta.
- 
+
 
 */
 

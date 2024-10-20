@@ -97,11 +97,11 @@ protected:
 	void machine_reset_common();
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void sorcerer_mem(address_map &map);
-	void sorcererb_mem(address_map &map);
-	void sorcerer_io(address_map &map);
-	void sorcerera_io(address_map &map);
-	void sorcererb_io(address_map &map);
+	void sorcerer_mem(address_map &map) ATTR_COLD;
+	void sorcererb_mem(address_map &map) ATTR_COLD;
+	void sorcerer_io(address_map &map) ATTR_COLD;
+	void sorcerera_io(address_map &map) ATTR_COLD;
+	void sorcererb_io(address_map &map) ATTR_COLD;
 
 	u8 m_portfe = 0U;
 	u8 m_keyboard_line = 0U;
@@ -146,9 +146,8 @@ private:
 	void port48_w(u8 data);
 	void intrq4_w(bool state);
 	bool m_halt = 0;
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	void busreq_w(bool state);
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 	u8 memory_read_byte(offs_t offset);
 	void memory_write_byte(offs_t offset, u8 data);
 	u8 io_read_byte(offs_t offset);
@@ -167,8 +166,8 @@ public:
 	void sorcererd(machine_config &config);
 
 private:
-	void sorcererd_mem(address_map &map);
-	void sorcererd_io(address_map &map);
+	void sorcererd_mem(address_map &map) ATTR_COLD;
+	void sorcererd_io(address_map &map) ATTR_COLD;
 	void port2c_w(u8 data);
 	void intrq2_w(bool state);
 	void drq2_w(bool state);
@@ -176,8 +175,8 @@ private:
 	bool m_wait = false;
 	bool m_drq_off = false;
 	bool m_intrq_off = false;
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 	optional_device<micropolis_device> m_fdc;
 	optional_device<fd1793_device> m_fdc2;
 };

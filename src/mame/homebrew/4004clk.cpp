@@ -36,7 +36,7 @@ public:
 	void _4004clk(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	required_device<i4004_cpu_device> m_maincpu;
@@ -47,11 +47,11 @@ private:
 	void nixie_w(offs_t offset, uint8_t data);
 	void neon_w(uint8_t data);
 
-	void _4004clk_mem(address_map &map);
-	void _4004clk_mp(address_map &map);
-	void _4004clk_rom(address_map &map);
-	void _4004clk_rp(address_map &map);
-	void _4004clk_stat(address_map &map);
+	void _4004clk_mem(address_map &map) ATTR_COLD;
+	void _4004clk_mp(address_map &map) ATTR_COLD;
+	void _4004clk_rom(address_map &map) ATTR_COLD;
+	void _4004clk_rp(address_map &map) ATTR_COLD;
+	void _4004clk_stat(address_map &map) ATTR_COLD;
 
 	static constexpr uint8_t nixie_to_num(uint16_t val)
 	{
@@ -147,7 +147,7 @@ static INPUT_PORTS_START( 4004clk )
 	PORT_CONFNAME( 0x04, 0x00, "Tick-Tock")
 	PORT_CONFSETTING( 0x00, "ON" )
 	PORT_CONFSETTING( 0x04, "OFF" )
-	PORT_CONFNAME( 0x08, 0x08, "50/60 Hz") PORT_CHANGED_MEMBER(DEVICE_SELF, nixieclock_state, switch_hz, 0)
+	PORT_CONFNAME( 0x08, 0x08, "50/60 Hz") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(nixieclock_state::switch_hz), 0)
 	PORT_CONFSETTING( 0x00, "50 Hz" )
 	PORT_CONFSETTING( 0x08, "60 Hz" )
 INPUT_PORTS_END

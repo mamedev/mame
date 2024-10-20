@@ -21,11 +21,11 @@ public:
 
 	auto irq_callback() { return irq_cb.bind(); }
 
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
-	void map_command(address_map &map);
-	void map_control(address_map &map);
-	void map_dma(address_map &map);
+	void map_command(address_map &map) ATTR_COLD;
+	void map_control(address_map &map) ATTR_COLD;
+	void map_dma(address_map &map) ATTR_COLD;
 
 	uint32_t ide_cs0_r(offs_t offset, uint32_t mem_mask = ~0);
 	uint32_t ide_cs1_r(offs_t offset, uint32_t mem_mask = ~0);
@@ -34,8 +34,8 @@ public:
 	void ide_irq(int state);
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	virtual void map_extra(uint64_t memory_window_start, uint64_t memory_window_end, uint64_t memory_offset, address_space *memory_space,
 		uint64_t io_window_start, uint64_t io_window_end, uint64_t io_offset, address_space *io_space) override;
@@ -71,12 +71,12 @@ public:
 
 	naomi_gdrom_board(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual void submap(address_map &map) override;
-	void sh4_map(address_map &map);
-	void sh4_io_map(address_map &map);
-	void pci_map(address_map &map);
-	void pci_config_map(address_map &map);
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual void submap(address_map &map) override ATTR_COLD;
+	void sh4_map(address_map &map) ATTR_COLD;
+	void sh4_io_map(address_map &map) ATTR_COLD;
+	void pci_map(address_map &map) ATTR_COLD;
+	void pci_config_map(address_map &map) ATTR_COLD;
 
 	void set_image_tag(const char *_image_tag)
 	{
@@ -85,7 +85,7 @@ public:
 
 	uint8_t *memory(uint32_t &size) { size = dimm_data_size; return dimm_data.get(); }
 
-	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 
 	void dimm_command_w(uint16_t data);     // 5f703c
 	uint16_t dimm_command_r();
@@ -128,9 +128,9 @@ public:
 	void pic_dimm_w(offs_t offset, uint8_t data, uint8_t mem_mask);
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
-	virtual ioport_constructor device_input_ports() const override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 
 	virtual void board_setup_address(uint32_t address, bool is_dma) override;
 	virtual void board_get_buffer(uint8_t *&base, uint32_t &limit) override;

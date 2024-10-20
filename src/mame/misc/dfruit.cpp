@@ -1,24 +1,20 @@
 // license:BSD-3-Clause
 // copyright-holders: Angelo Salese
+/**************************************************************************************************
 
-/***************************************************************************
+Fruit Dream (c) 1993 Nippon Data Kiki / Star Fish
+Gemcrush (c) 1996 Star Fish
 
-    Fruit Dream (c) 1993 Nippon Data Kiki / Star Fish
-    Gemcrush (c) 1996 Star Fish
+Uses a TC0091LVC, a variant of the one used on Taito L HW
 
-    driver by Angelo Salese
+TODO:
+- inputs are grossly mapped, lack of any input test doesn't help at all;
+- lamps?
+- service mode?
+- nvram?
+- dfruit: has an X on top-left corner after POST, is it supposed to be disabled somehow?
 
-    Uses a TC0091LVC, a variant of the one used on Taito L HW
-
-    TODO:
-    - inputs are grossly mapped, lack of any input test doesn't help at all;
-    - lamps?
-    - service mode?
-    - nvram?
-    - dfruit: (possible bug) has an X on top-left corner after POST,
-              is it supposed to be disabled somehow?
-
-***************************************************************************/
+**************************************************************************************************/
 
 #include "emu.h"
 
@@ -50,9 +46,9 @@ private:
 
 	void output_w(uint8_t data);
 
-	TIMER_DEVICE_CALLBACK_MEMBER(scanline_callback);
-	void program_map(address_map &map);
-	void tc0091lvc_map(address_map &map);
+	TIMER_DEVICE_CALLBACK_MEMBER(scanline_cb);
+	void main_map(address_map &map) ATTR_COLD;
+	void tc0091lvc_map(address_map &map) ATTR_COLD;
 };
 
 void dfruit_state::screen_vblank(int state)
@@ -75,7 +71,7 @@ void dfruit_state::tc0091lvc_map(address_map &map)
 	map(0xff08, 0xff08).rw(m_maincpu, FUNC(tc0091lvc_device::rom_bank_r), FUNC(tc0091lvc_device::rom_bank_w));
 }
 
-void dfruit_state::program_map(address_map &map)
+void dfruit_state::main_map(address_map &map)
 {
 	tc0091lvc_map(map);
 	map(0xa000, 0xa003).rw("i8255", FUNC(i8255_device::read), FUNC(i8255_device::write));
@@ -257,7 +253,7 @@ static INPUT_PORTS_START( gemcrush )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
-TIMER_DEVICE_CALLBACK_MEMBER(dfruit_state::scanline_callback)
+TIMER_DEVICE_CALLBACK_MEMBER(dfruit_state::scanline_cb)
 {
 	int scanline = param;
 
@@ -291,9 +287,9 @@ void dfruit_state::dfruit(machine_config &config)
 
 	// basic machine hardware
 	TC0091LVC(config, m_maincpu, MASTER_CLOCK / 2);
-	m_maincpu->set_addrmap(AS_PROGRAM, &dfruit_state::program_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &dfruit_state::main_map);
 
-	TIMER(config, "scantimer").configure_scanline(FUNC(dfruit_state::scanline_callback), "screen", 0, 1);
+	TIMER(config, "scantimer").configure_scanline(FUNC(dfruit_state::scanline_cb), "screen", 0, 1);
 
 	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));

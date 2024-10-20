@@ -700,6 +700,7 @@ void trs80m2_state::trs80m2(machine_config &config)
 	m_maincpu->set_daisy_config(trs80m2_daisy_chain);
 	m_maincpu->set_addrmap(AS_PROGRAM, &trs80m2_state::z80_mem);
 	m_maincpu->set_addrmap(AS_IO, &trs80m2_state::z80_io);
+	m_maincpu->busack_cb().set(m_dmac, FUNC(z80dma_device::bai_w));
 
 	// video hardware
 	screen_device &screen(SCREEN(config, SCREEN_TAG, SCREEN_TYPE_RASTER, rgb_t::green()));
@@ -738,7 +739,7 @@ void trs80m2_state::trs80m2(machine_config &config)
 	m_ctc->zc_callback<2>().set(Z80SIO_TAG, FUNC(z80sio_device::rxtxcb_w));
 
 	Z80DMA(config, m_dmac, 8_MHz_XTAL / 2);
-	m_dmac->out_busreq_callback().set_inputline(m_maincpu, INPUT_LINE_HALT);
+	m_dmac->out_busreq_callback().set_inputline(m_maincpu, Z80_INPUT_LINE_BUSRQ);
 	m_dmac->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 	m_dmac->in_mreq_callback().set(FUNC(trs80m2_state::read));
 	m_dmac->out_mreq_callback().set(FUNC(trs80m2_state::write));
@@ -789,6 +790,7 @@ void trs80m16_state::trs80m16(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &trs80m16_state::z80_mem);
 	m_maincpu->set_addrmap(AS_IO, &trs80m16_state::m16_z80_io);
 	m_maincpu->set_irq_acknowledge_callback(AM9519A_TAG, FUNC(am9519_device::iack_cb));
+	m_maincpu->busack_cb().set(m_dmac, FUNC(z80dma_device::bai_w));
 
 	M68000(config, m_subcpu, 24_MHz_XTAL / 4);
 	m_subcpu->set_addrmap(AS_PROGRAM, &trs80m16_state::m68000_mem);
@@ -831,7 +833,7 @@ void trs80m16_state::trs80m16(machine_config &config)
 	m_ctc->zc_callback<2>().set(Z80SIO_TAG, FUNC(z80sio_device::rxtxcb_w));
 
 	Z80DMA(config, m_dmac, 8_MHz_XTAL / 2);
-	m_dmac->out_busreq_callback().set_inputline(m_maincpu, INPUT_LINE_HALT);
+	m_dmac->out_busreq_callback().set_inputline(m_maincpu, Z80_INPUT_LINE_BUSRQ);
 	m_dmac->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 	m_dmac->in_mreq_callback().set(FUNC(trs80m2_state::read));
 	m_dmac->out_mreq_callback().set(FUNC(trs80m2_state::write));

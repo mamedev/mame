@@ -23,8 +23,8 @@ protected:
 	linear_flash_pccard_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, address_map_constructor amap);
 
 	// device_t
-	virtual ioport_constructor device_input_ports() const override;
-	virtual void device_start() override;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
+	virtual void device_start() override ATTR_COLD;
 
 	// device_memory_interface
 	virtual space_config_vector memory_space_config() const override;
@@ -41,7 +41,7 @@ class linear_flash_pccard_8bit_device :
 protected:
 	linear_flash_pccard_8bit_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
-	void amap(address_map &map);
+	void amap(address_map &map) ATTR_COLD;
 
 	required_device_array<intelfsh8_device, N> m_l;
 	required_device_array<intelfsh8_device, N> m_u;
@@ -54,7 +54,7 @@ class linear_flash_pccard_16bit_device :
 protected:
 	linear_flash_pccard_16bit_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
-	void amap(address_map &map);
+	void amap(address_map &map) ATTR_COLD;
 
 	required_device_array<intelfsh16_device, N> m_flash;
 };
@@ -67,7 +67,7 @@ protected:
 	linear_flash_pccard_29f017a_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	// device_t
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 };
 
 template<unsigned N>
@@ -78,7 +78,7 @@ protected:
 	linear_flash_pccard_lh28f016s_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	// device_t
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 };
 
 template<unsigned N>
@@ -89,7 +89,7 @@ protected:
 	linear_flash_pccard_28f640j5_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	// device_t
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 };
 
 class fujitsu_16mb_flash_card_device : public linear_flash_pccard_29f017a_device<4>

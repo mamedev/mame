@@ -43,8 +43,8 @@ public:
 	void act5a(machine_config &config);
 
 private:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	TIMER_CALLBACK_MEMBER(baud_clock);
 
@@ -63,8 +63,8 @@ private:
 	void port00_w(u8 data);
 	u8 port01_r();
 
-	void f8_mem(address_map &map);
-	void f8_io(address_map &map);
+	void f8_mem(address_map &map) ATTR_COLD;
+	void f8_io(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<ay51013_device> m_uart;
@@ -448,7 +448,7 @@ static INPUT_PORTS_START(act5a)
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Caps Lock") PORT_CHAR(UCHAR_MAMEKEY(CAPSLOCK)) PORT_CODE(KEYCODE_CAPSLOCK) PORT_TOGGLE
 
 	PORT_START("SPECIAL")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Break") PORT_CODE(KEYCODE_F9) PORT_WRITE_LINE_DEVICE_MEMBER("txd", input_merger_device, in_w<1>)
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Break") PORT_CODE(KEYCODE_F9) PORT_WRITE_LINE_DEVICE_MEMBER("txd", FUNC(input_merger_device::in_w<1>))
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Line/Loc") PORT_CODE(KEYCODE_F10) PORT_TOGGLE
 
 	PORT_START("DSW1")

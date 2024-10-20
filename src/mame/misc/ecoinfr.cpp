@@ -115,7 +115,7 @@ private:
 	void ec_port17_out_w(uint8_t data);
 	void ec_port18_out_w(uint8_t data);
 
-	virtual void machine_reset() override;
+	virtual void machine_reset() override ATTR_COLD;
 	virtual void machine_start() override { m_digits.resolve(); }
 	TIMER_DEVICE_CALLBACK_MEMBER(ecoinfr_irq_timer);
 
@@ -125,8 +125,8 @@ private:
 	required_device<cpu_device> m_maincpu;
 	required_device_array<stepper_device, 4> m_reel;
 	output_finder<16> m_digits;
-	void memmap(address_map &map);
-	void portmap(address_map &map);
+	void memmap(address_map &map) ATTR_COLD;
+	void portmap(address_map &map) ATTR_COLD;
 };
 
 
@@ -564,12 +564,12 @@ static INPUT_PORTS_START( ecoinfr_barx )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 
 	PORT_START("IN1")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(ecoinfr_state, reel1_opto_r)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(ecoinfr_state::reel1_opto_r))
 	PORT_DIPNAME( 0x02, 0x02, "IN1:02" )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( On ) )
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(ecoinfr_state, reel3_opto_r)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(ecoinfr_state, reel2_opto_r)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(ecoinfr_state::reel3_opto_r))
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(ecoinfr_state::reel2_opto_r))
 	PORT_DIPNAME( 0x10, 0x10, "IN1:10" )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( On ) )

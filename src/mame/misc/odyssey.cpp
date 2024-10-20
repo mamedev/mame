@@ -10,6 +10,7 @@
 
     TODO:
     - bp f7ae6,1,{eip+=0xf;g} fails ISA state $0f;
+    - Hangs after playing with SCSI regs, needs dump to proceed;
     - Accesses S3 video in New MMIO mode, core fumbles on video mode setup
       (prepares linear for 32bpp, core sets SVGA 8bpp instead)
     - Hangs after playing with LPT1 & IDE checks;
@@ -103,8 +104,8 @@ public:
 private:
 	required_device<pentium_device> m_maincpu;
 
-	void odyssey_map(address_map &map);
-	void odyssey_io(address_map &map);
+	void odyssey_map(address_map &map) ATTR_COLD;
+	void odyssey_io(address_map &map) ATTR_COLD;
 
 	static void national_superio_config(device_t *device);
 };
@@ -197,7 +198,7 @@ void odyssey_state::odyssey(machine_config &config)
 	//PCI_SLOT(config, "pci:3", pci_cards, 15, 0, 1, 2, 3, nullptr);
 
 	// pci:10.0 (J4C1) PCI expansion slot 4
-	PCI_SLOT(config, "pci:4", pci_cards, 16, 0, 1, 2, 3, nullptr);
+	PCI_SLOT(config, "pci:4", pci_cards, 16, 0, 1, 2, 3, "ncr53c825");
 
 	ISA16_SLOT(config, "board4", 0, "pci:07.0:isabus", isa_internal_devices, "pc87306", true).set_option_machine_config("pc87306", national_superio_config);
 	ISA16_SLOT(config, "isa1", 0, "pci:07.0:isabus", pc_isa16_cards, nullptr, false);
@@ -268,9 +269,6 @@ ROM_START( odyssey )
 
 	ROM_REGION( 0x10000, "vbios", 0 )   // video card BIOS
 	ROM_LOAD( "videobios", 0x000000, 0x00d000, NO_DUMP )
-
-	ROM_REGION( 0x10000, "scsibios", 0 )   // SCSI card BIOS
-	ROM_LOAD( "scsibios", 0x000000, 0x00d000, NO_DUMP )
 
 	DISK_REGION( "scsi_hdd_image" ) // SCSI HDD
 	DISK_IMAGE( "odyssey", 0, NO_DUMP )

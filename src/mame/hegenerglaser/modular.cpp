@@ -128,8 +128,8 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(switch_sensor_type) { set_sbtype(newval); }
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	// devices/pointers
@@ -143,13 +143,13 @@ private:
 	u8 m_bav_data = 0;
 
 	// address maps
-	void alm16_mem(address_map &map);
-	void alm32_mem(address_map &map);
-	void port16_mem(address_map &map);
-	void port32_mem(address_map &map);
-	void van16_mem(address_map &map);
-	void van32_mem(address_map &map);
-	void gen32_mem(address_map &map);
+	void alm16_mem(address_map &map) ATTR_COLD;
+	void alm32_mem(address_map &map) ATTR_COLD;
+	void port16_mem(address_map &map) ATTR_COLD;
+	void port32_mem(address_map &map) ATTR_COLD;
+	void van16_mem(address_map &map) ATTR_COLD;
+	void van32_mem(address_map &map) ATTR_COLD;
+	void gen32_mem(address_map &map) ATTR_COLD;
 
 	// I/O handlers
 	u32 rom_r(offs_t offset);
@@ -350,7 +350,7 @@ void mmodular_state::gen32_mem(address_map &map)
 
 static INPUT_PORTS_START( bavaria )
 	PORT_START("FAKE")
-	PORT_CONFNAME( 0x01, 0x00, "Board Sensors" ) PORT_CHANGED_MEMBER(DEVICE_SELF, mmodular_state, switch_sensor_type, 0)
+	PORT_CONFNAME( 0x01, 0x00, "Board Sensors" ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(mmodular_state::switch_sensor_type), 0)
 	PORT_CONFSETTING(    0x00, "Magnets (Exclusive)" ) // or Muenchen/Modular
 	PORT_CONFSETTING(    0x01, "Induction (Bavaria)" )
 INPUT_PORTS_END

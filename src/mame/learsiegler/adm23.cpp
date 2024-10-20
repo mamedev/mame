@@ -29,7 +29,7 @@ private:
 	MC6845_UPDATE_ROW(update_row);
 	MC6845_ON_UPDATE_ADDR_CHANGED(addr_changed);
 
-	void mem_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
 
 	required_region_ptr<u8> m_chargen;
 };

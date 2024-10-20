@@ -59,8 +59,8 @@ public:
 private:
 	void usart_clock_tick(int state);
 
-	void sdk80_io(address_map &map);
-	void sdk80_mem(address_map &map);
+	void sdk80_io(address_map &map) ATTR_COLD;
+	void sdk80_mem(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<i8251_device> m_usart;

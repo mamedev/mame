@@ -95,12 +95,12 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER( trigger_reset );
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
-	void vidbrain_mem(address_map &map);
-	void vidbrain_io(address_map &map);
+	void vidbrain_mem(address_map &map) ATTR_COLD;
+	void vidbrain_io(address_map &map) ATTR_COLD;
 
 	TIMER_CALLBACK_MEMBER(joystick_tick);
 
@@ -353,7 +353,7 @@ static INPUT_PORTS_START( vidbrain )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("BACK TEXT") PORT_CODE(KEYCODE_F1) PORT_CHAR(UCHAR_MAMEKEY(F1))
 
 	PORT_START("RESET")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("MASTER CONTROL") PORT_CODE(KEYCODE_F5) PORT_CHAR(UCHAR_MAMEKEY(F5)) PORT_CHANGED_MEMBER(DEVICE_SELF, vidbrain_state, trigger_reset, 0)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("MASTER CONTROL") PORT_CODE(KEYCODE_F5) PORT_CHAR(UCHAR_MAMEKEY(F5)) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(vidbrain_state::trigger_reset), 0)
 
 	PORT_START("JOY1-X")
 	PORT_BIT( 0xff, 50, IPT_AD_STICK_X ) PORT_MINMAX(0, 99) PORT_SENSITIVITY(25) PORT_PLAYER(1)

@@ -107,7 +107,7 @@ public:
 	void aquarium(machine_config &config);
 
 protected:
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	// memory pointers
@@ -150,9 +150,9 @@ private:
 	u8 snd_bitswap(u8 scrambled_data);
 	void aquarium_colpri_cb(u32 &colour, u32 &pri_mask);
 
-	void main_map(address_map &map);
-	void snd_map(address_map &map);
-	void snd_portmap(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
+	void snd_map(address_map &map) ATTR_COLD;
+	void snd_portmap(address_map &map) ATTR_COLD;
 };
 
 
@@ -389,7 +389,7 @@ static INPUT_PORTS_START( aquarium )
 	PORT_SERVICE( 0x1000, IP_ACTIVE_LOW )
 	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("soundlatch", generic_latch_8_device, pending_r)
+	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("soundlatch", FUNC(generic_latch_8_device::pending_r))
 INPUT_PORTS_END
 
 static const gfx_layout layout_5bpp_hi =

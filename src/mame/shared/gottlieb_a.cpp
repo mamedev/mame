@@ -110,7 +110,7 @@ INPUT_PORTS_START( gottlieb_sound_p2 )
 
 	// The sound test will only work if the 2 above dips are in opposing directions (one off and one on)
 	PORT_START("TEST")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Sound Test") PORT_CODE(KEYCODE_7_PAD) PORT_CHANGED_MEMBER(DEVICE_SELF, gottlieb_sound_p2_device, audio_nmi, 0)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Sound Test") PORT_CODE(KEYCODE_7_PAD) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(gottlieb_sound_p2_device::audio_nmi), 0)
 INPUT_PORTS_END
 
 ioport_constructor gottlieb_sound_p2_device::device_input_ports() const
@@ -451,7 +451,7 @@ INPUT_PORTS_START( gottlieb_sound_speech_r1 )
 	PORT_INCLUDE( gottlieb_sound_r1 )
 
 	PORT_MODIFY("SB1")
-	PORT_BIT( 0x80, 0x80, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("votrax", votrax_sc01_device, request)
+	PORT_BIT( 0x80, 0x80, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("votrax", FUNC(votrax_sc01_device::request))
 INPUT_PORTS_END
 
 ioport_constructor gottlieb_sound_speech_r1_device::device_input_ports() const
@@ -648,7 +648,7 @@ INPUT_PORTS_START( gottlieb_sound_r2 )
 	PORT_DIPNAME( 0x40, 0x40, "Sound Test" )            PORT_DIPLOCATION("SB2:3")
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("spsnd", sp0250_device, drq_r)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("spsnd", FUNC(sp0250_device::drq_r))
 INPUT_PORTS_END
 
 ioport_constructor gottlieb_sound_r2_device::device_input_ports() const

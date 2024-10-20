@@ -28,6 +28,7 @@ DEFINE_DEVICE_TYPE(SAMSUNG_K9F1G08U0B,  samsung_k9f1g08u0b_device,  "samsung_k9f
 DEFINE_DEVICE_TYPE(SAMSUNG_K9F1G08U0M,  samsung_k9f1g08u0m_device,  "samsung_k9f1g08u0m",  "Samsung K9F1G08U0M")
 DEFINE_DEVICE_TYPE(SAMSUNG_K9LAG08U0M,  samsung_k9lag08u0m_device,  "samsung_k9lag08u0m",  "Samsung K9LAG08U0M")
 DEFINE_DEVICE_TYPE(SAMSUNG_K9F2G08U0M,  samsung_k9f2g08u0m_device,  "samsung_k9f2g08u0m",  "Samsung K9F2G08U0M")
+DEFINE_DEVICE_TYPE(TOSHIBA_TC58256AFT,  toshiba_tc58256aft_device,  "toshiba_tc58256aft",  "Toshiba TC58256AFT")
 
 nand_device::nand_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: nand_device(mconfig, NAND, tag, owner, clock)
@@ -179,6 +180,21 @@ samsung_k9f2g08u0m_device::samsung_k9f2g08u0m_device(const machine_config &mconf
 	m_num_pages = 128 * 1024;
 	m_col_address_cycles = 2;
 	m_row_address_cycles = 3;
+	m_sequential_row_read = 0;
+}
+
+toshiba_tc58256aft_device::toshiba_tc58256aft_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: nand_device(mconfig, TOSHIBA_TC58256AFT, tag, owner, clock)
+{
+	m_id_len = 2;
+	m_id[0] = 0x98;
+	m_id[1] = 0x75;
+	m_page_data_size = 512;
+	m_page_total_size = 512 + 16;
+	m_log2_pages_per_block = compute_log2(32);
+	m_num_pages = 32 * 2048;
+	m_col_address_cycles = 1;
+	m_row_address_cycles = 2;
 	m_sequential_row_read = 0;
 }
 

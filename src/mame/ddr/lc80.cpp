@@ -92,7 +92,7 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(trigger_nmi);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	required_device<z80_device> m_maincpu;
@@ -107,11 +107,11 @@ private:
 
 	u8 m_matrix = 0;
 
-	void lc80_mem(address_map &map);
-	void lc80a_mem(address_map &map);
-	void lc80e_mem(address_map &map);
-	void lc80_2_mem(address_map &map);
-	void lc80_io(address_map &map);
+	void lc80_mem(address_map &map) ATTR_COLD;
+	void lc80a_mem(address_map &map) ATTR_COLD;
+	void lc80e_mem(address_map &map) ATTR_COLD;
+	void lc80_2_mem(address_map &map) ATTR_COLD;
+	void lc80_io(address_map &map) ATTR_COLD;
 
 	void halt_w(int state) { m_halt_led = state; }
 	void ctc_z0_w(int state);
@@ -211,8 +211,8 @@ static INPUT_PORTS_START( lc80 )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("ADR") PORT_CODE(KEYCODE_COMMA) PORT_CHAR(',')
 
 	PORT_START("SPECIAL")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("RES") PORT_CODE(KEYCODE_F1) PORT_CHANGED_MEMBER(DEVICE_SELF, lc80_state, trigger_reset, 0)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("NMI") PORT_CODE(KEYCODE_F2) PORT_CHANGED_MEMBER(DEVICE_SELF, lc80_state, trigger_nmi, 0)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("RES") PORT_CODE(KEYCODE_F1) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(lc80_state::trigger_reset), 0)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("NMI") PORT_CODE(KEYCODE_F2) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(lc80_state::trigger_nmi), 0)
 INPUT_PORTS_END
 
 

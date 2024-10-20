@@ -35,16 +35,18 @@ protected:
 		this->compliance = compliance;
 	}
 
-	virtual void device_start() override;
-	virtual void device_reset() override;
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 	virtual void scsi_command() override;
 	virtual uint8_t scsi_get_data(int id, int pos) override;
 	virtual void scsi_put_data(int buf, int offset, uint8_t data) override;
 
-	void return_no_cd();
+	virtual void return_no_cd();
 	static int to_msf(int frame);
+
+	bool m_removal_prevented;
 
 private:
 	static constexpr uint32_t bytes_per_sector = 2048;
@@ -127,12 +129,13 @@ class nscsi_cdrom_apple_device : public nscsi_cdrom_device
 {
 public:
 	nscsi_cdrom_apple_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 protected:
 	virtual void scsi_command() override;
 	virtual bool scsi_command_done(uint8_t command, uint8_t length) override;
 	virtual void scsi_put_data(int buf, int offset, uint8_t data) override;
+	virtual void return_no_cd() override;
 
 private:
 	bool m_stopped;

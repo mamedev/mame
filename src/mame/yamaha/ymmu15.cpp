@@ -100,11 +100,11 @@ private:
 	u16 m_pdt;
 	u8 m_cmah;
 
-	void c_map(address_map &map);
-	void s_map(address_map &map);
+	void c_map(address_map &map) ATTR_COLD;
+	void s_map(address_map &map) ATTR_COLD;
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	u16 pdt_r();
 	void pdt_w(u16 data);

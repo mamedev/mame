@@ -672,12 +672,12 @@ dew_zpg
 	TMP2++;
 	TMP = set_h(TMP, read(B|TMP2));
 	P &= ~(F_N|F_Z);
-	TMP++;
+	TMP--;
 	if(!TMP)
 		P |= F_Z;
 	else if(TMP & 0x8000)
 		P |= F_N;
-	TMP2++;
+	TMP2--;
 	write(B|TMP2, TMP);
 	TMP2++;
 	write(B|TMP2, TMP >> 8);
@@ -1198,10 +1198,10 @@ phw_aba
 	PC++;
 	TMP3 = read(TMP);
 	TMP3 = set_h(TMP3, read(TMP+1));
-	dec_SP_ce();
 	write(SP, TMP3);
 	dec_SP_ce();
 	write(SP, TMP3 >> 8);
+	dec_SP_ce();
 	prefetch();
 
 phw_iw2
@@ -1209,10 +1209,10 @@ phw_iw2
 	PC++;
 	TMP = set_h(TMP, read_pc());
 	PC++;
-	dec_SP_ce();
 	write(SP, TMP);
 	dec_SP_ce();
 	write(SP, TMP >> 8);
+	dec_SP_ce();
 	prefetch();
 
 phx_ce_imp
@@ -1657,7 +1657,7 @@ stz_ce_aba
 	PC++;
 	TMP = set_h(TMP, read_pc());
 	PC++;
-	write(TMP, A);
+	write(TMP, Z);
 	prefetch();
 
 stz_ce_abx
@@ -1665,7 +1665,7 @@ stz_ce_abx
 	PC++;
 	TMP = set_h(TMP, read_pc());
 	PC++;
-	write(TMP+X, A);
+	write(TMP+X, Z);
 	prefetch();
 
 stz_ce_zpg

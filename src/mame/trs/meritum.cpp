@@ -92,10 +92,10 @@ private:
 	u32 screen_update_meritum1(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	u32 screen_update_meritum2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void mem_map(address_map &map);
-	void io_map(address_map &map);
-	void mem_map2(address_map &map);
-	void io_map2(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
+	void io_map(address_map &map) ATTR_COLD;
+	void mem_map2(address_map &map) ATTR_COLD;
+	void io_map2(address_map &map) ATTR_COLD;
 	void mainppi_portb_w(u8);
 	void mainppi_portc_w(u8);
 
@@ -230,7 +230,7 @@ static INPUT_PORTS_START( meritum )
 	PORT_BIT(0xFC, 0x00, IPT_UNUSED)
 
 	PORT_START("NMI")
-	PORT_BIT(0x01, 0x01, IPT_KEYBOARD) PORT_NAME("NMI") PORT_CODE(KEYCODE_F1) PORT_WRITE_LINE_DEVICE_MEMBER("nmigate", input_merger_device, in_w<1>)
+	PORT_BIT(0x01, 0x01, IPT_KEYBOARD) PORT_NAME("NMI") PORT_CODE(KEYCODE_F1) PORT_WRITE_LINE_DEVICE_MEMBER("nmigate", FUNC(input_merger_device::in_w<1>))
 INPUT_PORTS_END
 
 u32 meritum_state::screen_update_meritum1(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)

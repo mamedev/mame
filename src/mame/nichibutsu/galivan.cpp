@@ -564,7 +564,6 @@ void galivan_state::galivan_common(machine_config &config)
 	//  Sum:                  0.67015
 	//  Multiply all 3 values by 1 / 0.67015 (i.e. 1.492203):
 	// Final values are: ym: 0.492203; dac1: 0.209505; dac2: 0.298291
-
 	FILTER_BIQUAD(config, m_ymfilter).opamp_sk_lowpass_setup(RES_K(4.7), RES_K(4.7), RES_M(999.99), RES_R(0.001), CAP_N(3.3), CAP_N(1.0)); // R15, R14, nothing(infinite resistance), wire(short), C9, C11
 	m_ymfilter->add_route(ALL_OUTPUTS, "speaker", 1.0);
 	FILTER_BIQUAD(config, m_dacfilter1).opamp_sk_lowpass_setup(RES_K(10), RES_K(10), RES_M(999.99), RES_R(0.001), CAP_N(10), CAP_N(4.7)); // R11, R10, nothing(infinite resistance), wire(short), C7, C17
@@ -631,6 +630,7 @@ void galivan_state::youmab(machine_config &config)
 
 	config.device_remove("nb1414m4");
 }
+
 
 /***************************************************************************
 

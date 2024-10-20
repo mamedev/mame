@@ -35,19 +35,19 @@ public:
 	void set_ram_size(uint32_t size) { ram_size = size; }
 	address_space *get_cpu_space(int spacenum) { return &cpu->space(spacenum); }
 
-	void bios_map(address_map &map);
+	void bios_map(address_map &map) ATTR_COLD;
 	void aperture_map(address_map &map) {}
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	virtual void reset_all_mappings() override;
 
 	virtual void map_extra(uint64_t memory_window_start, uint64_t memory_window_end, uint64_t memory_offset, address_space *memory_space,
 		uint64_t io_window_start, uint64_t io_window_end, uint64_t io_offset, address_space *io_space) override;
 
-	virtual void config_map(address_map &map) override;
+	virtual void config_map(address_map &map) override ATTR_COLD;
 
 private:
 	required_device<device_memory_interface> cpu;
@@ -73,13 +73,13 @@ public:
 	void set_ram_size(int ram_size);
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	virtual void map_extra(uint64_t memory_window_start, uint64_t memory_window_end, uint64_t memory_offset, address_space *memory_space,
 		uint64_t io_window_start, uint64_t io_window_end, uint64_t io_offset, address_space *io_space) override;
 
-	virtual void config_map(address_map &map) override;
+	virtual void config_map(address_map &map) override ATTR_COLD;
 
 private:
 	int ddr_ram_size = 0;
@@ -100,8 +100,8 @@ public:
 	uint8_t *get_buffer() { return buffer; }
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 private:
 	uint8_t buffer[0xff]{};
@@ -119,8 +119,8 @@ public:
 	virtual int execute_command(int command, int rw, int data) override;
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 private:
 	const uint8_t *buffer  = nullptr;
@@ -140,7 +140,7 @@ public:
 	uint8_t *get_buffer() { return buffer; }
 
 protected:
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 private:
 	uint8_t buffer[0xff]{};
@@ -156,7 +156,7 @@ public:
 	uint8_t *get_buffer() { return buffer; }
 
 protected:
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 private:
 	uint8_t buffer[0xff]{};
@@ -172,7 +172,7 @@ public:
 	uint8_t *get_buffer() { return buffer; }
 
 protected:
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 private:
 	uint8_t buffer[0xff]{};
@@ -189,7 +189,7 @@ public:
 	virtual void map_extra(address_space *memory_space, address_space *io_space) override;
 	virtual void set_host(int device_index, lpcbus_host_interface *host) override;
 	virtual uint32_t dma_transfer(int channel, dma_operation operation, dma_size size, uint32_t data) override;
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 	auto pin_reset() { return pin_reset_callback.bind(); }
 	auto pin_gatea20() { return pin_gatea20_callback.bind(); }
@@ -200,10 +200,10 @@ public:
 	auto ndtr2() { return m_ndtr2_callback.bind(); }
 	auto nrts2() { return m_nrts2_callback.bind(); }
 
-	void map_lpt(address_map& map);
-	void map_serial1(address_map& map);
-	void map_serial2(address_map& map);
-	void map_keyboard(address_map &map);
+	void map_lpt(address_map &map) ATTR_COLD;
+	void map_serial1(address_map &map) ATTR_COLD;
+	void map_serial2(address_map &map) ATTR_COLD;
+	void map_keyboard(address_map &map) ATTR_COLD;
 
 	// floppy disk controller
 	void irq_floppy_w(int state);
@@ -253,7 +253,7 @@ public:
 	void keybc_command_w(uint8_t data);
 
 protected:
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 private:
 	enum OperatingMode
@@ -302,8 +302,8 @@ private:
 	address_space *memspace = nullptr;
 	address_space *iospace = nullptr;
 
-	void internal_memory_map(address_map &map);
-	void internal_io_map(address_map &map);
+	void internal_memory_map(address_map &map) ATTR_COLD;
+	void internal_io_map(address_map &map) ATTR_COLD;
 	uint16_t get_base_address(int logical, int index);
 	void map_fdc_addresses();
 	void map_lpt_addresses();

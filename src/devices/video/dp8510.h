@@ -46,8 +46,8 @@ public:
 	u8 pixel_r(const offs_t pixel_address) const;
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	u16 logic_unit(const u16 src, const u16 dst) const;
 

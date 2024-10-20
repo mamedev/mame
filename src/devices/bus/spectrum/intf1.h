@@ -30,12 +30,12 @@ public:
 	static constexpr feature_type unemulated_features() { return feature::DISK | feature::LAN; }
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// optional information overrides
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 
 	virtual void pre_opcode_fetch(offs_t offset) override;
 	virtual void post_opcode_fetch(offs_t offset) override;

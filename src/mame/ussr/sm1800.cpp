@@ -51,13 +51,13 @@ private:
 	uint8_t porta_r();
 	uint8_t portc_r();
 	uint8_t m_irq_state = 0U;
-	void machine_start() override;
+	void machine_start() override ATTR_COLD;
 	void sm1800_palette(palette_device &palette) const;
 	INTERRUPT_GEN_MEMBER(vblank_interrupt);
 	IRQ_CALLBACK_MEMBER(irq_callback);
 	I8275_DRAW_CHARACTER_MEMBER( crtc_display_pixels );
-	void io_map(address_map &map);
-	void mem_map(address_map &map);
+	void io_map(address_map &map) ATTR_COLD;
+	void mem_map(address_map &map) ATTR_COLD;
 };
 
 void sm1800_state::mem_map(address_map &map)

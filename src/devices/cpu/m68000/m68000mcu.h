@@ -28,7 +28,7 @@ protected:
 	void internal_update();
 
 	virtual void internal_update(uint64_t current_time) = 0;
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 	void set_current_interrupt_level(u32 level);
 };

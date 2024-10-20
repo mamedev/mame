@@ -16,7 +16,6 @@
 #include "machine/gen_latch.h"
 #include "sound/msm5205.h"
 #include "vsystem_gga.h"
-#include "vsystem_spr2.h"
 #include "emupal.h"
 #include "screen.h"
 #include "tilemap.h"
@@ -44,8 +43,8 @@ public:
 	void init_common();
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 	DECLARE_VIDEO_START(fromance);
 
 	required_device<cpu_device> m_maincpu;
@@ -80,19 +79,19 @@ private:
 	optional_device<generic_latch_8_device> m_sublatch;
 	optional_device<msm5205_device> m_msm;
 
-	/* video-related */
+	// video-related
 	std::unique_ptr<uint8_t[]>   m_local_videoram[2];
 	std::unique_ptr<uint8_t[]>  m_local_paletteram;
 
 	emu_timer *m_crtc_timer;
 
-	/* misc */
+	// misc
 	uint8_t    m_portselect = 0;
 	uint8_t    m_adpcm_reset = 0;
 	uint8_t    m_adpcm_data = 0;
 	uint8_t    m_vclk_left = 0;
 
-	/* devices */
+	// devices
 	uint8_t fromance_busycheck_main_r();
 	uint8_t fromance_busycheck_sub_r();
 	void fromance_rombank_w(uint8_t data);
@@ -113,13 +112,13 @@ private:
 	inline void get_nekkyoku_tile_info(tile_data &tileinfo, int tile_index, int layer);
 	void crtc_refresh();
 	void fromance_adpcm_int(int state);
-	void fromance_main_map(address_map &map);
-	void fromance_sub_io_map(address_map &map);
-	void fromance_sub_map(address_map &map);
-	void idolmj_sub_io_map(address_map &map);
-	void nekkyoku_main_map(address_map &map);
-	void nekkyoku_sub_io_map(address_map &map);
-	void nekkyoku_sub_map(address_map &map);
+	void fromance_main_map(address_map &map) ATTR_COLD;
+	void fromance_sub_io_map(address_map &map) ATTR_COLD;
+	void fromance_sub_map(address_map &map) ATTR_COLD;
+	void idolmj_sub_io_map(address_map &map) ATTR_COLD;
+	void nekkyoku_main_map(address_map &map) ATTR_COLD;
+	void nekkyoku_sub_io_map(address_map &map) ATTR_COLD;
+	void nekkyoku_sub_map(address_map &map) ATTR_COLD;
 };
 
 #endif // MAME_VSYSTEM_FROMANCE_H

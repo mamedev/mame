@@ -64,7 +64,7 @@ public:
 
 protected:
 	// device_t implementation
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 	required_address_space m_memspace;
 
@@ -83,6 +83,7 @@ public:
 	virtual ~device_mc10cart_interface();
 
 	virtual int max_rom_length() const;
+
 	virtual std::pair<std::error_condition, std::string> load();
 
 protected:

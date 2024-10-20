@@ -83,6 +83,7 @@ nscsi_cdrom_device::nscsi_cdrom_device(const machine_config &mconfig, device_typ
 	: nscsi_full_device(mconfig, type, tag, owner, clock)
 	, image(*this, "image")
 	, cdda(*this, "cdda")
+	, m_removal_prevented(false)
 	, bytes_per_block(bytes_per_sector)
 	, lba(0)
 	, cur_sector(0)
@@ -549,6 +550,7 @@ void nscsi_cdrom_device::scsi_command()
 	case SC_PREVENT_ALLOW_MEDIUM_REMOVAL:
 		// TODO: support eject prevention
 		LOG("command %s MEDIUM REMOVAL\n", (scsi_cmdbuf[4] & 0x1) ? "PREVENT" : "ALLOW");
+		m_removal_prevented = BIT(scsi_cmdbuf[4], 0);
 		scsi_status_complete(SS_GOOD);
 		break;
 
@@ -883,11 +885,21 @@ void nscsi_cdrom_apple_device::device_start()
 }
 
 /*
-   The Apple II SCSI Card firmware demands that ASC on a failing TEST_UNIT_READY be either 0x28 or 0xb0.
-   0x28 is MEDIA_CHANGED, 0xb0 is vendor-specific.  If the drive returns the normal 0x3A for disc-not-present,
+   The Apple II SCSI Card firmware demands that ASC on a failing TEST_UNIT_READY be either 0x28 or 0xB0.
+   0x28 is MEDIA_CHANGED, 0xB0 is vendor-specific.  If the drive returns the normal 0x3A for disc-not-present,
    the firmware assumes the drive is broken and retries the TEST_UNIT_READY for 60 seconds before giving up
    and booting the machine.
+
+   MacOS will see the normal 0x3A disc-not-present and simply disbelieve it and hammer on the drive while
+   asking the user to format it because it's unreadable.  0xB0 makes it behave as expected.
 */
+
+void nscsi_cdrom_apple_device::return_no_cd()
+{
+	sense(false, SK_NOT_READY, 0xb0);
+	scsi_status_complete(SS_CHECK_CONDITION);
+}
+
 void nscsi_cdrom_apple_device::scsi_command()
 {
 	if (scsi_cmdbuf[0] != 8 && scsi_cmdbuf[0] != 0x28 && scsi_cmdbuf[0] != 0 && scsi_cmdbuf[0] != 0x03)
@@ -908,8 +920,7 @@ void nscsi_cdrom_apple_device::scsi_command()
 		}
 		else
 		{
-			sense(false, SK_NOT_READY, 0xb0);
-			scsi_status_complete(SS_CHECK_CONDITION);
+			return_no_cd();
 		}
 		break;
 
@@ -1312,15 +1323,33 @@ void nscsi_cdrom_apple_device::scsi_command()
 	case APPLE_AUDIO_CONTROL:
 		LOG("command APPLE AUDIO CONTROL, size %d\n", scsi_cmdbuf[8]);
 
-		scsi_data_out(3, scsi_cmdbuf[8]);
-		scsi_status_complete(SS_GOOD);
+		if (image->exists())
+		{
+			scsi_data_out(3, scsi_cmdbuf[8]);
+			scsi_status_complete(SS_GOOD);
+		}
+		else
+		{
+			return_no_cd();
+		}
 		break;
 
 	case APPLE_EJECT:
 		LOG("command APPLE EJECT\n");
-		cdda->stop_audio();
-		m_stopped = true;
-		scsi_status_complete(SS_GOOD);
+		if (!m_removal_prevented)
+		{
+			cdda->stop_audio();
+			m_stopped = true;
+			image->unload();
+			sense(false, SK_NOT_READY, SK_ASC_MEDIUM_NOT_PRESENT);
+			scsi_status_complete(SS_GOOD);
+		}
+		else
+		{
+			LOG("Eject not allowed by PREVENT_ALLOW_MEDIA_REMOVAL\n");
+			sense(false, SK_ILLEGAL_REQUEST, 0x80);     // "Prevent bit is set"
+			scsi_status_complete(SS_CHECK_CONDITION);
+		}
 		break;
 
 	case SC_READ_6:

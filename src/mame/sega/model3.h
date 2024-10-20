@@ -123,7 +123,7 @@ public:
 		m_work_ram(*this, "work_ram"),
 		m_bank_crom(*this, "bank_crom"),
 		m_paletteram64(*this, "paletteram64"),
-		m_dsbz80(*this, DSBZ80_TAG),
+		m_dsbz80(*this, "dsbz80"),
 		m_uart(*this, "uart"),
 		m_soundram(*this, "soundram"),
 		m_gfxdecode(*this, "gfxdecode"),
@@ -190,7 +190,7 @@ public:
 	void init_model3_15();
 
 protected:
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	required_device<ppc_device> m_maincpu;
@@ -428,14 +428,14 @@ private:
 
 	uint16_t crypt_read_callback(uint32_t addr);
 
-	void model3_5881_mem(address_map &map);
-	void model3_10_mem(address_map &map);
-	void model3_mem(address_map &map);
-	void model3_snd(address_map &map);
-	void scsp1_map(address_map &map);
-	void scsp2_map(address_map &map);
-	void getbass_iocpu_mem(address_map &map);
-	void getbass_iocpu_io(address_map &map);
+	void model3_5881_mem(address_map &map) ATTR_COLD;
+	void model3_10_mem(address_map &map) ATTR_COLD;
+	void model3_mem(address_map &map) ATTR_COLD;
+	void model3_snd(address_map &map) ATTR_COLD;
+	void scsp1_map(address_map &map) ATTR_COLD;
+	void scsp2_map(address_map &map) ATTR_COLD;
+	void getbass_iocpu_mem(address_map &map) ATTR_COLD;
+	void getbass_iocpu_io(address_map &map) ATTR_COLD;
 };
 
 #endif // MAME_SEGA_MODEL3_H

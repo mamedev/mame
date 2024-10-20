@@ -45,7 +45,6 @@
 
 #include "emu.h"
 #include "cpu/arm7/arm7.h"
-#include "cpu/arm7/arm7core.h"
 #include "machine/eepromser.h"
 #include "machine/pxa255.h"
 
@@ -89,7 +88,7 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(set_hiscore_dip);
 
 protected:
-	virtual void machine_reset() override;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	u32 m_seed;
@@ -108,8 +107,8 @@ private:
 	void cpld_w(offs_t offset, u32 data, u32 mem_mask = ~0);
 	u32 prot_cheater_r();
 
-	void _39in1_map(address_map &map);
-	void base_map(address_map &map);
+	void _39in1_map(address_map &map) ATTR_COLD;
+	void base_map(address_map &map) ATTR_COLD;
 
 	void decrypt(u8 xor00, u8 xor02, u8 xor04, u8 xor08, u8 xor10, u8 xor20, u8 xor40, u8 xor80, u8 bit7, u8 bit6, u8 bit5, u8 bit4, u8 bit3, u8 bit2, u8 bit1, u8 bit0);
 	void further_decrypt(u8 xor400, u8 xor800, u8 xor1000, u8 xor2000, u8 xor4000, u8 xor8000);
@@ -268,13 +267,13 @@ static INPUT_PORTS_START( 39in1 )
 //  The following dips apply to 39in1 and 48in1. 60in1 is the same but the last unused dipsw#4 is test mode off/on.
 
 	PORT_START("DSW")      // 1x 4-position DIP switch labelled SW3
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Flip_Screen ) )    PORT_DIPLOCATION("SW3:1") PORT_CHANGED_MEMBER(DEVICE_SELF, _39in1_state, set_flip_dip, 0)
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Flip_Screen ) )    PORT_DIPLOCATION("SW3:1") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(_39in1_state::set_flip_dip), 0)
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x00, "Display Mode" )            PORT_DIPLOCATION("SW3:2") PORT_CHANGED_MEMBER(DEVICE_SELF, _39in1_state, set_res_dip, 0)
+	PORT_DIPNAME( 0x02, 0x00, "Display Mode" )            PORT_DIPLOCATION("SW3:2") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(_39in1_state::set_res_dip), 0)
 	PORT_DIPSETTING(    0x02, "VGA 31.5kHz" )
 	PORT_DIPSETTING(    0x00, "CGA 15.75kHz" )
-	PORT_DIPNAME( 0x04, 0x04, "High Score Saver" )        PORT_DIPLOCATION("SW3:3") PORT_CHANGED_MEMBER(DEVICE_SELF, _39in1_state, set_hiscore_dip, 0)
+	PORT_DIPNAME( 0x04, 0x04, "High Score Saver" )        PORT_DIPLOCATION("SW3:3") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(_39in1_state::set_hiscore_dip), 0)
 	PORT_DIPSETTING(    0x04, "Disabled" )
 	PORT_DIPSETTING(    0x00, "Enabled" )
 INPUT_PORTS_END

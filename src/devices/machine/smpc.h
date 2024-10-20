@@ -32,7 +32,7 @@ public:
 	smpc_hle_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// I/O operations
-//  void io_map(address_map &map);
+//  void io_map(address_map &map) ATTR_COLD;
 	uint8_t read(offs_t offset);
 	void write(offs_t offset, uint8_t data);
 
@@ -85,9 +85,9 @@ public:
 protected:
 	// device-level overrides
 //  virtual void device_validity_check(validity_checker &valid) const override;
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 	virtual space_config_vector memory_space_config() const override;
 
 	// device_rtc_interface overrides
@@ -177,7 +177,7 @@ private:
 
 	required_device<screen_device> m_screen;
 
-	void smpc_regs(address_map &map);
+	void smpc_regs(address_map &map) ATTR_COLD;
 
 	void ireg_w(offs_t offset, uint8_t data);
 	void command_register_w(uint8_t data);

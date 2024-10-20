@@ -6,6 +6,81 @@ license:CC0-1.0
 
 <softwarelist name="psion_ssd" description="Psion Solid State Disks">
 
+	<!-- Series MC -->
+
+	<software name="eros4" supported="no">
+		<description>EROS Ver.4.0 (Licensed to The Yorkshire Post)</description>
+		<year>1995</year>
+		<publisher>Design Systems</publisher>
+		<sharedfeat name="compatibility" value="MC"/>
+		<part name="cart" interface="psion_ssd">
+			<dataarea name="rom" size="262144">
+				<rom name="Eros_v4.0.bin" size="262144" crc="6d30b636" sha1="29519a375403a4a0ecb5c23f4aa8ea5402069ad3"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mcmissile" supported="no">
+		<description>MC Missile</description>
+		<year>1990</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="author" value="Steve Townsend"/>
+		<sharedfeat name="compatibility" value="MC"/>
+		<part name="cart" interface="psion_ssd">
+			<dataarea name="rom" size="131072">
+				<rom name="MC_Missile.bin" size="131072" crc="2176dac1" sha1="ce831ba4a272b3b579e6aa0fdcff44452df0963d"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ssheet" supported="no">
+		<description>Spreadsheet</description>
+		<year>1990</year>
+		<publisher>Psion</publisher>
+		<sharedfeat name="compatibility" value="MC"/>
+		<part name="cart" interface="psion_ssd">
+			<dataarea name="rom" size="131072">
+				<rom name="Spreadsheet-108.bin" size="131072" crc="d8a617b3" sha1="b438b5ffb57a720f174e89262bddb679252e706b"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sysdisk212" cloneof="sysdisk220" supported="no">
+		<description>System Disk V2.12</description>
+		<year>1989</year>
+		<publisher>Psion</publisher>
+		<sharedfeat name="compatibility" value="MC"/>
+		<part name="cart" interface="psion_ssd">
+			<dataarea name="rom" size="131072">
+				<rom name="System_Disk-212.bin" size="131072" crc="2ee09e83" sha1="2ba5dcdb07986f53ac97ca2e397ded0fc839a70a"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sysdisk220" supported="no">
+		<description>System Disk V2.20</description>
+		<year>1989</year>
+		<publisher>Psion</publisher>
+		<sharedfeat name="compatibility" value="MC"/>
+		<part name="cart" interface="psion_ssd">
+			<dataarea name="rom" size="131072">
+				<rom name="System_Disk-220.bin" size="131072" crc="8d7dab78" sha1="a4ae14bfb30525033e681558e0aa5e4c5b21c62e"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sysdisk250" supported="no">
+		<description>System Disk (MC Word) V2.50</description>
+		<year>1992</year>
+		<publisher>Psion</publisher>
+		<sharedfeat name="compatibility" value="MC"/>
+		<part name="cart" interface="psion_ssd">
+			<dataarea name="rom" size="262144">
+				<rom name="MCWord_System_Disk-250.bin" size="262144" crc="c7f8ad21" sha1="5bc99c5430ad631dd094a0f99c2963a8c32b0556"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<!-- Series 3/3a -->
 
 	<software name="3achess">
@@ -347,6 +422,18 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="wgames3" supported="partial">
+		<description>Widget Games Pack 3</description>
+		<year>1995</year>
+		<publisher>Widget Software</publisher>
+		<sharedfeat name="compatibility" value="S3A"/>
+		<part name="cart" interface="psion_ssd">
+			<dataarea name="rom" size="262144">
+				<rom name="Widget_Games_3.bin" size="262144" crc="9d1573a9" sha1="b4ac10fc29054f5a0ad2c4bd4aecb3ac655399c8"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="wgames3a">
 		<description>Widget Games 3a</description>
 		<year>1995</year>
@@ -445,6 +532,44 @@ license:CC0-1.0
 		<part name="cart" interface="psion_ssd">
 			<dataarea name="rom" size="131072">
 				<rom name="Pyramid-1.0a.rom" size="131072" crc="70d86e7f" sha1="41a918760ffe6ee21304485bedceeaa996ce074b"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Internal Psion SSD's for testing and reprogramming devices -->
+
+	<software name="ovalwbrp" supported="no">
+		<description>OVAL Workabout Repro V0.24B</description>
+		<year>1996</year>
+		<publisher>Psion</publisher>
+		<sharedfeat name="compatibility" value="S3A"/>
+		<part name="cart" interface="psion_ssd">
+			<dataarea name="rom" size="2097152">
+				<rom name="OVAL_Workabout_Repro.rom" size="2097152" crc="8235f563" sha1="5248c018754355a38867e446c5152898aca45455"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pccardrp" supported="no">
+		<description>PC Card Adaptor Repro V1.00F</description>
+		<year>1996</year>
+		<publisher>Psion</publisher>
+		<sharedfeat name="compatibility" value="S3A"/>
+		<part name="cart" interface="psion_ssd">
+			<dataarea name="rom" size="131072">
+				<rom name="PC_Card_Adapt_Repro-V1.00F.rom" size="131072" crc="98bea62b" sha1="bc51c25687acf5b0fd63213627fec271ac2735c7"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sidepdt" supported="no">
+		<!-- Psion Dacom Test? -->
+		<description>SidePDT V1.01F</description>
+		<year>1993</year>
+		<publisher>Psion</publisher>
+		<part name="cart" interface="psion_ssd">
+			<dataarea name="rom" size="131072">
+				<rom name="SidePDT-V1.01F.rom" size="131072" crc="ebeda0e5" sha1="2e5f5bc78807064f1dcc87d69981b177c95eee22"/>
 			</dataarea>
 		</part>
 	</software>

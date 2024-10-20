@@ -87,8 +87,8 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(clock_config_changed);
 
 protected:
-	virtual void machine_reset() override;
-	virtual void machine_start() override;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	void z1013_keyboard_w(uint8_t data);
@@ -100,8 +100,8 @@ private:
 	DECLARE_SNAPSHOT_LOAD_MEMBER(snapshot_cb);
 	uint32_t screen_update_z1013(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void io_map(address_map &map);
-	void mem_map(address_map &map);
+	void io_map(address_map &map) ATTR_COLD;
+	void mem_map(address_map &map) ATTR_COLD;
 
 	uint8_t m_keyboard_line = 0U;
 	bool m_keyboard_part = false;
@@ -182,7 +182,7 @@ static INPUT_PORTS_START( z1013_8x4 )
 		PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_4WAY
 		PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_4WAY
 	PORT_START("TAKT")
-		PORT_CONFNAME(3, 3, "System Clock") PORT_CHANGED_MEMBER(DEVICE_SELF, z1013_state, clock_config_changed, 0)
+		PORT_CONFNAME(3, 3, "System Clock") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(z1013_state::clock_config_changed), 0)
 		PORT_CONFSETTING(3, "1 MHz")
 		PORT_CONFSETTING(2, "2 MHz")
 		PORT_CONFSETTING(1, "4 MHz")
@@ -267,7 +267,7 @@ static INPUT_PORTS_START( z1013_8x8 )
 		PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_4WAY
 		PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_4WAY
 	PORT_START("TAKT")
-		PORT_CONFNAME(3, 3, "System Clock") PORT_CHANGED_MEMBER(DEVICE_SELF, z1013_state, clock_config_changed, 0)
+		PORT_CONFNAME(3, 3, "System Clock") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(z1013_state::clock_config_changed), 0)
 		PORT_CONFSETTING(3, "1 MHz")
 		PORT_CONFSETTING(2, "2 MHz")
 		PORT_CONFSETTING(1, "4 MHz")
@@ -280,7 +280,7 @@ static INPUT_PORTS_START( z1013 )
 		PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_4WAY
 		PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_4WAY
 	PORT_START("TAKT")
-		PORT_CONFNAME(3, 3, "System Clock") PORT_CHANGED_MEMBER(DEVICE_SELF, z1013_state, clock_config_changed, 0)
+		PORT_CONFNAME(3, 3, "System Clock") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(z1013_state::clock_config_changed), 0)
 		PORT_CONFSETTING(3, "1 MHz")
 		PORT_CONFSETTING(2, "2 MHz")
 		PORT_CONFSETTING(1, "4 MHz")

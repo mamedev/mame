@@ -141,20 +141,20 @@ public:
 protected:
 	uint16_t m_towns_machine_id;  // default is 0x0101
 
-	void marty_mem(address_map &map);
-	void pcm_mem(address_map &map);
-	void towns16_io(address_map &map);
-	void towns_io(address_map &map);
-	void towns_1g_io(address_map &map);
-	void towns2_io(address_map &map);
-	void townsux_io(address_map &map);
-	void towns_mem(address_map &map);
-	void ux_mem(address_map &map);
+	void marty_mem(address_map &map) ATTR_COLD;
+	void pcm_mem(address_map &map) ATTR_COLD;
+	void towns16_io(address_map &map) ATTR_COLD;
+	void towns_io(address_map &map) ATTR_COLD;
+	void towns_1g_io(address_map &map) ATTR_COLD;
+	void towns2_io(address_map &map) ATTR_COLD;
+	void townsux_io(address_map &map) ATTR_COLD;
+	void towns_mem(address_map &map) ATTR_COLD;
+	void ux_mem(address_map &map) ATTR_COLD;
 
 	virtual void driver_start() override;
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 	required_device<ram_device> m_ram;
 	required_device<cpu_device> m_maincpu;
@@ -259,6 +259,7 @@ private:
 	emu_timer* m_towns_wait_timer = nullptr;
 	emu_timer* m_towns_status_timer = nullptr;
 	emu_timer* m_towns_cdda_timer = nullptr;
+	emu_timer* m_towns_seek_timer = nullptr;
 	struct towns_cdrom_controller m_towns_cd;
 	struct towns_video_controller m_video;
 
@@ -375,6 +376,7 @@ private:
 	void towns_cdrom_read(cdrom_image_device* device);
 	TIMER_CALLBACK_MEMBER(towns_cd_status_ready);
 	TIMER_CALLBACK_MEMBER(towns_delay_cdda);
+	TIMER_CALLBACK_MEMBER(towns_delay_seek);
 
 	u8 m_rtc_d = 0;
 	bool m_rtc_busy = false;

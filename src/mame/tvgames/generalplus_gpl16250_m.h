@@ -22,7 +22,7 @@ public:
 	address_space* get_program() { return m_program; }
 
 protected:
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 	virtual void device_config_complete() override;
 
 	// device_memory_interface overrides

@@ -44,10 +44,10 @@ public:
 	void boxer(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
-	void boxer_map(address_map &map);
+	void boxer_map(address_map &map) ATTR_COLD;
 
 	uint8_t input_r(offs_t offset);
 	uint8_t misc_r(offs_t offset);

@@ -84,10 +84,10 @@ public:
 
 protected:
 	// driver_device overrides
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	// devices
@@ -118,10 +118,10 @@ private:
 	INTERRUPT_GEN_MEMBER(slave_vblank_irq);
 	TIMER_DEVICE_CALLBACK_MEMBER(master_scanline);
 
-	void master_io(address_map &map);
-	void master_map(address_map &map);
-	void slave_io(address_map &map);
-	void slave_map(address_map &map);
+	void master_io(address_map &map) ATTR_COLD;
+	void master_map(address_map &map) ATTR_COLD;
+	void slave_io(address_map &map) ATTR_COLD;
+	void slave_map(address_map &map) ATTR_COLD;
 
 	void legacy_bg_draw(bitmap_ind16 &bitmap,const rectangle &cliprect);
 	void legacy_fg_draw(bitmap_ind16 &bitmap,const rectangle &cliprect);

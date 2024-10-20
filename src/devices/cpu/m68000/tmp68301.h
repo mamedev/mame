@@ -33,17 +33,16 @@ protected:
 	devcb_write16 m_parallel_w_cb;
 	devcb_write_line::array<3> m_tx_cb;
 
-	void device_start() override;
-	void device_reset() override;
-	u32 execute_input_lines() const noexcept override;
+	void device_start() override ATTR_COLD;
+	void device_reset() override ATTR_COLD;
 	void execute_set_input(int inputnum, int state) override;
 
 	void internal_update(uint64_t current_time = 0) override;
 
 	virtual u8 base_timer_irq() const noexcept { return 4; }
 
-	void internal_map(address_map &map);
-	void cpu_space_map(address_map &map);
+	void internal_map(address_map &map) ATTR_COLD;
+	void cpu_space_map(address_map &map) ATTR_COLD;
 
 	// Address decoder
 	u8 m_amar[2], m_aamr[2], m_aacr[3];

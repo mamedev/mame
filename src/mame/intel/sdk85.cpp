@@ -84,12 +84,12 @@ private:
 	void digit_w(u8 data);
 	u8 kbd_r();
 
-	void io_map(address_map &map);
-	void mem_map(address_map &map);
+	void io_map(address_map &map) ATTR_COLD;
+	void mem_map(address_map &map) ATTR_COLD;
 
 	u8 m_digit = 0U;
-	virtual void machine_reset() override;
-	virtual void machine_start() override;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void machine_start() override ATTR_COLD;
 
 	required_device<i8085a_cpu_device> m_maincpu;
 	required_device<i8279_device> m_kdc;
@@ -193,8 +193,8 @@ static INPUT_PORTS_START( sdk85 )
 	PORT_BIT(0xC0, IP_ACTIVE_LOW, IPT_UNUSED)
 
 	PORT_START("INTR") // buttons hardwired to 8085 inputs
-	PORT_BIT(1, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("VECT INTR") PORT_WRITE_LINE_MEMBER(sdk85_state, vect_intr_w) PORT_CODE(KEYCODE_F2)
-	PORT_BIT(2, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("RESET")     PORT_WRITE_LINE_MEMBER(sdk85_state, reset_w)     PORT_CODE(KEYCODE_F1)
+	PORT_BIT(1, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("VECT INTR") PORT_WRITE_LINE_MEMBER(FUNC(sdk85_state::vect_intr_w)) PORT_CODE(KEYCODE_F2)
+	PORT_BIT(2, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("RESET")     PORT_WRITE_LINE_MEMBER(FUNC(sdk85_state::reset_w))     PORT_CODE(KEYCODE_F1)
 INPUT_PORTS_END
 
 

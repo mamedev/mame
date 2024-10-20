@@ -46,14 +46,14 @@ public:
 protected:
 	tms0980_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u8 o_pins, u8 r_pins, u8 pc_bits, u8 byte_bits, u8 x_bits, u8 stack_levels, int rom_width, address_map_constructor rom_map, int ram_width, address_map_constructor ram_map);
 
-	void ram_144x4(address_map &map);
+	void ram_144x4(address_map &map) ATTR_COLD;
 
 	// overrides
 	virtual u32 decode_fixed(offs_t offset);
 	virtual u32 decode_micro(offs_t offset) override;
-	virtual void device_reset() override;
+	virtual void device_reset() override ATTR_COLD;
 
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 
@@ -78,7 +78,7 @@ public:
 
 protected:
 	// overrides
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 	virtual void write_o_reg(u8 index) override { tms1k_base_device::write_o_reg(index); }
 

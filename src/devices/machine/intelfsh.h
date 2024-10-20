@@ -22,7 +22,7 @@ protected:
 	intelfsh_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint8_t bits, uint32_t size, uint8_t maker_id, uint16_t device_id);
 
 	// device-level overrides
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 	// device_nvram_interface overrides
 	virtual void nvram_default() override;
@@ -42,6 +42,8 @@ protected:
 	uint8_t                  m_bits;
 	uint32_t                 m_addrmask;
 	uint16_t                 m_device_id;
+	uint16_t                 m_device_id2;
+	uint16_t                 m_device_id3;
 	uint8_t                  m_maker_id;
 	bool                     m_sector_is_4k;
 	bool                     m_sector_is_16k;
@@ -212,6 +214,12 @@ class macronix_29lv160tmc_device : public intelfsh8_device
 {
 public:
 	macronix_29lv160tmc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+};
+
+class st_m29w640gb_device : public intelfsh8_device
+{
+public:
+	st_m29w640gb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 };
 
 class panasonic_mn63f805mnp_device : public intelfsh8_device
@@ -396,6 +404,7 @@ DECLARE_DEVICE_TYPE(MACRONIX_29F1610MC,      macronix_29f1610mc_device)
 DECLARE_DEVICE_TYPE(MACRONIX_29F1610MC_16BIT,macronix_29f1610mc_16bit_device)
 DECLARE_DEVICE_TYPE(MACRONIX_29L001MC,       macronix_29l001mc_device)
 DECLARE_DEVICE_TYPE(MACRONIX_29LV160TMC,     macronix_29lv160tmc_device)
+DECLARE_DEVICE_TYPE(ST_M29W640GB,            st_m29w640gb_device)
 DECLARE_DEVICE_TYPE(TMS_29F040,              tms_29f040_device)
 
 DECLARE_DEVICE_TYPE(PANASONIC_MN63F805MNP,   panasonic_mn63f805mnp_device)

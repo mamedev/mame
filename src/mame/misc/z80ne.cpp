@@ -224,8 +224,8 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(z80ne_reset);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	void base_reset();
 	void save_state_vars();
@@ -275,8 +275,8 @@ protected:
 	cassette_image_device *cassette_device_image();
 
 private:
-	void mem_map(address_map &map);
-	void io_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
+	void io_map(address_map &map) ATTR_COLD;
 };
 
 class z80net_state : public z80ne_state
@@ -298,7 +298,7 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(z80net_nmi);
 
 protected:
-	virtual void machine_reset() override;
+	virtual void machine_reset() override ATTR_COLD;
 
 	int lx387_shift_r();
 	int lx387_control_r();
@@ -314,10 +314,10 @@ protected:
 
 	void reset_lx387();
 
-	void io_map(address_map &map);
+	void io_map(address_map &map) ATTR_COLD;
 
 private:
-	void mem_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
 };
 
 class z80netb_state : public z80net_state
@@ -331,10 +331,10 @@ public:
 	void z80netb(machine_config &config);
 
 protected:
-	virtual void machine_reset() override;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
-	void mem_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
 };
 
 class z80netf_state : public z80netb_state
@@ -352,8 +352,8 @@ public:
 	void z80netf(machine_config &config);
 
 private:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 	virtual void driver_start() override;
 
 	struct wd17xx_state_t
@@ -364,8 +364,8 @@ private:
 		uint8_t head = 0;  /* current head */
 	};
 
-	void mem_map(address_map &map);
-	void io_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
+	void io_map(address_map &map) ATTR_COLD;
 
 	void lx390_motor_w(uint8_t data);
 	uint8_t lx390_fdc_r(offs_t offset);
@@ -1173,7 +1173,7 @@ static INPUT_PORTS_START( z80ne )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("RST")           /* RESET key */
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("LX.384 Reset")  PORT_CODE(KEYCODE_F3) PORT_CHANGED_MEMBER(DEVICE_SELF, z80ne_state, z80ne_reset, 0) PORT_CHAR('N')
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("LX.384 Reset")  PORT_CODE(KEYCODE_F3) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(z80ne_state::z80ne_reset), 0) PORT_CHAR('N')
 
 	/* Settings - need to reboot after altering these */
 	PORT_START("LX.385")
@@ -1192,7 +1192,7 @@ static INPUT_PORTS_START( z80net )
 
 	/* LX.387 Keyboard BREAK key */
 	PORT_START("LX387_BRK")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Break") PORT_CODE(KEYCODE_END) PORT_CHAR(UCHAR_MAMEKEY(END)) PORT_CHANGED_MEMBER(DEVICE_SELF, z80net_state, z80net_nmi, 0)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Break") PORT_CODE(KEYCODE_END) PORT_CHAR(UCHAR_MAMEKEY(END)) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(z80net_state::z80net_nmi), 0)
 
 	/* LX.387 Keyboard (Encoded by KR2376) */
 	PORT_START("X0")

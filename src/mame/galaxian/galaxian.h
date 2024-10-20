@@ -324,7 +324,7 @@ public:
 	void bigkonggx(machine_config &config);
 	void scrammr(machine_config &config);
 
-	template <int Mask> CUSTOM_INPUT_MEMBER(ckongg_coinage_r);
+	template <int Mask> ioport_value ckongg_coinage_r();
 	template <int Mask> int ckongs_coinage_r();
 
 protected:
@@ -336,65 +336,65 @@ protected:
 	void set_h0_start(uint8_t start) { m_h0_start = start; }
 	void set_left_sprite_clip(uint8_t clip) { m_leftspriteclip = clip; }
 
-	void amigo2_map(address_map &map);
-	void anteaterg_map(address_map &map);
-	void anteatergg_map(address_map &map);
-	void anteateruk_map(address_map &map);
-	void astroamb_map(address_map &map);
-	void bigkonggx_map(address_map &map);
-	void bongo_map(address_map &map);
-	void bongog_map(address_map &map);
-	void bongo_io_map(address_map &map);
-	void checkmaj_sound_map(address_map &map);
-	void checkman_sound_map(address_map &map);
-	void checkman_sound_portmap(address_map &map);
-	void ckongg_map(address_map &map);
-	void ckongg_map_base(address_map &map);
-	void ckongmc_map(address_map &map);
-	void ckongs_map(address_map &map);
-	void explorer_map(address_map &map);
-	void fantastc_map(address_map &map);
-	void frogf_map(address_map &map);
-	void frogg_map(address_map &map);
-	void frogger_map(address_map &map);
-	void froggervd_map(address_map &map);
-	void frogger_sound_map(address_map &map);
-	void frogger_sound_portmap(address_map &map);
-	void froggeram_map(address_map &map);
-	void froggermc_map(address_map &map);
-	void galartic_map(address_map &map);
-	void galaxian_map(address_map &map);
-	void galaxian_map_base(address_map &map);
-	void galaxian_map_discrete(address_map &map);
-	void highroll_map(address_map &map);
-	void jumpbug_map(address_map &map);
-	void jumpbugbrf_map(address_map &map);
-	void jungsub_map(address_map &map);
-	void jungsub_io_map(address_map &map);
-	void konami_sound_map(address_map &map);
-	void konami_sound_portmap(address_map &map);
-	void kong_map(address_map &map);
-	void mandingarf_map(address_map &map);
-	void mandinka_map(address_map &map);
-	void mimonkey_map(address_map &map);
-	void mimonscr_map(address_map &map);
-	void mooncrst_map(address_map &map);
-	void mooncrst_map_base(address_map &map);
-	void mooncrst_map_discrete(address_map &map);
-	void moonqsr_decrypted_opcodes_map(address_map &map);
-	void ozon1_map(address_map &map);
-	void ozon1_io_map(address_map &map);
-	void scobra_map(address_map &map);
-	void scorpnmc_map(address_map &map);
-	void spactrai_map(address_map &map);
-	void takeoff_sound_map(address_map &map);
-	void takeoff_sound_portmap(address_map &map);
-	void theend_map(address_map &map);
-	void thepitm_map(address_map &map);
-	void turpins_map(address_map &map);
-	void turpins_sound_map(address_map &map);
-	void turtles_map(address_map &map);
-	void victoryc_map(address_map &map);
+	void amigo2_map(address_map &map) ATTR_COLD;
+	void anteaterg_map(address_map &map) ATTR_COLD;
+	void anteatergg_map(address_map &map) ATTR_COLD;
+	void anteateruk_map(address_map &map) ATTR_COLD;
+	void astroamb_map(address_map &map) ATTR_COLD;
+	void bigkonggx_map(address_map &map) ATTR_COLD;
+	void bongo_map(address_map &map) ATTR_COLD;
+	void bongog_map(address_map &map) ATTR_COLD;
+	void bongo_io_map(address_map &map) ATTR_COLD;
+	void checkmaj_sound_map(address_map &map) ATTR_COLD;
+	void checkman_sound_map(address_map &map) ATTR_COLD;
+	void checkman_sound_portmap(address_map &map) ATTR_COLD;
+	void ckongg_map(address_map &map) ATTR_COLD;
+	void ckongg_map_base(address_map &map) ATTR_COLD;
+	void ckongmc_map(address_map &map) ATTR_COLD;
+	void ckongs_map(address_map &map) ATTR_COLD;
+	void explorer_map(address_map &map) ATTR_COLD;
+	void fantastc_map(address_map &map) ATTR_COLD;
+	void frogf_map(address_map &map) ATTR_COLD;
+	void frogg_map(address_map &map) ATTR_COLD;
+	void frogger_map(address_map &map) ATTR_COLD;
+	void froggervd_map(address_map &map) ATTR_COLD;
+	void frogger_sound_map(address_map &map) ATTR_COLD;
+	void frogger_sound_portmap(address_map &map) ATTR_COLD;
+	void froggeram_map(address_map &map) ATTR_COLD;
+	void froggermc_map(address_map &map) ATTR_COLD;
+	void galartic_map(address_map &map) ATTR_COLD;
+	void galaxian_map(address_map &map) ATTR_COLD;
+	void galaxian_map_base(address_map &map) ATTR_COLD;
+	void galaxian_map_discrete(address_map &map) ATTR_COLD;
+	void highroll_map(address_map &map) ATTR_COLD;
+	void jumpbug_map(address_map &map) ATTR_COLD;
+	void jumpbugbrf_map(address_map &map) ATTR_COLD;
+	void jungsub_map(address_map &map) ATTR_COLD;
+	void jungsub_io_map(address_map &map) ATTR_COLD;
+	void konami_sound_map(address_map &map) ATTR_COLD;
+	void konami_sound_portmap(address_map &map) ATTR_COLD;
+	void kong_map(address_map &map) ATTR_COLD;
+	void mandingarf_map(address_map &map) ATTR_COLD;
+	void mandinka_map(address_map &map) ATTR_COLD;
+	void mimonkey_map(address_map &map) ATTR_COLD;
+	void mimonscr_map(address_map &map) ATTR_COLD;
+	void mooncrst_map(address_map &map) ATTR_COLD;
+	void mooncrst_map_base(address_map &map) ATTR_COLD;
+	void mooncrst_map_discrete(address_map &map) ATTR_COLD;
+	void moonqsr_decrypted_opcodes_map(address_map &map) ATTR_COLD;
+	void ozon1_map(address_map &map) ATTR_COLD;
+	void ozon1_io_map(address_map &map) ATTR_COLD;
+	void scobra_map(address_map &map) ATTR_COLD;
+	void scorpnmc_map(address_map &map) ATTR_COLD;
+	void spactrai_map(address_map &map) ATTR_COLD;
+	void takeoff_sound_map(address_map &map) ATTR_COLD;
+	void takeoff_sound_portmap(address_map &map) ATTR_COLD;
+	void theend_map(address_map &map) ATTR_COLD;
+	void thepitm_map(address_map &map) ATTR_COLD;
+	void turpins_map(address_map &map) ATTR_COLD;
+	void turpins_sound_map(address_map &map) ATTR_COLD;
+	void turtles_map(address_map &map) ATTR_COLD;
+	void victoryc_map(address_map &map) ATTR_COLD;
 
 	virtual void machine_start() override
 	{
@@ -402,7 +402,7 @@ protected:
 
 		m_irq_enabled = 0;
 	}
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	optional_device<cpu_device> m_audiocpu;
@@ -475,8 +475,8 @@ protected:
 	void bagmanmc_extend_sprite_info(const uint8_t *base, uint8_t *sx, uint8_t *sy, uint8_t *flipx, uint8_t *flipy, uint16_t *code, uint8_t *color);
 
 private:
-	void bagmanmc_map(address_map &map);
-	void bagmanmc_io_map(address_map &map);
+	void bagmanmc_map(address_map &map) ATTR_COLD;
+	void bagmanmc_io_map(address_map &map) ATTR_COLD;
 };
 
 
@@ -494,15 +494,15 @@ public:
 	void gmgalax(machine_config &config);
 
 	DECLARE_INPUT_CHANGED_MEMBER(game_changed);
-	template <int N> DECLARE_CUSTOM_INPUT_MEMBER(port_r);
+	template <int N> ioport_value port_r();
 
 	void init_gmgalax();
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
-	void gmgalax_map(address_map &map);
+	void gmgalax_map(address_map &map) ATTR_COLD;
 
 	required_ioport_array<3> m_glin;
 	required_ioport_array<3> m_gmin;
@@ -532,9 +532,9 @@ protected:
 	void pisces_extend_sprite_info(const uint8_t *base, uint8_t *sx, uint8_t *sy, uint8_t *flipx, uint8_t *flipy, uint16_t *code, uint8_t *color);
 
 private:
-	void pisces_map(address_map &map);
-	void skybase_map(address_map &map);
-	void porter_map(address_map &map);
+	void pisces_map(address_map &map) ATTR_COLD;
+	void skybase_map(address_map &map) ATTR_COLD;
+	void porter_map(address_map &map) ATTR_COLD;
 };
 
 
@@ -552,7 +552,7 @@ public:
 
 private:
 	void fourplay_rombank_w(offs_t offset, uint8_t data);
-	void fourplay_map(address_map &map);
+	void fourplay_map(address_map &map) ATTR_COLD;
 
 	required_memory_bank m_rombank;
 };
@@ -572,7 +572,7 @@ public:
 	void init_mshuttlj();
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	void ay8910_cs_w(uint8_t data);
@@ -580,9 +580,9 @@ private:
 	void ay8910_data_w(uint8_t data);
 	uint8_t ay8910_data_r();
 
-	void mshuttle_map(address_map &map);
-	void mshuttle_decrypted_opcodes_map(address_map &map);
-	void mshuttle_portmap(address_map &map);
+	void mshuttle_map(address_map &map) ATTR_COLD;
+	void mshuttle_decrypted_opcodes_map(address_map &map) ATTR_COLD;
+	void mshuttle_portmap(address_map &map) ATTR_COLD;
 
 	void mshuttle_decode(const uint8_t convtable[8][16]);
 
@@ -606,7 +606,7 @@ public:
 	void kingball(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	void speech_dip_w(uint8_t data);
@@ -614,9 +614,9 @@ private:
 	void sound2_w(uint8_t data);
 	void dac_w(uint8_t data);
 
-	void kingball_map(address_map &map);
-	void kingball_sound_map(address_map &map);
-	void kingball_sound_portmap(address_map &map);
+	void kingball_map(address_map &map) ATTR_COLD;
+	void kingball_sound_map(address_map &map) ATTR_COLD;
+	void kingball_sound_portmap(address_map &map) ATTR_COLD;
 
 	required_device<dac_byte_interface> m_dac;
 	required_ioport m_mux_port;
@@ -642,7 +642,7 @@ private:
 	void namenayo_draw_background(bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void namenayo_extend_tile_info(uint16_t *code, uint8_t *color, uint8_t attrib, uint8_t x, uint8_t y);
 	void namenayo_extend_sprite_info(const uint8_t *base, uint8_t *sx, uint8_t *sy, uint8_t *flipx, uint8_t *flipy, uint16_t *code, uint8_t *color);
-	void namenayo_map(address_map &map);
+	void namenayo_map(address_map &map) ATTR_COLD;
 	void namenayo_extattr_w(offs_t offset, uint8_t data);
 	void namenayo_unk_d800_w(uint8_t data);
 
@@ -667,7 +667,7 @@ public:
 	void init_tenspot();
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	void unk_6000_w(uint8_t data);
@@ -677,8 +677,8 @@ private:
 
 	void set_game_bank(int bank, bool invalidate_gfx);
 
-	void tenspot_map(address_map &map);
-	void tenspot_select_map(address_map &map);
+	void tenspot_map(address_map &map) ATTR_COLD;
+	void tenspot_select_map(address_map &map) ATTR_COLD;
 
 	required_ioport_array<10> m_game_dsw;
 	required_memory_bank m_mainbank;
@@ -700,12 +700,12 @@ public:
 	void init_zigzag();
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	void bankswap_w(uint8_t data);
 	void ay8910_w(offs_t offset, uint8_t data);
-	void zigzag_map(address_map &map);
+	void zigzag_map(address_map &map) ATTR_COLD;
 
 	required_memory_bank_array<2> m_rombanks;
 	uint8_t m_ay8910_latch = 0U;
@@ -729,7 +729,7 @@ private:
 	void videight_gfxbank_w(offs_t offset, uint8_t data);
 	void videight_extend_tile_info(uint16_t *code, uint8_t *color, uint8_t attrib, uint8_t x, uint8_t y);
 	void videight_extend_sprite_info(const uint8_t *base, uint8_t *sx, uint8_t *sy, uint8_t *flipx, uint8_t *flipy, uint16_t *code, uint8_t *color);
-	void videight_map(address_map &map);
+	void videight_map(address_map &map) ATTR_COLD;
 
 	required_memory_bank m_rombank;
 };
@@ -750,8 +750,8 @@ public:
 	void init_guttangts3();
 
 private:
-	void guttangt_map(address_map &map);
-	void guttangts3_map(address_map &map);
+	void guttangt_map(address_map &map) ATTR_COLD;
+	void guttangts3_map(address_map &map) ATTR_COLD;
 	void guttangt_rombank_w(uint8_t data);
 
 	optional_memory_bank m_rombank;
@@ -778,9 +778,9 @@ private:
 	uint8_t protection_r();
 	void protection_w(uint8_t data);
 
-	void scorpion_map(address_map &map);
-	void scorpion_sound_map(address_map &map);
-	void scorpion_sound_portmap(address_map &map);
+	void scorpion_map(address_map &map) ATTR_COLD;
+	void scorpion_sound_map(address_map &map) ATTR_COLD;
+	void scorpion_sound_portmap(address_map &map) ATTR_COLD;
 
 	required_device<digitalker_device> m_digitalker;
 };
@@ -801,7 +801,7 @@ public:
 	void init_sfx();
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 	uint8_t sample_io_r(offs_t offset);
 	void sample_io_w(offs_t offset, uint8_t data);
@@ -810,9 +810,9 @@ protected:
 	void sfx_draw_background(bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void sfx_draw_bullet(bitmap_rgb32 &bitmap, const rectangle &cliprect, int offs, int x, int y);
 
-	void sfx_map(address_map &map);
-	void sfx_sample_map(address_map &map);
-	void sfx_sample_portmap(address_map &map);
+	void sfx_map(address_map &map) ATTR_COLD;
+	void sfx_sample_map(address_map &map) ATTR_COLD;
+	void sfx_sample_portmap(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_audio2;
 	required_device<dac_byte_interface> m_dac;
@@ -835,13 +835,13 @@ public:
 	void init_monsterz();
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
-	void monsterz_map(address_map& map);
-	void monsterz_sound_map(address_map& map);
-	void monsterz_sound_portmap(address_map& map);
-	void monsterz_sample_map(address_map& map);
+	void monsterz_map(address_map &map) ATTR_COLD;
+	void monsterz_sound_map(address_map &map) ATTR_COLD;
+	void monsterz_sound_portmap(address_map &map) ATTR_COLD;
+	void monsterz_sample_map(address_map &map) ATTR_COLD;
 	void monsterz_ay8910_w(offs_t offset, uint8_t data);
 
 	required_device<dac_byte_interface> m_dac2;
@@ -862,12 +862,12 @@ public:
 	{
 	}
 
-	DECLARE_CUSTOM_INPUT_MEMBER(dial_r);
+	ioport_value dial_r();
 
 	void moonwar(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	void port_select_w(uint8_t data);
@@ -899,13 +899,13 @@ public:
 	void sbhoei_extend_sprite_info(const uint8_t *base, uint8_t *sx, uint8_t *sy, uint8_t *flipx, uint8_t *flipy, uint16_t *code, uint8_t *color);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
-	void sbhoei_map(address_map &map);
-	void sbhoei_map_discrete(address_map &map);
-	void sbhoei_sound_map(address_map &map);
-	void sbhoei_sound_io_map(address_map &map);
+	void sbhoei_map(address_map &map) ATTR_COLD;
+	void sbhoei_map_discrete(address_map &map) ATTR_COLD;
+	void sbhoei_sound_map(address_map &map) ATTR_COLD;
+	void sbhoei_sound_io_map(address_map &map) ATTR_COLD;
 
 	void sbhoei_palette(palette_device &palette);
 	void sbhoei_soundlatch_w(uint8_t data);
@@ -936,7 +936,7 @@ public:
 private:
 	required_device<sn76489a_device> m_snsnd;
 
-	void bmxstunts_map(address_map& map);
+	void bmxstunts_map(address_map &map) ATTR_COLD;
 	void snsnd_w(uint8_t data) { m_snsnd->write(bitswap<8>(data,0,1,2,3,4,5,6,7)); }
 };
 

@@ -3512,11 +3512,6 @@ uint32_t tms9995_device::execute_max_cycles() const noexcept
 	return 47;
 }
 
-uint32_t tms9995_device::execute_input_lines() const noexcept
-{
-	return 2;
-}
-
 std::unique_ptr<util::disasm_interface> tms9995_device::create_disassembler()
 {
 	return std::make_unique<tms9900_disassembler>(TMS9995_ID);

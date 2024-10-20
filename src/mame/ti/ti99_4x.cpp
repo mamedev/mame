@@ -167,9 +167,9 @@ private:
 	void video_interrupt_evpc_in(int state);
 	TIMER_CALLBACK_MEMBER(gromclk_tick);
 
-	void crumap(address_map &map);
-	void memmap(address_map &map);
-	void memmap_setaddress(address_map &map);
+	void crumap(address_map &map) ATTR_COLD;
+	void memmap(address_map &map) ATTR_COLD;
+	void memmap_setaddress(address_map &map) ATTR_COLD;
 
 	void    set_keyboard_column(int number, int data);
 	int     m_keyboard_column;
@@ -327,7 +327,7 @@ static INPUT_PORTS_START(ti99_4a)
 		PORT_CONFSETTING(    0x01, DEF_STR( On ) )
 
 	PORT_START( "LOADINT")
-		PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Load interrupt") PORT_CODE(KEYCODE_PRTSCR) PORT_CHANGED_MEMBER(DEVICE_SELF, ti99_4x_state, load_interrupt, 1)
+		PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Load interrupt") PORT_CODE(KEYCODE_PRTSCR) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(ti99_4x_state::load_interrupt), 1)
 
 	PORT_START("COL0")  // col 0
 		PORT_BIT(0x88, IP_ACTIVE_LOW, IPT_UNUSED)
@@ -840,7 +840,9 @@ void ti99_4x_state::console_reset(int state)
 	{
 		LOGMASKED(LOG_RESETLOAD, "Console reset line = %d\n", state);
 		m_cpu->set_input_line(INT_9900_RESET, state);
-		m_video->reset_line(state);
+		// Don't reset the (not existing) console video chip in the EVPC configuration
+		if (m_model != MODEL_4EV)
+			m_video->reset_line(state);
 		m_ioport->reset_in(state);
 	}
 }

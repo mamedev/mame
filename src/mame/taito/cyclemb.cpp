@@ -146,12 +146,12 @@ public:
 //  void ym_irq(int state);
 
 	void update_dial(int P);
-	template <int P> DECLARE_CUSTOM_INPUT_MEMBER(dial_r);
+	template <int P> ioport_value dial_r();
 
 	void init_skydest();
 	void init_cyclemb();
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 	void cyclemb_palette(palette_device &palette) const;
 
 	uint32_t screen_update_cyclemb(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -164,11 +164,11 @@ public:
 	void cyclemb_dial_reset();
 	void cyclemb(machine_config &config);
 	void skydest(machine_config &config);
-	void cyclemb_io(address_map &map);
-	void cyclemb_map(address_map &map);
-	void cyclemb_sound_io(address_map &map);
-	void cyclemb_sound_map(address_map &map);
-	void skydest_io(address_map &map);
+	void cyclemb_io(address_map &map) ATTR_COLD;
+	void cyclemb_map(address_map &map) ATTR_COLD;
+	void cyclemb_sound_io(address_map &map) ATTR_COLD;
+	void cyclemb_sound_map(address_map &map) ATTR_COLD;
+	void skydest_io(address_map &map) ATTR_COLD;
 };
 
 
@@ -765,7 +765,7 @@ void cyclemb_state::update_dial(int P)
 }
 
 template <int P>
-CUSTOM_INPUT_MEMBER(cyclemb_state::dial_r)
+ioport_value cyclemb_state::dial_r()
 {
 	return m_dial_status[P].current_value | (m_dial_status[P].reverse ? 0x80 : 0x00);
 }
@@ -784,7 +784,7 @@ static INPUT_PORTS_START( cyclemb )
 	PORT_BIT( 0xe0, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("P1_1")
-	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(cyclemb_state, dial_r<0>)
+	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(FUNC(cyclemb_state::dial_r<0>))
 
 	PORT_START("DIAL_P1")
 	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_MINMAX(0x00, 0xff) PORT_SENSITIVITY(20) PORT_KEYDELTA(16) PORT_PLAYER(1) PORT_RESET PORT_REVERSE
@@ -795,7 +795,7 @@ static INPUT_PORTS_START( cyclemb )
 	PORT_BIT( 0xe0, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("P2_1")
-	PORT_BIT( 0x9f, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(cyclemb_state, dial_r<1>)
+	PORT_BIT( 0x9f, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(FUNC(cyclemb_state::dial_r<1>))
 	PORT_BIT( 0x60, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("DIAL_P2")

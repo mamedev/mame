@@ -8,7 +8,6 @@ authors:hap
 <!-- define elements -->
 
 	<element name="black"><rect><color red="0.15" green="0.14" blue="0.14" /></rect></element>
-	<element name="red"><rect><color red="0.75" green="0.25" blue="0.2" /></rect></element>
 
 	<element name="but" defstate="0">
 		<rect state="0"><color red="0.81" green="0.8" blue="0.79" /></rect>
@@ -42,38 +41,6 @@ authors:hap
 	<element name="text_f"><text string="F"><color red="0.15" green="0.14" blue="0.14" /></text></element>
 	<element name="text_g"><text string="G"><color red="0.15" green="0.14" blue="0.14" /></text></element>
 	<element name="text_h"><text string="H"><color red="0.15" green="0.14" blue="0.14" /></text></element>
-
-	<element name="text_l1"><text string="WHITE" align="1"><color red="0.81" green="0.8" blue="0.79" /></text></element>
-	<element name="text_l2"><text string="BLACK" align="1"><color red="0.81" green="0.8" blue="0.79" /></text></element>
-	<element name="text_l3"><text string="2nd F" align="1"><color red="0.81" green="0.8" blue="0.79" /></text></element>
-	<element name="text_l4"><text string="CHECK" align="1"><color red="0.81" green="0.8" blue="0.79" /></text></element>
-	<element name="text_l5"><text string="MATE" align="1"><color red="0.81" green="0.8" blue="0.79" /></text></element>
-
-	<element name="text_b1a"><text string="NEW" align="1"><color red="0.81" green="0.8" blue="0.79" /></text></element>
-	<element name="text_b1b"><text string="GAME" align="1"><color red="0.81" green="0.8" blue="0.79" /></text></element>
-	<element name="text_b2a"><text string="LEVEL" align="1"><color red="0.81" green="0.8" blue="0.79" /></text></element>
-	<element name="text_b3a"><text string="PLAY" align="1"><color red="0.81" green="0.8" blue="0.79" /></text></element>
-	<element name="text_b4a"><text string="2nd F" align="1"><color red="0.81" green="0.8" blue="0.79" /></text></element>
-	<element name="text_b4b"><text string="ON" align="1"><color red="0.81" green="0.8" blue="0.79" /></text></element>
-	<element name="text_b5a"><text string="TAKE" align="1"><color red="0.81" green="0.8" blue="0.79" /></text></element>
-	<element name="text_b5b"><text string="BACK" align="1"><color red="0.81" green="0.8" blue="0.79" /></text></element>
-	<element name="text_b6a"><text string="WHITE/" align="1"><color red="0.81" green="0.8" blue="0.79" /></text></element>
-	<element name="text_b6b"><text string="BLACK" align="1"><color red="0.81" green="0.8" blue="0.79" /></text></element>
-	<element name="text_b9a"><text string="VERIFY" align="2"><color red="0.81" green="0.8" blue="0.79" /></text></element>
-
-	<element name="text_b1c"><text string="CLEAR" align="1"><color red="0.75" green="0.25" blue="0.2" /></text></element>
-	<element name="text_b1d"><text string="BOARD" align="1"><color red="0.75" green="0.25" blue="0.2" /></text></element>
-	<element name="text_b2c"><text string="SOUND" align="1"><color red="0.75" green="0.25" blue="0.2" /></text></element>
-	<element name="text_b3c"><text string="PVP" align="1"><color red="0.75" green="0.25" blue="0.2" /></text></element>
-	<element name="text_b4c"><text string="OFF" align="1"><color red="0.75" green="0.25" blue="0.2" /></text></element>
-	<element name="text_b9c"><text string="SET UP" align="2"><color red="0.75" green="0.25" blue="0.2" /></text></element>
-
-	<element name="text_p1"><image file="chess/wk.svg"></image></element>
-	<element name="text_p2"><image file="chess/wq.svg"></image></element>
-	<element name="text_p3"><image file="chess/wr.svg"></image></element>
-	<element name="text_p4"><image file="chess/wb.svg"></image></element>
-	<element name="text_p5"><image file="chess/wn.svg"></image></element>
-	<element name="text_p6"><image file="chess/wp.svg"></image></element>
 
 
 <!-- sb board -->
@@ -337,6 +304,32 @@ authors:hap
 
 <!-- button panel -->
 
+	<element name="text_b1a"><text string="NEW" align="1"><color red="0.81" green="0.8" blue="0.79" /></text></element>
+	<element name="text_b1b"><text string="GAME" align="1"><color red="0.81" green="0.8" blue="0.79" /></text></element>
+	<element name="text_b2a"><text string="LEVEL" align="1"><color red="0.81" green="0.8" blue="0.79" /></text></element>
+	<element name="text_b3a"><text string="PLAY" align="1"><color red="0.81" green="0.8" blue="0.79" /></text></element>
+	<element name="text_b4a"><text string="2nd F" align="1"><color red="0.81" green="0.8" blue="0.79" /></text></element>
+	<element name="text_b4b"><text string="ON" align="1"><color red="0.81" green="0.8" blue="0.79" /></text></element>
+	<element name="text_b5a"><text string="TAKE" align="1"><color red="0.81" green="0.8" blue="0.79" /></text></element>
+	<element name="text_b5b"><text string="BACK" align="1"><color red="0.81" green="0.8" blue="0.79" /></text></element>
+	<element name="text_b6a"><text string="WHITE/" align="1"><color red="0.81" green="0.8" blue="0.79" /></text></element>
+	<element name="text_b6b"><text string="BLACK" align="1"><color red="0.81" green="0.8" blue="0.79" /></text></element>
+	<element name="text_b9a"><text string="VERIFY" align="2"><color red="0.81" green="0.8" blue="0.79" /></text></element>
+
+	<element name="text_b1c"><text string="CLEAR" align="1"><color red="0.75" green="0.25" blue="0.2" /></text></element>
+	<element name="text_b1d"><text string="BOARD" align="1"><color red="0.75" green="0.25" blue="0.2" /></text></element>
+	<element name="text_b2c"><text string="SOUND" align="1"><color red="0.75" green="0.25" blue="0.2" /></text></element>
+	<element name="text_b3c"><text string="PVP" align="1"><color red="0.75" green="0.25" blue="0.2" /></text></element>
+	<element name="text_b4c"><text string="OFF" align="1"><color red="0.75" green="0.25" blue="0.2" /></text></element>
+	<element name="text_b9c"><text string="SET UP" align="2"><color red="0.75" green="0.25" blue="0.2" /></text></element>
+
+	<element name="text_p1"><image file="chess/wk.svg"></image></element>
+	<element name="text_p2"><image file="chess/wq.svg"></image></element>
+	<element name="text_p3"><image file="chess/wr.svg"></image></element>
+	<element name="text_p4"><image file="chess/wb.svg"></image></element>
+	<element name="text_p5"><image file="chess/wn.svg"></image></element>
+	<element name="text_p6"><image file="chess/wp.svg"></image></element>
+
 	<group name="panel1">
 		<bounds x="0" y="0" width="70" height="50" />
 
@@ -387,8 +380,16 @@ authors:hap
 
 <!-- status leds -->
 
+	<element name="red"><rect><color red="0.75" green="0.25" blue="0.2" /></rect></element>
+
+	<element name="text_l1"><text string="WHITE" align="1"><color red="0.81" green="0.8" blue="0.79" /></text></element>
+	<element name="text_l2"><text string="BLACK" align="1"><color red="0.81" green="0.8" blue="0.79" /></text></element>
+	<element name="text_l3"><text string="2nd F" align="1"><color red="0.81" green="0.8" blue="0.79" /></text></element>
+	<element name="text_l4"><text string="CHECK" align="1"><color red="0.81" green="0.8" blue="0.79" /></text></element>
+	<element name="text_l5"><text string="MATE" align="1"><color red="0.81" green="0.8" blue="0.79" /></text></element>
+
 	<group name="panel2">
-		<bounds x="0" y="0" width="10" height="30" />
+		<bounds x="0" y="0" width="20" height="30" />
 
 		<element name="0.a" ref="led2"><bounds x="0" yc="9"  width="1.5" height="1.5" /></element>
 		<element name="1.a" ref="led2"><bounds x="0" yc="12" width="1.5" height="1.5" /></element>
@@ -396,18 +397,18 @@ authors:hap
 		<element name="3.a" ref="led2"><bounds x="0" yc="18" width="1.5" height="1.5" /></element>
 		<element name="4.a" ref="led2"><bounds x="0" yc="21" width="1.5" height="1.5" /></element>
 
-		<element ref="text_l1"><bounds x="2.5" yc="9"  width="10" height="1.8" /></element>
-		<element ref="text_l2"><bounds x="2.5" yc="12" width="10" height="1.8" /></element>
-		<element ref="text_l3"><bounds x="2.5" yc="15" width="10" height="1.8" /></element>
-		<element ref="text_l4"><bounds x="2.5" yc="18" width="10" height="1.8" /></element>
-		<element ref="text_l5"><bounds x="2.5" yc="21" width="10" height="1.8" /></element>
+		<element ref="text_l1"><bounds x="3.5" yc="9"  width="10" height="1.8" /></element>
+		<element ref="text_l2"><bounds x="3.5" yc="12" width="10" height="1.8" /></element>
+		<element ref="text_l3"><bounds x="3.5" yc="15" width="10" height="1.8" /></element>
+		<element ref="text_l4"><bounds x="3.5" yc="18" width="10" height="1.8" /></element>
+		<element ref="text_l5"><bounds x="3.5" yc="21" width="10" height="1.8" /></element>
 
-		<element ref="red"><bounds x="0" yc="7.5"  width="8.5" height="0.2" /></element>
-		<element ref="red"><bounds x="0" yc="10.5" width="8.5" height="0.2" /></element>
-		<element ref="red"><bounds x="0" yc="13.5" width="8.5" height="0.2" /></element>
-		<element ref="red"><bounds x="0" yc="16.5" width="8.5" height="0.2" /></element>
-		<element ref="red"><bounds x="0" yc="19.5" width="8.5" height="0.2" /></element>
-		<element ref="red"><bounds x="0" yc="22.5" width="8.5" height="0.2" /></element>
+		<element ref="red"><bounds x="0" yc="7.5"  width="9.5" height="0.2" /></element>
+		<element ref="red"><bounds x="0" yc="10.5" width="9.5" height="0.2" /></element>
+		<element ref="red"><bounds x="0" yc="13.5" width="9.5" height="0.2" /></element>
+		<element ref="red"><bounds x="0" yc="16.5" width="9.5" height="0.2" /></element>
+		<element ref="red"><bounds x="0" yc="19.5" width="9.5" height="0.2" /></element>
+		<element ref="red"><bounds x="0" yc="22.5" width="9.5" height="0.2" /></element>
 	</group>
 
 
@@ -458,8 +459,8 @@ authors:hap
 		<element name="6.1" ref="led"><bounds x="68.25" y="83.9" width="1.5" height="1.5" /></element>
 		<element name="6.0" ref="led"><bounds x="78.25" y="83.9" width="1.5" height="1.5" /></element>
 
-		<group ref="panel1"><bounds x="76.2" y="46.0" width="70" height="50" /></group>
-		<group ref="panel2"><bounds x="124.5" y="10.5" width="10" height="30" /></group>
+		<group ref="panel1"><bounds x="76.2" y="42.0" width="70" height="50" /></group>
+		<group ref="panel2"><bounds x="123.5" y="5.6" width="20" height="30" /></group>
 
 	</view>
 </mamelayout>

@@ -21,10 +21,10 @@ public:
 	void init_rockclim();
 
 protected:
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 
 private:
-	void rockclim_map(address_map &map);
+	void rockclim_map(address_map &map) ATTR_COLD;
 
 	void rockclim_palette(palette_device &palette) const;
 	void rockclim_draw_background(bitmap_rgb32 &bitmap, const rectangle &cliprect);

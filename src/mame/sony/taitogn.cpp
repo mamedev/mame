@@ -383,12 +383,12 @@ private:
 	uint8_t gnet_mahjong_panel_r();
 	uint32_t zsg2_ext_r(offs_t offset);
 
-	void flashbank_map(address_map &map);
-	void main_map(address_map &map);
-	void main_mp_map(address_map &map);
+	void flashbank_map(address_map &map) ATTR_COLD;
+	void main_map(address_map &map) ATTR_COLD;
+	void main_mp_map(address_map &map) ATTR_COLD;
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	required_device<cpu_device> m_mn10200;
 	required_device<pccard_slot_device> m_pccard;

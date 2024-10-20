@@ -102,7 +102,7 @@ public:
 	void ace(machine_config &config);
 
 private:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
@@ -133,8 +133,8 @@ private:
 	void ald_w(uint8_t data);
 	SNAPSHOT_LOAD_MEMBER(snapshot_cb);
 
-	void ace_io(address_map &map);
-	void ace_mem(address_map &map);
+	void ace_io(address_map &map) ATTR_COLD;
+	void ace_mem(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<i8255_device> m_ppi;

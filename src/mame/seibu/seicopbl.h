@@ -38,11 +38,11 @@ public:
 	uint16_t scale_r();
 	void scale_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
-	void seibucopbl_map(address_map &map);
+	void seibucopbl_map(address_map &map) ATTR_COLD;
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 	virtual space_config_vector memory_space_config() const override;
 
 private:

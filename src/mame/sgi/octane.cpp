@@ -35,7 +35,7 @@ public:
 	void octane(machine_config &config);
 
 protected:
-	void mem_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
 
 	required_device<r5000be_device> m_maincpu;
 };

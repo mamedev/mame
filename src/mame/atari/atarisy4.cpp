@@ -130,9 +130,9 @@ protected:
 	void dsp0_bank_w(uint16_t data);
 	uint16_t analog_r();
 
-	virtual void machine_reset() override;
-	virtual void video_start() override;
-	virtual void video_reset() override;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
+	virtual void video_reset() override ATTR_COLD;
 
 	uint32_t screen_update_atarisy4(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
@@ -144,9 +144,9 @@ protected:
 	void load_ldafile(address_space &space, const uint8_t *file);
 	void load_hexfile(address_space &space, const uint8_t *file);
 
-	void main_map(address_map &map);
-	void dsp0_map(address_map &map);
-	void dsp0_io_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
+	void dsp0_map(address_map &map) ATTR_COLD;
+	void dsp0_io_map(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<tms32010_device> m_dsp0;
@@ -196,11 +196,11 @@ protected:
 	int dsp1_bio_r();
 	void dsp1_bank_w(uint16_t data);
 
-	virtual void machine_reset() override;
+	virtual void machine_reset() override ATTR_COLD;
 
-	void airrace_map(address_map &map);
-	void dsp1_map(address_map &map);
-	void dsp1_io_map(address_map &map);
+	void airrace_map(address_map &map) ATTR_COLD;
+	void dsp1_map(address_map &map) ATTR_COLD;
+	void dsp1_io_map(address_map &map) ATTR_COLD;
 
 private:
 	required_device<tms32010_device> m_dsp1;

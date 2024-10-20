@@ -85,7 +85,7 @@ public:
 	void konamigx_t4_psacmap_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 	void vblank_irq_ack_w(int state);
 	void hblank_irq_ack_w(int state);
-	DECLARE_CUSTOM_INPUT_MEMBER(gx_rdport1_3_r);
+	ioport_value gx_rdport1_3_r();
 	void init_konamigx();
 	TILE_GET_INFO_MEMBER(get_gx_psac_tile_info);
 	TILE_GET_INFO_MEMBER(get_gx_psac3_tile_info);
@@ -187,14 +187,14 @@ public:
 	void tbyahhoo(machine_config &config);
 	void gokuparo(machine_config &config);
 	void sexyparo(machine_config &config);
-	void gx_base_memmap(address_map &map);
-	void racinfrc_map(address_map &map);
-	void gx_type1_map(address_map &map);
-	void gx_type2_map(address_map &map);
-	void gx_type3_map(address_map &map);
-	void gx_type4_map(address_map &map);
-	void gxsndmap(address_map &map);
-	void gxtmsmap(address_map &map);
+	void gx_base_memmap(address_map &map) ATTR_COLD;
+	void racinfrc_map(address_map &map) ATTR_COLD;
+	void gx_type1_map(address_map &map) ATTR_COLD;
+	void gx_type2_map(address_map &map) ATTR_COLD;
+	void gx_type3_map(address_map &map) ATTR_COLD;
+	void gx_type4_map(address_map &map) ATTR_COLD;
+	void gxsndmap(address_map &map) ATTR_COLD;
+	void gxtmsmap(address_map &map) ATTR_COLD;
 
 protected:
 	required_device<cpu_device> m_maincpu;

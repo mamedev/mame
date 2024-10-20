@@ -71,14 +71,14 @@ public:
 	void vector3(machine_config &config);
 
 private:
-	void vector3_io(address_map &map);
-	void vector3_mem(address_map &map);
+	void vector3_io(address_map &map) ATTR_COLD;
+	void vector3_mem(address_map &map) ATTR_COLD;
 
 	memory_passthrough_handler m_rom_shadow_tap;
 	required_device<cpu_device> m_maincpu;
 	required_region_ptr<u8> m_rom;
 	required_shared_ptr<u8> m_ram;
-	void machine_reset() override;
+	void machine_reset() override ATTR_COLD;
 };
 
 

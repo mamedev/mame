@@ -109,7 +109,7 @@ Small note about natural keyboard: currently,
 
 static INPUT_PORTS_START( z88 )
 	PORT_START("BATTERY")
-	PORT_CONFNAME( 0x01, 0x00, "Battery Status" )   PORT_WRITE_LINE_DEVICE_MEMBER("blink", upd65031_device, btl_w)
+	PORT_CONFNAME( 0x01, 0x00, "Battery Status" )   PORT_WRITE_LINE_DEVICE_MEMBER("blink", FUNC(upd65031_device::btl_w))
 	PORT_CONFSETTING( 0x00, DEF_STR( Normal ) )
 	PORT_CONFSETTING( 0x01, "Low" )
 

@@ -46,12 +46,12 @@ protected:
 	void earom_write(offs_t offset, uint8_t data);
 	void earom_control_w(uint8_t data);
 
-	void bwidow_map(address_map &map);
-	void bwidowp_map(address_map &map);
-	void spacduel_map(address_map &map);
+	void bwidow_map(address_map &map) ATTR_COLD;
+	void bwidowp_map(address_map &map) ATTR_COLD;
+	void spacduel_map(address_map &map) ATTR_COLD;
 
 	virtual void machine_start() override { m_leds.resolve(); }
-	virtual void machine_reset() override;
+	virtual void machine_reset() override ATTR_COLD;
 
 	int m_lastdata = 0;
 	required_device<cpu_device> m_maincpu;

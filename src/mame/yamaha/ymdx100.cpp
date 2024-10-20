@@ -273,12 +273,12 @@ public:
 	void dx100(machine_config &config);
 
 	void led_w(int state)                  { m_led = state; }
-	DECLARE_CUSTOM_INPUT_MEMBER(midi_in_r) { return m_midi_in; }
+	ioport_value midi_in_r() { return m_midi_in; }
 
 protected:
 	virtual void driver_start() override;
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	HD44780_PIXEL_UPDATE(lcd_pixel_update);
@@ -286,7 +286,7 @@ private:
 
 	void p22_w(int state);
 
-	void mem_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
 
 	required_device<hd6303x_cpu_device> m_maincpu;
 	required_device<m58990_device> m_adc;
@@ -353,10 +353,10 @@ static INPUT_PORTS_START(dx100)
 	// TODO: Should 0x02, 0x04, 0x10, and 0x80 be listed here?
 	// They should be handled by the other interconnections in this file.
 	// If so, verify the active states of the MIDI ports.
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OUTPUT )   PORT_NAME("LED") PORT_WRITE_LINE_MEMBER(yamaha_dx100_state, led_w)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OUTPUT )   PORT_NAME("LED") PORT_WRITE_LINE_MEMBER(FUNC(yamaha_dx100_state::led_w))
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNUSED )  // tied to ground
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_CUSTOM )  // 500khz clock
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM )  PORT_CUSTOM_MEMBER(yamaha_dx100_state, midi_in_r)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM )  PORT_CUSTOM_MEMBER(FUNC(yamaha_dx100_state::midi_in_r))
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_OUTPUT )  // MIDI out
 	PORT_CONFNAME( 0x20, 0x00, "Foot Switch" )
 	PORT_CONFSETTING( 0x00, "Connected" )

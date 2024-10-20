@@ -60,8 +60,8 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	TIMER_CALLBACK_MEMBER(update_floppy);
 
@@ -163,7 +163,7 @@ private:
 		fdc_pll_t pll;
 	};
 
-	required_device_array<floppy_connector, 4> m_connectors;
+	optional_device_array<floppy_connector, 4> m_connectors;
 	devcb_read16 m_read_ds;
 
 	std::string ttsn() const;

@@ -151,7 +151,7 @@ void dmac_0448_device::dma_check(s32 param)
 		else
 		{
 			// memory to device
-			u8 const data = dma.ctrc > 0 ? m_bus->read_byte(address) : 0;
+			u8 const data = (dma.ctrc > 0) ? m_bus->read_byte(address) : 0;
 
 			LOG("dma_w data 0x%02x address 0x%08x\n", data, address);
 

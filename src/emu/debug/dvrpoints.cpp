@@ -11,7 +11,7 @@
 #include "emu.h"
 #include "dvrpoints.h"
 
-#include "debugger.h"
+#include "debugcpu.h"
 #include "points.h"
 
 #include <algorithm>

@@ -73,6 +73,7 @@ public:
 	template <typename T> void set_space(T &&tag, int spacenum) { m_space.set_tag(std::forward<T>(tag), spacenum); }
 
 	virtual space_config_vector memory_space_config() const override;
+	address_space &program_space() const { return *m_space; }
 
 	auto birq4() { return m_out_birq4_cb.bind(); }
 	auto birq5() { return m_out_birq6_cb.bind(); }
@@ -95,8 +96,8 @@ public:
 
 protected:
 	// device_t implementation
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// device_z80daisy_interface implementation
 	virtual int z80daisy_irq_state() override;
@@ -142,7 +143,7 @@ public:
 
 protected:
 	// device_t implementation
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 	devcb_write_line m_write_birq4;
 	devcb_write_line m_write_birq5;

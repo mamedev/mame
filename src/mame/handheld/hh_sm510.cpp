@@ -36,7 +36,7 @@ TODO:
   gnw_mariocmt, gnw_mariocmta, gnw_mariotj, gnw_mbaway, gnw_mmousep,
   gnw_pinball, gnw_popeyep, gnw_sbuster, gnw_snoopyp, gnw_zelda
 
-********************************************************************************
+================================================================================
 
 Misc Nintendo Game & Watch notes:
 
@@ -121,7 +121,7 @@ The "Game Watch" wristwatches are by Nelsonic, not Nintendo.
 Bassmate Computer (BM-501) is on identical hardware as G&W Multi Screen,
 but it's not part of the game series.
 
-********************************************************************************
+================================================================================
 
 Regarding Электроника (Elektronika, translated: Electronics): It is not
 actually a company. It was a USSR brand name for consumer electronics,
@@ -164,7 +164,7 @@ The MCUs used were not imported from Sharp, but cloned by USSR, renamed to
 
 void hh_sm510_state::machine_start()
 {
-	// resolve handlers
+	// resolve outputs
 	m_out_x.resolve();
 
 	// determine number of input lines (set it in the subclass constructor if different)
@@ -6874,7 +6874,7 @@ public:
 	void tgaiden(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	// R2 connects to a single LED behind the screen
@@ -9997,9 +9997,12 @@ ROM_END
   * Sharp SM510 under epoxy (die label MJ1)
   * lcd screen with custom segments, 1-bit sound
 
-  TODO or BTANB?: Energy and weapon power bars are swapped. Not verified on the
-  handheld. The manual does show them correctly, but looking at the LCD segment
-  ID groupings, the SVG is not wrong.
+  BTANB: Energy and weapon power bars are the wrong way around. The manual does
+  show them correctly, but it appears to be a doctored picture.
+
+  There's also a newer version called Project Alien, presumed to be the same ROM.
+  The LCD is different (no Xenomorph aliens). The background inlay is different
+  too, and this time the weapon/energy labels are placed correctly.
 
 *******************************************************************************/
 

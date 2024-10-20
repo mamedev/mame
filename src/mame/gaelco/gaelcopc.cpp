@@ -1,5 +1,6 @@
 // license:BSD-3-Clause
-// copyright-holders:David Haywood
+// copyright-holders: David Haywood
+
 /* Gaelco PC based hardware
 
 TODO:
@@ -48,7 +49,7 @@ public:
 	void gaelcopc(machine_config &config);
 
 private:
-	void gaelcopc_map(address_map &map);
+	void gaelcopc_map(address_map &map) ATTR_COLD;
 
 	// devices
 	required_device<pentium3_device> m_maincpu;
@@ -68,8 +69,8 @@ INPUT_PORTS_END
 
 void gaelcopc_state::gaelcopc(machine_config &config)
 {
-	/* basic machine hardware */
-	// bios mentions Socket 370, so at very least a Celeron or a Pentium 3 class CPU
+	// basic machine hardware
+	// BIOS mentions Socket 370, so at very least a Celeron or a Pentium 3 class CPU
 	// TODO: lowered rate for debugging aid, needs a slot option anyway
 	PENTIUM3(config, m_maincpu, 100'000'000);
 	m_maincpu->set_addrmap(AS_PROGRAM, &gaelcopc_state::gaelcopc_map); // TODO: remove me
@@ -81,7 +82,7 @@ void gaelcopc_state::gaelcopc(machine_config &config)
 // TODO: All of the provided BIOSes just have different ACFG table configs at $10000, investigate
 
 ROM_START(tokyocop)
-	ROM_REGION32_LE(0x80000, "bios", 0)  /* motherboard bios */
+	ROM_REGION32_LE(0x80000, "bios", 0)  // motherboard BIOS
 	// $40 Award 6.00 PG 12/19/2002
 	// $7413c Intel 815 Hardware version v0.0 08/13/1999
 	ROM_SYSTEM_BIOS(0, "default", "v0.0 08/13/1999")
@@ -99,7 +100,7 @@ tested working on the real hardware. It uses the same hardware and bios as the k
 ROM_END
 
 ROM_START(tokyocopk)
-	ROM_REGION32_LE(0x80000, "bios", 0)  /* motherboard bios */
+	ROM_REGION32_LE(0x80000, "bios", 0)  // motherboard BIOS
 	// $40 6.00 PG 12/19/2002
 	// $7413c v0.0 08/13/1999
 	ROM_LOAD("al1.u10", 0x000000, 0x80000, CRC(e426e030) SHA1(52bdb6d46c12150077169ac3add8c450326ad4af) )
@@ -109,7 +110,7 @@ ROM_START(tokyocopk)
 ROM_END
 
 ROM_START(tokyocopi)
-	ROM_REGION32_LE(0x80000, "bios", 0)  /* motherboard bios */
+	ROM_REGION32_LE(0x80000, "bios", 0)  // motherboard BIOS
 	// Not specifically provided, assume "works right" with same BIOS.
 	ROM_LOAD("al1.u10", 0x000000, 0x80000, CRC(e426e030) SHA1(52bdb6d46c12150077169ac3add8c450326ad4af) )
 
@@ -118,7 +119,7 @@ ROM_START(tokyocopi)
 ROM_END
 
 ROM_START(rriders)
-	ROM_REGION32_LE(0x80000, "bios", 0)  /* motherboard bios */
+	ROM_REGION32_LE(0x80000, "bios", 0)  // motherboard BIOS
 	// $40 6.00 PG 12/19/2002
 	// $7413c v0.0 08/13/1999
 	ROM_LOAD("22-03.u10", 0x000000, 0x80000, CRC(0ccae12f) SHA1(a8878fa73d5a4f5e9b6e3f35994fddea08cd3c2d) )
@@ -127,8 +128,9 @@ ROM_START(rriders)
 	DISK_IMAGE( "rriders", 0, SHA1(46e10517ee1b383e03c88cac67a54318c227e3e1) )
 ROM_END
 
+// Gaelco I/O card "REF. 050210" (Altera Cyclone EP1C3T144C8, AD9288...)
 ROM_START(tuningrc)
-	ROM_REGION32_LE(0x80000, "bios", 0)  /* motherboard bios */
+	ROM_REGION32_LE(0x80000, "bios", 0)  // motherboard BIOS
 	// $40 6.00 PG 12/19/2002
 	// $7413c v0.0 08/13/1999
 	ROM_LOAD("310j.u10", 0x000000, 0x80000, CRC(70b0797a) SHA1(696f602e83359d5d36798d4d2962ee85171e3622) )

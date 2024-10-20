@@ -47,7 +47,7 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(battery) { m_battery = newval; }
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	// devices/pointers
@@ -63,8 +63,8 @@ private:
 	u64 m_lcd_data[2] = { };
 
 	// address maps
-	void main_map(address_map &map);
-	void main_io(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
+	void main_io(address_map &map) ATTR_COLD;
 
 	// I/O handlers
 	template<int N> void lcd_output_w(u64 data);
@@ -199,7 +199,7 @@ static INPUT_PORTS_START( exechess )
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_OTHER) // dr
 
 	PORT_START("IN.3")
-	PORT_CONFNAME( 0x01, 0x00, "Battery Status" ) PORT_CHANGED_MEMBER(DEVICE_SELF, exechess_state, battery, 0)
+	PORT_CONFNAME( 0x01, 0x00, "Battery Status" ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(exechess_state::battery), 0)
 	PORT_CONFSETTING(    0x01, "Low" )
 	PORT_CONFSETTING(    0x00, DEF_STR( Normal ) )
 INPUT_PORTS_END
@@ -268,4 +268,4 @@ ROM_END
 *******************************************************************************/
 
 //    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS           INIT        COMPANY, FULLNAME, FLAGS
-SYST( 1981, exechess, 0,      0,      exechess, exechess, exechess_state, empty_init, "SciSys", "Executive Chess", MACHINE_NO_SOUND_HW | MACHINE_SUPPORTS_SAVE )
+SYST( 1981, exechess, 0,      0,      exechess, exechess, exechess_state, empty_init, "SciSys / Philidor Software", "Executive Chess", MACHINE_NO_SOUND_HW | MACHINE_SUPPORTS_SAVE )

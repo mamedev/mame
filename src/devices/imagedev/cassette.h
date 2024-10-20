@@ -107,7 +107,7 @@ public:
 protected:
 	// device_t implementation
 	virtual void device_config_complete() override;
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 	virtual bool use_software_list_file_extension_for_filetype() const noexcept override { return true; }
 
 	// device_image_interface implementation

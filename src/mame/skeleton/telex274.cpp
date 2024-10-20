@@ -114,9 +114,9 @@ public:
 	void telex274(machine_config &config);
 
 private:
-	void main_mem(address_map &map);
-	void coax_mem(address_map &map);
-	void exam_mem(address_map &map);
+	void main_mem(address_map &map) ATTR_COLD;
+	void coax_mem(address_map &map) ATTR_COLD;
+	void exam_mem(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_coaxcpu;

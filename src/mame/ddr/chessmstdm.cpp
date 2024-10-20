@@ -65,8 +65,8 @@ public:
 	void chessmstdm(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	required_device<z80_device> m_maincpu;
@@ -85,8 +85,8 @@ private:
 	int m_digit_dot = 0;
 	u16 m_digit_data = 0;
 
-	void chessmstdm_mem(address_map &map);
-	void chessmstdm_io(address_map &map);
+	void chessmstdm_mem(address_map &map) ATTR_COLD;
+	void chessmstdm_io(address_map &map) ATTR_COLD;
 
 	void reset_w(u8 data = 0);
 	u8 reset_r();
@@ -270,8 +270,8 @@ static INPUT_PORTS_START( chessmstdm )
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Enter")                   PORT_CODE(KEYCODE_ENTER) PORT_CODE(KEYCODE_ENTER_PAD)
 
 	PORT_START("IN.1")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Monitor") PORT_CODE(KEYCODE_F1) PORT_CHANGED_MEMBER(DEVICE_SELF, chessmstdm_state, monitor_button, 0)
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("View")    PORT_CODE(KEYCODE_F2) PORT_CHANGED_MEMBER(DEVICE_SELF, chessmstdm_state, view_button, 0)
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Monitor") PORT_CODE(KEYCODE_F1) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(chessmstdm_state::monitor_button), 0)
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("View")    PORT_CODE(KEYCODE_F2) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(chessmstdm_state::view_button), 0)
 INPUT_PORTS_END
 
 

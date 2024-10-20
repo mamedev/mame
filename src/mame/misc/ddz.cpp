@@ -72,8 +72,8 @@ public:
 	void ddz(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	// memory pointers
@@ -84,7 +84,7 @@ private:
 	required_device<se3208_device> m_maincpu;
 	required_device<vrender0soc_device> m_vr0soc;
 
-	void ddz_mem(address_map &map);
+	void ddz_mem(address_map &map) ATTR_COLD;
 };
 
 

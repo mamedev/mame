@@ -65,8 +65,8 @@ public:
 	void init_marimba();
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -82,8 +82,8 @@ private:
 
 	TIMER_DEVICE_CALLBACK_MEMBER(screen_scanline);
 
-	template<int Which> void tilemap_map(address_map &map, u32 base);
-	void mem_map(address_map &map);
+	template<int Which> void tilemap_map(address_map &map, u32 base) ATTR_COLD;
+	void mem_map(address_map &map) ATTR_COLD;
 
 	u32 poems_8020010_r();
 	u32 poems_count_r();

@@ -45,7 +45,7 @@
 #include "emu.h"
 #include "bus/generic/carts.h"
 #include "bus/generic/slot.h"
-#include "cpu/z80/z80.h" //CPU was actually a NSC800 (Z80 compatible)
+#include "cpu/z80/nsc800.h"
 #include "machine/i8279.h"
 #include "machine/pit8253.h"
 #include "sound/spkrdev.h"
@@ -74,8 +74,8 @@ public:
 	void i7000(machine_config &config);
 
 protected:
-	virtual void video_start() override;
-	virtual void machine_start() override;
+	virtual void video_start() override ATTR_COLD;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -96,8 +96,8 @@ private:
 	uint8_t kbd_r();
 	void scanlines_w(uint8_t data);
 
-	void i7000_io(address_map &map);
-	void i7000_mem(address_map &map);
+	void i7000_io(address_map &map) ATTR_COLD;
+	void i7000_mem(address_map &map) ATTR_COLD;
 };
 
 void i7000_state::scanlines_w(uint8_t data)

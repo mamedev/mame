@@ -31,8 +31,8 @@ public:
 	void dma_w(offs_t offset, uint16_t data);
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 private:
 	void do_cpu_dma(uint32_t len);

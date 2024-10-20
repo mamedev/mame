@@ -233,9 +233,9 @@ public:
 	void b128(machine_config &config);
 	void b256(machine_config &config);
 	void cbm610(machine_config &config);
-	void cbm2_mem(address_map &map);
-	void ext_io(address_map &map);
-	void ext_mem(address_map &map);
+	void cbm2_mem(address_map &map) ATTR_COLD;
+	void ext_io(address_map &map) ATTR_COLD;
+	void ext_mem(address_map &map) ATTR_COLD;
 };
 
 
@@ -317,9 +317,9 @@ public:
 	// interrupt state
 	void p500_pal(machine_config &config);
 	void p500_ntsc(machine_config &config);
-	void p500_mem(address_map &map);
-	void vic_colorram_map(address_map &map);
-	void vic_videoram_map(address_map &map);
+	void p500_mem(address_map &map) ATTR_COLD;
+	void vic_colorram_map(address_map &map) ATTR_COLD;
+	void vic_videoram_map(address_map &map) ATTR_COLD;
 };
 
 

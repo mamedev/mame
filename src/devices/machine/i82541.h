@@ -17,13 +17,13 @@ public:
 	i82541_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 private:
-	void registers_map(address_map &map);
-	void flash_map(address_map &map);
-	void registers_io_map(address_map &map);
+	void registers_map(address_map &map) ATTR_COLD;
+	void flash_map(address_map &map) ATTR_COLD;
+	void registers_io_map(address_map &map) ATTR_COLD;
 };
 
 DECLARE_DEVICE_TYPE(I82541, i82541_device)

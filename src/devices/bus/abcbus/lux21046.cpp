@@ -304,9 +304,10 @@ void luxor_55_21046_device::device_add_mconfig(machine_config & config)
 	m_maincpu->set_daisy_config(z80_daisy_chain);
 	m_maincpu->set_addrmap(AS_PROGRAM, &luxor_55_21046_device::luxor_55_21046_mem);
 	m_maincpu->set_addrmap(AS_IO, &luxor_55_21046_device::luxor_55_21046_io);
+	m_maincpu->busack_cb().set(m_dma, FUNC(z80dma_device::bai_w));
 
 	Z80DMA(config, m_dma, 16_MHz_XTAL / 4);
-	m_dma->out_busreq_callback().set_inputline(m_maincpu, INPUT_LINE_HALT);
+	m_dma->out_busreq_callback().set_inputline(m_maincpu, Z80_INPUT_LINE_BUSRQ);
 	m_dma->out_int_callback().set(FUNC(luxor_55_21046_device::dma_int_w));
 	m_dma->in_mreq_callback().set(FUNC(luxor_55_21046_device::memory_read_byte));
 	m_dma->out_mreq_callback().set(FUNC(luxor_55_21046_device::memory_write_byte));

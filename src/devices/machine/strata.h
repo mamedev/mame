@@ -21,7 +21,7 @@ public:
 
 protected:
 	// device-level overrides
-	void device_start() override;
+	void device_start() override ATTR_COLD;
 
 	void nvram_default() override;
 	bool nvram_read(util::read_stream &file) override;

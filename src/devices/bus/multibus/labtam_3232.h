@@ -22,14 +22,14 @@ public:
 
 protected:
 	// device_t overrides
-	virtual const tiny_rom_entry *device_rom_region() const override;
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual ioport_constructor device_input_ports() const override;
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 private:
-	template <unsigned ST> void cpu_map(address_map &map);
+	template <unsigned ST> void cpu_map(address_map &map) ATTR_COLD;
 
 	//void bus_mem_w(offs_t offset, u16 data, u16 mem_mask) { m_bus->space(AS_PROGRAM).write_word(0xe00000 | offset << 1, data, mem_mask); }
 	//u16 bus_mem_r(offs_t offset, u16 mem_mask) { return m_bus->space(AS_PROGRAM).read_word(0xe00000 | offset << 1, mem_mask); }

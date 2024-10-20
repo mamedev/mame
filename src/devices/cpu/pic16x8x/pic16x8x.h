@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Grull Osgo
+// copyright-holders:Tony La Porta, Grull Osgo
 /************************************************************************
 
   Microchip PIC16x8x Emulator
@@ -54,20 +54,20 @@ public:
 	 ****************************************************************************/
 	void set_config(u16 data);
 
-	void core_regs(address_map &map, u8 mirror = 0);
+	void core_regs(address_map &map, u8 mirror = 0) ATTR_COLD;
 
-	void ram_6(address_map &map);
-	void rom_9(address_map &map);
-	void ram_7(address_map &map);		
-	void rom_10(address_map &map);
+	void ram_6(address_map &map) ATTR_COLD;
+	void rom_9(address_map &map) ATTR_COLD;
+	void ram_7(address_map &map) ATTR_COLD;
+	void rom_10(address_map &map) ATTR_COLD;
 
 protected:
 	// construction/destruction
 	pic16x8x_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, int program_width, address_map_constructor program_map, address_map_constructor data_map);
 
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// device_execute_interface overrides
 	/**************************************************************************
@@ -81,7 +81,6 @@ protected:
 	virtual u64 execute_cycles_to_clocks(u64 cycles) const noexcept override { return (cycles * 4); }
 	virtual u32 execute_min_cycles() const noexcept override { return 1; }
 	virtual u32 execute_max_cycles() const noexcept override { return 2; }
-	virtual u32 execute_input_lines() const noexcept override { return 1; }
 	virtual bool execute_input_edge_triggered(int inputnum) const noexcept override { return inputnum == PIC16x8x_T0CKI; }
 	virtual void execute_run() override;
 	virtual void execute_set_input(int line, int state) override;
@@ -106,11 +105,11 @@ protected:
 	u16 m_buff[0x40];
 
 	optional_memory_region m_region;
-	
+
 	// address spaces
 	address_space_config m_program_config;
 	address_space_config m_data_config;
-	
+
 	int m_program_width;
 
 private:

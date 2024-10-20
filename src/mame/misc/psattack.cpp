@@ -161,9 +161,9 @@ private:
 	required_device<vrender0soc_device> m_vr0soc;
 	required_device<ata_interface_device> m_ata;
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	void psattack_mem(address_map &map);
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	void psattack_mem(address_map &map) ATTR_COLD;
 
 	uint16_t cfcard_data_r();
 	uint8_t cfcard_regs_r(offs_t offset);

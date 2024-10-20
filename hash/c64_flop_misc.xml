@@ -67,10 +67,15 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="metaldst">
+	<software name="metaldst" supported="no">
 		<description>Metal Dust</description>
 		<year>2012</year>
 		<publisher>Protovision</publisher>
+		<notes><![CDATA[
+[1581] or [.d81] ?FILE NOT FOUND ERROR
+[SuperCPU] resets to PC=0, in brk-land
+]]></notes>
+
 		<sharedfeat name="compatibility" value="PAL"/>
 		<sharedfeat name="requirement" value="c64_cart:supercpu"/>
 

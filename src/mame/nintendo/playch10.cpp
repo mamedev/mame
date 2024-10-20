@@ -397,26 +397,26 @@ private:
 
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 
-	void bios_io_map(address_map &map);
-	void bios_map(address_map &map);
-	void ppu_map(address_map &map);
-	void cart_map(address_map &map);
-	void cart_a_map(address_map &map);
-	void cart_b_map(address_map &map);
-	void cart_c_map(address_map &map);
-	void cart_d_map(address_map &map);
-	void cart_d2_map(address_map &map);
-	void cart_e_map(address_map &map);
-	void cart_f_map(address_map &map);
-	void cart_f2_map(address_map &map);
-	void cart_g_map(address_map &map);
-	void cart_h_map(address_map &map);
-	void cart_i_map(address_map &map);
-	void cart_k_map(address_map &map);
+	void bios_io_map(address_map &map) ATTR_COLD;
+	void bios_map(address_map &map) ATTR_COLD;
+	void ppu_map(address_map &map) ATTR_COLD;
+	void cart_map(address_map &map) ATTR_COLD;
+	void cart_a_map(address_map &map) ATTR_COLD;
+	void cart_b_map(address_map &map) ATTR_COLD;
+	void cart_c_map(address_map &map) ATTR_COLD;
+	void cart_d_map(address_map &map) ATTR_COLD;
+	void cart_d2_map(address_map &map) ATTR_COLD;
+	void cart_e_map(address_map &map) ATTR_COLD;
+	void cart_f_map(address_map &map) ATTR_COLD;
+	void cart_f2_map(address_map &map) ATTR_COLD;
+	void cart_g_map(address_map &map) ATTR_COLD;
+	void cart_h_map(address_map &map) ATTR_COLD;
+	void cart_i_map(address_map &map) ATTR_COLD;
+	void cart_k_map(address_map &map) ATTR_COLD;
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 	struct chr_bank
 	{
@@ -1638,7 +1638,7 @@ static INPUT_PORTS_START( playch10 )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE ) PORT_NAME("Channel Select") PORT_CODE(KEYCODE_0)
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_SERVICE ) PORT_NAME("Enter") PORT_CODE(KEYCODE_MINUS)
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SERVICE ) PORT_NAME("Reset") PORT_CODE(KEYCODE_EQUALS)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(playch10_state, int_detect_r)   // INT Detect
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(playch10_state::int_detect_r))   // INT Detect
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_COIN2 )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SERVICE1 )

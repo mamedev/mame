@@ -44,7 +44,7 @@ public:
 	x1_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 private:
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 	// z80daisy_interface overrides
 	virtual int z80daisy_irq_state() override;
 	virtual int z80daisy_irq_ack() override;
@@ -132,9 +132,9 @@ public:
 	void x1_portb_w(uint8_t data);
 	void x1_portc_w(uint8_t data);
 	void init_x1_kanji();
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 	uint32_t screen_update_x1(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	DECLARE_INPUT_CHANGED_MEMBER(ipl_reset);
@@ -170,10 +170,10 @@ public:
 	uint8_t m_key_irq_flag;       /**< Keyboard IRQ pending. */
 	uint8_t m_key_irq_vector;     /**< Keyboard IRQ vector. */
 
-	void x1_io(address_map &map);
-	void x1_io_banks(address_map &map);
-	void x1_io_banks_common(address_map &map);
-	void x1_mem(address_map &map);
+	void x1_io(address_map &map) ATTR_COLD;
+	void x1_io_banks(address_map &map) ATTR_COLD;
+	void x1_io_banks_common(address_map &map) ATTR_COLD;
+	void x1_mem(address_map &map) ATTR_COLD;
 protected:
 	struct scrn_reg_t
 	{
@@ -338,9 +338,9 @@ public:
 
 	void x1turbo(machine_config &config);
 protected:
-	void x1turbo_io_banks(address_map &map);
-	void x1turbo_mem(address_map &map);
-	virtual void machine_reset() override;
+	void x1turbo_io_banks(address_map &map) ATTR_COLD;
+	void x1turbo_mem(address_map &map) ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	required_device<z80dma_device> m_dma;

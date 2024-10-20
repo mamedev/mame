@@ -95,7 +95,7 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 	devcb_write_line m_irq_handler;
 	devcb_write_line m_nmi_handler;

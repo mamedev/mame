@@ -797,7 +797,7 @@ void menu_select_launch::recompute_metrics(uint32_t width, uint32_t height, floa
 //  perform our special rendering
 //-------------------------------------------------
 
-void menu_select_launch::custom_render(u32 flags, void *selectedref, float top, float bottom, float origx1, float origy1, float origx2, float origy2)
+void menu_select_launch::custom_render(uint32_t flags, void *selectedref, float top, float bottom, float origx1, float origy1, float origx2, float origy2)
 {
 	std::string tempbuf[4];
 
@@ -874,11 +874,11 @@ void menu_select_launch::custom_render(u32 flags, void *selectedref, float top, 
 		// next line is overall driver status
 		system_flags const &flags(get_system_flags(driver));
 		if (flags.machine_flags() & machine_flags::NOT_WORKING)
-			tempbuf[2] = _("Overall: NOT WORKING");
+			tempbuf[2] = _("Status: NOT WORKING");
 		else if ((flags.unemulated_features() | flags.imperfect_features()) & device_t::feature::PROTECTION)
-			tempbuf[2] = _("Overall: Unemulated Protection");
+			tempbuf[2] = _("Status: Unemulated Protection");
 		else
-			tempbuf[2] = _("Overall: Working");
+			tempbuf[2] = _("Status: Working");
 
 		// next line is graphics, sound status
 		if (flags.unemulated_features() & device_t::feature::GRAPHICS)
@@ -1918,7 +1918,11 @@ bool menu_select_launch::handle_keys(u32 flags, int &iptkey)
 
 	if (exclusive_input_pressed(iptkey, IPT_UI_CANCEL, 0))
 	{
-		if (!m_search.empty())
+		if (m_ui_error)
+		{
+			// dismiss error
+		}
+		else if (!m_search.empty())
 		{
 			// escape pressed with non-empty search text clears it
 			m_search.clear();
@@ -1940,7 +1944,12 @@ bool menu_select_launch::handle_keys(u32 flags, int &iptkey)
 	// accept left/right keys as-is with repeat
 	if (exclusive_input_pressed(iptkey, IPT_UI_LEFT, (flags & PROCESS_LR_REPEAT) ? 6 : 0))
 	{
-		if (m_focus == focused_menu::RIGHTTOP)
+		if (m_ui_error)
+		{
+			// dismiss error
+			return false;
+		}
+		else if (m_focus == focused_menu::RIGHTTOP)
 		{
 			// Swap the right panel and swallow it
 			iptkey = IPT_INVALID;
@@ -1971,7 +1980,12 @@ bool menu_select_launch::handle_keys(u32 flags, int &iptkey)
 	// swallow left/right keys if they are not appropriate
 	if (exclusive_input_pressed(iptkey, IPT_UI_RIGHT, (flags & PROCESS_LR_REPEAT) ? 6 : 0))
 	{
-		if (m_focus == focused_menu::RIGHTTOP)
+		if (m_ui_error)
+		{
+			// dismiss error
+			return false;
+		}
+		else if (m_focus == focused_menu::RIGHTTOP)
 		{
 			// Swap the right panel and swallow it
 			iptkey = IPT_INVALID;

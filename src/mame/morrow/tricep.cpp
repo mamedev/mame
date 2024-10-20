@@ -38,10 +38,10 @@ private:
 	uint8_t usart_r(offs_t offset);
 	void usart_w(offs_t offset, uint8_t data);
 
-	void mem_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
 
-	void machine_reset() override;
-	void machine_start() override;
+	void machine_reset() override ATTR_COLD;
+	void machine_start() override ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	required_device_array<scn2651_device, 4> m_usart;

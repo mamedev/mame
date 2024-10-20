@@ -126,7 +126,7 @@ private:
 	uint8_t funkball_config_reg_r();
 	void funkball_config_reg_w(uint8_t data);
 
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	struct
@@ -142,11 +142,11 @@ private:
 	void bios_ram_w(offs_t offset, uint8_t data);
 	uint8_t io20_r(offs_t offset);
 	void io20_w(offs_t offset, uint8_t data);
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	void flashbank_map(address_map &map);
-	void funkball_io(address_map &map);
-	void funkball_map(address_map &map);
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	void flashbank_map(address_map &map) ATTR_COLD;
+	void funkball_io(address_map &map) ATTR_COLD;
+	void funkball_map(address_map &map) ATTR_COLD;
 
 	uint32_t voodoo_0_pci_r(int function, int reg, uint32_t mem_mask);
 	void voodoo_0_pci_w(int function, int reg, uint32_t data, uint32_t mem_mask);

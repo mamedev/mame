@@ -67,8 +67,8 @@ public:
 	void olivetti(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	void dma_segment_w(offs_t offset, u8 data);
@@ -134,9 +134,9 @@ private:
 	static void floppy_formats(format_registration &fr);
 
 	static void cfg_m20_format(device_t *device);
-	void kbc_map(address_map &map);
-	void m24_io(address_map &map);
-	void m24_map(address_map &map);
+	void kbc_map(address_map &map) ATTR_COLD;
+	void m24_io(address_map &map) ATTR_COLD;
+	void m24_map(address_map &map) ATTR_COLD;
 };
 
 void m24_state::machine_start()

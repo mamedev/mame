@@ -52,7 +52,7 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 	// device_config_memory_interface overrides
 	virtual space_config_vector memory_space_config() const override;
@@ -73,7 +73,7 @@ private:
 	void draw_line(bitmap_ind16 &bmp, int line);
 	void interrupt_start_vblank(void);
 
-	void tms3556(address_map &map);
+	void tms3556(address_map &map) ATTR_COLD;
 
 	enum dma_mode_tt : u8 { dma_read, dma_write };
 

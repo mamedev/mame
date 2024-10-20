@@ -138,7 +138,7 @@ public:
 	void init_mrkicker();
 	void init_solitaire();
 
-	DECLARE_CUSTOM_INPUT_MEMBER(boonggab_photo_sensors_r);
+	ioport_value boonggab_photo_sensors_r();
 
 	u16 eeprom_r(offs_t offset);
 	u32 eeprom32_r();
@@ -151,11 +151,11 @@ public:
 
 	void banked_oki(int chip);
 
-	void common_map(address_map &map);
-	void common_32bit_map(address_map &map);
+	void common_map(address_map &map) ATTR_COLD;
+	void common_32bit_map(address_map &map) ATTR_COLD;
 
 protected:
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 
 	u32 m_flip_bit;
 	u8 m_palshift;
@@ -212,18 +212,18 @@ private:
 	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites_aoh(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void handle_flipped_visible_area(screen_device &screen);
-	void aoh_io(address_map &map);
-	void aoh_map(address_map &map);
-	void banked_oki_map(address_map &map);
-	void boonggab_io(address_map &map);
-	void coolmini_io(address_map &map);
-	void jmpbreak_io(address_map &map);
-	void worldadv_io(address_map &map);
-	void mrdig_io(address_map &map);
-	void mrkicker_io(address_map &map);
-	void solitaire_io(address_map &map);
-	void suplup_io(address_map &map);
-	void vamphalf_io(address_map &map);
+	void aoh_io(address_map &map) ATTR_COLD;
+	void aoh_map(address_map &map) ATTR_COLD;
+	void banked_oki_map(address_map &map) ATTR_COLD;
+	void boonggab_io(address_map &map) ATTR_COLD;
+	void coolmini_io(address_map &map) ATTR_COLD;
+	void jmpbreak_io(address_map &map) ATTR_COLD;
+	void worldadv_io(address_map &map) ATTR_COLD;
+	void mrdig_io(address_map &map) ATTR_COLD;
+	void mrkicker_io(address_map &map) ATTR_COLD;
+	void solitaire_io(address_map &map) ATTR_COLD;
+	void suplup_io(address_map &map) ATTR_COLD;
+	void vamphalf_io(address_map &map) ATTR_COLD;
 };
 
 class vamphalf_qdsp_state : public vamphalf_state
@@ -251,10 +251,10 @@ private:
 
 	void yorijori_eeprom_w(u32 data);
 
-	void misncrft_io(address_map &map);
-	void wyvernwg_io(address_map &map);
-	void yorijori_32bit_map(address_map &map);
-	void yorijori_io(address_map &map);
+	void misncrft_io(address_map &map) ATTR_COLD;
+	void wyvernwg_io(address_map &map) ATTR_COLD;
+	void yorijori_32bit_map(address_map &map) ATTR_COLD;
+	void yorijori_io(address_map &map) ATTR_COLD;
 };
 
 class vamphalf_nvram_state : public vamphalf_state
@@ -274,8 +274,8 @@ public:
 
 private:
 
-	void finalgdr_io(address_map &map);
-	void mrkickera_io(address_map &map);
+	void finalgdr_io(address_map &map) ATTR_COLD;
+	void mrkickera_io(address_map &map) ATTR_COLD;
 
 	required_device<nvram_device> m_nvram;
 
@@ -918,7 +918,7 @@ u32 vamphalf_state::screen_update_aoh(screen_device &screen, bitmap_ind16 &bitma
 	return 0;
 }
 
-CUSTOM_INPUT_MEMBER(vamphalf_state::boonggab_photo_sensors_r)
+ioport_value vamphalf_state::boonggab_photo_sensors_r()
 {
 	static const u16 photo_sensors_table[8] = { 0x07, 0x06, 0x05, 0x04, 0x03, 0x02, 0x01, 0x00 };
 	u8 res = m_photosensors->read();
@@ -1038,7 +1038,7 @@ static INPUT_PORTS_START( aoh )
 	PORT_BIT( 0x00000002, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x00000004, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x00000008, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x00000010, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read) // EEPROM bit
+	PORT_BIT( 0x00000010, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", FUNC(eeprom_serial_93cxx_device::do_read)) // EEPROM bit
 	PORT_BIT( 0x00000020, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x00000040, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x00000080, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -1067,7 +1067,7 @@ static INPUT_PORTS_START( boonggab )
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_CUSTOM ) // sensor 1
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_CUSTOM ) // sensor 2
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_CUSTOM ) // sensor 3
-	PORT_BIT( 0x3800, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(vamphalf_state, boonggab_photo_sensors_r) // photo sensors 1, 2 and 3
+	PORT_BIT( 0x3800, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(FUNC(vamphalf_state::boonggab_photo_sensors_r)) // photo sensors 1, 2 and 3
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNUSED )
 

@@ -231,7 +231,7 @@ public:
 	void init_ddpdfk();
 
 protected:
-	virtual void machine_reset() override;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	required_device<sh34_base_device> m_maincpu;
@@ -258,9 +258,9 @@ private:
 	uint64_t speedup_r();
 	void install_speedups(uint32_t idleramoff, uint32_t idlepc, bool is_typed);
 
-	void cv1k_d_map(address_map &map);
-	void cv1k_map(address_map &map);
-	void cv1k_port(address_map &map);
+	void cv1k_d_map(address_map &map) ATTR_COLD;
+	void cv1k_map(address_map &map) ATTR_COLD;
+	void cv1k_port(address_map &map) ATTR_COLD;
 };
 
 
@@ -434,9 +434,9 @@ static INPUT_PORTS_START( cv1k_base )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON4        ) PORT_PLAYER(2)
 
 	PORT_START( "EEPROMOUT" )
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", rtc9701_device, write_bit)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", rtc9701_device, set_clock_line)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", rtc9701_device, set_cs_line)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", FUNC(rtc9701_device::write_bit))
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", FUNC(rtc9701_device::set_clock_line))
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", FUNC(rtc9701_device::set_cs_line))
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( cv1k )

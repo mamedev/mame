@@ -131,7 +131,7 @@ u8 heath_z37_fdc_device::data_r()
 
 void heath_z37_fdc_device::write(offs_t reg, u8 val)
 {
-	LOGFUNC("%s: reg: %d val: %d\n", FUNCNAME, reg, val);
+	LOGFUNC("%s: reg: %d val: 0x%02x\n", FUNCNAME, reg, val);
 
 	switch (reg)
 	{
@@ -169,7 +169,7 @@ u8 heath_z37_fdc_device::read(offs_t reg)
 		break;
 	}
 
-	LOGFUNC("%s: reg: %d val: %d\n", FUNCNAME, reg, value);
+	LOGFUNC("%s: reg: %d val: 0x%02x\n", FUNCNAME, reg, value);
 
 	return value;
 }
@@ -209,6 +209,8 @@ void heath_z37_fdc_device::device_add_mconfig(machine_config &config)
 	FD1797(config, m_fdc, 16_MHz_XTAL / 16);
 	m_fdc->intrq_wr_callback().set(FUNC(heath_z37_fdc_device::set_irq));
 	m_fdc->drq_wr_callback().set(FUNC(heath_z37_fdc_device::set_drq));
+	// Z-89-37 schematics show the ready line tied high.
+	m_fdc->set_force_ready(true);
 
 	FLOPPY_CONNECTOR(config, m_floppies[0], z37_floppies, "qd", floppy_image_device::default_mfm_floppy_formats);
 	m_floppies[0]->enable_sound(true);

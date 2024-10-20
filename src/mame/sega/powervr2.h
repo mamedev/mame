@@ -32,8 +32,8 @@ public:
 		ERR_PVRIF_ILL_ADDR_IRQ
 	};
 
-	void ta_map(address_map &map);
-	void pd_dma_map(address_map &map);
+	void ta_map(address_map &map) ATTR_COLD;
+	void pd_dma_map(address_map &map) ATTR_COLD;
 
 	struct {
 		uint32_t pvr_addr;
@@ -338,8 +338,8 @@ public:
 		inline uint32_t sample_textured(texinfo *ti, float u, float v, uint32_t offset_color, uint32_t base_color);
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 	ioport_constructor device_input_ports() const override;
 
 private:

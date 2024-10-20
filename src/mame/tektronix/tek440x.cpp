@@ -97,8 +97,8 @@ public:
 	void tek4404(machine_config &config);
 
 private:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	u16 memory_r(offs_t offset, u16 mem_mask);
@@ -114,8 +114,8 @@ private:
 	void kb_tdata_w(int state);
 	void kb_rclamp_w(int state);
 
-	void logical_map(address_map &map);
-	void physical_map(address_map &map);
+	void logical_map(address_map &map) ATTR_COLD;
+	void physical_map(address_map &map) ATTR_COLD;
 
 	required_device<m68010_device> m_maincpu;
 	required_device<address_map_bank_device> m_vm;

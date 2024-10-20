@@ -26,8 +26,8 @@ protected:
 	DECLARE_MACHINE_START(pc_h98);
 	DECLARE_MACHINE_RESET(pc_h98);
 
-	void pc_h98_map(address_map &map);
-	void pc_h98_io(address_map &map);
+	void pc_h98_map(address_map &map) ATTR_COLD;
+	void pc_h98_io(address_map &map) ATTR_COLD;
 };
 
 void pc_hyper98_state::pc_h98_map(address_map &map)

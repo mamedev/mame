@@ -11,6 +11,7 @@
 
 #pragma once
 
+#include "screen.h"
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -35,6 +36,13 @@ public:
 		opts(*this);
 		set_default_option(dflt);
 		set_fixed(false);
+	}
+
+	template <typename T, typename U>
+	apple2_gameio_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&screen_tag, U &&opts, const char *dflt)
+		: apple2_gameio_device(mconfig, tag, owner, opts, dflt)
+	{
+		m_screen.set_tag(std::forward<T>(screen_tag));
 	}
 
 	// configuration
@@ -74,8 +82,10 @@ public:
 protected:
 	// device-level overrides
 	virtual void device_config_complete() override;
-	virtual void device_resolve_objects() override;
-	virtual void device_start() override;
+	virtual void device_resolve_objects() override ATTR_COLD;
+	virtual void device_start() override ATTR_COLD;
+
+	optional_device<screen_device> m_screen;
 
 private:
 	// selected device
@@ -115,6 +125,8 @@ protected:
 	virtual void an4_w(int state) { }
 	virtual void strobe_w(int state) { }
 
+	void set_screen(screen_device *screen) { m_screen = screen; }
+	screen_device *m_screen;
 private:
 	apple2_gameio_device *m_connector;
 };

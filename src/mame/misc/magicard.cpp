@@ -240,12 +240,12 @@ public:
 	void magicard_base(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	uint32_t screen_update_magicard(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	void ramdac_map(address_map &map);
+	void ramdac_map(address_map &map) ATTR_COLD;
 
 	void dram_w(offs_t offset, uint16_t data, uint16_t mem_mask);
 	uint16_t dram_r(offs_t offset, uint16_t mem_mask);
@@ -277,7 +277,7 @@ protected:
 private:
 	output_finder<8> m_lamps;
 
-	void scc66470_map(address_map &map);
+	void scc66470_map(address_map &map) ATTR_COLD;
 
 	std::unique_ptr<uint16_t []> m_dram;
 
@@ -299,10 +299,10 @@ public:
 	void init_dallaspk();
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
-	void magicard_map(address_map &map);
+	void magicard_map(address_map &map) ATTR_COLD;
 	uint8_t nvram_r(offs_t offset);
 	void nvram_w(offs_t offset, uint8_t data);
 	uint8_t read_ds1207(offs_t offset);
@@ -332,10 +332,10 @@ public:
 	void simpbest(machine_config &config);
 
 private:
-	void hotslots_map_base(address_map &map);
-	void hotslots_map(address_map &map);
-	void puzzleme_map(address_map &map);
-	void simpbest_map(address_map &map);
+	void hotslots_map_base(address_map &map) ATTR_COLD;
+	void hotslots_map(address_map &map) ATTR_COLD;
+	void puzzleme_map(address_map &map) ATTR_COLD;
+	void simpbest_map(address_map &map) ATTR_COLD;
 
 	uint8_t read_ds1207_ds2401(offs_t offset);
 	void write_ds1207_ds2401(offs_t offset, uint8_t data);
@@ -1103,7 +1103,7 @@ void hotslots_state::magicle(machine_config &config)
 {
 	hotslots_base(config);
 
-	pic16f84_device &pic(PIC16F84(config, "pic16f84", 4000000)); 
+	pic16f84_device &pic(PIC16F84(config, "pic16f84", 4000000));
 	pic.set_config(0x3ffa); // No protect - No Watchdog - HS Clock
 	pic.read_b().set(FUNC(hotslots_state::pic_portb_r));
 	pic.write_b().set(FUNC(hotslots_state::pic_portb_w));
@@ -1657,7 +1657,7 @@ ROM_START( quingo )
 
 	ROM_REGION( 0x0200, "sereeprom", 0 )  // Serial EPROM
 	ROM_LOAD16_WORD_SWAP("quingo_24c04a.bin", 0x0000, 0x0200, BAD_DUMP CRC(d5e82b49) SHA1(7dbdf7d539cbd59a3ac546b6f50861c4958abb3a) )  // all AA & 55
-	
+
 	ROM_REGION16_LE( 0x4280, "pic16f84", 0 )  // borrowed from magicle to avoid I2C bus error
 	ROM_LOAD("magicle_5.03_pic16f84_code.bin",   0x0000, 0x0800, BAD_DUMP CRC(22965864) SHA1(c421a9e9fac7c9c5dc01adda620dc8f5f16d94ba) )
 ROM_END
@@ -1747,7 +1747,7 @@ ROM_START( bigdeal0 )
 
 	ROM_REGION( 0x0200, "sereeprom", 0 )  // Serial EPROM
 	ROM_LOAD16_WORD_SWAP("big_deal_24c04a.bin", 0x0000, 0x0200, BAD_DUMP CRC(d5e82b49) SHA1(7dbdf7d539cbd59a3ac546b6f50861c4958abb3a) )  // all AA & 55
-	
+
 	ROM_REGION16_LE( 0x4280, "pic16f84", 0 )  // borrowed from magicle to avoid I2C bus error
 	ROM_LOAD("magicle_5.03_pic16f84_code.bin",   0x0000, 0x0800, BAD_DUMP CRC(22965864) SHA1(c421a9e9fac7c9c5dc01adda620dc8f5f16d94ba) )
 ROM_END
@@ -1837,7 +1837,7 @@ ROM_START( belslots )
 
 	ROM_REGION( 0x0200, "sereeprom", 0 )  // Serial EPROM
 	ROM_LOAD16_WORD_SWAP("bel_slots_exp_24c04a.bin", 0x0000, 0x0200, BAD_DUMP CRC(d5e82b49) SHA1(7dbdf7d539cbd59a3ac546b6f50861c4958abb3a) )  // all AA & 55
-	
+
 	ROM_REGION16_LE( 0x4280, "pic16f84", 0 )  // borrowed from magicle to avoid I2C bus error
 	ROM_LOAD("magicle_5.03_pic16f84_code.bin",   0x0000, 0x0800, BAD_DUMP CRC(22965864) SHA1(c421a9e9fac7c9c5dc01adda620dc8f5f16d94ba) )
 ROM_END

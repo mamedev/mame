@@ -208,7 +208,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="basic7">
-		<description>Octasoft BASIC 7.0 (Hun)</description>
+		<description>Octasoft BASIC 7.0 (Hungary)</description>
 		<year>1988</year>
 		<publisher>Novotrade</publisher>
 		<part name="cart" interface="plus4_cart">

@@ -132,7 +132,7 @@ public:
 protected:
 	ibm8514a_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 	void ibm8514_write(uint32_t offset, uint32_t src);
 	void ibm8514_write_fg(uint32_t offset);
 	void ibm8514_write_bg(uint32_t offset);

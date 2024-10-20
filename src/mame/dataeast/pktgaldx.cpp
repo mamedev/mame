@@ -132,8 +132,8 @@ private:
 	uint16_t ioprot_r(offs_t offset);
 	void ioprot_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
-	void decrypted_opcodes_map(address_map &map);
-	void prg_map(address_map &map);
+	void decrypted_opcodes_map(address_map &map) ATTR_COLD;
+	void prg_map(address_map &map) ATTR_COLD;
 };
 
 class pktgaldxb_state : public base_state
@@ -157,7 +157,7 @@ private:
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void prg_map(address_map &map);
+	void prg_map(address_map &map) ATTR_COLD;
 };
 
 

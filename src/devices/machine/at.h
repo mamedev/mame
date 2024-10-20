@@ -17,7 +17,7 @@ class at_mb_device : public device_t
 public:
 	at_mb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
-	void map(address_map &map);
+	void map(address_map &map) ATTR_COLD;
 
 	auto kbd_clk() { return m_keybc.lookup()->kbd_clk(); }
 	auto kbd_data() { return m_keybc.lookup()->kbd_data(); }
@@ -37,9 +37,9 @@ public:
 
 	void at_softlists(machine_config &config);
 protected:
-	void device_start() override;
-	void device_reset() override;
-	virtual void device_add_mconfig(machine_config &config) override;
+	void device_start() override ATTR_COLD;
+	void device_reset() override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 private:
 	void set_dma_channel(int channel, int state);

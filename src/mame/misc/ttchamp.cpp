@@ -139,14 +139,14 @@ private:
 	uint16_t mem_r(offs_t offset);
 	void mem_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
-	virtual void machine_start() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	INTERRUPT_GEN_MEMBER(irq);
-	void ttchamp_io(address_map &map);
-	void ttchamp_map(address_map &map);
+	void ttchamp_io(address_map &map) ATTR_COLD;
+	void ttchamp_map(address_map &map) ATTR_COLD;
 };
 
 ALLOW_SAVE_TYPE(ttchamp_state::picmode);

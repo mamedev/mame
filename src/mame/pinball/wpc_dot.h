@@ -34,10 +34,10 @@ public:
 
 protected:
 	// driver_device overrides
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
-	void wpc_dot_map(address_map &map);
+	void wpc_dot_map(address_map &map) ATTR_COLD;
 
 	TIMER_CALLBACK_MEMBER(vblank_tick);
 	TIMER_CALLBACK_MEMBER(trigger_irq);
@@ -81,7 +81,7 @@ public:
 	void wpc_flip1(machine_config &config);
 
 protected:
-	void wpc_flip1_map(address_map &map);
+	void wpc_flip1_map(address_map &map) ATTR_COLD;
 };
 
 class wpc_flip2_state : public wpc_flip1_state
@@ -95,7 +95,7 @@ public:
 	void wpc_flip2(machine_config &config);
 
 protected:
-	void wpc_flip2_map(address_map &map);
+	void wpc_flip2_map(address_map &map) ATTR_COLD;
 };
 
 #endif // MAME_PINBALL_WPC_DOT_H

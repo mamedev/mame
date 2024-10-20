@@ -34,8 +34,8 @@ public:
 	virtual void sync() override;
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 private:
 	enum {
@@ -69,6 +69,8 @@ private:
 
 	void crc_update(int bit);
 	void crc_clear();
+
+	void update_dat1byte();
 };
 
 DECLARE_DEVICE_TYPE(SWIM2, swim2_device)

@@ -34,9 +34,9 @@ public:
 	void ladyfrog(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	/* memory pointers */
@@ -90,8 +90,8 @@ private:
 	uint32_t screen_update_ladyfrog(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(nmi_callback);
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
-	void ladyfrog_map(address_map &map);
-	void ladyfrog_sound_map(address_map &map);
+	void ladyfrog_map(address_map &map) ATTR_COLD;
+	void ladyfrog_sound_map(address_map &map) ATTR_COLD;
 };
 
 #endif // MAME_MISC_LADYFROG_H

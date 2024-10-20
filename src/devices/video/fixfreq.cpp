@@ -50,7 +50,7 @@ DEFINE_DEVICE_TYPE(FIXFREQ, fixedfreq_device, "fixfreq",
 		(static_cast<fixedfreq_device &>(owner).monitor_val(_id)), 0xffff,     \
 		("Monitor - " _name));                                                 \
 	PORT_MINMAX(_min, _max)                                                    \
-	PORT_CHANGED_MEMBER(DEVICE_SELF, fixedfreq_device, port_changed, _id)      \
+	PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(fixedfreq_device::port_changed), _id)      \
 	PORT_CONDITION("ENABLE", 0x01, EQUALS, 0x01)
 
 #define IOPORT_ID(_id) ioport(#_id)

@@ -64,8 +64,8 @@ public:
 	void u29_portb_w(uint8_t data);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	void jpmsys5_common(machine_config &config);
 	void ymsound(machine_config &config);
@@ -90,10 +90,10 @@ protected:
 	optional_ioport m_strobe4;
 	optional_ioport m_unknown_port;
 
-	void jpm_sys5_common_map(address_map &map);
+	void jpm_sys5_common_map(address_map &map) ATTR_COLD;
 
 protected:
-	void m68000_ym_map(address_map &map);
+	void m68000_ym_map(address_map &map) ATTR_COLD;
 
 private:
 	template <unsigned N> void reel_optic_cb(int state) { if (state) m_optic_pattern |= (1 << ((7-N)^3)); else m_optic_pattern &= ~(1 << ((7-N)^3)); }
@@ -129,8 +129,8 @@ private:
 	void sys5_draw_lamps();
 
 
-	void m68000_awp_map(address_map &map);
-	void m68000_awp_map_saa(address_map &map);
+	void m68000_awp_map(address_map &map) ATTR_COLD;
+	void m68000_awp_map_saa(address_map &map) ATTR_COLD;
 
 	required_ioport m_direct_port;
 	optional_device<meters_device> m_meters; //jpmsys5v doesn't use this
@@ -167,8 +167,8 @@ public:
 	void jpmsys5v(machine_config &config);
 
 private:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	void tmsvideo(machine_config &config);
 
@@ -180,7 +180,7 @@ private:
 	uint32_t screen_update_jpmsys5v(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(touch_cb);
 
-	void m68000_map(address_map &map);
+	void m68000_map(address_map &map) ATTR_COLD;
 
 	required_device<tms34061_device> m_tms34061;
 	required_device<palette_device> m_palette;

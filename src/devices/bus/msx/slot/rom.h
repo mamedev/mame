@@ -19,7 +19,7 @@ public:
 protected:
 	msx_slot_rom_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
 
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 	u8 *rom_base() { return m_rom_region->base() + m_region_offset; }
 
 	required_memory_region m_rom_region;

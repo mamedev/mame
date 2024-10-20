@@ -1,13 +1,13 @@
 // license:BSD-3-Clause
 // copyright-holders:hap
-/*******************************************************************************
+/*
 
 Fidelity Electronics 6502 dynamic CPU clock divider
 
 Offset-dependent CPU clock divider base class. Used to compensate slow memory
 chips in chess computer models: SC12, AS12, PC, EAS, EAG.
 
-*******************************************************************************/
+*/
 
 #include "emu.h"
 #include "clockdiv.h"
@@ -17,7 +17,7 @@ chips in chess computer models: SC12, AS12, PC, EAS, EAG.
 
 INPUT_PORTS_START( fidel_clockdiv_2 )
 	PORT_START("div_config") // hardwired, default to /2
-	PORT_CONFNAME( 0x03, 0x02, "CPU Divider" ) PORT_CHANGED_MEMBER(DEVICE_SELF, fidel_clockdiv_state, div_changed, 0)
+	PORT_CONFNAME( 0x03, 0x02, "CPU Divider" ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(fidel_clockdiv_state::div_changed), 0)
 	PORT_CONFSETTING(    0x00, "Disabled" )
 	PORT_CONFSETTING(    0x02, "2" )
 	PORT_CONFSETTING(    0x03, "4" )
@@ -25,7 +25,7 @@ INPUT_PORTS_END
 
 INPUT_PORTS_START( fidel_clockdiv_4 )
 	PORT_START("div_config") // hardwired, default to /4
-	PORT_CONFNAME( 0x03, 0x03, "CPU Divider" ) PORT_CHANGED_MEMBER(DEVICE_SELF, fidel_clockdiv_state, div_changed, 0)
+	PORT_CONFNAME( 0x03, 0x03, "CPU Divider" ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(fidel_clockdiv_state::div_changed), 0)
 	PORT_CONFSETTING(    0x00, "Disabled" )
 	PORT_CONFSETTING(    0x02, "2" )
 	PORT_CONFSETTING(    0x03, "4" )

@@ -176,7 +176,7 @@ public:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void jclub2(machine_config &config);
-	void jclub2_map(address_map &map);
+	void jclub2_map(address_map &map) ATTR_COLD;
 protected:
 	required_device<st0020_device> m_st0020;
 };
@@ -214,9 +214,9 @@ public:
 	void init_jclub2o();
 
 	void jclub2o(machine_config &config);
-	void jclub2o_map(address_map &map);
-	void st0016_io(address_map &map);
-	void st0016_mem(address_map &map);
+	void jclub2o_map(address_map &map) ATTR_COLD;
+	void st0016_io(address_map &map) ATTR_COLD;
+	void st0016_mem(address_map &map) ATTR_COLD;
 private:
 	uint8_t m_cmd1;
 	uint8_t m_cmd2;
@@ -244,7 +244,7 @@ public:
 	void darkhorsa(machine_config &config);
 
 protected:
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	void input_sel_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
@@ -260,8 +260,8 @@ private:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void darkhors_map(address_map &map);
-	void darkhorsa_map(address_map &map);
+	void darkhors_map(address_map &map) ATTR_COLD;
+	void darkhorsa_map(address_map &map) ATTR_COLD;
 
 	required_shared_ptr<uint32_t> m_tmapram;
 	required_shared_ptr<uint32_t> m_tmapscroll;
@@ -1000,7 +1000,7 @@ static INPUT_PORTS_START( jclub2v100 )
 	PORT_CONFNAME(0x08000000, 0x08000000, "System Int Down")
 	PORT_CONFSETTING(         0x08000000, DEF_STR( Off ) )
 	PORT_CONFSETTING(         0x00000000, DEF_STR( On )  ) // Emergency Error 0002
-	PORT_BIT( 0x80000000, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
+	PORT_BIT( 0x80000000, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", FUNC(eeprom_serial_93cxx_device::do_read))
 
 	PORT_START("COIN") // 580008.w
 	PORT_BIT( 0x00010000, IP_ACTIVE_LOW,  IPT_OTHER   ) PORT_NAME("P1 Payout") PORT_CODE(KEYCODE_LCONTROL)
@@ -1009,8 +1009,8 @@ static INPUT_PORTS_START( jclub2v100 )
 	PORT_BIT( 0x00080000, IP_ACTIVE_LOW,  IPT_START1  )
 	PORT_BIT( 0x00100000, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 	PORT_BIT( 0x00200000, IP_ACTIVE_LOW,  IPT_UNKNOWN )
-	PORT_BIT( 0x00400000, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("hopper2", ticket_dispenser_device, line_r) // P2 coin out
-	PORT_BIT( 0x00800000, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("hopper1", ticket_dispenser_device, line_r) // P1 coin out
+	PORT_BIT( 0x00400000, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("hopper2", FUNC(ticket_dispenser_device::line_r)) // P2 coin out
+	PORT_BIT( 0x00800000, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("hopper1", FUNC(ticket_dispenser_device::line_r)) // P1 coin out
 	PORT_BIT( 0x01000000, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 	PORT_BIT( 0x02000000, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 	PORT_BIT( 0x04000000, IP_ACTIVE_LOW,  IPT_COIN1   ) PORT_IMPULSE(15) // P1 coin drop
@@ -1055,7 +1055,7 @@ static INPUT_PORTS_START( jclub2v112 )
 	PORT_CONFNAME(0x08000000, 0x08000000, "Disable Coins?") // causes lockout and coins to not register (same as an hardware error)
 	PORT_CONFSETTING(         0x08000000, DEF_STR( Off ))
 	PORT_CONFSETTING(         0x00000000, DEF_STR( On ))
-	PORT_BIT( 0x80000000, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
+	PORT_BIT( 0x80000000, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", FUNC(eeprom_serial_93cxx_device::do_read))
 INPUT_PORTS_END
 
 
@@ -1095,7 +1095,7 @@ static INPUT_PORTS_START( darkhors )
 	PORT_SERVICE_NO_TOGGLE( 0x00100000, IP_ACTIVE_LOW  ) // test switch (on during boot: service mode, but make sure Config Key is off!)
 	PORT_BIT( 0x00200000, IP_ACTIVE_LOW,  IPT_OTHER    ) PORT_NAME("Door 1") PORT_CODE(KEYCODE_OPENBRACE)  PORT_TOGGLE
 	PORT_BIT( 0x00400000, IP_ACTIVE_LOW,  IPT_OTHER    ) PORT_NAME("Door 2") PORT_CODE(KEYCODE_CLOSEBRACE) PORT_TOGGLE
-	PORT_BIT( 0x00800000, IP_ACTIVE_HIGH, IPT_CUSTOM  ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read) // door 3 in service mode!
+	PORT_BIT( 0x00800000, IP_ACTIVE_HIGH, IPT_CUSTOM  ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", FUNC(eeprom_serial_93cxx_device::do_read)) // door 3 in service mode!
 	PORT_BIT( 0x01000000, IP_ACTIVE_LOW,  IPT_START1   )
 	PORT_BIT( 0x02000000, IP_ACTIVE_LOW,  IPT_OTHER    ) PORT_NAME("P1 Payout") PORT_CODE(KEYCODE_LCONTROL)
 	PORT_BIT( 0x04000000, IP_ACTIVE_LOW,  IPT_OTHER    ) PORT_NAME("P1 Cancel") PORT_CODE(KEYCODE_LALT)
@@ -1168,8 +1168,8 @@ void jclub2o_state::jclub2o(machine_config &config)
 	EEPROM_S29290_16BIT(config, "eeprom");
 	WATCHDOG_TIMER(config, "watchdog");
 
-	TICKET_DISPENSER(config, m_hopper1, attotime::from_msec(200), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH);
-	TICKET_DISPENSER(config, m_hopper2, attotime::from_msec(200), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH);
+	TICKET_DISPENSER(config, m_hopper1, attotime::from_msec(200));
+	TICKET_DISPENSER(config, m_hopper2, attotime::from_msec(200));
 
 	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -1209,8 +1209,8 @@ void jclub2_state::jclub2(machine_config &config)
 	EEPROM_93C46_8BIT(config, "eeprom");
 	WATCHDOG_TIMER(config, "watchdog");
 
-	TICKET_DISPENSER(config, m_hopper1, attotime::from_msec(200), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH);
-	TICKET_DISPENSER(config, m_hopper2, attotime::from_msec(200), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH);
+	TICKET_DISPENSER(config, m_hopper1, attotime::from_msec(200));
+	TICKET_DISPENSER(config, m_hopper2, attotime::from_msec(200));
 
 	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -1253,8 +1253,8 @@ void darkhors_state::darkhors(machine_config &config)
 	EEPROM_93C46_8BIT(config, "eeprom");
 	WATCHDOG_TIMER(config, "watchdog");
 
-	TICKET_DISPENSER(config, m_hopper1, attotime::from_msec(200), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH);
-	TICKET_DISPENSER(config, m_hopper2, attotime::from_msec(200), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH);
+	TICKET_DISPENSER(config, m_hopper1, attotime::from_msec(200));
+	TICKET_DISPENSER(config, m_hopper2, attotime::from_msec(200));
 
 	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));

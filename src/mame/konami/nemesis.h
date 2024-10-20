@@ -145,9 +145,9 @@ private:
 	void city_sound_bank_w(uint8_t data);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 	uint32_t screen_update_nemesis(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void nemesis_vblank_irq(int state);
 	void bubsys_vblank_irq(int state);
@@ -163,23 +163,23 @@ private:
 	void volume_callback(uint8_t data);
 	void set_screen_raw_params(machine_config &config);
 
-	void blkpnthr_map(address_map &map);
-	void blkpnthr_sound_map(address_map &map);
-	void city_sound_map(address_map &map);
-	void citybomb_map(address_map &map);
-	void gx400_map(address_map &map);
-	void gx400_sound_map(address_map &map);
-	void gx400_vlm_map(address_map &map);
-	void hcrash_map(address_map &map);
-	void konamigt_map(address_map &map);
-	void nemesis_map(address_map &map);
-	void nyanpani_map(address_map &map);
-	void rf2_gx400_map(address_map &map);
-	void sal_sound_map(address_map &map);
-	void salamand_map(address_map &map);
-	void salamand_vlm_map(address_map &map);
-	void sound_map(address_map &map);
-	void bubsys_map(address_map &map);
+	void blkpnthr_map(address_map &map) ATTR_COLD;
+	void blkpnthr_sound_map(address_map &map) ATTR_COLD;
+	void city_sound_map(address_map &map) ATTR_COLD;
+	void citybomb_map(address_map &map) ATTR_COLD;
+	void gx400_map(address_map &map) ATTR_COLD;
+	void gx400_sound_map(address_map &map) ATTR_COLD;
+	void gx400_vlm_map(address_map &map) ATTR_COLD;
+	void hcrash_map(address_map &map) ATTR_COLD;
+	void konamigt_map(address_map &map) ATTR_COLD;
+	void nemesis_map(address_map &map) ATTR_COLD;
+	void nyanpani_map(address_map &map) ATTR_COLD;
+	void rf2_gx400_map(address_map &map) ATTR_COLD;
+	void sal_sound_map(address_map &map) ATTR_COLD;
+	void salamand_map(address_map &map) ATTR_COLD;
+	void salamand_vlm_map(address_map &map) ATTR_COLD;
+	void sound_map(address_map &map) ATTR_COLD;
+	void bubsys_map(address_map &map) ATTR_COLD;
 };
 
 #endif // MAME_KONAMI_NEMESIS_H

@@ -15,7 +15,6 @@
 #pragma once
 
 #include "cpu/arm7/arm7.h"
-#include "cpu/arm7/arm7core.h"
 #include "sound/dmadac.h"
 #include "emupal.h"
 
@@ -35,14 +34,14 @@ public:
 	template <int Bit> auto gpio_out() { return m_gpio_w[Bit].bind(); }
 	template <int Bit> void gpio_in(int state);
 
-	void map(address_map &map);
+	void map(address_map &map) ATTR_COLD;
 
 	// gpio_bit_w
 
 protected:
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	static constexpr u32 INTERNAL_OSC = 3686400;
 

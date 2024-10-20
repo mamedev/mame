@@ -51,14 +51,14 @@ private:
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	void draw_pixram( bitmap_ind16 &bitmap, const rectangle &cliprect );
 
-	void _40love_map(address_map &map);
-	void _40lovebl_map(address_map &map);
-	void sound_map(address_map &map);
-	void undoukai_map(address_map &map);
+	void _40love_map(address_map &map) ATTR_COLD;
+	void _40lovebl_map(address_map &map) ATTR_COLD;
+	void sound_map(address_map &map) ATTR_COLD;
+	void undoukai_map(address_map &map) ATTR_COLD;
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 	void bank_select_w(uint8_t data);
 	uint8_t snd_flag_r();

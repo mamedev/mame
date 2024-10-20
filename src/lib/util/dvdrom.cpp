@@ -58,8 +58,8 @@ dvdrom_file::dvdrom_file(chd_file *_chd)
 		throw nullptr;
 
 	/* check it's actually a DVD-ROM */
-	if (!chd->is_dvd())
-		throw nullptr;
+	if (std::error_condition err = chd->check_is_dvd())
+		throw err;
 
 	sector_count = chd->unit_count();
 }

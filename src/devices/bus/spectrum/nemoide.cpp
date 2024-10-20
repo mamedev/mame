@@ -22,11 +22,11 @@ public:
 	{ }
 
 protected:
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual void device_start() override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual void device_start() override ATTR_COLD;
 
 private:
-	void map_io(address_map &map);
+	void map_io(address_map &map) ATTR_COLD;
 
 	u8 ata_r(offs_t offset);
 	void ata_w(offs_t offset, u8 data);

@@ -91,12 +91,12 @@ private:
 	static void cfg_single_360K(device_t *device);
 	static void cfg_single_720K(device_t *device);
 
-	void pc16_io(address_map &map);
-	void pc16_map(address_map &map);
-	void pc8_io(address_map &map);
-	void pc8_map(address_map &map);
-	void pc8_flash_map(address_map &map);
-	void zenith_map(address_map &map);
+	void pc16_io(address_map &map) ATTR_COLD;
+	void pc16_map(address_map &map) ATTR_COLD;
+	void pc8_io(address_map &map) ATTR_COLD;
+	void pc8_map(address_map &map) ATTR_COLD;
+	void pc8_flash_map(address_map &map) ATTR_COLD;
+	void zenith_map(address_map &map) ATTR_COLD;
 };
 
 void pc_state::pc8_map(address_map &map)
@@ -360,7 +360,7 @@ static INPUT_PORTS_START( bondwell )
 	PORT_INCLUDE(pccga)
 
 	PORT_MODIFY("DSW2") /* IN3 */
-	PORT_DIPNAME( 0x02, 0x02, "Turbo Switch" ) PORT_CHANGED_MEMBER(DEVICE_SELF, pc_state, pc_turbo_callback, 0)
+	PORT_DIPNAME( 0x02, 0x02, "Turbo Switch" ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(pc_state::pc_turbo_callback), 0)
 	PORT_DIPSETTING(    0x00, "Off (4.77 MHz)" )
 	PORT_DIPSETTING(    0x02, "On (12 MHz)" )
 INPUT_PORTS_END

@@ -51,15 +51,15 @@ private:
 	void porte0_w(uint8_t data);
 	void portf0_w(uint8_t data);
 
-	void ts816_io(address_map &map);
-	void ts816_mem(address_map &map);
+	void ts816_io(address_map &map) ATTR_COLD;
+	void ts816_mem(address_map &map) ATTR_COLD;
 
 	uint8_t m_term_data = 0;
 	uint8_t m_status = 0;
 	bool m_2ndbank = false;
 	bool m_endram = false;
 	void set_banks();
-	virtual void machine_reset() override;
+	virtual void machine_reset() override ATTR_COLD;
 	required_device<z80_device> m_maincpu;
 	required_device<generic_terminal_device> m_terminal;
 };
@@ -273,6 +273,7 @@ void ts816_state::ts816(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &ts816_state::ts816_mem);
 	m_maincpu->set_addrmap(AS_IO, &ts816_state::ts816_io);
 	m_maincpu->set_daisy_config(daisy_chain);
+	m_maincpu->busack_cb().set("dma", FUNC(z80dma_device::bai_w));
 
 	/* video hardware */
 	GENERIC_TERMINAL(config, m_terminal, 0);
@@ -312,7 +313,7 @@ void ts816_state::ts816(machine_config &config)
 	ctc2.intr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
 	z80dma_device& dma(Z80DMA(config, "dma", XTAL(16'000'000) / 4));
-	//dma.out_busreq_callback().set(FUNC(ts816_state::busreq_w));
+	dma.out_busreq_callback().set_inputline(m_maincpu, Z80_INPUT_LINE_BUSRQ);
 	dma.out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 }
 

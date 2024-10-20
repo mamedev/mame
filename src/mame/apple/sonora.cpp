@@ -77,11 +77,10 @@ void sonora_device::device_add_mconfig(machine_config &config)
 	m_via1->cb2_handler().set(FUNC(sonora_device::via_out_cb2));
 	m_via1->irq_handler().set(FUNC(sonora_device::via1_irq));
 
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+
 	ASC(config, m_asc, C15M, asc_device::asc_type::SONORA);
-	m_asc->add_route(0, "lspeaker", 1.0);
-	m_asc->add_route(1, "rspeaker", 1.0);
+	m_asc->add_route(0, tag(), 1.0);
+	m_asc->add_route(1, tag(), 1.0);
 	m_asc->irqf_callback().set(FUNC(sonora_device::asc_irq));
 
 	SWIM2(config, m_fdc, C15M);
@@ -98,6 +97,7 @@ void sonora_device::device_add_mconfig(machine_config &config)
 
 sonora_device::sonora_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, SONORA, tag, owner, clock),
+	device_sound_interface(mconfig, *this),
 	write_pb4(*this),
 	write_pb5(*this),
 	write_cb2(*this),
@@ -122,6 +122,8 @@ sonora_device::sonora_device(const machine_config &mconfig, const char *tag, dev
 void sonora_device::device_start()
 {
 	m_vram = std::make_unique<u32[]>(0x100000 / sizeof(u32));
+
+	m_stream = stream_alloc(8, 2, m_asc->clock(), STREAM_SYNCHRONOUS);
 
 	m_6015_timer = timer_alloc(FUNC(sonora_device::mac_6015_tick), this);
 	m_6015_timer->adjust(attotime::never);
@@ -174,6 +176,15 @@ void sonora_device::device_reset()
 
 	space.unmap_write(0x00000000, memory_end);
 	space.install_rom(0x00000000, memory_end & ~memory_mirror, memory_mirror, m_rom_ptr);
+}
+
+void sonora_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
+{
+	for (int i = 0; i < inputs[0].samples(); i++)
+	{
+		outputs[0].put(i, inputs[0].get(i));
+		outputs[1].put(i, inputs[1].get(i));
+	}
 }
 
 u32 sonora_device::rom_switch_r(offs_t offset)

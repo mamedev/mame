@@ -28,8 +28,8 @@ private:
 
 	static constexpr unsigned MAX_FLOPPIES = 4;
 
-	void device_start() override;
-	void device_reset() override;
+	void device_start() override ATTR_COLD;
+	void device_reset() override ATTR_COLD;
 	void set_interrupt_line();
 
 	int     read_id(int unit, int head, int *cylinder_id, int *sector_id);

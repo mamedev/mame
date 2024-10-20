@@ -14,10 +14,13 @@ msx_slot_ram_device::msx_slot_ram_device(const machine_config &mconfig, const ch
 
 void msx_slot_ram_device::device_start()
 {
-	m_ram.resize(m_size);
-	save_item(NAME(m_ram));
+	if (m_size < m_end_address - m_start_address)
+		fatalerror("Invalid size %04x for address range %004x - %04x\n", m_start_address, m_end_address);
 
-	u8 *ram = m_ram.data();
+	m_ram = std::make_unique<u8[]>(m_size);
+	save_pointer(NAME(m_ram), m_size);
+
+	u8 *ram = &m_ram[0];
 	u32 start_address = m_start_address;
 	for (int i = m_start_address >> 14; i < 4 && i * 0x4000 < m_end_address; i++)
 	{

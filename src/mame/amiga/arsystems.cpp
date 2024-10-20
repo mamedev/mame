@@ -90,11 +90,11 @@ public:
 	void init_dlta();
 	void init_argh();
 
-	template <int Coin> DECLARE_CUSTOM_INPUT_MEMBER(coin_counter_r);
+	template <int Coin> ioport_value coin_counter_r();
 	DECLARE_INPUT_CHANGED_MEMBER(coin_changed_callback);
 
 protected:
-	virtual void machine_reset() override;
+	virtual void machine_reset() override ATTR_COLD;
 
 	void arcadia_multibios_change_game(uint16_t data);
 	void arcadia_cia_0_portb_w(uint8_t data);
@@ -102,10 +102,10 @@ protected:
 private:
 	inline void generic_decode(const char *tag, int bit7, int bit6, int bit5, int bit4, int bit3, int bit2, int bit1, int bit0);
 
-	void a500_mem(address_map &map);
-	void arcadia_map(address_map &map);
-	void argh_map(address_map &map);
-	void overlay_512kb_map(address_map &map);
+	void a500_mem(address_map &map) ATTR_COLD;
+	void arcadia_map(address_map &map) ATTR_COLD;
+	void argh_map(address_map &map) ATTR_COLD;
+	void overlay_512kb_map(address_map &map) ATTR_COLD;
 
 	optional_memory_region m_bios_region, m_rom_board;
 
@@ -167,7 +167,7 @@ void arcadia_amiga_state::arcadia_cia_0_portb_w(uint8_t data)
  *************************************/
 
 template <int Coin>
-CUSTOM_INPUT_MEMBER(arcadia_amiga_state::coin_counter_r)
+ioport_value arcadia_amiga_state::coin_counter_r()
 {
 	/* return coin counter values */
 	return m_coin_counter[Coin] & 3;
@@ -260,15 +260,15 @@ static INPUT_PORTS_START( arcadia )
 	PORT_SERVICE_NO_TOGGLE( 0x02, IP_ACTIVE_LOW )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START1 )
-	PORT_BIT( 0x30, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(arcadia_amiga_state, coin_counter_r<0>)
-	PORT_BIT( 0xc0, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(arcadia_amiga_state, coin_counter_r<1>)
+	PORT_BIT( 0x30, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(FUNC(arcadia_amiga_state::coin_counter_r<0>))
+	PORT_BIT( 0xc0, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(FUNC(arcadia_amiga_state::coin_counter_r<1>))
 
 	PORT_START("joy_0_dat")
-	PORT_BIT( 0x0303, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(arcadia_amiga_state, amiga_joystick_convert<0>)
+	PORT_BIT( 0x0303, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(FUNC(arcadia_amiga_state::amiga_joystick_convert<0>))
 	PORT_BIT( 0xfcfc, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("joy_1_dat")
-	PORT_BIT( 0x0303, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(arcadia_amiga_state, amiga_joystick_convert<1>)
+	PORT_BIT( 0x0303, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(FUNC(arcadia_amiga_state::amiga_joystick_convert<1>))
 	PORT_BIT( 0xfcfc, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("potgo")
@@ -291,8 +291,8 @@ static INPUT_PORTS_START( arcadia )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(2)
 
 	PORT_START("COINS")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, arcadia_amiga_state,coin_changed_callback, 0)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 ) PORT_CHANGED_MEMBER(DEVICE_SELF, arcadia_amiga_state,coin_changed_callback, 1)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(arcadia_amiga_state::coin_changed_callback), 0)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(arcadia_amiga_state::coin_changed_callback), 1)
 INPUT_PORTS_END
 
 // ar_ldrb manual specifically claims to have 4-way gate sticks.

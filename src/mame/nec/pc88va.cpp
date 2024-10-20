@@ -713,7 +713,7 @@ INPUT_CHANGED_MEMBER(pc88va_state::key_stroke)
 }
 
 #define VA_PORT_SCAN(_scancode_) \
-	PORT_CHANGED_MEMBER(DEVICE_SELF, pc88va_state, key_stroke, _scancode_)
+	PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(pc88va_state::key_stroke), _scancode_)
 
 static INPUT_PORTS_START( pc88va )
 	PORT_START("KEY0")

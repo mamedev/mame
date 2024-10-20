@@ -114,12 +114,10 @@ void v8_device::device_add_mconfig(machine_config &config)
 	m_via1->cb2_handler().set(FUNC(v8_device::via_out_cb2));
 	m_via1->irq_handler().set(FUNC(v8_device::via1_irq));
 
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
 	ASC(config, m_asc, C15M, asc_device::asc_type::V8);
-	m_asc->add_route(0, "lspeaker", 1.0);
-	m_asc->add_route(1, "rspeaker", 1.0);
 	m_asc->irqf_callback().set(FUNC(v8_device::asc_irq));
+	m_asc->add_route(0, tag(), 1.0);
+	m_asc->add_route(1, tag(), 1.0);
 }
 
 //-------------------------------------------------
@@ -133,6 +131,7 @@ v8_device::v8_device(const machine_config &mconfig, const char *tag, device_t *o
 
 v8_device::v8_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock) :
 	device_t(mconfig, type, tag, owner, clock),
+	device_sound_interface(mconfig, *this),
 	m_maincpu(*this, finder_base::DUMMY_TAG),
 	m_screen(*this, "screen"),
 	m_palette(*this, "palette"),
@@ -158,6 +157,8 @@ v8_device::v8_device(const machine_config &mconfig, device_type type, const char
 void v8_device::device_start()
 {
 	m_vram = std::make_unique<u32[]>(0x100000 / sizeof(u32));
+
+	m_stream = stream_alloc(8, 2, m_asc->clock(), STREAM_SYNCHRONOUS);
 
 	m_6015_timer = timer_alloc(FUNC(v8_device::mac_6015_tick), this);
 	m_6015_timer->adjust(attotime::never);
@@ -212,6 +213,15 @@ void v8_device::device_reset()
 
 	space.unmap_write(0x00000000, memory_end);
 	space.install_rom(0x00000000, memory_end & ~memory_mirror, memory_mirror, &m_rom[0]);
+}
+
+void v8_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
+{
+	for (int i = 0; i < inputs[0].samples(); i++)
+	{
+		outputs[0].put(i, inputs[0].get(i));
+		outputs[1].put(i, inputs[1].get(i));
+	}
 }
 
 u32 v8_device::rom_switch_r(offs_t offset)
@@ -877,8 +887,8 @@ void eagle_device::device_add_mconfig(machine_config &config)
 	m_screen->set_raw(15.6672_MHz_XTAL, 704, 0, 512, 370, 0, 342);
 
 	ASC(config.replace(), m_asc, C15M, asc_device::asc_type::EAGLE);
-	m_asc->add_route(0, "lspeaker", 1.0);
-	m_asc->add_route(1, "rspeaker", 1.0);
+	m_asc->add_route(0, tag(), 1.0);
+	m_asc->add_route(1, tag(), 1.0);
 	m_asc->irqf_callback().set(FUNC(eagle_device::asc_irq));
 }
 
@@ -958,8 +968,8 @@ void spice_device::device_add_mconfig(machine_config &config)
 	m_screen->set_raw(15.6672_MHz_XTAL, 640, 0, 512, 407, 0, 384);
 
 	ASC(config.replace(), m_asc, C15M, asc_device::asc_type::SONORA);
-	m_asc->add_route(0, "lspeaker", 1.0);
-	m_asc->add_route(1, "rspeaker", 1.0);
+	m_asc->add_route(0, tag(), 1.0);
+	m_asc->add_route(1, tag(), 1.0);
 	m_asc->irqf_callback().set(FUNC(spice_device::asc_irq));
 
 	SWIM2(config, m_fdc, C15M);

@@ -239,8 +239,8 @@ public:
 
 protected:
 	// device_t implementation
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	required_address_space m_memory_space;
 	memory_access<32, 2, 0, ENDIANNESS_LITTLE>::cache m_memory;
@@ -379,7 +379,7 @@ class emerald_ioga_device : public interpro_ioga_device
 public:
 	emerald_ioga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual void map(address_map &map) override;
+	virtual void map(address_map &map) override ATTR_COLD;
 
 	void eth_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 	u16 eth_r(offs_t offset, u16 mem_mask = ~0);
@@ -421,7 +421,7 @@ class turquoise_ioga_device : public interpro_ioga_device
 public:
 	turquoise_ioga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual void map(address_map &map) override;
+	virtual void map(address_map &map) override ATTR_COLD;
 
 	void eth_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 	u16 eth_r(offs_t offset, u16 mem_mask = ~0);
@@ -463,7 +463,7 @@ class sapphire_ioga_device : public interpro_ioga_device
 public:
 	sapphire_ioga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual void map(address_map &map) override;
+	virtual void map(address_map &map) override ATTR_COLD;
 
 	virtual TIMER_CALLBACK_MEMBER(timer_60hz) override;
 
@@ -492,8 +492,8 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	virtual TIMER_CALLBACK_MEMBER(interrupt_check) override;
 	virtual TIMER_CALLBACK_MEMBER(eth_reset) override;

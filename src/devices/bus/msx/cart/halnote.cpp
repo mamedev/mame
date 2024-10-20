@@ -20,7 +20,7 @@ public:
 protected:
 	// device_t implementation
 	virtual void device_start() override { }
-	virtual void device_reset() override;
+	virtual void device_reset() override ATTR_COLD;
 
 private:
 	static constexpr u8 BANK_MASK = (0x100000 / 0x2000) - 1;

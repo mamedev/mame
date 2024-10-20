@@ -1,0 +1,82 @@
+<?xml version="1.0"?>
+<!--
+license:CC0-1.0
+authors:hap
+-->
+<mamelayout version="2">
+
+<!-- NOTE: no chesspieces simulation here -->
+
+<!-- define elements -->
+
+	<element name="gray"><rect><color red="0.2" green="0.2" blue="0.2" /></rect></element>
+	<element name="lcdm"><rect><color red="0.54" green="0.57" blue="0.58" /></rect></element>
+
+	<element name="hlb" defstate="0">
+		<rect state="1"><color red="1" green="1" blue="1" /></rect>
+	</element>
+
+	<element name="text_b1"><text string="LV"><color red="0.8" green="0.78" blue="0.35" /></text></element>
+	<element name="text_b2"><text string="CE"><color red="0.8" green="0.78" blue="0.35" /></text></element>
+	<element name="text_b3"><text string="TB"><color red="0.8" green="0.78" blue="0.35" /></text></element>
+	<element name="text_b4"><text string="EN"><color red="0.8" green="0.78" blue="0.35" /></text></element>
+	<element name="text_ba"><text string="A1"><color red="0.8" green="0.78" blue="0.35" /></text></element>
+	<element name="text_bb"><text string="B2"><color red="0.8" green="0.78" blue="0.35" /></text></element>
+	<element name="text_bc"><text string="C3"><color red="0.8" green="0.78" blue="0.35" /></text></element>
+	<element name="text_bd"><text string="D4"><color red="0.8" green="0.78" blue="0.35" /></text></element>
+	<element name="text_be"><text string="E5"><color red="0.8" green="0.78" blue="0.35" /></text></element>
+	<element name="text_bf"><text string="F6"><color red="0.8" green="0.78" blue="0.35" /></text></element>
+	<element name="text_bg"><text string="G7"><color red="0.8" green="0.78" blue="0.35" /></text></element>
+	<element name="text_bh"><text string="H8"><color red="0.8" green="0.78" blue="0.35" /></text></element>
+
+
+<!-- build screen -->
+
+	<view name="Internal Layout">
+		<bounds left="-1" right="8" top="-1" bottom="8" />
+
+		<screen index="0"><bounds xc="3.5" yc="1.5" width="4" height="1.773" /></screen>
+		<element ref="lcdm" blend="multiply"><bounds xc="3.5" yc="1.5" width="5" height="2" /></element>
+
+		<!-- buttons -->
+		<element ref="gray"><bounds x="0" y="0" width="1" height="1" /></element>
+		<element ref="gray"><bounds x="6" y="0" width="1" height="1" /></element>
+		<element ref="gray"><bounds x="0" y="2" width="1" height="1" /></element>
+		<element ref="gray"><bounds x="6" y="2" width="1" height="1" /></element>
+		<element ref="gray"><bounds x="0" y="4" width="1" height="1" /></element>
+		<element ref="gray"><bounds x="2" y="4" width="1" height="1" /></element>
+		<element ref="gray"><bounds x="4" y="4" width="1" height="1" /></element>
+		<element ref="gray"><bounds x="6" y="4" width="1" height="1" /></element>
+		<element ref="gray"><bounds x="0" y="6" width="1" height="1" /></element>
+		<element ref="gray"><bounds x="2" y="6" width="1" height="1" /></element>
+		<element ref="gray"><bounds x="4" y="6" width="1" height="1" /></element>
+		<element ref="gray"><bounds x="6" y="6" width="1" height="1" /></element>
+
+		<element ref="text_b1"><bounds xc="0.5" yc="0.5" width="0.9" height="0.85" /></element>
+		<element ref="text_b2"><bounds xc="6.5" yc="0.5" width="0.9" height="0.85" /></element>
+		<element ref="text_b3"><bounds xc="0.5" yc="2.5" width="0.9" height="0.85" /></element>
+		<element ref="text_b4"><bounds xc="6.5" yc="2.5" width="0.9" height="0.85" /></element>
+		<element ref="text_ba"><bounds xc="0.5" yc="4.5" width="0.9" height="0.85" /></element>
+		<element ref="text_bb"><bounds xc="2.5" yc="4.5" width="0.9" height="0.85" /></element>
+		<element ref="text_bc"><bounds xc="4.5" yc="4.5" width="0.9" height="0.85" /></element>
+		<element ref="text_bd"><bounds xc="6.5" yc="4.5" width="0.9" height="0.85" /></element>
+		<element ref="text_be"><bounds xc="0.5" yc="6.5" width="0.9" height="0.85" /></element>
+		<element ref="text_bf"><bounds xc="2.5" yc="6.5" width="0.9" height="0.85" /></element>
+		<element ref="text_bg"><bounds xc="4.5" yc="6.5" width="0.9" height="0.85" /></element>
+		<element ref="text_bh"><bounds xc="6.5" yc="6.5" width="0.9" height="0.85" /></element>
+
+		<element ref="hlb" inputtag="IN.0" inputmask="0x04"><bounds x="0" y="0" width="1" height="1" /><color alpha="0.12" /></element>
+		<element ref="hlb" inputtag="IN.3" inputmask="0x04"><bounds x="6" y="0" width="1" height="1" /><color alpha="0.12" /></element>
+		<element ref="hlb" inputtag="IN.1" inputmask="0x04"><bounds x="0" y="2" width="1" height="1" /><color alpha="0.12" /></element>
+		<element ref="hlb" inputtag="IN.2" inputmask="0x04"><bounds x="6" y="2" width="1" height="1" /><color alpha="0.12" /></element>
+		<element ref="hlb" inputtag="IN.0" inputmask="0x01"><bounds x="0" y="4" width="1" height="1" /><color alpha="0.12" /></element>
+		<element ref="hlb" inputtag="IN.1" inputmask="0x01"><bounds x="2" y="4" width="1" height="1" /><color alpha="0.12" /></element>
+		<element ref="hlb" inputtag="IN.2" inputmask="0x01"><bounds x="4" y="4" width="1" height="1" /><color alpha="0.12" /></element>
+		<element ref="hlb" inputtag="IN.3" inputmask="0x01"><bounds x="6" y="4" width="1" height="1" /><color alpha="0.12" /></element>
+		<element ref="hlb" inputtag="IN.0" inputmask="0x02"><bounds x="0" y="6" width="1" height="1" /><color alpha="0.12" /></element>
+		<element ref="hlb" inputtag="IN.1" inputmask="0x02"><bounds x="2" y="6" width="1" height="1" /><color alpha="0.12" /></element>
+		<element ref="hlb" inputtag="IN.2" inputmask="0x02"><bounds x="4" y="6" width="1" height="1" /><color alpha="0.12" /></element>
+		<element ref="hlb" inputtag="IN.3" inputmask="0x02"><bounds x="6" y="6" width="1" height="1" /><color alpha="0.12" /></element>
+	</view>
+
+</mamelayout>

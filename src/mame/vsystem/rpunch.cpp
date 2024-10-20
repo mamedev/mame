@@ -150,7 +150,7 @@ public:
 	void rpunch(machine_config &config);
 	void svolleybl(machine_config &config);
 
-	DECLARE_CUSTOM_INPUT_MEMBER(hi_bits_r) { return m_hi_bits->read(); }
+	ioport_value hi_bits_r() { return m_hi_bits->read(); }
 
 protected:
 	required_device<cpu_device> m_maincpu;
@@ -172,13 +172,13 @@ protected:
 	void set_sprite_palette(int val) { m_sprite_palette = val; }
 	void set_sprite_xoffs(int val) { m_sprite_xoffs = val; }
 
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
-	void svolley_map(address_map &map);
-	void rpunch_map(address_map &map);
-	void svolleybl_main_map(address_map &map);
-	void sound_map(address_map &map);
-	void svolleybl_sound_map(address_map &map);
+	void svolley_map(address_map &map) ATTR_COLD;
+	void rpunch_map(address_map &map) ATTR_COLD;
+	void svolleybl_main_map(address_map &map) ATTR_COLD;
+	void sound_map(address_map &map) ATTR_COLD;
+	void svolleybl_sound_map(address_map &map) ATTR_COLD;
 
 private:
 	// hardware configuration
@@ -224,7 +224,7 @@ public:
 	void svolley(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 };
 
 
@@ -621,7 +621,7 @@ static INPUT_PORTS_START( rpunch )
 	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(1)
 	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(1)
 	PORT_BIT( 0x00c0, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0xff00, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(rpunch_state, hi_bits_r)
+	PORT_BIT( 0xff00, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(FUNC(rpunch_state::hi_bits_r))
 
 	PORT_START("P2")    // c001a lower 8 bits
 	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(2)
@@ -631,7 +631,7 @@ static INPUT_PORTS_START( rpunch )
 	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(2)
 	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(2)
 	PORT_BIT( 0x00c0, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0xff00, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(rpunch_state, hi_bits_r)
+	PORT_BIT( 0xff00, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(FUNC(rpunch_state::hi_bits_r))
 
 	PORT_START("SERVICE")   // c0018/c001a upper 8 bits
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 )

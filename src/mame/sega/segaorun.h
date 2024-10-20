@@ -76,7 +76,7 @@ public:
 	void init_outrunb();
 	void init_shangon();
 
-	CUSTOM_INPUT_MEMBER( bankmotor_pos_r );
+	ioport_value bankmotor_pos_r();
 
 protected:
 	// PPI read/write handlers
@@ -108,16 +108,16 @@ protected:
 
 	TIMER_DEVICE_CALLBACK_MEMBER(bankmotor_update);
 
-	void decrypted_opcodes_map(address_map &map);
-	void outrun_map(address_map &map);
-	void sound_map(address_map &map);
-	void sound_portmap(address_map &map);
-	void sub_map(address_map &map);
+	void decrypted_opcodes_map(address_map &map) ATTR_COLD;
+	void outrun_map(address_map &map) ATTR_COLD;
+	void sound_map(address_map &map) ATTR_COLD;
+	void sound_portmap(address_map &map) ATTR_COLD;
+	void sub_map(address_map &map) ATTR_COLD;
 
 	// device overrides
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 	TIMER_CALLBACK_MEMBER(irq2_gen_tick);
 	TIMER_CALLBACK_MEMBER(scanline_tick);

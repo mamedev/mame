@@ -83,21 +83,21 @@ private:
 	void hustler_ppi8255_0_w(offs_t offset, uint8_t data);
 	void hustler_ppi8255_1_w(offs_t offset, uint8_t data);
 
-	void hustler_map(address_map &map);
-	void hustler_sound_io_map(address_map &map);
-	void hustler_sound_map(address_map &map);
-	void hustlerb_map(address_map &map);
-	void hustlerb_sound_io_map(address_map &map);
-	void hustlerb_sound_map(address_map &map);
-	void hustlerb6_map(address_map &map);
-	void mimonkeyug_map(address_map &map);
-	void minefldfe_map(address_map &map);
-	void rescuefe_map(address_map &map);
-	void scobra_sound_io_map(address_map &map);
-	void scobra_sound_map(address_map &map);
-	void tazmani3_map(address_map &map);
-	void type1_map(address_map &map);
-	void type2_map(address_map &map);
+	void hustler_map(address_map &map) ATTR_COLD;
+	void hustler_sound_io_map(address_map &map) ATTR_COLD;
+	void hustler_sound_map(address_map &map) ATTR_COLD;
+	void hustlerb_map(address_map &map) ATTR_COLD;
+	void hustlerb_sound_io_map(address_map &map) ATTR_COLD;
+	void hustlerb_sound_map(address_map &map) ATTR_COLD;
+	void hustlerb6_map(address_map &map) ATTR_COLD;
+	void mimonkeyug_map(address_map &map) ATTR_COLD;
+	void minefldfe_map(address_map &map) ATTR_COLD;
+	void rescuefe_map(address_map &map) ATTR_COLD;
+	void scobra_sound_io_map(address_map &map) ATTR_COLD;
+	void scobra_sound_map(address_map &map) ATTR_COLD;
+	void tazmani3_map(address_map &map) ATTR_COLD;
+	void type1_map(address_map &map) ATTR_COLD;
+	void type2_map(address_map &map) ATTR_COLD;
 
 	optional_shared_ptr<uint8_t> m_soundram;
 };
@@ -438,8 +438,8 @@ static INPUT_PORTS_START( stratgyx )
 
 	PORT_START("IN2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_COCKTAIL
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(scobra_state, stratgyx_coinage_r<0x01>) /* lower 2 coinage DIPs */
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(scobra_state, stratgyx_coinage_r<0x02>) /* lower 2 coinage DIPs */
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(scobra_state::stratgyx_coinage_r<0x01>)) /* lower 2 coinage DIPs */
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(scobra_state::stratgyx_coinage_r<0x02>)) /* lower 2 coinage DIPs */
 	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Cabinet ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( Cocktail ) )
@@ -449,8 +449,8 @@ static INPUT_PORTS_START( stratgyx )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_COCKTAIL
 
 	PORT_START("IN3")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(scobra_state, stratgyx_coinage_r<0x04>) /* upper 2 coinage DIPs */
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(scobra_state, stratgyx_coinage_r<0x08>) /* upper 2 coinage DIPs */
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(scobra_state::stratgyx_coinage_r<0x04>)) /* upper 2 coinage DIPs */
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(scobra_state::stratgyx_coinage_r<0x08>)) /* upper 2 coinage DIPs */
 	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )  /* none of these appear to be used */
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -509,7 +509,7 @@ static INPUT_PORTS_START( darkplnt )
 	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Lives ) )
 	PORT_DIPSETTING(    0x00, "3" )
 	PORT_DIPSETTING(    0x02, "5" )
-	PORT_BIT( 0xfc, 0x00, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(scobra_state, darkplnt_dial_r) // scrambled dial
+	PORT_BIT( 0xfc, 0x00, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(FUNC(scobra_state::darkplnt_dial_r)) // scrambled dial
 
 	PORT_START("IN2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )

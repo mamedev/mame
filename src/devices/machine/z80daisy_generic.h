@@ -35,7 +35,7 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 	// z80daisy_interface overrides
 	virtual int z80daisy_irq_state() override;

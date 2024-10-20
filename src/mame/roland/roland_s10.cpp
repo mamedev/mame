@@ -53,9 +53,9 @@ protected:
 	void sw_scan_w(offs_t offset, u8 data);
 	void led_latch_w(u8 data);
 
-	void prog_map(address_map &map);
-	void s10_ext_map(address_map &map);
-	void mks100_ext_map(address_map &map);
+	void prog_map(address_map &map) ATTR_COLD;
+	void s10_ext_map(address_map &map) ATTR_COLD;
+	void mks100_ext_map(address_map &map) ATTR_COLD;
 
 	void palette_init(palette_device &palette);
 
@@ -84,7 +84,7 @@ private:
 	void led_latch1_w(u8 data);
 	void led_latch2_w(u8 data);
 
-	void s220_ext_map(address_map &map);
+	void s220_ext_map(address_map &map) ATTR_COLD;
 
 	required_device<bu3905_device> m_outctrl;
 };

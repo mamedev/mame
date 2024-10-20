@@ -16,11 +16,14 @@ And/or it could also be due to the programmer(s) being unfamiliar with H8.
 Hardware notes:
 - PCB label: ST9A-PE-001
 - Hitachi H8/325 MCU, 20MHz XTAL
-- Epson SED1502F, LCD screen (same as simultano)
+- Epson SED1502F, LCD screen (same as Saitek Simultano)
 - piezo, 16+3 LEDs, button sensors chessboard
 
 In 1992, it was also sold by Tandy as Chess Champion 2150L, still manufactured
 by Saitek. Overall, the hardware is the same, but with a slower CPU (16MHz XTAL).
+
+TODO:
+- are older versions of Prisma on PROM H8/325 just like with Blitz?
 
 *******************************************************************************/
 
@@ -28,7 +31,7 @@ by Saitek. Overall, the hardware is the same, but with a slower CPU (16MHz XTAL)
 
 #include "cpu/h8/h8325.h"
 #include "machine/sensorboard.h"
-#include "sound/spkrdev.h"
+#include "sound/dac.h"
 #include "video/pwm.h"
 #include "video/sed1500.h"
 
@@ -62,7 +65,7 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(change_cpu_freq);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	// devices/pointers
@@ -71,7 +74,7 @@ private:
 	required_device<pwm_display_device> m_led_pwm;
 	required_device<pwm_display_device> m_lcd_pwm;
 	required_device<sed1502_device> m_lcd;
-	required_device<speaker_sound_device> m_dac;
+	required_device<dac_1bit_device> m_dac;
 	required_ioport_array<4> m_inputs;
 	output_finder<16, 34> m_out_lcd;
 
@@ -162,7 +165,7 @@ void prisma_state::lcd_output_w(offs_t offset, u64 data)
 }
 
 
-// MCU ports
+// misc
 
 void prisma_state::update_leds()
 {
@@ -177,7 +180,7 @@ void prisma_state::p1_w(u8 data)
 	update_leds();
 
 	// P14: speaker out
-	m_dac->level_w(BIT(data, 4));
+	m_dac->write(BIT(data, 4));
 
 	// P16: ext power (no need to emulate it)
 }
@@ -266,9 +269,11 @@ static INPUT_PORTS_START( prisma )
 	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_4) PORT_NAME("Swap Side")
 	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_Q) PORT_NAME("New Game")
 	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_UNUSED)
-	PORT_CONFNAME( 0x81, 0x01, "CPU Frequency" ) PORT_CHANGED_MEMBER(DEVICE_SELF, prisma_state, change_cpu_freq, 0) // factory set
-	PORT_CONFSETTING(    0x00, "16MHz (CC 2150L)" )
+	PORT_CONFNAME( 0x81, 0x01, "CPU Frequency" ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(prisma_state::change_cpu_freq), 0) // factory set
+	PORT_CONFSETTING(    0x81, "12MHz (unofficial)" )
+	PORT_CONFSETTING(    0x00, "16MHz (Chess Champion 2150L)" )
 	PORT_CONFSETTING(    0x01, "20MHz (Prisma)" )
+	PORT_CONFSETTING(    0x80, "24MHz (unofficial)" )
 
 	PORT_START("IN.1")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_T) PORT_NAME("Normal")
@@ -296,7 +301,7 @@ static INPUT_PORTS_START( prisma )
 	PORT_CONFSETTING(    0x01, DEF_STR( Normal ) )
 
 	PORT_START("RESET")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_1) PORT_CHANGED_MEMBER(DEVICE_SELF, prisma_state, go_button, 0) PORT_NAME("Go")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_1) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(prisma_state::go_button), 0) PORT_NAME("Go")
 INPUT_PORTS_END
 
 
@@ -345,7 +350,7 @@ void prisma_state::prisma(machine_config &config)
 
 	// sound hardware
 	SPEAKER(config, "speaker").front_center();
-	SPEAKER_SOUND(config, m_dac).add_route(ALL_OUTPUTS, "speaker", 0.25);
+	DAC_1BIT(config, m_dac).add_route(ALL_OUTPUTS, "speaker", 0.25);
 }
 
 

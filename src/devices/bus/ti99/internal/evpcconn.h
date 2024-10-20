@@ -21,7 +21,7 @@ public:
 	evpc_clock_connector(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	void vclock_line(int state);
-	void device_start() override;
+	void device_start() override ATTR_COLD;
 	auto vdpint_cb() { return m_vdpint.bind(); }
 
 private:

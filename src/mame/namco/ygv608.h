@@ -23,7 +23,7 @@ public:
 	// construction/destruction
 	ygv608_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	void port_map(address_map &map);
+	void port_map(address_map &map) ATTR_COLD;
 
 	// ports section
 	uint8_t pattern_name_table_r();
@@ -92,11 +92,11 @@ public:
 	auto vblank_callback() { return m_vblank_handler.bind(); }
 	auto raster_callback() { return m_raster_handler.bind(); }
 
-	void regs_map(address_map &map);
+	void regs_map(address_map &map) ATTR_COLD;
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 	virtual void device_post_load() override;
 
 	virtual space_config_vector memory_space_config() const override;
@@ -130,7 +130,7 @@ private:
 	void register_state_save();
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_layer_roz(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, tilemap_t *source_tilemap);
-	void ygv608_draw_mosaic(bitmap_ind16 &bitmap, const rectangle &cliprect, int n);
+	void draw_mosaic(bitmap_ind16 &bitmap, const rectangle &cliprect, int n);
 
 	uint8_t m_namcond1_gfxbank;
 

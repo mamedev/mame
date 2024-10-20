@@ -64,8 +64,8 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
 
 protected:
-	virtual void machine_start() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -92,12 +92,12 @@ private:
 	void z80_2_ldp_write(uint8_t data);
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void vblank_irq(int state);
-	void z80_0_io(address_map &map);
-	void z80_0_mem(address_map &map);
-	void z80_1_io(address_map &map);
-	void z80_1_mem(address_map &map);
-	void z80_2_io(address_map &map);
-	void z80_2_mem(address_map &map);
+	void z80_0_io(address_map &map) ATTR_COLD;
+	void z80_0_mem(address_map &map) ATTR_COLD;
+	void z80_1_io(address_map &map) ATTR_COLD;
+	void z80_1_mem(address_map &map) ATTR_COLD;
+	void z80_2_io(address_map &map) ATTR_COLD;
+	void z80_2_mem(address_map &map) ATTR_COLD;
 };
 
 void istellar_state::tile_w(offs_t offset, uint8_t data)
@@ -299,8 +299,8 @@ static INPUT_PORTS_START( istellar )
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_SERVICE_NO_TOGGLE( 0x08, IP_ACTIVE_HIGH )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_CHANGED_MEMBER(DEVICE_SELF, istellar_state, coin_inserted, 0)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, istellar_state, coin_inserted, 0)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(istellar_state::coin_inserted), 0)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(istellar_state::coin_inserted), 0)
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_START2 )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_START1 )
 

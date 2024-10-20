@@ -298,6 +298,7 @@ Core Debugging Options
 | :ref:`debugscript <mame-commandline-debugscript>`
 | :ref:`[no]update_in_pause <mame-commandline-updateinpause>`
 | :ref:`watchdog <mame-commandline-watchdog>`
+| :ref:`debugger_host <mame-commandline-debuggerhost>`
 | :ref:`debugger_port <mame-commandline-debuggerport>`
 | :ref:`debugger_font <mame-commandline-debuggerfont>`
 | :ref:`debugger_font_size <mame-commandline-debuggerfontsize>`

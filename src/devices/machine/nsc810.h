@@ -50,8 +50,8 @@ public:
 	void write(offs_t offset, uint8_t data);
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	template <int Timer> TIMER_CALLBACK_MEMBER(timer_tick);
 

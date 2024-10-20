@@ -53,11 +53,11 @@ public:
 	void thayers(machine_config &config);
 
 private:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
-	void thayers_map(address_map &map);
-	void thayers_io_map(address_map &map);
+	void thayers_map(address_map &map) ATTR_COLD;
+	void thayers_io_map(address_map &map) ATTR_COLD;
 
 	TIMER_CALLBACK_MEMBER(firstirq_tick);
 	TIMER_CALLBACK_MEMBER(intrq_tick);
@@ -576,8 +576,8 @@ static INPUT_PORTS_START( thayers )
 	PORT_BIT( 0x0f, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("laserdisc", parallel_laserdisc_device, status_strobe_r)
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("laserdisc", parallel_laserdisc_device, ready_r)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("laserdisc", FUNC(parallel_laserdisc_device::status_strobe_r))
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("laserdisc", FUNC(parallel_laserdisc_device::ready_r))
 
 	PORT_START("ROW.0")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Yes") PORT_CODE(KEYCODE_F1)

@@ -80,9 +80,9 @@ protected:
 	{ }
 
 	virtual void device_post_load() override;
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 	void cmos_protect_w(uint32_t data);
 	void dma_queue_w(uint32_t data);
@@ -147,7 +147,7 @@ protected:
 		, m_dsw(*this, "DSW")
 	{ }
 
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 	uint32_t port0_r();
 	uint32_t adc_r();
@@ -164,7 +164,7 @@ protected:
 	uint16_t comm_bus_out();
 	uint16_t comm_bus_in();
 
-	void midvunit_map(address_map &map);
+	void midvunit_map(address_map &map) ATTR_COLD;
 
 	required_device<adc0844_device> m_adc;
 
@@ -203,7 +203,7 @@ public:
 	void init_crusnu21();
 	void init_crusnusa();
 
-	DECLARE_CUSTOM_INPUT_MEMBER(motion_r);
+	ioport_value motion_r();
 
 protected:
 	void init_crusnusa_common(offs_t speedup);
@@ -226,7 +226,7 @@ public:
 	void init_offroadc();
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 	void crusnwld_control_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 	uint32_t crusnwld_serial_status_r();
@@ -236,8 +236,8 @@ protected:
 	void bit_reset_w(uint32_t data);
 	void init_crusnwld_common(offs_t speedup);
 
-	void crusnwld_map(address_map &map);
-	void offroadc_map(address_map &map);
+	void crusnwld_map(address_map &map) ATTR_COLD;
+	void offroadc_map(address_map &map) ATTR_COLD;
 
 	required_device<midway_serial_pic2_device> m_midway_serial_pic2;
 
@@ -260,15 +260,15 @@ public:
 	void init_wargods();
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	uint32_t midvplus_misc_r(offs_t offset);
 	void midvplus_misc_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 	void midvplus_xf1_w(uint8_t data);
 
-	void midvplus_map(address_map &map);
+	void midvplus_map(address_map &map) ATTR_COLD;
 
 	required_device<midway_ioasic_device> m_midway_ioasic;
 	required_device<ata_interface_device> m_ata;

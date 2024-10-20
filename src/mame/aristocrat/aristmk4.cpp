@@ -1,6 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:Angelo Salese, Palindrome, FraSher, Roberto Fresca
-/***********************************************************************************************************************************************
+/**************************************************************************************************
 
     Driver: aristmk4
 
@@ -11,7 +11,7 @@
     original 86lions.c driver by Chris Hardy, Angelo Salese & Roberto Fresca
 
 
-    ***************** INITIALISATION *********************************************************************
+    ***************** INITIALISATION **************************************************************
 
     Method 1 :
     * Key in with the Jackpot Key followed by the Audit Key (F1 then F2 keys)
@@ -76,7 +76,7 @@
     Note: cgold2, fhunter and fhuntera must have DIP labeled "5201-5" switch to on at all times.
        This allows setup procedure to complete properly and game to play (if disabled, the games don't accept inputs).
 
-**********************************************************************************************************
+***************************************************************************************************
 
     Technical Notes:
 
@@ -103,7 +103,7 @@
     The AY8910 named ay2 has writes to lamps and the light tower on Port A and B. these are implemented via the layout
 
 
-**********************************************************************************************************
+***************************************************************************************************
 
     Updates....
 
@@ -216,7 +216,7 @@
     Renamed nodump program ROM in clkwise as it had the wrong EPROM number.
 
 
-*************************************************************************************************************
+***************************************************************************************************
 
     When the games first power on (or when reset), they will display a TILT message on the screen.
     This doesn't affect gameplay, and if there are no pending errors the game should coin up and/or play immediately.
@@ -295,7 +295,7 @@
     12. Hook up native/Jubilee MK4 games which have larger capacity ROMs (no native MK4 games dumped yet - all are MK2.5 format).
 
 
-    ***************** POKER GAMES ************************************************************************
+    ***************** POKER GAMES *****************************************************************
 
     Wild One & Golden Poker have a problem where the second branch condition is always true, see assembler below for
     example of Wild One.
@@ -318,7 +318,7 @@
     and SY6845E subvariants, so it all lies to those. -AS
 
 
-***********************************************************************************************************************************************/
+**************************************************************************************************/
 
 #define MAIN_CLOCK  12_MHz_XTAL
 
@@ -451,9 +451,9 @@ private:
 	uint8_t pb1_r();
 	uint8_t pc1_r();
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 	void aristmk4_palette(palette_device &palette) const;
 	void lions_palette(palette_device &palette) const;
 	uint32_t screen_update_aristmk4(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -463,8 +463,8 @@ private:
 	TIMER_CALLBACK_MEMBER(power_fail);
 	inline void uBackgroundColour();
 
-	void slots_mem(address_map &map);
-	void poker_mem(address_map &map);
+	void slots_mem(address_map &map) ATTR_COLD;
+	void poker_mem(address_map &map) ATTR_COLD;
 };
 
 /* Partial Cashcade protocol */

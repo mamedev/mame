@@ -69,8 +69,8 @@ public:
 	void robotadv(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -93,8 +93,8 @@ private:
 	attotime m_pwm_last;
 	emu_timer *m_refresh_timer;
 
-	void main_map(address_map &map);
-	void io_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
+	void io_map(address_map &map) ATTR_COLD;
 
 	void control1_w(u8 data);
 	void control2_w(u8 data);
@@ -573,4 +573,4 @@ ROM_END
 *******************************************************************************/
 
 //    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS           INIT        COMPANY, FULLNAME, FLAGS
-SYST( 1982, robotadv, 0,      0,      robotadv, robotadv, robotadv_state, empty_init, "Novag Industries", "Chess Robot Adversary", MACHINE_SUPPORTS_SAVE | MACHINE_MECHANICAL | MACHINE_IMPERFECT_CONTROLS )
+SYST( 1982, robotadv, 0,      0,      robotadv, robotadv, robotadv_state, empty_init, "Novag Industries / Intelligent Heuristic Programming", "Chess Robot Adversary", MACHINE_SUPPORTS_SAVE | MACHINE_MECHANICAL | MACHINE_IMPERFECT_CONTROLS )

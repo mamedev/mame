@@ -29,8 +29,8 @@ public:
 	void init_ths();
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	std::vector<uint16_t> m_sdram;
 
@@ -59,8 +59,8 @@ public:
 	}
 
 protected:
-	//virtual void machine_start() override;
-	virtual void machine_reset() override;
+	//virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	virtual uint16_t porta_r() override;
 	virtual uint16_t portb_r() override;
@@ -77,8 +77,8 @@ public:
 	}
 
 protected:
-	//virtual void machine_start() override;
-	virtual void machine_reset() override;
+	//virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 };
@@ -93,7 +93,7 @@ public:
 	}
 
 protected:
-	virtual void machine_reset() override;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	uint16_t paccon_speedup_hack_r();
@@ -108,7 +108,7 @@ public:
 	}
 
 protected:
-	virtual void machine_reset() override;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	uint16_t jak_pf_speedup_hack_r();
@@ -126,7 +126,7 @@ public:
 
 protected:
 
-	virtual void machine_reset() override;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 };

@@ -44,8 +44,8 @@ public:
 	void trigger_reset(int state);
 
 protected:
-	virtual void machine_start() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -63,8 +63,8 @@ private:
 	uint8_t bffx_r(offs_t offset);
 	void bffx_w(offs_t offset, uint8_t data);
 
-	void mt65_map(address_map &map);
-	void spinv_map(address_map &map);
+	void mt65_map(address_map &map) ATTR_COLD;
+	void spinv_map(address_map &map) ATTR_COLD;
 
 	void kbd_int(int state);
 	int m_keyboard_int_flag = 0;
@@ -104,14 +104,14 @@ public:
 	void trigger_reset(int state);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;
 	required_device<microtan_kbd_slot_device> m_keyboard;
 	required_device<tanbus_device> m_tanbus;
 
-	void mt6809_map(address_map &map);
+	void mt6809_map(address_map &map) ATTR_COLD;
 
 	uint8_t bffx_r(offs_t offset);
 	void bffx_w(offs_t offset, uint8_t data);

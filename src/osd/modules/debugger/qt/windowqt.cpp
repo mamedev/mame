@@ -9,6 +9,7 @@
 #include "logwindow.h"
 #include "memorywindow.h"
 
+#include "debugger.h"
 #include "debug/debugcon.h"
 #include "debug/debugcpu.h"
 
@@ -251,7 +252,8 @@ void WindowQt::debugActQuit()
 
 void WindowQt::debuggerExit()
 {
-	close();
+	// this isn't called from a Qt event loop, so close() will leak the window object
+	delete this;
 }
 
 

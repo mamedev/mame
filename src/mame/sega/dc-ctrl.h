@@ -34,7 +34,7 @@ protected:
 	template <uint8_t First> void set_port_tags() { }
 
 	// device-level overrides
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 	const char *model = nullptr, *license = nullptr, *versions = nullptr;
 	uint32_t id = 0;

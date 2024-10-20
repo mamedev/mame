@@ -19,7 +19,7 @@
 ****************************************************************************/
 
 #include "emu.h"
-#include "cpu/z80/z80.h"
+#include "cpu/z80/nsc800.h"
 #include "machine/mm58274c.h"
 #include "machine/nsc810.h"
 #include "machine/ram.h"
@@ -61,8 +61,8 @@ public:
 	void init_husky();
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	uint8_t porta_r();
@@ -84,8 +84,8 @@ private:
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	void husky_io(address_map &map);
-	void husky_mem(address_map &map);
+	void husky_io(address_map &map) ATTR_COLD;
+	void husky_mem(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	required_ioport_array<4> m_kbd;

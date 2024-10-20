@@ -77,7 +77,7 @@ public:
 	ecbbus_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// device-level overrides
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 	// inline configuration
 	template <typename T> void set_ecbbus_slot(T &&tag, int num)
@@ -121,7 +121,7 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 private:
 	static constexpr unsigned MAX_ECBBUS_SLOTS = 16;

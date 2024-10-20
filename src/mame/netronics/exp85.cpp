@@ -85,7 +85,7 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER( trigger_rst75 );
 
 private:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 	uint8_t i8355_a_r();
 	void i8355_a_w(uint8_t data);
@@ -94,8 +94,8 @@ private:
 
 	void status_out(u8 status);
 
-	void exp85_io(address_map &map);
-	void exp85_mem(address_map &map);
+	void exp85_io(address_map &map) ATTR_COLD;
+	void exp85_mem(address_map &map) ATTR_COLD;
 
 	void to_change(int to);
 
@@ -160,8 +160,8 @@ INPUT_CHANGED_MEMBER( exp85_state::trigger_rst75 )
 
 static INPUT_PORTS_START( exp85 )
 	PORT_START("SPECIAL")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_NAME("R") PORT_CODE(KEYCODE_F1) PORT_CHANGED_MEMBER(DEVICE_SELF, exp85_state, trigger_reset, 0)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_NAME("I") PORT_CODE(KEYCODE_F2) PORT_CHANGED_MEMBER(DEVICE_SELF, exp85_state, trigger_rst75, 0)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_NAME("R") PORT_CODE(KEYCODE_F1) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(exp85_state::trigger_reset), 0)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_NAME("I") PORT_CODE(KEYCODE_F2) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(exp85_state::trigger_rst75), 0)
 INPUT_PORTS_END
 
 /* 8355 Interface */

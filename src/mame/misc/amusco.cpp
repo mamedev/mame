@@ -124,8 +124,8 @@ public:
 	void coin_irq(int state);
 
 protected:
-	virtual void video_start() override;
-	virtual void machine_start() override;
+	virtual void video_start() override ATTR_COLD;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
@@ -142,8 +142,8 @@ private:
 	MC6845_UPDATE_ROW(update_row);
 	void amusco_palette(palette_device &palette) const;
 
-	void mem_map(address_map &map);
-	void io_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
+	void io_map(address_map &map) ATTR_COLD;
 
 	std::unique_ptr<uint8_t []> m_videoram{};
 	tilemap_t *m_bg_tilemap = nullptr;
@@ -280,7 +280,7 @@ void amusco_state::output_b_w(uint8_t data)
 	m_lamps[6] = BIT(data, 2); // Lamp 6 (Start/Draw)
 	m_lamps[7] = BIT(data, 1); // Lamp 7 (Unknown)
 
-	m_pit->write_gate0(!BIT(data, 4));
+	m_pit->write_gate0(BIT(~data, 4));
 
 //  logerror("Writing %02Xh to PPI output B\n", data);
 }
@@ -300,8 +300,8 @@ void amusco_state::output_c_w(uint8_t data)
 	if (!data)
 		return;
 
-	machine().bookkeeping().coin_counter_w(0, !BIT(data, 1));
-	m_hopper->motor_w(BIT(data, 4));
+	machine().bookkeeping().coin_counter_w(0, BIT(~data, 1));
+	m_hopper->motor_w(BIT(~data, 4));
 
 //  logerror("Writing %02Xh to PPI output C\n", data);
 }
@@ -419,8 +419,8 @@ static INPUT_PORTS_START( amusco )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_POKER_HOLD3 ) // move up in service mode
 
 	PORT_START("IN2")
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(COIN_IMPULSE) PORT_WRITE_LINE_DEVICE_MEMBER(":", amusco_state, coin_irq)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_IMPULSE(COIN_IMPULSE) PORT_WRITE_LINE_DEVICE_MEMBER(":", amusco_state, coin_irq)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(COIN_IMPULSE) PORT_WRITE_LINE_MEMBER(FUNC(amusco_state::coin_irq))
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_IMPULSE(COIN_IMPULSE) PORT_WRITE_LINE_MEMBER(FUNC(amusco_state::coin_irq))
 	PORT_BIT( 0xf9, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
@@ -429,7 +429,7 @@ static INPUT_PORTS_START( draw88pkr )
 
 	PORT_MODIFY("IN1") // Doors probably still exist, though code does nothing with them
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BILL1 ) PORT_IMPULSE(COIN_IMPULSE) PORT_WRITE_LINE_DEVICE_MEMBER(":", amusco_state, coin_irq)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BILL1 ) PORT_IMPULSE(COIN_IMPULSE) PORT_WRITE_LINE_MEMBER(FUNC(amusco_state::coin_irq))
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
@@ -574,7 +574,7 @@ void amusco_state::amusco(machine_config &config)
 	i8155b.in_pc_callback().set(m_rtc, FUNC(msm5832_device::data_r));
 	i8155b.out_pc_callback().set(m_rtc, FUNC(msm5832_device::data_w));
 
-	TICKET_DISPENSER(config, m_hopper, attotime::from_msec(30), TICKET_MOTOR_ACTIVE_LOW, TICKET_STATUS_ACTIVE_HIGH);
+	TICKET_DISPENSER(config, m_hopper, attotime::from_msec(30));
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);

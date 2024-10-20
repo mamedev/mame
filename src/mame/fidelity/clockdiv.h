@@ -23,7 +23,7 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(div_changed) { div_refresh(newval); }
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override { div_refresh(); }
 	virtual void device_post_load() override { div_refresh(); }
 

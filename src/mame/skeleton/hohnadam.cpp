@@ -31,9 +31,9 @@ private:
 	void d40000_w(offs_t offset, u8 data);
 	void d80000_w(offs_t offset, u8 data);
 
-	void main_map(address_map &map);
-	void panel_map(address_map &map);
-	void panel_ext_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
+	void panel_map(address_map &map) ATTR_COLD;
+	void panel_ext_map(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<mcs51_cpu_device> m_panelcpu;

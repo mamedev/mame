@@ -469,7 +469,7 @@ public:
 	void init_mpu12wbk();
 
 protected:
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 	virtual void machine_start() override { m_lamps.resolve(); }
 
 private:
@@ -489,7 +489,7 @@ private:
 	void crtc_vs(int state);
 
 	uint32_t screen_update_mpu12wbk(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	void mpu12wbk_map(address_map &map);
+	void mpu12wbk_map(address_map &map) ATTR_COLD;
 	uint32_t m_frames = 0;
 };
 
@@ -796,7 +796,7 @@ static INPUT_PORTS_START( mpu12wbk )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )                                          // DSW#2 OFF = Change; DSW#2 ON = Coin2
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER )   PORT_NAME("0-4") PORT_CODE(KEYCODE_S)  // unknown
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER )   PORT_READ_LINE_DEVICE_MEMBER("hopper", ticket_dispenser_device, line_r)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER )   PORT_READ_LINE_DEVICE_MEMBER("hopper", FUNC(ticket_dispenser_device::line_r))
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN3 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Supervisor Key") PORT_CODE(KEYCODE_8) PORT_TOGGLE   // key in / other features
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Service")        PORT_CODE(KEYCODE_0)               // all settings
@@ -862,7 +862,7 @@ static INPUT_PORTS_START( goldnjkr )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )                                          // DSW#2 OFF = Change; DSW#2 ON = Coin2
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER )   PORT_NAME("0-4") PORT_CODE(KEYCODE_S)  // unknown
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER )   PORT_READ_LINE_DEVICE_MEMBER("hopper", ticket_dispenser_device, line_r)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER )   PORT_READ_LINE_DEVICE_MEMBER("hopper", FUNC(ticket_dispenser_device::line_r))
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN3 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Supervisor Key") PORT_CODE(KEYCODE_8) PORT_TOGGLE   // key in / other features
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Service")        PORT_CODE(KEYCODE_0)               // all settings
@@ -962,7 +962,7 @@ void mpu12wbk_state::mpu12wbk(machine_config &config)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 	NVRAM(config, "nvram2", nvram_device::DEFAULT_ALL_0);
 
-	HOPPER(config, m_hopper, attotime::from_msec(100), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH );
+	HOPPER(config, m_hopper, attotime::from_msec(100));
 
 	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));

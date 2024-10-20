@@ -24,11 +24,11 @@ public:
 protected:
 	ppu_sh6578_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
-	void ppu_internal_map(address_map& map);
+	void ppu_internal_map(address_map &map) ATTR_COLD;
 
 private:
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	void scanline_increment_fine_ycounter() override;
 

@@ -42,14 +42,14 @@ public:
 
 	void lexibook_jg7425(machine_config &config);
 
-	void map(address_map& map);
+	void map(address_map &map) ATTR_COLD;
 
 protected:
 	uint32_t screen_update(screen_device& screen, bitmap_rgb32& bitmap, const rectangle& cliprect);
 
 private:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	required_device<score7_cpu_device> m_maincpu;
 	required_device<screen_device> m_screen;

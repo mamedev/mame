@@ -44,7 +44,7 @@ protected:
 		set_custom_space(0.0F, (line_height() * (m_have_analog ? 2.0F : 1.0F)) + (tb_border() * 3.0F));
 	}
 
-	virtual void custom_render(uint32_t flags, void *selectedref, float top, float bottom, float x, float y, float x2, float y2) override
+	virtual void custom_render(uint32_t flags, void *selectedref, float top, float bottom, float origx1, float origy1, float origx2, float origy2) override
 	{
 		if (selectedref)
 		{
@@ -57,20 +57,20 @@ protected:
 
 			// measure the name of the token string
 			float const tokenwidth = (std::min)(get_string_width(token) + (gutter_width() * 2.0F), 1.0F);
-			float const boxwidth = (std::max)(tokenwidth, x2 - x);
+			float const boxwidth = (std::max)(tokenwidth, origx2 - origx1);
 			rgb_t const fgcolor(ui().colors().text_color());
 
 			// draw the outer box
 			ui().draw_outlined_box(
 					container(),
-					(1.0F - boxwidth) * 0.5F, y2 + tb_border(),
-					(1.0F + boxwidth) * 0.5F, y2 + bottom,
+					(1.0F - boxwidth) * 0.5F, origy2 + tb_border(),
+					(1.0F + boxwidth) * 0.5F, origy2 + bottom,
 					ui().colors().background_color());
 
 			// show the token
 			draw_text_normal(
 					token,
-					(1.0F - boxwidth) * 0.5F, y2 + (tb_border() * 2.0F), boxwidth,
+					(1.0F - boxwidth) * 0.5F, origy2 + (tb_border() * 2.0F), boxwidth,
 					text_layout::text_justify::CENTER, text_layout::word_wrapping::TRUNCATE,
 					fgcolor);
 
@@ -81,11 +81,11 @@ protected:
 			case ITEM_CLASS_RELATIVE:
 				{
 					// draw the indicator
-					float const indleft = x + gutter_width();
-					float const indright = x2 - gutter_width();
-					float const indtop = y2 + (tb_border() * 2.0F) + (line_height() * 1.2F);
-					float const indbottom = y2 + (tb_border() * 2.0F) + (line_height() * 1.8F);
-					float const indcentre = (x + x2) * 0.5F;
+					float const indleft = origx1 + gutter_width();
+					float const indright = origx2 - gutter_width();
+					float const indtop = origy2 + (tb_border() * 2.0F) + (line_height() * 1.2F);
+					float const indbottom = origy2 + (tb_border() * 2.0F) + (line_height() * 1.8F);
+					float const indcentre = (origx1 + origx2) * 0.5F;
 					s32 const value = (input.itemclass() == ITEM_CLASS_ABSOLUTE) ? input.read_as_absolute(ITEM_MODIFIER_NONE) : input.read_as_relative(ITEM_MODIFIER_NONE);
 					if (0 < value)
 					{

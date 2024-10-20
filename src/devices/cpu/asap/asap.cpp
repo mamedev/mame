@@ -516,17 +516,6 @@ uint32_t asap_device::execute_max_cycles() const noexcept
 }
 
 
-//-------------------------------------------------
-//  execute_input_lines - return the number of
-//  input/interrupt lines
-//-------------------------------------------------
-
-uint32_t asap_device::execute_input_lines() const noexcept
-{
-	return 1;
-}
-
-
 void asap_device::execute_set_input(int inputnum, int state)
 {
 	m_irq_state = (state != CLEAR_LINE);

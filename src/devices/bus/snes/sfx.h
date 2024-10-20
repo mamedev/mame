@@ -17,8 +17,8 @@ protected:
 	sns_rom_superfx_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	virtual void snes_extern_irq_w(int state);
 
@@ -41,7 +41,7 @@ protected:
 
 	uint8_t sfx_ram[0x200000];
 
-	void sfx_map(address_map &map);
+	void sfx_map(address_map &map) ATTR_COLD;
 };
 
 class sns_rom_superfx1_device : public sns_rom_superfx_device
@@ -51,7 +51,7 @@ public:
 	sns_rom_superfx1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 };
 
 class sns_rom_superfx2_device : public sns_rom_superfx_device
@@ -61,7 +61,7 @@ public:
 	sns_rom_superfx2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 };
 
 // device type definition

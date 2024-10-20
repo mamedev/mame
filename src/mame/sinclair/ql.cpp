@@ -164,8 +164,8 @@ private:
 	required_ioport_array<2> m_joy;
 	required_ioport m_config;
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	uint8_t read(offs_t offset);
 	void write(offs_t offset, uint8_t data);
@@ -202,8 +202,8 @@ private:
 	bool m_qimi_enabled;
 	int m_qimi_extint;
 
-	void ipc_io(address_map &map);
-	void ql_mem(address_map &map);
+	void ipc_io(address_map &map) ATTR_COLD;
+	void ql_mem(address_map &map) ATTR_COLD;
 };
 
 

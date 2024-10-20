@@ -55,9 +55,9 @@ public:
 private:
 	void add_ym2413(machine_config& config);
 
-	void memmap_ym2413(address_map &map);
-	void memmap_characteriser_ym2413(address_map &map);
-	void memmap_bootleg_characteriser_ym2413(address_map &map);
+	void memmap_ym2413(address_map &map) ATTR_COLD;
+	void memmap_characteriser_ym2413(address_map &map) ATTR_COLD;
+	void memmap_bootleg_characteriser_ym2413(address_map &map) ATTR_COLD;
 
 	DECLARE_MACHINE_START(mpu4yam);
 
@@ -1663,6 +1663,6 @@ GAME(199?, m4voodoo,  0,        cheatchr_pal<mpu4_characteriser_pal::m435_charac
 GAME(199?, m4magdrg,  0,          cheatchr_pal<mpu4_characteriser_pal::magicdragon_characteriser_prot>(R7, RT1), mpu4_dutch,    mpu4mod4yam_machines_state, init_m4, ROT0,   "Barcrest","Magic Dragon (Barcrest) (MPU4) (DMD1.0)",GAME_FLAGS )
 
 // non-standard protection
-GAME(199?, m4hslo,    0,          bootleg_fixedret<0x56>(R4, RT1),       mpu4_70pc,    mpu4mod4yam_machines_state, init_m4, ROT0,   "(bootleg)","Hot Slot (bootleg) (MPU4) (HOT 3.0)",GAME_FLAGS )
+GAME(199?, m4hslo,    0,          bootleg_fixedret<0x56>(R4, RT1),       mpu4_70pc,    mpu4mod4yam_machines_state, init_m4, ROT0,   "bootleg","Hot Slot (bootleg) (MPU4) (HOT 3.0)",GAME_FLAGS )
 
 GAME(199?, m4addrd,   0,          cheatchr_pal<mpu4_characteriser_pal::m470_characteriser_prot>(R5R, RT1),   mpu4_dutch,    mpu4mod4yam_machines_state, init_m4, ROT0,   "Barcrest","Adders & Ladders (Barcrest) (Dutch) (MPU4) (DAL 1.2)",GAME_FLAGS )

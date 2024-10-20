@@ -50,101 +50,68 @@
 class arm7_cpu_device : public cpu_device, public arm7_disassembler::config
 {
 public:
+	enum
+	{
+		ARM7_IRQ_LINE=0, ARM7_FIRQ_LINE,
+		ARM7_ABORT_EXCEPTION, ARM7_ABORT_PREFETCH_EXCEPTION, ARM7_UNDEFINE_EXCEPTION,
+		ARM7_NUM_LINES
+	};
+	// Really there's only 1 ABORT Line.. and cpu decides whether it's during data fetch or prefetch, but we let the user specify
+
+	enum
+	{
+		ARM7_PC = 0,
+		ARM7_R0, ARM7_R1, ARM7_R2, ARM7_R3, ARM7_R4, ARM7_R5, ARM7_R6, ARM7_R7,
+		ARM7_R8, ARM7_R9, ARM7_R10, ARM7_R11, ARM7_R12, ARM7_R13, ARM7_R14, ARM7_R15,
+		ARM7_FR8, ARM7_FR9, ARM7_FR10, ARM7_FR11, ARM7_FR12, ARM7_FR13, ARM7_FR14,
+		ARM7_IR13, ARM7_IR14, ARM7_SR13, ARM7_SR14, ARM7_FSPSR, ARM7_ISPSR, ARM7_SSPSR,
+		ARM7_CPSR, ARM7_AR13, ARM7_AR14, ARM7_ASPSR, ARM7_UR13, ARM7_UR14, ARM7_USPSR, ARM7_LOGTLB
+	};
+
 	// construction/destruction
 	arm7_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	virtual ~arm7_cpu_device();
 
 	void set_high_vectors() { m_vectorbase = 0xffff0000; }
 
 protected:
-	enum
-	{
-		ARCHFLAG_T    = 1,        // Thumb present
-		ARCHFLAG_E    = 2,        // extended DSP operations present (only for v5+)
-		ARCHFLAG_J    = 4,        // "Jazelle" (direct execution of Java bytecode)
-		ARCHFLAG_MMU  = 8,        // has on-board MMU (traditional ARM style like the SA1110)
-		ARCHFLAG_SA   = 16,       // StrongARM extensions (enhanced TLB)
-		ARCHFLAG_XSCALE   = 32,   // XScale extensions (CP14, enhanced TLB)
-		ARCHFLAG_MODE26   = 64,   // supports 26-bit backwards compatibility mode
-		ARCHFLAG_K    = 128,      // enhanced MMU extensions present (only for v6)
-		ARCHFLAG_T2   = 256,      //Thumb-2 present
-	};
+	enum arm_arch_flag : uint32_t;
+	enum arm_copro_id : uint32_t;
 
-	enum
-	{
-		ARM9_COPRO_ID_STEP_SA1110_A0 = 0,
-		ARM9_COPRO_ID_STEP_SA1110_B0 = 4,
-		ARM9_COPRO_ID_STEP_SA1110_B1 = 5,
-		ARM9_COPRO_ID_STEP_SA1110_B2 = 8,
-		ARM9_COPRO_ID_STEP_SA1110_B4 = 8,
-
-		ARM9_COPRO_ID_STEP_PXA255_A0 = 6,
-
-		ARM9_COPRO_ID_STEP_ARM946_A0 = 1,
-
-		ARM9_COPRO_ID_STEP_ARM1176JZF_S_R0P0 = 0,
-		ARM9_COPRO_ID_STEP_ARM1176JZF_S_R0P7 = 7,
-
-		ARM9_COPRO_ID_PART_ARM1176JZF_S = 0xB76 << 4,
-		ARM9_COPRO_ID_PART_SA1110 = 0xB11 << 4,
-		ARM9_COPRO_ID_PART_ARM946 = 0x946 << 4,
-		ARM9_COPRO_ID_PART_ARM920 = 0x920 << 4,
-		ARM9_COPRO_ID_PART_ARM710 = 0x710 << 4,
-		ARM9_COPRO_ID_PART_PXA250 = 0x200 << 4,
-		ARM9_COPRO_ID_PART_PXA255 = 0x2d0 << 4,
-		ARM9_COPRO_ID_PART_PXA270 = 0x411 << 4,
-		ARM9_COPRO_ID_PART_GENERICARM7 = 0x700 << 4,
-
-		ARM9_COPRO_ID_PXA255_CORE_REV_SHIFT = 10,
-
-		ARM9_COPRO_ID_ARCH_V4     = 0x01 << 16,
-		ARM9_COPRO_ID_ARCH_V4T    = 0x02 << 16,
-		ARM9_COPRO_ID_ARCH_V5     = 0x03 << 16,
-		ARM9_COPRO_ID_ARCH_V5T    = 0x04 << 16,
-		ARM9_COPRO_ID_ARCH_V5TE   = 0x05 << 16,
-		ARM9_COPRO_ID_ARCH_V5TEJ  = 0x06 << 16,
-		ARM9_COPRO_ID_ARCH_V6     = 0x07 << 16,
-		ARM9_COPRO_ID_ARCH_CPUID  = 0x0F << 16,
-
-		ARM9_COPRO_ID_SPEC_REV0   = 0x00 << 20,
-		ARM9_COPRO_ID_SPEC_REV1   = 0x01 << 20,
-
-		ARM9_COPRO_ID_MFR_ARM = 0x41 << 24,
-		ARM9_COPRO_ID_MFR_DEC = 0x44 << 24,
-		ARM9_COPRO_ID_MFR_INTEL = 0x69 << 24
-	};
-
-	arm7_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint8_t archRev, uint32_t archFlags, endianness_t endianness);
+	arm7_cpu_device(
+			const machine_config &mconfig,
+			device_type type,
+			const char *tag,
+			device_t *owner,
+			uint32_t clock,
+			uint8_t archRev,
+			uint32_t archFlags,
+			endianness_t endianness,
+			address_map_constructor internal_map = address_map_constructor());
 
 	void postload();
 
-	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	// device_t implementation
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
-	// device_execute_interface overrides
+	// device_execute_interface implementation
 	virtual uint32_t execute_min_cycles() const noexcept override { return 3; }
 	virtual uint32_t execute_max_cycles() const noexcept override { return 4; }
-	virtual uint32_t execute_input_lines() const noexcept override { return 4; } /* There are actually only 2 input lines: we use 3 variants of the ABORT line while there is only 1 real one */
 	virtual void execute_run() override;
 	virtual void execute_set_input(int inputnum, int state) override;
 
-	// device_memory_interface overrides
+	// device_memory_interface  implementation
 	virtual space_config_vector memory_space_config() const override;
 	virtual bool memory_translate(int spacenum, int intention, offs_t &address, address_space *&target_space) override;
 
-	// device_state_interface overrides
+	// device_state_interface  implementation
 	virtual void state_export(const device_state_entry &entry) override;
 	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
 
-	// device_disasm_interface overrides
+	// device_disasm_interface  implementation
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 	virtual bool get_t_flag() const override;
-
-	address_space_config m_program_config;
-	memory_access<32, 2, 0, ENDIANNESS_LITTLE>::cache m_cachele;
-	memory_access<32, 2, 0, ENDIANNESS_BIG>::cache m_cachebe;
-
-	uint32_t m_r[/*NUM_REGS*/37];
 
 	void translate_insn_command(const std::vector<std::string_view> &params);
 	void translate_data_command(const std::vector<std::string_view> &params);
@@ -157,6 +124,16 @@ protected:
 	void add_ce_kernel_addr(offs_t addr, std::string value);
 	void init_ce_kernel_addrs();
 	void print_ce_kernel_address(const offs_t addr);
+
+	// for SoCs with onboard interrupt controllers - only call from scheduler or CPU's own context
+	void set_irq(int state);
+	void set_fiq(int state);
+
+	address_space_config m_program_config;
+	memory_access<32, 2, 0, ENDIANNESS_LITTLE>::cache m_cachele;
+	memory_access<32, 2, 0, ENDIANNESS_BIG>::cache m_cachebe;
+
+	uint32_t m_r[/*NUM_REGS*/37];
 
 	std::string m_ce_kernel_addrs[0x10400];
 	bool m_ce_kernel_addr_present[0x10400];
@@ -686,7 +663,7 @@ public:
 protected:
 	arm946es_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 private:
 	uint32_t cp15_control, cp15_itcm_base, cp15_dtcm_base, cp15_itcm_size, cp15_dtcm_size;
@@ -717,7 +694,7 @@ public:
 	virtual void arm7_rt_w_callback(offs_t offset, uint32_t data) override;
 
 protected:
-	virtual void device_reset() override;
+	virtual void device_reset() override ATTR_COLD;
 };
 
 class igs036_cpu_device : public arm946es_cpu_device

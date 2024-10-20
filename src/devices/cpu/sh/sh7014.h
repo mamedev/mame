@@ -48,16 +48,16 @@ public:
 	auto read_portf()  { return m_port.lookup()->port_f_read_callback(); }
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 	virtual void execute_set_input(int inputnum, int state) override;
 
 	virtual void sh2_exception_internal(const char *message, int irqline, int vector) override;
 
 private:
-	void sh7014_map(address_map &map);
+	void sh7014_map(address_map &map) ATTR_COLD;
 
 	void set_irq(int vector, int level, bool is_internal);
 

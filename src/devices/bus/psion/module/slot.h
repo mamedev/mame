@@ -78,13 +78,13 @@ public:
 	void intr_w(int state) { m_intr_cb(state); }
 
 protected:
-	// device-level overrides
-	virtual void device_start() override;
-
-	device_psion_module_interface *m_card;
+	// device_t overrides
+	virtual void device_start() override ATTR_COLD;
 
 private:
 	devcb_write_line m_intr_cb;
+
+	device_psion_module_interface *m_card;
 };
 
 

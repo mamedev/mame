@@ -26,12 +26,13 @@ public:
 
 	auto irq_cb() { return m_irq_cb.bind(); }
 	auto drq_cb() { return m_drq_cb.bind(); }
+	auto wait_cb() { return m_wait_cb.bind(); }
 
 protected:
 
-	virtual void device_start() override;
-	virtual void device_reset() override;
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 	void ctrl_w(u8 val);
 	void data_w(u8 val);
@@ -43,12 +44,13 @@ protected:
 	// Burst mode was required for a 2 MHz Z80 to handle 8" DD data rates.
 	// The typical irq/drq was too slow, this utilizes wait states to read the
 	// WD1797 data port once the drq line is high.
-	inline bool burstMode() { return !m_drq_allowed; }
+	inline bool burst_mode_r() { return !m_drq_allowed; }
 
 private:
 
 	devcb_write_line                           m_irq_cb;
 	devcb_write_line                           m_drq_cb;
+	devcb_write_line                           m_wait_cb;
 
 	required_device<fd1797_device>             m_fdc;
 	required_device_array<floppy_connector, 8> m_floppies;

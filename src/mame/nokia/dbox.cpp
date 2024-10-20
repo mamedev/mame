@@ -38,12 +38,12 @@
  * by Nokia 1985. Luxor designed among other things TV sets, Radios and the famous ABC-80. The Nokia Multimedia
  * Division was formed in Linköping as a result of the Luxor acquisition. Their main design was a satellite
  * receiver, the first satellite in Europe was launched in 1988 and the market was growing fast however it took
- * a long time, almost 10 years before the breakthrough came for Nokia, a deal with the Kirsch Gruppe was struck and
+ * a long time, almost 10 years before the breakthrough came for Nokia, a deal with the Kirch Gruppe was struck and
  * in 1996 the 68340 based Dbox-1 was released in Germany. The original design was expensive, so soon a cost reduced
  * version based on PPC, the Dbox-2, was released. The boxes sold in millions but the margins were negative or very
- * low at best and the Kirsch Gruppe went bankrupt in 2002 and Nokia decided to shutdown the facility in Linköping.
+ * low at best and the Kirch Gruppe went bankrupt in 2002 and Nokia decided to shutdown the facility in Linköping.
  *
- * The heavily subsidised Dbox was very popular in Holland since Kirsch Gruppe didn't lock usage to themselves. This was
+ * The heavily subsidised Dbox was very popular in Holland since Kirch Gruppe didn't lock usage to themselves. This was
  * corrected in a forced firmware upgrade leaving the "customers" in Holland without a working box. Pretty soon a
  * shareware software developed by Uli Hermann appeared called DVB98 and later DVB2000 re-enabling the boxes in  Holland
  * and blocking upgrades. Uli's software was by many considered better than the original software.
@@ -104,7 +104,7 @@
  * --------------------------------------------------------------------------
  * Address Range     Memory Space (physical)   Notes
  * --------------------------------------------------------------------------
- * 0xffffffff                                    (top of memory)
+ * 0xffffffff                                  (top of memory)
  * 0x00FFF780-0x00FFF7BF DMA                   offset to SIM40
  * 0x00FFF700-0x00FFF721 Serial devices        offset to SIM40
  * 0x00FFF600-0x00FFF67F Timers                offset to SIM40
@@ -398,15 +398,14 @@
  ****************************************************************************/
 
 #include "emu.h"
-#include "machine/68340.h"
-#include "machine/intelfsh.h"
-
-#include "video/sda5708.h"
-#include "machine/latch8.h" // IP16
-
-#include "sda5708.lh"
 
 #include "bus/rs232/rs232.h"
+#include "machine/68340.h"
+#include "machine/74259.h"
+#include "machine/intelfsh.h"
+#include "video/sda5708.h"
+
+#include "sda5708.lh"
 
 //**************************************************************************
 //  MACROS / CONSTANTS
@@ -453,15 +452,15 @@ public:
 private:
 	required_device<m68340_cpu_device> m_maincpu;
 	required_device<sda5708_device> m_display;
-	required_device<latch8_device> m_ip16_74259;
+	required_device<hct259_device> m_ip16_74259;
 
-	virtual void machine_reset() override;
-	virtual void machine_start() override;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void machine_start() override ATTR_COLD;
 	void sda5708_reset(uint8_t data);
 	void sda5708_clk(uint8_t data);
 	void write_pa(uint8_t data);
 
-	void dbox_map(address_map &map);
+	void dbox_map(address_map &map) ATTR_COLD;
 
 #if LOCALFLASH
 	uint16_t sysflash_r(offs_t offset);
@@ -520,66 +519,66 @@ void dbox_state::sysflash_w(offs_t offset, uint16_t data, uint16_t mem_mask) {
 	switch (m_sf_state)
 	{
 	case 0xf0:// Reset command, to get back to reading flash data
-	  m_sf_mode = 0;
-	  m_sf_state = 0;
-	  LOGFLASH("- Reset command\n");
-	  break;
+		m_sf_mode = 0;
+		m_sf_state = 0;
+		LOGFLASH("- Reset command\n");
+		break;
 	case 0xaa: // Building a multi byte command
-	  m_sf_mode = 1;
-	  break;
+		m_sf_mode = 1;
+		break;
 	case 0xaa55: // Building a multi byte command
 	case 0xaa55a0: // Program Data
 	case 0xaa5580: // Erase
 	case 0xaa5580aa: // Chip or Sector Erase
-	  break;
+		break;
 	case 0xaa5590: // Autoselect mode
-	  m_sf_mode = 4;
-	  m_sf_state = 0;
-	  LOGFLASH("- Autoselect Mode\n");
-	  break;
+		m_sf_mode = 4;
+		m_sf_state = 0;
+		LOGFLASH("- Autoselect Mode\n");
+		break;
 	case 0xb0: // Erase Suspend Mode
-	  m_sf_mode = 2;
-	  m_sf_state = 0;
-	  LOGFLASH("- Erase Suspend Mode\n");
-	  break;
+		m_sf_mode = 2;
+		m_sf_state = 0;
+		LOGFLASH("- Erase Suspend Mode\n");
+		break;
 	case 0x30: // Erase Resume Mode
-	  m_sf_mode = 3;
-	  m_sf_state = 0;
-	  LOGFLASH("- Erase Resume Mode\n");
-	  break;
+		m_sf_mode = 3;
+		m_sf_state = 0;
+		LOGFLASH("- Erase Resume Mode\n");
+		break;
 	}
 }
 
 uint16_t dbox_state::sysflash_r(offs_t offset) {
 
-  if (m_sf_mode == 0)
-  {
-	return m_sysflash[offset];
-  }
-  else
-  {
-	if (m_sf_mode == 4)
+	if (m_sf_mode == 0)
 	{
-	  switch (offset & 0xff)
-	  {
-	  case 0x00: LOGFLASH("- Manufacturer ID\n"); return 01; break; // Manufacturer ID
-//      case 0x01: LOGFLASH("- Device ID\n"); return 0x22d6; break; // Device ID (Top Boot Block) 29F800TA
-	  case 0x01: LOGFLASH("- Device ID\n"); return 0x2258; break; // Device ID (Bottom Boot Block) 29F800BA
-	  case 0x02: LOGFLASH("- Sector %02x protection: 1 (hardcoded)\n", offset >> 12); return 01; break;
-	  default:     LOGFLASH(" - Unhandled Mode:%d State:%08x\n", m_sf_mode, m_sf_state);
-	  }
+		return m_sysflash[offset];
 	}
-  }
-  return 0;
+	else
+	{
+		if (m_sf_mode == 4)
+		{
+			switch (offset & 0xff)
+			{
+			case 0x00: LOGFLASH("- Manufacturer ID\n"); return 01; break; // Manufacturer ID
+			//case 0x01: LOGFLASH("- Device ID\n"); return 0x22d6; break; // Device ID (Top Boot Block) 29F800TA
+			case 0x01: LOGFLASH("- Device ID\n"); return 0x2258; break; // Device ID (Bottom Boot Block) 29F800BA
+			case 0x02: LOGFLASH("- Sector %02x protection: 1 (hardcoded)\n", offset >> 12); return 01; break;
+			default:   LOGFLASH(" - Unhandled Mode:%d State:%08x\n", m_sf_mode, m_sf_state);
+			}
+		}
+	}
+	return 0;
 }
 /* End of flash emulation */
 #endif
 
 void dbox_state::dbox_map(address_map &map)
 {
-// CS0 - bootrom
-// 008004ee Address mask CS0 00000040, 003ffff5 (ffffffff) - Mask: 003fff00 FCM:0f DD:1 PS: 16-Bit
-// 008004f8 Base address CS0 00000044, 0000005b (ffffffff) - Base: 00000000 BFC:05 WP:1 FTE:0 NCS:1 Valid: Yes
+	// CS0 - bootrom
+	// 008004ee Address mask CS0 00000040, 003ffff5 (ffffffff) - Mask: 003fff00 FCM:0f DD:1 PS: 16-Bit
+	// 008004f8 Base address CS0 00000044, 0000005b (ffffffff) - Base: 00000000 BFC:05 WP:1 FTE:0 NCS:1 Valid: Yes
 #if LOCALFLASH
 	map(0x000000, 0x3fffff).rom().r(FUNC(dbox_state::sysflash_r)).region("flash0", 0);
 	map(0x000000, 0x3fffff).w(FUNC(dbox_state::sysflash_w));
@@ -587,19 +586,19 @@ void dbox_state::dbox_map(address_map &map)
 	map(0x000000, 0x0fffff).rw("flash0", FUNC(intelfsh16_device::read), FUNC(intelfsh16_device::write));
 	map(0x100000, 0x1fffff).rw("flash1", FUNC(intelfsh16_device::read), FUNC(intelfsh16_device::write));
 #endif
-// CS2 - CS demux
-// 0000009a Address mask CS2 00000050, 00007fff (ffffffff) - Mask: 00007f00 FCM:0f DD:3 PS: External DSACK response
-// 000000a2 Base address CS2 00000054, 00700003 (ffffffff) - Base: 00700000 BFC:00 WP:0 FTE:0 NCS:1 Valid: Yes
+	// CS2 - CS demux
+	// 0000009a Address mask CS2 00000050, 00007fff (ffffffff) - Mask: 00007f00 FCM:0f DD:3 PS: External DSACK response
+	// 000000a2 Base address CS2 00000054, 00700003 (ffffffff) - Base: 00700000 BFC:00 WP:0 FTE:0 NCS:1 Valid: Yes
 	//map(0x700000, 0x77ffff)
-// CS3 - 8 bit devices
-// 000000aa Address mask CS3 00000058, 000007f2 (ffffffff) - Mask: 00000700 FCM:0f DD:0 PS: 8-bit
-// 000000b2 Base address CS3 0000005c, 00780003 (ffffffff) - Base: 00780000 BFC:00 WP:0 FTE:0 NCS:1 Valid: Yes
+	// CS3 - 8 bit devices
+	// 000000aa Address mask CS3 00000058, 000007f2 (ffffffff) - Mask: 00000700 FCM:0f DD:0 PS: 8-bit
+	// 000000b2 Base address CS3 0000005c, 00780003 (ffffffff) - Base: 00780000 BFC:00 WP:0 FTE:0 NCS:1 Valid: Yes
 	// map(0x780000, 0x7807ff)
 	map(0x780100, 0x7801ff).w(FUNC(dbox_state::sda5708_reset));
 	map(0x780600, 0x7806ff).w(FUNC(dbox_state::sda5708_clk));
-// CS1 - RAM area
-// 0000008a Address mask CS1 00000048, 003ffff5 (ffffffff) - Mask: 003fff00 FCM:0f DD:1 PS: 16-Bit
-// 00000092 Base address CS1 0000004c, 00800003 (ffffffff) - Base: 00800000 BFC:00 WP:0 FTE:0 NCS:1 Valid: Yes
+	// CS1 - RAM area
+	// 0000008a Address mask CS1 00000048, 003ffff5 (ffffffff) - Mask: 003fff00 FCM:0f DD:1 PS: 16-Bit
+	// 00000092 Base address CS1 0000004c, 00800003 (ffffffff) - Base: 00800000 BFC:00 WP:0 FTE:0 NCS:1 Valid: Yes
 	map(0x800000, 0xcfffff).ram();
 }
 
@@ -634,9 +633,9 @@ void dbox_state::dbox(machine_config &config)
 	SDA5708(config, m_display, 0);
 	config.set_default_layout(layout_sda5708);
 
-	/* IP16 74256 8 bit latch */
-	LATCH8(config, m_ip16_74259);
-	m_ip16_74259->write_cb<4>().set("display", FUNC(sda5708_device::reset_w));
+	/* IP16 74259 8 bit latch */
+	HCT259(config, m_ip16_74259);
+	m_ip16_74259->q_out_cb<4>().set("display", FUNC(sda5708_device::reset_w));
 }
 
 void dbox_state::init_dbox()
@@ -662,4 +661,4 @@ ROM_END
 } // anonymous namespace
 
 
-COMP( 1996, dbox, 0, 0, dbox, dbox, dbox_state, init_dbox, "Nokia Multimedia", "D-box 1, Kirsch gruppe", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( 1996, dbox, 0, 0, dbox, dbox, dbox_state, init_dbox, "Nokia Multimedia", "D-box 1 (Kirch-Gruppe)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

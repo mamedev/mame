@@ -62,9 +62,9 @@ public:
 	void init_intv();
 
 private:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 	emu_timer *m_int_complete_timer;
 	emu_timer *m_int2_complete_timer;
@@ -127,12 +127,12 @@ private:
 	TIMER_CALLBACK_MEMBER(interrupt_complete);
 	TIMER_CALLBACK_MEMBER(btb_fill);
 
-	void intv2_mem(address_map &map);
-	void intv_mem(address_map &map);
-	void intvecs_mem(address_map &map);
-	void intvkbd2_mem(address_map &map);
-	void intvkbd_mem(address_map &map);
-	void intvoice_mem(address_map &map);
+	void intv2_mem(address_map &map) ATTR_COLD;
+	void intv_mem(address_map &map) ATTR_COLD;
+	void intvecs_mem(address_map &map) ATTR_COLD;
+	void intvkbd2_mem(address_map &map) ATTR_COLD;
+	void intvkbd_mem(address_map &map) ATTR_COLD;
+	void intvoice_mem(address_map &map) ATTR_COLD;
 
 	int m_is_keybd = 0;
 

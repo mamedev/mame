@@ -215,16 +215,16 @@ private:
 	u8 port82_r(); // cassin for 128k
 	void port82_w(u8 data); // banking 128k
 	void port84_w(u8 data); // dac port 48k
-	void machine_start() override;
-	void machine_reset() override;
+	void machine_start() override ATTR_COLD;
+	void machine_reset() override ATTR_COLD;
 	static void camplynx_floppy_formats(format_registration &fr);
 	MC6845_UPDATE_ROW(lynx48k_update_row);
 	MC6845_UPDATE_ROW(lynx128k_update_row);
-	void lynx128k_io(address_map &map);
-	void lynx128k_mem(address_map &map);
-	void lynx48k_io(address_map &map);
-	void lynx48k_mem(address_map &map);
-	void lynx96k_io(address_map &map);
+	void lynx128k_io(address_map &map) ATTR_COLD;
+	void lynx128k_mem(address_map &map) ATTR_COLD;
+	void lynx48k_io(address_map &map) ATTR_COLD;
+	void lynx48k_mem(address_map &map) ATTR_COLD;
+	void lynx96k_io(address_map &map) ATTR_COLD;
 	u8 m_port58 = 0U;
 	u8 m_port80 = 0U;
 	u8 m_bankdata = 0U;
@@ -558,7 +558,7 @@ void camplynx_state::lynx128k_io(address_map &map)
 static INPUT_PORTS_START( lynx48k )
 	PORT_START("LINE0")
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Shift") PORT_CODE(KEYCODE_LSHIFT) PORT_CODE(KEYCODE_RSHIFT) PORT_CHAR(UCHAR_SHIFT_1)
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Esc") PORT_CODE(KEYCODE_ESC) PORT_CHAR(27) PORT_CHANGED_MEMBER(DEVICE_SELF, camplynx_state, brk_key, 0)
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Esc") PORT_CODE(KEYCODE_ESC) PORT_CHAR(27) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(camplynx_state::brk_key), 0)
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Down") PORT_CODE(KEYCODE_DOWN) PORT_CHAR(UCHAR_MAMEKEY(DOWN))
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Up") PORT_CODE(KEYCODE_UP) PORT_CHAR(UCHAR_MAMEKEY(UP))
 	PORT_BIT(0x0e, IP_ACTIVE_LOW, IPT_UNUSED)

@@ -30,7 +30,7 @@ public:
 	// construction/destruction
 	imagetek_i4100_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
-	void map(address_map &map);
+	void map(address_map &map) ATTR_COLD;
 
 	void set_tmap_flip_xoffsets(int x1, int x2, int x3) { m_tilemap_flip_scrolldx[0] = x1; m_tilemap_flip_scrolldx[1] = x2; m_tilemap_flip_scrolldx[2] = x3; }
 	void set_tmap_flip_yoffsets(int y1, int y2, int y3) { m_tilemap_flip_scrolldy[0] = y1; m_tilemap_flip_scrolldy[1] = y2; m_tilemap_flip_scrolldy[2] = y3; }
@@ -75,9 +75,9 @@ protected:
 
 	// device-level overrides
 	//virtual void device_validity_check(validity_checker &valid) const override;
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	virtual void update_irq_state();
 
@@ -236,7 +236,7 @@ public:
 	// (it's unknown how the chip enables external sync)
 	u32 get_background_pen() { return m_palette->pen(m_background_color); }
 
-	void v2_map(address_map &map);
+	void v2_map(address_map &map) ATTR_COLD;
 };
 
 class imagetek_i4300_device : public imagetek_i4100_device
@@ -245,11 +245,11 @@ public:
 	// construction/destruction
 	imagetek_i4300_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
-	void v3_map(address_map &map);
+	void v3_map(address_map &map) ATTR_COLD;
 	u8 irq_vector_r(offs_t offset);
 
 protected:
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 	virtual void update_irq_state() override;
 

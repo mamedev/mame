@@ -67,8 +67,8 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual void device_start() override ATTR_COLD;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 
 	inline u16 ef9340_get_c_addr(u8 x, u8 y);
 	inline void ef9340_inc_c();

@@ -144,9 +144,9 @@ public:
 	int multigam_inputs_r();
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	required_device<rp2a03_device> m_maincpu;
@@ -221,11 +221,11 @@ private:
 	void supergm3_set_bank();
 	void multigm3_decrypt(uint8_t* mem, int memsize, const uint8_t* decode_nibble);
 	void multigam3_mmc3_scanline_cb(int scanline, bool vblank, bool blanked);
-	void multigam_map(address_map &map);
-	void multigm3_map(address_map &map);
-	void multigmt_map(address_map &map);
-	void supergm3_map(address_map &map);
-	void ppu_map(address_map &map);
+	void multigam_map(address_map &map) ATTR_COLD;
+	void multigm3_map(address_map &map) ATTR_COLD;
+	void multigmt_map(address_map &map) ATTR_COLD;
+	void supergm3_map(address_map &map) ATTR_COLD;
+	void ppu_map(address_map &map) ATTR_COLD;
 };
 
 
@@ -1010,7 +1010,7 @@ static INPUT_PORTS_START( multigam_common )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(2)
 
 	PORT_START("IN0")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(multigam_state, multigam_inputs_r)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(multigam_state::multigam_inputs_r))
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN1 )
 INPUT_PORTS_END
 

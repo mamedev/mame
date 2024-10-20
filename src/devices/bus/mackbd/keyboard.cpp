@@ -235,7 +235,7 @@ template <unsigned Rows>
 class peripheral_base : public device_t, public device_mac_keyboard_interface
 {
 public:
-	CUSTOM_INPUT_MEMBER(columns_r)
+	ioport_value columns_r()
 	{
 		ioport_value result(make_bitmask<ioport_value>(Rows));
 		for (unsigned i = 0U; Rows > i; ++i)
@@ -247,7 +247,7 @@ public:
 		return result ^ make_bitmask<ioport_value>(Rows);
 	}
 
-	CUSTOM_INPUT_MEMBER(host_data_r)
+	ioport_value host_data_r()
 	{
 		return m_host_data_in ^ 0x01;
 	}
@@ -402,12 +402,12 @@ protected:
 class keypad_base : public peripheral_base<3>
 {
 public:
-	CUSTOM_INPUT_MEMBER(keyboard_clock_r)
+	ioport_value keyboard_clock_r()
 	{
 		return m_keyboard_clock_in ^ 0x01;
 	}
 
-	CUSTOM_INPUT_MEMBER(keyboard_data_r)
+	ioport_value keyboard_data_r()
 	{
 		return m_keyboard_data_in ^ 0x01;
 	}
@@ -561,12 +561,12 @@ INPUT_PORTS_START(keyboard_us)
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_UNUSED)
 
 	PORT_START("P0")
-	PORT_BIT(0x3f, IP_ACTIVE_LOW, IPT_CUSTOM) PORT_CUSTOM_MEMBER(keyboard_base, columns_r)
+	PORT_BIT(0x3f, IP_ACTIVE_LOW, IPT_CUSTOM) PORT_CUSTOM_MEMBER(FUNC(keyboard_base::columns_r))
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_CAPSLOCK)                         PORT_CHAR(UCHAR_MAMEKEY(CAPSLOCK)) PORT_NAME("Caps Lock") PORT_TOGGLE
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_UNUSED)
 
 	PORT_START("P2")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_CUSTOM) PORT_CUSTOM_MEMBER(keyboard_base, host_data_r)
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_CUSTOM) PORT_CUSTOM_MEMBER(FUNC(keyboard_base::host_data_r))
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_UNUSED)
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_LSHIFT) PORT_CODE(KEYCODE_RSHIFT) PORT_CHAR(UCHAR_SHIFT_1)           PORT_NAME("Shift")
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_LCONTROL)                                                            PORT_NAME("Command")
@@ -890,7 +890,7 @@ INPUT_PORTS_START(keypad)
 	PORT_BIT(0x08, IP_ACTIVE_LOW,  IPT_KEYPAD) PORT_CODE(KEYCODE_8_PAD)      PORT_CHAR(UCHAR_MAMEKEY(8_PAD))     PORT_NAME("Keypad 8")
 	PORT_BIT(0x10, IP_ACTIVE_LOW,  IPT_KEYPAD) PORT_CODE(KEYCODE_9_PAD)      PORT_CHAR(UCHAR_MAMEKEY(9_PAD))     PORT_NAME("Keypad 9")
 	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_CUSTOM)
-	PORT_BIT(0x40, IP_ACTIVE_LOW,  IPT_CUSTOM) PORT_CUSTOM_MEMBER(keypad_base, keyboard_clock_r)
+	PORT_BIT(0x40, IP_ACTIVE_LOW,  IPT_CUSTOM) PORT_CUSTOM_MEMBER(FUNC(keypad_base::keyboard_clock_r))
 	PORT_BIT(0x80, IP_ACTIVE_LOW,  IPT_UNUSED)
 
 	PORT_START("P1")
@@ -904,9 +904,9 @@ INPUT_PORTS_START(keypad)
 	PORT_BIT(0x80, IP_ACTIVE_LOW,  IPT_KEYPAD) PORT_CODE(KEYCODE_7_PAD)      PORT_CHAR(UCHAR_MAMEKEY(7_PAD))     PORT_NAME("Keypad 7")
 
 	PORT_START("P2")
-	PORT_BIT(0x01, IP_ACTIVE_LOW,  IPT_CUSTOM) PORT_CUSTOM_MEMBER(keypad_base, host_data_r)
-	PORT_BIT(0x02, IP_ACTIVE_LOW,  IPT_CUSTOM) PORT_CUSTOM_MEMBER(keypad_base, keyboard_data_r)
-	PORT_BIT(0x0c, IP_ACTIVE_LOW,  IPT_CUSTOM) PORT_CUSTOM_MEMBER(keypad_base, columns_r)
+	PORT_BIT(0x01, IP_ACTIVE_LOW,  IPT_CUSTOM) PORT_CUSTOM_MEMBER(FUNC(keypad_base::host_data_r))
+	PORT_BIT(0x02, IP_ACTIVE_LOW,  IPT_CUSTOM) PORT_CUSTOM_MEMBER(FUNC(keypad_base::keyboard_data_r))
+	PORT_BIT(0x0c, IP_ACTIVE_LOW,  IPT_CUSTOM) PORT_CUSTOM_MEMBER(FUNC(keypad_base::columns_r))
 INPUT_PORTS_END
 
 INPUT_PORTS_START(keypad_eu)

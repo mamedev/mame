@@ -30,8 +30,8 @@ public:
 	void att3b2v3(machine_config &config);
 
 private:
-	void mem_map_300(address_map &map);
-	void mem_map_600(address_map &map);
+	void mem_map_300(address_map &map) ATTR_COLD;
+	void mem_map_600(address_map &map) ATTR_COLD;
 
 	required_device<we32100_device> m_maincpu;
 };

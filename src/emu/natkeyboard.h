@@ -62,10 +62,8 @@ public:
 
 	// posting
 	void post_char(char32_t ch, bool normalize_crlf = false);
-	void post(const char32_t *text, size_t length = 0, const attotime &rate = attotime::zero);
-	void post_utf8(const char *text, size_t length = 0, const attotime &rate = attotime::zero);
+	void post(std::u32string_view text, const attotime &rate = attotime::zero);
 	void post_utf8(std::string_view text, const attotime &rate = attotime::zero);
-	void post_coded(const char *text, size_t length = 0, const attotime &rate = attotime::zero);
 	void post_coded(std::string_view text, const attotime &rate = attotime::zero);
 	void paste();
 

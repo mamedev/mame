@@ -70,7 +70,7 @@ correctly, these ROMs will always be enabled.
 As it so happens, only four counter values are ever used, which is
 fortunate because the PAL only contains signals to enable the ROMs for
 those four counter values.  The valid counter values are $8, $9, $A, and
-$B.  The counter's intial value is $A, which is set by jumpers on the
+$B.  The counter's initial value is $A, which is set by jumpers on the
 daughterboard.  Following is a description of the resulting decryptions
 for these four counter states.
 
@@ -135,7 +135,11 @@ MACHINE_RESET_MEMBER(epospm_state, theglobp)
 
 /*
 
-Same Epos board as usual(theglobp,beastf,street heat). This is fairly easy to decrypt since it has consecutive bytes with the same algorithym.  There are 4 different algorithyms.  One consists almost entirely of text, one contains the majority of code and the remaining 2 are not used much and are therefore the most difficult.  It is however difficult to decrypt to rom.  The data for the coin sound is actually program code in a different phase. You need to move the sound tables and add a rom to get it to run without the daughterboard.
+Same Epos board as usual(theglobp,beastf,street heat). This is fairly easy to decrypt since it has consecutive bytes with the same algorithm.
+There are 4 different algorithms.  One consists almost entirely of text, one contains the majority of code and the remaining 2 are not used
+much and are therefore the most difficult. It is however difficult to decrypt to ROM.
+The data for the coin sound is actually program code in a different phase. You need to move the sound tables and add a ROM to get it to run
+without the daughterboard.
 
 acitya contains a bug with the insurance in blackjack.  It's impossible to collect, so it's likely that acitya is earlier than bwcasino.
 

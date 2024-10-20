@@ -52,7 +52,7 @@
 
     -   The Speech Feature enhances the game play.
 
-    -   Schematics: https://ia800501.us.archive.org/16/items/ArcadeGameManualGrandchampion/grandchampion.pdf
+    -   Schematics: https://archive.org/download/ArcadeGameManualGrandchampion/grandchampion.pdf
 
 ***************************************************************************/
 

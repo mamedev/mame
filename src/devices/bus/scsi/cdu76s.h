@@ -25,7 +25,7 @@ public:
 	virtual void ReadData( uint8_t *data, int dataLength ) override;
 
 protected:
-	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 };
 
 // device type definition

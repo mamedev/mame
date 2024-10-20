@@ -49,9 +49,9 @@ public:
 		m_cpua_out(*this, "genout%u", 0U)
 	{ }
 
-	DECLARE_CUSTOM_INPUT_MEMBER(gas_pedal_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(brake_pedal_r);
-	template <int axis> DECLARE_CUSTOM_INPUT_MEMBER(adstick_r);
+	ioport_value gas_pedal_r();
+	ioport_value brake_pedal_r();
+	template <int axis> ioport_value adstick_r();
 
 	void bshark_base(machine_config &config);
 	void bshark(machine_config &config);
@@ -59,8 +59,8 @@ public:
 
 protected:
 	virtual void device_post_load() override;
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	void screen_config(machine_config &config, int vdisp_start, int vdisp_end);
 
@@ -102,9 +102,9 @@ private:
 	u32 screen_update_bshark(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void parse_cpu_control();
 
-	void bshark_cpub_map(address_map &map);
-	void bshark_map(address_map &map);
-	void bsharkjjs_map(address_map &map);
+	void bshark_cpub_map(address_map &map) ATTR_COLD;
+	void bshark_map(address_map &map) ATTR_COLD;
+	void bsharkjjs_map(address_map &map) ATTR_COLD;
 };
 
 
@@ -122,13 +122,13 @@ public:
 	void dblaxle(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 	u16 dblaxle_steer_input_r(offs_t offset);
 
 	u32 screen_update_chasehq(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void z80_sound_map(address_map &map);
+	void z80_sound_map(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_audiocpu;
 
@@ -141,10 +141,10 @@ private:
 	u32 screen_update_aquajack(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	u32 screen_update_dblaxle(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void aquajack_map(address_map &map);
-	void aquajack_cpub_map(address_map &map);
-	void dblaxle_map(address_map &map);
-	void dblaxle_cpub_map(address_map &map);
+	void aquajack_map(address_map &map) ATTR_COLD;
+	void aquajack_cpub_map(address_map &map) ATTR_COLD;
+	void dblaxle_map(address_map &map) ATTR_COLD;
+	void dblaxle_cpub_map(address_map &map) ATTR_COLD;
 
 	required_memory_bank m_z80bank;
 };
@@ -163,8 +163,8 @@ public:
 	void enforce(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	u8 contcirc_input_bypass_r();
@@ -174,10 +174,10 @@ private:
 	void contcirc_draw_sprites_16x8(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int y_offs);
 	u32 screen_update_contcirc(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void contcirc_map(address_map &map);
-	void contcirc_cpub_map(address_map &map);
-	void enforce_map(address_map &map);
-	void enforce_cpub_map(address_map &map);
+	void contcirc_map(address_map &map) ATTR_COLD;
+	void contcirc_cpub_map(address_map &map) ATTR_COLD;
+	void enforce_map(address_map &map) ATTR_COLD;
+	void enforce_cpub_map(address_map &map) ATTR_COLD;
 
 	output_finder<2> m_shutter_out;
 
@@ -203,8 +203,8 @@ private:
 	u16 chasehq_motor_r(offs_t offset);
 	void chasehq_motor_w(offs_t offset, u16 data);
 
-	void chasehq_map(address_map &map);
-	void chasehq_cpub_map(address_map &map);
+	void chasehq_map(address_map &map) ATTR_COLD;
+	void chasehq_cpub_map(address_map &map) ATTR_COLD;
 
 	required_ioport_array<4> m_unknown_io;
 };
@@ -222,9 +222,9 @@ public:
 	void racingb(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 	TIMER_CALLBACK_MEMBER(trigger_int6);
 
@@ -239,10 +239,10 @@ private:
 	u32 screen_update_sci(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	u32 screen_update_racingb(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void sci_map(address_map &map);
-	void sci_cpub_map(address_map &map);
-	void racingb_map(address_map &map);
-	void racingb_cpub_map(address_map &map);
+	void sci_map(address_map &map) ATTR_COLD;
+	void sci_cpub_map(address_map &map) ATTR_COLD;
+	void racingb_map(address_map &map) ATTR_COLD;
+	void racingb_cpub_map(address_map &map) ATTR_COLD;
 
 	int        m_sci_spriteframe = 0;
 	s32        m_sci_int6 = 0;
@@ -265,14 +265,14 @@ public:
 	void nightstr(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	void nightstr_motor_w(offs_t offset, u16 data);
 	void nightstr_lamps_w(u8 data);
 
-	void nightstr_map(address_map &map);
-	void nightstr_cpub_map(address_map &map);
+	void nightstr_map(address_map &map) ATTR_COLD;
+	void nightstr_cpub_map(address_map &map) ATTR_COLD;
 
 	output_finder<3> m_motor_dir;
 	output_finder<3> m_motor_speed;
@@ -295,7 +295,7 @@ public:
 	void spacegun(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	void spacegun_eeprom_w(u8 data);
@@ -304,8 +304,8 @@ private:
 	void spacegun_draw_sprites_16x8(screen_device &screen, bitmap_ind16 &bitmap,const rectangle &cliprect,int y_offs);
 	u32 screen_update_spacegun(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void spacegun_map(address_map &map);
-	void spacegun_cpub_map(address_map &map);
+	void spacegun_map(address_map &map) ATTR_COLD;
+	void spacegun_cpub_map(address_map &map) ATTR_COLD;
 
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
 	required_ioport m_io_eepromout;

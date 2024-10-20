@@ -35,8 +35,8 @@ public:
 		, m_mcu(*this, "mcu")
 		, m_i8255(*this, "i8255")
 		, m_ymsnd(*this, "ymsnd")
-		, m_n7751(*this, "n7751")
-		, m_n7751_i8243(*this, "n7751_8243")
+		, m_upd7751(*this, "upd7751")
+		, m_upd7751_i8243(*this, "upd7751_8243")
 		, m_nvram(*this, "nvram")
 		, m_watchdog(*this, "watchdog")
 		, m_segaic16vid(*this, "segaic16vid")
@@ -50,8 +50,8 @@ public:
 		, m_custom_io_w(*this)
 		, m_video_control(0)
 		, m_mcu_control(0)
-		, m_n7751_command(0)
-		, m_n7751_rom_address(0)
+		, m_upd7751_command(0)
+		, m_upd7751_rom_address(0)
 		, m_last_buttons1(0)
 		, m_last_buttons2(0)
 		, m_read_port(0)
@@ -95,14 +95,14 @@ private:
 
 	// Z80 sound CPU read/write handlers
 	uint8_t sound_data_r();
-	void n7751_command_w(uint8_t data);
-	void n7751_control_w(uint8_t data);
-	template<int Shift> void n7751_rom_offset_w(uint8_t data);
+	void upd7751_command_w(uint8_t data);
+	void upd7751_control_w(uint8_t data);
+	template<int Shift> void upd7751_rom_offset_w(uint8_t data);
 
-	// N7751 sound generator CPU read/write handlers
-	uint8_t n7751_rom_r();
-	uint8_t n7751_p2_r();
-	void n7751_p2_w(uint8_t data);
+	// D7751 sound generator CPU read/write handlers
+	uint8_t upd7751_rom_r();
+	uint8_t upd7751_p2_r();
+	void upd7751_p2_w(uint8_t data);
 
 	// I8751 MCU read/write handlers
 	void mcu_control_w(uint8_t data);
@@ -115,22 +115,22 @@ private:
 	// video updates
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void decrypted_opcodes_map(address_map &map);
-	void mcu_io_map(address_map &map);
-	void sound_decrypted_opcodes_map(address_map &map);
-	void sound_map(address_map &map);
-	void sound_no7751_portmap(address_map &map);
-	void sound_portmap(address_map &map);
-	void system16a_map(address_map &map);
+	void decrypted_opcodes_map(address_map &map) ATTR_COLD;
+	void mcu_io_map(address_map &map) ATTR_COLD;
+	void sound_decrypted_opcodes_map(address_map &map) ATTR_COLD;
+	void sound_map(address_map &map) ATTR_COLD;
+	void sound_no7751_portmap(address_map &map) ATTR_COLD;
+	void sound_portmap(address_map &map) ATTR_COLD;
+	void system16a_map(address_map &map) ATTR_COLD;
 
 	// internal types
 	typedef delegate<void ()> i8751_sim_delegate;
 	typedef delegate<void (uint8_t, uint8_t)> lamp_changed_delegate;
 
 	// driver overrides
-	virtual void video_start() override;
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void video_start() override ATTR_COLD;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	// I8751 simulations
 	void dumpmtmt_i8751_sim();
@@ -154,8 +154,8 @@ private:
 	optional_device<i8751_device> m_mcu;
 	required_device<i8255_device> m_i8255;
 	required_device<ym2151_device> m_ymsnd;
-	optional_device<n7751_device> m_n7751;
-	optional_device<i8243_device> m_n7751_i8243;
+	optional_device<upd7751_device> m_upd7751;
+	optional_device<i8243_device> m_upd7751_i8243;
 	required_device<nvram_device> m_nvram;
 	required_device<watchdog_timer_device> m_watchdog;
 	required_device<segaic16_video_device> m_segaic16vid;
@@ -178,8 +178,8 @@ private:
 	emu_timer              * m_i8751_sync_timer;
 	uint8_t                  m_video_control;
 	uint8_t                  m_mcu_control;
-	uint8_t                  m_n7751_command;
-	uint32_t                 m_n7751_rom_address;
+	uint8_t                  m_upd7751_command;
+	uint32_t                 m_upd7751_rom_address;
 	uint8_t                  m_last_buttons1;
 	uint8_t                  m_last_buttons2;
 	uint8_t                  m_read_port;
@@ -198,9 +198,9 @@ public:
 		, m_steer(*this, "STEER")
 	{ }
 
-	DECLARE_CUSTOM_INPUT_MEMBER(afighter_accel_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(afighter_handl_left_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(afighter_handl_right_r);
+	ioport_value afighter_accel_r();
+	ioport_value afighter_handl_left_r();
+	ioport_value afighter_handl_right_r();
 
 private:
 	required_ioport     m_accel;

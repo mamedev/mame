@@ -94,9 +94,9 @@ public:
 
 protected:
 	// driver_device overrides
-	virtual void machine_reset() override;
-	virtual void machine_start() override;
-	virtual void video_start() override;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 	TIMER_CALLBACK_MEMBER(scanline_interrupt_check);
 
@@ -113,8 +113,8 @@ private:
 
 	void accomm_palette(palette_device &palette) const;
 
-	void main_map(address_map &map);
-	void saa5240_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
+	void saa5240_map(address_map &map) ATTR_COLD;
 
 	// devices
 	required_device<g65816_device> m_maincpu;
@@ -891,7 +891,7 @@ static INPUT_PORTS_START( accomm )
 	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_UNUSED)
 
 	PORT_START("STOP")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_F12)        PORT_CHAR(UCHAR_MAMEKEY(F12))      PORT_NAME("Stop") PORT_CHANGED_MEMBER(DEVICE_SELF, accomm_state, trigger_reset, 0)
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_F12)        PORT_CHAR(UCHAR_MAMEKEY(F12))      PORT_NAME("Stop") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(accomm_state::trigger_reset), 0)
 INPUT_PORTS_END
 
 void accomm_state::accomm(machine_config &config)

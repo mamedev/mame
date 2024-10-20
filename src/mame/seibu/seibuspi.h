@@ -56,7 +56,7 @@ public:
 	void init_ejanhs();
 	void init_sys386f();
 
-	template <int N> DECLARE_CUSTOM_INPUT_MEMBER(ejanhs_encode);
+	template <int N> ioport_value ejanhs_encode();
 
 	IRQ_CALLBACK_MEMBER(spi_irq_callback);
 	INTERRUPT_GEN_MEMBER(spi_interrupt);
@@ -157,8 +157,8 @@ protected:
 	void draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect, bitmap_ind8 &primap, int priority);
 	void combine_tilemap(bitmap_rgb32 &bitmap, const rectangle &cliprect, tilemap_t *tile, int sx, int sy, int opaque, s16 *rowscroll);
 
-	virtual void machine_start() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 	DECLARE_MACHINE_RESET(spi);
 	DECLARE_MACHINE_RESET(sxx2e);
 	DECLARE_VIDEO_START(ejanhs);
@@ -181,16 +181,16 @@ protected:
 	void rfjet_text_decrypt(u8 *rom);
 	void rfjet_bg_decrypt(u8 *rom, int size);
 
-	void base_map(address_map &map);
-	void rdft2_map(address_map &map);
-	void rise_map(address_map &map);
-	void sei252_map(address_map &map);
-	void spi_map(address_map &map);
-	void spi_soundmap(address_map &map);
-	void spi_ymf271_map(address_map &map);
-	void sxx2e_map(address_map &map);
-	void sxx2e_soundmap(address_map &map);
-	void sxx2f_map(address_map &map);
-	void sys386f_map(address_map &map);
-	void sys386i_map(address_map &map);
+	void base_map(address_map &map) ATTR_COLD;
+	void rdft2_map(address_map &map) ATTR_COLD;
+	void rise_map(address_map &map) ATTR_COLD;
+	void sei252_map(address_map &map) ATTR_COLD;
+	void spi_map(address_map &map) ATTR_COLD;
+	void spi_soundmap(address_map &map) ATTR_COLD;
+	void spi_ymf271_map(address_map &map) ATTR_COLD;
+	void sxx2e_map(address_map &map) ATTR_COLD;
+	void sxx2e_soundmap(address_map &map) ATTR_COLD;
+	void sxx2f_map(address_map &map) ATTR_COLD;
+	void sys386f_map(address_map &map) ATTR_COLD;
+	void sys386i_map(address_map &map) ATTR_COLD;
 };

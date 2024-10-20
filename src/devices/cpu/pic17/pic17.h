@@ -43,8 +43,8 @@ protected:
 	pic17_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u16 rom_size, address_map_constructor data_map);
 
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// device_execute_interface overrides
 	virtual void execute_run() override;
@@ -59,7 +59,7 @@ protected:
 	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
 
 	// internal data map
-	void core_data_map(address_map &map);
+	void core_data_map(address_map &map) ATTR_COLD;
 
 	// helpers for derived classes
 	void int_edge(bool rising);
@@ -134,7 +134,7 @@ private:
 	void q4_write();
 
 	// address map constructor
-	void program_map(address_map &map);
+	void program_map(address_map &map) ATTR_COLD;
 
 	// address spaces
 	const address_space_config m_program_config;

@@ -39,9 +39,9 @@ public:
 	void docastle(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	/* devices */
@@ -91,13 +91,13 @@ private:
 	void draw_sprites( screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect );
 	void docastle_tint(int state);
 	void idsoccer_adpcm_int(int state);
-	void docastle_io_map(address_map &map);
-	void docastle_map(address_map &map);
-	void docastle_map2(address_map &map);
-	void docastle_map3(address_map &map);
-	void dorunrun_map(address_map &map);
-	void dorunrun_map2(address_map &map);
-	void idsoccer_map(address_map &map);
+	void docastle_io_map(address_map &map) ATTR_COLD;
+	void docastle_map(address_map &map) ATTR_COLD;
+	void docastle_map2(address_map &map) ATTR_COLD;
+	void docastle_map3(address_map &map) ATTR_COLD;
+	void dorunrun_map(address_map &map) ATTR_COLD;
+	void dorunrun_map2(address_map &map) ATTR_COLD;
+	void idsoccer_map(address_map &map) ATTR_COLD;
 };
 
 #endif // MAME_UNIVERSAL_DOCASTLE_H

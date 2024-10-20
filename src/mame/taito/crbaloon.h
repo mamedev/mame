@@ -34,11 +34,11 @@ public:
 	{ }
 
 	void crbaloon(machine_config &config);
-	DECLARE_CUSTOM_INPUT_MEMBER(pc3092_r);
+	ioport_value pc3092_r();
 
 protected:
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	required_shared_ptr<uint8_t> m_videoram;
@@ -76,8 +76,8 @@ private:
 	void crbaloon_audio_set_breath_enable(int enabled);
 	void crbaloon_audio_set_appear_enable(int enabled);
 	void crbaloon_audio(machine_config &config);
-	void main_io_map(address_map &map);
-	void main_map(address_map &map);
+	void main_io_map(address_map &map) ATTR_COLD;
+	void main_map(address_map &map) ATTR_COLD;
 };
 
 #endif // MAME_TAITO_CRBALOON_H

@@ -36,9 +36,9 @@ public:
 
 protected:
 	// device-specific overrides
-	virtual ioport_constructor device_input_ports() const override;
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual void device_start() override;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual void device_start() override ATTR_COLD;
 
 	// interface-specific overrides
 	virtual u8 register_read(offs_t offset) override;
@@ -76,7 +76,7 @@ static INPUT_PORTS_START( mps )
 	PORT_CONFSETTING(0x0f, "1200")
 
 	PORT_START("CTS_ROUTE")
-	PORT_CONFNAME(1, 0, "CTS route") PORT_CHANGED_MEMBER(DEVICE_SELF, ss50_mps_device, cts_route_change, 0)
+	PORT_CONFNAME(1, 0, "CTS route") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(ss50_mps_device::cts_route_change), 0)
 	PORT_CONFSETTING(0, "Wired low (standard)")
 	PORT_CONFSETTING(1, "Connected through (modified)")
 

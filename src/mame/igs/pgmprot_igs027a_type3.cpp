@@ -98,7 +98,7 @@ u16 pgm_arm_type3_state::svg_68k_nmi_r()
 
 void pgm_arm_type3_state::svg_68k_nmi_w(u16 data)
 {
-	m_prot->pulse_input_line(ARM7_FIRQ_LINE, m_prot->minimum_quantum_time());
+	m_prot->pulse_input_line(arm7_cpu_device::ARM7_FIRQ_LINE, m_prot->minimum_quantum_time());
 }
 
 void pgm_arm_type3_state::svg_latch_68k_w(offs_t offset, u16 data, u16 mem_mask)

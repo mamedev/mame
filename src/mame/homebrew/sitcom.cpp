@@ -68,14 +68,14 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(update_buttons);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	virtual void update_ppi_pa(uint8_t data);
 	virtual void update_ppi_pb(uint8_t data);
 
-	void sitcom_mem(address_map &map);
-	void sitcom_io(address_map &map);
+	void sitcom_mem(address_map &map) ATTR_COLD;
+	void sitcom_io(address_map &map) ATTR_COLD;
 
 	template <unsigned D> void update_ds(offs_t offset, uint16_t data) { m_digits[(D << 2) | offset] = data; }
 	void update_rxd(int state)          { m_rxd = bool(state); }
@@ -120,8 +120,8 @@ public:
 	void sitcomtmr(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	virtual void update_ppi_pa(uint8_t data) override;
 	virtual void update_ppi_pb(uint8_t data) override;
@@ -162,8 +162,8 @@ void sitcom_state::sitcom_io(address_map &map)
 
 INPUT_PORTS_START( sitcom )
 	PORT_START("BUTTONS")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Boot")  PORT_CHANGED_MEMBER(DEVICE_SELF, sitcom_state, update_buttons, 0)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Reset") PORT_CHANGED_MEMBER(DEVICE_SELF, sitcom_state, update_buttons, 0)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Boot")  PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(sitcom_state::update_buttons), 0)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Reset") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(sitcom_state::update_buttons), 0)
 
 	PORT_START("PORTC")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_NAME("0") PORT_CODE(KEYCODE_0)
@@ -180,16 +180,16 @@ INPUT_PORTS_START( sitcomtmr )
 	PORT_INCLUDE(sitcom)
 
 	PORT_MODIFY("BUTTONS")
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_NAME("Shutter") PORT_CHANGED_MEMBER(DEVICE_SELF, sitcom_timer_state, update_shutter, 0)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_NAME("Shutter") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(sitcom_timer_state::update_shutter), 0)
 
 	PORT_MODIFY("PORTC")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Grey")
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("Blue")
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER(DEVICE_SELF, sitcom_timer_state, shutter_r)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER(DEVICE_SELF, FUNC(sitcom_timer_state::shutter_r))
 	PORT_BIT( 0xf8, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("SPEED")
-	PORT_CONFNAME(0xff, 0x1e, "Shutter Speed") PORT_CHANGED_MEMBER(DEVICE_SELF, sitcom_timer_state, update_speed, 0)
+	PORT_CONFNAME(0xff, 0x1e, "Shutter Speed") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(sitcom_timer_state::update_speed), 0)
 	PORT_CONFSETTING(0x00, "B")
 	PORT_CONFSETTING(0x01, "1")
 	PORT_CONFSETTING(0x02, "1/2")

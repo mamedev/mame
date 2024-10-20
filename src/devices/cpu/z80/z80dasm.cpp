@@ -2,7 +2,7 @@
 // copyright-holders:Juergen Buchmueller
 /*****************************************************************************
  *
- *   z80dasm.c
+ *   z80dasm.cpp
  *   Portable Z80 disassembler
  *
  *****************************************************************************/
@@ -22,6 +22,12 @@ static const char *const s_mnemonic[] =
 	"retn","rl"  ,"rla" ,"rlc" ,"rlca","rld" ,"rr"  ,"rra" ,
 	"rrc" ,"rrca","rrd" ,"rst" ,"sbc" ,"scf" ,"set" ,"sla" ,
 	"sll" ,"sra" ,"srl" ,"sub" ,"xor "
+
+	// z80n
+									  ,"swap","mirr","test",
+	"bsla","bsra","bsrl","bsrf","brlc","mul" ,"otib","nreg",
+	"pxdn","pxad","stae","ldix","ldws","lddx","lirx","lprx",
+	"ldrx"
 };
 
 const u32 z80_disassembler::s_flags[] =
@@ -35,6 +41,12 @@ const u32 z80_disassembler::s_flags[] =
 	STEP_OUT ,0        ,0        ,0        ,0        ,0    ,0        ,0        ,
 	0        ,0        ,0        ,STEP_OVER,0        ,0    ,0        ,0        ,
 	0        ,0        ,0        ,0        ,0
+
+	// z80n
+													 ,0    ,0        ,0        ,
+	0        ,0        ,0        ,0        ,0        ,0    ,0        ,0        ,
+	0        ,0        ,0        ,0        ,0        ,0    ,0        ,0        ,
+	0
 };
 
 const z80_disassembler::z80dasm z80_disassembler::mnemonic_xx_cb[256] =
@@ -215,13 +227,13 @@ const z80_disassembler::z80dasm z80_disassembler::mnemonic_ed[256] =
 	{zDB,"?"},      {zDB,"?"},      {zDB,"?"},      {zDB,"?"},
 	{zDB,"?"},      {zDB,"?"},      {zDB,"?"},      {zDB,"?"},
 	{zDB,"?"},      {zDB,"?"},      {zDB,"?"},      {zDB,"?"},
-	{zLDI,nullptr},       {zCPI,nullptr},       {zINI,nullptr},       {zOUTI,nullptr},
+	{zLDI,nullptr}, {zCPI,nullptr}, {zINI,nullptr}, {zOUTI,nullptr},
 	{zDB,"?"},      {zDB,"?"},      {zDB,"?"},      {zDB,"?"},
-	{zLDD,nullptr},       {zCPD,nullptr},       {zIND,nullptr},       {zOUTD,nullptr},
+	{zLDD,nullptr}, {zCPD,nullptr}, {zIND,nullptr}, {zOUTD,nullptr},
 	{zDB,"?"},      {zDB,"?"},      {zDB,"?"},      {zDB,"?"},
-	{zLDIR,nullptr},      {zCPIR,nullptr},      {zINIR,nullptr},      {zOTIR,nullptr},
+	{zLDIR,nullptr},{zCPIR,nullptr},{zINIR,nullptr},{zOTIR,nullptr},
 	{zDB,"?"},      {zDB,"?"},      {zDB,"?"},      {zDB,"?"},
-	{zLDDR,nullptr},      {zCPDR,nullptr},      {zINDR,nullptr},      {zOTDR,nullptr},
+	{zLDDR,nullptr},{zCPDR,nullptr},{zINDR,nullptr},{zOTDR,nullptr},
 	{zDB,"?"},      {zDB,"?"},      {zDB,"?"},      {zDB,"?"},
 	{zDB,"?"},      {zDB,"?"},      {zDB,"?"},      {zDB,"?"},
 	{zDB,"?"},      {zDB,"?"},      {zDB,"?"},      {zDB,"?"},
@@ -340,7 +352,7 @@ const z80_disassembler::z80dasm z80_disassembler::mnemonic_main[256] =
 	{zLD,"l,b"},    {zLD,"l,c"},    {zLD,"l,d"},    {zLD,"l,e"},
 	{zLD,"l,h"},    {zLD,"l,l"},    {zLD,"l,(hl)"}, {zLD,"l,a"},
 	{zLD,"(hl),b"}, {zLD,"(hl),c"}, {zLD,"(hl),d"}, {zLD,"(hl),e"},
-	{zLD,"(hl),h"}, {zLD,"(hl),l"}, {zHLT,nullptr},       {zLD,"(hl),a"},
+	{zLD,"(hl),h"}, {zLD,"(hl),l"}, {zHLT,nullptr}, {zLD,"(hl),a"},
 	{zLD,"a,b"},    {zLD,"a,c"},    {zLD,"a,d"},    {zLD,"a,e"},
 	{zLD,"a,h"},    {zLD,"a,l"},    {zLD,"a,(hl)"}, {zLD,"a,a"},
 	{zADD,"a,b"},   {zADD,"a,c"},   {zADD,"a,d"},   {zADD,"a,e"},
@@ -379,7 +391,7 @@ const z80_disassembler::z80dasm z80_disassembler::mnemonic_main[256] =
 
 char z80_disassembler::sign(s8 offset)
 {
-	return (offset < 0)? '-':'+';
+	return (offset < 0) ? '-' : '+';
 }
 
 u32 z80_disassembler::offs(s8 offset)
@@ -414,7 +426,7 @@ offs_t z80_disassembler::disassemble(std::ostream &stream, offs_t pc, const data
 		d = &mnemonic_cb[op];
 		break;
 	case 0xed:
-		d = &mnemonic_ed[opcodes.r8(pos++)];
+		d = &get_mnemonic_ed(opcodes.r8(pos++));
 		if (d->mnemonic == zDB)
 			pos--;
 		break;
@@ -422,7 +434,7 @@ offs_t z80_disassembler::disassemble(std::ostream &stream, offs_t pc, const data
 	{
 		ixy = "ix";
 		u8 op1 = opcodes.r8(pos++);
-		if( op1 == 0xcb )
+		if (op1 == 0xcb)
 		{
 			offset = params.r8(pos++);
 			op1 = params.r8(pos++);
@@ -440,7 +452,7 @@ offs_t z80_disassembler::disassemble(std::ostream &stream, offs_t pc, const data
 	{
 		ixy = "iy";
 		u8 op1 = opcodes.r8(pos++);
-		if( op1 == 0xcb )
+		if (op1 == 0xcb)
 		{
 			offset = params.r8(pos++);
 			op1 = params.r8(pos++);
@@ -460,15 +472,15 @@ offs_t z80_disassembler::disassemble(std::ostream &stream, offs_t pc, const data
 	}
 
 	uint32_t flags = s_flags[d->mnemonic];
-	if( d->arguments )
+	if (d->arguments)
 	{
 		util::stream_format(stream, "%-4s ", s_mnemonic[d->mnemonic]);
 		const char *src = d->arguments;
-		while( *src )
+		while (*src)
 		{
-			switch( *src )
+			switch (*src)
 			{
-			case '?':   /* illegal opcode */
+			case '?': // illegal opcode
 				util::stream_format(stream, "$%02x", op );
 				break;
 			case 'A':
@@ -477,25 +489,25 @@ offs_t z80_disassembler::disassemble(std::ostream &stream, offs_t pc, const data
 				if (src != d->arguments)
 					flags |= STEP_COND;
 				break;
-			case 'B':   /* Byte op arg */
+			case 'B': // Byte op arg
 				util::stream_format(stream, "$%02X", params.r8(pos++) );
 				break;
-			case 'N':   /* Immediate 16 bit */
+			case 'N': // Immediate 16 bit
 				util::stream_format(stream, "$%04X", params.r16(pos) );
 				pos += 2;
 				break;
-			case 'O':   /* Offset relative to PC */
+			case 'O': // Offset relative to PC
 				util::stream_format(stream, "$%04X", (pc + s8(params.r8(pos++)) + 2) & 0xffff);
 				if (src != d->arguments)
 					flags |= STEP_COND;
 				break;
-			case 'P':   /* Port number */
+			case 'P': // Port number
 				util::stream_format(stream, "$%02X", params.r8(pos++) );
 				break;
-			case 'V':   /* Restart vector */
+			case 'V': // Restart vector
 				util::stream_format(stream, "$%02X", op & 0x38 );
 				break;
-			case 'W':   /* Memory address word */
+			case 'W': // Memory address word
 				util::stream_format(stream, "$%04X", params.r16(pos) );
 				pos += 2;
 				break;
@@ -510,6 +522,7 @@ offs_t z80_disassembler::disassemble(std::ostream &stream, offs_t pc, const data
 				break;
 			default:
 				stream << *src;
+				break;
 			}
 			src++;
 		}

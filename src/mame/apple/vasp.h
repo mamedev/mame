@@ -14,7 +14,7 @@
 
 // ======================> vasp_device
 
-class vasp_device :  public device_t
+class vasp_device :  public device_t, public device_sound_interface
 {
 public:
 	// construction/destruction
@@ -32,7 +32,7 @@ public:
 	auto hdsel_callback() { return write_hdsel.bind(); }
 	auto pb3_callback() { return read_pb3.bind(); }
 
-	void map(address_map &map);
+	void map(address_map &map) ATTR_COLD;
 
 	template <typename... T> void set_maincpu_tag(T &&... args) { m_maincpu.set_tag(std::forward<T>(args)...); }
 	template <typename... T> void set_rom_tag(T &&... args) { m_rom.set_tag(std::forward<T>(args)...); }
@@ -48,10 +48,12 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual ioport_constructor device_input_ports() const override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
+
+	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
 
 private:
 	devcb_write_line write_pb4, write_pb5, write_cb2, write_hdsel;
@@ -66,6 +68,7 @@ private:
 	required_region_ptr<u32> m_rom;
 
 	std::unique_ptr<u32[]> m_vram;
+	sound_stream *m_stream;
 	emu_timer *m_6015_timer;
 	int m_via_interrupt, m_via2_interrupt, m_scc_interrupt, m_last_taken_interrupt;
 	u8 m_pseudovia_regs[256], m_pseudovia_ier, m_pseudovia_ifr;

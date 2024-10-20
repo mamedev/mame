@@ -89,9 +89,9 @@ protected:
 
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void sound_map(address_map &map);
+	void sound_map(address_map &map) ATTR_COLD;
 
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	void ddragon3_vreg_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
@@ -100,15 +100,15 @@ private:
 	void oki_bankswitch_w(uint8_t data);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 	uint32_t screen_update_ddragon3(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_ctribe(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void ctribe_map(address_map &map);
-	void ctribe_sound_map(address_map &map);
-	void dd3b_map(address_map &map);
-	void ddragon3_map(address_map &map);
+	void ctribe_map(address_map &map) ATTR_COLD;
+	void ctribe_sound_map(address_map &map) ATTR_COLD;
+	void dd3b_map(address_map &map) ATTR_COLD;
+	void ddragon3_map(address_map &map) ATTR_COLD;
 };
 
 
@@ -128,8 +128,8 @@ public:
 	void wwfwfest(machine_config &config);
 	void wwfwfstb(machine_config &config);
 
-	template <int N> DECLARE_CUSTOM_INPUT_MEMBER(dsw_3f_r);
-	template <int N> DECLARE_CUSTOM_INPUT_MEMBER(dsw_c0_r);
+	template <int N> ioport_value dsw_3f_r();
+	template <int N> ioport_value dsw_c0_r();
 
 private:
 	/* wwfwfest has an extra layer */
@@ -149,11 +149,11 @@ private:
 
 	TILE_GET_INFO_MEMBER(get_fg0_tile_info);
 
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 	DECLARE_VIDEO_START(wwfwfstb);
 	uint32_t screen_update_wwfwfest(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void main_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
 };
 
 #endif // MAME_TECHNOS_DDRAGON3_H

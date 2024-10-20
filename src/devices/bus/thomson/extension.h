@@ -44,7 +44,7 @@ public:
 	void io_map(address_space_installer &space, offs_t start, offs_t end);
 
 protected:
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 	devcb_write_line m_firq_callback;
 	devcb_write_line m_irq_callback;

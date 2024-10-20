@@ -82,8 +82,8 @@ public:
 	void init_1();
 
 private:
-	virtual void machine_reset() override;
-	virtual void machine_start() override;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void machine_start() override ATTR_COLD;
 	u8 ppic_r();
 	void ppia_w(u8 data);
 	void ppib_w(u8 data);
@@ -114,12 +114,12 @@ private:
 	void q9a_w(int state);
 	void qc9b_w(int state);
 	void update_mus();
-	void brvteam_map(address_map &map);
-	void canasta_map(address_map &map);
-	void main_map(address_map &map);
-	void audio_map(address_map &map);
-	void lapbylap_main_map(address_map &map);
-	void lapbylap_audio_map(address_map &map);
+	void brvteam_map(address_map &map) ATTR_COLD;
+	void canasta_map(address_map &map) ATTR_COLD;
+	void main_map(address_map &map) ATTR_COLD;
+	void audio_map(address_map &map) ATTR_COLD;
+	void lapbylap_main_map(address_map &map) ATTR_COLD;
+	void lapbylap_audio_map(address_map &map) ATTR_COLD;
 
 	bool m_pc0 = false;
 	u8 m_game = 0U;
@@ -1557,6 +1557,10 @@ ROM_START(pinmoonl)
 	ROM_LOAD("ci-23.bin", 0x10000, 0x10000, CRC(eac346da) SHA1(7c4c26ae089dda0dcd7300fd1ecabf5a91099c41))
 	ROM_LOAD("ci-22.bin", 0x20000, 0x10000, CRC(379740da) SHA1(83ad13ab7f1f37c78397d8e830bd74c5a7aea758))
 	ROM_LOAD("ci-21.bin", 0x30000, 0x10000, CRC(0febb4a7) SHA1(e6cc1b26ddfe9cd58da29de2a50a83ce50afe323))
+
+	ROM_REGION(0x4000, "bonus", ROMREGION_ERASEFF) // On "Bonus expansion board"
+	ROM_LOAD("inder_sa_m17_moon_ligh_bonus_rom_1.ci1", 0x0000, 0x2000, CRC(2c45fd1e) SHA1(4cd1336271d77d9acb7c81a5461546842e946dc3))
+	ROM_LOAD("inder_sa_m17_moon_ligh_bonus_rom_2.ci2", 0x2000, 0x2000, CRC(c0dc1523) SHA1(511657cc01fbbb5146e32ef26a9b259250df3fb6))
 ROM_END
 
 /*-------------------------------------------------------------------

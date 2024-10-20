@@ -275,7 +275,7 @@ int xain_state::vblank_r()
 
 ***************************************************************************/
 
-CUSTOM_INPUT_MEMBER(xain_state::mcu_status_r)
+ioport_value xain_state::mcu_status_r()
 {
 	// bit 0 is host MCU flag, bit 1 is host semaphore flag (both active low)
 	return
@@ -443,8 +443,8 @@ static INPUT_PORTS_START( xsleena )
 	PORT_START("VBLANK")
 	PORT_BIT( 0x03, IP_ACTIVE_LOW,  IPT_UNUSED )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW,  IPT_COIN3 )
-	PORT_BIT( 0x18, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_CUSTOM_MEMBER(xain_state, mcu_status_r)
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(xain_state, vblank_r)   // VBLANK
+	PORT_BIT( 0x18, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_CUSTOM_MEMBER(FUNC(xain_state::mcu_status_r))
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(xain_state::vblank_r))   // VBLANK
 	PORT_BIT( 0xc0, IP_ACTIVE_LOW,  IPT_UNUSED )
 INPUT_PORTS_END
 

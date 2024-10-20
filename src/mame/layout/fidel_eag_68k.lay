@@ -204,7 +204,7 @@ authors:hap
 
 			<repeat count="8">
 				<param name="x" start="8.3" increment="10" />
-				<param name="i2" start="15" increment="-1" />
+				<param name="i2" start="8" increment="1" />
 				<element name="~i1~.~i2~" ref="led"><bounds x="~x~" y="~y~" width="1.5" height="1.5" /></element>
 			</repeat>
 		</repeat>
@@ -452,21 +452,21 @@ authors:hap
 		<element ref="text_r92"><bounds x="96.8" y="49.5" width="10" height="1.5" /></element>
 		<element ref="text_r93"><bounds x="96.8" y="51" width="10" height="1.5" /></element>
 
-		<element name="8.10" ref="led2"><bounds x="90" y="29.75" width="1.5" height="1.5" /></element>
-		<element name="8.11" ref="led2"><bounds x="90" y="32.25" width="1.5" height="1.5" /></element>
-		<element name="8.12" ref="led2"><bounds x="90" y="34.75" width="1.5" height="1.5" /></element>
-		<element name="8.13" ref="led2"><bounds x="90" y="37.25" width="1.5" height="1.5" /></element>
-		<element name="8.14" ref="led2"><bounds x="90" y="39.75" width="1.5" height="1.5" /></element>
-		<element name="8.15" ref="led2"><bounds x="90" y="42.25" width="1.5" height="1.5" /></element>
+		<element name="8.13" ref="led2"><bounds x="90" y="29.75" width="1.5" height="1.5" /></element>
+		<element name="8.12" ref="led2"><bounds x="90" y="32.25" width="1.5" height="1.5" /></element>
+		<element name="8.11" ref="led2"><bounds x="90" y="34.75" width="1.5" height="1.5" /></element>
+		<element name="8.10" ref="led2"><bounds x="90" y="37.25" width="1.5" height="1.5" /></element>
+		<element name="8.9" ref="led2"><bounds x="90" y="39.75" width="1.5" height="1.5" /></element>
+		<element name="8.8" ref="led2"><bounds x="90" y="42.25" width="1.5" height="1.5" /></element>
 
-		<element ref="bt" inputtag="IN.0" inputmask="0x01"><bounds x="94" y="29.5" width="2" height="2" /></element>
-		<element ref="bt" inputtag="IN.0" inputmask="0x02"><bounds x="94" y="32" width="2" height="2" /></element>
-		<element ref="bt" inputtag="IN.0" inputmask="0x04"><bounds x="94" y="34.5" width="2" height="2" /></element>
-		<element ref="bt" inputtag="IN.0" inputmask="0x08"><bounds x="94" y="37" width="2" height="2" /></element>
-		<element ref="bt" inputtag="IN.0" inputmask="0x10"><bounds x="94" y="39.5" width="2" height="2" /></element>
-		<element ref="bt" inputtag="IN.0" inputmask="0x20"><bounds x="94" y="42" width="2" height="2" /></element>
-		<element ref="bt" inputtag="IN.0" inputmask="0x40"><bounds x="94" y="44.5" width="2" height="2" /></element>
-		<element ref="bt" inputtag="IN.0" inputmask="0x80"><bounds x="94" y="47" width="2" height="2" /></element>
+		<element ref="bt" inputtag="IN.0" inputmask="0x80"><bounds x="94" y="29.5" width="2" height="2" /></element>
+		<element ref="bt" inputtag="IN.0" inputmask="0x40"><bounds x="94" y="32" width="2" height="2" /></element>
+		<element ref="bt" inputtag="IN.0" inputmask="0x20"><bounds x="94" y="34.5" width="2" height="2" /></element>
+		<element ref="bt" inputtag="IN.0" inputmask="0x10"><bounds x="94" y="37" width="2" height="2" /></element>
+		<element ref="bt" inputtag="IN.0" inputmask="0x08"><bounds x="94" y="39.5" width="2" height="2" /></element>
+		<element ref="bt" inputtag="IN.0" inputmask="0x04"><bounds x="94" y="42" width="2" height="2" /></element>
+		<element ref="bt" inputtag="IN.0" inputmask="0x02"><bounds x="94" y="44.5" width="2" height="2" /></element>
+		<element ref="bt" inputtag="IN.0" inputmask="0x01"><bounds x="94" y="47" width="2" height="2" /></element>
 		<element ref="bt" inputtag="IN.1" inputmask="0x04"><bounds x="94" y="49.5" width="2" height="2" /></element>
 
 		<element ref="text_rx2"><bounds x="96.8" y="79.65" width="10" height="1.5" /></element>
@@ -475,8 +475,8 @@ authors:hap
 		<element ref="text_rx1b"><bounds x="88" y="78.75" width="5.5" height="1" /></element>
 		<element ref="text_ry1"><bounds x="88" y="81.25" width="5.5" height="1" /></element>
 
-		<element name="8.9" ref="led2y"><bounds x="90" y="79.75" width="1.5" height="1.5" /></element>
-		<element name="8.8" ref="led2g"><bounds x="90" y="82.25" width="1.5" height="1.5" /></element>
+		<element name="8.14" ref="led2y"><bounds x="90" y="79.75" width="1.5" height="1.5" /></element>
+		<element name="8.15" ref="led2g"><bounds x="90" y="82.25" width="1.5" height="1.5" /></element>
 
 		<element ref="bt" inputtag="IN.1" inputmask="0x01"><bounds x="94" y="79.5" width="2" height="2" /></element>
 		<element ref="bt" inputtag="IN.1" inputmask="0x02"><bounds x="94" y="82" width="2" height="2" /></element>

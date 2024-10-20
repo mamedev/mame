@@ -16,7 +16,7 @@
 
 #include "machine/timer.h"
 #include "sound/beep.h"
-#include "speaker.h"
+
 
 class hp98x6_upi_device : public device_t
 {
@@ -34,12 +34,19 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual ioport_constructor device_input_ports() const override;
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 private:
+	enum class fsm_st {
+		ST_IDLE,
+		ST_POR_TEST1,
+		ST_POR_TEST2,
+		ST_RESETTING
+	};
+
 	required_ioport_array<4> m_keys;
 	required_ioport m_shift;
 	required_ioport m_dial;
@@ -48,23 +55,19 @@ private:
 	required_device<timer_device> m_delay_timer;
 	required_device<timer_device> m_input_delay_timer;
 
+	// ID PROM
+	optional_region_ptr<uint8_t> m_idprom;
+
 	devcb_write_line m_irq1_write_func;
 	devcb_write_line m_irq7_write_func;
-	uint8_t m_ram[ 64 ];
+	uint8_t m_ram[64];
 	uint8_t m_data_in;
 	uint8_t m_data_out;
 	uint8_t m_status;
 	bool m_ready;
 	ioport_value m_last_dial;
 
-	enum class FSM_ST {
-		ST_IDLE,
-		ST_POR_TEST1,
-		ST_POR_TEST2,
-		ST_RESETTING
-	};
-
-	FSM_ST m_fsm_state;
+	fsm_st m_fsm_state;
 
 	TIMER_DEVICE_CALLBACK_MEMBER(ten_ms);
 	TIMER_DEVICE_CALLBACK_MEMBER(delay);
@@ -80,8 +83,8 @@ private:
 	void ten_ms_update_timers();
 	void ten_ms_update_beep();
 	void set_new_key(uint8_t scancode);
-	void acquire_keys(ioport_value input[ 4 ]);
-	bool is_key_down(const ioport_value input[ 4 ], uint8_t idx);
+	void acquire_keys(ioport_value input[4]);
+	bool is_key_down(const ioport_value input[4], uint8_t idx);
 	uint8_t encode_shift_ctrl(uint8_t st) const;
 	void try_output();
 	void try_fhs_output();

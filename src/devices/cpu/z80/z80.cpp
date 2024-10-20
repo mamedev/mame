@@ -1,219 +1,47 @@
 // license:BSD-3-Clause
 // copyright-holders:Juergen Buchmueller
 /*****************************************************************************
- *
- *   z80.cpp
- *   Portable Z80 emulator V3.9
- *
- *   TODO:
- *    - Interrupt mode 0 should be able to execute arbitrary opcodes
- *    - If LD A,I or LD A,R is interrupted, P/V flag gets reset, even if IFF2
- *      was set before this instruction (implemented, but not enabled: we need
- *      document Z80 types first, see below)
- *    - WAIT only stalls between instructions now, it should stall immediately.
- *    - Ideally, the tiny differences between Z80 types should be supported,
- *      currently known differences:
- *       - LD A,I/R P/V flag reset glitch is fixed on CMOS Z80
- *       - OUT (C),0 outputs 0 on NMOS Z80, $FF on CMOS Z80
- *       - SCF/CCF X/Y flags is ((flags | A) & 0x28) on SGS/SHARP/ZiLOG NMOS Z80,
- *         (flags & A & 0x28).
- *         However, recent findings say that SCF/CCF X/Y results depend on whether
- *         or not the previous instruction touched the flag register.
- *      This Z80 emulator assumes a ZiLOG NMOS model.
- *
- *   Changes in 0.243:
- *    Foundation for M cycles emulation. Currently we preserve cc_* tables with total timings.
- *    execute_run() behavior (simplified) ...
- *   Changes in 3.9:
- *    - Fixed cycle counts for LD IYL/IXL/IYH/IXH,n [Marshmellow]
- *    - Fixed X/Y flags in CCF/SCF/BIT, ZEXALL is happy now [hap]
- *    - Simplified DAA, renamed MEMPTR (3.8) to WZ, added TODO [hap]
- *    - Fixed IM2 interrupt cycles [eke]
- *   Changes in 3.8 [Miodrag Milanovic]:
- *    - Added MEMPTR register (according to informations provided
- *      by Vladimir Kladov
- *    - BIT n,(HL) now return valid values due to use of MEMPTR
- *    - Fixed BIT 6,(XY+o) undocumented instructions
- *   Changes in 3.7 [Aaron Giles]:
- *    - Changed NMI handling. NMIs are now latched in set_irq_state
- *      but are not taken there. Instead they are taken at the start of the
- *      execute loop.
- *    - Changed IRQ handling. IRQ state is set in set_irq_state but not taken
- *      except during the inner execute loop.
- *    - Removed x86 assembly hacks and obsolete timing loop catchers.
- *   Changes in 3.6:
- *    - Got rid of the code that would inexactly emulate a Z80, i.e. removed
- *      all the #if Z80_EXACT #else branches.
- *    - Removed leading underscores from local register name shortcuts as
- *      this violates the C99 standard.
- *    - Renamed the registers inside the Z80 context to lower case to avoid
- *      ambiguities (shortcuts would have had the same names as the fields
- *      of the structure).
- *   Changes in 3.5:
- *    - Implemented OTIR, INIR, etc. without look-up table for PF flag.
- *      [Ramsoft, Sean Young]
- *   Changes in 3.4:
- *    - Removed Z80-MSX specific code as it's not needed any more.
- *    - Implemented DAA without look-up table [Ramsoft, Sean Young]
- *   Changes in 3.3:
- *    - Fixed undocumented flags XF & YF in the non-asm versions of CP,
- *      and all the 16 bit arithmetic instructions. [Sean Young]
- *   Changes in 3.2:
- *    - Fixed undocumented flags XF & YF of RRCA, and CF and HF of
- *      INI/IND/OUTI/OUTD/INIR/INDR/OTIR/OTDR [Sean Young]
- *   Changes in 3.1:
- *    - removed the REPEAT_AT_ONCE execution of LDIR/CPIR etc. opcodes
- *      for readabilities sake and because the implementation was buggy
- *      (and i was not able to find the difference)
- *   Changes in 3.0:
- *    - 'finished' switch to dynamically overrideable cycle count tables
- *   Changes in 2.9:
- *    - added methods to access and override the cycle count tables
- *    - fixed handling and timing of multiple DD/FD prefixed opcodes
- *   Changes in 2.8:
- *    - OUTI/OUTD/OTIR/OTDR also pre-decrement the B register now.
- *      This was wrong because of a bug fix on the wrong side
- *      (astrocade sound driver).
- *   Changes in 2.7:
- *    - removed z80_vm specific code, it's not needed (and never was).
- *   Changes in 2.6:
- *    - BUSY_LOOP_HACKS needed to call change_pc() earlier, before
- *      checking the opcodes at the new address, because otherwise they
- *      might access the old (wrong or even nullptr) banked memory region.
- *      Thanks to Sean Young for finding this nasty bug.
- *   Changes in 2.5:
- *    - Burning cycles always adjusts the ICount by a multiple of 4.
- *    - In REPEAT_AT_ONCE cases the r register wasn't incremented twice
- *      per repetition as it should have been. Those repeated opcodes
- *      could also underflow the ICount.
- *    - Simplified TIME_LOOP_HACKS for BC and added two more for DE + HL
- *      timing loops. i think those hacks weren't endian safe before too.
- *   Changes in 2.4:
- *    - z80_reset zaps the entire context, sets IX and IY to 0xffff(!) and
- *      sets the Z flag. With these changes the Tehkan World Cup driver
- *      _seems_ to work again.
- *   Changes in 2.3:
- *    - External termination of the execution loop calls z80_burn() and
- *      z80_vm_burn() to burn an amount of cycles (r adjustment)
- *    - Shortcuts which burn CPU cycles (BUSY_LOOP_HACKS and TIME_LOOP_HACKS)
- *      now also adjust the r register depending on the skipped opcodes.
- *   Changes in 2.2:
- *    - Fixed bugs in CPL, SCF and CCF instructions flag handling.
- *    - Changed variable ea and arg16() function to u32; this
- *      produces slightly more efficient code.
- *    - The DD/FD XY CB opcodes where XY is 40-7F and Y is not 6/E
- *      are changed to calls to the X6/XE opcodes to reduce object size.
- *      They're hardly ever used so this should not yield a speed penalty.
- *   New in 2.0:
- *    - Optional more exact Z80 emulation (#define Z80_EXACT 1) according
- *      to a detailed description by Sean Young which can be found at:
- *      http://www.msxnet.org/tech/z80-documented.pdf
- *****************************************************************************/
+
+    ZiLOG Z80 emulator
+
+TODO:
+- Interrupt mode 0 should be able to execute arbitrary opcodes
+- If LD A,I or LD A,R is interrupted, P/V flag gets reset, even if IFF2
+  was set before this instruction (implemented, but not enabled: we need
+  document Z80 types first, see below)
+- Ideally, the tiny differences between Z80 types should be supported,
+  currently known differences:
+  - LD A,I/R P/V flag reset glitch is fixed on CMOS Z80
+  - OUT (C),0 outputs 0 on NMOS Z80, $FF on CMOS Z80
+  - SCF/CCF X/Y flags is ((flags | A) & 0x28) on SGS/SHARP/ZiLOG NMOS Z80,
+    (flags & A & 0x28).
+    However, recent findings say that SCF/CCF X/Y results depend on whether
+    or not the previous instruction touched the flag register.
+  This Z80 emulator assumes a ZiLOG NMOS model.
+
+*****************************************************************************/
 
 #include "emu.h"
 #include "z80.h"
 #include "z80dasm.h"
 
-#define LOG_UNDOC (1U << 1)
-#define LOG_INT   (1U << 2)
-#define LOG_TIME  (1U << 3)
+#include "z80.inc"
 
-#define VERBOSE ( LOG_UNDOC /*| LOG_INT*/ )
+#define LOG_INT   (1U << 1) // z80.lst
+#define LOG_UNDOC (1U << 2)
+
+#define VERBOSE (LOG_UNDOC)
 #include "logmacro.h"
 
-#define LOGUNDOC(...) LOGMASKED(LOG_UNDOC, __VA_ARGS__)
-#define LOGINT(...)   LOGMASKED(LOG_INT,   __VA_ARGS__)
 
-
-/* On an NMOS Z80, if LD A,I or LD A,R is interrupted, P/V flag gets reset,
-   even if IFF2 was set before this instruction. This issue was fixed on
-   the CMOS Z80, so until knowing (most) Z80 types on hardware, it's disabled */
-#define HAS_LDAIR_QUIRK  0
-
-
-/****************************************************************************
- * The Z80 registers. halt is set to 1 when the CPU is halted, the refresh
- * register is calculated as follows: refresh = (r & 127) | (r2 & 128)
- ****************************************************************************/
-#define CF      0x01
-#define NF      0x02
-#define PF      0x04
-#define VF      PF
-#define XF      0x08
-#define HF      0x10
-#define YF      0x20
-#define ZF      0x40
-#define SF      0x80
-
-#define INT_IRQ 0x01
-#define NMI_IRQ 0x02
-
-#define PRVPC   m_prvpc.d     // previous program counter
-
-#define PCD     m_pc.d
-#define PC      m_pc.w.l
-
-#define SPD     m_sp.d
-#define SP      m_sp.w.l
-
-#define AFD     m_af.d
-#define AF      m_af.w.l
-#define A       m_af.b.h
-#define F       m_af.b.l
-#define Q       m_q
-#define QT      m_qtemp
-#define I       m_i
-#define R       m_r
-#define R2      m_r2
-
-#define BCD     m_bc.d
-#define BC      m_bc.w.l
-#define B       m_bc.b.h
-#define C       m_bc.b.l
-
-#define DED     m_de.d
-#define DE      m_de.w.l
-#define D       m_de.b.h
-#define E       m_de.b.l
-
-#define HLD     m_hl.d
-#define HL      m_hl.w.l
-#define H       m_hl.b.h
-#define L       m_hl.b.l
-
-#define IXD     m_ix.d
-#define IX      m_ix.w.l
-#define HX      m_ix.b.h
-#define LX      m_ix.b.l
-
-#define IYD     m_iy.d
-#define IY      m_iy.w.l
-#define HY      m_iy.b.h
-#define LY      m_iy.b.l
-
-#define WZ      m_wz.w.l
-#define WZ_H    m_wz.b.h
-#define WZ_L    m_wz.b.l
-
-
-#define TADR     m_shared_addr.w   // Typically represents values from A0..15 pins. 16bit input in steps.
-#define TADR_H   m_shared_addr.b.h
-#define TADR_L   m_shared_addr.b.l
-#define TDAT     m_shared_data.w   // 16bit input(if use as second parameter) or output in steps.
-#define TDAT2    m_shared_data2.w
-#define TDAT_H   m_shared_data.b.h
-#define TDAT_L   m_shared_data.b.l
-#define TDAT8    m_shared_data.b.l // Typically represents values from D0..8 pins. 8bit input or output in steps.
-
-static bool tables_initialised = false;
-std::unique_ptr<u8[]> z80_device::SZ = std::make_unique<u8[]>(0x100);       // zero and sign flags
-std::unique_ptr<u8[]> z80_device::SZ_BIT = std::make_unique<u8[]>(0x100);   // zero, sign and parity/overflow (=zero) flags for BIT opcode
-std::unique_ptr<u8[]> z80_device::SZP = std::make_unique<u8[]>(0x100);      // zero, sign and parity flags
-std::unique_ptr<u8[]> z80_device::SZHV_inc = std::make_unique<u8[]>(0x100); // zero, sign, half carry and overflow flags INC r8
-std::unique_ptr<u8[]> z80_device::SZHV_dec = std::make_unique<u8[]>(0x100); // zero, sign, half carry and overflow flags DEC r8
-
-std::unique_ptr<u8[]> z80_device::SZHVC_add = std::make_unique<u8[]>(2 * 0x100 * 0x100);
-std::unique_ptr<u8[]> z80_device::SZHVC_sub = std::make_unique<u8[]>(2 * 0x100 * 0x100);
+bool z80_device::tables_initialised = false;
+u8 z80_device::SZ[] = {};       // zero and sign flags
+u8 z80_device::SZ_BIT[] = {};   // zero, sign and parity/overflow (=zero) flags for BIT opcode
+u8 z80_device::SZP[] = {};      // zero, sign and parity flags
+u8 z80_device::SZHV_inc[] = {}; // zero, sign, half carry and overflow flags INC r8
+u8 z80_device::SZHV_dec[] = {}; // zero, sign, half carry and overflow flags DEC r8
+u8 z80_device::SZHVC_add[] = {};
+u8 z80_device::SZHVC_sub[] = {};
 
 
 /***************************************************************
@@ -263,7 +91,7 @@ void z80_device::data_write(u16 addr, u8 value)
  ***************************************************************/
 u8 z80_device::opcode_read()
 {
-	return m_opcodes.read_byte(translate_memory_address(PCD));
+	return m_opcodes.read_byte(translate_memory_address(PC));
 }
 
 /****************************************************************
@@ -275,7 +103,7 @@ u8 z80_device::opcode_read()
  ***************************************************************/
 u8 z80_device::arg_read()
 {
-	return m_args.read_byte(translate_memory_address(PCD));
+	return m_args.read_byte(translate_memory_address(PC));
 }
 
 /***************************************************************
@@ -342,7 +170,7 @@ void z80_device::rra()
  ***************************************************************/
 void z80_device::add_a(u8 value)
 {
-	u32 ah = AFD & 0xff00;
+	u32 ah = AF & 0xff00;
 	u32 res = (u8)((ah >> 8) + value);
 	set_f(SZHVC_add[ah | res]);
 	A = res;
@@ -353,7 +181,7 @@ void z80_device::add_a(u8 value)
  ***************************************************************/
 void z80_device::adc_a(u8 value)
 {
-	u32 ah = AFD & 0xff00, c = AFD & 1;
+	u32 ah = AF & 0xff00, c = AF & 1;
 	u32 res = (u8)((ah >> 8) + value + c);
 	set_f(SZHVC_add[(c << 16) | ah | res]);
 	A = res;
@@ -364,7 +192,7 @@ void z80_device::adc_a(u8 value)
  ***************************************************************/
 void z80_device::sub(u8 value)
 {
-	u32 ah = AFD & 0xff00;
+	u32 ah = AF & 0xff00;
 	u32 res = (u8)((ah >> 8) - value);
 	set_f(SZHVC_sub[ah | res]);
 	A = res;
@@ -375,7 +203,7 @@ void z80_device::sub(u8 value)
  ***************************************************************/
 void z80_device::sbc_a(u8 value)
 {
-	u32 ah = AFD & 0xff00, c = AFD & 1;
+	u32 ah = AF & 0xff00, c = AF & 1;
 	u32 res = (u8)((ah >> 8) - value - c);
 	set_f(SZHVC_sub[(c << 16) | ah | res]);
 	A = res;
@@ -445,7 +273,7 @@ void z80_device::xor_a(u8 value)
 void z80_device::cp(u8 value)
 {
 	unsigned val = value;
-	u32 ah = AFD & 0xff00;
+	u32 ah = AF & 0xff00;
 	u32 res = (u8)((ah >> 8) - val);
 	set_f((SZHVC_sub[ah | res] & ~(YF | XF)) | (val & (YF | XF)));
 }
@@ -638,14 +466,15 @@ void z80_device::set_f(u8 f)
 
 void z80_device::illegal_1()
 {
-	LOGUNDOC("ill. opcode $%02x $%02x ($%04x)\n",
-			 m_opcodes.read_byte(translate_memory_address((PCD - 1) & 0xffff)), m_opcodes.read_byte(translate_memory_address(PCD)), PCD - 1);
+	LOGMASKED(LOG_UNDOC, "ill. opcode $%02x $%02x ($%04x)\n",
+			m_opcodes.read_byte(translate_memory_address((PC - 1) & 0xffff)),
+			m_opcodes.read_byte(translate_memory_address(PC)), PC - 1);
 }
 
 void z80_device::illegal_2()
 {
-	LOGUNDOC("ill. opcode $ed $%02x\n",
-			 m_opcodes.read_byte(translate_memory_address((PCD - 1) & 0xffff)));
+	LOGMASKED(LOG_UNDOC, "ill. opcode $ed $%02x\n",
+			m_opcodes.read_byte(translate_memory_address((PC - 1) & 0xffff)));
 }
 
 /****************************************************************************
@@ -679,36 +508,36 @@ void z80_device::device_start()
 				int val = newval - oldval;
 				*padd = (newval) ? ((newval & 0x80) ? SF : 0) : ZF;
 				*padd |= (newval & (YF | XF));  // undocumented flag bits 5+3
-				if( (newval & 0x0f) < (oldval & 0x0f) ) *padd |= HF;
-				if( newval < oldval ) *padd |= CF;
-				if( (val^oldval^0x80) & (val^newval) & 0x80 ) *padd |= VF;
+				if ((newval & 0x0f) < (oldval & 0x0f)) *padd |= HF;
+				if (newval < oldval) *padd |= CF;
+				if ((val^oldval^0x80) & (val^newval) & 0x80) *padd |= VF;
 				padd++;
 
 				// adc with carry set
 				val = newval - oldval - 1;
 				*padc = (newval) ? ((newval & 0x80) ? SF : 0) : ZF;
 				*padc |= (newval & (YF | XF));  // undocumented flag bits 5+3
-				if( (newval & 0x0f) <= (oldval & 0x0f) ) *padc |= HF;
-				if( newval <= oldval ) *padc |= CF;
-				if( (val^oldval^0x80) & (val^newval) & 0x80 ) *padc |= VF;
+				if ((newval & 0x0f) <= (oldval & 0x0f)) *padc |= HF;
+				if (newval <= oldval) *padc |= CF;
+				if ((val^oldval^0x80) & (val^newval) & 0x80) *padc |= VF;
 				padc++;
 
 				// cp, sub or sbc w/o carry set
 				val = oldval - newval;
 				*psub = NF | ((newval) ? ((newval & 0x80) ? SF : 0) : ZF);
 				*psub |= (newval & (YF | XF));  // undocumented flag bits 5+3
-				if( (newval & 0x0f) > (oldval & 0x0f) ) *psub |= HF;
-				if( newval > oldval ) *psub |= CF;
-				if( (val^oldval) & (oldval^newval) & 0x80 ) *psub |= VF;
+				if ((newval & 0x0f) > (oldval & 0x0f)) *psub |= HF;
+				if (newval > oldval) *psub |= CF;
+				if ((val^oldval) & (oldval^newval) & 0x80) *psub |= VF;
 				psub++;
 
 				// sbc with carry set
 				val = oldval - newval - 1;
 				*psbc = NF | ((newval) ? ((newval & 0x80) ? SF : 0) : ZF);
-				*psbc |= (newval & (YF | XF));  /* undocumented flag bits 5+3 */
-				if( (newval & 0x0f) >= (oldval & 0x0f) ) *psbc |= HF;
-				if( newval >= oldval ) *psbc |= CF;
-				if( (val^oldval) & (oldval^newval) & 0x80 ) *psbc |= VF;
+				*psbc |= (newval & (YF | XF));  // undocumented flag bits 5+3
+				if ((newval & 0x0f) >= (oldval & 0x0f)) *psbc |= HF;
+				if (newval >= oldval) *psbc |= CF;
+				if ((val^oldval) & (oldval^newval) & 0x80) *psbc |= VF;
 				psbc++;
 			}
 		}
@@ -716,31 +545,25 @@ void z80_device::device_start()
 		for (int i = 0; i < 256; i++)
 		{
 			int p = 0;
-			if( i&0x01 ) ++p;
-			if( i&0x02 ) ++p;
-			if( i&0x04 ) ++p;
-			if( i&0x08 ) ++p;
-			if( i&0x10 ) ++p;
-			if( i&0x20 ) ++p;
-			if( i&0x40 ) ++p;
-			if( i&0x80 ) ++p;
+			for (int b = 0; b < 8; b++)
+				p += BIT(i, b);
 			SZ[i] = i ? i & SF : ZF;
 			SZ[i] |= (i & (YF | XF));         // undocumented flag bits 5+3
 			SZ_BIT[i] = i ? i & SF : ZF | PF;
 			SZ_BIT[i] |= (i & (YF | XF));     // undocumented flag bits 5+3
 			SZP[i] = SZ[i] | ((p & 1) ? 0 : PF);
 			SZHV_inc[i] = SZ[i];
-			if( i == 0x80 ) SZHV_inc[i] |= VF;
-			if( (i & 0x0f) == 0x00 ) SZHV_inc[i] |= HF;
+			if (i == 0x80) SZHV_inc[i] |= VF;
+			if ((i & 0x0f) == 0x00) SZHV_inc[i] |= HF;
 			SZHV_dec[i] = SZ[i] | NF;
-			if( i == 0x7f ) SZHV_dec[i] |= VF;
-			if( (i & 0x0f) == 0x0f ) SZHV_dec[i] |= HF;
+			if (i == 0x7f) SZHV_dec[i] |= VF;
+			if ((i & 0x0f) == 0x0f) SZHV_dec[i] |= HF;
 		}
 
 		tables_initialised = true;
 	}
 
-	save_item(NAME(m_prvpc.w.l));
+	save_item(NAME(PRVPC));
 	save_item(NAME(PC));
 	save_item(NAME(SP));
 	save_item(NAME(AF));
@@ -750,14 +573,14 @@ void z80_device::device_start()
 	save_item(NAME(IX));
 	save_item(NAME(IY));
 	save_item(NAME(WZ));
-	save_item(NAME(m_af2.w.l));
-	save_item(NAME(m_bc2.w.l));
-	save_item(NAME(m_de2.w.l));
-	save_item(NAME(m_hl2.w.l));
-	save_item(NAME(m_r));
-	save_item(NAME(m_r2));
-	save_item(NAME(m_q));
-	save_item(NAME(m_qtemp));
+	save_item(NAME(m_af2.w));
+	save_item(NAME(m_bc2.w));
+	save_item(NAME(m_de2.w));
+	save_item(NAME(m_hl2.w));
+	save_item(NAME(QT));
+	save_item(NAME(Q));
+	save_item(NAME(R));
+	save_item(NAME(R2));
 	save_item(NAME(m_iff1));
 	save_item(NAME(m_iff2));
 	save_item(NAME(m_halt));
@@ -768,44 +591,51 @@ void z80_device::device_start()
 	save_item(NAME(m_irq_state));
 	save_item(NAME(m_wait_state));
 	save_item(NAME(m_busrq_state));
+	save_item(NAME(m_busack_state));
 	save_item(NAME(m_after_ei));
 	save_item(NAME(m_after_ldair));
-	save_item(NAME(m_ref));
+	save_item(NAME(m_ea));
 	save_item(NAME(m_tmp_irq_vector));
 	save_item(NAME(m_shared_addr.w));
 	save_item(NAME(m_shared_data.w));
 	save_item(NAME(m_shared_data2.w));
+	save_item(NAME(m_rtemp));
+	save_item(NAME(m_ref));
 
 	// Reset registers to their initial values
 	PRVPC = 0;
-	PCD = 0;
-	SPD = 0;
-	AFD = 0;
-	BCD = 0;
-	DED = 0;
-	HLD = 0;
-	IXD = 0;
-	IYD = 0;
+	PC = 0;
+	SP = 0;
+	AF = 0;
+	BC = 0;
+	DE = 0;
+	HL = 0;
+	IX = 0;
+	IY = 0;
 	WZ = 0;
-	m_af2.d = 0;
-	m_bc2.d = 0;
-	m_de2.d = 0;
-	m_hl2.d = 0;
-	m_r = 0;
-	m_r2 = 0;
+	m_af2.w = 0;
+	m_bc2.w = 0;
+	m_de2.w = 0;
+	m_hl2.w = 0;
+	QT = 0;
+	Q = 0;
+	R = 0;
+	R2 = 0;
 	m_iff1 = 0;
 	m_iff2 = 0;
 	m_halt = 0;
 	m_im = 0;
 	m_i = 0;
 	m_nmi_state = 0;
-	m_nmi_pending = 0;
+	m_nmi_pending = false;
 	m_irq_state = 0;
 	m_wait_state = 0;
 	m_busrq_state = 0;
-	m_after_ei = 0;
-	m_after_ldair = 0;
+	m_busack_state = 0;
+	m_after_ei = false;
+	m_after_ldair = false;
 	m_ea = 0;
+	m_rtemp = 0;
 
 	space(AS_PROGRAM).cache(m_args);
 	space(has_space(AS_OPCODES) ? AS_OPCODES : AS_PROGRAM).cache(m_opcodes);
@@ -816,8 +646,8 @@ void z80_device::device_start()
 	set_f(ZF);        // Zero flag is set
 
 	// set up the state table
-	state_add(STATE_GENPC,     "PC",        m_pc.w.l).callimport();
-	state_add(STATE_GENPCBASE, "CURPC",     m_prvpc.w.l).callimport().noshow();
+	state_add(STATE_GENPC,     "PC",        m_pc.w).callimport();
+	state_add(STATE_GENPCBASE, "CURPC",     m_prvpc.w).callimport().noshow();
 	state_add(Z80_SP,          "SP",        SP);
 	state_add(STATE_GENFLAGS,  "GENFLAGS",  F).noshow().formatstr("%8s");
 	state_add(Z80_A,           "A",         A).noshow();
@@ -833,10 +663,10 @@ void z80_device::device_start()
 	state_add(Z80_HL,          "HL",        HL);
 	state_add(Z80_IX,          "IX",        IX);
 	state_add(Z80_IY,          "IY",        IY);
-	state_add(Z80_AF2,         "AF2",       m_af2.w.l);
-	state_add(Z80_BC2,         "BC2",       m_bc2.w.l);
-	state_add(Z80_DE2,         "DE2",       m_de2.w.l);
-	state_add(Z80_HL2,         "HL2",       m_hl2.w.l);
+	state_add(Z80_AF2,         "AF2",       m_af2.w);
+	state_add(Z80_BC2,         "BC2",       m_bc2.w);
+	state_add(Z80_DE2,         "DE2",       m_de2.w);
+	state_add(Z80_HL2,         "HL2",       m_hl2.w);
 	state_add(Z80_WZ,          "WZ",        WZ);
 	state_add(Z80_R,           "R",         m_rtemp).callimport().callexport();
 	state_add(Z80_I,           "I",         m_i);
@@ -849,13 +679,6 @@ void z80_device::device_start()
 	set_icountptr(m_icount);
 }
 
-void nsc800_device::device_start()
-{
-	z80_device::device_start();
-
-	save_item(NAME(m_nsc800_irq_state));
-}
-
 /****************************************************************************
  * Do a reset
  ****************************************************************************/
@@ -865,6 +688,7 @@ void z80_device::device_reset()
 
 	m_ref = 0xffff00;
 	PC = 0x0000;
+	WZ = PC;
 	m_i = 0;
 	m_r = 0;
 	m_r2 = 0;
@@ -873,56 +697,11 @@ void z80_device::device_reset()
 	m_after_ldair = false;
 	m_iff1 = 0;
 	m_iff2 = 0;
-
-	WZ = PCD;
-}
-
-void nsc800_device::device_reset()
-{
-	z80_device::device_reset();
-	memset(m_nsc800_irq_state, 0, sizeof(m_nsc800_irq_state));
-}
-
-bool z80_device::check_icount(u8 to_step, int icount_saved, bool redonable)
-{
-	if ((m_icount < 0) && redonable && access_to_be_redone())
-	{
-		m_icount = icount_saved;
-		m_ref = (m_ref & 0xffff00) | (to_step - 1);
-		m_redone = true;
-		return true;
-	}
-	if (m_wait_state)
-	{
-		m_icount = 0;
-	}
-	if (m_icount <= 0)
-	{
-		m_ref = (m_ref & 0xffff00) | to_step;
-		return true;
-	}
-
-	return false;
 }
 
 void z80_device::do_op()
 {
-	const bool is_rop = m_ref >= 0xffff00;
 	#include "cpu/z80/z80.hxx"
-	if (!is_rop)
-	{
-		m_ref = 0xffff00;
-	}
-}
-
-void nsc800_device::do_op()
-{
-	const bool is_rop = m_ref >= 0xffff00;
-	#include "cpu/z80/z80_ncs800.hxx"
-	if (!is_rop)
-	{
-		m_ref = 0xffff00;
-	}
 }
 
 /****************************************************************************
@@ -936,8 +715,7 @@ void z80_device::execute_run()
 		return;
 	}
 
-	m_redone = false;
-	while (m_icount > 0 && !m_redone)
+	while (m_icount > 0)
 	{
 		do_op();
 	}
@@ -976,28 +754,6 @@ void z80_device::execute_set_input(int inputnum, int state)
 	}
 }
 
-void nsc800_device::execute_set_input(int inputnum, int state)
-{
-	switch (inputnum)
-	{
-	case NSC800_RSTA:
-		m_nsc800_irq_state[NSC800_RSTA] = state;
-		break;
-
-	case NSC800_RSTB:
-		m_nsc800_irq_state[NSC800_RSTB] = state;
-		break;
-
-	case NSC800_RSTC:
-		m_nsc800_irq_state[NSC800_RSTC] = state;
-		break;
-
-	default:
-		z80_device::execute_set_input(inputnum, state);
-		break;
-	}
-}
-
 /**************************************************************************
  * STATE IMPORT/EXPORT
  **************************************************************************/
@@ -1005,12 +761,14 @@ void z80_device::state_import(const device_state_entry &entry)
 {
 	switch (entry.index())
 	{
-	case STATE_GENPC:
-		m_prvpc = m_pc;
-		break;
-
 	case STATE_GENPCBASE:
 		m_pc = m_prvpc;
+		[[fallthrough]];
+	case STATE_GENPC:
+		m_prvpc = m_pc;
+		m_ref = 0xffff00;
+		m_after_ei = false;
+		m_after_ldair = false;
 		break;
 
 	case Z80_R:
@@ -1077,6 +835,7 @@ z80_device::z80_device(const machine_config &mconfig, device_type type, const ch
 	m_refresh_cb(*this),
 	m_nomreq_cb(*this),
 	m_halt_cb(*this),
+	m_busack_cb(*this),
 	m_m1_cycles(4),
 	m_memrq_cycles(3),
 	m_iorq_cycles(4)
@@ -1101,10 +860,3 @@ device_memory_interface::space_config_vector z80_device::memory_space_config() c
 }
 
 DEFINE_DEVICE_TYPE(Z80, z80_device, "z80", "Zilog Z80")
-
-nsc800_device::nsc800_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: z80_device(mconfig, NSC800, tag, owner, clock)
-{
-}
-
-DEFINE_DEVICE_TYPE(NSC800, nsc800_device, "nsc800", "National Semiconductor NSC800")

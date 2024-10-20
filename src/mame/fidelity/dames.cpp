@@ -53,7 +53,7 @@ public:
 	void dsc(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	// devices/pointers
@@ -66,7 +66,7 @@ private:
 	u8 m_inp_mux = 0;
 	u8 m_led_select = 0;
 
-	void main_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
 
 	void init_board(u8 data);
 	u8 read_board_row(u8 row);

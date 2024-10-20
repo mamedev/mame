@@ -2,13 +2,12 @@
 // copyright-holders:
 
 /*
-    Bad Lands(Modular System)
+    Bad Lands (Modular System)
 
     As with most of the 'Modular System' setups, the hardware is heavily modified from the original
     and consists of a multi-board stack in a cage, hence different driver.
 
-    This set was assembled from a stack of loose PCBs, so for this game the Modular System cage contains
-    at least 6 main boards and 1 sub board, but may be more.
+    For this game the Modular System cage contains 6 main boards and 1 sub board.
 
     MOD-6/1 - MC68000P10, 4 ROMs, RAMs, 20 MHz XTAL.
     MOD 1/4 - Sound board (Z8400BB1, 2 x YM2203C). 2 8-dips banks + small sub board with OKI M5205.
@@ -51,7 +50,7 @@ public:
 	void badlandsm(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -59,7 +58,7 @@ private:
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void main_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
 };
 
 

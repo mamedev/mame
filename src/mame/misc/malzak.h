@@ -36,8 +36,8 @@ public:
 	void malzak2(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	/* devices */
@@ -62,12 +62,12 @@ private:
 
 	void palette_init(palette_device &palette) const;
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 
-	void malzak2_map(address_map &map);
-	void malzak_data_map(address_map &map);
-	void malzak_io_map(address_map &map);
-	void malzak_map(address_map &map);
+	void malzak2_map(address_map &map) ATTR_COLD;
+	void malzak_data_map(address_map &map) ATTR_COLD;
+	void malzak_io_map(address_map &map) ATTR_COLD;
+	void malzak_map(address_map &map) ATTR_COLD;
 
 	TILE_GET_INFO_MEMBER(get_tile_info);
 	std::unique_ptr<bitmap_rgb32> m_trom_bitmap;

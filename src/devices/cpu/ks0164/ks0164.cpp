@@ -58,11 +58,6 @@ uint32_t ks0164_cpu_device::execute_max_cycles() const noexcept
 	return 5;
 }
 
-uint32_t ks0164_cpu_device::execute_input_lines() const noexcept
-{
-	return 16;
-}
-
 void ks0164_cpu_device::execute_set_input(int inputnum, int state)
 {
 	if(state)

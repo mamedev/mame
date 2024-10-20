@@ -196,9 +196,9 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(kbd_reset);
 
 private:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 	uint8_t ram_r(offs_t offset);
 	void ram_w(offs_t offset, uint8_t data);
@@ -227,8 +227,8 @@ private:
 
 	MC6845_UPDATE_ROW(update_row);
 
-	void z100_io(address_map &map);
-	void z100_mem(address_map &map);
+	void z100_io(address_map &map) ATTR_COLD;
+	void z100_mem(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	required_shared_ptr<uint8_t> m_ram;
@@ -646,8 +646,8 @@ INPUT_PORTS_START( z100 )
 	PORT_BIT(1, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_LALT) PORT_NAME("Fast Repeat")
 
 	PORT_START("CTRL") // 2 & 4
-	PORT_BIT(1, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_LCONTROL) PORT_NAME("Ctrl") PORT_CHANGED_MEMBER(DEVICE_SELF, z100_state, kbd_reset, 0)
-	PORT_BIT(2, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Reset") PORT_CHANGED_MEMBER(DEVICE_SELF, z100_state, kbd_reset, 0)
+	PORT_BIT(1, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_LCONTROL) PORT_NAME("Ctrl") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(z100_state::kbd_reset), 0)
+	PORT_BIT(2, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Reset") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(z100_state::kbd_reset), 0)
 
 	PORT_START("DSW101")
 	PORT_DIPNAME( 0x07, 0x00, "Default Auto-boot Device" )

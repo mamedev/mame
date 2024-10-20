@@ -83,7 +83,7 @@ void menu_audit::recompute_metrics(uint32_t width, uint32_t height, float aspect
 }
 
 
-void menu_audit::custom_render(uint32_t flags, void *selectedref, float top, float bottom, float x, float y, float x2, float y2)
+void menu_audit::custom_render(uint32_t flags, void *selectedref, float top, float bottom, float origx1, float origy1, float origx2, float origy2)
 {
 	switch (m_phase)
 	{
@@ -92,7 +92,7 @@ void menu_audit::custom_render(uint32_t flags, void *selectedref, float top, flo
 		{
 			draw_text_box(
 					&m_prompt, &m_prompt + 1,
-					x, x2, y2 + tb_border(), y2 + bottom,
+					origx1, origx2, origy2 + tb_border(), origy2 + bottom,
 					text_layout::text_justify::CENTER, text_layout::word_wrapping::NEVER, false,
 					ui().colors().text_color(), UI_GREEN_COLOR);
 		}

@@ -145,6 +145,7 @@ DEFINE_DEVICE_TYPE(M6809, m6809_device, "m6809", "MC6809 (legacy)")
 m6809_base_device::m6809_base_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, const device_type type, int divider) :
 	cpu_device(mconfig, type, tag, owner, clock),
 	m_lic_func(*this),
+	m_syncack_write_func(*this),
 	m_program_config("program", ENDIANNESS_BIG, 8, 16),
 	m_sprogram_config("decrypted_opcodes", ENDIANNESS_BIG, 8, 16),
 	m_clock_divider(divider)
@@ -447,17 +448,6 @@ uint32_t m6809_base_device::execute_min_cycles() const noexcept
 uint32_t m6809_base_device::execute_max_cycles() const noexcept
 {
 	return 19;
-}
-
-
-//-------------------------------------------------
-//  execute_input_lines - return the number of
-//  input/interrupt lines
-//-------------------------------------------------
-
-uint32_t m6809_base_device::execute_input_lines() const noexcept
-{
-	return 3;
 }
 
 

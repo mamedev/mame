@@ -1711,14 +1711,14 @@ INPUT_PORTS_END
 */
 static INPUT_PORTS_START( clubpacm )
 	PORT_START("IN0")
-	PORT_BIT( 0x0f, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(clubpacm_state, clubpacm_input_r)
+	PORT_BIT( 0x0f, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(FUNC(clubpacm_state::clubpacm_input_r))
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE1 )
 
 	PORT_START("IN1")
-	PORT_BIT( 0x0f, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(clubpacm_state, clubpacm_input_r)
+	PORT_BIT( 0x0f, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(FUNC(clubpacm_state::clubpacm_input_r))
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START2 )
@@ -5573,11 +5573,11 @@ ROM_START( pacmanmr ) // PCB is marked "PAC/M" on component side
 
 	ROM_REGION( 0x0120, "proms", 0 )
 	ROM_LOAD( "pacm.8h", 0x0000, 0x0020, CRC(2c3cc909) SHA1(32d68d4cfdf9f3e7351353428d268c763e809c63) )
-	ROM_LOAD( "pacm.4a", 0x0020, 0x0100, CRC(4c8e83a4) SHA1(e522cbc6c14bc481f2e97f1a7224c66bb283f553) )
+	ROM_LOAD( "pacm.4a", 0x0020, 0x0100, CRC(3eb3a8e4) SHA1(19097b5f60d1030f8b82d9f1d3a241f93e5c75d6) )
 
 	ROM_REGION( 0x0200, "namco", 0 )    // Sound PROMs
-	ROM_LOAD( "pacm.1m", 0x0000, 0x0100, CRC(4e8b3b74) SHA1(aa427aa45373e9a1e6a1155b4bc7bbd97f74f3d8) )
-	ROM_LOAD( "pacm.3m", 0x0100, 0x0100, CRC(05197026) SHA1(9b71fb175331bbc12e43441ecfad75b633e2f953) )  // Timing - not used
+	ROM_LOAD( "pacm.1m", 0x0000, 0x0100, CRC(3cb61034) SHA1(2f24b88839aee107a0ac1064f8bc4853933f5205) )
+	ROM_LOAD( "pacm.3m", 0x0100, 0x0100, CRC(77245b66) SHA1(0c4d0bee858b97632411c440bea6948a74759746) )  // Timing - not used
 ROM_END
 
 // this bootleg on Pacman hardware has half as many tiles as the original and some gfx / animations
@@ -6432,11 +6432,11 @@ ROM_START( mspacmane )
 
 	ROM_REGION( 0x0120, "proms", 0 )
 	ROM_LOAD( "8h",    0x0000, 0x0020, CRC(2c3cc909) SHA1(32d68d4cfdf9f3e7351353428d268c763e809c63) )
-	ROM_LOAD( "4a",    0x0020, 0x0100, CRC(4c8e83a4) SHA1(e522cbc6c14bc481f2e97f1a7224c66bb283f553) )
+	ROM_LOAD( "4a",    0x0020, 0x0100, CRC(3eb3a8e4) SHA1(19097b5f60d1030f8b82d9f1d3a241f93e5c75d6) )
 
 	ROM_REGION( 0x0200, "namco", 0 )    // Sound PROMs
-	ROM_LOAD( "1m",    0x0000, 0x0100, CRC(7b1f9b71) SHA1(5ef72bbdfb72db3eb1175fed652a761938eeb6cd) )
-	ROM_LOAD( "3m",    0x0100, 0x0100, CRC(05197026) SHA1(9b71fb175331bbc12e43441ecfad75b633e2f953) )    // Timing - not used
+	ROM_LOAD( "1m",    0x0000, 0x0100, CRC(0922b031) SHA1(1eb9e1f8e6b027ca80a0ee0b391d4e904e9ea49b) )
+	ROM_LOAD( "3m",    0x0100, 0x0100, CRC(77245b66) SHA1(0c4d0bee858b97632411c440bea6948a74759746) )    // Timing - not used
 ROM_END
 
 ROM_START( mspacmane2 ) // G-GA-2 + G-GB-2 PCBs
@@ -7443,14 +7443,36 @@ ROM_START( sprglobp )
 	ROM_LOAD( "82s126.3m"  ,  0x0100, 0x0100, CRC(77245b66) SHA1(0c4d0bee858b97632411c440bea6948a74759746) )    // Timing - not used
 ROM_END
 
+// A second dump exists. It has half sized program ROMs. The blister was missing 2 ROMs.
+// What's available is identical to the below dump but for 1 single byte at 0x88c which is 0x9a below and 0x92 in the other dump.
+ROM_START( sprglobp2 )
+	ROM_REGION( 0x20000, "maincpu", 0 )
+	ROM_LOAD( "1.bin", 0x0000, 0x1000, CRC(ac5bd172) SHA1(8c74ba7611e58e677f384ccd1fc1022b84cc2190) )
+	ROM_LOAD( "2.bin", 0x1000, 0x1000, CRC(35c7fcf1) SHA1(efb2efd51fb5643ad4f4df11593197097c5cad3f) )
+	ROM_LOAD( "3.bin", 0x2000, 0x1000, CRC(c10aae4b) SHA1(e40f6066c2eeefcf60553360eb424b875ef007b3) )
+	ROM_LOAD( "4.bin", 0x3000, 0x1000, CRC(b8fd4eb2) SHA1(9bd003b20af0fcaa27780cb7764795b6597f1156) )
+
+	ROM_REGION( 0x2000, "gfx1", 0 )
+	ROM_LOAD( "5,bin",  0x0000, 0x1000, CRC(1aa16109) SHA1(ddc8606512d7ab7555b84146b9d793f65ad0a75f) )
+	ROM_LOAD( "6.bin",  0x1000, 0x1000, CRC(afe72a89) SHA1(fb17632e2665c3cebc1865ef25fa310cc52725c4) )
+
+	ROM_REGION( 0x0120, "proms", 0 ) // not dumped for this set
+	ROM_LOAD( "7 f the glob.7f", 0x0000, 0x0020, BAD_DUMP CRC(1f617527) SHA1(448845cab63800a05fcb106897503d994377f78f) )
+	ROM_LOAD( "4 a the glob.4a", 0x0020, 0x0100, BAD_DUMP CRC(28faa769) SHA1(7588889f3102d4e0ca7918f536556209b2490ea1) )
+
+	ROM_REGION( 0x0200, "namco", 0 )    // Sound PROMs, not dumped for this set
+	ROM_LOAD( "82s126.1m",    0x0000, 0x0100, BAD_DUMP CRC(a9cc86bf) SHA1(bbcec0570aeceb582ff8238a4bc8546a23430081) )
+	ROM_LOAD( "82s126.3m"  ,  0x0100, 0x0100, BAD_DUMP CRC(77245b66) SHA1(0c4d0bee858b97632411c440bea6948a74759746) )    // Timing - not used
+ROM_END
+
 /* This set is from a modified Pengo board.  Pengo and Pacman are functionally the same.
    The bad sound is probably correct as the sound data is part of the protection. */
 ROM_START( sprglbpg )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "ic8.1",      0x0000, 0x1000, CRC(a2df2073) SHA1(14c55186053b080de06cc3691111ede8b2ead231) )
 	ROM_LOAD( "ic7.2",      0x1000, 0x1000, CRC(3d2c22d9) SHA1(2f1d27e49850f904d1f2256bfcf00557ed88bb16) )
-	ROM_LOAD( "ic15.3",      0x2000, 0x1000, CRC(a252047f) SHA1(9fadbb098b86ee98e1a81da938316b833fc26912) )
-	ROM_LOAD( "ic14.4",      0x3000, 0x1000, CRC(7efa81f1) SHA1(583999280623f02dcc318a6c7af5ee6fc46144b8) )
+	ROM_LOAD( "ic15.3",     0x2000, 0x1000, CRC(a252047f) SHA1(9fadbb098b86ee98e1a81da938316b833fc26912) )
+	ROM_LOAD( "ic14.4",     0x3000, 0x1000, CRC(7efa81f1) SHA1(583999280623f02dcc318a6c7af5ee6fc46144b8) )
 
 	ROM_REGION( 0x2000, "gfx1", 0 )
 	ROM_LOAD( "ic92.5",  0x0000, 0x2000, CRC(e54f484d) SHA1(4feb9ec917c2467a5ac531283cb00fe308be7775) )
@@ -8629,7 +8651,7 @@ void pacman_state::init_pengomc1()
 		romdata[i] = buf[i^0xff];
 }
 
-CUSTOM_INPUT_MEMBER(clubpacm_state::clubpacm_input_r)
+ioport_value clubpacm_state::clubpacm_input_r()
 {
 	ioport_value data = 0x0f;
 
@@ -8657,15 +8679,15 @@ void mspactwin_state::init_mspactwin()
 	{
 		// decode opcode
 		m_decrypted_opcodes     [A  ] = bitswap<8>(rom[       A  ]       , 4, 5, 6, 7, 0, 1, 2, 3);
-		m_decrypted_opcodes     [A+1] = bitswap<8>(rom[       A+1] ^ 0x9A, 6, 4, 5, 7, 2, 0, 3, 1);
+		m_decrypted_opcodes     [A+1] = bitswap<8>(rom[       A+1] ^ 0x9a, 6, 4, 5, 7, 2, 0, 3, 1);
 		m_decrypted_opcodes_high[A  ] = bitswap<8>(rom[0x8000+A  ]       , 4, 5, 6, 7, 0, 1, 2, 3);
-		m_decrypted_opcodes_high[A+1] = bitswap<8>(rom[0x8000+A+1] ^ 0x9A, 6, 4, 5, 7, 2, 0, 3, 1);
+		m_decrypted_opcodes_high[A+1] = bitswap<8>(rom[0x8000+A+1] ^ 0x9a, 6, 4, 5, 7, 2, 0, 3, 1);
 
 		// decode operand
 		rom[       A  ] = bitswap<8>(rom[       A  ]       , 0, 1, 2, 3, 4, 5, 6, 7);
-		rom[       A+1] = bitswap<8>(rom[       A+1] ^ 0xA3, 2, 4, 6, 3, 7, 0, 5, 1);
+		rom[       A+1] = bitswap<8>(rom[       A+1] ^ 0xa3, 2, 4, 6, 3, 7, 0, 5, 1);
 		rom[0x8000+A  ] = bitswap<8>(rom[0x8000+A  ]       , 0, 1, 2, 3, 4, 5, 6, 7);
-		rom[0x8000+A+1] = bitswap<8>(rom[0x8000+A+1] ^ 0xA3, 2, 4, 6, 3, 7, 0, 5, 1);
+		rom[0x8000+A+1] = bitswap<8>(rom[0x8000+A+1] ^ 0xa3, 2, 4, 6, 3, 7, 0, 5, 1);
 	}
 }
 
@@ -8675,6 +8697,52 @@ void pacman_state::init_mspackpls()
 
 	for (int i = 0x0000; i < 0xa000; i++)
 		rom[i] = bitswap<8>(rom[i], 7, 6, 5, 3, 4, 2, 1, 0);
+}
+
+void epospm_state::init_sprglobp2()
+{
+	// this set is very similar to the unencrypted sprglbpg set
+	// for some reason the following doesn't work for some ranges
+	// (opcodes are unencrypted there).
+
+	static const uint8_t data_xortable[16][8] =
+	{
+		{ 0xa8, 0xa8, 0xa8, 0xa8, 0xa8, 0xa8, 0xa8, 0xa8, },    // 0x0000
+		{ 0xa0, 0xa0, 0x88, 0x88, 0x88, 0x88, 0xa0, 0xa0, },    // 0x0001
+		{ 0x00, 0x00, 0x88, 0x88, 0x00, 0x00, 0x88, 0x88, },    // 0x0010
+		{ 0xa0, 0xa0, 0x88, 0x88, 0x88, 0x88, 0xa0, 0xa0, },    // 0x0011
+		{ 0x88, 0x88, 0xa0, 0xa0, 0x28, 0x28, 0x00, 0x00, },    // 0x0100
+		{ 0xa0, 0xa0, 0x88, 0x88, 0x88, 0x88, 0xa0, 0xa0, },    // 0x0101
+		{ 0x20, 0x20, 0x20, 0x20, 0x80, 0x80, 0x80, 0x80, },    // 0x0110
+		{ 0xa0, 0xa0, 0x88, 0x88, 0x88, 0x88, 0xa0, 0xa0, },    // 0x0111
+		{ 0xa8, 0xa8, 0xa8, 0xa8, 0xa8, 0xa8, 0xa8, 0xa8, },    // 0x1000
+		{ 0x28, 0x28, 0xa0, 0xa0, 0x00, 0x00, 0x88, 0x88, },    // 0x1001
+		{ 0x00, 0x00, 0x88, 0x88, 0x00, 0x00, 0x88, 0x88, },    // 0x1010
+		{ 0x28, 0x28, 0xa0, 0xa0, 0x00, 0x00, 0x88, 0x88, },    // 0x1011
+		{ 0x88, 0x88, 0xa0, 0xa0, 0x28, 0x28, 0x00, 0x00, },    // 0x1100
+		{ 0x28, 0x28, 0xa0, 0xa0, 0x00, 0x00, 0x88, 0x88, },    // 0x1101
+		{ 0x20, 0x20, 0x20, 0x20, 0x80, 0x80, 0x80, 0x80, },    // 0x1110
+		{ 0x28, 0x28, 0xa0, 0xa0, 0x00, 0x00, 0x88, 0x88, }     // 0x1111
+	};
+
+	uint8_t *rom = memregion("maincpu")->base();
+
+	for (int a = 0; a < 0x4000; a++)
+	{
+		uint8_t src = rom[a];
+
+		// pick the translation table from bits 0, 4, 8 and 12 of the address
+		int i = BIT(a, 0) + (BIT(a, 4) << 1) + (BIT(a, 8) << 2) + (BIT(a, 12) << 3);
+
+		// pick the offset in the table from bits 1, 3 and 5 of the source data
+		int j = BIT(src, 1) + (BIT(src, 3) << 1) + (BIT(src, 5) << 2);
+
+		// the bottom half of the translation table is the mirror image of the top
+		if (BIT(src, 7)) j = 7 - j;
+
+		// decode the ROM data
+		rom[a] = src ^ data_xortable[i][j];
+	}
 }
 
 /*************************************
@@ -8832,7 +8900,8 @@ GAME( 1983, acitya,   bwcasino, acitya,   acitya,   epospm_state,  empty_init,  
 GAME( 1983, theglobp, suprglob, theglobp, theglobp, epospm_state,  empty_init,    ROT90,  "Epos Corporation",         "The Glob (Pac-Man hardware, set 1)",                         MACHINE_SUPPORTS_SAVE )
 GAME( 1983, theglobpa,suprglob, theglobp, theglobp, epospm_state,  empty_init,    ROT90,  "Epos Corporation",         "The Glob (Pac-Man hardware, set 2)",                         MACHINE_SUPPORTS_SAVE )
 GAME( 1983, sprglobp, suprglob, theglobp, theglobp, epospm_state,  empty_init,    ROT90,  "Epos Corporation",         "Super Glob (Pac-Man hardware)",                              MACHINE_SUPPORTS_SAVE )
-GAME( 1984, sprglbpg, suprglob, pacman,   theglobp, epospm_state,  empty_init,    ROT90,  "bootleg (Software Labor)", "Super Glob (Pac-Man hardware) (German bootleg)",             MACHINE_SUPPORTS_SAVE )
+GAME( 1985, sprglobp2,suprglob, pacman,   theglobp, epospm_state,  init_sprglobp2,ROT90,  "bootleg (Elsys Software)", "Super Glob (Pac-Man hardware, bootleg)",                     MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // encrypted
+GAME( 1984, sprglbpg, suprglob, pacman,   theglobp, epospm_state,  empty_init,    ROT90,  "bootleg (Software Labor)", "Super Glob (Pac-Man hardware, German bootleg)",              MACHINE_SUPPORTS_SAVE )
 GAME( 1983, theglobme,suprglob, woodpek,  theglobp, epospm_state,  empty_init,    ROT90,  "Magic Electronics Inc.",   "The Glob (Pacman hardware, Magic Electronics Inc. license)", MACHINE_SUPPORTS_SAVE )
 
 GAME( 1984, beastfp,  suprglob, theglobp, theglobp, epospm_state,  empty_init,    ROT90,  "Epos Corporation",         "Beastie Feastie (Pac-Man conversion)",                       MACHINE_SUPPORTS_SAVE )

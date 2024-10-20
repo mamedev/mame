@@ -173,6 +173,14 @@ void beta_disk_device::data_w(uint8_t data)
 	}
 }
 
+void beta_disk_device::turbo_w(int state)
+{
+	if (m_betadisk_active == 1)
+	{
+		m_wd179x->set_clock_scale(1 << (state & 1));
+	}
+}
+
 void beta_disk_device::fdc_hld_w(int state)
 {
 	m_wd179x->set_force_ready(state); // HLD connected to RDY pin
@@ -200,12 +208,16 @@ void beta_disk_device::motors_control()
 void beta_disk_device::floppy_formats(format_registration &fr)
 {
 	fr.add_mfm_containers();
+	fr.add_pc_formats();
 	fr.add(FLOPPY_TRD_FORMAT);
 }
 
 static void beta_disk_floppies(device_slot_interface &device)
 {
+	device.option_add("525hd", FLOPPY_525_HD);
 	device.option_add("525qd", FLOPPY_525_QD);
+	device.option_add("35hd", FLOPPY_35_HD);
+	device.option_add("35dd", FLOPPY_35_DD);
 }
 
 

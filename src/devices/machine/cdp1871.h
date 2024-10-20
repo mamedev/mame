@@ -65,7 +65,7 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 	void change_output_lines();
 	void clock_scan_counters();

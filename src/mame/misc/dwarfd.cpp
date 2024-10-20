@@ -328,8 +328,8 @@ public:
 	void init_dwarfd();
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	/* video-related */
@@ -356,11 +356,11 @@ private:
 	I8275_DRAW_CHARACTER_MEMBER(display_pixels);
 	I8275_DRAW_CHARACTER_MEMBER(pesp_display_pixels);
 	I8275_DRAW_CHARACTER_MEMBER(qc_display_pixels);
-	void io_map(address_map &map);
-	void mem_map(address_map &map);
-	void pokeresp_map(address_map &map);
-	void qc_io_map(address_map &map);
-	void qc_map(address_map &map);
+	void io_map(address_map &map) ATTR_COLD;
+	void mem_map(address_map &map) ATTR_COLD;
+	void pokeresp_map(address_map &map) ATTR_COLD;
+	void qc_io_map(address_map &map) ATTR_COLD;
+	void qc_map(address_map &map) ATTR_COLD;
 };
 
 

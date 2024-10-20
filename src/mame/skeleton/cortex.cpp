@@ -68,8 +68,8 @@ public:
 	void cortex(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	void kbd_put(u8 data);
@@ -79,8 +79,8 @@ private:
 	u8 pio_r(offs_t offset);
 	u8 keyboard_r(offs_t offset);
 
-	void io_map(address_map &map);
-	void mem_map(address_map &map);
+	void io_map(address_map &map) ATTR_COLD;
+	void mem_map(address_map &map) ATTR_COLD;
 
 	bool m_kbd_ack = 0;
 	bool m_vdp_int = 0;

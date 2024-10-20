@@ -22,16 +22,18 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "cpu/z80/z80.h"
-#include "machine/eepromser.h"
-#include "sound/k051649.h"
-#include "sound/okim6295.h"
 #include "k053244_k053245.h"
 #include "konami_helper.h"
+
+#include "cpu/z80/z80.h"
+#include "machine/eepromser.h"
 #include "machine/k053252.h"
 #include "machine/nvram.h"
 #include "machine/ticket.h"
 #include "machine/timer.h"
+#include "sound/k051649.h"
+#include "sound/okim6295.h"
+
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
@@ -94,13 +96,13 @@ private:
 	void serial_io_w(u8 data);
 	void out_w(u8 data);
 
-	void common_map(address_map &map);
-	void quickpick5_main(address_map &map);
-	void waijockey_main(address_map &map);
+	void common_map(address_map &map) ATTR_COLD;
+	void quickpick5_main(address_map &map) ATTR_COLD;
+	void waijockey_main(address_map &map) ATTR_COLD;
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<palette_device> m_palette;
@@ -384,7 +386,7 @@ static INPUT_PORTS_START( quickpick5 )
 	PORT_START("IN1")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_COIN1)
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_SERVICE1)
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_READ_LINE_DEVICE_MEMBER("hopper", hopper_device, line_r)
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_CUSTOM) PORT_READ_LINE_DEVICE_MEMBER("hopper", FUNC(hopper_device::line_r))
 	PORT_SERVICE_NO_TOGGLE(0x08, IP_ACTIVE_LOW)
 	PORT_BIT(0xd0, IP_ACTIVE_LOW, IPT_UNUSED)
 
@@ -449,7 +451,7 @@ static INPUT_PORTS_START( quickpick5 )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 
 	PORT_START("IN3")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_READ_LINE_MEMBER(quickpick5_state, serial_io_r)
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_READ_LINE_MEMBER(FUNC(quickpick5_state::serial_io_r))
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_VBLANK("screen") // guess
 	PORT_BIT(0x7e, IP_ACTIVE_LOW, IPT_UNUSED)
 
@@ -487,7 +489,7 @@ static INPUT_PORTS_START( quickpick5 )
 	PORT_BIT(0x500, IP_ACTIVE_HIGH, IPT_UNKNOWN)
 
 	PORT_START("OUT")
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("hopper", hopper_device, motor_w)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("hopper", FUNC(hopper_device::motor_w))
 INPUT_PORTS_END
 
 // Control panel buttons layout:
@@ -495,7 +497,7 @@ INPUT_PORTS_END
 //        3 4 2-3 2-4 3-4 Start
 static INPUT_PORTS_START( waijockey )
 	PORT_START("IN1")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_READ_LINE_DEVICE_MEMBER("hopper", hopper_device, line_r)
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_CUSTOM) PORT_READ_LINE_DEVICE_MEMBER("hopper", FUNC(hopper_device::line_r))
 	PORT_SERVICE_NO_TOGGLE(0x02, IP_ACTIVE_LOW)
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_UNUSED) // * B16
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_COIN1) PORT_NAME("Medal")
@@ -554,7 +556,7 @@ static INPUT_PORTS_START( waijockey )
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_VBLANK("screen") // guess
 
 	PORT_START("OUT")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("hopper", hopper_device, motor_w)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("hopper", FUNC(hopper_device::motor_w))
 INPUT_PORTS_END
 
 void quickpick5_state::machine_start()
@@ -587,7 +589,7 @@ void quickpick5_state::quickpick5(machine_config &config)
 	Z80(config, m_maincpu, XTAL(32'000'000)/4); // z84c0008pec 8mhz part, 32Mhz xtal verified on PCB, divisor unknown
 	m_maincpu->set_addrmap(AS_PROGRAM, &quickpick5_state::quickpick5_main);
 	TIMER(config, "scantimer").configure_scanline(FUNC(quickpick5_state::scanline), "screen", 0, 1);
-	HOPPER(config, "hopper", attotime::from_msec(100), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_LOW);
+	HOPPER(config, "hopper", attotime::from_msec(100));
 
 	K053252(config, m_k053252, XTAL(32'000'000)/4); /* K053252, xtal verified, divider not verified */
 	m_k053252->int1_ack().set(FUNC(quickpick5_state::vbl_ack_w));

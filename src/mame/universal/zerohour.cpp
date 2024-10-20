@@ -78,8 +78,8 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(right_coin_inserted);
 
 protected:
-	virtual void machine_start() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 	void videoram_w(offs_t offset, u8 data);
 	void irqack_w(u8 data) { m_maincpu->set_input_line(0, CLEAR_LINE); }
@@ -94,7 +94,7 @@ protected:
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_bullets(bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void zerohour_map(address_map &map);
+	void zerohour_map(address_map &map) ATTR_COLD;
 
 	required_shared_ptr<u8> m_videoram;
 	required_shared_ptr<u8> m_spriteram;
@@ -128,7 +128,7 @@ public:
 	void redclash(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 	virtual u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect) override;
 
 private:
@@ -140,7 +140,7 @@ private:
 
 	TIMER_DEVICE_CALLBACK_MEMBER(beeper_off) { m_beep_clock->set_period(attotime::never); }
 
-	void redclash_map(address_map &map);
+	void redclash_map(address_map &map) ATTR_COLD;
 
 	required_device<clock_device> m_beep_clock;
 	required_device<timer_device> m_beep_trigger;
@@ -654,8 +654,8 @@ static INPUT_PORTS_START( zerohour )
 	// The coin slots are not memory mapped. Coin Left causes a NMI,
 	// Coin Right an IRQ. This fake input port is used by the interrupt
 	// handler to be notified of coin insertions.
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, zerohour_state, left_coin_inserted, 0)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 ) PORT_CHANGED_MEMBER(DEVICE_SELF, zerohour_state, right_coin_inserted, 0)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(zerohour_state::left_coin_inserted), 0)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(zerohour_state::right_coin_inserted), 0)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( redclash )

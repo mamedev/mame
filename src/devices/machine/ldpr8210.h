@@ -47,10 +47,10 @@ protected:
 	pioneer_pr8210_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
-	virtual const tiny_rom_entry *device_rom_region() const override;
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 	// subclass overrides
 	virtual void player_vsync(const vbi_metadata &vbi, int fieldnum, const attotime &curtime) override;
@@ -129,7 +129,7 @@ protected:
 	uint8_t             m_i8049_port2;          // 8049 port 2 state
 
 private:
-	void pr8210_portmap(address_map &map);
+	void pr8210_portmap(address_map &map) ATTR_COLD;
 };
 
 
@@ -154,10 +154,10 @@ protected:
 	virtual void player_vsync(const vbi_metadata &vbi, int fieldnum, const attotime &curtime) override;
 
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
-	virtual const tiny_rom_entry *device_rom_region() const override;
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 	// internal helpers
 	virtual bool override_control() const override { return m_controlthis; }
@@ -173,7 +173,7 @@ private:
 	void i8748_port2_w(uint8_t data);
 	int i8748_t0_r();
 
-	void simutrek_portmap(address_map &map);
+	void simutrek_portmap(address_map &map) ATTR_COLD;
 
 	// internal state
 	required_device<i8748_device> m_i8748_cpu;

@@ -158,7 +158,20 @@ public:
 		m_amsram(*this, SGCPU_AMSRAM_TAG),
 		m_keyboard(*this, "COL%u", 0U),
 		m_alpha(*this, "ALPHA"),
-		m_rom(*this, "maincpu")
+		m_rom(*this, "maincpu"),
+		m_int1(0),
+		m_int2(0),
+		m_waitcount(0),
+		m_addr_buf(0),
+		m_decode(0),
+		m_dbin(CLEAR_LINE),
+		m_keyboard_column(0),
+		m_check_alphalock(false),
+		m_map_mode_active(false),
+		m_dsr_active(false),
+		m_mapper_access(false),
+		m_rom6_active(false),
+		m_rom6_upper(false)
 	{ }
 
 	void ti99_4p_60hz(machine_config &config);
@@ -193,15 +206,11 @@ private:
 
 	void video_interrupt_in(int state);
 
-	void crumap(address_map &map);
-	void memmap(address_map &map);
-	void memmap_setaddress(address_map &map);
+	void crumap(address_map &map) ATTR_COLD;
+	void memmap(address_map &map) ATTR_COLD;
+	void memmap_setaddress(address_map &map) ATTR_COLD;
 
 	void    datamux_clock_in(int clock);
-
-	// Latch for 9901 INT1 and INT2 lines
-	int  m_int1;
-	int  m_int2;
 
 	// Devices
 	required_device<tms9900_device>        m_cpu;
@@ -227,26 +236,12 @@ private:
 	// First joystick. 6 for TI-99/4A
 	static constexpr int FIRSTJOY=6;
 
-	int     m_keyboard_column;
-	int     m_check_alphalock;
-
-	// true if SGCPU DSR is enabled
-	bool m_internal_dsr;
-
-	// true if SGCPU rom6 is enabled
-	bool m_internal_rom6;
-
-	// Offset to the ROM6 bank.
-	int m_rom6_bank;
+	// Latch for 9901 INT1 and INT2 lines
+	int m_int1;
+	int m_int2;
 
 	// Wait states
 	int m_waitcount;
-
-	// true when mapper is active
-	bool m_map_mode;
-
-	// true when mapper registers are accessible
-	bool m_access_mapper;
 
 	// Value on address bus (after being set by setaddress)
 	int m_addr_buf;
@@ -260,11 +255,26 @@ private:
 	// Incoming Ready level
 	int m_sysready;
 
+	// State of the DBIN line
+	int m_dbin;
+
+	uint8_t   m_lowbyte;
+	uint8_t   m_highbyte;
+	uint8_t   m_latch;
+	int     m_ready_prev;       // for debugging purposes only
+
+	// Keyboard
+	int  m_keyboard_column;
+	bool m_check_alphalock;
+
+	// true when mapper is active
+	bool m_map_mode_active;
+
 	// Internal DSR mapped in
-	bool m_internal_dsr_active;
+	bool m_dsr_active;
 
 	// Mapper visible in 4000 area
-	bool m_mapper_active;
+	bool m_mapper_access;
 
 	// ROM6 visible in 6000
 	bool m_rom6_active;
@@ -272,17 +282,8 @@ private:
 	// Upper bank of ROM6 selected
 	bool m_rom6_upper;
 
-	// State of the DBIN line
-	int m_dbin;
-
-	uint8_t   m_lowbyte;
-	uint8_t   m_highbyte;
-	uint8_t   m_latch;
-
 	// Mapper registers
 	uint8_t m_mapper[16];
-
-	int     m_ready_prev;       // for debugging purposes only
 };
 
 enum
@@ -412,14 +413,14 @@ int ti99_4p_state::decode_address(int address)
 		dec = SGCPU_RAM;
 		break;
 	case 0x4000:
-		if (m_internal_dsr_active) dec = SGCPU_INTDSR;
-		else if (m_mapper_active) dec = SGCPU_MAPPER;
+		if (m_dsr_active) dec = SGCPU_INTDSR;
+		else if (m_mapper_access) dec = SGCPU_MAPPER;
 		break;
 	case 0x6000:
 		if (m_rom6_active) dec = SGCPU_ROM6;
 		break;
 	case 0x8000:
-		if ((m_addr_buf & 0x1c00)==0x0000) dec = SGCPU_PADRAM;
+		if ((address & 0x1c00)==0x0000) dec = SGCPU_PADRAM;
 		break;
 
 	default:
@@ -466,21 +467,24 @@ void ti99_4p_state::setaddress(offs_t address, uint16_t busctrl)
 
 uint16_t ti99_4p_state::memread(offs_t offset)
 {
-	int address = 0;
-	uint8_t hbyte = 0;
+	int address = m_addr_buf;
+	int decode = m_decode;
+	int paddress = 0;
 
+	uint8_t hbyte = 0;
 	uint16_t value = 0;
 
-	int addr_off8k = m_addr_buf & 0x1fff;
 
 	// If we use the debugger, decode the address now (normally done in setaddress)
 	if (machine().side_effects_disabled())
 	{
-		m_addr_buf = offset << 1;
-		m_decode = decode_address(m_addr_buf);
+		address = offset << 1;
+		decode = decode_address(address);
 	}
 
-	switch (m_decode)
+	int addr_off8k = address & 0x1fff;
+
+	switch (decode)
 	{
 	case SGCPU_SYSROM:
 		value = m_rom[(ROM0BASE | addr_off8k) >> 1];
@@ -490,12 +494,12 @@ uint16_t ti99_4p_state::memread(offs_t offset)
 		// Memory read. The AEMS emulation has two address areas: The memory is at locations
 		// 0x2000-0x3fff and 0xa000-0xffff, and the mapper area is at 0x4000-0x401e
 		// (only even addresses).
-		if (m_map_mode)
-			address = (m_mapper[(m_addr_buf & 0xf000)>>12] << 12) | (m_addr_buf & 0x0fff);
+		if (m_map_mode_active)
+			paddress = (m_mapper[(address & 0xf000)>>12] << 12) | (address & 0x0fff);
 		else // transparent mode
-			address = m_addr_buf;
+			paddress = address;
 
-		value = ((m_amsram->pointer()[address] & 0xff) << 8) | (m_amsram->pointer()[address+1] & 0xff);
+		value = ((m_amsram->pointer()[paddress] & 0xff) << 8) | (m_amsram->pointer()[paddress+1] & 0xff);
 		break;
 
 	case SGCPU_INTDSR:
@@ -503,7 +507,7 @@ uint16_t ti99_4p_state::memread(offs_t offset)
 		break;
 
 	case SGCPU_MAPPER:
-		value = (m_mapper[m_addr_buf & 0x000f]<<8) & 0xff00;
+		value = (m_mapper[address & 0x000f]<<8) & 0xff00;
 		break;
 
 	case SGCPU_ROM6:
@@ -512,17 +516,19 @@ uint16_t ti99_4p_state::memread(offs_t offset)
 	case SGCPU_PADRAM:
 		// Scratch pad RAM (16 bit)
 		// 8000 ... 83ff (1K, 4 times the size of the internal RAM of the TI-99/4A)
-		value = ((m_scratchpad->pointer()[m_addr_buf & 0x03ff] & 0xff)<<8)
-				| (m_scratchpad->pointer()[(m_addr_buf & 0x03ff)+1] & 0xff);
+		value = ((m_scratchpad->pointer()[address & 0x03ff] & 0xff)<<8)
+				| (m_scratchpad->pointer()[(address & 0x03ff)+1] & 0xff);
 		break;
 
 	case SGCPU_PEB:
-		if (machine().side_effects_disabled()) return debugger_read(offset);
+		if (machine().side_effects_disabled())
+			return debugger_read(offset);
+
 		// The byte from the odd address has already been read into the latch
 		// Reading the even address now
-		m_peribox->readz(m_addr_buf, &hbyte);
+		m_peribox->readz(address, &hbyte);
 		m_peribox->memen_in(CLEAR_LINE);
-		LOGMASKED(LOG_MEM, "Read even byte from address %04x -> %02x\n",  m_addr_buf, hbyte);
+		LOGMASKED(LOG_MEM, "Read even byte from address %04x -> %02x\n",  address, hbyte);
 		value = (hbyte<<8) | m_latch;
 	}
 
@@ -532,62 +538,68 @@ uint16_t ti99_4p_state::memread(offs_t offset)
 
 void ti99_4p_state::memwrite(offs_t offset, uint16_t data)
 {
-	int address = 0;
+	int address = m_addr_buf;
+	int decode = m_decode;
+	int paddress = 0;
 
 	// If we use the debugger, decode the address now (normally done in setaddress)
 	if (machine().side_effects_disabled())
 	{
-		m_addr_buf = offset << 1;
-		m_decode = decode_address(m_addr_buf);
+		address = offset << 1;
+		decode = decode_address(address);
 	}
 
-	switch (m_decode)
+	switch (decode)
 	{
 	case SGCPU_SYSROM:
-		LOGMASKED(LOG_ILLWRITE, "Ignoring ROM write access at %04x\n", m_addr_buf);
+		LOGMASKED(LOG_ILLWRITE, "Ignoring ROM write access at %04x\n", address);
 		break;
 
 	case SGCPU_RAM:
 		// see above
-		if (m_map_mode)
-			address = (m_mapper[(m_addr_buf & 0xf000)>>12] << 12) | (m_addr_buf & 0x0fff);
+		if (m_map_mode_active)
+			paddress = (m_mapper[(address & 0xf000)>>12] << 12) | (address & 0x0fff);
 		else // transparent mode
-			address = m_addr_buf;
+			paddress = address;
 
-		m_amsram->pointer()[address] = (data >> 8) & 0xff;
-		m_amsram->pointer()[address+1] = data & 0xff;
+		m_amsram->pointer()[paddress] = (data >> 8) & 0xff;
+		m_amsram->pointer()[paddress+1] = data & 0xff;
 		break;
 
 	case SGCPU_INTDSR:
-		LOGMASKED(LOG_ILLWRITE, "Ignoring DSR write access at %04x\n", m_addr_buf);
+		LOGMASKED(LOG_ILLWRITE, "Ignoring DSR write access at %04x\n", address);
 		break;
 
 	case SGCPU_MAPPER:
-		m_mapper[(m_addr_buf>>1) & 0x000f] = data;  // writing both bytes, but only the first is accepted
+		m_mapper[(address>>1) & 0x000f] = data;  // writing both bytes, but only the first is accepted
 		break;
 
 	case SGCPU_ROM6:
 		// Writing to 6002 sets upper bank
-		m_rom6_upper = (m_addr_buf & 0x0002)!=0;
+		m_rom6_upper = (address & 0x0002)!=0;
 		break;
 
 	case SGCPU_PADRAM:
 		// Scratch pad RAM (16 bit)
 		// 8000 ... 83ff (1K, 4 times the size of the internal RAM of the TI-99/4A)
-		m_scratchpad->pointer()[m_addr_buf & 0x03ff] = (data >> 8) & 0xff;
-		m_scratchpad->pointer()[(m_addr_buf & 0x03ff)+1] = data & 0xff;
+		m_scratchpad->pointer()[address & 0x03ff] = (data >> 8) & 0xff;
+		m_scratchpad->pointer()[(address & 0x03ff)+1] = data & 0xff;
 		break;
 
 	case SGCPU_PEB:
-		if (machine().side_effects_disabled()) { debugger_write(offset, data); return; }
+		if (machine().side_effects_disabled())
+		{
+			debugger_write(offset, data);
+			return;
+		}
 
 		// Writing the even address now (addr)
 		// The databus multiplexer puts the even value into the latch and outputs the odd value now.
 		m_latch = (data >> 8) & 0xff;
 
 		// write odd byte
-		LOGMASKED(LOG_MEM, "datamux: write odd byte to address %04x <- %02x\n",  m_addr_buf+1, data & 0xff);
-		m_peribox->write(m_addr_buf+1, data & 0xff);
+		LOGMASKED(LOG_MEM, "datamux: write odd byte to address %04x <- %02x\n",  address+1, data & 0xff);
+		m_peribox->write(address+1, data & 0xff);
 		m_peribox->memen_in(CLEAR_LINE);
 	}
 }
@@ -709,8 +721,8 @@ void ti99_4p_state::cruwrite(offs_t offset, uint8_t data)
 
 	if ((addroff & 0xff00)==MAP_CRU_BASE)
 	{
-		if ((addroff & 0x000e)==0)  m_internal_dsr = data;
-		if ((addroff & 0x000e)==2)  m_internal_rom6 = data;
+		if ((addroff & 0x000e)==0)  m_dsr_active = data;
+		if ((addroff & 0x000e)==2)  m_rom6_active = data;
 		if ((addroff & 0x000e)==4)  m_peribox->senila((data!=0)? ASSERT_LINE : CLEAR_LINE);
 		if ((addroff & 0x000e)==6)  m_peribox->senilb((data!=0)? ASSERT_LINE : CLEAR_LINE);
 		// TODO: more CRU bits? 8=Fast timing / a=KBENA
@@ -718,8 +730,8 @@ void ti99_4p_state::cruwrite(offs_t offset, uint8_t data)
 	}
 	if ((addroff & 0xff00)==SAMS_CRU_BASE)
 	{
-		if ((addroff & 0x000e)==0) m_access_mapper = data;
-		if ((addroff & 0x000e)==2) m_map_mode = data;
+		if ((addroff & 0x000e)==0) m_mapper_access = data;
+		if ((addroff & 0x000e)==2) m_map_mode_active = data;
 		return;
 	}
 
@@ -791,56 +803,6 @@ uint8_t ti99_4p_state::psi_input(offs_t offset)
 		return 1;
 	}
 }
-
-/*  switch (offset & 0x03)
-    {
-    case tms9901_device::CB_INT7:
-        // Read pins INT3*-INT7* of TI99's 9901.
-        // bit 1: INT1 status
-        // bit 2: INT2 status
-        // bit 3-7: keyboard status bits 0 to 4
-        //
-        // |K|K|K|K|K|I2|I1|C|
-        //
-        if (m_keyboard_column >= FIRSTJOY) // joy 1 and 2
-        {
-            answer = m_joyport->read_port();
-        }
-        else
-        {
-            answer = m_keyboard[m_keyboard_column]->read();
-        }
-        if (m_check_alphalock)
-        {
-            answer &= ~(m_alpha->read());
-        }
-        answer = (answer << 3) | m_9901_int;
-        break;
-
-    case tms9901_device::INT8_INT15:
-        // Read pins int8_t*-INT15* of TI99's 9901.
-        // bit 0-2: keyboard status bits 5 to 7
-        // bit 3: tape input mirror
-        // bit 5-7: weird, not emulated
-
-        // |1|1|1|1|0|K|K|K|
-        if (m_keyboard_column >= FIRSTJOY) answer = 0x07;
-        else answer = ((m_keyboard[m_keyboard_column]->read())>>5) & 0x07;
-        answer |= 0xf0;
-        break;
-
-    case tms9901_device::P0_P7:
-        break;
-
-    case tms9901_device::P8_P15:
-        // Read pins P8-P15 of TI99's 9901.
-        // bit 26: high
-        // bit 27: tape input
-        answer = 4;
-        if (m_cassette->input() > 0) answer |= 8;
-        break;
-    }
-    */
 
 /*
     WRITE key column select (P2-P4)
@@ -988,30 +950,27 @@ void ti99_4p_state::driver_start()
 
 	m_sysready = ASSERT_LINE;
 	m_muxready = true;
+	m_dbin = CLEAR_LINE;
 
 	save_item(NAME(m_int1));
 	save_item(NAME(m_int2));
 	save_item(NAME(m_keyboard_column));
 	save_item(NAME(m_check_alphalock));
-	save_item(NAME(m_internal_dsr));
-	save_item(NAME(m_internal_rom6));
-	save_item(NAME(m_rom6_bank));
 	save_item(NAME(m_waitcount));
-	save_item(NAME(m_map_mode));
-	save_item(NAME(m_access_mapper));
 	save_item(NAME(m_addr_buf));
 	save_item(NAME(m_decode));
 	save_item(NAME(m_muxready));
 	save_item(NAME(m_sysready));
-	save_item(NAME(m_internal_dsr_active));
-	save_item(NAME(m_mapper_active));
-	save_item(NAME(m_rom6_active));
-	save_item(NAME(m_rom6_upper));
-	save_item(NAME(m_dbin));
 	save_item(NAME(m_lowbyte));
 	save_item(NAME(m_highbyte));
 	save_item(NAME(m_latch));
-	save_pointer(NAME(m_mapper),16);
+	save_item(NAME(m_map_mode_active));
+	save_item(NAME(m_dsr_active));
+	save_item(NAME(m_mapper_access));
+	save_item(NAME(m_rom6_active));
+	save_item(NAME(m_rom6_upper));
+	save_item(NAME(m_dbin));
+	save_item(NAME(m_mapper));
 }
 
 /*
@@ -1034,6 +993,15 @@ void ti99_4p_state::driver_reset()
 	m_int1 = m_int2 = CLEAR_LINE;
 	m_peribox->reset_in(ASSERT_LINE);
 	m_peribox->reset_in(CLEAR_LINE);
+	m_check_alphalock = false;
+	m_keyboard_column = 0;
+	m_waitcount = 0;
+	m_map_mode_active = false;
+	m_mapper_access = false;
+	m_dsr_active = false;
+	m_rom6_active = m_rom6_upper = false;
+	m_decode = 0;
+	m_addr_buf = 0;
 }
 
 /*

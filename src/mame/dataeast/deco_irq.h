@@ -37,7 +37,7 @@ public:
 
 	TIMER_CALLBACK_MEMBER(scanline_callback);
 
-	void map(address_map &map);
+	void map(address_map &map) ATTR_COLD;
 
 	void control_w(u8 data);
 	u8 scanline_r();
@@ -54,8 +54,8 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 private:
 	required_device<screen_device> m_screen;

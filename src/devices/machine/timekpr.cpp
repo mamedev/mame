@@ -432,13 +432,18 @@ u8 timekeeper_device::read(offs_t offset)
 	}
 	else if (offset == m_offset_flags && type() == M48T37)
 	{
-		// Clear the watchdog flag
-		m_data[m_offset_flags] &= ~FLAGS_WDF;
-		// Clear callbacks
-		m_reset_cb(CLEAR_LINE);
-		m_irq_cb(CLEAR_LINE);
+		if (!machine().side_effects_disabled())
+		{
+			// Clear the watchdog flag
+			m_data[m_offset_flags] &= ~FLAGS_WDF;
+			// Clear callbacks
+			m_reset_cb(CLEAR_LINE);
+			m_irq_cb(CLEAR_LINE);
+		}
 	}
-	LOG("timekeeper_device::read: %04x (%02x)\n", offset, result);
+	if (!machine().side_effects_disabled())
+		LOG("timekeeper_device::read: %04x (%02x)\n", offset, result);
+
 	return result;
 }
 

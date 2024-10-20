@@ -25,9 +25,9 @@ public:
 	uint16_t status_r();
 
 protected:
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_cpu;
@@ -51,7 +51,7 @@ private:
 	void crtc_register_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	uint16_t crtc_status_r(offs_t offset, uint16_t mem_mask = ~0);
 
-	void decodmd3_map(address_map &map);
+	void decodmd3_map(address_map &map) ATTR_COLD;
 };
 
 DECLARE_DEVICE_TYPE(DECODMD3, decodmd_type3_device)

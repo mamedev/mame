@@ -72,8 +72,8 @@ protected:
 	m6801_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, const m6800_cpu_device::op_func *insn, const u8 *cycles, address_map_constructor internal, int nvram_bytes);
 
 	// device_t implementation
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// device_nvram_interface implementation
 	virtual void nvram_default() override;
@@ -83,7 +83,6 @@ protected:
 	// device_execute_interface implementation
 	virtual u64 execute_clocks_to_cycles(u64 clocks) const noexcept override { return (clocks + 4 - 1) / 4; }
 	virtual u64 execute_cycles_to_clocks(u64 cycles) const noexcept override { return (cycles * 4); }
-	virtual u32 execute_input_lines() const noexcept override { return 6; }
 	virtual bool execute_input_edge_triggered(int inputnum) const noexcept override { return m6800_cpu_device::execute_input_edge_triggered(inputnum) || inputnum == M6801_STBY_LINE; }
 	virtual void execute_set_input(int inputnum, int state) override;
 
@@ -129,10 +128,10 @@ protected:
 	virtual void rcr_w(u8 data);
 	u8 ff_r();
 
-	void m6801_io(address_map &map);
-	void m6801_mem(address_map &map);
-	void hd6801_mem(address_map &map);
-	void m6803_mem(address_map &map);
+	void m6801_io(address_map &map) ATTR_COLD;
+	void m6801_mem(address_map &map) ATTR_COLD;
+	void hd6801_mem(address_map &map) ATTR_COLD;
+	void m6803_mem(address_map &map) ATTR_COLD;
 
 	devcb_read8::array<4> m_in_port_func;
 	devcb_write8::array<4> m_out_port_func;
@@ -211,12 +210,12 @@ public:
 
 protected:
 	// device_t implementation
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 private:
-	void m6801u4_io(address_map &map);
-	void m6801u4_mem(address_map &map);
+	void m6801u4_io(address_map &map) ATTR_COLD;
+	void m6801u4_mem(address_map &map) ATTR_COLD;
 
 	virtual void check_irq2() override;
 	virtual void set_timer_event() override;
@@ -358,14 +357,14 @@ protected:
 	virtual bool nvram_read(util::read_stream &file) override;
 	virtual bool nvram_write(util::write_stream &file) override;
 
-	void hd6301x_io(address_map &map);
-	void hd6303x_io(address_map &map);
-	void hd6301x_mem(address_map &map);
-	void hd6303x_mem(address_map &map);
+	void hd6301x_io(address_map &map) ATTR_COLD;
+	void hd6303x_io(address_map &map) ATTR_COLD;
+	void hd6301x_mem(address_map &map) ATTR_COLD;
+	void hd6303x_mem(address_map &map) ATTR_COLD;
 
 	// device_t implementation
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	virtual void write_port2() override;
 
@@ -436,7 +435,7 @@ public:
 protected:
 	hd6301x0_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, address_map_constructor internal, int nvram_bytes);
 
-	virtual void device_reset() override;
+	virtual void device_reset() override ATTR_COLD;
 };
 
 
@@ -465,14 +464,14 @@ class hd6301y_cpu_device : public hd6301x_cpu_device
 protected:
 	hd6301y_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, address_map_constructor internal, int nvram_bytes);
 
-	void hd6301y_io(address_map &map);
-	void hd6303y_io(address_map &map);
-	void hd6301y_mem(address_map &map);
-	void hd6303y_mem(address_map &map);
+	void hd6301y_io(address_map &map) ATTR_COLD;
+	void hd6303y_io(address_map &map) ATTR_COLD;
+	void hd6301y_mem(address_map &map) ATTR_COLD;
+	void hd6303y_mem(address_map &map) ATTR_COLD;
 
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// device_execute_interface overrides
 	virtual void execute_set_input(int inputnum, int state) override;

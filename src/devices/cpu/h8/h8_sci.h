@@ -122,8 +122,8 @@ protected:
 
 	std::string m_last_clock_message;
 
-	void device_start() override;
-	void device_reset() override;
+	void device_start() override ATTR_COLD;
+	void device_reset() override ATTR_COLD;
 
 	TIMER_CALLBACK_MEMBER(sync_tick);
 

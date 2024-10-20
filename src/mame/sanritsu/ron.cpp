@@ -73,16 +73,16 @@ private:
 	int audio_t1_r();
 	void ay_pa_w(uint8_t data);
 
-	void ron_audio_io(address_map &map);
-	void ron_audio_map(address_map &map);
-	void ron_io(address_map &map);
-	void ron_map(address_map &map);
+	void ron_audio_io(address_map &map) ATTR_COLD;
+	void ron_audio_map(address_map &map) ATTR_COLD;
+	void ron_io(address_map &map) ATTR_COLD;
+	void ron_map(address_map &map) ATTR_COLD;
 
 	// driver_device overrides
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 
 	// devices
 	required_device<cpu_device> m_maincpu;

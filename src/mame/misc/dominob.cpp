@@ -88,7 +88,7 @@ public:
 	void dominob(machine_config &config);
 
 protected:
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	/* memory pointers */
@@ -108,8 +108,8 @@ private:
 	uint8_t dominob_unk_port02_r();
 	uint32_t screen_update_dominob(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
-	void memmap(address_map &map);
-	void portmap(address_map &map);
+	void memmap(address_map &map) ATTR_COLD;
+	void portmap(address_map &map) ATTR_COLD;
 };
 
 void dominob_state::video_start()

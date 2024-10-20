@@ -29,9 +29,9 @@ public:
 	void d550(machine_config &config);
 
 private:
-	void d50_mem_map(address_map &map);
-	void d550_mem_map(address_map &map);
-	void eram_map(address_map &map);
+	void d50_mem_map(address_map &map) ATTR_COLD;
+	void d550_mem_map(address_map &map) ATTR_COLD;
+	void eram_map(address_map &map) ATTR_COLD;
 
 	required_device<upd78312_device> m_maincpu;
 	required_device<address_map_bank_device> m_eram;
@@ -122,7 +122,7 @@ ROM_START(d50) // Newer PCB with silkscreen "Roland || D-50, D-550 || MAIN BOARD
 	// missing 2.00
 
 	ROM_REGION(0x2000, "maincpu", 0)
-	ROM_LOAD("d78312g-022_15179266.ic25", 0x0000, 0x2000, NO_DUMP) // 8-digit Roland part number not printed on IC
+	ROM_LOAD("d78312g-022_15179266.ic25", 0x0000, 0x2000, CRC(9564903f) SHA1(f68ed97a06764ee000fe6e9d7b39017165f0efc4)) // 8-digit Roland part number not printed on IC
 	ROM_COPY("progrom", 0x0000, 0x0000, 0x2000)
 
 	ROM_REGION(0x80000, "pcm", 0)

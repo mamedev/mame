@@ -74,7 +74,7 @@ public:
 
 	void ld50(machine_config &config);
 
-	DECLARE_CUSTOM_INPUT_MEMBER(dial_r);
+	ioport_value dial_r();
 
 private:
 	u8 port0_r();
@@ -239,7 +239,7 @@ void ld50_state::port3_w(u8 data)
 	}
 }
 
-CUSTOM_INPUT_MEMBER(ld50_state::dial_r)
+ioport_value ld50_state::dial_r()
 {
 	// return the dial position as a 2-bit gray code
 	const u8 val = m_dial->read();
@@ -311,7 +311,7 @@ INPUT_PORTS_START(ld50)
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("SE Pad 1")
 
 	PORT_START("IN1")
-	PORT_BIT( 0x03, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(ld50_state, dial_r)
+	PORT_BIT( 0x03, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(FUNC(ld50_state::dial_r))
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_BACKSPACE) PORT_NAME("Effect")
 

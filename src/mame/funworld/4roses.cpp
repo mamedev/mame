@@ -227,8 +227,8 @@ protected:
 private:
 	uint8_t _4roses_opcode_r(offs_t offset);
 
-	void _4roses_map(address_map &map);
-	void _4roses_opcodes_map(address_map &map);
+	void _4roses_map(address_map &map) ATTR_COLD;
+	void _4roses_opcodes_map(address_map &map) ATTR_COLD;
 };
 
 class rugby_state : public _4roses_state
@@ -245,8 +245,8 @@ public:
 private:
 	uint8_t rugby_opcode_r(offs_t offset);
 
-	void rugby_map(address_map &map);
-	void rugby_opcodes_map(address_map &map);
+	void rugby_map(address_map &map) ATTR_COLD;
+	void rugby_opcodes_map(address_map &map) ATTR_COLD;
 };
 
 

@@ -28,7 +28,7 @@ public:
 	void set_be(int be) { m_be = be; }
 	void set_autoconfig(int autoconfig) { m_autoconfig = autoconfig; }
 	void set_irq_num(int irq_num) { m_irq_num = irq_num; }
-	virtual void config_map(address_map &map) override;
+	virtual void config_map(address_map &map) override ATTR_COLD;
 	void set_simm_size(int index, int size) { m_simm_size[index] = size; }
 	void set_simm0_size(int size) { m_simm_size[0] = size; }
 	void set_simm1_size(int size) { m_simm_size[1] = size; }
@@ -73,8 +73,8 @@ protected:
 
 	address_space *m_cpu_space;
 	virtual space_config_vector memory_space_config() const override;
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 
 private:
@@ -119,7 +119,7 @@ private:
 	required_memory_region m_romRegion;
 	optional_memory_region m_updateRegion;
 
-	void cpu_map(address_map &map);
+	void cpu_map(address_map &map) ATTR_COLD;
 
 	void map_cpu_space();
 

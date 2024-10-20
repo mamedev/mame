@@ -912,7 +912,7 @@ void segaorun_state::sound_portmap(address_map &map)
 //  GENERIC PORT DEFINITIONS
 //**************************************************************************
 
-CUSTOM_INPUT_MEMBER(segaorun_state::bankmotor_pos_r)
+ioport_value segaorun_state::bankmotor_pos_r()
 {
 	return m_bankmotor_pos >> 8 & 0xff;
 }
@@ -963,7 +963,7 @@ static INPUT_PORTS_START( outrun_generic )
 	PORT_BIT( 0xff, 0x00, IPT_PEDAL2 ) PORT_SENSITIVITY(100) PORT_KEYDELTA(40)
 
 	PORT_START("ADC.3")
-	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(segaorun_state, bankmotor_pos_r)
+	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(FUNC(segaorun_state::bankmotor_pos_r))
 INPUT_PORTS_END
 
 

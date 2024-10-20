@@ -67,8 +67,8 @@ public:
 
 protected:
 	virtual void device_post_load() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -105,9 +105,9 @@ private:
 	TMS340X0_FROM_SHIFTREG_CB_MEMBER(from_shiftreg);
 	TMS340X0_SCANLINE_IND16_CB_MEMBER(scanline_update);
 
-	void m68030_1_map(address_map &map);
-	void m68030_2_map(address_map &map);
-	void tms_program_map(address_map &map);
+	void m68030_1_map(address_map &map) ATTR_COLD;
+	void m68030_2_map(address_map &map) ATTR_COLD;
+	void tms_program_map(address_map &map) ATTR_COLD;
 };
 
 

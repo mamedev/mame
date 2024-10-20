@@ -24,5 +24,5 @@ private:
 	required_device<igs025_device> m_igs025;
 
 	void pgm_drgw2_decrypt();
-	void drgw2_mem(address_map &map);
+	void drgw2_mem(address_map &map) ATTR_COLD;
 };

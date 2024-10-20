@@ -86,8 +86,8 @@ private:
 	void pc_w(u8 data);
 	u8 pc_r();
 
-	virtual void machine_start() override;
-	void vl70_map(address_map &map);
+	virtual void machine_start() override ATTR_COLD;
+	void vl70_map(address_map &map) ATTR_COLD;
 };
 
 void vl70_state::machine_start()
