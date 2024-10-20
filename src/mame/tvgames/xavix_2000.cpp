@@ -274,6 +274,11 @@ ROM_START( epo_golf ) // GLFJ MAIN-03
 	ROM_LOAD("golf.bin", 0x000000, 0x400000, CRC(d1f231cf) SHA1(9421836a6bc4af9ee1fc7a402d62b2fb4dbcdefc) )
 ROM_END
 
+ROM_START( ban_omt ) // OMTJ MAIN-07
+	ROM_REGION(0x800000, "bios", ROMREGION_ERASE00)
+	ROM_LOAD("otmj.bin", 0x000000, 0x400000, CRC(1c1dc6fb) SHA1(d0cf1345b765d66ca9a0870ee6d0e3ccd84a8c0b) )
+ROM_END
+
 ROM_START( ttv_sw )
 	ROM_REGION( 0x800000, "bios", ROMREGION_ERASE00 )
 	ROM_LOAD( "jedi.bin", 0x000000, 0x800000, CRC(51cae5fd) SHA1(1ed8d556f31b4182259ca8c766d60c824d8d9744) )
@@ -342,7 +347,7 @@ CONS( 2002, epo_ebox, 0, 0, xavix2000_nv,        epo_ebox,    xavix_state,      
 CONS( 2002, epo_bowl, 0, 0, xavix2000_i2c_24c04, epo_bowl,    xavix_i2c_state,         init_xavix, "Epoch / SSD Company LTD",       "Excite Bowling (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
 // スーパーショット！ エキサイトゴルフ
-// needs timer irq hack to boot, fails to draw main menu properly (buggy xavix2000 opcodes?)
+// needs timer irq hack to boot, fails to draw main menu properly (buggy xavix2000 opcodes?)  (2002 date on PCB, 2003 ingame)
 CONS( 2003, epo_golf, 0,       0, xavix2000_i2c_24c04, ttv_lotr,   xavix_i2c_lotr_state, init_epo_mini, "Epoch / SSD Company LTD",       "Super Shot! Excite Golf (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
 // ミニモニ。パーティ！リズムでぴょん！
@@ -372,6 +377,10 @@ CONS( 2003, tak_chq,  0,      0, xavix2000_i2c_24c04, xavix_i2c,   xavix_i2c_sta
 // hangs after starting a game, check why
 // Let’s！TV プレイ　体感格闘ワンピースパンチバトル 　～海賊王にキミがなる！～ 
 CONS( 2004, ban_onep, 0, 0, xavix2000_i2c_24c04, ttv_lotr,    xavix_i2c_lotr_state, init_xavix, "Bandai / SSD Company LTD",         "Let's! TV Play One Piece Punch Battle (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+
+// Let’s！TV プレイ　闘印奥義　 陰陽大戦記～目指せ最強闘神士～
+// stalls unless timers are disabled like epo_mini / epo_golf, 2004 date on PCB, 2005 ingame
+CONS( 2005, ban_omt,  0, 0, xavix2000_i2c_24c04, ttv_lotr,    xavix_i2c_lotr_state, init_epo_mini, "Bandai / SSD Company LTD",         "Let's! TV Play Onmyou Taisenki (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
 // ディズニープリンセス　キラキラ魔法のレッスン
 CONS( 2004, tom_dpgm, 0, 0, xavix2000_i2c_24c08, ttv_lotr,    xavix_i2c_lotr_state, init_xavix, "Tomy / SSD Company LTD",         "Disney Princess Kirakira Mahou no Lesson (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )

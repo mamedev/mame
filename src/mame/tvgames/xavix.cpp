@@ -1576,6 +1576,17 @@ void xavix_i2c_state::xavix_i2c_24c02_43mhz(machine_config &config)
 	m_maincpu->set_clock(MAIN_CLOCK * 2);
 }
 
+void xavix_state::xavix_43mhz(machine_config &config)
+{
+	xavix(config);
+
+	// tomthr crashes when you start the game at regular clock speeds
+	// this could indicate that it's actually one of the newer chips
+	// even if extra opcodes are not being used.
+	m_maincpu->set_clock(MAIN_CLOCK * 2);
+}
+
+
 
 void xavix_i2c_state::xavix_i2c_24lc04(machine_config &config)
 {
@@ -2111,6 +2122,11 @@ ROM_START( tomplc )
 	ROM_LOAD("imaplayrailconductor.bin", 0x000000, 0x400000, CRC(b775d0ed) SHA1(33142509b11bbe45b0b9222232033dd64ef01ff2) )
 ROM_END
 
+ROM_START( tomthr ) // THRJ MAIN PCB   REV 0.6
+	ROM_REGION(0x400000, "bios", ROMREGION_ERASE00)
+	ROM_LOAD("thrj.u4", 0x000000, 0x400000, CRC(a7e8dc74) SHA1(676b2a905b757356c6c1dfe3f10148484caa44c5) )
+ROM_END
+
 ROM_START( gungunad )
 	ROM_REGION(0x200000, "bios", ROMREGION_ERASE00)
 	// some lines were swapped going into the die, but it is unclear if they're swapped back inside it
@@ -2447,6 +2463,9 @@ CONS( 2003, tomcpin,   0,          0,  xavix_i2c_24c08,  tomcpin,  xavix_i2c_sta
 
 // 日本一周 僕はプラレール運転士
 CONS( 2004, tomplc,    0,          0,  xavix_i2c_24c02_43mhz,tomplc,xavix_i2c_state,     init_xavix,    "Tomy / SSD Company LTD",                       "Nihon Isshuu - Boku wa Plarail Untenshi (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+
+// テレビで遊び隊 ハイパーレスキュー ぼくは救助隊！
+CONS( 2006, tomthr,    0,          0,  xavix_43mhz,      xavix,    xavix_state,          init_xavix,    "Takara Tomy / SSD Company LTD",                "Play Team Hyper Rescue on TV I'm A Rescue Team! (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
 // ガンガンアドベンチャー 
 CONS( 2001, gungunad,  0,          0,  xavix_nv,         xavix,    xavix_state,          init_xavix,    "Takara / SSD Company LTD",                     "Gun Gun Adventure (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )

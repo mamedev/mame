@@ -45905,6 +45905,7 @@ tak_geig                        //
 tcarnavi                        //
 tomcpin                         //
 tomshoot                        //
+tomthr                          //
 tomplc                          //
 tvpc_dor
 tvpc_ham
@@ -45916,6 +45917,7 @@ domfitad                        //
 dombikec                        //
 
 @source:tvgames/xavix_2000.cpp
+ban_omt                         //
 ban_onep                        //
 drgqst                          //
 duelmast                        //

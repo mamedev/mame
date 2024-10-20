@@ -128,6 +128,8 @@ public:
 
 	void xavix2002(machine_config &config);
 
+	void xavix_43mhz(machine_config &config);
+
 	void init_xavix();
 
 	void ioevent_trg01(int state);
