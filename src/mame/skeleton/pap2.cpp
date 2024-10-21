@@ -98,6 +98,6 @@ ROM_START(pap2)
 	// Original ROM label is unknown, if it had one. S/N FH900DC35989, MAC 00:12:17:FB:70:DC
 ROM_END
 
-}
+} // anonymous namespace
 
 SYST( 200?, pap2, 0, 0, pap2, pap2, pap2_state, empty_init, "Linksys (Cisco)", "PAP2", MACHINE_IS_SKELETON )

@@ -3452,10 +3452,13 @@ ExtractDisk  [11]"#10 危険な年頃  " -> "Apple Club 11.d88" [a9f8422b]
 	</software>
 
 	<!-- Omake: press F5 during gameplay for music test -->
-	<software name="arcus" supported="yes">
+	<software name="arcus" supported="no">
 		<description>Arcus</description>
 		<year>1988</year>
 		<publisher>ウルフチーム (WolfTeam)</publisher>
+		<notes><![CDATA[
+Hangs if title screen intro is skipped (regression?)
+]]></notes>
 		<!-- PC8801mk2SR -->
 		<info name="release" value="198805xx"/>
 		<info name="alt_title" value="アークス"/>

@@ -14,17 +14,14 @@
 ***************************************************************************/
 
 #include "emu.h"
+#include "bk_kmd.h"
+
+#include "machine/1801vp128.h"
 
 #include "formats/bk0010_dsk.h"
 
-#include "bk_kmd.h"
 
-
-//**************************************************************************
-//  DEVICE DEFINITIONS
-//**************************************************************************
-
-DEFINE_DEVICE_TYPE(BK_KMD, bk_kmd_device, "bk_kmd", "BK0010 floppy")
+namespace {
 
 ROM_START(bk_kmd)
 	ROM_REGION(0x1000, "maincpu", 0)
@@ -36,6 +33,32 @@ ROM_START(bk_kmd)
 	ROM_SYSTEM_BIOS(2, "327v12", "327 v12") // "FDD/HDD BIOS 327 V12 (c) JD/DWG!" -- modified mask 326
 	ROMX_LOAD("disk_327.rom", 0, 0x1000, CRC(ed8a43ae) SHA1(28eefbb63047b26e4aec104aeeca74e2f9d0276c), ROM_BIOS(2))
 ROM_END
+
+
+/***************************************************************************
+    TYPE DEFINITIONS
+***************************************************************************/
+
+// ======================> bk_kmd_device
+
+class bk_kmd_device : public device_t,
+					public device_qbus_card_interface
+{
+public:
+	// construction/destruction
+	bk_kmd_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+protected:
+	// device_t implementation
+	virtual void device_start() override;
+	virtual void device_add_mconfig(machine_config &config) override;
+	virtual const tiny_rom_entry *device_rom_region() const override;
+
+	required_device<k1801vp128_device> m_fdc;
+
+private:
+	static void floppy_formats(format_registration &fr);
+};
 
 
 //**************************************************************************
@@ -94,9 +117,16 @@ void bk_kmd_device::device_add_mconfig(machine_config &config)
 void bk_kmd_device::device_start()
 {
 	m_bus->install_device(0177130, 0177133,
-		emu::rw_delegate(m_fdc, FUNC(k1801vp128_device::read)),
-		emu::rw_delegate(m_fdc, FUNC(k1801vp128_device::write))
-	);
-	m_bus->program_space().install_rom(0160000, 0167777, memregion(this->subtag("maincpu").c_str())->base());
+			emu::rw_delegate(m_fdc, FUNC(k1801vp128_device::read)),
+			emu::rw_delegate(m_fdc, FUNC(k1801vp128_device::write)));
+	m_bus->program_space().install_rom(0160000, 0167777, memregion("maincpu")->base());
 }
 
+} // anonymous namespace
+
+
+//**************************************************************************
+//  DEVICE DEFINITIONS
+//**************************************************************************
+
+DEFINE_DEVICE_TYPE_PRIVATE(BK_KMD, device_qbus_card_interface, bk_kmd_device, "bk_kmd", "BK0010 floppy")

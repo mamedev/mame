@@ -83,6 +83,10 @@ const pc98_format::format pc98_format::formats[] = {
 		floppy_image::FF_525,  floppy_image::DSHD, floppy_image::MFM,
 		1200, 8, 77, 2, 1024, {}, 1, {}, 80, 50, 22, 84
 	},
+	{   /* 1MB 5 1/4 inch 256bps n88 basic disk type */
+		floppy_image::FF_525,  floppy_image::DSHD, floppy_image::MFM,
+		1200, 26, 77, 2, 256, {}, 1, {}, 80, 50, 21, 77
+	},
 	{}
 };
 

@@ -214,7 +214,11 @@ void pc9801_state::draw_text(bitmap_rgb32 &bitmap, uint32_t addr, int y, int wd,
 							tile_data = ((tile >> gfx_bit) & 1) ? 0xff : 0x00;
 						}
 						else
+						{
+							// TODO: arcus2 pretends to mask during intro via tile 0x87, lr = 16 and fontsel off (-> 8x8) in 24 kHz mode
+							// is it double heighting tiles?
 							tile_data = (m_char_rom[tile*char_size+m_video_ff[FONTSEL_REG]*0x800+yi]);
+						}
 					}
 
 					if(yi == lr-1)
