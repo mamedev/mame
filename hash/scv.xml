@@ -161,11 +161,10 @@ Information found at http://www.rhod.fr/yeno_epoch.html
 		</part>
 	</software>
 
-	<software name="dslayer" supported="no">
+	<software name="dslayer">
 		<description>Dragon Slayer</description>
 		<year>1986</year>
 		<publisher>Epoch</publisher>
-		<notes>Cannot start a game.</notes>
 		<part name="cart" interface="scv_cart">
 			<feature name="slot" value="rom32k_ram"/>
 			<dataarea name="rom" size="0x8000">
@@ -203,11 +202,10 @@ Information found at http://www.rhod.fr/yeno_epoch.html
 		</part>
 	</software>
 
-	<software name="lupin3" supported="no">
+	<software name="lupin3">
 		<description>Lupin III</description>
 		<year>1984</year>
 		<publisher>Epoch</publisher>
-		<notes>Game does not start.</notes>
 		<part name="cart" interface="scv_cart">
 			<feature name="slot" value="rom16k"/>
 			<dataarea name="rom" size="0x4000">
@@ -303,11 +301,10 @@ Information found at http://www.rhod.fr/yeno_epoch.html
 		</part>
 	</software>
 
-	<software name="popchips" supported="no">
+	<software name="popchips">
 		<description>Pop &amp; Chips</description>
 		<year>1985</year>
 		<publisher>Epoch</publisher>
-		<notes>Games do not start.</notes>
 		<part name="cart" interface="scv_cart">
 			<feature name="slot" value="rom32k_ram"/>
 			<dataarea name="rom" size="0x8000">
@@ -397,11 +394,10 @@ Information found at http://www.rhod.fr/yeno_epoch.html
 		</part>
 	</software>
 
-	<software name="sansupyu" supported="no">
+	<software name="sansupyu">
 		<description>Super Sansuu Puter</description>
 		<year>1985</year>
 		<publisher>Epoch</publisher>
-		<notes>Cannot enter answers in Game A or B.</notes>
 		<part name="cart" interface="scv_cart">
 			<feature name="slot" value="rom32k"/>
 			<dataarea name="rom" size="0x8000">
@@ -449,11 +445,10 @@ Information found at http://www.rhod.fr/yeno_epoch.html
 		</part>
 	</software>
 
-	<software name="ttball" supported="no">
+	<software name="ttball">
 		<description>Ton Ton Ball</description>
 		<year>1985</year>
 		<publisher>Epoch</publisher>
-		<notes>Unable to start game.</notes>
 		<part name="cart" interface="scv_cart">
 			<feature name="slot" value="rom16k"/>
 			<dataarea name="rom" size="0x4000">
@@ -462,11 +457,10 @@ Information found at http://www.rhod.fr/yeno_epoch.html
 		</part>
 	</software>
 
-	<software name="wheelrcr" supported="no">
+	<software name="wheelrcr">
 		<description>Wheelie Racer</description>
 		<year>1985</year>
 		<publisher>Epoch</publisher>
-		<notes>Unable to start game.</notes>
 		<part name="cart" interface="scv_cart">
 			<feature name="slot" value="rom16k"/>
 			<dataarea name="rom" size="0x4000">
