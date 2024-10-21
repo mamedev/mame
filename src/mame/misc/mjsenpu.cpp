@@ -67,11 +67,7 @@ public:
 		, m_hopper(*this, "hopper")
 		, m_mainram(*this, "mainram")
 	//  , m_vram(*this, "vram")
-		, m_mux_9e(*this, "MUX_9E")
-		, m_mux_9d(*this, "MUX_9D")
-		, m_mux_9b(*this, "MUX_9B")
-		, m_mux_97(*this, "MUX_97")
-		, m_mux_8f(*this, "MUX_8F")
+		, m_io_key(*this, "KEY%u", 0U)
 	{
 	}
 
@@ -94,20 +90,16 @@ private:
 	required_shared_ptr<uint32_t> m_mainram;
 //  required_shared_ptr<uint32_t> m_vram;
 
-	required_ioport m_mux_9e;
-	required_ioport m_mux_9d;
-	required_ioport m_mux_9b;
-	required_ioport m_mux_97;
-	required_ioport m_mux_8f;
+	required_ioport_array<5> m_io_key;
 
 	std::unique_ptr<uint16_t[]> m_vram[2];
 	uint8_t m_control = 0;
-	uint8_t m_mux = 0;
+	uint8_t m_key_matrix_select = 0;
 
 	void control_w(uint8_t data);
-	void mux_w(uint8_t data);
+	void key_matrix_w(uint8_t data);
 
-	uint32_t muxed_inputs_r();
+	uint32_t key_matrix_r();
 
 	uint32_t speedup_r();
 
@@ -163,7 +155,7 @@ void mjsenpu_state::control_w(uint8_t data)
 //      logerror("control_w %02x\n", data);
 }
 
-void mjsenpu_state::mux_w(uint8_t data)
+void mjsenpu_state::key_matrix_w(uint8_t data)
 {
 	if ((data != 0x80) &&
 		(data != 0x9e) &&
@@ -171,38 +163,23 @@ void mjsenpu_state::mux_w(uint8_t data)
 		(data != 0x9b) &&
 		(data != 0x97) &&
 		(data != 0x8f))
-			logerror("mux_w %02x\n", data);
+			logerror("key_matrix_w %02x\n", data);
 
-	m_mux = data;
+	// bit 0 to 4: Key matrix select
+	// Bit 5 to 6: unknown, always clear?
+	// bit 7: unknown, always set?
+	m_key_matrix_select = data;
 }
 
-uint32_t mjsenpu_state::muxed_inputs_r()
+uint32_t mjsenpu_state::key_matrix_r()
 {
-	switch (m_mux)
+	uint32_t result = 0xffffffff;
+	for (unsigned i = 0; i < m_io_key.size(); i++)
 	{
-	case 0x80: // not read
-		break;
-
-	case 0x9e:
-		return m_mux_9e->read();
-
-	case 0x9d:
-		return m_mux_9d->read();
-
-	case 0x9b:
-		return m_mux_9b->read();
-
-	case 0x97:
-		return m_mux_97->read();
-
-	case 0x8f:
-		return m_mux_8f->read();
+		if (BIT(~m_key_matrix_select, i))
+			result &= m_io_key[i]->read();
 	}
-
-	if (!machine().side_effects_disabled())
-		logerror("muxed_inputs_r with %02x\n", m_mux);
-
-	return 0x00000000;// 0xffffffff;
+	return result;
 }
 
 
@@ -224,7 +201,7 @@ void mjsenpu_state::main_map(address_map &map)
 
 void mjsenpu_state::main_portmap(address_map &map)
 {
-	map(0x4000, 0x4003).r(FUNC(mjsenpu_state::muxed_inputs_r));
+	map(0x4000, 0x4003).r(FUNC(mjsenpu_state::key_matrix_r));
 	map(0x4010, 0x4013).portr("IN1");
 
 	map(0x4023, 0x4023).w(FUNC(mjsenpu_state::control_w));
@@ -233,14 +210,54 @@ void mjsenpu_state::main_portmap(address_map &map)
 	map(0x4040, 0x4043).portr("DSW2");
 	map(0x4050, 0x4053).portr("DSW3");
 
-	map(0x4063, 0x4063).w(FUNC(mjsenpu_state::mux_w));
+	map(0x4063, 0x4063).w(FUNC(mjsenpu_state::key_matrix_w));
 
 	map(0x4073, 0x4073).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 }
 
 static INPUT_PORTS_START( mjsenpu )
 
-	PORT_START("MUX_8F") // in joystick mode?
+	PORT_START("KEY0")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_A        ) PORT_CONDITION("DSW3",0x08,EQUALS,0x08)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_E        ) PORT_CONDITION("DSW3",0x08,EQUALS,0x08)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_I        ) PORT_CONDITION("DSW3",0x08,EQUALS,0x08)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_M        ) PORT_CONDITION("DSW3",0x08,EQUALS,0x08)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_KAN      ) PORT_CONDITION("DSW3",0x08,EQUALS,0x08)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START1           ) PORT_CONDITION("DSW3",0x08,EQUALS,0x08)
+	PORT_BIT( 0x0000003f, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_CONDITION("DSW3",0x08,EQUALS,0x00)
+	PORT_BIT( 0xffffffc0, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("KEY1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_B        ) PORT_CONDITION("DSW3",0x08,EQUALS,0x08)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_F        ) PORT_CONDITION("DSW3",0x08,EQUALS,0x08)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_J        ) PORT_CONDITION("DSW3",0x08,EQUALS,0x08)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_N        ) PORT_CONDITION("DSW3",0x08,EQUALS,0x08)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_REACH    ) PORT_CONDITION("DSW3",0x08,EQUALS,0x08)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_MAHJONG_BET      ) PORT_CONDITION("DSW3",0x08,EQUALS,0x08)
+	PORT_BIT( 0x0000003f, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_CONDITION("DSW3",0x08,EQUALS,0x00)
+	PORT_BIT( 0xffffffc0, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("KEY2")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_C        ) PORT_CONDITION("DSW3",0x08,EQUALS,0x08)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_G        ) PORT_CONDITION("DSW3",0x08,EQUALS,0x08)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_K        ) PORT_CONDITION("DSW3",0x08,EQUALS,0x08)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_CHI      ) PORT_CONDITION("DSW3",0x08,EQUALS,0x08)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_RON      ) PORT_CONDITION("DSW3",0x08,EQUALS,0x08)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN          ) PORT_CONDITION("DSW3",0x08,EQUALS,0x08)
+	PORT_BIT( 0x0000003f, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_CONDITION("DSW3",0x08,EQUALS,0x00)
+	PORT_BIT( 0xffffffc0, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("KEY3")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_D        ) PORT_CONDITION("DSW3",0x08,EQUALS,0x08)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_H        ) PORT_CONDITION("DSW3",0x08,EQUALS,0x08)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_L        ) PORT_CONDITION("DSW3",0x08,EQUALS,0x08)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_PON      ) PORT_CONDITION("DSW3",0x08,EQUALS,0x08)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN          ) PORT_CONDITION("DSW3",0x08,EQUALS,0x08)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN          ) PORT_CONDITION("DSW3",0x08,EQUALS,0x08)
+	PORT_BIT( 0x0000003f, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_CONDITION("DSW3",0x08,EQUALS,0x00)
+	PORT_BIT( 0xffffffc0, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("KEY4") // in joystick mode?
 	PORT_BIT( 0x00000001, IP_ACTIVE_LOW, IPT_START1 ) PORT_CONDITION("DSW3",0x08,EQUALS,0x00)
 	PORT_BIT( 0x00000002, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_CONDITION("DSW3",0x08,EQUALS,0x00)
 	PORT_BIT( 0x00000004, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_CONDITION("DSW3",0x08,EQUALS,0x00)
@@ -251,46 +268,6 @@ static INPUT_PORTS_START( mjsenpu )
 	PORT_BIT( 0x00000080, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_CONDITION("DSW3",0x08,EQUALS,0x00)
 	PORT_BIT( 0x000000ff, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_CONDITION("DSW3",0x08,EQUALS,0x08)
 	PORT_BIT( 0xffffff00, IP_ACTIVE_LOW, IPT_UNUSED )
-
-	PORT_START("MUX_9E")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_A        ) PORT_CONDITION("DSW3",0x08,EQUALS,0x08)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_E        ) PORT_CONDITION("DSW3",0x08,EQUALS,0x08)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_I        ) PORT_CONDITION("DSW3",0x08,EQUALS,0x08)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_M        ) PORT_CONDITION("DSW3",0x08,EQUALS,0x08)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_KAN      ) PORT_CONDITION("DSW3",0x08,EQUALS,0x08)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START1           ) PORT_CONDITION("DSW3",0x08,EQUALS,0x08)
-	PORT_BIT( 0x0000003f, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_CONDITION("DSW3",0x08,EQUALS,0x00)
-	PORT_BIT( 0xffffffc0, IP_ACTIVE_LOW, IPT_UNUSED )
-
-	PORT_START("MUX_9D")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_B        ) PORT_CONDITION("DSW3",0x08,EQUALS,0x08)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_F        ) PORT_CONDITION("DSW3",0x08,EQUALS,0x08)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_J        ) PORT_CONDITION("DSW3",0x08,EQUALS,0x08)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_N        ) PORT_CONDITION("DSW3",0x08,EQUALS,0x08)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_REACH    ) PORT_CONDITION("DSW3",0x08,EQUALS,0x08)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_MAHJONG_BET      ) PORT_CONDITION("DSW3",0x08,EQUALS,0x08)
-	PORT_BIT( 0x0000003f, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_CONDITION("DSW3",0x08,EQUALS,0x00)
-	PORT_BIT( 0xffffffc0, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
-	PORT_START("MUX_9B")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_C        ) PORT_CONDITION("DSW3",0x08,EQUALS,0x08)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_G        ) PORT_CONDITION("DSW3",0x08,EQUALS,0x08)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_K        ) PORT_CONDITION("DSW3",0x08,EQUALS,0x08)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_CHI      ) PORT_CONDITION("DSW3",0x08,EQUALS,0x08)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_RON      ) PORT_CONDITION("DSW3",0x08,EQUALS,0x08)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN          ) PORT_CONDITION("DSW3",0x08,EQUALS,0x08)
-	PORT_BIT( 0x0000003f, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_CONDITION("DSW3",0x08,EQUALS,0x00)
-	PORT_BIT( 0xffffffc0, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
-	PORT_START("MUX_97")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_D        ) PORT_CONDITION("DSW3",0x08,EQUALS,0x08)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_H        ) PORT_CONDITION("DSW3",0x08,EQUALS,0x08)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_L        ) PORT_CONDITION("DSW3",0x08,EQUALS,0x08)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_PON      ) PORT_CONDITION("DSW3",0x08,EQUALS,0x08)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN          ) PORT_CONDITION("DSW3",0x08,EQUALS,0x08)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN          ) PORT_CONDITION("DSW3",0x08,EQUALS,0x08)
-	PORT_BIT( 0x0000003f, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_CONDITION("DSW3",0x08,EQUALS,0x00)
-	PORT_BIT( 0xffffffc0, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("IN1")
 	PORT_BIT(                 0x00000001, IP_ACTIVE_LOW, IPT_COIN1 )
@@ -421,7 +398,7 @@ uint32_t mjsenpu_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 void mjsenpu_state::machine_start()
 {
 	save_item(NAME(m_control));
-	save_item(NAME(m_mux));
+	save_item(NAME(m_key_matrix_select));
 }
 
 void mjsenpu_state::machine_reset()
