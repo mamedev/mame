@@ -399,6 +399,10 @@ unsigned a2_video_device::get_text_character(uint32_t code, int row)
 				invert_mask ^= 0x7f;  // and flip the color
 			}
 		}
+		if (Model == model::IIE)
+		{
+			code |= get_iie_langsw() * 0x100;
+		}
 	}
 	else    // original II and II Plus
 	{
