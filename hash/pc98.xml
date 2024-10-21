@@ -87,13 +87,13 @@ Uses [EGC], broken GFXs
 	</software>
 
 	<!-- NOTE: other Training Disks known to exist (seen FA and Hyper-98 in the wild) -->
-	<software name="rxtrain" supported="no">
+	<!-- TODO: may or may not be originally bundled with systems, this was originally included in n88bas61 -->
+	<software name="rxtrain" supported="yes">
 		<description>PC-9800 Series PC Training Disk (RX?)</description>
 		<year>1989</year>
 		<publisher>NEC ~ Gakken</publisher>
-		<notes><![CDATA[
-[PCG] swapped LR graphics
-]]></notes>
+		<info name="alt_title" value="PC-9801RX 98トレーニングディスク" />
+		<info name="usage" value="Expects a RS class minimum" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="rx_train.fdi" size="1265664" crc="607b85f8" sha1="0d2fdf6f0550e50127b27b42b470ba25b305239c" offset="0" />
@@ -4747,7 +4747,7 @@ Uses [DAC1BIT] for voice samples
 		<publisher>ソフトハウスアラジン (Software House Aladdin)</publisher>
 		<notes><![CDATA[
 Plays sound thru [DAC1BIT] only
-Every kanji character has one line of corruption
+Every [kanji] character has one line of corruption
 ]]></notes>
 		<info name="alt_title" value="エンシェント・ドラゴン" />
 		<part name="flop1" interface="floppy_5_25">
@@ -6321,7 +6321,7 @@ Not extensively tested
 		<year>1988</year>
 		<publisher>アスキー (ASCII)</publisher>
 		<notes><![CDATA[
-Requires kanji board
+Requires [kanji] board
 ]]></notes>
 		<info name="alt_title" value="バランス オブ パワー" />
 		<info name="release" value="198810xx" />
@@ -6346,7 +6346,7 @@ Requires kanji board
 		<year>1988</year>
 		<publisher>アスキー (ASCII)</publisher>
 		<notes><![CDATA[
-Requires kanji board
+Requires [kanji] board
 ]]></notes>
 		<info name="alt_title" value="バランス オブ パワー" />
 		<info name="release" value="198810xx" />
@@ -11201,7 +11201,7 @@ Untested, definitely requires working base game
 		<publisher>ザインソフト (Xain Soft)</publisher>
 		<notes><![CDATA[
 Runs too fast on VM class
-Requires kanji board
+Requires [kanji] board
 ]]></notes>
 		<info name="alt_title" value="クルージュ" />
 		<info name="release" value="19880812" />
@@ -11501,7 +11501,7 @@ Boots with NAX.COM -o20 -b80 -q -0 -f9 -t
 		<year>1992</year>
 		<publisher>ソフトスタジオWING (Soft Studio Wing)</publisher>
 		<notes><![CDATA[
-Course names draws a full square kanji block between nation and "GP" (verify)
+Course names draws a full square [kanji] block between nation and "GP" (verify)
 ]]></notes>
 		<info name="alt_title" value="コンストラクターズグランプリ" />
 		<info name="release" value="199209xx" />
@@ -30669,7 +30669,7 @@ TODO: check master floppy, size looks suspicious
 		<year>1986</year>
 		<publisher>アポロテクニカ (Apollo Technica)</publisher>
 		<notes><![CDATA[
-Has [PCG] LR issues during gameplay (score digits)
+Has [kanji] PCG LR issues during gameplay (score digits)
 Should screen mask bottom edge of screen
 ]]></notes>
 		<info name="alt_title" value="マイティーヘッド" />
@@ -32675,7 +32675,7 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 		<year>1983</year>
 		<publisher>光栄 (Koei)</publisher>
 		<notes><![CDATA[
-Requires kanji board, currently missing from vanilla class (use VM)
+Requires [kanji] board, currently missing from vanilla class (use VM)
 ]]></notes>
 		<info name="alt_title" value="信長の野望" />
 		<info name="release" value="198311xx" />
@@ -43577,8 +43577,7 @@ Requires a VM class machine, runs too fast on RS and beyond
 		<year>1995</year>
 		<publisher>ジャスト (Jast)</publisher>
 		<notes><![CDATA[
-Draws main menu [kanji] with LR cutoff right side.
-Eventually hangs with stuck [PC9801-26] sound note
+Eventually hangs with stuck [PC9801-26] sound note (verify, should be fixed)
 ]]></notes>
 		<info name="alt_title" value="天使たちの午後 コレクション２" />
 		<info name="release" value="19951117" />
@@ -51212,7 +51211,7 @@ Runs way too fast on RS class
 		<year>1991</year>
 		<publisher>グレイト (Great)</publisher>
 		<notes><![CDATA[
-Draws "Muaplay98" with half kanji width on boot
+Draws "Muaplay98" with half [kanji] width on boot
 ]]></notes>
 		<info name="alt_title" value="ＫＩＤＳ ＳＡＰ 特殊行動警察 ２ｎｄ ＦＩＬＥ" />
 		<info name="release" value="199109xx" />
@@ -62762,7 +62761,7 @@ Untested on [HDD] install
 		<year>1996</year>
 		<publisher>13cm</publisher>
 		<notes><![CDATA[
-Cutoff [kanji] LR right side
+Cutoff [kanji] LR right side (verify, should be fixed)
 ]]></notes>
 		<info name="alt_title" value="夢の精" />
 		<info name="release" value="19960126" />
