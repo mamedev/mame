@@ -305,7 +305,6 @@ on Joerg Woerner's datamath.org: http://www.datamath.org/IC_List.htm
 #include "h2hboxing.lh"
 #include "h2hfootb.lh"
 #include "h2hhockey.lh"
-#include "horseran.lh"
 #include "lilprof.lh"
 #include "litelrn.lh"
 #include "liveafb.lh"
@@ -8774,12 +8773,16 @@ void horseran_state::horseran(machine_config &config)
 	m_maincpu->write_r().set(FUNC(horseran_state::write_r));
 
 	// video hardware
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
+	screen.set_refresh_hz(60);
+	screen.set_size(1920, 978);
+	screen.set_visarea_full();
+
 	HLCD0569(config, m_lcd, 1100); // C=0.022uF
 	m_lcd->write_cols().set(FUNC(horseran_state::lcd_output_w));
 
 	PWM_DISPLAY(config, m_display).set_size(3+6, 24);
 	m_display->set_segmask(0x3f<<3, 0x7f);
-	config.set_default_layout(layout_horseran);
 
 	// no sound!
 }
@@ -8794,6 +8797,9 @@ ROM_START( horseran )
 	ROM_LOAD( "tms1100_common1_micro.pla", 0, 867, CRC(62445fc9) SHA1(d6297f2a4bc7a870b76cc498d19dbb0ce7d69fec) )
 	ROM_REGION( 365, "maincpu:opla", 0 ) // unused
 	ROM_LOAD( "tms1100_horseran_output.pla", 0, 365, CRC(0fea09b0) SHA1(27a56fcf2b490e9a7dbbc6ad48cc8aaca4cada94) )
+
+	ROM_REGION( 284940, "screen", 0)
+	ROM_LOAD( "horseran.svg", 0, 284940, CRC(eef5230d) SHA1(bafc3f7ac8052a4aafd7af80920e8a781c3898e4) )
 ROM_END
 
 
