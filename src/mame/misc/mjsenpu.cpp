@@ -16,7 +16,7 @@
  The test mode for this game is very buggy, this is not a MAME bug
  the same behavior has been observed on the original PCB.
 
- One example of this is the dipswitch viewer, which should show 3
+ One example of this is the DIP switch viewer, which should show 3
  rows of 8 1/0 values, one for each switch. ie
 
  00000000
@@ -25,7 +25,7 @@
 
  However..
 
- Instead of properly representing each of the dips, the 1st switch in
+ Instead of properly representing each of the banks, the 1st switch in
  each bank ends up turning on/off the entire row display (for rows 2/3
  it shifts row 1 by one pixel)
 
@@ -71,9 +71,9 @@ public:
 	{
 	}
 
-	void mjsenpu(machine_config &config);
+	void mjsenpu(machine_config &config) ATTR_COLD;
 
-	void init_mjsenpu();
+	void init_mjsenpu() ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -142,7 +142,7 @@ void mjsenpu_state::control_w(uint8_t data)
 
 	// bits 0x08 is used in the alt payout / hopper mode (see dipswitches)
 
-	// 0x04 seem to be hopper/ticket related? different ones get used depending on the dips
+	// 0x04 seem to be hopper/ticket related? different ones get used depending on the DIP switches
 	m_hopper->motor_w(BIT(~data, 2));
 
 	// bit 0x02 could be coin counter?
@@ -157,13 +157,8 @@ void mjsenpu_state::control_w(uint8_t data)
 
 void mjsenpu_state::key_matrix_w(uint8_t data)
 {
-	if ((data != 0x80) &&
-		(data != 0x9e) &&
-		(data != 0x9d) &&
-		(data != 0x9b) &&
-		(data != 0x97) &&
-		(data != 0x8f))
-			logerror("key_matrix_w %02x\n", data);
+	if ((data & 0xe0) != 0x80)
+		logerror("key_matrix_w %02x\n", data);
 
 	// bit 0 to 4: Key matrix select
 	// Bit 5 to 6: unknown, always clear?
