@@ -1303,6 +1303,18 @@ static INPUT_PORTS_START( epo_tfp2 )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_START2 ) PORT_NAME("Player 2 Start / Blue")
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( epo_tp2p )
+	PORT_INCLUDE(xavix)
+
+	PORT_MODIFY("IN0")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Player 1 Left") PORT_PLAYER(1)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Player 1 Right") PORT_PLAYER(1)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START1 ) PORT_NAME("Player 1 Start")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Player 2 Left") PORT_PLAYER(2)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Player 2 Right") PORT_PLAYER(2)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_START2 ) PORT_NAME("Player 2 Start")
+INPUT_PORTS_END
+
 static INPUT_PORTS_START( tvpc_tom )
 	PORT_INCLUDE(xavix_i2c)
 INPUT_PORTS_END
@@ -2324,6 +2336,11 @@ ROM_START( epo_tfp2 )
 	ROM_LOAD( "funpark2.u1", 0x000000, 0x400000, CRC(97ad5183) SHA1(77310b42d0a015838a1cef4eb5e74cc8335284d1) )
 ROM_END
 
+ROM_START( epo_tp2p ) // TF3J MAIN PCB 01
+	ROM_REGION( 0x800000, "bios", ROMREGION_ERASE00 )
+	ROM_LOAD( "grandslam.u3", 0x000000, 0x800000, CRC(d458ee01) SHA1(dd1a85d822121c46f89ca013fa56c482ab411c6e) )
+ROM_END
+
 ROM_START( epo_tenn )
 	ROM_REGION(0x800000, "bios", ROMREGION_ERASE00)
 	ROM_LOAD( "excitetennis.u4", 0x000000, 0x100000, CRC(10b0e1dd) SHA1(ba438201434f2b51792b119a3e3d07cc3e53b89a) )
@@ -2580,6 +2597,8 @@ CONS( 2008, hikara,   0,           0,  xavix_cart_hikara, hikara,    xavix_hikar
 
 // 東京フレンドパーク2 
 CONS( 2003, epo_tfp2,  0,          0,  xavix_i2c_24c08,  epo_tfp2, xavix_i2c_state, init_xavix, "Epoch / SSD Company LTD", "Tokyo Friend Park 2 (Japan)", MACHINE_IMPERFECT_SOUND) // uses in24lc08b
+
+CONS( 2007, epo_tp2p,  0,          0,  xavix,            epo_tp2p, xavix_state,     init_xavix, "Epoch / SSD Company LTD", "Tokyo Friend Park 2 Perfect - Go For Grand Slam (Japan)", MACHINE_IMPERFECT_SOUND)
 
 // きかんしゃトーマス テレビパソコン
 CONS( 2005, tvpc_tom,  0,          0,  xavix_i2c_24c16,  tvpc_tom, xavix_i2c_state, init_xavix, "Epoch / SSD Company LTD", "TV-PC Thomas & Friends (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
