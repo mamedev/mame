@@ -605,7 +605,8 @@ uint8_t pc9801_state::f0_r(offs_t offset)
 	{
 		// iterate thru all devices to check if an AMD98 is present
 		// TODO: move to cbus
-		for (pc9801_amd98_device &amd98 : device_type_enumerator<pc9801_amd98_device>(machine().root_device()))
+		// TODO: is this really part of PC-98 spec or it's coming from the device itself, as dip/jumper?
+		for (amd98_device &amd98 : device_type_enumerator<amd98_device>(machine().root_device()))
 		{
 			logerror("%s: Read AMD98 ID %s\n", machine().describe_context(), amd98.tag());
 			return 0x18; // return the right ID
@@ -1877,15 +1878,15 @@ static void pc9801_cbus_devices(device_slot_interface &device)
 {
 	// official HW
 //  PC-9801-14
-	device.option_add("pc9801_26", PC9801_26);
+	device.option_add("pc9801_26",  PC9801_26);
 	device.option_add("pc9801_55u", PC9801_55U);
 	device.option_add("pc9801_55l", PC9801_55L);
-	device.option_add("pc9801_86", PC9801_86);
+	device.option_add("pc9801_86",  PC9801_86);
 	device.option_add("pc9801_118", PC9801_118);
 	device.option_add("pc9801_spb", PC9801_SPEAKBOARD);
 //  Spark Board
-	device.option_add("pc9801_amd98", PC9801_AMD98); // AmuseMent boarD
-	device.option_add("mpu_pc98", MPU_PC98);
+	device.option_add("amd98",      AMD98);
+	device.option_add("mpu_pc98",   MPU_PC98);
 
 	// doujinshi HW
 // MAD Factory / Doujin Hard (同人ハード)

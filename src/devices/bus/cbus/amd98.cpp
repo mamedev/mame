@@ -2,16 +2,16 @@
 // copyright-holders:Angelo Salese
 /**************************************************************************************************
 
-    System Sacom AMD-98 (AmuseMent boarD)
+System Sacom AMD-98 (AmuseMent boarD)
 
-    3 PSG chips, one of the first sound boards released for PC98
-    Superseded by later NEC in-house sound boards
+3 PSG chips, one of the first sound boards released for PC98
+Superseded by later NEC in-house sound boards
 
-    TODO:
-    - not sure if it's AY8910 or YM2203, from a PCB pic it looks with stock AY logos?
-    - Third AY (uses port B from BOTH AYs);
-    - PIT control;
-    - PCM section;
+TODO:
+- not sure if it's AY8910 or YM2203, from a PCB pic it looks with stock AY logos?
+- f/f not completely understood;
+- PIT control;
+- PCM section;
 
 ===================================================================================================
 
@@ -28,8 +28,17 @@
 **************************************************************************************************/
 
 #include "emu.h"
-#include "bus/cbus/pc9801_amd98.h"
+#include "bus/cbus/amd98.h"
 #include "speaker.h"
+
+#define LOG_LATCH   (1U << 1)   // Detailed AY3 latch setups
+
+
+#define VERBOSE (LOG_GENERAL)
+//#define LOG_OUTPUT_FUNC osd_printf_info
+#include "logmacro.h"
+
+#define LOGLATCH(...)     LOGMASKED(LOG_LATCH, __VA_ARGS__)
 
 
 //**************************************************************************
@@ -37,29 +46,31 @@
 //**************************************************************************
 
 // device type definition
-DEFINE_DEVICE_TYPE(PC9801_AMD98, pc9801_amd98_device, "pc9801_amd98", "System Sacom AMD-98")
+DEFINE_DEVICE_TYPE(AMD98, amd98_device, "amd98", "System Sacom AMD-98")
 
 //-------------------------------------------------
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-void pc9801_amd98_device::device_add_mconfig(machine_config &config)
+void amd98_device::device_add_mconfig(machine_config &config)
 {
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	// Assume mono, as per highway making engine noise from ay1 only
+	SPEAKER(config, "speaker").front_center();
 	AY8910(config, m_ay1, 1'996'800);
 	m_ay1->port_a_read_callback().set_ioport("OPN_PA1");
-	m_ay1->port_b_write_callback().set(FUNC(pc9801_amd98_device::ay3_address_w));
-	m_ay1->add_route(ALL_OUTPUTS, "lspeaker", 0.50);
+	m_ay1->port_b_write_callback().set(FUNC(amd98_device::ay3_address_w));
+	m_ay1->add_route(ALL_OUTPUTS, "speaker", 0.50);
 
 	AY8910(config, m_ay2, 1'996'800);
 	m_ay2->port_a_read_callback().set_ioport("OPN_PA2");
-	m_ay2->port_b_write_callback().set(FUNC(pc9801_amd98_device::ay3_data_latch_w));
-	m_ay2->add_route(ALL_OUTPUTS, "rspeaker", 0.50);
+	m_ay2->port_b_write_callback().set(FUNC(amd98_device::ay3_data_latch_w));
+	m_ay2->add_route(ALL_OUTPUTS, "speaker", 0.50);
 
 	AY8910(config, m_ay3, 1'996'800);
-	m_ay3->add_route(ALL_OUTPUTS, "lspeaker", 0.25);
-	m_ay3->add_route(ALL_OUTPUTS, "rspeaker", 0.25);
+	m_ay3->port_b_write_callback().set([this] (u8 data) {
+		LOG("AMD-98 DAC %02x\n", data);
+	});
+	m_ay3->add_route(ALL_OUTPUTS, "speaker", 0.25);
 }
 
 static INPUT_PORTS_START( pc9801_amd98 )
@@ -84,7 +95,7 @@ static INPUT_PORTS_START( pc9801_amd98 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
-ioport_constructor pc9801_amd98_device::device_input_ports() const
+ioport_constructor amd98_device::device_input_ports() const
 {
 	return INPUT_PORTS_NAME( pc9801_amd98 );
 }
@@ -97,11 +108,11 @@ ioport_constructor pc9801_amd98_device::device_input_ports() const
 //**************************************************************************
 
 //-------------------------------------------------
-//  pc9801_amd98_device - constructor
+//  amd98_device - constructor
 //-------------------------------------------------
 
-pc9801_amd98_device::pc9801_amd98_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, PC9801_AMD98, tag, owner, clock)
+amd98_device::amd98_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, AMD98, tag, owner, clock)
 	, m_bus(*this, DEVICE_SELF_OWNER)
 	, m_ay1(*this, "ay1")
 	, m_ay2(*this, "ay2")
@@ -115,7 +126,7 @@ pc9801_amd98_device::pc9801_amd98_device(const machine_config &mconfig, const ch
 //  on this device
 //-------------------------------------------------
 
-void pc9801_amd98_device::device_validity_check(validity_checker &valid) const
+void amd98_device::device_validity_check(validity_checker &valid) const
 {
 }
 
@@ -123,7 +134,7 @@ void pc9801_amd98_device::device_validity_check(validity_checker &valid) const
 //  device_start - device-specific startup
 //-------------------------------------------------
 
-void pc9801_amd98_device::device_start()
+void amd98_device::device_start()
 {
 }
 
@@ -132,11 +143,11 @@ void pc9801_amd98_device::device_start()
 //  device_reset - device-specific reset
 //-------------------------------------------------
 
-void pc9801_amd98_device::device_reset()
+void amd98_device::device_reset()
 {
-	m_bus->install_io(0x00d8, 0x00df, read8sm_delegate(*this, FUNC(pc9801_amd98_device::read)), write8sm_delegate(*this, FUNC(pc9801_amd98_device::write)));
-	// Thexder access with following
-	m_bus->install_io(0x38d8, 0x38df, read8sm_delegate(*this, FUNC(pc9801_amd98_device::read)), write8sm_delegate(*this, FUNC(pc9801_amd98_device::write)));
+	m_bus->install_io(0x00d8, 0x00df, read8sm_delegate(*this, FUNC(amd98_device::read)), write8sm_delegate(*this, FUNC(amd98_device::write)));
+	// thexder access with following
+	m_bus->install_io(0x38d8, 0x38df, read8sm_delegate(*this, FUNC(amd98_device::read)), write8sm_delegate(*this, FUNC(amd98_device::write)));
 }
 
 
@@ -144,7 +155,7 @@ void pc9801_amd98_device::device_reset()
 //  READ/WRITE HANDLERS
 //**************************************************************************
 
-uint8_t pc9801_amd98_device::read(offs_t offset)
+uint8_t amd98_device::read(offs_t offset)
 {
 	switch(offset)
 	{
@@ -154,12 +165,12 @@ uint8_t pc9801_amd98_device::read(offs_t offset)
 			return m_ay2->data_r();
 	}
 
-	logerror("%02x\n",offset);
+	LOG("AMD-98: unhandled %02x read\n", offset + 0xd8);
 
 	return 0xff;
 }
 
-void pc9801_amd98_device::write(offs_t offset, uint8_t data)
+void amd98_device::write(offs_t offset, uint8_t data)
 {
 	switch(offset)
 	{
@@ -176,27 +187,34 @@ void pc9801_amd98_device::write(offs_t offset, uint8_t data)
 			m_ay2->data_w(data);
 			break;
 		default:
-			logerror("%02x %02x\n",offset,data);
+			LOG("AMD-98: unhandled %02x write %02x\n", offset + 0xd8, data);
 	}
 }
 
-void pc9801_amd98_device::ay3_address_w(uint8_t data)
+void amd98_device::ay3_address_w(uint8_t data)
 {
+	LOGLATCH("AMD-98 AY3 latch %02x\n", data);
 	m_ay3_latch = data;
 }
 
-void pc9801_amd98_device::ay3_data_latch_w(uint8_t data)
+void amd98_device::ay3_data_latch_w(uint8_t data)
 {
-	// TODO: this actually uses a flip flop mechanism, not quite sure about how it works yet
-	switch(data)
+	// TODO: actually goes 0 -> 1 -> 0
+	// TODO: thexder is the odd one: uses 0x00 -> 0x40 -> 0x47 (address) -> 0x40 -> 0x40 -> 0x43 (data) -> 0x40
+	if (!BIT(m_ay3_ff, 0) && BIT(data, 0))
 	{
-		case 0x47:
-			//logerror("%02x addr\n",m_ay3_latch);
-			m_ay3->address_w(m_ay3_latch);
-			break;
-		case 0x43:
-			//logerror("%02x data\n",m_ay3_latch);
-			m_ay3->data_w(m_ay3_latch);
-			break;
+		switch(data & 0xc2)
+		{
+			case 0x42:
+				LOG("AMD-98 AY3 write %02x address (f/f %02x)\n", m_ay3_latch, m_ay3_ff);
+				m_ay3->address_w(m_ay3_latch);
+				break;
+			case 0x40:
+				LOG("AMD-98 AY3 write %02x data (f/f %02x)\n", m_ay3_latch, m_ay3_ff);
+				m_ay3->data_w(m_ay3_latch);
+				break;
+		}
 	}
+	LOGLATCH("AMD-98 f/f %02x %02x\n", data, m_ay3_latch);
+	m_ay3_ff = data;
 }

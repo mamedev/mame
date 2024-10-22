@@ -6,8 +6,8 @@
 
 ***************************************************************************/
 
-#ifndef MAME_BUS_CBUS_PC9801_AMD98_H
-#define MAME_BUS_CBUS_PC9801_AMD98_H
+#ifndef MAME_BUS_CBUS_AMD98_H
+#define MAME_BUS_CBUS_AMD98_H
 
 #pragma once
 
@@ -18,13 +18,13 @@
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-// ======================> pc9801_amd98_device
+// ======================> amd98_device
 
-class pc9801_amd98_device : public device_t
+class amd98_device : public device_t
 {
 public:
 	// construction/destruction
-	pc9801_amd98_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	amd98_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	static constexpr feature_type imperfect_features() { return feature::SOUND; }
 
@@ -44,7 +44,7 @@ private:
 	void ay3_address_w(uint8_t data);
 	void ay3_data_latch_w(uint8_t data);
 
-	uint8_t m_ay3_latch;
+	uint8_t m_ay3_latch, m_ay3_ff;
 
 	required_device<pc9801_slot_device> m_bus;
 	required_device<ay8910_device>  m_ay1;
@@ -54,6 +54,6 @@ private:
 };
 
 // device type definition
-DECLARE_DEVICE_TYPE(PC9801_AMD98, pc9801_amd98_device)
+DECLARE_DEVICE_TYPE(AMD98, amd98_device)
 
-#endif // MAME_BUS_CBUS_PC9801_AMD98_H
+#endif // MAME_BUS_CBUS_AMD98_H

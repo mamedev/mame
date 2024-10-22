@@ -44,11 +44,11 @@
 
 #include "video/upd7220.h"
 
+#include "bus/cbus/amd98.h"
 #include "bus/cbus/pc9801_26.h"
 #include "bus/cbus/pc9801_55.h"
 #include "bus/cbus/pc9801_86.h"
 #include "bus/cbus/pc9801_118.h"
-#include "bus/cbus/pc9801_amd98.h"
 #include "bus/cbus/mpu_pc98.h"
 #include "bus/cbus/pc9801_cbus.h"
 #include "pc9801_kbd.h"
