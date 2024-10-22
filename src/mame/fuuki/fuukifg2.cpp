@@ -1,5 +1,6 @@
 // license:BSD-3-Clause
-// copyright-holders:Luca Elia,Paul Priest
+// copyright-holders: Luca Elia, Paul Priest
+
 /***************************************************************************
 
                           -= Fuuki 16 Bit Games =-
@@ -26,7 +27,7 @@ Do NOT trust the Service Mode for dipswitch settings for Go Go! Mile Smile:
   setting of Coin B and only uses the settings for Coin A, except for Coin B "Free Play"
   The game says Press 1 or 2, and will start the game, but jumps right to the Game Over
   and "Continue" countdown.
-The Service Mode is WAY off on effects of dipswitches for the ealier set!!! It reports
+The Service Mode is WAY off on effects of dipswitches for the earlier set!!! It reports
   the effects of MAME's SW1:3-8 have been moved to SW1:2-7 and Demo Sound has moved to
   SW2:7. What MAME shows as settings are according to actual game effect and reflect what
   the manual states.
@@ -46,13 +47,293 @@ To Do:
 ***************************************************************************/
 
 #include "emu.h"
-#include "fuukifg2.h"
+
+#include "fuukifg.h"
 
 #include "cpu/z80/z80.h"
 #include "cpu/m68000/m68000.h"
-#include "sound/ymopn.h"
+#include "machine/gen_latch.h"
+#include "sound/okim6295.h"
 #include "sound/ymopl.h"
+#include "sound/ymopn.h"
+
+#include "emupal.h"
+#include "screen.h"
 #include "speaker.h"
+#include "tilemap.h"
+
+
+namespace {
+
+class fuuki16_state : public driver_device
+{
+public:
+	fuuki16_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_audiocpu(*this, "audiocpu")
+		, m_oki(*this, "oki")
+		, m_gfxdecode(*this, "gfxdecode")
+		, m_screen(*this, "screen")
+		, m_palette(*this, "palette")
+		, m_fuukivid(*this, "fuukivid")
+		, m_soundlatch(*this, "soundlatch")
+		, m_spriteram(*this, "spriteram")
+		, m_vram(*this, "vram.%u", 0)
+		, m_vregs(*this, "vregs")
+		, m_unknown(*this, "unknown")
+		, m_priority(*this, "priority")
+		, m_soundbank(*this, "soundbank")
+	{ }
+
+	void fuuki16(machine_config &config);
+
+protected:
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
+
+private:
+	// devices
+	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_audiocpu;
+	required_device<okim6295_device> m_oki;
+	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<screen_device> m_screen;
+	required_device<palette_device> m_palette;
+	required_device<fuukivid_device> m_fuukivid;
+	required_device<generic_latch_8_device> m_soundlatch;
+
+	// memory pointers
+	required_shared_ptr<u16> m_spriteram;
+	required_shared_ptr_array<u16, 4> m_vram;
+	required_shared_ptr<u16> m_vregs;
+	required_shared_ptr<u16> m_unknown;
+	required_shared_ptr<u16> m_priority;
+
+	required_memory_bank m_soundbank;
+
+	// video-related
+	tilemap_t *m_tilemap[3]{};
+
+	// misc
+	emu_timer *m_level_1_interrupt_timer = nullptr;
+	emu_timer *m_vblank_interrupt_timer = nullptr;
+	emu_timer *m_raster_interrupt_timer = nullptr;
+
+	void main_map(address_map &map) ATTR_COLD;
+	void sound_io_map(address_map &map) ATTR_COLD;
+	void sound_map(address_map &map) ATTR_COLD;
+
+	TIMER_CALLBACK_MEMBER(level1_interrupt);
+	TIMER_CALLBACK_MEMBER(vblank_interrupt);
+	TIMER_CALLBACK_MEMBER(raster_interrupt);
+
+	void vregs_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	void sound_command_w(u8 data);
+	void sound_rombank_w(u8 data);
+	template<int Layer> void vram_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	template<int Layer> void vram_buffered_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	void oki_banking_w(u8 data);
+
+	template<int Layer> TILE_GET_INFO_MEMBER(get_tile_info);
+
+	void colpri_cb(u32 &colour, u32 &pri_mask);
+	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void draw_layer(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, u8 i, int flag, u8 pri, u8 primask = 0xff);
+};
+
+
+/***************************************************************************
+
+    [ 4 Scrolling Layers ]
+
+                            [ Layer 0 ]     [ Layer 1 ]     [ Layer 2 (double-buffered) ]
+
+    Tile Size:              16 x 16 x 4     16 x 16 x 8     8 x 8 x 4
+    Layer Size (tiles):     64 x 32         64 x 32         64 x 32
+
+    [ 1024? Zooming Sprites ]
+
+    Sprites are made of 16 x 16 x 4 tiles. Size can vary from 1 to 16
+    tiles both horizontally and vertically.
+    There is zooming (from full size to half size) and 4 levels of
+    priority (wrt layers)
+
+    * Note: the game does hardware assisted raster effects *
+
+***************************************************************************/
+
+/***************************************************************************
+
+
+                                    Tilemaps
+
+    Offset:     Bits:                   Value:
+
+        0.w                             Code
+
+        2.w     fedc ba98 ---- ----
+                ---- ---- 7--- ----     Flip Y
+                ---- ---- -6-- ----     Flip X
+                ---- ---- --54 3210     Color
+
+
+***************************************************************************/
+
+template<int Layer>
+TILE_GET_INFO_MEMBER(fuuki16_state::get_tile_info)
+{
+	const int buffer = (Layer < 2) ? 0 : (m_vregs[0x1e / 2] & 0x40) >> 6;
+	const u16 code = m_vram[Layer|buffer][2 * tile_index + 0];
+	const u16 attr = m_vram[Layer|buffer][2 * tile_index + 1];
+	tileinfo.set(Layer, code, attr & 0x3f, TILE_FLIPYX((attr >> 6) & 3));
+}
+
+/***************************************************************************
+
+
+                            Video Hardware Init
+
+
+***************************************************************************/
+
+// Not used atm, seems to be fine without clearing pens?
+#if 0
+void fuuki16_state::fuuki16_palette(palette_device &palette) const
+{
+	// The game does not initialise the palette at startup. It should be totally black
+	for (int pen = 0; pen < palette.entries(); pen++)
+		palette.set_pen_color(pen, rgb_t:black());
+}
+#endif
+
+void fuuki16_state::video_start()
+{
+	m_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(fuuki16_state::get_tile_info<0>)), TILEMAP_SCAN_ROWS, 16, 16, 64, 32);
+	m_tilemap[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(fuuki16_state::get_tile_info<1>)), TILEMAP_SCAN_ROWS, 16, 16, 64, 32);
+	m_tilemap[2] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(fuuki16_state::get_tile_info<2>)), TILEMAP_SCAN_ROWS,  8,  8, 64, 32);
+
+	m_tilemap[0]->set_transparent_pen(0x0f);    // 4 bits
+	m_tilemap[1]->set_transparent_pen(0xff);    // 8 bits
+	m_tilemap[2]->set_transparent_pen(0x0f);    // 4 bits
+
+	m_gfxdecode->gfx(1)->set_granularity(16); // 256 colour tiles with palette selectable on 16 colour boundaries
+}
+
+
+void fuuki16_state::colpri_cb(u32 &colour, u32 &pri_mask)
+{
+	const u8 priority = (colour >> 6) & 3;
+	switch (priority)
+	{
+		case 3:  pri_mask = 0xf0 | 0xcc | 0xaa;  break;  // behind all layers
+		case 2:  pri_mask = 0xf0 | 0xcc;         break;  // behind fg + middle layer
+		case 1:  pri_mask = 0xf0;                break;  // behind fg layer
+		case 0:
+		default: pri_mask = 0;                       // above all
+	}
+	colour &= 0x3f;
+}
+
+
+/***************************************************************************
+
+
+                                Screen Drawing
+
+    Video Registers (vregs):
+
+        00.w        Layer 0 Scroll Y
+        02.w        Layer 0 Scroll X
+        04.w        Layer 1 Scroll Y
+        06.w        Layer 1 Scroll X
+        08.w        Layer 2 Scroll Y
+        0a.w        Layer 2 Scroll X
+        0c.w        Layers Y Offset
+        0e.w        Layers X Offset
+
+        10-1a.w     ? 0
+        1c.w        Trigger a level 5 irq on this raster line
+        1e.w        ? $3390/$3393 (Flip Screen Off/On), $0040 is buffer for tilemap 2
+
+    Priority Register (priority):
+
+        fedc ba98 7654 3---
+        ---- ---- ---- -210     Layer Order
+
+
+    Unknown Registers (unknown):
+
+        00.w        ? $0200/$0201   (Flip Screen Off/On)
+        02.w        ? $f300/$0330
+
+***************************************************************************/
+
+// Wrapper to handle bg and bg2 together
+void fuuki16_state::draw_layer(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, u8 i, int flag, u8 pri, u8 primask)
+{
+	m_tilemap[i]->draw(screen, bitmap, cliprect, flag, pri, primask);
+}
+
+u32 fuuki16_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	/*
+	It's not independent bits causing layers to switch, that wouldn't make sense with 3 bits.
+	See fuukifg3 for more justification
+	*/
+	static const u8 pri_table[6][3] = {
+		{ 0, 1, 2 },
+		{ 0, 2, 1 },
+		{ 1, 0, 2 },
+		{ 1, 2, 0 },
+		{ 2, 0, 1 },
+		{ 2, 1, 0 }};
+
+	const u8 tm_front  = pri_table[m_priority[0] & 0x0f][0];
+	const u8 tm_middle = pri_table[m_priority[0] & 0x0f][1];
+	const u8 tm_back   = pri_table[m_priority[0] & 0x0f][2];
+
+	flip_screen_set(m_vregs[0x1e / 2] & 1);
+
+	// Layers scrolling
+
+	const u16 scrolly_offs = m_vregs[0xc / 2] - (flip_screen() ? 0x103 : 0x1f3);
+	const u16 scrollx_offs = m_vregs[0xe / 2] - (flip_screen() ? 0x2a7 : 0x3f6);
+
+	const u16 layer0_scrolly = m_vregs[0x0 / 2] + scrolly_offs;
+	const u16 layer0_scrollx = m_vregs[0x2 / 2] + scrollx_offs;
+	const u16 layer1_scrolly = m_vregs[0x4 / 2] + scrolly_offs;
+	const u16 layer1_scrollx = m_vregs[0x6 / 2] + scrollx_offs;
+
+	const u16 layer2_scrolly = m_vregs[0x8 / 2];
+	const u16 layer2_scrollx = m_vregs[0xa / 2];
+
+	m_tilemap[0]->set_scrollx(0, layer0_scrollx);
+	m_tilemap[0]->set_scrolly(0, layer0_scrolly);
+	m_tilemap[1]->set_scrollx(0, layer1_scrollx);
+	m_tilemap[1]->set_scrolly(0, layer1_scrolly);
+
+	m_tilemap[2]->set_scrollx(0, layer2_scrollx + 0x10);
+	m_tilemap[2]->set_scrolly(0, layer2_scrolly /*+ 0x02*/);
+
+	/* The backmost tilemap decides the background color(s) but sprites can
+	   go below the opaque pixels of that tilemap. We thus need to mark the
+	   transparent pixels of this layer with a different priority value */
+//  draw_layer(screen, bitmap, cliprect, tm_back, TILEMAP_DRAW_OPAQUE, 0);
+
+	/* Actually, bg colour is simply the last pen i.e. 0x1fff -pjp */
+	bitmap.fill((0x800 * 4) - 1, cliprect);
+	screen.priority().fill(0, cliprect);
+
+	draw_layer(screen, bitmap, cliprect, tm_back,   0, 1);
+	draw_layer(screen, bitmap, cliprect, tm_middle, 0, 2);
+	draw_layer(screen, bitmap, cliprect, tm_front,  0, 4);
+
+	m_fuukivid->draw_sprites(screen, bitmap, cliprect, flip_screen(), m_spriteram, m_spriteram.bytes() / 2);
+
+	return 0;
+}
 
 
 //-------------------------------------------------
@@ -81,7 +362,7 @@ void fuuki16_state::vregs_w(offs_t offset, u16 data, u16 mem_mask)
 
 void fuuki16_state::sound_command_w(u8 data)
 {
-	m_soundlatch->write(data & 0xff);
+	m_soundlatch->write(data);
 	m_audiocpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 //      m_maincpu->spin_until_time(attotime::from_usec(50));   // Allow the other CPU to reply
 	machine().scheduler().perfect_quantum(attotime::from_usec(50)); // Fixes glitching in rasters
@@ -105,21 +386,21 @@ void fuuki16_state::vram_buffered_w(offs_t offset, u16 data, u16 mem_mask)
 
 void fuuki16_state::main_map(address_map &map)
 {
-	map(0x000000, 0x0fffff).rom();                                                                     // ROM
-	map(0x400000, 0x40ffff).ram();                                                                     // RAM
-	map(0x500000, 0x501fff).ram().w(FUNC(fuuki16_state::vram_w<0>)).share("vram.0");                  // Layers
-	map(0x502000, 0x503fff).ram().w(FUNC(fuuki16_state::vram_w<1>)).share("vram.1");                  //
-	map(0x504000, 0x505fff).ram().w(FUNC(fuuki16_state::vram_buffered_w<2>)).share("vram.2");                  //
-	map(0x506000, 0x507fff).ram().w(FUNC(fuuki16_state::vram_buffered_w<3>)).share("vram.3");                  //
-	map(0x600000, 0x601fff).mirror(0x008000).ram().share("spriteram");   // Sprites, mirrored?
-	map(0x700000, 0x703fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");    // Palette
+	map(0x000000, 0x0fffff).rom();
+	map(0x400000, 0x40ffff).ram();
+	map(0x500000, 0x501fff).ram().w(FUNC(fuuki16_state::vram_w<0>)).share(m_vram[0]);
+	map(0x502000, 0x503fff).ram().w(FUNC(fuuki16_state::vram_w<1>)).share(m_vram[1]);
+	map(0x504000, 0x505fff).ram().w(FUNC(fuuki16_state::vram_buffered_w<2>)).share(m_vram[2]);
+	map(0x506000, 0x507fff).ram().w(FUNC(fuuki16_state::vram_buffered_w<3>)).share(m_vram[3]);
+	map(0x600000, 0x601fff).mirror(0x008000).ram().share(m_spriteram);   // mirrored?
+	map(0x700000, 0x703fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x800000, 0x800001).portr("SYSTEM");
 	map(0x810000, 0x810001).portr("P1_P2");
 	map(0x880000, 0x880001).portr("DSW");
-	map(0x8a0001, 0x8a0001).w(FUNC(fuuki16_state::sound_command_w));                                          // To Sound CPU
-	map(0x8c0000, 0x8c001f).ram().w(FUNC(fuuki16_state::vregs_w)).share("vregs");                        // Video Registers
-	map(0x8d0000, 0x8d0003).ram().share("unknown");                                         //
-	map(0x8e0000, 0x8e0001).ram().share("priority");                                            //
+	map(0x8a0001, 0x8a0001).w(FUNC(fuuki16_state::sound_command_w));
+	map(0x8c0000, 0x8c001f).ram().w(FUNC(fuuki16_state::vregs_w)).share(m_vregs);
+	map(0x8d0000, 0x8d0003).ram().share(m_unknown);
+	map(0x8e0000, 0x8e0001).ram().share(m_priority);
 }
 
 
@@ -149,20 +430,20 @@ void fuuki16_state::sound_map(address_map &map)
 {
 	map(0x0000, 0x5fff).rom();         // ROM
 	map(0x6000, 0x7fff).ram();         // RAM
-	map(0x8000, 0xffff).bankr("soundbank");    // Banked ROM
+	map(0x8000, 0xffff).bankr(m_soundbank);    // Banked ROM
 }
 
 void fuuki16_state::sound_io_map(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x00).w(FUNC(fuuki16_state::sound_rombank_w));  // ROM Bank
-	map(0x11, 0x11).r(m_soundlatch, FUNC(generic_latch_8_device::read)).nopw(); // From Main CPU / ? To Main CPU ?
-	map(0x20, 0x20).w(FUNC(fuuki16_state::oki_banking_w));    // Oki Banking
+	map(0x00, 0x00).w(FUNC(fuuki16_state::sound_rombank_w));
+	map(0x11, 0x11).r(m_soundlatch, FUNC(generic_latch_8_device::read)).nopw(); // To Main CPU ?
+	map(0x20, 0x20).w(FUNC(fuuki16_state::oki_banking_w));
 	map(0x30, 0x30).nopw();    // ? In the NMI routine
 	map(0x40, 0x41).w("ym1", FUNC(ym2203_device::write));
 	map(0x50, 0x51).rw("ym2", FUNC(ym3812_device::read), FUNC(ym3812_device::write));
-	map(0x60, 0x60).r(m_oki, FUNC(okim6295_device::read));   // M6295
-	map(0x61, 0x61).w(m_oki, FUNC(okim6295_device::write)); // M6295
+	map(0x60, 0x60).r(m_oki, FUNC(okim6295_device::read));
+	map(0x61, 0x61).w(m_oki, FUNC(okim6295_device::write));
 }
 
 
@@ -204,7 +485,7 @@ static INPUT_PORTS_START( gogomile )
 
 	PORT_START("DSW")       // $880000.w
 	PORT_SERVICE_DIPLOC(  0x0001, IP_ACTIVE_LOW, "SW1:1" )
-	PORT_DIPNAME( 0x0002, 0x0002, "Demo Music" )        PORT_DIPLOCATION("SW1:2") /* Game play sounds still play, only effects Music */
+	PORT_DIPNAME( 0x0002, 0x0002, "Demo Music" )        PORT_DIPLOCATION("SW1:2") // Game play sounds still play, only effects Music
 	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0002, DEF_STR( On ) )
 	PORT_DIPNAME( 0x000c, 0x000c, DEF_STR( Difficulty ) )   PORT_DIPLOCATION("SW1:3,4")
@@ -214,7 +495,7 @@ static INPUT_PORTS_START( gogomile )
 	PORT_DIPSETTING(      0x0004, DEF_STR( Very_Hard ) )
 	PORT_DIPNAME( 0x0030, 0x0030, DEF_STR( Language ) ) PORT_DIPLOCATION("SW1:5,6")
 	PORT_DIPSETTING(      0x0010, DEF_STR( Chinese ) )
-	PORT_DIPSETTING(      0x0030, DEF_STR( Japanese ) ) /* Only setting to give a "For use only in...." Copyright Notice */
+	PORT_DIPSETTING(      0x0030, DEF_STR( Japanese ) ) // Only setting to give a "For use only in...." Copyright Notice
 	PORT_DIPSETTING(      0x0000, DEF_STR( Korean ) )
 	PORT_DIPSETTING(      0x0020, DEF_STR( English ) )
 	PORT_DIPNAME( 0x00c0, 0x00c0, DEF_STR( Lives ) )    PORT_DIPLOCATION("SW1:7,8")
@@ -226,7 +507,7 @@ static INPUT_PORTS_START( gogomile )
 	PORT_DIPNAME( 0x0100, 0x0100, DEF_STR( Flip_Screen ) )  PORT_DIPLOCATION("SW2:1")
 	PORT_DIPSETTING(      0x0100, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPUNUSED_DIPLOC( 0x0200, 0x0200, "SW2:2" )    /* Manual states this dip is "Unused" */
+	PORT_DIPUNUSED_DIPLOC( 0x0200, 0x0200, "SW2:2" )    // Manual states this dip is "Unused"
 	PORT_DIPNAME( 0x1c00, 0x1c00, DEF_STR( Coinage ) )  PORT_DIPLOCATION("SW2:3,4,5")
 	PORT_DIPSETTING(      0x0400, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(      0x1400, DEF_STR( 3C_1C ) )
@@ -253,7 +534,7 @@ static INPUT_PORTS_START( gogomile )
 INPUT_PORTS_END
 
 
-static INPUT_PORTS_START( gogomileo )   /* The ealier version has different coinage settings. */
+static INPUT_PORTS_START( gogomileo )   // The earlier version has different coinage settings.
 	PORT_INCLUDE( gogomile )
 
 	PORT_MODIFY("DSW")      // $880000.w
@@ -291,15 +572,15 @@ static INPUT_PORTS_START( pbancho )
 	PORT_DIPSETTING(      0x0008, DEF_STR( Easiest ) )  // 1
 	PORT_DIPSETTING(      0x0010, DEF_STR( Easy )    )  // 2
 	PORT_DIPSETTING(      0x001c, DEF_STR( Normal )  )  // 3
+	PORT_DIPSETTING(      0x0000, "Normal, duplicate" ) // 3
+	PORT_DIPSETTING(      0x000c, "Normal, duplicate" ) // 3
+	PORT_DIPSETTING(      0x0014, "Normal, duplicate" ) // 3
 	PORT_DIPSETTING(      0x0018, DEF_STR( Hard )    )  // 4
 	PORT_DIPSETTING(      0x0004, DEF_STR( Hardest ) )  // 5
-//  PORT_DIPSETTING(      0x0000, DEF_STR( Normal )  )  // 3
-//  PORT_DIPSETTING(      0x000c, DEF_STR( Normal )  )  // 3
-//  PORT_DIPSETTING(      0x0014, DEF_STR( Normal )  )  // 3
 	PORT_DIPNAME( 0x0060, 0x0060, "Lives (Vs Mode)" )   PORT_DIPLOCATION("SW1:6,7")
 	PORT_DIPSETTING(      0x0000, "1" ) // 1 1
 	PORT_DIPSETTING(      0x0060, "2" ) // 2 3
-//  PORT_DIPSETTING(      0x0020, "2" ) // 2 3
+	PORT_DIPSETTING(      0x0020, "2, duplicate" ) // 2 3
 	PORT_DIPSETTING(      0x0040, "3" ) // 3 5
 	PORT_DIPNAME( 0x0080, 0x0080, "? Senin Mode ?" )    PORT_DIPLOCATION("SW1:8")
 	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
@@ -337,7 +618,7 @@ INPUT_PORTS_END
 //  graphics layouts
 //-------------------------------------------------
 
-/* 16x16x8 */
+// 16x16x8
 static const gfx_layout layout_16x16x8 =
 {
 	16,16,
@@ -350,9 +631,9 @@ static const gfx_layout layout_16x16x8 =
 };
 
 static GFXDECODE_START( gfx_fuuki16 )
-	GFXDECODE_ENTRY( "gfx2", 0, gfx_16x16x4_packed_msb, 0x400*0, 0x40 ) // [0] Layer 0
-	GFXDECODE_ENTRY( "gfx3", 0, layout_16x16x8,         0x400*1, 0x40 ) // [1] Layer 1
-	GFXDECODE_ENTRY( "gfx4", 0, gfx_8x8x4_packed_msb,   0x400*3, 0x40 ) // [2] Layer 2
+	GFXDECODE_ENTRY( "tiles_l0", 0, gfx_16x16x4_packed_msb, 0x400*0, 0x40 ) // [0] Layer 0
+	GFXDECODE_ENTRY( "tiles_l1", 0, layout_16x16x8,         0x400*1, 0x40 ) // [1] Layer 1
+	GFXDECODE_ENTRY( "tiles_l2", 0, gfx_8x8x4_packed_msb,   0x400*3, 0x40 ) // [2] Layer 2
 GFXDECODE_END
 
 
@@ -394,9 +675,9 @@ TIMER_CALLBACK_MEMBER(fuuki16_state::raster_interrupt)
 
 void fuuki16_state::machine_start()
 {
-	u8 *ROM = memregion("audiocpu")->base();
+	u8 *rom = memregion("audiocpu")->base();
 
-	m_soundbank->configure_entries(0, 3, &ROM[0x8000], 0x8000);
+	m_soundbank->configure_entries(0, 3, &rom[0x8000], 0x8000);
 
 	m_level_1_interrupt_timer = timer_alloc(FUNC(fuuki16_state::level1_interrupt), this);
 	m_vblank_interrupt_timer = timer_alloc(FUNC(fuuki16_state::vblank_interrupt), this);
@@ -416,15 +697,15 @@ void fuuki16_state::machine_reset()
 
 void fuuki16_state::fuuki16(machine_config &config)
 {
-	/* basic machine hardware */
-	M68000(config, m_maincpu, XTAL(32'000'000) / 2);    /* 16 MHz */
+	// basic machine hardware
+	M68000(config, m_maincpu, XTAL(32'000'000) / 2);    // 16 MHz
 	m_maincpu->set_addrmap(AS_PROGRAM, &fuuki16_state::main_map);
 
-	Z80(config, m_audiocpu, XTAL(12'000'000) / 2);      /* 6 MHz */
+	Z80(config, m_audiocpu, XTAL(12'000'000) / 2);      // 6 MHz
 	m_audiocpu->set_addrmap(AS_PROGRAM, &fuuki16_state::sound_map);
 	m_audiocpu->set_addrmap(AS_IO, &fuuki16_state::sound_io_map);
 
-	/* video hardware */
+	// video hardware
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_size(320, 256);
@@ -439,21 +720,21 @@ void fuuki16_state::fuuki16(machine_config &config)
 	m_fuukivid->set_palette(m_palette);
 	m_fuukivid->set_color_base(0x400*2);
 	m_fuukivid->set_color_num(0x40);
-	m_fuukivid->set_colpri_callback(FUNC(fuuki16_state::fuuki16_colpri_cb));
+	m_fuukivid->set_colpri_callback(FUNC(fuuki16_state::colpri_cb));
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
 	GENERIC_LATCH_8(config, m_soundlatch);
 
-	ym2203_device &ym1(YM2203(config, "ym1", XTAL(28'640'000) / 8)); /* 3.58 MHz */
+	ym2203_device &ym1(YM2203(config, "ym1", XTAL(28'640'000) / 8)); // 3.58 MHz
 	ym1.add_route(ALL_OUTPUTS, "mono", 0.15);
 
-	ym3812_device &ym2(YM3812(config, "ym2", XTAL(28'640'000) / 8)); /* 3.58 MHz */
+	ym3812_device &ym2(YM3812(config, "ym2", XTAL(28'640'000) / 8)); // 3.58 MHz
 	ym2.irq_handler().set_inputline(m_audiocpu, 0);
 	ym2.add_route(ALL_OUTPUTS, "mono", 0.30);
 
-	OKIM6295(config, m_oki, XTAL(32'000'000) / 32, okim6295_device::PIN7_HIGH); /* 1 Mhz */
+	OKIM6295(config, m_oki, XTAL(32'000'000) / 32, okim6295_device::PIN7_HIGH); // 1 MHz
 	m_oki->add_route(ALL_OUTPUTS, "mono", 0.85);
 }
 
@@ -509,58 +790,58 @@ YM2203C - 3.58mhz, OSC2 / 8
 ***************************************************************************/
 
 ROM_START( gogomile )
-	ROM_REGION( 0x100000, "maincpu", 0 )        /* 68000 Code */
+	ROM_REGION( 0x100000, "maincpu", 0 )        // 68000 code
 	ROM_LOAD16_BYTE( "fp2n.rom2", 0x000000, 0x080000, CRC(e73583a0) SHA1(05c6ee5cb2c151b32c462e8b920f9a57fb6cce5b) )
 	ROM_LOAD16_BYTE( "fp1n.rom1", 0x000001, 0x080000, CRC(7b110824) SHA1(980e326d3b9e113ed522be3076663a249da4e739) )
 
-	ROM_REGION( 0x20000, "audiocpu", 0 )        /* Z80 Code */
+	ROM_REGION( 0x20000, "audiocpu", 0 )        // Z80 code
 	ROM_LOAD( "fs1.rom24", 0x00000, 0x20000, CRC(4e4bd371) SHA1(429e776135ce8960e147762763d952d16ed3f9d4) )
 
-	ROM_REGION( 0x200000, "fuukivid", 0 )   /* 16x16x4 Sprites */
+	ROM_REGION( 0x200000, "fuukivid", 0 )   // 16x16x4 sprites
 	ROM_LOAD16_WORD_SWAP( "lh537k2r.rom20", 0x000000, 0x200000, CRC(525dbf51) SHA1(f21876676cc60ed65bc86884da894b24830826bb) )
 
-	ROM_REGION( 0x200000, "gfx2", 0 )   /* 16x16x4 Tiles */
+	ROM_REGION( 0x200000, "tiles_l0", 0 )   // 16x16x4 tiles
 	ROM_LOAD16_WORD_SWAP( "lh5370h6.rom3", 0x000000, 0x200000, CRC(e2ca7107) SHA1(7174c2e1e2106275ad41b53af22651dca492367a) )  // x11xxxxxxxxxxxxxxxxxx = 0xFF
 
-	ROM_REGION( 0x800000, "gfx3", 0 )   /* 16x16x8 Tiles */
+	ROM_REGION( 0x800000, "tiles_l1", 0 )   // 16x16x8 tiles
 	ROM_LOAD32_WORD_SWAP( "lh5370h7.rom15", 0x000000, 0x200000, CRC(34921680) SHA1(d9862f106caa14ea6ad925174e6bf2d542511593) )
 	ROM_LOAD32_WORD_SWAP( "lh5370h8.rom11", 0x000002, 0x200000, CRC(9961c925) SHA1(c47b4f19f090527b3e0c04dd046aa9cd51ca0e16) )
 	ROM_LOAD32_WORD_SWAP( "lh5370h9.rom16", 0x400000, 0x200000, CRC(e0118483) SHA1(36f9068e6c81c171b4426c3794277742bbc926f5) )
 	ROM_LOAD32_WORD_SWAP( "lh5370ha.rom12", 0x400002, 0x200000, CRC(5f2a87de) SHA1(d7ed8f01b40aaf58126aaeee10ec7d948a144080) )
 
-	ROM_REGION( 0x200000, "gfx4", 0 )   /* 16x16x4 Tiles */
+	ROM_REGION( 0x200000, "tiles_l2", 0 )   // 16x16x4 tiles
 	ROM_LOAD16_WORD_SWAP( "lh5370hb.rom19", 0x000000, 0x200000, CRC(bd1e896f) SHA1(075f7600cbced1d285cf32fc196844720eb12671) ) // FIRST AND SECOND HALF IDENTICAL
 
-	/* 0x40000 * 4: sounds+speech (japanese), sounds+speech (english) */
-	ROM_REGION( 0x100000, "oki", 0 )    /* Samples */
+	// 0x40000 * 4: sounds+speech (Japanese), sounds+speech (English)
+	ROM_REGION( 0x100000, "oki", 0 )    // samples
 	ROM_LOAD( "lh538n1d.rom25", 0x000000, 0x100000, CRC(01622a95) SHA1(8d414bfc6dcfab1cf9cfe5738eb5c2ff31b77df6) ) // 0x40000 * 4
 ROM_END
 
 ROM_START( gogomileo )
-	ROM_REGION( 0x100000, "maincpu", 0 )        /* 68000 Code */
+	ROM_REGION( 0x100000, "maincpu", 0 )        // 68000 code
 	ROM_LOAD16_BYTE( "fp2.rom2", 0x000000, 0x080000, CRC(28fd3e4e) SHA1(3303e5759c0781035c74354587e1916719695754) )    // 1xxxxxxxxxxxxxxxxxx = 0xFF
 	ROM_LOAD16_BYTE( "fp1.rom1", 0x000001, 0x080000, CRC(35a5fc45) SHA1(307207791cee7f40e88feffc5805ac25008a8566) )    // 1xxxxxxxxxxxxxxxxxx = 0xFF
 
-	ROM_REGION( 0x20000, "audiocpu", 0 )        /* Z80 Code */
+	ROM_REGION( 0x20000, "audiocpu", 0 )        // Z80 code
 	ROM_LOAD( "fs1.rom24", 0x00000, 0x20000, CRC(4e4bd371) SHA1(429e776135ce8960e147762763d952d16ed3f9d4) )
 
-	ROM_REGION( 0x200000, "fuukivid", 0 )   /* 16x16x4 Sprites */
+	ROM_REGION( 0x200000, "fuukivid", 0 )   // 16x16x4 sprites
 	ROM_LOAD16_WORD_SWAP( "lh537k2r.rom20", 0x000000, 0x200000, CRC(525dbf51) SHA1(f21876676cc60ed65bc86884da894b24830826bb) )
 
-	ROM_REGION( 0x200000, "gfx2", 0 )   /* 16x16x4 Tiles */
+	ROM_REGION( 0x200000, "tiles_l0", 0 )   // 16x16x4 tiles
 	ROM_LOAD16_WORD_SWAP( "lh5370h6.rom3", 0x000000, 0x200000, CRC(e2ca7107) SHA1(7174c2e1e2106275ad41b53af22651dca492367a) )  // x11xxxxxxxxxxxxxxxxxx = 0xFF
 
-	ROM_REGION( 0x800000, "gfx3", 0 )   /* 16x16x8 Tiles */
+	ROM_REGION( 0x800000, "tiles_l1", 0 )   // 16x16x8 tiles
 	ROM_LOAD32_WORD_SWAP( "lh5370h7.rom15", 0x000000, 0x200000, CRC(34921680) SHA1(d9862f106caa14ea6ad925174e6bf2d542511593) )
 	ROM_LOAD32_WORD_SWAP( "lh5370h8.rom11", 0x000002, 0x200000, CRC(9961c925) SHA1(c47b4f19f090527b3e0c04dd046aa9cd51ca0e16) )
 	ROM_LOAD32_WORD_SWAP( "lh5370h9.rom16", 0x400000, 0x200000, CRC(e0118483) SHA1(36f9068e6c81c171b4426c3794277742bbc926f5) )
 	ROM_LOAD32_WORD_SWAP( "lh5370ha.rom12", 0x400002, 0x200000, CRC(5f2a87de) SHA1(d7ed8f01b40aaf58126aaeee10ec7d948a144080) )
 
-	ROM_REGION( 0x200000, "gfx4", 0 )   /* 16x16x4 Tiles */
+	ROM_REGION( 0x200000, "tiles_l2", 0 )   // 16x16x4 tiles
 	ROM_LOAD16_WORD_SWAP( "lh5370hb.rom19", 0x000000, 0x200000, CRC(bd1e896f) SHA1(075f7600cbced1d285cf32fc196844720eb12671) ) // FIRST AND SECOND HALF IDENTICAL
 
-	/* 0x40000 * 4: sounds+speech (japanese), sounds+speech (english) */
-	ROM_REGION( 0x100000, "oki", 0 )    /* Samples */
+	// 0x40000 * 4: sounds+speech (Japanese), sounds+speech (English)
+	ROM_REGION( 0x100000, "oki", 0 )    // samples
 	ROM_LOAD( "lh538n1d.rom25", 0x000000, 0x100000, CRC(01622a95) SHA1(8d414bfc6dcfab1cf9cfe5738eb5c2ff31b77df6) ) // 0x40000 * 4
 ROM_END
 
@@ -599,54 +880,56 @@ Mitsubishi M60067-0901FP 452100 (208pin PQFP, GA1)
 ***************************************************************************/
 
 ROM_START( pbancho ) // ROMs NO1 & NO2 had an addition block dot on labels
-	ROM_REGION( 0x100000, "maincpu", 0 )        /* 68000 Code */
+	ROM_REGION( 0x100000, "maincpu", 0 )        // 68000 code
 	ROM_LOAD16_BYTE( "no1..rom2", 0x000000, 0x080000, CRC(e607eca6) SHA1(be9156d2a336a04fb9ff147b0d0287d8ff2ccfc5) ) // 1xxxxxxxxxxxxxxxxxx = 0xFF
 	ROM_LOAD16_BYTE( "no2..rom1", 0x000001, 0x080000, CRC(ee15b423) SHA1(6da7ba9dd785dfcf919c030e126daf8d6750d072) ) // 1xxxxxxxxxxxxxxxxxx = 0xFF
 
-	ROM_REGION( 0x20000, "audiocpu", 0 )        /* Z80 Code */
+	ROM_REGION( 0x20000, "audiocpu", 0 )        // Z80 code
 	ROM_LOAD( "no4.rom23", 0x00000, 0x20000, CRC(dfbfdb81) SHA1(84b0cbe843a9bbae43975afdbd029a9b76fd488b) )
 
-	ROM_REGION( 0x200000, "fuukivid", 0 )   /* 16x16x4 Sprites */
+	ROM_REGION( 0x200000, "fuukivid", 0 )   // 16x16x4 sprites
 	ROM_LOAD16_WORD_SWAP( "58.rom20", 0x000000, 0x200000, CRC(4dad0a2e) SHA1(a4f70557503110a5457b9096a79a5f249095fa55) )
 
-	ROM_REGION( 0x200000, "gfx2", 0 )   /* 16x16x4 Tiles */
+	ROM_REGION( 0x200000, "tiles_l0", 0 )   // 16x16x4 tiles
 	ROM_LOAD16_WORD_SWAP( "60.rom3",  0x000000, 0x200000, CRC(a50a3c1b) SHA1(a2b30f9f83f5dc2e069d7559aefbda9929fc640c) )
 
-	ROM_REGION( 0x400000, "gfx3", 0 )   /* 16x16x8 Tiles */
+	ROM_REGION( 0x400000, "tiles_l1", 0 )   // 16x16x8 tiles
 	ROM_LOAD32_WORD_SWAP( "59.rom15", 0x000000, 0x200000, CRC(b83dcb70) SHA1(b0b9df451535d85612fa095b4f694cf2e7930bca) )
 	ROM_LOAD32_WORD_SWAP( "61.rom11", 0x000002, 0x200000, CRC(7f1213b9) SHA1(f8d6432b270c4d0954602e430ddd26841eb05656) )
 
-	ROM_REGION( 0x200000, "gfx4", 0 )   /* 16x16x4 Tiles */
+	ROM_REGION( 0x200000, "tiles_l2", 0 )   // 16x16x4 tiles
 	ROM_LOAD16_WORD_SWAP( "60.rom3",  0x000000, 0x200000, CRC(a50a3c1b) SHA1(a2b30f9f83f5dc2e069d7559aefbda9929fc640c) )    // ?maybe?
 
-	ROM_REGION( 0x040000, "oki", 0 )    /* Samples */
+	ROM_REGION( 0x040000, "oki", 0 )    // samples
 	ROM_LOAD( "n03.rom25", 0x000000, 0x040000, CRC(a7bfb5ea) SHA1(61937eae4f8855bc09c494aff52d76d41dc3b76a) )
 ROM_END
 
 ROM_START( pbanchoa )
-	ROM_REGION( 0x100000, "maincpu", 0 )        /* 68000 Code */
+	ROM_REGION( 0x100000, "maincpu", 0 )        // 68000 code
 	ROM_LOAD16_BYTE( "no1.rom2", 0x000000, 0x080000, CRC(1b4fd178) SHA1(02cf3d2554b29cd253470d68ea959738f3b98dbe) ) // 1xxxxxxxxxxxxxxxxxx = 0xFF
 	ROM_LOAD16_BYTE( "no2.rom1", 0x000001, 0x080000, CRC(9cf510a5) SHA1(08e79b5bbd1c011c32f82dd15fba42d7898861be) ) // 1xxxxxxxxxxxxxxxxxx = 0xFF
 
-	ROM_REGION( 0x20000, "audiocpu", 0 )        /* Z80 Code */
+	ROM_REGION( 0x20000, "audiocpu", 0 )        // Z80 code
 	ROM_LOAD( "no4.rom23", 0x00000, 0x20000, CRC(dfbfdb81) SHA1(84b0cbe843a9bbae43975afdbd029a9b76fd488b) )
 
-	ROM_REGION( 0x200000, "fuukivid", 0 )   /* 16x16x4 Sprites */
+	ROM_REGION( 0x200000, "fuukivid", 0 )   // 16x16x4 sprites
 	ROM_LOAD16_WORD_SWAP( "58.rom20", 0x000000, 0x200000, CRC(4dad0a2e) SHA1(a4f70557503110a5457b9096a79a5f249095fa55) )
 
-	ROM_REGION( 0x200000, "gfx2", 0 )   /* 16x16x4 Tiles */
+	ROM_REGION( 0x200000, "tiles_l0", 0 )   // 16x16x4 tiles
 	ROM_LOAD16_WORD_SWAP( "60.rom3",  0x000000, 0x200000, CRC(a50a3c1b) SHA1(a2b30f9f83f5dc2e069d7559aefbda9929fc640c) )
 
-	ROM_REGION( 0x400000, "gfx3", 0 )   /* 16x16x8 Tiles */
+	ROM_REGION( 0x400000, "tiles_l1", 0 )   // 16x16x8 tiles
 	ROM_LOAD32_WORD_SWAP( "59.rom15", 0x000000, 0x200000, CRC(b83dcb70) SHA1(b0b9df451535d85612fa095b4f694cf2e7930bca) )
 	ROM_LOAD32_WORD_SWAP( "61.rom11", 0x000002, 0x200000, CRC(7f1213b9) SHA1(f8d6432b270c4d0954602e430ddd26841eb05656) )
 
-	ROM_REGION( 0x200000, "gfx4", 0 )   /* 16x16x4 Tiles */
+	ROM_REGION( 0x200000, "tiles_l2", 0 )   // 16x16x4 tiles
 	ROM_LOAD16_WORD_SWAP( "60.rom3",  0x000000, 0x200000, CRC(a50a3c1b) SHA1(a2b30f9f83f5dc2e069d7559aefbda9929fc640c) )    // ?maybe?
 
-	ROM_REGION( 0x040000, "oki", 0 )    /* Samples */
+	ROM_REGION( 0x040000, "oki", 0 )    // samples
 	ROM_LOAD( "n03.rom25", 0x000000, 0x040000, CRC(a7bfb5ea) SHA1(61937eae4f8855bc09c494aff52d76d41dc3b76a) )
 ROM_END
+
+} // anonymous namespace
 
 
 //-------------------------------------------------

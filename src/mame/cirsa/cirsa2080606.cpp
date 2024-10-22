@@ -170,7 +170,7 @@ ROM_START( maquinati )
 	ROM_LOAD( "la_maquina_del_tiempo_graf-es_bg2-2-3_g-2f119.u1", 0x4000000, 0x2000000, CRC(4d76a943) SHA1(f8819b509c416a29f6f3d41561e74c62ca7448e1) )
 	ROM_LOAD( "la_maquina_del_tiempo_graf-es_bg2-2-3_g-2f119.u2", 0x6000000, 0x2000000, CRC(19d3040e) SHA1(c174dce45755d918d62f116aaee06cabef8021f8) )
 	ROM_LOAD( "la_maquina_del_tiempo_graf-es_bg1-3-3_g-3f119.u1", 0x8000000, 0x2000000, CRC(067cf5f6) SHA1(3094d1b6f508def383b52a77007efd7a09c90ce1) )
-	ROM_LOAD( "la_maquina_del_tiempo_graf-es_bg1-3-3_g-3f119.u2", 0xA000000, 0x2000000, CRC(c017126c) SHA1(7ba628037da96874894317e72f62bc7b1878520d) )
+	ROM_LOAD( "la_maquina_del_tiempo_graf-es_bg1-3-3_g-3f119.u2", 0xa000000, 0x2000000, CRC(c017126c) SHA1(7ba628037da96874894317e72f62bc7b1878520d) )
 
 	// Reels PCB 2050104-2
 	ROM_REGION( 0x8000, "reels", 0 )

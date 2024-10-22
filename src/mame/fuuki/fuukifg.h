@@ -1,7 +1,8 @@
 // license:BSD-3-Clause
-// copyright-holders:Luca Elia, David Haywood
-#ifndef MAME_FUUKI_FUUKIFH_H
-#define MAME_FUUKI_FUUKIFH_H
+// copyright-holders: Luca Elia, David Haywood
+
+#ifndef MAME_FUUKI_FUUKIFG_H
+#define MAME_FUUKI_FUUKIFG_H
 
 #pragma once
 
@@ -23,7 +24,6 @@ public:
 
 protected:
 	virtual void device_start() override ATTR_COLD;
-	virtual void device_reset() override ATTR_COLD;
 
 private:
 	tile_delegate m_tile_cb;
@@ -35,4 +35,4 @@ private:
 
 DECLARE_DEVICE_TYPE(FUUKI_VIDEO, fuukivid_device)
 
-#endif // MAME_FUUKI_FUUKIFH_H
+#endif // MAME_FUUKI_FUUKIFG_H
