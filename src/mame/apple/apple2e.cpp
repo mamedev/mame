@@ -1778,23 +1778,23 @@ void apple2e_state::do_io(int offset, bool is_iic)
 		return;
 	}
 
-  if ((offset & 0xf0) == 0x20) // tape out / ROM bank on IIc/IIc+
-  {
-  	if (m_cassette)
+	if ((offset & 0xf0) == 0x20) // tape out / ROM bank on IIc/IIc+
+	{
+		if (m_cassette)
 		{
-      // Officially Apple only documents this softswitch at $c020 but
-      // all models with a tape interface will respond to any of the $c02x
-      // addresses
+			// Officially Apple only documents this softswitch at $c020 but
+			// all models with a tape interface will respond to any of the $c02x
+			// addresses.
 			m_cassette_state ^= 1;
 			m_cassette->output(m_cassette_state ? 1.0f : -1.0f);
 		}
-			
-    if (is_iic)
+
+		if (is_iic)
 		{
-      // Apple IIc Tech Reference 1st edition lists this softswitch at $c028 while
-      // the 2nd edition lists it at $c02x.  Both the IIc and IIc Plus will respond to
-      // $c02x.
-      m_romswitch = !m_romswitch;
+			// Apple IIc Tech Reference 1st edition lists this softswitch at $c028 while
+			// the 2nd edition lists it at $c02x.  Both the IIc and IIc Plus will respond to
+			// $c02x.
+			m_romswitch = !m_romswitch;
 			update_slotrom_banks();
 			lcrom_update();
 
@@ -1806,7 +1806,7 @@ void apple2e_state::do_io(int offset, bool is_iic)
 				m_35sel = false;
 			}
 		}
-  }
+	}
 
 	switch (offset)
 	{
