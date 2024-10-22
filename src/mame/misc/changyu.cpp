@@ -495,16 +495,19 @@ ROM_START( changyu )
 	ROM_LOAD( "2.u2",    0x08000, 0x08000, CRC(b9d78664) SHA1(763876f075f2b5b07e96b36b4e670dc466808f08) ) // 27C256
 	ROM_LOAD( "3.u3",    0x10000, 0x08000, CRC(17cc6716) SHA1(df8af0fbe93b8f92219721a35772ef93bca7adb5) ) // 27C256
 	ROM_LOAD( "4.u4",    0x18000, 0x08000, CRC(31b76c13) SHA1(c46da02aff8f57c0277e493c82e01970c0acd4fb) ) // 27C256
+	
+ROM_REGION(0x08000, "user1", 0) // also contain psg data
+    ROM_LOAD( "14.u70",  0x00000, 0x08000, CRC(cdfdfe11) SHA1(b170f9a6e2c77ce3ae01aabc8a963a11eb7fe74e) ) // under the sub board and near an empty socket (u77), program for a removed second CPU? or for the first?
 
-	ROM_LOAD( "9a.u74",  0x20000, 0x10000, CRC(12f3fd7a) SHA1(e220694b8fa5cfc172bf23149fceaeeb6d0b6230) ) // 27C512
-	ROM_LOAD( "10a.u61", 0x30000, 0x10000, CRC(8869968b) SHA1(fbab29436acde19d7d559160ef2394d43a6ebb87) ) // 27C512
-	ROM_LOAD( "11a.u62", 0x40000, 0x10000, CRC(d05e6348) SHA1(5b8bd4c94631aed46cbf7cd4db749e4855d4516c) ) // 27C512
+ROM_REGION(0x30000, "voices", 0)
+	ROM_LOAD( "9a.u74",  0x00000, 0x10000, CRC(12f3fd7a) SHA1(e220694b8fa5cfc172bf23149fceaeeb6d0b6230) ) // 27C512
+	ROM_LOAD( "10a.u61", 0x10000, 0x10000, CRC(8869968b) SHA1(fbab29436acde19d7d559160ef2394d43a6ebb87) ) // 27C512
+	ROM_LOAD( "11a.u62", 0x20000, 0x10000, CRC(d05e6348) SHA1(5b8bd4c94631aed46cbf7cd4db749e4855d4516c) ) // 27C512
 
-	ROM_LOAD( "14.u70",  0x50000, 0x08000, CRC(cdfdfe11) SHA1(b170f9a6e2c77ce3ae01aabc8a963a11eb7fe74e) ) // under the sub board and near an empty socket (u77), program for a removed second CPU? or for the first?
 
 	// u9 and u63 not populated
 
-	ROM_REGION(0x220, "proms", 0)
+	ROM_REGION(0x30000, "proms", 0)
 	ROM_LOAD( "63s281n.u48", 0x000, 0x100, CRC(eb75e89b) SHA1(d3d6843c2cb6fb94e39d51de92205863745efdc1) )
 	ROM_LOAD( "63s281n.u49", 0x100, 0x100, CRC(137e2d9c) SHA1(4e498e4fb73cad869789b902fc74d31ee3aa259f) )
 	ROM_LOAD( "82s123.u44",  0x200, 0x020, CRC(cbd7e5d4) SHA1(c7d96ee7f6fb0129630fdd4b079c4ed1eabda7c5) )
