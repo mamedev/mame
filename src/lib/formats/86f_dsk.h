@@ -14,9 +14,6 @@
 
 #include "flopimg.h"
 
-// workaround for conflict with glibc/bits/endian.h
-#undef BIG_ENDIAN
-
 class _86f_format : public floppy_image_format_t
 {
 public:
@@ -54,7 +51,7 @@ private:
 		ZONE_PREA2_2 = 0x200,
 		ZONE_A2 = 0x400,
 		ZONE_C64 = 0x600,
-		BIG_ENDIAN = 0x800,
+		ENDIAN_BIG = 0x800,
 		RPM_FAST = 0x1000,
 		TOTAL_BC = 0x1000
 	};
