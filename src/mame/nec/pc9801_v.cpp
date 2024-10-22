@@ -125,7 +125,7 @@ void pc9801_state::draw_text(bitmap_rgb32 &bitmap, uint32_t addr, int y, int wd,
 			kanji_sel = 1;
 			if((tile & 0x7e00) == 0x5600)
 			{
-				if(lasttile == tile)
+				if(lasttile == (tile | knj_tile))
 				{
 					tile_lr = 1;
 					lasttile = -1;
@@ -142,7 +142,7 @@ void pc9801_state::draw_text(bitmap_rgb32 &bitmap, uint32_t addr, int y, int wd,
 		}
 		else
 			x_step = 1;
-		lasttile = tile;
+		lasttile = (tile | knj_tile);
 
 		for(kanji_lr=0;kanji_lr<x_step;kanji_lr++)
 		{

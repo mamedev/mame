@@ -1843,7 +1843,7 @@ void upd7220_device::update_graphics(bitmap_rgb32 &bitmap, const rectangle &clip
 				for(int z = 0; z <= m_disp; ++z)
 				{
 					int yval = (y*zoom)+z + (bsy + m_vbp);
-					if(yval <= cliprect.bottom())
+					if(yval <= cliprect.bottom() && (yval - m_vbp) < m_al)
 						draw_graphics_line(bitmap, addr, yval, wd, mixed);
 				}
 			}
