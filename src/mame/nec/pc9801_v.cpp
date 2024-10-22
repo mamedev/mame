@@ -125,24 +125,38 @@ void pc9801_state::draw_text(bitmap_rgb32 &bitmap, uint32_t addr, int y, int wd,
 			kanji_sel = 1;
 			if((tile & 0x7e00) == 0x5600)
 			{
+				// ikochan (karaoke intro) and mightyhd (game start and gameplay)
+				// draws these PCG strips where first tile is identical to second, with LR disabled.
+				// TODO: what happens with LR enabled?
 				if(lasttile == (tile | knj_tile))
 				{
 					tile_lr = 1;
 					lasttile = -1;
 				}
 				else
+				{
 					tile_lr = pcg_lr;
+					lasttile = (tile | knj_tile);
+				}
 				x_step = 1;
 			}
 			else if((tile & 0x7c00) == 0x0800)  // 8x16 charset selector
+			{
 				x_step = 1;
+				lasttile = -1;
+			}
 			else
+			{
 				x_step = 2;
+				lasttile = -1;
+			}
 //          kanji_lr = 0;
 		}
 		else
+		{
 			x_step = 1;
-		lasttile = (tile | knj_tile);
+			lasttile = -1;
+		}
 
 		for(kanji_lr=0;kanji_lr<x_step;kanji_lr++)
 		{

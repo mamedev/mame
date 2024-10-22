@@ -31285,7 +31285,6 @@ Optional [AMD-98] support, needs PIT for BGM
 		<year>1986</year>
 		<publisher>アポロテクニカ (Apollo Technica)</publisher>
 		<notes><![CDATA[
-Has [kanji] PCG LR issues during gameplay (score digits)
 Should screen mask bottom edge of screen
 ]]></notes>
 		<info name="alt_title" value="マイティーヘッド" />
@@ -66539,13 +66538,10 @@ Crashes with a BASIC error when accessing house near starting point, incomplete 
 		</part>
 	</software>
 
-	<software name="volley2a" cloneof="volley2" supported="partial">
+	<software name="volley2a" cloneof="volley2" supported="yes">
 		<description>Volleyball 2 on 2 (5.25&quot; Disk)</description>
 		<year>19??</year>
 		<publisher>&lt;unofficial&gt;</publisher>
-		<notes><![CDATA[
-Has [kanji] PCG LR issues during gameplay and options (score digits)
-]]></notes>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="volleyball_2_on_2.fdi" size="1265664" crc="7331d549" sha1="835b02a5f411db1a3ef00ef6355cf40326e98588" offset="0" />
