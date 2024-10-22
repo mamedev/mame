@@ -143,8 +143,8 @@ Information found at http://www.rhod.fr/yeno_epoch.html
 		<part name="cart" interface="scv_cart">
 			<feature name="slot" value="rom64k"/>
 			<dataarea name="rom" size="0x10000">
-				<rom name="doraemon.0" size="0x8000" crc="ee0b874d" sha1="425eb6ed31faa2afdecc216145616f577f72db9a"/>
-				<rom name="doraemon.1" size="0x8000" crc="d2de91a6" sha1="6aba5ee3d08afad222bec9a176c2607829fa5cc6" offset="0x8000"/>
+				<rom name="doraemon.0" offset="0x0000" size="0x8000" crc="ee0b874d" sha1="425eb6ed31faa2afdecc216145616f577f72db9a"/>
+				<rom name="doraemon.1" offset="0x8000" size="0x8000" crc="d2de91a6" sha1="6aba5ee3d08afad222bec9a176c2607829fa5cc6"/>
 			</dataarea>
 		</part>
 	</software>
@@ -195,9 +195,9 @@ Information found at http://www.rhod.fr/yeno_epoch.html
 		<part name="cart" interface="scv_cart">
 			<feature name="slot" value="rom64k"/>
 			<dataarea name="rom" size="0x10000">
-				<rom name="kungfurd.0" size="0x8000" crc="9cfc5a67" sha1="1c34470c1f389db7be755e130db298f6b475c7ce"/>
-				<rom size="0x6000" offset="0x8000" loadflag="reload"/>
-				<rom name="kungfurd.1" size="0x2000" crc="a895375a" sha1="644ab7c7fb85d0d80aa3a416b0a5359d395e48a3" offset="0xe000"/>
+				<rom name="kungfurd.0" offset="0x0000" size="0x8000" crc="9cfc5a67" sha1="1c34470c1f389db7be755e130db298f6b475c7ce"/>
+				<rom offset="0x8000" size="0x6000" loadflag="reload"/>
+				<rom name="kungfurd.1" offset="0xe000" size="0x2000" crc="a895375a" sha1="644ab7c7fb85d0d80aa3a416b0a5359d395e48a3"/>
 			</dataarea>
 		</part>
 	</software>
@@ -371,11 +371,11 @@ Information found at http://www.rhod.fr/yeno_epoch.html
 		<part name="cart" interface="scv_cart">
 			<feature name="slot" value="rom64k"/>
 			<dataarea name="rom" size="0x10000">
-				<rom name="starspeeder.1" size="0x2000" crc="7978c4a6" sha1="6bb5ff3946867fa7adb6561dc084ef5a7a92c507"/>
-				<rom size="0x2000" offset="0x2000" loadflag="reload"/>
-				<rom size="0x2000" offset="0x4000" loadflag="reload"/>
-				<rom size="0x2000" offset="0x6000" loadflag="reload"/>
-				<rom name="starspeeder.0" size="0x8000" crc="511576ee" sha1="1b61132af26dc8d5c1b5e0f72c2e96192bba7e20" offset="0x8000"/>
+				<rom name="starspeeder.1" offset="0x0000" size="0x2000" crc="7978c4a6" sha1="6bb5ff3946867fa7adb6561dc084ef5a7a92c507"/>
+				<rom offset="0x2000" size="0x2000" loadflag="reload"/>
+				<rom offset="0x4000" size="0x2000" loadflag="reload"/>
+				<rom offset="0x6000" size="0x2000" loadflag="reload"/>
+				<rom name="starspeeder.0" offset="0x8000" size="0x8000" crc="511576ee" sha1="1b61132af26dc8d5c1b5e0f72c2e96192bba7e20"/>
 			</dataarea>
 		</part>
 	</software>
