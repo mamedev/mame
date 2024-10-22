@@ -4748,6 +4748,8 @@ end
 
 if (BUSES["QBUS"]~=null) then
 	files {
+		MAME_DIR .. "src/devices/bus/qbus/bk_kmd.cpp",
+		MAME_DIR .. "src/devices/bus/qbus/bk_kmd.h",
 		MAME_DIR .. "src/devices/bus/qbus/dsd4432.cpp",
 		MAME_DIR .. "src/devices/bus/qbus/dsd4432.h",
 		MAME_DIR .. "src/devices/bus/qbus/dvk_kgd.cpp",
@@ -5248,6 +5250,8 @@ end
 
 if (BUSES["CBUS"]~=null) then
 	files {
+		MAME_DIR .. "src/devices/bus/cbus/amd98.cpp",
+		MAME_DIR .. "src/devices/bus/cbus/amd98.h",
 		MAME_DIR .. "src/devices/bus/cbus/pc9801_26.cpp",
 		MAME_DIR .. "src/devices/bus/cbus/pc9801_26.h",
 		MAME_DIR .. "src/devices/bus/cbus/pc9801_55.cpp",
@@ -5256,8 +5260,6 @@ if (BUSES["CBUS"]~=null) then
 		MAME_DIR .. "src/devices/bus/cbus/pc9801_86.h",
 		MAME_DIR .. "src/devices/bus/cbus/pc9801_118.cpp",
 		MAME_DIR .. "src/devices/bus/cbus/pc9801_118.h",
-		MAME_DIR .. "src/devices/bus/cbus/pc9801_amd98.cpp",
-		MAME_DIR .. "src/devices/bus/cbus/pc9801_amd98.h",
 		MAME_DIR .. "src/devices/bus/cbus/pc9801_snd.cpp",
 		MAME_DIR .. "src/devices/bus/cbus/pc9801_snd.h",
 		MAME_DIR .. "src/devices/bus/cbus/mpu_pc98.cpp",

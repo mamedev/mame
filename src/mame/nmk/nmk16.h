@@ -12,6 +12,7 @@
 
 #include "seibusound.h"
 
+#include "cpu/m6805/m68705.h"
 #include "machine/gen_latch.h"
 #include "machine/timer.h"
 #include "sound/okim6295.h"
@@ -399,6 +400,46 @@ private:
 	void tomagic_map(address_map &map) ATTR_COLD;
 	void tomagic_sound_map(address_map &map) ATTR_COLD;
 	void tomagic_sound_io_map(address_map &map) ATTR_COLD;
+};
+
+class tharrierb_state : public nmk16_state
+{
+public:
+	tharrierb_state(const machine_config &mconfig, device_type type, const char *tag) :
+		nmk16_state(mconfig, type, tag),
+		m_mcu(*this, "mcu"),
+		m_inputs(*this, { "DSW1", "DSW2", "BUTTONS", "P1", "P2" })
+	{}
+
+	void tharrierb(machine_config &config);
+
+protected:
+	virtual void machine_start() override ATTR_COLD;
+
+private:
+	required_device<m68705r_device> m_mcu;
+	required_ioport_array<5> m_inputs;
+
+	u8 m_mcu_out_latch_msb = 0;
+	u8 m_mcu_out_latch_lsb = 0;
+	u8 m_mcu_in_latch = 0;
+
+	u8 m_mcu_portc = 0;
+
+	void tharrierb_map(address_map &map) ATTR_COLD;
+
+	// maincpu access
+	u16 mcu_status_r(offs_t offset, u16 mem_mask);
+	u16 mcu_data_r(offs_t offset, u16 mem_mask);
+	void mcu_control_w(offs_t offset, u16 data, u16 mem_mask);
+	void mcu_data_w(offs_t offset, u16 data, u16 mem_mask);
+
+	// 68705 mcu access
+	void mcu_porta_w(u8 data);
+	u8 mcu_portb_r();
+	void mcu_portb_w(u8 data);
+	void mcu_portc_w(u8 data);
+	u8 mcu_portd_r();
 };
 
 #endif //MAME_NMK_NMK16_H

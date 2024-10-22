@@ -432,7 +432,7 @@ TIMER_CALLBACK_MEMBER(pc9801_86_device::dac_tick)
 //
 //**************************************************************************
 
-DEFINE_DEVICE_TYPE(PC9801_SPEAKBOARD, pc9801_speakboard_device, "pc9801_spb", "NEC PC9801 SpeakBoard")
+DEFINE_DEVICE_TYPE(PC9801_SPEAKBOARD, pc9801_speakboard_device, "pc9801_spb", "NEC PC-9801 SpeakBoard")
 
 ROM_START( pc9801_spb )
 	ROM_REGION( 0x4000, "sound_bios", ROMREGION_ERASEFF )

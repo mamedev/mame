@@ -605,7 +605,8 @@ uint8_t pc9801_state::f0_r(offs_t offset)
 	{
 		// iterate thru all devices to check if an AMD98 is present
 		// TODO: move to cbus
-		for (pc9801_amd98_device &amd98 : device_type_enumerator<pc9801_amd98_device>(machine().root_device()))
+		// TODO: is this really part of PC-98 spec or it's coming from the device itself, as dip/jumper?
+		for (amd98_device &amd98 : device_type_enumerator<amd98_device>(machine().root_device()))
 		{
 			logerror("%s: Read AMD98 ID %s\n", machine().describe_context(), amd98.tag());
 			return 0x18; // return the right ID
@@ -674,7 +675,7 @@ void pc9801_state::pc9801_io(address_map &map)
  *
  ************************************/
 
-// TODO: it's possible that the offset calculation is actually linear.
+// TODO: convert to device
 // TODO: having this non-linear makes the system to boot in BASIC for PC-9821. Perhaps it stores settings? How to change these?
 uint8_t pc9801vm_state::pc9801rs_knjram_r(offs_t offset)
 {
@@ -686,28 +687,27 @@ uint8_t pc9801vm_state::pc9801rs_knjram_r(offs_t offset)
 		return m_char_rom[(m_font_addr >> 8) * (8 << char_size) + (char_size * 0x800) + ((offset >> 1) & 0xf)];
 	}
 
-	pcg_offset = (m_font_addr & 0x7fff) << 5;
+	pcg_offset = (m_font_addr & 0x7f7f) << 5;
 	pcg_offset|= offset & 0x1e;
 
 	// 8x16 charset selector
 	// telenetm defintely mirrors offset & 1 for 8x16 romaji title songs, would otherwise blank them out
 	if((m_font_addr & 0x7c00) == 0x0800)
-		return m_kanji_rom[pcg_offset];
+		return m_kanji_rom[pcg_offset | 0];
 
-	// mezaset2 don't bother with LR setting, implying it just read this linearly
-	pcg_offset|= offset & 1;
-
+	// rxtrain wants the LR setting for PCG area ...
 	if((m_font_addr & 0xff00) == 0x5600 || (m_font_addr & 0xff00) == 0x5700)
-		return m_kanji_rom[pcg_offset];
+		return m_kanji_rom[pcg_offset | m_font_lr];
 
-	return m_kanji_rom[pcg_offset];
+	// ... but mezaset2 don't, implying it just read this linearly
+	return m_kanji_rom[pcg_offset | (offset & 1)];
 }
 
 void pc9801vm_state::pc9801rs_knjram_w(offs_t offset, uint8_t data)
 {
 	uint32_t pcg_offset;
 
-	pcg_offset = (m_font_addr & 0x7fff) << 5;
+	pcg_offset = (m_font_addr & 0x7f7f) << 5;
 	pcg_offset|= offset & 0x1e;
 	pcg_offset|= m_font_lr;
 
@@ -1878,15 +1878,15 @@ static void pc9801_cbus_devices(device_slot_interface &device)
 {
 	// official HW
 //  PC-9801-14
-	device.option_add("pc9801_26", PC9801_26);
+	device.option_add("pc9801_26",  PC9801_26);
 	device.option_add("pc9801_55u", PC9801_55U);
 	device.option_add("pc9801_55l", PC9801_55L);
-	device.option_add("pc9801_86", PC9801_86);
+	device.option_add("pc9801_86",  PC9801_86);
 	device.option_add("pc9801_118", PC9801_118);
 	device.option_add("pc9801_spb", PC9801_SPEAKBOARD);
 //  Spark Board
-	device.option_add("pc9801_amd98", PC9801_AMD98); // AmuseMent boarD
-	device.option_add("mpu_pc98", MPU_PC98);
+	device.option_add("amd98",      AMD98);
+	device.option_add("mpu_pc98",   MPU_PC98);
 
 	// doujinshi HW
 // MAD Factory / Doujin Hard (同人ハード)

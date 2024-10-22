@@ -3232,51 +3232,6 @@ INPUT_PORTS_END
 		PORT_DIPSETTING(    0x40, "Return Coins" )                                        /* 退幣     */ \
 		PORT_DIPSETTING(    0x00, "Key-Out" )                                             /* 洗分     */
 
-#define MAHJONG_MATRIX_CONDITIONAL(port, mask) \
-		PORT_START("KEY0") \
-		PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_A )            PORT_CONDITION(port, mask, EQUALS, mask) \
-		PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_E )            PORT_CONDITION(port, mask, EQUALS, mask) \
-		PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_I )            PORT_CONDITION(port, mask, EQUALS, mask) \
-		PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_M )            PORT_CONDITION(port, mask, EQUALS, mask) \
-		PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_KAN )          PORT_CONDITION(port, mask, EQUALS, mask)  /* 槓   */ \
-		PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START1 )               PORT_CONDITION(port, mask, EQUALS, mask)  /* 開始 */ \
-		PORT_BIT( 0x3f, IP_ACTIVE_LOW, IPT_UNKNOWN )              PORT_CONDITION(port, mask, EQUALS, 0x00) \
-		PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNKNOWN ) \
-		PORT_START("KEY1") \
-		PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_B )            PORT_CONDITION(port, mask, EQUALS, mask) \
-		PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_F )            PORT_CONDITION(port, mask, EQUALS, mask) \
-		PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_J )            PORT_CONDITION(port, mask, EQUALS, mask) \
-		PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_N )            PORT_CONDITION(port, mask, EQUALS, mask) \
-		PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_REACH )        PORT_CONDITION(port, mask, EQUALS, mask)  /* 聽   */ \
-		PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_MAHJONG_BET )          PORT_CONDITION(port, mask, EQUALS, mask)  /* 押   */ \
-		PORT_BIT( 0x3f, IP_ACTIVE_LOW, IPT_UNKNOWN )              PORT_CONDITION(port, mask, EQUALS, 0x00) \
-		PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNKNOWN ) \
-		PORT_START("KEY2") \
-		PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_C )            PORT_CONDITION(port, mask, EQUALS, mask) \
-		PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_G )            PORT_CONDITION(port, mask, EQUALS, mask) \
-		PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_K )            PORT_CONDITION(port, mask, EQUALS, mask) \
-		PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_CHI )          PORT_CONDITION(port, mask, EQUALS, mask)  /* 吃   */ \
-		PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_RON )          PORT_CONDITION(port, mask, EQUALS, mask)  /* 胡   */ \
-		PORT_BIT( 0x1f, IP_ACTIVE_LOW, IPT_UNKNOWN )              PORT_CONDITION(port, mask, EQUALS, 0x00) \
-		PORT_BIT( 0xe0, IP_ACTIVE_LOW, IPT_UNKNOWN ) \
-		PORT_START("KEY3") \
-		PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_D )            PORT_CONDITION(port, mask, EQUALS, mask) \
-		PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_H )            PORT_CONDITION(port, mask, EQUALS, mask) \
-		PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_L )            PORT_CONDITION(port, mask, EQUALS, mask) \
-		PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_PON )          PORT_CONDITION(port, mask, EQUALS, mask)  /* 碰  */ \
-		PORT_BIT( 0x0f, IP_ACTIVE_LOW, IPT_UNKNOWN )              PORT_CONDITION(port, mask, EQUALS, 0x00) \
-		PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNKNOWN ) \
-		PORT_START("KEY4") \
-		PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_LAST_CHANCE )  PORT_CONDITION(port, mask, EQUALS, mask)  /* 海底 */ \
-		PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_SCORE )        PORT_CONDITION(port, mask, EQUALS, mask)  /* 得分 */ \
-		PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_DOUBLE_UP )    PORT_CONDITION(port, mask, EQUALS, mask)  /* 比倍 */ \
-		PORT_BIT( 0x07, IP_ACTIVE_LOW, IPT_UNKNOWN )              PORT_CONDITION(port, mask, EQUALS, 0x00) \
-		PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN ) \
-		PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_BIG )          PORT_CONDITION(port, mask, EQUALS, mask)  /* 大   */ \
-		PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_MAHJONG_SMALL )        PORT_CONDITION(port, mask, EQUALS, mask)  /* 小   */ \
-		PORT_BIT( 0x30, IP_ACTIVE_LOW, IPT_UNKNOWN )              PORT_CONDITION(port, mask, EQUALS, 0x00) \
-		PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
 static INPUT_PORTS_START( lhzb2_common )
 	PORT_INCLUDE(igs_mahjong_matrix)
 
@@ -3418,7 +3373,7 @@ static INPUT_PORTS_START( mgcs )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON2 )                PORT_CONDITION("DSW2", 0x10, EQUALS, 0x00)  // 押注
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON3 )                PORT_CONDITION("DSW2", 0x10, EQUALS, 0x00)  // 功能
 
-	MAHJONG_MATRIX_CONDITIONAL("DSW2", 0x10)
+	IGS_MAHJONG_MATRIX_CONDITIONAL("DSW2", 0x10, 0x10)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( sdmg2_common )
@@ -3455,7 +3410,7 @@ static INPUT_PORTS_START( sdmg2_common )
 	PORT_DIPSETTING(    0x80, "Numbers" )                                                             // 數字
 	PORT_DIPSETTING(    0x00, "Blocks" )                                                              // 方塊       (apples for bet, mahjong tong tiles for numbers)
 
-	MAHJONG_MATRIX_CONDITIONAL("DSW2", 0x40)
+	IGS_MAHJONG_MATRIX_CONDITIONAL("DSW2", 0x40, 0x40)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( sdmg2 )
@@ -3633,7 +3588,7 @@ static INPUT_PORTS_START( mgdh )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )                PORT_CONDITION("DSW2", 0x02, EQUALS, 0x02)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON2 )                PORT_CONDITION("DSW2", 0x02, EQUALS, 0x00)  // 押注
 
-	MAHJONG_MATRIX_CONDITIONAL("DSW2", 0x02)
+	IGS_MAHJONG_MATRIX_CONDITIONAL("DSW2", 0x02, 0x02)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( slqz2 )
@@ -3973,7 +3928,7 @@ static INPUT_PORTS_START( tarzan )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )                PORT_CONDITION("DSW3", 0x01, EQUALS, 0x00)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )                PORT_CONDITION("DSW3", 0x01, EQUALS, 0x00)
 
-	MAHJONG_MATRIX_CONDITIONAL("DSW3", 0x01)
+	IGS_MAHJONG_MATRIX_CONDITIONAL("DSW3", 0x01, 0x01)
 
 	PORT_MODIFY("KEY4") // never read and not shown in test mode
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )

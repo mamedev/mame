@@ -207,7 +207,7 @@ void igs_m027_023vid_state::m027_map(address_map &map)
 ***************************************************************************/
 
 INPUT_PORTS_START( mxsqy )
-	PORT_INCLUDE(igs_mahjong_matrix)
+	IGS_MAHJONG_MATRIX_CONDITIONAL("DSW1", 0x01, 0x00)
 
 	PORT_START("IN0")
 	PORT_BIT(0x07ff, IP_ACTIVE_LOW,  IPT_UNKNOWN)               PORT_CONDITION("DSW1", 0x01, EQUALS, 0x01)
@@ -227,14 +227,15 @@ INPUT_PORTS_START( mxsqy )
 	PORT_BIT(0x0040, IP_ACTIVE_LOW,  IPT_COIN1)                 PORT_CONDITION("DSW1", 0x01, EQUALS, 0x01)  // 投币
 	PORT_BIT(0x0078, IP_ACTIVE_LOW,  IPT_UNKNOWN)               PORT_CONDITION("DSW1", 0x01, EQUALS, 0x00)
 	PORT_BIT(0x0080, IP_ACTIVE_LOW,  IPT_GAMBLE_KEYIN)                                                      // 开分
-	PORT_BIT(0x0100, IP_ACTIVE_LOW,  IPT_START1)                                                            // 开始
-	PORT_BIT(0x0200, IP_ACTIVE_LOW,  IPT_JOYSTICK_UP)                                                       // 上
-	PORT_BIT(0x0400, IP_ACTIVE_LOW,  IPT_JOYSTICK_DOWN)                                                     // 下
-	PORT_BIT(0x0800, IP_ACTIVE_LOW,  IPT_JOYSTICK_LEFT)                                                     // 左
-	PORT_BIT(0x1000, IP_ACTIVE_LOW,  IPT_JOYSTICK_RIGHT)                                                    // 右
-	PORT_BIT(0x2000, IP_ACTIVE_LOW,  IPT_BUTTON1)                                                           // S1
-	PORT_BIT(0x4000, IP_ACTIVE_LOW,  IPT_BUTTON2)                                                           // S2
-	PORT_BIT(0x8000, IP_ACTIVE_LOW,  IPT_BUTTON3)                                                           // S3
+	PORT_BIT(0x0100, IP_ACTIVE_LOW,  IPT_START1)                PORT_CONDITION("DSW1", 0x01, EQUALS, 0x01)  // 开始
+	PORT_BIT(0x0200, IP_ACTIVE_LOW,  IPT_JOYSTICK_UP)           PORT_CONDITION("DSW1", 0x01, EQUALS, 0x01)  // 上
+	PORT_BIT(0x0400, IP_ACTIVE_LOW,  IPT_JOYSTICK_DOWN)         PORT_CONDITION("DSW1", 0x01, EQUALS, 0x01)  // 下
+	PORT_BIT(0x0800, IP_ACTIVE_LOW,  IPT_JOYSTICK_LEFT)         PORT_CONDITION("DSW1", 0x01, EQUALS, 0x01)  // 左
+	PORT_BIT(0x1000, IP_ACTIVE_LOW,  IPT_JOYSTICK_RIGHT)        PORT_CONDITION("DSW1", 0x01, EQUALS, 0x01)  // 右
+	PORT_BIT(0x2000, IP_ACTIVE_LOW,  IPT_BUTTON1)               PORT_CONDITION("DSW1", 0x01, EQUALS, 0x01)  // S1
+	PORT_BIT(0x4000, IP_ACTIVE_LOW,  IPT_BUTTON2)               PORT_CONDITION("DSW1", 0x01, EQUALS, 0x01)  // S2
+	PORT_BIT(0x8000, IP_ACTIVE_LOW,  IPT_BUTTON3)               PORT_CONDITION("DSW1", 0x01, EQUALS, 0x01)  // S3
+	PORT_BIT(0xff00, IP_ACTIVE_LOW,  IPT_UNKNOWN)               PORT_CONDITION("DSW1", 0x01, EQUALS, 0x00)
 
 	PORT_START("IN2")
 	PORT_BIT(0x0001, IP_ACTIVE_LOW,  IPT_GAMBLE_PAYOUT)                                                     // 退币

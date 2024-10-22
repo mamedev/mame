@@ -9459,7 +9459,7 @@ void upd7810_device::STM_7801()
 	upd7810_to_output_change(1);
 
 	/* Reload the timer */
-	m_ovc0 = 16 * ( TM0 + ( ( TM1 & 0x0f ) << 8 ) );
+	m_ovc0 = 8 * ( TM0 + ( ( TM1 & 0x0f ) << 8 ) );
 }
 
 void upd7810_device::MOV_MC_A_7801()

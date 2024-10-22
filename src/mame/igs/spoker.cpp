@@ -537,10 +537,10 @@ void jinhulu2_state::portmap(address_map &map)
 	map(0x4001, 0x4001).portr("DSW2");
 	map(0x4002, 0x4002).portr("DSW3");
 	map(0x5001, 0x5001).portr("SERVICE");
+	map(0x5010, 0x5010).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	//map(0x5030, 0x5030).w(FUNC()); // TODO: almost surely same protections as seen in igspoker.cpp and igs011.cpp. Probably the IGS003
 	//map(0x5031, 0x5031).r(FUNC()); // TODO: "
 	map(0x5031, 0x5031).w(FUNC(jinhulu2_state::nmi_w));
-	//map(0x????, 0x????).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0x7000, 0x77ff).ram().w(FUNC(jinhulu2_state::fg_tile_w)).share(m_fg_tile_ram);
 	map(0x7800, 0x7fff).ram().w(FUNC(jinhulu2_state::fg_color_w)).share(m_fg_color_ram);
 }

@@ -505,8 +505,7 @@ static inline int is_qnan_double(double x)
 {
 	uint64_t xi = *(uint64_t*)&x;
 	return( ((xi & DOUBLE_EXP) == DOUBLE_EXP) &&
-			((xi & 0x0007fffffffffffU) == 0x000000000000000U) &&
-			((xi & 0x000800000000000U) == 0x000800000000000U) );
+			((xi & 0x0008000000000000U) == 0x0008000000000000U) );
 }
 
 

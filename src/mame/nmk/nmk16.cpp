@@ -96,7 +96,8 @@ tharrier test mode:
 1)  Press player 2 buttons 1+2 during reset.  "Are you ready?" will appear
 2)  Press player 1 buttons in this sequence:
     2,1,2,2,1,1,↓,↓
-Note: this doesn't currently work, the message never appears (most likely an error in the protection simulation).
+Note: this only works in the bootleg, the message never appears in the original
+because of incomplete MCU simulation
 
 tdragon and hachamf test mode:
 
@@ -366,6 +367,88 @@ u16 nmk16_state::tharrier_mcu_r(offs_t offset, u16 mem_mask)
 	}
 }
 
+
+/***************************************************************************
+
+  tharrierb MCU emulation
+
+***************************************************************************/
+
+u16 tharrierb_state::mcu_status_r(offs_t offset, u16 mem_mask)
+{
+	u16 data = 0;
+
+	// bit 15 mcu status? other bits unused?
+	if (ACCESSING_BITS_8_15)
+		data |= 0x8000;
+
+	return data;
+}
+
+u16 tharrierb_state::mcu_data_r(offs_t offset, u16 mem_mask)
+{
+	u16 data = 0;
+
+	if (ACCESSING_BITS_0_7)
+		data |= m_mcu_out_latch_lsb << 0;
+
+	if (ACCESSING_BITS_8_15)
+		data |= m_mcu_out_latch_msb << 8;
+
+	return data;
+}
+
+void tharrierb_state::mcu_control_w(offs_t offset, u16 data, u16 mem_mask)
+{
+	// bit 0 mcu interrupt. other bits unused?
+	if (ACCESSING_BITS_0_7)
+		m_mcu->set_input_line(M68705_IRQ_LINE, BIT(~data, 0));
+}
+
+void tharrierb_state::mcu_data_w(offs_t offset, u16 data, u16 mem_mask)
+{
+	if (ACCESSING_BITS_0_7)
+		m_mcu_in_latch = data;
+}
+
+void tharrierb_state::mcu_porta_w(u8 data)
+{
+	m_mcu_out_latch_msb = data;
+}
+
+void tharrierb_state::mcu_portb_w(u8 data)
+{
+	m_mcu_out_latch_lsb = data;
+}
+
+u8 tharrierb_state::mcu_portb_r()
+{
+	return m_mcu_in_latch;
+}
+
+void tharrierb_state::mcu_portc_w(u8 data)
+{
+	// 7-------  set at start of mcu ack function, unset at end
+	// -6------  unset to enable read for port b latch
+	// --5-----  unset at mcu reset and set after mcu memory init
+	// ---4----  toggled after mcu reset and in mcu int
+	// ----3---  unused
+	// -----210  port d data source (inputs)
+
+	m_mcu_portc = data;
+}
+
+u8 tharrierb_state::mcu_portd_r()
+{
+	u8 select = m_mcu_portc & 0x07;
+
+	if (select < 5)
+		return m_inputs[select]->read();
+	else
+		return 0;
+}
+
+
 /***************************************************************************
 
   VRAM handlers
@@ -528,6 +611,25 @@ void nmk16_state::tharrier_map(address_map &map)
 	map(0x09c000, 0x09c7ff).ram(); // Unused txvideoram area?
 	map(0x09d000, 0x09d7ff).ram().w(FUNC(nmk16_state::txvideoram_w)).share("txvideoram");
 	map(0x0f0000, 0x0fffff).ram().w(FUNC(nmk16_state::mainram_strange_w)).share("mainram");
+}
+
+void tharrierb_state::tharrierb_map(address_map &map)
+{
+	map(0x000000, 0x03ffff).rom();
+	map(0x080000, 0x080001).mirror(0xf00).r(FUNC(tharrierb_state::mcu_status_r));
+	map(0x080002, 0x080003).mirror(0xf00).r(FUNC(tharrierb_state::mcu_data_r));
+	map(0x08000f, 0x08000f).r("soundlatch2", FUNC(generic_latch_8_device::read));
+	map(0x080010, 0x080011).mirror(0xf00).nopr().w(FUNC(tharrierb_state::mcu_control_w));
+	map(0x080012, 0x080013).mirror(0xf00).nopr().w(FUNC(tharrierb_state::mcu_data_w));
+	map(0x080014, 0x080015).unmaprw(); // flipscreen
+	map(0x08001c, 0x08001d).unmaprw(); // sound cpu reset
+	map(0x08001f, 0x08001f).w(m_soundlatch, FUNC(generic_latch_8_device::write));
+	map(0x088000, 0x0883ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
+	map(0x090000, 0x093fff).ram().w(FUNC(tharrierb_state::bgvideoram_w<0>)).share("bgvideoram0");
+	map(0x09c000, 0x09cfff).ram(); // verified in test mode
+	map(0x09d000, 0x09d7ff).ram().w(FUNC(tharrierb_state::txvideoram_w)).share("txvideoram");
+	map(0x09d800, 0x09dfff).ram(); // verified in test mode
+	map(0x0f0000, 0x0fffff).ram().w(FUNC(tharrierb_state::mainram_strange_w)).share("mainram");
 }
 
 void nmk16_state::tharrier_sound_map(address_map &map)
@@ -1536,6 +1638,81 @@ static INPUT_PORTS_START( tharrier )
 	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_UNKNOWN ) //coin ?
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( tharrierb )
+	PORT_START("P1")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON1 )                  PORT_PLAYER(1)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON2 )                  PORT_PLAYER(1)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT )  PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN )  PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP )    PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("P2")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON1 )                  PORT_PLAYER(2)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON2 )                  PORT_PLAYER(2)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT )  PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN )  PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP )    PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("BUTTONS")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START2 )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START1 )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_COIN1 ) // COIN2 in test mode
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_COIN2 ) // COIN1 in test mode (not supported by game?)
+	PORT_BIT( 0xc0, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("DSW1") // DIP2 in test mode
+	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Lives ) )      PORT_DIPLOCATION("DSW1:!1,!2")
+	PORT_DIPSETTING(    0x00, "3" )
+	PORT_DIPSETTING(    0x01, "2" )
+	PORT_DIPSETTING(    0x02, "4" )
+	PORT_DIPSETTING(    0x03, "5" )
+	PORT_DIPNAME( 0x0c, 0x00, DEF_STR( Bonus_Life ) ) PORT_DIPLOCATION("DSW1:!4,!3")
+	PORT_DIPSETTING(    0x00, "200k" )
+	PORT_DIPSETTING(    0x04, DEF_STR( None ) )
+	PORT_DIPSETTING(    0x08, "200k/1000k" )
+	PORT_DIPSETTING(    0x0c, "200k/500k/1000k/2000k/3000k/5000k" )
+	PORT_DIPNAME( 0x30, 0x00, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("DSW1:!6,!5")
+	PORT_DIPSETTING(    0x00, DEF_STR( Normal ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Easy ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Hard ) )
+	PORT_DIPSETTING(    0x30, DEF_STR( Hardest ) )
+	PORT_DIPUNUSED_DIPLOC(0x40, 0x00, "DSW1:!7")
+	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Cabinet ) )    PORT_DIPLOCATION("DSW1:!8")
+	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Cocktail ) )
+
+	PORT_START("DSW2") // DIP1 in test mode
+	PORT_DIPNAME( 0x07, 0x00, DEF_STR( Coin_B ) )      PORT_DIPLOCATION("DSW2:!1,!2,!3")
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( 1C_3C ) )
+	PORT_DIPSETTING(    0x03, DEF_STR( 1C_4C ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x05, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(    0x06, DEF_STR( 4C_1C ) )
+	PORT_DIPSETTING(    0x07, DEF_STR( Free_Play ) )
+	PORT_DIPNAME( 0x38, 0x00, DEF_STR( Coin_A ) )      PORT_DIPLOCATION("DSW2:!4,!5,!6")
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( 1C_3C ) )
+	PORT_DIPSETTING(    0x18, DEF_STR( 1C_4C ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x28, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(    0x30, DEF_STR( 4C_1C ) )
+	PORT_DIPSETTING(    0x38, DEF_STR( Free_Play ) )
+	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("DSW2:!7")
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPUNUSED_DIPLOC(0x80, 0x00, "DSW2:!8")
+INPUT_PORTS_END
 
 static INPUT_PORTS_START( mustang )
 	PORT_START("IN0")
@@ -4024,6 +4201,17 @@ void nmk16_state::machine_reset()
 	m_vtiming_val = 0xff;
 }
 
+void tharrierb_state::machine_start()
+{
+	nmk16_state::machine_start();
+
+	save_item(NAME(m_mcu_out_latch_msb));
+	save_item(NAME(m_mcu_out_latch_lsb));
+	save_item(NAME(m_mcu_in_latch));
+	save_item(NAME(m_mcu_portc));
+}
+
+
 /***************************************************************************
 
                              Screen Configurations
@@ -4376,6 +4564,22 @@ void nmk16_state::tharrier(machine_config &config)
 	OKIM6295(config, m_oki[1], XTAL(4'000'000), okim6295_device::PIN7_LOW);
 	m_oki[1]->set_addrmap(0, &nmk16_state::oki2_map);
 	m_oki[1]->add_route(ALL_OUTPUTS, "mono", 0.10);
+}
+
+void tharrierb_state::tharrierb(machine_config &config)
+{
+	tharrier(config);
+
+	m_maincpu->set_addrmap(AS_PROGRAM, &tharrierb_state::tharrierb_map);
+
+	M68705R3(config, m_mcu, XTAL(4'915'200) / 2); // unknown clock
+	m_mcu->porta_w().set(FUNC(tharrierb_state::mcu_porta_w));
+	m_mcu->portb_r().set(FUNC(tharrierb_state::mcu_portb_r));
+	m_mcu->portb_w().set(FUNC(tharrierb_state::mcu_portb_w));
+	m_mcu->portc_w().set(FUNC(tharrierb_state::mcu_portc_w));
+	m_mcu->portd_r().set(FUNC(tharrierb_state::mcu_portd_r));
+
+	config.set_perfect_quantum(m_maincpu);
 }
 
 void nmk16_state::mustang(machine_config &config)
@@ -6576,7 +6780,7 @@ ROM_START( tharrierb )
 	ROM_LOAD( "s1.512", 0x00000, 0x10000, CRC(b959f837) SHA1(073b14935e7d5b0cad19a3471fd26e9e3a363827) )
 
 	ROM_REGION( 0x1000, "mcu", 0 )
-	ROM_LOAD( "mc68705r35", 0x0000, 0x1000, NO_DUMP ) // doesn't seem to be used by the game. Possibly empty or leftover from a conversion?
+	ROM_LOAD( "mc68705r35.bin", 0x0000, 0x1000, CRC(c560798b) SHA1(aae2a04914f0253102024e1af76bcf68637f3aba) )
 
 	ROM_REGION( 0x8000, "fgtile", 0 )
 	ROM_LOAD( "t.256", 0x0000, 0x8000, CRC(4e9a7e0b) SHA1(ff143d1e01e865a62ecc695fe3359a2a0eacee05) ) // half size if compared to the original
@@ -6628,6 +6832,12 @@ ROM_START( tharrierb )
 	ROM_LOAD( "18h.512", 0x50000, 0x10000, CRC(370a2fbd) SHA1(9cdf8a6155a8afb4472f23df9d62f6a4e62fff30) )
 	ROM_LOAD( "19h.512", 0x60000, 0x10000, CRC(64e58cfe) SHA1(0310f5504513a8b0be20cfc337a038fcf7925131) )
 	ROM_LOAD( "20h.512", 0x70000, 0x10000, CRC(5ccd9205) SHA1(6e5443d6af5a896d6dd4b4e06d5c3151826bf8b5) )
+
+	ROM_REGION( 0x0100, "htiming", 0 )
+	ROM_LOAD( "22.bpr", 0x0000, 0x0100, CRC(cfdbb86c) SHA1(588822f6308a860937349c9106c2b4b1a75823ec) )  // 82S129
+
+	ROM_REGION( 0x0100, "vtiming", 0 )
+	ROM_LOAD( "21.bpr", 0x0000, 0x0100, CRC(fcd5efea) SHA1(cbda6b14127dabd1788cc256743cf62efaa5e8c4) )  // 82S135
 ROM_END
 
 
@@ -10402,8 +10612,8 @@ GAME( 1991, tdragonb3,  tdragon,  tdragonb3,    tdragonb,     nmk16_state, empty
 GAME( 1992, strahljbl,  strahl,   strahljbl,    strahljbl,    nmk16_state, empty_init,           ROT0,   "bootleg",                       "Koutetsu Yousai Strahl (Japan, bootleg)", 0 )
 
 // these are bootlegs with tharrier like sound hw
-GAME( 1990, mustangb3,  mustang,  mustangb3,    mustang,      nmk16_state, empty_init,           ROT0,   "bootleg (Lettering)",           "US AAF Mustang (Lettering bootleg)", 0 )
-GAME( 1989, tharrierb,  tharrier, tharrier,     tharrier,     nmk16_state, init_tharrier,        ROT270, "bootleg (Lettering)",           "Task Force Harrier (Lettering bootleg)", 0 )
+GAME( 1990, mustangb3,  mustang,  mustangb3,    mustang,      nmk16_state,     empty_init,       ROT0,   "bootleg (Lettering)",           "US AAF Mustang (Lettering bootleg)", 0 )
+GAME( 1989, tharrierb,  tharrier, tharrierb,    tharrierb,    tharrierb_state, init_tharrier,    ROT270, "bootleg (Lettering)",           "Task Force Harrier (Lettering bootleg)", 0 )
 
 // bootleg with no audio CPU and only 1 Oki
 GAME( 1991, tdragonb2,  tdragon,  tdragonb2,    tdragonb2,    nmk16_state, init_tdragonb2,       ROT270, "bootleg",                       "Thunder Dragon (bootleg with reduced sound system)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) // runs too quickly, Oki sounds terrible (IRQ problems? works better commenting out IRQ1_SCANLINE_2)

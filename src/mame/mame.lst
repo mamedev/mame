@@ -16377,6 +16377,9 @@ indyheat                        // (c) 1991 Leland
 wsf                             // (c) 1990 Leland
 wsf3                            // (c) 1990 Leland
 
+@source:cirsa/cirsa2080606.cpp
+maquinati                       // (c) 2015 Cirsa / Unidesa
+
 @source:cirsa/cirsa820xxx.cpp
 unk820501
 
@@ -20654,6 +20657,7 @@ ms3                             //
 ms5                             //
 ms72c                           //
 mystjag                         //
+tripplay                        // (c) 1999 IGT
 
 @source:igt/peplus.cpp
 im1p1952                        // (c) 1995 IGT - International Game Technology
@@ -42497,6 +42501,9 @@ p8000_16                        //
 @source:skeleton/palestra.cpp
 palestra
 
+@source:skeleton/pap2.cpp
+pap2
+
 @source:skeleton/pcksurfer.cpp
 pcksurfer                       // (c) 2006 Datawind
 
@@ -43820,6 +43827,7 @@ retofinvb                       // bootleg
 retofinvb1                      // bootleg
 retofinvb2                      // bootleg
 retofinvb3                      // bootleg
+retofinvbv                      // bootleg (Video Dens)
 
 @source:taito/rollrace.cpp
 fightrol                        // (c) 1983 Taito

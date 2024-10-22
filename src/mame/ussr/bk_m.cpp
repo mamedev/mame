@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Miodrag Milanovic
+// copyright-holders:Miodrag Milanovic, Sergey Svishchev
 /***************************************************************************
 
         BK machine driver by Miodrag Milanovic
@@ -40,6 +40,21 @@ uint16_t bk_state::vid_scroll_r()
 	return m_scroll;
 }
 
+// SEL1 register (0010 and 0010.01)
+//
+// 15-8	R	high byte of cpu start address
+// 7	R	bitbanger cts in
+// 7	W	cassette motor control, 1: off 0: on
+// 6	R	keyboard any key down, 1: no 0: yes
+// 6	W	cassette data and speaker out
+// 5	R	cassette data in
+// 5	W	cassette data and bitbanger rts out
+// 4	R	bitbanger rx
+// 4	W	bitbanger tx
+// 2	R	updated
+//
+// only original 0010 has bitbanger wired to UP connector
+
 uint16_t bk_state::sel1_r()
 {
 	double level = m_cassette->input();
@@ -73,38 +88,6 @@ void bk_state::sel1_w(uint16_t data)
 void bk_state::trap_w(uint16_t data)
 {
 	m_maincpu->pulse_input_line(t11_device::BUS_ERROR, attotime::zero);
-}
-
-uint16_t bk_state::floppy_cmd_r()
-{
-	return 0;
-}
-
-void bk_state::floppy_cmd_w(uint16_t data)
-{
-	if (BIT(data, 0))
-		m_drive = 0;
-
-	if (BIT(data, 1))
-		m_drive = 1;
-
-	if (BIT(data, 2))
-		m_drive = 2;
-
-	if (BIT(data, 3))
-		m_drive = 3;
-
-	if (data == 0)
-		m_drive = -1;
-}
-
-uint16_t bk_state::floppy_data_r()
-{
-	return 0;
-}
-
-void bk_state::floppy_data_w(uint16_t data)
-{
 }
 
 u32 bk_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)

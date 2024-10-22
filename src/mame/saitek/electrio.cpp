@@ -212,10 +212,10 @@ u8 electrio_state::input1_r()
 	{
 		for (int i = 0; i < 8; i++)
 			if (board && BIT(m_inp_mux, i))
-				data |= board->read_file(i);
+				data |= board->read_file(i, true);
 	}
 
-	return bitswap<4>(~data >> (N*4), 0,1,2,3);
+	return ~data >> (N * 4) & 0xf;
 }
 
 void electrio_state::leds_w(u16 data)
@@ -341,8 +341,8 @@ void electrio_state::pchess(machine_config &config)
 	HD44868(config, m_maincpu, 600'000); // approximation
 	m_maincpu->write_r<0>().set(FUNC(electrio_state::input_w<0>));
 	m_maincpu->write_r<1>().set(FUNC(electrio_state::input_w<1>));
-	m_maincpu->read_r<2>().set(FUNC(electrio_state::input1_r<1>));
-	m_maincpu->read_r<3>().set(FUNC(electrio_state::input1_r<0>));
+	m_maincpu->read_r<2>().set(FUNC(electrio_state::input1_r<0>));
+	m_maincpu->read_r<3>().set(FUNC(electrio_state::input1_r<1>));
 	m_maincpu->read_r<4>().set(FUNC(electrio_state::input2_r));
 	m_maincpu->write_r<5>().set("dac", FUNC(dac_1bit_device::write)).rshift(3);
 	m_maincpu->write_d().set(FUNC(electrio_state::leds_w));
