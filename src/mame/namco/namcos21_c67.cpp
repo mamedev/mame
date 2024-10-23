@@ -371,26 +371,25 @@ private:
 uint32_t namcos21_c67_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	//uint8_t *videoram = m_gpu_videoram.get();
-	int pivot = 3;
-	int pri;
-	bitmap.fill(0xff, cliprect );
-	screen.priority().fill(0, cliprect);
-	m_c355spr->build_sprite_list_and_render_sprites(cliprect); // TODO : buffered?
 
-	m_c355spr->draw(screen, bitmap, cliprect, 2 );
+	bitmap.fill(0xff, cliprect);
+	screen.priority().fill(0, cliprect);
+
+	m_c355spr->build_sprite_list_and_render_sprites(cliprect); // TODO : buffered?
+	m_c355spr->draw(screen, bitmap, cliprect, 2);
 
 	m_namcos21_3d->copy_visible_poly_framebuffer(bitmap, cliprect, 0x7fc0, 0x7ffe);
 
-	m_c355spr->draw(screen, bitmap, cliprect, 0 );
-	m_c355spr->draw(screen, bitmap, cliprect, 1 );
+	m_c355spr->draw(screen, bitmap, cliprect, 0);
+	m_c355spr->draw(screen, bitmap, cliprect, 1);
 
 	m_namcos21_3d->copy_visible_poly_framebuffer(bitmap, cliprect, 0, 0x7fbf);
 
 	/* draw high priority 2d sprites */
-	for( pri=pivot; pri<8; pri++ )
-	{
-		m_c355spr->draw(screen, bitmap, cliprect, pri );
-	}
+	const int pivot = 3;
+	for (int pri=pivot; pri<8; pri++)
+		m_c355spr->draw(screen, bitmap, cliprect, pri);
+
 	return 0;
 }
 
@@ -401,11 +400,10 @@ uint16_t namcos21_c67_state::video_enable_r()
 
 void namcos21_c67_state::video_enable_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
-	COMBINE_DATA( &m_video_enable ); /* 0x40 = enable */
-	if( m_video_enable!=0 && m_video_enable!=0x40 )
-	{
-		logerror( "unexpected video_enable_w=0x%x\n", m_video_enable );
-	}
+	COMBINE_DATA(&m_video_enable); /* 0x40 = enable */
+
+	if (m_video_enable!=0 && m_video_enable!=0x40)
+		logerror("unexpected video_enable_w=0x%x\n", m_video_enable);
 }
 
 /***********************************************************/
@@ -419,7 +417,7 @@ uint16_t namcos21_c67_state::dpram_word_r(offs_t offset)
 
 void namcos21_c67_state::dpram_word_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
-	if( ACCESSING_BITS_0_7 )
+	if (ACCESSING_BITS_0_7 )
 	{
 		m_dpram[offset] = data&0xff;
 	}
@@ -700,7 +698,7 @@ void namcos21_c67_state::sound_bankselect_w(uint8_t data)
 
 void namcos21_c67_state::sound_reset_w(uint8_t data)
 {
-	if (data & 0x01)
+	if (BIT(data, 0))
 	{
 		/* Resume execution */
 		m_audiocpu->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
@@ -712,17 +710,15 @@ void namcos21_c67_state::sound_reset_w(uint8_t data)
 		m_audiocpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 	}
 
-	if (data & 0x04)
-	{
+	if (BIT(data, 2))
 		m_namcos21_dsp_c67->reset_kickstart();
-	}
 }
 
 void namcos21_c67_state::system_reset_w(uint8_t data)
 {
-	reset_all_subcpus(data & 1 ? CLEAR_LINE : ASSERT_LINE);
+	reset_all_subcpus(BIT(data, 0) ? CLEAR_LINE : ASSERT_LINE);
 
-	if (data & 0x01)
+	if (BIT(data, 0))
 		m_maincpu->yield();
 }
 
@@ -748,7 +744,7 @@ void namcos21_c67_state::machine_reset()
 	/* Initialise the bank select in the sound CPU */
 	m_audiobank->set_entry(0); /* Page in bank 0 */
 
-	m_audiocpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE );
+	m_audiocpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 
 	/* Place CPU2 & CPU3 into the reset condition */
 	reset_all_subcpus(ASSERT_LINE);
@@ -773,7 +769,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(namcos21_c67_state::screen_scanline)
 	int scanline = param;
 //  int cur_posirq = get_posirq_scanline()*2;
 
-	if(scanline == 240*2)
+	if(scanline == (240*2))
 	{
 		m_master_intc->vblank_irq_trigger();
 		m_slave_intc->vblank_irq_trigger();
