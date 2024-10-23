@@ -40,7 +40,7 @@
             2   Let's TV Play series "Bo-kenger" /EPOCH/Japan                                                   -           -               -           -               -                   -                       -
             3   Challenge Ai-chan! Exciting Ping-pong /TAKARATOMY/Japan                                         -           -               -           -               -                   -                       dumped
             4   Sasuke & Sportsman Tournament /BANDAI/Japan                                                     -           -               -           -               -                   -                       -
-            5   Hyper resque, I am a resque team /BANDAI/Japan                                                  -           -               -           -               -                   -                       -
+            5   TV de  Asobitai Hyper Rescue - Boku wa Kyuujotai /BANDAI/Japan                                  -           -               -           -               -                   -                       -
             6   Let's TV Play series "Ultraman" /BANDAI/Japan                                                   -           -               -           -               -                   -                       -
             7   Let's TV Play Classic series "Namco Nostalgia 1" /BANDAI/Japan                                  CGSJ        x8              48          1M              24LC04                                      dumped non destructively
             8   Let's TV Play Classic series "Namco Nostalgia 2" /BANDAI/Japan                                  CGSJ        x8              48          1M              24LC04              SSD 98 PL7351-181       dumped
@@ -2535,7 +2535,7 @@ CONS( 2004, tomplc,    0,          0,  xavix_i2c_24c02_43mhz,tomplc,xavix_i2c_st
 
 // テレビで遊び隊 ハイパーレスキュー ぼくは救助隊！
 // the demos in attract mode end instantly as if a button was being held, but not sure where it's read
-CONS( 2006, tomthr,    0,          0,  xavix_43mhz,      tomthr,   xavix_state,          init_xavix,    "Takara Tomy / SSD Company LTD",                "Play Team Hyper Rescue on TV I'm A Rescue Team! (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+CONS( 2006, tomthr,    0,          0,  xavix_43mhz,      tomthr,   xavix_state,          init_xavix,    "Takara Tomy / SSD Company LTD",                "Asobitai Hyper Rescue - Boku wa Kyuujotai! (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
 // ガンガンアドベンチャー 
 CONS( 2001, gungunad,  0,          0,  xavix_nv,         xavix,    xavix_state,          init_xavix,    "Takara / SSD Company LTD",                     "Gun Gun Adventure (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
