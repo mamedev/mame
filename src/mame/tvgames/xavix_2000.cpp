@@ -187,6 +187,13 @@ static INPUT_PORTS_START( ttv_lotr )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("i2cmem", FUNC(i2cmem_device::read_sda))
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( epo_hamc )
+	PORT_INCLUDE(xavix)
+
+	PORT_MODIFY("IN1")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(xavix_epo_hamc_state::camera_r))
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(xavix_epo_hamc_state::camera_r))
+INPUT_PORTS_END
 
 static INPUT_PORTS_START( ttv_mx )
 	PORT_INCLUDE(xavix_i2c)
@@ -274,6 +281,11 @@ ROM_START( epo_golf ) // GLFJ MAIN-03
 	ROM_LOAD("golf.bin", 0x000000, 0x400000, CRC(d1f231cf) SHA1(9421836a6bc4af9ee1fc7a402d62b2fb4dbcdefc) )
 ROM_END
 
+ROM_START( epo_hamc ) // ET158 MB REV.0
+	ROM_REGION(0x400000, "bios", ROMREGION_ERASE00)
+	ROM_LOAD( "hamster.u1", 0x000000, 0x400000, CRC(b1177813) SHA1(ed01096ebb63b72267ad7e0b2115224bbab64011) )
+ROM_END
+
 ROM_START( ban_omt ) // OMTJ MAIN-07
 	ROM_REGION(0x800000, "bios", ROMREGION_ERASE00)
 	ROM_LOAD("otmj.bin", 0x000000, 0x400000, CRC(1c1dc6fb) SHA1(d0cf1345b765d66ca9a0870ee6d0e3ccd84a8c0b) )
@@ -349,6 +361,9 @@ CONS( 2002, epo_bowl, 0, 0, xavix2000_i2c_24c04, epo_bowl,    xavix_i2c_state,  
 // スーパーショット！ エキサイトゴルフ
 // needs timer irq hack to boot, fails to draw main menu properly (buggy xavix2000 opcodes?)  (2002 date on PCB, 2003 ingame)
 CONS( 2003, epo_golf, 0,       0, xavix2000_i2c_24c04, ttv_lotr,   xavix_i2c_lotr_state, init_epo_mini, "Epoch / SSD Company LTD",       "Super Shot! Excite Golf (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+
+// とっとこハム太郎 ハムハム大サーカス！
+CONS( 2002, epo_hamc,  0,      0, xavix2000,           epo_hamc,   xavix_epo_hamc_state, init_xavix,    "Epoch / SSD Company LTD",       "Tottoko Hamtaro Ham Ham Big Circus! (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
 // ミニモニ。パーティ！リズムでぴょん！
 // needs timer irq hack to boot
