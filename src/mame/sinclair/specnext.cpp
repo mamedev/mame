@@ -25,7 +25,6 @@
 #include "specnext_copper.h"
 #include "specnext_ctc.h"
 #include "specnext_divmmc.h"
-#include "specnext_dma.h"
 #include "specnext_multiface.h"
 #include "specnext_layer2.h"
 #include "specnext_lores.h"
@@ -36,6 +35,7 @@
 #include "cpu/z80/z80n.h"
 #include "machine/i2cmem.h"
 #include "machine/spi_sdcard.h"
+#include "machine/z80dma.h"
 #include "sound/ay8910.h"
 #include "sound/dac.h"
 #include "speaker.h"
@@ -80,7 +80,7 @@ public:
 		, m_view7(*this, "mem_view7")
 		, m_copper(*this, "copper")
 		, m_ctc(*this, "ctc")
-		, m_dma(*this, "ndma")
+		, m_dma(*this, "dma")
 		, m_i2cmem(*this, "i2cmem")
 		, m_sdcard(*this, "sdcard")
 		, m_ay(*this, "ay%u", 0U)
@@ -1146,13 +1146,13 @@ void specnext_state::mmu_x2_w(offs_t bank, u8 data)
 
 u8 specnext_state::dma_r(bool dma_mode)
 {
-	m_dma->dma_mode_w(dma_mode);
+	m_dma->set_dma_mode(dma_mode ? z80dma_device::dma_mode::ZILOG : z80dma_device::dma_mode::SPEC_NEXT);
 	return m_dma->read();
 }
 
 void specnext_state::dma_w(bool dma_mode, u8 data)
 {
-	m_dma->dma_mode_w(dma_mode);
+	m_dma->set_dma_mode(dma_mode ? z80dma_device::dma_mode::ZILOG : z80dma_device::dma_mode::SPEC_NEXT);
 	m_dma->write(data);
 }
 
@@ -2256,7 +2256,7 @@ void specnext_state::nr_1a_ula_clip_y2_w(u8 data)
 
 static const z80_daisy_config z80_daisy_chain[] =
 {
-	{ "ndma" },
+	{ "dma" },
 	{ "ctc" },
 	{ nullptr }
 };
@@ -3035,7 +3035,7 @@ void specnext_state::reset_hard()
 	m_nr_02_hard_reset = 0;
 	m_bootrom_en = 1;
 
-	m_dma->dma_mode_w(0);
+	m_dma->set_dma_mode(z80dma_device::dma_mode::SPEC_NEXT);
 	// nmi_mf = 0;
 	// nmi_divmmc = 0;
 	// nmi_expbus = 0;
@@ -3162,7 +3162,7 @@ void specnext_state::machine_reset()
 	m_port_ff_data = 0;
 	m_divmmc_delayed_check = 0;
 
-	m_dma->dma_mode_w(0);
+	m_dma->set_dma_mode(z80dma_device::dma_mode::SPEC_NEXT);
 	//z80_retn_seen_28_d  = 0;
 	//im2_dma_delay  = 0;
 	m_pulse_int_n  = 1;
@@ -3449,7 +3449,7 @@ void specnext_state::tbblue(machine_config &config)
 	m_maincpu->in_nextreg_cb().set(FUNC(specnext_state::reg_r));
 	m_maincpu->out_retn_seen_cb().set(FUNC(specnext_state::leave_nmi));
 	m_maincpu->nomreq_cb().set_nop();
-	m_maincpu->busack_cb().set(m_dma, FUNC(specnext_dma_device::bai_w));
+	m_maincpu->busack_cb().set(m_dma, FUNC(z80dma_device::bai_w));
 
 	SPECNEXT_CTC(config, m_ctc, 28_MHz_XTAL / 8);
 	m_ctc->intr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);

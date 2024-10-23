@@ -48,6 +48,13 @@ class z80dma_device :   public device_t,
 						public device_z80daisy_interface
 {
 public:
+	enum class dma_mode : u8
+	{
+		ZILOG = 0,
+		UA858D = 1,
+		SPEC_NEXT = 2
+	};
+
 	// construction/destruction
 	z80dma_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
@@ -60,6 +67,7 @@ public:
 	auto in_iorq_callback() { return m_in_iorq_cb.bind(); }
 	auto out_iorq_callback() { return m_out_iorq_cb.bind(); }
 
+	void set_dma_mode(dma_mode dma_mode) { m_dma_mode = dma_mode; }
 	u8 read();
 	virtual void write(u8 data);
 
@@ -90,7 +98,7 @@ protected:
 	static inline constexpr int TM_SEARCH             = 0x02;
 	static inline constexpr int TM_SEARCH_TRANSFER    = 0x03;
 
-	z80dma_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
+	z80dma_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, dma_mode dma_mode);
 
 	// device_t implementation
 	virtual void device_start() override ATTR_COLD;
@@ -112,6 +120,7 @@ protected:
 
 	static constexpr unsigned REGNUM(unsigned m, unsigned s) { return (m << 3) + s; }
 
+	dma_mode m_dma_mode;
 	u16 m_addressA;
 	u16 m_addressB;
 	u16 m_count;
@@ -164,8 +173,26 @@ private:
 	u8  m_vector;               // interrupt vector
 };
 
+class ua858d_device : public z80dma_device
+{
+public:
+	ua858d_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+};
+
+class specnext_dma_device : public z80dma_device
+{
+public:
+	specnext_dma_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+
+	virtual void write(u8 data) override;
+
+protected:
+	virtual void do_write() override;
+};
 
 // device type definition
 DECLARE_DEVICE_TYPE(Z80DMA, z80dma_device)
+DECLARE_DEVICE_TYPE(UA858D, ua858d_device)
+DECLARE_DEVICE_TYPE(SPECNEXT_DMA, specnext_dma_device)
 
 #endif // MAME_MACHINE_Z80DMA_H
