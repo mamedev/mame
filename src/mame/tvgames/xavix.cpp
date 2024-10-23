@@ -35,7 +35,7 @@
     2011        anpan-man kazoku de ikunou mat DX /JoyPalette/Japan                                             -           -               -           -               -                   -                       -
     2009        anpan-man pyon-pyon ikunou mat /JoyPalette/Japan                                                -           -               -           -               -                   -                       -
     2008        kyuukyoku! kinniku grand slam! SASUKE kanzen seiha /EPOCH/Japan                                 -           -               -           -               -                   -                       -
-    2007        Tokyo Friend park? perfect! mezase! grand slam! /EPOCH/Japan                                    -           -               -           -               -                   -                       -
+    2007        Tokyo Friend Park II Perfect! Mezase! Grand Slam!! /EPOCH/Japan                                 -           -               -           -               -                   -                       -
     2006    1   Let's TV Play series "Kamen Rider Kabuto" /EPOCH/Japan                                          -           -               -           -               -                   -                       -
             2   Let's TV Play series "Bo-kenger" /EPOCH/Japan                                                   -           -               -           -               -                   -                       -
             3   Challenge Ai-chan! Exciting Ping-pong /TAKARATOMY/Japan                                         -           -               -           -               -                   -                       dumped
@@ -2598,7 +2598,8 @@ CONS( 2008, hikara,   0,           0,  xavix_cart_hikara, hikara,    xavix_hikar
 // 東京フレンドパーク2 
 CONS( 2003, epo_tfp2,  0,          0,  xavix_i2c_24c08,  epo_tfp2, xavix_i2c_state, init_xavix, "Epoch / SSD Company LTD", "Tokyo Friend Park 2 (Japan)", MACHINE_IMPERFECT_SOUND) // uses in24lc08b
 
-CONS( 2007, epo_tp2p,  0,          0,  xavix,            epo_tp2p, xavix_state,     init_xavix, "Epoch / SSD Company LTD", "Tokyo Friend Park 2 Perfect - Go For Grand Slam (Japan)", MACHINE_IMPERFECT_SOUND)
+// 東京フレンドパークⅡ パーフェクト!めざせ!グランドスラム‼︎
+CONS( 2007, epo_tp2p,  0,          0,  xavix,            epo_tp2p, xavix_state,     init_xavix, "Epoch / SSD Company LTD", "Tokyo Friend Park II Perfect! Mezase! Grand Slam!! (Japan)", MACHINE_IMPERFECT_SOUND)
 
 // きかんしゃトーマス テレビパソコン
 CONS( 2005, tvpc_tom,  0,          0,  xavix_i2c_24c16,  tvpc_tom, xavix_i2c_state, init_xavix, "Epoch / SSD Company LTD", "TV-PC Thomas & Friends (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
