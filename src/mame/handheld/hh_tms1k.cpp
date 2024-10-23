@@ -8671,8 +8671,7 @@ private:
 void horseran_state::lcd_output_w(offs_t offset, u32 data)
 {
 	// only 3 rows used
-	if (offset <= 2)
-		m_display->matrix(1 << offset, data);
+	m_display->matrix(1 << offset, data);
 }
 
 void horseran_state::write_r(u32 data)

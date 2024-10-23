@@ -39,7 +39,7 @@ To Do:
   they involve changing the *vertical* scroll value of the layers
   each scanline (when you are about to die, in the solo game).
   In gogomile they weave the water backgrounds and do some
-  parallactic scrolling on later levels. *partly done, could do with
+  parallax scrolling on later levels. *partly done, could do with
   some tweaking
 
 - The scroll values are generally wrong when flip screen is on and rasters are often incorrect
@@ -197,16 +197,6 @@ TILE_GET_INFO_MEMBER(fuuki16_state::get_tile_info)
 
 
 ***************************************************************************/
-
-// Not used atm, seems to be fine without clearing pens?
-#if 0
-void fuuki16_state::fuuki16_palette(palette_device &palette) const
-{
-	// The game does not initialise the palette at startup. It should be totally black
-	for (int pen = 0; pen < palette.entries(); pen++)
-		palette.set_pen_color(pen, rgb_t:black());
-}
-#endif
 
 void fuuki16_state::video_start()
 {
@@ -714,7 +704,7 @@ void fuuki16_state::fuuki16(machine_config &config)
 	m_screen->set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_fuuki16);
-	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 0x4000 / 2);
+	PALETTE(config, m_palette, palette_device::BLACK).set_format(palette_device::xRGB_555, 0x4000 / 2);
 
 	FUUKI_VIDEO(config, m_fuukivid, 0);
 	m_fuukivid->set_palette(m_palette);
