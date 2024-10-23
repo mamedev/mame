@@ -15,7 +15,7 @@
     - Find how this HW drives the CRTC and verify timing of interrupts
 
     TODO:
-	- Convert TC0640FIO device to taito/taitoio.cpp
+    - Convert TC0640FIO device to taito/taitoio.cpp
 
     Taito custom chips on motherboard:
 
