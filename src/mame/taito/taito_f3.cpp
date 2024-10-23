@@ -14,6 +14,9 @@
     Other Issues:
     - Find how this HW drives the CRTC and verify timing of interrupts
 
+    TODO:
+    - Use TC0640FIO device implementation from taito/taitoio.cpp
+
     Taito custom chips on motherboard:
 
         TC0630FDP "Display Processor" - Graphics (sprites, playfields, prio, lineram...)
