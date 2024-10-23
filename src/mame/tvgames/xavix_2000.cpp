@@ -372,7 +372,7 @@ CONS( 2003, drgqst,   0,      0, xavix2000_i2c_24c08, ttv_lotr,    xavix_i2c_lot
 
 // チョロＱビュンビュンレーサー
 // lots broken, including attempting bad sprite DMAs, probably buggy xavix2000 opcodes
-CONS( 2003, tak_chq,  0,      0, xavix2000_i2c_24c04, xavix_i2c,   xavix_i2c_state,         init_xavix, "Takara / SSD Company LTD",      "Choro Q Byun Byun Racer (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+CONS( 2003, tak_chq,  0,      0, xavix2000_i2c_24c04, xavix_i2c,   xavix_i2c_state,         init_xavix, "Takara / SSD Company LTD",      "Choro-Q Byun Byun Racer (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
 // hangs after starting a game, check why
 // Let’s！TV プレイ　体感格闘ワンピースパンチバトル 　～海賊王にキミがなる！～ 
@@ -380,7 +380,7 @@ CONS( 2004, ban_onep, 0, 0, xavix2000_i2c_24c04, ttv_lotr,    xavix_i2c_lotr_sta
 
 // Let’s！TV プレイ　闘印奥義　 陰陽大戦記～目指せ最強闘神士～
 // stalls unless timers are disabled like epo_mini / epo_golf, 2004 date on PCB, 2005 ingame
-CONS( 2005, ban_omt,  0, 0, xavix2000_i2c_24c04, ttv_lotr,    xavix_i2c_lotr_state, init_epo_mini, "Bandai / SSD Company LTD",         "Let's! TV Play Onmyou Taisenki (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+CONS( 2005, ban_omt,  0, 0, xavix2000_i2c_24c04, ttv_lotr,    xavix_i2c_lotr_state, init_epo_mini, "Bandai / SSD Company LTD",         "Let's! TV Play Touin Ougi Onmyou Taisenki: Mezase Saikyou Toushinshi (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
 // ディズニープリンセス　キラキラ魔法のレッスン
 CONS( 2004, tom_dpgm, 0, 0, xavix2000_i2c_24c08, ttv_lotr,    xavix_i2c_lotr_state, init_xavix, "Tomy / SSD Company LTD",         "Disney Princess Kirakira Mahou no Lesson (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
