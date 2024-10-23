@@ -82,8 +82,8 @@ uint32_t pc9821_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap
 		}
 		else
 			m_hgdc[1]->screen_update(screen, bitmap, cliprect);
+		m_hgdc[0]->screen_update(screen, bitmap, cliprect);
 	}
-	m_hgdc[0]->screen_update(screen, bitmap, cliprect);
 
 	return 0;
 }

@@ -310,6 +310,8 @@ protected:
 	u8 m_vram_bank = 0;
 	u8 m_vram_disp = 0;
 
+	virtual void border_color_w(offs_t offset, u8 data);
+
 private:
 	UPD7220_DRAW_TEXT_LINE_MEMBER( hgdc_draw_text );
 
@@ -402,6 +404,8 @@ protected:
 
 	void pc9801rs_video_ff_w(offs_t offset, uint8_t data);
 	void pc9801rs_a0_w(offs_t offset, uint8_t data);
+
+	virtual void border_color_w(offs_t offset, u8 data) override;
 
 	uint8_t ide_ctrl_r();
 	void ide_ctrl_w(uint8_t data);

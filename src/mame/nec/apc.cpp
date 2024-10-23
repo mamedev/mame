@@ -212,9 +212,6 @@ UPD7220_DRAW_TEXT_LINE_MEMBER( apc_state::hgdc_draw_text )
 {
 	rgb_t const *const palette = m_palette->palette()->entry_list_raw();
 
-//  if(m_video_ff[DISPLAY_REG] == 0) //screen is off
-//      return;
-
 //  uint8_t interlace_on = m_video_reg[2] == 0x10; /* TODO: correct? */
 	uint8_t char_size = 19;
 
@@ -305,7 +302,7 @@ uint8_t apc_state::apc_port_28_r(offs_t offset)
 	{
 		if(offset & 4)
 		{
-			printf("Read undefined port %02x\n",offset+0x28);
+			logerror("Read undefined port %02x\n",offset+0x28);
 			res = 0xff;
 		}
 		else
@@ -322,7 +319,7 @@ void apc_state::apc_port_28_w(offs_t offset, uint8_t data)
 	else
 	{
 		if(offset & 4)
-			printf("Write undefined port %02x\n",offset+0x28);
+			logerror("Write undefined port %02x\n",offset+0x28);
 		else
 			m_i8259_s->write((offset & 2) >> 1, data);
 	}
@@ -366,7 +363,7 @@ uint8_t apc_state::apc_kbd_r(offs_t offset)
 
 void apc_state::apc_kbd_w(offs_t offset, uint8_t data)
 {
-	printf("KEYB %08x %02x\n",offset,data);
+	logerror("KEYB %08x %02x\n",offset,data);
 }
 
 void apc_state::apc_dma_segments_w(offs_t offset, uint8_t data)
@@ -434,7 +431,7 @@ uint8_t apc_state::apc_rtc_r()
 	/*
 	bit 1 high: low battery.
 	*/
-	//fprintf(stderr, "RTC Read: %d\n", m_rtc->data_out_r());
+	//logerror("RTC Read: %d\n", m_rtc->data_out_r());
 	return m_rtc->data_out_r();
 }
 
@@ -465,7 +462,7 @@ RTC write bits: 76543210
                 |\------- "don't care"
                 \-------- ///
 */
-	if (data&0xc0) fprintf(stderr,"RTC write: 0x%02x\n", data);
+	if (data&0xc0) logerror("RTC write: 0x%02x\n", data);
 	m_rtc->c0_w(BIT(data, 0)); // correct assuming theres a delay for changing command lines before stb
 	m_rtc->c1_w(BIT(data, 1)); // "
 	m_rtc->c2_w(BIT(data, 2)); // "
@@ -854,7 +851,7 @@ void apc_state::apc_dma_hrq_changed(int state)
 
 	m_dmac->hack_w(state);
 
-//  printf("%02x HLDA\n",state);
+//  logerror("%02x HLDA\n",state);
 }
 
 void apc_state::apc_tc_w(int state)
@@ -862,7 +859,7 @@ void apc_state::apc_tc_w(int state)
 	/* floppy terminal count */
 	m_fdc->tc_w(state);
 
-//  printf("TC %02x\n",state);
+//  logerror("TC %02x\n",state);
 }
 
 uint8_t apc_state::apc_dma_read_byte(offs_t offset)
@@ -870,7 +867,7 @@ uint8_t apc_state::apc_dma_read_byte(offs_t offset)
 	address_space &program = m_maincpu->space(AS_PROGRAM);
 	offs_t addr = (m_dma_offset[m_dack] << 16) | offset;
 
-//  printf("%08x\n",addr);
+//  logerror("%08x\n",addr);
 
 	return program.read_byte(addr);
 }
@@ -881,7 +878,7 @@ void apc_state::apc_dma_write_byte(offs_t offset, uint8_t data)
 	address_space &program = m_maincpu->space(AS_PROGRAM);
 	offs_t addr = (m_dma_offset[m_dack] << 16) | offset;
 
-//  printf("%08x %02x\n",addr,data);
+//  logerror("%08x %02x\n",addr,data);
 
 	program.write_byte(addr, data);
 }
@@ -891,10 +888,10 @@ inline void apc_state::set_dma_channel(int channel, int state)
 	if (!state) m_dack = channel;
 }
 
-void apc_state::apc_dack0_w(int state) { /*printf("%02x 0\n",state);*/ set_dma_channel(0, state); }
-void apc_state::apc_dack1_w(int state) { /*printf("%02x 1\n",state);*/ set_dma_channel(1, state); }
-void apc_state::apc_dack2_w(int state) { /*printf("%02x 2\n",state);*/ set_dma_channel(2, state); }
-void apc_state::apc_dack3_w(int state) { /*printf("%02x 3\n",state);*/ set_dma_channel(3, state); }
+void apc_state::apc_dack0_w(int state) { /*logerror("%02x 0\n",state);*/ set_dma_channel(0, state); }
+void apc_state::apc_dack1_w(int state) { /*logerror("%02x 1\n",state);*/ set_dma_channel(1, state); }
+void apc_state::apc_dack2_w(int state) { /*logerror("%02x 2\n",state);*/ set_dma_channel(2, state); }
+void apc_state::apc_dack3_w(int state) { /*logerror("%02x 3\n",state);*/ set_dma_channel(3, state); }
 
 /*
 CH0: CRT

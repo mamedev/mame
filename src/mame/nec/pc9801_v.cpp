@@ -32,8 +32,10 @@ uint32_t pc9801_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap
 
 	/* graphics */
 	if(m_video_ff[DISPLAY_REG] != 0)
+	{
 		m_hgdc[1]->screen_update(screen, bitmap, cliprect);
-	m_hgdc[0]->screen_update(screen, bitmap, cliprect);
+		m_hgdc[0]->screen_update(screen, bitmap, cliprect);
+	}
 
 	return 0;
 }
@@ -82,9 +84,6 @@ void pc9801_state::draw_text(bitmap_rgb32 &bitmap, uint32_t addr, int y, int wd,
 {
 	rgb_t const *const palette = m_palette->palette()->entry_list_raw();
 
-	if(m_video_ff[DISPLAY_REG] == 0) //screen is off
-		return;
-
 //  uint8_t interlace_on = m_video_ff[INTERLACE_REG];
 	uint8_t char_size = m_video_ff[FONTSEL_REG] ? 16 : 8;
 
@@ -126,7 +125,8 @@ void pc9801_state::draw_text(bitmap_rgb32 &bitmap, uint32_t addr, int y, int wd,
 			if((tile & 0x7e00) == 0x5600)
 			{
 				// ikochan (karaoke intro) and mightyhd (game start and gameplay)
-				// draws these PCG strips where first tile is identical to second, with LR disabled.
+				// draws these PCG strips where first tile is identical to second,
+				// with LR disabled on both but expecting the right half at the repetition anyway.
 				// TODO: what happens with LR enabled?
 				if(lasttile == (tile | knj_tile))
 				{
@@ -473,6 +473,25 @@ void pc9801_state::pc9801_a0_w(offs_t offset, uint8_t data)
 	}
 }
 
+void pc9801_state::border_color_w(offs_t offset, u8 data)
+{
+	if (data & ~1)
+		logerror("border_color_w [%02x] %02x\n", offset + 1, data);
+}
+
+void pc9801vm_state::border_color_w(offs_t offset, u8 data)
+{
+	pc9801_state::border_color_w(offset, data);
+	if (offset)
+	{
+		// 24.83/15.75 kHz selector, available for everything but vanilla class
+		// TODO: verify clock for 200 line mode (handtuned), verify that vanilla effectively cannot select it thru dips.
+		const XTAL screen_clock = (data & 1 ? XTAL(21'052'600) : (XTAL(21'052'600) / 3) * 2) / 8;
+
+		m_hgdc[0]->set_unscaled_clock(screen_clock);
+		m_hgdc[1]->set_unscaled_clock(screen_clock);
+	}
+}
 
 /*************************************************
  *
