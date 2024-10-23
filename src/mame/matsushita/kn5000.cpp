@@ -151,8 +151,8 @@ void kn5000_state::maincpu_mem(address_map &map)
 	map(0x200000, 0x2fffff).noprw(); // Extension board goes here.
 	map(0x300000, 0x3fffff).rom().region("custom_data", 0); // 8MBit FLASH ROM @ IC19 (CS5)
 	map(0x400000, 0x7fffff).rom().region("rhythm_data", 0); // 32MBit ROM @ IC14 (A22=1 and CS5)
-	map(0x800000, 0x82ffff).rom().region("subprogram", 0); // not sure yet in which chip this is stored, but I suspect it should be IC19
-//  map(0xc00000, 0xdfffff).mirror(0x200000).rom().region("table_data", 0); //2 * 8MBit ROMs @ IC1, IC3 (CS2)
+	//map(0x800000, 0x82ffff).rom().region("subprogram", 0); // not sure yet in which chip this is stored, but I suspect it should be IC19
+	map(0x800000, 0x9fffff).mirror(0x200000).rom().region("table_data", 0); //2 * 8MBit ROMs @ IC1, IC3 (CS2)
 	map(0xe00000, 0xffffff).mask(0x1fffff).rom().region("program", 0); //2 * 8MBit FLASH ROMs @ IC4, IC6
 }
 
@@ -814,8 +814,8 @@ ROM_START(kn5000)
 	ROM_FILL(0x01ff03, 1, 0x00)
 
 	ROM_REGION16_LE(0x200000, "table_data", 0)
-	ROM_LOAD16_BYTE("kn5000_table_data_rom_even.ic3", 0x000000, 0x100000, NO_DUMP)
-	ROM_LOAD16_BYTE("kn5000_table_data_rom_odd.ic1",  0x000001, 0x100000, CRC(cd907eac) SHA1(bedf09d606d476f3e6d03e590709715304cf7ea5))
+	ROM_LOAD32_WORD("kn5000_table_data_rom_even.ic3", 0x000000, 0x100000, CRC(b6f0becd) SHA1(1fd2604236b8d12ea7281fad64d72746eb00c525))
+	ROM_LOAD32_WORD("kn5000_table_data_rom_odd.ic1",  0x000002, 0x100000, CRC(cd907eac) SHA1(bedf09d606d476f3e6d03e590709715304cf7ea5))
 
 	ROM_REGION16_LE(0x100000, "custom_data", 0)
 	ROM_LOAD("kn5000_custom_data_rom.ic19", 0x000000, 0x100000, CRC(5de11a6b) SHA1(4709f815d3d03ce749c51f4af78c62bf4a5e3d94))
