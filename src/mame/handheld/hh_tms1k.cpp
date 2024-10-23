@@ -8639,11 +8639,12 @@ ROM_END
   * TMS1100NLL MP3491-N2 (die label: 1100E, MP3491)
   * HLCD0569, 67-segment LCD panel, no sound
 
-  This handheld is not a toy, read the manual for more information. In short,
-  it is a device for predicting the winning chance of a gambling horserace.
+  This handheld is not a toy, read the manual for more information, and patent
+  US4382280 for more in-depth information. In short, it is a device for predicting
+  the winning chance of a gambling horserace.
 
-  It was rereleased in 1994 in China/Canada by AHTI(Advanced Handicapping
-  Technologies, Inc.), on a Hitachi HD613901.
+  It was rereleased in 1994 in China/Canada by AHTI (Advanced Handicapping
+  Technologies, Inc.), on a Hitachi HD613901 (LCD-IV).
 
 *******************************************************************************/
 
@@ -8670,15 +8671,8 @@ private:
 void horseran_state::lcd_output_w(offs_t offset, u32 data)
 {
 	// only 3 rows used
-	if (offset > 2)
-		return;
-
-	// update lcd segments
-	m_display->matrix_partial(0, 3, 1 << offset, data);
-
-	// col5-11 and col13-19 are 7segs
-	for (int i = 0; i < 2; i++)
-		m_display->write_row(3 + (offset << 1 | i), bitswap<8>(data >> (4+8*i),7,3,5,2,0,1,4,6) & 0x7f);
+	if (offset <= 2)
+		m_display->matrix(1 << offset, data);
 }
 
 void horseran_state::write_r(u32 data)
@@ -8781,8 +8775,7 @@ void horseran_state::horseran(machine_config &config)
 	HLCD0569(config, m_lcd, 1100); // C=0.022uF
 	m_lcd->write_cols().set(FUNC(horseran_state::lcd_output_w));
 
-	PWM_DISPLAY(config, m_display).set_size(3+6, 24);
-	m_display->set_segmask(0x3f<<3, 0x7f);
+	PWM_DISPLAY(config, m_display).set_size(3, 24);
 
 	// no sound!
 }
@@ -8798,8 +8791,8 @@ ROM_START( horseran )
 	ROM_REGION( 365, "maincpu:opla", 0 ) // unused
 	ROM_LOAD( "tms1100_horseran_output.pla", 0, 365, CRC(0fea09b0) SHA1(27a56fcf2b490e9a7dbbc6ad48cc8aaca4cada94) )
 
-	ROM_REGION( 284940, "screen", 0)
-	ROM_LOAD( "horseran.svg", 0, 284940, CRC(eef5230d) SHA1(bafc3f7ac8052a4aafd7af80920e8a781c3898e4) )
+	ROM_REGION( 285857, "screen", 0)
+	ROM_LOAD( "horseran.svg", 0, 285857, CRC(2835acc5) SHA1(4fe19b4f902249ea9fb3e3baea704d4a7b9c897a) )
 ROM_END
 
 
