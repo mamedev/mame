@@ -21,6 +21,8 @@
 
 #include "bitmap.h"
 
+#include "softlist_dev.h"
+
 
 namespace {
 
@@ -177,6 +179,8 @@ void xbox_state::xbox(machine_config &config)
 	SPEAKER(config, "mono").front_center();
 
 	OHCI_GAME_CONTROLLER(config, "ohci_gamepad", 0);
+
+	SOFTWARE_LIST(config, "xbox_hdd_list").set_original("xbox_hdd");
 }
 
 
