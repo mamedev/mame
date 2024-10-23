@@ -111,6 +111,7 @@ static INPUT_PORTS_START( xavix_i2c )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("i2cmem", FUNC(i2cmem_device::read_sda))
 INPUT_PORTS_END
 
+
 static INPUT_PORTS_START( epo_ebox )
 	PORT_INCLUDE(xavix)
 
@@ -186,6 +187,7 @@ static INPUT_PORTS_START( ttv_lotr )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("i2cmem", FUNC(i2cmem_device::read_sda))
 INPUT_PORTS_END
 
+
 static INPUT_PORTS_START( ttv_mx )
 	PORT_INCLUDE(xavix_i2c)
 
@@ -251,6 +253,7 @@ void xavix_i2c_state::xavix2000_i2c_24c02(machine_config &config)
 
 
 
+
 ROM_START( epo_sdb )
 	ROM_REGION(0x400000, "bios", ROMREGION_ERASE00)
 	ROM_LOAD("superdashball.bin", 0x000000, 0x400000, CRC(a004a764) SHA1(47a96822d4d7d6a0f6be5cd729c3747dbab65979) )
@@ -266,10 +269,26 @@ ROM_START( epo_bowl )
 	ROM_LOAD("bowling.bin", 0x000000, 0x200000, CRC(d34f8d9e) SHA1(ebe3792172dc43904b9226beb27f1da89d2388cc) )
 ROM_END
 
+ROM_START( epo_golf ) // GLFJ MAIN-03
+	ROM_REGION(0x400000, "bios", ROMREGION_ERASE00)
+	ROM_LOAD("golf.bin", 0x000000, 0x400000, CRC(d1f231cf) SHA1(9421836a6bc4af9ee1fc7a402d62b2fb4dbcdefc) )
+ROM_END
+
+ROM_START( ban_omt ) // OMTJ MAIN-07
+	ROM_REGION(0x800000, "bios", ROMREGION_ERASE00)
+	ROM_LOAD("otmj.bin", 0x000000, 0x400000, CRC(1c1dc6fb) SHA1(d0cf1345b765d66ca9a0870ee6d0e3ccd84a8c0b) )
+ROM_END
+
 ROM_START( ttv_sw )
 	ROM_REGION( 0x800000, "bios", ROMREGION_ERASE00 )
 	ROM_LOAD( "jedi.bin", 0x000000, 0x800000, CRC(51cae5fd) SHA1(1ed8d556f31b4182259ca8c766d60c824d8d9744) )
 ROM_END
+
+ROM_START( ttv_swj )
+	ROM_REGION( 0x800000, "bios", ROMREGION_ERASE00 )
+	ROM_LOAD( "lightsaber.bin", 0x000000, 0x800000, CRC(a5c22ed0) SHA1(406f0bccb01cd4a26fe4a5675d7ebecc78c58147) )
+ROM_END
+
 
 ROM_START( ttv_lotr )
 	ROM_REGION( 0x800000, "bios", ROMREGION_ERASE00 )
@@ -284,6 +303,16 @@ ROM_END
 ROM_START( drgqst )
 	ROM_REGION( 0x800000, "bios", ROMREGION_ERASE00 )
 	ROM_LOAD( "dragonquest.bin", 0x000000, 0x800000, CRC(3d24413f) SHA1(1677e81cedcf349de7bf091a232dc82c6424efba) )
+ROM_END
+
+ROM_START( epo_mini )
+	ROM_REGION( 0x400000, "bios", ROMREGION_ERASE00 )
+	ROM_LOAD( "minimoni.u1", 0x000000, 0x400000, CRC(2adb01ee) SHA1(987218b6799195ba15adf39885c1d177c381ec26) )
+ROM_END
+
+ROM_START( tak_chq )
+	ROM_REGION( 0x400000, "bios", ROMREGION_ERASE00 )
+	ROM_LOAD( "choroq.u2", 0x000000, 0x400000, CRC(ffd2eb95) SHA1(a30884da5554483ebfd0009cf5dd1768be8a99cb) )
 ROM_END
 
 ROM_START( ban_onep )
@@ -302,6 +331,13 @@ ROM_START( tom_dpgm )
 ROM_END
 
 
+void xavix_i2c_lotr_state::init_epo_mini()
+{
+	init_xavix();
+	m_disable_timer_irq_hack = true;
+}
+
+
 // doesn't use extra opcodes?
 // K.O.しようぜ！エキサイトボクシング
 CONS( 2002, epo_ebox, 0, 0, xavix2000_nv,        epo_ebox,    xavix_state,             init_xavix, "Epoch / SSD Company LTD",       "Excite Boxing (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND ) // doesn't use XaviX2000 extra opcodes, but had that type of CPU
@@ -309,6 +345,14 @@ CONS( 2002, epo_ebox, 0, 0, xavix2000_nv,        epo_ebox,    xavix_state,      
 // die not confirmed, but uses extra opcodes.  (hangs on title screen due to combination of freq_timer_done nested interrupts tripping, and waiting on bits in input ports to change
 // ストライクきめるぜ！ エキサイトボウリング
 CONS( 2002, epo_bowl, 0, 0, xavix2000_i2c_24c04, epo_bowl,    xavix_i2c_state,         init_xavix, "Epoch / SSD Company LTD",       "Excite Bowling (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+
+// スーパーショット！ エキサイトゴルフ
+// needs timer irq hack to boot, fails to draw main menu properly (buggy xavix2000 opcodes?)  (2002 date on PCB, 2003 ingame)
+CONS( 2003, epo_golf, 0,       0, xavix2000_i2c_24c04, ttv_lotr,   xavix_i2c_lotr_state, init_epo_mini, "Epoch / SSD Company LTD",       "Super Shot! Excite Golf (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+
+// ミニモニ。パーティ！リズムでぴょん！
+// needs timer irq hack to boot
+CONS( 2003, epo_mini, 0,       0, xavix2000_i2c_24c08, ttv_lotr,   xavix_i2c_lotr_state, init_epo_mini, "Epoch / SSD Company LTD",        "mini-moni Party! Rhythm de Pyon! (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
 // takes a long time to boot to a card scanner error
 // This is a product in the Duel Masters line called Duel Station; the boot up screen calls it Duel Station, title logo is Duel Masters
@@ -319,15 +363,24 @@ CONS( 2003, duelmast, 0, 0, xavix2000_i2c_24c04, duelmast,    xavix_duelmast_sta
 // スーパーダッシュボール
 CONS( 2004, epo_sdb,  0, 0, xavix2000_nv_sdb,    epo_sdb,     xavix_2000_nv_sdb_state, init_xavix, "Epoch / SSD Company LTD",       "Super Dash Ball (Japan)",  MACHINE_IMPERFECT_SOUND )
 
-CONS( 2005, ttv_sw,   0, 0, xavix2000_i2c_24c02, ttv_lotr,    xavix_i2c_lotr_state,    init_xavix, "Tiger / SSD Company LTD",       "Star Wars Saga Edition - Lightsaber Battle Game", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
-CONS( 2005, ttv_lotr, 0, 0, xavix2000_i2c_24c02, ttv_lotr,    xavix_i2c_lotr_state,    init_xavix, "Tiger / SSD Company LTD",       "Lord Of The Rings - Warrior of Middle-Earth", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
-CONS( 2005, ttv_mx,   0, 0, xavix2000_i2c_24c04, ttv_mx,      xavix_i2c_state,         init_xavix, "Tiger / SSD Company LTD",       "MX Dirt Rebel", MACHINE_IMPERFECT_SOUND )
+CONS( 2005, ttv_sw,   0,      0, xavix2000_i2c_24c02, ttv_lotr,    xavix_i2c_lotr_state,    init_xavix, "Tiger / SSD Company LTD",       "Star Wars Saga Edition - Lightsaber Battle Game", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+CONS( 2005, ttv_swj,  ttv_sw, 0, xavix2000_i2c_24c02, ttv_lotr,    xavix_i2c_lotr_state,    init_xavix, "Tomy / SSD Company LTD",        "Star Wars Saga Edition - Lightsaber Battle Game (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+CONS( 2005, ttv_lotr, 0,      0, xavix2000_i2c_24c02, ttv_lotr,    xavix_i2c_lotr_state,    init_xavix, "Tiger / SSD Company LTD",       "Lord Of The Rings - Warrior of Middle-Earth", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+CONS( 2005, ttv_mx,   0,      0, xavix2000_i2c_24c04, ttv_mx,      xavix_i2c_state,         init_xavix, "Tiger / SSD Company LTD",       "MX Dirt Rebel", MACHINE_IMPERFECT_SOUND )
 // 剣神ドラゴンクエスト 甦りし伝説の剣 
-CONS( 2003, drgqst,   0, 0, xavix2000_i2c_24c08, ttv_lotr,    xavix_i2c_lotr_state,    init_xavix, "Square Enix / SSD Company LTD", "Kenshin Dragon Quest: Yomigaerishi Densetsu no Ken", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+CONS( 2003, drgqst,   0,      0, xavix2000_i2c_24c08, ttv_lotr,    xavix_i2c_lotr_state,    init_xavix, "Square Enix / SSD Company LTD", "Kenshin Dragon Quest: Yomigaerishi Densetsu no Ken (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+
+// チョロＱビュンビュンレーサー
+// lots broken, including attempting bad sprite DMAs, probably buggy xavix2000 opcodes
+CONS( 2003, tak_chq,  0,      0, xavix2000_i2c_24c04, xavix_i2c,   xavix_i2c_state,         init_xavix, "Takara / SSD Company LTD",      "Choro-Q Byun Byun Racer (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
 // hangs after starting a game, check why
 // Let’s！TV プレイ　体感格闘ワンピースパンチバトル 　～海賊王にキミがなる！～ 
 CONS( 2004, ban_onep, 0, 0, xavix2000_i2c_24c04, ttv_lotr,    xavix_i2c_lotr_state, init_xavix, "Bandai / SSD Company LTD",         "Let's! TV Play One Piece Punch Battle (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+
+// Let’s！TV プレイ　闘印奥義　 陰陽大戦記～目指せ最強闘神士～
+// stalls unless timers are disabled like epo_mini / epo_golf, 2004 date on PCB, 2005 ingame
+CONS( 2005, ban_omt,  0, 0, xavix2000_i2c_24c04, ttv_lotr,    xavix_i2c_lotr_state, init_epo_mini, "Bandai / SSD Company LTD",         "Let's! TV Play Touin Ougi Onmyou Taisenki: Mezase Saikyou Toushinshi (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
 // ディズニープリンセス　キラキラ魔法のレッスン
 CONS( 2004, tom_dpgm, 0, 0, xavix2000_i2c_24c08, ttv_lotr,    xavix_i2c_lotr_state, init_xavix, "Tomy / SSD Company LTD",         "Disney Princess Kirakira Mahou no Lesson (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )

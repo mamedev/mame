@@ -510,6 +510,9 @@ void xavix_state::draw_sprites_line(screen_device &screen, bitmap_rgb32 &bitmap,
 {
 	int alt_addressing = 0;
 
+	// some games have the top bit set, why?
+	m_spritereg &= 0x7f;
+
 	if ((m_spritereg == 0x00) || (m_spritereg == 0x01))
 	{
 		// 8-bit addressing  (Tile Number)
@@ -928,7 +931,8 @@ void xavix_state::spritefragment_dma_trg_w(uint8_t data)
 
 	if (unk)
 	{
-		fatalerror("m_spritefragment_dmaparam2[1] != 0x00 (is %02x)\n", m_spritefragment_dmaparam2[1]);
+		// tak_chq triggers this, but probably due to bad xavix2000 opcodes, as many things look invalid
+		logerror("m_spritefragment_dmaparam2[1] != 0x00 (is %02x)\n", m_spritefragment_dmaparam2[1]);
 	}
 
 	if (len == 0x00)

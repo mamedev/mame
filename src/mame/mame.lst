@@ -45853,6 +45853,7 @@ epo_epp                         //
 epo_epp2
 epo_epp3                        //
 epo_eppk                        //
+epo_epps                        //
 epo_esdx                        //
 epo_esht                        //
 epo_guru                        //
@@ -45863,6 +45864,7 @@ epo_quiz                        //
 epo_strk                        //
 epo_tenn                        //
 epo_tfp2                        //
+epo_tp2p                        //
 evio                            //
 gcslottv                        //
 gungunad                        //
@@ -45909,9 +45911,11 @@ tak_comt                        //
 tak_daig
 tak_gin                         //
 tak_geig                        //
+tak_hamr                        //
 tcarnavi                        //
 tomcpin                         //
 tomshoot                        //
+tomthr                          //
 tomplc                          //
 tvpc_dor
 tvpc_ham
@@ -45923,16 +45927,21 @@ domfitad                        //
 dombikec                        //
 
 @source:tvgames/xavix_2000.cpp
+ban_omt                         //
+ban_onep                        //
+drgqst                          //
 duelmast                        //
-epo_ebox                        //
 epo_bowl                        //
+epo_ebox                        //
+epo_golf                        //
+epo_mini                        //
 epo_sdb                         //
+tak_chq                         //
 tom_dpgm                        //
-ttv_sw                          //
 ttv_lotr                        //
 ttv_mx                          //
-drgqst                          //
-ban_onep                        //
+ttv_sw                          //
+ttv_swj                         //
 
 @source:tvgames/xavix_2002.cpp
 domdance                        //
@@ -45942,6 +45951,7 @@ domstepc                        //
 epo_tfit
 mrangbat
 suprtvpc
+suprtvpcdo
 suprtvpchk
 tmy_thom                        //
 udance

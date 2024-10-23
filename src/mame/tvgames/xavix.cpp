@@ -35,12 +35,12 @@
     2011        anpan-man kazoku de ikunou mat DX /JoyPalette/Japan                                             -           -               -           -               -                   -                       -
     2009        anpan-man pyon-pyon ikunou mat /JoyPalette/Japan                                                -           -               -           -               -                   -                       -
     2008        kyuukyoku! kinniku grand slam! SASUKE kanzen seiha /EPOCH/Japan                                 -           -               -           -               -                   -                       -
-    2007        Tokyo Friend park? perfect! mezase! grand slam! /EPOCH/Japan                                    -           -               -           -               -                   -                       -
+    2007        Tokyo Friend Park II Perfect! Mezase! Grand Slam!! /EPOCH/Japan                                 -           -               -           -               -                   -                       -
     2006    1   Let's TV Play series "Kamen Rider Kabuto" /EPOCH/Japan                                          -           -               -           -               -                   -                       -
             2   Let's TV Play series "Bo-kenger" /EPOCH/Japan                                                   -           -               -           -               -                   -                       -
             3   Challenge Ai-chan! Exciting Ping-pong /TAKARATOMY/Japan                                         -           -               -           -               -                   -                       dumped
             4   Sasuke & Sportsman Tournament /BANDAI/Japan                                                     -           -               -           -               -                   -                       -
-            5   Hyper resque, I am a resque team /BANDAI/Japan                                                  -           -               -           -               -                   -                       -
+            5   TV de  Asobitai Hyper Rescue - Boku wa Kyuujotai /BANDAI/Japan                                  -           -               -           -               -                   -                       -
             6   Let's TV Play series "Ultraman" /BANDAI/Japan                                                   -           -               -           -               -                   -                       -
             7   Let's TV Play Classic series "Namco Nostalgia 1" /BANDAI/Japan                                  CGSJ        x8              48          1M              24LC04                                      dumped non destructively
             8   Let's TV Play Classic series "Namco Nostalgia 2" /BANDAI/Japan                                  CGSJ        x8              48          1M              24LC04              SSD 98 PL7351-181       dumped
@@ -554,6 +554,19 @@ static INPUT_PORTS_START( epo_mms )
 
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( tak_hamr )
+	PORT_INCLUDE(xavix_i2c)
+
+	PORT_MODIFY("IN0")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(1) PORT_NAME("Player 1 - Green (Left)")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(1) PORT_NAME("Player 1 - Yellow (Middle)")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_PLAYER(1) PORT_NAME("Player 1 - Red (Right)")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(2) PORT_NAME("Player 2 - Green (Left)")
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(2) PORT_NAME("Player 2 - Yellow (Middle)")
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_PLAYER(2) PORT_NAME("Player 2 - Red (Right)")
+
+INPUT_PORTS_END
+
 static INPUT_PORTS_START( tomshoot )
 	PORT_INCLUDE(xavix_i2c)
 
@@ -612,6 +625,38 @@ static INPUT_PORTS_START( tomplc )
 
 	// are you expected to say something when this is held? game makes a crackle and doesn't act like you said anything
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_NAME("Speak")
+
+	PORT_MODIFY("AN0")
+	// all bits in this port seem to be the microphone input, the game just needs to register a large enough value when the button is pressed
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_BUTTON6 ) PORT_NAME("Microphone In")
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( tomthr )
+	PORT_INCLUDE(xavix)
+
+	PORT_MODIFY("IN0")
+	// not an actual joystick, this is a forward / backwards level, and a digital wheel
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_NAME("Move Forwards")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_NAME("Move Backwards")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_NAME("Steer Left") // steering is digital?
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_NAME("Steer Right")
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Horn / Select")
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Ignition Key")
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("Map")
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_NAME("Wipers")
+
+	PORT_MODIFY("IN1")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_NAME("Headlights")
+
+	PORT_MODIFY("AN0")
+	// all bits in this port seem to be the microphone input, the game just needs to register a large enough value when the button is pressed
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_BUTTON6 ) PORT_NAME("Microphone In")
+
+	PORT_MODIFY("AN5")
+	// read during attract demo
+
+	PORT_MODIFY("AN7")
+	// battery status?
 INPUT_PORTS_END
 
 
@@ -1258,6 +1303,18 @@ static INPUT_PORTS_START( epo_tfp2 )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_START2 ) PORT_NAME("Player 2 Start / Blue")
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( epo_tp2p )
+	PORT_INCLUDE(xavix)
+
+	PORT_MODIFY("IN0")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Player 1 Left") PORT_PLAYER(1)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Player 1 Right") PORT_PLAYER(1)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START1 ) PORT_NAME("Player 1 Start")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Player 2 Left") PORT_PLAYER(2)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Player 2 Right") PORT_PLAYER(2)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_START2 ) PORT_NAME("Player 2 Start")
+INPUT_PORTS_END
+
 static INPUT_PORTS_START( tvpc_tom )
 	PORT_INCLUDE(xavix_i2c)
 INPUT_PORTS_END
@@ -1575,6 +1632,17 @@ void xavix_i2c_state::xavix_i2c_24c02_43mhz(machine_config &config)
 	// even if extra opcodes are not being used.
 	m_maincpu->set_clock(MAIN_CLOCK * 2);
 }
+
+void xavix_state::xavix_43mhz(machine_config &config)
+{
+	xavix(config);
+
+	// tomthr crashes when you start the game at regular clock speeds
+	// this could indicate that it's actually one of the newer chips
+	// even if extra opcodes are not being used.
+	m_maincpu->set_clock(MAIN_CLOCK * 2);
+}
+
 
 
 void xavix_i2c_state::xavix_i2c_24lc04(machine_config &config)
@@ -1997,6 +2065,11 @@ ROM_START( epo_epp )
 	ROM_LOAD("excitepingpong.bin", 0x000000, 0x100000, CRC(1fdb9cbd) SHA1(8ed0c1f6d2708ab6e79f0b9553e587c6446e8338) )
 ROM_END
 
+ROM_START( epo_epps )
+	ROM_REGION(0x100000, "bios", ROMREGION_ERASE00)
+	ROM_LOAD("excitepingpong_special.bin", 0x000000, 0x100000, CRC(d59c4b44) SHA1(5a48b9046a1d1beb10972fc1d41d6d63fe829465) )
+ROM_END
+
 ROM_START( epo_eppk )
 	ROM_REGION(0x100000, "bios", ROMREGION_ERASE00)
 	ROM_LOAD("sonokongpingpong.bin", 0x000000, 0x100000, CRC(ea81ced6) SHA1(ef8961d3670148501a478c17cd09f5088e32ad41) )
@@ -2104,6 +2177,11 @@ ROM_END
 ROM_START( tomplc )
 	ROM_REGION(0x400000, "bios", ROMREGION_ERASE00)
 	ROM_LOAD("imaplayrailconductor.bin", 0x000000, 0x400000, CRC(b775d0ed) SHA1(33142509b11bbe45b0b9222232033dd64ef01ff2) )
+ROM_END
+
+ROM_START( tomthr ) // THRJ MAIN PCB   REV 0.6
+	ROM_REGION(0x400000, "bios", ROMREGION_ERASE00)
+	ROM_LOAD("thrj.u4", 0x000000, 0x400000, CRC(a7e8dc74) SHA1(676b2a905b757356c6c1dfe3f10148484caa44c5) )
 ROM_END
 
 ROM_START( gungunad )
@@ -2258,6 +2336,11 @@ ROM_START( epo_tfp2 )
 	ROM_LOAD( "funpark2.u1", 0x000000, 0x400000, CRC(97ad5183) SHA1(77310b42d0a015838a1cef4eb5e74cc8335284d1) )
 ROM_END
 
+ROM_START( epo_tp2p ) // TF3J MAIN PCB 01
+	ROM_REGION( 0x800000, "bios", ROMREGION_ERASE00 )
+	ROM_LOAD( "grandslam.u3", 0x000000, 0x800000, CRC(d458ee01) SHA1(dd1a85d822121c46f89ca013fa56c482ab411c6e) )
+ROM_END
+
 ROM_START( epo_tenn )
 	ROM_REGION(0x800000, "bios", ROMREGION_ERASE00)
 	ROM_LOAD( "excitetennis.u4", 0x000000, 0x100000, CRC(10b0e1dd) SHA1(ba438201434f2b51792b119a3e3d07cc3e53b89a) )
@@ -2290,6 +2373,10 @@ ROM_START( tak_gin ) // dumped from a PCB with 1x ROM Glob with TSOP pads, 1x un
 	ROM_LOAD( "snowboard.bin", 0x000000, 0x200000, CRC(79fdeae3) SHA1(ab08790e95cdccf3541ecbddb87ebf0dedb3718b) )
 ROM_END
 
+ROM_START( tak_hamr ) // HAMJ MAIN on PCB
+	ROM_REGION(0x400000, "bios", ROMREGION_ERASE00 )
+	ROM_LOAD( "hamj.u4", 0x000000, 0x400000, CRC(2f4f5270) SHA1(dfb75f0d20247cf1c886840149c7cf91780ae1b9) )
+ROM_END
 
 
 /* XaviX hardware titles (1st Generation)
@@ -2385,6 +2472,10 @@ CONS( 2001, epo_hamd,  0,          0,  xavix,            xavix,    xavix_state, 
 CONS( 2000, epo_epp,   0,          0,  xavix,            epo_epp,  xavix_state,          init_xavix,    "Epoch / SSD Company LTD",                      "Takkyuu Yarouze! Excite Ping Pong (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 CONS( 2000, epo_eppk,  epo_epp,    0,  xavix,            epo_epp,  xavix_state,          init_xavix,    "Epoch / SSD Company LTD / Sonokong",           "Real Ping Pong (Korea)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
+// しゃもじdeピンポン
+// This special version of Excite Ping Pong was a competition prize, not a retail product.  The competition was sponsored by ミツカン (Mizkan)
+CONS( 2001, epo_epps,  0,          0,  xavix,            epo_epp,  xavix_state,          init_xavix,    "Epoch / Mizkan / SSD Company LTD",             "Shamoji de Ping Pong (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+
 // 卓球やろうぜ！ エキサイトピンポン2
 CONS( 2003, epo_epp2,   0,         0,  xavix,            epo_epp,  xavix_state,          init_xavix,    "Epoch / SSD Company LTD",                      "Takkyuu Yarouze! Excite Ping Pong 2 (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
@@ -2423,6 +2514,9 @@ CONS( 2001, tak_comt,  0,          0,  xavix_nv,         tak_comt,  xavix_state,
 // 爆進スノボ ギンギンボーダーズ
 CONS( 2001, tak_gin,   0,          0,  xavix,            tak_gin,  xavix_state,          init_xavix,    "Takara / SSD Company LTD",                     "Bakushin Sno-Bo - Gingin Boarders (Japan)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_COLORS )
 
+// ぽこぽこハンマーズ 
+CONS( 2002, tak_hamr,  0,          0,  xavix_i2c_24c02,  tak_hamr, xavix_i2c_state,      init_xavix,    "Takara / SSD Company LTD",                     "Poko Poko Hammers (Japan)", MACHINE_IMPERFECT_SOUND )
+
 // was also distributed by Atlus as an arcade cabinet in 2005, ROM almost certainly different (this one will auto-power off after inactivity, an arcade wouldn't do that)
 // ジャラジャランド
 CONS( 2003, jarajal,   0,          0,  xavix_nv,         jarajal,  xavix_state,          init_xavix,    "Takara / SSD Company LTD",                     "Jyarajyaland (Japan, PlugIt! version)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
@@ -2438,6 +2532,10 @@ CONS( 2003, tomcpin,   0,          0,  xavix_i2c_24c08,  tomcpin,  xavix_i2c_sta
 
 // 日本一周 僕はプラレール運転士
 CONS( 2004, tomplc,    0,          0,  xavix_i2c_24c02_43mhz,tomplc,xavix_i2c_state,     init_xavix,    "Tomy / SSD Company LTD",                       "Nihon Isshuu - Boku wa Plarail Untenshi (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+
+// テレビで遊び隊 ハイパーレスキュー ぼくは救助隊！
+// the demos in attract mode end instantly as if a button was being held, but not sure where it's read
+CONS( 2006, tomthr,    0,          0,  xavix_43mhz,      tomthr,   xavix_state,          init_xavix,    "Takara Tomy / SSD Company LTD",                "Asobitai Hyper Rescue - Boku wa Kyuujotai! (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
 // ガンガンアドベンチャー 
 CONS( 2001, gungunad,  0,          0,  xavix_nv,         xavix,    xavix_state,          init_xavix,    "Takara / SSD Company LTD",                     "Gun Gun Adventure (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
@@ -2499,6 +2597,9 @@ CONS( 2008, hikara,   0,           0,  xavix_cart_hikara, hikara,    xavix_hikar
 
 // 東京フレンドパーク2 
 CONS( 2003, epo_tfp2,  0,          0,  xavix_i2c_24c08,  epo_tfp2, xavix_i2c_state, init_xavix, "Epoch / SSD Company LTD", "Tokyo Friend Park 2 (Japan)", MACHINE_IMPERFECT_SOUND) // uses in24lc08b
+
+// 東京フレンドパークⅡ パーフェクト!めざせ!グランドスラム‼︎
+CONS( 2007, epo_tp2p,  0,          0,  xavix,            epo_tp2p, xavix_state,     init_xavix, "Epoch / SSD Company LTD", "Tokyo Friend Park II Perfect! Mezase! Grand Slam!! (Japan)", MACHINE_IMPERFECT_SOUND)
 
 // きかんしゃトーマス テレビパソコン
 CONS( 2005, tvpc_tom,  0,          0,  xavix_i2c_24c16,  tvpc_tom, xavix_i2c_state, init_xavix, "Epoch / SSD Company LTD", "TV-PC Thomas & Friends (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)

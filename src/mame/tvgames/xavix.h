@@ -128,6 +128,8 @@ public:
 
 	void xavix2002(machine_config &config);
 
+	void xavix_43mhz(machine_config &config);
+
 	void init_xavix();
 
 	void ioevent_trg01(int state);
@@ -211,6 +213,8 @@ protected:
 	required_device<screen_device> m_screen;
 	required_device<address_map_bank_device> m_lowbus;
 	address_space* m_cpuspace = nullptr;
+
+	bool m_disable_timer_irq_hack = false; // hack for epo_mini which floods timer IRQs to the point it won't do anything else
 
 private:
 
@@ -610,7 +614,6 @@ private:
 	uint8_t guru_anport2_r() { uint8_t ret = m_mouse1x->read()-0x10; return ret; }
 };
 
-
 class xavix_i2c_state : public xavix_state
 {
 public:
@@ -647,6 +650,8 @@ public:
 	{ }
 
 	int camera_r();
+
+	void init_epo_mini();
 
 protected:
 	//virtual void write_io1(uint8_t data, uint8_t direction) override;
