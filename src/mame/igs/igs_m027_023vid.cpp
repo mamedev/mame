@@ -118,8 +118,6 @@ private:
 
 	void gpio_w(u8 data);
 
-	TIMER_DEVICE_CALLBACK_MEMBER(interrupt);
-
 	u16 sprites_r(offs_t offset);
 	void screen_vblank(int state);
 
@@ -164,6 +162,13 @@ void igs_m027_023vid_state::screen_vblank(int state)
 	{
 		// first 0xa00 of main ram = sprites, seems to be buffered, DMA?
 		m_video->get_sprites();
+
+		m_maincpu->pulse_input_line(arm7_cpu_device::ARM7_FIRQ_LINE, m_maincpu->minimum_quantum_time());
+	}
+	else
+	{
+		// this handles palette transfers, what scanline should it happen on? incorrect frame timing causes some graphics to be missing in service mode
+		igs_m027_023vid_state::irq_w<0>(ASSERT_LINE);
 	}
 }
 
@@ -358,24 +363,6 @@ void igs_m027_023vid_state::gpio_w(u8 data)
 	m_gpio_out = data;
 }
 
-
-TIMER_DEVICE_CALLBACK_MEMBER(igs_m027_023vid_state::interrupt)
-{
-	int const scanline = param;
-
-	switch (scanline)
-	{
-	case 0:
-		m_maincpu->pulse_input_line(arm7_cpu_device::ARM7_FIRQ_LINE, m_maincpu->minimum_quantum_time()); // vbl?
-		break;
-
-	case 192:
-		igs_m027_023vid_state::irq_w<0>(ASSERT_LINE);
-		break;
-	}
-}
-
-
 u16 igs_m027_023vid_state::sprites_r(offs_t offset)
 {
 	// there does seem to be a spritelist at the start of mainram like PGM
@@ -416,8 +403,6 @@ void igs_m027_023vid_state::m027_023vid(machine_config &config)
 	m_screen->screen_vblank().set(FUNC(igs_m027_023vid_state::screen_vblank));
 
 	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 0x1200/2);
-
-	TIMER(config, "scantimer").configure_scanline(FUNC(igs_m027_023vid_state::interrupt), "screen", 0, 1);
 
 	// PGM video
 	IGS023_VIDEO(config, m_video, 0);
