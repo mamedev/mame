@@ -157,7 +157,7 @@ void tim011_state::tim011_palette(palette_device &palette) const
 void tim011_state::tim011(machine_config &config)
 {
 	/* basic machine hardware */
-	HD64180RP(config, m_maincpu, XTAL(12'288'000)); // location U17 HD64180
+	HD64180RP(config, m_maincpu, 12.288_MHz_XTAL); // location U17 HD64180
 	m_maincpu->set_addrmap(AS_PROGRAM, &tim011_state::tim011_mem);
 	m_maincpu->set_addrmap(AS_IO, &tim011_state::tim011_io);
 	m_maincpu->tend1_wr_callback().set(m_fdc, FUNC(upd765a_device::tc_line_w));
@@ -169,7 +169,7 @@ void tim011_state::tim011(machine_config &config)
 	TIM011_KEYBOARD(config, "keyboard").txd_callback().set(m_maincpu, FUNC(z180_device::rxa1_w));
 
 	// FDC9266 location U43
-	UPD765A(config, m_fdc, XTAL(8'000'000), true, true);
+	UPD765A(config, m_fdc, 8_MHz_XTAL, true, true);
 	m_fdc->intrq_wr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ2);
 	m_fdc->drq_wr_callback().set_inputline(m_maincpu, Z180_INPUT_LINE_DREQ1);
 
@@ -183,10 +183,7 @@ void tim011_state::tim011(machine_config &config)
 	PALETTE(config, m_palette, FUNC(tim011_state::tim011_palette), 4);
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(50);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
-	screen.set_size(512, 256);
-	screen.set_visarea(0, 512-1, 0, 256-1);
+	screen.set_raw(12.288_MHz_XTAL, 768, 0, 512, 320, 0, 256);
 	screen.set_screen_update(FUNC(tim011_state::screen_update_tim011));
 	screen.set_palette(m_palette);
 
