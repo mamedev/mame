@@ -48,7 +48,6 @@
               Let's!TVプレイ ふたりはプリキュアMaxHeart マットでダンス MaxHeartにおどっちゃおう / バンダイ / 日本         Let's!TV Play Futari wa PreCure MaxHeart Dance on the mat Let's go to MaxHeart / Bandai / Japan
               テレビで遊び隊　韋駄天翔 激走 韋駄天バトル / トミー / 日本          Playing with TV Idaten Sho Gekisou Idaten Battle / Tommy / Japan
               Let's!TVプレイ 魔法戦隊マジレンジャー マジマットでダンス＆バトル / バンダイ / 日本        Let's!TV Play Mahou Sentai Magiranger Dance & Battle at Magimat / Bandai / Japan
-              東京フレンドパーク2スペシャル / エポック社 / 日本          Tokyo Friend Park 2 Special / Epochsha / Japan
               Let's!TVプレイ 音撃バトル！仮面ライダー響鬼 決めろ！一気火勢の型 / バンダイ / 日本        Let's!TV Play Ongeki Battle! Kamen Rider Hibiki Decide! Ichikkasei no Kata / Bandai / Japan
               Jala Jaland /atlus/Japan (arcade version)                                                       -           -               -           -               -                   -                       -
     2004      Printer for TV computer /EPOCH/Japan                                                            -           -               -           -               -                   -                       -
@@ -86,7 +85,8 @@
 
 
     dumped: either here, xavix_2000.cpp, or xavix_2002.cpp
-              Let's!TVプレイ ケロロ軍曹 ケロロ小隊大パニック！ドタバタ大決戦であります / バンダイ / 日本   Let's!TV Play Keroro Sergeant Keroro Platoon Panic! It’s a big slapstick battle / Bandai / Japan
+              東京フレンドパーク2スペシャル / エポック社 / 日本          Tokyo Friend Park 2 Special / Epochsha / Japan
+			  Let's!TVプレイ ケロロ軍曹 ケロロ小隊大パニック！ドタバタ大決戦であります / バンダイ / 日本   Let's!TV Play Keroro Sergeant Keroro Platoon Panic! It’s a big slapstick battle / Bandai / Japan
 			  スーパーテレビパソコン別売カートリッジ ペットケータイLink / エポック社 / 日本      Super TV PC Optional Cartridge Pet Mobile Link / Epochsha / Japan
               Challenge Ai-chan! Exciting Ping-pong /TAKARATOMY/Japan                                         -           -               -           -               -                   -                       dumped
               TV de  Asobitai Hyper Rescue - Boku wa Kyuujotai /BANDAI/Japan                                  -           -               -           -               -                   -                       -
@@ -2399,6 +2399,11 @@ ROM_START( epo_tfp2 )
 	ROM_LOAD( "funpark2.u1", 0x000000, 0x400000, CRC(97ad5183) SHA1(77310b42d0a015838a1cef4eb5e74cc8335284d1) )
 ROM_END
 
+ROM_START( epo_tp2s ) // TF2J MAIN_01 REV:05
+	ROM_REGION( 0x400000, "bios", ROMREGION_ERASE00 )
+	ROM_LOAD( "tf2j.u3", 0x000000, 0x400000, CRC(db2f124c) SHA1(fd60d4560ed53c63f95cf70a7d1ef13d1ecd1f42) )
+ROM_END
+
 ROM_START( epo_tp2p ) // TF3J MAIN PCB 01
 	ROM_REGION( 0x800000, "bios", ROMREGION_ERASE00 )
 	ROM_LOAD( "grandslam.u3", 0x000000, 0x800000, CRC(d458ee01) SHA1(dd1a85d822121c46f89ca013fa56c482ab411c6e) )
@@ -2666,6 +2671,9 @@ CONS( 2008, hikara,   0,           0,  xavix_cart_hikara, hikara,    xavix_hikar
 
 // 東京フレンドパーク2
 CONS( 2003, epo_tfp2,  0,          0,  xavix_i2c_24c08,  epo_tfp2, xavix_i2c_state, init_xavix, "Epoch / SSD Company LTD", "Tokyo Friend Park 2 (Japan)", MACHINE_IMPERFECT_SOUND) // uses in24lc08b
+
+// 東京フレンドパーク2スペシャル
+CONS( 2005, epo_tp2s,  0,          0,  xavix,            epo_tp2p, xavix_state,     init_xavix, "Epoch / SSD Company LTD", "Tokyo Friend Park II Special! (Japan)", MACHINE_IMPERFECT_SOUND)
 
 // 東京フレンドパークⅡ パーフェクト!めざせ!グランドスラム‼︎
 CONS( 2007, epo_tp2p,  0,          0,  xavix,            epo_tp2p, xavix_state,     init_xavix, "Epoch / SSD Company LTD", "Tokyo Friend Park II Perfect! Mezase! Grand Slam!! (Japan)", MACHINE_IMPERFECT_SOUND)
