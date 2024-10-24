@@ -143,7 +143,7 @@ u8 beckerport_device::read(offs_t offset)
 			{
 				// Try to read from dws
 				std::error_condition filerr = m_pSocket->read(m_buf, 0, sizeof(m_buf), m_rx_pending);
-				if (filerr && (std::errc::operation_would_block != filerr))
+				if (filerr)
 					osd_printf_error("%s: coco_dwsock.c: beckerport_device::read() socket read operation failed with error %s:%d %s\n", tag(), filerr.category().name(), filerr.value(), filerr.message());
 				else
 					m_head = 0;
