@@ -30,25 +30,22 @@
 
     preliminary list of XaviX software based on various sources (some likely still missing)
 
+    not dumped:
+
     year        name                                                                                            PCB ID      ROM width       TSOP pads   ROM size        SEEPROM             die markings            extra components / notes
 
     2011      anpan-man kazoku de ikunou mat DX /JoyPalette/Japan                                             -           -               -           -               -                   -                       -
     2009      anpan-man pyon-pyon ikunou mat /JoyPalette/Japan                                                -           -               -           -               -                   -                       -
-    2008      究極! 筋肉スタジアム! サスケ完全制覇   kyuukyoku! kinniku grand slam! SASUKE kanzen seiha /EPOCH/Japan                                 -           -               -           -               -                   -                       -
-    2006      Let's!TVプレイ　ドラゴンボールＺ　バトル体感かめはめ波２～オッスおめぇ悟空 天下一武道会～ / バンダイ / 日本         Let's!TV Play Dragon Ball Z Battle Experience Kamehameha 2 ~Ossu Ome Goku Tenkaichi Budokai~ / Bandai / Japan
-              Hello Kitty カードでおままごと　あいうおえ図鑑 / エポック社 / 日本       Hello Kitty Play House with Cards Aiuoe Illustrated Book / Epochsha / Japan
+    2006      Hello Kitty カードでおままごと　あいうおえ図鑑 / エポック社 / 日本       Hello Kitty Play House with Cards Aiuoe Illustrated Book / Epochsha / Japan
               ドラえもん 体感タケコプター! 空とぶ大冒険 / エポック社 / 日本      Doraemon Experience Takecopter! Great Flying Adventure / Epoch Publishing / Japan
-              スーパーテレビパソコン別売カートリッジ ペットケータイLink / エポック社 / 日本      Super TV PC Optional Cartridge Pet Mobile Link / Epochsha / Japan
               スーパーテレビパソコンLink / エポック社 / 日本   Super TV PC Link / Epoch / Japan
               Let's!TVプレイ ケロロ軍曹 ケロロ小隊大パニック！ドタバタ大決戦であります / バンダイ / 日本   Let's!TV Play Keroro Sergeant Keroro Platoon Panic! It’s a big slapstick battle / Bandai / Japan
               Let's!TVプレイ ふしぎ星のふたご姫Gyu! ドレスチェンジでキュートにダンス / バンダイ / 日本   Let's!TV Play Gyu, the Twin Princess of the Mysterious Planet! Dance cutely with a dress change / Bandai / Japan
               Let's!TVプレイ 体感キャストオフ 仮面ライダーカブト クロックアップ＆ライダーキック / バンダイ / 日本  Let's!TV Play Experience Cast Off Kamen Rider Kabuto Clock Up & Rider Kick / Bandai / Japan
               Let's!TVプレイ なりきり体感 ボウケンジャー 走れ！撃て！ミッションスタート！！ / バンダイ / 日本   Let's! TV Play Narikiri Experience Boukenger Run! Shoot! Mission starts! ! / Bandai / Japan
               テレビであそぼう！まなぼう！超能力あいうえお図鑑 / エポック社 / 日本   Let's play on TV! Learn! Superpower Aiueo Illustrated Book / Epochsha / Japan
-              SASUKE サスケ＆筋肉バトル!!スポーツマンNO.1決定戦 / エポック社 / 日本   SASUKE Sasuke & Muscle Battle!! Sportsman No. 1 Decisive Battle / Epoch Publishing / Japan
               Let's!TVプレイ なりきりファイト ウルトラマン 撃て！必殺光線！！ / タカラトミー / 日本   Let's!TV Play Narikiri Fight Ultraman Shoot! Deadly ray! ! / Takara Tomy / Japan
     2005      どこでもドラえもん 日本旅行ゲームDX体感！どこドラグランプリ！ / エポック社 / 日本          Doraemon anywhere - Japan travel game DX experience! Where is the Dragon Grand Prix! / Epoch / Japan
-              Let's!TVプレイ ドラゴンボ－ルＺ バトル体感かめはめ波～ おめぇとフュージョン / バンダイ / 日本          Let's!TV Play Dragon Ball Z Battle Experience Kamehameha ~ Ometo Fusion / Bandai / Japan
               Let's!TVプレイ ふたりはプリキュアMaxHeart マットでダンス MaxHeartにおどっちゃおう / バンダイ / 日本         Let's!TV Play Futari wa PreCure MaxHeart Dance on the mat Let's go to MaxHeart / Bandai / Japan
               テレビで遊び隊　韋駄天翔 激走 韋駄天バトル / トミー / 日本          Playing with TV Idaten Sho Gekisou Idaten Battle / Tommy / Japan
               Let's!TVプレイ 魔法戦隊マジレンジャー マジマットでダンス＆バトル / バンダイ / 日本        Let's!TV Play Mahou Sentai Magiranger Dance & Battle at Magimat / Bandai / Japan
@@ -68,8 +65,8 @@
     1999      ABC Jungle Fun Hippo /VTech/HK, USA, France                                                     -           -               -           -               -                   -                       -
 
     no TSOP pads
-    2004      Zuba-Zuba Blade /TAKARA/Japan                                                                   -           -               -           -               -                   -                       -
     2003      Beyblade Arcade Challenge 5-in-1 /Hasbro/USA                                                    -           -               -           -               -                   -                       have
+    2002      Zuba-Zuba Blade /TAKARA/Japan                                                                   -           -               -           -               -                   -                       -
     2002      Excite Striker (UK)
     2002      Beyblade Ultimate shooter /TAKARA/Japan                                                         -           -               -           -               -                   -                       -
     2001      Let's construct the town! /TAKARA/Japan                                                         -           -               -           -               -                   -                       -
@@ -81,7 +78,16 @@
     2000      Let's hit a homerun! Exciting baseball /EPOCH/Japan                                             -           -               -           -               -                                           -
     * one version of Gin-Gin boarders also had no pads, but the unit it was dumped from did have them
 
+    not dumped: xavix2.cpp
+
+    2008      究極! 筋肉スタジアム! サスケ完全制覇   kyuukyoku! kinniku grand slam! SASUKE kanzen seiha /EPOCH/Japan                                 -           -               -           -               -                   -                       -
+    2006      Let's!TVプレイ　ドラゴンボールＺ　バトル体感かめはめ波２～オッスおめぇ悟空 天下一武道会～ / バンダイ / 日本         Let's!TV Play Dragon Ball Z Battle Experience Kamehameha 2 ~Ossu Ome Goku Tenkaichi Budokai~ / Bandai / Japan
+    2006      SASUKE サスケ＆筋肉バトル!!スポーツマンNO.1決定戦 / エポック社 / 日本   SASUKE Sasuke & Muscle Battle!! Sportsman No. 1 Decisive Battle / Epoch Publishing / Japan
+    2005      Let's!TVプレイ ドラゴンボ－ルＺ バトル体感かめはめ波～ おめぇとフュージョン / バンダイ / 日本          Let's!TV Play Dragon Ball Z Battle Experience Kamehameha ~ Ometo Fusion / Bandai / Japan
+
+
     dumped: either here, xavix_2000.cpp, or xavix_2002.cpp
+              スーパーテレビパソコン別売カートリッジ ペットケータイLink / エポック社 / 日本      Super TV PC Optional Cartridge Pet Mobile Link / Epochsha / Japan
               Challenge Ai-chan! Exciting Ping-pong /TAKARATOMY/Japan                                         -           -               -           -               -                   -                       dumped
               TV de  Asobitai Hyper Rescue - Boku wa Kyuujotai /BANDAI/Japan                                  -           -               -           -               -                   -                       -
               Tokyo Friend Park II Perfect! Mezase! Grand Slam!! /EPOCH/Japan                                 -           -               -           -               -                   -                       -
@@ -192,7 +198,7 @@
               XaviXTennis                                                                                     SGM6446     x16             48          8M              24C08               SSD 2002 NEC 85054-611  dumped
               XaviXBowling                                                                                    SGM644C     x16             48                                                                      dumped
 
-	dumped: see xavix2.cpp
+    dumped: see xavix2.cpp
     2006      Let's!TVプレイ　ＮＡＲＵＴＯ－ナルト－ 忍者体感～だってばよ～ / バンダイ / 日本            Let's!TV Play NARUTO Ninja Experience ~Dattebayo~ / Bandai / Japan
 
 
