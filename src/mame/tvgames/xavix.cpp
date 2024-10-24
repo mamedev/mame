@@ -62,6 +62,7 @@
               Accessory memory mascot for TV mail Pc mail cot 2 characters (Charuru, Kurau) /EPOCH/Japan      -           -               -           -               -                   -                       -
               TV mail PC "Mercot /EPOCH/Japan                                                                 -           -               -           -               -                   -                       -
               Wildest computer robot "Daigander" (Korean version) /TAKARA/Korea                               -           -               -           -               -                   -                       -
+    2003      Hello Kitty TV computer /EPOCH/Japan                                                            -           -               -           -               -                   -                       -
     2001      Ping-pong(Chinese version) /Tenpon/China                                                        -           -               -           -               -                   -                       -
               Popira Korea version /SONOKONG/Korea                                                            -           -               -           -               -                   -                       -
               I singer: e-kara Korean version /SONOKONG/Korea                                                 -           -               -           -               -                   -                       -
@@ -119,7 +120,6 @@
               Play TV Madden Football /RADICA/USA                                                             74021       x8              48          4M              none                SSD 98 PL7351-181       dumped
               Play TV SSX Snowboarder (and Snowboarder white?) /RADICA/USA                                    74023                       none                                                                    dumped
               Disney Princess "Kira-Kira magical lesson" /TOMY/Japan                                          -           -               -           -               -                   -                       -
-              Hello Kitty TV computer /EPOCH/Japan                                                            -           -               -           -               -                   -                       -
               Gan-Gan Revoultion /TAKARA/Japan                                                                -           -               -           -               -                   -                       -
               Tokyo Friend Park II /EPOCH/Japan                                                               -           -               -           -               -                   -                       -
               TV mah-jongg /EPOCH/Japan                                                                       -           -               -           -               -                   -                       -
