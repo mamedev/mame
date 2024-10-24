@@ -261,6 +261,7 @@ void pc9801_kbd_device::device_reset()
 	m_keyb_tx = 0xff;
 	m_keyb_rx = 0;
 	m_key_avail = false;
+	m_write_irq(CLEAR_LINE);
 }
 
 //-------------------------------------------------
