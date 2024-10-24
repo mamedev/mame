@@ -35,9 +35,8 @@
     2011      anpan-man kazoku de ikunou mat DX /JoyPalette/Japan                                             -           -               -           -               -                   -                       -
     2009      anpan-man pyon-pyon ikunou mat /JoyPalette/Japan                                                -           -               -           -               -                   -                       -
     2008      kyuukyoku! kinniku grand slam! SASUKE kanzen seiha /EPOCH/Japan                                 -           -               -           -               -                   -                       -
-	2006      Let's TV Play series "Kamen Rider Kabuto" /EPOCH/Japan                                          -           -               -           -               -                   -                       -
+    2006      Let's TV Play series "Kamen Rider Kabuto" /EPOCH/Japan                                          -           -               -           -               -                   -                       -
               Let's TV Play series "Bo-kenger" /EPOCH/Japan                                                   -           -               -           -               -                   -                       -
-              Challenge Ai-chan! Exciting Ping-pong /TAKARATOMY/Japan                                         -           -               -           -               -                   -                       dumped
               Sasuke & Sportsman Tournament /BANDAI/Japan                                                     -           -               -           -               -                   -                       -
               Let's play and study! Doraemon Hiragana book /BANDAI/Japan                                      -           -               -           -               -                   -                       -
     2005      Let's TV Play series "Dragon Ball Z" /BANDAI/Japan                                              -           -               -           -               -                   -                       -
@@ -45,36 +44,37 @@
               Idaten Jump /TOMY/Japan                                                                         -           -               -           -               -                   -                       -
               Masked Rider HIBIKI /BANDAI/Japan                                                               -           -               -           -               -                   -                       -
               Dokodemo Doraemon Japan Travel Game DX /EPOCH/Japan                                             -           -               -           -               -                   -                       -
-              Jala Jaland /atlus/Japan (arcade version)                                                       -           -               -           -               -                   -                       -      
-	2004      Accessory cartridge for Super TV computer "Double mouse party" /EPOCH/Japan                     -           -               -           -               -                   -                       -
+              Jala Jaland /atlus/Japan (arcade version)                                                       -           -               -           -               -                   -                       -
+    2004      Accessory cartridge for Super TV computer "Double mouse party" /EPOCH/Japan                     -           -               -           -               -                   -                       -
               Printer for TV computer /EPOCH/Japan                                                            -           -               -           -               -                   -                       -
               Accessory memory mascot for TV mail Pc mail cot 2 characters (Putchi, Petchi) /EPOCH/Japan      -           -               -           -               -                   -                       -
               Accessory memory mascot for TV mail Pc mail cot 2 characters (Charuru, Kurau) /EPOCH/Japan      -           -               -           -               -                   -                       -
               TV mail PC "Mercot /EPOCH/Japan                                                                 -           -               -           -               -                   -                       -
-			  Wildest computer robot "Daigander" (Korean version) /TAKARA/Korea                               -           -               -           -               -                   -                       -
+              Wildest computer robot "Daigander" (Korean version) /TAKARA/Korea                               -           -               -           -               -                   -                       -
     2001      Ping-pong(Chinese version) /Tenpon/China                                                        -           -               -           -               -                   -                       -
               Popira Korea version /SONOKONG/Korea                                                            -           -               -           -               -                   -                       -
               I singer: e-kara Korean version /SONOKONG/Korea                                                 -           -               -           -               -                   -                       -
               Baseball Korean version /SONOKONG/Korea                                                         -           -               -           -               -                   -                       -
     1999      ABC Jungle Fun Hippo /VTech/HK, USA, France                                                     -           -               -           -               -                   -                       -
 
-	no TSOP pads
+    no TSOP pads
     2004      Zuba-Zuba Blade /TAKARA/Japan                                                                   -           -               -           -               -                   -                       -
     2003      Beyblade Arcade Challenge 5-in-1 /Hasbro/USA                                                    -           -               -           -               -                   -                       have
-	2002      Excite Striker (UK)
+    2002      Excite Striker (UK)
     2002      Beyblade Ultimate shooter /TAKARA/Japan                                                         -           -               -           -               -                   -                       -
-	2001      Let's construct the town! /TAKARA/Japan                                                         -           -               -           -               -                   -                       -
-	2001      TV hockey /TOMY/Japan                                                                           -           -               -           -               -                   -                       -
+    2001      Let's construct the town! /TAKARA/Japan                                                         -           -               -           -               -                   -                       -
+    2001      TV hockey /TOMY/Japan                                                                           -           -               -           -               -                   -                       -
     2001      Webdiver Gradion /TAKARA/Japan                                                                  -           -               -           -               -                   -                       -
     2001      Let's fish black bass! Exciting Fishing /EPOCH/Japan                                            -           -               -           -               -                   -                       -
     2001      black bass tsurouze! Excite Fishing /EPOCH/Japan *same as above?                                -           -               -           -               -                   -                       -
-	2000      connecTV OPUS /RADICA EU (different ROM to US?) 
-	2000      Let's hit a homerun! Exciting baseball /EPOCH/Japan                                             -           -               -           -               -                                           -
-	* one version of Gin-Gin boarders also had no pads, but the unit it was dumped from did have them
+    2000      connecTV OPUS /RADICA EU (different ROM to US?)
+    2000      Let's hit a homerun! Exciting baseball /EPOCH/Japan                                             -           -               -           -               -                                           -
+    * one version of Gin-Gin boarders also had no pads, but the unit it was dumped from did have them
 
-	dumped
+    dumped
+              Challenge Ai-chan! Exciting Ping-pong /TAKARATOMY/Japan                                         -           -               -           -               -                   -                       dumped
               TV de  Asobitai Hyper Rescue - Boku wa Kyuujotai /BANDAI/Japan                                  -           -               -           -               -                   -                       -
-		      Tokyo Friend Park II Perfect! Mezase! Grand Slam!! /EPOCH/Japan                                 -           -               -           -               -                   -                       -
+              Tokyo Friend Park II Perfect! Mezase! Grand Slam!! /EPOCH/Japan                                 -           -               -           -               -                   -                       -
               Scan card! Exciting Stage Soccer. /EPOCH/Japan                                                  -           -               -           -               -                   -                       -
               Hello Kitty Super TV computer /EPOCH/Japan                                                      -           -               -           -               -                   -                       -
               Doraemon Super TV computer /EPOCH/Japan                                                         -           -               -           -               -                   -                       -
@@ -102,10 +102,10 @@
               Exciting sports Tennis X Fitness /EPOCH/Japan                                                   -           -               -           -               -                   -                       -
               The Lord of the Rings Warrior of Middle Earth /Hasbro/USA                                       LORA        x8              48          8M              24C02               SSD 2000 NEC 85605-621  dumped
               All star Festival Quize /EPOCH/Japan                                                            -           -               -           -               -                   -                       -
-			  e-kara mix /TAKARA/Japan                                                                        -           -               -           -               -                   -                       -
+              e-kara mix /TAKARA/Japan                                                                        -           -               -           -               -                   -                       -
               Jumping Popira /TAKARA/Japan                                                                    -           -               -           -               -                   -                       -
               Tour around Japan. I'm a Prarail motorman /TOMY/Japan                                           -           -               -           -               -                   -                       dumped
-			  Play TV Monster Truck /RADICA/USA                                                               74026       x8              48          4M              none                SSD 98 PL7351-181       dumped
+              Play TV Monster Truck /RADICA/USA                                                               74026       x8              48          4M              none                SSD 98 PL7351-181       dumped
               Play TV Madden Football /RADICA/USA                                                             74021       x8              48          4M              none                SSD 98 PL7351-181       dumped
               Play TV SSX Snowboarder (and Snowboarder white?) /RADICA/USA                                    74023                       none                                                                    dumped
               Disney Princess "Kira-Kira magical lesson" /TOMY/Japan                                          -           -               -           -               -                   -                       -
@@ -168,15 +168,15 @@
               PLAY TV Bass Fishin' /RADICA/USA                                                                71008       x8              40          1M              none                SSD 98 PA7351-107       dumped
               PLAY TV Snowboarder (blue) /RADICA/USA                                                          71023       x8              40          1M              none                SSD 98 PL7351-181       dumped
               Bistro Kids /SEGA Toys/Japan                                                                    -           -               -           -               -                   -                       -
-	          Gan-Gan Adventure /TAKARA/Japan                                                                 -           -               -           -               -                   -                       -
+              Gan-Gan Adventure /TAKARA/Japan                                                                 -           -               -           -               -                   -                       -
               Hamu-chan's Daishuugou dance surunoda! hasirunoda! /EPOCH/Japan                                 -           -               -           -               -                   -                       -
               Popira /TAKARA/Japan                                                                            -           -               -           -               -                   -                       dumped
               e-kara /TAKARA/Japan                                                                            -           -               -           -               -                   -                       dumped
               Let's play ping-pong. Exciting ping-pong /EPOCH/Japan                                           -           -               -           -               -                   -                       dumped
               Ping-pong Korean version /SONOKONG/Korea                                                        -           -               -           -               -                   -                       dumped ('Reeal Ping Pong')
-			  PLAY TV Huntin' Buckmasters /RADICA/USA                                                         8074        x8              none                        none                SSD 98 PA7351-107       dumped
+              PLAY TV Huntin' Buckmasters /RADICA/USA                                                         8074        x8              none                        none                SSD 98 PA7351-107       dumped
               PLAY TV Ping Pong /RADICA/USA,HK,EU                                                             8028        x8              48          1M              none                SSD 97 PA7270-107       dumped
-	          PLAY TV OPUS /RADICA/USA                                                                        -           -               -           -               -                   -                       dumped (US version, PAL version appears to use different ROM)
+              PLAY TV OPUS /RADICA/USA                                                                        -           -               -           -               -                   -                       dumped (US version, PAL version appears to use different ROM)
               PLAY TV Baseball 2 /EPOCH/Japan, HK                                                             -           -               -           -               -                   -                       -
               Play TV Baseball /RADICA/USA,EU                                                                 8017        x8              none                        none                SSD 98 PA7351-107       dumped
               PLAY TV Football /RADICA/USA                                                                    74021       x8              48          4M              none                SSD 98 PL7351-181       dumped
@@ -2421,7 +2421,7 @@ ROM_END
 
 */
 
-// Let's!TVプレイCLASSIC タイトーノスタルジア1 
+// Let's!TVプレイCLASSIC タイトーノスタルジア1
 CONS( 2006, taitons1,  0,          0,  xavix_i2c_24lc04, nostalgia,xavix_i2c_state,      init_xavix,    "Bandai / SSD Company LTD / Taito",             "Let's! TV Play Classic - Taito Nostalgia 1 (Japan)", MACHINE_IMPERFECT_SOUND )
 
 // Let's!TVプレイCLASSIC タイトーノスタルジア2
@@ -2515,16 +2515,16 @@ CONS( 2006, epo_epp3,   0,         0,  xavix,            epo_epp,  xavix_state, 
 // TV麻雀 昇段対局～4人打ち
 CONS( 2003, epo_mj,     0,         0,  xavix_i2c_24lc02_mj,  epo_mj,   xavix_i2c_mj_state,   init_xavix,    "Epoch / SSD Company LTD",                      "TV Mahjong Promotion Game - 4-Player Game (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
-// 大モノ釣ろうぜ！ エキサイトフィッシングＤＸ 
+// 大モノ釣ろうぜ！ エキサイトフィッシングＤＸ
 CONS( 2003, epo_efdx,  0,          0,  xavix_i2c_24c08,  epo_efdx, xavix_i2c_state,      init_xavix,    "Epoch / SSD Company LTD",                      "Dai Mono Tsurouze! Excite Fishing DX (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
-// ぐるりんワールド 
+// ぐるりんワールド
 CONS( 2005, epo_guru,  0,          0,  xavix_guru,       epo_guru, xavix_guru_state,     init_xavix,    "Epoch / SSD Company LTD",                      "Gururin World (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 
 // ドラえもん こえでドカン！わくわくくうきほう！！
 CONS( 2002, epo_dmon, 0,           0,  xavix_i2c_24c02,  xavix_i2c,xavix_i2c_state,      init_xavix,    "Epoch / SSD Company LTD",                      "Doraemon Wakuwaku Kuukihou (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND ) // full / proper title?
 
-// コロッケ！いただ禁貨！バンカーバトル!! 
+// コロッケ！いただ禁貨！バンカーバトル!!
 CONS( 2003, epo_crok,  0,          0,  xavix_i2c_24lc04, xavix_i2c,xavix_i2c_state,      init_xavix,    "Epoch / SSD Company LTD",                      "Croket! Itada Kinka! Banker Battle!! (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
 // ミニモニ。ステージ！ダンスだぴょん！
@@ -2541,13 +2541,13 @@ CONS( 2005, has_wamg,  0,          0,  xavix,            has_wamg, xavix_state, 
 // GEIGEKI ゴーゴーシューティング
 CONS( 2002, tak_geig,  0,          0,  xavix_nv,         tak_geig, xavix_state,          init_xavix,    "Takara / SSD Company LTD",                     "Geigeki Go Go Shooting (Japan)", MACHINE_IMPERFECT_SOUND )
 
-// コメットさん☆ラブリンバトン 
+// コメットさん☆ラブリンバトン
 CONS( 2001, tak_comt,  0,          0,  xavix_nv,         tak_comt,  xavix_state,          init_xavix,    "Takara / SSD Company LTD",                     "Comet-san Lovelin Baton (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
 // 爆進スノボ ギンギンボーダーズ
 CONS( 2001, tak_gin,   0,          0,  xavix,            tak_gin,  xavix_state,          init_xavix,    "Takara / SSD Company LTD",                     "Bakushin Sno-Bo - Gingin Boarders (Japan)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_COLORS )
 
-// ぽこぽこハンマーズ 
+// ぽこぽこハンマーズ
 CONS( 2002, tak_hamr,  0,          0,  xavix_i2c_24c02,  tak_hamr, xavix_i2c_state,      init_xavix,    "Takara / SSD Company LTD",                     "Poko Poko Hammers (Japan)", MACHINE_IMPERFECT_SOUND )
 
 // was also distributed by Atlus as an arcade cabinet in 2005, ROM almost certainly different (this one will auto-power off after inactivity, an arcade wouldn't do that)
@@ -2557,7 +2557,7 @@ CONS( 2003, jarajal,   0,          0,  xavix_nv,         jarajal,  xavix_state, 
 // 近代撃ちまくりバラエティ 射的王(シャテキング)
 CONS( 2002, tomshoot, 0,           0,  xavix_i2c_24c02,  tomshoot,xavix_i2c_tomshoot_state,  init_xavix,    "Tomy / SSD Company LTD",                   "Kindai Uchimakuri Variety Shateking (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
-// トミカ カーナビドライブ / トミー 
+// トミカ カーナビドライブ / トミー
 CONS( 2003, tcarnavi,  0,          0,  xavix_nv,         tcarnavi, xavix_state,          init_xavix,    "Tomy / SSD Company LTD",                       "Tomica Carnavi Drive (Japan)", MACHINE_IMPERFECT_SOUND )
 
 // ちゃんぴよんピンボール
@@ -2570,7 +2570,7 @@ CONS( 2004, tomplc,    0,          0,  xavix_i2c_24c02_43mhz,tomplc,xavix_i2c_st
 // the demos in attract mode end instantly as if a button was being held, but not sure where it's read
 CONS( 2006, tomthr,    0,          0,  xavix_43mhz,      tomthr,   xavix_state,          init_xavix,    "Takara Tomy / SSD Company LTD",                "Asobitai Hyper Rescue - Boku wa Kyuujotai! (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
-// ガンガンアドベンチャー 
+// ガンガンアドベンチャー
 CONS( 2001, gungunad,  0,          0,  xavix_nv,         xavix,    xavix_state,          init_xavix,    "Takara / SSD Company LTD",                     "Gun Gun Adventure (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
 // ガンガンレボリューション
@@ -2604,7 +2604,7 @@ CONS( 2001, ddrfammt, 0,           0,  xavix_cart_ddrfammt,ddrfammt, xavix_cart_
 CONS( 2000, popira,   0,           0,  xavix_cart_popira,popira,   xavix_cart_state,     init_xavix,    "Takara / SSD Company LTD",                     "Popira (Japan)", MACHINE_IMPERFECT_SOUND/*|MACHINE_IS_BIOS_ROOT*/ ) // The original Popira is a single yellow unit
 // a Korean version exists from Sonokong brand, with different songs
 
-// ポピラ2 
+// ポピラ2
 CONS( 2002, popira2,  0,           0,  xavix_cart_popira2,popira2,  xavix_popira2_cart_state, init_xavix,    "Takara / SSD Company LTD",                 "Popira 2 (Japan)", MACHINE_IMPERFECT_SOUND/*|MACHINE_IS_BIOS_ROOT*/ ) // Popira 2 is a set of 2 blue & green linked units (2nd unit is just a controller, no CPU or TV out)
 
 // たいこでポピラ
@@ -2628,7 +2628,7 @@ CONS( 2006, ltv_tam,  0,           0,  xavix_i2c_24lc04_tam,  ltv_tam,xavix_i2c_
 
 CONS( 2008, hikara,   0,           0,  xavix_cart_hikara, hikara,    xavix_hikara_state,    init_xavix,    "Takara Tomy / SSD Company LTD",            "Hi-kara (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND /*| MACHINE_IS_BIOS_ROOT*/ )
 
-// 東京フレンドパーク2 
+// 東京フレンドパーク2
 CONS( 2003, epo_tfp2,  0,          0,  xavix_i2c_24c08,  epo_tfp2, xavix_i2c_state, init_xavix, "Epoch / SSD Company LTD", "Tokyo Friend Park 2 (Japan)", MACHINE_IMPERFECT_SOUND) // uses in24lc08b
 
 // 東京フレンドパークⅡ パーフェクト!めざせ!グランドスラム‼︎
