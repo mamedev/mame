@@ -1740,7 +1740,7 @@ void m68000_musashi_device::fpgen_rm_reg(u16 w2)
 		}
 		case 0x08: // FETOXM1
 		{
-			m_fpr[dst] = extFloat80_exm1(m_fpr[dst]);
+			m_fpr[dst] = extF80_sub(extFloat80_etox(source), i32_to_extF80(1));
 			set_condition_codes(m_fpr[dst]);
 			sync_exception_flags(source, dstCopy, EXC_ENB_UNDFLOW);
 			LOGMASKED(LOG_INSTRUCTIONS_VERBOSE, "FETOXM1: e ** %f - 1 = %f\n", fx80_to_double(source), fx80_to_double(m_fpr[dst]));
@@ -1749,7 +1749,7 @@ void m68000_musashi_device::fpgen_rm_reg(u16 w2)
 		}
 		case 0x10: // FETOX
 		{
-			m_fpr[dst] = extF80_add(extFloat80_exm1(m_fpr[dst]), i32_to_extF80(1));
+			m_fpr[dst] = extFloat80_etox(source);
 			set_condition_codes(m_fpr[dst]);
 			sync_exception_flags(source, dstCopy, EXC_ENB_UNDFLOW);
 			LOGMASKED(LOG_INSTRUCTIONS_VERBOSE, "FETOX: e ** %f = %f\n", fx80_to_double(source), fx80_to_double(m_fpr[dst]));
@@ -1758,16 +1758,16 @@ void m68000_musashi_device::fpgen_rm_reg(u16 w2)
 		}
 		case 0x11: // FTWOTOX
 		{
-			m_fpr[dst] = extF80_add(extFloat80_2xm1(m_fpr[dst]), i32_to_extF80(1));
+			m_fpr[dst] = extFloat80_2tox(source);
 			set_condition_codes(m_fpr[dst]);
 			sync_exception_flags(source, dstCopy, EXC_ENB_UNDFLOW);
-			LOGMASKED(LOG_INSTRUCTIONS_VERBOSE, "FTENTOX: 2 ** %f = %f\n", fx80_to_double(source), fx80_to_double(m_fpr[dst]));
+			printf("FTWOTOX: 2 ** %f = %f\n", fx80_to_double(source), fx80_to_double(m_fpr[dst]));
 			m_icount -= 590;
 			break;
 		}
 		case 0x12: // FTENTOX
 		{
-			m_fpr[dst] = extF80_add(extFloat80_10xm1(m_fpr[dst]), i32_to_extF80(1));
+			m_fpr[dst] = extFloat80_10tox(source);
 			set_condition_codes(m_fpr[dst]);
 			sync_exception_flags(source, dstCopy, EXC_ENB_UNDFLOW);
 			LOGMASKED(LOG_INSTRUCTIONS_VERBOSE, "FTENTOX: 10 ** %f = %f\n", fx80_to_double(source), fx80_to_double(m_fpr[dst]));
