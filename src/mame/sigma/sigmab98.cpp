@@ -786,7 +786,7 @@ void sigmab98_state::c6_w(uint8_t data)
 // 02 hopper motor on (active low)?
 void sigmab98_state::c8_w(uint8_t data)
 {
-	m_hopper->motor_w(~data >> 1 & data & 1);
+	m_hopper->motor_w((!(data & 0x02) && (data & 0x01)) ? 1 : 0);
 
 	m_c8 = data;
 	show_outputs();
@@ -877,7 +877,7 @@ void lufykzku_state::lufykzku_c8_w(uint8_t data)
 {
 	// bit 0? on payout button
 	// bit 1? when ending payment
-	m_hopper->motor_w(( (data & 0x01) && !(data & 0x02)) ? 0 : 1);
+	m_hopper->motor_w(((data & 0x01) && !(data & 0x02)) ? 1 : 0);
 
 	m_dsw_shifter[0]->shift_load_w(BIT(data, 4));
 	m_dsw_shifter[1]->shift_load_w(BIT(data, 4));
@@ -998,7 +998,7 @@ void sammymdl_state::leds_w(uint8_t data)
 // 01 hopper motor on (active low)?
 void sammymdl_state::hopper_w(uint8_t data)
 {
-	m_hopper->motor_w((!(data & 0x01) && (data & 0x02)) ? 0 : 1);
+	m_hopper->motor_w((!(data & 0x01) && (data & 0x02)) ? 1 : 0);
 
 	m_out[2] = data;
 	show_3_outputs();
@@ -1062,8 +1062,8 @@ void sammymdl_state::gocowboy_leds_w(uint8_t data)
 
 	// 10 hopper enable?
 	// 20 hopper motor on (active low)?
-	m_hopper_small->motor_w((!(data & 0x20) && (data & 0x10)) ? 0 : 1);
-	m_hopper_large->motor_w((!(data & 0x80) && (data & 0x40)) ? 0 : 1);
+	m_hopper_small->motor_w((!(data & 0x20) && (data & 0x10)) ? 1 : 0);
+	m_hopper_large->motor_w((!(data & 0x80) && (data & 0x40)) ? 1 : 0);
 
 	m_out[1] = data;
 	show_3_outputs();
