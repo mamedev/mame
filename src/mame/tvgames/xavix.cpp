@@ -52,25 +52,26 @@
               Accessory memory mascot for TV mail Pc mail cot 2 characters (Charuru, Kurau) /EPOCH/Japan      -           -               -           -               -                   -                       -
               TV mail PC "Mercot /EPOCH/Japan                                                                 -           -               -           -               -                   -                       -
 			  Wildest computer robot "Daigander" (Korean version) /TAKARA/Korea                               -           -               -           -               -                   -                       -
-              Zuba-Zuba Blade /TAKARA/Japan                                                                   -           -               -           -               -                   -                       -
     2001      Ping-pong(Chinese version) /Tenpon/China                                                        -           -               -           -               -                   -                       -
               Popira Korea version /SONOKONG/Korea                                                            -           -               -           -               -                   -                       -
               I singer: e-kara Korean version /SONOKONG/Korea                                                 -           -               -           -               -                   -                       -
-              Let's construct the town! /TAKARA/Japan                                                         -           -               -           -               -                   -                       -
               Baseball Korean version /SONOKONG/Korea                                                         -           -               -           -               -                   -                       -
               Ping-pong Korean version /SONOKONG/Korea                                                        -           -               -           -               -                   -                       dumped ('Reeal Ping Pong')
     1999      ABC Jungle Fun Hippo /VTech/HK, USA, France                                                     -           -               -           -               -                   -                       -
 
 	no TSOP pads
+    2004      Zuba-Zuba Blade /TAKARA/Japan                                                                   -           -               -           -               -                   -                       -
     2003      Beyblade Arcade Challenge 5-in-1 /Hasbro/USA                                                    -           -               -           -               -                   -                       have
 	2002      Excite Striker (UK)
     2002      Beyblade Ultimate shooter /TAKARA/Japan                                                         -           -               -           -               -                   -                       -
-    2001      TV hockey /TOMY/Japan                                                                           -           -               -           -               -                   -                       -
+	2001      Let's construct the town! /TAKARA/Japan                                                         -           -               -           -               -                   -                       -
+	2001      TV hockey /TOMY/Japan                                                                           -           -               -           -               -                   -                       -
     2001      Webdiver Gradion /TAKARA/Japan                                                                  -           -               -           -               -                   -                       -
     2001      Let's fish black bass! Exciting Fishing /EPOCH/Japan                                            -           -               -           -               -                   -                       -
     2001      black bass tsurouze! Excite Fishing /EPOCH/Japan *same as above?                                -           -               -           -               -                   -                       -
 	2000      connecTV OPUS /RADICA EU (different ROM to US?) 
 	2000      Let's hit a homerun! Exciting baseball /EPOCH/Japan                                             -           -               -           -               -                                           -
+	* one version of Gin-Gin boarders also had no pads, but the unit it was dumped from did have them
 
 	dumped
               TV de  Asobitai Hyper Rescue - Boku wa Kyuujotai /BANDAI/Japan                                  -           -               -           -               -                   -                       -
