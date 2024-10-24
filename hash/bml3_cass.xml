@@ -17,4 +17,21 @@ license:CC0-1.0
 			</dataarea>
 		</part>
 	</software>
+
+    <software name="igdemo" supported="yes">
+  		<description>IG Demo</description>
+		<year>1983?</year>
+		<publisher>Hitachi?</publisher>
+        <notes><![CDATA[
+Mixed 600/1200 baud rate image (switch done during program bootstrap, unnecessary to NEWON 7)
+Advertises IG features of Mark 5
+]]></notes>
+		<info name="usage" value="LOAD, press play on tape then RUN. Requires bml3mk5 (uses IG)." />
+		<part name="cass" interface="bml3_cass">
+			<dataarea name="cass" size="4251463">
+				<rom name="igdemo.flac" size="4251463" crc="fb1798b3" sha1="12153998bb6d15c839c8cd185109680ff2f02871"/>
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>
