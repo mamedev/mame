@@ -56,8 +56,7 @@
               東京フレンドパーク2スペシャル / エポック社 / 日本          Tokyo Friend Park 2 Special / Epochsha / Japan
               Let's!TVプレイ 音撃バトル！仮面ライダー響鬼 決めろ！一気火勢の型 / バンダイ / 日本        Let's!TV Play Ongeki Battle! Kamen Rider Hibiki Decide! Ichikkasei no Kata / Bandai / Japan
               Jala Jaland /atlus/Japan (arcade version)                                                       -           -               -           -               -                   -                       -
-    2004      Accessory cartridge for Super TV computer "Double mouse party" /EPOCH/Japan                     -           -               -           -               -                   -                       -
-              Printer for TV computer /EPOCH/Japan                                                            -           -               -           -               -                   -                       -
+    2004      Printer for TV computer /EPOCH/Japan                                                            -           -               -           -               -                   -                       -
               Accessory memory mascot for TV mail Pc mail cot 2 characters (Putchi, Petchi) /EPOCH/Japan      -           -               -           -               -                   -                       -
               Accessory memory mascot for TV mail Pc mail cot 2 characters (Charuru, Kurau) /EPOCH/Japan      -           -               -           -               -                   -                       -
               TV mail PC "Mercot /EPOCH/Japan                                                                 -           -               -           -               -                   -                       -
@@ -96,6 +95,7 @@
               Let's TV Play Classic series "Taito Nostalgia 1" /BANDAI/Japan                                  CGSJ        x8              48          2M              24LC04                                      flash, dumped non destructively
               Let's TV Play Classic series "Taito Nostalgia 2" /BANDAI/Japan                                  CGSJ        x8              48          2M              24LC04                                      flash, dumped non destructively
               Magic Ranger Battle /BANDAI/Japan                                                               -           -               -           -               -                   -                       dumped
+              Accessory cartridge for Super TV computer "Double mouse party" /EPOCH/Japan                     -           -               -           -               -                   -                       -
               Accessory cartridge for Super TV computer "ECC Junior" /EPOCH/Japan                             -           -               -           -               -                   -                       -
               Wild Adventure Mini Golf Game /Hasbro/USA                                                       MGFA        x8              48          4M              24C04               SSD 98 PL7351-181       dumped
               MX DIRT REBEL Game /Hasbro/USA                                                                  MTXA        x8              48          8M              24C04               SSD 2000 NEC 85605-621  dumped
