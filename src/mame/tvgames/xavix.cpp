@@ -56,7 +56,6 @@
               Popira Korea version /SONOKONG/Korea                                                            -           -               -           -               -                   -                       -
               I singer: e-kara Korean version /SONOKONG/Korea                                                 -           -               -           -               -                   -                       -
               Baseball Korean version /SONOKONG/Korea                                                         -           -               -           -               -                   -                       -
-              Ping-pong Korean version /SONOKONG/Korea                                                        -           -               -           -               -                   -                       dumped ('Reeal Ping Pong')
     1999      ABC Jungle Fun Hippo /VTech/HK, USA, France                                                     -           -               -           -               -                   -                       -
 
 	no TSOP pads
@@ -174,7 +173,8 @@
               Popira /TAKARA/Japan                                                                            -           -               -           -               -                   -                       dumped
               e-kara /TAKARA/Japan                                                                            -           -               -           -               -                   -                       dumped
               Let's play ping-pong. Exciting ping-pong /EPOCH/Japan                                           -           -               -           -               -                   -                       dumped
-              PLAY TV Huntin' Buckmasters /RADICA/USA                                                         8074        x8              none                        none                SSD 98 PA7351-107       dumped
+              Ping-pong Korean version /SONOKONG/Korea                                                        -           -               -           -               -                   -                       dumped ('Reeal Ping Pong')
+			  PLAY TV Huntin' Buckmasters /RADICA/USA                                                         8074        x8              none                        none                SSD 98 PA7351-107       dumped
               PLAY TV Ping Pong /RADICA/USA,HK,EU                                                             8028        x8              48          1M              none                SSD 97 PA7270-107       dumped
 	          PLAY TV OPUS /RADICA/USA                                                                        -           -               -           -               -                   -                       dumped (US version, PAL version appears to use different ROM)
               PLAY TV Baseball 2 /EPOCH/Japan, HK                                                             -           -               -           -               -                   -                       -
