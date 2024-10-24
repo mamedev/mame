@@ -590,7 +590,7 @@ static INPUT_PORTS_START( epo_mms )
 
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( epo_krrj )
+static INPUT_PORTS_START( ban_krrj )
 	PORT_INCLUDE(xavix)
 
 	PORT_MODIFY("IN0")
@@ -2202,7 +2202,7 @@ ROM_START( epo_mmsp )
 	ROM_LOAD("mm1j main-00.u1", 0x000000, 0x400000, CRC(65b40a27) SHA1(8f88973122277fe8f31bacb3a070609fde062946) )
 ROM_END
 
-ROM_START( epo_krrj ) // KRRJ MAIN PCB 01
+ROM_START( ban_krrj ) // KRRJ MAIN PCB 01
 	ROM_REGION( 0x400000, "bios", ROMREGION_ERASE00)
 	ROM_LOAD("krrj.u2", 0x000000, 0x400000, CRC(16f0fe78) SHA1(2b18cf6336e5adc64d4db0914788c159e60d91a2) )
 ROM_END
@@ -2567,7 +2567,7 @@ CONS( 2002, epo_mms,   0,          0,  xavix_i2c_24c02,  epo_mms,  xavix_i2c_sta
 CONS( 2003, epo_mmsp,  0,          0,  xavix_i2c_24c02,  epo_mms,  xavix_i2c_state,      init_xavix,    "Epoch / SSD Company LTD",                      "mini-moni Stage! Dance Dapyon! Plus (Japan)",  MACHINE_IMPERFECT_SOUND )
 
 // Let's!TVプレイ ケロロ軍曹 ケロロ小隊大パニック！ドタバタ大決戦であります
-CONS( 2006, epo_krrj,  0,          0,  xavix,            epo_krrj, xavix_state,          init_xavix,    "Epoch / SSD Company LTD",                      "Let's! TV Play Keroro Sergeant Keroro Platoon Panic! It's a Big Slapstick Battle (Japan)",  MACHINE_IMPERFECT_SOUND )
+CONS( 2006, ban_krrj,  0,          0,  xavix,            ban_krrj, xavix_state,          init_xavix,    "Bandai / SSD Company LTD",                      "Let's! TV Play Keroro Sergeant Keroro Platoon Panic! It's a Big Slapstick Battle (Japan)",  MACHINE_IMPERFECT_SOUND )
 
 // オールスター感謝祭　超豪華！クイズ決定版～赤坂５丁目体感スタジオ～
 CONS( 2004, epo_quiz,  0,          0,  xavix,            epo_quiz, xavix_state,          init_xavix,    "Epoch / SSD Company LTD",                      "All-Star Kansha-sai Chou Gouka! Quiz Kettieban: Akasaka 5-choume Taikan Studio (Japan)", MACHINE_IMPERFECT_SOUND )
