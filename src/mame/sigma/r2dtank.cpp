@@ -1,6 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood, Pierpaolo Prazzoli
 /*******************************************************************
+
 R2D Tank (c) 1980 Sigma Ent. Inc.
 
 driver by: David Haywood & Pierpaolo Prazzoli
@@ -81,8 +82,6 @@ public:
 
 	void r2dtank(machine_config &config);
 
-	int ttl74123_output_r();
-
 protected:
 	virtual void machine_start() override ATTR_COLD;
 
@@ -100,7 +99,6 @@ private:
 	required_device<ay8910_device> m_ay2;
 
 	uint8_t m_flipscreen = 0;
-	uint32_t m_ttl74123_output = 0;
 	uint8_t m_AY8910_selected = 0;
 
 	uint8_t audio_command_r();
@@ -114,13 +112,12 @@ private:
 	void flipscreen_w(int state);
 	void pia_comp_w(offs_t offset, uint8_t data);
 
-	void ttl74123_output_changed(int state);
-
 	MC6845_UPDATE_ROW(crtc_update_row);
 
 	void r2dtank_audio_map(address_map &map) ATTR_COLD;
 	void r2dtank_main_map(address_map &map) ATTR_COLD;
 };
+
 
 
 /*************************************
@@ -132,9 +129,9 @@ private:
 void r2dtank_state::main_cpu_irq(int state)
 {
 	int combined_state = m_pia_main->irq_a_state() | m_pia_main->irq_b_state() |
-							m_pia_audio->irq_a_state() | m_pia_audio->irq_b_state();
+			m_pia_audio->irq_a_state() | m_pia_audio->irq_b_state();
 
-	m_maincpu->set_input_line(M6809_IRQ_LINE,  combined_state ? ASSERT_LINE : CLEAR_LINE);
+	m_maincpu->set_input_line(M6809_IRQ_LINE, combined_state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -148,7 +145,6 @@ void r2dtank_state::main_cpu_irq(int state)
 uint8_t r2dtank_state::audio_command_r()
 {
 	uint8_t ret = m_soundlatch->read();
-
 	LOGMASKED(LOG_AUDIO_COMM, "%08X  CPU#1  Audio Command Read: %x\n", m_audiocpu->pc(), ret);
 
 	return ret;
@@ -225,29 +221,6 @@ void r2dtank_state::AY8910_port_w(uint8_t data)
 }
 
 
-/*************************************
- *
- *  74123
- *
- *  This timer is responsible for
- *  delaying the PIA1's port input.
- *  This delay ensures that
- *  CA1 is only changed in the VBLANK
- *  region, but not in HBLANK
- *
- *************************************/
-
-void r2dtank_state::ttl74123_output_changed(int state)
-{
-	m_pia_main->ca1_w(state);
-	m_ttl74123_output = state;
-}
-
-
-int r2dtank_state::ttl74123_output_r()
-{
-	return m_ttl74123_output;
-}
 
 /*************************************
  *
@@ -259,7 +232,6 @@ void r2dtank_state::machine_start()
 {
 	/* setup for save states */
 	save_item(NAME(m_flipscreen));
-	save_item(NAME(m_ttl74123_output));
 	save_item(NAME(m_AY8910_selected));
 }
 
@@ -270,7 +242,6 @@ void r2dtank_state::machine_start()
  *  Video system
  *
  *************************************/
-
 
 void r2dtank_state::flipscreen_w(int state)
 {
@@ -285,9 +256,7 @@ MC6845_UPDATE_ROW( r2dtank_state::crtc_update_row )
 	for (uint8_t cx = 0; cx < x_count; cx++)
 	{
 		/* the memory is hooked up to the MA, RA lines this way */
-		offs_t offs = ((ma << 3) & 0x1f00) |
-						((ra << 5) & 0x00e0) |
-						((ma << 0) & 0x001f);
+		offs_t offs = ((ma << 3) & 0x1f00) | ((ra << 5) & 0x00e0) | ((ma << 0) & 0x001f);
 
 		if (m_flipscreen)
 			offs = offs ^ 0x1fff;
@@ -365,7 +334,6 @@ void r2dtank_state::r2dtank_audio_map(address_map &map)
  *************************************/
 
 static INPUT_PORTS_START( r2dtank )
-
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
@@ -374,7 +342,7 @@ static INPUT_PORTS_START( r2dtank )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START2 )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(r2dtank_state::ttl74123_output_r))
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("74123", FUNC(ttl74123_device::q_r))
 
 	PORT_START("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_COCKTAIL
@@ -436,7 +404,6 @@ static INPUT_PORTS_START( r2dtank )
 	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
-
 INPUT_PORTS_END
 
 
@@ -471,8 +438,8 @@ void r2dtank_state::r2dtank(machine_config &config)
 	crtc.set_update_row_callback(FUNC(r2dtank_state::crtc_update_row));
 	crtc.out_de_callback().set("74123", FUNC(ttl74123_device::a_w));
 
-	/* 74LS123 */
-
+	/* 74LS123: This timer is responsible for delaying the PIA1's port input. */
+	/* This delay ensures that CA1 is only changed in the VBLANK region, but not in HBLANK. */
 	ttl74123_device &ttl74123(TTL74123(config, "74123", 0));
 	ttl74123.set_connection_type(TTL74123_GROUNDED);    /* the hook up type */
 	ttl74123.set_resistor_value(RES_K(22));             /* resistor connected to RCext */
@@ -480,7 +447,7 @@ void r2dtank_state::r2dtank(machine_config &config)
 	ttl74123.set_a_pin_value(1);                        /* A pin - driven by the CRTC */
 	ttl74123.set_b_pin_value(1);                        /* B pin - pulled high */
 	ttl74123.set_clear_pin_value(1);                    /* Clear pin - pulled high */
-	ttl74123.out_cb().set(FUNC(r2dtank_state::ttl74123_output_changed));
+	ttl74123.out_cb().set(m_pia_main, FUNC(pia6821_device::ca1_w));
 
 	PIA6821(config, m_pia_main);
 	m_pia_main->readpa_handler().set_ioport("IN0");
@@ -532,6 +499,7 @@ ROM_START( r2dtank )
 ROM_END
 
 } // anonymous namespace
+
 
 
 /*************************************
