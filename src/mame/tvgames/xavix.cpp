@@ -543,6 +543,13 @@ static INPUT_PORTS_START( xavix_i2c )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("i2cmem", FUNC(i2cmem_device::read_sda))
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( epo_mj )
+	PORT_INCLUDE(xavix)
+
+	PORT_MODIFY("IN1")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("i2cmem", FUNC(i2cmem_device::read_sda))
+INPUT_PORTS_END
+
 static INPUT_PORTS_START( epo_mms )
 	PORT_INCLUDE(xavix_i2c)
 
@@ -2085,6 +2092,11 @@ ROM_START( epo_epp3 )
 	ROM_LOAD("excitepingpong3.bin", 0x000000, 0x200000, CRC(a2ee8bff) SHA1(6e16dbaac9680e1f311c08e3f573d0cf8708b446))
 ROM_END
 
+ROM_START( epo_mj ) // MARJ MAIN-11A
+	ROM_REGION(0x200000, "bios", ROMREGION_ERASE00)
+	ROM_LOAD("marj.u4", 0x000000, 0x200000, CRC(4e496424) SHA1(9661130ad8315082bd211b3817e5830b576907a8) )
+ROM_END
+
 ROM_START( rad_socr )
 	ROM_REGION(0x800000, "bios", ROMREGION_ERASE00)
 	ROM_LOAD("soccer.u5", 0x000000, 0x100000, CRC(0564a766) SHA1(bded4f2e0d059731164c35de7df62ef411402901) )
@@ -2480,6 +2492,9 @@ CONS( 2003, epo_epp2,   0,         0,  xavix,            epo_epp,  xavix_state, 
 
 // 愛ちゃんに挑戦！エキサイトピンポン
 CONS( 2006, epo_epp3,   0,         0,  xavix,            epo_epp,  xavix_state,          init_xavix,    "Epoch / SSD Company LTD",                      "Ai-chan ni Chousen! Excite Ping Pong (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+
+// TV麻雀 昇段対局～4人打ち
+CONS( 2003, epo_mj,     0,         0,  xavix_i2c_24c02,  epo_mj,   xavix_i2c_mj_state,   init_xavix,    "Epoch / SSD Company LTD",                      "TV Mahjong Promotion Game - 4-Player Game (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
 // 大モノ釣ろうぜ！ エキサイトフィッシングＤＸ 
 CONS( 2003, epo_efdx,  0,          0,  xavix_i2c_24c08,  epo_efdx, xavix_i2c_state,      init_xavix,    "Epoch / SSD Company LTD",                      "Dai Mono Tsurouze! Excite Fishing DX (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )

@@ -642,6 +642,16 @@ protected:
 	required_device<i2cmem_device> m_i2cmem;
 };
 
+class xavix_i2c_mj_state : public xavix_i2c_state
+{
+public:
+	xavix_i2c_mj_state(const machine_config &mconfig, device_type type, const char *tag)
+		: xavix_i2c_state(mconfig, type, tag)
+	{ }
+protected:
+	virtual void write_io1(uint8_t data, uint8_t direction) override;
+};
+
 class xavix_epo_hamc_state : public xavix_state
 {
 public:
