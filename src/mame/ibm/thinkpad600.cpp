@@ -26,6 +26,7 @@ Hardware for the 600E model.
     -National Semiconductor PC97338VJG (ACPI 1.0 and PC98/99 Compliant SuperI/O).
     -Hitachi HD64F3437TF.
     -Atmel 24C01A (SEEPROM).
+    -Dallas DS17485S-5 (real-time clock/calendar).
     -Other chips: IMI-SG577DYB, TI SN75LVDS84, 4 x IBM 0364164PT3B (64 MB of RAM on the motherboard),
                   IBM 20H2987, IBM 10L3953, Motorola MC145583V, Maxim MAX1632EAI, etc.
    Modem PCB:
@@ -46,6 +47,7 @@ Hardware for the 600 model.
     -National Semiconductor PC97338VJG (ACPI 1.0 and PC98/99 Compliant SuperI/O).
     -Hitachi HD64F3437TF.
     -Atmel 24C01A (SEEPROM).
+    -Dallas DS17485S-5 (real-time clock/calendar).
     -Other chips: IMI-SG571BYB, TI SN75LVDS84, 4 x Mitsubishi M5M4V64S40ATP (64 MB of RAM on the motherboard),
                   IBM 20H2987, IBM 10L3932, Maxim MAX1631EAI, etc.
    Modem PCB (same as 600E model):
@@ -67,6 +69,7 @@ Hardware for the 600 model.
 #include "bus/rs232/terminal.h"
 #include "cpu/h8/h83337.h"
 #include "cpu/i386/i386.h"
+#include "machine/ds17x85.h"
 #include "machine/pci.h"
 #include "machine/pci-ide.h"
 #include "machine/i82443bx_host.h"
@@ -153,9 +156,11 @@ static void isa_internal_devices(device_slot_interface &device)
 void thinkpad600_state::thinkpad600_base(machine_config &config)
 {
 	// TODO: move away, maps on MB resource, bump to H83437
-	h83337_device &mcu(H83337(config, "mcu", XTAL(16'000'000))); // Actually an Hitachi HD64F3437TF, unknown clock
+	h83337_device &mcu(H83337(config, "mcu", 10_MHz_XTAL)); // Actually an Hitachi HD64F3437TF
 	mcu.set_addrmap(AS_PROGRAM, &thinkpad600_state::mcu_map);
 //  mcu.set_disable();
+
+	DS17485(config, "rtc", 16'000'000); // Dallas DS17485S-5, unknown clock
 }
 
 void thinkpad600_state::thinkpad600e(machine_config &config)
@@ -233,7 +238,7 @@ ROM_START(thinkpad600e)
 	ROM_LOAD( "hd64f3437tf-10l1057_rev04_h0499m.u39",  0x00000, 0x0f780, CRC(c21c928b) SHA1(33e3e6966f003655ffc2f3ac07772d2d3245740d) )
 
 	ROM_REGION(0x00080, "seeprom", 0)
-	ROM_LOAD( "atmel_24c01a.u98",                      0x00000, 0x00080, CRC(7ce51001) SHA1(6f25666373a6373ce0014c04df73a066f4da938b) )
+	ROM_LOAD( "atmel_24c01a.u98",                      0x00000, 0x00080, CRC(7ce51001) SHA1(6f25666373a6373ce0014c04df73a066f4da938b) ) // BIOS settings
 
 	ROM_REGION(0x00420, "seeprom2", 0)
 	ROM_LOAD( "at24rf08bt.u99",                        0x00000, 0x00420, CRC(c7ce9600) SHA1(4e6ed66250fed838614c3f1f6044fd9a19a2d0de) )
@@ -250,7 +255,7 @@ ROM_START(thinkpad600)
 	ROM_LOAD( "hd64f3437tf_10l9950_rev08_i2798m.u32",  0x00000, 0x0f780, CRC(546ec51c) SHA1(5d9b4be590307c4059ff11c434d0901819427649) )
 
 	ROM_REGION(0x00080, "seeprom", 0)
-	ROM_LOAD( "atmel_24c01a.u49",                      0x00000, 0x00080, CRC(9a2e2a18) SHA1(29e2832c97bc93debb4fb09fcbed582335b57efe) )
+	ROM_LOAD( "atmel_24c01a.u49",                      0x00000, 0x00080, CRC(9a2e2a18) SHA1(29e2832c97bc93debb4fb09fcbed582335b57efe) ) // BIOS settings
 
 	ROM_REGION(0x00c39, "plds", 0)
 	ROM_LOAD( "atf1500al-modemboard.u12",              0x00000, 0x00c39, CRC(7ecd4b79) SHA1(b69ef5fe227b466f331f863ba20efd7e23056809) ) // On modem PCB
