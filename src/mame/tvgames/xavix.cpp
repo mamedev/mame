@@ -546,8 +546,29 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( epo_mj )
 	PORT_INCLUDE(xavix)
 
+	// there are not 15 buttons, there are 7 plus the dial, this is for figuring out the inputs
+	PORT_MODIFY("IN0")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Back")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Select") // forward through menus
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON3 )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON4 )
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON5 )
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON6 )
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON7 )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_BUTTON8 )
+
 	PORT_MODIFY("IN1")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON9 )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("i2cmem", FUNC(i2cmem_device::read_sda))
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON10 )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON11 )
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON12 )
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON13 )
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON14 )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_BUTTON15 )
+
+	PORT_START("DIAL")
+	PORT_BIT( 0xff, 0x00, IPT_AD_STICK_X ) PORT_SENSITIVITY(16) PORT_KEYDELTA(16) PORT_REVERSE PORT_PLAYER(1)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( epo_mms )
@@ -1669,6 +1690,13 @@ void xavix_i2c_ltv_tam_state::xavix_i2c_24lc04_tam(machine_config &config)
 	m_anport->read_3_callback().set(FUNC(xavix_i2c_ltv_tam_state::tam_anport3_r));
 }
 
+void xavix_i2c_mj_state::xavix_i2c_24lc02_mj(machine_config &config)
+{
+	xavix_i2c_24c02(config);
+
+	m_anport->read_0_callback().set(FUNC(xavix_i2c_mj_state::mj_anport0_r));
+}
+
 void xavix_i2c_state::xavix_i2c_24c08(machine_config &config)
 {
 	xavix(config);
@@ -2494,7 +2522,7 @@ CONS( 2003, epo_epp2,   0,         0,  xavix,            epo_epp,  xavix_state, 
 CONS( 2006, epo_epp3,   0,         0,  xavix,            epo_epp,  xavix_state,          init_xavix,    "Epoch / SSD Company LTD",                      "Ai-chan ni Chousen! Excite Ping Pong (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
 // TV麻雀 昇段対局～4人打ち
-CONS( 2003, epo_mj,     0,         0,  xavix_i2c_24c02,  epo_mj,   xavix_i2c_mj_state,   init_xavix,    "Epoch / SSD Company LTD",                      "TV Mahjong Promotion Game - 4-Player Game (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+CONS( 2003, epo_mj,     0,         0,  xavix_i2c_24lc02_mj,  epo_mj,   xavix_i2c_mj_state,   init_xavix,    "Epoch / SSD Company LTD",                      "TV Mahjong Promotion Game - 4-Player Game (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
 // 大モノ釣ろうぜ！ エキサイトフィッシングＤＸ 
 CONS( 2003, epo_efdx,  0,          0,  xavix_i2c_24c08,  epo_efdx, xavix_i2c_state,      init_xavix,    "Epoch / SSD Company LTD",                      "Dai Mono Tsurouze! Excite Fishing DX (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
