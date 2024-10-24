@@ -1361,19 +1361,19 @@ bool menu_select_launch::scale_icon(bitmap_argb32 &&src, texture_and_bitmap &dst
 	assert(dst.texture);
 	if (src.valid())
 	{
-		// reduce the source bitmap if it's too big
+		// scale the source bitmap
 		bitmap_argb32 tmp;
-		float const ratio((std::min)({ float(m_icon_height) / src.height(), float(m_icon_width) / src.width(), 1.0F }));
-		if (1.0F > ratio)
+		float const ratio((std::min)({ float(m_icon_height) / src.height(), float(m_icon_width) / src.width() }));
+		if (1.0F == ratio)
+		{
+			tmp = std::move(src);
+		}
+		else
 		{
 			float const pix_height(std::ceil(src.height() * ratio));
 			float const pix_width(std::ceil(src.width() * ratio));
 			tmp.allocate(s32(pix_width), s32(pix_height));
 			render_resample_argb_bitmap_hq(tmp, src, render_color{ 1.0F, 1.0F, 1.0F, 1.0F }, true);
-		}
-		else
-		{
-			tmp = std::move(src);
 		}
 
 		// copy into the destination
