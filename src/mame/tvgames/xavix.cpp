@@ -2077,8 +2077,7 @@ ROM_END
 
 ROM_START( epo_epp2 )
 	ROM_REGION(0x200000, "bios", ROMREGION_ERASE00)
-	// there are some corrupt graphics here, reads were consistent so needs verifying against another unit
-	ROM_LOAD("excitepingpong2.u3", 0x000000, 0x200000, BAD_DUMP CRC(06665866) SHA1(96f6cdf10ee0f3a748960cc3346bb3114d1318f6) )
+	ROM_LOAD("excitepingpong2.u3", 0x000000, 0x200000, CRC(4b70012a) SHA1(4dd80472067027be5a416ec953f4ed6e7df5fc25) )
 ROM_END
 
 ROM_START( epo_epp3 )
