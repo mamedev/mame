@@ -35,8 +35,7 @@
     2011      anpan-man kazoku de ikunou mat DX /JoyPalette/Japan                                             -           -               -           -               -                   -                       -
     2009      anpan-man pyon-pyon ikunou mat /JoyPalette/Japan                                                -           -               -           -               -                   -                       -
     2008      究極! 筋肉スタジアム! サスケ完全制覇   kyuukyoku! kinniku grand slam! SASUKE kanzen seiha /EPOCH/Japan                                 -           -               -           -               -                   -                       -
-    2006      Let's!TVプレイ　ＮＡＲＵＴＯ－ナルト－ 忍者体感～だってばよ～ / バンダイ / 日本            Let's!TV Play NARUTO Ninja Experience ~Dattebayo~ / Bandai / Japan
-              Let's!TVプレイ　ドラゴンボールＺ　バトル体感かめはめ波２～オッスおめぇ悟空 天下一武道会～ / バンダイ / 日本         Let's!TV Play Dragon Ball Z Battle Experience Kamehameha 2 ~Ossu Ome Goku Tenkaichi Budokai~ / Bandai / Japan
+    2006      Let's!TVプレイ　ドラゴンボールＺ　バトル体感かめはめ波２～オッスおめぇ悟空 天下一武道会～ / バンダイ / 日本         Let's!TV Play Dragon Ball Z Battle Experience Kamehameha 2 ~Ossu Ome Goku Tenkaichi Budokai~ / Bandai / Japan
               Hello Kitty カードでおままごと　あいうおえ図鑑 / エポック社 / 日本       Hello Kitty Play House with Cards Aiuoe Illustrated Book / Epochsha / Japan
               ドラえもん 体感タケコプター! 空とぶ大冒険 / エポック社 / 日本      Doraemon Experience Takecopter! Great Flying Adventure / Epoch Publishing / Japan
               スーパーテレビパソコン別売カートリッジ ペットケータイLink / エポック社 / 日本      Super TV PC Optional Cartridge Pet Mobile Link / Epochsha / Japan
@@ -82,7 +81,7 @@
     2000      Let's hit a homerun! Exciting baseball /EPOCH/Japan                                             -           -               -           -               -                                           -
     * one version of Gin-Gin boarders also had no pads, but the unit it was dumped from did have them
 
-    dumped
+    dumped: either here, xavix_2000.cpp, or xavix_2002.cpp
               Challenge Ai-chan! Exciting Ping-pong /TAKARATOMY/Japan                                         -           -               -           -               -                   -                       dumped
               TV de  Asobitai Hyper Rescue - Boku wa Kyuujotai /BANDAI/Japan                                  -           -               -           -               -                   -                       -
               Tokyo Friend Park II Perfect! Mezase! Grand Slam!! /EPOCH/Japan                                 -           -               -           -               -                   -                       -
@@ -193,8 +192,10 @@
               XaviXTennis                                                                                     SGM6446     x16             48          8M              24C08               SSD 2002 NEC 85054-611  dumped
               XaviXBowling                                                                                    SGM644C     x16             48                                                                      dumped
 
+	dumped: see xavix2.cpp
+    2006      Let's!TVプレイ　ＮＡＲＵＴＯ－ナルト－ 忍者体感～だってばよ～ / バンダイ / 日本            Let's!TV Play NARUTO Ninja Experience ~Dattebayo~ / Bandai / Japan
 
-    TODO: put into above table (XaviXPORT cartridges)
+
 
     XaviX Tennis and XaviX Baseball are the simplest: just the CPU, x16 ROM and 24C08 SEEPROM.  Bowling and Boxing also have 4 IR LEDs and a 32x32 sensor.
     XaviX Fishing has ROM, 24C08 and a 24-pin daughterboard with a Nordic nRF24E1 2.4GHz 8051-based SoC.
