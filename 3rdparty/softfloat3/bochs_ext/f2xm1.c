@@ -33,8 +33,6 @@ these four paragraphs for those parts of this code that are retained.
 #include "softfloat-helpers.h"
 #include "softfloat-specialize.h"
 
-#include <stdio.h>
-
 static const extFloat80_t floatx80_posone = packFloatx80(0, 0x3fff, uint64_t(0x8000000000000000));
 static const extFloat80_t floatx80_negone = packFloatx80(1, 0x3fff, uint64_t(0x8000000000000000));
 static const extFloat80_t floatx80_neghalf = packFloatx80(1, 0x3ffe, uint64_t(0x8000000000000000));
