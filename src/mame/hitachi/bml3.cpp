@@ -30,7 +30,6 @@ TODO:
 #include "bus/bml3/rtc.h"
 #include "cpu/m6809/m6809.h"
 #include "machine/6821pia.h"
-#include "machine/clock.h"
 
 #include "screen.h"
 #include "softlist_dev.h"
@@ -212,7 +211,6 @@ void bml3_state::interlace_sel_w(u8 data)
 	crtc_change_clock();
 }
 
-
 u8 bml3_state::vram_r(offs_t offset)
 {
 	// Bit 7 masks reading back to the latch
@@ -297,6 +295,19 @@ void bml3_state::remote_w(u8 data)
 		BIT(data, 7) ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);
 }
 
+// BAUD SEL - ACIA clock select 600/1200 baud
+// (Misspelled as BANK SEL in the English documentation)
+void bml3_state::baud_sel_w(u8 data)
+{
+	m_baud_sel = BIT(data, 0);
+	m_acia_clock->set_unscaled_clock(m_baud_sel ? 19'200 : 9'600);
+}
+
+u8 bml3_state::baud_sel_r()
+{
+	return m_baud_sel;
+}
+
 // KBNMI - Keyboard "Break" key non-maskable interrupt
 u8 bml3_state::kbnmi_r()
 {
@@ -373,11 +384,11 @@ void bml3_state::system_io(address_map &map)
 	map(0x00d4, 0x00d4).w(FUNC(bml3_state::time_mask_w));
 	map(0x00d5, 0x00d5).noprw(); // L/P ENBL - Light pen operation enable
 	map(0x00d6, 0x00d6).w(FUNC(bml3_state::interlace_sel_w));
-//  map(0x00d7, 0x00d7) BANK SEL - baud select
+	map(0x00d7, 0x00d7).rw(FUNC(bml3_state::baud_sel_r), FUNC(bml3_state::baud_sel_w));
 	map(0x00d8, 0x00d8).rw(FUNC(bml3_state::c_reg_sel_r), FUNC(bml3_state::c_reg_sel_w));
 	map(0x00e0, 0x00e0).rw(FUNC(bml3_state::kb_sel_r), FUNC(bml3_state::kb_sel_w));
 //  map(0x00e8, 0x00e8) bank register
-//  map(0x00e9, 0x00e9) IG mode register
+//  map(0x00e9, 0x00e9) IG mode register (Mark 5 only, below)
 //  map(0x00ea, 0x00ea) IG enable register
 
 #if 0
@@ -863,9 +874,9 @@ void bml3_state::bml3(machine_config &config)
 	m_acia->rts_handler().set(FUNC(bml3_state::acia_rts_w));
 	m_acia->irq_handler().set(FUNC(bml3_state::acia_irq_w));
 
-	clock_device &acia_clock(CLOCK(config, "acia_clock", 9'600)); // 600 baud x 16(divider) = 9600
-	acia_clock.signal_handler().set(m_acia, FUNC(acia6850_device::write_txc));
-	acia_clock.signal_handler().append(m_acia, FUNC(acia6850_device::write_rxc));
+	CLOCK(config, m_acia_clock, 9'600); // 600 baud x 16(divider) = 9600
+	m_acia_clock->signal_handler().set(m_acia, FUNC(acia6850_device::write_txc));
+	m_acia_clock->signal_handler().append(m_acia, FUNC(acia6850_device::write_rxc));
 
 	CASSETTE(config, m_cassette);
 	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED);
