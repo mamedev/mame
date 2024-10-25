@@ -1262,52 +1262,52 @@ It can also be used with Final Furlong when wired correctly.
 
 #include <cfloat>
 
-#define LOG_PROJ_MAT		(1ULL << 1)
-#define LOG_3D_STATE_ERR	(1ULL << 2)
-#define LOG_3D_STATE_UNK	(1ULL << 3)
-#define LOG_MATRIX_ERR		(1ULL << 4)
-#define LOG_MATRIX_UNK		(1ULL << 5)
-#define LOG_VEC_ERR			(1ULL << 6)
-#define LOG_VEC_UNK			(1ULL << 7)
-#define LOG_RENDER_ERR		(1ULL << 8)
-#define LOG_RENDER_INFO		(1ULL << 9)
-#define LOG_MODEL_ERR		(1ULL << 10)
-#define LOG_MODEL_INFO		(1ULL << 11)
-#define LOG_MODELS			(1ULL << 12)
-#define LOG_C435_PIO_UNK	(1ULL << 13)
-#define LOG_C435_UNK		(1ULL << 14)
-#define LOG_C417_UNK		(1ULL << 15)
-#define LOG_C417_ACK		(1ULL << 16)
-#define LOG_C412_UNK		(1ULL << 17)
-#define LOG_C421_UNK		(1ULL << 18)
-#define LOG_C422_IRQ		(1ULL << 19)
-#define LOG_C422_UNK		(1ULL << 20)
-#define LOG_C361_UNK		(1ULL << 21)
-#define LOG_CTL_UNK			(1ULL << 22)
-#define LOG_MCU				(1ULL << 23)
-#define LOG_SH2				(1ULL << 24)
-#define LOG_SUBIRQ			(1ULL << 25)
-#define LOG_SPRITES			(1ULL << 26)
-#define LOG_IOMCU			(1ULL << 27)
-#define LOG_ADC_RD			(1ULL << 28)
-#define LOG_ADC_WR			(1ULL << 29)
-#define LOG_C417_IRQ		(1ULL << 30)
-#define LOG_C361_IRQ		(1ULL << 31)
-#define LOG_MATRIX_INFO		(1ULL << 32)
-#define LOG_VEC_INFO		(1ULL << 33)
-#define LOG_CTL_REG			(1ULL << 34)
-#define LOG_C435_REG		(1ULL << 35)
-#define LOG_C361_REG		(1ULL << 36)
-#define LOG_C417_REG		(1ULL << 37)
-#define LOG_C412_RAM		(1ULL << 38)
-#define LOG_C421_RAM		(1ULL << 39)
-#define LOG_C404_REGS		(1ULL << 40)
-#define LOG_C404_RAM		(1ULL << 41)
-#define LOG_GMEN			(1ULL << 42)
-#define LOG_MCU_PORTS		(1ULL << 43)
-#define LOG_RS232			(1ULL << 44)
-#define LOG_IRQ_STATUS  	(1ULL << 45)
-#define LOG_C451			(1ULL << 46)
+#define LOG_PROJ_MAT        (1ULL << 1)
+#define LOG_3D_STATE_ERR    (1ULL << 2)
+#define LOG_3D_STATE_UNK    (1ULL << 3)
+#define LOG_MATRIX_ERR      (1ULL << 4)
+#define LOG_MATRIX_UNK      (1ULL << 5)
+#define LOG_VEC_ERR         (1ULL << 6)
+#define LOG_VEC_UNK         (1ULL << 7)
+#define LOG_RENDER_ERR      (1ULL << 8)
+#define LOG_RENDER_INFO     (1ULL << 9)
+#define LOG_MODEL_ERR       (1ULL << 10)
+#define LOG_MODEL_INFO      (1ULL << 11)
+#define LOG_MODELS          (1ULL << 12)
+#define LOG_C435_PIO_UNK    (1ULL << 13)
+#define LOG_C435_UNK        (1ULL << 14)
+#define LOG_C417_UNK        (1ULL << 15)
+#define LOG_C417_ACK        (1ULL << 16)
+#define LOG_C412_UNK        (1ULL << 17)
+#define LOG_C421_UNK        (1ULL << 18)
+#define LOG_C422_IRQ        (1ULL << 19)
+#define LOG_C422_UNK        (1ULL << 20)
+#define LOG_C361_UNK        (1ULL << 21)
+#define LOG_CTL_UNK         (1ULL << 22)
+#define LOG_MCU             (1ULL << 23)
+#define LOG_SH2             (1ULL << 24)
+#define LOG_SUBIRQ          (1ULL << 25)
+#define LOG_SPRITES         (1ULL << 26)
+#define LOG_IOMCU           (1ULL << 27)
+#define LOG_ADC_RD          (1ULL << 28)
+#define LOG_ADC_WR          (1ULL << 29)
+#define LOG_C417_IRQ        (1ULL << 30)
+#define LOG_C361_IRQ        (1ULL << 31)
+#define LOG_MATRIX_INFO     (1ULL << 32)
+#define LOG_VEC_INFO        (1ULL << 33)
+#define LOG_CTL_REG         (1ULL << 34)
+#define LOG_C435_REG        (1ULL << 35)
+#define LOG_C361_REG        (1ULL << 36)
+#define LOG_C417_REG        (1ULL << 37)
+#define LOG_C412_RAM        (1ULL << 38)
+#define LOG_C421_RAM        (1ULL << 39)
+#define LOG_C404_REGS       (1ULL << 40)
+#define LOG_C404_RAM        (1ULL << 41)
+#define LOG_GMEN            (1ULL << 42)
+#define LOG_MCU_PORTS       (1ULL << 43)
+#define LOG_RS232           (1ULL << 44)
+#define LOG_IRQ_STATUS      (1ULL << 45)
+#define LOG_C451            (1ULL << 46)
 #define LOG_ALL ( LOG_PROJ_MAT | LOG_3D_STATE_ERR | LOG_3D_STATE_UNK | LOG_VEC_ERR | LOG_VEC_UNK | LOG_RENDER_ERR | LOG_RENDER_INFO | LOG_MODEL_ERR | \
 				LOG_MODEL_INFO | LOG_MODELS | LOG_C435_PIO_UNK | LOG_C435_UNK | LOG_C417_UNK | LOG_C417_ACK | LOG_C412_UNK | LOG_C421_UNK | \
 				LOG_C422_IRQ | LOG_C422_UNK | LOG_C361_UNK | LOG_CTL_UNK | LOG_C417_IRQ | LOG_C361_IRQ | LOG_MATRIX_INFO | LOG_VEC_INFO | \
@@ -1913,8 +1913,8 @@ protected:
 	// At 0x1e bytes per slot, rounded up to 0x20, that's 0x1000 to 0x2000 bytes.
 	// That fits pretty much anywhere, including inside an IC.
 	// Unknown right now if it's directly CPU-accessible. Command packets via DMA are probably more efficient.
-	s16 m_matrices[256][9];	// Matrices are stored in signed 2.14 fixed point
-	s32 m_vectors[256][3];	// Vectors are stored in signed 10.14 fixed point
+	s16 m_matrices[256][9]; // Matrices are stored in signed 2.14 fixed point
+	s32 m_vectors[256][3];  // Vectors are stored in signed 10.14 fixed point
 	s32 m_light_vector[3];
 	u16 m_scaling;
 	s32 m_spv[3];
@@ -2328,9 +2328,9 @@ static void transpose_matrix(s16 *m1)
 {
 	s16 m2[9];
 	memcpy(m2, m1, sizeof(m2));
-	m1[0] = m2[0];	m1[1] = m2[3];	m1[2] = m2[6];
-	m1[3] = m2[1];	m1[4] = m2[4];	m1[5] = m2[7];
-	m1[6] = m2[2];	m1[7] = m2[5];	m1[8] = m2[8];
+	m1[0] = m2[0];  m1[1] = m2[3];  m1[2] = m2[6];
+	m1[3] = m2[1];  m1[4] = m2[4];  m1[5] = m2[7];
+	m1[6] = m2[2];  m1[7] = m2[5];  m1[8] = m2[8];
 }
 
 void namcos23_state::c435_matrix_matrix_mul() // 0.0
@@ -2723,30 +2723,30 @@ void namcos23_state::c435_state_set(u16 type, const u16 *param)
 		3-e0: 1110 0000, has shade+tex+pos
 		3-a0: 1010 0000, has tex+pos
 		[:] Word 00: 000a
-		[:] Word 01: 34a0		type
-		[:] Word 02: 00003242	h
-		[:] Word 04: 0040ff00	pal?
-		[:] Word 06: 00000000	zbias?
-		[:] Word 08: 0000000f	u0
-		[:] Word 0a: 0000060f	v0
-		[:] Word 0c: 0000000f	u1
-		[:] Word 0e: 00000600	v1
-		[:] Word 10: 00000000	u2
-		[:] Word 12: 00000600	v2
-		[:] Word 14: 00000000	u3
-		[:] Word 16: 0000060f	v3
-		[:] Word 18: 000000c8	x0
-		[:] Word 1a: ffffff38	y0
-		[:] Word 1c: 00000500	z0
-		[:] Word 1e: ffffff38	x1
-		[:] Word 20: ffffff38	y1
-		[:] Word 22: 00000500	z1
-		[:] Word 24: ffffff38	x2
-		[:] Word 26: 000000c8	y2
-		[:] Word 28: 00000500	z2
-		[:] Word 2a: 000000c8	x3
-		[:] Word 2c: 000000c8	y3
-		[:] Word 2e: 00000500	z3
+		[:] Word 01: 34a0       type
+		[:] Word 02: 00003242   h
+		[:] Word 04: 0040ff00   pal?
+		[:] Word 06: 00000000   zbias?
+		[:] Word 08: 0000000f   u0
+		[:] Word 0a: 0000060f   v0
+		[:] Word 0c: 0000000f   u1
+		[:] Word 0e: 00000600   v1
+		[:] Word 10: 00000000   u2
+		[:] Word 12: 00000600   v2
+		[:] Word 14: 00000000   u3
+		[:] Word 16: 0000060f   v3
+		[:] Word 18: 000000c8   x0
+		[:] Word 1a: ffffff38   y0
+		[:] Word 1c: 00000500   z0
+		[:] Word 1e: ffffff38   x1
+		[:] Word 20: ffffff38   y1
+		[:] Word 22: 00000500   z1
+		[:] Word 24: ffffff38   x2
+		[:] Word 26: 000000c8   y2
+		[:] Word 28: 00000500   z2
+		[:] Word 2a: 000000c8   x3
+		[:] Word 2c: 000000c8   y3
+		[:] Word 2e: 00000500   z3
 		*/
 		re->immediate.type  =  param[ 0];
 		re->immediate.h     = (param[ 1] << 16) | param[ 2];
@@ -3394,8 +3394,8 @@ void namcos23_state::render_project(poly_vertex &pv)
 static bool render_stencil_lookup(running_machine &machine, float x, float y)
 {
 	namcos23_state *state = machine.driver_data<namcos23_state>();
-    u32 xx = u32(x);
-    u32 yy = u32(y);
+	u32 xx = u32(x);
+	u32 yy = u32(y);
 	u32 bit = (xx & 15) ^ 15;
 	u32 offs = ((yy << 6) | (xx >> 4)) & 0x1ffff;
 	if (!BIT(state->m_texram[offs], bit))
@@ -3478,7 +3478,7 @@ void namcos23_state::render_direct_poly(const namcos23_render_entry *re)
 		p->zkey = polyshift | (re->absolute_priority << 21);
 		p->rd.machine = &machine();
 		p->rd.texture_lookup = render_texture_lookup;
-        p->rd.stencil_lookup = render_stencil_lookup_always;
+		p->rd.stencil_lookup = render_stencil_lookup_always;
 		p->rd.pens = m_palette->pens() + (re->direct.d[2] & 0x7f00);
 		p->rd.direct = true;
 		p->rd.sprite = false;
@@ -3677,7 +3677,7 @@ void namcos23_state::render_immediate(const namcos23_render_entry *re)
 		p->zkey = zsort | (absolute_priority << 21);
 		p->rd.machine = &machine();
 		p->rd.texture_lookup = render_texture_lookup;
-        p->rd.stencil_lookup = stencil_enabled ? render_stencil_lookup : render_stencil_lookup_always;
+		p->rd.stencil_lookup = stencil_enabled ? render_stencil_lookup : render_stencil_lookup_always;
 		p->rd.pens = m_palette->pens() + (re->immediate.pal & 0x7f00);
 		p->rd.rgb = 0x00ffffff;
 		p->rd.direct = false;
@@ -3832,13 +3832,13 @@ void namcos23_state::render_model(const namcos23_render_entry *re)
 
 				float nrx, nry, nrz;
 				render_apply_matrot(nx, ny, nz, re, nrx, nry, nrz);
-                float length = sqrtf(nrx * nrx + nry * nry + nrz * nrz);
-                if (length != 0.0f)
-                {
-                    nrx /= length;
-                    nry /= length;
-                    nrz /= length;
-                }
+				float length = sqrtf(nrx * nrx + nry * nry + nrz * nrz);
+				if (length != 0.0f)
+				{
+					nrx /= length;
+					nry /= length;
+					nrz /= length;
+				}
 
 				float light_vector[3] =
 				{
@@ -3847,13 +3847,13 @@ void namcos23_state::render_model(const namcos23_render_entry *re)
 					util::sext(re->model.light_vector[2], 24) / 16384.f
 				};
 
-                length = sqrtf(light_vector[0] * light_vector[0] + light_vector[1] * light_vector[1] + light_vector[2] * light_vector[2]);
-                if (length != 0.0f)
-                {
-                    light_vector[0] /= length;
-                    light_vector[1] /= length;
-                    light_vector[2] /= length;
-                }
+				length = sqrtf(light_vector[0] * light_vector[0] + light_vector[1] * light_vector[1] + light_vector[2] * light_vector[2]);
+				if (length != 0.0f)
+				{
+					light_vector[0] /= length;
+					light_vector[1] /= length;
+					light_vector[2] /= length;
+				}
 
 				float lsi = nrx * light_vector[0] + nry * light_vector[1] + nrz * light_vector[2];
 				if (lsi < 0)
@@ -3861,7 +3861,7 @@ void namcos23_state::render_model(const namcos23_render_entry *re)
 
 				// Mapping taken out of a hat
 				pv[i].p[3] = std::clamp(16.f + 96.f * lsi, 0.f, 64.f);
-			}	break;
+			}   break;
 			}
 		}
 		namcos23_poly_entry *p = render.polys + render.poly_count;
@@ -3870,10 +3870,10 @@ void namcos23_state::render_model(const namcos23_render_entry *re)
 		{
 			if (BIT(h, 5))
 			{
-                const float z0 = pv[0].p[0];
-                const float z1 = pv[1].p[0];
-                const float z2 = pv[2].p[0];
-                const float z3 = pv[3].p[0];
+				const float z0 = pv[0].p[0];
+				const float z1 = pv[1].p[0];
+				const float z2 = pv[2].p[0];
+				const float z3 = pv[3].p[0];
 				float c1 =
 					(pv[2].x * (z0 * pv[1].y - pv[0].y * z1)) +
 					(pv[2].y * (pv[0].x * z1 - z0 * pv[1].x)) +
