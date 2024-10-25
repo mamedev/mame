@@ -71,7 +71,6 @@
     2001      TV hockey /TOMY/Japan                                                                           -           -               -           -               -                   -                       -
     2001      Webdiver Gradion /TAKARA/Japan                                                                  -           -               -           -               -                   -                       -
     2000      connecTV OPUS /RADICA EU (different ROM to US?)
-    2000      Let's hit a homerun! Exciting baseball /EPOCH/Japan                                             -           -               -           -               -                                           -
     * one version of Gin-Gin boarders also had no pads, but the unit it was dumped from did have them
 
     not dumped: xavix2.cpp
@@ -195,6 +194,7 @@
               PLAY TV Football /RADICA/USA                                                                    74021       x8              48          4M              none                SSD 98 PL7351-181       dumped
 			  Let's fish black bass! Exciting Fishing /EPOCH/Japan                                            -           -               -           -               -                   -                       -
 	          black bass tsurouze! Excite Fishing /EPOCH/Japan *same as above?                                -           -               -           -               -                   -                       -
+		      Let's hit a homerun! Exciting Stadium /EPOCH/Japan                                              -           -               -           -               -                                           -
 			  XaviXTennis                                                                                     SGM6446     x16             48          8M              24C08               SSD 2002 NEC 85054-611  dumped
               XaviXBowling                                                                                    SGM644C     x16             48                                                                      dumped
 
@@ -2114,6 +2114,11 @@ ROM_START( epo_esdx )
 	ROM_LOAD("baseballdx.bin", 0x000000, 0x400000, CRC(fe2e832e) SHA1(e6343f5e5f52316538d918d0d67c15764aa40f65) )
 ROM_END
 
+ROM_START( epo_stad )
+	ROM_REGION(0x200000, "bios", ROMREGION_ERASE00)
+	ROM_LOAD("excitestadium.bin", 0x000000, 0x200000, CRC(b58035b9) SHA1(1382a9e42ff932e7ec2186b210917bcf5c571b86) )
+ROM_END
+
 ROM_START( epo_esht ) // ESTJ-MAIN REV:0 PCB
 	ROM_REGION(0x400000, "bios", ROMREGION_ERASE00)
 	ROM_LOAD("tigers.u3", 0x000000, 0x400000, CRC(51a17ef3) SHA1(864190e91775716218be3ac0699570844d67d3e7) )
@@ -2527,6 +2532,9 @@ CONS( 2001, epo_strk,  0,          0,  xavix,            epo_epp,  xavix_state, 
 // A UK branded Epoch version (no Radica involvement) also exists, but so far all units seen have been 'no TSOP pads' cases
 
 CONS( 2002, rad_jcon,  0,          0,  xavix,            rad_jcon, xavix_state,          init_xavix,    "Radica / Takara / SSD Company LTD",            "Play TV Jr. Construction", MACHINE_IMPERFECT_SOUND )
+
+// ホームラン打とうぜ! エキサイトスタジアム  
+CONS( 2000, epo_stad,  0,          0,  xavix,            epo_epp,  xavix_state,          init_xavix,    "Epoch / SSD Company LTD",                      "Let's Hit a Home Run! Excite Stadium (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
 // 勝負しようぜ！ エキサイトスタジアムDX
 CONS( 2002, epo_esdx,  0,          0,  xavix,            epo_epp,  xavix_state,          init_xavix,    "Epoch / SSD Company LTD",                      "Shoubu Shiyouze! Excite Stadium DX (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
