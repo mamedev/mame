@@ -1447,7 +1447,7 @@ It can also be used with Final Furlong when wired correctly.
 */
 
 #include "emu.h"
-#include "cpu/f2mc16/mb9061x.h"
+#include "cpu/f2mc16/mb90610a.h"
 #include "cpu/h8/h83002.h"
 #include "cpu/h8/h83337.h"
 #include "cpu/mips/mips3.h"
@@ -3958,7 +3958,7 @@ void namcos23_state::motoxgo(machine_config &config)
 {
 	s23(config);
 
-	mb90611_device &amccpu(MB90611A(config, "amccpu", 4.9152_MHz_XTAL));
+	mb90611a_device &amccpu(MB90611A(config, "amccpu", 4.9152_MHz_XTAL));
 	amccpu.set_addrmap(AS_PROGRAM, &namcos23_state::motoxgo_exio_map);
 }
 
