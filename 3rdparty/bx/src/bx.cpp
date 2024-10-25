@@ -24,18 +24,43 @@ namespace bx
 
 	static bool defaultAssertHandler(const Location& _location, const char* _format, va_list _argList)
 	{
-		char temp[8192];
-		int32_t pos = 0;
+		char    temp[8192];
+		int32_t total = 0;
 
-		pos += snprintf(&temp[pos], max(0, sizeof(temp)-pos), "%s(%d): "
+		StaticMemoryBlockWriter smb(temp, BX_COUNTOF(temp) );
+
+		ErrorIgnore err;
+
+		total += write(&smb, &err, "\n--- ASSERT ---\n\n");
+
+		total += write(&smb, &err, "%s(%d): "
 			, _location.filePath
 			, _location.line
 			);
-		pos += vsnprintf(&temp[pos], max(0, sizeof(temp)-pos), _format, _argList);
-		pos += snprintf(&temp[pos], max(0, sizeof(temp)-pos), "\n");
-		debugOutput(temp);
+		total += write(&smb, _format, _argList, &err);
+		total += write(&smb, "\n\n", &err);
 
-		debugOutputCallstack(2);
+		uintptr_t stack[32];
+		const uint32_t num = getCallStack(2 /* skip self */, BX_COUNTOF(stack), stack);
+		total += writeCallstack(&smb, stack, num, &err);
+
+		total += write(&smb, &err,
+			"\nBuild info:\n"
+			"\tCompiler: " BX_COMPILER_NAME
+			", CPU: " BX_CPU_NAME
+			", Arch: " BX_ARCH_NAME
+			", OS: " BX_PLATFORM_NAME
+			", CRT: " BX_CRT_NAME
+			", C++: " BX_CPP_NAME
+
+			", Date: " __DATE__
+			", Time: " __TIME__
+			"\n"
+			);
+
+		total += write(&smb, &err, "\n--- END ---\n\n");
+
+		write(getDebugOut(), temp, total, ErrorIgnore{});
 
 		return true;
 	}
