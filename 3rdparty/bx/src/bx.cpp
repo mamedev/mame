@@ -35,6 +35,8 @@ namespace bx
 		pos += snprintf(&temp[pos], max(0, sizeof(temp)-pos), "\n");
 		debugOutput(temp);
 
+		debugOutputCallstack(2);
+
 		return true;
 	}
 
