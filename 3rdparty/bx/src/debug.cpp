@@ -274,22 +274,6 @@ namespace bx
 		return 1;
 	}
 
-	// If offset in UTF-8 string doesn't land on rune, walk back until first byte of rune is reached.
-	static const char* fixPtrToRune(const char* _strBegin, const char* _curr)
-	{
-		for (; _curr > _strBegin && (*_curr & 0xc0) == 0x80; --_curr);
-
-		return _curr;
-	}
-
-	StringView strTail(const StringView _str, uint32_t _num)
-	{
-		return StringView(
-				  fixPtrToRune(_str.getPtr(), _str.getTerm() - min(_num, _str.getLength() ) )
-				, _str.getTerm()
-				);
-	}
-
 	int32_t writeCallstack(WriterI* _writer, uintptr_t* _stack, uint32_t _num, Error* _err)
 	{
 		BX_ERROR_SCOPE(_err);

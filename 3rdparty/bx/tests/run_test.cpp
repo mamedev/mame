@@ -8,11 +8,6 @@
 #include <bx/string.h>
 #include <bx/file.h>
 
-namespace bx
-{
-	void debugOutputCallstack(uint32_t _skip);
-}
-
 bool testAssertHandler(const bx::Location& _location, const char* _format, va_list _argList)
 {
 	bx::printf("%s(%d): ", _location.filePath, _location.line);

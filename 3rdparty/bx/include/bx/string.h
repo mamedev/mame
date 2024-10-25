@@ -319,6 +319,9 @@ namespace bx
 	/// Returns string view with suffix trimmed.
 	StringView strTrimSuffix(const StringView& _str, const StringView& _suffix);
 
+	/// Returns string view `_num` from the right.
+	StringView strTail(const StringView _str, uint32_t _num);
+
 	/// Find new line. Returns pointer after new line terminator.
 	StringView strFindNl(const StringView& _str);
 
