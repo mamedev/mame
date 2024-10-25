@@ -523,15 +523,8 @@ void xavix_i2c_ltv_tam_state::write_io1(uint8_t data, uint8_t direction)
 
 void xavix_i2c_mj_state::write_io1(uint8_t data, uint8_t direction)
 {
-	if (direction & 0x02)
-	{
-		m_i2cmem->write_sda((data & 0x02) >> 1);
-	}
-
-	if (direction & 0x01)
-	{
-		m_i2cmem->write_scl((data & 0x01) >> 0);
-	}
+	m_i2cmem->write_sda(BIT(data | ~direction, 1));
+	m_i2cmem->write_scl(BIT(data | ~direction, 0));
 }
 
 // for taikodp

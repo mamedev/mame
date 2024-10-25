@@ -367,14 +367,14 @@ CONS( 2002, epo_bowl, 0, 0, xavix2000_i2c_24c04, epo_bowl,    xavix_i2c_state,  
 CONS( 2003, epo_golf, 0,       0, xavix2000_i2c_24c04, ttv_lotr,   xavix_i2c_lotr_state, init_epo_mini, "Epoch / SSD Company LTD",       "Super Shot! Excite Golf (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
 // とっとこハム太郎 ハムハム大サーカス！
-CONS( 2002, epo_hamc,  0,      0, xavix2000,           epo_hamc,   xavix_epo_hamc_state, init_xavix,    "Epoch / SSD Company LTD",       "Tottoko Hamtaro Ham Ham Big Circus! (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+CONS( 2002, epo_hamc,  0,      0, xavix2000,           epo_hamc,   xavix_epo_hamc_state, init_xavix,    "Epoch / SSD Company LTD",       "Tottoko Hamtaro - Ham Ham Dai Circus! (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
 // ミニモニ。パーティ！リズムでぴょん！
 // needs timer irq hack to boot
 CONS( 2003, epo_mini, 0,       0, xavix2000_i2c_24c08, ttv_lotr,   xavix_i2c_lotr_state, init_epo_mini, "Epoch / SSD Company LTD",        "mini-moni Party! Rhythm de Pyon! (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
 // カードスキャン!　エキサイトステージ サッカー日本代表チーム 
-CONS( 2006, epo_es2j,   0,     0,  xavix2000,          xavix,      xavix_state,          init_xavix,    "Epoch / SSD Company LTD",        "Card Scan! Excite Stage Japan National Soccer Team (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+CONS( 2006, epo_es2j,   0,     0,  xavix2000,          xavix,      xavix_state,          init_xavix,    "Epoch / SSD Company LTD",        "Card Scan! Excite Stage Soccer Nippon Daihyou Team (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
 
 // takes a long time to boot to a card scanner error
