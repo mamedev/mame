@@ -49,7 +49,7 @@ protected:
 	bool                     m_sector_is_16k;
 	bool                     m_top_boot_sector;
 	bool                     m_bot_boot_sector;
-	uint8_t                  m_page_size;
+	uint16_t                 m_page_size;
 
 	// internal state
 	std::unique_ptr<uint8_t[]> m_data;
@@ -59,7 +59,8 @@ protected:
 	bool                     m_flash_master_lock;
 	emu_timer *              m_timer;
 	int32_t                  m_bank;
-	uint8_t                  m_byte_count;
+	uint16_t                 m_byte_count;
+	bool                     m_sdp;
 
 	uint8_t                  m_write_buffer[32];
 	uint32_t                 m_write_buffer_start_address;
@@ -178,6 +179,12 @@ class amd_29lv200t_device : public intelfsh8_device
 {
 public:
 	amd_29lv200t_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+};
+
+class atmel_29c020_device : public intelfsh8_device
+{
+public:
+	atmel_29c020_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 };
 
 class sharp_lh28f016s_device : public intelfsh8_device
@@ -385,6 +392,7 @@ DECLARE_DEVICE_TYPE(INTEL_28F016S5,          intel_28f016s5_device)
 DECLARE_DEVICE_TYPE(SHARP_LH28F016S,         sharp_lh28f016s_device)
 DECLARE_DEVICE_TYPE(SHARP_LH28F016S_16BIT,   sharp_lh28f016s_16bit_device)
 DECLARE_DEVICE_TYPE(ATMEL_29C010,            atmel_29c010_device)
+DECLARE_DEVICE_TYPE(ATMEL_29C020,            atmel_29c020_device)
 DECLARE_DEVICE_TYPE(AMD_29F010,              amd_29f010_device)
 DECLARE_DEVICE_TYPE(AMD_29F040,              amd_29f040_device)
 DECLARE_DEVICE_TYPE(AMD_29F080,              amd_29f080_device)
