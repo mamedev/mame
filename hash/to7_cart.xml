@@ -60,7 +60,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	<software name="agenda">
 		<description>Agenda</description>
 		<year>1983</year>
-		<publisher>Answare</publisher>
+		<publisher>Answare-Diffusion</publisher>
 
 		<part name="cart" interface="to_cart">
 			<dataarea name="rom" size="16384">
@@ -84,7 +84,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	<software name="budgfami">
 		<description>Budget Familial</description>
 		<year>1982</year>
-		<publisher>Answare</publisher>
+		<publisher>Answare-Diffusion</publisher>
 
 		<part name="cart" interface="to_cart">
 			<dataarea name="rom" size="16384">
@@ -96,7 +96,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	<software name="calctric">
 		<description>Calculatrice</description>
 		<year>1983</year>
-		<publisher>Answare</publisher>
+		<publisher>Answare-Diffusion</publisher>
 
 		<part name="cart" interface="to_cart">
 			<dataarea name="rom" size="16384">
@@ -206,9 +206,9 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="gerezfic">
-		<description>Gerez vos Fiches</description>
+		<description>Gérez vos Fiches</description>
 		<year>1984</year>
-		<publisher>Answare</publisher>
+		<publisher>Answare-Diffusion</publisher>
 
 		<part name="cart" interface="to_cart">
 			<dataarea name="rom" size="8192">
@@ -218,9 +218,9 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="gerezfica" cloneof="gerezfic">
-		<description>Gerez vos Fiches (alt)</description>
+		<description>Gérez vos Fiches (alt)</description>
 		<year>1984</year>
-		<publisher>Answare</publisher>
+		<publisher>Answare-Diffusion</publisher>
 
 		<part name="cart" interface="to_cart">
 			<dataarea name="rom" size="16384">
@@ -230,9 +230,9 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="gerezbib">
-		<description>Gerez votre Bibliotheque-Discotheque-Videotheque</description>
+		<description>Gérez votre Bibliotheque-Discotheque-Videotheque</description>
 		<year>1983</year>
-		<publisher>Answare</publisher>
+		<publisher>Answare-Diffusion</publisher>
 
 		<part name="cart" interface="to_cart">
 			<dataarea name="rom" size="8192">
@@ -242,9 +242,9 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="gestpriv">
-		<description>Gestion Privee</description>
+		<description>Gestion Privée</description>
 		<year>1984</year>
-		<publisher>Answare</publisher>
+		<publisher>Answare-Diffusion</publisher>
 
 		<part name="cart" interface="to_cart">
 			<dataarea name="rom" size="16384">
@@ -450,7 +450,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 <!-- Educational -->
 
 	<software name="chiflett">
-		<description>Les Chiffres et les Lettres</description>
+		<description>Des Chiffres et des Lettres</description>
 		<year>1984</year>
 		<publisher>VIFI-Nathan</publisher>
 
@@ -536,7 +536,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="echo">
-		<description>Echo</description>
+		<description>Écho</description>
 		<year>1982</year>
 		<publisher>VIFI-Nathan</publisher>
 
@@ -551,7 +551,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	<software name="enigmati">
 		<description>Enigmatika</description>
 		<year>1984</year>
-		<publisher>Answare</publisher>
+		<publisher>Answare-Diffusion</publisher>
 		<sharedfeat name="requirement" value="to_cass:enigmati"/>
 
 		<part name="cart" interface="to_cart">

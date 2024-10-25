@@ -2938,7 +2938,7 @@ TBD: Which images are compatible with which systems?
 	<software name="action1">
 		<description>Action Volume 1</description>
 		<year>1989</year>
-		<publisher>Microids</publisher>
+		<publisher>Microïds</publisher>
 		<info name="usage" value="Load with Microsoft BASIC 1.0"/>
 
 		<part name="flop1" interface="floppy_3_5">
@@ -2952,7 +2952,7 @@ TBD: Which images are compatible with which systems?
 	<software name="action1a" cloneof="action1">
 		<description>Action Volume 1 (SAP format)</description>
 		<year>1989</year>
-		<publisher>Microids</publisher>
+		<publisher>Microïds</publisher>
 		<info name="usage" value="Load with Microsoft BASIC 1.0"/>
 
 		<part name="flop1" interface="floppy_3_5">
@@ -4881,7 +4881,7 @@ TBD: Which images are compatible with which systems?
 	<software name="simpack">
 		<description>Simulation Pack</description>
 		<year>1988</year>
-		<publisher>Microids</publisher>
+		<publisher>Microïds</publisher>
 
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1"/>
@@ -4901,7 +4901,7 @@ TBD: Which images are compatible with which systems?
 	<software name="simpacka" cloneof="simpack">
 		<description>Simulation Pack (SAP format)</description>
 		<year>1988</year>
-		<publisher>Microids</publisher>
+		<publisher>Microïds</publisher>
 		<info name="usage" value="Load with Microsoft BASIC 1.0"/>
 
 		<part name="flop1" interface="floppy_3_5">
@@ -4915,7 +4915,7 @@ TBD: Which images are compatible with which systems?
 	<software name="simpackb" cloneof="simpack" supported="no">
 		<description>Simulation Pack (640K disk)</description>
 		<year>1988</year>
-		<publisher>Microids</publisher>
+		<publisher>Microïds</publisher>
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="655360">
@@ -10551,7 +10551,7 @@ TBD: Which images are compatible with which systems?
 	<software name="cartciel">
 		<description>Carte du Ciel</description>
 		<year>1984</year>
-		<publisher>Answare</publisher>
+		<publisher>Answare-Diffusion</publisher>
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="327680">
@@ -10686,7 +10686,7 @@ TBD: Which images are compatible with which systems?
 	<software name="chicago">
 		<description>Chicago 90</description>
 		<year>1989</year>
-		<publisher>Microids</publisher>
+		<publisher>Microïds</publisher>
 		<info name="usage" value="Load with Microsoft BASIC 1.0"/>
 
 		<part name="flop1" interface="floppy_3_5">
@@ -11387,7 +11387,7 @@ TBD: Which images are compatible with which systems?
 	<software name="gp500cc">
 		<description>Grand Prix 500cc</description>
 		<year>1986</year>
-		<publisher>Microids</publisher>
+		<publisher>Microïds</publisher>
 		<info name="usage" value="Load with Microsoft BASIC 1.0"/>
 
 		<part name="flop1" interface="floppy_3_5">
@@ -12909,7 +12909,7 @@ TBD: Which images are compatible with which systems?
 	<software name="quad">
 		<description>Quad</description>
 		<year>1987</year>
-		<publisher>Microids</publisher>
+		<publisher>Microïds</publisher>
 		<info name="usage" value="Load with Microsoft BASIC 1.0"/>
 
 		<part name="flop1" interface="floppy_3_5">
@@ -12923,7 +12923,7 @@ TBD: Which images are compatible with which systems?
 	<software name="quada" cloneof="quad">
 		<description>Quad (alt)</description>
 		<year>1987</year>
-		<publisher>Microids</publisher>
+		<publisher>Microïds</publisher>
 		<info name="usage" value="Load with Microsoft BASIC 1.0"/>
 
 		<part name="flop1" interface="floppy_3_5">
@@ -12937,7 +12937,7 @@ TBD: Which images are compatible with which systems?
 	<software name="quadb" cloneof="quad">
 		<description>Quad (SAP format)</description>
 		<year>1987</year>
-		<publisher>Microids</publisher>
+		<publisher>Microïds</publisher>
 		<info name="usage" value="Load with Microsoft BASIC 1.0"/>
 
 		<part name="flop1" interface="floppy_3_5">
@@ -13792,7 +13792,7 @@ TBD: Which images are compatible with which systems?
 	<software name="superski">
 		<description>Super Ski</description>
 		<year>1987</year>
-		<publisher>Microids</publisher>
+		<publisher>Microïds</publisher>
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="327680">
@@ -13806,7 +13806,7 @@ TBD: Which images are compatible with which systems?
 	<software name="superskia" cloneof="superski">
 		<description>Super Ski (640K disk)</description>
 		<year>1987</year>
-		<publisher>Microids</publisher>
+		<publisher>Microïds</publisher>
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="655360">

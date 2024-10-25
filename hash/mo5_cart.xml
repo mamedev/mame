@@ -63,7 +63,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	<software name="agenda">
 		<description>Agenda</description>
 		<year>1984</year>
-		<publisher>Answare</publisher>
+		<publisher>Answare-Diffusion</publisher>
 
 		<part name="cart" interface="mo_cart">
 			<dataarea name="rom" size="16384">
@@ -75,7 +75,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	<software name="agendaa" cloneof="agenda">
 		<description>Agenda (alt)</description>
 		<year>1984</year>
-		<publisher>Answare</publisher>
+		<publisher>Answare-Diffusion</publisher>
 
 		<part name="cart" interface="mo_cart">
 			<dataarea name="rom" size="16384">
@@ -87,7 +87,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	<software name="agendab" cloneof="agenda">
 		<description>Agenda (alt 2)</description>
 		<year>1984</year>
-		<publisher>Answare</publisher>
+		<publisher>Answare-Diffusion</publisher>
 
 		<part name="cart" interface="mo_cart">
 			<dataarea name="rom" size="16384">
@@ -99,7 +99,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	<software name="carnet">
 		<description>Carnet d'Adresses</description>
 		<year>1984</year>
-		<publisher>Answare</publisher>
+		<publisher>Answare-Diffusion</publisher>
 
 		<part name="cart" interface="mo_cart">
 			<dataarea name="rom" size="16384">
@@ -111,7 +111,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	<software name="carneta" cloneof="carnet">
 		<description>Carnet d'Adresses (alt)</description>
 		<year>1984</year>
-		<publisher>Answare</publisher>
+		<publisher>Answare-Diffusion</publisher>
 
 		<part name="cart" interface="mo_cart">
 			<dataarea name="rom" size="16384">
@@ -408,7 +408,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	<software name="enigmati" supported="no">
 		<description>Enigmatika</description>
 		<year>1984</year>
-		<publisher>Answare</publisher>
+		<publisher>Answare-Diffusion</publisher>
 		<sharedfeat name="requirement" value="mo5_cass:enigmati"/>
 
 		<part name="cart" interface="mo_cart">
