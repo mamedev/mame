@@ -117,7 +117,7 @@ public:
 		set_default_option(dflt);
 		set_fixed(false);
 	}
-	rs232_port_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	rs232_port_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 	virtual ~rs232_port_device();
 
 	// static configuration helpers

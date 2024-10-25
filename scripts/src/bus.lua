@@ -5561,6 +5561,33 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/bus/jvs/jvs.h,BUSES["JVS"] = true
+---------------------------------------------------
+
+if (BUSES["JVS"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/bus/jvs/cyberlead.cpp",
+		MAME_DIR .. "src/devices/bus/jvs/cyberlead.h",
+		MAME_DIR .. "src/devices/bus/jvs/jvs.cpp",
+		MAME_DIR .. "src/devices/bus/jvs/jvs.h",
+		MAME_DIR .. "src/devices/bus/jvs/jvshle.cpp",
+		MAME_DIR .. "src/devices/bus/jvs/jvshle.h",
+		MAME_DIR .. "src/devices/bus/jvs/namcoio.cpp",
+		MAME_DIR .. "src/devices/bus/jvs/namcoio.h",
+	}
+
+	dependency {
+		{ MAME_DIR .. "src/devices/bus/jvs/cyberlead.cpp", GEN_DIR .. "emu/layout/cyberlead.lh" },
+	}
+
+	custombuildtask {
+		layoutbuildtask("emu/layout", "cyberlead"),
+	}
+end
+
+
+---------------------------------------------------
+--
 --@src/devices/bus/mtu130/board.h,BUSES["MTU130"] = true
 ---------------------------------------------------
 
