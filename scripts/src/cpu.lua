@@ -691,6 +691,8 @@ end
 
 if CPUS["H8"] then
 	files {
+		MAME_DIR .. "src/devices/cpu/h8/c77.cpp",
+		MAME_DIR .. "src/devices/cpu/h8/c77.h",
 		MAME_DIR .. "src/devices/cpu/h8/h8.cpp",
 		MAME_DIR .. "src/devices/cpu/h8/h8.h",
 		MAME_DIR .. "src/devices/cpu/h8/h8h.cpp",
