@@ -25,9 +25,6 @@ public:
 	void s_w(int state); // S button
 	void power_w(int state);
 
-	// set_current_time is unused here (only using dirtc for the counters)
-	virtual void set_current_time(const system_time &systime) override { ; }
-
 protected:
 	// device_t implementation
 	virtual void device_start() override ATTR_COLD;
@@ -39,6 +36,7 @@ protected:
 	virtual bool nvram_write(util::write_stream &file) override;
 
 	virtual void rtc_clock_updated(int year, int month, int day, int day_of_week, int hour, int minute, int second) override { ; } // unused
+	virtual bool rtc_battery_backed() const override { return false; } // only using dirtc for the counters
 
 private:
 	enum mode : u8

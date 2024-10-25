@@ -363,7 +363,6 @@ uint8_t atlantis_state::cmos_r(offs_t offset)
 
 void atlantis_state::cmos_w(offs_t offset, uint8_t data, uint8_t mem_mask)
 {
-	system_time systime;
 	// User I/O 0 = Allow write to cmos[0]. Serial Write Enable?
 	if (offset == 0 && (m_user_io_state & 0x1)) {
 		// Data written is shifted by 1 bit each time.  Maybe a serial line output?
