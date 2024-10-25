@@ -11,9 +11,9 @@
 
 namespace bx
 {
-	class StringView;
-	class WriterI;
-	class Error;
+	class  Error;
+	class  StringView;
+	struct WriterI;
 
 	/// Break in debugger.
 	///

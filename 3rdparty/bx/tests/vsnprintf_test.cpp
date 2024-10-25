@@ -101,7 +101,7 @@ static bool test(const char* _expected, const char* _format, ...)
 {
 	va_list argList;
 	va_start(argList, _format);
-	const bool result = test<true>(_expected, _format, argList);
+	const bool result = test<false>(_expected, _format, argList);
 	va_end(argList);
 
 	return result;

@@ -346,6 +346,14 @@ function toolchain(_buildDir, _libDir)
 			location (path.join(_buildDir, "projects", _ACTION .. "-mingw-gcc"))
 
 		elseif "mingw-clang" == _OPTIONS["gcc"] then
+			if not os.getenv("MINGW") then
+				print("Set MINGW environment variable.")
+			end
+
+			if not os.getenv("CLANG") then
+				print("Set CLANG environment variable.")
+			end
+
 			premake.gcc.cc   = "$(CLANG)/bin/clang"
 			premake.gcc.cxx  = "$(CLANG)/bin/clang++"
 			premake.gcc.ar   = "$(MINGW)/bin/ar"
@@ -653,6 +661,7 @@ function toolchain(_buildDir, _libDir)
 			"-isystem $(MINGW)/lib/gcc/x86_64-w64-mingw32/4.8.1/include/c++",
 			"-isystem $(MINGW)/lib/gcc/x86_64-w64-mingw32/4.8.1/include/c++/x86_64-w64-mingw32",
 			"-isystem $(MINGW)/x86_64-w64-mingw32/include",
+			"-Wno-nan-infinity-disabled",
 		}
 		linkoptions {
 			"-Qunused-arguments",

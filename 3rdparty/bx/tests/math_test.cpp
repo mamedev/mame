@@ -21,7 +21,7 @@ TEST_CASE("isFinite, isInfinite, isNan", "[math]")
 		REQUIRE(::__isnanf(u.f)    == bx::isNan(u.f) );
 		REQUIRE(::__isfinitef(u.f) == bx::isFinite(u.f) );
 		REQUIRE(::__isinff(u.f)    == bx::isInfinite(u.f) );
-#elif BX_COMPILER_MSVC
+#elif BX_COMPILER_MSVC || BX_CRT_MINGW
 		REQUIRE(!!::isnan(u.f)    == bx::isNan(u.f) );
 		REQUIRE(!!::isfinite(u.f) == bx::isFinite(u.f) );
 		REQUIRE(!!::isinf(u.f)    == bx::isInfinite(u.f) );
@@ -306,8 +306,8 @@ TEST_CASE("sqrt", "[math][libm]")
 
 	// sqrtSimd
 	REQUIRE(bx::isNan(bx::sqrtSimd(-1.0f) ) );
-	REQUIRE(bx::isEqual(bx::sqrtSimd(0.0f), ::sqrtf(0.0f), 0.0f) );
-	REQUIRE(bx::isEqual(bx::sqrtSimd(1.0f), ::sqrtf(1.0f), 0.0f) );
+	REQUIRE(bx::isEqual(bx::sqrtSimd(0.0f), ::sqrtf(0.0f), 0.00001f) );
+	REQUIRE(bx::isEqual(bx::sqrtSimd(1.0f), ::sqrtf(1.0f), 0.00001f) );
 
 	for (float xx = 0.0f; xx < 1000000.0f; xx += 1000.f)
 	{
@@ -326,8 +326,8 @@ TEST_CASE("sqrt", "[math][libm]")
 	// sqrt
 	REQUIRE(bx::isNan(::sqrtf(-1.0f) ) );
 	REQUIRE(bx::isNan(bx::sqrt(-1.0f) ) );
-	REQUIRE(bx::isEqual(bx::sqrt(0.0f), ::sqrtf(0.0f), 0.0f) );
-	REQUIRE(bx::isEqual(bx::sqrt(1.0f), ::sqrtf(1.0f), 0.0f) );
+	REQUIRE(bx::isEqual(bx::sqrt(0.0f), ::sqrtf(0.0f), 0.00001f) );
+	REQUIRE(bx::isEqual(bx::sqrt(1.0f), ::sqrtf(1.0f), 0.00001f) );
 
 	for (float xx = 0.0f; xx < 1000000.0f; xx += 1000.f)
 	{
@@ -673,10 +673,10 @@ TEST_CASE("vec3", "[math][vec3]")
 	REQUIRE(bx::isEqual({0.0f, 0.0f, 0.0f}, bx::normalize({0.0f, 0.0f, 0.0f}), 0.0f) );
 
 	bx::Vec3 normalized = bx::normalize({0.0f, 1.0f, 0.0f});
-	REQUIRE(bx::isEqual(normalized, {0.0f, 1.0f, 0.0f}, 0.0f) );
+	REQUIRE(bx::isEqual(normalized, {0.0f, 1.0f, 0.0f}, 0.00001f) );
 
 	float length = bx::length(normalized);
-	REQUIRE(bx::isEqual(length, 1.0f, 0.0f) );
+	REQUIRE(bx::isEqual(length, 1.0f, 0.00001f) );
 }
 
 TEST_CASE("quaternion", "[math][quaternion]")

@@ -35,8 +35,8 @@ public:
 			char ch = data[ii];
 
 			asCStr &= false
-				| bx::isPrint(ch)
-				| bx::isSpace(ch)
+				|| bx::isPrint(ch)
+				|| bx::isSpace(ch)
 				;
 		}
 
