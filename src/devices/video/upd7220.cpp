@@ -1182,9 +1182,14 @@ void upd7220_device::process_fifo()
 
 			if (cr != COMMAND_RESET3)
 				m_de = 0;
-			m_ra[0] = m_ra[1] = m_ra[2] = 0;
-			m_ra[3] = 0x19;
+			// NOTE: a reset doesn't touch anything belonging to parameters, as stated in docs.
+			// pc9801:mightyhd won't program sad/len but just issue a reset after BIOS
+			// (which originally sets len = 0x1ff)
+			// with this on, it will len = 400 lines, repeating the bottommost two rows in a 432 setup.
+			//m_ra[0] = m_ra[1] = m_ra[2] = 0;
+			//m_ra[3] = 0x19;
 			m_ead = 0;
+			// TODO: very unlikely, should be 0xffff assuming it's even touched ...
 			m_mask = 0;
 			// FIFO, Command Processor and internal counters are cleared by this
 			// - pc9801rs BIOS starts up a DMAW command that spindiz2 will dislike during its boot sequences
