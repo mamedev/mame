@@ -289,8 +289,7 @@ device_jvs_interface::device_jvs_interface(const machine_config &mconfig, device
 	m_root = m_port;
 	if (m_root)
 	{
-		device_jvs_interface *intf;
-		while (m_root->owner() && m_root->owner()->interface(intf) && m_root->owner()->owner())
+		while (m_root->owner() && dynamic_cast<jvs_port_device *>(m_root->owner()->owner()))
 			m_root = dynamic_cast<jvs_port_device *>(m_root->owner()->owner());
 	}
 }
