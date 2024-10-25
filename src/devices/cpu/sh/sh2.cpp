@@ -58,7 +58,6 @@ void sh2_device::device_start()
 
 	// internals
 	save_item(NAME(m_cpu_off));
-	save_item(NAME(m_test_irq));
 	save_item(NAME(m_irq_line_state));
 	save_item(NAME(m_nmi_line_state));
 	save_item(NAME(m_internal_irq_vector));
@@ -87,7 +86,7 @@ void sh2_device::device_reset()
 	m_sh2_state->pc = read_long(0);
 	m_sh2_state->r[15] = read_long(4);
 
-	m_test_irq = 0;
+	m_sh2_state->m_test_irq = 0;
 	m_cpu_off = 0;
 	m_internal_irq_vector = 0;
 	m_cache_dirty = true;
@@ -213,14 +212,14 @@ inline void sh2_device::LDCMSR(const uint16_t opcode) // passes Rn
 	m_sh2_state->sr = read_long(m_sh2_state->ea) & SH_FLAGS;
 	m_sh2_state->r[rn] += 4;
 	m_sh2_state->icount -= 2;
-	m_test_irq = 1;
+	m_sh2_state->m_test_irq = 1;
 }
 
 /*  LDC     Rm,SR */
 inline void sh2_device::LDCSR(const uint16_t opcode) // passes Rn
 {
 	m_sh2_state->sr = m_sh2_state->r[REG_N] & SH_FLAGS;
-	m_test_irq = 1;
+	m_sh2_state->m_test_irq = 1;
 }
 
 /*  RTE */
@@ -233,7 +232,7 @@ inline void sh2_device::RTE()
 	m_sh2_state->sr = read_long(m_sh2_state->ea) & SH_FLAGS;
 	m_sh2_state->r[15] += 4;
 	m_sh2_state->icount -= 3;
-	m_test_irq = 1;
+	m_sh2_state->m_test_irq = 1;
 }
 
 /*  TRAPA   #imm */
@@ -307,10 +306,10 @@ void sh2_device::execute_run()
 
 		execute_one(opcode);
 
-		if (m_test_irq && !m_sh2_state->m_delay)
+		if (m_sh2_state->m_test_irq && !m_sh2_state->m_delay)
 		{
 			check_pending_irq("mame_sh2_execute");
-			m_test_irq = 0;
+			m_sh2_state->m_test_irq = 0;
 		}
 		m_sh2_state->icount--;
 	} while (m_sh2_state->icount > 0);
@@ -377,7 +376,7 @@ void sh2_device::execute_set_input(int irqline, int state)
 			else
 			{
 				if (m_sh2_state->m_delay)
-					m_test_irq = 1;
+					m_sh2_state->m_test_irq = 1;
 				else
 					check_pending_irq("sh2_set_nmi_line");
 			}
@@ -402,12 +401,12 @@ void sh2_device::execute_set_input(int irqline, int state)
 
 			if (m_isdrc)
 			{
-				m_test_irq = 1;
+				m_sh2_state->m_test_irq = 1;
 			}
 			else
 			{
 				if (m_sh2_state->m_delay)
-					m_test_irq = 1;
+					m_sh2_state->m_test_irq = 1;
 				else
 					check_pending_irq("sh2_set_irq_line");
 			}

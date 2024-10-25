@@ -495,7 +495,7 @@ void sh7042_device::set_internal_interrupt(int level, u32 vector)
 {
 	m_sh2_state->internal_irq_level = level;
 	m_internal_irq_vector = vector;
-	m_test_irq = 1;
+	m_sh2_state->m_test_irq = 1;
 }
 
 void sh7042_device::sh2_exception_internal(const char *message, int irqline, int vector)

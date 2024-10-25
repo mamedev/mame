@@ -166,7 +166,7 @@ void sh7014_device::set_irq(int vector, int level, bool is_internal)
 
 	m_sh2_state->internal_irq_level = level;
 	m_internal_irq_vector = vector;
-	m_test_irq = 1;
+	m_sh2_state->m_test_irq = 1;
 }
 
 void sh7014_device::notify_dma_source(uint32_t source)

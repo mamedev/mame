@@ -4,6 +4,8 @@
 #include "h8h.h"
 #include "h8hd.h"
 
+#include "h8_intc.h"
+
 h8h_device::h8h_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, address_map_constructor map_delegate) :
 	h8_device(mconfig, type, tag, owner, clock, map_delegate)
 {

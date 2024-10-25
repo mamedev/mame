@@ -63,7 +63,6 @@ protected:
 	address_space *m_decrypted_program;
 	const uint32_t m_am;
 
-	uint32_t m_test_irq;
 	int32_t m_internal_irq_vector;
 	int8_t m_nmi_line_state;
 

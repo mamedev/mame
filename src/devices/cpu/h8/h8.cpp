@@ -26,6 +26,9 @@
 #include "h8_port.h"
 #include "h8d.h"
 
+#define VERBOSE	(0)
+#include "logmacro.h"
+
 h8_device::h8_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, address_map_constructor map_delegate) :
 	cpu_device(mconfig, type, tag, owner, clock),
 	device_nvram_interface(mconfig, *this),
@@ -72,13 +75,13 @@ const char h8_device::port_names[] = "123456789abcdefg";
 u8 h8_device::port_default_r(int port)
 {
 	if(!machine().side_effects_disabled())
-		logerror("read of un-hooked port %c (PC=%X)\n", port_names[port], m_PPC);
+		LOG("read of un-hooked port %c (PC=%X)\n", port_names[port], m_PPC);
 	return 0xff;
 }
 
 void h8_device::port_default_w(int port, u8 data)
 {
-	logerror("write of un-hooked port %c %02x\n", port_names[port], data);
+	LOG("write of un-hooked port %c %02x\n", port_names[port], data);
 }
 
 void h8_device::device_config_complete()

@@ -15,6 +15,7 @@
 
 #include "emu.h"
 #include "h8_port.h"
+#include "h8_intc.h"
 
 DEFINE_DEVICE_TYPE(H8_PORT, h8_port_device, "h8_digital_port", "H8 digital port")
 

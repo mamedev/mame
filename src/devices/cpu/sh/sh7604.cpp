@@ -33,7 +33,7 @@ DEFINE_DEVICE_TYPE(SH7604,  sh7604_device,  "sh2_7604",  "Hitachi SH-2 (SH7604)"
 
 sh7604_device::sh7604_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: sh2_device(mconfig, SH7604, tag, owner, clock, CPU_TYPE_SH2, address_map_constructor(FUNC(sh7604_device::sh7604_map), this), 32, 0xc7ffffff)
-	, m_test_irq(0), m_internal_irq_vector(0)
+	, m_internal_irq_vector(0)
 	, m_smr(0), m_brr(0), m_scr(0), m_tdr(0), m_ssr(0)
 	, m_tier(0), m_ftcsr(0), m_frc_tcr(0), m_tocr(0), m_frc(0), m_ocra(0), m_ocrb(0), m_frc_icr(0)
 	, m_ipra(0), m_iprb(0), m_vcra(0), m_vcrb(0), m_vcrc(0), m_vcrd(0), m_vcrwdt(0), m_vcrdiv(0), m_intc_icr(0), m_vecmd(false), m_nmie(false)
@@ -871,7 +871,6 @@ uint8_t sh7604_device::ftcsr_r()
 	// TODO: to be tested
 	if (!m_ftcsr_read_cb.isnull())
 		m_ftcsr_read_cb((((m_tier << 24) | (m_ftcsr << 16)) & 0xffff0000) | m_frc);
-
 	return m_ftcsr;
 }
 
@@ -1436,7 +1435,7 @@ void sh7604_device::sh2_recalc_irq()
 
 	m_sh2_state->internal_irq_level = irq;
 	m_internal_irq_vector = vector;
-	m_test_irq = 1;
+	m_sh2_state->m_test_irq = 1;
 }
 
 /*

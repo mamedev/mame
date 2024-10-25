@@ -232,7 +232,7 @@ void c352_device::write(offs_t offset, u16 data, u16 mem_mask)
 	else if (offset == 0x200)
 	{
 		COMBINE_DATA(&m_control);
-		logerror("C352 control register write: %04x & %04x\n", data, mem_mask);
+		LOG("C352 control register write: %04x & %04x\n", data, mem_mask);
 	}
 	else if (offset == 0x202) // execute keyons/keyoffs
 	{

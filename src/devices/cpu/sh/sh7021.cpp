@@ -218,10 +218,10 @@ void sh7021_device::execute_run()
 		execute_peripherals(consumed_cycles);
 		execute_one(opcode);
 
-		if (m_test_irq && !m_sh2_state->m_delay)
+		if (m_sh2_state->m_test_irq && !m_sh2_state->m_delay)
 		{
 			check_pending_irq("mame_sh2_execute");
-			m_test_irq = 0;
+			m_sh2_state->m_test_irq = 0;
 		}
 		m_sh2_state->icount--;
 		consumed_cycles = icount_before - m_sh2_state->icount;
@@ -615,7 +615,7 @@ void sh7021_device::recalc_irq()
 	{
 		m_sh2_state->internal_irq_level = irq;
 		m_internal_irq_vector = vector;
-		m_test_irq = 1;
+		m_sh2_state->m_test_irq = 1;
 	}
 }
 
