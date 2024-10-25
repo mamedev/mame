@@ -642,6 +642,37 @@ protected:
 	required_device<i2cmem_device> m_i2cmem;
 };
 
+class xavix_i2c_mj_state : public xavix_i2c_state
+{
+public:
+	xavix_i2c_mj_state(const machine_config &mconfig, device_type type, const char *tag)
+		: xavix_i2c_state(mconfig, type, tag)
+		, m_dial(*this, "DIAL")
+	{ }
+
+	void xavix_i2c_24lc02_mj(machine_config &config);
+
+protected:
+	virtual void write_io1(uint8_t data, uint8_t direction) override;
+
+	uint8_t mj_anport0_r() { return m_dial->read()^0x7f; }
+
+	required_ioport m_dial;
+};
+
+class xavix_epo_hamc_state : public xavix_state
+{
+public:
+	xavix_epo_hamc_state(const machine_config &mconfig, device_type type, const char *tag)
+		: xavix_state(mconfig, type, tag)
+	{ }
+
+	int camera_r() { return machine().rand(); }
+
+protected:
+};
+
+
 class xavix_i2c_lotr_state : public xavix_i2c_state
 {
 public:
