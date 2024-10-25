@@ -37,6 +37,7 @@ f2mc16_device::f2mc16_device(const machine_config &mconfig, device_type type, co
 	: cpu_device(mconfig, type, tag, owner, clock)
 	, m_program_config("program", ENDIANNESS_LITTLE, 16, 24, 0)
 	, m_program(nullptr)
+	, m_irq_level((7 << 13) | 0x1fff)
 {
 	m_tmp8 = 0;
 	m_tmp16 = 0;
@@ -61,10 +62,10 @@ void f2mc16_device::device_start()
 
 	set_icountptr(m_icount);
 
-	state_add(F2MC16_PCB, "PCB", m_pcb);
-	state_add(F2MC16_PC, "PC", m_pc).formatstr("%04X");
+	state_add(F2MC16_PCB, "PCB", m_pcb).callimport();
+	state_add(F2MC16_PC, "PC", m_pc).callimport().formatstr("%04X");
 	state_add(STATE_GENPC, "GENPC", m_temp).callimport().callexport().noshow();
-	state_add(STATE_GENPCBASE, "CURPC", m_temp).callimport().callexport().noshow();
+	state_add(STATE_GENPCBASE, "CURPC", m_pcbase).callimport().noshow();
 	state_add(F2MC16_PS, "PS", m_ps).formatstr("%04X");
 	state_add(STATE_GENFLAGS,  "GENFLAGS",  m_ps).callimport().formatstr("%7s").noshow();
 	state_add(F2MC16_DTB, "DTB", m_dtb).formatstr("%02X");
@@ -110,12 +111,14 @@ void f2mc16_device::device_start()
 	save_item(NAME(m_dpr));
 	save_item(NAME(m_tmp8));
 	save_item(NAME(m_prefix));
+	save_item(NAME(m_pcbase));
 	save_item(NAME(m_acc));
 	save_item(NAME(m_temp));
 	save_item(NAME(m_tmp32));
 	save_item(NAME(m_tmpea));
 	save_item(NAME(m_prefix_valid));
-	save_item(NAME(m_outstanding_irqs));
+	save_item(NAME(m_irq_level));
+	save_item(NAME(m_rmw));
 }
 
 void f2mc16_device::device_reset()
@@ -128,16 +131,11 @@ void f2mc16_device::device_reset()
 	m_dpr = 0x01;
 	m_dtb = 0;
 
-	for (int &entry : m_vector_level)
-	{
-		entry = 7;
-	}
-	m_outstanding_irqs = 0;
-
 	m_pc = read_16_vector(0xffffdc);
 	m_pcb = read_8_vector(0xffffde);
 
 	m_prefix_valid = false;
+	m_rmw = false;
 }
 
 void f2mc16_device::state_import(const device_state_entry &entry)
@@ -145,9 +143,19 @@ void f2mc16_device::state_import(const device_state_entry &entry)
 	switch (entry.index())
 	{
 		case STATE_GENPC:
+			m_pcbase = m_temp;
+			m_pc = (m_pcbase & 0xffff);
+			m_pcb = (m_pcbase >> 16) & 0xff;
+			break;
+
 		case STATE_GENPCBASE:
-			m_pc = (m_temp & 0xffff);
-			m_pcb = (m_temp >> 16) & 0xff;
+			m_pc = (m_pcbase & 0xffff);
+			m_pcb = (m_pcbase >> 16) & 0xff;
+			break;
+
+		case F2MC16_PCB:
+		case F2MC16_PC:
+			m_pcbase = ((m_pcb & 0xff) << 16) | m_pc;
 			break;
 
 		case F2MC16_RW0:  write_rwX(0, m_temp); break;
@@ -206,7 +214,6 @@ void f2mc16_device::state_export(const device_state_entry &entry)
 		case F2MC16_R7:  m_temp = read_rX(7); break;
 
 		case STATE_GENPC:
-		case STATE_GENPCBASE:
 			m_temp = m_pc;
 			m_temp |= (m_pcb << 16);
 			break;
@@ -234,31 +241,39 @@ void f2mc16_device::execute_run()
 {
 	while (m_icount > 0)
 	{
-		if (m_outstanding_irqs && !m_prefix_valid)
+		if (!m_prefix_valid && m_irq_level < m_ps && (m_ps & F_I))
 		{
-			int cpulevel = m_ps >> 13;
-
-			for (int irq = 0; irq < 256; irq++)
+			uint8_t irq_level = m_irq_level;
+			uint8_t irq_vector = standard_irq_callback(irq_level, m_pc);
+			if (irq_vector)
 			{
-				if (m_vector_level[irq] < cpulevel)
-				{
-					take_irq(irq, m_vector_level[irq]);
-					break;
-				}
+				take_irq_vector(irq_vector);
+				m_ps = (m_ps | (7 << 13)) & irq_level;
 			}
 		}
 
 		//m_icount--;
 
 		if (!m_prefix_valid)
+		{
+			m_pcbase = (m_pcb << 16) | m_pc;
 			debugger_instruction_hook((m_pcb << 16) | m_pc);
+		}
 		u8 opcode = read_8((m_pcb << 16) | m_pc);
 
 		switch (opcode)
 		{
-		case 0x00:  // NOP
+		// NOP
+		case 0x00:
 			m_icount--;
 			m_pc++;
+			break;
+
+		// INT9
+		case 0x01:
+			m_pc++;
+			take_irq_vector(9);
+			m_ps &= ~F_I;
 			break;
 
 		// NEG A
@@ -1286,64 +1301,45 @@ void f2mc16_device::execute_run()
 		// INT #vct8
 		case 0x68:
 			m_tmp8 = read_8((m_pcb << 16) | (m_pc + 1));
-			push_16_ssp((m_acc >> 16) & 0xffff);
-			push_16_ssp(m_acc & 0xffff);
-			push_16_ssp((m_dpr << 8) | m_adb);
-			push_16_ssp((m_dtb << 8) | m_pcb);
-			push_16_ssp(m_pc + 2);
-			push_16_ssp(m_ps);
+			m_pc += 2;
+			take_irq_vector(m_tmp8);
 			m_ps &= ~F_I;
-			m_ps |= F_S;
-			m_tmpea = 0xfffffc - (m_tmp8 * 4);
-			m_pc = read_16_vector(m_tmpea);
-			m_pcb = read_8_vector(m_tmpea + 2);
-			m_icount -= 12;
 			break;
+
+		// INT addr16
+		case 0x69:
+			m_tmp16 = read_16((m_pcb << 16) | (m_pc + 1));
+			m_pc += 3;
+			take_irq();
+			m_pc = m_tmp16;
+			m_ps &= ~F_I;
+			break;
+
+		// INTP addr24
+		case 0x6a:
+			m_tmp16 = read_16((m_pcb << 16) | (m_pc + 1));
+			m_tmp8 = read_8((m_pcb << 16) | (m_pc + 3));
+			m_pc += 4;
+			take_irq();
+			m_pcb = m_tmp8;
+			m_pc = m_tmp16;
+			m_ps &= ~F_I;
+							break;
 
 		// RETI
 		case 0x6b:
-			{
-				bool bFoundVec = false;
-
-				// there's an IRQ chaining facility, let's do it
-				if (m_outstanding_irqs)
-				{
-					int cpulevel = peek_stack_16() >> 13;
-					for (int irq = 0; irq < 256; irq++)
-					{
-						if (m_vector_level[irq] < cpulevel)
-						{
-							m_ps = read_16((m_ssb << 16) | m_ssp);
-							m_ps |= F_S;
-							m_ps &= ~0x7000;
-							m_ps |= (m_vector_level[irq] & 7) << 13;
-
-							u32 uVecAddr = 0xfffffc - (irq * 4);
-							m_pc = read_16_vector(uVecAddr);
-							m_pcb = read_8_vector(uVecAddr + 2);
-							bFoundVec = true;
-							//printf("RETI vector chain to %02x%04x\n", m_pcb, m_pc);
-							break;
-						}
-					}
-				}
-
-				// if no new IRQ was found or could be dispatched by the level
-				if (!bFoundVec)
-				{
-					m_ps = pull_16_ssp();
-					m_pc = pull_16_ssp();
-					m_tmp16 = pull_16_ssp();
-					m_pcb = m_tmp16 & 0xff;
-					m_dtb = m_tmp16 >> 8;
-					m_tmp16 = pull_16_ssp();
-					m_adb = m_tmp16 & 0xff;
-					m_dpr = m_tmp16 >> 8;
-					m_acc = pull_16_ssp();
-					m_acc |= (pull_16_ssp() << 16);
-					m_icount -= 17;
-				}
-			}
+			m_ps = pull_16_ssp();
+			m_pc = pull_16_ssp();
+			m_tmp16 = pull_16_ssp();
+			m_pcb = m_tmp16 & 0xff;
+			m_dtb = m_tmp16 >> 8;
+			m_tmp16 = pull_16_ssp();
+			m_adb = m_tmp16 & 0xff;
+			m_dpr = m_tmp16 >> 8;
+			m_acc = 0;
+			m_acc = pull_16_ssp();
+			m_acc |= (pull_16_ssp() << 16);
+			m_icount -= 17;
 			break;
 
 		case 0x6c:  // bit operation instructions
@@ -1644,7 +1640,7 @@ void f2mc16_device::execute_run()
 			break;
 
 		// BT
-		case 0xf8:;
+		case 0xf8:
 			if (m_ps & F_T)
 			{
 				take_branch();
@@ -1892,9 +1888,11 @@ void f2mc16_device::opcodes_bo6c(u8 operand)
 		// CLRB io:bp
 		case 0x40: case 0x41: case 0x42: case 0x43: case 0x44: case 0x45: case 0x46: case 0x47:
 			m_tmpea = read_8((m_pcb << 16) | (m_pc + 2));
+			m_rmw = true;
 			m_tmp8 = read_8(m_tmpea);
 			m_tmp8 &= ~(1 << (operand & 7));
 			write_8(m_tmpea, m_tmp8);
+			m_rmw = false;
 			m_pc += 3;
 			m_icount -= 7;
 			break;
@@ -1902,9 +1900,11 @@ void f2mc16_device::opcodes_bo6c(u8 operand)
 		// CLRB dir:bp
 		case 0x48: case 0x49: case 0x4a: case 0x4b: case 0x4c: case 0x4d: case 0x4e: case 0x4f:
 			m_tmpea = getdirbank(read_8((m_pcb << 16) | (m_pc + 2)));
+			m_rmw = true;
 			m_tmp8 = read_8(m_tmpea);
 			m_tmp8 &= ~(1 << (operand & 7));
 			write_8(m_tmpea, m_tmp8);
+			m_rmw = false;
 			m_pc += 3;
 			m_icount -= 7;
 			break;
@@ -1919,9 +1919,11 @@ void f2mc16_device::opcodes_bo6c(u8 operand)
 			}
 			else
 				m_tmpea |= (m_dtb<<16);
+			m_rmw = true;
 			m_tmp8 = read_8(m_tmpea);
 			m_tmp8 &= ~(1 << (operand & 7));
 			write_8(m_tmpea, m_tmp8);
+			m_rmw = false;
 			m_pc += 4;
 			m_icount -= 7;
 			break;
@@ -1929,9 +1931,11 @@ void f2mc16_device::opcodes_bo6c(u8 operand)
 		// SETB io:bp
 		case 0x60: case 0x61: case 0x62: case 0x63: case 0x64: case 0x65: case 0x66: case 0x67:
 			m_tmpea = read_8((m_pcb << 16) | (m_pc + 2));
+			m_rmw = true;
 			m_tmp8 = read_8(m_tmpea);
 			m_tmp8 |= (1 << (operand & 7));
 			write_8(m_tmpea, m_tmp8);
+			m_rmw = false;
 			m_pc += 3;
 			m_icount -= 7;
 			break;
@@ -1939,9 +1943,11 @@ void f2mc16_device::opcodes_bo6c(u8 operand)
 		// SETB dir:bp
 		case 0x68: case 0x69: case 0x6a: case 0x6b: case 0x6c: case 0x6d: case 0x6e: case 0x6f:
 			m_tmpea = getdirbank(read_8((m_pcb << 16) | (m_pc + 2)));
+			m_rmw = true;
 			m_tmp8 = read_8(m_tmpea);
 			m_tmp8 |= (1 << (operand & 7));
 			write_8(m_tmpea, m_tmp8);
+			m_rmw = false;
 			m_pc += 3;
 			m_icount -= 7;
 			break;
@@ -1949,6 +1955,7 @@ void f2mc16_device::opcodes_bo6c(u8 operand)
 		// SETB addr16:bp
 		case 0x78: case 0x79: case 0x7a: case 0x7b: case 0x7c: case 0x7d: case 0x7e: case 0x7f:
 			m_tmp16 = read_16((m_pcb << 16) | (m_pc + 2));
+			m_rmw = true;
 			if (m_prefix_valid)
 			{
 				m_prefix_valid = false;
@@ -1962,6 +1969,7 @@ void f2mc16_device::opcodes_bo6c(u8 operand)
 				m_tmp8 |= (1 << (operand & 7));
 				write_8((m_dtb<<16) | m_tmp16, m_tmp8);
 			}
+			m_rmw = false;
 			m_pc += 4;
 			m_icount -= 7;
 			break;
@@ -2085,7 +2093,7 @@ void f2mc16_device::opcodes_bo6c(u8 operand)
 			m_icount -= 7;
 			break;
 
-		// WTBS io:bp
+		// WBTS io:bp
 		case 0xc0: case 0xc1: case 0xc2: case 0xc3: case 0xc4: case 0xc5: case 0xc6: case 0xc7:
 			m_tmpea = read_8((m_pcb << 16) | (m_pc + 2));
 			m_tmp8 = read_8(m_tmpea);
@@ -2094,7 +2102,7 @@ void f2mc16_device::opcodes_bo6c(u8 operand)
 			m_icount -= 4;
 			break;
 
-		// WTBC io:bp
+		// WBTC io:bp
 		case 0xe0: case 0xe1: case 0xe2: case 0xe3: case 0xe4: case 0xe5: case 0xe6: case 0xe7:
 			m_tmpea = read_8((m_pcb << 16) | (m_pc + 2));
 			m_tmp8 = read_8(m_tmpea);
@@ -2922,8 +2930,10 @@ void f2mc16_device::opcodes_ea71(u8 operand)
 			m_tmp8 = read_8((m_pcb << 16) | (m_pc + 2));
 			m_tmp16 = read_rwX(operand & 7) + s8(m_tmp8);
 			m_tmpea = getRWbank(operand & 7, m_tmp16);
+			m_rmw = true;
 			m_tmp32 = doINC_32(read_32(m_tmpea));
 			write_32(m_tmpea, m_tmp32);
+			m_rmw = false;
 			m_pc += 3;
 			m_icount -= 11;
 			break;
@@ -2933,8 +2943,10 @@ void f2mc16_device::opcodes_ea71(u8 operand)
 			m_tmp16 = read_16((m_pcb << 16) | (m_pc + 2));
 			m_tmp16 = read_rwX(operand & 3) + s16(m_tmp16);
 			m_tmpea = getRWbank(operand & 3, m_tmp16);
+			m_rmw = true;
 			m_tmp32 = doINC_32(read_32(m_tmpea));
 			write_32(m_tmpea, m_tmp32);
+			m_rmw = false;	
 			m_pc += 4;
 			m_icount -= 11;
 			break;
@@ -2943,8 +2955,10 @@ void f2mc16_device::opcodes_ea71(u8 operand)
 		case 0x5c: case 0x5d:
 			m_tmp16 = read_rwX(operand & 1) + read_rwX(7);
 			m_tmpea = getRWbank(operand & 1, m_tmp16);
+			m_rmw = true;
 			m_tmp32 = doINC_32(read_32(m_tmpea));
 			write_32(m_tmpea, m_tmp32);
+			m_rmw = false;
 			m_pc += 2;
 			m_icount -= 13;
 			break;
@@ -2959,8 +2973,10 @@ void f2mc16_device::opcodes_ea71(u8 operand)
 			}
 			else
 				m_tmpea |= (m_dtb << 16);
+			m_rmw = true;
 			m_tmp32 = doINC_32(read_32(m_tmpea));
 			write_32(m_tmpea, m_tmp32);
+			m_rmw = false;
 			m_pc += 4;
 			m_icount -= 10;
 			break;
@@ -2978,8 +2994,10 @@ void f2mc16_device::opcodes_ea71(u8 operand)
 			m_tmp8 = read_8((m_pcb << 16) | (m_pc + 2));
 			m_tmp16 = read_rwX(operand & 7) + s8(m_tmp8);
 			m_tmpea = getRWbank(operand & 7, m_tmp16);
+			m_rmw = true;
 			m_tmp32 = doDEC_32(read_32(m_tmpea));
 			write_32(m_tmpea, m_tmp32);
+			m_rmw = false;
 			m_pc += 3;
 			m_icount -= 11;
 			break;
@@ -2989,8 +3007,10 @@ void f2mc16_device::opcodes_ea71(u8 operand)
 			m_tmp16 = read_16((m_pcb << 16) | (m_pc + 2));
 			m_tmp16 = read_rwX(operand & 3) + s16(m_tmp16);
 			m_tmpea = getRWbank(operand & 3, m_tmp16);
+			m_rmw = true;
 			m_tmp32 = doDEC_32(read_32(m_tmpea));
 			write_32(m_tmpea, m_tmp32);
+			m_rmw = false;
 			m_pc += 4;
 			m_icount -= 11;
 			break;
@@ -2999,8 +3019,10 @@ void f2mc16_device::opcodes_ea71(u8 operand)
 		case 0x7c: case 0x7d:
 			m_tmp16 = read_rwX(operand & 1) + read_rwX(7);
 			m_tmpea = getRWbank(operand & 1, m_tmp16);
+			m_rmw = true;
 			m_tmp32 = doDEC_32(read_32(m_tmpea));
 			write_32(m_tmpea, m_tmp32);
+			m_rmw = false;
 			m_pc += 2;
 			m_icount -= 13;
 			break;
@@ -3015,8 +3037,10 @@ void f2mc16_device::opcodes_ea71(u8 operand)
 			}
 			else
 				m_tmpea |= (m_dtb << 16);
+			m_rmw = true;
 			m_tmp32 = doDEC_32(read_32(m_tmpea));
 			write_32(m_tmpea, m_tmp32);
+			m_rmw = false;
 			m_pc += 4;
 			m_icount -= 10;
 			break;
@@ -3185,6 +3209,7 @@ void f2mc16_device::opcodes_ea71(u8 operand)
 
 		// MOV @RWx + RW7, #imm8
 		case 0xdc: case 0xdd:
+			m_tmp8 = read_8((m_pcb << 16) | (m_pc + 2));
 			m_tmp16 = read_rwX(operand & 1) + read_rwX(7);
 			m_tmpea = getRWbank(operand & 1, m_tmp16);
 			m_tmp8 = read_8((m_pcb << 16) | (m_pc + 2));
@@ -3297,8 +3322,10 @@ void f2mc16_device::opcodes_ea72(u8 operand)
 		case 0x48: case 0x49: case 0x4a: case 0x4b:
 			m_tmp16 = read_rwX(operand & 3);
 			m_tmpea = getRWbank(operand & 3, m_tmp16);
+			m_rmw = true;
 			m_tmp8 = doINC_8(read_8(m_tmpea));
 			write_8(m_tmpea, m_tmp8);
+			m_rmw = false;
 			m_pc += 2;
 			m_icount -= 7;
 			break;
@@ -3308,8 +3335,10 @@ void f2mc16_device::opcodes_ea72(u8 operand)
 			m_tmp8 = read_8((m_pcb << 16) | (m_pc + 2));
 			m_tmp16 = read_rwX(operand & 7) + s8(m_tmp8);
 			m_tmpea = getRWbank(operand & 7, m_tmp16);
+			m_rmw = true;
 			m_tmp8 = doINC_8(read_8(m_tmpea));
 			write_8(m_tmpea, m_tmp8);
+			m_rmw = false;
 			m_pc += 3;
 			m_icount -= 7;
 			break;
@@ -3319,8 +3348,10 @@ void f2mc16_device::opcodes_ea72(u8 operand)
 			m_tmp16 = read_16((m_pcb << 16) | (m_pc + 2));
 			m_tmp16 = read_rwX(operand & 3) + s16(m_tmp16);
 			m_tmpea = getRWbank(operand & 3, m_tmp16);
+			m_rmw = true;
 			m_tmp8 = doINC_8(read_8(m_tmpea));
 			write_8(m_tmpea, m_tmp8);
+			m_rmw = false;
 			m_pc += 4;
 			m_icount -= 7;
 			break;
@@ -3329,8 +3360,10 @@ void f2mc16_device::opcodes_ea72(u8 operand)
 		case 0x5c: case 0x5d:
 			m_tmp16 = read_rwX(operand & 1) + read_rwX(7);
 			m_tmpea = getRWbank(operand & 1, m_tmp16);
+			m_rmw = true;
 			m_tmp8 = doINC_8(read_8(m_tmpea));
 			write_8(m_tmpea, m_tmp8);
+			m_rmw = false;
 			m_pc += 2;
 			m_icount -= 9;
 			break;
@@ -3347,8 +3380,10 @@ void f2mc16_device::opcodes_ea72(u8 operand)
 			{
 				m_tmpea |= (m_dtb << 16);
 			}
+			m_rmw = true;
 			m_tmp8 = doINC_8(read_8(m_tmpea));
 			write_8(m_tmpea, m_tmp8);
+			m_rmw = false;
 			m_pc += 4;
 			m_icount -= 5;
 			break;
@@ -3365,8 +3400,10 @@ void f2mc16_device::opcodes_ea72(u8 operand)
 		case 0x68: case 0x69: case 0x6a: case 0x6b:
 			m_tmp16 = read_rwX(operand & 3);
 			m_tmpea = getRWbank(operand & 3, m_tmp16);
+			m_rmw = true;
 			m_tmp8 = doDEC_8(read_8(m_tmpea));
 			write_8(m_tmpea, m_tmp8);
+			m_rmw = false;
 			m_pc += 2;
 			m_icount -= 7;
 			break;
@@ -3376,8 +3413,10 @@ void f2mc16_device::opcodes_ea72(u8 operand)
 			m_tmp8 = read_8((m_pcb << 16) | (m_pc + 2));
 			m_tmp16 = read_rwX(operand & 7) + s8(m_tmp8);
 			m_tmpea = getRWbank(operand & 7, m_tmp16);
+			m_rmw = true;
 			m_tmp8 = doDEC_8(read_8(m_tmpea));
 			write_8(m_tmpea, m_tmp8);
+			m_rmw = false;
 			m_pc += 3;
 			m_icount -= 7;
 			break;
@@ -3387,8 +3426,10 @@ void f2mc16_device::opcodes_ea72(u8 operand)
 			m_tmp16 = read_16((m_pcb << 16) | (m_pc + 2));
 			m_tmp16 = read_rwX(operand & 3) + s16(m_tmp16);
 			m_tmpea = getRWbank(operand & 3, m_tmp16);
+			m_rmw = true;
 			m_tmp8 = doDEC_8(read_8(m_tmpea));
 			write_8(m_tmpea, m_tmp8);
+			m_rmw = false;
 			m_pc += 4;
 			m_icount -= 7;
 			break;
@@ -3397,8 +3438,10 @@ void f2mc16_device::opcodes_ea72(u8 operand)
 		case 0x7c: case 0x7d:
 			m_tmp16 = read_rwX(operand & 1) + read_rwX(7);
 			m_tmpea = getRWbank(operand & 1, m_tmp16);
+			m_rmw = true;
 			m_tmp8 = doDEC_8(read_8(m_tmpea));
 			write_8(m_tmpea, m_tmp8);
+			m_rmw = false;
 			m_pc += 2;
 			m_icount -= 9;
 			break;
@@ -3415,8 +3458,10 @@ void f2mc16_device::opcodes_ea72(u8 operand)
 			{
 				m_tmpea |= (m_dtb << 16);
 			}
+			m_rmw = true;
 			m_tmp8 = doDEC_8(read_8(m_tmpea));
 			write_8(m_tmpea, m_tmp8);
+			m_rmw = false;
 			m_pc += 4;
 			m_icount -= 6;
 			break;
@@ -3616,9 +3661,11 @@ void f2mc16_device::opcodes_ea73(u8 operand)
 		case 0x48: case 0x49: case 0x4a: case 0x4b:
 			m_tmp16 = read_rwX(operand & 3);
 			m_tmpea = getRWbank(operand & 3, m_tmp16);
+			m_rmw = true;
 			m_tmp16 = doINC_16(read_16(m_tmpea));
 			write_16(m_tmpea, m_tmp16);
-			m_pc += 3;
+			m_rmw = false;
+			m_pc += 2;
 			m_icount -= 5;
 			break;
 
@@ -3627,8 +3674,10 @@ void f2mc16_device::opcodes_ea73(u8 operand)
 			m_tmp8 = read_8((m_pcb << 16) | (m_pc + 2));
 			m_tmp16 = read_rwX(operand & 7) + s8(m_tmp8);
 			m_tmpea = getRWbank(operand & 7, m_tmp16);
+			m_rmw = true;
 			m_tmp16 = doINC_16(read_16(m_tmpea));
 			write_16(m_tmpea, m_tmp16);
+			m_rmw = false;
 			m_pc += 3;
 			m_icount -= 5;
 			break;
@@ -3638,8 +3687,10 @@ void f2mc16_device::opcodes_ea73(u8 operand)
 			m_tmp16 = read_16((m_pcb << 16) | (m_pc + 2));
 			m_tmp16 = read_rwX(operand & 3) + s16(m_tmp16);
 			m_tmpea = getRWbank(operand & 3, m_tmp16);
+			m_rmw = true;
 			m_tmp16 = doINC_16(read_16(m_tmpea));
 			write_16(m_tmpea, m_tmp16);
+			m_rmw = false;
 			m_pc += 4;
 			m_icount -= 5;
 			break;
@@ -3656,8 +3707,10 @@ void f2mc16_device::opcodes_ea73(u8 operand)
 			{
 				m_tmpea |= (m_dtb << 16);
 			}
+			m_rmw = true;
 			m_tmp16 = doINC_16(read_16(m_tmpea));
 			write_16(m_tmpea, m_tmp16);
+			m_rmw = false;
 			m_pc += 4;
 			m_icount -= 5;
 			break;
@@ -3674,9 +3727,11 @@ void f2mc16_device::opcodes_ea73(u8 operand)
 		case 0x68: case 0x69: case 0x6a: case 0x6b:
 			m_tmp16 = read_rwX(operand & 3);
 			m_tmpea = getRWbank(operand & 3, m_tmp16);
+			m_rmw = true;
 			m_tmp16 = doDEC_16(read_16(m_tmpea));
 			write_16(m_tmpea, m_tmp16);
-			m_pc += 3;
+			m_rmw = false;
+			m_pc += 2;
 			m_icount -= 5;
 			break;
 
@@ -3685,8 +3740,10 @@ void f2mc16_device::opcodes_ea73(u8 operand)
 			m_tmp8 = read_8((m_pcb << 16) | (m_pc + 2));
 			m_tmp16 = read_rwX(operand & 7) + s8(m_tmp8);
 			m_tmpea = getRWbank(operand & 7, m_tmp16);
+			m_rmw = true;
 			m_tmp16 = doDEC_16(read_16(m_tmpea));
 			write_16(m_tmpea, m_tmp16);
+			m_rmw = false;
 			m_pc += 3;
 			m_icount -= 5;
 			break;
@@ -3696,8 +3753,10 @@ void f2mc16_device::opcodes_ea73(u8 operand)
 			m_tmp16 = read_16((m_pcb << 16) | (m_pc + 2));
 			m_tmp16 = read_rwX(operand & 3) + s16(m_tmp16);
 			m_tmpea = getRWbank(operand & 3, m_tmp16);
+			m_rmw = true;
 			m_tmp16 = doDEC_16(read_16(m_tmpea));
 			write_16(m_tmpea, m_tmp16);
+			m_rmw = false;
 			m_pc += 4;
 			m_icount -= 5;
 			break;
@@ -3714,8 +3773,10 @@ void f2mc16_device::opcodes_ea73(u8 operand)
 			{
 				m_tmpea |= (m_dtb << 16);
 			}
+			m_rmw = true;
 			m_tmp16 = doDEC_16(read_16(m_tmpea));
 			write_16(m_tmpea, m_tmp16);
+			m_rmw = false;
 			m_pc += 4;
 			m_icount -= 5;
 			break;
@@ -4237,8 +4298,10 @@ void f2mc16_device::opcodes_ea75(u8 operand)
 		case 0x08: case 0x09: case 0x0a: case 0x0b:
 			m_tmp16 = read_rwX(operand & 3);
 			m_tmpea = getRWbank(operand & 3, m_tmp16);
+			m_rmw = true;
 			m_tmp8 = doADD_8(read_8(m_tmpea), m_acc & 0xff);
 			write_8(m_tmpea, m_tmp8);
+			m_rmw = false;
 			m_pc += 2;
 			m_icount -= 7;
 			break;
@@ -4248,8 +4311,10 @@ void f2mc16_device::opcodes_ea75(u8 operand)
 			m_tmp8 = read_8((m_pcb << 16) | (m_pc + 2));
 			m_tmp16 = read_rwX(operand & 7) + s8(m_tmp8);
 			m_tmpea = getRWbank(operand & 7, m_tmp16);
+			m_rmw = true;
 			m_tmp8 = doADD_8(read_8(m_tmpea), m_acc & 0xff);
 			write_8(m_tmpea, m_tmp8);
+			m_rmw = false;
 			m_pc += 3;
 			m_icount -= 6;
 			break;
@@ -4259,8 +4324,10 @@ void f2mc16_device::opcodes_ea75(u8 operand)
 			m_tmp16 = read_16((m_pcb << 16) | (m_pc + 2));
 			m_tmp16 = read_rwX(operand & 3) + s16(m_tmp16);
 			m_tmpea = getRWbank(operand & 3, m_tmp16);
+			m_rmw = true;
 			m_tmp8 = doADD_8(read_8(m_tmpea), m_acc & 0xff);
 			write_8(m_tmpea, m_tmp8);
+			m_rmw = false;
 			m_pc += 4;
 			m_icount -= 6;
 			break;
@@ -4278,8 +4345,10 @@ void f2mc16_device::opcodes_ea75(u8 operand)
 			m_tmp8 = read_8((m_pcb << 16) | (m_pc + 2));
 			m_tmp16 = read_rwX(operand & 7) + s8(m_tmp8);
 			m_tmpea = getRWbank(operand & 7, m_tmp16);
+			m_rmw = true;
 			m_tmp8 = doSUB_8(read_8(m_tmpea), m_acc & 0xff);
 			write_8(m_tmpea, m_tmp8);
+			m_rmw = false;
 			m_pc += 3;
 			m_icount -= 6;
 			break;
@@ -4289,8 +4358,10 @@ void f2mc16_device::opcodes_ea75(u8 operand)
 			m_tmp16 = read_16((m_pcb << 16) | (m_pc + 2));
 			m_tmp16 = read_rwX(operand & 3) + s16(m_tmp16);
 			m_tmpea = getRWbank(operand & 3, m_tmp16);
+			m_rmw = true;
 			m_tmp8 = doSUB_8(read_8(m_tmpea), m_acc & 0xff);
 			write_8(m_tmpea, m_tmp8);
+			m_rmw = false;
 			m_pc += 4;
 			m_icount -= 6;
 			break;
@@ -4308,8 +4379,10 @@ void f2mc16_device::opcodes_ea75(u8 operand)
 			m_tmp8 = read_8((m_pcb << 16) | (m_pc + 2));
 			m_tmp16 = read_rwX(operand & 7) + s8(m_tmp8);
 			m_tmpea = getRWbank(operand & 7, m_tmp16);
+			m_rmw = true;
 			m_tmp8 = doSUBC_8(read_8(m_tmpea), m_acc & 0xff);
 			write_8(m_tmpea, m_tmp8);
+			m_rmw = false;
 			m_pc += 3;
 			m_icount -= 6;
 			break;
@@ -4319,8 +4392,10 @@ void f2mc16_device::opcodes_ea75(u8 operand)
 			m_tmp16 = read_16((m_pcb << 16) | (m_pc + 2));
 			m_tmp16 = read_rwX(operand & 3) + s16(m_tmp16);
 			m_tmpea = getRWbank(operand & 3, m_tmp16);
+			m_rmw = true;
 			m_tmp8 = doSUBC_8(read_8(m_tmpea), m_acc & 0xff);
 			write_8(m_tmpea, m_tmp8);
+			m_rmw = false;
 			m_pc += 4;
 			m_icount -= 6;
 			break;
@@ -4341,9 +4416,11 @@ void f2mc16_device::opcodes_ea75(u8 operand)
 			m_tmp8 = read_8((m_pcb << 16) | (m_pc + 2));
 			m_tmp16 = read_rwX(operand & 7) + s8(m_tmp8);
 			m_tmpea = getRWbank(operand & 7, m_tmp16);
+			m_rmw = true;
 			m_tmp8 = read_8(m_tmpea);
 			m_tmp8 &= m_acc & 0xff;
 			write_8(m_tmpea, m_tmp8);
+			m_rmw = false;
 			setNZ_8(m_tmp8);
 			m_ps &= ~F_V;
 			m_pc += 3;
@@ -4355,9 +4432,11 @@ void f2mc16_device::opcodes_ea75(u8 operand)
 			m_tmp16 = read_16((m_pcb << 16) | (m_pc + 2));
 			m_tmp16 = read_rwX(operand & 3) + s16(m_tmp16);
 			m_tmpea = getRWbank(operand & 3, m_tmp16);
+			m_rmw = true;
 			m_tmp8 = read_8(m_tmpea);
 			m_tmp8 &= m_acc & 0xff;
 			write_8(m_tmpea, m_tmp8);
+			m_rmw = false;
 			setNZ_8(m_tmp8);
 			m_ps &= ~F_V;
 			m_pc += 4;
@@ -4380,9 +4459,11 @@ void f2mc16_device::opcodes_ea75(u8 operand)
 			m_tmp8 = read_8((m_pcb << 16) | (m_pc + 2));
 			m_tmp16 = read_rwX(operand & 7) + s8(m_tmp8);
 			m_tmpea = getRWbank(operand & 7, m_tmp16);
+			m_rmw = true;
 			m_tmp8 = read_8(m_tmpea);
 			m_tmp8 |= m_acc & 0xff;
 			write_8(m_tmpea, m_tmp8);
+			m_rmw = false;
 			setNZ_8(m_tmp8);
 			m_ps &= ~F_V;
 			m_pc += 3;
@@ -4394,9 +4475,11 @@ void f2mc16_device::opcodes_ea75(u8 operand)
 			m_tmp16 = read_16((m_pcb << 16) | (m_pc + 2));
 			m_tmp16 = read_rwX(operand & 3) + s16(m_tmp16);
 			m_tmpea = getRWbank(operand & 3, m_tmp16);
+			m_rmw = true;
 			m_tmp8 = read_8(m_tmpea);
 			m_tmp8 |= m_acc & 0xff;
 			write_8(m_tmpea, m_tmp8);
+			m_rmw = false;
 			setNZ_8(m_tmp8);
 			m_ps &= ~F_V;
 			m_pc += 4;
@@ -4419,9 +4502,11 @@ void f2mc16_device::opcodes_ea75(u8 operand)
 			m_tmp8 = read_8((m_pcb << 16) | (m_pc + 2));
 			m_tmp16 = read_rwX(operand & 7) + s8(m_tmp8);
 			m_tmpea = getRWbank(operand & 7, m_tmp16);
+			m_rmw = true;
 			m_tmp8 = read_8(m_tmpea);
 			m_tmp8 ^= m_acc & 0xff;
 			write_8(m_tmpea, m_tmp8);
+			m_rmw = false;
 			setNZ_8(m_tmp8);
 			m_ps &= ~F_V;
 			m_pc += 4;
@@ -4433,9 +4518,11 @@ void f2mc16_device::opcodes_ea75(u8 operand)
 			m_tmp16 = read_16((m_pcb << 16) | (m_pc + 2));
 			m_tmp16 = read_rwX(operand & 3) + s16(m_tmp16);
 			m_tmpea = getRWbank(operand & 3, m_tmp16);
+			m_rmw = true;
 			m_tmp8 = read_8(m_tmpea);
 			m_tmp8 ^= m_acc & 0xff;
 			write_8(m_tmpea, m_tmp8);
+			m_rmw = false;
 			setNZ_8(m_tmp8);
 			m_ps &= ~F_V;
 			m_pc += 4;
@@ -4937,8 +5024,10 @@ void f2mc16_device::opcodes_ea77(u8 operand)
 		case 0x08: case 0x09: case 0x0a: case 0x0b:
 			m_tmp16 = read_rwX(operand & 3);
 			m_tmpea = getRWbank(operand & 3, m_tmp16);
+			m_rmw = true;
 			m_tmp16 = doADD_16(read_16(m_tmpea), m_acc & 0xffff);
 			write_16(m_tmpea, m_tmp16);
+			m_rmw = false;
 			m_pc += 2;
 			m_icount -= 6;
 			break;
@@ -4955,8 +5044,10 @@ void f2mc16_device::opcodes_ea77(u8 operand)
 		case 0x28: case 0x29: case 0x2a: case 0x2b:
 			m_tmp16 = read_rwX(operand & 3);
 			m_tmpea = getRWbank(operand & 3, m_tmp16);
+			m_rmw = true;
 			m_tmp16 = doSUB_16(read_16(m_tmpea), m_acc & 0xffff);
 			write_16(m_tmpea, m_tmp16);
+			m_rmw = false;
 			m_pc += 2;
 			m_icount -= 6;
 			break;
@@ -4982,8 +5073,10 @@ void f2mc16_device::opcodes_ea77(u8 operand)
 		case 0x68: case 0x69: case 0x6a: case 0x6b:
 			m_tmp16 = read_rwX(operand & 3);
 			m_tmpea = getRWbank(operand & 3, m_tmp16);
+			m_rmw = true;
 			m_tmp16 = doSUB_16(0, read_16(m_tmpea));
 			write_16(m_tmpea, m_tmp16);
+			m_rmw = false;
 			m_pc += 2;
 			m_icount -= 6;
 			break;
@@ -5003,9 +5096,11 @@ void f2mc16_device::opcodes_ea77(u8 operand)
 		case 0x88: case 0x89: case 0x8a: case 0x8b:
 			m_tmp16 = read_rwX(operand & 3);
 			m_tmpea = getRWbank(operand & 3, m_tmp16);
+			m_rmw = true;
 			m_tmp16 = read_16(m_tmpea);
 			m_tmp16 &= (m_acc & 0xffff);
 			write_16(m_tmpea, m_tmp16);
+			m_rmw = false;
 			setNZ_16(m_tmp16);
 			m_ps &= ~F_V;
 			m_pc += 2;
@@ -5027,9 +5122,11 @@ void f2mc16_device::opcodes_ea77(u8 operand)
 		case 0xa8: case 0xa9: case 0xaa: case 0xab:
 			m_tmp16 = read_rwX(operand & 3);
 			m_tmpea = getRWbank(operand & 3, m_tmp16);
+			m_rmw = true;
 			m_tmp16 = read_16(m_tmpea);
 			m_tmp16 |= (m_acc & 0xffff);
 			write_16(m_tmpea, m_tmp16);
+			m_rmw = false;
 			setNZ_16(m_tmp16);
 			m_ps &= ~F_V;
 			m_pc += 2;
@@ -5051,9 +5148,11 @@ void f2mc16_device::opcodes_ea77(u8 operand)
 		case 0xc8: case 0xc9: case 0xca: case 0xcb:
 			m_tmp16 = read_rwX(operand & 3);
 			m_tmpea = getRWbank(operand & 3, m_tmp16);
+			m_rmw = true;
 			m_tmp16 = read_16(m_tmpea);
 			m_tmp16 ^= (m_acc & 0xffff);
 			write_16(m_tmpea, m_tmp16);
+			m_rmw = false;
 			setNZ_16(m_tmp16);
 			m_ps &= ~F_V;
 			m_pc += 2;
@@ -5074,8 +5173,10 @@ void f2mc16_device::opcodes_ea77(u8 operand)
 		case 0xe8: case 0xe9: case 0xea: case 0xeb:
 			m_tmp16 = read_rwX(operand & 3);
 			m_tmpea = getRWbank(operand & 3, m_tmp16);
+			m_rmw = true;
 			m_tmp16 = read_16(m_tmpea) ^ 0xffff;
 			write_16(m_tmpea, m_tmp16);
+			m_rmw = false;
 			setNZ_16(m_tmp16);
 			m_ps &= ~F_V;
 			m_pc += 2;
@@ -5482,31 +5583,23 @@ void f2mc16_device::execute_set_input(int inputnum, int state)
 {
 }
 
-void f2mc16_device::set_irq(int vector, int level)
+void f2mc16_device::set_irq_level(int irq_level)
 {
-	if (m_vector_level[vector] != level)
-	{
-		m_outstanding_irqs++;
-		m_vector_level[vector] = level;
-//      printf("set_irq: vec %d, level %d, %d outstanding\n", vector, level, m_outstanding_irqs);
-	}
+	m_irq_level = (irq_level << 13) | 0x1fff;
 }
 
-void f2mc16_device::clear_irq(int vector)
+void f2mc16_device::take_irq_vector(uint8_t irq_vector)
 {
-	if (m_vector_level[vector] < 7)
-	{
-		m_outstanding_irqs--;
-		m_vector_level[vector] = 7;
-		//printf("clear_irq: vec %d, %d outstanding\n", vector, m_outstanding_irqs);
-	}
+	take_irq();
+
+	u32 uVecAddr = 0xfffffc - (irq_vector * 4);
+	m_pc = read_16(uVecAddr);
+	m_pcb = read_8(uVecAddr + 2);
 }
 
-// note: this function must not use m_tmp16 unless you change RETI
-void f2mc16_device::take_irq(int vector, int level)
+// note: this function must not use m_tmp8/m_tmp16
+void f2mc16_device::take_irq()
 {
-	standard_irq_callback(vector, (m_pcb << 16) | m_pc);
-//  printf("take_irq: vector %d, level %d, old PC = %02x%04x\n", vector, level, m_pcb, m_pc);
 	push_16_ssp(m_acc>>16);
 	push_16_ssp(m_acc & 0xffff);
 	push_16_ssp((m_dpr<<8) | m_adb);
@@ -5515,11 +5608,4 @@ void f2mc16_device::take_irq(int vector, int level)
 	push_16_ssp(m_ps);
 
 	m_ps |= F_S;
-	m_ps &= ~0xe000;
-	m_ps |= (level & 7) << 13;
-
-	u32 uVecAddr = 0xfffffc - (vector * 4);
-	m_pc = read_16(uVecAddr);
-	m_pcb = read_8(uVecAddr + 2);
-	//printf("New PC = %02x%04x, new level=%d\n", m_pcb, m_pc, m_ps>>13);
 }
