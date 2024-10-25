@@ -318,6 +318,7 @@ void h8_sci_device::device_start()
 	save_item(NAME(m_smr));
 	save_item(NAME(m_scr));
 	save_item(NAME(m_ssr));
+	save_item(NAME(m_ssr_read));
 	save_item(NAME(m_brr));
 	save_item(NAME(m_rsr));
 	save_item(NAME(m_tsr));

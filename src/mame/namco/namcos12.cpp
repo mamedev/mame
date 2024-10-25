@@ -1294,7 +1294,7 @@ protected:
 		// Depending on the game, the method of specifying the main ROM region is different.
 		// Some games set exp_base to 0x1f300000 (toukon3, tenkomor) and others set the msb of the DMA offset to 1 (tekken3, sws2000 for example).
 		const bool is_mainrom = BIT( offset, 31 ) || m_maincpu->exp_base() == 0x1f300000;
-	
+
 		memory_region *region;
 
 		if ( is_mainrom )
@@ -2283,10 +2283,10 @@ static INPUT_PORTS_START(technodr)
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_UNUSED)
 
 	PORT_START("JVS_ANALOG_INPUT1")
-	PORT_BIT(0xffff, 0x5e00, IPT_PADDLE) PORT_MINMAX(0x1600, 0xa600) PORT_SENSITIVITY(100) PORT_KEYDELTA(2560) PORT_NAME("Steering Wheel") PORT_REVERSE
+	PORT_BIT(0xffff, 0x5e00, IPT_PADDLE) PORT_MINMAX(0x1600, 0xa600) PORT_SENSITIVITY(100) PORT_KEYDELTA(1280) PORT_NAME("Steering Wheel") PORT_REVERSE
 
 	PORT_START("JVS_ANALOG_INPUT2")
-	PORT_BIT(0xffff, 0x5e00, IPT_PEDAL2) PORT_MINMAX(0x3e00, 0x7e00) PORT_SENSITIVITY(100) PORT_KEYDELTA(2560) PORT_NAME("Brake Pedal") PORT_REVERSE
+	PORT_BIT(0xffff, 0x5e00, IPT_PEDAL2) PORT_MINMAX(0x3e00, 0x7e00) PORT_SENSITIVITY(100) PORT_KEYDELTA(1280) PORT_NAME("Brake Pedal") PORT_REVERSE
 
 	PORT_START("JVS_ANALOG_INPUT3")
 	PORT_BIT(0xffff, 0x9a00, IPT_PEDAL) PORT_MINMAX(0x4680, 0xed80) PORT_SENSITIVITY(100) PORT_KEYDELTA(2560) PORT_NAME("Gas Pedal") PORT_REVERSE
