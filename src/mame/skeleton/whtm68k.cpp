@@ -266,14 +266,13 @@ static INPUT_PORTS_START( unkwht )
 INPUT_PORTS_END
 
 
- // TODO: wrong, just enough to see something in the decoder
 const gfx_layout gfx_8x8x4_packed_msb_r =
 {
 	8,8,
 	RGN_FRAC(1,1),
 	4,
 	{ STEP4(3,-1) },
-	{ STEP8(28,-4) },
+	{ 4, 0, 28, 24, 20, 16, 12, 8 },
 	{ STEP8(0,4*8) },
 	8*8*4
 };

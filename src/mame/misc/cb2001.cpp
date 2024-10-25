@@ -43,6 +43,9 @@ this seems more like 8-bit hardware, maybe it should be v25, not v35...
 
 To enter input test, keep '9' pressed and press 'F3'.
 
+TODO:
+- correct / complete CPU decryption table
+
 *************************************************************************************************/
 
 #include "emu.h"
@@ -1495,8 +1498,7 @@ ROM_START( scherrymp ) // DYNA D9702 PCB; DYNA PLUS V1.6 in bookkeeping screen
 	ROM_REGION( 0x100000, "gfx", 0 )
 	ROM_LOAD( "d9701.12c", 0x000000, 0x100000, CRC(07d711a6) SHA1(6b5a4017eb1d31dc184831f85d786331f4a8e01f) )
 
-	// these are confirmed correct, though it's the only set using the smaller PROMs.
-	ROM_REGION( 0x400, "proms", 0 )
+	ROM_REGION( 0x400, "proms", ROMREGION_ERASE00 )
 	ROM_LOAD( "82s135.9b",  0x000, 0x100, CRC(66ed363f) SHA1(65bd37842c441c2e712844b07c0cfe37ef16d0ef) )
 	ROM_LOAD( "82s135.11b", 0x100, 0x100, CRC(a19821db) SHA1(62dda90dd67dfbc0b96f161f1f2b7a46a5805eae) )
 ROM_END
@@ -1581,6 +1583,30 @@ ROM_START( ndongmul2 ) // 뉴 동물동물 2 (bootleg MIA 94V-0 PCB; DYNA PLUS V
 	ROM_LOAD( "gal16v8d.u7",         0x000000, 0x000117, CRC(55e39258) SHA1(4546fdbd343290c2a7953b4cd0f8db5aab2fad18) )
 ROM_END
 
+ROM_START( mystjb ) // DYNA D9702 PCB; DYNA MYST V1.3G in bookkeeping screen
+	ROM_REGION16_LE( 0x40000, "boot_prg", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD( "mjb_3g.11f", 0x20000, 0x20000, CRC(b67d1311) SHA1(7694bee009c5720dde65226ec19544c5e6e5077e) )
+
+	ROM_REGION( 0x80000, "gfx", 0 )
+	ROM_LOAD( "mjb_1g.12b", 0x00000, 0x80000, CRC(00244991) SHA1(952095011ff766018b9ad310afc9dbd3a4c8f5a8) )
+
+	ROM_REGION( 0x400, "proms", ROMREGION_ERASE00 )
+	ROM_LOAD( "82s135.9b",  0x000, 0x100, CRC(777d4f6e) SHA1(6825514676ff1c2a2bef7c67819787d698eb32bf) )
+	ROM_LOAD( "82s135.11b", 0x100, 0x100, CRC(ee087df2) SHA1(b60a1097e997459e788dcfafe15237c95a55bbed) )
+ROM_END
+
+ROM_START( tripjack ) // DYNA D9805 PCB; DYNA TRJ V1.6G in bookkeeping screen
+	ROM_REGION16_LE( 0x40000, "boot_prg", 0 )
+	ROM_LOAD16_WORD( "27c2001.11f", 0x00000, 0x40000, CRC(f7b6226a) SHA1(f01329eff728547c369075a1bc0c2455438499a5) )
+
+	ROM_REGION( 0x80000, "gfx", 0 )
+	ROM_LOAD( "27c4002.12b", 0x00000, 0x80000, CRC(5b6221a9) SHA1(b777cc4aace17969d0357ba5e8c75c9f8b596da4) )
+
+	ROM_REGION( 0x400, "proms", ROMREGION_ERASE00 )
+	ROM_LOAD( "82s135.9b",  0x000, 0x100, CRC(2d2237fb) SHA1(9b71801bd465d2a823f648f4d3c1823b5ba3340e) )
+	ROM_LOAD( "82s135.11b", 0x100, 0x100, CRC(9940ef22) SHA1(42b0c6410d8db34e0316e95b7b7007abc3098341) )
+ROM_END
+
 
 void cb2001_state::init_smaller_proms()
 {
@@ -1608,3 +1634,5 @@ GAME( 1999, ndongmul2,    0,         ndongmul2, ndongmul2, cb2001_state, empty_i
 GAME( 1997, scherrymp,    0,         scherrymp, scherrymp, cb2001_state, init_smaller_proms, ROT0, "Dyna",  "Super Cherry Master Plus (V1.6)",  MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // 2001 version? (we have bootlegs running on z80 hw of a 1996 version)
 GAME( 1997, scherrymp10u, scherrymp, scherrymp, scherrymp, cb2001_state, empty_init,         ROT0, "Dyna",  "Super Cherry Master Plus (V1.0U)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) //
 GAME( 1997, cb5,          0,         cb5,       cb5,       cb2001_state, empty_init,         ROT0, "Dyna",  "Cherry Bonus V Five (V1.3)",       MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1998, mystjb,       0,         scherrymp, scherrymp, cb2001_state, init_smaller_proms, ROT0, "Dyna",  "Mystery J & B (V1.3G)",            MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1998, tripjack,     0,         scherrymp, scherrymp, cb2001_state, init_smaller_proms, ROT0, "Dyna",  "Triple Jack (V1.6G)",              MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
