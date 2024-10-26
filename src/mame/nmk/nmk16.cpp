@@ -5583,6 +5583,14 @@ void nmk16_state::bjtwin(machine_config &config)
 	nmk112.set_rom1_tag("oki2");
 }
 
+void nmk16_state::cactus(machine_config &config)
+{
+	bjtwin(config);
+
+	config.device_remove("scantimer");
+	set_hacky_interrupt_timing(config);
+}
+
 // The 215 writes minimal data here to select an unscrambling configuration hardwired inside the NMK214 chip.
 void macross_prot_state::mcu_port3_to_214_w(u8 data)
 {
@@ -5654,7 +5662,6 @@ void macross_prot_state::base_nmk214_215(machine_config &config)
 void macross_prot_state::macross_prot(machine_config &config)
 {
 	macross(config);
-
 	base_nmk214_215(config);
 
 	config.set_maximum_quantum(attotime::from_hz(6000));
@@ -5663,9 +5670,7 @@ void macross_prot_state::macross_prot(machine_config &config)
 void macross_prot_state::gunnail_prot(machine_config &config)
 {
 	gunnail(config);
-
 	set_interrupt_timing(config);
-
 	base_nmk214_215(config);
 
 	config.set_maximum_quantum(attotime::from_hz(6000));
@@ -5674,7 +5679,6 @@ void macross_prot_state::gunnail_prot(machine_config &config)
 void macross_prot_state::bjtwin_prot(machine_config &config)
 {
 	bjtwin(config);
-
 	base_nmk214_215(config);
 
 	config.set_maximum_quantum(attotime::from_hz(6000));
@@ -10576,7 +10580,7 @@ GAME( 1994, rapheroa,   arcadian, raphero,      raphero,      nmk16_state,      
 // both sets of both these games show a date of 9th Mar 1992 in the test mode, they look like different revisions so I doubt this is accurate
 GAME( 1992, sabotenb,   0,        bjtwin_prot, sabotenb,      macross_prot_state, empty_init,           ROT0,   "NMK / Tecmo",                  "Saboten Bombers (set 1)", 0 )
 GAME( 1992, sabotenba,  sabotenb, bjtwin_prot, sabotenb,      macross_prot_state, empty_init,           ROT0,   "NMK / Tecmo",                  "Saboten Bombers (set 2)", 0 )
-GAME( 1992, cactus,     sabotenb, bjtwin,      sabotenb,      nmk16_state,        init_nmk,             ROT0,   "bootleg",                      "Cactus (bootleg of Saboten Bombers)", 0 ) // PCB marked 'Cactus', no title screen
+GAME( 1992, cactus,     sabotenb, cactus,      sabotenb,      nmk16_state,        init_nmk,             ROT0,   "bootleg",                      "Cactus (bootleg of Saboten Bombers)", 0 ) // PCB marked 'Cactus', no title screen
 
 GAME( 1993, bjtwin,     0,        bjtwin_prot, bjtwin,        macross_prot_state, empty_init,           ROT270, "NMK",                          "Bombjack Twin (set 1)", 0 )
 GAME( 1993, bjtwina,    bjtwin,   bjtwin_prot, bjtwin,        macross_prot_state, empty_init,           ROT270, "NMK",                          "Bombjack Twin (set 2)", 0 )
