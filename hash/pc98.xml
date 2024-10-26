@@ -1422,22 +1422,71 @@ Utility disk file "BMENU." sports ugly GFX cyan fills (especially noticeable whe
 
 <!-- !Game (RPG) makers -->
 
-	<software name="cgtsuku">
-		<description>CG Tsukuuru 3D</description>
-		<year>19??</year>
-		<publisher>アスキー (ASCII)</publisher>
-		<info name="alt_title" value="CGツクール３Ｄ" />
-		<info name="usage" value="From DOS, run INSTALL.EXE to create a bootable disk or INSTHD.EXE to install to HDD" />
+	<software name="bakasuka">
+		<description>Bakasuka Wars</description>
+		<year>199?</year>
+		<publisher>ログインソフト (Login Soft)</publisher>
+		<info name="alt_title" value="バカスカウォーズ" />
 		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Install Disk"/>
-			<dataarea name="flop" size="1329680">
-				<rom name="cg_i.nfd" size="1329680" crc="60d844b4" sha1="1755f9690ede25744aa254b1768a941a469a9131" offset="0" />
+			<dataarea name="flop" size="1265664">
+				<rom name="main.fdi" size="1265664" crc="a25084a1" sha1="a198dc63d9d27e206e35456698df38449c5310d7" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="chimesq" supported="no">
+		<description>Chime's Quest</description>
+		<year>1992</year>
+		<publisher>ログインソフト (Login Soft)</publisher>
+		<notes><![CDATA[
+Looks a RPG maker tool
+Seems to be missing a disk labeled Data 3
+Not extensively tested, running game start will moan about missing files
+]]></notes>
+		<info name="alt_title" value="チャイムズクエスト" />
+		<info name="release" value="199202xx" />
+		<info name="usage" value="Run INSTALL.EXE from DOS to create a bootable disk or install to HDD" />
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="System Disk"/>
+			<dataarea name="flop" size="1265664">
+				<rom name="rpg_sys.fdi" size="1265664" crc="1c180b6d" sha1="503f1133e34de362d786e84ef26b0e009a07dfeb" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Sample Disk"/>
-			<dataarea name="flop" size="1329680">
-				<rom name="cg_s.nfd" size="1329680" crc="aec8568a" sha1="2dc9097451cc22886fcc1727bfd9580b8684e810" offset="0" />
+			<feature name="part_id" value="Data Disk 1"/>
+			<dataarea name="flop" size="1265664">
+				<rom name="rpg_dat1.fdi" size="1265664" crc="7acd0e17" sha1="a873248e5101171f362248ff02fabd226b8b6951" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Data Disk 2"/>
+			<dataarea name="flop" size="1265664">
+				<rom name="rpg_dat2.fdi" size="1265664" crc="5b9054c9" sha1="4bd65922955d9594d0db884d60065c12029684e8" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wargamec">
+		<description>War Game Construction</description>
+		<year>19??</year>
+		<publisher>システムソフト (SystemSoft)</publisher>
+		<info name="alt_title" value="ウォーゲームコンストラクション" />
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk A"/>
+			<dataarea name="flop" size="1265664">
+				<rom name="war_a.fdi" size="1265664" crc="18c3c108" sha1="f4bdffa26c8d2aa553ac3f662a7bd82a31bf6087" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk B"/>
+			<dataarea name="flop" size="1265664">
+				<rom name="war_b.fdi" size="1265664" crc="596fb864" sha1="bdd98f24d8c135628de394cd733549b2034108f8" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk C"/>
+			<dataarea name="flop" size="1265664">
+				<rom name="war_c.fdi" size="1265664" crc="fda801e4" sha1="fa31fbd7fc6ae8d61320922a1c6b7cd1b3f86443" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1509,6 +1558,26 @@ Utility disk file "BMENU." sports ugly GFX cyan fills (especially noticeable whe
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1261568">
 				<rom name="animation editor da vinci-98.hdm" size="1261568" crc="4d31c43a" sha1="8ec37a7fe3e006e3c4827762f6041d6f813e1c0b" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cgtsuku">
+		<description>CG Tsukuuru 3D</description>
+		<year>1992?</year>
+		<publisher>アスキー (ASCII)</publisher>
+		<info name="alt_title" value="CGツクール３Ｄ" />
+		<info name="usage" value="From DOS, run INSTALL.EXE to create a bootable disk or INSTHD.EXE to install to HDD" />
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Install Disk"/>
+			<dataarea name="flop" size="1329680">
+				<rom name="cg_i.nfd" size="1329680" crc="60d844b4" sha1="1755f9690ede25744aa254b1768a941a469a9131" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Sample Disk"/>
+			<dataarea name="flop" size="1329680">
+				<rom name="cg_s.nfd" size="1329680" crc="aec8568a" sha1="2dc9097451cc22886fcc1727bfd9580b8684e810" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -6738,18 +6807,6 @@ Has a [DAC1BIT] sampling tester on boot, needs +18 [tempo]/low [volume] on RS cl
 		</part>
 	</software>
 
-	<software name="bakasuka">
-		<description>Bakasuka Wars</description>
-		<year>199?</year>
-		<publisher>ログインソフト (Login Soft)</publisher>
-		<info name="alt_title" value="バカスカウォーズ" />
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="1265664">
-				<rom name="main.fdi" size="1265664" crc="a25084a1" sha1="a198dc63d9d27e206e35456698df38449c5310d7" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="bakendo" supported="no">
 		<description>Bakendou - Horse Racing Analyzer</description>
 		<year>1991</year>
@@ -10887,38 +10944,6 @@ Has optional [RS-MIDI] sound support
 			<feature name="part_id" value="Disk 5"/>
 			<dataarea name="flop" size="1261568">
 				<rom name="chikyuu bouei shoujo iko-chan - ufo daisakusen (disk 5).hdm" size="1261568" crc="f7339955" sha1="8e0ad26853bf239ba43c377e4825435dc87b6ca0" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="chimesq" supported="no">
-		<description>Chime's Quest</description>
-		<year>1992</year>
-		<publisher>ログインソフト (Login Soft)</publisher>
-		<notes><![CDATA[
-Looks a RPG maker tool
-Seems to be missing a disk labeled Data 3
-Not extensively tested, running game start will moan about missing files
-]]></notes>
-		<info name="alt_title" value="チャイムズクエスト" />
-		<info name="release" value="199202xx" />
-		<info name="usage" value="Run INSTALL.EXE from DOS to create a bootable disk or install to HDD" />
-		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="System Disk"/>
-			<dataarea name="flop" size="1265664">
-				<rom name="rpg_sys.fdi" size="1265664" crc="1c180b6d" sha1="503f1133e34de362d786e84ef26b0e009a07dfeb" offset="0" />
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Data Disk 1"/>
-			<dataarea name="flop" size="1265664">
-				<rom name="rpg_dat1.fdi" size="1265664" crc="7acd0e17" sha1="a873248e5101171f362248ff02fabd226b8b6951" offset="0" />
-			</dataarea>
-		</part>
-		<part name="flop3" interface="floppy_5_25">
-			<feature name="part_id" value="Data Disk 2"/>
-			<dataarea name="flop" size="1265664">
-				<rom name="rpg_dat2.fdi" size="1265664" crc="5b9054c9" sha1="4bd65922955d9594d0db884d60065c12029684e8" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -30000,7 +30025,7 @@ Wants two floppy disks if OPEN.EXE is executed
 			</dataarea>
 		</part>
 	</software>
-x
+
 	<software name="ligarued" supported="partial">
 		<description>Ligarued</description>
 		<year>1990</year>
@@ -50981,31 +51006,6 @@ doesn't boot when converted to d88 (2DD)
 			<feature name="part_id" value="Disk D"/>
 			<dataarea name="flop" size="1261568">
 				<rom name="wakusei omega no q ouji (disk d).hdm" size="1261568" crc="fc2cb501" sha1="3fb232e837bb7f1be90486224221340d8e8a4d4b" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="wargamec">
-		<description>War Game Construction</description>
-		<year>19??</year>
-		<publisher>システムソフト (SystemSoft)</publisher>
-		<info name="alt_title" value="ウォーゲームコンストラクション" />
-		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Disk A"/>
-			<dataarea name="flop" size="1265664">
-				<rom name="war_a.fdi" size="1265664" crc="18c3c108" sha1="f4bdffa26c8d2aa553ac3f662a7bd82a31bf6087" offset="0" />
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Disk B"/>
-			<dataarea name="flop" size="1265664">
-				<rom name="war_b.fdi" size="1265664" crc="596fb864" sha1="bdd98f24d8c135628de394cd733549b2034108f8" offset="0" />
-			</dataarea>
-		</part>
-		<part name="flop3" interface="floppy_5_25">
-			<feature name="part_id" value="Disk C"/>
-			<dataarea name="flop" size="1265664">
-				<rom name="war_c.fdi" size="1265664" crc="fda801e4" sha1="fa31fbd7fc6ae8d61320922a1c6b7cd1b3f86443" offset="0" />
 			</dataarea>
 		</part>
 	</software>
