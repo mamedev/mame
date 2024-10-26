@@ -378,6 +378,8 @@ protected:
 	void m68040_do_frestore(u32 addr, int reg);
 	void m68040_fpu_op1();
 	void m68881_ftrap();
+	u32 m6888x_read_cir(offs_t offset);
+	void m6888x_write_cir(offs_t offset, u32 data);
 };
 
 #endif // MAME_CPU_M68000_M68KMUSASHI_H
