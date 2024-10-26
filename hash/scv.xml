@@ -371,11 +371,9 @@ Information found at http://www.rhod.fr/yeno_epoch.html
 		<part name="cart" interface="scv_cart">
 			<feature name="slot" value="rom64k"/>
 			<dataarea name="rom" size="0x10000">
-				<rom name="starspeeder.1" offset="0x0000" size="0x2000" crc="7978c4a6" sha1="6bb5ff3946867fa7adb6561dc084ef5a7a92c507"/>
-				<rom offset="0x2000" size="0x2000" loadflag="reload"/>
-				<rom offset="0x4000" size="0x2000" loadflag="reload"/>
-				<rom offset="0x6000" size="0x2000" loadflag="reload"/>
-				<rom name="starspeeder.0" offset="0x8000" size="0x8000" crc="511576ee" sha1="1b61132af26dc8d5c1b5e0f72c2e96192bba7e20"/>
+				<rom name="starspeeder.0" offset="0x0000" size="0x8000" crc="511576ee" sha1="1b61132af26dc8d5c1b5e0f72c2e96192bba7e20"/>
+				<rom offset="0x8000" size="0x6000" loadflag="reload"/>
+				<rom name="starspeeder.1" offset="0xe000" size="0x2000" crc="7978c4a6" sha1="6bb5ff3946867fa7adb6561dc084ef5a7a92c507"/>
 			</dataarea>
 		</part>
 	</software>
