@@ -135,7 +135,7 @@ void rm480z_state::rm480z_MK1_mem(address_map &map)
 	m_view[1](0xe800, 0xf7ff).rom().region("ros", 0x0800);
 	//page 2 (for running BIR)
 	m_view[2](0x9800, 0x9fff).rom().region("bir1", 0x1800);
-	m_view[2](0xa000, 0xbfff).rom().region("bir2", 0x0000);	
+	m_view[2](0xa000, 0xbfff).rom().region("bir2", 0x0000);
 	m_view[2](0xc000, 0xd7ff).rom().region("bir1", 0x0000);
 	m_view[2](0xd800, 0xdfff).rom().region("bir0", 0x1800);
 	m_view[2](0xe000, 0xe7ff).rom().region("bir0", 0x0000);
@@ -360,7 +360,7 @@ ROM_START( rm480za )
 	ROM_REGION( 0x2000, "bir1", 0 )
 	ROM_LOAD( "bir5-4-1.bin",  0x0000, 0x2000, CRC(63959245) SHA1(2e42453ce281fd6cc2de176ff98f0a326d3ae8a8) )
 	ROM_REGION( 0x2000, "bir2", 0 )
-	ROM_LOAD( "bir5-4-2.bin",  0x0000, 0x2000, CRC(d3eb07cf) SHA1(9e576e8d2ae571319dc6c1cb035f13cf56abf690) )	
+	ROM_LOAD( "bir5-4-2.bin",  0x0000, 0x2000, CRC(d3eb07cf) SHA1(9e576e8d2ae571319dc6c1cb035f13cf56abf690) )
 
 	ROM_REGION( 0x2000, "chargen", 0 )
 	ROM_LOAD( "cg06.lq",        0x0000, 0x2000, BAD_DUMP CRC(15d40f7e) SHA1(a7266357eb9be849f77a97ff3013b236c0af8289) ) // chip is marked CG05, might not be the same, so marked as bad

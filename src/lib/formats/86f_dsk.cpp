@@ -235,7 +235,7 @@ bool _86f_format::load(util::random_read &io, uint32_t form_factor, const std::v
 /*
 bool _86f_format::save(util::random_read_write &io, const std::vector<uint32_t> &variants, const floppy_image &image) const
 {
-	return true;
+    return true;
 }
 */
 const _86f_format FLOPPY_86F_FORMAT;

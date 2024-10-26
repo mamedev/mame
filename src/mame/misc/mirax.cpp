@@ -328,7 +328,7 @@ void mirax_state::sound_cmd_w(uint8_t data)
 	m_audiocpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
-template<unsigned Which> 
+template<unsigned Which>
 void mirax_state::coin_counter_w(int state)
 {
 	machine().bookkeeping().coin_counter_w(Which, state);

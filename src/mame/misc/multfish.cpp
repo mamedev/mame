@@ -288,7 +288,7 @@ void igrosoft_gamble_state::vid_w(offs_t offset, uint8_t data)
 		uint8_t const r = ((coldat & 0x001f) >> 0);
 		uint8_t const g = ((coldat & 0x1f00) >> 8);
 		uint8_t const b = ((coldat & 0x00e0) >> (5))
-		                | ((coldat & 0xe000) >> (8+5-3));
+						| ((coldat & 0xe000) >> (8+5-3));
 
 		m_palette->set_pen_color((offset - 0x4000) / 2, r << 3, g << 3, b << 2);
 	}

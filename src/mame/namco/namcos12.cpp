@@ -1504,31 +1504,31 @@ protected:
 		/*
 		Banking notes for various alt bank games:
 		mdhorse, kaiunqz:
-			*0x1f000000 = ((val >> 0x17) & 0xe) | 8;
+		    *0x1f000000 = ((val >> 0x17) & 0xe) | 8;
 
 		golgo13, g13knd:
-			*0x1f000000 = ((val >> 0x17) & 0x6) + 8;
-			followed by
-			*0x1f000000 = (val >> 0x15) & 0x7;
+		    *0x1f000000 = ((val >> 0x17) & 0x6) + 8;
+		    followed by
+		    *0x1f000000 = (val >> 0x15) & 0x7;
 
 		truckk:
-			*0x1f000000 = ((val >> 0x17) & 0x1e) + 8;
-			followed by
-			*0x1f000000 = (val >> 0x15) & 0x7ff; (lower bits only set for manual transfers, mask is implicit)
+		    *0x1f000000 = ((val >> 0x17) & 0x1e) + 8;
+		    followed by
+		    *0x1f000000 = (val >> 0x15) & 0x7ff; (lower bits only set for manual transfers, mask is implicit)
 
 		sws2001:
-			The upper bits are set using fixed range checks:
-			if (val <= 0x0ffffff)
-				*0x1f000000 = 0x08;
-			else if (val >= 0x1000000 && val <= 0x1ffffff)
-				*0x1f000000 = 0x0a;
-			else if (val >= 0x2000000 && val <= 0x2ffffff)
-				*0x1f000000 = 0x0c;
-			else if (val >= 0x3000000)
-				*0x1f000000 = 0x0e;
+		    The upper bits are set using fixed range checks:
+		    if (val <= 0x0ffffff)
+		        *0x1f000000 = 0x08;
+		    else if (val >= 0x1000000 && val <= 0x1ffffff)
+		        *0x1f000000 = 0x0a;
+		    else if (val >= 0x2000000 && val <= 0x2ffffff)
+		        *0x1f000000 = 0x0c;
+		    else if (val >= 0x3000000)
+		        *0x1f000000 = 0x0e;
 
-			The function at 8004d01c is the same logic as above + logic for the lower 3 bits:
-			*0x1f000000 = (val >> 0x15) & 0x7;
+		    The function at 8004d01c is the same logic as above + logic for the lower 3 bits:
+		    *0x1f000000 = (val >> 0x15) & 0x7;
 		*/
 		if ((data & 8) != 0)
 			m_bankoffset = (data - 8) << 2;

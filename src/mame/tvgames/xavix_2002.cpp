@@ -607,7 +607,7 @@ CONS( 2007, domstepc, 0, 0, xavix2002_i2c_jmat, xavixp, xavix_i2c_jmat_state, in
 
 // some DIS games run on XaviX 2 instead, see xavix2.cpp for Domyos Fitness Adventure and Domyos Bike Concept
 
-// Let's!TVプレイ 魔法戦隊マジレンジャー マジマットでダンス＆バトル 
+// Let's!TVプレイ 魔法戦隊マジレンジャー マジマットでダンス＆バトル
 CONS( 2005, mrangbat, 0, 0, xavix2002_i2c_mrangbat, mrangbat,   xavix_i2c_state, init_xavix, "Bandai / SSD Company LTD", "Let's! TV Play Mahou Taiketsu Magiranger - Magimat de Dance & Battle (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 
 // エキサイトスポーツ　テニス×フィットネス

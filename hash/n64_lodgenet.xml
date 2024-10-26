@@ -24,7 +24,7 @@ license:CC0-1.0
 		<description>Donkey Kong 64</description>
 		<year>1999</year>
 		<publisher>Nintendo</publisher>
-   		<notes><![CDATA[
+		<notes><![CDATA[
 Will crash unless you let it run up until the intro song starts to play.
 ]]></notes>
 		<info name="serial" value="ndog00"/>

@@ -83,8 +83,8 @@
 
     dumped: either here, xavix_2000.cpp, or xavix_2002.cpp
               東京フレンドパーク2スペシャル / エポック社 / 日本          Tokyo Friend Park 2 Special / Epochsha / Japan
-			  Let's!TVプレイ ケロロ軍曹 ケロロ小隊大パニック！ドタバタ大決戦であります / バンダイ / 日本   Let's!TV Play Keroro Sergeant Keroro Platoon Panic! It’s a big slapstick battle / Bandai / Japan
-			  スーパーテレビパソコン別売カートリッジ ペットケータイLink / エポック社 / 日本      Super TV PC Optional Cartridge Pet Mobile Link / Epochsha / Japan
+              Let's!TVプレイ ケロロ軍曹 ケロロ小隊大パニック！ドタバタ大決戦であります / バンダイ / 日本   Let's!TV Play Keroro Sergeant Keroro Platoon Panic! It’s a big slapstick battle / Bandai / Japan
+              スーパーテレビパソコン別売カートリッジ ペットケータイLink / エポック社 / 日本      Super TV PC Optional Cartridge Pet Mobile Link / Epochsha / Japan
               Challenge Ai-chan! Exciting Ping-pong /TAKARATOMY/Japan                                         -           -               -           -               -                   -                       dumped
               TV de  Asobitai Hyper Rescue - Boku wa Kyuujotai /BANDAI/Japan                                  -           -               -           -               -                   -                       -
               Tokyo Friend Park II Perfect! Mezase! Grand Slam!! /EPOCH/Japan                                 -           -               -           -               -                   -                       -
@@ -192,10 +192,10 @@
               PLAY TV Baseball 2 /EPOCH/Japan, HK                                                             -           -               -           -               -                   -                       -
               Play TV Baseball /RADICA/USA,EU                                                                 8017        x8              none                        none                SSD 98 PA7351-107       dumped
               PLAY TV Football /RADICA/USA                                                                    74021       x8              48          4M              none                SSD 98 PL7351-181       dumped
-			  Let's fish black bass! Exciting Fishing /EPOCH/Japan                                            -           -               -           -               -                   -                       -
-	          black bass tsurouze! Excite Fishing /EPOCH/Japan *same as above?                                -           -               -           -               -                   -                       -
-		      Let's hit a homerun! Exciting Stadium /EPOCH/Japan                                              -           -               -           -               -                                           -
-			  XaviXTennis                                                                                     SGM6446     x16             48          8M              24C08               SSD 2002 NEC 85054-611  dumped
+              Let's fish black bass! Exciting Fishing /EPOCH/Japan                                            -           -               -           -               -                   -                       -
+              black bass tsurouze! Excite Fishing /EPOCH/Japan *same as above?                                -           -               -           -               -                   -                       -
+              Let's hit a homerun! Exciting Stadium /EPOCH/Japan                                              -           -               -           -               -                                           -
+              XaviXTennis                                                                                     SGM6446     x16             48          8M              24C08               SSD 2002 NEC 85054-611  dumped
               XaviXBowling                                                                                    SGM644C     x16             48                                                                      dumped
 
     dumped: see xavix2.cpp
@@ -2533,7 +2533,7 @@ CONS( 2001, epo_strk,  0,          0,  xavix,            epo_epp,  xavix_state, 
 
 CONS( 2002, rad_jcon,  0,          0,  xavix,            rad_jcon, xavix_state,          init_xavix,    "Radica / Takara / SSD Company LTD",            "Play TV Jr. Construction", MACHINE_IMPERFECT_SOUND )
 
-// ホームラン打とうぜ! エキサイトスタジアム  
+// ホームラン打とうぜ! エキサイトスタジアム
 CONS( 2000, epo_stad,  0,          0,  xavix,            epo_epp,  xavix_state,          init_xavix,    "Epoch / SSD Company LTD",                      "Home Run Datouze! Excite Stadium (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
 // 勝負しようぜ！ エキサイトスタジアムDX
@@ -2566,7 +2566,7 @@ CONS( 2006, epo_epp3,   0,         0,  xavix,            epo_epp,  xavix_state, 
 // TV麻雀 昇段対局～4人打ち
 CONS( 2003, epo_mj,     0,         0,  xavix_i2c_24lc02_mj,  epo_mj,   xavix_i2c_mj_state,   init_xavix,    "Epoch / SSD Company LTD",                      "TV Mahjong Shoudan Taikyoku - 4-nin Uchi (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
-// ブラックバス釣ろうぜ！ エキサイトフィッシング 
+// ブラックバス釣ろうぜ！ エキサイトフィッシング
 CONS( 2001, epo_fish,  0,          0,  xavix,            xavix,    xavix_state,          init_xavix,    "Epoch / SSD Company LTD",                      "Black Bass Tsurouze! Excite Fishing (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
 // 大モノ釣ろうぜ！ エキサイトフィッシングＤＸ

@@ -1453,8 +1453,8 @@ ROM_START( deluxe4u ) // Deluxe 4 U - Removes Blackjack game, but otherwise same
 	ROM_LOAD16_BYTE( "am27c020.ju07", 0x100000, 0x040000, CRC(d414c3af) SHA1(9299b07a8c7a3e30a1bb6028204a049a7cb510f7) )
 
 	ROM_REGION( 0x400000, "bgs", 0 )    // Layers, 16x16x8
-	ROM_LOAD32_WORD( "fu35", 0x000000, 0x200000, CRC(6df14570) SHA1(fa4fc64c984d6a94fe61ec809ec515e840388704) ) // Specific to Deluxe 4 U - No labels on the flash roms 
-	ROM_LOAD32_WORD( "fu34", 0x000002, 0x200000, CRC(93175d6d) SHA1(691832134f43e17bb767dff080b2736288961414) ) // Specific to Deluxe 4 U - No labels on the flash roms 
+	ROM_LOAD32_WORD( "fu35", 0x000000, 0x200000, CRC(6df14570) SHA1(fa4fc64c984d6a94fe61ec809ec515e840388704) ) // Specific to Deluxe 4 U - No labels on the flash roms
+	ROM_LOAD32_WORD( "fu34", 0x000002, 0x200000, CRC(93175d6d) SHA1(691832134f43e17bb767dff080b2736288961414) ) // Specific to Deluxe 4 U - No labels on the flash roms
 
 	ROM_REGION( 0x40000, "oki", 0 ) // Samples
 	ROM_LOAD( "esd4.su10", 0x00000, 0x20000, CRC(23f2b7d9) SHA1(328c951d14674760df68486841c933bad0d59fe3) ) // AT27C010 mask rom

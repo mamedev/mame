@@ -73,7 +73,7 @@ private:
 	u8 m_key_scan = 0;
 };
 
- 
+
 HD61202_UPDATE_CB(primusex_state::hd61202_update)
 {
 	if (lcd_on)

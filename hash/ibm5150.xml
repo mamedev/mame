@@ -6017,12 +6017,12 @@ Stalls or throws either "Bad command or file name", "disk read error" or "divide
 	</software>
 
 	<!--
-		This is not an official FreeDOS distribution, it is modified
-		to run more optimally on the original IBM PC model 5150.
+	    This is not an official FreeDOS distribution, it is modified
+	    to run more optimally on the original IBM PC model 5150.
 
-		More information about this distribution is available at:
-		* https://www.youtube.com/watch?v=EOVLlMQs9f8
-		* https://archive.org/details/free-dos-1.3-8086-minimized
+	    More information about this distribution is available at:
+	    * https://www.youtube.com/watch?v=EOVLlMQs9f8
+	    * https://archive.org/details/free-dos-1.3-8086-minimized
 	-->
 	<software name="freedos13_8086">
 		<description>FreeDOS 1.3 8086 Minimized</description>

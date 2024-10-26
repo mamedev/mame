@@ -80,7 +80,7 @@ void rm480z_state::control_port_write(offs_t offset, uint8_t data)
 		break;
 	case 5:
 		// USER I/O output port
-		break;	
+		break;
 	}
 }
 
@@ -120,7 +120,7 @@ uint8_t rm480z_state::status_port_read(offs_t offset)
 	case 5:
 		// USER I/O input port
 		break;
-	}	
+	}
 
 	return ret_val;
 }
@@ -162,7 +162,7 @@ uint8_t rm480z_state::hrg_port_read(offs_t offset)
 			ret_val = m_hrg_ram[index];
 		}
 		break;
-	}	
+	}
 
 	return ret_val;
 }
@@ -217,7 +217,7 @@ void rm480z_state::hrg_port_write(offs_t offset, uint8_t data)
 		{
 			m_hrg_ram[index] = data;
 		}
-		break;	
+		break;
 	}
 }
 

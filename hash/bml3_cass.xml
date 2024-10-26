@@ -18,11 +18,11 @@ license:CC0-1.0
 		</part>
 	</software>
 
-    <software name="igdemo" supported="yes">
-  		<description>IG Demo</description>
+	<software name="igdemo" supported="yes">
+		<description>IG Demo</description>
 		<year>1983?</year>
 		<publisher>Hitachi?</publisher>
-        <notes><![CDATA[
+		<notes><![CDATA[
 Mixed 600/1200 baud rate image (switch done during program bootstrap, unnecessary to NEWON 7)
 Advertises IG features of Mark 5
 ]]></notes>

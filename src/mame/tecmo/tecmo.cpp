@@ -1242,13 +1242,13 @@ ROM_START( silkwormb )
 	ROM_LOAD( "silkworm.10",  0x00000, 0x10000, CRC(8c7138bb) SHA1(0cfd69fa77d5b546f7dad80537d8d2497ae758bc) )  // fg tiles TMM24512
 	ROM_LOAD( "e10.11",       0x10000, 0x08000, CRC(c0c4687d) SHA1(afe05eb7e5a65c995aeac9ea773ad79eb053303f) )  // fg tiles TMM24256
 	ROM_LOAD( "silkworm.12",  0x20000, 0x10000, CRC(bb0f568f) SHA1(b66c6d0407ed0b068c6bf07987f1b923d4a6e4f8) )  // fg tiles TMM24512
-	ROM_LOAD( "e12.13",       0x30000, 0x08000, CRC(fc472811) SHA1(e862ec9b38f3f3a1f4668fbc587063eee8e9e821) )  // fg tiles 27C256  
+	ROM_LOAD( "e12.13",       0x30000, 0x08000, CRC(fc472811) SHA1(e862ec9b38f3f3a1f4668fbc587063eee8e9e821) )  // fg tiles 27C256
 
 	ROM_REGION( 0x40000, "bgtiles", 0 )
 	ROM_LOAD( "silkworm.14",  0x00000, 0x10000, CRC(409df64b) SHA1(cada970bf9cc8f6522e7a71e00fe873568852873) )  // bg tiles TMM24512
-	ROM_LOAD( "e14.15",       0x10000, 0x08000, CRC(b02acdb6) SHA1(6be74bb89680b79b3a5d13af638ed5a0bb077dad) )  // bg tiles 27C256  
-	ROM_LOAD( "e15.16",       0x20000, 0x08000, CRC(caf7b25e) SHA1(2c348af9d03efd801cbbc06deb02869bd6449518) )  // bg tiles 27C256  
-	ROM_LOAD( "e16.17",       0x38000, 0x08000, CRC(7ec93873) SHA1(0993a3b3e5ca84ef0ea32159825e379ba4cc5fbb) )  // bg tiles 27C256  
+	ROM_LOAD( "e14.15",       0x10000, 0x08000, CRC(b02acdb6) SHA1(6be74bb89680b79b3a5d13af638ed5a0bb077dad) )  // bg tiles 27C256
+	ROM_LOAD( "e15.16",       0x20000, 0x08000, CRC(caf7b25e) SHA1(2c348af9d03efd801cbbc06deb02869bd6449518) )  // bg tiles 27C256
+	ROM_LOAD( "e16.17",       0x38000, 0x08000, CRC(7ec93873) SHA1(0993a3b3e5ca84ef0ea32159825e379ba4cc5fbb) )  // bg tiles 27C256
 ROM_END
 
 ROM_START( silkwormb2 ) // 2-PCB stack, no markings

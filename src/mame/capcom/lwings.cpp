@@ -221,7 +221,7 @@ void lwings_state::lwings_bankswitch_w(uint8_t data)
 
 	// bit 4: sprite bank (fireball only)
 	m_sprbank = BIT(data, 4);
-	
+
 	// bit 5 resets the sound CPU
 	m_soundcpu->set_input_line(INPUT_LINE_RESET, BIT(data, 5) ? ASSERT_LINE : CLEAR_LINE);
 

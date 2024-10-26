@@ -241,7 +241,7 @@ uint8_t rmMQ2_device::fdc_read(offs_t offset)
 {
 	uint8_t data = m_fdc->read(offset);
 
-	/* When the 8INCH line is high the Index Pulse FDC input is connected to pin 4 of the 
+	/* When the 8INCH line is high the Index Pulse FDC input is connected to pin 4 of the
 	   floppy connector, which is unused by 5.25" drives.  This fact is used by the firmware
 	   to detect the drive type being used, i.e. it sets 8INCH high and checks to see if the IP
 	   is received within a set time.  We must therefore ensure that the INDEX bit of the

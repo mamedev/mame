@@ -91,8 +91,8 @@ public:
 		m_dsw(*this, "DSW"),
 		m_p1(*this, "P1"),
 		m_p2(*this, "P2")
-		
-	{ }
+	{
+	}
 
 	void meijinsn(machine_config &config);
 

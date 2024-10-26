@@ -6,7 +6,7 @@
   Large 6 digits 7 segments (plus dot) display up, a smaller 12 digits 7 segments display down,
   plus another two digits 7 sements display as credits counter.
 
-  There are no dip switches for hoppers, instead you can insert "KEY" mini PCBs on a small 
+  There are no DIP switches for hoppers, instead you can insert "KEY" mini PCBs on a small
   socket on the drivers PCB that shorts contacts TS4, TS5, TS6, TS7, TZ4, TZ5, TZ6 and TZ7.
   On the dumped machine, there was a KEY inserted named "KEY 3" that configures:
   -Hopper 1 = 0.10 €
@@ -14,7 +14,7 @@
   -Double/Nothing = NO
   -Coin acceptor = 0.10 = yes, 0.20 = yes, 0.50 = yes, 1.00 = yes, 2.00 = yes
 
-  
+
   Drivers PCB                 _________
                              | KEY    |
                              |Mini PCB|

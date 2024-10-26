@@ -373,7 +373,7 @@ CONS( 2002, epo_hamc,  0,      0, xavix2000,           epo_hamc,   xavix_epo_ham
 // needs timer irq hack to boot
 CONS( 2003, epo_mini, 0,       0, xavix2000_i2c_24c08, ttv_lotr,   xavix_i2c_lotr_state, init_epo_mini, "Epoch / SSD Company LTD",        "mini-moni Party! Rhythm de Pyon! (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
-// カードスキャン!　エキサイトステージ サッカー日本代表チーム 
+// カードスキャン!　エキサイトステージ サッカー日本代表チーム
 CONS( 2006, epo_es2j,   0,     0,  xavix2000,          xavix,      xavix_state,          init_xavix,    "Epoch / SSD Company LTD",        "Card Scan! Excite Stage Soccer Nippon Daihyou Team (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
 
@@ -390,7 +390,7 @@ CONS( 2005, ttv_sw,   0,      0, xavix2000_i2c_24c02, ttv_lotr,    xavix_i2c_lot
 CONS( 2005, ttv_swj,  ttv_sw, 0, xavix2000_i2c_24c02, ttv_lotr,    xavix_i2c_lotr_state,    init_xavix, "Tomy / SSD Company LTD",        "Star Wars Saga Edition - Lightsaber Battle Game (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 CONS( 2005, ttv_lotr, 0,      0, xavix2000_i2c_24c02, ttv_lotr,    xavix_i2c_lotr_state,    init_xavix, "Tiger / SSD Company LTD",       "Lord Of The Rings - Warrior of Middle-Earth", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 CONS( 2005, ttv_mx,   0,      0, xavix2000_i2c_24c04, ttv_mx,      xavix_i2c_state,         init_xavix, "Tiger / SSD Company LTD",       "MX Dirt Rebel", MACHINE_IMPERFECT_SOUND )
-// 剣神ドラゴンクエスト 甦りし伝説の剣 
+// 剣神ドラゴンクエスト 甦りし伝説の剣
 CONS( 2003, drgqst,   0,      0, xavix2000_i2c_24c08, ttv_lotr,    xavix_i2c_lotr_state,    init_xavix, "Square Enix / SSD Company LTD", "Kenshin Dragon Quest: Yomigaerishi Densetsu no Ken (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
 // チョロＱビュンビュンレーサー
@@ -398,7 +398,7 @@ CONS( 2003, drgqst,   0,      0, xavix2000_i2c_24c08, ttv_lotr,    xavix_i2c_lot
 CONS( 2003, tak_chq,  0,      0, xavix2000_i2c_24c04, xavix_i2c,   xavix_i2c_state,         init_xavix, "Takara / SSD Company LTD",      "Choro-Q Byun Byun Racer (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
 // hangs after starting a game, check why
-// Let’s！TV プレイ　体感格闘ワンピースパンチバトル 　～海賊王にキミがなる！～ 
+// Let’s！TV プレイ　体感格闘ワンピースパンチバトル 　～海賊王にキミがなる！～
 CONS( 2004, ban_onep, 0, 0, xavix2000_i2c_24c04, ttv_lotr,    xavix_i2c_lotr_state, init_xavix, "Bandai / SSD Company LTD",         "Let's! TV Play One Piece Punch Battle (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
 // Let’s！TV プレイ　闘印奥義　 陰陽大戦記～目指せ最強闘神士～
