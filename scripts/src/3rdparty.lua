@@ -1511,6 +1511,7 @@ end
 			"-Wno-unused-but-set-variable",
 			"-Wno-unused-function",
 			"-Wno-unused-variable",
+			"-Wno-tautological-compare",
 		}
 
 	configuration { }

@@ -340,16 +340,6 @@ static inline char * DESCRIBE_INSTR(char *s, uint64_t instr, uint32_t gpr, const
 uint8_t es5510_device::host_r(address_space &space, offs_t offset)
 {
 	//  printf("%06x: DSP read offset %04x (data is %04x)\n",pc(),offset,dsp_ram[offset]);
-
-	// VFX hack (FIXME: this is disgusting)
-	if (core_stricmp(machine().system().name, "vfx") == 0)
-	{
-		if (pc == 0xc091f0)
-		{
-			return downcast<m68000_base_device &>(space.device()).state_int(M68K_D2);
-		}
-	}
-
 	switch(offset)
 	{
 	case 0x00: LOG("ES5510: Host Read GPR latch[2]: %02x\n", (gpr_latch >> 16) & 0xff); return (gpr_latch >> 16) & 0xff;
