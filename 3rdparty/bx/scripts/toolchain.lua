@@ -290,13 +290,13 @@ function toolchain(_buildDir, _libDir)
 			location (path.join(_buildDir, "projects", _ACTION .. "-tvos-simulator"))
 
 		elseif "linux-gcc" == _OPTIONS["gcc"] then
-			location (path.join(_buildDir, "projects", _ACTION .. "-linux"))
+			location (path.join(_buildDir, "projects", _ACTION .. "-linux-gcc"))
 
 		elseif "linux-gcc-afl" == _OPTIONS["gcc"] then
 			premake.gcc.cc  = "afl-gcc"
 			premake.gcc.cxx = "afl-g++"
 			premake.gcc.ar  = "ar"
-			location (path.join(_buildDir, "projects", _ACTION .. "-linux"))
+			location (path.join(_buildDir, "projects", _ACTION .. "-linux-gcc"))
 
 		elseif "linux-clang" == _OPTIONS["gcc"] then
 			premake.gcc.cc  = "clang"

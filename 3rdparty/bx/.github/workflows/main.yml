@@ -80,7 +80,7 @@ jobs:
           { config: debug, binsuffix: Debug },
           { config: release, binsuffix: Release },
         ]
-    name: linux-${{ matrix.config }}64
+    name: linux-gcc-${{ matrix.config }}64
     runs-on: ubuntu-22.04
     steps:
       - name: Checkout bx
@@ -92,7 +92,7 @@ jobs:
         run: |
           cd bx
           tools/bin/linux/genie --gcc=linux-gcc gmake
-          make -R -C .build/projects/gmake-linux config=${{ matrix.config }}64 -j$(nproc)
+          make -R -C .build/projects/gmake-linux-gcc config=${{ matrix.config }}64 -j$(nproc)
       - name: Check
         run: |
           cd bx
