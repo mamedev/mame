@@ -5156,7 +5156,7 @@ The Curse of Monkey Island (Windows 95 demo version)
 	</software>
 
 	<!-- Windows 95/98/NT4 -->
-	<!-- Graphics bugged on svga_s3, sound not working properly on sblaster_16 -->
+	<!-- Graphical corruption on svga_s3 (true color bug?), sound not working properly on sblaster_16 -->
 	<software name="mvsbcn10" supported="no">
 		<description>Mavis Beacon Teaches Typing Special Edition 10</description>
 		<year>1999</year>
