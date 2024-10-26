@@ -110,6 +110,7 @@ TODO:
 #include "machine/genpc.h"
 #include "machine/timer.h"
 #include "emupal.h"
+#include "emutime.h"
 #include "screen.h"
 #include "softlist_dev.h"
 

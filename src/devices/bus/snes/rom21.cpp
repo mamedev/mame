@@ -10,6 +10,8 @@
 #include "emu.h"
 #include "rom21.h"
 
+#include "emutime.h"
+
 
 //-------------------------------------------------
 //  sns_rom_device - constructor
@@ -110,13 +112,13 @@ void sns_rom21_srtc_device::update_time()
 	m_rtc_ram[3] = systime->local_time.minute / 10;
 	m_rtc_ram[4] = systime->local_time.hour % 10;
 	m_rtc_ram[5] = systime->local_time.hour / 10;
-	m_rtc_ram[6] = systime->local_time.mday % 10;
-	m_rtc_ram[7] = systime->local_time.mday / 10;
+	m_rtc_ram[6] = systime->local_time.day_of_month % 10;
+	m_rtc_ram[7] = systime->local_time.day_of_month / 10;
 	m_rtc_ram[8] = systime->local_time.month;
 	m_rtc_ram[9] = (systime->local_time.year - 1000) % 10;
 	m_rtc_ram[10] = ((systime->local_time.year - 1000) / 10) % 10;
 	m_rtc_ram[11] = (systime->local_time.year - 1000) / 100;
-	m_rtc_ram[12] = systime->local_time.weekday % 7;
+	m_rtc_ram[12] = systime->local_time.day_of_week();
 }
 
 // Returns day-of-week for specified date

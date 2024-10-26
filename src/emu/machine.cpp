@@ -17,6 +17,7 @@
 #include "debugger.h"
 #include "dirtc.h"
 #include "emuopts.h"
+#include "emutime.h"
 #include "fileio.h"
 #include "http.h"
 #include "image.h"
@@ -297,7 +298,10 @@ int running_machine::run(bool quiet)
 		nvram_load();
 
 		// set the time on RTCs (this may overwrite parts of NVRAM)
-		set_rtc_datetime(system_time(m_base_time));
+		system_time rtctime(m_base_time);
+		if (!rtctime.customize(options().rtcdate()))
+			osd_printf_error("-%s option value \"%s\" does not conform to format (YYYY-MM-DD hh:mm:ss); using system time instead\n", OPTION_RTCDATE, options().rtcdate());
+		set_rtc_datetime(rtctime);
 
 		sound().ui_mute(false);
 		if (!quiet)
@@ -1241,56 +1245,6 @@ void running_machine::export_http_api()
 			response->set_body(s.GetString());
 		});
 	}
-}
-
-//**************************************************************************
-//  SYSTEM TIME
-//**************************************************************************
-
-//-------------------------------------------------
-//  system_time - constructor
-//-------------------------------------------------
-
-system_time::system_time()
-{
-	set(0);
-}
-
-system_time::system_time(time_t t)
-{
-	set(t);
-}
-
-
-//-------------------------------------------------
-//  set - fills out a system_time structure
-//-------------------------------------------------
-
-void system_time::set(time_t t)
-{
-	// FIXME: this crashes if localtime or gmtime returns nullptr
-	time = t;
-	local_time.set(*localtime(&t));
-	utc_time.set(*gmtime(&t));
-}
-
-
-//-------------------------------------------------
-//  get_tm_time - converts a tm struction to a
-//  MAME mame_system_tm structure
-//-------------------------------------------------
-
-void system_time::full_time::set(struct tm &t)
-{
-	second  = t.tm_sec;
-	minute  = t.tm_min;
-	hour    = t.tm_hour;
-	mday    = t.tm_mday;
-	month   = t.tm_mon;
-	year    = t.tm_year + 1900;
-	weekday = t.tm_wday;
-	day  = t.tm_yday;
-	is_dst  = t.tm_isdst;
 }
 
 

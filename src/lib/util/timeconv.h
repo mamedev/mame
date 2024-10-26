@@ -43,6 +43,8 @@ typedef std::chrono::duration<std::uint64_t, std::ratio<1, 10000000> > ntfs_dura
 
 struct arbitrary_datetime
 {
+	template <typename Rep, int Y, int M, int D, int H, int N, int S, typename Ratio> friend class arbitrary_clock;
+
 	int year;           // absolute year (1900 AD = 1900)
 	int month;          // month (1-12)
 	int day_of_month;   // day of month (1-31)
@@ -50,7 +52,16 @@ struct arbitrary_datetime
 	int minute;         // minute (0-59)
 	int second;         // second (0-59)
 
+	int day_of_week() const;
+	int day_of_year() const;
+
+	arbitrary_datetime() = default;
+	arbitrary_datetime(const arbitrary_datetime &dt) = default;
+	arbitrary_datetime(const struct tm &t) : year(t.tm_year + 1000), month(t.tm_mon + 1), day_of_month(t.tm_mday), hour(t.tm_hour), minute(t.tm_min), second(t.tm_sec) { }
 	static struct arbitrary_datetime now();
+
+private:
+	static int64_t absolute_day(int year, int month, int day);
 };
 
 
@@ -203,8 +214,8 @@ private:
 		const int minute        = clamp_or_throw(dt.minute, 0, 59, clamp, "invalid dt.minute");
 		const int second        = clamp_or_throw(dt.second, 0, 59, clamp, "invalid dt.second");
 
-		const int64_t our_absolute_day = absolute_day(Y, M, D);
-		const int64_t their_absolute_day = absolute_day(dt.year, month, day_of_month);
+		const int64_t our_absolute_day = arbitrary_datetime::absolute_day(Y, M, D);
+		const int64_t their_absolute_day = arbitrary_datetime::absolute_day(dt.year, month, day_of_month);
 
 		const auto our_fract_day = std::chrono::hours(H) + std::chrono::minutes(N) + std::chrono::seconds(S);
 		const auto their_fract_day = std::chrono::hours(hour) + std::chrono::minutes(minute) + std::chrono::seconds(second);
@@ -285,28 +296,6 @@ private:
 
 
 	typedef arbitrary_clock<std::int64_t, 1970, 1, 1, 0, 0, 0, std::chrono::system_clock::period > system_conversion_clock;
-
-	//-------------------------------------------------
-	//  absolute_day - returns the absolute day count
-	//  for the specified year/month/day
-	//-------------------------------------------------
-
-	static int64_t absolute_day(int year, int month, int day)
-	{
-		// first factor the year
-		int64_t result = (year - 1) * 365;
-		result += (year - 1) / 4;
-		result -= (year - 1) / 100;
-		result += (year - 1) / 400;
-
-		// then the month
-		for (int i = 1; i < month; i++)
-			result += gregorian_days_in_month(i, year);
-
-		// then the day
-		result += day - 1;
-		return result;
-	}
 };
 
 

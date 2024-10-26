@@ -25,6 +25,7 @@
 
 #include "diserial.h"
 #include "emupal.h"
+#include "emutime.h"
 #include "screen.h"
 #include "softlist_dev.h"
 #include "speaker.h"
@@ -576,12 +577,12 @@ uint8_t px4_state::sior_r()
 		{
 		case 1: m_sior = (dec_2_bcd(m_time.local_time.year) >> 4) & 0xf; break;
 		case 2: m_sior = dec_2_bcd(m_time.local_time.year) & 0xf; break;
-		case 3: m_sior = dec_2_bcd(m_time.local_time.month + 1); break;
-		case 4: m_sior = dec_2_bcd(m_time.local_time.mday); break;
+		case 3: m_sior = dec_2_bcd(m_time.local_time.month); break;
+		case 4: m_sior = dec_2_bcd(m_time.local_time.day_of_month); break;
 		case 5: m_sior = dec_2_bcd(m_time.local_time.hour); break;
 		case 6: m_sior = dec_2_bcd(m_time.local_time.minute); break;
 		case 7: m_sior = dec_2_bcd(m_time.local_time.second); break;
-		case 8: m_sior = dec_2_bcd(m_time.local_time.weekday); break;
+		case 8: m_sior = dec_2_bcd(m_time.local_time.day_of_week()); break;
 		}
 
 		// done?

@@ -141,6 +141,9 @@ class memory_view;
 // declared in emuopts.h
 class emu_options;
 
+// declared in emutime.h
+class system_time;
+
 // declared in fileio.h
 class emu_file;
 

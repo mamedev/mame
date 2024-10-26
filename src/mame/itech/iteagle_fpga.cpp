@@ -2,6 +2,9 @@
 // copyright-holders:Ted Green
 #include "emu.h"
 #include "iteagle_fpga.h"
+
+#include "emutime.h"
+
 #include "coreutil.h"
 
 #define LOG_FPGA            (1U << 1)
@@ -597,9 +600,10 @@ void iteagle_fpga_device::rtc_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 				raw[2] = dec_2_bcd(systime.local_time.minute);
 				raw[3] = dec_2_bcd(systime.local_time.hour);
 
-				raw[4] = dec_2_bcd((systime.local_time.weekday != 0) ? systime.local_time.weekday : 7);
-				raw[5] = dec_2_bcd(systime.local_time.mday);
-				raw[6] = dec_2_bcd(systime.local_time.month + 1);
+				int weekday = systime.local_time.day_of_week();
+				raw[4] = dec_2_bcd((weekday != 0) ? weekday : 7);
+				raw[5] = dec_2_bcd(systime.local_time.day_of_month);
+				raw[6] = dec_2_bcd(systime.local_time.month);
 				raw[7] = dec_2_bcd(systime.local_time.year - 1900); // Epoch is 1900
 				m_rtc_regs[0x7F8/4] = (raw[3]<<24) | (raw[2]<<16) | (raw[1]<<8) | (raw[0] <<0);
 				m_rtc_regs[0x7FC/4] = (raw[7]<<24) | (raw[6]<<16) | (raw[5]<<8) | (raw[4] <<0);
@@ -845,9 +849,10 @@ uint32_t iteagle_periph_device::ctrl_r(offs_t offset, uint32_t mem_mask)
 					m_rtc_regs[4] = dec_2_bcd(systime.local_time.hour);
 					m_rtc_regs[5] = 0x00; // Hours Alarm
 
-					m_rtc_regs[6] = dec_2_bcd((systime.local_time.weekday != 0) ? systime.local_time.weekday : 7);
-					m_rtc_regs[7] = dec_2_bcd(systime.local_time.mday);
-					m_rtc_regs[8] = dec_2_bcd(systime.local_time.month + 1);
+					int weekday = systime.local_time.day_of_week();
+					m_rtc_regs[6] = dec_2_bcd((weekday != 0) ? weekday : 7);
+					m_rtc_regs[7] = dec_2_bcd(systime.local_time.day_of_month);
+					m_rtc_regs[8] = dec_2_bcd(systime.local_time.month);
 					m_rtc_regs[9] = dec_2_bcd(systime.local_time.year - 1900); // Epoch is 1900
 					//m_rtc_regs[9] = 0x99; // Use 1998
 					//m_rtc_regs[0xa] &= ~0x10; // Reg A Status

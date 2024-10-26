@@ -59,38 +59,6 @@ constexpr int DEBUG_FLAG_OSD_ENABLED    = 0x00001000;       // The OSD debugger 
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-// ======================> system_time
-
-// system time description, both local and UTC
-class system_time
-{
-public:
-	system_time();
-	explicit system_time(time_t t);
-	void set(time_t t);
-
-	struct full_time
-	{
-		void set(struct tm &t);
-
-		u8          second;     // seconds (0-59)
-		u8          minute;     // minutes (0-59)
-		u8          hour;       // hours (0-23)
-		u8          mday;       // day of month (1-31)
-		u8          month;      // month (0-11)
-		s32         year;       // year (1=1 AD)
-		u8          weekday;    // day of week (0-6)
-		u16         day;        // day of year (0-365)
-		u8          is_dst;     // is this daylight savings?
-	};
-
-	s64           time;       // number of seconds elapsed since midnight, January 1 1970 UTC
-	full_time       local_time; // local time
-	full_time       utc_time;   // UTC coordinated time
-};
-
-
-
 // ======================> running_machine
 
 typedef delegate<void ()> machine_notify_delegate;

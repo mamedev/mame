@@ -10,7 +10,7 @@
 #include "cpu/mips/mips3.h"
 #include "cpu/mips/mips3com.h"
 
-#include "debugger.h"
+#include "emutime.h"
 #include "screen.h"
 
 #include <algorithm>
@@ -2019,9 +2019,9 @@ int n64_periphs::pif_channel_handle_command(int channel, int slength, uint8_t *s
 					rdata[0] = convert_to_bcd(systime.local_time.second); // Seconds
 					rdata[1] = convert_to_bcd(systime.local_time.minute); // Minutes
 					rdata[2] = 0x80 | convert_to_bcd(systime.local_time.hour); // Hours
-					rdata[3] = convert_to_bcd(systime.local_time.mday); // Day of month
-					rdata[4] = convert_to_bcd(systime.local_time.weekday); // Day of week
-					rdata[5] = convert_to_bcd(systime.local_time.month + 1); // Month
+					rdata[3] = convert_to_bcd(systime.local_time.day_of_month); // Day of month
+					rdata[4] = convert_to_bcd(systime.local_time.day_of_week()); // Day of week
+					rdata[5] = convert_to_bcd(systime.local_time.month); // Month
 					rdata[6] = convert_to_bcd(systime.local_time.year % 100); // Year
 					rdata[7] = convert_to_bcd(systime.local_time.year / 100); // Century
 					rdata[8] = 0x00;
@@ -2608,7 +2608,7 @@ void n64_periphs::dd_reg_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 					system_time systime;
 					machine().base_datetime(systime);
 
-					dd_data_reg = (convert_to_bcd(systime.local_time.mday) << 24) | (convert_to_bcd(systime.local_time.hour) << 16);
+					dd_data_reg = (convert_to_bcd(systime.local_time.day_of_month) << 24) | (convert_to_bcd(systime.local_time.hour) << 16);
 					break;
 				}
 

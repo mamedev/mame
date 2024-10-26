@@ -68,23 +68,63 @@ std::chrono::system_clock::duration system_clock_adjustment(calculate_system_clo
     IMPLEMENTATION
 ***************************************************************************/
 
+//-------------------------------------------------
+//  day_of_week - return the weekday (0=Sunday)
+//-------------------------------------------------
+
+int arbitrary_datetime::day_of_week() const
+{
+	return absolute_day(year, month, day_of_month) % 7;
+}
+
+
+//-------------------------------------------------
+//  day_of_year - return the day of year (0-365)
+//-------------------------------------------------
+
+int arbitrary_datetime::day_of_year() const
+{
+	int result = day_of_month - 1;
+
+	for (int i = 1; i < month; i++)
+		result += gregorian_days_in_month(i, year);
+
+	return result;
+}
+
+
 arbitrary_datetime arbitrary_datetime::now()
 {
 	time_t sec;
 	time(&sec);
 	auto t = *localtime(&sec);
 
-	arbitrary_datetime dt;
-	dt.year         = t.tm_year + 1900;
-	dt.month        = t.tm_mon + 1;
-	dt.day_of_month = t.tm_mday;
-	dt.hour         = t.tm_hour;
-	dt.minute       = t.tm_min;
-	dt.second       = t.tm_sec;
-
-	return dt;
+	// FIXME: this crashes if localtime returns nullptr
+	return arbitrary_datetime(t);
 }
 
+
+//-------------------------------------------------
+//  absolute_day - returns the absolute day count
+//  for the specified year/month/day
+//-------------------------------------------------
+
+int64_t arbitrary_datetime::absolute_day(int year, int month, int day)
+{
+	// first factor the year
+	int64_t result = (year - 1) * 365;
+	result += (year - 1) / 4;
+	result -= (year - 1) / 100;
+	result += (year - 1) / 400;
+
+	// then the month
+	for (int i = 1; i < month; i++)
+		result += gregorian_days_in_month(i, year);
+
+	// then the day
+	result += day - 1;
+	return result;
+}
 
 
 // -------------------------------------------------

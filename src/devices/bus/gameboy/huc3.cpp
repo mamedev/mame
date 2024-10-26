@@ -109,6 +109,7 @@
 #include "gbxfile.h"
 
 #include "dirtc.h"
+#include "emutime.h"
 
 #include <algorithm>
 #include <cassert>

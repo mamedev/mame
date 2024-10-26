@@ -8,6 +8,8 @@
 #include "emu.h"
 #include "spg2xx_io.h"
 
+#include "emutime.h"
+
 DEFINE_DEVICE_TYPE(SPG24X_IO, spg24x_io_device, "spg24x_io", "SPG240-series System-on-a-Chip I/O")
 DEFINE_DEVICE_TYPE(SPG28X_IO, spg28x_io_device, "spg28x_io", "SPG280-series System-on-a-Chip I/O")
 

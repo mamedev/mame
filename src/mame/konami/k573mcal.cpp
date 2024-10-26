@@ -23,6 +23,7 @@
 #include "k573mcal.h"
 
 #include "machine/timehelp.h"
+#include "emutime.h"
 
 #include "multibyte.h"
 
@@ -89,9 +90,9 @@ int k573mcal_device::handle_message(const uint8_t* send_buffer, uint32_t send_si
 
 		*recv_buffer++ = 0x01; // status, must be 1
 		*recv_buffer++ = uint8_t(systime.local_time.year % 100);
-		*recv_buffer++ = uint8_t(systime.local_time.month + 1);
-		*recv_buffer++ = systime.local_time.mday;
-		*recv_buffer++ = systime.local_time.weekday;
+		*recv_buffer++ = systime.local_time.month;
+		*recv_buffer++ = systime.local_time.day_of_month;
+		*recv_buffer++ = systime.local_time.day_of_week();
 		*recv_buffer++ = systime.local_time.hour;
 		*recv_buffer++ = systime.local_time.minute;
 		*recv_buffer++ = seconds; // Can't be the same value twice in a row

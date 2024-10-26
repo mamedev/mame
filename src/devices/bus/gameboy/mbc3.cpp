@@ -78,6 +78,7 @@
 #include "gbxfile.h"
 
 #include "dirtc.h"
+#include "emutime.h"
 
 #include "corestr.h"
 

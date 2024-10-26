@@ -16,6 +16,8 @@
 #include "emu.h"
 #include "rom.h"
 
+#include "emutime.h"
+
 
 //-------------------------------------------------
 //  gba_rom_device - constructor
@@ -820,9 +822,9 @@ void gba_s3511_device::update_time(int len)
 	if (len == 7)
 	{
 		m_data[0] = convert_to_bcd(curtime.local_time.year);
-		m_data[1] = convert_to_bcd(curtime.local_time.month + 1);
-		m_data[2] = convert_to_bcd(curtime.local_time.mday);
-		m_data[3] = convert_to_bcd(curtime.local_time.weekday);
+		m_data[1] = convert_to_bcd(curtime.local_time.month);
+		m_data[2] = convert_to_bcd(curtime.local_time.day_of_month);
+		m_data[3] = curtime.local_time.day_of_week();
 		m_data[4] = convert_to_bcd(curtime.local_time.hour);
 		m_data[5] = convert_to_bcd(curtime.local_time.minute);
 		m_data[6] = convert_to_bcd(curtime.local_time.second);

@@ -40,6 +40,7 @@
 
 #include "emu.h"
 #include "lisa.h"
+#include "emutime.h"
 #include "screen.h"
 
 
@@ -808,13 +809,14 @@ void lisa_state::nvram_init(nvram_device &nvram, void *data, size_t size)
 		/* Now we copy the host clock into the Lisa clock */
 		system_time systime;
 		machine().base_datetime(systime);
+		int day = systime.local_time.day_of_year() + 1;
 
 		m_clock_regs.alarm = 0xfffffL;
 		/* The clock count starts on 1st January 1980 */
 		m_clock_regs.years = (systime.local_time.year - 1980) & 0xf;
-		m_clock_regs.days1 = (systime.local_time.day + 1) / 100;
-		m_clock_regs.days2 = ((systime.local_time.day + 1) / 10) % 10;
-		m_clock_regs.days3 = (systime.local_time.day + 1) % 10;
+		m_clock_regs.days1 = day / 100;
+		m_clock_regs.days2 = (day / 10) % 10;
+		m_clock_regs.days3 = day % 10;
 		m_clock_regs.hours1 = systime.local_time.hour / 10;
 		m_clock_regs.hours2 = systime.local_time.hour % 10;
 		m_clock_regs.minutes1 = systime.local_time.minute / 10;

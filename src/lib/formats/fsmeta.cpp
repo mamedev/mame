@@ -63,7 +63,7 @@ meta_type meta_value::type() const
 
 util::arbitrary_datetime meta_value::as_date() const
 {
-	util::arbitrary_datetime result = { 0, };
+	util::arbitrary_datetime result;
 
 	std::visit(
 		overloaded

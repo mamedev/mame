@@ -31,6 +31,7 @@
 #include "emu.h"
 #include "x07.h"
 
+#include "emutime.h"
 #include "screen.h"
 #include "softlist_dev.h"
 #include "speaker.h"
@@ -55,9 +56,9 @@ void x07_state::t6834_cmd (uint8_t cmd)
 			machine().current_datetime(systime);
 			m_out.data[m_out.write++] = (systime.local_time.year>>8) & 0xff;
 			m_out.data[m_out.write++] = systime.local_time.year & 0xff;
-			m_out.data[m_out.write++] = systime.local_time.month + 1;
-			m_out.data[m_out.write++] = systime.local_time.mday;
-			m_out.data[m_out.write++] = ~(((0x01 << (7 - systime.local_time.weekday)) - 1) & 0xff);
+			m_out.data[m_out.write++] = systime.local_time.month;
+			m_out.data[m_out.write++] = systime.local_time.day_of_month;
+			m_out.data[m_out.write++] = ~(((0x01 << (7 - systime.local_time.day_of_week())) - 1) & 0xff);
 			m_out.data[m_out.write++] = systime.local_time.hour;
 			m_out.data[m_out.write++] = systime.local_time.minute;
 			m_out.data[m_out.write++] = systime.local_time.second;
@@ -157,7 +158,7 @@ void x07_state::t6834_cmd (uint8_t cmd)
 		{
 				system_time systime;
 				machine().current_datetime(systime);
-				m_out.data[m_out.write++] = systime.local_time.weekday;
+				m_out.data[m_out.write++] = systime.local_time.day_of_week();
 		}
 		break;
 

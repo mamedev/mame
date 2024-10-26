@@ -79,6 +79,8 @@
 #include "emu.h"
 #include "pc9801_memsw.h"
 
+#include "emutime.h"
+
 #include "coreutil.h"
 
 //**************************************************************************

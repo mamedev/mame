@@ -19,6 +19,7 @@
 
 #include "debugger.h"
 #include "emupal.h"
+#include "emutime.h"
 #include "screen.h"
 
 #define LOG_MAD2_REGISTER_ACCESS    (1U << 1)
@@ -395,7 +396,7 @@ uint8_t noki3310_state::nokia_ccont_r()
 		case 0x7:       data = systime.local_time.second;           break;
 		case 0x8:       data = systime.local_time.minute;           break;
 		case 0x9:       data = systime.local_time.hour;             break;
-		case 0xa:       data = systime.local_time.mday;             break;
+		case 0xa:       data = systime.local_time.day_of_month;     break;
 		case 0xe:       data |= 0x01;                               break;
 	}
 

@@ -188,6 +188,7 @@ Not all regional versions are available for each Megatouch series
 #include "sound/ay8910.h"
 #include "video/v9938.h"
 
+#include "emutime.h"
 #include "speaker.h"
 
 
@@ -519,9 +520,9 @@ uint8_t meritm_state::ds1644_r(offs_t offset)
 		m_ram[0x7ff9] = binary_to_BCD(systime.local_time.second);
 		m_ram[0x7ffa] = binary_to_BCD(systime.local_time.minute);
 		m_ram[0x7ffb] = binary_to_BCD(systime.local_time.hour);
-		m_ram[0x7ffc] = binary_to_BCD(systime.local_time.weekday+1);
-		m_ram[0x7ffd] = binary_to_BCD(systime.local_time.mday);
-		m_ram[0x7ffe] = binary_to_BCD(systime.local_time.month+1);
+		m_ram[0x7ffc] = systime.local_time.day_of_week() + 1;
+		m_ram[0x7ffd] = binary_to_BCD(systime.local_time.day_of_month);
+		m_ram[0x7ffe] = binary_to_BCD(systime.local_time.month);
 		m_ram[0x7fff] = binary_to_BCD(systime.local_time.year % 100);
 	}
 	return m_ram[rambank*0x2000 + 0x1ff8 + offset];

@@ -8,6 +8,8 @@
 #include "snes_slot.h"
 #include "rom21.h"
 
+#include "emutime.h"
+
 
 // ======================> sns_rom_spc7110_device
 

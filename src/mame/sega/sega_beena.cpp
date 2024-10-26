@@ -146,6 +146,7 @@
 
 #include "crsshair.h"
 #include "emupal.h"
+#include "emutime.h"
 #include "render.h"
 #include "softlist_dev.h"
 #include "schedule.h"
@@ -1700,9 +1701,9 @@ void sega_9h0_0008_state::update_rtc()
 	m_rtc[0] = systime.local_time.second;
 	m_rtc[1] = systime.local_time.minute;
 	m_rtc[2] = systime.local_time.hour;
-	m_rtc[3] = systime.local_time.mday;
-	m_rtc[4] = systime.local_time.weekday;
-	m_rtc[5] = systime.local_time.month;
+	m_rtc[3] = systime.local_time.day_of_month;
+	m_rtc[4] = systime.local_time.day_of_week();
+	m_rtc[5] = systime.local_time.month - 1;
 	m_rtc[6] = systime.local_time.year - 2000;
 }
 
