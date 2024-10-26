@@ -60,14 +60,15 @@ Information found at http://www.rhod.fr/yeno_epoch.html
 -->
 
 <softwarelist name="scv" description="Epoch Super Cassette Vision cartridges">
+
 	<software name="astrwrs">
 		<description>Astro Wars - Invader from Space</description>
 		<year>1984</year>
 		<publisher>Epoch</publisher>
 		<part name="cart" interface="scv_cart">
-			<feature name="slot" value="rom8k" />
-			<dataarea name="rom" size="8192">
-				<rom name="astrwrs.bin" size="8192" crc="2dbdb166" sha1="53a9a308b6f0bcb2137704f70657698719551b5e" offset="0000" />
+			<feature name="slot" value="rom8k"/>
+			<dataarea name="rom" size="0x2000">
+				<rom name="astrwrs.bin" size="0x2000" crc="2dbdb166" sha1="53a9a308b6f0bcb2137704f70657698719551b5e"/>
 			</dataarea>
 		</part>
 	</software>
@@ -77,9 +78,9 @@ Information found at http://www.rhod.fr/yeno_epoch.html
 		<year>1984</year>
 		<publisher>Epoch</publisher>
 		<part name="cart" interface="scv_cart">
-			<feature name="slot" value="rom8k" />
-			<dataarea name="rom" size="8192">
-				<rom name="astrwrs2.bin" size="8192" crc="34781de1" sha1="b419f2fccf3b2fbd360da2833064d2ea8bd6500b" offset="0000" />
+			<feature name="slot" value="rom8k"/>
+			<dataarea name="rom" size="0x2000">
+				<rom name="astrwrs2.bin" size="0x2000" crc="34781de1" sha1="b419f2fccf3b2fbd360da2833064d2ea8bd6500b"/>
 			</dataarea>
 		</part>
 	</software>
@@ -89,12 +90,12 @@ Information found at http://www.rhod.fr/yeno_epoch.html
 		<year>1985</year>
 		<publisher>Epoch</publisher>
 		<part name="cart" interface="scv_cart">
-			<feature name="slot" value="rom32k_ram" />
-			<dataarea name="rom" size="32768">
-				<rom name="basic.bin" size="32768" crc="ca965c2b" sha1="c68e2b81dec2c83e2aa5626c8df4011eada45245" offset="0000" />
+			<feature name="slot" value="rom32k_ram"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="basic.bin" size="0x8000" crc="ca965c2b" sha1="c68e2b81dec2c83e2aa5626c8df4011eada45245"/>
 			</dataarea>
 			<!-- 8KB? RAM on cartridge -->
-			<dataarea name="ram" size="8192" />
+			<dataarea name="ram" size="0x2000"/>
 		</part>
 	</software>
 
@@ -104,9 +105,9 @@ Information found at http://www.rhod.fr/yeno_epoch.html
 		<year>1984</year>
 		<publisher>Epoch</publisher>
 		<part name="cart" interface="scv_cart">
-			<feature name="slot" value="rom16k" />
-			<dataarea name="rom" size="16384">
-				<rom name="baseball.bin" size="16384" crc="56f1c473" sha1="37a1dce6c1921950c588d6492cd1b57feb615175" offset="0000" />
+			<feature name="slot" value="rom16k"/>
+			<dataarea name="rom" size="0x4000">
+				<rom name="baseball.bin" size="0x4000" crc="56f1c473" sha1="37a1dce6c1921950c588d6492cd1b57feb615175"/>
 			</dataarea>
 		</part>
 	</software>
@@ -116,9 +117,9 @@ Information found at http://www.rhod.fr/yeno_epoch.html
 		<year>1985</year>
 		<publisher>Epoch</publisher>
 		<part name="cart" interface="scv_cart">
-			<feature name="slot" value="rom16k" />
-			<dataarea name="rom" size="16384">
-				<rom name="boulder_dash.bin" size="16384" crc="e045884c" sha1="55942e5b7824314b072b7b40c6b72db0d5404189" offset="0" />
+			<feature name="slot" value="rom16k"/>
+			<dataarea name="rom" size="0x4000">
+				<rom name="boulder_dash.bin" size="0x4000" crc="e045884c" sha1="55942e5b7824314b072b7b40c6b72db0d5404189"/>
 			</dataarea>
 		</part>
 	</software>
@@ -128,9 +129,9 @@ Information found at http://www.rhod.fr/yeno_epoch.html
 		<year>1985</year>
 		<publisher>Epoch</publisher>
 		<part name="cart" interface="scv_cart">
-			<feature name="slot" value="rom16k" />
-			<dataarea name="rom" size="16384">
-				<rom name="comic_circus.bin" size="16384" crc="ea55faed" sha1="2e4ceb2bf68d26c263c3d1c63f7e2143ef2355bc" offset="0" />
+			<feature name="slot" value="rom16k"/>
+			<dataarea name="rom" size="0x4000">
+				<rom name="comic_circus.bin" size="0x4000" crc="ea55faed" sha1="2e4ceb2bf68d26c263c3d1c63f7e2143ef2355bc"/>
 			</dataarea>
 		</part>
 	</software>
@@ -140,10 +141,10 @@ Information found at http://www.rhod.fr/yeno_epoch.html
 		<year>1985</year>
 		<publisher>Epoch</publisher>
 		<part name="cart" interface="scv_cart">
-			<feature name="slot" value="rom64k" />
-			<dataarea name="rom" size="65536">
-				<rom name="doraemon.0" size="32768" crc="ee0b874d" sha1="425eb6ed31faa2afdecc216145616f577f72db9a" offset="0" />
-				<rom name="doraemon.1" size="32768" crc="d2de91a6" sha1="6aba5ee3d08afad222bec9a176c2607829fa5cc6" offset="0x8000" />
+			<feature name="slot" value="rom64k"/>
+			<dataarea name="rom" size="0x10000">
+				<rom name="doraemon.0" offset="0x0000" size="0x8000" crc="ee0b874d" sha1="425eb6ed31faa2afdecc216145616f577f72db9a"/>
+				<rom name="doraemon.1" offset="0x8000" size="0x8000" crc="d2de91a6" sha1="6aba5ee3d08afad222bec9a176c2607829fa5cc6"/>
 			</dataarea>
 		</part>
 	</software>
@@ -153,9 +154,9 @@ Information found at http://www.rhod.fr/yeno_epoch.html
 		<year>1986</year>
 		<publisher>Epoch</publisher>
 		<part name="cart" interface="scv_cart">
-			<feature name="slot" value="rom128k" />
-			<dataarea name="rom" size="131072">
-				<rom name="dragonba.bin" size="131072" crc="ea251664" sha1="bd3791ed43a2019a255152e3fc0d8a663cb9567a" offset="0" />
+			<feature name="slot" value="rom128k"/>
+			<dataarea name="rom" size="0x20000">
+				<rom name="dragonba.bin" size="0x20000" crc="ea251664" sha1="bd3791ed43a2019a255152e3fc0d8a663cb9567a"/>
 			</dataarea>
 		</part>
 	</software>
@@ -165,12 +166,12 @@ Information found at http://www.rhod.fr/yeno_epoch.html
 		<year>1986</year>
 		<publisher>Epoch</publisher>
 		<part name="cart" interface="scv_cart">
-			<feature name="slot" value="rom32k_ram" />
-			<dataarea name="rom" size="32768">
-				<rom name="dragonsl.bin" size="32768" crc="5971940f" sha1="c6e67e05d365fa81d3d9a3ad66d41bfeb1c3dd0d" offset="0" />
+			<feature name="slot" value="rom32k_ram"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="dragonsl.bin" size="0x8000" crc="5971940f" sha1="c6e67e05d365fa81d3d9a3ad66d41bfeb1c3dd0d"/>
 			</dataarea>
 			<!-- 8KB? RAM on cartridge -->
-			<dataarea name="ram" size="8192" />
+			<dataarea name="ram" size="0x2000"/>
 		</part>
 	</software>
 
@@ -179,9 +180,9 @@ Information found at http://www.rhod.fr/yeno_epoch.html
 		<year>1984</year>
 		<publisher>Epoch</publisher>
 		<part name="cart" interface="scv_cart">
-			<feature name="slot" value="rom16k" />
-			<dataarea name="rom" size="16384">
-				<rom name="elevfght.bin" size="16384" crc="72dd6031" sha1="8b2c185408309ee1e75d40299c003041db17b133" offset="0000" />
+			<feature name="slot" value="rom16k"/>
+			<dataarea name="rom" size="0x4000">
+				<rom name="elevfght.bin" size="0x4000" crc="72dd6031" sha1="8b2c185408309ee1e75d40299c003041db17b133"/>
 			</dataarea>
 		</part>
 	</software>
@@ -192,11 +193,11 @@ Information found at http://www.rhod.fr/yeno_epoch.html
 		<year>1985</year>
 		<publisher>Epoch</publisher>
 		<part name="cart" interface="scv_cart">
-			<feature name="slot" value="rom64k" />
-			<dataarea name="rom" size="65536">
-				<rom name="kungfurd.0" size="32768" crc="9cfc5a67" sha1="1c34470c1f389db7be755e130db298f6b475c7ce" offset="0" />
-				<rom size="24576" offset="0x8000" loadflag="reload" />
-				<rom name="kungfurd.1" size="8192"  crc="a895375a" sha1="644ab7c7fb85d0d80aa3a416b0a5359d395e48a3" offset="0xe000" />
+			<feature name="slot" value="rom64k"/>
+			<dataarea name="rom" size="0x10000">
+				<rom name="kungfurd.0" offset="0x0000" size="0x8000" crc="9cfc5a67" sha1="1c34470c1f389db7be755e130db298f6b475c7ce"/>
+				<rom offset="0x8000" size="0x6000" loadflag="reload"/>
+				<rom name="kungfurd.1" offset="0xe000" size="0x2000" crc="a895375a" sha1="644ab7c7fb85d0d80aa3a416b0a5359d395e48a3"/>
 			</dataarea>
 		</part>
 	</software>
@@ -206,9 +207,9 @@ Information found at http://www.rhod.fr/yeno_epoch.html
 		<year>1984</year>
 		<publisher>Epoch</publisher>
 		<part name="cart" interface="scv_cart">
-			<feature name="slot" value="rom16k" />
-			<dataarea name="rom" size="16384">
-				<rom name="lupin3.bin" size="16384" crc="16d7eb4a" sha1="62698c7c9d9723f74214626a4211a3c3f34e9dd5" offset="0" />
+			<feature name="slot" value="rom16k"/>
+			<dataarea name="rom" size="0x4000">
+				<rom name="lupin3.bin" size="0x4000" crc="16d7eb4a" sha1="62698c7c9d9723f74214626a4211a3c3f34e9dd5"/>
 			</dataarea>
 		</part>
 	</software>
@@ -218,9 +219,9 @@ Information found at http://www.rhod.fr/yeno_epoch.html
 		<year>1986</year>
 		<publisher>Epoch</publisher>
 		<part name="cart" interface="scv_cart">
-			<feature name="slot" value="rom32k" />
-			<dataarea name="rom" size="32768">
-				<rom name="mappy.bin" size="32768" crc="605829bb" sha1="70dc025ab3f32e18fd6f373dc47c9aa7fb9d48f0" offset="0" />
+			<feature name="slot" value="rom32k"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="mappy.bin" size="0x8000" crc="605829bb" sha1="70dc025ab3f32e18fd6f373dc47c9aa7fb9d48f0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -230,9 +231,9 @@ Information found at http://www.rhod.fr/yeno_epoch.html
 		<year>1985</year>
 		<publisher>Epoch</publisher>
 		<part name="cart" interface="scv_cart">
-			<feature name="slot" value="rom32k" />
-			<dataarea name="rom" size="32768">
-				<rom name="mlkprncs.bin" size="32768" crc="b2457990" sha1="b6234f99e474abd87a22a4b691b66bcb12e664cb" offset="0" />
+			<feature name="slot" value="rom32k"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="mlkprncs.bin" size="0x8000" crc="b2457990" sha1="b6234f99e474abd87a22a4b691b66bcb12e664cb"/>
 			</dataarea>
 		</part>
 	</software>
@@ -242,9 +243,9 @@ Information found at http://www.rhod.fr/yeno_epoch.html
 		<year>1985</year>
 		<publisher>Epoch</publisher>
 		<part name="cart" interface="scv_cart">
-			<feature name="slot" value="rom16k" />
-			<dataarea name="rom" size="16384">
-				<rom name="miner_2049er.bin" size="16384" crc="b0ffc6e2" sha1="0414878f4aedade180b273257497c1d11cdccb2f" offset="0" />
+			<feature name="slot" value="rom16k"/>
+			<dataarea name="rom" size="0x4000">
+				<rom name="miner_2049er.bin" size="0x4000" crc="b0ffc6e2" sha1="0414878f4aedade180b273257497c1d11cdccb2f"/>
 			</dataarea>
 		</part>
 	</software>
@@ -253,11 +254,11 @@ Information found at http://www.rhod.fr/yeno_epoch.html
 		<description>Y² Monster Land</description>
 		<year>1986</year>
 		<publisher>Epoch</publisher>
-		<info name="alt_title" value="Wai Wai Monster Land" />
+		<info name="alt_title" value="Wai Wai Monster Land"/>
 		<part name="cart" interface="scv_cart">
-			<feature name="slot" value="rom128k" />
-			<dataarea name="rom" size="131072">
-				<rom name="y2mnstld.bin" size="131072" crc="3ac28fe0" sha1="5ae7796ad35a7c537de11ebd3cfe3868d67235a1" offset="0" />
+			<feature name="slot" value="rom128k"/>
+			<dataarea name="rom" size="0x20000">
+				<rom name="y2mnstld.bin" size="0x20000" crc="3ac28fe0" sha1="5ae7796ad35a7c537de11ebd3cfe3868d67235a1"/>
 			</dataarea>
 		</part>
 	</software>
@@ -267,9 +268,9 @@ Information found at http://www.rhod.fr/yeno_epoch.html
 		<year>1984</year>
 		<publisher>Epoch</publisher>
 		<part name="cart" interface="scv_cart">
-			<feature name="slot" value="rom16k" />
-			<dataarea name="rom" size="16384">
-				<rom name="nebula.bin" size="16384" crc="5e6a4caf" sha1="699eaf434e73a42e71adf52426b22f0dd85e2897" offset="0000" />
+			<feature name="slot" value="rom16k"/>
+			<dataarea name="rom" size="0x4000">
+				<rom name="nebula.bin" size="0x4000" crc="5e6a4caf" sha1="699eaf434e73a42e71adf52426b22f0dd85e2897"/>
 			</dataarea>
 		</part>
 	</software>
@@ -279,9 +280,9 @@ Information found at http://www.rhod.fr/yeno_epoch.html
 		<year>1984</year>
 		<publisher>Epoch</publisher>
 		<part name="cart" interface="scv_cart">
-			<feature name="slot" value="rom16k" />
-			<dataarea name="rom" size="16384">
-				<rom name="nebulaa.bin" size="16384" crc="efb4bdcd" sha1="94a4b9a92d6f9a5f4a68721be4cc35920ca32628" offset="0" />
+			<feature name="slot" value="rom16k"/>
+			<dataarea name="rom" size="0x4000">
+				<rom name="nebulaa.bin" size="0x4000" crc="efb4bdcd" sha1="94a4b9a92d6f9a5f4a68721be4cc35920ca32628"/>
 			</dataarea>
 		</part>
 	</software>
@@ -291,12 +292,12 @@ Information found at http://www.rhod.fr/yeno_epoch.html
 		<year>1985</year>
 		<publisher>Epoch</publisher>
 		<part name="cart" interface="scv_cart">
-			<feature name="slot" value="rom128k_ram" />
-			<dataarea name="rom" size="131072">
-				<rom name="polepos2.bin" size="131072" crc="cb69903d" sha1="472900d7b7fa6cdf30014731dcc925ef5ca65499" offset="0" />
+			<feature name="slot" value="rom128k_ram"/>
+			<dataarea name="rom" size="0x20000">
+				<rom name="polepos2.bin" size="0x20000" crc="cb69903d" sha1="472900d7b7fa6cdf30014731dcc925ef5ca65499"/>
 			</dataarea>
 			<!-- 4KB RAM on cartridge -->
-			<dataarea name="ram" size="4096" />
+			<dataarea name="ram" size="0x1000"/>
 		</part>
 	</software>
 
@@ -305,12 +306,12 @@ Information found at http://www.rhod.fr/yeno_epoch.html
 		<year>1985</year>
 		<publisher>Epoch</publisher>
 		<part name="cart" interface="scv_cart">
-			<feature name="slot" value="rom32k_ram" />
-			<dataarea name="rom" size="32768">
-				<rom name="popchips.bin" size="32768" crc="cc4fb04d" sha1="5979abd6051d531eafe1ea3b37c97ce2e3e97f8e" offset="0" />
+			<feature name="slot" value="rom32k_ram"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="popchips.bin" size="0x8000" crc="cc4fb04d" sha1="5979abd6051d531eafe1ea3b37c97ce2e3e97f8e"/>
 			</dataarea>
 			<!-- 8KB RAM on cartridge -->
-			<dataarea name="ram" size="8192" />
+			<dataarea name="ram" size="0x2000"/>
 		</part>
 	</software>
 
@@ -319,9 +320,9 @@ Information found at http://www.rhod.fr/yeno_epoch.html
 		<year>1986</year>
 		<publisher>Epoch</publisher>
 		<part name="cart" interface="scv_cart">
-			<feature name="slot" value="rom128k" />
-			<dataarea name="rom" size="131072">
-				<rom name="prowrest.bin" size="131072" crc="5b1fb2a8" sha1="55fe356c04ce3db83cb3148d867cc8b8060cbb48" offset="0" />
+			<feature name="slot" value="rom128k"/>
+			<dataarea name="rom" size="0x20000">
+				<rom name="prowrest.bin" size="0x20000" crc="5b1fb2a8" sha1="55fe356c04ce3db83cb3148d867cc8b8060cbb48"/>
 			</dataarea>
 		</part>
 	</software>
@@ -331,9 +332,9 @@ Information found at http://www.rhod.fr/yeno_epoch.html
 		<year>1984</year>
 		<publisher>Epoch</publisher>
 		<part name="cart" interface="scv_cart">
-			<feature name="slot" value="rom16k" />
-			<dataarea name="rom" size="16384">
-				<rom name="punchboy.bin" size="16384" crc="4107f03a" sha1="e7391c71ba7deede3db22191ea058ccf429d7bb5" offset="0000" />
+			<feature name="slot" value="rom16k"/>
+			<dataarea name="rom" size="0x4000">
+				<rom name="punchboy.bin" size="0x4000" crc="4107f03a" sha1="e7391c71ba7deede3db22191ea058ccf429d7bb5"/>
 			</dataarea>
 		</part>
 	</software>
@@ -343,9 +344,9 @@ Information found at http://www.rhod.fr/yeno_epoch.html
 		<year>1984</year>
 		<publisher>Epoch</publisher>
 		<part name="cart" interface="scv_cart">
-			<feature name="slot" value="rom16k" />
-			<dataarea name="rom" size="16384">
-				<rom name="real_graphic_mahjong.bin" size="16384" crc="d3d9106c" sha1="7190ff2944c1ffbde6866e720417b86b3844ffa2" offset="0" />
+			<feature name="slot" value="rom16k"/>
+			<dataarea name="rom" size="0x4000">
+				<rom name="real_graphic_mahjong.bin" size="0x4000" crc="d3d9106c" sha1="7190ff2944c1ffbde6866e720417b86b3844ffa2"/>
 			</dataarea>
 		</part>
 	</software>
@@ -355,25 +356,24 @@ Information found at http://www.rhod.fr/yeno_epoch.html
 		<year>1986</year>
 		<publisher>Epoch</publisher>
 		<part name="cart" interface="scv_cart">
-			<feature name="slot" value="rom64k" />
-			<dataarea name="rom" size="65536">
-				<rom name="skykid.bin" size="65536" crc="f49f2085" sha1="7342fe10d38c79ed12fbfa94b5fd4bf1266c2571" offset="0" />
+			<feature name="slot" value="rom64k"/>
+			<dataarea name="rom" size="0x10000">
+				<rom name="skykid.bin" size="0x10000" crc="f49f2085" sha1="7342fe10d38c79ed12fbfa94b5fd4bf1266c2571"/>
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="starspdr" supported="partial">
+	<software name="starspdr" supported="no">
 		<description>Star Speeder</description>
 		<year>1985</year>
 		<publisher>Epoch</publisher>
+		<notes>Game does not start.</notes>
 		<part name="cart" interface="scv_cart">
-			<feature name="slot" value="rom64k" />
-			<dataarea name="rom" size="65536">
-				<rom name="starspeeder.1" size="8192"  crc="7978c4a6" sha1="6bb5ff3946867fa7adb6561dc084ef5a7a92c507" offset="0" />
-				<rom size="8192" offset="0x2000" loadflag="reload" />
-				<rom size="8192" offset="0x4000" loadflag="reload" />
-				<rom size="8192" offset="0x6000" loadflag="reload" />
-				<rom name="starspeeder.0" size="32768" crc="511576ee" sha1="1b61132af26dc8d5c1b5e0f72c2e96192bba7e20" offset="0x8000" />
+			<feature name="slot" value="rom64k"/>
+			<dataarea name="rom" size="0x10000">
+				<rom name="starspeeder.0" offset="0x0000" size="0x8000" crc="511576ee" sha1="1b61132af26dc8d5c1b5e0f72c2e96192bba7e20"/>
+				<rom offset="0x8000" size="0x6000" loadflag="reload"/>
+				<rom name="starspeeder.1" offset="0xe000" size="0x2000" crc="7978c4a6" sha1="6bb5ff3946867fa7adb6561dc084ef5a7a92c507"/>
 			</dataarea>
 		</part>
 	</software>
@@ -383,12 +383,12 @@ Information found at http://www.rhod.fr/yeno_epoch.html
 		<year>1985</year>
 		<publisher>Epoch</publisher>
 		<part name="cart" interface="scv_cart">
-			<feature name="slot" value="rom32k_ram" />
-			<dataarea name="rom" size="32768">
-				<rom name="shoginyu.bin" size="32768" crc="84005c4c" sha1="bd6681013dbbae94c03e501932836db07943468e" offset="0" />
+			<feature name="slot" value="rom32k_ram"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="shoginyu.bin" size="0x8000" crc="84005c4c" sha1="bd6681013dbbae94c03e501932836db07943468e"/>
 			</dataarea>
 			<!-- 8KB RAM on cartridge -->
-			<dataarea name="ram" size="8192" />
+			<dataarea name="ram" size="0x2000"/>
 		</part>
 	</software>
 
@@ -397,9 +397,9 @@ Information found at http://www.rhod.fr/yeno_epoch.html
 		<year>1985</year>
 		<publisher>Epoch</publisher>
 		<part name="cart" interface="scv_cart">
-			<feature name="slot" value="rom32k" />
-			<dataarea name="rom" size="32768">
-				<rom name="sansupyuta.bin" size="32768" crc="6e7e01b5" sha1="dc05257c831cffa5ec66302c88e1d45a92c6dc9c" offset="0" />
+			<feature name="slot" value="rom32k"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="sansupyuta.bin" size="0x8000" crc="6e7e01b5" sha1="dc05257c831cffa5ec66302c88e1d45a92c6dc9c"/>
 			</dataarea>
 		</part>
 	</software>
@@ -410,9 +410,9 @@ Information found at http://www.rhod.fr/yeno_epoch.html
 		<year>1985</year>
 		<publisher>Epoch</publisher>
 		<part name="cart" interface="scv_cart">
-			<feature name="slot" value="rom16k" />
-			<dataarea name="rom" size="16384">
-				<rom name="soccer.bin" size="16384" crc="8283907c" sha1="61e4b8e43cc593b3a2e838c08f6dad6cca77d712" offset="0000" />
+			<feature name="slot" value="rom16k"/>
+			<dataarea name="rom" size="0x4000">
+				<rom name="soccer.bin" size="0x4000" crc="8283907c" sha1="61e4b8e43cc593b3a2e838c08f6dad6cca77d712"/>
 			</dataarea>
 		</part>
 	</software>
@@ -423,9 +423,9 @@ Information found at http://www.rhod.fr/yeno_epoch.html
 		<year>1985</year>
 		<publisher>Epoch</publisher>
 		<part name="cart" interface="scv_cart">
-			<feature name="slot" value="rom16k" />
-			<dataarea name="rom" size="16384">
-				<rom name="soccera.bin" size="16384" crc="590eeefd" sha1="951ecd2a1d2e7d900c13e91ff028723a9df9e60e" offset="0000" />
+			<feature name="slot" value="rom16k"/>
+			<dataarea name="rom" size="0x4000">
+				<rom name="soccera.bin" size="0x4000" crc="590eeefd" sha1="951ecd2a1d2e7d900c13e91ff028723a9df9e60e"/>
 			</dataarea>
 		</part>
 	</software>
@@ -436,9 +436,9 @@ Information found at http://www.rhod.fr/yeno_epoch.html
 		<year>1984</year>
 		<publisher>Epoch</publisher>
 		<part name="cart" interface="scv_cart">
-			<feature name="slot" value="rom16k" />
-			<dataarea name="rom" size="16384">
-				<rom name="suprgolf.bin" size="16384" crc="0c0581c9" sha1="2d3ab09907a4a9c5d66306f316c7211f498cbcc2" offset="0000" />
+			<feature name="slot" value="rom16k"/>
+			<dataarea name="rom" size="0x4000">
+				<rom name="suprgolf.bin" size="0x4000" crc="0c0581c9" sha1="2d3ab09907a4a9c5d66306f316c7211f498cbcc2"/>
 			</dataarea>
 		</part>
 	</software>
@@ -448,9 +448,9 @@ Information found at http://www.rhod.fr/yeno_epoch.html
 		<year>1985</year>
 		<publisher>Epoch</publisher>
 		<part name="cart" interface="scv_cart">
-			<feature name="slot" value="rom16k" />
-			<dataarea name="rom" size="16384">
-				<rom name="ttball.bin" size="16384" crc="7f873bfa" sha1="093235ac2234c4c4e78a2addaab780d7a2cbe004" offset="0" />
+			<feature name="slot" value="rom16k"/>
+			<dataarea name="rom" size="0x4000">
+				<rom name="ttball.bin" size="0x4000" crc="7f873bfa" sha1="093235ac2234c4c4e78a2addaab780d7a2cbe004"/>
 			</dataarea>
 		</part>
 	</software>
@@ -460,9 +460,9 @@ Information found at http://www.rhod.fr/yeno_epoch.html
 		<year>1985</year>
 		<publisher>Epoch</publisher>
 		<part name="cart" interface="scv_cart">
-			<feature name="slot" value="rom16k" />
-			<dataarea name="rom" size="16384">
-				<rom name="wheelrcr.bin" size="16384" crc="9d9b29db" sha1="479f767384e7b7bfe58eeadd67dbe642fe8a2fcf" offset="0000" />
+			<feature name="slot" value="rom16k"/>
+			<dataarea name="rom" size="0x4000">
+				<rom name="wheelrcr.bin" size="0x4000" crc="9d9b29db" sha1="479f767384e7b7bfe58eeadd67dbe642fe8a2fcf"/>
 			</dataarea>
 		</part>
 	</software>
