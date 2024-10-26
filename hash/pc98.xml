@@ -2481,11 +2481,12 @@ Not extensively tested
 		</part>
 	</software>
 
-	<software name="yumeijin" supported="partial">
+	<software name="yumeijin" supported="no">
 		<description>Yu-Meijin ver3.0</description>
 		<year>1989</year>
 		<publisher>Corpus</publisher>
 		<notes><![CDATA[
+Cannot enter any character inside, keeps moaning about half kanji not supported no matter CR position
 Blink is half size
 Not extensively tested
 ]]></notes>
