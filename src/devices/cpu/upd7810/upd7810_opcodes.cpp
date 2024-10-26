@@ -9474,5 +9474,8 @@ void upd7810_device::MOV_MC_A_7801()
 	/* PC5  Output  IO/-M Output */
 	/* PC6  Output  HLDA Output  */
 	/* PC7  Input   HOLD Input   */
-	MC = 0x84 | ( ( A & 0x02 ) ? 0x02 : 0x00 ) | ( ( A & 0x01 ) ? 0x01 : 0x00 );
+	if (MC == A)
+		return;
+	MC = A;
+	WP(UPD7810_PORTC, m_pc_out);
 }
