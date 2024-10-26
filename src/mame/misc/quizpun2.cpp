@@ -149,13 +149,13 @@ private:
 
 	tilemap_t *m_bg_tmap;
 	tilemap_t *m_fg_tmap;
-	uint8_t m_scroll;
+	uint8_t m_scroll = 0;
 
-	uint8_t m_mcu_data_port;
-	uint8_t m_mcu_control_port;
-	bool m_mcu_pending;
-	bool m_mcu_written;
-	bool m_mcu_repeat;
+	uint8_t m_mcu_data_port = 0;
+	uint8_t m_mcu_control_port = 0;
+	bool m_mcu_pending = false;
+	bool m_mcu_written = false;
+	bool m_mcu_repeat = false;
 
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
@@ -287,8 +287,8 @@ void quizpun2_state::machine_start()
 	save_item(NAME(m_mcu_data_port));
 	save_item(NAME(m_mcu_control_port));
 	save_item(NAME(m_mcu_pending));
-	save_item(NAME(m_mcu_repeat));
 	save_item(NAME(m_mcu_written));
+	save_item(NAME(m_mcu_repeat));
 }
 
 void quizpun2_state::machine_reset()
@@ -296,7 +296,7 @@ void quizpun2_state::machine_reset()
 	m_mainbank->set_entry(0);
 
 	// quizpun2 service mode needs this to fix a race condition since the MCU takes a while to start up
-	m_maincpu->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
+	m_maincpu->set_input_line(Z80_INPUT_LINE_WAIT, ASSERT_LINE);
 
 	m_mcu_data_port = m_mcu_control_port = 0;
 	m_mcu_pending = m_mcu_written = m_mcu_repeat = false;
@@ -313,7 +313,7 @@ void quizpun2_state::cop_g_w(uint8_t data)
 	if (BIT(m_mcu_control_port, 0) && !BIT(data, 0))
 	{
 		m_mcu_pending = false;
-		m_maincpu->set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
+		m_maincpu->set_input_line(Z80_INPUT_LINE_WAIT, CLEAR_LINE);
 	}
 
 	m_mcu_control_port = data;
@@ -326,8 +326,7 @@ uint8_t quizpun2_state::cop_l_r()
 
 void quizpun2_state::cop_l_w(uint8_t data)
 {
-	if (m_mcu_repeat)
-		m_mcu_data_port = data;
+	m_mcu_data_port = data;
 }
 
 uint8_t quizpun2_state::cop_in_r()
@@ -389,31 +388,19 @@ void quizpun2_state::quizpun2_cop_map(address_map &map)
 
 uint8_t quizpun2_state::protection_r()
 {
-	LOGMCU("%s: port A read %02x\n", machine().describe_context(), m_mcu_data_port);
-
-	/*
-	   Upon reading this port the main CPU is stalled until the MCU provides the value to read
-	   and explicitly un-stalls the z80. Is this possible under the current MAME architecture?
-
-	   ** ghastly hack **
-
-	   The first read stalls the main CPU and triggers the MCU, it returns an incorrect value.
-	   It also decrements the main CPU PC back to the start of the read instruction.
-	   When the MCU un-stalls the Z80, the read happens again, returning the correct MCU-provided value this time
-	*/
-	if (m_mcu_repeat)
+	if (!machine().side_effects_disabled())
 	{
-		m_mcu_repeat = false;
-	}
-	else
-	{
-		m_mcu_pending = true;
-		m_mcu_written = false;
-		m_maincpu->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
-		m_maincpu->yield();
+		// Z80 is stalled until the MCU provides the value to read and un-stalls the Z80
+		if (!m_mcu_repeat)
+		{
+			LOGMCU("%s: port A read %02x\n", machine().describe_context(), m_mcu_data_port);
+			m_mcu_pending = true;
+			m_mcu_written = false;
+			m_maincpu->set_input_line(Z80_INPUT_LINE_WAIT, ASSERT_LINE);
+			m_maincpu->defer_access();
+		}
 
-		m_maincpu->set_state_int(Z80_PC, m_maincpu->state_int(Z80_PC) - 2);
-		m_mcu_repeat = true;
+		m_mcu_repeat = !m_mcu_repeat;
 	}
 
 	return m_mcu_data_port;
@@ -425,8 +412,7 @@ void quizpun2_state::protection_w(uint8_t data)
 	m_mcu_data_port = data;
 	m_mcu_pending = true;
 	m_mcu_written = true;
-	m_maincpu->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
-	m_maincpu->yield();
+	m_maincpu->set_input_line(Z80_INPUT_LINE_WAIT, ASSERT_LINE);
 }
 
 /***************************************************************************
@@ -454,10 +440,9 @@ uint8_t quizpun2_state::quizpun_68705_port_b_r()
 	// bit 3: 0 = pending
 	// bit 1: 0 = main CPU has written
 	// bit 0: 0 = main CPU is reading
-
 	uint8_t const ret =
 			0xf4 |
-			( m_mcu_pending                        ? 0 : (1 << 3)) |
+			( m_mcu_pending                    ? 0 : (1 << 3)) |
 			((m_mcu_pending &&  m_mcu_written) ? 0 : (1 << 1)) |
 			((m_mcu_pending && !m_mcu_written) ? 0 : (1 << 0));
 
@@ -470,11 +455,10 @@ void quizpun2_state::quizpun_68705_port_b_w(uint8_t data)
 	LOGMCU("%s: port B write %02x\n", machine().describe_context(), data);
 
 	// bit 2: 0->1 run main CPU
-
 	if (!BIT(m_mcu_control_port, 2) && BIT(data, 2))
 	{
 		m_mcu_pending = false;
-		m_maincpu->set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
+		m_maincpu->set_input_line(Z80_INPUT_LINE_WAIT, CLEAR_LINE);
 	}
 	m_mcu_control_port = data;
 }
@@ -643,6 +627,8 @@ void quizpun2_state::quizpun2(machine_config &config)
 	cop.read_si().set("eeprom", FUNC(eeprom_serial_93cxx_device::do_read));
 	cop.write_so().set("eeprom", FUNC(eeprom_serial_93cxx_device::di_write));
 	cop.write_sk().set("eeprom", FUNC(eeprom_serial_93cxx_device::clk_write));
+
+	config.set_perfect_quantum("cop");
 }
 
 void quizpun2_state::quizpun(machine_config &config)
@@ -656,6 +642,8 @@ void quizpun2_state::quizpun(machine_config &config)
 	mcu.porta_w().set(FUNC(quizpun2_state::quizpun_68705_port_a_w));
 	mcu.portb_w().set(FUNC(quizpun2_state::quizpun_68705_port_b_w));
 	mcu.portc_w().set(FUNC(quizpun2_state::quizpun_68705_port_c_w));
+
+	config.set_perfect_quantum("mcu");
 }
 
 /***************************************************************************
