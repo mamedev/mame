@@ -7,6 +7,27 @@
 #include "emu.h"
 #include "igs023_video.h"
 
+#include "screen.h"
+
+
+namespace {
+
+const gfx_layout pgm32_charlayout =
+{
+	32,32,
+	RGN_FRAC(1,1),
+	5,
+	{ 4, 3, 2, 1, 0 },
+	{ STEP32(0,5) },
+	{ STEP32(0,5*32) },
+	32*32*5
+};
+
+constexpr bool get_flipy(u8 flip) { return BIT(flip, 1); }
+constexpr bool get_flipx(u8 flip) { return BIT(flip, 0); }
+
+} // anonymous namespace
+
 
 DEFINE_DEVICE_TYPE(IGS023_VIDEO, igs023_video_device, "igs023", "IGS023 Video System")
 
@@ -17,19 +38,17 @@ igs023_video_device::igs023_video_device(const machine_config &mconfig, const ch
 	, m_adata(*this, "sprcol")
 	, m_bdata(*this, "sprmask")
 	, m_readspriteram_cb(*this, 0)
+	, m_sprite_ptr_pre(nullptr)
+	, m_bg_tilemap(nullptr)
+	, m_tx_tilemap(nullptr)
+	, m_aoffset(0)
+	, m_abit(0)
+	, m_boffset(0)
+	, m_bg_videoram(nullptr)
+	, m_tx_videoram(nullptr)
+	, m_rowscrollram(nullptr)
 {
 }
-
-static const gfx_layout pgm32_charlayout =
-{
-	32,32,
-	RGN_FRAC(1,1),
-	5,
-	{ 4, 3, 2, 1, 0 },
-	{ STEP32(0,5) },
-	{ STEP32(0,5*32) },
-	32*32*5
-};
 
 GFXDECODE_MEMBER( igs023_video_device::gfxinfo )
 	GFXDECODE_DEVICE(            DEVICE_SELF, 0, gfx_8x8x4_packed_lsb, 0x800, 32 ) /* 8x8x4 Tiles */
@@ -70,8 +89,6 @@ void igs023_video_device::videoram_w(offs_t offset, u16 data, u16 mem_mask)
 
 
 
-#include "screen.h"
-
 
 /******************************************************************************
  Sprites
@@ -85,10 +102,7 @@ void igs023_video_device::videoram_w(offs_t offset, u16 data, u16 mem_mask)
 // bg pri is 2
 // sprite already here is 1 / 3
 
-static constexpr bool get_flipy(u8 flip) { return BIT(flip, 1); }
-static constexpr bool get_flipx(u8 flip) { return BIT(flip, 0); }
-
-inline void igs023_video_device::pgm_draw_pix(int xdrawpos, int pri, u16* dest, u8* destpri, const rectangle &cliprect, u16 srcdat)
+inline void igs023_video_device::pgm_draw_pix(int xdrawpos, int pri, u16 *dest, u8 *destpri, const rectangle &cliprect, u16 srcdat)
 {
 	if ((xdrawpos >= cliprect.min_x) && (xdrawpos <= cliprect.max_x))
 	{
@@ -111,7 +125,7 @@ inline void igs023_video_device::pgm_draw_pix(int xdrawpos, int pri, u16* dest, 
 	}
 }
 
-inline void igs023_video_device::pgm_draw_pix_nopri(int xdrawpos, u16* dest, u8* destpri, const rectangle &cliprect, u16 srcdat)
+inline void igs023_video_device::pgm_draw_pix_nopri(int xdrawpos, u16 *dest, u8 *destpri, const rectangle &cliprect, u16 srcdat)
 {
 	if ((xdrawpos >= cliprect.min_x) && (xdrawpos <= cliprect.max_x))
 	{
@@ -123,7 +137,7 @@ inline void igs023_video_device::pgm_draw_pix_nopri(int xdrawpos, u16* dest, u8*
 	}
 }
 
-inline void igs023_video_device::pgm_draw_pix_pri(int xdrawpos, u16* dest, u8* destpri, const rectangle &cliprect, u16 srcdat)
+inline void igs023_video_device::pgm_draw_pix_pri(int xdrawpos, u16 *dest, u8 *destpri, const rectangle &cliprect, u16 srcdat)
 {
 	if ((xdrawpos >= cliprect.min_x) && (xdrawpos <= cliprect.max_x))
 	{
@@ -155,7 +169,7 @@ inline u8 igs023_video_device::get_sprite_pix()
   for complex zoomed cases
 *************************************************************************/
 
-void igs023_video_device::draw_sprite_line(int wide, u16* dest, u8* destpri, const rectangle &cliprect, int xzoom, bool xgrow, int flip, int xpos, int pri, int realxsize, int palt, bool draw)
+void igs023_video_device::draw_sprite_line(int wide, u16 *dest, u8 *destpri, const rectangle &cliprect, int xzoom, bool xgrow, int flip, int xpos, int pri, int realxsize, int palt, bool draw)
 {
 	int xoffset = 0;
 	int xdrawpos = 0;
@@ -384,7 +398,7 @@ void igs023_video_device::draw_sprite_new_zoomed(int wide, int high, int xpos, i
 }
 
 
-void igs023_video_device::draw_sprite_line_basic(int wide, u16* dest, u8* destpri, const rectangle &cliprect, int flip, int xpos, int pri, int realxsize, int palt, bool draw)
+void igs023_video_device::draw_sprite_line_basic(int wide, u16 *dest, u8 *destpri, const rectangle &cliprect, int flip, int xpos, int pri, int realxsize, int palt, bool draw)
 {
 	int xdrawpos = 0;
 	int xcntdraw = 0;
@@ -576,7 +590,7 @@ void igs023_video_device::get_sprites()
 {
 	m_sprite_ptr_pre = m_spritelist.get();
 
-	const u16* sprite_zoomtable = &m_videoregs[0x1000 / 2];
+	u16 const *const sprite_zoomtable = &m_videoregs[0x1000 / 2];
 
 	int sprite_num = 0;
 

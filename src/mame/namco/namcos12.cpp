@@ -1038,6 +1038,10 @@ The lever must be wired to analog port 0 (pin B22 parts side) of the Namco 48-wa
 */
 
 #include "emu.h"
+
+#include "namco_settings.h"
+#include "namcos12_cdxa.h"
+
 #include "bus/jvs/cyberlead.h"
 #include "bus/jvs/namcoio.h"
 #include "cpu/h8/h83002.h"
@@ -1047,8 +1051,7 @@ The lever must be wired to analog port 0 (pin B22 parts side) of the Namco 48-wa
 #include "machine/rtc4543.h"
 #include "sound/c352.h"
 #include "video/psx.h"
-#include "namco_settings.h"
-#include "namcos12_cdxa.h"
+
 #include "screen.h"
 #include "speaker.h"
 
@@ -2716,7 +2719,7 @@ ROM_START( mrdrillr )
 	ROM_LOAD( "dri1wave0.5",              0x0000000, 0x800000, CRC(32928df1) SHA1(79af92a2d24a0e3d5bfe1785776b0f86a93882ce) )
 ROM_END
 
-ROM_START( mrdrillrja )
+ROM_START( mrdrillrja2 )
 	ROM_REGION32_LE( 0x0400000, "maincpu:rom", 0 )
 	ROM_LOAD16_BYTE( "dri1vera2.2l",      0x0000000, 0x200000, CRC(751ca21d) SHA1(1c271bba83d387c797ce8daa43885bcb6e1a51a6) )
 	ROM_LOAD16_BYTE( "dri1vera2.2p",      0x0000001, 0x200000, CRC(2a2b0704) SHA1(5a8b40c6cf0adc43ca2ee0c576ec82f314aacd2c) )
@@ -2841,7 +2844,7 @@ ROM_START( soulclbr )
 	ROM_LOAD( "soc1wave0.2",              0x0000000, 0x800000, CRC(c100618d) SHA1(b87f88ee42ad9c5affa674e5f816d902143fed99) )
 ROM_END
 
-ROM_START( soulclbraa )
+ROM_START( soulclbrab )
 	ROM_REGION32_LE( 0x0400000, "maincpu:rom", 0 )
 	ROM_LOAD16_BYTE( "soc14verb.2l",      0x0000000, 0x200000, CRC(6af5c5f6) SHA1(51d1e7d78d95cfc765cd219ed07b405cd920044b) )
 	ROM_LOAD16_BYTE( "soc14verb.2p",      0x0000001, 0x200000, CRC(23e7a4c4) SHA1(a97f36cafdeff9e26fbd24e54ab8ac8080763761) )
@@ -2860,7 +2863,7 @@ ROM_START( soulclbraa )
 	ROM_LOAD( "soc1wave0.2",              0x0000000, 0x800000, CRC(c100618d) SHA1(b87f88ee42ad9c5affa674e5f816d902143fed99) )
 ROM_END
 
-ROM_START( soulclbrab )
+ROM_START( soulclbrac )
 	ROM_REGION32_LE( 0x0400000, "maincpu:rom", 0 )
 	ROM_LOAD16_BYTE( "soc14verc.2e",      0x0000000, 0x200000, CRC(c40e9614) SHA1(dc20469f0d657423e472fdf5897852ab9fb8bb73) )
 	ROM_LOAD16_BYTE( "soc14verc.2j",      0x0000001, 0x200000, CRC(80c41446) SHA1(e5620a4f0ffba913169a779df73384b7ca8780b9) )
@@ -2879,7 +2882,7 @@ ROM_START( soulclbrab )
 	ROM_LOAD( "soc1wave0.2",              0x0000000, 0x800000, CRC(c100618d) SHA1(b87f88ee42ad9c5affa674e5f816d902143fed99) )
 ROM_END
 
-ROM_START( soulclbrja )
+ROM_START( soulclbrja2 )
 	ROM_REGION32_LE( 0x0400000, "maincpu:rom", 0 )
 	ROM_LOAD16_BYTE( "soc1vera.2l",       0x0000000, 0x200000, CRC(37e0a203) SHA1(3915b5e530c8e70a07aa8ccedeb66633ae5f670e) )
 	ROM_LOAD16_BYTE( "soc1vera.2p",       0x0000001, 0x200000, CRC(7cd87a35) SHA1(5a4837b6f6a49c88126a0ddbb8059a4da77127bc) )
@@ -2936,7 +2939,7 @@ ROM_START( soulclbrjc )
 	ROM_LOAD( "soc1wave0.2",              0x0000000, 0x800000, CRC(c100618d) SHA1(b87f88ee42ad9c5affa674e5f816d902143fed99) )
 ROM_END
 
-ROM_START( soulclbrua )
+ROM_START( soulclbrub )
 	ROM_REGION32_LE( 0x0400000, "maincpu:rom", 0 )
 	ROM_LOAD16_BYTE( "soc13verb.2e",      0x0000000, 0x200000, CRC(ad7cfb1e) SHA1(7d1e7fd0024e31780335690906846e91ba063003) )
 	ROM_LOAD16_BYTE( "soc13verb.2j",      0x0000001, 0x200000, CRC(7449c045) SHA1(1c7a8b659d0f12dded2a00bc83baeb392fd7a719) )
@@ -2955,7 +2958,7 @@ ROM_START( soulclbrua )
 	ROM_LOAD( "soc1wave0.2",              0x0000000, 0x800000, CRC(c100618d) SHA1(b87f88ee42ad9c5affa674e5f816d902143fed99) )
 ROM_END
 
-ROM_START( soulclbrub )
+ROM_START( soulclbruc )
 	ROM_REGION32_LE( 0x0400000, "maincpu:rom", 0 )
 	ROM_LOAD16_BYTE( "soc13verc.2l",      0x0000000, 0x200000, CRC(4ba962fb) SHA1(e2b5e543d92a4157788482f3ab7c6b0e5ff30367) )
 	ROM_LOAD16_BYTE( "soc13verc.2p",      0x0000001, 0x200000, CRC(140c40de) SHA1(352faec0fff5a8422ee7c8db2e0c946b139be03f) )
@@ -3124,7 +3127,7 @@ ROM_START( tekken3ja )
 	ROM_LOAD( "tet1wave1.4",              0x0400000, 0x400000, CRC(ffeba79f) SHA1(941412bbe9d0305d9a23c224c1bb774c4321f6df) )
 ROM_END
 
-ROM_START( tekken3jb )
+ROM_START( tekken3je1 )
 	ROM_REGION32_LE( 0x0400000, "maincpu:rom", 0 )
 	ROM_LOAD16_BYTE( "tet1vere1.2e",      0x0000000, 0x200000, CRC(8b01113b) SHA1(45fdfd58293641ed16bc59c633a85a9cf64ccbaf) )
 	ROM_LOAD16_BYTE( "tet1vere1.2j",      0x0000001, 0x200000, CRC(df4c96fb) SHA1(2e223045bf5b80ccf615106e869760c5b7aa8d44) )
@@ -3170,7 +3173,7 @@ ROM_START( tekken3ua )
 	ROM_LOAD( "tet1wave1.4",              0x0400000, 0x400000, CRC(ffeba79f) SHA1(941412bbe9d0305d9a23c224c1bb774c4321f6df) )
 ROM_END
 
-ROM_START( tekken3ub )
+ROM_START( tekken3ud )
 	ROM_REGION32_LE( 0x0400000, "maincpu:rom", 0 )
 	ROM_LOAD16_BYTE( "tet3verd.2e",       0x0000000, 0x200000, CRC(9056a8d1) SHA1(08269de80361672f1a193e5cdcd0d4571b746a85) )
 	ROM_LOAD16_BYTE( "tet3verd.2j",       0x0000001, 0x200000, CRC(60ae06f4) SHA1(898355cc6bae4745b6b9913e34d50fe2a00f1c2c) )
@@ -3193,7 +3196,7 @@ ROM_START( tekken3ub )
 	ROM_LOAD( "tet1wave1.4",              0x0400000, 0x400000, CRC(ffeba79f) SHA1(941412bbe9d0305d9a23c224c1bb774c4321f6df) )
 ROM_END
 
-ROM_START( tekken3wa )
+ROM_START( tekken3a )
 	ROM_REGION32_LE( 0x0400000, "maincpu:rom", 0 )
 	ROM_LOAD16_BYTE( "tet2vera.2e",       0x0000000, 0x200000, CRC(7270f157) SHA1(e73c5970e58f9e8c5696f4e3b15908fbec6c21ce) )
 	ROM_LOAD16_BYTE( "tet2vera.2j",       0x0000001, 0x200000, CRC(94ceb446) SHA1(c730eb5c770991ae3ae0b9ba63681ce037e46746) )
@@ -3216,7 +3219,7 @@ ROM_START( tekken3wa )
 	ROM_LOAD( "tet1wave1.4",              0x0400000, 0x400000, CRC(ffeba79f) SHA1(941412bbe9d0305d9a23c224c1bb774c4321f6df) )
 ROM_END
 
-ROM_START( tekken3wb )
+ROM_START( tekken3b )
 	ROM_REGION32_LE( 0x0400000, "maincpu:rom", 0 )
 	ROM_LOAD16_BYTE( "tet2verb.2e",       0x0000000, 0x200000, CRC(a6cbc434) SHA1(859d84e6e9a52c2cdd54a2a0bb8104169eb19c07) )
 	ROM_LOAD16_BYTE( "tet2verb.2j",       0x0000001, 0x200000, CRC(c8f95ec5) SHA1(7f34c42e1fbc35118e8476cdb78fbdb9564001de) )
@@ -3239,7 +3242,7 @@ ROM_START( tekken3wb )
 	ROM_LOAD( "tet1wave1.4",              0x0400000, 0x400000, CRC(ffeba79f) SHA1(941412bbe9d0305d9a23c224c1bb774c4321f6df) )
 ROM_END
 
-ROM_START( tekken3wc )
+ROM_START( tekken3c )
 	ROM_REGION32_LE( 0x0400000, "maincpu:rom", 0 )
 	ROM_LOAD16_BYTE( "tet2verc.2e",       0x0000000, 0x200000, CRC(4483d76e) SHA1(c43b7e445acb77ddeb8a647bef1fc509ced0412e) )
 	ROM_LOAD16_BYTE( "tet2verc.2j",       0x0000001, 0x200000, CRC(3b4fee42) SHA1(b71b2969b0416e6fd348297876fc55d44e14ebef) )
@@ -3262,7 +3265,7 @@ ROM_START( tekken3wc )
 	ROM_LOAD( "tet1wave1.4",              0x0400000, 0x400000, CRC(ffeba79f) SHA1(941412bbe9d0305d9a23c224c1bb774c4321f6df) )
 ROM_END
 
-ROM_START( tekken3wd )
+ROM_START( tekken3d )
 	ROM_REGION32_LE( 0x0400000, "maincpu:rom", 0 )
 	ROM_LOAD16_BYTE( "tet2verd.2e",       0x0000000, 0x200000, CRC(ff269bcd) SHA1(f118b69ffe3ee1ad785c115c39d5166f3c546554) )
 	ROM_LOAD16_BYTE( "tet2verd.2j",       0x0000001, 0x200000, CRC(46f9205c) SHA1(662b8f910e4ccc1a0e9f3fef0992a92abbebebd0) )
@@ -3310,7 +3313,7 @@ ROM_START( tektagt )
 	ROM_LOAD( "teg1_wave1.ic12",          0x0800000, 0x800000, CRC(dbc74fff) SHA1(601b7e7361ea744b34e3fa1fc39d88641de7f4c6) )
 ROM_END
 
-ROM_START( tektagtja )
+ROM_START( tektagtja3 )
 	ROM_REGION32_LE( 0x0400000, "maincpu:rom", 0 )
 	ROM_LOAD16_BYTE( "teg1vera.2e",       0x0000000, 0x200000, BAD_DUMP CRC(17c4bf36) SHA1(abf2dfb3e35344cf4449ade6e63b36c590d9c131) )
 	ROM_LOAD16_BYTE( "teg1vera.2j",       0x0000001, 0x200000, BAD_DUMP CRC(97cd9524) SHA1(8031cb465db378a6d9db9b132cf1169b94cba7dc) )
@@ -3360,7 +3363,7 @@ ROM_START( tektagtjb )
 	ROM_LOAD( "teg1_wave1.ic12",          0x0800000, 0x800000, CRC(dbc74fff) SHA1(601b7e7361ea744b34e3fa1fc39d88641de7f4c6) )
 ROM_END
 
-ROM_START( tektagtjc )
+ROM_START( tektagtjc1 )
 	ROM_REGION32_LE( 0x0400000, "maincpu:rom", 0 )
 	ROM_LOAD16_BYTE( "teg1verc1.2e",      0x0000000, 0x200000, CRC(adbdfc2e) SHA1(e18458efb0f9b341970132b512d2e5104a942c6e) )
 	ROM_LOAD16_BYTE( "teg1verc1.2j",      0x0000001, 0x200000, CRC(2fa33418) SHA1(e15f4c8cc4309ebb90d8d015b1f17f75ce5c8879) )
@@ -3385,7 +3388,7 @@ ROM_START( tektagtjc )
 	ROM_LOAD( "teg1_wave1.ic12",          0x0800000, 0x800000, CRC(dbc74fff) SHA1(601b7e7361ea744b34e3fa1fc39d88641de7f4c6) )
 ROM_END
 
-ROM_START( tektagtua )
+ROM_START( tektagtub )
 	ROM_REGION32_LE( 0x0400000, "maincpu:rom", 0 )
 	ROM_LOAD16_BYTE( "teg3verb.2l",       0x0000000, 0x200000, CRC(97df2855) SHA1(c1b61df8e79348424f4bd2660ab5179ef21bdb07) )
 	ROM_LOAD16_BYTE( "teg3verb.2p",       0x0000001, 0x200000, CRC(1dbe7591) SHA1(af464caa03fdd12024ad482e9c853a36510bfba7) )
@@ -3410,7 +3413,7 @@ ROM_START( tektagtua )
 	ROM_LOAD( "teg1_wave1.ic12",          0x0800000, 0x800000, CRC(dbc74fff) SHA1(601b7e7361ea744b34e3fa1fc39d88641de7f4c6) )
 ROM_END
 
-ROM_START( tektagtub )
+ROM_START( tektagtuc1 )
 	ROM_REGION32_LE( 0x0400000, "maincpu:rom", 0 )
 	ROM_LOAD16_BYTE( "teg3verc1.2l",      0x0000000, 0x200000, CRC(1efb7b85) SHA1(0623bb6571caf046ff7b4f83f11ee84a92c4b462) )
 	ROM_LOAD16_BYTE( "teg3verc1.2p",      0x0000001, 0x200000, CRC(7caef9b2) SHA1(5c56d69ba2f723d0a4fbe4902196efc6ba9d5094) )
@@ -3435,7 +3438,7 @@ ROM_START( tektagtub )
 	ROM_LOAD( "teg1_wave1.ic12",          0x0800000, 0x800000, CRC(dbc74fff) SHA1(601b7e7361ea744b34e3fa1fc39d88641de7f4c6) )
 ROM_END
 
-ROM_START( tektagtwa )
+ROM_START( tektagtc1a )
 	ROM_REGION32_LE( 0x0400000, "maincpu:rom", 0 )
 	ROM_LOAD16_BYTE( "teg2ver_c1.2e",     0x0000000, 0x200000, CRC(c0800960) SHA1(80fc8910ebb2399b3be3c9ea87cc1d9283b42676) )
 	ROM_LOAD16_BYTE( "teg2ver_c1.2j",     0x0000001, 0x200000, CRC(c0476713) SHA1(e51e4f3cd20ad6838fb05aaede0ab288e145e7a2) )
@@ -3489,7 +3492,7 @@ ROM_START( tenkomor )
 	ROM_LOAD( "tkm1wave1.1",              0x0800000, 0x800000, CRC(7567796b) SHA1(99e4b867477da2ccddfa9bebc4be84adc5cba53c) )
 ROM_END
 
-ROM_START( tenkomorja )
+ROM_START( tenkomorja1 )
 	ROM_REGION32_LE( 0x0400000, "maincpu:rom", 0 )
 	ROM_LOAD16_BYTE( "tkm1vera.2e",       0x0000000, 0x200000, CRC(d4c89229) SHA1(aba6686eef924868b3bd2142fd073303fe9c4042) )
 	ROM_LOAD16_BYTE( "tkm1vera.2j",       0x0000001, 0x200000, CRC(a6bfcaf4) SHA1(55dfa65e07a63a413f6eb47084e60b4fc32bcde5) )
@@ -3587,22 +3590,22 @@ ROM_END
 
 //    YEAR  NAME        PARENT    MACHINE   INPUT     CLASS                   INIT        ROT   COMPANY            FULLNAME, FLAGS
 GAME( 1996, tekken3,    0,        coh700,   tekken3,  namcos12_state,         empty_init, ROT0, "Namco",           "Tekken 3 (World, TET2/VER.E1)", 0 ) /* KC006 */
-GAME( 1996, tekken3wa,  tekken3,  coh700,   tekken3,  namcos12_state,         empty_init, ROT0, "Namco",           "Tekken 3 (World, TET2/VER.A)", 0 ) /* KC006 */
-GAME( 1996, tekken3wb,  tekken3,  coh700,   tekken3,  namcos12_state,         empty_init, ROT0, "Namco",           "Tekken 3 (World, TET2/VER.B)", 0 ) /* KC006 */
-GAME( 1996, tekken3wc,  tekken3,  coh700,   tekken3,  namcos12_state,         empty_init, ROT0, "Namco",           "Tekken 3 (World, TET2/VER.C)", 0 ) /* KC006 */
-GAME( 1996, tekken3wd,  tekken3,  coh700,   tekken3,  namcos12_state,         empty_init, ROT0, "Namco",           "Tekken 3 (World, TET2/VER.D)", 0 ) /* KC006 */
+GAME( 1996, tekken3a,   tekken3,  coh700,   tekken3,  namcos12_state,         empty_init, ROT0, "Namco",           "Tekken 3 (World, TET2/VER.A)", 0 ) /* KC006 */
+GAME( 1996, tekken3b,   tekken3,  coh700,   tekken3,  namcos12_state,         empty_init, ROT0, "Namco",           "Tekken 3 (World, TET2/VER.B)", 0 ) /* KC006 */
+GAME( 1996, tekken3c,   tekken3,  coh700,   tekken3,  namcos12_state,         empty_init, ROT0, "Namco",           "Tekken 3 (World, TET2/VER.C)", 0 ) /* KC006 */
+GAME( 1996, tekken3d,   tekken3,  coh700,   tekken3,  namcos12_state,         empty_init, ROT0, "Namco",           "Tekken 3 (World, TET2/VER.D)", 0 ) /* KC006 */
 GAME( 1996, tekken3ua,  tekken3,  coh700,   tekken3,  namcos12_state,         empty_init, ROT0, "Namco",           "Tekken 3 (US, TET3/VER.A)", 0 ) /* KC006 */
-GAME( 1996, tekken3ub,  tekken3,  coh700,   tekken3,  namcos12_state,         empty_init, ROT0, "Namco",           "Tekken 3 (US, TET3/VER.D)", 0 ) /* KC006 */
+GAME( 1996, tekken3ud,  tekken3,  coh700,   tekken3,  namcos12_state,         empty_init, ROT0, "Namco",           "Tekken 3 (US, TET3/VER.D)", 0 ) /* KC006 */
 GAME( 1996, tekken3ja,  tekken3,  coh700,   tekken3,  namcos12_state,         empty_init, ROT0, "Namco",           "Tekken 3 (Japan, TET1/VER.A)", 0 ) /* KC006 */
-GAME( 1996, tekken3jb,  tekken3,  coh700,   tekken3,  namcos12_state,         empty_init, ROT0, "Namco",           "Tekken 3 (Japan, TET1/VER.E1)", 0 ) /* KC006 */
+GAME( 1996, tekken3je1, tekken3,  coh700,   tekken3,  namcos12_state,         empty_init, ROT0, "Namco",           "Tekken 3 (Japan, TET1/VER.E1)", 0 ) /* KC006 */
 GAME( 1997, lbgrande,   0,        coh700,   lbgrande, namcos12_state,         empty_init, ROT0, "Namco",           "Libero Grande (World, LG2/VER.A)", 0 ) /* KC014 */
 GAME( 1997, toukon3,    0,        coh700,   lbgrande, namcos12_state,         empty_init, ROT0, "Namco / Tomy",    "Shin Nihon Pro Wrestling Toukon Retsuden 3 Arcade Edition (Japan, TR1/VER.A)", MACHINE_IMPERFECT_GRAPHICS ) /* KC019 */
 GAME( 1998, soulclbr,   0,        coh700,   namcos12, namcos12_state,         empty_init, ROT0, "Namco",           "Soul Calibur (World, SOC12/VER.A2)", 0 ) /* KC020 */
-GAME( 1998, soulclbraa, soulclbr, coh700,   namcos12, namcos12_state,         empty_init, ROT0, "Namco",           "Soul Calibur (Asia, SOC14/VER.B)", 0 ) /* KC020 */
-GAME( 1998, soulclbrab, soulclbr, coh700,   namcos12, namcos12_state,         empty_init, ROT0, "Namco",           "Soul Calibur (Asia, SOC14/VER.C)", 0 ) /* KC020 */
-GAME( 1998, soulclbrua, soulclbr, coh700,   namcos12, namcos12_state,         empty_init, ROT0, "Namco",           "Soul Calibur (US, SOC13/VER.B)", 0 ) /* KC020 */
-GAME( 1998, soulclbrub, soulclbr, coh700,   namcos12, namcos12_state,         empty_init, ROT0, "Namco",           "Soul Calibur (US, SOC13/VER.C)", 0 ) /* KC020 */
-GAME( 1998, soulclbrja, soulclbr, coh700,   namcos12, namcos12_state,         empty_init, ROT0, "Namco",           "Soul Calibur (Japan, SOC11/VER.A2)", 0 ) /* KC020 */
+GAME( 1998, soulclbrab, soulclbr, coh700,   namcos12, namcos12_state,         empty_init, ROT0, "Namco",           "Soul Calibur (Asia, SOC14/VER.B)", 0 ) /* KC020 */
+GAME( 1998, soulclbrac, soulclbr, coh700,   namcos12, namcos12_state,         empty_init, ROT0, "Namco",           "Soul Calibur (Asia, SOC14/VER.C)", 0 ) /* KC020 */
+GAME( 1998, soulclbrub, soulclbr, coh700,   namcos12, namcos12_state,         empty_init, ROT0, "Namco",           "Soul Calibur (US, SOC13/VER.B)", 0 ) /* KC020 */
+GAME( 1998, soulclbruc, soulclbr, coh700,   namcos12, namcos12_state,         empty_init, ROT0, "Namco",           "Soul Calibur (US, SOC13/VER.C)", 0 ) /* KC020 */
+GAME( 1998, soulclbrja2,soulclbr, coh700,   namcos12, namcos12_state,         empty_init, ROT0, "Namco",           "Soul Calibur (Japan, SOC11/VER.A2)", 0 ) /* KC020 */
 GAME( 1998, soulclbrjb, soulclbr, coh700,   namcos12, namcos12_state,         empty_init, ROT0, "Namco",           "Soul Calibur (Japan, SOC11/VER.B)", 0 ) /* KC020 */
 GAME( 1998, soulclbrjc, soulclbr, coh700,   namcos12, namcos12_state,         empty_init, ROT0, "Namco",           "Soul Calibur (Japan, SOC11/VER.C)", 0 ) /* KC020 */
 GAME( 1998, ehrgeiz,    0,        coh700,   lbgrande, namcos12_state,         empty_init, ROT0, "Square / Namco",  "Ehrgeiz (World, EG2/VER.A)", 0 ) /* KC021 */
@@ -3613,7 +3616,7 @@ GAME( 1998, aplarail,   0,        aplarail, aplarail, namcos12_state,         em
 GAME( 1998, mdhorse,    0,        coh700,   mdhorse,  namcos12_altbank_state, empty_init, ROT0, "MOSS / Namco",    "Derby Quiz My Dream Horse (Japan, MDH1/VER.A2)", 0 ) /* KC035 */
 GAME( 1998, technodr,   0,        technodr, technodr, technodr_state,         empty_init, ROT0, "Namco",           "Techno Drive (Japan, TH1/VER.B)", 0 ) /* KC056 */
 GAME( 1998, tenkomor,   0,        coh700b,  namcos12, namcos12_state,         empty_init, ROT90,"Namco",           "Tenkomori Shooting (World, TKM2/VER.A1)", 0 ) /* KC036 */
-GAME( 1998, tenkomorja, tenkomor, coh700b,  namcos12, namcos12_state,         empty_init, ROT90,"Namco",           "Tenkomori Shooting (Japan, TKM1/VER.A1)", 0 ) /* KC036 */
+GAME( 1998, tenkomorja1,tenkomor, coh700b,  namcos12, namcos12_state,         empty_init, ROT90,"Namco",           "Tenkomori Shooting (Japan, TKM1/VER.A1)", 0 ) /* KC036 */
 GAME( 1998, fgtlayer,   0,        coh700b,  lbgrande, namcos12_state,         empty_init, ROT0, "Arika / Namco",   "Fighting Layer (Asia, FTL3/VER.A)", 0 ) /* KC037 */
 GAME( 1998, fgtlayerja, fgtlayer, coh700b,  lbgrande, namcos12_state,         empty_init, ROT0, "Arika / Namco",   "Fighting Layer (Japan, FTL0/VER.A)", 0 ) /* KC037 */
 GAME( 1998, pacapp,     0,        coh700b,  pacapp,   namcos12_state,         empty_init, ROT0, "Produce / Namco", "Paca Paca Passion (Japan, PPP1/VER.A2)", 0 ) /* KC038 */
@@ -3621,17 +3624,17 @@ GAME( 1999, ptblank2,   0,        coh700b,  ptblank2, ptblank2_state,         em
 GAME( 1999, gunbarl,    ptblank2, coh700b,  ptblank2, ptblank2_state,         empty_init, ROT0, "Namco",           "Gunbarl (Japan, GNB4/VER.A)", 0 ) /* KC042 */
 GAME( 1999, sws99,      0,        coh700,   namcos12, namcos12_state,         empty_init, ROT0, "Namco",           "Super World Stadium '99 (Japan, SS91/VER.A3)", 0 ) /* KC043 */
 GAME( 1999, tektagt,    0,        coh700b,  namcos12, tektagt_state,          empty_init, ROT0, "Namco",           "Tekken Tag Tournament (World, TEG2/VER.C1, set 1)", 0 ) /* KC044 */
-GAME( 1999, tektagtwa,  tektagt,  coh700b,  namcos12, tektagt_state,          empty_init, ROT0, "Namco",           "Tekken Tag Tournament (World, TEG2/VER.C1, set 2)", 0 ) /* KC044 */
-GAME( 1999, tektagtua,  tektagt,  coh700b,  namcos12, tektagt_state,          empty_init, ROT0, "Namco",           "Tekken Tag Tournament (US, TEG3/VER.B)", 0 ) /* KC044 */
-GAME( 1999, tektagtub,  tektagt,  coh700b,  namcos12, tektagt_state,          empty_init, ROT0, "Namco",           "Tekken Tag Tournament (US, TEG3/VER.C1)", 0 ) /* KC044 */
-GAME( 1999, tektagtja,  tektagt,  coh700b,  namcos12, tektagt_state,          empty_init, ROT0, "Namco",           "Tekken Tag Tournament (Japan, TEG1/VER.A3)", MACHINE_NOT_WORKING ) /* KC044 */
+GAME( 1999, tektagtc1a, tektagt,  coh700b,  namcos12, tektagt_state,          empty_init, ROT0, "Namco",           "Tekken Tag Tournament (World, TEG2/VER.C1, set 2)", 0 ) /* KC044 */
+GAME( 1999, tektagtub,  tektagt,  coh700b,  namcos12, tektagt_state,          empty_init, ROT0, "Namco",           "Tekken Tag Tournament (US, TEG3/VER.B)", 0 ) /* KC044 */
+GAME( 1999, tektagtuc1, tektagt,  coh700b,  namcos12, tektagt_state,          empty_init, ROT0, "Namco",           "Tekken Tag Tournament (US, TEG3/VER.C1)", 0 ) /* KC044 */
+GAME( 1999, tektagtja3, tektagt,  coh700b,  namcos12, tektagt_state,          empty_init, ROT0, "Namco",           "Tekken Tag Tournament (Japan, TEG1/VER.A3)", MACHINE_NOT_WORKING ) /* KC044 */
 GAME( 1999, tektagtjb,  tektagt,  coh700b,  namcos12, tektagt_state,          empty_init, ROT0, "Namco",           "Tekken Tag Tournament (Japan, TEG1/VER.B)", MACHINE_NOT_WORKING ) /* KC044 */
-GAME( 1999, tektagtjc,  tektagt,  coh700b,  namcos12, tektagt_state,          empty_init, ROT0, "Namco",           "Tekken Tag Tournament (Japan, TEG1/VER.C1)", 0 ) /* KC044 */
+GAME( 1999, tektagtjc1, tektagt,  coh700b,  namcos12, tektagt_state,          empty_init, ROT0, "Namco",           "Tekken Tag Tournament (Japan, TEG1/VER.C1)", 0 ) /* KC044 */
 GAME( 1999, ghlpanic,   0,        coh700b,  ghlpanic, ptblank2_state,         empty_init, ROT0, "Eighting / Raizing / Namco", "Ghoul Panic (World, OB2/VER.A)", 0 ) /* KC045 */
 GAME( 1999, ohbakyuun,  ghlpanic, coh700b,  ghlpanic, ptblank2_state,         empty_init, ROT0, "Eighting / Raizing / Namco", "Oh! Bakyuuun (Japan, OB1/VER.A)", 0 ) /* KC045 */
 GAME( 1999, pacapp2,    0,        coh700b,  pacapp2,  namcos12_state,         empty_init, ROT0, "Produce / Namco", "Paca Paca Passion 2 (Japan, PKS1/VER.A)", 0 ) /* KC046 */
 GAME( 1999, mrdrillr,   0,        coh700b,  mrdrillr, namcos12_state,         empty_init, ROT0, "Namco",           "Mr. Driller (US, DRI3/VER.A2)", 0 ) /* KC048 */
-GAME( 1999, mrdrillrja, mrdrillr, coh700b,  mrdrillr, namcos12_state,         empty_init, ROT0, "Namco",           "Mr. Driller (Japan, DRI1/VER.A2)", 0 ) /* KC048 */
+GAME( 1999, mrdrillrja2,mrdrillr, coh700b,  mrdrillr, namcos12_state,         empty_init, ROT0, "Namco",           "Mr. Driller (Japan, DRI1/VER.A2)", 0 ) /* KC048 */
 GAME( 1999, ujlnow,     0,        cdxa_pcb, ujlnow,   namcos12_cdxa_state,    empty_init, ROT0, "Namco",           "Um Jammer Lammy NOW! (Japan, UL1/VER.A)", 0 ) /* KC049 */
 GAME( 1999, kaiunqz,    0,        coh700,   mdhorse,  namcos12_altbank_state, empty_init, ROT0, "Namco",           "Kaiun Quiz (Japan, KW1/VER.A)", 0 ) /* KC050 */
 GAME( 1999, pacappsp,   0,        coh700b,  pacapp2,  namcos12_state,         empty_init, ROT0, "Produce / Namco", "Paca Paca Passion Special (Japan, PSP1/VER.A)", 0 ) /* KC052 */

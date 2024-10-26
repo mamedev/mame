@@ -28,12 +28,6 @@ protected:
 	virtual void device_reset() override ATTR_COLD;
 
 private:
-	required_memory_region m_gfx_region;
-
-	required_region_ptr<u16> m_adata;
-	required_region_ptr<u16> m_bdata;
-
-	/* video-related */
 	struct sprite_t
 	{
 		int x = 0, y = 0;
@@ -44,27 +38,37 @@ private:
 		u8 flip = 0, pri = 0;
 	};
 
-	std::unique_ptr<sprite_t[]> m_spritelist;
-	struct sprite_t *m_sprite_ptr_pre = nullptr;
-	tilemap_t     *m_bg_tilemap = nullptr;
-	tilemap_t     *m_tx_tilemap = nullptr;
+	required_memory_region m_gfx_region;
 
-	u32 m_aoffset = 0;
-	u8 m_abit = 0;
-	u32 m_boffset = 0;
+	required_region_ptr<u16> m_adata;
+	required_region_ptr<u16> m_bdata;
+
+	devcb_read16 m_readspriteram_cb; // for reading spritelist from mainram
+
+	std::unique_ptr<sprite_t[]> m_spritelist;
+	sprite_t *m_sprite_ptr_pre;
+	tilemap_t *m_bg_tilemap;
+	tilemap_t *m_tx_tilemap;
+
+	u32 m_aoffset;
+	u8 m_abit;
+	u32 m_boffset;
 
 	std::unique_ptr<uint16_t []> m_videoregs;
 	std::unique_ptr<uint16_t []> m_videoram;
 
-	devcb_read16 m_readspriteram_cb; // for reading spritelist from mainram
+	// working variables, don't need saving
+	u16 *m_bg_videoram = nullptr;
+	u16 *m_tx_videoram = nullptr;
+	u16 *m_rowscrollram = nullptr;
 
-	inline void pgm_draw_pix(int xdrawpos, int pri, u16* dest, u8* destpri, const rectangle &cliprect, u16 srcdat);
-	inline void pgm_draw_pix_nopri(int xdrawpos, u16* dest, u8* destpri, const rectangle &cliprect, u16 srcdat);
-	inline void pgm_draw_pix_pri(int xdrawpos, u16* dest, u8* destpri, const rectangle &cliprect, u16 srcdat);
-	inline u8 get_sprite_pix();
-	void draw_sprite_line(int wide, u16* dest, u8* destpri, const rectangle &cliprect, int xzoom, bool xgrow, int flip, int xpos, int pri, int realxsize, int palt, bool draw);
+	void pgm_draw_pix(int xdrawpos, int pri, u16 *dest, u8 *destpri, const rectangle &cliprect, u16 srcdat);
+	void pgm_draw_pix_nopri(int xdrawpos, u16 *dest, u8 *destpri, const rectangle &cliprect, u16 srcdat);
+	void pgm_draw_pix_pri(int xdrawpos, u16 *dest, u8 *destpri, const rectangle &cliprect, u16 srcdat);
+	u8 get_sprite_pix();
+	void draw_sprite_line(int wide, u16 *dest, u8 *destpri, const rectangle &cliprect, int xzoom, bool xgrow, int flip, int xpos, int pri, int realxsize, int palt, bool draw);
 	void draw_sprite_new_zoomed(int wide, int high, int xpos, int ypos, int palt, int flip, bitmap_ind16 &bitmap, const rectangle &cliprect, bitmap_ind8 &priority_bitmap, u32 xzoom, bool xgrow, u32 yzoom, bool ygrow, int pri);
-	void draw_sprite_line_basic(int wide, u16* dest, u8* destpri, const rectangle &cliprect, int flip, int xpos, int pri, int realxsize, int palt, bool draw);
+	void draw_sprite_line_basic(int wide, u16 *dest, u8 *destpri, const rectangle &cliprect, int flip, int xpos, int pri, int realxsize, int palt, bool draw);
 	void draw_sprite_new_basic(int wide, int high, int xpos, int ypos, int palt, int flip, bitmap_ind16 &bitmap, const rectangle &cliprect, bitmap_ind8 &priority_bitmap, int pri);
 	void draw_sprites(bitmap_ind16& spritebitmap, const rectangle &cliprect, bitmap_ind8& priority_bitmap);
 
@@ -75,11 +79,6 @@ private:
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 
 	DECLARE_GFXDECODE_MEMBER(gfxinfo);
-
-	// working variables, don't need saving
-	u16 *m_bg_videoram = nullptr;
-	u16 *m_tx_videoram = nullptr;
-	u16 *m_rowscrollram = nullptr;
 };
 
 DECLARE_DEVICE_TYPE(IGS023_VIDEO, igs023_video_device)
