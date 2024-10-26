@@ -25,7 +25,7 @@ TODO (most of these should be generic hash rulesets but anyway ...):
 - de-cloneize data disks, use comma separated info name="datadisk" instead;
 - Verify disk labels, several are mislabeled (i.e. has numbers instead of letters and viceversa);
 - Mark as baddump any SW disk(s) that sports non-default factory saves;
-- identify any FDI that has a size bigger than 1265664 (== 3'5" floppy image);
+- Verify .hdm 3.5" entries, all of them but 100best35 may be really 5.25" instead.
 - document any unorthodox way for running a given sw;
 - document (and support) alternative file types (FDD, NFD, FIX)
   can we convert some of those to FDI or D88? or some protection schemes need
@@ -38,6 +38,7 @@ TODO (most of these should be generic hash rulesets but anyway ...):
 - Identify any software that uses the MAD Factory NAX.EXE driver for Otomi-chan Kai sound board;
 - Find a bulletproof way to anti-virus scan all disks, particularly true for DOS SWs;
 - DIR the Wizard98 disks and understand how they works exactly (those supposedly are cracks for copy protected disks);
+- Fill in isbn codes for all the coverdiscs (which should tell already without the need of a separate category);
 
 -->
 
@@ -1420,7 +1421,7 @@ Utility disk file "BMENU." sports ugly GFX cyan fills (especially noticeable whe
 		</part>
 	</software>
 
-<!-- !Game (RPG) makers -->
+<!-- !Construction tools (Game makers) -->
 
 	<software name="bakasuka">
 		<description>Bakasuka Wars</description>
@@ -1462,6 +1463,132 @@ Not extensively tested, running game start will moan about missing files
 			<feature name="part_id" value="Data Disk 2"/>
 			<dataarea name="flop" size="1265664">
 				<rom name="rpg_dat2.fdi" size="1265664" crc="5b9054c9" sha1="4bd65922955d9594d0db884d60065c12029684e8" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ldb_advm" supported="no">
+		<description>LOGiN Disk &amp; Book Series - Adventure Tsukuuru 98 (5.25&quot; Disks)</description>
+		<year>1992</year>
+		<publisher>アスキー (ASCII)</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="1261568">
+				<rom name="login_adventure_maker_98_5.25_1.hdm" size="1261568" crc="c27d848b" sha1="597d21b6164fe6e5966d203332e39df7ec1f93f1" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2"/>
+			<dataarea name="flop" size="1261568">
+				<rom name="login_adventure_maker_98_5.25_2.hdm" size="1261568" crc="6f1c63d7" sha1="52dcba7f44863c8676b042a60072ae0bc321f196" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ldb_advm35" cloneof="ldb_advm" supported="no">
+		<description>LOGiN Disk &amp; Book Series - Adventure Tsukuuru 98 (3.5&quot; Disks)</description>
+		<year>1992</year>
+		<publisher>アスキー (ASCII)</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="1261568">
+				<rom name="login_adventure_maker_98_3.5_1.hdm" size="1261568" crc="c27d848b" sha1="597d21b6164fe6e5966d203332e39df7ec1f93f1" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 2"/>
+			<dataarea name="flop" size="1261568">
+				<rom name="login_adventure_maker_98_3.5_2.hdm" size="1261568" crc="6f1c63d7" sha1="52dcba7f44863c8676b042a60072ae0bc321f196" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ldb_char" supported="no">
+		<description>LOGiN Disk &amp; Book Series - Character Tsukuuru 98 (5.25&quot; Disks)</description>
+		<year>1992</year>
+		<publisher>アスキー (ASCII)</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="1261568">
+				<rom name="login_character_maker_98_5.25_1.hdm" size="1261568" crc="e815fb98" sha1="412510c9ba287b8ece6059c5848f94ff32169633" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2"/>
+			<dataarea name="flop" size="1261568">
+				<rom name="login_character_maker_98_5.25_2_skip.hdm" size="1261568" crc="1d68bcc4" sha1="872ec884991cd17f0d9bc96d09449a69d9fa8eee" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ldb_char35" cloneof="ldb_char" supported="no">
+		<description>LOGiN Disk &amp; Book Series - Character Tsukuuru 98 (3.5&quot; Disks)</description>
+		<year>1994</year>
+		<publisher>アスキー (ASCII)</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="1261568">
+				<rom name="login_character_maker_98_3.5_1.hdm" size="1261568" crc="652fcd60" sha1="90b4196fdbd6bf5cd4474cf7250d9c9a75393e37" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 2"/>
+			<dataarea name="flop" size="704512">
+				<rom name="login_character_maker_98_3.5_2_skip.hdm" size="704512" crc="7d0d1d69" sha1="ac90e467bb859f1cbb7e2c12c3700980c968538e" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ldb_dnte">
+		<description>LOGiN Disk &amp; Book Series - RPG Tsukuuru Dante98</description>
+		<year>1992</year>
+		<publisher>アスキー (ASCII)</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk A"/>
+			<dataarea name="flop" size="1281968">
+				<rom name="rpg_school_dante98_a.d88" size="1281968" crc="be55154f" sha1="79452d1b9af62a6f85d84896097214a82dbbf945" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk B"/>
+			<dataarea name="flop" size="1281968">
+				<rom name="rpg_school_dante98_b.d88" size="1281968" crc="bd982024" sha1="3d39202659628a4316fd33a16db8138acec817df" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ldb_dntea" cloneof="ldb_dnte" supported="no">
+		<description>LOGiN Disk &amp; Book Series - RPG Tsukuuru Dante98 (alt)</description>
+		<year>1992</year>
+		<publisher>アスキー (ASCII)</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk A"/>
+			<dataarea name="flop" size="1261568">
+				<rom name="dante_a.hdm" size="1261568" crc="7d023354" sha1="137fb286c22dfba138f655701d26d1bf120abec6" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk B"/>
+			<dataarea name="flop" size="1261568">
+				<rom name="dante_b.hdm" size="1261568" crc="41732f7f" sha1="2de6e817b412b24f977a6eb090edf7a7d4dd8d11" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ldb_shot" supported="no">
+		<description>LOGiN Disk &amp; Book Series - Shooting Tsukuuru 98</description>
+		<year>199?</year>
+		<publisher>アスキー (ASCII)</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="1261824">
+				<rom name="login_shooting_maker_98_1.dim" size="1261824" crc="3c36890e" sha1="8fb66501d62999338e4b71e5b47103122974318e" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2"/>
+			<dataarea name="flop" size="1261824">
+				<rom name="login_shooting_maker_98_2.dim" size="1261824" crc="99036750" sha1="fbd3fffa4a5155f38a8821a0419ca4022a0d8526" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1582,6 +1709,124 @@ Not extensively tested, running game start will moan about missing files
 		</part>
 	</software>
 
+	<software name="ldb_16am" supported="no">
+		<description>LOGiN Disk &amp; Book Series - 16 Colour Anime Tsukuuru</description>
+		<year>1994</year>
+		<publisher>アスキー (ASCII)</publisher>
+		<info name="alt_title" value="LOGiN DISK&amp;BOOKシリーズ 16色ぱたぱたアニメツクール" />
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="1261568">
+				<rom name="16_colour_anime_maker_1.hdm" size="1261568" crc="88fb5434" sha1="010810286610ee661114ae4443d4ef8896ab17b2" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2"/>
+			<dataarea name="flop" size="1261568">
+				<rom name="16_colour_anime_maker_2.hdm" size="1261568" crc="b3b57f9d" sha1="c00467e2711d2b2d65f8a180097b1e2c0c7505cb" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 3"/>
+			<dataarea name="flop" size="1261568">
+				<rom name="16_colour_anime_maker_3.hdm" size="1261568" crc="b0a2ee86" sha1="4b86f9833a6fcf6d44637b56facf8ed9fb009b0b" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ldb_256c" supported="no">
+		<description>LOGiN Disk &amp; Book Series - 256 Colour Paint Tool</description>
+		<year>1994</year>
+		<publisher>アスキー (ASCII)</publisher>
+		<info name="alt_title" value="LOGiN DISK&amp;BOOKシリーズ 256色お絵描きツール" />
+		<info name="usage" value="PC9821 only, as the name implies" />
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="1261568">
+				<rom name="256_colour_paint_tool_1.hdm" size="1261568" crc="67595923" sha1="bf5d728c6af6357dbcfccd4517e94eed00d3c3b3" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2"/>
+			<dataarea name="flop" size="1261568">
+				<rom name="256_colour_paint_tool_2.hdm" size="1261568" crc="a6563b90" sha1="6bdec98a13d7580cde885508276908215efa017a" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ldb_draw" supported="no">
+		<description>LOGiN Disk &amp; Book Series - Drawing Tool (5.25&quot; Disk)</description>
+		<year>1992</year>
+		<publisher>アスキー (ASCII)</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261568">
+				<rom name="drawing_tool_5in.hdm" size="1261568" crc="bb356266" sha1="037d6ec354b76576a5f6f79913003234d9b4d20f" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+
+	<software name="ldb_draw35" cloneof="ldb_draw" supported="no">
+		<description>LOGiN Disk &amp; Book Series - Drawing Tool (3.5&quot; Disk)</description>
+		<year>1992</year>
+		<publisher>アスキー (ASCII)</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1261568">
+				<rom name="drawing_tool_3in.hdm" size="1261568" crc="bb356266" sha1="037d6ec354b76576a5f6f79913003234d9b4d20f" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- TODO: isbn supposedly 978-4756108562, which should be different depending on if they really released as separate formats -->
+	<software name="ldb_polm">
+		<description>LOGiN Disk &amp; Book Series - Polygon Modeling Tsukuuru (5.25&quot; Disk)</description>
+		<year>1992</year>
+		<publisher>アスキー (ASCII)</publisher>
+		<info name="alt_title" value="ポリゴンモデリングツクール" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261568">
+				<rom name="polygon_5in.hdm" size="1261568" crc="79de37e4" sha1="16a2e40fc82e7bf9096c014298c9b13c86343547" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- TODO: despite filename this doesn't look 3.5" -->
+	<software name="ldb_polm35" cloneof="ldb_polm">
+		<description>LOGiN Disk &amp; Book Series - Polygon Modeling Tsukuuru (5.25&quot; Disk, alt)</description>
+		<year>1992</year>
+		<publisher>アスキー (ASCII)</publisher>
+		<info name="alt_title" value="ポリゴンモデリングツクール" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261568">
+				<rom name="polygon_3in.hdm" size="1261568" crc="79de37e4" sha1="16a2e40fc82e7bf9096c014298c9b13c86343547" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ldb_poly" supported="no">
+		<description>LOGiN Disk &amp; Book Series - Polygon Shooting Tsukuuru (5.25&quot; Disk)</description>
+		<year>1993?</year>
+		<publisher>アスキー (ASCII)</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="5.25&quot; version"/>
+			<dataarea name="flop" size="1261568">
+				<rom name="polygon_shooting_tsukuru_5.hdm" size="1261568" crc="25745efe" sha1="2ddd45909f10301d4cc1b11a07f9426ebdcdb2db" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- TODO: again filename hints as a 3.5" version when it's not, cfr. ldb_polm -->
+	<software name="ldb_poly35" cloneof="ldb_poly" supported="no">
+		<description>LOGiN Disk &amp; Book Series - Polygon Shooting Tsukuuru (5.25&quot; Disk, alt)</description>
+		<year>1993?</year>
+		<publisher>アスキー (ASCII)</publisher>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="1261568">
+				<rom name="polygon_shooting_tsukuru_3.hdm" size="1261568" crc="25745efe" sha1="2ddd45909f10301d4cc1b11a07f9426ebdcdb2db" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="magicart" supported="partial">
 		<description>Magical Art</description>
 		<!-- '89 most of the disk, .cfg file made in '90 (non-factory save?)-->
@@ -1652,6 +1897,23 @@ Not extensively tested
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1261568">
 				<rom name="computer_music_vol_20.hdm" size="1261568" crc="224add53" sha1="a5525c72344632d10b6e4d759f8b476b4927b7f8" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ldb_onga" supported="yes">
+		<description>LOGiN Disk &amp; Book Series - Ongaku Tsukuruu - LOGiN Museum Edition</description>
+		<year>1994</year>
+		<publisher>アスキー (ASCII)</publisher>
+		<notes><![CDATA[
+FM and PSG music maker
+]]></notes>
+		<info name="alt_title" value="LOGiN DISK&amp;BOOKシリーズ 音楽ツクール ログイン版ミュージアム" />
+		<info name="developer" value="Victor Entertainment" />
+		<info name="isbn" value="9784756108555" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261568">
+				<rom name="ongaku_tkool.hdm" size="1261568" crc="059f18ae" sha1="56b525fe1e624071b07917485644ee8fd53c58b1" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -2425,6 +2687,26 @@ Fails to boot with ワクチンプログラムの実行ができません (canno
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1261568">
 				<rom name="cyber_vaccine_itekomashi.hdm" size="1261568" crc="66855f4f" sha1="24561692874e2433ace0c821dd86578838159933" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ekispert" supported="yes">
+		<description>Ekispert (Orange Software crack)</description>
+		<!-- NOTE: original is '93 -->
+		<year>1994</year>
+		<publisher>ヴァル研究所 (Val Laboratory)</publisher>
+		<notes><![CDATA[
+Rail route viewer
+Contains extra PASSWORD.COM file crack which decodes serial number required for installation
+Contains extra EX.DOC explaining what's above for
+]]></notes>
+		<info name="alt_title" value="駅すぱあと" />
+		<info name="usage" value="Run INSTALL.EXE from DOS" />
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="1261568">
+				<rom name="ekispert.hdm" size="1261568" crc="221c3902" sha1="81483f82d8eca109d8aebcf282b4d65a0e004b03" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -18390,24 +18672,6 @@ Hangs during intro (regression?)
 		</part>
 	</software>
 
-	<!--
-	    This image includes a program called PASSWORD.COM which decodes the USER.ID file and shows the name and serial needed for installation.
-	    Probably not part of the original distribution.
-	-->
-	<software name="ekispert">
-		<description>Ekispert</description>
-		<year>1993</year>
-		<publisher>ヴァル研究所 (Val Laboratory)</publisher>
-		<info name="alt_title" value="駅すぱあと" />
-		<info name="usage" value="Run INSTALL.EXE from DOS" />
-		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 1"/>
-			<dataarea name="flop" size="1261568">
-				<rom name="ekispert.hdm" size="1261568" crc="221c3902" sha1="81483f82d8eca109d8aebcf282b4d65a0e004b03" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="ekudora">
 		<description>Ekudorado - Kagami no Naka no Oukoku</description>
 		<year>1997</year>
@@ -30520,26 +30784,34 @@ Has optional [RS-MIDI] sound support
 		</part>
 	</software>
 
-	<software name="ldb_dnte">
-		<description>LOGiN Disk &amp; Book Series - RPG Tsukuuru Dante98</description>
-		<year>1992</year>
+	<software name="ldb_sima">
+		<description>LOGiN Disk &amp; Book Series - SimAnt (5.25&quot; Disks)</description>
+		<year>1993</year>
 		<publisher>アスキー (ASCII)</publisher>
+		<info name="alt_title" value="ＬＯＧｉＮ ＤＩＳＫ＆ＢＯＯＫシリーズ - シムアント" />
+		<info name="release" value="19931029" />
 		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Disk A"/>
-			<dataarea name="flop" size="1281968">
-				<rom name="rpg_school_dante98_a.d88" size="1281968" crc="be55154f" sha1="79452d1b9af62a6f85d84896097214a82dbbf945" offset="0" />
+			<dataarea name="flop" size="1261568">
+				<rom name="simant_5in.hdm" size="1261568" crc="07a347d5" sha1="761a2d0967053b6b8e3932fca2bdc780833f60cf" offset="0" />
 			</dataarea>
 		</part>
-		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Disk B"/>
-			<dataarea name="flop" size="1281968">
-				<rom name="rpg_school_dante98_b.d88" size="1281968" crc="bd982024" sha1="3d39202659628a4316fd33a16db8138acec817df" offset="0" />
+	</software>
+
+	<software name="ldb_sima35" cloneof="ldb_sima" supported="no">
+		<description>LOGiN Disk &amp; Book Series - SimAnt (3.5&quot; Disks)</description>
+		<year>1993</year>
+		<publisher>アスキー (ASCII)</publisher>
+		<info name="alt_title" value="ＬＯＧｉＮ ＤＩＳＫ＆ＢＯＯＫシリーズ - シムアント" />
+		<info name="release" value="19931029" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1261568">
+				<rom name="simant_3in.hdm" size="1261568" crc="07a347d5" sha1="761a2d0967053b6b8e3932fca2bdc780833f60cf" offset="0" />
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="ldb_simaa" cloneof="ldb_sima">
-		<description>LOGiN Disk &amp; Book Series - SimAnt (alt)</description>
+		<description>LOGiN Disk &amp; Book Series - SimAnt (5.25&quot; Disks, alt)</description>
 		<year>1993</year>
 		<publisher>アスキー (ASCII)</publisher>
 		<info name="alt_title" value="ＬＯＧｉＮ ＤＩＳＫ＆ＢＯＯＫシリーズ シムアント" />
@@ -35620,32 +35892,33 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 		<publisher>ポイズンブレス (Poison Breath)</publisher>
 		<info name="alt_title" value="人間昆虫 覗き" />
 		<info name="release" value="19970221" />
+		<!-- Disk labels assumed from disk filename IDs -->
 		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 1"/>
+			<feature name="part_id" value="Disk A"/>
 			<dataarea name="flop" size="1265664">
 				<rom name="konchu_01.fdi" size="1265664" crc="e3105b8d" sha1="db71e1e2fab3d5b5175cfb7515c9a78c9ab64989" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 2"/>
+			<feature name="part_id" value="Disk B"/>
 			<dataarea name="flop" size="1265664">
 				<rom name="konchu_02.fdi" size="1265664" crc="6e691919" sha1="fedd76f4fc230b7caff776f5cabf14348e2353d9" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 3"/>
+			<feature name="part_id" value="Disk C"/>
 			<dataarea name="flop" size="1265664">
 				<rom name="konchu_03.fdi" size="1265664" crc="5bcb4819" sha1="3a8b6a83d4956477709f7866c22c4122fbc6f4ea" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop4" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 4"/>
+			<feature name="part_id" value="Disk D"/>
 			<dataarea name="flop" size="1265664">
 				<rom name="konchu_04.fdi" size="1265664" crc="beb29916" sha1="c6071d0f0b01e9102e855518be9c3c39d608d57b" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop5" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 5"/>
+			<feature name="part_id" value="Disk E"/>
 			<dataarea name="flop" size="1265664">
 				<rom name="konchu_05.fdi" size="1265664" crc="4812ec59" sha1="202766861a39467b16533a2e1852b1469b6a537f" offset="0" />
 			</dataarea>
@@ -64089,84 +64362,7 @@ Cutoff [kanji] LR right side (verify, should be fixed)
 		</part>
 	</software>
 
-	<software name="ldb_16am" supported="no">
-		<description>LOGiN Disk &amp; Book Series - 16 Colour Anime Tsukuuru</description>
-		<year>1994</year>
-		<publisher>アスキー (ASCII)</publisher>
-		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 1"/>
-			<dataarea name="flop" size="1261568">
-				<rom name="16_colour_anime_maker_1.hdm" size="1261568" crc="88fb5434" sha1="010810286610ee661114ae4443d4ef8896ab17b2" offset="0" />
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 2"/>
-			<dataarea name="flop" size="1261568">
-				<rom name="16_colour_anime_maker_2.hdm" size="1261568" crc="b3b57f9d" sha1="c00467e2711d2b2d65f8a180097b1e2c0c7505cb" offset="0" />
-			</dataarea>
-		</part>
-		<part name="flop3" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 3"/>
-			<dataarea name="flop" size="1261568">
-				<rom name="16_colour_anime_maker_3.hdm" size="1261568" crc="b0a2ee86" sha1="4b86f9833a6fcf6d44637b56facf8ed9fb009b0b" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="ldb_256c" supported="no">
-		<description>LOGiN Disk &amp; Book Series - 256 Colour Paint Tool</description>
-		<year>1994</year>
-		<publisher>アスキー (ASCII)</publisher>
-		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 1"/>
-			<dataarea name="flop" size="1261568">
-				<rom name="256_colour_paint_tool_1.hdm" size="1261568" crc="67595923" sha1="bf5d728c6af6357dbcfccd4517e94eed00d3c3b3" offset="0" />
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 2"/>
-			<dataarea name="flop" size="1261568">
-				<rom name="256_colour_paint_tool_2.hdm" size="1261568" crc="a6563b90" sha1="6bdec98a13d7580cde885508276908215efa017a" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="ldb_advm" supported="no">
-		<description>LOGiN Disk &amp; Book Series - Adventure Tsukuuru 98 (5.25&quot; Disks)</description>
-		<year>1992</year>
-		<publisher>アスキー (ASCII)</publisher>
-		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 1"/>
-			<dataarea name="flop" size="1261568">
-				<rom name="login_adventure_maker_98_5.25_1.hdm" size="1261568" crc="c27d848b" sha1="597d21b6164fe6e5966d203332e39df7ec1f93f1" offset="0" />
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 2"/>
-			<dataarea name="flop" size="1261568">
-				<rom name="login_adventure_maker_98_5.25_2.hdm" size="1261568" crc="6f1c63d7" sha1="52dcba7f44863c8676b042a60072ae0bc321f196" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="ldb_advm35" cloneof="ldb_advm" supported="no">
-		<description>LOGiN Disk &amp; Book Series - Adventure Tsukuuru 98 (3.5&quot; Disks)</description>
-		<year>1992</year>
-		<publisher>アスキー (ASCII)</publisher>
-		<part name="flop1" interface="floppy_3_5">
-			<feature name="part_id" value="Disk 1"/>
-			<dataarea name="flop" size="1261568">
-				<rom name="login_adventure_maker_98_3.5_1.hdm" size="1261568" crc="c27d848b" sha1="597d21b6164fe6e5966d203332e39df7ec1f93f1" offset="0" />
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_3_5">
-			<feature name="part_id" value="Disk 2"/>
-			<dataarea name="flop" size="1261568">
-				<rom name="login_adventure_maker_98_3.5_2.hdm" size="1261568" crc="6f1c63d7" sha1="52dcba7f44863c8676b042a60072ae0bc321f196" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
+	<!-- TODO: is cgtsuku a non-coverdisc version of these? -->
 	<software name="ldb_cg3d" supported="no">
 		<description>LOGiN Disk &amp; Book Series - CG Tsukuuru 3D (5.25&quot; Disks)</description>
 		<year>1992</year>
@@ -64203,42 +64399,6 @@ Cutoff [kanji] LR right side (verify, should be fixed)
 		</part>
 	</software>
 
-	<software name="ldb_char" supported="no">
-		<description>LOGiN Disk &amp; Book Series - Character Tsukuuru 98 (5.25&quot; Disks)</description>
-		<year>1992</year>
-		<publisher>アスキー (ASCII)</publisher>
-		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 1"/>
-			<dataarea name="flop" size="1261568">
-				<rom name="login_character_maker_98_5.25_1.hdm" size="1261568" crc="e815fb98" sha1="412510c9ba287b8ece6059c5848f94ff32169633" offset="0" />
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 2"/>
-			<dataarea name="flop" size="1261568">
-				<rom name="login_character_maker_98_5.25_2_skip.hdm" size="1261568" crc="1d68bcc4" sha1="872ec884991cd17f0d9bc96d09449a69d9fa8eee" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="ldb_char35" cloneof="ldb_char" supported="no">
-		<description>LOGiN Disk &amp; Book Series - Character Tsukuuru 98 (3.5&quot; Disks)</description>
-		<year>1994</year>
-		<publisher>アスキー (ASCII)</publisher>
-		<part name="flop1" interface="floppy_3_5">
-			<feature name="part_id" value="Disk 1"/>
-			<dataarea name="flop" size="1261568">
-				<rom name="login_character_maker_98_3.5_1.hdm" size="1261568" crc="652fcd60" sha1="90b4196fdbd6bf5cd4474cf7250d9c9a75393e37" offset="0" />
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_3_5">
-			<feature name="part_id" value="Disk 2"/>
-			<dataarea name="flop" size="704512">
-				<rom name="login_character_maker_98_3.5_2_skip.hdm" size="704512" crc="7d0d1d69" sha1="ac90e467bb859f1cbb7e2c12c3700980c968538e" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="ldb_dccn" supported="no">
 		<description>LOGiN Disk &amp; Book Series - J.B. Harold 3 - D.C. Connection</description>
 		<year>1994</year>
@@ -64261,29 +64421,6 @@ Cutoff [kanji] LR right side (verify, should be fixed)
 			<feature name="part_id" value="Disk 3"/>
 			<dataarea name="flop" size="1261568">
 				<rom name="ldb_dc_connection_3.hdm" size="1261568" crc="76fc47d5" sha1="0596d1ca7631c8340216e57951d8b8c2de1dc9d7" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="ldb_draw" supported="no">
-		<description>LOGiN Disk &amp; Book Series - Drawing Tool (5.25&quot; Disk)</description>
-		<year>1992</year>
-		<publisher>アスキー (ASCII)</publisher>
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="1261568">
-				<rom name="drawing_tool_5in.hdm" size="1261568" crc="bb356266" sha1="037d6ec354b76576a5f6f79913003234d9b4d20f" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-
-	<software name="ldb_draw35" cloneof="ldb_draw" supported="no">
-		<description>LOGiN Disk &amp; Book Series - Drawing Tool (3.5&quot; Disk)</description>
-		<year>1992</year>
-		<publisher>アスキー (ASCII)</publisher>
-		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size="1261568">
-				<rom name="drawing_tool_3in.hdm" size="1261568" crc="bb356266" sha1="037d6ec354b76576a5f6f79913003234d9b4d20f" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -64328,64 +64465,6 @@ Cutoff [kanji] LR right side (verify, should be fixed)
 		</part>
 	</software>
 
-	<software name="ldb_onga" supported="no">
-		<description>LOGiN Disk &amp; Book Series - Ongaku Tsukuruu - LOGiN Museum Edition</description>
-		<year>1993</year>
-		<publisher>アスキー (ASCII)</publisher>
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="1261568">
-				<rom name="ongaku_tkool.hdm" size="1261568" crc="059f18ae" sha1="56b525fe1e624071b07917485644ee8fd53c58b1" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="ldb_polm">
-		<description>LOGiN Disk &amp; Book Series - Polygon Modeling Tsukuuru (5.25&quot; Disk)</description>
-		<year>1992</year>
-		<publisher>アスキー (ASCII)</publisher>
-		<info name="alt_title" value="ポリゴンモデリングツクール" />
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="1261568">
-				<rom name="polygon_5in.hdm" size="1261568" crc="79de37e4" sha1="16a2e40fc82e7bf9096c014298c9b13c86343547" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="ldb_polm35" cloneof="ldb_polm">
-		<description>LOGiN Disk &amp; Book Series - Polygon Modeling Tsukuuru (3.5&quot; Disk)</description>
-		<year>1992</year>
-		<publisher>アスキー (ASCII)</publisher>
-		<info name="alt_title" value="ポリゴンモデリングツクール" />
-		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size="1261568">
-				<rom name="polygon_3in.hdm" size="1261568" crc="79de37e4" sha1="16a2e40fc82e7bf9096c014298c9b13c86343547" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="ldb_poly" supported="no">
-		<description>LOGiN Disk &amp; Book Series - Polygon Shooting Tsukuuru (5.25&quot; Disk)</description>
-		<year>1994</year>
-		<publisher>アスキー (ASCII)</publisher>
-		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="5.25&quot; version"/>
-			<dataarea name="flop" size="1261568">
-				<rom name="polygon_shooting_tsukuru_5.hdm" size="1261568" crc="25745efe" sha1="2ddd45909f10301d4cc1b11a07f9426ebdcdb2db" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="ldb_poly35" cloneof="ldb_poly" supported="no">
-		<description>LOGiN Disk &amp; Book Series - Polygon Shooting Tsukuuru (3.5&quot; Disk)</description>
-		<year>1994</year>
-		<publisher>アスキー (ASCII)</publisher>
-		<part name="flop2" interface="floppy_3_5">
-			<dataarea name="flop" size="1261568">
-				<rom name="polygon_shooting_tsukuru_3.hdm" size="1261568" crc="25745efe" sha1="2ddd45909f10301d4cc1b11a07f9426ebdcdb2db" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="ldb_rivh" supported="no">
 		<description>LOGiN Disk &amp; Book Series - Riverhill Mystery Selection (5.25&quot; Disks)</description>
 		<year>1993</year>
@@ -64418,68 +64497,6 @@ Cutoff [kanji] LR right side (verify, should be fixed)
 			<feature name="part_id" value="Disk 2"/>
 			<dataarea name="flop" size="1261568">
 				<rom name="jbh_3in_2.hdm" size="1261568" crc="e741763a" sha1="d64d2e14ac241cdb91d3bc4c560219f25cb4087b" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="ldb_dntea" cloneof="ldb_dnte" supported="no">
-		<description>LOGiN Disk &amp; Book Series - RPG Tsukuuru Dante98 (alt)</description>
-		<year>1992</year>
-		<publisher>アスキー (ASCII)</publisher>
-		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Disk A"/>
-			<dataarea name="flop" size="1261568">
-				<rom name="dante_a.hdm" size="1261568" crc="7d023354" sha1="137fb286c22dfba138f655701d26d1bf120abec6" offset="0" />
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Disk B"/>
-			<dataarea name="flop" size="1261568">
-				<rom name="dante_b.hdm" size="1261568" crc="41732f7f" sha1="2de6e817b412b24f977a6eb090edf7a7d4dd8d11" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="ldb_shot" supported="no">
-		<description>LOGiN Disk &amp; Book Series - Shooting Tsukuuru 98</description>
-		<year>199?</year>
-		<publisher>アスキー (ASCII)</publisher>
-		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 1"/>
-			<dataarea name="flop" size="1261824">
-				<rom name="login_shooting_maker_98_1.dim" size="1261824" crc="3c36890e" sha1="8fb66501d62999338e4b71e5b47103122974318e" offset="0" />
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 2"/>
-			<dataarea name="flop" size="1261824">
-				<rom name="login_shooting_maker_98_2.dim" size="1261824" crc="99036750" sha1="fbd3fffa4a5155f38a8821a0419ca4022a0d8526" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="ldb_sima">
-		<description>LOGiN Disk &amp; Book Series - SimAnt (5.25&quot; Disks)</description>
-		<year>1993</year>
-		<publisher>アスキー (ASCII)</publisher>
-		<info name="alt_title" value="ＬＯＧｉＮ ＤＩＳＫ＆ＢＯＯＫシリーズ - シムアント" />
-		<info name="release" value="19931029" />
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="1261568">
-				<rom name="simant_5in.hdm" size="1261568" crc="07a347d5" sha1="761a2d0967053b6b8e3932fca2bdc780833f60cf" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="ldb_sima35" cloneof="ldb_sima">
-		<description>LOGiN Disk &amp; Book Series - SimAnt (3.5&quot; Disks)</description>
-		<year>1993</year>
-		<publisher>アスキー (ASCII)</publisher>
-		<info name="alt_title" value="ＬＯＧｉＮ ＤＩＳＫ＆ＢＯＯＫシリーズ - シムアント" />
-		<info name="release" value="19931029" />
-		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size="1261568">
-				<rom name="simant_3in.hdm" size="1261568" crc="07a347d5" sha1="761a2d0967053b6b8e3932fca2bdc780833f60cf" offset="0" />
 			</dataarea>
 		</part>
 	</software>
