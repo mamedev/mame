@@ -105,7 +105,7 @@ class m68010_tekmmu_device : public m68010_device
 
 		//if (m_emmu_enabled)
 		if (spacenum == AS_PROGRAM)
-		if ((get_fc() & 4) == 0)			// only in User mode
+		if (!(m_s_flag & 4))			// only in User mode
 		if (BIT(*m_map_control, MAP_VM_ENABLE))
 		{
 			if (intention == TR_WRITE)
@@ -115,12 +115,21 @@ class m68010_tekmmu_device : public m68010_device
 				return false;
 			}
 
+			if (BIT(m_map[address >> 12], 11, 3) != (*m_map_control & 7))
+			{
+				return false;
+			}
+			
 			// dont try and translate a null page
 			if (BIT(m_map[address >> 12], 11, 3) != 0)
 			{
 				LOG("memory_translate: map %08x => paddr(%08x)\n",(address), (BIT(address, 0, 12) | (BIT(m_map[address >> 12], 0, 11) << 12) ) );
 			
 				address = BIT(address, 0, 12) | (BIT(m_map[address >> 12], 0, 11) << 12);
+			}
+			else
+			{
+				return false;
 			}
 		}
 		
