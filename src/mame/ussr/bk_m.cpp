@@ -17,13 +17,13 @@ void bk_state::machine_start()
 {
 	save_item(NAME(m_scroll));
 	save_item(NAME(m_sel1));
-	save_item(NAME(m_drive));
 }
 
 void bk_state::machine_reset()
 {
 	m_sel1 = SEL1_KEYDOWN | SEL1_MOTOR;
 	m_scroll = 01330;
+	m_monitor = ioport("CONFIG")->read();
 }
 
 void bk_state::reset_w(int state)
@@ -90,7 +90,53 @@ void bk_state::trap_w(uint16_t data)
 	m_maincpu->pulse_input_line(t11_device::BUS_ERROR, attotime::zero);
 }
 
-u32 bk_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+QUICKLOAD_LOAD_MEMBER(bk_state::quickload_cb)
+{
+	if (image.length() > 0100000)
+		return std::make_pair(image_error::INVALIDLENGTH, "File too long (must be no larger than 32 KB)");
+
+	address_space &space = m_maincpu->space(AS_PROGRAM);
+	uint16_t addr, size, offset;
+
+	image.fread(&addr, 2);
+	addr = little_endianize_int16(addr);
+	image.fread(&size, 2);
+	size = little_endianize_int16(size);
+	logerror("bk bin load: addr %06o size %06o\n", addr, size);
+
+	std::vector<uint16_t> buffer((size+1)/2);
+	image.fread(&buffer[0], size);
+
+	space.write_word(0264, addr);
+	space.write_word(0266, size);
+
+	offset = 0;
+	size /= 2;
+	while (size-- > 0)
+	{
+		space.write_word(addr, little_endianize_int16(buffer[offset]));
+		addr += 2;
+		offset++;
+	}
+
+	return std::make_pair(std::error_condition(), std::string());
+}
+
+void bk_state::bk0010_palette(palette_device &palette)
+{
+	palette.set_pen_color(0, rgb_t(0, 0, 0));
+	palette.set_pen_color(1, rgb_t(0, 0, 255));
+	palette.set_pen_color(2, rgb_t(0, 255, 0));
+	palette.set_pen_color(3, rgb_t(255, 0, 0));
+	palette.set_pen_color(4, rgb_t(255, 255, 255));
+}
+
+void bk_state::update_monitor(int state)
+{
+	m_monitor = state;
+}
+
+u32 bk_state::screen_update_10(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	u16 const mini = !BIT(m_scroll, 9);
 	u16 const nOfs = (m_scroll & 255) + (mini ? 40 : -216);
@@ -100,8 +146,20 @@ u32 bk_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const r
 		for (u16 x = 0; x < 32; x++)
 		{
 			u16 const code = (y > 63 && mini) ? 0 : m_vram[((y+nOfs) %256)*32 + x];
-			for (u8 b = 0; b < 16; b++)
-				bitmap.pix(y, x*16 + b) =  BIT(code, b);
+			if (m_monitor)
+			{
+				for (u8 b = 0; b < 16; b += 2)
+				{
+					int pixel = (code >> b) & 3;
+					bitmap.pix(y, x*16 + b) = pixel;
+					bitmap.pix(y, x*16 + b + 1) = pixel;
+				}
+			}
+			else
+			{
+				for (u8 b = 0; b < 16; b++)
+					bitmap.pix(y, x*16 + b) = BIT(code, b) << 2;
+			}
 		}
 	}
 	return 0;

@@ -34,11 +34,13 @@ public:
 	auto virq_wr_callback() { return m_write_virq.bind(); }
 	auto keydown_wr_callback() { return m_write_keydown.bind(); }
 	auto halt_wr_callback() { return m_write_halt.bind(); }
+	auto extra_wr_callback() { return m_write_extra.bind(); }
 
 	uint16_t read(offs_t offset);
 	void write(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
 	DECLARE_INPUT_CHANGED_MEMBER(stop_button);
+	DECLARE_INPUT_CHANGED_MEMBER(extra_button);
 
 protected:
 	// device-level overrides
@@ -60,6 +62,7 @@ private:
 	devcb_write_line m_write_virq;
 	devcb_write_line m_write_keydown;
 	devcb_write_line m_write_halt;
+	devcb_write_line m_write_extra;
 
 	uint8_t m_rxrdy;
 

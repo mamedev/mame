@@ -57,6 +57,10 @@ void bk_state::bk0010fd_mem(address_map &map)
 
 /* Input ports */
 static INPUT_PORTS_START( bk0010 )
+	PORT_START("CONFIG")
+	PORT_CONFNAME(0x01, 0x00, "Monitor type") PORT_WRITE_LINE_MEMBER(FUNC(bk_state::update_monitor))
+	PORT_CONFSETTING(0x00, "B&W")
+	PORT_CONFSETTING(0x01, "Color")
 INPUT_PORTS_END
 
 static const z80_daisy_config daisy_chain[] =
@@ -90,6 +94,7 @@ void bk_state::bk0010(machine_config &config)
 					m_sel1 |= SEL1_KEYDOWN;
 			});
 	m_kbd->halt_wr_callback().set_inputline(m_maincpu, t11_device::HLT_LINE);
+	m_kbd->extra_wr_callback().set([this] (int state) { m_monitor ^= 1; });
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -97,10 +102,10 @@ void bk_state::bk0010(machine_config &config)
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
 	screen.set_size(512, 256);
 	screen.set_visarea(0, 512-1, 0, 256-1);
-	screen.set_screen_update(FUNC(bk_state::screen_update));
-	screen.set_palette("palette");
+	screen.set_screen_update(FUNC(bk_state::screen_update_10));
+	screen.set_palette(m_palette);
 
-	PALETTE(config, "palette", palette_device::MONOCHROME);
+	PALETTE(config, m_palette, FUNC(bk_state::bk0010_palette), 5);
 
 	SPEAKER(config, "mono").front_center();
 	DAC_1BIT(config, m_dac, 0).add_route(ALL_OUTPUTS, "mono", 0.25);
@@ -111,6 +116,7 @@ void bk_state::bk0010(machine_config &config)
 	m_cassette->set_interface("bk0010_cass");
 
 	SOFTWARE_LIST(config, "cass_list").set_original("bk0010");
+	QUICKLOAD(config, "quickload", "bin", attotime::from_seconds(6)).set_load_callback(FUNC(bk_state::quickload_cb));
 }
 
 void bk_state::bk0010fd(machine_config &config)

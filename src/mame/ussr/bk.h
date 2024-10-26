@@ -15,7 +15,10 @@
 #include "bus/qbus/qbus.h"
 #include "cpu/t11/t11.h"
 #include "imagedev/cassette.h"
+#include "imagedev/snapquik.h"
 #include "sound/dac.h"
+
+#include "emupal.h"
 
 class bk_state : public driver_device
 {
@@ -24,6 +27,7 @@ public:
 		: driver_device(mconfig, type, tag)
 		, m_vram(*this, "videoram")
 		, m_maincpu(*this, "maincpu")
+		, m_palette(*this, "palette")
 		, m_cassette(*this, "cassette")
 		, m_dac(*this, "dac")
 		, m_kbd(*this, "keyboard")
@@ -32,6 +36,7 @@ public:
 
 	void bk0010(machine_config &config);
 	void bk0010fd(machine_config &config);
+	void update_monitor(int state);
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -48,6 +53,10 @@ private:
 		SEL1_MOTOR   = 0200,
 	};
 
+	uint16_t m_scroll;
+	uint16_t m_sel1;
+	int m_monitor;
+
 	uint16_t vid_scroll_r();
 	uint16_t sel1_r();
 	uint16_t trap_r();
@@ -55,21 +64,23 @@ private:
 	void sel1_w(uint16_t data);
 	void trap_w(uint16_t data);
 	void reset_w(int state);
-	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void bk0010_mem(address_map &map) ATTR_COLD;
-	void bk0010fd_mem(address_map &map) ATTR_COLD;
+	uint32_t screen_update_10(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	required_shared_ptr<uint16_t> m_vram;
 	required_device<k1801vm1_device> m_maincpu;
+	required_device<palette_device> m_palette;
 	required_device<cassette_image_device> m_cassette;
 	required_device<dac_bit_interface> m_dac;
 	required_device<k1801vp014_device> m_kbd;
 	required_device<qbus_device> m_qbus;
 
-	uint16_t m_scroll = 0U;
-	uint16_t m_sel1 = 0U;
-	uint16_t m_drive = 0U;
+	DECLARE_QUICKLOAD_LOAD_MEMBER(quickload_cb);
+
+	void bk0010_mem(address_map &map) ATTR_COLD;
+	void bk0010fd_mem(address_map &map) ATTR_COLD;
+
+	void bk0010_palette(palette_device &palette);
 };
 
 #endif // MAME_USSR_BK_H
