@@ -1208,24 +1208,24 @@ protected:
 			const auto p1 = player_r(0, 0x32);
 			const auto c1 = coin_r(0, 0x81);
 
-			return ~((BIT(p1, 1) << 7) |
-				(BIT(p1, 4) << 6) |
-				(BIT(p1, 5) << 5) |
-				(BIT(system, 7) << 4) |
+			return ~((BIT(p1, 1) << 7) | // BUTTON1
+				(BIT(p1, 4) << 6) | // DOWN
+				(BIT(p1, 5) << 5) | // UP
+				(BIT(system, 7) << 4) | // TEST
 				(0 << 3) | // unknown input
-				(BIT(~c1, 7) << 2) |
+				(BIT(~c1, 7) << 2) | // counter disconnected
 				(0 << 1) | // unknown input
-				(BIT(c1, 0) << 0));
+				(BIT(c1, 0) << 0)); // COIN
 		}
 		else if (offset == 1)
 		{
 			const auto p1 = player_r(0, 0xf001);
 
-			return ~((BIT(p1, 12) << 4) |
-				(BIT(p1, 13) << 3) |
-				(BIT(p1, 14) << 2) |
-				(BIT(p1, 15) << 1) |
-				(BIT(p1, 0) << 0));
+			return ~((BIT(p1, 12) << 4) | // BUTTON6
+				(BIT(p1, 13) << 3) | // BUTTON5
+				(BIT(p1, 14) << 2) | // BUTTON4
+				(BIT(p1, 15) << 1) | // BUTTON3
+				(BIT(p1, 0) << 0)); // BUTTON2
 		}
 
 		return 0xff;
@@ -1246,9 +1246,20 @@ protected:
 };
 
 
+static INPUT_PORTS_START(namco_csz1)
+	PORT_INCLUDE(namco_tssio)
+
+	PORT_MODIFY("JVS_SCREEN_POSITION_INPUT_X1")
+	PORT_BIT(0xfff, 0x1bf, IPT_LIGHTGUN_X) PORT_CROSSHAIR(X, 1.0, 0.0, 0) PORT_MINMAX(0x040, 0x33f) PORT_SENSITIVITY(100) PORT_KEYDELTA(12)
+
+	PORT_MODIFY("JVS_SCREEN_POSITION_INPUT_Y1")
+	PORT_BIT(0xfff, 0x08f, IPT_LIGHTGUN_Y) PORT_CROSSHAIR(Y, 1.0, 0.0, 0) PORT_MINMAX(0x020, 0x0ff) PORT_SENSITIVITY(100) PORT_KEYDELTA(4)
+INPUT_PORTS_END
+
 ROM_START( namco_csz1 )
 	ROM_REGION( 0x040000, "iocpu", 0 )
 	ROM_LOAD( "csz1prg0a.8f",    0x000000, 0x020000, CRC(8edc36b3) SHA1(b5df211988d856572fcc313480e693c8561784e4) )
+	ROM_FILL( 0x04ed, 1, 0x05 ) // HACK: Increase timeout from 4
 ROM_END
 
 class namco_csz1_device :
@@ -1262,6 +1273,11 @@ public:
 
 protected:
 	// device_t
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD
+	{
+		return m_default_inputs ? INPUT_PORTS_NAME(namco_csz1) : namco_c78_jvs_io_device::device_input_ports();
+	}
+
 	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD
 	{
 		return ROM_NAME(namco_csz1);
