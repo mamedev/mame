@@ -11,17 +11,22 @@
 
 #include "emu.h"
 
-#include "h_88_cass.h"
+#include "h_88_5.h"
 
+#include "formats/h8_cas.h"
+#include "imagedev/cassette.h"
 #include "machine/clock.h"
+#include "machine/i8251.h"
+#include "machine/timer.h"
 
+#include "softlist_dev.h"
 #include "speaker.h"
 
 #define LOG_REG   (1U << 1)
 #define LOG_LINES (1U << 2)
 #define LOG_CASS  (1U << 3)
 #define LOG_FUNC  (1U << 4)
-//#define VERBOSE (0xff)
+#define VERBOSE (0xff)
 
 #include "logmacro.h"
 
@@ -36,33 +41,70 @@
 #define FUNCNAME __PRETTY_FUNCTION__
 #endif
 
-DEFINE_DEVICE_TYPE(HEATH_H88_CASS, heath_h_88_cass_device, "heath_h_88_cass_device", "Heath H-88-5 Cassette Interface");
+namespace {
 
-heath_h_88_cass_device::heath_h_88_cass_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock):
-	device_t(mconfig, HEATH_H88_CASS, tag, owner, 0),
+class h_88_5_device : public device_t, public device_h89bus_right_card_interface
+{
+public:
+	h_88_5_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
+
+	virtual void write(u8 select_lines, u8 offset, u8 data) override;
+	virtual u8 read(u8 select_lines, u8 offset) override;
+
+protected:
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+
+	void uart_rts(u8 data);
+	void uart_tx_empty(u8 data);
+
+	TIMER_DEVICE_CALLBACK_MEMBER(kansas_r);
+	TIMER_DEVICE_CALLBACK_MEMBER(kansas_w);
+
+	required_device<i8251_device> m_uart;
+	required_device<cassette_image_device> m_cass_player;
+	required_device<cassette_image_device> m_cass_recorder;
+
+	u8 m_cass_data[4];
+	bool m_cassbit;
+	bool m_cassold;
+};
+
+h_88_5_device::h_88_5_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock):
+	device_t(mconfig, H89BUS_H_88_5, tag, owner, 0),
+	device_h89bus_right_card_interface(mconfig, *this),
 	m_uart(*this, "uart"),
 	m_cass_player(*this, "cassette_player"),
 	m_cass_recorder(*this, "cassette_recorder")
 {
 }
 
-void heath_h_88_cass_device::write(offs_t reg, u8 val)
+void h_88_5_device::write(u8 select_lines, u8 reg, u8 val)
 {
-	LOGREG("%s: reg: %d val: 0x%02x\n", FUNCNAME, reg, val);
+	if (select_lines & h89bus_device::H89_CASS)
+	{
+		LOGREG("%s: reg: %d val: 0x%02x\n", FUNCNAME, reg, val);
 
-	m_uart->write(reg, val);
+		m_uart->write(reg, val);
+	}
 }
 
-u8 heath_h_88_cass_device::read(offs_t reg)
+u8 h_88_5_device::read(u8 select_lines, u8 reg)
 {
-	u8 val = m_uart->read(reg);
+	if (select_lines & h89bus_device::H89_CASS)
+	{
+		u8 val = m_uart->read(reg);
 
-	LOGREG("%s: reg: %d val: 0x%02x\n", FUNCNAME, reg, val);
+		LOGREG("%s: reg: %d val: 0x%02x\n", FUNCNAME, reg, val);
 
-	return val;
+		return val;
+	}
+
+	return 0;
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(heath_h_88_cass_device::kansas_w)
+TIMER_DEVICE_CALLBACK_MEMBER(h_88_5_device::kansas_w)
 {
 	m_cass_data[3]++;
 
@@ -81,7 +123,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(heath_h_88_cass_device::kansas_w)
 	m_cass_recorder->output(BIT(m_cass_data[3], bit_pos) ? -1.0 : +1.0);
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(heath_h_88_cass_device::kansas_r)
+TIMER_DEVICE_CALLBACK_MEMBER(h_88_5_device::kansas_r)
 {
 	// cassette - turn 1200/2400Hz to a bit
 	m_cass_data[1]++;
@@ -98,28 +140,28 @@ TIMER_DEVICE_CALLBACK_MEMBER(heath_h_88_cass_device::kansas_r)
 	}
 }
 
-void heath_h_88_cass_device::uart_rts(u8 data)
+void h_88_5_device::uart_rts(u8 data)
 {
 	LOGLINES("%s: data: %d\n", FUNCNAME, data);
 
 	m_cass_player->change_state(bool(data) ? CASSETTE_STOPPED : CASSETTE_PLAY, CASSETTE_MASK_UISTATE);
 }
 
-void heath_h_88_cass_device::uart_tx_empty(u8 data)
+void h_88_5_device::uart_tx_empty(u8 data)
 {
 	LOGLINES("%s: data: %d\n", FUNCNAME, data);
 
 	m_cass_recorder->change_state(bool(data) ? CASSETTE_STOPPED : CASSETTE_RECORD, CASSETTE_MASK_UISTATE);
 }
 
-void heath_h_88_cass_device::device_start()
+void h_88_5_device::device_start()
 {
 	save_item(NAME(m_cass_data));
 	save_item(NAME(m_cassbit));
 	save_item(NAME(m_cassold));
 }
 
-void heath_h_88_cass_device::device_reset()
+void h_88_5_device::device_reset()
 {
 	LOGFUNC("%s\n", FUNCNAME);
 
@@ -136,12 +178,12 @@ void heath_h_88_cass_device::device_reset()
 	m_uart->write_rxd(0);
 }
 
-void heath_h_88_cass_device::device_add_mconfig(machine_config &config)
+void h_88_5_device::device_add_mconfig(machine_config &config)
 {
 	I8251(config, m_uart, 0);
 	m_uart->txd_handler().set([this] (bool state) { m_cassbit = state; });
-	m_uart->rts_handler().set(FUNC(heath_h_88_cass_device::uart_rts));
-	m_uart->txempty_handler().set(FUNC(heath_h_88_cass_device::uart_tx_empty));
+	m_uart->rts_handler().set(FUNC(h_88_5_device::uart_rts));
+	m_uart->txempty_handler().set(FUNC(h_88_5_device::uart_tx_empty));
 
 	clock_device &cassette_clock(CLOCK(config, "cassette_clock", 4800));
 	cassette_clock.signal_handler().set(m_uart, FUNC(i8251_device::write_txc));
@@ -161,6 +203,12 @@ void heath_h_88_cass_device::device_add_mconfig(machine_config &config)
 	m_cass_recorder->add_route(ALL_OUTPUTS, "mono", 0.15);
 	m_cass_recorder->set_interface("h88_cass_recorder");
 
-	TIMER(config, "kansas_w").configure_periodic(FUNC(heath_h_88_cass_device::kansas_w), attotime::from_hz(4800));
-	TIMER(config, "kansas_r").configure_periodic(FUNC(heath_h_88_cass_device::kansas_r), attotime::from_hz(40000));
+	SOFTWARE_LIST(config, "cass_list").set_original("h88_cass");
+
+	TIMER(config, "kansas_w").configure_periodic(FUNC(h_88_5_device::kansas_w), attotime::from_hz(4800));
+	TIMER(config, "kansas_r").configure_periodic(FUNC(h_88_5_device::kansas_r), attotime::from_hz(40000));
 }
+
+}
+
+DEFINE_DEVICE_TYPE_PRIVATE(H89BUS_H_88_5, device_h89bus_right_card_interface, h_88_5_device, "h89h_88_5", "Heath H-88-5 Cassette Interface Board");

@@ -14,6 +14,9 @@
 
 #include "mms77316_fdc.h"
 
+#include "imagedev/floppy.h"
+#include "machine/wd_fdc.h"
+
 #define LOG_REG   (1U << 1)    // Shows register setup
 #define LOG_LINES (1U << 2)    // Show control lines
 #define LOG_DRIVE (1U << 3)    // Show drive select
@@ -40,13 +43,58 @@
 #define FUNCNAME __PRETTY_FUNCTION__
 #endif
 
-DEFINE_DEVICE_TYPE(MMS77316_FDC, mms77316_fdc_device, "mms77316_fdc", "Magnolia MicroSystems 77316 Soft-sectored Controller");
+namespace {
+
+class mms77316_fdc_device : public device_t, public device_h89bus_right_card_interface
+{
+public:
+	mms77316_fdc_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
+
+	virtual void write(u8 select_lines, u8 offset, u8 data) override;
+	virtual u8 read(u8 select_lines, u8 offset) override;
+
+protected:
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+
+	void ctrl_w(u8 val);
+	void data_w(u8 val);
+	u8 data_r();
+
+	void set_irq(int state);
+	void set_drq(int state);
+
+	// Burst mode was required for a 2 MHz Z80 to handle 8" DD data rates.
+	// The typical irq/drq was too slow, this utilizes wait states to read the
+	// WD1797 data port once the drq line is high.
+	inline bool burst_mode_r() { return !m_drq_allowed; }
+
+private:
+	required_device<fd1797_device> m_fdc;
+	required_device_array<floppy_connector, 8> m_floppies;
+
+	bool m_irq_allowed;
+	bool m_drq_allowed;
+
+	bool m_irq;
+	bool m_drq;
+	u32 m_drq_count;
+
+	/// Bits set in cmd_ControlPort_c
+	static constexpr u8 ctrl_525DriveSel_c = 2;
+	static constexpr u8 ctrl_EnableIntReq_c = 3;
+	static constexpr u8 ctrl_EnableDrqInt_c = 5;
+	static constexpr u8 ctrl_SetMFMRecording_c = 6;
+
+	static constexpr XTAL MASTER_CLOCK = XTAL(8'000'000);
+	static constexpr XTAL FIVE_IN_CLOCK = MASTER_CLOCK / 8;
+	static constexpr XTAL EIGHT_IN_CLOCK = MASTER_CLOCK / 4;
+};
 
 mms77316_fdc_device::mms77316_fdc_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock):
-	device_t(mconfig, MMS77316_FDC, tag, owner, 0),
-	m_irq_cb(*this),
-	m_drq_cb(*this),
-	m_wait_cb(*this),
+	device_t(mconfig, H89BUS_MMS77316, tag, owner, 0),
+	device_h89bus_right_card_interface(mconfig, *this),
 	m_fdc(*this, "mms_fdc"),
 	m_floppies(*this, "mms_fdc:%u", 0U)
 {
@@ -69,13 +117,13 @@ void mms77316_fdc_device::ctrl_w(u8 val)
 
 	if (m_irq_allowed)
 	{
-		m_irq_cb(m_irq);
-		m_drq_cb(m_drq);
+		set_slot_fdcirq(m_irq);
+		set_slot_fdcdrq(m_drq);
 	}
 	else
 	{
-		m_irq_cb(CLEAR_LINE);
-		m_drq_cb(CLEAR_LINE);
+		set_slot_fdcirq(CLEAR_LINE);
+		set_slot_fdcdrq(CLEAR_LINE);
 	}
 
 	LOGDRIVE("%s: floppydrive: %d, 5.25 in: %d\n", FUNCNAME, floppy_drive, five_in_drv);
@@ -107,16 +155,21 @@ void mms77316_fdc_device::data_w(u8 val)
 	{
 		LOGBURST("%s: burst_mode_r\n", FUNCNAME);
 
-		m_wait_cb(ASSERT_LINE);
+		set_slot_wait(ASSERT_LINE);
 		return;
 	}
 
 	m_fdc->data_w(val);
 }
 
-void mms77316_fdc_device::write(offs_t reg, u8 val)
+void mms77316_fdc_device::write(u8 select_lines, u8 reg, u8 val)
 {
-	LOGREG("%s: reg: %d val: 0x%02x\n", FUNCNAME, reg, val);
+	if (!(select_lines & h89bus_device::H89_GPP))
+	{
+		return;
+	}
+
+	if (reg != 2) LOGREG("%s: reg: %d val: 0x%02x\n", FUNCNAME, reg, val);
 
 	switch (reg)
 	{
@@ -153,7 +206,7 @@ u8 mms77316_fdc_device::data_r()
 
 		if (!machine().side_effects_disabled())
 		{
-			m_wait_cb(ASSERT_LINE);
+			set_slot_wait(ASSERT_LINE);
 		}
 	}
 	else
@@ -166,8 +219,13 @@ u8 mms77316_fdc_device::data_r()
 	return data;
 }
 
-u8 mms77316_fdc_device::read(offs_t reg)
+u8 mms77316_fdc_device::read(u8 select_lines, u8 reg)
 {
+	if (!(select_lines & h89bus_device::H89_GPP))
+	{
+		return 0;
+	}
+
 	// default return for the h89
 	u8 value = 0xff;
 
@@ -215,9 +273,9 @@ void mms77316_fdc_device::device_reset()
 	m_irq         = false;
 	m_drq_count   = 0;
 
-	m_irq_cb(CLEAR_LINE);
-	m_drq_cb(CLEAR_LINE);
-	m_wait_cb(CLEAR_LINE);
+	set_slot_fdcirq(CLEAR_LINE);
+	set_slot_fdcdrq(CLEAR_LINE);
+	set_slot_wait(CLEAR_LINE);
 
 	for (int i = 0; i < 4; i++)
 	{
@@ -293,11 +351,11 @@ void mms77316_fdc_device::set_irq(int state)
 
 	if (m_irq)
 	{
-		m_wait_cb(CLEAR_LINE);
+		set_slot_wait(CLEAR_LINE);
 		m_drq_count = 0;
 	}
 
-	m_irq_cb(m_irq_allowed ? m_irq : CLEAR_LINE);
+	set_slot_fdcirq(m_irq_allowed ? m_irq : CLEAR_LINE);
 }
 
 void mms77316_fdc_device::set_drq(int state)
@@ -312,13 +370,17 @@ void mms77316_fdc_device::set_drq(int state)
 
 		if (m_drq)
 		{
-			m_wait_cb(CLEAR_LINE);
+			set_slot_wait(CLEAR_LINE);
 		}
 
-		m_drq_cb(m_drq_count == 0 ? m_drq : CLEAR_LINE);
+		set_slot_fdcdrq(m_drq_count == 0 ? m_drq : CLEAR_LINE);
 	}
 	else
 	{
-		m_drq_cb(m_drq_allowed ? m_drq : CLEAR_LINE);
+		set_slot_fdcdrq(m_drq_allowed ? m_drq : CLEAR_LINE);
 	}
 }
+
+}   // anonymous namespace
+
+DEFINE_DEVICE_TYPE_PRIVATE(H89BUS_MMS77316, device_h89bus_right_card_interface, mms77316_fdc_device, "mms77316_fdc", "Magnolia MicroSystems 77316 Soft-sectored Controller");

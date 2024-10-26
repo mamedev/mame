@@ -10,6 +10,9 @@
 
 #include "emu.h"
 
+#include "imagedev/floppy.h"
+#include "machine/wd_fdc.h"
+
 #include "z37_fdc.h"
 
 #define LOG_REG (1U << 1)    // Shows register setup
@@ -32,20 +35,66 @@
 #define FUNCNAME __PRETTY_FUNCTION__
 #endif
 
-DEFINE_DEVICE_TYPE(HEATH_Z37_FDC, heath_z37_fdc_device, "heath_z37_fdc", "Heath H/Z-37 Soft-sectored Controller");
+namespace {
 
-heath_z37_fdc_device::heath_z37_fdc_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock):
-	device_t(mconfig, HEATH_Z37_FDC, tag, owner, 0),
-	m_irq_cb(*this),
-	m_drq_cb(*this),
-	m_block_interrupt_cb(*this),
+class h89bus_z37_device : public device_t, public device_h89bus_right_card_interface
+{
+public:
+	h89bus_z37_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
+
+	virtual void write(u8 select_lines, u8 offset, u8 data) override;
+	virtual u8 read(u8 select_lines, u8 offset) override;
+
+protected:
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+
+	void ctrl_w(u8 val);
+
+	void intf_w(u8 val);
+
+	void cmd_w(u8 val);
+	u8 stat_r();
+
+	void data_w(u8 val);
+	u8 data_r();
+
+	void set_irq(int state);
+	void set_drq(int state);
+
+private:
+	required_device<fd1797_device> m_fdc;
+	required_device_array<floppy_connector, 4> m_floppies;
+
+	bool m_irq_allowed;
+	bool m_drq_allowed;
+	bool m_access_track_sector;
+
+	/// Bits set in cmd_ControlPort_c - DK.CON
+	static constexpr u8 ctrl_EnableIntReq_c = 0;
+	static constexpr u8 ctrl_EnableDrqInt_c = 1;
+	static constexpr u8 ctrl_SetMFMRecording_c = 2;
+	static constexpr u8 ctrl_MotorsOn_c = 3;
+	static constexpr u8 ctrl_Drive_0_c = 4;
+	static constexpr u8 ctrl_Drive_1_c = 5;
+	static constexpr u8 ctrl_Drive_2_c = 6;
+	static constexpr u8 ctrl_Drive_3_c = 7;
+
+	/// Bits to set alternate registers on InterfaceControl_c - DK.INT
+	static constexpr u8 if_SelectSectorTrack_c = 0;
+};
+
+h89bus_z37_device::h89bus_z37_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock):
+	device_t(mconfig, H89BUS_Z37, tag, owner, 0),
+	device_h89bus_right_card_interface(mconfig, *this),
 	m_fdc(*this, "z37_fdc"),
 	m_floppies(*this, "z37_fdc:%u", 0U)
 {
 }
 
 
-void heath_z37_fdc_device::ctrl_w(u8 val)
+void h89bus_z37_device::ctrl_w(u8 val)
 {
 	bool motor_on = bool(BIT(val, ctrl_MotorsOn_c));
 
@@ -58,12 +107,12 @@ void heath_z37_fdc_device::ctrl_w(u8 val)
 
 	if (m_drq_allowed)
 	{
-		m_block_interrupt_cb(1);
+		set_slot_blockirq(1);
 	}
 	else
 	{
-		m_block_interrupt_cb(0);
-		m_drq_cb(0);
+		set_slot_blockirq(0);
+		set_slot_fdcdrq(0);
 	}
 
 	if (BIT(val, ctrl_Drive_0_c))
@@ -102,60 +151,70 @@ void heath_z37_fdc_device::ctrl_w(u8 val)
 	}
 }
 
-void heath_z37_fdc_device::intf_w(u8 val)
+void h89bus_z37_device::intf_w(u8 val)
 {
 	m_access_track_sector = bool(BIT(val, if_SelectSectorTrack_c));
 
 	LOGREG("access track/sector: %d\n", m_access_track_sector);
 }
 
-void heath_z37_fdc_device::cmd_w(u8 val)
+void h89bus_z37_device::cmd_w(u8 val)
 {
 	m_access_track_sector ? m_fdc->sector_w(val) : m_fdc->cmd_w(val);
 }
 
-u8 heath_z37_fdc_device::stat_r()
+u8 h89bus_z37_device::stat_r()
 {
 	return m_access_track_sector ? m_fdc->sector_r() : m_fdc->status_r();
 }
 
-void heath_z37_fdc_device::data_w(u8 val)
+void h89bus_z37_device::data_w(u8 val)
 {
 	m_access_track_sector ? m_fdc->track_w(val) : m_fdc->data_w(val);
 }
 
-u8 heath_z37_fdc_device::data_r()
+u8 h89bus_z37_device::data_r()
 {
 	return m_access_track_sector ? m_fdc->track_r() : m_fdc->data_r();
 }
 
-void heath_z37_fdc_device::write(offs_t reg, u8 val)
+void h89bus_z37_device::write(u8 select_lines, u8 offset, u8 data)
 {
-	LOGFUNC("%s: reg: %d val: 0x%02x\n", FUNCNAME, reg, val);
+	if (!(select_lines & h89bus_device::H89_CASS))
+	{
+		return;
+	}
 
-	switch (reg)
+	LOGFUNC("%s: reg: %d val: 0x%02x\n", FUNCNAME, offset, data);
+
+	switch (offset)
 	{
 	case 0:
-		ctrl_w(val);
+		ctrl_w(data);
 		break;
 	case 1:
-		intf_w(val);
+		intf_w(data);
 		break;
 	case 2:
-		cmd_w(val);
+		cmd_w(data);
 		break;
 	case 3:
-		data_w(val);
+		data_w(data);
 		break;
 	}
 }
 
-u8 heath_z37_fdc_device::read(offs_t reg)
+u8 h89bus_z37_device::read(u8 select_lines, u8 offset)
 {
+	if (!(select_lines & h89bus_device::H89_CASS))
+	{
+		return 0;
+	}
+
 	// default return for the h89
 	u8 value = 0xff;
 
-	switch (reg)
+	switch (offset)
 	{
 	case 0:
 	case 1:
@@ -169,27 +228,27 @@ u8 heath_z37_fdc_device::read(offs_t reg)
 		break;
 	}
 
-	LOGFUNC("%s: reg: %d val: 0x%02x\n", FUNCNAME, reg, value);
+	LOGFUNC("%s: reg: %d val: 0x%02x\n", FUNCNAME, offset, value);
 
 	return value;
 }
 
-void heath_z37_fdc_device::device_start()
+void h89bus_z37_device::device_start()
 {
 	save_item(NAME(m_irq_allowed));
 	save_item(NAME(m_drq_allowed));
 	save_item(NAME(m_access_track_sector));
 }
 
-void heath_z37_fdc_device::device_reset()
+void h89bus_z37_device::device_reset()
 {
 	m_irq_allowed         = false;
 	m_drq_allowed         = false;
 	m_access_track_sector = false;
 
-	m_irq_cb(0);
-	m_drq_cb(0);
-	m_block_interrupt_cb(0);
+	set_slot_fdcirq(0);
+	set_slot_fdcdrq(0);
+	set_slot_blockirq(0);
 }
 
 static void z37_floppies(device_slot_interface &device)
@@ -204,11 +263,11 @@ static void z37_floppies(device_slot_interface &device)
 	device.option_add("qd",   FLOPPY_525_QD);
 }
 
-void heath_z37_fdc_device::device_add_mconfig(machine_config &config)
+void h89bus_z37_device::device_add_mconfig(machine_config &config)
 {
 	FD1797(config, m_fdc, 16_MHz_XTAL / 16);
-	m_fdc->intrq_wr_callback().set(FUNC(heath_z37_fdc_device::set_irq));
-	m_fdc->drq_wr_callback().set(FUNC(heath_z37_fdc_device::set_drq));
+	m_fdc->intrq_wr_callback().set(FUNC(h89bus_z37_device::set_irq));
+	m_fdc->drq_wr_callback().set(FUNC(h89bus_z37_device::set_drq));
 	// Z-89-37 schematics show the ready line tied high.
 	m_fdc->set_force_ready(true);
 
@@ -222,16 +281,20 @@ void heath_z37_fdc_device::device_add_mconfig(machine_config &config)
 	m_floppies[3]->enable_sound(true);
 }
 
-void heath_z37_fdc_device::set_irq(int state)
+void h89bus_z37_device::set_irq(int state)
 {
 	LOGLINES("set irq, allowed: %d state: %d\n", m_irq_allowed, state);
 
-	m_irq_cb(m_irq_allowed ? state : CLEAR_LINE);
+	set_slot_fdcirq(m_irq_allowed ? state : CLEAR_LINE);
 }
 
-void heath_z37_fdc_device::set_drq(int state)
+void h89bus_z37_device::set_drq(int state)
 {
 	LOGLINES("set drq, allowed: %d state: %d\n", m_drq_allowed, state);
 
-	m_drq_cb(m_drq_allowed ? state : CLEAR_LINE);
+	set_slot_fdcdrq(m_drq_allowed ? state : CLEAR_LINE);
 }
+
+}   // anonymous namespace
+
+DEFINE_DEVICE_TYPE_PRIVATE(H89BUS_Z37, device_h89bus_right_card_interface, h89bus_z37_device, "h89_z37", "Heathkit Z-37 Floppy Disk Controller");
