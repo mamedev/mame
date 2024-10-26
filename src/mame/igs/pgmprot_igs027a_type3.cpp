@@ -840,23 +840,23 @@ INPUT_PORTS_END
 
 void pgm_arm_type3_state::init_happy6()
 {
-	u8 *src = (u8 *)(machine().root_device().memregion("tiles")->base()) + 0x180000;
+	u8 *src = (u8 *)(memregion("igs023")->base()) + 0x180000;
 	pgm_descramble_happy6(src);
 	pgm_descramble_happy6_2(src);
 
-	src = (u8 *)(machine().root_device().memregion("sprcol")->base()) + 0x000000;
+	src = (u8 *)(memregion("igs023:sprcol")->base()) + 0x000000;
 	pgm_descramble_happy6(src);
 	pgm_descramble_happy6_2(src);
 
-	src = (u8 *)(machine().root_device().memregion("sprcol")->base()) + 0x0800000;
+	src = (u8 *)(memregion("igs023:sprcol")->base()) + 0x0800000;
 	pgm_descramble_happy6(src);
 	pgm_descramble_happy6_2(src);
 
-	src = (u8 *)(machine().root_device().memregion("sprmask")->base());
+	src = (u8 *)(memregion("igs023:sprmask")->base());
 	pgm_descramble_happy6(src);
 	pgm_descramble_happy6_2(src);
 
-	src = (u8 *)(machine().root_device().memregion("ics")->base()) + 0x400000;
+	src = (u8 *)(memregion("ics")->base()) + 0x400000;
 	pgm_descramble_happy6(src);
 	pgm_descramble_happy6_2(src);
 
