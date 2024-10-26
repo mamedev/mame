@@ -471,20 +471,20 @@ namespace bx
 
 	inline BX_CONST_FUNC float rsqrt(float _a)
 	{
-#if BX_CONFIG_SUPPORTS_SIMD
+#if BX_SIMD_SUPPORTED
 		return rsqrtSimd(_a);
 #else
 		return rsqrtRef(_a);
-#endif // BX_CONFIG_SUPPORTS_SIMD
+#endif // BX_SIMD_SUPPORTED
 	}
 
 	inline BX_CONST_FUNC float sqrt(float _a)
 	{
-#if BX_CONFIG_SUPPORTS_SIMD
+#if BX_SIMD_SUPPORTED
 		return sqrtSimd(_a);
 #else
 		return sqrtRef(_a);
-#endif // BX_CONFIG_SUPPORTS_SIMD
+#endif // BX_SIMD_SUPPORTED
 	}
 
 	inline BX_CONSTEXPR_FUNC float trunc(float _a)

@@ -40,7 +40,7 @@ namespace bx
 
 	BX_SIMD_INLINE void float4x4_mul(float4x4_t* _result, const float4x4_t* _a, const float4x4_t* _b)
 	{
-#if BX_CONFIG_SUPPORTS_SIMD
+#if BX_SIMD_SUPPORTED
 		_result->col[0] = simd_mul(_a->col[0], _b);
 		_result->col[1] = simd_mul(_a->col[1], _b);
 		_result->col[2] = simd_mul(_a->col[2], _b);
@@ -69,12 +69,12 @@ namespace bx
 		rr[13] = aa[12]*bb[ 1] + aa[13]*bb[ 5] + aa[14]*bb[ 9] + aa[15]*bb[13];
 		rr[14] = aa[12]*bb[ 2] + aa[13]*bb[ 6] + aa[14]*bb[10] + aa[15]*bb[14];
 		rr[15] = aa[12]*bb[ 3] + aa[13]*bb[ 7] + aa[14]*bb[11] + aa[15]*bb[15];
-#endif // BX_CONFIG_SUPPORTS_SIMD
+#endif // BX_SIMD_SUPPORTED
 	}
 
 	BX_SIMD_INLINE void model4x4_mul(float4x4_t* _result, const float4x4_t* _a, const float4x4_t* _b)
 	{
-#if BX_CONFIG_SUPPORTS_SIMD
+#if BX_SIMD_SUPPORTED
 		// With SIMD faster to do the general 4x4 form:
 		float4x4_mul(_result, _a, _b);
 #else
@@ -101,12 +101,12 @@ namespace bx
 		rr[13] = aa[12]*bb[ 1] + aa[13]*bb[ 5] + aa[14]*bb[ 9] + bb[13];
 		rr[14] = aa[12]*bb[ 2] + aa[13]*bb[ 6] + aa[14]*bb[10] + bb[14];
 		rr[15] = 1.0f;
-#endif // BX_CONFIG_SUPPORTS_SIMD
+#endif // BX_SIMD_SUPPORTED
 	}
 
 	BX_SIMD_INLINE void model4x4_mul_viewproj4x4(float4x4_t* _result, const float4x4_t* _model, const float4x4_t* _viewProj)
 	{
-#if BX_CONFIG_SUPPORTS_SIMD
+#if BX_SIMD_SUPPORTED
 		// With SIMD faster to do the general 4x4 form:
 		float4x4_mul(_result, _model, _viewProj);
 #else
@@ -132,7 +132,7 @@ namespace bx
 		rr[13] = aa[12]*bb[ 1] + aa[13]*bb[ 5] + aa[14]*bb[ 9] + bb[13];
 		rr[14] = aa[12]*bb[ 2] + aa[13]*bb[ 6] + aa[14]*bb[10] + bb[14];
 		rr[15] = aa[12]*bb[ 3] + aa[13]*bb[ 7] + aa[14]*bb[11] + bb[15];
-#endif // BX_CONFIG_SUPPORTS_SIMD
+#endif // BX_SIMD_SUPPORTED
 	}
 
 	BX_SIMD_FORCE_INLINE void float4x4_transpose(float4x4_t* _result, const float4x4_t* _mtx)

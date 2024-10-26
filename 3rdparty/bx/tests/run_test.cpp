@@ -7,6 +7,7 @@
 #include "test.h"
 #include <bx/string.h>
 #include <bx/file.h>
+#include <bx/simd_t.h>
 
 bool testAssertHandler(const bx::Location& _location, const char* _format, va_list _argList)
 {
@@ -29,15 +30,34 @@ int runAllTests(int _argc, const char* _argv[])
 {
 	bx::setAssertHandler(testAssertHandler);
 
-	DBG("Compiler: " BX_COMPILER_NAME
+	bx::printf(
+		"\nCompiler: " BX_COMPILER_NAME
 		", CPU: " BX_CPU_NAME
 		", Arch: " BX_ARCH_NAME
 		", OS: " BX_PLATFORM_NAME
 		", CRT: " BX_CRT_NAME
 		", C++: " BX_CPP_NAME
+		", SIMD"
+#if BX_SIMD_SUPPORTED
+#	if BX_SIMD_AVX
+		", AVX"
+#	endif // BX_SIMD_AVX
+#	if BX_SIMD_LANGEXT
+		", LangExt"
+#	endif // BX_SIMD_LANGEXT
+#	if BX_SIMD_NEON
+		", Neon"
+#	endif // BX_SIMD_NEON
+#	if BX_SIMD_SSE
+		", SSE"
+#	endif // BX_SIMD_SSE
+#else
+		": Not supported."
+#endif // BX_SIMD_SUPPORTED
 
 		", Date: " __DATE__
 		", Time: " __TIME__
+		"\n\n"
 		);
 
 	using namespace Catch;

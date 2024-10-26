@@ -16,7 +16,7 @@
 #define BX_SIMD_NEON    0
 #define BX_SIMD_SSE     0
 
-#define BX_CONFIG_SUPPORTS_SIMD 0
+#define BX_SIMD_SUPPORTED 0
 
 #if defined(__AVX__) || defined(__AVX2__)
 #	include <immintrin.h>
@@ -36,14 +36,23 @@
 #	include <arm_neon.h>
 #	undef  BX_SIMD_NEON
 #	define BX_SIMD_NEON 1
-#elif   BX_COMPILER_CLANG \
+#elif   BX_COMPILER_CLANG      \
 	&& !BX_PLATFORM_EMSCRIPTEN \
-	&& !BX_PLATFORM_IOS \
-	&& !BX_PLATFORM_VISIONOS \
+	&& !BX_PLATFORM_IOS        \
+	&& !BX_PLATFORM_VISIONOS   \
 	&&  BX_CLANG_HAS_EXTENSION(attribute_ext_vector_type)
 #	undef  BX_SIMD_LANGEXT
 #	define BX_SIMD_LANGEXT 1
 #endif //
+
+#if (  BX_SIMD_AVX     \
+	|| BX_SIMD_LANGEXT \
+	|| BX_SIMD_NEON    \
+	|| BX_SIMD_SSE     \
+	)
+#	undef  BX_SIMD_SUPPORTED
+#	define BX_SIMD_SUPPORTED 1
+#endif // BX_SIMD_*
 
 namespace bx
 {
@@ -492,15 +501,6 @@ BX_SIMD128_IMPLEMENT_TEST(xyzw);
 #	include "inline/simd128_sse.inl"
 #endif // BX_SIMD_SSE
 
-#if (  BX_SIMD_LANGEXT \
-	|| BX_SIMD_NEON    \
-	|| BX_SIMD_SSE     \
-	|| BX_SIMD_AVX     \
-	)
-#	undef  BX_CONFIG_SUPPORTS_SIMD
-#	define BX_CONFIG_SUPPORTS_SIMD 1
-#endif // BX_SIMD_*
-
 namespace bx
 {
 	union simd128_ref_t
@@ -514,7 +514,7 @@ namespace bx
 #	define BX_SIMD_WARN_REFERENCE_IMPL 0
 #endif // BX_SIMD_WARN_REFERENCE_IMPL
 
-#if !BX_CONFIG_SUPPORTS_SIMD
+#if !BX_SIMD_SUPPORTED
 #	if BX_SIMD_WARN_REFERENCE_IMPL
 #		pragma message("*** Using SIMD128 reference implementation! ***")
 #	endif // BX_SIMD_WARN_REFERENCE_IMPL
