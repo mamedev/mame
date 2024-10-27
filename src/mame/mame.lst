@@ -32520,6 +32520,9 @@ multi16                         //
 @source:mitsubishi/trium.cpp
 triumec                         //
 
+@source:moog/source.cpp
+moogsource                      // Moog Source
+
 @source:morrow/microdec.cpp
 md2                             //
 md3                             //
