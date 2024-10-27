@@ -36,9 +36,9 @@ int runAllTests(int _argc, const char* _argv[])
 		", Arch: " BX_ARCH_NAME
 		", OS: " BX_PLATFORM_NAME
 		", CRT: " BX_CRT_NAME
-		", C++: " BX_CPP_NAME
-		", SIMD"
+		", Features: " BX_CPP_NAME
 #if BX_SIMD_SUPPORTED
+		", SIMD"
 #	if BX_SIMD_AVX
 		", AVX"
 #	endif // BX_SIMD_AVX
@@ -51,8 +51,6 @@ int runAllTests(int _argc, const char* _argv[])
 #	if BX_SIMD_SSE
 		", SSE"
 #	endif // BX_SIMD_SSE
-#else
-		": Not supported."
 #endif // BX_SIMD_SUPPORTED
 
 		", Date: " __DATE__
