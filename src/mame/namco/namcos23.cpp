@@ -1493,7 +1493,6 @@ struct namcos23_render_data
 	u8 fogfactor;
 	bool pfade_enabled;
 	u8 fadefactor;
-	bool texture_enabled;
 	bool shade_enabled;
 	bool alpha_enabled;
 	bool blend_enabled;
@@ -3277,7 +3276,6 @@ void namcos23_renderer::render_scanline(s32 scanline, const extent_t& extent, co
 	bool polyfade_enabled = rd.pfade_enabled;
 	rgbaint_t fadecolor = rd.fadecolor;
 	rgbaint_t polycolor = rd.polycolor;
-	bool texture_enabled = rd.texture_enabled;
 	bool shade_enabled = rd.shade_enabled;
 	bool blend_enabled = rd.blend_enabled;
 
@@ -3311,13 +3309,8 @@ void namcos23_renderer::render_scanline(s32 scanline, const extent_t& extent, co
 		bool reject = rd.stencil_lookup(*rd.machine, tx, ty);
 		if (!reject)
 		{
-			u32 tex_rgb = 0xffffff;
-			if (texture_enabled)
-			{
-				ty += rd.tbase;
-				tex_rgb = rd.texture_lookup(*rd.machine, pens, penshift, penmask, tx, ty, pen);
-			}
-
+			ty += rd.tbase;
+			u32 tex_rgb = rd.texture_lookup(*rd.machine, pens, penshift, penmask, tx, ty, pen);
 			rgbaint_t rgb(tex_rgb);
 
 			if (shade_enabled)
@@ -3483,7 +3476,6 @@ void namcos23_state::render_direct_poly(const namcos23_render_entry *re)
 		p->rd.direct = true;
 		p->rd.sprite = false;
 		p->rd.immediate = false;
-		p->rd.texture_enabled = true;
 		p->rd.shade_enabled = true;
 		p->rd.rgb = 0x00ffffff;
 		p->rd.flags = flags;
@@ -3617,7 +3609,6 @@ void namcos23_state::render_immediate(const namcos23_render_entry *re)
 	u32 h    = re->immediate.h;
 	u32 polyshift = re->immediate.zbias;
 	u32 ne   = (type >> 8) & 0xf;
-	bool texture_enabled = BIT(type, 6);
 	bool stencil_enabled = BIT(h, 11);
 
 	float minz = FLT_MAX;
@@ -3683,7 +3674,6 @@ void namcos23_state::render_immediate(const namcos23_render_entry *re)
 		p->rd.direct = false;
 		p->rd.sprite = false;
 		p->rd.immediate = true;
-		p->rd.texture_enabled = texture_enabled;
 		p->rd.shade_enabled = true;
 		p->rd.h = h;
 		p->rd.type = type;
@@ -3738,7 +3728,6 @@ void namcos23_state::render_model(const namcos23_render_entry *re)
 
 		u32 cmode = (type & 0xf0000000) >> 28;
 		u32 tbase = ((type & 0x0f000000) >> 24) << 12;
-		bool texture_enabled = BIT(type, 6);
 		u8 color = (h >> 24) & 0x7f;
 		int lmode = (type >> 19) & 3;
 		int ne = (type >> 8) & 15;
@@ -3960,7 +3949,6 @@ void namcos23_state::render_model(const namcos23_render_entry *re)
 			p->rd.direct = false;
 			p->rd.sprite = false;
 			p->rd.immediate = false;
-			p->rd.texture_enabled = texture_enabled;
 			p->rd.shade_enabled = true;
 			p->rd.h = h;
 			p->rd.type = type;
@@ -4476,16 +4464,23 @@ void namcos23_state::mix_text_layer(screen_device &screen, bitmap_rgb32 &bitmap,
 
 u32 gorgon_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	if (m_c404.layer_flags & 2)
-	{
+	if (m_c404.layer_flags & 2 && !machine().video().skip_this_frame())
 		recalc_czram();
-	}
 
 	return namcos23_state::screen_update(screen, bitmap, cliprect);
 }
 
 u32 namcos23_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
+	if (machine().video().skip_this_frame())
+	{
+		m_render.cur = !m_render.cur;
+		m_render.count[m_render.cur] = 0;
+		m_render.poly_count = 0;
+
+		return UPDATE_HAS_NOT_CHANGED;
+	}
+
 	m_bgtilemap->set_palette_offset(m_c404.palbase);
 	screen.priority().fill(0, cliprect);
 
@@ -6171,6 +6166,7 @@ void gorgon_state::gorgon(machine_config &config)
 	m_screen->set_raw(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART);
 	m_screen->set_screen_update(FUNC(gorgon_state::screen_update));
 	m_screen->screen_vblank().set(FUNC(gorgon_state::vblank));
+	m_screen->set_video_attributes(VIDEO_ALWAYS_UPDATE);
 
 	PALETTE(config, m_palette).set_entries(0x8000);
 
@@ -6247,6 +6243,7 @@ void namcos23_state::s23(machine_config &config)
 	m_screen->set_raw(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART);
 	m_screen->set_screen_update(FUNC(namcos23_state::screen_update));
 	m_screen->screen_vblank().set(FUNC(namcos23_state::vblank));
+	m_screen->set_video_attributes(VIDEO_ALWAYS_UPDATE);
 
 	PALETTE(config, m_palette).set_entries(0x8000);
 
