@@ -577,7 +577,7 @@ void source_state::memory_map(address_map& map)
 void source_state::io_map(address_map& map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0xff).mirror(0xe0).w(FUNC(source_state::cv_w));
+	map(0x00, 0x1f).mirror(0xe0).w(FUNC(source_state::cv_w));
 }
 
 void source_state::machine_start()
