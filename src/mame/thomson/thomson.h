@@ -17,10 +17,12 @@
 
 #include "cpu/m6809/m6809.h"
 #include "imagedev/cassette.h"
+#include "imagedev/floppy.h"
 #include "machine/6821pia.h"
 #include "machine/input_merger.h"
 #include "machine/mc6846.h"
 #include "machine/ram.h"
+#include "machine/wd_fdc.h"
 #include "sound/dac.h"
 #include "bus/thomson/extension.h"
 #include "bus/thomson/nanoreseau.h"
@@ -388,6 +390,8 @@ public:
 		thomson_state(mconfig, type, tag),
 		m_to8_kbd(*this, "to8_kbd"),
 		m_to9_kbd(*this, "to9_kbd"),
+		m_fdc(*this, "fdc"),
+		m_floppy(*this, "fdc:%u", 0U),
 		m_centronics(*this, "centronics"),
 		m_cent_data_out(*this, "cent_data_out"),
 		m_syslobank(*this, TO8_SYS_LO),
@@ -406,6 +410,8 @@ public:
 protected:
 	optional_device<to8_keyboard_device> m_to8_kbd;
 	optional_device<to9_keyboard_device> m_to9_kbd;
+	optional_device<wd_fdc_device_base> m_fdc;
+	optional_device_array<floppy_connector, 2> m_floppy;
 	optional_device<centronics_device> m_centronics;
 	optional_device<output_latch_device> m_cent_data_out;
 
@@ -470,6 +476,10 @@ protected:
 	void to9_sys_porta_out(uint8_t data);
 	void to9_sys_portb_out(uint8_t data);
 	void to9_timer_port_out(uint8_t data);
+	uint8_t to9_fdc_r(offs_t offset);
+	void to9_fdc_w(offs_t offset, uint8_t data);
+	uint8_t to9_floppy_control_r();
+	void to9_floppy_control_w(uint8_t data);
 	DECLARE_MACHINE_RESET( to9 );
 	DECLARE_MACHINE_START( to9 );
 	uint8_t to9p_timer_port_in();
@@ -481,6 +491,7 @@ protected:
 	void to9_map(address_map &map) ATTR_COLD;
 	void to9p_map(address_map &map) ATTR_COLD;
 
+	uint8_t m_to9_floppy_control = 0;
 	uint8_t m_to9_palette_data[32]{};
 	uint8_t m_to9_palette_idx = 0;
 	uint8_t m_to9_soft_bank = 0;

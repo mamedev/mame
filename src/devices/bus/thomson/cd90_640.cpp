@@ -43,7 +43,7 @@ const tiny_rom_entry *cd90_640_device::device_rom_region() const
 
 void cd90_640_device::floppy_drives(device_slot_interface &device)
 {
-	device.option_add("dd90_640", FLOPPY_525_DD);
+	device.option_add("dd90_320", FLOPPY_525_DD);
 }
 
 void cd90_640_device::floppy_formats(format_registration &fr)
@@ -54,7 +54,7 @@ void cd90_640_device::floppy_formats(format_registration &fr)
 void cd90_640_device::device_add_mconfig(machine_config &config)
 {
 	WD1770(config, m_fdc, 8_MHz_XTAL);
-	FLOPPY_CONNECTOR(config, m_floppy[0], floppy_drives, "dd90_640", floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, m_floppy[0], floppy_drives, "dd90_320", floppy_formats).enable_sound(true);
 	FLOPPY_CONNECTOR(config, m_floppy[1], floppy_drives, nullptr,    floppy_formats).enable_sound(true);
 }
 

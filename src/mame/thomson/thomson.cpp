@@ -92,12 +92,11 @@
 #include "bus/thomson/speech.h"
 #include "machine/clock.h"
 #include "machine/ram.h"
-#include "machine/wd_fdc.h"
+#include "machine/thmfc1.h"
 
 #include "softlist_dev.h"
 #include "speaker.h"
 
-#include "formats/basicdsk.h"
 #include "formats/thom_cas.h"
 #include "formats/thom_dsk.h"
 
@@ -473,6 +472,23 @@ INPUT_PORTS_END
 static INPUT_PORTS_START ( t9000 )
 	PORT_INCLUDE ( to7 )
 INPUT_PORTS_END
+
+static void to9_floppy_drives(device_slot_interface &device)
+{
+	device.option_add("dd90_352", FLOPPY_35_DD);
+}
+
+static void to8_floppy_drives(device_slot_interface &device)
+{
+	device.option_add("dd90_352", FLOPPY_35_DD);
+	//  device.option_add("qd90_280", FLOPPY_28_QDD);
+}
+
+static void to35_floppy_formats(format_registration &fr)
+{
+	fr.add_pc_formats();
+	fr.add(FLOPPY_THOMSON_35_FORMAT);
+}
 
 /* ------------ driver ------------ */
 
@@ -1037,7 +1053,7 @@ It was replaced quickly with the improved TO9+.
   - MD 90-120: MODEM extension (identical to the TO7)
   - IEEE extension ? (unemulated)
   - floppy:
-    . integrated floppy controller, based on WD2793
+    . integrated floppy controller, based on WD1770 or WD2793
     . integrated one-sided double-density 3''1/2
     . external two-sided double-density 3''1/2, 5''1/4 or QDD (extension)
     . floppies are TO7 and MO5 compatible
@@ -1057,6 +1073,8 @@ void to9_state::to9_map(address_map &map)
 	map(0xe7c0, 0xe7c7).rw(m_mc6846, FUNC(mc6846_device::read), FUNC(mc6846_device::write));
 	map(0xe7c8, 0xe7cb).rw("pia_0", FUNC(pia6821_device::read_alt), FUNC(pia6821_device::write_alt));
 	map(0xe7cc, 0xe7cf).rw("pia_1", FUNC(pia6821_device::read_alt), FUNC(pia6821_device::write_alt));
+	map(0xe7d0, 0xe7d3).mirror(4).rw(m_fdc, FUNC(wd_fdc_device_base::read), FUNC(wd_fdc_device_base::write));
+	map(0xe7d8, 0xe7d8).rw(FUNC(to9_state::to9_floppy_control_r), FUNC(to9_state::to9_floppy_control_w));
 	map(0xe7da, 0xe7dd).rw(FUNC(to9_state::to9_vreg_r), FUNC(to9_state::to9_vreg_w));
 	map(0xe7de, 0xe7df).rw(m_to9_kbd, FUNC(to9_keyboard_device::kbd_acia_r), FUNC(to9_keyboard_device::kbd_acia_w));
 	map(0xe7e4, 0xe7e7).rw(FUNC(to9_state::to9_gatearray_r), FUNC(to9_state::to9_gatearray_w));
@@ -1164,6 +1182,16 @@ void to9_state::to9(machine_config &config)
 
 	m_mc6846->out_port().set(FUNC(to9_state::to9_timer_port_out));
 
+	WD1770(config, m_fdc, 16_MHz_XTAL / 2);
+	FLOPPY_CONNECTOR(config, m_floppy[0], to9_floppy_drives, "dd90_352", to35_floppy_formats, true).enable_sound(true);
+	FLOPPY_CONNECTOR(config, m_floppy[1], to9_floppy_drives, nullptr,    to35_floppy_formats, false).enable_sound(true);
+
+	m_extension->option_remove("cd90_015");
+	m_extension->option_remove("cq90_028");
+	m_extension->option_remove("cd90_351");
+	m_extension->option_remove("cd90_640");
+	m_extension->option_remove("nanoreseau");
+
 	CENTRONICS(config, m_centronics, centronics_devices, "printer");
 	m_centronics->busy_handler().set(FUNC(to9_state::write_centronics_busy));
 
@@ -1252,6 +1280,7 @@ void to9_state::to8_map(address_map &map)
 	map(0xe7c0, 0xe7c7).rw(m_mc6846, FUNC(mc6846_device::read), FUNC(mc6846_device::write));
 	map(0xe7c8, 0xe7cb).rw("pia_0", FUNC(pia6821_device::read_alt), FUNC(pia6821_device::write_alt));
 	map(0xe7cc, 0xe7cf).rw("pia_1", FUNC(pia6821_device::read_alt), FUNC(pia6821_device::write_alt));
+	map(0xe7d0, 0xe7d7).m("thmfc1", FUNC(thmfc1_device::map));
 	map(0xe7da, 0xe7dd).rw(FUNC(to9_state::to8_vreg_r), FUNC(to9_state::to8_vreg_w));
 	map(0xe7e4, 0xe7e7).rw(FUNC(to9_state::to8_gatearray_r), FUNC(to9_state::to8_gatearray_w));
 /*  map(0xe7f0, 0xe7f7).rw(FUNC(to9_state::to9_ieee_r), FUNC(to9_state::to9_ieee_w )); */
@@ -1361,6 +1390,16 @@ void to9_state::to8(machine_config &config)
 	m_pia_sys->cb2_handler().set_nop();
 	m_pia_sys->irqa_handler().set_nop();
 
+	THMFC1(config, "thmfc1", 16_MHz_XTAL);
+	FLOPPY_CONNECTOR(config, "thmfc1:0", to8_floppy_drives, "dd90_352", to35_floppy_formats, false).enable_sound(true);
+	FLOPPY_CONNECTOR(config, "thmfc1:1", to8_floppy_drives, nullptr,    to35_floppy_formats, false).enable_sound(true);
+
+	m_extension->option_remove("cd90_015");
+	m_extension->option_remove("cq90_028");
+	m_extension->option_remove("cd90_351");
+	m_extension->option_remove("cd90_640");
+	m_extension->option_remove("nanoreseau");
+
 	CENTRONICS(config, m_centronics, centronics_devices, "printer");
 	m_centronics->busy_handler().set(FUNC(to9_state::write_centronics_busy));
 
@@ -1380,6 +1419,7 @@ void to9_state::to8(machine_config &config)
 void to9_state::to8d(machine_config &config)
 {
 	to8(config);
+	subdevice<floppy_connector>("thmfc1:0")->set_fixed(true);
 }
 
 
@@ -1439,6 +1479,7 @@ void to9_state::to9p_map(address_map &map)
 	map(0xe7c0, 0xe7c7).rw(m_mc6846, FUNC(mc6846_device::read), FUNC(mc6846_device::write));
 	map(0xe7c8, 0xe7cb).rw("pia_0", FUNC(pia6821_device::read_alt), FUNC(pia6821_device::write_alt));
 	map(0xe7cc, 0xe7cf).rw("pia_1", FUNC(pia6821_device::read_alt), FUNC(pia6821_device::write_alt));
+	map(0xe7d0, 0xe7d7).m("thmfc1", FUNC(thmfc1_device::map));
 	map(0xe7da, 0xe7dd).rw(FUNC(to9_state::to8_vreg_r), FUNC(to9_state::to8_vreg_w));
 	map(0xe7de, 0xe7df).rw(m_to9_kbd, FUNC(to9_keyboard_device::kbd_acia_r), FUNC(to9_keyboard_device::kbd_acia_w));
 	map(0xe7e4, 0xe7e7).rw(FUNC(to9_state::to8_gatearray_r), FUNC(to9_state::to8_gatearray_w));
@@ -1515,6 +1556,16 @@ void to9_state::to9p(machine_config &config)
 	m_pia_sys->cb2_handler().set_nop();
 	m_pia_sys->irqa_handler().set_nop();
 	m_pia_sys->irqb_handler().set("mainfirq", FUNC(input_merger_device::in_w<1>));
+
+	THMFC1(config, "thmfc1", 16_MHz_XTAL);
+	FLOPPY_CONNECTOR(config, "thmfc1:0", to8_floppy_drives, "dd90_352", to35_floppy_formats, true).enable_sound(true);
+	FLOPPY_CONNECTOR(config, "thmfc1:1", to8_floppy_drives, nullptr,    to35_floppy_formats, false).enable_sound(true);
+
+	m_extension->option_remove("cd90_015");
+	m_extension->option_remove("cq90_028");
+	m_extension->option_remove("cd90_351");
+	m_extension->option_remove("cd90_640");
+	m_extension->option_remove("nanoreseau");
 
 	CENTRONICS(config, m_centronics, centronics_devices, "printer");
 	m_centronics->busy_handler().set(FUNC(to9_state::write_centronics_busy));

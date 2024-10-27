@@ -1728,6 +1728,33 @@ void to9_state::to9_timer_port_out(uint8_t data)
 }
 
 
+
+/* ------------ WD disk controller ------------ */
+
+
+
+void to9_state::to9_floppy_control_w(u8 data)
+{
+	m_to9_floppy_control = data;
+
+	floppy_image_device *floppy = nullptr;
+	if (BIT(m_to9_floppy_control, 1))
+		floppy = m_floppy[0]->get_device();
+	else if (BIT(m_to9_floppy_control, 2))
+		floppy = m_floppy[1]->get_device();
+	if (floppy)
+		floppy->ss_w(BIT(m_to9_floppy_control, 0));
+	m_fdc->set_floppy(floppy);
+
+	m_fdc->dden_w(BIT(m_to9_floppy_control, 7));
+}
+
+uint8_t to9_state::to9_floppy_control_r()
+{
+	return m_to9_floppy_control & 0x80;
+}
+
+
 /* ------------ init / reset ------------ */
 
 
@@ -1780,6 +1807,10 @@ MACHINE_START_MEMBER( to9_state, to9 )
 	m_extension->rom_map(m_maincpu->space(AS_PROGRAM), 0xe000, 0xe7bf);
 	m_extension->io_map (m_maincpu->space(AS_PROGRAM), 0xe7c0, 0xe7ff);
 
+	m_to9_floppy_control = 0;
+	m_fdc->set_floppy(nullptr);
+	m_fdc->dden_w(0);
+
 	/* memory */
 	m_thom_vram = ram;
 	m_thom_cart_bank = 0;
@@ -1799,6 +1830,7 @@ MACHINE_START_MEMBER( to9_state, to9 )
 	save_item(NAME(m_to7_lightpen));
 	save_item(NAME(m_to7_lightpen_step));
 	save_item(NAME(m_to9_soft_bank));
+	save_item(NAME(m_to9_floppy_control));
 	save_pointer(NAME(cartmem), 0x10000 );
 	machine().save().register_postload(save_prepost_delegate(FUNC(to9_state::to9_update_ram_bank_postload), this));
 	machine().save().register_postload(save_prepost_delegate(FUNC(to9_state::to9_update_cart_bank_postload), this));
