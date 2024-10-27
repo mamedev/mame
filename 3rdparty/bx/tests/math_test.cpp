@@ -11,7 +11,6 @@
 #include <stdint.h> // intXX_t
 #include <limits.h> // UCHAR_*
 
-#if !BX_CRT_MINGW
 TEST_CASE("isFinite, isInfinite, isNan", "[math]")
 {
 	for (uint64_t ii = 0; ii < UINT32_MAX; ii += rand()%(1<<13)+1)
@@ -26,14 +25,13 @@ TEST_CASE("isFinite, isInfinite, isNan", "[math]")
 		REQUIRE(!!::isnan(u.f)    == bx::isNan(u.f) );
 		REQUIRE(!!::isfinite(u.f) == bx::isFinite(u.f) );
 		REQUIRE(!!::isinf(u.f)    == bx::isInfinite(u.f) );
-#else
+#elif !BX_CRT_MINGW
 		REQUIRE(::isnanf(u.f)  == bx::isNan(u.f) );
 		REQUIRE(::finitef(u.f) == bx::isFinite(u.f) );
 		REQUIRE(::isinff(u.f)  == bx::isInfinite(u.f) );
-#endif // BX_PLATFORM_OSX
+#endif // BX_*
 	}
 }
-#endif // !BX_CRT_MINGW
 
 bool log2_test(float _a)
 {
