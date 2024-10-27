@@ -355,14 +355,8 @@ void smioc_device::SetDmaParameter(smioc_dma_parameter_t param, u16 value)
 {
 	int address = DmaParameterAddress(param);
 
-	static char const *const paramNames[] = { "smiocdma_sendaddress", "smiocdma_sendlength", "smiocdma_recvaddress", "smiocdma_recvlength" };
-	const char* paramName = "?";
-	if (param >= 0 && param < (sizeof(paramNames) / sizeof(*paramNames)))
-	{
-		paramName = paramNames[param];
-	}
-
-	WriteRamParameter("SetDmaParameter", paramName, address, value);
+	static char const *const paramNames[4] = { "smiocdma_sendaddress", "smiocdma_sendlength", "smiocdma_recvaddress", "smiocdma_recvlength" };
+	WriteRamParameter("SetDmaParameter", paramNames[param & 3], address, value);
 }
 
 u16 smioc_device::ReadDmaParameter(smioc_dma_parameter_t param)
