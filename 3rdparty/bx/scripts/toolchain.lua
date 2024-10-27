@@ -623,12 +623,12 @@ function toolchain(_buildDir, _libDir)
 			"MINGW_HAS_SECURE_API=1",
 		}
 		buildoptions {
+			"-Wa,-mbig-obj",
+			"-Wundef",
 			"-Wunused-value",
 			"-fdata-sections",
 			"-ffunction-sections",
 			"-msse4.2",
-			"-Wunused-value",
-			"-Wundef",
 		}
 		linkoptions {
 			"-Wl,--gc-sections",
