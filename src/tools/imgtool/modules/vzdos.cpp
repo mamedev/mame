@@ -744,7 +744,7 @@ static imgtoolerr_t vzdos_diskimage_writefile(imgtool::partition &partition, con
 	return IMGTOOLERR_SUCCESS;
 }
 
-static imgtoolerr_t vzdos_diskimage_suggesttransfer(imgtool::partition &partition, const char *fname, imgtool_transfer_suggestion *suggestions, size_t suggestions_length)
+static imgtoolerr_t vzdos_diskimage_suggesttransfer(imgtool::partition &partition, const char *fname, imgtool::transfer_suggestion *suggestions, size_t suggestions_length)
 {
 	imgtoolerr_t ret;
 	imgtool::image &image(partition.image());
@@ -756,35 +756,35 @@ static imgtoolerr_t vzdos_diskimage_suggesttransfer(imgtool::partition &partitio
 
 		switch (entry.ftype) {
 			case 'B':
-				suggestions[0].viability = SUGGESTION_RECOMMENDED;
+				suggestions[0].viability = imgtool::SUGGESTION_RECOMMENDED;
 				suggestions[0].filter = filter_vzsnapshot_getinfo;
 				suggestions[0].description = "VZ Snapshot";
-				suggestions[1].viability = SUGGESTION_POSSIBLE;
-				suggestions[1].filter = NULL;
+				suggestions[1].viability = imgtool::SUGGESTION_POSSIBLE;
+				suggestions[1].filter = nullptr;
 				suggestions[1].description = "Raw";
 				break;
 			case 'T':
-				suggestions[0].viability = SUGGESTION_RECOMMENDED;
+				suggestions[0].viability = imgtool::SUGGESTION_RECOMMENDED;
 				suggestions[0].filter = filter_vzsnapshot_getinfo;
 				suggestions[0].description = "VZ Snapshot";
-				suggestions[1].viability = SUGGESTION_POSSIBLE;
-				suggestions[1].filter = NULL;
+				suggestions[1].viability = imgtool::SUGGESTION_POSSIBLE;
+				suggestions[1].filter = nullptr;
 				suggestions[1].description = "Raw";
-				suggestions[2].viability = SUGGESTION_POSSIBLE;
+				suggestions[2].viability = imgtool::SUGGESTION_POSSIBLE;
 				suggestions[2].filter = filter_vzbas_getinfo;
 				suggestions[2].description = "Tokenized Basic";
 				break;
 			default:
-				suggestions[0].viability = SUGGESTION_RECOMMENDED;
-				suggestions[0].filter = NULL;
+				suggestions[0].viability = imgtool::SUGGESTION_RECOMMENDED;
+				suggestions[0].filter = nullptr;
 				suggestions[0].description = "Raw";
 		}
 
 	} else {
-		suggestions[0].viability = SUGGESTION_RECOMMENDED;
-		suggestions[0].filter = NULL;
+		suggestions[0].viability = imgtool::SUGGESTION_RECOMMENDED;
+		suggestions[0].filter = nullptr;
 		suggestions[0].description = "Raw";
-		suggestions[1].viability = SUGGESTION_POSSIBLE;
+		suggestions[1].viability = imgtool::SUGGESTION_POSSIBLE;
 		suggestions[1].filter = filter_vzsnapshot_getinfo;
 		suggestions[1].description = "VZ Snapshot";
 	}
@@ -890,7 +890,7 @@ static imgtoolerr_t vzsnapshot_writefile(imgtool::partition &partition, const ch
 	return IMGTOOLERR_SUCCESS;
 }
 
-void filter_vzsnapshot_getinfo(uint32_t state, union filterinfo *info)
+void filter_vzsnapshot_getinfo(uint32_t state, imgtool::filterinfo *info)
 {
 	switch(state)
 	{
@@ -939,16 +939,16 @@ void vzdos_get_info(const imgtool_class *imgclass, uint32_t state, union imgtool
 		case IMGTOOLINFO_INT_PREFER_UCASE:                  info->i = 1; break;
 		case IMGTOOLINFO_INT_DIRECTORY_EXTRA_BYTES:             info->i = sizeof(vz_iterator); break;
 
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
+		/* --- the following bits of info are returned as NUL-terminated strings --- */
 		case IMGTOOLINFO_STR_NAME:                          strcpy(info->s = imgtool_temp_str(), "vzdos"); break;
 		case IMGTOOLINFO_STR_DESCRIPTION:                   strcpy(info->s = imgtool_temp_str(), "VZ-DOS format"); break;
 		case IMGTOOLINFO_STR_FILE:                          strcpy(info->s = imgtool_temp_str(), __FILE__); break;
 		case IMGTOOLINFO_STR_WRITEFILE_OPTSPEC:             strcpy(info->s = imgtool_temp_str(), "T[0]-2;F[0]-1"); break;
-		case IMGTOOLINFO_STR_EOLN:                          info->s = NULL; break;
+		case IMGTOOLINFO_STR_EOLN:                          info->s = nullptr; break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case IMGTOOLINFO_PTR_MAKE_CLASS:                    info->make_class = imgtool_floppy_make_class; break;
-		case IMGTOOLINFO_PTR_OPEN:                          info->open = NULL; break;
+		case IMGTOOLINFO_PTR_OPEN:                          info->open = nullptr; break;
 		case IMGTOOLINFO_PTR_BEGIN_ENUM:                    info->begin_enum = vzdos_diskimage_beginenum; break;
 		case IMGTOOLINFO_PTR_NEXT_ENUM:                     info->next_enum = vzdos_diskimage_nextenum; break;
 		case IMGTOOLINFO_PTR_FREE_SPACE:                    info->free_space = vzdos_diskimage_freespace; break;

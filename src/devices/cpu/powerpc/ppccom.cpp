@@ -713,7 +713,7 @@ void ppc_device::device_start()
 	m_sebr = 0;
 	m_ser = 0;
 
-	memset(&m_spu, 0, sizeof(m_spu));
+	m_spu.clear();
 	m_pit_reload = 0;
 	m_irqstate = 0;
 	memset(m_buffered_dma_rate, 0, sizeof(m_buffered_dma_rate));
