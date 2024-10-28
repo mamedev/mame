@@ -50,8 +50,6 @@
 #		include <sys/syscall.h>
 #	elif BX_PLATFORM_OSX
 #		include <mach/mach.h> // mach_task_basic_info
-#	elif BX_PLATFORM_ANDROID
-#		include "debug.h" // getTid is not implemented...
 #	endif // BX_PLATFORM_ANDROID
 #endif // BX_PLATFORM_
 
@@ -65,7 +63,7 @@ namespace bx
 	|| BX_PLATFORM_WINRT   \
 	|| BX_CRT_NONE
 		BX_UNUSED(_ms);
-		debugOutput("sleep is not implemented"); debugBreak();
+		BX_ASSERT(false, "Function '%s' is not implemented!", BX_FUNCTION);
 #else
 		timespec req = { (time_t)_ms/1000, (long)( (_ms%1000)*1000000) };
 		timespec rem = { 0, 0 };
@@ -80,7 +78,7 @@ namespace bx
 #elif  BX_PLATFORM_XBOXONE \
 	|| BX_PLATFORM_WINRT   \
 	|| BX_CRT_NONE
-		debugOutput("yield is not implemented"); debugBreak();
+		BX_ASSERT(false, "Function '%s' is not implemented!", BX_FUNCTION);
 #else
 		::sched_yield();
 #endif // BX_PLATFORM_
@@ -97,7 +95,7 @@ namespace bx
 	|| BX_PLATFORM_OSX
 		return (mach_port_t)::pthread_mach_thread_np(pthread_self() );
 #else
-		debugOutput("getTid is not implemented"); debugBreak();
+		BX_ASSERT(false, "Function '%s' is not implemented!", BX_FUNCTION);
 		return 0;
 #endif // BX_PLATFORM_
 	}
@@ -155,6 +153,7 @@ namespace bx
 			);
 		return pmc.WorkingSetSize;
 #else
+		BX_ASSERT(false, "Function '%s' is not implemented!", BX_FUNCTION);
 		return 0;
 #endif // BX_PLATFORM_*
 	}

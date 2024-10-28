@@ -130,6 +130,11 @@ TEST_CASE("FilePath temp", "[filepath]")
 	tmp.join("bx.test/abvgd/555333/test");
 	REQUIRE(bx::makeAll(tmp, bx::ErrorAssert{}) );
 
+	if (BX_ENABLED(BX_PLATFORM_EMSCRIPTEN) )
+	{
+		SKIP("Not supported by wasm.");
+	}
+
 	tmp.set(bx::Dir::Temp);
 	tmp.join("bx.test");
 	REQUIRE(bx::removeAll(tmp, bx::ErrorAssert{}) );

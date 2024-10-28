@@ -87,6 +87,15 @@ project "bx.test"
 			"Cocoa.framework",
 		}
 
+	configuration { "wasm" }
+		buildoptions {
+			"-fwasm-exceptions",
+		}
+		linkoptions {
+			"-fwasm-exceptions",
+			"-s STACK_SIZE=262144",
+		}
+
 	configuration {}
 
 	strip()
