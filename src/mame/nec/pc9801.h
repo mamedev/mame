@@ -222,7 +222,7 @@ private:
 	void write_sasi_req(int state);
 	uint8_t sasi_status_r();
 	void sasi_ctrl_w(uint8_t data);
-	void draw_text(bitmap_rgb32 &bitmap, uint32_t addr, int y, int wd, int pitch, int lr, int cursor_on, int cursor_addr, bool lower);
+	void draw_text(bitmap_rgb32 &bitmap, uint32_t addr, int y, int wd, int pitch, int lr, int cursor_on, int cursor_addr, int cursor_bot, int cursor_top, bool lower);
 
 //  uint8_t winram_r();
 //  void winram_w(uint8_t data);

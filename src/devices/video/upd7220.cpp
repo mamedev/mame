@@ -1775,7 +1775,7 @@ void upd7220_device::update_text(bitmap_rgb32 &bitmap, const rectangle &cliprect
 		for (y = sy; y < sy + len; y++)
 		{
 			uint32_t const addr = sad + (y * m_pitch);
-			m_draw_text_cb(bitmap, addr, (y * m_lr) + m_vbp, wd, m_pitch, m_lr, m_dc, m_ead);
+			m_draw_text_cb(bitmap, addr, (y * m_lr) + m_vbp, wd, m_pitch, m_lr, m_dc, m_ead, m_ctop, m_cbot);
 		}
 
 		sy = y + 1;
@@ -1861,7 +1861,7 @@ void upd7220_device::update_graphics(bitmap_rgb32 &bitmap, const rectangle &clip
 				{
 					uint32_t const addr = (sad & 0x3ffff) + ((y / m_lr) * m_pitch);
 					int yval = y * zoom + (tsy + m_vbp);
-					m_draw_text_cb(bitmap, addr, yval, wd, m_pitch, m_lr, m_dc, m_ead);
+					m_draw_text_cb(bitmap, addr, yval, wd, m_pitch, m_lr, m_dc, m_ead, m_ctop, m_cbot);
 				}
 			}
 		}
