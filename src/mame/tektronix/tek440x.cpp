@@ -253,14 +253,14 @@ void PTEwrite(offs_t address, u16 data)
 				return PTEread(address);		// needed?
 			else
 			{
-				u32 address0 = mmu_translate_address(address, 1, get_fc(), M68K_SZ_WORD);
+				u32 address0 = mmu_translate_address(address, 1, m_s_flag | FUNCTION_CODE_USER_PROGRAM, M68K_SZ_WORD);
 				if (m_mmu_tmp_buserror_occurred)
 					return ~0;
 				return m_oprogram16.read_word(address0);
 			}
 		};
 		m_read8   = [this](offs_t address) -> u8     {
-			u32 address0 = mmu_translate_address(address, 1, get_fc(), M68K_SZ_BYTE);
+			u32 address0 = mmu_translate_address(address, 1, m_s_flag, M68K_SZ_BYTE);
 			if (m_mmu_tmp_buserror_occurred)
 				return ~0;
 			return m_program16.read_byte(address0);
@@ -270,21 +270,21 @@ void PTEwrite(offs_t address, u16 data)
 				return PTEread(address);
 			else
 			{
-				u32 address0 = mmu_translate_address(address, 1, get_fc(), M68K_SZ_WORD);
+				u32 address0 = mmu_translate_address(address, 1, m_s_flag, M68K_SZ_WORD);
 				if (m_mmu_tmp_buserror_occurred)
 					return ~0;
 				return m_program16.read_word(address0);
 			}
 		};
 		m_read32  = [this](offs_t address) -> u32    {
-			u32 address0 = mmu_translate_address(address, 1, get_fc(), M68K_SZ_LONG);
+			u32 address0 = mmu_translate_address(address, 1, m_s_flag, M68K_SZ_LONG);
 			if (m_mmu_tmp_buserror_occurred)
 				return ~0;
 			return m_program16.read_dword(address0);
 		};
 		
 		m_write8  = [this](offs_t address, u8 data)  {
-			u32 address0 = mmu_translate_address(address, 0, get_fc(), M68K_SZ_BYTE);
+			u32 address0 = mmu_translate_address(address, 0, m_s_flag, M68K_SZ_BYTE);
 			if (m_mmu_tmp_buserror_occurred)
 				return;
 			m_program16.write_word(address0 & ~1, data | (data << 8), address0 & 1 ? 0x00ff : 0xff00);
@@ -294,7 +294,7 @@ void PTEwrite(offs_t address, u16 data)
 				PTEwrite(address, data);
 			else
 			{
-				u32 address0 = mmu_translate_address(address, 0, get_fc(), M68K_SZ_WORD);
+				u32 address0 = mmu_translate_address(address, 0, m_s_flag, M68K_SZ_WORD);
 				if (m_mmu_tmp_buserror_occurred)
 					return;
 				m_program16.write_word(address0, data);
@@ -305,7 +305,7 @@ void PTEwrite(offs_t address, u16 data)
 				LOG("m_write32 to PTE!!!!!\n");
 			else
 			{
-				u32 address0 = mmu_translate_address(address, 0, get_fc(), M68K_SZ_LONG);
+				u32 address0 = mmu_translate_address(address, 0, m_s_flag, M68K_SZ_LONG);
 				if (m_mmu_tmp_buserror_occurred)
 					return;
 				m_program16.write_dword(address0, data);
