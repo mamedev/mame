@@ -26,7 +26,7 @@
 #define LOG_LINES (1U << 2)
 #define LOG_CASS  (1U << 3)
 #define LOG_FUNC  (1U << 4)
-#define VERBOSE (0xff)
+#define VERBOSE (0)
 
 #include "logmacro.h"
 

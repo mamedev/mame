@@ -257,12 +257,12 @@ u8 h89bus_device::io_dispatch_r(offs_t offset)
 			{
 				if (entry.m_p506_signals)
 				{
-					// p506 has FLPY but not CASS or LP
+					// p506 does not have CASS or LP
 					retval |= entry.read(decode & ~(H89_CASS | H89_LP), offset & 7);
 				}
 				else
 				{
-					// p504/p505 have CASS and LP but not FLPY
+					// p504/p505 does not have FLPY
 					retval |= entry.read(decode & ~H89_FLPY , offset & 7);
 				}
 			}
@@ -295,12 +295,12 @@ void h89bus_device::io_dispatch_w(offs_t offset, u8 data)
 			{
 				if (entry.m_p506_signals)
 				{
-					// p506 has FLPY but not CASS or LP1
-					entry.write(decode & ~H89_CASS, offset & 7, data);
+					// p506 does not have CASS or LP
+					entry.write(decode &  ~(H89_CASS | H89_LP), offset & 7, data);
 				}
 				else
 				{
-					// p504/p505 have LP1 and CASS but not FLPY
+					// p504/p505 does not have FLPY
 					entry.write(decode & ~H89_FLPY, offset & 7, data);
 				}
 			}
