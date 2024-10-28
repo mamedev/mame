@@ -518,16 +518,10 @@ namespace {
 
 static INPUT_PORTS_START(namco_c78_io)
 	PORT_START("DSW")
-	PORT_DIPNAME(0x08, 0x08, "DIP SW1") PORT_DIPLOCATION("SW2:1")
-	PORT_DIPSETTING(0x08, DEF_STR(Off))
-	PORT_DIPSETTING(0x00, DEF_STR(On))
-	PORT_DIPNAME(0x04, 0x04, "DIP SW2") PORT_DIPLOCATION("SW2:2")
-	PORT_DIPSETTING(0x04, DEF_STR(Off))
-	PORT_DIPSETTING(0x00, DEF_STR(On))
-	PORT_DIPNAME(0x02, 0x02, "Output Test") PORT_DIPLOCATION("SW2:3")
-	PORT_DIPSETTING(0x02, DEF_STR(Off))
-	PORT_DIPSETTING(0x00, DEF_STR(On))
-	PORT_DIPUNUSED_DIPLOC(0x01, 0x01, "SW2:4")
+	PORT_DIPUNKNOWN_DIPLOC(0x08, 0x08, "DIP SW2:1")
+	PORT_DIPUNKNOWN_DIPLOC(0x04, 0x04, "DIP SW2:2")
+	PORT_DIPUNKNOWN_DIPLOC(0x02, 0x02, "DIP SW2:3")
+	PORT_DIPUNKNOWN_DIPLOC(0x01, 0x01, "DIP SW2:4")
 INPUT_PORTS_END
 
 class namco_c78_jvs_io_device :
@@ -557,6 +551,7 @@ protected:
 		m_iocpu->write_port5().set(FUNC(namco_c78_jvs_io_device::iocpu_port_5_w));
 		m_iocpu->read_port6().set(FUNC(namco_c78_jvs_io_device::iocpu_port_6_r));
 		m_iocpu->write_port6().set(FUNC(namco_c78_jvs_io_device::iocpu_port_6_w));
+		m_iocpu->read_port9().set(FUNC(namco_c78_jvs_io_device::iocpu_port_9_r));
 
 		m_iocpu->write_sci_tx<0>().set(FUNC(namco_c78_jvs_io_device::txd));
 
@@ -588,26 +583,27 @@ protected:
 
 	uint8_t iocpu_port_4_r()
 	{
-		return (1 << 7) | // unknown input
-			(BIT(m_dsw->read(), 2, 2) << 5) |
+		return (1 << 7) | // J6:4 (unknown input)
+			(BIT(m_dsw->read(), 0, 2) << 5) | // SW2:3/SW2:4
 			((m_jvs_sense != jvs_port_device::sense::None) << 4) |
 			((m_jvs_sense != jvs_port_device::sense::Initialized) << 3) |
-			(1 << 2) | // sense
-			(3 << 0); // unknown output
+			(1 << 2) | // TR1 collector, emitter J1:1 & base J1:2 (sense)
+			(1 << 1) | // J6:10 (output high at startup)
+			(1 << 0); // NC (output)
 	}
 
 	void iocpu_port_4_w(uint8_t data)
 	{
 		sense(BIT(data, 2) ? jvs_port_device::sense::Initialized : jvs_port_device::sense::Uninitialized);
-		// BIT(data, 1) // set at startup
+		// BIT(data, 1)
 	}
 
 	uint8_t iocpu_port_5_r()
 	{
-		return (31 << 3) | // unknown input
-			(1 << 2) | // rts
-			(1 << 1) | // unknown input
-			(1 << 0); // unknown output
+		return (31 << 3) | // pins not bonded
+			(1 << 2) | // ADM485:2 (rts)
+			(1 << 1) | // ADM485:1 (configured as RxD)
+			(1 << 0); // ADM485:4 (configured as TxD)
 	}
 
 	void iocpu_port_5_w(uint8_t data)
@@ -615,13 +611,13 @@ protected:
 		rts(BIT(data, 2));
 	}
 
-	uint8_t iocpu_port_6_r()
+	virtual uint8_t iocpu_port_6_r()
 	{
 		return (1 << 7) | // unknown input
-			(3 << 5) | // coin counters
+			(3 << 5) | // coin counter output
 			(BIT(~player_r(0, 0x40), 6) << 4) |
 			(3 << 2) | // unknown output
-			(BIT(m_dsw->read(), 1) << 1) | // TODO: confirm DSW hookup
+			(BIT(m_dsw->read(), 2) << 1) | // SW2:2
 			(1 << 0); // unused input
 	}
 
@@ -633,6 +629,8 @@ protected:
 		// BIT(data, 2); // toggles (except asca1)
 	}
 
+	virtual uint8_t iocpu_port_9_r() = 0;
+
 	required_device<h83334_device> m_iocpu;
 	required_ioport m_dsw;
 };
@@ -640,6 +638,15 @@ protected:
 
 static INPUT_PORTS_START(namco_asca1)
 	PORT_INCLUDE(namco_c78_io)
+
+	PORT_MODIFY("DSW")
+	PORT_DIPNAME(0x04, 0x04, "Output Test") PORT_DIPLOCATION("SW2:2")
+	PORT_DIPSETTING(0x04, DEF_STR(Off))
+	PORT_DIPSETTING(0x00, DEF_STR(On))
+INPUT_PORTS_END
+
+static INPUT_PORTS_START(namco_asca1_default)
+	PORT_INCLUDE(namco_asca1)
 
 	PORT_START("SYSTEM")
 	PORT_SERVICE(0x80, IP_ACTIVE_HIGH)
@@ -717,7 +724,7 @@ protected:
 	// device_t
 	virtual ioport_constructor device_input_ports() const override ATTR_COLD
 	{
-		return m_default_inputs ? INPUT_PORTS_NAME(namco_asca1) : namco_c78_jvs_io_device::device_input_ports();
+		return m_default_inputs ? INPUT_PORTS_NAME(namco_asca1_default) : INPUT_PORTS_NAME(namco_asca1);
 	}
 
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD
@@ -726,7 +733,6 @@ protected:
 
 		m_iocpu->read_port8().set(FUNC(namco_asca_1_device::iocpu_port_8_r));
 		m_iocpu->write_port8().set(FUNC(namco_asca_1_device::iocpu_port_8_w));
-		m_iocpu->read_port9().set(FUNC(namco_asca_1_device::iocpu_port_9_r));
 		m_iocpu->write_port9().set(FUNC(namco_asca_1_device::iocpu_port_9_w));
 
 		m_iocpu->read_adc<0>().set(FUNC(namco_asca_1_device::adc_r<0>));
@@ -762,7 +768,7 @@ protected:
 
 	uint8_t iocpu_port_8_r()
 	{
-		return (1 << 7) | // unknown output
+		return (1 << 7) | // pin not bonded
 			(3 << 5) | // unknown input
 			(31 << 0); // unknown output
 	}
@@ -772,11 +778,11 @@ protected:
 		// BIT(data, 6) // set at startup, is set to input?
 	}
 
-	uint8_t iocpu_port_9_r()
+	virtual uint8_t iocpu_port_9_r() override
 	{
 		return (3 << 6) | // unknown input
 			(31 << 1) | // unknown output
-			(1 << 0); // unknown input
+			(BIT(m_dsw->read(), 3) << 0); // SW2:1 TODO: confirm 
 	}
 
 	void iocpu_port_9_w(uint8_t data)
@@ -852,8 +858,11 @@ protected:
 };
 
 
-static INPUT_PORTS_START(namco_asca3)
-	PORT_INCLUDE(namco_asca1)
+static INPUT_PORTS_START(namco_asca3_default)
+	PORT_INCLUDE(namco_asca1_default)
+
+	PORT_MODIFY("DSW")
+	PORT_DIPUNKNOWN_DIPLOC(0x04, 0x04, "DIP SW2:2")
 
 	PORT_MODIFY("COIN1")
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_TILT2) PORT_NAME("Counter 1 disconnected")
@@ -892,7 +901,7 @@ protected:
 	// device_t
 	virtual ioport_constructor device_input_ports() const override ATTR_COLD
 	{
-		return m_default_inputs ? INPUT_PORTS_NAME(namco_asca3) : namco_c78_jvs_io_device::device_input_ports();
+		return m_default_inputs ? INPUT_PORTS_NAME(namco_asca3_default) : namco_c78_jvs_io_device::device_input_ports();
 	}
 
 	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD
@@ -1079,6 +1088,14 @@ protected:
 static INPUT_PORTS_START(namco_tssio)
 	PORT_INCLUDE(namco_c78_io)
 
+	PORT_START("SW")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_BUTTON7) PORT_NAME("Unknown (SW2:unpopulated)")
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_BUTTON8) PORT_NAME("Service (SW3:unpopulated)")
+INPUT_PORTS_END
+
+static INPUT_PORTS_START(namco_tssio_default)
+	PORT_INCLUDE(namco_tssio)
+
 	PORT_START("SYSTEM")
 	PORT_SERVICE(0x80, IP_ACTIVE_HIGH)
 
@@ -1121,6 +1138,7 @@ public:
 protected:
 	namco_tss_io_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock = 0) :
 		namco_c78_jvs_io_device(mconfig, type, tag, owner, clock),
+		m_sw(*this, "SW"),
 		m_output(0)
 	{
 	}
@@ -1132,13 +1150,12 @@ protected:
 
 		m_iocpu->read_port8().set(FUNC(namco_tss_io_device::iocpu_port_8_r));
 		m_iocpu->write_port8().set(FUNC(namco_tss_io_device::iocpu_port_8_w));
-		m_iocpu->read_port9().set(FUNC(namco_tss_io_device::iocpu_port_9_r));
 		m_iocpu->write_port9().set(FUNC(namco_tss_io_device::iocpu_port_9_w));
 	}
 
 	virtual ioport_constructor device_input_ports() const override ATTR_COLD
 	{
-		return m_default_inputs ? INPUT_PORTS_NAME(namco_tssio) : namco_c78_jvs_io_device::device_input_ports();
+		return m_default_inputs ? INPUT_PORTS_NAME(namco_tssio_default) : INPUT_PORTS_NAME(namco_tssio);
 	}
 
 	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD
@@ -1164,23 +1181,36 @@ protected:
 		map(0x7007, 0x7007).r(FUNC(namco_tss_io_device::gun_ack_r)); // guessed, result ignored
 	}
 
+	virtual uint8_t iocpu_port_6_r() override
+	{
+		return (1 << 7) | // Altera:75 (unknown input)
+			(3 << 5) | // coin counter output
+			((BIT(~player_r(0, 0x40), 6) & BIT(m_sw->read(), 1)) << 4) | // SW3
+			(3 << 2) | // LED (unemulated)
+			(BIT(m_dsw->read(), 2) << 1) | // SW1:2
+			(BIT(m_sw->read(), 0) << 0); // SW2
+	}
+
 	uint8_t iocpu_port_8_r()
 	{
-		return (1 << 7) | // unknown output
-			(3 << 5) | // unknown input
-			(1 << 4) | // unknown output
-			(15 << 0); // unknown input
+		return (1 << 7) | // pin not bonded
+			(1 << 6) | // pullup VCC (maybe in case IRQ5 becomes enabled?)
+			(1 << 5) | // J6:2 (configured for RxD1)
+			(1 << 4) | // J6:3 (configured for TxD1)
+			(15 << 0); // A13/A12/A11/A10 (unemulated input)
 	}
 
 	void iocpu_port_8_w(uint8_t data)
 	{
 	}
 
-	uint8_t iocpu_port_9_r()
+	virtual uint8_t iocpu_port_9_r() override
 	{
-		return (1 << 7) | // unknown input
-			(15 << 3) | // unknown output
-			(7 << 0); // unknown input
+		return (1 << 7) | // Altera:74 (unknown input)
+			(1 << 6) | // NC (system clock output)
+			(7 << 3) | // Altera (unknown output)
+			(3 << 1) | // Altera (unknown input)
+			(BIT(m_dsw->read(), 3) << 0); // SW1:1/J6:11/Altera
 	}
 
 	void iocpu_port_9_w(uint8_t data)
@@ -1242,12 +1272,13 @@ protected:
 		}
 	}
 
+	required_ioport m_sw;
 	uint8_t m_output;
 };
 
 
-static INPUT_PORTS_START(namco_csz1)
-	PORT_INCLUDE(namco_tssio)
+static INPUT_PORTS_START(namco_csz1_default)
+	PORT_INCLUDE(namco_tssio_default)
 
 	PORT_MODIFY("SCREEN_POSITION_INPUT_X1")
 	PORT_BIT(0xfff, 0x1bf, IPT_LIGHTGUN_X) PORT_CROSSHAIR(X, 1.0, 0.0, 0) PORT_MINMAX(0x040, 0x33f) PORT_SENSITIVITY(100) PORT_KEYDELTA(12)
@@ -1275,7 +1306,7 @@ protected:
 	// device_t
 	virtual ioport_constructor device_input_ports() const override ATTR_COLD
 	{
-		return m_default_inputs ? INPUT_PORTS_NAME(namco_csz1) : namco_c78_jvs_io_device::device_input_ports();
+		return m_default_inputs ? INPUT_PORTS_NAME(namco_csz1_default) : namco_tss_io_device::device_input_ports();
 	}
 
 	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD
