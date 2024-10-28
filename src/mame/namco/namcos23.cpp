@@ -1327,15 +1327,15 @@ namespace
 #define C352CLOCK   (25401600)
 #define C352DIV     (288)
 
-#define PIXEL_CLOCK         (51.2_MHz_XTAL/4*2)
-
-#define HTOTAL              (814)
-#define HBEND               (0)
-#define HBSTART             (640)
-
-#define VTOTAL              (525)
-#define VBEND               (0)
-#define VBSTART             (480)
+#define PIXEL_CLOCK (51.2_MHz_XTAL/4*2)
+				   
+#define HTOTAL      (814)
+#define HBEND       (0)
+#define HBSTART     (640)
+				   
+#define VTOTAL      (525)
+#define VBEND       (0)
+#define VBSTART     (480)
 
 #define MAIN_VBLANK_IRQ 0x01
 #define MAIN_C361_IRQ   0x02
