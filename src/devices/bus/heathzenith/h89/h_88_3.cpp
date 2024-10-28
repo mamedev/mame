@@ -22,10 +22,10 @@ namespace {
 class h_88_3_device : public device_t, public device_h89bus_right_card_interface
 {
 public:
-		h_88_3_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = XTAL(1'843'200).value());
+	h_88_3_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = XTAL(1'843'200).value());
 
-		virtual void write(u8 select_lines, u8 offset, u8 data) override;
-		virtual u8 read(u8 select_lines, u8 offset) override;
+	virtual void write(u8 select_lines, u8 offset, u8 data) override;
+	virtual u8 read(u8 select_lines, u8 offset) override;
 
 protected:
 	h_88_3_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);

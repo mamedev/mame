@@ -44,7 +44,6 @@
 #include "emu.h"
 
 #include "intr_cntrl.h"
-//#include "mms77316_fdc.h"
 #include "sigmasoft_parallel_port.h"
 #include "tlb.h"
 
@@ -63,7 +62,7 @@
 // Single Step
 #define LOG_SS    (1U << 1)
 
-// #define VERBOSE ( LOG_SS )
+#define VERBOSE (0)
 #include "logmacro.h"
 
 #define LOGSS(...)    LOGMASKED(LOG_SS,    __VA_ARGS__)
@@ -113,7 +112,7 @@ protected:
 	bool m_rom_enabled;
 	bool m_timer_intr_enabled;
 	bool m_single_step_enabled;
-	bool m_floppy_ram_wp;
+	bool m_floppy_ram_we;
 
 	// single step flags
 	bool m_555a_latch;
@@ -151,6 +150,8 @@ protected:
 
 	void set_wait_state(int data);
 
+	void set_fmwe(int data);
+
 	u8 raise_NMI_r();
 	void raise_NMI_w(u8 data);
 	void console_intr(int data);
@@ -175,9 +176,6 @@ public:
 	}
 
 	void h88(machine_config &config);
-
-protected:
-	void h88_io(address_map &map);
 };
 
 
@@ -653,7 +651,7 @@ void h89_base_state::machine_start()
 	save_item(NAME(m_rom_enabled));
 	save_item(NAME(m_timer_intr_enabled));
 	save_item(NAME(m_single_step_enabled));
-	save_item(NAME(m_floppy_ram_wp));
+	save_item(NAME(m_floppy_ram_we));
 	save_item(NAME(m_cpu_speed_multiplier));
 	save_item(NAME(m_555a_latch));
 	save_item(NAME(m_555b_latch));
@@ -700,6 +698,8 @@ void h89_base_state::machine_start()
 		// remap the top 8k down to addr 0
 		m_mem_view[2].install_ram(0x0000, 0x1fff, ram_ptr + ram_size - 0x2000);
 	}
+
+	m_floppy_ram_we       = false;
 }
 
 void h89_base_state::machine_reset()
@@ -707,7 +707,6 @@ void h89_base_state::machine_reset()
 	m_rom_enabled         = true;
 	m_timer_intr_enabled  = true;
 	m_single_step_enabled = false;
-	m_floppy_ram_wp       = false;
 	reset_single_step_state();
 
 	ioport_value const cfg(m_config->read());
@@ -745,6 +744,13 @@ void h89_base_state::set_wait_state(int data)
 		machine().scheduler().synchronize();
 		m_maincpu->defer_access();
 	}
+}
+
+void h89_base_state::set_fmwe(int data)
+{
+	m_floppy_ram_we = bool(data);
+
+	update_mem_view();
 }
 
 u8 h89_base_state::raise_NMI_r()
@@ -792,7 +798,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(h89_base_state::h89_irq_timer)
 
 void h89_base_state::update_mem_view()
 {
-	m_mem_view.select(m_rom_enabled ? (m_floppy_ram_wp ? 0 : 1) : 2);
+	m_mem_view.select(m_rom_enabled ? (m_floppy_ram_we ? 1 : 0) : 2);
 }
 
 void h89_base_state::reset_single_step_state()
@@ -925,7 +931,7 @@ void h89_base_state::h89_base(machine_config &config)
 	Z80(config, m_maincpu, H89_CLOCK);
 	m_maincpu->set_m1_map(&h89_base_state::map_fetch);
 	m_maincpu->set_memory_map(&h89_base_state::h89_mem);
-	m_maincpu->set_io_map(&h88_state::h89_base_io);
+	m_maincpu->set_io_map(&h89_base_state::h89_base_io);
 	m_maincpu->set_irq_acknowledge_callback("intr_socket", FUNC(heath_intr_socket::irq_callback));
 
 	RAM(config, m_ram).set_default_size("64K").set_extra_options("16K,32K,48K").set_default_value(0x00);
@@ -955,7 +961,7 @@ void h89_base_state::h89_base(machine_config &config)
 	m_h89bus->out_tlb_callback().set(m_console, FUNC(ins8250_device::ins8250_w));
 	m_h89bus->in_nmi_callback().set(FUNC(h89_base_state::raise_NMI_r));
 	m_h89bus->out_nmi_callback().set(FUNC(h89_base_state::raise_NMI_w));
-	m_h89bus->in_gpp_callback().set_ioport("SW501");
+	m_h89bus->in_gpp_callback().set_ioport(m_sw501);
 	m_h89bus->out_gpp_callback().set(FUNC(h89_base_state::port_f2_w));
 	m_h89bus->out_int3_callback().set(FUNC(h89_base_state::slot_irq<3>));
 	m_h89bus->out_int4_callback().set(FUNC(h89_base_state::slot_irq<4>));
@@ -964,6 +970,7 @@ void h89_base_state::h89_base(machine_config &config)
 	m_h89bus->out_fdcirq_callback().set(m_intr_socket, FUNC(heath_intr_socket::set_irq));
 	m_h89bus->out_fdcdrq_callback().set(m_intr_socket, FUNC(heath_intr_socket::set_drq));
 	m_h89bus->out_blockirq_callback().set(m_intr_socket, FUNC(heath_intr_socket::block_interrupts));
+	m_h89bus->out_fmwe_callback().set(FUNC(h89_base_state::set_fmwe));
 	H89BUS_LEFT_SLOT(config, "p501", "h89bus", h89_left_cards, nullptr);
 	H89BUS_LEFT_SLOT(config, "p502", "h89bus", h89_left_cards, nullptr);
 	H89BUS_LEFT_SLOT(config, "p503", "h89bus", h89_left_cards, nullptr);
@@ -990,8 +997,6 @@ void h89_state::h89(machine_config &config)
 {
 	h89_base(config);
 	m_h89bus->set_default_bios_tag("444-61");
-
-	m_maincpu->set_io_map(&h89_state::h89_base_io);
 
 	m_intr_socket->set_default_option("h37");
 	m_intr_socket->set_fixed(true);
