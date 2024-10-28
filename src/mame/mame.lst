@@ -45919,11 +45919,13 @@ rad_ssxp                        //
 taikodp                         //
 taitons1                        //
 taitons2                        //
+tak_beyb                        //
 tak_comt                        //
 tak_daig
 tak_gin                         //
 tak_geig                        //
 tak_hamr                        //
+tak_zuba                        //
 tcarnavi                        //
 tomcpin                         //
 tomshoot                        //
@@ -45952,6 +45954,7 @@ epo_mini                        //
 epo_sdb                         //
 tak_chq                         //
 tom_dpgm                        //
+tom_jump
 ttv_lotr                        //
 ttv_mx                          //
 ttv_sw                          //

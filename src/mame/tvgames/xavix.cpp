@@ -46,7 +46,6 @@
               Let's!TVプレイ なりきりファイト ウルトラマン 撃て！必殺光線！！ / タカラトミー / 日本   Let's!TV Play Narikiri Fight Ultraman Shoot! Deadly ray! ! / Takara Tomy / Japan
     2005      どこでもドラえもん 日本旅行ゲームDX体感！どこドラグランプリ！ / エポック社 / 日本          Doraemon anywhere - Japan travel game DX experience! Where is the Dragon Grand Prix! / Epoch / Japan
               Let's!TVプレイ ふたりはプリキュアMaxHeart マットでダンス MaxHeartにおどっちゃおう / バンダイ / 日本         Let's!TV Play Futari wa PreCure MaxHeart Dance on the mat Let's go to MaxHeart / Bandai / Japan
-              テレビで遊び隊　韋駄天翔 激走 韋駄天バトル / トミー / 日本          Playing with TV Idaten Sho Gekisou Idaten Battle / Tommy / Japan
               Let's!TVプレイ 魔法戦隊マジレンジャー マジマットでダンス＆バトル / バンダイ / 日本        Let's!TV Play Mahou Sentai Magiranger Dance & Battle at Magimat / Bandai / Japan
               Let's!TVプレイ 音撃バトル！仮面ライダー響鬼 決めろ！一気火勢の型 / バンダイ / 日本        Let's!TV Play Ongeki Battle! Kamen Rider Hibiki Decide! Ichikkasei no Kata / Bandai / Japan
               Jala Jaland /atlus/Japan (arcade version)                                                       -           -               -           -               -                   -                       -
@@ -64,14 +63,12 @@
 
     not dumped: no TSOP pads
     2003      Beyblade Arcade Challenge 5-in-1 /Hasbro/USA                                                    -           -               -           -               -                   -                       have
-    2002      Zuba-Zuba Blade /TAKARA/Japan                                                                   -           -               -           -               -                   -                       -
     2002      Excite Striker (UK)
-    2002      Beyblade Ultimate shooter /TAKARA/Japan                                                         -           -               -           -               -                   -                       -
     2001      Let's construct the town! /TAKARA/Japan                                                         -           -               -           -               -                   -                       -
     2001      TV hockey /TOMY/Japan                                                                           -           -               -           -               -                   -                       -
     2001      Webdiver Gradion /TAKARA/Japan                                                                  -           -               -           -               -                   -                       -
     2000      connecTV OPUS /RADICA EU (different ROM to US?)
-    * one version of Gin-Gin boarders also had no pads, but the unit it was dumped from did have them
+
 
     not dumped: xavix2.cpp
 
@@ -80,8 +77,10 @@
     2006      SASUKE サスケ＆筋肉バトル!!スポーツマンNO.1決定戦 / エポック社 / 日本   SASUKE Sasuke & Muscle Battle!! Sportsman No. 1 Decisive Battle / Epoch Publishing / Japan
     2005      Let's!TVプレイ ドラゴンボ－ルＺ バトル体感かめはめ波～ おめぇとフュージョン / バンダイ / 日本          Let's!TV Play Dragon Ball Z Battle Experience Kamehameha ~ Ometo Fusion / Bandai / Japan
 
-
     dumped: either here, xavix_2000.cpp, or xavix_2002.cpp
+              Zuba-Zuba Blade /TAKARA/Japan                                                                   -           -               -           -               -                   -                       -
+              テレビで遊び隊　韋駄天翔 激走 韋駄天バトル / トミー / 日本          Playing with TV Idaten Sho Gekisou Idaten Battle / Tommy / Japan
+              Beyblade Ultimate shooter /TAKARA/Japan                                                         -           -               -           -               -                   -                       -
               東京フレンドパーク2スペシャル / エポック社 / 日本          Tokyo Friend Park 2 Special / Epochsha / Japan
               Let's!TVプレイ ケロロ軍曹 ケロロ小隊大パニック！ドタバタ大決戦であります / バンダイ / 日本   Let's!TV Play Keroro Sergeant Keroro Platoon Panic! It’s a big slapstick battle / Bandai / Japan
               スーパーテレビパソコン別売カートリッジ ペットケータイLink / エポック社 / 日本      Super TV PC Optional Cartridge Pet Mobile Link / Epochsha / Japan
@@ -172,6 +171,7 @@
               Gachinko Contest! Slot machine TV /DCT/Japan                                                    -           -               -           -               -                   -                       dumped
               Hamutaro, Dancing', Running /EPOCH/Japan                                                        -           -               -           -               -                   -                       -
               Gin-gin Snowboarders /TAKARA/Japan                                                              -           -               -           -               -                   -                       -
+                * one version of Gin-Gin boarders also had no pads, the content has been confirmed as identical
               Shoot! Exciting striker /EPOCH/Japan                                                            -           -               -           -               -                   -                       -
               e-kara US version /TAKARA USA, Hasbro/USA,EU                                                    71076       x8              none        1M                                  SSD 98 PA7351-107       this one or #20 above?  dumped
               Ms.Comett, Lovely baton /TAKARA/Japan<                                                          -           -               -           -               -                   -                       -
@@ -2207,6 +2207,11 @@ ROM_START( epo_mms )
 	ROM_LOAD("mmnj-main-4.u4", 0x000000, 0x400000, CRC(22f14ca2) SHA1(122e735eb7c54a22de16f65cd43d2cae788e0102) )
 ROM_END
 
+ROM_START( tak_zuba ) // CHBJ MAIN REV:01
+	ROM_REGION( 0x400000, "bios", ROMREGION_ERASE00)
+	ROM_LOAD("chbj.u2", 0x000000, 0x400000, CRC(6d60c8d2) SHA1(ba687fc95503223dd484ed9533dcb097ecfea00d) )
+ROM_END
+
 ROM_START( epo_mmsp )
 	ROM_REGION( 0x400000, "bios", ROMREGION_ERASE00)
 	ROM_LOAD("mm1j main-00.u1", 0x000000, 0x400000, CRC(65b40a27) SHA1(8f88973122277fe8f31bacb3a070609fde062946) )
@@ -2446,7 +2451,7 @@ ROM_START( tvpc_ham )
 	ROM_LOAD( "hpcj.u3", 0x000000, 0x400000, CRC(76e8c854) SHA1(5998c03292a16107d0d7ae00f77677582680f323) )
 ROM_END
 
-ROM_START( tak_gin ) // dumped from a PCB with 1x ROM Glob with TSOP pads, 1x unknown glob, 1x CPU glob.  It also exists in a configuration with just 1x ROM glob (no pads) and 1x CPU glob - unknown if code is the same
+ROM_START( tak_gin )
 	ROM_REGION(0x200000, "bios", ROMREGION_ERASE00 )
 	ROM_LOAD( "snowboard.bin", 0x000000, 0x200000, CRC(79fdeae3) SHA1(ab08790e95cdccf3541ecbddb87ebf0dedb3718b) )
 ROM_END
@@ -2456,6 +2461,11 @@ ROM_START( tak_hamr ) // HAMJ MAIN on PCB
 	ROM_LOAD( "hamj.u4", 0x000000, 0x400000, CRC(2f4f5270) SHA1(dfb75f0d20247cf1c886840149c7cf91780ae1b9) )
 ROM_END
 
+ROM_START( tak_beyb )
+	ROM_REGION(0x200000, "bios", ROMREGION_ERASE00 )
+	ROM_LOAD( "beyblade.u2", 0x000000, 0x200000, CRC(bcf6b3a7) SHA1(1c80f1241138b9d7816f1e5285ff8f3c61739c95) )
+ROM_END
+
 
 /* XaviX hardware titles (1st Generation)
 
@@ -2463,7 +2473,7 @@ ROM_END
     SSD 98 PL7351-181
     SSD 98 PA7351-107
     SSD 97 PA7270-107
-    type CPUS
+    type CPUs
 
     only new opcodes are callf and retf?
 
@@ -2584,6 +2594,9 @@ CONS( 2003, epo_crok,  0,          0,  xavix_i2c_24lc04, xavix_i2c,xavix_i2c_sta
 // ミニモニ。ステージ！ダンスだぴょん！
 CONS( 2002, epo_mms,   0,          0,  xavix_i2c_24c02,  epo_mms,  xavix_i2c_state,      init_xavix,    "Epoch / SSD Company LTD",                      "mini-moni Stage! Dance Dapyon! (Japan)",  MACHINE_IMPERFECT_SOUND )
 
+// ズバズバブレード
+CONS( 2002, tak_zuba,  0,          0,  xavix_i2c_24c02,  xavix_i2c,xavix_i2c_state,      init_xavix,    "Takara / SSD Company LTD",                     "Zuba Zuba Blade (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+
 // ミニモニ。ステージ！ダンスだぴょん！ぷらすっ
 CONS( 2003, epo_mmsp,  0,          0,  xavix_i2c_24c02,  epo_mms,  xavix_i2c_state,      init_xavix,    "Epoch / SSD Company LTD",                      "mini-moni Stage! Dance Dapyon! Plus (Japan)",  MACHINE_IMPERFECT_SOUND )
 
@@ -2606,6 +2619,9 @@ CONS( 2001, tak_gin,   0,          0,  xavix,            tak_gin,  xavix_state, 
 
 // ぽこぽこハンマーズ
 CONS( 2002, tak_hamr,  0,          0,  xavix_i2c_24c02,  tak_hamr, xavix_i2c_state,      init_xavix,    "Takara / SSD Company LTD",                     "Poko Poko Hammers (Japan)", MACHINE_IMPERFECT_SOUND )
+
+//ベイブレード　アルティメットシューター
+CONS( 2002, tak_beyb,  0,          0,  xavix,            xavix,    xavix_state,          init_xavix,    "Takara / SSD Company LTD",                     "Beyblade Ultimate Shooter (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
 // was also distributed by Atlus as an arcade cabinet in 2005, ROM almost certainly different (this one will auto-power off after inactivity, an arcade wouldn't do that)
 // ジャラジャランド
