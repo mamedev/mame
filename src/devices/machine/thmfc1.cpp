@@ -94,14 +94,14 @@ void thmfc1_device::cmd0_w(u8 data)
 
 	static const char *const mode[4] = { "reset", "wsect", "rhead", "rsect" };
 	m_cmd0 = data;
-	logerror("cmd0_w %02x, code=%s, ensyn=%d nomck=%d wgc=%d mode=%s\n", m_cmd1,
+	logerror("cmd0_w %02x, code=%s, ensyn=%d nomck=%d wgc=%d mode=%s\n", m_cmd0,
 			 m_cmd0 & C0_FM ? "fm" : "mfm",
 			 m_cmd0 & C0_ENSYN ? 1 : 0,
 			 m_cmd0 & C0_NOMCK ? 1 : 0,
 			 m_cmd0 & C0_WGC ? 1 : 0,
 			 mode[m_cmd0 & 3]);
 
-	if(m_stat0 & S0_FREE)
+	if(m_stat0 & S0_FREE) {
 		switch(m_cmd0 & 3) {
 		case 0:
 			break;
@@ -122,6 +122,7 @@ void thmfc1_device::cmd0_w(u8 data)
 			m_window_start = m_last_sync;
 			break;
 		}
+	}
 }
 
 void thmfc1_device::cmd1_w(u8 data)
@@ -367,7 +368,8 @@ void thmfc1_device::sync()
 				valid = m_data_reg == m_trck;
 				break;
 			case 5:
-				valid = (m_data_reg & 1) == (m_cmd1 & C1_SIDE ? 1 : 0);
+				// C1_SIDE seems to be ignored here, at least for floppy disks
+				valid = (m_data_reg & 1) == (m_cmd2 & C2_SISELB ? 0 : 1);
 				break;
 			case 6:
 				valid = m_data_reg == m_sect;
