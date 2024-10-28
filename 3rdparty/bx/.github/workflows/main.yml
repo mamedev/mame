@@ -139,6 +139,7 @@ jobs:
           repository: bkaradzic/bx
           path: bx
       - uses: mymindstorm/setup-emsdk@v14
+      - uses: browser-actions/setup-chrome@v1
       - name: Build
         run: |
           cd bx
@@ -147,3 +148,4 @@ jobs:
       - name: Check
         run: |
           cd bx
+#          npx http-server -o .build/wasm/bin/ & chromium http://127.0.0.1:8080/.build/wasm/bin/bx.testRelease.html
