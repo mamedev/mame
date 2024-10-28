@@ -6620,7 +6620,7 @@ User/save disks that can be created from the game itself are not included.
 		<rom name="Dragons of Flame (Japan) (Track 15).bin" size="19702704" crc="3bc9f46b" sha1="0e5d2c7a9afbf03c211d014d8daa676ec8a06223"/>
 		<rom name="Dragons of Flame (Japan).cue" size="1767" crc="7e003f93" sha1="04286683d48e6634f819e3b050f56f30a9c0817d"/>
 		-->
-		<description>Dragons of Flame</description>
+		<description>Advanced Dungeons &amp; Dragons - Dragons of Flame</description>
 		<year>1992</year>
 		<publisher>ポニーキャニオン (Pony Canyon)</publisher>
 		<info name="serial" value="HMC-195"/>
@@ -8422,7 +8422,7 @@ User/save disks that can be created from the game itself are not included.
 		<rom name="Eye of the Beholder II - The Legend of Darkmoon (Japan) (Track 47).bin" size="35209440" crc="72205ce3" sha1="b60f2096ca0e2278f8fcf1e3b2dc14a336b68d33"/>
 		<rom name="Eye of the Beholder II - The Legend of Darkmoon (Japan).cue" size="7055" crc="479038d3" sha1="995698629cd8c851aedb850b68f415c3fda0561a"/>
 		-->
-		<description>Eye of the Beholder II - The Legend of Darkmoon</description>
+		<description>Advanced Dungeons &amp; Dragons - Eye of the Beholder II - The Legend of Darkmoon</description>
 		<year>1993</year>
 		<publisher>サイベル (Cybelle)</publisher>
 		<info name="serial" value="HME-201"/>

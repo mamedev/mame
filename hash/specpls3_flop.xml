@@ -4478,7 +4478,7 @@ The game doesn't start after choosing the "Loader" option menu.
 	</software>
 
 	<software name="dragflam">
-		<description>Dragons of Flame</description>
+		<description>Advanced Dungeons &amp; Dragons - Dragons of Flame</description>
 		<year>1990</year>
 		<publisher>Erbe Software</publisher>
 		<info name="copy_protection" value="Manual required" />
@@ -7011,7 +7011,7 @@ The game exits to the spectrum main menu after choosing game initial option
 
 	<software name="herolanc">
 		<!-- SPS dump 3513 -->
-		<description>Heroes of the Lance</description>
+		<description>Advanced Dungeons &amp; Dragons - Heroes of the Lance</description>
 		<year>1988</year>
 		<publisher>U.S. Gold</publisher>
 		<part name="flop1" interface="floppy_3">
@@ -7022,7 +7022,7 @@ The game exits to the spectrum main menu after choosing game initial option
 	</software>
 
 	<software name="herolancsp" cloneof="herolanc">
-		<description>Heroes of the Lance (Erbe)</description>
+		<description>Advanced Dungeons &amp; Dragons - Heroes of the Lance (Erbe)</description>
 		<year>1988</year>
 		<publisher>Erbe Software</publisher>
 		<info name="region" value="Spain" />
@@ -7035,7 +7035,7 @@ The game exits to the spectrum main menu after choosing game initial option
 
 	<software name="herolanca" cloneof="herolanc">
 		<!-- May be the same edition as the IPF dump. -->
-		<description>Heroes of the Lance (alt)</description>
+		<description>Advanced Dungeons &amp; Dragons - Heroes of the Lance (alt)</description>
 		<year>1988</year>
 		<publisher>U.S. Gold</publisher>
 		<part name="flop1" interface="floppy_3">

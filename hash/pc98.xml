@@ -2486,7 +2486,7 @@ Not extensively tested
 		<year>1989</year>
 		<publisher>Corpus</publisher>
 		<notes><![CDATA[
-Cannot enter any character inside, keeps moaning about half kanji not supported no matter CR position
+Cannot enter any printing character in text area, keeps moaning about half kanji not supported no matter CR position
 Blink is half size
 Not extensively tested
 ]]></notes>
@@ -4070,7 +4070,7 @@ Hangs after entering name on VM class
 	</software>
 
 	<software name="herolanc">
-		<description>AD&amp;D Heroes of the Lance</description>
+		<description>Advanced Dungeons &amp; Dragons - Heroes of the Lance</description>
 		<year>1989</year>
 		<publisher>ポニーキャニオン (Pony Canyon)</publisher>
 		<info name="alt_title" value="ＡＤ＆Ｄ ヒーローズ オブ ランス" />
@@ -4083,7 +4083,7 @@ Hangs after entering name on VM class
 	</software>
 
 	<software name="hillsfar">
-		<description>AD&amp;D Hillsfar</description>
+		<description>Advanced Dungeons &amp; Dragons - Hillsfar</description>
 		<year>1990</year>
 		<publisher>ポニーキャニオン (Pony Canyon)</publisher>
 		<info name="alt_title" value="ＡＤ＆Ｄ ヒルズファー" />
@@ -4096,7 +4096,7 @@ Hangs after entering name on VM class
 	</software>
 
 	<software name="poolrad">
-		<description>AD&amp;D Pool of Radiance</description>
+		<description>Advanced Dungeons &amp; Dragons - Pool of Radiance</description>
 		<year>1989</year>
 		<publisher>ポニーキャニオン (Pony Canyon)</publisher>
 		<info name="alt_title" value="ＡＤ＆Ｄ プール オブ レイディアンス" />
@@ -10796,7 +10796,7 @@ Optional [AMD-98] support, uses AY1 only
 	</software>
 
 	<software name="ckrynn" supported="partial">
-		<description>Champions of Krynn</description>
+		<description>Advanced Dungeons &amp; Dragons - Champions of Krynn</description>
 		<year>1992</year>
 		<publisher>ポニーキャニオン (Pony Canyon)</publisher>
 		<notes><![CDATA[
@@ -12246,7 +12246,7 @@ Requires [kanji] board
 	</software>
 
 	<software name="ssilblad" supported="no">
-		<description>Secret of the Silver Blades</description>
+		<description>Advanced Dungeons &amp; Dragons - Secret of the Silver Blades</description>
 		<year>1992</year>
 		<publisher>ポニーキャニオン (Pony Canyon)</publisher>
 		<info name="alt_title" value="ＡＤ＆Ｄ シークレット オブ ザ シルバーブレード" />
@@ -13263,7 +13263,7 @@ Game was included on extra disk with purchase of Hanaou blank floppy disk pack.
 	</software>
 
 	<software name="azurebnd" supported="yes">
-		<description>Curse of the Azure Bonds</description>
+		<description>Advanced Dungeons &amp; Dragons - Curse of the Azure Bonds</description>
 		<year>1991</year>
 		<publisher>ポニーキャニオン (Pony Canyon)</publisher>
 		<info name="alt_title" value="ＡＤ＆Ｄ カース オブ アジュアボンド" />
@@ -13283,7 +13283,7 @@ Game was included on extra disk with purchase of Hanaou blank floppy disk pack.
 	</software>
 
 	<software name="azurebnda" cloneof="azurebnd" supported="yes">
-		<description>Curse of the Azure Bonds (alt)</description>
+		<description>Advanced Dungeons &amp; Dragons - Curse of the Azure Bonds (alt)</description>
 		<year>1991</year>
 		<publisher>ポニーキャニオン (Pony Canyon)</publisher>
 		<info name="alt_title" value="ＡＤ＆Ｄ カース オブ アジュアボンド" />
@@ -15118,7 +15118,7 @@ Is it really game like intended? [FDC] investigation required
 
 	<!-- Can't change disks, so it's not possible to save or load characters -->
 	<software name="dkkrynn" supported="no">
-		<description>Death Knights of Krynn</description>
+		<description>Advanced Dungeons &amp; Dragons - Death Knights of Krynn</description>
 		<year>1993</year>
 		<publisher>ポニーキャニオン (Pony Canyon)</publisher>
 		<info name="alt_title" value="ＡＤ＆Ｄ デスナイト オブ クリン" />
@@ -17773,7 +17773,7 @@ Couple of "Unimplemented floating point control" opcodes triggered in error.log
 
 	<software name="dragflam">
 		<!-- Origin: Neo Kobe Collection -->
-		<description>Dragons of Flame</description>
+		<description>Advanced Dungeons &amp; Dragons - Dragons of Flame</description>
 		<year>1992</year>
 		<publisher>ポニーキャニオン (Pony Canyon)</publisher>
 		<info name="alt_title" value="ＡＤ＆Ｄ ドラゴン オブ フレイム" />
@@ -17871,7 +17871,7 @@ Couple of "Unimplemented floating point control" opcodes triggered in error.log
 	</software>
 
 	<software name="drgstrik">
-		<description>DragonStrike</description>
+		<description>Advanced Dungeons &amp; Dragons - DragonStrike</description>
 		<year>1992</year>
 		<publisher>ポニーキャニオン (Pony Canyon)</publisher>
 		<info name="alt_title" value="ＡＤ＆Ｄ ドラゴンストライク" />
@@ -19436,7 +19436,7 @@ Black screen, [FDC] keeps reading chrn=(3, 0, 3, 256) in 2dd mode
 
 	<!-- Doesn't recognize disk changes, so it's not possible to create the save disk -->
 	<software name="eyebehol" supported="no">
-		<description>Eye of the Beholder</description>
+		<description>Advanced Dungeons &amp; Dragons - Eye of the Beholder</description>
 		<year>1992</year>
 		<publisher>ポニーキャニオン (Pony Canyon)</publisher>
 		<info name="alt_title" value="ＡＤ＆Ｄ アイ オブ ザ ビホルダー" />
@@ -19456,7 +19456,7 @@ Black screen, [FDC] keeps reading chrn=(3, 0, 3, 256) in 2dd mode
 	</software>
 
 	<software name="eyebeho2">
-		<description>Eye of the Beholder II - The Legend of Darkmoon</description>
+		<description>Advanced Dungeons &amp; Dragons - Eye of the Beholder II - The Legend of Darkmoon</description>
 		<year>1993</year>
 		<publisher>カプコン (Capcom)</publisher>
 		<info name="alt_title" value="ＡＤ＆Ｄ アイ オブ ザ ビホルダー２ ＴＨＥ ＬＥＧＥＮＤ ＯＦ ＤＡＲＫＭＯＯＮ" />
@@ -19483,7 +19483,7 @@ Black screen, [FDC] keeps reading chrn=(3, 0, 3, 256) in 2dd mode
 
 	<!-- Works in 16-color mode, hangs in 256-color mode -->
 	<software name="eyebeho3" supported="partial">
-		<description>Eye of the Beholder III - Assault on Myth Drannor</description>
+		<description>Advanced Dungeons &amp; Dragons - Eye of the Beholder III - Assault on Myth Drannor</description>
 		<year>1994</year>
 		<publisher>ビング (Ving)</publisher>
 		<info name="alt_title" value="ＡＤ＆Ｄ アイ オブ ザ ビホルダー３ ＡＳＳＡＵＬＴ ＯＮ ＭＹＴＨ ＤＲＡＮＮＯＲ" />
@@ -38286,7 +38286,7 @@ Requires [kanji] board, currently missing from vanilla class (use VM)
 	</software>
 
 	<software name="pooldark">
-		<description>Pools of Darkness</description>
+		<description>Advanced Dungeons &amp; Dragons - Pools of Darkness</description>
 		<year>1993</year>
 		<publisher>ポニーキャニオン (Pony Canyon)</publisher>
 		<info name="alt_title" value="ＡＤ＆Ｄ プールズ オブ ダークネス" />

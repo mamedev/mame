@@ -9926,7 +9926,7 @@ ATK test: OK
 
 	<software name="ckrynn" supported="no">
 		<!-- SPS (CAPS) release 986 -->
-		<description>Champions of Krynn (Europe, v1.0)</description>
+		<description>Advanced Dungeons &amp; Dragons - Champions of Krynn (Europe, v1.0)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, OCS, PAL) -->
 		<year>1990</year>
@@ -12591,7 +12591,7 @@ ATK test: C:0 H:U Bad
 
 	<software name="azurebnd" supported="no">
 		<!-- SPS (CAPS) release 982 -->
-		<description>Curse of the Azure Bonds (Europe, v1.0)</description>
+		<description>Advanced Dungeons &amp; Dragons - Curse of the Azure Bonds (Europe, v1.0)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, OCS, PAL) -->
 		<year>1990</year>
@@ -13554,7 +13554,7 @@ ATK test: OK
 
 	<software name="dkkrynn" supported="no">
 		<!-- SPS (CAPS) release 987 -->
-		<description>Death Knights of Krynn (Europe, v1.0)</description>
+		<description>Advanced Dungeons &amp; Dragons - Death Knights of Krynn (Europe, v1.0)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, OCS, PAL) -->
 		<year>1991</year>
@@ -15329,7 +15329,7 @@ ATK test: failed
 
 	<software name="dflame" supported="no">
 		<!-- SPS (CAPS) release 985 -->
-		<description>Dragons of Flame (Europe, v1.0)</description>
+		<description>Advanced Dungeons &amp; Dragons - Dragons of Flame (Europe, v1.0)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, OCS, PAL) -->
 		<year>1989</year>
@@ -15399,7 +15399,7 @@ ATK test: C:0 H:U Bad
 
 	<software name="drgstrik" supported="no">
 		<!-- SPS (CAPS) release 1479 -->
-		<description>DragonStrike (USA, v1.0)</description>
+		<description>Advanced Dungeons &amp; Dragons - DragonStrike (USA, v1.0)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, OCS, PAL) -->
 		<year>1990</year>
@@ -17846,7 +17846,7 @@ ATK test: OK
 
 	<software name="eyebehol" supported="no">
 		<!-- SPS (CAPS) release 116 -->
-		<description>Eye of the Beholder (Europe)</description>
+		<description>Advanced Dungeons &amp; Dragons - Eye of the Beholder (Europe)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, OCS, PAL) -->
 		<year>1991</year>
@@ -17876,7 +17876,7 @@ ATK test: OK
 
 	<software name="eyebeholg" cloneof="eyebehol" supported="no">
 		<!-- SPS (CAPS) release 680 -->
-		<description>Eye of the Beholder (Germany)</description>
+		<description>Advanced Dungeons &amp; Dragons - Eye of the Beholder (Germany)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, OCS, PAL) -->
 		<year>1991</year>
@@ -17906,7 +17906,7 @@ ATK test: OK
 
 	<software name="eyebeho2" supported="no">
 		<!-- SPS (CAPS) release 834 -->
-		<description>Eye of the Beholder II - The Legend of Darkmoon (Europe)</description>
+		<description>Advanced Dungeons &amp; Dragons - Eye of the Beholder II - The Legend of Darkmoon (Europe)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, OCS, PAL) -->
 		<year>1992</year>
@@ -17942,7 +17942,7 @@ ATK test: OK
 
 	<software name="eyebeho2g" cloneof="eyebeho2" supported="no">
 		<!-- SPS (CAPS) release 681 -->
-		<description>Eye of the Beholder II - Legende von Darkmoon (Germany)</description>
+		<description>Advanced Dungeons &amp; Dragons - Eye of the Beholder II - Legende von Darkmoon (Germany)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, OCS, PAL) -->
 		<year>1992</year>
@@ -23534,7 +23534,7 @@ ATK test: OK
 
 	<software name="herolanc" supported="no">
 		<!-- SPS (CAPS) release 778 -->
-		<description>Heroes of the Lance (Europe, v1.0)</description>
+		<description>Advanced Dungeons &amp; Dragons - Heroes of the Lance (Europe, v1.0)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, OCS, PAL) -->
 		<year>1988</year>
@@ -23822,7 +23822,7 @@ ATK test: OK
 
 	<software name="hillsfar" supported="no">
 		<!-- SPS (CAPS) release 981 -->
-		<description>Hillsfar (Europe, v1.0)</description>
+		<description>Advanced Dungeons &amp; Dragons - Hillsfar (Europe, v1.0)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, OCS, PAL) -->
 		<year>1989</year>
@@ -23839,7 +23839,7 @@ ATK test: OK
 
 	<software name="hillsfarg" cloneof="hillsfar" supported="no">
 		<!-- SPS (CAPS) release 961 -->
-		<description>Hillsfar (Germany, v1.0)</description>
+		<description>Advanced Dungeons &amp; Dragons - Hillsfar (Germany, v1.0)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, OCS, PAL) -->
 		<year>1989</year>
@@ -38395,7 +38395,7 @@ ATK test: OK
 
 	<software name="pooldark" supported="no">
 		<!-- SPS (CAPS) release 984 -->
-		<description>Pools of Darkness (Europe, v1.0 19920309)</description>
+		<description>Advanced Dungeons &amp; Dragons - Pools of Darkness (Europe, v1.0 19920309)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, OCS, PAL) -->
 		<year>1992</year>

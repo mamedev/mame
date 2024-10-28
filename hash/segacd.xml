@@ -1218,7 +1218,7 @@ Requires [disc swap]
 		<rom name="Eye of the Beholder (USA) (Track 55).bin" size="3069360" crc="541c162a" md5="bb7beb8580e02dd765f266042e545789" sha1="b5475270594903386974caa39545636feada7585"/>
 		<rom name="Eye of the Beholder (USA) (Track 56).bin" size="3981936" crc="612dbb21" md5="c6eba00a2b1da773d5ab6c3c94497829" sha1="a0dfce2a6cafda5a3f76ded7e1f5bb88350f235a"/>
 		-->
-		<description>Eye of the Beholder (USA)</description>
+		<description>Advanced Dungeons &amp; Dragons - Eye of the Beholder (USA)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<info name="alt_title" value="Advanced Dungeons &amp; Dragons - Eye of the Beholder (Box)"/>
