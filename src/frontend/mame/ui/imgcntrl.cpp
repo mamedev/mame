@@ -17,6 +17,9 @@
 #include "ui/swlist.h"
 #include "ui/ui.h"
 
+#include "bus/midi/midiinport.h"
+#include "bus/midi/midioutport.h"
+
 #include "audit.h"
 #include "drivenum.h"
 #include "emuopts.h"
@@ -294,7 +297,7 @@ void menu_control_device_image::menu_activated()
 
 	case START_MIDI:
 		m_midi = "";
-		menu::stack_push<menu_midi_inout>(ui(), container(), m_image.image_interface(), &m_midi);
+		menu::stack_push<menu_midi_inout>(ui(), container(), m_image.device().type() == MIDIIN, &m_midi);
 		m_state = SELECT_MIDI;
 		break;
 
