@@ -2198,8 +2198,8 @@ ROM_END
 
 ROM_START( epo_strkp )
 	ROM_REGION(0x800000, "bios", ROMREGION_ERASE00)
-	ROM_LOAD("excitestriker_uk.u4", 0x000000, 0x100000, CRC(201e150e) SHA1(f11405a4b7349e4bdfeb04110b1b6f67e0b63f64) )
-	ROM_LOAD("excitestriker_uk.u5", 0x400000, 0x200000, CRC(efd648aa) SHA1(59358b9a9df27dadc33ed4c3da9083f739b68340) )
+	ROM_LOAD("excitestriker_uk.u5", 0x000000, 0x100000, CRC(201e150e) SHA1(f11405a4b7349e4bdfeb04110b1b6f67e0b63f64) )
+	ROM_LOAD("excitestriker_uk.u4", 0x400000, 0x200000, CRC(efd648aa) SHA1(59358b9a9df27dadc33ed4c3da9083f739b68340) )
 ROM_END
 
 ROM_START( rad_jcon )
