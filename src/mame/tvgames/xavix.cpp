@@ -65,7 +65,6 @@
     2003      Beyblade Arcade Challenge 5-in-1 /Hasbro/USA                                                    -           -               -           -               -                   -                       have
     2002      Excite Striker (UK)
     2001      Let's construct the town! /TAKARA/Japan                                                         -           -               -           -               -                   -                       -
-    2001      TV hockey /TOMY/Japan                                                                           -           -               -           -               -                   -                       -
     2001      Webdiver Gradion /TAKARA/Japan                                                                  -           -               -           -               -                   -                       -
     2000      connecTV OPUS /RADICA EU (different ROM to US?)
 
@@ -78,7 +77,8 @@
     2005      Let's!TVプレイ ドラゴンボ－ルＺ バトル体感かめはめ波～ おめぇとフュージョン / バンダイ / 日本          Let's!TV Play Dragon Ball Z Battle Experience Kamehameha ~ Ometo Fusion / Bandai / Japan
 
     dumped: either here, xavix_2000.cpp, or xavix_2002.cpp
-              Zuba-Zuba Blade /TAKARA/Japan                                                                   -           -               -           -               -                   -                       -
+			  TV hockey /TOMY/Japan                                                                           -           -               -           -               -                   -                       -
+			  Zuba-Zuba Blade /TAKARA/Japan                                                                   -           -               -           -               -                   -                       -
               テレビで遊び隊　韋駄天翔 激走 韋駄天バトル / トミー / 日本          Playing with TV Idaten Sho Gekisou Idaten Battle / Tommy / Japan
               Beyblade Ultimate shooter /TAKARA/Japan                                                         -           -               -           -               -                   -                       -
               東京フレンドパーク2スペシャル / エポック社 / 日本          Tokyo Friend Park 2 Special / Epochsha / Japan
