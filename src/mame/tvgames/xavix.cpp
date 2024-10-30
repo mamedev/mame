@@ -727,6 +727,25 @@ static INPUT_PORTS_START( ltv_tam )
 INPUT_PORTS_END
 
 
+static INPUT_PORTS_START( tom_tvho )
+	PORT_INCLUDE(xavix)
+
+	PORT_MODIFY("MOUSE0X")
+	PORT_BIT( 0xff, 0x00, IPT_AD_STICK_X ) PORT_SENSITIVITY(7) PORT_KEYDELTA(35) PORT_REVERSE PORT_PLAYER(1)
+	PORT_MODIFY("MOUSE0Y")
+	PORT_BIT( 0xff, 0x00, IPT_AD_STICK_Y ) PORT_SENSITIVITY(7) PORT_KEYDELTA(35) PORT_PLAYER(1)
+	PORT_MODIFY("MOUSE1X")
+	PORT_BIT( 0xff, 0x00, IPT_AD_STICK_X ) PORT_SENSITIVITY(7) PORT_KEYDELTA(35) PORT_REVERSE PORT_PLAYER(2)
+	PORT_MODIFY("MOUSE1Y")
+	PORT_BIT( 0xff, 0x00, IPT_AD_STICK_Y ) PORT_SENSITIVITY(7) PORT_KEYDELTA(35) PORT_PLAYER(2)
+
+	PORT_MODIFY("IN0")
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(2)
+
+	PORT_MODIFY("IN1")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(1)
+INPUT_PORTS_END
+
 // left + right drums together = select / forward (needed on initial screen).  left drum = left in menus   right drum  = right in menus
 // analog reading depends heavily on timers, they're too fast right now so drum hits are too hard and register multiple times
 static INPUT_PORTS_START( taikodp )
@@ -1709,6 +1728,17 @@ void xavix_i2c_ltv_tam_state::xavix_i2c_24lc04_tam(machine_config &config)
 	m_anport->read_3_callback().set(FUNC(xavix_i2c_ltv_tam_state::tam_anport3_r));
 }
 
+
+void xavix_tom_tvho_state::xavix_tom_tvho(machine_config &config)
+{
+	xavix(config);
+
+	m_anport->read_0_callback().set(FUNC(xavix_tom_tvho_state::tvho_anport0_r));
+	m_anport->read_1_callback().set(FUNC(xavix_tom_tvho_state::tvho_anport1_r));
+	m_anport->read_2_callback().set(FUNC(xavix_tom_tvho_state::tvho_anport2_r));
+	m_anport->read_3_callback().set(FUNC(xavix_tom_tvho_state::tvho_anport3_r));
+}
+
 void xavix_i2c_mj_state::xavix_i2c_24lc02_mj(machine_config &config)
 {
 	xavix_i2c_24c02(config);
@@ -2227,6 +2257,11 @@ ROM_START( tak_geig )
 	ROM_LOAD("geigeki.bin", 0x000000, 0x400000, CRC(bd0c3576) SHA1(06f614dbec0225ce4ed866b98450912986d72faf) )
 ROM_END
 
+ROM_START( tom_tvho ) // ET105 REV 0.0
+	ROM_REGION(0x200000, "bios", ROMREGION_ERASE00)
+	ROM_LOAD("tvhockey.u4", 0x000000, 0x200000, CRC(9cd72ae2) SHA1(0530851123b607ddb85f9513405ce97c493f5fd6) )
+ROM_END
+
 ROM_START( tak_comt )
 	ROM_REGION(0x200000, "bios", ROMREGION_ERASE00)
 	ROM_LOAD("comet.u3", 0x000000, 0x200000, CRC(407c5566) SHA1(41d73c34af8cc3d07a34fcac0bc1856442c94200) )
@@ -2610,6 +2645,10 @@ CONS( 2005, has_wamg,  0,          0,  xavix,            has_wamg, xavix_state, 
 
 // GEIGEKI ゴーゴーシューティング
 CONS( 2002, tak_geig,  0,          0,  xavix_nv,         tak_geig, xavix_state,          init_xavix,    "Takara / SSD Company LTD",                     "Geigeki Go Go Shooting (Japan)", MACHINE_IMPERFECT_SOUND )
+
+// TVホッケー
+// playable but could do with better deadzome handling on the controls at least, and for some reason auto-center heads to the bottom left corner in breakout mode?
+CONS( 2001, tom_tvho,  0,          0,  xavix_tom_tvho,   tom_tvho, xavix_tom_tvho_state, init_xavix,    "Tomy / SSD Company LTD",                       "TV Hockey (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
 // コメットさん☆ラブリンバトン
 CONS( 2001, tak_comt,  0,          0,  xavix_nv,         tak_comt,  xavix_state,          init_xavix,    "Takara / SSD Company LTD",                     "Comet-san Lovelin Baton (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
