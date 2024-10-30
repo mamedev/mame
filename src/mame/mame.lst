@@ -923,9 +923,11 @@ macpb140                        // 1991 Apple Macintosh PowerBook 140
 macpb145                        // 1992 Apple Macintosh PowerBook 145
 macpb145b                       // 1993 Apple Macintosh PowerBook 145B
 macpb160                        // 1992 Apple Macintosh PowerBook 160
+macpb165                        // 1993 Apple Macintosh PowerBook 165
+macpb165c                       // 1993 Apple Macintosh PowerBook 165c
 macpb170                        // 1991 Apple Macintosh PowerBook 170
 macpb180                        // 1992 Apple Macintosh PowerBook 180
-macpb180c                       // 1992 Apple Macintosh PowerBook 180c
+macpb180c                       // 1993 Apple Macintosh PowerBook 180c
 macpd210                        // 1992 Apple Macintosh PowerBook Duo 210
 
 @source:apple/macquadra605.cpp
