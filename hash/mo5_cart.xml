@@ -5,15 +5,16 @@ license:CC0-1.0
 
 Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 -->
-<softwarelist name="mo5_cart" description="Thomson MO5 cartridges">
+<softwarelist name="mo5_cart" description="Thomson MO5 Mémo 5 cartridges">
 
 <!-- Applications -->
 
 	<software name="asm6809">
 		<description>Assembleur 6809 (v1.0)</description>
 		<year>1984</year>
-		<publisher>TO TEK International</publisher>
-		<info name="alt_title" value="6809 Language Module"/>
+		<publisher>TO TEK International / Microsoft</publisher>
+		<info name="alt_title" value="6809 Language Module" />
+		<info name="serial" value="AS 5011" />
 
 		<part name="cart" interface="mo_cart">
 			<dataarea name="rom" size="16384">
@@ -25,8 +26,9 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	<software name="asm6809a" cloneof="asm6809">
 		<description>Assembleur 6809 (v1.0, alt)</description>
 		<year>1984</year>
-		<publisher>TO TEK International</publisher>
-		<info name="alt_title" value="6809 Language Module"/>
+		<publisher>TO TEK International / Microsoft</publisher>
+		<info name="alt_title" value="6809 Language Module" />
+		<info name="serial" value="AS 5011" />
 
 		<part name="cart" interface="mo_cart">
 			<dataarea name="rom" size="16384">
@@ -38,8 +40,9 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	<software name="asm6809b" cloneof="asm6809">
 		<description>Assembleur 6809 (v1.0, alt 2)</description>
 		<year>1984</year>
-		<publisher>TO TEK International</publisher>
-		<info name="alt_title" value="6809 Language Module"/>
+		<publisher>TO TEK International / Microsoft</publisher>
+		<info name="alt_title" value="6809 Language Module" />
+		<info name="serial" value="AS 5011" />
 
 		<part name="cart" interface="mo_cart">
 			<dataarea name="rom" size="16384">
@@ -64,6 +67,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 		<description>Agenda</description>
 		<year>1984</year>
 		<publisher>Answare-Diffusion</publisher>
+		<info name="serial" value="AG.5006" />
 
 		<part name="cart" interface="mo_cart">
 			<dataarea name="rom" size="16384">
@@ -76,6 +80,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 		<description>Agenda (alt)</description>
 		<year>1984</year>
 		<publisher>Answare-Diffusion</publisher>
+		<info name="serial" value="AG.5006" />
 
 		<part name="cart" interface="mo_cart">
 			<dataarea name="rom" size="16384">
@@ -88,6 +93,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 		<description>Agenda (alt 2)</description>
 		<year>1984</year>
 		<publisher>Answare-Diffusion</publisher>
+		<info name="serial" value="AG.5006" />
 
 		<part name="cart" interface="mo_cart">
 			<dataarea name="rom" size="16384">
@@ -100,6 +106,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 		<description>Carnet d'Adresses</description>
 		<year>1984</year>
 		<publisher>Answare-Diffusion</publisher>
+		<info name="serial" value="CA.5002" />
 
 		<part name="cart" interface="mo_cart">
 			<dataarea name="rom" size="16384">
@@ -112,6 +119,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 		<description>Carnet d'Adresses (alt)</description>
 		<year>1984</year>
 		<publisher>Answare-Diffusion</publisher>
+		<info name="serial" value="CA.5002" />
 
 		<part name="cart" interface="mo_cart">
 			<dataarea name="rom" size="16384">
@@ -124,6 +132,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 		<description>Colorcalc</description>
 		<year>1985</year>
 		<publisher>France Image Logiciel (FIL)</publisher>
+		<info name="serial" value="CO 7052" />
 
 		<part name="cart" interface="mo_cart">
 			<dataarea name="rom" size="32768">
@@ -136,6 +145,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 		<description>Colorcalc (alt)</description>
 		<year>1985</year>
 		<publisher>France Image Logiciel (FIL)</publisher>
+		<info name="serial" value="CO 7052" />
 
 		<part name="cart" interface="mo_cart">
 			<dataarea name="rom" size="32768">
@@ -162,6 +172,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 		<description>Colorpaint</description>
 		<year>1985</year>
 		<publisher>France Image Logiciel (FIL)</publisher>
+		<info name="serial" value="CP 5068" />
 
 		<part name="cart" interface="mo_cart">
 			<dataarea name="rom" size="32768">
@@ -185,7 +196,8 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	<software name="logo">
 		<description>LOGO (v1.0)</description>
 		<year>1984</year>
-		<publisher>TO TEK International</publisher>
+		<publisher>TO TEK International / Systèmes d'Ordinateur Logo International (SOLI)</publisher>
+		<info name="serial" value="LO 5010" />
 
 		<part name="cart" interface="mo_cart">
 			<dataarea name="rom" size="16384">
@@ -197,7 +209,8 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	<software name="logoa" cloneof="logo">
 		<description>LOGO (v1.0, alt)</description>
 		<year>1984</year>
-		<publisher>TO TEK International</publisher>
+		<publisher>TO TEK International / Systèmes d'Ordinateur Logo International (SOLI)</publisher>
+		<info name="serial" value="LO 5010" />
 
 		<part name="cart" interface="mo_cart">
 			<dataarea name="rom" size="16384">
@@ -209,7 +222,8 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	<software name="logob" cloneof="logo">
 		<description>LOGO (v1.0, alt 2)</description>
 		<year>1984</year>
-		<publisher>TO TEK International</publisher>
+		<publisher>TO TEK International / Systèmes d'Ordinateur Logo International (SOLI)</publisher>
+		<info name="serial" value="LO 5010" />
 
 		<part name="cart" interface="mo_cart">
 			<dataarea name="rom" size="16384">
@@ -223,6 +237,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 		<description>LSEG-EDL (v3.2)</description>
 		<year>1985</year>
 		<publisher>ASELEC</publisher>
+		<info name="serial" value="A CB 03 001" />
 
 		<part name="cart" interface="mo_cart">
 			<dataarea name="rom" size="32768">
@@ -236,6 +251,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 		<description>LSEG-EDL (v3.2, alt)</description>
 		<year>1985</year>
 		<publisher>ASELEC</publisher>
+		<info name="serial" value="A CB 03 001" />
 
 		<part name="cart" interface="mo_cart">
 			<dataarea name="rom" size="32768">
@@ -245,9 +261,10 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="melodia">
-		<description>Melodia</description>
+		<description>Mélodia - Jeu de création musicale</description>
 		<year>1982</year>
 		<publisher>VIFI-Nathan</publisher>
+		<info name="serial" value="450011" />
 
 		<part name="cart" interface="mo_cart">
 			<dataarea name="rom" size="16384">
@@ -257,9 +274,10 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="melodiaa" cloneof="melodia">
-		<description>Melodia (alt)</description>
+		<description>Mélodia - Jeu de création musicale (alt)</description>
 		<year>1982</year>
 		<publisher>VIFI-Nathan</publisher>
+		<info name="serial" value="450011" />
 
 		<part name="cart" interface="mo_cart">
 			<dataarea name="rom" size="16384">
@@ -269,9 +287,10 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="pictor">
-		<description>Pictor</description>
+		<description>Pictor - La palette magique</description>
 		<year>1983</year>
 		<publisher>VIFI-Nathan</publisher>
+		<info name="serial" value="450010" />
 
 		<part name="cart" interface="mo_cart">
 			<dataarea name="rom" size="16384">
@@ -281,9 +300,10 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="pictora" cloneof="pictor">
-		<description>Pictor (alt)</description>
+		<description>Pictor - La palette magique (alt)</description>
 		<year>1983</year>
 		<publisher>VIFI-Nathan</publisher>
+		<info name="serial" value="450010" />
 
 		<part name="cart" interface="mo_cart">
 			<dataarea name="rom" size="16384">
@@ -298,6 +318,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 		<description>La Grille</description>
 		<year>1985</year>
 		<publisher>ASELEC</publisher>
+		<info name="serial" value="A AA 01 009" />
 
 		<part name="cart" interface="mo_cart">
 			<dataarea name="rom" size="16384">
@@ -307,9 +328,10 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="maison">
-		<description>La Maison d'Amedee</description>
+		<description>La Maison d'Amédée</description>
 		<year>1984</year>
 		<publisher>ASELEC</publisher>
+		<info name="serial" value="A AA 01 007" />
 
 		<part name="cart" interface="mo_cart">
 			<dataarea name="rom" size="16384">
@@ -319,9 +341,10 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="peche">
-		<description>La Peche a la Barre</description>
+		<description>La Pêche à la Barre</description>
 		<year>1984</year>
 		<publisher>ASELEC</publisher>
+		<info name="serial" value="A AA 01 010" />
 
 		<part name="cart" interface="mo_cart">
 			<dataarea name="rom" size="16384">
@@ -336,6 +359,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 		<description>Airbus</description>
 		<year>1984</year>
 		<publisher>VIFI-Nathan</publisher>
+		<info name="serial" value="450023" />
 
 		<part name="cart" interface="mo_cart">
 			<dataarea name="rom" size="16384">
@@ -348,6 +372,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 		<description>Airbus (alt)</description>
 		<year>1984</year>
 		<publisher>VIFI-Nathan</publisher>
+		<info name="serial" value="450023" />
 
 		<part name="cart" interface="mo_cart">
 			<dataarea name="rom" size="16384">
@@ -360,6 +385,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 		<description>Blitz! - Jeu d'Echecs</description>
 		<year>1985</year>
 		<publisher>France Image Logiciel (FIL)</publisher>
+		<info name="serial" value="BL 5018" />
 
 		<part name="cart" interface="mo_cart">
 			<dataarea name="rom" size="16384">
@@ -372,6 +398,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 		<description>Blitz! - Jeu d'Echecs (alt)</description>
 		<year>1985</year>
 		<publisher>France Image Logiciel (FIL)</publisher>
+		<info name="serial" value="BL 5018" />
 
 		<part name="cart" interface="mo_cart">
 			<dataarea name="rom" size="16384">
@@ -384,6 +411,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 		<description>Blitz! - Jeu d'Echecs (alt 2)</description>
 		<year>1985</year>
 		<publisher>France Image Logiciel (FIL)</publisher>
+		<info name="serial" value="BL 5018" />
 
 		<part name="cart" interface="mo_cart">
 			<dataarea name="rom" size="16384">
@@ -393,9 +421,10 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="controle">
-		<description>Controle Aerien</description>
+		<description>Contrôle Aérien</description>
 		<year>1984</year>
 		<publisher>VIFI International</publisher>
+		<info name="serial" value="4TF031" />
 
 		<part name="cart" interface="mo_cart">
 			<dataarea name="rom" size="16384">
@@ -419,9 +448,10 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="gemini">
-		<description>Gemini</description>
+		<description>Gemini - Les cartes retournées</description>
 		<year>1982</year>
 		<publisher>VIFI-Nathan</publisher>
+		<info name="serial" value="45.0005" />
 
 		<part name="cart" interface="mo_cart">
 			<dataarea name="rom" size="16384">
@@ -431,9 +461,10 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="geminia" cloneof="gemini">
-		<description>Gemini (alt)</description>
+		<description>Gemini - Les cartes retournées (alt)</description>
 		<year>1982</year>
 		<publisher>VIFI-Nathan</publisher>
+		<info name="serial" value="45.0005" />
 
 		<part name="cart" interface="mo_cart">
 			<dataarea name="rom" size="16384">
@@ -506,6 +537,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 		<description>Miner 2049er</description>
 		<year>1985</year>
 		<publisher>France Image Logiciel (FIL)</publisher>
+		<info name="serial" value="MN 5027" />
 
 		<part name="cart" interface="mo_cart">
 			<dataarea name="rom" size="16384">
@@ -518,6 +550,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 		<description>Miner 2049er (alt)</description>
 		<year>1985</year>
 		<publisher>France Image Logiciel (FIL)</publisher>
+		<info name="serial" value="MN 5027" />
 
 		<part name="cart" interface="mo_cart">
 			<dataarea name="rom" size="16384">
@@ -527,9 +560,10 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="motus">
-		<description>Motus</description>
+		<description>Motus - Les mots cachés</description>
 		<year>1982</year>
 		<publisher>VIFI-Nathan</publisher>
+		<info name="serial" value="450007" />
 
 		<part name="cart" interface="mo_cart">
 			<dataarea name="rom" size="16384">
@@ -539,9 +573,10 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="motusa" cloneof="motus">
-		<description>Motus (alt)</description>
+		<description>Motus - Les mots cachés (alt)</description>
 		<year>1982</year>
 		<publisher>VIFI-Nathan</publisher>
+		<info name="serial" value="450007" />
 
 		<part name="cart" interface="mo_cart">
 			<dataarea name="rom" size="16384">
@@ -551,9 +586,10 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="trap">
-		<description>Trap</description>
+		<description>Trap - Le labyrinthe</description>
 		<year>1982</year>
 		<publisher>VIFI-Nathan</publisher>
+		<info name="serial" value="450009" />
 
 		<part name="cart" interface="mo_cart">
 			<dataarea name="rom" size="16384">
@@ -563,9 +599,10 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="trapa" cloneof="trap">
-		<description>Trap (alt)</description>
+		<description>Trap - Le labyrinthe (alt)</description>
 		<year>1982</year>
 		<publisher>VIFI-Nathan</publisher>
+		<info name="serial" value="450009" />
 
 		<part name="cart" interface="mo_cart">
 			<dataarea name="rom" size="16384">
@@ -575,9 +612,10 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="tridi444">
-		<description>Tridi444</description>
+		<description>Tridi 444 - Aligner quatre pions dans l'espace</description>
 		<year>1982</year>
 		<publisher>VIFI-Nathan</publisher>
+		<info name="serial" value="45.0008" />
 
 		<part name="cart" interface="mo_cart">
 			<dataarea name="rom" size="16384">
@@ -587,9 +625,10 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="tridi444a" cloneof="tridi444">
-		<description>Tridi444 (alt)</description>
+		<description>Tridi 444 - Aligner quatre pions dans l'espace (alt)</description>
 		<year>1982</year>
 		<publisher>VIFI-Nathan</publisher>
+		<info name="serial" value="45.0008" />
 
 		<part name="cart" interface="mo_cart">
 			<dataarea name="rom" size="16384">
