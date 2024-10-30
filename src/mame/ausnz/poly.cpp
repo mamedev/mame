@@ -37,38 +37,34 @@
 #include "utf8.h"
 
 
-void poly_state::poly_bank(address_map &map)
-{
-	map.unmap_value_high();
-	/* System mode */
-	map(0x00000, 0x0ffff).rw(FUNC(poly_state::logical_mem_r), FUNC(poly_state::logical_mem_w)); // Logical Memory
-	map(0x0e000, 0x0e003).rw(m_pia[0], FUNC(pia6821_device::read), FUNC(pia6821_device::write));      // Video control PIA 6821
-	map(0x0e004, 0x0e005).rw(m_acia, FUNC(acia6850_device::read), FUNC(acia6850_device::write));      // Optional RS232 Interface
-	map(0x0e006, 0x0e006).w(FUNC(poly_state::baud_rate_w));                                     // Baud rate controller
-	map(0x0e00c, 0x0e00f).rw(m_pia[1], FUNC(pia6821_device::read), FUNC(pia6821_device::write));      // Keyboard PIA 6821
-	map(0x0e020, 0x0e027).rw(m_ptm, FUNC(ptm6840_device::read), FUNC(ptm6840_device::write));         // Timer 6840
-	map(0x0e030, 0x0e036).rw(FUNC(poly_state::network_r), FUNC(poly_state::network_w));         // Data Link Controller 6854
-	map(0x0e040, 0x0e040).w(FUNC(poly_state::set_protect_w));                                   // Set protect flip-flop after 1 E-cycle
-	map(0x0e050, 0x0e05f).ram().share("dat");                                                         // Dynamic Address Translator
-	map(0x0e060, 0x0e060).rw(FUNC(poly_state::select_map_r), FUNC(poly_state::select_map1_w));  // Select Map 1
-	map(0x0e070, 0x0e070).rw(FUNC(poly_state::select_map_r), FUNC(poly_state::select_map2_w));  // Select Map 2
-	map(0x0e800, 0x0efff).ram().share("videoram");                                                    // Teletext screens and System data
-	map(0x0f000, 0x0ffff).rom().region("system", 0);                                                  // System Program ROM
-	/* User mode */
-	map(0x10000, 0x1ffff).rw(FUNC(poly_state::logical_mem_r), FUNC(poly_state::logical_mem_w)); // Logical Memory
-	map(0x1fff0, 0x1ffff).r(FUNC(poly_state::vector_r));                                        // Vector fetch (interrupt and reset)
-}
-
-void polydev_state::poly_bank(address_map &map)
-{
-	poly_state::poly_bank(map);
-	map(0x0e014, 0x0e014).rw(FUNC(polydev_state::drive_register_r), FUNC(polydev_state::drive_register_w)); // Drive register
-	map(0x0e018, 0x0e01b).rw(FUNC(polydev_state::fdc_inv_r), FUNC(polydev_state::fdc_inv_w));               // Floppy controller
-}
-
 void poly_state::poly_mem(address_map &map)
 {
-	map(0x0000, 0xffff).m(m_bankdev, FUNC(address_map_bank_device::amap8));
+	map.unmap_value_high();
+	map(0x0000, 0xffff).view(m_memview);
+	/* System mode */
+	m_memview[0](0x0000, 0xffff).rw(FUNC(poly_state::logical_mem_r), FUNC(poly_state::logical_mem_w)); // Logical Memory
+	m_memview[0](0xe000, 0xe003).rw(m_pia[0], FUNC(pia6821_device::read), FUNC(pia6821_device::write));      // Video control PIA 6821
+	m_memview[0](0xe004, 0xe005).rw(m_acia, FUNC(acia6850_device::read), FUNC(acia6850_device::write));      // Optional RS232 Interface
+	m_memview[0](0xe006, 0xe006).w(FUNC(poly_state::baud_rate_w));                                     // Baud rate controller
+	m_memview[0](0xe00c, 0xe00f).rw(m_pia[1], FUNC(pia6821_device::read), FUNC(pia6821_device::write));      // Keyboard PIA 6821
+	m_memview[0](0xe020, 0xe027).rw(m_ptm, FUNC(ptm6840_device::read), FUNC(ptm6840_device::write));         // Timer 6840
+	m_memview[0](0xe030, 0xe036).rw(FUNC(poly_state::network_r), FUNC(poly_state::network_w));         // Data Link Controller 6854
+	m_memview[0](0xe040, 0xe040).w(FUNC(poly_state::set_protect_w));                                   // Set protect flip-flop after 1 E-cycle
+	m_memview[0](0xe050, 0xe05f).ram().share("dat");                                                         // Dynamic Address Translator
+	m_memview[0](0xe060, 0xe060).rw(FUNC(poly_state::select_map_r), FUNC(poly_state::select_map1_w));  // Select Map 1
+	m_memview[0](0xe070, 0xe070).rw(FUNC(poly_state::select_map_r), FUNC(poly_state::select_map2_w));  // Select Map 2
+	m_memview[0](0xe800, 0xefff).ram().share("videoram");                                                    // Teletext screens and System data
+	m_memview[0](0xf000, 0xffff).rom().region("system", 0);                                                  // System Program ROM
+	/* User mode */
+	m_memview[1](0x0000, 0xffff).rw(FUNC(poly_state::logical_mem_r), FUNC(poly_state::logical_mem_w)); // Logical Memory
+	m_memview[1](0xfff0, 0xffff).r(FUNC(poly_state::vector_r));                                        // Vector fetch (interrupt and reset)
+}
+
+void polydev_state::poly_mem(address_map &map)
+{
+	poly_state::poly_mem(map);
+	m_memview[0](0xe014, 0xe014).rw(FUNC(polydev_state::drive_register_r), FUNC(polydev_state::drive_register_w)); // Drive register
+	m_memview[0](0xe018, 0xe01b).rw(FUNC(polydev_state::fdc_inv_r), FUNC(polydev_state::fdc_inv_w));               // Floppy controller
 }
 
 
@@ -209,7 +205,7 @@ void poly_state::machine_reset()
 	//m_kr2376->set_input_pin(kr2376_device::KR2376_PII, 0);
 
 	/* system mode is entered on Reset */
-	m_bankdev->set_bank(0);
+	m_memview.select(0);
 }
 
 
@@ -260,8 +256,6 @@ void poly_state::poly(machine_config &config)
 	/* basic machine hardware */
 	MC6809(config, m_maincpu, 12.0576_MHz_XTAL / 3);
 	m_maincpu->set_addrmap(AS_PROGRAM, &poly_state::poly_mem);
-
-	ADDRESS_MAP_BANK(config, "bankdev").set_map(&poly_state::poly_bank).set_options(ENDIANNESS_LITTLE, 8, 17, 0x10000);
 
 	INPUT_MERGER_ANY_HIGH(config, "irqs").output_handler().set_inputline(m_maincpu, M6809_IRQ_LINE);
 

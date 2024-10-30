@@ -43,7 +43,6 @@
 #include "machine/kr2376.h"
 #include "machine/clock.h"
 #include "machine/mc6854.h"
-#include "machine/bankdev.h"
 #include "machine/ram.h"
 #include "machine/input_merger.h"
 #include "machine/wd_fdc.h"
@@ -61,8 +60,8 @@ class poly_state : public driver_device
 public:
 	poly_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
+		, m_memview(*this, "memview")
 		, m_maincpu(*this, "maincpu")
-		, m_bankdev(*this, "bankdev")
 		, m_ram(*this, RAM_TAG)
 		, m_trom(*this, "saa5050_%u", 1U)
 		, m_pia(*this, "pia%u", 0U)
@@ -90,13 +89,13 @@ public:
 
 	void init_poly();
 
-	virtual void poly_bank(address_map &map) ATTR_COLD;
+	virtual void poly_mem(address_map &map) ATTR_COLD;
+
+	memory_view m_memview;
 
 private:
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
-
-	void poly_mem(address_map &map) ATTR_COLD;
 
 	uint8_t logical_mem_r(offs_t offset);
 	void logical_mem_w(offs_t offset, uint8_t data);
@@ -124,7 +123,6 @@ private:
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	required_device<cpu_device> m_maincpu;
-	required_device<address_map_bank_device> m_bankdev;
 	required_device<ram_device> m_ram;
 	required_device_array<saa5050_device, 2> m_trom;
 	required_device_array<pia6821_device, 2> m_pia;
@@ -175,7 +173,7 @@ private:
 	void fdc_inv_w(offs_t offset, uint8_t data);
 
 
-	virtual void poly_bank(address_map &map) override ATTR_COLD;
+	virtual void poly_mem(address_map &map) override ATTR_COLD;
 
 	static void floppy_formats(format_registration &fr);
 
