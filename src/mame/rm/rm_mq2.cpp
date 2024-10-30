@@ -124,14 +124,14 @@ void rmMQ2_device::device_add_mconfig(machine_config &config)
 //-------------------------------------------------
 
 rmMQ2_device::rmMQ2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-		device_t(mconfig, RM_MQ2, tag, owner, clock),
-		device_rs232_port_interface(mconfig, *this),
-		m_maincpu(*this, "maincpu"),
-		m_ctc(*this, "ctc"),
-		m_sio(*this, "sio"),
-		m_fdc(*this, "wd1793"),
-		m_floppy0(*this, "wd1793:0"),
-		m_floppy1(*this, "wd1793:1")
+	device_t(mconfig, RM_MQ2, tag, owner, clock),
+	device_rs232_port_interface(mconfig, *this),
+	m_maincpu(*this, "maincpu"),
+	m_ctc(*this, "ctc"),
+	m_sio(*this, "sio"),
+	m_fdc(*this, "wd1793"),
+	m_floppy0(*this, "wd1793:0"),
+	m_floppy1(*this, "wd1793:1")
 {
 }
 

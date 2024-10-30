@@ -375,7 +375,7 @@ void rm380z_state::config_memory_map()
 {
 	address_space &program = m_maincpu->space(AS_PROGRAM);
 	uint8_t *rom = memregion(RM380Z_MAINCPU_TAG)->base();
-	uint8_t* m_ram_p = m_messram->pointer();
+	uint8_t *m_ram_p = m_messram->pointer();
 
 	if (ports_enabled_high())
 	{

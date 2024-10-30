@@ -793,9 +793,8 @@ void captainx_state::captainx(machine_config &config)
 {
 	buccanrs(config);
 
-	Z80(config.replace(), m_maincpu, 5_MHz_XTAL);
+	m_maincpu->set_clock(5_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &captainx_state::captainx_map);
-	m_maincpu->set_addrmap(AS_IO, &captainx_state::vigilant_io_map);
 
 	M68705R3(config, m_mcu, 5_MHz_XTAL / 2); // unknown clock
 	m_mcu->porta_w().set(FUNC(captainx_state::mcu_porta_w));

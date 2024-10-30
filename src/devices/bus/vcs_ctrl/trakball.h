@@ -37,10 +37,10 @@ protected:
 	virtual u8 vcs_joy_r() override;
 
 private:
+	void trakball_pos_and_dir_upd(int axis);
+
 	required_ioport m_trakballb;
 	required_ioport_array<2> m_trakballxy;
-
-	void trakball_pos_and_dir_upd(int axis);
 
 	uint32_t m_last_pos[2];
 	uint8_t m_last_direction[2];
