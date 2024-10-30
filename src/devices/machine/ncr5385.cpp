@@ -687,7 +687,7 @@ int ncr5385_device::state_step()
 			else
 				m_sbx = false;
 
-			delay = 5'000;	// AB 5ns, does this help??
+			delay = 5'000;	// AB 5us, does this help??
 			
 			// clear ACK except after last byte of message input phase
 			if (!remaining() && (ctrl & S_PHASE_MASK) == S_PHASE_MSG_IN)
