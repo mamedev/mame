@@ -1668,7 +1668,7 @@ template <unsigned N> void pc98_base_state::update_uart_irq(int state)
 	if (state)
 		m_uart_irq_pending |= 1 << N;
 	else
-		m_uart_irq_pending &= ~1 << N;
+		m_uart_irq_pending &= ~(1 << N);
 	uart_irq_check();
 }
 
