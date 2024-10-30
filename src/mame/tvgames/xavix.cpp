@@ -64,7 +64,6 @@
     not dumped: no TSOP pads
     2003      Beyblade Arcade Challenge 5-in-1 /Hasbro/USA                                                    -           -               -           -               -                   -                       have
     2002      Excite Striker (UK)
-    2001      Let's construct the town! /TAKARA/Japan                                                         -           -               -           -               -                   -                       -
     2001      Webdiver Gradion /TAKARA/Japan                                                                  -           -               -           -               -                   -                       -
     2000      connecTV OPUS /RADICA EU (different ROM to US?)
 
@@ -77,6 +76,7 @@
     2005      Let's!TVプレイ ドラゴンボ－ルＺ バトル体感かめはめ波～ おめぇとフュージョン / バンダイ / 日本          Let's!TV Play Dragon Ball Z Battle Experience Kamehameha ~ Ometo Fusion / Bandai / Japan
 
     dumped: either here, xavix_2000.cpp, or xavix_2002.cpp
+			  Let's construct the town! /TAKARA/Japan                                                         -           -               -           -               -                   -                       -
 			  TV hockey /TOMY/Japan                                                                           -           -               -           -               -                   -                       -
 			  Zuba-Zuba Blade /TAKARA/Japan                                                                   -           -               -           -               -                   -                       -
               テレビで遊び隊　韋駄天翔 激走 韋駄天バトル / トミー / 日本          Playing with TV Idaten Sho Gekisou Idaten Battle / Tommy / Japan
@@ -2202,6 +2202,12 @@ ROM_START( rad_jcon )
 	ROM_LOAD("jrconstr_u4.bin", 0x400000, 0x100000, CRC(4cfb6193) SHA1(0f56dfc91db3cc066836daf37ff46f9ff5ec5f94) )
 ROM_END
 
+ROM_START( tak_town )
+	ROM_REGION(0x800000, "bios", ROMREGION_ERASE00)
+	ROM_LOAD("rom.u5", 0x000000, 0x200000, CRC(46587e78) SHA1(f163492139087f7aaeea6448b652f58afcb4dd5c) )
+	ROM_LOAD("rom.u4", 0x400000, 0x100000, CRC(642e7e6a) SHA1(d8ff88ad20a60d2eb702dd353f307aa3fcfbbdd5) )
+ROM_END
+
 ROM_START( epo_guru )
 	ROM_REGION(0x400000, "bios", ROMREGION_ERASE00)
 	ROM_LOAD("gururinworld.bin", 0x000000, 0x400000, CRC(e5ae4523) SHA1(0e39ef8f94203d34e49422081667805f50a339a1) )
@@ -2576,6 +2582,10 @@ CONS( 2002, rad_socr,  0,          0,  xavix,            epo_epp,  xavix_state, 
 CONS( 2001, epo_strk,  0,          0,  xavix,            epo_epp,  xavix_state,          init_xavix,    "Epoch / SSD Company LTD",                      "Goal Kimeruze! Excite Striker (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 // A UK branded Epoch version (no Radica involvement) also exists, but so far all units seen have been 'no TSOP pads' cases
 
+// まちをつくろう 工事のくるま５     
+CONS( 2001, tak_town,  0,          0,  xavix,            rad_jcon, xavix_state,          init_xavix,    "Takara / SSD Company LTD",                     "Let's Build a Town: Construction Cars 5", MACHINE_IMPERFECT_SOUND )
+
+// this is roughly based on tak_town above
 CONS( 2002, rad_jcon,  0,          0,  xavix,            rad_jcon, xavix_state,          init_xavix,    "Radica / Takara / SSD Company LTD",            "Play TV Jr. Construction", MACHINE_IMPERFECT_SOUND )
 
 // ホームラン打とうぜ! エキサイトスタジアム
