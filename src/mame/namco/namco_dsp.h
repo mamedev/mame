@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood
-#ifndef MAME_NAMCO_NAMCO_C67_H
-#define MAME_NAMCO_NAMCO_C67_H
+#ifndef MAME_NAMCO_NAMCO_DSP_H
+#define MAME_NAMCO_NAMCO_DSP_H
 
 #pragma once
 
@@ -18,8 +18,19 @@ protected:
 
 };
 
+class namco_c71_device : public tms32025_device
+{
+public:
+	namco_c71_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+protected:
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
+
+};
+
 DECLARE_DEVICE_TYPE(NAMCO_C67, namco_c67_device)
+DECLARE_DEVICE_TYPE(NAMCO_C71, namco_c71_device)
 
 
 
-#endif // MAME_NAMCO_NAMCO_C67_H
+#endif // MAME_NAMCO_NAMCO_DSP_H
