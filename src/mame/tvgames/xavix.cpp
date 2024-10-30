@@ -859,6 +859,13 @@ static INPUT_PORTS_START( rad_opus )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_START1 ) PORT_NAME("Start / Bomb") // PI07
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( rad_opusp )
+	PORT_INCLUDE(rad_opus)
+
+	PORT_MODIFY("REGION") // PAL/NTSC flag
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_CUSTOM )
+INPUT_PORTS_END
+
 static INPUT_PORTS_START( rad_hnt )
 	PORT_INCLUDE(xavix)
 
@@ -2037,6 +2044,11 @@ ROM_START( rad_opus )
 	ROM_LOAD("opus.bin", 0x000000, 0x100000, CRC(509df402) SHA1(c5b863670eac8498ddda9dfde91387634cf7aa9f) )
 ROM_END
 
+ROM_START( rad_opusp )
+	ROM_REGION(0x100000, "bios", ROMREGION_ERASE00)
+	ROM_LOAD("opus_uk.bin", 0x000000, 0x100000, CRC(f84c11c5) SHA1(6e34129d0ca9c52b7c342fc94860629d81705523) )
+ROM_END
+
 ROM_START( rad_hnt )
 	ROM_REGION(0x100000, "bios", ROMREGION_ERASE00)
 	ROM_LOAD("huntin1.bin", 0x000000, 0x100000, CRC(e51e250f) SHA1(d72199096d466cd344bb243ef1228e0df9501d00) )
@@ -2542,7 +2554,9 @@ CONS( 2000, rad_ping,  0,          0,  xavix,            rad_ping, xavix_state, 
 CONS( 2000, rad_pingp, rad_ping,   0,  xavixp,           rad_pingp,xavix_state,          init_xavix,    "Radica / SSD Company LTD / Simmer Technology", "ConnecTV Table Tennis (PAL)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
 CONS( 2000, rad_opus,  0,          0,  xavix_nv,         rad_opus, xavix_state,          init_xavix,    "Radica / SSD Company LTD",                     "Play TV Opus (NTSC)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // there is a missing 'TV Static' noise effect when menus appear (box shows 'Play TV' ingame just shows 'Radica:Plug & Play')
-// ConnecTV Opus is a different ROM in this case? Game doesn't read from PAL/NTSC flag? (verify it isn't detecting PAL in some other way) ( https://www.youtube.com/watch?v=Ub9tstLEj_0 )
+// unlike many of the other Radica units which read a PAL/NTSC flag to determine the title, the US ROM above doesn't and there is no way to show the ConnecTV logo with it.
+// the PAL set does read the region flag and can display either title
+CONS( 2000, rad_opusp, rad_opus,   0,  xavixp_nv,        rad_opusp,xavix_state,          init_xavix,    "Radica / SSD Company LTD",                     "ConnecTV Opus (PAL)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 
 CONS( 2000, rad_hnt,   0,          0,  xavix_nv,         rad_hnt,  xavix_state,          init_xavix,    "Radica / SSD Company LTD",                     "Play TV Buckmasters Huntin' (NTSC)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // need to map gun (box shows 'Play TV' ingame just shows 'Plug & Play')
 
