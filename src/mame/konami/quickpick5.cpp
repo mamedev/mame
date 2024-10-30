@@ -52,8 +52,10 @@ public:
 		m_k053245(*this, "k053245"),
 		m_k051649(*this, "k051649"),
 		m_k053252(*this, "k053252"),
-		m_vram(*this, "vram"),
+		m_bank(*this, "bank"),
 		m_vram_view(*this, "vram_view"),
+		m_vram(*this, "vram"),
+		m_ttlrom(*this, "ttl"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_oki(*this, "oki"),
 		m_outport(*this, "OUT"),
@@ -104,8 +106,10 @@ private:
 	required_device<k05324x_device> m_k053245;
 	required_device<k051649_device> m_k051649;
 	required_device<k053252_device> m_k053252;
-	required_shared_ptr<u8> m_vram;
+	optional_memory_bank m_bank;
 	memory_view m_vram_view;
+	required_shared_ptr<u8> m_vram;
+	required_region_ptr<u8> m_ttlrom;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<okim6295_device> m_oki;
 	required_ioport m_outport;
@@ -190,14 +194,14 @@ void quickpick5_state::ccu_int_time_w(u8 data)
 
 void quickpick5_state::control_w(u8 data)
 {
-	membank("bank1")->set_entry(data&0x1);
+	m_bank->set_entry(data & 0x1);
 	if (((m_control & 0x60) != 0x60) && ((data & 0x60) == 0x60))
 	{
 		m_ttlrom_offset = 0;
 	}
 	m_control = data;
 
-	if ((m_control & 0x10) == 0x10)
+	if (m_control & 0x10)
 		m_vram_view.select(1); // SCC
 	else if ((m_control & 0x60) == 0x60)
 		m_vram_view.select(2); // TTL ROM
@@ -207,11 +211,10 @@ void quickpick5_state::control_w(u8 data)
 
 u8 quickpick5_state::ttlrom_r(offs_t offset)
 {
-	const u8 *ROM = memregion("ttl")->base();
-	u8 ret = ROM[m_ttlrom_offset];
+	u8 ret = m_ttlrom[m_ttlrom_offset];
 
 	if (!machine().side_effects_disabled())
-		m_ttlrom_offset++;
+		m_ttlrom_offset = (m_ttlrom_offset + 1) % m_ttlrom.bytes();
 
 	return ret;
 }
@@ -219,7 +222,7 @@ u8 quickpick5_state::ttlrom_r(offs_t offset)
 void quickpick5_state::vram_w(offs_t offset, u8 data)
 {
 	m_vram[offset] = data;
-	m_ttl_tilemap->mark_tile_dirty(offset>>1);
+	m_ttl_tilemap->mark_tile_dirty(offset >> 1);
 }
 
 void quickpick5_state::video_start()
@@ -237,7 +240,7 @@ void quickpick5_state::video_start()
 
 	int gfx_index;
 
-	/* find first empty slot to decode gfx */
+	// find first empty slot to decode gfx
 	for (gfx_index = 0; gfx_index < MAX_GFX_ELEMENTS; gfx_index++)
 		if (m_gfxdecode->gfx(gfx_index) == nullptr)
 			break;
@@ -260,12 +263,9 @@ void quickpick5_state::video_start()
 
 TILE_GET_INFO_MEMBER(quickpick5_state::ttl_get_tile_info)
 {
-	int attr, code;
-
-	attr = m_vram[BYTE_XOR_LE((tile_index<<1)+1)];
-	code = m_vram[BYTE_XOR_LE((tile_index<<1))] | ((attr & 0xf) << 8);
-	attr >>= 3;
-	attr &= ~1;
+	int attr = m_vram[BYTE_XOR_LE((tile_index << 1) + 1)];
+	int code = m_vram[BYTE_XOR_LE((tile_index << 1))] | ((attr & 0xf) << 8);
+	attr = attr >> 3 & ~1;
 
 	tileinfo.set(m_ttl_gfx_index, code, attr, 0);
 }
@@ -320,7 +320,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(quickpick5_state::scanline)
 void quickpick5_state::common_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom().region("maincpu", 0);
-	map(0x8000, 0xbfff).bankr("bank1");
+	map(0x8000, 0xbfff).bankr(m_bank);
 	map(0xc000, 0xdbff).ram().share("nvram");
 	map(0xdc00, 0xdc0f).rw(m_k053252, FUNC(k053252_device::read), FUNC(k053252_device::write));
 	map(0xdc40, 0xdc4f).rw(FUNC(quickpick5_state::k244_r), FUNC(quickpick5_state::k244_w));
@@ -336,7 +336,7 @@ void quickpick5_state::common_map(address_map &map)
 	map(0xe000, 0xefff).view(m_vram_view);
 	m_vram_view[0](0xe000, 0xefff).ram().w(FUNC(quickpick5_state::vram_w)).share(m_vram);
 	m_vram_view[1](0xe000, 0xe0ff).mirror(0x0f00).m(m_k051649, FUNC(k051649_device::scc_map));
-	m_vram_view[2](0xe000, 0xe0ff).mirror(0x0fff).r(FUNC(quickpick5_state::ttlrom_r));
+	m_vram_view[2](0xe000, 0xe000).mirror(0x0fff).r(FUNC(quickpick5_state::ttlrom_r));
 
 	map(0xf000, 0xf7ff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
 	map(0xf800, 0xffff).rw(FUNC(quickpick5_state::k245_r), FUNC(quickpick5_state::k245_w));
@@ -537,7 +537,7 @@ INPUT_PORTS_END
 
 void quickpick5_state::machine_start()
 {
-	membank("bank1")->configure_entries(0, 0x2, memregion("maincpu")->base()+0x8000, 0x4000);
+	m_bank->configure_entries(0, 0x2, memregion("maincpu")->base()+0x8000, 0x4000);
 
 	save_item(NAME(m_control));
 	save_item(NAME(m_ccu_int_time));
@@ -550,7 +550,7 @@ void quickpick5_state::machine_start()
 
 void quickpick5_state::machine_reset()
 {
-	membank("bank1")->set_entry(0);
+	m_bank->set_entry(0);
 	m_vram_view.select(0);
 
 	m_control = 0;
@@ -596,7 +596,7 @@ void quickpick5_state::quickpick5(machine_config &config)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	K051649(config, m_k051649, XTAL(32'000'000)/9);  // xtal is verified, divider is not
+	K051649(config, m_k051649, XTAL(32'000'000)/9); // xtal is verified, divider is not
 	m_k051649->add_route(ALL_OUTPUTS, "mono", 0.45);
 
 	OKIM6295(config, m_oki, XTAL(32'000'000)/18, okim6295_device::PIN7_HIGH);
@@ -611,19 +611,19 @@ void quickpick5_state::waijockey(machine_config &config)
 
 
 ROM_START( quickp5 )
-	ROM_REGION( 0x10000, "maincpu", 0 ) /* main program */
+	ROM_REGION( 0x10000, "maincpu", 0 ) // main program
 	ROM_LOAD( "117.10e.bin",  0x000000, 0x010000, CRC(3645e1a5) SHA1(7d0d98772f3732510e7a58f50a622fcec74087c3) )
 
-	ROM_REGION( 0x40000, "k053245", 0 )   /* sprites */
+	ROM_REGION( 0x40000, "k053245", 0 ) // sprites
 	ROM_LOAD32_BYTE( "117-a02-7k.bin", 0x000003, 0x010000, CRC(745a1dc9) SHA1(33d876fb70cb802d62f87ad3721740e0961c7bec) )
 	ROM_LOAD32_BYTE( "117-a03-7l.bin", 0x000002, 0x010000, CRC(07ec6db7) SHA1(7a94efc5f313fee6b9b63b7d2b6ba1cbf4158900) )
 	ROM_LOAD32_BYTE( "117-a04-3l.bin", 0x000001, 0x010000, CRC(08dba5df) SHA1(2174be21c5a7db31ccc20ca0b88e4a94145776a5) )
 	ROM_LOAD32_BYTE( "117-a05-3k.bin", 0x000000, 0x010000, CRC(9b2d0501) SHA1(3f1c69ef101153da5ac3335585541006c42e954d) )
 
-	ROM_REGION( 0x80000, "ttl", 0 ) /* TTL text tilemap characters? */
+	ROM_REGION( 0x80000, "ttl", 0 ) // TTL text tilemap characters?
 	ROM_LOAD( "117-18e.bin",  0x000000, 0x020000, CRC(10e0d1e2) SHA1(f4ba190814d5e3f3e910c9da24845b6ddb259bff) )
 
-	ROM_REGION( 0x20000, "oki", 0 )    /* OKIM6295 samples */
+	ROM_REGION( 0x20000, "oki", 0 ) // OKIM6295 samples
 	ROM_LOAD( "117-a01-2e.bin", 0x000000, 0x020000, CRC(3d8fbd01) SHA1(f350da2a4e7bfff9975188a39acf73415bd85b3d) )
 
 	ROM_REGION( 0x80000, "pals", 0 )
@@ -637,7 +637,7 @@ ROM_START( waijockey )
 	ROM_REGION( 0x10000, "maincpu", 0 ) // main program
 	ROM_LOAD( "gs-257-a02.7n",  0x000000, 0x010000, CRC(e9a5f416) SHA1(b762b393bbe394339904636ff1d31d8eeb8b8d05) )
 
-	ROM_REGION( 0x80000, "k053245", 0 )   // sprites
+	ROM_REGION( 0x80000, "k053245", 0 ) // sprites
 	ROM_LOAD32_BYTE( "gs-257-a03.3t",  0x000000, 0x020000, CRC(4aa2376b) SHA1(30e472457d10504fb805882a5eea7e548e812ff6) )
 	ROM_LOAD32_BYTE( "gs-257-a05.3u",  0x000001, 0x020000, CRC(a5b18792) SHA1(d5ee5e6a8040a2297073ad4b42b8978c9865cceb) )
 	ROM_LOAD32_BYTE( "gs-257-a04.10t", 0x000002, 0x020000, CRC(58c3ce20) SHA1(8d6df373a37770602d104325e27015611fdaaaff) )
@@ -646,7 +646,7 @@ ROM_START( waijockey )
 	ROM_REGION( 0x80000, "ttl", 0 ) // TTL text tilemap characters?
 	ROM_LOAD( "gs-257-a07.28t",  0x000000, 0x020000, CRC(26e3afa6) SHA1(dba5f321b523717b9dd3f1e22ef15c1301af403b) )
 
-	ROM_REGION( 0x20000, "oki", 0 )    // OKIM6295 samples
+	ROM_REGION( 0x20000, "oki", 0 ) // OKIM6295 samples
 	ROM_LOAD( "gs-257-a01.1g", 0x000000, 0x020000, CRC(8ce0e693) SHA1(fad19ba37c7987a4d2797200b96ac9c050eb5d94) )
 ROM_END
 
