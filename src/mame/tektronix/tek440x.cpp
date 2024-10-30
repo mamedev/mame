@@ -646,7 +646,7 @@ u16 tek440x_state::memory_r(offs_t offset, u16 mem_mask)
 			m_map_control &= ~(1 << MAP_CPU_WR);
 
 			// selftest expects fail if page.pid != map_control.pid
-			if ((BIT(m_map[offset >> 11], 11, 3)==0) || BIT(m_map[offset >> 11], 11, 3) != (m_map_control & 7))
+			if ( BIT(m_map[offset >> 11], 11, 3) != (m_map_control & 7))
 			{
 				m_map_control &= ~(1 << MAP_BLOCK_ACCESS);
 
