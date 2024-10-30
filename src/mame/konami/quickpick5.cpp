@@ -142,7 +142,7 @@ private:
 
 	void serial_io_w(u8 data);
 
-	optional_ioport_array<3> m_sio_ports;
+	required_ioport_array<3> m_sio_ports;
 	u16 m_sio_out = 0, m_sio_in0 = 0, m_sio_in1 = 0;
 	u8 m_sio_prev = 0;
 };
@@ -281,7 +281,6 @@ void waijockey_state::video_start()
 
 	m_ttl_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(waijockey_state::ttl_get_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
 	m_ttl_tilemap->set_transparent_pen(0);
-	m_ttl_tilemap->set_scrolly(28);
 
 	m_ttlrom_offset = 0;
 	m_ccu_int_time_count = 0;
@@ -397,14 +396,14 @@ static INPUT_PORTS_START( quickpick5 )
 	PORT_DIPSETTING(    0x00, DEF_STR( 5C_1C ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( 2C_1C ) )
-	PORT_DIPSETTING(    0x03, DEF_STR( 1C_7C ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( 1C_5C ) )
-	PORT_DIPSETTING(    0x05, DEF_STR( 1C_3C ) )
-	PORT_DIPSETTING(    0x06, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(    0x07, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x06, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(    0x05, DEF_STR( 1C_3C ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( 1C_5C ) )
+	PORT_DIPSETTING(    0x03, DEF_STR( 1C_7C ) )
 	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )   PORT_DIPLOCATION("DIPSW1:4")
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x30, 0x30, "Jack Pot" )   PORT_DIPLOCATION("DIPSW1:5,6")
 	PORT_DIPSETTING(    0x30, "300" )
 	PORT_DIPSETTING(    0x20, "500" )
@@ -418,33 +417,33 @@ static INPUT_PORTS_START( quickpick5 )
 
 	PORT_START("DSW2")
 	PORT_DIPNAME( 0x0f, 0x0f, "Max Payout" )   PORT_DIPLOCATION("DIPSW2:1,2,3,4")
-	PORT_DIPSETTING(    0x00, "94%" )
-	PORT_DIPSETTING(    0x01, "92%" )
-	PORT_DIPSETTING(    0x02, "91%" )
-	PORT_DIPSETTING(    0x03, "90%" )
-	PORT_DIPSETTING(    0x04, "89%" )
-	PORT_DIPSETTING(    0x05, "88%" )
-	PORT_DIPSETTING(    0x06, "87%" )
-	PORT_DIPSETTING(    0x07, "86%" )
-	PORT_DIPSETTING(    0x08, "85%" )
-	PORT_DIPSETTING(    0x09, "84%" )
-	PORT_DIPSETTING(    0x0a, "83%" )
-	PORT_DIPSETTING(    0x0b, "82%" )
-	PORT_DIPSETTING(    0x0c, "80%" )
-	PORT_DIPSETTING(    0x0d, "75%" )
-	PORT_DIPSETTING(    0x0e, "70%" )
 	PORT_DIPSETTING(    0x0f, "65%" )
+	PORT_DIPSETTING(    0x0e, "70%" )
+	PORT_DIPSETTING(    0x0d, "75%" )
+	PORT_DIPSETTING(    0x0c, "80%" )
+	PORT_DIPSETTING(    0x0b, "82%" )
+	PORT_DIPSETTING(    0x0a, "83%" )
+	PORT_DIPSETTING(    0x09, "84%" )
+	PORT_DIPSETTING(    0x08, "85%" )
+	PORT_DIPSETTING(    0x07, "86%" )
+	PORT_DIPSETTING(    0x06, "87%" )
+	PORT_DIPSETTING(    0x05, "88%" )
+	PORT_DIPSETTING(    0x04, "89%" )
+	PORT_DIPSETTING(    0x03, "90%" )
+	PORT_DIPSETTING(    0x02, "91%" )
+	PORT_DIPSETTING(    0x01, "92%" )
+	PORT_DIPSETTING(    0x00, "94%" )
 	PORT_DIPNAME( 0x30, 0x30, "Button Time" )   PORT_DIPLOCATION("DIPSW2:5,6")
-	PORT_DIPSETTING(    0x00, "40 Seconds" )
-	PORT_DIPSETTING(    0x10, "30 Seconds" )
-	PORT_DIPSETTING(    0x20, "20 Seconds" )
 	PORT_DIPSETTING(    0x30, "15 Seconds" )
+	PORT_DIPSETTING(    0x20, "20 Seconds" )
+	PORT_DIPSETTING(    0x10, "30 Seconds" )
+	PORT_DIPSETTING(    0x00, "40 Seconds" )
 	PORT_DIPNAME( 0x40, 0x00, "Backup Memory" )   PORT_DIPLOCATION("DIPSW2:7")
 	PORT_DIPSETTING(    0x00, "Clear" )
 	PORT_DIPSETTING(    0x40, "Keep" )
 	PORT_DIPNAME( 0x80, 0x00, "Attract Sound" )   PORT_DIPLOCATION("DIPSW2:8")
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("IN3")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_READ_LINE_MEMBER(FUNC(quickpick5_state::serial_io_r))
@@ -490,7 +489,7 @@ INPUT_PORTS_END
 //        3 4 2-3 2-4 3-4 Start
 static INPUT_PORTS_START( waijockey )
 	PORT_START("IN1")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_CUSTOM) PORT_READ_LINE_DEVICE_MEMBER("hopper", FUNC(hopper_device::line_r))
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_READ_LINE_DEVICE_MEMBER("hopper", FUNC(hopper_device::line_r))
 	PORT_SERVICE_NO_TOGGLE(0x02, IP_ACTIVE_LOW)
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_UNUSED) // * B16
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_COIN1) PORT_NAME("Medal")
@@ -511,30 +510,62 @@ static INPUT_PORTS_START( waijockey )
 
 	PORT_START("DSW1")
 	PORT_DIPNAME( 0x0f, 0x0f, DEF_STR( Coinage ) )   PORT_DIPLOCATION("DIPSW1:1,2,3,4")
-	PORT_DIPNAME( 0xf0, 0xf0, "Standard of Payout" ) PORT_DIPLOCATION("DIPSW1:5,6,7,8")
+	PORT_DIPSETTING(    0x0f, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x0e, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(    0x0d, DEF_STR( 1C_3C ) )
+	PORT_DIPSETTING(    0x0c, DEF_STR( 1C_4C ) )
+	PORT_DIPSETTING(    0x0b, DEF_STR( 1C_5C ) )
+	PORT_DIPSETTING(    0x0a, DEF_STR( 1C_6C ) )
+	PORT_DIPSETTING(    0x09, DEF_STR( 1C_7C ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( 1C_8C ) )
+	PORT_DIPSETTING(    0x07, DEF_STR( 1C_9C ) )
+	PORT_DIPSETTING(    0x06, "1 Coin/10 Credits" )
+	PORT_DIPSETTING(    0x05, "1 Coin/11 Credits" )
+	PORT_DIPSETTING(    0x04, "1 Coin/12 Credits" )
+	PORT_DIPSETTING(    0x03, "1 Coin/13 Credits" )
+	PORT_DIPSETTING(    0x02, "1 Coin/14 Credits" )
+	PORT_DIPSETTING(    0x01, "1 Coin/15 Credits" )
+	PORT_DIPSETTING(    0x00, "1 Coin/16 Credits" )
+	PORT_DIPNAME( 0xf0, 0xf0, "Max Payout" ) PORT_DIPLOCATION("DIPSW1:5,6,7,8")
+	PORT_DIPSETTING(    0xf0, "60%" )
+	PORT_DIPSETTING(    0xe0, "62%" )
+	PORT_DIPSETTING(    0xd0, "64%" )
+	PORT_DIPSETTING(    0xc0, "66%" )
+	PORT_DIPSETTING(    0xb0, "68%" )
+	PORT_DIPSETTING(    0xa0, "70%" )
+	PORT_DIPSETTING(    0x90, "72%" )
+	PORT_DIPSETTING(    0x80, "74%" )
+	PORT_DIPSETTING(    0x70, "76%" )
+	PORT_DIPSETTING(    0x60, "78%" )
+	PORT_DIPSETTING(    0x50, "80%" )
+	PORT_DIPSETTING(    0x40, "82%" )
+	PORT_DIPSETTING(    0x30, "84%" )
+	PORT_DIPSETTING(    0x20, "86%" )
+	PORT_DIPSETTING(    0x10, "88%" )
+	PORT_DIPSETTING(    0x00, "90%" )
 
 	PORT_START("DSW2")
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )   PORT_DIPLOCATION("DIPSW2:1")
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )   PORT_DIPLOCATION("DIPSW2:2")
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )   PORT_DIPLOCATION("DIPSW2:3")
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )   PORT_DIPLOCATION("DIPSW2:4")
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x10, 0x10, "Game Play Mode" )   PORT_DIPLOCATION("DIPSW2:5") // more like gameplay test mode
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x20, 0x00, "Payout Mode" )   PORT_DIPLOCATION("DIPSW2:6")
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPNAME( 0x40, 0x00, "Attract Sound" )   PORT_DIPLOCATION("DIPSW2:7")
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x00, "Attract Sound" )   PORT_DIPLOCATION("DIPSW2:7")
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x80, 0x00, "Backup Memory" )   PORT_DIPLOCATION("DIPSW2:8")
 	PORT_DIPSETTING(    0x00, "Clear" )
 	PORT_DIPSETTING(    0x80, "Keep" )
@@ -573,6 +604,7 @@ void waijockey_state::machine_reset()
 {
 	m_bank->set_entry(0);
 	m_vram_view.select(0);
+	m_ttl_tilemap->set_scrolly(15);
 
 	m_control = 0;
 	m_ccu_int_time = 0;
@@ -583,20 +615,21 @@ void quickpick5_state::machine_reset()
 {
 	waijockey_state::machine_reset();
 
+	m_ttl_tilemap->set_scrollx(80);
+	m_ttl_tilemap->set_scrolly(28);
+
 	m_sio_out = m_sio_in0 = m_sio_in1 = 0;
 	m_sio_prev = 0;
-
-	m_ttl_tilemap->set_scrollx(80);
 }
 
 void waijockey_state::waijockey(machine_config &config)
 {
 	// basic machine hardware
-	Z80(config, m_maincpu, XTAL(32'000'000)/4); // z84c0008pec 8mhz part, 32Mhz xtal verified on PCB, divisor unknown
+	Z80(config, m_maincpu, 32_MHz_XTAL/4); // z84c0008pec 8mhz part, 32Mhz xtal verified on PCB, divisor unknown
 	m_maincpu->set_addrmap(AS_PROGRAM, &waijockey_state::waijockey_main);
 	TIMER(config, "scantimer").configure_scanline(FUNC(waijockey_state::scanline), "screen", 0, 1);
 
-	K053252(config, m_k053252, XTAL(32'000'000)/4); // K053252, xtal verified, divider not verified
+	K053252(config, m_k053252, 32_MHz_XTAL/4); // K053252, xtal verified, divider not verified
 	m_k053252->int1_ack().set(FUNC(waijockey_state::vbl_ack_w));
 	m_k053252->int2_ack().set(FUNC(waijockey_state::nmi_ack_w));
 	m_k053252->int_time().set(FUNC(waijockey_state::ccu_int_time_w));
@@ -627,10 +660,10 @@ void waijockey_state::waijockey(machine_config &config)
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
-	K051649(config, m_k051649, XTAL(32'000'000)/9); // xtal is verified, divider is not
+	K051649(config, m_k051649, 32_MHz_XTAL/12); // xtal is verified, divider is not
 	m_k051649->add_route(ALL_OUTPUTS, "mono", 0.45);
 
-	OKIM6295(config, m_oki, XTAL(32'000'000)/18, okim6295_device::PIN7_HIGH);
+	OKIM6295(config, m_oki, 32_MHz_XTAL/24, okim6295_device::PIN7_HIGH);
 	m_oki->add_route(ALL_OUTPUTS, "mono", 1.0);
 }
 
