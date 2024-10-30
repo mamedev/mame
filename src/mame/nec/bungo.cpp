@@ -136,6 +136,9 @@ void bungo_mini5sx_state::mini5sx_config(machine_config &config)
 //  m_ppi_sys->in_pc_callback().set_constant(0xa0); // 0x80 cpu triple fault reset flag?
 //  m_ppi_sys->out_pc_callback().set(FUNC(pc98lt_state::ppi_sys_beep_portc_w));
 
+    // TODO: unverified, known to have a serial port
+    pc9801_serial(config);
+
 	I8255(config, m_ppi_prn, 0);
 //  m_ppi_prn->in_pb_callback().set_ioport("PRNB");
 

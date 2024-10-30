@@ -151,7 +151,8 @@ void pc98lt_state::lt_io(address_map &map)
 	map.unmap_value_high();
 //  map(0x0000, 0x001f) // PIC (bit 3 ON slave / master), V50 internal / <undefined>
 	map(0x0020, 0x002f).w(FUNC(pc98lt_state::rtc_w)).umask16(0x00ff);
-	map(0x0030, 0x0037).rw(m_ppi_sys, FUNC(i8255_device::read), FUNC(i8255_device::write)).umask16(0xff00); //i8251 RS232c / i8255 system port
+	map(0x0030, 0x0037).rw(m_ppi_sys, FUNC(i8255_device::read), FUNC(i8255_device::write)).umask16(0xff00);
+	map(0x0030, 0x0033).rw(m_sio, FUNC(i8251_device::read), FUNC(i8251_device::write)).umask16(0x00ff); //i8251 RS232c / i8255 system port
 	map(0x0040, 0x0047).rw(m_ppi_prn, FUNC(i8255_device::read), FUNC(i8255_device::write)).umask16(0x00ff);
 	map(0x0040, 0x0047).rw(m_keyb, FUNC(pc9801_kbd_device::rx_r), FUNC(pc9801_kbd_device::tx_w)).umask16(0xff00); //i8255 printer port / i8251 keyboard
 //  map(0x0070, 0x007f) // PIT, V50 internal
@@ -418,6 +419,13 @@ static void pc9801_floppies(device_slot_interface &device)
 //  device.option_add("35hd", FLOPPY_35_HD);
 }
 
+void pc98lt_state::uart_irq_check()
+{
+	m_maincpu->set_input_line(4, m_uart_irq_pending & m_uart_irq_mask ? ASSERT_LINE : CLEAR_LINE);
+}
+
+
+
 void pc98lt_state::lt_config(machine_config &config)
 {
 	const XTAL xtal = XTAL(8'000'000);
@@ -427,10 +435,9 @@ void pc98lt_state::lt_config(machine_config &config)
 	// TODO: jumps off the weeds if divided by / 4 after timer check, DMA issue?
 //  m_maincpu->set_tclk(xtal / 4);
 	m_maincpu->set_tclk(xtal / 100);
-//  m_maincpu->tout2_cb().set_inputline(m_maincpu, INPUT_LINE_IRQ2);
 //  m_pit->out_handler<0>().set(m_pic1, FUNC(pic8259_device::ir0_w));
-//  m_pit->out_handler<2>().set(m_sio, FUNC(i8251_device::write_txc));
-//  m_pit->out_handler<2>().append(m_sio, FUNC(i8251_device::write_rxc));
+	m_maincpu->tout2_cb().set(m_sio, FUNC(i8251_device::write_txc));
+	m_maincpu->tout2_cb().append(m_sio, FUNC(i8251_device::write_rxc));
 
 //  m_maincpu->set_irq_acknowledge_callback("pic8259_master", FUNC(pic8259_device::inta_cb));
 
@@ -443,6 +450,8 @@ void pc98lt_state::lt_config(machine_config &config)
 	m_ppi_sys->in_pb_callback().set_ioport("SYSB");
 //  m_ppi_sys->in_pc_callback().set_constant(0xa0); // 0x80 cpu triple fault reset flag?
 	m_ppi_sys->out_pc_callback().set(FUNC(pc98lt_state::ppi_sys_beep_portc_w));
+
+	pc9801_serial(config);
 
 	I8255(config, m_ppi_prn, 0);
 	m_ppi_prn->in_pb_callback().set_ioport("PRNB");

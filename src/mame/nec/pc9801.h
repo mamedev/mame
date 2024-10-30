@@ -33,6 +33,7 @@
 #include "machine/upd4991a.h"
 #include "machine/upd765.h"
 
+#include "bus/rs232/rs232.h"
 #include "bus/scsi/pc9801_sasi.h"
 #include "bus/scsi/scsi.h"
 #include "bus/scsi/scsihd.h"
@@ -71,7 +72,6 @@
 #include "formats/nfd_dsk.h"
 
 #define RTC_TAG      "rtc"
-#define UPD8251_TAG  "upd8251"
 #define SASIBUS_TAG  "sasi"
 
 #define ATTRSEL_REG 0
@@ -98,6 +98,7 @@ public:
 		, m_ppi_sys(*this, "ppi_sys")
 		, m_ppi_prn(*this, "ppi_prn")
 		, m_beeper(*this, "beeper")
+		, m_sio(*this, "sio")
 	{
 	}
 
@@ -112,13 +113,20 @@ protected:
 	required_device<i8255_device> m_ppi_sys;
 	required_device<i8255_device> m_ppi_prn;
 	optional_device<beep_device> m_beeper;
+	required_device<i8251_device> m_sio;
 
 	void rtc_w(uint8_t data);
 	void ppi_sys_beep_portc_w(uint8_t data);
 
+	virtual void uart_irq_check() = 0;
+	template <unsigned N> void update_uart_irq(int state);
+
+	void pc9801_serial(machine_config &config);
+
 	static void floppy_formats(format_registration &fr);
 
 	u8 m_sys_type = 0;
+	u8 m_uart_irq_mask = 0, m_uart_irq_pending = 0;
 };
 
 class pc9801_state : public pc98_base_state
@@ -142,7 +150,6 @@ public:
 		, m_pic1(*this, "pic8259_master")
 		, m_pic2(*this, "pic8259_slave")
 		, m_memsw(*this, "memsw")
-		, m_sio(*this, UPD8251_TAG)
 		, m_sasibus(*this, SASIBUS_TAG)
 		, m_sasi_data_out(*this, "sasi_data_out")
 		, m_sasi_data_in(*this, "sasi_data_in")
@@ -175,7 +182,6 @@ protected:
 	required_device<pic8259_device> m_pic2;
 private:
 	required_device<pc9801_memsw_device> m_memsw;
-	required_device<i8251_device> m_sio;
 	optional_device<scsi_port_device> m_sasibus;
 	optional_device<output_latch_device> m_sasi_data_out;
 	optional_device<input_buffer_device> m_sasi_data_in;
@@ -352,6 +358,10 @@ private:
 	void ppi_mouse_portc_w(uint8_t data);
 
 	TIMER_DEVICE_CALLBACK_MEMBER( mouse_irq_cb );
+
+// UART SIO
+protected:
+	virtual void uart_irq_check() override;
 };
 
 /**********************************************************

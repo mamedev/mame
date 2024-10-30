@@ -38,6 +38,9 @@ private:
 
 	u16 fake_dict_r(offs_t offset);
 
+    // just suppress for now, TBD
+	virtual void uart_irq_check() override {};
+
 	void bungo_palette(palette_device &palette) const;
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 };
