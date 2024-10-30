@@ -26,6 +26,7 @@
 #include "konami_helper.h"
 
 #include "cpu/z80/z80.h"
+#include "machine/bankdev.h"
 #include "machine/eepromser.h"
 #include "machine/k053252.h"
 #include "machine/nvram.h"
@@ -52,6 +53,7 @@ public:
 		m_k053245(*this, "k053245"),
 		m_k051649(*this, "k051649"),
 		m_k053252(*this, "k053252"),
+		m_scc_map(*this, "scc_map"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_oki(*this, "oki"),
 		m_outport(*this, "OUT"),
@@ -61,7 +63,13 @@ public:
 
 	void quickpick5(machine_config &config);
 	void waijockey(machine_config &config);
+
 	int serial_io_r();
+
+protected:
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	u32 screen_update_quickpick5(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -96,19 +104,17 @@ private:
 	void serial_io_w(u8 data);
 	void out_w(u8 data);
 
+	void scc_map(address_map &map) ATTR_COLD;
 	void common_map(address_map &map) ATTR_COLD;
 	void quickpick5_main(address_map &map) ATTR_COLD;
 	void waijockey_main(address_map &map) ATTR_COLD;
-
-	virtual void machine_start() override ATTR_COLD;
-	virtual void machine_reset() override ATTR_COLD;
-	virtual void video_start() override ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<palette_device> m_palette;
 	required_device<k05324x_device> m_k053245;
 	required_device<k051649_device> m_k051649;
 	required_device<k053252_device> m_k053252;
+	required_device<address_map_bank_device> m_scc_map;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<okim6295_device> m_oki;
 	required_ioport m_outport;
@@ -195,22 +201,17 @@ void quickpick5_state::ccu_int_time_w(u8 data)
 u8 quickpick5_state::vram_r(address_space &space, offs_t offset)
 {
 	if ((m_control & 0x10) == 0x10)
-	{
-		offset |= 0x800;
-		if ((offset >= 0x800) && (offset <= 0x880))
-		{
-			return m_k051649->k051649_waveform_r(offset & 0x7f);
-		}
-		else if ((offset >= 0x8e0) && (offset <= 0x8ff))
-		{
-			return m_k051649->k051649_test_r(space);
-		}
-	}
+		return m_scc_map->read8(offset & 0xff);
 
 	if ((m_control & 0x60) == 0x60)
 	{
-		u8 *ROM = memregion("ttl")->base();
-		return ROM[m_ttlrom_offset++];
+		const u8 *ROM = memregion("ttl")->base();
+		u8 ret = ROM[m_ttlrom_offset];
+
+		if (!machine().side_effects_disabled())
+			m_ttlrom_offset++;
+
+		return ret;
 	}
 
 	return m_vram[offset];
@@ -220,29 +221,7 @@ void quickpick5_state::vram_w(offs_t offset, u8 data)
 {
 	if ((m_control & 0x10) == 0x10)
 	{
-		offset |= 0x800;
-		if ((offset >= 0x800) && (offset < 0x880))
-		{
-			m_k051649->k051649_waveform_w(offset-0x800, data);
-			return;
-		}
-		else if (offset < 0x88a)
-		{
-			m_k051649->k051649_frequency_w(offset-0x880, data);
-			return;
-		}
-		else if (offset < 0x88f)
-		{
-			m_k051649->k051649_volume_w(offset-0x88a, data);
-			return;
-		}
-		else if (offset < 0x890)
-		{
-			m_k051649->k051649_keyonoff_w(data);
-			return;
-		}
-
-		m_k051649->k051649_test_w(data);
+		m_scc_map->write8(offset & 0xff, data);
 		return;
 	}
 
@@ -344,6 +323,11 @@ TIMER_DEVICE_CALLBACK_MEMBER(quickpick5_state::scanline)
 		m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 		m_ccu_int_time_count = m_ccu_int_time;
 	}
+}
+
+void quickpick5_state::scc_map(address_map &map)
+{
+	map(0x00, 0xff).m(m_k051649, FUNC(k051649_device::scc_map));
 }
 
 void quickpick5_state::common_map(address_map &map)
@@ -590,6 +574,8 @@ void quickpick5_state::quickpick5(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &quickpick5_state::quickpick5_main);
 	TIMER(config, "scantimer").configure_scanline(FUNC(quickpick5_state::scanline), "screen", 0, 1);
 	HOPPER(config, "hopper", attotime::from_msec(100));
+
+	ADDRESS_MAP_BANK(config, m_scc_map).set_map(&quickpick5_state::scc_map).set_options(ENDIANNESS_LITTLE, 8, 8);
 
 	K053252(config, m_k053252, XTAL(32'000'000)/4); /* K053252, xtal verified, divider not verified */
 	m_k053252->int1_ack().set(FUNC(quickpick5_state::vbl_ack_w));

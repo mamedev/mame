@@ -108,8 +108,8 @@ n = 0/2/4/6 10+n MHz XTAL
 b = Playing mode options on the 2nd row
 
 All known chess computers with the A20 ROM have LEDs, and the S/t/b options are
-either configured as either St, or b. So, none of them that have the Studies
-button and teach mode officially support the extra options and vice versa.
+configured as either St, or b. So, none of them that have the Studies button and
+teach mode officially support the extra options and vice versa.
 
 H8/3214 A20 MCU is used in:
 - Saitek Centurion (config: StL0_)
