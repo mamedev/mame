@@ -21646,6 +21646,7 @@ bowmen                          // (c) 1994 Ten-Level
 buccanrs                        // (c) 1989 Duintronic
 buccanrsa                       // (c) 1989 Duintronic
 buccanrsb                       // (c) 1989 Duintronic
+captainx                        // bootleg
 kikcubic                        // (c) 1988 (Japan)
 kikcubicb                       // bootleg
 vigilant                        // (c) 1988 (World Rev E)
@@ -36709,6 +36710,7 @@ bmf_fr                          //
 bmf_it                          //
 bmf_jp                          //
 bmf_nl                          //
+bmf_nl302                       //
 bmf_no                          //
 bmf_sp                          //
 bmf_sv                          //

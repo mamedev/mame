@@ -6,6 +6,7 @@
 #pragma once
 
 #include "m72_a.h"
+#include "cpu/m6805/m68705.h"
 #include "machine/timer.h"
 #include "emupal.h"
 
@@ -30,8 +31,17 @@ public:
 	void bowmen(machine_config &config);
 	void init_bowmen();
 
-private:
+protected:
 	required_device<cpu_device> m_maincpu;
+
+	virtual void machine_start() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
+	virtual void video_reset() override ATTR_COLD;
+
+	void vigilant_map(address_map &map) ATTR_COLD;
+	void vigilant_io_map(address_map &map) ATTR_COLD;
+
+private:
 	required_device<cpu_device> m_soundcpu;
 	required_device<m72_audio_device> m_audio;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -67,10 +77,6 @@ private:
 	// kikcubic
 	void kikcubic_coin_w(uint8_t data);
 
-	virtual void machine_start() override ATTR_COLD;
-	virtual void video_start() override ATTR_COLD;
-	virtual void video_reset() override ATTR_COLD;
-
 	uint32_t screen_update_vigilant(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_kikcubic(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_bowmen(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -88,9 +94,42 @@ private:
 	void kikcubic_map(address_map &map) ATTR_COLD;
 	void sound_io_map(address_map &map) ATTR_COLD;
 	void sound_map(address_map &map) ATTR_COLD;
-	void vigilant_io_map(address_map &map) ATTR_COLD;
-	void vigilant_map(address_map &map) ATTR_COLD;
 	void bowmen_io_map(address_map &map) ATTR_COLD;
 };
+
+class captainx_state : public vigilant_state
+{
+public:
+	captainx_state(const machine_config &mconfig, device_type type, const char *tag) :
+		vigilant_state(mconfig, type, tag),
+		m_mcu(*this, "mcu"),
+		m_maincpu_region(*this, "maincpu")
+	{}
+
+	void captainx(machine_config &config);
+
+protected:
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+
+private:
+	required_device<m68705r_device> m_mcu;
+	required_region_ptr<uint8_t> m_maincpu_region;
+
+	uint8_t m_decryption_ram[0x800];
+
+	uint8_t m_mcu_porta = 0;
+	uint8_t m_mcu_portb = 0;
+	uint8_t m_mcu_portc = 0;
+
+	void mcu_porta_w(u8 data);
+	void mcu_portb_w(u8 data);
+	void mcu_portc_w(u8 data);
+
+	void captainx_map(address_map &map) ATTR_COLD;
+
+	uint8_t rom_r(offs_t offset);
+};
+
 
 #endif // MAME_IREM_VIGILANT_H

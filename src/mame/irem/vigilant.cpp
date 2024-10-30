@@ -49,6 +49,24 @@ void vigilant_state::machine_start()
 	membank("bank1")->configure_entries(0, 8, memregion("maincpu")->base() + 0x10000, 0x4000);
 }
 
+void captainx_state::machine_start()
+{
+	vigilant_state::machine_start();
+
+	save_item(NAME(m_decryption_ram));
+	save_item(NAME(m_mcu_porta));
+	save_item(NAME(m_mcu_portb));
+	save_item(NAME(m_mcu_portc));
+}
+
+void captainx_state::machine_reset()
+{
+	vigilant_state::machine_reset();
+
+	// the main cpu will be started later by the mcu
+	m_maincpu->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
+}
+
 void vigilant_state::bank_select_w(uint8_t data)
 {
 	membank("bank1")->set_entry(data & 0x07);
@@ -87,6 +105,47 @@ void vigilant_state::kikcubic_coin_w(uint8_t data)
 }
 
 
+//**************************************************************************
+//  CAPTAINX MCU EMULATION
+//**************************************************************************
+
+void captainx_state::mcu_porta_w(u8 data)
+{
+	m_mcu_porta = data;
+}
+
+void captainx_state::mcu_portb_w(u8 data)
+{
+	// 7-------  unused
+	// -654----  address high bits
+	// ----32--  unused
+	// ------1-  on transition write to ram
+	// -------0  main cpu control
+
+	// write to decryption ram
+	if (BIT(m_mcu_portb, 1) == 1 && BIT(data, 1) == 0)
+		m_decryption_ram[(data & 0x70) << 4 | m_mcu_porta] = m_mcu_portc;
+
+	// the main cpu will start running once the table upload is finished
+	m_maincpu->set_input_line(INPUT_LINE_HALT, BIT(data, 0) ? CLEAR_LINE : ASSERT_LINE);
+
+	m_mcu_portb = data;
+}
+
+void captainx_state::mcu_portc_w(u8 data)
+{
+	m_mcu_portc = data;
+}
+
+
+uint8_t captainx_state::rom_r(offs_t offset)
+{
+	// the range 0x0000 to 0x7fff is read indirectly using the decryption ram
+	// for captainx only the first 0x200 bytes (of 0x800 total) are used, so this works
+	offs_t address = (BIT(offset, 0) ? 0x100 : 0) | m_maincpu_region[offset];
+	return m_decryption_ram[address] ^ 0xff;
+}
+
 
 void vigilant_state::vigilant_map(address_map &map)
 {
@@ -96,6 +155,12 @@ void vigilant_state::vigilant_map(address_map &map)
 	map(0xc800, 0xcfff).ram().w(FUNC(vigilant_state::paletteram_w)).share("paletteram");
 	map(0xd000, 0xdfff).ram().share("videoram");
 	map(0xe000, 0xefff).ram();
+}
+
+void captainx_state::captainx_map(address_map &map)
+{
+	vigilant_map(map);
+	map(0x0000, 0x7fff).r(FUNC(captainx_state::rom_r));
 }
 
 void vigilant_state::vigilant_io_map(address_map &map)
@@ -722,6 +787,20 @@ void vigilant_state::buccanrs(machine_config &config)
 	dac_8bit_r2r_device &dac(DAC_8BIT_R2R(config, "dac", 0)); // unknown DAC
 	dac.add_route(ALL_OUTPUTS, "lspeaker", 0.35);
 	dac.add_route(ALL_OUTPUTS, "rspeaker", 0.35);
+}
+
+void captainx_state::captainx(machine_config &config)
+{
+	buccanrs(config);
+
+	Z80(config.replace(), m_maincpu, 5_MHz_XTAL);
+	m_maincpu->set_addrmap(AS_PROGRAM, &captainx_state::captainx_map);
+	m_maincpu->set_addrmap(AS_IO, &captainx_state::vigilant_io_map);
+
+	M68705R3(config, m_mcu, 5_MHz_XTAL / 2); // unknown clock
+	m_mcu->porta_w().set(FUNC(captainx_state::mcu_porta_w));
+	m_mcu->portb_w().set(FUNC(captainx_state::mcu_portb_w));
+	m_mcu->portc_w().set(FUNC(captainx_state::mcu_portc_w));
 }
 
 void vigilant_state::kikcubic(machine_config &config)
@@ -1354,6 +1433,58 @@ ROM_START( buccanrsb )
 ROM_END
 
 
+/*
+PCB silkscreened DABONG-3
+
+2 x Z80B
+1 Motorola MC68705R3P + 11.bin on daughterboard riser
+2 x Yamaha YM2203C
+2 x Yamaha Y3014B DAC
+2 x 8 position DipSwitch
+18.432MHz OSC
+5.0000MHz OSC
+
+It appears the MC68705R3P only does the decryption.
+*/
+
+ROM_START( captainx )
+	ROM_REGION( 0x30000, "maincpu", 0 ) /* 64k for code + 128k for bankswitching */
+	ROM_LOAD( "11.bin",  0x00000, 0x10000, CRC(1a80f2ba) SHA1(028f80731d2922ffd005e5ba1e957bc9de22cec7) ) // 1ST AND 2ND HALF IDENTICAL
+	ROM_LOAD( "12.bin",  0x10000, 0x10000, CRC(87303ba8) SHA1(49a25393e853b9adf7df00a6f9c38a526a02ea4e) )
+
+	ROM_REGION( 0x10000, "soundcpu", 0 ) /* 64k for sound */
+	ROM_LOAD( "1.bin",  0x00000, 0x10000, CRC(eb65f8c3) SHA1(82566becb630ce92303905dc0c5bef9e80e9caad) )
+
+	ROM_REGION( 0x1000, "mcu", 0 )
+	ROM_LOAD( "68705r3",  0x00000, 0x1000, CRC(33b737f9) SHA1(a7e8ce1d82c642d70300320947c94acc6035afc8) )
+
+	ROM_REGION( 0x20000, "gfx1", 0 )
+	ROM_LOAD( "7.bin",  0x00000, 0x10000, CRC(95e3c517) SHA1(9954830ebc3a6414a3236f4e41981db082e5ea19) )
+	ROM_LOAD( "8.bin",  0x10000, 0x10000, CRC(fe2377ab) SHA1(8578c5466d98f140fdfc41e91cd841e725786e32) )
+
+	ROM_REGION( 0x80000, "gfx2", 0 )
+	ROM_LOAD( "3.bin",   0x00000, 0x10000, CRC(ebe12ed8) SHA1(f66c1839972d039e2bc7f09c5632506afbb5514f) )
+	ROM_CONTINUE(        0x20000, 0x10000 )
+	ROM_LOAD( "4.bin",   0x10000, 0x10000, CRC(4fe3bf97) SHA1(7910ace1eed80bfafa1f9f057ed67e23aa446a22) )
+	ROM_LOAD( "6.bin",   0x40000, 0x10000, CRC(078aef7f) SHA1(72e60d39d8af8bd31e9ae019b12620797eb0af7f) )
+	ROM_CONTINUE(        0x60000, 0x10000 )
+	ROM_LOAD( "5.bin",   0x50000, 0x10000, CRC(f650fa90) SHA1(c87081b4d6b09f865d08c5120da3d0fb3196a2c3) )
+
+	ROM_REGION( 0x40000, "gfx3", 0 )
+	ROM_LOAD( "9.bin",   0x20000, 0x20000, CRC(0c6188fb) SHA1(d49034384c6d0e94db2890223b32a2a49e79a639) )
+	ROM_LOAD( "10.bin",  0x00000, 0x20000, CRC(2d383ff8) SHA1(3062baac27feba69c6ed94935c5ced72d89ed4fb) )
+
+	ROM_REGION( 0x10000, "m72", 0 ) /* samples */
+	ROM_LOAD( "2.bin",  0x00000, 0x10000, CRC(36ee1dac) SHA1(6dfd2a885c0b1c9347abc4b204ade66551c4b404) )
+
+	ROM_REGION( 0x400, "proms", 0 ) /* NOT dumped from this PCB, assumed to be the same */
+	ROM_LOAD( "prom1.u54",  0x0000, 0x0100, CRC(c324835e) SHA1(cf6ffe38523badfda211d341410e93e647de87a9) )
+	ROM_LOAD( "prom4.u79",  0x0100, 0x0100, CRC(e6506ef4) SHA1(079841da7640b14d94aaaeb572bf018932b58293) )
+	ROM_LOAD( "prom3.u88",  0x0200, 0x0100, CRC(b43d094f) SHA1(2bed4892d8a91d7faac5a07bf858d9294eb30606) )
+	ROM_LOAD( "prom2.u99",  0x0300, 0x0100, CRC(e0aa8869) SHA1(ac8bdfeba69420ba56ec561bf3d0f1229d02cea2) )
+ROM_END
+
+
 ROM_START( bowmen )
 	ROM_REGION( 0x30000, "maincpu", 0 )  // 64k for code (+ 128k for bankswitching?)
 	ROM_LOAD( "4_27256.bin",   0x00000, 0x08000, CRC(e8dcabb6) SHA1(d6baf9af0ebdced8b73a36486ffd9b48b0d446ca) )
@@ -1410,20 +1541,22 @@ void vigilant_state::init_bowmen()
 }
 
 
-GAME( 1988, vigilant,   0,          vigilant, vigilant, vigilant_state, empty_init, ROT0, "Irem", "Vigilante (World, Rev E)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1988, vigilantg,  vigilant,   vigilant, vigilant, vigilant_state, empty_init, ROT0, "Irem (Data East license)", "Vigilante (US, Rev G)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1988, vigilanto,  vigilant,   vigilant, vigilant, vigilant_state, empty_init, ROT0, "Irem (Data East license)", "Vigilante (US)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1988, vigilanta,  vigilant,   vigilant, vigilant, vigilant_state, empty_init, ROT0, "Irem", "Vigilante (World, Rev A)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1988, vigilantb,  vigilant,   vigilant, vigilant, vigilant_state, empty_init, ROT0, "Irem (Data East license)", "Vigilante (US, Rev B)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1988, vigilantc,  vigilant,   vigilant, vigilant, vigilant_state, empty_init, ROT0, "Irem", "Vigilante (World, Rev C)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1988, vigilantd,  vigilant,   vigilant, vigilant, vigilant_state, empty_init, ROT0, "Irem", "Vigilante (Japan, Rev D)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1988, vigilantbl, vigilant,   vigilant, vigilant, vigilant_state, empty_init, ROT0, "bootleg", "Vigilante (bootleg)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 
-GAME( 1988, kikcubic,   0,          kikcubic, kikcubic, vigilant_state, empty_init, ROT0, "Irem", "Meikyu Jima (Japan)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) /* English title is Kickle Cubicle */
-GAME( 1988, kikcubicb,  kikcubic,   kikcubic, kikcubic, vigilant_state, empty_init, ROT0, "bootleg", "Kickle Cubele", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1988, vigilant,   0,          vigilant, vigilant, vigilant_state, empty_init,  ROT0, "Irem", "Vigilante (World, Rev E)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1988, vigilantg,  vigilant,   vigilant, vigilant, vigilant_state, empty_init,  ROT0, "Irem (Data East license)", "Vigilante (US, Rev G)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1988, vigilanto,  vigilant,   vigilant, vigilant, vigilant_state, empty_init,  ROT0, "Irem (Data East license)", "Vigilante (US)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1988, vigilanta,  vigilant,   vigilant, vigilant, vigilant_state, empty_init,  ROT0, "Irem", "Vigilante (World, Rev A)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1988, vigilantb,  vigilant,   vigilant, vigilant, vigilant_state, empty_init,  ROT0, "Irem (Data East license)", "Vigilante (US, Rev B)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1988, vigilantc,  vigilant,   vigilant, vigilant, vigilant_state, empty_init,  ROT0, "Irem", "Vigilante (World, Rev C)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1988, vigilantd,  vigilant,   vigilant, vigilant, vigilant_state, empty_init,  ROT0, "Irem", "Vigilante (Japan, Rev D)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1988, vigilantbl, vigilant,   vigilant, vigilant, vigilant_state, empty_init,  ROT0, "bootleg", "Vigilante (bootleg)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 
-GAME( 1989, buccanrs,   0,          buccanrs, buccanrs, vigilant_state, empty_init, ROT0, "Duintronic", "Buccaneers (set 1)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1989, buccanrsa,  buccanrs,   buccanrs, buccanra, vigilant_state, empty_init, ROT0, "Duintronic", "Buccaneers (set 2)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1989, buccanrsb,  buccanrs,   buccanrs, buccanrs, vigilant_state, empty_init, ROT0, "Duintronic", "Buccaneers (set 3, harder)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1988, kikcubic,   0,          kikcubic, kikcubic, vigilant_state, empty_init,  ROT0, "Irem", "Meikyu Jima (Japan)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) /* English title is Kickle Cubicle */
+GAME( 1988, kikcubicb,  kikcubic,   kikcubic, kikcubic, vigilant_state, empty_init,  ROT0, "bootleg", "Kickle Cubele", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+
+GAME( 1989, buccanrs,   0,          buccanrs, buccanrs, vigilant_state, empty_init,  ROT0, "Duintronic", "Buccaneers (set 1)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1989, buccanrsa,  buccanrs,   buccanrs, buccanra, vigilant_state, empty_init,  ROT0, "Duintronic", "Buccaneers (set 2)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1989, buccanrsb,  buccanrs,   buccanrs, buccanrs, vigilant_state, empty_init,  ROT0, "Duintronic", "Buccaneers (set 3, harder)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1990, captainx,   buccanrs,   captainx, buccanrs, captainx_state, empty_init,  ROT0, "bootleg (Electronics)",  "Captain X", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 
 GAME( 1994, bowmen,     0,          bowmen,   bowmen,   vigilant_state, init_bowmen, ROT0, "Ten-Level", "Bowmen", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
