@@ -29,7 +29,7 @@ Skeleton driver for "Flash VGA 2" hardware (from TourVisión?) for video-slots.
     |             74HC245D  ADM691AARW      M29F032D       M29F032D     |
     |                                       |_____|        |_____|      |
     |  __________          ________   ___    __________     __________  |
-    | OMROM G5V-2         |_ST232C|  24256B |CY62256LL|    |CY62256LL|  |
+    | OMRON G5V-2         |_ST232C|  24256B |CY62256LL|    |CY62256LL|  |
     |                                        ______________             |
     |    ·········                   CR2032 |M48T18-150PC1|   Switch    |
     |               _________         BATT  |_____________|    (o)      |
