@@ -1328,11 +1328,11 @@ namespace
 #define C352DIV     (288)
 
 #define PIXEL_CLOCK (51.2_MHz_XTAL/4*2)
-				   
+
 #define HTOTAL      (814)
 #define HBEND       (0)
 #define HBSTART     (640)
-				   
+
 #define VTOTAL      (525)
 #define VBEND       (0)
 #define VBSTART     (480)
