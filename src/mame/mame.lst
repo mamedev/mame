@@ -34748,6 +34748,8 @@ rminitv
 @source:nintendo/nes_vt369_vtunknown.cpp
 240in1ar
 bittboy
+cmpmx10
+cmpmx11
 denv150
 dgun2561
 dgun2577
@@ -34781,7 +34783,6 @@ mog_m320
 myarccn
 nubsupmf
 otrail
-pcmx11
 q5_500in1
 rd5_240
 red5mam

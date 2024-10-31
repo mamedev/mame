@@ -881,10 +881,17 @@ ROM_START( otrail )
 	ROM_LOAD( "t24c04a.bin", 0x000, 0x200, CRC(ce1fad6f) SHA1(82878996765739edba42042b6336460d5c8f8096) )
 ROM_END
 
-ROM_START( pcmx11 )
+ROM_START( cmpmx11 )
 	ROM_REGION( 0x800000, "mainrom", 0 )
-	ROM_LOAD( "pcmx11.bin", 0x000000, 0x800000, CRC(e1f3590b) SHA1(f78f7fc4f9a4474b5a9717dfbfc3199a5bc994ba) )
+	ROM_LOAD( "cmpmx11.bin", 0x000000, 0x800000, CRC(e1f3590b) SHA1(f78f7fc4f9a4474b5a9717dfbfc3199a5bc994ba) )
 ROM_END
+
+ROM_START( cmpmx10 )
+	ROM_REGION( 0x800000, "mainrom", 0 )
+	ROM_LOAD( "classicmaxpocket_vertical.u3", 0x000000, 0x800000, CRC(9d3614f9) SHA1(e5de00b23eb1a2d39c524f5b5aed3b1cda44efce) )
+ROM_END
+
+
 
 ROM_START( hhgc319 )
 	ROM_REGION( 0x1000000, "mainrom", 0 )
@@ -1002,8 +1009,10 @@ CONS( 2019, unk2019hh,  0,        0,  nes_vt369_vtunknown_hh_8mb, nes_vt369_vtun
 CONS( 2020, unk2020hh,  unk2019hh,0,  nes_vt369_vtunknown_hh_8mb, nes_vt369_vtunknown, nes_vt369_vtunknown_unk_state, empty_init, "<unknown>", "unknown VTxx based GameBoy style handheld (2020 PCB)", MACHINE_NOT_WORKING )
 
 // might be VT-09 or VT-162, uses a ROM glob on a sub-board, data lines seem scrambled at least?
-// NOT the same as the (undumped) vertical handheld console of the same name with Jungletac / Nice Code games, that one has unique games
-CONS( 2009, pcmx11,     0,        0,  nes_vt369_vtunknown_hh_8mb, nes_vt369_vtunknown, nes_vt369_vtunknown_unk_state, empty_init, "Premier Portfolio International",    "Classic Max Pocket PCMX11 - 12 in 1 Colour Games Console (France)", MACHINE_NOT_WORKING )
+CONS( 2009, cmpmx11,     0,        0,  nes_vt369_vtunknown_hh_8mb, nes_vt369_vtunknown, nes_vt369_vtunknown_unk_state, empty_init, "Premier Portfolio International",    "Classic Max Pocket PCMX11 - 12 in 1 Colour Games Console (horizontal, France)", MACHINE_NOT_WORKING )
+// this unit has a vertical screen, and the games are designed for that aspect, it's unclear if it's rotated or stretched
+// only Jungle Soft is shown on box for manufacturer details, 30-in-1 versions also exist (with some of the games from cmpmx11?)
+CONS( 2009, cmpmx10,     0,        0,  nes_vt369_vtunknown_hh_8mb, nes_vt369_vtunknown, nes_vt369_vtunknown_unk_state, empty_init, "Jungle Soft",    "Classic Max Pocket Mx-10 - 12 in 1 (vertical)", MACHINE_NOT_WORKING )
 
 /*****************************************************************************
 * below are VT369? games that use flash ROM
