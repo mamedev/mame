@@ -8499,26 +8499,17 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<!-- dgolf version 1.4TE rebuilt from Git using cc65 commit
-	     80a43d732dc9551ad84343ea9644d8fab7ec0bd9.  Byte-identical copies of 1.5 and
-	     1.0-1.4 have been reproduced with this toolchain, giving high confidence that the
-	     rebuilds are the same as what was released.  Without existent online copies,
-	     however, this cannot be verified.
-	-->
 	<software name="dgolf14te" cloneof="dgolf">
 		<description>NESert Golfing Tournament Edition (v1.4)</description>
 		<year>2019</year>
 		<publisher>rainwarrior</publisher>
-		<notes><![CDATA[
-		An original download should be located to verify and/or update the hash.
-		]]></notes>
-		<info name="release" value="20191124" /> <!-- From NESertGolfing Git tag -->
+		<info name="release" value="20191124" /> <!-- From NESertGolfing Git tag, apparently released earlier than this as downloads as early as 2019-11-10 exist -->
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="uxrom" />
 			<feature name="pcb" value="NES-UNROM" />
 			<feature name="mirroring" value="vertical" />
 			<dataarea name="prg" size="32768">
-				<rom name="dgolf_te prg" size="32768" crc="3ec19565" sha1="24c243f3edd8f1ba9c7f55ef45a1b4110e68ba1a" status="baddump" />
+				<rom name="dgolf_te prg" size="32768" crc="3ec19565" sha1="24c243f3edd8f1ba9c7f55ef45a1b4110e68ba1a" />
 			</dataarea>
 			<!-- 8k VRAM on cartridge -->
 			<dataarea name="vram" size="8192" />
