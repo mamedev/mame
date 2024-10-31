@@ -4,14 +4,16 @@
 
  quickpick5.cpp: Konami "Quick Pick 5" medal game
 
- Quick Pick 5
- (c) 1991 Konami
+ Quick Pick 5 (クイックピックファイブ) (c) 1991 Konami
+ Wai Wai Jockey (ワイワイジョッキー) (c) 1993 Konami
 
  Driver by R. Belmont
 
- PWB(A)352878A
+ PWB(A)352878A (Quick Pick 5)
+ PWB353330 (Wai Wai Jockey)
+
  Rundown of PCB:
-  Main CPU:  Z80
+  Main CPU: Z84C0008PEC
 
  Konami Custom chips:
   051649 (SCC1 sound)
@@ -319,13 +321,13 @@ TIMER_DEVICE_CALLBACK_MEMBER(waijockey_state::scanline)
 {
 	int scanline = param;
 
-	// z80 /IRQ is connected to the IRQ1(vblank) pin of k053252 CCU
+	// Z80 /IRQ is connected to the IRQ1(vblank) pin of k053252 CCU
 	if (scanline == 255)
 	{
 		m_maincpu->set_input_line(0, ASSERT_LINE);
 	}
 
-	// z80 /NMI is connected to the IRQ2 pin of k053252 CCU
+	// Z80 /NMI is connected to the IRQ2 pin of k053252 CCU
 	// the following code is emulating INT_TIME of the k053252, this code will go away
 	// when the new konami branch is merged.
 	m_ccu_int_time_count--;
@@ -618,11 +620,11 @@ void quickpick5_state::machine_reset()
 void waijockey_state::waijockey(machine_config &config)
 {
 	// basic machine hardware
-	Z80(config, m_maincpu, 32_MHz_XTAL/4); // z84c0008pec 8mhz part, 32Mhz xtal verified on PCB, divisor unknown
+	Z80(config, m_maincpu, 32_MHz_XTAL/4); // Z84C0008PEC 8MHz part, 32MHz XTAL verified on PCB, divisor unknown
 	m_maincpu->set_addrmap(AS_PROGRAM, &waijockey_state::waijockey_main);
 	TIMER(config, "scantimer").configure_scanline(FUNC(waijockey_state::scanline), "screen", 0, 1);
 
-	K053252(config, m_k053252, 32_MHz_XTAL/4); // K053252, xtal verified, divider not verified
+	K053252(config, m_k053252, 32_MHz_XTAL/4); // XTAL verified
 	m_k053252->int1_ack().set(FUNC(waijockey_state::vbl_ack_w));
 	m_k053252->int2_ack().set(FUNC(waijockey_state::nmi_ack_w));
 	m_k053252->int_time().set(FUNC(waijockey_state::ccu_int_time_w));
@@ -653,11 +655,11 @@ void waijockey_state::waijockey(machine_config &config)
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
-	K051649(config, m_k051649, 32_MHz_XTAL/12); // xtal is verified, divider is not
-	m_k051649->add_route(ALL_OUTPUTS, "mono", 0.45);
+	K051649(config, m_k051649, 32_MHz_XTAL/16); // XTAL verified
+	m_k051649->add_route(ALL_OUTPUTS, "mono", 0.5);
 
-	OKIM6295(config, m_oki, 32_MHz_XTAL/24, okim6295_device::PIN7_HIGH);
-	m_oki->add_route(ALL_OUTPUTS, "mono", 1.0);
+	OKIM6295(config, m_oki, 32_MHz_XTAL/24, okim6295_device::PIN7_LOW);
+	m_oki->add_route(ALL_OUTPUTS, "mono", 0.5);
 }
 
 void quickpick5_state::quickpick5(machine_config &config)
@@ -689,10 +691,8 @@ ROM_START( quickp5 )
 	ROM_REGION( 0x80000, "pals", 0 )
 	ROM_LOAD( "054590.11g",   0x000000, 0x040000, CRC(0442621c) SHA1(2e79bea4e37028a3c1223fb4e3b3e12ccad2b39b) )
 	ROM_LOAD( "054591.12g",   0x040000, 0x040000, CRC(eaa92d8f) SHA1(7a430f11127148f0c035973ce21cfec4cb60ce9d) )
-
 ROM_END
 
-// Konami PWB353330
 ROM_START( waijockey )
 	ROM_REGION( 0x10000, "maincpu", 0 ) // main program
 	ROM_LOAD( "gs-257-a02.7n",  0x000000, 0x010000, CRC(e9a5f416) SHA1(b762b393bbe394339904636ff1d31d8eeb8b8d05) )
