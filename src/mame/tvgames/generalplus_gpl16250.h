@@ -154,6 +154,7 @@ public:
 	void gameu(machine_config &config);
 
 	void init_gameu();
+	void init_gameu108();
 
 protected:
 
@@ -165,6 +166,8 @@ private:
 	void gameu_portb_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	void gameu_portc_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	void gameu_portd_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+
+	void decrypt_gameu();
 
 	uint32_t m_upperbase;
 	uint16_t m_porta_data;
