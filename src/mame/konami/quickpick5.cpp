@@ -340,7 +340,7 @@ void waijockey_state::common_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom().region("maincpu", 0);
 	map(0x8000, 0xbfff).bankr(m_bank);
-	map(0xc000, 0xdbff).ram().share("nvram");
+	map(0xc000, 0xdbff).ram();
 	map(0xdc00, 0xdc0f).rw(m_k053252, FUNC(k053252_device::read), FUNC(k053252_device::write));
 	map(0xdc40, 0xdc4f).rw(FUNC(waijockey_state::k244_r), FUNC(waijockey_state::k244_w));
 	map(0xdc80, 0xdc80).portr("DSW1");
@@ -365,12 +365,14 @@ void waijockey_state::common_map(address_map &map)
 void quickpick5_state::quickpick5_main(address_map &map)
 {
 	common_map(map);
+	map(0xd000, 0xd3ff).ram().share("nvram");
 	map(0xddc0, 0xddc0).w(FUNC(quickpick5_state::serial_io_w));
 }
 
 void waijockey_state::waijockey_main(address_map &map)
 {
 	common_map(map);
+	map(0xc000, 0xc3ff).ram().share("nvram");
 	map(0xdd41, 0xdd41).nopr(); // DSW3?
 	map(0xddc0, 0xddc0).nopw(); // bit 6 - coin counter OUT
 	map(0xde80, 0xde80).w(FUNC(waijockey_state::scrollx_w<0>));
@@ -401,22 +403,20 @@ static INPUT_PORTS_START( quickpick5 )
 	PORT_DIPSETTING(    0x05, DEF_STR( 1C_3C ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( 1C_5C ) )
 	PORT_DIPSETTING(    0x03, DEF_STR( 1C_7C ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DIPSW1:4")
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x30, 0x30, "Jack Pot" )         PORT_DIPLOCATION("DIPSW1:5,6")
+	PORT_DIPUNUSED_DIPLOC( 0x08, 0x08, "DIPSW1:4" )
+	PORT_DIPNAME( 0x30, 0x30, "Jackpot" ) PORT_DIPLOCATION("DIPSW1:5,6")
 	PORT_DIPSETTING(    0x30, "300" )
 	PORT_DIPSETTING(    0x20, "500" )
 	PORT_DIPSETTING(    0x10, "700" )
 	PORT_DIPSETTING(    0x00, "1000" )
-	PORT_DIPNAME( 0xc0, 0xc0, "Max Pay" )          PORT_DIPLOCATION("DIPSW1:7,8")
+	PORT_DIPNAME( 0xc0, 0xc0, "Max Pay" ) PORT_DIPLOCATION("DIPSW1:7,8")
 	PORT_DIPSETTING(    0xc0, "400" )
 	PORT_DIPSETTING(    0x80, "500" )
 	PORT_DIPSETTING(    0x40, "700" )
 	PORT_DIPSETTING(    0x00, "1000" )
 
 	PORT_START("DSW2")
-	PORT_DIPNAME( 0x0f, 0x0f, "Max Payout" )       PORT_DIPLOCATION("DIPSW2:1,2,3,4")
+	PORT_DIPNAME( 0x0f, 0x0f, "Max Payout" ) PORT_DIPLOCATION("DIPSW2:1,2,3,4")
 	PORT_DIPSETTING(    0x0f, "65%" )
 	PORT_DIPSETTING(    0x0e, "70%" )
 	PORT_DIPSETTING(    0x0d, "75%" )
@@ -433,15 +433,15 @@ static INPUT_PORTS_START( quickpick5 )
 	PORT_DIPSETTING(    0x02, "91%" )
 	PORT_DIPSETTING(    0x01, "92%" )
 	PORT_DIPSETTING(    0x00, "94%" )
-	PORT_DIPNAME( 0x30, 0x30, "Button Time" )      PORT_DIPLOCATION("DIPSW2:5,6")
+	PORT_DIPNAME( 0x30, 0x30, "Button Time" ) PORT_DIPLOCATION("DIPSW2:5,6")
 	PORT_DIPSETTING(    0x30, "15 Seconds" )
 	PORT_DIPSETTING(    0x20, "20 Seconds" )
 	PORT_DIPSETTING(    0x10, "30 Seconds" )
 	PORT_DIPSETTING(    0x00, "40 Seconds" )
-	PORT_DIPNAME( 0x40, 0x00, "Backup Memory" )    PORT_DIPLOCATION("DIPSW2:7")
+	PORT_DIPNAME( 0x40, 0x00, "Backup Memory" ) PORT_DIPLOCATION("DIPSW2:7")
 	PORT_DIPSETTING(    0x00, "Clear" )
 	PORT_DIPSETTING(    0x40, "Keep" )
-	PORT_DIPNAME( 0x80, 0x00, "Attract Sound" )    PORT_DIPLOCATION("DIPSW2:8")
+	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("DIPSW2:8")
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
@@ -527,7 +527,7 @@ static INPUT_PORTS_START( waijockey )
 	PORT_DIPSETTING(    0x02, "1 Coin/14 Credits" )
 	PORT_DIPSETTING(    0x01, "1 Coin/15 Credits" )
 	PORT_DIPSETTING(    0x00, "1 Coin/16 Credits" )
-	PORT_DIPNAME( 0xf0, 0xf0, "Max Payout" )       PORT_DIPLOCATION("DIPSW1:5,6,7,8")
+	PORT_DIPNAME( 0xf0, 0xf0, "Max Payout" ) PORT_DIPLOCATION("DIPSW1:5,6,7,8")
 	PORT_DIPSETTING(    0xf0, "60%" )
 	PORT_DIPSETTING(    0xe0, "62%" )
 	PORT_DIPSETTING(    0xd0, "64%" )
@@ -546,28 +546,20 @@ static INPUT_PORTS_START( waijockey )
 	PORT_DIPSETTING(    0x00, "90%" )
 
 	PORT_START("DSW2")
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DIPSW2:1")
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DIPSW2:2")
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DIPSW2:3")
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DIPSW2:4")
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, "Game Play Mode" )   PORT_DIPLOCATION("DIPSW2:5") // more like gameplay test mode
+	PORT_DIPUNUSED_DIPLOC( 0x01, 0x01, "DIPSW2:1" )
+	PORT_DIPUNUSED_DIPLOC( 0x02, 0x02, "DIPSW2:2" )
+	PORT_DIPUNUSED_DIPLOC( 0x04, 0x04, "DIPSW2:3" )
+	PORT_DIPUNUSED_DIPLOC( 0x08, 0x08, "DIPSW2:4" )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Free_Play ) ) PORT_DIPLOCATION("DIPSW2:5")
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x00, "Payout Mode" )      PORT_DIPLOCATION("DIPSW2:6")
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x00, "Attract Sound" )    PORT_DIPLOCATION("DIPSW2:7")
+	PORT_DIPNAME( 0x20, 0x20, "Payout Mode" ) PORT_DIPLOCATION("DIPSW2:6")
+	PORT_DIPSETTING(    0x00, "Credits" )
+	PORT_DIPSETTING(    0x20, "Medals" )
+	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("DIPSW2:7")
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x00, "Backup Memory" )    PORT_DIPLOCATION("DIPSW2:8")
+	PORT_DIPNAME( 0x80, 0x00, "Backup Memory" ) PORT_DIPLOCATION("DIPSW2:8")
 	PORT_DIPSETTING(    0x00, "Clear" )
 	PORT_DIPSETTING(    0x80, "Keep" )
 
@@ -583,7 +575,7 @@ INPUT_PORTS_END
 
 void waijockey_state::machine_start()
 {
-	m_bank->configure_entries(0, 0x2, memregion("maincpu")->base()+0x8000, 0x4000);
+	m_bank->configure_entries(0, 2, memregion("maincpu")->base() + 0x8000, 0x4000);
 
 	save_item(NAME(m_control));
 	save_item(NAME(m_scrollx));
@@ -721,5 +713,5 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 1991, quickp5,   0, quickpick5, quickpick5, quickpick5_state, empty_init, ROT0, "Konami", "Quick Pick 5", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS)
-GAME( 1993, waijockey, 0, waijockey,  waijockey,  waijockey_state,  empty_init, ROT0, "Konami", "Wai Wai Jockey", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING) // problem with nvram
+GAME( 1991, quickp5,   0, quickpick5, quickpick5, quickpick5_state, empty_init, ROT0, "Konami", "Quick Pick 5", MACHINE_SUPPORTS_SAVE )
+GAME( 1993, waijockey, 0, waijockey,  waijockey,  waijockey_state,  empty_init, ROT0, "Konami", "Wai Wai Jockey", MACHINE_SUPPORTS_SAVE )
