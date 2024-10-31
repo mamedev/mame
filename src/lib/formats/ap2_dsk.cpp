@@ -1284,9 +1284,9 @@ bool a2_nib_format::load(util::random_read &io, uint32_t form_factor, const std:
 	for (unsigned track = 0; track < nr_tracks; ++track) {
 		/*auto const [err, actual] =*/ read_at(io, track * nibbles_per_track, &nibbles[0], nibbles_per_track); // FIXME: check for errors and premature EOF
 		auto levels = generate_levels_from_nibbles(nibbles);
-		generate_track_from_levels(track, 0,
-								   levels,
-								   0, image);
+		if (!levels.empty()) {
+			generate_track_from_levels(track, 0, levels, 0, image);
+		}
 	}
 
 	image.set_form_variant(floppy_image::FF_525, floppy_image::SSSD);
