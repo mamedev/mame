@@ -478,6 +478,8 @@ void changyu2_state::changyu2(machine_config &config)
 
 	GENERIC_LATCH_8(config, m_mcu_response_latch);
 
+	HOPPER(config, m_hopper, attotime::from_msec(100));
+
 	YM2413(config, "ymsnd", 3.579545_MHz_XTAL).add_route(ALL_OUTPUTS, "mono", 0.9);
 }
 
