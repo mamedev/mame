@@ -599,7 +599,7 @@ void waijockey_state::machine_reset()
 {
 	m_bank->set_entry(0);
 	m_vram_view.select(0);
-	m_ttl_tilemap->set_scrolly(15);
+	m_ttl_tilemap->set_scrolly(16);
 
 	m_control = 0;
 	m_ccu_int_time = 0;
