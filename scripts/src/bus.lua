@@ -5742,7 +5742,7 @@ end
 
 ---------------------------------------------------
 --
---@src/devices/bus/h89/h89bus.h,BUSES["H89BUS"] = true
+--@src/devices/bus/heathzenith/h89bus.h,BUSES["H89BUS"] = true
 ---------------------------------------------------
 
 if (BUSES["H89BUS"]~=null) then
