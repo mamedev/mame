@@ -33,7 +33,7 @@ uint8_t poly_state::vector_r(offs_t offset)
 	if (!machine().side_effects_disabled())
 		m_memview.select(0);
 
-	return m_system->base()[0x0ff0 + offset];
+	return m_system->base()[offset & 0x0fff];
 }
 
 

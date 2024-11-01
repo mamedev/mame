@@ -57,7 +57,6 @@ void poly_state::poly_mem(address_map &map)
 	m_memview[0](0xf000, 0xffff).rom().region("system", 0);                                                  // System Program ROM
 	/* User mode */
 	m_memview[1](0x0000, 0xffff).rw(FUNC(poly_state::logical_mem_r), FUNC(poly_state::logical_mem_w)); // Logical Memory
-	m_memview[1](0xfff0, 0xffff).r(FUNC(poly_state::vector_r));                                        // Vector fetch (interrupt and reset)
 }
 
 void polydev_state::poly_mem(address_map &map)
@@ -256,6 +255,7 @@ void poly_state::poly(machine_config &config)
 	/* basic machine hardware */
 	MC6809(config, m_maincpu, 12.0576_MHz_XTAL / 3);
 	m_maincpu->set_addrmap(AS_PROGRAM, &poly_state::poly_mem);
+	m_maincpu->interrupt_vector_read().set(FUNC(poly_state::vector_r));
 
 	INPUT_MERGER_ANY_HIGH(config, "irqs").output_handler().set_inputline(m_maincpu, M6809_IRQ_LINE);
 

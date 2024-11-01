@@ -122,7 +122,7 @@ private:
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	required_device<cpu_device> m_maincpu;
+	required_device<mc6809_device> m_maincpu;
 	required_device<ram_device> m_ram;
 	required_device_array<saa5050_device, 2> m_trom;
 	required_device_array<pia6821_device, 2> m_pia;
