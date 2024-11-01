@@ -60,6 +60,7 @@ public:
 	void init_tjumpman();
 	void init_uopoko();
 
+	void cellage(machine_config &config);
 	void crusherm(machine_config &config);
 	void ddonpach(machine_config &config);
 	void dfeveron(machine_config &config);
@@ -75,7 +76,6 @@ public:
 	void tekkenbs(machine_config &config);
 	void tekkencw(machine_config &config);
 	void tjumpman(machine_config &config);
-	void unkyujin(machine_config &config);
 	void uopoko(machine_config &config);
 
 protected:
@@ -239,6 +239,7 @@ protected:
 	void init_cave();
 	void show_leds();
 
+	void cellage_map(address_map &map) ATTR_COLD;
 	void crusherm_map(address_map &map) ATTR_COLD;
 	void ddonpach_map(address_map &map) ATTR_COLD;
 	void dfeveron_map(address_map &map) ATTR_COLD;
@@ -254,7 +255,6 @@ protected:
 	void tekkenbs_map(address_map &map) ATTR_COLD;
 	void tekkencw_map(address_map &map) ATTR_COLD;
 	void tjumpman_map(address_map &map) ATTR_COLD;
-	void unkyujin_map(address_map &map) ATTR_COLD;
 	void uopoko_map(address_map &map) ATTR_COLD;
 };
 

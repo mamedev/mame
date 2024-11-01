@@ -65,7 +65,7 @@ To Do:
 
 - Measure video timings
 
-- unkyujin: still to be looked at. At 0xee30, do PC=0xee3c to boot.
+- cellage: still to be looked at. At 0xee30, do PC=0xee3c to boot.
 
 Stephh's notes (based on the games M68000 code and some tests) :
 
@@ -1290,12 +1290,12 @@ void cave_state::jumbogod_map(address_map &map)
 }
 
 /***************************************************************************
-                                   Yujin
+                                   Cellage
 ***************************************************************************/
 
 //TODO: LEDs, at least
 
-void cave_state::unkyujin_map(address_map &map)
+void cave_state::cellage_map(address_map &map)
 {
 	map(0x000000, 0x07ffff).rom();                                                                   // ROM
 	map(0x100000, 0x10ffff).ram().share("nvram");                                                    // RAM (battery)
@@ -1860,7 +1860,7 @@ static INPUT_PORTS_START( jumbogod )
 	PORT_BIT( 0xC0, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( unkyujin )
+static INPUT_PORTS_START( cellage )
 	PORT_START("IN0")
 	PORT_SERVICE( 0x01, IP_ACTIVE_LOW ) // must stay on during service mode
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START1 )
@@ -2632,11 +2632,11 @@ void cave_state::jumbogod(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &cave_state::jumbogod_map);
 }
 
-void cave_state::unkyujin(machine_config &config)
+void cave_state::cellage(machine_config &config)
 {
 	pacslot(config);
 
-	m_maincpu->set_addrmap(AS_PROGRAM, &cave_state::unkyujin_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &cave_state::cellage_map);
 
 	m_screen[0]->set_size(384, 240);
 	m_screen[0]->set_visarea(0, 384-1, 0, 240-1);
@@ -5265,8 +5265,9 @@ ROM_START( tjumpman )
 ROM_END
 
 
+// シールプリント機 セラージュ
 // YUJIN YPIA1080 CPU BOARD (basically same as Namco's N-44 EM)
-ROM_START( unkyujin )
+ROM_START( cellage )
 	ROM_REGION( 0x080000, "maincpu", 0 )
 	ROM_LOAD16_WORD_SWAP( "sra143.u41", 0x00000, 0x80000, CRC(4e3e8ac5) SHA1(e58255c0ac85849e92c46a118cf3c47edcaa8b86) )
 
@@ -5721,6 +5722,8 @@ GAME( 1996, agalletah,  agallet,  sailormn, cave,     cave_z80_state, init_agall
 // 68000 ROM string 0x328e-32b5 has 1993 copyright and publisher string, it's planned release date but cancelled?
 GAME( 1996, hotdogst,   0,        hotdogst, cave,     cave_z80_state, init_hotdogst,  ROT90,  "Marble (Ace International license)",     "Hotdog Storm (Korea)", MACHINE_SUPPORTS_SAVE )
 
+GAME( 1996, cellage,    0,        cellage,  cellage,  cave_state,     init_tjumpman,  ROT0,   "Yujin / Namco",                          "Cellage", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+
 GAME( 1996, pacslot,    0,        pacslot,  pacslot,  cave_state,     init_tjumpman,  ROT0,   "Namco",                                  "Pac-Slot",     MACHINE_SUPPORTS_SAVE )
 GAME( 1996, paceight,   0,        paceight, paceight, cave_state,     init_tjumpman,  ROT0,   "Namco",                                  "Pac-Eight",    MACHINE_SUPPORTS_SAVE )
 GAME( 1996, paccarn,    0,        paccarn,  paccarn,  cave_state,     init_tjumpman,  ROT0,   "Namco",                                  "Pac-Carnival", MACHINE_SUPPORTS_SAVE )
@@ -5762,5 +5765,3 @@ GAME( 1999, crusherm,   0,        crusherm, korokoro, cave_state,     init_korok
 GAME( 1999, tjumpman,   0,        tjumpman, tjumpman, cave_state,     init_tjumpman,  ROT0,   "Namco",                                  "Tobikose! Jumpman", MACHINE_SUPPORTS_SAVE )
 
 GAME( 2001, theroes,    0,        gaia,     theroes,  cave_state,     init_gaia,      ROT0,   "Primetek Investments",                   "Thunder Heroes", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND ) // cuts out occasionally
-
-GAME( 199?, unkyujin,   0,        unkyujin, unkyujin, cave_state,     init_tjumpman,  ROT0,   "Yujin",                                  "unknown Yujin photo booth", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
