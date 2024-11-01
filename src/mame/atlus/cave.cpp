@@ -65,6 +65,8 @@ To Do:
 
 - Measure video timings
 
+- unkyujin: still to be looked at. At 0xee30, do PC=0xee3c to boot.
+
 Stephh's notes (based on the games M68000 code and some tests) :
 
 1) 'gaia'
@@ -1288,6 +1290,31 @@ void cave_state::jumbogod_map(address_map &map)
 }
 
 /***************************************************************************
+                                   Yujin
+***************************************************************************/
+
+//TODO: LEDs, at least
+
+void cave_state::unkyujin_map(address_map &map)
+{
+	map(0x000000, 0x07ffff).rom();                                                                   // ROM
+	map(0x100000, 0x10ffff).ram().share("nvram");                                                    // RAM (battery)
+	map(0x200000, 0x20ffff).ram().share(m_spriteram[0]);                                             // Sprites (unused)
+	map(0x300000, 0x307fff).m(m_tilemap[0], FUNC(tilemap038_device::vram_map));                      // Layer 0
+	map(0x400000, 0x400001).portr("IN0");                                                            // Inputs + EEPROM + Hopper
+	map(0x400002, 0x400003).portr("IN1");                                                            // Inputs
+	map(0x500000, 0x500005).w(m_tilemap[0], FUNC(tilemap038_device::vregs_w));                       // Layer 0 Control
+	map(0x600000, 0x60007f).w(FUNC(cave_state::videoregs_w<0>)).share(m_videoregs[0]);               // Video Regs
+	map(0x600000, 0x600007).r(FUNC(cave_state::irq_cause_r));                                        // IRQ Cause
+	map(0x600068, 0x600069).w("watchdog", FUNC(watchdog_timer_device::reset16_w));                   // Watchdog
+	map(0x700000, 0x70ffff).ram().w(m_palette[0], FUNC(palette_device::write16)).share("palette.0"); // Palette
+	map(0x800001, 0x800001).rw("oki1", FUNC(okim6295_device::read), FUNC(okim6295_device::write));   // M6295
+	map(0x900001, 0x900001).rw("oki2", FUNC(okim6295_device::read), FUNC(okim6295_device::write));   // M6295
+	map(0xc00000, 0xc00001).w(FUNC(cave_state::pacslot_leds_w));                                     // Leds + Hopper
+	map(0xe00001, 0xe00001).w(FUNC(cave_state::tjumpman_eeprom_w));                                  // EEPROM
+}
+
+/***************************************************************************
                                     Uo Poko
 ***************************************************************************/
 
@@ -1831,6 +1858,28 @@ static INPUT_PORTS_START( jumbogod )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON2   ) PORT_NAME( "Nissen Kougeki (Atomic Breath) 1" )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON4   ) PORT_NAME( "Nissen Kougeki (Atomic Breath) 2" )
 	PORT_BIT( 0xC0, IP_ACTIVE_LOW, IPT_UNKNOWN )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( unkyujin )
+	PORT_START("IN0")
+	PORT_SERVICE( 0x01, IP_ACTIVE_LOW ) // must stay on during service mode
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(4)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", FUNC(eeprom_serial_93cxx_device::do_read))
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_PLAYER(4)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_PLAYER(4)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(10) // credits (impulse needed to coin up reliably)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON8 ) PORT_PLAYER(4)
+
+	PORT_START("IN1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( ppsatan )
@@ -2581,6 +2630,18 @@ void cave_state::jumbogod(machine_config &config)
 	pacslot(config);
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &cave_state::jumbogod_map);
+}
+
+void cave_state::unkyujin(machine_config &config)
+{
+	pacslot(config);
+
+	m_maincpu->set_addrmap(AS_PROGRAM, &cave_state::unkyujin_map);
+
+	m_screen[0]->set_size(384, 240);
+	m_screen[0]->set_visarea(0, 384-1, 0, 240-1);
+
+	m_tilemap[0]->set_xoffs(48, 0);
 }
 
 /***************************************************************************
@@ -5204,6 +5265,32 @@ ROM_START( tjumpman )
 ROM_END
 
 
+// YUJIN YPIA1080 CPU BOARD (basically same as Namco's N-44 EM)
+ROM_START( unkyujin )
+	ROM_REGION( 0x080000, "maincpu", 0 )
+	ROM_LOAD16_WORD_SWAP( "sra143.u41", 0x00000, 0x80000, CRC(4e3e8ac5) SHA1(e58255c0ac85849e92c46a118cf3c47edcaa8b86) )
+
+	ROM_REGION( 0x100000, "sprites0", ROMREGION_ERASE00 )
+	// not populated
+
+	// TODO: correct ROM loading
+	ROM_REGION( 0x100000, "layer0", 0 )
+	ROM_LOAD16_BYTE( "sra243.u60", 0x00000, 0x80000, CRC(c117ba37) SHA1(00398a5acd49c39afe9342fabcd4e2b63905ecb8) )
+	ROM_RELOAD(                    0x00001, 0x80000 )
+	// u61 not populated
+
+	ROM_REGION( 0x40000, "oki1", 0 )
+	ROM_LOAD( "sra310.u27", 0x00000, 0x40000, CRC(cb22e32e) SHA1(a1c335c2dda32e1b319d7edf7e76b559545e33ab) ) // 1xxxxxxxxxxxxxxxxx = 0xFF
+
+	ROM_REGION( 0x40000, "oki2", 0 )
+	ROM_LOAD( "sra410.u32", 0x00000, 0x40000, CRC(502a86ca) SHA1(7f14352298a4cb641970804586e1ebc640ec72c8) )
+
+	ROM_REGION( 0x117 * 2, "plds", 0 )
+	ROM_LOAD( "n44u1j.u1", 0x117*0, 0x117, CRC(2d8e06e1) SHA1(91e2a593ee83411c1c46be2b790c7acaa04b1e3e) )   // GAL16V8D-15LP
+	ROM_LOAD( "n44u3j.u3", 0x117*1, 0x117, CRC(5b12591d) SHA1(ed0fc64da0c9252fc67c1a63a871224719a20544) )   // GAL16V8D-15LP
+ROM_END
+
+
 /***************************************************************************
 
                              Puzzle Uo Poko
@@ -5675,3 +5762,5 @@ GAME( 1999, crusherm,   0,        crusherm, korokoro, cave_state,     init_korok
 GAME( 1999, tjumpman,   0,        tjumpman, tjumpman, cave_state,     init_tjumpman,  ROT0,   "Namco",                                  "Tobikose! Jumpman", MACHINE_SUPPORTS_SAVE )
 
 GAME( 2001, theroes,    0,        gaia,     theroes,  cave_state,     init_gaia,      ROT0,   "Primetek Investments",                   "Thunder Heroes", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND ) // cuts out occasionally
+
+GAME( 199?, unkyujin,   0,        unkyujin, unkyujin, cave_state,     init_tjumpman,  ROT0,   "Yujin",                                  "unknown Yujin photo booth", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )

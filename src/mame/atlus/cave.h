@@ -75,6 +75,7 @@ public:
 	void tekkenbs(machine_config &config);
 	void tekkencw(machine_config &config);
 	void tjumpman(machine_config &config);
+	void unkyujin(machine_config &config);
 	void uopoko(machine_config &config);
 
 protected:
@@ -253,6 +254,7 @@ protected:
 	void tekkenbs_map(address_map &map) ATTR_COLD;
 	void tekkencw_map(address_map &map) ATTR_COLD;
 	void tjumpman_map(address_map &map) ATTR_COLD;
+	void unkyujin_map(address_map &map) ATTR_COLD;
 	void uopoko_map(address_map &map) ATTR_COLD;
 };
 
