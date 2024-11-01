@@ -1888,8 +1888,6 @@ void cmi_state::machine_reset()
 
 	for (int cpunum = 0; cpunum < 2; ++cpunum)
 	{
-		address_space *space = (cpunum == CPU_1 ? m_cpu1space : m_cpu2space);
-
 		/* Select A (system) spaces */
 		m_cpu_active_space[cpunum] = MAPPING_A;
 	}
