@@ -51,6 +51,11 @@ protected:
 	u8 m_lp_int_idx;
 	u8 m_aux_int_idx;
 	u8 m_modem_int_idx;
+
+	int m_lp_intr;
+	int m_aux_intr;
+	int m_modem_intr;
+
 private:
 	void lp_w(offs_t reg, u8 val);
 	u8 lp_r(offs_t reg);
@@ -60,6 +65,8 @@ private:
 
 	void modem_w(offs_t reg, u8 val);
 	u8 modem_r(offs_t reg);
+
+	void update_intr(u8 level);
 
 	void lp_int(int data);
 	void aux_int(int data);
@@ -89,7 +96,10 @@ h_88_3_device::h_88_3_device(const machine_config &mconfig, device_type type, co
 	m_modem(*this, "modem"),
 	m_cfg_lp(*this, "CFG_LP"),
 	m_cfg_aux(*this, "CFG_AUX"),
-	m_cfg_modem(*this, "CFG_MODEM")
+	m_cfg_modem(*this, "CFG_MODEM"),
+	m_lp_intr(0),
+	m_aux_intr(0),
+	m_modem_intr(0)
 {
 }
 
@@ -172,6 +182,9 @@ void h_88_3_device::device_start()
 	save_item(NAME(m_aux_int_idx));
 	save_item(NAME(m_modem_enabled));
 	save_item(NAME(m_modem_int_idx));
+	save_item(NAME(m_lp_intr));
+	save_item(NAME(m_aux_intr));
+	save_item(NAME(m_modem_intr));
 }
 
 void h_88_3_device::device_reset()
@@ -194,19 +207,78 @@ void h_88_3_device::device_reset()
 	m_modem_int_idx = BIT(cfg_modem, 1, 2);
 }
 
+void h_88_3_device::update_intr(u8 level)
+{
+	// check for interrupt disabled
+	if (level == 0)
+	{
+		return;
+	}
+
+	// Handle multiple ports set to the same interrupt. If any are set, interrupt should be triggered
+	int data = 0;
+
+	if (m_lp_enabled && (m_lp_int_idx == level))
+	{
+		data |= m_lp_intr;
+	}
+	if (m_aux_enabled && (m_aux_int_idx == level))
+	{
+		data |= m_aux_intr;
+	}
+	if (m_modem_enabled && (m_modem_int_idx == level))
+	{
+		data |= m_modem_intr;
+	}
+
+	switch(level)
+	{
+		case 1:
+			set_slot_int3(data);
+			break;
+		case 2:
+			set_slot_int4(data);
+			break;
+		case 3:
+			set_slot_int5(data);
+			break;
+	}
+}
+
 void h_88_3_device::lp_int(int data)
 {
-	m_int_cb[m_lp_int_idx](data);
+	if (!m_lp_enabled)
+	{
+		return;
+	}
+
+	m_lp_intr = data;
+
+	update_intr(m_lp_int_idx);
 }
 
 void h_88_3_device::aux_int(int data)
 {
-	m_int_cb[m_aux_int_idx](data);
+	if (!m_aux_enabled)
+	{
+		return;
+	}
+
+	m_aux_intr = data;
+
+	update_intr(m_aux_int_idx);
 }
 
 void h_88_3_device::modem_int(int data)
 {
-	m_int_cb[m_modem_int_idx](data);
+	if (!m_modem_enabled)
+	{
+		return;
+	}
+
+	m_modem_intr = data;
+
+	update_intr(m_modem_int_idx);
 }
 
 void h_88_3_device::device_add_mconfig(machine_config &config)
