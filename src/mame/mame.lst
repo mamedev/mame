@@ -34748,8 +34748,6 @@ rminitv
 @source:nintendo/nes_vt369_vtunknown.cpp
 240in1ar
 bittboy
-cmpmx10
-cmpmx11
 denv150
 dgun2561
 dgun2577
@@ -35007,6 +35005,8 @@ wrecking                        // (c) 1984 Nintendo
 
 @source:nintendo/vt1682.cpp
 110dance
+cmpmx10
+cmpmx11
 dance555
 exsprt48
 gm235upc

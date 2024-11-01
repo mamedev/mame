@@ -356,6 +356,8 @@ private:
 	uint8_t vt1682_2030_r();
 	void vt1682_2030_w(uint8_t data);
 
+	uint8_t io_ef_r() { return 0x00; }
+
 	/* Video Helpers */
 
 	uint16_t get_spriteram_addr()
@@ -698,6 +700,25 @@ protected:
 
 private:
 	required_ioport m_io_p1;
+};
+
+class vt1682_mx10_state : public vt_vt1682_state
+{
+public:
+	vt1682_mx10_state(const machine_config& mconfig, device_type type, const char* tag) :
+		vt_vt1682_state(mconfig, type, tag),
+		m_io_uiob(*this, "UIOB")
+	{ }
+
+	void mx10(machine_config& config);
+
+	void mx10_init();
+
+protected:
+	uint8_t uiob_r() { logerror("%s uiob_r\n", machine().describe_context()); return m_io_uiob->read(); }
+
+private:
+	required_ioport m_io_uiob;
 };
 
 class vt1682_exsport_state : public vt_vt1682_state
@@ -5272,6 +5293,7 @@ void vt_vt1682_state::vt_vt1682_map(address_map &map)
 	map(0x214a, 0x214a).rw(m_uio, FUNC(vrt_vt1682_uio_device::inteact_214a_uio_b_direction_r), FUNC(vrt_vt1682_uio_device::inteact_214a_uio_b_direction_w));
 	map(0x214b, 0x214b).rw(m_uio, FUNC(vrt_vt1682_uio_device::inteact_214b_uio_b_attribute_r), FUNC(vrt_vt1682_uio_device::inteact_214b_uio_b_attribute_w));
 
+	map(0x214d, 0x214d).r(FUNC(vt_vt1682_state::io_ef_r));
 
 	// 3000-3fff internal ROM if enabled
 	map(0x4000, 0x7fff).r(FUNC(vt_vt1682_state::rom_4000_to_7fff_r));
@@ -5740,6 +5762,34 @@ static INPUT_PORTS_START( dance555 )
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( mx10 )
+	PORT_START("UIOB")
+	PORT_DIPNAME( 0x01, 0x00, "UIOB" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
+INPUT_PORTS_END
+
 
 // this controller code is just designed to feed the games with data they're happy with, it probably has no grounds in reality
 // as I don't know how they really work.  presumably wireless with timeouts, sending signals for brief periods that need to be
@@ -5980,6 +6030,27 @@ void vt1682_lxts3_state::vt1682_lxts3(machine_config& config)
 	m_uio->porta_in().set(FUNC(vt1682_lxts3_state::uio_porta_r));
 }
 
+void vt1682_mx10_state::mx10(machine_config& config)
+{
+	vt_vt1682_ntscbase(config);
+	vt_vt1682_common(config);
+
+	M6502(config.replace(), m_maincpu, MAIN_CPU_CLOCK_NTSC); // no opcode bitswap
+	m_maincpu->set_addrmap(AS_PROGRAM, &vt1682_mx10_state::vt_vt1682_map);
+
+	m_uio->portb_in().set(FUNC(vt1682_mx10_state::uiob_r));
+
+	m_leftdac->reset_routes();
+	m_rightdac->reset_routes();
+
+	config.device_remove(":lspeaker");
+	config.device_remove(":rspeaker");
+
+	SPEAKER(config, "mono").front_center();
+	m_leftdac->add_route(0, "mono", 0.5);
+	m_rightdac->add_route(0, "mono", 0.5);
+}
+
 void vt1682_lxts3_state::vt1682_unk1682(machine_config& config)
 {
 	vt_vt1682_palbase(config);
@@ -6020,6 +6091,45 @@ void vt_vt1682_state::regular_init()
 	m_bank->configure_entry(0, memregion("mainrom")->base() + 0x0000000);
 }
 
+void vt1682_mx10_state::mx10_init()
+{
+	regular_init();
+
+	// this gets the tiles correct
+	u16* src = (u16*)memregion("mainrom")->base();
+	int len = memregion("mainrom")->bytes();
+
+	std::vector<u16> buffer(len/2);
+	{
+		for (int i = 0; i < len/2; i++)
+		{
+			buffer[i] = bitswap<16>(src[i],
+
+				15,14,2,12,
+
+				11,10,9,8,
+
+				7,6,5,4,
+
+				3,13,1,0);
+		}
+
+		std::copy(buffer.begin(), buffer.end(), &src[0]);
+	}
+
+	{
+		u8 *src = memregion("mainrom")->base();
+		FILE *fp;
+		char filename[256];
+		sprintf(filename,"decrypted_%s", machine().system().name);
+		fp=fopen(filename, "w+b");
+		if (fp)
+		{
+			fwrite(src, len, 1, fp);
+			fclose(fp);
+		}
+	}
+}
 
 
 void intec_interact_state::banked_init()
@@ -6277,3 +6387,21 @@ CONS( 2010, lxts3,    0,  0,   vt1682_lxts3, lxts3, vt1682_lxts3_state, regular_
 // there are products on SunPlus type hardware with nearly identical shells 'Mi DiGi World' / 'Mi Digi Diary'
 // needs IO ports on sound CPU side, needs write access to space for RAM (inputs are 'mini-keyboard' style)
 CONS( 200?, gm235upc,  0,  0,  vt1682_dance, gm235upc, vt1682_dance_state, regular_init, "TimeTop", "Ultimate Pocket Console GM-235", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
+
+ROM_START( cmpmx11 )
+	ROM_REGION( 0x2000000, "mainrom", ROMREGION_ERASE00 )
+	ROM_LOAD( "cmpmx11.bin", 0x000000, 0x800000, CRC(e1f3590b) SHA1(f78f7fc4f9a4474b5a9717dfbfc3199a5bc994ba) )
+ROM_END
+
+ROM_START( cmpmx10 )
+	ROM_REGION( 0x2000000, "mainrom", ROMREGION_ERASE00 )
+	ROM_LOAD( "classicmaxpocket_vertical.u3", 0x000000, 0x800000, CRC(9d3614f9) SHA1(e5de00b23eb1a2d39c524f5b5aed3b1cda44efce) )
+ROM_END
+
+
+// might be VT-09 or VT-162, uses a ROM glob on a sub-board, data lines seem scrambled at least?
+CONS( 2009, cmpmx11,     0,        0,  mx10, mx10, vt1682_mx10_state, mx10_init, "Premier Portfolio International",    "Classic Max Pocket PCMX11 - 12 in 1 Colour Games Console (horizontal, France)", MACHINE_NOT_WORKING )
+// this unit has a vertical screen, and the games are designed for that aspect
+// only Jungle Soft is shown on box for manufacturer details, 30-in-1 versions also exist
+// see https://bootleggames.fandom.com/wiki/Classic_Max_Pocket for other units with these games
+CONS( 2009, cmpmx10,     0,        0,  mx10, mx10, vt1682_mx10_state, mx10_init, "Jungle Soft",    "Classic Max Pocket Mx-10 - 12 in 1 (vertical)", MACHINE_NOT_WORKING )
