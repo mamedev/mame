@@ -1710,7 +1710,7 @@ u8 cmi_state::vfetch2_r(offs_t offset)
 		// IRQ vector
 		int level = m_i8214[1]->a_r() ^ 7;
 		u8 irq_address = m_cpu2space->read_byte(0xffe0 + level*2 + BIT(offset, 0));
-		LOG("%s: CPU2 IRQ vector %s byte: %02x (%s)\n", machine().describe_context(), BIT(offset, 0) ? "low" : "high", irq_address);
+		LOG("%s: CPU2 IRQ vector %s byte: %02x\n", machine().describe_context(), BIT(offset, 0) ? "low" : "high", irq_address);
 		return irq_address;
 	}
 	else if ((offset & 0x000e) == 0x000e)
