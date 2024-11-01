@@ -715,7 +715,24 @@ public:
 	void mx10_init();
 
 protected:
-	uint8_t uiob_r() { logerror("%s uiob_r\n", machine().describe_context()); return m_io_uiob->read(); }
+	uint8_t uiob_r() { logerror("%s uiob_r dir %02x\n", machine().describe_context(), m_uio->inteact_214a_uio_b_direction_r()); return m_io_uiob->read(); }
+	void uiob_w(u8 data)
+	{
+		u8 direction = m_uio->inteact_214a_uio_b_direction_r();
+		logerror("%s uiob_w %02x dir %02x\n", machine().describe_context(), data, direction );
+
+		if (direction & 0x10)
+		{
+			if (data & 0x10)
+			{
+				m_bank->set_entry(1);
+			}
+			else
+			{
+				m_bank->set_entry(0);
+			}
+		}
+	}
 
 private:
 	required_ioport m_io_uiob;
@@ -4127,7 +4144,7 @@ void vt_vt1682_state::vt1682_soundcpu_211c_reg_irqctrl_w(uint8_t data)
 	if (data & 0x10)
 	{
 		// not seen used
-		logerror("Main CPU IRQ Request from Sound CPU\n");
+	//	logerror("Main CPU IRQ Request from Sound CPU\n");
 	}
 
 	if (data & 0x08)
@@ -5764,30 +5781,18 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( mx10 )
 	PORT_START("UIOB")
-	PORT_DIPNAME( 0x01, 0x00, "UIOB" )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Unknown ) )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(1)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(1)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(1)
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
 INPUT_PORTS_END
 
 
@@ -6039,6 +6044,7 @@ void vt1682_mx10_state::mx10(machine_config& config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &vt1682_mx10_state::vt_vt1682_map);
 
 	m_uio->portb_in().set(FUNC(vt1682_mx10_state::uiob_r));
+	m_uio->portb_out().set(FUNC(vt1682_mx10_state::uiob_w));
 
 	m_leftdac->reset_routes();
 	m_rightdac->reset_routes();
@@ -6093,7 +6099,8 @@ void vt_vt1682_state::regular_init()
 
 void vt1682_mx10_state::mx10_init()
 {
-	regular_init();
+	m_bank->configure_entry(0, memregion("mainrom")->base() + 0x0000000);
+	m_bank->configure_entry(1, memregion("mainrom")->base() + 0x2000000);
 
 	// this gets the tiles correct
 	u16* src = (u16*)memregion("mainrom")->base();
@@ -6104,31 +6111,21 @@ void vt1682_mx10_state::mx10_init()
 		for (int i = 0; i < len/2; i++)
 		{
 			buffer[i] = bitswap<16>(src[i],
-
 				15,14,2,12,
-
 				11,10,9,8,
-
 				7,6,5,4,
-
 				3,13,1,0);
 		}
 
 		std::copy(buffer.begin(), buffer.end(), &src[0]);
 	}
 
-	{
-		u8 *src = memregion("mainrom")->base();
-		FILE *fp;
-		char filename[256];
-		sprintf(filename,"decrypted_%s", machine().system().name);
-		fp=fopen(filename, "w+b");
-		if (fp)
-		{
-			fwrite(src, len, 1, fp);
-			fclose(fp);
-		}
-	}
+	// for some reason, after changing banks, the sound CPU
+	// doesn't seem to end up in a good state, and trashes
+	// its own memory
+	//
+	// this is an ugly hack to prevent that for now, at the expense of any kind of correct sound
+	m_soundcpu->set_clock_scale(0.01f);
 }
 
 
@@ -6389,13 +6386,17 @@ CONS( 2010, lxts3,    0,  0,   vt1682_lxts3, lxts3, vt1682_lxts3_state, regular_
 CONS( 200?, gm235upc,  0,  0,  vt1682_dance, gm235upc, vt1682_dance_state, regular_init, "TimeTop", "Ultimate Pocket Console GM-235", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
 
 ROM_START( cmpmx11 )
-	ROM_REGION( 0x2000000, "mainrom", ROMREGION_ERASE00 )
-	ROM_LOAD( "cmpmx11.bin", 0x000000, 0x800000, CRC(e1f3590b) SHA1(f78f7fc4f9a4474b5a9717dfbfc3199a5bc994ba) )
+	ROM_REGION( 0x4000000, "mainrom", ROMREGION_ERASE00 )
+	ROM_LOAD( "cmpmx11.bin", 0x000000, 0x400000, CRC(e1f3590b) SHA1(f78f7fc4f9a4474b5a9717dfbfc3199a5bc994ba) )
+	ROM_CONTINUE(0x2000000,0x400000)
 ROM_END
 
 ROM_START( cmpmx10 )
-	ROM_REGION( 0x2000000, "mainrom", ROMREGION_ERASE00 )
-	ROM_LOAD( "classicmaxpocket_vertical.u3", 0x000000, 0x800000, CRC(9d3614f9) SHA1(e5de00b23eb1a2d39c524f5b5aed3b1cda44efce) )
+	ROM_REGION( 0x4000000, "mainrom", ROMREGION_ERASE00 )
+	// despite V1682 being able to access 32Mbytes natively, this is split into 2 4Mbyte banks with external banking
+	// the 2nd bank contains an (unused) menu for a 6-in-1
+	ROM_LOAD( "classicmaxpocket_vertical.u3", 0x000000, 0x400000, CRC(9d3614f9) SHA1(e5de00b23eb1a2d39c524f5b5aed3b1cda44efce) )
+	ROM_CONTINUE(0x2000000,0x400000)
 ROM_END
 
 
@@ -6404,4 +6405,5 @@ CONS( 2009, cmpmx11,     0,        0,  mx10, mx10, vt1682_mx10_state, mx10_init,
 // this unit has a vertical screen, and the games are designed for that aspect
 // only Jungle Soft is shown on box for manufacturer details, 30-in-1 versions also exist
 // see https://bootleggames.fandom.com/wiki/Classic_Max_Pocket for other units with these games
-CONS( 2009, cmpmx10,     0,        0,  mx10, mx10, vt1682_mx10_state, mx10_init, "Jungle Soft",    "Classic Max Pocket Mx-10 - 12 in 1 (vertical)", MACHINE_NOT_WORKING )
+// how do you specify ROT270 with CONS? using GAME macro for now
+GAME( 2009, cmpmx10,     0,        mx10, mx10, vt1682_mx10_state, mx10_init, ROT270, "Jungle Soft",    "Classic Max Pocket Mx-10 - 12 in 1 (vertical)", MACHINE_NOT_WORKING )
