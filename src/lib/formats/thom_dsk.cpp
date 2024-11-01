@@ -76,6 +76,8 @@ const char *thomson_35_format::extensions() const noexcept
 	return "fd";
 }
 
+// 1280K .fd images exist but are not supported. They represent a notional type
+// of 4-sided disk that can be inserted into 2 drives at once.
 const thomson_35_format::format thomson_35_format::formats[] = {
 	{
 		floppy_image::FF_35, floppy_image::SSDD, floppy_image::MFM,
