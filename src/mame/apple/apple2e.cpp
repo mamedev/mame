@@ -190,6 +190,8 @@ static constexpr int IRQ_SLOT = 0;
 static constexpr int IRQ_VBL = 1;
 static constexpr int IRQ_MOUSEXY = 2;
 
+static constexpr XTAL A2BUS_7M_CLOCK = XTAL(14'318'181) / 2;
+
 class apple2e_state : public driver_device
 {
 public:
@@ -2139,13 +2141,13 @@ void apple2e_state::laser_calc_speed()
 			break;
 
 		case 2:
-			m_accel_speed = A2BUS_7M_CLOCK/3;   // 2.38 MHz
+			m_accel_speed = A2BUS_7M_CLOCK.value()/3;   // 2.38 MHz
 			m_accel_fast = true;
 			accel_full_speed();
 			break;
 
 		case 3:
-			m_accel_speed = A2BUS_7M_CLOCK/2;   // 3.58 MHz
+			m_accel_speed = A2BUS_7M_CLOCK.value()/2;   // 3.58 MHz
 			m_accel_fast = true;
 			accel_full_speed();
 			break;
@@ -5043,13 +5045,13 @@ void apple2e_state::apple2e_common(machine_config &config, bool enhanced, bool r
 	m_a2bus->nmi_w().set(FUNC(apple2e_state::a2bus_nmi_w));
 	m_a2bus->inh_w().set(FUNC(apple2e_state::a2bus_inh_w));
 	m_a2bus->dma_w().set_inputline(m_maincpu, INPUT_LINE_HALT);
-	A2BUS_SLOT(config, "sl1", m_a2bus, apple2e_cards, nullptr);
-	A2BUS_SLOT(config, "sl2", m_a2bus, apple2e_cards, nullptr);
-	A2BUS_SLOT(config, "sl3", m_a2bus, apple2e_cards, nullptr);
-	A2BUS_SLOT(config, "sl4", m_a2bus, apple2e_cards, "mockingboard");
-	A2BUS_SLOT(config, "sl5", m_a2bus, apple2e_cards, nullptr);
-	A2BUS_SLOT(config, "sl6", m_a2bus, apple2e_cards, "diskiing");
-	A2BUS_SLOT(config, "sl7", m_a2bus, apple2e_cards, nullptr);
+	A2BUS_SLOT(config, "sl1", A2BUS_7M_CLOCK, m_a2bus, apple2e_cards, nullptr);
+	A2BUS_SLOT(config, "sl2", A2BUS_7M_CLOCK, m_a2bus, apple2e_cards, nullptr);
+	A2BUS_SLOT(config, "sl3", A2BUS_7M_CLOCK, m_a2bus, apple2e_cards, nullptr);
+	A2BUS_SLOT(config, "sl4", A2BUS_7M_CLOCK, m_a2bus, apple2e_cards, "mockingboard");
+	A2BUS_SLOT(config, "sl5", A2BUS_7M_CLOCK, m_a2bus, apple2e_cards, nullptr);
+	A2BUS_SLOT(config, "sl6", A2BUS_7M_CLOCK, m_a2bus, apple2e_cards, "diskiing");
+	A2BUS_SLOT(config, "sl7", A2BUS_7M_CLOCK, m_a2bus, apple2e_cards, nullptr);
 
 	A2EAUXSLOT(config, m_a2eauxslot, 0);
 	m_a2eauxslot->set_space(m_maincpu, AS_PROGRAM);
@@ -5254,9 +5256,9 @@ void apple2e_state::laser128(machine_config &config)
 	A2BUS_LASER128(config, "sl2", A2BUS_7M_CLOCK).set_onboard(m_a2bus);
 	A2BUS_LASER128(config, "sl3", A2BUS_7M_CLOCK).set_onboard(m_a2bus);
 	A2BUS_LASER128(config, "sl4", A2BUS_7M_CLOCK).set_onboard(m_a2bus);
-	A2BUS_SLOT(config, "sl5", m_a2bus, apple2e_cards, nullptr);
+	A2BUS_SLOT(config, "sl5", A2BUS_7M_CLOCK, m_a2bus, apple2e_cards, nullptr);
 	A2BUS_LASER128(config, "sl6", A2BUS_7M_CLOCK).set_onboard(m_a2bus);
-	A2BUS_SLOT(config, "sl7", m_a2bus, apple2e_cards, nullptr);
+	A2BUS_SLOT(config, "sl7", A2BUS_7M_CLOCK, m_a2bus, apple2e_cards, nullptr);
 
 	CENTRONICS(config, m_printer_conn, centronics_devices, "printer");
 	m_printer_conn->busy_handler().set(FUNC(apple2e_state::busy_w));
@@ -5289,9 +5291,9 @@ void apple2e_state::laser128o(machine_config &config)
 	A2BUS_LASER128_ORIG(config, "sl2", A2BUS_7M_CLOCK).set_onboard(m_a2bus);
 	A2BUS_LASER128_ORIG(config, "sl3", A2BUS_7M_CLOCK).set_onboard(m_a2bus);
 	A2BUS_LASER128_ORIG(config, "sl4", A2BUS_7M_CLOCK).set_onboard(m_a2bus);
-	A2BUS_SLOT(config, "sl5", m_a2bus, apple2e_cards, nullptr);
+	A2BUS_SLOT(config, "sl5", A2BUS_7M_CLOCK, m_a2bus, apple2e_cards, nullptr);
 	A2BUS_LASER128_ORIG(config, "sl6", A2BUS_7M_CLOCK).set_onboard(m_a2bus);
-	A2BUS_SLOT(config, "sl7", m_a2bus, apple2e_cards, nullptr);
+	A2BUS_SLOT(config, "sl7", A2BUS_7M_CLOCK, m_a2bus, apple2e_cards, nullptr);
 
 	CENTRONICS(config, m_printer_conn, centronics_devices, "printer");
 	m_printer_conn->busy_handler().set(FUNC(apple2e_state::busy_w));
@@ -5400,7 +5402,7 @@ void apple2e_state::ace2200(machine_config &config)
 	config.device_remove("sl6");
 
 	A2BUS_ACE2X00_SLOT1(config, "sl1", A2BUS_7M_CLOCK).set_onboard(m_a2bus);
-	A2BUS_SLOT(config, "sl5", m_a2bus, apple2e_cards, "mockingboard");
+	A2BUS_SLOT(config, "sl5", A2BUS_7M_CLOCK, m_a2bus, apple2e_cards, "mockingboard");
 	A2BUS_ACE2X00_SLOT6(config, "sl6", A2BUS_7M_CLOCK).set_onboard(m_a2bus);
 
 	config.device_remove("aux");

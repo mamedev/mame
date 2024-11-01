@@ -3860,13 +3860,13 @@ void apple2gs_state::apple2gs(machine_config &config)
 	m_a2bus->nmi_w().set(FUNC(apple2gs_state::a2bus_nmi_w));
 	m_a2bus->inh_w().set(FUNC(apple2gs_state::a2bus_inh_w));
 	m_a2bus->dma_w().set_inputline(m_maincpu, INPUT_LINE_HALT);
-	A2BUS_SLOT(config, "sl1", m_a2bus, apple2gs_cards, nullptr);
-	A2BUS_SLOT(config, "sl2", m_a2bus, apple2gs_cards, nullptr);
-	A2BUS_SLOT(config, "sl3", m_a2bus, apple2gs_cards, nullptr);
-	A2BUS_SLOT(config, "sl4", m_a2bus, apple2gs_cards, nullptr);
-	A2BUS_SLOT(config, "sl5", m_a2bus, apple2gs_cards, nullptr);
-	A2BUS_SLOT(config, "sl6", m_a2bus, apple2gs_cards, nullptr);
-	A2BUS_SLOT(config, "sl7", m_a2bus, apple2gs_cards, nullptr);
+	A2BUS_SLOT(config, "sl1", A2GS_7M, m_a2bus, apple2gs_cards, nullptr);
+	A2BUS_SLOT(config, "sl2", A2GS_7M, m_a2bus, apple2gs_cards, nullptr);
+	A2BUS_SLOT(config, "sl3", A2GS_7M, m_a2bus, apple2gs_cards, nullptr);
+	A2BUS_SLOT(config, "sl4", A2GS_7M, m_a2bus, apple2gs_cards, nullptr);
+	A2BUS_SLOT(config, "sl5", A2GS_7M, m_a2bus, apple2gs_cards, nullptr);
+	A2BUS_SLOT(config, "sl6", A2GS_7M, m_a2bus, apple2gs_cards, nullptr);
+	A2BUS_SLOT(config, "sl7", A2GS_7M, m_a2bus, apple2gs_cards, nullptr);
 
 	IWM(config, m_iwm, A2GS_7M, A2GS_MASTER_CLOCK/14);
 	m_iwm->phases_cb().set(FUNC(apple2gs_state::phases_w));
