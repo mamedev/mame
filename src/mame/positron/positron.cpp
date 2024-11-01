@@ -346,8 +346,9 @@ void positron_state::mmu_w(offs_t offset, uint8_t data)
 
 uint8_t positron_state::vector_r(offs_t offset)
 {
+	if (m_mmu.active_key != 0)
+		logerror("vector_r: switched to task 0 from task %d (vector = $%04X)\n", m_mmu.active_key, offset);
 	m_mmu.active_key = 0;
-	logerror("irq_callback: switched to task %d\n", m_mmu.active_key);
 	m_mmu.sbit = true;
 	return m_maincpu->space(AS_PROGRAM).read_byte(offset);
 }
