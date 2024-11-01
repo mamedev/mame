@@ -134,7 +134,7 @@ public:
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
-	virtual void machine_reset() override { m_reset = true; }
+	virtual void machine_reset() override ATTR_COLD { m_reset = true; }
 
 private:
 	// devices/pointers

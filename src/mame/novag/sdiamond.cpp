@@ -69,7 +69,7 @@ public:
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
-	virtual void machine_reset() override { set_power(true); }
+	virtual void machine_reset() override ATTR_COLD { set_power(true); }
 
 private:
 	// devices/pointers
