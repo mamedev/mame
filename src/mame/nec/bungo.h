@@ -38,7 +38,7 @@ private:
 
 	u16 fake_dict_r(offs_t offset);
 
-    // just suppress for now, TBD
+	// just suppress for now, TBD
 	virtual void uart_irq_check() override {};
 
 	void bungo_palette(palette_device &palette) const;

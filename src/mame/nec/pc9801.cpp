@@ -3060,6 +3060,7 @@ COMP( 1986, pc9801vx,   0,        0, pc9801vx,  pc9801rs, pc9801vm_state, init_p
 // ...
 
 // PC-H98 (Hyper 98, '90-'93 high end line with High-reso, proprietary NESA bus, E²GC)
+// PC-H98S cfr. pc_h98.cpp
 // PC-H98T (LCD Hyper 98)
 // SV-H98 "98SERVER" (i486, later Hyper 98 revision)
 // SV-98 (Pentium based, second gen of 98SERVER)
@@ -3096,6 +3097,8 @@ COMP( 1993, pc9801bx2,  0,        0, pc9801bx2, pc9801rs, pc9801bx_state, init_p
 // ...
 
 // PC-98LT / PC-98HA -> cfr. pc98ha.cpp
+// PC-9801N "98NOTE" (V30 based, EMS + 3.5" floppy, 8.9" FL blue LCD).
+// PC-9801N* (98NOTE upgrades)
 // PC-9801T (i386SX, extremely expensive TFT or LCD laptop with C-Bus slots, de-facto a "portable" desktop machine)
 // PC-9801LX (i286, belongs to pc98ha.cpp?)
 // PC-9801LS (i386SX, Plasma laptop)

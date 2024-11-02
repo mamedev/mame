@@ -86,6 +86,16 @@ void pc9801_state::draw_text(bitmap_rgb32 &bitmap, uint32_t addr, int y, int wd,
 
 //  uint8_t interlace_on = m_video_ff[INTERLACE_REG];
 	uint8_t char_size = m_video_ff[FONTSEL_REG] ? 16 : 8;
+	uint8_t font_shift = 0;
+	const uint8_t char_base_mult = char_size;
+	// arcus2 (intro mask) and gamepac1:03:valiant double height tiles
+	// with lr = 16 and fontsel off (-> 8x8) in 24 kHz mode
+	// TODO: verify with LR slightly above or below this threshold
+	if (!m_video_ff[FONTSEL_REG] && lr >= 16)
+	{
+		font_shift = 1;
+		char_size = 16;
+	}
 
 	uint8_t x_step;
 	uint8_t lastul = 0;
@@ -118,6 +128,7 @@ void pc9801_state::draw_text(bitmap_rgb32 &bitmap, uint32_t addr, int y, int wd,
 			//kanji_lr |= (tile & 0x80) >> 7; // tokisg3
 			// ... but then ginga and gage expects working LR for PCG depending on the attribute.
 			// beast3 uses tile bit 7 for the heart shaped char displayed on first screen.
+			// TODO: rename pcg to gaiji (actual nomenclature)
 			const u8 pcg_lr = (BIT(knj_tile, 7) || BIT(tile, 7));
 			tile &= 0x7f;
 			tile <<= 8;
@@ -227,6 +238,7 @@ void pc9801_state::draw_text(bitmap_rgb32 &bitmap, uint32_t addr, int y, int wd,
 
 							int gfx_bit;
 							gfx_bit = (xi & 4);
+							// TODO: unverified for arcus2 case above, may be just base mult
 							gfx_bit+= (yi & (2 << (char_size == 16 ? 0x01 : 0x00)))>>(1+(char_size == 16));
 							gfx_bit+= (yi & (4 << (char_size == 16 ? 0x01 : 0x00)))>>(1+(char_size == 16));
 
@@ -234,9 +246,7 @@ void pc9801_state::draw_text(bitmap_rgb32 &bitmap, uint32_t addr, int y, int wd,
 						}
 						else
 						{
-							// TODO: arcus2 pretends to mask during intro via tile 0x87, lr = 16 and fontsel off (-> 8x8) in 24 kHz mode
-							// is it double heighting tiles?
-							tile_data = (m_char_rom[tile*char_size+m_video_ff[FONTSEL_REG]*0x800+yi]);
+							tile_data = (m_char_rom[tile*char_base_mult+m_video_ff[FONTSEL_REG]*0x800+(yi >> font_shift)]);
 						}
 					}
 

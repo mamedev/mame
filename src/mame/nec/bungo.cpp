@@ -2,20 +2,20 @@
 // copyright-holders:Angelo Salese
 /**************************************************************************************************
 
-    NEC 文豪 / "Bungo" Word Processors (laptop family)
+NEC 文豪 / "Bungo" Word Processors (laptop family)
 
-    TODO:
-    - needs list of components, no documentation available from the net except for bare specs here:
-      https://museum.ipsj.or.jp/en/computer/word/0058.html
-    - Needs an actual dump of the kanji ROM;
-    - Garbled message tells user to reset machine and hold SHIFT+MENU while having the
-      auxiliary disk in
-      https://www.leadedsolder.com/2022/10/15/pwp50sx-nec-mini5-psu-repair-pickup.html
-      NB: MENU key doesn't exist with current PC98 keyboard device, also note that the usual
-      I/O at $41-$43 is not polled (either expects an irq or perhaps they relocated)
-    - Verify what exactly the handwritten “Function 2 + F2 = Floppy.” printed on aux disk
-      means.
-    - Verify how much of PC-98 this really uses if anything at all.
+TODO:
+- needs list of components, no documentation available from the net except for bare specs here:
+  https://museum.ipsj.or.jp/en/computer/word/0058.html
+- Needs an actual dump of the kanji ROM;
+- Garbled message tells user to reset machine and hold SHIFT+MENU while having the
+  auxiliary disk in
+  https://www.leadedsolder.com/2022/10/15/pwp50sx-nec-mini5-psu-repair-pickup.html
+  NB: MENU key doesn't exist with current PC98 keyboard device, also note that the usual
+  I/O at $41-$43 is not polled (either expects an irq or perhaps they relocated)
+- Verify what exactly the handwritten “Function 2 + F2 = Floppy.” printed on aux disk
+  means.
+- Verify how much of PC-98 this really uses if anything at all.
 
 **************************************************************************************************/
 
@@ -136,8 +136,8 @@ void bungo_mini5sx_state::mini5sx_config(machine_config &config)
 //  m_ppi_sys->in_pc_callback().set_constant(0xa0); // 0x80 cpu triple fault reset flag?
 //  m_ppi_sys->out_pc_callback().set(FUNC(pc98lt_state::ppi_sys_beep_portc_w));
 
-    // TODO: unverified, known to have a serial port
-    pc9801_serial(config);
+	// TODO: unverified, known to have a serial port
+	pc9801_serial(config);
 
 	I8255(config, m_ppi_prn, 0);
 //  m_ppi_prn->in_pb_callback().set_ioport("PRNB");
