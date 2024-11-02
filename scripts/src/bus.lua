@@ -5751,6 +5751,8 @@ if (BUSES["H89BUS"]~=null) then
 		MAME_DIR .. "src/devices/bus/heathzenith/h89/cards.h",
 		MAME_DIR .. "src/devices/bus/heathzenith/h89/h89bus.cpp",
 		MAME_DIR .. "src/devices/bus/heathzenith/h89/h89bus.h",
+		MAME_DIR .. "src/devices/bus/heathzenith/h89/h17_fdc.cpp",
+		MAME_DIR .. "src/devices/bus/heathzenith/h89/h17_fdc.h",
 		MAME_DIR .. "src/devices/bus/heathzenith/h89/h_88_3.cpp",
 		MAME_DIR .. "src/devices/bus/heathzenith/h89/h_88_3.h",
 		MAME_DIR .. "src/devices/bus/heathzenith/h89/h_88_5.cpp",
