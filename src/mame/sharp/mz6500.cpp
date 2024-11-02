@@ -163,7 +163,7 @@ void mz6500_state::mz6500(machine_config &config)
 	PALETTE(config, "palette").set_entries(8);
 
 	/* Devices */
-	UPD7220(config, m_hgdc, 8000000/6); // unk clock
+	UPD7220(config, m_hgdc, 8000000 / 3); // unk clock
 	m_hgdc->set_addrmap(0, &mz6500_state::upd7220_map);
 	m_hgdc->set_display_pixels(FUNC(mz6500_state::hgdc_display_pixels));
 
