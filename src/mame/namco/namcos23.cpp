@@ -6050,28 +6050,6 @@ TIMER_CALLBACK_MEMBER(namcos23_gmen_state::sh2_irq_off)
 
 
 #define XOR(a) WORD2_XOR_BE(a)
-
-static const gfx_layout namcos23_sprite_layout =
-{
-	32,32,
-	RGN_FRAC(1,1),
-	8,
-	{ 0,1,2,3,4,5,6,7 },
-	{
-		0*8,1*8,2*8,3*8,4*8,5*8,6*8,7*8,
-		8*8,9*8,10*8,11*8,12*8,13*8,14*8,15*8,
-		16*8,17*8,18*8,19*8,20*8,21*8,22*8,23*8,
-		24*8,25*8,26*8,27*8,28*8,29*8,30*8,31*8
-	},
-	{
-		0*32*8,1*32*8,2*32*8,3*32*8,4*32*8,5*32*8,6*32*8,7*32*8,
-		8*32*8,9*32*8,10*32*8,11*32*8,12*32*8,13*32*8,14*32*8,15*32*8,
-		16*32*8,17*32*8,18*32*8,19*32*8,20*32*8,21*32*8,22*32*8,23*32*8,
-		24*32*8,25*32*8,26*32*8,27*32*8,28*32*8,29*32*8,30*32*8,31*32*8
-	},
-	32*32*8
-};
-
 static const gfx_layout namcos23_cg_layout =
 {
 	16,16,
@@ -6084,43 +6062,19 @@ static const gfx_layout namcos23_cg_layout =
 	64*16
 }; /* cg_layout */
 
-static const gfx_layout namcos23_textile_layout =
-{
-	16,16,
-	RGN_FRAC(1,1),
-	8,
-	{ 0,1,2,3,4,5,6,7 },
-	{
-		0*8,1*8,2*8,3*8,4*8,5*8,6*8,7*8,8*8,9*8,10*8,11*8,12*8,13*8,14*8,15*8
-	},
-	{
-		0*16*8,1*16*8,2*16*8,3*16*8,4*16*8,5*16*8,6*16*8,7*16*8,
-		8*16*8,9*16*8,10*16*8,11*16*8,12*16*8,13*16*8,14*16*8,15*16*8
-	},
-	16*16*8
-}; /* textile_layout */
+#undef XOR
 
-static const gfx_layout namcos23_texram_layout =
-{
-	16,16,
-	0x400, /* 0x3c0 */
-	4,
-	{ 0,1,2,3 },
-	{ XOR(0)*4, XOR(1)*4,  XOR(2)*4,  XOR(3)*4,  XOR(4)*4,  XOR(5)*4,  XOR(6)*4,  XOR(7)*4,
-		XOR(8)*4, XOR(9)*4, XOR(10)*4, XOR(11)*4, XOR(12)*4, XOR(13)*4, XOR(14)*4, XOR(15)*4 },
-	{ 64*0,64*1,64*2,64*3,64*4,64*5,64*6,64*7,64*8,64*9,64*10,64*11,64*12,64*13,64*14,64*15 },
-	64*16
-}; /* cg_layout */
+static GFXLAYOUT_RAW(namcos23_sprite_layout, 32, 32, 32*8, 32*32*8)
 
 static GFXDECODE_START( gfx_namcos23 )
-	GFXDECODE_ENTRY( nullptr, 0, namcos23_cg_layout, 0, 0x800 )
-	GFXDECODE_ENTRY( "textile", 0, namcos23_textile_layout,  0, 0x80 )
+	GFXDECODE_ENTRY( nullptr,   0, namcos23_cg_layout, 0, 0x800 )
+	GFXDECODE_ENTRY( "textile", 0, gfx_16x16x8_raw,    0, 0x80 )
 GFXDECODE_END
 
 static GFXDECODE_START( gfx_gorgon )
 	GFXDECODE_ENTRY( nullptr,   0, namcos23_cg_layout,     0, 0x800 )
-	GFXDECODE_ENTRY( "textile", 0, namcos23_textile_layout,  0, 0x80 )
-	GFXDECODE_ENTRY( "sprites", 0, namcos23_sprite_layout, 0,  0x80 )
+	GFXDECODE_ENTRY( "textile", 0, gfx_16x16x8_raw,        0, 0x80 )
+	GFXDECODE_ENTRY( "sprites", 0, namcos23_sprite_layout, 0, 0x80 )
 GFXDECODE_END
 
 void gorgon_state::gorgon(machine_config &config)

@@ -2012,7 +2012,7 @@ void namcos22_state::namcos22_dspram16_w(offs_t offset, u16 data, u16 mem_mask)
 			break;
 	}
 
-	m_polygonram[offset] = (hi << 16) | lo;
+	m_polygonram[offset] = hi << 16 | lo;
 }
 
 void namcos22_state::namcos22_dspram16_bank_w(offs_t offset, u16 data, u16 mem_mask)
@@ -2080,7 +2080,7 @@ u16 namcos22_state::point_loword_r()
 u16 namcos22_state::point_hiword_ir()
 {
 	// high bit is unknown busy signal (ridgerac, ridgera2, raverace, cybrcomm)
-	const u16 ret = 0x8000 | ((point_read(m_point_address) >> 16) & 0x00ff);
+	const u16 ret = 0x8000 | (point_read(m_point_address) >> 16 & 0x00ff);
 	if (!machine().side_effects_disabled())
 		m_point_address++;
 
@@ -2495,7 +2495,7 @@ u16 namcos22_state::dsp_slave_port5_r()
 #if 0
 	int numWords = SlaveBufSize();
 	int mode = 2;
-	return (numWords<<4) | mode;
+	return numWords << 4 | mode;
 #endif
 	return 0;
 }
@@ -2782,7 +2782,7 @@ void namcos22_state::handle_driving_io()
 	{
 		const u16 flags = m_inputs->read();
 		u16 steer = m_adc_ports[0]->read();
-		u16 gas   = m_adc_ports[1]->read();
+		u16 gas = m_adc_ports[1]->read();
 		u16 brake = m_adc_ports[2]->read();
 
 		switch (m_gametype)
@@ -3575,12 +3575,6 @@ INPUT_PORTS_END
 
 /*********************************************************************************************/
 
-/* System Super22 supports a sprite layer.
- * Sprites are rendered as part of the polygon draw list, based on a per-sprite Z attribute.
- * Each sprite has explicit placement/color/zoom controls.
- */
-static GFXLAYOUT_RAW(sprite_layout, 32, 32, 32*8, 32*32*8)
-
 /* text layer uses a set of 16x16x4bpp tiles defined in RAM */
 #define XOR(a) WORD2_XOR_BE(a)
 static const gfx_layout namcos22_cg_layout =
@@ -3596,6 +3590,12 @@ static const gfx_layout namcos22_cg_layout =
 };
 
 #undef XOR
+
+/* System Super22 supports a sprite layer.
+ * Sprites are rendered as part of the polygon draw list, based on a per-sprite Z attribute.
+ * Each sprite has explicit placement/color/zoom controls.
+ */
+static GFXLAYOUT_RAW(sprite_layout, 32, 32, 32*8, 32*32*8)
 
 static GFXDECODE_START( gfx_namcos22 )
 	GFXDECODE_ENTRY( nullptr,   0, namcos22_cg_layout, 0, 0x800 )

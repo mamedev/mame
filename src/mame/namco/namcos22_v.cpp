@@ -83,9 +83,9 @@ void namcos22_renderer::renderscanline_poly(int32_t scanline, const extent_t &ex
 		{
 			const int tx = int(u * ooz) & 0xfff;
 			const int ty = (int(v * ooz) & 0xfff) | bn;
-			const int to = ((ty << 4) & 0xfff00) | (tx >> 4);
-			pen = ttdata[(ttmap[to] << 8) | tt_ayx_to_pixel[(ttattr[to] << 8) | ((ty << 4) & 0xf0) | (tx & 0xf)]];
-			rgb.set(pens[(pen >> penshift) & penmask]);
+			const int to = (ty << 4 & 0xfff00) | (tx >> 4);
+			pen = ttdata[(ttmap[to] << 8) | tt_ayx_to_pixel[(ttattr[to] << 8) | (ty << 4 & 0xf0) | (tx & 0xf)]];
+			rgb.set(pens[pen >> penshift & penmask]);
 		}
 		else
 			rgb.set(0, 0xff, 0xff, 0xff);
@@ -176,9 +176,9 @@ void namcos22_renderer::renderscanline_poly_ss22(int32_t scanline, const extent_
 		{
 			const int tx = int(u * ooz) & 0xfff;
 			const int ty = (int(v * ooz) & 0xfff) | bn;
-			const int to = ((ty << 4) & 0xfff00) | (tx >> 4);
-			pen = ttdata[(ttmap[to] << 8) | tt_ayx_to_pixel[(ttattr[to] << 8) | ((ty << 4) & 0xf0) | (tx & 0xf)]];
-			rgb.set(pens[(pen >> penshift) & penmask]);
+			const int to = (ty << 4 & 0xfff00) | (tx >> 4);
+			pen = ttdata[(ttmap[to] << 8) | tt_ayx_to_pixel[(ttattr[to] << 8) | (ty << 4 & 0xf0) | (tx & 0xf)]];
+			rgb.set(pens[pen >> penshift & penmask]);
 		}
 		else
 			rgb.set(0, 0xff, 0xff, 0xff);
@@ -697,7 +697,7 @@ float namcos22_state::dspfloat_to_nativefloat(u32 val)
 {
 	const s16 mantissa = (s16)val;
 	float result = (float)mantissa;
-	int exponent = (val >> 16) & 0x3f;
+	int exponent = val >> 16 & 0x3f;
 	while (exponent < 0x2e)
 	{
 		result /= 2.0f;
@@ -864,7 +864,7 @@ void namcos22_state::draw_direct_poly(const u16 *src)
 		node->data.quad.texturebank = (src[1 + 4] & 0xf000) >> 12;
 	}
 	node->data.quad.color = (src[2] & 0xff00) >> 8;
-	node->data.quad.cz_value = (src[3] >> 2) & 0x1fff;
+	node->data.quad.cz_value = src[3] >> 2 & 0x1fff;
 	node->data.quad.cz_type = src[3] & 3;
 	node->data.quad.cz_adjust = 0;
 	node->data.quad.objectflags = 0;
@@ -1068,12 +1068,12 @@ void namcos22_state::blit_single_quad(u32 color, u32 addr, float m[4][4], int po
 		else if (packetformat & 0x40)
 		{
 			// gourad shading
-			bri = (point_read(i + addr) >> 16) & 0xff;
+			bri = point_read(i + addr) >> 16 & 0xff;
 		}
 		else
 		{
 			// flat shading
-			bri = (color >> 16) & 0xff;
+			bri = color >> 16 & 0xff;
 		}
 
 		v[i].bri = bri;
@@ -1081,11 +1081,11 @@ void namcos22_state::blit_single_quad(u32 color, u32 addr, float m[4][4], int po
 
 	// allocate quad
 	struct namcos22_scenenode *node = m_poly->new_scenenode(machine(), zsort, NAMCOS22_SCENENODE_QUAD);
-	node->data.quad.cmode = (v[0].u >> 12) & 0xf;
-	node->data.quad.texturebank = (v[0].v >> 12) & 0xf;
-	node->data.quad.color = (color >> 8) & 0xff;
+	node->data.quad.cmode = v[0].u >> 12 & 0xf;
+	node->data.quad.texturebank = v[0].v >> 12 & 0xf;
+	node->data.quad.color = color >> 8 & 0xff;
 	node->data.quad.cz_value = cz_value >> 8;
-	node->data.quad.cz_type = (flags >> 10) & 3;
+	node->data.quad.cz_type = flags >> 10 & 3;
 	node->data.quad.cz_adjust = m_cz_adjust;
 	node->data.quad.objectflags = m_objectflags;
 
@@ -1282,14 +1282,14 @@ void namcos22_state::slavesim_handle_bb0003(const s32 *src)
 	    0000 7ffe 0000
 	    0000 0000 7ffe
 	*/
-	m_camera_ambient = (src[0x1] >> 16) & 0xffff;
+	m_camera_ambient = src[0x1] >> 16 & 0xffff;
 	m_camera_power = src[0x1] & 0xffff;
 
 	m_camera_lx = dspfixed_to_nativefloat(src[0x2]);
 	m_camera_ly = dspfixed_to_nativefloat(src[0x3]);
 	m_camera_lz = dspfixed_to_nativefloat(src[0x4]);
 
-	m_absolute_priority = (src[0x3] >> 16) & 0xffff;
+	m_absolute_priority = src[0x3] >> 16 & 0xffff;
 	m_camera_vx = signed12(src[0x5] >> 16);
 	m_camera_vy = signed12(src[0x5] & 0xffff);
 	m_camera_zoom = dspfloat_to_nativefloat(src[0x6]);
@@ -1298,7 +1298,7 @@ void namcos22_state::slavesim_handle_bb0003(const s32 *src)
 	m_camera_vu = dspfloat_to_nativefloat(src[0x9]) * m_camera_zoom - 0.5f;
 	m_camera_vd = dspfloat_to_nativefloat(src[0xa]) * m_camera_zoom - 0.5f;
 
-	m_reflection = (src[0x2] >> 16) & 0x30; // z too?
+	m_reflection = src[0x2] >> 16 & 0x30; // z too?
 	m_cullflip = (m_reflection == 0x10 || m_reflection == 0x20);
 
 	if (BIT(m_reflection, 4))
@@ -1607,17 +1607,17 @@ void namcos22_state::draw_sprite_group(const u32 *src, const u32 *attr, int num_
 		int ypos = (src[0] & 0xffff) - deltay;
 		int sizex = src[1] >> 16;
 		int sizey = src[1] & 0xffff;
-		const int flipy = (src[2] >> 3) & 0x1;
+		const int flipy = BIT(src[2], 3);
 		int rows = src[2] & 0x7;
-		const int linktype = (src[2] & 0x00ff0000) >> 16;
-		const int flipx = (src[2] >> 7) & 0x1;
-		int cols = (src[2] >> 4) & 0x7;
+		const int linktype = src[2] >> 16 & 0xff;
+		const int flipx = BIT(src[2], 7);
+		int cols = src[2] >> 4 & 0x7;
 		const u32 code = src[3];
 		const int tile = code >> 16;
-		const int alpha = (code & 0xff00) >> 8;
+		const int alpha = code >> 8 & 0xff;
 
 		const u32 zcoord = attr[0] & 0x00ffffff;
-		const int color = (attr[1] >> 16) & 0xff;
+		const int color = attr[1] >> 16 & 0xff;
 		const int cz = attr[1] & 0xff;
 
 		// one of these is to override global fade setting?
@@ -1628,7 +1628,7 @@ void namcos22_state::draw_sprite_group(const u32 *src, const u32 *attr, int num_
 		const int prioverchar = (cz == 0xfe) ? 1 : 0;
 
 		// set window clipping
-		const int clip = (src[2] >> 23) & 0xe;
+		const int clip = src[2] >> 23 & 0xe;
 		const int cx_min = -deltax + (s16)(m_spriteram[0x80|clip] >> 16);
 		const int cx_max = -deltax + (s16)(m_spriteram[0x80|clip] & 0xffff);
 		const int cy_min = -deltay + (s16)(m_spriteram[0x81|clip] >> 16);
@@ -1788,7 +1788,7 @@ void namcos22_state::draw_sprites()
 
 	// where do the games store the number of sprites to be processed by vics???
 	// the current default implementation (using spritelist size) is clearly wrong and causes problems in dirtdash and airco22b
-	num_sprites = (m_vics_control[0x40/4] >> 4) & 0x1ff; // no +1
+	num_sprites = m_vics_control[0x40/4] >> 4 & 0x1ff; // no +1
 
 	// dirtdash sprite list starts at xxx4, number of sprites is stored in xxx0, it doesn't use set#2
 	if (m_gametype == NAMCOS22_DIRT_DASH)
@@ -1801,7 +1801,7 @@ void namcos22_state::draw_sprites()
 		draw_sprite_group(src, attr, num_sprites, deltax, deltay, y_lowres);
 	}
 
-	num_sprites = (m_vics_control[0x60/4] >> 4) & 0x1ff; // no +1
+	num_sprites = m_vics_control[0x60/4] >> 4 & 0x1ff; // no +1
 
 	// airco22b number of sprites for set#2 is stored in set#1 - it does not use set 1, or main set for sprites
 	if (m_gametype == NAMCOS22_AIR_COMBAT22)
@@ -1987,7 +1987,7 @@ u16 namcos22s_state::spotram_r(offs_t offset)
 	if (offset == 2)
 	{
 		// read
-		const u16 ret = m_spotram[(m_spotram_address >> 1) & 0x7ff];
+		const u16 ret = m_spotram[m_spotram_address >> 1 & 0x7ff];
 
 		if (!machine().side_effects_disabled())
 			m_spotram_address += 2;
@@ -2009,7 +2009,7 @@ void namcos22s_state::spotram_w(offs_t offset, u16 data, u16 mem_mask)
 
 		case 1:
 			// write
-			COMBINE_DATA(&m_spotram[(m_spotram_address >> 1) & 0x7ff]);
+			COMBINE_DATA(&m_spotram[m_spotram_address >> 1 & 0x7ff]);
 			m_spotram_address += 2;
 			break;
 
@@ -2039,7 +2039,7 @@ void namcos22s_state::namcos22s_mix_text_layer(screen_device &screen, bitmap_rgb
 	// prepare spot
 	const bool spot_enabled = BIT(m_spotram_enable, 0) && (m_chipselect & 0xc000);
 	const int spot_factor = (m_spot_factor < 0x100) ? 0 : m_spot_factor & 0xff;
-	const int spot_palbase = (m_text_palbase >> 8) & 3; // (src[x] >> 8) & 3
+	const int spot_palbase = m_text_palbase >> 8 & 3; // src[x] >> 8 & 3
 
 	// prepare fader
 	const bool fade_enabled = BIT(m_mixer_flags, 1) && m_screen_fade_factor;
@@ -2160,7 +2160,7 @@ void namcos22_state::namcos22_mix_text_layer(screen_device &screen, bitmap_rgb32
 			}
 
 			// apply gamma
-			dest[x] = (rlut[(pixel >> 16) & 0xff] << 16) | (glut[(pixel >> 8) & 0xff] << 8) | blut[pixel & 0xff];
+			dest[x] = (rlut[pixel >> 16 & 0xff] << 16) | (glut[pixel >> 8 & 0xff] << 8) | blut[pixel & 0xff];
 		}
 	}
 }
@@ -2540,8 +2540,8 @@ u32 namcos22s_state::screen_update_namcos22s(screen_device &screen, bitmap_rgb32
 		for (int x = cliprect.left(); x <= cliprect.right(); x++)
 		{
 			const u32 rgb = dest[x];
-			const u8 r = rlut[NATIVE_ENDIAN_VALUE_LE_BE(3, 0) ^ ((rgb >> 16) & 0xff)];
-			const u8 g = glut[NATIVE_ENDIAN_VALUE_LE_BE(3, 0) ^ ((rgb >> 8) & 0xff)];
+			const u8 r = rlut[NATIVE_ENDIAN_VALUE_LE_BE(3, 0) ^ (rgb >> 16 & 0xff)];
+			const u8 g = glut[NATIVE_ENDIAN_VALUE_LE_BE(3, 0) ^ (rgb >> 8 & 0xff)];
 			const u8 b = blut[NATIVE_ENDIAN_VALUE_LE_BE(3, 0) ^ (rgb & 0xff)];
 			dest[x] = (r << 16) | (g << 8) | b;
 		}
