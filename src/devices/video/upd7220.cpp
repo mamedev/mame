@@ -383,17 +383,11 @@ inline void upd7220_device::update_blank_timer(int state)
 
 inline void upd7220_device::recompute_parameters()
 {
-	int horiz_mult = 16, vert_mult = 1;
-	/* TODO: assume that the pitch also controls number of horizontal pixels in a single cell */
-	// horiz_mult = 4 if both mixed and interlace?
-	if((m_mode & UPD7220_MODE_DISPLAY_MASK) == UPD7220_MODE_DISPLAY_MIXED)
-		horiz_mult = 8;
-	else if((m_mode & UPD7220_MODE_INTERLACE_MASK) == UPD7220_MODE_INTERLACE_ON)
-	{
-		// in interlaced mode every line contains both fields
-		horiz_mult = 8; // TODO this breaks microbx2, compis uhrg video, characters are 16 pixels wide in interlaced mode too
-		vert_mult = 2;
-	}
+	// microbx2 wants horizontal multiplier of x16
+	// pc9801:diremono sets up m_mode to be specifically in character mode, wanting x8 here
+	// TODO: verify compis uhrg video & high reso Hyper 98
+	const int horiz_mult = (m_mode & UPD7220_MODE_DISPLAY_MASK) == UPD7220_MODE_DISPLAY_GRAPHICS ? 16 : 8;
+	const int vert_mult = (m_mode & UPD7220_MODE_INTERLACE_MASK) == UPD7220_MODE_INTERLACE_ON ? 2 : 1;
 
 	int horiz_pix_total = (m_hs + m_hbp + m_hfp + m_aw) * horiz_mult;
 	int vert_pix_total = (m_vs + m_vbp + m_al + m_vfp) * vert_mult;
