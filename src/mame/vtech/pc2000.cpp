@@ -126,9 +126,11 @@ protected:
 	void gl5000_io(address_map &map) ATTR_COLD;
 
 private:
-	int sed1520_screen_update(bitmap_ind16 &bitmap, const rectangle &cliprect, uint8_t *vram, int start_line, int adc, int start_x);
+	int sed1520_screen_update(bitmap_ind16 &bitmap, const rectangle &cliprect, uint8_t *vram, int start_line, int adc, int start_x, int max_y);
 	SED1520_UPDATE_CB(screen_update_right);
 	SED1520_UPDATE_CB(screen_update_left);
+	SED1520_UPDATE_CB(gl5000_screen_update_right);
+	SED1520_UPDATE_CB(gl5000_screen_update_left);
 
 	uint8_t rombank1_r();
 	uint8_t rombank2_r();
@@ -232,9 +234,9 @@ uint32_t gl3000s_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 	return 0;
 }
 
-int gl3000s_state::sed1520_screen_update(bitmap_ind16 &bitmap, const rectangle &cliprect, uint8_t *vram, int start_line, int adc, int start_x)
+int gl3000s_state::sed1520_screen_update(bitmap_ind16 &bitmap, const rectangle &cliprect, uint8_t *vram, int start_line, int adc, int start_x, int max_y)
 {
-	for (int y=0; y<2; y++)
+	for (int y=0; y<max_y; y++)
 	{
 		int row_pos = 0;
 		for (int x=0; x<61; x++)
@@ -258,7 +260,7 @@ int gl3000s_state::sed1520_screen_update(bitmap_ind16 &bitmap, const rectangle &
 SED1520_UPDATE_CB(gl3000s_state::screen_update_right)
 {
 	if (lcd_on)
-		return sed1520_screen_update(bitmap, cliprect, dram, start_line, adc, 119);
+		return sed1520_screen_update(bitmap, cliprect, dram, start_line, adc, 119, 2);
 
 	bitmap.fill(0, cliprect);
 	return 0;
@@ -325,12 +327,29 @@ SED1520_UPDATE_CB(gl3000s_state::screen_update_left)
 	}
 
 	if (lcd_on)
-		return sed1520_screen_update(bitmap, cliprect, dram, start_line, adc, 58);
+		return sed1520_screen_update(bitmap, cliprect, dram, start_line, adc, 58, 2);
 
 	bitmap.fill(0, cliprect);
 	return 0;
 }
 
+SED1520_UPDATE_CB(gl3000s_state::gl5000_screen_update_left)
+{
+	if (lcd_on)
+		return sed1520_screen_update(bitmap, cliprect, dram, start_line, adc, 119, 4);
+
+	bitmap.fill(0, cliprect);
+	return 0;
+}
+
+SED1520_UPDATE_CB(gl3000s_state::gl5000_screen_update_right)
+{
+	if (lcd_on)
+		return sed1520_screen_update(bitmap, cliprect, dram, start_line, adc, 58, 4);
+
+	bitmap.fill(0, cliprect);
+	return 0;
+}
 
 void gl3000s_state::gl3000s_io(address_map &map)
 {
@@ -757,7 +776,7 @@ void pc2000_state::pc2000gen(machine_config &config)
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
 	m_screen->set_screen_update("hd44780", FUNC(hd44780_device::screen_update));
 	m_screen->set_size(120, 18); //2x20 chars
-	m_screen->set_visarea(0, 120-1, 0, 18-1);
+	m_screen->set_visarea_full();
 	m_screen->set_palette("palette");
 
 	PALETTE(config, "palette", FUNC(pc2000_state::pc2000_palette), 2);
@@ -825,7 +844,7 @@ void gl3000s_state::gl3000s(machine_config &config)
 	SED1520(config, "sed1520_r").set_screen_update_cb(FUNC(gl3000s_state::screen_update_right)); // right panel is 61 pixels (59-119)
 
 	m_screen->set_size(120, 24);
-	m_screen->set_visarea(0, 120-1, 0, 24-1);
+	m_screen->set_visarea_full();
 	m_screen->set_screen_update(FUNC(gl3000s_state::screen_update));
 
 	config.set_default_layout(layout_gl3000s);
@@ -842,8 +861,11 @@ void gl3000s_state::gl5000(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &gl3000s_state::gl5000_io);
 	m_maincpu->remove_periodic_int(); // IM 2 vectored, not understood yet
 
-	subdevice<sed1520_device>("sed1520_l")->set_screen_update_cb(FUNC(gl3000s_state::screen_update_right));
-	subdevice<sed1520_device>("sed1520_r")->set_screen_update_cb(FUNC(gl3000s_state::screen_update_left));
+	m_screen->set_size(120, 40);
+	m_screen->set_visarea_full();
+
+	subdevice<sed1520_device>("sed1520_l")->set_screen_update_cb(FUNC(gl3000s_state::gl5000_screen_update_left));
+	subdevice<sed1520_device>("sed1520_r")->set_screen_update_cb(FUNC(gl3000s_state::gl5000_screen_update_right));
 }
 
 void gl4004_state::gl4000(machine_config &config)
@@ -851,7 +873,7 @@ void gl4004_state::gl4000(machine_config &config)
 	pc2000(config);
 
 	m_screen->set_size(120, 36); // 4x20 chars
-	m_screen->set_visarea(0, 120-1, 0, 36-1);
+	m_screen->set_visarea_full();
 
 	m_lcdc->set_lcd_size(4, 20);
 	m_lcdc->set_pixel_update_cb(FUNC(gl4004_state::gl4000_pixel_update));
@@ -947,7 +969,7 @@ COMP( 1994, gl4000,   0,      0,     gl4000,    pc2000,  gl4004_state, empty_ini
 COMP( 1996, gl4004,   0,      0,     gl4000,    pc2000,  gl4004_state, empty_init, "Video Technology",        "Genius Leader 4004 Quadro L (Germany)",  MACHINE_NOT_WORKING )
 COMP( 1997, gl5000,   0,      0,     gl5000,    gl3000s, gl3000s_state,empty_init, "Video Technology",        "Genius Leader 5000 (Germany)",           MACHINE_IS_SKELETON )
 COMP( 1997, gl5005x,  0,      0,     pc2000,    pc2000,  pc2000_state, empty_init, "Video Technology",        "Genius Leader 5005X (Germany)",          MACHINE_IS_SKELETON )
-COMP( 1997, glpn,     0,      0,     gl4000,    pc2000,  gl4004_state, empty_init, "Video Technology",        "Genius Leader Power Notebook (Germany)", MACHINE_IS_SKELETON )
+COMP( 1997, glpn,     0,      0,     gl5000,    gl3000s, gl3000s_state,empty_init, "Video Technology",        "Genius Leader Power Notebook (Germany)", MACHINE_IS_SKELETON )
 COMP( 1998, gmtt ,    0,      0,     gl4000,    pc2000,  gl4004_state, empty_init, "Video Technology",        "Genius Master Table Top (Germany)",      MACHINE_IS_SKELETON )
 COMP( 2001, gbs5505x, 0,      0,     pc2000,    pc2000,  pc2000_state, empty_init, "Video Technology",        "Genius BrainStation 5505X (Germany)",    MACHINE_IS_SKELETON )
 COMP( 1999, lexipcm,  0,      0,     pc2000,    pc2000,  pc2000_state, empty_init, "Lexibook",                "LexiPC Mega 2000 (Germany)",             MACHINE_IS_SKELETON )
