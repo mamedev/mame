@@ -1043,9 +1043,6 @@ void h89_mms_state::h89_mms(machine_config &config)
 #define ROM_H17 \
 		ROM_LOAD( "2716_444-19_h17.u520",     0x1800, 0x0800, CRC(26e80ae3) SHA1(0c0ee95d7cb1a760f924769e10c0db1678f2435c))
 
-#define ROM_MTR88 \
-		ROM_LOAD("2716_444-40_mtr88.u518",    0x0000, 0x0800, CRC(093afb79) SHA1(bcc1569ad9da7babf0a4199cab96d8cd59b2dd78))
-
 #define ROM_MTR90_444_142(x) \
 		ROM_SYSTEM_BIOS(x, "mtr90", "Zenith Data Systems MTR-90 (444-142)") \
 		ROMX_LOAD("2732_444-142_mtr90.u518",  0x0000, 0x1000, CRC(c4ff47c5) SHA1(d6f3d71ff270a663003ec18a3ed1fa49f627123a), ROM_BIOS(x))
@@ -1084,7 +1081,7 @@ ROM_START( h88 )
 
 	ROM_H17
 
-	ROM_MTR88
+	ROM_LOAD("2716_444-40_mtr88.u518",    0x0000, 0x0800, CRC(093afb79) SHA1(bcc1569ad9da7babf0a4199cab96d8cd59b2dd78))
 ROM_END
 
 ROM_START( h89 )
