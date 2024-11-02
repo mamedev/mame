@@ -1812,7 +1812,7 @@ void upd7220_device::update_graphics(bitmap_rgb32 &bitmap, const rectangle &clip
 	int im, wd;
 	int y = 0, tsy = 0, bsy = 0;
 	int mixed = ((m_mode & UPD7220_MODE_DISPLAY_MASK) == UPD7220_MODE_DISPLAY_MIXED) ? 1 : 0;
-	uint8_t interlace = ((m_mode & UPD7220_MODE_INTERLACE_MASK) == UPD7220_MODE_INTERLACE_ON) ? 0 : 1;
+	uint8_t interlace = ((m_mode & UPD7220_MODE_INTERLACE_MASK) == UPD7220_MODE_INTERLACE_ON) ? 1 : 0;
 	uint8_t zoom = m_disp + 1;
 
 	for(int area = 0; area < 4; area++)
@@ -1835,7 +1835,7 @@ void upd7220_device::update_graphics(bitmap_rgb32 &bitmap, const rectangle &clip
 			if (len == 0)
 				len = 0x400;
 
-			if(!interlace)
+			if(interlace)
 				len <<= 1;
 
 			for(y = 0; y < len; y++)
@@ -1848,7 +1848,9 @@ void upd7220_device::update_graphics(bitmap_rgb32 &bitmap, const rectangle &clip
 				for(int z = 0; z <= m_disp; ++z)
 				{
 					int yval = (y*zoom)+z + (bsy + m_vbp);
-					if(yval <= cliprect.bottom() && (yval - m_vbp) < m_al)
+					// pc9801:duel sets up bitmap layer with height 384 vs. 400 of text layer
+					// so we scissor here, interlace wants it bumped x2 (microbx2)
+					if(yval <= cliprect.bottom() && (yval - m_vbp) < m_al << interlace)
 						draw_graphics_line(bitmap, addr, yval, wd, mixed);
 				}
 			}
