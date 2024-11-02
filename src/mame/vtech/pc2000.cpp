@@ -117,16 +117,21 @@ public:
 	{ }
 
 	void gl3000s(machine_config &config);
+	void gl5000(machine_config &config);
 
 protected:
-	void machine_start() override ATTR_COLD;
+	virtual void machine_start() override ATTR_COLD;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void gl3000s_io(address_map &map) ATTR_COLD;
+	void gl5000_io(address_map &map) ATTR_COLD;
 
 private:
 	int sed1520_screen_update(bitmap_ind16 &bitmap, const rectangle &cliprect, uint8_t *vram, int start_line, int adc, int start_x);
 	SED1520_UPDATE_CB(screen_update_right);
 	SED1520_UPDATE_CB(screen_update_left);
+
+	uint8_t rombank1_r();
+	uint8_t rombank2_r();
 
 	required_device<sed1520_device> m_lcdc_r;
 	required_device<sed1520_device> m_lcdc_l;
@@ -218,17 +223,6 @@ void pc2000_state::pc2000_io(address_map &map)
 	map(0x12, 0x12).rw(FUNC(pc2000_state::beep_r), FUNC(pc2000_state::beep_w));
 }
 
-
-void gl3000s_state::machine_start()
-{
-	pc2000_state::machine_start();
-
-	m_lev_out.resolve();
-	m_try_out.resolve();
-	m_tick_out.resolve();
-	m_time_out.resolve();
-	m_points_out.resolve();
-}
 
 uint32_t gl3000s_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
@@ -347,6 +341,24 @@ void gl3000s_state::gl3000s_io(address_map &map)
 	map(0x08, 0x09).rw(m_lcdc_r, FUNC(sed1520_device::read), FUNC(sed1520_device::write));
 	map(0x0a, 0x0b).rw(m_lcdc_l, FUNC(sed1520_device::read), FUNC(sed1520_device::write));
 	map(0x10, 0x11).rw(FUNC(gl3000s_state::key_matrix_r), FUNC(gl3000s_state::key_matrix_w));
+}
+
+uint8_t gl3000s_state::rombank1_r()
+{
+	return m_bank1->entry();
+}
+
+uint8_t gl3000s_state::rombank2_r()
+{
+	return m_bank2->entry();
+}
+
+void gl3000s_state::gl5000_io(address_map &map)
+{
+	gl3000s_io(map);
+	map(0x01, 0x01).r(FUNC(gl3000s_state::rombank1_r));
+	map(0x03, 0x03).r(FUNC(gl3000s_state::rombank2_r));
+	map(0x12, 0x12).nopr(); // ?
 }
 
 /* Input ports */
@@ -659,6 +671,24 @@ void pc2000_state::machine_start()
 	m_bank2->configure_entries(0x80, 0x10, cart, 0x4000);
 }
 
+void gl3000s_state::machine_start()
+{
+	uint8_t *bios = memregion("bios")->base();
+	memory_region *cart_region = memregion(std::string(m_cart->tag()) + GENERIC_ROM_REGION_TAG);
+	uint8_t *cart = (cart_region != nullptr) ? cart_region->base() : memregion("bios")->base();
+
+	m_bank0->configure_entries(0, 0x20, bios, 0x4000);
+	m_bank1->configure_entries(0, 0x20, bios, 0x4000);
+	m_bank2->configure_entries(0, 0x20, bios, 0x4000);
+	m_bank2->configure_entries(0x80, 0x10, cart, 0x4000);
+
+	m_lev_out.resolve();
+	m_try_out.resolve();
+	m_tick_out.resolve();
+	m_time_out.resolve();
+	m_points_out.resolve();
+}
+
 void gl4004_state::machine_start()
 {
 	uint8_t *bios = memregion("bios")->base();
@@ -805,6 +835,17 @@ void gl3000s_state::gl3000s(machine_config &config)
 	SOFTWARE_LIST(config, "misterx_cart").set_compatible("misterx");
 }
 
+void gl3000s_state::gl5000(machine_config &config)
+{
+	gl3000s(config);
+
+	m_maincpu->set_addrmap(AS_IO, &gl3000s_state::gl5000_io);
+	m_maincpu->remove_periodic_int(); // IM 2 vectored, not understood yet
+
+	subdevice<sed1520_device>("sed1520_l")->set_screen_update_cb(FUNC(gl3000s_state::screen_update_right));
+	subdevice<sed1520_device>("sed1520_r")->set_screen_update_cb(FUNC(gl3000s_state::screen_update_left));
+}
+
 void gl4004_state::gl4000(machine_config &config)
 {
 	pc2000(config);
@@ -904,7 +945,7 @@ COMP( 1995, gl2000p,  gl2000, 0,     gl2000,    pc2000,  pc2000_state, empty_ini
 COMP( 1996, gl3000s,  0,      0,     gl3000s,   gl3000s, gl3000s_state,empty_init, "Video Technology",        "Genius Leader 3000S (Germany)",          MACHINE_NOT_WORKING )
 COMP( 1994, gl4000,   0,      0,     gl4000,    pc2000,  gl4004_state, empty_init, "Video Technology",        "Genius Leader 4000 Quadro (Germany)",    MACHINE_NOT_WORKING )
 COMP( 1996, gl4004,   0,      0,     gl4000,    pc2000,  gl4004_state, empty_init, "Video Technology",        "Genius Leader 4004 Quadro L (Germany)",  MACHINE_NOT_WORKING )
-COMP( 1997, gl5000,   0,      0,     pc2000,    pc2000,  pc2000_state, empty_init, "Video Technology",        "Genius Leader 5000 (Germany)",           MACHINE_IS_SKELETON )
+COMP( 1997, gl5000,   0,      0,     gl5000,    gl3000s, gl3000s_state,empty_init, "Video Technology",        "Genius Leader 5000 (Germany)",           MACHINE_IS_SKELETON )
 COMP( 1997, gl5005x,  0,      0,     pc2000,    pc2000,  pc2000_state, empty_init, "Video Technology",        "Genius Leader 5005X (Germany)",          MACHINE_IS_SKELETON )
 COMP( 1997, glpn,     0,      0,     gl4000,    pc2000,  gl4004_state, empty_init, "Video Technology",        "Genius Leader Power Notebook (Germany)", MACHINE_IS_SKELETON )
 COMP( 1998, gmtt ,    0,      0,     gl4000,    pc2000,  gl4004_state, empty_init, "Video Technology",        "Genius Master Table Top (Germany)",      MACHINE_IS_SKELETON )
