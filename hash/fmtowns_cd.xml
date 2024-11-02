@@ -8422,7 +8422,7 @@ User/save disks that can be created from the game itself are not included.
 		<rom name="Eye of the Beholder II - The Legend of Darkmoon (Japan) (Track 47).bin" size="35209440" crc="72205ce3" sha1="b60f2096ca0e2278f8fcf1e3b2dc14a336b68d33"/>
 		<rom name="Eye of the Beholder II - The Legend of Darkmoon (Japan).cue" size="7055" crc="479038d3" sha1="995698629cd8c851aedb850b68f415c3fda0561a"/>
 		-->
-		<description>Advanced Dungeons &amp; Dragons - Eye of the Beholder II - The Legend of Darkmoon</description>
+		<description>Advanced Dungeons &amp; Dragons - Eye of the Beholder II: The Legend of Darkmoon</description>
 		<year>1993</year>
 		<publisher>サイベル (Cybelle)</publisher>
 		<info name="serial" value="HME-201"/>

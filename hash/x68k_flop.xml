@@ -5004,10 +5004,13 @@ Including "Daikairei Powerup kit to Shin Scenario Make kit" &amp; "Daikairei Tsu
 		</part>
 	</software>
 
-	<software name="emerald" supported="yes">
+	<software name="emerald" supported="partial">
 		<description>Emerald Densetsu</description>
 		<year>1990</year>
 		<publisher>システムハウスオー (System House Oh!)</publisher>
+   		<notes><![CDATA[
+Has odd GFX boss fight transitions (verify)
+]]></notes>
 		<info name="alt_title" value="エメラルド伝説" />
 		<info name="usage" value="Create an unformatted .mfi user disk image for saving" />
 		<part name="flop1" interface="floppy_5_25">
