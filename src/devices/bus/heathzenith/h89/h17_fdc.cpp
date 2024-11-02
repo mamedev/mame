@@ -15,6 +15,10 @@
 #include "emu.h"
 #include "h17_fdc.h"
 
+#include "imagedev/floppy.h"
+#include "machine/s2350.h"
+
+
 #define LOG_REG   (1U << 1) // Register setup
 #define LOG_LINES (1U << 2) // Control lines
 #define LOG_DRIVE (1U << 3) // Drive select
@@ -35,12 +39,70 @@
 #define FUNCNAME __PRETTY_FUNCTION__
 #endif
 
+class heath_h17_fdc_device : public device_t, public device_h89bus_right_card_interface
+{
+public:
+	heath_h17_fdc_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 
-DEFINE_DEVICE_TYPE(HEATH_H17_FDC, heath_h17_fdc_device, "heath_h17_fdc", "Heath H-17 Hard-sectored Controller");
+	auto floppy_ram_wp_cb() { return m_floppy_ram_wp.bind(); }
+
+	virtual void write(u8 select_lines, u8 offset, u8 data) override;
+	virtual u8 read(u8 select_lines, u8 offset) override;
+
+	void side_select_w(int state);
+
+protected:
+	static constexpr u8 MAX_FLOPPY_DRIVES = 3;
+
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+
+	void ctrl_w(u8 val);
+	u8   floppy_status_r();
+
+	void set_floppy(floppy_image_device *floppy);
+	void step_w(int state);
+	void dir_w(int state);
+	void set_motor(bool motor_on);
+
+	void sync_character_received(int state);
+
+	TIMER_DEVICE_CALLBACK_MEMBER(tx_timer_cb);
+
+	devcb_write_line m_floppy_ram_wp;
+
+	required_device<s2350_device> m_s2350;
+	required_device_array<floppy_connector, MAX_FLOPPY_DRIVES> m_floppies;
+	required_device<timer_device> m_tx_timer;
+
+	bool m_motor_on;
+	bool m_write_gate;
+	bool m_sync_char_received;
+	u8   m_step_direction;
+	u8   m_side;
+
+	floppy_image_device *m_floppy;
+
+	/// write bit control port
+	static constexpr u8 CTRL_WRITE_GATE       = 0;
+	static constexpr u8 CTRL_DRIVE_SELECT_0   = 1;
+	static constexpr u8 CTRL_DRIVE_SELECT_1   = 2;
+	static constexpr u8 CTRL_DRIVE_SELECT_2   = 3;
+	static constexpr u8 CTRL_MOTOR_ON         = 4; // Controls all the drives
+	static constexpr u8 CTRL_DIRECTION        = 5; // (0 = out)
+	static constexpr u8 CTRL_STEP_COMMAND     = 6; // (Active high)
+	static constexpr u8 CTRL_WRITE_ENABLE_RAM = 7; // 0 - write protected
+
+	// USRT clock
+	static constexpr XTAL USRT_BASE_CLOCK = XTAL(12'288'000) / 6 / 16;
+	static constexpr u32  USRT_TX_CLOCK   = USRT_BASE_CLOCK.value();
+};
 
 
 heath_h17_fdc_device::heath_h17_fdc_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock):
-	device_t(mconfig, HEATH_H17_FDC, tag, owner, 0),
+	device_t(mconfig, H89BUS_H_17_FDC, tag, owner, 0),
+	device_h89bus_right_card_interface(mconfig, *this),
 	m_floppy_ram_wp(*this),
 	m_s2350(*this, "s2350"),
 	m_floppies(*this, "floppy%u", 0U),
@@ -49,23 +111,28 @@ heath_h17_fdc_device::heath_h17_fdc_device(const machine_config &mconfig, const 
 {
 }
 
-void heath_h17_fdc_device::write(offs_t reg, u8 val)
+void heath_h17_fdc_device::write(u8 select_lines, u8 offset, u8 data)
 {
-	LOGFUNC("%s: reg: %d val: 0x%02x\n", FUNCNAME, reg, val);
+	if (!(select_lines & h89bus_device::H89_FLPY))
+	{
+		return;
+	}
 
-	switch (reg)
+	LOGFUNC("%s: reg: %d val: 0x%02x\n", FUNCNAME, offset, data);
+
+	switch (offset)
 	{
 	case 0: // data port
-		m_s2350->transmitter_holding_reg_w(val);
+		m_s2350->transmitter_holding_reg_w(data);
 		break;
 	case 1: // fill character
-		m_s2350->transmit_fill_reg_w(val);
+		m_s2350->transmit_fill_reg_w(data);
 		break;
 	case 2: // sync port
-		m_s2350->receiver_sync_reg_w(val);
+		m_s2350->receiver_sync_reg_w(data);
 		break;
 	case 3: // control port
-		ctrl_w(val);
+		ctrl_w(data);
 		break;
 	}
 }
@@ -176,12 +243,16 @@ void heath_h17_fdc_device::ctrl_w(u8 val)
 	m_floppy_ram_wp(BIT(val, CTRL_WRITE_ENABLE_RAM));
 }
 
-u8 heath_h17_fdc_device::read(offs_t reg)
+u8 heath_h17_fdc_device::read(u8 select_lines, u8 offset)
 {
-	// default return for the h89
-	u8 val = 0xff;
+	if (!(select_lines & h89bus_device::H89_FLPY))
+	{
+		return 0;
+	}
 
-	switch (reg)
+	u8 val = 0;
+
+	switch (offset)
 	{
 	case 0: // data port
 		val = m_s2350->receiver_output_reg_r();
@@ -197,7 +268,7 @@ u8 heath_h17_fdc_device::read(offs_t reg)
 		break;
 	}
 
-	LOGREG("%s: reg: %d val: 0x%02x\n", FUNCNAME, reg, val);
+	LOGREG("%s: reg: %d val: 0x%02x\n", FUNCNAME, offset, val);
 
 	return val;
 }
@@ -288,3 +359,5 @@ void heath_h17_fdc_device::sync_character_received(int state)
 
 	m_sync_char_received = bool(!BIT(state, 0));
 }
+
+DEFINE_DEVICE_TYPE_PRIVATE(H89BUS_H_17_FDC, device_h89bus_right_card_interface, heath_h17_fdc_device, "h89_h17_fdc", "Heath H-17 Hard-sectored Controller (H-88-1)");
