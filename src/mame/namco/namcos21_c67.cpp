@@ -263,7 +263,7 @@ Namco System 21 Video Hardware
 #include "namco_c139.h"
 #include "namco_c148.h"
 #include "namco68.h"
-#include "namco_c67.h"
+#include "namco_dsp.h"
 #include "namcos21_dsp_c67.h"
 #include "namco_c355spr.h"
 #include "namcos21_3d.h"
