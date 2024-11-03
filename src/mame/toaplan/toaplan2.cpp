@@ -5352,7 +5352,7 @@ ROM_END
 
 ROM_START( batsugunsp )
 	ROM_REGION( 0x080000, "maincpu", 0 )            /* Main 68K code */
-	ROM_LOAD16_WORD_SWAP( "tp030-sp.u69", 0x000000, 0x080000, CRC(8072a0cd) SHA1(3a0a9cdf894926a16800c4882a2b00383d981367) )
+	ROM_LOAD16_WORD_SWAP( "tp-030sp.u69", 0x000000, 0x080000, CRC(8072a0cd) SHA1(3a0a9cdf894926a16800c4882a2b00383d981367) )
 
 	/* Secondary CPU is a Toaplan marked chip, (TS-007-Spy  TOA PLAN) */
 	/* It's a NEC V25 (PLCC94) (program uploaded by main CPU) */
