@@ -352,7 +352,7 @@ void pc9821_state::pc9821_io(address_map &map)
 	map(0x0020, 0x002f).w(FUNC(pc9821_state::dmapg8_w)).umask32(0xff00ff00);
 	map(0x0030, 0x0037).rw(m_ppi_sys, FUNC(i8255_device::read), FUNC(i8255_device::write)).umask32(0xff00ff00); //i8251 RS232c / i8255 system port
 	map(0x0040, 0x0047).rw(m_ppi_prn, FUNC(i8255_device::read), FUNC(i8255_device::write)).umask32(0x00ff00ff);
-	map(0x0040, 0x0047).rw(m_keyb, FUNC(pc9801_kbd_device::rx_r), FUNC(pc9801_kbd_device::tx_w)).umask32(0xff00ff00); //i8255 printer port / i8251 keyboard
+	map(0x0040, 0x0043).rw(m_sio_kbd, FUNC(i8251_device::read), FUNC(i8251_device::write)).umask16(0xff00); //i8255 printer port / i8251 keyboard
 //  map(0x0050, 0x0053).w(FUNC(pc9821_state::nmi_ctrl_w)).umask32(0x00ff00ff);
 //  map(0x005c, 0x005f).r(FUNC(pc9821_state::timestamp_r)).nopw(); // artic
 //  map(0x0060, 0x0063).rw(m_hgdc[0], FUNC(upd7220_device::read), FUNC(upd7220_device::write)).umask32(0x00ff00ff); //upd7220 character ports / <undefined>
