@@ -1702,6 +1702,7 @@ protected:
 
 	void irq_update_common(u32 cause);
 	virtual void irq_update(u32 cause);
+	void subcpu_irq1_update(int state);
 
 	void textram_w(offs_t offset, u32 data, u32 mem_mask = ~0);
 	void textchar_w(offs_t offset, u32 data, u32 mem_mask = ~0);
@@ -4638,6 +4639,12 @@ void crszone_state::irq_update(u32 cause)
 	}
 }
 
+void namcos23_state::subcpu_irq1_update(int state)
+{
+	m_subcpu->set_input_line(INPUT_LINE_IRQ1, state ? ASSERT_LINE : CLEAR_LINE);
+	m_sub_port8 = state ? (m_sub_port8 & ~0x02) : (m_sub_port8 | 0x02); // IRQ1 pin
+}
+
 void namcos23_state::vblank(int state)
 {
 	if (state)
@@ -4656,23 +4663,18 @@ void namcos23_state::vblank(int state)
 void gorgon_state::vblank(int state)
 {
 	namcos23_state::vblank(state);
-	m_subcpu->set_input_line(INPUT_LINE_IRQ1, state);
-	m_sub_port8 = m_sub_port8 & ~0x02; // IRQ1 pin
+	subcpu_irq1_update(state);
 }
 
 TIMER_CALLBACK_MEMBER(namcos23_state::subcpu_scanline_on_tick)
 {
 	if (m_screen->vpos() < 72)
-	{
-		m_subcpu->set_input_line(INPUT_LINE_IRQ1, ASSERT_LINE);
-	}
-	m_sub_port8 = m_sub_port8 & ~0x02; // IRQ1 pin
+		subcpu_irq1_update(ASSERT_LINE);
 }
 
 TIMER_CALLBACK_MEMBER(namcos23_state::subcpu_scanline_off_tick)
 {
-	m_sub_port8 |= 0x02; // IRQ1 pin
-	m_subcpu->set_input_line(INPUT_LINE_IRQ1, CLEAR_LINE);
+	subcpu_irq1_update(CLEAR_LINE);
 }
 
 
@@ -5332,7 +5334,7 @@ u32 crszone_state::irq_lv5_status_r()
 	if (m_main_irqcause & MAIN_C361_IRQ)
 	{
 		data |= 2;
-		irq_update(m_main_irqcause & ~MAIN_C451_IRQ);
+		irq_update(m_main_irqcause & ~MAIN_C361_IRQ);
 	}
 	LOGMASKED(LOG_IRQ_STATUS, "%s: LV5 IRQ status read: %08x\n", machine().describe_context(), data);
 	return data;
