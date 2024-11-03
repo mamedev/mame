@@ -128,6 +128,7 @@ Wad of bills | Pocket watch | Coins        |
 Diamond      | Wad of bills | Coins        |
 Pocket watch | Wad of bills | Diamond      |
 
+
 Lower reels
 
 Grape        | Grape        | Strawberry   |
