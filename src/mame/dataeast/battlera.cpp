@@ -118,8 +118,7 @@ public:
 		, m_screen(*this, "screen")
 		, m_huc6260(*this, "huc6260")
 		, m_soundlatch(*this, "soundlatch")
-		, m_in(*this, "IN%u", 0U)
-		, m_dsw(*this, "DSW%u", 1U)
+		, m_inputs(*this, { "IN0", "IN1", "IN2", "DSW2", "DSW1" })
 	{ }
 
 	void battlera(machine_config &config);
@@ -135,11 +134,10 @@ private:
 	required_device<screen_device> m_screen;
 	required_device<huc6260_device> m_huc6260;
 	required_device<generic_latch_8_device> m_soundlatch;
-	required_ioport_array<3> m_in;
-	required_ioport_array<2> m_dsw;
+	required_ioport_array<5> m_inputs;
 
 	uint8_t m_control_port_select = 0;
-	int m_msm5205next = 0;
+	uint8_t m_msm5205next = 0;
 	uint8_t m_toggle = 0;
 
 	void control_data_w(uint8_t data);
@@ -165,7 +163,7 @@ void battlera_state::machine_start()
 
 void battlera_state::machine_reset()
 {
-	m_control_port_select = 0;
+	m_control_port_select = 0xff;
 	m_msm5205next = 0;
 	m_toggle = 0;
 }
@@ -179,16 +177,13 @@ void battlera_state::control_data_w(uint8_t data)
 
 uint8_t battlera_state::control_data_r()
 {
-	switch (m_control_port_select)
-	{
-		case 0xfe: return m_in[0]->read(); // Player
-		case 0xfd: return m_in[1]->read(); // Player
-		case 0xfb: return m_in[2]->read(); // Coins
-		case 0xf7: return m_dsw[1]->read(); // Dip 2
-		case 0xef: return m_dsw[0]->read(); // Dip 1
-	}
+	uint8_t data = 0xff;
 
-	return 0xff;
+	for (int i = 0; i < 5; i++)
+		if (!BIT(m_control_port_select, i))
+			data &= m_inputs[i]->read();
+
+	return data;
 }
 
 /******************************************************************************/
@@ -210,13 +205,12 @@ void battlera_state::main_portmap(address_map &map)
 
 /******************************************************************************/
 
-
 void battlera_state::adpcm_int(int state)
 {
 	m_msm->data_w(m_msm5205next >> 4);
 	m_msm5205next <<= 4;
 
-	m_toggle = 1 - m_toggle;
+	m_toggle ^= 1;
 	if (m_toggle)
 		m_audiocpu->set_input_line(1, HOLD_LINE);
 }
