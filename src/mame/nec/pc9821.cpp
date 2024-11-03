@@ -329,6 +329,27 @@ void pc9821_state::pc9821_grcg_gvram0_w(offs_t offset, uint16_t data, uint16_t m
 	grcg_gvram0_w(offset,data,mem_mask);
 }
 
+void pc9821_state::pc9821_mode_ff_w(u8 data)
+{
+	const u8 mode_ff = data & 0xfe;
+	const u8 setting = BIT(data, 0);
+	// Monitor setting
+	// BA / BX / PC-H98 / PC-9821 / 98NOTE uses this f/f in place of 15/24 kHz switch
+	// TODO: better compose
+	if (mode_ff == 0x20)
+	{
+		if (!setting)
+		{
+			const XTAL screen_clock = XTAL(21'052'600) / 8;
+
+			m_hgdc[0]->set_unscaled_clock(screen_clock);
+			m_hgdc[1]->set_unscaled_clock(screen_clock);
+		}
+		else
+			popmessage("pc9821_mode_ff_w: 31 kHz mode selected");
+	}
+}
+
 void pc9821_state::pc9821_map(address_map &map)
 {
 	pc9801bx2_map(map);
@@ -359,6 +380,8 @@ void pc9821_state::pc9821_io(address_map &map)
 //  map(0x0060, 0x0063).r(FUNC(pc9821_state::unk_r)).umask32(0xff00ff00); // mouse related (unmapped checking for AT keyb controller\PS/2 mouse?)
 //  map(0x0064, 0x0064).w(FUNC(pc9821_state::vrtc_clear_w));
 	map(0x0068, 0x006b).w(FUNC(pc9821_state::pc9821_video_ff_w)).umask32(0x00ff00ff); //mode FF / <undefined>
+	map(0x006c, 0x006d).w(FUNC(pc9821_state::border_color_w)).umask16(0x00ff);
+	map(0x006e, 0x006f).w(FUNC(pc9821_state::pc9821_mode_ff_w)).umask16(0x00ff);
 //  map(0x0070, 0x007f).rw(m_pit, FUNC(pit8253_device::read), FUNC(pit8253_device::write)).umask32(0xff00ff00);
 //  map(0x0070, 0x007f).rw(FUNC(pc9821_state::grcg_r), FUNC(pc9821_state::grcg_w)).umask32(0x00ff00ff); //display registers "GRCG" / i8253 pit
 	map(0x0090, 0x0093).m(m_fdc_2hd, FUNC(upd765a_device::map)).umask32(0x00ff00ff);
@@ -392,6 +415,7 @@ void pc9821_state::pc9821_io(address_map &map)
 //  map(0x0c24, 0x0c24) cs4231 PCM board register control
 //  map(0x0c2b, 0x0c2b) cs4231 PCM board low byte control
 //  map(0x0c2d, 0x0c2d) cs4231 PCM board hi byte control
+	map(0x0ca0, 0x0ca0).lr8(NAME([] () { return 0xff; })); // high reso detection
 //  map(0x0cc0, 0x0cc7) SCSI interface / <undefined>
 //  map(0x0cfc, 0x0cff) PCI bus
 	map(0x1e8c, 0x1e8f).noprw(); // IDE RAM switch

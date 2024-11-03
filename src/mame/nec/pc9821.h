@@ -47,6 +47,7 @@ private:
 	void window_bank_w(offs_t offset, uint8_t data);
 	uint8_t ext2_video_ff_r();
 	void ext2_video_ff_w(uint8_t data);
+	void pc9821_mode_ff_w(u8 data);
 
 	uint8_t m_pc9821_window_bank = 0;
 	uint8_t m_ext2_ff = 0;
