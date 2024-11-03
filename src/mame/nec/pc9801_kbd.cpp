@@ -2,21 +2,22 @@
 // copyright-holders:Angelo Salese
 /**************************************************************************************************
 
-    PC-9801 Keyboard simulation
+PC-9801 Keyboard simulation
 
-    Resources:
-    - PC-98Bible;
-    - https://github.com/tmk/tmk_keyboard/wiki/PC-9801-Keyboard;
+Resources:
+- PC-98 Bible;
+- PC-9800 Technical DataBook;
+- https://github.com/tmk/tmk_keyboard/wiki/PC-9801-Keyboard;
 
-    TODO:
-    - key repeat;
-    - Implement actual i8251 interface;
-    - GRPH + SHIFT scancodes;
-    - Subclass keyboard variants (cfr. PC-9801-119 with Windows & Menu keys and PC-9801-115 Bungo);
-    - Verify untested keys:
-      STOP, COPY, and vf-1 through vf-5
-      STOP is correct, verified with branmar2
-    - Problems with natural keyboard (most nonprinting keys don't work);
+TODO:
+- key repeat;
+- Implement actual i8251 interface;
+- GRPH + SHIFT scancodes;
+- Subclass keyboard variants (cfr. PC-9801-119 with Windows & Menu keys and PC-9801-115 Bungo);
+- Verify untested keys:
+    STOP, COPY, and vf-1 through vf-5
+    STOP is correct, verified with branmar2
+- Problems with natural keyboard (most nonprinting keys don't work);
 
 **************************************************************************************************/
 
@@ -275,8 +276,9 @@ void pc9801_kbd_device::key_make(uint8_t row, uint8_t column)
 	send_key(code);
 
 	// no typematic for caps and kana locks
+    // page 345 of the Technical DataBook for timings
 	if (code != 0x71 && code != 0x72)
-		typematic_start(row, column, attotime::from_msec(1000), attotime::from_msec(100));
+		typematic_start(row, column, attotime::from_msec(500), attotime::from_msec(60));
 }
 
 void pc9801_kbd_device::key_break(uint8_t row, uint8_t column)
