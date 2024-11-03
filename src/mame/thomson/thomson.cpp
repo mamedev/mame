@@ -97,6 +97,7 @@
 #include "softlist_dev.h"
 #include "speaker.h"
 
+#include "formats/sap_dsk.h"
 #include "formats/thom_cas.h"
 #include "formats/thom_dsk.h"
 
@@ -494,6 +495,7 @@ static void to35_floppy_formats(format_registration &fr)
 {
 	fr.add_pc_formats();
 	fr.add(FLOPPY_THOMSON_35_FORMAT);
+	fr.add(FLOPPY_SAP_FORMAT);
 }
 
 /* ------------ driver ------------ */
