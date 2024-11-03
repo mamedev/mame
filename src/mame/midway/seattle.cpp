@@ -270,12 +270,12 @@ class seattle_state : public driver_device
 public:
 	seattle_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
-		m_nvram(*this, "nvram"),
 		m_maincpu(*this, "maincpu"),
 		m_galileo(*this, PCI_ID_GALILEO),
 		m_voodoo(*this, PCI_ID_VIDEO),
 		m_cage(*this, "cage"),
 		m_dcs(*this, "dcs"),
+		m_nvram(*this, "nvram", 0x20000, ENDIANNESS_LITTLE),
 		m_screen(*this, "screen"),
 		m_ethernet(*this, "ethernet"),
 		m_ioasic(*this, "ioasic"),
@@ -339,12 +339,12 @@ protected:
 	virtual void machine_reset() override ATTR_COLD;
 
 private:
-	required_device<nvram_device> m_nvram;
 	required_device<mips3_device> m_maincpu;
 	required_device<gt64010_device> m_galileo;
 	required_device<voodoo_1_pci_device> m_voodoo;
 	optional_device<atari_cage_seattle_device> m_cage;
 	optional_device<dcs_audio_device> m_dcs;
+	memory_share_creator<uint32_t> m_nvram;
 	required_device<screen_device> m_screen;
 	optional_device<smc91c94_device> m_ethernet;
 	required_device<midway_ioasic_device> m_ioasic;
@@ -368,34 +368,34 @@ private:
 	struct widget_data
 	{
 		// ethernet register address
-		uint8_t           ethernet_addr;
+		uint8_t ethernet_addr = 0;
 
 		// IRQ information
-		uint8_t           irq_num;
-		uint8_t           irq_mask;
+		uint8_t irq_num = 0;
+		uint8_t irq_mask = 0;
 	};
 
 	widget_data m_widget;
-	uint32_t m_interrupt_enable;
-	uint32_t m_interrupt_config;
-	uint32_t m_asic_reset;
-	std::vector<uint32_t> m_nvram_data;
-	uint8_t m_board_config;
-	uint8_t m_ethernet_irq_num;
-	uint8_t m_ethernet_irq_state;
-	uint8_t m_vblank_irq_num;
-	uint8_t m_vblank_latch;
-	uint8_t m_vblank_state;
-	uint8_t m_pending_analog_read;
-	uint8_t m_status_leds;
-	uint32_t m_cmos_write_enabled;
-	uint16_t m_output_last;
-	uint8_t m_output_mode;
-	uint32_t m_i40_data;
-	uint32_t m_gear;
-	int8_t m_wheel_force;
-	int m_wheel_offset;
-	bool m_wheel_calibrated;
+	uint32_t m_interrupt_enable = 0;
+	uint32_t m_interrupt_config = 0;
+	uint32_t m_asic_reset = 0;
+	uint8_t m_board_config = 0;
+	uint8_t m_ethernet_irq_num = 0;
+	uint8_t m_ethernet_irq_state = 0;
+	uint8_t m_vblank_irq_num = 0;
+	uint8_t m_vblank_latch = 0;
+	uint8_t m_vblank_state = 0;
+	uint8_t m_pending_analog_read = 0;
+	uint8_t m_status_leds = 0;
+	uint32_t m_cmos_write_enabled = 0;
+	uint16_t m_output_last = 0;
+	uint8_t m_output_mode = 0;
+	uint32_t m_i40_data = 0;
+	uint32_t m_gear = 0;
+	int8_t m_wheel_force = 0;
+	int m_wheel_offset = 0;
+	bool m_wheel_calibrated = false;
+
 	uint32_t interrupt_state_r();
 	uint32_t interrupt_state2_r();
 	uint32_t interrupt_config_r();
@@ -425,7 +425,6 @@ private:
 	void widget_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 	void i40_w(uint32_t data);
 	void wheel_board_w(offs_t offset, uint32_t data);
-
 
 	void ide_interrupt(int state);
 	void vblank_assert(int state);
@@ -489,13 +488,6 @@ void seattle_state::machine_start()
 	m_wheel_motor.resolve();
 	m_lamps.resolve();
 	m_leds.resolve();
-
-	m_pending_analog_read = 0;
-	m_ethernet_irq_state = 0;
-
-	m_widget.ethernet_addr = 0;
-	m_widget.irq_num = 0;
-	m_widget.irq_mask = 0;
 }
 
 
@@ -510,6 +502,7 @@ void seattle_state::machine_reset()
 	m_wheel_offset = 0;
 	m_wheel_calibrated = false;
 	m_ethernet_irq_num = 0;
+
 	// reset either the DCS2 board or the CAGE board
 	if (m_dcs != nullptr)
 	{
@@ -949,7 +942,8 @@ void seattle_state::ethernet_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 void seattle_state::widget_reset()
 {
 	uint8_t saved_irq = m_widget.irq_num;
-	memset(&m_widget, 0, sizeof(m_widget));
+	m_widget.ethernet_addr = 0;
+	m_widget.irq_mask = 0;
 	m_widget.irq_num = saved_irq;
 }
 
@@ -1095,14 +1089,14 @@ void seattle_state::widget_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 void seattle_state::cmos_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if (m_cmos_write_enabled)
-		COMBINE_DATA(&m_nvram_data[offset]);
+		COMBINE_DATA(&m_nvram[offset]);
 	m_cmos_write_enabled = false;
 }
 
 
 uint32_t seattle_state::cmos_r(offs_t offset)
 {
-	return m_nvram_data[offset];
+	return m_nvram[offset];
 }
 
 
@@ -2869,10 +2863,6 @@ ROM_END
 
 void seattle_state::init_common(int config)
 {
-	// setup nvram
-	m_nvram_data.resize(0x20000/4);
-	m_nvram->set_base(m_nvram_data.data(), 0x20000);
-
 	// switch off the configuration
 	m_board_config = config;
 	switch (config)
@@ -3039,8 +3029,6 @@ GAMEL( 1997, sfrushrkwo, sfrushrk, sfrushrkw, sfrushrk, seattle_state, init_sfru
 GAMEL( 1998, calspeed,   0,        calspeed,  calspeed, seattle_state, init_calspeed, ROT0, "Atari Games",  "California Speed (Version 2.1a Apr 17 1998, GUTS 1.25 Apr 17 1998 / MAIN Apr 17 1998)", MACHINE_SUPPORTS_SAVE, layout_calspeed )
 GAMEL( 1998, calspeeda,  calspeed, calspeed,  calspeed, seattle_state, init_calspeed, ROT0, "Atari Games",  "California Speed (Version 1.0r8 Mar 10 1998, GUTS Mar 10 1998 / MAIN Mar 10 1998)", MACHINE_SUPPORTS_SAVE, layout_calspeed )
 GAMEL( 1998, calspeedb,  calspeed, calspeed,  calspeed, seattle_state, init_calspeed, ROT0, "Atari Games",  "California Speed (Version 1.0r7a Mar 4 1998, GUTS Mar 3 1998 / MAIN Jan 19 1998)", MACHINE_SUPPORTS_SAVE, layout_calspeed )
-
-
 
 GAMEL( 1998, vaportrx,   0,        vaportrx,  vaportrx, seattle_state, init_vaportrx, ROT0, "Atari Games",  "Vapor TRX (GUTS Jul 2 1998 / MAIN Jul 18 1998)", MACHINE_SUPPORTS_SAVE, layout_vaportrx )
 GAMEL( 1998, vaportrxp,  vaportrx, vaportrx,  vaportrx, seattle_state, init_vaportrx, ROT0, "Atari Games",  "Vapor TRX (GUTS Apr 10 1998 / MAIN Apr 10 1998)", MACHINE_SUPPORTS_SAVE, layout_vaportrx )
