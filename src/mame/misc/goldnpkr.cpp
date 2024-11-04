@@ -1963,6 +1963,41 @@ static INPUT_PORTS_START( goldnpkr )
 	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( jkrbonus )
+	PORT_INCLUDE( goldnpkr )
+
+	PORT_MODIFY("SW1")
+	PORT_DIPNAME( 0x20, 0x20, "50hz/60hz" )         PORT_DIPLOCATION("SW1:2")
+	PORT_DIPSETTING(    0x20, "50hz" )
+	PORT_DIPSETTING(    0x00, "60hz" )
+
+	PORT_START("SW2") // TODO: not hooked up
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+INPUT_PORTS_END
+
 static INPUT_PORTS_START( pmpoker )
 	// Multiplexed - 4x5bits
 	PORT_START("IN0-0")
@@ -5271,6 +5306,24 @@ ROM_START( goldnpkf )
 
 	ROM_REGION( 0x0100, "proms", 0 )
 	ROM_LOAD( "82s129.7d",  0x0000, 0x0100, CRC(7f31066b) SHA1(15420780ec6b2870fc4539ec3afe4f0c58eedf12) )
+ROM_END
+
+
+ROM_START( goldnpkg )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "rb5e.12a",  0x4000, 0x4000, CRC(97f6992f) SHA1(5b08a157992c521856e8f53e63c8e82577870ca1) )
+
+	ROM_REGION( 0x6000, "gfx1", 0 )
+	ROM_FILL(          0x0000, 0x4000, 0x0000 ) // filling the R-G bitplanes
+	ROM_LOAD( "13.5a", 0x4000, 0x2000, CRC(32705e1d) SHA1(84f9305af38179985e0224ae2ea54c01dfef6e12) )    // char ROM
+
+	ROM_REGION( 0x6000, "gfx2", 0 )
+	ROM_LOAD( "11.2a", 0x0000, 0x2000, CRC(10b34856) SHA1(52e4cc81b36b4c807b1d4471c0f7bea66108d3fd) )    // cards deck gfx, bitplane1
+	ROM_LOAD( "12.4a", 0x2000, 0x2000, CRC(5fc965ef) SHA1(d9ecd7e9b4915750400e76ca604bec8152df1fe4) )    // cards deck gfx, bitplane2
+	ROM_COPY( "gfx1",  0x4800, 0x4000, 0x0800 )    // cards deck gfx, bitplane3. found in the 2nd quarter of the char rom
+
+	ROM_REGION( 0x0100, "proms", 0 )
+	ROM_LOAD( "tbp24s10n.7d",       0x0000, 0x0100, CRC(7f31066b) SHA1(15420780ec6b2870fc4539ec3afe4f0c58eedf12) )
 ROM_END
 
 
@@ -10894,6 +10947,26 @@ ROM_START( pmpoker )
 	ROM_LOAD( "tbp24sa10.bin",      0x0000, 0x0100, CRC(7f31066b) SHA1(15420780ec6b2870fc4539ec3afe4f0c58eedf12) ) // PROM dump confirmed OK
 ROM_END
 
+
+ROM_START( jkrbonus ) // PC0-009-31 PCB with sub PCB with CPU, its ROM and RAM, 2 banks of 8 DIP switches and logics.
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "67jp.ke011.sub", 0x6000, 0x1000, CRC(0811bd92) SHA1(c119b1210b2489262d7ae75a180ba7b79e5793d2) )
+	ROM_CONTINUE(               0x5000, 0x1000 )
+	ROM_LOAD( "68jp.a14",       0x7000, 0x1000, CRC(169a1d12) SHA1(91e283c839cc0639fd93e8119c5ae22061a768cc) )
+
+	ROM_REGION( 0x1800, "gfx1", 0 )
+	ROM_FILL(          0x0000, 0x1000, 0x0000 ) // filling the R-G bitplanes
+	ROM_LOAD( "m4.a7", 0x1000, 0x0800, BAD_DUMP CRC(62b9f90d) SHA1(39c61a01225027572fdb75543bb6a78ed74bb2fb) )    // char ROM, dead, using the one from pmpoker for now
+
+	ROM_REGION( 0x1800, "gfx2", 0 )
+	ROM_LOAD( "u43.a2", 0x0000, 0x0800, CRC(f2f94661) SHA1(f37f7c0dff680fd02897dae64e13e297d0fdb3e7) )    // cards deck gfx, bitplane1
+	ROM_LOAD( "u40.a4", 0x0800, 0x0800, CRC(6bbb1e2d) SHA1(51ee282219bf84218886ad11a24bc6a8e7337527) )    // cards deck gfx, bitplane2
+	ROM_LOAD( "u33.a5", 0x1000, 0x0800, CRC(907b21df) SHA1(a6a3968b2ee23ef15ecc8c3b2afbe1b2cc5f42e7) )    // cards deck gfx, bitplane3
+
+	ROM_REGION( 0x0100, "proms", 0 )
+	ROM_LOAD( "tbp24sa10.bin", 0x0000, 0x0100, BAD_DUMP CRC(7f31066b) SHA1(15420780ec6b2870fc4539ec3afe4f0c58eedf12) ) // not dumped for this set
+ROM_END
+
 /***************************************************************
 
   Casino Poker.
@@ -12661,6 +12734,7 @@ GAMEL( 198?, goldnpkc,  goldnpkr, goldnpkr, goldnpkr, goldnpkr_state, empty_init
 GAMEL( 198?, goldnpkd,  goldnpkr, goldnpkr, goldnpkr, goldnpkr_state, empty_init,    ROT0,   "bootleg",                  "Golden Poker Double Up (bootleg, set 2)",    MACHINE_NOT_WORKING, layout_goldnpkr )  // always get a winning flush
 GAMEL( 1983, goldnpke,  goldnpkr, goldnpkr, goldnpkr, goldnpkr_state, empty_init,    ROT0,   "Intercoast (bootleg)",     "Golden Poker Double Up (bootleg, set 3)",    0,                layout_goldnpkr )
 GAMEL( 1983, goldnpkf,  goldnpkr, goldnpkr, goldnpkr, goldnpkr_state, empty_init,    ROT0,   "Intercoast (bootleg)",     "Golden Poker Double Up (bootleg, set 4)",    0,                layout_goldnpkr )
+GAMEL( 1983, goldnpkg,  goldnpkr, goldnpkr, goldnpkr, goldnpkr_state, empty_init,    ROT0,   "bootleg",                  "Golden Poker Double Up (bootleg, set 5)",    0,                layout_goldnpkr )
 
 GAMEL( 198?, videtron,  0,        goldnpkr, videtron, goldnpkr_state, empty_init,    ROT0,   "<unknown>",                "Videotron Poker (cards selector, set 1)",    0,                layout_goldnpkr )
 GAMEL( 198?, videtron2, videtron, goldnpkr, videtron, goldnpkr_state, empty_init,    ROT0,   "<unknown>",                "Videotron Poker (cards selector, set 2)",    0,                layout_goldnpkr )
@@ -12802,6 +12876,7 @@ GAME(  198?, genie,     0,        genie,    genie,    goldnpkr_state, empty_init
 GAME(  198?, geniea,    genie,    geniea,   geniea,   goldnpkr_state, empty_init,    ROT0,   "<unknown>",                "Genie (ICP-1, set 2)",                    0 )
 GAMEL( 1983, silverga,  0,        goldnpkr, goldnpkr, goldnpkr_state, empty_init,    ROT0,   "<unknown>",                "Silver Game",                             0,                layout_goldnpkr )
 GAMEL( 1984, bonuspkr,  0,        goldnpkr, bonuspkr, goldnpkr_state, init_bonuspkr, ROT0,   "Galanthis Inc.",           "Bonus Poker",                             0,                layout_goldnpkr )
+GAMEL( 198?, jkrbonus,  0,        goldnpkr, jkrbonus, goldnpkr_state, empty_init,    ROT0,   "<unknown>",                "Joker Bonus",                             MACHINE_NOT_WORKING, layout_goldnpkr ) // second bank of DIPs not implemented
 
 GAMEL( 198?, superdbl,  pottnpkr, goldnpkr, goldnpkr, goldnpkr_state, empty_init,    ROT0,   "Karateco",                 "Super Double (French)",                   0,                layout_goldnpkr )
 GAME(  198?, pokerdub,  0,        pottnpkr, goldnpkr, goldnpkr_state, empty_init,    ROT0,   "<unknown>",                "unknown French poker game",               MACHINE_NOT_WORKING )                // lacks of 2nd program ROM.

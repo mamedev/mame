@@ -33,15 +33,24 @@
   MCU: Sticker: 8907 1990.10 L21-D M.COM
 
 
+  The following games run on a slightly different PCB:
+
   Bingo 75:
   A001: marks can't be seen. Sticker: WE8802-A 1989.2
   PCB marked: Wing 8802-C
+
+  Lucky 75:
+  A001: Sticker: WE8802-A 1989.9 LUCKY 75 <unreadable>
+
+  Lucky Star:
+  <unreadable>
 
   1x scratched DIL40 (@ location 3r)
   1x 89206A 61H09516P (@ location 7s)
   1x 101B10P (@ location 7p)
   2x 06B53P (@ locations 1d & 2d)
   1x 06B49P (@ location 2b)
+  1x 8251 (@ location 1a)
 
   1x 12 MHz Xtal (@ location 3t)
   5x 8 DIP switches banks (@ locations 5l, 5m, 5n, 5p & 5r)
@@ -253,6 +262,52 @@ ROM_START( bingo75 )    // runs on wing 8802-c board
 	ROM_LOAD( "82s129.5f", 0x0600, 0x0100, CRC(83c3ec8f) SHA1(4a6452ef73061a446e6a8ceb9d077bc71cc8e2b2) )
 ROM_END
 
+ROM_START( lucky75 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "a001-nomarks", 0x0000, 0x10000, NO_DUMP )
+
+	ROM_REGION( 0x4000, "mcu", 0 )
+	ROM_LOAD( "internal_rom", 0x0000, 0x4000,  NO_DUMP )
+
+	ROM_REGION( 0x40000, "unsorted", 0 )
+	ROM_LOAD( "13.2h", 0x00000, 0x10000, CRC(8308e18a) SHA1(9f611b9d9d0b34145087a6d00e2c1f2c85c6303a) )
+	ROM_LOAD( "14.2j", 0x10000, 0x10000, CRC(8de43823) SHA1(b4150b123d90017eb6290dea273d6e80afd3d72b) )
+	ROM_LOAD( "15.1h", 0x20000, 0x10000, CRC(16159f94) SHA1(7af692d60ba80934174f974c30e855dd0eb16654) )
+	ROM_LOAD( "16.1j", 0x30000, 0x10000, CRC(b98416c0) SHA1(9cec4476d28bd8c1878cf8f9053bc6f53ec36ca3) )
+
+	ROM_REGION( 0x0700, "proms", 0 )
+	ROM_LOAD( "tbp24s10n.4h", 0x0000, 0x0100, NO_DUMP )
+	ROM_LOAD( "tbp24s10n.4j", 0x0100, 0x0100, NO_DUMP )
+	ROM_LOAD( "tbp24s10n.5h", 0x0200, 0x0100, NO_DUMP )
+	ROM_LOAD( "tbp24s10n.5j", 0x0300, 0x0100, NO_DUMP )
+	ROM_LOAD( "tbp24s10n.5k", 0x0400, 0x0100, NO_DUMP )
+	ROM_LOAD( "tbp24s10n.4k", 0x0500, 0x0100, NO_DUMP )
+	ROM_LOAD( "tbp24s10n.5f", 0x0600, 0x0100, NO_DUMP )
+ROM_END
+
+ROM_START( luckystr )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "a001-nomarks", 0x0000, 0x10000, NO_DUMP )
+
+	ROM_REGION( 0x4000, "mcu", 0 )
+	ROM_LOAD( "internal_rom", 0x0000, 0x4000,  NO_DUMP )
+
+	ROM_REGION( 0x40000, "unsorted", 0 )
+	ROM_LOAD( "13.2h", 0x00000, 0x10000, CRC(8308e18a) SHA1(9f611b9d9d0b34145087a6d00e2c1f2c85c6303a) ) // same as lucky75
+	ROM_LOAD( "14.2j", 0x10000, 0x10000, CRC(8de43823) SHA1(b4150b123d90017eb6290dea273d6e80afd3d72b) ) // same as lucky75
+	ROM_LOAD( "11.1h", 0x20000, 0x10000, CRC(917931b8) SHA1(6594618688fc7d691af895cd6f7b2810021e2f44) )
+	ROM_LOAD( "12.1j", 0x30000, 0x10000, CRC(5b0cc16e) SHA1(f95f2bb3dd7f56751347c1f4379caaada69cdcd9) )
+
+	ROM_REGION( 0x0700, "proms", 0 )
+	ROM_LOAD( "tbp24s10n.4h", 0x0000, 0x0100, NO_DUMP )
+	ROM_LOAD( "tbp24s10n.4j", 0x0100, 0x0100, NO_DUMP )
+	ROM_LOAD( "tbp24s10n.5h", 0x0200, 0x0100, NO_DUMP )
+	ROM_LOAD( "tbp24s10n.5j", 0x0300, 0x0100, NO_DUMP )
+	ROM_LOAD( "tbp24s10n.5k", 0x0400, 0x0100, NO_DUMP )
+	ROM_LOAD( "tbp24s10n.4k", 0x0500, 0x0100, NO_DUMP )
+	ROM_LOAD( "tbp24s10n.5f", 0x0600, 0x0100, NO_DUMP )
+ROM_END
+
 } // anonymous namespace
 
 
@@ -260,4 +315,7 @@ GAME( 199?, lucky21,  0, lucky37, lucky37,  lucky37_state, empty_init, ROT0, "Wi
 GAME( 199?, lucky21d, 0, lucky37, lucky37,  lucky37_state, empty_init, ROT0, "Wing Co., Ltd.", "Lucky 21-D", MACHINE_IS_SKELETON )
 GAME( 199?, lucky25,  0, lucky37, lucky37,  lucky37_state, empty_init, ROT0, "Wing Co., Ltd.", "Lucky 25",   MACHINE_IS_SKELETON )
 GAME( 199?, lucky37,  0, lucky37, lucky37,  lucky37_state, empty_init, ROT0, "Wing Co., Ltd.", "Lucky 37",   MACHINE_IS_SKELETON )
+
 GAME( 199?, bingo75,  0, lucky37, lucky37,  lucky37_state, empty_init, ROT0, "Wing Co., Ltd.", "Bingo 75",   MACHINE_IS_SKELETON )
+GAME( 199?, lucky75,  0, lucky37, lucky37,  lucky37_state, empty_init, ROT0, "Wing Co., Ltd.", "Lucky 75",   MACHINE_IS_SKELETON )
+GAME( 199?, luckystr, 0, lucky37, lucky37,  lucky37_state, empty_init, ROT0, "Wing Co., Ltd.", "Lucky Star", MACHINE_IS_SKELETON )

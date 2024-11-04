@@ -30527,8 +30527,10 @@ goldnpkc                        // Bootleg
 goldnpkd                        // Bootleg
 goldnpke                        // Intercoast (bootleg)
 goldnpkf                        // Intercoast (bootleg)
+goldnpkg                        // Bootleg
 goldnpkr                        // (c) 1981 Bonanza
 goodluck                        // Unknown
+jkrbonus                        // bootleg?
 jokercar                        // 199?, unknown
 lespendu                        // (c) 198? Voyageur de L'Espace Inc.
 lespenduj                       // (c) 198? Voyageur de L'Espace Inc.
@@ -46741,11 +46743,13 @@ wicat                           //
 luckgrln                        // (c) 1991 Wing Co. Ltd
 
 @source:wing/lucky37.cpp
+bingo75                         // (c) 199? Wing Co. Ltd
 lucky21                         // (c) 199? Wing Co. Ltd
 lucky21d                        // (c) 199? Wing Co. Ltd
 lucky25                         // (c) 199? Wing Co. Ltd
 lucky37                         // (c) 199? Wing Co. Ltd
-bingo75                         // (c) 199? Wing Co. Ltd
+lucky75                         // (c) 199? Wing Co. Ltd
+luckystr                        // (c) 199? Wing Co. Ltd
 
 @source:wing/lucky74.cpp
 excitbj                         // (c) 1992 Wing Co. Ltd
