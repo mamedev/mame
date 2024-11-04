@@ -2,7 +2,7 @@
 // copyright-holders:Aaron Giles,Nicola Salmoria
 /***************************************************************************
 
-    AmeriDarts      (c) 1989 Ameri Corporation
+    Ameri Darts     (c) 1989 Ameri Corporation
     Cool Pool       (c) 1992 Catalina
     9 Ball Shootout (c) 1993 E-Scape/Bundra
 
@@ -11,7 +11,7 @@
 
     The main CPU is a TMS34010; it is encrypted in 9 Ball Shootout.
 
-    The second CPU in AmeriDarts is a TMS32015; it controls sound and
+    The second CPU in Ameri Darts is a TMS32015; it controls sound and
     the trackball inputs.
 
     The second CPU in Cool Pool and 9 Ball Shootout is a TMS320C26; the code
@@ -140,7 +140,7 @@ private:
 	required_ioport_array<2> m_in_xaxis;
 	required_ioport_array<2> m_in_yaxis;
 
-	bool m_old_cmd = false;
+	uint8_t m_old_cmd = 0;
 
 	void misc_w(uint16_t data);
 	int dsp_bio_line_r();
@@ -383,7 +383,7 @@ void coolpool_base_state::nvram_thrash_data_w(offs_t offset, uint16_t data, uint
 
 /*************************************
  *
- *  AmeriDarts IOP handling
+ *  Ameri Darts IOP handling
  *
  *************************************/
 
@@ -1303,9 +1303,9 @@ void _9ballsht_state::init_9ballsht()
  *
  *************************************/
 
-GAME( 1989, amerdart,  0,        amerdart,  amerdart, amerdart_state,  empty_init,    ROT0, "Ameri",                               "AmeriDarts (set 1)",           MACHINE_SUPPORTS_SAVE )
-GAME( 1989, amerdart2, amerdart, amerdart,  amerdart, amerdart_state,  empty_init,    ROT0, "Ameri",                               "AmeriDarts (set 2)",           MACHINE_SUPPORTS_SAVE )
-GAME( 1989, amerdart3, amerdart, amerdart,  amerdart, amerdart_state,  empty_init,    ROT0, "Ameri",                               "AmeriDarts (set 3)",           MACHINE_SUPPORTS_SAVE )
+GAME( 1989, amerdart,  0,        amerdart,  amerdart, amerdart_state,  empty_init,    ROT0, "Ameri",                               "Ameri Darts (set 1)",          MACHINE_SUPPORTS_SAVE )
+GAME( 1989, amerdart2, amerdart, amerdart,  amerdart, amerdart_state,  empty_init,    ROT0, "Ameri",                               "Ameri Darts (set 2)",          MACHINE_SUPPORTS_SAVE )
+GAME( 1989, amerdart3, amerdart, amerdart,  amerdart, amerdart_state,  empty_init,    ROT0, "Ameri",                               "Ameri Darts (set 3)",          MACHINE_SUPPORTS_SAVE )
 
 GAME( 1992, coolpool,  0,        coolpool,  coolpool, coolpool_state,  empty_init,    ROT0, "Catalina",                            "Cool Pool",                    MACHINE_SUPPORTS_SAVE )
 
