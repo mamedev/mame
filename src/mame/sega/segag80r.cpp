@@ -1188,6 +1188,44 @@ ROM_START( astrob1 )
 	ROM_LOAD( "316-0764.cpu-u15",    0x0400, 0x0020, CRC(c609b79e) SHA1(49dbcbb607079a182d7eb396c0da097166ea91c9) ) /* 6331, CPU board addressing */
 ROM_END
 
+// Original Sega/Gremlin PCBs. Handwritten EPR numbers.
+ROM_START( astrobf )
+	ROM_REGION( 0xc000, "maincpu", 0 )
+	ROM_LOAD( "829b.u25",             0x0000, 0x0800, CRC(14ae953c) SHA1(eb63d1b95faa5193db7fa6ab245e99325d519b5e) )
+	ROM_LOAD( "834-0012_epr-375.u1",  0x0800, 0x0800, CRC(82630950) SHA1(6e13cf5868d64835d9de823801cc4162b3c7b316) )
+	ROM_LOAD( "834-0012_epr-376.u2",  0x1000, 0x0800, CRC(d70d7d5e) SHA1(3d663cb36579c91cdb0ea82fd0af3b0ade8246b7) )
+	ROM_LOAD( "834-0012_epr-377.u3",  0x1800, 0x0800, CRC(0dbad477) SHA1(1fc6b3c628abd0d7a13b75eb2aeed7c04381f674) )
+	ROM_LOAD( "834-0012_epr-377.u4",  0x2000, 0x0800, CRC(8fa809ab) SHA1(c1dcae3b825dc283526b5ba742ca6816e5722464) )
+	ROM_LOAD( "834-0012_epr-379.u5",  0x2800, 0x0800, CRC(c7a3c014) SHA1(da25c2c2a116128e74df4de21727e2a4820c1045) )
+	ROM_LOAD( "834-0012_epr-380.u6",  0x3000, 0x0800, CRC(f13e804c) SHA1(550a02a4d21915d1127ba1be587539a8e27aa7ef) )
+	ROM_LOAD( "834-0012_epr-381.u7",  0x3800, 0x0800, CRC(2194a624) SHA1(a8a9baf202eb353b93dced71d74de713d54a5e5e) )
+	ROM_LOAD( "834-0012_epr-382.u8",  0x4000, 0x0800, CRC(95d84829) SHA1(a1684a695de41270721da851bed887a0c379e8c1) )
+	ROM_LOAD( "834-0012_epr-383.u9",  0x4800, 0x0800, CRC(1495059f) SHA1(d771274d5205421757076b9a5cfbd73fe2949901) )
+	ROM_LOAD( "834-0012_epr-384.u10", 0x5000, 0x0800, CRC(d036a5c5) SHA1(5557795280c5e492b94d670b156024d67d51aa8b) )
+	ROM_LOAD( "834-0012_epr-385.u11", 0x5800, 0x0800, CRC(788380dd) SHA1(6392386f9625c6fd609174e765a24e2c25fca957) )
+	ROM_LOAD( "834-0012_epr-386.u12", 0x6000, 0x0800, CRC(a43686c4) SHA1(1a6eae526de1667a7aa3a995b2655950555461eb) )
+	ROM_LOAD( "834-0012_epr-387.u13", 0x6800, 0x0800, CRC(43c8b973) SHA1(12ee379d24e2bcdd6b491262ac02f862a8a33aaf) )
+	ROM_LOAD( "834-0012_epr-388.u14", 0x7000, 0x0800, CRC(9f26d132) SHA1(5323a61de883ed1f2dca776b9d7c53a484249c02) )
+	ROM_LOAD( "834-0012_epr-436.u15", 0x7800, 0x0800, CRC(3897de4a) SHA1(4ded2e358fbeb95fc81ea519f7e7a30b9812f5c0) )
+	ROM_LOAD( "834-0012_epr-437.u16", 0x8000, 0x0800, CRC(7f8f7d95) SHA1(fa29ccf119246e7b49660419257378e7682026eb) )
+
+	ROM_REGION( 0x0800, "speech:cpu", 0 )
+	ROM_LOAD( "834-0013_epr-311x.u7", 0x0000, 0x0800, CRC(5988c767) SHA1(3b91a8cd46aa7e714028cc40f700fea32287afb1) )
+
+	ROM_REGION( 0x0020, "speech:proms", 0 )
+	ROM_LOAD( "pr84.speech-u30",      0x0000, 0x0020, CRC(adcb81d0) SHA1(74b0efc7e8362b0c98e54a6107981cff656d87e1) ) // 7051, speech board addressing
+
+	ROM_REGION( 0x4000, "speech:data", 0 )
+	ROM_LOAD( "834-0013_epr-438.u6",  0x0000, 0x0800, CRC(06ec6186) SHA1(e9f1cda5b5faac19665fba87dcd8cc2242984daf) )
+	ROM_LOAD( "834-0013_epr-434.u5",  0x0800, 0x0800, CRC(a8be23d5) SHA1(48445c96b2b8c0208e55822d89c36f0c8287011a) )
+	ROM_LOAD( "834-0013_epr-440.u4",  0x1000, 0x0800, CRC(7e07891d) SHA1(45d7de461f2f94f78ce5a8f6ebe7bd946c8e6630) )
+	ROM_LOAD( "834-0013_epr-441.u3",  0x1800, 0x0800, CRC(205ef84d) SHA1(8e48409da8c46fa34e25992ef80e8f15344835bf) )
+
+	ROM_REGION( 0x0420, "proms", 0 ) // not dumped for this set, but believed identical
+	ROM_LOAD( "316-0806.video1-u52",  0x0000, 0x0020, CRC(358128b6) SHA1(b6b4b9ecfdcc69b45e69e7a8614153d83be4c62b) ) // 6331
+	ROM_LOAD( "316-0764.cpu-u15",     0x0400, 0x0020, CRC(c609b79e) SHA1(49dbcbb607079a182d7eb396c0da097166ea91c9) ) // 6331, CPU board addressing
+ROM_END
+
 ROM_START( astrobg )
 	ROM_REGION( 0xc000, "maincpu", 0 )
 	ROM_LOAD( "829b.u25",   0x0000, 0x0800, CRC(14ae953c) SHA1(eb63d1b95faa5193db7fa6ab245e99325d519b5e) )
@@ -1752,22 +1790,23 @@ void segag80r_state::init_sindbadm()
  *************************************/
 
 //    YEAR, NAME,      PARENT,   MACHINE,  INPUT,    CLASS,          INIT,          MONITOR,COMPANY,FULLNAME,FLAGS
-/* basic G-80 system with: CPU board, PROM board, Video I board, custom sound boards */
-GAME( 1981, astrob,    0,        astrob,   astrob,   segag80r_state, init_astrob,   ROT270, "Sega", "Astro Blaster (version 3)", 0 )
-GAME( 1981, astrob2,   astrob,   astrob,   astrob2,  segag80r_state, init_astrob,   ROT270, "Sega", "Astro Blaster (version 2)", 0 )
-GAME( 1981, astrob2a,  astrob,   astrob,   astrob2,  segag80r_state, init_astrob,   ROT270, "Sega", "Astro Blaster (version 2a)", 0 )
-GAME( 1981, astrob2b,  astrob,   astrob,   astrob2,  segag80r_state, init_astrob,   ROT270, "Sega", "Astro Blaster (version 2b)", 0 )
-GAME( 1981, astrob1,   astrob,   astrob,   astrob,   segag80r_state, init_astrob,   ROT270, "Sega", "Astro Blaster (version 1)", MACHINE_NOT_WORKING ) // instant death if you start game with 1 credit, protection?, bad dump?
-GAME( 1981, astrobg,   astrob,   astrob,   astrob,   segag80r_state, init_astrob,   ROT270, "Sega", "Astro Blaster (German)", 0 )
-GAME( 1981, 005,       0,        sega005,  005,      segag80r_state, init_005,      ROT270, "Sega", "005", MACHINE_IMPERFECT_SOUND )
+// basic G-80 system with: CPU board, PROM board, Video I board, custom sound boards
+GAME( 1981, astrob,    0,        astrob,   astrob,   segag80r_state, init_astrob,   ROT270, "Sega", "Astro Blaster (version 3)",     0 )
+GAME( 1981, astrob2,   astrob,   astrob,   astrob2,  segag80r_state, init_astrob,   ROT270, "Sega", "Astro Blaster (version 2)",     0 )
+GAME( 1981, astrob2a,  astrob,   astrob,   astrob2,  segag80r_state, init_astrob,   ROT270, "Sega", "Astro Blaster (version 2a)",    0 )
+GAME( 1981, astrob2b,  astrob,   astrob,   astrob2,  segag80r_state, init_astrob,   ROT270, "Sega", "Astro Blaster (version 2b)",    0 )
+GAME( 1981, astrob1,   astrob,   astrob,   astrob,   segag80r_state, init_astrob,   ROT270, "Sega", "Astro Blaster (version 1)",     MACHINE_NOT_WORKING ) // instant death if you start game with 1 credit, protection?, bad dump?
+GAME( 1981, astrobf,   astrob,   astrob,   astrob,   segag80r_state, init_astrob,   ROT270, "Sega", "Astro Blaster (French)",        0 )
+GAME( 1981, astrobg,   astrob,   astrob,   astrob,   segag80r_state, init_astrob,   ROT270, "Sega", "Astro Blaster (German)",        0 )
+GAME( 1981, 005,       0,        sega005,  005,      segag80r_state, init_005,      ROT270, "Sega", "005",                           MACHINE_IMPERFECT_SOUND )
 
-/* basic G-80 system with individual background boards */
+// basic G-80 system with individual background boards
 GAME( 1981, spaceod,   0,        spaceod,  spaceod,  segag80r_state, init_spaceod,  ROT270, "Sega", "Space Odyssey (version 2)", MACHINE_IMPERFECT_SOUND )
 GAME( 1981, spaceod2,  spaceod,  spaceod,  spaceod,  segag80r_state, init_spaceod,  ROT270, "Sega", "Space Odyssey (version 1)", MACHINE_IMPERFECT_SOUND )
-GAME( 1982, monsterb,  0,        monsterb, monsterb, segag80r_state, init_monsterb, ROT270, "Sega", "Monster Bash", MACHINE_IMPERFECT_SOUND )
+GAME( 1982, monsterb,  0,        monsterb, monsterb, segag80r_state, init_monsterb, ROT270, "Sega", "Monster Bash",              MACHINE_IMPERFECT_SOUND )
 
-/* 2-board G-80 system */
+// 2-board G-80 system
 GAME( 1982, monsterb2, monsterb, monster2, monsterb, segag80r_state, init_monster2, ROT270, "Sega", "Monster Bash (2 board version)", MACHINE_IMPERFECT_SOUND )
-GAME( 1983, pignewt,   0,        pignewt,  pignewt,  segag80r_state, init_pignewt,  ROT270, "Sega", "Pig Newton (version C)", MACHINE_IMPERFECT_SOUND )
-GAME( 1983, pignewta,  pignewt,  pignewt,  pignewta, segag80r_state, init_pignewt,  ROT270, "Sega", "Pig Newton (version A)", MACHINE_IMPERFECT_SOUND )
-GAME( 1983, sindbadm,  0,        sindbadm, sindbadm, segag80r_state, init_sindbadm, ROT270, "Sega", "Sindbad Mystery", 0 )
+GAME( 1983, pignewt,   0,        pignewt,  pignewt,  segag80r_state, init_pignewt,  ROT270, "Sega", "Pig Newton (version C)",         MACHINE_IMPERFECT_SOUND )
+GAME( 1983, pignewta,  pignewt,  pignewt,  pignewta, segag80r_state, init_pignewt,  ROT270, "Sega", "Pig Newton (version A)",         MACHINE_IMPERFECT_SOUND )
+GAME( 1983, sindbadm,  0,        sindbadm, sindbadm, segag80r_state, init_sindbadm, ROT270, "Sega", "Sindbad Mystery",                0 )
