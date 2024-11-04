@@ -317,6 +317,11 @@ void specnext_sprites_device::device_reset()
 	update_config();
 }
 
+void specnext_sprites_device::device_post_load()
+{
+	m_sprites_cache.clear();
+}
+
 
 // device type definition
 DEFINE_DEVICE_TYPE(SPECNEXT_SPRITES, specnext_sprites_device, "sprites", "Spectrum Next Sprites")

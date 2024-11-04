@@ -70,8 +70,8 @@ protected:
 	u8 pb_r();
 	u8 m_digit = 0U;
 	u8 m_seg = 0U;
-	void machine_reset() override;
-	void machine_start() override;
+	void machine_reset() override ATTR_COLD;
+	void machine_start() override ATTR_COLD;
 	required_device<pia6821_device> m_pia;
 	required_device<cassette_image_device> m_cass;
 	required_device<cpu_device> m_maincpu;
@@ -81,7 +81,7 @@ protected:
 private:
 	void pa_w(u8 data);
 	void pb_w(u8 data);
-	void mkit09_mem(address_map &map);
+	void mkit09_mem(address_map &map) ATTR_COLD;
 };
 
 class mkit09a_state : public mkit09_state
@@ -94,7 +94,7 @@ public:
 private:
 	void pa_w(u8 data);
 	void pb_w(u8 data);
-	void mkit09a_mem(address_map &map);
+	void mkit09a_mem(address_map &map) ATTR_COLD;
 };
 
 
@@ -158,8 +158,8 @@ static INPUT_PORTS_START( mkit09 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("SPECIAL")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("RST") PORT_CODE(KEYCODE_ESC) PORT_CHANGED_MEMBER(DEVICE_SELF, mkit09_state, trigger_reset, 0)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("NMI") PORT_CODE(KEYCODE_F1) PORT_CHANGED_MEMBER(DEVICE_SELF, mkit09_state, trigger_nmi, 0)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("RST") PORT_CODE(KEYCODE_ESC) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(mkit09_state::trigger_reset), 0)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("NMI") PORT_CODE(KEYCODE_F1) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(mkit09_state::trigger_nmi), 0)
 INPUT_PORTS_END
 
 // ToDo: work out what the keys marked "??" do.
@@ -205,8 +205,8 @@ static INPUT_PORTS_START( mkit09a )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("SPECIAL")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("RST") PORT_CODE(KEYCODE_ESC) PORT_CHANGED_MEMBER(DEVICE_SELF, mkit09_state, trigger_reset, 0)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("NMI") PORT_CODE(KEYCODE_F1) PORT_CHANGED_MEMBER(DEVICE_SELF, mkit09_state, trigger_nmi, 0)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("RST") PORT_CODE(KEYCODE_ESC) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(mkit09_state::trigger_reset), 0)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("NMI") PORT_CODE(KEYCODE_F1) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(mkit09_state::trigger_nmi), 0)
 INPUT_PORTS_END
 
 INPUT_CHANGED_MEMBER( mkit09_state::trigger_reset )

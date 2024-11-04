@@ -113,7 +113,7 @@ private:
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline_interrupt);
 	void scanline_int_ack_w(uint16_t data);
 	void latch_w(uint8_t data);
-	void main_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
 };
 
 
@@ -128,7 +128,7 @@ public:
 	void arcadecl(machine_config &config);
 
 protected:
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 	virtual uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect) override;
 
 private:

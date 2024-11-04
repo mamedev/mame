@@ -541,9 +541,7 @@ void snes_state::snes_w_io(address_space &space, offs_t offset, uint8_t data)
 		case JOY3H:
 		case JOY4L:
 		case JOY4H:
-//#ifdef MAME_DEBUG
-			logerror( "Write to read-only register: %X value: %X", offset, data );
-//#endif /* MAME_DEBUG */
+			logerror( "Write to read-only register: %X value: %X\n", offset, data );
 			return;
 	}
 

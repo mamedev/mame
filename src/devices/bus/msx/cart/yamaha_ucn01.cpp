@@ -28,8 +28,8 @@ public:
 
 protected:
 	virtual void device_start() override { }
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual void device_resolve_objects() override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual void device_resolve_objects() override ATTR_COLD;
 	virtual void device_config_complete() override;
 
 private:

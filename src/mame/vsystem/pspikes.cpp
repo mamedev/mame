@@ -145,7 +145,7 @@ protected:
 	void pspikesc_map(address_map &map) ATTR_COLD;
 	void aerfboo2_map(address_map &map) ATTR_COLD;
 
-	void oki_map(address_map &map);
+	void oki_map(address_map &map) ATTR_COLD;
 
 	// devices referenced above
 	required_device<cpu_device> m_maincpu;
@@ -211,12 +211,12 @@ protected:
 private:
 	void aerfboot_okim6295_banking_w(uint8_t data);
 
-	void kickball_map(address_map &map);
-	void aerfboot_map(address_map &map);
+	void kickball_map(address_map &map) ATTR_COLD;
+	void aerfboot_map(address_map &map) ATTR_COLD;
 
-	void aerfboot_sound_map(address_map &map);
-	void kickball_sound_map(address_map &map);
-	void kickball_sound_portmap(address_map &map);
+	void aerfboot_sound_map(address_map &map) ATTR_COLD;
+	void kickball_sound_map(address_map &map) ATTR_COLD;
+	void kickball_sound_portmap(address_map &map) ATTR_COLD;
 };
 
 
@@ -241,8 +241,8 @@ private:
 
 	void spikes91_draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void spikes91_map(address_map &map);
-	void spikes91_sound_map(address_map &map);
+	void spikes91_map(address_map &map) ATTR_COLD;
+	void spikes91_sound_map(address_map &map) ATTR_COLD;
 
 	optional_shared_ptr<uint16_t> m_tx_tilemap_ram;
 
@@ -266,10 +266,10 @@ private:
 	void d7759_write_port_0_w(uint8_t data);
 	void d7759_reset_w(uint8_t data);
 
-	void main_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
 
-	void sound_map(address_map &map);
-	void sound_portmap(address_map &map);
+	void sound_map(address_map &map) ATTR_COLD;
+	void sound_portmap(address_map &map) ATTR_COLD;
 
 	required_device<upd7759_device> m_upd7759;
 };
@@ -296,8 +296,8 @@ private:
 
 	void draw_bitmap(bitmap_rgb32 &bitmap);
 
-	void main_map(address_map &map);
-	void sound_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
+	void sound_map(address_map &map) ATTR_COLD;
 
 	required_shared_ptr<uint16_t> m_bitmapram;
 
@@ -326,7 +326,7 @@ protected:
 
 	DECLARE_VIDEO_START(spinlbrk);
 
-	void sound_map(address_map &map);
+	void sound_map(address_map &map) ATTR_COLD;
 	void pspikes_sound_portmap(address_map &map) ATTR_COLD;
 
 	required_memory_bank m_soundbank;
@@ -341,11 +341,11 @@ private:
 	uint32_t screen_update_spinlbrk(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_turbofrc(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void pspikes_map(address_map &map);
-	void karatblz_map(address_map &map);
+	void pspikes_map(address_map &map) ATTR_COLD;
+	void karatblz_map(address_map &map) ATTR_COLD;
 	void spinlbrk_map(address_map &map) ATTR_COLD;
 	void turbofrc_map(address_map &map) ATTR_COLD;
-	void aerofgtb_map(address_map &map);
+	void aerofgtb_map(address_map &map) ATTR_COLD;
 
 	void spinlbrk_sound_portmap(address_map &map) ATTR_COLD;
 };

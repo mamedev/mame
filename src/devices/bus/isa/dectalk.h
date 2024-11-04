@@ -18,12 +18,12 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// optional information overrides
-	virtual const tiny_rom_entry *device_rom_region() const override;
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 private:
 	int bio_line_r();
@@ -45,10 +45,10 @@ private:
 	void output_ctl_w(uint16_t data);
 	void irq_line_w(uint16_t data);
 
-	void dectalk_cpu_io(address_map &map);
-	void dectalk_cpu_map(address_map &map);
-	void dectalk_dsp_io(address_map &map);
-	void dectalk_dsp_map(address_map &map);
+	void dectalk_cpu_io(address_map &map) ATTR_COLD;
+	void dectalk_cpu_map(address_map &map) ATTR_COLD;
+	void dectalk_dsp_io(address_map &map) ATTR_COLD;
+	void dectalk_dsp_map(address_map &map) ATTR_COLD;
 
 	uint16_t m_cmd, m_stat, m_data, m_dsp_dma, m_ctl;
 	uint8_t m_dma, m_vol, m_bio;

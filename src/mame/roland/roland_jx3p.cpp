@@ -45,12 +45,12 @@ private:
 
 	void if_anlg_mux_w(u8 data);
 
-	void prog_map(address_map &map);
-	void common_ext_map(address_map &map);
-	void jk3p_ext_map(address_map &map);
-	void mks30_ext_map(address_map &map);
-	void if_prog_map(address_map &map);
-	void if_ext_map(address_map &map);
+	void prog_map(address_map &map) ATTR_COLD;
+	void common_ext_map(address_map &map) ATTR_COLD;
+	void jk3p_ext_map(address_map &map) ATTR_COLD;
+	void mks30_ext_map(address_map &map) ATTR_COLD;
+	void if_prog_map(address_map &map) ATTR_COLD;
+	void if_ext_map(address_map &map) ATTR_COLD;
 
 	required_device<mcs51_cpu_device> m_maincpu;
 	optional_device<mcs51_cpu_device> m_ifcpu;

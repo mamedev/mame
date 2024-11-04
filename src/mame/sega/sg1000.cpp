@@ -136,15 +136,15 @@ public:
 protected:
 	required_device_array<sms_control_port_device, 2> m_ctrlports;
 
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 	uint8_t peripheral_r(offs_t offset);
 	void peripheral_w(offs_t offset, uint8_t data);
 
-	void sg1000_map(address_map &map);
-	void sg1000_io_map(address_map &map);
-	void sc3000_map(address_map &map);
-	void sc3000_io_map(address_map &map);
+	void sg1000_map(address_map &map) ATTR_COLD;
+	void sg1000_io_map(address_map &map) ATTR_COLD;
+	void sc3000_map(address_map &map) ATTR_COLD;
+	void sc3000_io_map(address_map &map) ATTR_COLD;
 };
 
 class omv_state : public sg1000_state_base
@@ -160,8 +160,8 @@ private:
 	uint8_t omv_r(offs_t offset);
 	void omv_w(offs_t offset, uint8_t data);
 
-	void omv_map(address_map &map);
-	void omv_io_map(address_map &map);
+	void omv_map(address_map &map) ATTR_COLD;
+	void omv_io_map(address_map &map) ATTR_COLD;
 };
 
 class omv2000_state : public omv_state
@@ -179,7 +179,7 @@ public:
 private:
 	required_device<sms_control_port_device> m_ctrl2;
 
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 };
 
 class sc3000_state : public sg1000_state
@@ -192,7 +192,7 @@ public:
 	void sc3000(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 	void sc3000_base(machine_config &config);
 };
@@ -216,15 +216,15 @@ private:
 
 	int m_centronics_busy = 0;
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	void write_centronics_busy(int state);
 	uint8_t ppi_pa_r();
 	void ppi_pc_w(uint8_t data);
 
-	void sf7000_io_map(address_map &map);
-	void sf7000_map(address_map &map);
+	void sf7000_io_map(address_map &map) ATTR_COLD;
+	void sf7000_map(address_map &map) ATTR_COLD;
 
 	static void floppy_formats(format_registration &fr);
 };
@@ -394,7 +394,7 @@ INPUT_CHANGED_MEMBER( sg1000_state::trigger_nmi )
 }
 
 /*-------------------------------------------------
-    CUSTOM_INPUT_MEMBER( ctrl2_r )
+    ioport_value ctrl2_r()
 -------------------------------------------------*/
 
 template <unsigned Shift>
@@ -409,7 +409,7 @@ ioport_value omv2000_state::ctrl2_r()
 
 static INPUT_PORTS_START( sg1000 )
 	PORT_START("NMI")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME(DEF_STR(Pause)) PORT_CODE(KEYCODE_1) PORT_CHANGED_MEMBER(DEVICE_SELF, sg1000_state, trigger_nmi, 0)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME(DEF_STR(Pause)) PORT_CODE(KEYCODE_1) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(sg1000_state::trigger_nmi), 0)
 INPUT_PORTS_END
 
 /*-------------------------------------------------
@@ -464,10 +464,10 @@ static INPUT_PORTS_START( omv2000 )
 	PORT_INCLUDE( omv1000 )
 
 	PORT_MODIFY("C4")
-	PORT_BIT( 0xc0, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(omv2000_state, ctrl2_r<0>);
+	PORT_BIT( 0xc0, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(FUNC(omv2000_state::ctrl2_r<0>));
 
 	PORT_MODIFY("C5")
-	PORT_BIT( 0x0f, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(omv2000_state, ctrl2_r<2>);
+	PORT_BIT( 0x0f, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(FUNC(omv2000_state::ctrl2_r<2>));
 	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
@@ -479,7 +479,7 @@ static INPUT_PORTS_START( sc3000 )
 	// keyboard keys are added by the embedded sk1100 device
 
 	PORT_START("NMI")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("RESET") PORT_CODE(KEYCODE_F10) PORT_CHANGED_MEMBER(DEVICE_SELF, sg1000_state, trigger_nmi, 0)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("RESET") PORT_CODE(KEYCODE_F10) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(sg1000_state::trigger_nmi), 0)
 INPUT_PORTS_END
 
 /*-------------------------------------------------

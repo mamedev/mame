@@ -643,16 +643,15 @@ uint32_t cclimber_state::screen_update_cclimber(screen_device &screen, bitmap_in
 	bitmap.fill(0, cliprect);
 	draw_playfield(screen, bitmap, cliprect);
 
-	// draw the "big sprite" under the regular sprites 
-	if ((m_bigsprite_control[0] & 0x01))
+	if (m_bigsprite_control[0] & 0x01)
 	{
+		// draw the "big sprite" under the regular sprites
 		cclimber_draw_bigsprite(screen, bitmap, cliprect);
 		cclimber_draw_sprites(bitmap, cliprect, m_gfxdecode->gfx(1));
 	}
-
-	// draw the "big sprite" over the regular sprites 
 	else
 	{
+		// draw the "big sprite" over the regular sprites
 		cclimber_draw_sprites(bitmap, cliprect, m_gfxdecode->gfx(1));
 		cclimber_draw_bigsprite(screen, bitmap, cliprect);
 	}
@@ -675,16 +674,15 @@ uint32_t yamato_state::screen_update_yamato(screen_device &screen, bitmap_ind16 
 
 	draw_playfield(screen, bitmap, cliprect);
 
-	// draw the "big sprite" under the regular sprites 
-	if ((m_bigsprite_control[0] & 0x01))
+	if (m_bigsprite_control[0] & 0x01)
 	{
+		// draw the "big sprite" under the regular sprites
 		cclimber_draw_bigsprite(screen, bitmap, cliprect);
 		toprollr_draw_sprites(bitmap, cliprect, m_gfxdecode->gfx(1));
 	}
-
-	// draw the "big sprite" over the regular sprites 
 	else
 	{
+		// draw the "big sprite" over the regular sprites
 		toprollr_draw_sprites(bitmap, cliprect, m_gfxdecode->gfx(1));
 		cclimber_draw_bigsprite(screen, bitmap, cliprect);
 	}
@@ -728,16 +726,15 @@ uint32_t swimmer_state::screen_update_swimmer(screen_device &screen, bitmap_ind1
 
 	draw_playfield(screen, bitmap, cliprect);
 
-	// draw the "big sprite" under the regular sprites 
-	if ((m_bigsprite_control[0] & 0x01))
+	if (m_bigsprite_control[0] & 0x01)
 	{
+		// draw the "big sprite" under the regular sprites
 		cclimber_draw_bigsprite(screen, bitmap, cliprect);
 		swimmer_draw_sprites(bitmap, cliprect, m_gfxdecode->gfx(1));
 	}
-
-	// draw the "big sprite" over the regular sprites 
 	else
 	{
+		// draw the "big sprite" over the regular sprites
 		swimmer_draw_sprites(bitmap, cliprect, m_gfxdecode->gfx(1));
 		cclimber_draw_bigsprite(screen, bitmap, cliprect);
 	}
@@ -760,16 +757,15 @@ uint32_t toprollr_state::screen_update_toprollr(screen_device &screen, bitmap_in
 	m_bg_tilemap->mark_all_dirty();
 	m_bg_tilemap->draw(screen, bitmap, scroll_area_clip, 0, 0);
 
-	// draw the "big sprite" over the regular sprites 
-	if ((m_bigsprite_control[1] & 0x20))
+	if (m_bigsprite_control[1] & 0x20)
 	{
+		// draw the "big sprite" over the regular sprites
 		toprollr_draw_sprites(bitmap, scroll_area_clip, m_gfxdecode->gfx(1));
 		toprollr_draw_bigsprite(screen, bitmap, scroll_area_clip);
 	}
-
-	// draw the "big sprite" under the regular sprites 
 	else
 	{
+		// draw the "big sprite" under the regular sprites
 		toprollr_draw_bigsprite(screen, bitmap, scroll_area_clip);
 		toprollr_draw_sprites(bitmap, scroll_area_clip, m_gfxdecode->gfx(1));
 	}

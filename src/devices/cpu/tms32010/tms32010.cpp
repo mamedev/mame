@@ -870,12 +870,8 @@ void tms3201x_base_device<HighBits>::device_start()
 	save_item(NAME(m_ALU.d));
 	save_item(NAME(m_Preg.d));
 	save_item(NAME(m_Treg));
-	save_item(NAME(m_AR[0]));
-	save_item(NAME(m_AR[1]));
-	save_item(NAME(m_STACK[0]));
-	save_item(NAME(m_STACK[1]));
-	save_item(NAME(m_STACK[2]));
-	save_item(NAME(m_STACK[3]));
+	save_item(NAME(m_AR));
+	save_item(NAME(m_STACK));
 	save_item(NAME(m_INTF));
 	save_item(NAME(m_opcode.d));
 	save_item(NAME(m_oldacc.d));
@@ -987,7 +983,7 @@ int tms3201x_base_device<HighBits>::Ext_IRQ()
 {
 	if (INTM == 0)
 	{
-		logerror("TMS32010:  EXT INTERRUPT\n");
+		standard_irq_callback(0, m_PC);
 		m_INTF = TMS32010_INT_NONE;
 		SET_FLAG(INTM_FLAG);
 		PUSH_STACK(m_PC);
@@ -1008,7 +1004,7 @@ void tms3201x_base_device<HighBits>::execute_run()
 	do
 	{
 		if (m_INTF) {
-			/* Dont service INT if previous instruction was MPY, MPYK or EINT */
+			/* Don't service INT if previous instruction was MPY, MPYK or EINT */
 			if ((m_opcode.b.h != 0x6d) && ((m_opcode.b.h & 0xe0) != 0x80) && (m_opcode.w.l != 0x7f82))
 				m_icount -= Ext_IRQ();
 		}

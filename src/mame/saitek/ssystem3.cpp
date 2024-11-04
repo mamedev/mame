@@ -3,14 +3,15 @@
 // thanks-to:Berger
 /*******************************************************************************
 
-SciSys / Novag Chess Champion: Super System III (aka MK III), distributed by
-both SciSys and Novag. Which company was responsible for which part of the
-manufacturing chain is unknown. The software is by SciSys (no mention of Novag
-in the ROM, it has "COPYRIGHT SCISYS LTD 1979").
+SciSys / Novag Chess Champion: Super System III (aka MK III)
+
+It was distributed by both SciSys and Novag. Which company was responsible for
+which part of the production chain is unknown. The copyright was assigned to SciSys
+(no mention of Novag in the ROM, it has "COPYRIGHT SCISYS LTD 1979").
 
 This is their 1st original product. MK II was licensed from Peter Jennings, and
-MK I was, to put it bluntly, a bootleg. The chess engine is by Mike Johnson,
-with support from David Levy.
+MK I was, to put it bluntly, a bootleg. The chess engine is by Mike Johnson, with
+support from David Levy, Philidor Software.
 
 Hardware notes:
 
@@ -116,7 +117,7 @@ public:
 	void init_ssystem3() { m_xor_kludge = true; }
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	// devices/pointers
@@ -142,9 +143,9 @@ private:
 	bool m_xor_kludge = false;
 
 	// address maps
-	void ssystem3_map(address_map &map);
-	void ssystem4_map(address_map &map);
-	void chessunit_map(address_map &map);
+	void ssystem3_map(address_map &map) ATTR_COLD;
+	void ssystem4_map(address_map &map) ATTR_COLD;
+	void chessunit_map(address_map &map) ATTR_COLD;
 
 	// I/O handlers
 	void lcd1_output_w(u32 data) { m_lcd1_data = data; }
@@ -440,7 +441,7 @@ static INPUT_PORTS_START( ssystem3 )
 	PORT_CONFNAME( 0x01, 0x01, "Memory Unit" )
 	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x01, DEF_STR( On ) )
-	PORT_CONFNAME( 0x02, 0x02, "Chess Unit" ) PORT_CHANGED_MEMBER(DEVICE_SELF, ssystem3_state, cu_plug, 0)
+	PORT_CONFNAME( 0x02, 0x02, "Chess Unit" ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(ssystem3_state::cu_plug), 0)
 	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x02, DEF_STR( On ) )
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_CUSTOM)
@@ -572,5 +573,6 @@ ROM_END
 *******************************************************************************/
 
 //    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS           INIT           COMPANY, FULLNAME, FLAGS
-SYST( 1979, ssystem3, 0,      0,      ssystem3, ssystem3, ssystem3_state, init_ssystem3, "SciSys / Novag Industries", "Chess Champion: Super System III", MACHINE_SUPPORTS_SAVE )
-SYST( 1980, ssystem4, 0,      0,      ssystem4, ssystem4, ssystem3_state, empty_init,    "SciSys", "Chess Champion: Super System IV", MACHINE_SUPPORTS_SAVE )
+SYST( 1979, ssystem3, 0,      0,      ssystem3, ssystem3, ssystem3_state, init_ssystem3, "SciSys / Novag Industries / Philidor Software", "Chess Champion: Super System III", MACHINE_SUPPORTS_SAVE )
+
+SYST( 1980, ssystem4, 0,      0,      ssystem4, ssystem4, ssystem3_state, empty_init,    "SciSys / Philidor Software", "Chess Champion: Super System IV", MACHINE_SUPPORTS_SAVE )

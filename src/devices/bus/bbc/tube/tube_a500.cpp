@@ -41,8 +41,8 @@ protected:
 	virtual void device_start() override { }
 
 	// optional information overrides
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 
 	virtual uint8_t host_r(offs_t offset) override { return m_ula->host_r(offset); }
 	virtual void host_w(offs_t offset, uint8_t data) override { m_ula->host_w(offset, data); }
@@ -56,8 +56,8 @@ protected:
 	required_device<input_merger_device> m_fiqs;
 
 private:
-	void arm_mem(address_map &map);
-	void a500_map(address_map &map);
+	void arm_mem(address_map &map) ATTR_COLD;
+	void a500_map(address_map &map) ATTR_COLD;
 
 	void prst_w(int state) { m_maincpu->set_input_line(INPUT_LINE_RESET, state); }
 };
@@ -72,11 +72,11 @@ public:
 
 protected:
 	// optional information overrides
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 
 private:
-	void a500d_map(address_map &map);
+	void a500d_map(address_map &map) ATTR_COLD;
 };
 
 

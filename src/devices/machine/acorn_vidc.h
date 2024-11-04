@@ -53,11 +53,11 @@ protected:
 
 	// device-level overrides
 	//virtual void device_validity_check(validity_checker &valid) const override;
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 	virtual u32 palette_entries() const noexcept override;
 	virtual void device_config_complete() override;
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 	virtual space_config_vector memory_space_config() const override;
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	virtual u32 get_pixel_clock();
@@ -67,7 +67,7 @@ protected:
 
 	address_space_config  m_space_config;
 
-	void regs_map(address_map &map);
+	void regs_map(address_map &map) ATTR_COLD;
 
 	enum {
 		CRTC_HCR = 0, CRTC_HSWR, CRTC_HBSR, CRTC_HDSR, CRTC_HDER, CRTC_HBER, CRTC_HCSR, CRTC_HIR,
@@ -158,11 +158,11 @@ public:
 	virtual bool get_dac_mode() override;
 
 protected:
-	virtual void device_add_mconfig(machine_config &config) override;
-	void regs_map(address_map &map);
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	void regs_map(address_map &map) ATTR_COLD;
 	virtual u32 palette_entries() const noexcept override;
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 	virtual void device_config_complete() override;
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	virtual u32 get_pixel_clock() override;

@@ -2715,37 +2715,25 @@ ROM_START( guzzlers ) // Swimmer Conversion, 1k vs 2k romsize in maincpu
 	ROM_LOAD( "tk01.bin",     0x0000, 0x0104, CRC(af082b3c) SHA1(94ee780945255ebfc2a0848a40289fbc4c7e7d7c) ) // appears to be PAL16L8
 ROM_END
 
-/*
-    Au (Swimmer Conversion)
-
-    CPU/Sound Board:   B102-403 (modified)
-    Video Board:       102-401 (modified)
-    Daughterboard: unmarked
-*/
-
 ROM_START( au )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "au1.l9",  0x0000, 0x1000, CRC(4e6b2ac1) SHA1(ddc24e292e7ece5e5b688798212c41b1f943ec83) )
-	ROM_LOAD( "au2.k9",  0x1000, 0x1000, CRC(07c1aea4) SHA1(9640a65d272f68af6bd080b113bd02e36a952989) )
-	ROM_LOAD( "au3.j9",  0x2000, 0x1000, CRC(d024a4e5) SHA1(13d5b48b27b8b94d7e97b2f8b67ca554c8bde9c0) )
-	ROM_LOAD( "au4.f9",  0x3000, 0x1000, CRC(afd783d9) SHA1(8940dd87f9a3bb63aa9b43533c4c12fe48a6b09d) )
-	ROM_LOAD( "au5.e9",  0x4000, 0x1000, CRC(372c06e9) SHA1(7b76959f99029e868c03141491dbfa74487890d9) )
-	ROM_LOAD( "au6.d9",  0x5000, 0x1000, CRC(2daa0b49) SHA1(20d7f31a1af759f8b55d65e99275c9692f4ad0b5) )
-	ROM_LOAD( "au7.c9",  0x6000, 0x1000, CRC(8345cce5) SHA1(bb6e8371d5f5acf91bca9568a5dd9335d95a501d) )
-	ROM_LOAD( "au8.a9",  0x7000, 0x1000, CRC(ad02f888) SHA1(1e8301311baa7f853510223c36982e7aa19ac34d) )
+	ROM_LOAD( "program0.e8", 0x0000, 0x2000, CRC(04c7ebc9) SHA1(f8b8a92d68786969b83dd041e695d11722ade4bc) )
+	ROM_LOAD( "program1.b8", 0x2000, 0x2000, CRC(d3820146) SHA1(73a2ae3a6ba2064572c2c5c726179748634293bd) )
+	ROM_LOAD( "program2.d8", 0x4000, 0x2000, CRC(da85cf0f) SHA1(16dfd574892f99124f52b83c7673c588f251e9fe) )
+	ROM_LOAD( "program3.a8", 0x6000, 0x2000, CRC(fa4bc959) SHA1(5848b3cffa1ace96676b6d0735f13eab8ee5c693) )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )
-	ROM_LOAD( "au12.4k",  0x0000, 0x1000, CRC(0315f0a1) SHA1(18d1e72298448737c8aa226f6d8b9c592143c4e8) )
+	ROM_LOAD( "sound0.c4",   0x0000, 0x1000, CRC(0315f0a1) SHA1(18d1e72298448737c8aa226f6d8b9c592143c4e8) )
 
 	ROM_REGION( 0x6000, "tile", 0 )
-	ROM_LOAD( "au13.18k",  0x0000, 0x2000, CRC(faa24ff4) SHA1(b95a9df5ea44c638589b7bab507638210b369401) )
-	ROM_LOAD( "au14.18l",  0x2000, 0x2000, CRC(2bd7aa4e) SHA1(9a1482cedd689bd10a30208cc10469bf5b53a264) )
-	ROM_LOAD( "au15.18m",  0x4000, 0x2000, CRC(d5a8bf00) SHA1(6a9ad47477c5041c3757f8dcaf3d54f054257ed3) )
+	ROM_LOAD( "tile2.bin",   0x0000, 0x2000, CRC(faa24ff4) SHA1(b95a9df5ea44c638589b7bab507638210b369401) )
+	ROM_LOAD( "tile1.bin",   0x2000, 0x2000, CRC(2bd7aa4e) SHA1(9a1482cedd689bd10a30208cc10469bf5b53a264) )
+	ROM_LOAD( "tile0.bin",   0x4000, 0x2000, CRC(d5a8bf00) SHA1(6a9ad47477c5041c3757f8dcaf3d54f054257ed3) )
 
 	ROM_REGION( 0x3000, "bigsprite", 0 )
-	ROM_LOAD( "au11.6c", 0x0000, 0x1000, CRC(19d65322) SHA1(e1d1c5a19ef6d1d773485a30a887da51c6281e1d) )
-	ROM_LOAD( "au10.5c", 0x1000, 0x1000, CRC(dd2bf0ba) SHA1(4a9688555e73cc3be61665ce9800eb8975844d4f) )
-	ROM_LOAD( "au9.4c",  0x2000, 0x1000, CRC(4a22394e) SHA1(6b8d9658a0c4cad21d226fe8b10ba3e0c8e9fe28) )
+	ROM_LOAD( "big2.g7",     0x0000, 0x1000, CRC(19d65322) SHA1(e1d1c5a19ef6d1d773485a30a887da51c6281e1d) )
+	ROM_LOAD( "big1.e7",     0x1000, 0x1000, CRC(dd2bf0ba) SHA1(4a9688555e73cc3be61665ce9800eb8975844d4f) )
+	ROM_LOAD( "big0.c7",     0x2000, 0x1000, CRC(4a22394e) SHA1(6b8d9658a0c4cad21d226fe8b10ba3e0c8e9fe28) )
 ROM_END
 
 ROM_START( yamato )
@@ -2957,7 +2945,7 @@ GAME( 1982, swimmerb,    swimmer,  swimmer,   swimmerb,  swimmer_state,  empty_i
 GAME( 1983, guzzler,     0,        guzzler,   guzzler,   swimmer_state,  empty_init,     ROT90,  "Tehkan", "Guzzler", MACHINE_SUPPORTS_SAVE )
 GAME( 1983, guzzlers,    guzzler,  guzzler,   guzzler,   swimmer_state,  empty_init,     ROT90,  "Tehkan", "Guzzler (Swimmer conversion)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1983, au,          0,        au,        au,        swimmer_state,  empty_init,     ROT90,  "Tehkan", "Au (Swimmer conversion)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, au,          0,        au,        au,        swimmer_state,  empty_init,     ROT90,  "Tehkan", "Au (location test)", MACHINE_SUPPORTS_SAVE )
 
 GAME( 1983, yamato,      0,        yamato,    yamato,    yamato_state,   init_yamato,    ROT90,  "Sega",   "Yamato (US)",     MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 GAME( 1983, yamato2,     yamato,   yamato,    yamato,    yamato_state,   init_yamato,    ROT90,  "Sega",   "Yamato (World?)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )

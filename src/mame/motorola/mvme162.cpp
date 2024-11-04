@@ -209,7 +209,7 @@ private:
 	void bootvect_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 	virtual void machine_start () override;
 	virtual void machine_reset () override;
-	void mvme162_mem(address_map &map);
+	void mvme162_mem(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<scc85230_device> m_sccterm;

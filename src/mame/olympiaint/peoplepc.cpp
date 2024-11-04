@@ -94,11 +94,11 @@ private:
 	void floppy_unload(floppy_image_device *dev);
 
 	uint8_t m_dma0pg = 0, m_p7c = 0;
-	void peoplepc_io(address_map &map);
-	void peoplepc_map(address_map &map);
+	void peoplepc_io(address_map &map) ATTR_COLD;
+	void peoplepc_map(address_map &map) ATTR_COLD;
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 };
 
 static const gfx_layout peoplepc_charlayout =

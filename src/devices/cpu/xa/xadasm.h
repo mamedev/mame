@@ -6,7 +6,7 @@
 
 #pragma once
 
-#define XA_DASM_PARAMS uint8_t op, std::ostream& stream, offs_t pc, const data_buffer& opcodes, const data_buffer& params
+#define XA_DASM_PARAMS u8 op, std::ostream& stream, offs_t pc, const data_buffer& opcodes, const data_buffer& params
 #define XA_CALL_PARAMS op, stream, pc, opcodes, params
 
 class xa_dasm : public util::disasm_interface
@@ -39,7 +39,7 @@ private:
 
 	const char* m_regnames16[16] = { "R0", "R1", "R2", "R3", "R4", "R5", "R6", "R7", "illegal", "illegal", "illegal", "illegal", "illegal", "illegal", "illegal", "illegal" };
 	const char* m_regnames8[16] = { "R0L", "R0H", "R1L", "R1H", "R2L", "R2H", "R3L", "R3H", "R4L", "R4H", "R5L", "R5H", "R6L", "R6H", "R7L", "R7H"};
-	const char* m_aluops[16] = { "ADD", "ADDC", "SUB", "SUBC", "CMP", "AND", "OR", "XOR", "MOV", "illegal ALU 0x09", "illegal ALU 0x0a", "illegal ALU 0x0b", "illegal ALU 0x0c", "illegal ALU 0x0d", "illegal ALU 0x0e", "illegal ALU 0x0f"};
+	const char* m_aluops[16] = { "ADD", "ADDC", "SUB", "SUBB", "CMP", "AND", "OR", "XOR", "MOV", "illegal ALU 0x09", "illegal ALU 0x0a", "illegal ALU 0x0b", "illegal ALU 0x0c", "illegal ALU 0x0d", "illegal ALU 0x0e", "illegal ALU 0x0f"};
 	const char* m_branches[15] = { "BCC", "BCS", "BNE", "BEQ", "BNV", "BOV", "BPL", "BMI", "BG", "BL", "BGE", "BLT", "BGT", "BLE", "BR" };
 	const char* m_addsmovs[2] = { "ADDS", "MOVS" };
 	const char* m_pushpull[4] = { "PUSH", "PUSHU", "POP", "POPU" };
@@ -51,7 +51,7 @@ private:
 	std::string show_expanded_data4(u16 data4, int size);
 
 	int handle_alu_type0(XA_DASM_PARAMS, int alu_op);
-	int handle_alu_type1(XA_DASM_PARAMS, uint8_t op2);
+	int handle_alu_type1(XA_DASM_PARAMS, u8 op2);
 	int handle_pushpop_rlist(XA_DASM_PARAMS, int type);
 	int handle_adds_movs(XA_DASM_PARAMS, int which);
 	int handle_shift(XA_DASM_PARAMS, int shift_type);

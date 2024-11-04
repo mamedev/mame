@@ -348,7 +348,7 @@ void menu_settings_dip_switches::recompute_metrics(uint32_t width, uint32_t heig
 }
 
 
-void menu_settings_dip_switches::custom_render(uint32_t flags, void *selectedref, float top, float bottom, float x1, float y1, float x2, float y2)
+void menu_settings_dip_switches::custom_render(uint32_t flags, void *selectedref, float top, float bottom, float origx1, float origy1, float origx2, float origy2)
 {
 	// catch if no DIP locations have to be drawn
 	if (!m_visible_switch_groups)
@@ -371,9 +371,9 @@ void menu_settings_dip_switches::custom_render(uint32_t flags, void *selectedref
 	}
 
 	// draw extra menu area
-	float const boxwidth((std::max)(width + (lr_border() * 2.0f), x2 - x1));
+	float const boxwidth((std::max)(width + (lr_border() * 2.0f), origx2 - origx1));
 	float const boxleft((1.0f - boxwidth) * 0.5f);
-	ui().draw_outlined_box(container(), boxleft, y2 + tb_border(), boxleft + boxwidth, y2 + bottom, ui().colors().background_color());
+	ui().draw_outlined_box(container(), boxleft, origy2 + tb_border(), boxleft + boxwidth, origy2 + bottom, ui().colors().background_color());
 
 	// calculate centred layout
 	float const nameleft((1.0f - width) * 0.5f);
@@ -404,7 +404,7 @@ void menu_settings_dip_switches::custom_render(uint32_t flags, void *selectedref
 			}
 
 			// draw the name
-			float const liney(y2 + (tb_border() * 2.0f) + (line_height() * (DIP_SWITCH_HEIGHT + DIP_SWITCH_SPACING) * line));
+			float const liney(origy2 + (tb_border() * 2.0f) + (line_height() * (DIP_SWITCH_HEIGHT + DIP_SWITCH_SPACING) * line));
 			draw_text_normal(
 					group.name,
 					nameleft, liney + (line_height() * (DIP_SWITCH_HEIGHT - 1.0f) / 2.0f), namewidth,

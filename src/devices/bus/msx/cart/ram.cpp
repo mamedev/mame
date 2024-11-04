@@ -252,7 +252,7 @@ protected:
 		, m_bank_mask(0)
 	{ }
 
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 	template <int Bank> void bank_w(u8 data);
 
@@ -357,8 +357,8 @@ public:
 	{ }
 
 protected:
-	virtual void device_start() override;
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 private:
 	required_device<sn76496_base_device> m_sn76489a;
@@ -413,9 +413,9 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(mode_callback);
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
-	virtual ioport_constructor device_input_ports() const override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 
 private:
 	static constexpr u8 MODE_RO = 0;
@@ -433,7 +433,7 @@ private:
 
 static INPUT_PORTS_START(double_ram_mode_switch)
 	PORT_START("MODE")
-	PORT_CONFNAME(0x01, 0x01, "Mode") PORT_CHANGED_MEMBER(DEVICE_SELF, msx_cart_double_ram_device, mode_callback, 0)
+	PORT_CONFNAME(0x01, 0x01, "Mode") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(msx_cart_double_ram_device::mode_callback), 0)
 	PORT_CONFSETTING(0x00, "Memory Mapper")
 	PORT_CONFSETTING(0x01, "MegaRAM")
 INPUT_PORTS_END

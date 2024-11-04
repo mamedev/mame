@@ -329,9 +329,9 @@ public:
 	void swyft(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	required_device<m68008_device> m_maincpu;
@@ -378,7 +378,7 @@ private:
 
 	void write_acia_clock(int state);
 
-	void swyft_mem(address_map &map);
+	void swyft_mem(address_map &map) ATTR_COLD;
 };
 
 

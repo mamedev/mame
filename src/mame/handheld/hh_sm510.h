@@ -19,7 +19,7 @@
 
 
 #define PORT_CHANGED_CB(x) \
-	PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, x, 0)
+	PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(hh_sm510_state::x), 0)
 
 
 class hh_sm510_state : public driver_device
@@ -81,8 +81,8 @@ protected:
 	TIMER_CALLBACK_MEMBER(display_decay_tick);
 	emu_timer *m_display_decay_timer = nullptr;
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	// machine configs
 	void mcfg_cpu_common(machine_config &config);

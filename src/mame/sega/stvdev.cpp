@@ -36,8 +36,8 @@ public:
 
 private:
 	required_device<cpu_device> m_maincpu;
-	void stvdev_io(address_map &map);
-	void stvdev_map(address_map &map);
+	void stvdev_io(address_map &map) ATTR_COLD;
+	void stvdev_map(address_map &map) ATTR_COLD;
 };
 
 

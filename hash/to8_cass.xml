@@ -5,7 +5,7 @@ license:CC0-1.0
 
 Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 -->
-<softwarelist name="to8_cass" description="Thomson TO8 cassetes">
+<softwarelist name="to8_cass" description="Thomson TO8 cassettes">
 
 	<software name="bactron">
 		<description>Bactron</description>
@@ -22,7 +22,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	<software name="chicago">
 		<description>Chicago 90</description>
 		<year>1989</year>
-		<publisher>Microids</publisher>
+		<publisher>Microïds</publisher>
 
 		<part name="cass1" interface="to_cass">
 			<dataarea name="cass" size="141466">
@@ -70,7 +70,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	<software name="gp500cc">
 		<description>Grand Prix 500cc</description>
 		<year>1986</year>
-		<publisher>Microids</publisher>
+		<publisher>Microïds</publisher>
 
 		<part name="cass1" interface="to_cass">
 			<dataarea name="cass" size="76605">
@@ -154,7 +154,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	<software name="superski">
 		<description>Super Ski</description>
 		<year>1987</year>
-		<publisher>Microids</publisher>
+		<publisher>Microïds</publisher>
 
 		<part name="cass1" interface="to_cass">
 			<dataarea name="cass" size="110461">

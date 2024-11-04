@@ -49,15 +49,15 @@ public:
 	void ggconnie(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	void lamp_w(uint8_t data);
 	void output_w(uint8_t data);
 	void oki_bank_w(offs_t offset, uint8_t data);
-	void sgx_io(address_map &map);
-	void sgx_mem(address_map &map);
-	void oki_map(address_map &map);
+	void sgx_io(address_map &map) ATTR_COLD;
+	void sgx_mem(address_map &map) ATTR_COLD;
+	void oki_map(address_map &map) ATTR_COLD;
 
 	required_device <msm6242_device> m_rtc;
 	required_device <okim6295_device> m_oki;

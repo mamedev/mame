@@ -50,9 +50,9 @@ public:
 	void rpatrol(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override { m_maincpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero); }
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	optional_device<cpu_device> m_audiocpu;
@@ -73,7 +73,7 @@ protected:
 	void flip_screen_x_w(int state);
 	void flip_screen_y_w(int state);
 
-	void cclimber_portmap(address_map &map);
+	void cclimber_portmap(address_map &map) ATTR_COLD;
 
 	void vblank_irq(int state);
 
@@ -106,12 +106,12 @@ private:
 	void cclimber_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, gfx_element *gfx);
 	void cclimber_decode(const uint8_t convtable[8][16]);
 
-	void bagmanf_map(address_map &map);
-	void cannonb_map(address_map &map);
-	void cclimber_map(address_map &map);
-	void decrypted_opcodes_map(address_map &map);
-	void rpatrol_map(address_map &map);
-	void rpatrol_portmap(address_map &map);
+	void bagmanf_map(address_map &map) ATTR_COLD;
+	void cannonb_map(address_map &map) ATTR_COLD;
+	void cclimber_map(address_map &map) ATTR_COLD;
+	void decrypted_opcodes_map(address_map &map) ATTR_COLD;
+	void rpatrol_map(address_map &map) ATTR_COLD;
+	void rpatrol_portmap(address_map &map) ATTR_COLD;
 };
 
 class swimmer_state : public cclimber_state
@@ -128,7 +128,7 @@ public:
 	void guzzler(machine_config &config);
 
 protected:
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	optional_shared_ptr<uint8_t> m_swimmer_background_color;
@@ -139,12 +139,12 @@ private:
 	void sidebg_enable_w(int state);
 	void palette_bank_w(int state);
 
-	void swimmer_root_map(address_map &map);
-	void swimmer_map(address_map &map);
-	void swimmer_audio_map(address_map &map);
-	void swimmer_audio_portmap(address_map &map);
-	void au_map(address_map &map);
-	void guzzler_map(address_map &map);
+	void swimmer_root_map(address_map &map) ATTR_COLD;
+	void swimmer_map(address_map &map) ATTR_COLD;
+	void swimmer_audio_map(address_map &map) ATTR_COLD;
+	void swimmer_audio_portmap(address_map &map) ATTR_COLD;
+	void au_map(address_map &map) ATTR_COLD;
+	void guzzler_map(address_map &map) ATTR_COLD;
 
 	void swimmer_palette(palette_device &palette) const;
 	void swimmer_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, gfx_element* gfx);
@@ -176,7 +176,7 @@ public:
 	void init_toprollr();
 
 protected:
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	optional_shared_ptr<uint8_t> m_toprollr_bg_videoram;
@@ -184,8 +184,8 @@ private:
 	required_memory_bank m_bank1;
 	required_memory_bank m_bank1d;
 
-	void toprollr_decrypted_opcodes_map(address_map &map);
-	void toprollr_map(address_map &map);
+	void toprollr_decrypted_opcodes_map(address_map &map) ATTR_COLD;
+	void toprollr_map(address_map &map) ATTR_COLD;
 
 	void toprollr_palette(palette_device &palette) const;
 	void toprollr_draw_bigsprite(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -216,11 +216,11 @@ private:
 	uint8_t yamato_p0_r();
 	uint8_t yamato_p1_r();
 
-	void yamato_map(address_map &map);
-	void yamato_decrypted_opcodes_map(address_map &map);
-	void yamato_portmap(address_map &map);
-	void yamato_audio_map(address_map &map);
-	void yamato_audio_portmap(address_map &map);
+	void yamato_map(address_map &map) ATTR_COLD;
+	void yamato_decrypted_opcodes_map(address_map &map) ATTR_COLD;
+	void yamato_portmap(address_map &map) ATTR_COLD;
+	void yamato_audio_map(address_map &map) ATTR_COLD;
+	void yamato_audio_portmap(address_map &map) ATTR_COLD;
 
 	void yamato_palette(palette_device &palette) const;
 	uint32_t screen_update_yamato(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

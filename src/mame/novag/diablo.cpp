@@ -6,7 +6,7 @@
 Novag Diablo 68000 (model 908)
 Novag Scorpio 68000 (model 909)
 
-Hardware notes (Diablo):
+Hardware notes (Diablo 68000):
 - M68000 @ 16MHz, IPL1 256Hz, IPL2 from ACIA IRQ(always high)
 - 2*8KB RAM TC5565 battery-backed, 2*32KB hashtable RAM TC55257
 - 3*32KB ROM (27C256 or equivalent)
@@ -35,8 +35,8 @@ Scorpio 68000 hardware is very similar, but with chessboard buttons and side led
 #include "speaker.h"
 
 // internal artwork
-#include "novag_diablo68k.lh"
-#include "novag_scorpio68k.lh"
+#include "novag_diablo68.lh"
+#include "novag_scorpio68.lh"
 
 
 namespace {
@@ -58,11 +58,11 @@ public:
 	{ }
 
 	// machine configs
-	void diablo68k(machine_config &config);
-	void scorpio68k(machine_config &config);
+	void diablo68(machine_config &config);
+	void scorpio68(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	// devices/pointers
@@ -77,18 +77,16 @@ private:
 	required_ioport_array<8> m_inputs;
 
 	u8 m_inp_mux = 0;
-	u8 m_led_data = 0;
-	u8 m_led_side = 0;
 	u8 m_lcd_control = 0;
 	u8 m_lcd_data = 0;
 
 	// address maps
-	void diablo68k_map(address_map &map);
-	void scorpio68k_map(address_map &map);
+	void diablo68_map(address_map &map) ATTR_COLD;
+	void scorpio68_map(address_map &map) ATTR_COLD;
 
 	// I/O handlers
-	void update_display();
 	void control_w(u8 data);
+	void control2_w(u8 data);
 	void lcd_data_w(u8 data);
 	void leds_w(u8 data);
 	u8 input1_r();
@@ -102,8 +100,6 @@ void diablo_state::machine_start()
 {
 	// register for savestates
 	save_item(NAME(m_inp_mux));
-	save_item(NAME(m_led_data));
-	save_item(NAME(m_led_side));
 	save_item(NAME(m_lcd_control));
 	save_item(NAME(m_lcd_data));
 }
@@ -137,14 +133,7 @@ HD44780_PIXEL_UPDATE(diablo_state::lcd_pixel_update)
 }
 
 
-// TTL
-
-void diablo_state::update_display()
-{
-	// update leds (lcd is done separately)
-	u8 led_select = 1 << m_inp_mux;
-	m_display->matrix(led_select, m_led_side << 8 | m_led_data);
-}
+// misc
 
 void diablo_state::control_w(u8 data)
 {
@@ -155,14 +144,19 @@ void diablo_state::control_w(u8 data)
 	m_lcd_control = data & 3;
 
 	// d7: enable beeper
-	m_beeper->set_state(data >> 7 & 1);
-
-	// d2,d3: side leds(scorpio)
-	m_led_side = ~data >> 2 & 3;
+	m_beeper->set_state(BIT(data, 7));
 
 	// d4-d6: input mux, led select
 	m_inp_mux = data >> 4 & 7;
-	update_display();
+	m_display->write_my(1 << m_inp_mux);
+}
+
+void diablo_state::control2_w(u8 data)
+{
+	control_w(data);
+
+	// d2,d3: side leds (scorpio68)
+	m_display->write_mx(~data >> 2 & 3);
 }
 
 void diablo_state::lcd_data_w(u8 data)
@@ -173,9 +167,8 @@ void diablo_state::lcd_data_w(u8 data)
 
 void diablo_state::leds_w(u8 data)
 {
-	// d0-d7: chessboard leds
-	m_led_data = data;
-	update_display();
+	// d0-d7: chessboard leds (diablo68)
+	m_display->write_mx(data);
 }
 
 u8 diablo_state::input1_r()
@@ -197,7 +190,7 @@ u8 diablo_state::input2_r()
     Address Maps
 *******************************************************************************/
 
-void diablo_state::diablo68k_map(address_map &map)
+void diablo_state::diablo68_map(address_map &map)
 {
 	map(0x000000, 0x00ffff).rom();
 	map(0x200000, 0x20ffff).rom().region("maincpu", 0x10000);
@@ -211,10 +204,10 @@ void diablo_state::diablo68k_map(address_map &map)
 	map(0xff8000, 0xffbfff).ram().share("nvram");
 }
 
-void diablo_state::scorpio68k_map(address_map &map)
+void diablo_state::scorpio68_map(address_map &map)
 {
-	diablo68k_map(map);
-	map(0x380000, 0x380000).w(FUNC(diablo_state::control_w));
+	diablo68_map(map);
+	map(0x380000, 0x380000).w(FUNC(diablo_state::control2_w));
 	map(0x3c0000, 0x3c0001).nopw();
 }
 
@@ -224,7 +217,7 @@ void diablo_state::scorpio68k_map(address_map &map)
     Input Ports
 *******************************************************************************/
 
-static INPUT_PORTS_START( diablo68k )
+static INPUT_PORTS_START( diablo68 )
 	PORT_START("IN.0")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_A) PORT_NAME("Go")
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_Q) PORT_NAME("Take Back / Analyze Games")
@@ -272,12 +265,12 @@ INPUT_PORTS_END
     Machine Configs
 *******************************************************************************/
 
-void diablo_state::diablo68k(machine_config &config)
+void diablo_state::diablo68(machine_config &config)
 {
 	// basic machine hardware
 	M68000(config, m_maincpu, 16_MHz_XTAL);
 	m_maincpu->set_interrupt_mixer(false);
-	m_maincpu->set_addrmap(AS_PROGRAM, &diablo_state::diablo68k_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &diablo_state::diablo68_map);
 
 	auto &irq_clock(CLOCK(config, "irq_clock", 32.768_kHz_XTAL/128)); // 256Hz
 	irq_clock.set_pulse_width(attotime::from_nsec(1380)); // active for 1.38us
@@ -305,8 +298,8 @@ void diablo_state::diablo68k(machine_config &config)
 	m_lcd->set_lcd_size(2, 8);
 	m_lcd->set_pixel_update_cb(FUNC(diablo_state::lcd_pixel_update));
 
-	PWM_DISPLAY(config, m_display).set_size(8, 8+2);
-	config.set_default_layout(layout_novag_diablo68k);
+	PWM_DISPLAY(config, m_display).set_size(8, 8);
+	config.set_default_layout(layout_novag_diablo68);
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
@@ -325,17 +318,18 @@ void diablo_state::diablo68k(machine_config &config)
 	m_rs232->dsr_handler().set("acia", FUNC(mos6551_device::write_dsr));
 }
 
-void diablo_state::scorpio68k(machine_config &config)
+void diablo_state::scorpio68(machine_config &config)
 {
-	diablo68k(config);
+	diablo68(config);
 
 	// basic machine hardware
-	m_maincpu->set_addrmap(AS_PROGRAM, &diablo_state::scorpio68k_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &diablo_state::scorpio68_map);
 
 	m_board->set_type(sensorboard_device::BUTTONS);
 	m_board->set_delay(attotime::from_msec(150));
 
-	config.set_default_layout(layout_novag_scorpio68k);
+	m_display->set_width(2);
+	config.set_default_layout(layout_novag_scorpio68);
 }
 
 
@@ -344,17 +338,24 @@ void diablo_state::scorpio68k(machine_config &config)
     ROM Definitions
 *******************************************************************************/
 
-ROM_START( diablo68 ) // ID = D 1.08
+ROM_START( diablo68 ) // ID = D 1.08, serial 90999x
 	ROM_REGION16_BE( 0x20000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD16_BYTE("d_904.u3", 0x00000, 0x8000, CRC(03477746) SHA1(8bffcb159a61e59bfc45411e319aea6501ebe2f9) )
-	ROM_LOAD16_BYTE("d_924.u2", 0x00001, 0x8000, CRC(e182dbdd) SHA1(24dacbef2173fa737636e4729ff22ec1e6623ca5) ) // only 2 bytes differ (one of them is the checksum)
+	ROM_LOAD16_BYTE("d_a09.u2", 0x00001, 0x8000, CRC(bcd27647) SHA1(2de5bccd4e7b9a32957811c0028dbca1a407b9b0) )
 	ROM_LOAD16_BYTE("502.u4",   0x10000, 0x8000, CRC(553a5c8c) SHA1(ccb5460ff10766a5ca8008ae2cffcff794318108) ) // no odd rom
 ROM_END
 
-ROM_START( diablo68a ) // ID = D 1.08
+ROM_START( diablo68a ) // ID = D 1.08, serial 90984x
+	ROM_REGION16_BE( 0x20000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD16_BYTE("d_904.u3", 0x00000, 0x8000, CRC(03477746) SHA1(8bffcb159a61e59bfc45411e319aea6501ebe2f9) )
+	ROM_LOAD16_BYTE("d_924.u2", 0x00001, 0x8000, CRC(e182dbdd) SHA1(24dacbef2173fa737636e4729ff22ec1e6623ca5) ) // only 4 bytes different from diablo68
+	ROM_LOAD16_BYTE("502.u4",   0x10000, 0x8000, CRC(553a5c8c) SHA1(ccb5460ff10766a5ca8008ae2cffcff794318108) ) // no odd rom
+ROM_END
+
+ROM_START( diablo68b ) // ID = D 1.08, serial 90973x
 	ROM_REGION16_BE( 0x20000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD16_BYTE("d_evn_904.u3", 0x00000, 0x8000, CRC(03477746) SHA1(8bffcb159a61e59bfc45411e319aea6501ebe2f9) )
-	ROM_LOAD16_BYTE("d_odd_904.u2", 0x00001, 0x8000, CRC(d46fcc7a) SHA1(8ed69cd0fec07bf5451eaa882c87cf7cf70c87eb) )
+	ROM_LOAD16_BYTE("d_odd_904.u2", 0x00001, 0x8000, CRC(d46fcc7a) SHA1(8ed69cd0fec07bf5451eaa882c87cf7cf70c87eb) ) // only 2 bytes different from diablo68a
 	ROM_LOAD16_BYTE("ds_bk.u4",     0x10000, 0x8000, CRC(553a5c8c) SHA1(ccb5460ff10766a5ca8008ae2cffcff794318108) ) // no odd rom
 ROM_END
 
@@ -374,8 +375,9 @@ ROM_END
     Drivers
 *******************************************************************************/
 
-//    YEAR  NAME       PARENT    COMPAT  MACHINE     INPUT       CLASS         INIT        COMPANY, FULLNAME, FLAGS
-SYST( 1991, diablo68,  0,        0,      diablo68k,  diablo68k,  diablo_state, empty_init, "Novag Industries", "Diablo 68000 (set 1)", MACHINE_SUPPORTS_SAVE )
-SYST( 1991, diablo68a, diablo68, 0,      diablo68k,  diablo68k,  diablo_state, empty_init, "Novag Industries", "Diablo 68000 (set 2)", MACHINE_SUPPORTS_SAVE )
+//    YEAR  NAME       PARENT    COMPAT  MACHINE    INPUT      CLASS         INIT        COMPANY, FULLNAME, FLAGS
+SYST( 1991, diablo68,  0,        0,      diablo68,  diablo68,  diablo_state, empty_init, "Novag Industries / Intelligent Heuristic Programming", "Diablo 68000 (set 1)", MACHINE_SUPPORTS_SAVE )
+SYST( 1991, diablo68a, diablo68, 0,      diablo68,  diablo68,  diablo_state, empty_init, "Novag Industries / Intelligent Heuristic Programming", "Diablo 68000 (set 2)", MACHINE_SUPPORTS_SAVE )
+SYST( 1991, diablo68b, diablo68, 0,      diablo68,  diablo68,  diablo_state, empty_init, "Novag Industries / Intelligent Heuristic Programming", "Diablo 68000 (set 3)", MACHINE_SUPPORTS_SAVE )
 
-SYST( 1991, scorpio68, 0,        0,      scorpio68k, diablo68k,  diablo_state, empty_init, "Novag Industries", "Scorpio 68000", MACHINE_SUPPORTS_SAVE )
+SYST( 1991, scorpio68, 0,        0,      scorpio68, diablo68,  diablo_state, empty_init, "Novag Industries / Intelligent Heuristic Programming", "Scorpio 68000", MACHINE_SUPPORTS_SAVE )

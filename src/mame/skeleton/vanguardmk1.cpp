@@ -21,7 +21,7 @@ public:
 	void vanguardmk1(machine_config &config);
 
 private:
-	void mcu_map(address_map &map);
+	void mcu_map(address_map &map) ATTR_COLD;
 };
 
 void vanguardmk1_state::mcu_map(address_map &map)

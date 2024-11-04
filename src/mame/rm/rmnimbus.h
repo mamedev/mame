@@ -158,10 +158,10 @@ private:
 	void nimbus_mouse_js_w(uint8_t data);
 	uint16_t nimbus_video_io_r(offs_t offset, uint16_t mem_mask = ~0);
 	void nimbus_video_io_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
-	virtual void video_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
+	virtual void video_reset() override ATTR_COLD;
 	uint32_t screen_update_nimbus(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void sio_interrupt(int state);
 	void nimbus_fdc_intrq_w(int state);
@@ -254,10 +254,10 @@ private:
 
 	bool m_voice_enabled = false;
 
-	void nimbus_io(address_map &map);
-	void nimbus_iocpu_io(address_map &map);
-	void nimbus_iocpu_mem(address_map &map);
-	void nimbus_mem(address_map &map);
+	void nimbus_io(address_map &map) ATTR_COLD;
+	void nimbus_iocpu_io(address_map &map) ATTR_COLD;
+	void nimbus_iocpu_mem(address_map &map) ATTR_COLD;
+	void nimbus_mem(address_map &map) ATTR_COLD;
 
 	void decode_dssi_none(uint16_t ds, uint16_t si);
 	void decode_dssi_generic(uint16_t ds, uint16_t si);

@@ -45,15 +45,15 @@ private:
 	uint8_t protection_r();
 	uint8_t v128_r();
 	uint32_t screen_update_dorachan(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	void dorachan_io_map(address_map &map);
-	void dorachan_map(address_map &map);
+	void dorachan_io_map(address_map &map) ATTR_COLD;
+	void dorachan_map(address_map &map) ATTR_COLD;
 
 	// internal state
 	uint8_t m_flip_screen = 0;
 	uint16_t m_prot_value = 0;
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	// devices, memory pointers
 	required_device<cpu_device> m_maincpu;

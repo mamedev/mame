@@ -24,8 +24,8 @@ protected:
 	m68hc05ex_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, int addrbits, address_map_constructor internal_map);
 
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 	virtual space_config_vector memory_space_config() const override;
 
 	virtual void interrupt_vector() override;
@@ -75,7 +75,7 @@ protected:
 	required_shared_ptr<u8> m_internal_ram;
 
 private:
-	void m68hc05e1_map(address_map &map);
+	void m68hc05e1_map(address_map &map) ATTR_COLD;
 };
 
 class m68hc05e5_device : public m68hc05e1_device
@@ -90,7 +90,7 @@ protected:
 	required_shared_ptr<u8> m_internal_ram;
 
 private:
-	void m68hc05e5_map(address_map &map);
+	void m68hc05e5_map(address_map &map) ATTR_COLD;
 };
 
 DECLARE_DEVICE_TYPE(M68HC05E1, m68hc05e1_device)

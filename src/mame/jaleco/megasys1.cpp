@@ -693,13 +693,13 @@ u8 megasys1_state::oki_status_r()
 		return m_oki[Chip]->read();
 }
 
-void megasys1_typea_state::p47b_adpcm_w(offs_t offset, u8 data)
+void megasys1_typea_state::p47bl_adpcm_w(offs_t offset, u8 data)
 {
 	// bit 6 is always set
-	m_p47b_adpcm[offset]->reset_w(BIT(data, 7));
-	m_p47b_adpcm[offset]->data_w(data & 0x0f);
-	m_p47b_adpcm[offset]->vclk_w(1);
-	m_p47b_adpcm[offset]->vclk_w(0);
+	m_p47bl_adpcm[offset]->reset_w(BIT(data, 7));
+	m_p47bl_adpcm[offset]->data_w(data & 0x0f);
+	m_p47bl_adpcm[offset]->vclk_w(1);
+	m_p47bl_adpcm[offset]->vclk_w(0);
 }
 
 /***************************************************************************
@@ -731,7 +731,7 @@ void megasys1_typea_state::kickoffb_sound_map(address_map &map)
 	map(0x0e0000, 0x0fffff).ram();
 }
 
-void megasys1_typea_state::p47b_sound_map(address_map &map)
+void megasys1_typea_state::p47bl_sound_map(address_map &map)
 {
 	map(0x000000, 0x01ffff).rom();
 	map(0x040000, 0x040001).r(m_soundlatch[0], FUNC(generic_latch_16_device::read));
@@ -743,15 +743,15 @@ void megasys1_typea_state::p47b_sound_map(address_map &map)
 	map(0x0e0000, 0x0fffff).ram();
 }
 
-void megasys1_typea_state::p47b_extracpu_prg_map(address_map &map) // TODO
+void megasys1_typea_state::p47bl_extracpu_prg_map(address_map &map) // TODO
 {
 	map(0x0000, 0xffff).rom().nopw();
 }
 
-void megasys1_typea_state::p47b_extracpu_io_map(address_map &map)
+void megasys1_typea_state::p47bl_extracpu_io_map(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x01).w(FUNC(megasys1_typea_state::p47b_adpcm_w));
+	map(0x00, 0x01).w(FUNC(megasys1_typea_state::p47bl_adpcm_w));
 	map(0x01, 0x01).r("soundlatch3", FUNC(generic_latch_8_device::read));
 }
 
@@ -1995,11 +1995,11 @@ void megasys1_typea_state::system_A_kickoffb(machine_config &config)
 	ymsnd.add_route(ALL_OUTPUTS, "rspeaker", 0.80);
 }
 
-void megasys1_typea_state::system_A_p47b(machine_config &config)
+void megasys1_typea_state::system_A_p47bl(machine_config &config)
 {
 	system_A_kickoffb(config);
 	m_audiocpu->set_clock(7.2_MHz_XTAL);
-	m_audiocpu->set_addrmap(AS_PROGRAM, &megasys1_typea_state::p47b_sound_map);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &megasys1_typea_state::p47bl_sound_map);
 
 	config.device_remove("oki1");
 
@@ -2008,21 +2008,21 @@ void megasys1_typea_state::system_A_p47b(machine_config &config)
 	// probably for driving the OKI M5205
 	z80_device &extracpu(Z80(config, "extracpu", 7.2_MHz_XTAL / 2)); // divisor not verified
 	extracpu.set_periodic_int(FUNC(megasys1_state::irq0_line_hold), attotime::from_hz(8000));
-	extracpu.set_addrmap(AS_PROGRAM, &megasys1_typea_state::p47b_extracpu_prg_map);
-	extracpu.set_addrmap(AS_IO, &megasys1_typea_state::p47b_extracpu_io_map);
+	extracpu.set_addrmap(AS_PROGRAM, &megasys1_typea_state::p47bl_extracpu_prg_map);
+	extracpu.set_addrmap(AS_IO, &megasys1_typea_state::p47bl_extracpu_io_map);
 
 	GENERIC_LATCH_8(config, "soundlatch3");
 
 	// OKI M5205
-	MSM5205(config, m_p47b_adpcm[0], 384000);
-	m_p47b_adpcm[0]->set_prescaler_selector(msm5205_device::SEX_4B);
-	m_p47b_adpcm[0]->add_route(ALL_OUTPUTS, "lspeaker", 1.0);
-	m_p47b_adpcm[0]->add_route(ALL_OUTPUTS, "rspeaker", 1.0);
+	MSM5205(config, m_p47bl_adpcm[0], 384000);
+	m_p47bl_adpcm[0]->set_prescaler_selector(msm5205_device::SEX_4B);
+	m_p47bl_adpcm[0]->add_route(ALL_OUTPUTS, "lspeaker", 1.0);
+	m_p47bl_adpcm[0]->add_route(ALL_OUTPUTS, "rspeaker", 1.0);
 
-	MSM5205(config, m_p47b_adpcm[1], 384000);
-	m_p47b_adpcm[1]->set_prescaler_selector(msm5205_device::SEX_4B);
-	m_p47b_adpcm[1]->add_route(ALL_OUTPUTS, "lspeaker", 1.0);
-	m_p47b_adpcm[1]->add_route(ALL_OUTPUTS, "rspeaker", 1.0);
+	MSM5205(config, m_p47bl_adpcm[1], 384000);
+	m_p47bl_adpcm[1]->set_prescaler_selector(msm5205_device::SEX_4B);
+	m_p47bl_adpcm[1]->add_route(ALL_OUTPUTS, "lspeaker", 1.0);
+	m_p47bl_adpcm[1]->add_route(ALL_OUTPUTS, "rspeaker", 1.0);
 }
 
 void megasys1_bc_iosim_state::system_B(machine_config &config)
@@ -4035,6 +4035,43 @@ ROM_START( p47 )
 	ROM_LOAD( "p-47.14m",    0x0000, 0x0200, CRC(1d877538) SHA1(a5be0dc65dcfc36fbba10d1fddbe155e24b6122f) )
 ROM_END
 
+// on original PCB with original ROMs. Has Freedom instead of Phantom.
+ROM_START( p47a )
+	ROM_REGION( 0x80000, "maincpu", 0 )     /* Main CPU Code */
+	ROM_LOAD16_BYTE( "jaleco_export_p-47_3.rom2", 0x000000, 0x020000, CRC(022e58b8) SHA1(87db59e409977358d9a7b689f2d69bef056328d9) )
+	ROM_LOAD16_BYTE( "jaleco_export_p-47_1.rom1", 0x000001, 0x020000, CRC(ed926bd8) SHA1(5cf3e7b9b23667eaa8ebcff0803a7b881c7b83cf) )
+
+	ROM_REGION( 0x20000, "audiocpu", 0 )        /* Sound CPU Code */
+	ROM_LOAD16_BYTE( "jaleco_p-47_9.rom8",  0x000000, 0x010000, CRC(ffcf318e) SHA1(c675968c931a7e8e00ae83e49e8cef3fd193da57) )
+	ROM_LOAD16_BYTE( "jaleco_p-47_19.rom7", 0x000001, 0x010000, CRC(adb8c12e) SHA1(31590b037133f81a52779dbd4f2b5ac5b59198ae) )
+
+	ROM_REGION( 0x080000, "scroll0", 0 ) /* Scroll 0 */
+	ROM_LOAD( "hn62312ap_c42.rom4",  0x000000, 0x040000, CRC(8a75e0c3) SHA1(1d550fd24bc05d4636ba7206247efe65c681494f) )
+	ROM_LOAD( "jaleco_p-47_7.rom3",  0x040000, 0x010000, CRC(f3b1850a) SHA1(d12c61f647aaad53d745ba66d50d22cdf8065c00) )
+
+	ROM_REGION( 0x080000, "scroll1", 0 ) /* Scroll 1 */
+	ROM_LOAD( "jaleco_p-47_23.rom5", 0x000000, 0x020000, CRC(6e9bc864) SHA1(f56ea2dd638a8f6952796535eb549ddd55573bcf) )
+	ROM_RELOAD(                      0x020000, 0x020000 )   /* why? */
+	ROM_LOAD( "jaleco_p-47_12.rom6", 0x040000, 0x020000, CRC(5268395f) SHA1(de0cba1e7a7d4acc27467d1b553e8f39bea7282e) )
+
+	ROM_REGION( 0x020000, "scroll2", 0 ) /* Scroll 2 */
+	ROM_LOAD( "jaleco_p-47_16.rom12", 0x000000, 0x010000, CRC(30e44375) SHA1(62a4bb217b6aad5fd4760a0f4999cb63559549a5) ) // "freedom" instead of "phantom" in the logo
+
+	ROM_REGION( 0x080000, "sprites", 0 ) /* Sprites */
+	ROM_LOAD( "hn62312ap_c45.rom11",  0x000000, 0x040000, CRC(a239baf4) SHA1(127e9ae02a87b3074300ebda68f00ed1a6e51dfb) )
+	ROM_LOAD( "jaleco_p-47_26.rom13", 0x040000, 0x020000, CRC(4d07581a) SHA1(768693e1fcb822b8284ba14c9a5c3d6b00f73383) )
+	ROM_RELOAD(                       0x060000, 0x020000 )   /* why? */
+
+	ROM_REGION( 0x040000, "oki1", 0 )       /* Samples */
+	ROM_LOAD( "hn62312ap_c44.rom9", 0x000000, 0x040000, CRC(a5f6da1f) SHA1(a876bd4f966e45e702879a834fc9344bea85d3fa) )
+
+	ROM_REGION( 0x040000, "oki2", 0 )       /* Samples */
+	ROM_LOAD( "hn62312ap_c43.rom10", 0x000000, 0x040000, CRC(9149286b) SHA1(f6c66c5cd50b72c4d401a263c65a8d4ef8cf9221) )
+
+	ROM_REGION( 0x0200, "proms", 0 )        /* Priority PROM  (N82S131N compatible type BPROM) */
+	ROM_LOAD( "p-47.14m",    0x0000, 0x0200, CRC(1d877538) SHA1(a5be0dc65dcfc36fbba10d1fddbe155e24b6122f) )
+ROM_END
+
 
 /*
 The Japanese version of P-47 can be found in 2 different ROM board configurations:
@@ -4160,7 +4197,7 @@ ROM_START( p47je )
 	ROM_LOAD( "p-47.14m",    0x0000, 0x0200, CRC(1d877538) SHA1(a5be0dc65dcfc36fbba10d1fddbe155e24b6122f) )
 ROM_END
 
-ROM_START( p47b ) // very similar to original hardware but for the sound system (a YM2203 with a Y3014B DAC with unpopulated spaces for another pair + an OKI M5205) and an extra Z80
+ROM_START( p47bl ) // very similar to original hardware but for the sound system (a YM2203 with a Y3014B DAC with unpopulated spaces for another pair + an OKI M5205) and an extra Z80
 	ROM_REGION( 0x80000, "maincpu", 0 )     /* Main CPU Code, identical to p47 set but with smaller ROMs */
 	ROM_LOAD16_BYTE( "12.bin", 0x000000, 0x010000, CRC(cc81abd8) SHA1(223d205ee5120d16b997b0788fcb81c0de52da04) )
 	ROM_LOAD16_BYTE( "13.bin", 0x020000, 0x010000, CRC(f3ea8a3e) SHA1(b2ea6661f7a3653ac6d92e07176546a41178eaff) )
@@ -5222,9 +5259,10 @@ GAME( 1988, makaiden,   lomakai,  system_Z,          lomakai,  megasys1_typez_st
 
 // Type A
 GAME( 1988, p47,        0,        system_A,                 p47,      megasys1_typea_state,        empty_init,        ROT0,   "Jaleco", "P-47 - The Phantom Fighter (World)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, p47a,       p47,      system_A,                 p47,      megasys1_typea_state,        empty_init,        ROT0,   "Jaleco", "P-47 - The Freedom Fighter (World)", MACHINE_SUPPORTS_SAVE )
 GAME( 1988, p47j,       p47,      system_A,                 p47,      megasys1_typea_state,        empty_init,        ROT0,   "Jaleco", "P-47 - The Freedom Fighter (Japan)", MACHINE_SUPPORTS_SAVE )
 GAME( 1988, p47je,      p47,      system_A,                 p47,      megasys1_typea_state,        empty_init,        ROT0,   "Jaleco", "P-47 - The Freedom Fighter (Japan, Export)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, p47b,       p47,      system_A_p47b,            p47,      megasys1_typea_state,        empty_init,        ROT0,   "bootleg","P-47 - The Freedom Fighter (World, bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, p47bl,      p47,      system_A_p47bl,           p47,      megasys1_typea_state,        empty_init,        ROT0,   "bootleg","P-47 - The Freedom Fighter (World, bootleg)", MACHINE_SUPPORTS_SAVE )
 GAME( 1988, kickoff,    0,        system_A,                 kickoff,  megasys1_typea_state,        empty_init,        ROT0,   "Jaleco", "Kick Off - Jaleco Cup (Japan)", MACHINE_SUPPORTS_SAVE )
 GAME( 1988, kickoffb,   kickoff,  system_A_kickoffb,        kickoff,  megasys1_typea_state,        empty_init,        ROT0,   "bootleg (Comodo)", "Kick Off - World Cup (bootleg)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // OKI needs to be checked
 GAME( 1988, tshingen,   0,        system_A_d65006,          tshingen, megasys1_typea_state,        empty_init,        ROT0,   "Jaleco", "Shingen Samurai-Fighter (Japan, English)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )

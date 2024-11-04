@@ -691,6 +691,8 @@ end
 
 if CPUS["H8"] then
 	files {
+		MAME_DIR .. "src/devices/cpu/h8/c77.cpp",
+		MAME_DIR .. "src/devices/cpu/h8/c77.h",
 		MAME_DIR .. "src/devices/cpu/h8/h8.cpp",
 		MAME_DIR .. "src/devices/cpu/h8/h8.h",
 		MAME_DIR .. "src/devices/cpu/h8/h8h.cpp",
@@ -853,6 +855,24 @@ end
 if opt_tool(CPUS, "HMCS40") then
 	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/hmcs40/hmcs40d.cpp")
 	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/hmcs40/hmcs40d.h")
+end
+
+--------------------------------------------------
+-- Hitachi HMCS400 series
+--@src/devices/cpu/hmcs400/hmcs400.h,CPUS["HMCS400"] = true
+--------------------------------------------------
+
+if CPUS["HMCS400"] then
+	files {
+		MAME_DIR .. "src/devices/cpu/hmcs400/hmcs400.cpp",
+		MAME_DIR .. "src/devices/cpu/hmcs400/hmcs400.h",
+		MAME_DIR .. "src/devices/cpu/hmcs400/hmcs400op.cpp",
+	}
+end
+
+if opt_tool(CPUS, "HMCS400") then
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/hmcs400/hmcs400d.cpp")
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/hmcs400/hmcs400d.h")
 end
 
 --------------------------------------------------
@@ -1209,6 +1229,7 @@ end
 if CPUS["XA"] then
 	files {
 		MAME_DIR .. "src/devices/cpu/xa/xa.cpp",
+		MAME_DIR .. "src/devices/cpu/xa/xa_ops.cpp",
 		MAME_DIR .. "src/devices/cpu/xa/xa.h",
 	}
 end
@@ -1392,6 +1413,23 @@ end
 if opt_tool(CPUS, "DIABLO") then
 	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/diablo/diablo1300dasm.cpp")
 	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/diablo/diablo1300dasm.h")
+end
+
+--------------------------------------------------
+-- KL1839VM1
+--@src/devices/cpu/mpk1839/kl1839vm1.h,CPUS["KL1839VM1"] = true
+--------------------------------------------------
+
+if CPUS["KL1839VM1"] then
+	files {
+		MAME_DIR .. "src/devices/cpu/mpk1839/kl1839vm1.cpp",
+		MAME_DIR .. "src/devices/cpu/mpk1839/kl1839vm1.h",
+	}
+end
+
+if opt_tool(CPUS, "KL1839VM1") then
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/mpk1839/kl1839vm1dasm.cpp")
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/mpk1839/kl1839vm1dasm.h")
 end
 
 --------------------------------------------------
@@ -2971,6 +3009,14 @@ end
 --------------------------------------------------
 -- Zilog Z80
 --@src/devices/cpu/z80/z80.h,CPUS["Z80"] = true
+--@src/devices/cpu/z80/tmpz84c011.h,CPUS["Z80"] = true
+--@src/devices/cpu/z80/tmpz84c015.h,CPUS["Z80"] = true
+--@src/devices/cpu/z80/ez80.h,CPUS["Z80"] = true
+--@src/devices/cpu/z80/lz8420m.h,CPUS["Z80"] = true
+--@src/devices/cpu/z80/mc8123.h,CPUS["Z80"] = true
+--@src/devices/cpu/z80/nsc800.h,CPUS["Z80"] = true
+--@src/devices/cpu/z80/r800.h,CPUS["Z80"] = true
+--@src/devices/cpu/z80/z84c015.h,CPUS["Z80"] = true
 --@src/devices/cpu/z80/z80n.h,CPUS["Z80N"] = true
 --@src/devices/cpu/z80/kc82.h,CPUS["KC80"] = true
 --@src/devices/cpu/z80/kl5c80a12.h,CPUS["KC80"] = true
@@ -2992,6 +3038,8 @@ if CPUS["Z80"] or CPUS["KC80"] or CPUS["Z80N"] then
 		MAME_DIR .. "src/devices/cpu/z80/lz8420m.h",
 		MAME_DIR .. "src/devices/cpu/z80/mc8123.cpp",
 		MAME_DIR .. "src/devices/cpu/z80/mc8123.h",
+		MAME_DIR .. "src/devices/cpu/z80/nsc800.cpp",
+		MAME_DIR .. "src/devices/cpu/z80/nsc800.h",
 		MAME_DIR .. "src/devices/cpu/z80/r800.cpp",
 		MAME_DIR .. "src/devices/cpu/z80/r800.h",
 		MAME_DIR .. "src/devices/cpu/z80/z84c015.cpp",
@@ -3000,7 +3048,7 @@ if CPUS["Z80"] or CPUS["KC80"] or CPUS["Z80N"] then
 
 	dependency {
 		{ MAME_DIR .. "src/devices/cpu/z80/z80.cpp", GEN_DIR .. "emu/cpu/z80/z80.hxx" },
-		{ MAME_DIR .. "src/devices/cpu/z80/z80.cpp", GEN_DIR .. "emu/cpu/z80/ncs800.hxx" },
+		{ MAME_DIR .. "src/devices/cpu/z80/nsc800.cpp", GEN_DIR .. "emu/cpu/z80/ncs800.hxx" },
 		{ MAME_DIR .. "src/devices/cpu/z80/r800.cpp", GEN_DIR .. "emu/cpu/z80/r800.hxx" },
 	}
 
@@ -3584,8 +3632,26 @@ if CPUS["F2MC16"] then
 	files {
 		MAME_DIR .. "src/devices/cpu/f2mc16/f2mc16.cpp",
 		MAME_DIR .. "src/devices/cpu/f2mc16/f2mc16.h",
-		MAME_DIR .. "src/devices/cpu/f2mc16/mb9061x.cpp",
-		MAME_DIR .. "src/devices/cpu/f2mc16/mb9061x.h",
+		MAME_DIR .. "src/devices/cpu/f2mc16/f2mc16_adc.cpp",
+		MAME_DIR .. "src/devices/cpu/f2mc16/f2mc16_adc.h",
+		MAME_DIR .. "src/devices/cpu/f2mc16/f2mc16_clock.cpp",
+		MAME_DIR .. "src/devices/cpu/f2mc16/f2mc16_clock.h",
+		MAME_DIR .. "src/devices/cpu/f2mc16/f2mc16_intc.cpp",
+		MAME_DIR .. "src/devices/cpu/f2mc16/f2mc16_intc.h",
+		MAME_DIR .. "src/devices/cpu/f2mc16/f2mc16_port.cpp",
+		MAME_DIR .. "src/devices/cpu/f2mc16/f2mc16_port.h",
+		MAME_DIR .. "src/devices/cpu/f2mc16/f2mc16_ppg.cpp",
+		MAME_DIR .. "src/devices/cpu/f2mc16/f2mc16_ppg.h",
+		MAME_DIR .. "src/devices/cpu/f2mc16/f2mc16_reload.cpp",
+		MAME_DIR .. "src/devices/cpu/f2mc16/f2mc16_reload.h",
+		MAME_DIR .. "src/devices/cpu/f2mc16/f2mc16_uart.cpp",
+		MAME_DIR .. "src/devices/cpu/f2mc16/f2mc16_uart.h",
+		MAME_DIR .. "src/devices/cpu/f2mc16/mb90570.cpp",
+		MAME_DIR .. "src/devices/cpu/f2mc16/mb90570.h",
+		MAME_DIR .. "src/devices/cpu/f2mc16/mb90610a.cpp",
+		MAME_DIR .. "src/devices/cpu/f2mc16/mb90610a.h",
+		MAME_DIR .. "src/devices/cpu/f2mc16/mb90640a.cpp",
+		MAME_DIR .. "src/devices/cpu/f2mc16/mb90640a.h",
 	}
 end
 

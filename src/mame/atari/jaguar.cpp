@@ -1119,8 +1119,8 @@ void jaguar_state::console_base_map(address_map &map)
 	map(0xf03000, 0xf03fff).mirror(0x008000).rw(FUNC(jaguar_state::gpu_ram_r16), FUNC(jaguar_state::gpu_ram_w16));
 	map(0xf10000, 0xf103ff).rw(FUNC(jaguar_state::jerry_regs_r), FUNC(jaguar_state::jerry_regs_w)); // might be reversed endian of the others..
 	map(0xf14000, 0xf14003).rw(FUNC(jaguar_state::joystick_r16), FUNC(jaguar_state::joystick_w16));
-	map(0xf14800, 0xf14803).rw(FUNC(jaguar_state::eeprom_clk16), FUNC(jaguar_state::eeprom_w16));  // GPI00
-	map(0xf15000, 0xf15003).r(FUNC(jaguar_state::eeprom_cs16));               // GPI01
+	map(0xf14800, 0xf14803).rw(FUNC(jaguar_state::eeprom_clk16), FUNC(jaguar_state::eeprom_w16));  // GPIO0
+	map(0xf15000, 0xf15003).r(FUNC(jaguar_state::eeprom_cs16));               // GPIO1
 	map(0xf1a100, 0xf1a13f).rw(FUNC(jaguar_state::dspctrl_r16), FUNC(jaguar_state::dspctrl_w16));
 	map(0xf1a140, 0xf1a17f).rw(FUNC(jaguar_state::serial_r16), FUNC(jaguar_state::serial_w16));
 	map(0xf1b000, 0xf1cfff).rw(FUNC(jaguar_state::dsp_ram_r16), FUNC(jaguar_state::dsp_ram_w16));
@@ -1351,10 +1351,10 @@ void jaguar_state::r3000_map(address_map &map)
 	map(0x04f02200, 0x04f022ff).rw(FUNC(jaguar_state::blitter_r), FUNC(jaguar_state::blitter_w));
 	map(0x04f03000, 0x04f03fff).mirror(0x00008000).ram().share("gpuram");
 	map(0x04f10000, 0x04f103ff).rw(FUNC(jaguar_state::jerry_regs_r), FUNC(jaguar_state::jerry_regs_w));
-	map(0x04f16000, 0x04f1600b).r(FUNC(jaguar_state::cojag_gun_input_r)); // GPI02
-	map(0x04f17000, 0x04f17003).lr16(NAME([this] () { return uint16_t(m_system->read()); })); // GPI03
-	map(0x04f17800, 0x04f17803).w(FUNC(jaguar_state::latch_w));          // GPI04
-	map(0x04f17c00, 0x04f17c03).portr("P1_P2");      // GPI05
+	map(0x04f16000, 0x04f1600b).r(FUNC(jaguar_state::cojag_gun_input_r)); // GPIO2
+	map(0x04f17000, 0x04f17003).lr16(NAME([this] () { return uint16_t(m_system->read()); })); // GPIO3
+	map(0x04f17800, 0x04f17803).w(FUNC(jaguar_state::latch_w));          // GPIO4
+	map(0x04f17c00, 0x04f17c03).portr("P1_P2");      // GPIO5
 	map(0x04f1a100, 0x04f1a13f).rw(FUNC(jaguar_state::dspctrl_r), FUNC(jaguar_state::dspctrl_w));
 	map(0x04f1a140, 0x04f1a17f).rw(FUNC(jaguar_state::serial_r), FUNC(jaguar_state::serial_w));
 	map(0x04f1b000, 0x04f1cfff).ram().share("dspram");
@@ -1395,10 +1395,10 @@ void jaguar_state::m68020_map(address_map &map)
 	map(0xf02200, 0xf022ff).rw(FUNC(jaguar_state::blitter_r), FUNC(jaguar_state::blitter_w));
 	map(0xf03000, 0xf03fff).mirror(0x008000).ram().share("gpuram");
 	map(0xf10000, 0xf103ff).rw(FUNC(jaguar_state::jerry_regs_r), FUNC(jaguar_state::jerry_regs_w));
-	map(0xf16000, 0xf1600b).r(FUNC(jaguar_state::cojag_gun_input_r)); // GPI02
-	map(0xf17000, 0xf17003).lr16(NAME([this] () { return uint16_t(m_system->read()); })); // GPI03
-//  map(0xf17800, 0xf17803).w(FUNC(jaguar_state::(latch_w));          // GPI04
-	map(0xf17c00, 0xf17c03).portr("P1_P2");      // GPI05
+	map(0xf16000, 0xf1600b).r(FUNC(jaguar_state::cojag_gun_input_r)); // GPIO2
+	map(0xf17000, 0xf17003).lr16(NAME([this] () { return uint16_t(m_system->read()); })); // GPIO3
+//  map(0xf17800, 0xf17803).w(FUNC(jaguar_state::(latch_w));          // GPIO4
+	map(0xf17c00, 0xf17c03).portr("P1_P2");      // GPIO5
 	map(0xf1a100, 0xf1a13f).rw(FUNC(jaguar_state::dspctrl_r), FUNC(jaguar_state::dspctrl_w));
 	map(0xf1a140, 0xf1a17f).rw(FUNC(jaguar_state::serial_r), FUNC(jaguar_state::serial_w));
 	map(0xf1b000, 0xf1cfff).ram().share("dspram");

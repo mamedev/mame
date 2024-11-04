@@ -16,7 +16,7 @@ public:
 	auto irq_handler_cb() { return m_irq_handler.bind(); }
 	auto drq_handler_cb() { return m_drq_handler.bind(); }
 
-	virtual void map(address_map &map);
+	virtual void map(address_map &map) ATTR_COLD;
 
 	uint8_t tcounter_lo_r();
 	void tcount_lo_w(uint8_t data);
@@ -50,8 +50,8 @@ public:
 protected:
 	ncr53c90_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	TIMER_CALLBACK_MEMBER(update_tick);
 
@@ -242,7 +242,7 @@ class ncr53c90a_device : public ncr53c90_device
 public:
 	ncr53c90a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual void map(address_map &map) override;
+	virtual void map(address_map &map) override ATTR_COLD;
 
 	virtual uint8_t status_r() override;
 
@@ -255,8 +255,8 @@ public:
 protected:
 	ncr53c90a_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	virtual bool check_valid_command(uint8_t cmd) override;
 
@@ -295,7 +295,7 @@ public:
 	};
 	void set_busmd(busmd_t const busmd) { m_busmd = busmd; }
 
-	virtual void map(address_map &map) override;
+	virtual void map(address_map &map) override ATTR_COLD;
 
 	uint8_t conf3_r() { return config3; }
 	void conf3_w(uint8_t data) { config3 = data; }
@@ -321,8 +321,8 @@ protected:
 		LBTM = 0x04, // last byte transfer mode
 	};
 
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 	virtual void check_drq() override;
 
 private:
@@ -342,7 +342,7 @@ class ncr53cf94_device : public ncr53c94_device
 public:
 	ncr53cf94_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual void map(address_map &map) override;
+	virtual void map(address_map &map) override ATTR_COLD;
 
 	virtual void conf2_w(uint8_t data) override;
 
@@ -358,8 +358,8 @@ public:
 protected:
 	ncr53cf94_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 private:
 	u8 config4;

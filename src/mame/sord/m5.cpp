@@ -351,8 +351,8 @@ protected:
 	u8 sts_r();
 	void com_w(u8 data);
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	u8 ppi_pa_r();
@@ -378,10 +378,10 @@ private:
 	void mem64KBF_w(u8 data);
 	void mem64KRX_w(offs_t offset, u8 data);
 
-	void fd5_io(address_map &map);
-	void fd5_mem(address_map &map);
-	void m5_io(address_map &map);
-	void m5_mem(address_map &map);
+	void fd5_io(address_map &map) ATTR_COLD;
+	void fd5_mem(address_map &map) ATTR_COLD;
+	void m5_io(address_map &map) ATTR_COLD;
+	void m5_mem(address_map &map) ATTR_COLD;
 
 private:
 	u8 m_ram_mode = 0;
@@ -412,8 +412,8 @@ public:
 	void brno(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	u8 ramdisk_r(offs_t offset);
@@ -427,8 +427,8 @@ private:
 
 	DECLARE_SNAPSHOT_LOAD_MEMBER(brno);
 
-	void brno_io(address_map &map);
-	void m5_mem_brno(address_map &map);
+	void brno_io(address_map &map) ATTR_COLD;
+	void m5_mem_brno(address_map &map) ATTR_COLD;
 
 	memory_view m_rom_view;
 	memory_view m_ram_view;

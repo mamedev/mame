@@ -116,9 +116,9 @@ private:
 	required_device<pentium2_device> m_maincpu;
 	required_device<voodoo_banshee_pci_device> m_voodoo;
 
-	void ga6la7_map(address_map &map);
-	void ga6la7_io(address_map &map);
-	void quake_map(address_map &map);
+	void ga6la7_map(address_map &map) ATTR_COLD;
+	void ga6la7_io(address_map &map) ATTR_COLD;
+	void quake_map(address_map &map) ATTR_COLD;
 
 	static void winbond_superio_config(device_t *device);
 };

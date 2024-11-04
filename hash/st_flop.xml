@@ -2321,7 +2321,7 @@ Keeps attempting to bootstrap with no success (cycles between white and black sc
 
 	<software name="herolanc" supported="no">
 		<!-- SPS (CAPS) release 3133 -->
-		<description>Heroes of the Lance (Europe)</description>
+		<description>Advanced Dungeons &amp; Dragons - Heroes of the Lance (Europe)</description>
 		<year>1988</year>
 		<publisher>U.S. Gold</publisher>
 		<sharedfeat name="compatibility" value="PAL"/>

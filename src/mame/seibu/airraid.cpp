@@ -191,10 +191,10 @@ private:
 	void bank_w(uint8_t data);
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline);
 
-	void main_map(address_map &map);
-	void sound_decrypted_opcodes_map(address_map &map);
-	void sound_map(address_map &map);
-	void decrypted_opcodes_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
+	void sound_decrypted_opcodes_map(address_map &map) ATTR_COLD;
+	void sound_map(address_map &map) ATTR_COLD;
+	void decrypted_opcodes_map(address_map &map) ATTR_COLD;
 };
 
 

@@ -63,8 +63,8 @@ public:
 	void init_pastelis();
 
 protected:
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 	void irq_ack_w(offs_t offset, uint16_t data);
 	void irq_enable_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
@@ -102,24 +102,24 @@ protected:
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void enable_video(bool enable);
 
-	void cairblad_map(address_map &map);
-	void hypreac2_map(address_map &map);
-	void hypreact_map(address_map &map);
-	void janjans1_map(address_map &map);
-	void jsk_map(address_map &map);
-	void jsk_v810_mem(address_map &map);
-	void keithlcy_map(address_map &map);
-	void meosism_map(address_map &map);
-	void mslider_map(address_map &map);
-	void ryorioh_map(address_map &map);
-	void srmp4_map(address_map &map);
-	void srmp7_map(address_map &map);
-	void srmp7_es5506_bank2_map(address_map &map);
-	void srmp7_es5506_bank3_map(address_map &map);
-	void survarts_map(address_map &map);
-	void ultrax_map(address_map &map);
+	void cairblad_map(address_map &map) ATTR_COLD;
+	void hypreac2_map(address_map &map) ATTR_COLD;
+	void hypreact_map(address_map &map) ATTR_COLD;
+	void janjans1_map(address_map &map) ATTR_COLD;
+	void jsk_map(address_map &map) ATTR_COLD;
+	void jsk_v810_mem(address_map &map) ATTR_COLD;
+	void keithlcy_map(address_map &map) ATTR_COLD;
+	void meosism_map(address_map &map) ATTR_COLD;
+	void mslider_map(address_map &map) ATTR_COLD;
+	void ryorioh_map(address_map &map) ATTR_COLD;
+	void srmp4_map(address_map &map) ATTR_COLD;
+	void srmp7_map(address_map &map) ATTR_COLD;
+	void srmp7_es5506_bank2_map(address_map &map) ATTR_COLD;
+	void srmp7_es5506_bank3_map(address_map &map) ATTR_COLD;
+	void survarts_map(address_map &map) ATTR_COLD;
+	void ultrax_map(address_map &map) ATTR_COLD;
 
-	void ssv_map(address_map &map, u32 rom);
+	void ssv_map(address_map &map, u32 rom) ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<es5506_device> m_ensoniq;
@@ -167,10 +167,10 @@ private:
 	void dsp_w(offs_t offset, uint16_t data);
 	uint16_t drifto94_unknown_r();
 
-	void drifto94_map(address_map &map);
-	void dsp_data_map(address_map &map);
-	void dsp_prg_map(address_map &map);
-	void twineag2_map(address_map &map);
+	void drifto94_map(address_map &map) ATTR_COLD;
+	void dsp_data_map(address_map &map) ATTR_COLD;
+	void dsp_prg_map(address_map &map) ATTR_COLD;
+	void twineag2_map(address_map &map) ATTR_COLD;
 
 	required_device<upd96050_device> m_dsp;
 };
@@ -190,7 +190,7 @@ public:
 	void gdfs(machine_config &config);
 
 protected:
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	void adc_int_w(int state);
@@ -198,7 +198,7 @@ private:
 	uint16_t eeprom_r();
 	void eeprom_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
-	void gdfs_map(address_map &map);
+	void gdfs_map(address_map &map) ATTR_COLD;
 
 	TILE_GET_INFO_MEMBER(get_tile_info);
 	void tmapram_w(offs_t offset, uint16_t data, uint16_t mem_mask);
@@ -227,7 +227,7 @@ public:
 	void init_eaglshot();
 
 protected:
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	void gfxrom_bank_w(uint8_t data);
@@ -235,7 +235,7 @@ private:
 	uint16_t gfxram_r(offs_t offset, uint16_t mem_mask);
 	void gfxram_w(offs_t offset, uint16_t data, uint16_t mem_mask);
 
-	void eaglshot_map(address_map &map);
+	void eaglshot_map(address_map &map) ATTR_COLD;
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
@@ -265,7 +265,7 @@ private:
 	void dial_w(uint8_t data);
 	void motor_w(uint16_t data);
 
-	void sxyreact_map(address_map &map);
+	void sxyreact_map(address_map &map) ATTR_COLD;
 
 	required_device<upd7001_device> m_sxyreact_adc;
 	required_ioport m_io_service;

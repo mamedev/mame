@@ -144,7 +144,7 @@ public:
 	void common(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_subcpu;
@@ -156,9 +156,9 @@ protected:
 	void nmi_mask_w(int state);
 	INTERRUPT_GEN_MEMBER(vblank_irq);
 
-	void cpu2_map(address_map &map);
-	void cpu2_port_map(address_map &map);
-	void main_port_map(address_map &map);
+	void cpu2_map(address_map &map) ATTR_COLD;
+	void cpu2_port_map(address_map &map) ATTR_COLD;
+	void main_port_map(address_map &map) ATTR_COLD;
 };
 
 class vastar_state : public vastar_common_state
@@ -172,12 +172,12 @@ public:
 	void vastar(machine_config &config);
 
 protected:
-	virtual void machine_reset() override;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	required_device<vastar_video_device> m_vasvid;
 
-	void main_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
 };
 
 class dogfightp_state : public vastar_common_state
@@ -190,7 +190,7 @@ public:
 	void dogfightp(machine_config &config);
 
 private:
-	void main_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
 };
 
 

@@ -59,7 +59,7 @@ private:
 	required_device<hc259_device> m_outlatch;
 	required_ioport m_keys;
 
-	void main_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
 
 	void led_w(u8 data);
 	u8 input_r();
@@ -139,7 +139,7 @@ void academy_state::academy(machine_config &config)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	HC259(config, m_outlatch); // SN74HC259N
-	m_outlatch->parallel_out_cb().set("display:dac", FUNC(speaker_sound_device::level_w)).rshift(2).mask(0x03);
+	m_outlatch->parallel_out_cb().set("display:dac", FUNC(dac_2bit_ones_complement_device::write)).rshift(2).mask(0x03);
 
 	MEPHISTO_SENSORS_BOARD(config, "board"); // internal
 	MEPHISTO_DISPLAY_MODULE2(config, "display"); // internal

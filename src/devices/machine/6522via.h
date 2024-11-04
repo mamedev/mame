@@ -84,7 +84,7 @@ public:
 	auto cb2_handler() { return m_cb2_handler.bind(); }
 	auto irq_handler() { return m_irq_handler.bind(); }
 
-	void map(address_map &map);
+	void map(address_map &map) ATTR_COLD;
 
 	u8 read(offs_t offset);
 	void write(offs_t offset, u8 data);
@@ -121,8 +121,8 @@ protected:
 	via6522_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	TIMER_CALLBACK_MEMBER(shift_irq_tick);
 	TIMER_CALLBACK_MEMBER(shift_tick);

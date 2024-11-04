@@ -16,18 +16,18 @@ public:
 	static constexpr feature_type unemulated_features() { return feature::MEDIA; }
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
-//  virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+//  virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 //  virtual void reset_all_mappings() override;
 
 	virtual void map_extra(uint64_t memory_window_start, uint64_t memory_window_end, uint64_t memory_offset, address_space *memory_space,
 						   uint64_t io_window_start, uint64_t io_window_end, uint64_t io_offset, address_space *io_space) override;
 
-	virtual void config_map(address_map &map) override;
+	virtual void config_map(address_map &map) override ATTR_COLD;
 
-	void map(address_map &map);
+	void map(address_map &map) ATTR_COLD;
 
 private:
 	u8 m_downstream_ports;

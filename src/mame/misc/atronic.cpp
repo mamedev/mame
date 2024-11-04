@@ -468,12 +468,12 @@ private:
 	u8 serial_r();
 	void serial_w(u8 data);
 
-	void atronic_map(address_map &map);
-	void atronic_portmap(address_map &map);
+	void atronic_map(address_map &map) ATTR_COLD;
+	void atronic_portmap(address_map &map) ATTR_COLD;
 
-	void video_map(address_map& map);
+	void video_map(address_map &map) ATTR_COLD;
 
-	void ramdac_map(address_map& map);
+	void ramdac_map(address_map &map) ATTR_COLD;
 
 	// devices
 	required_device<screen_device> m_screen;

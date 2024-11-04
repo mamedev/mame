@@ -9,6 +9,8 @@
 ****************************************************************************/
 
 #include "emu.h"
+#include "tim011_kbd.h"
+
 #include "cpu/z180/z180.h"
 #include "imagedev/floppy.h"
 #include "formats/tim011_dsk.h"
@@ -19,8 +21,6 @@
 #include "emupal.h"
 #include "screen.h"
 
-#define FDC9266_TAG "u43"
-
 namespace {
 
 class tim011_state : public driver_device
@@ -29,8 +29,8 @@ public:
 	tim011_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
-		, m_fdc(*this, FDC9266_TAG)
-		, m_floppy(*this, FDC9266_TAG ":%u", 0)
+		, m_fdc(*this, "fdc")
+		, m_floppy(*this, "fdc:%u", 0)
 		, m_vram(*this, "videoram")
 		, m_palette(*this, "palette")
 		, m_exp(*this, "exp")
@@ -39,7 +39,7 @@ public:
 	void tim011(machine_config &config);
 
 private:
-	virtual void machine_reset() override;
+	virtual void machine_reset() override ATTR_COLD;
 	uint32_t screen_update_tim011(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void print_w(uint8_t data);
 	void scroll_w(uint8_t data);
@@ -54,8 +54,8 @@ private:
 	required_device<palette_device> m_palette;
 	required_device<bus::tim011::exp_slot_device> m_exp;
 
-	void tim011_io(address_map &map);
-	void tim011_mem(address_map &map);
+	void tim011_io(address_map &map) ATTR_COLD;
+	void tim011_mem(address_map &map) ATTR_COLD;
 	void tim011_palette(palette_device &palette) const;
 };
 
@@ -142,14 +142,6 @@ static void tim011_floppy_formats(format_registration &fr)
 	fr.add(FLOPPY_TIM011_FORMAT);
 }
 
-static DEVICE_INPUT_DEFAULTS_START( keyboard )
-	DEVICE_INPUT_DEFAULTS( "RS232_RXBAUD", 0xff, RS232_BAUD_9600 )
-	DEVICE_INPUT_DEFAULTS( "RS232_TXBAUD", 0xff, RS232_BAUD_9600 )
-	DEVICE_INPUT_DEFAULTS( "RS232_DATABITS", 0xff, RS232_DATABITS_8 )
-	DEVICE_INPUT_DEFAULTS( "RS232_PARITY", 0xff, RS232_PARITY_ODD )
-	DEVICE_INPUT_DEFAULTS( "RS232_STOPBITS", 0xff, RS232_STOPBITS_1 )
-DEVICE_INPUT_DEFAULTS_END
-
 void tim011_state::tim011_palette(palette_device &palette) const
 {
 	static constexpr rgb_t tim011_pens[4] = {
@@ -165,39 +157,39 @@ void tim011_state::tim011_palette(palette_device &palette) const
 void tim011_state::tim011(machine_config &config)
 {
 	/* basic machine hardware */
-	HD64180RP(config, m_maincpu, XTAL(12'288'000)); // location U17 HD64180
+	HD64180RP(config, m_maincpu, 12.288_MHz_XTAL); // location U17 HD64180
 	m_maincpu->set_addrmap(AS_PROGRAM, &tim011_state::tim011_mem);
 	m_maincpu->set_addrmap(AS_IO, &tim011_state::tim011_io);
 	m_maincpu->tend1_wr_callback().set(m_fdc, FUNC(upd765a_device::tc_line_w));
-	m_maincpu->txa1_wr_callback().set("rs232", FUNC(rs232_port_device::write_txd));
+	m_maincpu->txa0_wr_callback().set("rs232", FUNC(rs232_port_device::write_txd));
+	m_maincpu->rts0_wr_callback().set("rs232", FUNC(rs232_port_device::write_rts));
+	m_maincpu->rts0_wr_callback().append("rs232", FUNC(rs232_port_device::write_dtr));
+	m_maincpu->txa1_wr_callback().set("keyboard", FUNC(tim011_keyboard_device::write_rxd));
 
-//  CDP1802(config, "keyboard", XTAL(1'750'000)); // CDP1802, unknown clock
+	TIM011_KEYBOARD(config, "keyboard").txd_callback().set(m_maincpu, FUNC(z180_device::rxa1_w));
 
 	// FDC9266 location U43
-	UPD765A(config, m_fdc, XTAL(8'000'000), true, true);
+	UPD765A(config, m_fdc, 8_MHz_XTAL, true, true);
 	m_fdc->intrq_wr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ2);
 	m_fdc->drq_wr_callback().set_inputline(m_maincpu, Z180_INPUT_LINE_DREQ1);
 
 	/* floppy drives */
-	FLOPPY_CONNECTOR(config, m_floppy[0], tim011_floppies, "35dd",  tim011_floppy_formats);
-	FLOPPY_CONNECTOR(config, m_floppy[1], tim011_floppies, nullptr, tim011_floppy_formats);
-	FLOPPY_CONNECTOR(config, m_floppy[2], tim011_floppies, nullptr, tim011_floppy_formats);
-	FLOPPY_CONNECTOR(config, m_floppy[3], tim011_floppies, nullptr, tim011_floppy_formats);
+	FLOPPY_CONNECTOR(config, m_floppy[0], tim011_floppies, "35dd",  tim011_floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, m_floppy[1], tim011_floppies, nullptr, tim011_floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, m_floppy[2], tim011_floppies, nullptr, tim011_floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, m_floppy[3], tim011_floppies, nullptr, tim011_floppy_formats).enable_sound(true);
 
 	/* video hardware */
 	PALETTE(config, m_palette, FUNC(tim011_state::tim011_palette), 4);
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(50);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
-	screen.set_size(512, 256);
-	screen.set_visarea(0, 512-1, 0, 256-1);
+	screen.set_raw(12.288_MHz_XTAL, 768, 0, 512, 320, 0, 256);
 	screen.set_screen_update(FUNC(tim011_state::screen_update_tim011));
 	screen.set_palette(m_palette);
 
-	rs232_port_device &rs232(RS232_PORT(config, "rs232", default_rs232_devices, "keyboard"));
-	rs232.set_option_device_input_defaults("keyboard", DEVICE_INPUT_DEFAULTS_NAME(keyboard));
-	rs232.rxd_handler().set(m_maincpu, FUNC(z180_device::rxa1_w));
+	rs232_port_device &rs232(RS232_PORT(config, "rs232", default_rs232_devices, nullptr));
+	rs232.rxd_handler().set(m_maincpu, FUNC(z180_device::rxa0_w));
+	rs232.cts_handler().set(m_maincpu, FUNC(z180_device::cts0_w));
 
 	TIM011_EXPANSION_SLOT(config, m_exp, tim011_exp_devices, nullptr);
 	m_exp->set_io_space(m_maincpu, AS_IO);
@@ -207,8 +199,6 @@ void tim011_state::tim011(machine_config &config)
 ROM_START( tim011 )
 	ROM_REGION( 0x2000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD( "sys_tim011.u16", 0x0000, 0x2000, CRC(5b4f1300) SHA1(d324991c4292d7dcde8b8d183a57458be8a2be7b))
-	ROM_REGION( 0x1000, "keyboard", ROMREGION_ERASEFF )
-	ROM_LOAD( "keyb_tim011.bin", 0x0000, 0x1000, CRC(a99c40a6) SHA1(d6d505271d91df4e079ec3c0a4abbe75ae9d649b))
 ROM_END
 
 } // Anonymous namespace
@@ -216,4 +206,4 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT        COMPANY                    FULLNAME   FLAGS */
-COMP( 1987, tim011, 0,      0,      tim011,  tim011, tim011_state, empty_init, "Mihajlo Pupin Institute", "TIM-011", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+COMP( 1987, tim011, 0,      0,      tim011,  tim011, tim011_state, empty_init, "Mihajlo Pupin Institute", "TIM-011", MACHINE_NOT_WORKING)

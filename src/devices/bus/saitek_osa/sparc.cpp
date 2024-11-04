@@ -55,11 +55,11 @@ public:
 	virtual void ack_w(int state) override;
 
 protected:
-	virtual const tiny_rom_entry *device_rom_region() const override;
-	virtual ioport_constructor device_input_ports() const override;
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 private:
 	required_device<mb86930_device> m_maincpu;
@@ -71,7 +71,7 @@ private:
 	u32 m_ram_mask = 0;
 	bool m_installed = false;
 
-	void debugger_map(address_map &map);
+	void debugger_map(address_map &map) ATTR_COLD;
 
 	u32 rom_r(offs_t offset, u32 mem_mask) { return m_rom[offset & m_rom_mask]; }
 	u32 ram_r(offs_t offset, u32 mem_mask) { return m_ram[offset & m_ram_mask]; }

@@ -281,10 +281,10 @@ public:
 
 	static void cr589_config(device_t *device);
 
-	void m2_map(address_map &map);
+	void m2_map(address_map &map) ATTR_COLD;
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 public:
 	void ppc1_int(int state);
@@ -727,7 +727,7 @@ static INPUT_PORTS_START( konamim2 )
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
+	PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", FUNC(eeprom_serial_93cxx_device::do_read))
 	PORT_BIT( 0x2000, IP_ACTIVE_HIGH, IPT_UNUSED ) // ATAPI?
 	PORT_BIT( 0xDE00, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END

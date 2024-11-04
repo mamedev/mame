@@ -66,9 +66,9 @@ public:
 	void _3x3puzzle(machine_config &config);
 
 protected:
-	virtual void video_start() override;
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void video_start() override ATTR_COLD;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	// memory pointers
@@ -97,7 +97,7 @@ private:
 	void tilemap1_scrollx_w(uint16_t data);
 	void tilemap1_scrolly_w(uint16_t data);
 
-	void _3x3puzzle_map(address_map &map);
+	void _3x3puzzle_map(address_map &map) ATTR_COLD;
 };
 
 

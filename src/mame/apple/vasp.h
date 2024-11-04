@@ -6,6 +6,8 @@
 
 #pragma once
 
+#include "pseudovia.h"
+
 #include "machine/6522via.h"
 #include "sound/asc.h"
 #include "emupal.h"
@@ -32,7 +34,7 @@ public:
 	auto hdsel_callback() { return write_hdsel.bind(); }
 	auto pb3_callback() { return read_pb3.bind(); }
 
-	void map(address_map &map);
+	void map(address_map &map) ATTR_COLD;
 
 	template <typename... T> void set_maincpu_tag(T &&... args) { m_maincpu.set_tag(std::forward<T>(args)...); }
 	template <typename... T> void set_rom_tag(T &&... args) { m_rom.set_tag(std::forward<T>(args)...); }
@@ -40,7 +42,6 @@ public:
 
 	void cb1_w(int state);
 	void cb2_w(int state);
-	void vbl_w(int state);
 	void scc_irq_w(int state);
 	void slot0_irq_w(int state);
 	void slot1_irq_w(int state);
@@ -48,10 +49,10 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual ioport_constructor device_input_ports() const override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 
 	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
 
@@ -64,6 +65,7 @@ private:
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 	required_device<via6522_device> m_via1;
+	required_device<pseudovia_device> m_pseudovia;
 	required_device<asc_device> m_asc;
 	required_region_ptr<u32> m_rom;
 
@@ -71,17 +73,16 @@ private:
 	sound_stream *m_stream;
 	emu_timer *m_6015_timer;
 	int m_via_interrupt, m_via2_interrupt, m_scc_interrupt, m_last_taken_interrupt;
-	u8 m_pseudovia_regs[256], m_pseudovia_ier, m_pseudovia_ifr;
 	u8 m_pal_address, m_pal_idx, m_pal_control, m_pal_colkey;
 	bool m_overlay;
 	u32 *m_ram_ptr, *m_rom_ptr;
 	u32 m_ram_size, m_rom_size;
+	u8 m_video_config;
 
 	u32 rom_switch_r(offs_t offset);
 
-	uint8_t pseudovia_r(offs_t offset);
-	void pseudovia_w(offs_t offset, uint8_t data);
-	void pseudovia_recalc_irqs();
+	u8 via2_video_config_r();
+	void via2_video_config_w(u8 data);
 
 	uint16_t mac_via_r(offs_t offset);
 	void mac_via_w(offs_t offset, uint16_t data, uint16_t mem_mask);

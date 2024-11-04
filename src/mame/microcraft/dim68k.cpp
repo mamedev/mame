@@ -101,13 +101,13 @@ private:
 
 	void fdc_irq_w(int state);
 
-	void mem_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
 
 	bool m_speaker_bit = 0;
 	u8 m_video_control = 0U;
 	u8 m_fdc_irq = 0U;
-	void machine_reset() override;
-	void machine_start() override;
+	void machine_reset() override ATTR_COLD;
+	void machine_start() override ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<mc6845_device> m_crtc;

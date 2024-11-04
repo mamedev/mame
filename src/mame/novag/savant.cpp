@@ -64,8 +64,8 @@ public:
 	void savant(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	// devices/pointers
@@ -87,10 +87,10 @@ private:
 	u64 m_lcd_data = 0;
 
 	// address maps
-	void main_map(address_map &map);
-	void main_io(address_map &map);
-	void mcu_map(address_map &map);
-	void mcu_io(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
+	void main_io(address_map &map) ATTR_COLD;
+	void mcu_map(address_map &map) ATTR_COLD;
+	void mcu_io(address_map &map) ATTR_COLD;
 
 	// I/O handlers
 	void nvram_w(offs_t offset, u8 data);
@@ -434,5 +434,5 @@ ROM_END
 *******************************************************************************/
 
 //    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT        COMPANY, FULLNAME, FLAGS
-SYST( 1981, savant,  0,      0,      savant,  savant, savant_state, empty_init, "Novag Industries", "Savant", MACHINE_SUPPORTS_SAVE )
-SYST( 1982, savant2, savant, 0,      savant,  savant, savant_state, empty_init, "Novag Industries", "Savant II", MACHINE_SUPPORTS_SAVE )
+SYST( 1981, savant,  0,      0,      savant,  savant, savant_state, empty_init, "Novag Industries / Intelligent Heuristic Programming", "Savant", MACHINE_SUPPORTS_SAVE )
+SYST( 1982, savant2, savant, 0,      savant,  savant, savant_state, empty_init, "Novag Industries / Intelligent Heuristic Programming", "Savant II", MACHINE_SUPPORTS_SAVE )

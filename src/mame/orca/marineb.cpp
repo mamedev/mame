@@ -78,9 +78,9 @@ public:
 	void changes(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	required_shared_ptr<uint8_t> m_videoram;
@@ -128,14 +128,14 @@ private:
 	void nmi_mask_w(int state);
 	uint8_t system_watchdog_r();
 	void marineb_vblank_irq(int state);
-	void marineb_map(address_map &map);
-	void marineb_io_map(address_map &map);
+	void marineb_map(address_map &map) ATTR_COLD;
+	void marineb_io_map(address_map &map) ATTR_COLD;
 
 	// wanted, bcruzm12
 	void irq_mask_w(int state);
 	void wanted_vblank_irq(int state);
-	void wanted_map(address_map &map);
-	void wanted_io_map(address_map &map);
+	void wanted_map(address_map &map) ATTR_COLD;
+	void wanted_io_map(address_map &map) ATTR_COLD;
 };
 
 

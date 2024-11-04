@@ -19,7 +19,7 @@ public:
 	{ }
 
 	void digimake(machine_config &config);
-	void mem_map_digi(address_map& map);
+	void mem_map_digi(address_map &map) ATTR_COLD;
 
 private:
 	virtual void portc_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0) override;

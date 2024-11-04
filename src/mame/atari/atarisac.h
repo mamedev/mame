@@ -39,10 +39,10 @@ public:
 
 protected:
 	// device level overrides
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual ioport_constructor device_input_ports() const override;
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// internal helpers
 	virtual void update_all_volumes() override;
@@ -59,8 +59,8 @@ private:
 	INTERRUPT_GEN_MEMBER(int_10k_gen);
 
 	// address maps
-	void sac_6502_map(address_map &map);
-	void sac_68k_map(address_map &map);
+	void sac_6502_map(address_map &map) ATTR_COLD;
+	void sac_68k_map(address_map &map) ATTR_COLD;
 
 	// devices
 	required_device<cpu_device> m_daccpu;

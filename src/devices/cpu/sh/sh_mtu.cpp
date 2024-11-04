@@ -216,7 +216,7 @@ void sh_mtu_channel_device::device_reset()
 	m_last_clock_update = 0;
 	m_event_time = 0;
 	m_phase = 0;
-	m_counter_cycle = 0;
+	m_counter_cycle = 1;
 	m_counter_incrementing = true;
 }
 
@@ -316,6 +316,7 @@ u8 sh_mtu_channel_device::tier_r()
 
 void sh_mtu_channel_device::tier_w(u8 data)
 {
+	update_counter();
 	m_tier = data;
 	if(0)
 		logerror("irq %c%c%c%c%c%c\n",
@@ -419,7 +420,7 @@ void sh_mtu_channel_device::recalc_event(u64 cur_time)
 	}
 
 	if(!cur_time)
-		cur_time = m_cpu->total_cycles();
+		cur_time = m_cpu->current_cycles();
 
 	if(m_counter_incrementing) {
 		u32 event_delay = 0xffffffff;
@@ -466,7 +467,7 @@ void sh_mtu_channel_device::update_counter(u64 cur_time)
 		return;
 
 	if(!cur_time)
-		cur_time = m_cpu->total_cycles();
+		cur_time = m_cpu->current_cycles();
 
 	if(!m_channel_active) {
 		m_last_clock_update = cur_time;

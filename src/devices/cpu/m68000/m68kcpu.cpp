@@ -901,7 +901,7 @@ void m68000_musashi_device::execute_run()
 
 			try
 			{
-			if (!m_instruction_restart)
+			if (!m_can_instruction_restart)
 			{
 				m_run_mode = RUN_MODE_NORMAL;
 				/* Read an instruction and call its handler */
@@ -1038,7 +1038,7 @@ void m68000_musashi_device::init_cpu_common(void)
 	m_pmmu_enabled     = false;
 	m_hmmu_enabled     = 0;
 	m_emmu_enabled     = false;
-	m_instruction_restart = false;
+	m_can_instruction_restart = false;
 
 	/* The first call to this function initializes the opcode handler jump table */
 	if(!emulation_initialized)
@@ -1073,7 +1073,7 @@ void m68000_musashi_device::init_cpu_common(void)
 	save_item(NAME(m_pmmu_enabled));
 	save_item(NAME(m_hmmu_enabled));
 	save_item(NAME(m_emmu_enabled));
-	save_item(NAME(m_instruction_restart));
+	save_item(NAME(m_can_instruction_restart));
 	save_item(NAME(m_restart_instruction));
 
 	save_item(NAME(m_mmu_crp_aptr));
@@ -1112,7 +1112,7 @@ void m68000_musashi_device::device_reset()
 	m_pmmu_enabled = false;
 	m_hmmu_enabled = 0;
 	m_emmu_enabled = false;
-	m_instruction_restart = false;
+	m_can_instruction_restart = false;
 
 	m_mmu_tc = 0;
 	m_mmu_tt0 = 0;
@@ -1316,7 +1316,7 @@ void m68000_musashi_device::set_hmmu_enable(int enable)
 void m68000_musashi_device::set_emmu_enable(bool enable)
 {
 	m_emmu_enabled = enable;
-	m_instruction_restart = m_pmmu_enabled || m_emmu_enabled;
+	m_can_instruction_restart = m_pmmu_enabled || m_emmu_enabled;
 }
 
 void m68000_musashi_device::set_fpu_enable(bool enable)
@@ -1602,6 +1602,238 @@ void m68000_musashi_device::init32mmu(address_space &space, address_space &ospac
 	};
 }
 
+/* interface for 32-bit data bus without byte smearing 68040) */
+void m68000_musashi_device::init32_no_smear(address_space &space, address_space &ospace)
+{
+	m_space = &space;
+	m_ospace = &ospace;
+	ospace.cache(m_oprogram32);
+	space.specific(m_program32);
+
+	m_readimm16 = [this](offs_t address) -> u16
+	{ return m_oprogram32.read_word(address); };
+	m_read8 = [this](offs_t address) -> u8
+	{ return m_program32.read_byte(address); };
+	m_read16 = [this](offs_t address) -> u16
+	{ return m_program32.read_word_unaligned(address); };
+	m_read32 = [this](offs_t address) -> u32
+	{ return m_program32.read_dword_unaligned(address); };
+	m_write8 = [this](offs_t address, u8 data)
+	{ return m_program32.write_byte(address, data); };
+	m_write16 = [this](offs_t address, u16 data)
+	{
+		if (address & 1)
+		{
+			m_program32.write_byte(address, data >> 8);
+			m_program32.write_byte(address + 1, data & 0xff);
+		}
+		else
+		{
+			m_program32.write_word(address, data);
+		}
+		return;
+	};
+	m_write32 = [this](offs_t address, u32 data)
+	{
+		switch (address & 3)
+		{
+		case 0:
+			m_program32.write_dword(address, data, 0xffffffffU);
+			break;
+
+		case 1:
+			m_program32.write_dword(address - 1, (data & 0xff000000U) | (data & 0xffffff00U) >> 8, 0x00ffffff);
+			m_program32.write_dword(address + 3, dword_from_byte(data & 0x000000ff), 0xff000000U);
+			break;
+
+		case 2:
+			m_program32.write_dword(address - 2, dword_from_word((data & 0xffff0000U) >> 16), 0x0000ffff);
+			m_program32.write_dword(address + 2, dword_from_word(data & 0x0000ffff), 0xffff0000U);
+			break;
+
+		case 3:
+			m_program32.write_dword(address - 3, dword_from_unaligned_word((data & 0xffff0000U) >> 16), 0x000000ff);
+			m_program32.write_dword(address + 1, rotl_32(data, 8), 0xffffff00U);
+			break;
+		}
+	};
+}
+
+/* interface for 32-bit data bus with PMMU without byte smearing (68040)*/
+void m68000_musashi_device::init32mmu_no_smear(address_space &space, address_space &ospace)
+{
+	m_space = &space;
+	m_ospace = &ospace;
+	ospace.cache(m_oprogram32);
+	space.specific(m_program32);
+
+	m_readimm16 = [this](offs_t address) -> u16
+	{
+		if (m_pmmu_enabled)
+		{
+			address = pmmu_translate_addr(address, 1);
+			if (m_mmu_tmp_buserror_occurred)
+				return ~0;
+		}
+
+		return m_oprogram32.read_word(address);
+	};
+
+	m_read8 = [this](offs_t address) -> u8
+	{
+		if (m_pmmu_enabled)
+		{
+			address = pmmu_translate_addr(address, 1);
+			if (m_mmu_tmp_buserror_occurred)
+				return ~0;
+		}
+		return m_program32.read_byte(address);
+	};
+
+	m_read16 = [this](offs_t address) -> u16
+	{
+		if (m_pmmu_enabled)
+		{
+			u32 address0 = pmmu_translate_addr(address, 1);
+			if (m_mmu_tmp_buserror_occurred)
+				return ~0;
+			if (WORD_ALIGNED(address))
+				return m_program32.read_word(address0);
+			u32 address1 = pmmu_translate_addr(address + 1, 1);
+			if (m_mmu_tmp_buserror_occurred)
+				return ~0;
+			u16 result = m_program32.read_byte(address0) << 8;
+			return result | m_program32.read_byte(address1);
+		}
+		return m_program32.read_word_unaligned(address);
+	};
+
+	m_read32 = [this](offs_t address) -> u32
+	{
+		if (m_pmmu_enabled)
+		{
+			u32 address0 = pmmu_translate_addr(address, 1);
+			if (m_mmu_tmp_buserror_occurred)
+				return ~0;
+			if ((address + 3) & 0xfc)
+				// not at page boundary; use default code
+				address = address0;
+			else if (DWORD_ALIGNED(address)) // 0
+				return m_program32.read_dword(address0);
+			else
+			{
+				u32 address2 = pmmu_translate_addr(address + 2, 1);
+				if (m_mmu_tmp_buserror_occurred)
+					return ~0;
+				if (WORD_ALIGNED(address))
+				{ // 2
+					u32 result = m_program32.read_word(address0) << 16;
+					return result | m_program32.read_word(address2);
+				}
+				u32 address1 = pmmu_translate_addr(address + 1, 1);
+				u32 address3 = pmmu_translate_addr(address + 3, 1);
+				if (m_mmu_tmp_buserror_occurred)
+					return ~0;
+				u32 result = m_program32.read_byte(address0) << 24;
+				result |= m_program32.read_word(address1) << 8;
+				return result | m_program32.read_byte(address3);
+			}
+		}
+		return m_program32.read_dword_unaligned(address);
+	};
+
+	m_write8 = [this](offs_t address, u8 data)
+	{
+		u32 address0 = address;
+		if (m_pmmu_enabled)
+		{
+			address0 = pmmu_translate_addr(address, 0);
+			if (m_mmu_tmp_buserror_occurred)
+				return;
+		}
+		m_program32.write_byte(address0, data);
+	};
+
+	m_write16 = [this](offs_t address, u16 data)
+	{
+		u32 address0 = address;
+		if (m_pmmu_enabled)
+		{
+			address0 = pmmu_translate_addr(address0, 0);
+			if (m_mmu_tmp_buserror_occurred)
+				return;
+		}
+		if (address0 & 1)
+		{
+			m_program32.write_byte(address0, data >> 8);
+			m_program32.write_byte(address0 + 1, data & 0xff);
+		}
+		else
+		{
+			m_program32.write_word(address0, data);
+		}
+	};
+
+	m_write32 = [this](offs_t address, u32 data)
+	{
+		u32 address0 = address;
+		if (m_pmmu_enabled)
+		{
+			address0 = pmmu_translate_addr(address0, 0);
+			if (m_mmu_tmp_buserror_occurred)
+				return;
+		}
+		switch (address & 3)
+		{
+		case 0:
+			m_program32.write_dword(address0, data, 0xffffffffU);
+			break;
+
+		case 1:
+		{
+			u32 address3 = address + 3;
+			if (m_pmmu_enabled)
+			{
+				address3 = pmmu_translate_addr(address3, 0);
+				if (m_mmu_tmp_buserror_occurred)
+					return;
+			}
+			m_program32.write_dword(address0 - 1, (data & 0xff000000U) | (data & 0xffffff00U) >> 8, 0x00ffffff);
+			m_program32.write_dword(address3, dword_from_byte(data & 0x000000ff), 0xff000000U);
+			break;
+		}
+
+		case 2:
+		{
+			u32 address2 = address + 2;
+			if (m_pmmu_enabled)
+			{
+				address2 = pmmu_translate_addr(address2, 0);
+				if (m_mmu_tmp_buserror_occurred)
+					return;
+			}
+			m_program32.write_dword(address0 - 2, dword_from_word((data & 0xffff0000U) >> 16), 0x0000ffff);
+			m_program32.write_dword(address2, dword_from_word(data & 0x0000ffff), 0xffff0000U);
+			break;
+		}
+
+		case 3:
+		{
+			u32 address1 = address + 1;
+			if (m_pmmu_enabled)
+			{
+				address1 = pmmu_translate_addr(address1, 0);
+				if (m_mmu_tmp_buserror_occurred)
+					return;
+			}
+			m_program32.write_dword(address0 - 3, dword_from_unaligned_word((data & 0xffff0000U) >> 16), 0x000000ff);
+			m_program32.write_dword(address1, rotl_32(data, 8), 0xffffff00U);
+			break;
+		}
+		}
+	};
+}
+
 void m68000_musashi_device::init32hmmu(address_space &space, address_space &ospace)
 {
 	m_space = &space;
@@ -1688,7 +1920,7 @@ void m68000_musashi_device::init32hmmu(address_space &space, address_space &ospa
 //         do not call set_input_line(M68K_LINE_BUSERROR) when using rerun flag
 void m68000_musashi_device::set_buserror_details(u32 fault_addr, u8 rw, u8 fc, bool rerun)
 {
-	if (m_instruction_restart && rerun) m_mmu_tmp_buserror_occurred = true; // hack for external MMU
+	if (m_can_instruction_restart && rerun) m_mmu_tmp_buserror_occurred = true; // hack for external MMU
 
 	// save values for 68000 specific bus error
 	m_aerr_address = fault_addr;
@@ -1997,7 +2229,6 @@ void m68000_musashi_device::init_cpu_m68030(void)
 	m_cyc_shift        = 1;
 	m_cyc_reset        = 518;
 	m_has_pmmu         = 1;
-	m_has_fpu          = 1;
 
 	define_state();
 }
@@ -2040,7 +2271,7 @@ void m68000_musashi_device::init_cpu_m68040(void)
 	m_cpu_type         = CPU_TYPE_040;
 
 
-	init32mmu(*m_program, *m_oprogram);
+	init32mmu_no_smear(*m_program, *m_oprogram);
 	m_sr_mask          = 0xf71f; /* T1 T0 S  M  -- I2 I1 I0 -- -- -- X  N  Z  V  C  */
 	m_state_table      = m68ki_instruction_state_table[5];
 	m_cyc_instruction  = m68ki_cycles[5];
@@ -2055,7 +2286,6 @@ void m68000_musashi_device::init_cpu_m68040(void)
 	m_cyc_shift        = 1;
 	m_cyc_reset        = 518;
 	m_has_pmmu         = 1;
-	m_has_fpu          = 1;
 
 	define_state();
 }
@@ -2068,7 +2298,7 @@ void m68000_musashi_device::init_cpu_m68ec040(void)
 	m_cpu_type         = CPU_TYPE_EC040;
 
 
-	init32(*m_program, *m_oprogram);
+	init32_no_smear(*m_program, *m_oprogram);
 	m_sr_mask          = 0xf71f; /* T1 T0 S  M  -- I2 I1 I0 -- -- -- X  N  Z  V  C  */
 	m_state_table      = m68ki_instruction_state_table[5];
 	m_cyc_instruction  = m68ki_cycles[5];
@@ -2096,7 +2326,7 @@ void m68000_musashi_device::init_cpu_m68lc040(void)
 	m_cpu_type         = CPU_TYPE_LC040;
 
 
-	init32mmu(*m_program, *m_oprogram);
+	init32mmu_no_smear(*m_program, *m_oprogram);
 	m_sr_mask          = 0xf71f; /* T1 T0 S  M  -- I2 I1 I0 -- -- -- X  N  Z  V  C  */
 	m_state_table      = m68ki_instruction_state_table[5];
 	m_cyc_instruction  = m68ki_cycles[5];
@@ -2337,7 +2567,7 @@ void m68000_musashi_device::clear_all()
 	m_pmmu_enabled= false;
 	m_hmmu_enabled= 0;
 	m_emmu_enabled= false;
-	m_instruction_restart= false;
+	m_can_instruction_restart= false;
 	m_has_fpu= 0;
 	m_fpu_just_reset= 0;
 

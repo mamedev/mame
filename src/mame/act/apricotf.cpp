@@ -43,7 +43,7 @@ public:
 	IRQ_CALLBACK_MEMBER(inta_cb);
 
 protected:
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 };
 
 DEFINE_DEVICE_TYPE(F1_DAISY, f1_daisy_device, "f1_daisy", "F1 daisy chain abstraction")
@@ -92,7 +92,7 @@ public:
 private:
 	static void floppy_formats(format_registration &fr);
 
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<z80ctc_device> m_ctc;
@@ -124,8 +124,8 @@ private:
 	int m_width80 = 0;
 	int m_lines200 = 0;
 
-	void main_io(address_map &map);
-	void main_map(address_map &map);
+	void main_io(address_map &map) ATTR_COLD;
+	void main_map(address_map &map) ATTR_COLD;
 };
 
 

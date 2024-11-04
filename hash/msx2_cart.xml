@@ -2372,7 +2372,7 @@ LZ93A13 (32 pin) - 8KB banks
 	</software>
 
 	<software name="herolanc">
-		<description>Heroes of the Lance (Japan)</description>
+		<description>Advanced Dungeons &amp; Dragons - Heroes of the Lance (Japan)</description>
 		<year>1991</year>
 		<publisher>Pony Canyon</publisher>
 		<info name="alt_title" value="ヒーローオブザランス" />
@@ -3965,6 +3965,19 @@ LZ93A13 (32 pin) - 8KB banks
 			<feature name="slot" value="konami_scc"/>
 			<dataarea name="rom" size="0x200000">
 				<rom name="los amores de brunilda - retroworks (v1.0).rom" size="0x138000" crc="edbfb59e" sha1="6d45d269058616873b12c477b72d254b14e8963f"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="arkanoah">
+		<description>Ark-A-Noah</description>
+		<year>2014</year>
+		<publisher>Matra</publisher>
+		<info name="serial" value="VGC3303"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="0"/>
+			<dataarea name="rom" size="0x10000">
+				<rom name="ark-a-noah - matra.rom" size="0x10000" crc="e6abc354" sha1="f5dcc5d5ea152f081fa8239457a992991c08a711"/>
 			</dataarea>
 		</part>
 	</software>

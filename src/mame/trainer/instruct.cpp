@@ -77,8 +77,8 @@ public:
 	void instruct(machine_config &config);
 
 protected:
-	virtual void machine_reset() override;
-	virtual void machine_start() override;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	uint8_t port_r();
@@ -93,9 +93,9 @@ private:
 	void portfa_w(uint8_t data);
 	DECLARE_QUICKLOAD_LOAD_MEMBER(quickload_cb);
 	INTERRUPT_GEN_MEMBER(t2l_int);
-	void data_map(address_map &map);
-	void io_map(address_map &map);
-	void mem_map(address_map &map);
+	void data_map(address_map &map) ATTR_COLD;
+	void io_map(address_map &map) ATTR_COLD;
+	void mem_map(address_map &map) ATTR_COLD;
 
 	uint16_t m_lar = 0U;
 	uint8_t m_digit = 0U;

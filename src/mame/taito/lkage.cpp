@@ -139,9 +139,9 @@ public:
 	void lkage(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 	void sh_nmi_disable_w(uint8_t data);
 	void sh_nmi_enable_w(uint8_t data);
@@ -158,11 +158,11 @@ protected:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	virtual void program_map(address_map &map);
-	virtual void io_map(address_map &map);
-	void bootleg_program_map(address_map &map);
-	void mcu_map(address_map &map);
-	virtual void sound_map(address_map &map);
+	virtual void program_map(address_map &map) ATTR_COLD;
+	virtual void io_map(address_map &map) ATTR_COLD;
+	void bootleg_program_map(address_map &map) ATTR_COLD;
+	void mcu_map(address_map &map) ATTR_COLD;
+	virtual void sound_map(address_map &map) ATTR_COLD;
 
 	required_shared_ptr<uint8_t> m_vreg;
 	required_shared_ptr<uint8_t> m_scroll;
@@ -206,8 +206,8 @@ public:
 	void lkagem(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	uint8_t exrom_data_r();
@@ -215,9 +215,9 @@ private:
 	void msm_volume_w(uint8_t data);
 	template <uint8_t N> void ay_volume_w(uint8_t data);
 
-	virtual void program_map(address_map &map) override;
+	virtual void program_map(address_map &map) override ATTR_COLD;
 	virtual void io_map(address_map &map) override { }
-	virtual void sound_map(address_map &map) override;
+	virtual void sound_map(address_map &map) override ATTR_COLD;
 
 	required_device<ta7630_device> m_ta7630;
 	required_device<msm5232_device> m_msm;

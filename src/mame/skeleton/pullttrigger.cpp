@@ -45,8 +45,8 @@ public:
 
 private:
 	required_device<cpu_device> m_maincpu;
-	void pullttrig_io(address_map &map);
-	void pullttrig_map(address_map &map);
+	void pullttrig_io(address_map &map) ATTR_COLD;
+	void pullttrig_map(address_map &map) ATTR_COLD;
 };
 
 
@@ -91,4 +91,4 @@ ROM_END
 } // anonymous namespace
 
 
-COMP(2003, pullttrig, 0, 0, pullttrig, pullttrig, pullttrig_state, empty_init, "Digital Silkroad", "Pull The Trigger", MACHINE_IS_SKELETON )
+GAME(2003, pullttrig, 0, pullttrig, pullttrig, pullttrig_state, empty_init, ROT0, "Digital Silkroad", "Pull The Trigger", MACHINE_IS_SKELETON)

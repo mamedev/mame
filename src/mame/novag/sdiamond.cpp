@@ -68,8 +68,8 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(power_switch);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override { set_power(true); }
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD { set_power(true); }
 
 private:
 	// devices/pointers
@@ -88,7 +88,7 @@ private:
 	u16 m_lcd_segs = 0;
 	u8 m_lcd_com = 0;
 
-	void main_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
 
 	// I/O handlers
 	void standby(int state);
@@ -294,8 +294,8 @@ static INPUT_PORTS_START( sdiamond )
 	PORT_CONFSETTING(    0x00, DEF_STR( Normal ) )
 
 	PORT_START("POWER")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_POWER_ON) PORT_CHANGED_MEMBER(DEVICE_SELF, sdiamond_state, power_switch, 1)
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_POWER_OFF) PORT_CHANGED_MEMBER(DEVICE_SELF, sdiamond_state, power_switch, 0)
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_POWER_ON) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(sdiamond_state::power_switch), 1)
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_POWER_OFF) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(sdiamond_state::power_switch), 0)
 INPUT_PORTS_END
 
 
@@ -373,4 +373,4 @@ ROM_END
 *******************************************************************************/
 
 //    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS           INIT        COMPANY, FULLNAME, FLAGS
-SYST( 2003, sdiamond, 0,      0,      sdiamond, sdiamond, sdiamond_state, empty_init, "Perfect Technology", "Star Diamond", MACHINE_SUPPORTS_SAVE )
+SYST( 2003, sdiamond, 0,      0,      sdiamond, sdiamond, sdiamond_state, empty_init, "Perfect Technology / Intelligent Heuristic Programming", "Star Diamond", MACHINE_SUPPORTS_SAVE )

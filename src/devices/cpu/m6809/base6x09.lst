@@ -50,8 +50,8 @@ IRQ:
 
 INTERRUPT_VECTOR:
 	@dummy_vma(1);
-	@m_pc.b.h = read_operand(0);
-	@m_pc.b.l = read_operand(1);
+	@m_pc.b.h = read_vector(0);
+	@m_pc.b.l = read_vector(1);
 	@dummy_vma(1);
 	return;
 

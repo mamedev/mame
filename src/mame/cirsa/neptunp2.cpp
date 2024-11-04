@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Tomasz Slanina
+// copyright-holders: Tomasz Slanina
 /***************************************************************************
 
     Unidesa/Cirsa "960606-5" hardware.
@@ -49,9 +49,10 @@ The same hardware from Unidesa/Cirsa was also used on some games from
   Unidesa/Cirsa/Europea Oklahoma Express
   Unidesa/Cirsa/Europea Ruleta de la Fortuna
 
-The "960606-3" version of this hardware was also used in several fruit
-machines released for the UK market by BGT Gaming Technology Ltd.
-(a division of Cirsa?).
+This hardware was also used in several fruit machines released for the UK market by B. Gaming Technology Ltd.
+B. Gaming Technology (BGT) was a brand of International Amusement Machine Corporation (IAMC), which was a
+member of the CIRSA Corporation.
+BGT was was formed in 1995 in Cannock, Staffordshire, to develop and supply gaming machines for the UK market.
 
 
  CIRSA / UNIDESA 960606-5 CPU BOARD
@@ -183,16 +184,16 @@ public:
 
 protected:
 	// driver_device overrides
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	uint8_t test_r();
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void neptunp2_io(address_map &map);
-	void neptunp2_video_map(address_map &map);
-	void neptunp2_no_video_map(address_map &map);
+	void neptunp2_io(address_map &map) ATTR_COLD;
+	void neptunp2_video_map(address_map &map) ATTR_COLD;
+	void neptunp2_no_video_map(address_map &map) ATTR_COLD;
 
 	// devices
 	required_device<cpu_device> m_maincpu;
@@ -576,10 +577,40 @@ ROM_START( unk960606b )
 	ROM_LOAD( "pat_063_tibpal16l8-25cn.u6", 0x000, 0x104, NO_DUMP ) // "PAT 063", protected
 ROM_END
 
+ROM_START( bg_barmy )
+	ROM_REGION( 0x100000, "maincpu", 0 )
+	ROM_LOAD( "barmyarmy_ndp16", 0x0000, 0x080000, CRC(ae488f48) SHA1(c417a3d1a79a0ca54ade2d9a4f6d70467e6c5cb4) )
+	ROM_RELOAD(0x80000, 0x80000)
+
+	ROM_REGION( 0x100000, "oki", 0 )
+	ROM_LOAD( "barmyarmy_sound1", 0x000000, 0x080000, CRC(3530d77c) SHA1(c7a42f698090fcd9644f9929b92935cf85183d23) )
+	ROM_LOAD( "barmyarmy_sound2", 0x080000, 0x080000, CRC(48d4c2f3) SHA1(71e64e3e76a55275484a7c72ce2a17232b27a4eb) )
+ROM_END
+
+// '960606-5 PCB and 'CB1 (CS4)' security counters module.
+ROM_START( bg_dbells )
+	ROM_REGION( 0x100000, "maincpu", 0 )
+	ROM_LOAD( "sldb.28c4.073nkyly014.u2", 0x0000, 0x080000, CRC(e0c855da) SHA1(1a12dee87705f2b9c4413fbad2a7bff89860ef19) )
+	ROM_RELOAD(0x80000, 0x80000)
+
+	ROM_REGION( 0x100000, "oki", ROMREGION_ERASE00 )
+	ROM_LOAD( "073snd1.u14", 0x000000, 0x080000, CRC(0ad1e49a) SHA1(e737936d377a46e2c0bf8eb856aa738f9f9c9675) )
+	ROM_LOAD( "073snd2.u15", 0x080000, 0x080000, CRC(5feecf8c) SHA1(5e85e3180087faca5f4e6e6cb7deed1a37360ac2) )
+
+	ROM_REGION( 0x800, "eeprom", 0 )
+	ROM_LOAD( "24c16.u10", 0x000, 0x800, CRC(0cba036f) SHA1(d5bfe96d32e97e820b22a36cd8fee08cfe812a69) )
+
+	ROM_REGION( 0x800, "counters", 0 )
+	ROM_LOAD( "cirsa_cs-4.bin", 0x000, 0x800, NO_DUMP )
+
+	ROM_REGION( 0x104, "plds", 0 )
+	ROM_LOAD( "pat.u6", 0x000, 0x104, NO_DUMP )
+ROM_END
+
 ROM_START( bg_ddb )
 	ROM_REGION( 0x100000, "maincpu", 0 )
 	ROM_LOAD( "nkyky_0-15_5", 0x0000, 0x080000, CRC(ac4a5094) SHA1(db4eab0be63e5daddca603af290debd8e929757e) )
-	ROM_RELOAD(0x80000,0x80000)
+	ROM_RELOAD(0x80000, 0x80000)
 
 	ROM_REGION( 0x100000, "oki", ROMREGION_ERASE00 )
 	/* There were sound ROMs in the 'CoinWorld Ding Dong Bells' set which might belong here, otherwise
@@ -595,20 +626,10 @@ ROM_START( bg_ddb )
 	ROM_LOAD( "pat.u6", 0x000, 0x104, NO_DUMP )
 ROM_END
 
-ROM_START( bg_barmy )
-	ROM_REGION( 0x100000, "maincpu", 0 )
-	ROM_LOAD( "barmyarmy_ndp16", 0x0000, 0x080000, CRC(ae488f48) SHA1(c417a3d1a79a0ca54ade2d9a4f6d70467e6c5cb4) )
-	ROM_RELOAD(0x80000,0x80000)
-
-	ROM_REGION( 0x100000, "oki", 0 )
-	ROM_LOAD( "barmyarmy_sound1", 0x000000, 0x080000, CRC(3530d77c) SHA1(c7a42f698090fcd9644f9929b92935cf85183d23) )
-	ROM_LOAD( "barmyarmy_sound2", 0x080000, 0x080000, CRC(48d4c2f3) SHA1(71e64e3e76a55275484a7c72ce2a17232b27a4eb) )
-ROM_END
-
 ROM_START( bg_max )
 	ROM_REGION( 0x100000, "maincpu", 0 )
 	ROM_LOAD( "max_a_million_v014", 0x0000, 0x080000, CRC(32fe9c3b) SHA1(77519657e6e478b3cd1bf2ad2aecc6e191abe554) )
-	ROM_RELOAD(0x80000,0x80000)
+	ROM_RELOAD(0x80000, 0x80000)
 
 	ROM_REGION( 0x100000, "oki", ROMREGION_ERASE00 )
 	// probably missing
@@ -626,7 +647,7 @@ ROM_END
 ROM_START( bg_maxa )
 	ROM_REGION( 0x100000, "maincpu", 0 )
 	ROM_LOAD( "max_a_million_v114", 0x0000, 0x080000, CRC(a66851e9) SHA1(733ec52fa01615e740ebd40fba4a88efe9d9f24f) )
-	ROM_RELOAD(0x80000,0x80000)
+	ROM_RELOAD(0x80000, 0x80000)
 
 	ROM_REGION( 0x100000, "oki", ROMREGION_ERASE00 )
 	// probably missing
@@ -643,7 +664,6 @@ ROM_END
 
 } // Anonymous namespace
 
-//    YEAR   NAME        PARENT COMPAT             MACHINE   INPUT           CLASS       INIT  COMPANY                  FULLNAME                                  FLAGS
 
 // Video games on Cirsa "960606-5" CPU PCB + "IS040302-3" VGA SOC-Legacy PCB (or similar video PCB)
 GAME( 2003,  neptunp2,   0,         neptunp2_video,    neptunp2, neptunp2_state, empty_init, ROT0, "Unidesa/Cirsa",         "Neptune's Pearls 2",                                MACHINE_IS_SKELETON ) // Year from legal registry date
@@ -659,8 +679,9 @@ GAME( 1999,  rockroll,   0,         neptunp2_no_video, c960606,  neptunp2_state,
 GAME( 2001?, unk960606,  0,         neptunp2_no_video, c960606,  neptunp2_state, empty_init, ROT0, "Unidesa/Cirsa",         "unknown 960606-5 based machine (set 1)",            MACHINE_IS_SKELETON_MECHANICAL ) // Year taken from sticker on PCB
 GAME( 2001?, unk960606b, 0,         neptunp2_no_video, c960606,  neptunp2_state, empty_init, ROT0, "Unidesa/Cirsa/Europea", "unknown 960606-5 based machine (set 2)",            MACHINE_IS_SKELETON_MECHANICAL ) // Year taken from sticker on PCB
 
-// BGT Fruit Machines
-GAME( 199?,  bg_ddb,     0,         neptunp2_no_video, c960606,  neptunp2_state, empty_init, ROT0, "BGT",                   "Ding Dong Bells (BGT)",                             MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 199?,  bg_barmy,   0,         neptunp2_no_video, c960606,  neptunp2_state, empty_init, ROT0, "BGT",                   "Barmy Army (BGT)",                                  MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 199?,  bg_max,     0,         neptunp2_no_video, c960606,  neptunp2_state, empty_init, ROT0, "BGT",                   "Max A Million (BGT) (set 1)",                       MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 199?,  bg_maxa,    bg_max,    neptunp2_no_video, c960606,  neptunp2_state, empty_init, ROT0, "BGT",                   "Max A Million (BGT) (set 2)",                       MACHINE_IS_SKELETON_MECHANICAL )
+// B. Gaming Technology Ltd. (BGT) fruit machines on Cirsa "960606-5" CPU PCB
+GAME( 1997,  bg_barmy,   0,         neptunp2_no_video, c960606,  neptunp2_state, empty_init, ROT0, "Unidesa/Cirsa/B. Gaming Technology", "Barmy Army",                            MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 2000,  bg_dbells,  0,         neptunp2_no_video, c960606,  neptunp2_state, empty_init, ROT0, "Unidesa/Cirsa/B. Gaming Technology", "Dancing Bells",                         MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 1999,  bg_ddb,     0,         neptunp2_no_video, c960606,  neptunp2_state, empty_init, ROT0, "Unidesa/Cirsa/B. Gaming Technology", "Ding Dong Bells (B Gaming Technology)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 2000,  bg_max,     0,         neptunp2_no_video, c960606,  neptunp2_state, empty_init, ROT0, "Unidesa/Cirsa/B. Gaming Technology", "Max A Million (set 1)",                 MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 2000,  bg_maxa,    bg_max,    neptunp2_no_video, c960606,  neptunp2_state, empty_init, ROT0, "Unidesa/Cirsa/B. Gaming Technology", "Max A Million (set 2)",                 MACHINE_IS_SKELETON_MECHANICAL )

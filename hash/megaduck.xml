@@ -112,7 +112,7 @@ license:CC0-1.0
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<!-- for the Super Computer / Learn Computer version of the Mega Duck, has custom banking -->
 	<software name="bildrlex" supported="no" >
 		<description>Bilder Lexikon</description>
@@ -124,7 +124,7 @@ license:CC0-1.0
 				<rom name="bilder_lexikon.bin" size="0x80000" crc="7c277223" sha1="c91f0141a06c2dbf0883303779c3b7cba09722a8" />
 			</dataarea>
 		</part>
-	</software>	
+	</software>
 
 	<software name="captkk">
 		<description>Captain Knick Knack</description>

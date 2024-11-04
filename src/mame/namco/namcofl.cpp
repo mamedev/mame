@@ -211,8 +211,8 @@ public:
 	void namcofl(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	required_device<i960_cpu_device> m_maincpu;
@@ -262,8 +262,8 @@ private:
 	int objcode2tile(int code);
 	void tilemap_cb(uint16_t code, int *tile, int *mask);
 	void roz_cb(uint16_t code, int *tile, int *mask, int which);
-	void namcoc75_am(address_map &map);
-	void main_map(address_map &map);
+	void namcoc75_am(address_map &map) ATTR_COLD;
+	void main_map(address_map &map) ATTR_COLD;
 };
 
 

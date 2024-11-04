@@ -339,9 +339,9 @@ protected:
 
 	void check_irqs(const uint16_t changed);
 
-	virtual void device_start() override;
-	virtual void device_reset() override;
-	virtual void device_stop() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+	virtual void device_stop() override ATTR_COLD;
 
 	uint16_t read_space(offs_t offset);
 
@@ -407,7 +407,7 @@ public:
 	uint16_t control_r(offs_t offset);
 	void control_w(offs_t offset, uint16_t data);
 
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 private:
 	uint16_t control_group16_r(uint8_t group, uint8_t offset);

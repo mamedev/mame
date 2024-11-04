@@ -29,9 +29,9 @@ public:
 	void d550(machine_config &config);
 
 private:
-	void d50_mem_map(address_map &map);
-	void d550_mem_map(address_map &map);
-	void eram_map(address_map &map);
+	void d50_mem_map(address_map &map) ATTR_COLD;
+	void d550_mem_map(address_map &map) ATTR_COLD;
+	void eram_map(address_map &map) ATTR_COLD;
 
 	required_device<upd78312_device> m_maincpu;
 	required_device<address_map_bank_device> m_eram;

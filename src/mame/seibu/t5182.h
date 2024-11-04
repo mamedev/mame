@@ -38,10 +38,10 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual const tiny_rom_entry *device_rom_region() const override;
-	virtual ioport_constructor device_input_ports() const override;
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_start() override ATTR_COLD;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 private:
 	TIMER_CALLBACK_MEMBER(setirq_callback);
@@ -54,8 +54,8 @@ private:
 	uint8_t ym_r(offs_t offset);
 	void ym_w(offs_t offset, uint8_t data);
 
-	void t5182_io(address_map &map);
-	void t5182_map(address_map &map);
+	void t5182_io(address_map &map) ATTR_COLD;
+	void t5182_map(address_map &map) ATTR_COLD;
 
 	// internal state
 	required_device<cpu_device> m_ourcpu;

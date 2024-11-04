@@ -2381,6 +2381,7 @@ No [VDP] sprites
 		<description>Dune II - Kampf um den Wüstenplaneten (Germany)</description>
 		<year>1993</year>
 		<publisher>Virgin Interactive</publisher>
+		<info name="language" value="German" />
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="171-5978BA"/>
@@ -3159,6 +3160,7 @@ Crashes after EA logo, requires better [VDP] irq handling
 		<description>Flashback (Europe, rev. A)</description>
 		<year>1993</year>
 		<publisher>U.S. Gold</publisher>
+		<info name="language" value="English/French"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="171-6329A"/>
 			<feature name="ic1" value="MPR-15410A-SM"/>
@@ -3174,6 +3176,7 @@ Crashes after EA logo, requires better [VDP] irq handling
 		<description>Flashback - The Quest for Identity (USA)</description>
 		<year>1993</year>
 		<publisher>U.S. Gold</publisher>
+		<info name="language" value="English/French"/>
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="171-6329A"/>
@@ -4504,6 +4507,7 @@ Moans about [Sega Mega Modem] not hooked up, punts to a red screen
 		<description>Kick Off 3 - European Challenge (Europe)</description>
 		<year>1994</year>
 		<publisher>Vic Tokai</publisher>
+		<info name="language" value="English/French/German/Italian/Spanish"/>
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="171-5978BA"/>
@@ -4626,6 +4630,7 @@ Moans about [Sega Mega Modem] not hooked up, punts to a red screen
 		<year>1993</year>
 		<publisher>Sega</publisher>
 		<info name="alt_title" value="Landstalker (Box)"/>
+		<info name="language" value="French"/>
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_sram"/>
@@ -4647,6 +4652,8 @@ Moans about [Sega Mega Modem] not hooked up, punts to a red screen
 		<description>Landstalker - Die Schätze von König Nolo (Germany)</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
+		<info name="language" value="German"/>
+		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_sram"/>
 			<feature name="pcb" value="171-6278A"/>
@@ -4832,6 +4839,7 @@ Moans about [Sega Mega Modem] not hooked up, punts to a red screen
 		<description>The Lost Vikings (Europe)</description>
 		<year>1994</year>
 		<publisher>Interplay</publisher>
+		<info name="language" value="English/French/German" />
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="171-5978BA"/>
@@ -5119,6 +5127,8 @@ Moans about [Sega Mega Modem] not hooked up, punts to a red screen
 		<description>Mega Lo Mania (France)</description>
 		<year>1992</year>
 		<publisher>Virgin Games</publisher>
+		<info name="language" value="French" />
+		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="171-5978BA"/>
 			<feature name="u1" value="MPR-15330-H, MPR-15330-T"/>   <!-- location not really marked on PCB, using u1 for consistency -->
@@ -6039,6 +6049,7 @@ Unsupported [Menacer] peripheral
 		<description>Olympic Gold (Europe)</description>
 		<year>1992</year>
 		<publisher>U.S. Gold</publisher>
+		<info name="language" value="Dutch/English/French/German/Italian/Portuguese (Brazil)/Spanish/Swedish"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="171-5703"/>
 			<feature name="ic1" value="MPR-14753-F"/>
@@ -6056,6 +6067,7 @@ Unsupported [Menacer] peripheral
 		<info name="serial" value="G-4081"/>
 		<info name="release" value="19920724"/>
 		<info name="alt_title" value="オリンピックゴールド"/>
+		<info name="language" value="Dutch/English/French/German/Italian/Portuguese (Brazil)/Spanish/Swedish"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="171-5703"/>
 			<feature name="ic1" value="MPR-14858A-T"/>
@@ -6584,6 +6596,7 @@ Unsupported [Menacer] peripheral
 		<description>Power Drive (Europe)</description>
 		<year>1994</year>
 		<publisher>U.S. Gold</publisher>
+		<info name="language" value="English/French/German/Portuguese (Brazil)/Spanish"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="171-5978BA"/>
 			<feature name="u1" value="MPR-17421-T"/>   <!-- location not really marked on PCB, using u1 for consistency -->
@@ -6722,6 +6735,7 @@ Unsupported [Menacer] peripheral
 		<description>Psycho Pinball (Europe, 199409)</description>
 		<year>1994</year>
 		<publisher>Codemasters</publisher>
+		<info name="language" value="English/French/German/Italian/Spanish" />
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="SR16V4-0"/>
 			<feature name="u1" value="CODEMASTERS PSYCHO PINBALL MDPP021F"/>   <!-- location not really marked on PCB, using u1 for consistency -->
@@ -7267,6 +7281,7 @@ Unsupported [Menacer] peripheral
 		<description>Sensible Soccer (Europe)</description>
 		<year>1993</year>
 		<publisher>Renegade</publisher>
+		<info name="language" value="English/French/German/Italian" />
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_sram"/>
@@ -7290,6 +7305,7 @@ Unsupported [Menacer] peripheral
 		<year>1994</year>
 		<publisher>Sony Imagesoft</publisher>
 		<info name="alt_title" value="International Sensible Soccer - Limited Edition: World Champions (Box)"/>
+		<info name="language" value="English/French/German/Italian" />
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_sram"/>
@@ -7591,6 +7607,7 @@ Unsupported [Menacer] peripheral
 		<description>Soleil (Spain)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
+		<info name="language" value="Spanish" />
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_sram"/>
@@ -7945,6 +7962,7 @@ Unsupported [Menacer] peripheral
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<info name="alt_title" value="La Légende de Thor (Box and cart)"/>
+		<info name="language" value="French" />
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_sram"/>
@@ -9097,6 +9115,8 @@ Unsupported [Menacer] peripheral
 		<description>Ultimate Soccer (Europe)</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
+		<info name="language" value="English/French/German/Italian/Spanish" />
+		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="171-5978B"/>
 			<feature name="u1" value="MPR-15819-S"/>   <!-- location not really marked on PCB, using u1 for consistency -->
@@ -9324,6 +9344,7 @@ Unsupported [Menacer] peripheral
 		<description>Where in the World Is Carmen Sandiego? (Europe, USA)</description>
 		<year>1992</year>
 		<publisher>Electronic Arts</publisher>
+		<info name="language" value="English/French/German/Italian/Spanish" />
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="PWB SC42X1 REV E"/>
 			<feature name="u1" value="CARMEN WORLD CWOR01"/>
@@ -9394,6 +9415,7 @@ Unsupported [Menacer] peripheral
 		<description>Winter Olympics (Europe)</description>
 		<year>1994</year>
 		<publisher>U.S. Gold</publisher>
+		<info name="language" value="English/French/German/Italian/Norwegian/Portuguese (Brazil)/Spanish/Swedish" />
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="837-10096 / 171-6587A"/>
 			<!-- two epoxy blocks are present on the PCB, 1MB each?!? -->
@@ -9520,6 +9542,7 @@ Real player names based off Mexico '86
 		<description>World Championship Soccer II (Europe)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="171-5978BA"/>
 			<feature name="u1" value="MPR-16930-F"/>   <!-- location not really marked on PCB, using u1 for consistency -->
@@ -9569,6 +9592,7 @@ https://tcrf.net/World_Championship_Soccer_(Genesis)
 		<description>World Cup USA 94 (Europe, USA, Korea)</description>
 		<year>1994</year>
 		<publisher>U.S. Gold</publisher>
+		<info name="language" value="Dutch/English/French/German/Italian/Portuguese (Brazil)/Spanish/Swedish" />
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_sram"/>
 			<feature name="pcb" value="?? (Sega)"/>
@@ -9892,6 +9916,7 @@ https://tcrf.net/World_Championship_Soccer_(Genesis)
 		<description>Rugby World Cup 1995 (Europe, USA)</description>
 		<year>1994</year>
 		<publisher>Electronic Arts</publisher>
+		<info name="language" value="English/French/Italian" />
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="PWA P10001 REV H"/>
 			<feature name="u1" value="RUGBY RUGBYB21"/>
@@ -10002,6 +10027,7 @@ Doesn't accept any input
 		<description>Soleil (France)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
+		<info name="language" value="French" />
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_sram"/>
@@ -10018,6 +10044,7 @@ Doesn't accept any input
 		<description>Soleil (Germany)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
+		<info name="language" value="German" />
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_sram"/>
@@ -10066,6 +10093,7 @@ Doesn't accept any input
 		<description>Psycho Pinball (Europe, 199410)</description>
 		<year>1994</year>
 		<publisher>Codemasters</publisher>
+		<info name="language" value="English/French/German/Italian/Spanish" />
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
 				<rom name="mdppf821.bin" size="2097152" crc="32dd8351" sha1="928f46ca87886c6e72d10f7c9db29b09e483bc49"/>
@@ -12591,7 +12619,7 @@ https://bootleggames.fandom.com/wiki/Barver_Battle_Saga:_Tai_Kong_Zhan_Shi
 	</software>
 
 	<software name="bmaster2p" cloneof="bmaster2">
-		<description>Blaster Master 2 (USA, prototype)</description>
+		<description>Blaster Master 2 (USA, prototype 19930415)</description>
 		<year>1993</year>
 		<publisher>Sunsoft</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -12899,6 +12927,17 @@ No [VDP] sprites
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="1048576">
 				<rom name="bram stoker's dracula (usa).bin" size="1048576" crc="077084a6" sha1="4ede0e75054655acab63f2a41b8c57e1cf137e58"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="breach">
+		<description>Breach (prototype)</description>
+		<year>1992?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" width="16" endianness="big" size="412818">
+				<rom name="Breach fixed rom.bin" size="412818" crc="121ce289" sha1="3eabd16b3a523e276069a107a95e86221b9a534e"/>
 			</dataarea>
 		</part>
 	</software>
@@ -13371,7 +13410,7 @@ No [VDP] sprites
 		<description>Cave Story - Doukutsu Monogatari (v0.8.0, Portuguese-Brazil)</description>
 		<year>2022</year>
 		<publisher>Studio Pixel</publisher>
-		<info name="language" value="Portuguse (Brazil)" />
+		<info name="language" value="Portuguese (Brazil)" />
 		<info name="version" value="0.8.0 2022.02" />
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_sram"/>
@@ -13464,7 +13503,7 @@ No [VDP] sprites
 	</software>
 
 	<software name="centurp" cloneof="centur">
-		<description>Centurion - Defender of Rome (Europe, prototype, 19910528)</description>
+		<description>Centurion - Defender of Rome (Europe, prototype 19910528)</description>
 		<year>1991</year>
 		<publisher>Electronic Arts</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -13486,7 +13525,7 @@ No [VDP] sprites
 	</software>
 
 	<software name="champwcsp" cloneof="champwcs">
-		<description>Champions World Class Soccer (prototype)</description>
+		<description>Champions World Class Soccer (prototype 19940318)</description>
 		<year>1994</year>
 		<publisher>Flying Edge</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -14276,7 +14315,7 @@ https://bootleggames.fandom.com/wiki/Chaoji_Dafuweng
 	</software>
 
 	<software name="comixp" cloneof="comix">
-		<description>Comix Zone (Europe, prototype, 19950628)</description>
+		<description>Comix Zone (Europe, prototype 19950628)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -14314,7 +14353,7 @@ https://bootleggames.fandom.com/wiki/Chaoji_Dafuweng
 	</software-->
 
 	<software name="comixup01" cloneof="comix">
-		<description>Comix Zone (Europe, prototype, 19950712)</description>
+		<description>Comix Zone (Europe, prototype 19950712)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -14325,7 +14364,7 @@ https://bootleggames.fandom.com/wiki/Chaoji_Dafuweng
 	</software>
 
 	<software name="comixup08" cloneof="comix">
-		<description>Comix Zone (USA, prototype, 19950601-B)</description>
+		<description>Comix Zone (USA, prototype 19950601-B)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -14336,7 +14375,7 @@ https://bootleggames.fandom.com/wiki/Chaoji_Dafuweng
 	</software>
 
 	<software name="comixup07" cloneof="comix">
-		<description>Comix Zone (USA, prototype, 19950601-C)</description>
+		<description>Comix Zone (USA, prototype 19950601-C)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -14347,7 +14386,7 @@ https://bootleggames.fandom.com/wiki/Chaoji_Dafuweng
 	</software>
 
 	<software name="comixup06" cloneof="comix">
-		<description>Comix Zone (USA, prototype, 19950601-D)</description>
+		<description>Comix Zone (USA, prototype 19950601-D)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -14358,7 +14397,7 @@ https://bootleggames.fandom.com/wiki/Chaoji_Dafuweng
 	</software>
 
 	<software name="comixup05" cloneof="comix">
-		<description>Comix Zone (USA, prototype, 19950601)</description>
+		<description>Comix Zone (USA, prototype 19950601)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -14369,7 +14408,7 @@ https://bootleggames.fandom.com/wiki/Chaoji_Dafuweng
 	</software>
 
 	<software name="comixup04" cloneof="comix">
-		<description>Comix Zone (USA, prototype, 19950602-B)</description>
+		<description>Comix Zone (USA, prototype 19950602-B)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<sharedfeat name="compatibility" value="NTSC-U"/>
@@ -14381,7 +14420,7 @@ https://bootleggames.fandom.com/wiki/Chaoji_Dafuweng
 	</software>
 
 	<software name="comixup03" cloneof="comix">
-		<description>Comix Zone (USA, prototype, 19950602)</description>
+		<description>Comix Zone (USA, prototype 19950602)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<sharedfeat name="compatibility" value="NTSC-U"/>
@@ -14393,7 +14432,7 @@ https://bootleggames.fandom.com/wiki/Chaoji_Dafuweng
 	</software>
 
 	<software name="comixup02" cloneof="comix">
-		<description>Comix Zone (USA, prototype, 19950603)</description>
+		<description>Comix Zone (USA, prototype 19950603)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<sharedfeat name="compatibility" value="NTSC-U"/>
@@ -14405,7 +14444,7 @@ https://bootleggames.fandom.com/wiki/Chaoji_Dafuweng
 	</software>
 
 	<software name="comixup10" cloneof="comix">
-		<description>Comix Zone (prototype, 19950526)</description>
+		<description>Comix Zone (prototype 19950526)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<!-- Compatibility not enforced -->
@@ -14417,7 +14456,7 @@ https://bootleggames.fandom.com/wiki/Chaoji_Dafuweng
 	</software>
 
 	<software name="comixup09" cloneof="comix">
-		<description>Comix Zone (prototype, 19950530)</description>
+		<description>Comix Zone (prototype 19950530)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<!-- Compatibility not enforced -->
@@ -14429,7 +14468,7 @@ https://bootleggames.fandom.com/wiki/Chaoji_Dafuweng
 	</software>
 
 	<software name="comixkp" cloneof="comix">
-		<description>Comix Zone (Korea, prototype, 19950609)</description>
+		<description>Comix Zone (Korea, prototype 19950609)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<sharedfeat name="compatibility" value="NTSC-U,NTSC-J"/>
@@ -14441,7 +14480,7 @@ https://bootleggames.fandom.com/wiki/Chaoji_Dafuweng
 	</software>
 
 	<software name="comixsc" cloneof="comix">
-		<description>Comix Zone (Sega Channel, prototype, 19950612)</description>
+		<description>Comix Zone (Sega Channel, prototype 19950612)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<sharedfeat name="compatibility" value="NTSC-U"/>
@@ -14637,7 +14676,7 @@ https://bootleggames.fandom.com/wiki/Chaoji_Dafuweng
 	</software>
 
 	<software name="crystlptp06" cloneof="crystlpt">
-		<description>Crystal's Pony Tale (USA, prototype, 19940701)</description>
+		<description>Crystal's Pony Tale (USA, prototype 19940701)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<sharedfeat name="compatibility" value="NTSC-U"/>
@@ -14649,7 +14688,7 @@ https://bootleggames.fandom.com/wiki/Chaoji_Dafuweng
 	</software>
 
 	<software name="crystlptp05" cloneof="crystlpt">
-		<description>Crystal's Pony Tale (USA, prototype, 19940702)</description>
+		<description>Crystal's Pony Tale (USA, prototype 19940702)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<sharedfeat name="compatibility" value="NTSC-U"/>
@@ -14661,7 +14700,7 @@ https://bootleggames.fandom.com/wiki/Chaoji_Dafuweng
 	</software>
 
 	<software name="crystlptp04" cloneof="crystlpt">
-		<description>Crystal's Pony Tale (USA, prototype, 19940703)</description>
+		<description>Crystal's Pony Tale (USA, prototype 19940703)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<sharedfeat name="compatibility" value="NTSC-U"/>
@@ -14673,7 +14712,7 @@ https://bootleggames.fandom.com/wiki/Chaoji_Dafuweng
 	</software>
 
 	<software name="crystlptp03" cloneof="crystlpt">
-		<description>Crystal's Pony Tale (USA, prototype, 19940712-B)</description>
+		<description>Crystal's Pony Tale (USA, prototype 19940712-B)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<sharedfeat name="compatibility" value="NTSC-U"/>
@@ -14685,7 +14724,7 @@ https://bootleggames.fandom.com/wiki/Chaoji_Dafuweng
 	</software>
 
 	<software name="crystlptp02" cloneof="crystlpt">
-		<description>Crystal's Pony Tale (USA, prototype, 19940712)</description>
+		<description>Crystal's Pony Tale (USA, prototype 19940712)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<sharedfeat name="compatibility" value="NTSC-U"/>
@@ -14697,7 +14736,7 @@ https://bootleggames.fandom.com/wiki/Chaoji_Dafuweng
 	</software>
 
 	<software name="crystlptp01" cloneof="crystlpt">
-		<description>Crystal's Pony Tale (USA, prototype, 19940713)</description>
+		<description>Crystal's Pony Tale (USA, prototype 19940713)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<sharedfeat name="compatibility" value="NTSC-U"/>
@@ -14709,7 +14748,7 @@ https://bootleggames.fandom.com/wiki/Chaoji_Dafuweng
 	</software>
 
 	<software name="crystlptp12" cloneof="crystlpt">
-		<description>Crystal's Pony Tale (USA, prototype, 19940601)</description>
+		<description>Crystal's Pony Tale (USA, prototype 19940601)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<!-- Compatibility not enforced -->
@@ -14721,7 +14760,7 @@ https://bootleggames.fandom.com/wiki/Chaoji_Dafuweng
 	</software>
 
 	<software name="crystlptp11" cloneof="crystlpt">
-		<description>Crystal's Pony Tale (USA, prototype, 19940606)</description>
+		<description>Crystal's Pony Tale (USA, prototype 19940606)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<!-- Compatibility not enforced -->
@@ -14733,7 +14772,7 @@ https://bootleggames.fandom.com/wiki/Chaoji_Dafuweng
 	</software>
 
 	<software name="crystlptp10" cloneof="crystlpt">
-		<description>Crystal's Pony Tale (USA, prototype, 19940610)</description>
+		<description>Crystal's Pony Tale (USA, prototype 19940610)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<!-- Compatibility not enforced -->
@@ -14745,7 +14784,7 @@ https://bootleggames.fandom.com/wiki/Chaoji_Dafuweng
 	</software>
 
 	<software name="crystlptp09" cloneof="crystlpt">
-		<description>Crystal's Pony Tale (USA, prototype, 19940623)</description>
+		<description>Crystal's Pony Tale (USA, prototype 19940623)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<sharedfeat name="compatibility" value="NTSC-U"/>
@@ -14757,7 +14796,7 @@ https://bootleggames.fandom.com/wiki/Chaoji_Dafuweng
 	</software>
 
 	<software name="crystlptp08" cloneof="crystlpt">
-		<description>Crystal's Pony Tale (USA, prototype, 19940628)</description>
+		<description>Crystal's Pony Tale (USA, prototype 19940628)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<sharedfeat name="compatibility" value="NTSC-U"/>
@@ -14769,7 +14808,7 @@ https://bootleggames.fandom.com/wiki/Chaoji_Dafuweng
 	</software>
 
 	<software name="crystlptp07" cloneof="crystlpt">
-		<description>Crystal's Pony Tale (USA, prototype, 19940630)</description>
+		<description>Crystal's Pony Tale (USA, prototype 19940630)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<sharedfeat name="compatibility" value="NTSC-U"/>
@@ -14781,7 +14820,7 @@ https://bootleggames.fandom.com/wiki/Chaoji_Dafuweng
 	</software>
 
 	<software name="crystlptp15" cloneof="crystlpt">
-		<description>Crystal's Pony Tale (USA, prototype, 19940511)</description>
+		<description>Crystal's Pony Tale (USA, prototype 19940511)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<!-- Compatibility not enforced -->
@@ -14793,7 +14832,7 @@ https://bootleggames.fandom.com/wiki/Chaoji_Dafuweng
 	</software>
 
 	<software name="crystlptp14" cloneof="crystlpt">
-		<description>Crystal's Pony Tale (USA, prototype, 19940519)</description>
+		<description>Crystal's Pony Tale (USA, prototype 19940519)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<!-- Compatibility not enforced -->
@@ -14805,7 +14844,7 @@ https://bootleggames.fandom.com/wiki/Chaoji_Dafuweng
 	</software>
 
 	<software name="crystlptp13" cloneof="crystlpt">
-		<description>Crystal's Pony Tale (USA, prototype, 19940526)</description>
+		<description>Crystal's Pony Tale (USA, prototype 19940526)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<!-- Compatibility not enforced -->
@@ -15382,7 +15421,7 @@ https://bootleggames.fandom.com/wiki/Chaoji_Dafuweng
 	</software>
 
 	<software name="desrtdemp9" cloneof="desrtdem" supported="no">
-		<description>Desert Demolition (prototype, 19941206)</description>
+		<description>Desert Demolition (prototype 19941206)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -15393,7 +15432,7 @@ https://bootleggames.fandom.com/wiki/Chaoji_Dafuweng
 	</software>
 
 	<software name="desrtdemp8" cloneof="desrtdem">
-		<description>Desert Demolition (prototype, 19941208)</description>
+		<description>Desert Demolition (prototype 19941208)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -15404,7 +15443,7 @@ https://bootleggames.fandom.com/wiki/Chaoji_Dafuweng
 	</software>
 
 	<software name="desrtdemp7" cloneof="desrtdem">
-		<description>Desert Demolition (prototype, 19941212-B)</description>
+		<description>Desert Demolition (prototype 19941212-B)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -15415,7 +15454,7 @@ https://bootleggames.fandom.com/wiki/Chaoji_Dafuweng
 	</software>
 
 	<software name="desrtdemp6" cloneof="desrtdem" supported="no">
-		<description>Desert Demolition (prototype, 19941212)</description>
+		<description>Desert Demolition (prototype 19941212)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -15426,7 +15465,7 @@ https://bootleggames.fandom.com/wiki/Chaoji_Dafuweng
 	</software>
 
 	<software name="desrtdemp5" cloneof="desrtdem">
-		<description>Desert Demolition (prototype, 19941213)</description>
+		<description>Desert Demolition (prototype 19941213)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -15437,7 +15476,7 @@ https://bootleggames.fandom.com/wiki/Chaoji_Dafuweng
 	</software>
 
 	<software name="desrtdemp4" cloneof="desrtdem">
-		<description>Desert Demolition (prototype, 19941214)</description>
+		<description>Desert Demolition (prototype 19941214)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -15448,7 +15487,7 @@ https://bootleggames.fandom.com/wiki/Chaoji_Dafuweng
 	</software>
 
 	<software name="desrtdemp3" cloneof="desrtdem">
-		<description>Desert Demolition (prototype, 19941215)</description>
+		<description>Desert Demolition (prototype 19941215)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -15459,7 +15498,7 @@ https://bootleggames.fandom.com/wiki/Chaoji_Dafuweng
 	</software>
 
 	<software name="desrtdemp2" cloneof="desrtdem">
-		<description>Desert Demolition (prototype, 19941216)</description>
+		<description>Desert Demolition (prototype 19941216)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -15470,7 +15509,7 @@ https://bootleggames.fandom.com/wiki/Chaoji_Dafuweng
 	</software>
 
 	<software name="desrtdemp1" cloneof="desrtdem">
-		<description>Desert Demolition (prototype, 19941219)</description>
+		<description>Desert Demolition (prototype 19941219)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -15592,7 +15631,7 @@ https://bootleggames.fandom.com/wiki/Chaoji_Dafuweng
 	</software>
 
 	<software name="dinohirep3" cloneof="dinohire">
-		<description>Tom Mason's Dinosaurs for Hire (prototype, 19930426)</description>
+		<description>Tom Mason's Dinosaurs for Hire (prototype 19930426)</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -15603,7 +15642,7 @@ https://bootleggames.fandom.com/wiki/Chaoji_Dafuweng
 	</software>
 
 	<software name="dinohirep2" cloneof="dinohire">
-		<description>Tom Mason's Dinosaurs for Hire (prototype, 19930427)</description>
+		<description>Tom Mason's Dinosaurs for Hire (prototype 19930427)</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -15614,7 +15653,7 @@ https://bootleggames.fandom.com/wiki/Chaoji_Dafuweng
 	</software>
 
 	<software name="dinohirep1" cloneof="dinohire">
-		<description>Tom Mason's Dinosaurs for Hire (prototype, 19930502)</description>
+		<description>Tom Mason's Dinosaurs for Hire (prototype 19930502)</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -15875,6 +15914,7 @@ Choppy timings during gameplay (btanb?)
 		<description>Dragon's Lair (USA, prototype)</description>
 		<year>199?</year>
 		<publisher>Taito</publisher>
+		<info name="alt_title" value="Dragon's Lair: The Adventure Continues"/> <!-- in game title -->
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="524288">
 				<rom name="dragon's lair (usa, prototype).bin" size="524288" crc="a33eb522" sha1="d29ec9588dcbc27a4ef3f838191b767235a6ff17"/>
@@ -16068,7 +16108,7 @@ Choppy timings during gameplay (btanb?)
 	</software>
 
 	<software name="dheadp3" cloneof="dhead">
-		<description>Dynamite Headdy (prototype, 19940614-CABEZA)</description>
+		<description>Dynamite Headdy (prototype 19940614-CABEZA)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -16091,7 +16131,7 @@ Choppy timings during gameplay (btanb?)
 	</software-->
 
 	<software name="dheadp2" cloneof="dhead">
-		<description>Dynamite Headdy (prototype, 19940616)</description>
+		<description>Dynamite Headdy (prototype 19940616)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -16102,7 +16142,7 @@ Choppy timings during gameplay (btanb?)
 	</software>
 
 	<software name="dheadp1" cloneof="dhead">
-		<description>Dynamite Headdy (prototype, 19940622)</description>
+		<description>Dynamite Headdy (prototype 19940622)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -16172,6 +16212,18 @@ Choppy timings during gameplay (btanb?)
 		</part>
 	</software>
 
+	<software name="ejimu_p" cloneof="ejim">
+		<description>Earthworm Jim (USA, prototype 19940728)</description>
+		<year>1994</year>
+		<publisher>Playmates Interactive</publisher>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" width="16" endianness="big" size="3145728">
+				<rom name="Earthworm Jim (Jul 28, 1994 prototype).bin" size="3145728" crc="24aa391b" sha1="606d80bbdddae0cb84d0d56e7c06660d004ee417"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="ejim2u" cloneof="ejim2">
 		<description>Earthworm Jim 2 (USA)</description>
 		<year>1996</year>
@@ -16180,6 +16232,18 @@ Choppy timings during gameplay (btanb?)
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="3145728">
 				<rom name="earthworm jim 2 (usa).bin" size="3145728" crc="d57f8ba7" sha1="ef7cccfc5eafa32fc6acc71dd9b71693f64eac94"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ejim2_p" cloneof="ejim2">
+		<description>Earthworm Jim 2 (Europe, prototype 19950824)</description>
+		<year>1995</year>
+		<publisher>Playmates Interactive</publisher>
+		<sharedfeat name="compatibility" value="PAL"/>
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" width="16" endianness="big" size="3145728">
+				<rom name="EarthwormJim2.5B1A.bin" size="3145728" crc="f92a931d" sha1="f2f1b0c79c972e83b9ec67cbb41007434c02aad9"/>
 			</dataarea>
 		</part>
 	</software>
@@ -16411,6 +16475,7 @@ https://segaretro.org/Elitserien_95
 https://segaretro.org/Elitserien_96
 ]]></notes>
 		<info name="developer" value="Neurostone"/>
+		<info name="language" value="Swedish"/>
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_sram"/>
@@ -16459,7 +16524,7 @@ https://segaretro.org/Elitserien_96
 	</software>
 
 	<software name="tazmarsp10" cloneof="tazmars">
-		<description>Escape from Mars Starring Taz (prototype, 19940418)</description>
+		<description>Escape from Mars Starring Taz (prototype 19940418)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<sharedfeat name="compatibility" value="NTSC-U"/>
@@ -16471,7 +16536,7 @@ https://segaretro.org/Elitserien_96
 	</software>
 
 	<software name="tazmarsp06" cloneof="tazmars">
-		<description>Escape from Mars Starring Taz (prototype, 19940602)</description>
+		<description>Escape from Mars Starring Taz (prototype 19940602)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<sharedfeat name="compatibility" value="NTSC-U"/>
@@ -16483,7 +16548,7 @@ https://segaretro.org/Elitserien_96
 	</software>
 
 	<software name="tazmarsp05" cloneof="tazmars">
-		<description>Escape from Mars Starring Taz (prototype, 19940607)</description>
+		<description>Escape from Mars Starring Taz (prototype 19940607)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<sharedfeat name="compatibility" value="NTSC-U"/>
@@ -16495,7 +16560,7 @@ https://segaretro.org/Elitserien_96
 	</software>
 
 	<software name="tazmarsp04" cloneof="tazmars">
-		<description>Escape from Mars Starring Taz (prototype, 19940610)</description>
+		<description>Escape from Mars Starring Taz (prototype 19940610)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<sharedfeat name="compatibility" value="NTSC-U"/>
@@ -16507,7 +16572,7 @@ https://segaretro.org/Elitserien_96
 	</software>
 
 	<software name="tazmarsp03" cloneof="tazmars">
-		<description>Escape from Mars Starring Taz (prototype, 19940614)</description>
+		<description>Escape from Mars Starring Taz (prototype 19940614)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<sharedfeat name="compatibility" value="NTSC-U"/>
@@ -16519,7 +16584,7 @@ https://segaretro.org/Elitserien_96
 	</software>
 
 	<software name="tazmarsp02" cloneof="tazmars">
-		<description>Escape from Mars Starring Taz (prototype, 19940618-A)</description>
+		<description>Escape from Mars Starring Taz (prototype 19940618-A)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<sharedfeat name="compatibility" value="NTSC-U"/>
@@ -16531,7 +16596,7 @@ https://segaretro.org/Elitserien_96
 	</software>
 
 	<software name="tazmarsp01" cloneof="tazmars">
-		<description>Escape from Mars Starring Taz (prototype, 19940620)</description>
+		<description>Escape from Mars Starring Taz (prototype 19940620)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<sharedfeat name="compatibility" value="NTSC-U"/>
@@ -16543,7 +16608,7 @@ https://segaretro.org/Elitserien_96
 	</software>
 
 	<software name="tazmarsp11" cloneof="tazmars">
-		<description>Escape from Mars Starring Taz (prototype, 19940309)</description>
+		<description>Escape from Mars Starring Taz (prototype 19940309)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<!-- Compatibility not enforced -->
@@ -16555,7 +16620,7 @@ https://segaretro.org/Elitserien_96
 	</software>
 
 	<software name="tazmarsp09" cloneof="tazmars">
-		<description>Escape from Mars Starring Taz (prototype, 19940509)</description>
+		<description>Escape from Mars Starring Taz (prototype 19940509)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<!-- Compatibility not enforced -->
@@ -16567,7 +16632,7 @@ https://segaretro.org/Elitserien_96
 	</software>
 
 	<software name="tazmarsp08" cloneof="tazmars">
-		<description>Escape from Mars Starring Taz (prototype, 19940518)</description>
+		<description>Escape from Mars Starring Taz (prototype 19940518)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<!-- Compatibility not enforced -->
@@ -16579,7 +16644,7 @@ https://segaretro.org/Elitserien_96
 	</software>
 
 	<software name="tazmarsp07" cloneof="tazmars">
-		<description>Escape from Mars Starring Taz (prototype, 19940523)</description>
+		<description>Escape from Mars Starring Taz (prototype 19940523)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<sharedfeat name="compatibility" value="NTSC-U"/>
@@ -16703,7 +16768,7 @@ https://segaretro.org/Elitserien_96
 	</software>
 
 	<software name="eternalcjp" cloneof="eternalc">
-		<description>Eternal Champions (Japan, prototype, 19931117)</description>
+		<description>Eternal Champions (Japan, prototype 19931117)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -17432,6 +17497,7 @@ https://segaretro.org/Feng_Shen_Ying_Jie_Chuan
 		<info name="serial" value="T-15083"/>
 		<info name="release" value="19931229"/>
 		<info name="alt_title" value="フラッシュバック"/>
+		<info name="language" value="Japanese"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="1572864">
 				<rom name="flashback (jpn).bin" size="1572864" crc="b790e3b4" sha1="5082180974a125b5f9c01c96410c0fdbfb707d2b"/>
@@ -17443,6 +17509,7 @@ https://segaretro.org/Feng_Shen_Ying_Jie_Chuan
 		<description>Flashback (prototype 19920918)</description>
 		<year>1992</year>
 		<publisher>U.S. Gold</publisher>
+		<info name="language" value="English/French"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
 				<rom name="flashback (sep 18, 1992 prototype).bin" size="2097152" crc="82095cb6" sha1="3c0b25e090d0c1167714e1a7346a289ffb808b49"/>
@@ -17454,6 +17521,7 @@ https://segaretro.org/Feng_Shen_Ying_Jie_Chuan
 		<description>Flashback - The Quest for Identity (USA, alt)</description>
 		<year>1993</year>
 		<publisher>U.S. Gold</publisher>
+		<info name="language" value="English/French"/>
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="1572864">
@@ -18924,6 +18992,7 @@ Unemulated [Sega Mega Modem] features
 		<info name="serial" value="G-5547"/>
 		<info name="release" value="19950804"/>
 		<info name="alt_title" value="プロストライカー ファイナルステージ"/>
+		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_sram"/>
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
@@ -20191,6 +20260,7 @@ Unsupported [Justifier] peripheral (joypad works)
 		<description>The Lost Vikings (Europe, prototype)</description>
 		<year>1993</year>
 		<publisher>Interplay</publisher>
+		<info name="language" value="English/French/German" />
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="1048576">
 				<rom name="lost vikings, the (euro) (beta).bin" size="1048576" crc="17bed25f" sha1="375eaa9845692db4fdbd0b51985aa0892a8fe425"/>
@@ -20202,6 +20272,7 @@ Unsupported [Justifier] peripheral (joypad works)
 		<description>The Lost Vikings (USA)</description>
 		<year>1994</year>
 		<publisher>Interplay</publisher>
+		<info name="language" value="English" />
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="1048576">
@@ -22401,7 +22472,7 @@ No [EEPROM] save
 	</software>
 
 	<software name="nbajamp" cloneof="nbajam">
-		<description>NBA Jam (Apr 1993 prototype)</description>
+		<description>NBA Jam (prototype 199304xx)</description>
 		<year>1993</year>
 		<publisher>Arena</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -23427,6 +23498,7 @@ Unemulated [Sega Mega Modem] features
 		<description>Olympic Gold (USA)</description>
 		<year>1992</year>
 		<publisher>U.S. Gold</publisher>
+		<info name="language" value="Dutch/English/French/German/Italian/Portuguese (Brazil)/Spanish/Swedish"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="524288">
 				<rom name="olympic gold (usa).bin" size="524288" crc="339594b4" sha1="f9febd976d98545dee35c10b69755908d6929fd4"/>
@@ -23633,8 +23705,19 @@ Black screen at intro
 	</software>
 
 	<software name="vortex">
-		<description>Out of the Vortex (prototype)</description>
-		<year>199?</year>
+		<description>Out of the Vortex (prototype 19950913)</description>
+		<year>1995</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" width="16" endianness="big" size="2084116">
+				<rom name="Out of the Vortex (Sep 13, 1995 prototype).bin" size="2084116" crc="03c997df" sha1="b8535312ffb9955bc52e55292967c4abad9e4b75"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="vortex_p1" cloneof="vortex">
+		<description>Out of the Vortex (prototype 19950710)</description>
+		<year>1995</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
@@ -24144,6 +24227,7 @@ Black screen at intro
 		<description>Phantasy Star II (Brazil)</description>
 		<year>199?</year>
 		<publisher>Tec Toy</publisher>
+		<info name="language" value="Portuguese (Brazil)"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_sram"/>
 			<dataarea name="rom" width="16" endianness="big" size="786432">
@@ -24277,6 +24361,7 @@ Black screen at intro
 		<description>Phantasy Star III - Generations of Doom (Brazil)</description>
 		<year>1998</year>
 		<publisher>Tec Toy</publisher>
+		<info name="language" value="Portuguese (Brazil)"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_sram"/>
 			<dataarea name="rom" width="16" endianness="big" size="786432">
@@ -25033,6 +25118,7 @@ Black screen
 		<description>Psycho Pinball (prototype)</description>
 		<year>1994</year>
 		<publisher>Codemasters</publisher>
+		<info name="language" value="English" />
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
 			<!-- This is the order they appear on PCB. Release by drx had ODD0/1 names swapped. -->
@@ -26022,7 +26108,7 @@ Red screen
 	</software>
 
 	<software name="roadriot">
-		<description>Road Riot 4WD (prototype, 19930719)</description>
+		<description>Road Riot 4WD (prototype 19930719)</description>
 		<year>1993</year>
 		<publisher>Tengen</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -27067,6 +27153,7 @@ https://segaretro.org/Shi_Jie_Zhi_Bang_Zheng_Ba_Zhan:_World_Pro_Baseball_94
 		<description>Show do Milhão (Brazil)</description>
 		<year>2001</year>
 		<publisher>Tec Toy</publisher>
+		<info name="language" value="Portuguese (Brazil)" />
 		<sharedfeat name="compatibility" value="NTSC-U,NTSC-J"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
@@ -27079,6 +27166,7 @@ https://segaretro.org/Shi_Jie_Zhi_Bang_Zheng_Ba_Zhan:_World_Pro_Baseball_94
 		<description>Show do Milhão Volume 2 (Brazil)</description>
 		<year>2002</year>
 		<publisher>Tec Toy</publisher>
+		<info name="language" value="Portuguese (Brazil)" />
 		<sharedfeat name="compatibility" value="NTSC-U,NTSC-J"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
@@ -27091,6 +27179,7 @@ https://segaretro.org/Shi_Jie_Zhi_Bang_Zheng_Ba_Zhan:_World_Pro_Baseball_94
 		<description>Show do Milhão Volume 2 (Brazil, alt)</description>
 		<year>2002</year>
 		<publisher>Tec Toy</publisher>
+		<info name="language" value="Portuguese (Brazil)" />
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
 				<rom name="show do milhao volume 2 (bra) (alt).bin" size="2097152" crc="d8c9ac6d" sha1="d9c3b494086fef2fa59e031436756236f3cfdf22"/>
@@ -27352,6 +27441,7 @@ https://bootleggames.fandom.com/wiki/Shui_Hu_Feng_Yun_Zhuan
 		<description>Soleil (Europe)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
+		<info name="language" value="English" />
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_sram"/>
@@ -27367,6 +27457,7 @@ https://bootleggames.fandom.com/wiki/Shui_Hu_Feng_Yun_Zhuan
 		<description>Crusader of Centy (USA)</description>
 		<year>1994</year>
 		<publisher>Atlus</publisher>
+		<info name="language" value="English" />
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_sram"/>
@@ -27385,6 +27476,7 @@ https://bootleggames.fandom.com/wiki/Shui_Hu_Feng_Yun_Zhuan
 		<info name="serial" value="G-5536"/>
 		<info name="release" value="19940617"/>
 		<info name="alt_title" value="新創世紀ラグナセンティ"/>
+		<info name="language" value="Japanese" />
 		<sharedfeat name="compatibility" value="NTSC-J,PAL"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_sram"/>
@@ -27401,6 +27493,7 @@ https://bootleggames.fandom.com/wiki/Shui_Hu_Feng_Yun_Zhuan
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<info name="alt_title" value="新創世紀ラグナセンティ"/>
+		<info name="language" value="Japanese" />
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="1048576">
 				<rom name="shin souseiki ragnacenty (jpn) (beta).bin" size="1048576" crc="43797455" sha1="963f13f74d648c573ced103b2803d15d0a2742e8"/>
@@ -27412,6 +27505,7 @@ https://bootleggames.fandom.com/wiki/Shui_Hu_Feng_Yun_Zhuan
 		<description>Ragnacenty (Korea)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
+		<info name="language" value="Korean" />
 		<sharedfeat name="compatibility" value="NTSC-J,PAL"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_sram"/>
@@ -27694,7 +27788,7 @@ Black screen, writes in ROM area then jumps to PC=1a2000 (encryption?)
 	</software>
 
 	<software name="sspinp3" cloneof="sspin">
-		<description>Sonic Spinball (Aug 1993 prototype)</description>
+		<description>Sonic Spinball (prototype 199308xx)</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -28722,7 +28816,7 @@ Freezes at the start of any in-game mode
 	</software>
 
 	<software name="steeltalp1" cloneof="steeltal" supported="no">
-		<description>Steel Talons (USA, prototype, 199206xx)</description>
+		<description>Steel Talons (USA, prototype 199206xx)</description>
 		<year>1992</year>
 		<publisher>Tengen</publisher>
 		<notes><![CDATA[
@@ -28795,6 +28889,7 @@ Freezes at the start of any in-game mode
 		<description>The Story of Thor (Germany)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
+		<info name="language" value="German" />
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_sram"/>
@@ -28841,6 +28936,7 @@ Freezes at the start of any in-game mode
 		<description>The Story of Thor (Korea)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
+		<info name="language" value="Korean" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_sram"/>
@@ -28901,6 +28997,7 @@ Freezes at the start of any in-game mode
 		<description>The Story of Thor (Spain)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
+		<info name="language" value="Spanish" />
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_sram"/>
@@ -29027,7 +29124,7 @@ Freezes at the start of any in-game mode
 	</software>
 
 	<software name="ssmartp" cloneof="ssmart">
-		<description>Street Smart (prototype, 19900629)</description>
+		<description>Street Smart (prototype 19900629)</description>
 		<year>1991</year>
 		<publisher>Treco</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -30794,6 +30891,7 @@ No BGMs
 		<description>Tintin au Tibet (Europe)</description>
 		<year>1995</year>
 		<publisher>Infogrames</publisher>
+		<info name="language" value="Dutch/English/French/German/Spanish/Swedish" />
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
@@ -30806,6 +30904,7 @@ No BGMs
 		<description>Tintin au Tibet (Europe, prototype)</description>
 		<year>1995</year>
 		<publisher>Infogrames</publisher>
+		<info name="language" value="Dutch/English/French/German/Spanish/Swedish" />
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
@@ -32276,6 +32375,7 @@ No BGMs
 		<description>Where in the World Is Carmen Sandiego? (Brazil)</description>
 		<year>199?</year>
 		<publisher>Tec Toy</publisher>
+		<info name="language" value="Portuguese (Brazil)/Spanish" />
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="1048576">
 				<rom name="where in the world is carmen sandiego (bra).bin" size="1048576" crc="7d4450ad" sha1="8441f0eba23c0b013ca3932914f9f8d364e61a01"/>
@@ -32287,6 +32387,7 @@ No BGMs
 		<description>Where in Time Is Carmen Sandiego? (Europe, USA)</description>
 		<year>1992</year>
 		<publisher>Electronic Arts</publisher>
+		<info name="language" value="English/French/German/Italian/Spanish" />
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="1048576">
 				<rom name="where in time is carmen sandiego (euro, usa).bin" size="1048576" crc="ea19d4a4" sha1="0b726481cd9333d26aa3fe53fa2f293c0c385509"/>
@@ -32298,6 +32399,7 @@ No BGMs
 		<description>Where in Time Is Carmen Sandiego? (Brazil)</description>
 		<year>199?</year>
 		<publisher>Tec Toy</publisher>
+		<info name="language" value="Portuguese (Brazil)/Spanish" />
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="1048576">
 				<rom name="where in time is carmen sandiego (bra).bin" size="1048576" crc="d523b552" sha1="213b6dfc129fe245f2ecd73ad91c772efd628462"/>
@@ -32410,6 +32512,7 @@ No BGMs
 		<info name="serial" value="G-4115"/>
 		<info name="release" value="19940211"/>
 		<info name="alt_title" value="ウィンターオリンピック"/>
+		<info name="language" value="English/French/German/Italian/Norwegian/Portuguese (Brazil)/Spanish/Swedish" />
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
 				<rom name="winter olympics (jpn).bin" size="2097152" crc="654a4684" sha1="aa2fc21eaa833640eaf882d66ca6ceb4f8adabcf"/>
@@ -32421,6 +32524,7 @@ No BGMs
 		<description>Winter Olympic Games (USA)</description>
 		<year>1993</year>
 		<publisher>U.S. Gold</publisher>
+		<info name="language" value="English/French/German/Italian/Norwegian/Portuguese (Brazil)/Spanish/Swedish" />
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
 				<rom name="winter olympic games (usa).bin" size="2097152" crc="c5834437" sha1="da5a2a0c1a0a6b7b29492f8845eca1167158ebea"/>
@@ -32496,8 +32600,9 @@ No BGMs
 
 	<software name="turmamon" cloneof="wboymw" supported="yes">
 		<description>Turma da Mônica na Terra dos Monstros (Brazil)</description>
-		<year>1996</year>
+		<year>1994</year>
 		<publisher>Tec Toy</publisher>
+		<info name="language" value="Portuguese (Brazil)" />
 		<part name="cart" interface="megadriv_cart">
 			<!-- Doesn't hang but will silently fail saving -->
 			<feature name="slot" value="rom_eeprom_mode1"/>
@@ -32526,6 +32631,7 @@ Unsupported Mega-CD/Wondermega cart allowing EBXA format to be played back
 		<description>World Championship Soccer II (USA)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="1048576">
 				<rom name="world championship soccer ii (usa).bin" size="1048576" crc="c1dd1c8e" sha1="f6ce0b826e028599942957729d72c7a8955c5e35"/>
@@ -34165,6 +34271,7 @@ Black screen
 		<description>Yu Yu Hakusho - Sunset Fighters (Brazil)</description>
 		<year>199?</year>
 		<publisher>Tec Toy</publisher>
+		<info name="language" value="Portuguese (Brazil)" />
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="3145728">
 				<rom name="yuu yuu hakusho - sunset fighters (bra).bin" size="3145728" crc="fe3fb8ee" sha1="e307363837626d47060f5347d0fccfc568a12b18"/>
@@ -34839,7 +34946,7 @@ https://bootleggames.fandom.com/wiki/Super_Bubble_Bobble_MD
 	</software>
 
 	<software name="sdkong99">
-		<description>Super Donkey Kong 99 (Protected)</description>
+		<description>Super Donkey Kong 99 (protected)</description>
 		<year>199?</year>
 		<publisher>&lt;unlicensed&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -35171,6 +35278,7 @@ https://bootleggames.fandom.com/wiki/Super_Bubble_Bobble_MD
 		<description>Ultimate Soccer (Europe, prototype)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
+		<info name="language" value="English/French/German/Italian/Spanish" />
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="1048576">
 				<rom name="world soccer (prototype).bin" size="1048576" crc="9d451f72" sha1="892747034876a7f587bbf0e3f21c9f35237bb1ea"/>
@@ -35731,6 +35839,7 @@ Unsupported lightgun or mouse?
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<info name="alt_title" value="Индиана Джонс Коридоры времени"/>
+		<info name="language" value="Russian" />
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="4194304">
 				<rom name="indiana jones - corridors of time (unl).bin" size="4194304" crc="54f82c76" sha1="c54370066b3afeed05226e33881746d86c33154a"/>
@@ -36113,9 +36222,10 @@ BGM sometimes goes silent (does several [YM2612] 68k writes without bus)
 	</software>
 
 	<software name="rickdang">
-		<description>Rick Dangerous (Russia)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<description>Rick Dangerous</description>
+		<year>2011</year>
+		<publisher>Pascal-O-Rama</publisher>
+		<info name="language" value="English" />
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="4063232">
 				<rom name="rick dangerous (unl).bin" size="4063232" crc="545cbbe4" sha1="9698dfa5d10509ded6952a88445e8db53c440de8"/>
@@ -36206,6 +36316,7 @@ https://segaretro.org/Shin_Samurai_Spirits_Haohmaru_Jigokuhen
 https://bootleggames.fandom.com/wiki/SpongeBob_SquarePants
 ]]></notes>
 		<info name="alt_title" value="Губка Боб"/>
+		<info name="language" value="Russian"/>
 		<!-- compatibility enforced even if it's a bootleg -->
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="megadriv_cart">
@@ -36457,6 +36568,18 @@ Jumps to invalid address, needs own slot type with mountable carts
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="131072">
 				<rom name="pro action replay (euro).bin" size="131072" crc="17255224" sha1="b0bbfe0c201b2ab2fc17b37e5709785fedc07170"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pvar" supported="no">
+		<description>Pro Version Action Replay (Europe)</description>
+		<year>1992</year>
+		<publisher>Datel</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" width="16" endianness="big" size="131072">
+				<rom name="27c256.low"  size="32768" crc="cca1bd54" sha1="39a934fca8343cf84ecff4f2010cb08e55ad2b06" offset="0x0000" loadflag="load16_byte"/>
+				<rom name="27c256.high" size="32768" crc="41c5499f" sha1="9f39ddfc9299f2d796e0f00472d258a854ce1b18" offset="0x0001" loadflag="load16_byte"/>
 			</dataarea>
 		</part>
 	</software>

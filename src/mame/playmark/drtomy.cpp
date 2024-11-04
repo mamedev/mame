@@ -77,16 +77,16 @@ private:
 	void drtomy_okibank_w(uint16_t data);
 	TILE_GET_INFO_MEMBER(get_tile_info_fg);
 	TILE_GET_INFO_MEMBER(get_tile_info_bg);
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 	uint32_t screen_update_drtomy(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	required_device<cpu_device> m_maincpu;
 	required_device<okim6295_device> m_oki;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
-	void drtomy_map(address_map &map);
+	void drtomy_map(address_map &map) ATTR_COLD;
 };
 
 

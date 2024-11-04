@@ -79,8 +79,8 @@ private:
 
 	void whizz_bankswitch_w(uint8_t data);
 
-	virtual void machine_start() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 	TILE_GET_INFO_MEMBER(get_sidearms_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_philko_bg_tile_info);
@@ -92,12 +92,12 @@ private:
 	void draw_starfield( bitmap_ind16 &bitmap );
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void sidearms_map(address_map &map);
-	void sidearms_sound_map(address_map &map);
-	void turtship_map(address_map &map);
-	void whizz_io_map(address_map &map);
-	void whizz_map(address_map &map);
-	void whizz_sound_map(address_map &map);
+	void sidearms_map(address_map &map) ATTR_COLD;
+	void sidearms_sound_map(address_map &map) ATTR_COLD;
+	void turtship_map(address_map &map) ATTR_COLD;
+	void whizz_io_map(address_map &map) ATTR_COLD;
+	void whizz_map(address_map &map) ATTR_COLD;
+	void whizz_sound_map(address_map &map) ATTR_COLD;
 };
 
 #endif // MAME_CAPCOM_SIDEARMS_H

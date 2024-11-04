@@ -265,6 +265,8 @@ INTERRUPT_GEN_MEMBER(xavix_state::interrupt)
 		m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 		m_video_ctrl |= 0x80;
 	}
+
+	xavix_interrupt_extra();
 }
 
 
@@ -453,6 +455,35 @@ uint8_t xavix_state::read_io1(uint8_t direction)
 	return m_in1->read();
 }
 
+uint8_t xavix_duelmast_state::read_io1(uint8_t direction)
+{
+	int pc = m_maincpu->pc();
+
+	// hacks to get it to boot.  It will still spin for a long time on a black
+	// screen before giving a card scanner error, you can bypass that with button 1
+	// but the game isn't playable
+
+	if (pc == 0x3c01)
+		return 0x00;
+
+	if (pc == 0x3c06)
+		return 0x02;
+
+	if (pc == 0x3c14)
+		return 0x04;
+
+	if (pc == 0x3c19)
+		return 0x00;
+
+	if (pc == 0x3c25)
+		return 0x04;
+
+	if (pc == 0x3c2a)
+		return 0x00;
+
+	return m_in1->read();
+}
+
 void xavix_state::write_io0(uint8_t data, uint8_t direction)
 {
 	// no special handling
@@ -490,6 +521,11 @@ void xavix_i2c_ltv_tam_state::write_io1(uint8_t data, uint8_t direction)
 	}
 }
 
+void xavix_i2c_mj_state::write_io1(uint8_t data, uint8_t direction)
+{
+	m_i2cmem->write_sda(BIT(data | ~direction, 1));
+	m_i2cmem->write_scl(BIT(data | ~direction, 0));
+}
 
 // for taikodp
 void xavix_i2c_cart_state::write_io1(uint8_t data, uint8_t direction)
@@ -762,7 +798,7 @@ void xavix_state::timer_freq_w(uint8_t data)
 
 TIMER_CALLBACK_MEMBER(xavix_state::freq_timer_done)
 {
-	if (m_timer_control & 0x40) // Timer IRQ enable?
+	if ((m_timer_control & 0x40) && (!m_disable_timer_irq_hack)) // Timer IRQ enable?
 	{
 		m_irqsource |= 0x10;
 		m_timer_control |= 0x80;

@@ -52,9 +52,9 @@ public:
 	void init_metlfrzr();
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	void legacy_bg_draw(bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -63,8 +63,8 @@ private:
 	uint32_t screen_update_metlfrzr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void output_w(uint8_t data);
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline);
-	void decrypted_opcodes_map(address_map &map);
-	void metlfrzr_map(address_map &map);
+	void decrypted_opcodes_map(address_map &map) ATTR_COLD;
+	void metlfrzr_map(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	required_shared_ptr<uint8_t> m_decrypted_opcodes;

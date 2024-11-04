@@ -42,12 +42,12 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// optional information overrides
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 
 	// device_isa8_card_interface
 	virtual uint8_t dack_r(int line) override;
@@ -67,7 +67,7 @@ private:
 	uint8_t wd1015_p2_r();
 	void wd1015_p2_w(uint8_t data);
 
-	void wd1015_io(address_map &map);
+	void wd1015_io(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<wd11c00_17_device> m_host;

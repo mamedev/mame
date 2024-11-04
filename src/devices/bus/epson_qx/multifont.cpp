@@ -58,22 +58,23 @@ DEFINE_DEVICE_TYPE(EPSON_QX_OPTION_MULTIFONT, bus::epson_qx::multifont_device, "
 namespace bus::epson_qx {
 
 ROM_START(multifont)
-	/* This is the i8039 program ROM for the Q10MF Multifont card, and the actual font ROMs are missing (6 * HN43128) */
+	/* This is the i8039 program ROM for the Q10MF Multifont card */
 	ROM_REGION( 0x0800, "i8039", 0 )
 	ROM_LOAD( "m12020a.3e", 0x0000, 0x0800, CRC(fa27f333) SHA1(73d27084ca7b002d5f370220d8da6623a6e82132))
 
 	ROM_REGION( 0x4000, "font0", 0 )
-	ROM_LOAD( "hn43128.1a", 0x0000, 0x4000, NO_DUMP)
+	ROM_LOAD( "hn43128.1a", 0x0000, 0x4000, CRC(0ba54615) SHA1(d718e9b3b6cab29a17c2d4d72a7b397121d96ffd))
 	ROM_REGION( 0x4000, "font1", 0 )
-	ROM_LOAD( "hn43128.2a", 0x0000, 0x4000, NO_DUMP)
+	ROM_LOAD( "hn43128.2a", 0x0000, 0x4000, CRC(968a8848) SHA1(e19ef2bd46c7471ed682a6d456be9cb1db5ce321))
 	ROM_REGION( 0x4000, "font2", 0 )
-	ROM_LOAD( "hn43128.1b", 0x0000, 0x4000, NO_DUMP)
+	ROM_LOAD( "hn43128.1b", 0x0000, 0x4000, CRC(e4ed0fb1) SHA1(77e825061f9af77d3f1963aa9cbbb46f49e86f92))
 	ROM_REGION( 0x4000, "font3", 0 )
-	ROM_LOAD( "hn43128.2b", 0x0000, 0x4000, NO_DUMP)
+	ROM_LOAD( "hn43128.2b", 0x0000, 0x4000, CRC(27e9c1da) SHA1(926985f0fec6b00960acd616bc73596bcb3d3884))
 	ROM_REGION( 0x4000, "font4", 0 )
-	ROM_LOAD( "hn43128.3a", 0x0000, 0x4000, NO_DUMP)
+	ROM_LOAD( "hn43128.3a", 0x0000, 0x4000, CRC(3e5dd796) SHA1(ffa6eb775545833b8e7647c450595fab6d6aa341))
 	ROM_REGION( 0x4000, "font5", 0 )
-	ROM_LOAD( "hn43128.3b", 0x0000, 0x4000, NO_DUMP)
+	ROM_LOAD( "hn43128.3b", 0x0000, 0x4000, CRC(adc569bf) SHA1(19246af07d6728ccd74a021265df827ecc6fe2b5))
+	/* Sockets 1c and 2c are empty */
 	ROM_REGION( 0x4000, "font6", 0 )
 	ROM_LOAD( "hn43128.1c", 0x0000, 0x4000, NO_DUMP)
 	ROM_REGION( 0x4000, "font7", 0 )

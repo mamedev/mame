@@ -49,7 +49,7 @@ public:
 
 private:
 	// device_t implementation
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 	u8 m_memcard_data[0x100];
 	u8 m_protection_data[4];

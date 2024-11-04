@@ -44,15 +44,15 @@ public:
 	void nmi_w(int state);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	MC6845_UPDATE_ROW(update_row);
 
 	void lamps_w(u8 data);
 
-	void mem_map(address_map &map);
-	void io_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
+	void io_map(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<pic8259_device> m_pic;
@@ -166,7 +166,7 @@ static INPUT_PORTS_START(freeway)
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("RESET")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_MEMORY_RESET) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, freeway_state, nmi_w)
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_MEMORY_RESET) PORT_WRITE_LINE_MEMBER(FUNC(freeway_state::nmi_w))
 INPUT_PORTS_END
 
 static GFXDECODE_START(gfx_freeway)

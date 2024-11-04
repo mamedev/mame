@@ -128,9 +128,9 @@ public:
 	void init_rthun2();
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 enum
 	{
@@ -249,31 +249,31 @@ enum
 	void RozCB_luckywld(uint16_t code, int *tile, int *mask, int which);
 	void RozCB_metlhawk(uint16_t code, int *tile, int *mask, int which);
 
-	void c140_default_am(address_map &map);
-	void common_default_am(address_map &map);
-	void common_finallap_am(address_map &map);
-	void common_suzuka8h_am(address_map &map);
-	void common_suzuka8h_roz_am(address_map &map);
-	void common_luckywld_roz_am(address_map &map);
-	void common_metlhawk_am(address_map &map);
-	void common_sgunner_am(address_map &map);
-	void master_common_am(address_map &map);
-	void master_default_am(address_map &map);
-	void master_finallap_am(address_map &map);
-	void master_suzuka8h_am(address_map &map);
-	void master_luckywld_am(address_map &map);
-	void master_metlhawk_am(address_map &map);
-	void master_sgunner_am(address_map &map);
+	void c140_default_am(address_map &map) ATTR_COLD;
+	void common_default_am(address_map &map) ATTR_COLD;
+	void common_finallap_am(address_map &map) ATTR_COLD;
+	void common_suzuka8h_am(address_map &map) ATTR_COLD;
+	void common_suzuka8h_roz_am(address_map &map) ATTR_COLD;
+	void common_luckywld_roz_am(address_map &map) ATTR_COLD;
+	void common_metlhawk_am(address_map &map) ATTR_COLD;
+	void common_sgunner_am(address_map &map) ATTR_COLD;
+	void master_common_am(address_map &map) ATTR_COLD;
+	void master_default_am(address_map &map) ATTR_COLD;
+	void master_finallap_am(address_map &map) ATTR_COLD;
+	void master_suzuka8h_am(address_map &map) ATTR_COLD;
+	void master_luckywld_am(address_map &map) ATTR_COLD;
+	void master_metlhawk_am(address_map &map) ATTR_COLD;
+	void master_sgunner_am(address_map &map) ATTR_COLD;
 
-	void namcos2_68k_default_cpu_board_am(address_map &map);
-	void slave_common_am(address_map &map);
-	void slave_default_am(address_map &map);
-	void slave_finallap_am(address_map &map);
-	void slave_suzuka8h_am(address_map &map);
-	void slave_luckywld_am(address_map &map);
-	void slave_metlhawk_am(address_map &map);
-	void slave_sgunner_am(address_map &map);
-	void sound_default_am(address_map &map);
+	void namcos2_68k_default_cpu_board_am(address_map &map) ATTR_COLD;
+	void slave_common_am(address_map &map) ATTR_COLD;
+	void slave_default_am(address_map &map) ATTR_COLD;
+	void slave_finallap_am(address_map &map) ATTR_COLD;
+	void slave_suzuka8h_am(address_map &map) ATTR_COLD;
+	void slave_luckywld_am(address_map &map) ATTR_COLD;
+	void slave_metlhawk_am(address_map &map) ATTR_COLD;
+	void slave_sgunner_am(address_map &map) ATTR_COLD;
+	void sound_default_am(address_map &map) ATTR_COLD;
 };
 
 class gollygho_state : public namcos2_state
@@ -287,7 +287,7 @@ public:
 	{ }
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 	virtual void dpram_word_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0) override;
 

@@ -47,13 +47,13 @@ public:
 	void basic31(machine_config &config);
 
 private:
-	void machine_start() override;
+	void machine_start() override ATTR_COLD;
 	void port1_w(u8 data);
 	uint8_t port3_r();
 	void port3_w(u8 data);
 	void rx_w(int state);
-	void io_map(address_map &map);
-	void mem_map(address_map &map);
+	void io_map(address_map &map) ATTR_COLD;
+	void mem_map(address_map &map) ATTR_COLD;
 	uint8_t m_port3 = 0U;
 	required_device<mcs51_cpu_device> m_maincpu;
 	required_device<rs232_port_device> m_serial;

@@ -24,8 +24,8 @@ public:
 	void ecoinf1_older(machine_config &config);
 
 private:
-	void older_memmap(address_map &map);
-	void older_portmap(address_map &map);
+	void older_memmap(address_map &map) ATTR_COLD;
+	void older_portmap(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 };

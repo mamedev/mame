@@ -94,8 +94,8 @@ public:
 	void monon_color(machine_config &config);
 protected:
 	// driver_device overrides
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	// screen updates
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -129,7 +129,7 @@ private:
 
 	uint8_t m_curpal[0x800 * 3];
 
-	void music_mem(address_map &map);
+	void music_mem(address_map &map) ATTR_COLD;
 	uint8_t music_rts_r();
 
 	uint8_t in0_r();

@@ -48,8 +48,8 @@ protected:
 		virtual u8 decrypt8(u8 value, offs_t pc, bool opcode) const override;
 	};
 
-	virtual void device_reset() override;
-	virtual void device_start() override;
+	virtual void device_reset() override ATTR_COLD;
+	virtual void device_start() override ATTR_COLD;
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 };
 

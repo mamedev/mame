@@ -69,16 +69,15 @@ protected:
 	virtual uint64_t execute_clocks_to_cycles(uint64_t clocks) const noexcept override { return (clocks / 2); }
 	virtual uint64_t execute_cycles_to_clocks(uint64_t cycles) const noexcept override { return (cycles * 2); }
 	virtual void execute_run() override;
-	virtual void device_start() override;
-	virtual void device_reset() override;
-	virtual uint32_t execute_input_lines() const noexcept override { return 1; }
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 	virtual uint8_t fetch() override;
 	uint32_t update_pc() { return m_pc = (m_sregs[CS] << 4) + m_ip; }
 
 	virtual uint8_t read_port_byte(uint16_t port) override;
 	virtual uint16_t read_port_word(uint16_t port) override;
 	virtual void write_port_byte(uint16_t port, uint8_t data) override;
-	void write_port_byte_al(uint16_t port);
+	virtual void write_port_byte_al(uint16_t port) override;
 	virtual void write_port_word(uint16_t port, uint16_t data) override;
 	virtual uint8_t read_byte(uint32_t addr) override;
 	virtual uint16_t read_word(uint32_t addr) override;

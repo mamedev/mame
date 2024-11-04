@@ -60,7 +60,7 @@ public:
 	void omar1(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 protected:
 	// devices/pointers
@@ -72,8 +72,8 @@ protected:
 
 	u8 m_inp_mux = 0;
 
-	void main_map(address_map &map);
-	void main_io(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
+	void main_io(address_map &map) ATTR_COLD;
 
 	void input1_w(u8 data);
 	void input2_w(u8 data);
@@ -103,7 +103,7 @@ public:
 	void omar2(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	u8 m_lcd_com = 0;

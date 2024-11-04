@@ -22,7 +22,7 @@
 #include "logmacro.h"
 
 
-CUSTOM_INPUT_MEMBER(arkanoid_state::arkanoid_semaphore_input_r)
+ioport_value arkanoid_state::arkanoid_semaphore_input_r()
 {
 	// bit 0 is host semaphore flag, bit 1 is MCU semaphore flag (both active low)
 	return

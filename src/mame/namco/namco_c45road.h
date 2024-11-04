@@ -21,7 +21,7 @@ public:
 	// construction/destruction
 	namco_c45_road_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
-	void map(address_map &map);
+	void map(address_map &map) ATTR_COLD;
 
 	// read/write handlers
 	uint16_t read(offs_t offset);
@@ -35,7 +35,7 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 	virtual space_config_vector memory_space_config() const override;
 
 private:

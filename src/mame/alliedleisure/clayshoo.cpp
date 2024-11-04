@@ -37,8 +37,8 @@ public:
 	void clayshoo(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -53,8 +53,8 @@ private:
 	uint8_t difficulty_input_port_r(int bit);
 	void create_analog_timers();
 
-	void main_io_map(address_map &map);
-	void main_map(address_map &map);
+	void main_io_map(address_map &map) ATTR_COLD;
+	void main_map(address_map &map) ATTR_COLD;
 
 	emu_timer *m_analog_timer_1 = nullptr, *m_analog_timer_2 = nullptr;
 	uint8_t m_input_port_select = 0;

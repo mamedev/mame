@@ -84,8 +84,8 @@ private:
 	uint8_t clut_r(offs_t offset);
 	void clut_w(offs_t offset, uint8_t data);
 
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 	uint32_t screen_update_type1(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_type2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -95,21 +95,21 @@ private:
 
 	void postload();
 
-	void av2mj1bb_io_map(address_map &map);
-	void av2mj1bb_map(address_map &map);
-	void av2mj2rg_map(address_map &map);
-	void galkaika_map(address_map &map);
-	void galkoku_io_map(address_map &map);
-	void galkoku_map(address_map &map);
-	void hyouban_io_map(address_map &map);
-	void mjlstory_map(address_map &map);
-	void nbmj8991_sound_io_map(address_map &map);
-	void nbmj8991_sound_map(address_map &map);
-	void pstadium_io_map(address_map &map);
-	void pstadium_map(address_map &map);
-	void tokyogal_map(address_map &map);
-	void triplew1_map(address_map &map);
-	void triplew2_map(address_map &map);
+	void av2mj1bb_io_map(address_map &map) ATTR_COLD;
+	void av2mj1bb_map(address_map &map) ATTR_COLD;
+	void av2mj2rg_map(address_map &map) ATTR_COLD;
+	void galkaika_map(address_map &map) ATTR_COLD;
+	void galkoku_io_map(address_map &map) ATTR_COLD;
+	void galkoku_map(address_map &map) ATTR_COLD;
+	void hyouban_io_map(address_map &map) ATTR_COLD;
+	void mjlstory_map(address_map &map) ATTR_COLD;
+	void nbmj8991_sound_io_map(address_map &map) ATTR_COLD;
+	void nbmj8991_sound_map(address_map &map) ATTR_COLD;
+	void pstadium_io_map(address_map &map) ATTR_COLD;
+	void pstadium_map(address_map &map) ATTR_COLD;
+	void tokyogal_map(address_map &map) ATTR_COLD;
+	void triplew1_map(address_map &map) ATTR_COLD;
+	void triplew2_map(address_map &map) ATTR_COLD;
 
 	TIMER_CALLBACK_MEMBER(clear_busy_flag);
 };

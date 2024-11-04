@@ -24,14 +24,14 @@ public:
 	void evolhh(machine_config &config);
 
 private:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	required_device<evo_cpu_device> m_maincpu;
 
-	void evolution_map(address_map &map);
+	void evolution_map(address_map &map) ATTR_COLD;
 };
 
 void evolution_handheldgame_state::machine_start()

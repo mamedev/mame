@@ -27,15 +27,15 @@ class cbm2_hrg_device : public device_t,
 {
 public:
 	// optional information overrides
-	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 
 protected:
 	// construction/destruction
 	cbm2_hrg_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// device_cbm2_expansion_card_interface overrides
 	virtual uint8_t cbm2_bd_r(offs_t offset, uint8_t data, int csbank1, int csbank2, int csbank3) override;
@@ -58,10 +58,10 @@ public:
 
 protected:
 	// optional information overrides
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 private:
-	void hrg_a_map(address_map &map);
+	void hrg_a_map(address_map &map) ATTR_COLD;
 };
 
 
@@ -75,10 +75,10 @@ public:
 
 protected:
 	// optional information overrides
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 private:
-	void hrg_b_map(address_map &map);
+	void hrg_b_map(address_map &map) ATTR_COLD;
 };
 
 

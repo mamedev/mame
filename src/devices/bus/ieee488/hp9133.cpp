@@ -28,7 +28,7 @@
 namespace {
 
 class hp9133_device : public device_t,
-		      public device_ieee488_interface
+			  public device_ieee488_interface
 {
 public:
 	// construction/destruction
@@ -36,11 +36,11 @@ public:
 
 protected:
 	// device_t implementation
-	virtual void device_start() override;
-	virtual void device_reset() override;
-	virtual ioport_constructor device_input_ports() const override;
-	virtual const tiny_rom_entry *device_rom_region() const override;
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 	// device_ieee488_interface implementation
 	virtual void ieee488_eoi(int state) override;
@@ -126,7 +126,7 @@ private:
 
 	void dma_ram_w(uint8_t data);
 	uint8_t dma_ram_r(offs_t offset);
-	void cpu_map(address_map &map);
+	void cpu_map(address_map &map) ATTR_COLD;
 	void floppy_index_cb(floppy_image_device *floppy, int state);
 	void hdc_bcs_cb(int state);
 	void hdc_bcr_cb(int state);
@@ -534,11 +534,11 @@ void hp9133_device::io1_w(uint8_t data)
 	// 0 - Fault LED#
 	m_head = (data >> 2) & 7;
 	LOG("%s: %02x Head %d %s%s%s%s\n", __func__,
-	    	data, m_head,
-	    	(data & IO1_W_BRDY) ? "BRDY " : "",
-	    	(data & IO1_W_WDRESET_N) ? "" : "HDCRESET ",
-	    	(data & IO1_W_DS1) ? "ACTIVE " : "",
-	    	(data & IO1_W_FLT_N) ? "" : "FAULT ");
+			data, m_head,
+			(data & IO1_W_BRDY) ? "BRDY " : "",
+			(data & IO1_W_WDRESET_N) ? "" : "HDCRESET ",
+			(data & IO1_W_DS1) ? "ACTIVE " : "",
+			(data & IO1_W_FLT_N) ? "" : "FAULT ");
 	if (!(data & IO1_W_WDRESET_N))
 		m_hdc->reset();
 	m_hdc->buffer_ready(data & IO1_W_BRDY);
@@ -590,8 +590,8 @@ void hp9133_device::io3_w(uint8_t data)
 	m_intsel = data & IO3_W_INTSEL_MASK;
 
 	LOG("%s: %02x = INTSEL %d, INT %d DMA %d DMA start %d DMA ACK %s\n", __func__,
-	    	data, m_intsel, m_intenable, m_dmaenable, BIT(data, 4),
-	    	m_dmaack_switch ? "GPIB" : "FDC");
+			data, m_intsel, m_intenable, m_dmaenable, BIT(data, 4),
+			m_dmaack_switch ? "GPIB" : "FDC");
 	update_intsel();
 	if (m_fast)
 		m_fast_timer->adjust(attotime::from_usec(1000));
@@ -713,7 +713,7 @@ void hp9133_device::hdc_readwrite_sector(bool write)
 	const auto &info = m_harddisk->get_info();
 	lba = (m_hdc_cylinder * info.heads + m_head) * info.sectors + sector;
 	LOG("%s: %s cyl %4d, head %d, sector %2d lba %8d\n", __func__,
-	    write ? "WRITE" : "READ ", m_hdc_cylinder, m_head, sector, lba);
+			write ? "WRITE" : "READ ", m_hdc_cylinder, m_head, sector, lba);
 	if (write) {
 		m_harddisk->write(lba, m_dma_ram);
 	} else {

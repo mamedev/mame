@@ -33,10 +33,10 @@ public:
 
 protected:
 	// device_t implementation
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual ioport_constructor device_input_ports() const override;
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// device_nvram_interface implementation
 	virtual void nvram_default() override;
@@ -60,7 +60,7 @@ private:
 	uint8_t nvram_r(offs_t offset) { return m_nvram[offset & 0x1fff]; }
 	void nvram_w(offs_t offset, uint8_t data) { m_nvram[offset & 0x1fff] = data; }
 
-	void c64_fcc_map(address_map &map);
+	void c64_fcc_map(address_map &map) ATTR_COLD;
 };
 
 

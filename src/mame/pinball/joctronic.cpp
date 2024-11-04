@@ -76,17 +76,17 @@ private:
 	void slalom03_oki_bank_w(uint8_t data);
 	void vck_w(int state);
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
-	void bldyrolr_maincpu_map(address_map &map);
-	void joctronic_sound_io_map(address_map &map);
-	void joctronic_sound_map(address_map &map);
-	void maincpu_io_map(address_map &map);
-	void maincpu_map(address_map &map);
-	void slalom03_maincpu_map(address_map &map);
-	void slalom03_sound_io_map(address_map &map);
-	void slalom03_sound_map(address_map &map);
+	void bldyrolr_maincpu_map(address_map &map) ATTR_COLD;
+	void joctronic_sound_io_map(address_map &map) ATTR_COLD;
+	void joctronic_sound_map(address_map &map) ATTR_COLD;
+	void maincpu_io_map(address_map &map) ATTR_COLD;
+	void maincpu_map(address_map &map) ATTR_COLD;
+	void slalom03_maincpu_map(address_map &map) ATTR_COLD;
+	void slalom03_sound_io_map(address_map &map) ATTR_COLD;
+	void slalom03_sound_map(address_map &map) ATTR_COLD;
 
 	required_device<z80_device> m_maincpu;
 	required_device<ls259_device> m_mainlatch;

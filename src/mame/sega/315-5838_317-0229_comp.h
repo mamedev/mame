@@ -36,8 +36,8 @@ public:
 	void set_hack_mode(int mode) { m_hackmode = mode; }
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 private:
 	uint16_t source_word_r();

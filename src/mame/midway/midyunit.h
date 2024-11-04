@@ -36,8 +36,8 @@ protected:
 	{
 	}
 
-	virtual void machine_start() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 	// protection data types
 	struct protection_data
@@ -111,7 +111,7 @@ protected:
 	void init_gfxrom(int bpp);
 	void install_hidden_ram(mc6809e_device &cpu, int prot_start, int prot_end);
 
-	void main_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
 
 	void yunit_core(machine_config &config);
 	void yunit_4bpp(machine_config &config);
@@ -132,18 +132,18 @@ public:
 	void init_narc();
 
 	int narc_talkback_strobe_r();
-	DECLARE_CUSTOM_INPUT_MEMBER(narc_talkback_data_r);
+	ioport_value narc_talkback_data_r();
 
 protected:
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	required_device<williams_narc_sound_device> m_narc_sound;
 
 	void narc_sound_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
-	void zunit_main_map(address_map &map);
+	void zunit_main_map(address_map &map) ATTR_COLD;
 };
 
 class midyunit_cvsd_state : public midyunit_base_state
@@ -166,7 +166,7 @@ public:
 	void init_trog();
 
 protected:
-	virtual void machine_reset() override;
+	virtual void machine_reset() override ATTR_COLD;
 
 	required_device<williams_cvsd_sound_device> m_cvsd_sound;
 
@@ -177,7 +177,7 @@ protected:
 
 	void init_generic(int bpp, int sound, int prot_start, int prot_end);
 
-	void cvsd_main_map(address_map &map);
+	void cvsd_main_map(address_map &map) ATTR_COLD;
 
 	void yunit_cvsd_core(machine_config &config);
 };
@@ -202,7 +202,7 @@ public:
 	int adpcm_irq_state_r();
 
 protected:
-	virtual void machine_reset() override;
+	virtual void machine_reset() override ATTR_COLD;
 
 	required_device<williams_adpcm_sound_device> m_adpcm_sound;
 
@@ -211,7 +211,7 @@ protected:
 
 	void init_generic(int bpp, int prot_start, int prot_end);
 
-	void adpcm_main_map(address_map &map);
+	void adpcm_main_map(address_map &map) ATTR_COLD;
 
 	void yunit_adpcm_core(machine_config &config);
 };
@@ -241,7 +241,7 @@ public:
 	void init_term2la3();
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	required_device<adc0844_device> m_adc;
@@ -265,7 +265,7 @@ private:
 	void term2la1_hack_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	void term2_init_common(write16s_delegate hack_w);
 
-	void term2_main_map(address_map &map);
+	void term2_main_map(address_map &map) ATTR_COLD;
 };
 
 class mkyawdim_state : public midyunit_base_state
@@ -285,7 +285,7 @@ public:
 	void init_mkyawdim();
 
 protected:
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_audiocpu;
@@ -297,10 +297,10 @@ private:
 	void yawdim_sound_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	void yawdim2_sound_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
-	void yawdim_main_map(address_map &map);
-	void yawdim2_main_map(address_map &map);
-	void yawdim_sound_map(address_map &map);
-	void yawdim2_sound_map(address_map &map);
+	void yawdim_main_map(address_map &map) ATTR_COLD;
+	void yawdim2_main_map(address_map &map) ATTR_COLD;
+	void yawdim_sound_map(address_map &map) ATTR_COLD;
+	void yawdim2_sound_map(address_map &map) ATTR_COLD;
 };
 
 #endif // MAME_MIDWAY_MIDYUNIT_H

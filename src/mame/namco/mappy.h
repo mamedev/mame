@@ -43,7 +43,7 @@ public:
 	void init_digdug2();
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	required_shared_ptr<uint8_t> m_videoram;
@@ -99,13 +99,13 @@ private:
 	void mappy_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, uint8_t *spriteram_base);
 	void phozon_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, uint8_t *spriteram_base);
 
-	void mappy_cpu1_map(address_map &map);
-	void mappy_cpu2_map(address_map &map);
-	void phozon_cpu1_map(address_map &map);
-	void phozon_cpu2_map(address_map &map);
-	void phozon_cpu3_map(address_map &map);
-	void superpac_cpu1_map(address_map &map);
-	void superpac_cpu2_map(address_map &map);
+	void mappy_cpu1_map(address_map &map) ATTR_COLD;
+	void mappy_cpu2_map(address_map &map) ATTR_COLD;
+	void phozon_cpu1_map(address_map &map) ATTR_COLD;
+	void phozon_cpu2_map(address_map &map) ATTR_COLD;
+	void phozon_cpu3_map(address_map &map) ATTR_COLD;
+	void superpac_cpu1_map(address_map &map) ATTR_COLD;
+	void superpac_cpu2_map(address_map &map) ATTR_COLD;
 };
 
 #endif // MAME_NAMCO_MAPPY_H

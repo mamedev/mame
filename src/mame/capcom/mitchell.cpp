@@ -184,9 +184,9 @@ public:
 	void init_dokaben();
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 	// devices
 	required_device<cpu_device> m_maincpu;
@@ -250,11 +250,11 @@ protected:
 	void bootleg_decode();
 	void configure_banks(void (*decode)(uint8_t *src, uint8_t *dst, int size));
 
-	void decrypted_opcodes_map(address_map &map);
-	void mgakuen_map(address_map &map);
-	void mitchell_io_map(address_map &map);
-	void mitchell_map(address_map &map);
-	void main_map(address_map &map);
+	void decrypted_opcodes_map(address_map &map) ATTR_COLD;
+	void mgakuen_map(address_map &map) ATTR_COLD;
+	void mitchell_io_map(address_map &map) ATTR_COLD;
+	void mitchell_map(address_map &map) ATTR_COLD;
+	void main_map(address_map &map) ATTR_COLD;
 };
 
 // adds a Z80 as audio CPU and has an Oki M5205 instead of M6295
@@ -275,8 +275,8 @@ public:
 	void init_spangbl();
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	// devices
@@ -293,11 +293,11 @@ private:
 	void sound_bankswitch_w(uint8_t data);
 	void adpcm_int(int state);
 
-	void mstworld2_io_map(address_map &map);
-	void pangba_sound_map(address_map &map);
-	void spangbl_io_map(address_map &map);
-	void main_map(address_map &map);
-	void spangbl_sound_map(address_map &map);
+	void mstworld2_io_map(address_map &map) ATTR_COLD;
+	void pangba_sound_map(address_map &map) ATTR_COLD;
+	void spangbl_io_map(address_map &map) ATTR_COLD;
+	void main_map(address_map &map) ATTR_COLD;
+	void spangbl_sound_map(address_map &map) ATTR_COLD;
 };
 
 
@@ -318,8 +318,8 @@ private:
 
 	void gfxctrl_w(uint8_t data);
 
-	void io_map(address_map &map);
-	void sound_map(address_map &map);
+	void io_map(address_map &map) ATTR_COLD;
+	void sound_map(address_map &map) ATTR_COLD;
 };
 
 // has an Oki M5205 instead of an Oki M6295 without additional audio CPU
@@ -337,7 +337,7 @@ public:
 private:
 	required_device<msm5205_device> m_msm;
 
-	void io_map(address_map &map);
+	void io_map(address_map &map) ATTR_COLD;
 };
 
 
@@ -871,7 +871,7 @@ static INPUT_PORTS_START( mj_common )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )    // unused?
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")
 	PORT_BIT( 0x70, IP_ACTIVE_LOW, IPT_UNKNOWN )    // unused?
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", FUNC(eeprom_serial_93cxx_device::do_read))
 
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -1132,7 +1132,7 @@ static INPUT_PORTS_START( pkladiesbl )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", FUNC(eeprom_serial_93cxx_device::do_read))
 
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE ) // ok
@@ -1229,7 +1229,7 @@ static INPUT_PORTS_START( pang )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )    // unused?
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")
 	PORT_BIT( 0x70, IP_ACTIVE_LOW, IPT_UNKNOWN )    // unused?
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", FUNC(eeprom_serial_93cxx_device::do_read))
 
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -1505,7 +1505,7 @@ static INPUT_PORTS_START( qtono1 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )    // unused?
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")
 	PORT_BIT( 0x70, IP_ACTIVE_LOW, IPT_UNKNOWN )    // unused?
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", FUNC(eeprom_serial_93cxx_device::do_read))
 
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE )    // same as the service mode farther down
@@ -1545,7 +1545,7 @@ static INPUT_PORTS_START( block )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )    // unused?
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")
 	PORT_BIT( 0x70, IP_ACTIVE_LOW, IPT_UNKNOWN )    // unused?
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", FUNC(eeprom_serial_93cxx_device::do_read))
 
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -1587,7 +1587,7 @@ static INPUT_PORTS_START( blockjoy )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )    // unused?
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")
 	PORT_BIT( 0x70, IP_ACTIVE_LOW, IPT_UNKNOWN )    // unused?
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", FUNC(eeprom_serial_93cxx_device::do_read))
 
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )

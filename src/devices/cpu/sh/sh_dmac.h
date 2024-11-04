@@ -38,8 +38,8 @@ protected:
 
 	u16 m_dmaor;
 
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 };
 
 class sh_dmac_channel_device : public device_t {
@@ -69,8 +69,8 @@ protected:
 
 	u32 m_sar, m_dar, m_dmatcr, m_chcr;
 
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 };
 
 DECLARE_DEVICE_TYPE(SH_DMAC, sh_dmac_device)

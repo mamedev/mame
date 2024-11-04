@@ -77,7 +77,7 @@ public:
 	void clk_w(int state);
 
 protected:
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 private:
 	device_delegate<void (int)> m_fo_handler;

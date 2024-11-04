@@ -101,8 +101,8 @@ public:
 	void targeth(machine_config &config);
 
 protected:
-	virtual void video_start() override;
-	virtual void machine_start() override;
+	virtual void video_start() override ATTR_COLD;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	void oki_bankswitch_w(uint8_t data);
@@ -120,9 +120,9 @@ private:
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void main_map(address_map &map);
-	void mcu_hostmem_map(address_map &map);
-	void oki_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
+	void mcu_hostmem_map(address_map &map) ATTR_COLD;
+	void oki_map(address_map &map) ATTR_COLD;
 
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 

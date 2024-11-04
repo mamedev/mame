@@ -30,10 +30,10 @@ public:
 	void sb180(machine_config &config);
 
 private:
-	virtual void machine_reset() override;
+	virtual void machine_reset() override ATTR_COLD;
 
-	void sb180_io(address_map &map);
-	void sb180_mem(address_map &map);
+	void sb180_io(address_map &map) ATTR_COLD;
+	void sb180_mem(address_map &map) ATTR_COLD;
 
 	required_device<z180_device> m_maincpu;
 	required_device<upd765a_device> m_fdc;

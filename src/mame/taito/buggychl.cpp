@@ -147,11 +147,11 @@ public:
 
 	void buggychl(machine_config &config);
 
-	DECLARE_CUSTOM_INPUT_MEMBER(pedal_in_r);
+	ioport_value pedal_in_r();
 
 protected:
-	virtual void machine_start() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	// memory pointers
@@ -207,8 +207,8 @@ private:
 	void draw_fg(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void main_map(address_map &map);
-	void sound_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
+	void sound_map(address_map &map) ATTR_COLD;
 };
 
 
@@ -240,13 +240,13 @@ void buggychl_state::sprite_lookup_w(offs_t offset, uint8_t data)
 
 void buggychl_state::ctrl_w(uint8_t data)
 {
-    // bit0 = VINV
-    // bit1 = HINV
-    // bit2 = /SN3OFF
-    // bit3 = SKY OFF
-    // bit4 = OJMODE
-    // bit6 = lockout
-    // bit7 = lamp
+	// bit0 = VINV
+	// bit1 = HINV
+	// bit2 = /SN3OFF
+	// bit3 = SKY OFF
+	// bit4 = OJMODE
+	// bit6 = lockout
+	// bit7 = lamp
 
 	flip_screen_y_set(data & 0x01);
 	flip_screen_x_set(data & 0x02);
@@ -651,7 +651,7 @@ Sound Master CPU (SMCPU)
 /******************************************************************************/
 
 // accelerator is 4-bit, we need to convert it here so that it doesn't clash with other inputs in IN1 (known i/o framework fault)
-CUSTOM_INPUT_MEMBER( buggychl_state::pedal_in_r )
+ioport_value buggychl_state::pedal_in_r()
 {
 	return m_pedal_input->read() >> 4;
 }
@@ -752,7 +752,7 @@ static INPUT_PORTS_START( buggychl )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SERVICE1 )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_TILT )
-	PORT_BIT( 0xf0, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(buggychl_state, pedal_in_r)
+	PORT_BIT( 0xf0, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(FUNC(buggychl_state::pedal_in_r))
 
 	PORT_START("PEDAL")
 	PORT_BIT( 0xff, 0x00, IPT_PEDAL ) PORT_MINMAX(0x00, 0xff) PORT_NAME("P1 Pedal") PORT_SENSITIVITY(100) PORT_KEYDELTA(15)   // accelerator

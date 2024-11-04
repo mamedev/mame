@@ -67,7 +67,7 @@ public:
 	void acrnsys1(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -81,7 +81,7 @@ private:
 	void acrnsys1_led_segment_w(uint8_t data);
 	TIMER_DEVICE_CALLBACK_MEMBER(kansas_w);
 	TIMER_DEVICE_CALLBACK_MEMBER(kansas_r);
-	void mem_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
 
 	uint8_t m_digit = 0;
 	uint8_t m_cass_data[4]{};

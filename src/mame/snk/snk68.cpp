@@ -114,15 +114,15 @@ protected:
 	void sound_w(uint8_t data);
 	void d7759_write_port_0_w(uint8_t data);
 
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 	void common_video_start();
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void tile_callback_notpow(int &tile, int &fx, int &fy, int &region);
 
-	void sound_io_map(address_map &map);
-	void sound_map(address_map &map);
+	void sound_io_map(address_map &map) ATTR_COLD;
+	void sound_map(address_map &map) ATTR_COLD;
 
 private:
 	uint32_t m_fg_tile_offset;
@@ -136,8 +136,8 @@ private:
 
 	void tile_callback_pow(int &tile, int &fx, int &fy, int &region);
 
-	void program_map(address_map &map);
-	void powbl_sound_io_map(address_map &map);
+	void program_map(address_map &map) ATTR_COLD;
+	void powbl_sound_io_map(address_map &map) ATTR_COLD;
 };
 
 class searchar_state : public snk68_state
@@ -152,8 +152,8 @@ public:
 	void searchar(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	optional_ioport_array<2> m_rotary_io;
@@ -169,7 +169,7 @@ private:
 
 	TILE_GET_INFO_MEMBER(get_tile_info);
 
-	void program_map(address_map &map);
+	void program_map(address_map &map) ATTR_COLD;
 };
 
 

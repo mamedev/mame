@@ -51,15 +51,15 @@ public:
 	void consoemt(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	required_device<i80188_cpu_device> m_maincpu;
 	required_device<mcs51_cpu_device> m_mcu;
 	required_device<hd44780_device> m_lcdc;
 
-	void mem_map(address_map &map);
-	void io_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
+	void io_map(address_map &map) ATTR_COLD;
 
 	void consoemt_palette(palette_device &palette) const;
 	HD44780_PIXEL_UPDATE(lcd_pixel_update);

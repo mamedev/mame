@@ -25,7 +25,7 @@ public:
 	void draw(screen_device &screen, bitmap_ind16 &bitmap, rectangle const &cliprect, bool flip);
 
 protected:
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 

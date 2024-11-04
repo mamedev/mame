@@ -82,7 +82,7 @@ public:
 	void volfied(machine_config &config);
 
 protected:
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	void video_ram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
@@ -97,8 +97,8 @@ private:
 
 	void refresh_pixel_layer(bitmap_ind16 &bitmap);
 
-	void main_map(address_map &map);
-	void z80_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
+	void z80_map(address_map &map) ATTR_COLD;
 
 	// memory pointers
 	required_shared_ptr<uint16_t> m_video_ram;

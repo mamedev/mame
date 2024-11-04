@@ -51,7 +51,7 @@ public:
 	void mondial(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -62,7 +62,7 @@ private:
 
 	u8 m_inp_mux = 0;
 
-	void mondial_mem(address_map &map);
+	void mondial_mem(address_map &map) ATTR_COLD;
 
 	void control_w(u8 data);
 	u8 irq_ack_r();

@@ -45,9 +45,9 @@ private:
 	I8275_DRAW_CHARACTER_MEMBER(display_pixels);
 
 	required_device<speaker_sound_device> m_speaker;
-	void mem_map(address_map &map);
-	void machine_reset() override;
-	void machine_start() override;
+	void mem_map(address_map &map) ATTR_COLD;
+	void machine_reset() override ATTR_COLD;
+	void machine_start() override ATTR_COLD;
 };
 
 

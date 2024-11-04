@@ -41,7 +41,7 @@ private:
 	required_shared_ptr<uint8_t> m_vram;
 	required_device<cassette_image_device> m_cassette;
 
-	void mem_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
 
 	uint8_t system_r();
 	void system_w(uint8_t data);

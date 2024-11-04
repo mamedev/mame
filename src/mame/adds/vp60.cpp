@@ -34,9 +34,9 @@ private:
 	u8 crtc_r(offs_t offset);
 	void crtc_w(offs_t offset, u8 data);
 
-	void io_map(address_map &map);
-	void kbd_map(address_map &map);
-	void mem_map(address_map &map);
+	void io_map(address_map &map) ATTR_COLD;
+	void kbd_map(address_map &map) ATTR_COLD;
+	void mem_map(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<i8275_device> m_crtc;

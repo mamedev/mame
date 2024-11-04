@@ -45,7 +45,7 @@ public:
 	{ }
 
 protected:
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 
 	void atari_palette(palette_device &palette) const;
 

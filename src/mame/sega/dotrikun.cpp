@@ -69,10 +69,10 @@ protected:
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline_off);
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline_on);
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	void dotrikun_map(address_map &map);
-	void io_map(address_map &map);
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	void dotrikun_map(address_map &map) ATTR_COLD;
+	void io_map(address_map &map) ATTR_COLD;
 };
 
 TIMER_DEVICE_CALLBACK_MEMBER(dotrikun_state::interrupt)

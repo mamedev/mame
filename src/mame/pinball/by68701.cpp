@@ -29,14 +29,14 @@ public:
 	{ }
 
 	void by68701(machine_config &config);
-	void by68701_map(address_map &map);
+	void by68701_map(address_map &map) ATTR_COLD;
 protected:
 
 	// devices
 	required_device<cpu_device> m_maincpu;
 
 	// driver_device overrides
-	virtual void machine_reset() override;
+	virtual void machine_reset() override ATTR_COLD;
 public:
 	void init_by68701();
 };

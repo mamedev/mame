@@ -2060,7 +2060,7 @@ static INPUT_PORTS_START( aceattac )
 	PORT_BIT( 0xfff, 0x00, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(100) PORT_KEYDELTA(30) PORT_PLAYER(TMP_PL1BALL)
 
 	PORT_START("HANDY1") // power of "hand" device
-	PORT_BIT( 0x07, 0x04, IPT_PEDAL2 ) PORT_SENSITIVITY(100) PORT_KEYDELTA(1) PORT_CENTERDELTA(2) PORT_PLAYER(TMP_PL1HAND) PORT_CHANGED_MEMBER(DEVICE_SELF, segas16b_state, handy_w, 0)
+	PORT_BIT( 0x07, 0x04, IPT_PEDAL2 ) PORT_SENSITIVITY(100) PORT_KEYDELTA(1) PORT_CENTERDELTA(2) PORT_PLAYER(TMP_PL1HAND) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(segas16b_state::handy_w), 0)
 
 	PORT_START("DIAL1") // toss formation
 	PORT_BIT( 0x0f, 0x00, IPT_POSITIONAL ) PORT_POSITIONS(10) PORT_WRAPS PORT_SENSITIVITY(10) PORT_KEYDELTA(1) PORT_CODE_DEC(KEYCODE_Z) PORT_CODE_INC(KEYCODE_X) PORT_PLAYER(1) PORT_INVERT PORT_FULL_TURN_COUNT(10)
@@ -2080,7 +2080,7 @@ static INPUT_PORTS_START( aceattac )
 	PORT_BIT( 0xfff, 0x00, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(100) PORT_KEYDELTA(30) PORT_PLAYER(TMP_PL2BALL)
 
 	PORT_START("HANDY2") // power of "hand" device
-	PORT_BIT( 0x07, 0x04, IPT_PEDAL2 ) PORT_SENSITIVITY(100) PORT_KEYDELTA(1) PORT_CENTERDELTA(2) PORT_PLAYER(TMP_PL2HAND) PORT_CHANGED_MEMBER(DEVICE_SELF, segas16b_state, handy_w, 1)
+	PORT_BIT( 0x07, 0x04, IPT_PEDAL2 ) PORT_SENSITIVITY(100) PORT_KEYDELTA(1) PORT_CENTERDELTA(2) PORT_PLAYER(TMP_PL2HAND) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(segas16b_state::handy_w), 1)
 
 	PORT_START("DIAL2") // toss formation
 	PORT_BIT( 0x0f, 0x00, IPT_POSITIONAL ) PORT_POSITIONS(10) PORT_WRAPS PORT_SENSITIVITY(10) PORT_KEYDELTA(1) PORT_CODE_DEC(KEYCODE_N) PORT_CODE_INC(KEYCODE_M) PORT_PLAYER(2) PORT_INVERT PORT_FULL_TURN_COUNT(10)
@@ -2172,7 +2172,7 @@ static INPUT_PORTS_START( afighter )
 INPUT_PORTS_END
 
 /* this is identical to the s16a implementation, maybe should be moved to common class */
-CUSTOM_INPUT_MEMBER(afighter_16b_analog_state::afighter_accel_r)
+ioport_value afighter_16b_analog_state::afighter_accel_r()
 {
 	int accel = m_accel->read();
 
@@ -2187,7 +2187,7 @@ CUSTOM_INPUT_MEMBER(afighter_16b_analog_state::afighter_accel_r)
 	return 0;
 }
 
-CUSTOM_INPUT_MEMBER(afighter_16b_analog_state::afighter_handl_left_r)
+ioport_value afighter_16b_analog_state::afighter_handl_left_r()
 {
 	int steer = m_steer->read();
 
@@ -2205,7 +2205,7 @@ CUSTOM_INPUT_MEMBER(afighter_16b_analog_state::afighter_handl_left_r)
 	return 0x00;
 }
 
-CUSTOM_INPUT_MEMBER(afighter_16b_analog_state::afighter_handl_right_r)
+ioport_value afighter_16b_analog_state::afighter_handl_right_r()
 {
 	int steer = m_steer->read();
 
@@ -2228,7 +2228,7 @@ static INPUT_PORTS_START( afighter_analog )
 	PORT_INCLUDE( afighter )
 
 	PORT_MODIFY("P1")
-	PORT_BIT( 0x07, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(afighter_16b_analog_state, afighter_accel_r)
+	PORT_BIT( 0x07, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(FUNC(afighter_16b_analog_state::afighter_accel_r))
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) // SHOT
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) // WEAPON1
@@ -2236,10 +2236,10 @@ static INPUT_PORTS_START( afighter_analog )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON4 ) // WEAPON3
 
 	PORT_MODIFY("P2")
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(afighter_16b_analog_state, afighter_handl_left_r)
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(FUNC(afighter_16b_analog_state::afighter_handl_left_r))
 
 	PORT_MODIFY("UNUSED")
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(afighter_16b_analog_state, afighter_handl_right_r)
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(FUNC(afighter_16b_analog_state::afighter_handl_right_r))
 
 	PORT_START("STEER")  // steering
 	PORT_BIT( 0xff, 0x00, IPT_PADDLE ) PORT_SENSITIVITY(100) PORT_KEYDELTA(4)

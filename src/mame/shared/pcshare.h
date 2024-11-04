@@ -47,7 +47,7 @@ protected:
 	void pcat_common(machine_config &config);
 	void pcat_common_nokeyboard(machine_config &config);
 
-	void pcat32_io_common(address_map &map);
+	void pcat32_io_common(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<am9517a_device> m_dma8237_1;

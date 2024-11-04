@@ -331,9 +331,9 @@ public:
 	void init_optiger();
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	required_device<ppc603e_device> m_maincpu;
@@ -388,12 +388,12 @@ private:
 
 	uint32_t m_tlcs_sound_ptr = 0;
 
-	void mn10200_map(address_map &map);
-	void ppc603e_mem(address_map &map);
-	void tlcs900h_mem(address_map &map);
-	void tms_data_map(address_map &map);
-	void tms_io_map(address_map &map);
-	void tms_program_map(address_map &map);
+	void mn10200_map(address_map &map) ATTR_COLD;
+	void ppc603e_mem(address_map &map) ATTR_COLD;
+	void tlcs900h_mem(address_map &map) ATTR_COLD;
+	void tms_data_map(address_map &map) ATTR_COLD;
+	void tms_io_map(address_map &map) ATTR_COLD;
+	void tms_program_map(address_map &map) ATTR_COLD;
 };
 
 void taitopjc_state::video_exit()

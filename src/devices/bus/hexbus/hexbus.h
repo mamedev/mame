@@ -60,7 +60,7 @@ protected:
 
 	void set_outbound_hexbus(hexbus_device *outbound) { m_hexbus_outbound = outbound; }
 
-	virtual void device_resolve_objects() override;
+	virtual void device_resolve_objects() override ATTR_COLD;
 
 	// Link to the inbound Hexbus (if not null, see Oso chip)
 	hexbus_device *m_hexbus_inbound;
@@ -161,7 +161,7 @@ public:
 	void write(int dir, uint8_t data);
 
 protected:
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 	device_hexbus_interface *m_next_dev;
 
 private:

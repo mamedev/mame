@@ -175,7 +175,7 @@ public:
 	void skysmash(machine_config &config);
 
 protected:
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
@@ -211,9 +211,9 @@ protected:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t pri_cb(uint8_t pri, uint8_t ext);
 
-	void bloodbro_map(address_map &map);
-	void common_map(address_map &map);
-	void skysmash_map(address_map &map);
+	void bloodbro_map(address_map &map) ATTR_COLD;
+	void common_map(address_map &map) ATTR_COLD;
+	void skysmash_map(address_map &map) ATTR_COLD;
 };
 
 class weststry_state : public bloodbro_state
@@ -241,8 +241,8 @@ private:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void main_map(address_map &map);
-	void sound_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
+	void sound_map(address_map &map) ATTR_COLD;
 };
 
 

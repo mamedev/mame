@@ -160,7 +160,7 @@ public:
 	auto in_eops_callback() { return m_eops_cb.bind(); }
 protected:
 	// device-level overrides
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 	// configuration
 	required_device<option_bus_device> m_bus;
@@ -224,8 +224,8 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	required_address_space m_iospace;
 	memory_view::memory_view_entry *m_view;

@@ -587,7 +587,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	<software name="chicago">
 		<description>Chicago 90</description>
 		<year>1989</year>
-		<publisher>Microids</publisher>
+		<publisher>Microïds</publisher>
 
 		<part name="cass1" interface="mo_cass">
 			<dataarea name="cass" size="48273695">
@@ -600,7 +600,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	<software name="chicagoa" cloneof="chicago" supported="no">
 		<description>Chicago 90 (Alt)</description>
 		<year>1989</year>
-		<publisher>Microids</publisher>
+		<publisher>Microïds</publisher>
 
 		<part name="cass1" interface="mo_cass">
 			<dataarea name="cass" size="156943">
@@ -613,7 +613,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	<software name="chicagob" cloneof="chicago" supported="no">
 		<description>Chicago 90 (Alt 2)</description>
 		<year>1989</year>
-		<publisher>Microids</publisher>
+		<publisher>Microïds</publisher>
 
 		<part name="cass1" interface="mo_cass">
 			<dataarea name="cass" size="156943">
@@ -626,7 +626,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	<software name="chicagoc" cloneof="chicago" supported="no">
 		<description>Chicago 90 (Alt 3)</description>
 		<year>1989</year>
-		<publisher>Microids</publisher>
+		<publisher>Microïds</publisher>
 
 		<part name="cass1" interface="mo_cass">
 			<dataarea name="cass" size="156943">
@@ -831,7 +831,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	<software name="gp500cc" supported="no">
 		<description>Grand Prix 500cc</description>
 		<year>1986</year>
-		<publisher>Microids</publisher>
+		<publisher>Microïds</publisher>
 
 		<part name="cass1" interface="mo_cass">
 			<dataarea name="cass" size="81939">
@@ -844,7 +844,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	<software name="gp500cca" cloneof="gp500cc" supported="no">
 		<description>Grand Prix 500cc (Alt)</description>
 		<year>1986</year>
-		<publisher>Microids</publisher>
+		<publisher>Microïds</publisher>
 
 		<part name="cass1" interface="mo_cass">
 			<dataarea name="cass" size="81939">
@@ -857,7 +857,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	<software name="gp500ccb" cloneof="gp500cc" supported="no">
 		<description>Grand Prix 500cc (Alt 2)</description>
 		<year>1986</year>
-		<publisher>Microids</publisher>
+		<publisher>Microïds</publisher>
 
 		<part name="cass1" interface="mo_cass">
 			<dataarea name="cass" size="81939">
@@ -1477,7 +1477,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	<software name="quad">
 		<description>Quad</description>
 		<year>1987</year>
-		<publisher>Microids</publisher>
+		<publisher>Microïds</publisher>
 
 		<part name="cass1" interface="mo_cass">
 			<dataarea name="cass" size="27264675">
@@ -1490,7 +1490,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	<software name="quada" cloneof="quad" supported="no">
 		<description>Quad (Alt)</description>
 		<year>1987</year>
-		<publisher>Microids</publisher>
+		<publisher>Microïds</publisher>
 
 		<part name="cass1" interface="mo_cass">
 			<dataarea name="cass" size="88402">
@@ -1503,7 +1503,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	<software name="quadb" cloneof="quad" supported="no">
 		<description>Quad (Alt 2)</description>
 		<year>1987</year>
-		<publisher>Microids</publisher>
+		<publisher>Microïds</publisher>
 
 		<part name="cass1" interface="mo_cass">
 			<dataarea name="cass" size="88402">
@@ -1516,7 +1516,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	<software name="quadc" cloneof="quad" supported="no">
 		<description>Quad (Alt 3)</description>
 		<year>1987</year>
-		<publisher>Microids</publisher>
+		<publisher>Microïds</publisher>
 
 		<part name="cass1" interface="mo_cass">
 			<dataarea name="cass" size="88402">
@@ -1530,7 +1530,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
     <software name="quadd" cloneof="quad" supported="no">
         <description>Quad (Bugged)</description>
         <year>1987</year>
-        <publisher>Microids</publisher>
+        <publisher>Microvds</publisher>
 
         <part name="cass1" interface="mo_cass">
             <dataarea name="cass" size="88402">
@@ -1663,7 +1663,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	<software name="superski">
 		<description>Super Ski</description>
 		<year>1987</year>
-		<publisher>Microids</publisher>
+		<publisher>Microïds</publisher>
 
 		<part name="cass1" interface="mo_cass">
 			<dataarea name="cass" size="36787694">
@@ -1676,7 +1676,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	<software name="superskia" cloneof="superski" supported="no">
 		<description>Super Ski (Alt)</description>
 		<year>1987</year>
-		<publisher>Microids</publisher>
+		<publisher>Microïds</publisher>
 
 		<part name="cass1" interface="mo_cass">
 			<dataarea name="cass" size="118216">
@@ -1689,7 +1689,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	<software name="superskib" cloneof="superski" supported="no">
 		<description>Super Ski (Alt 2)</description>
 		<year>1987</year>
-		<publisher>Microids</publisher>
+		<publisher>Microïds</publisher>
 
 		<part name="cass1" interface="mo_cass">
 			<dataarea name="cass" size="118216">
@@ -1702,7 +1702,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	<software name="superskic" cloneof="superski" supported="no">
 		<description>Super Ski (Alt 3)</description>
 		<year>1987</year>
-		<publisher>Microids</publisher>
+		<publisher>Microïds</publisher>
 
 		<part name="cass1" interface="mo_cass">
 			<dataarea name="cass" size="118216">
@@ -1716,7 +1716,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
     <software name="superskic" cloneof="superski" supported="no">
         <description>Super Ski (Bugged)</description>
         <year>1987</year>
-        <publisher>Microids</publisher>
+        <publisher>Microïds</publisher>
 
         <part name="cass1" interface="mo_cass">
             <dataarea name="cass" size="118216">

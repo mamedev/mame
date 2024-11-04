@@ -47,8 +47,8 @@ protected:
 
 	required_device<sh7042_device> m_cpu;
 
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	void update_irq();
 };

@@ -92,8 +92,8 @@ private:
 	DECLARE_QUICKLOAD_LOAD_MEMBER(quickload_cb);
 	required_shared_ptr<u8> m_p_videoram;
 
-	void io_map(address_map &map);
-	void mem_map(address_map &map);
+	void io_map(address_map &map) ATTR_COLD;
+	void mem_map(address_map &map) ATTR_COLD;
 
 	required_device<cosmac_device> m_maincpu;
 	required_device<cdp1864_device> m_cti;
@@ -103,8 +103,8 @@ private:
 	required_ioport m_special;
 	output_finder<2> m_leds;
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 	uint16_t m_resetcnt;
 
 	/* keyboard state */

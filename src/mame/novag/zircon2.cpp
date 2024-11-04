@@ -64,8 +64,8 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(power_switch);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override { set_power(true); }
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD { set_power(true); }
 
 private:
 	// devices/pointers
@@ -266,8 +266,8 @@ static INPUT_PORTS_START( zircon2 )
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_I) PORT_NAME("New Game")
 
 	PORT_START("POWER")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_POWER_ON) PORT_CHANGED_MEMBER(DEVICE_SELF, zircon2_state, power_switch, 1)
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_POWER_OFF) PORT_CHANGED_MEMBER(DEVICE_SELF, zircon2_state, power_switch, 0)
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_POWER_ON) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(zircon2_state::power_switch), 1)
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_POWER_OFF) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(zircon2_state::power_switch), 0)
 INPUT_PORTS_END
 
 
@@ -331,4 +331,4 @@ ROM_END
 *******************************************************************************/
 
 //    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS          INIT        COMPANY, FULLNAME, FLAGS
-SYST( 1995, zircon2, 0,      0,      zircon2, zircon2, zircon2_state, empty_init, "Novag Industries", "Zircon II", MACHINE_SUPPORTS_SAVE )
+SYST( 1995, zircon2, 0,      0,      zircon2, zircon2, zircon2_state, empty_init, "Novag Industries / Intelligent Heuristic Programming", "Zircon II", MACHINE_SUPPORTS_SAVE )

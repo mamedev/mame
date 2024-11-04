@@ -71,14 +71,15 @@ public:
 		, m_gfxdecode(*this, "gfxdecode")
 		, m_key_in(*this, "P1_IN%u", 0U)
 		, m_coin_in(*this, "COIN")
+		, m_eepromout(*this, "EEPROMOUT")
 	{ }
 
 	virtual void yumefuda(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	void vram_w(offs_t offset, uint8_t data);
@@ -92,8 +93,8 @@ private:
 	TILE_GET_INFO_MEMBER(get_tile_info);
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	void main_map(address_map &map);
-	void main_io(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
+	void main_io(address_map &map) ATTR_COLD;
 
 	tilemap_t *m_tilemap = nullptr;
 	uint8_t m_port_select = 0;
@@ -108,6 +109,7 @@ private:
 
 	required_ioport_array<6> m_key_in;
 	required_ioport m_coin_in;
+	required_ioport m_eepromout;
 };
 
 TILE_GET_INFO_MEMBER(albazg_state::get_tile_info)
@@ -221,7 +223,7 @@ void albazg_state::main_map(address_map &map)
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0x9fff).bankr(m_rombank);
 	map(0xa7fc, 0xa7fc).w(FUNC(albazg_state::prot_lock_w));
-	map(0xa7ff, 0xa7ff).portw("EEPROMOUT");
+	map(0xa7ff, 0xa7ff).portw(m_eepromout);
 	map(0xaf80, 0xafff).rw(FUNC(albazg_state::custom_ram_r), FUNC(albazg_state::custom_ram_w)).share(m_custom_ram);
 	map(0xb000, 0xb07f).ram().w("palette", FUNC(palette_device::write8)).share("palette");
 	map(0xb080, 0xb0ff).ram().w("palette", FUNC(palette_device::write8_ext)).share("palette_ext");
@@ -251,7 +253,7 @@ static INPUT_PORTS_START( yumefuda )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Coin Out")
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Pay Out")
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE3 ) PORT_NAME("Init SW")
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", FUNC(eeprom_serial_93cxx_device::do_read))
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("COIN")
@@ -305,9 +307,9 @@ static INPUT_PORTS_START( yumefuda )
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START( "EEPROMOUT" )
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, cs_write)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, clk_write)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, di_write)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", FUNC(eeprom_serial_93cxx_device::cs_write))
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", FUNC(eeprom_serial_93cxx_device::clk_write))
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", FUNC(eeprom_serial_93cxx_device::di_write))
 
 	// Added by translating the manual (both Yumefuda and Hana Awase 6 Part II have the same DIPs)
 	PORT_START("DSW1")

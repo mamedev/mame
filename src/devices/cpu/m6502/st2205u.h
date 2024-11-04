@@ -61,7 +61,7 @@ public:
 protected:
 	st2205u_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, address_map_constructor internal_map, int data_bits, bool has_banked_ram);
 
-	virtual void device_reset() override;
+	virtual void device_reset() override ATTR_COLD;
 
 	// sound stream update overrides
 	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
@@ -138,7 +138,7 @@ protected:
 	u8 mulh_r();
 	void mulh_w(u8 data);
 
-	void base_map(address_map &map);
+	void base_map(address_map &map) ATTR_COLD;
 
 	sound_stream *m_stream;
 
@@ -183,8 +183,8 @@ public:
 	st2205u_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	virtual u16 st2xxx_ireq_mask() const override { return 0xdfff; }
 	virtual const char *st2xxx_irq_name(int i) const override;
@@ -244,7 +244,7 @@ private:
 	u8 bmem_r(offs_t offset);
 	void bmem_w(offs_t offset, u8 data);
 
-	void int_map(address_map &map);
+	void int_map(address_map &map) ATTR_COLD;
 
 	u8 m_lbuf;
 	u8 m_lpal_index;
@@ -257,7 +257,7 @@ public:
 	st2302u_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 protected:
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 	virtual u16 st2xxx_ireq_mask() const override { return 0xd37f; } // ???
 	virtual const char *st2xxx_irq_name(int i) const override;
@@ -309,7 +309,7 @@ private:
 	u8 dmem_r(offs_t offset);
 	void dmem_w(offs_t offset, u8 data);
 
-	void int_map(address_map &map);
+	void int_map(address_map &map) ATTR_COLD;
 };
 
 DECLARE_DEVICE_TYPE(ST2205U, st2205u_device)

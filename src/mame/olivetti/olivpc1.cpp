@@ -54,11 +54,11 @@ public:
 		m_fdc(*this, "fdc"),
 		m_bank(*this, "bank")
 	{ }
-	void pc8_io(address_map &map);
-	void pc8_map(address_map &map);
-	void bank(address_map &map);
-	void machine_start() override;
-	void machine_reset() override;
+	void pc8_io(address_map &map) ATTR_COLD;
+	void pc8_map(address_map &map) ATTR_COLD;
+	void bank(address_map &map) ATTR_COLD;
+	void machine_start() override ATTR_COLD;
+	void machine_reset() override ATTR_COLD;
 	void olivpc1(machine_config &config);
 private:
 	u8 port6x_r(offs_t addr);

@@ -21,24 +21,24 @@
 
 #include "emu.h"
 
+#include "cpu/mcs48/mcs48.h"
 #include "cpu/z80/z80.h"
 #include "imagedev/floppy.h"
 #include "imagedev/snapquik.h"
+#include "machine/74259.h"
 #include "machine/timer.h"
 #include "machine/wd_fdc.h"
-#include "softlist_dev.h"
 #include "sound/beep.h"
 #include "sound/sn76496.h"
 #include "video/mc6845.h"
 
 #include "emupal.h"
 #include "screen.h"
+#include "softlist_dev.h"
 #include "speaker.h"
 
 
 namespace {
-
-#define MASTER_CLOCK 4.028_MHz_XTAL
 
 #define mc6845_h_char_total     (m_crtc_vreg[0]+1)
 #define mc6845_h_display        (m_crtc_vreg[1])
@@ -67,6 +67,7 @@ public:
 		, m_crtc(*this, "crtc")
 		, m_fdc(*this, "fdc")
 		, m_floppy(*this, "fdc:%u", 0U)
+		, m_ioctrl(*this, "ioctrl")
 		, m_beeper(*this, "beeper")
 		, m_gfxdecode(*this, "gfxdecode")
 		, m_palette(*this, "palette")
@@ -75,9 +76,9 @@ public:
 	void smc777(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	void mc6845_w(offs_t offset, uint8_t data);
@@ -95,6 +96,14 @@ private:
 	uint8_t io_status_1c_r();
 	uint8_t io_status_1d_r();
 	void io_control_w(uint8_t data);
+	void raminh_w(int state);
+	void vsup_w(int state);
+	void screen_lines_w(int state);
+	void rgb_select_w(int state);
+	void mt_on_w(int state);
+	void sound_out_w(int state);
+	void printer_strb_w(int state);
+	void cas_out_w(int state);
 	void color_mode_w(uint8_t data);
 	void ramdac_w(offs_t offset, uint8_t data);
 	uint8_t gcw_r();
@@ -117,14 +126,15 @@ private:
 
 	DECLARE_QUICKLOAD_LOAD_MEMBER(quickload_cb);
 
-	void smc777_io(address_map &map);
-	void smc777_mem(address_map &map);
+	void smc777_io(address_map &map) ATTR_COLD;
+	void smc777_mem(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<screen_device> m_screen;
 	required_device<mc6845_device> m_crtc;
 	required_device<mb8876_device> m_fdc;
 	required_device_array<floppy_connector, 2> m_floppy;
+	required_device<ls259_device> m_ioctrl;
 	required_device<beep_device> m_beeper;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
@@ -143,7 +153,6 @@ private:
 	uint8_t m_display_reg = 0;
 	uint8_t m_fdc_irq_flag = 0;
 	uint8_t m_fdc_drq_flag = 0;
-	uint8_t m_system_data = 0;
 	struct { uint8_t r = 0, g = 0, b = 0; } m_pal;
 	uint8_t m_raminh = 0, m_raminh_pending_change = 0; //bankswitch
 	uint8_t m_raminh_prefetch = 0;
@@ -410,34 +419,35 @@ QUICKLOAD_LOAD_MEMBER(smc777_state::quickload_cb)
 {
 	address_space& prog_space = m_maincpu->space(AS_PROGRAM);
 
-	if (image.length() >= 0xfd00)
-		return std::make_pair(image_error::INVALIDLENGTH, std::string());
-
-	/* The right RAM bank must be active */
-
-	/* Avoid loading a program if CP/M-80 is not in memory */
+	// Avoid loading a program if CP/M-80 is not in memory
 	if ((prog_space.read_byte(0) != 0xc3) || (prog_space.read_byte(5) != 0xc3))
 	{
 		machine_reset();
-		return std::make_pair(image_error::UNSUPPORTED, std::string());
+		return std::make_pair(image_error::UNSUPPORTED, "CP/M must already be running");
 	}
 
-	/* Load image to the TPA (Transient Program Area) */
+	// Check for sufficient RAM based on position of CPM
+	const int mem_avail = 256 * prog_space.read_byte(7) + prog_space.read_byte(6) - 512;
+	if (mem_avail < image.length())
+		return std::make_pair(image_error::UNSPECIFIED, "Insufficient memory available");
+
+	// Load image to the TPA (Transient Program Area)
 	uint16_t quickload_size = image.length();
 	for (uint16_t i = 0; i < quickload_size; i++)
 	{
 		uint8_t data;
-		if (image.fread( &data, 1) != 1)
-			return std::make_pair(image_error::UNSPECIFIED, std::string());
-		prog_space.write_byte(i+0x100, data);
+		if (image.fread(&data, 1) != 1)
+			return std::make_pair(image_error::UNSPECIFIED, "Problem reading the image at offset " + std::to_string(i));
+		prog_space.write_byte(i + 0x100, data);
 	}
 
-	/* clear out command tail */
-	prog_space.write_byte(0x80, 0);   prog_space.write_byte(0x81, 0);
+	// clear out command tail
+	prog_space.write_byte(0x80, 0);
+	prog_space.write_byte(0x81, 0);
 
-	/* Roughly set SP basing on the BDOS position */
-	m_maincpu->set_state_int(Z80_SP, 256 * prog_space.read_byte(7) - 300);
-	m_maincpu->set_pc(0x100);       // start program
+	// Roughly set SP basing on the BDOS position
+	m_maincpu->set_state_int(Z80_SP, mem_avail + 384);
+	m_maincpu->set_pc(0x100); // start program
 
 	return std::make_pair(std::error_condition(), std::string());
 }
@@ -575,29 +585,50 @@ uint8_t smc777_state::io_status_1d_r()
 
 void smc777_state::io_control_w(uint8_t data)
 {
-	/*
-	 * flip-flop based
-	 * ---x -111 cassette write
-	 * ---x -110 printer strobe
-	 * ---x -101 beeper
-	 * ---x -100 cassette start (MONITOR_ON_OFF)
-	 * ---x -011 0=RGB 1=Component
-	 * ---x -010 0=525 lines 1=625 lines (NTSC/PAL switch?)
-	 * ---x -001 1=display disable
-	 * ---x -000 ram inibit signal
-	 */
-	m_system_data = data;
-	switch(m_system_data & 0x07)
-	{
-		case 0x00:
-			// "ROM / RAM register change is done at the beginning of the next M1 cycle"
-			m_raminh_pending_change = ((data & 0x10) >> 4) ^ 1;
-			m_raminh_prefetch = (uint8_t)(m_maincpu->state_int(Z80_R)) & 0x7f;
-			break;
-		case 0x02: printf("Screen line number %d\n",data & 0x10 ? 625 : 525); break;
-		case 0x05: m_beeper->set_state(data & 0x10); break;
-		default: printf("System FF W %02x\n",data); break;
-	}
+	m_ioctrl->write_bit(data & 0x07, BIT(data, 4));
+}
+
+void smc777_state::raminh_w(int state)
+{
+	// "ROM / RAM register change is done at the beginning of the next M1 cycle"
+	m_raminh_pending_change = state ^ 1;
+	m_raminh_prefetch = (uint8_t)(m_maincpu->state_int(Z80_R)) & 0x7f;
+}
+
+void smc777_state::vsup_w(int state)
+{
+	logerror("%s: Display %sabled\n", machine().describe_context(), state ? "dis" : "en");
+}
+
+void smc777_state::screen_lines_w(int state)
+{
+	logerror("%s: Screen line number %d\n", machine().describe_context(), state ? 625 : 525);
+}
+
+void smc777_state::rgb_select_w(int state)
+{
+	// 0=RGB 1=Component
+	logerror("%s: %s video selected\n", machine().describe_context(), state ? "Component" : "RGB");
+}
+
+void smc777_state::mt_on_w(int state)
+{
+	logerror("%s: Cassette monitor %s\n", machine().describe_context(), state ? "on" : "off");
+}
+
+void smc777_state::sound_out_w(int state)
+{
+	m_beeper->set_state(state);
+}
+
+void smc777_state::printer_strb_w(int state)
+{
+	logerror("%s: Printer strobe %d\n", machine().describe_context(), !state);
+}
+
+void smc777_state::cas_out_w(int state)
+{
+	logerror("%s: Cassette write %d\n", machine().describe_context(), state);
 }
 
 void smc777_state::color_mode_w(uint8_t data)
@@ -665,11 +696,11 @@ uint8_t smc777_state::smc777_mem_r(offs_t offset)
 	uint8_t z80_r;
 
 	// TODO: do the bankswitch AFTER that the prefetch instruction is executed (hackish implementation)
-	if(m_raminh_prefetch != 0xff)
+	if(m_raminh_prefetch != 0xff && !machine().side_effects_disabled())
 	{
 		z80_r = (uint8_t)m_maincpu->state_int(Z80_R);
 
-		if(z80_r == ((m_raminh_prefetch+2) & 0x7f))
+		if(z80_r == ((m_raminh_prefetch+1) & 0x7f))
 		{
 			m_raminh = m_raminh_pending_change;
 			m_raminh_prefetch = 0xff;
@@ -1104,10 +1135,24 @@ static void smc777_floppies(device_slot_interface &device)
 
 void smc777_state::smc777(machine_config &config)
 {
+	constexpr XTAL MASTER_CLOCK = 32.2238_MHz_XTAL;
+
 	/* basic machine hardware */
-	Z80(config, m_maincpu, MASTER_CLOCK);
+	Z80(config, m_maincpu, MASTER_CLOCK / 8); // nominally 4.028 MHz
 	m_maincpu->set_addrmap(AS_PROGRAM, &smc777_state::smc777_mem);
 	m_maincpu->set_addrmap(AS_IO, &smc777_state::smc777_io);
+
+	I8041A(config, "mcu", 6_MHz_XTAL).set_disable();
+
+	LS259(config, m_ioctrl);
+	m_ioctrl->q_out_cb<0>().set(FUNC(smc777_state::raminh_w));
+	m_ioctrl->q_out_cb<1>().set(FUNC(smc777_state::vsup_w));
+	m_ioctrl->q_out_cb<2>().set(FUNC(smc777_state::screen_lines_w));
+	m_ioctrl->q_out_cb<3>().set(FUNC(smc777_state::rgb_select_w));
+	m_ioctrl->q_out_cb<4>().set(FUNC(smc777_state::mt_on_w));
+	m_ioctrl->q_out_cb<5>().set(FUNC(smc777_state::sound_out_w));
+	m_ioctrl->q_out_cb<6>().set(FUNC(smc777_state::printer_strb_w));
+	m_ioctrl->q_out_cb<7>().set(FUNC(smc777_state::cas_out_w));
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
@@ -1122,14 +1167,14 @@ void smc777_state::smc777(machine_config &config)
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfxdecode_device::empty);
 
-	HD6845S(config, m_crtc, MASTER_CLOCK/2);    /* HD68A45SP; unknown clock, hand tuned to get ~60 fps */
+	HD6845S(config, m_crtc, MASTER_CLOCK / 16); // HD68A45SP; unknown clock, hand tuned to get ~60 fps
 	m_crtc->set_screen(m_screen);
 	m_crtc->set_show_border_area(true);
 	m_crtc->set_char_width(8);
 	m_crtc->out_vsync_callback().set(FUNC(smc777_state::vsync_w));
 
 	// floppy controller
-	MB8876(config, m_fdc, 1_MHz_XTAL);
+	MB8876(config, m_fdc, MASTER_CLOCK / 32); // divider not confirmed
 	m_fdc->intrq_wr_callback().set(FUNC(smc777_state::fdc_intrq_w));
 	m_fdc->drq_wr_callback().set(FUNC(smc777_state::fdc_drq_w));
 
@@ -1143,7 +1188,7 @@ void smc777_state::smc777(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	SN76489A(config, "sn1", MASTER_CLOCK).add_route(ALL_OUTPUTS, "mono", 0.50); // unknown clock / divider
+	SN76489A(config, "sn1", MASTER_CLOCK / 8).add_route(ALL_OUTPUTS, "mono", 0.50); // unknown clock / divider
 
 	BEEP(config, m_beeper, 300); // TODO: correct frequency
 	m_beeper->add_route(ALL_OUTPUTS, "mono", 0.50);

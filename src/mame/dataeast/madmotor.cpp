@@ -52,8 +52,8 @@ public:
 
 private:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void madmotor_map(address_map &map);
-	void sound_map(address_map &map);
+	void madmotor_map(address_map &map) ATTR_COLD;
+	void sound_map(address_map &map) ATTR_COLD;
 
 	/* memory pointers */
 	required_shared_ptr<uint16_t> m_spriteram;

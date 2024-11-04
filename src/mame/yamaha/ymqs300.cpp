@@ -55,9 +55,9 @@ protected:
 
 	u8 m_mpb;
 
-	void mainmap(address_map &map);
-	void submap(address_map &map);
-	void lcdmap(address_map &map);
+	void mainmap(address_map &map) ATTR_COLD;
+	void submap(address_map &map) ATTR_COLD;
+	void lcdmap(address_map &map) ATTR_COLD;
 
 	u8 mlatch_r();
 	void mlatch_w(u8 data);
@@ -76,7 +76,7 @@ protected:
 
 	void lcd_palette(palette_device &palette) const;
 
-	void machine_start() override;
+	void machine_start() override ATTR_COLD;
 };
 
 class eos_b900_state : public qs300_state

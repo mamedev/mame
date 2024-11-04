@@ -65,7 +65,7 @@ public:
 	void init_mustache();
 
 protected:
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -90,8 +90,8 @@ private:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void decrypted_opcodes_map(address_map &map);
-	void memmap(address_map &map);
+	void decrypted_opcodes_map(address_map &map) ATTR_COLD;
+	void memmap(address_map &map) ATTR_COLD;
 };
 
 

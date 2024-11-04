@@ -109,32 +109,32 @@ protected:
 	u32 screen_update_dogyuun(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	u32 screen_update_batsugun(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void screen_vblank(int state);
-	void cpu_space_fixeightbl_map(address_map &map);
-	void cpu_space_pipibibsbl_map(address_map &map);
+	void cpu_space_fixeightbl_map(address_map &map) ATTR_COLD;
+	void cpu_space_pipibibsbl_map(address_map &map) ATTR_COLD;
 
 	void toaplan2_reset(int state);
 
-	void batsugun_68k_mem(address_map &map);
-	void batsugunbl_68k_mem(address_map &map);
-	void dogyuun_68k_mem(address_map &map);
-	void dogyuunto_68k_mem(address_map &map);
-	void dogyuunto_sound_z80_mem(address_map &map);
-	void enmadaio_68k_mem(address_map &map);
-	void enmadaio_oki(address_map &map);
-	void fixeightbl_oki(address_map &map);
-	void hd647180_io_map(address_map &map);
-	void kbash2_68k_mem(address_map &map);
-	void kbash_68k_mem(address_map &map);
-	void kbash_v25_mem(address_map &map);
-	void pipibibi_bootleg_68k_mem(address_map &map);
-	void pipibibs_68k_mem(address_map &map);
-	void pipibibs_sound_z80_mem(address_map &map);
-	void snowbro2_68k_mem(address_map &map);
-	void snowbro2b3_68k_mem(address_map &map);
-	void tekipaki_68k_mem(address_map &map);
-	void v25_mem(address_map &map);
-	void vfive_68k_mem(address_map &map);
-	void vfive_v25_mem(address_map &map);
+	void batsugun_68k_mem(address_map &map) ATTR_COLD;
+	void batsugunbl_68k_mem(address_map &map) ATTR_COLD;
+	void dogyuun_68k_mem(address_map &map) ATTR_COLD;
+	void dogyuunto_68k_mem(address_map &map) ATTR_COLD;
+	void dogyuunto_sound_z80_mem(address_map &map) ATTR_COLD;
+	void enmadaio_68k_mem(address_map &map) ATTR_COLD;
+	void enmadaio_oki(address_map &map) ATTR_COLD;
+	void fixeightbl_oki(address_map &map) ATTR_COLD;
+	void hd647180_io_map(address_map &map) ATTR_COLD;
+	void kbash2_68k_mem(address_map &map) ATTR_COLD;
+	void kbash_68k_mem(address_map &map) ATTR_COLD;
+	void kbash_v25_mem(address_map &map) ATTR_COLD;
+	void pipibibi_bootleg_68k_mem(address_map &map) ATTR_COLD;
+	void pipibibs_68k_mem(address_map &map) ATTR_COLD;
+	void pipibibs_sound_z80_mem(address_map &map) ATTR_COLD;
+	void snowbro2_68k_mem(address_map &map) ATTR_COLD;
+	void snowbro2b3_68k_mem(address_map &map) ATTR_COLD;
+	void tekipaki_68k_mem(address_map &map) ATTR_COLD;
+	void v25_mem(address_map &map) ATTR_COLD;
+	void vfive_68k_mem(address_map &map) ATTR_COLD;
+	void vfive_v25_mem(address_map &map) ATTR_COLD;
 };
 
 // with paddle
@@ -149,8 +149,8 @@ public:
 	void ghox(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	required_ioport_array<2> m_io_pad;
@@ -159,8 +159,8 @@ private:
 
 	template<unsigned Which> u16 ghox_h_analog_r();
 
-	void ghox_68k_mem(address_map &map);
-	void ghox_hd647180_mem_map(address_map &map);
+	void ghox_68k_mem(address_map &map) ATTR_COLD;
+	void ghox_hd647180_mem_map(address_map &map) ATTR_COLD;
 };
 
 // with text layer
@@ -198,7 +198,7 @@ public:
 	void init_fixeight();
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 	virtual void device_post_load() override;
 
 private:
@@ -259,24 +259,24 @@ private:
 	INTERRUPT_GEN_MEMBER(bbakraid_snd_interrupt);
 	void create_tx_tilemap(int dx = 0, int dx_flipped = 0);
 
-	void batrider_68k_mem(address_map &map);
-	void batrider_dma_mem(address_map &map);
-	void batrider_sound_z80_mem(address_map &map);
-	void batrider_sound_z80_port(address_map &map);
-	void bbakraid_68k_mem(address_map &map);
-	void bbakraid_sound_z80_mem(address_map &map);
-	void bbakraid_sound_z80_port(address_map &map);
-	void bgaregga_68k_mem(address_map &map);
-	void bgaregga_sound_z80_mem(address_map &map);
-	void fixeight_68k_mem(address_map &map);
-	void fixeight_v25_mem(address_map &map);
-	void fixeightbl_68k_mem(address_map &map);
-	void mahoudai_68k_mem(address_map &map);
-	void nprobowl_68k_mem(address_map &map);
-	template<unsigned Chip> void raizing_oki(address_map &map);
-	void raizing_sound_z80_mem(address_map &map);
-	void shippumd_68k_mem(address_map &map);
-	void truxton2_68k_mem(address_map &map);
+	void batrider_68k_mem(address_map &map) ATTR_COLD;
+	void batrider_dma_mem(address_map &map) ATTR_COLD;
+	void batrider_sound_z80_mem(address_map &map) ATTR_COLD;
+	void batrider_sound_z80_port(address_map &map) ATTR_COLD;
+	void bbakraid_68k_mem(address_map &map) ATTR_COLD;
+	void bbakraid_sound_z80_mem(address_map &map) ATTR_COLD;
+	void bbakraid_sound_z80_port(address_map &map) ATTR_COLD;
+	void bgaregga_68k_mem(address_map &map) ATTR_COLD;
+	void bgaregga_sound_z80_mem(address_map &map) ATTR_COLD;
+	void fixeight_68k_mem(address_map &map) ATTR_COLD;
+	void fixeight_v25_mem(address_map &map) ATTR_COLD;
+	void fixeightbl_68k_mem(address_map &map) ATTR_COLD;
+	void mahoudai_68k_mem(address_map &map) ATTR_COLD;
+	void nprobowl_68k_mem(address_map &map) ATTR_COLD;
+	template<unsigned Chip> void raizing_oki(address_map &map) ATTR_COLD;
+	void raizing_sound_z80_mem(address_map &map) ATTR_COLD;
+	void shippumd_68k_mem(address_map &map) ATTR_COLD;
+	void truxton2_68k_mem(address_map &map) ATTR_COLD;
 };
 
 
@@ -300,8 +300,8 @@ private:
 	void pwrkick_coin_w(u8 data);
 	void pwrkick_coin_lockout_w(u8 data);
 
-	void othldrby_68k_mem(address_map &map);
-	void pwrkick_68k_mem(address_map &map);
+	void othldrby_68k_mem(address_map &map) ATTR_COLD;
+	void pwrkick_68k_mem(address_map &map) ATTR_COLD;
 };
 
 #endif // MAME_TOAPLAN_TOAPLAN2_H

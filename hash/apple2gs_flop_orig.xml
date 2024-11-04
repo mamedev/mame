@@ -647,7 +647,7 @@ license:CC0-1.0
 	<software name="qustron2">
 		<description>Questron II (version 1.1)</description>
 		<year>1988</year>
-		<publisher>Strategic Simulations</publisher>
+		<publisher>Strategic Simulations Inc. (SSI)</publisher>
 		<info name="developer" value="Westwood Associates" />
 		<info name="usage" value="Requires a 512K Apple IIgs." />
 		<info name="version" value="1.1" />
@@ -677,10 +677,10 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="roadwr2k">
+	<software name="roadwar2k">
 		<description>Roadwar 2000</description>
 		<year>1987</year>
-		<publisher>Strategic Simulations</publisher>
+		<publisher>Strategic Simulations Inc. (SSI)</publisher>
 		<info name="developer" value="Westwood Associates" />
 		<info name="usage" value="Requires a 512K Apple IIgs." />
 		<sharedfeat name="compatibility" value="A2GS" />
@@ -1845,11 +1845,12 @@ license:CC0-1.0
 	</software>
 
 	<software name="hallsmzm">
-		<description>Halls of Montezuma</description>
+		<description>Halls of Montezuma (version 1.0 07-1990)</description>
 		<year>1990</year>
-		<publisher>Strategic Simulations</publisher>
+		<publisher>Strategic Studies Group (SSG)</publisher>
 		<info name="programmer" value="Roger Keating, Ian Trout, Allan Bell, Sue Bell, and Steven Hart" />
 		<info name="usage" value="Requires a 1MB Apple IIgs ROM 01 or later." />
+		<info name="version" value="1.0 07-1990" />
 		<sharedfeat name="compatibility" value="A2GS" />
 		<!-- Dump released: 2021-06-04 -->
 		<!-- simulation game -->
@@ -4258,6 +4259,135 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1345297">
 				<rom name="strip poker ii iigs.woz" size="1345297" crc="835d6724" sha1="05a280b8663ee6add694e0f7d2900745bd53fdad" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="timepilot12" cloneof="timepilot">
+		<description>Time Pilot (version 1.2)</description>
+		<year>2024</year>
+		<publisher>Stefan Wessels</publisher>
+		<info name="programmer" value="Stefan Wessels and Antoine Vignau" />
+		<info name="usage" value="Requires an Apple IIgs." />
+		<info name="version" value="1.2" />
+		<!--First Apple IIgs version.  No icon or audio.-->
+		<sharedfeat name="compatibility" value="A2GS" />
+		<!--Dump released: 07-09-2024-->
+		<!--arcade game-->
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="819200">
+				<rom name="timepilot_v1.2.po" size="819200" crc="dfd6b004" sha1="7094438f4c089eb3474c495344e10a93ab3240ff" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="timepilot13" cloneof="timepilot">
+		<description>Time Pilot (version 1.3)</description>
+		<year>2024</year>
+		<publisher>Stefan Wessels and Brutal Deluxe Software</publisher>
+		<info name="programmer" value="Stefan Wessels and Antoine Vignau" />
+		<info name="usage" value="Requires an Apple IIgs." />
+		<info name="version" value="1.3" />
+		<!--Version 1.3 Adds sound.  Audio code supplied by Brutal Deluxe Software.-->
+		<sharedfeat name="compatibility" value="A2GS" />
+		<!--Dump released: 07-09-2024-->
+		<!--arcade game-->
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="819200">
+				<rom name="timepilot_v1.3.po" size="819200" crc="6b974655" sha1="1ad93f9ea15e058137c80eac6e202242171363d4" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="timepilot14" cloneof="timepilot">
+		<description>Time Pilot (version 1.4)</description>
+		<year>2024</year>
+		<publisher>Stefan Wessels and Brutal Deluxe Software</publisher>
+		<info name="programmer" value="Stefan Wessels and Antoine Vignau" />
+		<info name="usage" value="Requires an Apple IIgs." />
+		<info name="version" value="1.4" />
+		<!--Fixed audio corruption and clipping issues at the top of the screen.-->
+		<sharedfeat name="compatibility" value="A2GS" />
+		<!--Dump released: 07-09-2024-->
+		<!--arcade game-->
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="819200">
+				<rom name="timepilot_v1.4.po" size="819200" crc="5481abc5" sha1="e9dd9c7e881730b8692d2edaa0c36cfbd08c6a52" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="timepilot15" cloneof="timepilot">
+		<description>Time Pilot (version 1.5)</description>
+		<year>2024</year>
+		<publisher>Stefan Wessels and Brutal Deluxe Software</publisher>
+		<info name="programmer" value="Stefan Wessels and Antoine Vignau" />
+		<info name="usage" value="Requires an Apple IIgs." />
+		<info name="version" value="1.5" />
+		<!--Scores are now saved and loaded, press ESC to stop a game, external RAM sounds at 22kHz, enemy explosion bug fixed, loader with splash screen.-->
+		<sharedfeat name="compatibility" value="A2GS" />
+		<!--Dump released: 07-18-2024-->
+		<!--arcade game-->
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 1" />
+			<dataarea name="flop" size="819200">
+				<rom name="timepilot1_v1.5.po" size="819200" crc="8dde5067" sha1="8ae4f9f143c153a58a569c05eb0ad0f451a47bcf" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 2" />
+			<dataarea name="flop" size="819200">
+				<rom name="timepilot2_v1.5.po" size="819200" crc="8a1ae6ff" sha1="05c55a40898fcd16a987f162146fe86b670d2229" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="timepilot15a" cloneof="timepilot">
+		<description>Time Pilot (version 1.5.A)</description>
+		<year>2024</year>
+		<publisher>Stefan Wessels and Brutal Deluxe Software</publisher>
+		<info name="programmer" value="Stefan Wessels and Antoine Vignau" />
+		<info name="usage" value="Requires an Apple IIgs." />
+		<info name="version" value="1.5.A" />
+		<!--Fixed bad bug in game ending with high score and skip waiting for Game Over screen.-->
+		<sharedfeat name="compatibility" value="A2GS" />
+		<!--Dump released: 07-19-2024-->
+		<!--arcade game-->
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 1" />
+			<dataarea name="flop" size="819200">
+				<rom name="timepilot1_v1.5.a.po" size="819200" crc="9abe07ea" sha1="76c19e628861aa917ab270a07531759f89b10bdf" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 2" />
+			<dataarea name="flop" size="819200">
+				<rom name="timepilot2_v1.5.a.po" size="819200" crc="34334279" sha1="d4efa41c20fe8979aeb0651e8667fd24a8566ccd" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="timepilot">
+		<description>Time Pilot (version 1.6)</description>
+		<year>2024</year>
+		<publisher>Stefan Wessels and Brutal Deluxe Software</publisher>
+		<info name="programmer" value="Stefan Wessels and Antoine Vignau" />
+		<info name="usage" value="Requires an Apple IIgs." />
+		<info name="version" value="1.6" />
+		<!--Code optimizations, splash screen has credits, and softer bomb sound.-->
+		<sharedfeat name="compatibility" value="A2GS" />
+		<!--Dump released: 08-15-2024-->
+		<!--arcade game-->
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 1" />
+			<dataarea name="flop" size="819200">
+				<rom name="timepilot_gs1_v1.6.po" size="819200" crc="b4c4e971" sha1="d9a8f0766eeb102e0a91cd6f664a4155c21c0116" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 2" />
+			<dataarea name="flop" size="819200">
+				<rom name="timepilot_gs2_v1.6.po" size="819200" crc="24c0c3c0" sha1="8c06eca43aef35dfa68094696ace3de05036f5e0" />
 			</dataarea>
 		</part>
 	</software>

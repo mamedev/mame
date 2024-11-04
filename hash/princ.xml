@@ -94,7 +94,7 @@ PCBs have surface mount pads for two chips, but only one of them is populated:
 	</software>
 
 	<software name="pochacco" supported="yes">
-		<description>Pochacco</description>
+		<description>Pochacco - The Yorimichi Dog</description>
 		<year>1996</year>
 		<publisher>Tomy</publisher>
 		<info name="serial" value="IRC #01"/>

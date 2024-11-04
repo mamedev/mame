@@ -180,10 +180,10 @@ private:
 	void lamps2_w(uint8_t data);
 	void lamps3_w(uint8_t data);
 
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
-	void jankenmn_map(address_map &map);
-	void jankenmn_port_map(address_map &map);
+	void jankenmn_map(address_map &map) ATTR_COLD;
+	void jankenmn_port_map(address_map &map) ATTR_COLD;
 
 	required_device<z80_device> m_maincpu;
 	output_finder<2> m_digits;
@@ -338,7 +338,7 @@ static INPUT_PORTS_START( jankenmn )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("Paa (Paper)")
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_COIN3 ) // 100 yen coin
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(jankenmn_state, hopper_status_r)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(jankenmn_state::hopper_status_r))
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_COIN2 ) // 10 yen coin
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_COIN1 ) // 10 yen coin
 

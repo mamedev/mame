@@ -213,7 +213,7 @@ public:
 private:
 	required_device<cpu_device> m_maincpu;
 
-	void rfslotspcpent_map(address_map &map);
+	void rfslotspcpent_map(address_map &map) ATTR_COLD;
 };
 
 void rfslotspcpent_state::rfslotspcpent_map(address_map &map)

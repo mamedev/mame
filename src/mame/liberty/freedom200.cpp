@@ -83,8 +83,8 @@ public:
 	void freedom200(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	required_device<z80_device> m_maincpu;
@@ -107,11 +107,11 @@ private:
 	bool m_dw_blink;
 	bool m_dw_cursor;
 
-	void mem_map(address_map &map);
-	void io_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
+	void io_map(address_map &map) ATTR_COLD;
 
-	void char_map(address_map &map);
-	void attr_map(address_map &map);
+	void char_map(address_map &map) ATTR_COLD;
+	void attr_map(address_map &map) ATTR_COLD;
 	void avdc_intr_w(int state);
 	void video_ctrl_w(uint8_t data);
 	SCN2674_DRAW_CHARACTER_MEMBER(draw_character);

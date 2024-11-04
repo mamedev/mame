@@ -65,8 +65,8 @@ public:
 	void init_pengadvb2();
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	uint8_t mem_r(offs_t offset);
@@ -80,9 +80,9 @@ private:
 	void ppi_port_c_w(uint8_t data);
 
 	void pengadvb_decrypt(const char* region);
-	void bank_mem(address_map &map);
-	void io_mem(address_map &map);
-	void program_mem(address_map &map);
+	void bank_mem(address_map &map) ATTR_COLD;
+	void io_mem(address_map &map) ATTR_COLD;
+	void program_mem(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	required_device_array<address_map_bank_device, 4> m_page;

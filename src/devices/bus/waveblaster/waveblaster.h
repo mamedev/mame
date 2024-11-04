@@ -34,7 +34,7 @@ protected:
 	bool m_state_system_is_annoying = true;
 	devcb_write_line m_midi_tx;
 
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 };
 
 class device_waveblaster_interface: public device_interface

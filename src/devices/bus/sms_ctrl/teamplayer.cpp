@@ -38,10 +38,10 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(reselect);
 
 protected:
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual ioport_constructor device_input_ports() const override;
-	virtual void device_resolve_objects() override;
-	virtual void device_start() override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
+	virtual void device_resolve_objects() override ATTR_COLD;
+	virtual void device_start() override ATTR_COLD;
 
 private:
 	enum : u8
@@ -100,7 +100,7 @@ private:
 
 INPUT_PORTS_START( sms_teamplayer )
 	PORT_START("SELECT")
-	PORT_CONFNAME(0x07, 0x04, "Switch") PORT_CHANGED_MEMBER(DEVICE_SELF, sms_teamplayer_device, reselect, 0)
+	PORT_CONFNAME(0x07, 0x04, "Switch") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(sms_teamplayer_device::reselect), 0)
 	PORT_CONFSETTING(   0x00, "A")
 	PORT_CONFSETTING(   0x01, "B")
 	PORT_CONFSETTING(   0x02, "C")

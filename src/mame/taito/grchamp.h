@@ -44,9 +44,9 @@ public:
 	void grchamp(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	void cpu0_outputs_w(offs_t offset, uint8_t data);
@@ -86,11 +86,11 @@ private:
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void draw_objects(int y, uint8_t *objdata);
-	void main_map(address_map &map);
-	void main_portmap(address_map &map);
-	void sound_map(address_map &map);
-	void sub_map(address_map &map);
-	void sub_portmap(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
+	void main_portmap(address_map &map) ATTR_COLD;
+	void sound_map(address_map &map) ATTR_COLD;
+	void sub_map(address_map &map) ATTR_COLD;
+	void sub_portmap(address_map &map) ATTR_COLD;
 
 	uint8_t       m_cpu0_out[16]{};
 	uint8_t       m_cpu1_out[16]{};

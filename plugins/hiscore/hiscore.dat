@@ -1978,7 +1978,7 @@ gngprot:
 @:maincpu,program,00d0,4,00,00
 
 
-diamond:
+diamrun:
 @:maincpu,program,1200,80,4b,00
 
 

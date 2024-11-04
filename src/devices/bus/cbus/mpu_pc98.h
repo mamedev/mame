@@ -22,17 +22,17 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// optional information overrides
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 private:
 	// called back by the MPU401 core to set the IRQ line state
 	void mpu_irq_out(int state);
 
-	void map(address_map &map);
+	void map(address_map &map) ATTR_COLD;
 
 	required_device<pc9801_slot_device> m_bus;
 	required_device<mpu401_device> m_mpu401;

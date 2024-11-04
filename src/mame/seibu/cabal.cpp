@@ -198,7 +198,7 @@ public:
 	{ }
 
 protected:
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
@@ -247,12 +247,12 @@ private:
 
 	void sound_irq_trigger_word_w(offs_t offset, uint16_t data, uint16_t mem_mask);
 
-	void main_map(address_map &map);
-	void sound_decrypted_opcodes_map(address_map &map);
-	void sound_map(address_map &map);
-	void trackball_main_map(address_map &map);
-	void cabalbl2_predecrypted_opcodes_map(address_map &map);
-	void cabalbl2_sound_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
+	void sound_decrypted_opcodes_map(address_map &map) ATTR_COLD;
+	void sound_map(address_map &map) ATTR_COLD;
+	void trackball_main_map(address_map &map) ATTR_COLD;
+	void cabalbl2_predecrypted_opcodes_map(address_map &map) ATTR_COLD;
+	void cabalbl2_sound_map(address_map &map) ATTR_COLD;
 };
 
 class cabalbl_state : public cabal_base_state
@@ -265,8 +265,8 @@ public:
 	void cabalbl(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	int m_sound_command[2]{};
@@ -277,12 +277,12 @@ private:
 	void coin_w(uint8_t data);
 	template<uint8_t Which> void adpcm_w(uint8_t data);
 
-	void main_map(address_map &map);
-	void sound_map(address_map &map);
-	void talk1_map(address_map &map);
-	void talk1_portmap(address_map &map);
-	void talk2_map(address_map &map);
-	void talk2_portmap(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
+	void sound_map(address_map &map) ATTR_COLD;
+	void talk1_map(address_map &map) ATTR_COLD;
+	void talk1_portmap(address_map &map) ATTR_COLD;
+	void talk2_map(address_map &map) ATTR_COLD;
+	void talk2_portmap(address_map &map) ATTR_COLD;
 };
 
 

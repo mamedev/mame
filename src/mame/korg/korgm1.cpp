@@ -46,10 +46,10 @@ public:
 
 protected:
 	// driver_device overrides
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	HD44780_PIXEL_UPDATE(lcd_pixel_update);
@@ -58,8 +58,8 @@ private:
 	u8 panel_sw_r();
 	void panel_leds_w(u8 data);
 
-	void korgm1_map(address_map &map);
-	void korgm1_io(address_map &map);
+	void korgm1_map(address_map &map) ATTR_COLD;
+	void korgm1_io(address_map &map) ATTR_COLD;
 
 	void palette_init(palette_device &palette);
 

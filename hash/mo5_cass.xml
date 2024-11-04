@@ -173,7 +173,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	<software name="astrcoup">
 		<description>Astro-Couple</description>
 		<year>1985</year>
-		<publisher>Answare</publisher>
+		<publisher>Answare-Diffusion</publisher>
 
 		<part name="cass1" interface="mo_cass">
 			<dataarea name="cass" size="29753">
@@ -185,7 +185,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	<software name="biorythm">
 		<description>Biorythmes</description>
 		<year>1984</year>
-		<publisher>Answare</publisher>
+		<publisher>Answare-Diffusion</publisher>
 
 		<part name="cass1" interface="mo_cass">
 			<dataarea name="cass" size="15302">
@@ -197,7 +197,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	<software name="biorythma" cloneof="biorythm">
 		<description>Biorythmes (alt)</description>
 		<year>1984</year>
-		<publisher>Answare</publisher>
+		<publisher>Answare-Diffusion</publisher>
 
 		<part name="cass1" interface="mo_cass">
 			<dataarea name="cass" size="15302">
@@ -209,7 +209,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	<software name="biorythmb" cloneof="biorythm">
 		<description>Biorythmes (alt 2)</description>
 		<year>1984</year>
-		<publisher>Answare</publisher>
+		<publisher>Answare-Diffusion</publisher>
 
 		<part name="cass1" interface="mo_cass">
 			<dataarea name="cass" size="15302">
@@ -269,7 +269,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	<software name="cartciel">
 		<description>Carte du Ciel</description>
 		<year>1983</year>
-		<publisher>Answare</publisher>
+		<publisher>Answare-Diffusion</publisher>
 
 		<part name="cass1" interface="mo_cass">
 			<dataarea name="cass" size="29208">
@@ -281,7 +281,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	<software name="cartciela" cloneof="cartciel">
 		<description>Carte du Ciel (alt)</description>
 		<year>1983</year>
-		<publisher>Answare</publisher>
+		<publisher>Answare-Diffusion</publisher>
 
 		<part name="cass1" interface="mo_cass">
 			<dataarea name="cass" size="29208">
@@ -293,7 +293,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	<software name="cartcielb" cloneof="cartciel">
 		<description>Carte du Ciel (alt 2)</description>
 		<year>1983</year>
-		<publisher>Answare</publisher>
+		<publisher>Answare-Diffusion</publisher>
 
 		<part name="cass1" interface="mo_cass">
 			<dataarea name="cass" size="29208">
@@ -305,7 +305,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	<software name="cartcielc" cloneof="cartciel">
 		<description>Carte du Ciel (alt 3)</description>
 		<year>1983</year>
-		<publisher>Answare</publisher>
+		<publisher>Answare-Diffusion</publisher>
 
 		<part name="cass1" interface="mo_cass">
 			<dataarea name="cass" size="29208">
@@ -474,7 +474,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	<software name="courrier">
 		<description>Courrier</description>
 		<year>1984</year>
-		<publisher>Answare</publisher>
+		<publisher>Answare-Diffusion</publisher>
 
 		<part name="cass1" interface="mo_cass">
 			<dataarea name="cass" size="22397">
@@ -690,7 +690,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	<software name="eparempr">
 		<description>Epargne - Emprunt</description>
 		<year>1984</year>
-		<publisher>Answare</publisher>
+		<publisher>Answare-Diffusion</publisher>
 
 		<part name="cass1" interface="mo_cass">
 			<dataarea name="cass" size="19726">
@@ -8932,7 +8932,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	<software name="barrymcg">
 		<description>Barry McGuigan Championship Boxing</description>
 		<year>198?</year>
-		<publisher>Microids</publisher>
+		<publisher>Microïds</publisher>
 
 		<part name="cass1" interface="mo_cass">
 			<dataarea name="cass" size="35419">
@@ -8944,7 +8944,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	<software name="barrymcga" cloneof="barrymcg">
 		<description>Barry McGuigan Championship Boxing (alt)</description>
 		<year>198?</year>
-		<publisher>Microids</publisher>
+		<publisher>Microïds</publisher>
 
 		<part name="cass1" interface="mo_cass">
 			<dataarea name="cass" size="35634">
@@ -8956,7 +8956,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	<software name="barrymcgb" cloneof="barrymcg">
 		<description>Barry McGuigan Championship Boxing (alt 2)</description>
 		<year>198?</year>
-		<publisher>Microids</publisher>
+		<publisher>Microïds</publisher>
 
 		<part name="cass1" interface="mo_cass">
 			<dataarea name="cass" size="35634">
@@ -10920,7 +10920,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	<software name="enigmati">
 		<description>Enigmatika</description>
 		<year>1984</year>
-		<publisher>Answare</publisher>
+		<publisher>Answare-Diffusion</publisher>
 
 		<part name="cass1" interface="mo_cass">
 			<feature name="part_id" value="Tape 1"/>
@@ -10957,7 +10957,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	<software name="enigmatia" cloneof="enigmati">
 		<description>Enigmatika (alt tapes 1-4)</description>
 		<year>1984</year>
-		<publisher>Answare</publisher>
+		<publisher>Answare-Diffusion</publisher>
 
 		<part name="cass1" interface="mo_cass">
 			<feature name="part_id" value="Tape 1"/>
@@ -14787,7 +14787,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	<software name="oceania">
 		<description>Oceania</description>
 		<year>1985</year>
-		<publisher>Microids</publisher>
+		<publisher>Microïds</publisher>
 
 		<part name="cass1" interface="mo_cass">
 			<dataarea name="cass" size="35514">
@@ -14799,7 +14799,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	<software name="oceaniaa" cloneof="oceania">
 		<description>Oceania (alt)</description>
 		<year>1985</year>
-		<publisher>Microids</publisher>
+		<publisher>Microïds</publisher>
 
 		<part name="cass1" interface="mo_cass">
 			<dataarea name="cass" size="35514">
@@ -14811,7 +14811,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	<software name="oceaniab" cloneof="oceania">
 		<description>Oceania (alt 2)</description>
 		<year>1985</year>
-		<publisher>Microids</publisher>
+		<publisher>Microïds</publisher>
 
 		<part name="cass1" interface="mo_cass">
 			<dataarea name="cass" size="35514">
@@ -15279,9 +15279,9 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="poliecon">
-		<description>Politique Economique</description>
+		<description>Politique Économique</description>
 		<year>1984</year>
-		<publisher>Answare</publisher>
+		<publisher>Answare-Diffusion</publisher>
 
 		<part name="cass1" interface="mo_cass">
 			<dataarea name="cass" size="19274">
@@ -15291,9 +15291,9 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="poliecona" cloneof="poliecon">
-		<description>Politique Economique (alt)</description>
+		<description>Politique Économique (alt)</description>
 		<year>1984</year>
-		<publisher>Answare</publisher>
+		<publisher>Answare-Diffusion</publisher>
 
 		<part name="cass1" interface="mo_cass">
 			<dataarea name="cass" size="19339">
@@ -15303,9 +15303,9 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="polieconb" cloneof="poliecon">
-		<description>Politique Economique (alt 2)</description>
+		<description>Politique Économique (alt 2)</description>
 		<year>1984</year>
-		<publisher>Answare</publisher>
+		<publisher>Answare-Diffusion</publisher>
 
 		<part name="cass1" interface="mo_cass">
 			<dataarea name="cass" size="19339">
@@ -15315,9 +15315,9 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="polieconc" cloneof="poliecon">
-		<description>Politique Economique (alt 3)</description>
+		<description>Politique Économique (alt 3)</description>
 		<year>1984</year>
-		<publisher>Answare</publisher>
+		<publisher>Answare-Diffusion</publisher>
 
 		<part name="cass1" interface="mo_cass">
 			<dataarea name="cass" size="19339">
@@ -15926,7 +15926,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	<software name="rodeo">
 		<description>Rodeo</description>
 		<year>1985</year>
-		<publisher>Microids</publisher>
+		<publisher>Microïds</publisher>
 
 		<part name="cass1" interface="mo_cass">
 			<dataarea name="cass" size="43463">
@@ -15938,7 +15938,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	<software name="rodeoa" cloneof="rodeo">
 		<description>Rodeo (alt)</description>
 		<year>1985</year>
-		<publisher>Microids</publisher>
+		<publisher>Microïds</publisher>
 
 		<part name="cass1" interface="mo_cass">
 			<dataarea name="cass" size="43463">
@@ -15950,7 +15950,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	<software name="rodeob" cloneof="rodeo">
 		<description>Rodeo (alt 2)</description>
 		<year>1985</year>
-		<publisher>Microids</publisher>
+		<publisher>Microïds</publisher>
 
 		<part name="cass1" interface="mo_cass">
 			<dataarea name="cass" size="43463">
@@ -16008,7 +16008,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="rotorwar">
-		<description>Rotor-War</description>
+		<description>Rotorwar</description>
 		<year>1984</year>
 		<publisher>VIFI-Nathan</publisher>
 
@@ -16476,7 +16476,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	<software name="solnoir">
 		<description>Soleil Noir</description>
 		<year>1985</year>
-		<publisher>Microids</publisher>
+		<publisher>Microïds</publisher>
 
 		<part name="cass1" interface="mo_cass">
 			<dataarea name="cass" size="36599">
@@ -16488,7 +16488,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	<software name="solnoira" cloneof="solnoir">
 		<description>Soleil Noir (alt)</description>
 		<year>1985</year>
-		<publisher>Microids</publisher>
+		<publisher>Microïds</publisher>
 
 		<part name="cass1" interface="mo_cass">
 			<dataarea name="cass" size="36599">
@@ -16500,7 +16500,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	<software name="solnoirb" cloneof="solnoir">
 		<description>Soleil Noir (alt 2)</description>
 		<year>1985</year>
-		<publisher>Microids</publisher>
+		<publisher>Microïds</publisher>
 
 		<part name="cass1" interface="mo_cass">
 			<dataarea name="cass" size="36599">
@@ -17035,7 +17035,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	<software name="stennisb" cloneof="stennis">
 		<description>Super Tennis (Answare)</description>
 		<year>1985</year>
-		<publisher>Answare</publisher>
+		<publisher>Answare-Diffusion</publisher>
 
 		<part name="cass1" interface="mo_cass">
 			<dataarea name="cass" size="28860">
@@ -17047,7 +17047,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	<software name="stennisc" cloneof="stennis">
 		<description>Super Tennis (Answare) (alt)</description>
 		<year>1985</year>
-		<publisher>Answare</publisher>
+		<publisher>Answare-Diffusion</publisher>
 
 		<part name="cass1" interface="mo_cass">
 			<dataarea name="cass" size="29026">
@@ -17059,7 +17059,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	<software name="stennisd" cloneof="stennis">
 		<description>Super Tennis (Answare) (alt 2)</description>
 		<year>1985</year>
-		<publisher>Answare</publisher>
+		<publisher>Answare-Diffusion</publisher>
 
 		<part name="cass1" interface="mo_cass">
 			<dataarea name="cass" size="29026">
@@ -17071,7 +17071,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	<software name="stennise" cloneof="stennis">
 		<description>Super Tennis (Answare) (alt 3)</description>
 		<year>1985</year>
-		<publisher>Answare</publisher>
+		<publisher>Answare-Diffusion</publisher>
 
 		<part name="cass1" interface="mo_cass">
 			<dataarea name="cass" size="29026">
@@ -18075,7 +18075,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	<software name="votezmoi">
 		<description>Votez pour Moi</description>
 		<year>1985</year>
-		<publisher>Answare</publisher>
+		<publisher>Answare-Diffusion</publisher>
 
 		<part name="cass1" interface="mo_cass">
 			<dataarea name="cass" size="31541">
@@ -18087,7 +18087,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	<software name="votezmoia" cloneof="votezmoi">
 		<description>Votez pour Moi (alt)</description>
 		<year>1985</year>
-		<publisher>Answare</publisher>
+		<publisher>Answare-Diffusion</publisher>
 
 		<part name="cass1" interface="mo_cass">
 			<dataarea name="cass" size="31720">
@@ -18099,7 +18099,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	<software name="votezmoib" cloneof="votezmoi">
 		<description>Votez pour Moi (alt 2)</description>
 		<year>1985</year>
-		<publisher>Answare</publisher>
+		<publisher>Answare-Diffusion</publisher>
 
 		<part name="cass1" interface="mo_cass">
 			<dataarea name="cass" size="31720">
@@ -18111,7 +18111,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	<software name="votezmoic" cloneof="votezmoi">
 		<description>Votez pour Moi (alt 3)</description>
 		<year>1985</year>
-		<publisher>Answare</publisher>
+		<publisher>Answare-Diffusion</publisher>
 
 		<part name="cass1" interface="mo_cass">
 			<dataarea name="cass" size="31720">
@@ -18339,7 +18339,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	<software name="xray">
 		<description>X-Ray</description>
 		<year>1986</year>
-		<publisher>Microids</publisher>
+		<publisher>Microïds</publisher>
 
 		<part name="cass1" interface="mo_cass">
 			<dataarea name="cass" size="11606858">
@@ -18351,7 +18351,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	<software name="xraya" cloneof="xray">
 		<description>X-Ray (alt)</description>
 		<year>1986</year>
-		<publisher>Microids</publisher>
+		<publisher>Microïds</publisher>
 
 		<part name="cass1" interface="mo_cass">
 			<dataarea name="cass" size="35051">

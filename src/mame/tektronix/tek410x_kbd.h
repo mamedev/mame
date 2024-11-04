@@ -31,10 +31,10 @@ public:
 
 protected:
 	// device_t implementation
-	virtual void device_start() override;
-	virtual ioport_constructor device_input_ports() const override;
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual void device_start() override ATTR_COLD;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 
 private:
 	// MCU handlers
@@ -43,7 +43,7 @@ private:
 	void p2_w(u8 data);
 
 	// address maps
-	void ext_map(address_map &map);
+	void ext_map(address_map &map) ATTR_COLD;
 
 	// object finders
 	required_device<mcs48_cpu_device> m_mcu;

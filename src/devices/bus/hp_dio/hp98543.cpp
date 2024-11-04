@@ -43,11 +43,11 @@ public:
 protected:
 	dio16_98543_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 
 	virtual space_config_vector memory_space_config() const override;
 private:
@@ -59,7 +59,7 @@ private:
 	void int3_w(int state);
 
 	const address_space_config m_space_config;
-	void map(address_map &map);
+	void map(address_map &map) ATTR_COLD;
 	void update_int();
 	static constexpr int m_h_pix = 1024;
 	static constexpr int m_v_pix = 400;

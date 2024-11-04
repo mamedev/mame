@@ -117,16 +117,16 @@ public:
 	uint32_t screen_update_bublbobl(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void configure_banks();
 
-	void bootleg_map(address_map &map);
-	void bublbobl_maincpu_map(address_map &map);
-	void common_maincpu_map(address_map &map);
-	void sound_map(address_map &map);
-	void subcpu_map(address_map &map);
-	void tokio_map(address_map &map);
-	void tokio_map_bootleg(address_map &map);
-	void tokio_map_mcu(address_map &map);
-	void tokio_sound_map(address_map &map);
-	void tokio_subcpu_map(address_map &map);
+	void bootleg_map(address_map &map) ATTR_COLD;
+	void bublbobl_maincpu_map(address_map &map) ATTR_COLD;
+	void common_maincpu_map(address_map &map) ATTR_COLD;
+	void sound_map(address_map &map) ATTR_COLD;
+	void subcpu_map(address_map &map) ATTR_COLD;
+	void tokio_map(address_map &map) ATTR_COLD;
+	void tokio_map_bootleg(address_map &map) ATTR_COLD;
+	void tokio_map_mcu(address_map &map) ATTR_COLD;
+	void tokio_sound_map(address_map &map) ATTR_COLD;
+	void tokio_subcpu_map(address_map &map) ATTR_COLD;
 
 protected:
 	TIMER_CALLBACK_MEMBER(irq_ack);

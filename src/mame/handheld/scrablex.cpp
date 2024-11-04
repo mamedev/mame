@@ -43,7 +43,7 @@ public:
 	void scrablex(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	required_device<mb8841_cpu_device> m_maincpu;

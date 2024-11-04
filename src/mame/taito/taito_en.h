@@ -32,14 +32,14 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 private:
-	void en_sound_map(address_map &map);
-	void en_otis_map(address_map &map);
-	void fc7_map(address_map &map);
+	void en_sound_map(address_map &map) ATTR_COLD;
+	void en_otis_map(address_map &map) ATTR_COLD;
+	void fc7_map(address_map &map) ATTR_COLD;
 
 	// inherited devices/pointers
 	required_device<m68000_device> m_audiocpu;

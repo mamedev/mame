@@ -54,12 +54,12 @@ public:
 	void capcom(machine_config &config);
 
 protected:
-	virtual void machine_reset() override;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;
 
-	void capcom_map(address_map &map);
+	void capcom_map(address_map &map) ATTR_COLD;
 };
 
 

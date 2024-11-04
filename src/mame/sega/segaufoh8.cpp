@@ -47,7 +47,7 @@ public:
 private:
 	required_device<h83007_device> m_maincpu;
 
-	void program_map(address_map &map);
+	void program_map(address_map &map) ATTR_COLD;
 };
 
 

@@ -230,7 +230,7 @@ void econet_e01_device::e01_mem(address_map &map)
 	map(0xfc20, 0xfc23).mirror(0x00c0).rw(MC6854_TAG, FUNC(mc6854_device::read), FUNC(mc6854_device::write));
 	map(0xfc24, 0xfc24).mirror(0x00c3).rw(FUNC(econet_e01_device::network_irq_disable_r), FUNC(econet_e01_device::network_irq_disable_w));
 	map(0xfc28, 0xfc28).mirror(0x00c3).rw(FUNC(econet_e01_device::network_irq_enable_r), FUNC(econet_e01_device::network_irq_enable_w));
-	map(0xfc2c, 0xfc2c).mirror(0x00c3).portr("FLAP");
+	map(0xfc2c, 0xfc2c).mirror(0x00c3).portr(m_flap);
 	map(0xfc30, 0xfc30).mirror(0x00c0).rw(FUNC(econet_e01_device::hdc_data_r), FUNC(econet_e01_device::hdc_data_w));
 	map(0xfc31, 0xfc31).mirror(0x00c0).r("scsi_ctrl_in", FUNC(input_buffer_device::read));
 	map(0xfc32, 0xfc32).mirror(0x00c0).w(FUNC(econet_e01_device::hdc_select_w));
@@ -404,6 +404,7 @@ econet_e01_device::econet_e01_device(const machine_config &mconfig, device_type 
 	, m_floppy(*this, WD2793_TAG":%u", 0U)
 	, m_rom(*this, R65C102_TAG)
 	, m_centronics(*this, CENTRONICS_TAG)
+	, m_flap(*this, "FLAP")
 	, m_led(*this, "led_0")
 	, m_adlc_ie(0)
 	, m_hdc_ie(0)

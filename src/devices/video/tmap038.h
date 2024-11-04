@@ -35,12 +35,12 @@ public:
 	void draw(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, u32 flags, u8 pri = 0, u8 pri_mask = ~0);
 
 	// access
-	void vram_map(address_map &map);
-	void vram_8x8_map(address_map &map);
-	void vram_16x16_map(address_map &map);
+	void vram_map(address_map &map) ATTR_COLD;
+	void vram_8x8_map(address_map &map) ATTR_COLD;
+	void vram_16x16_map(address_map &map) ATTR_COLD;
 
-	void vram_writeonly_map(address_map &map);
-	void vram_16x16_writeonly_map(address_map &map);
+	void vram_writeonly_map(address_map &map) ATTR_COLD;
+	void vram_16x16_writeonly_map(address_map &map) ATTR_COLD;
 
 	u16 vram_8x8_r(offs_t offset);
 	void vram_8x8_w(offs_t offset, u16 data, u16 mem_mask);
@@ -86,8 +86,8 @@ public:
 	bool tile_is_8x8() const   { return (!m_tiledim) || (m_vram_16x16 == nullptr); }
 	bool tile_is_16x16() const { return m_tiledim || (m_vram_8x8 == nullptr); }
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 private:
 	TILE_GET_INFO_MEMBER(get_tile_info);

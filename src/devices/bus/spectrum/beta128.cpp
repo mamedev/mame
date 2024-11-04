@@ -37,10 +37,10 @@ DEFINE_DEVICE_TYPE(SPECTRUM_BETA128, spectrum_beta128_device, "spectrum_beta128"
 
 INPUT_PORTS_START(beta128)
 	PORT_START("BUTTON") // don't use F12, it clashes with the 'exit from debugger' button
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_BUTTON1) PORT_NAME("Magic Button") PORT_CODE(KEYCODE_MINUS_PAD) PORT_CHANGED_MEMBER(DEVICE_SELF, spectrum_beta128_device, magic_button, 0)
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_BUTTON1) PORT_NAME("Magic Button") PORT_CODE(KEYCODE_MINUS_PAD) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(spectrum_beta128_device::magic_button), 0)
 
 	PORT_START("SWITCH")
-	PORT_CONFNAME(0x03, 0x01, "System Switch") //PORT_CHANGED_MEMBER(DEVICE_SELF, spectrum_beta128_device, switch_changed, 0)
+	PORT_CONFNAME(0x03, 0x01, "System Switch") //PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(spectrum_beta128_device::switch_changed), 0)
 	PORT_CONFSETTING(0x00, "Off (128)")
 	PORT_CONFSETTING(0x01, "Normal (auto-boot)") // also enable Beta-disk V3/V4 compatibility, auto-boot feature does not work on Spectrum128.
 	//PORT_CONFSETTING(0x02, "Reset") // TODO: implement RESET callback

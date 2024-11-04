@@ -63,7 +63,7 @@ public:
 private:
 	required_device<cpu_device> m_maincpu;
 
-	void neomania_map(address_map &map);
+	void neomania_map(address_map &map) ATTR_COLD;
 };
 
 

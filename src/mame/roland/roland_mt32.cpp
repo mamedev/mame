@@ -200,8 +200,8 @@ public:
 	void mt32(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	required_device<i8x9x_device> cpu;
@@ -225,7 +225,7 @@ private:
 	TIMER_DEVICE_CALLBACK_MEMBER(midi_timer_cb);
 	TIMER_DEVICE_CALLBACK_MEMBER(samples_timer_cb);
 
-	void mt32_map(address_map &map);
+	void mt32_map(address_map &map) ATTR_COLD;
 
 	uint8_t lcd_data_buffer[256]{};
 	int lcd_data_buffer_pos = 0;

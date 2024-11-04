@@ -32,13 +32,13 @@ public:
 
 private:
 	uint8_t vt520_some_r();
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 	uint32_t screen_update_vt520(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 	required_region_ptr<uint8_t> m_rom;
-	void vt520_io(address_map &map);
-	void vt520_mem(address_map &map);
+	void vt520_io(address_map &map) ATTR_COLD;
+	void vt520_mem(address_map &map) ATTR_COLD;
 };
 
 

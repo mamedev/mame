@@ -63,9 +63,9 @@ public:
 	auto guny_callback() { return m_guny_cb.bind(); }
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 	TIMER_CALLBACK_MEMBER(assert_vblank_irq);
 
@@ -105,9 +105,9 @@ private:
 	void update_sequence(uint32_t data);
 	void update_sequence_eg1(uint32_t data);
 
-	void rtc_map(address_map &map);
-	void fpga_map(address_map &map);
-	void ram_map(address_map &map);
+	void rtc_map(address_map &map) ATTR_COLD;
+	void fpga_map(address_map &map) ATTR_COLD;
+	void ram_map(address_map &map) ATTR_COLD;
 
 	uint32_t fpga_r(offs_t offset, uint32_t mem_mask = ~0);
 	void fpga_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
@@ -132,9 +132,9 @@ public:
 	void set_info(int sw_version, int hw_version) {m_sw_version=sw_version; m_hw_version=hw_version;}
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 private:
 	address_space *m_memory_space = nullptr;
@@ -143,7 +143,7 @@ private:
 
 	std::array<uint16_t, 0x40> m_iteagle_default_eeprom;
 
-	void eeprom_map(address_map &map);
+	void eeprom_map(address_map &map) ATTR_COLD;
 	uint32_t eeprom_r(offs_t offset, uint32_t mem_mask = ~0);
 	void eeprom_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 
@@ -156,9 +156,9 @@ public:
 	iteagle_periph_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 private:
 	optional_device<nvram_device> m_rtc;
@@ -166,7 +166,7 @@ private:
 	uint32_t m_ctrl_regs[0xd0/4];
 	uint8_t m_rtc_regs[0x100];
 
-	void ctrl_map(address_map &map);
+	void ctrl_map(address_map &map) ATTR_COLD;
 
 	uint32_t ctrl_r(offs_t offset, uint32_t mem_mask = ~0);
 	void ctrl_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);

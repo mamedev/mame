@@ -82,7 +82,6 @@
 #include "emu.h"
 
 #include "cpu/arm7/arm7.h"
-#include "cpu/arm7/arm7core.h"
 
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
@@ -106,8 +105,8 @@ public:
 	void ivl_karaoke_base(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -117,7 +116,7 @@ private:
 
 	uint32_t a000004_r();
 
-	void arm_map(address_map &map);
+	void arm_map(address_map &map) ATTR_COLD;
 };
 
 class easy_karaoke_cartslot_state : public ivl_karaoke_state
@@ -132,7 +131,7 @@ public:
 	void easy_karaoke(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load);
@@ -164,7 +163,7 @@ void easy_karaoke_cartslot_state::machine_start()
 
 void ivl_karaoke_state::machine_reset()
 {
-	m_maincpu->set_state_int(ARM7_R15, 0x04000000);
+	m_maincpu->set_state_int(arm7_cpu_device::ARM7_R15, 0x04000000);
 }
 
 DEVICE_IMAGE_LOAD_MEMBER(easy_karaoke_cartslot_state::cart_load)
@@ -442,7 +441,78 @@ ROM_END
 
 /*
 
-song list is unknown for the Japanese version as the titles aren't stored as ASCII in the flash ROM
+the bkarast set contains the following 68 songs, the box indicates there are '3 trial songs' so most of these are probably downloaded
+to the unit?
+
+長崎は今日も雨だった                      内山田洋とクール・ファイブ
+ＴＳＵＮＡＭＩ                           サザンオールスターズ
+北酒場                                   細川たかし
+未来へ                                   Kiroro
+らいおんハート                            SMAP
+ザ☆ピ～ス！                              モーニング娘。
+君をのせて                                天空の城ラピュタより
+となりのトトロ                           となりのトトロ　井上あずみ
+おどるポンポコリン                          Ｂ．Ｂ．クィーンズ
+ついて来るかい                              小林旭
+あの娘が泣いてる波止場                      三橋美智也
+君といつまでも                              加山雄三
+いい日旅立ち                              山口百恵
+矢切の渡し                                細川たかし
+恋の町札幌                               石原裕次郎
+またあえる日まで                             ゆ　ず
+また逢う日まで                              尾崎紀世彦
+中の島ブルース                             内山田洋とクール・ファイブ
+燃えてヒーロー                              キャプテン翼　沖田浩之・小粥よう子
+アカシアの雨がやむとき                        西田佐知子
+霧の摩周湖                               布施明
+圭子の夢は夜ひらく                          藤圭子
+きよしのズンドコ節                           氷川きよし
+人生いろいろ                              島倉千代子
+真赤な太陽                               美空ひばり＆ジャッキー吉川とブルー・コメッツ
+別れの一本杉                             春日八郎
+天城越え                                 石川さゆり
+夜霧よ今夜も有難う                         石原裕次郎
+命くれない                                 瀬川瑛子
+千曲川                                  五木ひろし
+川の流れのように                           美空ひばり
+北国の春                                千昌夫
+瀬戸の花嫁                              小柳ルミ子
+愛燦燦＜あいさんさん＞                     美空ひばり
+一円玉の旅がらす                          晴山さおり
+北の宿から                               都はるみ
+孫                                      大泉逸郎
+だんな様                                 三船和子
+越冬つばめ                               森昌子
+津軽海峡・冬景色                         石川さゆり
+君は心の妻だから                          鶴岡雅義と東京ロマンチカ
+おふくろさん                               森進一
+祝い酒                                  坂本冬美
+さざんかの宿                              大川栄策
+昔の名前で出ています                       小林旭
+DAN DAN 心魅かれてく                      FIELD OF VIEW
+君こそわが命                              水原弘
+くちなしの花                               渡哲也
+おもいで酒                                小林幸子
+ソーラン節                                北海道民謡
+星は何でも知っている                        平尾昌晃
+嵐を呼ぶ男                               石原裕次郎
+昴－すばる－                             谷村新司
+骨まで愛して                             城卓矢
+女のみち                                宮史郎とぴんからトリオ
+襟裳岬                                 森進一
+さそり座の女                             美川憲一
+笑って許して                             和田アキ子
+長崎から船に乗って                        五木ひろし
+星のフラメンコ                             西郷輝彦
+今日でお別れ                            菅原洋一
+どうにもとまらない                          山本リンダ
+いつか逢う日を夢みて                      増位山太志郎・長沢薫
+男と女のラブゲーム                         日野美歌／葵司朗
+別れても好きな人                         ロス・インディオス＆シルヴィア
+もしかして－ＰＡＲＴⅡ                       小林幸子＋美樹克彦
+ウナ・セラ・ディ東京                        ザ・ピーナッツ
+涙くんさよなら                            坂本九
+
 
 */
 
@@ -535,6 +605,125 @@ ROM_START( karams )
 	ROM_LOAD( "ics0300-a.u9", 0x000000, 0x800000, CRC(32a7a429) SHA1(ed219bc9201b45f67c5e7dbe3fb3db70823c59f0) )
 ROM_END
 
+/*
+The 'karamsg' set has the following 42 songs built in.
+
+40 παλικάρια
+Alouette                                    Enfant
+Always On My Mind                           Elvis Presley (R)
+Discogirl                                   Σάκης Ρουβάς
+Guantanamera                                Popular
+Kumbaya                                     Popular
+La Cucaracha                                Standard
+Oh, My Darling Clementine                   Children
+Silent Night                                Christmas
+The Greatest Love Of All                    Whitney Houston
+We Wish You A Merry Christmas               Standard
+Έλα να με τελειώσεις                        Αντώνης Ρέμος
+Ένας αϊτός
+Απόψε                                       Αντώνης Ρέμος
+Αρχιμηνιά κι αρχιχρονι
+Αχ κορίτσι μου                              Γιάννης Πλούταρχος
+Αχ κουνελάκι
+Βγαίνει η βαρκούλα
+Γιάννη μου το μαντήλι σ
+Δεν έχω τάσεις αυτοκτον Άννα Βίσση
+Εχω τόσα να σου πω                          One
+Ιτιά ιτιά
+Καλήν εσπέραν άρχοντες
+Κόφτην Ελένη την ελιά
+Μια βοσκοπούλα αγάπησα
+Μια ωραία πεταλούδα
+Μου παρήγγειλε τ'αηδόνι
+Παιδιά της Σαμαρίνας
+Παπάκι πάει στην ποταμι
+Παραδοσιακό Ηπείρου
+Περνά περνά η μέλισσα
+Σήμερα γάμος γίνεται
+Σαμιώτισσα
+Στου Μανώλη την ταβέρνα
+Το φεγγάρι Νατάσσα Θεοδωρίδου
+Το φεγγάρι κάνει κύκλο
+Τρίγωνα κάλαντα
+Χαρωπά τα δυό μου χέρια
+Χιόνια στο καμπαναριό
+Ω έλατο
+Ο Μενούσης
+Ομολογώ                                     Βαλάντης
+
+*/
+ROM_START( karamsg )
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD( "ics0302-a.u9", 0x000000, 0x800000, CRC(9aaeb556) SHA1(c1f9142c15a15c73f249fad229a65580b7a3ad27) )
+ROM_END
+
+
+/*
+The 'dks7000c' set has the following 25 songs built in.
+
+A Spoonful of Sugar                         Mary Poppins
+A Whole New World                           Disney
+Bare Necessities                            The Jungle Book
+Be Our Guest                                Beauty and the Beast
+Bibbidi-Bobbidi-Boo                         Disney
+Can You Feel The Love Tonight               The Lion King
+Chim Chim Cheree                            Disney
+Circle of Life                              The Lion King
+Colors of the Wind                          Pocahontas
+Cruella De Vil                              101 Dalmations
+Hakuna Matata                               The Lion King
+I Just Can't Wait To Be King                The Lion King
+I Wan'na Be Like You (The Monkey Song)      The Jungle Book
+I Won't Say (I'm In Love)                   Hercules
+I'll Make A Man Out Of You                  Mulan
+If I Didn't Have You                        Monsters Inc.
+It's A Small World                          New York World's Fair
+Kiss The Girl                               The Little Mermaid
+Part Of Your World                          The Little Mermaid
+Supercalifragilisticexpialidocious          Disney
+Yo Ho! (A Pirate's Life For Me)             Pirates of the Caribbean
+You Can Fly! You Can Fly! You Can Fly!      Peter Pan
+You'll Be In My Heart                       Tarzan
+You've Got A Friend In Me                   Toy Story
+Zip-A-Dee-Do-Dah                            Song of the South
+
+*/
+ROM_START( dks7000c )
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD( "dks7000c.bin", 0x000000, 0x400000, CRC(1c03e59e) SHA1(617d13a9b353fb648f10e136bc07c496a424b953) )
+ROM_END
+
+/*
+The 'dks7000p' set has the following 20 songs built in.
+
+A Dream Is a Wish Your Heart Makes          Cinderella
+A Whole New World                           Disney
+Be Our Guest                                Beauty and the Beast
+Bibbidi-Bobbidi-Boo                         Disney
+Chim Chim Cheree                            Disney
+Circle of Life                              The Lion King
+Colors of the Wind                          Pocahontas
+Forget About Love                           The Return of Jafar
+Gaston                                      Beauty and the Beast
+I Just Can't Wait To Be King                The Lion King
+I Won't Say (I'm In Love)                   Hercules
+I'll Make A Man Out Of You                  Mulan
+Just Around The River Bend                  Pocahontas
+Kiss The Girl                               The Little Mermaid
+Once Upon A Dream                           Sleeping Beauty
+Out There                                   The Huntchback of Notre Dame
+Poor Unfortunate Souls                      The Little Mermaid
+Reflection                                  Mulan
+Supercalifragilisticexpialidocious          Disney
+Under The Sea                               Disney
+
+*/
+ROM_START( dks7000p )
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD( "dks7000p.bin", 0x000000, 0x400000, CRC(8ec210fb) SHA1(56337e99f3be57af02e5f7f6e340c3f22deb566d) )
+ROM_END
+
+
 } // anonymous namespace
 
 // This is the original US release, there's no cartridge slot, but it has a NAND Flash inside, and in addition to 50 built-in songs, advertises
@@ -546,8 +735,13 @@ CONS( 2002, karatvsta,     karatvst,       0,      ivl_karaoke_base, ivl_karaoke
 CONS( 2002, mks4001,       0,              0,      ivl_karaoke_base, ivl_karaoke, ivl_karaoke_state, empty_init, "IVL Technologies (Memorex license)", "Star Singer Karaoke (MKS4001)", MACHINE_IS_SKELETON ) // 50 songs built in, appears to have around 54 downloads, including a test download
 
 // Bandai's Japanese release also lacks a cartridge slot, relying on downloads for additional songs. It also comes with a CD containing the PC-side software.  The external microphone design differs slightly.
-CONS( 2002, bkarast,       karatvst,       0,      ivl_karaoke_base, ivl_karaoke, ivl_karaoke_state, empty_init, "IVL Technologies (Bandai license)", "Karaoke Station (Japan)", MACHINE_IS_SKELETON )
+CONS( 2002, bkarast,       0,              0,      ivl_karaoke_base, ivl_karaoke, ivl_karaoke_state, empty_init, "IVL Technologies (Bandai license)", "Karaoke Station (Japan)", MACHINE_IS_SKELETON )
 
 // The European releases take cartridges rather than relying on a download service
-CONS( 2004, easykara,      karatvst,       0,      easy_karaoke, ivl_karaoke, easy_karaoke_cartslot_state, empty_init, "IVL Technologies (Easy Karaoke license)", "Easy Karaoke Groove Station (UK)", MACHINE_IS_SKELETON )
-CONS( 2003, karams,        karatvst,       0,      easy_karaoke, ivl_karaoke, easy_karaoke_cartslot_state, empty_init, "IVL Technologies (Lexibook license)",     "KaraokeMicro Star (France)", MACHINE_IS_SKELETON )
+CONS( 2004, easykara,      0,              0,      easy_karaoke, ivl_karaoke, easy_karaoke_cartslot_state, empty_init, "IVL Technologies (Easy Karaoke license)", "Easy Karaoke Groove Station (UK)", MACHINE_IS_SKELETON )
+
+CONS( 2003, karams,        0,              0,      easy_karaoke, ivl_karaoke, easy_karaoke_cartslot_state, empty_init, "IVL Technologies (Lexibook license)",             "KaraokeMicro Star (France)", MACHINE_IS_SKELETON )
+CONS( 2003, karamsg,       0,              0,      easy_karaoke, ivl_karaoke, easy_karaoke_cartslot_state, empty_init, "IVL Technologies (Lexibook / Imago license)",     "Karaoke Microphone Pro / KaraokeMicro Star (Greece)", MACHINE_IS_SKELETON ) // KaraokeMicro Star branding is used on-screen, Karaoke Microphone Pro on the box
+
+CONS( 2003, dks7000c,      0,              0,      easy_karaoke, ivl_karaoke, easy_karaoke_cartslot_state, empty_init, "IVL Technologies (Disney / Memcorp Inc license)", "Disney Classic Handheld Karaoke Player (DKS7000-C)", MACHINE_IS_SKELETON )
+CONS( 2003, dks7000p,      0,              0,      easy_karaoke, ivl_karaoke, easy_karaoke_cartslot_state, empty_init, "IVL Technologies (Disney / Memcorp Inc license)", "Disney Princess Handheld Karaoke Player (DKS7000-P)", MACHINE_IS_SKELETON )

@@ -209,6 +209,7 @@ public:
 	void request_quit();
 	void set_pointer_activity_timeout(int target, std::chrono::steady_clock::duration timeout) noexcept;
 	void set_hide_inactive_pointers(int target, bool hide) noexcept;
+	void restore_initial_pointer_options(int target) noexcept;
 	std::chrono::steady_clock::duration pointer_activity_timeout(int target) const noexcept;
 	bool hide_inactive_pointers(int target) const noexcept;
 
@@ -282,7 +283,7 @@ private:
 	enum class ui_callback_type : int;
 
 	struct active_pointer;
-	struct pointer_options;
+	class pointer_options;
 
 	using handler_callback_func = delegate<uint32_t (render_container &)>;
 	using device_feature_set = std::set<std::pair<std::string, std::string> >;

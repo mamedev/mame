@@ -33,8 +33,8 @@ public:
 	static const uint8_t SIO_DEVICE_ID = 0x01;
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	void xmit_fifo_push(uint8_t data);
 	uint8_t recv_fifo_pop();

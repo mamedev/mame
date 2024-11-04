@@ -99,8 +99,8 @@ public:
 	void mlanding(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	static constexpr u32 c_dma_bank_words = 0x2000;
@@ -173,13 +173,13 @@ private:
 	u32 exec_dma();
 	void msm5205_update(unsigned chip);
 
-	void audio_map_io(address_map &map);
-	void audio_map_prog(address_map &map);
-	void dsp_map_data(address_map &map);
-	void dsp_map_prog(address_map &map);
-	void main_map(address_map &map);
-	void mecha_map_prog(address_map &map);
-	void sub_map(address_map &map);
+	void audio_map_io(address_map &map) ATTR_COLD;
+	void audio_map_prog(address_map &map) ATTR_COLD;
+	void dsp_map_data(address_map &map) ATTR_COLD;
+	void dsp_map_prog(address_map &map) ATTR_COLD;
+	void main_map(address_map &map) ATTR_COLD;
+	void mecha_map_prog(address_map &map) ATTR_COLD;
+	void sub_map(address_map &map) ATTR_COLD;
 };
 
 
@@ -909,14 +909,14 @@ static INPUT_PORTS_START( mlanding )
 
 	// despite what the service mode claims limits are really active low.
 	PORT_START("LIMIT0")
-	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("yokectrl", taitoio_yoke_device, handle_right_r )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW,  IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("yokectrl", taitoio_yoke_device, slot_up_r )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW,  IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("yokectrl", taitoio_yoke_device, slot_down_r )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("yokectrl", FUNC(taitoio_yoke_device::handle_right_r))
+	PORT_BIT( 0x20, IP_ACTIVE_LOW,  IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("yokectrl", FUNC(taitoio_yoke_device::slot_up_r))
+	PORT_BIT( 0x40, IP_ACTIVE_LOW,  IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("yokectrl", FUNC(taitoio_yoke_device::slot_down_r))
 
 	PORT_START("LIMIT1")
-	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("yokectrl", taitoio_yoke_device, handle_down_r )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW,  IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("yokectrl", taitoio_yoke_device, handle_left_r )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW,  IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("yokectrl", taitoio_yoke_device, handle_up_r )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("yokectrl", FUNC(taitoio_yoke_device::handle_down_r))
+	PORT_BIT( 0x20, IP_ACTIVE_LOW,  IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("yokectrl", FUNC(taitoio_yoke_device::handle_left_r))
+	PORT_BIT( 0x40, IP_ACTIVE_LOW,  IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("yokectrl", FUNC(taitoio_yoke_device::handle_up_r))
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( mlandingj )

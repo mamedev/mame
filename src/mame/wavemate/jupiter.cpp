@@ -63,10 +63,10 @@ public:
 	void init_jupiter2();
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
-	void jupiter2_mem(address_map &map);
+	void jupiter2_mem(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<acia6850_device> m_acia0;
@@ -89,7 +89,7 @@ public:
 	void init_jupiter3();
 
 protected:
-	virtual void machine_reset() override;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -98,8 +98,8 @@ private:
 	uint8_t key_r();
 	uint8_t ff_r();
 
-	void jupiter3_io(address_map &map);
-	void jupiter3_mem(address_map &map);
+	void jupiter3_io(address_map &map) ATTR_COLD;
+	void jupiter3_mem(address_map &map) ATTR_COLD;
 
 	uint8_t m_term_data = 0U;
 	required_device<cpu_device> m_maincpu;

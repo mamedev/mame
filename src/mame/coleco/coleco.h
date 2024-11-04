@@ -40,8 +40,8 @@ public:
 			m_roller_y(*this, "ROLLER_Y")
 	{ }
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	uint8_t cart_r(offs_t offset);
 	void cart_w(offs_t offset, uint8_t data);
@@ -64,9 +64,9 @@ public:
 	void coleco(machine_config &config);
 	void czz50(machine_config &config);
 	void dina(machine_config &config);
-	void coleco_io_map(address_map &map);
-	void coleco_map(address_map &map);
-	void czz50_map(address_map &map);
+	void coleco_io_map(address_map &map) ATTR_COLD;
+	void coleco_map(address_map &map) ATTR_COLD;
+	void czz50_map(address_map &map) ATTR_COLD;
 protected:
 	required_device<cpu_device> m_maincpu;
 	required_device<colecovision_cartridge_slot_device> m_cart;
@@ -113,8 +113,8 @@ public:
 			m_io_keyboard(*this, {"ROW0", "ROW1", "ROW2", "ROW3", "ROW4", "ROW5", "ROW6", "ROW7"})
 		{}
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	void bit90(machine_config &config);
 
@@ -131,8 +131,8 @@ protected:
 	required_ioport_array<8> m_io_keyboard;
 
 private:
-	void bit90_map(address_map &map);
-	void bit90_io_map(address_map &map);
+	void bit90_map(address_map &map) ATTR_COLD;
+	void bit90_io_map(address_map &map) ATTR_COLD;
 
 	uint8_t m_keyselect = 0U;
 	uint8_t m_unknown = 0U;

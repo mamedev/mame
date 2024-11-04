@@ -126,14 +126,13 @@ public:
 	void write_to_dol(int32_t value);
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 	virtual space_config_vector memory_space_config() const override;
 	virtual uint64_t execute_clocks_to_cycles(uint64_t clocks) const noexcept override;
 	virtual uint64_t execute_cycles_to_clocks(uint64_t cycles) const noexcept override;
 	virtual uint32_t execute_min_cycles() const noexcept override;
 	virtual uint32_t execute_max_cycles() const noexcept override;
-	virtual uint32_t execute_input_lines() const noexcept override;
 	virtual void execute_run() override;
 	virtual void execute_set_input(int linenum, int state) override;
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;

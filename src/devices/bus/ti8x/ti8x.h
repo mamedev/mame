@@ -77,7 +77,7 @@ protected:
 			device_t *owner,
 			u32 clock);
 
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 	virtual void device_config_complete() override;
 
 	devcb_write_line m_tip_handler;

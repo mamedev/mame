@@ -57,7 +57,7 @@ protected:
 	{ }
 
 protected:
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -94,7 +94,7 @@ public:
 	void cyberbal2p(machine_config &config);
 
 protected:
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	required_device<screen_device> m_screen;
@@ -110,7 +110,7 @@ private:
 	uint32_t screen_update_cyberbal2p(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	// memory maps
-	void cyberbal2p_map(address_map &map);
+	void cyberbal2p_map(address_map &map) ATTR_COLD;
 };
 
 
@@ -136,8 +136,8 @@ public:
 	void cyberbalt(machine_config &config);
 
 protected:
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	optional_device<atari_slapstic_device> m_slapstic;
@@ -164,9 +164,9 @@ private:
 	uint32_t screen_update_cyberbal_right(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	// memory maps
-	void main_map(address_map &map);
-	void tournament_map(address_map &map);
-	void extra_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
+	void tournament_map(address_map &map) ATTR_COLD;
+	void extra_map(address_map &map) ATTR_COLD;
 };
 
 

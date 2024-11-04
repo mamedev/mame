@@ -121,8 +121,8 @@ public:
 	required_device<ram_device> m_ram;
 	required_ioport m_s8;
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	uint16_t pcs6_0_1_r(offs_t offset, uint16_t mem_mask = ~0);
 	void pcs6_0_1_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
@@ -162,9 +162,9 @@ public:
 	int m_tmr0;
 	void compis(machine_config &config);
 	void compis2(machine_config &config);
-	void compis2_mem(address_map &map);
-	void compis_io(address_map &map);
-	void compis_mem(address_map &map);
+	void compis2_mem(address_map &map) ATTR_COLD;
+	void compis_io(address_map &map) ATTR_COLD;
+	void compis_mem(address_map &map) ATTR_COLD;
 };
 
 

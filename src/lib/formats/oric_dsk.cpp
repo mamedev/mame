@@ -12,6 +12,7 @@
 
 #include "ioprocs.h"
 #include "multibyte.h"
+#include "osdcore.h"
 
 #include <cstring>
 
@@ -67,6 +68,17 @@ bool oric_dsk_format::load(util::random_read &io, uint32_t form_factor, const st
 
 	int sides  = get_u32le(&h[ 8]);
 	int tracks = get_u32le(&h[12]);
+
+	int max_tracks, max_sides;
+	image.get_maximal_geometry(max_tracks, max_sides);
+	if (tracks > max_tracks) {
+		osd_printf_error("oric_dsk: Floppy disk has too many tracks for this drive (floppy tracks=%d, drive tracks=%d).\n", tracks, max_tracks);
+		return false;
+	}
+	if (sides > max_sides) {
+		osd_printf_warning("oric_dsk: Floppy disk has excess of heads for this drive that will be discarded (floppy heads=%d, drive heads=%d).\n", sides, max_sides);
+		sides = max_sides;
+	}
 
 	for(int side=0; side<sides; side++)
 		for(int track=0; track<tracks; track++) {

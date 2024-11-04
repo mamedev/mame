@@ -15,7 +15,6 @@
 
 #include "emu.h"
 #include "cpu/arm7/arm7.h"
-#include "cpu/arm7/arm7core.h"
 #include "etna.h"
 #include "sound/spkrdev.h"
 
@@ -45,8 +44,8 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(touch_down);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	TIMER_CALLBACK_MEMBER(update_timer1);
 	TIMER_CALLBACK_MEMBER(update_timer2);
@@ -170,7 +169,7 @@ private:
 		PORTE
 	};
 
-	void main_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 

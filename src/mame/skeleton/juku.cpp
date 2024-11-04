@@ -69,8 +69,8 @@ public:
 	void juku(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	required_device<i8080a_cpu_device> m_maincpu;
@@ -85,9 +85,9 @@ private:
 	required_ioport_array<16> m_keys;
 	required_ioport m_key_special;
 
-	void mem_map(address_map &map);
-	void bank_map(address_map &map);
-	void io_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
+	void bank_map(address_map &map) ATTR_COLD;
+	void io_map(address_map &map) ATTR_COLD;
 
 	void pio0_porta_w(uint8_t data);
 	uint8_t pio0_portb_r();

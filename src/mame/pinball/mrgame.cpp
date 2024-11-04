@@ -97,8 +97,8 @@ public:
 	void wcup90(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	void mrgame_palette(palette_device &palette) const;
@@ -128,15 +128,15 @@ private:
 	TILE_GET_INFO_MEMBER(get_tile_info);
 	uint32_t screen_update_mrgame(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void audio1_io(address_map &map);
-	void audio1_map(address_map &map);
-	void audio2_io(address_map &map);
-	void audio2_map(address_map &map);
-	void main_map(address_map &map);
-	void video_map(address_map &map);
-	void macattck_video_map(address_map &map);
-	void macattck_audio1_map(address_map &map);
-	void wcup90_audio2_map(address_map &map);
+	void audio1_io(address_map &map) ATTR_COLD;
+	void audio1_map(address_map &map) ATTR_COLD;
+	void audio2_io(address_map &map) ATTR_COLD;
+	void audio2_map(address_map &map) ATTR_COLD;
+	void main_map(address_map &map) ATTR_COLD;
+	void video_map(address_map &map) ATTR_COLD;
+	void macattck_video_map(address_map &map) ATTR_COLD;
+	void macattck_audio1_map(address_map &map) ATTR_COLD;
+	void wcup90_audio2_map(address_map &map) ATTR_COLD;
 
 	required_device<palette_device> m_palette;
 	required_shared_ptr<u8> m_p_videoram;
@@ -728,7 +728,7 @@ void mrgame_state::mrgame(machine_config &config)
 	dacvol.add_route(0, "rdac", -1.0, DAC_INPUT_RANGE_LO);
 
 	tms5220_device &tms(TMS5220(config, "tms", 672000)); // uses a RC combination. 672k copied from jedi.h
-	tms.ready_cb().set_inputline("audiocpu2", Z80_INPUT_LINE_BOGUSWAIT);
+	tms.ready_cb().set_inputline("audiocpu2", Z80_INPUT_LINE_WAIT);
 	tms.add_route(ALL_OUTPUTS, "lspeaker", 1.0);
 	tms.add_route(ALL_OUTPUTS, "rspeaker", 1.0);
 

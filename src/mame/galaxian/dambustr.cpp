@@ -78,7 +78,7 @@ private:
 
 	int m_noise_data = 0;
 	void dambustr_noise_enable_w(uint8_t data);
-	void dambustr_map(address_map &map);
+	void dambustr_map(address_map &map) ATTR_COLD;
 };
 
 

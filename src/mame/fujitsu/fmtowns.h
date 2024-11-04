@@ -141,20 +141,20 @@ public:
 protected:
 	uint16_t m_towns_machine_id;  // default is 0x0101
 
-	void marty_mem(address_map &map);
-	void pcm_mem(address_map &map);
-	void towns16_io(address_map &map);
-	void towns_io(address_map &map);
-	void towns_1g_io(address_map &map);
-	void towns2_io(address_map &map);
-	void townsux_io(address_map &map);
-	void towns_mem(address_map &map);
-	void ux_mem(address_map &map);
+	void marty_mem(address_map &map) ATTR_COLD;
+	void pcm_mem(address_map &map) ATTR_COLD;
+	void towns16_io(address_map &map) ATTR_COLD;
+	void towns_io(address_map &map) ATTR_COLD;
+	void towns_1g_io(address_map &map) ATTR_COLD;
+	void towns2_io(address_map &map) ATTR_COLD;
+	void townsux_io(address_map &map) ATTR_COLD;
+	void towns_mem(address_map &map) ATTR_COLD;
+	void ux_mem(address_map &map) ATTR_COLD;
 
 	virtual void driver_start() override;
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 	required_device<ram_device> m_ram;
 	required_device<cpu_device> m_maincpu;

@@ -131,7 +131,6 @@ private:
 	u8 kbd_r();
 	void kbd_put(u8 data);
 	void clock_w(int state);
-	void busreq_w(int state);
 	void ctc_z1_w(int state);
 	void sio_wrdya_w(int state);
 	void sio_wrdyb_w(int state);
@@ -141,16 +140,16 @@ private:
 	u8 io_read_byte(offs_t offset);
 	void io_write_byte(offs_t offset, u8 data);
 	MC6845_UPDATE_ROW(crtc_update_row);
-	void io_map(address_map &map);
-	void mem_map(address_map &map);
+	void io_map(address_map &map) ATTR_COLD;
+	void mem_map(address_map &map) ATTR_COLD;
 	u8 crt8002(u8 ac_ra, u8 ac_chr, u8 ac_attr, uint16_t ac_cnt, bool ac_curs);
 	u8 m_term_data = 0U;
 	u8 m_term_status = 0U;
 	uint16_t m_cnt = 0U;
 	bool m_cc[8]{};
 	floppy_image_device *m_floppy;
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 	address_space *m_mem;
 	address_space *m_io;
 	std::unique_ptr<u8[]> m_vram; // video ram 2k
@@ -232,13 +231,6 @@ void bigbord2_state::fdc_drq_w(int state)
 
 /* Z80 DMA */
 
-
-void bigbord2_state::busreq_w(int state)
-{
-// since our Z80 has no support for BUSACK, we assume it is granted immediately
-	m_maincpu->set_input_line(Z80_INPUT_LINE_BUSRQ, state);
-	m_dma->bai_w(state); // tell dma that bus has been granted
-}
 
 u8 bigbord2_state::memory_read_byte(offs_t offset)
 {
@@ -595,6 +587,7 @@ void bigbord2_state::bigbord2(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &bigbord2_state::mem_map);
 	m_maincpu->set_addrmap(AS_IO, &bigbord2_state::io_map);
 	m_maincpu->set_daisy_config(daisy_chain);
+	m_maincpu->busack_cb().set(m_dma, FUNC(z80dma_device::bai_w));
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -607,7 +600,7 @@ void bigbord2_state::bigbord2(machine_config &config)
 
 	/* devices */
 	Z80DMA(config, m_dma, MAIN_CLOCK);  // U62
-	m_dma->out_busreq_callback().set(FUNC(bigbord2_state::busreq_w));
+	m_dma->out_busreq_callback().set_inputline(m_maincpu, Z80_INPUT_LINE_BUSRQ);
 	m_dma->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 	m_dma->in_mreq_callback().set(FUNC(bigbord2_state::memory_read_byte));
 	m_dma->out_mreq_callback().set(FUNC(bigbord2_state::memory_write_byte));

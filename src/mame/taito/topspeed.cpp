@@ -206,12 +206,12 @@ public:
 
 	void topspeed(machine_config &config);
 
-	DECLARE_CUSTOM_INPUT_MEMBER(gas_pedal_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(brake_pedal_r);
+	ioport_value gas_pedal_r();
+	ioport_value brake_pedal_r();
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	required_shared_ptr<u16> m_spritemap;
@@ -267,10 +267,10 @@ private:
 	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void cpua_map(address_map &map);
-	void cpub_map(address_map &map);
-	void z80_io(address_map &map);
-	void z80_prg(address_map &map);
+	void cpua_map(address_map &map) ATTR_COLD;
+	void cpub_map(address_map &map) ATTR_COLD;
+	void z80_io(address_map &map) ATTR_COLD;
+	void z80_prg(address_map &map) ATTR_COLD;
 };
 
 
@@ -587,13 +587,13 @@ u8 topspeed_state::input_bypass_r()
 	}
 }
 
-CUSTOM_INPUT_MEMBER(topspeed_state::gas_pedal_r)
+ioport_value topspeed_state::gas_pedal_r()
 {
 	static constexpr u8 retval[8] = { 0, 1, 3, 2, 6, 7, 5, 4 };
 	return retval[m_gas->read() & 7];
 }
 
-CUSTOM_INPUT_MEMBER(topspeed_state::brake_pedal_r)
+ioport_value topspeed_state::brake_pedal_r()
 {
 	static constexpr u8 retval[8] = { 0, 1, 3, 2, 6, 7, 5, 4 };
 	return retval[m_brake->read() & 7];
@@ -854,7 +854,7 @@ static INPUT_PORTS_START( topspeed )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_COIN2 )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_COIN1 )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_SERVICE1 )
-	PORT_BIT( 0xe0, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(topspeed_state, brake_pedal_r) PORT_CONDITION("DSWA", 0x03, NOTEQUALS, 0x02)
+	PORT_BIT( 0xe0, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(FUNC(topspeed_state::brake_pedal_r)) PORT_CONDITION("DSWA", 0x03, NOTEQUALS, 0x02)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW,  IPT_BUTTON2 ) PORT_NAME("Brake Switch") PORT_CONDITION("DSWA", 0x03, EQUALS, 0x02)
 
 	PORT_START("IN1")
@@ -863,7 +863,7 @@ static INPUT_PORTS_START( topspeed )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW,  IPT_SERVICE2 ) PORT_NAME("Calibrate") // ?
 	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_START1 )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_BUTTON4 ) PORT_NAME("Shifter") PORT_TOGGLE
-	PORT_BIT( 0xe0, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(topspeed_state, gas_pedal_r) PORT_CONDITION("DSWA", 0x03, NOTEQUALS, 0x02)
+	PORT_BIT( 0xe0, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(FUNC(topspeed_state::gas_pedal_r)) PORT_CONDITION("DSWA", 0x03, NOTEQUALS, 0x02)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW,  IPT_BUTTON1 ) PORT_NAME("Gas Switch") PORT_CONDITION("DSWA", 0x03, EQUALS, 0x02)
 
 	PORT_START("IN2")   // Unused

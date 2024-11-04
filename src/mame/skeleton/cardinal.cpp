@@ -42,7 +42,7 @@ public:
 	void cardinal(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	u8 p1_r();
@@ -51,9 +51,9 @@ private:
 	u8 vtlc_r();
 	void vtlc_w(u8 data);
 
-	void prog_map(address_map &map);
-	void ext_map(address_map &map);
-	void ram_map(address_map &map);
+	void prog_map(address_map &map) ATTR_COLD;
+	void ext_map(address_map &map) ATTR_COLD;
+	void ram_map(address_map &map) ATTR_COLD;
 
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
 	required_device<crt9028_device> m_vtlc;

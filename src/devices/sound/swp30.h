@@ -17,15 +17,14 @@ public:
 
 	swp30_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 33868800);
 
-	void map(address_map &map);
+	void map(address_map &map) ATTR_COLD;
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
 	virtual uint32_t execute_min_cycles() const noexcept override;
 	virtual uint32_t execute_max_cycles() const noexcept override;
-	virtual uint32_t execute_input_lines() const noexcept override;
 	virtual uint64_t execute_clocks_to_cycles(uint64_t clocks) const noexcept override { return (clocks + 1) / 2; }
 	virtual void execute_run() override;
 	virtual space_config_vector memory_space_config() const override;
@@ -216,10 +215,10 @@ private:
 	template<int sel> u16 meg_lfo_r(offs_t offset);
 	template<int sel> void meg_lfo_w(offs_t offset, u16 data);
 
-	void meg_prg_map(address_map &map);
+	void meg_prg_map(address_map &map) ATTR_COLD;
 	u64 meg_prg_map_r(offs_t address);
 
-	void meg_reverb_map(address_map &map);
+	void meg_reverb_map(address_map &map) ATTR_COLD;
 
 	virtual u16 swp30d_const_r(u16 address) const override;
 	virtual u16 swp30d_offset_r(u16 address) const override;

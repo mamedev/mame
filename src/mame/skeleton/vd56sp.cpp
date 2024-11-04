@@ -25,7 +25,7 @@ public:
 	void vd56sp(machine_config &mconfig);
 
 private:
-	void exp_map(address_map &map);
+	void exp_map(address_map &map) ATTR_COLD;
 
 	required_device<r65c19_device> m_maincpu;
 };

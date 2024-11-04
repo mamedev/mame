@@ -134,12 +134,12 @@ public:
 	void ym3526(machine_config &config);
 
 protected:
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 
-	void amazon_base_map(address_map &map);
+	void amazon_base_map(address_map &map) ATTR_COLD;
 
 private:
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -176,11 +176,11 @@ private:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void horekidb2_map(address_map &map);
-	void sound_2203_io_map(address_map &map);
-	void sound_3526_io_map(address_map &map);
-	void sound_map(address_map &map);
-	void terracre_map(address_map &map);
+	void horekidb2_map(address_map &map) ATTR_COLD;
+	void sound_2203_io_map(address_map &map) ATTR_COLD;
+	void sound_3526_io_map(address_map &map) ATTR_COLD;
+	void sound_map(address_map &map) ATTR_COLD;
+	void terracre_map(address_map &map) ATTR_COLD;
 };
 
 class amazon_state : public terracre_state
@@ -196,7 +196,7 @@ public:
 private:
 	required_device<nb1412m2_device> m_prot;
 
-	void amazon_1412m2_map(address_map &map);
+	void amazon_1412m2_map(address_map &map) ATTR_COLD;
 };
 
 

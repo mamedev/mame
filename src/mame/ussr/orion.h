@@ -86,7 +86,7 @@ protected:
 	void orion_romdisk_portb_w(uint8_t data);
 	void orion_romdisk_portc_w(uint8_t data);
 	static void orion_floppy_formats(format_registration &fr);
-	void machine_start() override;
+	void machine_start() override ATTR_COLD;
 
 	uint8_t m_orion128_video_mode = 0;
 	uint8_t m_orion128_video_page = 0;
@@ -131,9 +131,9 @@ protected:
 	void orionpro_bank_switch();
 
 private:
-	void machine_reset() override;
-	void io_map(address_map &map);
-	void mem_map(address_map &map);
+	void machine_reset() override ATTR_COLD;
+	void io_map(address_map &map) ATTR_COLD;
+	void mem_map(address_map &map) ATTR_COLD;
 };
 
 class orion_z80_state : public orion_state
@@ -147,9 +147,9 @@ public:
 	void orionz80ms(machine_config &config);
 
 private:
-	void machine_reset() override;
-	void io_map(address_map &map);
-	void mem_map(address_map &map);
+	void machine_reset() override ATTR_COLD;
+	void io_map(address_map &map) ATTR_COLD;
+	void mem_map(address_map &map) ATTR_COLD;
 };
 
 class orion_pro_state : public orion_state
@@ -162,9 +162,9 @@ public:
 	void orionpro(machine_config &config);
 
 private:
-	void machine_reset() override;
-	void io_map(address_map &map);
-	void mem_map(address_map &map);
+	void machine_reset() override ATTR_COLD;
+	void io_map(address_map &map) ATTR_COLD;
+	void mem_map(address_map &map) ATTR_COLD;
 };
 
 #endif // MAME_RADIO_ORION_H

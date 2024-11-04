@@ -230,7 +230,7 @@ void rocknms_state::rocknms_main2sub_w(offs_t offset, u16 data, u16 mem_mask)
 		m_rocknms_main2sub = (data ^ 0xffff);
 }
 
-CUSTOM_INPUT_MEMBER(rocknms_state::rocknms_main2sub_status_r)
+ioport_value rocknms_state::rocknms_main2sub_status_r()
 {
 	return m_rocknms_sub2main & 0x0003;
 }
@@ -1326,7 +1326,7 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( rocknms )
 	PORT_START("PLAYERS")   // IN0 - $be0002.w
-	PORT_BIT( 0x0003, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(rocknms_state, rocknms_main2sub_status_r) // MAIN -> SUB Communication
+	PORT_BIT( 0x0003, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(FUNC(rocknms_state::rocknms_main2sub_status_r)) // MAIN -> SUB Communication
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(1)
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(1)
 	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(1)

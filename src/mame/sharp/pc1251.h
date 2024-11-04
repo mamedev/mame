@@ -31,15 +31,15 @@ public:
 	void pc1250(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void pc1250_mem(address_map &map);
-	void pc1251_mem(address_map &map);
-	void pc1255_mem(address_map &map);
-	void pc1260_mem(address_map &map);
-	void pc1261_mem(address_map &map);
+	void pc1250_mem(address_map &map) ATTR_COLD;
+	void pc1251_mem(address_map &map) ATTR_COLD;
+	void pc1255_mem(address_map &map) ATTR_COLD;
+	void pc1260_mem(address_map &map) ATTR_COLD;
+	void pc1261_mem(address_map &map) ATTR_COLD;
 
 	void out_b_w(uint8_t data);
 	void out_c_w(uint8_t data);
@@ -77,7 +77,7 @@ public:
 	void pc1261(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 };
 
 #endif // MAME_SHARP_PC1251_H

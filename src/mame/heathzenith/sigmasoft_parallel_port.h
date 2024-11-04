@@ -32,7 +32,7 @@ public:
 
 protected:
 
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 	u8 video_mem_r();
 	void video_mem_w(u8 val);

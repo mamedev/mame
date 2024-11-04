@@ -71,8 +71,8 @@ public:
 	required_ioport_array<16> m_y;
 	required_ioport m_y128;
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
@@ -84,8 +84,8 @@ public:
 
 	uint8_t m_xo;
 	void compucolor2(machine_config &config);
-	void compucolor2_io(address_map &map);
-	void compucolor2_mem(address_map &map);
+	void compucolor2_io(address_map &map) ATTR_COLD;
+	void compucolor2_mem(address_map &map) ATTR_COLD;
 };
 
 void compucolor2_state::compucolor2_mem(address_map &map)

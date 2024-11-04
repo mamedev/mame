@@ -50,14 +50,14 @@ protected:
 	void sound_on_w(uint8_t data);
 	void flip_screen_x_w(int state);
 	void flip_screen_y_w(int state);
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 	uint32_t screen_update_tutankhm_bootleg(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_tutankhm_scramble(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_tutankhm(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void vblank_irq(int state);
-	void main_map(address_map &map);
-	virtual void video_start() override;
+	void main_map(address_map &map) ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 	void galaxian_palette(palette_device &palette);
 	static rgb_t raw_to_rgb_func(u32 raw);
 

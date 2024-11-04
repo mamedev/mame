@@ -95,8 +95,8 @@ public:
 
 private:
 	required_device<cpu_device> m_maincpu;
-	void main_io(address_map &map);
-	void main_map(address_map &map);
+	void main_io(address_map &map) ATTR_COLD;
+	void main_map(address_map &map) ATTR_COLD;
 };
 
 /*****************************************************************************/

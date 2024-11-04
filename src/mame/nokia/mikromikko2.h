@@ -59,8 +59,8 @@ public:
 	void mm2(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	required_device<i80186_cpu_device> m_maincpu;
@@ -81,10 +81,11 @@ private:
 	required_device<rs232_port_device> m_rs232b;
 	required_device<palette_device> m_palette;
 
-	void mm2_map(address_map &map);
-	void mm2_io_map(address_map &map);
-	void vpac_mem(address_map &map);
+	void mm2_map(address_map &map) ATTR_COLD;
+	void mm2_io_map(address_map &map) ATTR_COLD;
+	void vpac_mem(address_map &map) ATTR_COLD;
 
+	void palette(palette_device &palette) const;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	static void floppy_formats(format_registration &fr);
@@ -103,7 +104,7 @@ private:
 	void update_pic_ir0() { m_pic->ir0_w(m_ir0); }
 	void ir0_w(int state) { if (state) { m_ir0 = ASSERT_LINE; update_pic_ir0(); } }
 	void tcl_w(offs_t offset, uint8_t data) { m_ir0 = CLEAR_LINE; update_pic_ir0(); }
-	
+
 	void update_pic_ir5() { m_pic->ir5_w(m_vpac_int || m_sio_rxrdy || m_sio_txrdy); }
 	void vpac_int_w(int state) { m_vpac_int = state; update_pic_ir5(); }
 	void sio_rxrdy_w(int state) { m_sio_rxrdy = state; update_pic_ir5(); }

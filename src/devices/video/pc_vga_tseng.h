@@ -23,18 +23,18 @@ public:
 	virtual void mem_w(offs_t offset, uint8_t data) override;
 
 protected:
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
-	virtual void io_3bx_3dx_map(address_map &map) override;
-	virtual void io_3cx_map(address_map &map) override;
+	virtual void io_3bx_3dx_map(address_map &map) override ATTR_COLD;
+	virtual void io_3cx_map(address_map &map) override ATTR_COLD;
 
 	u8 ramdac_hidden_mask_r(offs_t offset);
 	void ramdac_hidden_mask_w(offs_t offset, u8 data);
 	u8 ramdac_hidden_windex_r(offs_t offset);
 
-	virtual void crtc_map(address_map &map) override;
-	virtual void sequencer_map(address_map &map) override;
-	virtual void attribute_map(address_map &map) override;
+	virtual void crtc_map(address_map &map) override ATTR_COLD;
+	virtual void sequencer_map(address_map &map) override ATTR_COLD;
+	virtual void attribute_map(address_map &map) override ATTR_COLD;
 
 	virtual void recompute_params() override;
 private:

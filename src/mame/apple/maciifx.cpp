@@ -75,11 +75,11 @@ public:
 	}
 
 	void maciifx(machine_config &config);
-	void maciifx_map(address_map &map);
+	void maciifx_map(address_map &map) ATTR_COLD;
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	required_device<m68030_device> m_maincpu;

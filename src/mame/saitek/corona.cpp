@@ -29,13 +29,13 @@ different compared to Stratos/Turbo King.
 
 namespace {
 
-// note: sub-class of saitek_stratos_state (see stratos.h, stratos.cpp)
+// note: sub-class of stratos_base_state (see stratos.h, stratos.cpp)
 
-class corona_state : public saitek_stratos_state
+class corona_state : public stratos_base_state
 {
 public:
 	corona_state(const machine_config &mconfig, device_type type, const char *tag) :
-		saitek_stratos_state(mconfig, type, tag),
+		stratos_base_state(mconfig, type, tag),
 		m_rombank(*this, "rombank"),
 		m_board(*this, "board"),
 		m_dac(*this, "dac"),
@@ -46,8 +46,8 @@ public:
 	void corona(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	// devices/pointers
@@ -63,7 +63,7 @@ private:
 	u8 m_led_data1 = 0;
 	u8 m_led_data2 = 0;
 
-	void main_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
 
 	// I/O handlers
 	void update_leds();
@@ -81,7 +81,7 @@ private:
 
 void corona_state::machine_start()
 {
-	saitek_stratos_state::machine_start();
+	stratos_base_state::machine_start();
 
 	// register for savestates
 	save_item(NAME(m_control1));
@@ -94,7 +94,7 @@ void corona_state::machine_start()
 
 void corona_state::machine_reset()
 {
-	saitek_stratos_state::machine_reset();
+	stratos_base_state::machine_reset();
 
 	m_control2 = 0;
 	m_rombank.select(0);

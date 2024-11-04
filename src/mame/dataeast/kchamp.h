@@ -79,8 +79,8 @@ private:
 	void kchamp_colorram_w(offs_t offset, uint8_t data);
 	void sound_control_w(u8 data);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 	void kchamp_palette(palette_device &palette) const;
 	DECLARE_MACHINE_START(kchampvs);
 	DECLARE_MACHINE_START(kchamp);
@@ -88,19 +88,18 @@ private:
 	uint32_t screen_update_kchamp(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void vblank_irq(int state);
 	INTERRUPT_GEN_MEMBER(sound_int);
-	void kchamp_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void kchampvs_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int dx, int dy);
 	void decrypt_code();
 	void msmint(int state);
-	void decrypted_opcodes_map(address_map &map);
-	void kchamp_io_map(address_map &map);
-	void kchamp_map(address_map &map);
-	void kchamp_sound_io_map(address_map &map);
-	void kchamp_sound_map(address_map &map);
-	void kchampvs_io_map(address_map &map);
-	void kchampvs_map(address_map &map);
-	void kchampvs_sound_io_map(address_map &map);
-	void kchampvs_sound_map(address_map &map);
+	void decrypted_opcodes_map(address_map &map) ATTR_COLD;
+	void kchamp_io_map(address_map &map) ATTR_COLD;
+	void kchamp_map(address_map &map) ATTR_COLD;
+	void kchamp_sound_io_map(address_map &map) ATTR_COLD;
+	void kchamp_sound_map(address_map &map) ATTR_COLD;
+	void kchampvs_io_map(address_map &map) ATTR_COLD;
+	void kchampvs_map(address_map &map) ATTR_COLD;
+	void kchampvs_sound_io_map(address_map &map) ATTR_COLD;
+	void kchampvs_sound_map(address_map &map) ATTR_COLD;
 };
 
 #endif // MAME_DATAEAST_KCHAMP_H

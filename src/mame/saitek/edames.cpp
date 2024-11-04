@@ -16,9 +16,9 @@ fidelity/dames.cpp. It will give an error beep if the user removes a captured
 piece from the board, but it doesn't matter.
 
 Two versions were sold, each should have the same MCU and ROM: a tabletop model
-(Electronic Dames, 8MHz or 12MHz), and a portable model (Compact Dames Computer,
-8MHz). As with SciSys/Saitek chess computers, they were also licensed to Tandy.
-The program engine is DIOS by Eric van Riet Paap.
+(Electronic Dames, 8MHz or 12MHz, model 660), and a portable model (Compact Dames
+Computer, 8MHz, model 661). As with SciSys/Saitek chess computers, they were also
+licensed to Tandy. The program engine is DIOS by Eric van Riet Paap.
 
 According to the second hand market, the tabletop French version is much more
 common than the English one. The manual and a LED label incorrectly call crowned
@@ -64,7 +64,7 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(change_cpu_freq);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	// devices/pointers
@@ -235,7 +235,7 @@ static INPUT_PORTS_START( edames ) // see comments for French version labels
 	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_2) PORT_NAME("Stop")       // Stop
 
 	PORT_START("IN.3")
-	PORT_CONFNAME( 0x03, 0x02, "CPU Frequency" ) PORT_CHANGED_MEMBER(DEVICE_SELF, edames_state, change_cpu_freq, 0) // factory set
+	PORT_CONFNAME( 0x03, 0x02, "CPU Frequency" ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(edames_state::change_cpu_freq), 0) // factory set
 	PORT_CONFSETTING(    0x03, "6MHz (unofficial)" )
 	PORT_CONFSETTING(    0x02, "8MHz (original version)" )
 	PORT_CONFSETTING(    0x01, "10MHz (unofficial)" )
@@ -243,7 +243,7 @@ static INPUT_PORTS_START( edames ) // see comments for French version labels
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CODE(KEYCODE_T) PORT_NAME("Swap Side")   // Tourne Damier
 
 	PORT_START("RESET")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_1) PORT_CHANGED_MEMBER(DEVICE_SELF, edames_state, go_button, 0) PORT_NAME("Go") // Go
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_1) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(edames_state::go_button), 0) PORT_NAME("Go") // Go
 INPUT_PORTS_END
 
 

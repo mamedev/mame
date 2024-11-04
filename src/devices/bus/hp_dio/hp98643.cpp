@@ -46,17 +46,17 @@ protected:
 
 
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
-	virtual ioport_constructor device_input_ports() const override;
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 private:
 	required_device<am7990_device> m_lance;
 	required_ioport m_switches;
 
-	void addrmap(address_map &map);
+	void addrmap(address_map &map) ATTR_COLD;
 	void update_int();
 	int get_irq_line();
 

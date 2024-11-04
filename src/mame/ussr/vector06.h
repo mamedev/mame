@@ -76,14 +76,14 @@ private:
 	void status_callback(uint8_t data);
 	void ramdisk_w(uint8_t data);
 	void speaker_w(int state);
-	void machine_start() override;
-	void machine_reset() override;
+	void machine_start() override ATTR_COLD;
+	void machine_reset() override ATTR_COLD;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	IRQ_CALLBACK_MEMBER(irq_callback);
 	void update_mem();
 
-	void io_map(address_map &map);
-	void mem_map(address_map &map);
+	void io_map(address_map &map) ATTR_COLD;
+	void mem_map(address_map &map) ATTR_COLD;
 
 	required_device<i8080_cpu_device> m_maincpu;
 	required_region_ptr<u8> m_rom;

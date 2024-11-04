@@ -160,9 +160,9 @@ public:
 	void init_fghtbskt();
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	required_shared_ptr<uint8_t> m_spriteram;
@@ -221,10 +221,10 @@ private:
 	INTERRUPT_GEN_MEMBER(snd_irq);
 	INTERRUPT_GEN_MEMBER(vblank_irq);
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
-	void fghtbskt_map(address_map &map);
-	void i8039_map(address_map &map);
-	void i8039_port_map(address_map &map);
-	void m63_map(address_map &map);
+	void fghtbskt_map(address_map &map) ATTR_COLD;
+	void i8039_map(address_map &map) ATTR_COLD;
+	void i8039_port_map(address_map &map) ATTR_COLD;
+	void m63_map(address_map &map) ATTR_COLD;
 };
 
 

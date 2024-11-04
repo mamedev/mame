@@ -40,8 +40,8 @@ public:
 	void init_rtriv();
 
 protected:
-	virtual void machine_start() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -97,13 +97,13 @@ private:
 	uint32_t screen_update_desertdan(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int priority_to_draw);
 
-	void audio_io_map(address_map &map);
-	void audio_map(address_map &map);
-	void desertdan_main_map(address_map &map);
-	void dockmanb_main_map(address_map &map);
-	void intrepid_main_map(address_map &map);
-	void thepit_main_map(address_map &map);
-	void theportr_main_map(address_map &map);
+	void audio_io_map(address_map &map) ATTR_COLD;
+	void audio_map(address_map &map) ATTR_COLD;
+	void desertdan_main_map(address_map &map) ATTR_COLD;
+	void dockmanb_main_map(address_map &map) ATTR_COLD;
+	void intrepid_main_map(address_map &map) ATTR_COLD;
+	void thepit_main_map(address_map &map) ATTR_COLD;
+	void theportr_main_map(address_map &map) ATTR_COLD;
 };
 
 #endif // MAME_THEPIT_THEPIT_H

@@ -65,7 +65,6 @@ TODO:
 
 #include "emu.h"
 #include "cpu/arm7/arm7.h"
-#include "cpu/arm7/arm7core.h"
 #include "emupal.h"
 #include "screen.h"
 
@@ -94,8 +93,8 @@ private:
 	required_device<cpu_device> m_maincpu;
 	required_device<screen_device> m_screen;
 
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 	uint32_t io4_r(offs_t offset, uint32_t mem_mask = ~0);
 	void io4_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 
@@ -106,7 +105,7 @@ private:
 	void io10_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 
 	uint32_t screen_update_mk3b_soc(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	void map(address_map &map);
+	void map(address_map &map) ATTR_COLD;
 	std::string debug_buf;
 };
 

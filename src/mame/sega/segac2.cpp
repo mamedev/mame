@@ -232,8 +232,8 @@ public:
 	void init_zunkyou();
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	int m_segac2_enable_display;
 
@@ -306,8 +306,8 @@ protected:
 	int prot_func_puyopuy2(int in);
 	int prot_func_zunkyou(int in);
 
-	void segac_map(address_map &map);
-	void segac2_map(address_map &map);
+	void segac_map(address_map &map) ATTR_COLD;
+	void segac2_map(address_map &map) ATTR_COLD;
 };
 
 
@@ -1090,7 +1090,7 @@ static INPUT_PORTS_START( wwmarine )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0xc0, 0x00, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(wwmarine_state, read_wheel)
+	PORT_BIT( 0xc0, 0x00, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(FUNC(wwmarine_state::read_wheel))
 
 	PORT_MODIFY("P2")
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )

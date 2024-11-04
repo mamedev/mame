@@ -336,7 +336,7 @@ public:
 	void eto(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 	// memory pointers
 	required_memory_bank m_audiobank;
@@ -354,10 +354,10 @@ protected:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void screen_vblank(int state);
 
-	void z80_map(address_map &map);
+	void z80_map(address_map &map) ATTR_COLD;
 
 private:
-	void eto_map(address_map &map);
+	void eto_map(address_map &map) ATTR_COLD;
 };
 
 
@@ -375,8 +375,8 @@ public:
 	void asuka(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	// memory pointers
@@ -395,8 +395,8 @@ private:
 	void msm5205_stop_w(u8 data);
 	void msm5205_vck(int state);
 
-	void asuka_map(address_map &map);
-	void z80_map(address_map &map);
+	void asuka_map(address_map &map) ATTR_COLD;
+	void z80_map(address_map &map) ATTR_COLD;
 };
 
 
@@ -421,8 +421,8 @@ private:
 	INTERRUPT_GEN_MEMBER(interrupt);
 	TIMER_DEVICE_CALLBACK_MEMBER(cchip_irq_clear_cb);
 
-	void main_map(address_map &map);
-	void z80_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
+	void z80_map(address_map &map) ATTR_COLD;
 };
 
 
@@ -437,7 +437,7 @@ public:
 	void cadash(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	// memory pointers
@@ -450,9 +450,9 @@ private:
 	void share_w(offs_t offset, u16 data);
 	INTERRUPT_GEN_MEMBER(interrupt);
 
-	void main_map(address_map &map);
-	void sub_io(address_map &map);
-	void sub_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
+	void sub_io(address_map &map) ATTR_COLD;
+	void sub_map(address_map &map) ATTR_COLD;
 };
 
 

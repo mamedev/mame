@@ -20,11 +20,11 @@ public:
 	// irq line numbers are 0..3
 	template<int irq> auto write_irq() { return m_irq[irq].bind(); }
 
-	void map(address_map &map);
+	void map(address_map &map) ATTR_COLD;
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 protected:
 	devcb_write_line::array<7> m_tx;

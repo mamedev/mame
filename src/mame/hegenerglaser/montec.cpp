@@ -58,7 +58,7 @@ public:
 	void montec4le(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -69,7 +69,7 @@ private:
 	required_ioport_array<2> m_keys;
 	output_finder<8> m_digits;
 
-	void montec_mem(address_map &map);
+	void montec_mem(address_map &map) ATTR_COLD;
 
 	template<int N> void lcd_output_w(u32 data);
 	void led_w(u8 data);

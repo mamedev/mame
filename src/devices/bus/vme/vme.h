@@ -94,16 +94,16 @@ public:
 
 protected:
 	// device_t implementation
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 	// device_memory_interface implementation
 	virtual space_config_vector memory_space_config() const override;
 
 private:
-	void iack(address_map &map);
-	void a16(address_map &map);
-	void a24(address_map &map);
-	void a32(address_map &map);
+	void iack(address_map &map) ATTR_COLD;
+	void a16(address_map &map) ATTR_COLD;
+	void a24(address_map &map) ATTR_COLD;
+	void a32(address_map &map) ATTR_COLD;
 
 	u32 read_iack(address_space &space, offs_t offset, u32 mem_mask);
 	u32 read_berr(address_space &space, offs_t offset, u32 mem_mask);
@@ -149,7 +149,7 @@ public:
 
 protected:
 	// device_t implementation
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 private:
 	required_device<vme_bus_device> m_bus;

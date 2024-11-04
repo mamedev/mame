@@ -43,19 +43,19 @@ public:
 	void tabe22(machine_config &config);
 
 private:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 	void sod_w(int state);
 	void cols_w(int state);
 	SCN2674_DRAW_CHARACTER_MEMBER(draw_character);
 
-	void cit220p_mem_map(address_map &map);
-	void cit220p_io_map(address_map &map);
-	void vp122_mem_map(address_map &map);
-	void vp122_io_map(address_map &map);
+	void cit220p_mem_map(address_map &map) ATTR_COLD;
+	void cit220p_io_map(address_map &map) ATTR_COLD;
+	void vp122_mem_map(address_map &map) ATTR_COLD;
+	void vp122_io_map(address_map &map) ATTR_COLD;
 
-	void char_map(address_map &map);
-	void attr_map(address_map &map);
+	void char_map(address_map &map) ATTR_COLD;
+	void attr_map(address_map &map) ATTR_COLD;
 
 	required_device<i8085a_cpu_device> m_maincpu;
 	required_device<screen_device> m_screen;

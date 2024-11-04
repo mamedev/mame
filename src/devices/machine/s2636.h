@@ -28,6 +28,7 @@ class s2636_device : public device_t,
 {
 public:
 	s2636_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	virtual ~s2636_device();
 
 	void set_offsets(int y_offset, int x_offset) { m_x_offset = x_offset; m_y_offset = y_offset; }
 
@@ -55,7 +56,7 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 	// sound stream update overrides
 	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;

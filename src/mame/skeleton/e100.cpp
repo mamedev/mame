@@ -169,7 +169,7 @@ private:
 	required_region_ptr<uint8_t> m_chargen;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	virtual void machine_reset() override { m_maincpu->reset(); LOG("--->%s()\n", FUNCNAME); };
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 	uint8_t pia_r(offs_t offset);
 	void pia_w(offs_t offset, uint8_t data);
 	uint8_t pia1_kbA_r();
@@ -179,7 +179,7 @@ private:
 	void pia1_ca2_w(int state);
 	void pia1_cb2_w(int state);
 	TIMER_DEVICE_CALLBACK_MEMBER(rtc_w);
-	void e100_map(address_map &map);
+	void e100_map(address_map &map) ATTR_COLD;
 
 	required_ioport m_io_line0;
 	required_ioport m_io_line1;

@@ -269,8 +269,8 @@ private:
 	void ppi8255_intf_h_write_b(uint8_t data) { logerror("%04x - ppi8255_intf_h_(used)write_b %02x\n", m_maincpu->pcbase(), data); }
 	void ppi8255_intf_h_write_c(uint8_t data) { logerror("%04x - ppi8255_intf_h_(used)write_c %02x\n", m_maincpu->pcbase(), data); }
 
-	void pyramid_memmap(address_map &map);
-	void pyramid_portmap(address_map &map);
+	void pyramid_memmap(address_map &map) ATTR_COLD;
+	void pyramid_portmap(address_map &map) ATTR_COLD;
 
 	required_device<z180_device> m_maincpu;
 	required_device_array<stepper_device, 4> m_reels;

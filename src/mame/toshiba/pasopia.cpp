@@ -58,8 +58,8 @@ public:
 	void pasopia(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	void pasopia_ctrl_w(u8 data);
@@ -80,8 +80,8 @@ private:
 	MC6845_UPDATE_ROW(crtc_update_row);
 	TIMER_CALLBACK_MEMBER(pio_timer);
 
-	void pasopia_io(address_map &map);
-	void pasopia_map(address_map &map);
+	void pasopia_io(address_map &map) ATTR_COLD;
+	void pasopia_map(address_map &map) ATTR_COLD;
 
 	u8 m_hblank = 0;
 	u16 m_vram_addr = 0;

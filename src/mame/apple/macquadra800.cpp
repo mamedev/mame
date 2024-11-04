@@ -72,7 +72,7 @@ public:
 	void macqd610(machine_config &config);
 	void macqd650(machine_config &config);
 
-	void quadra800_map(address_map &map);
+	void quadra800_map(address_map &map) ATTR_COLD;
 
 	void init_macqd800();
 
@@ -91,8 +91,8 @@ private:
 
 	u8 m_mac[6];
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	u16 mac_scc_r(offs_t offset)
 	{

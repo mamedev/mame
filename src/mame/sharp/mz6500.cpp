@@ -40,14 +40,14 @@ private:
 	[[maybe_unused]]void fdc_irq(bool state);
 	[[maybe_unused]]void fdc_drq(bool state);
 	required_shared_ptr<u16> m_vram;
-	void machine_reset() override;
-	void machine_start() override;
+	void machine_reset() override ATTR_COLD;
+	void machine_start() override ATTR_COLD;
 	required_device<cpu_device> m_maincpu;
 	required_device<palette_device> m_palette;
 	UPD7220_DISPLAY_PIXELS_MEMBER( hgdc_display_pixels );
-	void io_map(address_map &map);
-	void mem_map(address_map &map);
-	void upd7220_map(address_map &map);
+	void io_map(address_map &map) ATTR_COLD;
+	void mem_map(address_map &map) ATTR_COLD;
+	void upd7220_map(address_map &map) ATTR_COLD;
 };
 
 UPD7220_DISPLAY_PIXELS_MEMBER( mz6500_state::hgdc_display_pixels )
@@ -163,7 +163,7 @@ void mz6500_state::mz6500(machine_config &config)
 	PALETTE(config, "palette").set_entries(8);
 
 	/* Devices */
-	UPD7220(config, m_hgdc, 8000000/6); // unk clock
+	UPD7220(config, m_hgdc, 8000000 / 3); // unk clock
 	m_hgdc->set_addrmap(0, &mz6500_state::upd7220_map);
 	m_hgdc->set_display_pixels(FUNC(mz6500_state::hgdc_display_pixels));
 

@@ -142,7 +142,7 @@ public:
 	void invqix(machine_config &config);
 
 protected:
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -158,7 +158,7 @@ private:
 
 	void vctl_w(uint16_t data);
 
-	void invqix_prg_map(address_map &map);
+	void invqix_prg_map(address_map &map) ATTR_COLD;
 
 	// devices
 	required_device<h8s2394_device> m_maincpu;

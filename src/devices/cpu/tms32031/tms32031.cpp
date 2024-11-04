@@ -855,17 +855,6 @@ uint32_t tms3203x_device::execute_max_cycles() const noexcept
 
 
 //-------------------------------------------------
-//  execute_input_lines - return the number of
-//  input/interrupt lines
-//-------------------------------------------------
-
-uint32_t tms3203x_device::execute_input_lines() const noexcept
-{
-	return 14;
-}
-
-
-//-------------------------------------------------
 //  execute_clocks_to_cycles - convert the raw
 //  clock into cycles per second
 //-------------------------------------------------

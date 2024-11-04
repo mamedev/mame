@@ -141,8 +141,8 @@ public:
 	void x180ii(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	// devices
@@ -210,9 +210,9 @@ private:
 
 	// machine
 	INTERRUPT_GEN_MEMBER(joystand_interrupt);
-	void joystand_map(address_map &map);
-	void x180ii_map(address_map &map);
-	void cart_map(address_map &map);
+	void joystand_map(address_map &map) ATTR_COLD;
+	void x180ii_map(address_map &map) ATTR_COLD;
+	void cart_map(address_map &map) ATTR_COLD;
 };
 
 const rgb_t joystand_state::BG15_TRANSPARENT = 0x99999999;

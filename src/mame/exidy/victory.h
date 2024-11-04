@@ -63,9 +63,9 @@ private:
 	void update_foreground();
 
 	virtual void machine_start() override { m_lamps.resolve(); }
-	virtual void video_start() override;
-	void main_io_map(address_map &map);
-	void main_map(address_map &map);
+	virtual void video_start() override ATTR_COLD;
+	void main_io_map(address_map &map) ATTR_COLD;
+	void main_map(address_map &map) ATTR_COLD;
 
 	/* microcode state */
 	struct micro_t

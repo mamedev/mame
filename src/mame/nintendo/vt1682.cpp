@@ -132,9 +132,9 @@ public:
 	void regular_init();
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 	required_device<vrt_vt1682_io_device> m_io;
 	required_device<vrt_vt1682_uio_device> m_uio;
@@ -142,8 +142,8 @@ protected:
 	required_device<dac_12bit_r2r_device> m_rightdac;
 	required_device<cpu_device> m_maincpu;
 
-	void vt_vt1682_map(address_map& map);
-	void vt_vt1682_sound_map(address_map& map);
+	void vt_vt1682_map(address_map &map) ATTR_COLD;
+	void vt_vt1682_sound_map(address_map &map) ATTR_COLD;
 
 	required_device<address_map_bank_device> m_fullrom;
 	required_memory_bank m_bank;
@@ -177,10 +177,10 @@ private:
 
 	uint32_t screen_update(screen_device& screen, bitmap_rgb32& bitmap, const rectangle& cliprect);
 
-	void rom_map(address_map& map);
+	void rom_map(address_map &map) ATTR_COLD;
 
-	void spriteram_map(address_map& map);
-	void vram_map(address_map& map);
+	void spriteram_map(address_map &map) ATTR_COLD;
+	void vram_map(address_map &map) ATTR_COLD;
 
 
 	/* Video */
@@ -644,8 +644,8 @@ public:
 	void ext_rombank_w(uint8_t data);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 
@@ -716,8 +716,8 @@ public:
 	void uiob_w(uint8_t data);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	int m_old_portb;
 	int m_portb_shiftpos = 0;

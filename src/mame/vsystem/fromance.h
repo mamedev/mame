@@ -43,8 +43,8 @@ public:
 	void init_common();
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 	DECLARE_VIDEO_START(fromance);
 
 	required_device<cpu_device> m_maincpu;
@@ -112,13 +112,13 @@ private:
 	inline void get_nekkyoku_tile_info(tile_data &tileinfo, int tile_index, int layer);
 	void crtc_refresh();
 	void fromance_adpcm_int(int state);
-	void fromance_main_map(address_map &map);
-	void fromance_sub_io_map(address_map &map);
-	void fromance_sub_map(address_map &map);
-	void idolmj_sub_io_map(address_map &map);
-	void nekkyoku_main_map(address_map &map);
-	void nekkyoku_sub_io_map(address_map &map);
-	void nekkyoku_sub_map(address_map &map);
+	void fromance_main_map(address_map &map) ATTR_COLD;
+	void fromance_sub_io_map(address_map &map) ATTR_COLD;
+	void fromance_sub_map(address_map &map) ATTR_COLD;
+	void idolmj_sub_io_map(address_map &map) ATTR_COLD;
+	void nekkyoku_main_map(address_map &map) ATTR_COLD;
+	void nekkyoku_sub_io_map(address_map &map) ATTR_COLD;
+	void nekkyoku_sub_map(address_map &map) ATTR_COLD;
 };
 
 #endif // MAME_VSYSTEM_FROMANCE_H

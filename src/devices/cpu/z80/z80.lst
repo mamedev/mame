@@ -40,9 +40,9 @@ macro   wm16
 
 macro   wm16_sp
 	SP--;
-	m_memrq_cycles !! data_write(SPD, TDAT_H);
+	m_memrq_cycles !! data_write(SP, TDAT_H);
 	SP--;
-	m_memrq_cycles !! data_write(SPD, TDAT_L);
+	m_memrq_cycles !! data_write(SP, TDAT_L);
 
 macro   rop
 	m_m1_cycles-2 !! TDAT8 = opcode_read();
@@ -66,16 +66,16 @@ macro   arg16
 
 macro   eax
 	call arg
-	m_ea = (u32)(u16)(IX + (s8)TDAT8); WZ = m_ea;
+	m_ea = (u16)(IX + (s8)TDAT8); WZ = m_ea;
 
 macro   eay
 	call arg
-	m_ea = (u32)(u16)(IY + (s8)TDAT8); WZ = m_ea;
+	m_ea = (u16)(IY + (s8)TDAT8); WZ = m_ea;
 
 macro   pop
-	m_memrq_cycles !! TDAT_L = data_read(SPD);
+	m_memrq_cycles !! TDAT_L = data_read(SP);
 	SP++;
-	m_memrq_cycles !! TDAT_H = data_read(SPD);
+	m_memrq_cycles !! TDAT_H = data_read(SP);
 	SP++;
 
 macro   push
@@ -84,12 +84,12 @@ macro   push
 
 macro   jp
 	call arg16
-	PCD = TDAT; WZ = PC;
+	PC = TDAT; WZ = PC;
 
 macro   jp_cond
 	if (TDAT8) {
 		call arg16
-		PC = TDAT; WZ = PCD;
+		PC = TDAT; WZ = PC;
 	} else {
 		// implicit do PC += 2
 		call arg16
@@ -98,13 +98,13 @@ macro   jp_cond
 
 macro   jr
 	call arg
-	TADR = PCD-1;
+	TADR = PC-1;
 	5 * call nomreq_addr
 	PC += (s8)TDAT8; WZ = PC;
 
 macro   r800:jr
 	call arg
-	TADR = PCD-1;
+	TADR = PC-1;
 	+ 1
 	PC += (s8)TDAT8; WZ = PC;
 
@@ -117,19 +117,19 @@ macro   jr_cond
 
 macro   arg16_call
 	call arg16
-	m_ea = TDAT; TADR = PCD-1;
+	m_ea = TDAT; TADR = PC-1;
 	call nomreq_addr
 	WZ = m_ea; TDAT = PC;
 	call wm16_sp
-	PCD = m_ea;
+	PC = m_ea;
 
 macro   r800:arg16_call
 	call arg16
-	m_ea = TDAT; TADR = PCD-1;
+	m_ea = TDAT; TADR = PC-1;
 	call nomreq_addr
 	WZ = m_ea; TDAT = PC;
 	call wm16_sp
-	PCD = m_ea;
+	PC = m_ea;
 
 macro   call_cond
 	if (TDAT8) {
@@ -148,7 +148,7 @@ macro   ret_cond
 
 macro   retn
 	call pop
-	PC = TDAT; LOGINT("RETN m_iff1:%d m_iff2:%d\n", m_iff1, m_iff2); WZ = PC; m_iff1 = m_iff2;
+	PC = TDAT; LOGMASKED(LOG_INT, "RETN m_iff1:%d m_iff2:%d\n", m_iff1, m_iff2); WZ = PC; m_iff1 = m_iff2;
 
 macro   z80n:retn
 	m_out_retn_seen_cb(0);
@@ -159,7 +159,7 @@ macro   z80n:retn
 	} else {
 		PC = TDAT;
 	}
-	LOGINT("RETN m_iff1:%d m_iff2:%d\n", m_iff1, m_iff2); WZ = PC; m_iff1 = m_iff2;
+	LOGMASKED(LOG_INT, "RETN m_iff1:%d m_iff2:%d\n", m_iff1, m_iff2); WZ = PC; m_iff1 = m_iff2;
 
 macro   reti
 	call pop
@@ -236,17 +236,17 @@ macro   r800:add16
 
 macro   adc_hl
 	call nomreq_ir 7
-	{ u32 res = HLD + TDAT + (F & CF); WZ = HL + 1; set_f((((HLD ^ res ^ TDAT) >> 8) & HF) | ((res >> 16) & CF) | ((res >> 8) & (SF | YF | XF)) | ((res & 0xffff) ? 0 : ZF) | (((TDAT ^ HLD ^ 0x8000) & (TDAT ^ res) & 0x8000) >> 13)); HL = (u16)res; }
+	{ u32 res = HL + TDAT + (F & CF); WZ = HL + 1; set_f((((HL ^ res ^ TDAT) >> 8) & HF) | ((res >> 16) & CF) | ((res >> 8) & (SF | YF | XF)) | ((res & 0xffff) ? 0 : ZF) | (((TDAT ^ HL ^ 0x8000) & (TDAT ^ res) & 0x8000) >> 13)); HL = (u16)res; }
 
 macro   r800:adc_hl
-	{ u32 res = HLD + TDAT + (F & CF); WZ = HL + 1; set_f((((HLD ^ res ^ TDAT) >> 8) & HF) | ((res >> 16) & CF) | ((res >> 8) & (SF | YF | XF)) | ((res & 0xffff) ? 0 : ZF) | (((TDAT ^ HLD ^ 0x8000) & (TDAT ^ res) & 0x8000) >> 13)); HL = (u16)res; }
+	{ u32 res = HL + TDAT + (F & CF); WZ = HL + 1; set_f((((HL ^ res ^ TDAT) >> 8) & HF) | ((res >> 16) & CF) | ((res >> 8) & (SF | YF | XF)) | ((res & 0xffff) ? 0 : ZF) | (((TDAT ^ HL ^ 0x8000) & (TDAT ^ res) & 0x8000) >> 13)); HL = (u16)res; }
 
 macro   sbc_hl
 	call nomreq_ir 7
-	{ u32 res = HLD - TDAT - (F & CF); WZ = HL + 1; set_f((((HLD ^ res ^ TDAT) >> 8) & HF) | NF | ((res >> 16) & CF) | ((res >> 8) & (SF | YF | XF)) | ((res & 0xffff) ? 0 : ZF) | (((TDAT ^ HLD) & (HLD ^ res) &0x8000) >> 13)); HL = (u16)res; }
+	{ u32 res = HL - TDAT - (F & CF); WZ = HL + 1; set_f((((HL ^ res ^ TDAT) >> 8) & HF) | NF | ((res >> 16) & CF) | ((res >> 8) & (SF | YF | XF)) | ((res & 0xffff) ? 0 : ZF) | (((TDAT ^ HL) & (HL ^ res) &0x8000) >> 13)); HL = (u16)res; }
 
 macro   r800:sbc_hl
-	{ u32 res = HLD - TDAT - (F & CF); WZ = HL + 1; set_f((((HLD ^ res ^ TDAT) >> 8) & HF) | NF | ((res >> 16) & CF) | ((res >> 8) & (SF | YF | XF)) | ((res & 0xffff) ? 0 : ZF) | (((TDAT ^ HLD) & (HLD ^ res) &0x8000) >> 13)); HL = (u16)res; }
+	{ u32 res = HL - TDAT - (F & CF); WZ = HL + 1; set_f((((HL ^ res ^ TDAT) >> 8) & HF) | NF | ((res >> 16) & CF) | ((res >> 8) & (SF | YF | XF)) | ((res & 0xffff) ? 0 : ZF) | (((TDAT ^ HL) & (HL ^ res) &0x8000) >> 13)); HL = (u16)res; }
 
 macro   ldi
 	TADR = HL;
@@ -519,8 +519,8 @@ macro   take_nmi
 	+ 5
 	TDAT = PC;
 	call wm16_sp
-	PCD = 0x0066;
-	WZ = PCD;
+	PC = 0x0066;
+	WZ = PC;
 	m_nmi_pending = false;
 
 macro   take_interrupt
@@ -535,8 +535,8 @@ macro   take_interrupt
 	{
 		// fetch the IRQ vector
 		device_z80daisy_interface *intf = daisy_get_irq_device();
-		m_tmp_irq_vector = (intf != nullptr) ? intf->z80daisy_irq_ack() : standard_irq_callback(0, m_pc.w.l);
-		LOGINT("single INT m_tmp_irq_vector $%02x\n", m_tmp_irq_vector);
+		m_tmp_irq_vector = (intf != nullptr) ? intf->z80daisy_irq_ack() : standard_irq_callback(0, m_pc.w);
+		LOGMASKED(LOG_INT, "single INT m_tmp_irq_vector $%02x\n", m_tmp_irq_vector);
 	}
 	// 'interrupt latency' cycles
 	+ 2
@@ -552,21 +552,21 @@ macro   take_interrupt
 		m_tmp_irq_vector = (m_tmp_irq_vector & 0xff) | (m_i << 8);
 		TADR = m_tmp_irq_vector;
 		call rm16
-		PCD = TDAT;
-		LOGINT("IM2 [$%04x] = $%04x\n", m_tmp_irq_vector, PCD);
+		PC = TDAT;
+		LOGMASKED(LOG_INT, "IM2 [$%04x] = $%04x\n", m_tmp_irq_vector, PC);
 	} else if (m_im == 1) {
 		// Interrupt mode 1. RST 38h
-		LOGINT("'%s' IM1 $0038\n", tag());
+		LOGMASKED(LOG_INT, "'%s' IM1 $0038\n", tag());
 		// RST $38
 		+ 5
 		TDAT = PC;
 		call wm16_sp
-		PCD = 0x0038;
+		PC = 0x0038;
 	} else {
 		/* Interrupt mode 0. We check for CALL and JP instructions,
 		   if neither of these were found we assume a 1 byte opcode
 		   was placed on the databus */
-		LOGINT("IM0 $%04x\n", m_tmp_irq_vector);
+		LOGMASKED(LOG_INT, "IM0 $%04x\n", m_tmp_irq_vector);
 
 		// check for nop
 		if (m_tmp_irq_vector != 0x00) {
@@ -575,27 +575,27 @@ macro   take_interrupt
 				+ 11
 				TDAT = PC;
 				call wm16_sp
-				PCD = m_tmp_irq_vector & 0xffff;
+				PC = m_tmp_irq_vector & 0xffff;
 			} else if ((m_tmp_irq_vector & 0xff0000) == 0xc30000) {
 				// JP $xxxx cycles
 				+ 10
-				PCD = m_tmp_irq_vector & 0xffff;
-			} else if (m_tmp_irq_vector == 0xfb) {
-				// rst (or other opcodes?)
-				+ 4
-				ei();
+				PC = m_tmp_irq_vector & 0xffff;
 			} else if ((m_tmp_irq_vector & 0xc7) == 0xc7) {
 				// RST $xx cycles
 				+ 5
 				TDAT = PC;
 				call wm16_sp
-				PCD = m_tmp_irq_vector & 0x0038;
+				PC = m_tmp_irq_vector & 0x0038;
+			} else if (m_tmp_irq_vector == 0xfb) {
+				// EI cycles
+				+ 4
+				ei();
 			} else {
 				logerror("take_interrupt: unexpected opcode in im0 mode: 0x%02x\n", m_tmp_irq_vector);
 			}
 		}
 	}
-	WZ = PCD;
+	WZ = PC;
 	#if HAS_LDAIR_QUIRK
 		// reset parity flag after LD A,I or LD A,R
 		if (m_after_ldair) F &= ~PF;
@@ -627,23 +627,23 @@ macro   nsc800_take_interrupt
 	m_iff1 = m_iff2 = 0;
 	// 'interrupt latency' cycles
 	+ 7
-	if (m_nsc800_irq_state[NSC800_RSTA]) {
+	if (m_nsc800_irq_state[0]) {
 		TDAT = PC;
 		call wm16_sp
-		PCD = 0x003c;
-	} else if (m_nsc800_irq_state[NSC800_RSTB]) {
+		PC = 0x003c;
+	} else if (m_nsc800_irq_state[1]) {
 		TDAT = PC;
 		call wm16_sp
-		PCD = 0x0034;
-	} else if (m_nsc800_irq_state[NSC800_RSTC]) {
+		PC = 0x0034;
+	} else if (m_nsc800_irq_state[2]) {
 		TDAT = PC;
 		call wm16_sp
-		PCD = 0x002c;
+		PC = 0x002c;
 	} else {
 		+ 2 * m_memrq_cycles
 		;
 	}
-	WZ = PCD;
+	WZ = PC;
 	#if HAS_LDAIR_QUIRK
 		// reset parity flag after LD A,I or LD A,R
 		if (m_after_ldair) F &= ~PF;
@@ -652,7 +652,7 @@ macro   nsc800_take_interrupt
 macro   ncs800:check_interrupts
 	if (m_nmi_pending) {
 		call take_nmi
-	} else if ((m_nsc800_irq_state[NSC800_RSTA] != CLEAR_LINE || m_nsc800_irq_state[NSC800_RSTB] != CLEAR_LINE || m_nsc800_irq_state[NSC800_RSTC] != CLEAR_LINE) && m_iff1 && !m_after_ei) {
+	} else if ((m_nsc800_irq_state[0] != CLEAR_LINE || m_nsc800_irq_state[1] != CLEAR_LINE || m_nsc800_irq_state[2] != CLEAR_LINE) && m_iff1 && !m_after_ei) {
 		call nsc800_take_interrupt
 	} else if (m_irq_state != CLEAR_LINE && m_iff1 && !m_after_ei) {
 		call take_interrupt
@@ -678,8 +678,8 @@ ffff
 	call check_interrupts
 	m_after_ei = false;
 	m_after_ldair = false;
-	PRVPC = PCD;
-	debugger_instruction_hook(PCD);
+	PRVPC = PC;
+	debugger_instruction_hook(PC);
 	call rop
 	if (m_halt) {
 		PC--;
@@ -3133,7 +3133,7 @@ dd33	# DB   DD
 
 dd34	# INC  (IX+o)
 	call eax
-	TADR = PCD-1;
+	TADR = PC-1;
 	5 * call nomreq_addr
 	TADR = m_ea;
 	call rm_reg
@@ -3142,7 +3142,7 @@ dd34	# INC  (IX+o)
 
 dd35	# DEC  (IX+o)
 	call eax
-	TADR = PCD-1;
+	TADR = PC-1;
 	5 * call nomreq_addr
 	TADR = m_ea;
 	call rm_reg
@@ -3152,7 +3152,7 @@ dd35	# DEC  (IX+o)
 dd36	# LD   (IX+o),n
 	call eax
 	call arg
-	TADR = PCD-1;
+	TADR = PC-1;
 	2 * call nomreq_addr
 	TADR = m_ea;
 	call wm
@@ -3218,7 +3218,7 @@ dd45	# LD   B,LX
 
 dd46	# LD   B,(IX+o)
 	call eax
-	TADR = PCD-1;
+	TADR = PC-1;
 	5 * call nomreq_addr
 	TADR = m_ea;
 	call rm
@@ -3252,7 +3252,7 @@ dd4d	# LD   C,LX
 
 dd4e	# LD   C,(IX+o)
 	call eax
-	TADR = PCD-1;
+	TADR = PC-1;
 	5 * call nomreq_addr
 	TADR = m_ea;
 	call rm
@@ -3286,7 +3286,7 @@ dd55	# LD   D,LX
 
 dd56	# LD   D,(IX+o)
 	call eax
-	TADR = PCD-1;
+	TADR = PC-1;
 	5 * call nomreq_addr
 	TADR = m_ea;
 	call rm
@@ -3320,7 +3320,7 @@ dd5d	# LD   E,LX
 
 dd5e	# LD   E,(IX+o)
 	call eax
-	TADR = PCD-1;
+	TADR = PC-1;
 	5 * call nomreq_addr
 	TADR = m_ea;
 	call rm
@@ -3349,7 +3349,7 @@ dd65	# LD   HX,LX
 
 dd66	# LD   H,(IX+o)
 	call eax
-	TADR = PCD-1;
+	TADR = PC-1;
 	5 * call nomreq_addr
 	TADR = m_ea;
 	call rm
@@ -3377,7 +3377,7 @@ dd6d	# LD   LX,LX
 
 dd6e	# LD   L,(IX+o)
 	call eax
-	TADR = PCD-1;
+	TADR = PC-1;
 	5 * call nomreq_addr
 	TADR = m_ea;
 	call rm
@@ -3388,42 +3388,42 @@ dd6f	# LD   LX,A
 
 dd70	# LD   (IX+o),B
 	call eax
-	TADR = PCD-1;
+	TADR = PC-1;
 	5 * call nomreq_addr
 	TADR = m_ea; TDAT8 = B;
 	call wm
 
 dd71	# LD   (IX+o),C
 	call eax
-	TADR = PCD-1;
+	TADR = PC-1;
 	5 * call nomreq_addr
 	TADR = m_ea; TDAT8 = C;
 	call wm
 
 dd72	# LD   (IX+o),D
 	call eax
-	TADR = PCD-1;
+	TADR = PC-1;
 	5 * call nomreq_addr
 	TADR = m_ea; TDAT8 = D;
 	call wm
 
 dd73	# LD   (IX+o),E
 	call eax
-	TADR = PCD-1;
+	TADR = PC-1;
 	5 * call nomreq_addr
 	TADR = m_ea; TDAT8 = E;
 	call wm
 
 dd74	# LD   (IX+o),H
 	call eax
-	TADR = PCD-1;
+	TADR = PC-1;
 	5 * call nomreq_addr
 	TADR = m_ea; TDAT8 = H;
 	call wm
 
 dd75	# LD   (IX+o),L
 	call eax
-	TADR = PCD-1;
+	TADR = PC-1;
 	5 * call nomreq_addr
 	TADR = m_ea; TDAT8 = L;
 	call wm
@@ -3434,7 +3434,7 @@ dd76	# DB   DD
 
 dd77	# LD   (IX+o),A
 	call eax
-	TADR = PCD-1;
+	TADR = PC-1;
 	5 * call nomreq_addr
 	TADR = m_ea; TDAT8 = A;
 	call wm
@@ -3463,7 +3463,7 @@ dd7d	# LD   A,LX
 
 dd7e	# LD   A,(IX+o)
 	call eax
-	TADR = PCD-1;
+	TADR = PC-1;
 	5 * call nomreq_addr
 	TADR = m_ea;
 	call rm
@@ -3497,7 +3497,7 @@ dd85	# ADD  A,LX
 
 dd86	# ADD  A,(IX+o)
 	call eax
-	TADR = PCD-1;
+	TADR = PC-1;
 	5 * call nomreq_addr
 	TADR = m_ea;
 	call rm
@@ -3531,7 +3531,7 @@ dd8d	# ADC  A,LX
 
 dd8e	# ADC  A,(IX+o)
 	call eax
-	TADR = PCD-1;
+	TADR = PC-1;
 	5 * call nomreq_addr
 	TADR = m_ea;
 	call rm
@@ -3565,7 +3565,7 @@ dd95	# SUB  LX
 
 dd96	# SUB  (IX+o)
 	call eax
-	TADR = PCD-1;
+	TADR = PC-1;
 	5 * call nomreq_addr
 	TADR = m_ea;
 	call rm
@@ -3599,7 +3599,7 @@ dd9d	# SBC  A,LX
 
 dd9e	# SBC  A,(IX+o)
 	call eax
-	TADR = PCD-1;
+	TADR = PC-1;
 	5 * call nomreq_addr
 	TADR = m_ea;
 	call rm
@@ -3633,7 +3633,7 @@ dda5	# AND  LX
 
 dda6	# AND  (IX+o)
 	call eax
-	TADR = PCD-1;
+	TADR = PC-1;
 	5 * call nomreq_addr
 	TADR = m_ea;
 	call rm
@@ -3667,7 +3667,7 @@ ddad	# XOR  LX
 
 ddae	# XOR  (IX+o)
 	call eax
-	TADR = PCD-1;
+	TADR = PC-1;
 	5 * call nomreq_addr
 	TADR = m_ea;
 	call rm
@@ -3701,7 +3701,7 @@ ddb5	# OR   LX
 
 ddb6	# OR   (IX+o)
 	call eax
-	TADR = PCD-1;
+	TADR = PC-1;
 	5 * call nomreq_addr
 	TADR = m_ea;
 	call rm
@@ -3735,7 +3735,7 @@ ddbd	# CP   LX
 
 ddbe	# CP   (IX+o)
 	call eax
-	TADR = PCD-1;
+	TADR = PC-1;
 	5 * call nomreq_addr
 	TADR = m_ea;
 	call rm
@@ -3792,7 +3792,7 @@ ddca	# DB   DD
 ddcb	# **   DD CB xx
 	call eax
 	call arg
-	TADR = PCD-1;
+	TADR = PC-1;
 	2 * call nomreq_addr
 	call jump_prefixed 0xfe
 
@@ -4221,7 +4221,7 @@ fd33	# DB   FD
 
 fd34	# INC  (IY+o)
 	call eay
-	TADR = PCD-1;
+	TADR = PC-1;
 	5 * call nomreq_addr
 	TADR = m_ea;
 	call rm_reg
@@ -4230,7 +4230,7 @@ fd34	# INC  (IY+o)
 
 fd35	# DEC  (IY+o)
 	call eay
-	TADR = PCD-1;
+	TADR = PC-1;
 	5 * call nomreq_addr
 	TADR = m_ea;
 	call rm_reg
@@ -4240,7 +4240,7 @@ fd35	# DEC  (IY+o)
 fd36	# LD   (IY+o),n
 	call eay
 	call arg
-	TADR = PCD-1;
+	TADR = PC-1;
 	2 * call nomreq_addr
 	TADR = m_ea;
 	call wm
@@ -4306,7 +4306,7 @@ fd45	# LD   B,LY
 
 fd46	# LD   B,(IY+o)
 	call eay
-	TADR = PCD-1;
+	TADR = PC-1;
 	5 * call nomreq_addr
 	TADR = m_ea;
 	call rm
@@ -4340,7 +4340,7 @@ fd4d	# LD   C,LY
 
 fd4e	# LD   C,(IY+o)
 	call eay
-	TADR = PCD-1;
+	TADR = PC-1;
 	5 * call nomreq_addr
 	TADR = m_ea;
 	call rm
@@ -4374,7 +4374,7 @@ fd55	# LD   D,LY
 
 fd56	# LD   D,(IY+o)
 	call eay
-	TADR = PCD-1;
+	TADR = PC-1;
 	5 * call nomreq_addr
 	TADR = m_ea;
 	call rm
@@ -4408,7 +4408,7 @@ fd5d	# LD   E,LY
 
 fd5e	# LD   E,(IY+o)
 	call eay
-	TADR = PCD-1;
+	TADR = PC-1;
 	5 * call nomreq_addr
 	TADR = m_ea;
 	call rm
@@ -4437,7 +4437,7 @@ fd65	# LD   HY,LY
 
 fd66	# LD   H,(IY+o)
 	call eay
-	TADR = PCD-1;
+	TADR = PC-1;
 	5 * call nomreq_addr
 	TADR = m_ea;
 	call rm
@@ -4465,7 +4465,7 @@ fd6d	# LD   LY,LY
 
 fd6e	# LD   L,(IY+o)
 	call eay
-	TADR = PCD-1;
+	TADR = PC-1;
 	5 * call nomreq_addr
 	TADR = m_ea;
 	call rm
@@ -4476,42 +4476,42 @@ fd6f	# LD   LY,A
 
 fd70	# LD   (IY+o),B
 	call eay
-	TADR = PCD-1;
+	TADR = PC-1;
 	5 * call nomreq_addr
 	TADR = m_ea; TDAT8 = B;
 	call wm
 
 fd71	# LD   (IY+o),C
 	call eay
-	TADR = PCD-1;
+	TADR = PC-1;
 	5 * call nomreq_addr
 	TADR = m_ea; TDAT8 = C;
 	call wm
 
 fd72	# LD   (IY+o),D
 	call eay
-	TADR = PCD-1;
+	TADR = PC-1;
 	5 * call nomreq_addr
 	TADR = m_ea; TDAT8 = D;
 	call wm
 
 fd73	# LD   (IY+o),E
 	call eay
-	TADR = PCD-1;
+	TADR = PC-1;
 	5 * call nomreq_addr
 	TADR = m_ea; TDAT8 = E;
 	call wm
 
 fd74	# LD   (IY+o),H
 	call eay
-	TADR = PCD-1;
+	TADR = PC-1;
 	5 * call nomreq_addr
 	TADR = m_ea; TDAT8 = H;
 	call wm
 
 fd75	# LD   (IY+o),L
 	call eay
-	TADR = PCD-1;
+	TADR = PC-1;
 	5 * call nomreq_addr
 	TADR = m_ea; TDAT8 = L;
 	call wm
@@ -4522,7 +4522,7 @@ fd76	# DB   FD
 
 fd77	# LD   (IY+o),A
 	call eay
-	TADR = PCD-1;
+	TADR = PC-1;
 	5 * call nomreq_addr
 	TADR = m_ea; TDAT8 = A;
 	call wm
@@ -4551,7 +4551,7 @@ fd7d	# LD   A,LY
 
 fd7e	# LD   A,(IY+o)
 	call eay
-	TADR = PCD-1;
+	TADR = PC-1;
 	5 * call nomreq_addr
 	TADR = m_ea;
 	call rm
@@ -4585,7 +4585,7 @@ fd85	# ADD  A,LY
 
 fd86	# ADD  A,(IY+o)
 	call eay
-	TADR = PCD-1;
+	TADR = PC-1;
 	5 * call nomreq_addr
 	TADR = m_ea;
 	call rm
@@ -4619,7 +4619,7 @@ fd8d	# ADC  A,LY
 
 fd8e	# ADC  A,(IY+o)
 	call eay
-	TADR = PCD-1;
+	TADR = PC-1;
 	5 * call nomreq_addr
 	TADR = m_ea;
 	call rm
@@ -4653,7 +4653,7 @@ fd95	# SUB  LY
 
 fd96	# SUB  (IY+o)
 	call eay
-	TADR = PCD-1;
+	TADR = PC-1;
 	5 * call nomreq_addr
 	TADR = m_ea;
 	call rm
@@ -4687,7 +4687,7 @@ fd9d	# SBC  A,LY
 
 fd9e	# SBC  A,(IY+o)
 	call eay
-	TADR = PCD-1;
+	TADR = PC-1;
 	5 * call nomreq_addr
 	TADR = m_ea;
 	call rm
@@ -4721,7 +4721,7 @@ fda5	# AND  LY
 
 fda6	# AND  (IY+o)
 	call eay
-	TADR = PCD-1;
+	TADR = PC-1;
 	5 * call nomreq_addr
 	TADR = m_ea;
 	call rm
@@ -4755,7 +4755,7 @@ fdad	# XOR  LY
 
 fdae	# XOR  (IY+o)
 	call eay
-	TADR = PCD-1;
+	TADR = PC-1;
 	5 * call nomreq_addr
 	TADR = m_ea;
 	call rm
@@ -4789,7 +4789,7 @@ fdb5	# OR   LY
 
 fdb6	# OR   (IY+o)
 	call eay
-	TADR = PCD-1;
+	TADR = PC-1;
 	5 * call nomreq_addr
 	TADR = m_ea;
 	call rm
@@ -4823,7 +4823,7 @@ fdbd	# CP   LY
 
 fdbe	# CP   (IY+o)
 	call eay
-	TADR = PCD-1;
+	TADR = PC-1;
 	5 * call nomreq_addr
 	TADR = m_ea;
 	call rm
@@ -4880,7 +4880,7 @@ fdca	# DB   FD
 fdcb	# **   FD CB xx
 	call eay
 	call arg
-	TADR = PCD-1;
+	TADR = PC-1;
 	2 * call nomreq_addr
 	call jump_prefixed 0xfe
 
@@ -6634,7 +6634,7 @@ edff	# DB   ED
 
 00c9	# RET
 	call pop
-	PC = TDAT; WZ = PCD;
+	PC = TDAT; WZ = PC;
 
 00ca	# JP   Z,a
 	TDAT8 = F & ZF;
@@ -8794,7 +8794,7 @@ z80n:ed95	# setae
 z80n:ed98	# jp (c)
 	TADR = BC;
 	call in
-	PCD = (PCD & 0xc000) + (TDAT8 << 6);
+	PC = (PC & 0xc000) + (TDAT8 << 6);
 
 z80n:eda4	# ldix
 	call ldix

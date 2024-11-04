@@ -59,8 +59,8 @@ public:
 	void init_namcostr();
 
 protected:
-	virtual void machine_start() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 	void grdians_lockout_w(uint8_t data);
 
@@ -95,19 +95,19 @@ protected:
 
 	void sound_bank_w(offs_t offset, uint8_t data);
 
-	void ablastb_map(address_map &map);
-	void grdians_map(address_map &map);
-	void gundamex_map(address_map &map);
-	void myangel2_map(address_map &map);
-	void myangel_map(address_map &map);
-	void namcostr_map(address_map &map);
-	void penbros_base_map(address_map &map);
-	void penbros_map(address_map &map);
-	void pzlbowl_map(address_map &map);
-	void reelquak_map(address_map &map);
-	void samshoot_map(address_map &map);
-	void telpacfl_map(address_map &map);
-	void x1_map(address_map &map);
+	void ablastb_map(address_map &map) ATTR_COLD;
+	void grdians_map(address_map &map) ATTR_COLD;
+	void gundamex_map(address_map &map) ATTR_COLD;
+	void myangel2_map(address_map &map) ATTR_COLD;
+	void myangel_map(address_map &map) ATTR_COLD;
+	void namcostr_map(address_map &map) ATTR_COLD;
+	void penbros_base_map(address_map &map) ATTR_COLD;
+	void penbros_map(address_map &map) ATTR_COLD;
+	void pzlbowl_map(address_map &map) ATTR_COLD;
+	void reelquak_map(address_map &map) ATTR_COLD;
+	void samshoot_map(address_map &map) ATTR_COLD;
+	void telpacfl_map(address_map &map) ATTR_COLD;
+	void x1_map(address_map &map) ATTR_COLD;
 
 	void seta2(machine_config &config);
 	void seta2_32m(machine_config &config);
@@ -158,12 +158,12 @@ public:
 	void mj4simai(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	template <unsigned Which> uint16_t mj4simai_key_r();
 
-	void mj4simai_map(address_map &map);
+	void mj4simai_map(address_map &map) ATTR_COLD;
 
 	required_ioport_array<5> m_keys[2];
 
@@ -190,8 +190,8 @@ public:
 	void init_funcube3();
 
 private:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	uint8_t nvram_r(offs_t offset) { return m_nvram[offset]; }
 	void nvram_w(offs_t offset, uint8_t data) { m_nvram[offset] = data; }
@@ -205,9 +205,9 @@ private:
 
 	TIMER_DEVICE_CALLBACK_MEMBER(funcube_interrupt);
 
-	void funcube2_map(address_map &map);
-	void funcube_map(address_map &map);
-	void funcube_sub_map(address_map &map);
+	void funcube2_map(address_map &map) ATTR_COLD;
+	void funcube_map(address_map &map) ATTR_COLD;
+	void funcube_sub_map(address_map &map) ATTR_COLD;
 
 	void funcube_debug_outputs();
 
@@ -245,7 +245,7 @@ private:
 
 	uint32_t staraudi_screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void staraudi_map(address_map &map);
+	void staraudi_map(address_map &map) ATTR_COLD;
 
 	virtual void driver_start() override;
 

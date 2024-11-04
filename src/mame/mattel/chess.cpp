@@ -54,8 +54,8 @@ public:
 	void mchess(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	// devices/pointers
@@ -77,7 +77,6 @@ private:
 
 void mchess_state::machine_start()
 {
-	// resolve handlers
 	m_out_x.resolve();
 
 	// register for savestates

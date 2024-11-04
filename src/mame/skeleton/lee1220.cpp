@@ -34,7 +34,7 @@ public:
 	void lee1220(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	MC6845_UPDATE_ROW(update_row);
@@ -43,8 +43,8 @@ private:
 	void sdlc_w(offs_t offset, u8 data);
 	u8 c0_r();
 
-	void mem_map(address_map &map);
-	void io_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
+	void io_map(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	//required_device<wd1933_device> m_sdlc;

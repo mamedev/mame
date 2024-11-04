@@ -192,14 +192,14 @@ protected:
 	void sega_9h0_0008(machine_config &config);
 
 	virtual void device_post_load() override;
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 	virtual void install_game_rom();
 	virtual void update_sensors(offs_t offset);
 
-	void beena_arm7_map(address_map &map);
+	void beena_arm7_map(address_map &map) ATTR_COLD;
 
 	void request_irq();
 	void request_fiq();
@@ -1679,15 +1679,15 @@ int32_t sega_9h0_0008_state::rescale_alpha_step(uint8_t step)
 
 void sega_9h0_0008_state::request_irq()
 {
-	m_maincpu->set_input_line(ARM7_IRQ_LINE, ASSERT_LINE);
-	m_maincpu->set_input_line(ARM7_IRQ_LINE, CLEAR_LINE);
+	m_maincpu->set_input_line(arm7_cpu_device::ARM7_IRQ_LINE, ASSERT_LINE);
+	m_maincpu->set_input_line(arm7_cpu_device::ARM7_IRQ_LINE, CLEAR_LINE);
 }
 
 void sega_9h0_0008_state::request_fiq()
 {
 	if (m_requested_fiq) {
-		m_maincpu->set_input_line(ARM7_FIRQ_LINE, ASSERT_LINE);
-		m_maincpu->set_input_line(ARM7_FIRQ_LINE, CLEAR_LINE);
+		m_maincpu->set_input_line(arm7_cpu_device::ARM7_FIRQ_LINE, ASSERT_LINE);
+		m_maincpu->set_input_line(arm7_cpu_device::ARM7_FIRQ_LINE, CLEAR_LINE);
 
 		m_requested_fiq = false;
 	}
@@ -2009,8 +2009,8 @@ private:
 		WRITE_DATA,
 	};
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	virtual void install_game_rom() override;
 
@@ -2261,7 +2261,7 @@ static INPUT_PORTS_START( sega_beena )
 	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_X ) PORT_CROSSHAIR(X, 1.0, 0.0, 0) PORT_SENSITIVITY(30) PORT_KEYDELTA(10) PORT_MINMAX(0, 255) PORT_PLAYER(1) PORT_NAME("Pen X")
 
 	PORT_START("PENY")
-	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_Y ) PORT_CROSSHAIR(Y, 1.0, 0.0, 0) PORT_SENSITIVITY(30) PORT_KEYDELTA(10) PORT_MINMAX(0, 255) PORT_PLAYER(1) PORT_NAME("Pen Y") PORT_CROSSHAIR_MAPPER_MEMBER(DEVICE_SELF, sega_beena_state, pen_y_mapper)
+	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_Y ) PORT_CROSSHAIR(Y, 1.0, 0.0, 0) PORT_SENSITIVITY(30) PORT_KEYDELTA(10) PORT_MINMAX(0, 255) PORT_PLAYER(1) PORT_NAME("Pen Y") PORT_CROSSHAIR_MAPPER_MEMBER(FUNC(sega_beena_state::pen_y_mapper))
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( tvochken )
@@ -2273,7 +2273,7 @@ static INPUT_PORTS_START( tvochken )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1) PORT_NAME("C")
 
 	PORT_START("CARDS")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_PLAYER(1) PORT_NAME("Scan Card") PORT_WRITE_LINE_MEMBER(tvochken_state, scan_card)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_PLAYER(1) PORT_NAME("Scan Card") PORT_WRITE_LINE_MEMBER(FUNC(tvochken_state::scan_card))
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( carbeena )

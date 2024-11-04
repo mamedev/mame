@@ -4,7 +4,7 @@
 /*
   Skeleton driver for Alcatel Web Touch One.
   More information and technical manuals: https://www.minitel-alcatel.fr/gamme_webphone.html
-  The phone asks for an adminstrative password for performing a factory reset.
+  The phone asks for an administrative password for performing a factory reset.
 
   Hardware info for model 2840:
    -CPU: Motorola PowerPC 823
@@ -24,7 +24,7 @@
    |   |            |  |74HC4053||74HC4053|            |__|            |
    |   |____________|                    ___                   _______ |
    |  _______                    34119->|  |                  |MC3403| |
-   | 74AHCT574	                        |__|                           |
+   | 74AHCT574                          |__|                           |
    |  ____________   ____________                                      |
    | |KM416S4030CT| |KM416S4030CT|                                     |
    | |____________| |____________|                                     |
@@ -35,7 +35,7 @@
    |                    Xtal       |            |          |74HCT541 | |
    |                 32.768 MHz    |            |          |_________| |
    |                               |____________|                      |
-   |                                                                   | 
+   |                                                                   |
    |                                          _______                  |
    | 3BN62121AAAF KAZZA 01                   |ST 324|                  |
    |___________________________________________________________________|
@@ -97,8 +97,8 @@ public:
 	void webtouchone(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<screen_device> m_screen;

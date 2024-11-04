@@ -57,12 +57,12 @@ public:
 	void bbl380(machine_config &config);
 
 private:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	void bbl380_map(address_map &map);
+	void bbl380_map(address_map &map) ATTR_COLD;
 
 	required_device<st2205u_base_device> m_maincpu;
 	required_device<screen_device> m_screen;
@@ -260,8 +260,8 @@ static INPUT_PORTS_START(bbl380)
 	PORT_START("IN1")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_BUTTON1) PORT_NAME("A")
 	PORT_BIT(0x06, IP_ACTIVE_LOW, IPT_UNUSED)
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_READ_LINE_DEVICE_MEMBER("menucontrol", bl_handhelds_menucontrol_device, data_r)
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_READ_LINE_DEVICE_MEMBER("menucontrol", bl_handhelds_menucontrol_device, status_r)
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_READ_LINE_DEVICE_MEMBER("menucontrol", FUNC(bl_handhelds_menucontrol_device::data_r))
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_READ_LINE_DEVICE_MEMBER("menucontrol", FUNC(bl_handhelds_menucontrol_device::status_r))
 	PORT_BIT(0xe0, IP_ACTIVE_LOW, IPT_UNUSED)
 INPUT_PORTS_END
 
@@ -367,26 +367,49 @@ ROM_START(supreme)
 	ROM_LOAD("25q32.bin", 0x000000, 0x400000, CRC(93072a3d) SHA1(9f8770839032922e64d5ddd8864441357623c45f))
 ROM_END
 
+ROM_START(pg118)
+	ROM_REGION(0x800000, "maincpu", ROMREGION_ERASEFF)
+	ROM_LOAD("st2x_internal.bin", 0x002000, 0x002000, BAD_DUMP CRC(f4dc1fc2) SHA1(bbc11539c48eb612ebae50da45e03b6fde440941)) // internal OTPROM BIOS, dumped from dgun2953 PCB, 6000-7fff range
+
+	ROM_REGION(0x800000, "spi", ROMREGION_ERASEFF)
+	ROM_LOAD("25vq32.bin", 0x000000, 0x400000, CRC(e99f1621) SHA1(f907c36a1a884d892331b7de294a8fd58f7bf9d5) )
+ROM_END
+
+ROM_START(toumapet)
+	ROM_REGION(0x800000, "maincpu", ROMREGION_ERASEFF)
+	ROM_LOAD("st2x_internal.bin", 0x002000, 0x002000, BAD_DUMP CRC(f4dc1fc2) SHA1(bbc11539c48eb612ebae50da45e03b6fde440941)) // internal OTPROM BIOS, dumped from dgun2953 PCB, 6000-7fff range
+
+	ROM_REGION(0x800000, "spi", ROMREGION_ERASEFF)
+	ROM_LOAD("p25d32sh.bin", 0x000000, 0x400000, CRC(25498f00) SHA1(c5c410e29f540d7f1fd4bbb333467f8a3eaccc15) )
+ROM_END
+
+
 } // anonymous namespace
 
 
 // older releases (primarily for Asian market?)
 
-CONS( 201?, bbl380,        0,       0,      bbl380,   bbl380, bbl380_state, empty_init, "BaoBaoLong", "BBL380 - 180 in 1", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+CONS( 201?, bbl380,        0,       0,      bbl380,   bbl380, bbl380_state, empty_init, "BaoBaoLong", "BBL380 - 180 in 1", MACHINE_NOT_WORKING )
 
-CONS( 201?, mc_cb203,      0,       0,      bbl380,   bbl380, bbl380_state, empty_init, "Coolboy", "Coolboy RS-17 - 203 in 1", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+CONS( 201?, mc_cb203,      0,       0,      bbl380,   bbl380, bbl380_state, empty_init, "Coolboy", "Coolboy RS-17 - 203 in 1", MACHINE_NOT_WORKING )
 
 // newer releases (more heavily censored, for export markets?) internal ROM was changed for these
 
-CONS( 201?, dphh8630,      0,       0,      bbl380,   bbl380, bbl380_state, empty_init, "<unknown>", "Digital Pocket Hand Held System 230-in-1 - Model 8630 / Model 8633", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // sometimes sold as PCP.  Model 8630/8633 are same ROM, different case
+CONS( 201?, dphh8630,      0,       0,      bbl380,   bbl380, bbl380_state, empty_init, "<unknown>", "Digital Pocket Hand Held System 230-in-1 - Model 8630 / Model 8633", MACHINE_IMPERFECT_SOUND ) // sometimes sold as PCP.  Model 8630/8633 are same ROM, different case
 
-CONS( 201?, rhhc152,       0,       0,      bbl380,   bbl380, bbl380_state, empty_init, "Orb", "Retro Handheld Console 152-in-1", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // looks like a mini GameBoy - 'Over 150 games' on box
+CONS( 201?, rhhc152,       0,       0,      bbl380,   bbl380, bbl380_state, empty_init, "Orb", "Retro Handheld Console 152-in-1", MACHINE_IMPERFECT_SOUND ) // looks like a mini GameBoy - 'Over 150 games' on box
 
-CONS( 201?, ragc153,       0,       0,      bbl380,   bbl380, bbl380_state, empty_init, "Orb", "Retro Arcade Game Controller 153-in-1", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // looks like a Game & Watch
+CONS( 201?, ragc153,       0,       0,      bbl380,   bbl380, bbl380_state, empty_init, "Orb", "Retro Arcade Game Controller 153-in-1", MACHINE_IMPERFECT_SOUND ) // looks like a Game & Watch
 
-CONS( 201?, dgun2953,      0,       0,      bbl380,   bbl380, bbl380_state, empty_init, "dreamGEAR", "My Arcade Gamer Mini 160-in-1 (DGUN-2953)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+CONS( 201?, dgun2953,      0,       0,      bbl380,   bbl380, bbl380_state, empty_init, "dreamGEAR", "My Arcade Gamer Mini 160-in-1 (DGUN-2953)", MACHINE_IMPERFECT_SOUND )
 
-CONS( 201?, arcade10,      0,       0,      bbl380,   bbl380, bbl380_state, empty_init, "Fizz Creations", "Mini Arcade Console (Arcade 10-in-1)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+CONS( 201?, arcade10,      0,       0,      bbl380,   bbl380, bbl380_state, empty_init, "Fizz Creations", "Mini Arcade Console (Arcade 10-in-1)", MACHINE_IMPERFECT_SOUND )
 
-CONS( 201?, supreme,       0,       0,      bbl380,   bbl380, bbl380_state, empty_init, "Fizz Creations", "Arcade Classics Mini Handheld Arcade (Supreme 150)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+CONS( 201?, supreme,       0,       0,      bbl380,   bbl380, bbl380_state, empty_init, "Fizz Creations", "Arcade Classics Mini Handheld Arcade (Supreme 150)", MACHINE_IMPERFECT_SOUND )
+
+// these are for the Japanese market, the ROM is the same between the Pocket Game and Game Computer but the form factor is different.
+// they have the 0xE4 XOR on the SPI data like many of the above units, but don't currently boot - need to verify if the internal ROM part should be the same or not
+CONS( 2019, pg118,         0,       0,      bbl380,   bbl380, bbl380_state, empty_init, "Pocket Game / Game Computer", "Pocket Game 118-in-1 / Game Computer 118-in-1", MACHINE_NOT_WORKING )
+// also has the 0xE4 XOR, also doesn't currently boot
+CONS( 2021, toumapet,      0,       0,      bbl380,   bbl380, bbl380_state, empty_init, "Shenzhen Shiji New Technology", "Tou ma Pet", MACHINE_NOT_WORKING )
 

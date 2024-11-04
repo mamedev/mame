@@ -152,5 +152,5 @@ void sm5a_device::execute_one()
 			}
 			break; // 0xfc
 
-	} // big switch
+	} // 0xf0
 }

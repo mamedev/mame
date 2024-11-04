@@ -85,8 +85,8 @@ protected:
 	void sprite_ram_w(offs_t offset, uint8_t data);
 	void sprite_lookup_w(offs_t offset, uint8_t data);
 
-	virtual void machine_start() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 	uint32_t screen_update_20pacgal(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void vblank_irq(int state);
 	void starpal_init(palette_device &palette) const;
@@ -99,8 +99,8 @@ protected:
 						uint8_t code, uint8_t color, int flip_y, int flip_x);
 	void common_save_state();
 
-	void _20pacgal_io_map(address_map &map);
-	void _20pacgal_map(address_map &map);
+	void _20pacgal_io_map(address_map &map) ATTR_COLD;
+	void _20pacgal_map(address_map &map) ATTR_COLD;
 };
 
 
@@ -116,10 +116,10 @@ public:
 private:
 	uint8_t _25pacman_io_87_r();
 
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
-	void _25pacman_io_map(address_map &map);
-	void _25pacman_map(address_map &map);
+	void _25pacman_io_map(address_map &map) ATTR_COLD;
+	void _25pacman_map(address_map &map) ATTR_COLD;
 };
 
 #endif // MAME_NAMCO_20PACGAL_H

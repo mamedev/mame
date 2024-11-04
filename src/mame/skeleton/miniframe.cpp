@@ -50,8 +50,8 @@ private:
 
 	[[maybe_unused]] uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	uint16_t ram_mmu_r(offs_t offset);
 	void ram_mmu_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
@@ -63,8 +63,8 @@ private:
 
 	required_shared_ptr<uint16_t> m_mapram;
 
-	void miniframe_mem(address_map &map);
-	void ramrombank_map(address_map &map);
+	void miniframe_mem(address_map &map) ATTR_COLD;
+	void ramrombank_map(address_map &map) ATTR_COLD;
 
 	uint16_t *m_ramptr = nullptr;
 	uint32_t m_ramsize = 0;

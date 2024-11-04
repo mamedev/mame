@@ -109,9 +109,9 @@ private:
 	uint8_t mermaid_collision_r();
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 	void common_palette(palette_device &palette) const;
 	void mermaid_palette(palette_device &palette) const;
 	void rougien_palette(palette_device &palette) const;
@@ -121,7 +121,7 @@ private:
 	uint8_t collision_check( rectangle& rect );
 	void collision_update();
 	void rougien_adpcm_int(int state);
-	void mermaid_map(address_map &map);
+	void mermaid_map(address_map &map) ATTR_COLD;
 };
 
 #endif // MAME_SANRITSU_MERMAID_H

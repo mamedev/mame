@@ -44,6 +44,7 @@ protected:
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
+	virtual void device_post_load() override ATTR_COLD;
 
 	memory_share_creator<u8> m_sprite_pattern_ram;
 	memory_share_creator<u8> m_sprite_attr_ram;

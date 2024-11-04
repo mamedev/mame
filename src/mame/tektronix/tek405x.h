@@ -111,10 +111,10 @@ private:
 	void write_acia_clock(int state);
 
 	TIMER_DEVICE_CALLBACK_MEMBER(keyboard_tick);
-	void tek4051_mem(address_map &map);
+	void tek4051_mem(address_map &map) ATTR_COLD;
 
-	virtual void machine_start() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<pia6821_device> m_gpib_pia;
@@ -164,10 +164,10 @@ public:
 	void tek4052(machine_config &config);
 
 private:
-	void tek4052_mem(address_map &map);
+	void tek4052_mem(address_map &map) ATTR_COLD;
 
-	virtual void machine_start() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<ram_device> m_ram;

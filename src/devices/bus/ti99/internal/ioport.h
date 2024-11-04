@@ -86,7 +86,7 @@ public:
 	auto ready_cb() { return m_console_ready.bind(); }
 
 protected:
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 	virtual void device_config_complete() override;
 
 	// Methods called back from the external device

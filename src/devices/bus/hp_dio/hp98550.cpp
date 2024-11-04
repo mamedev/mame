@@ -47,11 +47,11 @@ protected:
 
 	dio32_98550_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 
 	virtual space_config_vector memory_space_config() const override;
 
@@ -59,7 +59,7 @@ protected:
 	void int_w(offs_t offset, uint8_t data);
 
 	const address_space_config m_space_config;
-	void map(address_map &map);
+	void map(address_map &map) ATTR_COLD;
 	void update_int();
 
 	static constexpr int m_fb_width = 2048;

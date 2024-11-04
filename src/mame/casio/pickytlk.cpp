@@ -65,7 +65,7 @@ public:
 	void pickytlk(machine_config &config);
 
 	DECLARE_CROSSHAIR_MAPPER_MEMBER(pen_y_mapper);
-	DECLARE_CUSTOM_INPUT_MEMBER(pen_y_rescale_r);
+	ioport_value pen_y_rescale_r();
 	ioport_value pen_target_r();
 
 private:
@@ -82,8 +82,8 @@ private:
 		PEN_HOLD = 2,
 	};
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	void kol_w(u8 data);
 	void koh_w(u8 data);
@@ -103,7 +103,7 @@ private:
 	void pickytlk_palette(palette_device &palette) const;
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void pickytlk_mem(address_map &map);
+	void pickytlk_mem(address_map &map) ATTR_COLD;
 
 	static constexpr float rescale(float x, float min_x, float max_x, float a, float b)
 	{
@@ -155,7 +155,7 @@ CROSSHAIR_MAPPER_MEMBER(pickytlk_state::pen_y_mapper)
 	return (float) pen_y_rescale_r() / 0xff;
 }
 
-CUSTOM_INPUT_MEMBER(pickytlk_state::pen_y_rescale_r)
+ioport_value pickytlk_state::pen_y_rescale_r()
 {
 	/*
 	    There are two distinct areas that can be interacted with the pen:
@@ -388,16 +388,16 @@ static INPUT_PORTS_START(pickytlk)
 	// TODO: On/Off/Reset
 	PORT_START("BUTTONS")
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_PLAYER(1) PORT_NAME("Pen Down")
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(pickytlk_state, pen_target_r)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(pickytlk_state::pen_target_r))
 
 	PORT_START("PEN_X")
 	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_X ) PORT_CROSSHAIR(X, 1.0, 0.0, 0) PORT_SENSITIVITY(30) PORT_KEYDELTA(10) PORT_MINMAX(0, 255) PORT_PLAYER(1) PORT_NAME("Pen X")
 
 	PORT_START("PEN_Y")
-	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_Y ) PORT_CROSSHAIR(Y, 1.0, 0.0, 0) PORT_SENSITIVITY(30) PORT_KEYDELTA(10) PORT_MINMAX(0, 255) PORT_PLAYER(1) PORT_NAME("Pen Y") PORT_CROSSHAIR_MAPPER_MEMBER(DEVICE_SELF, pickytlk_state, pen_y_mapper)
+	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_Y ) PORT_CROSSHAIR(Y, 1.0, 0.0, 0) PORT_SENSITIVITY(30) PORT_KEYDELTA(10) PORT_MINMAX(0, 255) PORT_PLAYER(1) PORT_NAME("Pen Y") PORT_CROSSHAIR_MAPPER_MEMBER(FUNC(pickytlk_state::pen_y_mapper))
 
 	PORT_START("PEN_Y_RESCALE")
-	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(pickytlk_state, pen_y_rescale_r)
+	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(FUNC(pickytlk_state::pen_y_rescale_r))
 INPUT_PORTS_END
 
 

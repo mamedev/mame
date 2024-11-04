@@ -48,14 +48,14 @@ private:
 	void port01_w(u8 data);
 	void clock_w(int state);
 
-	void main_map(address_map &map);
-	void sub_io(address_map &map);
-	void sub_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
+	void sub_io(address_map &map) ATTR_COLD;
+	void sub_map(address_map &map) ATTR_COLD;
 
 	u8 m_port01 = 0;
 	bool m_clock_en = false;
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 	required_device<cpu_device> m_maincpu;
 };
 

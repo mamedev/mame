@@ -54,9 +54,9 @@ public:
 	void cm1800(machine_config &config);
 
 private:
-	void io_map(address_map &map);
-	void mem_map(address_map &map);
-	virtual void machine_reset() override;
+	void io_map(address_map &map) ATTR_COLD;
+	void mem_map(address_map &map) ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 	u8 uart_status_r();
 	required_device<cpu_device> m_maincpu;
 	required_device<ay31015_device> m_uart;

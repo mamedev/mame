@@ -75,8 +75,8 @@ public:
 	void cmmb(machine_config &config);
 
 protected:
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -92,8 +92,8 @@ private:
 	uint8_t flash_r(offs_t offset);
 	void flash_w(offs_t offset, uint8_t data);
 
-	void cmmb_map(address_map &map);
-	void bnk2000_map(address_map &map);
+	void cmmb_map(address_map &map) ATTR_COLD;
+	void bnk2000_map(address_map &map) ATTR_COLD;
 
 	void vram_w(offs_t offset, uint8_t data);
 	void charram_w(offs_t offset, uint8_t data);

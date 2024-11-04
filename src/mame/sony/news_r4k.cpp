@@ -304,16 +304,16 @@ protected:
 	};
 
 	// driver_device overrides
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	void machine_common(machine_config &config);
 
 	// address maps
-	void cpu_map(address_map &map);
-	void sonic3_map(address_map &map);
-	void cpu_map_main_memory(address_map &map);
-	void cpu_map_debug(address_map &map);
+	void cpu_map(address_map &map) ATTR_COLD;
+	void sonic3_map(address_map &map) ATTR_COLD;
+	void cpu_map_main_memory(address_map &map) ATTR_COLD;
+	void cpu_map_debug(address_map &map) ATTR_COLD;
 
 	// Interrupts
 	// See news5000 section of https://github.com/NetBSD/src/blob/trunk/sys/arch/newsmips/include/adrsmap.h

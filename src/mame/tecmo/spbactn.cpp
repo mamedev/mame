@@ -183,7 +183,7 @@ public:
 	void spbactn(machine_config &config);
 
 protected:
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
@@ -208,7 +208,7 @@ protected:
 
 	int draw_video(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, bool alt_sprites);
 
-	void sound_map(address_map &map);
+	void sound_map(address_map &map) ATTR_COLD;
 
 private:
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
@@ -220,7 +220,7 @@ private:
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	void main_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
 };
 
 class spbactnp_state : public spbactn_state
@@ -239,7 +239,7 @@ public:
 	void spbactnp(machine_config &config);
 
 protected:
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_extracpu;
@@ -266,8 +266,8 @@ private:
 
 	uint8_t extra_latch_r(offs_t offset);
 
-	void extra_map(address_map &map);
-	void main_map(address_map &map);
+	void extra_map(address_map &map) ATTR_COLD;
+	void main_map(address_map &map) ATTR_COLD;
 };
 
 

@@ -19,7 +19,7 @@ public:
 	uint16_t regs1_r(offs_t offset, uint16_t mem_mask = ~0);
 	void regs1_go_w(uint16_t data);
 
-	void grap2_map(address_map &map);
+	void grap2_map(address_map &map) ATTR_COLD;
 
 	void do_rle(uint32_t address);
 	void set_color_555(pen_t color, int rshift, int gshift, int bshift, uint16_t data);
@@ -68,8 +68,8 @@ public:
 	std::unique_ptr<uint16_t[]> m_framebuffer_unk2;
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// device_palette_interface overrides
 	virtual uint32_t palette_entries() const noexcept override { return PALETTE_SIZE; }

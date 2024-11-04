@@ -65,6 +65,15 @@ TILE_GET_INFO_MEMBER(nmk16_state::bjtwin_get_bg_tile_info)
 			0);
 }
 
+TILE_GET_INFO_MEMBER(nmk16_state::powerins_get_bg_tile_info)
+{
+	const u16 code = m_bgvideoram[0][tile_index];
+	tileinfo.set(1,
+			(code & 0x07ff) | (m_bgbank << 11),
+			((code & 0xf000) >> 12) | ((code & 0x0800) >> 7),
+			0);
+}
+
 
 /***************************************************************************
 
@@ -81,7 +90,6 @@ void nmk16_state::video_init()
 	m_bgbank = 0;
 	m_mustang_bg_xscroll = 0;
 
-	m_dma_timer = timer_alloc(FUNC(nmk16_state::dma_callback), this);
 	save_pointer(NAME(m_spriteram_old), 0x1000/2);
 	save_pointer(NAME(m_spriteram_old2), 0x1000/2);
 	save_item(NAME(m_bgbank));
@@ -162,6 +170,36 @@ VIDEO_START_MEMBER(nmk16_state, bjtwin)
 	video_init();
 	// 384x224 screen, leftmost 64 pixels have to be retrieved from the other side of the tilemap (!)
 	m_bg_tilemap[0]->set_scrolldx(28+64, 28+64);
+}
+
+/***************************************************************************
+                          [ Tiles Format VRAM 0]
+Offset:
+
+0.w     fedc ---- ---- ----     Color Low  Bits
+        ---- b--- ---- ----     Color High Bit
+        ---- -a98 7654 3210     Code (Banked)
+
+                          [ Tiles Format VRAM 1]
+Offset:
+
+0.w     fedc ---- ---- ----     Color
+        ---- ba98 7654 3210     Code
+
+***************************************************************************/
+
+VIDEO_START_MEMBER(nmk16_state, powerins)
+{
+	m_bg_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(nmk16_state::powerins_get_bg_tile_info)), tilemap_mapper_delegate(*this, FUNC(nmk16_state::tilemap_scan_pages)), 16, 16, 256, 32);
+	m_bg_tilemap[1] = nullptr;
+	m_tx_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(nmk16_state::common_get_tx_tile_info)), TILEMAP_SCAN_COLS, 8, 8, 64, 32);
+
+	m_tx_tilemap->set_transparent_pen(15);
+
+	video_init();
+	// 320x224 screen, leftmost 32 pixels have to be retrieved from the other side of the tilemap (!)
+	m_bg_tilemap[0]->set_scrolldx(60+32, 60+32);
+	m_tx_tilemap->set_scrolldx(60+32, 60+32);
 }
 
 void nmk16_state::mustang_scroll_w(u16 data)
@@ -295,12 +333,24 @@ void nmk16_state::get_colour_5bit(u32 &colour, u32 &pri_mask)
 	pri_mask |= GFX_PMASK_2; // under foreground
 }
 
+void nmk16_state::get_colour_6bit(u32 &colour, u32 &pri_mask)
+{
+	colour &= 0x3f;
+	pri_mask |= GFX_PMASK_2; // under foreground
+}
+
 // manybloc uses extra flip bits on the sprites, but these break other games
 
 void nmk16_state::get_sprite_flip(u16 attr, int &flipx, int &flipy, int &code)
 {
 	flipy = (attr & 0x200) >> 9;
 	flipx = (attr & 0x100) >> 8;
+}
+
+void nmk16_state::get_flip_extcode_powerins(u16 attr, int &flipx, int &flipy, int &code)
+{
+	flipx = (attr & 0x1000) >> 12;
+	code = (code & 0x7fff) | ((attr & 0x100) << 7);
 }
 
 void nmk16_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, u16 *src)
@@ -401,6 +451,17 @@ u32 nmk16_state::screen_update_bjtwin(screen_device &screen, bitmap_ind16 &bitma
 	bg_update(screen, bitmap, cliprect, 0);
 	draw_sprites(screen, bitmap, cliprect, m_spriteram_old.get()); // only a single buffer, verified
 	return 0;
+}
+
+void nmk16_state::screen_vblank_powerins_bootleg(int state)
+{
+	if (state)
+	{
+		m_maincpu->set_input_line(4, HOLD_LINE);
+		// bootlegs don't have DMA?
+		memcpy(m_spriteram_old2.get(),m_spriteram_old.get(), 0x1000);
+		memcpy(m_spriteram_old.get(), m_mainram + m_sprdma_base / 2, 0x1000);
+	}
 }
 
 

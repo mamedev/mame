@@ -93,8 +93,8 @@ private:
 	void sound_bank_w(uint8_t data);
 	uint8_t k052109_051960_r(offs_t offset);
 	void k052109_051960_w(offs_t offset, uint8_t data);
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 	uint32_t screen_update_spy(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void pmc_run();
 	void volume_callback0(uint8_t data);
@@ -102,8 +102,8 @@ private:
 	K052109_CB_MEMBER(tile_callback);
 	K051960_CB_MEMBER(sprite_callback);
 
-	void spy_map(address_map &map);
-	void spy_sound_map(address_map &map);
+	void spy_map(address_map &map) ATTR_COLD;
+	void spy_sound_map(address_map &map) ATTR_COLD;
 };
 
 

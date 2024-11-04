@@ -35,9 +35,9 @@ protected:
 		this->compliance = compliance;
 	}
 
-	virtual void device_start() override;
-	virtual void device_reset() override;
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 	virtual void scsi_command() override;
 	virtual uint8_t scsi_get_data(int id, int pos) override;
@@ -129,7 +129,7 @@ class nscsi_cdrom_apple_device : public nscsi_cdrom_device
 {
 public:
 	nscsi_cdrom_apple_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 protected:
 	virtual void scsi_command() override;

@@ -113,9 +113,9 @@ public:
 	void fuusen_init();
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	void konmedal_palette(palette_device &palette) const;
@@ -152,9 +152,9 @@ private:
 	void shuri_irq_w(uint8_t data);
 	void mario_scrollhack_w(uint8_t data);
 
-	void ddboy_main(address_map &map);
-	void medal_main(address_map &map);
-	void shuriboy_main(address_map &map);
+	void ddboy_main(address_map &map) ATTR_COLD;
+	void medal_main(address_map &map) ATTR_COLD;
+	void shuriboy_main(address_map &map) ATTR_COLD;
 
 	void machine_start_common();
 
@@ -538,11 +538,11 @@ static INPUT_PORTS_START( konmedal )
 	PORT_SERVICE_NO_TOGGLE( 0x02, IP_ACTIVE_LOW )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN1 ) // 10Y
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN2 ) // 100Y for medals exchange, not game coin in to play
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("hopper", hopper_device, line_r)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("hopper", FUNC(hopper_device::line_r))
 	PORT_BIT( 0xe0, IP_ACTIVE_LOW, IPT_UNKNOWN )    // unused
 
 	PORT_START("OUT")
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("hopper", hopper_device, motor_w)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("hopper", FUNC(hopper_device::motor_w))
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( ddboy )
@@ -560,11 +560,11 @@ static INPUT_PORTS_START( shuriboy )
 	PORT_INCLUDE( konmedal )
 
 	PORT_MODIFY("IN1")
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("upd", upd7759_device, busy_r)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("upd", FUNC(upd7759_device::busy_r))
 
 	PORT_MODIFY("OUT")
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("upd", upd7759_device, reset_w) // this should be called 1st, but it's not
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("upd", upd7759_device, start_w)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("upd", FUNC(upd7759_device::reset_w)) // this should be called 1st, but it's not
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("upd", FUNC(upd7759_device::start_w))
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( fuusenpn )
@@ -832,7 +832,7 @@ void konmedal_state::tsukande(machine_config &config)
 
 	NVRAM(config, m_nvram, nvram_device::DEFAULT_ALL_0);
 	m_nvram->set_custom_handler(FUNC(konmedal_state::medal_nvram_init));
-	HOPPER(config, "hopper", attotime::from_msec(100), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH);
+	HOPPER(config, "hopper", attotime::from_msec(100));
 
 	K053252(config, m_k053252, XTAL(14'318'181) / 2); // not verified
 	m_k053252->int1_ack().set(FUNC(konmedal_state::vbl_ack_w));
@@ -875,7 +875,7 @@ void konmedal_state::ddboy(machine_config &config)
 
 	NVRAM(config, m_nvram, nvram_device::DEFAULT_ALL_0);
 	m_nvram->set_custom_handler(FUNC(konmedal_state::medal_nvram_init));
-	HOPPER(config, "hopper", attotime::from_msec(100), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH);
+	HOPPER(config, "hopper", attotime::from_msec(100));
 
 	K053252(config, m_k053252, XTAL(14'318'181) / 2); // not verified
 	m_k053252->int1_ack().set(FUNC(konmedal_state::vbl_ack_w));
@@ -1019,7 +1019,7 @@ void konmedal_state::shuriboy(machine_config &config)
 
 	NVRAM(config, m_nvram, nvram_device::DEFAULT_ALL_0);
 	m_nvram->set_custom_handler(FUNC(konmedal_state::shuriboy_nvram_init));
-	HOPPER(config, "hopper", attotime::from_msec(100), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH);
+	HOPPER(config, "hopper", attotime::from_msec(100));
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER)); // everything not verified, just a placeholder

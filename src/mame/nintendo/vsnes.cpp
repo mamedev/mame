@@ -184,7 +184,8 @@ protected:
 	{
 	}
 
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	template <u8 Side> void vsnes_coin_counter_w(offs_t offset, u8 data);
 	template <u8 Side> u8 vsnes_coin_counter_r(offs_t offset);
@@ -192,10 +193,10 @@ protected:
 	template <u8 Side> u8 vsnes_in0_r();
 	template <u8 Side> u8 vsnes_in1_r();
 
-	void vsnes_cpu1_map(address_map &map);
-	void vsnes_cpu2_map(address_map &map);
-	void vsnes_ppu1_map(address_map &map);
-	void vsnes_ppu2_map(address_map &map);
+	void vsnes_cpu1_map(address_map &map) ATTR_COLD;
+	void vsnes_cpu2_map(address_map &map) ATTR_COLD;
+	void vsnes_ppu1_map(address_map &map) ATTR_COLD;
+	void vsnes_ppu2_map(address_map &map) ATTR_COLD;
 
 	void init_prg_banking();
 	void prg32(int bank);
@@ -217,11 +218,11 @@ protected:
 
 	memory_bank_array_creator<4> m_prg_banks;
 	memory_view m_prg_view;
-	int m_prg_chunks = 0;
+	u32 m_prg_chunks = 0;
 
 	memory_bank_array_creator<8> m_chr_banks;
 	memory_view m_chr_view;
-	int m_chr_chunks = 0;
+	u32 m_chr_chunks = 0;
 
 	bool m_has_gun = false;
 
@@ -232,9 +233,9 @@ private:
 	optional_ioport m_gunx;
 	optional_ioport m_guny;
 
-	int m_coin = 0;
-	int m_input_latch[4]{};
-	int m_input_strobe[2]{};
+	u8 m_coin = 0;
+	u32 m_input_latch[4]{};
+	u8 m_input_strobe[2]{};
 };
 
 class vs_uni_state : public vs_base_state
@@ -266,35 +267,35 @@ public:
 	void init_rbibb();
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
-	void vsnormal_vrom_banking(u8 data);
-	void vskonami_rom_banking(offs_t offset, u8 data);
+	void vsnormal_vrom_banking_w(u8 data);
+	void vskonami_rom_banking_w(offs_t offset, u8 data);
 	void vsgshoe_gun_in0_w(u8 data);
-	void drmario_rom_banking(offs_t offset, u8 data);
-	void vsvram_rom_banking(u8 data);
-	void vs108_rom_banking(offs_t offset, u8 data);
+	void drmario_rom_banking_w(offs_t offset, u8 data);
+	void vsvram_rom_banking_w(u8 data);
+	void vs108_rom_banking_w(offs_t offset, u8 data);
 	u8 rbibb_prot_r(offs_t offset);
 	u8 supxevs_prot_1_r();
 	u8 supxevs_prot_2_r();
 	u8 supxevs_prot_3_r();
 	u8 supxevs_prot_4_r();
 	u8 tkoboxng_prot_r(offs_t offset);
-	void sunsoft3_rom_banking(offs_t offset, u8 data);
+	void sunsoft3_rom_banking_w(offs_t offset, u8 data);
 	void set_bnglngby_irq_w(u8 data);
 	u8 set_bnglngby_irq_r();
 
 	void v_set_videorom_bank(int start, int count, int vrom_start_bank);
 
-	int m_mmc1_shiftreg = 0;
-	int m_mmc1_shiftcount = 0;
-	int m_mmc1_prg16k = 0;
-	int m_mmc1_switchlow = 0;
-	int m_mmc1_chr4k = 0;
-	int m_108_reg = 0;
-	int m_prot_index = 0;
-	int m_ret = 0;
+	u8 m_mmc1_shiftreg = 0;
+	u8 m_mmc1_shiftcount = 0;
+	bool m_mmc1_prg16k = false;
+	u8 m_mmc1_switchlow = 0;
+	bool m_mmc1_chr4k = false;
+	u8 m_108_reg = 0;
+	u8 m_prot_index = 0;
+	u8 m_ret = 0;
 };
 
 class vs_dual_state : public vs_base_state
@@ -309,10 +310,10 @@ public:
 	void init_vsdual();
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
-	template <u8 Side> void vsdual_vrom_banking(u8 data);
+	template <u8 Side> void vsdual_vrom_banking_w(u8 data);
 };
 
 class vs_smbbl_state : public vs_base_state
@@ -328,7 +329,7 @@ public:
 	void vs_smbbl(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	void smbbl_6502_sn_w(offs_t offset, u8 data);
@@ -338,16 +339,16 @@ private:
 	void smbbl_scanline_cb(int scanline, bool vblank, bool blanked);
 	u8 smbbl_ppu_data_r();
 
-	void smbbl_6502_map(address_map &map);
-	void smbbl_z80_map(address_map &map);
-	void smbbl_ppu_map(address_map &map);
+	void smbbl_6502_map(address_map &map) ATTR_COLD;
+	void smbbl_z80_map(address_map &map) ATTR_COLD;
+	void smbbl_ppu_map(address_map &map) ATTR_COLD;
 
 	required_device<sn76489_device> m_sn1;
 	required_device<sn76489_device> m_sn2;
 
 	u8 m_bootleg_sound_offset = 0;
 	u8 m_bootleg_sound_data = 0;
-	int m_bootleg_latched_scanline = 0;
+	s32 m_bootleg_latched_scanline = 0;
 };
 
 
@@ -369,7 +370,8 @@ template <u8 Side>
 u8 vs_base_state::vsnes_coin_counter_r(offs_t offset)
 {
 	// reads effectively write MSB of address (via open bus) to coin counter
-	machine().bookkeeping().coin_counter_w(Side, BIT(offset, 8));
+	if (!machine().side_effects_disabled())
+		machine().bookkeeping().coin_counter_w(Side, BIT(offset, 8));
 
 	// only for platoon
 	return m_coin;
@@ -382,8 +384,8 @@ void vs_base_state::vsnes_in0_w(u8 data)
 	if (m_input_strobe[Side] & ~data & 1)
 	{
 		// load up the latches
-		int p1 = 2 * Side;
-		int p2 = p1 + 1;
+		const u8 p1 = 2 * Side;
+		const u8 p2 = p1 + 1;
 		m_input_latch[p1] = m_in[p1]->read();
 		m_input_latch[p2] = m_in[p2]->read();
 
@@ -397,17 +399,21 @@ void vs_base_state::vsnes_in0_w(u8 data)
 template <u8 Side>
 u8 vs_base_state::vsnes_in0_r()
 {
-	int p1 = 2 * Side;
+	const u8 p1 = 2 * Side;
 
-	if (m_input_strobe[Side] & 1)
+	if (!machine().side_effects_disabled())
 	{
-		m_input_latch[p1] = m_in[p1]->read();
-		if (m_has_gun && m_sensor->detect_light(m_gunx->read(), m_guny->read()))
-			m_input_latch[p1] |= 0x40;
+		if (m_input_strobe[Side] & 1)
+		{
+			m_input_latch[p1] = m_in[p1]->read();
+			if (m_has_gun && m_sensor->detect_light(m_gunx->read(), m_guny->read()))
+				m_input_latch[p1] |= 0x40;
+		}
 	}
 
-	int ret = m_input_latch[p1] & 1;
-	m_input_latch[p1] >>= 1;
+	u8 ret = m_input_latch[p1] & 1;
+	if (!machine().side_effects_disabled())
+		m_input_latch[p1] >>= 1;
 
 // FIXME: UniSystem's wiring harness connects S Coin 2 to S Coin 1 edge hardness
 // This should mean games that don't check Coin 2 inputs respond on UniSys, but on DualSys they'd miss the Coin 2 inserts as all 4 inputs are separate?
@@ -423,16 +429,23 @@ u8 vs_base_state::vsnes_in1_r()
 {
 	// Only the Sub side CPU can kick the watchdog, which it must do by periodically reading $4017.
 	// This is one reason UniSystem games too must be installed on the Sub side.
-	if (m_watchdog && Side == SUB)
-		m_watchdog->watchdog_reset();
+	if (!machine().side_effects_disabled())
+	{
+		if (m_watchdog && Side == SUB)
+			m_watchdog->watchdog_reset();
+	}
 
-	int p2 = 2 * Side + 1;
+	const u8 p2 = 2 * Side + 1;
 
-	if (m_input_strobe[Side] & 1)
-		m_input_latch[p2] = m_in[p2]->read();
+	if (!machine().side_effects_disabled())
+	{
+		if (m_input_strobe[Side] & 1)
+			m_input_latch[p2] = m_in[p2]->read();
+	}
 
-	int ret = m_input_latch[p2] & 1;
-	m_input_latch[p2] >>= 1;
+	u8 ret = m_input_latch[p2] & 1;
+	if (!machine().side_effects_disabled())
+		m_input_latch[p2] >>= 1;
 
 	ret |= m_dsw[Side]->read() & ~3;          // merge the rest of the dipswitches
 
@@ -508,8 +521,17 @@ void vs_uni_state::v_set_videorom_bank(int start, int count, int vrom_start_bank
 		m_chr_banks[i + start]->set_entry(vrom_start_bank + i);
 }
 
+void vs_base_state::machine_start()
+{
+	save_item(NAME(m_coin));
+	save_item(NAME(m_input_latch));
+	save_item(NAME(m_input_strobe));
+}
+
 void vs_uni_state::machine_start()
 {
+	vs_base_state::machine_start();
+
 	// establish chr banks
 	// DRIVER_INIT is called first - means we can handle this different for VRAM games!
 	if (m_gfx1_rom != nullptr)
@@ -526,15 +548,26 @@ void vs_uni_state::machine_start()
 	}
 	else
 		m_chr_view.select(0);
+
+	save_item(NAME(m_mmc1_shiftreg));
+	save_item(NAME(m_mmc1_shiftcount));
+	save_item(NAME(m_mmc1_prg16k));
+	save_item(NAME(m_mmc1_switchlow));
+	save_item(NAME(m_mmc1_chr4k));
+	save_item(NAME(m_108_reg));
+	save_item(NAME(m_prot_index));
+	save_item(NAME(m_ret));
 }
 
 void vs_dual_state::machine_start()
 {
+	vs_base_state::machine_start();
+
 	for (int i = 0; i < 2; i++)
 	{
 		const char *region = i ? "gfx2" : "gfx1";
 		u8 *base = memregion(region)->base();
-		int entries = memregion(region)->bytes() / 0x2000;
+		const u32 entries = memregion(region)->bytes() / 0x2000;
 		m_chr_banks[i]->configure_entries(0, entries, base, 0x2000);
 		m_chr_banks[i]->set_entry(0);
 	}
@@ -542,12 +575,18 @@ void vs_dual_state::machine_start()
 
 void vs_smbbl_state::machine_start()
 {
+	vs_base_state::machine_start();
+
 	m_ppu1->set_scanline_callback(*this, FUNC(vs_smbbl_state::smbbl_scanline_cb));
 
 	u8 *base = m_gfx1_rom->base();
-	int entries = m_gfx1_rom->bytes() / 0x2000;
+	const u32 entries = m_gfx1_rom->bytes() / 0x2000;
 	m_chr_banks[0]->configure_entries(0, entries, base, 0x2000);
 	m_chr_banks[0]->set_entry(0);
+
+	save_item(NAME(m_bootleg_sound_offset));
+	save_item(NAME(m_bootleg_sound_data));
+	save_item(NAME(m_bootleg_latched_scanline));
 }
 
 /**********************************************************************************
@@ -559,7 +598,7 @@ void vs_smbbl_state::machine_start()
 //**********************************************************************************
 // Most games: VROM Banking in controller 0 write
 
-void vs_uni_state::vsnormal_vrom_banking(u8 data)
+void vs_uni_state::vsnormal_vrom_banking_w(u8 data)
 {
 	// switch vrom
 	v_set_videorom_bank(0, 8, (data & 4) ? 8 : 0);
@@ -573,7 +612,7 @@ void vs_uni_state::vsnormal_vrom_banking(u8 data)
 void vs_uni_state::init_vsnormal()
 {
 	// vrom switching is enabled with bit 2 of $4016
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0x4016, 0x4016, write8smo_delegate(*this, FUNC(vs_uni_state::vsnormal_vrom_banking)));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x4016, 0x4016, write8smo_delegate(*this, FUNC(vs_uni_state::vsnormal_vrom_banking_w)));
 }
 
 //**********************************************************************************
@@ -588,7 +627,7 @@ void vs_uni_state::init_vsgun()
 //**********************************************************************************
 // Konami VRC1 games: ROM banking at $8000-$ffff
 
-void vs_uni_state::vskonami_rom_banking(offs_t offset, u8 data)
+void vs_uni_state::vskonami_rom_banking_w(offs_t offset, u8 data)
 {
 	int reg = BIT(offset, 12, 3);
 
@@ -616,7 +655,7 @@ void vs_uni_state::init_vskonami()
 	init_prg_banking();
 
 	// banking is done with writes to the $8000-$ffff area
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0x8000, 0xffff, write8sm_delegate(*this, FUNC(vs_uni_state::vskonami_rom_banking)));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x8000, 0xffff, write8sm_delegate(*this, FUNC(vs_uni_state::vskonami_rom_banking_w)));
 }
 
 //**********************************************************************************
@@ -628,7 +667,7 @@ void vs_uni_state::vsgshoe_gun_in0_w(u8 data)
 	m_prg_banks[0]->set_entry(BIT(data, 2));
 
 	// otherwise do normal CHR banking and IO write
-	vsnormal_vrom_banking(data);
+	vsnormal_vrom_banking_w(data);
 }
 
 void vs_uni_state::init_vsgshoe()
@@ -645,13 +684,13 @@ void vs_uni_state::init_vsgshoe()
 //**********************************************************************************
 // MMC1 (Dr Mario): ROM banking at $8000-$ffff
 
-void vs_uni_state::drmario_rom_banking(offs_t offset, u8 data)
+void vs_uni_state::drmario_rom_banking_w(offs_t offset, u8 data)
 {
 	// reset mapper
 	if (data & 0x80)
 	{
 		m_mmc1_shiftcount = 0;
-		m_mmc1_prg16k = 1;
+		m_mmc1_prg16k = true;
 		m_mmc1_switchlow = 1;
 
 		return;
@@ -702,7 +741,7 @@ void vs_uni_state::init_drmario()
 	init_prg_banking();
 
 	// MMC1 mapper at $8000-$ffff
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0x8000, 0xffff, write8sm_delegate(*this, FUNC(vs_uni_state::drmario_rom_banking)));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x8000, 0xffff, write8sm_delegate(*this, FUNC(vs_uni_state::drmario_rom_banking_w)));
 
 	m_mmc1_shiftreg = 0;
 	m_mmc1_shiftcount = 0;
@@ -711,7 +750,7 @@ void vs_uni_state::init_drmario()
 //**********************************************************************************
 // (UNROM) Games with VRAM instead of graphics ROMs: ROM banking at $8000-$ffff
 
-void vs_uni_state::vsvram_rom_banking(u8 data)
+void vs_uni_state::vsvram_rom_banking_w(u8 data)
 {
 	prg16(0, data);
 }
@@ -722,13 +761,13 @@ void vs_uni_state::init_vsvram()
 	init_prg_banking();
 
 	// banking is done with writes to the $8000-$ffff area
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0x8000, 0xffff, write8smo_delegate(*this, FUNC(vs_uni_state::vsvram_rom_banking)));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x8000, 0xffff, write8smo_delegate(*this, FUNC(vs_uni_state::vsvram_rom_banking_w)));
 }
 
 //**********************************************************************************
 // (Namco) 108 (MMC3 predecessor) games
 
-void vs_uni_state::vs108_rom_banking(offs_t offset, u8 data)
+void vs_uni_state::vs108_rom_banking_w(offs_t offset, u8 data)
 {
 	switch (offset & 0x6001)
 	{
@@ -752,7 +791,7 @@ void vs_uni_state::vs108_rom_banking(offs_t offset, u8 data)
 			break;
 
 		default:
-			logerror("vs108_rom_banking uncaught: %04x value: %02x\n", offset + 0x8000, data);
+			logerror("vs108_rom_banking_w uncaught: %04x value: %02x\n", offset + 0x8000, data);
 			break;
 	}
 }
@@ -767,7 +806,7 @@ void vs_uni_state::init_vs108()
 	m_108_reg = 0;
 
 	// 108 chip at $8000-$9fff
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0x8000, 0xffff, write8sm_delegate(*this, FUNC(vs_uni_state::vs108_rom_banking)));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x8000, 0xffff, write8sm_delegate(*this, FUNC(vs_uni_state::vs108_rom_banking_w)));
 }
 
 // Vs. RBI Baseball
@@ -785,11 +824,15 @@ u8 vs_uni_state::rbibb_prot_r(offs_t offset)
 
 	if (offset == 0)
 	{
-		m_prot_index = 0;
+		if (!machine().side_effects_disabled())
+			m_prot_index = 0;
 		return 0;
 	}
 
-	return prot_data[m_prot_index++ & 0x1f];
+	const u8 prot_index = m_prot_index;
+	if (!machine().side_effects_disabled())
+		m_prot_index++;
+	return prot_data[prot_index & 0x1f];
 }
 
 void vs_uni_state::init_rbibb()
@@ -805,7 +848,8 @@ void vs_uni_state::init_rbibb()
 
 u8 vs_uni_state::supxevs_prot_1_r()
 {
-	m_prot_index ^= 1;
+	if (!machine().side_effects_disabled())
+		m_prot_index ^= 1;
 	return 0x05;
 }
 
@@ -850,11 +894,15 @@ u8 vs_uni_state::tkoboxng_prot_r(offs_t offset)
 
 	if (offset == 0)
 	{
-		m_prot_index = 0;
+		if (!machine().side_effects_disabled())
+			m_prot_index = 0;
 		return 0;
 	}
 
-	return prot_data[m_prot_index++ & 0x1f];
+	const u8 prot_index = m_prot_index;
+	if (!machine().side_effects_disabled())
+		m_prot_index++;
+	return prot_data[prot_index & 0x1f];
 }
 
 void vs_uni_state::init_tkoboxng()
@@ -876,7 +924,7 @@ void vs_uni_state::init_vsfdf()
 //**********************************************************************************
 // Sunsoft-3 (Platoon) rom banking
 
-void vs_uni_state::sunsoft3_rom_banking(offs_t offset, u8 data)
+void vs_uni_state::sunsoft3_rom_banking_w(offs_t offset, u8 data)
 {
 	switch (offset & 0x7800)
 	{
@@ -899,7 +947,7 @@ void vs_uni_state::init_platoon()
 	// point program banks to last 32K
 	init_prg_banking();
 
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0x8000, 0xffff, write8sm_delegate(*this, FUNC(vs_uni_state::sunsoft3_rom_banking)));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x8000, 0xffff, write8sm_delegate(*this, FUNC(vs_uni_state::sunsoft3_rom_banking_w)));
 }
 
 //**********************************************************************************
@@ -934,7 +982,7 @@ void vs_uni_state::init_bnglngby()
 // VS DualSystem
 
 template <u8 Side>
-void vs_dual_state::vsdual_vrom_banking(u8 data)
+void vs_dual_state::vsdual_vrom_banking_w(u8 data)
 {
 	// switch vrom
 	m_chr_banks[Side]->set_entry(BIT(data, 2));
@@ -950,8 +998,8 @@ void vs_dual_state::vsdual_vrom_banking(u8 data)
 void vs_dual_state::init_vsdual()
 {
 	// vrom switching is enabled with bit 2 of $4016
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0x4016, 0x4016, write8smo_delegate(*this, FUNC(vs_dual_state::vsdual_vrom_banking<MAIN>)));
-	m_subcpu->space(AS_PROGRAM).install_write_handler(0x4016, 0x4016, write8smo_delegate(*this, FUNC(vs_dual_state::vsdual_vrom_banking<SUB>)));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x4016, 0x4016, write8smo_delegate(*this, FUNC(vs_dual_state::vsdual_vrom_banking_w<MAIN>)));
+	m_subcpu->space(AS_PROGRAM).install_write_handler(0x4016, 0x4016, write8smo_delegate(*this, FUNC(vs_dual_state::vsdual_vrom_banking_w<SUB>)));
 }
 
 //**********************************************************************************
@@ -972,7 +1020,7 @@ u8 vs_smbbl_state::smbbl_ppu_data_r()
 {
 	// CPU always reads higher CHR ROM banks from $2007, PPU always reads lower ones
 	m_chr_banks[0]->set_entry(1);
-	u8 data = m_ppu1->read(0x2007);
+	const u8 data = m_ppu1->read(0x2007);
 	m_chr_banks[0]->set_entry(0);
 
 	return data;

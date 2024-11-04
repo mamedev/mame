@@ -11,7 +11,7 @@ DEFINE_DEVICE_TYPE(MIPSX, mipsx_cpu_device, "mipsx", "MIPS-X")
 
 mipsx_cpu_device::mipsx_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: cpu_device(mconfig, MIPSX, tag, owner, clock)
-	, m_program_config("program", ENDIANNESS_BIG, 32, 24, 0)
+	, m_program_config("program", ENDIANNESS_BIG, 32, 32, 0)
 	, m_pc(0)
 	, m_program(nullptr)
 	, m_icount(0)

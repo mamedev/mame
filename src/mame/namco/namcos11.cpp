@@ -503,11 +503,11 @@ private:
 	TIMER_DEVICE_CALLBACK_MEMBER(mcu_irq0_cb);
 	TIMER_DEVICE_CALLBACK_MEMBER(mcu_irq2_cb);
 
-	void c76_map(address_map &map);
-	void namcos11_map(address_map &map);
-	void ptblank2ua_map(address_map &map);
-	void rom8_64_map(address_map &map);
-	void rom8_map(address_map &map);
+	void c76_map(address_map &map) ATTR_COLD;
+	void namcos11_map(address_map &map) ATTR_COLD;
+	void ptblank2ua_map(address_map &map) ATTR_COLD;
+	void rom8_64_map(address_map &map) ATTR_COLD;
+	void rom8_map(address_map &map) ATTR_COLD;
 
 	virtual void driver_start() override;
 

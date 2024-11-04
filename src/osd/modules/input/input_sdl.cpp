@@ -608,6 +608,7 @@ public:
 
 	virtual void reset() override
 	{
+		sdl_device::reset();
 		memset(&m_keyboard.state, 0, sizeof(m_keyboard.state));
 		m_capslock_pressed = std::chrono::steady_clock::time_point::min();
 	}
@@ -662,6 +663,7 @@ public:
 
 	virtual void reset() override
 	{
+		sdl_device::reset();
 		memset(&m_mouse, 0, sizeof(m_mouse));
 		m_v = m_h = 0;
 	}
@@ -1316,25 +1318,20 @@ public:
 
 	~sdl_joystick_device()
 	{
-		if (m_joydevice)
-		{
-			if (m_hapdevice)
-			{
-				SDL_HapticClose(m_hapdevice);
-				m_hapdevice = nullptr;
-			}
-			SDL_JoystickClose(m_joydevice);
-			m_joydevice = nullptr;
-		}
+		close_device();
 	}
 
 	virtual void reset() override
 	{
-		memset(&m_joystick, 0, sizeof(m_joystick));
+		sdl_joystick_device_base::reset();
+		clear_buffer();
 	}
 
 	virtual void process_event(SDL_Event const &event) override
 	{
+		if (!m_joydevice)
+			return;
+
 		switch (event.type)
 		{
 		case SDL_JOYAXISMOTION:
@@ -1370,17 +1367,8 @@ public:
 		case SDL_JOYDEVICEREMOVED:
 			osd_printf_verbose("Joystick: %s [ID %s] disconnected\n", name(), id());
 			clear_instance();
-			reset();
-			if (m_joydevice)
-			{
-				if (m_hapdevice)
-				{
-					SDL_HapticClose(m_hapdevice);
-					m_hapdevice = nullptr;
-				}
-				SDL_JoystickClose(m_joydevice);
-				m_joydevice = nullptr;
-			}
+			clear_buffer();
+			close_device();
 			break;
 		}
 	}
@@ -1417,6 +1405,25 @@ protected:
 private:
 	SDL_Joystick *m_joydevice;
 	SDL_Haptic *m_hapdevice;
+
+	void clear_buffer()
+	{
+		memset(&m_joystick, 0, sizeof(m_joystick));
+	}
+
+	void close_device()
+	{
+		if (m_joydevice)
+		{
+			if (m_hapdevice)
+			{
+				SDL_HapticClose(m_hapdevice);
+				m_hapdevice = nullptr;
+			}
+			SDL_JoystickClose(m_joydevice);
+			m_joydevice = nullptr;
+		}
+	}
 };
 
 
@@ -1483,11 +1490,7 @@ public:
 
 	~sdl_game_controller_device()
 	{
-		if (m_ctrldevice)
-		{
-			SDL_GameControllerClose(m_ctrldevice);
-			m_ctrldevice = nullptr;
-		}
+		close_device();
 	}
 
 	virtual void configure(input_device &device) override
@@ -2048,11 +2051,15 @@ public:
 
 	virtual void reset() override
 	{
-		memset(&m_controller, 0, sizeof(m_controller));
+		sdl_joystick_device_base::reset();
+		clear_buffer();
 	}
 
 	virtual void process_event(SDL_Event const &event) override
 	{
+		if (!m_ctrldevice)
+			return;
+
 		switch (event.type)
 		{
 		case SDL_CONTROLLERAXISMOTION:
@@ -2079,12 +2086,8 @@ public:
 		case SDL_CONTROLLERDEVICEREMOVED:
 			osd_printf_verbose("Game Controller: %s [ID %s] disconnected\n", name(), id());
 			clear_instance();
-			reset();
-			if (m_ctrldevice)
-			{
-				SDL_GameControllerClose(m_ctrldevice);
-				m_ctrldevice = nullptr;
-			}
+			clear_buffer();
+			close_device();
 			break;
 		}
 	}
@@ -2110,6 +2113,20 @@ private:
 
 	sdl_controller_state m_controller;
 	SDL_GameController *m_ctrldevice;
+
+	void clear_buffer()
+	{
+		memset(&m_controller, 0, sizeof(m_controller));
+	}
+
+	void close_device()
+	{
+		if (m_ctrldevice)
+		{
+			SDL_GameControllerClose(m_ctrldevice);
+			m_ctrldevice = nullptr;
+		}
+	}
 };
 
 

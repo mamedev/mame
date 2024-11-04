@@ -87,8 +87,8 @@ public:
 	void atarians(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	u8 m1080_r();
@@ -107,10 +107,10 @@ private:
 	void midearth_w(offs_t offset, u8 data);
 	TIMER_DEVICE_CALLBACK_MEMBER(nmi);
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_s);
-	void common_map(address_map &map);
-	void mem_map(address_map &map);
-	void atarians_map(address_map &map);
-	void midearth_map(address_map &map);
+	void common_map(address_map &map) ATTR_COLD;
+	void mem_map(address_map &map) ATTR_COLD;
+	void atarians_map(address_map &map) ATTR_COLD;
+	void midearth_map(address_map &map) ATTR_COLD;
 
 	bool m_audio_en = false;
 	u8 m_timer_s[3]{};

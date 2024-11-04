@@ -28,7 +28,7 @@ public:
 	MC6845_UPDATE_ROW( t1000_gfx_2bpp_tga_update_row );
 	MC6845_UPDATE_ROW( t1000_gfx_1bpp_update_row );
 
-	void vram_map(address_map &map);
+	void vram_map(address_map &map) ATTR_COLD;
 
 protected:
 	// used in tandy1000hx; used in pcjr???
@@ -104,8 +104,8 @@ public:
 	void disable_w(int state);
 
 protected:
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual void device_start() override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual void device_start() override ATTR_COLD;
 
 private:
 	void mode_switch();
@@ -132,8 +132,8 @@ public:
 	MC6845_UPDATE_ROW( pcjr_gfx_2bpp_high_update_row );
 
 protected:
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual void device_start() override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual void device_start() override ATTR_COLD;
 
 	required_device<pic8259_device> m_pic8259;
 	uint8_t   *m_jxkanji;

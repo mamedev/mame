@@ -98,8 +98,8 @@ protected:
 
 	h8_timer8_channel_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
 
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	void update_counter(u64 cur_time = 0, u64 delta = 0);
 	void recalc_event(u64 cur_time = 0);

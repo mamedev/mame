@@ -85,15 +85,15 @@ public:
 	void init_fatfurspb();
 
 protected:
-	void machine_start() override;
+	void machine_start() override ATTR_COLD;
 
 private:
 	required_device<mcs51_cpu_device> m_mcu;
 
-	void mem_map(address_map &map);
-	void io_map(address_map &map);
-	void snes_map(address_map &map);
-	void spc_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
+	void io_map(address_map &map) ATTR_COLD;
+	void snes_map(address_map &map) ATTR_COLD;
+	void spc_map(address_map &map) ATTR_COLD;
 
 	void mcu_p1_w(uint8_t data);
 	uint8_t mcu_p3_r();

@@ -161,10 +161,10 @@ public:
 	void init_d70();
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
-	void lcd_map(address_map &map);
+	void lcd_map(address_map &map) ATTR_COLD;
 	void lcd_palette(palette_device &palette) const;
 
 	void bank_w(u8 data);
@@ -191,7 +191,7 @@ private:
 
 	void midi_in_w(int state);
 
-	void d70_map(address_map &map);
+	void d70_map(address_map &map) ATTR_COLD;
 
 	void descramble_rom_internal(u8 *dst, const u8 *src);
 	void descramble_rom_external(u8 *dst, const u8 *src);

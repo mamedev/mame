@@ -179,7 +179,7 @@ private:
 		osd_printf_info("Write to %08X & %016X = %016X\n", offset * 8, mem_mask, data);
 	}
 
-	void ppc_mem(address_map &map);
+	void ppc_mem(address_map &map) ATTR_COLD;
 
 	// internal state
 	required_device<ppc603e_device> m_cpu;

@@ -76,8 +76,8 @@ protected:
 	required_device<h8_device> m_cpu;
 	optional_device_array<h8gen_dma_channel_device, 4> m_dmach;
 
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	virtual u8 active_channels() const = 0;
 
@@ -125,8 +125,8 @@ protected:
 	u8 m_dmawer, m_dmatcr;
 	u16 m_dmabcr;
 
-	void device_start() override;
-	void device_reset() override;
+	void device_start() override ATTR_COLD;
+	void device_reset() override ATTR_COLD;
 
 	u8 active_channels() const override;
 };
@@ -192,8 +192,8 @@ protected:
 	u16 m_ioar[2], m_etcr[2];
 	bool m_dreq;
 
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	virtual void dma_done(int subchannel);
 	virtual int channel_mode() const = 0;
@@ -230,8 +230,8 @@ protected:
 	bool m_has_adc;
 	bool m_targets_sci1;
 
-	void device_start() override;
-	void device_reset() override;
+	void device_start() override ATTR_COLD;
+	void device_reset() override ATTR_COLD;
 	void dma_done(int subchannel) override;
 
 	int channel_mode() const override;
@@ -260,8 +260,8 @@ protected:
 	u16 m_dmacr;
 
 	required_device<h8s_dma_device> m_dma;
-	void device_start() override;
-	void device_reset() override;
+	void device_start() override ATTR_COLD;
+	void device_reset() override ATTR_COLD;
 	void dma_done(int subchannel) override;
 
 	int channel_mode() const override;

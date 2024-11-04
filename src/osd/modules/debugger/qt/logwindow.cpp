@@ -3,10 +3,6 @@
 #include "emu.h"
 #include "logwindow.h"
 
-#include "debug/debugcon.h"
-#include "debug/debugcpu.h"
-#include "debug/dvdisasm.h"
-
 #include "util/xmlfile.h"
 
 #include <QtWidgets/QVBoxLayout>

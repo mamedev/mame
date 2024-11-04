@@ -68,8 +68,8 @@ private:
 	required_device<mephisto_display2_device> m_display;
 	required_ioport m_keys;
 
-	void berlin_mem(address_map &map);
-	void berlinp_mem(address_map &map);
+	void berlin_mem(address_map &map) ATTR_COLD;
+	void berlinp_mem(address_map &map) ATTR_COLD;
 
 	u8 nvram_r(offs_t offset) { return m_nvram[offset]; }
 	void nvram_w(offs_t offset, u8 data) { m_nvram[offset] = data; }

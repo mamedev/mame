@@ -65,8 +65,8 @@ private:
 	required_device<sis5513_ide_device> m_ide_00_1;
 	required_device<sis950_lpc_device> m_lpc_01_0;
 
-//  void main_io(address_map &map);
-//  void main_map(address_map &map);
+//  void main_io(address_map &map) ATTR_COLD;
+//  void main_map(address_map &map) ATTR_COLD;
 	static void ite_superio_config(device_t *device);
 };
 

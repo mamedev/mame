@@ -28,16 +28,16 @@ public:
 	void sbasssta(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	void input_select_w(u8 data);
 	u8 input_r();
 
-	void bassstr_prog(address_map &map);
-	void sbasssta_prog(address_map &map);
-	void bassstr_data(address_map &map);
-	void sbasssta_data(address_map &map);
+	void bassstr_prog(address_map &map) ATTR_COLD;
+	void sbasssta_prog(address_map &map) ATTR_COLD;
+	void bassstr_data(address_map &map) ATTR_COLD;
+	void sbasssta_data(address_map &map) ATTR_COLD;
 
 	required_device<mn1880_device> m_maincpu;
 	required_ioport_array<4> m_inputs;

@@ -133,8 +133,8 @@ public:
 	void mephisto3(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override { m_reset = true; }
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD { m_reset = true; }
 
 private:
 	// devices/pointers
@@ -154,14 +154,14 @@ private:
 	u8 m_esb_select = 0;
 
 	// address maps
-	void mephisto_map(address_map &map);
-	void mephistoj_map(address_map &map);
-	void mephisto2_map(address_map &map);
-	void mephistoe2_map(address_map &map);
-	void mephistoe2a_map(address_map &map);
-	void mephisto3_map(address_map &map);
-	void mephisto_io(address_map &map);
-	void mephistoj_io(address_map &map);
+	void mephisto_map(address_map &map) ATTR_COLD;
+	void mephistoj_map(address_map &map) ATTR_COLD;
+	void mephisto2_map(address_map &map) ATTR_COLD;
+	void mephistoe2_map(address_map &map) ATTR_COLD;
+	void mephistoe2a_map(address_map &map) ATTR_COLD;
+	void mephisto3_map(address_map &map) ATTR_COLD;
+	void mephisto_io(address_map &map) ATTR_COLD;
+	void mephistoj_io(address_map &map) ATTR_COLD;
 
 	// I/O handlers
 	int clear_r();
@@ -200,13 +200,13 @@ INPUT_CHANGED_MEMBER(brikett_state::change_cpu_freq)
 	if (newval & 8)
 	{
 		/*
-			3rd hardware model has 2 XTALs, it will increase CPU voltage (and speed)
-			when running on mains power, the 3.579545MHz XTAL is still used for IRQ.
+		    3rd hardware model has 2 XTALs, it will increase CPU voltage (and speed)
+		    when running on mains power, the 3.579545MHz XTAL is still used for IRQ.
 
-			Mephisto III could be fitted with a 12MHz XTAL instead of 6.144MHz and
-			a newer CDP1805CE CPU by Hobby Computer Centrale on request. (It is
-			unexpected that the 1805 accepts such a high overclock, but tests show
-			that it is indeed twice faster)
+		    Mephisto III could be fitted with a 12MHz XTAL instead of 6.144MHz and
+		    a newer CDP1805CE CPU by Hobby Computer Centrale on request. (It is
+		    unexpected that the 1805 accepts such a high overclock, but tests show
+		    that it is indeed twice faster)
 		*/
 		static const XTAL freq[3] = { 3.579545_MHz_XTAL, 6.144_MHz_XTAL, 12_MHz_XTAL };
 		m_maincpu->set_unscaled_clock(freq[(newval & 3) % 3]);
@@ -413,16 +413,16 @@ static INPUT_PORTS_START( mephisto )
 	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_H) PORT_CODE(KEYCODE_8) PORT_CODE(KEYCODE_8_PAD) PORT_NAME("H / 8")
 
 	PORT_START("IN.4") // 3rd model main PCB has 2 XTALs on PCB
-	PORT_CONFNAME( 0x03, 0x01, "CPU Frequency" ) PORT_CHANGED_MEMBER(DEVICE_SELF, brikett_state, change_cpu_freq, 0) PORT_CONDITION("IN.4", 0x0c, EQUALS, 0x08)
+	PORT_CONFNAME( 0x03, 0x01, "CPU Frequency" ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(brikett_state::change_cpu_freq), 0) PORT_CONDITION("IN.4", 0x0c, EQUALS, 0x08)
 	PORT_CONFSETTING(    0x00, "3.579MHz (Battery)" )
 	PORT_CONFSETTING(    0x01, "6.144MHz (Mains)" )
-	PORT_CONFNAME( 0x0c, 0x00, "Base Hardware" ) PORT_CHANGED_MEMBER(DEVICE_SELF, brikett_state, change_cpu_freq, 0)
+	PORT_CONFNAME( 0x0c, 0x00, "Base Hardware" ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(brikett_state::change_cpu_freq), 0)
 	PORT_CONFSETTING(    0x00, "1st Model (3.579MHz)" ) // or 2nd model with this XTAL
 	PORT_CONFSETTING(    0x04, "2nd Model (4.194MHz)" )
 	PORT_CONFSETTING(    0x08, "3rd Model (2 XTALs)" )
 
 	PORT_START("RESET")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_R) PORT_NAME("RES") PORT_CHANGED_MEMBER(DEVICE_SELF, brikett_state, reset_button, 0)
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_R) PORT_NAME("RES") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(brikett_state::reset_button), 0)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( mephistoj )
@@ -471,7 +471,7 @@ static INPUT_PORTS_START( mephisto3 )
 	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_M) PORT_NAME("MEM")
 
 	PORT_MODIFY("IN.4")
-	PORT_CONFNAME( 0x03, 0x01, "CPU Frequency" ) PORT_CHANGED_MEMBER(DEVICE_SELF, brikett_state, change_cpu_freq, 0)
+	PORT_CONFNAME( 0x03, 0x01, "CPU Frequency" ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(brikett_state::change_cpu_freq), 0)
 	PORT_CONFSETTING(    0x00, "3.579MHz (Battery)" )
 	PORT_CONFSETTING(    0x01, "6.144MHz (Mains)" )
 	PORT_CONFSETTING(    0x02, "12MHz (Special)" )

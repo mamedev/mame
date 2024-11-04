@@ -1085,7 +1085,7 @@ public:
 protected:
 	virtual void machine_start() override { m_lamps.resolve(); }
 
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 
 	void goldnpkr_videoram_w(offs_t offset, uint8_t data);
 	void goldnpkr_colorram_w(offs_t offset, uint8_t data);
@@ -1121,23 +1121,23 @@ private:
 	DECLARE_MACHINE_RESET(mondial);
 	DECLARE_MACHINE_RESET(lespendu);
 
-	void genie_map(address_map &map);
-	void goldnpkr_map(address_map &map);
-	void mondial_map(address_map &map);
-	void witchcdj_map(address_map &map);
-	void pottnpkr_map(address_map &map);
-	void wcrdxtnd_map(address_map &map);
-	void wildcard_map(address_map &map);
-	void wildcrdb_map(address_map &map);
-	void wildcrdb_mcu_io_map(address_map &map);
-	void wildcrdb_mcu_map(address_map &map);
-	void wildcrdb_mcu_decrypted_opcodes_map(address_map &map);
-	void witchcrd_falcon_map(address_map &map);
-	void witchcrd_map(address_map &map);
-	void super21p_map(address_map &map);
-	void op5cards_map(address_map &map);
-	void icp_ext_map(address_map &map);
-	void lespendu_map(address_map &map);
+	void genie_map(address_map &map) ATTR_COLD;
+	void goldnpkr_map(address_map &map) ATTR_COLD;
+	void mondial_map(address_map &map) ATTR_COLD;
+	void witchcdj_map(address_map &map) ATTR_COLD;
+	void pottnpkr_map(address_map &map) ATTR_COLD;
+	void wcrdxtnd_map(address_map &map) ATTR_COLD;
+	void wildcard_map(address_map &map) ATTR_COLD;
+	void wildcrdb_map(address_map &map) ATTR_COLD;
+	void wildcrdb_mcu_io_map(address_map &map) ATTR_COLD;
+	void wildcrdb_mcu_map(address_map &map) ATTR_COLD;
+	void wildcrdb_mcu_decrypted_opcodes_map(address_map &map) ATTR_COLD;
+	void witchcrd_falcon_map(address_map &map) ATTR_COLD;
+	void witchcrd_map(address_map &map) ATTR_COLD;
+	void super21p_map(address_map &map) ATTR_COLD;
+	void op5cards_map(address_map &map) ATTR_COLD;
+	void icp_ext_map(address_map &map) ATTR_COLD;
+	void lespendu_map(address_map &map) ATTR_COLD;
 
 	required_shared_ptr<uint8_t> m_videoram;
 	required_shared_ptr<uint8_t> m_colorram;
@@ -1171,8 +1171,8 @@ private:
 	void mcu_command_w(uint8_t data);
 	void mcu_portb_w(uint8_t data);
 	void mcu_portc_w(uint8_t data);
-	void megadpkr_banked_map(address_map &map);
-	void megadpkr_map(address_map &map);
+	void megadpkr_banked_map(address_map &map) ATTR_COLD;
+	void megadpkr_map(address_map &map) ATTR_COLD;
 
 	required_region_ptr<uint8_t> m_cpubank;
 
@@ -5658,6 +5658,28 @@ ROM_START( potnpkrl )
 ROM_END
 
 
+/* Potten's Poker - PCB ICP-1 (unencrypted).
+   'PLM07242 VER 2.1 1988 04-15 BY PED' string in ROM
+*/
+ROM_START( potnpkrm )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "7.16a",  0x2000, 0x1000, CRC(62ad9e7d) SHA1(74fe533da0dcf21662d1adf599fcdf7f97583646) )
+	ROM_LOAD( "8.17a",  0x3000, 0x1000, CRC(1c288dd8) SHA1(d8a074b950a2cc01a4e72151138113ff725bdc1e) )
+
+	ROM_REGION( 0x1800, "gfx1", 0 )
+	ROM_FILL(           0x0000, 0x1000, 0x0000 ) // filling the R-G bitplanes
+	ROM_LOAD( "4.8a",   0x1000, 0x0800, CRC(17d0d174) SHA1(ecf507439b6df950052e65ec014830f0287b98b9) )    // char ROM
+
+	ROM_REGION( 0x1800, "gfx2", 0 )
+	ROM_LOAD( "1.4a",   0x0000, 0x0800, CRC(f2f94661) SHA1(f37f7c0dff680fd02897dae64e13e297d0fdb3e7) )    // cards deck gfx, bitplane1
+	ROM_LOAD( "2.6a",   0x0800, 0x0800, CRC(508e07a9) SHA1(23a08ab657086c890489ef0f063f396f630928ff) )    // cards deck gfx, bitplane2
+	ROM_LOAD( "3.7a",   0x1000, 0x0800, BAD_DUMP CRC(6e3e9b1d) SHA1(14eb8d14ce16719a6ad7d13db01e47c8f05955f0) )    // cards deck gfx, bitplane3, using a standard one for now
+
+	ROM_REGION( 0x0100, "proms", 0 )
+	ROM_LOAD( "82s129.9c",    0x0000, 0x0100, BAD_DUMP CRC(7f31066b) SHA1(15420780ec6b2870fc4539ec3afe4f0c58eedf12) ) // PROM dump needed
+ROM_END
+
+
 ROM_START( goodluck )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "goodluck_glh6b.bin", 0x0000, 0x8000, CRC(2cfa4a2c) SHA1(720e2900f3a0ef2632aa201a63b5eba0570e6aa3) )
@@ -5684,7 +5706,7 @@ ROM_END
   Nothing about them, except that they are running
   on ICP-1 type boards.
 
-  It's a supossed Jack Potten's Poker upgrade.
+  It's a supposed Jack Potten's Poker upgrade.
 
 *************************************************************/
 
@@ -12657,6 +12679,7 @@ GAMEL( 198?, potnpkri,  pottnpkr, pottnpkr, goldnpkr, goldnpkr_state, empty_init
 GAMEL( 198?, potnpkrj,  pottnpkr, goldnpkr, goldnpkr, goldnpkr_state, empty_init,    ROT0,   "bootleg",                  "Jack Potten's Poker (set 11, German, W.W.)", 0,                layout_goldnpkr )
 GAMEL( 198?, potnpkrk,  pottnpkr, goldnpkr, goldnpkr, goldnpkr_state, empty_init,    ROT0,   "bootleg",                  "Jack Potten's Poker (set 12, no Double-Up)", 0,                layout_goldnpkr )
 GAMEL( 198?, potnpkrl,  pottnpkr, pottnpkr, potnpkra, goldnpkr_state, empty_init,    ROT0,   "<unknown>",                "Jack Potten's Poker (set 13, ICP-1 PCB)",    0,                layout_goldnpkr )  // unencrypted IPC-1 PCB.
+GAMEL( 1988, potnpkrm,  pottnpkr, pottnpkr, goldnpkr, goldnpkr_state, empty_init,    ROT0,   "bootleg (PED)",            "Jack Potten's Poker (set 14, ICP-1 PCB)",    0,                layout_goldnpkr )  // unencrypted IPC-1 PCB.
 GAMEL( 198?, ngold,     pottnpkr, pottnpkr, ngold,    goldnpkr_state, empty_init,    ROT0,   "<unknown>",                "Jack Potten's Poker (NGold, set 1)",         0,                layout_goldnpkr )
 GAMEL( 198?, ngolda,    pottnpkr, pottnpkr, ngold,    goldnpkr_state, empty_init,    ROT0,   "<unknown>",                "Jack Potten's Poker (NGold, set 2)",         0,                layout_goldnpkr )
 GAMEL( 198?, ngoldb,    pottnpkr, pottnpkr, ngoldb,   goldnpkr_state, empty_init,    ROT0,   "<unknown>",                "Jack Potten's Poker (NGold, set 3)",         0,                layout_goldnpkr )

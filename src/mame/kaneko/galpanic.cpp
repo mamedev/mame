@@ -101,8 +101,8 @@ public:
 	void galpanic(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -127,9 +127,9 @@ private:
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline);
 	void draw_fgbitmap(bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void galpanic_map(address_map &map);
-	void oki_map(address_map &map);
-	void galpanica_map(address_map &map);
+	void galpanic_map(address_map &map) ATTR_COLD;
+	void oki_map(address_map &map) ATTR_COLD;
+	void galpanica_map(address_map &map) ATTR_COLD;
 };
 
 

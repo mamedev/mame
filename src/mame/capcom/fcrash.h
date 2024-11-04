@@ -77,19 +77,19 @@ protected:
 	void fcrash_render_high_layer(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int layer);
 	virtual void fcrash_build_palette();
 
-	void fcrash_map(address_map &map);
-	void mtwinsb_map(address_map &map);
-	void sf2m1_map(address_map &map);
-	void sgyxz_map(address_map &map);
-	void wofabl_map(address_map &map);
-	void wofr1bl_map(address_map &map);
-	void varthb_map(address_map &map);
+	void fcrash_map(address_map &map) ATTR_COLD;
+	void mtwinsb_map(address_map &map) ATTR_COLD;
+	void sf2m1_map(address_map &map) ATTR_COLD;
+	void sgyxz_map(address_map &map) ATTR_COLD;
+	void wofabl_map(address_map &map) ATTR_COLD;
+	void wofr1bl_map(address_map &map) ATTR_COLD;
+	void varthb_map(address_map &map) ATTR_COLD;
 
-	void fcrash_sound_map(address_map &map);
-	void ffightblb_sound_map(address_map &map);
-	void ffightblb_oki_map(address_map &map);
-	void kodb_sound_map(address_map &map);
-	void sgyxz_sound_map(address_map &map);
+	void fcrash_sound_map(address_map &map) ATTR_COLD;
+	void ffightblb_sound_map(address_map &map) ATTR_COLD;
+	void ffightblb_oki_map(address_map &map) ATTR_COLD;
+	void kodb_sound_map(address_map &map) ATTR_COLD;
+	void sgyxz_sound_map(address_map &map) ATTR_COLD;
 
 	/* sound hw */
 	int m_sample_buffer1 = 0;

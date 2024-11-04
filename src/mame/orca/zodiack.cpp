@@ -124,8 +124,8 @@ public:
 	void percuss(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	void nmi_mask_w(uint8_t data);
@@ -145,9 +145,9 @@ private:
 	INTERRUPT_GEN_MEMBER(sound_nmi_gen);
 	void vblank_main_nmi_w(int state);
 
-	void io_map(address_map &map);
-	void main_map(address_map &map);
-	void sound_map(address_map &map);
+	void io_map(address_map &map) ATTR_COLD;
+	void main_map(address_map &map) ATTR_COLD;
+	void sound_map(address_map &map) ATTR_COLD;
 };
 
 void zodiack_state::nmi_mask_w(uint8_t data)

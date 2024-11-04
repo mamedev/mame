@@ -116,8 +116,8 @@ public:
 	void sms1000(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	required_device<t11_device> m_maincpu;
@@ -127,9 +127,9 @@ private:
 	DECLARE_MACHINE_RESET(pdp11ub2);
 	DECLARE_MACHINE_RESET(pdp11qb);
 	void load9312prom(uint8_t *desc, uint8_t *src, int size);
-	void pdp11_mem(address_map &map);
-	void pdp11qb_mem(address_map &map);
-	void sms1000_mem_188(address_map &map);
+	void pdp11_mem(address_map &map) ATTR_COLD;
+	void pdp11qb_mem(address_map &map) ATTR_COLD;
+	void sms1000_mem_188(address_map &map) ATTR_COLD;
 };
 
 void pdp11_state::pdp11_mem(address_map &map)

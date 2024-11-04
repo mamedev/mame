@@ -92,6 +92,19 @@ inline ATTR_FORCE_INLINE uint8_t m6809_base_device::read_operand(int ordinal)
 
 
 //-------------------------------------------------
+//  read_vector
+//-------------------------------------------------
+
+inline ATTR_FORCE_INLINE uint8_t m6809_base_device::read_vector(int ordinal)
+{
+	if(m_vector_read_func.isunset())
+		return read_memory(m_ea.w + ordinal);
+	else
+		return m_vector_read_func(m_ea.w + ordinal);
+}
+
+
+//-------------------------------------------------
 //  write_operand
 //-------------------------------------------------
 

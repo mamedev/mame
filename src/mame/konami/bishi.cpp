@@ -126,11 +126,11 @@ private:
 	TIMER_DEVICE_CALLBACK_MEMBER(bishi_scanline);
 	K056832_CB_MEMBER(tile_callback);
 
-	void main_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 private:
 	/* misc */
 	uint16_t     m_cur_control = 0U;

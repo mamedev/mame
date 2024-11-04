@@ -44,7 +44,7 @@ public:
 	virtual std::string get_default_card_software(get_default_card_software_hook &hook) const override;
 
 protected:
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 private:
 	optional_address_space m_address_space;

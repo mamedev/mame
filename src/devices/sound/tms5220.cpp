@@ -746,11 +746,11 @@ void tms5220_device::update_fifo_status_and_ints()
 
 /**********************************************************************************************
 
-     extract_bits -- extract a specific number of bits from the current input stream (FIFO or VSM)
+     read_bits -- read a specific number of bits from the current input stream (FIFO or VSM)
 
 ***********************************************************************************************/
 
-int tms5220_device::extract_bits(int count)
+int tms5220_device::read_bits(int count)
 {
 	int val = 0;
 
@@ -1469,7 +1469,7 @@ void tms5220_device::parse_frame()
 	has a 2 bit rate preceding it, grab two bits here and store them as the rate; */
 	if ((TMS5220_HAS_RATE_CONTROL) && (m_c_variant_rate & 0x04))
 	{
-		i = extract_bits(2);
+		i = read_bits(2);
 		printbits(i, 2);
 		LOGMASKED(LOG_PARSE_FRAME_DUMP_BIN | LOG_PARSE_FRAME_DUMP_HEX, " ");
 		m_IP = reload_table[i];
@@ -1481,7 +1481,7 @@ void tms5220_device::parse_frame()
 	if (m_DDIS && m_buffer_empty) goto ranout;
 
 	// attempt to extract the energy index
-	m_new_frame_energy_idx = extract_bits(m_coeff->energy_bits);
+	m_new_frame_energy_idx = read_bits(m_coeff->energy_bits);
 	printbits(m_new_frame_energy_idx, m_coeff->energy_bits);
 	LOGMASKED(LOG_PARSE_FRAME_DUMP_BIN | LOG_PARSE_FRAME_DUMP_HEX, " ");
 	update_fifo_status_and_ints();
@@ -1492,12 +1492,12 @@ void tms5220_device::parse_frame()
 
 
 	// attempt to extract the repeat flag
-	rep_flag = extract_bits(1);
+	rep_flag = read_bits(1);
 	printbits(rep_flag, 1);
 	LOGMASKED(LOG_PARSE_FRAME_DUMP_BIN | LOG_PARSE_FRAME_DUMP_HEX, " ");
 
 	// attempt to extract the pitch
-	m_new_frame_pitch_idx = extract_bits(m_coeff->pitch_bits);
+	m_new_frame_pitch_idx = read_bits(m_coeff->pitch_bits);
 	printbits(m_new_frame_pitch_idx, m_coeff->pitch_bits);
 	LOGMASKED(LOG_PARSE_FRAME_DUMP_BIN | LOG_PARSE_FRAME_DUMP_HEX, " ");
 	// if the new frame is unvoiced, be sure to zero out the k5-k10 parameters
@@ -1511,7 +1511,7 @@ void tms5220_device::parse_frame()
 	// extract first 4 K coefficients
 	for (i = 0; i < 4; i++)
 	{
-		m_new_frame_k_idx[i] = extract_bits(m_coeff->kbits[i]);
+		m_new_frame_k_idx[i] = read_bits(m_coeff->kbits[i]);
 		printbits(m_new_frame_k_idx[i], m_coeff->kbits[i]);
 		LOGMASKED(LOG_PARSE_FRAME_DUMP_BIN | LOG_PARSE_FRAME_DUMP_HEX, " ");
 		update_fifo_status_and_ints();
@@ -1528,7 +1528,7 @@ void tms5220_device::parse_frame()
 	// If we got here, we need the remaining 6 K's
 	for (i = 4; i < m_coeff->num_k; i++)
 	{
-		m_new_frame_k_idx[i] = extract_bits(m_coeff->kbits[i]);
+		m_new_frame_k_idx[i] = read_bits(m_coeff->kbits[i]);
 		printbits(m_new_frame_k_idx[i], m_coeff->kbits[i]);
 		LOGMASKED(LOG_PARSE_FRAME_DUMP_BIN | LOG_PARSE_FRAME_DUMP_HEX, " ");
 		update_fifo_status_and_ints();

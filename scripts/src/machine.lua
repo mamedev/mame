@@ -1561,7 +1561,7 @@ if (MACHINES["1MB5"]~=null) then
 end
 
 ---------------------------------------------------
---@src/devices/machine/i2cmem.h,MACHINES["I2CHLE"] = true
+--@src/devices/machine/i2chle.h,MACHINES["I2CHLE"] = true
 ---------------------------------------------------
 
 if (MACHINES["I2CHLE"]~=null) then
@@ -3322,6 +3322,17 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/machine/sc16is741.h,MACHINES["SC16IS741"] = true
+---------------------------------------------------
+if (MACHINES["SC16IS741"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/sc16is741.cpp",
+		MAME_DIR .. "src/devices/machine/sc16is741.h",
+	}
+end
+
+---------------------------------------------------
+--
 --@src/devices/machine/scc66470.h,MACHINES["SCC66470"] = true
 ---------------------------------------------------
 if (MACHINES["SCC66470"]~=null) then
@@ -3580,6 +3591,18 @@ if (MACHINES["TE7750"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/machine/te7750.cpp",
 		MAME_DIR .. "src/devices/machine/te7750.h",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/devices/machine/thmfc1.h,MACHINES["THMFC1"] = true
+---------------------------------------------------
+
+if (MACHINES["THMFC1"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/thmfc1.cpp",
+		MAME_DIR .. "src/devices/machine/thmfc1.h",
 	}
 end
 
@@ -4476,6 +4499,18 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/machine/pc97338.h,MACHINES["PC97338"] = true
+---------------------------------------------------
+
+if (MACHINES["PC97338"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/pc97338.cpp",
+		MAME_DIR .. "src/devices/machine/pc97338.h",
+	}
+end
+
+---------------------------------------------------
+--
 --@src/devices/machine/w83787f.h,MACHINES["W83787F"] = true
 ---------------------------------------------------
 
@@ -4568,6 +4603,17 @@ if (MACHINES["SMARTMEDIA"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/machine/smartmed.cpp",
 		MAME_DIR .. "src/devices/machine/smartmed.h",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/devices/machine/spi_psram.h,MACHINES["SPIPSRAM"] = true
+---------------------------------------------------
+if (MACHINES["SPIPSRAM"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/spi_psram.cpp",
+		MAME_DIR .. "src/devices/machine/spi_psram.h",
 	}
 end
 

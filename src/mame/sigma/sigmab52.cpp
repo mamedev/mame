@@ -197,12 +197,12 @@ private:
 	void ptm2_irq(int state);
 	void audiocpu_irq_update();
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
-	void jwildb52_hd63484_map(address_map &map);
-	void jwildb52_map(address_map &map);
-	void sound_prog_map(address_map &map);
+	void jwildb52_hd63484_map(address_map &map) ATTR_COLD;
+	void jwildb52_map(address_map &map) ATTR_COLD;
+	void sound_prog_map(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device>     m_maincpu;
 	required_device<cpu_device>     m_audiocpu;
@@ -487,7 +487,7 @@ static INPUT_PORTS_START( jwildb52 )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN ) PORT_CODE(KEYCODE_7_PAD)
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("V Door")
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN ) PORT_CODE(KEYCODE_8_PAD)
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, sigmab52_state, coin_drop_start, 0)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(sigmab52_state::coin_drop_start), 0)
 
 	PORT_START("DSW1")
 	PORT_DIPNAME( 0x01, 0x01, "DSW1-1" )        PORT_DIPLOCATION("SW1:1")

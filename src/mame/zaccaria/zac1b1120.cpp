@@ -58,10 +58,10 @@ public:
 	void tinvader(machine_config &config);
 	void dodgem(machine_config &config);
 
-	DECLARE_CUSTOM_INPUT_MEMBER(bg_collision_r) { return m_collision_background; }
+	ioport_value bg_collision_r() { return m_collision_background; }
 
 protected:
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	// devices
@@ -91,7 +91,7 @@ private:
 	int sprite_collision(int first, int second);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void main_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
 };
 
 
@@ -346,7 +346,7 @@ static INPUT_PORTS_START( tinvader )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE2 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED  )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(zac1b1120_state, bg_collision_r)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(FUNC(zac1b1120_state::bg_collision_r))
 
 	PORT_START("1E81")
 	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Lives ) )
@@ -408,7 +408,7 @@ static INPUT_PORTS_START( dodgem )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED  )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(zac1b1120_state, bg_collision_r)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(FUNC(zac1b1120_state::bg_collision_r))
 
 	PORT_START("1E81")
 	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Lives ) )

@@ -89,7 +89,7 @@ public:
 	hp48_module m_modules[6];
 
 private:
-	virtual void machine_reset() override;
+	virtual void machine_reset() override ATTR_COLD;
 	void base_machine_start(hp48_models model);
 
 	void hp48_palette(palette_device &palette) const;
@@ -133,7 +133,7 @@ private:
 	/* keyboard interrupt system */
 	void rsi(int state);
 	void hp48_common(machine_config &config);
-	void hp48(address_map &map);
+	void hp48(address_map &map) ATTR_COLD;
 
 	required_device<saturn_device> m_maincpu;
 	required_device<dac_bit_interface> m_dac;

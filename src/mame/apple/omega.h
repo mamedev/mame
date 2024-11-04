@@ -20,7 +20,7 @@ public:
 
 protected:
 	// device_r overrides
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 private:
 	devcb_write32 m_write_pclock;

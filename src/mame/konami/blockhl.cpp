@@ -56,7 +56,7 @@ public:
 	void blockhl(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	required_device<konami_cpu_device> m_maincpu;
@@ -76,8 +76,8 @@ private:
 
 	void banking_callback(uint8_t data);
 
-	void audio_map(address_map &map);
-	void main_map(address_map &map);
+	void audio_map(address_map &map) ATTR_COLD;
+	void main_map(address_map &map) ATTR_COLD;
 };
 
 

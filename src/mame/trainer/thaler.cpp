@@ -34,14 +34,14 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(reset_changed);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;
 	required_ioport_array<6> m_keypad;
 	output_finder<6> m_digit;
 
-	void mps65_map(address_map &map);
+	void mps65_map(address_map &map) ATTR_COLD;
 
 	uint8_t pa_r();
 	void pa_w(uint8_t data);
@@ -129,7 +129,7 @@ static INPUT_PORTS_START( mps65 )
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_ENTER) PORT_CHAR(13) PORT_NAME("Enter")
 
 	PORT_START("RESET")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_R) PORT_NAME("Reset") PORT_CHANGED_MEMBER(DEVICE_SELF, mps65_state, reset_changed, 0)
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_R) PORT_NAME("Reset") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(mps65_state::reset_changed), 0)
 INPUT_PORTS_END
 
 

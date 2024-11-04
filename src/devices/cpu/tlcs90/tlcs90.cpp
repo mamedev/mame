@@ -6,10 +6,6 @@
 
     emulation by Luca Elia, based on the Z80 core by Juergen Buchmueller
 
-    ChangeLog:
-
-    20150517 Fixed TRUN bit masking (timers start/stop handling) [Rainer Keuchel]
-
 *************************************************************************************************************/
 
 #include "emu.h"
@@ -284,31 +280,28 @@ static uint8_t SZHV_dec[256]; /* zero, sign, half carry and overflow flags DEC r
 #define OP_16 0x80
 
 
+#define OP(   X,CT )       m_op = X; m_cyc_t = (CT*2);
+#define OP16( X,CT )       OP( (X)|OP_16,CT )
 
+#define OPCC(   X,CF,CT )  OP( X, CT ) m_cyc_f = (CF*2);
+#define OPCC16( X,CF,CT )  OPCC( (X)|OP_16,CF,CT )
 
-
-#define OP(   X,CT )        m_op = X;       m_cyc_t = (CT*2);
-#define OP16( X,CT )        OP( (X)|OP_16,CT )
-
-#define OPCC(   X,CF,CT )   OP( X, CT ) m_cyc_f = (CF*2);
-#define OPCC16( X,CF,CT )   OPCC( (X)|OP_16,CF,CT )
-
-#define BIT8( N,I )         m_mode##N = e_mode::BIT8;  m_r##N = I;
-#define I8( N,I )           m_mode##N = e_mode::I8;        m_r##N = I;
-#define D8( N,I )           m_mode##N = e_mode::D8;        m_r##N = I;
-#define I16( N,I )          m_mode##N = e_mode::I16;       m_r##N = I;
-#define D16( N,I )          m_mode##N = e_mode::D16;       m_r##N = I;
-#define R8( N,R )           m_mode##N = e_mode::R8;        m_r##N = R;
-#define R16( N,R )          m_mode##N = e_mode::R16;       m_r##N = R;
-#define Q16( N,R )          m_mode##N = e_mode::R16;       m_r##N = R; if (m_r##N == SP) m_r##N = AF;
-#define MI16( N,I )         m_mode##N = e_mode::MI16;  m_r##N = I;
-#define MR16( N,R )         m_mode##N = e_mode::MR16;  m_r##N = R;
-#define MR16D8( N,R,I )     m_mode##N = e_mode::MR16D8;    m_r##N = R; m_r##N##b = I;
-#define MR16R8( N,R,g )     m_mode##N = e_mode::MR16R8;    m_r##N = R; m_r##N##b = g;
-#define NONE( N )           m_mode##N = e_mode::NONE;
-#define CC( N,cc )          m_mode##N = e_mode::CC;        m_r##N = cc;
-#define R16D8( N,R,I )      m_mode##N = e_mode::R16D8; m_r##N = R; m_r##N##b = I;
-#define R16R8( N,R,g )      m_mode##N = e_mode::R16R8; m_r##N = R; m_r##N##b = g;
+#define BIT8( N,I )        m_mode##N = e_mode::BIT8;    m_r##N = I;
+#define I8( N,I )          m_mode##N = e_mode::I8;      m_r##N = I;
+#define D8( N,I )          m_mode##N = e_mode::D8;      m_r##N = I;
+#define I16( N,I )         m_mode##N = e_mode::I16;     m_r##N = I;
+#define D16( N,I )         m_mode##N = e_mode::D16;     m_r##N = I;
+#define R8( N,R )          m_mode##N = e_mode::R8;      m_r##N = R;
+#define R16( N,R )         m_mode##N = e_mode::R16;     m_r##N = R;
+#define Q16( N,R )         m_mode##N = e_mode::R16;     m_r##N = R; if (m_r##N == SP) m_r##N = AF;
+#define MI16( N,I )        m_mode##N = e_mode::MI16;    m_r##N = I;
+#define MR16( N,R )        m_mode##N = e_mode::MR16;    m_r##N = R;
+#define MR16D8( N,R,I )    m_mode##N = e_mode::MR16D8;  m_r##N = R; m_r##N##b = I;
+#define MR16R8( N,R,g )    m_mode##N = e_mode::MR16R8;  m_r##N = R; m_r##N##b = g;
+#define NONE( N )          m_mode##N = e_mode::NONE;
+#define CC( N,cc )         m_mode##N = e_mode::CC;      m_r##N = cc;
+#define R16D8( N,R,I )     m_mode##N = e_mode::R16D8;   m_r##N = R; m_r##N##b = I;
+#define R16R8( N,R,g )     m_mode##N = e_mode::R16R8;   m_r##N = R; m_r##N##b = g;
 
 uint8_t  tlcs90_device::RM8 (uint32_t a)    { return m_program->read_byte( a ); }
 uint16_t tlcs90_device::RM16(uint32_t a)    { return RM8(a) | (RM8( (a+1) & 0xffff ) << 8); }
@@ -2128,11 +2121,6 @@ void tlcs90_device::device_reset()
 	m_t4mod = 0;
 	std::fill(std::begin(m_treg_8bit), std::end(m_treg_8bit), 0);
 	std::fill(std::begin(m_treg_16bit), std::end(m_treg_16bit), 0);
-}
-
-void tlcs90_device::execute_burn(int32_t cycles)
-{
-	m_icount -= 4 * ((cycles + 3) / 4);
 }
 
 

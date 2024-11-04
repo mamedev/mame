@@ -16,10 +16,10 @@ public:
 
 	static constexpr feature_type unemulated_features() { return feature::SOUND; }
 
-	virtual void io_map(address_map &map) override;
+	virtual void io_map(address_map &map) override ATTR_COLD;
 
 private:
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 	required_device_array<ym2149_device, 2> m_psg;
 };

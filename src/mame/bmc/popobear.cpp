@@ -1,5 +1,6 @@
 // license:BSD-3-Clause
-// copyright-holders:Angelo Salese, David Haywood
+// copyright-holders: Angelo Salese, David Haywood
+
 /**************************************************************************************************
 
 Popo Bear (c) 2000 BMC
@@ -10,6 +11,8 @@ TODO:
 - complete I/Os;
 - Identify what's on $600000 & $620000;
 - Uses tas opcode to sync to irq, from VDP?
+- magkengo: doesn't boot, same as popobear would do without the 0x620000 work-around, but it doesn't
+  read there.
 
 ===================================================================================================
 
@@ -72,10 +75,12 @@ Component Side   A   B   Solder Side
 **************************************************************************************************/
 
 #include "emu.h"
+
 #include "cpu/m68000/m68000.h"
 #include "machine/timer.h"
 #include "sound/okim6295.h"
 #include "sound/ymopl.h"
+
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
@@ -105,6 +110,9 @@ public:
 
 	void popobear(machine_config &config);
 
+protected:
+	virtual void video_start() override ATTR_COLD;
+
 private:
 	required_device<cpu_device> m_maincpu;
 	required_device<screen_device> m_screen;
@@ -124,14 +132,13 @@ private:
 	void irq_ack_w(uint8_t data);
 	void vram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
-	virtual void video_start() override;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect);
+	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline_cb);
 
 	void postload();
-	void main_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
 };
 
 
@@ -149,9 +156,9 @@ void popobear_state::vram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 	);
 
 	COMBINE_DATA(&m_vram_rearranged[swapped_offset]);
-	m_gfxdecode->gfx(0)->mark_dirty((swapped_offset)/32);
+	m_gfxdecode->gfx(0)->mark_dirty((swapped_offset) / 32);
 
-	// unfortunately tilemaps and tilegfx share the same ram so we're always dirty if we write to RAM
+	// unfortunately tilemaps and tilegfx share the same RAM so we're always dirty if we write to RAM
 	m_bg_tilemap[0]->mark_all_dirty();
 	m_bg_tilemap[1]->mark_all_dirty();
 	m_bg_tilemap[2]->mark_all_dirty();
@@ -175,9 +182,9 @@ GFXDECODE_END
 
 template <unsigned N> TILE_GET_INFO_MEMBER(popobear_state::get_tile_info)
 {
-	int base = m_tilemap_base[N];
-	int tileno = m_vram[base / 2 + tile_index];
-	int flipyx = (tileno >> 14);
+	int const base = m_tilemap_base[N];
+	int const tileno = m_vram[base / 2 + tile_index];
+	int const flipyx = (tileno >> 14);
 	tileinfo.set(0, tileno & 0x3fff, 0, TILE_FLIPYX(flipyx));
 }
 
@@ -218,42 +225,40 @@ void popobear_state::video_start()
  * ---- ---- ---- --x- NOT set on the enemy character / characters in your line
  * ---- ---- ---- ---x set on opposite to above?
  */
-void popobear_state::draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect)
+void popobear_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	uint8_t* vram = reinterpret_cast<uint8_t *>(m_spriteram.target());
-	int i;
 
-
-	for (int drawpri = 0xf;drawpri>=0x0;drawpri--)
+	for (int drawpri = 0xf; drawpri >= 0x0; drawpri--)
 	{
-		/* 0x106 = 8 x 8 */
-		/* 0x*29 = 32 x 32 */
-		for(i = 0x800-8;i >= 0; i-=8)
+		// 0x106 = 8 x 8
+		// 0x*29 = 32 x 32
+		for (int i = 0x800 - 8; i >= 0; i -= 8)
 		{
 			uint16_t *sprdata = &m_spriteram[(0x7f800 + i) / 2];
 
-			int param = sprdata[0];
-			int pri = (param & 0x0f00)>>8;
+			int const param = sprdata[0];
+			int const pri = (param & 0x0f00) >> 8;
 
 			// we do this because it's sprite<->sprite priority,
-			if (pri!=drawpri)
+			if (pri != drawpri)
 				continue;
 
 			int y = sprdata[1];
 			int x = sprdata[2];
 			int spr_num = sprdata[3];
 
-			int width = 8 << ((param & 0x30)>>4);
-			int height = width; // sprites are always square?
+			int const width = 8 << ((param & 0x30) >> 4);
+			int const height = width; // sprites are always square?
 
-			int color_bank = ((param & 0xc)>>2);
-			int x_dir = param & 0x40;
-			int y_dir = param & 0x80;
+			int color_bank = ((param & 0xc) >> 2);
+			int const x_dir = param & 0x40;
+			int const y_dir = param & 0x80;
 
-			if (x&0x8000) x-= 0x10000;
-			if (y&0x8000) y-= 0x10000;
+			if (x & 0x8000) x -= 0x10000;
+			if (y & 0x8000) y -= 0x10000;
 
-			if (param&0xf000) color_bank = (machine().rand() & 0x3);
+			if (param & 0xf000) color_bank = (machine().rand() & 0x3);
 
 
 
@@ -269,46 +274,46 @@ void popobear_state::draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect
 
 				case 0x1: // butterflies in intro, enemy characters, line of characters, stage start text
 				//color_bank = (machine().rand() & 0x3);
-				add_it = color_bank*0x40;
+				add_it = color_bank * 0x40;
 				break;
 
 				case 0x2: // characters in intro, main player, powerups, timer, large dancing chars between levels (0x3f?)
 				//color_bank = (machine().rand() & 0x3);
-				add_it = color_bank*0x40;
+				add_it = color_bank * 0x40;
 				break;
 
 				case 0x3: // letters on GAME OVER need this..
-				add_it = color_bank*0x40;
+				add_it = color_bank * 0x40;
 				add_it += 0x20;
 				break;
 			}
 
-			if(param == 0)
+			if (param == 0)
 				continue;
 
 
 			spr_num <<= 3;
 
-			for(int yi=0;yi<height;yi++)
+			for (int yi = 0; yi < height; yi++)
 			{
-				int y_draw = (y_dir) ? y+((height-1) - yi) : y+yi;
+				int const y_draw = (y_dir) ? y + ((height - 1) - yi) : y + yi;
 
-				for(int xi=0;xi<width;xi++)
+				for (int xi = 0; xi < width; xi++)
 				{
-					uint8_t pix = vram[BYTE_XOR_BE(spr_num)];
-					int x_draw = (x_dir) ? x+((width-1) - xi) : x+xi;
+					uint8_t const pix = vram[BYTE_XOR_BE(spr_num)];
+					int const x_draw = (x_dir) ? x + ((width - 1) - xi) : x + xi;
 
-					if(cliprect.contains(x_draw, y_draw))
+					if (cliprect.contains(x_draw, y_draw))
 					{
 						// this is a bit strange, pix data is basically 8-bit
-						// but we have to treat 0x00, 0x40, 0x80, 0xc0 */
-						// see scores when you colect an item, must be at least steps of 0x40 or one of the female panda gfx between levels breaks.. might depend on lower bits?
+						// but we have to treat 0x00, 0x40, 0x80, 0xc0
+						// see scores when you collect an item, must be at least steps of 0x40 or one of the female panda gfx between levels breaks.. might depend on lower bits?
 						// granularity also means colour bank is applied *0x40
 						// and we have 2 more possible colour bank bits
 						// colours on game over screen are still wrong without the weird param kludge above
-						if (pix&0x3f)
+						if (pix & 0x3f)
 						{
-							bitmap.pix(y_draw, x_draw) = m_palette->pen(((pix+(add_it))&0xff)+0x100);
+							bitmap.pix(y_draw, x_draw) = m_palette->pen(((pix + (add_it)) & 0xff) + 0x100);
 						}
 					}
 
@@ -322,13 +327,9 @@ void popobear_state::draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect
 uint32_t popobear_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(0, cliprect);
-	int line;
-	rectangle clip;
-	int scrollbase;
-	int scrollbase2;
 
 	const rectangle &visarea = screen.visible_area();
-	clip = visarea;
+	rectangle clip = visarea;
 
 	//popmessage("%04x",m_vregs[0/2]);
 	uint16_t* vreg = m_vregs;
@@ -338,7 +339,7 @@ uint32_t popobear_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 	// vreg[0x00] also looks like it could be some enable registers
 	// 0x82ff - BMC logo
 	// 0x8aff - some attract scenes (no sprites)
-	// 0x8bff - game attract scense etc. (sprites)
+	// 0x8bff - game attract scenes etc. (sprites)
 
 	// vreg[0x01] is always
 	// 0xfefb
@@ -347,10 +348,10 @@ uint32_t popobear_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 
 	// these are more than just enable, they get written with 0x0d and 0x1f (and 0x00 when a layer is off)
 	// seems to be related to the linescroll mode at least? maybe sizes?
-	int enable0 = (m_vregs[0x0c] & 0xff00)>>8;
-	int enable1 = (m_vregs[0x0c] & 0x00ff)>>0;
-	int enable2 = (m_vregs[0x0d] & 0xff00)>>8;
-	int enable3 = (m_vregs[0x0d] & 0x00ff)>>0;
+	int const enable0 = (m_vregs[0x0c] & 0xff00) >> 8;
+	int const enable1 = (m_vregs[0x0c] & 0x00ff) >> 0;
+	int const enable2 = (m_vregs[0x0d] & 0xff00) >> 8;
+	int const enable3 = (m_vregs[0x0d] & 0x00ff) >> 0;
 
 	if ((enable0 != 0x00) && (enable0 != 0x0d) && (enable0 != 0x1f)) popmessage("unknown enable0 value %02x", enable0);
 	if ((enable1 != 0x00) && (enable1 != 0x0d) && (enable1 != 0x1f)) popmessage("unknown enable1 value %02x", enable1);
@@ -370,20 +371,23 @@ uint32_t popobear_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 
 	// the upper 2 tilemaps have a lineselect / linescroll logic
 
+	int scrollbase;
+	int scrollbase2;
+
 	if (enable1 == 0x1f)
 	{
 		scrollbase = 0xdf600;
 		scrollbase2 = 0xdf800;
 
-		for (line = 0; line < 240;line++)
+		for (int line = 0; line < 240; line++)
 		{
-			uint16_t val = m_vram[scrollbase/2 + line];
-			uint16_t upper = (m_vram[scrollbase2/2 + line]&0xff00)>>8;
+			uint16_t const val = m_vram[scrollbase / 2 + line];
+			uint16_t const upper = (m_vram[scrollbase2 / 2 + line] & 0xff00) >> 8;
 
 			clip.sety(line, line);
 
-			m_bg_tilemap[1]->set_scrollx(0,(val&0x00ff) | (upper << 8));
-			m_bg_tilemap[1]->set_scrolly(0,((val&0xff00)>>8)-line);
+			m_bg_tilemap[1]->set_scrollx(0, (val & 0x00ff) | (upper << 8));
+			m_bg_tilemap[1]->set_scrolly(0, ((val & 0xff00) >> 8) - line);
 
 			m_bg_tilemap[1]->draw(screen, bitmap, clip, 0, 0);
 		}
@@ -400,15 +404,15 @@ uint32_t popobear_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 		scrollbase = 0xdf400;
 		scrollbase2 = 0xdf800;
 
-		for (line = 0; line < 240;line++)
+		for (int line = 0; line < 240; line++)
 		{
-			uint16_t val = m_vram[scrollbase/2 + line];
-			uint16_t upper = (m_vram[scrollbase2/2 + line]&0x00ff)>>0;
+			uint16_t const val = m_vram[scrollbase / 2 + line];
+			uint16_t const upper = (m_vram[scrollbase2 / 2 + line] & 0x00ff) >> 0;
 
 			clip.sety(line, line);
 
-			m_bg_tilemap[0]->set_scrollx(0,(val&0x00ff) | (upper << 8));
-			m_bg_tilemap[0]->set_scrolly(0,((val&0xff00)>>8)-line);
+			m_bg_tilemap[0]->set_scrollx(0, (val & 0x00ff) | (upper << 8));
+			m_bg_tilemap[0]->set_scrolly(0, ((val & 0xff00) >> 8) - line);
 
 			m_bg_tilemap[0]->draw(screen, bitmap, clip, 0, 0);
 		}
@@ -420,16 +424,16 @@ uint32_t popobear_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 		m_bg_tilemap[0]->draw(screen, bitmap, cliprect, 0, 0);
 	}
 
-	draw_sprites(bitmap,cliprect);
+	draw_sprites(bitmap, cliprect);
 
 	return 0;
 }
 
 void popobear_state::irq_ack_w(uint8_t data)
 {
-	for(int i = 0; i < 8; i++)
+	for (int i = 0; i < 8; i++)
 	{
-		if(BIT(data, i))
+		if (BIT(data, i))
 			m_maincpu->set_input_line(i, CLEAR_LINE);
 	}
 }
@@ -439,11 +443,11 @@ void popobear_state::main_map(address_map &map)
 	map.unmap_value_high();
 	map(0x000000, 0x03ffff).rom();
 	map(0x210000, 0x21ffff).ram();
-	map(0x280000, 0x2fffff).ram().share("spriteram"); // unknown boundaries
-	map(0x300000, 0x3fffff).ram().w(FUNC(popobear_state::vram_w)).share("vram"); // tile definitions + tilemaps
+	map(0x280000, 0x2fffff).ram().share(m_spriteram); // unknown boundaries
+	map(0x300000, 0x3fffff).ram().w(FUNC(popobear_state::vram_w)).share(m_vram); // tile definitions + tilemaps
 
 	// TODO: is the 48xxxx block entirely from AIA90423?
-	map(0x480000, 0x48001f).ram().share("vregs");
+	map(0x480000, 0x48001f).ram().share(m_vregs);
 	map(0x480031, 0x480031).w(FUNC(popobear_state::irq_ack_w));
 	map(0x480034, 0x480035).nopr(); // uses bset/bclr to write, which causes a read (ignored)
 	map(0x480035, 0x480035).lw8(
@@ -484,31 +488,56 @@ void popobear_state::main_map(address_map &map)
 
 // TODO: unconfirmed diplocations
 static INPUT_PORTS_START( popobear )
-	PORT_START("DSW1")
+	PORT_START("IN0")
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1)
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("IN1")
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SW1:1")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0e, 0x00, "Coin_A" ) PORT_DIPLOCATION("SW1:2,3,4")
-	PORT_DIPSETTING(    0x0c, DEF_STR( 3C_1C ) )
-	PORT_DIPSETTING(    0x0a, DEF_STR( 2C_1C ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( 1C_2C ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( 1C_3C ) )
-	PORT_DIPSETTING(    0x06, DEF_STR( 1C_4C ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( 1C_5C ) )
-	PORT_DIPSETTING(    0x0e, "Freeplay" )
-	PORT_DIPNAME( 0x30, 0x00, DEF_STR( Lives ) ) PORT_DIPLOCATION("SW1:5,6")
-	PORT_DIPSETTING(    0x10, "2" )
-	PORT_DIPSETTING(    0x00, "3" )
-	PORT_DIPSETTING(    0x20, "4" )
-	PORT_DIPSETTING(    0x30, "5" )
-	PORT_DIPNAME( 0xc0, 0x00, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("SW1:7,8")
-	PORT_DIPSETTING(    0x80, DEF_STR( Very_Easy ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Easy ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Normal ) )
-	PORT_DIPSETTING(    0xc0, DEF_STR( Hard ) )
+	PORT_DIPNAME( 0x0e, 0x0e, "Coin_A" ) PORT_DIPLOCATION("SW1:2,3,4")
+	PORT_DIPSETTING(    0x02, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x0e, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x0c, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(    0x0a, DEF_STR( 1C_3C ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( 1C_4C ) )
+	PORT_DIPSETTING(    0x06, DEF_STR( 1C_5C ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Free_Play ) )
+	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Lives ) ) PORT_DIPLOCATION("SW1:5,6")
+	PORT_DIPSETTING(    0x20, "2" )
+	PORT_DIPSETTING(    0x30, "3" )
+	PORT_DIPSETTING(    0x10, "4" )
+	PORT_DIPSETTING(    0x00, "5" )
+	PORT_DIPNAME( 0xc0, 0xc0, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("SW1:7,8")
+	PORT_DIPSETTING(    0x40, DEF_STR( Very_Easy ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Easy ) )
+	PORT_DIPSETTING(    0xc0, DEF_STR( Normal ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Hard ) )
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(2)
+	PORT_BIT( 0x1e00, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_DIPNAME( 0x2000, 0x2000, "Service?" ) // hangs if flipped on during attract
+	PORT_DIPSETTING(    0x2000, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_START2 )
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_START1 )
 
-	PORT_START("DSW2")
+	PORT_START("DSW2") // TODO: where are this read?
 	PORT_DIPNAME( 0x01, 0x00, "Arrow" ) PORT_DIPLOCATION("SW2:1")
 	PORT_DIPSETTING(    0x01, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
@@ -533,65 +562,37 @@ static INPUT_PORTS_START( popobear )
 	PORT_DIPNAME( 0x80, 0x00, "DSW2:8" ) PORT_DIPLOCATION("SW2:8")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
-
-	PORT_START("IN0")
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(2)
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(2)
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(2)
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(2)
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)
-	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1)
-	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1)
-	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1)
-	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(1)
-	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
-	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
-	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1)
-	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNUSED )
-
-	PORT_START("IN1")
-	PORT_BIT( 0x00ff, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(2)
-	PORT_BIT( 0x1e00, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_DIPNAME( 0x2000, 0x2000, "Service?" ) // hangs if flipped on during attract
-	PORT_DIPSETTING(    0x2000, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
-	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_START2 )
-	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_START1 )
 INPUT_PORTS_END
 
 
 TIMER_DEVICE_CALLBACK_MEMBER(popobear_state::scanline_cb)
 {
-	int scanline = param;
+	int const scanline = param;
 
 	// vblank-in
 	// Order is trusted, 5 as vblank-in makes title mosaic-esque rotation to draw incorrectly
-	if(scanline == 240)
+	if (scanline == 240)
 		m_maincpu->set_input_line(3, ASSERT_LINE);
 
 	// vblank-out
-	if(scanline == 0)
+	if (scanline == 0)
 		m_maincpu->set_input_line(5, ASSERT_LINE);
 
-	/* TODO: actually a timer irq, tied with YM2413 sound chip (controls BGM tempo) */
-	/* the YM2413 doesn't have interrupts? */
-	if(scanline == 64 || scanline == 192)
+	// TODO: actually a timer irq, tied with YM2413 sound chip (controls BGM tempo)
+	// the YM2413 doesn't have interrupts?
+	if (scanline == 64 || scanline == 192)
 		m_maincpu->set_input_line(2, ASSERT_LINE);
 }
 
 void popobear_state::popobear(machine_config &config)
 {
-	M68000(config, m_maincpu, XTAL(42'000'000)/4);  // divisor guessed
+	M68000(config, m_maincpu, XTAL(42'000'000) / 4);  // divisor guessed
 	m_maincpu->set_addrmap(AS_PROGRAM, &popobear_state::main_map);
 	TIMER(config, "scantimer").configure_scanline(FUNC(popobear_state::scanline_cb), "screen", 0, 1);
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(60);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); // not accurate
 	m_screen->set_screen_update(FUNC(popobear_state::screen_update));
 	m_screen->set_palette(m_palette);
 	m_screen->set_size(128*8, 32*8);
@@ -603,9 +604,9 @@ void popobear_state::popobear(machine_config &config)
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_popobear);
 
-	YM2413(config, "ymsnd", XTAL(42'000'000)/16).add_route(ALL_OUTPUTS, "mono", 1.0);  // divisor guessed
+	YM2413(config, "ymsnd", XTAL(42'000'000) / 16).add_route(ALL_OUTPUTS, "mono", 1.0);  // divisor guessed
 
-	OKIM6295(config, "oki", XTAL(42'000'000)/32, okim6295_device::PIN7_LOW).add_route(ALL_OUTPUTS, "mono", 1.0);  // divisor guessed
+	OKIM6295(config, "oki", XTAL(42'000'000) / 32, okim6295_device::PIN7_LOW).add_route(ALL_OUTPUTS, "mono", 1.0);  // divisor guessed
 }
 
 
@@ -624,7 +625,25 @@ ROM_START( popobear )
 	ROM_LOAD( "popobear_ta-a-901.u9", 0x00000, 0x40000,  CRC(f1e94926) SHA1(f4d6f5b5811d90d0069f6efbb44d725ff0d07e1c) )
 ROM_END
 
+// HERBHOME 20A23-1 PCB. Mostly same components as popobear's (BMC AIA90423, BMC AIA90610, OKI6295, 42 MHz XTAL, etc.), different layout.
+// Has a Altera MAX EPM7064SLC84-10 and only 1 8-DIP bank
+// Has Herb Home 2003 copyright in ROM but stickers have 2005. TODO: Verify date on title screen when it boots.
+ROM_START( magkengo )
+	ROM_REGION( 0x40000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "magical_kengo_2005_l1_a_201_u27.u27", 0x000000, 0x020000, CRC(eddfd8b1) SHA1(9eaeff2c0798b2b6b727ad6f3749cc427a52db41) ) // M27C1001
+	ROM_LOAD16_BYTE( "magical_kengo_2005_l1_a_101_u26.u26", 0x000001, 0x020000, CRC(449ad8ab) SHA1(625bd2491eb95aa8e39f75db0d0cd01ec649f5b8) ) // M27C1001
+
+	ROM_REGION16_BE( 0x400000, "gfx_data", ROMREGION_ERASE00 )
+	ROM_LOAD16_BYTE( "magical_kengo_2005_l8_a_401_u6.u6", 0x000000, 0x100000, CRC(857e34e6) SHA1(17681a684f451c92f577d6cb3443a3801b192df3) ) // M27C801
+	ROM_LOAD16_BYTE( "magical_kengo_2005_l8_a_301_u5.u5", 0x000001, 0x100000, CRC(ca03b9fd) SHA1(b9fb407760ed1fc276f42a6dd326edbf97c1660d) ) // M27C801
+	// u3 and u4 empty not populated
+
+	ROM_REGION( 0x80000, "oki", 0 )
+	ROM_LOAD( "magical_kengo_2005_l4_a_701_u20.u20", 0x00000, 0x80000, CRC(a2c563a7) SHA1(ce33e95887cdf76cb4c5f944bbdd219de1b2c7c0) ) // AMD AM27C040
+ROM_END
+
 } // anonymous namespace
 
 
-GAME( 2000, popobear,    0, popobear,    popobear, popobear_state, empty_init, ROT0,  "BMC", "PoPo Bear",  MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_TIMING | MACHINE_SUPPORTS_SAVE )
+GAME( 2000, popobear, 0, popobear, popobear, popobear_state, empty_init, ROT0, "BMC",       "PoPo Bear",     MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_TIMING | MACHINE_SUPPORTS_SAVE )
+GAME( 2005, magkengo, 0, popobear, popobear, popobear_state, empty_init, ROT0, "Herb Home", "Magical Kengo", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_TIMING | MACHINE_SUPPORTS_SAVE )

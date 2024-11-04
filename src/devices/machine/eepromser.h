@@ -36,7 +36,7 @@ protected:
 	eeprom_serial_base_device(const machine_config &mconfig, device_type devtype, const char *tag, device_t *owner, eeprom_serial_streaming enable_streaming);
 
 	// device-level overrides
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 	// read interfaces differ between implementations
 
@@ -197,7 +197,7 @@ protected:
 	void execute_command() override;
 	void copy_ram_to_eeprom();
 	void copy_eeprom_to_ram();
-	void device_start() override;
+	void device_start() override ATTR_COLD;
 	uint8_t m_ram_length;
 	uint16_t m_ram_data[16];
 	uint16_t m_reading;

@@ -117,8 +117,8 @@ private:
 	void mycom_rtc_w(u8 data);
 	MC6845_UPDATE_ROW(crtc_update_row);
 
-	void mycom_io(address_map &map);
-	void mycom_map(address_map &map);
+	void mycom_io(address_map &map) ATTR_COLD;
+	void mycom_map(address_map &map) ATTR_COLD;
 
 	std::unique_ptr<u8[]> m_vram;
 	u8 m_port0a = 0U;
@@ -126,8 +126,8 @@ private:
 	u8 m_sn_we = 0U;
 	u16 m_i_videoram = 0U;
 	bool m_keyb_press_flag = false;
-	virtual void machine_reset() override;
-	virtual void machine_start() override;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void machine_start() override ATTR_COLD;
 	required_device<cpu_device> m_maincpu;
 	required_region_ptr<u8> m_rom;
 	required_shared_ptr<u8> m_ram;

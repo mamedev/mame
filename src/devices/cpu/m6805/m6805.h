@@ -126,13 +126,12 @@ protected:
 			address_map_constructor internal_map);
 
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// device_execute_interface overrides
 	virtual uint32_t execute_min_cycles() const noexcept override;
 	virtual uint32_t execute_max_cycles() const noexcept override;
-	virtual uint32_t execute_input_lines() const noexcept override;
 	virtual void execute_run() override;
 	virtual void execute_set_input(int inputnum, int state) override;
 	virtual uint64_t execute_clocks_to_cycles(uint64_t clocks) const noexcept override;
@@ -319,7 +318,7 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_reset() override;
+	virtual void device_reset() override ATTR_COLD;
 
 	virtual void interrupt_vector() override;
 
@@ -344,7 +343,7 @@ protected:
 			address_map_constructor internal_map);
 
 	// device-level overrides
-	virtual void device_reset() override;
+	virtual void device_reset() override ATTR_COLD;
 
 	virtual void execute_set_input(int inputnum, int state) override;
 	virtual bool execute_input_edge_triggered(int inputnum) const noexcept override { return inputnum == INPUT_LINE_NMI; }
@@ -362,7 +361,7 @@ public:
 	hd6305v0_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 private:
-	void internal_map(address_map &map);
+	void internal_map(address_map &map) ATTR_COLD;
 };
 
 // ======================> hd6305y2_device
@@ -374,7 +373,7 @@ public:
 	hd6305y2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 private:
-	void internal_map(address_map &map);
+	void internal_map(address_map &map) ATTR_COLD;
 };
 
 // ======================> hd63705z0_device
@@ -386,7 +385,7 @@ public:
 	hd63705z0_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 private:
-	void internal_map(address_map &map);
+	void internal_map(address_map &map) ATTR_COLD;
 };
 
 #define M6805_IRQ_LINE      0

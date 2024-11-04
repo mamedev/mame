@@ -1280,11 +1280,13 @@ void mc6845_device::device_reset()
 
 	m_light_pen_latched = false;
 
+	// TODO: as per the note above, none of these should reset unless otherwise proven.
 	m_cursor_addr = 0;
 	m_line_address = 0;
-	m_horiz_disp = 0;
+	// bml3 in particular disagrees with these two.
+	//m_horiz_disp = 0;
+	//m_mode_control = 0;
 	m_cursor_x = 0;
-	m_mode_control = 0;
 	m_register_address_latch = 0;
 	m_update_addr = 0;
 	m_light_pen_addr = 0;

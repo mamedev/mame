@@ -92,8 +92,8 @@ public:
 	void quadra_base(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	u32 rom_switch_r(offs_t offset);
 	u16 via_r(offs_t offset);
@@ -169,7 +169,7 @@ public:
 	{
 	}
 
-	void quadra700_map(address_map &map);
+	void quadra700_map(address_map &map) ATTR_COLD;
 	void macqd700(machine_config &config);
 
 private:
@@ -196,13 +196,13 @@ public:
 	{
 	}
 
-	void quadra900_map(address_map &map);
+	void quadra900_map(address_map &map) ATTR_COLD;
 	void macqd900(machine_config &config);
 	void macqd950(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	void egret_reset_w(int state);
 	void fdc_hdsel(int state);
@@ -830,7 +830,7 @@ void eclipse_state::via2_out_b_q900(u8 data)
 
 		SOFTWARE_LIST(config, "hdd_list").set_original("mac_hdd");
 		SOFTWARE_LIST(config, "cd_list").set_original("mac_cdrom").set_filter("MC68040");
-	//	SOFTWARE_LIST(config, "cd_apple_dev").set_original("apple_devcd");
+		//SOFTWARE_LIST(config, "cd_apple_dev").set_original("apple_devcd");
 		SOFTWARE_LIST(config, "flop_mac35_orig").set_original("mac_flop_orig");
 		SOFTWARE_LIST(config, "flop_mac35_clean").set_original("mac_flop_clcracked");
 		SOFTWARE_LIST(config, "flop35_list").set_original("mac_flop");

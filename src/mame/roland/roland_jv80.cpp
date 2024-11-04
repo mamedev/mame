@@ -28,7 +28,7 @@ public:
 	void jv880(machine_config &config);
 
 private:
-	void jv880_mem_map(address_map &map);
+	void jv880_mem_map(address_map &map) ATTR_COLD;
 
 	required_device<h8532_device> m_maincpu;
 	required_device<tc6116_device> m_pcm;
@@ -73,7 +73,7 @@ public:
 	void rd500(machine_config &config);
 
 private:
-	void rd500_mem_map(address_map &map);
+	void rd500_mem_map(address_map &map) ATTR_COLD;
 
 	u8 keyscan_r(offs_t offset);
 	void keyscan_w(offs_t offset, u8 data);

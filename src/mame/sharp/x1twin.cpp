@@ -46,10 +46,10 @@ public:
 
 private:
 	uint32_t screen_update_x1pce(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	void pce_io(address_map &map);
-	void pce_mem(address_map &map);
-	void x1_io(address_map &map);
-	void x1_mem(address_map &map);
+	void pce_io(address_map &map) ATTR_COLD;
+	void pce_mem(address_map &map) ATTR_COLD;
+	void x1_io(address_map &map) ATTR_COLD;
+	void x1_mem(address_map &map) ATTR_COLD;
 };
 
 
@@ -115,8 +115,8 @@ INPUT_CHANGED_MEMBER(x1twin_state::nmi_reset)
 
 INPUT_PORTS_START( x1twin )
 	PORT_START("FP_SYS") //front panel buttons, hard-wired with the soft reset/NMI lines
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CHANGED_MEMBER(DEVICE_SELF, x1twin_state, ipl_reset,0) PORT_NAME("IPL reset")
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CHANGED_MEMBER(DEVICE_SELF, x1twin_state, nmi_reset,0) PORT_NAME("NMI reset")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(x1twin_state::ipl_reset), 0) PORT_NAME("IPL reset")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(x1twin_state::nmi_reset), 0) PORT_NAME("NMI reset")
 
 	PORT_START("SOUND_SW") //FIXME: this is X1Turbo specific
 	PORT_DIPNAME( 0x80, 0x80, "OPM Sound Setting?" )

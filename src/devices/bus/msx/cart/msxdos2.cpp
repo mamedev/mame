@@ -34,7 +34,7 @@ protected:
 	{ }
 
 	virtual void device_start() override { }
-	virtual void device_reset() override;
+	virtual void device_reset() override ATTR_COLD;
 	virtual std::error_condition initialize_cartridge(std::string &message) override;
 
 	void bank_w(u8 data);
@@ -103,7 +103,7 @@ public:
 	virtual std::error_condition initialize_cartridge(std::string &message) override;
 
 protected:
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 private:
 	u8 secondary_slot_r();

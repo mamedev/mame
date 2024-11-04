@@ -50,7 +50,7 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER( trigger_res );
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	required_device<z80_device> m_maincpu;
@@ -61,9 +61,9 @@ private:
 	required_ioport m_special;
 	output_finder<2> m_leds;
 
-	void mpf1_step(address_map &map);
-	void mpf1p_io_map(address_map &map);
-	void mpf1p_map(address_map &map);
+	void mpf1_step(address_map &map) ATTR_COLD;
+	void mpf1p_io_map(address_map &map) ATTR_COLD;
+	void mpf1p_map(address_map &map) ATTR_COLD;
 
 	uint8_t step_r(offs_t offset);
 
@@ -227,7 +227,7 @@ static INPUT_PORTS_START( mpf1p )
 	PORT_BIT( 0xcf, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("RESET")
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("RESET") PORT_CODE(KEYCODE_F3) PORT_CHANGED_MEMBER(DEVICE_SELF, mpf1p_state, trigger_res, 0)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("RESET") PORT_CODE(KEYCODE_F3) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(mpf1p_state::trigger_res), 0)
 INPUT_PORTS_END
 
 

@@ -55,7 +55,7 @@ public:
 	void pitchhit(machine_config &config);
 
 private:
-	void main_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
 
 	required_device<mc6809_device> m_maincpu;
 };

@@ -7,7 +7,7 @@ authors:hap
 
 <!-- define elements -->
 
-	<element name="gray"><rect><color red="0.51" green="0.5" blue="0.49" /></rect></element>
+	<element name="white"><rect><color red="0.81" green="0.8" blue="0.79" /></rect></element>
 
 	<element name="led" defstate="0">
 		<disk state="1"><color red="1.0" green="0.1" blue="0.15" /></disk>
@@ -23,71 +23,80 @@ authors:hap
 		<disk state="1"><color red="0.26" green="0.23" blue="0.23" /></disk>
 	</element>
 
-	<element name="text_1"><text string="1"><color red="0.9" green="0.9" blue="0.9" /></text></element>
-	<element name="text_2"><text string="2"><color red="0.9" green="0.9" blue="0.9" /></text></element>
-	<element name="text_3"><text string="3"><color red="0.9" green="0.9" blue="0.9" /></text></element>
-	<element name="text_4"><text string="4"><color red="0.9" green="0.9" blue="0.9" /></text></element>
-	<element name="text_5"><text string="5"><color red="0.9" green="0.9" blue="0.9" /></text></element>
-	<element name="text_6"><text string="6"><color red="0.9" green="0.9" blue="0.9" /></text></element>
-	<element name="text_7"><text string="7"><color red="0.9" green="0.9" blue="0.9" /></text></element>
-	<element name="text_8"><text string="8"><color red="0.9" green="0.9" blue="0.9" /></text></element>
+	<element name="text_1"><text string="1"><color red="0.81" green="0.8" blue="0.79" /></text></element>
+	<element name="text_2"><text string="2"><color red="0.81" green="0.8" blue="0.79" /></text></element>
+	<element name="text_3"><text string="3"><color red="0.81" green="0.8" blue="0.79" /></text></element>
+	<element name="text_4"><text string="4"><color red="0.81" green="0.8" blue="0.79" /></text></element>
+	<element name="text_5"><text string="5"><color red="0.81" green="0.8" blue="0.79" /></text></element>
+	<element name="text_6"><text string="6"><color red="0.81" green="0.8" blue="0.79" /></text></element>
+	<element name="text_7"><text string="7"><color red="0.81" green="0.8" blue="0.79" /></text></element>
+	<element name="text_8"><text string="8"><color red="0.81" green="0.8" blue="0.79" /></text></element>
 
-	<element name="text_a"><text string="A"><color red="0.9" green="0.9" blue="0.9" /></text></element>
-	<element name="text_b"><text string="B"><color red="0.9" green="0.9" blue="0.9" /></text></element>
-	<element name="text_c"><text string="C"><color red="0.9" green="0.9" blue="0.9" /></text></element>
-	<element name="text_d"><text string="D"><color red="0.9" green="0.9" blue="0.9" /></text></element>
-	<element name="text_e"><text string="E"><color red="0.9" green="0.9" blue="0.9" /></text></element>
-	<element name="text_f"><text string="F"><color red="0.9" green="0.9" blue="0.9" /></text></element>
-	<element name="text_g"><text string="G"><color red="0.9" green="0.9" blue="0.9" /></text></element>
-	<element name="text_h"><text string="H"><color red="0.9" green="0.9" blue="0.9" /></text></element>
+	<element name="text_a"><text string="A"><color red="0.81" green="0.8" blue="0.79" /></text></element>
+	<element name="text_b"><text string="B"><color red="0.81" green="0.8" blue="0.79" /></text></element>
+	<element name="text_c"><text string="C"><color red="0.81" green="0.8" blue="0.79" /></text></element>
+	<element name="text_d"><text string="D"><color red="0.81" green="0.8" blue="0.79" /></text></element>
+	<element name="text_e"><text string="E"><color red="0.81" green="0.8" blue="0.79" /></text></element>
+	<element name="text_f"><text string="F"><color red="0.81" green="0.8" blue="0.79" /></text></element>
+	<element name="text_g"><text string="G"><color red="0.81" green="0.8" blue="0.79" /></text></element>
+	<element name="text_h"><text string="H"><color red="0.81" green="0.8" blue="0.79" /></text></element>
 
-	<element name="text_l1ax"><text string="Player/"><color red="0.51" green="0.5" blue="0.49" /></text></element>
-	<element name="text_l1a"><text string="Player"><color red="0.51" green="0.5" blue="0.49" /></text></element>
-	<element name="text_l1b"><text string="Gambit Book"><color red="0.51" green="0.5" blue="0.49" /></text></element>
-	<element name="text_l2ax"><text string="Best Move/"><color red="0.51" green="0.5" blue="0.49" /></text></element>
-	<element name="text_l2a"><text string="Random"><color red="0.51" green="0.5" blue="0.49" /></text></element>
-	<element name="text_l2b"><text string="Training Level"><color red="0.51" green="0.5" blue="0.49" /></text></element>
-	<element name="text_l3a"><text string="Sound"><color red="0.51" green="0.5" blue="0.49" /></text></element>
-	<element name="text_l3b"><text string="Depth Search"><color red="0.51" green="0.5" blue="0.49" /></text></element>
-	<element name="text_l4a"><text string="Solve Mate"><color red="0.51" green="0.5" blue="0.49" /></text></element>
-	<element name="text_l4b"><text string="Infinite"><color red="0.51" green="0.5" blue="0.49" /></text></element>
-	<element name="text_l5a"><text string="Print Board"><color red="0.51" green="0.5" blue="0.49" /></text></element>
-	<element name="text_l5b"><text string="Interface"><color red="0.51" green="0.5" blue="0.49" /></text></element>
-	<element name="text_l6a"><text string="Print List"><color red="0.51" green="0.5" blue="0.49" /></text></element>
-	<element name="text_l6b"><text string="Acc. Time"><color red="0.51" green="0.5" blue="0.49" /></text></element>
-	<element name="text_l7a"><text string="Set Level"><color red="0.51" green="0.5" blue="0.49" /></text></element>
-	<element name="text_l7b"><text string=" "><color red="0.51" green="0.5" blue="0.49" /></text></element>
-	<element name="text_l8a"><text string="Take Back"><color red="0.51" green="0.5" blue="0.49" /></text></element>
-	<element name="text_l8b"><text string="Restore"><color red="0.51" green="0.5" blue="0.49" /></text></element>
+	<element name="text_l1ax"><text string="Player/"><color red="0.81" green="0.8" blue="0.79" /></text></element>
+	<element name="text_l1a"><text string="Player"><color red="0.81" green="0.8" blue="0.79" /></text></element>
+	<element name="text_l1b"><text string="Gambit Book"><color red="0.81" green="0.8" blue="0.79" /></text></element>
+	<element name="text_l2ax"><text string="Best Move/"><color red="0.81" green="0.8" blue="0.79" /></text></element>
+	<element name="text_l2a"><text string="Random"><color red="0.81" green="0.8" blue="0.79" /></text></element>
+	<element name="text_l2b"><text string="Training Level"><color red="0.81" green="0.8" blue="0.79" /></text></element>
+	<element name="text_l3a"><text string="Sound"><color red="0.81" green="0.8" blue="0.79" /></text></element>
+	<element name="text_l3b"><text string="Depth Search"><color red="0.81" green="0.8" blue="0.79" /></text></element>
+	<element name="text_l4a"><text string="Solve Mate"><color red="0.81" green="0.8" blue="0.79" /></text></element>
+	<element name="text_l4b"><text string="Infinite"><color red="0.81" green="0.8" blue="0.79" /></text></element>
+	<element name="text_l5a"><text string="Print Board"><color red="0.81" green="0.8" blue="0.79" /></text></element>
+	<element name="text_l5b"><text string="Interface"><color red="0.81" green="0.8" blue="0.79" /></text></element>
+	<element name="text_l6a"><text string="Print List"><color red="0.81" green="0.8" blue="0.79" /></text></element>
+	<element name="text_l6b"><text string="Acc. Time"><color red="0.81" green="0.8" blue="0.79" /></text></element>
+	<element name="text_l7a"><text string="Set Level"><color red="0.81" green="0.8" blue="0.79" /></text></element>
+	<element name="text_l7b"><text string=" "><color red="0.81" green="0.8" blue="0.79" /></text></element>
+	<element name="text_l8a"><text string="Take Back"><color red="0.81" green="0.8" blue="0.79" /></text></element>
+	<element name="text_l8b"><text string="Restore"><color red="0.81" green="0.8" blue="0.79" /></text></element>
 
-	<element name="text_m1a"><text string="New Game"><color red="0.51" green="0.5" blue="0.49" /></text></element>
-	<element name="text_m1b"><text string=" "><color red="0.51" green="0.5" blue="0.49" /></text></element>
-	<element name="text_m2a"><text string="Verify"><color red="0.51" green="0.5" blue="0.49" /></text></element>
-	<element name="text_m2b"><text string="Set Up"><color red="0.51" green="0.5" blue="0.49" /></text></element>
-	<element name="text_m3a"><text string="Change Color"><color red="0.51" green="0.5" blue="0.49" /></text></element>
-	<element name="text_m3b"><text string=" "><color red="0.51" green="0.5" blue="0.49" /></text></element>
-	<element name="text_m4a"><text string="Clear Board"><color red="0.51" green="0.5" blue="0.49" /></text></element>
-	<element name="text_m4b"><text string="Tournament"><color red="0.51" green="0.5" blue="0.49" /></text></element>
-	<element name="text_m4bx"><text string="Book"><color red="0.51" green="0.5" blue="0.49" /></text></element>
-	<element name="text_m5a"><text string="Print Moves"><color red="0.51" green="0.5" blue="0.49" /></text></element>
-	<element name="text_m5b"><text string="Print"><color red="0.51" green="0.5" blue="0.49" /></text></element>
-	<element name="text_m5bx"><text string="Evaluations"><color red="0.51" green="0.5" blue="0.49" /></text></element>
-	<element name="text_m6a"><text string="Trace Forward"><color red="0.51" green="0.5" blue="0.49" /></text></element>
-	<element name="text_m6b"><text string="AutoPlay"><color red="0.51" green="0.5" blue="0.49" /></text></element>
-	<element name="text_m7a"><text string="Hint"><color red="0.51" green="0.5" blue="0.49" /></text></element>
-	<element name="text_m7b"><text string="Next Best"><color red="0.51" green="0.5" blue="0.49" /></text></element>
-	<element name="text_m8a"><text string="Go"><color red="0.51" green="0.5" blue="0.49" /></text></element>
-	<element name="text_m8b"><text string=" "><color red="0.51" green="0.5" blue="0.49" /></text></element>
+	<element name="text_m1a"><text string="New Game"><color red="0.81" green="0.8" blue="0.79" /></text></element>
+	<element name="text_m1b"><text string=" "><color red="0.81" green="0.8" blue="0.79" /></text></element>
+	<element name="text_m2a"><text string="Verify"><color red="0.81" green="0.8" blue="0.79" /></text></element>
+	<element name="text_m2b"><text string="Set Up"><color red="0.81" green="0.8" blue="0.79" /></text></element>
+	<element name="text_m3a"><text string="Change Color"><color red="0.81" green="0.8" blue="0.79" /></text></element>
+	<element name="text_m3b"><text string=" "><color red="0.81" green="0.8" blue="0.79" /></text></element>
+	<element name="text_m4a"><text string="Clear Board"><color red="0.81" green="0.8" blue="0.79" /></text></element>
+	<element name="text_m4b"><text string="Tournament"><color red="0.81" green="0.8" blue="0.79" /></text></element>
+	<element name="text_m4bx"><text string="Book"><color red="0.81" green="0.8" blue="0.79" /></text></element>
+	<element name="text_m5a"><text string="Print Moves"><color red="0.81" green="0.8" blue="0.79" /></text></element>
+	<element name="text_m5b"><text string="Print"><color red="0.81" green="0.8" blue="0.79" /></text></element>
+	<element name="text_m5bx"><text string="Evaluations"><color red="0.81" green="0.8" blue="0.79" /></text></element>
+	<element name="text_m6a"><text string="Trace Forward"><color red="0.81" green="0.8" blue="0.79" /></text></element>
+	<element name="text_m6b"><text string="AutoPlay"><color red="0.81" green="0.8" blue="0.79" /></text></element>
+	<element name="text_m7a"><text string="Hint"><color red="0.81" green="0.8" blue="0.79" /></text></element>
+	<element name="text_m7b"><text string="Next Best"><color red="0.81" green="0.8" blue="0.79" /></text></element>
+	<element name="text_m8a"><text string="Go"><color red="0.81" green="0.8" blue="0.79" /></text></element>
+	<element name="text_m8b"><text string=" "><color red="0.81" green="0.8" blue="0.79" /></text></element>
 
-	<element name="text_rx"><text string="C o m p u t i n g"><color red="0.51" green="0.5" blue="0.49" /></text></element>
-	<element name="text_r1"><text string="Error"><color red="0.51" green="0.5" blue="0.49" /></text></element>
-	<element name="text_r2"><text string="Verify"><color red="0.51" green="0.5" blue="0.49" /></text></element>
-	<element name="text_r3"><text string="Set Up"><color red="0.51" green="0.5" blue="0.49" /></text></element>
-	<element name="text_r4"><text string="Check"><color red="0.51" green="0.5" blue="0.49" /></text></element>
-	<element name="text_r5"><text string="Mate"><color red="0.51" green="0.5" blue="0.49" /></text></element>
-	<element name="text_r6"><text string="Draw"><color red="0.51" green="0.5" blue="0.49" /></text></element>
-	<element name="text_r7"><text string="Black"><color red="0.51" green="0.5" blue="0.49" /></text></element>
-	<element name="text_r8"><text string="White"><color red="0.51" green="0.5" blue="0.49" /></text></element>
+	<element name="text_rx1"><text string="C"><color red="0.81" green="0.8" blue="0.79" /></text></element>
+	<element name="text_rx2"><text string="O"><color red="0.81" green="0.8" blue="0.79" /></text></element>
+	<element name="text_rx3"><text string="M"><color red="0.81" green="0.8" blue="0.79" /></text></element>
+	<element name="text_rx4"><text string="P"><color red="0.81" green="0.8" blue="0.79" /></text></element>
+	<element name="text_rx5"><text string="U"><color red="0.81" green="0.8" blue="0.79" /></text></element>
+	<element name="text_rx6"><text string="T"><color red="0.81" green="0.8" blue="0.79" /></text></element>
+	<element name="text_rx7"><text string="I"><color red="0.81" green="0.8" blue="0.79" /></text></element>
+	<element name="text_rx8"><text string="N"><color red="0.81" green="0.8" blue="0.79" /></text></element>
+	<element name="text_rx9"><text string="G"><color red="0.81" green="0.8" blue="0.79" /></text></element>
+
+	<element name="text_r1"><text string="Error"><color red="0.81" green="0.8" blue="0.79" /></text></element>
+	<element name="text_r2"><text string="Verify"><color red="0.81" green="0.8" blue="0.79" /></text></element>
+	<element name="text_r3"><text string="Set Up"><color red="0.81" green="0.8" blue="0.79" /></text></element>
+	<element name="text_r4"><text string="Check"><color red="0.81" green="0.8" blue="0.79" /></text></element>
+	<element name="text_r5"><text string="Mate"><color red="0.81" green="0.8" blue="0.79" /></text></element>
+	<element name="text_r6"><text string="Draw"><color red="0.81" green="0.8" blue="0.79" /></text></element>
+	<element name="text_r7"><text string="Black"><color red="0.81" green="0.8" blue="0.79" /></text></element>
+	<element name="text_r8"><text string="White"><color red="0.81" green="0.8" blue="0.79" /></text></element>
 
 	<element name="text_p1"><image file="chess/wk.svg"></image></element>
 	<element name="text_p2"><image file="chess/wq.svg"></image></element>
@@ -410,7 +419,7 @@ authors:hap
 		<element ref="text_p5"><bounds x="113.15" y="56.96" width="2.2" height="2.2" /></element>
 		<element ref="text_p6"><bounds x="113.15" y="64.67" width="2.2" height="2.2" /></element>
 
-		<element ref="gray" blend="multiply"><bounds x="94.5" y="20" width="22" height="60" /></element>
+		<element ref="white" blend="multiply"><bounds x="94.5" y="20" width="22" height="60" /></element>
 
 		<element ref="but" inputtag="IN.0" inputmask="0x02"><bounds x="97.38" y="24.00" width="2.5" height="2.5" /></element>
 		<element ref="but" inputtag="IN.1" inputmask="0x02"><bounds x="97.38" y="31.71" width="2.5" height="2.5" /></element>
@@ -477,7 +486,11 @@ authors:hap
 		<element ref="text_r7"><bounds x="110.5" y="69.04" width="7.5" height="1.4" /></element>
 		<element ref="text_r8"><bounds x="110.5" y="76.85" width="7.5" height="1.4" /></element>
 
-		<element ref="text_rx"><bounds x="116.3" y="24.2" width="1.4" height="10" /><orientation rotate="90" /></element>
+		<repeat count="9">
+			<param name="y" start="24.4" increment="1.0" />
+			<param name="i" start="1" increment="1" />
+			<element ref="text_rx~i~"><bounds x="115.3" y="~y~" width="3" height="1.1" /></element>
+		</repeat>
 
 		<element name="8.0" ref="led2"><bounds x="113.5" y="24.50" width="1.5" height="1.5" /></element>
 		<element name="8.1" ref="led2"><bounds x="113.5" y="32.21" width="1.5" height="1.5" /></element>

@@ -38,8 +38,8 @@ public:
 	void scv_pal(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	TIMER_CALLBACK_MEMBER(vblank_update);
 
@@ -58,7 +58,7 @@ private:
 	void draw_semi_graph(bitmap_ind16 &bitmap, uint8_t x, uint8_t y, uint8_t data, uint8_t fg);
 	void draw_block_graph(bitmap_ind16 &bitmap, uint8_t x, uint8_t y, uint8_t col);
 
-	void scv_mem(address_map &map);
+	void scv_mem(address_map &map) ATTR_COLD;
 
 	uint8_t m_porta;
 	uint8_t m_portc;

@@ -47,8 +47,8 @@ private:
 	required_device<s3c2410_device> m_s3c2410;
 	required_shared_ptr<uint32_t> m_steppingstone;
 	lcd_spi_t m_lcd_spi;
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 	uint32_t s3c2410_gpio_port_r(offs_t offset);
 	void s3c2410_gpio_port_w(offs_t offset, uint32_t data);
 	inline void verboselog(int n_level, const char *s_fmt, ...) ATTR_PRINTF(3,4);
@@ -57,7 +57,7 @@ private:
 	void lcd_spi_line_w( int line, int data);
 	int lcd_spi_line_r( int line);
 	required_device<cpu_device> m_maincpu;
-	void hp49gp_map(address_map &map);
+	void hp49gp_map(address_map &map) ATTR_COLD;
 };
 
 /***************************************************************************
@@ -312,25 +312,25 @@ void hp49gp_state::hp49gp(machine_config &config)
 
 static INPUT_PORTS_START( hp49gp )
 	PORT_START("ROW1")
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, hp49gp_state, port_changed, 1) PORT_NAME("F1 | A | Y=") PORT_CODE(KEYCODE_F1) PORT_CODE(KEYCODE_A) PORT_CHAR('A')
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(hp49gp_state::port_changed), 1) PORT_NAME("F1 | A | Y=") PORT_CODE(KEYCODE_F1) PORT_CODE(KEYCODE_A) PORT_CHAR('A')
 	PORT_BIT( 0xDF, IP_ACTIVE_LOW, IPT_UNUSED)
 	PORT_START("ROW2")
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, hp49gp_state, port_changed, 2) PORT_NAME("F2 | B | WIN") PORT_CODE(KEYCODE_F2)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(hp49gp_state::port_changed), 2) PORT_NAME("F2 | B | WIN") PORT_CODE(KEYCODE_F2)
 	PORT_BIT( 0xDF, IP_ACTIVE_LOW, IPT_UNUSED)
 	PORT_START("ROW3")
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, hp49gp_state, port_changed, 3) PORT_NAME("F3 | C | GRAPH") PORT_CODE(KEYCODE_F3)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(hp49gp_state::port_changed), 3) PORT_NAME("F3 | C | GRAPH") PORT_CODE(KEYCODE_F3)
 	PORT_BIT( 0xDF, IP_ACTIVE_LOW, IPT_UNUSED)
 	PORT_START("ROW4")
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, hp49gp_state, port_changed, 4) PORT_NAME("F4 | D | 2D/3D") PORT_CODE(KEYCODE_F4)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(hp49gp_state::port_changed), 4) PORT_NAME("F4 | D | 2D/3D") PORT_CODE(KEYCODE_F4)
 	PORT_BIT( 0xDF, IP_ACTIVE_LOW, IPT_UNUSED)
 	PORT_START("ROW5")
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, hp49gp_state, port_changed, 5) PORT_NAME("F5 | E | TBLSET") PORT_CODE(KEYCODE_F5)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(hp49gp_state::port_changed), 5) PORT_NAME("F5 | E | TBLSET") PORT_CODE(KEYCODE_F5)
 	PORT_BIT( 0xDF, IP_ACTIVE_LOW, IPT_UNUSED)
 	PORT_START("ROW6")
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, hp49gp_state, port_changed, 6) PORT_NAME("F6 | F | TABLE") PORT_CODE(KEYCODE_F6)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(hp49gp_state::port_changed), 6) PORT_NAME("F6 | F | TABLE") PORT_CODE(KEYCODE_F6)
 	PORT_BIT( 0xDF, IP_ACTIVE_LOW, IPT_UNUSED)
 	PORT_START("ROW7")
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, hp49gp_state, port_changed, 7) PORT_NAME("APPS | G | FILES | BEGIN") PORT_CODE(KEYCODE_G) PORT_CHAR('G')
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(hp49gp_state::port_changed), 7) PORT_NAME("APPS | G | FILES | BEGIN") PORT_CODE(KEYCODE_G) PORT_CHAR('G')
 	PORT_BIT( 0xDF, IP_ACTIVE_LOW, IPT_UNUSED)
 INPUT_PORTS_END
 

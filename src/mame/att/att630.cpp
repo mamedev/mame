@@ -29,7 +29,7 @@ public:
 	void att730x(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -37,8 +37,8 @@ private:
 	u8 bram_r(offs_t offset);
 	void bram_w(offs_t offset, u8 data);
 
-	void att630_map(address_map &map);
-	void att730_map(address_map &map);
+	void att630_map(address_map &map) ATTR_COLD;
+	void att730_map(address_map &map) ATTR_COLD;
 
 	required_device<m68000_device> m_maincpu;
 	required_shared_ptr<u16> m_vram;

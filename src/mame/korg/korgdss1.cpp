@@ -47,8 +47,8 @@ public:
 	void dss1(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	u8 klm782_ga1_r(offs_t offset);
 	void klm782_ga1_w(offs_t offset, u8 data);
@@ -88,8 +88,8 @@ private:
 	u8 kbd_r();
 	void kbd_w(u8 data);
 
-	void cpu1_map(address_map &map);
-	void cpu2_map(address_map &map);
+	void cpu1_map(address_map &map) ATTR_COLD;
+	void cpu2_map(address_map &map) ATTR_COLD;
 
 	void palette_init_dss1(palette_device &palette);
 
@@ -118,8 +118,8 @@ public:
 	void dssmsrk(machine_config &config);
 
 private:
-	void msrk_map(address_map &map);
-	void msrk_io_map(address_map &map);
+	void msrk_map(address_map &map) ATTR_COLD;
+	void msrk_io_map(address_map &map) ATTR_COLD;
 
 	u8 fdc_r(offs_t offset);
 	void fdc_w(offs_t offset, u8 data);

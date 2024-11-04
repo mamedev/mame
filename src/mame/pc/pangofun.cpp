@@ -119,9 +119,9 @@ public:
 	void init_pangofun();
 
 private:
-	virtual void machine_start() override;
-	void pcat_io(address_map &map);
-	void pcat_map(address_map &map);
+	virtual void machine_start() override ATTR_COLD;
+	void pcat_io(address_map &map) ATTR_COLD;
+	void pcat_map(address_map &map) ATTR_COLD;
 };
 
 

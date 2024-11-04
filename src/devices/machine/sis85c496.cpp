@@ -622,7 +622,7 @@ int sis85c496_host_device::pin_mapper(int pin)
 
 void sis85c496_host_device::irq_handler(int line, int state)
 {
-	if(line < 0 && line >= 16)
+	if(line < 0 || line >= 16)
 		return;
 
 	logerror("irq_handler %d %d\n", line, state);

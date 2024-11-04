@@ -63,10 +63,10 @@ public:
 	void pc532(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
-	template <unsigned ST> void cpu_map(address_map &map);
+	template <unsigned ST> void cpu_map(address_map &map) ATTR_COLD;
 
 	required_device<ns32532_device> m_cpu;
 	required_device<ns32381_device> m_fpu;

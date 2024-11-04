@@ -124,15 +124,15 @@ public:
 	void crgolf(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	// devices
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_device<palette_device> m_palette;
 
-	void sound_map(address_map &map);
+	void sound_map(address_map &map) ATTR_COLD;
 
 private:
 	// memory pointers
@@ -160,7 +160,7 @@ private:
 	template <uint8_t Which> void screen_enable_w(int state);
 	void palette(palette_device &palette) const;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void main_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
 };
 
 class crgolfhi_state : public crgolf_state
@@ -175,8 +175,8 @@ public:
 	void crgolfhi(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	// memory pointers
@@ -192,7 +192,7 @@ private:
 	void sample_w(offs_t offset, uint8_t data);
 	void vck_callback(int state);
 
-	void sound_map(address_map &map);
+	void sound_map(address_map &map) ATTR_COLD;
 };
 
 class mastrglf_state : public crgolfhi_state
@@ -210,10 +210,10 @@ private:
 	uint8_t unk_sound_07_r();
 	void unk_sound_0c_w(uint8_t data);
 	void palette(palette_device &palette) const;
-	void main_io_map(address_map &map);
-	void main_prg_map(address_map &map);
-	void sound_io_map(address_map &map);
-	void sound_prg_map(address_map &map);
+	void main_io_map(address_map &map) ATTR_COLD;
+	void main_prg_map(address_map &map) ATTR_COLD;
+	void sound_io_map(address_map &map) ATTR_COLD;
+	void sound_prg_map(address_map &map) ATTR_COLD;
 };
 
 

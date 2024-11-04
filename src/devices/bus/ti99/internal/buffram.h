@@ -30,7 +30,7 @@ public:
 	void set_buffered(bool on) { nvram_enable_backup(on); }
 
 private:
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 	// derived class overrides
 	virtual void nvram_default() override;

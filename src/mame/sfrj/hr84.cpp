@@ -50,7 +50,7 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(break_handler);
 
 protected:
-	virtual void machine_reset() override;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	u8 pa_r();
@@ -59,7 +59,7 @@ private:
 	MC6845_UPDATE_ROW(crtc_update_row);
 	TIMER_DEVICE_CALLBACK_MEMBER(cassette_input);
 
-	void hr84_mem(address_map &map);
+	void hr84_mem(address_map &map) ATTR_COLD;
 
 	required_device<pia6821_device> m_pia0;
 	required_device<cpu_device> m_maincpu;
@@ -94,7 +94,7 @@ INPUT_CHANGED_MEMBER(hr84_state::break_handler)
 /* Input ports */
 static INPUT_PORTS_START( hr84 )
 	PORT_START("BRK")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Break") PORT_CODE(KEYCODE_END) PORT_CHAR(UCHAR_MAMEKEY(END)) PORT_CHANGED_MEMBER(DEVICE_SELF, hr84_state, break_handler, 0)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Break") PORT_CODE(KEYCODE_END) PORT_CHAR(UCHAR_MAMEKEY(END)) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(hr84_state::break_handler), 0)
 
 	PORT_START("X0")
 	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_UNUSED )

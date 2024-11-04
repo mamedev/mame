@@ -30,7 +30,7 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 	// device_cbm_iec_interface overrides
 	virtual void cbm_iec_atn(int state) override;

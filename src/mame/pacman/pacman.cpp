@@ -1711,14 +1711,14 @@ INPUT_PORTS_END
 */
 static INPUT_PORTS_START( clubpacm )
 	PORT_START("IN0")
-	PORT_BIT( 0x0f, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(clubpacm_state, clubpacm_input_r)
+	PORT_BIT( 0x0f, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(FUNC(clubpacm_state::clubpacm_input_r))
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE1 )
 
 	PORT_START("IN1")
-	PORT_BIT( 0x0f, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(clubpacm_state, clubpacm_input_r)
+	PORT_BIT( 0x0f, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(FUNC(clubpacm_state::clubpacm_input_r))
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START2 )
@@ -8651,7 +8651,7 @@ void pacman_state::init_pengomc1()
 		romdata[i] = buf[i^0xff];
 }
 
-CUSTOM_INPUT_MEMBER(clubpacm_state::clubpacm_input_r)
+ioport_value clubpacm_state::clubpacm_input_r()
 {
 	ioport_value data = 0x0f;
 

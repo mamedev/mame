@@ -43,7 +43,7 @@ private:
 
 	void vfd_w(uint16_t data);
 
-	void globalfr_map(address_map &map);
+	void globalfr_map(address_map &map) ATTR_COLD;
 };
 
 /******************************************************************************/

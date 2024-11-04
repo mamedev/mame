@@ -49,8 +49,8 @@ class fga002_device :  public device_t
 	fga002_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 #if 0
 	// device_z80daisy_interface overrides
 	virtual int z80daisy_irq_state() override;

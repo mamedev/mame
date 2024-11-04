@@ -40,8 +40,8 @@ public:
 	void pokemini(machine_config &config);
 
 protected:
-	virtual void video_start() override;
-	virtual void machine_start() override;
+	virtual void video_start() override ATTR_COLD;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	struct PRC
@@ -93,7 +93,7 @@ private:
 	uint8_t rom_r(offs_t offset);
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load);
 
-	void pokemini_mem_map(address_map &map);
+	void pokemini_mem_map(address_map &map) ATTR_COLD;
 
 	void check_irqs();
 	void update_sound();

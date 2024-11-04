@@ -28,15 +28,15 @@ public:
 	auto out_wr_callback() { return m_write_out.bind(); }
 
 	// optional information overrides
-	virtual ioport_constructor device_input_ports() const override;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 
 protected:
 	/* number of pulses that can be stored */
 	static constexpr unsigned TRANSMIT_BUFFER_LENGTH = 256;
 
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	TIMER_CALLBACK_MEMBER(transmit_pulse);
 

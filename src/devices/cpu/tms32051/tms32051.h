@@ -62,19 +62,18 @@ public:
 	uint16_t cpuregs_r(offs_t offset);
 	void cpuregs_w(offs_t offset, uint16_t data);
 
-	void tms32051_internal_data(address_map &map);
-	void tms32051_internal_pgm(address_map &map);
+	void tms32051_internal_data(address_map &map) ATTR_COLD;
+	void tms32051_internal_pgm(address_map &map) ATTR_COLD;
 protected:
 	tms32051_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, address_map_constructor internal_pgm, address_map_constructor internal_data);
 
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// device_execute_interface overrides
 	virtual uint32_t execute_min_cycles() const noexcept override { return 1; }
 	virtual uint32_t execute_max_cycles() const noexcept override { return 5; }
-	virtual uint32_t execute_input_lines() const noexcept override { return 6; }
 	virtual void execute_run() override;
 	virtual void execute_set_input(int inputnum, int state) override;
 
@@ -375,10 +374,10 @@ public:
 	// construction/destruction
 	tms32053_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	void tms32053_internal_data(address_map &map);
-	void tms32053_internal_pgm(address_map &map);
+	void tms32053_internal_data(address_map &map) ATTR_COLD;
+	void tms32053_internal_pgm(address_map &map) ATTR_COLD;
 protected:
-	virtual void device_reset() override;
+	virtual void device_reset() override ATTR_COLD;
 };
 
 

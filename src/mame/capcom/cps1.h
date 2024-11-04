@@ -215,7 +215,7 @@ protected:
 	TILE_GET_INFO_MEMBER(get_tile0_info);
 	TILE_GET_INFO_MEMBER(get_tile1_info);
 	TILE_GET_INFO_MEMBER(get_tile2_info);
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 
 	INTERRUPT_GEN_MEMBER(cps1_interrupt);
 	TIMER_DEVICE_CALLBACK_MEMBER(ganbare_interrupt);
@@ -227,18 +227,18 @@ protected:
 	void kabuki_setup(void (*decode)(uint8_t *src, uint8_t *dst));
 
 	/* maps */
-	void cpu_space_map(address_map &map);
-	void main_map(address_map &map);
-	void forgottn_map(address_map &map);
-	void qsound_main_map(address_map &map);
-	void qsound_decrypted_opcodes_map(address_map &map);
-	void sub_map(address_map &map);
-	void qsound_sub_map(address_map &map);
-	void sf2m3_map(address_map &map);
-	void sf2cems6_map(address_map &map);
-	void sf2m10_map(address_map &map);
-	void varthb2_map(address_map &map);
-	void varthb3_map(address_map &map);
+	void cpu_space_map(address_map &map) ATTR_COLD;
+	void main_map(address_map &map) ATTR_COLD;
+	void forgottn_map(address_map &map) ATTR_COLD;
+	void qsound_main_map(address_map &map) ATTR_COLD;
+	void qsound_decrypted_opcodes_map(address_map &map) ATTR_COLD;
+	void sub_map(address_map &map) ATTR_COLD;
+	void qsound_sub_map(address_map &map) ATTR_COLD;
+	void sf2m3_map(address_map &map) ATTR_COLD;
+	void sf2cems6_map(address_map &map) ATTR_COLD;
+	void sf2m10_map(address_map &map) ATTR_COLD;
+	void varthb2_map(address_map &map) ATTR_COLD;
+	void varthb3_map(address_map &map) ATTR_COLD;
 
 	// game-specific
 	uint16_t m_sf2ceblp_prot = 0;

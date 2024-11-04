@@ -33,14 +33,14 @@
 */
 
 /*
-	
-	TODO:
 
-	- DMA
-	- floppy
-	- SASI
-	- video
-	- keyboard
+    TODO:
+
+    - DMA
+    - floppy
+    - SASI
+    - video
+    - keyboard
 
 */
 
@@ -79,7 +79,7 @@ uint8_t mm2_state::status_r(offs_t offset)
 	uint8_t data = 0x80;
 
 	data |= !m_rs232a->dsr_r() << 4;
-	
+
 	return data;
 }
 
@@ -169,8 +169,8 @@ uint8_t mm2_state::dmac_mem_r(offs_t offset)
 	if (WORD_ALIGNED(offset))
 	{
 		return mem[offset >> 1] & 0xff;
-	} 
-	else 
+	}
+	else
 	{
 		return mem[offset >> 1] >> 8;
 	}
@@ -180,11 +180,11 @@ void mm2_state::dmac_mem_w(offs_t offset, uint8_t data)
 {
 	uint16_t *mem = (uint16_t *)m_maincpu->space(AS_PROGRAM).get_write_ptr(m_dma_hi << 15);
 	uint16_t value = mem[offset >> 1];
-	
-	if (WORD_ALIGNED(offset)) 
+
+	if (WORD_ALIGNED(offset))
 	{
 		mem[offset >> 1] = (value & 0xff00) | data;
-	} 
+	}
 	else
 	{
 		mem[offset >> 1] = data << 8 | (value & 0xff);
@@ -289,6 +289,13 @@ static GFXDECODE_START( gfx_mm2 )
 	GFXDECODE_ENTRY( "chargen", 0, gfxlayout, 0, 1 )
 GFXDECODE_END
 
+void mm2_state::palette(palette_device &palette) const
+{
+	palette.set_pen_color(0, rgb_t(0xff, 0xff, 0xff)); // white
+	palette.set_pen_color(1, rgb_t(0x00, 0x00, 0x00)); // black (normal color)
+	palette.set_pen_color(2, rgb_t(0x7f, 0x7f, 0x7f)); // grey ("highlight" mode color)
+}
+
 uint32_t mm2_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	if (!m_blc)
@@ -312,7 +319,7 @@ uint32_t mm2_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, c
 
 				for (int bit = 0; bit < 8; bit++)
 				{
-					bool pixel = BIT(char_data, 0) ^ !m_cpl;
+					bool pixel = BIT(char_data, 0) ^ m_cpl;
 					char_data >>= 1;
 
 					bitmap.pix((sy * 12) + y, (sx * 8) + bit) = pixel;
@@ -376,12 +383,12 @@ void mm2_state::mm2(machine_config &config)
 	m_mpsc->out_txdb_callback().set(m_rs232b, FUNC(rs232_port_device::write_txd));
 	m_mpsc->out_rtsb_callback().set(m_rs232b, FUNC(rs232_port_device::write_rts));
 	m_mpsc->out_int_callback().set(m_pic, FUNC(pic8259_device::ir1_w));
-	
+
 	RS232_PORT(config, m_rs232a, default_rs232_devices, nullptr);
 	m_rs232a->rxd_handler().set(m_mpsc, FUNC(z80dart_device::rxa_w));
 	m_rs232a->dcd_handler().set(m_mpsc, FUNC(z80dart_device::dcda_w));
 	m_rs232a->cts_handler().set(m_mpsc, FUNC(z80dart_device::ctsa_w));
-	
+
 	RS232_PORT(config, m_rs232b, default_rs232_devices, "terminal");
 	m_rs232b->rxd_handler().set(m_mpsc, FUNC(z80dart_device::rxb_w));
 	m_rs232b->cts_handler().set(m_mpsc, FUNC(z80dart_device::ctsb_w));
@@ -400,7 +407,7 @@ void mm2_state::mm2(machine_config &config)
 	screen.set_palette(m_palette);
 
 	GFXDECODE(config, "gfxdecode", m_palette, gfx_mm2);
-	PALETTE(config, m_palette, palette_device::MONOCHROME);
+	PALETTE(config, m_palette, FUNC(mm2_state::palette), 3);
 
 	CRT9007(config, m_vpac, 35.4525_MHz_XTAL/8);
 	m_vpac->set_addrmap(0, &mm2_state::vpac_mem);

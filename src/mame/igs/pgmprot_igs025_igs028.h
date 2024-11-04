@@ -18,7 +18,7 @@ public:
 	void pgm_028_025_ol(machine_config &config);
 
 protected:
-	virtual void machine_reset() override;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	required_shared_ptr<u16> m_sharedprotram;
@@ -27,7 +27,7 @@ private:
 
 	void igs025_to_igs028_callback( void );
 
-	void olds_mem(address_map &map);
+	void olds_mem(address_map &map) ATTR_COLD;
 };
 
 INPUT_PORTS_EXTERN( olds );

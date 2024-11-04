@@ -30,10 +30,10 @@ private:
 	required_device<sh3be_device> m_maincpu;
 	required_device<sed1330_device> m_lcdc;  // In reality a sed1335
 
-	void map(address_map &map);
-	void lcdc_map(address_map &map);
+	void map(address_map &map) ATTR_COLD;
+	void lcdc_map(address_map &map) ATTR_COLD;
 
-	void machine_start() override;
+	void machine_start() override ATTR_COLD;
 };
 
 void psr2000_state::machine_start()

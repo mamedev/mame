@@ -77,8 +77,8 @@ public:
 protected:
 	// device_t implementation
 	virtual void device_config_complete() override;
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// device_execute_interface implementation
 	virtual u64 execute_clocks_to_cycles(u64 clocks) const noexcept override { return (clocks + 4 - 1) / 4; }
@@ -125,7 +125,7 @@ private:
 	u8 timer_x_r(offs_t offset);
 	void timer_x_w(offs_t offset, u8 data);
 
-	void internal_map(address_map &map);
+	void internal_map(address_map &map) ATTR_COLD;
 
 	const address_space_config m_data_config;
 	memory_access<16, 0, 0, ENDIANNESS_LITTLE>::specific m_data;

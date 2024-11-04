@@ -36,8 +36,8 @@ private:
 	u8 ctc_r(offs_t offset);
 	void ctc_w(offs_t offset, u8 data);
 
-	void io_map(address_map &map);
-	void mem_map(address_map &map);
+	void io_map(address_map &map) ATTR_COLD;
+	void mem_map(address_map &map) ATTR_COLD;
 
 	required_device<z80_device> m_maincpu;
 	required_device<z80ctc_device> m_ctc;

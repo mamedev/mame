@@ -635,12 +635,10 @@ uint16_t x68k_state::sram_r(offs_t offset)
 
 void x68k_state::vid_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
-	switch(offset)
-	{
-	case 0x000:
+	if(offset < 0x80)
 		COMBINE_DATA(m_video.reg);
-		break;
-	case 0x080:  // priority levels
+	else if(offset < 0x100)
+	{
 		COMBINE_DATA(m_video.reg+1);
 		if(ACCESSING_BITS_0_7)
 		{
@@ -661,13 +659,11 @@ void x68k_state::vid_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 			if(m_video.sprite_pri == 3)
 				m_video.sprite_pri--;
 		}
-		break;
-	case 0x100:
-		COMBINE_DATA(m_video.reg+2);
-		break;
-	default:
-		LOGMASKED(LOG_SYS, "VC: Invalid video controller write (offset = 0x%04x, data = %04x)\n",offset,data);
 	}
+	else if(offset < 0x180)
+		COMBINE_DATA(m_video.reg+2);
+	else
+		LOGMASKED(LOG_SYS, "VC: Invalid video controller write (offset = 0x%04x, data = %04x)\n",offset,data);
 }
 
 uint16_t x68k_state::vid_r(offs_t offset)

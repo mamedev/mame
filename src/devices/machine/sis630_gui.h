@@ -14,26 +14,26 @@ class sis630_gui_device : public pci_device
 public:
 	sis630_gui_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	void legacy_memory_map(address_map &map);
-	void legacy_io_map(address_map &map);
+	void legacy_memory_map(address_map &map) ATTR_COLD;
+	void legacy_io_map(address_map &map) ATTR_COLD;
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
-	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 
 //  virtual void reset_all_mappings() override;
 
 	virtual void map_extra(uint64_t memory_window_start, uint64_t memory_window_end, uint64_t memory_offset, address_space *memory_space,
 						   uint64_t io_window_start, uint64_t io_window_end, uint64_t io_offset, address_space *io_space) override;
 
-	virtual void config_map(address_map &map) override;
+	virtual void config_map(address_map &map) override ATTR_COLD;
 
-	void memory_map(address_map &map);
-	void io_map(address_map &map);
-	void space_io_map(address_map &map);
+	void memory_map(address_map &map) ATTR_COLD;
+	void io_map(address_map &map) ATTR_COLD;
+	void space_io_map(address_map &map) ATTR_COLD;
 
 private:
 	required_device<sis630_vga_device> m_vga;
@@ -80,8 +80,8 @@ public:
 	sis630_bridge_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	virtual void map_extra(uint64_t memory_window_start, uint64_t memory_window_end, uint64_t memory_offset, address_space *memory_space,
 						   uint64_t io_window_start, uint64_t io_window_end, uint64_t io_offset, address_space *io_space) override;

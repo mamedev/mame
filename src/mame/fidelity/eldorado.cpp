@@ -6,7 +6,7 @@
 Fidelity Eldorado Chess Challenger (model 6119)
 
 Hardware notes:
-- PCB label CXG262-600-001, CXG262-600-101
+- PCB label: CXG262-600-001, CXG262-600-101
 - TMP80C49AP6-6744 MCU, 2KB internal ROM, 6MHz XTAL
 - buzzer, 16 leds, 8*8 chessboard buttons
 
@@ -42,11 +42,10 @@ public:
 		m_inputs(*this, "IN.0")
 	{ }
 
-	// machine configs
 	void eldorado(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	// devices/pointers
@@ -57,15 +56,12 @@ private:
 	required_ioport m_inputs;
 
 	bool m_kp_select = false;
-	u16 m_inp_mux = 0;
-	u8 m_led_select = 0;
+	u8 m_inp_mux = 0;
 
 	// I/O handlers
-	void update_display();
 	void mux_w(u8 data);
 	u8 mux_r();
 	void control_w(u8 data);
-	int t0_r();
 	u8 input_r();
 };
 
@@ -74,7 +70,6 @@ void eldorado_state::machine_start()
 	// register for savestates
 	save_item(NAME(m_kp_select));
 	save_item(NAME(m_inp_mux));
-	save_item(NAME(m_led_select));
 }
 
 
@@ -83,16 +78,11 @@ void eldorado_state::machine_start()
     I/O
 *******************************************************************************/
 
-void eldorado_state::update_display()
-{
-	m_display->matrix(m_led_select, m_inp_mux);
-}
-
 void eldorado_state::mux_w(u8 data)
 {
 	// D0-D7: input mux, led data
 	m_inp_mux = ~data;
-	update_display();
+	m_display->write_mx(m_inp_mux);
 }
 
 u8 eldorado_state::mux_r()
@@ -106,24 +96,17 @@ void eldorado_state::control_w(u8 data)
 	m_dac->write(BIT(~data, 4));
 
 	// P25,P26: led select
-	m_led_select = ~data >> 5 & 3;
-	update_display();
+	m_display->write_my(~data >> 5 & 3);
 
-	// P27: keypad select
+	// P27: input mux highest bit (also goes to T0)
 	m_kp_select = !bool(data & 0x80);
-}
-
-int eldorado_state::t0_r()
-{
-	// T0: P27
-	return m_kp_select ? 0 : 1;
 }
 
 u8 eldorado_state::input_r()
 {
+	// P10-P17: multiplexed inputs
 	u8 data = 0;
 
-	// P10-P17: multiplexed inputs
 	// read chessboard buttons
 	for (int i = 0; i < 8; i++)
 		if (BIT(m_inp_mux, i))
@@ -151,7 +134,7 @@ static INPUT_PORTS_START( eldorado )
 	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_5) PORT_CODE(KEYCODE_5_PAD) PORT_NAME("Verify / Queen")
 	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_6) PORT_CODE(KEYCODE_6_PAD) PORT_NAME("Problem / King")
 	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_DEL) PORT_CODE(KEYCODE_BACKSPACE) PORT_NAME("Clear")
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_N) PORT_NAME("New Game")
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_R) PORT_CODE(KEYCODE_N) PORT_NAME("New Game")
 INPUT_PORTS_END
 
 
@@ -168,7 +151,7 @@ void eldorado_state::eldorado(machine_config &config)
 	m_maincpu->p2_out_cb().set(FUNC(eldorado_state::control_w));
 	m_maincpu->bus_in_cb().set(FUNC(eldorado_state::mux_r));
 	m_maincpu->bus_out_cb().set(FUNC(eldorado_state::mux_w));
-	m_maincpu->t0_in_cb().set(FUNC(eldorado_state::t0_r));
+	m_maincpu->t0_in_cb().set(m_maincpu, FUNC(mcs48_cpu_device::p2_r)).bit(7);
 
 	SENSORBOARD(config, m_board).set_type(sensorboard_device::BUTTONS);
 	m_board->init_cb().set(m_board, FUNC(sensorboard_device::preset_chess));
@@ -191,7 +174,7 @@ void eldorado_state::eldorado(machine_config &config)
 
 ROM_START( feldo )
 	ROM_REGION( 0x0800, "maincpu", 0 )
-	ROM_LOAD("100-1027a01", 0x0000, 0x0800, CRC(3b93b6d2) SHA1(353a741624b4c7fd74a0cf601e2e52f9914b58b8) )
+	ROM_LOAD("tmp80c49ap6-6744_100-1027a01", 0x0000, 0x0800, CRC(3b93b6d2) SHA1(353a741624b4c7fd74a0cf601e2e52f9914b58b8) )
 ROM_END
 
 } // anonymous namespace

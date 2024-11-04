@@ -53,7 +53,7 @@ public:
 	void mondial68k(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -67,7 +67,7 @@ private:
 	u8 m_input_mux = 0xff;
 	u8 m_board_mux = 0xff;
 
-	void mondial68k_mem(address_map &map);
+	void mondial68k_mem(address_map &map) ATTR_COLD;
 
 	void update_leds();
 	void lcd_output_w(u32 data);

@@ -83,9 +83,9 @@ protected:
 
 	sh7042_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
 
-	virtual void device_start() override;
-	virtual void device_reset() override;
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 	virtual void sh2_exception_internal(const char *message, int irqline, int vector) override;
 	virtual void execute_set_input(int irqline, int state) override;
 
@@ -132,7 +132,7 @@ private:
 	u32 m_pcf_e;
 	u16 m_pcf_if;
 
-	void map(address_map &map);
+	void map(address_map &map) ATTR_COLD;
 
 	u16 adc_default(int adc);
 	u16 port16_default_r(int port);

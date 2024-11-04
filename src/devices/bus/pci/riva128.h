@@ -15,26 +15,26 @@ class riva128_device : public pci_card_device
 public:
 	riva128_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	void legacy_memory_map(address_map &map);
-	void legacy_io_map(address_map &map);
+	void legacy_memory_map(address_map &map) ATTR_COLD;
+	void legacy_io_map(address_map &map) ATTR_COLD;
 
 protected:
 	riva128_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual void device_start() override;
-	virtual void device_reset() override;
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
-	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 
 	virtual void map_extra(uint64_t memory_window_start, uint64_t memory_window_end, uint64_t memory_offset, address_space *memory_space,
 						   uint64_t io_window_start, uint64_t io_window_end, uint64_t io_offset, address_space *io_space) override;
 
-	virtual void config_map(address_map &map) override;
+	virtual void config_map(address_map &map) override ATTR_COLD;
 
-	virtual void mmio_map(address_map &map);
-	virtual void vram_aperture_map(address_map &map);
-	virtual void indirect_io_map(address_map &map);
+	virtual void mmio_map(address_map &map) ATTR_COLD;
+	virtual void vram_aperture_map(address_map &map) ATTR_COLD;
+	virtual void indirect_io_map(address_map &map) ATTR_COLD;
 
 	required_device<nvidia_nv3_vga_device> m_svga;
 	required_memory_region m_vga_rom;
@@ -56,7 +56,7 @@ public:
 	riva128zx_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
-	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 };
 
 DECLARE_DEVICE_TYPE(RIVA128,   riva128_device)

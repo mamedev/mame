@@ -99,8 +99,8 @@ public:
 	void goldcue(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	void bank_w(uint8_t data);
@@ -110,10 +110,10 @@ private:
 	void switch_w(uint8_t data);
 	INTERRUPT_GEN_MEMBER(whitestar_firq_interrupt);
 
-	void whitestar_base_map(address_map &map);
-	void whitestar_map(address_map &map);
-	void whitestarm_map(address_map &map);
-	void goldcue_map(address_map &map);
+	void whitestar_base_map(address_map &map) ATTR_COLD;
+	void whitestar_map(address_map &map) ATTR_COLD;
+	void whitestarm_map(address_map &map) ATTR_COLD;
+	void goldcue_map(address_map &map) ATTR_COLD;
 	u8 m_row = 0U;
 	required_device<cpu_device> m_maincpu;
 	//required_device<cpu_device> m_dmdcpu;

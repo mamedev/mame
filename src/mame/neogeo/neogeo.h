@@ -43,8 +43,8 @@
 class neogeo_base_state : public driver_device
 {
 public:
-	DECLARE_CUSTOM_INPUT_MEMBER(get_memcard_status);
-	DECLARE_CUSTOM_INPUT_MEMBER(get_audio_result);
+	ioport_value get_memcard_status();
+	ioport_value get_audio_result();
 
 protected:
 	neogeo_base_state(const machine_config &mconfig, device_type type, const char *tag)
@@ -112,13 +112,13 @@ protected:
 	void neogeo_stereo(machine_config &config);
 	void neogeo_memcard(machine_config &config);
 
-	void base_main_map(address_map &map);
-	void audio_io_map(address_map &map);
-	void audio_map(address_map &map);
+	void base_main_map(address_map &map) ATTR_COLD;
+	void audio_io_map(address_map &map) ATTR_COLD;
+	void audio_map(address_map &map) ATTR_COLD;
 
 	// device overrides
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	virtual void device_post_load() override;
 
@@ -155,8 +155,8 @@ protected:
 
 	// video hardware, including maincpu interrupts
 	// TODO: make into a device
-	virtual void video_start() override;
-	virtual void video_reset() override;
+	virtual void video_start() override ATTR_COLD;
+	virtual void video_reset() override ATTR_COLD;
 
 	const pen_t *m_bg_pen = nullptr;
 	uint8_t      m_vblank_level = 0;
@@ -222,7 +222,7 @@ private:
 class ngarcade_base_state : public neogeo_base_state
 {
 public:
-	DECLARE_CUSTOM_INPUT_MEMBER(startsel_edge_joy_r);
+	ioport_value startsel_edge_joy_r();
 
 protected:
 	ngarcade_base_state(const machine_config &mconfig, device_type type, const char *tag)
@@ -233,8 +233,8 @@ protected:
 	{
 	}
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	virtual void io_control_w(offs_t offset, uint8_t data) override;
 	void set_save_ram_unlock(int state);
@@ -247,7 +247,7 @@ protected:
 	void neogeo_arcade(machine_config &config);
 	void neogeo_mono(machine_config &config);
 
-	void neogeo_main_map(address_map &map);
+	void neogeo_main_map(address_map &map) ATTR_COLD;
 
 private:
 	required_shared_ptr<uint16_t> m_save_ram;
@@ -272,9 +272,9 @@ protected:
 
 	uint16_t aes_in2_r();
 
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
-	void aes_base_main_map(address_map &map);
+	void aes_base_main_map(address_map &map) ATTR_COLD;
 
 private:
 	required_ioport m_io_in2;

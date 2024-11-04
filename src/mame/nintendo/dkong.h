@@ -321,22 +321,22 @@ private:
 	void memory_write_byte(offs_t offset, uint8_t data);
 	double CD4049(double x);
 
-	void dkong3_io_map(address_map &map);
-	void dkong3_map(address_map &map);
-	void dkong3_sound1_map(address_map &map);
-	void dkong3_sound2_map(address_map &map);
-	void dkong_map(address_map &map);
-	void dkong_sound_io_map(address_map &map);
-	void dkong_sound_map(address_map &map);
-	void dkongjr_map(address_map &map);
-	void dkongjr_sound_io_map(address_map &map);
-	void epos_readport(address_map &map);
-	void radarscp1_sound_io_map(address_map &map);
+	void dkong3_io_map(address_map &map) ATTR_COLD;
+	void dkong3_map(address_map &map) ATTR_COLD;
+	void dkong3_sound1_map(address_map &map) ATTR_COLD;
+	void dkong3_sound2_map(address_map &map) ATTR_COLD;
+	void dkong_map(address_map &map) ATTR_COLD;
+	void dkong_sound_io_map(address_map &map) ATTR_COLD;
+	void dkong_sound_map(address_map &map) ATTR_COLD;
+	void dkongjr_map(address_map &map) ATTR_COLD;
+	void dkongjr_sound_io_map(address_map &map) ATTR_COLD;
+	void epos_readport(address_map &map) ATTR_COLD;
+	void radarscp1_sound_io_map(address_map &map) ATTR_COLD;
 
-	void s2650_map(address_map &map);
-	void s2650_io_map(address_map &map);
-	void s2650_data_map(address_map &map);
-	void spclforc_data_map(address_map &map);
+	void s2650_map(address_map &map) ATTR_COLD;
+	void s2650_io_map(address_map &map) ATTR_COLD;
+	void s2650_data_map(address_map &map) ATTR_COLD;
+	void spclforc_data_map(address_map &map) ATTR_COLD;
 
 	// video/dkong.c
 	void radarscp_step(int line_cnt);

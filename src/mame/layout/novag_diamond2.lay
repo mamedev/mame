@@ -388,7 +388,7 @@ authors:hap
 		<bounds x="0" y="0" width="40" height="80" />
 
 		<repeat count="6">
-			<param name="y" start="14.4" increment="8.05714" />
+			<param name="y" start="14.5" increment="8.05714" />
 			<param name="i" start="1" increment="1" />
 
 			<element ref="blackb"><bounds xc="18" yc="~y~" width="3" height="3" /></element>

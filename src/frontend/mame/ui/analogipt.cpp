@@ -113,7 +113,7 @@ void menu_analog::recompute_metrics(uint32_t width, uint32_t height, float aspec
 }
 
 
-void menu_analog::custom_render(uint32_t flags, void *selectedref, float top, float bottom, float x, float y, float x2, float y2)
+void menu_analog::custom_render(uint32_t flags, void *selectedref, float top, float bottom, float origx1, float origy1, float origx2, float origy2)
 {
 	// work out how much space to use for field names
 	float const extrawidth(0.4F + (((ui().box_lr_border() * 2.0F) + ui().get_line_height()) * x_aspect()));
@@ -133,19 +133,19 @@ void menu_analog::custom_render(uint32_t flags, void *selectedref, float top, fl
 			m_prompt = util::string_format(_("menu-analoginput", "Press %s to show settings"), ui().get_general_input_setting(IPT_UI_ON_SCREEN_DISPLAY));
 		draw_text_box(
 				&m_prompt, &m_prompt + 1,
-				m_box_left, m_box_right, y - top, y - top + line_height() + (tb_border() * 2.0F),
+				m_box_left, m_box_right, origy1 - top, origy1 - top + line_height() + (tb_border() * 2.0F),
 				text_layout::text_justify::CENTER, text_layout::word_wrapping::TRUNCATE, false,
 				fgcolor, ui().colors().background_color());
-		m_box_top = y - top + line_height() + (tb_border() * 3.0F);
-		firstliney = y - top + line_height() + (tb_border() * 4.0F);
-		m_visible_fields = std::min<int>(m_field_data.size(), int((y2 + bottom - tb_border() - firstliney) / line_height()));
+		m_box_top = origy1 - top + line_height() + (tb_border() * 3.0F);
+		firstliney = origy1 - top + line_height() + (tb_border() * 4.0F);
+		m_visible_fields = std::min<int>(m_field_data.size(), int((origy2 + bottom - tb_border() - firstliney) / line_height()));
 		m_box_bottom = firstliney + (line_height() * m_visible_fields) + tb_border();
 	}
 	else
 	{
-		m_box_top = y2 + tb_border();
-		m_box_bottom = y2 + bottom;
-		firstliney = y2 + (tb_border() * 2.0F);
+		m_box_top = origy2 + tb_border();
+		m_box_bottom = origy2 + bottom;
+		firstliney = origy2 + (tb_border() * 2.0F);
 		m_visible_fields = m_bottom_fields;
 	}
 	ui().draw_outlined_box(container(), m_box_left, m_box_top, m_box_right, m_box_bottom, ui().colors().background_color());

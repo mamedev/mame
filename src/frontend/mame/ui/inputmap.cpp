@@ -322,7 +322,7 @@ void menu_input::recompute_metrics(uint32_t width, uint32_t height, float aspect
 }
 
 
-void menu_input::custom_render(uint32_t flags, void *selectedref, float top, float bottom, float x1, float y1, float x2, float y2)
+void menu_input::custom_render(uint32_t flags, void *selectedref, float top, float bottom, float origx1, float origy1, float origx2, float origy2)
 {
 	if (pollingitem)
 	{
@@ -330,7 +330,7 @@ void menu_input::custom_render(uint32_t flags, void *selectedref, float top, flo
 		char const *const text[] = { seqname.c_str() };
 		draw_text_box(
 				std::begin(text), std::end(text),
-				x1, x2, y2 + tb_border(), y2 + bottom,
+				origx1, origx2, origy2 + tb_border(), origy2 + bottom,
 				text_layout::text_justify::CENTER, text_layout::word_wrapping::NEVER, false,
 				ui().colors().text_color(), ui().colors().background_color());
 	}
@@ -347,7 +347,7 @@ void menu_input::custom_render(uint32_t flags, void *selectedref, float top, flo
 			char const *const text[] = { errormsg.c_str() };
 			draw_text_box(
 					std::begin(text), std::end(text),
-					x1, x2, y2 + tb_border(), y2 + bottom,
+					origx1, origx2, origy2 + tb_border(), origy2 + bottom,
 					text_layout::text_justify::CENTER, text_layout::word_wrapping::NEVER, false,
 					ui().colors().text_color(), UI_RED_COLOR);
 		}
@@ -359,7 +359,7 @@ void menu_input::custom_render(uint32_t flags, void *selectedref, float top, flo
 				char const *const text[] = { _("Pressed") };
 				draw_text_box(
 						std::begin(text), std::end(text),
-						x1, x2, y2 + tb_border(), y2 + bottom,
+						origx1, origx2, origy2 + tb_border(), origy2 + bottom,
 						text_layout::text_justify::CENTER, text_layout::word_wrapping::NEVER, false,
 						ui().colors().text_color(), ui().colors().background_color());
 			}
@@ -370,7 +370,7 @@ void menu_input::custom_render(uint32_t flags, void *selectedref, float top, flo
 					(!item.seq.empty() || item.defseq->empty()) ? clearprompt.c_str() : defaultprompt.c_str() };
 				draw_text_box(
 						std::begin(text), std::end(text),
-						x1, x2, y2 + tb_border(), y2 + bottom,
+						origx1, origx2, origy2 + tb_border(), origy2 + bottom,
 						text_layout::text_justify::CENTER, text_layout::word_wrapping::NEVER, false,
 						ui().colors().text_color(), ui().colors().background_color());
 			}

@@ -148,7 +148,7 @@ public:
 	void bup(machine_config &config);
 
 protected:
-	virtual void machine_reset() override;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -157,11 +157,11 @@ private:
 	required_ioport_array<2> m_keys;
 	required_ioport m_reset;
 
-	void bup_mem(address_map &map);
-	void mm2_mem(address_map &map);
-	void mm4_mem(address_map &map);
-	void mm5p_mem(address_map &map);
-	void rebel5_mem(address_map &map);
+	void bup_mem(address_map &map) ATTR_COLD;
+	void mm2_mem(address_map &map) ATTR_COLD;
+	void mm4_mem(address_map &map) ATTR_COLD;
+	void mm5p_mem(address_map &map) ATTR_COLD;
+	void rebel5_mem(address_map &map) ATTR_COLD;
 
 	void lcd_irqack_w(u8 data);
 	u8 keys_r(offs_t offset);
@@ -286,8 +286,8 @@ static INPUT_PORTS_START( mm2 )
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("D / 4 / Rook") PORT_CODE(KEYCODE_D) PORT_CODE(KEYCODE_4) PORT_CODE(KEYCODE_4_PAD)
 
 	PORT_START("RESET")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("RES 1") PORT_CODE(KEYCODE_Z) PORT_CODE(KEYCODE_F1) PORT_CHANGED_MEMBER(DEVICE_SELF, mm2_state, reset_button, 0)
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("RES 2") PORT_CODE(KEYCODE_X) PORT_CODE(KEYCODE_F1) PORT_CHANGED_MEMBER(DEVICE_SELF, mm2_state, reset_button, 0)
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("RES 1") PORT_CODE(KEYCODE_Z) PORT_CODE(KEYCODE_F1) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(mm2_state::reset_button), 0)
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("RES 2") PORT_CODE(KEYCODE_X) PORT_CODE(KEYCODE_F1) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(mm2_state::reset_button), 0)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( bup )

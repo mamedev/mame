@@ -91,7 +91,7 @@ template <class TEvent>
 class event_based_device : public device_info
 {
 private:
-	static inline constexpr unsigned DEFAULT_EVENT_QUEUE_SIZE = 20;
+	static inline constexpr unsigned DEFAULT_EVENT_QUEUE_SIZE = 64;
 
 	std::queue<TEvent> m_event_queue;
 
@@ -117,7 +117,7 @@ public:
 			m_event_queue.pop();
 	}
 
-	void virtual poll(bool relative_reset) override
+	virtual void poll(bool relative_reset) override
 	{
 		std::lock_guard<std::mutex> scope_lock(m_device_lock);
 
@@ -127,6 +127,12 @@ public:
 			process_event(m_event_queue.front());
 			m_event_queue.pop();
 		}
+	}
+
+	virtual void reset() override
+	{
+		std::lock_guard<std::mutex> scope_lock(m_device_lock);
+		std::queue<TEvent>().swap(m_event_queue);
 	}
 };
 

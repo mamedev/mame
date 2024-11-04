@@ -254,7 +254,7 @@ public:
 	void init_vampire();
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -287,8 +287,8 @@ private:
 	void blitter_w(offs_t offset, u8 data);
 	void blit_trigger(offs_t offset);
 
-	void vampire_memory(address_map &map);
-	void vampire_audio(address_map &map);
+	void vampire_memory(address_map &map) ATTR_COLD;
+	void vampire_audio(address_map &map) ATTR_COLD;
 
 	void pit_out_w0(int state);
 	void pit_out_w1(int state);

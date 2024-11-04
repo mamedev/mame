@@ -60,8 +60,8 @@ public:
 	void init_monkelf();
 
 protected:
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	optional_device<cpu_device> m_audiocpu;
@@ -81,15 +81,15 @@ protected:
 	optional_device<timer_device> m_scantimer;
 	required_region_ptr<u16> m_rom_maincpu;
 
-	void megasys1B_map(address_map &map);
-	void megasys1C_map(address_map &map);
+	void megasys1B_map(address_map &map) ATTR_COLD;
+	void megasys1C_map(address_map &map) ATTR_COLD;
 
 	void megasys1c_handle_scanline_irq(int scanline);
 	TIMER_DEVICE_CALLBACK_MEMBER(megasys_base_scanline);
 	TIMER_DEVICE_CALLBACK_MEMBER(megasys1B_scanline);
 
-	void megasys_base_map(address_map &map);
-	void megasys1B_sound_map(address_map &map);
+	void megasys_base_map(address_map &map) ATTR_COLD;
+	void megasys1B_sound_map(address_map &map) ATTR_COLD;
 
 	void megasys1_palette(palette_device &palette);
 
@@ -146,8 +146,8 @@ private:
 
 	void priority_create();
 
-	void megasys1B_edfbl_map(address_map &map);
-	void megasys1B_monkelf_map(address_map &map);
+	void megasys1B_edfbl_map(address_map &map) ATTR_COLD;
+	void megasys1B_monkelf_map(address_map &map) ATTR_COLD;
 };
 
 class megasys1_typea_state : public megasys1_state
@@ -155,7 +155,7 @@ class megasys1_typea_state : public megasys1_state
 public:
 	megasys1_typea_state(const machine_config &mconfig, device_type type, const char *tag) :
 		megasys1_state(mconfig, type, tag),
-		m_p47b_adpcm(*this, "msm%u", 1U),
+		m_p47bl_adpcm(*this, "msm%u", 1U),
 		m_gatearray(*this, "gatearray")
 	{ }
 
@@ -164,7 +164,7 @@ public:
 	void system_A_gs88000_soldam(machine_config &config);
 	void system_A_iganinju(machine_config &config);
 	void system_A_kickoffb(machine_config &config);
-	void system_A_p47b(machine_config &config);
+	void system_A_p47bl(machine_config &config);
 	void system_A_d65006(machine_config &config);
 	void system_A_d65006_iganinju(machine_config &config);
 	void system_A_gs88000(machine_config &config);
@@ -176,21 +176,21 @@ public:
 	void init_lordofkbp();
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
-	void kickoffb_sound_map(address_map &map);
-	void p47b_sound_map(address_map &map);
-	void p47b_extracpu_prg_map(address_map &map);
-	void p47b_extracpu_io_map(address_map &map);
-	void megasys1A_map(address_map &map);
-	void megasys1A_sound_map(address_map &map);
+	void kickoffb_sound_map(address_map &map) ATTR_COLD;
+	void p47bl_sound_map(address_map &map) ATTR_COLD;
+	void p47bl_extracpu_prg_map(address_map &map) ATTR_COLD;
+	void p47bl_extracpu_io_map(address_map &map) ATTR_COLD;
+	void megasys1A_map(address_map &map) ATTR_COLD;
+	void megasys1A_sound_map(address_map &map) ATTR_COLD;
 
-	void p47b_adpcm_w(offs_t offset, u8 data);
+	void p47bl_adpcm_w(offs_t offset, u8 data);
 
 
 private:
-	optional_device_array<msm5205_device, 2> m_p47b_adpcm;
+	optional_device_array<msm5205_device, 2> m_p47bl_adpcm;
 	optional_device<megasys1_gatearray_device> m_gatearray;
 
 	TIMER_DEVICE_CALLBACK_MEMBER(megasys1A_iganinju_scanline);
@@ -208,7 +208,7 @@ public:
 	{ }
 
 protected:
-	virtual void machine_reset() override;
+	virtual void machine_reset() override ATTR_COLD;
 };
 
 class megasys1_typed_state : public megasys1_state
@@ -234,8 +234,8 @@ private:
 
 	INTERRUPT_GEN_MEMBER(megasys1D_irq);
 
-	void megasys1D_map(address_map &map);
-	void megasys1D_oki_map(address_map &map);
+	void megasys1D_map(address_map &map) ATTR_COLD;
+	void megasys1D_oki_map(address_map &map) ATTR_COLD;
 };
 
 
@@ -256,9 +256,9 @@ protected:
 private:
 	void soundlatch_z_w(u16 data);
 
-	void megasys1Z_map(address_map &map);
-	void z80_sound_io_map(address_map &map);
-	void z80_sound_map(address_map &map);
+	void megasys1Z_map(address_map &map) ATTR_COLD;
+	void z80_sound_io_map(address_map &map) ATTR_COLD;
+	void z80_sound_map(address_map &map) ATTR_COLD;
 };
 
 
@@ -279,8 +279,8 @@ public:
 	void system_C_iosim(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	const u8 *m_ip_select_values = nullptr; // System B and C
 
@@ -291,8 +291,8 @@ protected:
 	static constexpr u8 hayaosi1_seq[7] =    { 0x51,0x52,0x53,0x54,0x55,  0xfc,0x06 };
 	static constexpr u8 chimeraba_seq[7]   = { 0x56,0x52,0x53,0x55,0x54,  0xfa,0x06 };
 
-	void megasys1B_iosim_map(address_map &map);
-	void megasys1C_iosim_map(address_map &map);
+	void megasys1B_iosim_map(address_map &map) ATTR_COLD;
+	void megasys1C_iosim_map(address_map &map) ATTR_COLD;
 
 	u16 ip_select_r();
 	void ip_select_w(u16 data);
@@ -309,8 +309,8 @@ public:
 	void system_C_iomcu(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	required_device<tlcs90_device> m_iomcu;
@@ -325,8 +325,8 @@ private:
 	u8 m_mcu_input_data;
 	u8 m_mcu_io_data;
 
-	void megasys1C_iomcu_map(address_map &map);
-	void iomcu_map(address_map &map);
+	void megasys1C_iomcu_map(address_map &map) ATTR_COLD;
+	void iomcu_map(address_map &map) ATTR_COLD;
 
 	TIMER_DEVICE_CALLBACK_MEMBER(megasys1C_iomcu_scanline);
 };

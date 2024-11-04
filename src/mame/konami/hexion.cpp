@@ -141,7 +141,7 @@ public:
 	void hexionb(machine_config &config);
 
 protected:
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -177,9 +177,9 @@ private:
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline);
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void base_map(address_map &map);
-	void hexion_map(address_map &map);
-	void hexionb_map(address_map &map);
+	void base_map(address_map &map) ATTR_COLD;
+	void hexion_map(address_map &map) ATTR_COLD;
+	void hexionb_map(address_map &map) ATTR_COLD;
 };
 
 

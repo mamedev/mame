@@ -2,7 +2,6 @@
 // copyright-holders:Juergen Buchmueller
 /*****************************************************************************
  *
- *   z180.c
  *   Portable Z180 emulator V0.3
  *
  *****************************************************************************/
@@ -13,8 +12,8 @@
         - HALT processing is not yet perfect. The manual states that
           during HALT, all dma and internal i/o incl. timers continue to
           work. Currently, only timers are implemented. Ideally, the
-          burn_cycles routine would go away and halt processing be
-          implemented in cpu_execute.
+          (currently unused) burn_cycles routine would go away and halt
+          processing be implemented in execute_run.
 
         - Documentation for RXS/CTS1 pin is contradictory.
 
@@ -2015,7 +2014,7 @@ again:
 /****************************************************************************
  * Burn 'cycles' T-states. Adjust R register for the lost time
  ****************************************************************************/
-void z180_device::execute_burn(int32_t cycles)
+void z180_device::burn_cycles(int32_t cycles)
 {
 	int extra_cycles = memory_wait_states();
 

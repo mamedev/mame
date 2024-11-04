@@ -92,12 +92,12 @@ private:
 
 	void soundcmd_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	void okibank_w(uint8_t data);
-	virtual void machine_start() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 	uint32_t screen_update_diverboy(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(  bitmap_ind16 &bitmap, const rectangle &cliprect );
-	void diverboy_map(address_map &map);
-	void snd_map(address_map &map);
+	void diverboy_map(address_map &map) ATTR_COLD;
+	void snd_map(address_map &map) ATTR_COLD;
 };
 
 

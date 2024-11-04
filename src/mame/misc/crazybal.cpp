@@ -9,11 +9,17 @@ http://www.tilt.it/deb/egs-en.html
 Entirely TTL. Believed to be the first arcade game to have high score initials entry.
 This was achieved via a keyboard on the control panel: http://www.citylan.it/wiki/images/c/c3/1698_control_panel_%2B_ingame.jpg
 
+crazybal:
 main PCB is marked: "EGS 113 [S]" on component side
 sub PCB is marked: "EGS 114 [S]" on component side
 27.025 OSC on main PCB
 
-A PCB set is available for tracing.
+crazybala:
+main PCB is marked: "EGS 106" on component side
+sub PCB is marked: "EGS 107" on component side
+
+PCB set 113 + 114 is available for tracing.
+Schematics are available for PCB set 106 + 107.
 */
 
 
@@ -54,15 +60,12 @@ public:
 	void crazybal(machine_config &config);
 
 protected:
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
-	// driver_device overrides
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 
 private:
-	// devices
 	required_device<netlist_mame_device> m_maincpu;
 	required_device<fixedfreq_device> m_video;
 };
@@ -95,10 +98,10 @@ void crazybal_state::video_start()
 
 void crazybal_state::crazybal(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	NETLIST_CPU(config, m_maincpu, netlist::config::DEFAULT_CLOCK()).set_source(netlist_crazybal);
 
-	/* video hardware */
+	// video hardware
 	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
 	FIXFREQ(config, m_video).set_screen("screen");
 	m_video->set_monitor_clock(MASTER_CLOCK);
@@ -109,6 +112,7 @@ void crazybal_state::crazybal(machine_config &config)
 }
 
 
+// EGS 113 + EGS 114 PCBs
 ROM_START( crazybal )
 	ROM_REGION( 0x1000, "maincpu", ROMREGION_ERASE00 )
 
@@ -124,7 +128,34 @@ ROM_START( crazybal )
 	ROM_LOAD( "3.12l",     0x000, 0x100, CRC(e2ca8670) SHA1(60bc4be4185c50a9afd3a28d1fb9e8f46c93764a) ) // Sn74S287N
 ROM_END
 
+// EGS 106 + EGS 107 PCBs (found in a cabinet distributed by Bontempi)
+ROM_START( crazybala )
+	ROM_REGION( 0x1000, "maincpu", ROMREGION_ERASE00 )
+
+	ROM_REGION( 0x0340, "mainpcb_proms", ROMREGION_ERASE00 )
+	ROM_LOAD( "74s287.12c", 0x000, 0x100, CRC(1f05c2df) SHA1(189e90ca29ef043ed1d4640aed3fa472a4e26da8) )
+	ROM_LOAD( "74s287.12d", 0x100, 0x100, CRC(f1d7a030) SHA1(697cf26dbfbd6207cb1dd2e098d6dba9b0bdbaf3) )
+	ROM_LOAD( "74s287.13e", 0x200, 0x100, CRC(57280959) SHA1(8162d9868e8367ba4c21712dc275ce4888cfbc70) )
+	ROM_LOAD( "6331.4g",    0x300, 0x020, CRC(21ee11cc) SHA1(4cdf16665015ee984a300e59c73eb2aa12c13e4e) )
+	ROM_LOAD( "74s188.6h",  0x320, 0x020, CRC(7b4b2f9f) SHA1(96b4a90e3c51582434e0eca1c3701cc2183dd372) )
+ROM_END
+
+// EGS 106 + EGS 107 PCBs. Only one PROM (at 4G) differs from the other set on this hw version.
+// It affects the shape of the 6 bumpers in the middle of the screen.
+ROM_START( crazybalb )
+	ROM_REGION( 0x1000, "maincpu", ROMREGION_ERASE00 )
+
+	ROM_REGION( 0x0340, "mainpcb_proms", ROMREGION_ERASE00 )
+	ROM_LOAD( "mmi6331.12c", 0x000, 0x100, CRC(1f05c2df) SHA1(189e90ca29ef043ed1d4640aed3fa472a4e26da8) )
+	ROM_LOAD( "mmi6331.12d", 0x100, 0x100, CRC(f1d7a030) SHA1(697cf26dbfbd6207cb1dd2e098d6dba9b0bdbaf3) )
+	ROM_LOAD( "mmi6331.13e", 0x200, 0x100, CRC(57280959) SHA1(8162d9868e8367ba4c21712dc275ce4888cfbc70) )
+	ROM_LOAD( "74s188.4g",   0x300, 0x020, CRC(fd10b3e7) SHA1(b5464d198f08d770a781ee284ba56987d1bcff12) )
+	ROM_LOAD( "74s188.6h",   0x320, 0x020, CRC(7b4b2f9f) SHA1(96b4a90e3c51582434e0eca1c3701cc2183dd372) )
+ROM_END
+
 } // anonymous namespace
 
 
-GAME( 1978, crazybal, 0, crazybal, 0, crazybal_state, empty_init, ROT0, "Electronic Games Systems", "Crazy Balls", MACHINE_IS_SKELETON )
+GAME( 1978, crazybal,  0,        crazybal, 0, crazybal_state, empty_init, ROT0, "Electronic Games Systems / NAT",      "Crazy Balls (NAT)",             MACHINE_IS_SKELETON )
+GAME( 1978, crazybala, crazybal, crazybal, 0, crazybal_state, empty_init, ROT0, "Electronic Games Systems / Bontempi", "Crazy Balls (Bontempi, set 1)", MACHINE_IS_SKELETON )
+GAME( 1978, crazybalb, crazybal, crazybal, 0, crazybal_state, empty_init, ROT0, "Electronic Games Systems / Bontempi", "Crazy Balls (Bontempi, set 2)", MACHINE_IS_SKELETON )

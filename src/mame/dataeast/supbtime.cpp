@@ -1,5 +1,6 @@
 // license: BSD-3-Clause
 // copyright-holders: Bryan McPhail, David Haywood, Dirk Best
+
 /***************************************************************************
 
   Super Burger Time     © 1990 Data East Corporation
@@ -8,7 +9,7 @@
 
   These games all run on the DE-0343 board.
 
-  Sound:  Ym2151, Oki adpcm - NOTE!  The sound program writes to the address
+  Sound:  YM2151, Oki ADPCM - NOTE!  The sound program writes to the address
 of a YM2203 and a 2nd Oki chip but the board does _not_ have them.  The sound
 program is simply the 'generic' Data East sound program unmodified for this cut
 down hardware (it doesn't write any good sound data btw, mostly zeros).
@@ -47,7 +48,7 @@ Stephh's notes (based on the games M68000 code and some tests) :
             8      Stratosphere
             9      Space
 
-      * As levels x-9 and 9-x are only constitued of a "big boss", you can't
+      * As levels x-9 and 9-x are only constituted of a "big boss", you can't
         edit them !
       * All data is stored within the range 0x02b8c8-0x02d2c9, but it should be
         extended to 0x02ebeb (and perhaps 0x02ffff). TO BE CONFIRMED !
@@ -60,8 +61,130 @@ Stephh's notes (based on the games M68000 code and some tests) :
 ***************************************************************************/
 
 #include "emu.h"
-#include "supbtime.h"
+
+#include "deco16ic.h"
+#include "decocrpt.h"
+#include "decospr.h"
+
+#include "cpu/h6280/h6280.h"
+#include "cpu/m68000/m68000.h"
+#include "machine/gen_latch.h"
+#include "sound/okim6295.h"
+#include "sound/ymopm.h"
+
 #include "emupal.h"
+#include "screen.h"
+#include "speaker.h"
+
+
+namespace {
+
+class supbtime_state : public driver_device
+{
+public:
+	supbtime_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag)
+		, m_spriteram(*this, "spriteram")
+		, m_pf_rowscroll(*this, "pf%u_rowscroll", 1U)
+		, m_maincpu(*this, "maincpu")
+		, m_audiocpu(*this, "audiocpu")
+		, m_deco_tilegen(*this, "tilegen")
+		, m_sprgen(*this, "spritegen")
+	{ }
+
+	void chinatwn(machine_config &config);
+	void supbtime(machine_config &config);
+	void tumblep(machine_config &config);
+
+	void init_tumblep();
+
+private:
+	required_shared_ptr<uint16_t> m_spriteram;
+	required_shared_ptr_array<uint16_t, 2> m_pf_rowscroll;
+	required_device<cpu_device> m_maincpu;
+	required_device<h6280_device> m_audiocpu;
+	required_device<deco16ic_device> m_deco_tilegen;
+	required_device<decospr_device> m_sprgen;
+
+	void vblank_w(int state);
+	uint16_t vblank_ack_r();
+	uint32_t screen_update_common(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, bool use_offsets);
+	uint32_t screen_update_chinatwn(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_supbtime(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_tumblep(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+
+	void chinatwn_map(address_map &map) ATTR_COLD;
+	void sound_map(address_map &map) ATTR_COLD;
+	void supbtime_map(address_map &map) ATTR_COLD;
+	void tumblep_map(address_map &map) ATTR_COLD;
+};
+
+
+/***************************************************************************
+
+    Video mixing
+
+    - are there priority registers / bits in the sprites that would allow
+      this to be collapsed further?
+
+***************************************************************************/
+
+uint32_t supbtime_state::screen_update_common(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, bool use_offsets)
+{
+	uint16_t const flip = m_deco_tilegen->pf_control_r(0);
+
+	flip_screen_set(BIT(flip, 7));
+	m_sprgen->set_flip_screen(BIT(flip, 7));
+	m_deco_tilegen->pf_update(m_pf_rowscroll[0], m_pf_rowscroll[1]);
+
+	bitmap.fill(768, cliprect);
+
+	if (use_offsets)
+	{
+		// chinatwn and tumblep are verified as needing a 1 pixel offset on the tilemaps to match original hardware (supbtime appears to not want them)
+		m_deco_tilegen->set_scrolldx(0, 0, 1, -1);
+		m_deco_tilegen->set_scrolldx(0, 1, 1, -1);
+		m_deco_tilegen->set_scrolldx(1, 0, 1, -1);
+		m_deco_tilegen->set_scrolldx(1, 1, 1, -1);
+	}
+
+	return 0;
+}
+
+// End sequence uses rowscroll '98 c0' on pf1 (jmp to 1d61a on supbtimej)
+uint32_t supbtime_state::screen_update_supbtime(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	screen_update_common(screen, bitmap, cliprect, false);
+
+	m_deco_tilegen->tilemap_2_draw(screen, bitmap, cliprect, 0, 0);
+	m_sprgen->draw_sprites(bitmap, cliprect, m_spriteram, 0x400);
+	m_deco_tilegen->tilemap_1_draw(screen, bitmap, cliprect, 0, 0);
+
+	return 0;
+}
+
+uint32_t supbtime_state::screen_update_chinatwn(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	screen_update_common(screen, bitmap, cliprect, true);
+
+	m_deco_tilegen->tilemap_2_draw(screen, bitmap, cliprect, 0, 0);
+	m_sprgen->draw_sprites(bitmap, cliprect, m_spriteram, 0x400);
+	m_deco_tilegen->tilemap_1_draw(screen, bitmap, cliprect, 0, 0);
+
+	return 0;
+}
+
+uint32_t supbtime_state::screen_update_tumblep(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	screen_update_common(screen, bitmap, cliprect, true);
+
+	m_deco_tilegen->tilemap_2_draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
+	m_deco_tilegen->tilemap_1_draw(screen, bitmap, cliprect, 0, 0);
+	m_sprgen->draw_sprites(bitmap, cliprect, m_spriteram, 0x400);
+
+	return 0;
+}
+
 
 #define TUMBLEP_HACK 0
 
@@ -74,9 +197,9 @@ void supbtime_state::supbtime_map(address_map &map)
 {
 	map(0x000000, 0x03ffff).rom();
 	map(0x100000, 0x103fff).ram();
-	map(0x104000, 0x11ffff).nopw(); // Nothing there
-	map(0x120000, 0x1207ff).ram().share("spriteram");
-	map(0x120800, 0x13ffff).nopw(); // Nothing there
+	map(0x104000, 0x11ffff).nopw(); // Nothing here
+	map(0x120000, 0x1207ff).ram().share(m_spriteram);
+	map(0x120800, 0x13ffff).nopw(); // Nothing here
 	map(0x140000, 0x1407ff).ram().w("palette", FUNC(palette_device::write16)).share("palette");
 	map(0x180000, 0x180001).portr("INPUTS");
 	map(0x180002, 0x180003).portr("DSW");
@@ -87,15 +210,15 @@ void supbtime_state::supbtime_map(address_map &map)
 	map(0x300000, 0x30000f).rw(m_deco_tilegen, FUNC(deco16ic_device::pf_control_r), FUNC(deco16ic_device::pf_control_w));
 	map(0x320000, 0x321fff).rw(m_deco_tilegen, FUNC(deco16ic_device::pf1_data_r), FUNC(deco16ic_device::pf1_data_w));
 	map(0x322000, 0x323fff).rw(m_deco_tilegen, FUNC(deco16ic_device::pf2_data_r), FUNC(deco16ic_device::pf2_data_w));
-	map(0x340000, 0x3407ff).ram().share("pf1_rowscroll");
-	map(0x342000, 0x3427ff).ram().share("pf2_rowscroll");
+	map(0x340000, 0x3407ff).ram().share(m_pf_rowscroll[0]);
+	map(0x342000, 0x3427ff).ram().share(m_pf_rowscroll[1]);
 }
 
 void supbtime_state::chinatwn_map(address_map &map)
 {
 	map(0x000000, 0x03ffff).rom();
 	map(0x100001, 0x100001).w("soundlatch", FUNC(generic_latch_8_device::write));
-	map(0x120000, 0x1207ff).ram().share("spriteram");
+	map(0x120000, 0x1207ff).ram().share(m_spriteram);
 	map(0x140000, 0x1407ff).ram().w("palette", FUNC(palette_device::write16)).share("palette");
 	map(0x180000, 0x180001).portr("INPUTS");
 	map(0x180002, 0x180003).portr("DSW");
@@ -106,8 +229,8 @@ void supbtime_state::chinatwn_map(address_map &map)
 	map(0x300000, 0x30000f).rw(m_deco_tilegen, FUNC(deco16ic_device::pf_control_r), FUNC(deco16ic_device::pf_control_w));
 	map(0x320000, 0x321fff).rw(m_deco_tilegen, FUNC(deco16ic_device::pf1_data_r), FUNC(deco16ic_device::pf1_data_w));
 	map(0x322000, 0x323fff).rw(m_deco_tilegen, FUNC(deco16ic_device::pf2_data_r), FUNC(deco16ic_device::pf2_data_w));
-	map(0x340000, 0x3407ff).ram().share("pf1_rowscroll"); // unused
-	map(0x342000, 0x3427ff).ram().share("pf2_rowscroll"); // unused
+	map(0x340000, 0x3407ff).ram().share(m_pf_rowscroll[0]); // unused
+	map(0x342000, 0x3427ff).ram().share(m_pf_rowscroll[1]); // unused
 }
 
 void supbtime_state::tumblep_map(address_map &map)
@@ -124,12 +247,12 @@ void supbtime_state::tumblep_map(address_map &map)
 	map(0x180008, 0x180009).portr("SYSTEM");
 	map(0x18000a, 0x18000b).r(FUNC(supbtime_state::vblank_ack_r));
 	map(0x18000a, 0x18000d).nopw(); // ?
-	map(0x1a0000, 0x1a07ff).ram().share("spriteram");
+	map(0x1a0000, 0x1a07ff).ram().share(m_spriteram);
 	map(0x300000, 0x30000f).w(m_deco_tilegen, FUNC(deco16ic_device::pf_control_w));
 	map(0x320000, 0x320fff).rw(m_deco_tilegen, FUNC(deco16ic_device::pf1_data_r), FUNC(deco16ic_device::pf1_data_w));
 	map(0x322000, 0x322fff).rw(m_deco_tilegen, FUNC(deco16ic_device::pf2_data_r), FUNC(deco16ic_device::pf2_data_w));
-	map(0x340000, 0x3407ff).writeonly().share("pf1_rowscroll"); // unused
-	map(0x342000, 0x3427ff).writeonly().share("pf2_rowscroll"); // unused
+	map(0x340000, 0x3407ff).writeonly().share(m_pf_rowscroll[0]); // unused
+	map(0x342000, 0x3427ff).writeonly().share(m_pf_rowscroll[1]); // unused
 }
 
 // Physical memory map (21 bits)
@@ -421,7 +544,7 @@ ROM_START( supbtime )
 	ROM_LOAD("tg5.j1",  0x514, 0x104, CRC(21d02af7) SHA1(4b221a478cb3381e9551de770df7c491c5e59c90)) // PAL16L8
 ROM_END
 
-ROM_START( supbtimea ) // this set has no backgrounds ingame for most stages, but has been verifeid as good on multiple PCBs, design choice
+ROM_START( supbtimea ) // this set has no backgrounds ingame for most stages, but has been verified as good on multiple PCBs, design choice
 	ROM_REGION( 0x40000, "maincpu", 0 )
 	ROM_LOAD16_BYTE("3.11f", 0x00000, 0x20000, CRC(98b5f263) SHA1(ee4b0d2fcdc95aba0e78d066bd6c4d553a902848))
 	ROM_LOAD16_BYTE("4.12f", 0x00001, 0x20000, CRC(937e68b9) SHA1(4779e150518b9014c2154f33d38767c6a7447334))
@@ -531,6 +654,9 @@ void supbtime_state::init_tumblep()
 	RAM[(offset + 2)/2] = 0xffff;   // andi.w  #$f3ff, D0
 #endif
 }
+
+} // anonymous namespace
+
 
 //**************************************************************************
 //  SYSTEM DRIVERS

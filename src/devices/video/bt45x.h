@@ -42,13 +42,13 @@ public:
 		CR54_1648 = 0x00  // 16 on 48 off, 25/75
 	};
 
-	virtual void map(address_map &map);
+	virtual void map(address_map &map) ATTR_COLD;
 
 protected:
 	bt45x_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, const u32 palette_colors, const u32 overlay_colors);
 
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	u8 address_r();
 	void address_w(u8 data);
@@ -82,7 +82,7 @@ class bt45x_rgb_device_base : public bt45x_device_base, public device_palette_in
 protected:
 	bt45x_rgb_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, const u32 palette_colors, const u32 overlay_colors);
 
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 	virtual u32 palette_entries() const noexcept override { return m_palette_colors + m_overlay_colors; }
 
@@ -109,7 +109,7 @@ public:
 protected:
 	bt45x_mono_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, const u32 palette_colors, const u32 overlay_colors);
 
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 	virtual u8 palette_r(address_space &space) override;
 	virtual void palette_w(u8 data) override;
@@ -137,7 +137,7 @@ class bt453_device : public bt45x_rgb_device_base
 public:
 	bt453_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual void map(address_map &map) override;
+	virtual void map(address_map &map) override ATTR_COLD;
 };
 
 class bt454_device : public bt45x_rgb_device_base
@@ -145,7 +145,7 @@ class bt454_device : public bt45x_rgb_device_base
 public:
 	bt454_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual void map(address_map &map) override;
+	virtual void map(address_map &map) override ATTR_COLD;
 };
 
 class bt455_device : public bt45x_mono_device_base
@@ -153,7 +153,7 @@ class bt455_device : public bt45x_mono_device_base
 public:
 	bt455_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual void map(address_map &map) override;
+	virtual void map(address_map &map) override ATTR_COLD;
 };
 
 class bt457_device : public bt45x_mono_device_base

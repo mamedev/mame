@@ -30,7 +30,7 @@ public:
 
 	void base(machine_config &config);
 
-	void cs_map_base(address_map &map);
+	void cs_map_base(address_map &map) ATTR_COLD;
 
 	virtual uint16_t cs0_r(offs_t offset);
 	virtual void cs0_w(offs_t offset, uint16_t data);
@@ -46,8 +46,8 @@ public:
 	void cs_callback(uint16_t cs0, uint16_t cs1, uint16_t cs2, uint16_t cs3, uint16_t cs4);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 
 	required_device<sunplus_gcm394_base_device> m_maincpu;
@@ -86,7 +86,7 @@ public:
 
 protected:
 
-	virtual void machine_reset() override;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	int m_upperbase = 0;
@@ -108,7 +108,7 @@ public:
 
 protected:
 
-	virtual void machine_reset() override;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 };
@@ -125,7 +125,7 @@ public:
 
 protected:
 
-	virtual void machine_reset() override;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	int m_upperbase = 0;
@@ -138,6 +138,39 @@ private:
 	uint16_t m_portb_data = 0U;
 	uint16_t m_portd_data = 0U;
 	uint8_t m_bank = 0U;
+};
+
+
+class gameu_handheld_game_state : public gcm394_game_state
+{
+public:
+	gameu_handheld_game_state(const machine_config& mconfig, device_type type, const char* tag) :
+		gcm394_game_state(mconfig, type, tag)
+	{
+	}
+
+	virtual uint16_t cs0_r(offs_t offset) override;
+
+	void gameu(machine_config &config);
+
+	void init_gameu();
+
+protected:
+
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
+private:
+	void gameu_porta_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void gameu_portb_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void gameu_portc_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void gameu_portd_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+
+	uint32_t m_upperbase;
+	uint16_t m_porta_data;
+	uint16_t m_portb_data;
+	uint16_t m_portc_data;
+	uint16_t m_portd_data;
 };
 
 

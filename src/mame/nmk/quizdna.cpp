@@ -45,8 +45,8 @@ public:
 	void gekiretu(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -82,11 +82,11 @@ private:
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void gakupara_io_map(address_map &map);
-	void gekiretu_io_map(address_map &map);
-	void gekiretu_map(address_map &map);
-	void quizdna_io_map(address_map &map);
-	void quizdna_map(address_map &map);
+	void gakupara_io_map(address_map &map) ATTR_COLD;
+	void gekiretu_io_map(address_map &map) ATTR_COLD;
+	void gekiretu_map(address_map &map) ATTR_COLD;
+	void quizdna_io_map(address_map &map) ATTR_COLD;
+	void quizdna_map(address_map &map) ATTR_COLD;
 };
 
 
@@ -347,9 +347,9 @@ void quizdna_state::gekiretu_io_map(address_map &map)
 
 /****************************************************************************/
 
-static INPUT_PORTS_START( quizdna )
+static INPUT_PORTS_START( quizdna ) // DIP definitions and defaults verified with manual
 	PORT_START("DSW2")
-	PORT_DIPNAME( 0x0f, 0x0f, DEF_STR( Coinage ) )
+	PORT_DIPNAME( 0x0f, 0x0f, DEF_STR( Coinage ) ) PORT_DIPLOCATION("DSW2:1,2,3,4")
 	PORT_DIPSETTING(    0x01, DEF_STR( 9C_1C ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( 8C_1C ) )
 	PORT_DIPSETTING(    0x03, DEF_STR( 7C_1C ) )
@@ -366,37 +366,37 @@ static INPUT_PORTS_START( quizdna )
 	PORT_DIPSETTING(    0x0b, DEF_STR( 1C_5C ) )
 	PORT_DIPSETTING(    0x0a, DEF_STR( 1C_6C ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Free_Play ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Demo_Sounds ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("DSW2:5")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, "Unknown 2-6" )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unused ) ) PORT_DIPLOCATION("DSW2:6") // confirmed 'Unused' by the manual
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Flip_Screen ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Flip_Screen ) ) PORT_DIPLOCATION("DSW2:7")
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_SERVICE( 0x80, IP_ACTIVE_LOW )
+	PORT_SERVICE( 0x80, IP_ACTIVE_LOW ) PORT_DIPLOCATION("DSW2:8")
 
 	PORT_START("DSW3")
-	PORT_DIPNAME( 0x03, 0x02, "Timer" )
+	PORT_DIPNAME( 0x03, 0x02, "Timer" ) PORT_DIPLOCATION("DSW3:1,2")
 	PORT_DIPSETTING(    0x03, "Slow" )
 	PORT_DIPSETTING(    0x02, DEF_STR( Normal ) )
 	PORT_DIPSETTING(    0x01, "Fast" )
 	PORT_DIPSETTING(    0x00, "Very Fast" )
-	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Lives ) )
+	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Lives ) ) PORT_DIPLOCATION("DSW3:3,4")
 	PORT_DIPSETTING(    0x08, "1" )
 	PORT_DIPSETTING(    0x04, "2" )
 	PORT_DIPSETTING(    0x0c, "3" )
 	PORT_DIPSETTING(    0x00, "4" )
-	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Bonus_Life ) )
+	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Bonus_Life ) ) PORT_DIPLOCATION("DSW3:5,6")
 	PORT_DIPSETTING(    0x30, "Every 500k" )
 	PORT_DIPSETTING(    0x20, "Every 1000k" )
 	PORT_DIPSETTING(    0x10, "Every 2000k" )
 	PORT_DIPSETTING(    0x00, DEF_STR( None ) )
-	PORT_DIPNAME( 0x40, 0x40, "Carat" )
+	PORT_DIPNAME( 0x40, 0x40, "Carat" ) PORT_DIPLOCATION("DSW3:7")
 	PORT_DIPSETTING(    0x40, "20" )
 	PORT_DIPSETTING(    0x00, "0" )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Allow_Continue ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Allow_Continue ) ) PORT_DIPLOCATION("DSW3:8")
 	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( Yes ) )
 
@@ -441,9 +441,9 @@ static INPUT_PORTS_START( quizdna )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( gakupara )
+static INPUT_PORTS_START( gakupara ) // DIP definitions and defaults verified with manual
 	PORT_START("DSW2")
-	PORT_DIPNAME( 0x0f, 0x0f, DEF_STR( Coinage ) )
+	PORT_DIPNAME( 0x0f, 0x0f, DEF_STR( Coinage ) ) PORT_DIPLOCATION("DSW2:1,2,3,4")
 	PORT_DIPSETTING(    0x00, "10 Coins/1 Credit" )
 	PORT_DIPSETTING(    0x01, DEF_STR( 9C_1C ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( 8C_1C ) )
@@ -460,39 +460,39 @@ static INPUT_PORTS_START( gakupara )
 	PORT_DIPSETTING(    0x0c, DEF_STR( 1C_4C ) )
 	PORT_DIPSETTING(    0x0b, DEF_STR( 1C_5C ) )
 	PORT_DIPSETTING(    0x0a, DEF_STR( 1C_6C ) )
-	PORT_DIPNAME( 0x10, 0x00, "Demo Music" )
+	PORT_DIPNAME( 0x10, 0x00, "Demo Music" ) PORT_DIPLOCATION("DSW2:5")
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Flip_Screen ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Flip_Screen ) ) PORT_DIPLOCATION("DSW2:6")
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0xc0, 0x80, "Timer" )
+	PORT_DIPNAME( 0xc0, 0x80, "Timer" ) PORT_DIPLOCATION("DSW2:7,8")
 	PORT_DIPSETTING(    0xc0, "Slow" )
 	PORT_DIPSETTING(    0x80, DEF_STR( Normal ) )
 	PORT_DIPSETTING(    0x40, "Fast" )
 	PORT_DIPSETTING(    0x00, "Very Fast" )
 
 	PORT_START("DSW3")
-	PORT_SERVICE( 0x01, IP_ACTIVE_LOW )
-	PORT_DIPNAME( 0x02, 0x02, "Unknown 3-2" )
+	PORT_SERVICE( 0x01, IP_ACTIVE_LOW )  PORT_DIPLOCATION("DSW3:1")
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unused ) ) PORT_DIPLOCATION("DSW3:2") // 0xfe are "prohibited from use" according to manual
 	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, "Unknown 3-3" )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unused ) ) PORT_DIPLOCATION("DSW3:3")
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, "Unknown 3-4" )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unused ) ) PORT_DIPLOCATION("DSW3:4")
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, "Unknown 3-5" )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unused ) ) PORT_DIPLOCATION("DSW3:5")
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, "Unknown 3-6" )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unused ) ) PORT_DIPLOCATION("DSW3:6")
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, "Unknown 3-7" )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unused ) ) PORT_DIPLOCATION("DSW3:7")
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, "Unknown 3-8" )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unused ) ) PORT_DIPLOCATION("DSW3:8")
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
@@ -788,6 +788,31 @@ ROM_START( gakupara )
 	ROM_LOAD( "u148.bin", 0x000000,  0x000020, CRC(971df9d2) SHA1(280f5b386922b9902ca9211c719642c2bd0ba899) )
 ROM_END
 
+ROM_START( gakupara102 ) // ARC-0004-1 PCB
+	ROM_REGION( 0xd0000, "maincpu", 0 )
+	ROM_LOAD( "u28.bin",  0x00000,  0x08000, CRC(9256c18a) SHA1(6704fa48c468621af76ce91b38addeee0d654b56) ) // SLDH
+	ROM_CONTINUE(         0x18000,  0x78000 )             // banked
+	ROM_LOAD( "u29.bin",  0x90000,  0x40000, CRC(09f4948e) SHA1(21ccf5af6935cf40c0cf73fbee14bff3c4e1d23d) ) // banked
+
+	ROM_REGION( 0x40000, "fgtiles", 0 )
+	ROM_LOAD( "u102.bin", 0x00000,  0x20000, CRC(62402ac9) SHA1(bf52d22b119d54410dad4949b0687bb0edf3e143) )
+	ROM_LOAD( "u103.bin", 0x20000,  0x20000, CRC(38644251) SHA1(ebfdc43c38e1380709ed08575c346b2467ad1592) )
+
+	ROM_REGION( 0x108000, "bgtiles", 0 )
+	ROM_LOAD( "u100.bin", 0x000000,  0x100000, CRC(f9d886ea) SHA1(d7763f54a165af720216b96e601a66fbc59e3568) )
+	ROM_LOAD( "u99.bin",  0x100000,  0x008000, CRC(ac224d0a) SHA1(f187c3b74bc18606d0fe638f6a829f71c109998d) )
+
+	ROM_REGION( 0x108000, "sprites", 0 )
+	ROM_LOAD( "u98.bin",  0x000000,  0x100000, CRC(a6e8cb56) SHA1(2fc85c1769513cc7aa5e23afaf0c99c38de9b855) )
+	ROM_LOAD( "u97.bin",  0x100000,  0x008000, CRC(9dacd5c9) SHA1(e40211059e71408be3d67807463304f4d4ecae37) )
+
+	ROM_REGION( 0x80000, "oki", 0 ) // samples
+	ROM_LOAD( "u32.bin",  0x000000,  0x040000, CRC(eb03c535) SHA1(4d6c749ccab4681eee0a1fb243e9f3dbe61b9f94) )
+
+	ROM_REGION( 0x00020, "fgctrl", 0 )
+	ROM_LOAD( "u148.bin", 0x000000,  0x000020, CRC(971df9d2) SHA1(280f5b386922b9902ca9211c719642c2bd0ba899) )
+ROM_END
+
 ROM_START( gekiretu )
 	ROM_REGION( 0xd0000, "maincpu", 0 )
 	ROM_LOAD( "quiz3-pr.28",  0x00000,  0x08000, CRC(a761e86f) SHA1(85331ef53598491e78c2d123b1ebd358aff46436) )
@@ -813,9 +838,38 @@ ROM_START( gekiretu )
 	ROM_LOAD( "quiz3.148",    0x000000,  0x000020, CRC(91267e8a) SHA1(ae5bd8efea5322c4d9986d06680a781392f9a642) )
 ROM_END
 
+ROM_START( gekiretup ) // ARC-0005-1 PCB, hand-written labels
+	ROM_REGION( 0xd0000, "maincpu", 0 )
+	ROM_LOAD( "quiz3-pr.28",  0x00000,  0x08000, CRC(a761e86f) SHA1(85331ef53598491e78c2d123b1ebd358aff46436) ) // same as final
+	ROM_CONTINUE(             0x18000,  0x78000 ) // banked
+	// empty
+
+	ROM_REGION( 0x40000, "fgtiles", 0 )
+	ROM_LOAD( "quiz2_kanji.u102",  0x00000,  0x20000, BAD_DUMP CRC(62402ac9) SHA1(bf52d22b119d54410dad4949b0687bb0edf3e143) ) // using the one from final for now, redump pending
+	// empty
+
+	ROM_REGION( 0x108000, "bgtiles", 0 ) // almost identical to final (some changes in the second ROM - i.e. missing copyright and Gakuen Paradise 2 subtitle in title screen)
+	ROM_LOAD( "bg0mask.u100", 0x000000,  0x80000, CRC(2344be20) SHA1(f6656ec19c0cb8fecf21873ecfb0e1ea1c9ea570) )
+	ROM_LOAD( "bghi.u99",     0x080000,  0x80000, CRC(0353ce23) SHA1(71ea78458b7c70805f32dd7a6329b1b302cb5a9e) )
+	// empty
+
+	ROM_REGION( 0x108000, "sprites", 0 ) // same as final, just split
+	ROM_LOAD( "obj0_mask.u98",  0x000000,  0x080000, CRC(a367c004) SHA1(a092dbc3186a5ca2f88377f4851702f2af7e71ab) )
+	ROM_LOAD( "obj1_mask.u97",  0x080000,  0x080000, CRC(c4444ae0) SHA1(da113019920dbfc23c55ececc4ca3667f978224e) )
+	// empty
+
+	ROM_REGION( 0x80000, "oki", 0 ) // samples
+	ROM_LOAD( "quiz3-sn.32",  0x000000,  0x040000, CRC(36dca582) SHA1(2607602e942244cfaae931da2ad36da9a8f855f7) ) // same as final
+
+	ROM_REGION( 0x00020, "fgctrl", 0 )
+	ROM_LOAD( "quiz3.148",    0x000000,  0x000020, CRC(91267e8a) SHA1(ae5bd8efea5322c4d9986d06680a781392f9a642) )
+ROM_END
+
 } // anonymous namespace
 
 
-GAME( 1991, gakupara, 0, gakupara, gakupara, quizdna_state, empty_init, ROT0, "NMK",  "Quiz Gakuen Paradise (Japan)",    MACHINE_SUPPORTS_SAVE )
-GAME( 1992, quizdna,  0, quizdna,  quizdna,  quizdna_state, empty_init, ROT0, "Face", "Quiz DNA no Hanran (Japan)",      MACHINE_SUPPORTS_SAVE )
-GAME( 1992, gekiretu, 0, gekiretu, gekiretu, quizdna_state, empty_init, ROT0, "Face", "Quiz Gekiretsu Scramble (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, gakupara,    0,        gakupara, gakupara, quizdna_state, empty_init, ROT0, "NMK",  "Quiz Gakuen Paradise (Japan, ver. 1.04)",    MACHINE_SUPPORTS_SAVE )
+GAME( 1991, gakupara102, gakupara, gakupara, gakupara, quizdna_state, empty_init, ROT0, "NMK",  "Quiz Gakuen Paradise (Japan, ver. 1.02)",    MACHINE_SUPPORTS_SAVE )
+GAME( 1992, quizdna,     0,        quizdna,  quizdna,  quizdna_state, empty_init, ROT0, "Face", "Quiz DNA no Hanran (Japan)",                 MACHINE_SUPPORTS_SAVE )
+GAME( 1992, gekiretu,    0,        gekiretu, gekiretu, quizdna_state, empty_init, ROT0, "Face", "Quiz Gekiretsu Scramble (Japan)",            MACHINE_SUPPORTS_SAVE )
+GAME( 1992, gekiretup,   gekiretu, gekiretu, gekiretu, quizdna_state, empty_init, ROT0, "Face", "Quiz Gekiretsu Scramble (Japan, prototype)", MACHINE_SUPPORTS_SAVE )

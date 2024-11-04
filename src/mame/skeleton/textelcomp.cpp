@@ -38,7 +38,7 @@ public:
 	void textelcomp(machine_config &config);
 
 private:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 	void keyscan_w(u8 data);
 	u8 keyboard_r();
 	void shift_data_w(int state);
@@ -46,8 +46,8 @@ private:
 	void update_shift_output();
 	void rtc_w(u8 data);
 
-	void mem_map(address_map &map);
-	void lcdc_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
+	void lcdc_map(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<msm58321_device> m_rtc;

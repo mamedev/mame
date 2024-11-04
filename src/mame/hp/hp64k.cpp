@@ -183,8 +183,8 @@ public:
 private:
 	virtual void driver_start() override;
 	//virtual void machine_start();
-	virtual void video_start() override;
-	virtual void machine_reset() override;
+	virtual void video_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	uint8_t hp64k_crtc_filter(uint8_t data);
 	void hp64k_crtc_w(offs_t offset, uint16_t data);
@@ -244,8 +244,8 @@ private:
 	TIMER_DEVICE_CALLBACK_MEMBER(hp64k_beeper_off);
 
 	void hp64k_baud_clk_w(int state);
-	void cpu_io_map(address_map &map);
-	void cpu_mem_map(address_map &map);
+	void cpu_io_map(address_map &map) ATTR_COLD;
+	void cpu_mem_map(address_map &map) ATTR_COLD;
 
 	required_device<hp_5061_3011_cpu_device> m_cpu;
 	required_device<i8275_device> m_crtc;

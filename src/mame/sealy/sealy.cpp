@@ -59,7 +59,7 @@ private:
 	// screen updates
 	void sealy_palette(palette_device &palette) const;
 	uint32_t screen_update_sealy(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	void sealy_map(address_map &map);
+	void sealy_map(address_map &map) ATTR_COLD;
 };
 
 

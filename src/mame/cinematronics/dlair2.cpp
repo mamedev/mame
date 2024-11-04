@@ -62,14 +62,14 @@ private:
 	INTERRUPT_GEN_MEMBER(dlair2_timer_irq);
 	void dlair2_palette(palette_device &palette) const;
 
-	void dlair2_io(address_map &map);
-	void dlair2_map(address_map &map);
+	void dlair2_io(address_map &map) ATTR_COLD;
+	void dlair2_map(address_map &map) ATTR_COLD;
 
 	// driver_device overrides
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 };
 
 void dlair2_state::video_start()

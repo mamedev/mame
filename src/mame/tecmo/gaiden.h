@@ -45,8 +45,8 @@ public:
 	void init_shadoww();
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	void irq_ack_w(uint16_t data);
 	void drgnbowl_irq_ack_w(uint8_t data);
@@ -75,11 +75,11 @@ protected:
 	void drgnbowl_draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void descramble_drgnbowl(int descramble_cpu);
 
-	void drgnbowl_map(address_map &map);
-	void drgnbowl_sound_map(address_map &map);
-	void drgnbowl_sound_port_map(address_map &map);
-	void gaiden_map(address_map &map);
-	void sound_map(address_map &map);
+	void drgnbowl_map(address_map &map) ATTR_COLD;
+	void drgnbowl_sound_map(address_map &map) ATTR_COLD;
+	void drgnbowl_sound_port_map(address_map &map) ATTR_COLD;
+	void gaiden_map(address_map &map) ATTR_COLD;
+	void sound_map(address_map &map) ATTR_COLD;
 
 	// devices
 	required_device<cpu_device> m_maincpu;
@@ -129,13 +129,13 @@ public:
 	void init_wildfang();
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	void wildfang_protection_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	uint16_t protection_r();
 
-	void wildfang_map(address_map &map);
+	void wildfang_map(address_map &map) ATTR_COLD;
 
 	// protection related
 	uint16_t    m_prot = 0;
@@ -156,16 +156,16 @@ public:
 
 protected:
 	virtual void device_post_load() override;
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	void raiga_protection_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	void screen_vblank_raiga(int state);
 	uint32_t screen_update_raiga(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	void raiga_map(address_map &map);
+	void raiga_map(address_map &map) ATTR_COLD;
 
 	// protection related
 	bool m_protmode = false; // protection related
@@ -186,7 +186,7 @@ public:
 	void init_mastninj();
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	// devices
@@ -205,8 +205,8 @@ private:
 
 	void descramble_mastninj_gfx(uint8_t* src);
 
-	void mastninj_map(address_map &map);
-	void mastninj_sound_map(address_map &map);
+	void mastninj_map(address_map &map) ATTR_COLD;
+	void mastninj_sound_map(address_map &map) ATTR_COLD;
 };
 
 #endif // MAME_TECMO_GAIDEN_H

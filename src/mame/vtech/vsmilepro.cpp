@@ -40,7 +40,7 @@ public:
 	void vsmilpro(machine_config &config);
 
 private:
-	void vsmilpro_map(address_map &map);
+	void vsmilpro_map(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 };

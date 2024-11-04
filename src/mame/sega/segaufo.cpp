@@ -114,7 +114,7 @@ public:
 	void ufo800(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override { m_nmi_enable = false; }
 
 private:
@@ -148,9 +148,9 @@ private:
 	TIMER_CALLBACK_MEMBER(simulate_xyz);
 
 	// address maps
-	void ufo_map(address_map &map);
-	void ufo_portmap(address_map &map);
-	void ex_ufo21_portmap(address_map &map);
+	void ufo_map(address_map &map) ATTR_COLD;
+	void ufo_portmap(address_map &map) ATTR_COLD;
+	void ex_ufo21_portmap(address_map &map) ATTR_COLD;
 
 	// I/O handlers
 	void pit_out0(int state);

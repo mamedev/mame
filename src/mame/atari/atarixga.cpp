@@ -74,7 +74,7 @@ void atari_136094_0072_device::device_start()
 {
 	m_ram = std::make_unique<uint16_t[]>(RAM_WORDS);
 
-	save_pointer(NAME(m_ram), RAM_WORDS * sizeof(uint16_t));
+	save_pointer(NAME(m_ram), RAM_WORDS);
 	save_item(NAME(m_address));
 	save_item(NAME(m_ciphertext));
 }
@@ -293,7 +293,7 @@ atari_136095_0072_device::atari_136095_0072_device(const machine_config &mconfig
 void atari_136095_0072_device::device_start()
 {
 	m_ram = std::make_unique<uint16_t[]>(RAM_WORDS);
-	save_pointer(NAME(m_ram), RAM_WORDS * sizeof(uint16_t));
+	save_pointer(NAME(m_ram), RAM_WORDS);
 
 	save_item(NAME(m_update.addr));
 	save_item(NAME(m_update.data));

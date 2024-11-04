@@ -48,7 +48,7 @@ public:
 	void mrisc(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -56,7 +56,7 @@ private:
 	required_memory_bank m_rombank;
 	required_ioport m_keys;
 
-	void mrisc_mem(address_map &map);
+	void mrisc_mem(address_map &map) ATTR_COLD;
 
 	u8 keys_r(offs_t offset);
 	u8 chessm_r();

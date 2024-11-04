@@ -155,7 +155,7 @@ public:
 	void tecfri(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -192,13 +192,13 @@ public:
 	void trckydoc(machine_config &config);
 
 protected:
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void prg_map(address_map &map);
+	void prg_map(address_map &map) ATTR_COLD;
 };
 
 class sauro_state : public base_state
@@ -215,7 +215,7 @@ public:
 	void saurobl(machine_config &config);
 
 protected:
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	required_device<generic_latch_8_device> m_soundlatch;
@@ -238,10 +238,10 @@ private:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void main_io_map(address_map &map);
-	void main_prg_map(address_map &map);
-	void sauro_sound_map(address_map &map);
-	void saurobl_sound_map(address_map &map);
+	void main_io_map(address_map &map) ATTR_COLD;
+	void main_prg_map(address_map &map) ATTR_COLD;
+	void sauro_sound_map(address_map &map) ATTR_COLD;
+	void saurobl_sound_map(address_map &map) ATTR_COLD;
 };
 
 

@@ -23,8 +23,8 @@ public:
 	virtual int execute_command(int command, int rw, int data) override;
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 private:
 	uint8_t buffer[0xff];
@@ -43,8 +43,8 @@ public:
 	virtual int execute_command(int command, int rw, int data) override;
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 private:
 };
@@ -64,8 +64,8 @@ public:
 	std::function<void(void)> hack_eeprom;
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 private:
 };
@@ -90,10 +90,10 @@ public:
 	void write_rs232(offs_t offset, uint8_t data);
 
 protected:
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 private:
-	void internal_io_map(address_map &map);
+	void internal_io_map(address_map &map) ATTR_COLD;
 
 	lpcbus_host_interface *lpchost = nullptr;
 	int lpcindex = 0;
@@ -134,7 +134,7 @@ protected:
 	void vblank_callback(int state);
 	uint32_t screen_update_callback(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 	void maincpu_interrupt(int state);
 	IRQ_CALLBACK_MEMBER(irq_callback);
 

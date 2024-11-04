@@ -34,7 +34,7 @@ public:
 	auto intd_callback() { return m_intd_cb.bind(); }
 
 protected:
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 	virtual void device_config_complete() override;
 
 	devcb_write_line m_inta_cb;
@@ -75,8 +75,8 @@ public:
 
 
 protected:
-//  virtual void device_add_mconfig(machine_config &config) override;
-	virtual void device_start() override;
+//  virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual void device_start() override ATTR_COLD;
 };
 
 void fp1060io_slot_devices(device_slot_interface &device);

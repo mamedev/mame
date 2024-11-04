@@ -107,10 +107,10 @@ private:
 	required_device<z80_device> m_maincpu;
 	required_device<z80_device> m_displaycpu;
 
-	void main_program_map(address_map &map);
-	void display_program_map(address_map &map);
-	void main_io_map(address_map &map);
-	void display_io_map(address_map &map);
+	void main_program_map(address_map &map) ATTR_COLD;
+	void display_program_map(address_map &map) ATTR_COLD;
+	void main_io_map(address_map &map) ATTR_COLD;
+	void display_io_map(address_map &map) ATTR_COLD;
 };
 
 

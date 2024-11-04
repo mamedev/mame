@@ -35,9 +35,9 @@ public:
 	auto write_video_irq_callback() { return m_video_irq_cb.bind(); }
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 	void check_video_irq();
 	TIMER_CALLBACK_MEMBER(screenpos_hit);

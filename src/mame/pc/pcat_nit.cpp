@@ -124,11 +124,11 @@ private:
 
 	void pcat_nit_rombank_w(uint8_t data);
 	uint8_t pcat_nit_io_r(offs_t offset);
-	virtual void machine_start() override;
-	void bonanza_io_map(address_map &map);
-	void bonanza_map(address_map &map);
-	void pcat_map(address_map &map);
-	void pcat_nit_io(address_map &map);
+	virtual void machine_start() override ATTR_COLD;
+	void bonanza_io_map(address_map &map) ATTR_COLD;
+	void bonanza_map(address_map &map) ATTR_COLD;
+	void pcat_map(address_map &map) ATTR_COLD;
+	void pcat_nit_io(address_map &map) ATTR_COLD;
 };
 
 /*************************************

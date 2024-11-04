@@ -14,9 +14,9 @@ class atirage_device : public pci_device
 public:
 	atirage_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
-	void mem_map(address_map &map);
-	void io_map(address_map &map);
-	void reg_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
+	void io_map(address_map &map) ATTR_COLD;
+	void reg_map(address_map &map) ATTR_COLD;
 
 	auto gpio_get_cb() { return read_gpio.bind(); }
 	auto gpio_set_cb() { return write_gpio.bind(); }
@@ -24,12 +24,12 @@ public:
 	void set_gpio_pullups(u16 pullups) { m_gpio_pullups = pullups; }
 
 protected:
-	virtual void device_start() override;
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 	virtual void map_extra(uint64_t memory_window_start, uint64_t memory_window_end, uint64_t memory_offset, address_space *memory_space,
 	uint64_t io_window_start, uint64_t io_window_end, uint64_t io_offset, address_space *io_space) override;
-	virtual void config_map(address_map &map) override;
+	virtual void config_map(address_map &map) override ATTR_COLD;
 
 	required_device<mach64_device> m_mach64;
 	required_device<screen_device> m_screen;
@@ -67,7 +67,7 @@ public:
 	atirageii_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 };
 
 class atirageiic_device : public atirage_device
@@ -76,7 +76,7 @@ public:
 	atirageiic_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 };
 
 class atirageiidvd_device : public atirage_device
@@ -85,16 +85,16 @@ public:
 	atirageiidvd_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
-	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 	virtual void map_extra(uint64_t memory_window_start, uint64_t memory_window_end, uint64_t memory_offset, address_space *memory_space,
 	uint64_t io_window_start, uint64_t io_window_end, uint64_t io_offset, address_space *io_space) override;
 
 	u8 vram_r(offs_t offset);
 	void vram_w(offs_t offset, uint8_t data);
-	void legacy_io_map(address_map &map);
+	void legacy_io_map(address_map &map) ATTR_COLD;
 
 private:
 	required_memory_region m_vga_rom;
@@ -106,7 +106,7 @@ public:
 	atiragepro_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 };
 
 DECLARE_DEVICE_TYPE(ATI_RAGEII, atirageii_device)

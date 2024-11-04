@@ -337,7 +337,7 @@ Titles, serial #s, publishers and release dates taken from:
 	</software>
 
 	<software name="flolitaa" cloneof="flolita">
-		<description>Final Lolita (Alt)</description>
+		<description>Final Lolita (alt)</description>
 		<year>1985</year>
 		<publisher>パソコンショップ高知 (PSK)</publisher>
 		<info name="release" value="198511xx"/>
@@ -550,7 +550,7 @@ Titles, serial #s, publishers and release dates taken from:
 
 <!-- Disk 2 only differs in the d77 header -->
 	<software name="hydlide2a" cloneof="hydlide2">
-		<description>Hydlide II - Shine of Darkness (Alt Disk 1)</description>
+		<description>Hydlide II - Shine of Darkness (alt Disk 1)</description>
 		<year>1986</year>
 		<publisher>T&amp;E Soft</publisher>
 		<info name="serial" value="TED-65, TEM-65"/>
@@ -976,7 +976,7 @@ Titles, serial #s, publishers and release dates taken from:
 	</software>
 
 	<software name="revivera" cloneof="reviver">
-		<description>Reviver (Alt Master Disk)</description>
+		<description>Reviver (alt Master Disk)</description>
 		<year>1987</year>
 		<publisher>アルシスソフト (Arsys Soft)</publisher>
 		<info name="alt_title" value="リバイバー"/>
@@ -1134,7 +1134,7 @@ Titles, serial #s, publishers and release dates taken from:
 	</software>
 
 	<software name="thexdera" cloneof="thexder">
-		<description>Thexder (Protected)</description>
+		<description>Thexder (protected)</description>
 		<year>1985</year>
 		<publisher>ゲームアーツ (Game Arts)</publisher>
 		<info name="release" value="198510xx"/>
@@ -1186,7 +1186,7 @@ Titles, serial #s, publishers and release dates taken from:
 	</software>
 
 	<software name="transylva" cloneof="transylv" supported="no">
-		<description>Transylvania (Alt?)</description>
+		<description>Transylvania (alt?)</description>
 		<year>1983</year>
 		<publisher>スタークラフト (Starcraft)</publisher>
 		<info name="alt_title" value="トランシルバニア"/>
@@ -1327,7 +1327,7 @@ Titles, serial #s, publishers and release dates taken from:
 	</software>
 
 	<software name="wibarma" cloneof="wibarm">
-		<description>Wibarm (Alt Data Disk)</description>
+		<description>Wibarm (alt Data Disk)</description>
 		<year>1986</year>
 		<publisher>アルシスソフト (Arsys Soft)</publisher>
 		<info name="release" value="198610xx"/>
@@ -1506,7 +1506,7 @@ Titles, serial #s, publishers and release dates taken from:
 
 <!-- The user disk from this set has been reported to make the set above working! Investigate! -->
 	<software name="xanadu2a" cloneof="xanadu2">
-		<description>Xanadu Scenario II - The Resurrection of Dragon (Alt)</description>
+		<description>Xanadu Scenario II - The Resurrection of Dragon (alt)</description>
 		<year>1986</year>
 		<publisher>日本ファルコム (Nihon Falcom)</publisher>
 		<info name="release" value="198611xx"/>
@@ -1594,7 +1594,7 @@ Titles, serial #s, publishers and release dates taken from:
 	</software>
 
 	<software name="ysa" cloneof="ys">
-		<description>Ys - Ancient Ys Vanished Omen (Alt Data Disk)</description>
+		<description>Ys - Ancient Ys Vanished Omen (alt Data Disk)</description>
 		<year>1987</year>
 		<publisher>日本ファルコム (Nihon Falcom)</publisher>
 		<info name="serial" value="FUNW13029"/>
@@ -2090,7 +2090,7 @@ systems, for the moment they stay here!
 	</software>
 
 	<software name="pack02">
-		<description>Game Pack (Alt)</description>
+		<description>Game Pack (alt)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 
@@ -2102,7 +2102,7 @@ systems, for the moment they stay here!
 	</software>
 
 	<software name="pack03">
-		<description>Game Pack (Alt 2)</description>
+		<description>Game Pack (alt 2)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 
@@ -2114,7 +2114,7 @@ systems, for the moment they stay here!
 	</software>
 
 	<software name="pack04">
-		<description>Game Pack (Alt 3)</description>
+		<description>Game Pack (alt 3)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 
@@ -2162,7 +2162,7 @@ Others are no-warranty...
 	</software>
 
 	<software name="game03ga" cloneof="game03g">
-		<description>Game 03G (Alt?)</description>
+		<description>Game 03G (alt?)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -2212,7 +2212,7 @@ Others are not start...
 	</software>
 
 	<software name="game011a" cloneof="game011">
-		<description>Game 011 (Alt)</description>
+		<description>Game 011 (alt)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -2241,7 +2241,7 @@ Disk #012 for FM-7/77/AV
 	</software>
 
 	<software name="game012a" cloneof="game012">
-		<description>Game 012 (Alt)</description>
+		<description>Game 012 (alt)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -2270,7 +2270,7 @@ Game #013 for FM-7/77/AV.
 	</software>
 
 	<software name="game013a" cloneof="game013">
-		<description>Game 013 (Alt)</description>
+		<description>Game 013 (alt)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">

@@ -31,7 +31,7 @@ public:
 private:
 	HD44780_PIXEL_UPDATE(pixel_update);
 
-	void mem_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
 
 	required_device<hd6303x_cpu_device> m_maincpu;
 	required_device<ym2154_device> m_ryp4;

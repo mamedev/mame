@@ -34,10 +34,10 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual ioport_constructor device_input_ports() const override;
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 private:
 	enum class fsm_st {
@@ -54,6 +54,9 @@ private:
 	required_device<timer_device> m_10ms_timer;
 	required_device<timer_device> m_delay_timer;
 	required_device<timer_device> m_input_delay_timer;
+
+	// ID PROM
+	optional_region_ptr<uint8_t> m_idprom;
 
 	devcb_write_line m_irq1_write_func;
 	devcb_write_line m_irq7_write_func;

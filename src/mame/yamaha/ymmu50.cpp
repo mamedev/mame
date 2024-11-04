@@ -90,7 +90,7 @@ private:
 	required_ioport m_ioport_o2;
 	required_shared_ptr<u16> m_ram;
 
-	u8 cur_p6, cur_pa, cur_pb, cur_pc;
+	u8 cur_p6, cur_p9, cur_pa, cur_pb, cur_pc;
 
 	u16 adc_ar_r();
 	u16 adc_al_r();
@@ -99,22 +99,24 @@ private:
 
 	void p6_w(u8 data);
 	u8 p6_r();
+	void p9_w(u8 data);
 	void pa_w(u8 data);
 	u8 pa_r();
 	void pb_w(u8 data);
 	u8 pb_r();
 	void pc_w(u8 data);
 	u8 pc_r();
+	void update_contrast();
 
-	void mu50_map(address_map &map);
+	void mu50_map(address_map &map) ATTR_COLD;
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 };
 
 void mu50_state::machine_start()
 {
-	cur_p6 = cur_pa = cur_pb = cur_pc = 0xff;
+	cur_p6 = cur_p9 = cur_pa = cur_pb = cur_pc = 0xff;
 }
 
 void mu50_state::machine_reset()
@@ -178,14 +180,27 @@ u8 mu50_state::p6_r()
 	return cur_p6;
 }
 
+void mu50_state::p9_w(u8 data)
+{
+	cur_p9 = data;
+	update_contrast();
+}
+
 u8 mu50_state::pb_r()
 {
 	return cur_pb;
 }
 
+void mu50_state::update_contrast()
+{
+	m_lcd->set_contrast(((~cur_p9 >> 3) & 0x6) | (BIT(~cur_pb, 1)));
+}
+
 void mu50_state::pb_w(u8 data)
 {
 	cur_pb = data;
+	m_lcd->set_leds((~data >> 2) & 0x1f);
+	update_contrast();
 }
 
 void mu50_state::pa_w(u8 data)
@@ -239,6 +254,7 @@ void mu50_state::mu50(machine_config &config)
 	m_mu50cpu->read_adc<7>().set_constant(0);
 	m_mu50cpu->read_port6().set(FUNC(mu50_state::p6_r));
 	m_mu50cpu->write_port6().set(FUNC(mu50_state::p6_w));
+	m_mu50cpu->write_port9().set(FUNC(mu50_state::p9_w));
 	m_mu50cpu->read_porta().set(FUNC(mu50_state::pa_r));
 	m_mu50cpu->write_porta().set(FUNC(mu50_state::pa_w));
 	m_mu50cpu->read_portb().set(FUNC(mu50_state::pb_r));

@@ -193,16 +193,16 @@ protected:
 	static void cfg_single_1200K(device_t *device);
 	static void cfg_single_1440K(device_t *device);
 	static void cfg_dual_1440K(device_t *device);
-	void at16_io(address_map &map);
-	void at16_map(address_map &map);
-	void at16l_map(address_map &map);
-	void at32_io(address_map &map);
-	void at32_map(address_map &map);
-	void at32l_map(address_map &map);
-	void ficpio_io(address_map &map);
-	void ficpio_map(address_map &map);
-	void neat_io(address_map &map);
-	void ps1_16_io(address_map &map);
+	void at16_io(address_map &map) ATTR_COLD;
+	void at16_map(address_map &map) ATTR_COLD;
+	void at16l_map(address_map &map) ATTR_COLD;
+	void at32_io(address_map &map) ATTR_COLD;
+	void at32_map(address_map &map) ATTR_COLD;
+	void at32l_map(address_map &map) ATTR_COLD;
+	void ficpio_io(address_map &map) ATTR_COLD;
+	void ficpio_map(address_map &map) ATTR_COLD;
+	void neat_io(address_map &map) ATTR_COLD;
+	void ps1_16_io(address_map &map) ATTR_COLD;
 };
 
 class at_vrom_fix_state : public at_state
@@ -216,7 +216,7 @@ public:
 	void megapcpla(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 };
 
 class megapc_state : public driver_device
@@ -249,10 +249,10 @@ private:
 	void wd7600_hold(int state);
 	void wd7600_tc(offs_t offset, uint8_t data) { m_isabus->eop_w(offset, data); }
 	void wd7600_spkr(int state) { m_speaker->level_w(state); }
-	void megapc_io(address_map &map);
-	void megapc_map(address_map &map);
-	void megapcpl_io(address_map &map);
-	void megapcpl_map(address_map &map);
+	void megapc_io(address_map &map) ATTR_COLD;
+	void megapc_map(address_map &map) ATTR_COLD;
+	void megapcpl_io(address_map &map) ATTR_COLD;
+	void megapcpl_map(address_map &map) ATTR_COLD;
 };
 
 

@@ -61,9 +61,9 @@ public:
 	template <int N> int fp_analog_bit_r();
 
 private:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 	struct gaelco3d_object_data
 	{
@@ -173,11 +173,11 @@ private:
 	void adsp_tx_callback(offs_t offset, uint32_t data);
 	void fp_analog_clock_w(int state);
 
-	void adsp_data_map(address_map &map);
-	void adsp_program_map(address_map &map);
-	void main020_map(address_map &map);
-	void main_map(address_map &map);
-	void tms_map(address_map &map);
+	void adsp_data_map(address_map &map) ATTR_COLD;
+	void adsp_program_map(address_map &map) ATTR_COLD;
+	void main020_map(address_map &map) ATTR_COLD;
+	void main_map(address_map &map) ATTR_COLD;
+	void tms_map(address_map &map) ATTR_COLD;
 };
 
 #endif // MAME_GAELCO_GAELCO3D_H

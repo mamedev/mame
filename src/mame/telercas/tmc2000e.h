@@ -59,11 +59,11 @@ private:
 
 	/* keyboard state */
 	int m_keylatch = 0;         /* key latch */
-	void tmc2000e_io_map(address_map &map);
-	void tmc2000e_map(address_map &map);
+	void tmc2000e_io_map(address_map &map) ATTR_COLD;
+	void tmc2000e_map(address_map &map) ATTR_COLD;
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	required_device<cosmac_device> m_maincpu;
 	required_device<cdp1864_device> m_cti;

@@ -142,8 +142,8 @@ public:
 	void init_kongball();
 
 protected:
-	virtual void machine_start() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -190,9 +190,9 @@ private:
 	uint32_t screen_update_wheelfir(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void screen_vblank_wheelfir(int state);
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline_timer_callback);
-	void ramdac_map(address_map &map);
-	void wheelfir_main(address_map &map);
-	void wheelfir_sub(address_map &map);
+	void ramdac_map(address_map &map) ATTR_COLD;
+	void wheelfir_main(address_map &map) ATTR_COLD;
+	void wheelfir_sub(address_map &map) ATTR_COLD;
 	int m_adc_eoc;
 
 	bool m_force_extra_irq1;
@@ -576,7 +576,7 @@ static INPUT_PORTS_START( pwball )
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME( "Test" )
-	PORT_BIT( 0x2000, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_READ_LINE_DEVICE_MEMBER(DEVICE_SELF, wheelfir_state, adc_eoc_r)
+	PORT_BIT( 0x2000, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_READ_LINE_DEVICE_MEMBER(DEVICE_SELF, FUNC(wheelfir_state::adc_eoc_r))
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNUSED )
 

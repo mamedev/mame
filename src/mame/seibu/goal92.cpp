@@ -50,9 +50,9 @@ public:
 	void goal92(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	// memory pointers
@@ -97,8 +97,8 @@ private:
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int pri);
 	void irqhandler(int state);
 	void adpcm_int(int state);
-	void main_map(address_map &map);
-	void sound_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
+	void sound_map(address_map &map) ATTR_COLD;
 };
 
 
@@ -338,7 +338,7 @@ void goal92_state::sound_map(address_map &map)
 }
 
 static INPUT_PORTS_START( goal92 )
-	
+
 	PORT_START("DSW1")
 	PORT_DIPNAME( 0x0007, 0x0007, "Coin 1 (3)" ) PORT_DIPLOCATION("SW1:1,2,3")
 	PORT_DIPSETTING(      0x0000, DEF_STR( 4C_1C ) )
@@ -363,7 +363,7 @@ static INPUT_PORTS_START( goal92 )
 	PORT_DIPSETTING(      0x0000, "x2" )
 
 	// NOTE: It should be the screen flip DIP, but isn't working
-	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW1:8") 
+	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW1:8")
 	PORT_DIPSETTING(      0x2000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 

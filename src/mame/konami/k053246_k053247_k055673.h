@@ -443,8 +443,8 @@ protected:
 	k053247_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
 
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	template <class BitmapClass> void k053247_sprites_draw_common(BitmapClass &bitmap, const rectangle &cliprect);
 };
@@ -460,7 +460,7 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 //  virtual void device_reset();
 private:
 	std::unique_ptr<u16[]> m_combined_gfx;

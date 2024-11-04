@@ -55,7 +55,7 @@ public:
 private:
 	required_device<h8532_device> m_maincpu;
 
-	void sc55mk2_map(address_map &map);
+	void sc55mk2_map(address_map &map) ATTR_COLD;
 };
 
 sc55mk2_state::sc55mk2_state(const machine_config &mconfig, device_type type, const char *tag) :

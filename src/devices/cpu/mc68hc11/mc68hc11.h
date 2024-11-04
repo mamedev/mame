@@ -56,13 +56,12 @@ protected:
 	mc68hc11_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint16_t ram_size, uint16_t reg_block_size, uint16_t rom_size, uint16_t eeprom_size, uint8_t init_value, uint8_t config_mask, uint8_t option_mask);
 
 	// device_t implementation
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// device_execute_interface implementation
 	virtual uint32_t execute_min_cycles() const noexcept override { return 1; }
 	virtual uint32_t execute_max_cycles() const noexcept override { return 41; }
-	virtual uint32_t execute_input_lines() const noexcept override { return 2; }
 	virtual uint64_t execute_clocks_to_cycles(uint64_t clocks) const noexcept override { return (clocks + 4 - 1) / 4; }
 	virtual uint64_t execute_cycles_to_clocks(uint64_t cycles) const noexcept override { return (cycles * 4); }
 	virtual void execute_run() override;
@@ -229,7 +228,7 @@ private:
 	ophandler hc11_optable_page3[256];
 	ophandler hc11_optable_page4[256];
 
-	void internal_map(address_map &map);
+	void internal_map(address_map &map) ATTR_COLD;
 
 	uint8_t FETCH();
 	uint16_t FETCH16();
@@ -565,7 +564,7 @@ public:
 	mc68hc11a1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
-	virtual void device_reset() override;
+	virtual void device_reset() override ATTR_COLD;
 
 	virtual void mc68hc11_reg_map(memory_view::memory_view_entry &block, offs_t base) override;
 
@@ -580,7 +579,7 @@ public:
 	mc68hc11d0_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
-	virtual void device_reset() override;
+	virtual void device_reset() override ATTR_COLD;
 
 	virtual void mc68hc11_reg_map(memory_view::memory_view_entry &block, offs_t base) override;
 
@@ -595,7 +594,7 @@ public:
 	mc68hc11e1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
-	virtual void device_reset() override;
+	virtual void device_reset() override ATTR_COLD;
 
 	virtual void mc68hc11_reg_map(memory_view::memory_view_entry &block, offs_t base) override;
 };
@@ -607,7 +606,7 @@ public:
 	mc68hc811e2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
-	virtual void device_reset() override;
+	virtual void device_reset() override ATTR_COLD;
 
 	virtual void mc68hc11_reg_map(memory_view::memory_view_entry &block, offs_t base) override;
 };
@@ -619,7 +618,7 @@ public:
 	mc68hc11f1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
-	virtual void device_reset() override;
+	virtual void device_reset() override ATTR_COLD;
 
 	virtual void mc68hc11_reg_map(memory_view::memory_view_entry &block, offs_t base) override;
 };

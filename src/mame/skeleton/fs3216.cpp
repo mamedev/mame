@@ -45,8 +45,8 @@ public:
 	void fs3216(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	MC6845_UPDATE_ROW(crt_update_row);
@@ -78,11 +78,11 @@ private:
 	u8 fdc_ram_r(offs_t offset);
 	void fdc_ram_w(offs_t offset, u8 data);
 
-	void main_map(address_map &map);
-	void clb_map(address_map &map);
-	void fc7_map(address_map &map);
-	void wdcpu_prog_map(address_map &map);
-	void wdcpu_bank_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
+	void clb_map(address_map &map) ATTR_COLD;
+	void fc7_map(address_map &map) ATTR_COLD;
+	void wdcpu_prog_map(address_map &map) ATTR_COLD;
+	void wdcpu_bank_map(address_map &map) ATTR_COLD;
 
 	required_device<m68000_device> m_maincpu;
 	required_device<address_map_bank_device> m_clb;

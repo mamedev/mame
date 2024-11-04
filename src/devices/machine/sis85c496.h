@@ -66,9 +66,9 @@ public:
 	void pc_irq15_w(int state);
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 	virtual void device_config_complete() override;
 
 	void map_bios(address_space *memory_space, uint32_t start, uint32_t end);
@@ -79,7 +79,7 @@ protected:
 	virtual void map_extra(uint64_t memory_window_start, uint64_t memory_window_end, uint64_t memory_offset, address_space *memory_space,
 						   uint64_t io_window_start, uint64_t io_window_end, uint64_t io_offset, address_space *io_space) override;
 
-	virtual void config_map(address_map &map) override;
+	virtual void config_map(address_map &map) override ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -120,7 +120,7 @@ private:
 	uint16_t m_ide_vesa_ctrl;
 	u8 m_dram_boundary[8]{};
 
-	void internal_io_map(address_map &map);
+	void internal_io_map(address_map &map) ATTR_COLD;
 
 	uint8_t dram_config_r() { return m_dram_config; }
 	void dram_config_w(uint8_t data) { m_dram_config = data; remap_cb(); }

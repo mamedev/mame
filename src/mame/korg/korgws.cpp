@@ -28,8 +28,8 @@ public:
 	void korgwssr(machine_config &config);
 
 private:
-	void h16_map(address_map &map);
-	void wssr_map(address_map &map);
+	void h16_map(address_map &map) ATTR_COLD;
+	void wssr_map(address_map &map) ATTR_COLD;
 
 	required_device<hd641016_device> m_maincpu;
 	required_device<m3745x_device> m_ksp;

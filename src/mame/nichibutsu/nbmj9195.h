@@ -77,9 +77,9 @@ public:
 	void otatidai(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 	TIMER_CALLBACK_MEMBER(clear_busy_flag);
 
@@ -159,37 +159,37 @@ private:
 	void gfxdraw(int vram);
 	void postload();
 
-	void cmehyou_io_map(address_map &map);
-	void gal10ren_io_map(address_map &map);
-	void imekura_io_map(address_map &map);
-	void jituroku_io_map(address_map &map);
-	void koinomp_io_map(address_map &map);
-	void koinomp_map(address_map &map);
-	void mjegolf_io_map(address_map &map);
-	void mjegolf_map(address_map &map);
-	void mjgottsu_io_map(address_map &map);
-	void mjkoiura_io_map(address_map &map);
-	void mjlaman_io_map(address_map &map);
-	void mjuraden_io_map(address_map &map);
-	void mjuraden_map(address_map &map);
-	void mkeibaou_io_map(address_map &map);
-	void mkoiuraa_io_map(address_map &map);
-	void mmehyou_io_map(address_map &map);
-	void mscoutm_io_map(address_map &map);
-	void mscoutm_map(address_map &map);
-	void ngpgal_io_map(address_map &map);
-	void ngpgal_map(address_map &map);
-	void otatidai_io_map(address_map &map);
-	void pachiten_io_map(address_map &map);
-	void patimono_io_map(address_map &map);
-	void psailor1_io_map(address_map &map);
-	void psailor2_io_map(address_map &map);
-	void renaiclb_io_map(address_map &map);
-	void sailorwr_io_map(address_map &map);
-	void sailorws_io_map(address_map &map);
-	void sailorws_map(address_map &map);
-	void yosimotm_io_map(address_map &map);
-	void yosimoto_io_map(address_map &map);
+	void cmehyou_io_map(address_map &map) ATTR_COLD;
+	void gal10ren_io_map(address_map &map) ATTR_COLD;
+	void imekura_io_map(address_map &map) ATTR_COLD;
+	void jituroku_io_map(address_map &map) ATTR_COLD;
+	void koinomp_io_map(address_map &map) ATTR_COLD;
+	void koinomp_map(address_map &map) ATTR_COLD;
+	void mjegolf_io_map(address_map &map) ATTR_COLD;
+	void mjegolf_map(address_map &map) ATTR_COLD;
+	void mjgottsu_io_map(address_map &map) ATTR_COLD;
+	void mjkoiura_io_map(address_map &map) ATTR_COLD;
+	void mjlaman_io_map(address_map &map) ATTR_COLD;
+	void mjuraden_io_map(address_map &map) ATTR_COLD;
+	void mjuraden_map(address_map &map) ATTR_COLD;
+	void mkeibaou_io_map(address_map &map) ATTR_COLD;
+	void mkoiuraa_io_map(address_map &map) ATTR_COLD;
+	void mmehyou_io_map(address_map &map) ATTR_COLD;
+	void mscoutm_io_map(address_map &map) ATTR_COLD;
+	void mscoutm_map(address_map &map) ATTR_COLD;
+	void ngpgal_io_map(address_map &map) ATTR_COLD;
+	void ngpgal_map(address_map &map) ATTR_COLD;
+	void otatidai_io_map(address_map &map) ATTR_COLD;
+	void pachiten_io_map(address_map &map) ATTR_COLD;
+	void patimono_io_map(address_map &map) ATTR_COLD;
+	void psailor1_io_map(address_map &map) ATTR_COLD;
+	void psailor2_io_map(address_map &map) ATTR_COLD;
+	void renaiclb_io_map(address_map &map) ATTR_COLD;
+	void sailorwr_io_map(address_map &map) ATTR_COLD;
+	void sailorws_io_map(address_map &map) ATTR_COLD;
+	void sailorws_map(address_map &map) ATTR_COLD;
+	void yosimotm_io_map(address_map &map) ATTR_COLD;
+	void yosimoto_io_map(address_map &map) ATTR_COLD;
 };
 
 #endif // MAME_NICHIBUTSU_NBMJ9195_H

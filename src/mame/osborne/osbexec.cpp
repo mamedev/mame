@@ -68,7 +68,7 @@ private:
 	required_device_array<floppy_image_device, 2> m_floppy;
 	required_ioport_array<8> m_kbd_row;
 
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
@@ -119,7 +119,7 @@ private:
 	void osbexec_c000_w(offs_t offset, uint8_t data);
 	uint8_t osbexec_kbd_r(offs_t offset);
 	uint8_t osbexec_rtc_r();
-	virtual void machine_reset() override;
+	virtual void machine_reset() override ATTR_COLD;
 	TIMER_CALLBACK_MEMBER(osbexec_video_callback);
 	uint8_t osbexec_pia0_a_r();
 	void osbexec_pia0_a_w(uint8_t data);
@@ -132,8 +132,8 @@ private:
 	void modem_dsr_w(int state);
 	void modem_ri_w(int state);
 	void comm_clk_a_w(int state);
-	void osbexec_io(address_map &map);
-	void osbexec_mem(address_map &map);
+	void osbexec_io(address_map &map) ATTR_COLD;
+	void osbexec_mem(address_map &map) ATTR_COLD;
 };
 
 

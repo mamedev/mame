@@ -67,9 +67,9 @@ public:
 	void init_gslgr94u();
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	int m_gametype = 0;
@@ -155,9 +155,9 @@ private:
 	void NB2TilemapCB_outfxies(u16 code, int *tile, int *mask);
 	void NB2RozCB_machbrkr(u16 code, int *tile, int *mask, int which);
 	void NB2RozCB_outfxies(u16 code, int *tile, int *mask, int which);
-	void namcoc75_am(address_map &map);
-	void namconb1_am(address_map &map);
-	void namconb2_am(address_map &map);
+	void namcoc75_am(address_map &map) ATTR_COLD;
+	void namconb1_am(address_map &map) ATTR_COLD;
+	void namconb2_am(address_map &map) ATTR_COLD;
 };
 
 #endif // MAME_NAMCO_NAMCONB1_H

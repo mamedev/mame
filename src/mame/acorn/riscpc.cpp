@@ -16,7 +16,6 @@
 
 #include "emu.h"
 #include "cpu/arm7/arm7.h"
-#include "cpu/arm7/arm7core.h"
 #include "machine/acorn_vidc.h"
 #include "machine/arm_iomd.h"
 #include "machine/i2cmem.h"
@@ -42,6 +41,7 @@ public:
 		, m_screen(*this, "screen")
 		, m_i2cmem(*this, "i2cmem")
 		, m_kbdc(*this, "kbdc")
+		, m_mouse(*this, "MOUSE")
 	{ }
 
 	void rpc700(machine_config &config);
@@ -60,12 +60,13 @@ private:
 	required_device<screen_device> m_screen;
 	required_device<i2cmem_device> m_i2cmem;
 	required_device<ps2_keyboard_controller_device> m_kbdc;
+	required_ioport m_mouse;
 
-	virtual void machine_reset() override;
-	virtual void machine_start() override;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void machine_start() override ATTR_COLD;
 
-	void a7000_map(address_map &map);
-	void riscpc_map(address_map &map);
+	void a7000_map(address_map &map) ATTR_COLD;
+	void riscpc_map(address_map &map) ATTR_COLD;
 
 	bool m_i2cmem_clock = false;
 	int iocr_od0_r();
@@ -109,7 +110,7 @@ void riscpc_state::a7000_map(address_map &map)
 //  AM_RANGE(0x03040000, 0x0304ffff) //podule space 0,1,2,3
 //  AM_RANGE(0x03070000, 0x0307ffff) //podule space 4,5,6,7
 	map(0x03200000, 0x032001ff).m(m_iomd, FUNC(arm7500fe_iomd_device::map));
-	map(0x03310000, 0x03310003).portr("MOUSE");
+	map(0x03310000, 0x03310003).portr(m_mouse);
 
 	map(0x03400000, 0x037fffff).w(m_vidc, FUNC(arm_vidc20_device::write));
 //  AM_RANGE(0x08000000, 0x08ffffff) AM_MIRROR(0x07000000) //EASI space

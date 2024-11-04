@@ -66,9 +66,9 @@ private:
 	void lamps_w(offs_t, u8);
 	void display_w(offs_t, u8);
 	u16 seg8to14(u16 data);
-	void mem_map(address_map &map);
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	void mem_map(address_map &map) ATTR_COLD;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 	required_device<m6504_device> m_maincpu;
 	required_ioport_array<11> m_io_keyboard;
 	output_finder<48> m_digits;

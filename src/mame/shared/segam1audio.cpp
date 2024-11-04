@@ -25,7 +25,7 @@ void segam1audio_device::segam1audio_map(address_map &map)
 	map(0xc60000, 0xc60007).rw(m_multipcm_2, FUNC(multipcm_device::read), FUNC(multipcm_device::write)).umask16(0x00ff);
 	map(0xc70000, 0xc70001).w(FUNC(segam1audio_device::m1_snd_mpcm_bnk2_w));
 	map(0xd00000, 0xd00007).rw(m_ym, FUNC(ym3438_device::read), FUNC(ym3438_device::write)).umask16(0x00ff);
-	map(0xf00000, 0xf0ffff).ram();
+	map(0xf00000, 0xf0ffff).ram(); // real PCB actually has 2x 8kBx8-bit SRAMs (16kB total)
 }
 
 void segam1audio_device::mpcm1_map(address_map &map)

@@ -78,7 +78,7 @@ public:
 	void init_wpksoc();
 
 protected:
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -126,14 +126,14 @@ private:
 	void update_scroll_positions();
 	void tilemap_draw(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int laynum, int category, int opaque);
 	void screen_refresh(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void dsoccr94_io_map(address_map &map);
-	void dsoccr94_map(address_map &map);
-	void firebarr_map(address_map &map);
-	void main_map(address_map &map);
-	void main_portmap(address_map &map);
-	void sound_map(address_map &map);
-	void wpksoc_io_map(address_map &map);
-	void wpksoc_map(address_map &map);
+	void dsoccr94_io_map(address_map &map) ATTR_COLD;
+	void dsoccr94_map(address_map &map) ATTR_COLD;
+	void firebarr_map(address_map &map) ATTR_COLD;
+	void main_map(address_map &map) ATTR_COLD;
+	void main_portmap(address_map &map) ATTR_COLD;
+	void sound_map(address_map &map) ATTR_COLD;
+	void wpksoc_io_map(address_map &map) ATTR_COLD;
+	void wpksoc_map(address_map &map) ATTR_COLD;
 };
 
 

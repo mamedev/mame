@@ -56,8 +56,8 @@ public:
 	void isbc8030(machine_config &config);
 
 private:
-	void isbc8030_io(address_map &map);
-	void isbc8030_mem(address_map &map);
+	void isbc8030_io(address_map &map) ATTR_COLD;
+	void isbc8030_mem(address_map &map) ATTR_COLD;
 
 	required_device<i8085a_cpu_device> m_maincpu;
 	required_device<i8251_device> m_usart;

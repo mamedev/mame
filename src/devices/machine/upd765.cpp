@@ -714,7 +714,7 @@ uint8_t upd765_family_device::fifo_pop(bool internal)
 	if(!fifo_write && !fifo_pos)
 		disable_transfer();
 	int thr = fifocfg & FIF_THR;
-	if(fifo_write && fifo_expected && (fifo_pos <= thr || (fifocfg & FIF_DIS)))
+	if(fifo_write && fifo_expected && (fifo_pos <= thr || (fifocfg & FIF_DIS)) && !tc_done)
 		enable_transfer();
 	return r;
 }
@@ -1615,8 +1615,13 @@ void upd765_family_device::recalibrate_start(floppy_info &fi)
 	fi.dir = 1;
 	fi.counter = recalibrate_steps;
 	fi.ready = get_ready(command[1] & 3);
-	fi.st0 = (fi.ready ? 0 : ST0_NR);
-	seek_continue(fi);
+	fi.st0 = command[1] & 7;
+	if(fi.ready) {
+		seek_continue(fi);
+	} else {
+		fi.st0 |= ST0_NR | ST0_FAIL | ST0_SE;
+		command_end(fi, false);
+	}
 }
 
 void upd765_family_device::seek_start(floppy_info &fi)
@@ -1626,8 +1631,13 @@ void upd765_family_device::seek_start(floppy_info &fi)
 	fi.sub_state = SEEK_WAIT_STEP_TIME_DONE;
 	fi.dir = fi.pcn > command[2] ? 1 : 0;
 	fi.ready = get_ready(command[1] & 3);
-	fi.st0 = (fi.ready ? 0 : ST0_NR);
-	seek_continue(fi);
+	fi.st0 = command[1] & 7;
+	if(fi.ready) {
+		seek_continue(fi);
+	} else {
+		fi.st0 |= ST0_NR | ST0_FAIL | ST0_SE;
+		command_end(fi, false);
+	}
 }
 
 void upd765_family_device::delay_cycles(floppy_info &fi, int cycles)
@@ -1862,12 +1872,6 @@ void upd765_family_device::read_data_continue(floppy_info &fi)
 
 		case SCAN_ID:
 			LOGSTATE("SCAN_ID\n");
-			if(cur_live.crc) {
-				fi.st0 |= ST0_FAIL;
-				st1 |= ST1_DE|ST1_ND;
-				fi.sub_state = COMMAND_DONE;
-				break;
-			}
 			// MZ: This st1 handling ensures that both HX5102 floppy and the
 			// Speedlock protection scheme are properly working.
 			// a) HX5102 requires that the ND flag not be set when no address
@@ -1888,6 +1892,13 @@ void upd765_family_device::read_data_continue(floppy_info &fi)
 				LOGSTATE("SEARCH_ADDRESS_MARK_HEADER\n");
 				live_start(fi, SEARCH_ADDRESS_MARK_HEADER);
 				return;
+			}
+			if(cur_live.crc) {
+				fi.st0 |= ST0_FAIL;
+				st1 |= ST1_DE;
+				st1 &= ~ST1_ND;
+				fi.sub_state = COMMAND_DONE;
+				break;
 			}
 			st1 &= ~ST1_ND;
 			st2 &= ~ST2_WC;
@@ -2567,7 +2578,7 @@ TIMER_CALLBACK_MEMBER(upd765_family_device::run_drive_ready_polling)
 			LOGCOMMAND("polled %d : %d -> %d\n", fid, flopi[fid].ready, ready);
 			flopi[fid].ready = ready;
 			if(!flopi[fid].st0_filled) {
-				flopi[fid].st0 = ST0_ABRT | fid;
+				flopi[fid].st0 = ST0_ABRT | fid | (ready ? 0 : ST0_NR);
 				flopi[fid].st0_filled = true;
 				irq = true;
 			}

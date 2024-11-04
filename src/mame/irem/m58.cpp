@@ -49,7 +49,7 @@ public:
 	void yard(machine_config &config);
 
 protected:
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -81,7 +81,7 @@ private:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_panel(bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void yard_map(address_map &map);
+	void yard_map(address_map &map) ATTR_COLD;
 };
 
 

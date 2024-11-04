@@ -271,8 +271,8 @@ public:
 	void init_sms_supergame();
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	virtual void refresh_banks();
 	required_memory_bank_array<3> m_game_bank;
@@ -287,8 +287,8 @@ private:
 	void port08_w(uint8_t data);
 	void port18_w(uint8_t data);
 
-	void sms_supergame_io(address_map &map);
-	void sms_supergame_map(address_map &map);
+	void sms_supergame_io(address_map &map) ATTR_COLD;
+	void sms_supergame_map(address_map &map) ATTR_COLD;
 };
 
 class smsbootleg_a_state : public smsbootleg_state
@@ -406,7 +406,7 @@ static INPUT_PORTS_START( sms_supergame )
 	PORT_START("PAUSE")
 	PORT_BIT( 0x7f, IP_ACTIVE_LOW, IPT_UNUSED )
 	// TODO: are games really supposed to not have a way to pause?
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )// PORT_NAME(DEF_STR(Pause)) PORT_CODE(KEYCODE_1) PORT_WRITE_LINE_DEVICE_MEMBER("sms_vdp", sega315_5124_device, n_nmi_in_write)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )// PORT_NAME(DEF_STR(Pause)) PORT_CODE(KEYCODE_1) PORT_WRITE_LINE_DEVICE_MEMBER("sms_vdp", FUNC(sega315_5124_device::n_nmi_in_write))
 
 	PORT_START("IN2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY

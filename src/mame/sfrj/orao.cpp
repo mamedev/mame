@@ -55,11 +55,11 @@ public:
 private:
 	u8 kbd_r(offs_t offset);
 	void sound_w(offs_t offset, u8 data);
-	virtual void machine_reset() override;
-	virtual void machine_start() override;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void machine_start() override ATTR_COLD;
 	u32 screen_update_orao(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void mem_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
 
 	required_shared_ptr<u8> m_memory;
 	required_shared_ptr<u8> m_vram;

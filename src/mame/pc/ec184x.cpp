@@ -61,10 +61,10 @@ private:
 	uint8_t memboard_r(offs_t offset);
 	void memboard_w(offs_t offset, uint8_t data);
 
-	void ec1840_io(address_map &map);
-	void ec1840_map(address_map &map);
-	void ec1841_io(address_map &map);
-	void ec1841_map(address_map &map);
+	void ec1840_io(address_map &map) ATTR_COLD;
+	void ec1840_map(address_map &map) ATTR_COLD;
+	void ec1841_io(address_map &map) ATTR_COLD;
+	void ec1841_map(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<ram_device> m_ram;

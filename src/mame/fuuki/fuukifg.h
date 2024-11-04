@@ -1,7 +1,8 @@
 // license:BSD-3-Clause
-// copyright-holders:Luca Elia, David Haywood
-#ifndef MAME_FUUKI_FUUKIFH_H
-#define MAME_FUUKI_FUUKIFH_H
+// copyright-holders: Luca Elia, David Haywood
+
+#ifndef MAME_FUUKI_FUUKIFG_H
+#define MAME_FUUKI_FUUKIFG_H
 
 #pragma once
 
@@ -22,8 +23,7 @@ public:
 	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, bool flip_screen, u16 *spriteram, u32 size);
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
 
 private:
 	tile_delegate m_tile_cb;
@@ -35,4 +35,4 @@ private:
 
 DECLARE_DEVICE_TYPE(FUUKI_VIDEO, fuukivid_device)
 
-#endif // MAME_FUUKI_FUUKIFH_H
+#endif // MAME_FUUKI_FUUKIFG_H

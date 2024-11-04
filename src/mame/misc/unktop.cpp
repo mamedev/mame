@@ -40,7 +40,7 @@ public:
 private:
 	required_device<hd6303x_cpu_device> m_maincpu;
 
-	void program_map(address_map &map);
+	void program_map(address_map &map) ATTR_COLD;
 };
 
 

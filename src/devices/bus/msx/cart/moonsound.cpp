@@ -32,18 +32,18 @@ public:
 
 protected:
 	// device_t implementation
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 
 private:
 	void irq_w(int state);
 	void write_ymf278b_pcm(offs_t offset, u8 data);
 	u8 read_ymf278b_pcm(offs_t offset);
 	u8 read_c0();
-	void ymf278b_map(address_map &map);
+	void ymf278b_map(address_map &map) ATTR_COLD;
 
 	required_device<ymf278b_device> m_ymf278b;
 };

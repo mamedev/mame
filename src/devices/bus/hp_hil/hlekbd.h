@@ -19,8 +19,8 @@ class hle_hp_ipc_device
 public:
 	hle_hp_ipc_device(machine_config const &mconfig, char const *tag, device_t *owner, uint32_t clock);
 
-	virtual ioport_constructor device_input_ports() const override;
-	virtual void device_reset() override;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// device_matrix_keyboard_interface overrides
 	virtual void key_make(uint8_t row, uint8_t column) override;
@@ -51,8 +51,8 @@ class hle_hp_itf_device
 {
 public:
 	hle_hp_itf_device(machine_config const &mconfig, char const *tag, device_t *owner, uint32_t clock);
-	virtual void device_reset() override;
-	virtual ioport_constructor device_input_ports() const override;
+	virtual void device_reset() override ATTR_COLD;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 
 	// device_matrix_keyboard_interface overrides
 	virtual void key_make(uint8_t row, uint8_t column) override;

@@ -37,7 +37,7 @@ public:
 	void z29(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	void keyin_w(int state);
@@ -47,8 +47,8 @@ private:
 	void crtc_w(offs_t offset, u8 data);
 	void latch_12k_w(u8 data);
 
-	void prg_map(address_map &map);
-	void ext_map(address_map &map);
+	void prg_map(address_map &map) ATTR_COLD;
+	void ext_map(address_map &map) ATTR_COLD;
 
 	required_device<mcs51_cpu_device> m_maincpu;
 	required_device<z29_keyboard_port_device> m_keyboard;
@@ -76,7 +76,7 @@ void z29_state::keyin_w(int state)
 
 /**
  * Port 1 (based on ROM listing)
- * 
+ *
  * bit 0 - KB output line
  * bit 1 - KB input line
  * bit 2 - 0 = normal video       1 = suppressed
@@ -93,7 +93,7 @@ u8 z29_state::p1_r()
 
 /**
  * Port 3 (based on ROM listing)
- * 
+ *
  * bit 1 - predefined serial port transmit pin
  * bit 4 - 0 = clear memory  1 = DMA CRTC
  * bit 5 - Clear to Send

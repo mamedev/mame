@@ -23,7 +23,7 @@ void exorterm155_terminal_device::device_add_mconfig(machine_config &config)
 INPUT_PORTS_START(exorterm155_terminal)
 
 	PORT_START("FLOW_CONTROL")
-	PORT_CONFNAME(0x1, 1, "Flow Control") PORT_CHANGED_MEMBER(DEVICE_SELF, exorterm155_terminal_device, flow_control, 0)
+	PORT_CONFNAME(0x1, 1, "Flow Control") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(exorterm155_terminal_device::flow_control), 0)
 	PORT_CONFSETTING(0x00, "None")
 	PORT_CONFSETTING(0x01, "Terminal DTR to remote CTS")
 

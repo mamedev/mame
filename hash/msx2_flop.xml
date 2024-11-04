@@ -22567,7 +22567,7 @@ HOMEBREW
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_3_5">
- 			<feature name="part_id" value="Disk C"/>
+			<feature name="part_id" value="Disk C"/>
 			<dataarea name="flop" size="737280">
 				<rom name="nv magazine 1996-8 - syntax (disk c).dsk" size="737280" crc="57d18c6c" sha1="a78662916d50229ad6110eb4dcc4f45453ec632f"/>
 			</dataarea>

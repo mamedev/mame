@@ -23,6 +23,7 @@ void pc9801_state::video_start()
 
 	std::fill(std::begin(m_ex_video_ff), std::end(m_ex_video_ff), 0);
 	std::fill(std::begin(m_video_ff), std::end(m_video_ff), 0);
+	save_pointer(NAME(m_video_ff), 8);
 }
 
 uint32_t pc9801_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
@@ -31,8 +32,10 @@ uint32_t pc9801_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap
 
 	/* graphics */
 	if(m_video_ff[DISPLAY_REG] != 0)
+	{
 		m_hgdc[1]->screen_update(screen, bitmap, cliprect);
-	m_hgdc[0]->screen_update(screen, bitmap, cliprect);
+		m_hgdc[0]->screen_update(screen, bitmap, cliprect);
+	}
 
 	return 0;
 }
@@ -74,26 +77,36 @@ UPD7220_DISPLAY_PIXELS_MEMBER( pc9801_state::hgdc_display_pixels )
 
 UPD7220_DRAW_TEXT_LINE_MEMBER( pc9801_state::hgdc_draw_text )
 {
-	draw_text(bitmap, addr, y, wd, pitch, lr, cursor_on, cursor_addr, false);
+	draw_text(bitmap, addr, y, wd, pitch, lr, cursor_on, cursor_addr, cursor_bot, cursor_top, false);
 }
 
-void pc9801_state::draw_text(bitmap_rgb32 &bitmap, uint32_t addr, int y, int wd, int pitch, int lr, int cursor_on, int cursor_addr, bool lower)
+void pc9801_state::draw_text(bitmap_rgb32 &bitmap, uint32_t addr, int y, int wd, int pitch, int lr, int cursor_on, int cursor_addr, int cursor_bot, int cursor_top, bool lower)
 {
 	rgb_t const *const palette = m_palette->palette()->entry_list_raw();
 
-	if(m_video_ff[DISPLAY_REG] == 0) //screen is off
-		return;
-
 //  uint8_t interlace_on = m_video_ff[INTERLACE_REG];
 	uint8_t char_size = m_video_ff[FONTSEL_REG] ? 16 : 8;
+	uint8_t font_shift = 0;
+	const uint8_t char_base_mult = char_size;
+	// arcus2 (intro mask) and gamepac1:03:valiant double height tiles
+	// with lr = 16 and fontsel off (-> 8x8) in 24 kHz mode
+	// TODO: verify with LR slightly above or below this threshold
+	if (!m_video_ff[FONTSEL_REG] && lr >= 16)
+	{
+		font_shift = 1;
+		char_size = 16;
+	}
 
 	uint8_t x_step;
 	uint8_t lastul = 0;
+	uint16_t lasttile = -1;
 
 	int scroll_start = 33 - (m_txt_scroll_reg[4] & 0x1f);
 	int scroll_end = scroll_start + m_txt_scroll_reg[5];
 	int scroll = m_txt_scroll_reg[3] % 20;
 	int line = y / lr;
+	// TODO: accurate blink rate
+	const bool is_blink_rate = m_screen->frame_number() & 0x10;
 
 	for(int x=0;x<pitch;x+=x_step)
 	{
@@ -101,34 +114,71 @@ void pc9801_state::draw_text(bitmap_rgb32 &bitmap, uint32_t addr, int y, int wd,
 
 		uint8_t kanji_sel = 0;
 		uint8_t kanji_lr = 0;
+		uint8_t tile_lr = 0;
+		bool pair = false;
 
 		uint16_t tile = m_video_ram[0][tile_addr & 0xfff] & 0xff;
 		uint8_t knj_tile = m_video_ram[0][tile_addr & 0xfff] >> 8;
 		if(knj_tile)
 		{
-			/* Note: bit 7 doesn't really count, if a kanji is enabled then the successive tile is always the second part of it.
-			   Trusted with Alice no Yakata, Animahjong V3, Aki no Tsukasa no Fushigi no Kabe, Apros ...
-			*/
+			// Note: bit 7 doesn't really count for normal kanjis,
+			// if a kanji is enabled then the successive tile is always the second part of it.
+			// Trusted with alice, animjv3, akitsuka, apros ...
 			//kanji_lr = (knj_tile & 0x80) >> 7;
-			//kanji_lr |= (tile & 0x80) >> 7; // Tokimeki Sports Gal 3
+			//kanji_lr |= (tile & 0x80) >> 7; // tokisg3
+			// ... but then ginga and gage expects working LR for PCG depending on the attribute.
+			// beast3 uses tile bit 7 for the heart shaped char displayed on first screen.
+			// TODO: rename pcg to gaiji (actual nomenclature)
+			const u8 pcg_lr = (BIT(knj_tile, 7) || BIT(tile, 7));
 			tile &= 0x7f;
 			tile <<= 8;
 			tile |= (knj_tile & 0x7f);
 			kanji_sel = 1;
-			if((tile & 0x7c00) == 0x0800) // 8x16 charset selector
+			if((tile & 0x7e00) == 0x5600)
+			{
+				// ikochan (karaoke intro) and mightyhd (game start and gameplay)
+				// draws these PCG strips where first tile is identical to second,
+				// with LR disabled on both but expecting the right half at the repetition anyway.
+				// TODO: what happens with LR enabled?
+				if(lasttile == (tile | knj_tile))
+				{
+					tile_lr = 1;
+					lasttile = -1;
+					pair = true;
+				}
+				else
+				{
+					if((lasttile & 0x7f7f) == tile)
+						pair = true;
+					tile_lr = pcg_lr;
+					lasttile = (tile | knj_tile);
+				}
 				x_step = 1;
+			}
+			else if((tile & 0x7c00) == 0x0800)  // 8x16 charset selector
+			{
+				x_step = 1;
+				lasttile = -1;
+			}
 			else
+			{
 				x_step = 2;
+				lasttile = -1;
+				pair = true;
+			}
 //          kanji_lr = 0;
 		}
 		else
+		{
 			x_step = 1;
+			lasttile = -1;
+		}
 
 		for(kanji_lr=0;kanji_lr<x_step;kanji_lr++)
 		{
-			/* Rori Rori Rolling definitely uses different colors for brake stop PCG elements,
-			   assume that all attributes are recalculated on different strips */
-			uint8_t attr = (m_video_ram[0][((tile_addr+kanji_lr) & 0xfff) | 0x1000] & 0xff);
+			// - roliroli wants to read the current strip for brake stop PCG elements
+			// - flixx selects attribute by the linear X in ranking (i.e. no tile_lr)
+			uint8_t attr = (m_video_ram[0][((tile_addr + kanji_lr) & 0xfff) | 0x1000] & 0xff);
 
 			uint8_t secret = (attr & 1) ^ 1;
 			uint8_t blink = attr & 2;
@@ -169,33 +219,35 @@ void pc9801_state::draw_text(bitmap_rgb32 &bitmap, uint32_t addr, int y, int wd,
 
 					if(!secret)
 					{
-						/* TODO: priority */
-						if(gfx_mode)
+						// kanji select takes over semigraphics
+						// beatvice wants this for bitmap masking on edges during gameplay
+						// (uses fully opaque PCG tiles)
+						if(kanji_sel)
+							tile_data = (m_kanji_rom[tile*0x20+yi*2+kanji_lr+tile_lr]);
+						else if(gfx_mode)
 						{
+							// gfx strip mode (semigraphics)
+							// number refers to the bit number in the tile data.
+							// This mode is identical to the one seen in PC-8001
+							// 00004444
+							// 11115555
+							// 22226666
+							// 33337777
+
 							tile_data = 0;
-
-							/*
-							    gfx strip mode:
-
-							    number refers to the bit number in the tile data.
-							    This mode is identical to the one seen in PC-8801
-							    00004444
-							    11115555
-							    22226666
-							    33337777
-							*/
 
 							int gfx_bit;
 							gfx_bit = (xi & 4);
+							// TODO: unverified for arcus2 case above, may be just base mult
 							gfx_bit+= (yi & (2 << (char_size == 16 ? 0x01 : 0x00)))>>(1+(char_size == 16));
 							gfx_bit+= (yi & (4 << (char_size == 16 ? 0x01 : 0x00)))>>(1+(char_size == 16));
 
 							tile_data = ((tile >> gfx_bit) & 1) ? 0xff : 0x00;
 						}
-						else if(kanji_sel)
-							tile_data = (m_kanji_rom[tile*0x20+yi*2+kanji_lr]);
 						else
-							tile_data = (m_char_rom[tile*char_size+m_video_ff[FONTSEL_REG]*0x800+yi]);
+						{
+							tile_data = (m_char_rom[tile*char_base_mult+m_video_ff[FONTSEL_REG]*0x800+(yi >> font_shift)]);
+						}
 					}
 
 					if(yi == lr-1)
@@ -205,18 +257,19 @@ void pc9801_state::draw_text(bitmap_rgb32 &bitmap, uint32_t addr, int y, int wd,
 					}
 					if(v_line)  { tile_data|=8; }
 
-					/* TODO: proper blink rate for these two */
-					if(cursor_on && cursor_addr == tile_addr && m_screen->frame_number() & 0x10)
+					if(cursor_on && (cursor_addr == tile_addr || (pair && cursor_addr == (tile_addr - 1) && pair)) && is_blink_rate && cursor_top >= yi && cursor_bot <= yi)
 						tile_data^=0xff;
 
-					if(blink && m_screen->frame_number() & 0x10)
+					if(blink && is_blink_rate)
 						tile_data = 0;
 
 					if(reverse) { tile_data^=0xff; }
 
 					int pen;
+					// daremo wants to mask during intro with reverse attribute only
+					// using color is a guess: may just be black.
 					if(yi >= char_size)
-						pen = -1;
+						pen = reverse ? color : -1;
 					else
 						pen = (tile_data >> (7-xi) & 1) ? color : -1;
 
@@ -237,7 +290,7 @@ void pc9801_state::draw_text(bitmap_rgb32 &bitmap, uint32_t addr, int y, int wd,
 		}
 	}
 	if(scroll && !lower && (line >= scroll_start) && (line <= scroll_end))
-		return draw_text(bitmap, addr += pitch, y, wd, pitch, lr, cursor_on, cursor_addr, true);
+		return draw_text(bitmap, addr += pitch, y, wd, pitch, lr, cursor_on, cursor_addr, cursor_bot, cursor_top, true);
 }
 
 /*************************************************
@@ -435,6 +488,25 @@ void pc9801_state::pc9801_a0_w(offs_t offset, uint8_t data)
 	}
 }
 
+void pc9801_state::border_color_w(offs_t offset, u8 data)
+{
+	if (data & ~1)
+		logerror("border_color_w [%02x] %02x\n", offset + 1, data);
+}
+
+void pc9801vm_state::border_color_w(offs_t offset, u8 data)
+{
+	pc9801_state::border_color_w(offset, data);
+	if (offset)
+	{
+		// 24.83/15.75 kHz selector, available for everything but vanilla class
+		// TODO: verify clock for 200 line mode (handtuned), verify that vanilla effectively cannot select it thru dips.
+		const XTAL screen_clock = (data & 1 ? XTAL(21'052'600) : (XTAL(21'052'600) / 3) * 2) / 8;
+
+		m_hgdc[0]->set_unscaled_clock(screen_clock);
+		m_hgdc[1]->set_unscaled_clock(screen_clock);
+	}
+}
 
 /*************************************************
  *

@@ -117,8 +117,8 @@ public:
 	void cgang(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	// devices/pointers
@@ -165,8 +165,8 @@ private:
 	TIMER_CALLBACK_MEMBER(output_sol) { m_en_sol[param >> 1] = param & 1; }
 
 	// address maps
-	void main_map(address_map &map);
-	void sound_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
+	void sound_map(address_map &map) ATTR_COLD;
 
 	// I/O handlers
 	void main_irq_w(int state);
@@ -809,7 +809,7 @@ void cgang_state::cgang(machine_config &config)
 	WATCHDOG_TIMER(config, m_watchdog); // HA1835P
 	m_watchdog->set_time(attotime::from_msec(100)); // approximation
 
-	TICKET_DISPENSER(config, m_ticket, attotime::from_msec(3000), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH);
+	TICKET_DISPENSER(config, m_ticket, attotime::from_msec(3000));
 
 	// video hardware
 	PWM_DISPLAY(config, m_digits).set_size(10, 7);

@@ -22,14 +22,14 @@ public:
 	u32 ram_r(offs_t offset, u32 mem_mask = ~0);
 	void ram_w(offs_t offset, u32 data, u32 mem_mask = ~0);
 
-	virtual void regs_map(address_map &map);
+	virtual void regs_map(address_map &map) ATTR_COLD;
 
 protected:
 	k056230_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	memory_share_creator<u32> m_ram;
 
@@ -45,10 +45,10 @@ public:
 	// construction/destruction
 	k056230_viper_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 
-	virtual void regs_map(address_map &map) override;
+	virtual void regs_map(address_map &map) override ATTR_COLD;
 
 protected:
-	virtual void device_reset() override;
+	virtual void device_reset() override ATTR_COLD;
 
 private:
 	u8 m_control = 0;

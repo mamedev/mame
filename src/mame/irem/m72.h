@@ -96,7 +96,6 @@ public:
 	void nspiritj(machine_config &config);
 
 	void init_dkgenm72();
-	void init_gallop();
 	void init_m72_8751();
 	void init_dbreedm72();
 	void init_nspirit();
@@ -176,10 +175,8 @@ private:
 
 	// game specific
 	void nspirit_sample_trigger_w(offs_t offset, u16 data, u16 mem_mask = ~0);
-	void loht_sample_trigger_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 	void dbreedm72_sample_trigger_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 	void dkgenm72_sample_trigger_w(offs_t offset, u16 data, u16 mem_mask = ~0);
-	void gallop_sample_trigger_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 	void rtype2_port02_w(u8 data);
 	void poundfor_port02_w(u8 data);
 	void m82_gfx_ctrl_w(offs_t offset, u16 data, u16 mem_mask);
@@ -192,8 +189,8 @@ private:
 
 	TILEMAP_MAPPER_MEMBER(m82_scan_rows);
 
-	void machine_start() override;
-	void machine_reset() override;
+	void machine_start() override ATTR_COLD;
+	void machine_reset() override ATTR_COLD;
 	DECLARE_VIDEO_START(m72);
 	DECLARE_VIDEO_START(dbreedm72);
 	DECLARE_VIDEO_START(imgfight);
@@ -226,41 +223,41 @@ private:
 	void copy_le(u16 *dest, const u8 *src, u8 bytes);
 	void install_protection_handler(const u8 *code,const u8 *crc);
 
-	void dbreed_map(address_map &map);
-	void dbreedm72_map(address_map &map);
-	void dbreedwm72_map(address_map &map);
-	void hharry_map(address_map &map);
-	void hharryu_map(address_map &map);
-	void kengo_map(address_map &map);
-	void lohtb_map(address_map &map);
-	void lohtb_portmap(address_map &map);
-	void m72_cpu1_common_map(address_map &map);
-	void m72_map(address_map &map);
-	void m72_protected_map(address_map &map);
-	void m72_portmap(address_map &map);
-	void m72_protected_portmap(address_map &map);
-	void m72_airduel_portmap(address_map &map);
-	void m81_cpu1_common_map(address_map &map);
-	void m81_portmap(address_map &map);
-	void m82_map(address_map &map);
-	void m82_portmap(address_map &map);
-	void m84_cpu1_common_map(address_map &map);
-	void m84_portmap(address_map &map);
-	void m84_v33_portmap(address_map &map);
-	void i80c31_mem_map(address_map &map);
-	void mcu_io_map(address_map &map);
-	void poundfor_portmap(address_map &map);
-	void poundfor_sound_portmap(address_map &map);
-	void rtype2_map(address_map &map);
-	void rtype2_sound_portmap(address_map &map);
-	void rtype_map(address_map &map);
-	void rtype_sound_portmap(address_map &map);
-	void sound_portmap(address_map &map);
-	void sound_protected_portmap(address_map &map);
-	void sound_ram_map(address_map &map);
-	void sound_rom_map(address_map &map);
-	void xmultipl_map(address_map &map);
-	void xmultiplm72_map(address_map &map);
+	void dbreed_map(address_map &map) ATTR_COLD;
+	void dbreedm72_map(address_map &map) ATTR_COLD;
+	void dbreedwm72_map(address_map &map) ATTR_COLD;
+	void hharry_map(address_map &map) ATTR_COLD;
+	void hharryu_map(address_map &map) ATTR_COLD;
+	void kengo_map(address_map &map) ATTR_COLD;
+	void lohtb_map(address_map &map) ATTR_COLD;
+	void lohtb_portmap(address_map &map) ATTR_COLD;
+	void m72_cpu1_common_map(address_map &map) ATTR_COLD;
+	void m72_map(address_map &map) ATTR_COLD;
+	void m72_protected_map(address_map &map) ATTR_COLD;
+	void m72_portmap(address_map &map) ATTR_COLD;
+	void m72_protected_portmap(address_map &map) ATTR_COLD;
+	void m72_airduel_portmap(address_map &map) ATTR_COLD;
+	void m81_cpu1_common_map(address_map &map) ATTR_COLD;
+	void m81_portmap(address_map &map) ATTR_COLD;
+	void m82_map(address_map &map) ATTR_COLD;
+	void m82_portmap(address_map &map) ATTR_COLD;
+	void m84_cpu1_common_map(address_map &map) ATTR_COLD;
+	void m84_portmap(address_map &map) ATTR_COLD;
+	void m84_v33_portmap(address_map &map) ATTR_COLD;
+	void i80c31_mem_map(address_map &map) ATTR_COLD;
+	void mcu_io_map(address_map &map) ATTR_COLD;
+	void poundfor_portmap(address_map &map) ATTR_COLD;
+	void poundfor_sound_portmap(address_map &map) ATTR_COLD;
+	void rtype2_map(address_map &map) ATTR_COLD;
+	void rtype2_sound_portmap(address_map &map) ATTR_COLD;
+	void rtype_map(address_map &map) ATTR_COLD;
+	void rtype_sound_portmap(address_map &map) ATTR_COLD;
+	void sound_portmap(address_map &map) ATTR_COLD;
+	void sound_protected_portmap(address_map &map) ATTR_COLD;
+	void sound_ram_map(address_map &map) ATTR_COLD;
+	void sound_rom_map(address_map &map) ATTR_COLD;
+	void xmultipl_map(address_map &map) ATTR_COLD;
+	void xmultiplm72_map(address_map &map) ATTR_COLD;
 };
 
 #endif // MAME_IREM_M72_H

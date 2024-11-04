@@ -50,8 +50,8 @@ protected:
 	u8 m_dr;
 	s32 m_last_output;
 
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 	void update_output();
 };
 

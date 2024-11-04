@@ -255,7 +255,7 @@ public:
 	void init_expro02();
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -289,18 +289,18 @@ private:
 	// comad
 	uint16_t comad_timer_r();
 	uint8_t comad_okim6295_r();
-	void comad_map(address_map &map);
-	void expro02_map(address_map &map);
-	void expro02_video_base_map(address_map &map);
-	void expro02_video_base_map_noview2(address_map &map);
-	void fantasia_map(address_map &map);
-	void fantsia2_map(address_map &map);
-	void galhustl_map(address_map &map);
-	void oki_map(address_map &map);
-	void smissw_map(address_map &map);
-	void supmodel_map(address_map &map);
-	void supmodl2_map(address_map &map);
-	void zipzap_map(address_map &map);
+	void comad_map(address_map &map) ATTR_COLD;
+	void expro02_map(address_map &map) ATTR_COLD;
+	void expro02_video_base_map(address_map &map) ATTR_COLD;
+	void expro02_video_base_map_noview2(address_map &map) ATTR_COLD;
+	void fantasia_map(address_map &map) ATTR_COLD;
+	void fantsia2_map(address_map &map) ATTR_COLD;
+	void galhustl_map(address_map &map) ATTR_COLD;
+	void oki_map(address_map &map) ATTR_COLD;
+	void smissw_map(address_map &map) ATTR_COLD;
+	void supmodel_map(address_map &map) ATTR_COLD;
+	void supmodl2_map(address_map &map) ATTR_COLD;
+	void zipzap_map(address_map &map) ATTR_COLD;
 };
 
 /* some weird logic needed for Gals Panic on the EXPRO02 board */

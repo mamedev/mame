@@ -1756,13 +1756,9 @@ bool render_target::map_point_container(s32 target_x, s32 target_y, render_conta
 	if (&container == m_ui_container)
 	{
 		// this hit test went against the UI container
-		if ((target_f.first >= 0.0f) && (target_f.first < 1.0f) && (target_f.second >= 0.0f) && (target_f.second < 1.0f))
-		{
-			// this point was successfully mapped
-			container_x = float(target_x) / m_width;
-			container_y = float(target_y) / m_height;
-			return true;
-		}
+		container_x = float(target_x) / m_width;
+		container_y = float(target_y) / m_height;
+		return (target_f.first >= 0.0f) && (target_f.first < 1.0f) && (target_f.second >= 0.0f) && (target_f.second < 1.0f);
 	}
 	else
 	{
@@ -1781,15 +1777,12 @@ bool render_target::map_point_container(s32 target_x, s32 target_y, render_conta
 					[&container] (layout_view_item &item) { return &item.screen()->container() == &container; }));
 		if (items.end() != found)
 		{
+			// point successfully mapped
 			layout_view_item &item(*found);
 			render_bounds const bounds(item.bounds());
-			if (bounds.includes(target_f.first, target_f.second))
-			{
-				// point successfully mapped
-				container_x = (target_f.first - bounds.x0) / bounds.width();
-				container_y = (target_f.second - bounds.y0) / bounds.height();
-				return true;
-			}
+			container_x = (target_f.first - bounds.x0) / bounds.width();
+			container_y = (target_f.second - bounds.y0) / bounds.height();
+			return bounds.includes(target_f.first, target_f.second);
 		}
 	}
 

@@ -32,7 +32,7 @@ public:
 	void proteusxr(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	void add_lcd(machine_config &config);
@@ -40,11 +40,11 @@ private:
 	HD44780_PIXEL_UPDATE(lcd_pixel_update);
 	void palette_init(palette_device &palette);
 
-	void proteus1_map(address_map &map);
-	void proteusxr_map(address_map &map);
-	void vintkeys_map(address_map &map);
-	void phatt_map(address_map &map);
-	void fc7_map(address_map &map);
+	void proteus1_map(address_map &map) ATTR_COLD;
+	void proteusxr_map(address_map &map) ATTR_COLD;
+	void vintkeys_map(address_map &map) ATTR_COLD;
+	void phatt_map(address_map &map) ATTR_COLD;
+	void fc7_map(address_map &map) ATTR_COLD;
 
 	required_device<m68000_base_device> m_maincpu;
 	required_device<mc68901_device> m_mfp;

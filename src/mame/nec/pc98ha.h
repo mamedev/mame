@@ -31,13 +31,13 @@ public:
 	void lt_config(machine_config &config);
 
 protected:
-	void lt_map(address_map &map);
-	void lt_io(address_map &map);
+	void lt_map(address_map &map) ATTR_COLD;
+	void lt_io(address_map &map) ATTR_COLD;
 
 	required_device<v50_device> m_maincpu;
 
-	virtual void machine_start() override;
-//  virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+//  virtual void machine_reset() override ATTR_COLD;
 private:
 	required_device<upd765a_device> m_fdc;
 	required_shared_ptr<uint16_t> m_gvram;
@@ -64,6 +64,8 @@ private:
 
 	u8 m_floppy_mode = 0;
 	u8 m_fdc_ctrl = 0;
+
+	virtual void uart_irq_check() override;
 };
 
 class pc98ha_state : public pc98lt_state
@@ -81,10 +83,10 @@ public:
 	void ha_config(machine_config &config);
 
 protected:
-	void ha_map(address_map &map);
-	void ha_io(address_map &map);
+	void ha_map(address_map &map) ATTR_COLD;
+	void ha_io(address_map &map) ATTR_COLD;
 
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 private:
 	required_memory_bank_array<4> m_ems_banks;
 	memory_view m_ext_view;

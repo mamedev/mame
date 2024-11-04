@@ -32,8 +32,8 @@ namespace
 
 		protected:
 			// device-level overrides
-			virtual void device_start() override;
-			virtual void device_add_mconfig(machine_config &config) override;
+			virtual void device_start() override ATTR_COLD;
+			virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 			virtual u8 meb_read(offs_t offset) override;
 			virtual void meb_write(offs_t offset, u8 data) override;
 

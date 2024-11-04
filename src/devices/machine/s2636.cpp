@@ -180,6 +180,10 @@ s2636_device::s2636_device(const machine_config &mconfig, const char *tag, devic
 	for (auto &elem : m_obj_dup) elem = false;
 }
 
+s2636_device::~s2636_device()
+{
+}
+
 //-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------

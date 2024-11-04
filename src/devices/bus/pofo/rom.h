@@ -30,7 +30,7 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 	// device_portfolio_memory_card_slot_interface overrides
 	virtual bool cdet() override { return 0; }

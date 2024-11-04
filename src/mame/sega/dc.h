@@ -12,7 +12,6 @@
 #include "powervr2.h"
 
 #include "cpu/arm7/arm7.h"
-#include "cpu/arm7/arm7core.h"
 #include "cpu/sh/sh4.h"
 #include "machine/timer.h"
 #include "sound/aica.h"
@@ -46,8 +45,8 @@ public:
 	uint8_t m_armrst = 0U;
 	emu_timer *m_ch2_dma_irq_timer = nullptr;
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 	void g2_dma_end_w(offs_t channel, u8 state);
 	void g2_dma_error_ia_w(offs_t channel, u8 state);
 	void g2_dma_error_ov_w(offs_t channel, u8 state);
@@ -90,8 +89,8 @@ public:
 	DECLARE_MACHINE_RESET(dc_console);
 
 	void naomi_aw_base(machine_config &config);
-	void aica_map(address_map &map);
-	void dc_audio_map(address_map &map);
+	void aica_map(address_map &map) ATTR_COLD;
+	void dc_audio_map(address_map &map) ATTR_COLD;
 
 protected:
 	void system_bus_config(machine_config &config, const char *cpu_tag);

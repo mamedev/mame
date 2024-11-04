@@ -74,9 +74,9 @@ public:
 	void superwng(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -111,8 +111,8 @@ private:
 	void main_nmi_interrupt(int state);
 	INTERRUPT_GEN_MEMBER(sound_nmi_assert);
 
-	void main_map(address_map &map);
-	void sound_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
+	void sound_map(address_map &map) ATTR_COLD;
 };
 
 void superwng_state::unk_a187_w(uint8_t data)

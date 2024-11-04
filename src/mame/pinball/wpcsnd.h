@@ -39,12 +39,12 @@ public:
 	// callbacks
 	auto reply_callback() { return m_reply_cb.bind(); }
 
-	void wpcsnd_map(address_map &map);
+	void wpcsnd_map(address_map &map) ATTR_COLD;
 protected:
 	// overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 private:
 	uint8_t m_latch = 0;

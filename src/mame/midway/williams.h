@@ -119,8 +119,8 @@ protected:
 	const uint8_t *m_blitter_remap;
 	std::unique_ptr<uint8_t[]> m_blitter_remap_lookup;
 
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 	u8 port_0_49way_r();
 	void vram_select_w(u8 data);
@@ -142,13 +142,13 @@ protected:
 	void williams_base(machine_config &config);
 	void williams_muxed(machine_config &config);
 
-	void main_map(address_map &map);
-	void bubbles_main_map(address_map &map);
-	void sinistar_main_map(address_map &map);
-	void spdball_main_map(address_map &map);
-	void alienar_main_map(address_map &map);
-	virtual void sound_map(address_map &map);
-	void sound2_map(address_map &map); // for Blaster and Sinistar cockpit
+	void main_map(address_map &map) ATTR_COLD;
+	void bubbles_main_map(address_map &map) ATTR_COLD;
+	void sinistar_main_map(address_map &map) ATTR_COLD;
+	void spdball_main_map(address_map &map) ATTR_COLD;
+	void alienar_main_map(address_map &map) ATTR_COLD;
+	virtual void sound_map(address_map &map) ATTR_COLD;
+	void sound2_map(address_map &map) ATTR_COLD; // for Blaster and Sinistar cockpit
 };
 
 // Defender
@@ -166,12 +166,12 @@ public:
 	void init_defndjeu();
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
-	void defender_main_map(address_map &map);
-	void defender_sound_map(address_map &map);
-	void defender_sound_map_6802(address_map &map);
+	void defender_main_map(address_map &map) ATTR_COLD;
+	void defender_sound_map(address_map &map) ATTR_COLD;
+	void defender_sound_map_6802(address_map &map) ATTR_COLD;
 
 private:
 	void video_control_w(u8 data);
@@ -189,7 +189,7 @@ public:
 	void mayday(machine_config &config);
 
 private:
-	void mayday_main_map(address_map &map);
+	void mayday_main_map(address_map &map) ATTR_COLD;
 
 	u8 protection_r(offs_t offset);
 };
@@ -203,8 +203,8 @@ public:
 		m_dial(*this, "DIAL")
 	{ }
 
-	DECLARE_CUSTOM_INPUT_MEMBER(dial0_r) { return m_dial->read() & 3; }
-	DECLARE_CUSTOM_INPUT_MEMBER(dial1_r) { return m_dial->read() >> 2 & 3; }
+	ioport_value dial0_r() { return m_dial->read() & 3; }
+	ioport_value dial1_r() { return m_dial->read() >> 2 & 3; }
 
 private:
 	required_ioport m_dial;
@@ -224,9 +224,9 @@ public:
 	void blaster(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	required_device<ls157_x2_device> m_muxa;
@@ -244,7 +244,7 @@ private:
 
 	virtual uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect) override;
 
-	void blaster_main_map(address_map &map);
+	void blaster_main_map(address_map &map) ATTR_COLD;
 };
 
 // base Williams 2nd gen hardware
@@ -287,9 +287,9 @@ protected:
 
 	void williams2_base(machine_config &config);
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 	virtual u8 video_counter_r() override;
 
@@ -314,10 +314,10 @@ protected:
 
 	virtual uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect) override;
 
-	void common_map(address_map &map);
-	void d000_rom_map(address_map &map);
-	void d000_ram_map(address_map &map);
-	virtual void sound_map(address_map &map) override;
+	void common_map(address_map &map) ATTR_COLD;
+	void d000_rom_map(address_map &map) ATTR_COLD;
+	void d000_ram_map(address_map &map) ATTR_COLD;
+	virtual void sound_map(address_map &map) override ATTR_COLD;
 
 	void video_control_w(u8 data);
 };
@@ -337,7 +337,7 @@ public:
 	void mysticm(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 	virtual uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect) override;
 
@@ -366,10 +366,10 @@ public:
 
 	void tshoot(machine_config &config);
 
-	template <int P> DECLARE_CUSTOM_INPUT_MEMBER(gun_r);
+	template <int P> ioport_value gun_r();
 
 private:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 	void maxvol_w(int state);
 	void lamp_w(u8 data);
@@ -395,7 +395,7 @@ public:
 	void joust2(machine_config &config);
 
 private:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 	required_device<ls157_device> m_mux;
 	required_device<s11_obg_device> m_bg;

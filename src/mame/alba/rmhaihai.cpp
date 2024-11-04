@@ -66,14 +66,14 @@ protected:
 	void ctrl_w(uint8_t data);
 	void adpcm_w(uint8_t data);
 
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 
-	void rmhaihai_io_map(address_map &map);
-	void rmhaihai_map(address_map &map);
+	void rmhaihai_io_map(address_map &map) ATTR_COLD;
+	void rmhaihai_map(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<msm5205_device> m_msm;
@@ -109,14 +109,14 @@ public:
 	void themj(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	required_memory_bank_array<2> m_cpubank;
 
-	void themj_io_map(address_map &map);
-	void themj_map(address_map &map);
+	void themj_io_map(address_map &map) ATTR_COLD;
+	void themj_map(address_map &map) ATTR_COLD;
 	void themj_rombank_w(uint8_t data);
 };
 

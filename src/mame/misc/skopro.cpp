@@ -42,7 +42,7 @@ public:
 private:
 	required_device<cpu_device> m_maincpu;
 
-	void skopro_map(address_map &map);
+	void skopro_map(address_map &map) ATTR_COLD;
 };
 
 void skopro_state::skopro_map(address_map &map)

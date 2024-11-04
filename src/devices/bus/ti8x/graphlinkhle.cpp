@@ -22,9 +22,9 @@ public:
 	graph_link_hle_device(machine_config const &mconfig, char const *tag, device_t *owner, uint32_t clock);
 
 protected:
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	virtual void byte_collision() override;
 	virtual void byte_send_timeout() override;

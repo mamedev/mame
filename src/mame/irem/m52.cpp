@@ -82,8 +82,8 @@ public:
 	void m52(machine_config &config);
 
 protected:
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 	virtual void scroll_w(uint8_t data);
 
 	// board mod changes?
@@ -130,8 +130,8 @@ private:
 	void draw_background(bitmap_rgb32 &bitmap, const rectangle &cliprect, int xpos, int ypos, int image);
 	void draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect, int initoffs);
 
-	void main_map(address_map &map);
-	void main_portmap(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
+	void main_portmap(address_map &map) ATTR_COLD;
 };
 
 class alpha1v_state : public m52_state
@@ -143,10 +143,10 @@ public:
 
 	void alpha1v(machine_config &config);
 
-	void main_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
 
 protected:
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 	virtual void scroll_w(uint8_t data) override;
 
 private:

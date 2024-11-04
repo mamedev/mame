@@ -176,6 +176,7 @@ void mm76_device::execute_one()
 
 				}
 				break; // 0xfc
-		}
+
+		} // 0xf0
 	}
 }

@@ -75,8 +75,8 @@ public:
 	void mm1(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override { m_reset = true; }
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD { m_reset = true; }
 
 private:
 	// devices/pointers
@@ -89,9 +89,9 @@ private:
 	u8 m_kp_mux = 0;
 
 	// address maps
-	void mirage_map(address_map &map);
-	void mm1_map(address_map &map);
-	void mm1_io(address_map &map);
+	void mirage_map(address_map &map) ATTR_COLD;
+	void mm1_map(address_map &map) ATTR_COLD;
+	void mm1_io(address_map &map) ATTR_COLD;
 
 	// I/O handlers
 	void update_display();
@@ -227,7 +227,7 @@ static INPUT_PORTS_START( mirage )
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_H) PORT_CODE(KEYCODE_8) PORT_CODE(KEYCODE_8_PAD) PORT_NAME("H / 8")
 
 	PORT_START("FAKE") // module came with buttons sensorboard by default
-	PORT_CONFNAME( 0x01, 0x00, "Board Sensors" ) PORT_CHANGED_MEMBER(DEVICE_SELF, mm1_state, mirage_switch_sensor_type, 0)
+	PORT_CONFNAME( 0x01, 0x00, "Board Sensors" ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(mm1_state::mirage_switch_sensor_type), 0)
 	PORT_CONFSETTING(    0x00, "Buttons (Mirage)" )
 	PORT_CONFSETTING(    0x01, "Magnets (Modular)" )
 INPUT_PORTS_END

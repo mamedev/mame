@@ -113,13 +113,13 @@ public:
 	void init_bootsys2();
 	void init_bootsys2d();
 
-	DECLARE_CUSTOM_INPUT_MEMBER(dakkochn_mux_data_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(dakkochn_mux_status_r);
+	ioport_value dakkochn_mux_data_r();
+	ioport_value dakkochn_mux_status_r();
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	// video related
@@ -236,18 +236,18 @@ private:
 	std::unique_ptr<u8[]> m_banked_decrypted_opcodes;
 
 	// address maps
-	void banked_decrypted_opcodes_map(address_map &map);
-	void decrypted_opcodes_map(address_map &map);
+	void banked_decrypted_opcodes_map(address_map &map) ATTR_COLD;
+	void decrypted_opcodes_map(address_map &map) ATTR_COLD;
 	void encrypted_sys1ppi_maps(machine_config &config);
 	void encrypted_sys1pio_maps(machine_config &config);
 	void encrypted_sys2_mc8123_maps(machine_config &config);
-	void mcu_io_map(address_map &map);
-	void nobo_map(address_map &map);
-	void sound_map(address_map &map);
-	void system1_map(address_map &map);
-	void blockgal_pio_io_map(address_map &map);
-	void system1_pio_io_map(address_map &map);
-	void system1_ppi_io_map(address_map &map);
+	void mcu_io_map(address_map &map) ATTR_COLD;
+	void nobo_map(address_map &map) ATTR_COLD;
+	void sound_map(address_map &map) ATTR_COLD;
+	void system1_map(address_map &map) ATTR_COLD;
+	void blockgal_pio_io_map(address_map &map) ATTR_COLD;
+	void system1_pio_io_map(address_map &map) ATTR_COLD;
+	void system1_ppi_io_map(address_map &map) ATTR_COLD;
 };
 
 #endif // MAME_SEGA_SYSTEM1_H

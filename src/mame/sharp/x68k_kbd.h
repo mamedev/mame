@@ -13,11 +13,11 @@ class x68k_keyboard_device : public buffered_rs232_device<16U>, protected device
 {
 public:
 	x68k_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	virtual ioport_constructor device_input_ports() const override;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 	virtual void key_make(uint8_t row, uint8_t column) override;
 	virtual void key_repeat(uint8_t row, uint8_t column) override;
 	virtual void key_break(uint8_t row, uint8_t column) override;

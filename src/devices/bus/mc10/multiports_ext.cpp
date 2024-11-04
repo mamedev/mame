@@ -47,12 +47,12 @@ protected:
 	mc10_multiports_ext_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
 
 	// device_t implementation
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	void control_register_write(offs_t offset, u8 data);
 
-	void multiports_mem(address_map &map);
+	void multiports_mem(address_map &map) ATTR_COLD;
 
 private:
 	memory_bank_creator m_bank;

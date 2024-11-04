@@ -1236,7 +1236,7 @@ static void pcw_ssfloppies(device_slot_interface &device)
 
 static void pcw_dsfloppies(device_slot_interface &device)
 {
-	device.option_add("3dsdd", FLOPPY_3_DSDD);
+	device.option_add("3dsqd", FLOPPY_3_DSQD);
 }
 
 static void pcw_35floppies(device_slot_interface &device)
@@ -1321,7 +1321,7 @@ void pcw_state::pcw8512(machine_config &config)
 	m_palette->set_init(FUNC(pcw_state::set_8xxx_palette));
 
 	FLOPPY_CONNECTOR(config, "upd765:0", pcw_ssfloppies, "3ssdd", floppy_image_device::default_mfm_floppy_formats);
-	FLOPPY_CONNECTOR(config, "upd765:1", pcw_dsfloppies, "3dsdd", floppy_image_device::default_mfm_floppy_formats);
+	FLOPPY_CONNECTOR(config, "upd765:1", pcw_dsfloppies, "3dsqd", floppy_image_device::default_mfm_floppy_formats);
 
 	screen_device &printer(SCREEN(config, "printer", SCREEN_TYPE_RASTER));
 	printer.set_refresh_hz(50);
@@ -1342,7 +1342,7 @@ void pcw_state::pcw9512(machine_config &config)
 	pcw(config);
 	m_palette->set_init(FUNC(pcw_state::set_9xxx_palette));
 
-	FLOPPY_CONNECTOR(config, "upd765:0", pcw_dsfloppies, "3dsdd", floppy_image_device::default_mfm_floppy_formats);
+	FLOPPY_CONNECTOR(config, "upd765:0", pcw_dsfloppies, "3dsqd", floppy_image_device::default_mfm_floppy_formats);
 	FLOPPY_CONNECTOR(config, "upd765:1", pcw_dsfloppies, nullptr, floppy_image_device::default_mfm_floppy_formats);
 
 	m_maincpu->set_addrmap(AS_IO, &pcw_state::pcw9512_io);

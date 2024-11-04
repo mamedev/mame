@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Valley Bell
-#ifndef MAME_SOUND_ROLANDLP_H
-#define MAME_SOUND_ROLANDLP_H
+#ifndef MAME_SOUND_ROLAND_LP_H
+#define MAME_SOUND_ROLAND_LP_H
 
 #pragma once
 
@@ -19,8 +19,8 @@ public:
 
 protected:
 	// device_t implementation
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// device_sound_interface implementation
 	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
@@ -66,4 +66,4 @@ private:
 
 DECLARE_DEVICE_TYPE(MB87419_MB87420, mb87419_mb87420_device)
 
-#endif // MAME_SOUND_ROLANDLP_H
+#endif // MAME_SOUND_ROLAND_LP_H

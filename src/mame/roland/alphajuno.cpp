@@ -36,17 +36,17 @@ public:
 	void mks50(machine_config &config);
 
 protected:
-	virtual void machine_reset() override;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	HD44780_PIXEL_UPDATE(lcd_pixel_update);
 
 	void lcd_w(offs_t offset, u8 data);
 
-	void prog_map(address_map &map);
-	void ajuno1_ext_map(address_map &map);
-	void ajuno2_ext_map(address_map &map);
-	void mks50_ext_map(address_map &map);
+	void prog_map(address_map &map) ATTR_COLD;
+	void ajuno1_ext_map(address_map &map) ATTR_COLD;
+	void ajuno2_ext_map(address_map &map) ATTR_COLD;
+	void mks50_ext_map(address_map &map) ATTR_COLD;
 
 	void palette_init(palette_device &palette);
 

@@ -57,10 +57,10 @@ public:
 	void timetrv(machine_config &config);
 
 private:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
-	void timetrv_map(address_map &map);
-	void timetrv_io(address_map &map);
+	void timetrv_map(address_map &map) ATTR_COLD;
+	void timetrv_io(address_map &map) ATTR_COLD;
 
 	void ppi1_pc_w(uint8_t data);
 

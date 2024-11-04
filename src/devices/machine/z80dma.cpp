@@ -18,8 +18,6 @@
         - rewrite to match documentation
         - implement missing features
         - implement more asserts
-        - implement a INPUT_LINE_BUSREQ for Z80. As a workaround,
-          HALT is used. This implies burst mode.
 
 **********************************************************************/
 
@@ -27,16 +25,18 @@
 #include "z80dma.h"
 
 #define LOG_DMA     (1U << 1)
+#define LOG_INT     (1U << 2)
 
-//#define VERBOSE (LOG_GENERAL | LOG_DMA)
+//#define VERBOSE (LOG_GENERAL | LOG_DMA | LOG_INT)
 #include "logmacro.h"
 
 #define LOGDMA(...) LOGMASKED(LOG_DMA, __VA_ARGS__)
+#define LOGINT(...) LOGMASKED(LOG_INT, __VA_ARGS__)
 
-//**************************************************************************
-//  CONSTANTS
-//**************************************************************************
 
+/****************************************************************************
+ * CONSTANTS
+ ****************************************************************************/
 enum
 {
 	INT_RDY = 0,
@@ -45,12 +45,25 @@ enum
 	INT_MATCH_END_OF_BLOCK
 };
 
+enum
+{
+	SEQ_WAIT_READY = 0,
+	SEQ_REQUEST_BUS,
+	SEQ_WAITING_ACK,
+	SEQ_TRANS1_INC_DEC_SOURCE_ADDRESS,
+	SEQ_TRANS1_READ_SOURCE,
+	SEQ_TRANS1_INC_DEC_DEST_ADDRESS,
+	SEQ_TRANS1_WRITE_DEST,
+	SEQ_TRANS1_BYTE_MATCH,
+	SEQ_TRANS1_INC_BYTE_COUNTER,
+	SEQ_TRANS1_SET_FLAGS,
+	SEQ_FINISH
+};
 
 
-//**************************************************************************
-//  MACROS
-//**************************************************************************
-
+/****************************************************************************
+ * MACROS
+ ****************************************************************************/
 #define GET_REGNUM(_r)          (&(_r) - &(WR0))
 #define WR0                     REG(0, 0)
 #define WR1                     REG(1, 0)
@@ -91,12 +104,11 @@ enum
 #define PORTA_MEMORY            (((WR1 >> 3) & 0x01) == 0x00)
 #define PORTB_MEMORY            (((WR2 >> 3) & 0x01) == 0x00)
 
-#define PORTA_CYCLE_LEN         (4-(PORTA_TIMING & 0x03))
-#define PORTB_CYCLE_LEN         (4-(PORTB_TIMING & 0x03))
-
 #define PORTA_IS_SOURCE         ((WR0 >> 2) & 0x01)
 #define PORTB_IS_SOURCE         (!PORTA_IS_SOURCE)
 #define TRANSFER_MODE           (WR0 & 0x03)
+
+#define OPERATING_MODE          ((WR4 >> 5) & 0x03) // 0b00: Byte; 0b01: Continuous; 0b10: Burst; 0b11: Do not program
 
 #define MATCH_F_SET             (m_status &= ~0x10)
 #define MATCH_F_CLEAR           (m_status |= 0x10)
@@ -114,23 +126,20 @@ enum
 #define PULSE_GENERATED         (INTERRUPT_CTRL & 0x04)
 
 
-//**************************************************************************
-//  LIVE DEVICE
-//**************************************************************************
-
-// device type definition
+/****************************************************************************
+ * device type definition
+ ****************************************************************************/
 DEFINE_DEVICE_TYPE(Z80DMA, z80dma_device, "z80dma", "Z80 DMA Controller")
 
-//-------------------------------------------------
-//  z80dma_device - constructor
-//-------------------------------------------------
-
-z80dma_device::z80dma_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+/****************************************************************************
+ * z80dma_device - constructor
+ ****************************************************************************/
+z80dma_device::z80dma_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: z80dma_device(mconfig, Z80DMA, tag, owner, clock)
 {
 }
 
-z80dma_device::z80dma_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+z80dma_device::z80dma_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_z80daisy_interface(mconfig, *this)
 	, m_out_busreq_cb(*this)
@@ -144,15 +153,13 @@ z80dma_device::z80dma_device(const machine_config &mconfig, device_type type, co
 {
 }
 
-
-//-------------------------------------------------
-//  device_start - device-specific startup
-//-------------------------------------------------
-
+/****************************************************************************
+ * device_start - device-specific startup
+ ****************************************************************************/
 void z80dma_device::device_start()
 {
 	// allocate timer
-	m_timer = timer_alloc(FUNC(z80dma_device::timerproc), this);
+	m_timer = timer_alloc(FUNC(z80dma_device::clock_w), this);
 
 	// register for state saving
 	save_item(NAME(m_regs));
@@ -160,7 +167,7 @@ void z80dma_device::device_start()
 	save_item(NAME(m_num_follow));
 	save_item(NAME(m_cur_follow));
 	save_item(NAME(m_status));
-	save_item(NAME(m_dma_enabled));
+	save_item(NAME(m_dma_seq));
 	save_item(NAME(m_vector));
 	save_item(NAME(m_iei));
 	save_item(NAME(m_ip));
@@ -171,27 +178,29 @@ void z80dma_device::device_start()
 	save_item(NAME(m_byte_counter));
 	save_item(NAME(m_rdy));
 	save_item(NAME(m_force_ready));
-	save_item(NAME(m_is_read));
+	save_item(NAME(m_wait));
+	save_item(NAME(m_busrq_ack));
 	save_item(NAME(m_is_pulse));
-	save_item(NAME(m_cur_cycle));
 	save_item(NAME(m_latch));
 }
 
 
-//-------------------------------------------------
-//  device_reset - device-specific reset
-//-------------------------------------------------
-
+/****************************************************************************
+ * device_reset - device-specific reset
+ ****************************************************************************/
 void z80dma_device::device_reset()
 {
+	m_timer->reset();
+
 	m_status = 0;
+	m_dma_seq = ~0;
 	m_rdy = 0;
 	m_force_ready = 0;
+	m_wait = 0;
 	m_num_follow = 0;
-	m_dma_enabled = 0;
 	m_read_num_follow = m_read_cur_follow = 0;
 	m_reset_pointer = 0;
-	m_is_read = false;
+	m_busrq_ack = 0;
 	m_is_pulse = false;
 	memset(m_regs, 0, sizeof(m_regs));
 	memset(m_regs_follow, 0, sizeof(m_regs_follow));
@@ -201,21 +210,17 @@ void z80dma_device::device_reset()
 	m_ip = 0;
 	m_ius = 0;
 	m_vector = 0;
-
-	update_status();
 }
 
 
+/****************************************************************************
+ * DAISY CHAIN INTERFACE
+ ****************************************************************************/
 
-//**************************************************************************
-//  DAISY CHAIN INTERFACE
-//**************************************************************************
-
-//-------------------------------------------------
-//  z80daisy_irq_state - return the overall IRQ
-//  state for this device
-//-------------------------------------------------
-
+/****************************************************************************
+ * z80daisy_irq_state - return the overall IRQ
+ * state for this device
+ ****************************************************************************/
 int z80dma_device::z80daisy_irq_state()
 {
 	int state = 0;
@@ -230,23 +235,20 @@ int z80dma_device::z80daisy_irq_state()
 		// interrupt under service
 		state = Z80_DAISY_IEO;
 	}
-
-	LOG("Z80DMA Interrupt State: %u\n", state);
+	LOGINT("Z80DMA Interrupt State: %u\n", state);
 
 	return state;
 }
 
-
-//-------------------------------------------------
-//  z80daisy_irq_ack - acknowledge an IRQ and
-//  return the appropriate vector
-//-------------------------------------------------
-
+/****************************************************************************
+ * z80daisy_irq_ack - acknowledge an IRQ and
+ * return the appropriate vector
+ ****************************************************************************/
 int z80dma_device::z80daisy_irq_ack()
 {
 	if (m_ip)
 	{
-		LOG("Z80DMA Interrupt Acknowledge\n");
+		LOGINT("Z80DMA Interrupt Acknowledge\n");
 
 		// clear interrupt pending flag
 		m_ip = 0;
@@ -257,70 +259,74 @@ int z80dma_device::z80daisy_irq_ack()
 
 		return m_vector;
 	}
-
-	//logerror("z80dma_irq_ack: failed to find an interrupt to ack!\n");
-
-	return 0;
+	else
+	{
+		LOGINT("z80dma_irq_ack: failed to find an interrupt to ack!\n");
+		return 0;
+	}
 }
 
-
-//-------------------------------------------------
-//  z80daisy_irq_reti - clear the interrupt
-//  pending state to allow other interrupts through
-//-------------------------------------------------
-
+/****************************************************************************
+ * z80daisy_irq_reti - clear the interrupt
+ * pending state to allow other interrupts through
+ ****************************************************************************/
 void z80dma_device::z80daisy_irq_reti()
 {
 	if (m_ius)
 	{
-		LOG("Z80DMA Return from Interrupt\n");
+		LOGINT("Z80DMA Return from Interrupt\n");
 
 		// clear interrupt under service flag
 		m_ius = 0;
 		interrupt_check();
-
-		return;
 	}
-
-	//logerror("z80dma_irq_reti: failed to find an interrupt to clear IEO on!\n");
+	else
+	{
+		LOGINT("z80dma_irq_reti: failed to find an interrupt to clear IEO on!\n");
+	}
 }
-
 
 
 //**************************************************************************
 //  INTERNAL STATE MANAGEMENT
 //**************************************************************************
 
-//-------------------------------------------------
-//  is_ready - ready for DMA transfer?
-//-------------------------------------------------
-
-int z80dma_device::is_ready()
+void z80dma_device::enable()
 {
-	return (m_force_ready) || (m_rdy == READY_ACTIVE_HIGH);
+	const attotime curtime = machine().time();
+	m_timer->adjust(attotime::from_ticks(curtime.as_ticks(clock()) + 1, clock()) - curtime, 0, clocks_to_attotime(1));
+	m_dma_seq = SEQ_WAIT_READY;
 }
 
+void z80dma_device::disable()
+{
+	m_timer->reset();
+	if (m_busrq_ack == 1)
+	{
+		m_out_busreq_cb(CLEAR_LINE);
+	}
+}
 
-//-------------------------------------------------
-//  interrupt_check - update IRQ line state
-//-------------------------------------------------
+/****************************************************************************
+ * is_ready - ready for DMA transfer?
+ ****************************************************************************/
+int z80dma_device::is_ready()
+{
+	return m_force_ready || (m_rdy == READY_ACTIVE_HIGH);
+}
 
+/****************************************************************************
+ * interrupt_check - update IRQ line state
+ ****************************************************************************/
 void z80dma_device::interrupt_check()
 {
 	m_out_int_cb(m_ip ? ASSERT_LINE : CLEAR_LINE);
-
-	int ieo = m_iei;
-	if (m_ip) {
-		ieo = 0;
-	}
-	m_out_ieo_cb(ieo);
+	m_out_ieo_cb(m_ip ? 0 : m_iei);
 }
 
-
-//-------------------------------------------------
-//  trigger_interrupt - trigger DMA interrupt
-//-------------------------------------------------
-
+/****************************************************************************
+ * trigger_interrupt - trigger DMA interrupt
+ ****************************************************************************/
 void z80dma_device::trigger_interrupt(int level)
 {
 	if (!m_ius && INTERRUPT_ENABLE)
@@ -340,23 +346,19 @@ void z80dma_device::trigger_interrupt(int level)
 
 		m_status &= ~0x08;
 
-		LOG("Z80DMA Interrupt Pending\n");
+		LOGINT("Z80DMA Interrupt Pending\n");
 
 		interrupt_check();
 	}
 }
 
-
-//-------------------------------------------------
-//  do_read - perform DMA read
-//-------------------------------------------------
-
+/****************************************************************************
+ * do_read - perform DMA read
+ ****************************************************************************/
 void z80dma_device::do_read()
 {
-	uint8_t mode;
-
-	mode = TRANSFER_MODE;
-	switch(mode) {
+	switch(TRANSFER_MODE)
+	{
 		case TM_TRANSFER:
 		case TM_SEARCH:
 		case TM_SEARCH_TRANSFER:
@@ -380,16 +382,14 @@ void z80dma_device::do_read()
 			}
 			break;
 		default:
-			logerror("z80dma_do_operation: invalid mode %d!\n", mode);
+			logerror("z80dma_do_operation: invalid mode %d!\n", TRANSFER_MODE);
 			break;
 	}
 }
 
-
-//-------------------------------------------------
-//  do_write - perform DMA write
-//-------------------------------------------------
-
+/****************************************************************************
+ * do_write - perform DMA write
+ ****************************************************************************/
 void z80dma_device::do_transfer_write()
 {
 	if (PORTA_IS_SOURCE)
@@ -414,25 +414,19 @@ void z80dma_device::do_transfer_write()
 
 void z80dma_device::do_search()
 {
-	uint8_t load_byte,match_byte;
-	load_byte = m_latch | MASK_BYTE;
-	match_byte = MATCH_BYTE | MASK_BYTE;
-	//LOG("%02x %02x\n",load_byte,match_byte));
-	if (load_byte == match_byte)
+	const u8 load_byte = m_latch | MASK_BYTE;
+	const u8 match_byte = MATCH_BYTE | MASK_BYTE;
+	LOGDMA("SEARCH: %02x %02x\n", load_byte, match_byte);
+	if (INT_ON_MATCH && load_byte == match_byte)
 	{
-		if (INT_ON_MATCH)
-		{
-			trigger_interrupt(INT_MATCH);
-		}
+		trigger_interrupt(INT_MATCH);
 	}
 }
 
 void z80dma_device::do_write()
 {
-	uint8_t mode;
-
-	mode = TRANSFER_MODE;
-	switch(mode) {
+	switch(TRANSFER_MODE)
+	{
 		case TM_TRANSFER:
 			do_transfer_write();
 			break;
@@ -447,7 +441,7 @@ void z80dma_device::do_write()
 			break;
 
 		default:
-			logerror("z80dma_do_operation: invalid mode %d!\n", mode);
+			logerror("z80dma_do_operation: invalid mode %d!\n", TRANSFER_MODE);
 			break;
 	}
 
@@ -457,140 +451,170 @@ void z80dma_device::do_write()
 	m_byte_counter++;
 }
 
-
-//-------------------------------------------------
-//  timerproc
-//-------------------------------------------------
-
-TIMER_CALLBACK_MEMBER(z80dma_device::timerproc)
+/****************************************************************************
+ * clock_w - raising edge
+ ****************************************************************************/
+TIMER_CALLBACK_MEMBER(z80dma_device::clock_w)
 {
-	if (--m_cur_cycle)
+	switch (m_dma_seq)
 	{
-		return;
-	}
-
-	if (PULSE_GENERATED)
-	{
-		if (m_is_pulse)
-		{
-			m_out_int_cb(CLEAR_LINE);
-			m_is_pulse = false;
-		}
-		else
-		{
-			if ((m_byte_counter & 0xff)==PULSE_CTRL  && is_ready())
+		case SEQ_WAIT_READY:
+			if (is_ready())
 			{
-				m_is_pulse = true;
-				m_out_int_cb(ASSERT_LINE);
+				// Continuos mode only request BUS during start
+				if (OPERATING_MODE != 0b01 || m_byte_counter == 0)
+				{
+					m_dma_seq = SEQ_REQUEST_BUS;
+				}
+				else
+				{
+					m_dma_seq = SEQ_TRANS1_INC_DEC_SOURCE_ADDRESS;
+				}
 			}
-		}
-	}
+			break;
 
-	if (m_is_read && !is_ready()) return;
+		case SEQ_REQUEST_BUS:
+			if (m_busrq_ack == 0)
+			{
+				m_out_busreq_cb(ASSERT_LINE);
+			}
+			m_dma_seq = SEQ_WAITING_ACK;
+			break;
 
-	if (m_is_read)
-	{
-		/* TODO: there's a nasty recursion bug with Alpha for Sharp X1 Turbo on the transfers with this function! */
-		do_read();
-		m_is_read = false;
-		m_cur_cycle = (PORTA_IS_SOURCE ? PORTA_CYCLE_LEN : PORTB_CYCLE_LEN);
-	}
-	else
-	{
-		do_write();
-		m_is_read = true;
-		m_cur_cycle = (PORTB_IS_SOURCE ? PORTA_CYCLE_LEN : PORTB_CYCLE_LEN);
+		case SEQ_WAITING_ACK:
+			if (m_busrq_ack == 1)
+			{
+				m_dma_seq = SEQ_TRANS1_INC_DEC_SOURCE_ADDRESS;
+			}
+			break;
 
-		// param==1 indicates final transfer
-		m_timer->set_param(m_byte_counter == m_count);
-	}
+		case SEQ_TRANS1_INC_DEC_SOURCE_ADDRESS:
+			{
+				if (PULSE_GENERATED && (m_byte_counter & 0xff) == PULSE_CTRL)
+				{
+					m_is_pulse = true;
+					m_out_int_cb(ASSERT_LINE);
+				}
 
-	if (m_is_read && param)
-	{
-		m_dma_enabled = 0; //FIXME: Correct?
-		m_status = 0x09;
+				const attotime clock = clocks_to_attotime(1);
+				const attotime next = clock * (3 - ((PORTA_IS_SOURCE ? PORTA_TIMING : PORTB_TIMING) & 0x03));
+				m_timer->adjust(next, 0, clock);
 
-		m_status |= !is_ready() << 1; // ready line status
+				m_dma_seq = SEQ_TRANS1_READ_SOURCE;
+			}
+			break;
 
-		if(TRANSFER_MODE == TM_TRANSFER)     m_status |= 0x10;   // no match found
+		case SEQ_TRANS1_READ_SOURCE:
+			if (!m_wait)
+			{
+				// TODO: there's a nasty recursion bug with Alpha for Sharp X1 Turbo on the transfers with this function!
+				do_read();
 
-		update_status();
-		LOG("Z80DMA End of Block\n");
+				m_dma_seq = SEQ_TRANS1_INC_DEC_DEST_ADDRESS;
+			}
+			break;
 
-		if (INT_ON_END_OF_BLOCK)
-		{
-			trigger_interrupt(INT_END_OF_BLOCK);
-		}
+		case SEQ_TRANS1_INC_DEC_DEST_ADDRESS:
+			{
+				const attotime clock = clocks_to_attotime(1);
+				const attotime next = clock * (3 - ((PORTB_IS_SOURCE ? PORTA_TIMING : PORTB_TIMING) & 0x03));
+				m_timer->adjust(next, 0, clock);
 
-		if (AUTO_RESTART)
-		{
-			LOG("Z80DMA Auto Restart\n");
+				m_dma_seq = SEQ_TRANS1_WRITE_DEST;
+			}
+			break;
 
-			m_dma_enabled = 1;
-			m_addressA = PORTA_ADDRESS;
-			m_addressB = PORTB_ADDRESS;
-			m_count = BLOCKLEN;
-			m_byte_counter = 0;
-			m_status |= 0x30;
-			m_timer->set_param(0);
-		}
+		case SEQ_TRANS1_WRITE_DEST:
+			if (!m_wait)
+			{
+				// hack?: count=0 cause infinite loop in 'x1turbo40 suikoden' and makes it work.
+				const bool is_final = m_count && m_byte_counter == m_count;
+
+				do_write();
+
+				if (PULSE_GENERATED && m_is_pulse)
+				{
+					m_out_int_cb(CLEAR_LINE);
+					m_is_pulse = false;
+				}
+
+				const u8 mode = is_final ? 0b11 : OPERATING_MODE;
+				switch (mode)
+				{
+					case 0b00: // Byte/Single/byte-at-a-time
+						m_out_busreq_cb(CLEAR_LINE);
+						m_dma_seq = SEQ_WAIT_READY;
+						break;
+
+					case 0b10: // Burst/Demand
+						if (is_ready())
+						{
+							m_dma_seq = SEQ_TRANS1_INC_DEC_SOURCE_ADDRESS;
+						}
+						else
+						{
+							m_out_busreq_cb(CLEAR_LINE);
+							m_dma_seq = SEQ_WAIT_READY;
+						}
+						break;
+
+					case 0b01: // Continuous/Block
+						m_dma_seq = is_ready() ? SEQ_TRANS1_INC_DEC_SOURCE_ADDRESS : SEQ_WAIT_READY;
+						break;
+
+					default: // Undefined || final
+						m_dma_seq = SEQ_FINISH;
+						break;
+				}
+			}
+			break;
+
+		case SEQ_TRANS1_BYTE_MATCH:
+		case SEQ_TRANS1_INC_BYTE_COUNTER:
+		case SEQ_TRANS1_SET_FLAGS:
+		case SEQ_FINISH:
+			disable();
+			m_status = 0x09;
+			m_status |= !is_ready() << 1; // ready line status
+
+			if(TRANSFER_MODE == TM_TRANSFER)     m_status |= 0x10;   // no match found
+
+			LOG("Z80DMA End of Block\n");
+
+			if (INT_ON_END_OF_BLOCK)
+			{
+				trigger_interrupt(INT_END_OF_BLOCK);
+			}
+
+			if (AUTO_RESTART)
+			{
+				LOG("Z80DMA Auto Restart\n");
+
+				m_addressA = PORTA_ADDRESS;
+				m_addressB = PORTB_ADDRESS;
+				m_count = BLOCKLEN;
+				m_byte_counter = 0;
+				m_status |= 0x30;
+				enable();
+			}
+			break;
+
+		default:
+			break;
 	}
 }
 
 
-//-------------------------------------------------
-//  update_status - update DMA status
-//-------------------------------------------------
+/****************************************************************************
+ * READ/WRITE INTERFACES
+ ****************************************************************************/
 
-void z80dma_device::update_status()
+/****************************************************************************
+ * read - register read
+ ****************************************************************************/
+u8 z80dma_device::read()
 {
-	// no transfer is active right now; is there a transfer pending right now?
-	bool const pending_transfer = is_ready() && m_dma_enabled;
-
-	if (pending_transfer)
-	{
-		m_is_read = true;
-		m_cur_cycle = (PORTA_IS_SOURCE ? PORTA_CYCLE_LEN : PORTB_CYCLE_LEN);
-		attotime const next = attotime::from_hz(clock());
-		m_timer->adjust(
-			attotime::zero,
-			m_timer->param(),
-			// 1 byte transferred in 4 clock cycles
-			next);
-	}
-	else
-	{
-		if (m_is_read)
-		{
-			// no transfers active right now
-			m_timer->reset();
-		}
-	}
-
-	// set the busreq line
-	m_out_busreq_cb(pending_transfer ? ASSERT_LINE : CLEAR_LINE);
-}
-
-
-
-//**************************************************************************
-//  READ/WRITE INTERFACES
-//**************************************************************************
-
-//-------------------------------------------------
-//  read - register read
-//-------------------------------------------------
-
-uint8_t z80dma_device::read()
-{
-	uint8_t res;
-
-	if(m_read_num_follow == 0) // special case: Legend of Kage on X1 Turbo
-		res = m_status;
-	else {
-		res = m_read_regs_follow[m_read_cur_follow];
-	}
-
+	const u8 res = m_read_regs_follow[m_read_cur_follow];
 	m_read_cur_follow++;
 
 	if(m_read_cur_follow >= m_read_num_follow)
@@ -601,12 +625,10 @@ uint8_t z80dma_device::read()
 	return res;
 }
 
-
-//-------------------------------------------------
-//  write - register write
-//-------------------------------------------------
-
-void z80dma_device::write(uint8_t data)
+/****************************************************************************
+ * write - register write
+ ****************************************************************************/
+void z80dma_device::write(u8 data)
 {
 	if (m_num_follow == 0)
 	{
@@ -647,6 +669,11 @@ void z80dma_device::write(uint8_t data)
 				m_regs_follow[m_num_follow++] = GET_REGNUM(MASK_BYTE);
 			if (data & 0x10)
 				m_regs_follow[m_num_follow++] = GET_REGNUM(MATCH_BYTE);
+
+			if (BIT(data, 6))
+			{
+				enable();
+			}
 		}
 		else if ((data & 0x83) == 0x81) // WR4
 		{
@@ -667,8 +694,6 @@ void z80dma_device::write(uint8_t data)
 		else if ((data & 0x83) == 0x83) // WR6
 		{
 			LOG("Z80DMA WR6 %02x\n", data);
-			m_dma_enabled = 0;
-
 			WR6 = data;
 
 			switch (data)
@@ -691,30 +716,33 @@ void z80dma_device::write(uint8_t data)
 				case COMMAND_INITIATE_READ_SEQUENCE:
 					LOG("Z80DMA Initiate Read Sequence\n");
 					m_read_cur_follow = m_read_num_follow = 0;
-					if(READ_MASK & 0x01) { m_read_regs_follow[m_read_num_follow++] = m_status; }
-					if(READ_MASK & 0x02) { m_read_regs_follow[m_read_num_follow++] = m_byte_counter & 0xff; } //byte counter (low)
-					if(READ_MASK & 0x04) { m_read_regs_follow[m_read_num_follow++] = m_byte_counter >> 8; } //byte counter (high)
-					if(READ_MASK & 0x08) { m_read_regs_follow[m_read_num_follow++] = m_addressA & 0xff; } //port A address (low)
-					if(READ_MASK & 0x10) { m_read_regs_follow[m_read_num_follow++] = m_addressA >> 8; } //port A address (high)
-					if(READ_MASK & 0x20) { m_read_regs_follow[m_read_num_follow++] = m_addressB & 0xff; } //port B address (low)
-					if(READ_MASK & 0x40) { m_read_regs_follow[m_read_num_follow++] = m_addressB >> 8; } //port B address (high)
+					if (READ_MASK & 0x01) { m_read_regs_follow[m_read_num_follow++] = m_status; }
+					if (READ_MASK & 0x02) { m_read_regs_follow[m_read_num_follow++] = m_byte_counter & 0xff; } //byte counter (low)
+					if (READ_MASK & 0x04) { m_read_regs_follow[m_read_num_follow++] = m_byte_counter >> 8; } //byte counter (high)
+					if (READ_MASK & 0x08) { m_read_regs_follow[m_read_num_follow++] = m_addressA & 0xff; } //port A address (low)
+					if (READ_MASK & 0x10) { m_read_regs_follow[m_read_num_follow++] = m_addressA >> 8; } //port A address (high)
+					if (READ_MASK & 0x20) { m_read_regs_follow[m_read_num_follow++] = m_addressB & 0xff; } //port B address (low)
+					if (READ_MASK & 0x40) { m_read_regs_follow[m_read_num_follow++] = m_addressB >> 8; } //port B address (high)
 					break;
 				case COMMAND_RESET:
 					LOG("Z80DMA Reset\n");
-					m_dma_enabled = 0;
+					disable();
 					m_force_ready = 0;
 					m_ip = 0;
 					m_ius = 0;
 					interrupt_check();
 					// Needs six reset commands to reset the DMA
 					{
-						uint8_t WRi;
+						u8 WRi;
 
-						for(WRi=0;WRi<7;WRi++)
+						for (WRi = 0; WRi < 7; WRi++)
 							REG(WRi,m_reset_pointer) = 0;
 
 						m_reset_pointer++;
-						if(m_reset_pointer >= 6) { m_reset_pointer = 0; }
+						if (m_reset_pointer >= 6)
+						{
+							m_reset_pointer = 0;
+						}
 					}
 					m_status = 0x38;
 					break;
@@ -725,17 +753,16 @@ void z80dma_device::write(uint8_t data)
 					m_count = BLOCKLEN;
 					m_byte_counter = 0;
 					m_status |= 0x30;
-					m_timer->set_param(0);
 
 					LOG("Z80DMA Load A: %x B: %x N: %x\n", m_addressA, m_addressB, m_count);
 					break;
 				case COMMAND_DISABLE_DMA:
 					LOG("Z80DMA Disable DMA\n");
-					m_dma_enabled = 0;
+					disable();
 					break;
 				case COMMAND_ENABLE_DMA:
 					LOG("Z80DMA Enable DMA\n");
-					m_dma_enabled = 1;
+					enable();
 					break;
 				case COMMAND_READ_MASK_FOLLOWS:
 					LOG("Z80DMA Set Read Mask\n");
@@ -745,10 +772,9 @@ void z80dma_device::write(uint8_t data)
 					LOG("Z80DMA Continue\n");
 					m_count = BLOCKLEN;
 					m_byte_counter = 0;
-					m_dma_enabled = 1;
+					//enable(); //???m_dma_enabled = 1;
 					//"match not found" & "end of block" status flags zeroed here
 					m_status |= 0x30;
-					m_timer->set_param(0);
 					break;
 				case COMMAND_RESET_PORT_A_TIMING:
 					LOG("Z80DMA Reset Port A Timing\n");
@@ -782,9 +808,8 @@ void z80dma_device::write(uint8_t data)
 				default:
 					logerror("Z80DMA Unknown WR6 command %02x\n", data);
 			}
-			update_status();
 		}
-		else if(data == 0x8e) //newtype on Sharp X1, unknown purpose
+		else if (data == 0x8e) //newtype on Sharp X1, unknown purpose
 			logerror("Z80DMA Unknown base register %02x\n", data);
 		else
 			fatalerror("Z80DMA '%s' Unknown base register %02x\n", tag(), data);
@@ -797,7 +822,7 @@ void z80dma_device::write(uint8_t data)
 		int nreg = m_regs_follow[m_cur_follow];
 		m_regs[nreg] = data;
 		m_cur_follow++;
-		if (m_cur_follow>=m_num_follow)
+		if (m_cur_follow >= m_num_follow)
 			m_num_follow = 0;
 		if (nreg == REGNUM(4,3))
 		{
@@ -812,32 +837,31 @@ void z80dma_device::write(uint8_t data)
 		{
 			m_read_cur_follow = m_read_num_follow = 0;
 
-			if(READ_MASK & 0x01) { m_read_regs_follow[m_read_num_follow++] = m_status; }
-			if(READ_MASK & 0x02) { m_read_regs_follow[m_read_num_follow++] = m_byte_counter & 0xff; } //byte counter (low)
-			if(READ_MASK & 0x04) { m_read_regs_follow[m_read_num_follow++] = m_byte_counter >> 8; } //byte counter (high)
-			if(READ_MASK & 0x08) { m_read_regs_follow[m_read_num_follow++] = m_addressA & 0xff; } //port A address (low)
-			if(READ_MASK & 0x10) { m_read_regs_follow[m_read_num_follow++] = m_addressA >> 8; } //port A address (high)
-			if(READ_MASK & 0x20) { m_read_regs_follow[m_read_num_follow++] = m_addressB & 0xff; } //port B address (low)
-			if(READ_MASK & 0x40) { m_read_regs_follow[m_read_num_follow++] = m_addressB >> 8; } //port B address (high)
+			if (READ_MASK & 0x01) { m_read_regs_follow[m_read_num_follow++] = m_status; }
+			if (READ_MASK & 0x02) { m_read_regs_follow[m_read_num_follow++] = m_byte_counter & 0xff; } //byte counter (low)
+			if (READ_MASK & 0x04) { m_read_regs_follow[m_read_num_follow++] = m_byte_counter >> 8; } //byte counter (high)
+			if (READ_MASK & 0x08) { m_read_regs_follow[m_read_num_follow++] = m_addressA & 0xff; } //port A address (low)
+			if (READ_MASK & 0x10) { m_read_regs_follow[m_read_num_follow++] = m_addressA >> 8; } //port A address (high)
+			if (READ_MASK & 0x20) { m_read_regs_follow[m_read_num_follow++] = m_addressB & 0xff; } //port B address (low)
+			if (READ_MASK & 0x40) { m_read_regs_follow[m_read_num_follow++] = m_addressB >> 8; } //port B address (high)
 		}
 
 		m_reset_pointer++;
-		if(m_reset_pointer >= 6) { m_reset_pointer = 0; }
+		if (m_reset_pointer >= 6)
+		{
+			m_reset_pointer = 0;
+		}
 	}
 }
 
-
-//-------------------------------------------------
-//  rdy_write_callback - deferred RDY signal write
-//-------------------------------------------------
-
+/****************************************************************************
+ * rdy_write_callback - deferred RDY signal write
+ ****************************************************************************/
 TIMER_CALLBACK_MEMBER(z80dma_device::rdy_write_callback)
 {
 	// normalize state
 	m_rdy = param;
 	m_status = (m_status & 0xFD) | (!is_ready() << 1);
-
-	update_status();
 
 	if (is_ready() && INT_ON_READY)
 	{
@@ -845,31 +869,19 @@ TIMER_CALLBACK_MEMBER(z80dma_device::rdy_write_callback)
 	}
 }
 
-
-//-------------------------------------------------
-//  rdy_w - ready input
-//-------------------------------------------------
-
+/****************************************************************************
+ * rdy_w - ready input
+ ****************************************************************************/
 void z80dma_device::rdy_w(int state)
 {
 	LOG("Z80DMA RDY: %d Active High: %d\n", state, READY_ACTIVE_HIGH);
 	machine().scheduler().synchronize(timer_expired_delegate(FUNC(z80dma_device::rdy_write_callback),this), state);
 }
 
-
-//-------------------------------------------------
-//  wait_w - wait input
-//-------------------------------------------------
-
-void z80dma_device::wait_w(int state)
-{
-}
-
-
-//-------------------------------------------------
-//  bai_w - bus acknowledge input
-//-------------------------------------------------
-
+/****************************************************************************
+ * bai_w - bus acknowledge input
+ ****************************************************************************/
 void z80dma_device::bai_w(int state)
 {
+	m_busrq_ack = state;
 }

@@ -63,8 +63,8 @@ public:
 	void tvc(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<address_map_bank_device> m_bank1;
@@ -114,11 +114,11 @@ protected:
 
 	void tvc_palette(palette_device &palette) const;
 
-	void tvc_mem(address_map &map);
-	void tvc_bank1(address_map &map);
-	void tvc_bank3(address_map &map);
-	void tvc_bank4(address_map &map);
-	void tvc_io(address_map &map);
+	void tvc_mem(address_map &map) ATTR_COLD;
+	void tvc_bank1(address_map &map) ATTR_COLD;
+	void tvc_bank3(address_map &map) ATTR_COLD;
+	void tvc_bank4(address_map &map) ATTR_COLD;
+	void tvc_io(address_map &map) ATTR_COLD;
 };
 
 class tvc64p_state : public tvc_state
@@ -133,15 +133,15 @@ public:
 	void tvc64p(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	void vram_bank_w(uint8_t data);
 
-	void bank1_64p(address_map &map);
-	void bank3_64p(address_map &map);
-	void io_64p(address_map &map);
+	void bank1_64p(address_map &map) ATTR_COLD;
+	void bank3_64p(address_map &map) ATTR_COLD;
+	void io_64p(address_map &map) ATTR_COLD;
 
 	required_memory_bank m_vram_bank1;
 	required_memory_bank m_vram_bank3;

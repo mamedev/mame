@@ -349,6 +349,7 @@ public:
 		m_screen(*this, "screen"),
 		m_alpha_8201(*this, "alpha_8201"),
 		m_mainlatch(*this, "mainlatch"),
+		m_in(*this, "IN%u", 0U),
 		m_bg_videoram(*this, "bg_videoram"),
 		m_fg_videoram(*this, "fg_videoram", 0x800, ENDIANNESS_BIG),
 		m_spriteram(*this, "spriteram")
@@ -366,14 +367,15 @@ protected:
 	required_device<screen_device> m_screen;
 	required_device<alpha_8201_device> m_alpha_8201;
 	required_device<ls259_device> m_mainlatch;
+	required_ioport_array<2> m_in;
 
 	// memory pointers
 	required_shared_ptr<uint16_t> m_bg_videoram;
 	memory_share_creator<uint8_t> m_fg_videoram;
 	required_shared_ptr<uint16_t> m_spriteram;
 
-	virtual void machine_start() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 	uint16_t spriteram_kludge_r();
 	uint8_t fg_videoram_r(offs_t offset);
@@ -391,9 +393,9 @@ protected:
 	void unpack_block(const char *region, int offset, int size);
 	void unpack_region(const char *region);
 
-	void bngotime_map(address_map &map);
-	void equites_map(address_map &map);
-	void common_map(address_map &map);
+	void bngotime_map(address_map &map) ATTR_COLD;
+	void equites_map(address_map &map) ATTR_COLD;
+	void common_map(address_map &map) ATTR_COLD;
 
 	tilemap_t *m_fg_tilemap = nullptr;
 	tilemap_t *m_bg_tilemap = nullptr;
@@ -412,10 +414,10 @@ public:
 	void gekisou(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
-	void gekisou_map(address_map &map);
+	void gekisou_map(address_map &map) ATTR_COLD;
 	void unknown_bit_w(offs_t offset, uint16_t data);
 
 	int m_unknown_bit = 0;
@@ -635,9 +637,9 @@ void equites_state::common_map(address_map &map)
 	map(0x100000, 0x1001ff).ram().share("spriteram");
 	map(0x100000, 0x100001).r(FUNC(equites_state::spriteram_kludge_r));
 	map(0x140000, 0x1407ff).rw(m_alpha_8201, FUNC(alpha_8201_device::ext_ram_r), FUNC(alpha_8201_device::ext_ram_w)).umask16(0x00ff);
-	map(0x180000, 0x180001).portr("IN1");
+	map(0x180000, 0x180001).portr(m_in[1]);
 	map(0x180000, 0x180000).select(0x03c000).lw8(NAME([this] (offs_t offset, u8 data) { m_mainlatch->write_a3(offset >> 14); }));
-	map(0x1c0000, 0x1c0001).portr("IN0").w(FUNC(equites_state::scrollreg_w));
+	map(0x1c0000, 0x1c0001).portr(m_in[0]).w(FUNC(equites_state::scrollreg_w));
 	map(0x380000, 0x380000).w(FUNC(equites_state::bgcolor_w));
 	map(0x780000, 0x780001).w("watchdog", FUNC(watchdog_timer_device::reset16_w));
 }
@@ -741,7 +743,7 @@ static INPUT_PORTS_START( gekisou )
 	PORT_BIT( 0x1000, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x2000, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x4000, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(gekisou_state, unknown_bit_r)
+	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(gekisou_state::unknown_bit_r))
 
 	/* this is actually a variable resistor */
 	PORT_START(FRQ_ADJUSTER_TAG)

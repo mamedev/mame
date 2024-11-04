@@ -30,9 +30,9 @@ public:
 	auto spi_out_cb() { return m_spi_out_cb.bind(); }
 	auto spi_out_dir_cb() { return m_spi_out_dir_cb.bind(); }
 
-	void program_internal(address_map &map);
-	void data_internal(address_map &map);
-	void io_internal(address_map &map);
+	void program_internal(address_map &map) ATTR_COLD;
+	void data_internal(address_map &map) ATTR_COLD;
+	void io_internal(address_map &map) ATTR_COLD;
 
 protected:
 	// construction/destruction
@@ -40,13 +40,12 @@ protected:
 	axc51base_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, address_map_constructor program_map, address_map_constructor data_map, address_map_constructor io_map, int program_width, int data_width, uint8_t features = 0);
 
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// device_execute_interface overrides
 	virtual uint32_t execute_min_cycles() const noexcept override { return 1; }
 	virtual uint32_t execute_max_cycles() const noexcept override { return 20; }
-	virtual uint32_t execute_input_lines() const noexcept override { return 6; }
 	virtual void execute_run() override;
 	virtual void execute_set_input(int inputnum, int state) override;
 
@@ -524,12 +523,12 @@ public:
 protected:
 	ax208_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual void device_reset() override;
+	virtual void device_reset() override ATTR_COLD;
 
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
-	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 
-	void ax208_internal_program_mem(address_map &map);
+	void ax208_internal_program_mem(address_map &map) ATTR_COLD;
 };
 
 class ax208p_cpu_device : public ax208_cpu_device
@@ -539,7 +538,7 @@ public:
 	ax208p_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
-	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 };
 
 

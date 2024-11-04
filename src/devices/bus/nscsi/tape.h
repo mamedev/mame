@@ -23,11 +23,11 @@ protected:
 	nscsi_tape_device(const machine_config &config, device_type type, const char *tag, device_t *owner, u32 clock);
 
 	// device_t implementation
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 	// nscsi_full_device implementation
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 	virtual void scsi_command() override;
 	virtual u8 scsi_get_data(int id, int pos) override;
 	virtual void scsi_put_data(int id, int pos, u8 data) override;

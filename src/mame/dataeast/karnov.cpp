@@ -128,8 +128,8 @@ public:
 	void karnovjbl(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -160,13 +160,13 @@ private:
 	DECLARE_VIDEO_START(wndrplnt);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void base_sound_map(address_map &map);
-	void chelnovjbl_mcu_map(address_map &map);
-	void chelnovjbl_mcu_io_map(address_map &map);
-	void karnov_map(address_map &map);
-	void karnovjbl_map(address_map &map);
-	void karnov_sound_map(address_map &map);
-	void karnovjbl_sound_map(address_map &map);
+	void base_sound_map(address_map &map) ATTR_COLD;
+	void chelnovjbl_mcu_map(address_map &map) ATTR_COLD;
+	void chelnovjbl_mcu_io_map(address_map &map) ATTR_COLD;
+	void karnov_map(address_map &map) ATTR_COLD;
+	void karnovjbl_map(address_map &map) ATTR_COLD;
+	void karnov_sound_map(address_map &map) ATTR_COLD;
+	void karnovjbl_sound_map(address_map &map) ATTR_COLD;
 
 	void screen_vblank(int state);
 	// protection mcu
@@ -395,9 +395,9 @@ static INPUT_PORTS_START( common )
 
 	PORT_START("COIN")
 	PORT_BIT( 0x1f, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1 )    PORT_WRITE_LINE_DEVICE_MEMBER("coin", input_merger_device, in_w<0>)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2 )    PORT_WRITE_LINE_DEVICE_MEMBER("coin", input_merger_device, in_w<1>)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_WRITE_LINE_DEVICE_MEMBER("coin", input_merger_device, in_w<2>)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1 )    PORT_WRITE_LINE_DEVICE_MEMBER("coin", FUNC(input_merger_device::in_w<0>))
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2 )    PORT_WRITE_LINE_DEVICE_MEMBER("coin", FUNC(input_merger_device::in_w<1>))
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_WRITE_LINE_DEVICE_MEMBER("coin", FUNC(input_merger_device::in_w<2>))
 INPUT_PORTS_END
 
 /* verified from M68000 code */

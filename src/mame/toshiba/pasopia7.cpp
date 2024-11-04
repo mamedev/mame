@@ -82,9 +82,9 @@ public:
 	void init_p7_raster();
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	uint8_t vram_r(offs_t offset);
@@ -114,8 +114,8 @@ private:
 	void p7_lcd_palette(palette_device &palette) const;
 	MC6845_UPDATE_ROW(update_row);
 
-	void pasopia7_io(address_map &map);
-	void pasopia7_mem(address_map &map);
+	void pasopia7_io(address_map &map) ATTR_COLD;
+	void pasopia7_mem(address_map &map) ATTR_COLD;
 
 	std::unique_ptr<uint8_t[]> m_work_ram;
 	std::unique_ptr<uint8_t[]> m_vram;

@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0-1.0
+-->
+<softwarelist name="bmjr_cass" description="Hitachi Basic Master Jr. cassettes">
+
+	<!-- TODO: compatible with Basic Master LV2 too -->
+	<software name="wilwesp" supported="yes">
+		<!-- Capitalized as WILWESP on Micom Basic printout, wILwESP in-game -->
+		<description>Wilwesp</description>
+		<year>1984</year>
+		<publisher>Micom BASIC</publisher>
+		<info name="usage" value="LOAD WILWSP then RUN" />
+		<info name="author" value="Orange Juice"/>
+		<part name="cass" interface="bmjr_cass">
+			<dataarea name="cass" size="23584812">
+				<rom name="wilwesp.wav" size="23584812" crc="d46d46e6" sha1="32494926110bdb015e85d18dff2ea7b2f6d58580"/>
+			</dataarea>
+		</part>
+	</software>
+</softwarelist>

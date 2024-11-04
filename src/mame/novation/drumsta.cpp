@@ -27,8 +27,8 @@ public:
 	void drumsta(machine_config &config);
 
 private:
-	void drumsta_prog(address_map &map);
-	void drumsta_data(address_map &map);
+	void drumsta_prog(address_map &map) ATTR_COLD;
+	void drumsta_data(address_map &map) ATTR_COLD;
 
 	required_device<mn1880_device> m_maincpu;
 	required_device<adsp2181_device> m_dsp;

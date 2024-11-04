@@ -149,7 +149,7 @@ public:
 	void init_tbonusal();
 
 protected:
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	void ss9601_byte_lo_w(uint8_t data);
@@ -227,17 +227,17 @@ private:
 	TILE_GET_INFO_MEMBER(ss9601_get_tile_info_1);
 	uint32_t screen_update_subsino2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void bishjan_map(address_map &map);
-	void mtrain_io(address_map &map);
-	void mtrain_base_map(address_map &map);
-	void mtrain_map(address_map &map);
-	void tbonusal_map(address_map &map);
-	void new2001_map(address_map &map);
-	void ramdac_map(address_map &map);
-	void saklove_io(address_map &map);
-	void saklove_map(address_map &map);
-	void xplan_io(address_map &map);
-	void xplan_map(address_map &map);
+	void bishjan_map(address_map &map) ATTR_COLD;
+	void mtrain_io(address_map &map) ATTR_COLD;
+	void mtrain_base_map(address_map &map) ATTR_COLD;
+	void mtrain_map(address_map &map) ATTR_COLD;
+	void tbonusal_map(address_map &map) ATTR_COLD;
+	void new2001_map(address_map &map) ATTR_COLD;
+	void ramdac_map(address_map &map) ATTR_COLD;
+	void saklove_io(address_map &map) ATTR_COLD;
+	void saklove_map(address_map &map) ATTR_COLD;
+	void xplan_io(address_map &map) ATTR_COLD;
+	void xplan_map(address_map &map) ATTR_COLD;
 
 	virtual void machine_start() override { m_leds.resolve(); }
 
@@ -1513,7 +1513,7 @@ static INPUT_PORTS_START( bishjan )
 	PORT_START("SYSTEM") // IN A
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN        )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE        )   PORT_IMPULSE(1) // service mode (press twice for inputs)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_CUSTOM        )   PORT_READ_LINE_DEVICE_MEMBER("hopper", ticket_dispenser_device, line_r) // hopper sensor
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_CUSTOM        )   PORT_READ_LINE_DEVICE_MEMBER("hopper", FUNC(ticket_dispenser_device::line_r)) // hopper sensor
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE1       )   // stats
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE2       )   // pay out? "hopper empty"
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1          )   PORT_IMPULSE(2) // coin
@@ -1752,7 +1752,7 @@ static INPUT_PORTS_START( expcard )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER        ) PORT_NAME("Reset") PORT_CODE(KEYCODE_F1)  // reset
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN      )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OTHER       ) // serial out
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM      ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", ds2430a_device, data_r)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM      ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", FUNC(ds2430a_device::data_r))
 INPUT_PORTS_END
 
 /***************************************************************************
@@ -1896,7 +1896,7 @@ static INPUT_PORTS_START( mtrain )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_OTHER   ) PORT_NAME("Reset") PORT_CODE(KEYCODE_F1)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW,  IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM  ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", ds2430a_device, data_r) // serial in
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM  ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", FUNC(ds2430a_device::data_r)) // serial in
 INPUT_PORTS_END
 
 /***************************************************************************
@@ -2043,7 +2043,7 @@ static INPUT_PORTS_START( strain ) // inputs need verifying
 	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_OTHER   ) PORT_NAME("Reset") PORT_CODE(KEYCODE_F1)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW,  IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM  ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", ds2430a_device, data_r) // serial in
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM  ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", FUNC(ds2430a_device::data_r)) // serial in
 INPUT_PORTS_END
 
 /***************************************************************************
@@ -2190,7 +2190,7 @@ static INPUT_PORTS_START( tbonusal ) // inputs need verifying
 	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_OTHER   ) PORT_NAME("Reset") PORT_CODE(KEYCODE_F1)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW,  IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM  ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", ds2430a_device, data_r) // serial in
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM  ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", FUNC(ds2430a_device::data_r)) // serial in
 INPUT_PORTS_END
 
 /***************************************************************************
@@ -2321,7 +2321,7 @@ static INPUT_PORTS_START( saklove )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER    ) PORT_NAME("Reset") PORT_CODE(KEYCODE_F1)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN  )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OTHER   ) // serial out
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM  ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", ds2430a_device, data_r) // serial in
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM  ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", FUNC(ds2430a_device::data_r)) // serial in
 INPUT_PORTS_END
 
 /***************************************************************************
@@ -2471,7 +2471,7 @@ static INPUT_PORTS_START( treacity )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER    ) PORT_NAME("Reset") PORT_CODE(KEYCODE_F1)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN  )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OTHER   ) // serial out
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM  ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", ds2430a_device, data_r) // serial in
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM  ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", FUNC(ds2430a_device::data_r)) // serial in
 INPUT_PORTS_END
 
 /***************************************************************************
@@ -2539,7 +2539,7 @@ static INPUT_PORTS_START( xplan )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER         ) PORT_NAME("Reset") PORT_CODE(KEYCODE_F1)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN       )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OTHER        ) // serial out
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM       ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", ds2430a_device, data_r) // serial in
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM       ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", FUNC(ds2430a_device::data_r)) // serial in
 INPUT_PORTS_END
 
 /***************************************************************************
@@ -2601,18 +2601,18 @@ static INPUT_PORTS_START( xtrain )
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_UNKNOWN)
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_UNKNOWN)
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_UNKNOWN)
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_CUSTOM)  PORT_READ_LINE_DEVICE_MEMBER("hopper", ticket_dispenser_device, line_r)
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_CUSTOM)  PORT_READ_LINE_DEVICE_MEMBER("hopper", FUNC(ticket_dispenser_device::line_r))
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_OTHER)   PORT_NAME("Reset") PORT_CODE(KEYCODE_F1)
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_UNKNOWN)
 	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_OTHER) // serial out
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_READ_LINE_DEVICE_MEMBER("eeprom", ds2430a_device, data_r) // serial in
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_READ_LINE_DEVICE_MEMBER("eeprom", FUNC(ds2430a_device::data_r)) // serial in
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( ptrain )
 	PORT_INCLUDE(xtrain)
 
 	PORT_MODIFY("IN-B")
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_CUSTOM) PORT_READ_LINE_DEVICE_MEMBER("ticket", ticket_dispenser_device, line_r)
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_CUSTOM) PORT_READ_LINE_DEVICE_MEMBER("ticket", FUNC(ticket_dispenser_device::line_r))
 INPUT_PORTS_END
 
 
@@ -2757,7 +2757,7 @@ static INPUT_PORTS_START( wtrnymph )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_OTHER   ) PORT_NAME("Reset") PORT_CODE(KEYCODE_F1)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW,  IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM  ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", ds2430a_device, data_r) // serial in
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM  ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", FUNC(ds2430a_device::data_r)) // serial in
 INPUT_PORTS_END
 
 
@@ -2787,7 +2787,7 @@ void subsino2_state::bishjan(machine_config &config)
 	io.in_port_callback<9>().set_ioport("RESET");
 	io.out_port_callback<9>().set(FUNC(subsino2_state::bishjan_outputs_w));
 
-	TICKET_DISPENSER(config, m_hopper, attotime::from_msec(200), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH);
+	TICKET_DISPENSER(config, m_hopper, attotime::from_msec(200));
 
 	DS2430A(config, m_eeprom).set_timing_scale(0.24);
 
@@ -3028,14 +3028,14 @@ void subsino2_state::xtrain(machine_config &config)
 	io.out_port_callback<8>().set(FUNC(subsino2_state::xtrain_out_b_w)); // B
 	io.out_port_callback<9>().set(FUNC(subsino2_state::xtrain_out_a_w)); // A
 
-	HOPPER(config, m_hopper, attotime::from_msec(200), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH);
+	HOPPER(config, m_hopper, attotime::from_msec(200));
 }
 
 void subsino2_state::ptrain(machine_config &config)
 {
 	xtrain(config);
 
-	TICKET_DISPENSER(config, m_ticket, attotime::from_msec(200), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH);
+	TICKET_DISPENSER(config, m_ticket, attotime::from_msec(200));
 }
 
 void subsino2_state::expcard(machine_config &config)

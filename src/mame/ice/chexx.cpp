@@ -123,7 +123,7 @@ public:
 	void lamp_w(uint8_t data);
 
 	void chexx(machine_config &config);
-	void mem(address_map &map);
+	void mem(address_map &map) ATTR_COLD;
 
 protected:
 	TIMER_CALLBACK_MEMBER(update);
@@ -132,8 +132,8 @@ protected:
 	void digitalker_set_bank(uint8_t bank);
 
 	// driver_device overrides
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	// devices
 	required_device<cpu_device> m_maincpu;
@@ -170,7 +170,7 @@ public:
 protected:
 	void ay_w(offs_t offset, uint8_t data);
 
-	void mem(address_map &map);
+	void mem(address_map &map) ATTR_COLD;
 
 	required_device<ay8910_device> m_aysnd; // only faceoffh
 	uint8_t m_ay_cmd = 0;

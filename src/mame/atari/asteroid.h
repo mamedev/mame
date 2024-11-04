@@ -76,8 +76,8 @@ public:
 	void init_asterock();
 	void init_asteroidb();
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 	void asteroid_base(machine_config &config);
 	void asterock(machine_config &config);
 	void asteroid(machine_config &config);
@@ -86,9 +86,9 @@ public:
 	void asteroid_sound(machine_config &config);
 	void astdelux_sound(machine_config &config);
 	void llander_sound(machine_config &config);
-	void astdelux_map(address_map &map);
-	void asteroid_map(address_map &map);
-	void llander_map(address_map &map);
+	void astdelux_map(address_map &map) ATTR_COLD;
+	void asteroid_map(address_map &map) ATTR_COLD;
+	void llander_map(address_map &map) ATTR_COLD;
 };
 
 #endif // MAME_ATARI_ASTEROID_H

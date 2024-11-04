@@ -69,9 +69,9 @@ public:
 		{ }
 
 	void barni(machine_config &config);
-	void audiocpu_map(address_map &map);
-	void maincpu_map(address_map &map);
-	void subcpu_map(address_map &map);
+	void audiocpu_map(address_map &map) ATTR_COLD;
+	void maincpu_map(address_map &map) ATTR_COLD;
+	void subcpu_map(address_map &map) ATTR_COLD;
 private:
 	u8 soundcmd_r();
 	u8 set_firq();
@@ -84,7 +84,7 @@ private:
 	u8 m_via_pa = 0U;
 	u8 m_bitcount = 0U;
 	u8 m_soundcmd = 0U;
-	//void machine_reset() override;
+	//void machine_reset() override ATTR_COLD;
 	void machine_start() override { m_digits.resolve(); }
 	required_device<mc6809e_device> m_maincpu;
 	required_device<mc6809e_device> m_subcpu;

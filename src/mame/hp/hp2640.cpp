@@ -189,8 +189,8 @@ protected:
 		CHARGEN_E = 0x10
 	};
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	IRQ_CALLBACK_MEMBER(irq_callback);
 
@@ -223,8 +223,8 @@ protected:
 
 	uint8_t poll_r();
 
-	void cpu_mem_map(address_map &map);
-	void cpu_io_map(address_map &map);
+	void cpu_mem_map(address_map &map) ATTR_COLD;
+	void cpu_io_map(address_map &map) ATTR_COLD;
 
 	required_device<i8080a_cpu_device> m_cpu;
 	required_device<timer_device> m_timer_10ms;
@@ -1159,7 +1159,7 @@ public:
 	void hp2641(machine_config &config);
 
 protected:
-	void cpu_mem_map(address_map &map);
+	void cpu_mem_map(address_map &map) ATTR_COLD;
 };
 
 hp2641_state::hp2641_state(const machine_config &mconfig, device_type type, const char *tag)

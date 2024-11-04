@@ -52,8 +52,8 @@ private:
 	required_device<pit68230_device> m_pit;
 	required_device<msm58321_device> m_rtc;
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	void m68k_reset_callback(int state);
 	u32 buserror_r();
@@ -68,7 +68,7 @@ private:
 		m_maincpu->set_input_line(M68K_IRQ_4, state);
 	}
 
-	void micro20_map(address_map &map);
+	void micro20_map(address_map &map) ATTR_COLD;
 
 	u8 m_tin;
 	u8 m_h4;

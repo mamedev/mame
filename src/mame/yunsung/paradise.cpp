@@ -144,9 +144,9 @@ public:
 	void init_tgtball();
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	// devices
@@ -202,12 +202,12 @@ private:
 
 	void update_pix_palbank();
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void base_map(address_map &map);
-	void paradise_io_map(address_map &map);
-	void paradise_map(address_map &map);
-	void tgtball_map(address_map &map);
-	void torus_io_map(address_map &map);
-	void torus_map(address_map &map);
+	void base_map(address_map &map) ATTR_COLD;
+	void paradise_io_map(address_map &map) ATTR_COLD;
+	void paradise_map(address_map &map) ATTR_COLD;
+	void tgtball_map(address_map &map) ATTR_COLD;
+	void torus_io_map(address_map &map) ATTR_COLD;
+	void torus_map(address_map &map) ATTR_COLD;
 };
 
 

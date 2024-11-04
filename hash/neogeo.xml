@@ -11622,7 +11622,36 @@ license:CC0-1.0
 	</software>
 
 	<software name="gladmort">
-		<description>Gladmort (demo)</description>
+		<description>GladMort (demo²)</description>
+		<year>2024</year>
+		<publisher>PixelHeart</publisher>
+		<sharedfeat name="release" value="MVS,AES" />
+		<sharedfeat name="compatibility" value="MVS,AES" />
+		<part name="cart" interface="neo_cart">
+			<dataarea name="maincpu" width="16" endianness="big" size="0x100000">
+				<rom loadflag="load16_word_swap" name="dod-p1.bin" offset="0x000000" size="0x100000" crc="d7712425" sha1="eb9c32b584a600cc67784113cd87629c3eab4e1c" />
+			</dataarea>
+			<dataarea name="fixed" size="0x020000">
+				<rom offset="0x000000" size="0x020000" name="dod-s1.bin" crc="8304be52" sha1="fbeaee12553709e54e7f5134dfd2ff96df5fdee0" />
+			</dataarea>
+			<dataarea name="audiocpu" size="0x010000">
+				<rom offset="0x000000" size="0x010000" name="dod-m1.bin" crc="0dfddae3" sha1="4bfa6af6874510d1da95badee1bd23d3be853461" />
+			</dataarea>
+			<dataarea name="ymsnd:adpcma" size="0x1000000">
+				<rom name="dod-v1.bin" offset="0x000000" size="0x400000" crc="3b5e1408" sha1="90cc923273d002819228cde8bdc57d76915b52f1" />
+				<rom name="dod-v2.bin" offset="0x400000" size="0x400000" crc="d44f004d" sha1="bfb652111b1d065d48833034ab0333e69af9c947" />
+				<rom name="dod-v3.bin" offset="0x800000" size="0x400000" crc="e9e8de2f" sha1="2a480f925073776308c07b6d4cc2334115bc17f2" />
+				<rom name="dod-v4.bin" offset="0xc00000" size="0x400000" crc="aaf3f4e2" sha1="9e126db19a98de4bd0c649f7a655e1e79cc236ed" />
+			</dataarea>
+			<dataarea name="sprites" size="0x2800000">
+				<rom loadflag="load16_byte" name="dod-c1.bin" offset="0x000000" size="0x1400000" crc="bcb081ba" sha1="68cdd3c2920a0fc5c52a5ba1d6e4efd0e735e11d" />
+				<rom loadflag="load16_byte" name="dod-c2.bin" offset="0x000001" size="0x1400000" crc="1b927329" sha1="4861da95ce6a9d0521bbeed3b4f06daa0750c15c" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gladmort_d1" cloneof="gladmort">
+		<description>GladMort (demo)</description>
 		<year>2024</year>
 		<publisher>PixelHeart</publisher>
 		<sharedfeat name="release" value="MVS,AES" />

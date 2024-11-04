@@ -87,8 +87,8 @@ public:
 	void su2000(machine_config &config);
 
 private:
-	void pcat_io(address_map &map);
-	void pcat_map(address_map &map);
+	void pcat_io(address_map &map) ATTR_COLD;
+	void pcat_map(address_map &map) ATTR_COLD;
 };
 
 

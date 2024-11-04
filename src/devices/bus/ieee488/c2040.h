@@ -40,19 +40,19 @@ public:
 	void riot1_pb_w(uint8_t data);
 	void via_pb_w(uint8_t data);
 
-	void c2040_fdc_mem(address_map &map);
-	void c2040_main_mem(address_map &map);
+	void c2040_fdc_mem(address_map &map) ATTR_COLD;
+	void c2040_main_mem(address_map &map) ATTR_COLD;
 protected:
 	c2040_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// optional information overrides
-	virtual const tiny_rom_entry *device_rom_region() const override;
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual ioport_constructor device_input_ports() const override;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 
 	// device_ieee488_interface overrides
 	virtual void ieee488_atn(int state) override;
@@ -102,8 +102,8 @@ public:
 
 protected:
 	// optional information overrides
-	virtual const tiny_rom_entry *device_rom_region() const override;
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 private:
 	static void floppy_formats(format_registration &fr);
@@ -120,8 +120,8 @@ public:
 
 protected:
 	// optional information overrides
-	virtual const tiny_rom_entry *device_rom_region() const override;
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 private:
 	static void floppy_formats(format_registration &fr);

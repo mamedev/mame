@@ -233,8 +233,8 @@ public:
 	void nightmare(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	TIMER_CALLBACK_MEMBER(clear_reset);
 
@@ -245,10 +245,10 @@ protected:
 	void ic10_w(uint8_t data);
 	void unkout_w(uint8_t data);
 
-	void main_map(address_map &map);
-	void io_map(address_map &map);
-	void sound_map(address_map &map);
-	void sound_io_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
+	void io_map(address_map &map) ATTR_COLD;
+	void sound_map(address_map &map) ATTR_COLD;
+	void sound_io_map(address_map &map) ATTR_COLD;
 	uint32_t screen_update_nightmare(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	required_device<cosmac_device> m_maincpu;
@@ -405,8 +405,8 @@ static INPUT_PORTS_START( nightmare )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_COCKTAIL
 
 	PORT_START("EF")
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_SERVICE ) PORT_WRITE_LINE_DEVICE_MEMBER("cdp1802", cosmac_device, ef3_w) //ic17 - cpu
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_TILT ) PORT_WRITE_LINE_DEVICE_MEMBER("cdp1802", cosmac_device, ef4_w)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_SERVICE ) PORT_WRITE_LINE_DEVICE_MEMBER("cdp1802", FUNC(cosmac_device::ef3_w)) //ic17 - cpu
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_TILT ) PORT_WRITE_LINE_DEVICE_MEMBER("cdp1802", FUNC(cosmac_device::ef4_w))
 INPUT_PORTS_END
 
 

@@ -192,11 +192,11 @@ private:
 	void supershot_output0_w(uint8_t data);
 	void supershot_output1_w(uint8_t data);
 	TILE_GET_INFO_MEMBER(get_supershot_text_tile_info);
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 	uint32_t screen_update_supershot(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
-	void supershot_map(address_map &map);
+	void supershot_map(address_map &map) ATTR_COLD;
 };
 
 

@@ -26,6 +26,12 @@ public:
 
 	bool get_nomap() const { return nomap; }
 
+	uint8_t get_port();
+	void set_pulls(uint8_t pullup, uint8_t pulldown);
+
+	auto read_callback() { return read_port.bind(); }
+	auto write_callback() { return write_port.bind(); }
+
 protected:
 	uint32_t map_offset[2];
 	uint8_t map_enable;
@@ -43,8 +49,13 @@ protected:
 		virtual void write(uint16_t adr, uint8_t val) override;
 	};
 
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	devcb_read8  read_port;
+	devcb_write8 write_port;
+
+	uint8_t pullup, floating, dir, port, drive;
+
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 	virtual bool memory_translate(int spacenum, int intention, offs_t &address, address_space *&target_space) override;
 
 	inline uint32_t map(uint16_t adr) {
@@ -55,6 +66,14 @@ protected:
 		nomap = true;
 		return adr;
 	}
+
+	uint8_t dir_r();
+	void dir_w(uint8_t data);
+	uint8_t port_r();
+	void port_w(uint8_t data);
+
+	void init_port();
+	void update_port();
 
 #define O(o) void o ## _full(); void o ## _partial()
 

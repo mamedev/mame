@@ -105,15 +105,15 @@ public:
 	void dfs500(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
-	void cpanelcpu_mem_map(address_map &map);
-	void cpanelcpu_io_map(address_map &map);
-	void maincpu_mem_map(address_map &map);
-	[[maybe_unused]] void maincpu_io_map(address_map &map);
-	void effectcpu_mem_map(address_map &map);
+	void cpanelcpu_mem_map(address_map &map) ATTR_COLD;
+	void cpanelcpu_io_map(address_map &map) ATTR_COLD;
+	void maincpu_mem_map(address_map &map) ATTR_COLD;
+	[[maybe_unused]] void maincpu_io_map(address_map &map) ATTR_COLD;
+	void effectcpu_mem_map(address_map &map) ATTR_COLD;
 	uint8_t pit_r(offs_t offset);
 	void pit_w(offs_t offset, uint8_t data);
 	uint8_t cpanel_pit_r(offs_t offset);

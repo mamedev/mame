@@ -71,8 +71,8 @@ protected:
 	bool m_analog_powered, m_adtrg;
 	u64 m_next_event;
 
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	void sampling();
 	void start_conversion();

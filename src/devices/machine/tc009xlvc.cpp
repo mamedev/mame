@@ -102,7 +102,7 @@ void tc0090lvc_device::cpu_map(address_map &map)
 void tc0090lvc_device::vram_map(address_map &map)
 {
 	map(0x010000, 0x01ffff).readonly().share("vram");
-	// note, the way tiles are addressed suggests that 0x0000-0x3fff of this might be usable,
+	// NOTE: the way tiles are addressed suggests that 0x0000-0x3fff of this might be usable,
 	//       but we don't map it anywhere, so the first tiles are always blank at the moment.
 	map(0x014000, 0x01ffff).lw8(NAME([this] (offs_t offset, u8 data) { vram_w(offset + 0x4000, data); }));
 	map(0x040000, 0x05ffff).ram().share("bitmap_ram");

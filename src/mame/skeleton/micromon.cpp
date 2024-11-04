@@ -38,10 +38,10 @@ public:
 private:
 	int clear_r();
 
-	void io_map(address_map &map);
-	void mem_map(address_map &map);
+	void io_map(address_map &map) ATTR_COLD;
+	void mem_map(address_map &map) ATTR_COLD;
 
-	virtual void machine_reset() override;
+	virtual void machine_reset() override ATTR_COLD;
 	uint8_t m_resetcnt = 0U;
 	required_device<cosmac_device> m_maincpu;
 };

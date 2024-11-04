@@ -87,9 +87,9 @@ protected:
 	f3853_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	// device_t implementation
-	virtual void device_resolve_objects() override;
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_resolve_objects() override ATTR_COLD;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	uint16_t timer_interrupt_vector() const { return m_int_vector & ~uint16_t(0x0080); }
 	uint16_t external_interrupt_vector() const { return m_int_vector | uint16_t(0x0080); }
@@ -153,7 +153,7 @@ public:
 protected:
 	f3856_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 	virtual void timer_start(uint8_t value) override;
 

@@ -114,8 +114,8 @@ public:
 	void macii_init();
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	void set_memory_overlay(int overlay);
@@ -149,8 +149,8 @@ private:
 	void mac_asc_irq(int state);
 	void adb_irq_w(int state) { m_adb_irq_pending = state; }
 
-	void macii_map(address_map &map);
-	void macse30_map(address_map &map);
+	void macii_map(address_map &map) ATTR_COLD;
+	void macse30_map(address_map &map) ATTR_COLD;
 
 	void phases_w(u8 phases);
 	void devsel_w(u8 devsel);

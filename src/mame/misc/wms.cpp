@@ -108,10 +108,10 @@ private:
 	uint8_t test_r();
 	uint32_t screen_update_wms(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void adsp_data_map(address_map &map);
-	void adsp_program_map(address_map &map);
-	void wms_io(address_map &map);
-	void wms_map(address_map &map);
+	void adsp_data_map(address_map &map) ATTR_COLD;
+	void adsp_program_map(address_map &map) ATTR_COLD;
+	void wms_io(address_map &map) ATTR_COLD;
+	void wms_map(address_map &map) ATTR_COLD;
 
 	// devices
 	required_device<cpu_device> m_maincpu;

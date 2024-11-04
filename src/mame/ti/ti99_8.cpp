@@ -264,9 +264,9 @@ private:
 	void cassette_motor(int state);
 	void tms9901_interrupt(offs_t offset, uint8_t data);
 
-	void crumap(address_map &map);
-	void memmap(address_map &map);
-	void memmap_setaddress(address_map &map);
+	void crumap(address_map &map) ATTR_COLD;
+	void memmap(address_map &map) ATTR_COLD;
+	void memmap_setaddress(address_map &map) ATTR_COLD;
 
 	// Keyboard support
 	void    set_keyboard_column(int number, int data);

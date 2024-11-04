@@ -490,7 +490,7 @@ public:
 	void init_fclown();
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -523,8 +523,8 @@ private:
 	MC6845_UPDATE_ROW(update_row);
 	void _5clown_palette(palette_device &palette) const;
 
-	void fcaudio_map(address_map &map);
-	void fclown_map(address_map &map);
+	void fcaudio_map(address_map &map) ATTR_COLD;
+	void fclown_map(address_map &map) ATTR_COLD;
 };
 
 void _5clown_state::machine_start()

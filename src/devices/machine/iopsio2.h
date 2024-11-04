@@ -43,8 +43,8 @@ public:
 	void receive_from_device_hack(uint8_t data); // TODO: Turn me into a bus interface!
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	TIMER_CALLBACK_MEMBER(response_timer);
 

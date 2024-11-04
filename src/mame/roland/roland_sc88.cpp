@@ -26,7 +26,7 @@ public:
 	void sc88vl(machine_config &config);
 
 private:
-	void main_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
 
 	required_device<h8510_device> m_maincpu;
 };

@@ -50,8 +50,8 @@ public:
 	void init_mk3r20();
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	void cmos_enable_w(uint16_t data);
@@ -68,7 +68,7 @@ private:
 	void wwfmania_io_0_w(uint16_t data);
 
 	void init_mk3_common();
-	void main_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
 
 	required_device<tms340x0_device> m_maincpu;
 	required_device<midtunit_video_device> m_video;

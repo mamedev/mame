@@ -224,9 +224,9 @@ private:
 	void sfmsk_w(int state);
 	void hdmsk_w(int state);
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 	void nvram_init(nvram_device &nvram, void *data, size_t size);
 	uint32_t screen_update_lisa(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(lisa_interrupt);
@@ -251,9 +251,9 @@ private:
 	void scan_keyboard();
 	void unplug_keyboard();
 	void plug_keyboard();
-	void lisa210_fdc_map(address_map &map);
-	void lisa_fdc_map(address_map &map);
-	void lisa_map(address_map &map);
+	void lisa210_fdc_map(address_map &map) ATTR_COLD;
+	void lisa_fdc_map(address_map &map) ATTR_COLD;
+	void lisa_map(address_map &map) ATTR_COLD;
 };
 
 #endif // MAME_APPLE_LISA_H

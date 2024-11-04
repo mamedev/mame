@@ -28,8 +28,8 @@ public:
 private:
 	HD44780_PIXEL_UPDATE(lcd_pixel_update);
 
-	void prog_map(address_map &map);
-	void ext_map(address_map &map);
+	void prog_map(address_map &map) ATTR_COLD;
+	void ext_map(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 };

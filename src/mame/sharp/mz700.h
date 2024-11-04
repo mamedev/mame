@@ -50,8 +50,8 @@ public:
 	void init_mz700();
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	uint8_t mz700_e008_r();
 	void mz700_e008_w(uint8_t data);
@@ -75,9 +75,9 @@ protected:
 	void write_centronics_busy(int state);
 	void write_centronics_perror(int state);
 
-	void mz700_banke(address_map &map);
-	void mz700_io(address_map &map);
-	void mz700_mem(address_map &map);
+	void mz700_banke(address_map &map) ATTR_COLD;
+	void mz700_io(address_map &map) ATTR_COLD;
+	void mz700_mem(address_map &map) ATTR_COLD;
 
 	int m_mz700 = 0;                /* 1 if running on an mz700 */
 
@@ -137,7 +137,7 @@ public:
 	void init_mz800();
 
 protected:
-	virtual void machine_reset() override;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	uint8_t mz800_bank_0_r();
@@ -159,9 +159,9 @@ private:
 	void mz800_z80pio_port_a_w(uint8_t data);
 	void pio_port_a_w(uint8_t data);
 
-	void mz800_bankf(address_map &map);
-	void mz800_io(address_map &map);
-	void mz800_mem(address_map &map);
+	void mz800_bankf(address_map &map) ATTR_COLD;
+	void mz800_io(address_map &map) ATTR_COLD;
+	void mz800_mem(address_map &map) ATTR_COLD;
 
 	required_device_array<msx_general_purpose_port_device, 2> m_joy;
 

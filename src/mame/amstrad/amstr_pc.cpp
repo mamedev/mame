@@ -234,7 +234,7 @@ public:
 	void ppc512(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -273,10 +273,10 @@ private:
 	static void cfg_com(device_t *device);
 	static void cfg_fdc(device_t *device);
 
-	void pc200_io(address_map &map);
-	void pc2086_map(address_map &map);
-	void ppc512_io(address_map &map);
-	void ppc640_map(address_map &map);
+	void pc200_io(address_map &map) ATTR_COLD;
+	void pc2086_map(address_map &map) ATTR_COLD;
+	void ppc512_io(address_map &map) ATTR_COLD;
+	void ppc640_map(address_map &map) ATTR_COLD;
 };
 
 void amstrad_pc_state::ppc640_map(address_map &map)

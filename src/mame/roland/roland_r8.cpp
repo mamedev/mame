@@ -115,8 +115,8 @@ public:
 	void init_r8();
 
 protected:
-	void mk1_map(address_map &map);
-	void mk2_map(address_map &map);
+	void mk1_map(address_map &map) ATTR_COLD;
+	void mk2_map(address_map &map) ATTR_COLD;
 
 	std::pair<std::error_condition, std::string> pcmrom_load(generic_slot_device* pcmcard, int card_id, device_image_interface &image);
 	void pcmrom_unload(int card_id);

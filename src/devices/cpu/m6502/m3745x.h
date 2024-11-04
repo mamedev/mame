@@ -56,8 +56,8 @@ protected:
 	m3745x_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, address_map_constructor internal_map);
 
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 	virtual space_config_vector memory_space_config() const override;
 
 	// device_execute_interface overrides
@@ -90,7 +90,7 @@ class m37450_device : public m3745x_device
 public:
 	m37450_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	void m37450_map(address_map &map);
+	void m37450_map(address_map &map) ATTR_COLD;
 protected:
 	m37450_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 };
