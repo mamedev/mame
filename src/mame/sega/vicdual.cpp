@@ -4028,6 +4028,22 @@ ROM_START( hocrash )
 	ROM_LOAD( "316-0042.u88", 0x0020, 0x0020, CRC(a1506b9d) SHA1(037c3db2ea40eca459e8acba9d1506dd28d72d10) )    /* sequence PROM */
 ROM_END
 
+// Head On bootleg by Niemer
+ROM_START( bumba )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "bum0.bin",     0x0000, 0x0400, CRC(4bb51259) SHA1(43411ffda3fe03b1d694f70791b0bab5786759c0) )
+	ROM_LOAD( "bum1.bin",     0x0400, 0x0400, CRC(aeac8c5f) SHA1(ef9ad63d13076a559ba12c6421ad61de21dd4c90) )
+	ROM_LOAD( "bum2.bin",     0x0800, 0x0400, CRC(f1a0cb72) SHA1(540b30225ef176c416ea5b142fe7dbb67b7a78fb) )
+	ROM_LOAD( "bum3.bin",     0x0c00, 0x0400, CRC(fd67208d) SHA1(539b0db174aef66ac7d8137e4eca4e3237bc7a82) )
+	ROM_LOAD( "bum4.bin",     0x1000, 0x0400, CRC(069e839e) SHA1(e1ed68573c13c0c88a2bb7b2096860523de952c0) )
+	ROM_LOAD( "bum5.bin",     0x1400, 0x0400, CRC(11960190) SHA1(f3908fece95b7e5468ae4bba5a9f2d2482ed6656) )
+	ROM_LOAD( "bum6.bin",     0x1800, 0x0400, CRC(d3782c1d) SHA1(340782374b7015a0aaf98aeb6503b759e199a58a) )
+
+	ROM_REGION( 0x0040, "user1", 0 )    // timing PROMs
+	ROM_LOAD( "316-0043.u87", 0x0000, 0x0020, CRC(e60a7960) SHA1(b8b8716e859c57c35310efc4594262afedb84823) )    // control PROM
+	ROM_LOAD( "316-0042.u88", 0x0020, 0x0020, CRC(a1506b9d) SHA1(037c3db2ea40eca459e8acba9d1506dd28d72d10) )    // sequence PROM
+ROM_END
+
 ROM_START( headon2 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "u27.bin",      0x0000, 0x0400, CRC(fa47d2fb) SHA1(b3208f5bce228c453bdafbc9c1f2c8e1bd920d32) )
@@ -4943,58 +4959,59 @@ ROM_END
  *
  *************************************/
 
-//    YEAR  NAME        PARENT    MACHINE    INPUT      CLASS            INIT        ORIENT. COMPANY,                    FULLNAME,      FLAGS
-GAMEL(1977, depthch,    0,        depthch,   depthch,   vicdual_state,   empty_init, ROT0,   "Gremlin",                 "Depthcharge", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_depthch )
-GAMEL(1977, depthcho,   depthch,  depthch,   depthch,   vicdual_state,   empty_init, ROT0,   "Gremlin",                 "Depthcharge (older)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_depthch )
-GAMEL(1977, subhunt,    depthch,  depthch,   depthch,   vicdual_state,   empty_init, ROT0,   "Gremlin (Taito license)", "Sub Hunter (Gremlin / Taito)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_depthch )
-GAME( 1977, safari,     0,        safari,    safari,    vicdual_state,   empty_init, ROT0,   "Gremlin",                 "Safari (set 1)", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1977, safaria,    safari,   safari,    safari,    vicdual_state,   empty_init, ROT0,   "Gremlin",                 "Safari (set 2, bootleg?)", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE ) // on a bootleg board, but seems a different code revision too
-GAME( 1978, frogs,      0,        frogs,     frogs,     vicdual_state,   empty_init, ROT0,   "Gremlin",                 "Frogs", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1979, sspaceat,   0,        sspaceat,  sspaceat,  vicdual_state,   empty_init, ROT270, "Sega",                    "Space Attack (upright set 1)", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1979, sspaceat2,  sspaceat, sspaceat,  sspaceat,  vicdual_state,   empty_init, ROT270, "Sega",                    "Space Attack (upright set 2)", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1979, sspaceat3,  sspaceat, sspaceat,  sspaceat,  vicdual_state,   empty_init, ROT270, "Sega",                    "Space Attack (upright set 3)", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1979, sspaceatc,  sspaceat, sspaceat,  sspaceat,  vicdual_state,   empty_init, ROT270, "Sega",                    "Space Attack (cocktail)", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1979, sspacaho,   0,        sspacaho,  sspacaho,  vicdual_state,   empty_init, ROT270, "Sega",                    "Space Attack / Head On", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1979, headon,     0,        headon,    headon,    vicdual_state,   empty_init, ROT0,   "Gremlin",                 "Head On (2 players)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1979, headon1,    headon,   headon,    headon,    vicdual_state,   empty_init, ROT0,   "Gremlin",                 "Head On (1 player)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1979, headonn,    headon,   headonn,   headonn,   vicdual_state,   empty_init, ROT270, "Nintendo",                "Head On N", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1979, headons,    headon,   headons,   headons,   vicdual_state,   empty_init, ROT0,   "bootleg (Sidam)",         "Head On (Sidam bootleg, set 1)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1979, headonsa,   headon,   headons,   headonsa,  headonsa_state,  empty_init, ROT0,   "bootleg (Sidam)",         "Head On (Sidam bootleg, set 2)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1979, headonmz,   headon,   headon,    headonmz,  vicdual_state,   empty_init, ROT0,   "bootleg",                 "Head On (bootleg, alt maze)", MACHINE_SUPPORTS_SAVE )
-GAME( 1979, supcrash,   headon,   headons,   supcrash,  vicdual_state,   empty_init, ROT0,   "bootleg (VGG)",           "Super Crash (bootleg of Head On)", MACHINE_NO_SOUND  | MACHINE_SUPPORTS_SAVE )
-GAME( 1979, hocrash,    headon,   headons,   hocrash,   vicdual_state,   empty_init, ROT0,   "bootleg (Fraber)",        "Crash (bootleg of Head On)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1979, headon2,    0,        headon2,   headon2,   vicdual_state,   empty_init, ROT0,   "Sega",                    "Head On 2",  MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1979, headon2s,   headon2,  headon2bw, headon2s,  headonsa_state,  empty_init, ROT0,   "bootleg (Sidam)",         "Head On 2 (Sidam bootleg)",  MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1979, car2,       headon2,  headon2bw, car2,      vicdual_state,   empty_init, ROT0,   "bootleg (RZ Bologna)",    "Car 2 (bootleg of Head On 2)",  MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // title still says 'HeadOn 2'
-GAME( 1979, invho2,     0,        invho2,    invho2,    vicdual_state,   empty_init, ROT270, "Sega",                    "Invinco / Head On 2 (set 1)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1979, invho2a,    invho2,   invho2,    invho2,    vicdual_state,   empty_init, ROT270, "Sega",                    "Invinco / Head On 2 (set 2)", MACHINE_NOT_WORKING | MACHINE_WRONG_COLORS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // wrong colors make Head On 2 unplayable (all black)
-GAME( 1980, nsub,       0,        nsub,      nsub,      nsub_state,      empty_init, ROT270, "Sega",                    "N-Sub (upright)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // this is the upright set. cocktail set still needs to be dumped
-GAME( 1980, samurai,    0,        samurai,   samurai,   vicdual_state,   empty_init, ROT270, "Sega",                    "Samurai (World)", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1980, samuraij,   samurai,  samurai,   samurai,   vicdual_state,   empty_init, ROT270, "Sega",                    "Samurai (Japan)", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1979, invinco,    0,        invinco,   invinco,   vicdual_state,   empty_init, ROT270, "Sega",                    "Invinco", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1979, invcarht,   0,        carhntds,  carhntds,  vicdual_state,   empty_init, ROT270, "Sega",                    "Invinco / Car Hunt (Germany)", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1979, invds,      0,        invds,     invds,     vicdual_state,   empty_init, ROT270, "Sega",                    "Invinco / Deep Scan", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1979, carhntds,   0,        carhntds,  carhntds,  vicdual_state,   empty_init, ROT270, "Sega",                    "Car Hunt / Deep Scan (France)", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1980, tranqgun,   0,        tranqgun,  tranqgun,  tranqgun_state,  empty_init, ROT270, "Sega",                    "Tranquillizer Gun", MACHINE_SUPPORTS_SAVE )
-GAME( 1980, spacetrk,   0,        spacetrk,  spacetrk,  vicdual_state,   empty_init, ROT270, "Sega",                    "Space Trek (upright)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1980, spacetrkc,  spacetrk, spacetrk,  spacetrkc, vicdual_state,   empty_init, ROT270, "Sega",                    "Space Trek (cocktail)", MACHINE_IMPERFECT_GRAPHICS |MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1980, carnival,   0,        carnival,  carnival,  carnival_state,  empty_init, ROT270, "Sega",                    "Carnival (upright, AY8912 music)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1980, carnivalb,  carnival, carnivalb, carnival,  carnival_state,  empty_init, ROT270, "Sega",                    "Carnival (upright, PIT8253 music)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1980, carnivalc,  carnival, carnival,  carnivalc, carnival_state,  empty_init, ROT270, "Sega",                    "Carnival (cocktail)",  MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1980, carnivalca, carnival, carnival,  carnivalc, carnival_state,  empty_init, ROT270, "Sega",                    "Carnival (cocktail, earlier)",  MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // one missing ROM
-GAME( 1980, carnivalh,  carnival, carnivalh, carnivalh, carnivalh_state, empty_init, ROT270, "Sega",                    "Carnival (Head On hardware, set 1)",  MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1980, carnivalha, carnival, carnivalh, carnivalh, carnivalh_state, empty_init, ROT270, "Sega",                    "Carnival (Head On hardware, set 2)",  MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1980, verbena,    carnival, carnival,  carnival,  carnival_state,  empty_init, ROT270, "bootleg (Cocamatic)",     "Verbena (bootleg of Carnival)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1981, brdrline,   0,        brdrline,  brdrline,  vicdual_state,   empty_init, ROT270, "Sega",                    "Borderline", MACHINE_SUPPORTS_SAVE )
-GAME( 1981, starrkr,    brdrline, brdrline,  starrkr,   vicdual_state,   empty_init, ROT270, "Sega",                    "Star Raker", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1981, brdrlins,   brdrline, brdrline,  brdrline,  vicdual_state,   empty_init, ROT270, "bootleg (Sidam)",         "Borderline (Sidam bootleg)", MACHINE_SUPPORTS_SAVE )
-GAME( 1981, brdrlinb,   brdrline, brdrline,  brdrline,  vicdual_state,   empty_init, ROT270, "bootleg (Karateco)",      "Borderline (Karateco bootleg)", MACHINE_SUPPORTS_SAVE )
-GAME( 1981, brdrlinet,  brdrline, brdrlinet, brdrline,  tranqgun_state,  empty_init, ROT270, "Sega",                    "Borderline (Tranquillizer Gun conversion)", MACHINE_SUPPORTS_SAVE ) // official factory conversion
-GAME( 198?, nostromo,   0,        headons,   startrks,  vicdual_state,   empty_init, ROT0,   "bootleg",                 "Nostromo", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // sound board probably differs
-GAME( 198?, startrks,   nostromo, headons,   startrks,  vicdual_state,   empty_init, ROT0,   "bootleg (Sidam)",         "Star Trek (Head On hardware)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1980, digger,     0,        digger,    digger,    vicdual_state,   empty_init, ROT270, "Sega",                    "Digger", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1981, pulsar,     0,        pulsar,    pulsar,    vicdual_state,   empty_init, ROT270, "Sega",                    "Pulsar", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1979, heiankyo,   0,        heiankyo,  heiankyo,  vicdual_state,   empty_init, ROT270, "Denki Onkyo",             "Heiankyo Alien", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 19??, alphaho,    0,        alphaho,   alphaho,   vicdual_state,   empty_init, ROT270, "Data East Corporation",   "Alpha Fighter / Head On", MACHINE_WRONG_COLORS | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
+//    YEAR  NAME        PARENT    MACHINE    INPUT      CLASS            INIT        ORIENT. COMPANY,                    FULLNAME,                                                FLAGS
+GAMEL(1977, depthch,    0,        depthch,   depthch,   vicdual_state,   empty_init, ROT0,   "Gremlin",                 "Depthcharge",                                            MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_depthch )
+GAMEL(1977, depthcho,   depthch,  depthch,   depthch,   vicdual_state,   empty_init, ROT0,   "Gremlin",                 "Depthcharge (older)",                                    MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_depthch )
+GAMEL(1977, subhunt,    depthch,  depthch,   depthch,   vicdual_state,   empty_init, ROT0,   "Gremlin (Taito license)", "Sub Hunter (Gremlin / Taito)",                           MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_depthch )
+GAME( 1977, safari,     0,        safari,    safari,    vicdual_state,   empty_init, ROT0,   "Gremlin",                 "Safari (set 1)",                                         MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1977, safaria,    safari,   safari,    safari,    vicdual_state,   empty_init, ROT0,   "Gremlin",                 "Safari (set 2, bootleg?)",                               MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE ) // on a bootleg board, but seems a different code revision too
+GAME( 1978, frogs,      0,        frogs,     frogs,     vicdual_state,   empty_init, ROT0,   "Gremlin",                 "Frogs",                                                  MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1979, sspaceat,   0,        sspaceat,  sspaceat,  vicdual_state,   empty_init, ROT270, "Sega",                    "Space Attack (upright set 1)",                           MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1979, sspaceat2,  sspaceat, sspaceat,  sspaceat,  vicdual_state,   empty_init, ROT270, "Sega",                    "Space Attack (upright set 2)",                           MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1979, sspaceat3,  sspaceat, sspaceat,  sspaceat,  vicdual_state,   empty_init, ROT270, "Sega",                    "Space Attack (upright set 3)",                           MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1979, sspaceatc,  sspaceat, sspaceat,  sspaceat,  vicdual_state,   empty_init, ROT270, "Sega",                    "Space Attack (cocktail)",                                MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1979, sspacaho,   0,        sspacaho,  sspacaho,  vicdual_state,   empty_init, ROT270, "Sega",                    "Space Attack / Head On",                                 MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1979, headon,     0,        headon,    headon,    vicdual_state,   empty_init, ROT0,   "Gremlin",                 "Head On (2 players)",                                    MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1979, headon1,    headon,   headon,    headon,    vicdual_state,   empty_init, ROT0,   "Gremlin",                 "Head On (1 player)",                                     MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1979, headonn,    headon,   headonn,   headonn,   vicdual_state,   empty_init, ROT270, "Nintendo",                "Head On N",                                              MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1979, headons,    headon,   headons,   headons,   vicdual_state,   empty_init, ROT0,   "bootleg (Sidam)",         "Head On (Sidam bootleg, set 1)",                         MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1979, headonsa,   headon,   headons,   headonsa,  headonsa_state,  empty_init, ROT0,   "bootleg (Sidam)",         "Head On (Sidam bootleg, set 2)",                         MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1979, headonmz,   headon,   headon,    headonmz,  vicdual_state,   empty_init, ROT0,   "bootleg",                 "Head On (bootleg, alt maze)",                            MACHINE_SUPPORTS_SAVE )
+GAME( 1979, supcrash,   headon,   headons,   supcrash,  vicdual_state,   empty_init, ROT0,   "bootleg (VGG)",           "Super Crash (bootleg of Head On)",                       MACHINE_NO_SOUND  | MACHINE_SUPPORTS_SAVE )
+GAME( 1979, hocrash,    headon,   headons,   hocrash,   vicdual_state,   empty_init, ROT0,   "bootleg (Fraber)",        "Crash (bootleg of Head On)",                             MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1979, bumba,      headon,   headons,   headons,   vicdual_state,   empty_init, ROT0,   "bootleg (Niemer)",        "Bumba (bootleg of Head On)",                             MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1979, headon2,    0,        headon2,   headon2,   vicdual_state,   empty_init, ROT0,   "Sega",                    "Head On 2",                                              MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1979, headon2s,   headon2,  headon2bw, headon2s,  headonsa_state,  empty_init, ROT0,   "bootleg (Sidam)",         "Head On 2 (Sidam bootleg)",                              MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1979, car2,       headon2,  headon2bw, car2,      vicdual_state,   empty_init, ROT0,   "bootleg (RZ Bologna)",    "Car 2 (bootleg of Head On 2)",                           MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // title still says 'HeadOn 2'
+GAME( 1979, invho2,     0,        invho2,    invho2,    vicdual_state,   empty_init, ROT270, "Sega",                    "Invinco / Head On 2 (set 1)",                            MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1979, invho2a,    invho2,   invho2,    invho2,    vicdual_state,   empty_init, ROT270, "Sega",                    "Invinco / Head On 2 (set 2)",                            MACHINE_NOT_WORKING | MACHINE_WRONG_COLORS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // wrong colors make Head On 2 unplayable (all black)
+GAME( 1980, nsub,       0,        nsub,      nsub,      nsub_state,      empty_init, ROT270, "Sega",                    "N-Sub (upright)",                                        MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // this is the upright set. cocktail set still needs to be dumped
+GAME( 1980, samurai,    0,        samurai,   samurai,   vicdual_state,   empty_init, ROT270, "Sega",                    "Samurai (World)",                                        MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1980, samuraij,   samurai,  samurai,   samurai,   vicdual_state,   empty_init, ROT270, "Sega",                    "Samurai (Japan)",                                        MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1979, invinco,    0,        invinco,   invinco,   vicdual_state,   empty_init, ROT270, "Sega",                    "Invinco",                                                MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1979, invcarht,   0,        carhntds,  carhntds,  vicdual_state,   empty_init, ROT270, "Sega",                    "Invinco / Car Hunt (Germany)",                           MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1979, invds,      0,        invds,     invds,     vicdual_state,   empty_init, ROT270, "Sega",                    "Invinco / Deep Scan",                                    MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1979, carhntds,   0,        carhntds,  carhntds,  vicdual_state,   empty_init, ROT270, "Sega",                    "Car Hunt / Deep Scan (France)",                          MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1980, tranqgun,   0,        tranqgun,  tranqgun,  tranqgun_state,  empty_init, ROT270, "Sega",                    "Tranquillizer Gun",                                      MACHINE_SUPPORTS_SAVE )
+GAME( 1980, spacetrk,   0,        spacetrk,  spacetrk,  vicdual_state,   empty_init, ROT270, "Sega",                    "Space Trek (upright)",                                   MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1980, spacetrkc,  spacetrk, spacetrk,  spacetrkc, vicdual_state,   empty_init, ROT270, "Sega",                    "Space Trek (cocktail)",                                  MACHINE_IMPERFECT_GRAPHICS |MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1980, carnival,   0,        carnival,  carnival,  carnival_state,  empty_init, ROT270, "Sega",                    "Carnival (upright, AY8912 music)",                       MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1980, carnivalb,  carnival, carnivalb, carnival,  carnival_state,  empty_init, ROT270, "Sega",                    "Carnival (upright, PIT8253 music)",                      MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1980, carnivalc,  carnival, carnival,  carnivalc, carnival_state,  empty_init, ROT270, "Sega",                    "Carnival (cocktail)",                                    MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1980, carnivalca, carnival, carnival,  carnivalc, carnival_state,  empty_init, ROT270, "Sega",                    "Carnival (cocktail, earlier)",                           MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // one missing ROM
+GAME( 1980, carnivalh,  carnival, carnivalh, carnivalh, carnivalh_state, empty_init, ROT270, "Sega",                    "Carnival (Head On hardware, set 1)",                     MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1980, carnivalha, carnival, carnivalh, carnivalh, carnivalh_state, empty_init, ROT270, "Sega",                    "Carnival (Head On hardware, set 2)",                     MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1980, verbena,    carnival, carnival,  carnival,  carnival_state,  empty_init, ROT270, "bootleg (Cocamatic)",     "Verbena (bootleg of Carnival)",                          MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1981, brdrline,   0,        brdrline,  brdrline,  vicdual_state,   empty_init, ROT270, "Sega",                    "Borderline",                                             MACHINE_SUPPORTS_SAVE )
+GAME( 1981, starrkr,    brdrline, brdrline,  starrkr,   vicdual_state,   empty_init, ROT270, "Sega",                    "Star Raker",                                             MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1981, brdrlins,   brdrline, brdrline,  brdrline,  vicdual_state,   empty_init, ROT270, "bootleg (Sidam)",         "Borderline (Sidam bootleg)",                             MACHINE_SUPPORTS_SAVE )
+GAME( 1981, brdrlinb,   brdrline, brdrline,  brdrline,  vicdual_state,   empty_init, ROT270, "bootleg (Karateco)",      "Borderline (Karateco bootleg)",                          MACHINE_SUPPORTS_SAVE )
+GAME( 1981, brdrlinet,  brdrline, brdrlinet, brdrline,  tranqgun_state,  empty_init, ROT270, "Sega",                    "Borderline (Tranquillizer Gun conversion)",              MACHINE_SUPPORTS_SAVE ) // official factory conversion
+GAME( 198?, nostromo,   0,        headons,   startrks,  vicdual_state,   empty_init, ROT0,   "bootleg",                 "Nostromo",                                               MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // sound board probably differs
+GAME( 198?, startrks,   nostromo, headons,   startrks,  vicdual_state,   empty_init, ROT0,   "bootleg (Sidam)",         "Star Trek (Head On hardware)",                           MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1980, digger,     0,        digger,    digger,    vicdual_state,   empty_init, ROT270, "Sega",                    "Digger",                                                 MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1981, pulsar,     0,        pulsar,    pulsar,    vicdual_state,   empty_init, ROT270, "Sega",                    "Pulsar",                                                 MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1979, heiankyo,   0,        heiankyo,  heiankyo,  vicdual_state,   empty_init, ROT270, "Denki Onkyo",             "Heiankyo Alien",                                         MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 19??, alphaho,    0,        alphaho,   alphaho,   vicdual_state,   empty_init, ROT270, "Data East Corporation",   "Alpha Fighter / Head On",                                MACHINE_WRONG_COLORS | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 19??, alphahob,   alphaho,  alphaho,   alphahob,  vicdual_state,   empty_init, ROT270, "bootleg",                 "Missile / Circuit (bootleg of Alpha Fighter / Head On)", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1982, wantsega,   0,        carhntds,  wantsega,  vicdual_state,   empty_init, ROT270, "Sega",                    "Wanted (Sega)", MACHINE_NO_SOUND | MACHINE_IMPERFECT_CONTROLS | MACHINE_SUPPORTS_SAVE )
+GAME( 1982, wantsega,   0,        carhntds,  wantsega,  vicdual_state,   empty_init, ROT270, "Sega",                    "Wanted (Sega)",                                          MACHINE_NO_SOUND | MACHINE_IMPERFECT_CONTROLS | MACHINE_SUPPORTS_SAVE )
