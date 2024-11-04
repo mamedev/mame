@@ -481,6 +481,18 @@ ROM_START( beijuehh )
 	ROM_LOAD16_WORD_SWAP( "beijeu.bin", 0x0000000, 0x8000000, CRC(e7b968af) SHA1(a39a3a70e6e0827e4395e09e55983eb9e9348e4a) ) // some address lines might be swapped
 ROM_END
 
+ROM_START( bornkidh )
+	ROM_REGION( 0x4000000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "sunplus.u3", 0x0000000, 0x0800000, CRC(c4da9d0b) SHA1(5fc644ae26046677e67a01dde3fc6061e73bb60f) )
+	ROM_CONTINUE(0x1000000, 0x0800000)
+	ROM_CONTINUE(0x0800000, 0x0800000)
+	ROM_CONTINUE(0x1800000, 0x0800000)
+	ROM_CONTINUE(0x2000000, 0x0800000)
+	ROM_CONTINUE(0x3000000, 0x0800000)
+	ROM_CONTINUE(0x2800000, 0x0800000)
+	ROM_CONTINUE(0x3800000, 0x0800000)
+ROM_END
+
 
 ROM_START( gameu50 )
 	ROM_REGION( 0x2000000, "maincpu", ROMREGION_ERASEFF )
@@ -790,6 +802,7 @@ CONS(2012, imgame,    0,       0, tkmag220, tkmag220, tkmag220_game_state,  empt
 // Does the 'Helicopter' game work properly on real hardware? The function at 0x0D2BE7 uses RAM address 0x2372 for the upper bits of the tile base offset calculation
 // but that RAM address doesn't appear to be written anywhere in the code, resulting in scrolling being entirely broken.
 CONS(201?, beijuehh,    0,       0, beijuehh, beijuehh, beijuehh_game_state,  empty_init,      "Beijue",      "Beijue 16 Bit Handheld Games 220-in-1 (Game Boy style case)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+CONS(201?, bornkidh,    0,       0, beijuehh, beijuehh, beijuehh_game_state,  empty_init,      "BornKid",     "BornKid 16 Bit Handheld Games 100-in-1", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
 // die on this one is 'GCM420'
 CONS(2013, gormiti,   0, 0, base, gormiti,  gormiti_game_state, empty_init, "Giochi Preziosi", "Gormiti Game Arena (Spain)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
