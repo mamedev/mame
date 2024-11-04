@@ -21,7 +21,7 @@ inline uint16_t sap_dsk_format::accumulate_crc(uint16_t crc, uint8_t data) noexc
 
 const char *sap_dsk_format::name() const noexcept
 {
-	return "sap_dsk";
+	return "sap";
 }
 
 const char *sap_dsk_format::description() const noexcept
@@ -123,9 +123,9 @@ bool sap_dsk_format::load(util::random_read &io, uint32_t form_factor, const std
 			{
 				if (auto [err, actual] = read_at(io, read_offset, &sector_header[0], 4); err || actual != 4)
 					return false;
-				if (sector_count == 0 && sector_header[0] == 1)
+				if (sector_count == 0 && sector_header[0] == 0x01)
 					is_mfm = false;
-				uint8_t sector_size = (sector_header[0] & 2) ? 4 >> (sector_header[0] & 1) : 1;
+				uint8_t sector_size = (sector_header[0] & 0x02) ? 4 >> (sector_header[0] & 0x01) : 1;
 				if (track_size < sector_size)
 					return false;
 				uint16_t sector_octets = sector_size * (is_mfm ? 256 : 128);
@@ -149,7 +149,8 @@ bool sap_dsk_format::load(util::random_read &io, uint32_t form_factor, const std
 				sectors[sector_count].size = sector_size;
 				sectors[sector_count].actual_size = sector_octets;
 				sectors[sector_count].data = bufptr;
-				sectors[sector_count].deleted = false;
+				// Teo claims this flag is set for protection with "all the gap bytes set to 0xF7"; actual purpose is a bit unclear
+				sectors[sector_count].deleted = bool(sector_header[0] & 0x04);
 				sectors[sector_count].bad_crc = crc != get_u16be(sector_crc);
 
 				read_offset += sector_octets + 6;
