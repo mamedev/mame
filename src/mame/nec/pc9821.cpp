@@ -51,6 +51,10 @@ uint32_t pc9821_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap
 
 	if(m_video_ff[DISPLAY_REG] != 0)
 	{
+		// TODO: following is wrong: definitely requires GDC latches
+		// flashb (pitch=512) and skinpan (two areas on title screen)
+		// aitd sets pitch=40, which means something else inside 7220 should do the bump.
+
 		// PEGC 256 mode is linear VRAM picked from a specific VRAM buffer.
 		// It doesn't latch values from GDC, it runs on its own renderer instead.
 		// Is the DAC really merging two pixels not unlike VGA correlated Mode 13h?
@@ -59,23 +63,22 @@ uint32_t pc9821_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap
 		if (m_ex_video_ff[ANALOG_256_MODE])
 		{
 			rgb_t const *const palette = m_palette->palette()->entry_list_raw();
-			u16 *ext_gvram = (u16 *)m_ext_gvram.target();
+			u8 *ext_gvram = (u8 *)m_ext_gvram.target();
 			int base_y = cliprect.min_y;
 
 			for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 			{
 				for (int x = cliprect.min_x; x <= cliprect.max_x; x += 8)
 				{
-					u32 address = (y - base_y) * (640 / 8) + (x / 8);
-					for(int xi = 0; xi < 8; xi += 2)
+					u32 address = (y - base_y) * (640 / 8) + (x >> 3);
+					for(int xi = 0; xi < 8; xi ++)
 					{
 						int res_x = x + xi;
 						int res_y = y;
 
-						u16 pen = ext_gvram[(address << 2) + (xi >> 1) + (m_vram_disp * 0x20000)];
+						u16 pen = ext_gvram[(address << 3) + xi + (m_vram_disp * 0x40000)];
 
-						bitmap.pix(res_y, res_x + 0) = palette[(pen & 0xff) + 0x20];
-						bitmap.pix(res_y, res_x + 1) = palette[(pen >> 8) + 0x20];
+						bitmap.pix(res_y, res_x) = palette[(pen & 0xff) + 0x20];
 					}
 				}
 			}
@@ -129,8 +132,13 @@ void pc9821_state::pc9821_video_ff_w(offs_t offset, uint8_t data)
 			return;
 		m_ex_video_ff[(data & 0xfe) >> 1] = data & 1;
 
-		//if((data & 0xfe) == 0x20)
-		//  logerror("%02x\n",data & 1);
+		if((data & 0xfe) == 0x20)
+		{
+			if (data & 1)
+				m_pegc_mmio_view.select(0);
+			else
+				m_pegc_mmio_view.disable();
+		}
 	}
 
 	/* Intentional fall-through */
@@ -171,17 +179,17 @@ void pc9821_state::pc9821_a0_w(offs_t offset, uint8_t data)
 	{
 		switch(offset)
 		{
-			case 0x08: m_analog256.pal_entry = data & 0xff; break;
-			case 0x0a: m_analog256.g[m_analog256.pal_entry] = data & 0xff; break;
-			case 0x0c: m_analog256.r[m_analog256.pal_entry] = data & 0xff; break;
-			case 0x0e: m_analog256.b[m_analog256.pal_entry] = data & 0xff; break;
+			case 0x08: m_pegc.pal_entry = data & 0xff; break;
+			case 0x0a: m_pegc.g[m_pegc.pal_entry] = data & 0xff; break;
+			case 0x0c: m_pegc.r[m_pegc.pal_entry] = data & 0xff; break;
+			case 0x0e: m_pegc.b[m_pegc.pal_entry] = data & 0xff; break;
 		}
 
 		m_palette->set_pen_color(
-			m_analog256.pal_entry + 0x20,
-			m_analog256.r[m_analog256.pal_entry],
-			m_analog256.g[m_analog256.pal_entry],
-			m_analog256.b[m_analog256.pal_entry]
+			m_pegc.pal_entry + 0x20,
+			m_pegc.r[m_pegc.pal_entry],
+			m_pegc.g[m_pegc.pal_entry],
+			m_pegc.b[m_pegc.pal_entry]
 		);
 		return;
 	}
@@ -273,7 +281,7 @@ uint16_t pc9821_state::pc9821_grcg_gvram_r(offs_t offset, uint16_t mem_mask)
 		u16 *ext_gvram = (u16 *)m_ext_gvram.target();
 		int bank = offset >> 14;
 		if(bank <= 1)
-			return ext_gvram[((m_analog256.bank[bank])*0x4000) + (offset & 0x3fff)];
+			return ext_gvram[((m_pegc.bank[bank])*0x4000) + (offset & 0x3fff)];
 		return 0xffff;
 	}
 
@@ -287,47 +295,13 @@ void pc9821_state::pc9821_grcg_gvram_w(offs_t offset, uint16_t data, uint16_t me
 		u16 *ext_gvram = (u16 *)m_ext_gvram.target();
 		int bank = offset >> 14;
 		if(bank <= 1)
-			COMBINE_DATA(&ext_gvram[((m_analog256.bank[bank])*0x4000) + (offset & 0x3fff)]);
+			COMBINE_DATA(&ext_gvram[((m_pegc.bank[bank])*0x4000) + (offset & 0x3fff)]);
 		return;
 	}
 
 	grcg_gvram_w(offset,data,mem_mask);
 }
 
-uint16_t pc9821_state::pc9821_grcg_gvram0_r(offs_t offset, uint16_t mem_mask)
-{
-	if(m_ex_video_ff[ANALOG_256_MODE])
-	{
-		switch(offset*2)
-		{
-			case 4: return m_analog256.bank[0];
-			case 6: return m_analog256.bank[1];
-		}
-
-		//return 0;
-	}
-
-	return grcg_gvram0_r(offset, mem_mask);
-}
-
-void pc9821_state::pc9821_grcg_gvram0_w(offs_t offset, uint16_t data, uint16_t mem_mask)
-{
-	if(m_ex_video_ff[ANALOG_256_MODE])
-	{
-		//printf("%08x %08x\n",offset*2,data);
-		if(mem_mask & 0xff)
-		{
-			switch(offset*2)
-			{
-				case 4: m_analog256.bank[0] = data & 0xf; break;
-				case 6: m_analog256.bank[1] = data & 0xf; break;
-			}
-		}
-		return;
-	}
-
-	grcg_gvram0_w(offset,data,mem_mask);
-}
 
 void pc9821_state::pc9821_mode_ff_w(u8 data)
 {
@@ -350,6 +324,71 @@ void pc9821_state::pc9821_mode_ff_w(u8 data)
 	}
 }
 
+// $e0000 base
+void pc9821_state::pegc_mmio_map(address_map &map)
+{
+	map(0x0004, 0x0004).select(2).lrw8(
+		NAME([this] (offs_t offset) {
+			return m_pegc.bank[offset];
+		}),
+		NAME([this] (offs_t offset, u8 data) {
+			m_pegc.bank[offset] = data & 0xf;
+		})
+	);
+	map(0x100, 0x100).lw8(
+		NAME([this] (u8 data) {
+			m_pegc.packed_mode = bool(BIT(data, 0));
+            logerror("$e0100 packed mode %02x\n", data);
+		})
+	);
+//  map(0x102, 0x102) enable pegc linear VRAM at upper addresses
+	// $4a0 alias
+	map(0x104, 0x104).lw8(
+		NAME([this] (u8 data) {
+			pc9821_egc_w(0x0 / 2, data, 0x00ff);
+		})
+	);
+	// $4a4 alias
+	map(0x108, 0x109).lw16(
+		NAME([this] (u16 data, u16 mem_mask) {
+			pc9821_egc_w(0x4 / 2, data, mem_mask);
+		})
+	);
+//  map(0x10a, 0x10a) enable color comparator when reading VRAM
+	// $4a8 alias (mask)
+	// TODO: verify what happens on 32-bit accesses
+	map(0x10c, 0x10d).lw16(
+		NAME([this] (u16 data, u16 mem_mask) {
+			pc9821_egc_w(0x8 / 2, data, mem_mask);
+		})
+	);
+	// $4ae alias (block transfer)
+	map(0x110, 0x111).lw16(
+		NAME([this] (u16 data, u16 mem_mask) {
+			pc9821_egc_w(0xe / 2, data, mem_mask);
+		})
+	);
+	// $4ac alias (shift reg)
+	map(0x112, 0x113).lw16(
+		NAME([this] (u16 data, u16 mem_mask) {
+			pc9821_egc_w(0xc / 2, data, mem_mask);
+		})
+	);
+	// $4a6 alias (foreground color)
+	map(0x114, 0x114).lw8(
+		NAME([this] (u8 data) {
+			pc9821_egc_w(0x6 / 2, data, 0xff);
+		})
+	);
+	// $4aa alias (background color)
+	map(0x118, 0x118).lw8(
+		NAME([this] (u8 data) {
+			pc9821_egc_w(0xa / 2, data, 0xff);
+		})
+	);
+//  map(0x120, 0x19f) pattern register (image_xfer? relates to bit 15 of $108)
+}
+
 void pc9821_state::pc9821_map(address_map &map)
 {
 	pc9801bx2_map(map);
@@ -357,7 +396,9 @@ void pc9821_state::pc9821_map(address_map &map)
 //  map(0x000cc000, 0x000cffff).rom().region("sound_bios", 0); //sound BIOS
 //  map(0x000d8000, 0x000d9fff).rom().region("ide",0)
 //  map(0x000da000, 0x000dbfff).ram(); // ide ram
-	map(0x000e0000, 0x000e7fff).rw(FUNC(pc9821_state::pc9821_grcg_gvram0_r), FUNC(pc9821_state::pc9821_grcg_gvram0_w));
+	map(0x000e0000, 0x000e7fff).rw(FUNC(pc9821_state::grcg_gvram0_r), FUNC(pc9821_state::grcg_gvram0_w));
+	map(0x000e0000, 0x000e7fff).view(m_pegc_mmio_view);
+	m_pegc_mmio_view[0](0x000e0000, 0x000e7fff).m(*this, FUNC(pc9821_state::pegc_mmio_map));
 	map(0x00f00000, 0x00f9ffff).ram().share("ext_gvram");
 	map(0xfff00000, 0xfff9ffff).ram().share("ext_gvram");
 }
@@ -699,6 +740,7 @@ MACHINE_RESET_MEMBER(pc9821_state,pc9821)
 	MACHINE_RESET_CALL_MEMBER(pc9801rs);
 
 	m_pc9821_window_bank = 0x08;
+	m_pegc_mmio_view.disable();
 }
 
 // TODO: setter for DMAC clock should follow up whatever is the CPU clock

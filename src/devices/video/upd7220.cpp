@@ -1826,7 +1826,7 @@ void upd7220_device::update_graphics(bitmap_rgb32 &bitmap, const rectangle &clip
 	uint8_t interlace = ((m_mode & UPD7220_MODE_INTERLACE_MASK) == UPD7220_MODE_INTERLACE_ON) ? 1 : 0;
 	uint8_t zoom = m_disp + 1;
 
-	LOGAREA("FRAME=%d MODE=%02x FORCE BITMAP=%d ZOOM=%02x\n", screen().frame_number(), m_mode, force_bitmap, zoom);
+	LOGAREA("FRAME=%d MODE=%02x FORCE BITMAP=%d ZOOM=%02x PITCH=%d\n", screen().frame_number(), m_mode, force_bitmap, zoom, m_pitch);
 
 	for(int area = 0; area < 4; area++)
 	{

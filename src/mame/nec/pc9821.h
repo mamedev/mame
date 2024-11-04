@@ -19,6 +19,7 @@ public:
 	pc9821_state(const machine_config &mconfig, device_type type, const char *tag)
 		: pc9801bx_state(mconfig, type, tag)
 		, m_ext_gvram(*this, "ext_gvram")
+		, m_pegc_mmio_view(*this, "pegc_mmio_view")
 	{
 	}
 
@@ -35,11 +36,10 @@ protected:
 
 private:
 	required_shared_ptr<uint32_t> m_ext_gvram;
+	memory_view m_pegc_mmio_view;
 
 	uint16_t pc9821_grcg_gvram_r(offs_t offset, uint16_t mem_mask = ~0);
 	void pc9821_grcg_gvram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-	uint16_t pc9821_grcg_gvram0_r(offs_t offset, uint16_t mem_mask = ~0);
-	void pc9821_grcg_gvram0_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	void pc9821_video_ff_w(offs_t offset, uint8_t data);
 	uint8_t pc9821_a0_r(offs_t offset);
 	void pc9821_a0_w(offs_t offset, uint8_t data);
@@ -56,10 +56,11 @@ private:
 		uint8_t pal_entry = 0;
 		uint8_t r[0x100]{}, g[0x100]{}, b[0x100]{};
 		uint16_t bank[2]{};
-	}m_analog256;
+		bool packed_mode = false;
+	}m_pegc;
 
 	void pc9821_egc_w(offs_t offset, u16 data, u16 mem_mask = ~0);
-
+	void pegc_mmio_map(address_map &map);
 
 //  UPD7220_DISPLAY_PIXELS_MEMBER( pegc_display_pixels );
 };
