@@ -19,7 +19,8 @@ TODO:
 - microbx2: sets mode=0x1f (interlace), oddly cuts off area scroll on prompt (double height chars?)
   while DEMO.1 don't.
 - repeat fields interlace mode;
-- better honoring of visible area;
+- support non-draw on retrace mode (pc98 bitmap layer -> potential raster effects), better
+  honoring of visible area (bail out thru m_al, cutting off unnecessary comparisons);
 - light pen;
 
 **************************************************************************************************/
@@ -32,7 +33,7 @@ TODO:
 
 #define LOG_CRTC      (1U << 1)
 #define LOG_DRAW      (1U << 2)
-#define LOG_AREA      (1U << 3) // print works best with -oslog
+#define LOG_AREA      (1U << 3) // printout works best with -oslog
 #define LOG_CMD       (1U << 4)
 #define LOG_CMD2      (1U << 5) // DE related commands
 #define LOG_CMD3      (1U << 6) // memory interface (RDAT/WDAT)
@@ -1805,8 +1806,7 @@ void upd7220_device::draw_graphics_line(bitmap_rgb32 &bitmap, uint32_t addr, int
 
 	for (int sx = 0; sx < aw; sx++)
 	{
-		// TODO: remove bump from both
-		if((sx << 4) < m_aw * 16 && y < al)
+		if(sx < m_aw && y < al)
 			m_display_cb(bitmap, y, sx << 4, addr + (wd + 1) * (sx % pitch));
 	}
 }
@@ -1837,20 +1837,22 @@ void upd7220_device::update_graphics(bitmap_rgb32 &bitmap, const rectangle &clip
 		if(im || force_bitmap)
 		{
 			// according to documentation only areas 0-1-2 can be drawn in bitmap mode
-			// PC98 Quarth definitely needs area 2 for player section.
+			// - pc98:quarth definitely needs area 2 for player section.
+            // - pc98:steamhea wants area 3 for scrolling and dialogue screens to work together,
+            //   contradicting the doc. Fixed in 7220A or applies just for mixed mode?
 			// TODO: what happens if combined area size is smaller than display height?
 			// documentation suggests that it should repeat from area 0, needs real HW verification (no known SW do it).
-			if(area >= 3)
-				break;
+			if (area >= 3 && !force_bitmap)
+                break;
 
-			// PC98 madoum1-3 sets up ALL areas to a length of 0 after initial intro screen.
+			// pc98:madoum1-3 sets up ALL areas to a length of 0 after initial intro screen.
 			// madoum1: area 0 sad==0 on gameplay (PC=0x955e7), sad==0xaa0 on second intro screen (tower) then intentionally scrolls up and back to initial position.
 			// Suggests that length should be treated as max size if this occurs, this is also proven to be correct via real HW verification.
 			// TODO: check if text partition do the same.
 			if (len == 0)
 				len = 0x400;
 
-			if(interlace)
+			if (interlace)
 				len <<= 1;
 
 			for(y = 0; y < len; y++)

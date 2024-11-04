@@ -25,13 +25,9 @@ TODO (most of these should be generic hash rulesets but anyway ...):
 - de-cloneize data disks, use comma separated info name="datadisk" instead;
 - Verify disk labels, several are mislabeled (i.e. has numbers instead of letters and viceversa);
 - Mark as baddump any SW disk(s) that sports non-default factory saves;
-- Verify .hdm 3.5" entries, all of them but 100best35 may be really 5.25" instead.
+- Verify .hdm 3.5" entries, all of them but 100best35 works on 5.25" interface instead.
+  Unless 123note is right and .hdm filesize is that trimmed ...
 - document any unorthodox way for running a given sw;
-- document (and support) alternative file types (FDD, NFD, FIX)
-  can we convert some of those to FDI or D88? or some protection schemes need
-  such format? (Note that some disks come in DIP, DCP, DCU formats: these shall
-  be just plain images, like FDI, just with different headers with the track
-  "map")
 - fix doujin software names;
 - Remove manufacturer=<unofficial> and instead assign proper manufacturer naming for
   Victor freeware software (+ bad dump flag), bootleg for the PC9801 Game Packs;
@@ -2439,10 +2435,14 @@ Not extensively tested (has several spreadsheet examples)
 		</part>
 	</software>
 
-	<software name="freelncd">
-		<description>Lotus Freelance (demo)</description>
-		<year>19??</year>
+	<software name="freelncd" supported="partial">
+		<description>Lotus Freelance (R3J Auto Demo v1.0)</description>
+		<year>1989</year>
+		<!-- "Lotus Development Japan Ltd." -->
 		<publisher>Lotus</publisher>
+		<notes><![CDATA[
+Doesn't draw [kanji] on VM class
+]]></notes>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1261568">
 				<rom name="freelance_demo.hdm" size="1261568" crc="a9bab9de" sha1="128943b9c32ecc82bf58f214ad7cd5c655b46480" offset="0" />
@@ -3433,14 +3433,13 @@ Incorrect layout on track 0 head 0, expected_size=166666, current_size=261600
 		</part>
 	</software>
 
-	<!--
-	    After the intro the game asks for a disk in drive A. It doesn't work with any of the disks here.
-	    Works when installed to HDD.
-	-->
-	<software name="5jikanm" supported="partial">
+	<software name="5jikanm" supported="yes">
 		<description>5 Jikanme no Venus</description>
 		<year>1995</year>
 		<publisher>フェアリーダスト (Fairy Dust)</publisher>
+		<notes><![CDATA[
+Throws a "excution file has been renamed" warning during MEGDOS boot
+]]></notes>
 		<info name="alt_title" value="５時間目のヴィーナス" />
 		<info name="release" value="19950407" />
 		<part name="flop1" interface="floppy_5_25">
@@ -5702,11 +5701,13 @@ Every [kanji] character has one line of corruption
 		</part>
 	</software>
 
-	<!-- At some point it was possible to mount a -86 and a -26 to split BGMs and SFXs, regressed -->
 	<software name="animjv3" supported="partial">
 		<description>Animahjong V3</description>
 		<year>1993</year>
 		<publisher>ソニア (Sogna)</publisher>
+		<notes><![CDATA[
+[C-Bus] was possible to mount both -86 and -26 to split BGMs and SFXs (regression)
+]]></notes>
 		<info name="alt_title" value="あにまーじゃんＶ３" />
 		<info name="release" value="19930226" />
 		<part name="flop1" interface="floppy_5_25">
@@ -11862,11 +11863,17 @@ Missing [7220] text selector for choices (btanb? May just require specific keys,
 		</part>
 	</software>
 
-	<!-- Running the game from floppy doesn't work, it doesn't recognize the disks properly. Works from HDD. -->
-	<software name="civ" supported="partial">
+	<software name="civ" supported="no">
 		<description>Sid Meier's Civilization</description>
 		<year>1992</year>
 		<publisher>マイクロプローズジャパン (MicroProse Japan)</publisher>
+		<notes><![CDATA[
+Selecting new game from floppy direct boot will eventually black screen after world creation (that requires user press?) (verify)
+Booting from flop7 will "SYSTEM SHUTDOWN" no matter floppy combination
+[7220] Oddly cuts off mouse cursor when near top of screen, color clash on new game selections (verified to flicker)
+No BGM sound during gameplay (verify)
+[MIDI] MT-32 will black screen if selected when game is installed from HDD
+]]></notes>
 		<info name="alt_title" value="シヴィライゼーション" />
 		<info name="release" value="19920925" />
 		<info name="usage" value="Run INSTALL.BAT from DOS to install to HDD" />
@@ -11900,12 +11907,14 @@ Missing [7220] text selector for choices (btanb? May just require specific keys,
 				<rom name="civil5.fdi" size="1265664" crc="d415d6d9" sha1="f4940bbf3cd059646e8b99fc726654e33a2620b0" offset="0" />
 			</dataarea>
 		</part>
+		<!-- Maps data disk? -->
 		<part name="flop6" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 6"/>
 			<dataarea name="flop" size="1265664">
 				<rom name="civil6.fdi" size="1265664" crc="913b2f6c" sha1="3ecd379da1afc80a7744e5ae344adf279888ca2e" offset="0" />
 			</dataarea>
 		</part>
+		<!-- Alt DOS 5.00 boot disk? -->
 		<part name="flop7" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 7"/>
 			<dataarea name="flop" size="1265664">
@@ -15917,15 +15926,14 @@ Is it really game like intended? [FDC] investigation required
 		</part>
 	</software>
 
-	<!--
-	    Doesn't recognize disk changes, but it's possible to install the game to HDD.
-	    Also, This game is supposed to play voice samples, but in MAME it just outputs a constant beep.
-	-->
 	<software name="diadrum" supported="partial">
 		<!-- Origin: Neo Kobe Collection -->
 		<description>Diadrum</description>
 		<year>1993</year>
 		<publisher>日本クリエイト (Nihon Create)</publisher>
+		<notes><![CDATA[
+Opening [DAC1BIT] has low pitch on RS class
+]]></notes>
 		<info name="alt_title" value="ディアドラム" />
 		<info name="release" value="19931202" />
 		<info name="usage" value="Run INSTHD.EXE from DOS to install to HDD" />
@@ -16166,10 +16174,11 @@ During a game [mouse] clicking is too fast (skips intermediate selections)
 		<publisher>ビクター音楽産業 (Victor Musical Industries)</publisher>
 		<info name="alt_title" value="ディレクター物語" />
 		<info name="release" value="19880921" />
+		<!-- baddump: non-factory Ranking (assuming VICTOR should be first place at 0 pts.)-->
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="1086448">
-				<rom name="director monogatari (disk 1).d88" size="1086448" crc="5b45487f" sha1="e23c77fb7c41bd86f865b14f2767406ea9e1a172" offset="0" />
+				<rom name="director monogatari (disk 1).d88" size="1086448" crc="5b45487f" sha1="e23c77fb7c41bd86f865b14f2767406ea9e1a172" offset="0" status="baddump" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
@@ -18060,13 +18069,10 @@ Couple of "Unimplemented floating point control" opcodes triggered in error.log
 		</part>
 	</software>
 
-	<software name="duel" supported="partial">
+	<software name="duel" supported="yes">
 		<description>Duel</description>
 		<year>1990</year>
 		<publisher>呉ソフトウエア工房 (KSK)</publisher>
-		<notes><![CDATA[
-[7220] bitmap not masking bottom of screen
-]]></notes>
 		<info name="alt_title" value="デュエル" />
 		<info name="release" value="19900512" />
 		<part name="flop1" interface="floppy_5_25">
@@ -61929,6 +61935,11 @@ Untested on [HDD] install
 		<description>Steam-Heart's</description>
 		<year>1994</year>
 		<publisher>戯画 (Giga)</publisher>
+		<notes><![CDATA[
+Awful [PC9801-86] mixing: channel 0 submerges everything else
+Can't make [MIDI] GS/GS2/MT-32 to work thru mu50
+Not extensively tested
+]]></notes>
 		<info name="alt_title" value="スチームハーツ" />
 		<info name="release" value="19940315" />
 		<part name="flop1" interface="floppy_5_25">
