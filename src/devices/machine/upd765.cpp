@@ -1619,7 +1619,7 @@ void upd765_family_device::recalibrate_start(floppy_info &fi)
 	if(fi.ready) {
 		seek_continue(fi);
 	} else {
-		fi.st0 |= ST0_NR | ST0_FAIL;
+		fi.st0 |= ST0_NR | ST0_FAIL | ST0_SE;
 		command_end(fi, false);
 	}
 }
@@ -1635,7 +1635,7 @@ void upd765_family_device::seek_start(floppy_info &fi)
 	if(fi.ready) {
 		seek_continue(fi);
 	} else {
-		fi.st0 |= ST0_NR | ST0_FAIL;
+		fi.st0 |= ST0_NR | ST0_FAIL | ST0_SE;
 		command_end(fi, false);
 	}
 }
