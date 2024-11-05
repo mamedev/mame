@@ -14,8 +14,6 @@ removed (interrupt flags are via memory-mapped I/O).
 
 TODO:
 - add serial interface
-- current I/O ports are hardcoded for HMS402/4/8, which will need to be changed
-  when other MCU types are added
 - do the LAW/LWA opcodes not work on early revisions of HMCS400? the 1988 user
   manual warns that the W register is write-only, and that there is no efficient
   way to save this register when using interrupts
@@ -37,10 +35,11 @@ TODO:
 // CL = low-power
 // AC = high-speed
 
-// HMCS408, HMCS414, HMCS424 have a mask option for the system clock divider
+// HMCS408, HMCS41x, HMCS42x have a mask option for the system clock divider
+// HMCS41x don't have timer A or serial interface, HMCS41x and HMCS42x have less I/O pins
 // rev 2 apparently added LAW/LWA opcodes?
 
-// HMCS402C/CL/AC, 64 pins DP-64S or FP-64, 2Kx10 ROM, 160x4 RAM
+// HMCS402C/CL/AC, DP-64S or FP-64, 2Kx10 ROM, 160x4 RAM
 DEFINE_DEVICE_TYPE(HD614022, hd614022_device, "hd614022", "Hitachi HD614022") // C, rev 2
 DEFINE_DEVICE_TYPE(HD614023, hd614023_device, "hd614023", "Hitachi HD614023") // C, rev 1
 DEFINE_DEVICE_TYPE(HD614025, hd614025_device, "hd614025", "Hitachi HD614025") // CL, rev 2
@@ -48,7 +47,7 @@ DEFINE_DEVICE_TYPE(HD614026, hd614026_device, "hd614026", "Hitachi HD614026") //
 DEFINE_DEVICE_TYPE(HD614028, hd614028_device, "hd614028", "Hitachi HD614028") // AC, rev 2
 DEFINE_DEVICE_TYPE(HD614029, hd614029_device, "hd614029", "Hitachi HD614029") // AC, rev 1
 
-// HMCS404C/CL/AC, 64 pins DP-64S or FP-64, 4Kx10 ROM, 256x4 RAM
+// HMCS404C/CL/AC, DP-64S or FP-64, 4Kx10 ROM, 256x4 RAM
 DEFINE_DEVICE_TYPE(HD614042, hd614042_device, "hd614042", "Hitachi HD614042") // C, rev 2
 DEFINE_DEVICE_TYPE(HD614043, hd614043_device, "hd614043", "Hitachi HD614043") // C, rev 1
 DEFINE_DEVICE_TYPE(HD614045, hd614045_device, "hd614045", "Hitachi HD614045") // CL, rev 2
@@ -56,13 +55,28 @@ DEFINE_DEVICE_TYPE(HD614046, hd614046_device, "hd614046", "Hitachi HD614046") //
 DEFINE_DEVICE_TYPE(HD614048, hd614048_device, "hd614048", "Hitachi HD614048") // AC, rev 2
 DEFINE_DEVICE_TYPE(HD614049, hd614049_device, "hd614049", "Hitachi HD614049") // AC, rev 1
 
-// HMCS408C/CL/AC, 64 pins DP-64S or FP-64, 8Kx10 ROM, 512x4 RAM
+// HMCS408C/CL/AC, DP-64S or FP-64, 8Kx10 ROM, 512x4 RAM
 DEFINE_DEVICE_TYPE(HD614080, hd614080_device, "hd614080", "Hitachi HD614080") // C, rev 2
 DEFINE_DEVICE_TYPE(HD614081, hd614081_device, "hd614081", "Hitachi HD614081") // C, rev 1
 DEFINE_DEVICE_TYPE(HD614085, hd614085_device, "hd614085", "Hitachi HD614085") // CL, rev 2
 DEFINE_DEVICE_TYPE(HD614086, hd614086_device, "hd614086", "Hitachi HD614086") // CL, rev 1
 DEFINE_DEVICE_TYPE(HD614088, hd614088_device, "hd614088", "Hitachi HD614088") // AC, rev 2
 DEFINE_DEVICE_TYPE(HD614089, hd614089_device, "hd614089", "Hitachi HD614089") // AC, rev 1
+
+// HMCS412C/CL/AC, DP-42/DP-42S or FP-44A, 2Kx10 ROM, 160x4 RAM
+DEFINE_DEVICE_TYPE(HD614120, hd614120_device, "hd614120", "Hitachi HD614120") // C
+DEFINE_DEVICE_TYPE(HD614125, hd614125_device, "hd614125", "Hitachi HD614125") // CL
+DEFINE_DEVICE_TYPE(HD614128, hd614128_device, "hd614128", "Hitachi HD614128") // AC
+
+// HMCS414C/CL/AC, DP-42/DP-42S or FP-44A, 4Kx10 ROM, 160x4 RAM
+DEFINE_DEVICE_TYPE(HD614140, hd614140_device, "hd614140", "Hitachi HD614140") // C
+DEFINE_DEVICE_TYPE(HD614145, hd614145_device, "hd614145", "Hitachi HD614145") // CL
+DEFINE_DEVICE_TYPE(HD614148, hd614148_device, "hd614148", "Hitachi HD614148") // AC
+
+// HMCS424C/CL/AC, DP-42/DP-42S or FP-44A, 4Kx10 ROM, 256x4 RAM
+DEFINE_DEVICE_TYPE(HD404240, hd404240_device, "hd404240", "Hitachi HD404240") // C
+DEFINE_DEVICE_TYPE(HD40L4240, hd40l4240_device, "hd40l4240", "Hitachi HD40L4240") // CL
+DEFINE_DEVICE_TYPE(HD40A4240, hd40a4240_device, "hd40a4240", "Hitachi HD40A4240") // AC
 
 
 //-------------------------------------------------
@@ -168,6 +182,57 @@ hd614089_device::hd614089_device(const machine_config &mconfig, const char *tag,
 { }
 
 
+hmcs41x_cpu_device::hmcs41x_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u32 rom_size, u32 ram_size) :
+	hmcs400_cpu_device(mconfig, type, tag, owner, clock, rom_size, ram_size)
+{
+	m_has_div = true;
+}
+
+hmcs412_cpu_device::hmcs412_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock) :
+	hmcs41x_cpu_device(mconfig, type, tag, owner, clock, 0x800, 96)
+{ }
+
+hd614120_device::hd614120_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
+	hmcs412_cpu_device(mconfig, HD614120, tag, owner, clock)
+{ }
+hd614125_device::hd614125_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
+	hmcs412_cpu_device(mconfig, HD614125, tag, owner, clock)
+{ }
+hd614128_device::hd614128_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
+	hmcs412_cpu_device(mconfig, HD614128, tag, owner, clock)
+{ }
+
+
+hmcs414_cpu_device::hmcs414_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock) :
+	hmcs41x_cpu_device(mconfig, type, tag, owner, clock, 0x1000, 96)
+{ }
+
+hd614140_device::hd614140_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
+	hmcs414_cpu_device(mconfig, HD614140, tag, owner, clock)
+{ }
+hd614145_device::hd614145_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
+	hmcs414_cpu_device(mconfig, HD614145, tag, owner, clock)
+{ }
+hd614148_device::hd614148_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
+	hmcs414_cpu_device(mconfig, HD614148, tag, owner, clock)
+{ }
+
+
+hmcs424_cpu_device::hmcs424_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock) :
+	hmcs41x_cpu_device(mconfig, type, tag, owner, clock, 0x1000, 192)
+{ }
+
+hd404240_device::hd404240_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
+	hmcs424_cpu_device(mconfig, HD404240, tag, owner, clock)
+{ }
+hd40l4240_device::hd40l4240_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
+	hmcs424_cpu_device(mconfig, HD40L4240, tag, owner, clock)
+{ }
+hd40a4240_device::hd40a4240_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
+	hmcs424_cpu_device(mconfig, HD40A4240, tag, owner, clock)
+{ }
+
+
 //-------------------------------------------------
 //  initialization
 //-------------------------------------------------
@@ -199,11 +264,13 @@ void hmcs400_cpu_device::device_start()
 
 	memset(m_r, 0, sizeof(m_r));
 	memset(m_r_mask, 0, sizeof(m_r_mask));
+	m_r_dir = 0;
 	m_d = 0;
 	m_d_mask = 0;
 
 	m_int_line[0] = m_int_line[1] = 1;
 	m_irq_flags = 0;
+	m_irq_mask = 0x33ff;
 	m_pmr = 0;
 	m_prescaler = 0;
 	m_timer_mode[0] = m_timer_mode[1] = 0;
@@ -233,6 +300,7 @@ void hmcs400_cpu_device::device_start()
 
 	save_item(NAME(m_r));
 	save_item(NAME(m_r_mask));
+	save_item(NAME(m_r_dir));
 	save_item(NAME(m_d));
 	save_item(NAME(m_d_mask));
 
@@ -266,6 +334,15 @@ void hmcs400_cpu_device::device_start()
 	state_add(++m_state_count, "CA", m_ca).formatstr("%01X").noshow(); // 11
 
 	set_icountptr(m_icount);
+}
+
+void hmcs41x_cpu_device::device_start()
+{
+	hmcs400_cpu_device::device_start();
+
+	// no timer A or serial interface
+	m_irq_mask = 0x033f;
+	m_data->unmap_readwrite(0x005, 0x008);
 }
 
 void hmcs400_cpu_device::device_reset()
@@ -428,6 +505,9 @@ void hmcs400_cpu_device::reset_io()
 	m_d_mask = m_d = 0x000f;
 	m_write_d(m_d_mask);
 
+	// R0 and R6-R8 are write-only, R9 and RA are read-only
+	m_r_dir = 0x16affe;
+
 	for (int i = 0; i < 11; i++)
 	{
 		// R0-R2 and RA are high-voltage
@@ -438,13 +518,20 @@ void hmcs400_cpu_device::reset_io()
 	}
 }
 
+void hmcs41x_cpu_device::reset_io()
+{
+	// does not have R5-R9
+	hmcs400_cpu_device::reset_io();
+	m_r_dir &= ~0xffc00;
+}
+
 u8 hmcs400_cpu_device::read_r(u8 index)
 {
 	// reads from write-only or non-existent ports are invalid
-	const bool write_only = (index == 0 || (index >= 6 && index <= 8));
-	if (write_only || index > 10)
+	const u8 dir = m_r_dir >> (index * 2) & 3;
+	if (~dir & 1)
 	{
-		logerror("read from %s port R%X @ $%04X\n", write_only ? "output" : "unknown", index, m_prev_pc);
+		logerror("read from %s port R%X @ $%04X\n", (dir & 2) ? "output" : "unknown", index, m_prev_pc);
 		return 0xf;
 	}
 
@@ -479,7 +566,7 @@ void hmcs400_cpu_device::write_r(u8 index, u8 data)
 	data &= 0xf;
 
 	// ignore writes to read-only or non-existent ports
-	if (index > 8)
+	if (~m_r_dir >> (index * 2) & 2)
 		return;
 
 	if (m_write_r[index].isunset())
@@ -550,7 +637,7 @@ bool hmcs400_cpu_device::access_mode(u8 mem_mask, bool bit_mode)
 			return true;
 	}
 
-	if (err)
+	if (err || mem_mask == 0)
 		logerror("invalid access to I/O register @ $%04X\n", m_prev_pc);
 
 	return false;
@@ -559,7 +646,7 @@ bool hmcs400_cpu_device::access_mode(u8 mem_mask, bool bit_mode)
 u8 hmcs400_cpu_device::irq_control_r(offs_t offset, u8 mem_mask)
 {
 	// mask out unused bits (RSP is write-only)
-	const u16 unused = 0xcc02;
+	const u16 unused = ~m_irq_mask | 2;
 	u16 data = m_irq_flags | unused;
 
 	if (!machine().side_effects_disabled())
@@ -585,7 +672,7 @@ void hmcs400_cpu_device::irq_control_w(offs_t offset, u8 data, u8 mem_mask)
 	u16 mask = mem_mask << (offset * 4);
 
 	// ignore writes to unused bits
-	if (mask & 0xcc00)
+	if (mask & ~m_irq_mask)
 		return;
 
 	// ignore writing 1 to flags that can only be cleared
@@ -633,7 +720,7 @@ void hmcs400_cpu_device::take_interrupt(int irq)
 void hmcs400_cpu_device::check_interrupts()
 {
 	// irq priority is in the same order as the irq control flags
-	u16 irq = m_irq_flags >> 2;
+	u16 irq = (m_irq_flags & m_irq_mask) >> 2;
 
 	for (int i = 0; i < 7; i++)
 	{
