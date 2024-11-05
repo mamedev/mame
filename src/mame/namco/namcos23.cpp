@@ -6314,6 +6314,7 @@ void namcos23_state::timecrs2(machine_config &config)
 void namcoss23_state::ss23(machine_config &config)
 {
 	s23(config);
+	m_maincpu->set_addrmap(AS_PROGRAM, &namcoss23_state::mips_map);
 }
 
 void namcoss23_state::timecrs2v4a(machine_config &config)
