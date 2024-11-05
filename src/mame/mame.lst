@@ -15091,6 +15091,7 @@ koftball                        // (c) 1995 BMC
 
 @source:bmc/popobear.cpp
 magkengo                        // (c) 2005 Herb Home
+magkengou                       // (c) 2005 Herb Home
 popobear                        // (c) 2000 BMC
 
 @source:bondwell/bw12.cpp
@@ -20301,6 +20302,7 @@ happyskl                        // (c) 2000?
 iqblocka                        // (c) 1996
 iqblockf                        // (c) 1996
 jking103a                       // (c) 1999
+jking200pr                      // (c) 2000?
 jking302us                      // (c) 2000?
 lhzb                            // (c) 1998
 lhzba                           // (c) 1998
@@ -20318,6 +20320,8 @@ slqz2a                          // (c) 1998
 spkrform                        // (c) 2000?
 starzan                         // (c) 2000?
 tarzan                          // (c) 1999
+tarzan103m                      // (c) 1999?
+tarzan202fa                     // (c) 1999?
 tarzana                         // (c) 1999
 tarzanb                         // (c) 1999
 tarzanc                         // (c) 1999
@@ -42108,6 +42112,8 @@ ckz80                           //
 
 @source:skeleton/cle68k.cpp
 dmndhrt                         //
+dmndhrtn                        //
+honeybee                        //
 
 @source:skeleton/clxvme186.cpp
 clxvme186                       //

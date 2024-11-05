@@ -686,6 +686,7 @@ public:
 	void init_happyskl() ATTR_COLD;
 	void init_iqblocka() ATTR_COLD;
 	void init_jking103a() ATTR_COLD;
+	void init_jking200pr() ATTR_COLD;
 	void init_jking302us() ATTR_COLD;
 	void init_lhzb2() ATTR_COLD;
 	void init_lhzb2a() ATTR_COLD;
@@ -864,6 +865,7 @@ private:
 	// Decrypt
 	void decrypt_program_rom(int mask, int a7, int a6, int a5, int a4, int a3, int a2, int a1, int a0) ATTR_COLD;
 
+	void jking200pr_decrypt_program_rom() ATTR_COLD;
 	void mgcs_decrypt_program_rom() ATTR_COLD;
 	void mgcsa_decrypt_program_rom() ATTR_COLD;
 	void mgcs_igs029_run() ATTR_COLD;
@@ -1368,6 +1370,49 @@ void igs017_state::init_jking103a()
 // m_igs_string->dump("jking103a_string.key", 0xb14d, 0xb244, false);
 }
 
+void igs017_state::jking200pr_decrypt_program_rom()
+{
+	const int rom_size = memregion("maincpu")->bytes();
+	u8 * const rom = memregion("maincpu")->base();
+
+	for (int i = 0; i < rom_size; i++)
+	{
+		u8 x = rom[i];
+
+		if ((i & 0x00011) == 0x00011) x ^= 0x01;
+		if ((i & 0x02180) == 0x00000) x ^= 0x01;
+		if (((i & 0x00220) == 0x00020) || ((i & 0x002a0) == 0x002a0)) x ^= 0x20;
+		if (((i & 0x00200) == 0x00000) || ((i & 0x00220) == 0x00220)) x ^= 0x40;
+		if ((i & 0x001c0) != 0x00040) x ^= 0x80;
+
+		m_decrypted_opcodes[i] = x;
+	}
+
+	for (int i = 0; i < rom_size; i++) // by iq_132
+	{
+		u8 x = rom[i];
+
+		if ((i & 0x00011) == 0x00011) x ^= 0x01;
+		if ((i & 0x02180) == 0x00000) x ^= 0x01;
+		if (((i & 0x001e0) == 0x00100) || ((i & 0x001e0) == 0x00140)) x ^= 0x20;
+		if ((i & 0x00260) != 0x00020) x ^= 0x40;
+		if (((i & 0x00020) == 0x00020) || ((i & 0x00180) == 0x00080)) x ^= 0x80;
+
+		rom[i] = x;
+	}
+
+//  save_decrypted_rom(rom, rom_size);
+//  save_decrypted_rom(m_decrypted_opcodes, rom_size);
+}
+
+void igs017_state::init_jking200pr()
+{
+	jking200pr_decrypt_program_rom();
+	m_igs017_igs031->tarzan_decrypt_tiles(1);
+	m_igs017_igs031->tarzan_decrypt_sprites(0, 0);
+
+// m_igs_string->dump("jking200pr_string.key", 0xb14d, 0xb244, false);
+}
 
 void igs017_state::init_happyskl()
 {
@@ -4014,6 +4059,36 @@ static INPUT_PORTS_START( starzan )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN       ) // no effects in key test
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( tarzan202fa )
+	PORT_INCLUDE(starzan)
+
+	PORT_MODIFY("DSW1")
+	PORT_DIPUNUSED_DIPLOC(0x40, 0x40, "SW1:7") // not used from here on according to test mode, PCB does have 3 8-dip banks
+	PORT_DIPUNUSED_DIPLOC(0x80, 0x80, "SW1:8")
+
+	PORT_MODIFY("DSW2")
+	PORT_DIPUNUSED_DIPLOC(0x01, 0x01, "SW2:1")
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( tarzan103m )
+	PORT_INCLUDE(tarzan202fa)
+
+	PORT_MODIFY("DSW1")
+	PORT_DIPUNUSED_DIPLOC(0x10, 0x10, "SW1:5") // not used from here on according to test mode, PCB does have 3 8-dip banks
+	PORT_DIPUNUSED_DIPLOC(0x20, 0x20, "SW1:6")
+
+	PORT_MODIFY("PLAYER1")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_HIGH   ) PORT_NAME("Button A / Big / Double Up (double) / Show Odds")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_LOW    ) PORT_NAME("Button C / Small / Double Up (half)")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SLOT_STOP3    ) PORT_NAME("Left / Stop 3")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_GAMBLE_BET    ) PORT_NAME("Button B / Bet / Double Up")
+
+	PORT_MODIFY("PLAYER2")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SLOT_STOP2    ) PORT_NAME("Down / Stop 2")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SLOT_STOP4    ) PORT_NAME("Right / Stop 4")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SLOT_STOP1    ) PORT_NAME("Up / Stop 1")
+INPUT_PORTS_END
+
 // Test mode is in Italian (probably machine translated given how literal it is)
 static INPUT_PORTS_START( happyskl )
 	PORT_START("DSW1")
@@ -5745,6 +5820,53 @@ ROM_START( starzan )
 	ROM_LOAD( "starzan_string.key", 0x00, 0xec, CRC(b33f5050) SHA1(900d3c48944dbdd95d9e48d74c355e82e00ac012) )
 ROM_END
 
+ROM_START( tarzan202fa ) // IGS PCB NO-0230-1 (IGS025 stickered X7)
+	ROM_REGION( 0x40000, "maincpu", 0 )
+	ROM_LOAD( "tarzan_v102f.u9", 0x00000, 0x40000, CRC(b099baaa) SHA1(02f021852bf70dcb3ced66974a609acd45162ddc) )
+
+	ROM_REGION( 0x400000, "igs017_igs031:sprites", 0 )
+	ROM_LOAD( "igs_a2104_cg_v110.u3", 0x000000, 0x400000, CRC(dcbff16f) SHA1(2bf77ef4448c26124c8d8d18bb7ffe4105cfa940) ) // FIXED BITS (xxxxxxx0xxxxxxxx)
+	// empty u2 socket
+
+	ROM_REGION( 0x80000, "igs017_igs031:tilemaps", 0 )
+	ROM_LOAD( "igs_t2105_cg_v110.u11", 0x00000, 0x80000, CRC(1d4be260) SHA1(6374c61735144b3ff54d5e490f26adac4a10b14d) )
+
+	ROM_REGION( 0x80000, "oki", 0 )
+	ROM_LOAD( "igs_s2102_sp_v102.u8", 0x00000, 0x80000, CRC(90dda82d) SHA1(67fbc1e8d76b85e124136e2f1df09c8b6c5a8f97) )
+
+	ROM_REGION( 0x2dd * 2, "plds", ROMREGION_ERASE )
+	ROM_LOAD( "palce22v10h_tar97_u10-1.u10", 0x000, 0x2dd, NO_DUMP ) // read protected
+	ROM_LOAD( "palce22v10h_tar97_u20.u20",   0x2dd, 0x2dd, NO_DUMP ) // ""
+
+	ROM_REGION( 0xec, "igs_string", 0 )
+	ROM_LOAD( "tarzan202fa_string.key", 0x00, 0xec, CRC(b33f5050) SHA1(900d3c48944dbdd95d9e48d74c355e82e00ac012) )
+ROM_END
+
+// IGS PCB NO-0230-1 (IGS025 stickered Z8 and Tarzan 2)
+// has Jungle King Plus string but shows Jungle King title screen
+ROM_START( jking200pr )
+	ROM_REGION( 0x40000, "maincpu", 0 )
+	ROM_LOAD( "u9", 0x00000, 0x40000, CRC(8c40c920) SHA1(7d2c8b7b9e1eca4bf3f895e79c45e86937dc7cb4) ) //  1ST AND 2ND HALF IDENTICAL, no original label
+	ROM_IGNORE(              0x40000 )
+
+	ROM_REGION( 0x400000, "igs017_igs031:sprites", 0 )
+	ROM_LOAD( "igs_a2104_cg_v110.u3", 0x000000, 0x400000, CRC(dcbff16f) SHA1(2bf77ef4448c26124c8d8d18bb7ffe4105cfa940) ) // FIXED BITS (xxxxxxx0xxxxxxxx)
+	// empty u2 socket
+
+	ROM_REGION( 0x80000, "igs017_igs031:tilemaps", 0 )
+	ROM_LOAD( "igs_t2105_cg_v110.u11", 0x00000, 0x80000, CRC(1d4be260) SHA1(6374c61735144b3ff54d5e490f26adac4a10b14d) )
+
+	ROM_REGION( 0x80000, "oki", 0 )
+	ROM_LOAD( "igs_s2102_sp_v102.u8", 0x00000, 0x80000, CRC(90dda82d) SHA1(67fbc1e8d76b85e124136e2f1df09c8b6c5a8f97) )
+
+	ROM_REGION( 0x2dd * 2, "plds", ROMREGION_ERASE )
+	ROM_LOAD( "palce22v10h_tar97_u10-1.u10", 0x000, 0x2dd, NO_DUMP ) // read protected
+	ROM_LOAD( "palce22v10h_tar97_u20.u20",   0x2dd, 0x2dd, NO_DUMP ) // ""
+
+	ROM_REGION( 0xec, "igs_string", 0 )
+	ROM_LOAD( "jking200pr_string.key", 0x00, 0xec, CRC(b33f5050) SHA1(900d3c48944dbdd95d9e48d74c355e82e00ac012) )
+ROM_END
+
 // default settings password is all start button
 ROM_START( jking103a )
 	ROM_REGION( 0x40000, "maincpu", 0 )
@@ -5766,6 +5888,30 @@ ROM_START( jking103a )
 
 	ROM_REGION( 0xec, "igs_string", 0 )
 	ROM_LOAD( "jking103a_string.key", 0x00, 0xec, BAD_DUMP CRC(8d288f5e) SHA1(19c184600d80838ef04be8ab29c93d91cf3161c9) ) // TODO: check this
+ROM_END
+
+// IGS PCB NO-0230-1 (IGS025 without original sticker)
+ROM_START( tarzan103m )
+	ROM_REGION( 0x40000, "maincpu", 0 )
+	ROM_LOAD( "tms27c040.u9", 0x00000, 0x40000, CRC(19e3811d) SHA1(ff6b26b7cba84f030649da92eb27892b7c8eb7df) ) //  1ST AND 2ND HALF IDENTICAL, no original label
+	ROM_IGNORE(                        0x40000 )
+
+	ROM_REGION( 0x400000, "igs017_igs031:sprites", 0 )
+	ROM_LOAD( "igs_a2104_cg_v110.u3", 0x00000, 0x400000, CRC(dcbff16f) SHA1(2bf77ef4448c26124c8d8d18bb7ffe4105cfa940) ) // FIXED BITS (xxxxxxx0xxxxxxxx)
+	// empty u2
+
+	ROM_REGION( 0x80000, "igs017_igs031:tilemaps", 0 )
+	ROM_LOAD( "igs_t2105_cg_v110.u11", 0x00000, 0x80000, CRC(1d4be260) SHA1(6374c61735144b3ff54d5e490f26adac4a10b14d) )
+
+	ROM_REGION( 0x80000, "oki", 0 )
+	ROM_LOAD( "igs_s2102_sp_v102.u8", 0x00000, 0x80000, CRC(90dda82d) SHA1(67fbc1e8d76b85e124136e2f1df09c8b6c5a8f97) )
+
+	ROM_REGION( 0x2dd * 2, "plds", ROMREGION_ERASE )
+	ROM_LOAD( "eg.u20", 0x000, 0x2dd, NO_DUMP )
+	ROM_LOAD( "eg.u21", 0x2dd, 0x2dd, NO_DUMP )
+
+	ROM_REGION( 0xec, "igs_string", 0 )
+	ROM_LOAD( "tarzan103m_string.key", 0x00, 0xec, CRC(b33f5050) SHA1(900d3c48944dbdd95d9e48d74c355e82e00ac012) )
 ROM_END
 
 
@@ -5890,32 +6036,35 @@ ROM_END
 
 } // anonymous namespace
 
-GAME ( 1996,  iqblocka,   iqblock,  iqblocka,   iqblocka, igs017_state, init_iqblocka,   ROT0, "IGS", "Shuzi Leyuan (China, V127M, gambling)",                              0 ) // 數字樂園
-GAME ( 1997,  iqblockf,   iqblock,  iqblockf,   iqblockf, igs017_state, init_iqblocka,   ROT0, "IGS", "IQ Block (V113FR, gambling)",                                        0 )
-GAME ( 1997,  mgdh,       0,        mgdh,       mgdh,     igs017_state, init_mgdh,       ROT0, "IGS", "Manguan Daheng (Taiwan, V125T1)",                                    MACHINE_IMPERFECT_COLORS | MACHINE_UNEMULATED_PROTECTION) // 滿貫大亨, wrong colors in betting screen, game id check (patched out)
-GAME ( 1997,  mgdha,      mgdh,     mgdha,      mgdh,     igs017_state, init_mgdha,      ROT0, "IGS", "Manguan Daheng (Taiwan, V123T1)",                                    0 ) // 滿貫大亨
-GAME ( 1997,  sdmg2,      0,        sdmg2,      sdmg2,    igs017_state, init_sdmg2,      ROT0, "IGS", "Chaoji Da Manguan II (China, V754C, set 1)",                         0 ) // 超級大滿貫II
-GAME ( 1997,  sdmg2a,     sdmg2,    sdmg2,      sdmg2,    igs017_state, init_sdmg2a,     ROT0, "IGS", "Chaoji Da Manguan II (China, V754C, set 2)",                         0 ) // 超級大滿貫II
-GAME ( 1997,  tjsb,       0,        tjsb,       tjsb,     igs017_state, init_tjsb,       ROT0, "IGS", "Tian Jiang Shen Bing (China, V137C)",                                MACHINE_UNEMULATED_PROTECTION ) // 天將神兵, fails the bonus round protection check (if enabled via DSW), see e.g. demo mode
-GAME ( 1998,  genius6,    0,        genius6,    genius6,  igs017_state, init_iqblocka,   ROT0, "IGS", "Genius 6 (V110F)",                                                   0 ) // shows Chinese text in puzzle game
-GAME ( 1997,  genius6a,   genius6,  genius6,    genius6,  igs017_state, init_iqblocka,   ROT0, "IGS", "Genius 6 (V133F)",                                                   0 ) // clone because it has older copyright year
-GAME ( 1997,  genius6b,   genius6,  genius6,    genius6,  igs017_state, init_iqblocka,   ROT0, "IGS", "Genius 6 (V132F)",                                                   0 ) // "
-GAME ( 1998,  mgcs,       0,        mgcs,       mgcs,     igs017_state, init_mgcs,       ROT0, "IGS", "Manguan Caishen (China, V103CS)",                                    MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION ) // 满贯财神, finish IGS029 protection
-GAME ( 1998,  mgcsa,      mgcs,     mgcsa,      mgcs,     igs017_state, init_mgcsa,      ROT0, "IGS", "Manguan Caishen (China, V106CS)",                                    MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION ) // 满贯财神, finish IGS029 protection
-GAME ( 1998,  lhzb,       0,        lhzb2,      lhzb,     igs017_state, init_lhzb2,      ROT0, "IGS", "Long Hu Zhengba (China, VS105M, set 1)",                             MACHINE_UNEMULATED_PROTECTION ) // 龙虎争霸, finish IGS022 protection
-GAME ( 1998,  lhzba,      lhzb,     lhzb2,      lhzb,     igs017_state, init_lhzb2,      ROT0, "IGS", "Long Hu Zhengba (China, VS105M, set 2)",                             MACHINE_UNEMULATED_PROTECTION ) // 龙虎争霸, finish IGS022 protection
-GAME ( 1998,  lhzb2,      0,        lhzb2,      lhzb2,    igs017_state, init_lhzb2,      ROT0, "IGS", "Long Hu Zhengba 2 (China, set 1)",                                   MACHINE_UNEMULATED_PROTECTION ) // 龙虎争霸2, finish IGS022 protection
-GAME ( 1998,  lhzb2a,     lhzb2,    lhzb2a,     lhzb2a,   igs017_state, init_lhzb2a,     ROT0, "IGS", "Long Hu Zhengba 2 (China, VS221M)",                                  0 ) // 龙虎争霸2
-GAME ( 1998,  slqz2,      0,        slqz2,      slqz2,    igs017_state, init_slqz2,      ROT0, "IGS", "Shuang Long Qiang Zhu 2 VS (China, VS203J)",                         MACHINE_UNEMULATED_PROTECTION ) // 双龙抢珠, finish IGS022 protection
-GAME ( 1998,  slqz2a,     slqz2,    slqz2,      slqz2,    igs017_state, init_slqz2,      ROT0, "IGS", "Shuang Long Qiang Zhu 2 VS (China, set 2)",                          MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION ) // 双龙抢珠, misses program ROM dump, finish IGS022 protection
-GAME ( 1999,  tarzanc,    0,        tarzan,     tarzan,   igs017_state, init_tarzanc,    ROT0, "IGS", "Tarzan Chuang Tian Guan (China, V109C, set 1)",                      0 ) // 泰山闯天关
-GAME ( 1999,  tarzan,     tarzanc,  tarzan,     tarzan,   igs017_state, init_tarzan,     ROT0, "IGS", "Tarzan Chuang Tian Guan (China, V109C, set 2)",                      MACHINE_NOT_WORKING ) // missing sprites and sound rom, imperfect tiles decryption
-GAME ( 1999,  tarzana,    tarzanc,  tarzan,     tarzan,   igs017_state, init_tarzana,    ROT0, "IGS", "Tarzan (V107)",                                                      MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION ) // missing IGS029 protection, missing sprites and sound rom
-GAME ( 1999,  tarzanb,    tarzanc,  tarzan,     tarzan,   igs017_state, init_tarzanc,    ROT0, "IGS", "Tarzan Chuang Tian Guan (China, V110)",                              0 )
-GAME ( 2000,  sdmg2p,     0,        sdmg2p,     sdmg2p,   igs017_state, init_sdmg2p,     ROT0, "IGS", "Maque Wangchao / Chaoji Da Manguan 2 - Jiaqiang Ban (China, V100C)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING ) // 麻雀王朝 / 超級大滿貫 2 -加強版 protection kicks in after starting game, hopper isn't hooked up correctly
-GAMEL( 2000?, starzan,    0,        starzan,    starzan,  igs017_state, init_starzan,    ROT0, "IGS (G.F. Gioca license)", "Super Tarzan (Italy, V100I)",                   0, layout_igsslot  )
-GAMEL( 2000?, jking103a,  starzan,  starzan,    starzan,  igs017_state, init_jking103a,  ROT0, "IGS", "Jungle King (V103A)",                                                0, layout_igsslot )
-GAMEL( 2000?, happyskl,   0,        happyskl,   happyskl, igs017_state, init_happyskl,   ROT0, "IGS", "Happy Skill (Italy, V611IT)",                                        0, layout_igspoker )
-GAMEL( 2000?, cpoker2,    0,        cpoker2,    cpoker2,  igs017_state, init_cpoker2,    ROT0, "IGS", "Champion Poker 2 (V100A)",                                           0, layout_igspoker )
-GAME ( 2000?, spkrform,   spk306us, spkrform,   spkrform, igs017_state, init_spkrform,   ROT0, "IGS", "Super Poker (V100xD03) / Formosa",                                   MACHINE_UNEMULATED_PROTECTION ) // poker game enabling forced with a patch. Parent spk306us in driver spoker.cpp
-GAME ( 2000?, jking302us, 0,        jking302us, starzan,  igs017_state, init_jking302us, ROT0, "IGS", "Jungle King (V302US)",                                               MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION ) // missing IGS025 and IGS029 protection
+GAME ( 1996,  iqblocka,    iqblock,  iqblocka,   iqblocka,    igs017_state, init_iqblocka,   ROT0, "IGS", "Shuzi Leyuan (China, V127M, gambling)",                              0 ) // 數字樂園
+GAME ( 1997,  iqblockf,    iqblock,  iqblockf,   iqblockf,    igs017_state, init_iqblocka,   ROT0, "IGS", "IQ Block (V113FR, gambling)",                                        0 )
+GAME ( 1997,  mgdh,        0,        mgdh,       mgdh,        igs017_state, init_mgdh,       ROT0, "IGS", "Manguan Daheng (Taiwan, V125T1)",                                    MACHINE_IMPERFECT_COLORS | MACHINE_UNEMULATED_PROTECTION) // 滿貫大亨, wrong colors in betting screen, game id check (patched out)
+GAME ( 1997,  mgdha,       mgdh,     mgdha,      mgdh,        igs017_state, init_mgdha,      ROT0, "IGS", "Manguan Daheng (Taiwan, V123T1)",                                    0 ) // 滿貫大亨
+GAME ( 1997,  sdmg2,       0,        sdmg2,      sdmg2,       igs017_state, init_sdmg2,      ROT0, "IGS", "Chaoji Da Manguan II (China, V754C, set 1)",                         0 ) // 超級大滿貫II
+GAME ( 1997,  sdmg2a,      sdmg2,    sdmg2,      sdmg2,       igs017_state, init_sdmg2a,     ROT0, "IGS", "Chaoji Da Manguan II (China, V754C, set 2)",                         0 ) // 超級大滿貫II
+GAME ( 1997,  tjsb,        0,        tjsb,       tjsb,        igs017_state, init_tjsb,       ROT0, "IGS", "Tian Jiang Shen Bing (China, V137C)",                                MACHINE_UNEMULATED_PROTECTION ) // 天將神兵, fails the bonus round protection check (if enabled via DSW), see e.g. demo mode
+GAME ( 1998,  genius6,     0,        genius6,    genius6,     igs017_state, init_iqblocka,   ROT0, "IGS", "Genius 6 (V110F)",                                                   0 ) // shows Chinese text in puzzle game
+GAME ( 1997,  genius6a,    genius6,  genius6,    genius6,     igs017_state, init_iqblocka,   ROT0, "IGS", "Genius 6 (V133F)",                                                   0 ) // clone because it has older copyright year
+GAME ( 1997,  genius6b,    genius6,  genius6,    genius6,     igs017_state, init_iqblocka,   ROT0, "IGS", "Genius 6 (V132F)",                                                   0 ) // "
+GAME ( 1998,  mgcs,        0,        mgcs,       mgcs,        igs017_state, init_mgcs,       ROT0, "IGS", "Manguan Caishen (China, V103CS)",                                    MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION ) // 满贯财神, finish IGS029 protection
+GAME ( 1998,  mgcsa,       mgcs,     mgcsa,      mgcs,        igs017_state, init_mgcsa,      ROT0, "IGS", "Manguan Caishen (China, V106CS)",                                    MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION ) // 满贯财神, finish IGS029 protection
+GAME ( 1998,  lhzb,        0,        lhzb2,      lhzb,        igs017_state, init_lhzb2,      ROT0, "IGS", "Long Hu Zhengba (China, VS105M, set 1)",                             MACHINE_UNEMULATED_PROTECTION ) // 龙虎争霸, finish IGS022 protection
+GAME ( 1998,  lhzba,       lhzb,     lhzb2,      lhzb,        igs017_state, init_lhzb2,      ROT0, "IGS", "Long Hu Zhengba (China, VS105M, set 2)",                             MACHINE_UNEMULATED_PROTECTION ) // 龙虎争霸, finish IGS022 protection
+GAME ( 1998,  lhzb2,       0,        lhzb2,      lhzb2,       igs017_state, init_lhzb2,      ROT0, "IGS", "Long Hu Zhengba 2 (China, set 1)",                                   MACHINE_UNEMULATED_PROTECTION ) // 龙虎争霸2, finish IGS022 protection
+GAME ( 1998,  lhzb2a,      lhzb2,    lhzb2a,     lhzb2a,      igs017_state, init_lhzb2a,     ROT0, "IGS", "Long Hu Zhengba 2 (China, VS221M)",                                  0 ) // 龙虎争霸2
+GAME ( 1998,  slqz2,       0,        slqz2,      slqz2,       igs017_state, init_slqz2,      ROT0, "IGS", "Shuang Long Qiang Zhu 2 VS (China, VS203J)",                         MACHINE_UNEMULATED_PROTECTION ) // 双龙抢珠, finish IGS022 protection
+GAME ( 1998,  slqz2a,      slqz2,    slqz2,      slqz2,       igs017_state, init_slqz2,      ROT0, "IGS", "Shuang Long Qiang Zhu 2 VS (China, set 2)",                          MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION ) // 双龙抢珠, misses program ROM dump, finish IGS022 protection
+GAME ( 1999,  tarzanc,     0,        tarzan,     tarzan,      igs017_state, init_tarzanc,    ROT0, "IGS", "Tarzan Chuang Tian Guan (China, V109C, set 1)",                      0 ) // 泰山闯天关
+GAME ( 1999,  tarzan,      tarzanc,  tarzan,     tarzan,      igs017_state, init_tarzan,     ROT0, "IGS", "Tarzan Chuang Tian Guan (China, V109C, set 2)",                      MACHINE_NOT_WORKING ) // missing sprites and sound rom, imperfect tiles decryption
+GAME ( 1999,  tarzana,     tarzanc,  tarzan,     tarzan,      igs017_state, init_tarzana,    ROT0, "IGS", "Tarzan (V107)",                                                      MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION ) // missing IGS029 protection, missing sprites and sound rom
+GAME ( 1999,  tarzanb,     tarzanc,  tarzan,     tarzan,      igs017_state, init_tarzanc,    ROT0, "IGS", "Tarzan Chuang Tian Guan (China, V110)",                              0 )
+GAME ( 2000,  sdmg2p,      0,        sdmg2p,     sdmg2p,      igs017_state, init_sdmg2p,     ROT0, "IGS", "Maque Wangchao / Chaoji Da Manguan 2 - Jiaqiang Ban (China, V100C)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING ) // 麻雀王朝 / 超級大滿貫 2 -加強版 protection kicks in after starting game, hopper isn't hooked up correctly
+GAMEL( 2000?, starzan,     0,        starzan,    starzan,     igs017_state, init_starzan,    ROT0, "IGS (G.F. Gioca license)", "Super Tarzan (Italy, V100I)",                   0, layout_igsslot )
+GAMEL( 2000?, jking103a,   starzan,  starzan,    starzan,     igs017_state, init_jking103a,  ROT0, "IGS", "Jungle King (V103A)",                                                0, layout_igsslot )
+GAMEL( 1999,  jking200pr,  starzan,  starzan,    tarzan202fa, igs017_state, init_jking200pr, ROT0, "IGS", "Jungle King (V200PR)",                                               0, layout_igsslot )
+GAME ( 1999?, tarzan103m,  tarzanc,  starzan,    tarzan103m,  igs017_state, init_starzan,    ROT0, "IGS", "Tarzan (V103M)",                                                     0 )
+GAMEL( 1999?, tarzan202fa, tarzanc,  starzan,    tarzan202fa, igs017_state, init_jking103a,  ROT0, "IGS", "Tarzan (V202FA)",                                                    0, layout_igsslot  )
+GAMEL( 2000?, happyskl,    0,        happyskl,   happyskl,    igs017_state, init_happyskl,   ROT0, "IGS", "Happy Skill (Italy, V611IT)",                                        0, layout_igspoker )
+GAMEL( 2000?, cpoker2,     0,        cpoker2,    cpoker2,     igs017_state, init_cpoker2,    ROT0, "IGS", "Champion Poker 2 (V100A)",                                           0, layout_igspoker )
+GAME ( 2000?, spkrform,    spk306us, spkrform,   spkrform,    igs017_state, init_spkrform,   ROT0, "IGS", "Super Poker (V100xD03) / Formosa",                                   MACHINE_UNEMULATED_PROTECTION ) // poker game enabling forced with a patch. Parent spk306us in driver spoker.cpp
+GAME ( 2000?, jking302us,  0,        jking302us, starzan,     igs017_state, init_jking302us, ROT0, "IGS", "Jungle King (V302US)",                                               MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION ) // missing IGS025 and IGS029 protection
