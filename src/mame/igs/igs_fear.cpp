@@ -526,7 +526,7 @@ ROM_END
 ROM_START( icescape ) // IGS PCB-0433-16-GK (same PCB as Fearless Pinocchio) - Has IGS027A, MX10EXAQC, 2x Actel A54SX32A, ICS2115, 2x 8-DIP banks
 	ROM_REGION( 0x04000, "maincpu", 0 )
 	// Internal ROM of IGS027A ARM based MCU
-	ROM_LOAD( "a7.bin", 0x00000, 0x4000, NO_DUMP ) // sticker marked 'A7', unreadable location
+	ROM_LOAD( "igs027_a7.bin", 0x00000, 0x4000, CRC(16285c0f) SHA1(7e70a890d7793982f54ff70641566b4810d4a1d8) ) // sticker marked 'A7', unreadable location
 
 	ROM_REGION32_LE( 0x80000, "user1", 0 ) // external ARM data / prg
 	ROM_LOAD( "icescape_v-104fa.u37", 0x000000, 0x80000, CRC(e3552726) SHA1(bac34ac4fce1519c1bc8020064090e77b5c2a629) ) // TMS27C240
@@ -565,4 +565,4 @@ void igs_fear_state::init_igs_icescape()
 
 GAME( 2005, superkds, 0, igs_fear_xor, superkds, igs_fear_state, init_igs_superkds, ROT0, "IGS (Golden Dragon Amusement license)", "Super Kids / Jiu Nan Xiao Yingxiong (S019CN)", MACHINE_NODEVICE_LAN )
 GAME( 2006, fearless, 0, igs_fear_xor, fear,     igs_fear_state, init_igs_fear,     ROT0, "IGS (American Alpha license)",          "Fearless Pinocchio (V101US)",                  0 )
-GAME( 2006, icescape, 0, igs_fear,     fear,     igs_fear_state, init_igs_icescape, ROT0, "IGS",                                   "Icescape (V104FA)",                            MACHINE_IS_SKELETON ) // IGS FOR V104FA 2006-11-02
+GAME( 2006, icescape, 0, igs_fear_xor, fear,     igs_fear_state, init_igs_icescape, ROT0, "IGS",                                   "Icescape (V104FA)",                            MACHINE_IS_SKELETON ) // IGS FOR V104FA 2006-11-02
