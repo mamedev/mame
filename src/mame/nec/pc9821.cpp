@@ -51,32 +51,35 @@ uint32_t pc9821_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap
 
 	if(m_video_ff[DISPLAY_REG] != 0)
 	{
-		// TODO: following is wrong: definitely requires GDC latches
-		// flashb (pitch=512) and skinpan (two areas on title screen)
-		// aitd sets pitch=40, which means something else inside 7220 should do the bump.
-
-		// PEGC 256 mode is linear VRAM picked from a specific VRAM buffer.
-		// It doesn't latch values from GDC, it runs on its own renderer instead.
-		// Is the DAC really merging two pixels not unlike VGA correlated Mode 13h?
-		// https://github.com/joncampbell123/dosbox-x/issues/1289#issuecomment-543025016
-		// TODO: getter cliprect from bitmap GDC
 		if (m_ex_video_ff[ANALOG_256_MODE])
 		{
 			rgb_t const *const palette = m_palette->palette()->entry_list_raw();
 			u8 *ext_gvram = (u8 *)m_ext_gvram.target();
 			int base_y = cliprect.min_y;
+			u32 base_address;
+			u16 pitch;
+			u8 im;
 
 			for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 			{
+				const int rel_y = y - base_y;
+
+				std::tie(base_address, pitch, im) = m_hgdc[1]->get_area_partition_props(rel_y);
+				// aitd sets PITCH=40 (320), guess: assume im == 0 doing the trick
+				const u8 pitch_shift = im ^ 1;
+
 				for (int x = cliprect.min_x; x <= cliprect.max_x; x += 8)
 				{
-					u32 address = (y - base_y) * (640 / 8) + (x >> 3);
+					// Mask is confirmed by flashb:
+					// does double buffering at SAD $38fc and $fffc, except when
+					// it goes single on title, drawing on current bank displayed.
+					u32 address = (((base_address << 1) + (rel_y) * (pitch << pitch_shift) + (x >> 3)) & 0xffff) << 3;
 					for(int xi = 0; xi < 8; xi ++)
 					{
 						int res_x = x + xi;
 						int res_y = y;
 
-						u16 pen = ext_gvram[(address << 3) + xi + (m_vram_disp * 0x40000)];
+						u16 pen = ext_gvram[(address + xi) + (m_vram_disp * 0x40000)];
 
 						bitmap.pix(res_y, res_x) = palette[(pen & 0xff) + 0x20];
 					}
@@ -307,20 +310,17 @@ void pc9821_state::pc9821_mode_ff_w(u8 data)
 {
 	const u8 mode_ff = data & 0xfe;
 	const u8 setting = BIT(data, 0);
-	// Monitor setting
+	// 24/31 kHz Monitor setting
 	// BA / BX / PC-H98 / PC-9821 / 98NOTE uses this f/f in place of 15/24 kHz switch
 	// TODO: better compose
+	// TODO: both frequencies needs to be verified
+	// 31 kHz from standard VGA clock (flashb)
 	if (mode_ff == 0x20)
 	{
-		if (!setting)
-		{
-			const XTAL screen_clock = XTAL(21'052'600) / 8;
+		const XTAL screen_clock = (setting ? XTAL(25'175'000) : XTAL(21'052'600)) / 8;
 
-			m_hgdc[0]->set_unscaled_clock(screen_clock);
-			m_hgdc[1]->set_unscaled_clock(screen_clock);
-		}
-		else
-			popmessage("pc9821_mode_ff_w: 31 kHz mode selected");
+		m_hgdc[0]->set_unscaled_clock(screen_clock);
+		m_hgdc[1]->set_unscaled_clock(screen_clock);
 	}
 }
 
@@ -338,7 +338,7 @@ void pc9821_state::pegc_mmio_map(address_map &map)
 	map(0x100, 0x100).lw8(
 		NAME([this] (u8 data) {
 			m_pegc.packed_mode = bool(BIT(data, 0));
-            logerror("$e0100 packed mode %02x\n", data);
+			logerror("$e0100 packed mode %02x\n", data);
 		})
 	);
 //  map(0x102, 0x102) enable pegc linear VRAM at upper addresses

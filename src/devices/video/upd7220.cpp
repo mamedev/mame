@@ -392,6 +392,11 @@ inline void upd7220_device::update_blank_timer(int state)
 //  recompute_parameters -
 //-------------------------------------------------
 
+void upd7220_device::device_clock_changed()
+{
+	recompute_parameters();
+}
+
 inline void upd7220_device::recompute_parameters()
 {
 	// microbx2 wants horizontal multiplier of x16
@@ -613,6 +618,19 @@ inline void upd7220_device::get_graphics_partition(int index, uint32_t *sad, uin
 	*wd = BIT(m_ra[(index * 4) + 3], 7);
 }
 
+/*
+ * experimental, for non-canonical stuff such as PC9821 PEGC
+ */
+std::tuple<u32, u16, u8> upd7220_device::get_area_partition_props(int line)
+{
+	uint32_t sad;
+	uint16_t len;
+	int im, wd;
+	// TODO: multiareas (pc9821:skinpan title)
+	get_graphics_partition(0, &sad, &len, &im, &wd);
+
+	return std::make_tuple(sad, m_pitch, im);
+}
 
 
 //**************************************************************************
@@ -1838,12 +1856,12 @@ void upd7220_device::update_graphics(bitmap_rgb32 &bitmap, const rectangle &clip
 		{
 			// according to documentation only areas 0-1-2 can be drawn in bitmap mode
 			// - pc98:quarth definitely needs area 2 for player section.
-            // - pc98:steamhea wants area 3 for scrolling and dialogue screens to work together,
-            //   contradicting the doc. Fixed in 7220A or applies just for mixed mode?
+			// - pc98:steamhea wants area 3 for scrolling and dialogue screens to work together,
+			//   contradicting the doc. Fixed in 7220A or applies just for mixed mode?
 			// TODO: what happens if combined area size is smaller than display height?
 			// documentation suggests that it should repeat from area 0, needs real HW verification (no known SW do it).
 			if (area >= 3 && !force_bitmap)
-                break;
+				break;
 
 			// pc98:madoum1-3 sets up ALL areas to a length of 0 after initial intro screen.
 			// madoum1: area 0 sad==0 on gameplay (PC=0x955e7), sad==0xaa0 on second intro screen (tower) then intentionally scrolls up and back to initial position.

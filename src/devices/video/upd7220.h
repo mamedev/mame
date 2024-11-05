@@ -87,6 +87,8 @@ public:
 	void ext_sync_w(int state);
 	void lpen_w(int state);
 
+	std::tuple<u32, u16, u8> get_area_partition_props(int line);
+
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 protected:
@@ -100,6 +102,7 @@ protected:
 	virtual space_config_vector memory_space_config() const override;
 
 	virtual int translate_command(uint8_t data);
+	virtual void device_clock_changed() override;
 
 	TIMER_CALLBACK_MEMBER(hsync_update);
 	TIMER_CALLBACK_MEMBER(vsync_update);
