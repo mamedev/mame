@@ -363,11 +363,11 @@ Information found at http://www.rhod.fr/yeno_epoch.html
 		</part>
 	</software>
 
-	<software name="starspdr" supported="no">
+	<software name="starspdr" supported="partial">
 		<description>Star Speeder</description>
 		<year>1985</year>
 		<publisher>Epoch</publisher>
-		<notes>Game does not start.</notes>
+		<notes>uPD1771 adpcm playback is not supported.</notes>
 		<part name="cart" interface="scv_cart">
 			<feature name="slot" value="rom64k"/>
 			<dataarea name="rom" size="0x10000">
