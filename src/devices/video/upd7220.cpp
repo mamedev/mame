@@ -467,7 +467,7 @@ inline void upd7220_device::reset_figs_param()
 inline uint16_t upd7220_device::read_vram()
 {
 	uint16_t const data = readword(m_ead);
-	m_ead += x_dir[m_figs.m_dir] + (y_dir[m_figs.m_dir] * m_pitch);
+	m_ead += x_dir[m_figs.m_dir] + (y_dir[m_figs.m_dir] * get_pitch());
 	m_ead &= 0x3ffff;
 
 	return data;
@@ -587,7 +587,7 @@ inline void upd7220_device::wdat(uint8_t type, uint8_t mod)
 	for(int i = 0; i < m_figs.m_dc + 1; i++)
 	{
 		write_vram(type, mod, result);
-		m_ead += x_dir[m_figs.m_dir] + (y_dir[m_figs.m_dir] * m_pitch);
+		m_ead += x_dir[m_figs.m_dir] + (y_dir[m_figs.m_dir] * get_pitch());
 		m_ead &= 0x3ffff;
 	}
 }
@@ -1696,7 +1696,7 @@ void upd7220_device::dack_w(uint8_t data)
 		{
 			m_dma_data = ((m_dma_data & 0xff) | data << 8) & m_mask;
 			write_vram(m_dma_type, m_dma_mod, m_dma_data);
-			m_ead += x_dir[m_figs.m_dir] + (y_dir[m_figs.m_dir] * m_pitch);
+			m_ead += x_dir[m_figs.m_dir] + (y_dir[m_figs.m_dir] * get_pitch());
 			m_ead &= 0x3ffff;
 		}
 		else
@@ -1707,13 +1707,13 @@ void upd7220_device::dack_w(uint8_t data)
 	case 2:
 		m_dma_data = data & (m_mask & 0xff);
 		write_vram(m_dma_type, m_dma_mod, m_dma_data);
-		m_ead += x_dir[m_figs.m_dir] + (y_dir[m_figs.m_dir] * m_pitch);
+		m_ead += x_dir[m_figs.m_dir] + (y_dir[m_figs.m_dir] * get_pitch());
 		m_ead &= 0x3ffff;
 		break;
 	case 3:
 		m_dma_data = (data << 8) & (m_mask & 0xff00);
 		write_vram(m_dma_type, m_dma_mod, m_dma_data);
-		m_ead += x_dir[m_figs.m_dir] + (y_dir[m_figs.m_dir] * m_pitch);
+		m_ead += x_dir[m_figs.m_dir] + (y_dir[m_figs.m_dir] * get_pitch());
 		m_ead &= 0x3ffff;
 		break;
 	default:
