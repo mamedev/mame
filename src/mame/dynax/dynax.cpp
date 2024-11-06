@@ -3737,140 +3737,141 @@ static INPUT_PORTS_START( neruton )
 INPUT_PORTS_END
 
 
+/* little0000bag fixed */
 static INPUT_PORTS_START( tenkai )
 	PORT_START("DSW0")
-	PORT_DIPNAME( 0x0f, 0x07, "Pay Out Rate" )
-	PORT_DIPSETTING(    0x00, "50" )
-	PORT_DIPSETTING(    0x01, "53" )
-	PORT_DIPSETTING(    0x02, "56" )
-	PORT_DIPSETTING(    0x03, "59" )
-	PORT_DIPSETTING(    0x04, "62" )
-	PORT_DIPSETTING(    0x05, "65" )
-	PORT_DIPSETTING(    0x06, "68" )
-	PORT_DIPSETTING(    0x07, "71" )
-	PORT_DIPSETTING(    0x08, "75" )
-	PORT_DIPSETTING(    0x09, "78" )
-	PORT_DIPSETTING(    0x0a, "81" )
-	PORT_DIPSETTING(    0x0b, "84" )
-	PORT_DIPSETTING(    0x0c, "87" )
-	PORT_DIPSETTING(    0x0d, "90" )
-	PORT_DIPSETTING(    0x0e, "93" )
-	PORT_DIPSETTING(    0x0f, "96" )
-	PORT_DIPNAME( 0x30, 0x10, "Odds Rate" )
-	PORT_DIPSETTING(    0x30, "1 2 4 8 12 16 24 32" )
-	PORT_DIPSETTING(    0x00, "1 2 3 5 8 15 30 50" )
-	PORT_DIPSETTING(    0x10, "1 2 3 5 10 25 50 100" )
-	PORT_DIPSETTING(    0x20, "1 2 3 5 10 50 100 200" )
-	PORT_DIPNAME( 0xc0, 0x40, "Max Bet" )
-	PORT_DIPSETTING(    0xc0, "1" )
-	PORT_DIPSETTING(    0x80, "5" )
-	PORT_DIPSETTING(    0x40, "10" )
-	PORT_DIPSETTING(    0x00, "20" )
+	PORT_DIPNAME( 0x0f, 0x07, "Pay Out Rate" )	//出分比例
+	PORT_DIPSETTING( 0x00, "50" )
+	PORT_DIPSETTING( 0x01, "53" )
+	PORT_DIPSETTING( 0x02, "56" )
+	PORT_DIPSETTING( 0x03, "59" )
+	PORT_DIPSETTING( 0x04, "62" )
+	PORT_DIPSETTING( 0x05, "65" )
+	PORT_DIPSETTING( 0x06, "68" )
+	PORT_DIPSETTING( 0x07, "71" )
+	PORT_DIPSETTING( 0x08, "75" )
+	PORT_DIPSETTING( 0x09, "78" )
+	PORT_DIPSETTING( 0x0a, "81" )
+	PORT_DIPSETTING( 0x0b, "84" )
+	PORT_DIPSETTING( 0x0c, "87" )
+	PORT_DIPSETTING( 0x0d, "90" )
+	PORT_DIPSETTING( 0x0e, "93" )
+	PORT_DIPSETTING( 0x0f, "96" )
+	PORT_DIPNAME( 0x30, 0x10, "Odds Rate" )	//役满倍率
+	PORT_DIPSETTING( 0x30, "1 2 4 8 12 16 24 32" )
+	PORT_DIPSETTING( 0x00, "1 2 3 5 8 15 30 50" )
+	PORT_DIPSETTING( 0x10, "1 2 3 5 10 25 50 100" )
+	PORT_DIPSETTING( 0x20, "1 2 3 5 10 50 100 200" )
+	PORT_DIPNAME( 0xc0, 0x40, "Max Bet" )	//最大押注
+	PORT_DIPSETTING( 0xc0, "1" )
+	PORT_DIPSETTING( 0x80, "5" )
+	PORT_DIPSETTING( 0x40, "10" )
+	PORT_DIPSETTING( 0x00, "20" )
 
 	PORT_START("DSW1")
-	PORT_DIPNAME( 0x03, 0x03, "Unknown 1-0&1" )
+	PORT_DIPNAME( 0x03, 0x03, "Coin Rate" )	//投币比例
 	PORT_DIPSETTING(    0x03, "1:1" )
 	PORT_DIPSETTING(    0x02, "1:2" )
 	PORT_DIPSETTING(    0x01, "1:5" )
 	PORT_DIPSETTING(    0x00, "1:10" )
-	PORT_DIPNAME( 0x0c, 0x0c, "Min Rate To Play" )
+	PORT_DIPNAME( 0x0c, 0x0c, "Min Bet" )	//最小押注
 	PORT_DIPSETTING(    0x0c, "1" )
 	PORT_DIPSETTING(    0x08, "2" )
 	PORT_DIPSETTING(    0x04, "3" )
 	PORT_DIPSETTING(    0x00, "5" )
-	PORT_DIPNAME( 0x70, 0x70, "YAKUMAN Bonus" )
+	PORT_DIPNAME( 0x70, 0x70, "YAKUMAN Bonus" )	//役满周期
 	PORT_DIPSETTING(    0x70, "Cut" )
 	PORT_DIPSETTING(    0x60, "1 T" )
 	PORT_DIPSETTING(    0x50, "300" )
 	PORT_DIPSETTING(    0x40, "500" )
 	PORT_DIPSETTING(    0x30, "700" )
 	PORT_DIPSETTING(    0x20, "1000" )
-//  PORT_DIPSETTING(    0x10, "1000" )
-//  PORT_DIPSETTING(    0x00, "1000" )
-	PORT_DIPNAME( 0x80, 0x80, "Unknown 1-7" )
-	PORT_DIPSETTING(    0x00, "1" )
-	PORT_DIPSETTING(    0x80, "2" )
+// 	PORT_DIPSETTING( 0x10, "1000" )
+// 	PORT_DIPSETTING( 0x00, "1000" )
+	PORT_DIPNAME( 0x80, 0x80, "YAKU TIMES" )	//每次役满次数
+	PORT_DIPSETTING( 0x00, "1" )
+	PORT_DIPSETTING( 0x80, "2" )
 
 	PORT_START("DSW2")
-	PORT_DIPNAME( 0x01, 0x01, "Unknown 2-0" )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, "Unknown 2-1" )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, "Girls (Demo)" )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, "In-Game Bet?" )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, "Unknown 2-4" )
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, "Auto Tsumo after Reach" )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, "Last Chance" )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, "DonDen Key" )
+	PORT_DIPNAME( 0x01, 0x01, "Credit Mode" )	//游戏方式
+	PORT_DIPSETTING(    0x01, "Key-In" )	//上分
+	PORT_DIPSETTING(    0x00, "Coin Acceptor" )	//投币
+	PORT_DIPNAME( 0x02, 0x02, "Flip_Screen" )	//画面反转
+	PORT_DIPSETTING(    0x02, "Normal" )	//正常
+	PORT_DIPSETTING(    0x00, "Flip" )		//反转
+	PORT_DIPNAME( 0x04, 0x04, "TENKAIGEN" )	//天开眼有无
+	PORT_DIPSETTING(    0x00, "Yes" )
+	PORT_DIPSETTING(    0x04, "No" )
+	PORT_DIPNAME( 0x08, 0x08, "In-Game Bet" )	//游戏结束后续玩
+	PORT_DIPSETTING(    0x08, "No" )
+	PORT_DIPSETTING(    0x00, "Yes" )	//游戏结束后续玩
+	PORT_DIPNAME( 0x10, 0x10, "Dealer Bonus" )	//连庄赠与
+	PORT_DIPSETTING(    0x10, "No" )
+	PORT_DIPSETTING(    0x00, "Yes" )
+	PORT_DIPNAME( 0x20, 0x20, "Auto Tsumo after Reach" )	//听牌自动摸打
+	PORT_DIPSETTING(    0x20, "Off" )
+	PORT_DIPSETTING(    0x00, "On" )
+	PORT_DIPNAME( 0x40, 0x40, "Last Chance" )	//海底捞
+	PORT_DIPSETTING(    0x40, "No" )
+	PORT_DIPSETTING(    0x00, "Yes" )
+	PORT_DIPNAME( 0x80, 0x80, "DonDen Key" )	//换牌按键
 	PORT_DIPSETTING(    0x80, "Start" )
-	PORT_DIPSETTING(    0x00, "Flip Flop" )
+	PORT_DIPSETTING(    0x00, "Flip Flop" )	//射频按键
 
 	PORT_START("DSW3")
-	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Demo_Sounds ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x00, "In-Game Music" )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, "Select Girl" )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x00, "Moles On Gal's Face" )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, "Unknown 3-4" )
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, "Unknown 3-5" )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, "Unknown 3-6" )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x01, 0x00, "Demo_Sounds" )	//演示声音
+	PORT_DIPSETTING(    0x01, "No" )
+	PORT_DIPSETTING(    0x00, "Yes" )
+	PORT_DIPNAME( 0x02, 0x00, "In-Game Music" )	//游戏音乐
+	PORT_DIPSETTING(    0x02, "No" )
+	PORT_DIPSETTING(    0x00, "Yes" )
+	PORT_DIPNAME( 0x04, 0x04, "Select Girl" )	//对战角色选择
+	PORT_DIPSETTING(    0x04, "No" )
+	PORT_DIPSETTING(    0x00, "Yes" )
+	PORT_DIPNAME( 0x08, 0x00, "Moles On Gal's Face" )	//是否有痣
+	PORT_DIPSETTING(    0x00, "No" )
+	PORT_DIPSETTING(    0x08, "Yes" )
+	PORT_DIPNAME( 0x10, 0x10, "Language" )
+	PORT_DIPSETTING(    0x10, "Japanese" )
+	PORT_DIPSETTING(    0x00, "Chinese" )
+	PORT_DIPNAME( 0x20, 0x20, "Three Times Chances Changing Tiles Rate" )	//三元换牌的频率
+	PORT_DIPSETTING(    0x20, "Normal" )
+	PORT_DIPSETTING(    0x00, "Few" )
+	PORT_DIPNAME( 0x40, 0x40, "TENKAIGEN Rate" )	//天开眼的频率
+	PORT_DIPSETTING(    0x40, "Normal" )
+	PORT_DIPSETTING(    0x00, "Few" )
 	PORT_DIPNAME( 0x80, 0x80, "Set Date" )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x80, "Off" )
+	PORT_DIPSETTING(    0x00, "On" )
 
 	PORT_START("DSW4")  /* (top) */
-	PORT_DIPNAME( 0x01, 0x01, "Credits Per Note" )
-	PORT_DIPSETTING(    0x01, "5" )
-	PORT_DIPSETTING(    0x00, "10" )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Flip_Screen ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, "Unknown top-2" )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, "Unknown top-3" )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, "Unknown top-4" )
+	PORT_DIPNAME( 0x01, 0x01, "Game Style" )	//游戏体
+	PORT_DIPSETTING(    0x01, "New Moon Style" )	//新月台风
+	PORT_DIPSETTING(    0x00, "Hopper Style" )
+	PORT_DIPNAME( 0x02, 0x02, "Hopper Activity" )
+	PORT_DIPSETTING(    0x02, "No" )
+	PORT_DIPSETTING(    0x00, "Activity" )
+	PORT_DIPNAME( 0x04, 0x04, "CPU Weak  Or Strong" )	//电脑强弱
+	PORT_DIPSETTING(    0x04, "Normal" )
+	PORT_DIPSETTING(    0x00, "Strong" )
+	PORT_DIPNAME( 0x08, 0x08, "Service Count" )
+	PORT_DIPSETTING(    0x08, "Off" )
+	PORT_DIPSETTING(    0x00, "On" )
+	PORT_DIPNAME( 0x10, 0x10, "DON DEN TIME" )	//换牌次数
 	PORT_DIPSETTING(    0x10, "8" )
 	PORT_DIPSETTING(    0x00, "5" )
-	PORT_DIPNAME( 0x20, 0x20, "Unknown top-5" )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, "Subtitle" )
-	PORT_DIPSETTING(    0x40, DEF_STR( None ) )
+	PORT_DIPNAME( 0x20, 0x20, "Show Clock" )
+	PORT_DIPSETTING(    0x20, "Off" )
+	PORT_DIPSETTING(    0x00, "On" )
+	PORT_DIPNAME( 0x40, 0x40, "Subtitle" )	//副标题Part2显示
+	PORT_DIPSETTING(    0x40, "None" )
 	PORT_DIPSETTING(    0x00, "Part 2" )
-	PORT_DIPNAME( 0x80, 0x80, "Unknown top-7" )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, "YAKUMAN TABLE" )	//已胡役满清单显示
+	PORT_DIPSETTING(    0x80, "No" )
+	PORT_DIPSETTING(    0x00, "Only Part 2 Yes" )	//仅Part 2有效
 
 	PORT_START("COINS")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT ) PORT_CODE(KEYCODE_4) // Pay
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT ) 	PORT_CODE(KEYCODE_4) // Pay
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN  )   // 18B
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE  )   // Test
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE2 )   // Analyzer
@@ -3882,6 +3883,88 @@ static INPUT_PORTS_START( tenkai )
 	PORT_INCLUDE( MAHJONG_KEYS_BET )
 INPUT_PORTS_END
 
+/* little0000bag fixed*/
+static INPUT_PORTS_START( ougonhai )
+	PORT_INCLUDE( tenkai )
+	
+	PORT_MODIFY("DSW2")
+	PORT_DIPNAME( 0x01, 0x01, "Credit Mode" )	//游戏方式
+	PORT_DIPSETTING( 0x01, "Key-In" )	//上分
+	PORT_DIPSETTING( 0x00, "Coin Acceptor" )	//投币
+	PORT_DIPNAME( 0x02, 0x02, "Flip_Screen" )	//画面反转
+	PORT_DIPSETTING( 0x02, "Normal" )	//正常
+	PORT_DIPSETTING( 0x00, "Flip" )	//反转
+	PORT_DIPNAME( 0x04, 0x04, "DonDen Key" )	//换牌按键
+	PORT_DIPSETTING( 0x04, "Flip Flop" )	//射频按键
+	PORT_DIPSETTING( 0x00, "Start" )	//开始键
+	PORT_DIPNAME( 0x08, 0x08, "In-Game Bet" )	//游戏结束后续玩
+	PORT_DIPSETTING( 0x08, "No" )	//结束
+	PORT_DIPSETTING( 0x00, "Yes" )	//押分续玩
+	PORT_DIPNAME( 0x10, 0x10, "Auto Tsumo after Reach" )	//听牌自动摸打
+	PORT_DIPSETTING( 0x10, "Off" )
+	PORT_DIPSETTING( 0x00, "On" )
+
+	PORT_DIPNAME( 0x20, 0x20, "Last Chance" )	//海底捞
+	PORT_DIPSETTING( 0x20, "No" )	//无海底捞
+	PORT_DIPSETTING( 0x00, "Yes" )	//有海底捞
+	PORT_DIPNAME( 0x40, 0x40, "YAKUMAN TABLE" )	//已胡役满清单显示
+	PORT_DIPSETTING( 0x40, "No" )
+	PORT_DIPSETTING( 0x00, "Yes" )
+	PORT_DIPNAME( 0x80, 0x80, "Gold Rush Rate" )	//黄金牌出现频率
+	PORT_DIPSETTING( 0x80, "High" )	//多
+	PORT_DIPSETTING( 0x00, "Normal" )	//普通
+	PORT_MODIFY("DSW3")
+	PORT_DIPNAME( 0x01, 0x00, "Demo_Sounds" )	//演示声音
+	PORT_DIPSETTING( 0x01, "No" )
+	PORT_DIPSETTING( 0x00, "Yes" )
+	PORT_DIPNAME( 0x02, 0x00, "In-Game Music" )	//游戏音乐
+	PORT_DIPSETTING( 0x02, "No" )
+	PORT_DIPSETTING( 0x00, "Yes" )
+	PORT_DIPNAME( 0x04, 0x04, "Girl After Dealer" )	//连庄有无美女
+	PORT_DIPSETTING( 0x04, "No" )
+	PORT_DIPSETTING( 0x00, "Yes" )
+	PORT_DIPNAME( 0x08, 0x00, "Unknown" )
+	PORT_DIPSETTING( 0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING( 0x08, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, "Language" )	//语言
+	PORT_DIPSETTING( 0x10, "Japanese" )
+	PORT_DIPSETTING( 0x00, "Chinese" )
+	PORT_DIPNAME( 0x20, 0x20, "Computer Show Tiles" )	//电脑现牌
+	PORT_DIPSETTING( 0x20, "No" )	//不现牌
+	PORT_DIPSETTING( 0x00, "Yes" )	//现牌
+	PORT_DIPNAME( 0x40, 0x40, "Service Mode" )	//服务模式
+	PORT_DIPSETTING( 0x40, "No" )
+	PORT_DIPSETTING( 0x00, "Yes" )
+	PORT_DIPNAME( 0x80, 0x80, "Show Inventory" )	//库存显示
+	PORT_DIPSETTING( 0x80, "No" )
+	PORT_DIPSETTING( 0x00, "Yes" )
+	PORT_MODIFY("DSW4") /* (top) */
+	PORT_DIPNAME( 0x01, 0x01, "Key-In Rate" )	//上分比例
+	PORT_DIPSETTING( 0x01, "5" )
+	PORT_DIPSETTING( 0x00, "10" )
+	PORT_DIPNAME( 0x02, 0x02, "Flip_Screen" )	//画面反转
+	PORT_DIPSETTING( 0x02, "Normal" )
+	PORT_DIPSETTING( 0x00, "Flip" )
+	PORT_DIPNAME( 0x04, 0x04, "Computer Weak Or Strong" )	//电脑强弱
+	PORT_DIPSETTING( 0x04, "Normal" )
+	PORT_DIPSETTING( 0x00, "Strong" )
+	PORT_DIPNAME( 0x08, 0x08, "Dealer Bonus" )	//连庄有无
+	PORT_DIPSETTING( 0x08, "No" )
+	PORT_DIPSETTING( 0x00, "Yes" )
+	PORT_DIPNAME( 0x10, 0x10, "DON DEN TIME" )	//换牌次数
+	PORT_DIPSETTING( 0x10, "8" )
+	PORT_DIPSETTING( 0x00, "5" )
+	PORT_DIPNAME( 0x20, 0x20, "Unknown" )
+	PORT_DIPSETTING( 0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING( 0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, "Test Mode" )	//测试模式
+	PORT_DIPSETTING( 0x40, "No" )
+	PORT_DIPSETTING( 0x00, "Yes" )
+	PORT_DIPNAME( 0x80, 0x80, "Unknown" )
+	PORT_DIPSETTING( 0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING( 0x00, DEF_STR( On ) )
+
+INPUT_PORTS_END
 
 static INPUT_PORTS_START( mjreach )
 	PORT_START("DSW0")
@@ -7443,10 +7526,10 @@ GAME( 1991, tenkai2b,   tenkai,   tenkai,     tenkai,   dynax_state,       empty
 GAME( 1991, tenkaibb,   tenkai,   tenkai,     tenkai,   dynax_state,       empty_init,    ROT0,   "bootleg",                   "Mahjong Tenkaigen (Japan bootleg b)",                           MACHINE_SUPPORTS_SAVE ) // FIXME: check if "b" is a PCB rev. letter
 GAME( 1991, tenkaicb,   tenkai,   tenkai,     tenkai,   dynax_state,       empty_init,    ROT0,   "bootleg",                   "Mahjong Tenkaigen (Japan bootleg c)",                           MACHINE_SUPPORTS_SAVE ) // FIXME: check if "c" is a PCB rev. letter
 GAME( 1991, tenkaie,    tenkai,   tenkai,     tenkai,   dynax_state,       empty_init,    ROT0,   "Dynax",                     "Mahjong Tenkaigen (Japan set 2)",                               MACHINE_SUPPORTS_SAVE )
-GAME( 1991, ougonhai,   0,        ougonhai,   tenkai,   dynax_state,       empty_init,    ROT0,   "Dynax",                     "Mahjong Ougon no Hai (Japan)",                                  MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // FIXME: correct TMP90840 hookup, confirm being a medal game as well
-GAME( 1991, ougonhaib1, ougonhai, ougonhaib1, tenkai,   dynax_state,       empty_init,    ROT0,   "bootleg",                   "Mahjong Ougon no Hai (Japan bootleg set 1, medal)",             MACHINE_SUPPORTS_SAVE )
-GAME( 1991, ougonhaib2, ougonhai, ougonhaib1, tenkai,   dynax_state,       empty_init,    ROT0,   "bootleg",                   "Mahjong Ougon no Hai (Japan bootleg set 2, medal)",             MACHINE_SUPPORTS_SAVE )
-GAME( 1991, ougonhaib3, ougonhai, ougonhaib1, tenkai,   dynax_state,       empty_init,    ROT0,   "bootleg",                   "Mahjong Ougon no Hai (Japan bootleg set 3, medal)",             MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1991, ougonhai,   0,        ougonhai,   ougonhai,   dynax_state,       empty_init,    ROT0,   "Dynax",                     "Mahjong Ougon no Hai (Japan)",                                  MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // FIXME: correct TMP90840 hookup, confirm being a medal game as well
+GAME( 1991, ougonhaib1, ougonhai, ougonhaib1, ougonhai,   dynax_state,       empty_init,    ROT0,   "bootleg",                   "Mahjong Ougon no Hai (Japan bootleg set 1, medal)",             MACHINE_SUPPORTS_SAVE )
+GAME( 1991, ougonhaib2, ougonhai, ougonhaib1, ougonhai,   dynax_state,       empty_init,    ROT0,   "bootleg",                   "Mahjong Ougon no Hai (Japan bootleg set 2, medal)",             MACHINE_SUPPORTS_SAVE )
+GAME( 1991, ougonhaib3, ougonhai, ougonhaib1, ougonhai,   dynax_state,       empty_init,    ROT0,   "bootleg",                   "Mahjong Ougon no Hai (Japan bootleg set 3, medal)",             MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 GAME( 1994, mjreach,    0,        mjreach,    mjreach,  dynax_state,       empty_init,    ROT0,   "Dynax",                     "Mahjong Reach (Ver. 1.00)",                                     MACHINE_SUPPORTS_SAVE )
 GAME( 1994, mjreachbl,  mjreach,  mjreach,    mjreach,  dynax_state,       empty_init,    ROT0,   "bootleg",                   "Mahjong Reach (Ver. 1.00, bootleg)",                            MACHINE_SUPPORTS_SAVE )
 GAME( 1994, mjreachp2,  mjreach,  mjreachp2,  mjreach,  dynax_state,       empty_init,    ROT0,   "Dynax",                     "Mahjong Reach Part II (Ver. D88)",                              MACHINE_SUPPORTS_SAVE )
