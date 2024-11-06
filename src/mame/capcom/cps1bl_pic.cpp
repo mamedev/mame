@@ -17,7 +17,7 @@
     Generally the sound quality is very poor compared to official Capcom hardware.
     Both music and sound effects are produced by just a single M6295.
     Background music consists of short pre-recorded clips which loop continuously.
-    Currently all games have no sound emulation due to the PICs being secured/protected.
+    Currently most games have no sound emulation due to the PICs being secured/protected.
     Unless any un-protected PIcs ever turn up (unlikely) then "decapping" of working chips is probably the
     only way valid dumps will ever be made.
 
@@ -27,8 +27,8 @@ dinopic:           No sound.
 dinopic2:          No sound.
 dinopic3:          No sound. Some minor gfx priority issues, confirmed present on real board.
 jurassic99:        No sound.
-punipic, punipic2: No sound. Problems in Central Park. Patches used.
-punipic3:          Same as punipic, and doors are missing.
+punipic, punipic2: Problems in Central Park. Patches used.
+punipic3:          Same as punipic, and no sound and doors are missing.
 slampic:           No sound. Some minor gfx issues (sprites on character select screen).
 slampic2:          No sound. All gfx issues confirmed present on real board.
 wofpic:            No sound. Some minor gfx issues (sprite priorities mainly).  https://youtu.be/Ozlb2gNRSfs
@@ -61,8 +61,10 @@ namespace {
 class cps1bl_pic_state : public cps1bl_no_brgt
 {
 public:
-	cps1bl_pic_state(const machine_config &mconfig, device_type type, const char *tag)
-		: cps1bl_no_brgt(mconfig, type, tag)
+	cps1bl_pic_state(const machine_config &mconfig, device_type type, const char *tag) :
+		cps1bl_no_brgt(mconfig, type, tag),
+		m_pic(*this, "pic"),
+		m_okibank(*this, "okibank")
 	{ }
 
 	void punipic(machine_config &config);
@@ -74,7 +76,23 @@ public:
 	void init_slampic();
 
 protected:
+	required_device<pic16c57_device> m_pic;
+	required_memory_bank m_okibank;
+
+	uint8_t m_pic_portb = 0;
+	uint8_t m_pic_portc = 0;
+
 	void dinopic_layer_w(offs_t offset, uint16_t data);
+
+	void pic_porta_w(uint8_t data);
+	uint8_t pic_portb_r();
+	void pic_portb_w(uint8_t data);
+	uint8_t pic_portc_r();
+	void pic_portc_w(uint8_t data);
+
+	void oki_map(address_map &map);
+
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	DECLARE_MACHINE_START(punipic);
@@ -91,14 +109,17 @@ private:
 class slampic2_state : public fcrash_state
 {
 public:
-	slampic2_state(const machine_config &mconfig, device_type type, const char *tag)
-		: fcrash_state(mconfig, type, tag)
+	slampic2_state(const machine_config &mconfig, device_type type, const char *tag) :
+		fcrash_state(mconfig, type, tag),
+		m_pic(*this, "pic")
 	{ }
 
 	void slampic2(machine_config &config);
 	void init_slampic2();
 
 private:
+	required_device<pic16c57_device> m_pic;
+
 	DECLARE_MACHINE_START(slampic2);
 	uint16_t slampic2_cps_a_r(offs_t offset);
 	void slampic2_sound_w(uint16_t data);
@@ -397,15 +418,77 @@ void wofpic_state::wofpic_spr_base_w(uint16_t data)
 }
 
 
+//**************************************************************************
+//  AUDIO
+//**************************************************************************
+
+// Note: This is clearly the exact same sound system as used by funkyjetb
+
+void cps1bl_pic_state::pic_porta_w(uint8_t data)
+{
+	m_okibank->set_entry(data & 0x0f);
+}
+
+uint8_t cps1bl_pic_state::pic_portb_r()
+{
+	return m_pic_portb;
+}
+
+void cps1bl_pic_state::pic_portb_w(uint8_t data)
+{
+	m_pic_portb = data;
+}
+
+uint8_t cps1bl_pic_state::pic_portc_r()
+{
+	return m_soundlatch->pending_r() ? 0x40 : 0x00;
+}
+
+void cps1bl_pic_state::pic_portc_w(uint8_t data)
+{
+	// 7-------  not used
+	// -6------  soundlatch data pending (input)
+	// --5-----  soundlatch ack
+	// ---4----  soundlatch select
+	// ----3---  not used
+	// -----2--  oki select
+	// ------1-  oki write latch
+	// -------0  oki read enable
+
+	if (BIT(m_pic_portc, 5) == 1 && BIT(data, 5) == 0)
+		m_soundlatch->acknowledge_w();
+
+	if (BIT(data, 4) == 0)
+		m_pic_portb = m_soundlatch->read();
+
+	if (BIT(data, 2) == 0)
+	{
+		if (BIT(m_pic_portc, 1) == 1 && BIT(data, 1) == 0)
+			m_oki->write(m_pic_portb);
+
+		if (BIT(data, 0) == 0)
+			m_pic_portb = m_oki->read();
+	}
+
+	m_pic_portc = data;
+}
+
+
 void dinopic_state::dinopic(machine_config &config)
 {
 	/* basic machine hardware */
-	M68000(config, m_maincpu, 12000000);
+	M68000(config, m_maincpu, 24_MHz_XTAL / 2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &dinopic_state::dinopic_map);
 	m_maincpu->set_vblank_int("screen", FUNC(dinopic_state::cps1_interrupt));
 	m_maincpu->set_addrmap(m68000_base_device::AS_CPU_SPACE, &dinopic_state::cpu_space_map);
 
-	//PIC16C57(config, m_audiocpu, 3750000).set_disable(); /* no valid dumps .. */
+	PIC16C57(config, m_pic, 30_MHz_XTAL / 8);
+	m_pic->write_a().set(FUNC(dinopic_state::pic_porta_w));
+	m_pic->read_b().set(FUNC(dinopic_state::pic_portb_r));
+	m_pic->write_b().set(FUNC(dinopic_state::pic_portb_w));
+	m_pic->read_c().set(FUNC(dinopic_state::pic_portc_r));
+	m_pic->write_c().set(FUNC(dinopic_state::pic_portc_w));
+	m_pic->set_disable(); // no valid dump
 
 	MCFG_MACHINE_START_OVERRIDE(dinopic_state, dinopic)
 
@@ -429,18 +512,25 @@ void dinopic_state::dinopic(machine_config &config)
 
 	GENERIC_LATCH_8(config, m_soundlatch);
 
-	OKIM6295(config, m_oki, 1000000, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 0.30);
+	OKIM6295(config, m_oki, 1000000, okim6295_device::PIN7_HIGH);
+	m_oki->add_route(ALL_OUTPUTS, "mono", 0.30);
+	m_oki->set_addrmap(0, &dinopic_state::oki_map);
 }
 
 void cps1bl_pic_state::punipic(machine_config &config)
 {
 	/* basic machine hardware */
-	M68000(config, m_maincpu, 12000000);
+	M68000(config, m_maincpu, 24_MHz_XTAL / 2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &cps1bl_pic_state::punipic_map);
 	m_maincpu->set_vblank_int("screen", FUNC(cps1bl_pic_state::cps1_interrupt));
 	m_maincpu->set_addrmap(m68000_base_device::AS_CPU_SPACE, &cps1bl_pic_state::cpu_space_map);
 
-	//PIC16C57(config, m_audiocpu, 12000000).set_disable(); /* no valid dumps .. */
+	PIC16C57(config, m_pic, 30_MHz_XTAL / 8);
+	m_pic->write_a().set(FUNC(cps1bl_pic_state::pic_porta_w));
+	m_pic->read_b().set(FUNC(cps1bl_pic_state::pic_portb_r));
+	m_pic->write_b().set(FUNC(cps1bl_pic_state::pic_portb_w));
+	m_pic->read_c().set(FUNC(cps1bl_pic_state::pic_portc_r));
+	m_pic->write_c().set(FUNC(cps1bl_pic_state::pic_portc_w));
 
 	MCFG_MACHINE_START_OVERRIDE(cps1bl_pic_state, punipic)
 
@@ -464,7 +554,9 @@ void cps1bl_pic_state::punipic(machine_config &config)
 
 	GENERIC_LATCH_8(config, m_soundlatch);
 
-	OKIM6295(config, m_oki, 1000000, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 0.30);
+	OKIM6295(config, m_oki, 1000000, okim6295_device::PIN7_HIGH);
+	m_oki->add_route(ALL_OUTPUTS, "mono", 0.30);
+	m_oki->set_addrmap(0, &cps1bl_pic_state::oki_map);
 }
 
 void cps1bl_pic_state::slampic(machine_config &config)
@@ -475,7 +567,8 @@ void cps1bl_pic_state::slampic(machine_config &config)
 	m_maincpu->set_vblank_int("screen", FUNC(cps1bl_pic_state::cps1_interrupt));
 	m_maincpu->set_addrmap(m68000_base_device::AS_CPU_SPACE, &cps1bl_pic_state::cpu_space_map);
 
-	//PIC16C57(config, m_audiocpu, 12000000).set_disable(); /* no valid dumps .. */
+	PIC16C57(config, m_pic, 12000000);
+	m_pic->set_disable(); // no valid dump
 
 	MCFG_MACHINE_START_OVERRIDE(cps1bl_pic_state, slampic)
 
@@ -497,7 +590,9 @@ void cps1bl_pic_state::slampic(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	OKIM6295(config, m_oki, 1000000, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 0.30);
+	OKIM6295(config, m_oki, 1000000, okim6295_device::PIN7_HIGH);
+	m_oki->add_route(ALL_OUTPUTS, "mono", 0.30);
+	m_oki->set_addrmap(0, &cps1bl_pic_state::oki_map);
 }
 
 void slampic2_state::slampic2(machine_config &config)
@@ -507,8 +602,8 @@ void slampic2_state::slampic2(machine_config &config)
 	m_maincpu->set_vblank_int("screen", FUNC(slampic2_state::cps1_interrupt));
 	m_maincpu->set_addrmap(m68000_base_device::AS_CPU_SPACE, &slampic2_state::cpu_space_map);
 
-	PIC16C57(config, m_audiocpu, 4000000);  // measured
-	//m_audiocpu->set_disable();
+	PIC16C57(config, m_pic, 4000000); // measured
+	m_pic->set_disable();
 
 	MCFG_MACHINE_START_OVERRIDE(slampic2_state, slampic2)
 
@@ -652,9 +747,27 @@ void wofpic_state::wofpic_map(address_map &map)
 	map(0xff0000, 0xffffff).ram().share("mainram");
 }
 
+void cps1bl_pic_state::oki_map(address_map &map)
+{
+	map(0x00000, 0x37fff).rom().region("oki", 0);
+	map(0x38000, 0x3ffff).bankr("okibank");
+}
+
+
+void cps1bl_pic_state::machine_start()
+{
+	// configure oki rom banking
+	m_okibank->configure_entries(0, 16, memregion("oki")->base(), 0x8000);
+
+	// register for save states
+	save_item(NAME(m_pic_portb));
+	save_item(NAME(m_pic_portc));
+}
 
 MACHINE_START_MEMBER(dinopic_state, dinopic)
 {
+	cps1bl_pic_state::machine_start();
+
 	m_layer_enable_reg = 0x0a;
 	m_layer_mask_reg[0] = 0x0c;
 	m_layer_mask_reg[1] = 0x0e;
@@ -670,6 +783,8 @@ MACHINE_START_MEMBER(dinopic_state, dinopic)
 
 MACHINE_START_MEMBER(cps1bl_pic_state, punipic)
 {
+	cps1bl_pic_state::machine_start();
+
 	m_layer_enable_reg = 0x12;
 	m_layer_mask_reg[0] = 0x14;
 	m_layer_mask_reg[1] = 0x16;
@@ -684,6 +799,8 @@ MACHINE_START_MEMBER(cps1bl_pic_state, punipic)
 
 MACHINE_START_MEMBER(cps1bl_pic_state, slampic)
 {
+	cps1bl_pic_state::machine_start();
+
 	m_layer_enable_reg = 0x16;
 	m_layer_mask_reg[0] = 0x00;
 	m_layer_mask_reg[1] = 0x02;
@@ -713,6 +830,8 @@ MACHINE_START_MEMBER(slampic2_state, slampic2)
 
 MACHINE_START_MEMBER(wofpic_state, wofpic)
 {
+	cps1bl_pic_state::machine_start();
+
 	m_layer_enable_reg = 0x26;
 	m_layer_mask_reg[0] = 0x28;
 	m_layer_mask_reg[1] = 0x2a;
@@ -1106,7 +1225,7 @@ ROM_START( dinopic )
 	ROM_LOAD64_BYTE( "10.bin", 0x200003, 0x40000, CRC(88847705) SHA1(05dc90067921960e417b7436056a5e1f86abaa1a) )
 	ROM_CONTINUE(              0x200007, 0x40000)
 
-	ROM_REGION( 0x28000, "audiocpu", 0 ) /* PIC16c57 - protected, dump isn't valid */
+	ROM_REGION( 0x2d4c, "pic", 0 )
 	ROM_LOAD( "pic16c57-rp", 0x00000, 0x2d4c, BAD_DUMP CRC(5a6d393c) SHA1(1391a1590aff5f75bb6fae1c83eddb796b53135d) )
 
 	ROM_REGION( 0x80000, "oki", 0 ) /* OKI6295 samples */
@@ -1160,7 +1279,7 @@ ROM_START( dinopic2 )
 	ROM_LOAD64_BYTE( "27c4000-m12481-5.bin", 0x200003, 0x40000, CRC(88847705) SHA1(05dc90067921960e417b7436056a5e1f86abaa1a) )
 	ROM_CONTINUE(                            0x200007, 0x40000)
 
-	ROM_REGION( 0x28000, "audiocpu", 0 ) /* PIC16c57 - protected, dump isn't valid */
+	ROM_REGION( 0x26cc, "pic", 0 )
 	ROM_LOAD( "pic16c57-xt.hex", 0x00000, 0x26cc, BAD_DUMP CRC(a6a5eac4) SHA1(2039789084836769180f0bfd230c2553a37e2aaf) )
 
 	ROM_REGION( 0x80000, "oki", 0 ) /* OKI6295 samples */
@@ -1216,9 +1335,8 @@ ROM_START( dinopic3 )
 	ROM_CONTINUE( 0x000006, 0x80000 )
 	ROM_CONTINUE( 0x200006, 0x80000 )
 
-	// no markings, assume pic16c57, secured
-	//ROM_REGION( 0x2000, "audiocpu", 0 )
-	//ROM_LOAD( "pic_t1.bin", 0x0000, 0x1007, NO_DUMP )
+	ROM_REGION( 0x1000, "pic", 0 )
+	ROM_LOAD( "pic16c57.bin", 0x0000, 0x1000, NO_DUMP )
 
 	ROM_REGION( 0x80000, "oki", 0 )
 	ROM_LOAD( "ti-i_27c040.bin", 0x000000, 0x80000, CRC(7d921309) SHA1(d51e60e904d302c2516b734189e141aa171b2b82) )  // = dinopic, dinopic2
@@ -1302,8 +1420,8 @@ ROM_START( jurassic99 )
 	ROM_CONTINUE( 0x200006, 0x80000 )
 
 	// EMC EM78P447AP, secured
-	//ROM_REGION( 0x3000, "audiocpu", 0 )
-	//ROM_LOAD( "u28.bin", 0x0000, 0x2020, NO_DUMP )
+	ROM_REGION( 0x1000, "pic", 0 )
+	ROM_LOAD( "pic16c57.bin", 0x0000, 0x1000, NO_DUMP )
 
 	ROM_REGION( 0x80000, "oki", 0 )
 	ROM_LOAD( "21003_u27.bin", 0x000000, 0x80000, CRC(7d921309) SHA1(d51e60e904d302c2516b734189e141aa171b2b82) )  // == dinopic, dinopic2, dinopic3
@@ -1369,10 +1487,10 @@ ROM_START( punipic )
 	ROM_LOAD64_BYTE( "gfx10.bin", 0x200003, 0x40000, CRC(763974c9) SHA1(f9b93c7cf0cb8c212fc21c57c85459b7d2e4e2fd) )
 	ROM_CONTINUE(                 0x200007, 0x40000)
 
-	ROM_REGION( 0x28000, "audiocpu", 0 ) /* PIC16c57 - protected */
-	ROM_LOAD( "pic16c57", 0x00000, 0x4000, NO_DUMP )
+	ROM_REGION( 0x1000, "pic", 0 )
+	ROM_LOAD( "pic16c57.bin", 0x0000, 0x1000, CRC(22e1a720) SHA1(c465cd34b72fe306530fa12f54cce04be1b7d415) )
 
-	ROM_REGION( 0x200000, "oki", 0 ) /* OKI6295 */
+	ROM_REGION( 0x80000, "oki", 0 ) /* OKI6295 */
 	ROM_LOAD( "sound.bin", 0x000000, 0x80000, CRC(aeec9dc6) SHA1(56fd62e8db8aa96cdd242d8c705849a413567780) )
 ROM_END
 
@@ -1436,10 +1554,10 @@ ROM_START( punipic2 )
 	ROM_CONTINUE(                   0x000006, 0x80000 )
 	ROM_CONTINUE(                   0x200006, 0x80000 )
 
-	ROM_REGION( 0x28000, "audiocpu", 0 ) /* PIC16c57 - protected */
-	ROM_LOAD( "pic16c57", 0x00000, 0x4000, NO_DUMP )
+	ROM_REGION( 0x1000, "pic", 0 )
+	ROM_LOAD( "pic16c57.bin", 0x0000, 0x1000, CRC(22e1a720) SHA1(c465cd34b72fe306530fa12f54cce04be1b7d415) )
 
-	ROM_REGION( 0x200000, "oki", 0 ) /* OKI6295 */
+	ROM_REGION( 0x80000, "oki", 0 ) /* OKI6295 */
 	ROM_LOAD( "sound.bin", 0x000000, 0x80000, CRC(aeec9dc6) SHA1(56fd62e8db8aa96cdd242d8c705849a413567780) )
 
 	ROM_REGION( 0x200000, "user1", 0 ) /* other */
@@ -1465,10 +1583,10 @@ ROM_START( punipic3 )
 	ROM_CONTINUE(                 0x200002, 0x80000 )
 	ROM_CONTINUE(                 0x200006, 0x80000 )
 
-	ROM_REGION( 0x28000, "audiocpu", ROMREGION_ERASE00 ) /* PIC16c57 (maybe, not listed in readme) */
+	ROM_REGION( 0x1000, "pic", ROMREGION_ERASE00 ) /* PIC16c57 (maybe, not listed in readme) */
 	//ROM_LOAD( "pic16c57", 0x00000, 0x4000, NO_DUMP )
 
-	ROM_REGION( 0x200000, "oki", ROMREGION_ERASE00 ) /* OKI6295 */
+	ROM_REGION( 0x80000, "oki", ROMREGION_ERASE00 ) /* OKI6295 */
 	//ROM_LOAD( "sound.bin", 0x000000, 0x80000, CRC(aeec9dc6) SHA1(56fd62e8db8aa96cdd242d8c705849a413567780) )
 ROM_END
 
@@ -1508,7 +1626,7 @@ ROM_START( slampic )
 	ROM_LOAD64_BYTE( "10.bin", 0x400003, 0x40000, CRC(f538e620) SHA1(354cd0548b067dfc8782bbe13b0a9c2083dbd290) )
 	ROM_CONTINUE(              0x400007, 0x40000)
 
-	ROM_REGION( 0x2000, "audiocpu", 0 ) /* PIC16c57 - protected, dump isn't valid */
+	ROM_REGION( 0x2000, "pic", 0 ) /* PIC16c57 - protected, dump isn't valid */
 	ROM_LOAD( "pic16c57-xt-p.bin", 0x00000, 0x2000, BAD_DUMP CRC(aeae5ccc) SHA1(553afb68f7bf130cdf34e24512f72b4ecef1576f) )
 
 	ROM_REGION( 0x80000, "oki", 0 ) /* OKI6295 samples */
@@ -1658,7 +1776,7 @@ ROM_START( slampic2 )
 	// ROM_LOAD64_BYTE( "rom4.bin", 0x600003, 0x40000, CRC(9683dd30) SHA1(8b258b386baff5e06a9b7f176c49507f7e531b95) )  // ~ 14.bin
 	// ROM_CONTINUE(                0x600007, 0x40000)
 
-	ROM_REGION( 0x2000, "audiocpu", 0 ) // NO DUMP  -  protected PIC
+	ROM_REGION( 0x2000, "pic", 0 ) // NO DUMP  -  protected PIC
 	ROM_LOAD( "pic_u33.bin", 0x0000, 0x1007, BAD_DUMP CRC(6dba4094) SHA1(ca3362de83205fc6563d16a59b8e6e4bb7ebf4a6) )
 
 	ROM_REGION( 0x140000, "oki", 0 )
@@ -1720,10 +1838,10 @@ ROM_START( wofpic )
 	ROM_LOAD64_BYTE( "m12073-3", 0x200003, 0x40000, CRC(efc17c9a) SHA1(26429a9039bb249e17945508c16645c82f7f412a) )
 	ROM_CONTINUE(                0x200007, 0x40000)
 
-	ROM_REGION( 0x2000, "audiocpu", 0 ) // NO DUMP  -  protected PIC
-	ROM_LOAD( "pic.bin", 0x0000, 0x1007, NO_DUMP )
+	ROM_REGION( 0x1000, "pic", 0 ) // NO DUMP  -  protected PIC
+	ROM_LOAD( "pic.bin", 0x0000, 0x1000, NO_DUMP )
 
-	ROM_REGION( 0x080000, "oki", 0 )
+	ROM_REGION( 0x80000, "oki", 0 )
 	ROM_LOAD( "ma12073.4mm", 0x00000, 0x80000, CRC(ac421276) SHA1(56786c23b0d96e1a2540e7269aa20fd390f98b5b) )
 ROM_END
 
@@ -1737,8 +1855,8 @@ GAME( 1993,  dinopic2,   dino,      dinopic,   dino,      dinopic_state,     ini
 GAME( 1993,  dinopic3,   dino,      dinopic,   dino,      dinopic_state,     init_dinopic,   ROT0,  "bootleg",  "Cadillacs and Dinosaurs (bootleg with PIC16C57, set 3)",  MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )     // 930201 ETC
 GAME( 1993,  jurassic99, dino,      dinopic,   dino,      dinopic_state,     init_dinopic,   ROT0,  "bootleg",  "Jurassic 99 (Cadillacs and Dinosaurs bootleg with EM78P447AP)",  MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )     // 930201 ?
 
-GAME( 1993,  punipic,    punisher,  punipic,   punisher,  cps1bl_pic_state,  init_punipic,   ROT0,  "bootleg",  "The Punisher (bootleg with PIC16C57, set 1)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )  // 930422 ETC
-GAME( 1993,  punipic2,   punisher,  punipic,   punisher,  cps1bl_pic_state,  init_punipic,   ROT0,  "bootleg",  "The Punisher (bootleg with PIC16C57, set 2)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )  // 930422 ETC
+GAME( 1993,  punipic,    punisher,  punipic,   punisher,  cps1bl_pic_state,  init_punipic,   ROT0,  "bootleg",  "The Punisher (bootleg with PIC16C57, set 1)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )  // 930422 ETC
+GAME( 1993,  punipic2,   punisher,  punipic,   punisher,  cps1bl_pic_state,  init_punipic,   ROT0,  "bootleg",  "The Punisher (bootleg with PIC16C57, set 2)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )  // 930422 ETC
 GAME( 1993,  punipic3,   punisher,  punipic,   punisher,  cps1bl_pic_state,  init_punipic3,  ROT0,  "bootleg",  "The Punisher (bootleg with PIC16C57, set 3)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )  // 930422 ETC
 
 GAME( 1993,  slampic,    slammast,  slampic,   slampic,   cps1bl_pic_state,  init_dinopic,   ROT0,  "bootleg",  "Saturday Night Slam Masters (bootleg with PIC16C57, set 1)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )  // 930713 ETC
