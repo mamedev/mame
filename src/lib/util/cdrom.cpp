@@ -2104,7 +2104,9 @@ std::error_condition cdrom_file::parse_iso(std::string_view tocfname, toc &outto
 
 std::error_condition cdrom_file::parse_gdi(std::string_view tocfname, toc &outtoc, track_input_info &outinfo)
 {
-	int i, numtracks;
+	char token[512];
+	int i = 0;
+	int trackcnt = 0;
 
 	std::string path = std::string(tocfname);
 
@@ -2125,89 +2127,171 @@ std::error_condition cdrom_file::parse_gdi(std::string_view tocfname, toc &outto
 	char linebuffer[512];
 	memset(linebuffer, 0, sizeof(linebuffer));
 
-	fgets(linebuffer,511,infile);
-	numtracks=atoi(linebuffer);
-
-	for(i=0;i<numtracks;++i)
+	if (!fgets(linebuffer,511,infile))
 	{
-		char *tok;
-		int trknum;
-		int trksize,trktype;
-		int sz;
+		printf("GDI doesn't have track count (blank file?)\n");
+		return chd_file::error::INVALID_DATA;
+	}
 
-		fgets(linebuffer,511,infile);
+	i = 0;
+	TOKENIZE
 
-		tok=strtok(linebuffer," ");
+	const int numtracks = atoi(token);
 
-		trknum=atoi(tok)-1;
+	if (numtracks > 0 && numtracks - 1 > std::size(outinfo.track))
+	{
+		printf("GDI expects too many tracks. Expected %d tracks but only up to %zu tracks allowed\n", numtracks, std::size(outinfo.track) + 1);
+		return chd_file::error::INVALID_DATA;
+	}
 
-		outinfo.track[trknum].swap=false;
-		outinfo.track[trknum].offset=0;
+	if (numtracks == 0)
+	{
+		printf("GDI header specifies no tracks\n");
+		return chd_file::error::INVALID_DATA;
+	}
+
+	while (!feof(infile))
+	{
+		int paramcnt = 0;
+
+		if (!fgets(linebuffer,511,infile))
+			break;
+
+		i = 0;
+		TOKENIZE
+
+		// Ignore empty lines so they're not countered toward the total track count
+		if (strlen(token) == 0)
+			continue;
+
+		paramcnt++;
+		const int trknum = atoi(token) - 1;
+
+		if (trknum < 0 || trknum > std::size(outinfo.track) || trknum + 1 > numtracks)
+		{
+			printf("Track %d is out of expected range of 1 to %d\n", trknum + 1, numtracks);
+			return chd_file::error::INVALID_DATA;
+		}
+
+		if (outtoc.tracks[trknum].datasize != 0)
+			printf("warning: Track %d defined multiple times?\n", trknum + 1);
+		else
+			trackcnt++;
+
+		outinfo.track[trknum].swap = false;
+		outinfo.track[trknum].offset = 0;
 
 		outtoc.tracks[trknum].datasize = 0;
 		outtoc.tracks[trknum].subtype = CD_SUB_NONE;
 		outtoc.tracks[trknum].subsize = 0;
 		outtoc.tracks[trknum].pgsub = CD_SUB_NONE;
 
-		tok=strtok(nullptr," ");
-		outtoc.tracks[trknum].physframeofs=atoi(tok);
+		TOKENIZE
+		if (strlen(token) > 0)
+			paramcnt++;
+		outtoc.tracks[trknum].physframeofs = atoi(token);
 
-		tok=strtok(nullptr," ");
-		trktype=atoi(tok);
+		TOKENIZE
+		if (strlen(token) > 0)
+			paramcnt++;
+		const int trktype = atoi(token);
 
-		tok=strtok(nullptr," ");
-		trksize=atoi(tok);
+		TOKENIZE
+		if (strlen(token) > 0)
+			paramcnt++;
+		const int trksize = atoi(token);
 
-		if(trktype==4 && trksize==2352)
+		if (trktype == 4 && trksize == 2352)
 		{
-			outtoc.tracks[trknum].trktype=CD_TRACK_MODE1_RAW;
-			outtoc.tracks[trknum].datasize=2352;
+			outtoc.tracks[trknum].trktype = CD_TRACK_MODE1_RAW;
+			outtoc.tracks[trknum].datasize = 2352;
 		}
-		if(trktype==4 && trksize==2048)
+		else if (trktype == 4 && trksize == 2048)
 		{
-			outtoc.tracks[trknum].trktype=CD_TRACK_MODE1;
-			outtoc.tracks[trknum].datasize=2048;
+			outtoc.tracks[trknum].trktype = CD_TRACK_MODE1;
+			outtoc.tracks[trknum].datasize = 2048;
 		}
-		if(trktype==0)
+		else if (trktype == 0)
 		{
-			outtoc.tracks[trknum].trktype=CD_TRACK_AUDIO;
-			outtoc.tracks[trknum].datasize=2352;
+			outtoc.tracks[trknum].trktype = CD_TRACK_AUDIO;
+			outtoc.tracks[trknum].datasize = 2352;
 			outinfo.track[trknum].swap = true;
 		}
-
-		std::string name;
-
-		tok=strtok(nullptr," ");
-		name = tok;
-		if (tok[0]=='"') {
-			do {
-				tok=strtok(nullptr," ");
-				if (tok!=nullptr) {
-					name += " ";
-					name += tok;
-				}
-			} while(tok!=nullptr && (strrchr(tok,'"')-tok !=(strlen(tok)-1)));
-			strdelchr(name,'"');
+		else
+		{
+			printf("Unknown track type %d and track size %d combination encountered\n", trktype, trksize);
+			return chd_file::error::INVALID_DATA;
 		}
+
+		// skip to start of next token
+		int pi = i;
+		while (pi < std::size(linebuffer) && isspace(linebuffer[pi]))
+			pi++;
+
+		if (linebuffer[pi] == '"' && strchr(linebuffer + pi + 1, '"') == nullptr)
+		{
+			printf("Track %d filename does not having closing quotation mark: '%s'\n", trknum + 1, linebuffer + pi);
+			return chd_file::error::INVALID_DATA;
+		}
+
+		TOKENIZE
+		if (strlen(token) > 0)
+			paramcnt++;
+		std::string name = token;
+
 		outinfo.track[trknum].fname.assign(path).append(name);
 
-		sz = get_file_size(outinfo.track[trknum].fname);
-
-		outtoc.tracks[trknum].frames = sz/trksize;
+		const uint64_t sz = get_file_size(outinfo.track[trknum].fname);
+		outtoc.tracks[trknum].frames = sz / trksize;
 		outtoc.tracks[trknum].padframes = 0;
 
 		if (trknum != 0)
 		{
-			int dif=outtoc.tracks[trknum].physframeofs-(outtoc.tracks[trknum-1].frames+outtoc.tracks[trknum-1].physframeofs);
+			const int dif = outtoc.tracks[trknum].physframeofs - (outtoc.tracks[trknum-1].frames + outtoc.tracks[trknum-1].physframeofs);
 			outtoc.tracks[trknum-1].frames += dif;
 			outtoc.tracks[trknum-1].padframes = dif;
 		}
+
+		TOKENIZE
+		// offset parameter, not used
+		if (strlen(token) > 0)
+			paramcnt++;
+
+		// check if there are any extra parameters that shouldn't be there
+		while (strlen(token) > 0)
+		{
+			TOKENIZE
+			if (strlen(token) > 0)
+				paramcnt++;
+		}
+
+		if (paramcnt != 6)
+		{
+			printf("GDI track entry should have 6 parameters, found %d\n", paramcnt);
+			return chd_file::error::INVALID_DATA;
+		}
+	}
+
+	bool missing_tracks = trackcnt != numtracks;
+	for (int i = 0; i < numtracks; i++)
+	{
+		if (outtoc.tracks[i].datasize == 0)
+		{
+			printf("Could not find track %d\n", i + 1);
+			missing_tracks = true;
+		}
+	}
+
+	if (missing_tracks)
+	{
+		printf("GDI is missing tracks\n");
+		return chd_file::error::INVALID_DATA;
 	}
 
 	if (EXTRA_VERBOSE)
-		for(i=0; i < numtracks; i++)
+		for(int i = 0; i < numtracks; i++)
 		{
-			printf("%s %d %d %d (true %d)\n", outinfo.track[i].fname.c_str(), outtoc.tracks[i].frames, outtoc.tracks[i].padframes, outtoc.tracks[i].physframeofs, outtoc.tracks[i].frames - outtoc.tracks[i].padframes);
+			printf("'%s' %d %d %d (true %d)\n", outinfo.track[i].fname.c_str(), outtoc.tracks[i].frames, outtoc.tracks[i].padframes, outtoc.tracks[i].physframeofs, outtoc.tracks[i].frames - outtoc.tracks[i].padframes);
 		}
 
 	/* close the input TOC */
