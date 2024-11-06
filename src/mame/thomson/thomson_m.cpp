@@ -13,6 +13,8 @@
 #include "machine/6821pia.h"
 #include "machine/ram.h"
 
+#include <cmath>
+
 #define LOG_KBD    (1U << 1) /* TO8 / TO9 / TO9+ keyboard */
 #define LOG_BANK   (1U << 2)
 #define LOG_VIDEO  (1U << 3) /* video & lightpen */
@@ -209,21 +211,6 @@ void thomson_state::mo5_set_cassette_motor(int state)
 
 
 
-
-/*************************** utilities ********************************/
-
-
-
-/* ------------ IRQs ------------ */
-
-
-void thomson_state::thom_irq_reset()
-{
-	m_mainfirq->in_w<2>(0);
-}
-
-
-
 /***************************** TO7 / T9000 *************************/
 
 DEVICE_IMAGE_LOAD_MEMBER( thomson_state::to7_cartridge )
@@ -338,6 +325,22 @@ uint8_t thomson_state::to7_cartridge_r(offs_t offset)
 
 
 
+/* write to video memory through addresses 0x4000-0x5fff */
+void thomson_state::to7_vram_w(offs_t offset, uint8_t data)
+{
+	assert( offset < 0x2000 );
+	/* force two topmost color bits to 1 */
+	if ( m_thom_mode_point )
+		data |= 0xc0;
+	if ( m_thom_vram[ offset + m_thom_mode_point ] == data )
+		return;
+	m_thom_vram[ offset + m_thom_mode_point ] = data;
+	/* dirty whole scanline */
+	m_video->mark_dirty(offset);
+}
+
+
+
 /* ------------ 6846 (timer, I/O) ------------ */
 
 
@@ -346,7 +349,7 @@ void thomson_state::to7_timer_port_out(uint8_t data)
 {
 	thom_set_mode_point( data & 1 );          /* bit 0: video bank switch */
 	m_caps_led = (data & 8) ? 1 : 0; /* bit 3: keyboard led */
-	thom_set_border_color( ((data & 0x10) ? 1 : 0) |           /* bits 4-6: border color */
+	m_video->set_border_color( ((data & 0x10) ? 1 : 0) |           /* bits 4-6: border color */
 							((data & 0x20) ? 2 : 0) |
 							((data & 0x40) ? 4 : 0) );
 }
@@ -367,27 +370,9 @@ uint8_t thomson_state::to7_timer_port_in()
 
 void thomson_state::to7_lightpen_cb( int step )
 {
-	if ( ! m_to7_lightpen )
-		return;
-
 	LOGMASKED(LOG_VIDEO, "%f to7_lightpen_cb: step=%i\n", machine().time().as_double(), step);
 	m_pia_sys->cb1_w( 1 );
 	m_pia_sys->cb1_w( 0 );
-	m_to7_lightpen_step = step;
-}
-
-
-
-/* ------------ video ------------ */
-
-
-
-void thomson_state::to7_set_init( int init )
-{
-	/* INIT signal wired to system PIA 6821 */
-
-	LOGMASKED(LOG_VIDEO, "%f to7_set_init: init=%i\n", machine().time().as_double(), init);
-	m_pia_sys->ca1_w( init );
 }
 
 
@@ -398,7 +383,7 @@ void thomson_state::to7_set_init( int init )
 
 void thomson_state::to7_sys_cb2_out(int state)
 {
-	m_to7_lightpen = !state;
+	m_video->set_lightpen_active(!state);
 }
 
 
@@ -410,16 +395,12 @@ void thomson_state::to7_sys_portb_out(uint8_t data)
 
 
 
-#define TO7_LIGHTPEN_DECAL 17 /* horizontal lightpen shift, stored in $60D2 */
-
-
-
 uint8_t thomson_state::to7_sys_porta_in()
 {
-	if ( m_to7_lightpen )
+	if ( m_video->lightpen_active() )
 	{
 		/* lightpen hi */
-		return to7_lightpen_gpl( TO7_LIGHTPEN_DECAL, m_to7_lightpen_step ) >> 8;
+		return m_video->to7_lightpen_gpl() >> 8;
 	}
 	else
 	{
@@ -442,7 +423,86 @@ uint8_t thomson_state::to7_sys_porta_in()
 uint8_t thomson_state::to7_sys_portb_in()
 {
 	/* lightpen low */
-	return to7_lightpen_gpl( TO7_LIGHTPEN_DECAL, m_to7_lightpen_step ) & 0xff;
+	return m_video->to7_lightpen_gpl() & 0xff;
+}
+
+
+
+/* -------------- misc --------------- */
+
+
+void thomson_state::thom_set_mode_point( int point )
+{
+	assert( point >= 0 && point <= 1 );
+	m_thom_mode_point = ( ! point ) * 0x2000;
+	m_vrambank->set_entry( ! point );
+}
+
+
+
+/* -------------- initialization --------------- */
+
+
+void thomson_state::video_start()
+{
+	LOG("thom: video start called\n");
+
+	m_thom_mode_point = 0;
+	save_item(NAME(m_thom_mode_point));
+	m_vrambank->set_entry( 0 );
+
+	m_caps_led.resolve();
+}
+
+
+/* TO7, TO7/70 palette, hardcoded in ROM
+   without further information, we assume that the hardcoded values
+   are the same as those setup by the TO8/TO9+/MO6 when booting up
+ */
+
+static const uint16_t thom_pal_init[16] =
+{
+	0x1000, /* 0: black */        0x000f, /* 1: red */
+	0x00f0, /* 2: geen */         0x00ff, /* 3: yellow */
+	0x0f00, /* 4: blue */         0x0f0f, /* 5: purple */
+	0x0ff0, /* 6: cyan */         0x0fff, /* 7: white */
+	0x0777, /* 8: gray */         0x033a, /* 9: pink */
+	0x03a3, /* a: light green */  0x03aa, /* b: light yellow */
+	0x0a33, /* c: light blue */   0x0a3a, /* d: redish pink */
+	0x0ee7, /* e: light cyan */   0x007b, /* f: orange */
+};
+
+
+void thomson_state::thom_palette(palette_device &palette)
+{
+	LOG("thom: palette init called\n");
+
+	/* TO8 and later use an EF9369 color palette chip
+	   The spec shows a built-in gamma correction for gamma=2.8
+	   i.e., output is out = in ^ (1/2.8)
+
+	   For the TO7, the gamma correction is irrelevant.
+
+	   For the TO7/70, we use the same palette and gamma has the TO8,
+	   which gives good results (but is not verified).
+	 */
+	thom_configure_palette(1.0 / 2.8, thom_pal_init, palette);
+}
+
+
+/* sets the fixed palette (for MO5,TO7,TO7/70) and gamma correction */
+void thomson_state::thom_configure_palette(double gamma, const uint16_t* pal, palette_device& palette)
+{
+	m_video->set_fixed_palette(pal);
+
+	for ( int i = 0; i < 4097; i++ )
+	{
+		uint8_t r = 255. * pow( (i & 15) / 15., gamma );
+		uint8_t g = 255. * pow( ((i>> 4) & 15) / 15., gamma );
+		uint8_t b = 255. * pow( ((i >> 8) & 15) / 15., gamma );
+		/* uint8_t alpha = i & 0x1000 ? 0 : 255;  TODO: transparency */
+		palette.set_pen_color(i, r, g, b );
+	}
 }
 
 
@@ -640,28 +700,19 @@ MACHINE_RESET_MEMBER( thomson_state, to7 )
 	LOG("to7: machine reset called\n");
 
 	/* subsystems */
-	thom_irq_reset();
 	to7_game_reset();
 
 	m_extension->rom_map(m_maincpu->space(AS_PROGRAM), 0xe000, 0xe7bf);
 	m_extension->io_map (m_maincpu->space(AS_PROGRAM), 0xe7c0, 0xe7ff);
 
 	/* video */
-	thom_set_video_mode( THOM_VMODE_TO770 );
-	m_thom_init_cb = &thomson_state::to7_set_init;
-	m_thom_lightpen_cb = std::bind(&thomson_state::to7_lightpen_cb, this,  std::placeholders::_1);
-	thom_set_lightpen_callback( 3 );
 	thom_set_mode_point( 0 );
-	thom_set_border_color( 0 );
 	m_pia_sys->cb1_w( 0 );
 
 	/* memory */
 	m_old_cart_bank = -1;
 	to7_update_cart_bank();
 	/* thom_cart_bank not reset */
-
-	/* lightpen */
-	m_to7_lightpen = 0;
 }
 
 
@@ -709,8 +760,6 @@ MACHINE_START_MEMBER( thomson_state, to7 )
 	/* save-state */
 	save_item(NAME(m_thom_cart_nb_banks));
 	save_item(NAME(m_thom_cart_bank));
-	save_item(NAME(m_to7_lightpen));
-	save_item(NAME(m_to7_lightpen_step));
 	save_pointer(NAME(cartmem), 0x10000 );
 	machine().save().register_postload(save_prepost_delegate(FUNC(thomson_state::to7_update_cart_bank_postload),this));
 }
@@ -802,6 +851,19 @@ void thomson_state::to770_sys_portb_out(uint8_t data)
 
 
 
+/* write to video memory through addresses 0x4000-0x5fff (TO)
+   or 0x0000-0x1fff (MO) */
+void thomson_state::to770_vram_w(offs_t offset, uint8_t data)
+{
+	assert( offset < 0x2000 );
+	if ( m_thom_vram[ offset + m_thom_mode_point ] == data )
+		return;
+	m_thom_vram[ offset + m_thom_mode_point ] = data;
+	/* dirty whole scanline */
+	m_video->mark_dirty(offset);
+}
+
+
 /* ------------ 6846 (timer, I/O) ------------ */
 
 
@@ -810,45 +872,10 @@ void thomson_state::to770_timer_port_out(uint8_t data)
 {
 	thom_set_mode_point( data & 1 );          /* bit 0: video bank switch */
 	m_caps_led = (data & 8) ? 1 : 0; /* bit 3: keyboard led */
-	thom_set_border_color( ((data & 0x10) ? 1 : 0) |          /* 4-bit border color */
+	m_video->set_border_color( ((data & 0x10) ? 1 : 0) |          /* 4-bit border color */
 							((data & 0x20) ? 2 : 0) |
 							((data & 0x40) ? 4 : 0) |
 							((data & 0x04) ? 0 : 8) );
-}
-
-
-/* ------------ gate-array ------------ */
-
-
-
-uint8_t thomson_state::to770_gatearray_r(offs_t offset)
-{
-	struct thom_vsignal v = thom_get_vsignal();
-	struct thom_vsignal l = thom_get_lightpen_vsignal( TO7_LIGHTPEN_DECAL, m_to7_lightpen_step - 1, 0 );
-	int count, inil, init, lt3;
-	count = m_to7_lightpen ? l.count : v.count;
-	inil  = m_to7_lightpen ? l.inil  : v.inil;
-	init  = m_to7_lightpen ? l.init  : v.init;
-	lt3   = m_to7_lightpen ? l.lt3   : v.lt3;
-
-	switch ( offset )
-	{
-	case 0: return (count >> 8) & 0xff;
-	case 1: return count & 0xff;
-	case 2: return (lt3 << 7) | (inil << 6);
-	case 3: return (init << 7);
-	default:
-		LOGMASKED(LOG_ERRORS, "$%04x to770_gatearray_r: invalid offset %i\n", m_maincpu->pc(), offset);
-		return 0;
-	}
-}
-
-
-
-void thomson_state::to770_gatearray_w(offs_t offset, uint8_t data)
-{
-	if ( ! offset )
-		m_to7_lightpen = data & 1;
 }
 
 
@@ -862,19 +889,13 @@ MACHINE_RESET_MEMBER( thomson_state, to770 )
 	LOG("to770: machine reset called\n");
 
 	/* subsystems */
-	thom_irq_reset();
 	to7_game_reset();
 
 	m_extension->rom_map(m_maincpu->space(AS_PROGRAM), 0xe000, 0xe7bf);
 	m_extension->io_map (m_maincpu->space(AS_PROGRAM), 0xe7c0, 0xe7ff);
 
 	/* video */
-	thom_set_video_mode( THOM_VMODE_TO770 );
-	m_thom_init_cb = &thomson_state::to7_set_init;
-	m_thom_lightpen_cb = std::bind(&thomson_state::to7_lightpen_cb, this,  std::placeholders::_1);
-	thom_set_lightpen_callback( 3 );
 	thom_set_mode_point( 0 );
-	thom_set_border_color( 8 );
 	m_pia_sys->cb1_w( 0 );
 
 	/* memory */
@@ -883,9 +904,6 @@ MACHINE_RESET_MEMBER( thomson_state, to770 )
 	to7_update_cart_bank();
 	to770_update_ram_bank();
 	/* thom_cart_bank not reset */
-
-	/* lightpen */
-	m_to7_lightpen = 0;
 }
 
 
@@ -918,8 +936,6 @@ MACHINE_START_MEMBER( thomson_state, to770 )
 	/* save-state */
 	save_item(NAME(m_thom_cart_nb_banks));
 	save_item(NAME(m_thom_cart_bank));
-	save_item(NAME(m_to7_lightpen));
-	save_item(NAME(m_to7_lightpen_step));
 	save_pointer(NAME(cartmem), 0x10000 );
 	machine().save().register_postload(save_prepost_delegate(FUNC(thomson_state::to770_update_ram_bank_postload), this));
 	machine().save().register_postload(save_prepost_delegate(FUNC(thomson_state::to7_update_cart_bank_postload), this));
@@ -938,35 +954,8 @@ MACHINE_START_MEMBER( thomson_state, to770 )
 void mo5_state::mo5_lightpen_cb( int step )
 {
 	/* MO5 signals ca1 (TO7 signals cb1) */
-	if ( ! m_to7_lightpen )
-		return;
-
 	m_pia_sys->ca1_w( 1 );
 	m_pia_sys->ca1_w( 0 );
-	m_to7_lightpen_step = step;
-}
-
-
-/* ------------ periodic interrupt ------------ */
-
-/* the MO5 & MO6 do not have a MC 6846 timer,
-   they have a fixed 50 Hz timer instead
-*/
-
-
-TIMER_CALLBACK_MEMBER(thomson_state::mo5_periodic_cb)
-{
-	/* pulse */
-	m_pia_sys->cb1_w( 1 );
-	m_pia_sys->cb1_w( 0 );
-}
-
-
-
-void thomson_state::mo5_init_timer()
-{
-	/* time is a little faster than 50 Hz to match video framerate */
-	m_mo5_periodic_timer->adjust(attotime::zero, 0, attotime::from_usec( 19968 ));
 }
 
 
@@ -978,7 +967,7 @@ void thomson_state::mo5_init_timer()
 void mo5_state::mo5_sys_porta_out(uint8_t data)
 {
 	thom_set_mode_point( data & 1 );       /* bit 0: video bank switch */
-	thom_set_border_color( (data >> 1) & 15 ); /* bit 1-4: border color */
+	m_video->set_border_color( (data >> 1) & 15 ); /* bit 1-4: border color */
 	mo5_set_cassette( (data & 0x40) ? 1 : 0 ); /* bit 6: cassette output */
 }
 
@@ -1001,45 +990,6 @@ uint8_t mo5_state::mo5_sys_portb_in()
 	int lin = 7 - ((portb >> 4) & 7); /* key line */
 
 	return ( m_io_keyboard[lin]->read() & (1 << col) ) ? 0x80 : 0;
-}
-
-
-
-/* ------------ gate-array ------------ */
-
-
-
-#define MO5_LIGHTPEN_DECAL 12
-
-
-
-uint8_t mo5_state::mo5_gatearray_r(offs_t offset)
-{
-	struct thom_vsignal v = thom_get_vsignal();
-	struct thom_vsignal l = thom_get_lightpen_vsignal( MO5_LIGHTPEN_DECAL, m_to7_lightpen_step - 1, 0 );
-	int count, inil, init, lt3;
-	count = m_to7_lightpen ? l.count : v.count;
-	inil  = m_to7_lightpen ? l.inil  : v.inil;
-	init  = m_to7_lightpen ? l.init  : v.init;
-	lt3   = m_to7_lightpen ? l.lt3   : v.lt3;
-
-	switch ( offset ) {
-	case 0: return (count >> 8) & 0xff;
-	case 1: return count & 0xff;
-	case 2: return (lt3 << 7) | (inil << 6);
-	case 3: return (init << 7);
-	default:
-		LOGMASKED(LOG_ERRORS, "$%04x mo5_gatearray_r: invalid offset %i\n",  m_maincpu->pc(), offset);
-		return 0;
-	}
-}
-
-
-
-void mo5_state::mo5_gatearray_w(offs_t offset, uint8_t data)
-{
-	if ( ! offset )
-		m_to7_lightpen = data & 1;
 }
 
 
@@ -1233,22 +1183,42 @@ void mo5_state::mo5_ext_w(uint8_t data)
 /* ------------ init / reset ------------ */
 
 
+/* MO5 palette, hardcoded in a ROM
+   values are from "Manuel Technique du MO5", p.19
+ */
+static const uint16_t mo5_pal_init[16] =
+{
+	0x1000, /* 0: black */        0x055f, /* 1: red */
+	0x00f0, /* 2: geen */         0x00ff, /* 3: yellow */
+	0x0f55, /* 4: blue */         0x0f0f, /* 5: purple */
+	0x0ff5, /* 6: cyan */         0x0fff, /* 7: white */
+	0x0aaa, /* 8: gray */         0x0aaf, /* 9: pink */
+	0x0afa, /* a: light green */  0x0aff, /* b: light yellow */
+	0x0fa5, /* c: light blue */   0x0faf, /* d: parama pink */
+	0x0ffa, /* e: light cyan */   0x05af, /* f: orange */
+};
+
+void mo5_state::mo5_palette(palette_device &palette)
+{
+	LOG("thom: MO5 palette init called\n");
+
+	/* The MO5 has a different fixed palette than the TO7/70.
+	   We use a smaller gamma correction which gives intutively better
+	   results (but is not verified).
+	 */
+	thom_configure_palette(1.0, mo5_pal_init, palette);
+}
+
 
 MACHINE_RESET_MEMBER( mo5_state, mo5 )
 {
 	LOG("mo5: machine reset called\n");
 
 	/* subsystems */
-	thom_irq_reset();
 	to7_game_reset();
-	mo5_init_timer();
 
 	/* video */
-	thom_set_video_mode( THOM_VMODE_MO5 );
-	m_thom_lightpen_cb = std::bind(&mo5_state::mo5_lightpen_cb, this,  std::placeholders::_1);
-	thom_set_lightpen_callback( 3 );
 	thom_set_mode_point( 0 );
-	thom_set_border_color( 0 );
 	m_pia_sys->ca1_w( 0 );
 
 	/* memory */
@@ -1256,9 +1226,6 @@ MACHINE_RESET_MEMBER( mo5_state, mo5 )
 	mo5_update_cart_bank();
 	/* mo5_reg_cart not reset */
 	/* thom_cart_bank not reset */
-
-	/* lightpen */
-	m_to7_lightpen = 0;
 }
 
 
@@ -1273,7 +1240,6 @@ MACHINE_START_MEMBER( mo5_state, mo5 )
 
 	/* subsystems */
 	to7_game_init();
-	m_mo5_periodic_timer = timer_alloc(FUNC(mo5_state::mo5_periodic_cb), this);
 
 	m_extension->rom_map(m_maincpu->space(AS_PROGRAM), 0xa000, 0xa7bf);
 	m_extension->io_map (m_maincpu->space(AS_PROGRAM), 0xa7c0, 0xa7ff);
@@ -1294,8 +1260,6 @@ MACHINE_START_MEMBER( mo5_state, mo5 )
 	/* save-state */
 	save_item(NAME(m_thom_cart_nb_banks));
 	save_item(NAME(m_thom_cart_bank));
-	save_item(NAME(m_to7_lightpen));
-	save_item(NAME(m_to7_lightpen_step));
 	save_item(NAME(m_mo5_reg_cart));
 	save_pointer(NAME(cartmem), 0x10000 );
 	machine().save().register_postload(save_prepost_delegate(FUNC(mo5_state::mo5_update_cart_bank_postload), this));
@@ -1315,115 +1279,17 @@ MACHINE_START_MEMBER( mo5_state, mo5 )
 
 
 
-void to9_state::to9_ieee_w(offs_t offset, uint8_t data)
+void thomson_state::to9_ieee_w(offs_t offset, uint8_t data)
 {
 	LOGMASKED(LOG_ERRORS, "$%04x %f to9_ieee_w: unhandled write $%02X to register %i\n", m_maincpu->pc(), machine().time().as_double(), data, offset);
 }
 
 
 
-uint8_t to9_state::to9_ieee_r(offs_t offset)
+uint8_t thomson_state::to9_ieee_r(offs_t offset)
 {
 	LOGMASKED(LOG_ERRORS, "$%04x %f to9_ieee_r: unhandled read from register %i\n", m_maincpu->pc(), machine().time().as_double(), offset);
 	return 0;
-}
-
-
-
-/* ------------ system gate-array ------------ */
-
-
-
-#define TO9_LIGHTPEN_DECAL 8
-
-
-
-uint8_t to9_state::to9_gatearray_r(offs_t offset)
-{
-	struct thom_vsignal v = thom_get_vsignal();
-	struct thom_vsignal l = thom_get_lightpen_vsignal( TO9_LIGHTPEN_DECAL, m_to7_lightpen_step - 1, 0 );
-	int count, inil, init, lt3;
-	count = m_to7_lightpen ? l.count : v.count;
-	inil  = m_to7_lightpen ? l.inil  : v.inil;
-	init  = m_to7_lightpen ? l.init  : v.init;
-	lt3   = m_to7_lightpen ? l.lt3   : v.lt3;
-
-	switch ( offset )
-	{
-	case 0: return (count >> 8) & 0xff;
-	case 1: return count & 0xff;
-	case 2: return (lt3 << 7) | (inil << 6);
-	case 3: return (v.init << 7) | (init << 6); /* != TO7/70 */
-	default:
-		LOGMASKED(LOG_ERRORS, "$%04x to9_gatearray_r: invalid offset %i\n", m_maincpu->pc(), offset);
-		return 0;
-	}
-}
-
-
-
-void to9_state::to9_gatearray_w(offs_t offset, uint8_t data)
-{
-	if ( ! offset )
-		m_to7_lightpen = data & 1;
-}
-
-
-
-/* ------------ video gate-array ------------ */
-
-
-
-/* style: 0 => TO9, 1 => TO8/TO9, 2 => MO6 */
-void to9_state::to9_set_video_mode( uint8_t data, int style )
-{
-	switch ( data & 0x7f )
-	{
-	case 0x00:
-		if ( style == 2 )
-			thom_set_video_mode( THOM_VMODE_MO5 );
-		else if ( style == 1 )
-			thom_set_video_mode( THOM_VMODE_TO770 );
-		else
-			thom_set_video_mode( THOM_VMODE_TO9 );
-		break;
-
-	// undocumented, but tested on a real TO8D
-	case 0x20: thom_set_video_mode( THOM_VMODE_MO5_ALT );     break;
-
-	case 0x21: thom_set_video_mode( THOM_VMODE_BITMAP4 );     break;
-
-	case 0x41: thom_set_video_mode( THOM_VMODE_BITMAP4_ALT ); break;
-
-	// also undocumented but tested
-	case 0x59: thom_set_video_mode( THOM_VMODE_BITMAP4_ALT_HALF ); break;
-
-	case 0x2a:
-		if ( style==0 )
-			thom_set_video_mode( THOM_VMODE_80_TO9 );
-		else
-			thom_set_video_mode( THOM_VMODE_80 );
-		break;
-
-	case 0x7b: thom_set_video_mode( THOM_VMODE_BITMAP16 );    break;
-
-	case 0x24: thom_set_video_mode( THOM_VMODE_PAGE1 );       break;
-
-	case 0x25: thom_set_video_mode( THOM_VMODE_PAGE2 );       break;
-
-	case 0x26: thom_set_video_mode( THOM_VMODE_OVERLAY );     break;
-
-		// undocumented 160x200 variant of overlay
-	case 0x3e: thom_set_video_mode( THOM_VMODE_OVERLAY_HALF );     break;
-
-	case 0x3f: thom_set_video_mode( THOM_VMODE_OVERLAY3 );    break;
-
-	// undocumented variant enconding for bitmap16
-	case 0x5b: thom_set_video_mode( THOM_VMODE_BITMAP16_ALT ); break;
-
-	default:
-		LOGMASKED(LOG_ERRORS, "to9_set_video_mode: unknown mode $%02X tr=%i phi=%i mod=%i\n", data, (data >> 5) & 3, (data >> 3) & 2, data & 7);
-	}
 }
 
 
@@ -1444,10 +1310,6 @@ uint8_t to9_state::to9_vreg_r(offs_t offset)
 
 	case 1: /* palette address */
 		return m_to9_palette_idx;
-
-	case 2:
-	case 3:
-		return 0;
 
 	default:
 		LOGMASKED(LOG_ERRORS, "to9_vreg_r: invalid read offset %i\n", offset);
@@ -1470,7 +1332,7 @@ void to9_state::to9_vreg_w(offs_t offset, uint8_t data)
 		idx = m_to9_palette_idx / 2;
 		color = m_to9_palette_data[ 2 * idx + 1 ];
 		color = m_to9_palette_data[ 2 * idx ] | (color << 8);
-		thom_set_palette( idx ^ 8, color & 0x1fff );
+		m_video->set_palette( idx ^ 8, color & 0x1fff );
 		m_to9_palette_idx = ( m_to9_palette_idx + 1 ) & 31;
 	}
 	break;
@@ -1478,23 +1340,12 @@ void to9_state::to9_vreg_w(offs_t offset, uint8_t data)
 	case 1: /* palette address */
 		m_to9_palette_idx = data & 31;
 		break;
-
-	case 2: /* video mode */
-		to9_set_video_mode( data, 0 );
-		break;
-
-	case 3: /* border color */
-		thom_set_border_color( data & 15 );
-		break;
-
-	default:
-		LOGMASKED(LOG_ERRORS, "to9_vreg_w: invalid write offset %i data=$%02X\n", offset, data);
 	}
 }
 
 
 
-void to9_state::to9_palette_init()
+void thomson_state::to9_palette_init()
 {
 	m_to9_palette_idx = 0;
 	memset( m_to9_palette_data, 0, sizeof( m_to9_palette_data ) );
@@ -1719,6 +1570,10 @@ void to9_state::to9_sys_portb_out(uint8_t data)
 /* ------------ 6846 (timer, I/O) ------------ */
 
 
+void to9_state::write_centronics_busy(int state)
+{
+	m_centronics_busy = state;
+}
 
 void to9_state::to9_timer_port_out(uint8_t data)
 {
@@ -1764,17 +1619,12 @@ MACHINE_RESET_MEMBER( to9_state, to9 )
 	LOG("to9: machine reset called\n");
 
 	/* subsystems */
-	thom_irq_reset();
 	to7_game_reset();
 
 	m_extension->rom_map(m_maincpu->space(AS_PROGRAM), 0xe000, 0xe7bf);
 	m_extension->io_map (m_maincpu->space(AS_PROGRAM), 0xe7c0, 0xe7ff);
 
 	/* video */
-	thom_set_video_mode( THOM_VMODE_TO9 );
-	m_thom_lightpen_cb = std::bind(&to9_state::to7_lightpen_cb, this,  std::placeholders::_1);
-	thom_set_lightpen_callback( 3 );
-	thom_set_border_color( 8 );
 	thom_set_mode_point( 0 );
 	m_pia_sys->cb1_w( 0 );
 
@@ -1785,9 +1635,6 @@ MACHINE_RESET_MEMBER( to9_state, to9 )
 	to9_update_cart_bank();
 	to9_update_ram_bank();
 	/* thom_cart_bank not reset */
-
-	/* lightpen */
-	m_to7_lightpen = 0;
 }
 
 
@@ -1827,8 +1674,6 @@ MACHINE_START_MEMBER( to9_state, to9 )
 	/* save-state */
 	save_item(NAME(m_thom_cart_nb_banks));
 	save_item(NAME(m_thom_cart_bank));
-	save_item(NAME(m_to7_lightpen));
-	save_item(NAME(m_to7_lightpen_step));
 	save_item(NAME(m_to9_soft_bank));
 	save_item(NAME(m_to9_floppy_control));
 	save_pointer(NAME(cartmem), 0x10000 );
@@ -1843,14 +1688,14 @@ MACHINE_START_MEMBER( to9_state, to9 )
 
 /* ------------ RAM / ROM banking ------------ */
 
-void to9_state::to8_update_ram_bank()
+void to8_state::to8_update_ram_bank()
 {
 	address_space& space = m_maincpu->space(AS_PROGRAM);
 	uint8_t bank = 0;
 
-	if ( m_to8_reg_sys1 & 0x10 )
+	if ( m_video->reg_sys1() & 0x10 )
 	{
-		bank = m_to8_reg_ram & 31;
+		bank = m_video->reg_ram() & 31;
 	}
 	else
 	{
@@ -1895,31 +1740,31 @@ void to9_state::to8_update_ram_bank()
 		}
 		m_to8_data_vpage = bank;
 		m_old_ram_bank = bank;
-		LOGMASKED(LOG_BANK, "to8_update_ram_bank: select bank %i (%s style)\n", bank, (m_to8_reg_sys1 & 0x10) ? "new" : "old");
+		LOGMASKED(LOG_BANK, "to8_update_ram_bank: select bank %i (%s style)\n", bank, (m_video->reg_sys1() & 0x10) ? "new" : "old");
 	}
 }
 
 
 
-void to9_state::to8_update_ram_bank_postload()
+void to8_state::to8_update_ram_bank_postload()
 {
 	to8_update_ram_bank();
 }
 
 
 
-void to9_state::to8_update_cart_bank()
+void to8_state::to8_update_cart_bank()
 {
 	address_space& space = m_maincpu->space(AS_PROGRAM);
 	int bank = 0;
 	int bank_is_read_only = 0;
 
-	if ( m_to8_reg_cart & 0x20 )
+	if ( m_video->reg_cart() & 0x20 )
 	{
 		/* RAM space */
-		m_to8_cart_vpage = m_to8_reg_cart & 31;
+		m_to8_cart_vpage = m_video->reg_cart() & 31;
 		bank = 8 + m_to8_cart_vpage;
-		bank_is_read_only = (( m_to8_reg_cart & 0x40 ) == 0);
+		bank_is_read_only = (( m_video->reg_cart() & 0x40 ) == 0);
 		if ( bank != m_old_cart_bank )
 		{
 			/* mapping to VRAM */
@@ -1936,7 +1781,7 @@ void to9_state::to8_update_cart_bank()
 						}
 						else
 						{
-							space.install_write_handler( 0x0000, 0x3fff, write8sm_delegate(*this, FUNC(to9_state::to8_vcart_w)));
+							space.install_write_handler( 0x0000, 0x3fff, write8sm_delegate(*this, FUNC(to8_state::to8_vcart_w)));
 						}
 					}
 				}
@@ -1976,7 +1821,7 @@ void to9_state::to8_update_cart_bank()
 				{
 					if (m_to8_cart_vpage < 4)
 					{
-						space.install_write_handler( 0x0000, 0x3fff, write8sm_delegate(*this, FUNC(to9_state::to8_vcart_w)));
+						space.install_write_handler( 0x0000, 0x3fff, write8sm_delegate(*this, FUNC(to8_state::to8_vcart_w)));
 					}
 					else
 					{
@@ -1999,7 +1844,7 @@ void to9_state::to8_update_cart_bank()
 				if ( m_old_cart_bank < 4 || m_old_cart_bank > 7 )
 				{
 					space.install_read_bank( 0x0000, 0x3fff, m_cartbank );
-					space.install_write_handler( 0x0000, 0x3fff, write8sm_delegate(*this, FUNC(to9_state::to8_cartridge_w)) );
+					space.install_write_handler( 0x0000, 0x3fff, write8sm_delegate(*this, FUNC(to8_state::to8_cartridge_w)) );
 				}
 				LOGMASKED(LOG_BANK, "to8_update_cart_bank: CART is internal bank %i\n", m_to8_soft_bank);
 			}
@@ -2015,8 +1860,8 @@ void to9_state::to8_update_cart_bank()
 					if ( m_old_cart_bank < 0 || m_old_cart_bank > 3 )
 					{
 						space.install_read_bank( 0x0000, 0x3fff, m_cartbank );
-						space.install_write_handler( 0x0000, 0x3fff, write8sm_delegate(*this, FUNC(to9_state::to8_cartridge_w)) );
-						space.install_read_handler( 0x0000, 0x0003, read8sm_delegate(*this, FUNC(to9_state::to8_cartridge_r)) );
+						space.install_write_handler( 0x0000, 0x3fff, write8sm_delegate(*this, FUNC(to8_state::to8_cartridge_w)) );
+						space.install_read_handler( 0x0000, 0x0003, read8sm_delegate(*this, FUNC(to8_state::to8_cartridge_r)) );
 					}
 					LOGMASKED(LOG_BANK, "to8_update_cart_bank: CART is external cartridge bank %i\n", bank);
 				}
@@ -2040,7 +1885,7 @@ void to9_state::to8_update_cart_bank()
 
 
 
-void to9_state::to8_update_cart_bank_postload()
+void to8_state::to8_update_cart_bank_postload()
 {
 	to8_update_cart_bank();
 }
@@ -2048,7 +1893,7 @@ void to9_state::to8_update_cart_bank_postload()
 
 
 /* ROM bank switch */
-void to9_state::to8_cartridge_w(offs_t offset, uint8_t data)
+void to8_state::to8_cartridge_w(offs_t offset, uint8_t data)
 {
 	if ( offset >= 0x2000 )
 		return;
@@ -2064,7 +1909,7 @@ void to9_state::to8_cartridge_w(offs_t offset, uint8_t data)
 
 
 /* read signal to 0000-0003 generates a bank switch */
-uint8_t to9_state::to8_cartridge_r(offs_t offset)
+uint8_t to8_state::to8_cartridge_r(offs_t offset)
 {
 	uint8_t data = m_cart_rom[offset + (m_thom_cart_bank % m_thom_cart_nb_banks) * 0x4000];
 	if ( !machine().side_effects_disabled() )
@@ -2076,103 +1921,78 @@ uint8_t to9_state::to8_cartridge_r(offs_t offset)
 }
 
 
-/* ------------ system gate-array ------------ */
 
+/* write to video memory through system space (always page 1) */
 
-
-#define TO8_LIGHTPEN_DECAL 16
-
-
-
-uint8_t to9_state::to8_gatearray_r(offs_t offset)
+void to8_state::to8_sys_lo_w(offs_t offset, uint8_t data)
 {
-	struct thom_vsignal v = thom_get_vsignal();
-	struct thom_vsignal l = thom_get_lightpen_vsignal( TO8_LIGHTPEN_DECAL, m_to7_lightpen_step - 1, 6 );
-	int count, inil, init, lt3;
-	uint8_t res;
-	count = m_to7_lightpen ? l.count : v.count;
-	inil  = m_to7_lightpen ? l.inil  : v.inil;
-	init  = m_to7_lightpen ? l.init  : v.init;
-	lt3   = m_to7_lightpen ? l.lt3   : v.lt3;
-
-	switch ( offset )
-	{
-	case 0: /* system 2 / lightpen register 1 */
-		if ( m_to7_lightpen )
-			res = (count >> 8) & 0xff;
-		else
-			res = m_to8_reg_sys2 & 0xf0;
-		break;
-
-	case 1: /* ram register / lightpen register 2 */
-		if ( m_to7_lightpen )
-		{
-			if ( !machine().side_effects_disabled() )
-			{
-				m_mainfirq->in_w<2>(0);
-				m_to8_lightpen_intr = 0;
-			}
-			res = count & 0xff;
-		}
-		else
-			res = m_to8_reg_ram & 0x1f;
-		break;
-
-	case 2: /* cartrige register / lightpen register 3 */
-		if ( m_to7_lightpen )
-			res = (lt3 << 7) | (inil << 6);
-		else
-			res = m_to8_reg_cart;
-		break;
-
-	case 3: /* lightpen register 4 */
-		res = (v.init << 7) | (init << 6) | (v.inil << 5) | (m_to8_lightpen_intr << 1) | m_to7_lightpen;
-		break;
-
-	default:
-		LOGMASKED(LOG_ERRORS, "$%04x to8_gatearray_r: invalid offset %i\n", m_maincpu->pc(), offset);
-		res = 0;
-	}
-
-	LOGMASKED(LOG_VIDEO, "$%04x %f to8_gatearray_r: off=%i ($%04X) res=$%02X lightpen=%i\n", m_maincpu->pc(), machine().time().as_double(), offset, 0xe7e4 + offset, res, m_to7_lightpen);
-
-	return res;
+	uint8_t* dst = m_thom_vram + offset + 0x6000;
+	assert( offset < 0x2000 );
+	if ( *dst == data )
+		return;
+	*dst = data;
+	/* dirty whole scanline */
+	m_video->mark_dirty(offset);
 }
 
 
 
-void to9_state::to8_gatearray_w(offs_t offset, uint8_t data)
+void to8_state::to8_sys_hi_w(offs_t offset, uint8_t data)
 {
-	LOGMASKED(LOG_VIDEO, "$%04x %f to8_gatearray_w: off=%i ($%04X) data=$%02X\n", m_maincpu->pc(), machine().time().as_double(), offset, 0xe7e4 + offset, data);
+	uint8_t* dst = m_thom_vram + offset + 0x4000;
+	assert( offset < 0x2000 );
+	if ( *dst == data ) return;
+	*dst = data;
+	/* dirty whole scanline */
+	m_video->mark_dirty(offset);
+}
 
-	switch ( offset )
-	{
-	case 0: /* switch */
-		m_to7_lightpen = data & 1;
-		break;
 
-	case 1: /* ram register */
-		if ( m_to8_reg_sys1 & 0x10 )
-		{
-			m_to8_reg_ram = data;
-			to8_update_ram_bank();
-		}
-		break;
 
-	case 2: /* cartridge register */
-		m_to8_reg_cart = data;
-		to8_update_cart_bank();
-		break;
+/* write to video memory through data space */
 
-	case 3: /* system register 1 */
-		m_to8_reg_sys1 = data;
-		to8_update_ram_bank();
-		to8_update_cart_bank();
-		break;
+void to8_state::to8_data_lo_w(offs_t offset, uint8_t data)
+{
+	uint8_t* dst = m_thom_vram + ( ( offset + 0x4000 * m_to8_data_vpage + 0x2000 ) & m_ram->mask() );
+	assert( offset < 0x2000 );
+	if ( *dst == data )
+		return;
+	*dst = data;
+	/* dirty whole scanline */
+	if ( m_to8_data_vpage >= 4 )
+		return;
+	m_video->mark_dirty(offset);
+}
 
-	default:
-		LOGMASKED(LOG_ERRORS, "$%04x to8_gatearray_w: invalid offset %i (data=$%02X)\n", m_maincpu->pc(), offset, data);
-	}
+
+
+void to8_state::to8_data_hi_w(offs_t offset, uint8_t data)
+{
+	uint8_t* dst = m_thom_vram + ( ( offset + 0x4000 * m_to8_data_vpage ) & m_ram->mask() );
+	assert( offset < 0x2000 );
+	if ( *dst == data )
+		return;
+	*dst = data;
+	/* dirty whole scanline */
+	if ( m_to8_data_vpage >= 4 )
+		return;
+	m_video->mark_dirty(offset);
+}
+
+
+
+/* write to video memory page through cartridge addresses space */
+void to8_state::to8_vcart_w(offs_t offset, uint8_t data)
+{
+	uint8_t* dst = m_thom_vram + ( ( offset + 0x4000 * m_to8_cart_vpage ) & m_ram->mask() );
+	assert( offset < 0x4000 );
+	if ( *dst == data )
+		return;
+	*dst = data;
+	/* dirty whole scanline */
+	if ( m_to8_cart_vpage >= 4  )
+		return;
+	m_video->mark_dirty(offset & 0x1fff);
 }
 
 
@@ -2181,10 +2001,10 @@ void to9_state::to8_gatearray_w(offs_t offset, uint8_t data)
 
 
 
-uint8_t to9_state::to8_vreg_r(offs_t offset)
+uint8_t to8_state::to8_vreg_r(offs_t offset)
 {
 	/* 0xe7dc from external floppy drive aliases the video gate-array */
-	if ( ( offset == 3 ) && ( m_to8_reg_ram & 0x80 ) && ( m_to8_reg_sys1 & 0x80 ) )
+	if ( ( offset == 3 ) && ( m_video->reg_ram() & 0x80 ) && ( m_video->reg_sys1() & 0x80 ) )
 	{
 		if ( machine().side_effects_disabled() )
 			return 0;
@@ -2219,7 +2039,7 @@ uint8_t to9_state::to8_vreg_r(offs_t offset)
 
 
 
-void to9_state::to8_vreg_w(offs_t offset, uint8_t data)
+void to8_state::to8_vreg_w(offs_t offset, uint8_t data)
 {
 	LOGMASKED(LOG_VIDEO, "$%04x %f to8_vreg_w: off=%i ($%04X) data=$%02X\n", m_maincpu->pc(), machine().time().as_double(), offset, 0xe7da + offset, data);
 
@@ -2232,7 +2052,7 @@ void to9_state::to8_vreg_w(offs_t offset, uint8_t data)
 		idx = m_to9_palette_idx / 2;
 		color = m_to9_palette_data[ 2 * idx + 1 ];
 		color = m_to9_palette_data[ 2 * idx ] | (color << 8);
-		thom_set_palette( idx, color & 0x1fff );
+		m_video->set_palette( idx, color & 0x1fff );
 		m_to9_palette_idx = ( m_to9_palette_idx + 1 ) & 31;
 	}
 	break;
@@ -2242,21 +2062,17 @@ void to9_state::to8_vreg_w(offs_t offset, uint8_t data)
 		break;
 
 	case 2: /* display register */
-		to9_set_video_mode( data, 1 );
+		m_video->video_mode_w( data );
 		break;
 
 	case 3: /* system register 2 */
 		/* 0xe7dc from external floppy drive aliases the video gate-array */
-		if ( ( offset == 3 ) && ( m_to8_reg_ram & 0x80 ) && ( m_to8_reg_sys1 & 0x80 ) )
+		if ( ( offset == 3 ) && ( m_video->reg_ram() & 0x80 ) && ( m_video->reg_sys1() & 0x80 ) )
 		{
 			abort(); // to7_floppy_w( 0xc, data );
 		}
 		else
-		{
-			m_to8_reg_sys2 = data;
-			thom_set_video_page( data >> 6 );
-			thom_set_border_color( data & 15 );
-		}
+			m_video->sys2_w( data );
 		break;
 
 	default:
@@ -2269,7 +2085,7 @@ void to9_state::to8_vreg_w(offs_t offset, uint8_t data)
 /* ------------ system PIA 6821 ------------ */
 
 
-uint8_t to9_state::to8_sys_porta_in()
+uint8_t to8_state::to8_sys_porta_in()
 {
 	int ktest = m_to8_kbd->ktest_r();
 
@@ -2281,7 +2097,20 @@ uint8_t to9_state::to8_sys_porta_in()
 
 
 
-void to9_state::to8_sys_portb_out(uint8_t data)
+void to8_state::to8_sys_porta_out(uint8_t data)
+{
+	m_centronics->write_data1(BIT(data, 1));
+	m_centronics->write_data2(BIT(data, 2));
+	m_centronics->write_data3(BIT(data, 3));
+	m_centronics->write_data4(BIT(data, 4));
+	m_centronics->write_data5(BIT(data, 5));
+	m_centronics->write_data6(BIT(data, 6));
+	m_centronics->write_data7(BIT(data, 7));
+}
+
+
+
+void to8_state::to8_sys_portb_out(uint8_t data)
 {
 	m_centronics->write_data0(BIT(data, 0));
 	m_centronics->write_strobe(BIT(data, 1));
@@ -2297,12 +2126,12 @@ void to9_state::to8_sys_portb_out(uint8_t data)
 /* ------------ 6846 (timer, I/O) ------------ */
 
 
-void to9_state::write_centronics_busy(int state)
+void to8_state::write_centronics_busy(int state)
 {
 	m_centronics_busy = state;
 }
 
-uint8_t to9_state::to8_timer_port_in()
+uint8_t to8_state::to8_timer_port_in()
 {
 	int lightpen = (m_io_lightpen_button->read() & 1) ? 2 : 0;
 	int cass = to7_get_cassette() ? 0x80 : 0;
@@ -2313,7 +2142,7 @@ uint8_t to9_state::to8_timer_port_in()
 
 
 
-void to9_state::to8_timer_port_out(uint8_t data)
+void to8_state::to8_timer_port_out(uint8_t data)
 {
 	int ack = (data & 0x20) ? 1 : 0;       /* bit 5: keyboard ACK */
 	m_to8_bios_bank = (data & 0x10) ? 1 : 0; /* bit 4: BIOS bank*/
@@ -2326,26 +2155,11 @@ void to9_state::to8_timer_port_out(uint8_t data)
 
 
 
-void to9_state::to8_timer_cp2_out(int state)
+void to8_state::to8_timer_cp2_out(int state)
 {
 	/* mute */
 	m_to7_game_mute = state;
 	to7_game_sound_update();
-}
-
-/* ------------ lightpen ------------ */
-
-
-
-/* direct connection to interrupt line instead of through a PIA */
-void to9_state::to8_lightpen_cb( int step )
-{
-	if ( ! m_to7_lightpen )
-		return;
-
-	m_mainfirq->in_w<2>(1);
-	m_to7_lightpen_step = step;
-	m_to8_lightpen_intr = 1;
 }
 
 
@@ -2354,28 +2168,17 @@ void to9_state::to8_lightpen_cb( int step )
 
 
 
-MACHINE_RESET_MEMBER( to9_state, to8 )
+MACHINE_RESET_MEMBER( to8_state, to8 )
 {
 	LOG("to8: machine reset called\n");
 
 	/* subsystems */
-	thom_irq_reset();
 	to7_game_reset();
 
 	/* gate-array */
-	m_to7_lightpen = 0;
-	m_to8_reg_ram = 0;
-	m_to8_reg_cart = 0;
-	m_to8_reg_sys1 = 0;
-	m_to8_reg_sys2 = 0;
-	m_to8_lightpen_intr = 0;
 	m_to8_soft_select = 0;
 
 	/* video */
-	thom_set_video_mode( THOM_VMODE_TO770 );
-	m_thom_lightpen_cb = std::bind(&to9_state::to8_lightpen_cb, this,  std::placeholders::_1);
-	thom_set_lightpen_callback( 4 );
-	thom_set_border_color( 0 );
 	thom_set_mode_point( 0 );
 	m_pia_sys->cb1_w( 0 );
 
@@ -2395,7 +2198,7 @@ MACHINE_RESET_MEMBER( to9_state, to8 )
 
 
 
-MACHINE_START_MEMBER( to9_state, to8 )
+MACHINE_START_MEMBER( to8_state, to8 )
 {
 	uint8_t* basic = memregion("basic")->base();
 	uint8_t* monitor = memregion("monitor")->base();
@@ -2446,21 +2249,14 @@ MACHINE_START_MEMBER( to9_state, to8 )
 	/* save-state */
 	save_item(NAME(m_thom_cart_nb_banks));
 	save_item(NAME(m_thom_cart_bank));
-	save_item(NAME(m_to7_lightpen));
-	save_item(NAME(m_to7_lightpen_step));
-	save_item(NAME(m_to8_reg_ram));
-	save_item(NAME(m_to8_reg_cart));
-	save_item(NAME(m_to8_reg_sys1));
-	save_item(NAME(m_to8_reg_sys2));
 	save_item(NAME(m_to8_soft_select));
 	save_item(NAME(m_to8_soft_bank));
 	save_item(NAME(m_to8_bios_bank));
-	save_item(NAME(m_to8_lightpen_intr));
 	save_item(NAME(m_to8_data_vpage));
 	save_item(NAME(m_to8_cart_vpage));
 	save_pointer(NAME(cartmem), 0x10000 );
-	machine().save().register_postload(save_prepost_delegate(FUNC(to9_state::to8_update_ram_bank_postload), this));
-	machine().save().register_postload(save_prepost_delegate(FUNC(to9_state::to8_update_cart_bank_postload), this));
+	machine().save().register_postload(save_prepost_delegate(FUNC(to8_state::to8_update_ram_bank_postload), this));
+	machine().save().register_postload(save_prepost_delegate(FUNC(to8_state::to8_update_cart_bank_postload), this));
 }
 
 
@@ -2471,13 +2267,23 @@ MACHINE_START_MEMBER( to9_state, to8 )
 
 /* ------------ system PIA 6821 ------------ */
 
+uint8_t to8_state::to9p_sys_porta_in()
+{
+	uint8_t ktest = m_to9_kbd->ktest_r();
+
+	LOGMASKED(LOG_KBD, "to9_sys_porta_in: ktest=%i\n", ktest);
+
+	// PB1-7 are not connected, and are pulled hi internally
+	return ktest | 0xfe;
+}
+
 
 
 /* ------------ 6846 (timer, I/O) ------------ */
 
 
 
-uint8_t to9_state::to9p_timer_port_in()
+uint8_t to8_state::to9p_timer_port_in()
 {
 	int lightpen = (m_io_lightpen_button->read() & 1) ? 2 : 0;
 	int cass = to7_get_cassette() ? 0x80 : 0;
@@ -2487,7 +2293,7 @@ uint8_t to9_state::to9p_timer_port_in()
 
 
 
-void to9_state::to9p_timer_port_out(uint8_t data)
+void to8_state::to9p_timer_port_out(uint8_t data)
 {
 	int bios_bank = (data & 0x10) ? 1 : 0; /* bit 4: BIOS bank */
 	thom_set_mode_point( data & 1 );       /* bit 0: video bank switch */
@@ -2498,47 +2304,7 @@ void to9_state::to9p_timer_port_out(uint8_t data)
 
 /* ------------ init / reset ------------ */
 
-MACHINE_RESET_MEMBER( to9_state, to9p )
-{
-	LOG("to9p: machine reset called\n");
-
-	/* subsystems */
-	thom_irq_reset();
-	to7_game_reset();
-
-	/* gate-array */
-	m_to7_lightpen = 0;
-	m_to8_reg_ram = 0;
-	m_to8_reg_cart = 0;
-	m_to8_reg_sys1 = 0;
-	m_to8_reg_sys2 = 0;
-	m_to8_lightpen_intr = 0;
-	m_to8_soft_select = 0;
-
-	/* video */
-	thom_set_video_mode( THOM_VMODE_TO770 );
-	m_thom_lightpen_cb = std::bind(&to9_state::to8_lightpen_cb, this,  std::placeholders::_1);
-	thom_set_lightpen_callback( 4 );
-	thom_set_border_color( 0 );
-	thom_set_mode_point( 0 );
-	m_pia_sys->cb1_w( 0 );
-
-	/* memory */
-	m_old_ram_bank = -1;
-	m_old_cart_bank = -1;
-	m_to8_cart_vpage = 0;
-	m_to8_data_vpage = 0;
-	m_to8_soft_bank = 0;
-	m_to8_bios_bank = 0;
-	to8_update_ram_bank();
-	to8_update_cart_bank();
-	m_biosbank->set_entry( 0 );
-	/* thom_cart_bank not reset */
-}
-
-
-
-MACHINE_START_MEMBER( to9_state, to9p )
+MACHINE_START_MEMBER( to8_state, to9p )
 {
 	uint8_t* basic = memregion("basic")->base();
 	uint8_t* monitor = memregion("monitor")->base();
@@ -2577,21 +2343,14 @@ MACHINE_START_MEMBER( to9_state, to9p )
 	/* save-state */
 	save_item(NAME(m_thom_cart_nb_banks));
 	save_item(NAME(m_thom_cart_bank));
-	save_item(NAME(m_to7_lightpen));
-	save_item(NAME(m_to7_lightpen_step));
-	save_item(NAME(m_to8_reg_ram));
-	save_item(NAME(m_to8_reg_cart));
-	save_item(NAME(m_to8_reg_sys1));
-	save_item(NAME(m_to8_reg_sys2));
 	save_item(NAME(m_to8_soft_select));
 	save_item(NAME(m_to8_soft_bank));
 	save_item(NAME(m_to8_bios_bank));
-	save_item(NAME(m_to8_lightpen_intr));
 	save_item(NAME(m_to8_data_vpage));
 	save_item(NAME(m_to8_cart_vpage));
 	save_pointer(NAME(cartmem), 0x10000 );
-	machine().save().register_postload(save_prepost_delegate(FUNC(to9_state::to8_update_ram_bank_postload), this));
-	machine().save().register_postload(save_prepost_delegate(FUNC(to9_state::to8_update_cart_bank_postload), this));
+	machine().save().register_postload(save_prepost_delegate(FUNC(to8_state::to8_update_ram_bank_postload), this));
+	machine().save().register_postload(save_prepost_delegate(FUNC(to8_state::to8_update_cart_bank_postload), this));
 }
 
 
@@ -2608,9 +2367,9 @@ void mo6_state::mo6_update_ram_bank()
 {
 	uint8_t bank = 0;
 
-	if ( m_to8_reg_sys1 & 0x10 )
+	if ( m_video->reg_sys1() & 0x10 )
 	{
-		bank = m_to8_reg_ram & 7; /* 128 KB RAM only = 8 pages */
+		bank = m_video->reg_ram() & 7; /* 128 KB RAM only = 8 pages */
 	}
 	if ( bank != m_to8_data_vpage ) {
 		m_datalobank->set_entry( bank );
@@ -2637,15 +2396,15 @@ void mo6_state::mo6_update_cart_bank()
 	int bank = 0;
 	int bank_is_read_only = 0;
 
-	if ( ( ( m_to8_reg_sys1 & 0x40 ) && ( m_to8_reg_cart & 0x20 ) ) || ( ! ( m_to8_reg_sys1 & 0x40 ) && ( m_mo5_reg_cart & 4 ) ) )
+	if ( ( ( m_video->reg_sys1() & 0x40 ) && ( m_video->reg_cart() & 0x20 ) ) || ( ! ( m_video->reg_sys1() & 0x40 ) && ( m_mo5_reg_cart & 4 ) ) )
 	{
 		/* RAM space */
-		if ( m_to8_reg_sys1 & 0x40 )
+		if ( m_video->reg_sys1() & 0x40 )
 		{
 			/* use a7e6 */
-			m_to8_cart_vpage = m_to8_reg_cart & 7; /* 128 KB RAM only = 8 pages */
+			m_to8_cart_vpage = m_video->reg_cart() & 7; /* 128 KB RAM only = 8 pages */
 			bank = 8 + m_to8_cart_vpage;
-			bank_is_read_only = (( m_to8_reg_cart & 0x40 ) == 0);
+			bank_is_read_only = (( m_video->reg_cart() & 0x40 ) == 0);
 			if ( bank != m_old_cart_bank )
 			{
 				if (m_to8_cart_vpage < 4)
@@ -2767,10 +2526,10 @@ void mo6_state::mo6_update_cart_bank()
 	else
 	{
 		/* ROM space */
-		if ( m_to8_reg_sys2 & 0x20 )
+		if ( m_video->reg_sys2() & 0x20 )
 		{
 			/* internal ROM */
-			if ( m_to8_reg_sys2 & 0x10)
+			if ( m_video->reg_sys2() & 0x10)
 			{
 				bank = b + 6; /* BASIC 128 */
 			}
@@ -2866,6 +2625,34 @@ void mo6_state::mo6_ext_w(uint8_t data)
 	/* MO5 network extension compatible */
 	m_mo5_reg_cart = data;
 	mo6_update_cart_bank();
+}
+
+
+
+void mo6_state::mo6_vcart_lo_w(offs_t offset, uint8_t data)
+{
+	uint8_t* dst = m_thom_vram + ( ( offset + 0x3000 + 0x4000 * m_to8_cart_vpage ) & m_ram->mask() );
+	assert( offset < 0x1000 );
+	if ( *dst == data )
+		return;
+	*dst = data;
+	/* dirty whole scanline */
+	if ( m_to8_cart_vpage >= 4  )
+		return;
+	m_video->mark_dirty(offset & 0x1fff);
+}
+
+void mo6_state::mo6_vcart_hi_w(offs_t offset, uint8_t data)
+{
+	uint8_t* dst = m_thom_vram + ( ( offset + 0x4000 * m_to8_cart_vpage ) & m_ram->mask() );
+	assert( offset < 0x3000 );
+	if ( *dst == data )
+		return;
+	*dst = data;
+	/* dirty whole scanline */
+	if ( m_to8_cart_vpage >= 4  )
+		return;
+	m_video->mark_dirty(offset & 0x1fff);
 }
 
 
@@ -2996,104 +2783,6 @@ void mo6_state::mo6_sys_cb2_out(int state)
 
 
 
-/* ------------ system gate-array ------------ */
-
-#define MO6_LIGHTPEN_DECAL 12
-
-
-
-uint8_t mo6_state::mo6_gatearray_r(offs_t offset)
-{
-	struct thom_vsignal v = thom_get_vsignal();
-	struct thom_vsignal l = thom_get_lightpen_vsignal( MO6_LIGHTPEN_DECAL, m_to7_lightpen_step - 1, 6 );
-	int count, inil, init, lt3;
-	uint8_t res;
-	count = m_to7_lightpen ? l.count : v.count;
-	inil  = m_to7_lightpen ? l.inil  : v.inil;
-	init  = m_to7_lightpen ? l.init  : v.init;
-	lt3   = m_to7_lightpen ? l.lt3   : v.lt3;
-
-	switch ( offset )
-	{
-	case 0: /* system 2 / lightpen register 1 */
-		if ( m_to7_lightpen )
-			res = (count >> 8) & 0xff;
-		else
-			res = m_to8_reg_sys2 & 0xf0;
-		break;
-
-	case 1: /* ram register / lightpen register 2 */
-		if ( m_to7_lightpen )
-		{
-			if ( !machine().side_effects_disabled() )
-			{
-				m_mainfirq->in_w<2>(0);
-				m_to8_lightpen_intr = 0;
-			}
-			res =  count & 0xff;
-		}
-		else
-			res = m_to8_reg_ram & 0x1f;
-		break;
-
-	case 2: /* cartrige register / lightpen register 3 */
-		if ( m_to7_lightpen )
-			res = (lt3 << 7) | (inil << 6);
-		else
-			res = 0;
-		break;
-
-	case 3: /* lightpen register 4 */
-		res = (v.init << 7) | (init << 6) | (v.inil << 5) | (m_to8_lightpen_intr << 1) | m_to7_lightpen;
-		break;
-
-	default:
-		LOGMASKED(LOG_ERRORS, "$%04x mo6_gatearray_r: invalid offset %i\n", m_maincpu->pc(), offset);
-		res = 0;
-	}
-
-	LOGMASKED(LOG_VIDEO, "$%04x %f mo6_gatearray_r: off=%i ($%04X) res=$%02X lightpen=%i\n", m_maincpu->pc(), machine().time().as_double(), offset, 0xa7e4 + offset, res, m_to7_lightpen);
-
-	return res;
-}
-
-
-
-void mo6_state::mo6_gatearray_w(offs_t offset, uint8_t data)
-{
-	LOGMASKED(LOG_VIDEO, "$%04x %f mo6_gatearray_w: off=%i ($%04X) data=$%02X\n", m_maincpu->pc(), machine().time().as_double(), offset, 0xa7e4 + offset, data);
-
-	switch ( offset )
-	{
-	case 0: /* switch */
-		m_to7_lightpen = data & 1;
-		break;
-
-	case 1: /* ram register */
-		if ( m_to8_reg_sys1 & 0x10 )
-		{
-			m_to8_reg_ram = data;
-			mo6_update_ram_bank();
-		}
-		break;
-
-	case 2: /* cartridge register */
-		m_to8_reg_cart = data;
-		mo6_update_cart_bank();
-		break;
-
-	case 3: /* system register 1 */
-		m_to8_reg_sys1 = data;
-		mo6_update_ram_bank();
-		mo6_update_cart_bank();
-		break;
-
-	default:
-		LOGMASKED(LOG_ERRORS, "$%04x mo6_gatearray_w: invalid offset %i (data=$%02X)\n", m_maincpu->pc(), offset, data);
-	}
-}
-
-
 /* ------------ video gate-array ------------ */
 
 
@@ -3101,7 +2790,7 @@ void mo6_state::mo6_gatearray_w(offs_t offset, uint8_t data)
 uint8_t mo6_state::mo6_vreg_r(offs_t offset)
 {
 	/* 0xa7dc from external floppy drive aliases the video gate-array */
-	if ( ( offset == 3 ) && ( m_to8_reg_ram & 0x80 ) )
+	if ( ( offset == 3 ) && ( m_video->reg_ram() & 0x80 ) )
 		{
 		if ( !machine().side_effects_disabled() )
 			abort(); // return to7_floppy_r( 0xc );
@@ -3137,23 +2826,18 @@ void mo6_state::mo6_vreg_w(offs_t offset, uint8_t data)
 		return;
 
 	case 2: /* display / external floppy register */
-		if ( ( m_to8_reg_sys1 & 0x80 ) && ( m_to8_reg_ram & 0x80 ) )
+		if ( ( m_video->reg_sys1() & 0x80 ) && ( m_video->reg_ram() & 0x80 ) )
 			abort(); // to7_floppy_w( 0xc, data );
 		else
-			to9_set_video_mode( data, 2 );
+			m_video->video_mode_w( data );
 		break;
 
 	case 3: /* system register 2 */
 		/* 0xa7dc from external floppy drive aliases the video gate-array */
-		if ( ( offset == 3 ) && ( m_to8_reg_ram & 0x80 ) )
+		if ( ( offset == 3 ) && ( m_video->reg_ram() & 0x80 ) )
 			abort(); // to7_floppy_w( 0xc, data );
 		else
-		{
-			m_to8_reg_sys2 = data;
-			thom_set_video_page( data >> 6 );
-			thom_set_border_color( data & 15 );
-			mo6_update_cart_bank();
-		}
+			m_video->sys2_w( data );
 		break;
 
 	default:
@@ -3172,23 +2856,9 @@ MACHINE_RESET_MEMBER( mo6_state, mo6 )
 	LOG("mo6: machine reset called\n");
 
 	/* subsystems */
-	thom_irq_reset();
 	mo6_game_reset();
-	mo5_init_timer();
-
-	/* gate-array */
-	m_to7_lightpen = 0;
-	m_to8_reg_ram = 0;
-	m_to8_reg_cart = 0;
-	m_to8_reg_sys1 = 0;
-	m_to8_reg_sys2 = 0;
-	m_to8_lightpen_intr = 0;
 
 	/* video */
-	thom_set_video_mode( THOM_VMODE_MO5 );
-	m_thom_lightpen_cb = std::bind(&mo6_state::to8_lightpen_cb, this,  std::placeholders::_1);
-	thom_set_lightpen_callback( 3 );
-	thom_set_border_color( 0 );
 	thom_set_mode_point( 0 );
 	m_pia_sys->ca1_w( 0 );
 
@@ -3216,7 +2886,6 @@ MACHINE_START_MEMBER( mo6_state, mo6 )
 	/* subsystems */
 	mo6_game_init();
 	to9_palette_init();
-	m_mo5_periodic_timer = timer_alloc(FUNC(mo6_state::mo5_periodic_cb), this);
 
 	m_extension->rom_map(m_maincpu->space(AS_PROGRAM), 0xa000, 0xa7bf);
 	m_extension->io_map (m_maincpu->space(AS_PROGRAM), 0xa7c0, 0xa7ff);
@@ -3252,13 +2921,6 @@ MACHINE_START_MEMBER( mo6_state, mo6 )
 	/* save-state */
 	save_item(NAME(m_thom_cart_nb_banks));
 	save_item(NAME(m_thom_cart_bank));
-	save_item(NAME(m_to7_lightpen));
-	save_item(NAME(m_to7_lightpen_step));
-	save_item(NAME(m_to8_reg_ram));
-	save_item(NAME(m_to8_reg_cart));
-	save_item(NAME(m_to8_reg_sys1));
-	save_item(NAME(m_to8_reg_sys2));
-	save_item(NAME(m_to8_lightpen_intr));
 	save_item(NAME(m_to8_data_vpage));
 	save_item(NAME(m_to8_cart_vpage));
 	save_item(NAME(m_mo5_reg_cart));
@@ -3345,23 +3007,9 @@ MACHINE_RESET_MEMBER( mo5nr_state, mo5nr )
 	m_extension_view.select(m_nanoreseau_config->read() & 1);
 
 	/* subsystems */
-	thom_irq_reset();
 	mo5nr_game_reset();
-	mo5_init_timer();
-
-	/* gate-array */
-	m_to7_lightpen = 0;
-	m_to8_reg_ram = 0;
-	m_to8_reg_cart = 0;
-	m_to8_reg_sys1 = 0;
-	m_to8_reg_sys2 = 0;
-	m_to8_lightpen_intr = 0;
 
 	/* video */
-	thom_set_video_mode( THOM_VMODE_MO5 );
-	m_thom_lightpen_cb = std::bind(&mo5nr_state::to8_lightpen_cb, this,  std::placeholders::_1);
-	thom_set_lightpen_callback( 3 );
-	thom_set_border_color( 0 );
 	thom_set_mode_point( 0 );
 	m_pia_sys->ca1_w( 0 );
 
@@ -3370,8 +3018,6 @@ MACHINE_RESET_MEMBER( mo5nr_state, mo5nr )
 	m_old_cart_bank = -1;
 	m_to8_cart_vpage = 0;
 	m_to8_data_vpage = 0;
-	mo6_update_ram_bank();
-	mo6_update_cart_bank();
 	/* mo5_reg_cart not reset */
 	/* thom_cart_bank not reset */
 }
@@ -3389,7 +3035,6 @@ MACHINE_START_MEMBER( mo5nr_state, mo5nr )
 	/* subsystems */
 	mo5nr_game_init();
 	to9_palette_init();
-	m_mo5_periodic_timer = timer_alloc(FUNC(mo5nr_state::mo5_periodic_cb), this);
 
 	m_extension->rom_map(m_extension_view[0], 0xa000, 0xa7bf);
 	m_extension->io_map (m_extension_view[0], 0xa7c0, 0xa7ff);
@@ -3428,13 +3073,6 @@ MACHINE_START_MEMBER( mo5nr_state, mo5nr )
 	/* save-state */
 	save_item(NAME(m_thom_cart_nb_banks));
 	save_item(NAME(m_thom_cart_bank));
-	save_item(NAME(m_to7_lightpen));
-	save_item(NAME(m_to7_lightpen_step));
-	save_item(NAME(m_to8_reg_ram));
-	save_item(NAME(m_to8_reg_cart));
-	save_item(NAME(m_to8_reg_sys1));
-	save_item(NAME(m_to8_reg_sys2));
-	save_item(NAME(m_to8_lightpen_intr));
 	save_item(NAME(m_to8_data_vpage));
 	save_item(NAME(m_to8_cart_vpage));
 	save_item(NAME(m_mo5_reg_cart));

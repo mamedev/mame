@@ -94,6 +94,7 @@
 #include "machine/ram.h"
 #include "machine/thmfc1.h"
 
+#include "screen.h"
 #include "softlist_dev.h"
 #include "speaker.h"
 
@@ -220,6 +221,12 @@ static INPUT_PORTS_START( thom_lightpen )
 	PORT_CODE( MOUSECODE_BUTTON1 )
 
 INPUT_PORTS_END
+
+#define TO7_LIGHTPEN_DECAL 17 /* horizontal lightpen shift, stored in $60D2 */
+#define MO5_LIGHTPEN_DECAL 12
+#define TO9_LIGHTPEN_DECAL 8
+#define TO8_LIGHTPEN_DECAL 16
+#define MO6_LIGHTPEN_DECAL 12
 
 /************************** T9000 / TO7 *******************************
 
@@ -383,21 +390,6 @@ static INPUT_PORTS_START ( to7_config )
 
 INPUT_PORTS_END
 
-static INPUT_PORTS_START ( to7_vconfig )
-	PORT_START ( "vconfig" )
-
-	PORT_CONFNAME ( 0x03, 0x00, "Border" )
-	PORT_CONFSETTING ( 0x00, "Normal (56x47)" )
-	PORT_CONFSETTING ( 0x01, "Small (16x16)" )
-	PORT_CONFSETTING ( 0x02, DEF_STR ( None ) )
-
-	PORT_CONFNAME ( 0x0c, 0x08, "Resolution" )
-	PORT_CONFSETTING ( 0x00, DEF_STR ( Low ) )
-	PORT_CONFSETTING ( 0x04, DEF_STR ( High  ) )
-	PORT_CONFSETTING ( 0x08, "Auto"  )
-
-INPUT_PORTS_END
-
 static INPUT_PORTS_START ( to7_keyboard )
 	PORT_START ( "keyboard.0" )
 		KEY ( 0, "Shift", LSHIFT ) PORT_CODE ( KEYCODE_RSHIFT ) PORT_CHAR(UCHAR_SHIFT_1)
@@ -473,7 +465,6 @@ static INPUT_PORTS_START ( to7 )
 	PORT_INCLUDE ( thom_game_port )
 	PORT_INCLUDE ( to7_keyboard )
 	PORT_INCLUDE ( to7_config )
-	PORT_INCLUDE ( to7_vconfig )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START ( t9000 )
@@ -525,13 +516,7 @@ void thomson_state::to7_base(machine_config &config, bool is_mo)
 	}
 
 /* video */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_refresh_hz(/*50*/ 1./0.019968);
-	m_screen->set_size(THOM_TOTAL_WIDTH * 2, THOM_TOTAL_HEIGHT);
-	m_screen->set_visarea(0, THOM_TOTAL_WIDTH * 2 - 1, 0, THOM_TOTAL_HEIGHT - 1);
-	m_screen->set_screen_update(FUNC(thomson_state::screen_update_thom));
-	m_screen->screen_vblank().set(FUNC(thomson_state::thom_vblank));
-	m_screen->set_palette("palette");
+	SCREEN(config, "screen", SCREEN_TYPE_RASTER).set_palette("palette");
 
 	PALETTE(config, "palette", FUNC(thomson_state::thom_palette), 4097); // 12-bit color + transparency
 
@@ -601,6 +586,14 @@ void thomson_state::to7(machine_config &config)
 
 	MC6809(config.replace(), m_maincpu, 16_MHz_XTAL / 4);
 	m_maincpu->set_addrmap(AS_PROGRAM, &thomson_state::to7_map);
+
+	TO7_VIDEO(config, m_video, 16_MHz_XTAL);
+	m_video->set_screen("screen");
+	m_video->set_lightpen_decal(TO7_LIGHTPEN_DECAL);
+	m_video->set_lightpen_steps(3);
+	m_video->set_vram_page_cb(FUNC(thomson_state::get_vram_page));
+	m_video->set_lightpen_step_cb(FUNC(thomson_state::to7_lightpen_cb));
+	m_video->init_cb().set(m_pia_sys, FUNC(pia6821_device::ca1_w));
 }
 
 void thomson_state::t9000(machine_config &config)
@@ -665,7 +658,6 @@ In arabic mode, Ctrl+E / Ctrl+X to start / stop typing in-line latin.
 
 void thomson_state::to770_map(address_map &map)
 {
-
 	map(0x0000, 0x3fff).bankr(THOM_CART_BANK).w(FUNC(thomson_state::to7_cartridge_w)); /* 4 * 16 KB */
 	map(0x4000, 0x5fff).bankr(THOM_VRAM_BANK).w(FUNC(thomson_state::to770_vram_w));
 	map(0x6000, 0x9fff).bankrw(THOM_BASE_BANK); /* 16 KB */
@@ -673,7 +665,7 @@ void thomson_state::to770_map(address_map &map)
 	map(0xe7c0, 0xe7c7).rw(m_mc6846, FUNC(mc6846_device::read), FUNC(mc6846_device::write));
 	map(0xe7c8, 0xe7cb).rw("pia_0", FUNC(pia6821_device::read_alt), FUNC(pia6821_device::write_alt));
 	map(0xe7cc, 0xe7cf).rw("pia_1", FUNC(pia6821_device::read_alt), FUNC(pia6821_device::write_alt));
-	map(0xe7e4, 0xe7e7).rw(FUNC(thomson_state::to770_gatearray_r), FUNC(thomson_state::to770_gatearray_w));
+	map(0xe7e4, 0xe7e7).rw(m_video, FUNC(to770_video_device::gatearray_r), FUNC(to770_video_device::gatearray_w));
 	map(0xe800, 0xefff).rom().region("mc6846", 0);
 	map(0xf000, 0xffff).rom().region("monitor", 0);
 
@@ -790,6 +782,14 @@ void thomson_state::to770(machine_config &config)
 	/* internal ram */
 	m_ram->set_default_size("128K").set_extra_options("64K");
 
+	TO770_VIDEO(config, m_video, 16_MHz_XTAL);
+	m_video->set_screen("screen");
+	m_video->set_lightpen_decal(TO7_LIGHTPEN_DECAL);
+	m_video->set_lightpen_steps(3);
+	m_video->set_vram_page_cb(FUNC(thomson_state::get_vram_page));
+	m_video->set_lightpen_step_cb(FUNC(thomson_state::to7_lightpen_cb));
+	m_video->init_cb().set(m_pia_sys, FUNC(pia6821_device::ca1_w));
+
 	SOFTWARE_LIST(config, "t770_cart_list").set_original("to770_cart");
 	SOFTWARE_LIST(config.replace(), "to7_cart_list").set_compatible("to7_cart");
 }
@@ -873,7 +873,7 @@ void mo5_state::mo5_map(address_map &map)
 	map(0xa7c0, 0xa7c3).rw("pia_0", FUNC(pia6821_device::read_alt), FUNC(pia6821_device::write_alt));
 	map(0xa7cb, 0xa7cb).w(FUNC(mo5_state::mo5_ext_w));
 	map(0xa7cc, 0xa7cf).rw("pia_1", FUNC(pia6821_device::read_alt), FUNC(pia6821_device::write_alt));
-	map(0xa7e4, 0xa7e7).rw(FUNC(mo5_state::mo5_gatearray_r), FUNC(mo5_state::mo5_gatearray_w));
+	map(0xa7e4, 0xa7e7).rw(m_video, FUNC(to770_video_device::gatearray_r), FUNC(to770_video_device::gatearray_w));
 	map(0xb000, 0xefff).bankr(THOM_CART_BANK).w(FUNC(mo5_state::mo5_cartridge_w));
 	map(0xf000, 0xffff).rom().region("basic", 0x4000);
 
@@ -990,6 +990,15 @@ void mo5_state::mo5(machine_config &config)
 
 	/* internal ram */
 	m_ram->set_default_size("112K");
+
+	TO770_VIDEO(config, m_video, 16_MHz_XTAL);
+	m_video->set_screen("screen");
+	m_video->set_is_mo(true);
+	m_video->set_lightpen_decal(MO5_LIGHTPEN_DECAL);
+	m_video->set_lightpen_steps(3);
+	m_video->set_vram_page_cb(FUNC(mo5_state::get_vram_page));
+	m_video->set_lightpen_step_cb(FUNC(mo5_state::mo5_lightpen_cb));
+	m_video->int_50hz_cb().set(m_pia_sys, FUNC(pia6821_device::cb1_w));
 }
 
 void mo5_state::mo5e(machine_config &config)
@@ -1088,9 +1097,11 @@ void to9_state::to9_map(address_map &map)
 	map(0xe7cc, 0xe7cf).rw("pia_1", FUNC(pia6821_device::read_alt), FUNC(pia6821_device::write_alt));
 	map(0xe7d0, 0xe7d3).mirror(4).rw(m_fdc, FUNC(wd_fdc_device_base::read), FUNC(wd_fdc_device_base::write));
 	map(0xe7d8, 0xe7d8).rw(FUNC(to9_state::to9_floppy_control_r), FUNC(to9_state::to9_floppy_control_w));
-	map(0xe7da, 0xe7dd).rw(FUNC(to9_state::to9_vreg_r), FUNC(to9_state::to9_vreg_w));
+	map(0xe7da, 0xe7db).rw(FUNC(to9_state::to9_vreg_r), FUNC(to9_state::to9_vreg_w));
+	map(0xe7dc, 0xe7dc).w(m_video, FUNC(to9_video_device::video_mode_w));
+	map(0xe7dd, 0xe7dd).w(m_video, FUNC(to9_video_device::border_color_w));
 	map(0xe7de, 0xe7df).rw(m_to9_kbd, FUNC(to9_keyboard_device::kbd_acia_r), FUNC(to9_keyboard_device::kbd_acia_w));
-	map(0xe7e4, 0xe7e7).rw(FUNC(to9_state::to9_gatearray_r), FUNC(to9_state::to9_gatearray_w));
+	map(0xe7e4, 0xe7e7).rw(m_video, FUNC(to9_video_device::gatearray_r), FUNC(to9_video_device::gatearray_w));
 /*  map(0xe7f0, 0xe7f7).rw(FUNC(to9_state::to9_ieee_r), FUNC(to9_state::to9_ieee_w )); */
 	map(0xe800, 0xffff).rom().region("monitor", 0x800);
 
@@ -1138,7 +1149,6 @@ ROM_END
 static INPUT_PORTS_START ( to9 )
 	PORT_INCLUDE ( thom_lightpen )
 	PORT_INCLUDE ( thom_game_port )
-	PORT_INCLUDE ( to7_vconfig )
 
 	PORT_START ( "config" )
 	PORT_BIT ( 0x01, 0x00, IPT_UNUSED )
@@ -1191,6 +1201,13 @@ void to9_state::to9(machine_config &config)
 
 	/* internal ram */
 	m_ram->set_default_size("192K").set_extra_options("128K");
+
+	TO9_VIDEO(config, m_video, 16_MHz_XTAL);
+	m_video->set_screen("screen");
+	m_video->set_lightpen_decal(TO9_LIGHTPEN_DECAL);
+	m_video->set_lightpen_steps(3);
+	m_video->set_vram_page_cb(FUNC(to9_state::get_vram_page));
+	m_video->set_lightpen_step_cb(FUNC(to9_state::to7_lightpen_cb));
 }
 
 
@@ -1260,24 +1277,23 @@ The TO8D is simply a TO8 with an integrated 3"1/2 floppy drive.
 **********************************************************************/
 
 
-void to9_state::to8_map(address_map &map)
+void to8_state::to8_map(address_map &map)
 {
-
-	map(0x0000, 0x3fff).bankr(THOM_CART_BANK).w(FUNC(to9_state::to8_cartridge_w)); /* 4 * 16 KB */
-	map(0x4000, 0x5fff).bankr(THOM_VRAM_BANK).w(FUNC(to9_state::to770_vram_w));
-	map(0x6000, 0x7fff).bankr(TO8_SYS_LO).w(FUNC(to9_state::to8_sys_lo_w));
-	map(0x8000, 0x9fff).bankr(TO8_SYS_HI).w(FUNC(to9_state::to8_sys_hi_w));
-	map(0xa000, 0xbfff).bankr(TO8_DATA_LO).w(FUNC(to9_state::to8_data_lo_w));
-	map(0xc000, 0xdfff).bankr(TO8_DATA_HI).w(FUNC(to9_state::to8_data_hi_w));
+	map(0x0000, 0x3fff).bankr(THOM_CART_BANK).w(FUNC(to8_state::to8_cartridge_w)); /* 4 * 16 KB */
+	map(0x4000, 0x5fff).bankr(THOM_VRAM_BANK).w(FUNC(to8_state::to770_vram_w));
+	map(0x6000, 0x7fff).bankr(TO8_SYS_LO).w(FUNC(to8_state::to8_sys_lo_w));
+	map(0x8000, 0x9fff).bankr(TO8_SYS_HI).w(FUNC(to8_state::to8_sys_hi_w));
+	map(0xa000, 0xbfff).bankr(TO8_DATA_LO).w(FUNC(to8_state::to8_data_lo_w));
+	map(0xc000, 0xdfff).bankr(TO8_DATA_HI).w(FUNC(to8_state::to8_data_hi_w));
 	map(0xe000, 0xffff).bankr(TO8_BIOS_BANK);
 	map(0xe7c0, 0xe7ff).unmaprw();
 	map(0xe7c0, 0xe7c7).rw(m_mc6846, FUNC(mc6846_device::read), FUNC(mc6846_device::write));
 	map(0xe7c8, 0xe7cb).rw("pia_0", FUNC(pia6821_device::read_alt), FUNC(pia6821_device::write_alt));
 	map(0xe7cc, 0xe7cf).rw("pia_1", FUNC(pia6821_device::read_alt), FUNC(pia6821_device::write_alt));
 	map(0xe7d0, 0xe7d7).m("thmfc1", FUNC(thmfc1_device::map));
-	map(0xe7da, 0xe7dd).rw(FUNC(to9_state::to8_vreg_r), FUNC(to9_state::to8_vreg_w));
-	map(0xe7e4, 0xe7e7).rw(FUNC(to9_state::to8_gatearray_r), FUNC(to9_state::to8_gatearray_w));
-/*  map(0xe7f0, 0xe7f7).rw(FUNC(to9_state::to9_ieee_r), FUNC(to9_state::to9_ieee_w )); */
+	map(0xe7da, 0xe7dd).rw(FUNC(to8_state::to8_vreg_r), FUNC(to8_state::to8_vreg_w));
+	map(0xe7e4, 0xe7e7).rw(m_video, FUNC(to8_video_device::gatearray_r), FUNC(to8_video_device::gatearray_w));
+/*  map(0xe7f0, 0xe7f7).rw(FUNC(to8_state::to9_ieee_r), FUNC(to8_state::to9_ieee_w )); */
 
 /* 0x10000 - 0x1ffff: 64 KB external ROM cartridge */
 /* 0x20000 - 0x2ffff: 64 KB internal software ROM */
@@ -1325,7 +1341,6 @@ static INPUT_PORTS_START ( to8 )
 	PORT_INCLUDE ( thom_lightpen )
 	PORT_INCLUDE ( thom_game_port )
 	PORT_INCLUDE ( to7_config )
-	PORT_INCLUDE ( to7_vconfig )
 INPUT_PORTS_END
 
 
@@ -1335,21 +1350,21 @@ INPUT_PORTS_END
 
 /* ------------ driver ------------ */
 
-void to9_state::to8(machine_config &config)
+void to8_state::to8(machine_config &config)
 {
 	to7_base(config, false);
-	MCFG_MACHINE_START_OVERRIDE( to9_state, to8 )
-	MCFG_MACHINE_RESET_OVERRIDE( to9_state, to8 )
+	MCFG_MACHINE_START_OVERRIDE( to8_state, to8 )
+	MCFG_MACHINE_RESET_OVERRIDE( to8_state, to8 )
 
-	m_maincpu->set_addrmap(AS_PROGRAM, &to9_state::to8_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &to8_state::to8_map);
 
 	TO8_KEYBOARD(config, m_to8_kbd);
 	m_to8_kbd->data_cb().set(m_mc6846, FUNC(mc6846_device::set_input_cp1));
 
-	m_pia_sys->readpa_handler().set(FUNC(to9_state::to8_sys_porta_in));
+	m_pia_sys->readpa_handler().set(FUNC(to8_state::to8_sys_porta_in));
 	m_pia_sys->readpb_handler().set_constant(0);
-	m_pia_sys->writepa_handler().set(FUNC(to9_state::to9_sys_porta_out));
-	m_pia_sys->writepb_handler().set(FUNC(to9_state::to8_sys_portb_out));
+	m_pia_sys->writepa_handler().set(FUNC(to8_state::to8_sys_porta_out));
+	m_pia_sys->writepb_handler().set(FUNC(to8_state::to8_sys_portb_out));
 	m_pia_sys->cb2_handler().set_nop();
 	m_pia_sys->irqa_handler().set_nop();
 
@@ -1364,14 +1379,23 @@ void to9_state::to8(machine_config &config)
 	m_extension->option_remove("nanoreseau");
 
 	CENTRONICS(config, m_centronics, centronics_devices, "printer");
-	m_centronics->busy_handler().set(FUNC(to9_state::write_centronics_busy));
+	m_centronics->busy_handler().set(FUNC(to8_state::write_centronics_busy));
 
-	m_mc6846->out_port().set(FUNC(to9_state::to8_timer_port_out));
-	m_mc6846->in_port().set(FUNC(to9_state::to8_timer_port_in));
-	m_mc6846->cp2().set(FUNC(to9_state::to8_timer_cp2_out));
+	m_mc6846->out_port().set(FUNC(to8_state::to8_timer_port_out));
+	m_mc6846->in_port().set(FUNC(to8_state::to8_timer_port_in));
+	m_mc6846->cp2().set(FUNC(to8_state::to8_timer_cp2_out));
 
 	/* internal ram */
 	m_ram->set_default_size("512K").set_extra_options("256K");
+
+	TO8_VIDEO(config, m_video, 16_MHz_XTAL);
+	m_video->set_screen("screen");
+	m_video->set_lightpen_decal(TO8_LIGHTPEN_DECAL);
+	m_video->set_lightpen_steps(4);
+	m_video->set_vram_page_cb(FUNC(to8_state::get_vram_page));
+	downcast<to8_video_device &>(*m_video).set_update_ram_bank_cb(FUNC(to8_state::to8_update_ram_bank));
+	downcast<to8_video_device &>(*m_video).set_update_cart_bank_cb(FUNC(to8_state::to8_update_cart_bank));
+	downcast<to8_video_device &>(*m_video).lightpen_intr_cb().set(m_mainfirq, FUNC(input_merger_device::in_w<2>));
 
 	SOFTWARE_LIST(config, "to8_cass_list").set_original("to8_cass");
 	SOFTWARE_LIST(config, "to8_qd_list").set_original("to8_qd");
@@ -1379,16 +1403,16 @@ void to9_state::to8(machine_config &config)
 	SOFTWARE_LIST(config.replace(), "to7_qd_list").set_compatible("to7_qd");
 }
 
-void to9_state::to8d(machine_config &config)
+void to8_state::to8d(machine_config &config)
 {
 	to8(config);
 	subdevice<floppy_connector>("thmfc1:0")->set_fixed(true);
 }
 
 
-COMP( 1986, to8, 0, 0, to8, to8, to9_state, empty_init, "Thomson", "TO8", 0 )
+COMP( 1986, to8, 0, 0, to8, to8, to8_state, empty_init, "Thomson", "TO8", 0 )
 
-COMP( 1987, to8d, to8, 0, to8d, to8d, to9_state, empty_init, "Thomson", "TO8D", 0 )
+COMP( 1987, to8d, to8, 0, to8d, to8d, to8_state, empty_init, "Thomson", "TO8D", 0 )
 
 
 /******************************** TO9+ *******************************
@@ -1428,25 +1452,25 @@ The differences with the TO8 are:
 
 **********************************************************************/
 
-void to9_state::to9p_map(address_map &map)
+void to8_state::to9p_map(address_map &map)
 {
 
-	map(0x0000, 0x3fff).bankr(THOM_CART_BANK).w(FUNC(to9_state::to8_cartridge_w)); /* 4 * 16 KB */
-	map(0x4000, 0x5fff).bankr(THOM_VRAM_BANK).w(FUNC(to9_state::to770_vram_w));
-	map(0x6000, 0x7fff).bankr(TO8_SYS_LO).w(FUNC(to9_state::to8_sys_lo_w));
-	map(0x8000, 0x9fff).bankr(TO8_SYS_HI).w(FUNC(to9_state::to8_sys_hi_w));
-	map(0xa000, 0xbfff).bankr(TO8_DATA_LO).w(FUNC(to9_state::to8_data_lo_w));
-	map(0xc000, 0xdfff).bankr(TO8_DATA_HI).w(FUNC(to9_state::to8_data_hi_w));
+	map(0x0000, 0x3fff).bankr(THOM_CART_BANK).w(FUNC(to8_state::to8_cartridge_w)); /* 4 * 16 KB */
+	map(0x4000, 0x5fff).bankr(THOM_VRAM_BANK).w(FUNC(to8_state::to770_vram_w));
+	map(0x6000, 0x7fff).bankr(TO8_SYS_LO).w(FUNC(to8_state::to8_sys_lo_w));
+	map(0x8000, 0x9fff).bankr(TO8_SYS_HI).w(FUNC(to8_state::to8_sys_hi_w));
+	map(0xa000, 0xbfff).bankr(TO8_DATA_LO).w(FUNC(to8_state::to8_data_lo_w));
+	map(0xc000, 0xdfff).bankr(TO8_DATA_HI).w(FUNC(to8_state::to8_data_hi_w));
 	map(0xe000, 0xffff).bankr(TO8_BIOS_BANK);
 	map(0xe7c0, 0xe7ff).unmaprw();
 	map(0xe7c0, 0xe7c7).rw(m_mc6846, FUNC(mc6846_device::read), FUNC(mc6846_device::write));
 	map(0xe7c8, 0xe7cb).rw("pia_0", FUNC(pia6821_device::read_alt), FUNC(pia6821_device::write_alt));
 	map(0xe7cc, 0xe7cf).rw("pia_1", FUNC(pia6821_device::read_alt), FUNC(pia6821_device::write_alt));
 	map(0xe7d0, 0xe7d7).m("thmfc1", FUNC(thmfc1_device::map));
-	map(0xe7da, 0xe7dd).rw(FUNC(to9_state::to8_vreg_r), FUNC(to9_state::to8_vreg_w));
+	map(0xe7da, 0xe7dd).rw(FUNC(to8_state::to8_vreg_r), FUNC(to8_state::to8_vreg_w));
 	map(0xe7de, 0xe7df).rw(m_to9_kbd, FUNC(to9_keyboard_device::kbd_acia_r), FUNC(to9_keyboard_device::kbd_acia_w));
-	map(0xe7e4, 0xe7e7).rw(FUNC(to9_state::to8_gatearray_r), FUNC(to9_state::to8_gatearray_w));
-/*  map(0xe7f0, 0xe7f7).rw(FUNC(to9_state::to9_ieee_r), FUNC(to9_state::to9_ieee_w )); */
+	map(0xe7e4, 0xe7e7).rw(m_video, FUNC(to8_video_device::gatearray_r), FUNC(to8_video_device::gatearray_w));
+/*  map(0xe7f0, 0xe7f7).rw(FUNC(to8_state::to9_ieee_r), FUNC(to8_state::to9_ieee_w )); */
 
 /* 0x10000 - 0x1ffff: 64 KB external ROM cartridge */
 /* 0x20000 - 0x2ffff: 64 KB internal software ROM */
@@ -1481,26 +1505,25 @@ static INPUT_PORTS_START ( to9p )
 	PORT_INCLUDE ( thom_lightpen )
 	PORT_INCLUDE ( thom_game_port )
 	PORT_INCLUDE ( to7_config )
-	PORT_INCLUDE ( to7_vconfig )
 INPUT_PORTS_END
 
 /* ------------ driver ------------ */
 
-void to9_state::to9p(machine_config &config)
+void to8_state::to9p(machine_config &config)
 {
 	to7_base(config, false);
-	MCFG_MACHINE_START_OVERRIDE( to9_state, to9p )
-	MCFG_MACHINE_RESET_OVERRIDE( to9_state, to9p )
+	MCFG_MACHINE_START_OVERRIDE( to8_state, to9p )
+	MCFG_MACHINE_RESET_OVERRIDE( to8_state, to8 )
 
-	m_maincpu->set_addrmap(AS_PROGRAM, &to9_state::to9p_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &to8_state::to9p_map);
 
 	TO9P_KEYBOARD(config, m_to9_kbd);
 	m_to9_kbd->irq_cb().set(m_mainirq, FUNC(input_merger_device::in_w<4>));
 
-	m_pia_sys->readpa_handler().set(FUNC(to9_state::to9_sys_porta_in));
+	m_pia_sys->readpa_handler().set(FUNC(to8_state::to9p_sys_porta_in));
 	m_pia_sys->readpb_handler().set_constant(0);
-	m_pia_sys->writepa_handler().set(FUNC(to9_state::to9_sys_porta_out));
-	m_pia_sys->writepb_handler().set(FUNC(to9_state::to8_sys_portb_out));
+	m_pia_sys->writepa_handler().set(FUNC(to8_state::to8_sys_porta_out));
+	m_pia_sys->writepb_handler().set(FUNC(to8_state::to8_sys_portb_out));
 	m_pia_sys->cb2_handler().set_nop();
 	m_pia_sys->irqa_handler().set_nop();
 	m_pia_sys->irqb_handler().set("mainfirq", FUNC(input_merger_device::in_w<1>));
@@ -1516,14 +1539,23 @@ void to9_state::to9p(machine_config &config)
 	m_extension->option_remove("nanoreseau");
 
 	CENTRONICS(config, m_centronics, centronics_devices, "printer");
-	m_centronics->busy_handler().set(FUNC(to9_state::write_centronics_busy));
+	m_centronics->busy_handler().set(FUNC(to8_state::write_centronics_busy));
 
-	m_mc6846->out_port().set(FUNC(to9_state::to9p_timer_port_out));
-	m_mc6846->in_port().set(FUNC(to9_state::to9p_timer_port_in));
-	m_mc6846->cp2().set(FUNC(to9_state::to8_timer_cp2_out));
+	m_mc6846->out_port().set(FUNC(to8_state::to9p_timer_port_out));
+	m_mc6846->in_port().set(FUNC(to8_state::to9p_timer_port_in));
+	m_mc6846->cp2().set(FUNC(to8_state::to8_timer_cp2_out));
 
 	/* internal ram */
 	m_ram->set_default_size("512K");
+
+	TO8_VIDEO(config, m_video, 16_MHz_XTAL);
+	m_video->set_screen("screen");
+	m_video->set_lightpen_decal(TO8_LIGHTPEN_DECAL);
+	m_video->set_lightpen_steps(4);
+	m_video->set_vram_page_cb(FUNC(to8_state::get_vram_page));
+	downcast<to8_video_device &>(*m_video).set_update_ram_bank_cb(FUNC(to8_state::to8_update_ram_bank));
+	downcast<to8_video_device &>(*m_video).set_update_cart_bank_cb(FUNC(to8_state::to8_update_cart_bank));
+	downcast<to8_video_device &>(*m_video).lightpen_intr_cb().set(m_mainfirq, FUNC(input_merger_device::in_w<2>));
 
 	SOFTWARE_LIST(config, "to8_cass_list").set_original("to8_cass");
 	SOFTWARE_LIST(config, "to8_qd_list").set_original("to8_qd");
@@ -1531,7 +1563,7 @@ void to9_state::to9p(machine_config &config)
 	SOFTWARE_LIST(config.replace(), "to7_qd_list").set_compatible("to7_qd");
 }
 
-COMP( 1986, to9p, 0, 0, to9p, to9p, to9_state, empty_init, "Thomson", "TO9+", 0 )
+COMP( 1986, to9p, 0, 0, to9p, to9p, to8_state, empty_init, "Thomson", "TO9+", 0 )
 
 
 
@@ -1595,7 +1627,6 @@ a PC XT.
 
 void mo6_state::mo6_map(address_map &map)
 {
-
 	map(0x0000, 0x1fff).bankr(THOM_VRAM_BANK).w(FUNC(mo6_state::to770_vram_w));
 	map(0x2000, 0x3fff).bankr(TO8_SYS_LO).w(FUNC(mo6_state::to8_sys_lo_w));
 	map(0x4000, 0x5fff).bankr(TO8_SYS_HI).w(FUNC(mo6_state::to8_sys_hi_w));
@@ -1605,7 +1636,7 @@ void mo6_state::mo6_map(address_map &map)
 	map(0xa7cb, 0xa7cb).w(FUNC(mo6_state::mo6_ext_w));
 	map(0xa7cc, 0xa7cf).rw("pia_1", FUNC(pia6821_device::read_alt), FUNC(pia6821_device::write_alt));
 	map(0xa7da, 0xa7dd).rw(FUNC(mo6_state::mo6_vreg_r), FUNC(mo6_state::mo6_vreg_w));
-	map(0xa7e4, 0xa7e7).rw(FUNC(mo6_state::mo6_gatearray_r), FUNC(mo6_state::mo6_gatearray_w));
+	map(0xa7e4, 0xa7e7).rw(m_video, FUNC(to8_video_device::gatearray_r), FUNC(to8_video_device::gatearray_w));
 /*  map(0xa7f0, 0xa7f7).rw(FUNC(mo6_state::to9_ieee_r), FUNC(homson_state::to9_ieee_w));*/
 	map(0xb000, 0xbfff).bankr(MO6_CART_LO).w(FUNC(mo6_state::mo6_cartridge_w));
 	map(0xc000, 0xefff).bankr(MO6_CART_HI).w(FUNC(mo6_state::mo6_cartridge_w));
@@ -1780,7 +1811,6 @@ static INPUT_PORTS_START ( mo6 )
 	PORT_INCLUDE ( thom_game_port )
 	PORT_INCLUDE ( mo6_keyboard )
 	PORT_INCLUDE ( to7_config )
-	PORT_INCLUDE ( to7_vconfig )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START ( pro128 )
@@ -1788,7 +1818,6 @@ static INPUT_PORTS_START ( pro128 )
 	PORT_INCLUDE ( thom_game_port )
 	PORT_INCLUDE ( pro128_keyboard )
 	PORT_INCLUDE ( to7_config )
-	PORT_INCLUDE ( to7_vconfig )
 INPUT_PORTS_END
 
 
@@ -1826,6 +1855,17 @@ void mo6_state::mo6(machine_config &config)
 
 	/* internal ram */
 	m_ram->set_default_size("128K");
+
+	TO8_VIDEO(config, m_video, 16_MHz_XTAL);
+	m_video->set_is_mo(true);
+	m_video->set_screen("screen");
+	m_video->set_lightpen_decal(MO6_LIGHTPEN_DECAL);
+	m_video->set_lightpen_steps(3);
+	m_video->set_vram_page_cb(FUNC(mo6_state::get_vram_page));
+	downcast<to8_video_device &>(*m_video).set_update_ram_bank_cb(FUNC(mo6_state::mo6_update_ram_bank));
+	downcast<to8_video_device &>(*m_video).set_update_cart_bank_cb(FUNC(mo6_state::mo6_update_cart_bank));
+	downcast<to8_video_device &>(*m_video).lightpen_intr_cb().set(m_mainfirq, FUNC(input_merger_device::in_w<2>));
+	m_video->int_50hz_cb().set(m_pia_sys, FUNC(pia6821_device::cb1_w));
 
 	config.device_remove("to7_cart_list");
 	config.device_remove("to7_cass_list");
@@ -1894,7 +1934,6 @@ Here are the differences between the MO6 and MO5NR:
 
 void mo5nr_state::mo5nr_map(address_map &map)
 {
-
 	map(0x0000, 0x1fff).bankr(THOM_VRAM_BANK).w(FUNC(mo5nr_state::to770_vram_w));
 	map(0x2000, 0x3fff).bankr(TO8_SYS_LO).w(FUNC(mo5nr_state::to8_sys_lo_w));
 	map(0x4000, 0x5fff).bankr(TO8_SYS_HI).w(FUNC(mo5nr_state::to8_sys_hi_w));
@@ -1906,7 +1945,7 @@ void mo5nr_state::mo5nr_map(address_map &map)
 	map(0xa7cc, 0xa7cf).rw("pia_1", FUNC(pia6821_device::read_alt), FUNC(pia6821_device::write_alt));
 	m_extension_view[1](0xa7d8, 0xa7d9).r(FUNC(mo5nr_state::id_r));
 	map(0xa7da, 0xa7dd).rw(FUNC(mo5nr_state::mo6_vreg_r), FUNC(mo5nr_state::mo6_vreg_w));
-	map(0xa7e4, 0xa7e7).rw(FUNC(mo5nr_state::mo6_gatearray_r), FUNC(mo5nr_state::mo6_gatearray_w));
+	map(0xa7e4, 0xa7e7).rw(m_video, FUNC(to8_video_device::gatearray_r), FUNC(to8_video_device::gatearray_w));
 /*  map(0xa7f0, 0xa7f7).rw(FUNC(mo5nr_state::to9_ieee_r), FUNC(homson_state::to9_ieee_w));*/
 	map(0xb000, 0xbfff).bankr(MO6_CART_LO).w(FUNC(mo5nr_state::mo6_cartridge_w));
 	map(0xc000, 0xefff).bankr(MO6_CART_HI).w(FUNC(mo5nr_state::mo6_cartridge_w));
@@ -2026,7 +2065,6 @@ static INPUT_PORTS_START ( mo5nr )
 	PORT_INCLUDE ( thom_game_port )
 	PORT_INCLUDE ( mo5nr_keyboard )
 	PORT_INCLUDE ( to7_config )
-	PORT_INCLUDE ( to7_vconfig )
 
 	PORT_START ( "nanoreseau_config" )
 	PORT_DIPNAME(0x01, 0x01, "Extension selection") PORT_DIPLOCATION("SW03:1")
@@ -2098,6 +2136,17 @@ void mo5nr_state::mo5nr(machine_config &config)
 
 	/* internal ram */
 	m_ram->set_default_size("128K");
+
+	TO8_VIDEO(config, m_video, 16_MHz_XTAL);
+	m_video->set_is_mo(true);
+	m_video->set_screen("screen");
+	m_video->set_lightpen_decal(MO6_LIGHTPEN_DECAL);
+	m_video->set_lightpen_steps(3);
+	m_video->set_vram_page_cb(FUNC(mo5nr_state::get_vram_page));
+	downcast<to8_video_device &>(*m_video).set_update_ram_bank_cb(FUNC(mo5nr_state::mo6_update_ram_bank));
+	downcast<to8_video_device &>(*m_video).set_update_cart_bank_cb(FUNC(mo5nr_state::mo6_update_cart_bank));
+	downcast<to8_video_device &>(*m_video).lightpen_intr_cb().set(m_mainfirq, FUNC(input_merger_device::in_w<2>));
+	m_video->int_50hz_cb().set(m_pia_sys, FUNC(pia6821_device::cb1_w));
 
 	config.device_remove("to7_cart_list");
 	config.device_remove("to7_cass_list");
