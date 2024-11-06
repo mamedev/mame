@@ -1029,6 +1029,10 @@ void pc9801vm_state::pc9801rs_video_ff_w(offs_t offset, uint8_t data)
  * ---- --x- Graph LIO BIOS select (?), on 9801VX21
  * ---- ---x Mate A: selects high-reso mode
  *           ^ unknown otherwise
+ *
+ * TODO: why BIOS has to read it twice during cold boot?
+ * Later 9821 machines will add a mov bh,al on second read, is there some kind of side
+ * effect for reading?
  */
 u8 pc9801vm_state::dma_access_ctrl_r(offs_t offset)
 {
@@ -2076,7 +2080,9 @@ MACHINE_RESET_MEMBER(pc9801vm_state,pc9801rs)
 	m_fdc_mode = 3;
 	fdc_set_density_mode(true); // 2HD
 	// 0xfb on PC98XL
-	m_dma_access_ctrl = 0xfe;
+	// TODO: breaks UART setup for pc9801rs
+	// m_dma_access_ctrl = 0xfe;
+	m_dma_access_ctrl = 0;
 	m_ide_sel = 0;
 	m_maincpu->set_input_line(INPUT_LINE_A20, m_gate_a20);
 
@@ -2152,6 +2158,8 @@ void pc9801_state::pc9801_keyboard(machine_config &config)
 
 	PC9801_KBD(config, m_keyb, 0);
 	m_keyb->rxd_callback().set("sio_kbd", FUNC(i8251_device::write_rxd));
+	m_keyb->rdy_callback().set("sio_kbd", FUNC(i8251_device::write_cts));
+	m_keyb->rty_callback().set("sio_kbd", FUNC(i8251_device::write_dsr));
 }
 
 void pc9801_state::pit_clock_config(machine_config &config, const XTAL clock)

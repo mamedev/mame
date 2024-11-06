@@ -30,6 +30,9 @@ public:
 	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 
 	auto rxd_callback()    { return m_tx_cb.bind(); }
+	auto rdy_callback()    { return m_rdy_cb.bind(); }
+	auto rty_callback()    { return m_rty_cb.bind(); }
+
 	void input_txd(int state)  { device_buffered_serial_interface::rx_w(state); }
 
 protected:
@@ -60,6 +63,8 @@ private:
 	void send_key(uint8_t code);
 
 	devcb_write_line m_tx_cb;
+	devcb_write_line m_rdy_cb;
+	devcb_write_line m_rty_cb;
 };
 
 

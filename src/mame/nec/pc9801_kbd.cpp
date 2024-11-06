@@ -46,6 +46,8 @@ pc9801_kbd_device::pc9801_kbd_device(const machine_config &mconfig, const char *
 	, device_buffered_serial_interface(mconfig, *this)
 	, device_matrix_keyboard_interface(mconfig, *this, "KEY0", "KEY1", "KEY2", "KEY3", "KEY4", "KEY5", "KEY6", "KEY7", "KEY8", "KEY9", "KEYA", "KEYB", "KEYC", "KEYD", "KEYE", "KEYF")
 	, m_tx_cb(*this)
+	, m_rdy_cb(*this)
+	, m_rty_cb(*this)
 {
 }
 
@@ -56,6 +58,49 @@ pc9801_kbd_device::pc9801_kbd_device(const machine_config &mconfig, const char *
 uint8_t pc9801_kbd_device::translate(uint8_t row, uint8_t column)
 {
 	return row * 8 + column;
+}
+
+//-------------------------------------------------
+//  device_validity_check - perform validity checks
+//  on this device
+//-------------------------------------------------
+
+void pc9801_kbd_device::device_validity_check(validity_checker &valid) const
+{
+}
+
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void pc9801_kbd_device::device_start()
+{
+	// ...
+}
+
+
+//-------------------------------------------------
+//  device_reset - device-specific reset
+//-------------------------------------------------
+
+void pc9801_kbd_device::device_reset()
+{
+	clear_fifo();
+	set_data_frame(START_BIT_COUNT, DATA_BIT_COUNT, PARITY, STOP_BITS);
+	set_rcv_rate(BAUD);
+	set_tra_rate(BAUD);
+	receive_register_reset();
+	transmit_register_reset();
+
+	reset_key_state();
+	start_processing(attotime::from_hz(BAUD));
+	typematic_stop();
+	// NOTE: both signals active low
+	// ready signal
+	m_rdy_cb(0);
+	// resend signal
+	m_rty_cb(0);
 }
 
 static INPUT_PORTS_START( pc9801_kbd )
@@ -227,43 +272,6 @@ ioport_constructor pc9801_kbd_device::device_input_ports() const
 	return INPUT_PORTS_NAME( pc9801_kbd );
 }
 
-//-------------------------------------------------
-//  device_validity_check - perform validity checks
-//  on this device
-//-------------------------------------------------
-
-void pc9801_kbd_device::device_validity_check(validity_checker &valid) const
-{
-}
-
-
-//-------------------------------------------------
-//  device_start - device-specific startup
-//-------------------------------------------------
-
-void pc9801_kbd_device::device_start()
-{
-	// ...
-}
-
-
-//-------------------------------------------------
-//  device_reset - device-specific reset
-//-------------------------------------------------
-
-void pc9801_kbd_device::device_reset()
-{
-	clear_fifo();
-	set_data_frame(START_BIT_COUNT, DATA_BIT_COUNT, PARITY, STOP_BITS);
-	set_rcv_rate(BAUD);
-	set_tra_rate(BAUD);
-	receive_register_reset();
-	transmit_register_reset();
-
-	reset_key_state();
-	start_processing(attotime::from_hz(BAUD));
-	typematic_stop();
-}
 
 //**************************************************************************
 //  Serial implementation
@@ -276,7 +284,7 @@ void pc9801_kbd_device::key_make(uint8_t row, uint8_t column)
 	send_key(code);
 
 	// no typematic for caps and kana locks
-    // page 345 of the Technical DataBook for timings
+	// page 345 of the Technical DataBook for timings
 	if (code != 0x71 && code != 0x72)
 		typematic_start(row, column, attotime::from_msec(500), attotime::from_msec(60));
 }
@@ -320,6 +328,10 @@ void pc9801_kbd_device::transmit_byte(u8 byte)
 		stop_processing();
 }
 
+/*
+ * 0xff: reset
+ * everything else: implementation specific, TBD
+ */
 void pc9801_kbd_device::received_byte(u8 byte)
 {
 	logerror("received_byte 0x%02x\n", byte);
