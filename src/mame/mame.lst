@@ -44611,6 +44611,9 @@ wwfwfestu                       // TA-0031 (c) 1991 (US)
 wwfwfestu1                      // TA-0031 (c) 1991 (US)
 wwfwfestub                      // bootleg
 
+@source:technos/ddragon_ms.cpp
+ddragonm                        // bootleg (Modular System)
+
 @source:technos/dogfgt.cpp
 dogfgt                          // TA-0011 (c) 1984
 dogfgtj                         // TA-0011 (c) 1984
