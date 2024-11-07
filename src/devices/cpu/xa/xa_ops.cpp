@@ -1608,13 +1608,14 @@ void xa_cpu::mulu_word_rd_rs(u8 rd, u8 rs)
 	if (result == 0x0000)
 		set_z_flag();
 	else
-		clear_n_flag();
+		clear_z_flag();
 
 	if (result & 0x8000)
 		set_n_flag();
 	else
 		clear_n_flag();
 
+	// TODO: verify these are writing to the correct registers
 	sr16(rd, result & 0xffff);
 	sr16(rd + 1, result >> 16);
 
@@ -1669,13 +1670,14 @@ void xa_cpu::divu_dword_rd_rs(u8 rd, u8 rs)
 		if (result == 0x0000)
 			set_z_flag();
 		else
-			clear_n_flag();
+			clear_z_flag();
 
 		if (result & 0x8000)
 			set_n_flag();
 		else
 			clear_n_flag();
 
+		// TODO: verify these are writing to the correct registers
 		sr16(rd, result);
 		sr16(rd + 1, remainder);
 	}
