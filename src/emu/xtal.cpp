@@ -455,6 +455,7 @@ const double XTAL::known_xtals[] = {
 	 42'105'200, // 42.1052_MHz_XTAL       NEC PC-88xx
 	 42'954'545, // 42.954545_MHz_XTAL     CPS3 (12x NTSC subcarrier)
 	 43'320'000, // 43.32_MHz_XTAL         DEC VT420
+	 44'000'000, // 44_MHz_XTAL            VGame slots
 	 44'100'000, // 44.1_MHz_XTAL          Subsino's Bishou Jan
 	 44'236'800, // 44.2368_MHz_XTAL       ReCo6502, Fortune 32:16
 	 44'452'800, // 44.4528_MHz_XTAL       TeleVideo 965

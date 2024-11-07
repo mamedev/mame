@@ -14,7 +14,6 @@ Undumped games on similar hardware (ES-9402 or ES-9410):
 * Miracle Seven - Heaven's Gate Turbo
 * Multi Spin
 * Royal Choice Poker
-* Ukiyo Box
 
 TODO:
 - lastbank: sprites should be clip masked during gameplay (verify);
@@ -571,6 +570,15 @@ static INPUT_PORTS_START( fever13 )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( ukiyobx )
+	PORT_INCLUDE( fever13 )
+
+	PORT_MODIFY("DSW4")
+	PORT_DIPNAME( 0x40, 0x40, "Hopper Access" ) PORT_DIPLOCATION("DSW4:7")
+	PORT_DIPSETTING(    0x00, "Slow" )
+	PORT_DIPSETTING(    0x40, "Fast" )
+INPUT_PORTS_END
+
 static INPUT_PORTS_START( mir7hg )
 	PORT_INCLUDE( fever13 )
 
@@ -682,7 +690,7 @@ ROM_START( lastbank )
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "8.u48", 0x00000, 0x10000, CRC(3a7bfe10) SHA1(7dc543e11d3c0b9872fcc622339ade25383a1eb3) )
 
-	ROM_REGION( 0x120000, "maincpu:gfx", 0 )
+	ROM_REGION( 0x200000, "maincpu:gfx", ROMREGION_ERASEFF )
 	ROM_LOAD( "u11",   0x000000, 0x100000, CRC(2588d82d) SHA1(426f6821862d54123e53410e2776586ddf6b21e7) )
 	ROM_LOAD( "5.u10", 0x100000, 0x020000, CRC(51f3c5a7) SHA1(73d4c8817fe96d75be32c43e816e93c52b5d2b27) )
 
@@ -702,7 +710,7 @@ ROM_START( fever13 )
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "4.u48", 0x00000, 0x10000, CRC(33cba6b2) SHA1(cf7d1c7c6215b2f83c9266f92f46d3cfc0242afc) )
 
-	ROM_REGION( 0x120000, "maincpu:gfx", 0 )
+	ROM_REGION( 0x200000, "maincpu:gfx", ROMREGION_ERASEFF )
 	// unlabeled mask ROM, socket marked as 23C8000 CG ROM
 	ROM_LOAD( "u11", 0x000000, 0x100000, CRC(da59b0d8) SHA1(86fd3cd77aae22e103d11e697b8b4f70ae8b8197) )
 
@@ -714,6 +722,24 @@ ROM_START( fever13 )
 ROM_END
 
 // ES-9410 PCB
+ROM_START( ukiyobx )
+	ROM_REGION( 0x40000, "maincpu", 0 )
+	ROM_LOAD( "5-9d33.u9", 0x00000, 0x40000,CRC(6a567f55) SHA1(087579e420d581439788561abddfe42fdeaaaa88) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_LOAD( "4.u48", 0x00000, 0x10000, CRC(33cba6b2) SHA1(cf7d1c7c6215b2f83c9266f92f46d3cfc0242afc) )
+
+	ROM_REGION( 0x200000, "maincpu:gfx", ROMREGION_ERASEFF )
+	ROM_LOAD( "u11", 0x00000, 0x100000, CRC(da59b0d8) SHA1(86fd3cd77aae22e103d11e697b8b4f70ae8b8197) )
+
+	ROM_REGION( 0x40000, "oki", 0 )
+	ROM_LOAD( "es-9410.u55", 0x00000, 0x40000, CRC(09b5e4d6) SHA1(cf0235e9cf0577bf932beda7e4fb1b84410a3e0c) ) // 1xxxxxxxxxxxxxxxxx = 0xFF
+
+	ROM_REGION( 0x80000, "essnd", 0 ) // Samples
+	ROM_LOAD( "es-9410.u60", 0x00000, 0x80000, CRC(f277afa9) SHA1(1b5a8abad37b6f19730f99bf97334b4eb2da4399) )
+ROM_END
+
+// ES-9410 PCB
 ROM_START( mir7hg ) // v1.0.2 Feb 19 1996 15:05:17
 	ROM_REGION( 0x40000, "maincpu", 0 )
 	ROM_LOAD( "1.u9", 0x00000, 0x40000, CRC(efbd17aa) SHA1(387314504a9ce23221d868c7b042250cc9643d9c) )
@@ -721,7 +747,7 @@ ROM_START( mir7hg ) // v1.0.2 Feb 19 1996 15:05:17
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "3.u48", 0x00000, 0x10000, CRC(895da366) SHA1(4e82e2ee9b6a91453b8dca9f313714ef846dec56) ) // 11111xxxxxxxxxxx = 0xFF
 
-	ROM_REGION( 0x80000, "maincpu:gfx", 0 )
+	ROM_REGION( 0x200000, "maincpu:gfx", ROMREGION_ERASEFF )
 	ROM_LOAD( "2.u11", 0x00000, 0x80000, CRC(ddb65010) SHA1(f5af9f63f353023d2ce8e8787a13ec090158ac25) )
 
 	ROM_REGION( 0x40000, "oki", 0 )
@@ -734,6 +760,7 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 1994, lastbank, 0, lastbank, lastbank, lastbank_state, empty_init, ROT0, "Excellent System", "Last Bank (v1.16)",                             MACHINE_SUPPORTS_SAVE )
-GAME( 1995, fever13,  0, lastbank, fever13,  fever13_state,  empty_init, ROT0, "Excellent System", "Fever 13 (Japan, v1.3)",                        MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
-GAME( 1996, mir7hg,   0, lastbank, mir7hg,   fever13_state,  empty_init, ROT0, "Excellent System", "Miracle Seven - Heaven's Gate (Japan, v1.0.2)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
+GAME( 1994, lastbank, 0,       lastbank, lastbank, lastbank_state, empty_init, ROT0, "Excellent System", "Last Bank (v1.16)",                             MACHINE_SUPPORTS_SAVE )
+GAME( 1995, fever13,  0,       lastbank, fever13,  fever13_state,  empty_init, ROT0, "Excellent System", "Fever 13 (Japan, v1.3)",                        MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
+GAME( 1995, ukiyobx,  fever13, lastbank, ukiyobx,  fever13_state,  empty_init, ROT0, "Excellent System", "Ukiyo Box (Japan, v1.3.7)",                     MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
+GAME( 1996, mir7hg,   0,       lastbank, mir7hg,   fever13_state,  empty_init, ROT0, "Excellent System", "Miracle Seven - Heaven's Gate (Japan, v1.0.2)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )

@@ -17915,6 +17915,7 @@ pwrflip                         // (c) 1994 Excellent System
 fever13                         // (c) 1995 Excellent System
 lastbank                        // (c) 1994 Excellent System
 mir7hg                          // (c) 1996 Excellent System
+ukiyobx                         // (c) 1995 Excellent System
 
 @source:excellent/witch.cpp
 keirinou                        // (c) 1987 Excellent System
@@ -42408,6 +42409,10 @@ lft1510                         //
 @source:skeleton/lg-dvd.cpp
 lggp40                          //
 
+@source:skeleton/lgtz80.cpp
+arthurkn                        //
+fruitcat                        //
+
 @source:skeleton/lilith.cpp
 lilith                          //
 
@@ -42765,6 +42770,9 @@ vector3                         //
 
 @source:skeleton/vectrix.cpp
 vectrix                         // (c) 19?? Olympia?
+
+@source:skeleton/vgame.cpp
+hilice                          //
 
 @source:skeleton/vp415.cpp
 vp415                           // (c) 1983 Philips
