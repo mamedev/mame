@@ -42264,6 +42264,9 @@ waveterm                        //
 @source:skeleton/evolution_handheld.cpp
 evolhh
 
+@source:skeleton/extrema_m27sv.cpp
+multgmxl
+
 @source:skeleton/fanucs15.cpp
 fanucs15                        // 1990
 
