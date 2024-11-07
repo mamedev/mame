@@ -1598,7 +1598,7 @@ void xa_cpu::mulu_word_rd_rs(u8 rd, u8 rs)
 	u16 fullval = gr16(rd);
 	u16 rsval = gr16(rs);
 
-	u32 result = fullval * rsval;
+	u32 result = (u32)fullval * rsval;
 
 	if (result & 0xffff0000)
 		set_v_flag();
