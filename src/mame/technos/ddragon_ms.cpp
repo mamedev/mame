@@ -141,7 +141,7 @@ ROM_START( ddragonm )
 	ROM_LOAD( "mod_3-4_dr302_27c512.ic13", 0x10000, 0x10000, CRC(67321538) SHA1(9dca2ea8bdcf6c0d3657d0d81c8aa02bb34ce4bd) )
 	ROM_LOAD( "mod_3-4_dr301_27c512.ic14", 0x20000, 0x10000, CRC(de8f6f06) SHA1(68de0f757b4a8652ed13ad9802b022a36339d6e1) ) // 1ST AND 2ND HALF IDENTICAL
 
-	ROM_REGION( 0x8000, "audiocpu", 0 ) // on MOD 1/3 board
+	ROM_REGION( 0x10000, "audiocpu", 0 ) // on MOD 1/3 board
 	ROM_LOAD( "mod_1-3_dra101_27c512.ic12", 0x00000, 0x10000, CRC(e75de5a1) SHA1(e59a67b05d8dc723edfd88c52fe75301d345c38c) )
 
 	ROM_REGION( 0x20000, "tiles1", 0 ) // on MOD 4/3 board
