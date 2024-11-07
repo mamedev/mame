@@ -1421,7 +1421,7 @@ ROM_START( jurassic99 )
 
 	// EMC EM78P447AP, secured
 	ROM_REGION( 0x1000, "pic", 0 )
-	ROM_LOAD( "pic16c57.bin", 0x0000, 0x1000, NO_DUMP )
+	ROM_LOAD( "em78p447ap.u28", 0x0000, 0x1000, NO_DUMP )
 
 	ROM_REGION( 0x80000, "oki", 0 )
 	ROM_LOAD( "21003_u27.bin", 0x000000, 0x80000, CRC(7d921309) SHA1(d51e60e904d302c2516b734189e141aa171b2b82) )  // == dinopic, dinopic2, dinopic3
