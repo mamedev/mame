@@ -1009,13 +1009,13 @@ ROM_START( ninjemat )
 
 	ROM_REGION( 0x8000, "gfx4", 0 ) // background tilemaps
 	ROM_LOAD( "5.c1",         0x00000, 0x4000, CRC(e8469d44) SHA1(a015e4f67597fca438ed4c714b9854615e5d59b7) )
-	ROM_LOAD( "6.c3",         0x04000, 0x4000, BAD_DUMP CRC(163a024e) SHA1(bb4c78f5e231e8e9c9556790d94972b963b1480e) ) // Damaged ROM?
+	ROM_LOAD( "6.c3",         0x04000, 0x4000, BAD_DUMP CRC(163a024e) SHA1(bb4c78f5e231e8e9c9556790d94972b963b1480e) ) // Bad ROM?
 
 	ROM_REGION( 0x0400, "proms", 0 )
 	ROM_LOAD( "7114.a9",      0x00000, 0x0100, CRC(6eecaeaa) SHA1(5767fb8b07d652956474e2a6e56bc49b7c002814) ) // red
 	ROM_LOAD( "7114.a10",     0x00100, 0x0100, CRC(30556466) SHA1(caa1a941d3a2651504acc1ea3ae14de921e1975a) ) // green
 	ROM_LOAD( "7114.a11",     0x00200, 0x0100, CRC(1fe3d4fd) SHA1(6f1f432667ec1d7286149ccde6790b74499aa50a) ) // blue
-	ROM_LOAD( "mb7114e.2d",   0x00300, 0x0100, BAD_DUMP CRC(75466109) SHA1(6196d12ab7103f6ef991b826d8b93303a61d4c48) ) // sprite lookup table, not dumped on this set
+	ROM_LOAD( "7114.c2",      0x00300, 0x0100, CRC(23bade78) SHA1(7e2de5eb08d888f97830807b6dbe85d09bb3b7f8) ) // sprite lookup table
 
 	ROM_REGION( 0x0100, "user1", 0 )
 	ROM_LOAD( "7114.a7",      0x00000, 0x0100, CRC(6d17bab4) SHA1(55dc38ef2dd9a76398abdc7a5171850530c20023) ) // sprite palette bank
