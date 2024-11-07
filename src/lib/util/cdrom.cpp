@@ -2161,7 +2161,7 @@ std::error_condition cdrom_file::parse_gdi(std::string_view tocfname, toc &outto
 		TOKENIZE
 
 		// Ignore empty lines so they're not countered toward the total track count
-		if (strlen(token) == 0)
+		if (!token[0])
 			continue;
 
 		paramcnt++;
@@ -2187,17 +2187,17 @@ std::error_condition cdrom_file::parse_gdi(std::string_view tocfname, toc &outto
 		outtoc.tracks[trknum].pgsub = CD_SUB_NONE;
 
 		TOKENIZE
-		if (strlen(token) > 0)
+		if (token[0])
 			paramcnt++;
 		outtoc.tracks[trknum].physframeofs = atoi(token);
 
 		TOKENIZE
-		if (strlen(token) > 0)
+		if (token[0])
 			paramcnt++;
 		const int trktype = atoi(token);
 
 		TOKENIZE
-		if (strlen(token) > 0)
+		if (token[0])
 			paramcnt++;
 		const int trksize = atoi(token);
 
@@ -2235,7 +2235,7 @@ std::error_condition cdrom_file::parse_gdi(std::string_view tocfname, toc &outto
 		}
 
 		TOKENIZE
-		if (strlen(token) > 0)
+		if (token[0])
 			paramcnt++;
 		std::string name = token;
 
@@ -2254,14 +2254,14 @@ std::error_condition cdrom_file::parse_gdi(std::string_view tocfname, toc &outto
 
 		TOKENIZE
 		// offset parameter, not used
-		if (strlen(token) > 0)
+		if (token[0])
 			paramcnt++;
 
 		// check if there are any extra parameters that shouldn't be there
-		while (strlen(token) > 0)
+		while (token[0])
 		{
 			TOKENIZE
-			if (strlen(token) > 0)
+			if (token[0])
 				paramcnt++;
 		}
 
