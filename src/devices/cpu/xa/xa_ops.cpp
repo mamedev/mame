@@ -1595,6 +1595,9 @@ void xa_cpu::divu_byte_rd_rs(u8 rd, u8 rs) { fatalerror( "DIVU.b %s, %s", m_regn
 //MULU.w Rd, Rs
 void xa_cpu::mulu_word_rd_rs(u8 rd, u8 rs)
 {
+	if (rd & 1)
+		fatalerror("mulu_word_rd_rs with low rd bit set\n");
+
 	u16 fullval = gr16(rd);
 	u16 rsval = gr16(rs);
 
