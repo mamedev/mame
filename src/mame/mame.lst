@@ -34668,6 +34668,7 @@ dgun853
 gamezn2
 gprnrs1
 gprnrs16
+gujtv108
 joysti30
 lxnoddy
 majgnc
@@ -34772,6 +34773,7 @@ egame150
 fapocket
 gcs2mgp
 gtct885
+hhgc319
 hkb502
 hkb502a
 lpgm240
@@ -34795,7 +34797,6 @@ mog_m320
 myarccn
 nubsupmf
 otrail
-pcmx11
 q5_500in1
 rd5_240
 red5mam
@@ -35020,6 +35021,8 @@ wrecking                        // (c) 1984 Nintendo
 
 @source:nintendo/vt1682.cpp
 110dance
+cmpmx10
+cmpmx11
 dance555
 exsprt48
 gm235upc
@@ -42688,6 +42691,9 @@ systel100                       //
 @source:skeleton/syvg.cpp
 luckyvl
 
+@source:skeleton/tamagotchi_pix.cpp
+tamapix
+
 @source:skeleton/tavernie.cpp
 cpu09                           //
 ivg09                           //
@@ -45535,7 +45541,9 @@ beambox
 
 @source:tvgames/generalplus_gpl16250_rom.cpp
 beijuehh
+bornkidh
 gameu50
+gameu108
 gormiti
 imgame
 myac220
@@ -45587,6 +45595,7 @@ kidizmb
 kidizmp
 pocketmp
 pocketmr
+sanxpet
 zippity
 zippityuk
 
@@ -45903,6 +45912,7 @@ epo_mmsp                        //
 epo_quiz                        //
 epo_stad
 epo_strk                        //
+epo_strkp                       //
 epo_tenn                        //
 epo_tfp2                        //
 epo_tp2p                        //
@@ -45937,6 +45947,8 @@ rad_madf                        //
 rad_mtrk                        //
 rad_mtrkp                       //
 rad_opus                        //
+rad_opusp                       //
+rad_opusa                       //
 rad_ping                        //
 rad_pingp                       //
 rad_rh                          //
@@ -45949,12 +45961,16 @@ rad_ssxp                        //
 taikodp                         //
 taitons1                        //
 taitons2                        //
+tak_beyb                        //
 tak_comt                        //
 tak_daig
 tak_gin                         //
 tak_geig                        //
 tak_hamr                        //
+tak_town                        //
+tak_zuba                        //
 tcarnavi                        //
+tom_tvho                        //
 tomcpin                         //
 tomshoot                        //
 tomthr                          //
@@ -45982,6 +45998,7 @@ epo_mini                        //
 epo_sdb                         //
 tak_chq                         //
 tom_dpgm                        //
+tom_jump
 ttv_lotr                        //
 ttv_mx                          //
 ttv_sw                          //
@@ -45999,6 +46016,7 @@ suprtvpcdo
 suprtvpchk
 tmy_thom                        //
 udance
+xavaero                         //
 xavbaseb                        //
 xavbassf                        //
 xavbowl                         //

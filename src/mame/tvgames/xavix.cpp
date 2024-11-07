@@ -46,7 +46,6 @@
               Let's!TVプレイ なりきりファイト ウルトラマン 撃て！必殺光線！！ / タカラトミー / 日本   Let's!TV Play Narikiri Fight Ultraman Shoot! Deadly ray! ! / Takara Tomy / Japan
     2005      どこでもドラえもん 日本旅行ゲームDX体感！どこドラグランプリ！ / エポック社 / 日本          Doraemon anywhere - Japan travel game DX experience! Where is the Dragon Grand Prix! / Epoch / Japan
               Let's!TVプレイ ふたりはプリキュアMaxHeart マットでダンス MaxHeartにおどっちゃおう / バンダイ / 日本         Let's!TV Play Futari wa PreCure MaxHeart Dance on the mat Let's go to MaxHeart / Bandai / Japan
-              テレビで遊び隊　韋駄天翔 激走 韋駄天バトル / トミー / 日本          Playing with TV Idaten Sho Gekisou Idaten Battle / Tommy / Japan
               Let's!TVプレイ 魔法戦隊マジレンジャー マジマットでダンス＆バトル / バンダイ / 日本        Let's!TV Play Mahou Sentai Magiranger Dance & Battle at Magimat / Bandai / Japan
               Let's!TVプレイ 音撃バトル！仮面ライダー響鬼 決めろ！一気火勢の型 / バンダイ / 日本        Let's!TV Play Ongeki Battle! Kamen Rider Hibiki Decide! Ichikkasei no Kata / Bandai / Japan
               Jala Jaland /atlus/Japan (arcade version)                                                       -           -               -           -               -                   -                       -
@@ -64,14 +63,10 @@
 
     not dumped: no TSOP pads
     2003      Beyblade Arcade Challenge 5-in-1 /Hasbro/USA                                                    -           -               -           -               -                   -                       have
-    2002      Zuba-Zuba Blade /TAKARA/Japan                                                                   -           -               -           -               -                   -                       -
     2002      Excite Striker (UK)
-    2002      Beyblade Ultimate shooter /TAKARA/Japan                                                         -           -               -           -               -                   -                       -
-    2001      Let's construct the town! /TAKARA/Japan                                                         -           -               -           -               -                   -                       -
-    2001      TV hockey /TOMY/Japan                                                                           -           -               -           -               -                   -                       -
     2001      Webdiver Gradion /TAKARA/Japan                                                                  -           -               -           -               -                   -                       -
     2000      connecTV OPUS /RADICA EU (different ROM to US?)
-    * one version of Gin-Gin boarders also had no pads, but the unit it was dumped from did have them
+
 
     not dumped: xavix2.cpp
 
@@ -80,8 +75,12 @@
     2006      SASUKE サスケ＆筋肉バトル!!スポーツマンNO.1決定戦 / エポック社 / 日本   SASUKE Sasuke & Muscle Battle!! Sportsman No. 1 Decisive Battle / Epoch Publishing / Japan
     2005      Let's!TVプレイ ドラゴンボ－ルＺ バトル体感かめはめ波～ おめぇとフュージョン / バンダイ / 日本          Let's!TV Play Dragon Ball Z Battle Experience Kamehameha ~ Ometo Fusion / Bandai / Japan
 
-
     dumped: either here, xavix_2000.cpp, or xavix_2002.cpp
+			  Let's construct the town! /TAKARA/Japan                                                         -           -               -           -               -                   -                       -
+			  TV hockey /TOMY/Japan                                                                           -           -               -           -               -                   -                       -
+			  Zuba-Zuba Blade /TAKARA/Japan                                                                   -           -               -           -               -                   -                       -
+              テレビで遊び隊　韋駄天翔 激走 韋駄天バトル / トミー / 日本          Playing with TV Idaten Sho Gekisou Idaten Battle / Tommy / Japan
+              Beyblade Ultimate shooter /TAKARA/Japan                                                         -           -               -           -               -                   -                       -
               東京フレンドパーク2スペシャル / エポック社 / 日本          Tokyo Friend Park 2 Special / Epochsha / Japan
               Let's!TVプレイ ケロロ軍曹 ケロロ小隊大パニック！ドタバタ大決戦であります / バンダイ / 日本   Let's!TV Play Keroro Sergeant Keroro Platoon Panic! It’s a big slapstick battle / Bandai / Japan
               スーパーテレビパソコン別売カートリッジ ペットケータイLink / エポック社 / 日本      Super TV PC Optional Cartridge Pet Mobile Link / Epochsha / Japan
@@ -172,6 +171,7 @@
               Gachinko Contest! Slot machine TV /DCT/Japan                                                    -           -               -           -               -                   -                       dumped
               Hamutaro, Dancing', Running /EPOCH/Japan                                                        -           -               -           -               -                   -                       -
               Gin-gin Snowboarders /TAKARA/Japan                                                              -           -               -           -               -                   -                       -
+                * one version of Gin-Gin boarders also had no pads, the content has been confirmed as identical
               Shoot! Exciting striker /EPOCH/Japan                                                            -           -               -           -               -                   -                       -
               e-kara US version /TAKARA USA, Hasbro/USA,EU                                                    71076       x8              none        1M                                  SSD 98 PA7351-107       this one or #20 above?  dumped
               Ms.Comett, Lovely baton /TAKARA/Japan<                                                          -           -               -           -               -                   -                       -
@@ -727,6 +727,25 @@ static INPUT_PORTS_START( ltv_tam )
 INPUT_PORTS_END
 
 
+static INPUT_PORTS_START( tom_tvho )
+	PORT_INCLUDE(xavix)
+
+	PORT_MODIFY("MOUSE0X")
+	PORT_BIT( 0xff, 0x00, IPT_AD_STICK_X ) PORT_SENSITIVITY(7) PORT_KEYDELTA(35) PORT_REVERSE PORT_PLAYER(1)
+	PORT_MODIFY("MOUSE0Y")
+	PORT_BIT( 0xff, 0x00, IPT_AD_STICK_Y ) PORT_SENSITIVITY(7) PORT_KEYDELTA(35) PORT_PLAYER(1)
+	PORT_MODIFY("MOUSE1X")
+	PORT_BIT( 0xff, 0x00, IPT_AD_STICK_X ) PORT_SENSITIVITY(7) PORT_KEYDELTA(35) PORT_REVERSE PORT_PLAYER(2)
+	PORT_MODIFY("MOUSE1Y")
+	PORT_BIT( 0xff, 0x00, IPT_AD_STICK_Y ) PORT_SENSITIVITY(7) PORT_KEYDELTA(35) PORT_PLAYER(2)
+
+	PORT_MODIFY("IN0")
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(2)
+
+	PORT_MODIFY("IN1")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(1)
+INPUT_PORTS_END
+
 // left + right drums together = select / forward (needed on initial screen).  left drum = left in menus   right drum  = right in menus
 // analog reading depends heavily on timers, they're too fast right now so drum hits are too hard and register multiple times
 static INPUT_PORTS_START( taikodp )
@@ -838,6 +857,13 @@ static INPUT_PORTS_START( rad_opus )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON6 ) PORT_NAME("Pause") // PI05
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_NAME("Menu Select") // PI06
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_START1 ) PORT_NAME("Start / Bomb") // PI07
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( rad_opusp )
+	PORT_INCLUDE(rad_opus)
+
+	PORT_MODIFY("REGION") // PAL/NTSC flag
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_CUSTOM )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( rad_hnt )
@@ -1709,6 +1735,17 @@ void xavix_i2c_ltv_tam_state::xavix_i2c_24lc04_tam(machine_config &config)
 	m_anport->read_3_callback().set(FUNC(xavix_i2c_ltv_tam_state::tam_anport3_r));
 }
 
+
+void xavix_tom_tvho_state::xavix_tom_tvho(machine_config &config)
+{
+	xavix(config);
+
+	m_anport->read_0_callback().set(FUNC(xavix_tom_tvho_state::tvho_anport0_r));
+	m_anport->read_1_callback().set(FUNC(xavix_tom_tvho_state::tvho_anport1_r));
+	m_anport->read_2_callback().set(FUNC(xavix_tom_tvho_state::tvho_anport2_r));
+	m_anport->read_3_callback().set(FUNC(xavix_tom_tvho_state::tvho_anport3_r));
+}
+
 void xavix_i2c_mj_state::xavix_i2c_24lc02_mj(machine_config &config)
 {
 	xavix_i2c_24c02(config);
@@ -2004,7 +2041,17 @@ ROM_END
 
 ROM_START( rad_opus )
 	ROM_REGION(0x100000, "bios", ROMREGION_ERASE00)
-	ROM_LOAD("opus.bin", 0x000000, 0x100000, CRC(509df402) SHA1(c5b863670eac8498ddda9dfde91387634cf7aa9f) )
+	ROM_LOAD("opus.bin", 0x000000, 0x100000, CRC(f84c11c5) SHA1(6e34129d0ca9c52b7c342fc94860629d81705523) )
+ROM_END
+
+ROM_START( rad_opusp )
+	ROM_REGION(0x100000, "bios", ROMREGION_ERASE00)
+	ROM_LOAD("opus.bin", 0x000000, 0x100000, CRC(f84c11c5) SHA1(6e34129d0ca9c52b7c342fc94860629d81705523) )
+ROM_END
+
+ROM_START( rad_opusa )
+	ROM_REGION(0x100000, "bios", ROMREGION_ERASE00)
+	ROM_LOAD("opus_alt.bin", 0x000000, 0x100000, CRC(509df402) SHA1(c5b863670eac8498ddda9dfde91387634cf7aa9f) )
 ROM_END
 
 ROM_START( rad_hnt )
@@ -2166,10 +2213,22 @@ ROM_START( epo_strk )
 	ROM_LOAD("excitestriker.u4", 0x400000, 0x200000, CRC(0f37ca15) SHA1(b35aaf7f5adddba57c898538f157146bb4d1f9b4) )
 ROM_END
 
+ROM_START( epo_strkp )
+	ROM_REGION(0x800000, "bios", ROMREGION_ERASE00)
+	ROM_LOAD("excitestriker_uk.u5", 0x000000, 0x100000, CRC(201e150e) SHA1(f11405a4b7349e4bdfeb04110b1b6f67e0b63f64) )
+	ROM_LOAD("excitestriker_uk.u4", 0x400000, 0x200000, CRC(efd648aa) SHA1(59358b9a9df27dadc33ed4c3da9083f739b68340) )
+ROM_END
+
 ROM_START( rad_jcon )
 	ROM_REGION(0x800000, "bios", ROMREGION_ERASE00)
 	ROM_LOAD("jrconstr_u5.bin", 0x000000, 0x200000, CRC(306699d2) SHA1(121b04bb598d4531db53e497be9270449bb8ffe4) )
 	ROM_LOAD("jrconstr_u4.bin", 0x400000, 0x100000, CRC(4cfb6193) SHA1(0f56dfc91db3cc066836daf37ff46f9ff5ec5f94) )
+ROM_END
+
+ROM_START( tak_town )
+	ROM_REGION(0x800000, "bios", ROMREGION_ERASE00)
+	ROM_LOAD("rom.u5", 0x000000, 0x200000, CRC(46587e78) SHA1(f163492139087f7aaeea6448b652f58afcb4dd5c) )
+	ROM_LOAD("rom.u4", 0x400000, 0x100000, CRC(642e7e6a) SHA1(d8ff88ad20a60d2eb702dd353f307aa3fcfbbdd5) )
 ROM_END
 
 ROM_START( epo_guru )
@@ -2207,6 +2266,11 @@ ROM_START( epo_mms )
 	ROM_LOAD("mmnj-main-4.u4", 0x000000, 0x400000, CRC(22f14ca2) SHA1(122e735eb7c54a22de16f65cd43d2cae788e0102) )
 ROM_END
 
+ROM_START( tak_zuba ) // CHBJ MAIN REV:01
+	ROM_REGION( 0x400000, "bios", ROMREGION_ERASE00)
+	ROM_LOAD("chbj.u2", 0x000000, 0x400000, CRC(6d60c8d2) SHA1(ba687fc95503223dd484ed9533dcb097ecfea00d) )
+ROM_END
+
 ROM_START( epo_mmsp )
 	ROM_REGION( 0x400000, "bios", ROMREGION_ERASE00)
 	ROM_LOAD("mm1j main-00.u1", 0x000000, 0x400000, CRC(65b40a27) SHA1(8f88973122277fe8f31bacb3a070609fde062946) )
@@ -2220,6 +2284,11 @@ ROM_END
 ROM_START( tak_geig )
 	ROM_REGION(0x400000, "bios", ROMREGION_ERASE00)
 	ROM_LOAD("geigeki.bin", 0x000000, 0x400000, CRC(bd0c3576) SHA1(06f614dbec0225ce4ed866b98450912986d72faf) )
+ROM_END
+
+ROM_START( tom_tvho ) // ET105 REV 0.0
+	ROM_REGION(0x200000, "bios", ROMREGION_ERASE00)
+	ROM_LOAD("tvhockey.u4", 0x000000, 0x200000, CRC(9cd72ae2) SHA1(0530851123b607ddb85f9513405ce97c493f5fd6) )
 ROM_END
 
 ROM_START( tak_comt )
@@ -2446,7 +2515,7 @@ ROM_START( tvpc_ham )
 	ROM_LOAD( "hpcj.u3", 0x000000, 0x400000, CRC(76e8c854) SHA1(5998c03292a16107d0d7ae00f77677582680f323) )
 ROM_END
 
-ROM_START( tak_gin ) // dumped from a PCB with 1x ROM Glob with TSOP pads, 1x unknown glob, 1x CPU glob.  It also exists in a configuration with just 1x ROM glob (no pads) and 1x CPU glob - unknown if code is the same
+ROM_START( tak_gin )
 	ROM_REGION(0x200000, "bios", ROMREGION_ERASE00 )
 	ROM_LOAD( "snowboard.bin", 0x000000, 0x200000, CRC(79fdeae3) SHA1(ab08790e95cdccf3541ecbddb87ebf0dedb3718b) )
 ROM_END
@@ -2456,6 +2525,11 @@ ROM_START( tak_hamr ) // HAMJ MAIN on PCB
 	ROM_LOAD( "hamj.u4", 0x000000, 0x400000, CRC(2f4f5270) SHA1(dfb75f0d20247cf1c886840149c7cf91780ae1b9) )
 ROM_END
 
+ROM_START( tak_beyb )
+	ROM_REGION(0x200000, "bios", ROMREGION_ERASE00 )
+	ROM_LOAD( "beyblade.u2", 0x000000, 0x200000, CRC(bcf6b3a7) SHA1(1c80f1241138b9d7816f1e5285ff8f3c61739c95) )
+ROM_END
+
 
 /* XaviX hardware titles (1st Generation)
 
@@ -2463,7 +2537,7 @@ ROM_END
     SSD 98 PL7351-181
     SSD 98 PA7351-107
     SSD 97 PA7270-107
-    type CPUS
+    type CPUs
 
     only new opcodes are callf and retf?
 
@@ -2484,8 +2558,12 @@ CONS( 2006, namcons2,  0,          0,  xavix_i2c_24lc04, nostalgia,xavix_i2c_sta
 CONS( 2000, rad_ping,  0,          0,  xavix,            rad_ping, xavix_state,          init_xavix,    "Radica / SSD Company LTD / Simmer Technology", "Play TV Ping Pong (NTSC)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND ) // "Simmer Technology" is also known as "Hummer Technology Co., Ltd"
 CONS( 2000, rad_pingp, rad_ping,   0,  xavixp,           rad_pingp,xavix_state,          init_xavix,    "Radica / SSD Company LTD / Simmer Technology", "ConnecTV Table Tennis (PAL)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
+// this set reads the region byte and will show either 'RADICA: Play TV Opus' or 'RADICA: ConnecTV Opus' as the title
 CONS( 2000, rad_opus,  0,          0,  xavix_nv,         rad_opus, xavix_state,          init_xavix,    "Radica / SSD Company LTD",                     "Play TV Opus (NTSC)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // there is a missing 'TV Static' noise effect when menus appear (box shows 'Play TV' ingame just shows 'Radica:Plug & Play')
-// ConnecTV Opus is a different ROM in this case? Game doesn't read from PAL/NTSC flag? (verify it isn't detecting PAL in some other way) ( https://www.youtube.com/watch?v=Ub9tstLEj_0 )
+CONS( 2000, rad_opusp, rad_opus,   0,  xavixp_nv,        rad_opusp,xavix_state,          init_xavix,    "Radica / SSD Company LTD",                     "ConnecTV Opus (PAL)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+// the set below does NOT read the PAL/NTSC flag, and will only display 'RADICA: Plug & Play Opus' as the title
+// older release, or region where the Play TV / ConnecTV trademarks weren't used?
+CONS( 2000, rad_opusa, rad_opus,   0,  xavixp_nv,        rad_opus, xavix_state,          init_xavix,    "Radica / SSD Company LTD",                     "Plug & Play Opus (NTSC)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 
 CONS( 2000, rad_hnt,   0,          0,  xavix_nv,         rad_hnt,  xavix_state,          init_xavix,    "Radica / SSD Company LTD",                     "Play TV Buckmasters Huntin' (NTSC)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // need to map gun (box shows 'Play TV' ingame just shows 'Plug & Play')
 
@@ -2501,8 +2579,6 @@ CONS( 200?, rad_crdn,  0,          0,  xavix,            rad_crdn, xavix_state, 
 CONS( 200?, rad_crdnp, rad_crdn,   0,  xavixp,           rad_crdnp,xavix_state,          init_xavix,    "Radica / SSD Company LTD",                     "ConnecTV Card Night (PAL)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 
 CONS( 2000, rad_bb,    0,          0,  xavix,            rad_bb,   xavix_state,          init_xavix,    "Radica / SSD Company LTD",                     "Play TV Baseball (NTSC)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // Play TV branding used on box, not ingame
-
-CONS( 2002, rad_bb2,   0,          0,  xavix,            rad_bb2,  xavix_state,          init_xavix,    "Radica / SSD Company LTD",                     "Play TV Baseball 2 (NTSC)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // contains string "Radica RBB2 V1.0"
 
 CONS( 2001, rad_bass,  0,          0,  xavix,            rad_bass, xavix_state,          init_xavix,    "Radica / SSD Company LTD",                     "Play TV Bass Fishin' (NTSC)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 CONS( 2001, rad_bassp, rad_bass,   0,  xavixp,           rad_bassp,xavix_state,          init_xavix,    "Radica / SSD Company LTD",                     "ConnecTV Bass Fishin' (PAL)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
@@ -2526,15 +2602,20 @@ CONS( 2006, rad_sbw,   0,          0,  xavix,            rad_snow, xavix_state, 
 
 CONS( 2002, rad_bdp,   0,          0,  xavix,            rad_bdp,  xavix_state,          init_xavix,    "Radica / Mattel / SSD Company LTD",            "Barbie Dance Party", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 
-CONS( 2002, rad_socr,  0,          0,  xavix,            epo_epp,  xavix_state,          init_xavix,    "Radica / Epoch / SSD Company LTD",             "Play TV Soccer", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 // ゴール決めるぜ！ エキサイトストライカー
 CONS( 2001, epo_strk,  0,          0,  xavix,            epo_epp,  xavix_state,          init_xavix,    "Epoch / SSD Company LTD",                      "Goal Kimeruze! Excite Striker (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
-// A UK branded Epoch version (no Radica involvement) also exists, but so far all units seen have been 'no TSOP pads' cases
+CONS( 2002, epo_strkp, epo_strk,   0,  xavixp,           epo_epp,  xavix_state,          init_xavix,    "Epoch / SSD Company LTD",                      "Let's Play Excite Striker (UK)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+CONS( 2002, rad_socr,  epo_strk,   0,  xavix,            epo_epp,  xavix_state,          init_xavix,    "Radica / Epoch / SSD Company LTD",             "Play TV Soccer", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
-CONS( 2002, rad_jcon,  0,          0,  xavix,            rad_jcon, xavix_state,          init_xavix,    "Radica / Takara / SSD Company LTD",            "Play TV Jr. Construction", MACHINE_IMPERFECT_SOUND )
+// まちをつくろう 工事のくるま５     
+CONS( 2001, tak_town,  0,          0,  xavix,            rad_jcon, xavix_state,          init_xavix,    "Takara / SSD Company LTD",                     "Machi o Tsukurou: Kouji no Kuruma 5 (Japan)", MACHINE_IMPERFECT_SOUND )
+// this is roughly based on tak_town above
+CONS( 2002, rad_jcon,  tak_town,   0,  xavix,            rad_jcon, xavix_state,          init_xavix,    "Radica / Takara / SSD Company LTD",            "Play TV Jr. Construction", MACHINE_IMPERFECT_SOUND )
 
 // ホームラン打とうぜ! エキサイトスタジアム
 CONS( 2000, epo_stad,  0,          0,  xavix,            epo_epp,  xavix_state,          init_xavix,    "Epoch / SSD Company LTD",                      "Home Run Datouze! Excite Stadium (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+// this seems to be based off the epo_stad code, but heavily modified
+CONS( 2002, rad_bb2,   0,          0,  xavix,            rad_bb2,  xavix_state,          init_xavix,    "Radica / SSD Company LTD",                     "Play TV Baseball 2 (NTSC)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // contains string "Radica RBB2 V1.0"
 
 // 勝負しようぜ！ エキサイトスタジアムDX
 CONS( 2002, epo_esdx,  0,          0,  xavix,            epo_epp,  xavix_state,          init_xavix,    "Epoch / SSD Company LTD",                      "Shoubu Shiyouze! Excite Stadium DX (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
@@ -2584,6 +2665,9 @@ CONS( 2003, epo_crok,  0,          0,  xavix_i2c_24lc04, xavix_i2c,xavix_i2c_sta
 // ミニモニ。ステージ！ダンスだぴょん！
 CONS( 2002, epo_mms,   0,          0,  xavix_i2c_24c02,  epo_mms,  xavix_i2c_state,      init_xavix,    "Epoch / SSD Company LTD",                      "mini-moni Stage! Dance Dapyon! (Japan)",  MACHINE_IMPERFECT_SOUND )
 
+// ズバズバブレード
+CONS( 2002, tak_zuba,  0,          0,  xavix_i2c_24c02,  xavix_i2c,xavix_i2c_state,      init_xavix,    "Takara / SSD Company LTD",                     "Zuba Zuba Blade (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+
 // ミニモニ。ステージ！ダンスだぴょん！ぷらすっ
 CONS( 2003, epo_mmsp,  0,          0,  xavix_i2c_24c02,  epo_mms,  xavix_i2c_state,      init_xavix,    "Epoch / SSD Company LTD",                      "mini-moni Stage! Dance Dapyon! Plus (Japan)",  MACHINE_IMPERFECT_SOUND )
 
@@ -2598,6 +2682,10 @@ CONS( 2005, has_wamg,  0,          0,  xavix,            has_wamg, xavix_state, 
 // GEIGEKI ゴーゴーシューティング
 CONS( 2002, tak_geig,  0,          0,  xavix_nv,         tak_geig, xavix_state,          init_xavix,    "Takara / SSD Company LTD",                     "Geigeki Go Go Shooting (Japan)", MACHINE_IMPERFECT_SOUND )
 
+// TVホッケー
+// playable but could do with better deadzome handling on the controls at least, and for some reason auto-center heads to the bottom left corner in breakout mode?
+CONS( 2001, tom_tvho,  0,          0,  xavix_tom_tvho,   tom_tvho, xavix_tom_tvho_state, init_xavix,    "Tomy / SSD Company LTD",                       "TV Hockey (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+
 // コメットさん☆ラブリンバトン
 CONS( 2001, tak_comt,  0,          0,  xavix_nv,         tak_comt,  xavix_state,          init_xavix,    "Takara / SSD Company LTD",                     "Comet-san Lovelin Baton (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
@@ -2606,6 +2694,9 @@ CONS( 2001, tak_gin,   0,          0,  xavix,            tak_gin,  xavix_state, 
 
 // ぽこぽこハンマーズ
 CONS( 2002, tak_hamr,  0,          0,  xavix_i2c_24c02,  tak_hamr, xavix_i2c_state,      init_xavix,    "Takara / SSD Company LTD",                     "Poko Poko Hammers (Japan)", MACHINE_IMPERFECT_SOUND )
+
+//ベイブレード　アルティメットシューター
+CONS( 2002, tak_beyb,  0,          0,  xavix,            xavix,    xavix_state,          init_xavix,    "Takara / SSD Company LTD",                     "Beyblade Ultimate Shooter (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
 // was also distributed by Atlus as an arcade cabinet in 2005, ROM almost certainly different (this one will auto-power off after inactivity, an arcade wouldn't do that)
 // ジャラジャランド

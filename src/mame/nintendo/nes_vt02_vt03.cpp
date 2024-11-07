@@ -1387,7 +1387,10 @@ ROM_START( tvmjfc )
 	ROM_LOAD( "s29al016m90tfir2_tsop48.bin", 0x00000, 0x200000, CRC(28ef6219) SHA1(7ac2592f2a88532f537629660074ebae08efab82) )
 ROM_END
 
-
+ROM_START( gujtv108 )
+	ROM_REGION( 0x2000000, "mainrom", ROMREGION_ERASE00 )
+	ROM_LOAD( "29lv320.u1", 0x00000, 0x400000, CRC(56df0a09) SHA1(03aa6ad71ab283c99608a6dfa55c96148841bd10) )
+ROM_END
 
 
 void nes_vt_state::init_protpp()
@@ -1465,6 +1468,7 @@ CONS( 200?, mc_dgear,  0,  0,  nes_vt_4mb,    nes_vt, nes_vt_state, empty_init, 
 
 CONS( 200?, sudo6in1,  0,  0,  nes_vt_pal_1mb,    nes_vt, nes_vt_state, empty_init, "Nice Code", "6-in-1 Sudoku Plug & Play", MACHINE_IMPERFECT_GRAPHICS ) // no manufacturer info on packaging, games seem to be from Nice Code, although this isn't certain
 
+CONS( 200?, gujtv108,  0,  0,  nes_vt_4mb,        nes_vt, nes_vt_state, empty_init, "YSN",    "GameU Joint TV Bank 108-in-1 (model AH9069)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 
 // small black unit, dpad on left, 4 buttons (A,B,X,Y) on right, Start/Reset/Select in middle, unit text "Sudoku Plug & Play TV Game"
 CONS( 200?, sudopptv,  0, 0,  nes_vt_waixing_512kb_rasterhack,        nes_vt, nes_vt_waixing_state, empty_init, "Smart Planet", "Sudoku Plug & Play TV Game '6 Intelligent Games'", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
@@ -1506,7 +1510,6 @@ CONS( 200?, joysti30,  0,  0,  nes_vt_vh2009_4mb,        nes_vt, nes_vt_swap_op_
 
 // has no audio, is there extra hardware, or is it just using unemulated VT features?
 CONS( 2005, lxnoddy,   0,  0,  nes_vt_vh2009_pal_2mb,        lxnoddy, nes_vt_swap_op_d5_d6_state, empty_init, "Lexibook",   "Noddy's TV Console", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND )
-
 
 // mostly bootleg NES games, but also has Frogger, Scramble and Asteroids in it
 CONS( 200?, gamezn2,   0,        0,  nes_vt_4mb,    nes_vt, nes_vt_state, init_gamezn2, "<unknown>", "Game Zone II 128-in-1", MACHINE_IMPERFECT_GRAPHICS ) // was this PAL? (lots of raster splits are broken at the moment either way)
