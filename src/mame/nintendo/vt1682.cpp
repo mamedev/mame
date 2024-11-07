@@ -715,6 +715,7 @@ public:
 	void mx10_init();
 
 protected:
+	uint8_t uioa_r() { logerror("%s uioa_r dir %02x\n", machine().describe_context(), m_uio->inteact_212a_uio_a_direction_r()); return 0xff; } // cmpmx11 needs something here to boot 
 	uint8_t uiob_r() { logerror("%s uiob_r dir %02x\n", machine().describe_context(), m_uio->inteact_214a_uio_b_direction_r()); return m_io_uiob->read(); }
 	void uiob_w(u8 data)
 	{
@@ -6043,6 +6044,7 @@ void vt1682_mx10_state::mx10(machine_config& config)
 	M6502(config.replace(), m_maincpu, MAIN_CPU_CLOCK_NTSC); // no opcode bitswap
 	m_maincpu->set_addrmap(AS_PROGRAM, &vt1682_mx10_state::vt_vt1682_map);
 
+	m_uio->porta_in().set(FUNC(vt1682_mx10_state::uioa_r));
 	m_uio->portb_in().set(FUNC(vt1682_mx10_state::uiob_r));
 	m_uio->portb_out().set(FUNC(vt1682_mx10_state::uiob_w));
 
@@ -6385,12 +6387,6 @@ CONS( 2010, lxts3,    0,  0,   vt1682_lxts3, lxts3, vt1682_lxts3_state, regular_
 // needs IO ports on sound CPU side, needs write access to space for RAM (inputs are 'mini-keyboard' style)
 CONS( 200?, gm235upc,  0,  0,  vt1682_dance, gm235upc, vt1682_dance_state, regular_init, "TimeTop", "Ultimate Pocket Console GM-235", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
 
-ROM_START( cmpmx11 )
-	ROM_REGION( 0x4000000, "mainrom", ROMREGION_ERASE00 )
-	ROM_LOAD( "cmpmx11.bin", 0x000000, 0x400000, CRC(e1f3590b) SHA1(f78f7fc4f9a4474b5a9717dfbfc3199a5bc994ba) )
-	ROM_CONTINUE(0x2000000,0x400000)
-ROM_END
-
 ROM_START( cmpmx10 )
 	ROM_REGION( 0x4000000, "mainrom", ROMREGION_ERASE00 )
 	// despite V1682 being able to access 32Mbytes natively, this is split into 2 4Mbyte banks with external banking
@@ -6399,9 +6395,14 @@ ROM_START( cmpmx10 )
 	ROM_CONTINUE(0x2000000,0x400000)
 ROM_END
 
+ROM_START( cmpmx11 )
+	ROM_REGION( 0x4000000, "mainrom", ROMREGION_ERASE00 )
+	ROM_LOAD( "cmpmx11.bin", 0x000000, 0x800000, CRC(e1f3590b) SHA1(f78f7fc4f9a4474b5a9717dfbfc3199a5bc994ba) )
+	// this set doesn't use banking, and expects the 8Mbytes to map straight
+ROM_END
 
 // might be VT-09 or VT-162, uses a ROM glob on a sub-board, data lines seem scrambled at least?
-CONS( 2009, cmpmx11,     0,        0,  mx10, mx10, vt1682_mx10_state, mx10_init, "Premier Portfolio International",    "Classic Max Pocket PCMX11 - 12 in 1 Colour Games Console (horizontal, France)", MACHINE_NOT_WORKING )
+CONS( 2009, cmpmx11,     0,        0,  mx10, mx10, vt1682_mx10_state, mx10_init, "Jungle Soft (Premier Portfolio International license)",    "Classic Max Pocket PCMX11 - 12 in 1 Colour Games Console (horizontal, France)", MACHINE_NOT_WORKING )
 // this unit has a vertical screen, and the games are designed for that aspect
 // only Jungle Soft is shown on box for manufacturer details, 30-in-1 versions also exist
 // see https://bootleggames.fandom.com/wiki/Classic_Max_Pocket for other units with these games
