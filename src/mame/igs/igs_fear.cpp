@@ -532,13 +532,15 @@ ROM_START( icescape ) // IGS PCB-0433-16-GK (same PCB as Fearless Pinocchio) - H
 	ROM_LOAD( "icescape_v-104fa.u37", 0x000000, 0x80000, CRC(e3552726) SHA1(bac34ac4fce1519c1bc8020064090e77b5c2a629) ) // TMS27C240
 
 	ROM_REGION( 0x10000, "xa:mcu", 0 ) // MX10EXAQC (80C51 XA based MCU) marked O7
+	// while the XA is marked O7 like fearless, it is not confirmed to be the same (IGS labels are not unique)
+	// it can currently be booted with the superkds XA (fearless XA requires some additional XA ops to be implemented)
 	ROM_LOAD( "o7.u33", 0x00000, 0x10000, NO_DUMP )
 
 	ROM_REGION( 0x2000000, "gfx1", 0 ) // FIXED BITS (0xxxxxxx) (graphics are 7bpp)
-	ROM_LOAD32_WORD( "icescape_fa_cg_u7.u7",   0x0000000, 0x800000, NO_DUMP )
-	ROM_LOAD32_WORD( "icescape_fa_cg_u6.u6",   0x0000002, 0x800000, NO_DUMP )
-	ROM_LOAD32_WORD( "icescape_fa_cg_u14.u14", 0x1000000, 0x800000, NO_DUMP )
-	ROM_LOAD32_WORD( "icescape_fa_cg_u13.u13", 0x1000002, 0x800000, NO_DUMP )
+	ROM_LOAD32_WORD( "icescape_fa_cg_u7.u7",   0x0000000, 0x800000, CRC(cd534afb) SHA1(ba9a265d45f7a1a0ca1ac248789609b24b19441d) )
+	ROM_LOAD32_WORD( "icescape_fa_cg_u6.u6",   0x0000002, 0x800000, CRC(4c9781fe) SHA1(bc2ac914ecaf1c10800b3634d457006aee29e248) )
+	ROM_LOAD32_WORD( "icescape_fa_cg_u14.u14", 0x1000000, 0x800000, CRC(ec1eef24) SHA1(0668ea7c7475599c8d2e93580b8e81c104e7b0a0) )
+	ROM_LOAD32_WORD( "icescape_fa_cg_u13.u13", 0x1000002, 0x800000, CRC(18477258) SHA1(e19fbcabfbfe9e37b94cef1054b4d65b49ad38db) )
 	// u17 and u18 not populated
 
 	ROM_REGION( 0x400000, "xa:ics", 0 )
