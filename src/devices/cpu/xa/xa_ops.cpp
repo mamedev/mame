@@ -1595,7 +1595,7 @@ void xa_cpu::divu_byte_rd_rs(u8 rd, u8 rs) { fatalerror( "DIVU.b %s, %s", m_regn
 //MULU.w Rd, Rs
 void xa_cpu::mulu_word_rd_rs(u8 rd, u8 rs)
 {
-	u32 fullval = gr16(rd);
+	u16 fullval = gr16(rd);
 	u16 rsval = gr16(rs);
 
 	u32 result = fullval * rsval;
