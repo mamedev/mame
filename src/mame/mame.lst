@@ -18074,71 +18074,71 @@ bridgecv
 gincribc
 
 @source:fidelity/cc1.cpp
-cc1                             //
-cc3                             //
+cc1
+cc3
 cc10c
 
 @source:fidelity/cc7.cpp
-backgamc                        //
-cc7                             //
-cc7a                            //
+backgamc
+cc7
+cc7a
 
 @source:fidelity/cc10.cpp
-cc10                            //
-cc10a                           //
-checkc4                         //
+cc10
+cc10a
+checkc4
 
 @source:fidelity/checkc2.cpp
 checkc2
 
 @source:fidelity/chesster.cpp
-chesster                        //
-chesstera                       //
-kishon                          //
-kishona                         //
+chesster
+chesstera
+kishon
+kishona
 
 @source:fidelity/csc.cpp
-csc                             //
-csce                            //
-cscet                           //
-reversic                        //
-super9cc                        //
+csc
+csce
+cscet
+reversic
+super9cc
 
 @source:fidelity/dames.cpp
-damesc                          //
+damesc
 
 @source:fidelity/desdis.cpp
-fdes2000d                       //
-fdes2100d                       //
-fdes2100da                      //
-fdes2265                        //
-fdes2265a                       //
-fdes2325                        //
+fdes2000d
+fdes2100d
+fdes2100da
+fdes2265
+fdes2265a
+fdes2325
 
 @source:fidelity/eag68k.cpp
-feagv10                         //
-feagv11                         //
-feagv4                          //
-feagv4a                         //
-feagv5                          //
-feagv7                          //
-feagv7a                         //
-feagv7b                         //
-feagv7c                         //
-feagv9                          //
-feagv9a                         //
-feagv9b                         //
-feagv9c                         //
-fex68k                          //
-fex68ka                         //
-fex68kb                         //
-fex68km2                        //
-fex68km2a                       //
-fex68km3                        //
-fex68km3a                       //
-fex68km3b                       //
-fex68km4                        //
-premiere                        //
+feagv10
+feagv11
+feagv4
+feagv4a
+feagv5
+feagv7
+feagv7a
+feagv7b
+feagv7c
+feagv9
+feagv9a
+feagv9b
+feagv9c
+fex68k
+fex68ka
+fex68kb
+fex68km2
+fex68km2a
+fex68km3
+fex68km3a
+fex68km3b
+fex68km4
+premiere
 
 @source:fidelity/eldorado.cpp
 feldo
@@ -18151,46 +18151,47 @@ felega2
 felega3
 
 @source:fidelity/elite.cpp
-feag                            //
-feag2100                        //
-feag2100a                       //
-feas                            //
-feasbu                          //
-feasbua                         //
-feasgla                         //
-feasglaa                        //
-feasglab                        //
-feasx                           //
-fpres                           //
-fpresa                          //
-fpresb                          //
-fpresc                          //
-fpresd                          //
-fprese                          //
-fpresbu                         //
-fpresgla                        //
+feag
+feag2100
+feag2100a
+feagpriv
+feas
+feasbu
+feasbua
+feasgla
+feasglaa
+feasglab
+feasx
+fpres
+fpresa
+fpresb
+fpresc
+fpresd
+fprese
+fpresbu
+fpresgla
 
 @source:fidelity/excel.cpp
-fexcel                          //
-fexcel12                        //
-fexcel12a                       //
-fexcela                         //
-fexceld                         //
-fexcelp                         //
-fexcelpa                        //
-fexcelv                         //
-granits                         // RCS
+fexcel
+fexcel12
+fexcel12a
+fexcela
+fexceld
+fexcelp
+fexcelpa
+fexcelv
+granits
 
 @source:fidelity/msc.cpp
 miniscco
 
 @source:fidelity/phantom.cpp
-cphantom                        //
-fphantom                        //
+cphantom
+fphantom
 
 @source:fidelity/sc12.cpp
-fscc12                          //
-fscc12a                         //
+fscc12
+fscc12a
 
 @source:fidelity/sc6.cpp
 classic
@@ -18200,21 +18201,21 @@ gambitv
 miniscc
 
 @source:fidelity/sc8.cpp
-fscc8                           //
+fscc8
 
 @source:fidelity/sc9.cpp
-fscc9                           //
-fscc9b                          //
-fscc9c                          //
-fscc9ps                         //
+fscc9
+fscc9b
+fscc9c
+fscc9ps
 
 @source:fidelity/vcc.cpp
-avcc                            //
-vcc                             //
-vcca                            //
+avcc
+vcc
+vcca
 
 @source:fidelity/vsc.cpp
-vsc                             //
+vsc
 
 @source:force/miniforce.cpp
 miniforce                       // D26 cabinet test board

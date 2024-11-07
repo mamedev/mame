@@ -676,7 +676,7 @@ ROM_END
 //    YEAR  NAME         PARENT      COMPAT  MACHINE      INPUT        STATE          INIT        COMPANY, FULLNAME, FLAGS
 SYST( 1980, mephisto,    0,          0,      mephisto,    mephisto,    brikett_state, empty_init, "Hegener + Glaser", "Mephisto", MACHINE_SUPPORTS_SAVE )
 
-SYST( 1981, mephisto1x,  0,          0,      mephisto2,   mephisto,    brikett_state, empty_init, "Hegener + Glaser", "Mephisto 1X", MACHINE_SUPPORTS_SAVE )
+SYST( 1981, mephisto1x,  0,          0,      mephisto2,   mephisto,    brikett_state, empty_init, "Hegener + Glaser", "Mephisto 1X", MACHINE_SUPPORTS_SAVE ) // France
 SYST( 1982, mephistoj,   0,          0,      mephistoj,   mephistoj,   brikett_state, empty_init, "Hegener + Glaser", "Mephisto Junior (1982 version)", MACHINE_SUPPORTS_SAVE ) // there's also a "Mephisto Junior" from 1990
 
 SYST( 1981, mephisto2,   0,          0,      mephisto2,   mephisto,    brikett_state, empty_init, "Hegener + Glaser", "Mephisto II (set 1)", MACHINE_SUPPORTS_SAVE )
