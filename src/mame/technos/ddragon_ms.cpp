@@ -105,12 +105,12 @@ INPUT_PORTS_END
 void ddragon_ms_state::ddragonm(machine_config &config)
 {
 	// basic machine hardware
-	MC6809E(config, m_maincpu, 20_MHz_XTAL / 3); // MC68B09EP, divisor unknown
+	MC6809E(config, m_maincpu, 22.1184_MHz_XTAL / 3); // MC68B09EP, divisor unknown
 	m_maincpu->set_addrmap(AS_PROGRAM, &ddragon_ms_state::main_map);
 
-	MC6809E(config, m_subcpu, 20_MHz_XTAL / 3); // MC68B09EP, divisor unknown
+	MC6809E(config, m_subcpu, 22.1184_MHz_XTAL / 3); // MC68B09EP, divisor unknown
 
-	MC6809(config, m_soundcpu, 20_MHz_XTAL / 5).set_disable(); // Motorola SC84014P, divisor unknown
+	MC6809(config, m_soundcpu, 22.1184_MHz_XTAL / 5).set_disable(); // Motorola SC84014P, divisor unknown, no xtal on the PCB
 
 	// video hardware
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER); // all wrong
