@@ -6398,7 +6398,7 @@ ROM_END
 ROM_START( cmpmx11 )
 	ROM_REGION( 0x4000000, "mainrom", ROMREGION_ERASE00 )
 	ROM_LOAD( "cmpmx11.bin", 0x000000, 0x800000, CRC(e1f3590b) SHA1(f78f7fc4f9a4474b5a9717dfbfc3199a5bc994ba) )
-	// this set doesn't use banking, and expects the 8Mbytes to map straight
+	// this set doesn't use external banking, and expects the 8Mbytes to map straight
 ROM_END
 
 // might be VT-09 or VT-162, uses a ROM glob on a sub-board, data lines seem scrambled at least?
