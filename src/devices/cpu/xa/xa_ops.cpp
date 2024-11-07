@@ -1527,7 +1527,7 @@ void xa_cpu::bnv_rel8(u8 rel8) { fatalerror("BNV %04x\n", expand_rel8(rel8)); }
 // BOV rel8                    Branch if overflow flag is set                                          2 6t/3nt    1111 0101  rrrr rrrr
 void xa_cpu::bov_rel8(u8 rel8) { fatalerror("BOV %04x\n", expand_rel8(rel8)); }
 // BPL rel8                    Branch if the negative flag is clear                                    2 6t/3nt    1111 0110  rrrr rrrr
-void xa_cpu::bpl_rel8(u8 rel8) { fatalerror("BPL %04x\n", expand_rel8(rel8)); }
+void xa_cpu::bpl_rel8(u8 rel8) { if (!get_n_flag()) { set_pc_in_current_page(expand_rel8(rel8)); cy(6); } else { cy(3); } }
 // BMI rel8                    Branch if the negative flag is set                                      2 6t/3nt    1111 0111  rrrr rrrr
 void xa_cpu::bmi_rel8(u8 rel8) { fatalerror("BMI %04x\n", expand_rel8(rel8)); }
 // BG rel8                     Branch if greater than (unsigned)                                       2 6t/3nt    1111 1000  rrrr rrrr
@@ -1593,7 +1593,39 @@ void xa_cpu::mulu_byte_rd_rs(u8 rd, u8 rs) { fatalerror( "MULU.b %s, %s", m_regn
 //DIVU.b Rd, Rs
 void xa_cpu::divu_byte_rd_rs(u8 rd, u8 rs) { fatalerror( "DIVU.b %s, %s", m_regnames8[rd], m_regnames8[rs]); }
 //MULU.w Rd, Rs
-void xa_cpu::mulu_word_rd_rs(u8 rd, u8 rs) { fatalerror( "MULU.w %s, %s", m_regnames16[rd], m_regnames16[rs]); }
+void xa_cpu::mulu_word_rd_rs(u8 rd, u8 rs)
+{
+	if (rd & 1)
+		fatalerror("mulu_word_rd_rs with low rd bit set\n");
+
+	u16 fullval = gr16(rd);
+	u16 rsval = gr16(rs);
+
+	u32 result = (u32)fullval * rsval;
+
+	if (result & 0xffff0000)
+		set_v_flag();
+	else
+		clear_v_flag();
+
+	if (result == 0x0000)
+		set_z_flag();
+	else
+		clear_z_flag();
+
+	if (result & 0x8000)
+		set_n_flag();
+	else
+		clear_n_flag();
+
+	// TODO: verify these are writing to the correct registers
+	sr16(rd, result & 0xffff);
+	sr16(rd + 1, result >> 16);
+
+	clear_c_flag();
+
+	cy(12);
+}
 //DIVU.w Rd, Rs
 void xa_cpu::divu_word_rd_rs(u8 rd, u8 rs) { fatalerror( "DIVU.w %s, %s", m_regnames16[rd], m_regnames16[rs]); }
 // MUL.w Rd, Rs
@@ -1641,13 +1673,14 @@ void xa_cpu::divu_dword_rd_rs(u8 rd, u8 rs)
 		if (result == 0x0000)
 			set_z_flag();
 		else
-			clear_n_flag();
+			clear_z_flag();
 
 		if (result & 0x8000)
 			set_n_flag();
 		else
 			clear_n_flag();
 
+		// TODO: verify these are writing to the correct registers
 		sr16(rd, result);
 		sr16(rd + 1, remainder);
 	}
