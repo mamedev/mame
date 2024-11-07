@@ -200,7 +200,7 @@ cdrom_file::cdrom_file(std::string_view inputfile)
 
 		if (EXTRA_VERBOSE)
 		{
-			printf("session %d track %02d is format %d subtype %d datasize %d subsize %d frames %d extraframes %d pregap %d pgmode %d presize %d postgap %d logofs %d physofs %d chdofs %d logframes %d pad %d\n",
+			osd_printf_verbose("session %d track %02d is format %d subtype %d datasize %d subsize %d frames %d extraframes %d pregap %d pgmode %d presize %d postgap %d logofs %d physofs %d chdofs %d logframes %d pad %d\n",
 					track.session + 1,
 					i + 1,
 					track.trktype,
@@ -302,7 +302,7 @@ cdrom_file::cdrom_file(chd_file *_chd)
 
 		if (EXTRA_VERBOSE)
 		{
-			printf("session %d track %02d is format %d subtype %d datasize %d subsize %d frames %d extraframes %d pregap %d pgmode %d presize %d postgap %d logofs %d physofs %d chdofs %d logframes %d pad %d\n",
+			osd_printf_verbose("session %d track %02d is format %d subtype %d datasize %d subsize %d frames %d extraframes %d pregap %d pgmode %d presize %d postgap %d logofs %d physofs %d chdofs %d logframes %d pad %d\n",
 					track.session + 1,
 					i + 1,
 					track.trktype,
@@ -380,7 +380,7 @@ std::error_condition cdrom_file::read_partial_sector(void *dest, uint32_t lbasec
 		if ((cdtoc.tracks[tracknum].pgdatasize == 0) && (lbasector < cdtoc.tracks[tracknum].logframeofs))
 		{
 			if (EXTRA_VERBOSE)
-				printf("PG missing sector: LBA %d, trklog %d\n", lbasector, cdtoc.tracks[tracknum].logframeofs);
+				osd_printf_verbose("PG missing sector: LBA %d, trklog %d\n", lbasector, cdtoc.tracks[tracknum].logframeofs);
 			memset(dest, 0, length);
 			return result;
 		}
@@ -416,7 +416,7 @@ std::error_condition cdrom_file::read_partial_sector(void *dest, uint32_t lbasec
 		sourcefileoffset += chdsector * bytespersector + startoffs;
 
 		if (EXTRA_VERBOSE)
-			printf("Reading %u bytes from sector %d from track %d at offset %lu\n", (unsigned)length, chdsector, tracknum + 1, (unsigned long)sourcefileoffset);
+			osd_printf_verbose("Reading %u bytes from sector %d from track %d at offset %lu\n", (unsigned)length, chdsector, tracknum + 1, (unsigned long)sourcefileoffset);
 
 		result = srcfile.seek(sourcefileoffset, SEEK_SET);
 		size_t actual;
@@ -996,7 +996,7 @@ std::error_condition cdrom_file::parse_metadata(chd_file *chd, toc &toc)
 	if (toc.numtrks > 0)
 		return std::error_condition();
 
-	printf("toc.numtrks = %u?!\n", toc.numtrks);
+	osd_printf_info("toc.numtrks = %u?!\n", toc.numtrks);
 
 	/* look for old-style metadata */
 	std::vector<uint8_t> oldmetadata;
@@ -1624,7 +1624,7 @@ uint32_t cdrom_file::parse_wav_sample(std::string_view filename, uint32_t *datao
 	std::error_condition const filerr = osd_file::open(fname, OPEN_FLAG_READ, file, fsize);
 	if (filerr)
 	{
-		printf("ERROR: could not open (%s)\n", fname.c_str());
+		osd_printf_error("ERROR: could not open (%s)\n", fname);
 		return 0;
 	}
 
@@ -1633,12 +1633,12 @@ uint32_t cdrom_file::parse_wav_sample(std::string_view filename, uint32_t *datao
 	offset += actual;
 	if (offset < 4)
 	{
-		printf("ERROR: unexpected RIFF offset %lu (%s)\n", offset, fname.c_str());
+		osd_printf_error("ERROR: unexpected RIFF offset %lu (%s)\n", offset, fname);
 		return 0;
 	}
 	if (memcmp(&buf[0], "RIFF", 4) != 0)
 	{
-		printf("ERROR: could not find RIFF header (%s)\n", fname.c_str());
+		osd_printf_error("ERROR: could not find RIFF header (%s)\n", fname);
 		return 0;
 	}
 
@@ -1647,7 +1647,7 @@ uint32_t cdrom_file::parse_wav_sample(std::string_view filename, uint32_t *datao
 	offset += actual;
 	if (offset < 8)
 	{
-		printf("ERROR: unexpected size offset %lu (%s)\n", offset, fname.c_str());
+		osd_printf_error("ERROR: unexpected size offset %lu (%s)\n", offset, fname);
 		return 0;
 	}
 	filesize = little_endianize_int32(filesize);
@@ -1657,12 +1657,12 @@ uint32_t cdrom_file::parse_wav_sample(std::string_view filename, uint32_t *datao
 	offset += actual;
 	if (offset < 12)
 	{
-		printf("ERROR: unexpected WAVE offset %lu (%s)\n", offset, fname.c_str());
+		osd_printf_error("ERROR: unexpected WAVE offset %lu (%s)\n", offset, fname);
 		return 0;
 	}
 	if (memcmp(&buf[0], "WAVE", 4) != 0)
 	{
-		printf("ERROR: could not find WAVE header (%s)\n", fname.c_str());
+		osd_printf_error("ERROR: could not find WAVE header (%s)\n", fname);
 		return 0;
 	}
 
@@ -1681,7 +1681,7 @@ uint32_t cdrom_file::parse_wav_sample(std::string_view filename, uint32_t *datao
 		offset += length;
 		if (offset >= filesize)
 		{
-			printf("ERROR: could not find fmt tag (%s)\n", fname.c_str());
+			osd_printf_error("ERROR: could not find fmt tag (%s)\n", fname);
 			return 0;
 		}
 	}
@@ -1692,7 +1692,7 @@ uint32_t cdrom_file::parse_wav_sample(std::string_view filename, uint32_t *datao
 	temp16 = little_endianize_int16(temp16);
 	if (temp16 != 1)
 	{
-		printf("ERROR: unsupported format %u - only PCM is supported (%s)\n", temp16, fname.c_str());
+		osd_printf_error("ERROR: unsupported format %u - only PCM is supported (%s)\n", temp16, fname);
 		return 0;
 	}
 
@@ -1702,7 +1702,7 @@ uint32_t cdrom_file::parse_wav_sample(std::string_view filename, uint32_t *datao
 	temp16 = little_endianize_int16(temp16);
 	if (temp16 != 2)
 	{
-		printf("ERROR: unsupported number of channels %u - only stereo is supported (%s)\n", temp16, fname.c_str());
+		osd_printf_error("ERROR: unsupported number of channels %u - only stereo is supported (%s)\n", temp16, fname);
 		return 0;
 	}
 
@@ -1712,7 +1712,7 @@ uint32_t cdrom_file::parse_wav_sample(std::string_view filename, uint32_t *datao
 	rate = little_endianize_int32(rate);
 	if (rate != 44100)
 	{
-		printf("ERROR: unsupported samplerate %u - only 44100 is supported (%s)\n", rate, fname.c_str());
+		osd_printf_error("ERROR: unsupported samplerate %u - only 44100 is supported (%s)\n", rate, fname);
 		return 0;
 	}
 
@@ -1726,7 +1726,7 @@ uint32_t cdrom_file::parse_wav_sample(std::string_view filename, uint32_t *datao
 	bits = little_endianize_int16(bits);
 	if (bits != 16)
 	{
-		printf("ERROR: unsupported bits/sample %u - only 16 is supported (%s)\n", bits, fname.c_str());
+		osd_printf_error("ERROR: unsupported bits/sample %u - only 16 is supported (%s)\n", bits, fname);
 		return 0;
 	}
 
@@ -1748,7 +1748,7 @@ uint32_t cdrom_file::parse_wav_sample(std::string_view filename, uint32_t *datao
 		offset += length;
 		if (offset >= filesize)
 		{
-			printf("ERROR: could not find data tag (%s)\n", fname.c_str());
+			osd_printf_error("ERROR: could not find data tag (%s)\n", fname);
 			return 0;
 		}
 	}
@@ -1756,7 +1756,7 @@ uint32_t cdrom_file::parse_wav_sample(std::string_view filename, uint32_t *datao
 	/* if there was a 0 length data block, we're done */
 	if (length == 0)
 	{
-		printf("ERROR: empty data block (%s)\n", fname.c_str());
+		osd_printf_error("ERROR: empty data block (%s)\n", fname);
 		return 0;
 	}
 
@@ -1866,7 +1866,7 @@ std::error_condition cdrom_file::parse_nero(std::string_view tocfname, toc &outt
 
 	if (memcmp(buffer, "NER5", 4))
 	{
-		printf("ERROR: Not a Nero 5.5 or later image!\n");
+		osd_printf_error("ERROR: Not a Nero 5.5 or later image!\n");
 		fclose(infile);
 		return chd_file::error::UNSUPPORTED_FORMAT;
 	}
@@ -1875,7 +1875,7 @@ std::error_condition cdrom_file::parse_nero(std::string_view tocfname, toc &outt
 
 	if ((buffer[7] != 0) || (buffer[6] != 0) || (buffer[5] != 0) || (buffer[4] != 0))
 	{
-		printf("ERROR: File size is > 4GB, this version of CHDMAN cannot handle it.");
+		osd_printf_error("ERROR: File size is > 4GB, this version of CHDMAN cannot handle it.");
 		fclose(infile);
 		return chd_file::error::UNSUPPORTED_FORMAT;
 	}
@@ -1932,12 +1932,12 @@ std::error_condition cdrom_file::parse_nero(std::string_view tocfname, toc &outt
 						break;
 
 					case 0x0300:    // Mode 2 Form 1
-						printf("ERROR: Mode 2 Form 1 tracks not supported\n");
+						osd_printf_error("ERROR: Mode 2 Form 1 tracks not supported\n");
 						fclose(infile);
 						return chd_file::error::UNSUPPORTED_FORMAT;
 
 					case 0x0500:    // raw data
-						printf("ERROR: Raw data tracks not supported\n");
+						osd_printf_error("ERROR: Raw data tracks not supported\n");
 						fclose(infile);
 						return chd_file::error::UNSUPPORTED_FORMAT;
 
@@ -1952,22 +1952,22 @@ std::error_condition cdrom_file::parse_nero(std::string_view tocfname, toc &outt
 						break;
 
 					case 0x0f00:    // raw data with sub-channel
-						printf("ERROR: Raw data tracks with sub-channel not supported\n");
+						osd_printf_error("ERROR: Raw data tracks with sub-channel not supported\n");
 						fclose(infile);
 						return chd_file::error::UNSUPPORTED_FORMAT;
 
 					case 0x1000:    // audio with sub-channel
-						printf("ERROR: Audio tracks with sub-channel not supported\n");
+						osd_printf_error("ERROR: Audio tracks with sub-channel not supported\n");
 						fclose(infile);
 						return chd_file::error::UNSUPPORTED_FORMAT;
 
 					case 0x1100:    // raw Mode 2 Form 1 with sub-channel
-						printf("ERROR: Raw Mode 2 Form 1 tracks with sub-channel not supported\n");
+						osd_printf_error("ERROR: Raw Mode 2 Form 1 tracks with sub-channel not supported\n");
 						fclose(infile);
 						return chd_file::error::UNSUPPORTED_FORMAT;
 
 					default:
-						printf("ERROR: Unknown track type %x, contact MAMEDEV!\n", mode);
+						osd_printf_error("ERROR: Unknown track type %x, contact MAMEDEV!\n", mode);
 						fclose(infile);
 						return chd_file::error::UNSUPPORTED_FORMAT;
 				}
@@ -2066,7 +2066,7 @@ std::error_condition cdrom_file::parse_iso(std::string_view tocfname, toc &outto
 		outtoc.tracks[0].datasize = 2352;
 		outinfo.track[0].swap = false;
 	} else {
-		printf("ERROR: Unrecognized track type\n");
+		osd_printf_error("ERROR: Unrecognized track type\n");
 		return chd_file::error::UNSUPPORTED_FORMAT;
 	}
 
@@ -2290,7 +2290,7 @@ std::error_condition cdrom_file::parse_gdi(std::string_view tocfname, toc &outto
 	if (EXTRA_VERBOSE)
 		for(int i = 0; i < numtracks; i++)
 		{
-			osd_printf_info("'%s' %d %d %d (true %d)\n", outinfo.track[i].fname, outtoc.tracks[i].frames, outtoc.tracks[i].padframes, outtoc.tracks[i].physframeofs, outtoc.tracks[i].frames - outtoc.tracks[i].padframes);
+			osd_printf_verbose("'%s' %d %d %d (true %d)\n", outinfo.track[i].fname, outtoc.tracks[i].frames, outtoc.tracks[i].padframes, outtoc.tracks[i].physframeofs, outtoc.tracks[i].frames - outtoc.tracks[i].padframes);
 		}
 
 	/* close the input TOC */
@@ -2469,14 +2469,14 @@ std::error_condition cdrom_file::parse_cue(std::string_view tocfname, toc &outto
 				if (!wavlen)
 				{
 					fclose(infile);
-					printf("ERROR: couldn't read [%s] or not a valid .WAV\n", lastfname.c_str());
+					osd_printf_error("ERROR: couldn't read [%s] or not a valid .WAV\n", lastfname);
 					return chd_file::error::INVALID_DATA;
 				}
 			}
 			else
 			{
 				fclose(infile);
-				printf("ERROR: Unhandled track type %s\n", token);
+				osd_printf_error("ERROR: Unhandled track type %s\n", token);
 				return chd_file::error::UNSUPPORTED_FORMAT;
 			}
 		}
@@ -2531,11 +2531,11 @@ std::error_condition cdrom_file::parse_cue(std::string_view tocfname, toc &outto
 			{
 				if (is_gdrom)
 				{
-					printf("trk %d: fname %s offset %d area %d\n", trknum, outinfo.track[trknum].fname.c_str(), outinfo.track[trknum].offset, outtoc.tracks[trknum].multicuearea);
+					osd_printf_verbose("trk %d: fname %s offset %d area %d\n", trknum, outinfo.track[trknum].fname, outinfo.track[trknum].offset, outtoc.tracks[trknum].multicuearea);
 				}
 				else
 				{
-					printf("trk %d: fname %s offset %d\n", trknum, outinfo.track[trknum].fname.c_str(), outinfo.track[trknum].offset);
+					osd_printf_verbose("trk %d: fname %s offset %d\n", trknum, outinfo.track[trknum].fname, outinfo.track[trknum].offset);
 				}
 			}
 
@@ -2543,7 +2543,7 @@ std::error_condition cdrom_file::parse_cue(std::string_view tocfname, toc &outto
 			if (outtoc.tracks[trknum].datasize == 0)
 			{
 				fclose(infile);
-				printf("ERROR: Unknown track type [%s].  Contact MAMEDEV.\n", token);
+				osd_printf_error("ERROR: Unknown track type [%s].  Contact MAMEDEV.\n", token);
 				return chd_file::error::UNSUPPORTED_FORMAT;
 			}
 
@@ -2566,7 +2566,7 @@ std::error_condition cdrom_file::parse_cue(std::string_view tocfname, toc &outto
 
 			if (idx < 0 || idx > MAX_INDEX)
 			{
-				printf("ERROR: encountered invalid index %d\n", idx);
+				osd_printf_error("ERROR: encountered invalid index %d\n", idx);
 				return chd_file::error::INVALID_DATA;
 			}
 
@@ -2645,7 +2645,7 @@ std::error_condition cdrom_file::parse_cue(std::string_view tocfname, toc &outto
 		if (outinfo.track[trknum].idx[1] == -1)
 		{
 			/* index 1 should always be set */
-			printf("ERROR: track %d is missing INDEX 01 marker\n", trknum+1);
+			osd_printf_error("ERROR: track %d is missing INDEX 01 marker\n", trknum+1);
 			return chd_file::error::INVALID_DATA;
 		}
 
@@ -2665,7 +2665,7 @@ std::error_condition cdrom_file::parse_cue(std::string_view tocfname, toc &outto
 			tlen = get_file_size(outinfo.track[trknum].fname);
 			if (tlen == 0)
 			{
-				printf("ERROR: couldn't find bin file [%s]\n", outinfo.track[trknum-1].fname.c_str());
+				osd_printf_error("ERROR: couldn't find bin file [%s]\n", outinfo.track[trknum-1].fname);
 				return std::errc::no_such_file_or_directory;
 			}
 
@@ -2679,7 +2679,7 @@ std::error_condition cdrom_file::parse_cue(std::string_view tocfname, toc &outto
 
 			if (outtoc.tracks[trknum].frames == 0)
 			{
-				printf("ERROR: unable to determine size of track %d, missing INDEX 01 markers?\n", trknum+1);
+				osd_printf_error("ERROR: unable to determine size of track %d, missing INDEX 01 markers?\n", trknum+1);
 				return chd_file::error::INVALID_DATA;
 			}
 
@@ -2695,7 +2695,7 @@ std::error_condition cdrom_file::parse_cue(std::string_view tocfname, toc &outto
 			tlen = get_file_size(outinfo.track[trknum].fname);
 			if (tlen == 0)
 			{
-				printf("ERROR: couldn't find bin file [%s]\n", outinfo.track[trknum-1].fname.c_str());
+				osd_printf_error("ERROR: couldn't find bin file [%s]\n", outinfo.track[trknum-1].fname);
 				return std::errc::no_such_file_or_directory;
 			}
 
@@ -2804,7 +2804,7 @@ std::error_condition cdrom_file::parse_cue(std::string_view tocfname, toc &outto
 	{
 		for (trknum = 0; trknum < outtoc.numtrks; trknum++)
 		{
-			printf("session %d trk %d: %d frames @ offset %d, pad=%d, split=%d, area=%d, phys=%d, pregap=%d, pgtype=%d, pgdatasize=%d, idx0=%d, idx1=%d, dataframes=%d\n",
+			osd_printf_verbose("session %d trk %d: %d frames @ offset %d, pad=%d, split=%d, area=%d, phys=%d, pregap=%d, pgtype=%d, pgdatasize=%d, idx0=%d, idx1=%d, dataframes=%d\n",
 					outtoc.tracks[trknum].session + 1,
 					trknum + 1,
 					outtoc.tracks[trknum].frames,
@@ -3089,7 +3089,7 @@ std::error_condition cdrom_file::parse_toc(std::string_view tocfname, toc &outto
 			if (outtoc.tracks[trknum].datasize == 0)
 			{
 				fclose(infile);
-				printf("ERROR: Unknown track type [%s].  Contact MAMEDEV.\n", token);
+				osd_printf_error("ERROR: Unknown track type [%s].  Contact MAMEDEV.\n", token);
 				return chd_file::error::UNSUPPORTED_FORMAT;
 			}
 
