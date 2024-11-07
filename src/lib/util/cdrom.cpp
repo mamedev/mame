@@ -2447,10 +2447,16 @@ std::error_condition cdrom_file::parse_cue(std::string_view tocfname, toc &outto
 			TOKENIZE
 
 			/* keep the filename */
-			std::string prevfname = lastfname;
-			lastfname.assign(path).append(token);
-			if (prevfname.length() > 0 && lastfname.compare(prevfname) != 0)
-				is_multibin = true;
+			if (!is_multibin)
+			{
+				std::string prevfname(std::move(lastfname));
+				lastfname.assign(path).append(token);
+				is_multibin = !prevfname.empty() && lastfname != prevfname;
+			}
+			else
+			{
+				lastfname.assign(path).append(token);
+			}
 
 			/* get the file type */
 			TOKENIZE
