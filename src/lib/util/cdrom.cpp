@@ -2886,7 +2886,43 @@ std::error_condition cdrom_file::parse_toc(std::string_view tocfname, toc &outto
 
 			TOKENIZE
 
-			if ((!strcmp(token, "DATAFILE")) || (!strcmp(token, "AUDIOFILE")) || (!strcmp(token, "FILE")))
+			/*
+			Samples: https://github.com/cdrdao/cdrdao/tree/master/testtocs
+
+			Unimplemented:
+			CD_TEXT
+			SILENCE
+			ZERO
+			FIFO
+			PREGAP
+			CATALOG
+			ISRC
+			*/
+			if (!strcmp(token, "NO"))
+			{
+				TOKENIZE
+				if (!strcmp(token, "COPY"))
+					outtoc.tracks[trknum].control_flags &= ~CD_FLAG_CONTROL_DIGITAL_COPY_PERMITTED;
+				else if (!strcmp(token, "PRE_EMPHASIS"))
+					outtoc.tracks[trknum].control_flags &= ~CD_FLAG_CONTROL_PREEMPHASIS;
+			}
+			else if (!strcmp(token, "COPY"))
+			{
+				outtoc.tracks[trknum].control_flags |= CD_FLAG_CONTROL_DIGITAL_COPY_PERMITTED;
+			}
+			else if (!strcmp(token, "PRE_EMPHASIS"))
+			{
+				outtoc.tracks[trknum].control_flags |= CD_FLAG_CONTROL_PREEMPHASIS;
+			}
+			else if (!strcmp(token, "TWO_CHANNEL_AUDIO"))
+			{
+				outtoc.tracks[trknum].control_flags &= ~CD_FLAG_CONTROL_4CH;
+			}
+			else if (!strcmp(token, "FOUR_CHANNEL_AUDIO"))
+			{
+				outtoc.tracks[trknum].control_flags |= CD_FLAG_CONTROL_4CH;
+			}
+			else if ((!strcmp(token, "DATAFILE")) || (!strcmp(token, "AUDIOFILE")) || (!strcmp(token, "FILE")))
 			{
 				int f;
 

@@ -265,6 +265,10 @@ void t10mmc::ExecCommand()
 			break;
 		}
 
+		case TOC_FORMAT_CDTEXT:
+			length = 4;
+			break;
+
 		default:
 			m_device->logerror("T10MMC: Unhandled READ TOC format %d\n", toc_format());
 			length = 0;
@@ -622,8 +626,8 @@ void t10mmc::ExecCommand()
 			auto track_type = m_image->get_track_type(trk);
 
 			// If there's a transition between CD data and CD audio anywhere in the requested range then return an error
-			if ((last_track_type == cdrom_file::CD_TRACK_AUDIO && track_type != cdrom_file::CD_TRACK_AUDIO)
-			|| (last_track_type != cdrom_file::CD_TRACK_AUDIO && track_type == cdrom_file::CD_TRACK_AUDIO))
+			if (last_track_type != -1 && ((last_track_type == cdrom_file::CD_TRACK_AUDIO && track_type != cdrom_file::CD_TRACK_AUDIO)
+			|| (last_track_type != cdrom_file::CD_TRACK_AUDIO && track_type == cdrom_file::CD_TRACK_AUDIO)))
 			{
 				set_sense(SCSI_SENSE_KEY_ILLEGAL_REQUEST, SCSI_SENSE_ASC_ASCQ_ILLEGAL_MODE_FOR_THIS_TRACK);
 
@@ -1463,6 +1467,14 @@ void t10mmc::ReadData( uint8_t *data, int dataLength )
 					}
 				}
 
+				break;
+			}
+
+			case TOC_FORMAT_CDTEXT:
+			{
+				put_u16be(&data[0], 0); // length
+				data[2] = 0; // first track/session/reserved
+				data[3] = 0; // last track/session/reserved
 				break;
 			}
 
