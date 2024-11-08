@@ -346,9 +346,6 @@ void system1_state::videoram_w(offs_t offset, u8 data)
 {
 	videoram_wait_states(m_maincpu);
 	offset |= 0x1000 * ((m_videoram_bank >> 1) % (m_tilemap_pages / 2));
-	m_videoram[offset] = data;
-
-	m_tilemap_page[offset / 0x800]->mark_tile_dirty((offset % 0x800) / 2);
 
 	/* force a partial update if the page is changing */
 	if (m_tilemap_pages > 2 && offset >= 0x740 && offset < 0x748 && offset % 2 == 0)
@@ -356,6 +353,9 @@ void system1_state::videoram_w(offs_t offset, u8 data)
 		//m_screen->update_now();
 		m_screen->update_partial(m_screen->vpos());
 	}
+
+	m_videoram[offset] = data;
+	m_tilemap_page[offset / 0x800]->mark_tile_dirty((offset % 0x800) / 2);
 }
 
 void system1_state::videoram_bank_w(u8 data)
@@ -536,10 +536,10 @@ void system1_state::video_update_common(screen_device &screen, bitmap_ind16 &bit
 
 			/* using the sprite, background, and foreground pixels, look up the color behavior */
 			const u8 lookup_index =  (((sprpix & 0xf) == 0) << 0) |
-							(((fgpix & 7) == 0) << 1) |
-							(((fgpix >> 9) & 3) << 2) |
-							(((bgpix & 7) == 0) << 4) |
-							(((bgpix >> 9) & 3) << 5);
+					(((fgpix & 7) == 0) << 1) |
+					(((fgpix >> 9) & 3) << 2) |
+					(((bgpix & 7) == 0) << 4) |
+					(((bgpix >> 9) & 3) << 5);
 			u8 lookup_value = m_lookup_prom[lookup_index];
 
 			/* compute collisions based on two of the PROM bits */
