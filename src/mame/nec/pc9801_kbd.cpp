@@ -10,8 +10,7 @@ Resources:
 - https://github.com/tmk/tmk_keyboard/wiki/PC-9801-Keyboard;
 
 TODO:
-- key repeat;
-- Implement actual i8251 interface;
+- actual RDY / RTY implementation, find and check schematics (how they connects to i8251?)
 - GRPH + SHIFT scancodes;
 - Subclass keyboard variants (cfr. PC-9801-119 with Windows & Menu keys and PC-9801-115 Bungo);
 - Verify untested keys:
@@ -49,15 +48,6 @@ pc9801_kbd_device::pc9801_kbd_device(const machine_config &mconfig, const char *
 	, m_rdy_cb(*this)
 	, m_rty_cb(*this)
 {
-}
-
-//-------------------------------------------------
-//  input_ports - device-specific input ports
-//-------------------------------------------------
-
-uint8_t pc9801_kbd_device::translate(uint8_t row, uint8_t column)
-{
-	return row * 8 + column;
 }
 
 //-------------------------------------------------
@@ -101,6 +91,11 @@ void pc9801_kbd_device::device_reset()
 	m_rdy_cb(0);
 	// resend signal
 	m_rty_cb(0);
+}
+
+uint8_t pc9801_kbd_device::translate(uint8_t row, uint8_t column)
+{
+	return row * 8 + column;
 }
 
 static INPUT_PORTS_START( pc9801_kbd )
@@ -274,7 +269,7 @@ ioport_constructor pc9801_kbd_device::device_input_ports() const
 
 
 //**************************************************************************
-//  Serial implementation
+//  device_matrix_keyboard
 //**************************************************************************
 
 void pc9801_kbd_device::key_make(uint8_t row, uint8_t column)
@@ -301,9 +296,9 @@ void pc9801_kbd_device::key_break(uint8_t row, uint8_t column)
 
 void pc9801_kbd_device::key_repeat(uint8_t row, uint8_t column)
 {
-  uint8_t code = translate(row, column);
+	uint8_t code = translate(row, column);
 
-  send_key(code);
+	send_key(code);
 }
 
 void pc9801_kbd_device::send_key(uint8_t code)
@@ -312,6 +307,10 @@ void pc9801_kbd_device::send_key(uint8_t code)
 	if (fifo_full())
 		stop_processing();
 }
+
+//**************************************************************************
+//  Serial implementation
+//**************************************************************************
 
 void pc9801_kbd_device::tra_complete()
 {
@@ -330,11 +329,23 @@ void pc9801_kbd_device::transmit_byte(u8 byte)
 
 /*
  * 0xff: reset
- * everything else: implementation specific, TBD
+ * everything else: implementation specific, TBD (0x9* command, some have extra parameters)
  */
 void pc9801_kbd_device::received_byte(u8 byte)
 {
 	logerror("received_byte 0x%02x\n", byte);
+	if (byte == 0xff)
+	{
+		clear_fifo();
+		receive_register_reset();
+		transmit_register_reset();
+
+		reset_key_state();
+		start_processing(attotime::from_hz(BAUD));
+		typematic_stop();
+		m_rdy_cb(0);
+		m_rty_cb(0);
+	}
 }
 
 void pc9801_kbd_device::rcv_complete()
@@ -342,4 +353,3 @@ void pc9801_kbd_device::rcv_complete()
 	receive_register_extract();
 	received_byte(get_received_char());
 }
-
