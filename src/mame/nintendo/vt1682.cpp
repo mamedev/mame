@@ -242,6 +242,11 @@ private:
 	uint8_t m_202e;
 	uint8_t m_2030;
 
+	int m_scu_to_main_irq_active;
+	int m_timera_to_main_irq_active;
+	int m_current_main_vector;
+
+	void update_main_interrupts();
 
 	uint8_t vt1682_2000_r();
 	void vt1682_2000_w(uint8_t data);
@@ -464,6 +469,9 @@ private:
 
 	void vt1682_2105_comr6_tvmodes_w(uint8_t data);
 
+	void vt1682_212e_unused_w(u8 data);
+
+	uint8_t vt1682_211c_scuirq_clear_r();
 	void vt1682_211c_regs_ext2421_w(uint8_t data);
 
 	uint8_t vt1682_2122_dma_dt_addr_7_0_r();
@@ -871,6 +879,10 @@ void vt_vt1682_state::machine_start()
 
 	/* System */
 
+	save_item(NAME(m_scu_to_main_irq_active));
+	save_item(NAME(m_timera_to_main_irq_active));
+	save_item(NAME(m_current_main_vector));
+
 	save_item(NAME(m_prgbank1_r0));
 	save_item(NAME(m_prgbank1_r1));
 	save_item(NAME(m_210c_prgbank1_r2));
@@ -972,6 +984,10 @@ void vt_vt1682_state::machine_reset()
 	m_2030 = 0;
 
 	/* System */
+	m_scu_to_main_irq_active = 0;
+	m_timera_to_main_irq_active = 0;
+	m_current_main_vector = 0xfffe;
+
 	m_prgbank1_r0 = 0;
 	m_prgbank1_r1 = 0;
 	m_210c_prgbank1_r2 = 0;
@@ -4161,9 +4177,11 @@ void vt_vt1682_state::vt1682_soundcpu_211c_reg_irqctrl_w(uint8_t data)
 
 	if (data & 0x10)
 	{
-		// not seen used
+		m_scu_to_main_irq_active = 1;
+		update_main_interrupts();
 	//	logerror("Main CPU IRQ Request from Sound CPU\n");
 	}
+
 
 	if (data & 0x08)
 	{
@@ -5203,6 +5221,21 @@ void vt_vt1682_state::vt_vt1682_sound_map(address_map& map)
 	map(0xfffe, 0xffff).r(FUNC(vt_vt1682_state::soundcpu_irq_vector_hack_r)); // probably need custom IRQ support in the core instead...
 }
 
+uint8_t vt_vt1682_state::vt1682_211c_scuirq_clear_r()
+{
+	m_scu_to_main_irq_active = 0;
+	update_main_interrupts();
+	return 0x00;
+}
+
+void vt_vt1682_state::vt1682_212e_unused_w(u8 data)
+{
+	// this is listed as unused, but the main CPU writes here at the
+	// end of the SCU IRQ (and doesn't use 211c above)
+	m_scu_to_main_irq_active = 0;
+	update_main_interrupts();
+}
+
 void vt_vt1682_state::vt_vt1682_map(address_map &map)
 {
 	map(0x0000, 0x0fff).ram();
@@ -5294,7 +5327,7 @@ void vt_vt1682_state::vt_vt1682_map(address_map &map)
 	// 2119 UART
 	// 211a UART
 	// 211b UART
-	map(0x211c, 0x211c).w(FUNC(vt_vt1682_state::vt1682_211c_regs_ext2421_w));
+	map(0x211c, 0x211c).rw(FUNC(vt_vt1682_state::vt1682_211c_scuirq_clear_r), FUNC(vt_vt1682_state::vt1682_211c_regs_ext2421_w));
 	// 211d misc enable regs
 	// 211e ADC
 	// 211f voice gain
@@ -5313,7 +5346,7 @@ void vt_vt1682_state::vt_vt1682_map(address_map &map)
 	map(0x212b, 0x212b).rw(m_uio, FUNC(vrt_vt1682_uio_device::inteact_212b_uio_a_attribute_r), FUNC(vrt_vt1682_uio_device::inteact_212b_uio_a_attribute_w));
 	map(0x212c, 0x212c).rw(FUNC(vt_vt1682_state::vt1682_212c_prng_r), FUNC(vt_vt1682_state::vt1682_212c_prng_seed_w));
 	// 212d PLL
-	// 212e unused
+	map(0x212e, 0x212e).w(FUNC(vt_vt1682_state::vt1682_212e_unused_w));
 	// 212f unused
 	map(0x2130, 0x2130).rw(m_maincpu_alu, FUNC(vrt_vt1682_alu_device::alu_out_1_r), FUNC(vrt_vt1682_alu_device::alu_oprand_1_w));
 	map(0x2131, 0x2131).rw(m_maincpu_alu, FUNC(vrt_vt1682_alu_device::alu_out_2_r), FUNC(vrt_vt1682_alu_device::alu_oprand_2_w));
@@ -5372,7 +5405,7 @@ uint8_t vt_vt1682_state::soundcpu_irq_vector_hack_r(offs_t offset)
 uint8_t vt_vt1682_state::maincpu_irq_vector_hack_r(offs_t offset)
 {
 	// redirect to Timer IRQ!
-	return rom_8000_to_ffff_r((0xfff8 - 0x8000)+offset);
+	return rom_8000_to_ffff_r((m_current_main_vector - 0x8000)+offset);
 }
 
 // intg5410 writes a new program without resetting the CPU when selecting from the 'arcade' game main menu, this is problematic
@@ -5418,9 +5451,33 @@ void vt_vt1682_state::maincpu_timer_irq(int state)
 	*/
 
 	if (state)
-		m_maincpu->set_input_line(0, ASSERT_LINE);
+		m_timera_to_main_irq_active = 1;
 	else
+		m_timera_to_main_irq_active = 0;
+
+	update_main_interrupts();
+}
+
+void vt_vt1682_state::update_main_interrupts()
+{
+	if (m_timera_to_main_irq_active || m_scu_to_main_irq_active)
+	{
+		if (m_timera_to_main_irq_active)
+		{
+			m_current_main_vector = 0xfff8;
+		}
+		else if (m_scu_to_main_irq_active)
+		{
+			m_current_main_vector = 0xfff6;
+		}
+
+		m_maincpu->set_input_line(0, ASSERT_LINE);
+	}
+	else
+	{
+		m_current_main_vector = 0xfffe;
 		m_maincpu->set_input_line(0, CLEAR_LINE);
+	}
 }
 
 TIMER_DEVICE_CALLBACK_MEMBER(vt_vt1682_state::line_render_start)
