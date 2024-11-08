@@ -17,6 +17,7 @@
 #include "hashing.h"
 #include "md5.h"
 #include "multibyte.h"
+#include "osdcore.h"
 #include "path.h"
 #include "strformat.h"
 #include "vbiparse.h"
@@ -70,6 +71,9 @@ constexpr uint32_t TEMP_BUFFER_SIZE = 32 * 1024 * 1024;
 constexpr int MODE_NORMAL = 0;
 constexpr int MODE_CUEBIN = 1;
 constexpr int MODE_GDI = 2;
+
+// osd printf verbosity
+constexpr bool OSD_PRINTF_VERBOSE = false;
 
 // command modifier
 #define REQUIRED "~"
@@ -156,6 +160,46 @@ static void do_list_templates(parameters_map &params);
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
+
+// Allow chdman to show osd_printf_X messages
+class chdman_osd_output : public osd_output
+{
+public:
+	chdman_osd_output() {
+		osd_output::push(this);
+	}
+
+	~chdman_osd_output() {
+		osd_output::pop(this);
+	}
+
+	void output_callback(osd_output_channel channel, const util::format_argument_pack<char> &args);
+};
+
+void chdman_osd_output::output_callback(osd_output_channel channel, const util::format_argument_pack<char> &args)
+{
+	switch (channel)
+	{
+	case OSD_OUTPUT_CHANNEL_ERROR:
+	case OSD_OUTPUT_CHANNEL_WARNING:
+		util::stream_format(std::cerr, args);
+		break;
+	case OSD_OUTPUT_CHANNEL_INFO:
+	case OSD_OUTPUT_CHANNEL_LOG:
+		util::stream_format(std::cout, args);
+		break;
+	case OSD_OUTPUT_CHANNEL_VERBOSE:
+		if (OSD_PRINTF_VERBOSE) util::stream_format(std::cout, args);
+		break;
+	case OSD_OUTPUT_CHANNEL_DEBUG:
+#ifdef MAME_DEBUG
+		util::stream_format(std::cout, args);
+#endif
+		break;
+	default:
+		break;
+	}
+}
 
 // ======================> option_description
 
@@ -3354,6 +3398,7 @@ static void do_list_templates(parameters_map &params)
 int CLIB_DECL main(int argc, char *argv[])
 {
 	const std::vector<std::string> args = osd_get_command_line(argc, argv);
+	chdman_osd_output osdoutput;
 
 	// print the header
 	extern const char build_version[];
