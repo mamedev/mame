@@ -324,18 +324,20 @@ inline void system1_state::videoram_wait_states(cpu_device *cpu)
 	   and is only restarted by the FIXST signal, which occurs once every
 	   'n' pixel clocks. 'n' is determined by the horizontal control PAL. */
 
-	/* this assumes 4 5MHz pixel clocks per FIXST, or 8*4 20MHz CPU clocks,
+	/* this assumes 4 5MHz pixel clocks per FIXST, or 3.2 4MHz CPU clocks,
 	   and is based on a dump of 315-5137 */
-	const u32 cpu_cycles_per_fixst = 4 * 4;
-	const u32 fixst_offset = 2 * 4;
-	u32 cycles_until_next_fixst = cpu_cycles_per_fixst - ((cpu->total_cycles() - fixst_offset) % cpu_cycles_per_fixst);
+	const u32 cpu_cycles_per_fixst = 32; // 3.2 * 10
+	const u32 fixst_offset = cpu_cycles_per_fixst / 2;
+	const u64 total_cycles = cpu->total_cycles() * 10ULL;
+	u32 cycles_until_next_fixst = cpu_cycles_per_fixst - ((total_cycles - fixst_offset) % cpu_cycles_per_fixst);
 
-	cpu->adjust_icount(-cycles_until_next_fixst);
+	cpu->adjust_icount(-((cycles_until_next_fixst + 5) / 10));
 }
 
 u8 system1_state::videoram_r(offs_t offset)
 {
-	videoram_wait_states(m_maincpu);
+	if (!machine().side_effects_disabled())
+		videoram_wait_states(m_maincpu);
 	offset |= 0x1000 * ((m_videoram_bank >> 1) % (m_tilemap_pages / 2));
 	return m_videoram[offset];
 }
