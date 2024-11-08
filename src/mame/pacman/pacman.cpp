@@ -5631,17 +5631,22 @@ ROM_START( pengopac )
 	ROM_LOAD( "82s126.3m",    0x0100, 0x0100, CRC(77245b66) SHA1(0c4d0bee858b97632411c440bea6948a74759746) )  // Timing - not used
 ROM_END
 
-/* Marti Colls bootleg (set 1). 18 MHz xtal. 
-   Program ROMs were, along with a PROM and a 6116 SRAM, on a small sub-board from Novatronic, silkscreened "NOVATRONIC BILBAO SPAIN  COPYRIGHT 1982". */
+/* Marti Colls bootleg (set 1).
+   There are two PCB versions with the same ROM set:
+    -An older one, just labeled "PAC", with a 18 MHz xtal, and a Novatronic NVS board (a small sub-board from Novatronic, 
+      silkscreened "NOVATRONIC BILBAO SPAIN  COPYRIGHT 1982", with the CPU, program ROMs, a PROM and a 6116 SRAM:
+      https://www.recreativas.org/novatronic-video-sistema-nvs-6072-novatronic-sa). This one is where the PROMs were dumped from.
+    -A newer one, silkscreened by MARTI COLLS, with a sub-board similar to the Novatronic one (but without Novatronic texts).
+      PROMs weren't dumped on this PCB. */
 ROM_START( pengomc1 )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "pengomc_01_sub.a5", 0x4000, 0x0200, CRC(ea415ede) SHA1(da005876d96361c5b807a3cf1b82ec066c678c87) )
+	ROM_REGION( 0x10000, "maincpu", 0 ) // All of them on the Novatronic NVS board
+	ROM_LOAD( "pengomc_01.a5", 0x4000, 0x0200, CRC(ea415ede) SHA1(da005876d96361c5b807a3cf1b82ec066c678c87) )
 	ROM_CONTINUE( 0x0200, 0x0e00 )
-	ROM_LOAD( "pengomc_02_sub.a4", 0x0000, 0x0200, CRC(dfe9640e) SHA1(c0366399092cafecba1e407b256a62c0c3b538c0) )
+	ROM_LOAD( "pengomc_02.a4", 0x0000, 0x0200, CRC(dfe9640e) SHA1(c0366399092cafecba1e407b256a62c0c3b538c0) )
 	ROM_CONTINUE( 0x4200, 0x0e00 )
-	ROM_LOAD( "pengomc_03_sub.a3", 0x5000, 0x1000, CRC(0ac08ae4) SHA1(29eadd0ef0d1f584785e4e6f6cc9561c7dbfb70c) )
-	ROM_LOAD( "pengomc_04_sub.a2", 0x6000, 0x1000, CRC(1717a7d9) SHA1(d550a7644be3712ddbcbf008d45f99c0743976bb) )
-	ROM_LOAD( "pengomc_05_sub.a1", 0x7000, 0x1000, CRC(cb6eb19c) SHA1(c66256e0fc7ccdcac997775ae9186aef1e0819d9) )
+	ROM_LOAD( "pengomc_03.a3", 0x5000, 0x1000, CRC(0ac08ae4) SHA1(29eadd0ef0d1f584785e4e6f6cc9561c7dbfb70c) )
+	ROM_LOAD( "pengomc_04.a2", 0x6000, 0x1000, CRC(1717a7d9) SHA1(d550a7644be3712ddbcbf008d45f99c0743976bb) )
+	ROM_LOAD( "pengomc_05.a1", 0x7000, 0x1000, CRC(cb6eb19c) SHA1(c66256e0fc7ccdcac997775ae9186aef1e0819d9) )
 
 	ROM_REGION( 0x2000, "gfx1", 0 )
 	ROM_LOAD( "pengomc_09.e6", 0x0000, 0x0800, CRC(ad88978a) SHA1(a568baf751753660223958b722980f031310eba1) ) // same as pengoa.bin on "pengojpm"
@@ -5657,8 +5662,8 @@ ROM_START( pengomc1 )
 	ROM_LOAD( "82s129.1m", 0x0000, 0x0100, CRC(3cb61034) SHA1(2f24b88839aee107a0ac1064f8bc4853933f5205) )
 	ROM_LOAD( "82s129.3m", 0x0100, 0x0100, CRC(822fe878) SHA1(a3d8918d66e8ef1f45183d48da9b8f842ef0d2fa) ) // Timing - not used
 
-	ROM_REGION( 0x0200, "extraprom", 0 ) // Additional PROM found on a small subboard from Novatronic with the program ROMs (1 to 5) and a 6116 SRAM
-	ROM_LOAD( "82s135_sub.a6", 0x0000, 0x0100, CRC(b3628535) SHA1(2eb0e2c66c107f274393c5c902c78a1e6fa86cda) )
+	ROM_REGION( 0x0200, "nvs", 0 ) // Additional PROM on the Novatronic NVS board
+	ROM_LOAD( "82s135.a6", 0x0000, 0x0100, CRC(b3628535) SHA1(2eb0e2c66c107f274393c5c902c78a1e6fa86cda) )
 ROM_END
 
 // Marti Colls bootleg (set 2)
@@ -6517,7 +6522,8 @@ ROM_START( pacgal2 )
 	ROM_LOAD( "82s126.3m",    0x0100, 0x0100, CRC(77245b66) SHA1(0c4d0bee858b97632411c440bea6948a74759746) )    // Timing - not used
 ROM_END
 
-ROM_START( mspacmbn ) // Main PCB H-P1, sub PCB with main CPU ROMs marked Novatronic and 1982
+// Main PCB H-P1, with Novatronic NVS sub PCB with main CPU ROMs, marked Novatronic and 1982
+ROM_START( mspacmbn )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "1_sub.bin",       0x2000, 0x0200, CRC(0839a86e) SHA1(b9f3e477bd2e7ffd98156d5fa14f5ea12468811f) )
 	ROM_CONTINUE(                0x0200, 0x0200 )
@@ -6552,12 +6558,15 @@ ROM_START( mspacmbn ) // Main PCB H-P1, sub PCB with main CPU ROMs marked Novatr
 	ROM_LOAD( "10.bin", 0x1800, 0x0800, CRC(50c7477d) SHA1(c04ec282a8cb528df5e38ad750d12ee71612695d) )
 
 	ROM_REGION( 0x0120, "proms", 0 ) // not dumped for this set, taken from the very similar pacgal2
-	ROM_LOAD( "82s123.7f",    0x0000, 0x0020, BAD_DUMP CRC(2fc650bd) SHA1(8d0268dee78e47c712202b0ec4f1f51109b1f2a5) )
-	ROM_LOAD( "82s126.4a",    0x0020, 0x0100, BAD_DUMP CRC(3eb3a8e4) SHA1(19097b5f60d1030f8b82d9f1d3a241f93e5c75d6) )
+	ROM_LOAD( "82s123.7f", 0x0000, 0x0020, BAD_DUMP CRC(2fc650bd) SHA1(8d0268dee78e47c712202b0ec4f1f51109b1f2a5) )
+	ROM_LOAD( "82s126.4a", 0x0020, 0x0100, BAD_DUMP CRC(3eb3a8e4) SHA1(19097b5f60d1030f8b82d9f1d3a241f93e5c75d6) )
 
-	ROM_REGION( 0x0200, "namco", 0 ) // sound PROMs,not dumped for this set, taken from the very similar pacgal2
-	ROM_LOAD( "82s126.1m",    0x0000, 0x0100, BAD_DUMP CRC(a9cc86bf) SHA1(bbcec0570aeceb582ff8238a4bc8546a23430081) )
-	ROM_LOAD( "82s126.3m",    0x0100, 0x0100, BAD_DUMP CRC(77245b66) SHA1(0c4d0bee858b97632411c440bea6948a74759746) )
+	ROM_REGION( 0x0200, "namco", 0 ) // sound PROMs, not dumped for this set, taken from the very similar pacgal2
+	ROM_LOAD( "82s126.1m", 0x0000, 0x0100, BAD_DUMP CRC(a9cc86bf) SHA1(bbcec0570aeceb582ff8238a4bc8546a23430081) )
+	ROM_LOAD( "82s126.3m", 0x0100, 0x0100, BAD_DUMP CRC(77245b66) SHA1(0c4d0bee858b97632411c440bea6948a74759746) )
+
+	ROM_REGION( 0x100, "nvs", 0 ) // Additional PROM on the Novatronic NVS board
+	ROM_LOAD( "82s135.a6", 0x0000, 0x0100, NO_DUMP )
 ROM_END
 
 ROM_START( mschamp ) // "Original" Zola-Puc board.  FORCE ELECTRONICS KM-001 PCB copyright by RAYGLO MFG CO  1992/1993
