@@ -136,7 +136,7 @@ cdrom_file::cdrom_file(std::string_view inputfile)
 	std::error_condition err = parse_toc(inputfile, cdtoc, cdtrack_info);
 	if (err)
 	{
-		fprintf(stderr, "Error reading input file: %s\n", err.message().c_str());
+		osd_printf_error("Error reading input file: %s\n", err.message());
 		throw nullptr;
 	}
 
@@ -152,13 +152,13 @@ cdrom_file::cdrom_file(std::string_view inputfile)
 		std::error_condition const filerr = osd_file::open(cdtrack_info.track[i].fname, OPEN_FLAG_READ, file, length);
 		if (filerr)
 		{
-			fprintf(stderr, "Unable to open file: %s\n", cdtrack_info.track[i].fname.c_str());
+			osd_printf_error("Unable to open file: %s\n", cdtrack_info.track[i].fname);
 			throw nullptr;
 		}
 		fhandle[i] = util::osd_file_read(std::move(file));
 		if (!fhandle[i])
 		{
-			fprintf(stderr, "Unable to open file: %s\n", cdtrack_info.track[i].fname.c_str());
+			osd_printf_error("Unable to open file: %s\n", cdtrack_info.track[i].fname);
 			throw nullptr;
 		}
 	}
