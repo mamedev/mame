@@ -163,6 +163,8 @@ protected:
 	void vt_vt1682_palbase(machine_config& config);
 	void vt_vt1682_common(machine_config& config);
 
+	virtual void clear_sound_reset_line();
+
 private:
 	required_device<vrt_vt1682_alu_device> m_maincpu_alu;
 	required_device<vrt_vt1682_alu_device> m_soundcpu_alu;
@@ -733,6 +735,16 @@ protected:
 				m_bank->set_entry(0);
 			}
 		}
+	}
+
+	virtual void clear_sound_reset_line() override
+	{
+		// the Classic Max Pocket likely use the internal ROM feature of the Sound CPU
+		// as the code uploaded doesn't initialize these things on reset, resulting
+		// in the machine state becoming corrupted
+		vt_vt1682_state::clear_sound_reset_line();
+		m_soundcpu->set_state_int(M6502_S, 0x1e4+0x3); // set stack pointer somewhere sensible, there is a block of 0xff bytes in this area, which could be the correct location
+		m_soundcpu->set_state_int(M6502_P, 0x06); // disable interrupts
 	}
 
 private:
@@ -2687,6 +2699,12 @@ uint8_t vt_vt1682_state::vt1682_2106_enable_regs_r()
 	return ret;
 }
 
+void vt_vt1682_state::clear_sound_reset_line()
+{
+	m_soundcpu->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
+	m_scpu_is_in_reset = false;
+}
+
 void vt_vt1682_state::vt1682_2106_enable_regs_w(uint8_t data)
 {
 	// COMR6 is used for banking
@@ -2696,8 +2714,7 @@ void vt_vt1682_state::vt1682_2106_enable_regs_w(uint8_t data)
 
 	if (data & 0x20)
 	{
-		m_soundcpu->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
-		m_scpu_is_in_reset = false;
+		clear_sound_reset_line();
 	}
 	else
 	{
