@@ -5634,8 +5634,8 @@ ROM_END
 /* Marti Colls bootleg (set 1).
    There are two PCB versions with the same ROM set:
     -An older one, just labeled "PAC", with a 18 MHz xtal, and a Novatronic NVS board (a small sub-board from Novatronic, 
-      silkscreened "NOVATRONIC BILBAO SPAIN  COPYRIGHT 1982", with the CPU, program ROMs, a PROM and a 6116 SRAM:
-      https://www.recreativas.org/novatronic-video-sistema-nvs-6072-novatronic-sa). This one is where the PROMs were dumped from.
+      silkscreened "NOVATRONIC BILBAO SPAIN  COPYRIGHT 1982", with the CPU, program ROMs, a PROM and a 6116 SRAM
+      (https://www.recreativas.org/novatronic-video-sistema-nvs-6072-novatronic-sa). This one is where the PROMs were dumped from.
     -A newer one, silkscreened by MARTI COLLS, with a sub-board similar to the Novatronic one (but without Novatronic texts).
       PROMs weren't dumped on this PCB. */
 ROM_START( pengomc1 )
