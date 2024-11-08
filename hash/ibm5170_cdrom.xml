@@ -5023,6 +5023,34 @@ https://www.pcgamingwiki.com/wiki/The_Adventures_of_Lomax
 		</part>
 	</software>
 
+	<!-- Windows 95/NT4 -->
+	<software name="mfma_addsub">
+		<description>My First Math Adventure: Adding and Subtracting</description>
+		<year>1998</year>
+		<publisher>Global Software Publishing</publisher>
+		<info name="developer" value="Dorling Kindersley" />
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="my first math adventure - adding and subtracting" sha1="860fe59ec122aff801de2c724e40a5f0045f88be" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Windows 3.1/95 -->
+	<!-- Program fails to launch properly on ct486/Win95 -->
+	<software name="mmmsgram" supported="no">
+		<description>Multimedia Middle School Grammar</description>
+		<year>1995</year>
+		<publisher>Pro One</publisher>
+		<info name="developer" value="Sofsource" />
+		<info name="language" value="English" />
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="multimedia middle school grammar" sha1="cc38cae6e47ddebbbffa3e57bd3fbcedac5ed1fe" />
+			</diskarea>
+		</part>
+	</software>
+
 	<!-- "CDROM not ISO9660 or High Sierra" when trying to DIR it -->
 	<software name="monkisl3" supported="no">
 		<description>The Curse of Monkey Island</description>
@@ -5123,6 +5151,21 @@ The Curse of Monkey Island (Windows 95 demo version)
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="moondrg" sha1="fc79ee0bbc66f22c32fa4a171ba7c97094b195e6" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Windows 95/98/NT4 -->
+	<!-- Graphical corruption on svga_s3 (true color bug?), sound not working properly on sblaster_16 -->
+	<software name="mvsbcn10" supported="no">
+		<description>Mavis Beacon Teaches Typing Special Edition 10</description>
+		<year>1999</year>
+		<publisher>Brøderbund</publisher>
+		<info name="developer" value="The Learning Company" />
+		<info name="language" value="English" />
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="mavis beacon teaches typing special edition 10" sha1="5e37dd988b0e0696c3b466c46d8ec471cbc3c5f2" />
 			</diskarea>
 		</part>
 	</software>
@@ -6591,6 +6634,19 @@ Unemulated optional [Gravis Gamepad], [Gravis Gamepad Pro], [Gravis Grip 4-playe
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="doom shareware" sha1="9a6048f924df4289b9f51e5925f1ef2a9b985095" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Windows 95/98 -->
+	<software name="ultsolitaire">
+		<description>Ultimate Solitaire</description>
+		<year>2003</year>
+		<publisher>ValuSoft</publisher>
+		<info name="developer" value="ValuSoft" />
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="ultimate solitaire" sha1="fb3b20a6cefabd2f11ca799de7f43aa9bfab439f" />
 			</diskarea>
 		</part>
 	</software>
