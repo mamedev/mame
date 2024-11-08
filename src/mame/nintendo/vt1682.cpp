@@ -6138,13 +6138,6 @@ void vt1682_mx10_state::mx10_init()
 
 		std::copy(buffer.begin(), buffer.end(), &src[0]);
 	}
-
-	// for some reason, after changing banks, the sound CPU
-	// doesn't seem to end up in a good state, and trashes
-	// its own memory
-	//
-	// this is an ugly hack to prevent that for now, at the expense of any kind of correct sound
-	m_soundcpu->set_clock_scale(0.01f);
 }
 
 
