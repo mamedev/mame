@@ -16,8 +16,9 @@ DS2404S RTC
 KOS9F XTAL (near RTC)
 square 144 pin chip with no marking
 12.000 MHz XTAL (near 144 pin chip)
-2x PK3_CTRL chips
+2x LATTICE Mach211SP-15JC - 18JI 8010OPY3 PK3_CTRL chips
 2x GM71C18163CJ6 RAM
+BR62256P RAM
 Oki M6295 sound chip
 2x bank of 8 DIP switches
 
