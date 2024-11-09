@@ -1609,7 +1609,7 @@ void t10mmc::WriteData( uint8_t *data, int dataLength )
 	case T10SPC_CMD_MODE_SELECT_6:
 	case T10SPC_CMD_MODE_SELECT_10:
 	{
-		int len = (command[0] == T10SPC_CMD_MODE_SELECT_6) ? data[0] : get_u16be(&data[0]);
+		int len = (command[0] == T10SPC_CMD_MODE_SELECT_6) ? data[0] + 1 : get_u16be(&data[0]) + 2;
 		int bdlen = (command[0] == T10SPC_CMD_MODE_SELECT_6) ? data[3] : get_u16be(&data[6]);
 		int ptr = (command[0] == T10SPC_CMD_MODE_SELECT_6) ? 4 : 8;
 
@@ -1660,7 +1660,6 @@ void t10mmc::WriteData( uint8_t *data, int dataLength )
 
 			ptr += data[ptr + 1] + 2;
 		}
-
 		break;
 	}
 
