@@ -79,6 +79,7 @@
 #define WIDTH40_REG 2
 #define FONTSEL_REG 3
 #define INTERLACE_REG 4
+#define KAC_REG 5
 #define MEMSW_REG   6
 #define DISPLAY_REG 7
 

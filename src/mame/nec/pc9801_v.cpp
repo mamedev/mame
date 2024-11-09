@@ -474,6 +474,7 @@ void pc9801_state::pc9801_a0_w(offs_t offset, uint8_t data)
 				pcg_offset = (m_font_addr & 0x7fff) << 5;
 				pcg_offset|= m_font_line;
 				pcg_offset|= m_font_lr;
+
 				//logerror("%04x %02x %02x %08x\n",m_font_addr,m_font_line,m_font_lr,pcg_offset);
 				if((m_font_addr & 0xff00) == 0x5600 || (m_font_addr & 0xff00) == 0x5700)
 				{
