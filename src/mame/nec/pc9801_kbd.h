@@ -30,10 +30,14 @@ public:
 	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 
 	auto rxd_callback()    { return m_tx_cb.bind(); }
-	auto rdy_callback()    { return m_rdy_cb.bind(); }
-	auto rty_callback()    { return m_rty_cb.bind(); }
+//  auto rdy_callback()    { return m_rdy_cb.bind(); }
+//  auto rty_callback()    { return m_rty_cb.bind(); }
 
+	// input_rts?
 	void input_txd(int state)  { device_buffered_serial_interface::rx_w(state); }
+	void input_rty(int state);
+	// input_rdy?
+	void input_kbde(int state);
 
 protected:
 	// device-level overrides
@@ -63,8 +67,11 @@ private:
 	void send_key(uint8_t code);
 
 	devcb_write_line m_tx_cb;
-	devcb_write_line m_rdy_cb;
-	devcb_write_line m_rty_cb;
+//  devcb_write_line m_rdy_cb;
+//  devcb_write_line m_rty_cb;
+
+//  bool m_repeat_state = false;
+	int m_rty_state = 0;
 };
 
 

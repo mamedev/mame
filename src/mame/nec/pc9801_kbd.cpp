@@ -10,7 +10,11 @@ Resources:
 - https://github.com/tmk/tmk_keyboard/wiki/PC-9801-Keyboard;
 
 TODO:
-- actual RDY / RTY implementation, find and check schematics (how they connects to i8251?)
+- RTY behaviour
+\- triggered in bokosuka when it starts losing a key break along the way.
+- key repeat: alternates break and make keys when typematic kicks in, 30ms per swap?
+\- Most keyboards don't have a method for disabling typematic, depends on RTY?
+- Undumped i8048 MCU;
 - GRPH + SHIFT scancodes;
 - Subclass keyboard variants (cfr. PC-9801-119 with Windows & Menu keys and PC-9801-115 Bungo);
 - Verify untested keys:
@@ -45,8 +49,6 @@ pc9801_kbd_device::pc9801_kbd_device(const machine_config &mconfig, const char *
 	, device_buffered_serial_interface(mconfig, *this)
 	, device_matrix_keyboard_interface(mconfig, *this, "KEY0", "KEY1", "KEY2", "KEY3", "KEY4", "KEY5", "KEY6", "KEY7", "KEY8", "KEY9", "KEYA", "KEYB", "KEYC", "KEYD", "KEYE", "KEYF")
 	, m_tx_cb(*this)
-	, m_rdy_cb(*this)
-	, m_rty_cb(*this)
 {
 }
 
@@ -86,11 +88,8 @@ void pc9801_kbd_device::device_reset()
 	reset_key_state();
 	start_processing(attotime::from_hz(BAUD));
 	typematic_stop();
-	// NOTE: both signals active low
-	// ready signal
-	m_rdy_cb(0);
-	// resend signal
-	m_rty_cb(0);
+
+//  m_repeat_state = false;
 }
 
 uint8_t pc9801_kbd_device::translate(uint8_t row, uint8_t column)
@@ -279,9 +278,13 @@ void pc9801_kbd_device::key_make(uint8_t row, uint8_t column)
 	send_key(code);
 
 	// no typematic for caps and kana locks
+	// TODO: does it applies to the whole E row?
 	// page 345 of the Technical DataBook for timings
 	if (code != 0x71 && code != 0x72)
+	{
+		//m_repeat_state = 0;
 		typematic_start(row, column, attotime::from_msec(500), attotime::from_msec(60));
+	}
 }
 
 void pc9801_kbd_device::key_break(uint8_t row, uint8_t column)
@@ -296,9 +299,12 @@ void pc9801_kbd_device::key_break(uint8_t row, uint8_t column)
 
 void pc9801_kbd_device::key_repeat(uint8_t row, uint8_t column)
 {
-	uint8_t code = translate(row, column);
+//  uint8_t code = translate(row, column);
 
-	send_key(code);
+//    m_repeat_state ^= 1;
+//    code |= m_repeat_state << 7;
+//
+//    send_key(code);
 }
 
 void pc9801_kbd_device::send_key(uint8_t code)
@@ -343,8 +349,6 @@ void pc9801_kbd_device::received_byte(u8 byte)
 		reset_key_state();
 		start_processing(attotime::from_hz(BAUD));
 		typematic_stop();
-		m_rdy_cb(0);
-		m_rty_cb(0);
 	}
 }
 
@@ -352,4 +356,17 @@ void pc9801_kbd_device::rcv_complete()
 {
 	receive_register_extract();
 	received_byte(get_received_char());
+}
+
+void pc9801_kbd_device::input_kbde(int state)
+{
+	if (state)
+		start_processing(attotime::from_hz(BAUD));
+	else
+		stop_processing();
+}
+
+void pc9801_kbd_device::input_rty(int state)
+{
+	m_rty_state = state;
 }

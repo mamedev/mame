@@ -445,6 +445,8 @@ void pc98lt_state::lt_config(machine_config &config)
 	I8251(config, m_sio_kbd, 0);
 	m_sio_kbd->txd_handler().set("keyb", FUNC(pc9801_kbd_device::input_txd));
 	m_sio_kbd->rxrdy_handler().set_inputline(m_maincpu, INPUT_LINE_IRQ1);
+	m_sio_kbd->write_cts(0);
+	m_sio_kbd->write_dsr(0);
 
 	clock_device &kbd_clock(CLOCK(config, "kbd_clock", 19'200));
 	kbd_clock.signal_handler().set(m_sio_kbd, FUNC(i8251_device::write_rxc));

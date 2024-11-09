@@ -2150,6 +2150,10 @@ void pc9801_state::pc9801_keyboard(machine_config &config)
 {
 	I8251(config, m_sio_kbd, 0);
 	m_sio_kbd->txd_handler().set("keyb", FUNC(pc9801_kbd_device::input_txd));
+	m_sio_kbd->dtr_handler().set("keyb", FUNC(pc9801_kbd_device::input_rty));
+	m_sio_kbd->rts_handler().set("keyb", FUNC(pc9801_kbd_device::input_kbde));
+	m_sio_kbd->write_cts(0);
+	m_sio_kbd->write_dsr(0);
 	m_sio_kbd->rxrdy_handler().set(m_pic1, FUNC(pic8259_device::ir1_w));
 
 	clock_device &kbd_clock(CLOCK(config, "kbd_clock", 19'200));
@@ -2158,8 +2162,6 @@ void pc9801_state::pc9801_keyboard(machine_config &config)
 
 	PC9801_KBD(config, m_keyb, 0);
 	m_keyb->rxd_callback().set("sio_kbd", FUNC(i8251_device::write_rxd));
-	m_keyb->rdy_callback().set("sio_kbd", FUNC(i8251_device::write_cts));
-	m_keyb->rty_callback().set("sio_kbd", FUNC(i8251_device::write_dsr));
 }
 
 void pc9801_state::pit_clock_config(machine_config &config, const XTAL clock)
