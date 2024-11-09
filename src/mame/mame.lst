@@ -24059,6 +24059,9 @@ gradius3a                       // GX945 (c) 1989 (Asia)
 gradius3j                       // GX945 (c) 1989 (Japan)
 gradius3js                      // GX945 (c) 1989 (Japan, split)
 
+@source:konami/gryzor_ms.cpp
+gryzorm                         // bootleg (Modular System)
+
 @source:konami/gticlub.cpp
 gticlub                         // GX688 (c)1996 Euro EAA
 gticluba                        // GX688 (c)1996 Asia AAA
