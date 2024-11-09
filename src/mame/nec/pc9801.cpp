@@ -638,9 +638,9 @@ void pc9801_state::pc9801_common_io(address_map &map)
 	map(0x0000, 0x001f).rw(FUNC(pc9801_state::pic_r), FUNC(pc9801_state::pic_w)).umask16(0x00ff); // i8259 PIC (bit 3 ON slave / master) / i8237 DMA
 	map(0x0020, 0x002f).w(FUNC(pc9801_state::rtc_w)).umask16(0x00ff);
 	map(0x0030, 0x0037).rw(m_ppi_sys, FUNC(i8255_device::read), FUNC(i8255_device::write)).umask16(0xff00);
-	map(0x0030, 0x0033).rw(m_sio, FUNC(i8251_device::read), FUNC(i8251_device::write)).umask16(0x00ff); //i8251 RS232c / i8255 system port
+	map(0x0030, 0x0033).rw(m_sio_rs, FUNC(i8251_device::read), FUNC(i8251_device::write)).umask16(0x00ff); //i8251 RS232c / i8255 system port
 	map(0x0040, 0x0047).rw(m_ppi_prn, FUNC(i8255_device::read), FUNC(i8255_device::write)).umask16(0x00ff);
-	map(0x0040, 0x0047).rw(m_keyb, FUNC(pc9801_kbd_device::rx_r), FUNC(pc9801_kbd_device::tx_w)).umask16(0xff00); //i8255 printer port / i8251 keyboard
+	map(0x0040, 0x0043).rw(m_sio_kbd, FUNC(i8251_device::read), FUNC(i8251_device::write)).umask16(0xff00); //i8255 printer port / i8251 keyboard
 	map(0x0050, 0x0057).lr8(NAME([] (offs_t offset) { return 0xff; })).umask16(0xff00);
 	map(0x0050, 0x0053).w(FUNC(pc9801_state::nmi_ctrl_w)).umask16(0x00ff); // NMI FF / host FDD 2d (PC-80S31K)
 	map(0x0060, 0x0063).rw(m_hgdc[0], FUNC(upd7220_device::read), FUNC(upd7220_device::write)).umask16(0x00ff); //upd7220 character ports / <undefined>
@@ -651,7 +651,7 @@ void pc9801_state::pc9801_common_io(address_map &map)
 	// (can be accessed only thru the $3fdb alias)
 	map(0x0070, 0x0077).rw(m_pit, FUNC(pit8253_device::read), FUNC(pit8253_device::write)).umask16(0xff00);
 	map(0x0070, 0x007f).rw(FUNC(pc9801_state::txt_scrl_r), FUNC(pc9801_state::txt_scrl_w)).umask16(0x00ff); //display registers / i8253 pit
-//  map(0x0090, 0x0093).rw(m_sio, FUNC(i8251_device::read), FUNC(i8251_device::write)).umask16(0xff00); // CMT SIO (optional, C-Bus)
+//  map(0x0090, 0x0093).rw(m_sio_cmt, FUNC(i8251_device::read), FUNC(i8251_device::write)).umask16(0xff00); // CMT SIO (optional, C-Bus)
 	map(0x7fd8, 0x7fdf).rw(m_ppi_mouse, FUNC(i8255_device::read), FUNC(i8255_device::write)).umask16(0xff00);
 }
 
@@ -1030,6 +1030,10 @@ void pc9801vm_state::pc9801rs_video_ff_w(offs_t offset, uint8_t data)
  * ---- --x- Graph LIO BIOS select (?), on 9801VX21
  * ---- ---x Mate A: selects high-reso mode
  *           ^ unknown otherwise
+ *
+ * TODO: why BIOS has to read it twice during cold boot?
+ * Later 9821 machines will add a mov bh,al on second read, is there some kind of side
+ * effect for reading?
  */
 u8 pc9801vm_state::dma_access_ctrl_r(offs_t offset)
 {
@@ -2077,7 +2081,9 @@ MACHINE_RESET_MEMBER(pc9801vm_state,pc9801rs)
 	m_fdc_mode = 3;
 	fdc_set_density_mode(true); // 2HD
 	// 0xfb on PC98XL
-	m_dma_access_ctrl = 0xfe;
+	// TODO: breaks UART setup for pc9801rs
+	// m_dma_access_ctrl = 0xfe;
+	m_dma_access_ctrl = 0;
 	m_ide_sel = 0;
 	m_maincpu->set_input_line(INPUT_LINE_A20, m_gate_a20);
 
@@ -2143,8 +2149,20 @@ void pc9801_atapi_devices(device_slot_interface &device)
 
 void pc9801_state::pc9801_keyboard(machine_config &config)
 {
-	PC9801_KBD(config, m_keyb, 53);
-	m_keyb->irq_wr_callback().set(m_pic1, FUNC(pic8259_device::ir1_w));
+	I8251(config, m_sio_kbd, 0);
+	m_sio_kbd->txd_handler().set("keyb", FUNC(pc9801_kbd_device::input_txd));
+	m_sio_kbd->dtr_handler().set("keyb", FUNC(pc9801_kbd_device::input_rty));
+	m_sio_kbd->rts_handler().set("keyb", FUNC(pc9801_kbd_device::input_kbde));
+	m_sio_kbd->write_cts(0);
+	m_sio_kbd->write_dsr(0);
+	m_sio_kbd->rxrdy_handler().set(m_pic1, FUNC(pic8259_device::ir1_w));
+
+	clock_device &kbd_clock(CLOCK(config, "kbd_clock", 19'200));
+	kbd_clock.signal_handler().set(m_sio_kbd, FUNC(i8251_device::write_rxc));
+	kbd_clock.signal_handler().append(m_sio_kbd, FUNC(i8251_device::write_txc));
+
+	PC9801_KBD(config, m_keyb, 0);
+	m_keyb->rxd_callback().set("sio_kbd", FUNC(i8251_device::write_rxd));
 }
 
 void pc9801_state::pit_clock_config(machine_config &config, const XTAL clock)
@@ -2251,18 +2269,18 @@ void pc9801vm_state::pc9801_ide(machine_config &config)
 void pc98_base_state::pc9801_serial(machine_config &config)
 {
 	// clocked by PIT channel 2
-	I8251(config, m_sio, 0);
-	m_sio->txd_handler().set("serial", FUNC(rs232_port_device::write_txd));
-	m_sio->rts_handler().set("serial", FUNC(rs232_port_device::write_rts));
-	m_sio->dtr_handler().set("serial", FUNC(rs232_port_device::write_dtr));
-	m_sio->rxrdy_handler().set([this] (int state) { update_uart_irq<0>(state); });
-	m_sio->txempty_handler().set([this] (int state) { update_uart_irq<1>(state); });
-	m_sio->txrdy_handler().set([this] (int state) { update_uart_irq<2>(state); });
+	I8251(config, m_sio_rs, 0);
+	m_sio_rs->txd_handler().set("serial", FUNC(rs232_port_device::write_txd));
+	m_sio_rs->rts_handler().set("serial", FUNC(rs232_port_device::write_rts));
+	m_sio_rs->dtr_handler().set("serial", FUNC(rs232_port_device::write_dtr));
+	m_sio_rs->rxrdy_handler().set([this] (int state) { update_uart_irq<0>(state); });
+	m_sio_rs->txempty_handler().set([this] (int state) { update_uart_irq<1>(state); });
+	m_sio_rs->txrdy_handler().set([this] (int state) { update_uart_irq<2>(state); });
 
 	rs232_port_device &rs232(RS232_PORT(config, "serial", default_rs232_devices, nullptr));
-	rs232.rxd_handler().set(m_sio, FUNC(i8251_device::write_rxd));
-	rs232.cts_handler().set(m_sio, FUNC(i8251_device::write_cts));
-	rs232.dsr_handler().set(m_sio, FUNC(i8251_device::write_dsr));
+	rs232.rxd_handler().set(m_sio_rs, FUNC(i8251_device::write_rxd));
+	rs232.cts_handler().set(m_sio_rs, FUNC(i8251_device::write_cts));
+	rs232.dsr_handler().set(m_sio_rs, FUNC(i8251_device::write_dsr));
 }
 
 void pc9801_state::pc9801_common(machine_config &config)
@@ -2272,8 +2290,8 @@ void pc9801_state::pc9801_common(machine_config &config)
 	m_pit->out_handler<0>().set(m_pic1, FUNC(pic8259_device::ir0_w));
 	m_pit->set_clk<1>(MAIN_CLOCK_X1); // Memory Refresh
 	m_pit->set_clk<2>(MAIN_CLOCK_X1); // RS-232C
-	m_pit->out_handler<2>().set(m_sio, FUNC(i8251_device::write_txc));
-	m_pit->out_handler<2>().append(m_sio, FUNC(i8251_device::write_rxc));
+	m_pit->out_handler<2>().set(m_sio_rs, FUNC(i8251_device::write_txc));
+	m_pit->out_handler<2>().append(m_sio_rs, FUNC(i8251_device::write_rxc));
 
 	AM9517A(config, m_dmac, 5000000); // unknown clock, TODO: check channels 0 - 1
 	m_dmac->dreq_active_low();
