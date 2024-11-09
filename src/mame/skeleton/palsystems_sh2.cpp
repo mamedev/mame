@@ -200,7 +200,7 @@ ROM_START( mpoker2a ) // this was on the PAL POKER 3 PCB
 	ROM_LOAD( "flash56.bin", 0x000000, 0x200000, CRC(fbca21df) SHA1(78ab98468bb4d5563d14a9a5be4be73112e8b0a2) )
 
 	ROM_REGION( 0x80000, "oki", 0 )
-	ROM_LOAD( "msm27c401.bin", 0x00000, 0x80000, NO_DUMP )
+	ROM_LOAD( "msm27c401cz.bin", 0x00000, 0x80000, CRC(c55fd486) SHA1(e8ba3686b1f88a70863da7dd6dcfa39e80c569f5) )
 ROM_END
 
 ROM_START( mpoker2b ) // this was on the SH-POKER V3.0
