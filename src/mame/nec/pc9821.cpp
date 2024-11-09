@@ -59,6 +59,8 @@ uint32_t pc9821_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap
 			u32 base_address;
 			u16 pitch;
 			u8 im;
+			// 0x68: VRAM 800/480 line mode (os2warp3)
+			const u32 vram_base = BIT(m_ex_video_ff[0x68 >> 1], 0) ? 0 : m_vram_disp * 0x40000;
 
 			for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 			{
@@ -79,7 +81,7 @@ uint32_t pc9821_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap
 						int res_x = x + xi;
 						int res_y = y;
 
-						u16 pen = ext_gvram[(address + xi) + (m_vram_disp * 0x40000)];
+						u16 pen = ext_gvram[((address + xi) + vram_base) & 0x7ffff];
 
 						bitmap.pix(res_y, res_x) = palette[(pen & 0xff) + 0x20];
 					}
@@ -314,6 +316,7 @@ void pc9821_state::pc9821_mode_ff_w(u8 data)
 	// BA / BX / PC-H98 / PC-9821 / 98NOTE uses this f/f in place of 15/24 kHz switch
 	// TODO: better compose
 	// TODO: both frequencies needs to be verified
+	// TODO: os2warp3 still runs at wrong clock, why?
 	// 31 kHz from standard VGA clock (flashb)
 	if (mode_ff == 0x20)
 	{
@@ -322,6 +325,8 @@ void pc9821_state::pc9821_mode_ff_w(u8 data)
 		m_hgdc[0]->set_unscaled_clock(screen_clock);
 		m_hgdc[1]->set_unscaled_clock(screen_clock);
 	}
+	else
+		logerror("Mode f/f $0068: [%02x] -> %02x\n", mode_ff, setting);
 }
 
 // $e0000 base
