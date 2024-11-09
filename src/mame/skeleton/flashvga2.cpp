@@ -39,10 +39,12 @@ Skeleton driver for "Flash VGA 2" hardware (from TourVisión?) for video-slots.
 *****************************************************************************/
 
 #include "emu.h"
+
 #include "cpu/i86/i186.h"
-#include "emupal.h"
 #include "machine/mc68681.h"
 #include "machine/timekpr.h"
+
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
