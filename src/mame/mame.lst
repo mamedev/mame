@@ -42560,6 +42560,11 @@ p8000_16                        //
 @source:skeleton/palestra.cpp
 palestra
 
+@source:skeleton/palsystems_sh2.cpp
+mpoker2                         //
+mpoker2a                        //
+mpoker2b                        //
+
 @source:skeleton/pap2.cpp
 pap2
 
