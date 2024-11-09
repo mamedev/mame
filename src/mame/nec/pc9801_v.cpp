@@ -826,13 +826,6 @@ uint16_t pc9801vm_state::egc_blit_r(uint32_t offset, uint16_t mem_mask)
 		m_egc.pat[2] = m_video_ram[1][plane_off + (0x4000 * 3)];
 		m_egc.pat[3] = m_video_ram[1][plane_off];
 	}
-	//TODO: this needs another look
-	/*if(m_egc.first && !m_egc.init)
-	{
-	    m_egc.leftover[0] = m_egc.leftover[1] = m_egc.leftover[2] = m_egc.leftover[3] = 0;
-	    if(((m_egc.regs[6] >> 4) & 0xf) >= (m_egc.regs[6] & 0xf)) // check if we have enough bits
-	        m_egc.init = true;
-	}*/
 	m_egc.init = true;
 	for(int i = 0; i < 4; i++)
 		m_egc.src[i] = egc_shift(i, m_video_ram[1][plane_off + (((i + 1) & 3) * 0x4000)]);

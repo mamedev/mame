@@ -850,6 +850,7 @@ void pc9801vm_state::egc_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 	{
 		case 6:
 		case 7:
+			m_egc.leftover[0] = m_egc.leftover[1] = m_egc.leftover[2] = m_egc.leftover[3] = 0;
 			m_egc.count = (m_egc.regs[7] & 0xfff) + 1;
 			m_egc.first = true;
 			m_egc.init = false;
