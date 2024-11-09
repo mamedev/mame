@@ -49,6 +49,8 @@ pc9801_kbd_device::pc9801_kbd_device(const machine_config &mconfig, const char *
 	, device_buffered_serial_interface(mconfig, *this)
 	, device_matrix_keyboard_interface(mconfig, *this, "KEY0", "KEY1", "KEY2", "KEY3", "KEY4", "KEY5", "KEY6", "KEY7", "KEY8", "KEY9", "KEYA", "KEYB", "KEYC", "KEYD", "KEYE", "KEYF")
 	, m_tx_cb(*this)
+	, m_kbde_state(0)
+	, m_rty_state(0)
 {
 }
 
@@ -360,10 +362,11 @@ void pc9801_kbd_device::rcv_complete()
 
 void pc9801_kbd_device::input_kbde(int state)
 {
-	if (state)
+	if (!m_kbde_state && state)
 		start_processing(attotime::from_hz(BAUD));
-	else
+	if (m_kbde_state && !state)
 		stop_processing();
+	m_kbde_state = state;
 }
 
 void pc9801_kbd_device::input_rty(int state)

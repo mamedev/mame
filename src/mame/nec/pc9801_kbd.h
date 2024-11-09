@@ -70,8 +70,9 @@ private:
 //  devcb_write_line m_rdy_cb;
 //  devcb_write_line m_rty_cb;
 
-//  bool m_repeat_state = false;
-	int m_rty_state = 0;
+//  bool m_repeat_state;
+	int m_kbde_state;
+	int m_rty_state;
 };
 
 
