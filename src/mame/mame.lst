@@ -42255,11 +42255,11 @@ fanucspgm                       // 1983
 @source:skeleton/fc100.cpp
 fc100                           //
 
-@source:skeleton/flashvga2.cpp
-ruletamag                       // (c) 2005 Codere
-
 @source:skeleton/fk1.cpp
 fk1                             //
+
+@source:skeleton/flashvga2.cpp
+ruletamag                       // (c) 2005 Codere
 
 @source:skeleton/fs3216.cpp
 fs3216                          //
