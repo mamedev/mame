@@ -172,7 +172,8 @@ template<int N>
 void royal_state::lcd_segs_w(u8 data)
 {
 	// R0x,R6x-R8x: LCD segment data
-	m_lcd_segs = (m_lcd_segs & ~(0xf << (N*4))) | (data << (N*4));
+	const u8 shift = N * 4;
+	m_lcd_segs = (m_lcd_segs & ~(0xf << shift)) | (data << shift);
 	update_lcd();
 }
 

@@ -324,18 +324,20 @@ inline void system1_state::videoram_wait_states(cpu_device *cpu)
 	   and is only restarted by the FIXST signal, which occurs once every
 	   'n' pixel clocks. 'n' is determined by the horizontal control PAL. */
 
-	/* this assumes 4 5MHz pixel clocks per FIXST, or 8*4 20MHz CPU clocks,
+	/* this assumes 4 5MHz pixel clocks per FIXST, or 3.2 4MHz CPU clocks,
 	   and is based on a dump of 315-5137 */
-	const u32 cpu_cycles_per_fixst = 4 * 4;
-	const u32 fixst_offset = 2 * 4;
-	u32 cycles_until_next_fixst = cpu_cycles_per_fixst - ((cpu->total_cycles() - fixst_offset) % cpu_cycles_per_fixst);
+	const u32 cpu_cycles_per_fixst = 32; // 3.2 * 10
+	const u32 fixst_offset = cpu_cycles_per_fixst / 2;
+	const u64 total_cycles = cpu->total_cycles() * 10ULL;
+	u32 cycles_until_next_fixst = cpu_cycles_per_fixst - ((total_cycles - fixst_offset) % cpu_cycles_per_fixst);
 
-	cpu->adjust_icount(-cycles_until_next_fixst);
+	cpu->adjust_icount(-((cycles_until_next_fixst + 5) / 10));
 }
 
 u8 system1_state::videoram_r(offs_t offset)
 {
-	videoram_wait_states(m_maincpu);
+	if (!machine().side_effects_disabled())
+		videoram_wait_states(m_maincpu);
 	offset |= 0x1000 * ((m_videoram_bank >> 1) % (m_tilemap_pages / 2));
 	return m_videoram[offset];
 }
@@ -344,9 +346,6 @@ void system1_state::videoram_w(offs_t offset, u8 data)
 {
 	videoram_wait_states(m_maincpu);
 	offset |= 0x1000 * ((m_videoram_bank >> 1) % (m_tilemap_pages / 2));
-	m_videoram[offset] = data;
-
-	m_tilemap_page[offset / 0x800]->mark_tile_dirty((offset % 0x800) / 2);
 
 	/* force a partial update if the page is changing */
 	if (m_tilemap_pages > 2 && offset >= 0x740 && offset < 0x748 && offset % 2 == 0)
@@ -354,6 +353,9 @@ void system1_state::videoram_w(offs_t offset, u8 data)
 		//m_screen->update_now();
 		m_screen->update_partial(m_screen->vpos());
 	}
+
+	m_videoram[offset] = data;
+	m_tilemap_page[offset / 0x800]->mark_tile_dirty((offset % 0x800) / 2);
 }
 
 void system1_state::videoram_bank_w(u8 data)
@@ -534,10 +536,10 @@ void system1_state::video_update_common(screen_device &screen, bitmap_ind16 &bit
 
 			/* using the sprite, background, and foreground pixels, look up the color behavior */
 			const u8 lookup_index =  (((sprpix & 0xf) == 0) << 0) |
-							(((fgpix & 7) == 0) << 1) |
-							(((fgpix >> 9) & 3) << 2) |
-							(((bgpix & 7) == 0) << 4) |
-							(((bgpix >> 9) & 3) << 5);
+					(((fgpix & 7) == 0) << 1) |
+					(((fgpix >> 9) & 3) << 2) |
+					(((bgpix & 7) == 0) << 4) |
+					(((bgpix >> 9) & 3) << 5);
 			u8 lookup_value = m_lookup_prom[lookup_index];
 
 			/* compute collisions based on two of the PROM bits */

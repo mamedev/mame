@@ -9141,6 +9141,20 @@ void galaxian_state::init_jumpbug()
 }
 
 
+void galaxian_state::init_jumpbugbc()
+{
+	init_jumpbug();
+
+	uint8_t *romdata = memregion("maincpu")->base();
+	uint8_t buf[0x10000];
+	memcpy(buf, romdata, 0x10000);
+
+	// descramble the content of each 0x100 block
+	for (int i = 0; i < 0x10000; i++)
+		romdata[i] = buf[i ^ 0xff];
+}
+
+
 void galaxian_state::init_checkman()
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
@@ -13589,6 +13603,62 @@ ROM_START( jumpbugbrf )
 	ROM_LOAD( "82s123.bin",   0x0000, 0x0020, CRC(4e3caeab) SHA1(a25083c3e36d28afdefe4af6e6d4f3155e303625) )
 ROM_END
 
+ROM_START( jumpbugbc ) // bootleg on an Cirsa-branded Galaxian PCB with a Novatronic NVS board (https://www.recreativas.org/novatronic-video-sistema-nvs-6072-novatronic-sa).
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "j3_2732_e0572.a3", 0x0000, 0x0200, CRC(74b16a8a) SHA1(16b15142f8cc7d8a91bbd08ae456a5e5c5733910) )
+	ROM_CONTINUE(                 0x2200, 0x0200)
+	ROM_CONTINUE(                 0x0400, 0x0200)
+	ROM_CONTINUE(                 0x2600, 0x0200)
+	ROM_CONTINUE(                 0x2800, 0x0800)
+	ROM_LOAD( "j4_2732_e0572.a2", 0x1000, 0x0200, CRC(24308e02) SHA1(8a85f3e7d95db8a692b5834d6a4186037d1d94c3) )
+	ROM_CONTINUE(                 0x3200, 0x0200)
+	ROM_CONTINUE(                 0x1400, 0x0200)
+	ROM_CONTINUE(                 0x3600, 0x0200)
+	ROM_CONTINUE(                 0x3800, 0x0800)
+	ROM_LOAD( "j1_2732_e0572.a5", 0x2000, 0x0200, CRC(b45a5ba1) SHA1(d6357ed9a4cbde2cf8865097bbfaa039ba01b614) )
+	ROM_CONTINUE(                 0x0200, 0x0200)
+	ROM_CONTINUE(                 0x2400, 0x0200)
+	ROM_CONTINUE(                 0x0600, 0x0200)
+	ROM_CONTINUE(                 0x0800, 0x0800)
+	ROM_LOAD( "j2_2732_e0572.a4", 0x3000, 0x0200, CRC(cf9085a4) SHA1(b83b5eaf8f0620370215199728b45a5578a16f64) )
+	ROM_CONTINUE(                 0x1200, 0x0200)
+	ROM_CONTINUE(                 0x3400, 0x0200)
+	ROM_CONTINUE(                 0x1600, 0x0200)
+	ROM_CONTINUE(                 0x1800, 0x0800)
+	ROM_LOAD( "j6_2732_e0572.b1", 0x8000, 0x0200, CRC(bb9049fd) SHA1(71cdada93f5e8d50520fdeb7edf48b590913dfba) )
+	ROM_CONTINUE(                 0x9200, 0x0200)
+	ROM_CONTINUE(                 0x8400, 0x0200)
+	ROM_CONTINUE(                 0x9600, 0x0200)
+	ROM_CONTINUE(                 0x8800, 0x0200)
+	ROM_CONTINUE(                 0x9a00, 0x0200)
+	ROM_CONTINUE(                 0x8c00, 0x0200)
+	ROM_CONTINUE(                 0x9e00, 0x0200)
+	ROM_LOAD( "j5_2732_e0572.a1", 0x9000, 0x0200, CRC(9c6c77bb) SHA1(d44b851f2cc6bee046d90ad4c279e658eefac91c) )
+	ROM_CONTINUE(                 0x8200, 0x0200)
+	ROM_CONTINUE(                 0x9400, 0x0200)
+	ROM_CONTINUE(                 0x8600, 0x0200)
+	ROM_CONTINUE(                 0x9800, 0x0200)
+	ROM_CONTINUE(                 0x8a00, 0x0200)
+	ROM_CONTINUE(                 0x9c00, 0x0200)
+	ROM_CONTINUE(                 0x8e00, 0x0200)
+	ROM_LOAD( "j7_2716_e0572.b2", 0xa000, 0x0800, CRC(81fdc344) SHA1(873d131a889cfbdbeb06b8652d45b6f14d0c2124) )
+	ROM_LOAD( "j8_2716_e0572.b3", 0xa800, 0x0800, CRC(a75ea283) SHA1(36e248de0af917ff4c054b788918483057c84d9b) )
+
+	ROM_REGION( 0x3000, "gfx1", 0 )
+	ROM_LOAD( "c1_2716_sub.bin",  0x0000, 0x0800, CRC(9a091b0a) SHA1(19b88f802ee80ff8901ef99e3688f2869f1a69c5) )
+	ROM_LOAD( "c4_2532_sub.bin",  0x1000, 0x0800, CRC(e12e6f3d) SHA1(c2bf562919e3972a1569bc90b9679ef5e4108c4b) )
+	ROM_CONTINUE(                 0x0800, 0x0800)
+	ROM_LOAD( "c2_2716_sub.bin",  0x1800, 0x0800, CRC(7749b111) SHA1(55071ce04708bd52177644298f76ae79d23f6ac9) )
+	ROM_LOAD( "c3_2532_sub.bin",  0x2800, 0x0800, CRC(5d7df54f) SHA1(d1e6072625c9eaec79714489aeb67b063990cf39) )
+	ROM_CONTINUE(                 0x2000, 0x0800)
+
+	ROM_REGION( 0x0020, "proms", 0 )
+	ROM_LOAD( "74s288.bin",       0x0000, 0x0020, CRC(6a0c7d87) SHA1(140335d85c67c75b65689d4e76d29863c209cf32) )
+
+	ROM_REGION( 0x0200, "nvs", 0 ) // Additional PROM on the Novatronic NVS board
+	ROM_LOAD( "82s135_e0572.a6",  0x0000, 0x0100, NO_DUMP )
+ROM_END
+
 ROM_START( olibug ) // bootleg on an original Midway Galaxian PCB
 	ROM_REGION( 0x10000, "maincpu", 0 ) // b6 and b7 differ from jumpbugb
 	ROM_LOAD( "b1.bin",  0x0000, 0x1000, CRC(415aa1b7) SHA1(4f9edd7e9720acf085dd8910849c2f2fac5cb547) )
@@ -16690,6 +16760,7 @@ GAME( 198?, timefgtr,    0,        timefgtr,   timefgtr,   galaxian_state, init_
 GAME( 1981, jumpbug,     0,        jumpbug,    jumpbug,    galaxian_state, init_jumpbug,    ROT90,  "Hoei (Rock-Ola license)",      "Jump Bug",                      MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND ) // or by Alpha Denshi Co. under contract from Hoei?
 GAME( 1981, jumpbugb,    jumpbug,  jumpbug,    jumpbug,    galaxian_state, init_jumpbug,    ROT90,  "bootleg",                      "Jump Bug (bootleg, set 1)",     MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND ) // bootleg of Sega license
 GAME( 1982, jumpbugbrf,  jumpbug,  jumpbugbrf, jumpbug,    galaxian_state, init_jumpbug,    ROT90,  "bootleg (Recreativos Franco)", "Jump Bug (bootleg, set 2)",     MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE ) // bootleg from Recreativos Franco, without AY-8910
+GAME( 1982, jumpbugbc,   jumpbug,  jumpbugbrf, jumpbug,    galaxian_state, init_jumpbugbc,  ROT90,  "bootleg (Cirsa)",              "Jump Bug (bootleg, set 3)",     MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )// bootleg on Cirsa PCB, without AY-8910
 GAME( 1982, olibug,      jumpbug,  jumpbug,    jumpbug,    galaxian_state, init_jumpbug,    ROT90,  "bootleg",                      "Oli Bug (bootleg of Jump Bug)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND | MACHINE_WRONG_COLORS | MACHINE_NOT_WORKING ) // one bad GFX ROM, uses Galaxian color PROM?
 GAME( 1983, levers,      0,        jumpbug,    levers,     galaxian_state, init_jumpbug,    ROT90,  "Rock-Ola",                     "Levers",                        MACHINE_SUPPORTS_SAVE )
 

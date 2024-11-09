@@ -1393,9 +1393,9 @@ void to8_state::to8(machine_config &config)
 	m_video->set_lightpen_decal(TO8_LIGHTPEN_DECAL);
 	m_video->set_lightpen_steps(4);
 	m_video->set_vram_page_cb(FUNC(to8_state::get_vram_page));
-	downcast<to8_video_device &>(*m_video).set_update_ram_bank_cb(FUNC(to8_state::to8_update_ram_bank));
-	downcast<to8_video_device &>(*m_video).set_update_cart_bank_cb(FUNC(to8_state::to8_update_cart_bank));
-	downcast<to8_video_device &>(*m_video).lightpen_intr_cb().set(m_mainfirq, FUNC(input_merger_device::in_w<2>));
+	m_video->set_update_ram_bank_cb(FUNC(to8_state::to8_update_ram_bank));
+	m_video->set_update_cart_bank_cb(FUNC(to8_state::to8_update_cart_bank));
+	m_video->lightpen_intr_cb().set(m_mainfirq, FUNC(input_merger_device::in_w<2>));
 
 	SOFTWARE_LIST(config, "to8_cass_list").set_original("to8_cass");
 	SOFTWARE_LIST(config, "to8_qd_list").set_original("to8_qd");
@@ -1553,9 +1553,9 @@ void to8_state::to9p(machine_config &config)
 	m_video->set_lightpen_decal(TO8_LIGHTPEN_DECAL);
 	m_video->set_lightpen_steps(4);
 	m_video->set_vram_page_cb(FUNC(to8_state::get_vram_page));
-	downcast<to8_video_device &>(*m_video).set_update_ram_bank_cb(FUNC(to8_state::to8_update_ram_bank));
-	downcast<to8_video_device &>(*m_video).set_update_cart_bank_cb(FUNC(to8_state::to8_update_cart_bank));
-	downcast<to8_video_device &>(*m_video).lightpen_intr_cb().set(m_mainfirq, FUNC(input_merger_device::in_w<2>));
+	m_video->set_update_ram_bank_cb(FUNC(to8_state::to8_update_ram_bank));
+	m_video->set_update_cart_bank_cb(FUNC(to8_state::to8_update_cart_bank));
+	m_video->lightpen_intr_cb().set(m_mainfirq, FUNC(input_merger_device::in_w<2>));
 
 	SOFTWARE_LIST(config, "to8_cass_list").set_original("to8_cass");
 	SOFTWARE_LIST(config, "to8_qd_list").set_original("to8_qd");
@@ -1862,9 +1862,9 @@ void mo6_state::mo6(machine_config &config)
 	m_video->set_lightpen_decal(MO6_LIGHTPEN_DECAL);
 	m_video->set_lightpen_steps(3);
 	m_video->set_vram_page_cb(FUNC(mo6_state::get_vram_page));
-	downcast<to8_video_device &>(*m_video).set_update_ram_bank_cb(FUNC(mo6_state::mo6_update_ram_bank));
-	downcast<to8_video_device &>(*m_video).set_update_cart_bank_cb(FUNC(mo6_state::mo6_update_cart_bank));
-	downcast<to8_video_device &>(*m_video).lightpen_intr_cb().set(m_mainfirq, FUNC(input_merger_device::in_w<2>));
+	m_video->set_update_ram_bank_cb(FUNC(mo6_state::mo6_update_ram_bank));
+	m_video->set_update_cart_bank_cb(FUNC(mo6_state::mo6_update_cart_bank));
+	m_video->lightpen_intr_cb().set(m_mainfirq, FUNC(input_merger_device::in_w<2>));
 	m_video->int_50hz_cb().set(m_pia_sys, FUNC(pia6821_device::cb1_w));
 
 	config.device_remove("to7_cart_list");
@@ -2143,9 +2143,9 @@ void mo5nr_state::mo5nr(machine_config &config)
 	m_video->set_lightpen_decal(MO6_LIGHTPEN_DECAL);
 	m_video->set_lightpen_steps(3);
 	m_video->set_vram_page_cb(FUNC(mo5nr_state::get_vram_page));
-	downcast<to8_video_device &>(*m_video).set_update_ram_bank_cb(FUNC(mo5nr_state::mo6_update_ram_bank));
-	downcast<to8_video_device &>(*m_video).set_update_cart_bank_cb(FUNC(mo5nr_state::mo6_update_cart_bank));
-	downcast<to8_video_device &>(*m_video).lightpen_intr_cb().set(m_mainfirq, FUNC(input_merger_device::in_w<2>));
+	m_video->set_update_ram_bank_cb(FUNC(mo5nr_state::mo6_update_ram_bank));
+	m_video->set_update_cart_bank_cb(FUNC(mo5nr_state::mo6_update_cart_bank));
+	m_video->lightpen_intr_cb().set(m_mainfirq, FUNC(input_merger_device::in_w<2>));
 	m_video->int_50hz_cb().set(m_pia_sys, FUNC(pia6821_device::cb1_w));
 
 	config.device_remove("to7_cart_list");

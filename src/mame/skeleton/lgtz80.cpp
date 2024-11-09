@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:
+// copyright-holders:AJR
 
 /*
 Video slots by Logic Game Tech Int. (LGT).
@@ -9,7 +9,7 @@ scratched off rectangular 100-pin chip, stickered ASIC 1
 scratched off square 100-pin chip, stickered ASIC 2
 scratched off square 100-pin chip, stickered ASIC 3
 scratched off square 44-pin chip, stickered ASIC 4
-12 MHz XTAL (near ASCI 2)
+12 MHz XTAL (near ASIC 2)
 7.3728 MHz XTAL (near ASIC 4)
 U6295 sound chip
 HM86171-80 RAM (near CPU ROM)
@@ -40,7 +40,8 @@ class lgtz80_state : public driver_device
 public:
 	lgtz80_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu")
+		m_maincpu(*this, "maincpu"),
+		m_control(0)
 	{ }
 
 	void lgtz80(machine_config &config) ATTR_COLD;
@@ -49,6 +50,8 @@ public:
 	void init_fruitcat() ATTR_COLD;
 
 protected:
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 	virtual void video_start() override ATTR_COLD;
 
 private:
@@ -56,13 +59,28 @@ private:
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
+	uint8_t control_r();
+	void control_w(uint8_t data);
+
 	void program_map(address_map &map) ATTR_COLD;
+	void io_map(address_map &map) ATTR_COLD;
+
+	uint8_t m_control;
 };
 
 
+void lgtz80_state::machine_start()
+{
+	save_item(NAME(m_control));
+}
+
+void lgtz80_state::machine_reset()
+{
+	m_control = 0;
+}
+
 uint32_t lgtz80_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-
 	return 0;
 }
 
@@ -71,9 +89,30 @@ void lgtz80_state::video_start()
 }
 
 
+uint8_t lgtz80_state::control_r()
+{
+	return m_control;
+}
+
+void lgtz80_state::control_w(uint8_t data)
+{
+	// Bit 7 = NMI mask
+	logerror("%s: control_w(%02X)\n", machine().describe_context(), data);
+	m_control = data;
+}
+
 void lgtz80_state::program_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0x9fff).ram(); // NVRAM?
+	map(0xb000, 0xbfff).rom(); // not correct
+	map(0xf800, 0xffff).ram();
+}
+
+void lgtz80_state::io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0xc0, 0xc0).rw(FUNC(lgtz80_state::control_r), FUNC(lgtz80_state::control_w));
 }
 
 
@@ -121,6 +160,7 @@ void lgtz80_state::lgtz80(machine_config &config)
 {
 	Z80(config, m_maincpu, 12_MHz_XTAL / 4 ); // exact CPU model and divider not verified
 	m_maincpu->set_addrmap(AS_PROGRAM, &lgtz80_state::program_map);
+	m_maincpu->set_addrmap(AS_IO, &lgtz80_state::io_map);
 	// m_maincpu->set_vblank_int("screen", FUNC(lgtz80_state::irq0_line_hold));
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER)); // TODO
@@ -173,12 +213,232 @@ ROM_END
 
 void lgtz80_state::init_fruitcat()
 {
-	// TODO: encryption involves at least a bitswap, maybe conditional on address lines (not verified yet)
+	// Encryption involves a permutation of odd-numbered data lines, conditional on address lines
+	uint8_t *rom = memregion("maincpu")->base();
+	for (int i = 0; i < 0x20000; i++)
+	{
+		switch (i & 0x7c0)
+		{
+		case 0x000:
+			rom[i] = bitswap<8>(rom[i], 5, 6, 7, 4, 1, 2, 3, 0);
+			break;
+
+		case 0x040:
+		case 0x440:
+			rom[i] = bitswap<8>(rom[i], 7, 6, 3, 4, 1, 2, 5, 0);
+			break;
+
+		case 0x080:
+		case 0x480:
+			rom[i] = bitswap<8>(rom[i], 1, 6, 7, 4, 5, 2, 3, 0);
+			break;
+
+		case 0x0c0:
+			rom[i] = bitswap<8>(rom[i], 1, 6, 5, 4, 3, 2, 7, 0);
+			break;
+
+		case 0x100:
+		case 0x400:
+			rom[i] = bitswap<8>(rom[i], 3, 6, 7, 4, 5, 2, 1, 0);
+			break;
+
+		case 0x140:
+			rom[i] = bitswap<8>(rom[i], 1, 6, 3, 4, 7, 2, 5, 0);
+			break;
+
+		case 0x180:
+		case 0x2c0:
+			rom[i] = bitswap<8>(rom[i], 3, 6, 5, 4, 1, 2, 7, 0);
+			break;
+
+		case 0x1c0:
+			rom[i] = bitswap<8>(rom[i], 7, 6, 5, 4, 1, 2, 3, 0);
+			break;
+
+		case 0x200:
+			rom[i] = bitswap<8>(rom[i], 5, 6, 3, 4, 1, 2, 7, 0);
+			break;
+
+		case 0x240:
+		case 0x5c0:
+			rom[i] = bitswap<8>(rom[i], 5, 6, 1, 4, 7, 2, 3, 0);
+			break;
+
+		case 0x280:
+			rom[i] = bitswap<8>(rom[i], 3, 6, 1, 4, 7, 2, 5, 0);
+			break;
+
+		case 0x300:
+			//rom[i] = bitswap<8>(rom[i], 7, 6, 5, 4, 3, 2, 1, 0);
+			break;
+
+		case 0x340:
+			rom[i] = bitswap<8>(rom[i], 1, 6, 7, 4, 3, 2, 5, 0);
+			break;
+
+		case 0x380:
+			rom[i] = bitswap<8>(rom[i], 5, 6, 3, 4, 7, 2, 1, 0);
+			break;
+
+		case 0x3c0:
+		case 0x540:
+			rom[i] = bitswap<8>(rom[i], 5, 6, 1, 4, 3, 2, 7, 0);
+			break;
+
+		case 0x4c0:
+			rom[i] = bitswap<8>(rom[i], 7, 6, 3, 4, 5, 2, 1, 0);
+			break;
+
+		case 0x500:
+		case 0x780:
+			rom[i] = bitswap<8>(rom[i], 7, 6, 1, 4, 5, 2, 3, 0);
+			break;
+
+		case 0x580:
+			rom[i] = bitswap<8>(rom[i], 1, 6, 5, 4, 7, 2, 3, 0);
+			break;
+
+		case 0x600:
+		case 0x680:
+			rom[i] = bitswap<8>(rom[i], 7, 6, 1, 4, 3, 2, 5, 0);
+			break;
+
+		case 0x640:
+			rom[i] = bitswap<8>(rom[i], 3, 6, 5, 4, 7, 2, 1, 0);
+			break;
+
+		case 0x6c0:
+			rom[i] = bitswap<8>(rom[i], 5, 6, 7, 4, 3, 2, 1, 0);
+			break;
+
+		case 0x700:
+			rom[i] = bitswap<8>(rom[i], 3, 6, 7, 4, 1, 2, 5, 0);
+			break;
+
+		case 0x740:
+			rom[i] = bitswap<8>(rom[i], 3, 6, 1, 4, 5, 2, 7, 0);
+			break;
+
+		case 0x7c0:
+			rom[i] = bitswap<8>(rom[i], 1, 6, 3, 4, 5, 2, 7, 0);
+			break;
+		}
+	}
 }
 
 void lgtz80_state::init_arthurkn()
 {
-	// TODO: encryption involves at least a bitswap, maybe conditional on address lines (not verified yet)
+	// Encryption involves a permutation of odd-numbered data lines, conditional on address lines
+	uint8_t *rom = memregion("maincpu")->base();
+	for (int i = 0; i < 0x20000; i++)
+	{
+		switch (i & 0x7c0)
+		{
+		case 0x000:
+		case 0x1c0:
+			rom[i] = bitswap<8>(rom[i], 3, 6, 5, 4, 1, 2, 7, 0);
+			break;
+
+		case 0x040:
+		case 0x0c0:
+			rom[i] = bitswap<8>(rom[i], 7, 6, 3, 4, 1, 2, 5, 0);
+			break;
+
+		case 0x080:
+		case 0x2c0:
+			rom[i] = bitswap<8>(rom[i], 5, 6, 1, 4, 7, 2, 3, 0);
+			break;
+
+		case 0x100:
+			rom[i] = bitswap<8>(rom[i], 1, 6, 7, 4, 3, 2, 5, 0);
+			break;
+
+		case 0x140:
+		case 0x340:
+			rom[i] = bitswap<8>(rom[i], 3, 6, 7, 4, 5, 2, 1, 0);	
+			break;
+
+		case 0x180:
+			//rom[i] = bitswap<8>(rom[i], 7, 6, 5, 4, 3, 2, 1, 0);
+			break;
+
+		case 0x200:
+		case 0x380:
+			rom[i] = bitswap<8>(rom[i], 7, 6, 1, 4, 3, 2, 5, 0);
+			break;
+
+		case 0x240:
+			rom[i] = bitswap<8>(rom[i], 5, 6, 3, 4, 1, 2, 7, 0);
+			break;
+
+		case 0x280:
+		case 0x300:
+			rom[i] = bitswap<8>(rom[i], 7, 6, 1, 4, 5, 2, 3, 0);
+			break;
+
+		case 0x3c0:
+		case 0x440:
+			rom[i] = bitswap<8>(rom[i], 5, 6, 1, 4, 3, 2, 7, 0);
+			break;
+
+		case 0x400:
+		case 0x480:
+			rom[i] = bitswap<8>(rom[i], 1, 6, 7, 4, 5, 2, 3, 0);
+			break;
+
+		case 0x4c0:
+			rom[i] = bitswap<8>(rom[i], 5, 6, 7, 4, 3, 2, 1, 0);
+			break;
+
+		case 0x500:
+			rom[i] = bitswap<8>(rom[i], 3, 6, 1, 4, 7, 2, 5, 0);
+			break;
+
+		case 0x540:
+			rom[i] = bitswap<8>(rom[i], 1, 6, 5, 4, 7, 2, 3, 0);
+			break;
+
+		case 0x580:
+			rom[i] = bitswap<8>(rom[i], 3, 6, 5, 4, 7, 2, 1, 0);
+			break;
+
+		case 0x5c0:
+			rom[i] = bitswap<8>(rom[i], 3, 6, 1, 4, 5, 2, 7, 0);
+			break;
+
+		case 0x600:
+			rom[i] = bitswap<8>(rom[i], 7, 6, 5, 4, 1, 2, 3, 0);
+			break;
+
+		case 0x640:
+			rom[i] = bitswap<8>(rom[i], 5, 6, 7, 4, 1, 2, 3, 0);
+			break;
+
+		case 0x680:
+			rom[i] = bitswap<8>(rom[i], 1, 6, 5, 4, 3, 2, 7, 0);
+			break;
+
+		case 0x6c0:
+			rom[i] = bitswap<8>(rom[i], 7, 6, 3, 4, 5, 2, 1, 0);
+			break;
+
+		case 0x700:
+			rom[i] = bitswap<8>(rom[i], 1, 6, 3, 4, 5, 2, 7, 0);
+			break;
+
+		case 0x740:
+			rom[i] = bitswap<8>(rom[i], 3, 6, 7, 4, 1, 2, 5, 0);
+			break;
+
+		case 0x780:
+			rom[i] = bitswap<8>(rom[i], 1, 6, 3, 4, 7, 2, 5, 0);
+			break;
+
+		case 0x7c0:
+			rom[i] = bitswap<8>(rom[i], 5, 6, 3, 4, 7, 2, 1, 0);
+			break;
+		}
+	}
 }
 
 } // anonymous namespace

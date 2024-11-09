@@ -182,6 +182,18 @@ PPC750 - PowerPC 750 (G3) CPU
 			</diskarea>
 		</part>
 	</software>
+	<!-- Mac OS 7.0.1-9.x -->
+	<software name="mfma_addsub">
+		<description>My First Math Adventure: Adding and Subtracting</description>
+		<year>1998</year>
+		<publisher>Global Software Publishing</publisher>
+		<info name="developer" value="Dorling Kindersley" />
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="my first math adventure - adding and subtracting" sha1="860fe59ec122aff801de2c724e40a5f0045f88be" />
+			</diskarea>
+		</part>
+	</software>
 	<software name="pwrmaccd">
 		<description>Power Macintosh 6100/7100/8100 CD (System Software 7.1.2P) (US English)</description>
 		<year>1994</year>

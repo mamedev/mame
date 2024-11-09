@@ -305,6 +305,7 @@ seem to have access to.
 #include "emu.h"
 #include "system1.h"
 
+#include "machine/input_merger.h"
 #include "machine/segacrpt_device.h"
 #include "cpu/z80/mc8123.h"
 
@@ -574,7 +575,7 @@ void system1_state::mcu_io_w(offs_t offset, u8 data)
 
 		default:
 			logerror("%03X: MCU movx write mode %02X offset %04X = %02X\n",
-						m_mcu->pc(), m_mcu_control, offset, data);
+					m_mcu->pc(), m_mcu_control, offset, data);
 			break;
 	}
 }
@@ -595,7 +596,7 @@ u8 system1_state::mcu_io_r(offs_t offset)
 
 		default:
 			logerror("%03X: MCU movx read mode %02X offset %04X\n",
-						m_mcu->pc(), m_mcu_control, offset);
+					m_mcu->pc(), m_mcu_control, offset);
 			return 0xff;
 	}
 }
@@ -2215,6 +2216,12 @@ void system1_state::sys1ppi(machine_config &config)
 
 	/* 2nd SN's clock is selectable via jumper */
 	SN76489A(config, m_sn[1], SOUND_CLOCK/2).add_route(ALL_OUTPUTS, "mono", 0.50);
+
+	input_merger_device &sn_ready(INPUT_MERGER_ANY_LOW(config, "sn_ready"));
+	sn_ready.output_handler().set_inputline(m_soundcpu, Z80_INPUT_LINE_WAIT);
+
+	m_sn[0]->ready_cb().set("sn_ready", FUNC(input_merger_device::in_w<0>));
+	m_sn[1]->ready_cb().set("sn_ready", FUNC(input_merger_device::in_w<1>));
 }
 
 /* reduced visible area for scrolling games */
@@ -2499,6 +2506,8 @@ void system1_state::mcu(machine_config &config)
 	I8751(config, m_mcu, SOUND_CLOCK);
 	m_mcu->set_addrmap(AS_IO, &system1_state::mcu_io_map);
 	m_mcu->port_out_cb<1>().set(FUNC(system1_state::mcu_control_w));
+
+	config.set_maximum_quantum(attotime::from_hz(m_maincpu->clock() / 16));
 
 	m_screen->screen_vblank().set_inputline("mcu", MCS51_INT0_LINE);
 	// This interrupt is driven by pin 15 of a PAL16R4 (315-5138 on Choplifter), based on the vertical count.
@@ -5604,16 +5613,6 @@ void system1_state::init_wbml()
 	downcast<mc8123_device &>(*m_maincpu).decode(m_maincpu_region->base(), m_banked_decrypted_opcodes.get(), m_maincpu_region->bytes());
 }
 
-void system1_state::init_tokisens()
-{
-	// HACK: otherwise player dies in attract mode and game gives a continue screen,
-	// probably the other Z80 timing kludges aren't quite accurate (or the encrypted CPU differs)
-	// could also be different screen refresh, or even just exactly when the first interrupt occurs
-	m_maincpu->set_clock_scale(1.07f);
-
-	init_wbml();
-}
-
 void system1_state::init_dakkochn()
 {
 	m_videomode_custom = &system1_state::dakkochn_custom_w;
@@ -5783,15 +5782,15 @@ GAME( 1986, gardia,     0,        sys1piox_317_0006, gardia,    system1_state, i
 GAME( 1986, brain,      0,        sys1pio,           brain,     system1_state, init_bank44,       ROT0,   "Coreland / Sega", "Brain", MACHINE_SUPPORTS_SAVE )
 
 /* System 2 */
-GAME( 1985, choplift,   0,        sys2rowm,          choplift,  system1_state, init_bank0c,       ROT0,   "Sega (licensed from Dan Gorlin)", "Choplifter (8751 315-5151)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, chopliftu,  choplift, sys2row,           choplift,  system1_state, init_bank0c,       ROT0,   "Sega (licensed from Dan Gorlin)", "Choplifter (unprotected)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, choplift,   0,        sys2rowm,          choplift,  system1_state, init_bank0c,       ROT0,   "Sega", "Choplifter (8751 315-5151)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, chopliftu,  choplift, sys2row,           choplift,  system1_state, init_bank0c,       ROT0,   "Sega", "Choplifter (unprotected)", MACHINE_SUPPORTS_SAVE )
 GAME( 1985, chopliftbl, choplift, sys2row,           choplift,  system1_state, init_bank0c,       ROT0,   "bootleg", "Choplifter (bootleg)", MACHINE_SUPPORTS_SAVE )
 GAME( 1985, shtngmst,   0,        sys2m,             shtngmst,  system1_state, init_shtngmst,     ROT0,   "Sega", "Shooting Master (8751 315-5159a)", MACHINE_SUPPORTS_SAVE )
 GAME( 1986, gardiab,    gardia,   sys2_317_0007,     gardia,    system1_state, init_bank44,       ROT270, "bootleg", "Gardia (317-0007?, bootleg)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 GAME( 1986, gardiaj,    gardia,   sys2_317_0006,     gardia,    system1_state, init_bank44,       ROT270, "Coreland / Sega", "Gardia (Japan, 317-0006)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 GAME( 1986, wboysys2,   wboy,     sys2_315_5177,     wboysys2,  system1_state, init_bank0c,       ROT0,   "Escape (Sega license)", "Wonder Boy (system 2, set 1, 315-5177)", MACHINE_SUPPORTS_SAVE )
 GAME( 1986, wboysys2a,  wboy,     sys2_315_5176,     wboysys2,  system1_state, init_bank0c,       ROT0,   "Escape (Sega license)", "Wonder Boy (system 2, set 2, 315-5176)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, tokisens,   0,        sys2xb,            tokisens,  system1_state, init_tokisens,     ROT90,  "Sega", "Toki no Senshi - Chrono Soldier (MC-8123, 317-0040)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, tokisens,   0,        sys2xb,            tokisens,  system1_state, init_wbml,         ROT90,  "Sega", "Toki no Senshi - Chrono Soldier (MC-8123, 317-0040)", MACHINE_SUPPORTS_SAVE )
 GAME( 1987, tokisensa,  tokisens, sys2,              tokisensa, system1_state, init_bank0c,       ROT90,  "Sega", "Toki no Senshi - Chrono Soldier (prototype?)", MACHINE_SUPPORTS_SAVE ) // or bootleg?
 GAME( 1987, wbml,       0,        sys2xb,            wbml,      system1_state, init_wbml,         ROT0,   "Sega / Westone", "Wonder Boy - Monster Land (Japan New Ver., MC-8123, 317-0043)", MACHINE_SUPPORTS_SAVE )
 GAME( 1987, wbmljo,     wbml,     sys2xb,            wbml,      system1_state, init_wbml,         ROT0,   "Sega / Westone", "Wonder Boy - Monster Land (Japan Old Ver., MC-8123, 317-0043)", MACHINE_SUPPORTS_SAVE )

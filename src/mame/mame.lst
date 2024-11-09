@@ -18563,6 +18563,7 @@ thoop2a                         // (c) 1994 - REF.940411
 wrally                          // (c) 1993 - Ref 930705
 wrallya                         // (c) 1993 - Ref 930705
 wrallyat                        // (c) 1993 - Ref 930217
+wrallyata                       // (c) 1993 - Ref 930217
 wrallyb                         // (c) 1993 - Ref 930217
 wrallyc                         // (c) 1993
 
@@ -18707,6 +18708,7 @@ guttangts3                      //
 highroll                        //
 jumpbug                         // (c) 1981 Rock-ola
 jumpbugb                        // (c) 1981 Sega
+jumpbugbc                       // bootleg
 jumpbugbrf                      // bootleg
 jungsub                         // bootleg
 kamakazi3                       // Video Games (UK) Ltd., hack or bootleg?
@@ -24058,6 +24060,9 @@ gradius3a                       // GX945 (c) 1989 (Asia)
 gradius3j                       // GX945 (c) 1989 (Japan)
 gradius3js                      // GX945 (c) 1989 (Japan, split)
 
+@source:konami/gryzor_ms.cpp
+gryzorm                         // bootleg (Modular System)
+
 @source:konami/gticlub.cpp
 gticlub                         // GX688 (c)1996 Euro EAA
 gticluba                        // GX688 (c)1996 Asia AAA
@@ -29336,7 +29341,8 @@ comebaby                        // (c) 2000 ExPotato
 mastcrane                       // (c) 199? Compumatic
 mastcranea                      // (c) 199? Compumatic
 mastcraneb                      // (c) 199? Compumatic
-octopussy                       // (c) 1990 Covielsa
+octopussy                       // (c) 2000 Covielsa
+toyshop                         // (c) 2012 OM Vending
 
 @source:misc/coolpool.cpp
 9ballsht                        // (c) 1993 E-Scape EnterMedia + "marketed by Bundra Games"
@@ -32499,7 +32505,28 @@ wmstopb                         // (c) 1999 WMS - Top Banana (Russian)
 yukongld                        // (c) 2000 WMS - Yukon Gold (Russian)
 
 @source:misc/xtom3d.cpp
+pumpipx2                        // (c) 2002 Andamiro
+pumpipx2p                       // (c) 2002 Andamiro
+pumpipx3                        // (c) 2003 Andamiro
+pumpipx3a                       // (c) 2003 Andamiro
+pumpipx3b                       // (c) 2003 Andamiro
 pumpit1                         // (c) 1999 Andamiro
+pumpit2                         // (c) 1999 Andamiro
+pumpit2a                        // (c) 2000 Andamiro
+pumpit3                         // (c) 2000 Andamiro
+pumpit3a                        // (c) 2000 Andamiro
+pumpit8                         // (c) 2002 Andamiro
+pumpitc                         // (c) 2000 Andamiro
+pumpite                         // (c) 2001 Andamiro
+pumpitea                        // (c) 2001 Andamiro
+pumpito                         // (c) 2000 Andamiro
+pumpitp2                        // (c) 2002 Andamiro
+pumpitp3                        // (c) 2003 Andamiro
+pumpitp3a                       // (c) 2003 Andamiro
+pumpitpc                        // (c) 2000 Andamiro
+pumpitpr                        // (c) 2001 Andamiro
+pumpitpru                       // (c) 2001 Andamiro
+pumpitpx                        // (c) 2001 Andamiro
 pumpitup                        // (c) 1999 Andamiro
 xtom3d                          // (c) 1999 Andamiro
 
@@ -34221,6 +34248,7 @@ galivan                         // (c) 1985
 galivan2                        // (c) 1985
 galivan3                        // (c) 1985
 ninjemak                        // (c) 1986 (US?)
+ninjemat                        // (c) 1986 (Tecfri license)
 youma                           // (c) 1986 (Japan)
 youma2                          // (c) 1986 (Japan)
 youmab                          // bootleg
@@ -40156,6 +40184,7 @@ astrob1                         // (c) 1981
 astrob2                         // (c) 1981
 astrob2a                        // (c) 1981
 astrob2b                        // (c) 1981
+astrobf                         // (c) 1981
 astrobg                         // (c) 1981
 monsterb                        // (c) 1982
 monsterb2                       // (c) 1982
@@ -41072,6 +41101,7 @@ brdrlinb                        // Karateco bootleg
 brdrline                        // (c) 1980 Sega
 brdrlinet                       // (c) 1981 Sega
 brdrlins                        // Sidam bootleg
+bumba                           // Niemer bootleg of Head On
 car2                            // bootleg
 carhntds                        //
 carnival                        // 651-666 (c) 1980 Sega
@@ -41176,6 +41206,9 @@ cabaluk                         // (c) 1988 Tad + Electrocoin license
 cabalukj                        // (c) 1988 Tad + Electrocoin license
 cabalus                         // (c) 1988 Tad + Fabtek license
 cabalus2                        // (c) 1988 Tad + Fabtek license
+
+@source:seibu/cabal_ms.cpp
+cabalm                          // bootleg
 
 @source:seibu/darkmist.cpp
 darkmist                        // (c) 1986 Taito
@@ -42283,6 +42316,9 @@ fc100                           //
 @source:skeleton/fk1.cpp
 fk1                             //
 
+@source:skeleton/flashvga2.cpp
+ruletamag                       // (c) 2005 Codere
+
 @source:skeleton/fs3216.cpp
 fs3216                          //
 
@@ -42537,6 +42573,11 @@ p8000_16                        //
 
 @source:skeleton/palestra.cpp
 palestra
+
+@source:skeleton/palsystems_sh2.cpp
+mpoker2                         //
+mpoker2a                        //
+mpoker2b                        //
 
 @source:skeleton/pap2.cpp
 pap2
@@ -44629,6 +44670,9 @@ wwfwfestu                       // TA-0031 (c) 1991 (US)
 wwfwfestu1                      // TA-0031 (c) 1991 (US)
 wwfwfestub                      // bootleg
 
+@source:technos/ddragon_ms.cpp
+ddragonm                        // bootleg (Modular System)
+
 @source:technos/dogfgt.cpp
 dogfgt                          // TA-0011 (c) 1984
 dogfgtj                         // TA-0011 (c) 1984
@@ -44738,6 +44782,9 @@ starforc                        // (c) 1984 Tehkan
 starforca                       // (c) 1984 Tehkan
 starforcb                       // (c) 1984 Tehkan
 starforce                       // (c) 1984 Tehkan
+
+@source:tecmo/shadoww_ms.cpp
+shadowwm                        // bootleg (Modular System)
 
 @source:tecmo/solomon.cpp
 solomon                         // (c) 1986 Tecmo

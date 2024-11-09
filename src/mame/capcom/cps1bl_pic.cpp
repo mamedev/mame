@@ -84,7 +84,6 @@ protected:
 
 	void dinopic_layer_w(offs_t offset, uint16_t data);
 
-	void pic_porta_w(uint8_t data);
 	uint8_t pic_portb_r();
 	void pic_portb_w(uint8_t data);
 	uint8_t pic_portc_r();
@@ -424,14 +423,17 @@ void wofpic_state::wofpic_spr_base_w(uint16_t data)
 
 // Note: This is clearly the exact same sound system as used by funkyjetb
 
-void cps1bl_pic_state::pic_porta_w(uint8_t data)
-{
-	m_okibank->set_entry(data & 0x0f);
-}
-
 uint8_t cps1bl_pic_state::pic_portb_r()
 {
-	return m_pic_portb;
+	uint8_t data = 0xff;
+
+	if (BIT(m_pic_portc, 4) == 0)
+		data &= m_soundlatch->read();
+
+	if (BIT(m_pic_portc, 2) == 0 && BIT(m_pic_portc, 0) == 0)
+		data &= m_oki->read();
+
+	return data;
 }
 
 void cps1bl_pic_state::pic_portb_w(uint8_t data)
@@ -458,17 +460,8 @@ void cps1bl_pic_state::pic_portc_w(uint8_t data)
 	if (BIT(m_pic_portc, 5) == 1 && BIT(data, 5) == 0)
 		m_soundlatch->acknowledge_w();
 
-	if (BIT(data, 4) == 0)
-		m_pic_portb = m_soundlatch->read();
-
-	if (BIT(data, 2) == 0)
-	{
-		if (BIT(m_pic_portc, 1) == 1 && BIT(data, 1) == 0)
-			m_oki->write(m_pic_portb);
-
-		if (BIT(data, 0) == 0)
-			m_pic_portb = m_oki->read();
-	}
+	if (BIT(m_pic_portc, 1) == 1 && BIT(data, 1) == 0 && BIT(data, 2) == 0)
+		m_oki->write(m_pic_portb);
 
 	m_pic_portc = data;
 }
@@ -483,7 +476,7 @@ void dinopic_state::dinopic(machine_config &config)
 	m_maincpu->set_addrmap(m68000_base_device::AS_CPU_SPACE, &dinopic_state::cpu_space_map);
 
 	PIC16C57(config, m_pic, 30_MHz_XTAL / 8);
-	m_pic->write_a().set(FUNC(dinopic_state::pic_porta_w));
+	m_pic->write_a().set_membank(m_okibank).mask(0x0f);
 	m_pic->read_b().set(FUNC(dinopic_state::pic_portb_r));
 	m_pic->write_b().set(FUNC(dinopic_state::pic_portb_w));
 	m_pic->read_c().set(FUNC(dinopic_state::pic_portc_r));
@@ -526,7 +519,7 @@ void cps1bl_pic_state::punipic(machine_config &config)
 	m_maincpu->set_addrmap(m68000_base_device::AS_CPU_SPACE, &cps1bl_pic_state::cpu_space_map);
 
 	PIC16C57(config, m_pic, 30_MHz_XTAL / 8);
-	m_pic->write_a().set(FUNC(cps1bl_pic_state::pic_porta_w));
+	m_pic->write_a().set_membank(m_okibank).mask(0x0f);
 	m_pic->read_b().set(FUNC(cps1bl_pic_state::pic_portb_r));
 	m_pic->write_b().set(FUNC(cps1bl_pic_state::pic_portb_w));
 	m_pic->read_c().set(FUNC(cps1bl_pic_state::pic_portc_r));

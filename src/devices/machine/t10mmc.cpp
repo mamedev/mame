@@ -265,6 +265,10 @@ void t10mmc::ExecCommand()
 			break;
 		}
 
+		case TOC_FORMAT_CDTEXT:
+			length = 4;
+			break;
+
 		default:
 			m_device->logerror("T10MMC: Unhandled READ TOC format %d\n", toc_format());
 			length = 0;
@@ -622,8 +626,8 @@ void t10mmc::ExecCommand()
 			auto track_type = m_image->get_track_type(trk);
 
 			// If there's a transition between CD data and CD audio anywhere in the requested range then return an error
-			if ((last_track_type == cdrom_file::CD_TRACK_AUDIO && track_type != cdrom_file::CD_TRACK_AUDIO)
-			|| (last_track_type != cdrom_file::CD_TRACK_AUDIO && track_type == cdrom_file::CD_TRACK_AUDIO))
+			if (last_track_type != -1 && ((last_track_type == cdrom_file::CD_TRACK_AUDIO && track_type != cdrom_file::CD_TRACK_AUDIO)
+			|| (last_track_type != cdrom_file::CD_TRACK_AUDIO && track_type == cdrom_file::CD_TRACK_AUDIO)))
 			{
 				set_sense(SCSI_SENSE_KEY_ILLEGAL_REQUEST, SCSI_SENSE_ASC_ASCQ_ILLEGAL_MODE_FOR_THIS_TRACK);
 
@@ -1466,6 +1470,14 @@ void t10mmc::ReadData( uint8_t *data, int dataLength )
 				break;
 			}
 
+			case TOC_FORMAT_CDTEXT:
+			{
+				put_u16be(&data[0], 0); // length
+				data[2] = 0; // first track/session/reserved
+				data[3] = 0; // last track/session/reserved
+				break;
+			}
+
 			default:
 				m_device->logerror("T10MMC: Unhandled READ TOC format %d\n", toc_format());
 				std::fill_n(data, dataLength, 0);
@@ -1481,61 +1493,88 @@ void t10mmc::ReadData( uint8_t *data, int dataLength )
 			memset(data, 0, SCSILengthFromUINT16( &command[ 7 ] ));
 
 			const uint8_t page = command[2] & 0x3f;
-			int ptr = 0;
+			int ptr = (command[0] == T10SPC_CMD_MODE_SENSE_6) ? 4 : 8;
 
 			if ((page == 0xe) || (page == 0x3f))
-			{ // CD Audio control page
-					data[ptr++] = 0x8e; // page E, parameter is savable
-					data[ptr++] = 0x0e; // page length
-					data[ptr++] = (1 << 2) | (m_sotc << 1); // IMMED = 1
-					ptr += 5;   // skip reserved bytes
-					// connect each audio channel to 1 output port and indicate max volume
-					data[ptr++] = 1;
-					data[ptr++] = 0xff;
-					data[ptr++] = 2;
-					data[ptr++] = 0xff;
-					data[ptr++] = 4;
-					data[ptr++] = 0xff;
-					data[ptr++] = 8;
-					data[ptr++] = 0xff;
+			{
+				// CD Audio control page
+				data[ptr++] = 0x8e; // page E, parameter is savable
+				data[ptr++] = 0x0e; // page length
+				data[ptr++] = (1 << 2) | (m_sotc << 1); // IMMED = 1
+				// reserved
+				data[ptr++] = 0;
+				data[ptr++] = 0;
+				data[ptr++] = 0;
+				data[ptr++] = 0;
+				data[ptr++] = 0;
+				// connect each audio channel to 1 output port and indicate max volume
+				data[ptr++] = 1;
+				data[ptr++] = 0xff;
+				data[ptr++] = 2;
+				data[ptr++] = 0xff;
+				data[ptr++] = 4;
+				data[ptr++] = 0xff;
+				data[ptr++] = 8;
+				data[ptr++] = 0xff;
 			}
 
 			if ((page == 0x0d) || (page == 0x3f))
-			{ // CD page
-					data[ptr++] = 0x0d;
-					data[ptr++] = 6;    // page length
-					data[ptr++] = 0;
-					data[ptr++] = 0;
-					data[ptr++] = 0;
-					data[ptr++] = 60;
-					data[ptr++] = 0;
-					data[ptr++] = 75;
+			{
+				// CD page
+				data[ptr++] = 0x0d;
+				data[ptr++] = 6;    // page length
+				data[ptr++] = 0;
+				data[ptr++] = 0;
+				data[ptr++] = 0;
+				data[ptr++] = 60;
+				data[ptr++] = 0;
+				data[ptr++] = 75;
 			}
 
 			if ((page == 0x2a) || (page == 0x3f))
-			{ // Page capabilities
-					data[ptr++] = 0x2a;
-					data[ptr++] = 0x14; // page length
-					data[ptr++] = 0x00;
-					data[ptr++] = 0x00; // CD-R only
-					data[ptr++] = 0x01; // can play audio
-					data[ptr++] = 0;
-					data[ptr++] = 0;
-					data[ptr++] = 0;
-					data[ptr++] = 0x02;
-					data[ptr++] = 0xc0; // 4x speed
-					data[ptr++] = 0x01;
-					data[ptr++] = 0x00; // 256 volume levels supported
-					data[ptr++] = 0x00;
-					data[ptr++] = 0x00; // buffer
-					data[ptr++] = 0x02;
-					data[ptr++] = 0xc0; // 4x read speed
-					data[ptr++] = 0;
-					data[ptr++] = 0;
-					data[ptr++] = 0;
-					data[ptr++] = 0;
-					data[ptr++] = 0;
-					data[ptr++] = 0;
+			{
+				// Page capabilities
+				data[ptr++] = 0x2a;
+				data[ptr++] = 0x14; // page length
+				data[ptr++] = 0x00;
+				data[ptr++] = 0x00; // CD-R only
+				data[ptr++] =
+					(1 << 4) | // Mode 2 Form 1
+					(1 << 1) | // XA Cmds Supported
+					(1 << 0); // AudioPlay
+				data[ptr++] = 0;
+				data[ptr++] = 0;
+				data[ptr++] = 0;
+				data[ptr++] = 0x02;
+				data[ptr++] = 0xc0; // 4x speed
+				data[ptr++] = 0x01;
+				data[ptr++] = 0x00; // 256 volume levels supported
+				data[ptr++] = 0x00;
+				data[ptr++] = 0x00; // buffer
+				data[ptr++] = 0x02;
+				data[ptr++] = 0xc0; // 4x read speed
+				data[ptr++] = 0;
+				data[ptr++] = 0;
+				data[ptr++] = 0;
+				data[ptr++] = 0;
+				data[ptr++] = 0;
+				data[ptr++] = 0;
+			}
+
+			if (command[0] == T10SPC_CMD_MODE_SENSE_6)
+			{
+				data[0] = ptr - 1; // Mode Data Length
+				data[1] = 0x70; // Medium Type
+				data[2] = 0x00; // Device-Specific Parameter
+				data[3] = 0x00; // Block Descriptor Length
+			}
+			else
+			{
+				put_u16be(&data[0], ptr - 2); // Mode Data Length
+				data[2] = 0x70; // Medium Type
+				data[3] = 0x00; // Device-Specific Parameter
+				put_u16be(&data[4], 0); // Reserved
+				put_u16be(&data[6], 0); // Block Descriptor Length
 			}
 		}
 		break;
@@ -1548,7 +1587,7 @@ void t10mmc::ReadData( uint8_t *data, int dataLength )
 		if((command[1] & 0x0f) == 0 && command[7] == 0x04) // DVD / DVD disc manufacturing information
 		{
 			data[1] = 0xe;
-			for(int i=4; i != 0xe; i++)
+			for (int i = 4; i != 0xe; i++)
 				data[i] = 0;
 		}
 		break;
@@ -1569,42 +1608,63 @@ void t10mmc::WriteData( uint8_t *data, int dataLength )
 	{
 	case T10SPC_CMD_MODE_SELECT_6:
 	case T10SPC_CMD_MODE_SELECT_10:
-		m_device->logerror("T10MMC: MODE SELECT page %x\n", data[0] & 0x3f);
+	{
+		int len = (command[0] == T10SPC_CMD_MODE_SELECT_6) ? data[0] + 1 : get_u16be(&data[0]) + 2;
+		int bdlen = (command[0] == T10SPC_CMD_MODE_SELECT_6) ? data[3] : get_u16be(&data[6]);
+		int ptr = (command[0] == T10SPC_CMD_MODE_SELECT_6) ? 4 : 8;
 
-		switch (data[0] & 0x3f)
+		if (bdlen == 8)
 		{
-			case 0x0:   // vendor-specific
-				// check for SGI extension to force 512-byte blocks
-				if ((data[3] == 8) && (data[10] == 2))
-				{
-					m_device->logerror("T10MMC: Experimental SGI 512-byte block extension enabled\n");
+			int blen = get_u24be(&data[ptr + 5]);
+			if (blen == 512)
+			{
+				m_device->logerror("T10MMC: Experimental SGI 512-byte block extension enabled\n");
 
-					m_sector_bytes = 512;
-					m_num_subblocks = 4;
-				}
-				else
-				{
-					m_device->logerror("T10MMC: Unknown vendor-specific page!\n");
-				}
-				break;
+				m_sector_bytes = 512;
+				m_num_subblocks = 4;
+			}
+			else if (blen == 2048)
+			{
+				m_sector_bytes = 2048;
+				m_num_subblocks = 1;
+			}
+			else
+			{
+				m_device->logerror("T10MMC: Unsupported block length %d\n", blen);
+			}
+		}
+		else if (bdlen)
+			m_device->logerror("T10MMC: MODE SELECT Invalid Block Descriptor Length %d\n", bdlen);
 
+		ptr += bdlen;
+
+		while (ptr < len)
+		{
+			m_device->logerror("T10MMC: MODE SELECT page %x\n", data[ptr + 0] & 0x3f);
+
+			switch (data[ptr + 0] & 0x3f)
+			{
 			case 0xe:   // audio page
-				m_sotc = (data[2] >> 1) & 1;
-				m_device->logerror("Ch 0 route: %x vol: %x\n", data[8], data[9]);
-				m_device->logerror("Ch 1 route: %x vol: %x\n", data[10], data[11]);
-				m_device->logerror("Ch 2 route: %x vol: %x\n", data[12], data[13]);
-				m_device->logerror("Ch 3 route: %x vol: %x\n", data[14], data[15]);
+				m_sotc = (data[ptr + 2] >> 1) & 1;
+				m_device->logerror("Ch 0 route: %x vol: %x\n", data[ptr + 8], data[ptr + 9]);
+				m_device->logerror("Ch 1 route: %x vol: %x\n", data[ptr + 10], data[ptr + 11]);
+				m_device->logerror("Ch 2 route: %x vol: %x\n", data[ptr + 12], data[ptr + 13]);
+				m_device->logerror("Ch 3 route: %x vol: %x\n", data[ptr + 14], data[ptr + 15]);
 
 				// TODO: CDDA audio channels and output port should be separate
 				// The actual audio channel that gets sent to the output port is configurable and more than one audio channel can go to an output port
-				m_cdda->set_output_gain(0, data[9] / 255.0f);
-				m_cdda->set_output_gain(1, data[11] / 255.0f);
+				m_cdda->set_output_gain(0, data[ptr + 9] / 255.0f);
+				m_cdda->set_output_gain(1, data[ptr + 11] / 255.0f);
 				break;
+			}
+
+			ptr += data[ptr + 1] + 2;
 		}
 		break;
+	}
 
 	default:
 		t10spc::WriteData( data, dataLength );
 		break;
-}
+	}
 }

@@ -153,4 +153,4 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 2006?, multgmxl, 0, extrema_m27sv, multgmxl, extrema_m27sv_state, empty_init, ROT0, "Extrema", "Multi GAMEe XL", MACHINE_IS_SKELETON )
+GAME( 2006?, multgmxl, 0, extrema_m27sv, multgmxl, extrema_m27sv_state, empty_init, ROT0, "Extrema", "Multi GAME XL", MACHINE_IS_SKELETON )

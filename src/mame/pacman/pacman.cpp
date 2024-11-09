@@ -5631,32 +5631,39 @@ ROM_START( pengopac )
 	ROM_LOAD( "82s126.3m",    0x0100, 0x0100, CRC(77245b66) SHA1(0c4d0bee858b97632411c440bea6948a74759746) )  // Timing - not used
 ROM_END
 
-// Marti Colls bootleg (set 1)
+/* Marti Colls bootleg (set 1).
+   There are two PCB versions with the same ROM set:
+    -An older one, just labeled "PAC", with a 18 MHz xtal, and a Novatronic NVS board (a small sub-board from Novatronic, 
+      silkscreened "NOVATRONIC BILBAO SPAIN  COPYRIGHT 1982", with the CPU, program ROMs, a PROM and a 6116 SRAM
+      (https://www.recreativas.org/novatronic-video-sistema-nvs-6072-novatronic-sa). This one is where the PROMs were dumped from.
+    -A newer one, silkscreened by MARTI COLLS, with a sub-board similar to the Novatronic one (but without Novatronic texts).
+      PROMs weren't dumped on this PCB. */
 ROM_START( pengomc1 )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "pengomc_01.bin", 0x4000, 0x0200, CRC(ea415ede) SHA1(da005876d96361c5b807a3cf1b82ec066c678c87) )
+	ROM_REGION( 0x10000, "maincpu", 0 ) // All of them on the Novatronic NVS board
+	ROM_LOAD( "pengomc_01.a5", 0x4000, 0x0200, CRC(ea415ede) SHA1(da005876d96361c5b807a3cf1b82ec066c678c87) )
 	ROM_CONTINUE( 0x0200, 0x0e00 )
-	ROM_LOAD( "pengomc_02.bin", 0x0000, 0x0200, CRC(dfe9640e) SHA1(c0366399092cafecba1e407b256a62c0c3b538c0) )
+	ROM_LOAD( "pengomc_02.a4", 0x0000, 0x0200, CRC(dfe9640e) SHA1(c0366399092cafecba1e407b256a62c0c3b538c0) )
 	ROM_CONTINUE( 0x4200, 0x0e00 )
-	ROM_LOAD( "pengomc_03.bin", 0x5000, 0x1000, CRC(0ac08ae4) SHA1(29eadd0ef0d1f584785e4e6f6cc9561c7dbfb70c) )
-	ROM_LOAD( "pengomc_04.bin", 0x6000, 0x1000, CRC(1717a7d9) SHA1(d550a7644be3712ddbcbf008d45f99c0743976bb) )
-	ROM_LOAD( "pengomc_05.bin", 0x7000, 0x1000, CRC(cb6eb19c) SHA1(c66256e0fc7ccdcac997775ae9186aef1e0819d9) )
+	ROM_LOAD( "pengomc_03.a3", 0x5000, 0x1000, CRC(0ac08ae4) SHA1(29eadd0ef0d1f584785e4e6f6cc9561c7dbfb70c) )
+	ROM_LOAD( "pengomc_04.a2", 0x6000, 0x1000, CRC(1717a7d9) SHA1(d550a7644be3712ddbcbf008d45f99c0743976bb) )
+	ROM_LOAD( "pengomc_05.a1", 0x7000, 0x1000, CRC(cb6eb19c) SHA1(c66256e0fc7ccdcac997775ae9186aef1e0819d9) )
 
 	ROM_REGION( 0x2000, "gfx1", 0 )
-	ROM_LOAD( "pengomc_09.bin", 0x0000, 0x0800, CRC(ad88978a) SHA1(a568baf751753660223958b722980f031310eba1) ) // same as pengoa.bin on "pengojpm"
-	ROM_LOAD( "pengomc_11.bin", 0x0800, 0x0800, CRC(cb208b9f) SHA1(63b64b52c9c3e18b2d2823e79095160fb1a71f00) ) // same as pengoc.bin on "pengojpm"
-	ROM_LOAD( "pengomc_10.bin", 0x1000, 0x0800, CRC(bae319a3) SHA1(88f0562ba2501f16ddfaffb12c4d1c00315f4225) ) // same as pengob.bin on "pengojpm"
-	ROM_LOAD( "pengomc_12.bin", 0x1800, 0x0800, CRC(5a5190e8) SHA1(caf49a348c649fbf959e97c632832bdb5bc068be) ) // same as pengod.bin on "pengojpm"
+	ROM_LOAD( "pengomc_09.e6", 0x0000, 0x0800, CRC(ad88978a) SHA1(a568baf751753660223958b722980f031310eba1) ) // same as pengoa.bin on "pengojpm"
+	ROM_LOAD( "pengomc_11.h6", 0x0800, 0x0800, CRC(cb208b9f) SHA1(63b64b52c9c3e18b2d2823e79095160fb1a71f00) ) // same as pengoc.bin on "pengojpm"
+	ROM_LOAD( "pengomc_10.f6", 0x1000, 0x0800, CRC(bae319a3) SHA1(88f0562ba2501f16ddfaffb12c4d1c00315f4225) ) // same as pengob.bin on "pengojpm"
+	ROM_LOAD( "pengomc_12.k6", 0x1800, 0x0800, CRC(5a5190e8) SHA1(caf49a348c649fbf959e97c632832bdb5bc068be) ) // same as pengod.bin on "pengojpm"
 
-	// Undumped on the Marti Colls PCB, taken from "pengojpm" set
 	ROM_REGION( 0x0420, "proms", 0 )
-	ROM_LOAD( "pr1633.78", 0x0000, 0x0020, BAD_DUMP CRC(3a5844ec) SHA1(680eab0e1204c9b74adc11588461651b474021bb) ) // Color palette
-	ROM_LOAD( "pr1634.88", 0x0020, 0x0400, BAD_DUMP CRC(766b139b) SHA1(3fcd66610fcaee814953a115bf5e04788923181f) ) // Color lookup
+	ROM_LOAD( "82s123.8h", 0x0000, 0x0020, CRC(3a5844ec) SHA1(680eab0e1204c9b74adc11588461651b474021bb) ) // Color palette
+	ROM_LOAD( "82s129.4a", 0x0020, 0x0100, BAD_DUMP CRC(ef283be2) SHA1(6d616348c06d08f3ffbe875a40036a2453cb45ad) ) // Color lookup taken from "pengopac" set, found entirely filled with 0x0f on this PCB
 
-	// Undumped on the Marti Colls PCB, taken from "pengojpm" set
-	ROM_REGION( 0x0200, "namco", 0 )    // Sound PROMs
-	ROM_LOAD( "82s126.1m", 0x0000, 0x0100, BAD_DUMP CRC(a9cc86bf) SHA1(bbcec0570aeceb582ff8238a4bc8546a23430081) )
-	ROM_LOAD( "82s126.3m", 0x0100, 0x0100, BAD_DUMP CRC(77245b66) SHA1(0c4d0bee858b97632411c440bea6948a74759746) ) // Timing - not used
+	ROM_REGION( 0x0200, "namco", 0 ) // Sound PROMs
+	ROM_LOAD( "82s129.1m", 0x0000, 0x0100, CRC(3cb61034) SHA1(2f24b88839aee107a0ac1064f8bc4853933f5205) )
+	ROM_LOAD( "82s129.3m", 0x0100, 0x0100, CRC(822fe878) SHA1(a3d8918d66e8ef1f45183d48da9b8f842ef0d2fa) ) // Timing - not used
+
+	ROM_REGION( 0x0200, "nvs", 0 ) // Additional PROM on the Novatronic NVS board
+	ROM_LOAD( "82s135.a6", 0x0000, 0x0100, CRC(b3628535) SHA1(2eb0e2c66c107f274393c5c902c78a1e6fa86cda) )
 ROM_END
 
 // Marti Colls bootleg (set 2)
@@ -6515,7 +6522,8 @@ ROM_START( pacgal2 )
 	ROM_LOAD( "82s126.3m",    0x0100, 0x0100, CRC(77245b66) SHA1(0c4d0bee858b97632411c440bea6948a74759746) )    // Timing - not used
 ROM_END
 
-ROM_START( mspacmbn ) // Main PCB H-P1, sub PCB with main CPU ROMs marked Novatronic and 1982
+// Main PCB H-P1, with Novatronic NVS sub PCB with main CPU ROMs, marked Novatronic and 1982
+ROM_START( mspacmbn )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "1_sub.bin",       0x2000, 0x0200, CRC(0839a86e) SHA1(b9f3e477bd2e7ffd98156d5fa14f5ea12468811f) )
 	ROM_CONTINUE(                0x0200, 0x0200 )
@@ -6550,12 +6558,15 @@ ROM_START( mspacmbn ) // Main PCB H-P1, sub PCB with main CPU ROMs marked Novatr
 	ROM_LOAD( "10.bin", 0x1800, 0x0800, CRC(50c7477d) SHA1(c04ec282a8cb528df5e38ad750d12ee71612695d) )
 
 	ROM_REGION( 0x0120, "proms", 0 ) // not dumped for this set, taken from the very similar pacgal2
-	ROM_LOAD( "82s123.7f",    0x0000, 0x0020, BAD_DUMP CRC(2fc650bd) SHA1(8d0268dee78e47c712202b0ec4f1f51109b1f2a5) )
-	ROM_LOAD( "82s126.4a",    0x0020, 0x0100, BAD_DUMP CRC(3eb3a8e4) SHA1(19097b5f60d1030f8b82d9f1d3a241f93e5c75d6) )
+	ROM_LOAD( "82s123.7f", 0x0000, 0x0020, BAD_DUMP CRC(2fc650bd) SHA1(8d0268dee78e47c712202b0ec4f1f51109b1f2a5) )
+	ROM_LOAD( "82s126.4a", 0x0020, 0x0100, BAD_DUMP CRC(3eb3a8e4) SHA1(19097b5f60d1030f8b82d9f1d3a241f93e5c75d6) )
 
-	ROM_REGION( 0x0200, "namco", 0 ) // sound PROMs,not dumped for this set, taken from the very similar pacgal2
-	ROM_LOAD( "82s126.1m",    0x0000, 0x0100, BAD_DUMP CRC(a9cc86bf) SHA1(bbcec0570aeceb582ff8238a4bc8546a23430081) )
-	ROM_LOAD( "82s126.3m",    0x0100, 0x0100, BAD_DUMP CRC(77245b66) SHA1(0c4d0bee858b97632411c440bea6948a74759746) )
+	ROM_REGION( 0x0200, "namco", 0 ) // sound PROMs, not dumped for this set, taken from the very similar pacgal2
+	ROM_LOAD( "82s126.1m", 0x0000, 0x0100, BAD_DUMP CRC(a9cc86bf) SHA1(bbcec0570aeceb582ff8238a4bc8546a23430081) )
+	ROM_LOAD( "82s126.3m", 0x0100, 0x0100, BAD_DUMP CRC(77245b66) SHA1(0c4d0bee858b97632411c440bea6948a74759746) )
+
+	ROM_REGION( 0x100, "nvs", 0 ) // Additional PROM on the Novatronic NVS board
+	ROM_LOAD( "82s135.a6", 0x0000, 0x0100, NO_DUMP )
 ROM_END
 
 ROM_START( mschamp ) // "Original" Zola-Puc board.  FORCE ELECTRONICS KM-001 PCB copyright by RAYGLO MFG CO  1992/1993
@@ -8899,10 +8910,10 @@ GAME( 1983, acitya,   bwcasino, acitya,   acitya,   epospm_state,  empty_init,  
 
 GAME( 1983, theglobp, suprglob, theglobp, theglobp, epospm_state,  empty_init,    ROT90,  "Epos Corporation",         "The Glob (Pac-Man hardware, set 1)",                         MACHINE_SUPPORTS_SAVE )
 GAME( 1983, theglobpa,suprglob, theglobp, theglobp, epospm_state,  empty_init,    ROT90,  "Epos Corporation",         "The Glob (Pac-Man hardware, set 2)",                         MACHINE_SUPPORTS_SAVE )
+GAME( 1983, theglobme,suprglob, woodpek,  theglobp, epospm_state,  empty_init,    ROT90,  "Epos Corporation (Magic Electronics Inc. license)", "The Glob (Pac-Man hardware, Magic Electronics)", MACHINE_SUPPORTS_SAVE )
 GAME( 1983, sprglobp, suprglob, theglobp, theglobp, epospm_state,  empty_init,    ROT90,  "Epos Corporation",         "Super Glob (Pac-Man hardware)",                              MACHINE_SUPPORTS_SAVE )
 GAME( 1985, sprglobp2,suprglob, pacman,   theglobp, epospm_state,  init_sprglobp2,ROT90,  "bootleg (Elsys Software)", "Super Glob (Pac-Man hardware, bootleg)",                     MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // encrypted
 GAME( 1984, sprglbpg, suprglob, pacman,   theglobp, epospm_state,  empty_init,    ROT90,  "bootleg (Software Labor)", "Super Glob (Pac-Man hardware, German bootleg)",              MACHINE_SUPPORTS_SAVE )
-GAME( 1983, theglobme,suprglob, woodpek,  theglobp, epospm_state,  empty_init,    ROT90,  "Magic Electronics Inc.",   "The Glob (Pacman hardware, Magic Electronics Inc. license)", MACHINE_SUPPORTS_SAVE )
 
 GAME( 1984, beastfp,  suprglob, theglobp, theglobp, epospm_state,  empty_init,    ROT90,  "Epos Corporation",         "Beastie Feastie (Pac-Man conversion)",                       MACHINE_SUPPORTS_SAVE )
 GAME( 1984, eeekkp,   eeekk,    eeekkp,   eeekkp,   epospm_state,  empty_init,    ROT90,  "Epos Corporation",         "Eeekk! (Pac-Man conversion)",                                MACHINE_SUPPORTS_SAVE )

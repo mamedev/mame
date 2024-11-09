@@ -693,7 +693,7 @@ ROM_START( wrallyc )
 	ROM_LOAD( "pal16r8-b15.bin",      0x0000, 0x0104, CRC(b50337a6) SHA1(1f922753cb9982cad9a3c9246894ecd38273236e) )
 ROM_END
 
-ROM_START( wrallyat ) // Board Marked 930217, Atari License
+ROM_START( wrallyat ) // Board marked 930217, Atari license
 	ROM_REGION( 0x100000, "maincpu", 0 )    // 68000 code
 	ROM_LOAD16_BYTE( "rally.c23", 0x000000, 0x080000, CRC(366595ad) SHA1(e16341ed9eacf9b729c28184268150ea9b62f185) ) // North & South America only...
 	ROM_LOAD16_BYTE( "rally.c22", 0x000001, 0x080000, CRC(0ad4ec6f) SHA1(991557cf25fe960b1c586e990e6019befe5a11d0) )
@@ -722,11 +722,41 @@ ROM_START( wrallyat ) // Board Marked 930217, Atari License
 	ROM_LOAD( "pal16r8-b15.bin",      0x0000, 0x0104, CRC(b50337a6) SHA1(1f922753cb9982cad9a3c9246894ecd38273236e) )
 ROM_END
 
+ROM_START( wrallyata ) // Board marked REF. 930217, Atari license
+	ROM_REGION( 0x100000, "maincpu", 0 )    // 68000 code
+	ROM_LOAD16_BYTE( "rally_c23.c23", 0x00000, 0x80000, CRC(291b3995) SHA1(92f9a84e3d3de762d0127e56590b8fd0a6e6a0eb) ) // North & South America only...
+	ROM_LOAD16_BYTE( "rally_c22.c22", 0x00001, 0x80000, CRC(25f0ee88) SHA1(60af7d7b7fb67fba0ed22d192e3369ea6afaf58a) )
+
+	ROM_REGION( 0x8000, "gaelco_ds5002fp:sram", 0 ) // DS5002FP code
+	ROM_LOAD( "wrdallas.bin", 0x00000, 0x8000, CRC(547d1768) SHA1(c58d1edd072d796be0663fb265f4739ec006b688) )
+
+	ROM_REGION( 0x100, "gaelco_ds5002fp:mcu:internal", ROMREGION_ERASE00 )
+	// These are the default states stored in NVRAM
+	DS5002FP_SET_MON( 0x88 )
+	DS5002FP_SET_RPCTL( 0x00 )
+	DS5002FP_SET_CRCR( 0x80 )
+
+	ROM_REGION( 0x200000, "gfx", 0 )
+	ROM_LOAD( "rally h-12.h12", 0x000000, 0x100000, CRC(3353dc00) SHA1(db3b1686751dcaa231d66c08b5be81fcfe299ad9) ) // Same data, different layout
+	ROM_LOAD( "rally h-8.h8",   0x100000, 0x100000, CRC(58dcd024) SHA1(384ff296d3c7c8e0c4469231d1940de3cea89fc2) )
+
+	ROM_REGION( 0x100000, "oki", 0 )    // ADPCM samples - sound chip is OKIM6295
+	ROM_LOAD( "sound c-1.c1", 0x000000, 0x100000, CRC(2d69c9b8) SHA1(328cb3c928dc6921c0c3f0277f59bca6c747c504) ) // Same data in a single ROM
+
+	ROM_REGION( 0x0514, "plds", 0 ) // PALs and GALs
+	ROM_LOAD( "tibpal20l8-25cnt.b23", 0x0000, 0x02e5, BAD_DUMP CRC(a1c780ed) SHA1(91dc230d94c992c4c4516554c0faeced41e1e34e) ) // Bruteforced but verified (as GAL22V10)
+	ROM_LOAD( "gal16v8-25lnc.h21",    0x0000, 0x0104, NO_DUMP )
+	ROM_LOAD( "tibpal20l8-25cnt.h15", 0x0000, 0x02e5, BAD_DUMP CRC(a39efdc6) SHA1(bf86f764665531639076dfcc72583457f1cbf806) ) // Bruteforced but verified (as GAL22V10)
+	ROM_LOAD( "pal16r4-e2.bin",       0x0000, 0x0104, CRC(15fee75c) SHA1(b9ee5121dd41f2535d9abd78ff5fcfeaa1ac6b62) )
+	ROM_LOAD( "pal16r8-b15.bin",      0x0000, 0x0104, CRC(b50337a6) SHA1(1f922753cb9982cad9a3c9246894ecd38273236e) )
+ROM_END
+
 } // anonymous namespace
 
 
-GAME( 1993, wrally,   0,      wrally, wrally, wrally_state, empty_init, ROT0, "Gaelco",                 "World Rally (Version 1.0, Checksum 0E56)", MACHINE_SUPPORTS_SAVE ) // Dallas DS5002FP power failure shows as: "Tension baja"
-GAME( 1993, wrallya,  wrally, wrally, wrally, wrally_state, empty_init, ROT0, "Gaelco",                 "World Rally (Version 1.0, Checksum 3873)", MACHINE_SUPPORTS_SAVE ) // Dallas DS5002FP power failure shows as: "Power Failure"
-GAME( 1993, wrallyb,  wrally, wrally, wrally, wrally_state, empty_init, ROT0, "Gaelco",                 "World Rally (Version 1.0, Checksum 8AA2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1993, wrallyc,  wrally, wrally, wrally, wrally_state, empty_init, ROT0, "Gaelco",                 "World Rally (Version 1.0, Checksum E586)", MACHINE_SUPPORTS_SAVE )
-GAME( 1993, wrallyat, wrally, wrally, wrally, wrally_state, empty_init, ROT0, "Gaelco (Atari license)", "World Rally (US, 930217)",                 MACHINE_SUPPORTS_SAVE )
+GAME( 1993, wrally,    0,      wrally, wrally, wrally_state, empty_init, ROT0, "Gaelco",                 "World Rally (version 1.0, checksum 0E56)",     MACHINE_SUPPORTS_SAVE ) // Dallas DS5002FP power failure shows as: "Tension baja"
+GAME( 1993, wrallya,   wrally, wrally, wrally, wrally_state, empty_init, ROT0, "Gaelco",                 "World Rally (version 1.0, checksum 3873)",     MACHINE_SUPPORTS_SAVE ) // Dallas DS5002FP power failure shows as: "Power Failure"
+GAME( 1993, wrallyb,   wrally, wrally, wrally, wrally_state, empty_init, ROT0, "Gaelco",                 "World Rally (version 1.0, checksum 8AA2)",     MACHINE_SUPPORTS_SAVE )
+GAME( 1993, wrallyc,   wrally, wrally, wrally, wrally_state, empty_init, ROT0, "Gaelco",                 "World Rally (version 1.0, checksum E586)",     MACHINE_SUPPORTS_SAVE )
+GAME( 1993, wrallyat,  wrally, wrally, wrally, wrally_state, empty_init, ROT0, "Gaelco (Atari license)", "World Rally (US, version 1.0, checksum 2CC1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1993, wrallyata, wrally, wrally, wrally, wrally_state, empty_init, ROT0, "Gaelco (Atari license)", "World Rally (US, version 1.0, checksum 75A5)", MACHINE_SUPPORTS_SAVE )

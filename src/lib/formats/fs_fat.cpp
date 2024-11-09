@@ -564,6 +564,8 @@ impl::impl(fsblk_t &blockdev, fsblk_t::block_t &&boot_sector_block, std::vector<
 	, m_last_cluster_indicator(((u64)1 << bits_per_fat_entry) - 1)
 	, m_last_valid_cluster(m_last_cluster_indicator - 0x10)
 {
+	if (m_bytes_per_sector == 0)
+		m_bytes_per_sector = 512;
 }
 
 
