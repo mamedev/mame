@@ -44773,6 +44773,9 @@ starforca                       // (c) 1984 Tehkan
 starforcb                       // (c) 1984 Tehkan
 starforce                       // (c) 1984 Tehkan
 
+@source:tecmo/shadoww_ms.cpp
+shadowwm                        // bootleg (Modular System)
+
 @source:tecmo/solomon.cpp
 solomon                         // (c) 1986 Tecmo
 solomonj                        // (c) 1986 Tecmo
