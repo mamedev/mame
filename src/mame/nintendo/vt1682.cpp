@@ -2219,8 +2219,10 @@ void vt_vt1682_state::vt1682_2020_bk_linescroll_w(uint8_t data)
 	LOGMASKED(LOG_OTHER, "%s: vt1682_2020_bk_linescroll_w writing: %02x\n", machine().describe_context(), data);
 	m_2020_bk_linescroll = data;
 
-	if (data)
-		popmessage("linescroll %02x!\n", data);
+	// cmpmx10 / cmpmx11 set a scroll bank, but don't appear to enable linescroll
+	// lxts3 enables this for the racing game, but doesn't seem to upload a table
+//	if (data)
+//		popmessage("linescroll %02x!\n", data);
 }
 
 /*
