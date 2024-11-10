@@ -4499,7 +4499,6 @@ void vt_vt1682_state::setup_video_pages(int which, int tilesize, int vs, int hs,
 	pagebases[2] = 0xffff;
 	pagebases[3] = 0xffff;
 
-
 	if (!tilesize) // 8x8 mode
 	{
 		if (vs_hs == 0)
@@ -4517,7 +4516,7 @@ void vt_vt1682_state::setup_video_pages(int which, int tilesize, int vs, int hs,
 				pagebases[0] = 0x800; /* 0x800-0xfff */ // technically invalid?
 				break;
 			case 0x3:
-				pagebases[0] = 0x800; /* 0x800-0xfff */ // technically invalid?
+				pagebases[0] = 0x800; /* 0x800-0xfff */ // technically invalid (but set by a number of games in cmpmx10 / cmpmx11 eg. Go Go Go)
 				break;
 			}
 
