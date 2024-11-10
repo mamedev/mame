@@ -145,6 +145,7 @@ protected:
 
 	void vt_vt1682_map(address_map &map) ATTR_COLD;
 	void vt_vt1682_sound_map(address_map &map) ATTR_COLD;
+	void rom_map(address_map &map) ATTR_COLD;
 
 	required_device<address_map_bank_device> m_fullrom;
 	required_memory_bank m_bank;
@@ -183,7 +184,6 @@ private:
 
 	uint32_t screen_update(screen_device& screen, bitmap_rgb32& bitmap, const rectangle& cliprect);
 
-	void rom_map(address_map &map) ATTR_COLD;
 
 	void spriteram_map(address_map &map) ATTR_COLD;
 	void vram_map(address_map &map) ATTR_COLD;
@@ -595,6 +595,10 @@ private:
 	uint8_t vt1682_soundcpu_211b_dacright_15_8_r();
 	void vt1682_soundcpu_211b_dacright_15_8_w(uint8_t data);
 
+	// TODO: hook these up properly, used by gm235upc
+	uint8_t vt1682_soundcpu_2410_ioa_data_r() { return machine().rand(); }
+	uint8_t vt1682_soundcpu_2410_iob_data_r() { return machine().rand(); }
+
 	/* Support */
 
 	void vt1682_timer_enable_trampoline_w(uint8_t data)
@@ -618,6 +622,7 @@ private:
 
 	uint8_t rom_4000_to_7fff_r(offs_t offset);
 	uint8_t rom_8000_to_ffff_r(offs_t offset);
+	void rom_8000_to_ffff_w(offs_t offset, uint8_t data);
 
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline);
 	TIMER_DEVICE_CALLBACK_MEMBER(line_render_start);
@@ -690,6 +695,7 @@ public:
 	{ }
 
 	void vt1682_dance(machine_config& config);
+	void gm235upc(machine_config& config);
 
 protected:
 	uint8_t uio_porta_r();
@@ -697,6 +703,8 @@ protected:
 
 private:
 	required_ioport m_io_p1;
+
+	void rom_ram_map(address_map& map);
 };
 
 class vt1682_lxts3_state : public vt_vt1682_state
@@ -1306,6 +1314,13 @@ uint8_t vt_vt1682_state::rom_8000_to_ffff_r(offs_t offset)
 	const uint32_t address = translate_address_8000_to_ffff(offset + 0x8000);
 	return m_fullrom->read8(address);
 }
+
+void vt_vt1682_state::rom_8000_to_ffff_w(offs_t offset, uint8_t data)
+{
+	const uint32_t address = translate_address_8000_to_ffff(offset + 0x8000);
+	m_fullrom->write8(address, data);
+}
+
 
 /************************************************************************************************************************************
  VT1682 PPU Registers
@@ -5225,6 +5240,12 @@ void vt_vt1682_state::rom_map(address_map &map)
 	map(0x0000000, 0x1ffffff).bankr("cartbank");
 }
 
+void vt1682_dance_state::rom_ram_map(address_map &map)
+{
+	rom_map(map);
+ 	map(0x1000000, 0x101ffff).ram();
+}
+
 // 11-bits (0x800 bytes) for sprites
 void vt_vt1682_state::spriteram_map(address_map &map)
 {
@@ -5271,6 +5292,11 @@ void vt_vt1682_state::vt_vt1682_sound_map(address_map& map)
 	map(0x2135, 0x2135).rw(m_soundcpu_alu, FUNC(vrt_vt1682_alu_device::alu_out_6_r), FUNC(vrt_vt1682_alu_device::alu_oprand_6_mult_w));
 	map(0x2136, 0x2136).w(m_soundcpu_alu, FUNC(vrt_vt1682_alu_device::alu_oprand_5_div_w));
 	map(0x2137, 0x2137).w(m_soundcpu_alu, FUNC(vrt_vt1682_alu_device::alu_oprand_6_div_w));
+
+	// is this IO port the same logic as the UIO?
+	map(0x2140, 0x2140).r(FUNC(vt_vt1682_state::vt1682_soundcpu_2410_ioa_data_r));
+	map(0x2144, 0x2144).r(FUNC(vt_vt1682_state::vt1682_soundcpu_2410_iob_data_r));
+
 
 	map(0xf000, 0xffff).ram().share("sound_share"); // doesn't actually map here, the CPU fetches vectors from 0x0ff0 - 0x0fff!
 
@@ -5415,7 +5441,7 @@ void vt_vt1682_state::vt_vt1682_map(address_map &map)
 
 	// 3000-3fff internal ROM if enabled
 	map(0x4000, 0x7fff).r(FUNC(vt_vt1682_state::rom_4000_to_7fff_r));
-	map(0x8000, 0xffff).r(FUNC(vt_vt1682_state::rom_8000_to_ffff_r));
+	map(0x8000, 0xffff).rw(FUNC(vt_vt1682_state::rom_8000_to_ffff_r), FUNC(vt_vt1682_state::rom_8000_to_ffff_w));
 
 	map(0xfffe, 0xffff).r(FUNC(vt_vt1682_state::maincpu_irq_vector_hack_r)); // probably need custom IRQ support in the core instead...
 }
@@ -6185,6 +6211,14 @@ void vt1682_dance_state::vt1682_dance(machine_config& config)
 	m_uio->porta_out().set(FUNC(vt1682_dance_state::uio_porta_w));
 }
 
+void vt1682_dance_state::gm235upc(machine_config& config)
+{
+	vt1682_dance(config);
+	m_fullrom->set_map(&vt1682_dance_state::rom_ram_map);
+}
+
+
+
 void vt1682_lxts3_state::vt1682_lxts3(machine_config& config)
 {
 	vt_vt1682_ntscbase(config);
@@ -6550,7 +6584,7 @@ CONS( 2010, lxts3,    0,  0,   vt1682_lxts3, lxts3, vt1682_lxts3_state, regular_
 
 // there are products on SunPlus type hardware with nearly identical shells 'Mi DiGi World' / 'Mi Digi Diary'
 // needs IO ports on sound CPU side, needs write access to space for RAM (inputs are 'mini-keyboard' style)
-CONS( 200?, gm235upc,  0,  0,  vt1682_dance, gm235upc, vt1682_dance_state, regular_init, "TimeTop", "Ultimate Pocket Console GM-235", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
+CONS( 200?, gm235upc,  0,  0,  gm235upc, gm235upc, vt1682_dance_state, regular_init, "TimeTop", "Ultimate Pocket Console GM-235", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
 
 ROM_START( cmpmx10 )
 	ROM_REGION( 0x4000000, "mainrom", ROMREGION_ERASE00 )
