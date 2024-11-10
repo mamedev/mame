@@ -181,14 +181,16 @@ void wk1800_state::apo_w(int state)
 /**************************************************************************/
 void wk1800_state::render_w(int state)
 {
-	if(!state)
+	if (!state)
 		return;
 
 	const u8 *render = m_lcdc->render();
-	for(int x = 0; x < 64; x++) {
-		for(int y = 0; y < 8; y++) {
+	for (int x = 0; x < 64; x++)
+	{
+		for (int y = 0; y < 8; y++)
+		{
 			u8 v = *render++;
-			for(int z = 0; z < 5; z++)
+			for (int z = 0; z < 5; z++)
 				m_outputs[x][y][z] = (v >> z) & 1;
 		}
 		render += 8;
@@ -284,7 +286,7 @@ void wk1800_state::wk1600(machine_config &config)
 	HD44780(config, m_lcdc, 270'000); // TODO: Wrong device type, should be SED1278F2A; clock not measured, datasheet typical clock used
 	m_lcdc->set_lcd_size(2, 8);
 
-	auto& screen = SCREEN(config, "screen", SCREEN_TYPE_SVG);
+	auto& screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
 	screen.set_refresh_hz(60);
 	screen.set_size(1755, 450);
 	screen.set_visarea_full();
@@ -299,7 +301,7 @@ void wk1800_state::wk1600(machine_config &config)
 } 
 
 /**************************************************************************/
-[[maybe_unused]] static void wk1800_floppies(device_slot_interface& device)
+static void wk1800_floppies(device_slot_interface& device)
 {
 	device.option_add("35hd", FLOPPY_35_HD);
 }

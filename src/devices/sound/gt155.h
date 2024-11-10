@@ -1,11 +1,12 @@
 // license:BSD-3-Clause
 // copyright-holders: Devin Acker
+
 /***************************************************************************
-    Casio GT913 sound (HLE)
+    Casio GT155 (HG51B155FD)
 ***************************************************************************/
 
-#ifndef MAME_DEVICES_SOUND_GT155_H
-#define MAME_DEVICES_SOUND_GT155_H
+#ifndef MAME_SOUND_GT155_H
+#define MAME_SOUND_GT155_H
 
 #pragma once
 
@@ -14,8 +15,6 @@
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
-
-// ======================> gt913_sound_device
 
 class gt155_device : public device_t,
 	public device_sound_interface,
@@ -45,20 +44,6 @@ protected:
 private:
 	static constexpr unsigned CLOCKS_PER_SAMPLE = 512;
 	static constexpr unsigned ENV_SHIFT = 8;
-
-	u16 reg16(u8 num) const;
-	u32 reg24(u8 num) const;
-	u32 reg32(u8 num) const;
-
-	void voice_command(u8 data);
-
-	sound_stream *m_stream;
-
-	u16 m_volume[0x800];
-
-	u8 m_data[6];
-	u32 m_dsp_data[128];
-	u32 m_rom_addr;
 
 	struct voice_t
 	{
@@ -96,9 +81,23 @@ private:
 	void mix_sample(voice_t &voice, s64 &left, s64 &right);
 	void update_sample(voice_t &voice);
 
+	u16 reg16(u8 num) const;
+	u32 reg24(u8 num) const;
+	u32 reg32(u8 num) const;
+
+	void voice_command(u8 data);
+
+	sound_stream *m_stream;
+
+	u16 m_volume[0x800];
+
+	u8 m_data[6];
+	u32 m_dsp_data[128];
+	u32 m_rom_addr;
+
 	voice_t m_voices[32];
 };
 
 DECLARE_DEVICE_TYPE(GT155, gt155_device)
 
-#endif // MAME_DEVICES_SOUND_GT155_H
+#endif // MAME_SOUND_GT155_H
