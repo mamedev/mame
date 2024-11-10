@@ -251,7 +251,13 @@ private:
 	int m_current_main_vector;
 	int m_new_main_vector;
 
+	int m_timera_to_sound_irq_active;
+	int m_timerb_to_sound_irq_active;
+	int m_current_sound_vector;
+	int m_new_sound_vector;
+
 	void update_main_interrupts();
+	void update_sound_interrupts();
 
 	uint8_t vt1682_2000_r();
 	void vt1682_2000_w(uint8_t data);
@@ -892,6 +898,11 @@ void vt_vt1682_state::machine_start()
 	save_item(NAME(m_current_main_vector));
 	save_item(NAME(m_new_main_vector));
 
+	save_item(NAME(m_timera_to_sound_irq_active));
+	save_item(NAME(m_timerb_to_sound_irq_active));
+	save_item(NAME(m_current_sound_vector));
+	save_item(NAME(m_new_sound_vector));
+
 	save_item(NAME(m_prgbank1_r0));
 	save_item(NAME(m_prgbank1_r1));
 	save_item(NAME(m_210c_prgbank1_r2));
@@ -1000,6 +1011,11 @@ void vt_vt1682_state::machine_reset()
 	m_current_main_vector = 0xfffe;
 	m_new_main_vector = 0xfffe;
 
+	m_timera_to_sound_irq_active = 0;
+	m_timerb_to_sound_irq_active = 0;
+	m_current_sound_vector = 0x0ff8;
+	m_new_sound_vector = 0x0ff8;
+
 	m_prgbank1_r0 = 0;
 	m_prgbank1_r1 = 0;
 	m_210c_prgbank1_r2 = 0;
@@ -1045,6 +1061,7 @@ void vt_vt1682_state::machine_reset()
 	m_scpu_is_in_reset = 1;
 
 	update_main_interrupts();
+	update_sound_interrupts();
 }
 
 /*
@@ -5438,9 +5455,20 @@ Ext IRQ         0x0ffe - 0x0fff
 
 uint8_t vt_vt1682_state::soundcpu_irq_vector_hack_r(offs_t offset)
 {
-	// redirect to Timer IRQ!
-	return m_sound_share[0x0ff8 + offset];
+	if (!machine().side_effects_disabled())
+	{
+		if (offset == 0)
+			m_current_sound_vector = m_new_sound_vector;
+		// redirect to Timer IRQ!
+		return m_sound_share[m_current_sound_vector + offset];
+	}
+	else
+	{
+		return m_sound_share[0x0ffe + offset];
+	}
 }
+
+
 
 uint8_t vt_vt1682_state::maincpu_irq_vector_hack_r(offs_t offset)
 {
@@ -5467,24 +5495,50 @@ void vt_vt1682_state::vt1682_sound_reset_hack_w(offs_t offset, uint8_t data)
 	m_soundcpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 }
 
+void vt_vt1682_state::update_sound_interrupts()
+{
+	if (m_timera_to_sound_irq_active || m_timerb_to_sound_irq_active)
+	{
+		if (m_timera_to_sound_irq_active)
+		{
+			m_new_sound_vector = 0x0ff8;
+		}
+		else if (m_timerb_to_sound_irq_active)
+		{
+			m_new_sound_vector = 0x0ff6;
+		}
+
+		m_soundcpu->set_input_line(0, ASSERT_LINE);
+	}
+	else
+	{
+		m_new_sound_vector = 0x0ffe;
+		m_soundcpu->set_input_line(0, CLEAR_LINE);
+	}
+}
+
+
 void vt_vt1682_state::soundcpu_timera_irq(int state)
 {
 	if (state && !m_scpu_is_in_reset)
-		m_soundcpu->set_input_line(0, ASSERT_LINE);
+		m_timera_to_sound_irq_active = 1;
 	else
-		m_soundcpu->set_input_line(0, CLEAR_LINE);
+		m_timera_to_sound_irq_active = 0;
+
+	update_sound_interrupts();
 }
 
 void vt_vt1682_state::soundcpu_timerb_irq(int state)
 {
-// need to set proper vector (need IRQ priority manager function?)
-/*
-    if (state)
-        m_soundcpu->set_input_line(0, ASSERT_LINE);
-    else
-        m_soundcpu->set_input_line(0, CLEAR_LINE);
-*/
+	if (state && !m_scpu_is_in_reset)
+		m_timerb_to_sound_irq_active = 1;
+	else
+		m_timerb_to_sound_irq_active = 0;
+
+	update_sound_interrupts();
 }
+
+
 
 void vt_vt1682_state::maincpu_timer_irq(int state)
 {
