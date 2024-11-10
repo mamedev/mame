@@ -166,6 +166,9 @@ protected:
 
 	virtual void clear_sound_reset_line();
 
+	// hacks
+	bool m_allow_bk_paldepth_mode = true;
+
 private:
 	required_device<vrt_vt1682_alu_device> m_maincpu_alu;
 	required_device<vrt_vt1682_alu_device> m_soundcpu_alu;
@@ -4907,7 +4910,7 @@ void vt_vt1682_state::draw_layer(int which, int opaque, const rectangle& cliprec
 	int bk_line = (m_main_control_bk[which] & 0x02) >> 1;
 	int bk_tilebpp = (m_main_control_bk[which] & 0x0c) >> 2;
 	int bk_depth = (m_main_control_bk[which] & 0x30) >> 4;
-	int bk_paldepth_mode = (m_main_control_bk[which] & 0x40) >> 5; // called bkpal in places, bk_pal_select in others (in conflict with palselect below)
+	int bk_paldepth_mode = (m_main_control_bk[which] & 0x40) >> 6; // called bkpal in places, bk_pal_select in others (in conflict with palselect below) needs to be ignored for cmpmx10
 	int bk_enable = (m_main_control_bk[which] & 0x80) >> 7;
 
 	if (bk_enable)
@@ -5009,9 +5012,15 @@ void vt_vt1682_state::draw_layer(int which, int opaque, const rectangle& cliprec
 
 					uint8_t realpal, realdepth;
 
-					if (bk_paldepth_mode)
+					// Dingle Hunt and Ocean Fantasy in cmpmx10 turn this on
+					// but priority data and palette data are stored as normal
+					// resulting in broken palettes and priority if we use it
+					// 
+					// does it really work on hardware? we disable it entirely
+					// in those sets for now
+					if (bk_paldepth_mode && m_allow_bk_paldepth_mode)
 					{
-						// this mode isn't tested, not seen it used
+						// haven't seen this used properly
 						//if (bk_paldepth_mode)
 						//  popmessage("bk_paldepth_mode set\n");
 						realdepth = pal & 0x03;
@@ -6220,6 +6229,8 @@ void vt1682_mx10_state::mx10_init()
 
 		std::copy(buffer.begin(), buffer.end(), &src[0]);
 	}
+
+	m_allow_bk_paldepth_mode = false;
 }
 
 
