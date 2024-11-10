@@ -2027,6 +2027,9 @@ MACHINE_START_MEMBER(pc9801vm_state,pc9801rs)
 	save_item(NAME(m_egc.leftover));
 	save_item(NAME(m_egc.first));
 	save_item(NAME(m_egc.init));
+
+	save_item(NAME(m_grcg.mode));
+	save_item(NAME(m_vram_bank));
 }
 
 MACHINE_START_MEMBER(pc9801us_state,pc9801us)
