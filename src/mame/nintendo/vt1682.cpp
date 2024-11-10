@@ -511,7 +511,7 @@ private:
 	uint8_t soundcpu_irq_vector_hack_r(offs_t offset);
 	uint8_t maincpu_irq_vector_hack_r(offs_t offset);
 	void vt1682_sound_reset_hack_w(offs_t offset, uint8_t data);
-	bool m_scpu_is_in_reset;
+	uint8_t m_scpu_is_in_reset;
 
 	/* System Helpers */
 
@@ -923,6 +923,8 @@ void vt_vt1682_state::machine_start()
 	save_item(NAME(m_soundcpu_2119_dacleft_15_8));
 	save_item(NAME(m_soundcpu_211a_dacright_7_0));
 	save_item(NAME(m_soundcpu_211b_dacright_15_8));
+
+	save_item(NAME(m_scpu_is_in_reset));
 }
 
 void vt_vt1682_state::machine_reset()
@@ -1037,7 +1039,7 @@ void vt_vt1682_state::machine_reset()
 	m_bank->set_entry(0);
 
 	m_soundcpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
-	m_scpu_is_in_reset = true;
+	m_scpu_is_in_reset = 1;
 }
 
 /*
@@ -2745,7 +2747,7 @@ uint8_t vt_vt1682_state::vt1682_2106_enable_regs_r()
 void vt_vt1682_state::clear_sound_reset_line()
 {
 	m_soundcpu->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
-	m_scpu_is_in_reset = false;
+	m_scpu_is_in_reset = 0;
 }
 
 void vt_vt1682_state::vt1682_2106_enable_regs_w(uint8_t data)
@@ -2762,7 +2764,7 @@ void vt_vt1682_state::vt1682_2106_enable_regs_w(uint8_t data)
 	else
 	{
 		m_soundcpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
-		m_scpu_is_in_reset = true;
+		m_scpu_is_in_reset = 1;
 	}
 }
 
