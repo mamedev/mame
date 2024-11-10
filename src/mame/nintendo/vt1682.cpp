@@ -249,6 +249,7 @@ private:
 	int m_scu_to_main_irq_active;
 	int m_timera_to_main_irq_active;
 	int m_current_main_vector;
+	int m_new_main_vector;
 
 	void update_main_interrupts();
 
@@ -889,6 +890,7 @@ void vt_vt1682_state::machine_start()
 	save_item(NAME(m_scu_to_main_irq_active));
 	save_item(NAME(m_timera_to_main_irq_active));
 	save_item(NAME(m_current_main_vector));
+	save_item(NAME(m_new_main_vector));
 
 	save_item(NAME(m_prgbank1_r0));
 	save_item(NAME(m_prgbank1_r1));
@@ -996,6 +998,7 @@ void vt_vt1682_state::machine_reset()
 	m_scu_to_main_irq_active = 0;
 	m_timera_to_main_irq_active = 0;
 	m_current_main_vector = 0xfffe;
+	m_new_main_vector = 0xfffe;
 
 	m_prgbank1_r0 = 0;
 	m_prgbank1_r1 = 0;
@@ -5443,6 +5446,9 @@ uint8_t vt_vt1682_state::maincpu_irq_vector_hack_r(offs_t offset)
 {
 	if (!machine().side_effects_disabled())
 	{
+		if (offset == 0)
+			m_current_main_vector = m_new_main_vector;
+
 		uint8_t ret = rom_8000_to_ffff_r((m_current_main_vector - 0x8000) + offset);
 		// redirect to required IRQ!
 		return ret;
@@ -5509,18 +5515,18 @@ void vt_vt1682_state::update_main_interrupts()
 	{
 		if (m_timera_to_main_irq_active)
 		{
-			m_current_main_vector = 0xfff8;
+			m_new_main_vector = 0xfff8;
 		}
 		else if (m_scu_to_main_irq_active)
 		{
-			m_current_main_vector = 0xfff6;
+			m_new_main_vector = 0xfff6;
 		}
 
 		m_maincpu->set_input_line(0, ASSERT_LINE);
 	}
 	else
 	{
-		m_current_main_vector = 0xfffe;
+		m_new_main_vector = 0xfffe;
 		m_maincpu->set_input_line(0, CLEAR_LINE);
 	}
 }
