@@ -94,8 +94,128 @@ class m68010_tekmmu_device : public m68010_device
 	using m68010_device::m68010_device;
 
 	// HACK
-	u8 *m_map_control = nullptr;
-	u16 *m_map = nullptr;
+	u8 *m_map_control_ptr = nullptr;
+	u16 *m_map_ptr = nullptr;
+
+
+#ifdef USE_INTERNAL_MAP
+	u8 m_map_control;
+	u8 m_latched_map_control;		// latched until user mode access (page 2.1-54)
+	memory_share_creator<u16> m_map;
+
+	u16 map_r(offs_t offset)
+	{
+		if (!machine().side_effects_disabled())
+		{
+			if ((offset>>11) < 0x20)
+				LOG("map_r 0x%08x => %04x\n",offset>>11, m_map[(offset >> 11)&0x7ff] );
+
+			// selftest does a read and expects it to fail iff !MAP_SYS_WR_ENABLE; its not WR enable, its enable..
+			if (!BIT(m_map_control, MAP_SYS_WR_ENABLE))
+			{
+					LOG("map_r: bus error: PID(%d) %08x fc(%d) pc(%08x)\n", BIT(m_map[(offset >> 11) & 0x7ff], 11, 3), OFF16_TO_OFF8(offset), get_fc(), pc());
+					set_input_line(M68K_LINE_BUSERROR, ASSERT_LINE);
+					set_input_line(M68K_LINE_BUSERROR, CLEAR_LINE);
+					set_buserror_details(offset, 0, get_fc());
+					return 0;
+			}
+		}
+		
+		return m_map[(offset >> 11) & 0x7ff];
+	}
+
+	void map_w(offs_t offset, u16 data, u16 mem_mask)
+	{
+		if ((offset>>11) < 0x20)
+		{
+			LOG("map_w: %08x  <= %04x paddr(%08x) PID(%d) dirty(%d) write_enable(%d)\n",
+				(offset >> 11) & 0x7ff, data,
+				OFF16_TO_OFF8(BIT(data, 0, 11)<<11),BIT(data, 11, 3), data & 0x8000 ? 1 : 0, data & 0x4000 ? 1 : 0,
+				pc());
+		}
+		
+		if (BIT(m_map_control, MAP_SYS_WR_ENABLE))
+		{
+			COMBINE_DATA(&m_map[(offset >> 11) & 0x7ff]);
+		}
+	}
+
+	u8 mapcntl_r()
+	{
+		if (!machine().side_effects_disabled())
+		{
+			// page 2.1-54 implies that this can only be read in user mode
+
+			LOG("mapcntl_r(%02x) cpuWr(%d) BlockAccess(%d) SysWrEn(%d) PID(%d) pc(%08x)\n",m_map_control,
+				BIT(m_map_control, MAP_CPU_WR) ? 1 : 0,
+				BIT(m_map_control, MAP_BLOCK_ACCESS) ? 1 : 0,
+				BIT(m_map_control, MAP_SYS_WR_ENABLE) ? 1 : 0,
+				m_map_control & 15,
+				pc());
+		}
+		
+		u8 ans = m_map_control;
+		
+		// mask out 'SysWrEn'
+		// 0xc0 means 'not blocked write' aka successful write
+		if ((ans & 0xc0) != 0xc0)
+			ans &= ~(1<<MAP_SYS_WR_ENABLE);
+
+		return ans;
+	}
+
+	void mapcntl_w(u8 data)
+	{
+		// copied on user mode read/write
+		m_latched_map_control = data & 0x3f;
+		
+		if (m_map_control != (data & 0x3f))
+		{
+			LOG("mapcntl_w mmu_enable   %2d pc(%8x)\n", BIT(data, MAP_VM_ENABLE),  pc());
+			LOG("mapcntl_w write_enable %2d\n", BIT(data, MAP_SYS_WR_ENABLE));
+			LOG("mapcntl_w pte PID      %2d\n", data & 15);
+			
+			if (BIT(data, MAP_VM_ENABLE) && (data & 15))
+			for(uint32_t i=0; i<2048; i++)
+			{
+				if (m_map[i])
+				LOG("XXXmapcntl_w: %08x -> paddr(%08x) PID(%d) dirty(%d) write_enable(%d)\n",
+					OFF16_TO_OFF8(i << 11), OFF16_TO_OFF8(BIT(m_map[i], 0, 11)<<11),
+					BIT(m_map[i], 11, 3), m_map[i] & 0x8000 ? 1 : 0, m_map[i] & 0x4000 ? 1 : 0);
+			}
+
+		}
+
+		// NB bit 6 & 7 is not used
+		
+		// disable using latched state for now
+		//m_map_control = data & 0x3f;
+		
+	}
+
+
+	// FIXME Phil says use internal_map
+	// need to have ctor that can call m68000_musashi_device() with our internal_map
+	void cpu_internal_map(address_map &map)
+	{
+		map(0x780000, 0x780000).rw(FUNC(m68010_tekmmu_device::mapcntl_r), FUNC(m68010_tekmmu_device::mapcntl_w));
+		map(0x800000, 0xffffff).rw(FUNC(m68010_tekmmu_device::map_r), FUNC(m68010_tekmmu_device::map_w));
+	}
+
+	m68010_tekmmu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
+		m68010_device::m68010_device(mconfig, tag, owner, clock, address_map_constructor(FUNC(m68010_tekmmu_device::cpu_internal_map),this)),
+		m_map(*this, "map", 0x1000, ENDIANNESS_BIG)		// 2k 16-bit entries
+	{
+	}
+#endif
+
+public:
+	int is_user()
+	{
+		int a = ((get_fc() & 4) == 0);
+		return (a );
+	}
+
 
 	// device_memory_interface overrides
 	bool memory_translate(int spacenum, int intention, offs_t &address, address_space *&target_space) override
@@ -623,7 +743,7 @@ u16 tek440x_state::memory_r(offs_t offset, u16 mem_mask)
 
 	if (!machine().side_effects_disabled())
 	{
-		if ((m_maincpu->get_fc() & 4) == 0)			// User mode access updates map_control from write latch
+		if (m_maincpu->is_user())				// User mode access updates map_control from write latch
 		{
 				// NB need to apply once only as m_map_control gets modified
 				if (m_latched_map_control && m_latched_map_control != m_map_control)
