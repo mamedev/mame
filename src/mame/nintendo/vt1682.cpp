@@ -5441,8 +5441,16 @@ uint8_t vt_vt1682_state::soundcpu_irq_vector_hack_r(offs_t offset)
 
 uint8_t vt_vt1682_state::maincpu_irq_vector_hack_r(offs_t offset)
 {
-	// redirect to Timer IRQ!
-	return rom_8000_to_ffff_r((m_current_main_vector - 0x8000)+offset);
+	if (!machine().side_effects_disabled())
+	{
+		uint8_t ret = rom_8000_to_ffff_r((m_current_main_vector - 0x8000) + offset);
+		// redirect to required IRQ!
+		return ret;
+	}
+	else
+	{
+		return rom_8000_to_ffff_r((0xfffe - 0x8000) + offset);
+	}
 }
 
 // intg5410 writes a new program without resetting the CPU when selecting from the 'arcade' game main menu, this is problematic
