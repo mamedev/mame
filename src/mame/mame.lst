@@ -33773,11 +33773,11 @@ pc9801rx                        // 1988
 pc9801us                        // 1992
 pc9801ux                        // 1987
 pc9801vm                        // 1985
-pc9801vm11                      // 1985
 pc9801vx                        // 1986
 
 @source:nec/pc9801_epson.cpp
 pc286vs                         // 1989
+pc286u                          // 1987
 pc386m                          // 1990
 pc486se                         // 1993
 pc486mu                         // 1994

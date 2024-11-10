@@ -1375,16 +1375,16 @@ static INPUT_PORTS_START( pc9801rs )
 	PORT_CONFSETTING(    0x04, DEF_STR( No ) )
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( pc9801vm11 )
-	PORT_INCLUDE( pc9801rs )
-
-	PORT_MODIFY("DSW3")
-	// TODO: "CPU Add Waitstate Penalty"?
-	// specific for PC-98DO, CV21, UV11 and VM11
-	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW3:!5")
-	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Yes ) )
-INPUT_PORTS_END
+//static INPUT_PORTS_START( pc9801vm11 )
+//  PORT_INCLUDE( pc9801rs )
+//
+//  PORT_MODIFY("DSW3")
+//  // TODO: "CPU Add Waitstate Penalty"?
+//  // specific for PC-98DO, CV21, UV11 and VM11
+//  PORT_DIPNAME( 0x10, 0x00, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW3:!5")
+//  PORT_DIPSETTING(    0x00, DEF_STR( No ) )
+//  PORT_DIPSETTING(    0x10, DEF_STR( Yes ) )
+//INPUT_PORTS_END
 
 
 static const gfx_layout charset_8x8 =
@@ -2701,24 +2701,6 @@ ROM_START( pc9801vm )
 ROM_END
 
 /*
-VM11 - V30 8/10
-
-TODO: this ISN'T a real VM11 model!
-*/
-
-ROM_START( pc9801vm11 )
-	ROM_REGION16_LE( 0x30000, "ipl", ROMREGION_ERASEFF )
-	ROM_LOAD( "itf_ux.rom",  0x10000, 0x08000, BAD_DUMP CRC(c7942563) SHA1(61bb210d64c7264be939b11df1e9cd14ffeee3c9) )
-	ROM_LOAD( "bios_vm.rom", 0x18000, 0x18000, CRC(2e2d7cee) SHA1(159549f845dc70bf61955f9469d2281a0131b47f) )
-
-	ROM_REGION( 0x80000, "chargen", 0 )
-	ROM_LOAD( "font_vm.rom",     0x000000, 0x046800, BAD_DUMP CRC(456d9fc7) SHA1(78ba9960f135372825ab7244b5e4e73a810002ff) )
-
-	LOAD_KANJI_ROMS
-//  LOAD_IDE_ROM
-ROM_END
-
-/*
 VX - 80286 10 + V30 8
 
 UVPROM label on extension board for CPU board (4 * NEC D27C256D-15):
@@ -3076,8 +3058,6 @@ COMP( 1983, pc9801f,    pc9801,   0, pc9801,    pc9801,   pc9801_state, init_pc9
 
 // VM class (V30)
 COMP( 1985, pc9801vm,   0,        0, pc9801vm,  pc9801rs, pc9801vm_state, init_pc9801vm_kanji, "NEC",   "PC-9801VM",                     MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND ) // genuine dump
-COMP( 1985, pc9801vm11, pc9801ux, 0, pc9801vm,  pc9801vm11, pc9801vm_state, init_pc9801_kanji,   "NEC",
-  "PC-9801VM11",                   MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
 // UX class (i286)
 COMP( 1987, pc9801ux,   0,        0, pc9801ux,  pc9801rs, pc9801vm_state, init_pc9801_kanji,   "NEC",   "PC-9801UX",                     MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
