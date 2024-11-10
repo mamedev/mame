@@ -72,11 +72,12 @@
 #include "screen.h"
 #include "speaker.h"
 
+#define LOG_DMA              (1U << 4)
 #define LOG_VRAM_WRITES      (1U << 1)
 #define LOG_SRAM_WRITES      (1U << 2)
 #define LOG_OTHER            (1U << 3)
 
-#define LOG_ALL           (LOG_VRAM_WRITES | LOG_SRAM_WRITES | LOG_OTHER)
+#define LOG_ALL           (LOG_DMA | LOG_VRAM_WRITES | LOG_SRAM_WRITES | LOG_OTHER)
 
 #define VERBOSE             (0)
 #include "logmacro.h"
@@ -725,7 +726,7 @@ public:
 	void mx10_init();
 
 protected:
-	uint8_t uioa_r() { logerror("%s uioa_r dir %02x\n", machine().describe_context(), m_uio->inteact_212a_uio_a_direction_r()); return 0xff; } // cmpmx11 needs something here to boot 
+	uint8_t uioa_r() { logerror("%s uioa_r dir %02x\n", machine().describe_context(), m_uio->inteact_212a_uio_a_direction_r()); return 0xff; } // cmpmx11 needs something here to boot (probably just a power off button in here)
 	uint8_t uiob_r() { logerror("%s uiob_r dir %02x\n", machine().describe_context(), m_uio->inteact_214a_uio_b_direction_r()); return m_io_uiob->read(); }
 	void uiob_w(u8 data)
 	{
@@ -747,9 +748,13 @@ protected:
 
 	virtual void clear_sound_reset_line() override
 	{
-		// the Classic Max Pocket likely use the internal ROM feature of the Sound CPU
-		// as the code uploaded doesn't initialize these things on reset, resulting
-		// in the machine state becoming corrupted
+		// The code uploaded by the Classic Max Pocket units doesn't initialize the SP on reset
+		// leading to the stack destroying critical code / data and moving down RAM every time
+		// the system resets the sound CPU when selecting new games or exiting to menu.
+		//
+		// While it could be there's a small internal ROM stub doing that before jumping to the
+		// vectors (VT168 has this capability for both CPUs) it's equally likely that the 6502
+		// core in the chip just initializes the SP to this value on every reset.
 		vt_vt1682_state::clear_sound_reset_line();
 		m_soundcpu->set_state_int(M6502_S, 0x1e4+0x3); // set stack pointer somewhere sensible, there is a block of 0xff bytes in this area, which could be the correct location
 		m_soundcpu->set_state_int(M6502_P, 0x06); // disable interrupts
@@ -1303,7 +1308,7 @@ uint8_t vt_vt1682_state::vt1682_2000_r()
 
 void vt_vt1682_state::vt1682_2000_w(uint8_t data)
 {
-	LOGMASKED(LOG_OTHER, "%s: vt1682_2000_w writing: %02x (Capture:%1x Slave:%1x NMI_Enable:%1x)\n", machine().describe_context(), data, (data & 0x10)>>4, (data & 0x08)>>3, (data & 0x01)>>0 );
+	LOGMASKED(LOG_OTHER, "%s: vt1682_2000_w writing: %02x (Capture:%1x Slave:%1x NMI_Enable:%1x)\n", machine().describe_context(), data, (data & 0x10) >> 4, (data & 0x08) >> 3, (data & 0x01) >> 0);
 	m_2000 = data;
 }
 
@@ -1518,9 +1523,27 @@ uint8_t vt_vt1682_state::vt1682_2007_vram_data_r()
 void vt_vt1682_state::vt1682_2007_vram_data_w(uint8_t data)
 {
 	uint16_t vram_address = get_vram_addr();
+
 	m_vram->write8(vram_address, data);
-	LOGMASKED(LOG_VRAM_WRITES, "%s: vt1682_2007_vram_data_w writing: %02x to VideoRam Address %04x\n", machine().describe_context(), data, vram_address);
-	vram_address++; // auto inc
+	
+	if (m_2000 & 0x4)
+	{
+		// this mode is completely undocumented, but needed for many games in the cmpmx10 / cmpmx11 sets
+		if (vram_address & 0x01)
+		{
+			vram_address += 0x40;
+			vram_address &= ~0x01;
+		}
+		else
+		{
+			vram_address++;
+		}
+	}
+	else
+	{
+		vram_address++;
+	}
+
 	set_vram_addr(vram_address); // update registers
 }
 
@@ -2724,7 +2747,7 @@ void vt_vt1682_state::clear_sound_reset_line()
 void vt_vt1682_state::vt1682_2106_enable_regs_w(uint8_t data)
 {
 	// COMR6 is used for banking
-	LOGMASKED(LOG_OTHER, "%s: vt1682_2106_enable_regs_w writing: %02x (scpurn:%1x scpuon:%1x spion:%1x uarton:%1x tvon:%1x lcdon:%1x)\n", machine().describe_context().c_str(), data,
+	LOGMASKED(LOG_OTHER, "%s: vt1682_2106_enable_regs_w writing: %02x (scpurn:%1x scpuon:%1x spion:%1x uarton:%1x tvon:%1x lcdon:%1x)\n", machine().describe_context(), data,
 		(data & 0x20) >> 5, (data & 0x10) >> 4, (data & 0x08) >> 3, (data & 0x04) >> 2, (data & 0x02) >> 1, (data & 0x01));
 	m_2106_enable_reg = data;
 
@@ -3395,13 +3418,13 @@ void vt_vt1682_state::vt1682_211c_regs_ext2421_w(uint8_t data)
 uint8_t vt_vt1682_state::vt1682_2122_dma_dt_addr_7_0_r()
 {
 	uint8_t ret = m_2122_dma_dt_addr_7_0;
-	LOGMASKED(LOG_OTHER, "%s: vt1682_2122_dma_dt_addr_7_0_r returning: %02x\n", machine().describe_context(), ret);
+	LOGMASKED(LOG_DMA, "%s: vt1682_2122_dma_dt_addr_7_0_r returning: %02x\n", machine().describe_context(), ret);
 	return ret;
 }
 
 void vt_vt1682_state::vt1682_2122_dma_dt_addr_7_0_w(uint8_t data)
 {
-	LOGMASKED(LOG_OTHER, "%s: vt1682_2122_dma_dt_addr_7_0_w writing: %02x\n", machine().describe_context(), data);
+	LOGMASKED(LOG_DMA, "%s: vt1682_2122_dma_dt_addr_7_0_w writing: %02x\n", machine().describe_context(), data);
 	m_2122_dma_dt_addr_7_0 = data;
 }
 
@@ -3422,13 +3445,13 @@ void vt_vt1682_state::vt1682_2122_dma_dt_addr_7_0_w(uint8_t data)
 uint8_t vt_vt1682_state::vt1682_2123_dma_dt_addr_15_8_r()
 {
 	uint8_t ret = m_2123_dma_dt_addr_15_8;
-	LOGMASKED(LOG_OTHER, "%s: vt1682_2123_dma_dt_addr_15_8_r returning: %02x\n", machine().describe_context(), ret);
+	LOGMASKED(LOG_DMA, "%s: vt1682_2123_dma_dt_addr_15_8_r returning: %02x\n", machine().describe_context(), ret);
 	return ret;
 }
 
 void vt_vt1682_state::vt1682_2123_dma_dt_addr_15_8_w(uint8_t data)
 {
-	LOGMASKED(LOG_OTHER, "%s: vt1682_2123_dma_dt_addr_15_8_w writing: %02x\n", machine().describe_context(), data);
+	LOGMASKED(LOG_DMA, "%s: vt1682_2123_dma_dt_addr_15_8_w writing: %02x\n", machine().describe_context(), data);
 	m_2123_dma_dt_addr_15_8 = data;
 }
 
@@ -3449,13 +3472,13 @@ void vt_vt1682_state::vt1682_2123_dma_dt_addr_15_8_w(uint8_t data)
 uint8_t vt_vt1682_state::vt1682_2124_dma_sr_addr_7_0_r()
 {
 	uint8_t ret = m_2124_dma_sr_addr_7_0;
-	LOGMASKED(LOG_OTHER, "%s: vt1682_2124_dma_sr_addr_7_0_r returning: %02x\n", machine().describe_context(), ret);
+	LOGMASKED(LOG_DMA, "%s: vt1682_2124_dma_sr_addr_7_0_r returning: %02x\n", machine().describe_context(), ret);
 	return ret;
 }
 
 void vt_vt1682_state::vt1682_2124_dma_sr_addr_7_0_w(uint8_t data)
 {
-	LOGMASKED(LOG_OTHER, "%s: vt1682_2124_dma_sr_addr_7_0_w writing: %02x\n", machine().describe_context(), data);
+	LOGMASKED(LOG_DMA, "%s: vt1682_2124_dma_sr_addr_7_0_w writing: %02x\n", machine().describe_context(), data);
 	m_2124_dma_sr_addr_7_0 = data;
 }
 
@@ -3476,13 +3499,13 @@ void vt_vt1682_state::vt1682_2124_dma_sr_addr_7_0_w(uint8_t data)
 uint8_t vt_vt1682_state::vt1682_2125_dma_sr_addr_15_8_r()
 {
 	uint8_t ret = m_2125_dma_sr_addr_15_8;
-	LOGMASKED(LOG_OTHER, "%s: vt1682_2125_dma_sr_addr_15_8_r returning: %02x\n", machine().describe_context(), ret);
+	LOGMASKED(LOG_DMA, "%s: vt1682_2125_dma_sr_addr_15_8_r returning: %02x\n", machine().describe_context(), ret);
 	return ret;
 }
 
 void vt_vt1682_state::vt1682_2125_dma_sr_addr_15_8_w(uint8_t data)
 {
-	LOGMASKED(LOG_OTHER, "%s: vt1682_2125_dma_sr_addr_15_8_w writing: %02x\n", machine().describe_context(), data);
+	LOGMASKED(LOG_DMA, "%s: vt1682_2125_dma_sr_addr_15_8_w writing: %02x\n", machine().describe_context(), data);
 	m_2125_dma_sr_addr_15_8 = data;
 }
 
@@ -3504,13 +3527,13 @@ void vt_vt1682_state::vt1682_2125_dma_sr_addr_15_8_w(uint8_t data)
 uint8_t vt_vt1682_state::vt1682_2126_dma_sr_bank_addr_22_15_r()
 {
 	uint8_t ret = m_2126_dma_sr_bank_addr_22_15;
-	LOGMASKED(LOG_OTHER, "%s: vt1682_2126_dma_sr_bank_addr_22_15_r returning: %02x\n", machine().describe_context(), ret);
+	LOGMASKED(LOG_DMA, "%s: vt1682_2126_dma_sr_bank_addr_22_15_r returning: %02x\n", machine().describe_context(), ret);
 	return ret;
 }
 
 void vt_vt1682_state::vt1682_2126_dma_sr_bank_addr_22_15_w(uint8_t data)
 {
-	LOGMASKED(LOG_OTHER, "%s: vt1682_2126_dma_sr_bank_addr_22_15_w writing: %02x\n", machine().describe_context(), data);
+	LOGMASKED(LOG_DMA, "%s: vt1682_2126_dma_sr_bank_addr_22_15_w writing: %02x\n", machine().describe_context(), data);
 	m_2126_dma_sr_bank_addr_22_15 = data;
 }
 
@@ -3545,7 +3568,7 @@ uint8_t vt_vt1682_state::vt1682_2127_dma_status_r()
 	int dma_status = 0; // 1 would be 'busy'
 	ret |= dma_status;
 
-	LOGMASKED(LOG_OTHER, "%s: vt1682_2127_dma_status_r returning: %02x\n", machine().describe_context(), ret);
+	LOGMASKED(LOG_DMA, "%s: vt1682_2127_dma_status_r returning: %02x\n", machine().describe_context(), ret);
 	return ret;
 }
 
@@ -3560,9 +3583,14 @@ void vt_vt1682_state::do_dma_external_to_internal(int data, bool is_video)
 	uint16_t dstaddr = get_dma_dt_addr();
 
 	if (is_video)
-		LOGMASKED(LOG_OTHER, "Doing DMA, External to Internal (VRAM/SRAM) src: %08x dest: %04x length: %03x\n", srcaddr | srcbank<<15, dstaddr, count);
+	{
+		if (get_dma_dt_addr() == 0x2004)
+			LOGMASKED(LOG_DMA, "Doing DMA, External to Internal (VRAM/SRAM) src: %08x dest: %04x length: %03x - spriteram addr %04x\n", srcaddr | srcbank << 15, dstaddr, count, get_spriteram_addr());
+		else
+			LOGMASKED(LOG_DMA, "Doing DMA, External to Internal (VRAM/SRAM) src: %08x dest: %04x length: %03x - vram addr %04x\n", srcaddr | srcbank << 15, dstaddr, count, get_vram_addr());
+	}
 	else
-		LOGMASKED(LOG_OTHER, "Doing DMA, External to Internal src: %08x dest: %04x length: %03x\n", srcaddr | srcbank<<15, dstaddr, count);
+		LOGMASKED(LOG_DMA, "Doing DMA, External to Internal src: %08x dest: %04x length: %03x\n", srcaddr | srcbank<<15, dstaddr, count);
 
 	for (int i = 0; i < count; i++)
 	{
@@ -3593,9 +3621,14 @@ void vt_vt1682_state::do_dma_internal_to_internal(int data, bool is_video)
 	uint16_t dstaddr = get_dma_dt_addr();
 
 	if (is_video)
-		LOGMASKED(LOG_OTHER, "Doing DMA, Internal to Internal (VRAM/SRAM) src: %04x dest: %04x length: %03x\n", srcaddr, dstaddr, count);
+	{
+		if (get_dma_dt_addr() == 0x2004)
+			LOGMASKED(LOG_DMA, "Doing DMA, Internal to Internal (VRAM/SRAM) src: %04x dest: %04x length: %03x - spriteram addr %04x\n", srcaddr, dstaddr, count, get_spriteram_addr());
+		else
+			LOGMASKED(LOG_DMA, "Doing DMA, Internal to Internal (VRAM/SRAM) src: %04x dest: %04x length: %03x - vram addr %04x\n", srcaddr, dstaddr, count, get_vram_addr());
+	}
 	else
-		LOGMASKED(LOG_OTHER, "Doing DMA, Internal to Internal src: %04x dest: %04x length: %03x\n", srcaddr, dstaddr, count);
+		LOGMASKED(LOG_DMA, "Doing DMA, Internal to Internal src: %04x dest: %04x length: %03x\n", srcaddr, dstaddr, count);
 
 	for (int i = 0; i < count; i++)
 	{
@@ -3621,7 +3654,7 @@ void vt_vt1682_state::do_dma_internal_to_internal(int data, bool is_video)
 
 void vt_vt1682_state::vt1682_2127_dma_size_trigger_w(uint8_t data)
 {
-	LOGMASKED(LOG_OTHER, "%s: vt1682_2127_dma_size_trigger_w writing: %02x\n", machine().describe_context(), data);
+	LOGMASKED(LOG_DMA, "%s: vt1682_2127_dma_size_trigger_w writing: %02x\n", machine().describe_context(), data);
 
 	// hw waits until VBLANK before actually doing the DMA! (TODO)
 
@@ -3631,7 +3664,7 @@ void vt_vt1682_state::vt1682_2127_dma_size_trigger_w(uint8_t data)
 		{
 			// Source External
 			// Dest External
-			LOGMASKED(LOG_OTHER, "Invalid DMA, both Source and Dest are 'External'\n");
+			LOGMASKED(LOG_DMA, "Invalid DMA, both Source and Dest are 'External'\n");
 			return;
 		}
 		else
@@ -3644,7 +3677,7 @@ void vt_vt1682_state::vt1682_2127_dma_size_trigger_w(uint8_t data)
 
 			if ((srcaddr & 1) || ((dstaddr & 1) && (!get_dma_dt_is_video())) )
 			{
-				LOGMASKED(LOG_OTHER, "Invalid DMA, low bit of address set\n");
+				LOGMASKED(LOG_DMA, "Invalid DMA, low bit of address set\n");
 				return;
 			}
 
@@ -3668,11 +3701,11 @@ void vt_vt1682_state::vt1682_2127_dma_size_trigger_w(uint8_t data)
 
 			if ((srcaddr & 1) || (dstaddr & 1))
 			{
-				LOGMASKED(LOG_OTHER, "Invalid DMA, low bit of address set\n");
+				LOGMASKED(LOG_DMA, "Invalid DMA, low bit of address set\n");
 				return;
 			}
 
-			LOGMASKED(LOG_OTHER, "Unhandled DMA, Dest is 'External'\n");
+			LOGMASKED(LOG_DMA, "Unhandled DMA, Dest is 'External'\n");
 			return;
 		}
 		else
@@ -3685,7 +3718,7 @@ void vt_vt1682_state::vt1682_2127_dma_size_trigger_w(uint8_t data)
 
 			if ((srcaddr & 1) || ((dstaddr & 1) && (!get_dma_dt_is_video())) )
 			{
-				LOGMASKED(LOG_OTHER, "Invalid DMA, low bit of address set\n");
+				LOGMASKED(LOG_DMA, "Invalid DMA, low bit of address set\n");
 				return;
 			}
 
@@ -3711,13 +3744,13 @@ void vt_vt1682_state::vt1682_2127_dma_size_trigger_w(uint8_t data)
 uint8_t vt_vt1682_state::vt1682_2128_dma_sr_bank_addr_24_23_r()
 {
 	uint8_t ret = m_2128_dma_sr_bank_addr_24_23;
-	LOGMASKED(LOG_OTHER, "%s: vt1682_2128_dma_sr_bank_addr_24_23_r returning: %02x\n", machine().describe_context(), ret);
+	LOGMASKED(LOG_DMA, "%s: vt1682_2128_dma_sr_bank_addr_24_23_r returning: %02x\n", machine().describe_context(), ret);
 	return ret;
 }
 
 void vt_vt1682_state::vt1682_2128_dma_sr_bank_addr_24_23_w(uint8_t data)
 {
-	LOGMASKED(LOG_OTHER, "%s: vt1682_2128_dma_sr_bank_addr_24_23_w writing: %02x\n", machine().describe_context(), data);
+	LOGMASKED(LOG_DMA, "%s: vt1682_2128_dma_sr_bank_addr_24_23_w writing: %02x\n", machine().describe_context(), data);
 	m_2128_dma_sr_bank_addr_24_23 = data & 0x03;
 }
 
@@ -5860,7 +5893,7 @@ static INPUT_PORTS_START( mx10 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(1)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(1)
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(1)
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) ) // these 2 'unknowns' seem to be power / reset buttons
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
 	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
