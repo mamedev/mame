@@ -72,10 +72,10 @@
 #include "screen.h"
 #include "speaker.h"
 
-#define LOG_DMA              (1U << 4)
 #define LOG_VRAM_WRITES      (1U << 1)
 #define LOG_SRAM_WRITES      (1U << 2)
 #define LOG_OTHER            (1U << 3)
+#define LOG_DMA              (1U << 4)
 
 #define LOG_ALL           (LOG_DMA | LOG_VRAM_WRITES | LOG_SRAM_WRITES | LOG_OTHER)
 
@@ -246,15 +246,15 @@ private:
 	uint8_t m_202e;
 	uint8_t m_2030;
 
-	int m_scu_to_main_irq_active;
-	int m_timera_to_main_irq_active;
-	int m_current_main_vector;
-	int m_new_main_vector;
+	uint8_t m_scu_to_main_irq_active;
+	uint8_t m_timera_to_main_irq_active;
+	uint16_t m_current_main_vector;
+	uint16_t m_new_main_vector;
 
-	int m_timera_to_sound_irq_active;
-	int m_timerb_to_sound_irq_active;
-	int m_current_sound_vector;
-	int m_new_sound_vector;
+	uint8_t m_timera_to_sound_irq_active;
+	uint8_t m_timerb_to_sound_irq_active;
+	uint16_t m_current_sound_vector;
+	uint16_t m_new_sound_vector;
 
 	void update_main_interrupts();
 	void update_sound_interrupts();
@@ -480,9 +480,8 @@ private:
 
 	void vt1682_2105_comr6_tvmodes_w(uint8_t data);
 
-	void vt1682_212e_unused_w(u8 data);
+	void vt1682_212e_scuirq_clear_w(u8 data);
 
-	uint8_t vt1682_211c_scuirq_clear_r();
 	void vt1682_211c_regs_ext2421_w(uint8_t data);
 
 	uint8_t vt1682_2122_dma_dt_addr_7_0_r();
@@ -5278,17 +5277,11 @@ void vt_vt1682_state::vt_vt1682_sound_map(address_map& map)
 	map(0xfffe, 0xffff).r(FUNC(vt_vt1682_state::soundcpu_irq_vector_hack_r)); // probably need custom IRQ support in the core instead...
 }
 
-uint8_t vt_vt1682_state::vt1682_211c_scuirq_clear_r()
+void vt_vt1682_state::vt1682_212e_scuirq_clear_w(u8 data)
 {
-	m_scu_to_main_irq_active = 0;
-	update_main_interrupts();
-	return 0x00;
-}
-
-void vt_vt1682_state::vt1682_212e_unused_w(u8 data)
-{
-	// this is listed as unused, but the main CPU writes here at the
-	// end of the SCU IRQ (and doesn't use 211c above)
+	// this is listed as unused in older documentation, with 211c reads being for scuirq clear
+	// however later documentation lists this address as a correction and the software we are
+	// aware of uses it
 	m_scu_to_main_irq_active = 0;
 	update_main_interrupts();
 }
@@ -5384,7 +5377,7 @@ void vt_vt1682_state::vt_vt1682_map(address_map &map)
 	// 2119 UART
 	// 211a UART
 	// 211b UART
-	map(0x211c, 0x211c).rw(FUNC(vt_vt1682_state::vt1682_211c_scuirq_clear_r), FUNC(vt_vt1682_state::vt1682_211c_regs_ext2421_w));
+	map(0x211c, 0x211c).w(FUNC(vt_vt1682_state::vt1682_211c_regs_ext2421_w));
 	// 211d misc enable regs
 	// 211e ADC
 	// 211f voice gain
@@ -5403,7 +5396,7 @@ void vt_vt1682_state::vt_vt1682_map(address_map &map)
 	map(0x212b, 0x212b).rw(m_uio, FUNC(vrt_vt1682_uio_device::inteact_212b_uio_a_attribute_r), FUNC(vrt_vt1682_uio_device::inteact_212b_uio_a_attribute_w));
 	map(0x212c, 0x212c).rw(FUNC(vt_vt1682_state::vt1682_212c_prng_r), FUNC(vt_vt1682_state::vt1682_212c_prng_seed_w));
 	// 212d PLL
-	map(0x212e, 0x212e).w(FUNC(vt_vt1682_state::vt1682_212e_unused_w));
+	map(0x212e, 0x212e).w(FUNC(vt_vt1682_state::vt1682_212e_scuirq_clear_w));
 	// 212f unused
 	map(0x2130, 0x2130).rw(m_maincpu_alu, FUNC(vrt_vt1682_alu_device::alu_out_1_r), FUNC(vrt_vt1682_alu_device::alu_oprand_1_w));
 	map(0x2131, 0x2131).rw(m_maincpu_alu, FUNC(vrt_vt1682_alu_device::alu_out_2_r), FUNC(vrt_vt1682_alu_device::alu_oprand_2_w));
