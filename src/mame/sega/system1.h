@@ -55,7 +55,7 @@ public:
 	void sys1piox_315_5110(machine_config &config);
 	void sys1piox_315_5111(machine_config &config);
 	void sys1piox_315_5065(machine_config &config);
-	void sys2m(machine_config &config);
+	void shtngmst(machine_config &config);
 	void sys1ppix_315_5178(machine_config &config);
 	void sys1ppix_315_5179(machine_config &config);
 	void sys1piox_315_5093(machine_config &config);
@@ -103,7 +103,6 @@ public:
 	void init_nobb();
 	void init_dakkochn();
 	void init_bootleg();
-	void init_shtngmst();
 	void init_blockgal();
 	void init_nob();
 	void init_myherok();
@@ -135,9 +134,8 @@ private:
 	tilemap_t *m_tilemap_page[8]{};
 	u8 m_tilemap_pages = 0;
 
-	// protection, miscs
+	// protection, misc
 	u8 m_adjust_cycles = 0;
-	u8 m_mute_xor = 0;
 	u8 m_dakkochn_mux_data = 0;
 	u8 m_mcu_control = 0;
 	u8 m_nob_maincpu_latch = 0;
@@ -181,12 +179,10 @@ private:
 	u8 nobb_inport23_r();
 	void nobb_outport24_w(u8 data);
 	u8 nob_start_r();
-	u8 shtngmst_gunx_r();
 
 	// video functions
 	TILE_GET_INFO_MEMBER(tile_get_info);
 	void system1_palette(palette_device &palette) const;
-	DECLARE_MACHINE_START(system2);
 	DECLARE_VIDEO_START(system2);
 	DECLARE_MACHINE_START(myherok);
 	u32 screen_update_system1(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -244,9 +240,10 @@ private:
 	void nobo_map(address_map &map) ATTR_COLD;
 	void sound_map(address_map &map) ATTR_COLD;
 	void system1_map(address_map &map) ATTR_COLD;
-	void blockgal_pio_io_map(address_map &map) ATTR_COLD;
+	void blockgal_io_map(address_map &map) ATTR_COLD;
 	void system1_pio_io_map(address_map &map) ATTR_COLD;
 	void system1_ppi_io_map(address_map &map) ATTR_COLD;
+	void shtngmst_io_map(address_map &map) ATTR_COLD;
 };
 
 #endif // MAME_SEGA_SYSTEM1_H

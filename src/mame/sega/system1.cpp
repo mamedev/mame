@@ -9,13 +9,12 @@ driver by Jarek Parchanski, Nicola Salmoria, Mirko Buffoni
 Up'n Down, Mister Viking, Flicky, SWAT, Water Match and Bull Fight are known
 to run on IDENTICAL hardware (they were sold by Bally-Midway as ROM swaps).
 
-DIP locations verified from manual for:
-      - wboy
-      - choplift
-
-TODO: - fully understand nobb ports involved in the protection
-      - different XTAL/divider configurations for some Star Jacker
-        cabinets? See you.tube/-a7srHVPb_U
+TODO:
+- fully understand nobb ports involved in the protection
+- different XTAL/divider configurations for some Star Jacker cabinets?
+  See you.tube/-a7srHVPb_U
+- shtngmst handgun acts like a machine gun, trigger is a normal microswitch,
+  so what causes this?
 
 *******************************************************************************
 
@@ -349,13 +348,6 @@ void system1_state::machine_start()
 }
 
 
-MACHINE_START_MEMBER(system1_state,system2)
-{
-	system1_state::machine_start();
-	m_mute_xor = 0x01;
-}
-
-
 void system1_state::machine_reset()
 {
 	m_dakkochn_mux_data = 0;
@@ -461,20 +453,6 @@ void system1_state::dakkochn_custom_w(u8 data, u8 prevdata)
 
 /*************************************
  *
- *  Shooting Master gun input
- *
- *************************************/
-
-u8 system1_state::shtngmst_gunx_r()
-{
-	// x is slightly offset, and has a range of 00-fe
-	u8 x = ioport("GUNX")->read() - 0x12;
-	return (x == 0xff) ? 0xfe : x;
-}
-
-
-/*************************************
- *
  *  Sound I/O
  *
  *************************************/
@@ -482,7 +460,7 @@ u8 system1_state::shtngmst_gunx_r()
 void system1_state::sound_control_w(u8 data)
 {
 	/* bit 0 = MUTE (inverted sense on System 2) */
-	machine().sound().system_mute((data ^ m_mute_xor) & 1);
+	machine().sound().system_mute(data & 1);
 
 	/* bit 6 = feedback from sound board that read occurred */
 
@@ -551,12 +529,12 @@ void system1_state::mcu_control_w(u8 data)
 	    Bit 0 -> Directly connected to Z80 /INT line
 	*/
 
-	/* boost interleave to ensure that the MCU can break the Z80 out of a HALT */
+	/* boost interleave to ensure that the MCU can break the Z80 out of BUSRQ */
 	if (!BIT(m_mcu_control, 6) && BIT(data, 6))
 		machine().scheduler().perfect_quantum(attotime::from_usec(10));
 
 	m_mcu_control = data;
-	m_maincpu->set_input_line(INPUT_LINE_HALT, (data & 0x40) ? ASSERT_LINE : CLEAR_LINE);
+	m_maincpu->set_input_line(Z80_INPUT_LINE_BUSRQ, (data & 0x40) ? ASSERT_LINE : CLEAR_LINE);
 	m_maincpu->set_input_line(0, (data & 0x01) ? CLEAR_LINE : ASSERT_LINE);
 }
 
@@ -595,8 +573,11 @@ u8 system1_state::mcu_io_r(offs_t offset)
 			return m_maincpu->space(AS_IO).read_byte(offset);
 
 		default:
-			logerror("%03X: MCU movx read mode %02X offset %04X\n",
-					m_mcu->pc(), m_mcu_control, offset);
+			if (!machine().side_effects_disabled())
+			{
+				logerror("%03X: MCU movx read mode %02X offset %04X\n",
+						m_mcu->pc(), m_mcu_control, offset);
+			}
 			return 0xff;
 	}
 }
@@ -778,6 +759,15 @@ void system1_state::system1_ppi_io_map(address_map &map)
 	map(0x14, 0x17).rw(m_ppi8255, FUNC(i8255_device::read), FUNC(i8255_device::write));
 }
 
+void system1_state::shtngmst_io_map(address_map &map)
+{
+	system1_ppi_io_map(map);
+	map(0x10, 0x10).mirror(0x03).portr("TRIGGER");
+	map(0x18, 0x18).mirror(0x03).portr("SW12");
+	map(0x1c, 0x1c).mirror(0x02).portr("GUNX");
+	map(0x1d, 0x1d).mirror(0x02).portr("GUNY");
+}
+
 /* I/O map for systems with a Z80 PIO chip */
 void system1_state::system1_pio_io_map(address_map &map)
 {
@@ -791,15 +781,11 @@ void system1_state::system1_pio_io_map(address_map &map)
 	map(0x18, 0x1b).rw("pio", FUNC(z80pio_device::read), FUNC(z80pio_device::write));
 }
 
-void system1_state::blockgal_pio_io_map(address_map &map)
+void system1_state::blockgal_io_map(address_map &map)
 {
-	map.global_mask(0x1f);
-	map(0x00, 0x00).mirror(0x03).portr("P1");
-	map(0x04, 0x04).mirror(0x03).portr("P2");
-	map(0x08, 0x08).mirror(0x03).portr("SYSTEM");
-	map(0x0d, 0x0d).mirror(0x02).portr("SWA");    // DIP2
-	map(0x10, 0x10).mirror(0x03).portr("SWB");    // DIP1
-	map(0x18, 0x1b).rw("pio", FUNC(z80pio_device::read), FUNC(z80pio_device::write));
+	system1_pio_io_map(map);
+	map(0x0c, 0x0c).mirror(0x02).unmapr();
+	map(0x0d, 0x0d).mirror(0x02).portr("SWA");
 }
 
 /*************************************
@@ -1754,6 +1740,9 @@ static INPUT_PORTS_START( shtngmst )
 	PORT_MODIFY("P2")
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
+	PORT_MODIFY("SYSTEM")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )
+
 	PORT_MODIFY("SWA")
 	PORT_DIPNAME( 0x01, 0x01, "Shots Per Second" )      PORT_DIPLOCATION("SWB:1")
 	PORT_DIPSETTING(    0x00, "3" )
@@ -1777,46 +1766,52 @@ static INPUT_PORTS_START( shtngmst )
 	PORT_DIPSETTING(    0x40, DEF_STR( Hard ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )
 
-	PORT_START("TRIGGER")  /* trigger is in here */
+	PORT_START("TRIGGER")
 	PORT_BIT( 0x3f, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON1 )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_START("GUNX")
+	PORT_BIT( 0xff, 0x7f, IPT_LIGHTGUN_X ) PORT_CROSSHAIR(X, 1.0, 0.0, 0) PORT_MINMAX(0x00, 0xfe) PORT_SENSITIVITY(48) PORT_KEYDELTA(8)
 
-	PORT_START("GUNX") /* 1c */
-	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_X ) PORT_CROSSHAIR(X, 1.0, 0.0, 0) PORT_SENSITIVITY(48) PORT_KEYDELTA(8)
+	PORT_START("GUNY")
+	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_Y ) PORT_CROSSHAIR(Y, -1.0, 0.0, 0) PORT_MINMAX(0x10, 0xf0) PORT_SENSITIVITY(64) PORT_KEYDELTA(8) PORT_REVERSE
 
-	PORT_START("GUNY") /* 1d */
-	PORT_BIT( 0xff, 0x90, IPT_LIGHTGUN_Y ) PORT_CROSSHAIR(Y, -1.0, 0.0, 0) PORT_MINMAX(0x20, 0xff) PORT_SENSITIVITY(64) PORT_KEYDELTA(8) PORT_REVERSE
-
-	PORT_START("18") /* 18 */
-	/* what is this? check the game code... */
-	PORT_DIPNAME( 0x01, 0x01, "port 18" )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_START("SW12") // 2 dials
+	PORT_CONFNAME( 0x0f, 0x08, "Gun Y Offset" ) // SW 1
+	PORT_CONFSETTING(    0x00, "-16" )
+	PORT_CONFSETTING(    0x01, "-14" )
+	PORT_CONFSETTING(    0x02, "-12" )
+	PORT_CONFSETTING(    0x03, "-10" )
+	PORT_CONFSETTING(    0x04, "-8" )
+	PORT_CONFSETTING(    0x05, "-6" )
+	PORT_CONFSETTING(    0x06, "-4" )
+	PORT_CONFSETTING(    0x07, "-2" )
+	PORT_CONFSETTING(    0x08, "0" )
+	PORT_CONFSETTING(    0x09, "2" )
+	PORT_CONFSETTING(    0x0a, "4" )
+	PORT_CONFSETTING(    0x0b, "6" )
+	PORT_CONFSETTING(    0x0c, "8" )
+	PORT_CONFSETTING(    0x0d, "10" )
+	PORT_CONFSETTING(    0x0e, "12" )
+	PORT_CONFSETTING(    0x0f, "14" )
+	PORT_CONFNAME( 0xf0, 0x60, "Gun X Offset" ) // SW 2
+	PORT_CONFSETTING(    0x00, "-12" )
+	PORT_CONFSETTING(    0x10, "-10" )
+	PORT_CONFSETTING(    0x20, "-8" )
+	PORT_CONFSETTING(    0x30, "-6" )
+	PORT_CONFSETTING(    0x40, "-4" )
+	PORT_CONFSETTING(    0x50, "-2" )
+	PORT_CONFSETTING(    0x60, "0" )
+	PORT_CONFSETTING(    0x70, "2" )
+	PORT_CONFSETTING(    0x80, "4" )
+	PORT_CONFSETTING(    0x90, "6" )
+	PORT_CONFSETTING(    0xa0, "8" )
+	PORT_CONFSETTING(    0xb0, "10" )
+	PORT_CONFSETTING(    0xc0, "12" )
+	PORT_CONFSETTING(    0xd0, "14" )
+	PORT_CONFSETTING(    0xe0, "16" )
+	PORT_CONFSETTING(    0xf0, "18" )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( wboysys2 )
@@ -2034,7 +2029,7 @@ static INPUT_PORTS_START( dakkochn )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )     /* start 1 & 2 not connected. */
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	/*TODO: Dip-Switches */
+	/* TODO: Dip-Switches */
 	PORT_MODIFY("SWA")
 	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Demo_Sounds ) )  PORT_DIPLOCATION("SWB:2")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
@@ -2043,7 +2038,7 @@ static INPUT_PORTS_START( dakkochn )
 	PORT_DIPSETTING(    0x04, "3" )
 	PORT_DIPSETTING(    0x0c, "4" )
 	PORT_DIPSETTING(    0x08, "5" )
-/* 0x00 gives 4 lives */
+	/* 0x00 gives 4 lives */
 	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Bonus_Life ) )   PORT_DIPLOCATION("SWB:5")
 	PORT_DIPSETTING(    0x10, "30000 100000 200000" )
 	PORT_DIPSETTING(    0x00, "50000 150000 250000" )
@@ -2228,8 +2223,6 @@ void system1_state::sys1ppi(machine_config &config)
 void system1_state::sys1ppis(machine_config &config)
 {
 	sys1ppi(config);
-
-	/* video hardware */
 	m_screen->set_visarea(2*(0*8+8), 2*(32*8-1-8), 0*8, 28*8-1);
 }
 
@@ -2285,7 +2278,7 @@ void system1_state::sys1pioxb(machine_config &config)
 void system1_state::blockgal(machine_config &config)
 {
 	sys1pioxb(config);
-	m_maincpu->set_addrmap(AS_IO, &system1_state::blockgal_pio_io_map);
+	m_maincpu->set_addrmap(AS_IO, &system1_state::blockgal_io_map);
 }
 
 void system1_state::sys1ppix_315_5178(machine_config &config)
@@ -2509,11 +2502,11 @@ void system1_state::mcu(machine_config &config)
 
 	config.set_maximum_quantum(attotime::from_hz(m_maincpu->clock() / 16));
 
-	m_screen->screen_vblank().set_inputline("mcu", MCS51_INT0_LINE);
+	TIMER(config, "mcu_t0", 0).configure_periodic(FUNC(system1_state::mcu_t0_callback), attotime::from_usec(2500));
+
 	// This interrupt is driven by pin 15 of a PAL16R4 (315-5138 on Choplifter), based on the vertical count.
 	// The actual duty cycle likely differs from VBLANK, which is another output from the same PAL.
-
-	TIMER(config, "mcu_t0", 0).configure_periodic(FUNC(system1_state::mcu_t0_callback), attotime::from_usec(2500));
+	m_screen->screen_vblank().set_inputline("mcu", MCS51_INT0_LINE);
 }
 
 /* alternate program map with RAM/collision swapped */
@@ -2523,6 +2516,9 @@ void system1_state::nob(machine_config &config)
 
 	/* basic machine hardware */
 	m_maincpu->set_addrmap(AS_PROGRAM, &system1_state::nobo_map);
+
+	// nob is the only game that has 2 coin counters
+	m_ppi8255->out_pb_callback().append([this](u8 data) { machine().bookkeeping().coin_counter_w(1, data & 2); });
 
 	m_sn[1]->set_clock(SOUND_CLOCK / 4);
 }
@@ -2546,7 +2542,7 @@ void system1_state::sys2(machine_config &config)
 {
 	sys1ppi(config);
 
-	MCFG_MACHINE_START_OVERRIDE(system1_state,system2)
+	m_ppi8255->out_pc_callback().set(FUNC(system1_state::sound_control_w)).exor(0x01);
 
 	/* video hardware */
 	MCFG_VIDEO_START_OVERRIDE(system1_state,system2)
@@ -2608,18 +2604,17 @@ void system1_state::sys2xboot(machine_config &config)
 	m_maincpu->set_addrmap(AS_OPCODES, &system1_state::banked_decrypted_opcodes_map);
 }
 
-void system1_state::sys2m(machine_config &config)
+void system1_state::shtngmst(machine_config &config)
 {
 	sys2(config);
 	mcu(config);
+	m_maincpu->set_addrmap(AS_IO, &system1_state::shtngmst_io_map);
 }
 
 /* system2 with rowscroll */
 void system1_state::sys2row(machine_config &config)
 {
 	sys2(config);
-
-	/* video hardware */
 	m_screen->set_screen_update(FUNC(system1_state::screen_update_system2_rowscroll));
 }
 
@@ -5691,16 +5686,6 @@ void system1_state::init_bootsys2d()
 	m_bank1d->configure_entries(0, 4, m_maincpu_region->base() + 0x10000, 0x4000);
 }
 
-void system1_state::init_shtngmst()
-{
-	address_space &iospace = m_maincpu->space(AS_IO);
-	iospace.install_read_port(0x12, 0x12, "TRIGGER");
-	iospace.install_read_port(0x18, 0x18, 0x03, "18");
-	iospace.install_read_handler(0x1c, 0x1c, 0, 0x02, 0, read8smo_delegate(*this, FUNC(system1_state::shtngmst_gunx_r)));
-	iospace.install_read_port(0x1d, 0x1d, 0x02, "GUNY");
-	init_bank0c();
-}
-
 
 
 /*************************************
@@ -5762,7 +5747,7 @@ GAME( 1985, teddybboa,  teddybb,  sys1piox_315_5111, teddybb,   system1_state, e
 GAME( 1985, teddybbobl, teddybb,  sys1piox_315_5155, teddybb,   system1_state, empty_init,        ROT0,   "bootleg", "TeddyBoy Blues (Old Ver. bootleg)", MACHINE_SUPPORTS_SAVE )
 GAME( 1985, myhero,     0,        sys1pio,           myhero,    system1_state, empty_init,        ROT0,   "Coreland / Sega", "My Hero (US, not encrypted)", MACHINE_SUPPORTS_SAVE )
 GAME( 1985, sscandal,   myhero,   sys1piox_315_5132, myhero,    system1_state, empty_init,        ROT0,   "Coreland / Sega", "Seishun Scandal (315-5132, Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, myherobl,   myhero,   sys1piox_315_5132, myhero,    system1_state, empty_init,        ROT0,   "bootleg",         "My Hero (bootleg, 315-5132 encryption)", MACHINE_SUPPORTS_SAVE ) // cloned 315-5132 encryption? might be a direct copy of an undumped original set
+GAME( 1985, myherobl,   myhero,   sys1piox_315_5132, myhero,    system1_state, empty_init,        ROT0,   "bootleg", "My Hero (bootleg, 315-5132 encryption)", MACHINE_SUPPORTS_SAVE ) // cloned 315-5132 encryption? might be a direct copy of an undumped original set
 GAME( 1985, myherok,    myhero,   sys1piox_315_5132, myhero,    system1_state, init_myherok,      ROT0,   "Coreland / Sega", "Cheongchun Ilbeonji (Korea)", MACHINE_SUPPORTS_SAVE ) // possible bootleg, has extra encryption
 GAME( 1985, 4dwarrio,   0,        sys1piox_315_5162, 4dwarrio,  system1_state, empty_init,        ROT0,   "Coreland / Sega", "4-D Warriors (315-5162)", MACHINE_SUPPORTS_SAVE )
 GAME( 1986, raflesia,   0,        sys1piox_315_5162, raflesia,  system1_state, empty_init,        ROT270, "Coreland / Sega", "Rafflesia (315-5162)", MACHINE_SUPPORTS_SAVE )
@@ -5774,7 +5759,7 @@ GAME( 1986, wboyu,      wboy,     sys1pio,           wboyu,     system1_state, e
 GAME( 1986, wboy5,      wboy,     sys1piox_315_5135, wboy3,     system1_state, empty_init,        ROT0,   "bootleg", "Wonder Boy (set 5, bootleg)", MACHINE_SUPPORTS_SAVE )
 GAME( 1986, wboyub,     wboy,     sys1piox_315_5177, wboy,      system1_state, empty_init,        ROT0,   "bootleg", "Wonder Boy (US bootleg)", MACHINE_SUPPORTS_SAVE )
 GAME( 1986, wboyblt,    wboy,     sys1piox_315_5135, wboy3,     system1_state, empty_init,        ROT0,   "bootleg (Tecfri)", "Wonder Boy (Tecfri bootleg)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, blockgal,   0,        blockgal,          blockgal,  system1_state, init_blockgal,     ROT90,  "Sega / Vic Tokai","Block Gal (MC-8123B, 317-0029)", MACHINE_SUPPORTS_SAVE)
+GAME( 1987, blockgal,   0,        blockgal,          blockgal,  system1_state, init_blockgal,     ROT90,  "Sega / Vic Tokai", "Block Gal (MC-8123B, 317-0029)", MACHINE_SUPPORTS_SAVE)
 
 /* PIO-based System 1 with ROM banking */
 GAME( 1985, hvymetal,   0,        sys1piox_315_5135, hvymetal,  system1_state, init_bank44,       ROT0,   "Sega", "Heavy Metal (315-5135)", MACHINE_SUPPORTS_SAVE )
@@ -5785,7 +5770,7 @@ GAME( 1986, brain,      0,        sys1pio,           brain,     system1_state, i
 GAME( 1985, choplift,   0,        sys2rowm,          choplift,  system1_state, init_bank0c,       ROT0,   "Sega", "Choplifter (8751 315-5151)", MACHINE_SUPPORTS_SAVE )
 GAME( 1985, chopliftu,  choplift, sys2row,           choplift,  system1_state, init_bank0c,       ROT0,   "Sega", "Choplifter (unprotected)", MACHINE_SUPPORTS_SAVE )
 GAME( 1985, chopliftbl, choplift, sys2row,           choplift,  system1_state, init_bank0c,       ROT0,   "bootleg", "Choplifter (bootleg)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, shtngmst,   0,        sys2m,             shtngmst,  system1_state, init_shtngmst,     ROT0,   "Sega", "Shooting Master (8751 315-5159a)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, shtngmst,   0,        shtngmst,          shtngmst,  system1_state, init_bank0c,       ROT0,   "Sega", "Shooting Master (8751 315-5159a)", MACHINE_SUPPORTS_SAVE )
 GAME( 1986, gardiab,    gardia,   sys2_317_0007,     gardia,    system1_state, init_bank44,       ROT270, "bootleg", "Gardia (317-0007?, bootleg)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 GAME( 1986, gardiaj,    gardia,   sys2_317_0006,     gardia,    system1_state, init_bank44,       ROT270, "Coreland / Sega", "Gardia (Japan, 317-0006)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 GAME( 1986, wboysys2,   wboy,     sys2_315_5177,     wboysys2,  system1_state, init_bank0c,       ROT0,   "Escape (Sega license)", "Wonder Boy (system 2, set 1, 315-5177)", MACHINE_SUPPORTS_SAVE )
