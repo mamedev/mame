@@ -371,16 +371,24 @@ namespace bx
 	}
 
 	template<> inline BX_CONSTEXPR_FUNC uint8_t countTrailingZeros(uint8_t  _val) { return bx::min<uint8_t>(8,  countTrailingZeros<uint32_t>(_val) ); }
-	template<> inline BX_CONSTEXPR_FUNC uint8_t countTrailingZeros(int8_t   _val) { return             countTrailingZeros<uint8_t >(_val);   }
+	template<> inline BX_CONSTEXPR_FUNC uint8_t countTrailingZeros(int8_t   _val) { return                      countTrailingZeros<uint8_t >(_val);   }
 	template<> inline BX_CONSTEXPR_FUNC uint8_t countTrailingZeros(uint16_t _val) { return bx::min<uint8_t>(16, countTrailingZeros<uint32_t>(_val) ); }
-	template<> inline BX_CONSTEXPR_FUNC uint8_t countTrailingZeros(int16_t  _val) { return             countTrailingZeros<uint16_t>(_val);   }
-	template<> inline BX_CONSTEXPR_FUNC uint8_t countTrailingZeros(int32_t  _val) { return             countTrailingZeros<uint32_t>(_val);   }
-	template<> inline BX_CONSTEXPR_FUNC uint8_t countTrailingZeros(int64_t  _val) { return             countTrailingZeros<uint64_t>(_val);   }
+	template<> inline BX_CONSTEXPR_FUNC uint8_t countTrailingZeros(int16_t  _val) { return                      countTrailingZeros<uint16_t>(_val);   }
+	template<> inline BX_CONSTEXPR_FUNC uint8_t countTrailingZeros(int32_t  _val) { return                      countTrailingZeros<uint32_t>(_val);   }
+	template<> inline BX_CONSTEXPR_FUNC uint8_t countTrailingZeros(int64_t  _val) { return                      countTrailingZeros<uint64_t>(_val);   }
 
 	template<typename Ty>
-	inline BX_CONSTEXPR_FUNC uint8_t findFirstSet(Ty _x)
+	inline BX_CONSTEXPR_FUNC uint8_t findFirstSet(Ty _val)
 	{
-		return Ty(0) == _x ? uint8_t(0) : countTrailingZeros<Ty>(_x) + 1;
+		BX_STATIC_ASSERT(isInteger<Ty>(), "Type Ty must be of integer type!");
+		return Ty(0) == _val ? uint8_t(0) : countTrailingZeros<Ty>(_val) + 1;
+	}
+
+	template<typename Ty>
+	inline BX_CONSTEXPR_FUNC uint8_t findLastSet(Ty _val)
+	{
+		BX_STATIC_ASSERT(isInteger<Ty>(), "Type Ty must be of integer type!");
+		return Ty(0) == _val ? uint8_t(0) : sizeof(Ty)*8 - countLeadingZeros<Ty>(_val);
 	}
 
 	template<typename Ty>

@@ -299,6 +299,11 @@ namespace bx
 	template<typename Ty>
 	BX_CONSTEXPR_FUNC uint8_t findFirstSet(Ty _val);
 
+	/// Find last set.
+	///
+	template<typename Ty>
+	BX_CONSTEXPR_FUNC uint8_t findLastSet(Ty _val);
+
 	/// Returns the next smallest integer base 2 logarithm of _a.
 	///
 	template<typename Ty>

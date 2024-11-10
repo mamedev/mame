@@ -56,17 +56,17 @@ TEST_CASE("log2", "[math][libm]")
 
 TEST_CASE("ceilLog2", "[math]")
 {
-	REQUIRE(0 == bx::ceilLog2(-1) );
-	REQUIRE(0 == bx::ceilLog2(0) );
-	REQUIRE(0 == bx::ceilLog2(1) );
-	REQUIRE(1 == bx::ceilLog2(2) );
-	REQUIRE(2 == bx::ceilLog2(4) );
-	REQUIRE(3 == bx::ceilLog2(8) );
-	REQUIRE(4 == bx::ceilLog2(16) );
-	REQUIRE(5 == bx::ceilLog2(32) );
-	REQUIRE(6 == bx::ceilLog2(64) );
-	REQUIRE(7 == bx::ceilLog2(128) );
-	REQUIRE(8 == bx::ceilLog2(256) );
+	STATIC_REQUIRE(0 == bx::ceilLog2(-1) );
+	STATIC_REQUIRE(0 == bx::ceilLog2(0) );
+	STATIC_REQUIRE(0 == bx::ceilLog2(1) );
+	STATIC_REQUIRE(1 == bx::ceilLog2(2) );
+	STATIC_REQUIRE(2 == bx::ceilLog2(4) );
+	STATIC_REQUIRE(3 == bx::ceilLog2(8) );
+	STATIC_REQUIRE(4 == bx::ceilLog2(16) );
+	STATIC_REQUIRE(5 == bx::ceilLog2(32) );
+	STATIC_REQUIRE(6 == bx::ceilLog2(64) );
+	STATIC_REQUIRE(7 == bx::ceilLog2(128) );
+	STATIC_REQUIRE(8 == bx::ceilLog2(256) );
 
 	{
 		uint32_t ii = 0;
@@ -99,24 +99,23 @@ TEST_CASE("ceilLog2", "[math]")
 
 	for (uint32_t ii = 1; ii < INT32_MAX; ii += rand()%(1<<13)+1)
 	{
-//		DBG("%u: %u %u", ii, bx::uint32_nextpow2(ii), bx::nextPow2(ii) );
 		REQUIRE(bx::nextPow2(ii) == bx::uint32_nextpow2(ii) );
 	}
 }
 
 TEST_CASE("floorLog2", "[math]")
 {
-	REQUIRE(0 == bx::floorLog2(-1) );
-	REQUIRE(0 == bx::floorLog2(0) );
-	REQUIRE(0 == bx::floorLog2(1) );
-	REQUIRE(1 == bx::floorLog2(2) );
-	REQUIRE(2 == bx::floorLog2(4) );
-	REQUIRE(3 == bx::floorLog2(8) );
-	REQUIRE(4 == bx::floorLog2(16) );
-	REQUIRE(5 == bx::floorLog2(32) );
-	REQUIRE(6 == bx::floorLog2(64) );
-	REQUIRE(7 == bx::floorLog2(128) );
-	REQUIRE(8 == bx::floorLog2(256) );
+	STATIC_REQUIRE(0 == bx::floorLog2(-1) );
+	STATIC_REQUIRE(0 == bx::floorLog2(0) );
+	STATIC_REQUIRE(0 == bx::floorLog2(1) );
+	STATIC_REQUIRE(1 == bx::floorLog2(2) );
+	STATIC_REQUIRE(2 == bx::floorLog2(4) );
+	STATIC_REQUIRE(3 == bx::floorLog2(8) );
+	STATIC_REQUIRE(4 == bx::floorLog2(16) );
+	STATIC_REQUIRE(5 == bx::floorLog2(32) );
+	STATIC_REQUIRE(6 == bx::floorLog2(64) );
+	STATIC_REQUIRE(7 == bx::floorLog2(128) );
+	STATIC_REQUIRE(8 == bx::floorLog2(256) );
 
 	{
 		uint32_t ii = 0;
@@ -172,63 +171,132 @@ TEST_CASE("ceilLog2 & floorLog2", "[math]")
 
 TEST_CASE("countTrailingZeros", "[math]")
 {
-	REQUIRE( 0 == bx::countTrailingZeros<uint8_t >(1) );
-	REQUIRE( 7 == bx::countTrailingZeros<uint8_t >(1<<7) );
-	REQUIRE( 8 == bx::countTrailingZeros<uint8_t >(0) );
-	REQUIRE( 1 == bx::countTrailingZeros<uint8_t >(0x3e) );
-	REQUIRE( 0 == bx::countTrailingZeros<uint16_t>(1) );
-	REQUIRE(15 == bx::countTrailingZeros<uint16_t>(1<<15) );
-	REQUIRE(16 == bx::countTrailingZeros<uint16_t>(0) );
-	REQUIRE( 0 == bx::countTrailingZeros<uint32_t>(1) );
-	REQUIRE(32 == bx::countTrailingZeros<uint32_t>(0) );
-	REQUIRE(31 == bx::countTrailingZeros<uint32_t>(1u<<31) );
-	REQUIRE( 0 == bx::countTrailingZeros<uint64_t>(1) );
-	REQUIRE(64 == bx::countTrailingZeros<uint64_t>(0) );
+	STATIC_REQUIRE( 0 == bx::countTrailingZeros<uint8_t >(1) );
+	STATIC_REQUIRE( 7 == bx::countTrailingZeros<uint8_t >(1<<7) );
+	STATIC_REQUIRE( 8 == bx::countTrailingZeros<uint8_t >(0) );
+	STATIC_REQUIRE( 1 == bx::countTrailingZeros<uint8_t >(0x3e) );
+	STATIC_REQUIRE( 0 == bx::countTrailingZeros<uint16_t>(1) );
+	STATIC_REQUIRE(15 == bx::countTrailingZeros<uint16_t>(1<<15) );
+	STATIC_REQUIRE(16 == bx::countTrailingZeros<uint16_t>(0) );
+	STATIC_REQUIRE( 0 == bx::countTrailingZeros<uint32_t>(1) );
+	STATIC_REQUIRE(32 == bx::countTrailingZeros<uint32_t>(0) );
+	STATIC_REQUIRE(31 == bx::countTrailingZeros<uint32_t>(1u<<31) );
+	STATIC_REQUIRE( 0 == bx::countTrailingZeros<uint64_t>(1) );
+	STATIC_REQUIRE(64 == bx::countTrailingZeros<uint64_t>(0) );
 }
 
 TEST_CASE("countLeadingZeros", "[math]")
 {
-	REQUIRE( 7 == bx::countLeadingZeros<uint8_t >(1) );
-	REQUIRE( 8 == bx::countLeadingZeros<uint8_t >(0) );
-	REQUIRE( 2 == bx::countLeadingZeros<uint8_t >(0x3e) );
-	REQUIRE(15 == bx::countLeadingZeros<uint16_t>(1) );
-	REQUIRE(16 == bx::countLeadingZeros<uint16_t>(0) );
-	REQUIRE(31 == bx::countLeadingZeros<uint32_t>(1) );
-	REQUIRE(32 == bx::countLeadingZeros<uint32_t>(0) );
-	REQUIRE(63 == bx::countLeadingZeros<uint64_t>(1) );
-	REQUIRE(64 == bx::countLeadingZeros<uint64_t>(0) );
+	STATIC_REQUIRE( 7 == bx::countLeadingZeros<uint8_t >(1) );
+	STATIC_REQUIRE( 8 == bx::countLeadingZeros<uint8_t >(0) );
+	STATIC_REQUIRE( 2 == bx::countLeadingZeros<uint8_t >(0x3e) );
+	STATIC_REQUIRE(15 == bx::countLeadingZeros<uint16_t>(1) );
+	STATIC_REQUIRE(16 == bx::countLeadingZeros<uint16_t>(0) );
+	STATIC_REQUIRE(31 == bx::countLeadingZeros<uint32_t>(1) );
+	STATIC_REQUIRE(32 == bx::countLeadingZeros<uint32_t>(0) );
+	STATIC_REQUIRE(63 == bx::countLeadingZeros<uint64_t>(1) );
+	STATIC_REQUIRE(64 == bx::countLeadingZeros<uint64_t>(0) );
 }
 
 TEST_CASE("countBits", "[math]")
 {
-	REQUIRE( 0 == bx::countBits(0) );
-	REQUIRE( 1 == bx::countBits(1) );
+	STATIC_REQUIRE( 0 == bx::countBits(0) );
+	STATIC_REQUIRE( 1 == bx::countBits(1) );
 
-	REQUIRE( 4 == bx::countBits<uint8_t>(0x55) );
-	REQUIRE( 8 == bx::countBits<uint16_t>(0x5555) );
-	REQUIRE(16 == bx::countBits<uint32_t>(0x55555555) );
-	REQUIRE(32 == bx::countBits<uint64_t>(0x5555555555555555) );
+	STATIC_REQUIRE( 4 == bx::countBits<uint8_t>(0x55) );
+	STATIC_REQUIRE( 8 == bx::countBits<uint16_t>(0x5555) );
+	STATIC_REQUIRE(16 == bx::countBits<uint32_t>(0x55555555) );
+	STATIC_REQUIRE(32 == bx::countBits<uint64_t>(0x5555555555555555) );
 
-	REQUIRE( 8 == bx::countBits(UINT8_MAX) );
-	REQUIRE(16 == bx::countBits(UINT16_MAX) );
-	REQUIRE(32 == bx::countBits(UINT32_MAX) );
-	REQUIRE(64 == bx::countBits(UINT64_MAX) );
+	STATIC_REQUIRE( 8 == bx::countBits(UINT8_MAX) );
+	STATIC_REQUIRE(16 == bx::countBits(UINT16_MAX) );
+	STATIC_REQUIRE(32 == bx::countBits(UINT32_MAX) );
+	STATIC_REQUIRE(64 == bx::countBits(UINT64_MAX) );
+}
+
+template<typename Ty>
+void testFindFirstSet()
+{
+	for (uint8_t ii = 0, num = sizeof(Ty)*8; ii < num; ++ii)
+	{
+		{
+			const Ty val = Ty(1) << ii;
+			const uint8_t result = bx::findFirstSet<Ty>(val);
+			REQUIRE(result == ii + 1);
+		}
+
+		{
+			const Ty val = ( (Ty(1) << ii) ) | (Ty(1) << (num - 1) );
+			const uint8_t result = bx::findFirstSet<Ty>(val);
+			REQUIRE(result == ii + 1);
+		}
+	}
 }
 
 TEST_CASE("findFirstSet", "[math]")
 {
-	REQUIRE( 1 == bx::findFirstSet<uint8_t >(1) );
-	REQUIRE( 8 == bx::findFirstSet<uint8_t >(1<<7) );
-	REQUIRE( 0 == bx::findFirstSet<uint8_t >(0) );
-	REQUIRE( 2 == bx::findFirstSet<uint8_t >(0x3e) );
-	REQUIRE( 1 == bx::findFirstSet<uint16_t>(1) );
-	REQUIRE(16 == bx::findFirstSet<uint16_t>(1<<15) );
-	REQUIRE( 0 == bx::findFirstSet<uint16_t>(0) );
-	REQUIRE( 1 == bx::findFirstSet<uint32_t>(1) );
-	REQUIRE( 0 == bx::findFirstSet<uint32_t>(0) );
-	REQUIRE(32 == bx::findFirstSet<uint32_t>(1u<<31) );
-	REQUIRE( 1 == bx::findFirstSet<uint64_t>(1) );
-	REQUIRE( 0 == bx::findFirstSet<uint64_t>(0) );
+	STATIC_REQUIRE( 1 == bx::findFirstSet<uint8_t >(1) );
+	STATIC_REQUIRE( 8 == bx::findFirstSet<uint8_t >(1<<7) );
+	STATIC_REQUIRE( 0 == bx::findFirstSet<uint8_t >(0) );
+	STATIC_REQUIRE( 2 == bx::findFirstSet<uint8_t >(0x3e) );
+	STATIC_REQUIRE( 1 == bx::findFirstSet<uint16_t>(1) );
+	STATIC_REQUIRE(16 == bx::findFirstSet<uint16_t>(1<<15) );
+	STATIC_REQUIRE( 0 == bx::findFirstSet<uint16_t>(0) );
+	STATIC_REQUIRE( 1 == bx::findFirstSet<uint32_t>(1) );
+	STATIC_REQUIRE( 0 == bx::findFirstSet<uint32_t>(0) );
+	STATIC_REQUIRE(32 == bx::findFirstSet<uint32_t>(1u<<31) );
+	STATIC_REQUIRE( 1 == bx::findFirstSet<uint64_t>(1) );
+	STATIC_REQUIRE( 0 == bx::findFirstSet<uint64_t>(0) );
+	STATIC_REQUIRE(64 == bx::findFirstSet<uint64_t>(0x8000000000000000ull) );
+	STATIC_REQUIRE( 1 == bx::findFirstSet<uint64_t>(0x8000000000000001ull) );
+
+	testFindFirstSet<uint8_t>();
+	testFindFirstSet<uint16_t>();
+	testFindFirstSet<uint32_t>();
+	testFindFirstSet<uint64_t>();
+}
+
+template<typename Ty>
+void testFindLastSet()
+{
+	for (uint8_t ii = 0, num = sizeof(Ty)*8; ii < num; ++ii)
+	{
+		{
+			const Ty val = Ty(1) << ii;
+			const uint8_t result = bx::findLastSet<Ty>(val);
+			REQUIRE(result == ii + 1);
+		}
+
+		{
+			const Ty val = (Ty(1) << ii) - 1;
+			const uint8_t result = bx::findLastSet<Ty>(val);
+			REQUIRE(result == ii);
+		}
+	}
+}
+
+TEST_CASE("findLastSet", "[math]")
+{
+	STATIC_REQUIRE( 1 == bx::findLastSet<uint8_t >(1) );
+	STATIC_REQUIRE( 8 == bx::findLastSet<uint8_t >(1<<7) );
+	STATIC_REQUIRE( 0 == bx::findLastSet<uint8_t >(0) );
+	STATIC_REQUIRE( 6 == bx::findLastSet<uint8_t >(0x3e) );
+	STATIC_REQUIRE( 1 == bx::findLastSet<uint16_t>(1) );
+	STATIC_REQUIRE(16 == bx::findLastSet<uint16_t>(1<<15) );
+	STATIC_REQUIRE( 0 == bx::findLastSet<uint16_t>(0) );
+	STATIC_REQUIRE( 1 == bx::findLastSet<uint32_t>(1) );
+	STATIC_REQUIRE( 0 == bx::findLastSet<uint32_t>(0) );
+	STATIC_REQUIRE(32 == bx::findLastSet<uint32_t>(1u<<31) );
+	STATIC_REQUIRE( 1 == bx::findLastSet<uint64_t>(1) );
+	STATIC_REQUIRE( 0 == bx::findLastSet<uint64_t>(0) );
+	STATIC_REQUIRE( 1 == bx::findLastSet<uint64_t>(1ull) );
+	STATIC_REQUIRE(64 == bx::findLastSet<uint64_t>(0x8000000000000000ull) );
+	STATIC_REQUIRE(64 == bx::findLastSet<uint64_t>(0x8000000000000001ull) );
+
+	testFindLastSet<uint8_t>();
+	testFindLastSet<uint16_t>();
+	testFindLastSet<uint32_t>();
+	testFindLastSet<uint64_t>();
 }
 
 BX_PRAGMA_DIAGNOSTIC_PUSH();
@@ -236,16 +304,16 @@ BX_PRAGMA_DIAGNOSTIC_IGNORED_MSVC(4723) // potential divide by 0
 
 TEST_CASE("rcp", "[math][libm]")
 {
-	REQUIRE(1.0f == bx::rcp(1.0f) );
-	REQUIRE(2.0f == bx::rcp(0.5f) );
+	STATIC_REQUIRE(1.0f == bx::rcp(1.0f) );
+	STATIC_REQUIRE(2.0f == bx::rcp(0.5f) );
 	REQUIRE(bx::isInfinite(bx::rcp( 0.0f) ) );
 	REQUIRE(bx::isInfinite(bx::rcp(-0.0f) ) );
 }
 
 TEST_CASE("rcpSafe", "[math][libm]")
 {
-	REQUIRE(1.0f == bx::rcpSafe(1.0f) );
-	REQUIRE(2.0f == bx::rcpSafe(0.5f) );
+	STATIC_REQUIRE(1.0f == bx::rcpSafe(1.0f) );
+	STATIC_REQUIRE(2.0f == bx::rcpSafe(0.5f) );
 	REQUIRE(!bx::isInfinite(bx::rcpSafe( 0.0f) ) );
 	REQUIRE(!bx::isInfinite(bx::rcpSafe(-0.0f) ) );
 }
@@ -348,43 +416,43 @@ BX_PRAGMA_DIAGNOSTIC_POP();
 
 TEST_CASE("abs", "[math][libm]")
 {
-	REQUIRE(1389.0f == bx::abs(-1389.0f) );
-	REQUIRE(1389.0f == bx::abs( 1389.0f) );
-	REQUIRE(   0.0f == bx::abs(-0.0f) );
-	REQUIRE(   0.0f == bx::abs( 0.0f) );
+	STATIC_REQUIRE(1389.0f == bx::abs(-1389.0f) );
+	STATIC_REQUIRE(1389.0f == bx::abs( 1389.0f) );
+	STATIC_REQUIRE(   0.0f == bx::abs(-0.0f) );
+	STATIC_REQUIRE(   0.0f == bx::abs( 0.0f) );
 }
 
 TEST_CASE("mod", "[math][libm]")
 {
-	REQUIRE(389.0f == bx::mod(1389.0f, 1000.0f) );
-	REQUIRE( 89.0f == bx::mod(1389.0f, 100.0f) );
-	REQUIRE(  9.0f == bx::mod(1389.0f, 10.0f) );
-	REQUIRE(  4.0f == bx::mod(1389.0f, 5.0f) );
-	REQUIRE(  1.0f == bx::mod(1389.0f, 2.0f) );
+	STATIC_REQUIRE(389.0f == bx::mod(1389.0f, 1000.0f) );
+	STATIC_REQUIRE( 89.0f == bx::mod(1389.0f, 100.0f) );
+	STATIC_REQUIRE(  9.0f == bx::mod(1389.0f, 10.0f) );
+	STATIC_REQUIRE(  4.0f == bx::mod(1389.0f, 5.0f) );
+	STATIC_REQUIRE(  1.0f == bx::mod(1389.0f, 2.0f) );
 }
 
 TEST_CASE("floor", "[math][libm]")
 {
-	REQUIRE( 13.0f == bx::floor( 13.89f) );
-	REQUIRE(-14.0f == bx::floor(-13.89f) );
+	STATIC_REQUIRE( 13.0f == bx::floor( 13.89f) );
+	STATIC_REQUIRE(-14.0f == bx::floor(-13.89f) );
 }
 
 TEST_CASE("ceil", "[math][libm]")
 {
-	REQUIRE( 14.0f == bx::ceil(  13.89f) );
-	REQUIRE(-13.0f == bx::ceil( -13.89f) );
+	STATIC_REQUIRE( 14.0f == bx::ceil(  13.89f) );
+	STATIC_REQUIRE(-13.0f == bx::ceil( -13.89f) );
 }
 
 TEST_CASE("trunc", "[math][libm]")
 {
-	REQUIRE( 13.0f == bx::trunc( 13.89f) );
-	REQUIRE(-13.0f == bx::trunc(-13.89f) );
+	STATIC_REQUIRE( 13.0f == bx::trunc( 13.89f) );
+	STATIC_REQUIRE(-13.0f == bx::trunc(-13.89f) );
 }
 
 TEST_CASE("fract", "[math][libm]")
 {
-	REQUIRE(bx::isEqual( 0.89f, bx::fract( 13.89f), 0.000001f) );
-	REQUIRE(bx::isEqual(-0.89f, bx::fract(-13.89f), 0.000001f) );
+	STATIC_REQUIRE(bx::isEqual( 0.89f, bx::fract( 13.89f), 0.000001f) );
+	STATIC_REQUIRE(bx::isEqual(-0.89f, bx::fract(-13.89f), 0.000001f) );
 }
 
 TEST_CASE("ldexp", "[math][libm]")
@@ -633,10 +701,10 @@ TEST_CASE("bitsToFloat, floatToBits, bitsToDouble, doubleToBits", "[math]")
 
 TEST_CASE("lerp", "[math]")
 {
-	REQUIRE(1389.0f == bx::lerp(1389.0f, 1453.0f, 0.0f) );
-	REQUIRE(1453.0f == bx::lerp(1389.0f, 1453.0f, 1.0f) );
-	REQUIRE(   0.5f == bx::lerp(   0.0f,    1.0f, 0.5f) );
-	REQUIRE(   0.0f == bx::lerp(   0.0f,    0.0f, 0.5f) );
+	STATIC_REQUIRE(1389.0f == bx::lerp(1389.0f, 1453.0f, 0.0f) );
+	STATIC_REQUIRE(1453.0f == bx::lerp(1389.0f, 1453.0f, 1.0f) );
+	STATIC_REQUIRE(   0.5f == bx::lerp(   0.0f,    1.0f, 0.5f) );
+	STATIC_REQUIRE(   0.0f == bx::lerp(   0.0f,    0.0f, 0.5f) );
 }
 
 void mtxCheck(const float* _a, const float* _b)
