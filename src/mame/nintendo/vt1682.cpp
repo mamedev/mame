@@ -622,7 +622,6 @@ private:
 	int get_address_for_tilepos(int x, int y, int tilesize, uint16_t* pagebases);
 
 	void draw_tile_pixline(int segment, int tile, int yy, int x, int y, int palselect, int pal, int is16pix_high, int is16pix_wide, int bpp, int depth, int opaque, int flipx, int flipy, const rectangle& cliprect);
-	[[maybe_unused]] void draw_tile(int segment, int tile, int x, int y, int palselect, int pal, int is16pix_high, int is16pix_wide, int bpp, int depth, int opaque, int flipx, int flipy, const rectangle& cliprect);
 	void draw_layer(int which, int opaque, const rectangle& cliprect);
 	void draw_sprites(const rectangle& cliprect);
 };
@@ -4484,15 +4483,6 @@ void vt_vt1682_state::draw_tile_pixline(int segment, int tile, int tileline, int
 				shift += shift_amount;
 			}
 		}
-	}
-}
-void vt_vt1682_state::draw_tile(int segment, int tile, int x, int y, int palselect, int pal, int is16pix_high, int is16pix_wide, int bpp, int depth, int opaque, int flipx, int flipy, const rectangle& cliprect)
-{
-	int tilesize_high = is16pix_high ? 16 : 8;
-
-	for (int yy = 0; yy < tilesize_high; yy++) // tile y lines
-	{
-		draw_tile_pixline(segment, tile, yy, x, y+yy, palselect, pal, is16pix_high, is16pix_wide, bpp, depth, opaque, flipx, flipy, cliprect);
 	}
 }
 
