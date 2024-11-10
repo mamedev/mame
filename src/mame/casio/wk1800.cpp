@@ -200,9 +200,9 @@ void wk1800_state::render_w(int state)
 void wk1800_state::wk1600_map(address_map& map)
 {
 	map(0x00000, 0x1ffff).rom();
-	map(0x20000, 0x2ffff).rw(m_gt155, NAME(gt155_device::read), NAME(gt155_device::write));
-	map(0x30000, 0x30001).mirror(0x0fff0).r("kbd", NAME(gt913_kbd_hle_device::read));
-	map(0x30002, 0x30003).mirror(0x0fff0).r("kbd", NAME(gt913_kbd_hle_device::status_r));
+	map(0x20000, 0x2ffff).rw(m_gt155, FUNC(gt155_device::read), FUNC(gt155_device::write));
+	map(0x30000, 0x30001).mirror(0x0fff0).r("kbd", FUNC(gt913_kbd_hle_device::read));
+	map(0x30002, 0x30003).mirror(0x0fff0).r("kbd", FUNC(gt913_kbd_hle_device::status_r));
 	map(0x80000, 0x9ffff).mirror(0x60000).ram().share("nvram");
 }
 
@@ -210,11 +210,11 @@ void wk1800_state::wk1600_map(address_map& map)
 void wk1800_state::wk1800_map(address_map& map)
 {
 	map(0x00000, 0x1ffff).rom();
-	map(0x20000, 0x2ffff).rw(m_gt155, NAME(gt155_device::read), NAME(gt155_device::write));
-	map(0x30000, 0x30001).mirror(0x0fff0).r("kbd", NAME(gt913_kbd_hle_device::read));
-	map(0x30002, 0x30003).mirror(0x0fff0).r("kbd", NAME(gt913_kbd_hle_device::status_r));
+	map(0x20000, 0x2ffff).rw(m_gt155, FUNC(gt155_device::read), FUNC(gt155_device::write));
+	map(0x30000, 0x30001).mirror(0x0fff0).r("kbd", FUNC(gt913_kbd_hle_device::read));
+	map(0x30002, 0x30003).mirror(0x0fff0).r("kbd", FUNC(gt913_kbd_hle_device::status_r));
 	map(0x40000, 0x40003).mirror(0x1fffc).m(m_fdc, FUNC(hd63266f_device::map));
-	map(0x60000, 0x7ffff).rw(m_fdc, NAME(hd63266f_device::dma_r), NAME(hd63266f_device::dma_w));
+	map(0x60000, 0x7ffff).rw(m_fdc, FUNC(hd63266f_device::dma_r), FUNC(hd63266f_device::dma_w));
 	map(0x80000, 0xbffff).mirror(0x40000).ram().share("nvram");
 }
 
