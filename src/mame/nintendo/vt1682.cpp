@@ -6573,10 +6573,11 @@ ROM_START( cmpmx11 )
 	// this set doesn't use external banking, and expects the 8Mbytes to map straight
 ROM_END
 
-// might be VT-09 or VT-162, uses a ROM glob on a sub-board, data lines seem scrambled at least?
-CONS( 2009, cmpmx11,     0,        0,  mx10, mx10, vt1682_mx10_state, mx10_init, "Jungle Soft (Premier Portfolio International license)",    "Classic Max Pocket PCMX11 - 12 in 1 Colour Games Console (horizontal, France)", MACHINE_NOT_WORKING )
+// as with others the cmpmx10 and cmpmx11 have minor offset issues in some games, you can see it easily in Jewel Master
+// 2007 is the copyright date shown on all the games, but the unit could have been released later
+CONS( 2007, cmpmx11,     0,        0,  mx10, mx10, vt1682_mx10_state, mx10_init, "Jungle Soft (Premier Portfolio International license)",    "Classic Max Pocket PCMX11 - 12 in 1 Colour Games Console (horizontal, France)", MACHINE_IMPERFECT_GRAPHICS )
 // this unit has a vertical screen, and the games are designed for that aspect
 // only Jungle Soft is shown on box for manufacturer details, 30-in-1 versions also exist
 // see https://bootleggames.fandom.com/wiki/Classic_Max_Pocket for other units with these games
 // how do you specify ROT270 with CONS? using GAME macro for now
-GAME( 2009, cmpmx10,     0,        mx10, mx10, vt1682_mx10_state, mx10_init, ROT270, "Jungle Soft",    "Classic Max Pocket Mx-10 - 12 in 1 (vertical)", MACHINE_NOT_WORKING )
+GAME( 2007, cmpmx10,     0,        mx10, mx10, vt1682_mx10_state, mx10_init, ROT270, "Jungle Soft",    "Classic Max Pocket Mx-10 - 12 in 1 (vertical)", MACHINE_IMPERFECT_GRAPHICS )
