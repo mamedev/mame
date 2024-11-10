@@ -1040,6 +1040,8 @@ void vt_vt1682_state::machine_reset()
 
 	m_soundcpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 	m_scpu_is_in_reset = 1;
+
+	update_main_interrupts();
 }
 
 /*
