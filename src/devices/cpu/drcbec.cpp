@@ -950,13 +950,13 @@ int drcbe_c::execute(code_handle &entry)
 				break;
 
 			case MAKE_OPCODE_SHORT(OP_MULU, 4, 0):      // MULU    dst,edst,src1,src2[,f]
-				temp64 = (uint64_t)(uint32_t)PARAM2 * (uint64_t)(uint32_t)PARAM3;
+				temp64 = mulu_32x32(PARAM2, PARAM3);
 				PARAM1 = temp64 >> 32;
 				PARAM0 = (uint32_t)temp64;
 				break;
 
 			case MAKE_OPCODE_SHORT(OP_MULU, 4, 1):
-				temp64 = (uint64_t)(uint32_t)PARAM2 * (uint64_t)(uint32_t)PARAM3;
+				temp64 = mulu_32x32(PARAM2, PARAM3);
 				flags = FLAGS64_NZ(temp64);
 				PARAM1 = temp64 >> 32;
 				PARAM0 = (uint32_t)temp64;
@@ -965,13 +965,13 @@ int drcbe_c::execute(code_handle &entry)
 				break;
 
 			case MAKE_OPCODE_SHORT(OP_MULS, 4, 0):      // MULS    dst,edst,src1,src2[,f]
-				temp64 = (int64_t)(int32_t)PARAM2 * (int64_t)(int32_t)PARAM3;
+				temp64 = mul_32x32(PARAM2, PARAM3);
 				PARAM1 = temp64 >> 32;
 				PARAM0 = (uint32_t)temp64;
 				break;
 
 			case MAKE_OPCODE_SHORT(OP_MULS, 4, 1):
-				temp64 = (int64_t)(int32_t)PARAM2 * (int64_t)(int32_t)PARAM3;
+				temp64 = mul_32x32(PARAM2, PARAM3);
 				temp32 = (int32_t)temp64;
 				flags = FLAGS32_NZ(temp32);
 				PARAM1 = temp64 >> 32;
