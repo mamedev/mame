@@ -225,27 +225,27 @@ public:
 
 		//if (m_emmu_enabled)
 		if (spacenum == AS_PROGRAM)
-		if (!(m_s_flag & 4))			// only in User mode
-		if (BIT(*m_map_control, MAP_VM_ENABLE))
+		if (!supervisor_mode())		// only in User mode
+		if (BIT(*m_map_control_ptr, MAP_VM_ENABLE))
 		{
 			if (intention == TR_WRITE)
-			if (BIT(m_map[address >> 12], 14) == 0)	// read only
+			if (BIT(m_map_ptr[address >> 12], 14) == 0)	// read only
 			{
 				LOG("memory_translate: write fail\n");
 				return false;
 			}
 
-			if (BIT(m_map[address >> 12], 11, 3) != (*m_map_control & 7))
+			if (BIT(m_map_ptr[address >> 12], 11, 3) != (*m_map_control_ptr & 7))
 			{
 				return false;
 			}
 			
 			// dont try and translate a null page
-			if (BIT(m_map[address >> 12], 11, 3) != 0)
+			if (BIT(m_map_ptr[address >> 12], 11, 3) != 0)
 			{
-				LOG("memory_translate: map %08x => paddr(%08x)\n",(address), (BIT(address, 0, 12) | (BIT(m_map[address >> 12], 0, 11) << 12) ) );
+				//LOG("memory_translate: map %08x => paddr(%08x)\n",(address), (BIT(address, 0, 12) | (BIT(m_map_ptr[address >> 12], 0, 11) << 12) ) );
 			
-				address = BIT(address, 0, 12) | (BIT(m_map[address >> 12], 0, 11) << 12);
+				address = BIT(address, 0, 12) | (BIT(m_map_ptr[address >> 12], 0, 11) << 12);
 			}
 			else
 			{
@@ -262,27 +262,27 @@ public:
 		m_mmu_tmp_fc = fc;
 		m_mmu_tmp_sz = sz;
 
-		if (!m_mmu_tmp_buserror_occurred && ((fc & 4) == 0) && (BIT(*m_map_control, MAP_VM_ENABLE)))
+		if (!m_mmu_tmp_buserror_occurred && ((fc & 4) == 0) && (BIT(*m_map_control_ptr, MAP_VM_ENABLE)))
 		{
-			LOG("mmu_translate_address: map %08x => paddr(%08x) fc(%d) pc(%08x)\n",(address), BIT(address, 0, 12) | (BIT(m_map[address >> 12], 0, 11) << 12), fc, pc());
+			LOG("mmu_translate_address: map %08x => paddr(%08x) fc(%d) pc(%08x)\n",(address), BIT(address, 0, 12) | (BIT(m_map_ptr[address >> 12], 0, 11) << 12), fc, pc());
 
 			if (rw)
 			{
 				// is !cpuWr
-				*m_map_control &= ~(1 << MAP_CPU_WR);
+				*m_map_control_ptr &= ~(1 << MAP_CPU_WR);
 			}
 			else
 			{
 				// is cpuWr
-				*m_map_control |= (1 << MAP_CPU_WR);
+				*m_map_control_ptr |= (1 << MAP_CPU_WR);
 			}
 
 			// matching pid
-			if (BIT(m_map[address >> 12], 11, 3) != (*m_map_control & 7))
+			if (BIT(m_map_ptr[address >> 12], 11, 3) != (*m_map_control_ptr & 7))
 			{
-				*m_map_control &= ~(1 << MAP_BLOCK_ACCESS);
+				*m_map_control_ptr &= ~(1 << MAP_BLOCK_ACCESS);
 
-				LOG("mmu_translate_address: bus error: PID(%d) != %d %08x fc(%d) pc(%08x)\n", BIT(m_map[address >> 12], 11, 3), (*m_map_control & 7), address, fc, pc());
+				LOG("mmu_translate_address: bus error: PID(%d) != %d %08x fc(%d) pc(%08x)\n", BIT(m_map_ptr[address >> 12], 11, 3), (*m_map_control_ptr & 7), address, fc, pc());
 				set_buserror_details(address, rw, fc, true);
 				restart_this_instruction();
 				set_input_line(M68K_LINE_BUSERROR, ASSERT_LINE);
@@ -291,13 +291,13 @@ public:
 			}
 			else
 			{
-				*m_map_control |= (1 << MAP_BLOCK_ACCESS);
+				*m_map_control_ptr |= (1 << MAP_BLOCK_ACCESS);
 			}
 
 			// write enabled?
-			if ((rw==0) && BIT(m_map[address >> 12], 14) == 0)	// read only page
+			if ((rw==0) && BIT(m_map_ptr[address >> 12], 14) == 0)	// read only page
 			{
-				*m_map_control &= ~(1 << MAP_BLOCK_ACCESS);
+				*m_map_control_ptr &= ~(1 << MAP_BLOCK_ACCESS);
 
 				LOG("mmu_translate_address: bus error: READONLY %08x fc(%d) pc(%08x)\n",(address), fc, pc());
 				set_buserror_details(address, rw, fc, false);
@@ -309,11 +309,11 @@ public:
 			// mark page dirty
 			if (rw==0)
 			{
-				m_map[address >> 12] |= 0x8000;
-				LOG("mmu_translate_address: DIRTY m_map(0x%04x) m_map_control(%02x)\n", m_map[address >> 12], m_map_control);
+				m_map_ptr[address >> 12] |= 0x8000;
+				LOG("mmu_translate_address: DIRTY m_map_ptr(0x%04x) m_map_control(%02x)\n", m_map_ptr[address >> 12], m_map_control_ptr);
 			}
 
-			address = BIT(address, 0, 12) | (BIT(m_map[address >> 12], 0, 11) << 12);
+			address = BIT(address, 0, 12) | (BIT(m_map_ptr[address >> 12], 0, 11) << 12);
 		}
 
 		// is there memory here?
@@ -328,33 +328,33 @@ public:
 		return address;
 	}
 
-u16 PTEread(offs_t address)
-{
-	// selftest does a read and expects it to fail iff !MAP_SYS_WR_ENABLE; its not WR enable, its enable..
-	if (!BIT(*m_map_control, MAP_SYS_WR_ENABLE))
+	u16 PTEread(offs_t address)
 	{
-			LOG("PTEread: bus error: PID(%d) %08x fc(%d) pc(%08x)\n", BIT(m_map[(address >> 12) & 0x7ff], 11, 3), (address), get_fc(), pc());
-			set_buserror_details(address, 1, get_fc(), false);
-			set_input_line(M68K_LINE_BUSERROR, ASSERT_LINE);
-			set_input_line(M68K_LINE_BUSERROR, CLEAR_LINE);
-			return 0;
+		// selftest does a read and expects it to fail iff !MAP_SYS_WR_ENABLE; its not WR enable, its enable..
+		if (!BIT(*m_map_control_ptr, MAP_SYS_WR_ENABLE))
+		{
+				LOG("PTEread: bus error: PID(%d) %08x fc(%d) pc(%08x)\n", BIT(m_map_ptr[(address >> 12) & 0x7ff], 11, 3), (address), get_fc(), pc());
+				set_buserror_details(address, 1, get_fc(), false);
+				set_input_line(M68K_LINE_BUSERROR, ASSERT_LINE);
+				set_input_line(M68K_LINE_BUSERROR, CLEAR_LINE);
+				return 0;
+		}
+
+		return m_map_ptr[(address>>12) & 0x7ff];
 	}
 
-	return m_map[(address>>12) & 0x7ff];
-}
-
-void PTEwrite(offs_t address, u16 data)
-{
-	if (((address>>12) & 0x7ff) < 20)
-		LOG("PTEwrite: %08x  <= %04x paddr(%08x) PID(%d) dirty(%d) write_enable(%d)\n",
-		(address>>12) & 0x7ff, data,
-		(BIT(data, 0, 11)<<12), BIT(data, 11, 3), data & 0x8000 ? 1 : 0, data & 0x4000 ? 1 : 0);
-
-	if (BIT(*m_map_control, MAP_SYS_WR_ENABLE))
+	void PTEwrite(offs_t address, u16 data)
 	{
-		m_map[(address>>12) & 0x7ff] = data;
+		if (((address>>12) & 0x7ff) < 20)
+			LOG("PTEwrite: %08x  <= %04x paddr(%08x) PID(%d) dirty(%d) write_enable(%d)\n",
+			(address>>12) & 0x7ff, data,
+			(BIT(data, 0, 11)<<12), BIT(data, 11, 3), data & 0x8000 ? 1 : 0, data & 0x4000 ? 1 : 0);
+
+		if (BIT(*m_map_control_ptr, MAP_SYS_WR_ENABLE))
+		{
+			m_map_ptr[(address>>12) & 0x7ff] = data;
+		}
 	}
-}
 
 #ifdef USE_MMU
 	void init16(address_space &space, address_space &ospace)
@@ -461,7 +461,7 @@ void PTEwrite(offs_t address, u16 data)
 
 	void device_start() override
 	{
-		//m68010_device::device_start();
+		//we need to override init_cpu_m68010 so replacing call to m68010_device::device_start();
 		m68000_musashi_device::device_start();
 		init_cpu_m68010();
 		
@@ -474,8 +474,8 @@ public:
 	{
 		LOG("m68010_tekmmu_device::linktoMMU: control(%p) map(%p) m_emmu_enabled(%d)\n",map_control, map, m_emmu_enabled);
 		
-		m_map_control = map_control;
-		m_map = map;
+		m_map_control_ptr = map_control;
+		m_map_ptr = map;
 	}
 
 };
@@ -757,8 +757,8 @@ u16 tek440x_state::memory_r(offs_t offset, u16 mem_mask)
 		const offs_t offset0 = offset;
 
 #ifndef USE_MMU
-		if (!inbuserr)														// not in buserr interrupt
-		if ((m_maincpu->get_fc() & 4) == 0)			// only in User mode
+		if (!inbuserr)			// not in buserr interrupt
+		if (m_maincpu->is_user())			// only in User mode
 		if (BIT(m_map_control, MAP_VM_ENABLE))
 		{
 		
@@ -809,7 +809,7 @@ u16 tek440x_state::memory_r(offs_t offset, u16 mem_mask)
 
 void tek440x_state::memory_w(offs_t offset, u16 data, u16 mem_mask)
 {
-	if ((m_maincpu->get_fc() & 4) == 0)			// User mode access updates map_control from write latch
+	if (m_maincpu->is_user())		// User mode access updates map_control from write latch
 	{
 			if (m_latched_map_control && m_latched_map_control != m_map_control)
 			{
@@ -821,7 +821,7 @@ void tek440x_state::memory_w(offs_t offset, u16 data, u16 mem_mask)
 	
 	const offs_t offset0 = offset;
 #ifndef USE_MMU
-	if ((m_maincpu->get_fc() & 4) == 0)			// only in User mode
+	if (m_maincpu->is_user())		// only in User mode
 	if (BIT(m_map_control, MAP_VM_ENABLE))
 	{
 		//LOG("memory_w: m_map(0x%04x)\n", m_map[offset >> 11]);
@@ -979,7 +979,7 @@ void tek440x_state::mapcntl_w(u8 data)
 	
 	// disable using latched state for now
 	
-	m_map_control = data & 0x3f;
+	//m_map_control = data & 0x3f;
 	
 }
 
