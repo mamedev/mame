@@ -16674,7 +16674,7 @@ https://segaretro.org/Elitserien_96
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_sram"/>
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
-				<rom name="espn national hockey night (usa).bin" size="2097152" crc="1d08828c" sha1="cfd65e3ffb17e1718356ef8de7c527e2c9fd8940"/>
+				<rom name="espn national hockey night (usa).bin" size="2097152" crc="401dc618" sha1="cb312d6617574f5b9cccd56a83a0a45b734671ed"/>
 			</dataarea>
 			<dataarea name="sram" size="16384">
 			</dataarea>
