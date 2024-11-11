@@ -67,8 +67,8 @@ private:
 	u8 m_pcm_mode, m_vol[7], m_pcm_ctrl, m_pcm_mute;
 	uint16_t m_head, m_tail, m_count, m_irq_rate;
 	bool m_pcmirq, m_fmirq, m_pcm_clk, m_init;
-	required_device<dac_word_interface> m_ldac;
-	required_device<dac_word_interface> m_rdac;
+	required_device<dac_16bit_r2r_twos_complement_device> m_ldac;
+	required_device<dac_16bit_r2r_twos_complement_device> m_rdac;
 	std::vector<u8> m_queue;
 	emu_timer *m_dac_timer;
 };

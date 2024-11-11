@@ -224,8 +224,17 @@ void pc9801_86_device::device_start()
 	);
 	m_bus->install_io(0xa460, 0xa463, read8smo_delegate(*this, FUNC(pc9801_86_device::id_r)), write8smo_delegate(*this, FUNC(pc9801_86_device::mask_w)));
 	m_bus->install_io(0xa464, 0xa46f, read8sm_delegate(*this, FUNC(pc9801_86_device::pcm_r)), write8sm_delegate(*this, FUNC(pc9801_86_device::pcm_w)));
-	m_bus->install_io(0xa66c, 0xa66f, read8sm_delegate(*this, [this](offs_t o){ return o == 2 ? m_pcm_mute : 0xff; }, "pc9801_86_mute_r"),
-								   write8sm_delegate(*this, [this](offs_t o, u8 d){ if(o == 2) m_pcm_mute = d; }, "pc9801_86_mute_w"));
+	m_bus->install_io(0xa66c, 0xa66f,
+		read8sm_delegate(*this, [this](offs_t o){ return o == 2 ? m_pcm_mute : 0xff; }, "pc9801_86_mute_r"),
+		write8sm_delegate(*this, [this](offs_t o, u8 d){
+			if(o == 2)
+			{
+				m_pcm_mute = d;
+				m_ldac->set_output_gain(ALL_OUTPUTS, BIT(m_pcm_mute, 0) ? 0.0 : 1.0);
+				m_rdac->set_output_gain(ALL_OUTPUTS, BIT(m_pcm_mute, 0) ? 0.0 : 1.0);
+			}
+		}, "pc9801_86_mute_w")
+	);
 
 	m_io_base = 0;
 
@@ -258,7 +267,11 @@ void pc9801_86_device::device_reset()
 	m_fmirq = m_pcmirq = m_init = false;
 	m_irq_rate = 0;
 	m_pcm_ctrl = m_pcm_mode = 0;
-	m_pcm_mute = 0;
+	// Starts off with DACs muted (os2warp3 will burp a lot while initializing OS)
+	m_pcm_mute = 0x01;
+	m_ldac->set_output_gain(ALL_OUTPUTS, 0.0);
+	m_rdac->set_output_gain(ALL_OUTPUTS, 0.0);
+
 	m_pcm_clk = false;
 	memset(&m_queue[0], 0, QUEUE_SIZE);
 }
