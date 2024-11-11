@@ -123,6 +123,7 @@ public:
 		m_soundcpu_alu(*this, "soundalu"),
 		m_spriteram(*this, "spriteram"),
 		m_vram(*this, "vram"),
+		m_mainram(*this, "mainram"),
 		m_sound_share(*this, "sound_share"),
 		m_gfxdecode(*this, "gfxdecode2"),
 		m_palette(*this, "palette"),
@@ -177,6 +178,7 @@ private:
 
 	required_device<address_map_bank_device> m_spriteram;
 	required_device<address_map_bank_device> m_vram;
+	required_shared_ptr<uint8_t> m_mainram;
 	required_shared_ptr<uint8_t> m_sound_share;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
@@ -596,7 +598,8 @@ private:
 	void vt1682_soundcpu_211b_dacright_15_8_w(uint8_t data);
 
 	// TODO: hook these up properly, used by gm235upc
-	uint8_t vt1682_soundcpu_2410_ioa_data_r() { return machine().rand(); }
+	uint8_t vt1682_soundcpu_2410_ioa_data_r() { return machine().rand() & 0x8a; }
+	void vt1682_soundcpu_2410_ioa_data_w(uint8_t data) { }
 	uint8_t vt1682_soundcpu_2410_iob_data_r() { return machine().rand(); }
 
 	/* Support */
@@ -2261,8 +2264,8 @@ void vt_vt1682_state::vt1682_2020_bk_linescroll_w(uint8_t data)
 
 	// cmpmx10 / cmpmx11 set a scroll bank, but don't appear to enable linescroll
 	// lxts3 enables this for the racing game, but doesn't seem to upload a table
-//	if (data)
-//		popmessage("linescroll %02x!\n", data);
+	if (data & 0x30)
+		popmessage("linescroll unused %01x | BK2enable %d BK1enable %d PRAM addr %04x!\n", (data & 0xc0) >> 6, (data & 0x20)>> 5, (data & 0x10) >> 4, (data & 0xf) << 8);
 }
 
 /*
@@ -4952,27 +4955,11 @@ void vt_vt1682_state::draw_layer(int which, int opaque, const rectangle& cliprec
 
 	if (bk_enable)
 	{
-		int xscroll = m_xscroll_7_0_bk[which];
 		int yscroll = m_yscroll_7_0_bk[which];
-		int xscrollmsb = (m_scroll_control_bk[which] & 0x01);
 		int yscrollmsb = (m_scroll_control_bk[which] & 0x02) >> 1;
 		int page_layout_h = (m_scroll_control_bk[which] & 0x04) >> 2;
 		int page_layout_v = (m_scroll_control_bk[which] & 0x08) >> 3;
 		int high_color = (m_scroll_control_bk[which] & 0x10) >> 4;
-
-		/* must be some condition for this, as Maze Pac does not want this offset (confirmed no offset on hardware) but some others do (see Snake title for example)
-		   documentation says it's a hw bug, for bk2 (+2 pixels), but conditions aren't understood, and bk1 clearly needs offset too
-		   sprites and tilemaps on the select menu need to align too, without left edge scrolling glitches
-		   judging this from videos is tricky, because there's another bug that causes the right-most column of pixels to not render for certain scroll values
-		   and the right-most 2 columns of sprites to not render
-
-		   does this come down to pal1/pal2 output mixing rather than specific layers?
-		*/
-		//if (which == 0)
-		//  xscroll += 1;
-
-		//if (which == 1)
-		//  xscroll += 1;
 
 		int segment = m_segment_7_0_bk[which];
 		segment |= m_segment_11_8_bk[which] << 8;
@@ -4984,21 +4971,52 @@ void vt_vt1682_state::draw_layer(int which, int opaque, const rectangle& cliprec
 
 		uint16_t bases[4];
 
-		setup_video_pages(which, bk_tilesize, page_layout_v, page_layout_h, yscrollmsb, xscrollmsb, bases);
-
-		//LOGMASKED(LOG_OTHER, "layer %d bases %04x %04x %04x %04x (scrolls x:%02x y:%02x)\n", which, bases[0], bases[1], bases[2], bases[3], xscroll, yscroll);
-
 		if (!bk_line)
 		{
 			int palselect;
 			if (which == 0) palselect = m_200f_bk_pal_sel & 0x03;
 			else palselect = (m_200f_bk_pal_sel & 0x0c) >> 2;
 
-			// Character Mode
-			LOGMASKED(LOG_OTHER, "DRAWING ----- bk, Character Mode Segment base %08x, TileSize %1x Bpp %1x, Depth %1x PalDepthMode:%1x PalSelect:%1 PageLayout_V:%1x PageLayout_H:%1x XScroll %04x YScroll %04x\n", segment, bk_tilesize, bk_tilebpp, bk_depth, bk_paldepth_mode, palselect, page_layout_v, page_layout_h, xscroll, yscroll);
-
 			for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 			{
+				int xscroll = m_xscroll_7_0_bk[which];
+				int xscrollmsb = (m_scroll_control_bk[which] & 0x01);
+
+				int rowscroll_pram_address = (m_2020_bk_linescroll & 0xf) * 0x100;
+
+				bool rowscroll_enabled = false;
+				if ((which == 0) && (m_2020_bk_linescroll & 0x10))
+					rowscroll_enabled = true;
+				if ((which == 1) && (m_2020_bk_linescroll & 0x20))
+					rowscroll_enabled = true;
+
+				if (rowscroll_enabled)
+				{
+					// yes, the rowscroll table is in main ram, not vram ?!
+					xscroll += (s8)m_mainram[rowscroll_pram_address + y];
+					// also need to modify xscrollmsb?
+				}
+
+				/* must be some condition for this, as Maze Pac does not want this offset (confirmed no offset on hardware) but some others do (see Snake title for example)
+				   documentation says it's a hw bug, for bk2 (+2 pixels), but conditions aren't understood, and bk1 clearly needs offset too
+				   sprites and tilemaps on the select menu need to align too, without left edge scrolling glitches
+				   judging this from videos is tricky, because there's another bug that causes the right-most column of pixels to not render for certain scroll values
+				   and the right-most 2 columns of sprites to not render
+
+				   does this come down to pal1/pal2 output mixing rather than specific layers?
+
+				   maybe some odd interaction with rowscroll even if it's disabled?
+				   (as rowscroll is weird using mainram, and the mx10/11 sets set a bank even without enabling it, maybe as a workaround)
+				*/
+
+				//if (which == 0)
+				//  xscroll += 1;
+
+				//if (which == 1)
+				//  xscroll += 1;
+
+				setup_video_pages(which, bk_tilesize, page_layout_v, page_layout_h, yscrollmsb, xscrollmsb, bases);
+
 				int ytile, ytileline;
 
 				int ywithscroll = y - yscroll;
@@ -5294,7 +5312,7 @@ void vt_vt1682_state::vt_vt1682_sound_map(address_map& map)
 	map(0x2137, 0x2137).w(m_soundcpu_alu, FUNC(vrt_vt1682_alu_device::alu_oprand_6_div_w));
 
 	// is this IO port the same logic as the UIO?
-	map(0x2140, 0x2140).r(FUNC(vt_vt1682_state::vt1682_soundcpu_2410_ioa_data_r));
+	map(0x2140, 0x2140).rw(FUNC(vt_vt1682_state::vt1682_soundcpu_2410_ioa_data_r), FUNC(vt_vt1682_state::vt1682_soundcpu_2410_ioa_data_w));
 	map(0x2144, 0x2144).r(FUNC(vt_vt1682_state::vt1682_soundcpu_2410_iob_data_r));
 
 
@@ -5314,7 +5332,7 @@ void vt_vt1682_state::vt1682_212e_scuirq_clear_w(u8 data)
 
 void vt_vt1682_state::vt_vt1682_map(address_map &map)
 {
-	map(0x0000, 0x0fff).ram();
+	map(0x0000, 0x0fff).ram().share("mainram");
 	map(0x1000, 0x1fff).ram().share("sound_share");
 	map(0x1ff4, 0x1fff).w(FUNC(vt_vt1682_state::vt1682_sound_reset_hack_w));
 
@@ -5915,6 +5933,14 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( gm235upc )
 	PORT_START("IN0")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON3 )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON1 )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON4 )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( lxts3 )
