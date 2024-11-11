@@ -128,6 +128,16 @@ protected:
 		VECTOR_RESET_FFFE   = 0xFFFE
 	};
 
+	// exception numbers for debugger
+	enum
+	{
+		EXCEPTION_SWI   = 1,
+		EXCEPTION_SWI2  = 2,
+		EXCEPTION_SWI3  = 3,
+		EXCEPTION_XFIRQ = 4,
+		EXCEPTION_XRES  = 5
+	};
+
 	union M6809Q
 	{
 		#ifdef LSB_FIRST
@@ -332,6 +342,5 @@ enum
 
 #define M6809_IRQ_LINE  0   /* IRQ line number */
 #define M6809_FIRQ_LINE 1   /* FIRQ line number */
-#define M6809_SWI       2   /* Virtual SWI line to be used during SWI acknowledge cycle */
 
 #endif // MAME_CPU_M6809_M6809_H

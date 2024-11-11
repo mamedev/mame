@@ -21,6 +21,7 @@
 #include "machine/am9517a.h"
 #include "machine/bankdev.h"
 #include "machine/buffer.h"
+#include "machine/clock.h"
 #include "machine/i8251.h"
 #include "machine/i8255.h"
 #include "machine/output_latch.h"
@@ -78,6 +79,7 @@
 #define WIDTH40_REG 2
 #define FONTSEL_REG 3
 #define INTERLACE_REG 4
+#define KAC_REG 5
 #define MEMSW_REG   6
 #define DISPLAY_REG 7
 
@@ -98,7 +100,8 @@ public:
 		, m_ppi_sys(*this, "ppi_sys")
 		, m_ppi_prn(*this, "ppi_prn")
 		, m_beeper(*this, "beeper")
-		, m_sio(*this, "sio")
+		, m_sio_rs(*this, "sio_rs")
+		, m_sio_kbd(*this, "sio_kbd")
 	{
 	}
 
@@ -113,7 +116,8 @@ protected:
 	required_device<i8255_device> m_ppi_sys;
 	required_device<i8255_device> m_ppi_prn;
 	optional_device<beep_device> m_beeper;
-	required_device<i8251_device> m_sio;
+	required_device<i8251_device> m_sio_rs;
+	required_device<i8251_device> m_sio_kbd;
 
 	void rtc_w(uint8_t data);
 	void ppi_sys_beep_portc_w(uint8_t data);

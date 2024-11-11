@@ -457,7 +457,7 @@ inline void upd7220_device::reset_figs_param()
 	m_figs.m_dm = 0xffff;
 	m_figs.m_gd = 0;
 	m_figs.m_figure_type = 0;
-	m_pattern = 0xffff;
+	m_pattern = (m_ra[8]) | (m_ra[9] << 8);
 }
 
 
@@ -1852,6 +1852,9 @@ void upd7220_device::update_graphics(bitmap_rgb32 &bitmap, const rectangle &clip
 
 		LOGAREA("%s: AREA=%d BSY=%4d SAD=%06x len=%04x im=%d wd=%d\n", this->tag(), area, bsy, sad, len, im, wd);
 
+		// pc9821:aitd (256 color mode) and pc9821:os2warp3 (16, installation screens) wants this shift
+		const u8 pitch_shift = force_bitmap ? im : mixed;
+
 		if(im || force_bitmap)
 		{
 			// according to documentation only areas 0-1-2 can be drawn in bitmap mode
@@ -1879,14 +1882,14 @@ void upd7220_device::update_graphics(bitmap_rgb32 &bitmap, const rectangle &clip
 				// pc98 quarth doesn't seem to use pitch here and it definitely wants bsy to be /2 to make scrolling to work.
 				// pc98 xevious wants the pitch to be fixed at 80, and wants bsy to be /1
 				// pc98 dbuster contradicts with Xevious with regards of the pitch tho ...
-				uint32_t const addr = (sad & 0x3ffff) + ((y / (mixed ? 1 : m_lr)) * (m_pitch >> mixed));
+				uint32_t const addr = (sad & 0x3ffff) + ((y / (mixed ? 1 : m_lr)) * (m_pitch >> pitch_shift));
 				for(int z = 0; z <= m_disp; ++z)
 				{
 					int yval = (y*zoom)+z + (bsy + m_vbp);
 					// pc9801:duel sets up bitmap layer with height 384 vs. 400 of text layer
 					// so we scissor here, interlace wants it bumped x2 (microbx2)
 					if(yval <= cliprect.bottom() && (yval - m_vbp) < m_al << interlace)
-						draw_graphics_line(bitmap, addr, yval, wd, mixed);
+						draw_graphics_line(bitmap, addr, yval, wd, pitch_shift);
 				}
 			}
 		}

@@ -268,7 +268,9 @@ void vrt_vt1682_alu_device::alu_oprand_6_mult_w(uint8_t data)
 	uint32_t result = param1 * param2;
 
 	put_u32le(&m_alu_oprand[0], result);
-	// 4/5 untouched? or set to 0?
+
+	// lxts3 (Sunnyside Race) reads result from 4/5 instead of 0/1
+	put_u16le(&m_alu_oprand[4], result & 0xffff);
 }
 
 
@@ -321,6 +323,6 @@ void vrt_vt1682_alu_device::alu_oprand_6_div_w(uint8_t data)
 		uint16_t remainder = param1 - param2 * (quotient & ~uint32_t(1));
 
 		put_u32le(&m_alu_oprand[0], quotient);
-		put_u16le(&m_alu_oprand[4], (remainder >> 1) | ((remainder & 1) << 15));
+		put_u16le(&m_alu_oprand[4], (remainder >> 1) | (remainder << 15));
 	}
 }

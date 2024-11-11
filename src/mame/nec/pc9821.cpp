@@ -59,6 +59,8 @@ uint32_t pc9821_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap
 			u32 base_address;
 			u16 pitch;
 			u8 im;
+			// 0x68: VRAM 800/480 line mode (os2warp3)
+			const u32 vram_base = BIT(m_ex_video_ff[0x68 >> 1], 0) ? 0 : m_vram_disp * 0x40000;
 
 			for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 			{
@@ -79,7 +81,7 @@ uint32_t pc9821_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap
 						int res_x = x + xi;
 						int res_y = y;
 
-						u16 pen = ext_gvram[(address + xi) + (m_vram_disp * 0x40000)];
+						u16 pen = ext_gvram[((address + xi) + vram_base) & 0x7ffff];
 
 						bitmap.pix(res_y, res_x) = palette[(pen & 0xff) + 0x20];
 					}
@@ -314,6 +316,7 @@ void pc9821_state::pc9821_mode_ff_w(u8 data)
 	// BA / BX / PC-H98 / PC-9821 / 98NOTE uses this f/f in place of 15/24 kHz switch
 	// TODO: better compose
 	// TODO: both frequencies needs to be verified
+	// TODO: os2warp3 still runs at wrong clock, why?
 	// 31 kHz from standard VGA clock (flashb)
 	if (mode_ff == 0x20)
 	{
@@ -322,6 +325,8 @@ void pc9821_state::pc9821_mode_ff_w(u8 data)
 		m_hgdc[0]->set_unscaled_clock(screen_clock);
 		m_hgdc[1]->set_unscaled_clock(screen_clock);
 	}
+	else
+		logerror("Mode f/f $0068: [%02x] -> %02x\n", mode_ff, setting);
 }
 
 // $e0000 base
@@ -414,7 +419,7 @@ void pc9821_state::pc9821_io(address_map &map)
 	map(0x0020, 0x002f).w(FUNC(pc9821_state::dmapg8_w)).umask32(0xff00ff00);
 	map(0x0030, 0x0037).rw(m_ppi_sys, FUNC(i8255_device::read), FUNC(i8255_device::write)).umask32(0xff00ff00); //i8251 RS232c / i8255 system port
 	map(0x0040, 0x0047).rw(m_ppi_prn, FUNC(i8255_device::read), FUNC(i8255_device::write)).umask32(0x00ff00ff);
-	map(0x0040, 0x0047).rw(m_keyb, FUNC(pc9801_kbd_device::rx_r), FUNC(pc9801_kbd_device::tx_w)).umask32(0xff00ff00); //i8255 printer port / i8251 keyboard
+	map(0x0040, 0x0043).rw(m_sio_kbd, FUNC(i8251_device::read), FUNC(i8251_device::write)).umask16(0xff00); //i8255 printer port / i8251 keyboard
 //  map(0x0050, 0x0053).w(FUNC(pc9821_state::nmi_ctrl_w)).umask32(0x00ff00ff);
 //  map(0x005c, 0x005f).r(FUNC(pc9821_state::timestamp_r)).nopw(); // artic
 //  map(0x0060, 0x0063).rw(m_hgdc[0], FUNC(upd7220_device::read), FUNC(upd7220_device::write)).umask32(0x00ff00ff); //upd7220 character ports / <undefined>

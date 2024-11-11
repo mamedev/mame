@@ -3821,6 +3821,30 @@ ROM_START( theroes )
 	ROM_LOAD( "t-hero-snd3.u0455",    0x800000, 0x400000, CRC(52b0b2c0) SHA1(6e96698905391c21a4fedd60e2768734b58add4e) )
 ROM_END
 
+ROM_START( theroesa ) // missing ROM labels
+	ROM_REGION( 0x100000, "maincpu", 0 )        /* 68000 Code */
+	ROM_LOAD16_BYTE( "u0127", 0x000000, 0x080000, CRC(a2c599a7) SHA1(6f78e4171dbe587e997b1453ab7cb933a23e671f) )
+	ROM_LOAD16_BYTE( "u0129", 0x000001, 0x080000, CRC(f205a715) SHA1(baa94f5d6a5e3505ffab35c312686f1dc5ac15ef) )
+
+	ROM_REGION( 0x800000, "sprites0", 0 )  /* Sprites */
+	ROM_LOAD( "t-hero-obj1.u0736", 0x000000, 0x400000, CRC(35090f7c) SHA1(035e6c12a87d9c7241eea34fc7e2170bec842acc) )
+	ROM_LOAD( "t-hero-obj2.u0738", 0x400000, 0x400000, CRC(71605108) SHA1(6070c26d8f22fafc81d97cacfef96ae652e355d0) )
+
+	ROM_REGION( 0x400000, "layer0", 0 )
+	ROM_LOAD( "t-hero-bg1.u0999", 0x000000, 0x400000, CRC(47b0fb40) SHA1(a7217b3d805b4255c589821cdadd9b190cada525) )
+
+	ROM_REGION( 0x400000, "layer1", 0 )
+	ROM_LOAD( "t-hero-bg2.u0995", 0x000000, 0x400000, CRC(b16237a1) SHA1(66aed2c5036492a17d20de90333e172a6f117851) )
+
+	ROM_REGION( 0x400000, "layer2", 0 )
+	ROM_LOAD( "t-hero-bg3.u0998", 0x000000, 0x400000, CRC(08eb5604) SHA1(3d32966708c73198272c40e6ddc680bf4c7919eb) )
+
+	ROM_REGION( 0xc00000, "ymz", 0 )    /* Samples */
+	ROM_LOAD( "crvsaders-snd1.u0447", 0x000000, 0x400000, CRC(92770a52) SHA1(81f6835e1b45eb0f367e4586fdda92466f02edb9) )
+	ROM_LOAD( "crvsaders-snd2.u0454", 0x400000, 0x400000, CRC(329ae1cf) SHA1(0c5e5074a5d8f4fb85ab4893bc953f192dcb301a) )
+	ROM_LOAD( "t-hero-snd3.u0455",    0x800000, 0x400000, CRC(52b0b2c0) SHA1(6e96698905391c21a4fedd60e2768734b58add4e) )
+ROM_END
+
 
 /***************************************************************************
 
@@ -5764,4 +5788,5 @@ GAME( 1999, crusherm,   0,        crusherm, korokoro, cave_state,     init_korok
 
 GAME( 1999, tjumpman,   0,        tjumpman, tjumpman, cave_state,     init_tjumpman,  ROT0,   "Namco",                                  "Tobikose! Jumpman", MACHINE_SUPPORTS_SAVE )
 
-GAME( 2001, theroes,    0,        gaia,     theroes,  cave_state,     init_gaia,      ROT0,   "Primetek Investments",                   "Thunder Heroes", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND ) // cuts out occasionally
+GAME( 2001, theroes,    0,        gaia,     theroes,  cave_state,     init_gaia,      ROT0,   "Primetek Investments",                   "Thunder Heroes (set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND ) // cuts out occasionally
+GAME( 2001, theroesa,   theroes,  gaia,     theroes,  cave_state,     init_gaia,      ROT0,   "Primetek Investments",                   "Thunder Heroes (set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND ) // cuts out occasionally

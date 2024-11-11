@@ -4280,13 +4280,13 @@ void sparcv8_device::execute_mul(uint32_t op)
 	uint32_t result = 0;
 	if (UMUL || UMULCC)
 	{
-		uint64_t dresult = (uint64_t)RS1REG * (uint64_t)operand2;
+		uint64_t dresult = mulu_32x32(RS1REG, operand2);
 		Y = (uint32_t)(dresult >> 32);
 		result = (uint32_t)dresult;
 	}
 	else if (SMUL || SMULCC)
 	{
-		int64_t dresult = (int64_t)(int32_t)RS1REG * (int64_t)(int32_t)operand2;
+		int64_t dresult = mul_32x32(RS1REG, operand2);
 		Y = (uint32_t)(dresult >> 32);
 		result = (uint32_t)dresult;
 	}

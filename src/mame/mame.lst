@@ -2303,6 +2303,7 @@ sailormnu                       // (c) 1995 Banpresto (Ver. 95/03/22B, country i
 tekkenbs                        // (c) 1998 Namco
 tekkencw                        // (c) 1997 Namco
 theroes                         // (c) 2001 Primetek Investments
+theroesa                        // (c) 2001 Primetek Investments
 tjumpman                        // (c) 1999 Namco
 uopoko                          // (c) 1998 Cave + Jaleco license
 uopokoj                         // (c) 1998 Cave + Jaleco license
@@ -17138,6 +17139,7 @@ madalienb                       // (c) 1980
 
 @source:dataeast/madmotor.cpp
 madmotor                        // (c) [1989] Mitchell
+madmotora                       // (c) [1989] Mitchell
 
 @source:dataeast/metlclsh.cpp
 metlclsh                        // (c) 1985 Data East
@@ -33771,11 +33773,11 @@ pc9801rx                        // 1988
 pc9801us                        // 1992
 pc9801ux                        // 1987
 pc9801vm                        // 1985
-pc9801vm11                      // 1985
 pc9801vx                        // 1986
 
 @source:nec/pc9801_epson.cpp
 pc286vs                         // 1989
+pc286u                          // 1987
 pc386m                          // 1990
 pc486se                         // 1993
 pc486mu                         // 1994
