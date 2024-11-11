@@ -280,8 +280,6 @@ GFX:                Custom 145     ( 80 pin PQFP)
 #include "speaker.h"
 
 
-#define MASTER_CLOCK    XTAL(48'384'000)
-
 #define ENABLE_LOGGING (0)
 
 
@@ -298,7 +296,7 @@ void namconb1_state::machine_start()
 
 TIMER_DEVICE_CALLBACK_MEMBER(namconb1_state::scantimer)
 {
-	int scanline = param;
+	const int scanline = param;
 
 	// Handle VBLANK
 	if (scanline == 224)
@@ -308,7 +306,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(namconb1_state::scantimer)
 	}
 
 	// Handle POSIRQ
-	u32 posirq_scanline = m_c116->get_reg(5) - 32;
+	const u32 posirq_scanline = m_c116->get_reg(5) - 32;
 
 	if (scanline == posirq_scanline)
 	{
@@ -410,7 +408,7 @@ void namconb1_state::namconb1_cpureg_w(offs_t offset, u8 data)
 			break;
 
 		case 0x18:
-			if (data & 1)
+			if (BIT(data, 0))
 			{
 				m_mcu->set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
 				m_mcu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
@@ -427,7 +425,7 @@ void namconb1_state::namconb1_cpureg_w(offs_t offset, u8 data)
 }
 
 
-void namconb1_state::namconb2_cpureg_w(offs_t offset, u8 data)
+void namconb2_state::namconb2_cpureg_w(offs_t offset, u8 data)
 {
 	/**
 	 * f00000 VBL IRQ enable/level
@@ -496,7 +494,7 @@ void namconb1_state::namconb2_cpureg_w(offs_t offset, u8 data)
 			break;
 
 		case 0x16:
-			if (data & 1)
+			if (BIT(data, 0))
 			{
 				m_mcu->set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
 				m_mcu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
@@ -528,7 +526,7 @@ u8 namconb1_state::namconb1_cpureg_r(offs_t offset)
 }
 
 
-u8 namconb1_state::namconb2_cpureg_r(offs_t offset)
+u8 namconb2_state::namconb2_cpureg_r(offs_t offset)
 {
 	// 14: Watchdog
 	if (ENABLE_LOGGING)
@@ -545,12 +543,15 @@ u8 namconb1_state::namconb2_cpureg_r(offs_t offset)
 
 u32 namconb1_state::custom_key_r(offs_t offset)
 {
-	u16 old_count = m_count;
+	const u16 old_count = m_count;
 
-	do
-	{ /* pick a random number, but don't pick the same twice in a row */
-		m_count = machine().rand();
-	} while (m_count == old_count);
+	if (!machine().side_effects_disabled())
+	{
+		do
+		{ /* pick a random number, but don't pick the same twice in a row */
+			m_count = machine().rand();
+		} while (m_count == old_count);
+	}
 
 	switch (m_gametype)
 	{
@@ -561,7 +562,7 @@ u32 namconb1_state::custom_key_r(offs_t offset)
 	    magic value, it writes a scratch value to the keycus once per frame.
 
 	    On hardware, if there is no keycus or the wrong keycus is present, this write will stall the
-	    68000 (probably nothing completes the bus cycle in that case) and the game will hang instead
+	    68020 (probably nothing completes the bus cycle in that case) and the game will hang instead
 	    of booting.
 
 	    Patching these writes out causes the game to run fine with no keycus present.
@@ -644,19 +645,19 @@ u32 namconb1_state::custom_key_r(offs_t offset)
 /***************************************************************/
 
 
-u32 namconb1_state::gunbulet_gun_r(offs_t offset)
+u32 gunbulet_state::gun_r(offs_t offset)
 {
 	int result = 0;
 
 	switch (offset)
 	{
-		case 0: case 1: result = (u8)(0x0f + m_light1_y->read() * 224/255); break; /* Y (p2) */
-		case 2: case 3: result = (u8)(0x26 + m_light1_x->read() * 288/314); break; /* X (p2) */
-		case 4: case 5: result = (u8)(0x0f + m_light0_y->read() * 224/255); break; /* Y (p1) */
-		case 6: case 7: result = (u8)(0x26 + m_light0_x->read() * 288/314); break; /* X (p1) */
+		case 0: case 1: result = (u8)(0x0f + m_light_y[1]->read() * 224/255); break; /* Y (p2) */
+		case 2: case 3: result = (u8)(0x26 + m_light_x[1]->read() * 288/314); break; /* X (p2) */
+		case 4: case 5: result = (u8)(0x0f + m_light_y[0]->read() * 224/255); break; /* Y (p1) */
+		case 6: case 7: result = (u8)(0x26 + m_light_x[0]->read() * 288/314); break; /* X (p1) */
 	}
-	return result<<24;
-} /* gunbulet_gun_r */
+	return result << 24;
+} /* gun_r */
 
 u32 namconb1_state::randgen_r()
 {
@@ -687,7 +688,6 @@ void namconb1_state::share_w(offs_t offset, u32 data, u32 mem_mask)
 void namconb1_state::namconb1_am(address_map &map)
 {
 	map(0x000000, 0x0fffff).rom();
-	map(0x100000, 0x10001f).r(FUNC(namconb1_state::gunbulet_gun_r));
 	map(0x1c0000, 0x1cffff).ram();
 	map(0x1e4000, 0x1e4003).rw(FUNC(namconb1_state::randgen_r), FUNC(namconb1_state::srand_w));
 	map(0x200000, 0x207fff).rw(FUNC(namconb1_state::share_r), FUNC(namconb1_state::share_w));
@@ -698,17 +698,23 @@ void namconb1_state::namconb1_am(address_map &map)
 	map(0x620000, 0x620007).rw(m_c355spr, FUNC(namco_c355spr_device::position_r), FUNC(namco_c355spr_device::position_w));
 	map(0x640000, 0x64ffff).rw(m_c123tmap, FUNC(namco_c123tmap_device::videoram16_r), FUNC(namco_c123tmap_device::videoram16_w));
 	map(0x660000, 0x66003f).rw(m_c123tmap, FUNC(namco_c123tmap_device::control16_r), FUNC(namco_c123tmap_device::control16_w));
-	map(0x680000, 0x68000f).ram().share("spritebank32");
+	map(0x680000, 0x68000f).ram().share(m_spritebank32);
 	map(0x6e0000, 0x6e001f).r(FUNC(namconb1_state::custom_key_r)).nopw();
 	map(0x700000, 0x707fff).rw(m_c116, FUNC(namco_c116_device::read), FUNC(namco_c116_device::write));
 }
 
-void namconb1_state::namconb2_am(address_map &map)
+void gunbulet_state::gunbulet_am(address_map &map)
+{
+	namconb1_am(map);
+	map(0x100000, 0x10001f).r(FUNC(gunbulet_state::gun_r));
+}
+
+void namconb2_state::namconb2_am(address_map &map)
 {
 	map(0x000000, 0x0fffff).rom();
 	map(0x1c0000, 0x1cffff).ram();
-	map(0x1e4000, 0x1e4003).rw(FUNC(namconb1_state::randgen_r), FUNC(namconb1_state::srand_w));
-	map(0x200000, 0x207fff).rw(FUNC(namconb1_state::share_r), FUNC(namconb1_state::share_w));
+	map(0x1e4000, 0x1e4003).rw(FUNC(namconb2_state::randgen_r), FUNC(namconb2_state::srand_w));
+	map(0x200000, 0x207fff).rw(FUNC(namconb2_state::share_r), FUNC(namconb2_state::share_w));
 	map(0x208000, 0x2fffff).ram();
 	map(0x400000, 0x4fffff).rom().region("data", 0);
 	map(0x600000, 0x61ffff).rw(m_c355spr, FUNC(namco_c355spr_device::spriteram_r), FUNC(namco_c355spr_device::spriteram_w)).share("objram");
@@ -719,12 +725,12 @@ void namconb1_state::namconb2_am(address_map &map)
 	map(0x700000, 0x71ffff).rw(m_c169roz, FUNC(namco_c169roz_device::videoram_r), FUNC(namco_c169roz_device::videoram_w));
 	map(0x740000, 0x74001f).rw(m_c169roz, FUNC(namco_c169roz_device::control_r), FUNC(namco_c169roz_device::control_w));
 	map(0x800000, 0x807fff).rw(m_c116, FUNC(namco_c116_device::read), FUNC(namco_c116_device::write));
-	map(0x900008, 0x90000f).ram().share("spritebank32");
-	map(0x940000, 0x94000f).ram().share("tilebank32");
-	map(0x980000, 0x98000f).ram().w(FUNC(namconb1_state::rozbank32_w)).share("rozbank32");
+	map(0x900008, 0x90000f).ram().share(m_spritebank32);
+	map(0x940000, 0x94000f).ram().share(m_tilebank32);
+	map(0x980000, 0x98000f).ram().w(FUNC(namconb2_state::rozbank32_w)).share(m_rozbank32);
 	map(0xa00000, 0xa007ff).rw(m_eeprom, FUNC(eeprom_parallel_28xx_device::read), FUNC(eeprom_parallel_28xx_device::write));
-	map(0xc00000, 0xc0001f).r(FUNC(namconb1_state::custom_key_r)).nopw();
-	map(0xf00000, 0xf0001f).rw(FUNC(namconb1_state::namconb2_cpureg_r), FUNC(namconb1_state::namconb2_cpureg_w));
+	map(0xc00000, 0xc0001f).r(FUNC(namconb2_state::custom_key_r)).nopw();
+	map(0xf00000, 0xf0001f).rw(FUNC(namconb2_state::namconb2_cpureg_r), FUNC(namconb2_state::namconb2_cpureg_w));
 }
 
 void namconb1_state::mcu_shared_w(offs_t offset, u16 data, u16 mem_mask)
@@ -923,7 +929,7 @@ void namconb1_state::init_sws97()
 	m_gametype = NAMCONB1_SWS97;
 } /* sws97 */
 
-void namconb1_state::init_gunbulet()
+void gunbulet_state::init_gunbulet()
 {
 	m_gametype = NAMCONB1_GUNBULET;
 } /* gunbulet */
@@ -933,12 +939,12 @@ void namconb1_state::init_vshoot()
 	m_gametype = NAMCONB1_VSHOOT;
 } /* vshoot */
 
-void namconb1_state::init_machbrkr()
+void namconb2_state::init_machbrkr()
 {
 	m_gametype = NAMCONB2_MACH_BREAKERS;
 }
 
-void namconb1_state::init_outfxies()
+void namconb2_state::init_outfxies()
 {
 	m_gametype = NAMCONB2_OUTFOXIES;
 }
@@ -957,10 +963,10 @@ void namconb1_state::machine_reset()
 
 void namconb1_state::namconb1(machine_config &config)
 {
-	M68EC020(config, m_maincpu, MASTER_CLOCK / 2);
+	M68EC020(config, m_maincpu, XTAL(48'384'000) / 2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &namconb1_state::namconb1_am);
 
-	NAMCO_C75(config, m_mcu, MASTER_CLOCK / 3);
+	NAMCO_C75(config, m_mcu, XTAL(48'384'000) / 3);
 	m_mcu->set_addrmap(AS_PROGRAM, &namconb1_state::namcoc75_am);
 	m_mcu->p6_in_cb().set(FUNC(namconb1_state::port6_r));
 	m_mcu->p6_out_cb().set(FUNC(namconb1_state::port6_w));
@@ -983,7 +989,7 @@ void namconb1_state::namconb1(machine_config &config)
 	TIMER(config, "mcu_irq2").configure_periodic(FUNC(namconb1_state::mcu_irq2_cb), attotime::from_hz(60));
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_raw(MASTER_CLOCK / 8, 384, 0, 288, 264, 0, 224);
+	m_screen->set_raw(XTAL(48'384'000) / 8, 384, 0, 288, 264, 0, 224);
 	m_screen->set_screen_update(FUNC(namconb1_state::screen_update_namconb1));
 	m_screen->screen_vblank().set(FUNC(namconb1_state::screen_vblank));
 	m_screen->set_palette(m_c116);
@@ -1009,20 +1015,26 @@ void namconb1_state::namconb1(machine_config &config)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	c352_device &c352(C352(config, "c352", MASTER_CLOCK/2, 288));
+	c352_device &c352(C352(config, "c352", XTAL(48'384'000) / 2, 288));
 	c352.add_route(0, "lspeaker", 1.00);
 	c352.add_route(1, "rspeaker", 1.00);
 	//c352.add_route(2, "lspeaker", 1.00); // Second DAC not present.
 	//c352.add_route(3, "rspeaker", 1.00);
 }
 
-void namconb1_state::namconb2(machine_config &config)
+void gunbulet_state::gunbulet(machine_config &config)
+{
+	namconb1(config);
+	m_maincpu->set_addrmap(AS_PROGRAM, &gunbulet_state::gunbulet_am);
+}
+
+void namconb2_state::namconb2(machine_config &config)
 {
 	namconb1(config);
 
-	m_maincpu->set_addrmap(AS_PROGRAM, &namconb1_state::namconb2_am);
+	m_maincpu->set_addrmap(AS_PROGRAM, &namconb2_state::namconb2_am);
 
-	m_screen->set_screen_update(FUNC(namconb1_state::screen_update_namconb2));
+	m_screen->set_screen_update(FUNC(namconb2_state::screen_update_namconb2));
 
 	NAMCO_C169ROZ(config, m_c169roz);
 	m_c169roz->set_palette(m_c116);
@@ -1031,26 +1043,26 @@ void namconb1_state::namconb2(machine_config &config)
 	m_c169roz->set_color_base(0x1800);
 }
 
-void namconb1_state::machbrkr(machine_config &config)
+void namconb2_state::machbrkr(machine_config &config)
 {
 	namconb2(config);
 
-	m_c123tmap->set_tile_callback(namco_c123tmap_device::c123_tilemap_delegate(&namconb1_state::NB2TilemapCB_machbrkr, this));
+	m_c123tmap->set_tile_callback(namco_c123tmap_device::c123_tilemap_delegate(&namconb2_state::NB2TilemapCB_machbrkr, this));
 
-	m_c169roz->set_tile_callback(namco_c169roz_device::c169_tilemap_delegate(&namconb1_state::NB2RozCB_machbrkr, this));
+	m_c169roz->set_tile_callback(namco_c169roz_device::c169_tilemap_delegate(&namconb2_state::NB2RozCB_machbrkr, this));
 
-	m_c355spr->set_tile_callback(namco_c355spr_device::c355_obj_code2tile_delegate(&namconb1_state::NB2objcode2tile_machbrkr, this));
+	m_c355spr->set_tile_callback(namco_c355spr_device::c355_obj_code2tile_delegate(&namconb2_state::NB2objcode2tile_machbrkr, this));
 }
 
-void namconb1_state::outfxies(machine_config &config)
+void namconb2_state::outfxies(machine_config &config)
 {
 	namconb2(config);
 
-	m_c123tmap->set_tile_callback(namco_c123tmap_device::c123_tilemap_delegate(&namconb1_state::NB2TilemapCB_outfxies, this));
+	m_c123tmap->set_tile_callback(namco_c123tmap_device::c123_tilemap_delegate(&namconb2_state::NB2TilemapCB_outfxies, this));
 
-	m_c169roz->set_tile_callback(namco_c169roz_device::c169_tilemap_delegate(&namconb1_state::NB2RozCB_outfxies, this));
+	m_c169roz->set_tile_callback(namco_c169roz_device::c169_tilemap_delegate(&namconb2_state::NB2RozCB_outfxies, this));
 
-	m_c355spr->set_tile_callback(namco_c355spr_device::c355_obj_code2tile_delegate(&namconb1_state::NB2objcode2tile_outfxies, this));
+	m_c355spr->set_tile_callback(namco_c355spr_device::c355_obj_code2tile_delegate(&namconb2_state::NB2objcode2tile_outfxies, this));
 }
 
 
@@ -2036,10 +2048,10 @@ ROM_END
 GAME( 1994, nebulray,   0,        namconb1, namconb1, namconb1_state, init_nebulray, ROT90, "Namco", "Nebulas Ray (World, NR2)", MACHINE_SUPPORTS_SAVE )
 GAME( 1994, nebulrayj,  nebulray, namconb1, namconb1, namconb1_state, init_nebulray, ROT90, "Namco", "Nebulas Ray (Japan, NR1)", MACHINE_SUPPORTS_SAVE )
 GAME( 1994, nebulrayp,  nebulray, namconb1, namconb1, namconb1_state, init_nebulray, ROT90, "Namco", "Nebulas Ray (prototype)", MACHINE_SUPPORTS_SAVE )
-GAME( 1994, ptblank,    0,        namconb1, gunbulet, namconb1_state, init_gunbulet, ROT0,  "Namco", "Point Blank (World, GN2 Rev B, set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1994, ptblanka,   ptblank,  namconb1, gunbulet, namconb1_state, init_gunbulet, ROT0,  "Namco", "Point Blank (World, GN2 Rev B, set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1994, gunbuletj,  ptblank,  namconb1, gunbulet, namconb1_state, init_gunbulet, ROT0,  "Namco", "Gun Bullet (Japan, GN1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1994, gunbuletw,  ptblank,  namconb1, gunbulet, namconb1_state, init_gunbulet, ROT0,  "Namco", "Gun Bullet (World, GN3 Rev B)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, ptblank,    0,        gunbulet, gunbulet, gunbulet_state, init_gunbulet, ROT0,  "Namco", "Point Blank (World, GN2 Rev B, set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, ptblanka,   ptblank,  gunbulet, gunbulet, gunbulet_state, init_gunbulet, ROT0,  "Namco", "Point Blank (World, GN2 Rev B, set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, gunbuletj,  ptblank,  gunbulet, gunbulet, gunbulet_state, init_gunbulet, ROT0,  "Namco", "Gun Bullet (Japan, GN1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, gunbuletw,  ptblank,  gunbulet, gunbulet, gunbulet_state, init_gunbulet, ROT0,  "Namco", "Gun Bullet (World, GN3 Rev B)", MACHINE_SUPPORTS_SAVE )
 GAME( 1993, gslugrsj,   0,        namconb1, namconb1, namconb1_state, init_gslgr94u, ROT0,  "Namco", "Great Sluggers (Japan)", MACHINE_SUPPORTS_SAVE )
 GAME( 1994, gslgr94u,   0,        namconb1, namconb1, namconb1_state, init_gslgr94u, ROT0,  "Namco", "Great Sluggers '94", MACHINE_SUPPORTS_SAVE )
 GAME( 1994, gslgr94j,   gslgr94u, namconb1, namconb1, namconb1_state, init_gslgr94j, ROT0,  "Namco", "Great Sluggers '94 (Japan)", MACHINE_SUPPORTS_SAVE )
@@ -2048,9 +2060,9 @@ GAME( 1996, sws96,      0,        namconb1, namconb1, namconb1_state, init_sws96
 GAME( 1997, sws97,      0,        namconb1, namconb1, namconb1_state, init_sws97,    ROT0,  "Namco", "Super World Stadium '97 (Japan)", MACHINE_SUPPORTS_SAVE )
 GAME( 1994, vshoot,     0,        namconb1, namconb1, namconb1_state, init_vshoot,   ROT0,  "Namco", "J-League Soccer V-Shoot (Japan)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1994, outfxies,   0,        outfxies, namconb1, namconb1_state, init_outfxies, ROT0, "Namco", "The Outfoxies (World, OU2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1994, outfxiesj,  outfxies, outfxies, namconb1, namconb1_state, init_outfxies, ROT0, "Namco", "The Outfoxies (Japan, OU1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1994, outfxiesja, outfxies, machbrkr, namconb1, namconb1_state, init_outfxies, ROT0, "Namco", "The Outfoxies (Japan, OU1, alternate GFX ROMs)", MACHINE_SUPPORTS_SAVE ) // GFX ROMs are different and are in the same format as the Mach Breakers ones
-GAME( 1994, outfxiesa,  outfxies, outfxies, namconb1, namconb1_state, init_outfxies, ROT0, "Namco", "The Outfoxies (Korea?)", MACHINE_SUPPORTS_SAVE )
-GAME( 1995, machbrkr,   0,        machbrkr, namconb1, namconb1_state, init_machbrkr, ROT0, "Namco", "Mach Breakers (World, MB2)", MACHINE_SUPPORTS_SAVE ) /* Title screen doesn't show subtitle "Numan Athletics 2" */
-GAME( 1995, machbrkrj,  machbrkr, machbrkr, namconb1, namconb1_state, init_machbrkr, ROT0, "Namco", "Mach Breakers - Numan Athletics 2 (Japan, MB1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, outfxies,   0,        outfxies, namconb1, namconb2_state, init_outfxies, ROT0, "Namco", "The Outfoxies (World, OU2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, outfxiesj,  outfxies, outfxies, namconb1, namconb2_state, init_outfxies, ROT0, "Namco", "The Outfoxies (Japan, OU1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, outfxiesja, outfxies, machbrkr, namconb1, namconb2_state, init_outfxies, ROT0, "Namco", "The Outfoxies (Japan, OU1, alternate GFX ROMs)", MACHINE_SUPPORTS_SAVE ) // GFX ROMs are different and are in the same format as the Mach Breakers ones
+GAME( 1994, outfxiesa,  outfxies, outfxies, namconb1, namconb2_state, init_outfxies, ROT0, "Namco", "The Outfoxies (Korea?)", MACHINE_SUPPORTS_SAVE )
+GAME( 1995, machbrkr,   0,        machbrkr, namconb1, namconb2_state, init_machbrkr, ROT0, "Namco", "Mach Breakers (World, MB2)", MACHINE_SUPPORTS_SAVE ) /* Title screen doesn't show subtitle "Numan Athletics 2" */
+GAME( 1995, machbrkrj,  machbrkr, machbrkr, namconb1, namconb2_state, init_machbrkr, ROT0, "Namco", "Mach Breakers - Numan Athletics 2 (Japan, MB1)", MACHINE_SUPPORTS_SAVE )
