@@ -8964,12 +8964,14 @@ void guttangt_state::init_guttangts3()
 	common_init(&galaxian_state::galaxian_draw_bullet, &galaxian_state::galaxian_draw_background, nullptr, &galaxian_state::guttangt_extend_sprite_info);
 
 	uint8_t *romdata = memregion("maincpu")->base();
-	uint8_t buf[0x4800];
-	memcpy(buf, romdata, 0x4800);
 
 	// descramble the content of each 0x100 block
-	for (int i = 0; i < 0x4800; i++)
-		romdata[i] = buf[i ^ 0xff];
+	for (int i = 0; i < 0x4800; i += 0x100)
+	{
+		using std::swap;
+		for (int j = 0; j < (0x100 / 2); j++)
+			swap(romdata[i | j], romdata[i | (j ^ 0xff)]);
+	}
 }
 
 void sbhoei_state::init_sbhoei()
@@ -9146,12 +9148,14 @@ void galaxian_state::init_jumpbugbc()
 	init_jumpbug();
 
 	uint8_t *romdata = memregion("maincpu")->base();
-	uint8_t buf[0x10000];
-	memcpy(buf, romdata, 0x10000);
 
 	// descramble the content of each 0x100 block
-	for (int i = 0; i < 0x10000; i++)
-		romdata[i] = buf[i ^ 0xff];
+	for (int i = 0; i < 0x10000; i += 0x100)
+	{
+		using std::swap;
+		for (int j = 0; j < (0x100 / 2); j++)
+			swap(romdata[i | j], romdata[i | (j ^ 0xff)]);
+	}
 }
 
 

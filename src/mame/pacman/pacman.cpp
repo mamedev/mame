@@ -5633,7 +5633,7 @@ ROM_END
 
 /* Marti Colls bootleg (set 1).
    There are two PCB versions with the same ROM set:
-    -An older one, just labeled "PAC", with a 18 MHz xtal, and a Novatronic NVS board (a small sub-board from Novatronic, 
+    -An older one, just labeled "PAC", with a 18 MHz xtal, and a Novatronic NVS board (a small sub-board from Novatronic,
       silkscreened "NOVATRONIC BILBAO SPAIN  COPYRIGHT 1982", with the CPU, program ROMs, a PROM and a 6116 SRAM
       (https://www.recreativas.org/novatronic-video-sistema-nvs-6072-novatronic-sa). This one is where the PROMs were dumped from.
     -A newer one, silkscreened by MARTI COLLS, with a sub-board similar to the Novatronic one (but without Novatronic texts).
@@ -8654,12 +8654,14 @@ uint8_t pacman_state::cannonbp_protection_r(offs_t offset)
 void pacman_state::init_pengomc1()
 {
 	uint8_t *romdata = memregion("maincpu")->base();
-	uint8_t buf[0xc000];
-	memcpy(buf, romdata, 0xc000);
 
 	// some sort of weak protection?
-	for (int i = 0; i < 0xc000; i++)
-		romdata[i] = buf[i^0xff];
+	for (int i = 0; i < 0xc000; i += 0x100)
+	{
+		using std::swap;
+		for (int j = 0; j < (0x100 / 2); j++)
+			swap(romdata[i | j], romdata[i | (j ^ 0xff)]);
+	}
 }
 
 ioport_value clubpacm_state::clubpacm_input_r()

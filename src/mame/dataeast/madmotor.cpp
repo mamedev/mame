@@ -341,6 +341,9 @@ ROM_START( madmotor )
 
 	ROM_REGION( 0x40000, "oki2", 0 )
 	ROM_LOAD( "13.h3",    0x00000, 0x20000, CRC(cc4d65e9) SHA1(b9bcaa52c570f94d2f2e5dd84c94773cc4115442) )
+
+	ROM_REGION( 0x100, "proms", 0 )
+	ROM_LOAD( "fm-23.19h", 0x000, 0x100, CRC(6d51adf8) SHA1(51f2792d06f46ec27c60c814745641aa8709a200) ) // probably related to sprites' hardware
 ROM_END
 
 ROM_START( madmotora )
@@ -382,6 +385,9 @@ ROM_START( madmotora )
 
 	ROM_REGION( 0x40000, "oki2", 0 )
 	ROM_LOAD( "13.h3",    0x00000, 0x20000, CRC(cc4d65e9) SHA1(b9bcaa52c570f94d2f2e5dd84c94773cc4115442) )
+
+	ROM_REGION( 0x100, "proms", 0 )
+	ROM_LOAD( "fm-23.19h", 0x000, 0x100, CRC(6d51adf8) SHA1(51f2792d06f46ec27c60c814745641aa8709a200) ) // probably related to sprites' hardware
 ROM_END
 
 /******************************************************************************/

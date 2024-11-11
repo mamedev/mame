@@ -14,7 +14,7 @@ HD64F7044F28 (SH-2) with internal ROM
 D720J8 XTAL (near SH2)
 DS2404S RTC
 KOS9F XTAL (near RTC)
-square 144 pin chip with no marking
+square 144 pin chip with no marking (probably YGV617B-S like board below)
 12.000 MHz XTAL (near 144 pin chip)
 2x LATTICE Mach211SP-15JC - 18JI 8010OPY3 PK3_CTRL chips
 2x GM71C18163CJ6 RAM
@@ -22,6 +22,30 @@ BR62256P RAM
 Oki M6295 sound chip
 2x bank of 8 DIP switches
 
+The main components for PAL POKER 3 are:
+HD64F7044F28 (SH-2) with internal ROM
+D720J8 XTAL (near SH2)
+DS2404S RTC
+KOS9F XTAL (near RTC)
+YGV617B-S Advanced Video Processor
+12.000 MHz XTAL (near 144 pin chip)
+LATTICE Mach211SP-15JC - 18JI 9950APA B PK2_CTRL chip
+2x GM71C18163CJ6 RAM
+BR62256P RAM
+Oki M6295 sound chip
+2x bank of 8 DIP switches
+
+The main components for SH-POKER V3.0 are:
+scratched square 112 pin chip (probably HD64F7044F28 as above)
+14.318 MHz XTAL
+DS2404S RTC
+DS7A XTAL (near RTC)
+scratched square 144 pin chip (probably YGV617B-S as above)
+12.000 MHz XTAL (near 144 pin chip)
+scratched square 40 pin chip (probably LATTICE Mach211SP as above)
+scratched square 44 pin chip (probably Oki M6295 as above)
+6x bank of 8 DIP switches (on base board)
+bank of 8 DIP switches (on CPU board)
 
 TODO: everything. Needs internal ROM dumps.
 */
@@ -188,6 +212,9 @@ ROM_START( mpoker2 ) // this was on the PAL PCB
 	ROM_REGION( 0x200000, "gfx", 0 )
 	ROM_LOAD( "lh28f160s5t.u0222", 0x000000, 0x200000, CRC(12dc71c7) SHA1(e0db76e05752f475e554ccd24244ea8bc60f2042) )
 
+	ROM_REGION( 0x4934, "mach", 0 )
+	ROM_LOAD( "pk3_ctrl.jed", 0x0000, 0x4934, NO_DUMP )
+
 	ROM_REGION( 0x80000, "oki", 0 )
 	ROM_LOAD( "msm27c401.u066", 0x00000, 0x80000, CRC(2aba63a3) SHA1(c3d0a5a37cfa309cb94d6218c068fe90272d1721) ) // 1xxxxxxxxxxxxxxxxxx = 0x00
 ROM_END
@@ -195,6 +222,9 @@ ROM_END
 ROM_START( mpoker2a ) // this was on the PAL POKER 3 PCB
 	ROM_REGION( 0x40000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD( "internal_rom", 0x00000, 0x40000, NO_DUMP)
+
+	ROM_REGION( 0x4934, "mach", 0 )
+	ROM_LOAD( "pk2_ctrl.u0114.jed", 0x0000, 0x4934, CRC(5f897e0e) SHA1(018eadeeb43846fb23b2665758a108e0c1a79d72) ) // JED as jedutil can't handle MACHs yet
 
 	ROM_REGION( 0x200000, "gfx", 0 )
 	ROM_LOAD( "flash56.bin", 0x000000, 0x200000, CRC(fbca21df) SHA1(78ab98468bb4d5563d14a9a5be4be73112e8b0a2) )
@@ -209,6 +239,9 @@ ROM_START( mpoker2b ) // this was on the SH-POKER V3.0
 
 	ROM_REGION( 0x200000, "gfx", 0 )
 	ROM_LOAD( "flash56.bin", 0x000000, 0x200000, CRC(1d65901c) SHA1(f8f42ff2dc858a5970ecfbdfb08154047833676b) )
+
+	ROM_REGION( 0x4934, "mach", 0 )
+	ROM_LOAD( "mach.u0114.jed", 0x0000, 0x4934, CRC(2f9b8fdc) SHA1(ab5ddac49db6d8a8a5a59cf6fefe145031add487) ) // JED as jedutil can't handle MACHs yet
 
 	ROM_REGION( 0x80000, "oki", 0 )
 	ROM_LOAD( "msm27c401.bin", 0x00000, 0x80000, CRC(2aba63a3) SHA1(c3d0a5a37cfa309cb94d6218c068fe90272d1721) ) // 1xxxxxxxxxxxxxxxxxx = 0x00
