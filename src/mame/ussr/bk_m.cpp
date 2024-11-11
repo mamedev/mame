@@ -131,7 +131,7 @@ void bk_state::bk0010_palette(palette_device &palette)
 	palette.set_pen_color(4, rgb_t(255, 255, 255));
 }
 
-void bk_state::update_monitor(int state)
+void bk_state::update_monitor_type(int state)
 {
 	m_monitor = state;
 }

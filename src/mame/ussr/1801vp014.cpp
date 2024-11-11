@@ -43,7 +43,7 @@ static INPUT_PORTS_START(ms7008)
 	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("ЗАГЛ/СТР / Caps Lock") PORT_CODE(KEYCODE_CAPSLOCK) PORT_CHAR(UCHAR_MAMEKEY(CAPSLOCK)) PORT_TOGGLE
 	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_UNUSED)
 	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_UNUSED)
-	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("monitor switch") PORT_CODE(KEYCODE_ASTERISK) PORT_TOGGLE PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(k1801vp014_device::extra_button), 0)
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("mono/color monitor toggle") PORT_CODE(KEYCODE_ASTERISK) PORT_TOGGLE PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(k1801vp014_device::monitor_type_button), 0)
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("СТОП / Stop") PORT_CODE(KEYCODE_PAUSE) PORT_CHAR(UCHAR_MAMEKEY(PAUSE)) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(k1801vp014_device::stop_button), 0)
 
 	PORT_START("LINE0") // X0
@@ -158,9 +158,9 @@ INPUT_CHANGED_MEMBER(k1801vp014_device::stop_button)
 	m_write_halt(newval ? ASSERT_LINE : CLEAR_LINE);
 }
 
-INPUT_CHANGED_MEMBER(k1801vp014_device::extra_button)
+INPUT_CHANGED_MEMBER(k1801vp014_device::monitor_type_button)
 {
-	m_write_extra(newval ? ASSERT_LINE : CLEAR_LINE);
+	m_write_monitor_type(newval ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -176,7 +176,7 @@ k1801vp014_device::k1801vp014_device(const machine_config &mconfig, const char *
 	, m_write_virq(*this)
 	, m_write_keydown(*this)
 	, m_write_halt(*this)
-	, m_write_extra(*this)
+	, m_write_monitor_type(*this)
 {
 }
 

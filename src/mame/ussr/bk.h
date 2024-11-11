@@ -36,7 +36,7 @@ public:
 
 	void bk0010(machine_config &config);
 	void bk0010fd(machine_config &config);
-	void update_monitor(int state);
+	void update_monitor_type(int state);
 
 protected:
 	virtual void machine_start() override ATTR_COLD;

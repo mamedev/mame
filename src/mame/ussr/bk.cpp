@@ -58,7 +58,7 @@ void bk_state::bk0010fd_mem(address_map &map)
 /* Input ports */
 static INPUT_PORTS_START( bk0010 )
 	PORT_START("CONFIG")
-	PORT_CONFNAME(0x01, 0x00, "Monitor type") PORT_WRITE_LINE_MEMBER(FUNC(bk_state::update_monitor))
+	PORT_CONFNAME(0x01, 0x00, "Monitor type") PORT_WRITE_LINE_MEMBER(FUNC(bk_state::update_monitor_type))
 	PORT_CONFSETTING(0x00, "B&W")
 	PORT_CONFSETTING(0x01, "Color")
 INPUT_PORTS_END
@@ -94,7 +94,7 @@ void bk_state::bk0010(machine_config &config)
 					m_sel1 |= SEL1_KEYDOWN;
 			});
 	m_kbd->halt_wr_callback().set_inputline(m_maincpu, t11_device::HLT_LINE);
-	m_kbd->extra_wr_callback().set([this] (int state) { m_monitor ^= 1; });
+	m_kbd->monitor_type_wr_callback().set([this] (int state) { m_monitor ^= 1; });
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
