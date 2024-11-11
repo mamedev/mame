@@ -304,7 +304,7 @@ void thinkpad600_state::thinkpad600(machine_config &config)
 
 
 ROM_START(thinkpad760xd)
-	ROM_REGION( 0x80000, "bios", 0 )
+	ROM_REGION( 0x80000, "pci:07.0", 0 )
 	ROM_LOAD( "e28f004_89g8164_rev37_h1897m.u17", 0x00000, 0x80000, CRC(6092594f) SHA1(25681e4952a432e1170f69ae75f3260245b6b44b) ) // BIOS
 
 	ROM_REGION( 0x0f780, "mcu", 0)
@@ -315,7 +315,7 @@ ROM_START(thinkpad760xd)
 ROM_END
 
 ROM_START(thinkpad600)
-	ROM_REGION( 0x80000,  "bios", 0 )
+	ROM_REGION( 0x80000,  "pci:07.0", 0 )
 	ROM_LOAD( "tms28f004b_18l9949_rev16-i2298m.u76",  0x00000, 0x80000, CRC(00a52b32) SHA1(08db425b8edb3a036f22beb588caa6f050fc8eb2) )
 
 	ROM_REGION(0x0f780, "mcu", 0)
@@ -354,7 +354,7 @@ ROM_START(thinkpad600e)
 ROM_END
 
 ROM_START(thinkpad770z)
-	ROM_REGION( 0x80000,  "bios", 0 )
+	ROM_REGION( 0x80000,  "pci:07.0", 0 )
 	ROM_LOAD( "e28f004b5t80-10l1055-rev09-d0999m.u59", 0x00000, 0x80000, CRC(f9f255c5) SHA1(ee209802d08c6498a42e52c5c45ce469dc095ad4) )
 
 	ROM_REGION(0x0f780, "mcu", 0)
@@ -377,4 +377,3 @@ COMP( 1995, thinkpad760xd, 0,      0,      thinkpad600,  thinkpad600, thinkpad60
 COMP( 1998, thinkpad600,   0,      0,      thinkpad600,  thinkpad600, thinkpad600_state, empty_init, "IBM",   "ThinkPad 600",   MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 COMP( 1999, thinkpad600e,  0,      0,      thinkpad600e, thinkpad600, thinkpad600_state, empty_init, "IBM",   "ThinkPad 600E",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 COMP( 1999, thinkpad770z,  0,      0,      thinkpad600,  thinkpad600, thinkpad600_state, empty_init, "IBM",   "ThinkPad 770Z",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-
