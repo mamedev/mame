@@ -110,9 +110,15 @@ void challenge_gear_state::machine_reset()
 void challenge_gear_state::challenge_gear(machine_config &config)
 {
 	/* basic machine hardware */
-	msm665xx_device &maincpu(MSM66573(config, "maincpu", 14'000'000));
+	msm665xx_device &maincpu(MSM66573(config, "maincpu", 4_MHz_XTAL)); // 100-lead square glob (type guessed); XL2 = 4.00H
+	//maincpu.set_xtclk(32.768_kHz_XTAL);
 	maincpu.set_addrmap(AS_PROGRAM, &challenge_gear_state::program_map);
 	maincpu.set_addrmap(AS_DATA, &challenge_gear_state::data_map);
+	// P6.5 <-> I2C SDA
+	// P6.6 -> I2C SCL
+	// P8 -> key matrix -> P10
+
+	//I2C_24C16(config, "eeprom"); // "BR24C16FV" silkscreened on PCB
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
