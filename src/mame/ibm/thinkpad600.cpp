@@ -2,7 +2,7 @@
 // copyright-holders: Angelo Salese
 /**************************************************************************************************
 
-IBM ThinkPad 600 and 760 series.
+IBM ThinkPad 6xx and 7xx series.
 More info from IBM: https://psref.lenovo.com/syspool/Sys/PDF/withdrawnbook/twbook.pdf
 
 TODO:
@@ -57,6 +57,51 @@ Hardware for the 600 model.
     -Atmel ATF1500AL.
     -TI TCM320AC36C (Voice-Band Audio Processor [VBAPE]).
     -Large BGA chip silkscreened "IPI I8L7360 F27904A".
+
+IBM ThinkPad 760 was a notebook computer introduced in 1995 by IBM as part of the ThinkPad 700-series.
+Eleven models were produced: 760C, 760CD, 760L, 760LD, 760E, 760ED, 760EL, 760ELD, 760XL, 760XD, and 760D/L.
+
+Hardware for the 760XD model.
+  CPU PCB:
+    -Intel Mobile Pentium MMX 166 (TT80503166).
+    -Two Samsung KM732V589T-15 (Cache SRAM, 32KX32).
+    -One IDT 71V256 (Lower Power 3.3V CMOS Fast SRAM 256K [32K x 8-Bit]).
+  RAM PCB:
+    -Four on-board Toshiba TC51V18165CFTS-60 (1M X 16 EDO DRAM).
+    -Two DIMM slots.
+  Main PCB:
+    -Intel PCIset SB82437MX.
+    -Intel PCIset SB82371FB.
+    -Two Intel PCIset FA82438MX.
+    -W48C60-402G.
+    -Four M5M4V18165CTTP (1M x 16 EDO DRAM).
+    -Dallas DS17485S-5 (real-time clock/calendar).
+    -NEC 53G9037.
+    -NEC 53G9038.
+    -IBM 89G7219.
+    -IBM 20H2888.
+    -IBM 94G0207.
+    -HD6433436A18F (mask ROM, IBM-branded).
+    -Maxim MAX3243CAI.
+    -C46CM6 (SEEPROM, for BIOS settings).
+    -Texas Instruments PCIbus PCI1130PDV.
+    -Texas Instruments 90G9510.
+    -Intel Flash E28F004 (BIOS).
+  Video PCB:
+    -NEC 53G9037.
+    -IBM 20H2929.
+    -IBM 03H9515.
+    -Trident Cyber9385T.
+    -Two National Semiconductor DS90CF561MTD (LVDS 18-Bit Color Flat Panel Display [FPD] Link).
+    -Six KM416V256DT-L6 (256K x 16Bit CMOS Dynamic RAM with Fast Page Mode).
+    -AD722JR (RGB to NTSC/PAL Encoder).
+    -Philips SAA7110A WP.
+  Sound PCB:
+    -HM62W4032HFP25.
+    -Crystal CS4218-KQ.
+    -Texas Instruments TCM320AC36C (Voice-Band Audio Processor).
+  Two separate small PCBs with two IR transceivers.
+
 
 IBM ThinkPad 770 was a laptop designed and manufactured by IBM targeted for the business, enterprise and professional user.
 It was the last lineup in the ThinkPad 700-series, succeeding the 760 as the high-end laptop of the ThinkPad lineup. 
@@ -258,6 +303,31 @@ void thinkpad600_state::thinkpad600(machine_config &config)
 }
 
 
+ROM_START(thinkpad760xd)
+	ROM_REGION( 0x80000, "bios", 0 )
+	ROM_LOAD( "e28f004_89g8164_rev37_h1897m.u17", 0x00000, 0x80000, CRC(6092594f) SHA1(25681e4952a432e1170f69ae75f3260245b6b44b) ) // BIOS
+
+	ROM_REGION( 0x0f780, "mcu", 0)
+	ROM_LOAD( "ibm_hd6433436a18f_40h8792.u39",    0x00000, 0x0f780, NO_DUMP ) // Mask ROM, undumped
+
+	ROM_REGION( 0x00080, "seeprom", 0)
+	ROM_LOAD( "st93c46c.u30",                     0x00000, 0x00080, CRC(22cac7b5) SHA1(ee48ecf5d59e243e9afb0ca7e41ed8437eec8097) ) // BIOS settings
+ROM_END
+
+ROM_START(thinkpad600)
+	ROM_REGION( 0x80000,  "bios", 0 )
+	ROM_LOAD( "tms28f004b_18l9949_rev16-i2298m.u76",  0x00000, 0x80000, CRC(00a52b32) SHA1(08db425b8edb3a036f22beb588caa6f050fc8eb2) )
+
+	ROM_REGION(0x0f780, "mcu", 0)
+	ROM_LOAD( "hd64f3437tf_10l9950_rev08_i2798m.u32", 0x00000, 0x0f780, CRC(546ec51c) SHA1(5d9b4be590307c4059ff11c434d0901819427649) )
+
+	ROM_REGION(0x00080, "seeprom", 0)
+	ROM_LOAD( "atmel_24c01a.u49",                     0x00000, 0x00080, CRC(9a2e2a18) SHA1(29e2832c97bc93debb4fb09fcbed582335b57efe) ) // BIOS settings
+
+	ROM_REGION(0x00c39, "plds", 0)
+	ROM_LOAD( "atf1500al-modemboard.u12",             0x00000, 0x00c39, CRC(7ecd4b79) SHA1(b69ef5fe227b466f331f863ba20efd7e23056809) ) // On modem PCB
+ROM_END
+
 ROM_START(thinkpad600e)
 	ROM_REGION( 0x80000, "bios", 0 )
 	ROM_LOAD( "e28f004b5t80-10l1056_rev15_h0399m.u60", 0x00000, 0x80000, CRC(fba7567b) SHA1(a84e7d4e5740150e78e5002714c9125705f3356a) )
@@ -271,34 +341,20 @@ ROM_START(thinkpad600e)
 	ROM_COPY( "bios", 0x20000, 0x00000, 0x20000 )
 
 	ROM_REGION(0x0f780, "mcu", 0)
-	ROM_LOAD( "hd64f3437tf-10l1057_rev04_h0499m.u39",  0x00000, 0x0f780, CRC(c21c928b) SHA1(33e3e6966f003655ffc2f3ac07772d2d3245740d) )
+	ROM_LOAD( "hd64f3437tf-10l1057_rev04_h0499m.u39", 0x00000, 0x0f780, CRC(c21c928b) SHA1(33e3e6966f003655ffc2f3ac07772d2d3245740d) )
 
 	ROM_REGION(0x00080, "seeprom", 0)
-	ROM_LOAD( "atmel_24c01a.u98",                      0x00000, 0x00080, CRC(7ce51001) SHA1(6f25666373a6373ce0014c04df73a066f4da938b) ) // BIOS settings
+	ROM_LOAD( "atmel_24c01a.u98",                     0x00000, 0x00080, CRC(7ce51001) SHA1(6f25666373a6373ce0014c04df73a066f4da938b) ) // BIOS settings
 
 	ROM_REGION(0x00420, "seeprom2", 0)
-	ROM_LOAD( "at24rf08bt.u99",                        0x00000, 0x00420, CRC(c7ce9600) SHA1(4e6ed66250fed838614c3f1f6044fd9a19a2d0de) )
+	ROM_LOAD( "at24rf08bt.u99",                       0x00000, 0x00420, CRC(c7ce9600) SHA1(4e6ed66250fed838614c3f1f6044fd9a19a2d0de) )
 
 	ROM_REGION(0x00c39, "plds", 0)
-	ROM_LOAD( "atf1500al-modemboard.u12",              0x00000, 0x00c39, CRC(7ecd4b79) SHA1(b69ef5fe227b466f331f863ba20efd7e23056809) ) // On modem PCB
-ROM_END
-
-ROM_START(thinkpad600)
-	ROM_REGION( 0x80000,  "pci:07.0", 0 )
-	ROM_LOAD( "tms28f004b_18l9949_rev16-i2298m.u76",   0x00000, 0x80000, CRC(00a52b32) SHA1(08db425b8edb3a036f22beb588caa6f050fc8eb2) )
-
-	ROM_REGION(0x0f780, "mcu", 0)
-	ROM_LOAD( "hd64f3437tf_10l9950_rev08_i2798m.u32",  0x00000, 0x0f780, CRC(546ec51c) SHA1(5d9b4be590307c4059ff11c434d0901819427649) )
-
-	ROM_REGION(0x00080, "seeprom", 0)
-	ROM_LOAD( "atmel_24c01a.u49",                      0x00000, 0x00080, CRC(9a2e2a18) SHA1(29e2832c97bc93debb4fb09fcbed582335b57efe) ) // BIOS settings
-
-	ROM_REGION(0x00c39, "plds", 0)
-	ROM_LOAD( "atf1500al-modemboard.u12",              0x00000, 0x00c39, CRC(7ecd4b79) SHA1(b69ef5fe227b466f331f863ba20efd7e23056809) ) // On modem PCB
+	ROM_LOAD( "atf1500al-modemboard.u12",             0x00000, 0x00c39, CRC(7ecd4b79) SHA1(b69ef5fe227b466f331f863ba20efd7e23056809) ) // On modem PCB
 ROM_END
 
 ROM_START(thinkpad770z)
-	ROM_REGION( 0x80000,  "pci:07.0", 0 )
+	ROM_REGION( 0x80000,  "bios", 0 )
 	ROM_LOAD( "e28f004b5t80-10l1055-rev09-d0999m.u59", 0x00000, 0x80000, CRC(f9f255c5) SHA1(ee209802d08c6498a42e52c5c45ce469dc095ad4) )
 
 	ROM_REGION(0x0f780, "mcu", 0)
@@ -316,7 +372,9 @@ ROM_END
 
 } // anonymous namespace
 
-//    YEAR, NAME,         PARENT, COMPAT, MACHINE,      INPUT,       CLASS,             INIT,       COMPANY, FULLNAME,        FLAGS
-COMP( 1999, thinkpad600e, 0,      0,      thinkpad600e, thinkpad600, thinkpad600_state, empty_init, "IBM",   "ThinkPad 600E", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-COMP( 1998, thinkpad600,  0,      0,      thinkpad600,  thinkpad600, thinkpad600_state, empty_init, "IBM",   "ThinkPad 600",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-COMP( 1998, thinkpad770z, 0,      0,      thinkpad600,  thinkpad600, thinkpad600_state, empty_init, "IBM",   "ThinkPad 770Z", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+//    YEAR, NAME,          PARENT, COMPAT, MACHINE,      INPUT,       CLASS,             INIT,       COMPANY, FULLNAME,         760FLAGS
+COMP( 1995, thinkpad760xd, 0,      0,      thinkpad600,  thinkpad600, thinkpad600_state, empty_init, "IBM",   "ThinkPad 760XD", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( 1998, thinkpad600,   0,      0,      thinkpad600,  thinkpad600, thinkpad600_state, empty_init, "IBM",   "ThinkPad 600",   MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( 1999, thinkpad600e,  0,      0,      thinkpad600e, thinkpad600, thinkpad600_state, empty_init, "IBM",   "ThinkPad 600E",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( 1999, thinkpad770z,  0,      0,      thinkpad600,  thinkpad600, thinkpad600_state, empty_init, "IBM",   "ThinkPad 770Z",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+
