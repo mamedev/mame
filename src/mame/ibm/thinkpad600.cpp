@@ -2,11 +2,12 @@
 // copyright-holders: Angelo Salese
 /**************************************************************************************************
 
-IBM ThinkPad 600 series
+IBM ThinkPad 600 and 760 series.
+More info from IBM: https://psref.lenovo.com/syspool/Sys/PDF/withdrawnbook/twbook.pdf
 
 TODO:
 - Intel e28f004b5t80 flash ROM;
-- RTC (what's the CMOS here?);
+- RTC (DS17485S-5);
 - keyboard (thru H8/3437);
 
 ===================================================================================================
@@ -56,6 +57,41 @@ Hardware for the 600 model.
     -Atmel ATF1500AL.
     -TI TCM320AC36C (Voice-Band Audio Processor [VBAPE]).
     -Large BGA chip silkscreened "IPI I8L7360 F27904A".
+
+IBM ThinkPad 770 was a laptop designed and manufactured by IBM targeted for the business, enterprise and professional user.
+It was the last lineup in the ThinkPad 700-series, succeeding the 760 as the high-end laptop of the ThinkPad lineup. 
+The line was produced from October 1997 to May 2000, and eventually replaced by the ThinkPad models A20m and A20p.
+
+Hardware for the 770Z model.
+
+  Main PCB:
+    -Intel Mobile Pentium II 366 MMC-2 (PMG36602002AA).
+    -Texas Instruments PCIbus SN104698GFN.
+    -Intel PCIset FW82371EB (PCI-TO-ISA / IDE XCELERATOR PIIX4)
+    -Crystal CS4610C-CQ (CrystalClear SoundFusion PCI Audio Accelerator).
+    -Crystal CS4239-KQ (CrystalClear Portable ISA Audio System).
+    -National Semiconductor PC97338VJG (ACPI 1.0 and PC98/99 Compliant SuperI/O).
+    -Hitachi HD64F3437TF (near a 33.868 MHz xtal).
+    -Atmel 24C01A (SEEPROM).
+    -Dallas DS17485S-5 (real-time clock/calendar).
+    -Other chips: NEC-J 1K3153 919LW, National SemiconductorLMC6034IM, IBM 20H2987
+                  IBM 10L3953, IMI SSC660EYB, IMI SG577DYB
+   Modem PCB:
+    -IBM 3780i Mwave DSP.
+    -Epson 11J9289.
+    -Five AS7C3256-15TC (RAM).
+    -Atmel ATF1500AL.
+    -TI TCM320AC36C (Voice-Band Audio Processor [VBAPE]).
+   Video PCB:
+    -Trident Cyber9397DVD.
+    -Two KM4132G512TQ-8.
+   DVD and enhaced video PCB.
+    -IBM MPEGCD1MPFC21C (near a 27 MHz xtal).
+    -Analog Devices ADV7175AKS (integrated digital video encoder).
+    -M5M4V16S40CTP.
+    -CS8404A-CS.
+    -Philips SAA7111A (video input processor).
+
 
 **************************************************************************************************/
 
@@ -261,8 +297,26 @@ ROM_START(thinkpad600)
 	ROM_LOAD( "atf1500al-modemboard.u12",              0x00000, 0x00c39, CRC(7ecd4b79) SHA1(b69ef5fe227b466f331f863ba20efd7e23056809) ) // On modem PCB
 ROM_END
 
+ROM_START(thinkpad770z)
+	ROM_REGION( 0x80000,  "pci:07.0", 0 )
+	ROM_LOAD( "e28f004b5t80-10l1055-rev09-d0999m.u59", 0x00000, 0x80000, CRC(f9f255c5) SHA1(ee209802d08c6498a42e52c5c45ce469dc095ad4) )
+
+	ROM_REGION(0x0f780, "mcu", 0)
+	ROM_LOAD( "hd64f3437tf-10l1049-rev05-e2699m.u10",  0x00000, 0x0f780, CRC(c1bad151) SHA1(73d0d1b15c083a18aff6b80188443b0dc1d976c3) )
+
+	ROM_REGION(0x00080, "seeprom", 0)
+	ROM_LOAD( "atmel24c01a.u94",                       0x00000, 0x00080, CRC(7ce51001) SHA1(6f25666373a6373ce0014c04df73a066f4da938b) ) // BIOS settings
+
+	ROM_REGION(0x00420, "seeprom2", 0)
+	ROM_LOAD( "una-at24rf08bt.bin",                    0x00000, 0x00420, CRC(9ccddd43) SHA1(262af18b5649b01f70ef1587a14405f8f6cd8fe2) )
+
+	ROM_REGION(0x00c39, "plds", 0)
+	ROM_LOAD( "atf1500al-modemboard.u12",              0x00000, 0x00c39, CRC(7ecd4b79) SHA1(b69ef5fe227b466f331f863ba20efd7e23056809) ) // On modem PCB
+ROM_END
+
 } // anonymous namespace
 
 //    YEAR, NAME,         PARENT, COMPAT, MACHINE,      INPUT,       CLASS,             INIT,       COMPANY, FULLNAME,        FLAGS
 COMP( 1999, thinkpad600e, 0,      0,      thinkpad600e, thinkpad600, thinkpad600_state, empty_init, "IBM",   "ThinkPad 600E", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 COMP( 1998, thinkpad600,  0,      0,      thinkpad600,  thinkpad600, thinkpad600_state, empty_init, "IBM",   "ThinkPad 600",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( 1998, thinkpad770z, 0,      0,      thinkpad600,  thinkpad600, thinkpad600_state, empty_init, "IBM",   "ThinkPad 770Z", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
