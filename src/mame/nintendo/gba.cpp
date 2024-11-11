@@ -8,6 +8,14 @@
 
   By R. Belmont & Ryan Holtz
 
+  Game Boy Player (DOL-017) is a hardware add-on for the GameCube to
+  run GB/GBC/GBA games on the TV, normally requiring a special boot
+  disc in the GameCube to operate.  It is mostly normal GBA hardware
+  with inputs and outputs adjusted for TV player.  This unit is
+  currently not working, as it fails to boot.  The BIOS only differs
+  by a few bytes, but the hardware might need to be initialized in
+  another manner.
+
 ***************************************************************************/
 
 #include "emu.h"
@@ -1496,7 +1504,17 @@ void gba_robotech_state::gbadv_robotech(machine_config &config)
 
 ROM_START( gba )
 	ROM_REGION( 0x4000, "maincpu", 0 )
-	ROM_LOAD( "gba.bin", 0x000000, 0x004000, CRC(81977335) SHA1(300c20df6731a33952ded8c436f7f186d25d3492) )
+
+	ROM_SYSTEM_BIOS(0, "agb-v1", "Game Boy Advance (AGB-001)")
+	ROMX_LOAD( "gba.bin", 0x000000, 0x004000, CRC(81977335) SHA1(300c20df6731a33952ded8c436f7f186d25d3492), ROM_BIOS(0) )
+
+	ROM_SYSTEM_BIOS(1, "agb-beta", "Game Boy Advance (beta)")
+	ROMX_LOAD( "gba-beta.bin", 0x000000, 0x004000, CRC(15e1f676) SHA1(aa98a2ad32b86106340665d1222d7d973a1361c7), ROM_BIOS(1) )
+ROM_END
+
+ROM_START( gbplayer )
+	ROM_REGION ( 0x4000, "maincpu", 0 )
+	ROM_LOAD("gbplayer.bin", 0x000000, 0x004000, CRC(3f02ea8f) SHA1(3d4b5d095576f5b994bf62c00cac9428a88b2b78) )
 ROM_END
 
 ROM_START( robotech )
@@ -1506,6 +1524,7 @@ ROM_END
 
 //   YEAR  NAME       PARENT  COMPAT  MACHINE           INPUT       CLASS               INIT        COMPANY     FULLNAME            FLAGS
 CONS(2001, gba,       0,      0,      gbadv_cons,       gbadv_cons, gba_cons_state,     empty_init, "Nintendo", "Game Boy Advance", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND)
+CONS(2003, gbplayer,  gba,    0,      gbadv_cons,       gbadv_cons, gba_cons_state,     empty_init, "Nintendo", "Game Boy Player",  MACHINE_NOT_WORKING)
 
 // this is a single game reissue of "Robotech - The Macross Saga (Euro, USA)" on the GBA but with double
 // sized ROM (BIOS replacement in first half?) and other mods.  It is unclear how compatible this is with

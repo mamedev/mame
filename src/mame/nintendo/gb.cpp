@@ -1243,8 +1243,23 @@ ROM_END
 
 ROM_START(gbcolor)
 	ROM_REGION(0x800, "maincpu", 0)
-	ROM_LOAD("gbc_boot.1", 0x0000, 0x0100, CRC(779ea374) SHA1(e4b40c9fd593a97a1618cfb2696f290cf9596a62)) // Bootstrap code part 1
-	ROM_LOAD("gbc_boot.2", 0x0100, 0x0700, CRC(f741807d) SHA1(f943b1e0b640cf1d371e1d8f0ada69af03ebb396)) // Bootstrap code part 2
+
+	// The international Game Boy Color hardware (CGB-001)
+	ROM_SYSTEM_BIOS(0, "cgb-v1", "Game Boy Color v1 CGB-001")
+	ROMX_LOAD("gbc_v1_boot.1", 0x0000, 0x0100, CRC(779ea374) SHA1(e4b40c9fd593a97a1618cfb2696f290cf9596a62), ROM_BIOS(0) ) // Bootstrap code part 1
+	ROMX_LOAD("gbc_v1_boot.2", 0x0100, 0x0700, CRC(f741807d) SHA1(f943b1e0b640cf1d371e1d8f0ada69af03ebb396), ROM_BIOS(0) ) // Bootstrap code part 2
+
+	// (Older?) Japanese units used another version of the BIOS
+	ROM_SYSTEM_BIOS(1, "cgb-v0", "Game Boy Color v0 (Japan) CGB-001")
+	ROMX_LOAD("gbc_v0_boot.1", 0x0000, 0x0100, CRC(7edc621b) SHA1(8fc5f2e25b2cf480d378e4463c89bd0aecdfb21f), ROM_BIOS(1) )
+	ROMX_LOAD("gbc_v0_boot.2", 0x0100, 0x0700, CRC(2a16a329) SHA1(03c0cbfcb7e6a239e25cfb90cafae81087c465f6), ROM_BIOS(1) )
+
+	// Game Boy Advance includes a modified version of the BIOS code.
+	// Some games (shantae, wendy, zeldaage, zeldasea) use CPU register values
+	// set by it to enable GBA-exclusive features.
+	ROM_SYSTEM_BIOS(2, "agb", "Game Boy Advance AGB-001")
+	ROMX_LOAD("gbc_gba_boot.1", 0x0000, 0x0100, CRC(3c2ef5a4) SHA1(8c43360930ebc42a909cff736800606c697d59ea), ROM_BIOS(2) )
+	ROMX_LOAD("gbc_gba_boot.2", 0x0100, 0x0700, CRC(5f940766) SHA1(ba7ab25014e23d8b902b514571e1e21cc42d370f), ROM_BIOS(2) )
 ROM_END
 
 ROM_START(megaduck)
