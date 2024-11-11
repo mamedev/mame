@@ -337,11 +337,11 @@ void system1_state::machine_start()
 	}
 
 	save_item(NAME(m_adjust_cycles));
-	save_item(NAME(m_videomode_prev));
 	save_item(NAME(m_mcu_control));
 	save_item(NAME(m_nob_maincpu_latch));
 	save_item(NAME(m_nob_mcu_latch));
 	save_item(NAME(m_nob_mcu_status));
+	save_item(NAME(m_nobb_inport23_step));
 }
 
 
@@ -376,14 +376,14 @@ void system1_state::adjust_cycles(u8 data)
  *
  *************************************/
 
-void system1_state::bank44_custom_w(u8 data, u8 prevdata)
+void system1_state::bank44_custom_w(u8 data)
 {
 	// bank bits are bits 6 and 2
 	m_bank1->set_entry(((data & 0x40) >> 5) | ((data & 0x04) >> 2));
 }
 
 
-void system1_state::bank0c_custom_w(u8 data, u8 prevdata)
+void system1_state::bank0c_custom_w(u8 data)
 {
 	// bank bits are bits 3 and 2
 	m_bank1->set_entry((data & 0x0c) >> 2);
@@ -404,8 +404,7 @@ void system1_state::videomode_w(u8 data)
 
 	// handle any custom banking or other stuff
 	if (m_videomode_custom != nullptr)
-		(this->*m_videomode_custom)(data, m_videomode_prev);
-	m_videomode_prev = data;
+		(this->*m_videomode_custom)(data);
 
 	// remaining signals are video-related
 	common_videomode_w(data);
@@ -723,13 +722,13 @@ u8 system1_state::nob_mcu_status_r()
 u8 system1_state::nobb_inport1c_r()
 {
 //  logerror("IN  $1c : pc = %04x - data = 0x80\n",m_maincpu->pc());
-	return(0x80);   // infinite loop (at 0x0fb3) until bit 7 is set
+	return(0x80); // infinite loop (at 0x0fb3) until bit 7 is set
 }
 
 u8 system1_state::nobb_inport22_r()
 {
 //  logerror("IN  $22 : pc = %04x - data = %02x\n",m_maincpu->pc(),nobb_inport17_step);
-	return(0);//nobb_inport17_step);
+	return(0); // nobb_inport17_step;
 }
 
 u8 system1_state::nobb_inport23_r()

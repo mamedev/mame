@@ -111,13 +111,12 @@ public:
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
-	virtual void machine_reset() override ATTR_COLD { };
+	virtual void machine_reset() override ATTR_COLD { }
 	virtual void video_start() override ATTR_COLD;
 
 	// video related
 	std::unique_ptr<u8[]> m_videoram;
-	void (system1_state::*m_videomode_custom)(u8 data, u8 prevdata);
-	u8 m_videomode_prev = 0;
+	void (system1_state::*m_videomode_custom)(u8 data);
 	std::unique_ptr<u8[]> m_mix_collide;
 	u8 m_mix_collide_summary = 0;
 	std::unique_ptr<u8[]> m_sprite_collide;
@@ -134,7 +133,7 @@ protected:
 	u8 m_nob_maincpu_latch = 0;
 	u8 m_nob_mcu_latch = 0;
 	u8 m_nob_mcu_status = 0;
-	int m_nobb_inport23_step = 0;
+	u8 m_nobb_inport23_step = 0;
 
 	// video handlers
 	void common_videomode_w(u8 data);
@@ -189,8 +188,8 @@ protected:
 	// misc functions
 	TIMER_DEVICE_CALLBACK_MEMBER(soundirq_gen);
 	TIMER_DEVICE_CALLBACK_MEMBER(mcu_t0_callback);
-	void bank44_custom_w(u8 data, u8 prevdata);
-	void bank0c_custom_w(u8 data, u8 prevdata);
+	void bank44_custom_w(u8 data);
+	void bank0c_custom_w(u8 data);
 
 	// devices
 	required_device<z80_device> m_maincpu;
