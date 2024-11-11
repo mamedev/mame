@@ -55,7 +55,6 @@ public:
 	void sys1piox_315_5110(machine_config &config);
 	void sys1piox_315_5111(machine_config &config);
 	void sys1piox_315_5065(machine_config &config);
-	void shtngmst(machine_config &config);
 	void sys1ppix_315_5178(machine_config &config);
 	void sys1ppix_315_5179(machine_config &config);
 	void sys1piox_315_5093(machine_config &config);
@@ -101,7 +100,6 @@ public:
 	void init_bank44();
 
 	void init_nobb();
-	void init_dakkochn();
 	void init_bootleg();
 	void init_blockgal();
 	void init_nob();
@@ -111,15 +109,11 @@ public:
 	void init_bootsys2();
 	void init_bootsys2d();
 
-	ioport_value dakkochn_mux_data_r();
-	ioport_value dakkochn_mux_status_r();
-
 protected:
 	virtual void machine_start() override ATTR_COLD;
-	virtual void machine_reset() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD { };
 	virtual void video_start() override ATTR_COLD;
 
-private:
 	// video related
 	std::unique_ptr<u8[]> m_videoram;
 	void (system1_state::*m_videomode_custom)(u8 data, u8 prevdata);
@@ -136,7 +130,6 @@ private:
 
 	// protection, misc
 	u8 m_adjust_cycles = 0;
-	u8 m_dakkochn_mux_data = 0;
 	u8 m_mcu_control = 0;
 	u8 m_nob_maincpu_latch = 0;
 	u8 m_nob_mcu_latch = 0;
@@ -145,7 +138,7 @@ private:
 
 	// video handlers
 	void common_videomode_w(u8 data);
-	void videomode_w(u8 data);
+	virtual void videomode_w(u8 data);
 	void videoram_bank_w(u8 data);
 	u8 mixer_collision_r(offs_t offset);
 	void mixer_collision_w(offs_t offset, u8 data);
@@ -198,7 +191,6 @@ private:
 	TIMER_DEVICE_CALLBACK_MEMBER(mcu_t0_callback);
 	void bank44_custom_w(u8 data, u8 prevdata);
 	void bank0c_custom_w(u8 data, u8 prevdata);
-	void dakkochn_custom_w(u8 data, u8 prevdata);
 
 	// devices
 	required_device<z80_device> m_maincpu;
@@ -243,7 +235,58 @@ private:
 	void blockgal_io_map(address_map &map) ATTR_COLD;
 	void system1_pio_io_map(address_map &map) ATTR_COLD;
 	void system1_ppi_io_map(address_map &map) ATTR_COLD;
+};
+
+class shtngmst_state : public system1_state
+{
+public:
+	shtngmst_state(const machine_config &mconfig, device_type type, const char *tag) :
+		system1_state(mconfig, type, tag),
+		m_gun_solenoid(*this, "gun_solenoid")
+	{ }
+
+	void shtngmst(machine_config &config);
+
+	DECLARE_INPUT_CHANGED_MEMBER(gun_trigger);
+
+protected:
+	virtual void machine_start() override ATTR_COLD;
+
+private:
+	output_finder<> m_gun_solenoid;
+
+	u8 m_gun_output = 0;
+	u8 m_gun_trigger = 0;
+
 	void shtngmst_io_map(address_map &map) ATTR_COLD;
+
+	u8 gun_output_r() { return m_gun_output; }
+	void gun_output_w(u8 data);
+	u8 gun_trigger_r();
+};
+
+class dakkochn_state : public system1_state
+{
+public:
+	dakkochn_state(const machine_config &mconfig, device_type type, const char *tag) :
+		system1_state(mconfig, type, tag),
+		m_keys(*this, "KEY%u", 0)
+	{ }
+
+	ioport_value mux_data_r();
+	ioport_value mux_status_r();
+
+protected:
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+
+	virtual void videomode_w(u8 data) override;
+
+private:
+	required_ioport_array<7> m_keys;
+
+	u8 m_mux_count = 0;
+	u8 m_mux_clock = 0;
 };
 
 #endif // MAME_SEGA_SYSTEM1_H
