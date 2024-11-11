@@ -789,6 +789,7 @@ void mame_formats_full_list(mame_formats_enumerator &en)
 	en.add(fs::PRODOS);
 #endif
 #ifdef HAS_FORMATS_AP2_DSK
+	en.add(FLOPPY_A213S_FORMAT); // ap2_dsk.h
 	en.add(FLOPPY_A216S_DOS_FORMAT); // ap2_dsk.h
 	en.add(FLOPPY_A216S_PRODOS_FORMAT); // ap2_dsk.h
 	en.add(FLOPPY_RWTS18_FORMAT); // ap2_dsk.h

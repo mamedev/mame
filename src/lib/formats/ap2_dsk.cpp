@@ -18,6 +18,128 @@
 #include <cstdlib>
 #include <cstring>
 
+static const uint8_t translate5[] = {
+	0xab, 0xad, 0xae, 0xaf, 0xb5, 0xb6, 0xb7, 0xba,
+	0xbb, 0xbd, 0xbe, 0xbf, 0xd6, 0xd7, 0xda, 0xdb,
+	0xdd, 0xde, 0xdf, 0xea, 0xeb, 0xed, 0xee, 0xef,
+	0xf5, 0xf6, 0xf7, 0xfa, 0xfb, 0xfd, 0xfe, 0xff,
+};
+
+a2_13sect_format::a2_13sect_format() : floppy_image_format_t()
+{
+}
+
+int a2_13sect_format::identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants) const
+{
+	uint64_t size;
+	if (io.length(size))
+		return 0;
+
+	if (size != APPLE2_STD_TRACK_COUNT * 13 * 256)
+		return 0;
+
+	return FIFID_SIZE;
+}
+
+bool a2_13sect_format::load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image &image) const
+{
+	uint64_t size;
+	if (io.length(size))
+		return false;
+
+	image.set_form_variant(floppy_image::FF_525, floppy_image::SSSD);
+
+	int tracks = size / 13 / 256;
+
+	for(int track = 0; track < tracks; track++) {
+		std::vector<uint32_t> track_data;
+		uint8_t sector_data[256 * 13];
+
+		auto const [err, actual] = read_at(
+			io, track * sizeof sector_data, sector_data, sizeof sector_data);
+		if (err || actual != sizeof sector_data)
+			return false;
+
+		for(int i=0; i<13; i++) {
+			int sector = (i * 10) % 13;
+
+			// write inter-sector padding
+			for(int j=0; j<40; j++)
+				raw_w(track_data, 9, 0x1fe);
+			raw_w(track_data,  8, 0xff);
+
+			// write sector address
+			raw_w(track_data, 24, 0xd5aab5);
+			raw_w(track_data, 16, gcr4_encode(0xfe));
+			raw_w(track_data, 16, gcr4_encode(track));
+			raw_w(track_data, 16, gcr4_encode(sector));
+			raw_w(track_data, 16, gcr4_encode(0xfe ^ track ^ sector));
+			raw_w(track_data, 24, 0xdeaaeb);
+
+			// write intra-sector padding
+			for(int j=0; j<11; j++)
+				raw_w(track_data, 9, 0x1fe);
+
+			// write sector data
+			raw_w(track_data, 24, 0xd5aaad);
+
+			uint8_t pval = 0x00;
+			auto write_data_byte = [&track_data, &pval](uint8_t nval) {
+				raw_w(track_data, 8, translate5[nval ^ pval]);
+				pval = nval;
+			};
+
+			const uint8_t *sdata = sector_data + 256 * sector;
+
+			// write 154 bytes encoding bits 2-0
+			write_data_byte(sdata[255] & 7);
+			for (int k=2; k>-1; k--)
+				for (int j=0; j<51; j++)
+					write_data_byte(
+						(sdata[j*5+k] & 7) << 2
+						| ((sdata[j*5+3] >> (2-k)) & 1) << 1
+						| ((sdata[j*5+4] >> (2-k)) & 1));
+
+			// write 256 bytes encoding bits 7-3
+			for (int k=0; k<5; k++)
+				for (int j=50; j>-1; j--)
+					write_data_byte(sdata[j*5+k] >> 3);
+			write_data_byte(sdata[255] >> 3);
+
+			raw_w(track_data, 8, translate5[pval]);
+			raw_w(track_data, 24, 0xdeaaeb);
+			raw_w(track_data, 8, 0xff);
+		}
+
+		generate_track_from_levels(track, 0, track_data, 0, image);
+	}
+
+	return true;
+}
+
+
+const char *a2_13sect_format::name() const noexcept
+{
+	return "a2_13sect";
+}
+
+const char *a2_13sect_format::description() const noexcept
+{
+	return "Apple II 13-sector d13 image";
+}
+
+const char *a2_13sect_format::extensions() const noexcept
+{
+	return "d13";
+}
+
+bool a2_13sect_format::supports_save() const noexcept
+{
+	return false;
+}
+
+const a2_13sect_format FLOPPY_A213S_FORMAT;
+
 static const uint8_t translate6[0x40] =
 {
 	0x96, 0x97, 0x9a, 0x9b, 0x9d, 0x9e, 0x9f, 0xa6,
