@@ -34578,7 +34578,6 @@ mduckspa                        // Mega Duck / Super Quique (Spain)
 
 @source:nintendo/gba.cpp
 gba                             // Nintendo Game Boy Advance Handheld
-gbplayer                        // Nintendo Game Boy Player (GameCube add-on)
 robotech                        // Coleco
 
 @source:nintendo/mario.cpp

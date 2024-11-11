@@ -8,14 +8,6 @@
 
   By R. Belmont & Ryan Holtz
 
-  Game Boy Player (DOL-017) is a hardware add-on for the GameCube to
-  run GB/GBC/GBA games on the TV, normally requiring a special boot
-  disc in the GameCube to operate.  It is mostly normal GBA hardware
-  with inputs and outputs adjusted for TV player.  This unit is
-  currently not working, as it fails to boot.  The BIOS only differs
-  by a few bytes, but the hardware might need to be initialized in
-  another manner.
-
 ***************************************************************************/
 
 #include "emu.h"
@@ -1512,11 +1504,6 @@ ROM_START( gba )
 	ROMX_LOAD( "gba-proto.bin", 0x000000, 0x004000, CRC(15e1f676) SHA1(aa98a2ad32b86106340665d1222d7d973a1361c7), ROM_BIOS(1) )
 ROM_END
 
-ROM_START( gbplayer )
-	ROM_REGION ( 0x4000, "maincpu", 0 )
-	ROM_LOAD("gbplayer.bin", 0x000000, 0x004000, CRC(3f02ea8f) SHA1(3d4b5d095576f5b994bf62c00cac9428a88b2b78) )
-ROM_END
-
 ROM_START( robotech )
 	ROM_REGION( 0x1000100, "maincpu", 0 )
 	ROM_LOAD( "coleco_robotech_mx29gl128elt21_00c22273.bin", 0x0000000, 0x1000100, CRC(04beee9c) SHA1(acf07d51c525b055679186cc07c6ac2cd8f45eac) )
@@ -1524,7 +1511,6 @@ ROM_END
 
 //   YEAR  NAME       PARENT  COMPAT  MACHINE           INPUT       CLASS               INIT        COMPANY     FULLNAME            FLAGS
 CONS(2001, gba,       0,      0,      gbadv_cons,       gbadv_cons, gba_cons_state,     empty_init, "Nintendo", "Game Boy Advance", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND)
-CONS(2003, gbplayer,  gba,    0,      gbadv_cons,       gbadv_cons, gba_cons_state,     empty_init, "Nintendo", "Game Boy Player",  MACHINE_NOT_WORKING)
 
 // this is a single game reissue of "Robotech - The Macross Saga (Euro, USA)" on the GBA but with double
 // sized ROM (BIOS replacement in first half?) and other mods.  It is unclear how compatible this is with
