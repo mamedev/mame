@@ -672,7 +672,7 @@ SWI:
 	// doesn't use SOFTWARE_INTERRUPT label because SWI will
 	// inhibit IRQ/FIRQ
 	set_ea(VECTOR_SWI);
-	standard_irq_callback(M6809_SWI, m_pc.w);
+	debugger_exception_hook(EXCEPTION_SWI);
 	m_cc |= CC_E;
 	set_regop16(m_s);
 	m_temp.w = entire_state_registers();
@@ -684,12 +684,12 @@ SWI:
 
 SWI2:
 	set_ea(VECTOR_SWI2);
-	standard_irq_callback(M6809_SWI, m_pc.w);
+	debugger_exception_hook(EXCEPTION_SWI2);
 	goto SOFTWARE_INTERRUPT;
 
 SWI3:
 	set_ea(VECTOR_SWI3);
-	standard_irq_callback(M6809_SWI, m_pc.w);
+	debugger_exception_hook(EXCEPTION_SWI3);
 	goto SOFTWARE_INTERRUPT;
 
 SOFTWARE_INTERRUPT:
