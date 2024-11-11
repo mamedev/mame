@@ -1508,8 +1508,8 @@ ROM_START( gba )
 	ROM_SYSTEM_BIOS(0, "agb-v1", "Game Boy Advance (AGB-001)")
 	ROMX_LOAD( "gba.bin", 0x000000, 0x004000, CRC(81977335) SHA1(300c20df6731a33952ded8c436f7f186d25d3492), ROM_BIOS(0) )
 
-	ROM_SYSTEM_BIOS(1, "agb-beta", "Game Boy Advance (beta)")
-	ROMX_LOAD( "gba-beta.bin", 0x000000, 0x004000, CRC(15e1f676) SHA1(aa98a2ad32b86106340665d1222d7d973a1361c7), ROM_BIOS(1) )
+	ROM_SYSTEM_BIOS(1, "agb-proto", "Game Boy Advance (prototype)")
+	ROMX_LOAD( "gba-proto.bin", 0x000000, 0x004000, CRC(15e1f676) SHA1(aa98a2ad32b86106340665d1222d7d973a1361c7), ROM_BIOS(1) )
 ROM_END
 
 ROM_START( gbplayer )
