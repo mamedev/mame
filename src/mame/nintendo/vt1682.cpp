@@ -18,10 +18,7 @@
     Sound Quality (currently crackles)
     Verify timer enable / disable behavior
     Line Modes, High Colour Line Mode
-    Tile rowscroll modes
     0x8000 bit in palette is 'cut through' mode, which isn't the same as transpen, some kind of palette manipulation
-    **DONE** It seems Pal1 and Pal2 should actually be separate render buffers for each palette, on which layers / sprites can be enabled, that are mixed later and can be output independently to LCD and TV?
-        (how does this work with high colour line mode?)
     CCIR effects (only apply to 'palette 2'?)
     LCD Control registers
     Internal to External DMA (glitchy)
@@ -30,12 +27,12 @@
     Verify raster timing (might be off by a line)
     Hardware glitches (scroll layers + sprites get offset under specific conditions, sprites sometimes missing in 2 rightmost column, bk sometimes missing in rightmost column during scroll)
     Sleep functionality on sound cpu (broken on hardware?)
-    Interrupt controller / proper interrupt support (currently a bit hacky, only main timer and sub-timer a supported)
+    Improve Interrupt controller
     Proper IO support (enables / disables) UART, I2C etc.
     'Capture' mode
     Gain (zoom) for Tilemaps
     Refactor into a device
-    Verify that internal ROMs are blank (it isn't used for any set we have)
+    Verify that internal ROMs where possible (not always used)
 
     + more
 
@@ -2263,9 +2260,9 @@ void vt_vt1682_state::vt1682_2020_bk_linescroll_w(uint8_t data)
 	m_2020_bk_linescroll = data;
 
 	// cmpmx10 / cmpmx11 set a scroll bank, but don't appear to enable linescroll
-	// lxts3 enables this for the racing game, but doesn't seem to upload a table
-	if (data & 0x30)
-		popmessage("linescroll unused %01x | BK2enable %d BK1enable %d PRAM addr %04x!\n", (data & 0xc0) >> 6, (data & 0x20)>> 5, (data & 0x10) >> 4, (data & 0xf) << 8);
+	// could this be a workaround for the scroll offset issue the hardware has?
+	//if (data & 0x30)
+	//	popmessage("linescroll unused %01x | BK2enable %d BK1enable %d PRAM addr %04x!\n", (data & 0xc0) >> 6, (data & 0x20)>> 5, (data & 0x10) >> 4, (data & 0xf) << 8);
 }
 
 /*
@@ -6596,17 +6593,17 @@ CONS( 200?, dance555,  0,  0,  vt1682_exsportp,   dance555, vt1682_exsport_state
 
 // manual explicitly states it has NTSC output only (unit can be connected to a TV) and both Ranning Horse + Explosion (Bomberman) are the NTSC versions
 // has 21.477 Mhz XTAL
-CONS( 200?, njp60in1,  0,  0,   vt1682_lxts3, njp60in1, vt1682_lxts3_state, njp60in1_init, "<unknown>", "NJ Pocket 60-in-1 handheld 'X zero' (NTSC)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND) // linescroll issues
+CONS( 200?, njp60in1,  0,  0,   vt1682_lxts3, njp60in1, vt1682_lxts3_state, njp60in1_init, "<unknown>", "NJ Pocket 60-in-1 handheld 'X zero' (NTSC)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND)
 
 // fewer than 268 games, there are repeats
-CONS( 200?, pgs268,  0,  0,   vt1682_lxts3, njp60in1, vt1682_lxts3_state, pgs268_init, "<unknown>", "Portable Game Station 268-in-1", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND) // linescroll issues
+CONS( 200?, pgs268,  0,  0,   vt1682_lxts3, njp60in1, vt1682_lxts3_state, pgs268_init, "<unknown>", "Portable Game Station 268-in-1", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND)
 
 // this appears to be related to the NJ Pocket, claims 101-in-1 but has some duplicates.
 // Like the 'Wow Wireless gaming' it incorrectly mixes the PAL version of 'Ranning Horse' with the NTSC version of 'Bomberman', it has no TV output.
 // has 26.6017 Mhz (6xPAL) XTAL
-CONS( 200?, unk1682,  0,  0,   vt1682_unk1682, lxts3, vt1682_lxts3_state, unk1682_init, "<unknown>", "unknown VT1682-based 101-in-1 handheld (PAL)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND) // linescroll issues
+CONS( 200?, unk1682,  0,  0,   vt1682_unk1682, lxts3, vt1682_lxts3_state, unk1682_init, "<unknown>", "unknown VT1682-based 101-in-1 handheld (PAL)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND)
 
-CONS( 2010, lxts3,    0,  0,   vt1682_lxts3, lxts3, vt1682_lxts3_state, regular_init,  "Lexibook", "Toy Story 3 (Lexibook)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // linescroll issues
+CONS( 2010, lxts3,    0,  0,   vt1682_lxts3, lxts3, vt1682_lxts3_state, regular_init,  "Lexibook", "Toy Story 3 (Lexibook)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 
 // there are products on SunPlus type hardware with nearly identical shells 'Mi DiGi World' / 'Mi Digi Diary'
 // needs IO ports on sound CPU side, needs write access to space for RAM (inputs are 'mini-keyboard' style)
