@@ -2,32 +2,33 @@
 // copyright-holders:Angelo Salese
 /**************************************************************************************************
 
-    NEC PC-9801-86 sound card
-    NEC PC-9801-SpeakBoard sound card
-    Mad Factory Otomi-chan Kai sound card
+NEC PC-9801-86 sound card
+NEC PC-9801-SpeakBoard sound card
+Mad Factory Otomi-chan Kai sound card
 
-    Similar to PC-9801-26, this one has YM2608 instead of YM2203 and an
-    additional DAC port
+Similar to PC-9801-26, this one has YM2608 instead of YM2203 and an
+additional DAC port
 
-    SpeakBoard sound card seems to be derived design from -86, with an additional
-    OPNA mapped at 0x58*
+SpeakBoard sound card seems to be derived design from -86, with an additional
+OPNA mapped at 0x58*
 
-    Otomi-chan Kai is a doujinshi sound card based off SpeakBoard design.
-    It uses YM3438 OPL2C mapped at 0x78*, and anything that uses the nax.exe sound driver
-    expects this to be installed as default (cfr. datsumj).
-    To fallback to a regular -26/-86 board user needs to add parameter switches "-2" or "-3"
-    respectively, cfr. "nax -?" for additional details.
+Otomi-chan Kai is a doujinshi sound card based off SpeakBoard design.
+It uses YM3438 OPL2C mapped at 0x78*, and anything that uses the nax.exe sound driver
+expects this to be installed as default (cfr. datsumj).
+To fallback to a regular -26/-86 board user needs to add parameter switches "-2" or "-3"
+respectively, cfr. "nax -?" for additional details.
 
-    TODO:
-    - Test all pcm modes;
-    - Make volume work;
-    - Recording;
-    - SpeakBoard: no idea about software that uses this, also board shows a single YM2608B?
-      "-86 only supports ADPCM instead of PCM, while SpeakBoard has OPNA + 256 Kbit RAM";
-    - Otomi-chan Kai: find a manual (マニュアル), it's mentioned with nax usage.
-      Very low-res scan of the PCB sports a 4-bit dip-sw bank at very least;
-    - Otomi-chan Kai: unknown ID port readback;
-    - verify sound irq;
+TODO:
+- Test all pcm modes;
+- Fix PCM overflow bug properly (CPUENB signal yield host CPU until DAC catches up?)
+- Make volume work;
+- Recording;
+- SpeakBoard: no idea about software that uses this, also board shows a single YM2608B?
+    "-86 only supports ADPCM instead of PCM, while SpeakBoard has OPNA + 256 Kbit RAM";
+- Otomi-chan Kai: find a manual (マニュアル), it's mentioned with nax usage.
+    Very low-res scan of the PCB sports a 4-bit dip-sw bank at very least;
+- Otomi-chan Kai: unknown ID port readback;
+- verify sound irq;
 
 **************************************************************************************************/
 
@@ -368,14 +369,21 @@ void pc9801_86_device::io_map(address_map &map)
 			return 0;
 		}),
 		NAME([this] (u8 data) {
+			// HACK: on overflow make sure to single step the FIFO enough to claim some space back
+			// os2warp3 initializes the full buffer with 0x00 then quickly pretends
+			// that DAC already catched up by the time the actual startup/shutdown chimes are sent.
+			if (queue_count() == QUEUE_SIZE)
+			{
+				dac_transfer();
+				logerror("Warning: $a46c write with FIFO overflow %02x\n", m_pcm_mode);
+			}
+
 			if(queue_count() < QUEUE_SIZE)
 			{
 				m_queue[m_head++] = data;
 				m_head %= QUEUE_SIZE;
 				m_count++;
 			}
-			// TODO: what should happen on overflow?
-			// os2warp3 startup / shutdown chimes do this already
 		})
 	);
 }
@@ -424,12 +432,8 @@ u8 pc9801_86_device::queue_pop()
 	return ret;
 }
 
-TIMER_CALLBACK_MEMBER(pc9801_86_device::dac_tick)
+void pc9801_86_device::dac_transfer()
 {
-	m_pcm_clk = !m_pcm_clk;
-	if((m_pcm_ctrl & 0x40) || !(m_pcm_ctrl & 0x80))
-		return;
-
 	switch(m_pcm_mode & 0x70)
 	{
 		case 0x70: // 8bit stereo
@@ -461,6 +465,20 @@ TIMER_CALLBACK_MEMBER(pc9801_86_device::dac_tick)
 			m_rdac->write(rsample);
 		}   break;
 	}
+}
+
+TIMER_CALLBACK_MEMBER(pc9801_86_device::dac_tick)
+{
+	m_pcm_clk = !m_pcm_clk;
+	if((m_pcm_ctrl & 0x40) || !(m_pcm_ctrl & 0x80))
+		return;
+
+	// TODO: verify underflow
+	// should leave the DACs in whatever state they are or ...?
+	if (!queue_count())
+		return;
+
+	dac_transfer();
 	if((queue_count() < m_irq_rate) && (m_pcm_ctrl & 0x20))
 	{
 		m_pcmirq = true;
