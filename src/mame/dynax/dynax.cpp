@@ -3745,6 +3745,16 @@ static INPUT_PORTS_START( tenkai )
 	// SW 3  OFF OFF  ON  ON  ON  ON  ON  ON OFF  ON       OFF OFF  ON  ON  ON  ON  ON  ON OFF  ON
 	// SW 4  OFF  ON  ON  ON OFF OFF OFF OFF OFF OFF        ON  ON  ON  ON OFF OFF OFF OFF OFF OFF
 
+	// The odds rate table entries correspond to the following hands:
+	// * １ハン  1  han
+	// * ２ハン  2  han
+	// * ３ハン  3  han
+	// * 満　貫  mangan
+	// * 跳　満  haneman
+	// * 倍　満  baiman
+	// * 三倍満  sanbaiman
+	// * 役　満  yakuman
+
 	// There is an additional 4-switch bank (SW 5) for selecting the wiring options.
 
 	PORT_START("DSW0")
@@ -3805,15 +3815,15 @@ static INPUT_PORTS_START( tenkai )
 	PORT_DIPSETTING(    0x01, "Credit type" )                                                     // クレジット・タイプ
 	PORT_DIPSETTING(    0x00, "Hopper type" )                                                     // ホッパー・タイプ
 	PORT_DIPNAME( 0x02, 0x02, "Hopper Polarity" )               PORT_DIPLOCATION("SW 3:2")        // ホッパー・アクティブ
-	PORT_DIPSETTING(    0x02, DEF_STR(Off) )
-	PORT_DIPSETTING(    0x00, DEF_STR(On) )
+	PORT_DIPSETTING(    0x02, DEF_STR(Normal) )                                                   // 通常
+	PORT_DIPSETTING(    0x00, "Inverted" )                                                        // 反転
 	PORT_DIPNAME( 0x04, 0x00, "Tenkaigen Day" )                 PORT_DIPLOCATION("SW 3:3")        // 天開眼の日
 	PORT_DIPSETTING(    0x04, DEF_STR(Off) )                                                      // 無
 	PORT_DIPSETTING(    0x00, DEF_STR(On) )                                                       // 有
 	PORT_DIPNAME( 0x08, 0x00, "Double Up" )                     PORT_DIPLOCATION("SW 3:4")        // Ｗ－ＢＥＴ
 	PORT_DIPSETTING(    0x08, DEF_STR(Off) )                                                      // 無
 	PORT_DIPSETTING(    0x00, DEF_STR(On) )                                                       // 有
-	PORT_DIPNAME( 0x10, 0x00, "Renso Rate" )                    PORT_DIPLOCATION("SW 3:5")
+	PORT_DIPNAME( 0x10, 0x00, "Renso Rate" )                    PORT_DIPLOCATION("SW 3:5")        // 連荘レート
 	PORT_DIPSETTING(    0x10, DEF_STR(Off) )                                                      // 無
 	PORT_DIPSETTING(    0x00, DEF_STR(On) )                                                       // 有
 	PORT_DIPNAME( 0x20, 0x00, "Auto Reach" )                    PORT_DIPLOCATION("SW 3:6")        // オート・リーチ
@@ -3822,7 +3832,7 @@ static INPUT_PORTS_START( tenkai )
 	PORT_DIPNAME( 0x40, 0x00, "Last Chance" )                   PORT_DIPLOCATION("SW 3:7")        // ラスト・チャンス
 	PORT_DIPSETTING(    0x40, DEF_STR(Off) )                                                      // 無
 	PORT_DIPSETTING(    0x00, DEF_STR(On) )                                                       // 有
-	PORT_DIPNAME( 0x80, 0x00, "Don Den Key" )                   PORT_DIPLOCATION("SW 3:8")
+	PORT_DIPNAME( 0x80, 0x00, "Don Den Button" )                PORT_DIPLOCATION("SW 3:8")        // Ｄｏｎ・Ｄｅｎ　機能ボタン変更
 	PORT_DIPSETTING(    0x80, "Start" )                                                           // スタート・ボタ
 	PORT_DIPSETTING(    0x00, "Flip Flop" )                                                       // Ｆ／Ｆ・ボタン
 
@@ -3862,25 +3872,25 @@ static INPUT_PORTS_START( tenkai )
 	PORT_DIPSETTING(    0x00, "20" )                            PORT_CONDITION("DSW1", 0x03, EQUALS, 0x02)
 	PORT_DIPSETTING(    0x00, "50" )                            PORT_CONDITION("DSW1", 0x03, EQUALS, 0x01)
 	PORT_DIPSETTING(    0x00, "100" )                           PORT_CONDITION("DSW1", 0x03, EQUALS, 0x00)
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Flip_Screen ) )          PORT_DIPLOCATION("SW 1:10")
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Flip_Screen ) )          PORT_DIPLOCATION("SW 1:10")       // モニター画面反転
+	PORT_DIPSETTING(    0x02, DEF_STR(Off) )                                                      // 通常
+	PORT_DIPSETTING(    0x00, DEF_STR(On) )                                                       // 反転
 	PORT_DIPNAME( 0x04, 0x00, "Computer Strength" )             PORT_DIPLOCATION("SW 2:9")        // コンピューターの強さ
 	PORT_DIPSETTING(    0x00, DEF_STR(Normal) )                                                   // 普通
 	PORT_DIPSETTING(    0x04, "Strong" )                                                          // 強い
 	PORT_DIPNAME( 0x08, 0x00, "Service Count" )                 PORT_DIPLOCATION("SW 2:10")       // サービス・カウント
 	PORT_DIPSETTING(    0x08, DEF_STR(Off) )                                                      // 無
 	PORT_DIPSETTING(    0x00, DEF_STR(On) )                                                       // 有
-	PORT_DIPNAME( 0x10, 0x10, "Don Den Count" )                 PORT_DIPLOCATION("SW 3:9")
+	PORT_DIPNAME( 0x10, 0x10, "Don Den Count" )                 PORT_DIPLOCATION("SW 3:9")        // Ｄｏｎ・Ｄｅｎ　回数
 	PORT_DIPSETTING(    0x00, "5 times" )                                                         // ５回
 	PORT_DIPSETTING(    0x10, "8 times" )                                                         // ８回
 	PORT_DIPNAME( 0x20, 0x00, "Show In-Game Clock" )            PORT_DIPLOCATION("SW 3:10")       // ゲーム中の時計表示
 	PORT_DIPSETTING(    0x20, DEF_STR(No) )                                                       // 無
 	PORT_DIPSETTING(    0x00, DEF_STR(Yes) )                                                      // 有
-	PORT_DIPNAME( 0x40, 0x40, "Game Title" )                    PORT_DIPLOCATION("SW 4:9")
+	PORT_DIPNAME( 0x40, 0x40, "Game Title" )                    PORT_DIPLOCATION("SW 4:9")        // ＯＦＦ固定
 	PORT_DIPSETTING(    0x40, "Mahjong Tenkaigen" )
 	PORT_DIPSETTING(    0x00, "Mahjong Tenkaigen Part 2" )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR(Unknown) )                PORT_DIPLOCATION("SW 4:10") PORT_CONDITION("DSW4", 0x40, EQUALS, 0x40)
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR(Unknown) )                PORT_DIPLOCATION("SW 4:10") PORT_CONDITION("DSW4", 0x40, EQUALS, 0x40) // ＯＦＦ固定
 	PORT_DIPSETTING(    0x80, DEF_STR(Off) )
 	PORT_DIPSETTING(    0x00, DEF_STR(On) )
 	PORT_DIPNAME( 0x80, 0x80, "Show Yakuman Table" )            PORT_DIPLOCATION("SW 4:10") PORT_CONDITION("DSW4", 0x40, EQUALS, 0x00)
@@ -3898,6 +3908,51 @@ static INPUT_PORTS_START( tenkai )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE1 )   // Service
 
 	PORT_INCLUDE( MAHJONG_KEYS_BET )
+INPUT_PORTS_END
+
+
+INPUT_PORTS_START( ougonhai )
+	// The manual provides two sets of standard settings:
+	//       標準設定　シングル向け                        標準設定　コーナー向け
+	// SW 1  OFF OFF OFF  ON  ON  ON OFF  ON  ON OFF       OFF OFF OFF  ON  ON  ON OFF  ON  ON OFF
+	// SW 2  OFF OFF OFF OFF  ON  ON OFF  ON  ON  ON       OFF OFF OFF OFF  ON OFF  ON  ON  ON  ON
+	// SW 3  OFF OFF  ON  ON  ON  ON OFF OFF               OFF OFF OFF  ON  ON  ON  ON OFF
+	// SW 4  OFF  ON  ON OFF OFF OFF OFF OFF                ON  ON  ON OFF OFF OFF OFF OFF
+
+	PORT_INCLUDE( tenkai )
+
+	PORT_MODIFY("DSW2")
+	PORT_DIPNAME( 0x04, 0x00, "Don Den Button" )                PORT_DIPLOCATION("SW 3:3")        // Ｄｏｎ・Ｄｅｎ　機能ボタン変更
+	PORT_DIPSETTING(    0x04, "Start" )                                                           // スタート・ボタ
+	PORT_DIPSETTING(    0x00, "Flip Flop" )                                                       // Ｆ／Ｆ・ボタン
+	PORT_DIPNAME( 0x10, 0x00, "Auto Reach" )                    PORT_DIPLOCATION("SW 3:5")        // オート・リーチ
+	PORT_DIPSETTING(    0x10, DEF_STR(Off) )                                                      // 無
+	PORT_DIPSETTING(    0x00, DEF_STR(On) )                                                       // 有
+	PORT_DIPNAME( 0x20, 0x00, "Slot Last Chance" )              PORT_DIPLOCATION("SW 3:6")        // スロット　ラスト・チャンス
+	PORT_DIPSETTING(    0x20, DEF_STR(Off) )                                                      // 無
+	PORT_DIPSETTING(    0x00, DEF_STR(On) )                                                       // 有
+	PORT_DIPNAME( 0x40, 0x40, "Show Yakuman Table" )            PORT_DIPLOCATION("SW 3:7")        // 役満ウインポイントの表示
+	PORT_DIPSETTING(    0x40, DEF_STR(No) )                                                       // 無
+	PORT_DIPSETTING(    0x00, DEF_STR(Yes) )                                                      // 有
+	PORT_DIPNAME( 0x80, 0x80, "Gold Rush Payout Rate" )         PORT_DIPLOCATION("SW 3:8")        // ＧＯＬＤ　ＲＵＳＨ　出率
+	PORT_DIPSETTING(    0x80, DEF_STR(Normal) )                                                   // 普通
+	PORT_DIPSETTING(    0x00, DEF_STR(High) )                                                     // 多い
+
+	PORT_MODIFY("DSW3")
+	PORT_DIPNAME( 0x04, 0x00, "Show Renso Gal" )                PORT_DIPLOCATION("SW 4:3")        // 連荘ギャル表示
+	PORT_DIPSETTING(    0x04, DEF_STR(No) )                                                       // 無
+	PORT_DIPSETTING(    0x00, DEF_STR(Yes) )                                                      // 有
+	PORT_DIPUNKNOWN_DIPLOC( 0x08, 0x08, "SW 4:4" )                                                // ＯＦＦ固定
+	PORT_DIPUNKNOWN_DIPLOC( 0x10, 0x10, "SW 4:5" )                                                // ＯＦＦ固定
+	PORT_DIPUNKNOWN_DIPLOC( 0x20, 0x20, "SW 4:6" )                                                // ＯＦＦ固定
+	PORT_DIPUNKNOWN_DIPLOC( 0x40, 0x40, "SW 4:7" )                                                // ＯＦＦ固定
+	PORT_DIPUNKNOWN_DIPLOC( 0x80, 0x80, "SW 4:8" )                                                // ＯＦＦ固定
+
+	PORT_MODIFY("DSW4")
+	PORT_DIPNAME( 0x08, 0x00, "Renso Rate" )                    PORT_DIPLOCATION("SW 2:10")       // 連荘レート
+	PORT_DIPSETTING(    0x08, DEF_STR(Off) )                                                      // 無
+	PORT_DIPSETTING(    0x00, DEF_STR(On) )                                                       // 有
+	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
 
@@ -7461,10 +7516,10 @@ GAME( 1991, tenkai2b,   tenkai,   tenkai,     tenkai,   dynax_state,       empty
 GAME( 1991, tenkaibb,   tenkai,   tenkai,     tenkai,   dynax_state,       empty_init,    ROT0,   "bootleg",                   "Mahjong Tenkaigen (Japan bootleg b)",                           MACHINE_SUPPORTS_SAVE ) // FIXME: check if "b" is a PCB rev. letter
 GAME( 1991, tenkaicb,   tenkai,   tenkai,     tenkai,   dynax_state,       empty_init,    ROT0,   "bootleg",                   "Mahjong Tenkaigen (Japan bootleg c)",                           MACHINE_SUPPORTS_SAVE ) // FIXME: check if "c" is a PCB rev. letter
 GAME( 1991, tenkaie,    tenkai,   tenkai,     tenkai,   dynax_state,       empty_init,    ROT0,   "Dynax",                     "Mahjong Tenkaigen (Japan set 2)",                               MACHINE_SUPPORTS_SAVE )
-GAME( 1991, ougonhai,   0,        ougonhai,   tenkai,   dynax_state,       empty_init,    ROT0,   "Dynax",                     "Mahjong Ougon no Hai (Japan)",                                  MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // FIXME: correct TMP90840 hookup, confirm being a medal game as well
-GAME( 1991, ougonhaib1, ougonhai, ougonhaib1, tenkai,   dynax_state,       empty_init,    ROT0,   "bootleg",                   "Mahjong Ougon no Hai (Japan bootleg set 1, medal)",             MACHINE_SUPPORTS_SAVE )
-GAME( 1991, ougonhaib2, ougonhai, ougonhaib1, tenkai,   dynax_state,       empty_init,    ROT0,   "bootleg",                   "Mahjong Ougon no Hai (Japan bootleg set 2, medal)",             MACHINE_SUPPORTS_SAVE )
-GAME( 1991, ougonhaib3, ougonhai, ougonhaib1, tenkai,   dynax_state,       empty_init,    ROT0,   "bootleg",                   "Mahjong Ougon no Hai (Japan bootleg set 3, medal)",             MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1991, ougonhai,   0,        ougonhai,   ougonhai, dynax_state,       empty_init,    ROT0,   "Dynax",                     "Mahjong Ougon no Hai (Japan)",                                  MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // FIXME: correct TMP90840 hookup, confirm being a medal game as well
+GAME( 1991, ougonhaib1, ougonhai, ougonhaib1, ougonhai, dynax_state,       empty_init,    ROT0,   "bootleg",                   "Mahjong Ougon no Hai (Japan bootleg set 1, medal)",             MACHINE_SUPPORTS_SAVE )
+GAME( 1991, ougonhaib2, ougonhai, ougonhaib1, ougonhai, dynax_state,       empty_init,    ROT0,   "bootleg",                   "Mahjong Ougon no Hai (Japan bootleg set 2, medal)",             MACHINE_SUPPORTS_SAVE )
+GAME( 1991, ougonhaib3, ougonhai, ougonhaib1, ougonhai, dynax_state,       empty_init,    ROT0,   "bootleg",                   "Mahjong Ougon no Hai (Japan bootleg set 3, medal)",             MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 GAME( 1994, mjreach,    0,        mjreach,    mjreach,  dynax_state,       empty_init,    ROT0,   "Dynax",                     "Mahjong Reach (Ver. 1.00)",                                     MACHINE_SUPPORTS_SAVE )
 GAME( 1994, mjreachbl,  mjreach,  mjreach,    mjreach,  dynax_state,       empty_init,    ROT0,   "bootleg",                   "Mahjong Reach (Ver. 1.00, bootleg)",                            MACHINE_SUPPORTS_SAVE )
 GAME( 1994, mjreachp2,  mjreach,  mjreachp2,  mjreach,  dynax_state,       empty_init,    ROT0,   "Dynax",                     "Mahjong Reach Part II (Ver. D88)",                              MACHINE_SUPPORTS_SAVE )
