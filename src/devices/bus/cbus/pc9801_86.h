@@ -12,8 +12,10 @@
 #pragma once
 
 #include "bus/cbus/pc9801_cbus.h"
+#include "machine/input_merger.h"
 #include "sound/dac.h"
 #include "sound/ymopn.h"
+
 #include "pc9801_snd.h"
 
 //**************************************************************************
@@ -48,6 +50,7 @@ protected:
 
 	required_device<pc9801_slot_device> m_bus;
 	required_device<ym2608_device>  m_opna;
+	required_device<input_merger_device> m_irqs;
 
 	void opna_map(address_map &map) ATTR_COLD;
 
@@ -66,7 +69,7 @@ private:
 
 	u8 m_pcm_mode, m_vol[7], m_pcm_ctrl, m_pcm_mute;
 	uint16_t m_head, m_tail, m_count, m_irq_rate;
-	bool m_pcmirq, m_fmirq, m_pcm_clk, m_init;
+	bool m_pcmirq, m_pcm_clk, m_init;
 	required_device<dac_16bit_r2r_twos_complement_device> m_ldac;
 	required_device<dac_16bit_r2r_twos_complement_device> m_rdac;
 	std::vector<u8> m_queue;

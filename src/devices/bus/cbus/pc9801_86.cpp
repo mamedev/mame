@@ -44,13 +44,6 @@
 // device type definition
 DEFINE_DEVICE_TYPE(PC9801_86, pc9801_86_device, "pc9801_86", "NEC PC-9801-86")
 
-void pc9801_86_device::sound_irq(int state)
-{
-	m_fmirq = state ? true : false;
-	// TODO: sometimes misfired irq causes sound or even host hang
-	m_bus->int_w<5>(state || (m_pcmirq ? ASSERT_LINE : CLEAR_LINE));
-}
-
 // only for derived designs?
 void pc9801_86_device::opna_map(address_map &map)
 {
@@ -74,12 +67,14 @@ void pc9801_86_device::pc9801_86_config(machine_config &config)
 	// TC55257CFL-10 (U15)
 	// unknown chip (most likely surface scratched) U3)
 
+	INPUT_MERGER_ANY_HIGH(config, m_irqs).output_handler().set([this](int state) { m_bus->int_w<5>(state); });
+
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 	YM2608(config, m_opna, 7.987_MHz_XTAL); // actually YM2608B
 	// shouldn't have one
 //  m_opna->set_addrmap(0, &pc9801_86_device::opna_map);
-	m_opna->irq_handler().set(FUNC(pc9801_86_device::sound_irq));
+	m_opna->irq_handler().set(m_irqs, FUNC(input_merger_device::in_w<0>));
 	m_opna->port_a_read_callback().set(FUNC(pc9801_86_device::opn_porta_r));
 	//m_opna->port_b_read_callback().set(FUNC(pc8801_state::opn_portb_r));
 	//m_opna->port_a_write_callback().set(FUNC(pc8801_state::opn_porta_w));
@@ -182,6 +177,7 @@ pc9801_86_device::pc9801_86_device(const machine_config &mconfig, device_type ty
 	: pc9801_snd_device(mconfig, type, tag, owner, clock)
 	, m_bus(*this, DEVICE_SELF_OWNER)
 	, m_opna(*this, "opna")
+	, m_irqs(*this, "irqs")
 	, m_ldac(*this, "ldac")
 	, m_rdac(*this, "rdac")
 	, m_queue(QUEUE_SIZE)
@@ -264,7 +260,7 @@ void pc9801_86_device::device_reset()
 
 	m_mask = 0;
 	m_head = m_tail = m_count = 0;
-	m_fmirq = m_pcmirq = m_init = false;
+	m_pcmirq = m_init = false;
 	m_irq_rate = 0;
 	m_pcm_ctrl = m_pcm_mode = 0;
 	// Starts off with DACs muted (os2warp3 will burp a lot while initializing OS)
@@ -329,7 +325,9 @@ u8 pc9801_86_device::pcm_r(offs_t offset)
 			case 3:
 				return m_pcm_mode;
 			case 4:
+			{
 				return 0;
+			}
 		}
 	}
 	else // odd
@@ -355,9 +353,13 @@ void pc9801_86_device::pcm_w(offs_t offset, u8 data)
 					m_head = m_tail = m_count = 0;
 				if(!(data & 0x10))
 				{
-					m_bus->int_w<5>(m_fmirq ? ASSERT_LINE : CLEAR_LINE);
+					//m_bus->int_w<5>(m_fmirq ? ASSERT_LINE : CLEAR_LINE);
 					if(!(queue_count() < m_irq_rate) || !(data & 0x80))
-						m_pcmirq = false; //TODO: this needs research
+					{
+						 //TODO: this needs research
+						m_pcmirq = false;
+						m_irqs->in_w<1>(CLEAR_LINE);
+					}
 				}
 				m_init = true;
 				m_pcm_ctrl = data & ~0x10;
@@ -435,7 +437,8 @@ TIMER_CALLBACK_MEMBER(pc9801_86_device::dac_tick)
 	if((queue_count() < m_irq_rate) && (m_pcm_ctrl & 0x20))
 	{
 		m_pcmirq = true;
-		m_bus->int_w<5>(ASSERT_LINE);
+		//m_bus->int_w<5>(ASSERT_LINE);
+		m_irqs->in_w<1>(ASSERT_LINE);
 	}
 }
 
