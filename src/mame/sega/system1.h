@@ -187,7 +187,7 @@ protected:
 
 	// misc functions
 	TIMER_DEVICE_CALLBACK_MEMBER(soundirq_gen);
-	TIMER_DEVICE_CALLBACK_MEMBER(mcu_t0_callback);
+	IRQ_CALLBACK_MEMBER(mcu_t0_callback);
 	void bank44_custom_w(u8 data);
 	void bank0c_custom_w(u8 data);
 

@@ -572,7 +572,7 @@ void system1_state::mcu_control_w(u8 data)
 {
 	/*
 	    Bit 7 -> connects to TD62003 pins 5 & 6 @ IC151
-	    Bit 6 -> via PLS153, when high, asserts the BUSREQ signal, halting the Z80
+	    Bit 6 -> via PLS153, when high, asserts the BUSRQ signal, halting the Z80
 	    Bit 5 -> n/c
 	    Bit 4 -> (with bit 3) Memory select: 0=Z80 program space, 1=banked ROM, 2=Z80 I/O space, 3=watchdog?
 	    Bit 3 ->
@@ -635,16 +635,12 @@ u8 system1_state::mcu_io_r(offs_t offset)
 }
 
 
-TIMER_DEVICE_CALLBACK_MEMBER(system1_state::mcu_t0_callback)
+IRQ_CALLBACK_MEMBER(system1_state::mcu_t0_callback)
 {
-	/* The T0 line is clocked by something; if it is not clocked fast
-	   enough, the MCU will fail; on shtngmst this happens after 3
-	   VBLANKs without a tick.
-	   choplift is even more picky about it, affecting scroll speed
-	*/
-
 	m_mcu->set_input_line(MCS51_T0_LINE, ASSERT_LINE);
 	m_mcu->set_input_line(MCS51_T0_LINE, CLEAR_LINE);
+
+	return 0xff;
 }
 
 
@@ -2524,11 +2520,12 @@ void system1_state::mcu(machine_config &config)
 
 	config.set_maximum_quantum(attotime::from_hz(m_maincpu->clock() / 16));
 
-	TIMER(config, "mcu_t0", 0).configure_periodic(FUNC(system1_state::mcu_t0_callback), attotime::from_usec(2500));
-
 	// This interrupt is driven by pin 15 of a PAL16R4 (315-5138 on Choplifter), based on the vertical count.
 	// The actual duty cycle likely differs from VBLANK, which is another output from the same PAL.
 	m_screen->screen_vblank().set_inputline("mcu", MCS51_INT0_LINE);
+
+	// bus controller INTACK pin clocks MCU T0
+	m_maincpu->set_irq_acknowledge_callback(FUNC(system1_state::mcu_t0_callback));
 }
 
 // alternate program map with RAM/collision swapped
