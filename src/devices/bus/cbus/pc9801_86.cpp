@@ -364,6 +364,7 @@ void pc9801_86_device::io_map(address_map &map)
 	map(0x0c, 0x0c).lrw8(
 		NAME([this] () {
 			// TODO: recording mode
+			(void)this;
 			return 0;
 		}),
 		NAME([this] (u8 data) {
