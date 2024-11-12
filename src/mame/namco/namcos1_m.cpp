@@ -954,25 +954,27 @@ u8 namcos1_state::berabohm_buttons_r(offs_t offset)
 		   much time reading the inputs and won't have enough cycles to play two
 		   digital sounds at once. This value is enough to read all inputs at least
 		   once per frame */
-		if (!machine().side_effects_disabled())
-			++m_strobe_count;
-		if (m_strobe_count > 4)
+		u8 strobe_count = m_strobe_count + 1;
+		u8 strobe = m_strobe;
+		u8 input_count = m_input_count;
+		if (strobe_count > 4)
 		{
-			if (!machine().side_effects_disabled())
-			{
-				m_strobe_count = 0;
-				m_strobe ^= 0x40;
-			}
-			if (m_strobe == 0)
-			{
-				if (!machine().side_effects_disabled())
-					m_input_count = (m_input_count + 1) % 5;
-			}
+			strobe_count = 0;
+			strobe ^= 0x40;
+			if (!strobe)
+				input_count = (input_count + 1) % 5;
 		}
 
 		// status bit, used to signal end of pressure sensitive button reads
-		if (m_input_count == 3) res |= 0x10;
-		res |= m_strobe;
+		if (input_count == 3) res |= 0x10;
+		res |= strobe;
+
+		if (!machine().side_effects_disabled())
+		{
+			m_strobe_count = strobe_count;
+			m_strobe = strobe;
+			m_input_count = input_count;
+		}
 
 		return res;
 	}
@@ -1016,43 +1018,49 @@ u8 namcos1_state::faceoff_inputs_r(offs_t offset)
 		   much time reading the inputs and won't have enough cycles to play two
 		   digital sounds at once. This value is enough to read all inputs at least
 		   once per frame */
-		if (!machine().side_effects_disabled())
-			++m_strobe_count;
-		if (m_strobe_count > 8)
+		u8 strobe_count = m_strobe_count + 1;
+		u8 input_count = m_input_count;
+		u8 stored_input[2] = {m_stored_input[0], m_stored_input[1]};
+		if (strobe_count > 8)
 		{
-			if (!machine().side_effects_disabled())
-				m_strobe_count = 0;
+			strobe_count = 0;
 
-			res |= m_input_count;
+			res |= input_count;
 
-			switch (m_input_count)
+			switch (input_count)
 			{
 				case 0:
-					m_stored_input[0] = m_io_in[0]->read() & 0x1f;
-					m_stored_input[1] = (m_io_in[3]->read() & 0x07) << 3;
+					stored_input[0] = m_io_in[0]->read() & 0x1f;
+					stored_input[1] = (m_io_in[3]->read() & 0x07) << 3;
 					break;
 
 				case 3:
-					m_stored_input[0] = m_io_in[2]->read() & 0x1f;
+					stored_input[0] = m_io_in[2]->read() & 0x1f;
 					break;
 
 				case 4:
-					m_stored_input[0] = m_io_in[1]->read() & 0x1f;
-					m_stored_input[1] = m_io_in[3]->read() & 0x18;
+					stored_input[0] = m_io_in[1]->read() & 0x1f;
+					stored_input[1] = m_io_in[3]->read() & 0x18;
 					break;
 
 				default:
-					m_stored_input[0] = 0x1f;
-					m_stored_input[1] = 0x1f;
+					stored_input[0] = 0x1f;
+					stored_input[1] = 0x1f;
 					break;
 			}
-
-			if (!machine().side_effects_disabled())
-				m_input_count = (m_input_count + 1) & 7;
+			input_count = (input_count + 1) & 7;
 		}
 		else
 		{
-			res |= 0x40 | m_stored_input[1];
+			res |= 0x40 | stored_input[1];
+		}
+
+		if (!machine().side_effects_disabled())
+		{
+			m_strobe_count = strobe_count;
+			m_input_count = input_count;
+			m_stored_input[0] = stored_input[0];
+			m_stored_input[1] = stored_input[1];
 		}
 
 		return res;

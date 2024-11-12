@@ -266,7 +266,7 @@ u16 namcos2_state::namcos2_68k_key_r(offs_t offset)
 		case 1: return 0x110;
 		case 4: return 0xBE;
 		case 6: return 0x1001;
-		case 7: return (m_sendval == true) ? 0xBE : 1;
+		case 7: return (m_sendval) ? 0xBE : 1;
 		}
 		break;
 
@@ -281,7 +281,7 @@ u16 namcos2_state::namcos2_68k_key_r(offs_t offset)
 		switch(offset)
 		{
 		case 4:
-			if (m_sendval == true)
+			if (m_sendval)
 			{
 				if (!machine().side_effects_disabled())
 					m_sendval = false;
@@ -289,7 +289,7 @@ u16 namcos2_state::namcos2_68k_key_r(offs_t offset)
 			}
 			break;
 		case 7:
-			if (m_sendval == true)
+			if (m_sendval)
 			{
 				if (!machine().side_effects_disabled())
 					m_sendval = false;
