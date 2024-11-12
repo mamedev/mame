@@ -48,6 +48,7 @@ public:
 	void cclimberx(machine_config &config);
 	void ckongb(machine_config &config);
 	void rpatrol(machine_config &config);
+	void tangramq(machine_config &config);
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -112,6 +113,8 @@ private:
 	void decrypted_opcodes_map(address_map &map) ATTR_COLD;
 	void rpatrol_map(address_map &map) ATTR_COLD;
 	void rpatrol_portmap(address_map &map) ATTR_COLD;
+	void tangramq_map(address_map &map) ATTR_COLD;
+	void tangramq_sound_map(address_map &map) ATTR_COLD;
 };
 
 class swimmer_state : public cclimber_state

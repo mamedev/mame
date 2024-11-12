@@ -240,15 +240,22 @@ Dip location verified from manual for: cclimber, guzzler, swimmer
  this causes them to crash after the a few rounds - confirmed on an original PCB.
  They clearly weren't tested properly by the bootleggers.
 
+ Tangram Q
+ ---------
+ Inputs aren't correct, sound tempo is wrong (NMI ack problem?)
+
 ***************************************************************************/
 
 #include "emu.h"
+
 #include "cclimber.h"
 #include "cclimber_a.h"
 
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
 #include "sound/samples.h"
+#include "sound/snkwave.h"
+
 #include "speaker.h"
 
 
@@ -497,6 +504,27 @@ void cclimber_state::bagmanf_map(address_map &map)
 	map(0xb800, 0xb800).nopr();
 }
 
+void cclimber_state::tangramq_map(address_map &map)
+{
+	map(0x0000, 0x5fff).rom();
+	map(0x6000, 0x6bff).ram();
+	map(0x8000, 0x8000).portr("P1");
+	map(0x8020, 0x8020).portr("P2");
+	map(0x8800, 0x88ff).ram().share("bigspriteram");
+	map(0x9000, 0x93ff).mirror(0x0400).ram().share("videoram");
+	map(0x9800, 0x981f).ram().share("column_scroll");
+	map(0x9820, 0x987f).ram(); // not used, but initialized
+	map(0x9880, 0x989f).ram().share("spriteram");
+	map(0x98a0, 0x98db).ram(); // not used, but initialized
+	map(0x98dc, 0x98df).ram().share("bigspritectrl");
+	map(0x98e0, 0x98ff).ram(); // not used, but initialized
+	map(0x9c00, 0x9fff).ram().w(FUNC(cclimber_state::cclimber_colorram_w)).share("colorram");
+	map(0xa000, 0xa000).portr("P3");
+	map(0xa000, 0xa007).w(m_mainlatch, FUNC(ls259_device::write_d0));
+	map(0xb000, 0xb000).portr("DSW").w("soundlatch", FUNC(generic_latch_8_device::write));
+	map(0xb800, 0xb800).portr("SYSTEM");
+}
+
 void toprollr_state::toprollr_decrypted_opcodes_map(address_map &map)
 {
 	map(0x0000, 0x5fff).bankr("bank1d");
@@ -555,6 +583,17 @@ void yamato_state::yamato_audio_portmap(address_map &map)
 	map(0x02, 0x03).w("ay2", FUNC(ay8910_device::address_data_w));
 	map(0x04, 0x04).r(FUNC(yamato_state::yamato_p0_r)); // ???
 	map(0x08, 0x08).r(FUNC(yamato_state::yamato_p1_r)); // ???
+}
+
+void cclimber_state::tangramq_sound_map(address_map &map)
+{
+	map(0x0000, 0x1fff).rom();
+	map(0x4000, 0x4000).r("soundlatch", FUNC(generic_latch_8_device::read));
+	map(0x8000, 0x8001).w("ay1", FUNC(ay8910_device::address_data_w));
+	map(0x8002, 0x8007).w("wave", FUNC(snkwave_device::snkwave_w));
+	map(0x8008, 0x8009).w("ay2", FUNC(ay8910_device::address_data_w));
+	// map(0xa000, 0xa000) // TODO: NMI related?
+	map(0xe000, 0xe3ff).ram();
 }
 
 
@@ -798,6 +837,89 @@ static INPUT_PORTS_START( rpatrol )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START1 )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_START2 )
 	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNUSED )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( tangramq )
+	PORT_START("P1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START2 )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("P2")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("P3")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2) // this drops the piece
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2) // pressing this one and the following together rotates pieces
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("DSW")
+	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW1:1")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW1:2")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW1:3")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, "Invincibility" ) PORT_DIPLOCATION("DSW1:4")
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW1:5")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW1:6")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW1:7")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW1:8")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
+
+	PORT_START("SYSTEM")
+	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Lives ) ) PORT_DIPLOCATION("DSW2:1,2")
+	PORT_DIPSETTING(    0x00, "1" )
+	PORT_DIPSETTING(    0x01, "2" )
+	PORT_DIPSETTING(    0x02, "3" )
+	PORT_DIPSETTING(    0x03, "5" )
+	PORT_DIPNAME( 0x04, 0x04, "Freeze" ) PORT_DIPLOCATION("DSW2:3")
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("DSW2:4")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
+	PORT_DIPNAME( 0x70, 0x00, DEF_STR( Coinage ) ) PORT_DIPLOCATION("DSW2:5,6,7")
+	PORT_DIPSETTING(    0x70, DEF_STR( 4C_1C ) )
+	PORT_DIPSETTING(    0x60, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(    0x50, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( 1C_3C ) )
+	PORT_DIPSETTING(    0x30, DEF_STR( 1C_5C ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( 1C_6C ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Flip_Screen ) ) PORT_DIPLOCATION("DSW2:8")
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( swimmer )
@@ -1204,7 +1326,6 @@ void cclimber_state::root(machine_config &config)
 	// basic machine hardware
 	Z80(config, m_maincpu, 18.432_MHz_XTAL/3/2); // 3.072 MHz
 	m_maincpu->set_addrmap(AS_PROGRAM, &cclimber_state::cclimber_map);
-	m_maincpu->set_addrmap(AS_IO, &cclimber_state::cclimber_portmap);
 
 	LS259(config, m_mainlatch, 0);
 	m_mainlatch->q_out_cb<0>().set(FUNC(cclimber_state::nmi_mask_w));
@@ -1230,6 +1351,8 @@ void cclimber_state::cclimber(machine_config &config)
 {
 	root(config);
 
+	m_maincpu->set_addrmap(AS_IO, &cclimber_state::cclimber_portmap);
+
 	// 7J on CCG-1
 	m_mainlatch->q_out_cb<4>().set("cclimber_audio", FUNC(cclimber_audio_device::sample_trigger));
 
@@ -1248,6 +1371,29 @@ void cclimber_state::rpatrol(machine_config &config)
 	// sound hardware
 	SPEAKER(config, "speaker").front_center();
 	AY8910(config, "aysnd", 18.432_MHz_XTAL/3/2/2).add_route(ALL_OUTPUTS, "speaker", 0.5);
+}
+
+void cclimber_state::tangramq(machine_config &config)
+{
+	root(config);
+
+	m_maincpu->set_addrmap(AS_PROGRAM, &cclimber_state::tangramq_map);
+
+	Z80(config, m_audiocpu, 8_MHz_XTAL / 2); // divider not verified
+	m_audiocpu->set_addrmap(AS_PROGRAM, &cclimber_state::tangramq_sound_map);
+
+	m_screen->screen_vblank().append_inputline(m_audiocpu, INPUT_LINE_NMI); // TODO: probably wrong
+
+	// sound hardware
+	SPEAKER(config, "speaker").front_center();
+
+	GENERIC_LATCH_8(config, "soundlatch").data_pending_callback().set_inputline(m_audiocpu, 0, HOLD_LINE);
+
+	AY8910(config, "ay1", 8_MHz_XTAL / 4).add_route(ALL_OUTPUTS, "speaker", 0.35); // divider not verified
+
+	AY8910(config, "ay2", 8_MHz_XTAL / 4).add_route(ALL_OUTPUTS, "speaker", 0.35); // divider not verified
+
+	SNKWAVE(config, "wave", 8_MHz_XTAL).add_route(ALL_OUTPUTS, "speaker", 0.30); // lack of divider not verified
 }
 
 void cclimber_state::cclimberx(machine_config &config)
@@ -2385,6 +2531,51 @@ ROM_START( silvland )
 ROM_END
 
 
+/*
+Tangram Q
+
+SNK ELECTRONICS A3002 UC01 + A2003UP03-01 PCBs
+
+A3002 UC01 main components:
+NEC D780C-1 CPU
+18.432 MHz XTAL
+2x HM6116LP-3 RAM (near program ROMs)
+6x TMM315D-1 SRAM (near CPU)
+2x M5L5101LP-1 RAM (near BG ROMs)
+2x bank of 8 DIP switches
+lots of TTL
+
+A2003UP03-01 main components:
+NEC D780C-1 CPU
+2x AY-3-8910 sound chip
+8 MHz XTAL
+HM6116P-4 RAM
+lots of TTL
+*/
+
+ROM_START(tangramq)
+	ROM_REGION( 0x6000, "maincpu", 0 )
+	ROM_LOAD( "m1.k5", 0x0000, 0x2000, CRC(dff92169) SHA1(805784afeba676306ed6c0d41d33ed0163bdc08e) )
+	ROM_LOAD( "m2.k4", 0x2000, 0x2000, CRC(1cbade75) SHA1(1fa276261428c392917df4a4dbd9f99710b9855e) )
+
+	ROM_REGION( 0x2000, "audiocpu", 0 )
+	ROM_LOAD( "s1.a6", 0x0000, 0x2000, CRC(05af38f6) SHA1(7bdbf798964aa4d603fca0178b3f8fc251d207f6) )
+
+	ROM_REGION( 0x2000, "bigsprite", 0 )
+	ROM_LOAD( "b1.e19", 0x0000, 0x1000, CRC(f3ec2562) SHA1(859473c45b9d22c138b70ea649b93d41721e1e0d) ) // 1xxxxxxxxxxx = 0xFF
+	ROM_LOAD( "b2.e17", 0x1000, 0x1000, CRC(77d21b84) SHA1(7f9bfbfbc7fd51a97f15fee54ac851ddfa97b213) ) // 1xxxxxxxxxxx = 0xFF
+
+	ROM_REGION( 0x4000, "tile", 0 )
+	ROM_LOAD( "f1.h4", 0x0000, 0x2000, CRC(c7c3ffe1) SHA1(f8f0ac3b73f560af3ef0954e5d80984bad605ea2) )
+	ROM_LOAD( "f2.h2", 0x2000, 0x2000, CRC(dbc13c1f) SHA1(b299582f97a384b2d252d815a3c64e9f54346748) )
+
+	ROM_REGION( 0x60, "proms", 0 )
+	ROM_LOAD( "mb7051_m02.m6", 0x00, 0x20, CRC(b3fc1505) SHA1(5b94adde0428a26b815c7eb9b3f3716470d349c7) )
+	ROM_LOAD( "mb7051_m02.m7", 0x20, 0x20, CRC(26aada9e) SHA1(f59645e606ea4f0dd0fc4ea47dd03f526c534941) )
+	ROM_LOAD( "mb7051_m02.m8", 0x40, 0x20, CRC(676b3166) SHA1(29b9434cd34d43ea5664e436e2a24b54f8d88aac) )
+ROM_END
+
+
 /* This dump was a mess.  11n and 11k seem to be bad dumps, the second half should probably be sprite data
    Comparing to set 2 11l and 11h are unnecessary, and are actually from Le Bagnard(set1), as is 5m.
    5n ID'd as unknown, but it also is from bagnard with some patches.
@@ -2932,6 +3123,8 @@ GAME( 1981, rpatrol,     0,        rpatrol,   rpatrol,   cclimber_state, init_rp
 GAME( 1981, rpatroln,    rpatrol,  rpatrol,   rpatrol,   cclimber_state, empty_init,     ROT0,   "Orca",    "River Patrol (Japan, unprotected)",  MACHINE_SUPPORTS_SAVE )
 GAME( 1981, rpatrolb,    rpatrol,  rpatrol,   rpatrol,   cclimber_state, empty_init,     ROT0,   "bootleg", "River Patrol (bootleg)",             MACHINE_SUPPORTS_SAVE )
 GAME( 1981, silvland,    rpatrol,  rpatrol,   rpatrol,   cclimber_state, empty_init,     ROT0,   "Falcon",  "Silver Land (hack of River Patrol)", MACHINE_SUPPORTS_SAVE )
+
+GAME( 1983, tangramq,    0,        tangramq,  tangramq,  cclimber_state, empty_init,     ROT270, "SNK",     "Tangram Q", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 
 // see pacman.cpp for parent
 GAME( 1985, cannonb,     cannonbp, cannonb,   cannonb,   cclimber_state, init_cannonb,   ROT90,  "bootleg (Soft)",              "Cannon Ball (bootleg on Crazy Kong hardware) (set 1, buggy)",         MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // bootleggers missed protection after bonus game
