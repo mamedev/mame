@@ -4538,6 +4538,35 @@ ROM_START( carnivalha )
 	ROM_LOAD( "316-042.u66", 0x0020, 0x0020, CRC(a1506b9d) SHA1(037c3db2ea40eca459e8acba9d1506dd28d72d10) ) /* sequence PROM */
 ROM_END
 
+ROM_START( carnivalmm )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "16mm.u33",  0x0000, 0x0400, CRC(0230bd0a) SHA1(1f5ae709e4cc86b8e682401b2d82b31eb45b41d5) )
+	ROM_LOAD( "15mm.u32",  0x0400, 0x0400, CRC(a1f58beb) SHA1(e027beca7bf3ef5ef67e2195f909332fd194b5dc) )
+	ROM_LOAD( "14mm.u31",  0x0800, 0x0400, CRC(67b17922) SHA1(46cdfd0371dec61a5440c2111660729c0f0ecdb8) )
+	ROM_LOAD( "13mm.u30",  0x0c00, 0x0400, CRC(befb09a5) SHA1(da44b6a869b5eb0705e01fee4478696f6bef9de8) )
+	ROM_LOAD( "12mm.u29",  0x1000, 0x0400, CRC(b5230913) SHA1(0db699e40c35da113f9301cedcd958d765699aac) )
+	ROM_LOAD( "11mm.u28",  0x1400, 0x0400, CRC(53040332) SHA1(ff7a06d93cb890abf0616770774668396d128ba3) )
+	ROM_LOAD( "10mm.u27",  0x1800, 0x0400, CRC(a3b9c2db) SHA1(2893fae8c2aeab2a68297bf1f2c3022ff98dca95) )
+	ROM_LOAD( "9mm.u26",   0x1c00, 0x0400, CRC(fcc3854e) SHA1(7adbd6ca6f636dec75fa6eccdf3381686e074bc6) )
+	ROM_LOAD( "8mm.u8",    0x2000, 0x0400, CRC(28be8d69) SHA1(2d9ac9a53f00fe2282e4317585e6bddadb676c0f) )
+	ROM_LOAD( "7mm.u7",    0x2400, 0x0400, CRC(3873ccdb) SHA1(56be81fdee8947758ba966915c0739e5560a7f94) )
+	ROM_LOAD( "6mm.u6",    0x2800, 0x0400, CRC(d9a96dff) SHA1(0366acf3418901bfeeda59d4cd51fe8ceaad4577) )
+	ROM_LOAD( "5mm.u5",    0x2c00, 0x0400, CRC(d893ca72) SHA1(564176ab7f3757d51db8eef9fbc4228fa2ce328f) )
+	ROM_LOAD( "4mm.u4",    0x3000, 0x0400, CRC(df8c63c5) SHA1(e8d0632b5cb5bd7f698485531f3edeb13efdc685) )
+	ROM_LOAD( "3mm.u3",    0x3400, 0x0400, CRC(689a73e8) SHA1(b4134e8d892df7ba3352e4d3f581923decae6e54) )
+	ROM_LOAD( "2mm.u2",    0x3800, 0x0400, CRC(b94ef7ab) SHA1(8079e0f97688817d2f6ed5810aa1501dc09585d6) )
+	ROM_LOAD( "1mm.u1",    0x3c00, 0x0400, CRC(6e10c057) SHA1(743a28bb6f4f395fd3db36d5e40acc3475f55f5d) )
+
+	ROM_REGION( 0x0020, "proms", 0 )
+	ROM_LOAD( "mmi6331.u4",       0x0000, 0x0020, CRC(f0084d80) SHA1(95ec912ac2c64cd58a50c68afc0993746841a531) )
+
+	ROM_REGION( 0x0400, "audiocpu", 0 )
+	ROM_LOAD( "sound.u25",    0x0000, 0x0400, CRC(0dbaa2b0) SHA1(eae7fc362a0ff8f908c42e093c7dbb603659373c) )
+
+	ROM_REGION( 0x0020, "user1", 0 )    /* timing PROM */
+	ROM_LOAD( "mmi6331.u14",  0x0000, 0x0020, CRC(9617d796) SHA1(7cff2741866095ff42eadd8022bea349ec8d2f39) )
+ROM_END
+
 ROM_START( verbena )
 	ROM_REGION( 0x10000, "maincpu", 0 ) // all 2708s
 	ROM_LOAD( "16v.u33",   0x0000, 0x0400, CRC(a47a1c54) SHA1(1c8944c24b6eb1d35b778dc7448466f1c5be484e) ) // handwritten label
@@ -4999,6 +5028,7 @@ GAME( 1980, carnivalc,  carnival, carnival,  carnivalc, carnival_state,  empty_i
 GAME( 1980, carnivalca, carnival, carnival,  carnivalc, carnival_state,  empty_init, ROT270, "Sega",                    "Carnival (cocktail, earlier)",                           MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // one missing ROM
 GAME( 1980, carnivalh,  carnival, carnivalh, carnivalh, carnivalh_state, empty_init, ROT270, "Sega",                    "Carnival (Head On hardware, set 1)",                     MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1980, carnivalha, carnival, carnivalh, carnivalh, carnivalh_state, empty_init, ROT270, "Sega",                    "Carnival (Head On hardware, set 2)",                     MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1980, carnivalmm, carnival, carnival,  carnival,  carnival_state,  empty_init, ROT270, "bootleg (ManilaMatic)",   "Carnival (ManilaMatic bootleg)",                         MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1980, verbena,    carnival, carnival,  carnival,  carnival_state,  empty_init, ROT270, "bootleg (Cocamatic)",     "Verbena (bootleg of Carnival)",                          MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1981, brdrline,   0,        brdrline,  brdrline,  vicdual_state,   empty_init, ROT270, "Sega",                    "Borderline",                                             MACHINE_SUPPORTS_SAVE )
 GAME( 1981, starrkr,    brdrline, brdrline,  starrkr,   vicdual_state,   empty_init, ROT270, "Sega",                    "Star Raker",                                             MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
