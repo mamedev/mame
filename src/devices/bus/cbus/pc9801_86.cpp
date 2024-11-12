@@ -133,7 +133,6 @@ static INPUT_PORTS_START( pc9801_86 )
 	PORT_INCLUDE( pc9801_joy_port )
 
 	// Single 8-bit DSW bank
-	// TODO: how HW really reads these?
 	PORT_START("OPNA_DSW")
 	PORT_DIPNAME( 0x01, 0x00, "PC-9801-86: Port Base" ) PORT_DIPLOCATION("OPNA_SW:!1")
 	PORT_DIPSETTING(    0x00, "0x188" )
@@ -149,6 +148,7 @@ static INPUT_PORTS_START( pc9801_86 )
 	PORT_DIPNAME( 0x10, 0x00, "PC-9801-86: Interrupt enable") PORT_DIPLOCATION("OPNA_SW:!5")
 	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( No ) )
+	// TODO: how HW really read this?
 	PORT_DIPNAME( 0xe0, 0x80, "PC-9801-86: ID number") PORT_DIPLOCATION("OPNA_SW:!6,!7,!8")
 	PORT_DIPSETTING(    0x00, "0" )
 	PORT_DIPSETTING(    0x20, "1" )
@@ -190,7 +190,6 @@ pc9801_86_device::pc9801_86_device(const machine_config &mconfig, const char *ta
 
 }
 
-
 //-------------------------------------------------
 //  device_validity_check - perform validity checks
 //  on this device
@@ -209,7 +208,6 @@ u16 pc9801_86_device::read_io_base()
 //  device_start - device-specific startup
 //-------------------------------------------------
 
-
 void pc9801_86_device::device_start()
 {
 	// TODO: uninstall option from dip
@@ -218,10 +216,10 @@ void pc9801_86_device::device_start()
 		0xcffff,
 		memregion(this->subtag("sound_bios").c_str())->base()
 	);
-	m_bus->install_io(0xa460, 0xa463, read8smo_delegate(*this, FUNC(pc9801_86_device::id_r)), write8smo_delegate(*this, FUNC(pc9801_86_device::mask_w)));
-	m_bus->install_io(0xa464, 0xa46f, read8sm_delegate(*this, FUNC(pc9801_86_device::pcm_r)), write8sm_delegate(*this, FUNC(pc9801_86_device::pcm_w)));
+	// TODO: who wins if 2+ PC-9801-86 or mixed -73/-86 are mounted?
+	m_bus->install_device(0xa460, 0xa46f, *this, &pc9801_86_device::io_map);
 	m_bus->install_io(0xa66c, 0xa66f,
-		read8sm_delegate(*this, [this](offs_t o){ return o == 2 ? m_pcm_mute : 0xff; }, "pc9801_86_mute_r"),
+		read8sm_delegate(*this, [this](offs_t o){ return o == 2 ? m_pcm_mute : 0xff; }, "pcm_mute_r"),
 		write8sm_delegate(*this, [this](offs_t o, u8 d){
 			if(o == 2)
 			{
@@ -229,7 +227,7 @@ void pc9801_86_device::device_start()
 				m_ldac->set_output_gain(ALL_OUTPUTS, BIT(m_pcm_mute, 0) ? 0.0 : 1.0);
 				m_rdac->set_output_gain(ALL_OUTPUTS, BIT(m_pcm_mute, 0) ? 0.0 : 1.0);
 			}
-		}, "pc9801_86_mute_w")
+		}, "pcm_mute_w")
 	);
 
 	m_io_base = 0;
@@ -297,6 +295,107 @@ void pc9801_86_device::opna_w(offs_t offset, u8 data)
 		logerror("%s: Write to undefined port [%02x] %02x\n", machine().describe_context(), offset + m_io_base, data);
 }
 
+u8 pc9801_86_device::pcm_control_r()
+{
+	return m_pcm_ctrl | (m_pcmirq ? 0x10 : 0);
+}
+
+void pc9801_86_device::pcm_control_w(u8 data)
+{
+	const u32 rate = (25.4_MHz_XTAL).value() / 16;
+	const int divs[8] = {36, 48, 72, 96, 144, 192, 288, 384};
+
+	if(((data & 7) != (m_pcm_ctrl & 7)) || !m_init)
+		m_dac_timer->adjust(attotime::from_ticks(divs[data & 7], rate), 0, attotime::from_ticks(divs[data & 7], rate));
+	if(data & 8)
+		m_head = m_tail = m_count = 0;
+	if(!(data & 0x10))
+	{
+		//m_bus->int_w<5>(m_fmirq ? ASSERT_LINE : CLEAR_LINE);
+		if(!(queue_count() < m_irq_rate) || !(data & 0x80))
+		{
+			//TODO: this needs research
+			m_pcmirq = false;
+			m_irqs->in_w<1>(CLEAR_LINE);
+		}
+	}
+	m_init = true;
+	m_pcm_ctrl = data & ~0x10;
+}
+
+// $a460 base
+void pc9801_86_device::io_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x00, 0x00).rw(FUNC(pc9801_86_device::id_r), FUNC(pc9801_86_device::mask_w));
+//  map(0x02, 0x02) μPD6380 for PC9801-73 control
+//  map(0x04, 0x04) μPD6380 for PC9801-73 data
+	map(0x06, 0x06).lrw8(
+		NAME([this] () {
+			u8 res = 0;
+			// FIFO full
+			res |= (queue_count() == QUEUE_SIZE) << 7;
+			// FIFO empty
+			res |= !queue_count() << 6;
+			// recording overflow
+			res |= 0 << 5;
+			// DAC clock
+			res |= m_pcm_clk << 0;
+			return res;
+		}),
+		NAME([this] (u8 data) {
+			const u8 line_select = data >> 5;
+			m_vol[line_select] = data & 0x0f;
+			logerror("$a466 volume control [%02x] %02x\n", line_select, data & 0xf);
+		})
+	);
+	map(0x08, 0x08).rw(FUNC(pc9801_86_device::pcm_control_r), FUNC(pc9801_86_device::pcm_control_w));
+	map(0x0a, 0x0a).lrw8(
+		NAME([this] () {
+			return m_pcm_mode;
+		}),
+		NAME([this] (u8 data) {
+			if(m_pcm_ctrl & 0x20)
+				m_irq_rate = (data + 1) * 128;
+			else
+				m_pcm_mode = data;
+		})
+	);
+	map(0x0c, 0x0c).lrw8(
+		NAME([this] () {
+			// TODO: recording mode
+			return 0;
+		}),
+		NAME([this] (u8 data) {
+			if(queue_count() < QUEUE_SIZE)
+			{
+				m_queue[m_head++] = data;
+				m_head %= QUEUE_SIZE;
+				m_count++;
+			}
+			// TODO: what should happen on overflow?
+			// os2warp3 startup / shutdown chimes do this already
+		})
+	);
+}
+
+/*
+ * xxxx ---- ID
+ * 0000 ---- PC-90DO+ built-in
+ * 0001 ---- PC-98GS built-in
+ * 0010 ---- PC-9801-73/-76, I/O base $188
+ * 0011 ---- PC-9801-73/-76, I/O base $288
+ * 0100 ---- PC-9801-86, I/O base $188, PC-9821 Multi/A Mate/early CanBe (Ce/Cs2/Ce2)
+ * 0101 ---- PC-9801-86, I/O base $288
+ * 0110 ---- PC-9821Nf/Np built-in
+ * 0111 ---- PC-9821 X Mate (as PC-9821XE10-B?)
+ * 1000 ---- PC-9821 later CanBe/Na7/Nx built-in
+ * 1111 ---- <unsupported or PC-9801-26>
+ * ---- --x- (1) OPNA force volume to 0
+ * ---- ---x select OPN base
+ * ---- ---1 OPNA
+ * ---- ---0 OPN
+ */
 u8 pc9801_86_device::id_r()
 {
 	// either a -86 or 9821 MATE A uses this id (built-in)
@@ -306,82 +405,9 @@ u8 pc9801_86_device::id_r()
 
 void pc9801_86_device::mask_w(u8 data)
 {
-	m_mask = data & 1;
+	m_mask = data & 3;
 	// TODO: bit 1 totally cuts off OPNA output
 	logerror("%s: OPNA mask setting %02x\n", machine().describe_context(), data);
-}
-
-u8 pc9801_86_device::pcm_r(offs_t offset)
-{
-	if((offset & 1) == 0)
-	{
-		switch(offset >> 1)
-		{
-			case 1:
-				return ((queue_count() == QUEUE_SIZE) ? 0x80 : 0) |
-						(!queue_count() ? 0x40 : 0) | (m_pcm_clk ? 1 : 0);
-			case 2:
-				return m_pcm_ctrl | (m_pcmirq ? 0x10 : 0);
-			case 3:
-				return m_pcm_mode;
-			case 4:
-			{
-				return 0;
-			}
-		}
-	}
-	else // odd
-		logerror("PC9801-86: Read to undefined port [%02x]\n",offset+0xa464);
-	return 0xff;
-}
-
-void pc9801_86_device::pcm_w(offs_t offset, u8 data)
-{
-	const u32 rate = (25.4_MHz_XTAL).value() / 16;
-	const int divs[8] = {36, 48, 72, 96, 144, 192, 288, 384};
-	if((offset & 1) == 0)
-	{
-		switch(offset >> 1)
-		{
-			case 1:
-				m_vol[data >> 5] = data & 0x0f;
-				break;
-			case 2:
-				if(((data & 7) != (m_pcm_ctrl & 7)) || !m_init)
-					m_dac_timer->adjust(attotime::from_ticks(divs[data & 7], rate), 0, attotime::from_ticks(divs[data & 7], rate));
-				if(data & 8)
-					m_head = m_tail = m_count = 0;
-				if(!(data & 0x10))
-				{
-					//m_bus->int_w<5>(m_fmirq ? ASSERT_LINE : CLEAR_LINE);
-					if(!(queue_count() < m_irq_rate) || !(data & 0x80))
-					{
-						 //TODO: this needs research
-						m_pcmirq = false;
-						m_irqs->in_w<1>(CLEAR_LINE);
-					}
-				}
-				m_init = true;
-				m_pcm_ctrl = data & ~0x10;
-				break;
-			case 3:
-				if(m_pcm_ctrl & 0x20)
-					m_irq_rate = (data + 1) * 128;
-				else
-					m_pcm_mode = data;
-				break;
-			case 4:
-				if(queue_count() < QUEUE_SIZE)
-				{
-					m_queue[m_head++] = data;
-					m_head %= QUEUE_SIZE;
-					m_count++;
-				}
-				break;
-		}
-	}
-	else // odd
-		logerror("PC9801-86: Write to undefined port [%02x] %02x\n",offset+0xa464,data);
 }
 
 int pc9801_86_device::queue_count()

@@ -31,9 +31,11 @@ public:
 	pc9801_86_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	pc9801_86_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
-	void sound_irq(int state);
-
 protected:
+	void io_map(address_map &map) ATTR_COLD;
+	u8 pcm_control_r();
+	void pcm_control_w(u8 data);
+
 	// device-level overrides
 	virtual void device_validity_check(validity_checker &valid) const override;
 	virtual void device_start() override ATTR_COLD;
@@ -58,8 +60,6 @@ protected:
 	void opna_w(offs_t offset, u8 data);
 	virtual u8 id_r();
 	void mask_w(u8 data);
-	u8 pcm_r(offs_t offset);
-	void pcm_w(offs_t offset, u8 data);
 
 	u8 m_mask;
 
