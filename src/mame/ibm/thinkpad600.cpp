@@ -293,7 +293,7 @@ void thinkpad600_state::thinkpad600e(machine_config &config)
 
 void thinkpad600_state::thinkpad600(machine_config &config)
 {
-	PENTIUM2(config, m_maincpu, 300'000'000); // Intel Pentium II 300 Mobile MMC-1 (PMD30005002AA)
+	PENTIUM2(config, m_maincpu, 300'000'000); // Intel Pentium II 300 Mobile MMC-1 (PMD30005002AA) on the 600 model
 	m_maincpu->set_disable();
 
 	// TODO: fill me, uses earlier PIIX4 AB
@@ -305,27 +305,27 @@ void thinkpad600_state::thinkpad600(machine_config &config)
 
 ROM_START(thinkpad760xd)
 	ROM_REGION( 0x80000, "pci:07.0", 0 )
-	ROM_LOAD( "e28f004_89g8164_rev37_h1897m.u17", 0x00000, 0x80000, CRC(6092594f) SHA1(25681e4952a432e1170f69ae75f3260245b6b44b) ) // BIOS
+	ROM_LOAD( "e28f004_89g8164_rev37_h1897m.u17",      0x00000, 0x80000, CRC(6092594f) SHA1(25681e4952a432e1170f69ae75f3260245b6b44b) ) // BIOS
 
 	ROM_REGION( 0x0f780, "mcu", 0)
-	ROM_LOAD( "ibm_hd6433436a18f_40h8792.u39",    0x00000, 0x0f780, NO_DUMP ) // Mask ROM, undumped
+	ROM_LOAD( "ibm_hd6433436a18f_40h8792.u39",         0x00000, 0x0f780, NO_DUMP ) // Mask ROM, undumped
 
 	ROM_REGION( 0x00080, "seeprom", 0)
-	ROM_LOAD( "st93c46c.u30",                     0x00000, 0x00080, CRC(22cac7b5) SHA1(ee48ecf5d59e243e9afb0ca7e41ed8437eec8097) ) // BIOS settings
+	ROM_LOAD( "st93c46c.u30",                          0x00000, 0x00080, CRC(22cac7b5) SHA1(ee48ecf5d59e243e9afb0ca7e41ed8437eec8097) ) // BIOS settings
 ROM_END
 
 ROM_START(thinkpad600)
-	ROM_REGION( 0x80000,  "pci:07.0", 0 )
-	ROM_LOAD( "tms28f004b_18l9949_rev16-i2298m.u76",  0x00000, 0x80000, CRC(00a52b32) SHA1(08db425b8edb3a036f22beb588caa6f050fc8eb2) )
+	ROM_REGION( 0x80000, "pci:07.0", 0 )
+	ROM_LOAD( "tms28f004b_18l9949_rev16-i2298m.u76",   0x00000, 0x80000, CRC(00a52b32) SHA1(08db425b8edb3a036f22beb588caa6f050fc8eb2) )
 
 	ROM_REGION(0x0f780, "mcu", 0)
-	ROM_LOAD( "hd64f3437tf_10l9950_rev08_i2798m.u32", 0x00000, 0x0f780, CRC(546ec51c) SHA1(5d9b4be590307c4059ff11c434d0901819427649) )
+	ROM_LOAD( "hd64f3437tf_10l9950_rev08_i2798m.u32",  0x00000, 0x0f780, CRC(546ec51c) SHA1(5d9b4be590307c4059ff11c434d0901819427649) )
 
 	ROM_REGION(0x00080, "seeprom", 0)
-	ROM_LOAD( "atmel_24c01a.u49",                     0x00000, 0x00080, CRC(9a2e2a18) SHA1(29e2832c97bc93debb4fb09fcbed582335b57efe) ) // BIOS settings
+	ROM_LOAD( "atmel_24c01a.u49",                      0x00000, 0x00080, CRC(9a2e2a18) SHA1(29e2832c97bc93debb4fb09fcbed582335b57efe) ) // BIOS settings
 
 	ROM_REGION(0x00c39, "plds", 0)
-	ROM_LOAD( "atf1500al-modemboard.u12",             0x00000, 0x00c39, CRC(7ecd4b79) SHA1(b69ef5fe227b466f331f863ba20efd7e23056809) ) // On modem PCB
+	ROM_LOAD( "atf1500al-modemboard.u12",              0x00000, 0x00c39, CRC(7ecd4b79) SHA1(b69ef5fe227b466f331f863ba20efd7e23056809) ) // On modem PCB
 ROM_END
 
 ROM_START(thinkpad600e)
@@ -341,20 +341,20 @@ ROM_START(thinkpad600e)
 	ROM_COPY( "bios", 0x20000, 0x00000, 0x20000 )
 
 	ROM_REGION(0x0f780, "mcu", 0)
-	ROM_LOAD( "hd64f3437tf-10l1057_rev04_h0499m.u39", 0x00000, 0x0f780, CRC(c21c928b) SHA1(33e3e6966f003655ffc2f3ac07772d2d3245740d) )
+	ROM_LOAD( "hd64f3437tf-10l1057_rev04_h0499m.u39",  0x00000, 0x0f780, CRC(c21c928b) SHA1(33e3e6966f003655ffc2f3ac07772d2d3245740d) )
 
 	ROM_REGION(0x00080, "seeprom", 0)
-	ROM_LOAD( "atmel_24c01a.u98",                     0x00000, 0x00080, CRC(7ce51001) SHA1(6f25666373a6373ce0014c04df73a066f4da938b) ) // BIOS settings
+	ROM_LOAD( "atmel_24c01a.u98",                      0x00000, 0x00080, CRC(7ce51001) SHA1(6f25666373a6373ce0014c04df73a066f4da938b) ) // BIOS settings
 
 	ROM_REGION(0x00420, "seeprom2", 0)
-	ROM_LOAD( "at24rf08bt.u99",                       0x00000, 0x00420, CRC(c7ce9600) SHA1(4e6ed66250fed838614c3f1f6044fd9a19a2d0de) )
+	ROM_LOAD( "at24rf08bt.u99",                        0x00000, 0x00420, CRC(c7ce9600) SHA1(4e6ed66250fed838614c3f1f6044fd9a19a2d0de) )
 
 	ROM_REGION(0x00c39, "plds", 0)
-	ROM_LOAD( "atf1500al-modemboard.u12",             0x00000, 0x00c39, CRC(7ecd4b79) SHA1(b69ef5fe227b466f331f863ba20efd7e23056809) ) // On modem PCB
+	ROM_LOAD( "atf1500al-modemboard.u12",              0x00000, 0x00c39, CRC(7ecd4b79) SHA1(b69ef5fe227b466f331f863ba20efd7e23056809) ) // On modem PCB
 ROM_END
 
 ROM_START(thinkpad770z)
-	ROM_REGION( 0x80000,  "pci:07.0", 0 )
+	ROM_REGION( 0x80000, "pci:07.0", 0 )
 	ROM_LOAD( "e28f004b5t80-10l1055-rev09-d0999m.u59", 0x00000, 0x80000, CRC(f9f255c5) SHA1(ee209802d08c6498a42e52c5c45ce469dc095ad4) )
 
 	ROM_REGION(0x0f780, "mcu", 0)
