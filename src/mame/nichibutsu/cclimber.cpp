@@ -240,10 +240,6 @@ Dip location verified from manual for: cclimber, guzzler, swimmer
  this causes them to crash after the a few rounds - confirmed on an original PCB.
  They clearly weren't tested properly by the bootleggers.
 
- Tangram Q
- ---------
- Inputs aren't correct, sound tempo is wrong (NMI ack problem?)
-
 ***************************************************************************/
 
 #include "emu.h"
@@ -508,8 +504,8 @@ void cclimber_state::tangramq_map(address_map &map)
 {
 	map(0x0000, 0x5fff).rom();
 	map(0x6000, 0x6bff).ram();
-	map(0x8000, 0x8000).portr("P1");
-	map(0x8020, 0x8020).portr("P2");
+	map(0x8000, 0x8000).portr("SYSTEM1");
+	map(0x8020, 0x8020).portr("SYSTEM2");
 	map(0x8800, 0x88ff).ram().share("bigspriteram");
 	map(0x9000, 0x93ff).mirror(0x0400).ram().share("videoram");
 	map(0x9800, 0x981f).ram().share("column_scroll");
@@ -519,10 +515,11 @@ void cclimber_state::tangramq_map(address_map &map)
 	map(0x98dc, 0x98df).ram().share("bigspritectrl");
 	map(0x98e0, 0x98ff).ram(); // not used, but initialized
 	map(0x9c00, 0x9fff).ram().w(FUNC(cclimber_state::cclimber_colorram_w)).share("colorram");
-	map(0xa000, 0xa000).portr("P3");
+	map(0xa000, 0xa000).portr("P1");
+	map(0xa800, 0xa800).portr("P2");
 	map(0xa000, 0xa007).w(m_mainlatch, FUNC(ls259_device::write_d0));
-	map(0xb000, 0xb000).portr("DSW").w("soundlatch", FUNC(generic_latch_8_device::write));
-	map(0xb800, 0xb800).portr("SYSTEM");
+	map(0xb000, 0xb000).portr("DSW1").w("soundlatch", FUNC(generic_latch_8_device::write));
+	map(0xb800, 0xb800).portr("DSW2");
 }
 
 void toprollr_state::toprollr_decrypted_opcodes_map(address_map &map)
@@ -592,7 +589,7 @@ void cclimber_state::tangramq_sound_map(address_map &map)
 	map(0x8000, 0x8001).w("ay1", FUNC(ay8910_device::address_data_w));
 	map(0x8002, 0x8007).w("wave", FUNC(snkwave_device::snkwave_w));
 	map(0x8008, 0x8009).w("ay2", FUNC(ay8910_device::address_data_w));
-	// map(0xa000, 0xa000) // TODO: NMI related?
+	map(0xa000, 0xa000).nopw(); // TODO: NMI related?
 	map(0xe000, 0xe3ff).ram();
 }
 
@@ -841,36 +838,26 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( tangramq )
 	PORT_START("P1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START2 )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START1 )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON1 )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT )
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
 	PORT_START("P2")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_COCKTAIL
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_COCKTAIL
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_COCKTAIL
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
-	PORT_START("P3")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2) // this drops the piece
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2) // pressing this one and the following together rotates pieces
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
-	PORT_START("DSW")
+	PORT_START("DSW1")
 	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW1:1")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
@@ -880,12 +867,12 @@ static INPUT_PORTS_START( tangramq )
 	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW1:3")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, "Invincibility" ) PORT_DIPLOCATION("DSW1:4")
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Free_Play ) ) PORT_DIPLOCATION("DSW1:4")
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW1:5")
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, "Infinite Lives" ) PORT_DIPLOCATION("DSW1:5")
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW1:6")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
@@ -896,7 +883,7 @@ static INPUT_PORTS_START( tangramq )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 
-	PORT_START("SYSTEM")
+	PORT_START("DSW2")
 	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Lives ) ) PORT_DIPLOCATION("DSW2:1,2")
 	PORT_DIPSETTING(    0x00, "1" )
 	PORT_DIPSETTING(    0x01, "2" )
@@ -917,9 +904,29 @@ static INPUT_PORTS_START( tangramq )
 	PORT_DIPSETTING(    0x20, DEF_STR( 1C_3C ) )
 	PORT_DIPSETTING(    0x30, DEF_STR( 1C_5C ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( 1C_6C ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Flip_Screen ) ) PORT_DIPLOCATION("DSW2:8")
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Cabinet ) ) PORT_DIPLOCATION("DSW2:8")
+	PORT_DIPSETTING(    0x80, DEF_STR( Upright ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Cocktail ) )
+
+	PORT_START("SYSTEM1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START2 )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("SYSTEM2")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( swimmer )
@@ -1325,7 +1332,6 @@ void cclimber_state::root(machine_config &config)
 {
 	// basic machine hardware
 	Z80(config, m_maincpu, 18.432_MHz_XTAL/3/2); // 3.072 MHz
-	m_maincpu->set_addrmap(AS_PROGRAM, &cclimber_state::cclimber_map);
 
 	LS259(config, m_mainlatch, 0);
 	m_mainlatch->q_out_cb<0>().set(FUNC(cclimber_state::nmi_mask_w));
@@ -1351,6 +1357,7 @@ void cclimber_state::cclimber(machine_config &config)
 {
 	root(config);
 
+	m_maincpu->set_addrmap(AS_PROGRAM, &cclimber_state::cclimber_map);
 	m_maincpu->set_addrmap(AS_IO, &cclimber_state::cclimber_portmap);
 
 	// 7J on CCG-1
@@ -1382,7 +1389,7 @@ void cclimber_state::tangramq(machine_config &config)
 	Z80(config, m_audiocpu, 8_MHz_XTAL / 2); // divider not verified
 	m_audiocpu->set_addrmap(AS_PROGRAM, &cclimber_state::tangramq_sound_map);
 
-	m_screen->screen_vblank().append_inputline(m_audiocpu, INPUT_LINE_NMI); // TODO: probably wrong
+	m_audiocpu->set_periodic_int(FUNC(cclimber_state::nmi_line_pulse), attotime::from_ticks(0x8000, 8_MHz_XTAL));
 
 	// sound hardware
 	SPEAKER(config, "speaker").front_center();
@@ -1390,7 +1397,6 @@ void cclimber_state::tangramq(machine_config &config)
 	GENERIC_LATCH_8(config, "soundlatch").data_pending_callback().set_inputline(m_audiocpu, 0, HOLD_LINE);
 
 	AY8910(config, "ay1", 8_MHz_XTAL / 4).add_route(ALL_OUTPUTS, "speaker", 0.35); // divider not verified
-
 	AY8910(config, "ay2", 8_MHz_XTAL / 4).add_route(ALL_OUTPUTS, "speaker", 0.35); // divider not verified
 
 	SNKWAVE(config, "wave", 8_MHz_XTAL).add_route(ALL_OUTPUTS, "speaker", 0.30); // lack of divider not verified
@@ -1506,7 +1512,7 @@ void swimmer_state::swimmer(machine_config &config)
 	Z80(config, m_audiocpu, 4_MHz_XTAL/2); // verified on pcb
 	m_audiocpu->set_addrmap(AS_PROGRAM, &swimmer_state::swimmer_audio_map);
 	m_audiocpu->set_addrmap(AS_IO, &swimmer_state::swimmer_audio_portmap);
-	m_audiocpu->set_periodic_int(FUNC(swimmer_state::nmi_line_pulse), attotime::from_hz((double)4000000/16384)); // IRQs are triggered by the main CPU
+	m_audiocpu->set_periodic_int(FUNC(swimmer_state::nmi_line_pulse), attotime::from_ticks(0x4000, 4_MHz_XTAL));
 
 	// video hardware
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
@@ -2553,7 +2559,7 @@ HM6116P-4 RAM
 lots of TTL
 */
 
-ROM_START(tangramq)
+ROM_START( tangramq )
 	ROM_REGION( 0x6000, "maincpu", 0 )
 	ROM_LOAD( "m1.k5", 0x0000, 0x2000, CRC(dff92169) SHA1(805784afeba676306ed6c0d41d33ed0163bdc08e) )
 	ROM_LOAD( "m2.k4", 0x2000, 0x2000, CRC(1cbade75) SHA1(1fa276261428c392917df4a4dbd9f99710b9855e) )
@@ -2562,8 +2568,8 @@ ROM_START(tangramq)
 	ROM_LOAD( "s1.a6", 0x0000, 0x2000, CRC(05af38f6) SHA1(7bdbf798964aa4d603fca0178b3f8fc251d207f6) )
 
 	ROM_REGION( 0x2000, "bigsprite", 0 )
-	ROM_LOAD( "b1.e19", 0x0000, 0x1000, CRC(f3ec2562) SHA1(859473c45b9d22c138b70ea649b93d41721e1e0d) ) // 1xxxxxxxxxxx = 0xFF
-	ROM_LOAD( "b2.e17", 0x1000, 0x1000, CRC(77d21b84) SHA1(7f9bfbfbc7fd51a97f15fee54ac851ddfa97b213) ) // 1xxxxxxxxxxx = 0xFF
+	ROM_LOAD( "b2.e17", 0x0000, 0x1000, CRC(77d21b84) SHA1(7f9bfbfbc7fd51a97f15fee54ac851ddfa97b213) ) // 1xxxxxxxxxxx = 0xFF
+	ROM_LOAD( "b1.e19", 0x1000, 0x1000, CRC(f3ec2562) SHA1(859473c45b9d22c138b70ea649b93d41721e1e0d) ) // 1xxxxxxxxxxx = 0xFF
 
 	ROM_REGION( 0x4000, "tile", 0 )
 	ROM_LOAD( "f1.h4", 0x0000, 0x2000, CRC(c7c3ffe1) SHA1(f8f0ac3b73f560af3ef0954e5d80984bad605ea2) )
@@ -3010,8 +3016,8 @@ ROM_START( toprollr )
 	ROM_LOAD( "2.f5",   0x00000, 0x02000, CRC(ef789f00) SHA1(424d69584d391ee7b9ad5db7ee6ced97d69897d4) )
 	ROM_LOAD( "8.f3",   0x02000, 0x02000, CRC(94371cfb) SHA1(cb501c36b213c995a4048b3a96c85848c556cd05) )
 	ROM_LOAD( "4.k5",   0x04000, 0x02000, CRC(1cb48ea0) SHA1(fdc75075112042ec84a7d1b3e5b5a6db1d1cb871) )
-	ROM_COPY( "user1", 0x04000, 0x0a000, 0x02000 )
-	ROM_COPY( "user1", 0x04000, 0x10000, 0x02000 )
+	ROM_COPY( "user1",  0x04000, 0x0a000, 0x02000 )
+	ROM_COPY( "user1",  0x04000, 0x10000, 0x02000 )
 	ROM_LOAD( "3.h5",   0x06000, 0x02000, CRC(d45494ba) SHA1(6e235b34f9457acadad6d4e27799978bc2e3db08) )
 	ROM_LOAD( "9.h3",   0x08000, 0x02000, CRC(8a8032a7) SHA1(d6642d72645c613c21f65bbbe1560d0437d41f43) )
 	ROM_LOAD( "1.d5",   0x0c000, 0x02000, CRC(9894374d) SHA1(173de4abbc3fb5d522aa6d6d5caf8e4d54f2a598) )
@@ -3094,10 +3100,10 @@ GAME( 1980, cclimbrrod,  cclimber, cclimber,  cclimber,  cclimber_state, empty_i
 /* these sets have ugly colours, no extra attract screen, and no graphics for the extra attract screen in the BG roms
   - there is a Falcon logo in the text roms which is unused
   - does the code to display the extra screen still exist in the roms?  */
-GAME( 1981, ckong,       0,        cclimber,  ckong,     cclimber_state, empty_init,     ROT270, "Kyoei / Falcon", "Crazy Kong",                               MACHINE_SUPPORTS_SAVE ) // on a Falcon FCK-01 PCB, but doesn't display any Falcon copyright
-GAME( 1981, ckongalc,    ckong,    cclimber,  ckong,     cclimber_state, empty_init,     ROT270, "bootleg (Alca)", "Crazy Kong (Alca bootleg)",                MACHINE_SUPPORTS_SAVE )
-GAME( 1981, monkeyd,     ckong,    cclimber,  ckong,     cclimber_state, empty_init,     ROT270, "bootleg",        "Monkey Donkey",                            MACHINE_SUPPORTS_SAVE )
-GAME( 1981, dking,       ckong,    cclimber,  ckong,     cclimber_state, init_dking,     ROT270, "bootleg",        "Donkey King",                              MACHINE_SUPPORTS_SAVE ) // supposedly, possibly by Hafasonic?
+GAME( 1981, ckong,       0,        cclimber,  ckong,     cclimber_state, empty_init,     ROT270, "Kyoei / Falcon", "Crazy Kong",                                  MACHINE_SUPPORTS_SAVE ) // on a Falcon FCK-01 PCB, but doesn't display any Falcon copyright
+GAME( 1981, ckongalc,    ckong,    cclimber,  ckong,     cclimber_state, empty_init,     ROT270, "bootleg (Alca)", "Crazy Kong (Alca bootleg)",                   MACHINE_SUPPORTS_SAVE )
+GAME( 1981, monkeyd,     ckong,    cclimber,  ckong,     cclimber_state, empty_init,     ROT270, "bootleg",        "Monkey Donkey",                               MACHINE_SUPPORTS_SAVE )
+GAME( 1981, dking,       ckong,    cclimber,  ckong,     cclimber_state, init_dking,     ROT270, "bootleg",        "Donkey King",                                 MACHINE_SUPPORTS_SAVE ) // supposedly, possibly by Hafasonic?
 GAME( 1981, ckongdks,    ckong,    cclimber,  ckong,     cclimber_state, init_dking,     ROT270, "bootleg",        "Donkey Kong (Spanish bootleg of Crazy Kong)", MACHINE_SUPPORTS_SAVE )
 
 /* these sets have correct colours, and also contain the graphics used for the extra attract screen in the BG roms, but it is unused
@@ -3119,12 +3125,12 @@ GAME( 1981, ckongpt2b2,  ckongpt2, cclimber,  ckongb2,   cclimber_state, empty_i
 // see bagman.cpp for parent
 GAME( 1982, bagmanf,     bagman,   bagmanf,   bagmanf,   cclimber_state, empty_init,     ROT270, "bootleg", "Le Bagnard (bootleg on Crazy Kong hardware)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 
-GAME( 1981, rpatrol,     0,        rpatrol,   rpatrol,   cclimber_state, init_rpatrol,   ROT0,   "Orca",    "River Patrol (Japan)",               MACHINE_SUPPORTS_SAVE)
+GAME( 1981, rpatrol,     0,        rpatrol,   rpatrol,   cclimber_state, init_rpatrol,   ROT0,   "Orca",    "River Patrol (Japan)",               MACHINE_SUPPORTS_SAVE )
 GAME( 1981, rpatroln,    rpatrol,  rpatrol,   rpatrol,   cclimber_state, empty_init,     ROT0,   "Orca",    "River Patrol (Japan, unprotected)",  MACHINE_SUPPORTS_SAVE )
 GAME( 1981, rpatrolb,    rpatrol,  rpatrol,   rpatrol,   cclimber_state, empty_init,     ROT0,   "bootleg", "River Patrol (bootleg)",             MACHINE_SUPPORTS_SAVE )
 GAME( 1981, silvland,    rpatrol,  rpatrol,   rpatrol,   cclimber_state, empty_init,     ROT0,   "Falcon",  "Silver Land (hack of River Patrol)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1983, tangramq,    0,        tangramq,  tangramq,  cclimber_state, empty_init,     ROT270, "SNK",     "Tangram Q", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1983, tangramq,    0,        tangramq,  tangramq,  cclimber_state, empty_init,     ROT270, "SNK",     "Tangram Q", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 
 // see pacman.cpp for parent
 GAME( 1985, cannonb,     cannonbp, cannonb,   cannonb,   cclimber_state, init_cannonb,   ROT90,  "bootleg (Soft)",              "Cannon Ball (bootleg on Crazy Kong hardware) (set 1, buggy)",         MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // bootleggers missed protection after bonus game
@@ -3135,7 +3141,7 @@ GAME( 1982, swimmer,     0,        swimmer,   swimmer,   swimmer_state,  empty_i
 GAME( 1982, swimmera,    swimmer,  swimmer,   swimmer,   swimmer_state,  empty_init,     ROT0,   "Tehkan", "Swimmer (set 2)", MACHINE_SUPPORTS_SAVE )
 GAME( 1982, swimmerb,    swimmer,  swimmer,   swimmerb,  swimmer_state,  empty_init,     ROT0,   "Tehkan", "Swimmer (set 3)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1983, guzzler,     0,        guzzler,   guzzler,   swimmer_state,  empty_init,     ROT90,  "Tehkan", "Guzzler", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, guzzler,     0,        guzzler,   guzzler,   swimmer_state,  empty_init,     ROT90,  "Tehkan", "Guzzler",                      MACHINE_SUPPORTS_SAVE )
 GAME( 1983, guzzlers,    guzzler,  guzzler,   guzzler,   swimmer_state,  empty_init,     ROT90,  "Tehkan", "Guzzler (Swimmer conversion)", MACHINE_SUPPORTS_SAVE )
 
 GAME( 1983, au,          0,        au,        au,        swimmer_state,  empty_init,     ROT90,  "Tehkan", "Au (location test)", MACHINE_SUPPORTS_SAVE )
