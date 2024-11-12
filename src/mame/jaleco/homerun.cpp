@@ -1,32 +1,27 @@
 // license:BSD-3-Clause
 // copyright-holders: Tomasz Slanina
-
 /*
- Moero!! Pro Yakyuu Homerun Kyousou - (c) 1988 Jaleco
- Dynamic Shoot Kyousou - (c) 1988 Jaleco
- Ganbare Jajamaru Saisho wa Goo / Ganbare Jajamaru Hop Step & Jump - (c) 1990 Jaleco
- Driver by Tomasz Slanina
 
- They're gambling games (seems to be aimed at kids), with a little skill involved.
- All games have a medal hopper to reward the player.
+Moero!! Pro Yakyuu Homerun Kyousou - (c) 1988 Jaleco
+Dynamic Shoot Kyousou - (c) 1988 Jaleco
+Ganbare Jajamaru Saisho wa Goo / Ganbare Jajamaru Hop Step & Jump - (c) 1990 Jaleco
+Driver by Tomasz Slanina
 
- *weird* hardware - based on NES version
- (gfx bank changed in the middle of screen,
-  sprites in NES format etc)
+They're gambling games (seems to be aimed at kids), with a little skill involved.
+All games have a medal hopper to reward the player.
 
- homerun, dynashot and ganjaja use an extra soundchip for playing voice/samples
+*weird* hardware - based on NES version
+(gfx bank changed in the middle of screen,
+ sprites in NES format etc)
 
-Todo :
- - Dump homerun and dynashot sample ROM
- - Improve controls/DIP switches
- - Fix sprite glitches in ganjaja Hop Step & Jump
- - Fix sample playing in ganjaja Saisho wa Goo. The words 'rock', 'paper', scissors' are not played?
- - Fix small gfx glitch on right side of screen in homerun. On the real PCB there is nothing on the right side.
- - Fix coinage; Extra credits are added on the first coin-up so with 5C 1C, only 4 coins are required for a credit.
-   After that first credit, coinage works as expected and additional crediting requires the correct number of coins.
-   When X-Coins Y-Credits is active (where X=* and Y>1), coinage works as expected.
-   When starting the game with 1C 1C active, all games start with 1 credit.
+homerun, dynashot and ganjaja use an extra soundchip for playing voice/samples
 
+TODO:
+- Dump homerun and dynashot sample ROM
+- Improve controls/DIP switches
+- Fix sprite glitches in ganjaja Hop Step & Jump
+- Fix sample playing in ganjaja Saisho wa Goo. The words 'rock', 'paper', scissors' are not played?
+- Fix small gfx glitch on right side of screen in homerun. On the real PCB there is nothing on the right side.
 
 ------------------------------------------------------------------------------------
 
@@ -104,7 +99,6 @@ the team selection screen shows the number of credits in the game.
 This version shows the 2nd-chance number countdown on screen that is mentioned in the manual.
 777 2nd chance video reference: https://www.youtube.com/watch?v=FBCD2tXG4Jo&t=392
 This version of Homerun is not dumped.
-
 
 ------------------------------------------------------------------------------------
 */
@@ -220,26 +214,24 @@ void homerun_state::scrollx_w(u8 data)
 
 void homerun_state::banking_w(u8 data)
 {
-	u8 const old = m_gfx_ctrl;
-	if (old ^ data)
+	if (m_gfx_ctrl != data)
 	{
-		if ((old ^ data) & 3)
+		if ((m_gfx_ctrl ^ data) & 3)
 		{
 			// games do mid-screen gfx bank switching
-			int vpos = m_screen->vpos();
-			m_screen->update_partial(vpos);
+			m_screen->update_partial(m_screen->vpos());
 		}
 
 		// d0-d1: gfx bank
 		// d2-d4: ?
 		// d5-d7: prg bank
-		m_gfx_ctrl = data;
-		if ((old ^ m_gfx_ctrl) & 1)
+		if ((m_gfx_ctrl ^ data) & 1)
 			m_tilemap->mark_all_dirty();
 
-		if ((old ^ m_gfx_ctrl) >> 5 & 7)
-			m_mainbank->set_entry(m_gfx_ctrl >> 5 & 7);
+		if ((m_gfx_ctrl ^ data) >> 5 & 7)
+			m_mainbank->set_entry(data >> 5 & 7);
 
+		m_gfx_ctrl = data;
 	}
 }
 
@@ -352,8 +344,8 @@ void homerun_state::control_w(u8 data)
 	// d5: d7756 reset pin(?)
 	if (m_d7756 != nullptr)
 	{
-		m_d7756->reset_w(!BIT(data, 5));
-		m_d7756->start_w(!BIT(data, 4));
+		m_d7756->reset_w(BIT(~data, 5));
+		m_d7756->start_w(BIT(data, 4));
 	}
 	if (m_samples != nullptr)
 	{
@@ -440,7 +432,7 @@ static INPUT_PORTS_START( homerun )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_BUTTON1 )
 
 	PORT_START("IN2")
-	PORT_BIT( 0x20, IP_ACTIVE_LOW,  IPT_COIN1 )
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_COIN1 )
 	PORT_BIT( 0xdf, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
 	PORT_START("DSW")
@@ -448,20 +440,12 @@ static INPUT_PORTS_START( homerun )
 	PORT_DIPSETTING(    0x00, DEF_STR( 5C_1C ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( 2C_1C ) )
-	PORT_DIPSETTING(    0x03, DEF_STR( Free_Play ) )  // game boots with 2 permanent credits which is correct
-	PORT_DIPUNUSED_DIPLOC( 0x04, 0x04, "DIPSW:3" )  // manual shows blank so assumed to be unused
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )         PORT_DIPLOCATION("DIPSW:4")
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )         PORT_DIPLOCATION("DIPSW:5")
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )         PORT_DIPLOCATION("DIPSW:6")
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )         PORT_DIPLOCATION("DIPSW:7")
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x03, DEF_STR( Free_Play ) ) // game boots with 2 permanent credits which is correct
+	PORT_DIPUNUSED_DIPLOC( 0x04, 0x04, "DIPSW:3" ) // manual shows blank so assumed to be unused
+	PORT_DIPUNKNOWN_DIPLOC( 0x08, 0x08, "DIPSW:4" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x10, 0x10, "DIPSW:5" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x20, 0x20, "DIPSW:6" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x40, 0x40, "DIPSW:7" )
 	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Coin_B ) )          PORT_DIPLOCATION("DIPSW:8")
 	PORT_DIPSETTING(    0x80, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_2C ) )
@@ -489,7 +473,7 @@ static INPUT_PORTS_START( dynashot )
 	PORT_START("IN0")
 	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_COIN2 )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(homerun_state::sprite0_r))
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED )  // ... actually does have a D7756 on the PCB
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED ) // ... actually does have a D7756 on the PCB
 	PORT_BIT( 0x37, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
 	PORT_START("IN1")
@@ -503,7 +487,7 @@ static INPUT_PORTS_START( dynashot )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_BUTTON1 )
 
 	PORT_START("IN2")
-	PORT_BIT( 0x20, IP_ACTIVE_LOW,  IPT_COIN1 )
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_COIN1 )
 	PORT_BIT( 0xdf, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
 	PORT_START("DSW")
@@ -511,14 +495,14 @@ static INPUT_PORTS_START( dynashot )
 	PORT_DIPSETTING(    0x00, DEF_STR( 5C_1C ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( 2C_1C ) )
-	PORT_DIPSETTING(    0x03, DEF_STR( 1C_1C ) )  // game boots with 1 credit inserted - wrong
+	PORT_DIPSETTING(    0x03, DEF_STR( 1C_1C ) )
 	PORT_DIPUNKNOWN_DIPLOC( 0x04, 0x04, "DIPSW:3" )
 	PORT_DIPUNKNOWN_DIPLOC( 0x08, 0x08, "DIPSW:4" )
 	PORT_DIPUNKNOWN_DIPLOC( 0x10, 0x10, "DIPSW:5" )
 	PORT_DIPUNKNOWN_DIPLOC( 0x20, 0x20, "DIPSW:6" )
 	PORT_DIPNAME( 0xc0, 0xc0, DEF_STR( Coin_B ) )          PORT_DIPLOCATION("DIPSW:7,8")
 	PORT_DIPSETTING(    0x80, DEF_STR( 2C_1C ) )
-	PORT_DIPSETTING(    0xc0, DEF_STR( 1C_1C ) )  // game boots with 1 credit inserted - wrong
+	PORT_DIPSETTING(    0xc0, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( 1C_3C ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_5C ) )
 INPUT_PORTS_END
@@ -541,16 +525,14 @@ static INPUT_PORTS_START( ganjaja )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
 	PORT_START("IN2")
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNKNOWN ) // bit masked with IN0 IPT_COIN1, maybe coin lockout?
-	PORT_BIT( 0x20, IP_ACTIVE_LOW,  IPT_COIN1 )
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNKNOWN ) // also coin 2?
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_COIN1 )
 	PORT_BIT( 0xcf, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
 	PORT_START("DSW")
-	// Starts game with coin in if 1C_1C
-	// With 2C_1C only 1 coin is needed to start the game because 1 extra credit is incorrectly given
-	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Coin_A ) )       PORT_DIPLOCATION("DIPSW:1")
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Coin_A ) )       PORT_DIPLOCATION("DIPSW:1")
 	PORT_DIPSETTING(    0x00, DEF_STR( 2C_1C ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( 1C_1C ) ) // game boots with 1 credit inserted - wrong
+	PORT_DIPSETTING(    0x01, DEF_STR( 1C_1C ) )
 	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Coin_B ) )       PORT_DIPLOCATION("DIPSW:2")
 	PORT_DIPSETTING(    0x00, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( 1C_1C ) )
@@ -558,7 +540,9 @@ static INPUT_PORTS_START( ganjaja )
 	PORT_DIPUNKNOWN_DIPLOC( 0x08, 0x08, "DIPSW:4" )
 	PORT_DIPUNKNOWN_DIPLOC( 0x10, 0x10, "DIPSW:5" )
 	PORT_DIPUNKNOWN_DIPLOC( 0x20, 0x20, "DIPSW:6" ) // chance to win?
-	PORT_DIPUNKNOWN_DIPLOC( 0x40, 0x40, "DIPSW:7" ) // "
+	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Demo_Sounds ) )  PORT_DIPLOCATION("DIPSW:7")
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x80, 0x80, "Game" )                  PORT_DIPLOCATION("DIPSW:8")
 	PORT_DIPSETTING(    0x80, "Saisho wa Goo" )
 	PORT_DIPSETTING(    0x00, "Hop Step & Jump" )
