@@ -729,7 +729,6 @@ void pc9801vm_state::egc_blit_w(uint32_t offset, uint16_t data, uint16_t mem_mas
 	{
 		if(BIT(m_egc.regs[2], 10))
 		{
-			m_egc.leftover[0] = 0;
 			egc_shift(0, data);
 			// leftover[0] is inited above, set others to same
 			m_egc.leftover[1] = m_egc.leftover[2] = m_egc.leftover[3] = m_egc.leftover[0];
@@ -742,8 +741,6 @@ void pc9801vm_state::egc_blit_w(uint32_t offset, uint16_t data, uint16_t mem_mas
 	if(m_egc.first)
 	{
 		mask &= dir ? ~((1 << dst_off) - 1) : ((1 << (16 - dst_off)) - 1);
-		if(BIT(m_egc.regs[2], 10) && !m_egc.init)
-			m_egc.leftover[0] = m_egc.leftover[1] = m_egc.leftover[2] = m_egc.leftover[3] = 0;
 		m_egc.init = true;
 	}
 
@@ -762,6 +759,15 @@ void pc9801vm_state::egc_blit_w(uint32_t offset, uint16_t data, uint16_t mem_mas
 		mask &= end_mask;
 	}
 
+	// load all the plane pattern regs
+	if((m_egc.regs[2] & 0x300) == 0x200)
+	{
+		m_egc.pat[0] = m_video_ram[1][offset + 0x4000];
+		m_egc.pat[1] = m_video_ram[1][offset + (0x4000 * 2)];
+		m_egc.pat[2] = m_video_ram[1][offset + (0x4000 * 3)];
+		m_egc.pat[3] = m_video_ram[1][offset];
+	}
+
 	for(int i = 0; i < 4; i++)
 	{
 		if(!BIT(m_egc.regs[0], i))
@@ -769,9 +775,6 @@ void pc9801vm_state::egc_blit_w(uint32_t offset, uint16_t data, uint16_t mem_mas
 			uint16_t src = m_egc.src[i], pat = egc_color_pat(i);
 			if(BIT(m_egc.regs[2], 10))
 				src = egc_shift(i, data);
-
-			if((m_egc.regs[2] & 0x300) == 0x200)
-				pat = m_video_ram[1][offset + (((i + 1) & 3) * 0x4000)];
 
 			switch((m_egc.regs[2] >> 11) & 3)
 			{
