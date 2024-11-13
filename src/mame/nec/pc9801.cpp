@@ -1117,7 +1117,6 @@ void pc9801vm_state::pc9801ux_io(address_map &map)
 	map(0x0439, 0x0439).rw(FUNC(pc9801vm_state::dma_access_ctrl_r), FUNC(pc9801vm_state::dma_access_ctrl_w));
 	map(0x043c, 0x043f).w(FUNC(pc9801vm_state::pc9801rs_bank_w)); //ROM/RAM bank
 	map(0x04a0, 0x04af).w(FUNC(pc9801vm_state::egc_w));
-	map(0x04ae, 0x04af).lr16(NAME([this]() { return m_egc.first; }));
 	map(0x3fd8, 0x3fdf).rw(m_pit, FUNC(pit8253_device::read), FUNC(pit8253_device::write)).umask16(0xff00);
 }
 
