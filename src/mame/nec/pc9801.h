@@ -496,7 +496,8 @@ private:
 		int16_t count = 0;
 		uint16_t leftover[4]{};
 		bool first = false;
-		bool init = false;
+		bool start = false;
+		bool loaded = false;
 	} m_egc;
 
 protected:

@@ -865,7 +865,8 @@ void pc9801vm_state::egc_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 			m_egc.leftover[0] = m_egc.leftover[1] = m_egc.leftover[2] = m_egc.leftover[3] = 0;
 			m_egc.count = (m_egc.regs[7] & 0xfff) + 1;
 			m_egc.first = true;
-			m_egc.init = false;
+			m_egc.start = false;
+			m_egc.loaded = false;
 			break;
 	}
 }
@@ -1116,6 +1117,7 @@ void pc9801vm_state::pc9801ux_io(address_map &map)
 	map(0x0439, 0x0439).rw(FUNC(pc9801vm_state::dma_access_ctrl_r), FUNC(pc9801vm_state::dma_access_ctrl_w));
 	map(0x043c, 0x043f).w(FUNC(pc9801vm_state::pc9801rs_bank_w)); //ROM/RAM bank
 	map(0x04a0, 0x04af).w(FUNC(pc9801vm_state::egc_w));
+	map(0x04ae, 0x04af).lr16(NAME([this]() { return m_egc.first; }));
 	map(0x3fd8, 0x3fdf).rw(m_pit, FUNC(pit8253_device::read), FUNC(pit8253_device::write)).umask16(0xff00);
 }
 
@@ -2027,7 +2029,7 @@ MACHINE_START_MEMBER(pc9801vm_state,pc9801rs)
 	save_item(NAME(m_egc.count));
 	save_item(NAME(m_egc.leftover));
 	save_item(NAME(m_egc.first));
-	save_item(NAME(m_egc.init));
+	save_item(NAME(m_egc.start));
 
 	save_item(NAME(m_grcg.mode));
 	save_item(NAME(m_vram_bank));
