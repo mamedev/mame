@@ -1440,13 +1440,13 @@ void yamato_state::yamato(machine_config &config)
 	root(config);
 
 	// basic machine hardware
-	sega_315_5018_device &maincpu(SEGA_315_5018(config.replace(), m_maincpu, 18.432_MHz_XTAL/3/2)); // 3.072 MHz
+	sega_315_5018_device &maincpu(SEGA_315_5018(config.replace(), m_maincpu, 12_MHz_XTAL/4)); // 3 MHz
 	maincpu.set_addrmap(AS_PROGRAM, &yamato_state::yamato_map);
 	maincpu.set_addrmap(AS_IO, &yamato_state::yamato_portmap);
 	maincpu.set_addrmap(AS_OPCODES, &yamato_state::yamato_decrypted_opcodes_map);
 	maincpu.set_decrypted_tag(":decrypted_opcodes");
 
-	Z80(config, m_audiocpu, 18.432_MHz_XTAL/3/2); // 3.072 MHz?
+	Z80(config, m_audiocpu, 12_MHz_XTAL/8); // 1.5 MHz
 	m_audiocpu->set_addrmap(AS_PROGRAM, &yamato_state::yamato_audio_map);
 	m_audiocpu->set_addrmap(AS_IO, &yamato_state::yamato_audio_portmap);
 
@@ -1459,8 +1459,8 @@ void yamato_state::yamato(machine_config &config)
 	// audio hardware
 	SPEAKER(config, "speaker").front_center();
 
-	AY8910(config, "ay1", 18.432_MHz_XTAL/12).add_route(ALL_OUTPUTS, "speaker", 0.25); // 1.536 MHz
-	AY8910(config, "ay2", 18.432_MHz_XTAL/12).add_route(ALL_OUTPUTS, "speaker", 0.25); // 1.536 MHz
+	AY8910(config, "ay1", 12_MHz_XTAL/8).add_route(ALL_OUTPUTS, "speaker", 0.25); // 1.5 MHz
+	AY8910(config, "ay2", 12_MHz_XTAL/8).add_route(ALL_OUTPUTS, "speaker", 0.25); // 1.5 MHz
 }
 
 
@@ -1468,7 +1468,8 @@ void toprollr_state::toprollr(machine_config &config)
 {
 	cclimber(config);
 
-	sega_315_5018_device &maincpu(SEGA_315_5018(config.replace(), m_maincpu, 18.432_MHz_XTAL/3/2)); // 3.072 MHz
+	// basic machine hardware
+	sega_315_5018_device &maincpu(SEGA_315_5018(config.replace(), m_maincpu, 12_MHz_XTAL/4)); // 3 MHz
 	maincpu.set_addrmap(AS_PROGRAM, &toprollr_state::toprollr_map);
 	maincpu.set_addrmap(AS_IO, &toprollr_state::cclimber_portmap);
 	maincpu.set_addrmap(AS_OPCODES, &toprollr_state::toprollr_decrypted_opcodes_map);
@@ -1486,6 +1487,8 @@ void toprollr_state::toprollr(machine_config &config)
 
 	subdevice<screen_device>("screen")->set_screen_update(FUNC(toprollr_state::screen_update_toprollr));
 
+	// audio hardware
+	subdevice<cclimber_audio_device>("cclimber_audio")->set_clock(12_MHz_XTAL/8);
 	subdevice<cclimber_audio_device>("cclimber_audio")->set_sample_clockdiv(4);
 }
 
