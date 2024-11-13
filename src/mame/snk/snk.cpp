@@ -700,10 +700,8 @@ void snk_state::machine_start()
 
 uint8_t snk_state::snk_cpuA_nmi_trigger_r()
 {
-	if(!machine().side_effects_disabled())
-	{
+	if (!machine().side_effects_disabled())
 		m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
-	}
 	return 0xff;
 }
 
@@ -714,10 +712,8 @@ void snk_state::snk_cpuA_nmi_ack_w(uint8_t data)
 
 uint8_t snk_state::snk_cpuB_nmi_trigger_r()
 {
-	if(!machine().side_effects_disabled())
-	{
+	if (!machine().side_effects_disabled())
 		m_subcpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
-	}
 	return 0xff;
 }
 
@@ -743,7 +739,8 @@ enum
 
 uint8_t snk_state::marvins_sound_nmi_ack_r()
 {
-	m_audiocpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
+	if (!machine().side_effects_disabled())
+		m_audiocpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 	return 0xff;
 }
 
@@ -778,19 +775,22 @@ void snk_state::sgladiat_soundlatch_w(uint8_t data)
 
 uint8_t snk_state::sgladiat_soundlatch_r()
 {
-	machine().scheduler().synchronize(timer_expired_delegate(FUNC(snk_state::sgladiat_sndirq_update_callback),this), BUSY_CLEAR);
+	if (!machine().side_effects_disabled())
+		machine().scheduler().synchronize(timer_expired_delegate(FUNC(snk_state::sgladiat_sndirq_update_callback),this), BUSY_CLEAR);
 	return m_soundlatch->read();
 }
 
 uint8_t snk_state::sgladiat_sound_nmi_ack_r()
 {
-	machine().scheduler().synchronize(timer_expired_delegate(FUNC(snk_state::sgladiat_sndirq_update_callback),this), CMDIRQ_CLEAR);
+	if (!machine().side_effects_disabled())
+		machine().scheduler().synchronize(timer_expired_delegate(FUNC(snk_state::sgladiat_sndirq_update_callback),this), CMDIRQ_CLEAR);
 	return 0xff;
 }
 
 uint8_t snk_state::sgladiat_sound_irq_ack_r()
 {
-	m_audiocpu->set_input_line(0, CLEAR_LINE);
+	if (!machine().side_effects_disabled())
+		m_audiocpu->set_input_line(0, CLEAR_LINE);
 	return 0xff;
 }
 
@@ -903,20 +903,23 @@ void snk_state::snk_sound_status_w(uint8_t data)
 
 uint8_t snk_state::tnk3_cmdirq_ack_r()
 {
-	machine().scheduler().synchronize(timer_expired_delegate(FUNC(snk_state::sndirq_update_callback),this), CMDIRQ_CLEAR);
+	if (!machine().side_effects_disabled())
+		machine().scheduler().synchronize(timer_expired_delegate(FUNC(snk_state::sndirq_update_callback),this), CMDIRQ_CLEAR);
 	return 0xff;
 }
 
 uint8_t snk_state::tnk3_ymirq_ack_r()
 {
-	machine().scheduler().synchronize(timer_expired_delegate(FUNC(snk_state::sndirq_update_callback),this), YM1IRQ_CLEAR);
+	if (!machine().side_effects_disabled())
+		machine().scheduler().synchronize(timer_expired_delegate(FUNC(snk_state::sndirq_update_callback),this), YM1IRQ_CLEAR);
 	return 0xff;
 }
 
 uint8_t snk_state::tnk3_busy_clear_r()
 {
 	// it's uncertain whether the latch should be cleared here or when it's read
-	m_soundlatch->clear_w();
+	if (!machine().side_effects_disabled())
+		m_soundlatch->clear_w();
 	machine().scheduler().synchronize(timer_expired_delegate(FUNC(snk_state::sndirq_update_callback),this), BUSY_CLEAR);
 	return 0xff;
 }
@@ -938,7 +941,6 @@ In particular, the hf_size handling might be wrong.
 A trojan could be used on the board to verify the exact behaviour.
 
 *****************************************************************************/
-
 
 void snk_state::hardflags_scrollx_w(uint8_t data)
 {
@@ -986,12 +988,12 @@ int snk_state::hardflags_check8(int num)
 		(hardflags_check(num + 7) << 7);
 }
 
-uint8_t snk_state::hardflags1_r(){ return hardflags_check8(0*8); }
-uint8_t snk_state::hardflags2_r(){ return hardflags_check8(1*8); }
-uint8_t snk_state::hardflags3_r(){ return hardflags_check8(2*8); }
-uint8_t snk_state::hardflags4_r(){ return hardflags_check8(3*8); }
-uint8_t snk_state::hardflags5_r(){ return hardflags_check8(4*8); }
-uint8_t snk_state::hardflags6_r(){ return hardflags_check8(5*8); }
+uint8_t snk_state::hardflags1_r() { return hardflags_check8(0*8); }
+uint8_t snk_state::hardflags2_r() { return hardflags_check8(1*8); }
+uint8_t snk_state::hardflags3_r() { return hardflags_check8(2*8); }
+uint8_t snk_state::hardflags4_r() { return hardflags_check8(3*8); }
+uint8_t snk_state::hardflags5_r() { return hardflags_check8(4*8); }
+uint8_t snk_state::hardflags6_r() { return hardflags_check8(5*8); }
 uint8_t snk_state::hardflags7_r()
 {
 	// apparently the startup tests use bits 0&1 while the game uses bits 4&5
@@ -1018,7 +1020,6 @@ passes the startup checks. There is not enough evidence to infer more.
 A trojan could be used on the board to verify the exact behaviour.
 
 *****************************************************************************/
-
 
 void snk_state::turbocheck16_1_w(uint8_t data)
 {
@@ -1078,18 +1079,18 @@ int snk_state::turbofront_check8(int small, int num)
 		(turbofront_check(small, num + 7) << 7);
 }
 
-uint8_t snk_state::turbocheck16_1_r(){ return turbofront_check8(1, 0*8); }
-uint8_t snk_state::turbocheck16_2_r(){ return turbofront_check8(1, 1*8); }
-uint8_t snk_state::turbocheck16_3_r(){ return turbofront_check8(1, 2*8); }
-uint8_t snk_state::turbocheck16_4_r(){ return turbofront_check8(1, 3*8); }
-uint8_t snk_state::turbocheck16_5_r(){ return turbofront_check8(1, 4*8); }
-uint8_t snk_state::turbocheck16_6_r(){ return turbofront_check8(1, 5*8); }
-uint8_t snk_state::turbocheck16_7_r(){ return turbofront_check8(1, 6*8); }
-uint8_t snk_state::turbocheck16_8_r(){ return turbofront_check8(1, 7*8); }
-uint8_t snk_state::turbocheck32_1_r(){ return turbofront_check8(0, 0*8); }
-uint8_t snk_state::turbocheck32_2_r(){ return turbofront_check8(0, 1*8); }
-uint8_t snk_state::turbocheck32_3_r(){ return turbofront_check8(0, 2*8); }
-uint8_t snk_state::turbocheck32_4_r(){ return turbofront_check8(0, 3*8); }
+uint8_t snk_state::turbocheck16_1_r() { return turbofront_check8(1, 0*8); }
+uint8_t snk_state::turbocheck16_2_r() { return turbofront_check8(1, 1*8); }
+uint8_t snk_state::turbocheck16_3_r() { return turbofront_check8(1, 2*8); }
+uint8_t snk_state::turbocheck16_4_r() { return turbofront_check8(1, 3*8); }
+uint8_t snk_state::turbocheck16_5_r() { return turbofront_check8(1, 4*8); }
+uint8_t snk_state::turbocheck16_6_r() { return turbofront_check8(1, 5*8); }
+uint8_t snk_state::turbocheck16_7_r() { return turbofront_check8(1, 6*8); }
+uint8_t snk_state::turbocheck16_8_r() { return turbofront_check8(1, 7*8); }
+uint8_t snk_state::turbocheck32_1_r() { return turbofront_check8(0, 0*8); }
+uint8_t snk_state::turbocheck32_2_r() { return turbofront_check8(0, 1*8); }
+uint8_t snk_state::turbocheck32_3_r() { return turbofront_check8(0, 2*8); }
+uint8_t snk_state::turbocheck32_4_r() { return turbofront_check8(0, 3*8); }
 
 
 
@@ -4033,18 +4034,18 @@ GFXDECODE_END
 void snk_state::marvins(machine_config &config)
 {
 	/* basic machine hardware */
-	Z80(config, m_maincpu, 3360000);   /* 3.36 MHz */
+	Z80(config, m_maincpu, 3360000); // 3.36 MHz
 	m_maincpu->set_addrmap(AS_PROGRAM, &snk_state::marvins_cpuA_map);
 	m_maincpu->set_vblank_int("screen", FUNC(snk_state::irq0_line_hold));
 
-	Z80(config, m_subcpu, 3360000);    /* 3.36 MHz */
+	Z80(config, m_subcpu, 3360000); // 3.36 MHz
 	m_subcpu->set_addrmap(AS_PROGRAM, &snk_state::marvins_cpuB_map);
 	m_subcpu->set_vblank_int("screen", FUNC(snk_state::irq0_line_hold));
 
-	Z80(config, m_audiocpu, 4000000);  /* verified on schematics */
+	Z80(config, m_audiocpu, 8_MHz_XTAL/2); // verified on schematics
 	m_audiocpu->set_addrmap(AS_PROGRAM, &snk_state::marvins_sound_map);
 	m_audiocpu->set_addrmap(AS_IO, &snk_state::marvins_sound_portmap);
-	m_audiocpu->set_periodic_int(FUNC(snk_state::nmi_line_assert), attotime::from_hz(244));  // schematics show a separate 244Hz timer
+	m_audiocpu->set_periodic_int(FUNC(snk_state::nmi_line_assert), attotime::from_ticks(0x4000, 8_MHz_XTAL/2)); // 244Hz
 
 	config.set_maximum_quantum(attotime::from_hz(6000));
 
@@ -4067,11 +4068,11 @@ void snk_state::marvins(machine_config &config)
 	SPEAKER(config, "mono").front_center();
 
 	GENERIC_LATCH_8(config, m_soundlatch);
-	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, 0, HOLD_LINE);
+	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, 0, HOLD_LINE); // auto ack
 
-	AY8910(config, "ay1", 2000000).add_route(ALL_OUTPUTS, "mono", 0.35);  /* verified on schematics */
-	AY8910(config, "ay2", 2000000).add_route(ALL_OUTPUTS, "mono", 0.35);/* verified on schematics */
-	SNKWAVE(config, "wave", 8000000).add_route(ALL_OUTPUTS, "mono", 0.30);   /* verified on schematics */
+	AY8910(config, "ay1", 8_MHz_XTAL/4).add_route(ALL_OUTPUTS, "mono", 0.35); // verified on schematics
+	AY8910(config, "ay2", 8_MHz_XTAL/4).add_route(ALL_OUTPUTS, "mono", 0.35); // verified on schematics
+	SNKWAVE(config, "wave", 8_MHz_XTAL).add_route(ALL_OUTPUTS, "mono", 0.30); // verified on schematics
 }
 
 void snk_state::vangrd2(machine_config &config)
@@ -4168,15 +4169,15 @@ void snk_state::hal21(machine_config &config)
 void snk_state::tnk3(machine_config &config)
 {
 	/* basic machine hardware */
-	Z80(config, m_maincpu, XTAL(13'400'000)/4); /* verified on pcb */
+	Z80(config, m_maincpu, 13.4_MHz_XTAL/4); /* verified on pcb */
 	m_maincpu->set_addrmap(AS_PROGRAM, &snk_state::tnk3_cpuA_map);
 	m_maincpu->set_vblank_int("screen", FUNC(snk_state::irq0_line_hold));
 
-	Z80(config, m_subcpu, XTAL(13'400'000)/4); /* verified on pcb */
+	Z80(config, m_subcpu, 13.4_MHz_XTAL/4); /* verified on pcb */
 	m_subcpu->set_addrmap(AS_PROGRAM, &snk_state::tnk3_cpuB_map);
 	m_subcpu->set_vblank_int("screen", FUNC(snk_state::irq0_line_hold));
 
-	Z80(config, m_audiocpu, XTAL(8'000'000)/2); /* verified on pcb */
+	Z80(config, m_audiocpu, 8_MHz_XTAL/2); /* verified on pcb */
 	m_audiocpu->set_addrmap(AS_PROGRAM, &snk_state::tnk3_YM3526_sound_map);
 
 	config.set_maximum_quantum(attotime::from_hz(6000));
@@ -4201,7 +4202,7 @@ void snk_state::tnk3(machine_config &config)
 
 	GENERIC_LATCH_8(config, m_soundlatch);
 
-	ym3526_device &ym1(YM3526(config, "ym1", XTAL(8'000'000)/2)); /* verified on pcb */
+	ym3526_device &ym1(YM3526(config, "ym1", 8_MHz_XTAL/2)); /* verified on pcb */
 	ym1.irq_handler().set(FUNC(snk_state::ymirq_callback_1));
 	ym1.add_route(ALL_OUTPUTS, "mono", 2.0);
 }
@@ -4227,7 +4228,7 @@ void snk_state::athena(machine_config &config)
 	m_audiocpu->set_addrmap(AS_PROGRAM, &snk_state::YM3526_YM3526_sound_map);
 
 	/* sound hardware */
-	ym3526_device &ym2(YM3526(config, "ym2", XTAL(8'000'000)/2)); /* verified on pcb */
+	ym3526_device &ym2(YM3526(config, "ym2", 8_MHz_XTAL/2)); /* verified on pcb */
 	ym2.irq_handler().set(FUNC(snk_state::ymirq_callback_2));
 	ym2.add_route(ALL_OUTPUTS, "mono", 2.0);
 }
@@ -4241,7 +4242,7 @@ void snk_state::fitegolf(machine_config &config)
 	m_audiocpu->set_addrmap(AS_PROGRAM, &snk_state::YM3812_sound_map);
 
 	/* sound hardware */
-	ym3812_device &ym1(YM3812(config.replace(), "ym1", XTAL(4'000'000))); /* verified on pcb */
+	ym3812_device &ym1(YM3812(config.replace(), "ym1", 4_MHz_XTAL)); /* verified on pcb */
 	ym1.irq_handler().set(FUNC(snk_state::ymirq_callback_1));
 	ym1.add_route(ALL_OUTPUTS, "mono", 2.0);
 }
@@ -4261,15 +4262,15 @@ void snk_state::countryc(machine_config &config)
 void snk_state::ikari(machine_config &config)
 {
 	/* basic machine hardware */
-	Z80(config, m_maincpu, XTAL(13'400'000)/4); /* verified on pcb */
+	Z80(config, m_maincpu, 13.4_MHz_XTAL/4); /* verified on pcb */
 	m_maincpu->set_addrmap(AS_PROGRAM, &snk_state::ikari_cpuA_map);
 	m_maincpu->set_vblank_int("screen", FUNC(snk_state::irq0_line_hold));
 
-	Z80(config, m_subcpu, XTAL(13'400'000)/4); /* verified on pcb */
+	Z80(config, m_subcpu, 13.4_MHz_XTAL/4); /* verified on pcb */
 	m_subcpu->set_addrmap(AS_PROGRAM, &snk_state::ikari_cpuB_map);
 	m_subcpu->set_vblank_int("screen", FUNC(snk_state::irq0_line_hold));
 
-	Z80(config, m_audiocpu, XTAL(8'000'000)/2); /* verified on pcb */
+	Z80(config, m_audiocpu, 8_MHz_XTAL/2); /* verified on pcb */
 	m_audiocpu->set_addrmap(AS_PROGRAM, &snk_state::YM3526_YM3526_sound_map);
 
 	config.set_maximum_quantum(attotime::from_hz(6000));
@@ -4293,11 +4294,11 @@ void snk_state::ikari(machine_config &config)
 
 	GENERIC_LATCH_8(config, m_soundlatch);
 
-	ym3526_device &ym1(YM3526(config, "ym1", XTAL(8'000'000)/2)); /* verified on pcb */
+	ym3526_device &ym1(YM3526(config, "ym1", 8_MHz_XTAL/2)); /* verified on pcb */
 	ym1.irq_handler().set(FUNC(snk_state::ymirq_callback_1));
 	ym1.add_route(ALL_OUTPUTS, "mono", 2.0);
 
-	ym3526_device &ym2(YM3526(config, "ym2", XTAL(8'000'000)/2)); /* verified on pcb */
+	ym3526_device &ym2(YM3526(config, "ym2", 8_MHz_XTAL/2)); /* verified on pcb */
 	ym2.irq_handler().set(FUNC(snk_state::ymirq_callback_2));
 	ym2.add_route(ALL_OUTPUTS, "mono", 2.0);
 }
@@ -4310,7 +4311,7 @@ void snk_state::victroad(machine_config &config)
 	m_audiocpu->set_addrmap(AS_PROGRAM, &snk_state::YM3526_Y8950_sound_map);
 
 	/* sound hardware */
-	y8950_device &ym2(Y8950(config.replace(), "ym2", XTAL(8'000'000)/2)); /* verified on pcb */
+	y8950_device &ym2(Y8950(config.replace(), "ym2", 8_MHz_XTAL/2)); /* verified on pcb */
 	ym2.irq_handler().set(FUNC(snk_state::ymirq_callback_2));
 	ym2.add_route(ALL_OUTPUTS, "mono", 2.0);
 }
@@ -4318,15 +4319,15 @@ void snk_state::victroad(machine_config &config)
 void snk_state::bermudat(machine_config &config)
 {
 	/* basic machine hardware */
-	Z80(config, m_maincpu, XTAL(8'000'000)/2); /* verified on pcb */
+	Z80(config, m_maincpu, 8_MHz_XTAL/2); /* verified on pcb */
 	m_maincpu->set_addrmap(AS_PROGRAM, &snk_state::bermudat_cpuA_map);
 	m_maincpu->set_vblank_int("screen", FUNC(snk_state::irq0_line_hold));
 
-	Z80(config, m_subcpu, XTAL(8'000'000)/2); /* verified on pcb */
+	Z80(config, m_subcpu, 8_MHz_XTAL/2); /* verified on pcb */
 	m_subcpu->set_addrmap(AS_PROGRAM, &snk_state::bermudat_cpuB_map);
 	m_subcpu->set_vblank_int("screen", FUNC(snk_state::irq0_line_hold));
 
-	Z80(config, m_audiocpu, XTAL(8'000'000)/2); /* verified on pcb */
+	Z80(config, m_audiocpu, 8_MHz_XTAL/2); /* verified on pcb */
 	m_audiocpu->set_addrmap(AS_PROGRAM, &snk_state::YM3526_Y8950_sound_map);
 
 	config.set_maximum_quantum(attotime::from_hz(24000));
@@ -4350,11 +4351,11 @@ void snk_state::bermudat(machine_config &config)
 
 	GENERIC_LATCH_8(config, m_soundlatch);
 
-	ym3526_device &ym1(YM3526(config, "ym1", XTAL(8'000'000)/2)); /* verified on pcb */
+	ym3526_device &ym1(YM3526(config, "ym1", 8_MHz_XTAL/2)); /* verified on pcb */
 	ym1.irq_handler().set(FUNC(snk_state::ymirq_callback_1));
 	ym1.add_route(ALL_OUTPUTS, "mono", 2.0);
 
-	y8950_device &ym2(Y8950(config, "ym2", XTAL(8'000'000)/2)); /* verified on pcb */
+	y8950_device &ym2(Y8950(config, "ym2", 8_MHz_XTAL/2)); /* verified on pcb */
 	ym2.irq_handler().set(FUNC(snk_state::ymirq_callback_2));
 	ym2.add_route(ALL_OUTPUTS, "mono", 2.0);
 }

@@ -260,6 +260,30 @@ void cclimber_state::machine_start()
 	save_item(NAME(m_nmi_mask));
 }
 
+
+void cclimber_state::nmi_mask_w(int state)
+{
+	m_nmi_mask = state;
+}
+
+void cclimber_state::vblank_irq(int state)
+{
+	if (state && m_nmi_mask)
+		m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
+}
+
+void cclimber_state::bagmanf_vblank_irq(int state)
+{
+	if (state && m_nmi_mask)
+		m_maincpu->set_input_line(0, HOLD_LINE);
+}
+
+void cclimber_state::tangramq_sound_nmi_clear_w(uint8_t data)
+{
+	m_audiocpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
+}
+
+
 void swimmer_state::swimmer_sh_soundlatch_w(uint8_t data)
 {
 	m_soundlatch->write(data);
@@ -309,19 +333,6 @@ void toprollr_state::toprollr_rombank_w(int state)
 		m_bank1->set_entry(m_rombank);
 		m_bank1d->set_entry(m_rombank);
 	}
-}
-
-
-void cclimber_state::nmi_mask_w(int state)
-{
-	m_nmi_mask = state;
-}
-
-
-uint8_t cclimber_state::bagmanf_a000_r()
-{
-	// Should this actually use the same PAL16R6 as the parent set?
-	return 0x3f;
 }
 
 
@@ -493,7 +504,7 @@ void cclimber_state::bagmanf_map(address_map &map)
 	map(0x9800, 0x9800).portr("SYSTEM");
 	map(0x98dc, 0x98df).ram().share("bigspritectrl"); // wrong
 	map(0x9c00, 0x9fff).ram(); // not used, but initialized
-	map(0xa000, 0xa000).r(FUNC(cclimber_state::bagmanf_a000_r));
+	map(0xa000, 0xa000).lr8(NAME([]() { return 0x3f; })); // should this actually use the same PAL16R6 as the parent set?
 	map(0xa000, 0xa007).w(m_mainlatch, FUNC(ls259_device::write_d0));
 	map(0xa800, 0xa800).nopr().w("cclimber_audio", FUNC(cclimber_audio_device::sample_rate_w));
 	map(0xb000, 0xb000).portr("DSW").w("cclimber_audio", FUNC(cclimber_audio_device::sample_volume_w));
@@ -589,7 +600,7 @@ void cclimber_state::tangramq_sound_map(address_map &map)
 	map(0x8000, 0x8001).w("ay1", FUNC(ay8910_device::address_data_w));
 	map(0x8002, 0x8007).w("wave", FUNC(snkwave_device::snkwave_w));
 	map(0x8008, 0x8009).w("ay2", FUNC(ay8910_device::address_data_w));
-	map(0xa000, 0xa000).nopw(); // TODO: NMI related?
+	map(0xa000, 0xa000).w(FUNC(cclimber_state::tangramq_sound_nmi_clear_w));
 	map(0xe000, 0xe3ff).ram();
 }
 
@@ -840,8 +851,8 @@ static INPUT_PORTS_START( tangramq )
 	PORT_START("P1")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON1 )
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT )
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_2WAY
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_2WAY
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNKNOWN )
@@ -850,8 +861,8 @@ static INPUT_PORTS_START( tangramq )
 	PORT_START("P2")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_COCKTAIL
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_COCKTAIL
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_COCKTAIL
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_2WAY PORT_COCKTAIL
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_2WAY PORT_COCKTAIL
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNKNOWN )
@@ -919,14 +930,8 @@ static INPUT_PORTS_START( tangramq )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("SYSTEM2")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0xf7, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( swimmer )
@@ -1316,17 +1321,6 @@ static GFXDECODE_START( gfx_au )
 	GFXDECODE_ENTRY( "bigsprite", 0x0000, swimmer_charlayout,  0,  8 ) // big sprites
 GFXDECODE_END
 
-void cclimber_state::vblank_irq(int state)
-{
-	if (state && m_nmi_mask)
-		m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
-}
-
-void cclimber_state::bagmanf_vblank_irq(int state)
-{
-	if (state && m_nmi_mask)
-		m_maincpu->set_input_line(0, HOLD_LINE);
-}
 
 void cclimber_state::root(machine_config &config)
 {
@@ -1389,12 +1383,12 @@ void cclimber_state::tangramq(machine_config &config)
 	Z80(config, m_audiocpu, 8_MHz_XTAL / 2);
 	m_audiocpu->set_addrmap(AS_PROGRAM, &cclimber_state::tangramq_sound_map);
 
-	m_audiocpu->set_periodic_int(FUNC(cclimber_state::nmi_line_pulse), attotime::from_ticks(0x8000, 8_MHz_XTAL));
+	m_audiocpu->set_periodic_int(FUNC(cclimber_state::nmi_line_assert), attotime::from_ticks(0x4000, 8_MHz_XTAL / 2)); // 244Hz
 
 	// sound hardware
 	SPEAKER(config, "speaker").front_center();
 
-	GENERIC_LATCH_8(config, "soundlatch").data_pending_callback().set_inputline(m_audiocpu, 0, HOLD_LINE);
+	GENERIC_LATCH_8(config, "soundlatch").data_pending_callback().set_inputline(m_audiocpu, 0, HOLD_LINE); // auto ack
 
 	AY8910(config, "ay1", 8_MHz_XTAL / 4).add_route(ALL_OUTPUTS, "speaker", 0.35);
 	AY8910(config, "ay2", 8_MHz_XTAL / 4).add_route(ALL_OUTPUTS, "speaker", 0.35);
@@ -2568,7 +2562,7 @@ ROM_START( tangramq )
 	ROM_REGION( 0x2000, "audiocpu", 0 )
 	ROM_LOAD( "s1.a6", 0x0000, 0x2000, CRC(05af38f6) SHA1(7bdbf798964aa4d603fca0178b3f8fc251d207f6) )
 
-	// BTANB?: colors look glitchy when in this order, but matches PCB reference and flyers
+	// BTANB?: bigsprite colors look glitchy when in this order, but matches PCB reference and flyers
 	ROM_REGION( 0x2000, "bigsprite", 0 )
 	ROM_LOAD( "b2.e17", 0x0000, 0x1000, CRC(77d21b84) SHA1(7f9bfbfbc7fd51a97f15fee54ac851ddfa97b213) ) // 1xxxxxxxxxxx = 0xFF
 	ROM_LOAD( "b1.e19", 0x1000, 0x1000, CRC(f3ec2562) SHA1(859473c45b9d22c138b70ea649b93d41721e1e0d) ) // 1xxxxxxxxxxx = 0xFF

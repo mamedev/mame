@@ -97,8 +97,8 @@ private:
 
 	bool m_nmi_mask = false;
 
-	uint8_t bagmanf_a000_r();
 	void bagmanf_vblank_irq(int state);
+	void tangramq_sound_nmi_clear_w(uint8_t data);
 
 	void cclimber_palette(palette_device &palette) const;
 

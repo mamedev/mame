@@ -18,15 +18,15 @@ DEFINE_DEVICE_TYPE(SNKWAVE, snkwave_device, "snkwave", "SNK Wave")
 //  snkwave_device - constructor
 //-------------------------------------------------
 
-snkwave_device::snkwave_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, SNKWAVE, tag, owner, clock),
-		device_sound_interface(mconfig, *this),
-		m_stream(nullptr),
-		m_external_clock(0),
-		m_sample_rate(0),
-		m_frequency(0),
-		m_counter(0),
-		m_waveform_position(0)
+snkwave_device::snkwave_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, SNKWAVE, tag, owner, clock),
+	device_sound_interface(mconfig, *this),
+	m_stream(nullptr),
+	m_external_clock(0),
+	m_sample_rate(0),
+	m_frequency(0),
+	m_counter(0),
+	m_waveform_position(0)
 {
 	std::fill(std::begin(m_waveform), std::end(m_waveform), 0);
 }
