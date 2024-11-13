@@ -520,6 +520,7 @@ function toolchain(_buildDir, _libDir)
 
 	configuration { "*-clang" }
 		buildoptions {
+			"-Wno-nan-infinity-disabled",
 			"-Wno-tautological-constant-compare",
 		}
 
