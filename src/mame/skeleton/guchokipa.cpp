@@ -20,7 +20,10 @@ Bank of 8 switches
 The riser board has a pair of HM4334 1K*4 static RAMs and a quad 2-input NAND gate.
 
 TODO:
-- everything
+- sound
+- colors
+- is visible area correct?
+- remaining dips
 */
 
 
@@ -81,14 +84,16 @@ private:
 
 TILE_GET_INFO_MEMBER(guchokipa_state::get_bg_tile_info)
 {
-	int const code = m_bgram[tile_index] | 0x200; // TODO: identify banking bits
+	int const code = m_bgram[tile_index];
 
 	tileinfo.set(0, code, 0, 0);
 }
 
 TILE_GET_INFO_MEMBER(guchokipa_state::get_fg_tile_info)
 {
-	int const code = m_fgram[tile_index];
+	int code = m_fgram[tile_index];
+
+	if (code == 0x00) code = 0x3ff; // why? is this another 'big sprite' thing?
 
 	tileinfo.set(1, code, 0, 0);
 }
@@ -97,7 +102,7 @@ TILE_GET_INFO_MEMBER(guchokipa_state::get_fg_tile_info)
 void guchokipa_state::video_start()
 {
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(guchokipa_state::get_bg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
-	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(guchokipa_state::get_fg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32); // wrong
+	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(guchokipa_state::get_fg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 
 	m_fg_tilemap->set_transparent_pen(0);
 }
@@ -129,7 +134,7 @@ void guchokipa_state::main_program_map(address_map &map)
 	map(0x6400, 0x67ff).ram();
 	map(0x7000, 0x73ff).ram().w(FUNC(guchokipa_state::bgram_w)).share(m_bgram);
 	map(0x7400, 0x77ff).ram().w(FUNC(guchokipa_state::fgram_w)).share(m_fgram);
-	map(0x7c00, 0x7fff).ram();
+	map(0x7c00, 0x7fff).ram(); // only seems to be initialized with 0xff at start up
 }
 
 void guchokipa_state::main_io_map(address_map &map)
@@ -138,7 +143,7 @@ void guchokipa_state::main_io_map(address_map &map)
 	map(0x00, 0x00).portr("SW");
 	map(0x01, 0x01).portr("IN0");
 	map(0x02, 0x02).portr("IN1");
-	// map(0x17, 0x17).w(); // sound latch?
+	map(0x17, 0x17).lw8(NAME([this] (uint8_t data) { if (data & 0xfe) logerror("flip w: %02x\n", data); flip_screen_set(BIT(data, 0)); }));
 	// map(0x30, 0x30).w() // lamps?
 	// .w("soundlatch", FUNC(generic_latch_8_device::write));
 }
@@ -185,10 +190,10 @@ static INPUT_PORTS_START( guchokipa )
 	PORT_DIPSETTING(    0x02, "A 2C / B 10C / C 20C" )
 	PORT_DIPSETTING(    0x01, "A 4C / B 20C / C 40C" )
 	PORT_DIPSETTING(    0x00, "A 5C / B 25C / C 50C" )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW:3")
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW:4")
+	PORT_DIPNAME( 0x04, 0x04, "Max Bet" ) PORT_DIPLOCATION("SW:3")
+	PORT_DIPSETTING(    0x04, "10" )
+	PORT_DIPSETTING(    0x00, "30" )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW:4") // some combination of the following 3 seems to affect win probability
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW:5")
@@ -197,18 +202,18 @@ static INPUT_PORTS_START( guchokipa )
 	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW:6")
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW:7") // some kind of test mode
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Service_Mode ) ) PORT_DIPLOCATION("SW:7")
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW:8")
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Flip_Screen ) ) PORT_DIPLOCATION("SW:8")
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
 
 static GFXDECODE_START( gfx_guchokipa )
-	GFXDECODE_ENTRY( "bgtiles", 0, gfx_8x8x1, 0, 16 )
-	GFXDECODE_ENTRY( "fgtiles", 0, gfx_8x8x1, 0, 16 )
+	GFXDECODE_ENTRY( "tiles", 0,     gfx_8x8x4_planar, 0, 1 )
+	GFXDECODE_ENTRY( "tiles", 0x800, gfx_8x8x4_planar, 0, 1 )
 GFXDECODE_END
 
 
@@ -232,7 +237,7 @@ void guchokipa_state::guchokipa(machine_config &config)
 	screen.set_palette("palette");
 
 	GFXDECODE(config, m_gfxdecode, "palette", gfx_guchokipa);
-	PALETTE(config, "palette").set_entries(0x100); // TODO
+	PALETTE(config, "palette").set_entries(0x10); // TODO
 
 	SPEAKER(config, "mono").front_center();
 
@@ -252,17 +257,15 @@ ROM_START( guchokip )
 	ROM_REGION( 0x800, "audiocpu", 0 )
 	ROM_LOAD( "4209.bg11", 0x000, 0x800, CRC(44b2b7d1) SHA1(672931ff572ac6361b493dc9a49f6146bdc26b78) )
 
-	ROM_REGION( 0x4000, "bgtiles", 0 )
+	ROM_REGION( 0x8000, "tiles", 0 )
 	ROM_LOAD( "4201.b1", 0x0000, 0x1000, CRC(838726ab) SHA1(5bcfb3c6badc8f7b7bea17a228137e4bff39a0e5) )
-	ROM_LOAD( "4202.g1", 0x1000, 0x1000, CRC(a45d5258) SHA1(9080c51b2dc5d6bc4d01cc29deed0e2a5ea78dbd) )
-	ROM_LOAD( "4203.r1", 0x2000, 0x1000, CRC(8769aad5) SHA1(71f3d22e8e0006ba89329ac4a48f09e11ab67875) )
-	ROM_LOAD( "4204.t1", 0x3000, 0x1000, CRC(da77a765) SHA1(e8626548909b5e735cdb603964324482848ce476) )
-
-	ROM_REGION( 0x4000, "fgtiles", 0 )
-	ROM_LOAD( "4205.b2", 0x0000, 0x1000, CRC(58efc253) SHA1(b3344df68c665da996f3332f43030a664931db80) )
-	ROM_LOAD( "4206.g2", 0x1000, 0x1000, CRC(e18d50f7) SHA1(c922a019c13c904701abe5a9e42be955d80a7ecb) )
-	ROM_LOAD( "4207.r2", 0x2000, 0x1000, CRC(9b78e95e) SHA1(2f3fdcc3bb92b2eb3a967de39ffe4eee74cac8e0) )
-	ROM_LOAD( "4208.t2", 0x3000, 0x1000, CRC(be97d733) SHA1(ff3b199c8d1203d9d6c0060f217bbd7de32a8152) )
+	ROM_LOAD( "4205.b2", 0x1000, 0x1000, CRC(58efc253) SHA1(b3344df68c665da996f3332f43030a664931db80) )
+	ROM_LOAD( "4202.g1", 0x2000, 0x1000, CRC(a45d5258) SHA1(9080c51b2dc5d6bc4d01cc29deed0e2a5ea78dbd) )
+	ROM_LOAD( "4206.g2", 0x3000, 0x1000, CRC(e18d50f7) SHA1(c922a019c13c904701abe5a9e42be955d80a7ecb) )
+	ROM_LOAD( "4203.r1", 0x4000, 0x1000, CRC(8769aad5) SHA1(71f3d22e8e0006ba89329ac4a48f09e11ab67875) )
+	ROM_LOAD( "4207.r2", 0x5000, 0x1000, CRC(9b78e95e) SHA1(2f3fdcc3bb92b2eb3a967de39ffe4eee74cac8e0) )
+	ROM_LOAD( "4204.t1", 0x6000, 0x1000, CRC(da77a765) SHA1(e8626548909b5e735cdb603964324482848ce476) )
+	ROM_LOAD( "4208.t2", 0x7000, 0x1000, CRC(be97d733) SHA1(ff3b199c8d1203d9d6c0060f217bbd7de32a8152) )
 ROM_END
 
 } // anonymous namespace
