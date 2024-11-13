@@ -151,7 +151,6 @@ TODO:
 
      TODO:
       - bg gradient color decode & table selection
-      - music is too fast?
 
 
     Top Roller:
@@ -300,27 +299,6 @@ uint8_t swimmer_state::soundlatch_read_and_clear()
 		m_soundlatch->clear_w();
 
 	return res;
-}
-
-
-void yamato_state::yamato_p0_w(uint8_t data)
-{
-	m_yamato_p0 = data;
-}
-
-void yamato_state::yamato_p1_w(uint8_t data)
-{
-	m_yamato_p1 = data;
-}
-
-uint8_t yamato_state::yamato_p0_r()
-{
-	return m_yamato_p0;
-}
-
-uint8_t yamato_state::yamato_p1_r()
-{
-	return m_yamato_p1;
 }
 
 
@@ -557,8 +535,8 @@ void cclimber_state::rpatrol_portmap(address_map &map)
 void yamato_state::yamato_portmap(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x00).w(FUNC(yamato_state::yamato_p0_w)); // ???
-	map(0x01, 0x01).w(FUNC(yamato_state::yamato_p1_w)); // ???
+	map(0x00, 0x00).w("soundlatch1", FUNC(generic_latch_8_device::write));
+	map(0x01, 0x01).w("soundlatch2", FUNC(generic_latch_8_device::write));
 }
 
 
@@ -589,8 +567,8 @@ void yamato_state::yamato_audio_portmap(address_map &map)
 	map.global_mask(0xff);
 	map(0x00, 0x01).w("ay1", FUNC(ay8910_device::address_data_w));
 	map(0x02, 0x03).w("ay2", FUNC(ay8910_device::address_data_w));
-	map(0x04, 0x04).r(FUNC(yamato_state::yamato_p0_r)); // ???
-	map(0x08, 0x08).r(FUNC(yamato_state::yamato_p1_r)); // ???
+	map(0x04, 0x04).r("soundlatch1", FUNC(generic_latch_8_device::read));
+	map(0x08, 0x08).r("soundlatch2", FUNC(generic_latch_8_device::read));
 }
 
 void cclimber_state::tangramq_sound_map(address_map &map)
@@ -1118,6 +1096,7 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( toprollr )
 	PORT_START("P1")
+	PORT_BIT( 0x07, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON1 )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_8WAY
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_8WAY
@@ -1125,6 +1104,7 @@ static INPUT_PORTS_START( toprollr )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_8WAY
 
 	PORT_START("P2")
+	PORT_BIT( 0x07, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_COCKTAIL
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_8WAY PORT_COCKTAIL
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_COCKTAIL
@@ -1162,6 +1142,7 @@ static INPUT_PORTS_START( toprollr )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE1 )
+	PORT_BIT( 0xe0, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
 
@@ -1457,6 +1438,9 @@ void yamato_state::yamato(machine_config &config)
 	subdevice<screen_device>("screen")->set_screen_update(FUNC(yamato_state::screen_update_yamato));
 
 	// audio hardware
+	GENERIC_LATCH_8(config, "soundlatch1");
+	GENERIC_LATCH_8(config, "soundlatch2");
+
 	SPEAKER(config, "speaker").front_center();
 
 	AY8910(config, "ay1", 12_MHz_XTAL/8).add_route(ALL_OUTPUTS, "speaker", 0.25); // 1.5 MHz
@@ -3035,13 +3019,6 @@ ROM_START( toprollr )
 ROM_END
 
 
-void yamato_state::init_yamato()
-{
-	save_item(NAME(m_yamato_p0));
-	save_item(NAME(m_yamato_p1));
-}
-
-
 void toprollr_state::init_toprollr()
 {
 	m_opcodes = std::make_unique<uint8_t[]>(0x6000*3);
@@ -3145,7 +3122,7 @@ GAME( 1983, guzzlers,    guzzler,  guzzler,   guzzler,   swimmer_state,  empty_i
 
 GAME( 1983, au,          0,        au,        au,        swimmer_state,  empty_init,     ROT90,  "Tehkan", "Au (location test)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1983, yamato,      0,        yamato,    yamato,    yamato_state,   init_yamato,    ROT90,  "Sega",   "Yamato (US)",     MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1983, yamato2,     yamato,   yamato,    yamato,    yamato_state,   init_yamato,    ROT90,  "Sega",   "Yamato (World?)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1983, yamato,      0,        yamato,    yamato,    yamato_state,   empty_init,     ROT90,  "Sega",   "Yamato (US)",     MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1983, yamato2,     yamato,   yamato,    yamato,    yamato_state,   empty_init,     ROT90,  "Sega",   "Yamato (World?)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 
 GAME( 1983, toprollr,    0,        toprollr,  toprollr,  toprollr_state, init_toprollr,  ROT90,  "Jaleco", "Top Roller", MACHINE_SUPPORTS_SAVE )

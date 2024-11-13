@@ -211,14 +211,7 @@ public:
 
 	void yamato(machine_config &config);
 
-	void init_yamato();
-
 private:
-	void yamato_p0_w(uint8_t data);
-	void yamato_p1_w(uint8_t data);
-	uint8_t yamato_p0_r();
-	uint8_t yamato_p1_r();
-
 	void yamato_map(address_map &map) ATTR_COLD;
 	void yamato_decrypted_opcodes_map(address_map &map) ATTR_COLD;
 	void yamato_portmap(address_map &map) ATTR_COLD;
@@ -227,9 +220,6 @@ private:
 
 	void yamato_palette(palette_device &palette) const;
 	uint32_t screen_update_yamato(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-
-	uint8_t m_yamato_p0 = 0;
-	uint8_t m_yamato_p1 = 0;
 
 	static constexpr int YAMATO_SKY_PEN_BASE = 0x60;
 };
