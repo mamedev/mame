@@ -551,12 +551,12 @@ void spectrum_state::spectrum_map(address_map &map)
 
 void spectrum_state::spectrum_opcodes(address_map &map)
 {
-	map(0x0000, 0xffff).rw(FUNC(spectrum_state::spectrum_data_r), FUNC(spectrum_state::spectrum_data_w));
+	map(0x0000, 0xffff).r(FUNC(spectrum_state::pre_opcode_fetch_r));
 }
 
 void spectrum_state::spectrum_data(address_map &map)
 {
-	map(0x0000, 0xffff).r(FUNC(spectrum_state::pre_opcode_fetch_r));
+	map(0x0000, 0xffff).rw(FUNC(spectrum_state::spectrum_data_r), FUNC(spectrum_state::spectrum_data_w));
 }
 
 // The ula is usually accessed with port 0xfe but is only partially decoded with a single address line (A0),
@@ -796,9 +796,9 @@ void spectrum_state::spectrum_common(machine_config &config)
 {
 	/* basic machine hardware */
 	Z80(config, m_maincpu, X1 / 4);        /* This is verified only for the ZX Spectrum. Other clones are reported to have different clocks */
-	m_maincpu->set_addrmap(AS_PROGRAM, &spectrum_state::spectrum_opcodes);
-	m_maincpu->set_addrmap(AS_OPCODES, &spectrum_state::spectrum_data);
-	m_maincpu->set_addrmap(AS_IO, &spectrum_state::spectrum_io);
+	m_maincpu->set_m1_map(&spectrum_state::spectrum_opcodes);
+	m_maincpu->set_memory_map(&spectrum_state::spectrum_data);
+	m_maincpu->set_io_map(&spectrum_state::spectrum_io);
 	m_maincpu->set_vblank_int("screen", FUNC(spectrum_state::spec_interrupt));
 	m_maincpu->nomreq_cb().set(FUNC(spectrum_state::spectrum_nomreq));
 
@@ -864,7 +864,7 @@ void spectrum_state::spectrum_clone(machine_config &config)
 	spectrum(config);
 
 	// no floating bus
-	m_maincpu->set_addrmap(AS_IO, &spectrum_state::spectrum_clone_io);
+	m_maincpu->set_io_map(&spectrum_state::spectrum_clone_io);
 	m_exp->fb_r_handler().set([]() { return 0xff; });
 }
 
@@ -1115,11 +1115,6 @@ ROM_START(blitzs)
 	ROM_LOAD("blitz.rom",0x0000,0x4000, CRC(91e535a8) SHA1(14f09d45dc3803cbdb05c33adb28eb12dbad9dd0))
 ROM_END
 
-ROM_START(byte)
-	ROM_REGION(0x10000,"maincpu",0)
-	ROM_LOAD("byte.rom",0x0000,0x4000, CRC(c13ba473) SHA1(99f40727185abbb2413f218d69df021ae2e99e45))
-ROM_END
-
 ROM_START(orizon)
 	ROM_REGION(0x10000,"maincpu",0)
 	ROM_LOAD("orizon.rom",0x0000,0x4000, CRC(ed4d9787) SHA1(3e8b29862e06be03344393c320a64a109fd9aff5))
@@ -1198,7 +1193,6 @@ COMP( 1993, didakm93, spectrum, 0,      spectrum_clone, spec_plus, spectrum_stat
 COMP( 1988, mistrum,  spectrum, 0,      spectrum_clone, spectrum,  spectrum_state, init_spectrum, "Amaterske RADIO",       "Mistrum",               0 )  // keyboard could be spectrum in some models (since it was a build-yourself design)
 COMP( 198?, bk08,     spectrum, 0,      spectrum_clone, spectrum,  spectrum_state, init_spectrum, "Orel",                  "BK-08",                 0 )
 COMP( 1990, blitzs,   spectrum, 0,      spectrum_clone, spectrum,  spectrum_state, init_spectrum, "<unknown>",             "Blic",                  0 )  // no keyboard images found
-COMP( 1990, byte,     spectrum, 0,      spectrum_clone, spectrum,  spectrum_state, init_spectrum, "BEMZ",                  "PEVM Byte",             0 )  // no keyboard images found
 COMP( 199?, orizon,   spectrum, 0,      spectrum_clone, spectrum,  spectrum_state, init_spectrum, "<unknown>",             "Orizon-Micro",          0 )  // no keyboard images found
 COMP( 1993, quorum48, spectrum, 0,      spectrum_clone, spectrum,  spectrum_state, init_spectrum, "<unknown>",             "Kvorum 48K",            MACHINE_NOT_WORKING )
 COMP( 1993, magic6,   spectrum, 0,      spectrum_clone, spectrum,  spectrum_state, init_spectrum, "<unknown>",             "Magic 6",               MACHINE_NOT_WORKING )   // keyboard should be spectrum, but image was not clear
