@@ -38,7 +38,7 @@ Year + Game                Main Board   Sub Board    CPU   Sound                
 91 Mj Angels               D5512068L1-1 D6107068L-1  Z80   AY8912        YM2413 M5205       RAM
 91 Mj Comic Gekijou V.1    D5512068L1-1 D6107068L-1  Z80   AY8912        YM2413 M5205 M6242 RAM   NL-001, Battery
 91 Mj Tenkaigen                                      TLCS  AY8910        YM2413       M6242 RAM   Protection, Battery
-91 Mj Ougon no Hai         D6209038L1-0              TLCS  AY8910        YM2413             RAM   Undumped TMP91P640 Code, Battery
+91 Mj Ougon no Pai         D6209038L1-0              TLCS  AY8910        YM2413             RAM   Undumped TMP91P640 Code, Battery
 92 Quiz TV Gassyuukoku     D5512068L1-2 D6410288L-1  Z80   AY8912        YM2413 M5205       RAM
 92 Hanafuda Hana Tengoku   D6502208L1   D6107068L-1  Z80   AY8910        YM2413       M6242 RAM
 94 Castle Of Dracula                                 Z80   M6295                            PROM  Blitter is an FPGA
@@ -5012,7 +5012,7 @@ void dynax_state::tenkai(machine_config &config)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	LS259(config, m_mainlatch); // 10C on Ougon no Hai
+	LS259(config, m_mainlatch); // 10C on Ougon no Pai
 	m_mainlatch->q_out_cb<0>().set(FUNC(dynax_state::flipscreen_w)).invert();
 	m_mainlatch->q_out_cb<1>().set(FUNC(dynax_state::layer_half_w));
 	m_mainlatch->q_out_cb<2>().set(FUNC(dynax_state::layer_half2_w));
@@ -7140,7 +7140,7 @@ ROM_END
 
 /***************************************************************************
 
-Mahjong Ougon no Hai
+Mahjong 黄金の牌 (Ougon no Pai)
 DYNAX D6209038L1-0
 
 AY-3-8910A, YM2413, rest of the chips are scratched
@@ -7164,7 +7164,7 @@ ROM_END
 
 /***************************************************************************
 
-Mahjong Ougon no Hai (bootleg, PCB is not working)
+Mahjong 黄金の牌 (Ougon no Pai) (bootleg, PCB is not working)
 
 PCB Layout
 ----------
@@ -7535,10 +7535,10 @@ GAME( 1991, tenkai2b,   tenkai,   tenkai,     tenkai,   dynax_state,       empty
 GAME( 1991, tenkaibb,   tenkai,   tenkai,     tenkai,   dynax_state,       empty_init,    ROT0,   "bootleg",                   "Mahjong Tenkaigen (Japan bootleg b)",                           MACHINE_SUPPORTS_SAVE ) // FIXME: check if "b" is a PCB rev. letter
 GAME( 1991, tenkaicb,   tenkai,   tenkai,     tenkai,   dynax_state,       empty_init,    ROT0,   "bootleg",                   "Mahjong Tenkaigen (Japan bootleg c)",                           MACHINE_SUPPORTS_SAVE ) // FIXME: check if "c" is a PCB rev. letter
 GAME( 1991, tenkaie,    tenkai,   tenkai,     tenkai,   dynax_state,       empty_init,    ROT0,   "Dynax",                     "Mahjong Tenkaigen (Japan set 2)",                               MACHINE_SUPPORTS_SAVE )
-GAME( 1991, ougonhai,   0,        ougonhai,   ougonhai, dynax_state,       empty_init,    ROT0,   "Dynax",                     "Mahjong Ougon no Hai (Japan)",                                  MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // FIXME: correct TMP90840 hookup, confirm being a medal game as well
-GAME( 1991, ougonhaib1, ougonhai, ougonhaib1, ougonhai, dynax_state,       empty_init,    ROT0,   "bootleg",                   "Mahjong Ougon no Hai (Japan bootleg set 1, medal)",             MACHINE_SUPPORTS_SAVE )
-GAME( 1991, ougonhaib2, ougonhai, ougonhaib1, ougonhai, dynax_state,       empty_init,    ROT0,   "bootleg",                   "Mahjong Ougon no Hai (Japan bootleg set 2, medal)",             MACHINE_SUPPORTS_SAVE )
-GAME( 1991, ougonhaib3, ougonhai, ougonhaib1, ougonhai, dynax_state,       empty_init,    ROT0,   "bootleg",                   "Mahjong Ougon no Hai (Japan bootleg set 3, medal)",             MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1991, ougonhai,   0,        ougonhai,   ougonhai, dynax_state,       empty_init,    ROT0,   "Dynax",                     "Mahjong Ougon no Pai (Japan)",                                  MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // FIXME: correct TMP90840 hookup, confirm being a medal game as well
+GAME( 1991, ougonhaib1, ougonhai, ougonhaib1, ougonhai, dynax_state,       empty_init,    ROT0,   "bootleg",                   "Mahjong Ougon no Pai (Japan bootleg set 1, medal)",             MACHINE_SUPPORTS_SAVE )
+GAME( 1991, ougonhaib2, ougonhai, ougonhaib1, ougonhai, dynax_state,       empty_init,    ROT0,   "bootleg",                   "Mahjong Ougon no Pai (Japan bootleg set 2, medal)",             MACHINE_SUPPORTS_SAVE )
+GAME( 1991, ougonhaib3, ougonhai, ougonhaib1, ougonhai, dynax_state,       empty_init,    ROT0,   "bootleg",                   "Mahjong Ougon no Pai (Japan bootleg set 3, medal)",             MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 GAME( 1994, mjreach,    0,        mjreach,    mjreach,  dynax_state,       empty_init,    ROT0,   "Dynax",                     "Mahjong Reach (Ver. 1.00)",                                     MACHINE_SUPPORTS_SAVE )
 GAME( 1994, mjreachbl,  mjreach,  mjreach,    mjreach,  dynax_state,       empty_init,    ROT0,   "bootleg",                   "Mahjong Reach (Ver. 1.00, bootleg)",                            MACHINE_SUPPORTS_SAVE )
 GAME( 1994, mjreachp2,  mjreach,  mjreachp2,  mjreach,  dynax_state,       empty_init,    ROT0,   "Dynax",                     "Mahjong Reach Part II (Ver. D88)",                              MACHINE_SUPPORTS_SAVE )
