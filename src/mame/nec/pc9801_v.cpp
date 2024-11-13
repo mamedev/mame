@@ -720,7 +720,7 @@ uint16_t pc9801vm_state::egc_do_partial_op(int plane, uint16_t src, uint16_t pat
 
 void pc9801vm_state::egc_blit_w(uint32_t offset, uint16_t data, uint16_t mem_mask)
 {
-	uint16_t mask = m_egc.regs[4] & mem_mask, out = 0;
+	uint16_t mask = m_egc.mask & mem_mask, out = 0;
 	bool dir = !(m_egc.regs[6] & 0x1000);
 	int dst_off = (m_egc.regs[6] >> 4) & 0xf, src_off = m_egc.regs[6] & 0xf;
 	offset = (offset & 0x3fff) +  m_vram_bank * 0x10000;

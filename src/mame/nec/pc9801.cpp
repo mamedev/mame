@@ -855,10 +855,14 @@ void pc9801vm_state::pc9801rs_a0_w(offs_t offset, uint8_t data)
 
 void pc9801vm_state::egc_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
-	if(!(m_egc.regs[1] & 0x6000) || (offset != 4)) // why?
-		COMBINE_DATA(&m_egc.regs[offset]);
+	if((m_egc.regs[1] & 0x6000) && (offset == 4)) // why?
+		return;
+	COMBINE_DATA(&m_egc.regs[offset]);
 	switch(offset)
 	{
+		case 4:
+			m_egc.mask = bitswap<16>(m_egc.regs[4],8,9,10,11,12,13,14,15,0,1,2,3,4,5,6,7);
+			break;
 		case 2:
 		case 6:
 		case 7:
@@ -2029,6 +2033,7 @@ MACHINE_START_MEMBER(pc9801vm_state,pc9801rs)
 	save_item(NAME(m_egc.leftover));
 	save_item(NAME(m_egc.first));
 	save_item(NAME(m_egc.start));
+	save_item(NAME(m_egc.mask));
 
 	save_item(NAME(m_grcg.mode));
 	save_item(NAME(m_vram_bank));
