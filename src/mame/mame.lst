@@ -30580,6 +30580,7 @@ potnpkrj                        // Bootleg
 potnpkrk                        // Bootleg
 potnpkrl                        // Bootleg
 potnpkrm                        // Bootleg
+potnpkrn                        // Bootleg
 pottnpkr                        // Bootleg
 royale                          // Unknown
 royalea                         // Unknown
@@ -42353,6 +42354,9 @@ goupilg2                        //
 
 @source:skeleton/grfd2301.cpp
 grfd2301                        //
+
+@source:skeleton/guchokipa.cpp
+guchokip
 
 @source:skeleton/happyvideo.cpp
 hppyvideo                       //
