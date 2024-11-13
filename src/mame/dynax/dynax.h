@@ -16,6 +16,7 @@
 #include "machine/bankdev.h"
 #include "machine/gen_latch.h"
 #include "machine/rstbuf.h"
+#include "machine/ticket.h"
 #include "sound/msm5205.h"
 #include "sound/okim6295.h"
 
@@ -33,6 +34,7 @@ public:
 		, m_palette(*this, "palette")
 		, m_mainlatch(*this, "mainlatch")
 		, m_blitter(*this, "blitter")
+		, m_hopper(*this, "hopper")
 		, m_bankdev(*this, "bankdev")
 		, m_mainirq(*this, "mainirq")
 	{
@@ -66,6 +68,7 @@ protected:
 	required_device<palette_device> m_palette;
 	optional_device<ls259_device> m_mainlatch;
 	optional_device<dynax_blitter_rev2_device> m_blitter;
+	optional_device<hopper_device> m_hopper;
 
 	/* input / output */
 	uint8_t m_input_sel = 0U;

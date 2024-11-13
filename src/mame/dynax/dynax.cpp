@@ -1040,9 +1040,9 @@ void dynax_state::tenkai_ip_w(uint8_t data)
 	switch (m_input_sel)
 	{
 	case 0x0c:
-		machine().bookkeeping().coin_counter_w(0, data & 0x01);
-		machine().bookkeeping().coin_counter_w(1, data & 0x02);
-		// bit 2?
+		machine().bookkeeping().coin_counter_w(0, BIT(data, 0));
+		machine().bookkeeping().coin_counter_w(1, BIT(data, 1));
+		m_hopper->motor_w(BIT(data, 2));
 		// bit 3?
 //          popmessage("%02x", data);
 		return;
@@ -1052,7 +1052,7 @@ void dynax_state::tenkai_ip_w(uint8_t data)
 			break;
 		return;
 	}
-	logerror("%04x: unmapped ip_sel=%02x written with %02x\n", m_maincpu->pc(), m_input_sel, data);
+	logerror("%s: unmapped ip_sel=%02x written with %02x\n", machine().describe_context(), m_input_sel, data);
 }
 
 uint8_t dynax_state::tenkai_ip_r(offs_t offset)
@@ -1070,8 +1070,13 @@ uint8_t dynax_state::tenkai_ip_r(offs_t offset)
 				case 0x80:
 					return ioport("COINS")->read(); // coins
 
+				case 0x02:
+				case 0x82:
+					// do other bits do anything?
+					return m_hopper->line_r() ? 0xbf : 0xff;
+
 				default:
-					logerror("%04x: unmapped ip_sel=%02x read from offs %x\n", m_maincpu->pc(), m_input_sel, offset);
+					logerror("%s: unmapped ip_sel=%02x read from offs %x\n", machine().describe_context(), m_input_sel, offset);
 					return 0xff;
 			}
 		}
@@ -1086,7 +1091,7 @@ uint8_t dynax_state::tenkai_ip_r(offs_t offset)
 				// player 2
 				case 0x81:
 					if (m_keyb >= 5)
-						logerror("%04x: unmapped keyb=%02x read\n", m_maincpu->pc(), m_keyb);
+						logerror("%s: unmapped keyb=%02x read\n", machine().describe_context(), m_keyb);
 					return 0xff;//ioport(keynames1[m_keyb++])->read();
 
 				// player 1
@@ -1095,13 +1100,13 @@ uint8_t dynax_state::tenkai_ip_r(offs_t offset)
 						return 0x00;
 					if (m_keyb >= 5)
 					{
-						logerror("%04x: unmapped keyb=%02x read\n", m_maincpu->pc(), m_keyb);
+						logerror("%s: unmapped keyb=%02x read\n", machine().describe_context(), m_keyb);
 						return 0x00;
 					}
 					return ioport(keynames0[m_keyb++])->read();
 
 				default:
-					logerror("%04x: unmapped ip_sel=%02x read from offs %x\n", m_maincpu->pc(), m_input_sel, offset);
+					logerror("%s: unmapped ip_sel=%02x read from offs %x\n", machine().describe_context(), m_input_sel, offset);
 					return 0xff;
 			}
 		}
@@ -1227,7 +1232,7 @@ void dynax_state::tenkai_blit_romregion_w(uint8_t data)
 		case 0x83:  dynax_blit_romregion_w(1);    return;
 		case 0x80:  dynax_blit_romregion_w(2);    return;
 	}
-	logerror("%04x: unmapped romregion=%02X\n", m_maincpu->pc(), data);
+	logerror("%s: unmapped romregion=%02X\n", machine().describe_context(), data);
 }
 
 void dynax_state::tenkai_map(address_map &map)
@@ -1981,7 +1986,7 @@ static INPUT_PORTS_START( hanamai )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME(DEF_STR( Test ))
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE2 )   // Analyzer
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK )  // Analyzer
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MEMORY_RESET ) // Memory Reset
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 )
@@ -2046,7 +2051,7 @@ static INPUT_PORTS_START( hnkochou )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT ) PORT_CODE(KEYCODE_4) // Pay
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_SERVICE_NO_TOGGLE(0x04, IP_ACTIVE_LOW )    // Test (there isn't a dip switch)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE2 )   // Analyzer
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK )  // Analyzer
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MEMORY_RESET ) // Memory Reset
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN3 )      // Note
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(2)
@@ -2111,7 +2116,7 @@ static INPUT_PORTS_START( hnoridur )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME(DEF_STR( Test ))
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE2 )   // Analyzer
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK )  // Analyzer
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MEMORY_RESET ) // Memory Reset
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 )
@@ -2278,7 +2283,7 @@ static INPUT_PORTS_START( hjingi )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT ) PORT_CODE(KEYCODE_4) // Pay
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE4 )   // 18B
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME(DEF_STR( Test ))
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE2 )   // Analyzer
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK )  // Analyzer
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MEMORY_RESET ) // Memory Reset
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN2    )   // Key In
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 )
@@ -2438,7 +2443,7 @@ static INPUT_PORTS_START( mjfriday )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )    // "17B"
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )    // "18B"
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE )    // Test (there isn't a dip switch)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE2 )   // Analyzer
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK )  // Analyzer
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MEMORY_RESET ) // Memory Reset
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )    // "06B"
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 )
@@ -2504,7 +2509,7 @@ static INPUT_PORTS_START( mjdialq2 )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )    // "17B"
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )    // "18B"
 	PORT_SERVICE_NO_TOGGLE(0x04, IP_ACTIVE_LOW)     // Test (there isn't a dip switch)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE2 )   // Analyzer
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK )  // Analyzer
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MEMORY_RESET ) // Memory Reset
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )    // "06B"
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 )
@@ -2569,7 +2574,7 @@ static INPUT_PORTS_START( yarunara )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN  )   // "17B"
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN  )   // "18B"
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE  ) PORT_NAME(DEF_STR( Test ))
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE2 )   // Analyzer
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK )  // Analyzer
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MEMORY_RESET ) // Memory Reset
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN  )   // "06B"
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1    )
@@ -2615,7 +2620,7 @@ static INPUT_PORTS_START( warahana )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN  )   // "17B"
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN  )   // "18B"
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE  ) PORT_NAME(DEF_STR( Test ))
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE2 )   // Analyzer
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK )  // Analyzer
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MEMORY_RESET ) // Memory Reset
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN  )   // "06B"
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1    )
@@ -2679,7 +2684,7 @@ static INPUT_PORTS_START( hanayara )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN  )   // "17B"
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN  )   // "18B"
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE  ) PORT_NAME(DEF_STR( Test ))
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE2 )   // Analyzer
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK )  // Analyzer
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MEMORY_RESET ) // Memory Reset
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN  )   // "06B"
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1    )
@@ -2842,7 +2847,7 @@ static INPUT_PORTS_START( mcnpshnt )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE )    // Test
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE2 )   // Analyzer
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK )  // Analyzer
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MEMORY_RESET ) // Memory Reset
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 )
@@ -2908,7 +2913,7 @@ static INPUT_PORTS_START( nanajign )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE )    // Test
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE2 )   // Analyzer
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK )  // Analyzer
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MEMORY_RESET ) // Memory Reset
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 )
@@ -3106,7 +3111,7 @@ static INPUT_PORTS_START( jantouki )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_SERVICE_NO_TOGGLE(0x04, IP_ACTIVE_LOW )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE2 )   // Analyzer
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK )  // Analyzer
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MEMORY_RESET ) // Memory Reset
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 )
@@ -3267,29 +3272,29 @@ static INPUT_PORTS_START( mjembase )
 
 	PORT_START("COINS")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT ) PORT_CODE(KEYCODE_4) // Pay
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN  )   // 18B
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE  )   // Test
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE2 )   // Analyzer
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )      // 18B
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE )      // Test
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK )  // Analyzer
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MEMORY_RESET ) // Memory Reset
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN2    )   // Note
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1    )   // Coin
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE1 )   // Service
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN2 )        // Note
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 )        // Coin
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE1 )     // Service
 
 	PORT_INCLUDE( MAHJONG_KEYS_BET )
 INPUT_PORTS_END
 
 
-// dip locations verified on mjelctrb pcb
+// DIP switch locations verified on mjelctrb PCB
 static INPUT_PORTS_START( mjelct3 )
 	PORT_START("COINS")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT ) PORT_CODE(KEYCODE_4) // Pay
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN  )   // 18B
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE  )   // Test
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE2 )   // Analyzer
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )     // 18B
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE )     // Test
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK )  // Analyzer
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MEMORY_RESET ) // Memory Reset
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN2    )   // Note
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1    )   // Coin
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE1 )   // Service
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN2 )        // Note
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 )        // Coin
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE1 )     // Service
 
 	PORT_INCLUDE( MAHJONG_KEYS_BET )
 
@@ -3412,13 +3417,13 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( mjelctrn )
 	PORT_START("COINS")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT ) PORT_CODE(KEYCODE_4) // Pay
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN  )   // 18B
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE  )   // Test
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE2 )   // Analyzer
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )      // 18B
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE )      // Test
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK )  // Analyzer
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MEMORY_RESET ) // Memory Reset
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN2    )   // Note
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1    )   // Coin
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE1 )   // Service
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN2 )        // Note
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 )        // Coin
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE1 )     // Service
 
 	PORT_INCLUDE( MAHJONG_KEYS_BET )
 
@@ -3594,13 +3599,13 @@ static INPUT_PORTS_START( majxtal7 )
 
 	PORT_START("COINS")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT ) PORT_CODE(KEYCODE_4) // Pay
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN  )   // 18B
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE  )   // Test
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE2 )   // Analyzer
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )      // 18B
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE )      // Test
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK )  // Analyzer
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MEMORY_RESET ) // Memory Reset
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN2    )   // Note
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1    )   // Coin
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE1 )   // Service
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN2 )        // Note
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 )        // Coin
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE1 )     // Service
 
 	PORT_INCLUDE( MAHJONG_KEYS_BET )
 
@@ -3721,7 +3726,7 @@ static INPUT_PORTS_START( neruton )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )    // 17B
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )    // 18B
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME(DEF_STR( Test ))   // Test
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE2 )   // Analyzer
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK )  // Analyzer
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MEMORY_RESET ) // Memory Reset
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )    // 06B
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 )  // Coin
@@ -3754,6 +3759,11 @@ static INPUT_PORTS_START( tenkai )
 	// * 倍　満  baiman
 	// * 三倍満  sanbaiman
 	// * 役　満  yakuman
+
+	// Setting Gal Pose to Type B shows moles on the gals' faces, and inserts screens
+	// in the stage 2 and 5 win animations implying that they've been censored by being
+	// cut short.  However, the animations are complete - nothing shown for Type A is
+	// actually cut.
 
 	// There is an additional 4-switch bank (SW 5) for selecting the wiring options.
 
@@ -3811,9 +3821,9 @@ static INPUT_PORTS_START( tenkai )
 	PORT_DIPSETTING(    0x80, "2" )                                                               // ２回
 
 	PORT_START("DSW2")
-	PORT_DIPNAME( 0x01, 0x01, "Game Type" )                     PORT_DIPLOCATION("SW 3:1")        // ゲーム・タイプ
-	PORT_DIPSETTING(    0x01, "Credit type" )                                                     // クレジット・タイプ
-	PORT_DIPSETTING(    0x00, "Hopper type" )                                                     // ホッパー・タイプ
+	PORT_DIPNAME( 0x01, 0x01, "Payout Mode" )                   PORT_DIPLOCATION("SW 3:1")        // ゲーム・タイプ
+	PORT_DIPSETTING(    0x01, "Key-out" )                                                         // クレジット・タイプ
+	PORT_DIPSETTING(    0x00, "Hopper" )                                                          // ホッパー・タイプ
 	PORT_DIPNAME( 0x02, 0x02, "Hopper Polarity" )               PORT_DIPLOCATION("SW 3:2")        // ホッパー・アクティブ
 	PORT_DIPSETTING(    0x02, DEF_STR(Normal) )                                                   // 通常
 	PORT_DIPSETTING(    0x00, "Inverted" )                                                        // 反転
@@ -3823,7 +3833,7 @@ static INPUT_PORTS_START( tenkai )
 	PORT_DIPNAME( 0x08, 0x00, "Double Up" )                     PORT_DIPLOCATION("SW 3:4")        // Ｗ－ＢＥＴ
 	PORT_DIPSETTING(    0x08, DEF_STR(Off) )                                                      // 無
 	PORT_DIPSETTING(    0x00, DEF_STR(On) )                                                       // 有
-	PORT_DIPNAME( 0x10, 0x00, "Renso Rate" )                    PORT_DIPLOCATION("SW 3:5")        // 連荘レート
+	PORT_DIPNAME( 0x10, 0x00, "Renchan Rate" )                  PORT_DIPLOCATION("SW 3:5")        // 連荘レート
 	PORT_DIPSETTING(    0x10, DEF_STR(Off) )                                                      // 無
 	PORT_DIPSETTING(    0x00, DEF_STR(On) )                                                       // 有
 	PORT_DIPNAME( 0x20, 0x00, "Auto Reach" )                    PORT_DIPLOCATION("SW 3:6")        // オート・リーチ
@@ -3898,14 +3908,15 @@ static INPUT_PORTS_START( tenkai )
 	PORT_DIPSETTING(    0x00, DEF_STR(Yes) )
 
 	PORT_START("COINS")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT ) PORT_CODE(KEYCODE_4) // Pay
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN  )   // 18B
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE  )   // Test
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE2 )   // Analyzer
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MEMORY_RESET ) // Memory Reset
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN2    )   // Note
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1    )   // Coin
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE1 )   // Service
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT ) PORT_CODE(KEYCODE_4) PORT_CONDITION("DSW2", 0x01, EQUALS, 0x00) // Pay (default assignment conflicts with I)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT )                      PORT_CONDITION("DSW2", 0x01, EQUALS, 0x01)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )                                                                       // 18B
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_TOGGLE                                                           // Test
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK )                                                                   // Analyzer
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MEMORY_RESET )                                                                  // Memory Reset
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BILL1 )         PORT_CODE(KEYCODE_6)                                            // Note (default assignment conflicts with Small)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 )                                                                         // Coin
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE1 )                                                                      // Service
 
 	PORT_INCLUDE( MAHJONG_KEYS_BET )
 INPUT_PORTS_END
@@ -3939,17 +3950,23 @@ INPUT_PORTS_START( ougonhai )
 	PORT_DIPSETTING(    0x00, DEF_STR(High) )                                                     // 多い
 
 	PORT_MODIFY("DSW3")
-	PORT_DIPNAME( 0x04, 0x00, "Show Renso Gal" )                PORT_DIPLOCATION("SW 4:3")        // 連荘ギャル表示
+	PORT_DIPNAME( 0x04, 0x00, "Show Renchan Gal" )              PORT_DIPLOCATION("SW 4:3")        // 連荘ギャル表示
 	PORT_DIPSETTING(    0x04, DEF_STR(No) )                                                       // 無
 	PORT_DIPSETTING(    0x00, DEF_STR(Yes) )                                                      // 有
 	PORT_DIPUNKNOWN_DIPLOC( 0x08, 0x08, "SW 4:4" )                                                // ＯＦＦ固定
-	PORT_DIPUNKNOWN_DIPLOC( 0x10, 0x10, "SW 4:5" )                                                // ＯＦＦ固定
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR(Language) )               PORT_DIPLOCATION("SW 4:5")        // ＯＦＦ固定
+	PORT_DIPSETTING(    0x10, DEF_STR(Japanese) )
+	PORT_DIPSETTING(    0x00, DEF_STR(Chinese) )
 	PORT_DIPUNKNOWN_DIPLOC( 0x20, 0x20, "SW 4:6" )                                                // ＯＦＦ固定
-	PORT_DIPUNKNOWN_DIPLOC( 0x40, 0x40, "SW 4:7" )                                                // ＯＦＦ固定
-	PORT_DIPUNKNOWN_DIPLOC( 0x80, 0x80, "SW 4:8" )                                                // ＯＦＦ固定
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR(Service_Mode) )           PORT_DIPLOCATION("SW 4:7")        // ＯＦＦ固定
+	PORT_DIPSETTING(    0x40, DEF_STR(Off) )
+	PORT_DIPSETTING(    0x00, DEF_STR(On) )
+	PORT_DIPNAME( 0x80, 0x80, "Show Statistics (Debug)" )       PORT_DIPLOCATION("SW 4:8" )       // ＯＦＦ固定
+	PORT_DIPSETTING(    0x80, DEF_STR(Off) )
+	PORT_DIPSETTING(    0x00, DEF_STR(On) )
 
 	PORT_MODIFY("DSW4")
-	PORT_DIPNAME( 0x08, 0x00, "Renso Rate" )                    PORT_DIPLOCATION("SW 2:10")       // 連荘レート
+	PORT_DIPNAME( 0x08, 0x00, "Renchan Rate" )                  PORT_DIPLOCATION("SW 2:10")       // 連荘レート
 	PORT_DIPSETTING(    0x08, DEF_STR(Off) )                                                      // 無
 	PORT_DIPSETTING(    0x00, DEF_STR(On) )                                                       // 有
 	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -4089,13 +4106,13 @@ static INPUT_PORTS_START( mjreach )
 
 	PORT_START("COINS")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT ) PORT_CODE(KEYCODE_4) // Pay
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN  )   // 18B
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE  )   // Test
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE2 )   // Analyzer
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )      // 18B
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE )      // Test
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK )  // Analyzer
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MEMORY_RESET ) // Memory Reset
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN2    )   // Note
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1    )   // Coin
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE1 )   // Service
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN2 )        // Note
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 )        // Coin
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE1 )     // Service
 
 	PORT_INCLUDE( MAHJONG_KEYS_BET )
 INPUT_PORTS_END
@@ -4213,13 +4230,13 @@ static INPUT_PORTS_START( gekisha )
 
 	PORT_START("COINS")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT ) PORT_CODE(KEYCODE_4) // Pay
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN  )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE  )   // Test
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE2 )   // Analyzer
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE )      // Test
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK )  // Analyzer
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MEMORY_RESET ) // Memory Reset
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN2    )   // Note
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1    )   // Coin
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN  )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN2 )        // Note
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 )        // Coin
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_INCLUDE( MAHJONG_KEYS_BET )
 INPUT_PORTS_END
@@ -5002,6 +5019,8 @@ void dynax_state::tenkai(machine_config &config)
 	m_mainlatch->q_out_cb<3>().set(FUNC(dynax_state::tenkai_6c_w));
 	m_mainlatch->q_out_cb<4>().set(FUNC(dynax_state::tenkai_70_w));
 	m_mainlatch->q_out_cb<7>().set(FUNC(dynax_state::tenkai_blitter_ack_w));
+
+	HOPPER(config, m_hopper, attotime::from_msec(50));
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
