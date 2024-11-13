@@ -1386,7 +1386,7 @@ void cclimber_state::tangramq(machine_config &config)
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &cclimber_state::tangramq_map);
 
-	Z80(config, m_audiocpu, 8_MHz_XTAL / 2); // divider not verified
+	Z80(config, m_audiocpu, 8_MHz_XTAL / 2);
 	m_audiocpu->set_addrmap(AS_PROGRAM, &cclimber_state::tangramq_sound_map);
 
 	m_audiocpu->set_periodic_int(FUNC(cclimber_state::nmi_line_pulse), attotime::from_ticks(0x8000, 8_MHz_XTAL));
@@ -1396,10 +1396,10 @@ void cclimber_state::tangramq(machine_config &config)
 
 	GENERIC_LATCH_8(config, "soundlatch").data_pending_callback().set_inputline(m_audiocpu, 0, HOLD_LINE);
 
-	AY8910(config, "ay1", 8_MHz_XTAL / 4).add_route(ALL_OUTPUTS, "speaker", 0.35); // divider not verified
-	AY8910(config, "ay2", 8_MHz_XTAL / 4).add_route(ALL_OUTPUTS, "speaker", 0.35); // divider not verified
+	AY8910(config, "ay1", 8_MHz_XTAL / 4).add_route(ALL_OUTPUTS, "speaker", 0.35);
+	AY8910(config, "ay2", 8_MHz_XTAL / 4).add_route(ALL_OUTPUTS, "speaker", 0.35);
 
-	SNKWAVE(config, "wave", 8_MHz_XTAL).add_route(ALL_OUTPUTS, "speaker", 0.30); // lack of divider not verified
+	SNKWAVE(config, "wave", 8_MHz_XTAL).add_route(ALL_OUTPUTS, "speaker", 0.30); // unused?
 }
 
 void cclimber_state::cclimberx(machine_config &config)
@@ -2557,6 +2557,7 @@ NEC D780C-1 CPU
 8 MHz XTAL
 HM6116P-4 RAM
 lots of TTL
+note: same PCB as Marvin's Maze
 */
 
 ROM_START( tangramq )
@@ -2567,6 +2568,7 @@ ROM_START( tangramq )
 	ROM_REGION( 0x2000, "audiocpu", 0 )
 	ROM_LOAD( "s1.a6", 0x0000, 0x2000, CRC(05af38f6) SHA1(7bdbf798964aa4d603fca0178b3f8fc251d207f6) )
 
+	// BTANB?: colors look glitchy when in this order, but matches PCB reference and flyers
 	ROM_REGION( 0x2000, "bigsprite", 0 )
 	ROM_LOAD( "b2.e17", 0x0000, 0x1000, CRC(77d21b84) SHA1(7f9bfbfbc7fd51a97f15fee54ac851ddfa97b213) ) // 1xxxxxxxxxxx = 0xFF
 	ROM_LOAD( "b1.e19", 0x1000, 0x1000, CRC(f3ec2562) SHA1(859473c45b9d22c138b70ea649b93d41721e1e0d) ) // 1xxxxxxxxxxx = 0xFF
