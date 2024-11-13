@@ -25,7 +25,7 @@ DDR & TF PCBs look identical, all the parts are in the same place, the traces ar
 Some of m_unkregs must retain value (or return certain things) or RAM containing vectors gets blanked and game crashes.
 The G65816 code on these is VERY ugly and difficult to follow, many redundant statements, excessive mode switching, accessing things via pointers to pointers etc.
 
-One of the vectors points to 0x6000, there is nothing mapped there, could it be a small internal ROM or some debug trap for development?
+One of the vectors points to 0x6000, there is nothing mapped there, could it be a small internal ROM (sound related?) or some debug trap for development?
 
 
 ---
@@ -36,6 +36,20 @@ Mountain Bike Rally uses scrolling / split (helps confirm the same row skip logi
 Turn and Whack (cards) game runs far too quickly (might show us where timer config is)
 The Power Game game also appears to run far too quickly
 Territory Pursuit uses y-flipped sprites
+
+The code to play/request a sample from ROM is at 0D:FB7B
+It is called after pushing 3 words onto the stack containing the sample address
+
+eg.
+05:85B6: pea $0000
+05:85B9: pea $0005
+05:85BC: pea $f8bc
+05:85BF: jsl $0dfb7b    --- play sample
+
+Samples appear to be terminated with 0x8000
+
+The game also has some terrible PSG-like music, is this coming from a secondary MCU as there is an additional glob on
+each of the units using the tech, and the audio quality varies significantly.
 
 */
 
