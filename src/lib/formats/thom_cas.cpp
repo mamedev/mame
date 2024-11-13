@@ -58,6 +58,8 @@ static uint8_t* to7_k7_bits;
    and so, is used by emulators that bypass the BIOS routine.
    It is generally hacked from the raw image more or less by hand
    (in particular, to by-pass special loaders and copy-protection schemes).
+   Many of these hacks use emulator-exclusive 6809 instructions and will
+   not work in MAME.
 
    As we run the original BIOS routine, we need to hack back the k7 file
    into the original stream.
@@ -462,7 +464,8 @@ static cassette_image::error mo5_k5_load( cassette_image *cass )
 	size_t size = cass->image_size( ), pos = 0;
 	int i, sz, sz2, hbit = 0;
 	uint8_t typ, block[264], sum;
-	int invalid = 0, hbitsize = 0, dcmoto = 0;
+	int invalid = 0, hbitsize = 0;
+	bool dcmoto = false, dcmoto_old = false;
 
 	LOG (( "mo5_k5_load: start conversion, size=%li\n", (long)size ));
 	PRINT (( "mo5_k5_load: open cassette, length: %li bytes\n", (long) size ));
@@ -553,7 +556,9 @@ static cassette_image::error mo5_k5_load( cassette_image *cass )
 
 	cass->image_read( block, pos, 6 );
 	if ( ! memcmp( block, "DCMOTO", 6 ) || ! memcmp( block, "DCMO5", 5 ) || ! memcmp( block, "DCMO6", 5 ) )
-		dcmoto = 1;
+		dcmoto = true;
+	if ( block[0] == 0xdc && block[1] == 0x01 )
+		dcmoto_old = true;
 
 	/* loop over regular blocks */
 	while ( pos < size )
@@ -573,6 +578,12 @@ static cassette_image::error mo5_k5_load( cassette_image *cass )
 				LOG (( "mo5_k5_load: DCMO* signature found at off=$%x\n", (int)pos ));
 				pos += 5;
 			}
+		}
+		else if ( dcmoto_old )
+		{
+			cass->image_read( block, pos, 1 );
+			if ( block[0] == 0xdc )
+				pos++;
 		}
 
 		/* skip 0x01 filler */
@@ -693,7 +704,12 @@ static cassette_image::error mo5_k5_load( cassette_image *cass )
 					pos -= sz;
 					goto rebounce;
 				}
-				if ( invalid < 10 && sz > 6 && ( (in == 0x3c && in2 == 0x5a) || (in == 0xc3 && in2 == 0x5a) || (in == 0xc3 && in2 == 0x3c) || (in == 0x87 && in2 == 0x4a)  ) )
+				if ( invalid < 10 && sz > 6 &&
+					( (in == 0x3c && in2 == 0x5a) ||
+					  (in == 0xc3 && in2 == 0x5a) ||
+					  (in == 0xc3 && in2 == 0x3c) ||
+					  (in == 0x87 && in2 == 0x4a) ||
+					  (in == 0x3c && in2 == 0x55) ) ) // Androïdes
 				{
 					/* special block found */
 					K5_FILL_0( 1200 );
