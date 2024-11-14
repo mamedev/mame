@@ -127,9 +127,8 @@ protected:
 
 	static constexpr u8 GPP_SINGLE_STEP_BIT             = 0;
 	static constexpr u8 GPP_ENABLE_TIMER_INTERRUPT_BIT  = 1;
-	static constexpr u8 GPP_MEM1_BIT                    = 2;
 	static constexpr u8 GPP_MEM0_BIT                    = 4;
-	static constexpr u8 GPP_DISABLE_ROM_BIT             = 5;
+	static constexpr u8 GPP_MEM1_BIT                    = 5;
 	static constexpr u8 GPP_IO0_BIT                     = 6;
 	static constexpr u8 GPP_IO1_BIT                     = 7;
 
@@ -841,10 +840,10 @@ void h89_base_state::reset_single_step_state()
 // ---------------------
 //  0    Single-step enable
 //  1    2 mSec interrupt enable
-//  2    Latched bit MEM 1 H on memory exp connector
-//  3    Not used
+//  2    Not used (on original Heath CPU Board)
+//  3    Not used (on original Heath CPU Board)
 //  4    Latched bit MEM 0 H on memory expansion connector (Commonly used for Speed upgrades)
-//  5    ORG-0 (CP/M map)
+//  5    Latched bit MEM 1 H on memory expansion connector - ORG-0 (CP/M map)
 //  6    Latched bit I/O 0 on I/O exp connector
 //  7    Latched bit I/O 1 on I/O exp connector
 //
@@ -872,9 +871,9 @@ void h89_base_state::update_gpp(u8 gpp)
 		}
 	}
 
-	if (BIT(changed_gpp, GPP_DISABLE_ROM_BIT))
+	if (BIT(changed_gpp, GPP_MEM1_BIT))
 	{
-		m_rom_enabled = BIT(m_gpp, GPP_DISABLE_ROM_BIT) == 0;
+		m_rom_enabled = BIT(m_gpp, GPP_MEM1_BIT) == 0;
 
 		update_mem_view();
 	}
