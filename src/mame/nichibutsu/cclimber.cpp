@@ -2,8 +2,7 @@
 // copyright-holders:Nicola Salmoria
 /***************************************************************************
 
-Crazy Climber memory map (preliminary)
-as described by Lionel Theunissen (lionelth@ozemail.com.au)
+Nichibutsu Crazy Climber
 
 Crazy Kong is very similar to Crazy Climber, there is an additional ROM at
 5000-5fff and RAM is at 6000-6bff. Dip switches and input connections are
@@ -13,7 +12,6 @@ Swimmer is similar but also different (e.g. it has two CPUs and two 8910,
 graphics are 3bpp instead of 2)
 
 TODO:
-- verify timings of sound/music on Swimmer
 - add tms5110 support to bagmanf
 - toprollr Coin_B 2C_1C doesn't work right, is it a BTANB?
 
@@ -153,9 +151,9 @@ Cannon Ball
 -----------
  The Cannon Ball bootlegs on this Falcon (Crazy Kong) hardware
  don't correctly handle the protection device found on the original
- pacman hardware conversion, this causes them to crash after the
- a few rounds - confirmed on an original PCB. They clearly weren't
- tested properly by the bootleggers.
+ pacman hardware conversion, this causes them to crash after a few
+ rounds - confirmed on an original PCB. They clearly weren't tested
+ properly by the bootleggers.
 
 -------------------------------------------------------------------
 
@@ -398,17 +396,18 @@ void cclimber_state::bagmanf_vblank_irq(int state)
 		m_maincpu->set_input_line(0, HOLD_LINE);
 }
 
-void cclimber_state::tangramq_sound_nmi_clear_w(uint8_t data)
+void cclimber_state::sound_nmi_clear_w(uint8_t data)
 {
 	m_audiocpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 }
 
-
-void swimmer_state::swimmer_sh_soundlatch_w(uint8_t data)
+uint8_t cclimber_state::sound_nmi_clear_r()
 {
-	m_soundlatch->write(data);
-	m_audiocpu->set_input_line_and_vector(0, HOLD_LINE, 0xff); // Z80
+	if (!machine().side_effects_disabled())
+		sound_nmi_clear_w(0);
+	return 0xff;
 }
+
 
 uint8_t swimmer_state::soundlatch_read_and_clear()
 {
@@ -515,7 +514,7 @@ void swimmer_state::swimmer_root_map(address_map &map)
 	map(0x9c00, 0x9fff).ram().w(FUNC(swimmer_state::cclimber_colorram_w)).share("colorram");
 	map(0xa000, 0xa007).w(m_mainlatch, FUNC(ls259_device::write_d0));
 	map(0xa000, 0xa000).mirror(0x07ff).portr("P2");
-	map(0xa800, 0xa800).mirror(0x07ff).portr("P1").w(FUNC(swimmer_state::swimmer_sh_soundlatch_w));
+	map(0xa800, 0xa800).mirror(0x07ff).portr("P1").w(m_soundlatch, FUNC(generic_latch_8_device::write));
 	map(0xb000, 0xb000).mirror(0x07ff).portr("DSW1");
 	map(0xb800, 0xb800).mirror(0x07ff).portr("DSW2");
 }
@@ -665,9 +664,9 @@ void yamato_state::yamato_portmap(address_map &map)
 void swimmer_state::swimmer_audio_map(address_map &map)
 {
 	map(0x0000, 0x0fff).rom();
-	map(0x2000, 0x23ff).ram();
-	map(0x3000, 0x3000).r(FUNC(swimmer_state::soundlatch_read_and_clear));
-	map(0x4000, 0x4001).ram(); // ???
+	map(0x2000, 0x23ff).mirror(0x0c00).ram();
+	map(0x3000, 0x3000).mirror(0x0fff).r(FUNC(swimmer_state::soundlatch_read_and_clear));
+	map(0x4000, 0x4000).mirror(0x0fff).rw(FUNC(swimmer_state::sound_nmi_clear_r), FUNC(swimmer_state::sound_nmi_clear_w));
 }
 
 void yamato_state::yamato_audio_map(address_map &map)
@@ -701,7 +700,7 @@ void cclimber_state::tangramq_sound_map(address_map &map)
 	map(0x8000, 0x8001).w("ay1", FUNC(ay8910_device::address_data_w));
 	map(0x8002, 0x8007).w("wave", FUNC(snkwave_device::snkwave_w));
 	map(0x8008, 0x8009).w("ay2", FUNC(ay8910_device::address_data_w));
-	map(0xa000, 0xa000).w(FUNC(cclimber_state::tangramq_sound_nmi_clear_w));
+	map(0xa000, 0xa000).w(FUNC(cclimber_state::sound_nmi_clear_w));
 	map(0xe000, 0xe3ff).ram();
 }
 
@@ -1648,7 +1647,7 @@ void swimmer_state::swimmer(machine_config &config)
 	Z80(config, m_audiocpu, 4_MHz_XTAL/2); // verified on pcb
 	m_audiocpu->set_addrmap(AS_PROGRAM, &swimmer_state::swimmer_audio_map);
 	m_audiocpu->set_addrmap(AS_IO, &swimmer_state::swimmer_audio_portmap);
-	m_audiocpu->set_periodic_int(FUNC(swimmer_state::nmi_line_pulse), attotime::from_ticks(0x4000, 4_MHz_XTAL));
+	m_audiocpu->set_periodic_int(FUNC(swimmer_state::nmi_line_assert), attotime::from_ticks(0x4000, 4_MHz_XTAL));
 
 	// video hardware
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
@@ -1669,6 +1668,7 @@ void swimmer_state::swimmer(machine_config &config)
 	SPEAKER(config, "speaker").front_center();
 
 	GENERIC_LATCH_8(config, m_soundlatch);
+	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, 0, HOLD_LINE); // auto ack
 
 	AY8910(config, "ay1", 4_MHz_XTAL/2).add_route(ALL_OUTPUTS, "speaker", 0.25); // verified on pcb
 	AY8910(config, "ay2", 4_MHz_XTAL/2).add_route(ALL_OUTPUTS, "speaker", 0.25); // verified on pcb

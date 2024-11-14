@@ -83,6 +83,8 @@ protected:
 	void cclimber_portmap(address_map &map) ATTR_COLD;
 
 	void vblank_irq(int state);
+	void sound_nmi_clear_w(uint8_t data);
+	uint8_t sound_nmi_clear_r();
 
 	TILE_GET_INFO_MEMBER(cclimber_get_pf_tile_info);
 	TILE_GET_INFO_MEMBER(cclimber_get_bs_tile_info);
@@ -98,7 +100,6 @@ private:
 	bool m_nmi_mask = false;
 
 	void bagmanf_vblank_irq(int state);
-	void tangramq_sound_nmi_clear_w(uint8_t data);
 
 	void cclimber_palette(palette_device &palette) const;
 
@@ -144,7 +145,6 @@ private:
 	uint16_t m_sidepen = 0;
 
 	uint8_t soundlatch_read_and_clear();
-	void swimmer_sh_soundlatch_w(uint8_t data);
 	void sidebg_enable_w(int state);
 	void palette_bank_w(int state);
 
