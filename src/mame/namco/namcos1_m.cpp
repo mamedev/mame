@@ -1019,49 +1019,45 @@ u8 namcos1_state::faceoff_inputs_r(offs_t offset)
 		   digital sounds at once. This value is enough to read all inputs at least
 		   once per frame */
 		u8 strobe_count = m_strobe_count + 1;
-		u8 input_count = m_input_count;
-		u8 stored_input[2] = {m_stored_input[0], m_stored_input[1]};
 		if (strobe_count > 8)
 		{
 			strobe_count = 0;
 
-			res |= input_count;
+			res |= m_input_count;
 
-			switch (input_count)
+			if (!machine().side_effects_disabled())
 			{
-				case 0:
-					stored_input[0] = m_io_in[0]->read() & 0x1f;
-					stored_input[1] = (m_io_in[3]->read() & 0x07) << 3;
-					break;
+				switch (m_input_count)
+				{
+					case 0:
+						m_stored_input[0] = m_io_in[0]->read() & 0x1f;
+						m_stored_input[1] = (m_io_in[3]->read() & 0x07) << 3;
+						break;
 
-				case 3:
-					stored_input[0] = m_io_in[2]->read() & 0x1f;
-					break;
+					case 3:
+						m_stored_input[0] = m_io_in[2]->read() & 0x1f;
+						break;
 
-				case 4:
-					stored_input[0] = m_io_in[1]->read() & 0x1f;
-					stored_input[1] = m_io_in[3]->read() & 0x18;
-					break;
+					case 4:
+						m_stored_input[0] = m_io_in[1]->read() & 0x1f;
+						m_stored_input[1] = m_io_in[3]->read() & 0x18;
+						break;
 
-				default:
-					stored_input[0] = 0x1f;
-					stored_input[1] = 0x1f;
-					break;
+					default:
+						m_stored_input[0] = 0x1f;
+						m_stored_input[1] = 0x1f;
+						break;
+				}
+				m_input_count = (m_input_count + 1) & 7;
 			}
-			input_count = (input_count + 1) & 7;
 		}
 		else
 		{
-			res |= 0x40 | stored_input[1];
+			res |= 0x40 | m_stored_input[1];
 		}
 
 		if (!machine().side_effects_disabled())
-		{
 			m_strobe_count = strobe_count;
-			m_input_count = input_count;
-			m_stored_input[0] = stored_input[0];
-			m_stored_input[1] = stored_input[1];
-		}
 
 		return res;
 	}
