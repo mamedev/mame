@@ -18,11 +18,11 @@ Namco System II
 #include "machine/nvram.h"
 
 
-uint16_t namcos2_state::namcos2_finallap_prot_r(offs_t offset)
+u16 namcos2_state::namcos2_finallap_prot_r(offs_t offset)
 {
-	static const uint16_t table0[8] = { 0x0000,0x0040,0x0440,0x2440,0x2480,0xa080,0x8081,0x8041 };
-	static const uint16_t table1[8] = { 0x0040,0x0060,0x0060,0x0860,0x0864,0x08e4,0x08e5,0x08a5 };
-	uint16_t data;
+	static const u16 table0[8] = { 0x0000,0x0040,0x0440,0x2440,0x2480,0xa080,0x8081,0x8041 };
+	static const u16 table1[8] = { 0x0040,0x0060,0x0060,0x0860,0x0864,0x08e4,0x08e5,0x08a5 };
+	u16 data;
 
 	switch( offset )
 	{
@@ -35,25 +35,27 @@ uint16_t namcos2_state::namcos2_finallap_prot_r(offs_t offset)
 		break;
 
 	case 2:
-		data = table1[m_finallap_prot_count&7];
-		data = (data&0xff00)>>8;
+		data = table1[m_finallap_prot_count & 7];
+		data = (data & 0xff00) >> 8;
 		break;
 
 	case 3:
-		data = table1[m_finallap_prot_count&7];
-		m_finallap_prot_count++;
-		data = data&0x00ff;
+		data = table1[m_finallap_prot_count & 7];
+		if (!machine().side_effects_disabled())
+			m_finallap_prot_count++;
+		data = data & 0x00ff;
 		break;
 
 	case 0x3fffc/2:
-		data = table0[m_finallap_prot_count&7];
-		data = data&0xff00;
+		data = table0[m_finallap_prot_count & 7];
+		data = data & 0xff00;
 		break;
 
 	case 0x3fffe/2:
-		data = table0[m_finallap_prot_count&7];
-		m_finallap_prot_count++;
-		data = (data&0x00ff)<<8;
+		data = table0[m_finallap_prot_count & 7];
+		if (!machine().side_effects_disabled())
+			m_finallap_prot_count++;
+		data = (data & 0x00ff) << 8;
 		break;
 
 	default:
@@ -71,10 +73,10 @@ uint16_t namcos2_state::namcos2_finallap_prot_r(offs_t offset)
 
 void namcos2_state::machine_start()
 {
-	m_eeprom = std::make_unique<uint8_t[]>(0x2000);
+	m_eeprom = std::make_unique<u8[]>(0x2000);
 	subdevice<nvram_device>("nvram")->set_base(m_eeprom.get(), 0x2000);
 
-	uint32_t max = memregion("audiocpu")->bytes() / 0x4000;
+	const u32 max = memregion("audiocpu")->bytes() / 0x4000;
 	for (int i = 0; i < 0x10; i++)
 		m_audiobank->configure_entry(i, memregion("audiocpu")->base() + (i % max) * 0x4000);
 
@@ -121,7 +123,7 @@ void namcos2_state::reset_all_subcpus(int state)
 	}
 }
 
-void namcos2_state::sound_reset_w(uint8_t data)
+void namcos2_state::sound_reset_w(u8 data)
 {
 	if (data & 0x01)
 	{
@@ -136,7 +138,7 @@ void namcos2_state::sound_reset_w(uint8_t data)
 	}
 }
 
-void namcos2_state::system_reset_w(uint8_t data)
+void namcos2_state::system_reset_w(u8 data)
 {
 	reset_all_subcpus(data & 1 ? CLEAR_LINE : ASSERT_LINE);
 
@@ -148,12 +150,12 @@ void namcos2_state::system_reset_w(uint8_t data)
 /* EEPROM Load/Save and read/write handling                  */
 /*************************************************************/
 
-void namcos2_state::eeprom_w(offs_t offset, uint8_t data)
+void namcos2_state::eeprom_w(offs_t offset, u8 data)
 {
 	m_eeprom[offset] = data;
 }
 
-uint8_t namcos2_state::eeprom_r(offs_t offset)
+u8 namcos2_state::eeprom_r(offs_t offset)
 {
 	return m_eeprom[offset];
 }
@@ -193,7 +195,7 @@ suzuk8h2    1993
 sws93       1993    334         $014e
  *************************************************************/
 
-uint16_t namcos2_state::namcos2_68k_key_r(offs_t offset)
+u16 namcos2_state::namcos2_68k_key_r(offs_t offset)
 {
 	switch (m_gametype)
 	{
@@ -264,7 +266,7 @@ uint16_t namcos2_state::namcos2_68k_key_r(offs_t offset)
 		case 1: return 0x110;
 		case 4: return 0xBE;
 		case 6: return 0x1001;
-		case 7: return (m_sendval==1)?0xBE:1;
+		case 7: return (m_sendval) ? 0xBE : 1;
 		}
 		break;
 
@@ -279,14 +281,18 @@ uint16_t namcos2_state::namcos2_68k_key_r(offs_t offset)
 		switch(offset)
 		{
 		case 4:
-			if( m_sendval == 1 ){
-				m_sendval = 0;
+			if (m_sendval)
+			{
+				if (!machine().side_effects_disabled())
+					m_sendval = false;
 				return 0x13F;
 			}
 			break;
 		case 7:
-			if( m_sendval == 1 ){
-				m_sendval = 0;
+			if (m_sendval)
+			{
+				if (!machine().side_effects_disabled())
+					m_sendval = false;
 				return 0x13F;
 			}
 			break;
@@ -360,26 +366,26 @@ uint16_t namcos2_state::namcos2_68k_key_r(offs_t offset)
 		break;
 	}
 
-	return machine().rand()&0xffff;
+	return machine().rand() & 0xffff;
 }
 
-void namcos2_state::namcos2_68k_key_w(offs_t offset, uint16_t data)
+void namcos2_state::namcos2_68k_key_w(offs_t offset, u16 data)
 {
-	if( m_gametype == NAMCOS2_MARVEL_LAND && offset == 5 )
+	if (m_gametype == NAMCOS2_MARVEL_LAND && offset == 5)
 	{
-		if (data == 0x615E) m_sendval = 1;
+		if (data == 0x615E) m_sendval = true;
 	}
-	if( m_gametype == NAMCOS2_ROLLING_THUNDER_2 && offset == 4 )
+	if (m_gametype == NAMCOS2_ROLLING_THUNDER_2 && offset == 4)
 	{
-		if (data == 0x13EC) m_sendval = 1;
+		if (data == 0x13EC) m_sendval = true;
 	}
-	if( m_gametype == NAMCOS2_ROLLING_THUNDER_2 && offset == 7 )
+	if (m_gametype == NAMCOS2_ROLLING_THUNDER_2 && offset == 7)
 	{
-		if (data == 0x13EC) m_sendval = 1;
+		if (data == 0x13EC) m_sendval = true;
 	}
-	if( m_gametype == NAMCOS2_MARVEL_LAND && offset == 6 )
+	if (m_gametype == NAMCOS2_MARVEL_LAND && offset == 6)
 	{
-		if (data == 0x1001) m_sendval = 0;
+		if (data == 0x1001) m_sendval = false;
 	}
 }
 
@@ -387,22 +393,23 @@ void namcos2_state::namcos2_68k_key_w(offs_t offset, uint16_t data)
 /* 68000 Interrupt/IO Handlers - CUSTOM 148 - NOT SHARED     */
 /*************************************************************/
 
+/*
 #define NO_OF_LINES     256
 #define FRAME_TIME      (1.0/60.0)
 #define LINE_LENGTH     (FRAME_TIME/NO_OF_LINES)
-
+*/
 
 
 /**************************************************************/
 /*  Sound sub-system                                          */
 /**************************************************************/
 
-void namcos2_state::sound_bankselect_w(uint8_t data)
+void namcos2_state::sound_bankselect_w(u8 data)
 {
-	m_audiobank->set_entry(data>>4);
+	m_audiobank->set_entry(data >> 4);
 }
 
-uint16_t namcos2_state::c140_rom_r(offs_t offset)
+u16 namcos2_state::c140_rom_r(offs_t offset)
 {
 	/*
 	    Verified from schematics:
