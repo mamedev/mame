@@ -580,7 +580,7 @@ void juku_state::pio0_portc_w(uint8_t data)
 	// ---4----  (cas?) ff / floppy density (sd = 1, dd = 0)
 	// ----3---  (cas?) play / floppy size (8" = 1, 5.25" = 0)
 	// -----2--  (cas?) rec / floppy motor (on = 1, off = 0)
-	// --s----10  memory mode
+	// ------10  memory mode
 
 	floppy_image_device *floppy = m_floppy[BIT(data, 5)]->get_device();
 	m_fdc->set_floppy(floppy);
