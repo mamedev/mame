@@ -5,6 +5,11 @@
 // fearless 1234
 // superkds (unknown)
 
+// Other games on this hardware:
+// Fist Talks (uses mostly the same graphics as Fearless Pinnochio, but
+//             is a Rock, Paper, Scissors game, not a fighter, and has
+//             only 4 graphic ROMs which are likely all different to FP)
+
 #include "emu.h"
 
 #include "igs027a.h"
@@ -339,6 +344,59 @@ INPUT_PORTS_START( superkds )
 	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(20) PORT_KEYDELTA(20)
 INPUT_PORTS_END
 
+// has a touchscreen (optional?)
+static INPUT_PORTS_START( icescape )
+	PORT_START("IN0")
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_SERVICE1 ) // brings up password screen
+
+	PORT_START("IN1")
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_IMPULSE(5)
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("DSW1")
+	PORT_DIPNAME( 0x01, 0x01, "Touchscreen Test" ) PORT_DIPLOCATION("SW1:1")
+	PORT_DIPSETTING(    0x01, DEF_STR(Off) )
+	PORT_DIPSETTING(    0x00, DEF_STR(On) )
+	PORT_DIPUNKNOWN_DIPLOC(0x02, 0x00, "SW1:2")
+	PORT_DIPUNKNOWN_DIPLOC(0x04, 0x00, "SW1:3")
+	PORT_DIPUNKNOWN_DIPLOC(0x08, 0x00, "SW1:4")
+	PORT_DIPUNKNOWN_DIPLOC(0x10, 0x00, "SW1:5")
+	PORT_DIPUNKNOWN_DIPLOC(0x20, 0x00, "SW1:6")
+	PORT_DIPUNKNOWN_DIPLOC(0x40, 0x00, "SW1:7")
+	PORT_DIPUNKNOWN_DIPLOC(0x80, 0x00, "SW1:7")
+
+	PORT_START("DSW2")
+	PORT_DIPUNKNOWN_DIPLOC(0x01, 0x00, "SW2:1")
+	PORT_DIPUNKNOWN_DIPLOC(0x02, 0x00, "SW2:2")
+	PORT_DIPUNKNOWN_DIPLOC(0x04, 0x00, "SW2:3")
+	PORT_DIPUNKNOWN_DIPLOC(0x08, 0x00, "SW2:4")
+	PORT_DIPUNKNOWN_DIPLOC(0x10, 0x00, "SW2:5")
+	PORT_DIPUNKNOWN_DIPLOC(0x20, 0x00, "SW2:6")
+	PORT_DIPUNKNOWN_DIPLOC(0x40, 0x00, "SW2:7")
+	PORT_DIPUNKNOWN_DIPLOC(0x80, 0x00, "SW2:7")
+INPUT_PORTS_END
+
 void igs_fear_state::vblank_irq(int state)
 {
 	m_maincpu->set_input_line(arm7_cpu_device::ARM7_FIRQ_LINE, (state && m_screen->frame_number() & 1) ? 1 : 0);
@@ -486,8 +544,8 @@ ROM_START( fearless )
 	ROM_REGION32_LE( 0x80000, "user1", 0 ) // external ARM data / prg
 	ROM_LOAD( "fearlessp_v-101us.u37", 0x000000, 0x80000, CRC(2522873c) SHA1(8db709877311b6d2796353fc9a44a820937e35c2) )
 
-	ROM_REGION( 0x10000, "xa:mcu", 0 ) // MX10EXAQC (80C51 XA based MCU) marked 07, not read protected
-	ROM_LOAD( "fearlessp_07.u33", 0x000000, 0x10000, CRC(7dae4900) SHA1(bbf7ba7c9e95ff2ffeb1dc0fc7ccedd4da274d01) )
+	ROM_REGION( 0x10000, "xa:mcu", 0 ) // MX10EXAQC (80C51 XA based MCU) marked O7, not read protected
+	ROM_LOAD( "o7.u33", 0x000000, 0x10000, CRC(7dae4900) SHA1(bbf7ba7c9e95ff2ffeb1dc0fc7ccedd4da274d01) )
 
 	ROM_REGION( 0x3000000, "gfx1", 0 ) // FIXED BITS (0xxxxxxx) (graphics are 7bpp)
 	ROM_LOAD32_WORD( "fearlessp_u7_cg-0l.u7",   0x0000000, 0x800000, CRC(ca254db4) SHA1(f5670c2ff0720c84c9aff3cea95b118b6044e469) )
@@ -532,9 +590,7 @@ ROM_START( icescape ) // IGS PCB-0433-16-GK (same PCB as Fearless Pinocchio) - H
 	ROM_LOAD( "icescape_v-104fa.u37", 0x000000, 0x80000, CRC(e3552726) SHA1(bac34ac4fce1519c1bc8020064090e77b5c2a629) ) // TMS27C240
 
 	ROM_REGION( 0x10000, "xa:mcu", 0 ) // MX10EXAQC (80C51 XA based MCU) marked O7
-	// while the XA is marked O7 like fearless, it is not confirmed to be the same (IGS labels are not unique)
-	// it can currently be booted with the superkds XA (fearless XA requires some additional XA ops to be implemented)
-	ROM_LOAD( "o7.u33", 0x00000, 0x10000, NO_DUMP )
+	ROM_LOAD( "o7.u33", 0x000000, 0x10000, CRC(7dae4900) SHA1(bbf7ba7c9e95ff2ffeb1dc0fc7ccedd4da274d01) )
 
 	ROM_REGION( 0x2000000, "gfx1", 0 ) // FIXED BITS (0xxxxxxx) (graphics are 7bpp)
 	ROM_LOAD32_WORD( "icescape_fa_cg_u7.u7",   0x0000000, 0x800000, CRC(cd534afb) SHA1(ba9a265d45f7a1a0ca1ac248789609b24b19441d) )
@@ -567,4 +623,4 @@ void igs_fear_state::init_igs_icescape()
 
 GAME( 2005, superkds, 0, igs_fear_xor, superkds, igs_fear_state, init_igs_superkds, ROT0, "IGS (Golden Dragon Amusement license)", "Super Kids / Jiu Nan Xiao Yingxiong (S019CN)", MACHINE_NODEVICE_LAN )
 GAME( 2006, fearless, 0, igs_fear_xor, fear,     igs_fear_state, init_igs_fear,     ROT0, "IGS (American Alpha license)",          "Fearless Pinocchio (V101US)",                  0 )
-GAME( 2006, icescape, 0, igs_fear_xor, fear,     igs_fear_state, init_igs_icescape, ROT0, "IGS",                                   "Icescape (V104FA)",                            MACHINE_IS_SKELETON ) // IGS FOR V104FA 2006-11-02
+GAME( 2006, icescape, 0, igs_fear_xor, icescape, igs_fear_state, init_igs_icescape, ROT0, "IGS",                                   "Icescape (V104FA)",                            MACHINE_NOT_WORKING ) // IGS FOR V104FA 2006-11-02, internal ROM "TUE AUG 30 10:47:23 2005 ICESCAPE_V100FA"
