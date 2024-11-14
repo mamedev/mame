@@ -502,8 +502,9 @@ void pc9801vm_state::border_color_w(offs_t offset, u8 data)
 	if (offset)
 	{
 		// 24.83/15.75 kHz selector, available for everything but vanilla class
-		// TODO: verify clock for 200 line mode (handtuned), verify that vanilla effectively cannot select it thru dips.
-		const XTAL screen_clock = (data & 1 ? XTAL(21'052'600) : (XTAL(21'052'600) / 3) * 2) / 8;
+		// TODO: verify that vanilla effectively cannot select it thru dips.
+		// TODO: pc9801vm doesn't access this
+		const XTAL screen_clock = (data & 1 ? XTAL(21'052'600) : XTAL(14'318'181)) / 8;
 
 		m_hgdc[0]->set_unscaled_clock(screen_clock);
 		m_hgdc[1]->set_unscaled_clock(screen_clock);

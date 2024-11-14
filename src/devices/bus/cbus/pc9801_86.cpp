@@ -357,7 +357,13 @@ void pc9801_86_device::io_map(address_map &map)
 		}),
 		NAME([this] (u8 data) {
 			if(m_pcm_ctrl & 0x20)
+			{
+				// TODO: may fall over with the irq logic math
+				// queue_count() < (0xff + 1) << 7 = 0x8000 -> always true
+				if (data == 0xff)
+					popmessage("pc9801_86: $a46a irq_rate == 0xff");
 				m_irq_rate = (data + 1) * 128;
+			}
 			else
 				m_pcm_mode = data;
 		})
