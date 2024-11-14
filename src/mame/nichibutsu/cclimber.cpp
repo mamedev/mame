@@ -15,8 +15,10 @@ graphics are 3bpp instead of 2)
 TODO:
 - verify timings of sound/music on Swimmer
 - add tms5110 support to bagmanf
-- yamato bg gradient color decode & table selection
 - toprollr Coin_B 2C_1C doesn't work right, is it a BTANB?
+
+BTANB:
+- yamato shot and missile sound effects block the bg music
 
 -------------------------------------------------------------------
 
@@ -127,33 +129,33 @@ I/O C  ;AY-3-8910 Data Read Reg.
 
 -------------------------------------------------------------------
 
-T.S. 17.12.2005:
-
 Yamato:
 -------
- Added temporary bg gradient (bad colors/offset).
+ Gradient tables are stored in two ROMs. Each table is 256 bytes
+ long: 128 for normal and 128 bytes for flipped screen.
+ Color format is direct RGB mapping of 16 bits.
 
- Gradient table are stored in two(?) ROMs.
- Each table is 256 bytes long: 128 for normal
- and 128 bytes for flipped screen.
- Color format is unknown - probably direct RGB
- mapping of 8 or 16 (both roms) bits. Also table
- selection source is unknown.
-
- At the title screen, it's a solid dark-cyan.
- During gameplay, the sky is a cyan gradient, and
- the sea is a dark blue gradient. When the player
- ship explodes, the sky and sea briefly turn to a
- lighter cyan gradient, followed by cyan-pink for
- the sky, and purple-red for the sea.
+ At the title screen, it's a solid dark-cyan. During gameplay,
+ the sky is a cyan gradient, and the sea is a dark blue gradient.
+ When the player ship explodes, the sky and sea briefly turn to a
+ lighter cyan gradient, followed by cyan-pink for the sky,
+ and purple-red for the sea.
 
 
 Top Roller:
 ----------
- It's made by the same developers as Yamato (apparently
- Falcon) and probably uses the same encrypted SEGA cpu.
+ It's made by the same developers as Yamato (apparently Falcon)
+ and probably uses the same encrypted SEGA cpu.
 
  lives - $6155
+
+Cannon Ball
+-----------
+ The Cannon Ball bootlegs on this Falcon (Crazy Kong) hardware
+ don't correctly handle the protection device found on the original
+ pacman hardware conversion, this causes them to crash after the
+ a few rounds - confirmed on an original PCB. They clearly weren't
+ tested properly by the bootleggers.
 
 -------------------------------------------------------------------
 
@@ -220,13 +222,143 @@ Notes:
 
 -------------------------------------------------------------------
 
- Cannon Ball
- -----------
+Donkey King
+1981 (bootleg)
 
- The Cannon Ball bootlegs on this Falcon (Crazy Kong) hardware don't correctly
- handle the protection device found on the original pacman hardware conversion,
- this causes them to crash after the a few rounds - confirmed on an original PCB.
- They clearly weren't tested properly by the bootleggers.
+This game runs on dedicated hardware.
+
+Possibly bootlegged by Hafasonic?
+
+CPU Board
+---------
+
+MTD-2
+|-----------------------------------------|
+|C1181  VOL             D5.1K   D7.1N     |
+|      LM3900               D6.1M   D8.1R |
+|                                         |
+|                       6116    D10.2N    |
+|                           D9.2M   D11.2R|
+|   4066                                  |
+|         AY3-8910                        |
+|                                  PAL12L6|
+|                                         |
+|1                                        |
+|8               2114 2114                |
+|W                                        |
+|A                                        |
+|Y                                        |
+|                                         |
+|                                         |
+|                    Z80A                 |
+|                                         |
+|                                         |
+|                                         |
+|   DSW(8)    82S129.5G                   |
+|                                         |
+|-----------------------------------------|
+Notes:
+      Z80 clock - 3.072MHz [18.432/6]
+      AY3-8910 clock - 1.536MHz [18.432/12]
+      HSync - 15.5065kHz
+      VSync - 60.5608Hz
+
+
+Video Board
+-----------
+
+MTD-2B
+|-----------------------------------------|
+| 18.432MHz                  82S123.1T    |
+|          2114                82S123.1U  |
+|          2114                  82S123.1V|
+|                                         |
+|                                         |
+|                                         |
+|                                         |
+|                                         |
+|                                         |
+|                                         |
+|                                         |
+|                                         |
+|                                         |
+|                                         |
+|2101 2101    2114 2114                   |
+|                                         |
+|D12.6A      D1.6H D3.6L    2115 2115 2115|
+|   D13.6C      D2.6K  D4.6N              |
+|                                         |
+|                                         |
+|                           2115 2115 2125|
+|                                         |
+|-----------------------------------------|
+
+
+18-way Pinout
+-------------
+
+Parts          Solder
+-------------------------
+GND      1     GND
+GND      2     GND
+GND      3     GND
+SPK-     4     SPK+
++12V     5     +12V
+         6     P1 UP
+         7     P2 UP
+         8     VIDEO GND
++5V      9     +5V
+P1 DOWN  10
+P2 DOWN  11
+         12    P2 START
+COIN     13    P1 START
+P1 JUMP  14    P1 RIGHT
+RED      15    P1 LEFT
+P2 RIGHT 16    BLUE
+P2 LEFT  17    GREEN
+P2 JUMP  18    SYNC
+
+
+Dip Switch - Donkey King
++----------------+-----+-----+-----+-----+-----+-----+-----+-----+
+|                |  1  |  2  |  3  |  4  |  5  |  6  |  7  |  8  |
++----------------+-----+-----+-----+-----+-----+-----+-----+-----+
+|Life          3 | OFF | OFF |     |     |     |     |     |     |
+|                +-----+-----+-----+-----+-----+-----+-----+-----+
+|              4 | ON  | OFF |     |     |     |     |     |     |
+|                +-----+-----+-----+-----+-----+-----+-----+-----+
+|              5 | OFF | ON  |     |     |     |     |     |     |
+|                +-----+-----+-----+-----+-----+-----+-----+-----+
+|              6 | ON  | ON  |     |     |     |     |     |     |
++----------------+-----+-----+-----+-----+-----+-----+-----+-----+
+|Bonus      7000 |     |     | OFF | OFF |     |     |     |     |
+|                +-----+-----+-----+-----+-----+-----+-----+-----+
+|          10000 |     |     | ON  | OFF |     |     |     |     |
+|                +-----+-----+-----+-----+-----+-----+-----+-----+
+|          15000 |     |     | OFF | ON  |     |     |     |     |
+|                +-----+-----+-----+-----+-----+-----+-----+-----+
+|          20000 |     |     | ON  | ON  |     |     |     |     |
++----------------+-----+-----+-----+-----+-----+-----+-----+-----+
+|Credit    1C 1P |     |     |     |     | OFF | OFF | OFF |     |
+|                +-----+-----+-----+-----+-----+-----+-----+-----+
+|          1C 2P |     |     |     |     | OFF | ON  | OFF |     |
+|                +-----+-----+-----+-----+-----+-----+-----+-----+
+|          1C 3P |     |     |     |     | OFF | OFF | ON  |     |
+|                +-----+-----+-----+-----+-----+-----+-----+-----+
+|          1C 4P |     |     |     |     | OFF | ON  | ON  |     |
+|                +-----+-----+-----+-----+-----+-----+-----+-----+
+|          2C 1P |     |     |     |     | ON  | OFF | OFF |     |
+|                +-----+-----+-----+-----+-----+-----+-----+-----+
+|          3C 1P |     |     |     |     | ON  | ON  | OFF |     |
+|                +-----+-----+-----+-----+-----+-----+-----+-----+
+|          4C 1P |     |     |     |     | ON  | OFF | ON  |     |
+|                +-----+-----+-----+-----+-----+-----+-----+-----+
+|          5C 1P |     |     |     |     | ON  | ON  | ON  |     |
++----------------+-----+-----+-----+-----+-----+-----+-----+-----+
+|Screen    Table |     |     |     |     |     |     |     | OFF |
+|                +-----+-----+-----+-----+-----+-----+-----+-----+
+|        Upright |     |     |     |     |     |     |     | ON  |
++----------------+-----+-----+-----+-----+-----+-----+-----+-----+
 
 ***************************************************************************/
 
@@ -1435,7 +1567,7 @@ void cclimber_state::bagmanf(machine_config &config)
 	// basic machine hardware
 	m_maincpu->set_addrmap(AS_PROGRAM, &cclimber_state::bagmanf_map);
 
-	subdevice<screen_device>("screen")->screen_vblank().set(FUNC(cclimber_state::bagmanf_vblank_irq));
+	m_screen->screen_vblank().set(FUNC(cclimber_state::bagmanf_vblank_irq));
 }
 
 
@@ -1455,10 +1587,10 @@ void yamato_state::yamato(machine_config &config)
 	m_audiocpu->set_addrmap(AS_IO, &yamato_state::yamato_audio_portmap);
 
 	// video hardware
-	m_palette->set_entries(16*4+8*4+256);
 	m_palette->set_init(FUNC(yamato_state::yamato_palette));
 
-	subdevice<screen_device>("screen")->set_screen_update(FUNC(yamato_state::screen_update_yamato));
+	m_screen->set_screen_update(FUNC(yamato_state::screen_update_yamato));
+	m_screen->set_no_palette();
 
 	// audio hardware
 	GENERIC_LATCH_8(config, "soundlatch1");
@@ -1492,7 +1624,7 @@ void toprollr_state::toprollr(machine_config &config)
 	m_palette->set_entries(32*5);
 	m_palette->set_init(FUNC(toprollr_state::toprollr_palette));
 
-	subdevice<screen_device>("screen")->set_screen_update(FUNC(toprollr_state::screen_update_toprollr));
+	m_screen->set_screen_update(FUNC(toprollr_state::screen_update_toprollr));
 
 	// audio hardware
 	subdevice<cclimber_audio_device>("cclimber_audio")->set_clock(12_MHz_XTAL/8);
@@ -2228,144 +2360,6 @@ ROM_START( monkeyd )
 ROM_END
 
 
-/* Donkey King
-1981 (bootleg)
-
-This game runs on dedicated hardware.
-
-Possibly bootlegged by Hafasonic?
-
-CPU Board
----------
-
-MTD-2
-|-----------------------------------------|
-|C1181  VOL             D5.1K   D7.1N     |
-|      LM3900               D6.1M   D8.1R |
-|                                         |
-|                       6116    D10.2N    |
-|                           D9.2M   D11.2R|
-|   4066                                  |
-|         AY3-8910                        |
-|                                  PAL12L6|
-|                                         |
-|1                                        |
-|8               2114 2114                |
-|W                                        |
-|A                                        |
-|Y                                        |
-|                                         |
-|                                         |
-|                    Z80A                 |
-|                                         |
-|                                         |
-|                                         |
-|   DSW(8)    82S129.5G                   |
-|                                         |
-|-----------------------------------------|
-Notes:
-      Z80 clock - 3.072MHz [18.432/6]
-      AY3-8910 clock - 1.536MHz [18.432/12]
-      HSync - 15.5065kHz
-      VSync - 60.5608Hz
-
-
-Video Board
------------
-
-MTD-2B
-|-----------------------------------------|
-| 18.432MHz                  82S123.1T    |
-|          2114                82S123.1U  |
-|          2114                  82S123.1V|
-|                                         |
-|                                         |
-|                                         |
-|                                         |
-|                                         |
-|                                         |
-|                                         |
-|                                         |
-|                                         |
-|                                         |
-|                                         |
-|2101 2101    2114 2114                   |
-|                                         |
-|D12.6A      D1.6H D3.6L    2115 2115 2115|
-|   D13.6C      D2.6K  D4.6N              |
-|                                         |
-|                                         |
-|                           2115 2115 2125|
-|                                         |
-|-----------------------------------------|
-
-
-18-way Pinout
--------------
-
-Parts          Solder
--------------------------
-GND      1     GND
-GND      2     GND
-GND      3     GND
-SPK-     4     SPK+
-+12V     5     +12V
-         6     P1 UP
-         7     P2 UP
-         8     VIDEO GND
-+5V      9     +5V
-P1 DOWN  10
-P2 DOWN  11
-         12    P2 START
-COIN     13    P1 START
-P1 JUMP  14    P1 RIGHT
-RED      15    P1 LEFT
-P2 RIGHT 16    BLUE
-P2 LEFT  17    GREEN
-P2 JUMP  18    SYNC
-
-
-Dip Switch - Donkey King
-+----------------+-----+-----+-----+-----+-----+-----+-----+-----+
-|                |  1  |  2  |  3  |  4  |  5  |  6  |  7  |  8  |
-+----------------+-----+-----+-----+-----+-----+-----+-----+-----+
-|Life          3 | OFF | OFF |     |     |     |     |     |     |
-|                +-----+-----+-----+-----+-----+-----+-----+-----+
-|              4 | ON  | OFF |     |     |     |     |     |     |
-|                +-----+-----+-----+-----+-----+-----+-----+-----+
-|              5 | OFF | ON  |     |     |     |     |     |     |
-|                +-----+-----+-----+-----+-----+-----+-----+-----+
-|              6 | ON  | ON  |     |     |     |     |     |     |
-+----------------+-----+-----+-----+-----+-----+-----+-----+-----+
-|Bonus      7000 |     |     | OFF | OFF |     |     |     |     |
-|                +-----+-----+-----+-----+-----+-----+-----+-----+
-|          10000 |     |     | ON  | OFF |     |     |     |     |
-|                +-----+-----+-----+-----+-----+-----+-----+-----+
-|          15000 |     |     | OFF | ON  |     |     |     |     |
-|                +-----+-----+-----+-----+-----+-----+-----+-----+
-|          20000 |     |     | ON  | ON  |     |     |     |     |
-+----------------+-----+-----+-----+-----+-----+-----+-----+-----+
-|Credit    1C 1P |     |     |     |     | OFF | OFF | OFF |     |
-|                +-----+-----+-----+-----+-----+-----+-----+-----+
-|          1C 2P |     |     |     |     | OFF | ON  | OFF |     |
-|                +-----+-----+-----+-----+-----+-----+-----+-----+
-|          1C 3P |     |     |     |     | OFF | OFF | ON  |     |
-|                +-----+-----+-----+-----+-----+-----+-----+-----+
-|          1C 4P |     |     |     |     | OFF | ON  | ON  |     |
-|                +-----+-----+-----+-----+-----+-----+-----+-----+
-|          2C 1P |     |     |     |     | ON  | OFF | OFF |     |
-|                +-----+-----+-----+-----+-----+-----+-----+-----+
-|          3C 1P |     |     |     |     | ON  | ON  | OFF |     |
-|                +-----+-----+-----+-----+-----+-----+-----+-----+
-|          4C 1P |     |     |     |     | ON  | OFF | ON  |     |
-|                +-----+-----+-----+-----+-----+-----+-----+-----+
-|          5C 1P |     |     |     |     | ON  | ON  | ON  |     |
-+----------------+-----+-----+-----+-----+-----+-----+-----+-----+
-|Screen    Table |     |     |     |     |     |     |     | OFF |
-|                +-----+-----+-----+-----+-----+-----+-----+-----+
-|        Upright |     |     |     |     |     |     |     | ON  |
-+----------------+-----+-----+-----+-----+-----+-----+-----+-----+ */
-
 ROM_START( dking )
 	ROM_REGION( 0x6000, "maincpu", 0 )
 	ROM_LOAD( "d11.r2", 0x0800, 0x0800, CRC(f7cace41) SHA1(981dbb1cddd66a0cbc8fe147172ffe7eb5b7fa21) )
@@ -2958,8 +2952,8 @@ ROM_START( yamato )
 	ROM_LOAD( "8.11c",        0x0000, 0x1000, CRC(28024d9a) SHA1(c871c4d74be72a8bfea99e89d43f91922f4b734b) )
 	ROM_LOAD( "7.11a",        0x1000, 0x1000, CRC(4a179790) SHA1(7fb6b033de939ff8bd13055c073311dca2c1a6fe) )
 
-	ROM_REGION( 0x2000, "user1", 0 )
-	ROM_LOAD( "5.5lm",        0x0000, 0x1000, CRC(7761ad24) SHA1(98878b19addd142d35718080eece05eaaee0388d) ) // ??
+	ROM_REGION( 0x2000, "gradient", 0 )
+	ROM_LOAD( "5.5lm",        0x0000, 0x1000, CRC(7761ad24) SHA1(98878b19addd142d35718080eece05eaaee0388d) )
 	ROM_LOAD( "6.5n",         0x1000, 0x1000, CRC(da48444c) SHA1(a43e672ce262eb817fb4e5715ef4fb304a6a2815) )
 
 	ROM_REGION( 0x00a0, "proms", 0 )
@@ -2989,8 +2983,8 @@ ROM_START( yamato2 )
 	ROM_LOAD( "8.11c",        0x0000, 0x1000, CRC(28024d9a) SHA1(c871c4d74be72a8bfea99e89d43f91922f4b734b) )
 	ROM_LOAD( "7.11a",        0x1000, 0x1000, CRC(4a179790) SHA1(7fb6b033de939ff8bd13055c073311dca2c1a6fe) )
 
-	ROM_REGION( 0x2000, "user1", 0 )
-	ROM_LOAD( "5.5lm",        0x0000, 0x1000, CRC(7761ad24) SHA1(98878b19addd142d35718080eece05eaaee0388d) ) // ??
+	ROM_REGION( 0x2000, "gradient", 0 )
+	ROM_LOAD( "5.5lm",        0x0000, 0x1000, CRC(7761ad24) SHA1(98878b19addd142d35718080eece05eaaee0388d) )
 	ROM_LOAD( "6.5n",         0x1000, 0x1000, CRC(da48444c) SHA1(a43e672ce262eb817fb4e5715ef4fb304a6a2815) )
 
 	ROM_REGION( 0x00a0, "proms", 0 )
@@ -3143,7 +3137,7 @@ GAME( 1983, guzzlers,    guzzler,  guzzler,   guzzler,   swimmer_state,  empty_i
 
 GAME( 1983, au,          0,        au,        au,        swimmer_state,  empty_init,     ROT90,  "Tehkan", "Au (location test)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1983, yamato,      0,        yamato,    yamato,    yamato_state,   empty_init,     ROT90,  "Sega",   "Yamato (US)",     MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1983, yamato2,     yamato,   yamato,    yamato2,   yamato_state,   empty_init,     ROT90,  "Sega",   "Yamato (World?)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1983, yamato,      0,        yamato,    yamato,    yamato_state,   empty_init,     ROT90,  "Sega",   "Yamato (US)",     MACHINE_SUPPORTS_SAVE )
+GAME( 1983, yamato2,     yamato,   yamato,    yamato2,   yamato_state,   empty_init,     ROT90,  "Sega",   "Yamato (World?)", MACHINE_SUPPORTS_SAVE )
 
 GAME( 1983, toprollr,    0,        toprollr,  toprollr,  toprollr_state, init_toprollr,  ROT90,  "Jaleco", "Top Roller", MACHINE_SUPPORTS_SAVE )

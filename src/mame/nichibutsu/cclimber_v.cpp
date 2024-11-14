@@ -229,10 +229,6 @@ void yamato_state::yamato_palette(palette_device &palette) const
 
 		palette.set_pen_color(i + 0x40, rgb_t(r, g, b));
 	}
-
-	// fake colors for bg gradient
-	for (int i = 0; i < 0x100; i++)
-		palette.set_pen_color(YAMATO_SKY_PEN_BASE + i, rgb_t(0, 0, i));
 }
 
 
@@ -288,19 +284,19 @@ void swimmer_state::set_background_pen()
 {
 	int bit0, bit1, bit2;
 
-	/* red component */
+	// red component
 	bit0 = 0;
 	bit1 = (*m_swimmer_background_color >> 6) & 0x01;
 	bit2 = (*m_swimmer_background_color >> 7) & 0x01;
 	int const r = 0x20 * bit0 + 0x40 * bit1 + 0x80 * bit2;
 
-	/* green component */
+	// green component
 	bit0 = (*m_swimmer_background_color >> 3) & 0x01;
 	bit1 = (*m_swimmer_background_color >> 4) & 0x01;
 	bit2 = (*m_swimmer_background_color >> 5) & 0x01;
 	int const g = 0x20 * bit0 + 0x40 * bit1 + 0x80 * bit2;
 
-	/* blue component */
+	// blue component
 	bit0 = (*m_swimmer_background_color >> 0) & 0x01;
 	bit1 = (*m_swimmer_background_color >> 1) & 0x01;
 	bit2 = (*m_swimmer_background_color >> 2) & 0x01;
@@ -312,7 +308,7 @@ void swimmer_state::set_background_pen()
 
 void cclimber_state::cclimber_colorram_w(offs_t offset, uint8_t data)
 {
-	/* A5 is not connected, there is only 0x200 bytes of RAM */
+	// A5 is not connected, there is only 0x200 bytes of RAM
 	m_colorram[offset & ~0x20] = data;
 	m_colorram[offset |  0x20] = data;
 }
@@ -346,7 +342,7 @@ TILE_GET_INFO_MEMBER(cclimber_state::cclimber_get_pf_tile_info)
 {
 	const int flags = TILE_FLIPYX(m_colorram[tile_index] >> 6);
 
-	/* vertical flipping flips two adjacent characters */
+	// vertical flipping flips two adjacent characters
 	if (flags & 0x02)
 		tile_index = tile_index ^ 0x20;
 
@@ -363,7 +359,7 @@ TILE_GET_INFO_MEMBER(swimmer_state::swimmer_get_pf_tile_info)
 {
 	const int flags = TILE_FLIPYX(m_colorram[tile_index] >> 6);
 
-	/* vertical flipping flips two adjacent characters */
+	// vertical flipping flips two adjacent characters
 	if (flags & 0x02)
 		tile_index = tile_index ^ 0x20;
 
@@ -386,10 +382,10 @@ TILE_GET_INFO_MEMBER(toprollr_state::toprollr_get_pf_tile_info)
 
 TILE_GET_INFO_MEMBER(cclimber_state::cclimber_get_bs_tile_info)
 {
-	/* only the lower right is visible */
+	// only the lower right is visible
 	tileinfo.group = ((tile_index & 0x210) == 0x210) ? 0 : 1;
 
-	/* the address doesn't use A4 of the coordinates, giving a 16x16 map */
+	// the address doesn't use A4 of the coordinates, giving a 16x16 map
 	tile_index = ((tile_index & 0x1e0) >> 1) | (tile_index & 0x0f);
 
 	const int code = ((m_bigsprite_control[1] & 0x08) << 5) | m_bigsprite_videoram[tile_index];
@@ -401,10 +397,10 @@ TILE_GET_INFO_MEMBER(cclimber_state::cclimber_get_bs_tile_info)
 
 TILE_GET_INFO_MEMBER(toprollr_state::toprollr_get_bs_tile_info)
 {
-	/* only the lower right is visible */
+	// only the lower right is visible
 	tileinfo.group = ((tile_index & 0x210) == 0x210) ? 0 : 1;
 
-	/* the address doesn't use A4 of the coordinates, giving a 16x16 map */
+	// the address doesn't use A4 of the coordinates, giving a 16x16 map
 	tile_index = ((tile_index & 0x1e0) >> 1) | (tile_index & 0x0f);
 
 	const int code = ((m_bigsprite_control[1] & 0x18) << 5) | m_bigsprite_videoram[tile_index];
@@ -437,6 +433,12 @@ void cclimber_state::video_start()
 
 	save_item(NAME(m_flip_x));
 	save_item(NAME(m_flip_y));
+}
+
+void yamato_state::video_start()
+{
+	cclimber_state::video_start();
+	m_screen->register_screen_bitmap(m_dest_bitmap);
 }
 
 void swimmer_state::video_start()
@@ -543,8 +545,8 @@ void cclimber_state::cclimber_draw_sprites(bitmap_ind16 &bitmap, const rectangle
 		int y = 240 - m_spriteram[offs + 2];
 
 		int code = ((m_spriteram[offs + 1] & 0x10) << 3) |
-					((m_spriteram[offs + 1] & 0x20) << 1) |
-					( m_spriteram[offs + 0] & 0x3f);
+				((m_spriteram[offs + 1] & 0x20) << 1) |
+				(m_spriteram[offs + 0] & 0x3f);
 
 		int color = m_spriteram[offs + 1] & 0x0f;
 
@@ -578,8 +580,8 @@ void cclimber_state::toprollr_draw_sprites(bitmap_ind16 &bitmap, const rectangle
 		int y = 240 - m_spriteram[offs + 2];
 
 		const int code = ((m_spriteram[offs + 1] & 0x10) << 3) |
-					((m_spriteram[offs + 1] & 0x20) << 1) |
-					( m_spriteram[offs + 0] & 0x3f);
+				((m_spriteram[offs + 1] & 0x20) << 1) |
+				(m_spriteram[offs + 0] & 0x3f);
 
 		const int color = m_spriteram[offs + 1] & 0x0f;
 
@@ -613,10 +615,10 @@ void swimmer_state::swimmer_draw_sprites(bitmap_ind16 &bitmap, const rectangle &
 		int y = 240 - m_spriteram[offs + 2];
 
 		const int code = ((m_spriteram[offs + 1] & 0x30) << 2) |
-					(m_spriteram[offs + 0] & 0x3f);
+				(m_spriteram[offs + 0] & 0x3f);
 
 		const int color = (m_palettebank << 4) |
-					(m_spriteram[offs + 1] & 0x0f);
+				(m_spriteram[offs + 1] & 0x0f);
 
 		int flipx = m_spriteram[offs + 0] & 0x40;
 		int flipy = m_spriteram[offs + 0] & 0x80;
@@ -660,31 +662,61 @@ uint32_t cclimber_state::screen_update_cclimber(screen_device &screen, bitmap_in
 }
 
 
-uint32_t yamato_state::screen_update_yamato(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t yamato_state::screen_update_yamato(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	uint8_t const *const sky_rom = memregion("user1")->base() + 0x1200;
+	bitmap.fill(0, cliprect);
 
-	for (int i = 0; i < 0x100; i++)
+	// gradient bank from 74259
+	uint16_t bank = bitswap<3>(m_mainlatch->output_state(),3,5,6) << 8;
+	bank |= m_flip_x ? 0x80 : 0;
+
+	// fill in the gradient
+	for (int i = 0; i < 0x80; i++)
 	{
-		pen_t pen = YAMATO_SKY_PEN_BASE + sky_rom[(m_flip_x ? 0x80 : 0) + (i >> 1)];
+		const uint8_t data0 = m_gradient_rom[0x0000 | bank | i];
+		const uint8_t data1 = m_gradient_rom[0x1000 | bank | i];
 
-		for (int j = 0; j < 0x100; j++)
-			bitmap.pix(j, (i - 8) & 0xff) = pen;
+		uint8_t r = pal5bit(data0 & 0x1f);
+		uint8_t g = pal5bit(data0 >> 5 | (data1 << 3 & 0x18));
+		uint8_t b = pal6bit(data1 >> 2);
+		uint32_t color = r << 16 | g << 8 | b;
+
+		for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
+		{
+			int start = (i * 2 - 8) & 0xff;
+			for (int x = start; x < start + 2; x++)
+			{
+				if (cliprect.contains(x, y))
+					bitmap.pix(y, x) = color;
+			}
+		}
 	}
 
-	draw_playfield(screen, bitmap, cliprect);
+	m_dest_bitmap.fill(0xff, cliprect);
+	draw_playfield(screen, m_dest_bitmap, cliprect);
 
 	if (m_bigsprite_control[0] & 0x01)
 	{
 		// draw the "big sprite" under the regular sprites
-		cclimber_draw_bigsprite(screen, bitmap, cliprect);
-		toprollr_draw_sprites(bitmap, cliprect, m_gfxdecode->gfx(1));
+		cclimber_draw_bigsprite(screen, m_dest_bitmap, cliprect);
+		toprollr_draw_sprites(m_dest_bitmap, cliprect, m_gfxdecode->gfx(1));
 	}
 	else
 	{
 		// draw the "big sprite" over the regular sprites
-		toprollr_draw_sprites(bitmap, cliprect, m_gfxdecode->gfx(1));
-		cclimber_draw_bigsprite(screen, bitmap, cliprect);
+		toprollr_draw_sprites(m_dest_bitmap, cliprect, m_gfxdecode->gfx(1));
+		cclimber_draw_bigsprite(screen, m_dest_bitmap, cliprect);
+	}
+
+	// copy the tilemap/sprites
+	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
+	{
+		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
+		{
+			const pen_t pen = m_dest_bitmap.pix(y, x);
+			if (pen != 0xff)
+				bitmap.pix(y, x) = m_palette->pen(pen);
+		}
 	}
 
 	return 0;
