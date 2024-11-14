@@ -31,6 +31,9 @@
 #include "machine/z80sio.h"
 #include "machine/wd_fdc.h"
 
+
+namespace {
+
 class ts802_state : public driver_device
 {
 public:
@@ -45,7 +48,7 @@ public:
 	void init_ts802();
 
 private:
-	virtual void machine_reset() override;
+	virtual void machine_reset() override ATTR_COLD;
 	uint8_t port00_r() { return 0x80; };
 	uint8_t port0c_r() { return 1; };
 	uint8_t port0e_r() { return 0; };
@@ -59,8 +62,8 @@ private:
 	uint8_t io_read_byte(offs_t offset);
 	void io_write_byte(offs_t offset, uint8_t data);
 	void kbd_put(u8 data);
-	void ts802_io(address_map &map);
-	void ts802_mem(address_map &map);
+	void ts802_io(address_map &map) ATTR_COLD;
+	void ts802_mem(address_map &map) ATTR_COLD;
 
 	uint8_t m_term_data = 0;
 	address_space *m_mem = nullptr;
@@ -196,13 +199,14 @@ void ts802_state::ts802(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &ts802_state::ts802_mem);
 	m_maincpu->set_addrmap(AS_IO, &ts802_state::ts802_io);
 	//m_maincpu->set_daisy_config(daisy_chain_intf); // causes problems
+	m_maincpu->busack_cb().set("dma", FUNC(z80dma_device::bai_w));
 
 	/* Devices */
 	GENERIC_TERMINAL(config, m_terminal, 0);
 	m_terminal->set_keyboard_callback(FUNC(ts802_state::kbd_put));
 
 	z80dma_device& dma(Z80DMA(config, "dma", 16_MHz_XTAL / 4));
-	dma.out_busreq_callback().set_inputline(m_maincpu, INPUT_LINE_HALT);
+	dma.out_busreq_callback().set_inputline(m_maincpu, Z80_INPUT_LINE_BUSRQ);
 	dma.out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 	dma.in_mreq_callback().set(FUNC(ts802_state::memory_read_byte));
 	dma.out_mreq_callback().set(FUNC(ts802_state::memory_write_byte));
@@ -240,6 +244,9 @@ ROM_START( ts802h )
 	ROM_LOAD( "800000-003a.a68",  0x0000, 0x0800, CRC(24eeb74d) SHA1(77900937f1492b4c5a70ba3aac55da322d403fbd) )
 	ROM_LOAD( "800000-002a.a67",  0x0800, 0x0800, CRC(4b6c6e29) SHA1(c236e4625bc16062154cbebc4dbc8d62183ef9ab) )
 ROM_END
+
+} // anonymous namespace
+
 
 /* Driver */
 

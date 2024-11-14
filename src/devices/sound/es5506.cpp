@@ -97,6 +97,8 @@ Ensoniq OTIS - ES5505                                            Ensoniq OTTO - 
 
 ***********************************************************************************************/
 
+#define LOG_SERIAL              (1U << 1)
+
 #define VERBOSE                 0
 #include "logmacro.h"
 
@@ -171,7 +173,7 @@ es550x_device::es550x_device(const machine_config &mconfig, device_type type, co
 	, m_region3(*this, finder_base::DUMMY_TAG)
 	, m_channels(0)
 	, m_irq_cb(*this)
-	, m_read_port_cb(*this)
+	, m_read_port_cb(*this, 0)
 	, m_sample_rate_changed_cb(*this)
 {
 }
@@ -199,9 +201,6 @@ void es550x_device::device_start()
 {
 	// initialize the rest of the structure
 	m_master_clock = clock();
-	m_irq_cb.resolve();
-	m_read_port_cb.resolve();
-	m_sample_rate_changed_cb.resolve();
 	m_irqv = 0x80;
 
 	// register save
@@ -299,8 +298,7 @@ void es550x_device::device_clock_changed()
 	m_master_clock = clock();
 	m_sample_rate = m_master_clock / (16 * (m_active_voices + 1));
 	m_stream->set_sample_rate(m_sample_rate);
-	if (!m_sample_rate_changed_cb.isnull())
-		m_sample_rate_changed_cb(m_sample_rate);
+	m_sample_rate_changed_cb(m_sample_rate);
 }
 
 //-------------------------------------------------
@@ -416,8 +414,7 @@ device_memory_interface::space_config_vector es5505_device::memory_space_config(
 void es550x_device::update_irq_state()
 {
 	// ES5505/6 irq line has been set high - inform the host
-	if (!m_irq_cb.isnull())
-		m_irq_cb(1); // IRQB set high
+	m_irq_cb(1); // IRQB set high
 }
 
 void es550x_device::update_internal_irq_state()
@@ -433,8 +430,7 @@ void es550x_device::update_internal_irq_state()
 
 	m_irqv = 0x80;
 
-	if (!m_irq_cb.isnull())
-		m_irq_cb(0); // IRQB set low
+	m_irq_cb(0); // IRQB set low
 }
 
 /**********************************************************************************************
@@ -785,7 +781,7 @@ inline void es5505_device::check_for_end_forward(es550x_voice *voice, u64 &accum
 
 inline void es5505_device::check_for_end_reverse(es550x_voice *voice, u64 &accum)
 {
-	// are we past the end? */
+	// are we past the end?
 	if (accum < voice->start)
 	{
 		// generate interrupt if required
@@ -860,7 +856,7 @@ void es550x_device::generate_ulaw(es550x_voice *voice, s32 *dest)
 			check_for_end_forward(voice, accum);
 		}
 
-		// two cases: second case is backward direction */
+		// two cases: second case is backward direction
 		else
 		{
 			// fetch two samples
@@ -1097,75 +1093,74 @@ inline void es5506_device::reg_write_low(es550x_voice *voice, offs_t offset, u32
 {
 	switch (offset)
 	{
-		case 0x00/8:    /* CR */
+		case 0x00/8:    // CR
 			voice->control = data & 0xffff;
 			LOG("voice %d, control=%04x\n", m_current_page & 0x1f, voice->control);
 			break;
 
-		case 0x08/8:    /* FC */
+		case 0x08/8:    // FC
 			voice->freqcount = get_address_acc_shifted_val(data & 0x1ffff);
 			LOG("voice %d, freq count=%08x\n", m_current_page & 0x1f, get_address_acc_res(voice->freqcount));
 			break;
 
-		case 0x10/8:    /* LVOL */
+		case 0x10/8:    // LVOL
 			voice->lvol = data & 0xffff; // low 4 bit is used for finer envelope control
 			LOG("voice %d, left vol=%04x\n", m_current_page & 0x1f, voice->lvol);
 			break;
 
-		case 0x18/8:    /* LVRAMP */
+		case 0x18/8:    // LVRAMP
 			voice->lvramp = (data & 0xff00) >> 8;
 			LOG("voice %d, left vol ramp=%04x\n", m_current_page & 0x1f, voice->lvramp);
 			break;
 
-		case 0x20/8:    /* RVOL */
+		case 0x20/8:    // RVOL
 			voice->rvol = data & 0xffff; // low 4 bit is used for finer envelope control
 			LOG("voice %d, right vol=%04x\n", m_current_page & 0x1f, voice->rvol);
 			break;
 
-		case 0x28/8:    /* RVRAMP */
+		case 0x28/8:    // RVRAMP
 			voice->rvramp = (data & 0xff00) >> 8;
 			LOG("voice %d, right vol ramp=%04x\n", m_current_page & 0x1f, voice->rvramp);
 			break;
 
-		case 0x30/8:    /* ECOUNT */
+		case 0x30/8:    // ECOUNT
 			voice->ecount = data & 0x1ff;
 			voice->filtcount = 0;
 			LOG("voice %d, envelope count=%04x\n", m_current_page & 0x1f, voice->ecount);
 			break;
 
-		case 0x38/8:    /* K2 */
+		case 0x38/8:    // K2
 			voice->k2 = data & 0xffff; // low 4 bit is used for finer envelope control
 			LOG("voice %d, K2=%04x\n", m_current_page & 0x1f, voice->k2);
 			break;
 
-		case 0x40/8:    /* K2RAMP */
+		case 0x40/8:    // K2RAMP
 			voice->k2ramp = ((data & 0xff00) >> 8) | ((data & 0x0001) << 31);
 			LOG("voice %d, K2 ramp=%04x\n", m_current_page & 0x1f, voice->k2ramp);
 			break;
 
-		case 0x48/8:    /* K1 */
+		case 0x48/8:    // K1
 			voice->k1 = data & 0xffff; // low 4 bit is used for finer envelope control
 			LOG("voice %d, K1=%04x\n", m_current_page & 0x1f, voice->k1);
 			break;
 
-		case 0x50/8:    /* K1RAMP */
+		case 0x50/8:    // K1RAMP
 			voice->k1ramp = ((data & 0xff00) >> 8) | ((data & 0x0001) << 31);
 			LOG("voice %d, K1 ramp=%04x\n", m_current_page & 0x1f, voice->k1ramp);
 			break;
 
-		case 0x58/8:    /* ACTV */
+		case 0x58/8:    // ACTV
 		{
 			m_active_voices = data & 0x1f;
 			m_sample_rate = m_master_clock / (16 * (m_active_voices + 1));
 			m_stream->set_sample_rate(m_sample_rate);
-			if (!m_sample_rate_changed_cb.isnull())
-				m_sample_rate_changed_cb(m_sample_rate);
+			m_sample_rate_changed_cb(m_sample_rate);
 
 			LOG("active voices=%d, sample_rate=%d\n", m_active_voices, m_sample_rate);
 			break;
 		}
 
-		case 0x60/8:    /* MODE */
+		case 0x60/8:    // MODE
 			// [4:3] = 00 : Single, Master, Early address mode
 			// [4:3] = 01 : Single, Master, Normal address mode
 			// [4:3] = 10 : Dual, Slave, Normal address mode
@@ -1173,11 +1168,11 @@ inline void es5506_device::reg_write_low(es550x_voice *voice, offs_t offset, u32
 			m_mode = data & 0x1f; // MODE1[4], MODE0[3], BCLK_EN[2], WCLK_EN[1], LRCLK_EN[0]
 			break;
 
-		case 0x68/8:    /* PAR - read only */
-		case 0x70/8:    /* IRQV - read only */
+		case 0x68/8:    // PAR - read only
+		case 0x70/8:    // IRQV - read only
 			break;
 
-		case 0x78/8:    /* PAGE */
+		case 0x78/8:    // PAGE
 			m_current_page = data & 0x7f;
 			break;
 	}
@@ -1187,73 +1182,76 @@ inline void es5506_device::reg_write_high(es550x_voice *voice, offs_t offset, u3
 {
 	switch (offset)
 	{
-		case 0x00/8:    /* CR */
+		case 0x00/8:    // CR
 			voice->control = data & 0xffff;
 			LOG("voice %d, control=%04x\n", m_current_page & 0x1f, voice->control);
 			break;
 
-		case 0x08/8:    /* START */
+		case 0x08/8:    // START
 			voice->start = get_address_acc_shifted_val(data & 0xfffff800);
 			LOG("voice %d, loop start=%08x\n", m_current_page & 0x1f, get_address_acc_res(voice->start));
 			break;
 
-		case 0x10/8:    /* END */
+		case 0x10/8:    // END
 			voice->end = get_address_acc_shifted_val(data & 0xffffff80);
 			LOG("voice %d, loop end=%08x\n", m_current_page & 0x1f, get_address_acc_res(voice->end));
 			break;
 
-		case 0x18/8:    /* ACCUM */
+		case 0x18/8:    // ACCUM
 			voice->accum = get_address_acc_shifted_val(data);
 			LOG("voice %d, accum=%08x\n", m_current_page & 0x1f, get_address_acc_res(voice->accum));
 			break;
 
-		case 0x20/8:    /* O4(n-1) */
-			voice->o4n1 = (s32)(data << 14) >> 14;
+		case 0x20/8:    // O4(n-1); TODO: 16.1 signed fixed point according to datasheet
+			voice->o4n1 = util::sext(data, 18);
 			LOG("voice %d, O4(n-1)=%05x\n", m_current_page & 0x1f, voice->o4n1 & 0x3ffff);
 			break;
 
-		case 0x28/8:    /* O3(n-1) */
-			voice->o3n1 = (s32)(data << 14) >> 14;
+		case 0x28/8:    // O3(n-1)
+			voice->o3n1 = util::sext(data, 18);
 			LOG("voice %d, O3(n-1)=%05x\n", m_current_page & 0x1f, voice->o3n1 & 0x3ffff);
 			break;
 
-		case 0x30/8:    /* O3(n-2) */
-			voice->o3n2 = (s32)(data << 14) >> 14;
+		case 0x30/8:    // O3(n-2)
+			voice->o3n2 = util::sext(data, 18);
 			LOG("voice %d, O3(n-2)=%05x\n", m_current_page & 0x1f, voice->o3n2 & 0x3ffff);
 			break;
 
-		case 0x38/8:    /* O2(n-1) */
-			voice->o2n1 = (s32)(data << 14) >> 14;
+		case 0x38/8:    // O2(n-1)
+			voice->o2n1 = util::sext(data, 18);
 			LOG("voice %d, O2(n-1)=%05x\n", m_current_page & 0x1f, voice->o2n1 & 0x3ffff);
 			break;
 
-		case 0x40/8:    /* O2(n-2) */
-			voice->o2n2 = (s32)(data << 14) >> 14;
+		case 0x40/8:    // O2(n-2)
+			voice->o2n2 = util::sext(data, 18);
 			LOG("voice %d, O2(n-2)=%05x\n", m_current_page & 0x1f, voice->o2n2 & 0x3ffff);
 			break;
 
-		case 0x48/8:    /* O1(n-1) */
-			voice->o1n1 = (s32)(data << 14) >> 14;
+		case 0x48/8:    // O1(n-1)
+			voice->o1n1 = util::sext(data, 18);
 			LOG("voice %d, O1(n-1)=%05x\n", m_current_page & 0x1f, voice->o1n1 & 0x3ffff);
 			break;
 
-		case 0x50/8:    /* W_ST */
+		case 0x50/8:    // W_ST
 			m_wst = data & 0x7f;
+			LOGMASKED(LOG_SERIAL, "%s: word clock start = %02x\n", machine().describe_context(), m_wst);
 			break;
 
-		case 0x58/8:    /* W_END */
+		case 0x58/8:    // W_END
 			m_wend = data & 0x7f;
+			LOGMASKED(LOG_SERIAL, "%s: word clock end = %02x\n", machine().describe_context(), m_wend);
 			break;
 
-		case 0x60/8:    /* LR_END */
+		case 0x60/8:    // LR_END
 			m_lrend = data & 0x7f;
+			LOGMASKED(LOG_SERIAL, "%s: left/right clock end = %02x\n", machine().describe_context(), m_lrend);
 			break;
 
-		case 0x68/8:    /* PAR - read only */
-		case 0x70/8:    /* IRQV - read only */
+		case 0x68/8:    // PAR - read only
+		case 0x70/8:    // IRQV - read only
 			break;
 
-		case 0x78/8:    /* PAGE */
+		case 0x78/8:    // PAGE
 			m_current_page = data & 0x7f;
 			break;
 	}
@@ -1263,63 +1261,63 @@ inline void es5506_device::reg_write_test(es550x_voice *voice, offs_t offset, u3
 {
 	switch (offset)
 	{
-		case 0x00/8:    /* CHANNEL 0 LEFT */
+		case 0x00/8:    // CHANNEL 0 LEFT
 			LOG("Channel 0 left test write %08x\n", data);
 			break;
 
-		case 0x08/8:    /* CHANNEL 0 RIGHT */
+		case 0x08/8:    // CHANNEL 0 RIGHT
 			LOG("Channel 0 right test write %08x\n", data);
 			break;
 
-		case 0x10/8:    /* CHANNEL 1 LEFT */
+		case 0x10/8:    // CHANNEL 1 LEFT
 			LOG("Channel 1 left test write %08x\n", data);
 			break;
 
-		case 0x18/8:    /* CHANNEL 1 RIGHT */
+		case 0x18/8:    // CHANNEL 1 RIGHT
 			LOG("Channel 1 right test write %08x\n", data);
 			break;
 
-		case 0x20/8:    /* CHANNEL 2 LEFT */
+		case 0x20/8:    // CHANNEL 2 LEFT
 			LOG("Channel 2 left test write %08x\n", data);
 			break;
 
-		case 0x28/8:    /* CHANNEL 2 RIGHT */
+		case 0x28/8:    // CHANNEL 2 RIGHT
 			LOG("Channel 2 right test write %08x\n", data);
 			break;
 
-		case 0x30/8:    /* CHANNEL 3 LEFT */
+		case 0x30/8:    // CHANNEL 3 LEFT
 			LOG("Channel 3 left test write %08x\n", data);
 			break;
 
-		case 0x38/8:    /* CHANNEL 3 RIGHT */
+		case 0x38/8:    // CHANNEL 3 RIGHT
 			LOG("Channel 3 right test write %08x\n", data);
 			break;
 
-		case 0x40/8:    /* CHANNEL 4 LEFT */
+		case 0x40/8:    // CHANNEL 4 LEFT
 			LOG("Channel 4 left test write %08x\n", data);
 			break;
 
-		case 0x48/8:    /* CHANNEL 4 RIGHT */
+		case 0x48/8:    // CHANNEL 4 RIGHT
 			LOG("Channel 4 right test write %08x\n", data);
 			break;
 
-		case 0x50/8:    /* CHANNEL 5 LEFT */
+		case 0x50/8:    // CHANNEL 5 LEFT
 			LOG("Channel 5 left test write %08x\n", data);
 			break;
 
-		case 0x58/8:    /* CHANNEL 6 RIGHT */
+		case 0x58/8:    // CHANNEL 6 RIGHT
 			LOG("Channel 5 right test write %08x\n", data);
 			break;
 
-		case 0x60/8:    /* EMPTY */
+		case 0x60/8:    // EMPTY
 			LOG("Test write EMPTY %08x\n", data);
 			break;
 
-		case 0x68/8:    /* PAR - read only */
-		case 0x70/8:    /* IRQV - read only */
+		case 0x68/8:    // PAR - read only
+		case 0x70/8:    // IRQV - read only
 			break;
 
-		case 0x78/8:    /* PAGE */
+		case 0x78/8:    // PAGE
 			m_current_page = data & 0x7f;
 			break;
 	}
@@ -1366,70 +1364,70 @@ inline u32 es5506_device::reg_read_low(es550x_voice *voice, offs_t offset)
 
 	switch (offset)
 	{
-		case 0x00/8:    /* CR */
+		case 0x00/8:    // CR
 			result = voice->control;
 			break;
 
-		case 0x08/8:    /* FC */
+		case 0x08/8:    // FC
 			result = get_address_acc_res(voice->freqcount);
 			break;
 
-		case 0x10/8:    /* LVOL */
+		case 0x10/8:    // LVOL
 			result = voice->lvol;
 			break;
 
-		case 0x18/8:    /* LVRAMP */
+		case 0x18/8:    // LVRAMP
 			result = voice->lvramp << 8;
 			break;
 
-		case 0x20/8:    /* RVOL */
+		case 0x20/8:    // RVOL
 			result = voice->rvol;
 			break;
 
-		case 0x28/8:    /* RVRAMP */
+		case 0x28/8:    // RVRAMP
 			result = voice->rvramp << 8;
 			break;
 
-		case 0x30/8:    /* ECOUNT */
+		case 0x30/8:    // ECOUNT
 			result = voice->ecount;
 			break;
 
-		case 0x38/8:    /* K2 */
+		case 0x38/8:    // K2
 			result = voice->k2;
 			break;
 
-		case 0x40/8:    /* K2RAMP */
+		case 0x40/8:    // K2RAMP
 			result = (voice->k2ramp << 8) | (voice->k2ramp >> 31);
 			break;
 
-		case 0x48/8:    /* K1 */
+		case 0x48/8:    // K1
 			result = voice->k1;
 			break;
 
-		case 0x50/8:    /* K1RAMP */
+		case 0x50/8:    // K1RAMP
 			result = (voice->k1ramp << 8) | (voice->k1ramp >> 31);
 			break;
 
-		case 0x58/8:    /* ACTV */
+		case 0x58/8:    // ACTV
 			result = m_active_voices;
 			break;
 
-		case 0x60/8:    /* MODE */
+		case 0x60/8:    // MODE
 			result = m_mode;
 			break;
 
-		case 0x68/8:    /* PAR */
-			if (!m_read_port_cb.isnull())
+		case 0x68/8:    // PAR
+			if (!m_read_port_cb.isunset())
 				result = m_read_port_cb(0) & 0x3ff; // 10 bit, 9:0
 			break;
 
-		case 0x70/8:    /* IRQV */
+		case 0x70/8:    // IRQV
 			result = m_irqv;
 			if (!machine().side_effects_disabled())
 				update_internal_irq_state();
 			break;
 
-		case 0x78/8:    /* PAGE */
+		case 0x78/8:    // PAGE
 			result = m_current_page;
 			break;
 	}
@@ -1443,70 +1441,70 @@ inline u32 es5506_device::reg_read_high(es550x_voice *voice, offs_t offset)
 
 	switch (offset)
 	{
-		case 0x00/8:    /* CR */
+		case 0x00/8:    // CR
 			result = voice->control;
 			break;
 
-		case 0x08/8:    /* START */
+		case 0x08/8:    // START
 			result = get_address_acc_res(voice->start);
 			break;
 
-		case 0x10/8:    /* END */
+		case 0x10/8:    // END
 			result = get_address_acc_res(voice->end);
 			break;
 
-		case 0x18/8:    /* ACCUM */
+		case 0x18/8:    // ACCUM
 			result = get_address_acc_res(voice->accum);
 			break;
 
-		case 0x20/8:    /* O4(n-1) */
+		case 0x20/8:    // O4(n-1); TODO: 16.1 signed fixed point according to datasheet
 			result = voice->o4n1 & 0x3ffff;
 			break;
 
-		case 0x28/8:    /* O3(n-1) */
+		case 0x28/8:    // O3(n-1)
 			result = voice->o3n1 & 0x3ffff;
 			break;
 
-		case 0x30/8:    /* O3(n-2) */
+		case 0x30/8:    // O3(n-2)
 			result = voice->o3n2 & 0x3ffff;
 			break;
 
-		case 0x38/8:    /* O2(n-1) */
+		case 0x38/8:    // O2(n-1)
 			result = voice->o2n1 & 0x3ffff;
 			break;
 
-		case 0x40/8:    /* O2(n-2) */
+		case 0x40/8:    // O2(n-2)
 			result = voice->o2n2 & 0x3ffff;
 			break;
 
-		case 0x48/8:    /* O1(n-1) */
+		case 0x48/8:    // O1(n-1)
 			result = voice->o1n1 & 0x3ffff;
 			break;
 
-		case 0x50/8:    /* W_ST */
+		case 0x50/8:    // W_ST
 			result = m_wst;
 			break;
 
-		case 0x58/8:    /* W_END */
+		case 0x58/8:    // W_END
 			result = m_wend;
 			break;
 
-		case 0x60/8:    /* LR_END */
+		case 0x60/8:    // LR_END
 			result = m_lrend;
 			break;
 
-		case 0x68/8:    /* PAR */
-			if (!m_read_port_cb.isnull())
+		case 0x68/8:    // PAR
+			if (!m_read_port_cb.isunset())
 				result = m_read_port_cb(0) & 0x3ff; // 10 bit, 9:0
 			break;
 
-		case 0x70/8:    /* IRQV */
+		case 0x70/8:    // IRQV
 			result = m_irqv;
 			if (!machine().side_effects_disabled())
 				update_internal_irq_state();
 			break;
 
-		case 0x78/8:    /* PAGE */
+		case 0x78/8:    // PAGE
 			result = m_current_page;
 			break;
 	}
@@ -1518,16 +1516,16 @@ inline u32 es5506_device::reg_read_test(es550x_voice *voice, offs_t offset)
 
 	switch (offset)
 	{
-		case 0x68/8:    /* PAR */
-			if (!m_read_port_cb.isnull())
+		case 0x68/8:    // PAR
+			if (!m_read_port_cb.isunset())
 				result = m_read_port_cb(0) & 0x3ff; // 10 bit, 9:0
 			break;
 
-		case 0x70/8:    /* IRQV */
+		case 0x70/8:    // IRQV
 			result = m_irqv;
 			break;
 
-		case 0x78/8:    /* PAGE */
+		case 0x78/8:    // PAGE
 			result = m_current_page;
 			break;
 	}
@@ -1573,7 +1571,7 @@ inline void es5505_device::reg_write_low(es550x_voice *voice, offs_t offset, u16
 {
 	switch (offset)
 	{
-		case 0x00:  /* CR */
+		case 0x00:  // CR
 			voice->control |= 0xf000; // bit 15-12 always 1
 			if (ACCESSING_BITS_0_7)
 			{
@@ -1590,7 +1588,7 @@ inline void es5505_device::reg_write_low(es550x_voice *voice, offs_t offset, u16
 			LOG("%s:voice %d, control=%04x (raw=%04x & %04x)\n", machine().describe_context(), m_current_page & 0x1f, voice->control, data, mem_mask ^ 0xffff);
 			break;
 
-		case 0x01:  /* FC */
+		case 0x01:  // FC
 			if (ACCESSING_BITS_0_7)
 				voice->freqcount = (voice->freqcount & ~get_address_acc_shifted_val(0x00fe, 1)) | (get_address_acc_shifted_val((data & 0x00fe), 1));
 			if (ACCESSING_BITS_8_15)
@@ -1598,7 +1596,7 @@ inline void es5505_device::reg_write_low(es550x_voice *voice, offs_t offset, u16
 			LOG("%s:voice %d, freq count=%08x\n", machine().describe_context(), m_current_page & 0x1f, get_address_acc_res(voice->freqcount, 1));
 			break;
 
-		case 0x02:  /* STRT (hi) */
+		case 0x02:  // STRT (hi)
 			if (ACCESSING_BITS_0_7)
 				voice->start = (voice->start & ~get_address_acc_shifted_val(0x00ff0000)) | (get_address_acc_shifted_val((data & 0x00ff) << 16));
 			if (ACCESSING_BITS_8_15)
@@ -1606,7 +1604,7 @@ inline void es5505_device::reg_write_low(es550x_voice *voice, offs_t offset, u16
 			LOG("%s:voice %d, loop start=%08x\n", machine().describe_context(), m_current_page & 0x1f, get_address_acc_res(voice->start));
 			break;
 
-		case 0x03:  /* STRT (lo) */
+		case 0x03:  // STRT (lo)
 			if (ACCESSING_BITS_0_7)
 				voice->start = (voice->start & ~get_address_acc_shifted_val(0x000000e0)) | (get_address_acc_shifted_val(data & 0x00e0));
 			if (ACCESSING_BITS_8_15)
@@ -1614,7 +1612,7 @@ inline void es5505_device::reg_write_low(es550x_voice *voice, offs_t offset, u16
 			LOG("%s:voice %d, loop start=%08x\n", machine().describe_context(), m_current_page & 0x1f, get_address_acc_res(voice->start));
 			break;
 
-		case 0x04:  /* END (hi) */
+		case 0x04:  // END (hi)
 			if (ACCESSING_BITS_0_7)
 				voice->end = (voice->end & ~get_address_acc_shifted_val(0x00ff0000)) | (get_address_acc_shifted_val((data & 0x00ff) << 16));
 			if (ACCESSING_BITS_8_15)
@@ -1625,7 +1623,7 @@ inline void es5505_device::reg_write_low(es550x_voice *voice, offs_t offset, u16
 			LOG("%s:voice %d, loop end=%08x\n", machine().describe_context(), m_current_page & 0x1f, get_address_acc_res(voice->end));
 			break;
 
-		case 0x05:  /* END (lo) */
+		case 0x05:  // END (lo)
 			if (ACCESSING_BITS_0_7)
 				voice->end = (voice->end & ~get_address_acc_shifted_val(0x000000e0)) | (get_address_acc_shifted_val(data & 0x00e0));
 			if (ACCESSING_BITS_8_15)
@@ -1636,7 +1634,7 @@ inline void es5505_device::reg_write_low(es550x_voice *voice, offs_t offset, u16
 			LOG("%s:voice %d, loop end=%08x\n", machine().describe_context(), m_current_page & 0x1f, get_address_acc_res(voice->end));
 			break;
 
-		case 0x06:  /* K2 */
+		case 0x06:  // K2
 			if (ACCESSING_BITS_0_7)
 				voice->k2 = (voice->k2 & ~0x00f0) | (data & 0x00f0);
 			if (ACCESSING_BITS_8_15)
@@ -1644,7 +1642,7 @@ inline void es5505_device::reg_write_low(es550x_voice *voice, offs_t offset, u16
 			LOG("%s:voice %d, K2=%03x\n", machine().describe_context(), m_current_page & 0x1f, voice->k2 >> FILTER_SHIFT);
 			break;
 
-		case 0x07:  /* K1 */
+		case 0x07:  // K1
 			if (ACCESSING_BITS_0_7)
 				voice->k1 = (voice->k1 & ~0x00f0) | (data & 0x00f0);
 			if (ACCESSING_BITS_8_15)
@@ -1652,19 +1650,19 @@ inline void es5505_device::reg_write_low(es550x_voice *voice, offs_t offset, u16
 			LOG("%s:voice %d, K1=%03x\n", machine().describe_context(), m_current_page & 0x1f, voice->k1 >> FILTER_SHIFT);
 			break;
 
-		case 0x08:  /* LVOL */
+		case 0x08:  // LVOL
 			if (ACCESSING_BITS_8_15)
 				voice->lvol = (voice->lvol & ~0xff) | ((data & 0xff00) >> 8);
 			LOG("%s:voice %d, left vol=%02x\n", machine().describe_context(), m_current_page & 0x1f, voice->lvol);
 			break;
 
-		case 0x09:  /* RVOL */
+		case 0x09:  // RVOL
 			if (ACCESSING_BITS_8_15)
 				voice->rvol = (voice->rvol & ~0xff) | ((data & 0xff00) >> 8);
 			LOG("%s:voice %d, right vol=%02x\n", machine().describe_context(), m_current_page & 0x1f, voice->rvol);
 			break;
 
-		case 0x0a:  /* ACC (hi) */
+		case 0x0a:  // ACC (hi)
 			if (ACCESSING_BITS_0_7)
 				voice->accum = (voice->accum & ~get_address_acc_shifted_val(0x00ff0000)) | (get_address_acc_shifted_val((data & 0x00ff) << 16));
 			if (ACCESSING_BITS_8_15)
@@ -1672,7 +1670,7 @@ inline void es5505_device::reg_write_low(es550x_voice *voice, offs_t offset, u16
 			LOG("%s:voice %d, accum=%08x\n", machine().describe_context(), m_current_page & 0x1f, get_address_acc_res(voice->accum));
 			break;
 
-		case 0x0b:  /* ACC (lo) */
+		case 0x0b:  // ACC (lo)
 			if (ACCESSING_BITS_0_7)
 				voice->accum = (voice->accum & ~get_address_acc_shifted_val(0x000000ff)) | (get_address_acc_shifted_val(data & 0x00ff));
 			if (ACCESSING_BITS_8_15)
@@ -1680,26 +1678,25 @@ inline void es5505_device::reg_write_low(es550x_voice *voice, offs_t offset, u16
 			LOG("%s:voice %d, accum=%08x\n", machine().describe_context(), m_current_page & 0x1f, get_address_acc_res(voice->accum));
 			break;
 
-		case 0x0c:  /* unused */
+		case 0x0c:  // unused
 			break;
 
-		case 0x0d:  /* ACT */
+		case 0x0d:  // ACT
 			if (ACCESSING_BITS_0_7)
 			{
 				m_active_voices = data & 0x1f;
 				m_sample_rate = m_master_clock / (16 * (m_active_voices + 1));
 				m_stream->set_sample_rate(m_sample_rate);
-				if (!m_sample_rate_changed_cb.isnull())
-					m_sample_rate_changed_cb(m_sample_rate);
+				m_sample_rate_changed_cb(m_sample_rate);
 
 				LOG("active voices=%d, sample_rate=%d\n", m_active_voices, m_sample_rate);
 			}
 			break;
 
-		case 0x0e:  /* IRQV - read only */
+		case 0x0e:  // IRQV - read only
 			break;
 
-		case 0x0f:  /* PAGE */
+		case 0x0f:  // PAGE
 			if (ACCESSING_BITS_0_7)
 				m_current_page = data & 0x7f;
 			break;
@@ -1711,7 +1708,7 @@ inline void es5505_device::reg_write_high(es550x_voice *voice, offs_t offset, u1
 {
 	switch (offset)
 	{
-		case 0x00:  /* CR */
+		case 0x00:  // CR
 			voice->control |= 0xf000; // bit 15-12 always 1
 			if (ACCESSING_BITS_0_7)
 				voice->control = (voice->control & ~0x00ff) | (data & 0x00ff);
@@ -1721,7 +1718,7 @@ inline void es5505_device::reg_write_high(es550x_voice *voice, offs_t offset, u1
 			LOG("%s:voice %d, control=%04x (raw=%04x & %04x)\n", machine().describe_context(), m_current_page & 0x1f, voice->control, data, mem_mask);
 			break;
 
-		case 0x01:  /* O4(n-1) */
+		case 0x01:  // O4(n-1)
 			if (ACCESSING_BITS_0_7)
 				voice->o4n1 = (voice->o4n1 & ~0x00ff) | (data & 0x00ff);
 			if (ACCESSING_BITS_8_15)
@@ -1729,7 +1726,7 @@ inline void es5505_device::reg_write_high(es550x_voice *voice, offs_t offset, u1
 			LOG("%s:voice %d, O4(n-1)=%04x\n", machine().describe_context(), m_current_page & 0x1f, voice->o4n1 & 0xffff);
 			break;
 
-		case 0x02:  /* O3(n-1) */
+		case 0x02:  // O3(n-1)
 			if (ACCESSING_BITS_0_7)
 				voice->o3n1 = (voice->o3n1 & ~0x00ff) | (data & 0x00ff);
 			if (ACCESSING_BITS_8_15)
@@ -1737,7 +1734,7 @@ inline void es5505_device::reg_write_high(es550x_voice *voice, offs_t offset, u1
 			LOG("%s:voice %d, O3(n-1)=%04x\n", machine().describe_context(), m_current_page & 0x1f, voice->o3n1 & 0xffff);
 			break;
 
-		case 0x03:  /* O3(n-2) */
+		case 0x03:  // O3(n-2)
 			if (ACCESSING_BITS_0_7)
 				voice->o3n2 = (voice->o3n2 & ~0x00ff) | (data & 0x00ff);
 			if (ACCESSING_BITS_8_15)
@@ -1745,7 +1742,7 @@ inline void es5505_device::reg_write_high(es550x_voice *voice, offs_t offset, u1
 			LOG("%s:voice %d, O3(n-2)=%04x\n", machine().describe_context(), m_current_page & 0x1f, voice->o3n2 & 0xffff);
 			break;
 
-		case 0x04:  /* O2(n-1) */
+		case 0x04:  // O2(n-1)
 			if (ACCESSING_BITS_0_7)
 				voice->o2n1 = (voice->o2n1 & ~0x00ff) | (data & 0x00ff);
 			if (ACCESSING_BITS_8_15)
@@ -1753,7 +1750,7 @@ inline void es5505_device::reg_write_high(es550x_voice *voice, offs_t offset, u1
 			LOG("%s:voice %d, O2(n-1)=%04x\n", machine().describe_context(), m_current_page & 0x1f, voice->o2n1 & 0xffff);
 			break;
 
-		case 0x05:  /* O2(n-2) */
+		case 0x05:  // O2(n-2)
 			if (ACCESSING_BITS_0_7)
 				voice->o2n2 = (voice->o2n2 & ~0x00ff) | (data & 0x00ff);
 			if (ACCESSING_BITS_8_15)
@@ -1761,7 +1758,7 @@ inline void es5505_device::reg_write_high(es550x_voice *voice, offs_t offset, u1
 			LOG("%s:voice %d, O2(n-2)=%04x\n", machine().describe_context(), m_current_page & 0x1f, voice->o2n2 & 0xffff);
 			break;
 
-		case 0x06:  /* O1(n-1) */
+		case 0x06:  // O1(n-1)
 			if (ACCESSING_BITS_0_7)
 				voice->o1n1 = (voice->o1n1 & ~0x00ff) | (data & 0x00ff);
 			if (ACCESSING_BITS_8_15)
@@ -1774,26 +1771,25 @@ inline void es5505_device::reg_write_high(es550x_voice *voice, offs_t offset, u1
 		case 0x09:
 		case 0x0a:
 		case 0x0b:
-		case 0x0c:  /* unused */
+		case 0x0c:  // unused
 			break;
 
-		case 0x0d:  /* ACT */
+		case 0x0d:  // ACT
 			if (ACCESSING_BITS_0_7)
 			{
 				m_active_voices = data & 0x1f;
 				m_sample_rate = m_master_clock / (16 * (m_active_voices + 1));
 				m_stream->set_sample_rate(m_sample_rate);
-				if (!m_sample_rate_changed_cb.isnull())
-					m_sample_rate_changed_cb(m_sample_rate);
+				m_sample_rate_changed_cb(m_sample_rate);
 
 				LOG("active voices=%d, sample_rate=%d\n", m_active_voices, m_sample_rate);
 			}
 			break;
 
-		case 0x0e:  /* IRQV - read only */
+		case 0x0e:  // IRQV - read only
 			break;
 
-		case 0x0f:  /* PAGE */
+		case 0x0f:  // PAGE
 			if (ACCESSING_BITS_0_7)
 				m_current_page = data & 0x7f;
 			break;
@@ -1805,44 +1801,44 @@ inline void es5505_device::reg_write_test(es550x_voice *voice, offs_t offset, u1
 {
 	switch (offset)
 	{
-		case 0x00:  /* CH0L */
-		case 0x01:  /* CH0R */
-		case 0x02:  /* CH1L */
-		case 0x03:  /* CH1R */
-		case 0x04:  /* CH2L */
-		case 0x05:  /* CH2R */
-		case 0x06:  /* CH3L */
-		case 0x07:  /* CH3R */
+		case 0x00:  // CH0L
+		case 0x01:  // CH0R
+		case 0x02:  // CH1L
+		case 0x03:  // CH1R
+		case 0x04:  // CH2L
+		case 0x05:  // CH2R
+		case 0x06:  // CH3L
+		case 0x07:  // CH3R
 			break;
 
-		case 0x08:  /* SERMODE */
+		case 0x08:  // SERMODE
 			m_mode |= 0x7f8; // bit 10-3 always 1
 			if (ACCESSING_BITS_8_15)
 				m_mode = (m_mode & ~0xf800) | (data & 0xf800); // MSB[4:0] (unknown purpose)
 			if (ACCESSING_BITS_0_7)
 				m_mode = (m_mode & ~0x0007) | (data & 0x0007); // SONY/BB, TEST, A/D
+			LOGMASKED(LOG_SERIAL, "%s: serial mode = %04x & %04x", machine().describe_context(), m_mode, mem_mask);
 			break;
 
-		case 0x09:  /* PAR */
+		case 0x09:  // PAR
 			break;
 
-		case 0x0d:  /* ACT */
+		case 0x0d:  // ACT
 			if (ACCESSING_BITS_0_7)
 			{
 				m_active_voices = data & 0x1f;
 				m_sample_rate = m_master_clock / (16 * (m_active_voices + 1));
 				m_stream->set_sample_rate(m_sample_rate);
-				if (!m_sample_rate_changed_cb.isnull())
-					m_sample_rate_changed_cb(m_sample_rate);
+				m_sample_rate_changed_cb(m_sample_rate);
 
 				LOG("active voices=%d, sample_rate=%d\n", m_active_voices, m_sample_rate);
 			}
 			break;
 
-		case 0x0e:  /* IRQV - read only */
+		case 0x0e:  // IRQV - read only
 			break;
 
-		case 0x0f:  /* PAGE */
+		case 0x0f:  // PAGE
 			if (ACCESSING_BITS_0_7)
 				m_current_page = data & 0x7f;
 			break;
@@ -1882,68 +1878,68 @@ inline u16 es5505_device::reg_read_low(es550x_voice *voice, offs_t offset)
 
 	switch (offset)
 	{
-		case 0x00:  /* CR */
+		case 0x00:  // CR
 			result = voice->control | 0xf000;
 			break;
 
-		case 0x01:  /* FC */
+		case 0x01:  // FC
 			result = get_address_acc_res(voice->freqcount, 1);
 			break;
 
-		case 0x02:  /* STRT (hi) */
+		case 0x02:  // STRT (hi)
 			result = get_address_acc_res(voice->start) >> 16;
 			break;
 
-		case 0x03:  /* STRT (lo) */
+		case 0x03:  // STRT (lo)
 			result = get_address_acc_res(voice->start);
 			break;
 
-		case 0x04:  /* END (hi) */
+		case 0x04:  // END (hi)
 			result = get_address_acc_res(voice->end) >> 16;
 			break;
 
-		case 0x05:  /* END (lo) */
+		case 0x05:  // END (lo)
 			result = get_address_acc_res(voice->end);
 			break;
 
-		case 0x06:  /* K2 */
+		case 0x06:  // K2
 			result = voice->k2;
 			break;
 
-		case 0x07:  /* K1 */
+		case 0x07:  // K1
 			result = voice->k1;
 			break;
 
-		case 0x08:  /* LVOL */
+		case 0x08:  // LVOL
 			result = voice->lvol << 8;
 			break;
 
-		case 0x09:  /* RVOL */
+		case 0x09:  // RVOL
 			result = voice->rvol << 8;
 			break;
 
-		case 0x0a:  /* ACC (hi) */
+		case 0x0a:  // ACC (hi)
 			result = get_address_acc_res(voice->accum) >> 16;
 			break;
 
-		case 0x0b:  /* ACC (lo) */
+		case 0x0b:  // ACC (lo)
 			result = get_address_acc_res(voice->accum);
 			break;
 
-		case 0x0c:  /* unused */
+		case 0x0c:  // unused
 			break;
 
-		case 0x0d:  /* ACT */
+		case 0x0d:  // ACT
 			result = m_active_voices;
 			break;
 
-		case 0x0e:  /* IRQV */
+		case 0x0e:  // IRQV
 			result = m_irqv;
 			if (!machine().side_effects_disabled())
 				update_internal_irq_state();
 			break;
 
-		case 0x0f:  /* PAGE */
+		case 0x0f:  // PAGE
 			result = m_current_page;
 			break;
 	}
@@ -1957,37 +1953,37 @@ inline u16 es5505_device::reg_read_high(es550x_voice *voice, offs_t offset)
 
 	switch (offset)
 	{
-		case 0x00:  /* CR */
+		case 0x00:  // CR
 			result = voice->control | 0xf000;
 			break;
 
-		case 0x01:  /* O4(n-1) */
+		case 0x01:  // O4(n-1)
 			result = voice->o4n1 & 0xffff;
 			break;
 
-		case 0x02:  /* O3(n-1) */
+		case 0x02:  // O3(n-1)
 			result = voice->o3n1 & 0xffff;
 			break;
 
-		case 0x03:  /* O3(n-2) */
+		case 0x03:  // O3(n-2)
 			result = voice->o3n2 & 0xffff;
 			break;
 
-		case 0x04:  /* O2(n-1) */
+		case 0x04:  // O2(n-1)
 			result = voice->o2n1 & 0xffff;
 			break;
 
-		case 0x05:  /* O2(n-2) */
+		case 0x05:  // O2(n-2)
 			result = voice->o2n2 & 0xffff;
 			break;
 
-		case 0x06:  /* O1(n-1) */
-			/* special case for the Taito F3 games: they set the accumulator on a stopped */
-			/* voice and assume the filters continue to process the data. They then read */
-			/* the O1(n-1) in order to extract raw data from the sound ROMs. Since we don't */
-			/* want to waste time filtering stopped channels, we just look for a read from */
-			/* this register on a stopped voice, and return the raw sample data at the */
-			/* accumulator */
+		case 0x06:  // O1(n-1)
+			// special case for the Taito F3 games: they set the accumulator on a stopped
+			// voice and assume the filters continue to process the data. They then read
+			// the O1(n-1) in order to extract raw data from the sound ROMs. Since we don't
+			// want to waste time filtering stopped channels, we just look for a read from
+			// this register on a stopped voice, and return the raw sample data at the
+			// accumulator
 			if ((voice->control & CONTROL_STOPMASK))
 			{
 				voice->o1n1 = read_sample(voice, get_integer_addr(voice->accum));
@@ -2001,20 +1997,20 @@ inline u16 es5505_device::reg_read_high(es550x_voice *voice, offs_t offset)
 		case 0x09:
 		case 0x0a:
 		case 0x0b:
-		case 0x0c:  /* unused */
+		case 0x0c:  // unused
 			break;
 
-		case 0x0d:  /* ACT */
+		case 0x0d:  // ACT
 			result = m_active_voices;
 			break;
 
-		case 0x0e:  /* IRQV */
+		case 0x0e:  // IRQV
 			result = m_irqv;
 			if (!machine().side_effects_disabled())
 				update_internal_irq_state();
 			break;
 
-		case 0x0f:  /* PAGE */
+		case 0x0f:  // PAGE
 			result = m_current_page;
 			break;
 	}
@@ -2028,37 +2024,37 @@ inline u16 es5505_device::reg_read_test(es550x_voice *voice, offs_t offset)
 
 	switch (offset)
 	{
-		case 0x00:  /* CH0L */
-		case 0x01:  /* CH0R */
-		case 0x02:  /* CH1L */
-		case 0x03:  /* CH1R */
-		case 0x04:  /* CH2L */
-		case 0x05:  /* CH2R */
-		case 0x06:  /* CH3L */
-		case 0x07:  /* CH3R */
+		case 0x00:  // CH0L
+		case 0x01:  // CH0R
+		case 0x02:  // CH1L
+		case 0x03:  // CH1R
+		case 0x04:  // CH2L
+		case 0x05:  // CH2R
+		case 0x06:  // CH3L
+		case 0x07:  // CH3R
 			break;
 
-		case 0x08:  /* SERMODE */
+		case 0x08:  // SERMODE
 			result = m_mode | 0x7f8;
 			break;
 
-		case 0x09:  /* PAR */
-			if (!m_read_port_cb.isnull())
+		case 0x09:  // PAR
+			if (!m_read_port_cb.isunset())
 				result = m_read_port_cb(0) & 0xffc0; // 10 bit, 15:6
 			break;
 
-		/* The following are global, and thus accessible form all pages */
-		case 0x0d:  /* ACT */
+		// The following are global, and thus accessible form all pages
+		case 0x0d:  // ACT
 			result = m_active_voices;
 			break;
 
-		case 0x0e:  /* IRQV */
+		case 0x0e:  // IRQV
 			result = m_irqv;
 			if (!machine().side_effects_disabled())
 				update_internal_irq_state();
 			break;
 
-		case 0x0f:  /* PAGE */
+		case 0x0f:  // PAGE
 			result = m_current_page;
 			break;
 	}

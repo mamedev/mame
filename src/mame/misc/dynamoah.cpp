@@ -19,6 +19,9 @@
 #define VERBOSE 0
 #include "logmacro.h"
 
+
+namespace {
+
 class dynamoah_state : public driver_device
 {
 public:
@@ -36,8 +39,8 @@ private:
 	uint8_t ext_r(offs_t offset);
 	void ext_w(offs_t offset, uint8_t data);
 
-	void i8031_mem(address_map &map);
-	void i8031_ext_mem(address_map &map);
+	void i8031_mem(address_map &map) ATTR_COLD;
+	void i8031_ext_mem(address_map &map) ATTR_COLD;
 };
 
 void dynamoah_state::p1_w(uint8_t data)
@@ -115,6 +118,9 @@ void dynamoah_state::security_decrypt()
 			romdata[addr] = bitswap<8>(romdata[addr], 4, 1, 2, 7, 6, 0, 3, 5);
 	}
 }
+
+} // anonymous namespace
+
 
 GAME( 199?, dynamoah,  0,        dynamoah, dynamoah, dynamoah_state, security_decrypt, ROT0, "Dynamo", "Air Hockey (6.12?, encrypted)", MACHINE_IS_SKELETON_MECHANICAL )
 GAME( 199?, dynamoaha, dynamoah, dynamoah, dynamoah, dynamoah_state, security_decrypt, ROT0, "Dynamo", "Air Hockey (6.03, encrypted)", MACHINE_IS_SKELETON_MECHANICAL )

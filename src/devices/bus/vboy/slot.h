@@ -64,6 +64,10 @@
 
 #include "imagedev/cartrom.h"
 
+#include <cassert>
+#include <string>
+#include <utility>
+
 
 //**************************************************************************
 //  FORWARD DECLARATIONS
@@ -101,7 +105,7 @@ public:
 	template <typename T> void set_rom(T &&tag, int no, offs_t base) { m_rom_space.set_tag(std::forward<T>(tag), no); m_rom_base = base; }
 
 	// device_image_interface implementation
-	virtual image_init_result call_load() override;
+	virtual std::pair<std::error_condition, std::string> call_load() override;
 	virtual void call_unload() override;
 	virtual bool is_reset_on_load() const noexcept override { return true; }
 	virtual char const *image_interface() const noexcept override { return "vboy_cart"; }
@@ -113,7 +117,6 @@ public:
 protected:
 	// device_t implementation
 	virtual void device_validity_check(validity_checker &valid) const override ATTR_COLD;
-	virtual void device_resolve_objects() override ATTR_COLD;
 	virtual void device_start() override ATTR_COLD;
 
 private:
@@ -134,19 +137,19 @@ private:
 class device_vboy_cart_interface : public device_interface
 {
 public:
-	virtual image_init_result load() ATTR_COLD = 0;
+	virtual std::error_condition load() ATTR_COLD = 0;
 	virtual void unload() ATTR_COLD;
 
 protected:
 	device_vboy_cart_interface(machine_config const &mconfig, device_t &device);
 
-	bool has_slot() const { return nullptr != m_slot; }
-	address_space *exp_space() { return m_slot ? m_slot->m_exp_space.target() : nullptr; }
-	address_space *chip_space() { return m_slot ? m_slot->m_chip_space.target() : nullptr; }
-	address_space *rom_space() { return m_slot ? m_slot->m_rom_space.target() : nullptr; }
-	offs_t exp_base() { return m_slot ? m_slot->m_exp_base : 0U; }
-	offs_t chip_base() { return m_slot ? m_slot->m_chip_base : 0U; }
-	offs_t rom_base() { return m_slot ? m_slot->m_rom_base : 0U; }
+	bool has_slot() const noexcept { return nullptr != m_slot; }
+	address_space *exp_space() noexcept { return m_slot ? m_slot->m_exp_space.target() : nullptr; }
+	address_space *chip_space() noexcept { return m_slot ? m_slot->m_chip_space.target() : nullptr; }
+	address_space *rom_space() noexcept { return m_slot ? m_slot->m_rom_space.target() : nullptr; }
+	offs_t exp_base() noexcept { return m_slot ? m_slot->m_exp_base : 0U; }
+	offs_t chip_base() noexcept { return m_slot ? m_slot->m_chip_base : 0U; }
+	offs_t rom_base() noexcept { return m_slot ? m_slot->m_rom_base : 0U; }
 
 	void battery_load(void *buffer, int length, int fill) { assert(m_slot); m_slot->battery_load(buffer, length, fill); }
 	void battery_load(void *buffer, int length, void *def_buffer) { assert(m_slot); m_slot->battery_load(buffer, length, def_buffer); }

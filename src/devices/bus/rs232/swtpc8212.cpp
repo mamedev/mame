@@ -23,7 +23,7 @@ void swtpc8212_terminal_device::device_add_mconfig(machine_config &config)
 INPUT_PORTS_START(swtpc8212_terminal)
 
 	PORT_START("FLOW_CONTROL")
-	PORT_CONFNAME(0x1, 1, "Flow control") PORT_CHANGED_MEMBER(DEVICE_SELF, swtpc8212_terminal_device, flow_control, 0)
+	PORT_CONFNAME(0x1, 1, "Flow control") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(swtpc8212_terminal_device::flow_control), 0)
 	PORT_CONFSETTING(0x00, "None")
 	PORT_CONFSETTING(0x01, "Terminal DTR to remote CTS")
 
@@ -34,19 +34,19 @@ ioport_constructor swtpc8212_terminal_device::device_input_ports() const
 	return INPUT_PORTS_NAME(swtpc8212_terminal);
 }
 
-WRITE_LINE_MEMBER(swtpc8212_terminal_device::input_txd)
+void swtpc8212_terminal_device::input_txd(int state)
 {
 	m_swtpc8212->rs232_conn_rxd_w(state);
 }
 
-WRITE_LINE_MEMBER(swtpc8212_terminal_device::route_term_rts)
+void swtpc8212_terminal_device::route_term_rts(int state)
 {
 	// Loop the terminal RTS output to the terminal CTS input.
 	m_swtpc8212->rs232_conn_cts_w(state);
 }
 
 // This terminal uses DTR for hardware flow control.
-WRITE_LINE_MEMBER(swtpc8212_terminal_device::route_term_dtr)
+void swtpc8212_terminal_device::route_term_dtr(int state)
 {
 	if (m_flow_control->read())
 	{

@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Luca Elia, David Haywood
-#ifndef MAME_VIDEO_KANEKO_SPR_H
-#define MAME_VIDEO_KANEKO_SPR_H
+#ifndef MAME_KANEKO_KANEKO_SPR_H
+#define MAME_KANEKO_KANEKO_SPR_H
 
 #pragma once
 
@@ -67,8 +67,8 @@ protected:
 			device_t *owner,
 			u32 clock);
 
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 
 	// flip latching (set when declaring device in MCFG )  probably needs figuring out properly, only brapboys wants it?
@@ -127,7 +127,7 @@ public:
 	int get_sprite_type(void) override{ return 0; }
 
 protected:
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 };
 
 DECLARE_DEVICE_TYPE(KANEKO_VU002_SPRITE, kaneko_vu002_sprite_device)
@@ -146,9 +146,9 @@ public:
 	int get_sprite_type(void) override{ return 1; }
 
 protected:
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 };
 
 DECLARE_DEVICE_TYPE(KANEKO_KC002_SPRITE, kaneko_kc002_sprite_device)
 
-#endif // MAME_VIDEO_KANEKO_SPR_H
+#endif // MAME_KANEKO_KANEKO_SPR_H

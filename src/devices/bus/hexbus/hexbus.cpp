@@ -150,10 +150,10 @@
 // Devices
 #include "hx5102.h"
 
-#define LOG_LINES          (1U<<1)   // Line changes
-#define LOG_ENABLED        (1U<<2)   // Enabled
+#define LOG_LINES          (1U << 1)   // Line changes
+#define LOG_ENABLED        (1U << 2)   // Enabled
 
-#define VERBOSE ( LOG_GENERAL )
+#define VERBOSE (LOG_GENERAL)
 
 #include "logmacro.h"
 

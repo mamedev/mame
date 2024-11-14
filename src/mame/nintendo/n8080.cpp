@@ -137,24 +137,538 @@ Notes:
 ***************************************************************************/
 
 #include "emu.h"
-#include "n8080.h"
+
+#include "n8080_a.h"
+
+#include "cpu/i8085/i8085.h"
+#include "machine/timer.h"
+
+#include "emupal.h"
+#include "screen.h"
+
+
+namespace {
+
+class n8080_state : public driver_device
+{
+public:
+	n8080_state(const machine_config &mconfig, device_type type, const char *tag) ATTR_COLD :
+		driver_device(mconfig, type, tag),
+		m_videoram(*this, "videoram"),
+		m_prom(*this, "proms"),
+		m_maincpu(*this, "maincpu"),
+		m_screen(*this, "screen"),
+		m_palette(*this, "palette"),
+		m_sound(*this, "soundboard")
+	{ }
+
+protected:
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+
+	virtual void delayed_sound_1(u8 data);
+	virtual void delayed_sound_2(u8 data);
+
+	void n8080_shift_bits_w(u8 data);
+	void n8080_shift_data_w(u8 data);
+	u8 n8080_shift_r();
+	void n8080_video_control_w(u8 data);
+	void n8080_sound_1_w(u8 data);
+	void n8080_sound_2_w(u8 data);
+	void n8080_inte_callback(int state);
+	void n8080_status_callback(u8 data);
+	void n8080_palette(palette_device &palette) const ATTR_COLD;
+	TIMER_DEVICE_CALLBACK_MEMBER(rst1_tick);
+	TIMER_DEVICE_CALLBACK_MEMBER(rst2_tick);
+	TIMER_CALLBACK_MEMBER(stop_mono_flop_callback);
+	TIMER_CALLBACK_MEMBER(delayed_sound_1_callback);
+	TIMER_CALLBACK_MEMBER(delayed_sound_2_callback);
+
+	void main_cpu_map(address_map &map) ATTR_COLD;
+	void main_io_map(address_map &map) ATTR_COLD;
+
+	/* memory pointers */
+	required_shared_ptr<u8> m_videoram;
+	optional_memory_region m_prom;
+
+	/* video-related */
+	u8 m_sheriff_color_mode;
+	u8 m_sheriff_color_data;
+
+	/* other */
+	unsigned m_shift_data;
+	u8 m_shift_bits;
+	bool m_inte;
+
+	/* devices */
+	required_device<i8080a_cpu_device> m_maincpu;
+	required_device<screen_device> m_screen;
+	required_device<palette_device> m_palette;
+	required_device<n8080_sound_device_base> m_sound;
+};
+
+class spacefev_state : public n8080_state
+{
+public:
+	spacefev_state(const machine_config &mconfig, device_type type, const char *tag) ATTR_COLD :
+		n8080_state(mconfig, type, tag),
+		m_video_conf(*this, "VIDEO")
+	{ }
+
+	void spacefev(machine_config &config) ATTR_COLD;
+
+protected:
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+
+	virtual void delayed_sound_1(u8 data) override;
+	virtual void delayed_sound_2(u8 data) override;
+
+private:
+	TIMER_CALLBACK_MEMBER(stop_red_cannon);
+	void start_red_cannon();
+	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+
+	required_ioport m_video_conf;
+
+	emu_timer *m_cannon_timer;
+
+	u8 m_prev_snd_data = 0;
+	bool m_red_screen = false;
+	bool m_red_cannon = false;
+};
+
+class sheriff_state : public n8080_state
+{
+public:
+	sheriff_state(const machine_config &mconfig, device_type type, const char *tag) ATTR_COLD :
+		n8080_state(mconfig, type, tag)
+	{ }
+
+	void sheriff(machine_config &config) ATTR_COLD;
+	void westgun2(machine_config &config) ATTR_COLD;
+
+protected:
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+
+private:
+	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+};
+
+class helifire_state : public n8080_state
+{
+public:
+	helifire_state(const machine_config &mconfig, device_type type, const char *tag) ATTR_COLD :
+		n8080_state(mconfig, type, tag),
+		m_colorram(*this, "colorram"),
+		m_pot(*this, "POT%u", 0)
+	{ }
+
+	void helifire(machine_config &config) ATTR_COLD;
+
+protected:
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+
+	virtual void delayed_sound_2(u8 data) override;
+
+private:
+	void helifire_palette(palette_device &palette) const ATTR_COLD;
+	void next_line();
+	void screen_vblank(int state);
+	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+
+	void main_cpu_map(address_map &map) ATTR_COLD;
+
+	required_shared_ptr<u8> m_colorram;
+	required_ioport_array<2> m_pot;
+
+	bool m_flash = false;
+	u8 m_LSFR[63];
+	unsigned m_mv = 0;
+	unsigned m_sc = 0; // IC56
+};
 
 
 // Shifter circuit done with TTL
 
-void n8080_state::n8080_shift_bits_w(uint8_t data)
+void n8080_state::n8080_shift_bits_w(u8 data)
 {
 	m_shift_bits = data & 7;
 }
 
-void n8080_state::n8080_shift_data_w(uint8_t data)
+void n8080_state::n8080_shift_data_w(u8 data)
 {
 	m_shift_data = (m_shift_data >> 8) | (data << 8);
 }
 
-uint8_t n8080_state::n8080_shift_r()
+u8 n8080_state::n8080_shift_r()
 {
 	return m_shift_data >> (8 - m_shift_bits);
+}
+
+
+void n8080_state::delayed_sound_1(u8 data)
+{
+	m_sound->sound1_w(data);
+}
+
+void spacefev_state::delayed_sound_1(u8 data)
+{
+	if (BIT(data & ~m_prev_snd_data, 4))
+		start_red_cannon();
+
+	m_red_screen = BIT(data, 3);
+
+	m_prev_snd_data = data;
+
+	n8080_state::delayed_sound_1(data);
+}
+
+
+void n8080_state::delayed_sound_2(u8 data)
+{
+	m_sound->sound2_w(data);
+}
+
+void spacefev_state::delayed_sound_2(u8 data)
+{
+	flip_screen_set(BIT(data, 5));
+
+	n8080_state::delayed_sound_2(data);
+}
+
+void helifire_state::delayed_sound_2(u8 data)
+{
+	m_flash = BIT(data, 5);
+
+	n8080_state::delayed_sound_2(data);
+}
+
+
+void n8080_state::n8080_video_control_w(u8 data)
+{
+	m_sheriff_color_mode = (data >> 3) & 3;
+	m_sheriff_color_data = (data >> 0) & 7;
+	flip_screen_set(data & 0x20);
+}
+
+
+void n8080_state::n8080_palette(palette_device &palette) const
+{
+	for (int i = 0; i < 8; i++)
+		palette.set_pen_color(i, pal1bit(i >> 0), pal1bit(i >> 1), pal1bit(i >> 2));
+}
+
+
+void helifire_state::helifire_palette(palette_device &palette) const
+{
+	n8080_palette(palette);
+
+	for (int i = 0; i < 0x100; i++)
+	{
+		int const level = 0xff * exp(-3 * i / 255.); // capacitor discharge
+
+		palette.set_pen_color(0x000 + 8 + i, rgb_t(0x00, 0x00, level)); // shades of blue
+		palette.set_pen_color(0x100 + 8 + i, rgb_t(0x00, 0xc0, level)); // shades of blue w/ green star
+
+		palette.set_pen_color(0x200 + 8 + i, rgb_t(level, 0x00, 0x00)); // shades of red
+		palette.set_pen_color(0x300 + 8 + i, rgb_t(level, 0xc0, 0x00)); // shades of red w/ green star
+	}
+}
+
+
+void spacefev_state::start_red_cannon()
+{
+	m_red_cannon = true;
+	m_cannon_timer->adjust(attotime::from_usec(550 * 68 * 10));
+}
+
+
+TIMER_CALLBACK_MEMBER(spacefev_state::stop_red_cannon)
+{
+	m_red_cannon = false;
+	m_cannon_timer->adjust(attotime::never);
+}
+
+
+void helifire_state::next_line()
+{
+	m_mv++;
+
+	if (m_sc % 4 == 2)
+	{
+		m_mv %= 256;
+	}
+	else
+	{
+		if (flip_screen())
+			m_mv %= 255;
+		else
+			m_mv %= 257;
+	}
+
+	if (m_mv == 128)
+	{
+		m_sc++;
+	}
+}
+
+
+u32 spacefev_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	const bool mono = bool(m_video_conf->read());
+	u8 mask = flip_screen() ? 0xff : 0x00;
+
+	u8 const *pRAM = m_videoram;
+	u8 const *const pPROM = m_prom->base();
+
+	for (int y = 0; y < 256; y++)
+	{
+		u16 *const pLine = &bitmap.pix(y ^ mask);
+
+		for (int x = 0; x < 256; x += 8)
+		{
+			u8 color = 0;
+
+			if (m_red_screen)
+				color = 1;
+			else
+			{
+				u8 val = pPROM[x >> 3];
+
+				if ((x >> 3) == 0x06)
+				{
+					color = m_red_cannon ? 1 : 7;
+				}
+
+				if ((x >> 3) == 0x1b)
+				{
+					static const u8 ufo_color[] =
+					{
+						1, // red
+						2, // green
+						7, // white
+						3, // yellow
+						5, // magenta
+						6, // cyan
+					};
+
+					int cycle = screen.frame_number() / 32;
+
+					color = ufo_color[cycle % 6];
+				}
+
+				for (int n = color + 1; n < 8; n++)
+				{
+					if (~val & (1 << n))
+					{
+						color = n;
+					}
+				}
+			}
+
+			if (mono)
+				color = 7; // force B&W here
+
+			for (int n = 0; n < 8; n++)
+			{
+				pLine[(x + n) ^ mask] = (pRAM[x >> 3] & (1 << n)) ? color : 0;
+			}
+		}
+
+		pRAM += 32;
+	}
+	return 0;
+}
+
+
+u32 sheriff_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	u8 mask = flip_screen() ? 0xff : 0x00;
+
+	u8 const *pRAM = m_videoram;
+	u8 const *const pPROM = m_prom->base();
+
+	for (int y = 0; y < 256; y++)
+	{
+		u16 *const pLine = &bitmap.pix(y ^ mask);
+
+		for (int x = 0; x < 256; x += 8)
+		{
+			u8 color = pPROM[32 * (y >> 3) + (x >> 3)];
+
+			if (m_sheriff_color_mode == 1 && !(color & 8))
+				color = m_sheriff_color_data ^ 7;
+
+			if (m_sheriff_color_mode == 2)
+				color = m_sheriff_color_data ^ 7;
+
+			if (m_sheriff_color_mode == 3)
+				color = 7;
+
+			for (int n = 0; n < 8; n++)
+			{
+				pLine[(x + n) ^ mask] = ((pRAM[x >> 3] >> n) & 1) ? (color & 7) : 0;
+			}
+		}
+
+		pRAM += 32;
+	}
+	return 0;
+}
+
+
+u32 helifire_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	const int SUN_BRIGHTNESS = m_pot[0]->read();
+	const int SEA_BRIGHTNESS = m_pot[1]->read();
+
+	static const int wave[8] = { 0, 1, 2, 2, 2, 1, 0, 0 };
+
+	unsigned saved_mv = m_mv;
+	unsigned saved_sc = m_sc;
+
+	for (int y = 0; y < 256; y++)
+	{
+		u16 *const pLine = &bitmap.pix(y);
+
+		int level = 120 + wave[m_mv & 7];
+
+		// draw sky
+		for (int x = level; x < 256; x++)
+		{
+			pLine[x] = 0x200 + 8 + SUN_BRIGHTNESS + x - level;
+		}
+
+		// draw stars
+		if (m_mv % 8 == 4) // upper half
+		{
+			int step = (320 * (m_mv - 0)) % sizeof m_LSFR;
+
+			int data =
+				((m_LSFR[step] & 1) << 6) |
+				((m_LSFR[step] & 2) << 4) |
+				((m_LSFR[step] & 4) << 2) |
+				((m_LSFR[step] & 8) << 0);
+
+			pLine[0x80 + data] |= 0x100;
+		}
+
+		if (m_mv % 8 == 5) // lower half
+		{
+			int step = (320 * (m_mv - 1)) % sizeof m_LSFR;
+
+			int data =
+				((m_LSFR[step] & 1) << 6) |
+				((m_LSFR[step] & 2) << 4) |
+				((m_LSFR[step] & 4) << 2) |
+				((m_LSFR[step] & 8) << 0);
+
+			pLine[0x00 + data] |= 0x100;
+		}
+
+		// draw sea
+		for (int x = 0; x < level; x++)
+		{
+			pLine[x] = 8 + SEA_BRIGHTNESS + x;
+		}
+
+		// draw foreground
+		for (int x = 0; x < 256; x += 8)
+		{
+			int offset = 32 * y + (x >> 3);
+
+			for (int n = 0; n < 8; n++)
+			{
+				if (flip_screen())
+				{
+					if ((m_videoram[offset ^ 0x1fff] << n) & 0x80)
+					{
+						pLine[x + n] = m_colorram[offset ^ 0x1fff] & 7;
+					}
+				}
+				else
+				{
+					if ((m_videoram[offset] >> n) & 1)
+					{
+						pLine[x + n] = m_colorram[offset] & 7;
+					}
+				}
+			}
+		}
+
+		// next line
+		next_line();
+	}
+
+	m_mv = saved_mv;
+	m_sc = saved_sc;
+	return 0;
+}
+
+
+void helifire_state::screen_vblank(int state)
+{
+	// falling edge
+	if (!state)
+	{
+		int n = (m_screen->frame_number() >> 1) % sizeof m_LSFR;
+
+		int i;
+
+		for (i = 0; i < 8; i++)
+		{
+			int R = (i & 1);
+			int G = (i & 2);
+			int B = (i & 4);
+
+			if (m_flash)
+			{
+				if (m_LSFR[n] & 0x20)
+				{
+					G |= B;
+				}
+
+				if (m_screen->frame_number() & 0x04)
+				{
+					R |= G;
+				}
+			}
+
+			m_palette->set_pen_color(i,
+				R ? 255 : 0,
+				G ? 255 : 0,
+				B ? 255 : 0);
+		}
+
+		for (i = 0; i < 256; i++)
+		{
+			next_line();
+		}
+	}
+}
+
+
+void n8080_state::n8080_sound_1_w(u8 data)
+{
+	machine().scheduler().synchronize(timer_expired_delegate(FUNC(n8080_state::delayed_sound_1_callback), this), data); // force CPUs to sync
+}
+
+void n8080_state::n8080_sound_2_w(u8 data)
+{
+	machine().scheduler().synchronize(timer_expired_delegate(FUNC(n8080_state::delayed_sound_2_callback), this), data); // force CPUs to sync
+}
+
+TIMER_CALLBACK_MEMBER(n8080_state::delayed_sound_1_callback)
+{
+	delayed_sound_1(param);
+}
+
+TIMER_CALLBACK_MEMBER(n8080_state::delayed_sound_2_callback)
+{
+	delayed_sound_2(param);
 }
 
 
@@ -193,7 +707,7 @@ void n8080_state::main_io_map(address_map &map)
 
 // Input ports
 
-static INPUT_PORTS_START( spacefev )
+INPUT_PORTS_START( spacefev )
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_2WAY
@@ -249,7 +763,7 @@ static INPUT_PORTS_START( spacefev )
 INPUT_PORTS_END
 
 
-static INPUT_PORTS_START( highsplt )
+INPUT_PORTS_START( highsplt )
 	PORT_INCLUDE( spacefev )
 
 	PORT_MODIFY("IN2")
@@ -278,7 +792,7 @@ static INPUT_PORTS_START( highsplt )
 INPUT_PORTS_END
 
 
-static INPUT_PORTS_START( spacelnc )
+INPUT_PORTS_START( spacelnc )
 	PORT_INCLUDE( highsplt )
 
 	PORT_MODIFY("IN2")
@@ -307,7 +821,7 @@ static INPUT_PORTS_START( spacelnc )
 INPUT_PORTS_END
 
 
-static INPUT_PORTS_START( sheriff )
+INPUT_PORTS_START( sheriff )
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICKLEFT_RIGHT )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICKLEFT_LEFT )
@@ -355,7 +869,7 @@ static INPUT_PORTS_START( sheriff )
 INPUT_PORTS_END
 
 
-static INPUT_PORTS_START( bandido )
+INPUT_PORTS_START( bandido )
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICKLEFT_RIGHT )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICKLEFT_LEFT )
@@ -406,7 +920,7 @@ static INPUT_PORTS_START( bandido )
 INPUT_PORTS_END
 
 
-static INPUT_PORTS_START( westgun2 )
+INPUT_PORTS_START( westgun2 )
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICKLEFT_RIGHT )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICKLEFT_LEFT )
@@ -446,7 +960,7 @@ static INPUT_PORTS_START( westgun2 )
 INPUT_PORTS_END
 
 
-static INPUT_PORTS_START( helifire )
+INPUT_PORTS_START( helifire )
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT )
@@ -538,12 +1052,12 @@ TIMER_DEVICE_CALLBACK_MEMBER(n8080_state::rst2_tick)
 	m_maincpu->set_input_line_and_vector(INPUT_LINE_IRQ0, state, 0xd7); // I8080
 }
 
-WRITE_LINE_MEMBER(n8080_state::n8080_inte_callback)
+void n8080_state::n8080_inte_callback(int state)
 {
-	m_inte = state;
+	m_inte = state != 0;
 }
 
-void n8080_state::n8080_status_callback(uint8_t data)
+void n8080_state::n8080_status_callback(u8 data)
 {
 	if (data & i8080a_cpu_device::STATUS_INTA)
 	{
@@ -566,15 +1080,43 @@ void n8080_state::machine_reset()
 {
 	m_shift_data = 0;
 	m_shift_bits = 0;
-	m_inte = 0;
+	m_inte = false;
+
+	delayed_sound_1(0);
+	delayed_sound_2(0);
+}
+
+void spacefev_state::machine_start()
+{
+	n8080_state::machine_start();
+
+	m_cannon_timer = timer_alloc(FUNC(spacefev_state::stop_red_cannon), this);
+
+	flip_screen_set(0);
+
+	save_item(NAME(m_prev_snd_data));
+	save_item(NAME(m_red_screen));
+	save_item(NAME(m_red_cannon));
 }
 
 void spacefev_state::machine_reset()
 {
+	m_prev_snd_data = 0;
+
 	n8080_state::machine_reset();
 
-	m_red_screen = 0;
-	m_red_cannon = 0;
+	m_red_screen = false;
+	m_red_cannon = false;
+}
+
+void sheriff_state::machine_start()
+{
+	n8080_state::machine_start();
+
+	flip_screen_set(0);
+
+	save_item(NAME(m_sheriff_color_mode));
+	save_item(NAME(m_sheriff_color_data));
 }
 
 void sheriff_state::machine_reset()
@@ -585,13 +1127,33 @@ void sheriff_state::machine_reset()
 	m_sheriff_color_data = 0;
 }
 
+void helifire_state::machine_start()
+{
+	n8080_state::machine_start();
+
+	u8 data = 0;
+	for (int i = 0; i < 63; i++)
+	{
+		u8 const bit = (data >> 6) ^ (data >> 7) ^ 1;
+		data = (data << 1) | (bit & 1);
+		m_LSFR[i] = data;
+	}
+
+	flip_screen_set(0);
+
+	save_item(NAME(m_mv));
+	save_item(NAME(m_sc));
+	save_item(NAME(m_flash));
+	save_item(NAME(m_LSFR));
+}
+
 void helifire_state::machine_reset()
 {
 	n8080_state::machine_reset();
 
 	m_mv = 0;
 	m_sc = 0;
-	m_flash = 0;
+	m_flash = false;
 }
 
 
@@ -618,7 +1180,7 @@ void spacefev_state::spacefev(machine_config &config)
 	TIMER(config, "rst2").configure_scanline(FUNC(spacefev_state::rst2_tick), "screen", 240, 256);
 
 	/* sound hardware */
-	spacefev_sound(config);
+	SPACEFEV_SOUND(config, m_sound, u32(0));
 }
 
 void sheriff_state::sheriff(machine_config &config)
@@ -642,7 +1204,7 @@ void sheriff_state::sheriff(machine_config &config)
 	TIMER(config, "rst2").configure_scanline(FUNC(sheriff_state::rst2_tick), "screen", 240, 256);
 
 	/* sound hardware */
-	sheriff_sound(config);
+	SHERIFF_SOUND(config, m_sound, u32(0));
 }
 
 void sheriff_state::westgun2(machine_config &config)
@@ -676,7 +1238,7 @@ void helifire_state::helifire(machine_config &config)
 	TIMER(config, "rst2").configure_scanline(FUNC(helifire_state::rst2_tick), "screen", 240, 256);
 
 	/* sound hardware */
-	helifire_sound(config);
+	HELIFIRE_SOUND(config, m_sound, u32(0));
 }
 
 
@@ -692,12 +1254,12 @@ ROM_START( spacefev )
 	ROM_LOAD( "h2-ro-.bin",  0x1400, 0x0400, CRC(a163e800) SHA1(e8817f3e17f099a0dc66213d2d3d3fdeb117b10e) ) // "H2??"
 	ROM_LOAD( "i1-ro-p.bin", 0x1800, 0x0400, CRC(756b5582) SHA1(b7f3d218b7f4267ce6128624306396bcacb9b44e) ) // "I1??P"
 
-	ROM_REGION( 0x0400, "audiocpu", 0 )
+	ROM_REGION( 0x0400, "soundboard:cpu", 0 )
 	ROM_LOAD( "ss3.ic2",     0x0000, 0x0400, CRC(95c2c1ee) SHA1(42a3a382fc7d2782052372d71f6d0e8a153e74d0) )
 
 	ROM_REGION( 0x0020, "proms", 0 ) // for color video hw
 	ROM_LOAD( "f5-i-.bin",   0x0000, 0x0020, CRC(c5914ec1) SHA1(198875fcab36d09c8726bb21e2fdff9882f6721a) ) // "F5?C"
-	ROM_END
+ROM_END
 
 ROM_START( spacefevo )
 	ROM_REGION( 0x8000, "maincpu", 0 )
@@ -709,12 +1271,12 @@ ROM_START( spacefevo )
 	ROM_LOAD( "h2-ro-.bin",  0x1400, 0x0400, CRC(a163e800) SHA1(e8817f3e17f099a0dc66213d2d3d3fdeb117b10e) ) // "H2??"
 	ROM_LOAD( "i1-ro-.bin",  0x1800, 0x0400, CRC(00027be2) SHA1(551a779a2e5a6455b7a348d246731c094e0ec709) ) // "I1??"
 
-	ROM_REGION( 0x0400, "audiocpu", 0 )
+	ROM_REGION( 0x0400, "soundboard:cpu", 0 )
 	ROM_LOAD( "ss3.ic2",     0x0000, 0x0400, CRC(95c2c1ee) SHA1(42a3a382fc7d2782052372d71f6d0e8a153e74d0) )
 
 	ROM_REGION( 0x0020, "proms", 0 ) // for color video hw
 	ROM_LOAD( "f5-i-.bin",   0x0000, 0x0020, CRC(c5914ec1) SHA1(198875fcab36d09c8726bb21e2fdff9882f6721a) ) // "F5?C"
-	ROM_END
+ROM_END
 
 ROM_START( spacefevo2 )
 	ROM_REGION( 0x8000, "maincpu", 0 )
@@ -726,7 +1288,7 @@ ROM_START( spacefevo2 )
 	ROM_LOAD( "h2-i-.bin",   0x1400, 0x0400, CRC(bddbc94f) SHA1(f90cbc3cd0f695cbb9ae03b608f4bf5a4a000c64) ) // "H2?C"
 	ROM_LOAD( "i1-i-.bin",   0x1800, 0x0400, CRC(437786c5) SHA1(2ccdb0d48dbbfe47ae82e970ca37970602405cf6) ) // "I1?C"
 
-	ROM_REGION( 0x0400, "audiocpu", 0 )
+	ROM_REGION( 0x0400, "soundboard:cpu", 0 )
 	ROM_LOAD( "ss3.ic2",     0x0000, 0x0400, CRC(95c2c1ee) SHA1(42a3a382fc7d2782052372d71f6d0e8a153e74d0) )
 
 	ROM_REGION( 0x0020, "proms", 0 ) // for color video hw
@@ -744,7 +1306,7 @@ ROM_START( highsplt )
 	ROM_LOAD( "hs.i1",       0x1800, 0x0400, CRC(41e18df9) SHA1(2212c836313775e7c507a875672c0b3635825e02) )
 	ROM_LOAD( "i2-ha-.bin",  0x1c00, 0x0400, CRC(eff9f82d) SHA1(5004e52dfa652ceefca9ed4210c0fa8f0591dc08) ) // "I2?n"
 
-	ROM_REGION( 0x0400, "audiocpu", 0 )
+	ROM_REGION( 0x0400, "soundboard:cpu", 0 )
 	ROM_LOAD( "ss4.bin",     0x0000, 0x0400, CRC(939e01d4) SHA1(7c9ccd24e5da03831cd0aa821da17e3b81cd8381) )
 
 	ROM_REGION( 0x0020, "proms", 0 )
@@ -762,7 +1324,7 @@ ROM_START( highsplta )
 	ROM_LOAD( "i1-ha-.bin",  0x1800, 0x0400, CRC(aa36b25d) SHA1(28f555aab27b206a8c6f550b6caa938cece6e204) ) // "I1?n"
 	ROM_LOAD( "i2-ha-.bin",  0x1c00, 0x0400, CRC(eff9f82d) SHA1(5004e52dfa652ceefca9ed4210c0fa8f0591dc08) ) // "I2?n"
 
-	ROM_REGION( 0x0400, "audiocpu", 0 )
+	ROM_REGION( 0x0400, "soundboard:cpu", 0 )
 	ROM_LOAD( "ss4.bin",     0x0000, 0x0400, CRC(939e01d4) SHA1(7c9ccd24e5da03831cd0aa821da17e3b81cd8381) )
 
 	ROM_REGION( 0x0020, "proms", 0 )
@@ -780,7 +1342,7 @@ ROM_START( highspltb )
 	ROM_LOAD( "i1-ha-.bin",  0x1800, 0x0400, CRC(aa36b25d) SHA1(28f555aab27b206a8c6f550b6caa938cece6e204) ) // "I1?n"
 	ROM_LOAD( "i2-ha-.bin",  0x1c00, 0x0400, CRC(eff9f82d) SHA1(5004e52dfa652ceefca9ed4210c0fa8f0591dc08) ) // "I2?n"
 
-	ROM_REGION( 0x0400, "audiocpu", 0 )
+	ROM_REGION( 0x0400, "soundboard:cpu", 0 )
 	ROM_LOAD( "ss4.ic2",     0x0000, 0x0400, CRC(ce95dc5f) SHA1(20f7b8c565c408439dcfae240b7d1aa42c29651b) )
 
 	ROM_REGION( 0x0020, "proms", 0 )
@@ -798,7 +1360,7 @@ ROM_START( spacelnc )
 	ROM_LOAD( "sl.i1",    0x1800, 0x0400, CRC(d30007a3) SHA1(9e5905df8f7822385daef159a07f0e8257cb862a) )
 	ROM_LOAD( "sl.i2",    0x1c00, 0x0400, CRC(640ffd2f) SHA1(65c21396c39dc99ec263f66f400a8e4c7712b20a) )
 
-	ROM_REGION( 0x0400, "audiocpu", 0 )
+	ROM_REGION( 0x0400, "soundboard:cpu", 0 )
 	ROM_LOAD( "sl.snd",   0x0000, 0x0400, CRC(8e1ff929) SHA1(5c7da97b05fb8fff242158978199f5d35b234426) )
 
 	ROM_REGION( 0x0020, "proms", 0 )
@@ -817,7 +1379,7 @@ ROM_START( sheriff )
 	ROM_LOAD( "sh.i2",    0x1c00, 0x0400, CRC(5c5f3f86) SHA1(25c64ccb7d0e136f67d6e1da7927ae6d89e0ceb9) )
 	ROM_LOAD( "sh.j1",    0x2000, 0x0400, CRC(0aa8b79a) SHA1(aed139e8c8ba912823c57fe4cc7231b2d638f479) )
 
-	ROM_REGION( 0x0400, "audiocpu", 0 )
+	ROM_REGION( 0x0400, "soundboard:cpu", 0 )
 	ROM_LOAD( "sh.snd",   0x0000, 0x0400, CRC(75731745) SHA1(538a63c9c60f1886fca4caf3eb1e0bada2d3f162) )
 
 	ROM_REGION( 0x0400, "proms", 0 )
@@ -837,7 +1399,7 @@ ROM_START( bandido )
 	ROM_LOAD( "sh.j1",    0x2000, 0x0400, CRC(0aa8b79a) SHA1(aed139e8c8ba912823c57fe4cc7231b2d638f479) )
 	ROM_LOAD( "sh-a.j2",  0x2400, 0x0400, CRC(a10b848a) SHA1(c045f1f6a11cbf49a1bae06c701b659d587292a3) )
 
-	ROM_REGION( 0x0400, "audiocpu", 0 )
+	ROM_REGION( 0x0400, "soundboard:cpu", 0 )
 	ROM_LOAD( "sh.snd",   0x0000, 0x0400, CRC(75731745) SHA1(538a63c9c60f1886fca4caf3eb1e0bada2d3f162) )
 
 	ROM_REGION( 0x0400, "proms", 0 )
@@ -852,7 +1414,7 @@ ROM_START( westgun2 )
 	ROM_LOAD( "rf04.ic33",    0x1800, 0x0800, CRC(60b71f0d) SHA1(10650426972afb0ccb964548a52879ed3f0b316a) )
 	ROM_LOAD( "rf05.ic32",    0x2000, 0x0800, CRC(81e650fb) SHA1(e600567125294d1411fcad3a015edb98cee36ff8) )
 
-	ROM_REGION( 0x0800, "audiocpu", 0 )
+	ROM_REGION( 0x0800, "soundboard:cpu", 0 )
 	ROM_LOAD( "rf06.ic35",   0x0000, 0x0800, CRC(4eafe957) SHA1(78e03402219c0ad814f63ae507eadc636d95f755) )
 
 	ROM_REGION( 0x0400, "proms", 0 )
@@ -872,7 +1434,7 @@ ROM_START( helifire )
 	ROM_LOAD( "tub_j1_b",  0x2000, 0x0400, CRC(98ef24db) SHA1(70ad8dd6e1e8f4bf4ce431737ca1856eecc03d53) )
 	ROM_LOAD( "tub_j2_b",  0x2400, 0x0400, CRC(5e2b5877) SHA1(f7c747e8a1d9fe2dda71ee6304636cf3cdf727a7) )
 
-	ROM_REGION( 0x0400, "audiocpu", 0 )
+	ROM_REGION( 0x0400, "soundboard:cpu", 0 )
 	ROM_LOAD( "tub-e_ic5-a", 0x0000, 0x0400, CRC(9d77a31f) SHA1(36db9b5087b6661de88042854874bc247c92d985) )
 ROM_END
 
@@ -889,9 +1451,11 @@ ROM_START( helifirea )
 	ROM_LOAD( "hf.j1",    0x2000, 0x0400, CRC(98ef24db) SHA1(70ad8dd6e1e8f4bf4ce431737ca1856eecc03d53) )
 	ROM_LOAD( "hf.j2",    0x2400, 0x0400, CRC(5e2b5877) SHA1(f7c747e8a1d9fe2dda71ee6304636cf3cdf727a7) )
 
-	ROM_REGION( 0x0400, "audiocpu", 0 )
+	ROM_REGION( 0x0400, "soundboard:cpu", 0 )
 	ROM_LOAD( "hf.snd",   0x0000, 0x0400, CRC(9d77a31f) SHA1(36db9b5087b6661de88042854874bc247c92d985) )
 ROM_END
+
+} // anonymous namespace
 
 
 //    YEAR, NAME,       PARENT,   MACHINE,  INPUT,    CLASS,          INIT,       MONITOR, COMPANY, FULLNAME, FLAGS

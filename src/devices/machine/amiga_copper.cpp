@@ -19,7 +19,8 @@
     - Find & verify cdang examples (especially for ECS/AGA);
     - Find & verify examples that uses this non-canonically,
       i.e. anything that may use this for controlling Paula, FDC or Blitter;
-    - Add debugger command for printing the current disassembler structure;
+    - Add debugger command for printing the current disassembler structure
+      (current live logging is painfully slow in places, cfr. lweapon);
 
 **************************************************************************************************/
 
@@ -33,6 +34,8 @@
 #define LOG_CHIPSET (1U << 5)   // Show custom chipset writes
 
 #define VERBOSE (LOG_WARN)
+//#define VERBOSE (LOG_WARN | LOG_CHIPSET | LOG_PC | LOG_INST)
+//#define LOG_OUTPUT_FUNC osd_printf_info
 
 #include "logmacro.h"
 
@@ -67,7 +70,7 @@ DEFINE_DEVICE_TYPE(AMIGA_COPPER, amiga_copper_device, "amiga_copper", "Amiga Cop
 amiga_copper_device::amiga_copper_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, AMIGA_COPPER, tag, owner, clock)
 	, m_host_cpu(*this, finder_base::DUMMY_TAG)
-	, m_chipmem_r(*this)
+	, m_chipmem_r(*this, 0)
 {
 }
 
@@ -80,7 +83,6 @@ amiga_copper_device::amiga_copper_device(const machine_config &mconfig, const ch
 void amiga_copper_device::device_start()
 {
 	m_host_space = &m_host_cpu->space(AS_PROGRAM);
-	m_chipmem_r.resolve_safe(0);
 
 	save_item(NAME(m_cdang_setting));
 	save_item(NAME(m_cdang_min_reg));
@@ -246,10 +248,10 @@ int amiga_copper_device::execute_next(int xpos, int ypos, bool is_blitter_busy)
 	if (m_pending_offset)
 	{
 		//LOGCHIPSET("%02X.%02X: Write to %s = %04x\n", ypos, xpos / 2, s_custom_reg_names[m_copper_pending_offset & 0xff], m_copper_pending_data);
-		LOGCHIPSET("%02X.%02X: Write to %s = %04x\n",
+		LOGCHIPSET("%02X.%02X: MOVE $dff%03x = %04x\n",
 			ypos,
 			xpos / 2,
-			m_pending_offset << 1,
+			(m_pending_offset << 1),
 			m_pending_data
 		);
 		m_host_space->write_word(0xdff000 | (m_pending_offset << 1), m_pending_data);
@@ -314,7 +316,7 @@ int amiga_copper_device::execute_next(int xpos, int ypos, bool is_blitter_busy)
 			if (delay[word0] == 0)
 			{
 				//LOGCHIPSET("%02X.%02X: Write to %s = %04x\n", ypos, xpos / 2, s_custom_reg_names[word0 & 0xff], word1);
-				LOGCHIPSET("%02X.%02X: Write to %s = %04x\n",
+				LOGCHIPSET("%02X.%02X: MOVE $dff%03x = %04x\n",
 					ypos,
 					xpos / 2,
 					word0 << 1,
@@ -353,7 +355,7 @@ int amiga_copper_device::execute_next(int xpos, int ypos, bool is_blitter_busy)
 		/* handle a wait */
 		if ((word1 & 1) == 0)
 		{
-			LOGINST("  Waiting for %04x & %04x (currently %04x)\n",
+			LOGINST("  WAIT %04x & %04x (currently %04x)\n",
 				m_waitval,
 				m_waitmask,
 				(ypos << 8) | (xpos >> 1)
@@ -367,7 +369,7 @@ int amiga_copper_device::execute_next(int xpos, int ypos, bool is_blitter_busy)
 		{
 			int curpos = (ypos << 8) | (xpos >> 1);
 
-			LOGINST("  Skipping if %04x & %04x (currently %04x)\n",
+			LOGINST("  SKIP %04x & %04x (currently %04x)\n",
 				m_waitval,
 				m_waitmask,
 				(ypos << 8) | (xpos >> 1)

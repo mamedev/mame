@@ -24,6 +24,7 @@
 ****************************************************************************/
 
 #include "emu.h"
+
 #include "bus/rs232/rs232.h"
 #include "cpu/m6502/m6502.h"
 #include "machine/input_merger.h"
@@ -31,8 +32,12 @@
 #include "machine/mos6551.h"
 #include "sound/beep.h"
 #include "video/mc6845.h"
+
 #include "screen.h"
 #include "speaker.h"
+
+
+namespace {
 
 #define ACIA_TAG    "acia"
 #define CRTC_TAG    "crtc"
@@ -62,8 +67,8 @@ public:
 	void tv910(machine_config &config);
 
 private:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	MC6845_UPDATE_ROW(crtc_update_row);
 	MC6845_ON_UPDATE_ADDR_CHANGED(crtc_update_addr);
@@ -76,14 +81,14 @@ private:
 	void nmi_ack_w(uint8_t data);
 	void control_w(uint8_t data);
 
-	DECLARE_WRITE_LINE_MEMBER(vbl_w);
+	void vbl_w(int state);
 
-	DECLARE_READ_LINE_MEMBER(ay3600_shift_r);
-	DECLARE_READ_LINE_MEMBER(ay3600_control_r);
-	DECLARE_WRITE_LINE_MEMBER(ay3600_data_ready_w);
-	DECLARE_WRITE_LINE_MEMBER(ay3600_ako_w);
+	int ay3600_shift_r();
+	int ay3600_control_r();
+	void ay3600_data_ready_w(int state);
+	void ay3600_ako_w(int state);
 
-	void tv910_mem(address_map &map);
+	void tv910_mem(address_map &map) ATTR_COLD;
 
 	required_device<m6502_device> m_maincpu;
 	required_device<input_merger_device> m_mainirq;
@@ -178,7 +183,7 @@ uint8_t tv910_state::kbd_flags_r()
 	return rv;
 }
 
-READ_LINE_MEMBER(tv910_state::ay3600_shift_r)
+int tv910_state::ay3600_shift_r()
 {
 	// either shift key
 	if (m_kbspecial->read() & 0x06)
@@ -189,7 +194,7 @@ READ_LINE_MEMBER(tv910_state::ay3600_shift_r)
 	return CLEAR_LINE;
 }
 
-READ_LINE_MEMBER(tv910_state::ay3600_control_r)
+int tv910_state::ay3600_control_r()
 {
 	if (m_kbspecial->read() & 0x08)
 	{
@@ -199,7 +204,7 @@ READ_LINE_MEMBER(tv910_state::ay3600_control_r)
 	return CLEAR_LINE;
 }
 
-WRITE_LINE_MEMBER(tv910_state::ay3600_data_ready_w)
+void tv910_state::ay3600_data_ready_w(int state)
 {
 	if (state == ASSERT_LINE)
 	{
@@ -212,7 +217,7 @@ WRITE_LINE_MEMBER(tv910_state::ay3600_data_ready_w)
 	}
 }
 
-WRITE_LINE_MEMBER(tv910_state::ay3600_ako_w)
+void tv910_state::ay3600_ako_w(int state)
 {
 	m_anykeydown = (state == ASSERT_LINE) ? true : false;
 
@@ -298,7 +303,7 @@ static INPUT_PORTS_START( tv910 )
 	PORT_START("X5")
 	PORT_BIT(0x001, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_PRTSCR)    PORT_CHAR(UCHAR_MAMEKEY(PRTSCR))
 	PORT_BIT(0x002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_L)          PORT_CHAR('l') PORT_CHAR('L')
-	PORT_BIT(0x004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME(UTF8_LEFT)          PORT_CODE(KEYCODE_LEFT)
+	PORT_BIT(0x004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME(u8"\u2190")         PORT_CODE(KEYCODE_LEFT) // ←
 	PORT_BIT(0x008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_COLON)      PORT_CHAR(';') PORT_CHAR(':')
 	PORT_BIT(0x010, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_SLASH)      PORT_CHAR('/') PORT_CHAR('?')
 	PORT_BIT(0x020, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_ENTER_PAD)  PORT_CHAR(UCHAR_MAMEKEY(ENTER_PAD))
@@ -318,11 +323,11 @@ static INPUT_PORTS_START( tv910 )
 	PORT_BIT(0x100, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_F18)       PORT_CHAR(UCHAR_MAMEKEY(F18))
 
 	PORT_START("X7")
-	PORT_BIT(0x001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME(UTF8_RIGHT)         PORT_CODE(KEYCODE_RIGHT)
+	PORT_BIT(0x001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME(u8"\u2192")         PORT_CODE(KEYCODE_RIGHT) // →
 	PORT_BIT(0x002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_Z)          PORT_CHAR('z') PORT_CHAR('Z')
-	PORT_BIT(0x004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME(UTF8_UP)            PORT_CODE(KEYCODE_UP)
+	PORT_BIT(0x004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME(u8"\u2191")         PORT_CODE(KEYCODE_UP) // ↑
 /// 008 - CLRSP
-	PORT_BIT(0x010, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME(UTF8_DOWN)          PORT_CODE(KEYCODE_DOWN)     PORT_CHAR(10)      // E0 47
+	PORT_BIT(0x010, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME(u8"\u2193")         PORT_CODE(KEYCODE_DOWN)     PORT_CHAR(10)      // ↓  E0 47
 	PORT_BIT(0x080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_CLOSEBRACE) PORT_CHAR('{') PORT_CHAR('}')
 
 	PORT_START("X8")
@@ -451,7 +456,7 @@ MC6845_ON_UPDATE_ADDR_CHANGED( tv910_state::crtc_update_addr )
 {
 }
 
-WRITE_LINE_MEMBER(tv910_state::vbl_w)
+void tv910_state::vbl_w(int state)
 {
 	// this is ACKed by vbl_ack_w, state going 0 here doesn't ack the IRQ
 	if (state)
@@ -571,6 +576,9 @@ ROM_START( tv910 )
 	ROM_REGION(0x1000, "keyboard", 0)
 	ROM_LOAD( "1800000-019b_bell_a2_43d6.bin", 0x000000, 0x000800, CRC(de954a77) SHA1(c4f7c19799c15d12d89f08dc31064fc6be9befb0) )
 ROM_END
+
+} // anonymous namespace
+
 
 /* Driver */
 //    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY              FULLNAME               FLAGS

@@ -32,9 +32,9 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual ioport_constructor device_input_ports() const override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 
 	// device_vip_expansion_card_interface overrides
 	virtual void vip_program_w(offs_t offset, uint8_t data, int cdef, int *minh) override;
@@ -45,9 +45,9 @@ protected:
 	virtual int vip_ef4_r() override;
 
 private:
-	DECLARE_READ_LINE_MEMBER( rd_r );
-	DECLARE_READ_LINE_MEMBER( bd_r );
-	DECLARE_READ_LINE_MEMBER( gd_r );
+	int rd_r();
+	int bd_r();
+	int gd_r();
 
 	required_device<cdp1862_device> m_cgc;
 	memory_share_creator<uint8_t> m_color_ram;

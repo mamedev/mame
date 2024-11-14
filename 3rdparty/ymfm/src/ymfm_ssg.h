@@ -44,9 +44,8 @@ namespace ymfm
 
 // ======================> ssg_override
 
-// this class represents a built-in overridable SSG implementation; at this
-// time it is not implemented, so you will have to add your own, or else live
-// with no SSG audio
+// this class describes a simple interface to allow the internal SSG to be
+// overridden with another implementation
 class ssg_override
 {
 public:
@@ -131,8 +130,8 @@ public:
 	uint32_t io_b_data() const                          { return m_regdata[0x0f]; }
 
 	// per-channel registers
-	uint32_t ch_noise_enable(uint32_t choffs) const     { return bitfield(~m_regdata[0x07], 3 + choffs); }
-	uint32_t ch_tone_enable(uint32_t choffs) const      { return bitfield(~m_regdata[0x07], 0 + choffs); }
+	uint32_t ch_noise_enable_n(uint32_t choffs) const     { return bitfield(m_regdata[0x07], 3 + choffs); }
+	uint32_t ch_tone_enable_n(uint32_t choffs) const      { return bitfield(m_regdata[0x07], 0 + choffs); }
 	uint32_t ch_tone_period(uint32_t choffs) const      { return m_regdata[0x00 + 2 * choffs] | (bitfield(m_regdata[0x01 + 2 * choffs], 0, 4) << 8); }
 	uint32_t ch_envelope_enable(uint32_t choffs) const  { return bitfield(m_regdata[0x08 + choffs], 4); }
 	uint32_t ch_amplitude(uint32_t choffs) const        { return bitfield(m_regdata[0x08 + choffs], 0, 4); }

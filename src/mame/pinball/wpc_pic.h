@@ -3,8 +3,8 @@
 
 // Williams Pinball Controller Pic-based protection simulation
 
-#ifndef MAME_MACHINE_WPC_PIC_H
-#define MAME_MACHINE_WPC_PIC_H
+#ifndef MAME_PINBALL_WPC_PIC_H
+#define MAME_PINBALL_WPC_PIC_H
 
 #pragma once
 
@@ -25,8 +25,8 @@ protected:
 	uint8_t mem[16]{}, chk[3]{}, curcmd = 0, scrambler = 0, count = 0, chk_count = 0, cmpchk[3]{};
 	const char *serial;
 
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	void serial_to_pic();
 	void check_game_id();
@@ -34,4 +34,4 @@ protected:
 
 DECLARE_DEVICE_TYPE(WPC_PIC, wpc_pic_device)
 
-#endif // MAME_MACHINE_WPC_PIC_H
+#endif // MAME_PINBALL_WPC_PIC_H

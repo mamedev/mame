@@ -4,8 +4,9 @@ vec2 v_sinangle : TEXCOORD2 = vec2(0.0,0.0);
 vec2 v_cosangle : TEXCOORD3 = vec2(0.0,0.0);
 vec2 v_one      : TEXCOORD4 = vec2(0.0,0.0);
 vec4 v_coeffs   : TEXCOORD5 = vec4(0.0,0.0,0.0,0.0);
-vec4 v_lpcoeffs1: TEXCOORD6 = vec4(0.0,0.0,0.0,0.0);
-vec4 v_lpcoeffs2: TEXCOORD7 = vec4(0.0,0.0,0.0,0.0);
+vec4 v_coeffs2  : TEXCOORD6 = vec4(0.0,0.0,0.0,0.0);
+vec4 v_lpcoeffs1: TEXCOORD7 = vec4(0.0,0.0,0.0,0.0);
+vec4 v_lpcoeffs2: TEXCOORD8 = vec4(0.0,0.0,0.0,0.0);
 
 vec3 a_position  : POSITION;
 vec4 a_color0    : COLOR0;

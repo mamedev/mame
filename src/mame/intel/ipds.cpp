@@ -16,6 +16,8 @@
 #include "screen.h"
 
 
+namespace {
+
 class ipds_state : public driver_device
 {
 public:
@@ -40,9 +42,9 @@ private:
 	void kbd_put(u8 data);
 	I8275_DRAW_CHARACTER_MEMBER( crtc_display_pixels );
 	uint8_t m_term_data = 0U;
-	virtual void machine_reset() override;
-	void ipds_io(address_map &map);
-	void ipds_mem(address_map &map);
+	virtual void machine_reset() override ATTR_COLD;
+	void ipds_io(address_map &map) ATTR_COLD;
+	void ipds_mem(address_map &map) ATTR_COLD;
 };
 
 uint8_t ipds_state::ipds_b0_r()
@@ -96,15 +98,18 @@ I8275_DRAW_CHARACTER_MEMBER( ipds_state::crtc_display_pixels )
 	uint8_t *charmap = memregion("chargen")->base();
 	uint8_t pixels = charmap[(linecount & 7) + (charcode << 3)] ^ 0xff;
 
-	if (vsp)
+	using namespace i8275_attributes;
+
+	if (BIT(attrcode, VSP))
 		pixels = 0;
 
-	if (lten)
+	if (BIT(attrcode, LTEN))
 		pixels = 0xff;
 
-	if (rvv)
+	if (BIT(attrcode, RVV))
 		pixels ^= 0xff;
 
+	bool hlgt = BIT(attrcode, HLGT);
 	for(int i=0;i<6;i++)
 		bitmap.pix(y, x + i) = palette[(pixels >> (5-i)) & 1 ? (hlgt ? 2 : 1) : 0];
 }
@@ -173,6 +178,9 @@ ROM_START( ipds )
 	ROM_LOAD( "162806-001.u24", 0x0000, 0x0800, CRC(e6ba41ca) SHA1(a2d3438b728670b75c359ff49146ef57c08bf0f1) )
 	ROM_LOAD( "163775-001.u8",  0x0800, 0x0800, CRC(0442163e) SHA1(737732adcfe22823db37112e28758464f5d9af7b) )
 ROM_END
+
+} // anonymous namespace
+
 
 /* Driver */
 

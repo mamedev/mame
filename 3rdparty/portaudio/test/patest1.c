@@ -1,7 +1,7 @@
 /** @file patest1.c
-	@ingroup test_src
-	@brief Ring modulate the audio input with a sine wave for 20 seconds.
-	@author Ross Bencina <rossb@audiomulch.com>
+    @ingroup test_src
+    @brief Ring modulate the audio input with a sine wave for 20 seconds.
+    @author Ross Bencina <rossb@audiomulch.com>
 */
 /*
  * $Id$
@@ -31,13 +31,13 @@
  */
 
 /*
- * The text above constitutes the entire PortAudio license; however, 
+ * The text above constitutes the entire PortAudio license; however,
  * the PortAudio community also makes the following non-binding requests:
  *
  * Any person wishing to distribute modifications to the Software is
  * requested to send the modifications to the original developer so that
- * they can be incorporated into the canonical version. It is also 
- * requested that these non-binding requests be included along with the 
+ * they can be incorporated into the canonical version. It is also
+ * requested that these non-binding requests be included along with the
  * license above.
  */
 
@@ -49,13 +49,15 @@
 #define M_PI (3.14159265)
 #endif
 
-#define SAMPLE_RATE (44100)
+#define SAMPLE_RATE        (44100)
+#define NUM_INPUT_CHANNELS     (1)
+#define NUM_OUTPUT_CHANNELS    (2)
+#define SINE_TABLE_SIZE      (100)
 
 typedef struct
 {
-    float sine[100];
+    float sine[SINE_TABLE_SIZE];
     int phase;
-    int sampsToGo;
 }
 patest1data;
 
@@ -68,38 +70,19 @@ static int patest1Callback( const void *inputBuffer, void *outputBuffer,
     patest1data *data = (patest1data*)userData;
     float *in = (float*)inputBuffer;
     float *out = (float*)outputBuffer;
-    int framesToCalc = framesPerBuffer;
     unsigned long i = 0;
-    int finished;
 
-    if( data->sampsToGo < framesPerBuffer )
-    {
-        framesToCalc = data->sampsToGo;
-        finished = paComplete;
-    }
-    else
-    {
-        finished = paContinue;
-    }
-
-    for( ; i<framesToCalc; i++ )
-    {
-        *out++ = *in++ * data->sine[data->phase];  /* left */
-        *out++ = *in++ * data->sine[data->phase++];  /* right */
-        if( data->phase >= 100 )
-            data->phase = 0;
-    }
-
-    data->sampsToGo -= framesToCalc;
-
-    /* zero remainder of final buffer if not already done */
     for( ; i<framesPerBuffer; i++ )
     {
-        *out++ = 0; /* left */
-        *out++ = 0; /* right */
+        /* Mono input, stereo output. */
+        float output = *in++ * data->sine[data->phase++];
+        if( data->phase >= SINE_TABLE_SIZE )
+            data->phase = 0;
+        *out++ = output;  /* left */
+        *out++ = output;  /* right */
     }
-    
-    return finished;
+
+    return paContinue;
 }
 
 int main(int argc, char* argv[]);
@@ -113,33 +96,32 @@ int main(int argc, char* argv[])
     const PaHostErrorInfo*  herr;
 
     printf("patest1.c\n"); fflush(stdout);
-    printf("Ring modulate input for 20 seconds.\n"); fflush(stdout);
-    
-    /* initialise sinusoidal wavetable */
-    for( i=0; i<100; i++ )
-        data.sine[i] = sin( ((double)i/100.) * M_PI * 2. );
-    data.phase = 0;
-    data.sampsToGo = SAMPLE_RATE * 20;        /* 20 seconds. */
+    printf("Ring modulate input until ENTER key pressed.\n"); fflush(stdout);
 
-    /* initialise portaudio subsytem */
+    /* initialise sinusoidal wavetable */
+    for( i=0; i<SINE_TABLE_SIZE; i++ )
+        data.sine[i] = sin( ((double)i/SINE_TABLE_SIZE) * M_PI * 2. );
+    data.phase = 0;
+
+    /* initialise portaudio subsystem */
     err = Pa_Initialize();
 
     inputParameters.device = Pa_GetDefaultInputDevice();    /* default input device */
     if (inputParameters.device == paNoDevice) {
-      fprintf(stderr,"Error: No input default device.\n");
-      goto done;
+        fprintf(stderr, "Error: No input default device.\n");
+        goto done;
     }
-    inputParameters.channelCount = 2;                       /* stereo input */
+    inputParameters.channelCount = NUM_INPUT_CHANNELS;      /* mono input */
     inputParameters.sampleFormat = paFloat32;               /* 32 bit floating point input */
     inputParameters.suggestedLatency = Pa_GetDeviceInfo( inputParameters.device )->defaultLowInputLatency;
     inputParameters.hostApiSpecificStreamInfo = NULL;
 
     outputParameters.device = Pa_GetDefaultOutputDevice();  /* default output device */
     if (outputParameters.device == paNoDevice) {
-      fprintf(stderr,"Error: No default output device.\n");
-      goto done;
+        fprintf(stderr,"Error: No default output device.\n");
+        goto done;
     }
-    outputParameters.channelCount = 2;                      /* stereo output */
+    outputParameters.channelCount = NUM_OUTPUT_CHANNELS;    /* stereo output */
     outputParameters.sampleFormat = paFloat32;              /* 32 bit floating point output */
     outputParameters.suggestedLatency = Pa_GetDeviceInfo( outputParameters.device )->defaultLowOutputLatency;
     outputParameters.hostApiSpecificStreamInfo = NULL;
@@ -149,7 +131,7 @@ int main(int argc, char* argv[])
                         &inputParameters,
                         &outputParameters,
                         (double)SAMPLE_RATE, /* Samplerate in Hertz. */
-                        512,                 /* Small buffers */
+                        256,                 /* Small buffers */
                         paClipOff,           /* We won't output out of range samples so don't bother clipping them. */
                         patest1Callback,
                         &data );
@@ -157,18 +139,18 @@ int main(int argc, char* argv[])
 
     err = Pa_StartStream( stream );
     if( err != paNoError ) goto done;
-    
+
     printf( "Press any key to end.\n" ); fflush(stdout);
-         
+
     getc( stdin ); /* wait for input before exiting */
 
     err = Pa_AbortStream( stream );
     if( err != paNoError ) goto done;
-    
+
     printf( "Waiting for stream to complete...\n" );
 
     /* sleep until playback has finished */
-    while( ( err = Pa_IsStreamActive( stream ) ) == 1 ) Pa_Sleep(1000);
+    while( ( err = Pa_IsStreamActive( stream ) ) == 1 ) Pa_Sleep(100);
     if( err < 0 ) goto done;
 
     err = Pa_CloseStream( stream );
@@ -179,7 +161,7 @@ done:
 
     if( err != paNoError )
     {
-        fprintf( stderr, "An error occured while using portaudio\n" );
+        fprintf( stderr, "An error occurred while using portaudio\n" );
         if( err == paUnanticipatedHostError )
         {
             fprintf( stderr, " unanticipated host error.\n");

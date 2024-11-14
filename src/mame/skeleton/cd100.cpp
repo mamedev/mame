@@ -16,6 +16,9 @@
 #include "machine/msm6242.h"
 #include "machine/nvram.h"
 
+
+namespace {
+
 class cd100_state : public driver_device
 {
 public:
@@ -34,7 +37,7 @@ public:
 	void cd100b(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	u8 ccc_in_r();
@@ -46,9 +49,9 @@ private:
 	void mech_p2_w(u8 data);
 	void mech_latch_w(u8 data);
 
-	void ccc_mem_map(address_map &map);
-	void ccc_io_map(address_map &map);
-	void mc6803_map(address_map &map);
+	void ccc_mem_map(address_map &map) ATTR_COLD;
+	void ccc_io_map(address_map &map) ATTR_COLD;
+	void mc6803_map(address_map &map) ATTR_COLD;
 
 	required_device<z180_device> m_maincpu;
 	required_device<m6803_cpu_device> m_mechcpu;
@@ -262,6 +265,8 @@ ROM_START(cd100b)
 	ROM_REGION(0x8000, "mech_program", 0)
 	ROM_LOAD("70038325.31", 0x0000, 0x8000, CRC(6c46039a) SHA1(e4410180d94e9a60ddc8f42296ee60be20b28b5b)) // "CDM4 Mech Controller version 3.1"
 ROM_END
+
+} // anonymous namespace
 
 
 SYST(1992, cd100b, 0, 0, cd100b, cd100b, cd100_state, empty_init, "Rowe International", "CD-100B LaserStar", MACHINE_IS_SKELETON_MECHANICAL)

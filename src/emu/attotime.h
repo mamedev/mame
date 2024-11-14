@@ -38,9 +38,10 @@
 #include "emucore.h"
 #include "xtal.h"
 
+#include "eminline.h"
+
 #include <cmath>
-#undef min
-#undef max
+
 
 //**************************************************************************
 //  CONSTANTS
@@ -180,7 +181,7 @@ public:
 //**************************************************************************
 
 /** handle addition between two attotimes */
-inline attotime operator+(const attotime &left, const attotime &right) noexcept
+inline constexpr attotime operator+(const attotime &left, const attotime &right) noexcept
 {
 	attotime result;
 
@@ -230,7 +231,7 @@ inline attotime &attotime::operator+=(const attotime &right) noexcept
 
 
 /** handle subtraction between two attotimes */
-inline attotime operator-(const attotime &left, const attotime &right) noexcept
+inline constexpr attotime operator-(const attotime &left, const attotime &right) noexcept
 {
 	attotime result;
 

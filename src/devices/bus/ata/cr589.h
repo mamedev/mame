@@ -29,8 +29,8 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// device_nvram_interface overrides
 	virtual void nvram_default() override;
@@ -39,7 +39,7 @@ protected:
 
 private:
 	int download;
-	uint8_t buffer[ 65536 ];
+	uint8_t buffer[65536];
 	int bufferOffset;
 };
 

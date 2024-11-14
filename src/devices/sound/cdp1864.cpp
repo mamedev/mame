@@ -58,24 +58,24 @@ DEFINE_DEVICE_TYPE(CDP1864, cdp1864_device, "cdp1864", "RCA CDP1864")
 //  cdp1864_device - constructor
 //-------------------------------------------------
 
-cdp1864_device::cdp1864_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, CDP1864, tag, owner, clock),
-		device_sound_interface(mconfig, *this),
-		device_video_interface(mconfig, *this),
-		m_read_inlace(*this),
-		m_read_rdata(*this),
-		m_read_bdata(*this),
-		m_read_gdata(*this),
-		m_write_int(*this),
-		m_write_dma_out(*this),
-		m_write_efx(*this),
-		m_write_hsync(*this),
-		m_disp(0),
-		m_dmaout(0),
-		m_bgcolor(0),
-		m_con(0),
-		m_aoe(0),
-		m_latch(CDP1864_DEFAULT_LATCH)
+cdp1864_device::cdp1864_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, CDP1864, tag, owner, clock),
+	device_sound_interface(mconfig, *this),
+	device_video_interface(mconfig, *this),
+	m_read_inlace(*this, 1),
+	m_read_rdata(*this, 0),
+	m_read_bdata(*this, 0),
+	m_read_gdata(*this, 0),
+	m_write_int(*this),
+	m_write_dma_out(*this),
+	m_write_efx(*this),
+	m_write_hsync(*this),
+	m_disp(0),
+	m_dmaout(0),
+	m_bgcolor(0),
+	m_con(0),
+	m_aoe(0),
+	m_latch(CDP1864_DEFAULT_LATCH)
 {
 }
 
@@ -105,16 +105,6 @@ void cdp1864_device::device_config_complete()
 
 void cdp1864_device::device_start()
 {
-	// resolve callbacks
-	m_read_inlace.resolve_safe(1);
-	m_read_rdata.resolve_safe(0);
-	m_read_bdata.resolve_safe(0);
-	m_read_gdata.resolve_safe(0);
-	m_write_int.resolve_safe();
-	m_write_dma_out.resolve_safe();
-	m_write_efx.resolve_safe();
-	m_write_hsync.resolve_safe();
-
 	// initialize palette
 	initialize_palette();
 

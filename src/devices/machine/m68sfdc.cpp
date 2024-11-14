@@ -64,17 +64,11 @@ ioport_constructor m68sfdc_device::device_input_ports() const
 	return INPUT_PORTS_NAME(m68sfdc);
 }
 
-void m68sfdc_device::device_resolve_objects()
-{
-}
-
 void m68sfdc_device::device_start()
 {
-	m_irq_handler.resolve_safe();
-	m_nmi_handler.resolve_safe();
-
 	m_timer_head_load = timer_alloc(FUNC(m68sfdc_device::head_load_update), this);
 	m_timer_timeout = timer_alloc(FUNC(m68sfdc_device::timeout_expired), this);
+
 	save_item(NAME(m_select_0));
 	save_item(NAME(m_select_1));
 	save_item(NAME(m_select_2));
@@ -138,12 +132,12 @@ void m68sfdc_device::set_floppies_4(floppy_connector *f0, floppy_connector *f1, 
 	}
 }
 
-WRITE_LINE_MEMBER(m68sfdc_device::handle_irq)
+void m68sfdc_device::handle_irq(int state)
 {
 	m_irq_handler(state);
 }
 
-WRITE_LINE_MEMBER(m68sfdc_device::handle_nmi)
+void m68sfdc_device::handle_nmi(int state)
 {
 	m_nmi_handler(state);
 }
@@ -835,7 +829,7 @@ bool m68sfdc_device::pll_write_next_bit(bool bit, attotime &tm, floppy_image_dev
 
 void m68sfdc_device::device_add_mconfig(machine_config &config)
 {
-	PIA6821(config, m_pia, 0);
+	PIA6821(config, m_pia);
 	m_pia->readpa_handler().set(FUNC(m68sfdc_device::pia_pa_r));
 	m_pia->writepa_handler().set(FUNC(m68sfdc_device::pia_pa_w));
 	m_pia->ca1_w(0);

@@ -99,6 +99,8 @@ ROMs    : MR96004-10.1  [125661cd] (IC5 - Samples)
 #include "tilemap.h"
 
 
+namespace {
+
 class ms32_bnstars_state : public ms32_base_state
 {
 public:
@@ -126,7 +128,7 @@ public:
 
 	void init_bnstars();
 
-	template <int P> DECLARE_CUSTOM_INPUT_MEMBER(mahjong_ctrl_r);
+	template <int P> ioport_value mahjong_ctrl_r();
 
 private:
 
@@ -163,7 +165,7 @@ private:
 	template <int chip> u16 object_vram_r(offs_t offset);
 	template <int chip> void palette_ram_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 	template <int chip> u16 palette_ram_r(offs_t offset);
-	DECLARE_WRITE_LINE_MEMBER(flipscreen_dual_w);
+	void flipscreen_dual_w(int state);
 	template <int chip> TILE_GET_INFO_MEMBER(get_ascii_tile_info);
 	template <int chip> TILE_GET_INFO_MEMBER(get_scroll_tile_info);
 	template <int chip> TILE_GET_INFO_MEMBER(get_rotate_tile_info);
@@ -173,10 +175,10 @@ private:
 	tilemap_t *m_scroll_tilemap[2]{};
 	tilemap_t *m_rotate_tilemap[2]{};
 
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 	template <int which> u32 screen_update_dual(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void bnstars_map(address_map &map);
-	void bnstars_sound_map(address_map &map);
+	void bnstars_map(address_map &map) ATTR_COLD;
+	void bnstars_sound_map(address_map &map) ATTR_COLD;
 
 	void bnstars1_mahjong_select_w(u32 data);
 
@@ -184,7 +186,7 @@ private:
 };
 
 
-WRITE_LINE_MEMBER(ms32_bnstars_state::flipscreen_dual_w)
+void ms32_bnstars_state::flipscreen_dual_w(int state)
 {
 	for (int chip = 0; chip < 2; chip++)
 	{
@@ -434,7 +436,7 @@ template <int chip> void ms32_bnstars_state::palette_ram_w(offs_t offset, u16 da
 }
 
 template <int P>
-CUSTOM_INPUT_MEMBER(ms32_bnstars_state::mahjong_ctrl_r)
+ioport_value ms32_bnstars_state::mahjong_ctrl_r()
 {
 	required_ioport_array<4> &keys = (P == 0) ? m_p1_keys : m_p2_keys;
 	// different routing than other ms32.cpp mahjong games, using 0x2080 as mask
@@ -507,7 +509,7 @@ void ms32_bnstars_state::bnstars_sound_map(address_map &map)
 
 static INPUT_PORTS_START( bnstars )
 	PORT_START("P1")
-	PORT_BIT( 0x000000ff, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(ms32_bnstars_state, mahjong_ctrl_r<0>)
+	PORT_BIT( 0x000000ff, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(FUNC(ms32_bnstars_state::mahjong_ctrl_r<0>))
 	PORT_BIT( 0x0000ff00, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x00010000, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x00020000, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -550,7 +552,7 @@ static INPUT_PORTS_START( bnstars )
 	PORT_BIT( 0xe0, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("P2")
-	PORT_BIT( 0x000000ff, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(ms32_bnstars_state, mahjong_ctrl_r<1>)
+	PORT_BIT( 0x000000ff, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(FUNC(ms32_bnstars_state::mahjong_ctrl_r<1>))
 	PORT_BIT( 0x0000ff00, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x00010000, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x00020000, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -800,5 +802,8 @@ void ms32_bnstars_state::init_bnstars()
 
 	configure_banks();
 }
+
+} // anonymous namespace
+
 
 GAME( 1997, bnstars1, 0, bnstars, bnstars, ms32_bnstars_state, init_bnstars, ROT0, "Jaleco", "Vs. Janshi Brandnew Stars", MACHINE_IMPERFECT_GRAPHICS )

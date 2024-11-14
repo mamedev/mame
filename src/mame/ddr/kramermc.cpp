@@ -62,6 +62,9 @@ drops every second character.
 #include "sound/spkrdev.h"
 #include "speaker.h"
 
+
+namespace {
+
 class kramermc_state : public driver_device
 {
 public:
@@ -81,8 +84,8 @@ public:
 
 private:
 	u8 m_porta = 0U;
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 	uint32_t screen_update_kramermc(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint8_t port_a_r();
 	uint8_t port_b_r();
@@ -93,8 +96,8 @@ private:
 	required_device<speaker_sound_device> m_speaker;
 	required_device<palette_device> m_palette;
 	required_ioport_array<8> m_io_keyboard;
-	void kramermc_io(address_map &map);
-	void kramermc_mem(address_map &map);
+	void kramermc_io(address_map &map) ATTR_COLD;
+	void kramermc_mem(address_map &map) ATTR_COLD;
 };
 
 
@@ -281,6 +284,9 @@ ROM_START( kramermc )
 	ROM_REGION(0x0800, "chargen",0)
 	ROM_LOAD ("chargen.kmc",  0x0000, 0x0800, CRC(1ba52f9f) SHA1(71bbad90dd427d0132c871a4d3848ab3d4d84b8a) )
 ROM_END
+
+} // anonymous namespace
+
 
 /* Driver */
 

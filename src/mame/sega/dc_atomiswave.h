@@ -1,8 +1,8 @@
 // license:LGPL-2.1+
 // copyright-holders: Samuele Zannoli, R. Belmont, ElSemi, David Haywood, Angelo Salese, Olivier Galibert, MetalliC
 
-#ifndef MAME_INCLUDES_DC_ATOMISWAVE_H
-#define MAME_INCLUDES_DC_ATOMISWAVE_H
+#ifndef MAME_SEGA_DC_ATOMISWAVE_H
+#define MAME_SEGA_DC_ATOMISWAVE_H
 
 #pragma once
 
@@ -38,8 +38,8 @@ public:
 	void init_atomiswave();
 
 protected:
-	virtual void aw_map(address_map &map);
-	void aw_port(address_map &map);
+	virtual void aw_map(address_map &map) ATTR_COLD;
+	void aw_port(address_map &map) ATTR_COLD;
 
 private:
 	required_device<macronix_29l001mc_device> m_awflash;
@@ -61,9 +61,9 @@ public:
 	   { }
 
 protected:
-	virtual void aw_map(address_map &map) override;
+	virtual void aw_map(address_map &map) override ATTR_COLD;
 private:
 	uint64_t allnet_hack_r(offs_t offset, uint64_t mem_mask = ~0);
 };
 
-#endif // MAME_INCLUDES_DC_ATOMISWAVE_H
+#endif // MAME_SEGA_DC_ATOMISWAVE_H

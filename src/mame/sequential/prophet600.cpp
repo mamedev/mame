@@ -57,6 +57,9 @@
 
 #include "prophet600.lh"
 
+
+namespace {
+
 #define MAINCPU_TAG "z80"
 #define PIT_TAG     "pit"
 #define UART_TAG    "uart"
@@ -89,12 +92,12 @@ public:
 	void prophet600(machine_config &config);
 
 private:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
-	DECLARE_WRITE_LINE_MEMBER( pit_ch0_tick_w );
-	DECLARE_WRITE_LINE_MEMBER( pit_ch2_tick_w );
-	DECLARE_WRITE_LINE_MEMBER( acia_irq_w );
-	DECLARE_WRITE_LINE_MEMBER( acia_clock_w );
+	void pit_ch0_tick_w(int state);
+	void pit_ch2_tick_w(int state);
+	void acia_irq_w(int state);
+	void acia_clock_w(int state);
 
 	void dac_w(offs_t offset, uint8_t data);
 	void scanrow_w(uint8_t data);
@@ -106,8 +109,8 @@ private:
 	void cv_w(uint8_t data);
 	void gate_w(uint8_t data);
 
-	void cpu_map(address_map &map);
-	void io_map(address_map &map);
+	void cpu_map(address_map &map) ATTR_COLD;
+	void io_map(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<acia6850_device> m_acia;
@@ -127,18 +130,18 @@ private:
 	uint16_t m_CVs[CV_MAX]{};
 };
 
-WRITE_LINE_MEMBER( prophet600_state::pit_ch0_tick_w )
+void prophet600_state::pit_ch0_tick_w(int state)
 {
 	m_maincpu->set_input_line(INPUT_LINE_IRQ0, state);
 }
 
-WRITE_LINE_MEMBER( prophet600_state::pit_ch2_tick_w )
+void prophet600_state::pit_ch2_tick_w(int state)
 {
 	m_comparitor &= ~0x04;
 	m_comparitor |= (state == ASSERT_LINE) ? 0x04 : 0x00;
 }
 
-WRITE_LINE_MEMBER( prophet600_state::acia_irq_w )
+void prophet600_state::acia_irq_w(int state)
 {
 	if (!m_nmi_gate)
 	{
@@ -146,7 +149,7 @@ WRITE_LINE_MEMBER( prophet600_state::acia_irq_w )
 	}
 }
 
-WRITE_LINE_MEMBER( prophet600_state::acia_clock_w )
+void prophet600_state::acia_clock_w(int state)
 {
 	m_acia->write_txc(state);
 	m_acia->write_rxc(state);
@@ -305,5 +308,8 @@ ROM_START( prpht600 )
 	ROM_REGION(0x2000, MAINCPU_TAG, 0)
 	ROM_LOAD( "p600.bin",     0x000000, 0x002000, CRC(78e3f048) SHA1(61548b6de3d9b5c0ae76f8e751ece0b57de17118) )
 ROM_END
+
+} // anonymous namespace
+
 
 CONS( 1983, prpht600, 0, 0, prophet600, prophet600, prophet600_state, empty_init, "Sequential Circuits", "Prophet-600", MACHINE_NOT_WORKING|MACHINE_NO_SOUND )

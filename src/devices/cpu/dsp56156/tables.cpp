@@ -502,14 +502,14 @@ void assemble_eas_from_mm_table(uint16_t mm, int n1, int n2, std::string& ea1, s
 	char temp2[32];
 	switch(mm)
 	{
-		case 0x0: sprintf(temp1, "(R%d)+",  n1) ;
-					sprintf(temp2, "(R%d)+",    n2) ; break;
-		case 0x1: sprintf(temp1, "(R%d)+",  n1) ;
-					sprintf(temp2, "(R%d)+N%d", n2, n2); break;
-		case 0x2: sprintf(temp1, "(R%d)+N%d", n1, n1);
-					sprintf(temp2, "(R%d)+",    n2) ; break;
-		case 0x3: sprintf(temp1, "(R%d)+N%d", n1, n1);
-					sprintf(temp2, "(R%d)+N%d", n2, n2); break;
+		case 0x0: snprintf(temp1, 32, "(R%d)+",  n1) ;
+					snprintf(temp2, 32, "(R%d)+",    n2) ; break;
+		case 0x1: snprintf(temp1, 32, "(R%d)+",  n1) ;
+					snprintf(temp2, 32, "(R%d)+N%d", n2, n2); break;
+		case 0x2: snprintf(temp1, 32, "(R%d)+N%d", n1, n1);
+					snprintf(temp2, 32, "(R%d)+",    n2) ; break;
+		case 0x3: snprintf(temp1, 32, "(R%d)+N%d", n1, n1);
+					snprintf(temp2, 32, "(R%d)+N%d", n2, n2); break;
 	}
 	ea1 = temp1;
 	ea2 = temp2;
@@ -540,8 +540,8 @@ void assemble_ea_from_t_table(uint16_t t, uint16_t val, std::string& ea)
 	char temp[32];
 	switch(t)
 	{
-		case 0x0: sprintf(temp, "X:>$%x", val); break;
-		case 0x1: sprintf(temp, "#>$%x", val);  break;
+		case 0x0: snprintf(temp, 32, "X:>$%x", val); break;
+		case 0x1: snprintf(temp, 32, "#>$%x", val);  break;
 		// NEW // case 0x0: sprintf(ea, "X:$%04x", val); break;
 		// NEW // case 0x1: sprintf(ea, "#$%04x", val);  break;
 	}
@@ -565,12 +565,12 @@ void assemble_D_from_P_table(uint16_t P, uint16_t ppppp, std::string& D)
 	switch(P)
 	{
 		case 0x0:
-			sprintf(temp, "X:<$%x", ppppp);
+			snprintf(temp, 32, "X:<$%x", ppppp);
 			// NEW // sprintf(temp, "X:$%02x", ppppp);
 			break;
 		case 0x1:
 			assemble_address_from_IO_short_address(ppppp, fullAddy);
-			sprintf(temp, "X:<<$%s", fullAddy.c_str());
+			snprintf(temp, 32, "X:<<$%s", fullAddy.c_str());
 			// NEW // sprintf(temp, "X:$%s", fullAddy.c_str());
 			break;
 	}

@@ -2,8 +2,8 @@
 // copyright-holders:Curt Coder
 #pragma once
 
-#ifndef MAME_INCLUDES_VIP_H
-#define MAME_INCLUDES_VIP_H
+#ifndef MAME_RCA_VIP_H
+#define MAME_RCA_VIP_H
 
 #include "bus/vip/byteio.h"
 #include "bus/vip/exp.h"
@@ -69,30 +69,30 @@ private:
 	uint8_t io_r(offs_t offset);
 	void io_w(offs_t offset, uint8_t data);
 
-	DECLARE_READ_LINE_MEMBER(clear_r);
-	DECLARE_READ_LINE_MEMBER(ef1_r);
-	DECLARE_READ_LINE_MEMBER(ef2_r);
-	DECLARE_READ_LINE_MEMBER(ef3_r);
-	DECLARE_READ_LINE_MEMBER(ef4_r);
-	DECLARE_WRITE_LINE_MEMBER(q_w);
+	int clear_r();
+	int ef1_r();
+	int ef2_r();
+	int ef3_r();
+	int ef4_r();
+	void q_w(int state);
 
-	DECLARE_WRITE_LINE_MEMBER(vdc_int_w);
-	DECLARE_WRITE_LINE_MEMBER(vdc_dma_out_w);
-	DECLARE_WRITE_LINE_MEMBER(vdc_ef1_w);
+	void vdc_int_w(int state);
+	void vdc_dma_out_w(int state);
+	void vdc_ef1_w(int state);
 
-	DECLARE_WRITE_LINE_MEMBER(byteio_inst_w);
+	void byteio_inst_w(int state);
 
-	DECLARE_WRITE_LINE_MEMBER(exp_int_w );
-	DECLARE_WRITE_LINE_MEMBER(exp_dma_out_w);
-	DECLARE_WRITE_LINE_MEMBER(exp_dma_in_w);
+	void exp_int_w(int state);
+	void exp_dma_out_w(int state);
+	void exp_dma_in_w(int state);
 
 	DECLARE_QUICKLOAD_LOAD_MEMBER(quickload_cb);
 
-	void vip_io(address_map &map);
-	void vip_mem(address_map &map);
+	void vip_io(address_map &map) ATTR_COLD;
+	void vip_mem(address_map &map) ATTR_COLD;
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	required_device<cosmac_device> m_maincpu;
 	required_device<cdp1861_device> m_vdc;
@@ -132,4 +132,4 @@ private:
 	output_finder<3> m_leds;
 };
 
-#endif
+#endif // MAME_RCA_VIP_H

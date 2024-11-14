@@ -1,7 +1,7 @@
 // license:GPL-2.0+
 // copyright-holders:Raphael Nabet
-#ifndef MAME_VIDEO_911_VDT_H
-#define MAME_VIDEO_911_VDT_H
+#ifndef MAME_TI_911_VDT_H
+#define MAME_TI_911_VDT_H
 
 #pragma once
 
@@ -55,9 +55,9 @@ public:
 
 protected:
 	// device-level overrides
-	void device_start() override;
-	void device_reset() override;
-	virtual void device_add_mconfig(machine_config &config) override;
+	void device_start() override ATTR_COLD;
+	void device_reset() override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 	ioport_constructor device_input_ports() const override;
 
 	TIMER_CALLBACK_MEMBER(blink_tick);
@@ -112,4 +112,4 @@ private:
 
 DECLARE_DEVICE_TYPE(VDT911, vdt911_device)
 
-#endif // MAME_VIDEO_911_VDT_H
+#endif // MAME_TI_911_VDT_H

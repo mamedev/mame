@@ -8,12 +8,15 @@
 
 ***************************************************************************/
 
-#include <cctype>
-
 #include "emu.h"
 #include "network.h"
+
 #include "config.h"
+#include "dinetwork.h"
+
 #include "xmlfile.h"
+
+#include <cctype>
 
 //**************************************************************************
 //  NETWORK MANAGER
@@ -54,7 +57,7 @@ void network_manager::config_load(config_type cfg_type, config_level cfg_level, 
 						network.set_interface(interface);
 						const char *mac_addr = node->get_attribute_string("mac", nullptr);
 						if (mac_addr != nullptr && strlen(mac_addr) == 17) {
-							char mac[7];
+							uint8_t mac[6];
 							unsigned int mac_num[6];
 							sscanf(mac_addr, "%02x:%02x:%02x:%02x:%02x:%02x", &mac_num[0], &mac_num[1], &mac_num[2], &mac_num[3], &mac_num[4], &mac_num[5]);
 							for (int i = 0; i<6; i++) mac[i] = mac_num[i];
@@ -84,10 +87,11 @@ void network_manager::config_save(config_type cfg_type, util::xml::data_node *pa
 			{
 				node->set_attribute("tag", network.device().tag());
 				node->set_attribute_int("interface", network.get_interface());
-				const char *mac = network.get_mac();
-				char mac_addr[6 * 3];
-				sprintf(mac_addr, "%02x:%02x:%02x:%02x:%02x:%02x", u8(mac[0]), u8(mac[1]), u8(mac[2]), u8(mac[3]), u8(mac[4]), u8(mac[5]));
-				node->set_attribute("mac", mac_addr);
+				const std::array<u8, 6> &mac = network.get_mac();
+				const std::string mac_addr = util::string_format(
+						"%02x:%02x:%02x:%02x:%02x:%02x",
+						mac[0], mac[1], mac[2], mac[3], mac[4], mac[5]);
+				node->set_attribute("mac", mac_addr.c_str());
 			}
 		}
 	}

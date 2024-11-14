@@ -22,14 +22,22 @@
     core_stricmp - case-insensitive string compare
 -------------------------------------------------*/
 
-int core_stricmp(const char *s1, const char *s2)
+int core_stricmp(std::string_view s1, std::string_view s2)
 {
-	for (;;)
+	auto s1_iter = s1.begin();
+	auto s2_iter = s2.begin();
+	while (true)
 	{
-		int c1 = tolower((uint8_t)*s1++);
-		int c2 = tolower((uint8_t)*s2++);
-		if (c1 == 0 || c1 != c2)
-			return c1 - c2;
+		if (s1.end() == s1_iter)
+			return (s2.end() == s2_iter) ? 0 : -1;
+		else if (s2.end() == s2_iter)
+			return 1;
+
+		const int c1 = tolower(uint8_t(*s1_iter++));
+		const int c2 = tolower(uint8_t(*s2_iter++));
+		const int diff = c1 - c2;
+		if (diff)
+			return diff;
 	}
 }
 
@@ -55,70 +63,42 @@ int core_strnicmp(const char *s1, const char *s2, size_t n)
 
 /*-------------------------------------------------
     core_strwildcmp - case-insensitive wildcard
-    string compare (up to 16 characters at the
-    moment)
+    string compare
 -------------------------------------------------*/
 
-int core_strwildcmp(const char *sp1, const char *sp2)
+int core_strwildcmp(std::string_view s1, std::string_view s2)
 {
-	char s1[17], s2[17];
-	size_t i, l1, l2;
-	char *p;
-
-	//assert(strlen(sp1) < 16);
-	//assert(strlen(sp2) < 16);
-
-	if (sp1[0] == 0) strcpy(s1, "*");
-	else { strncpy(s1, sp1, 16); s1[16] = 0; }
-
-	if (sp2[0] == 0) strcpy(s2, "*");
-	else { strncpy(s2, sp2, 16); s2[16] = 0; }
-
-	p = strchr(s1, '*');
-	if (p)
+	// slight tweak of core_stricmp() logic
+	auto s1_iter = s1.begin();
+	auto s2_iter = s2.begin();
+	while (true)
 	{
-		for (i = p - s1; i < 16; i++) s1[i] = '?';
-		s1[16] = 0;
-	}
+		if ((s1.end() != s1_iter && *s1_iter == '*')
+			|| (s2.end() != s2_iter && *s2_iter == '*'))
+			return 0;
 
-	p = strchr(s2, '*');
-	if (p)
-	{
-		for (i = p - s2; i < 16; i++) s2[i] = '?';
-		s2[16] = 0;
-	}
+		if (s1.end() == s1_iter)
+			return (s2.end() == s2_iter) ? 0 : -1;
+		else if (s2.end() == s2_iter)
+			return 1;
 
-	l1 = strlen(s1);
-	if (l1 < 16)
-	{
-		for (i = l1 + 1; i < 16; i++) s1[i] = ' ';
-		s1[16] = 0;
+		const int c1 = tolower(uint8_t(*s1_iter++));
+		const int c2 = tolower(uint8_t(*s2_iter++));
+		const int diff = (c1 != '?' && c2 != '?')
+			? c1 - c2
+			: 0;
+		if (diff)
+			return diff;
 	}
-
-	l2 = strlen(s2);
-	if (l2 < 16)
-	{
-		for (i = l2 + 1; i < 16; i++) s2[i] = ' ';
-		s2[16] = 0;
-	}
-
-	for (i = 0; i < 16; i++)
-	{
-		if (s1[i] == '?' && s2[i] != '?') s1[i] = s2[i];
-		if (s2[i] == '?' && s1[i] != '?') s2[i] = s1[i];
-	}
-
-	return core_stricmp(s1, s2);
 }
 
-bool core_iswildstr(const char *sp)
+bool core_iswildstr(std::string_view s)
 {
-	for ( ; sp && *sp; sp++)
+	auto iter = std::find_if(s.begin(), s.end(), [](char c)
 	{
-		if (('?' == *sp) || ('*' == *sp))
-			return true;
-	}
-	return false;
+		return c == '?' || c == '*';
+	});
+	return iter != s.end();
 }
 
 
@@ -146,38 +126,15 @@ void strreplacechr(std::string& str, char ch, char newch)
 	}
 }
 
-static std::string_view internal_strtrimspace(std::string_view str, bool right_only)
-{
-	// identify the start
-	std::string_view::iterator start = str.begin();
-	if (!right_only)
-	{
-		start = std::find_if(
-			str.begin(),
-			str.end(),
-			[](char c) { return !isspace(uint8_t(c)); });
-	}
-
-	// identify the end
-	std::string_view::iterator end = std::find_if(
-		str.rbegin(),
-		std::string_view::reverse_iterator(start),
-		[](char c) { return !isspace(uint8_t(c)); }).base();
-
-	// extract the string
-	return end > start
-		? str.substr(start - str.begin(), end - start)
-		: std::string_view();
-}
-
 std::string_view strtrimspace(std::string_view str)
 {
-	return internal_strtrimspace(str, false);
+	std::string_view str2 = strtrimleft(str, [] (char c) { return !isspace(uint8_t(c)); });
+	return strtrimright(str2, [] (char c) { return !isspace(uint8_t(c)); });
 }
 
 std::string_view strtrimrightspace(std::string_view str)
 {
-	return internal_strtrimspace(str, true);
+	return strtrimright(str, [] (char c) { return !isspace(uint8_t(c)); });
 }
 
 std::string strmakeupper(std::string_view str)
@@ -188,11 +145,11 @@ std::string strmakeupper(std::string_view str)
 }
 
 /**
- * @fn  std::string &strmakelower(std::string_view str)
+ * @fn  std::string strmakelower(std::string_view str)
  *
  * @brief   Returns a lower case version of the given string.
  *
- * @param [in,out]  str The string to make lower case
+ * @param [in]  str The string to make lower case
  *
  * @return  A new std::string having been changed to lower case
  */
@@ -231,6 +188,40 @@ int strreplace(std::string &str, const std::string& search, const std::string& r
 }
 
 namespace util {
+
+/**
+ * @fn  bool streqlower(std::string_view str, std::string_view lcstr)
+ *
+ * @brief   Tests whether a mixed-case string matches a lowercase string.
+ *
+ * @param [in]  str   First string to compare (may be mixed-case).
+ * @param [in]  lcstr Second string to compare (must be all lowercase).
+ *
+ * @return  True if the strings match regardless of case.
+ */
+
+bool streqlower(std::string_view str, std::string_view lcstr)
+{
+	return std::equal(str.begin(), str.end(), lcstr.begin(), lcstr.end(),
+						[] (unsigned char c1, unsigned char c2) { return std::tolower(c1) == c2; });
+}
+
+/**
+ * @fn  bool strequpper(std::string_view str, std::string_view ucstr)
+ *
+ * @brief   Tests whether a mixed-case string matches an uppercase string.
+ *
+ * @param [in]  str   First string to compare (may be mixed-case).
+ * @param [in]  ucstr Second string to compare (must be all uppercase).
+ *
+ * @return  True if the strings match regardless of case.
+ */
+
+bool strequpper(std::string_view str, std::string_view ucstr)
+{
+	return std::equal(str.begin(), str.end(), ucstr.begin(), ucstr.end(),
+						[] (unsigned char c1, unsigned char c2) { return std::toupper(c1) == c2; });
+}
 
 /**
  * @fn  double edit_distance(std::u32string_view lhs, std::u32string_view rhs)

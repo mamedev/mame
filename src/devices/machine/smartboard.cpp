@@ -2,7 +2,7 @@
 // copyright-holders:Sandro Ronco, hap
 /******************************************************************************
 
-Tasc SmartBoard SB30
+Tasc SmartBoard SB30 (analog)
 
 Chessboard controller for use with Tasc R30 chesscomputer, or as PC peripheral.
 
@@ -83,13 +83,16 @@ tasc_sb30_device::tasc_sb30_device(const machine_config &mconfig, const char *ta
 
 void tasc_sb30_device::device_start()
 {
-	m_led_out.resolve();
-	if (m_led_out.isnull())
+	if (m_led_out.isunset())
 		m_out_leds.resolve();
 
-	m_data_out.resolve_safe();
-
-	std::fill(std::begin(m_squares), std::end(m_squares), 0);
+	// zerofill
+	m_data0 = 0;
+	m_data1 = 0;
+	m_output = 0;
+	m_scan_pending = false;
+	m_pos = 0;
+	std::fill_n(m_squares, std::size(m_squares), 0);
 
 	// register for savestates
 	save_item(NAME(m_data0));
@@ -137,7 +140,7 @@ void tasc_sb30_device::device_add_mconfig(machine_config &config)
 //  sensorboard_device interface
 //-------------------------------------------------
 
-void tasc_sb30_device::init_cb(int state)
+void tasc_sb30_device::init_cb(u8 data)
 {
 	m_board->clear_board();
 	m_board->write_piece(0, 0, SB30_WHITE_ROOK1);
@@ -298,7 +301,7 @@ void tasc_sb30_device::data0_w(int state)
 		else
 		{
 			// output board led(s)
-			if (m_led_out.isnull())
+			if (m_led_out.isunset())
 				m_out_leds[m_pos & 7][m_pos >> 3 & 7] = m_data1;
 			else
 				m_led_out(m_pos & 0x3f, m_data1);

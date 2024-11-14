@@ -27,18 +27,16 @@
 #include "68153bim.h"
 #include "cpu/m68000/m68000.h"
 
-//#define LOG_GENERAL (1U <<  0)
-#define LOG_SETUP   (1U <<  1)
-#define LOG_INT     (1U <<  2)
-#define LOG_READ    (1U <<  3)
-#define LOG_IACK    (1U <<  4)
+#define LOG_SETUP   (1U << 1)
+#define LOG_INT     (1U << 2)
+#define LOG_READ    (1U << 3)
+#define LOG_IACK    (1U << 4)
 
 //#define VERBOSE ( LOG_SETUP | LOG_INT | LOG_IACK | LOG_GENERAL | LOG_READ)
 //#define LOG_OUTPUT_FUNC printf
 
 #include "logmacro.h"
 
-//#define LOG(...)      LOGMASKED(LOG_GENERAL, __VA_ARGS__)
 #define LOGSETUP(...) LOGMASKED(LOG_SETUP,   __VA_ARGS__)
 #define LOGINT(...)   LOGMASKED(LOG_INT,     __VA_ARGS__)
 #define LOGR(...)     LOGMASKED(LOG_READ,    __VA_ARGS__)
@@ -88,7 +86,7 @@ bim68153_device::bim68153_device(const machine_config &mconfig, device_type type
 	, m_out_int_cb(*this)
 	, m_out_intal0_cb(*this)
 	, m_out_intal1_cb(*this)
-	, m_out_iackout_cb(*this)
+	, m_out_iackout_cb(*this, 0)
 	, m_iackin(ASSERT_LINE)
 	, m_irq_level(0)
 {
@@ -128,11 +126,6 @@ int bim68153_device::get_channel_index(bim68153_channel *ch)
 void bim68153_device::device_start()
 {
 	LOG("%s\n", FUNCNAME);
-	// resolve callbacks
-	m_out_int_cb.resolve_safe();
-	m_out_intal0_cb.resolve_safe();
-	m_out_intal1_cb.resolve_safe();
-	m_out_iackout_cb.resolve_safe(0);
 }
 
 //-------------------------------------------------
@@ -320,7 +313,7 @@ void bim68153_device::write(offs_t offset, uint8_t data)
 
 bim68153_channel::bim68153_channel(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, MC68153_CHANNEL, tag, owner, clock)
-	, m_out_iack_cb(*this)
+	, m_out_iack_cb(*this, 0)
 	, m_int_state(NONE)
 	, m_control(0)
 	, m_vector(0)
@@ -343,9 +336,6 @@ void bim68153_channel::device_start()
 	save_item(NAME(m_control));
 	save_item(NAME(m_vector));
 	save_item(NAME(m_int_state));
-
-	// Resolve callbacks
-	m_out_iack_cb.resolve_safe(0);
 }
 
 
@@ -364,7 +354,7 @@ void bim68153_channel::device_reset()
 }
 
 /* Trigger an interrupt */
-WRITE_LINE_MEMBER( bim68153_channel::int_w )
+void bim68153_channel::int_w(int state)
 {
 	LOGINT("%s Ch %d: %s\n",FUNCNAME, m_index, state == CLEAR_LINE ? "Cleared" : "Asserted");
 	if (state == ASSERT_LINE)

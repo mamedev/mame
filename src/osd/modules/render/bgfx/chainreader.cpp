@@ -6,25 +6,28 @@
 //
 //============================================================
 
-#include <string>
+#include "chainreader.h"
+
+#include "chain.h"
+#include "chainentryreader.h"
+#include "chainmanager.h"
+#include "parameter.h"
+#include "paramreader.h"
+#include "slider.h"
+#include "sliderreader.h"
+#include "targetmanager.h"
+#include "targetreader.h"
+
 #include <vector>
 #include <map>
 
-#include "emu.h"
-#include <modules/lib/osdobj_common.h>
-
-#include "chainreader.h"
-#include "chain.h"
-#include "chainmanager.h"
-#include "sliderreader.h"
-#include "paramreader.h"
-#include "chainentryreader.h"
-#include "targetreader.h"
-#include "targetmanager.h"
-#include "slider.h"
-#include "parameter.h"
-
-bgfx_chain* chain_reader::read_from_value(const Value& value, std::string prefix, chain_manager& chains, uint32_t screen_index)
+std::unique_ptr<bgfx_chain> chain_reader::read_from_value(
+		const Value& value,
+		const std::string &prefix,
+		chain_manager& chains,
+		uint32_t screen_index,
+		uint16_t user_prescale,
+		uint16_t max_prescale_size)
 {
 	if (!validate_parameters(value, prefix))
 	{
@@ -98,7 +101,7 @@ bgfx_chain* chain_reader::read_from_value(const Value& value, std::string prefix
 		// TODO: Move into its own reader
 		for (uint32_t i = 0; i < target_array.Size(); i++)
 		{
-			bgfx_target* target = target_reader::read_from_value(target_array[i], prefix + "targets[" + std::to_string(i) + "]: ", chains, screen_index);
+			bgfx_target* target = target_reader::read_from_value(target_array[i], prefix + "targets[" + std::to_string(i) + "]: ", chains, screen_index, user_prescale, max_prescale_size);
 			if (target == nullptr)
 			{
 				return nullptr;
@@ -123,19 +126,28 @@ bgfx_chain* chain_reader::read_from_value(const Value& value, std::string prefix
 		}
 	}
 
-	return new bgfx_chain(name, author, transform, chains.targets(), sliders, parameters, entries, target_list, screen_index);
+	return std::make_unique<bgfx_chain>(
+			std::move(name),
+			std::move(author),
+			transform,
+			chains.targets(),
+			std::move(sliders),
+			std::move(parameters),
+			std::move(entries),
+			std::move(target_list),
+			screen_index);
 }
 
-bool chain_reader::validate_parameters(const Value& value, std::string prefix)
+bool chain_reader::validate_parameters(const Value& value, const std::string &prefix)
 {
-	if (!READER_CHECK(value.HasMember("name"), (prefix + "Must have string value 'name'\n").c_str())) return false;
-	if (!READER_CHECK(value["name"].IsString(), (prefix + "Value 'name' must be a string\n").c_str())) return false;
-	if (!READER_CHECK(value.HasMember("author"), (prefix + "Must have string value 'author'\n").c_str())) return false;
-	if (!READER_CHECK(value["author"].IsString(), (prefix + "Value 'author' must be a string\n").c_str())) return false;
-	if (!READER_CHECK(value.HasMember("passes"), (prefix + "Must have array value 'passes'\n").c_str())) return false;
-	if (!READER_CHECK(value["passes"].IsArray(), (prefix + "Value 'passes' must be an array\n").c_str())) return false;
-	if (!READER_CHECK(!value.HasMember("sliders") || value["sliders"].IsArray(), (prefix + "Value 'sliders' must be an array\n").c_str())) return false;
-	if (!READER_CHECK(!value.HasMember("parameters") || value["parameters"].IsArray(), (prefix + "Value 'parameters' must be an array\n").c_str())) return false;
-	if (!READER_CHECK(!value.HasMember("targets") || value["targets"].IsArray(), (prefix + "Value 'targets' must be an array\n").c_str())) return false;
+	if (!READER_CHECK(value.HasMember("name"), "%sMust have string value 'name'\n", prefix)) return false;
+	if (!READER_CHECK(value["name"].IsString(), "%sValue 'name' must be a string\n", prefix)) return false;
+	if (!READER_CHECK(value.HasMember("author"), "%sMust have string value 'author'\n", prefix)) return false;
+	if (!READER_CHECK(value["author"].IsString(), "%sValue 'author' must be a string\n", prefix)) return false;
+	if (!READER_CHECK(value.HasMember("passes"), "%sMust have array value 'passes'\n", prefix)) return false;
+	if (!READER_CHECK(value["passes"].IsArray(), "%sValue 'passes' must be an array\n", prefix)) return false;
+	if (!READER_CHECK(!value.HasMember("sliders") || value["sliders"].IsArray(), "%sValue 'sliders' must be an array\n", prefix)) return false;
+	if (!READER_CHECK(!value.HasMember("parameters") || value["parameters"].IsArray(), "%sValue 'parameters' must be an array\n", prefix)) return false;
+	if (!READER_CHECK(!value.HasMember("targets") || value["targets"].IsArray(), "%sValue 'targets' must be an array\n", prefix)) return false;
 	return true;
 }

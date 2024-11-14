@@ -4,6 +4,9 @@
 #include "emu.h"
 #include "spg2xx.h"
 
+
+namespace {
+
 class jakks_tvtouch_state : public spg2xx_game_state
 {
 public:
@@ -14,8 +17,8 @@ public:
 	void tvtouch(machine_config &config);
 
 private:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	uint16_t porta_r(offs_t offset, uint16_t mem_mask = ~0);
 	uint16_t portb_r(offs_t offset, uint16_t mem_mask = ~0);
@@ -23,7 +26,7 @@ private:
 	void porta_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0) override;
 	void portb_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0) override;
 	void portc_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0) override;
-	DECLARE_WRITE_LINE_MEMBER(spi_w);
+	void spi_w(int state);
 
 	uint8_t m_spi_bit = 0;
 	uint8_t m_spi_val = 0;
@@ -231,7 +234,7 @@ void jakks_tvtouch_state::portc_w(offs_t offset, uint16_t data, uint16_t mem_mas
 		m_i2cmem->write_sda(BIT(data, 0));
 }
 
-WRITE_LINE_MEMBER(jakks_tvtouch_state::spi_w)
+void jakks_tvtouch_state::spi_w(int state)
 {
 	m_spi_val |= state << m_spi_bit;
 	if (m_spi_bit == 0)
@@ -283,6 +286,8 @@ ROM_START( tvtchsb )
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD16_WORD_SWAP( "touchspongebob.bin", 0x000000, 0x400000, CRC(a6d7f544) SHA1(fc15b3d2bbbd951d82c81bef59f45506d6c4e2e3) )
 ROM_END
+
+} // anonymous namespace
 
 
 // TV Touch Games (these are re-release versions of classic JAKKS games but using a touchpad controller)

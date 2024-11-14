@@ -457,7 +457,7 @@ uint8_t adam_state::mreq_r(offs_t offset)
 		}
 	}
 
-	data = m_cart->bd_r(offset & 0x7fff, data, cs1, cs2, cs3, cs4);
+	data &= m_cart->read(offset & 0x7fff, cs1, cs2, cs3, cs4);
 	data = m_slot[0]->bd_r(offset & 0xff, data, 1, biorq, 1, 1, 1);
 	data = m_slot[1]->bd_r(offset, data, bmreq, biorq, aux_rom_cs, 1, cas2);
 	data = m_slot[2]->bd_r(offset, data, 1, 1, 1, cas1, cas2);
@@ -516,6 +516,7 @@ void adam_state::mreq_w(offs_t offset, uint8_t data)
 		m_ram->pointer()[offset] = data;
 	}
 
+	// TODO: cartridge slot write
 	m_slot[0]->bd_w(offset & 0xff, data, 1, biorq, 1, 1, 1);
 	m_slot[1]->bd_w(offset, data, bmreq, biorq, aux_rom_cs, 1, cas2);
 	m_slot[2]->bd_w(offset, data, 1, 1, 1, cas1, cas2);
@@ -878,18 +879,6 @@ void adam_state::adam_io(address_map &map)
 }
 
 
-//-------------------------------------------------
-//  ADDRESS_MAP( m6801_mem )
-//-------------------------------------------------
-
-void adam_state::m6801_mem(address_map &map)
-{
-	map(0x0000, 0x001f).m(m_netcpu, FUNC(m6801_cpu_device::m6801_io));
-	map(0x0080, 0x00ff).ram();
-	map(0xf800, 0xffff).rom().region(M6801_TAG, 0);
-}
-
-
 
 //**************************************************************************
 //  INPUT PORTS
@@ -913,7 +902,7 @@ INPUT_PORTS_END
 //  TMS9928A_INTERFACE( vdc_intf )
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( adam_state::vdc_int_w )
+void adam_state::vdc_int_w(int state)
 {
 	if (state && !m_vdp_nmi)
 	{
@@ -927,7 +916,7 @@ WRITE_LINE_MEMBER( adam_state::vdc_int_w )
 //  M6801_INTERFACE( m6801_intf )
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( adam_state::os3_w )
+void adam_state::os3_w(int state)
 {
 	if (state && !m_dma)
 	{
@@ -943,19 +932,19 @@ WRITE_LINE_MEMBER( adam_state::os3_w )
 
 			//logerror("Master 6801 read from %04x data %02x\n", m_ba, m_data_out);
 
-			m_netcpu->set_input_line(M6801_SC1_LINE, ASSERT_LINE);
-			m_netcpu->set_input_line(M6801_SC1_LINE, CLEAR_LINE);
+			m_netcpu->set_input_line(M6801_IS3_LINE, ASSERT_LINE);
+			m_netcpu->set_input_line(M6801_IS3_LINE, CLEAR_LINE);
 		}
 	}
 }
 
 
-WRITE_LINE_MEMBER( adam_state::joy1_irq_w )
+void adam_state::joy1_irq_w(int state)
 {
 	// TODO
 }
 
-WRITE_LINE_MEMBER( adam_state::joy2_irq_w )
+void adam_state::joy2_irq_w(int state)
 {
 	// TODO
 }
@@ -1034,7 +1023,6 @@ void adam_state::adam(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &adam_state::adam_io);
 
 	M6801(config, m_netcpu, XTAL(4'000'000));
-	m_netcpu->set_addrmap(AS_PROGRAM, &adam_state::m6801_mem);
 	m_netcpu->out_p1_cb().set(FUNC(adam_state::m6801_p1_w));
 	m_netcpu->in_p2_cb().set(FUNC(adam_state::m6801_p2_r));
 	m_netcpu->out_p2_cb().set(FUNC(adam_state::m6801_p2_w));
@@ -1092,6 +1080,7 @@ void adam_state::adam(machine_config &config)
 
 	// software lists
 	SOFTWARE_LIST(config, "colec_cart_list").set_original("coleco");
+	SOFTWARE_LIST(config, "colec_hb_list").set_original("coleco_homebrew");
 	SOFTWARE_LIST(config, "adam_cart_list").set_original("adam_cart");
 	SOFTWARE_LIST(config, "cass_list").set_original("adam_cass");
 	SOFTWARE_LIST(config, "flop_list").set_original("adam_flop");

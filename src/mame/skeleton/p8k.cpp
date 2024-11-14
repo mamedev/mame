@@ -80,6 +80,8 @@ p8k_16_daisy_device::p8k_16_daisy_device(const machine_config &mconfig, const ch
 	, z80_daisy_chain_interface(mconfig, *this) {}
 
 
+namespace {
+
 class p8k_state : public driver_device
 {
 public:
@@ -101,20 +103,20 @@ private:
 	void port0_w(offs_t offset, uint8_t data);
 	DECLARE_MACHINE_RESET(p8k);
 
-	DECLARE_WRITE_LINE_MEMBER(fdc_irq);
-	DECLARE_WRITE_LINE_MEMBER(p8k_daisy_interrupt);
-	DECLARE_WRITE_LINE_MEMBER(p8k_dma_irq_w);
-	DECLARE_WRITE_LINE_MEMBER(p8k_16_daisy_interrupt );
+	[[maybe_unused]] void fdc_irq(int state);
+	void p8k_daisy_interrupt(int state);
+	void p8k_dma_irq_w(int state);
+	void p8k_16_daisy_interrupt(int state);
 	uint8_t memory_read_byte(offs_t offset);
 	void memory_write_byte(offs_t offset, uint8_t data);
 	uint8_t io_read_byte(offs_t offset);
 	void io_write_byte(offs_t offset, uint8_t data);
 
-	void p8k_16_datamap(address_map &map);
-	void p8k_16_iomap(address_map &map);
-	void p8k_16_memmap(address_map &map);
-	void p8k_iomap(address_map &map);
-	void p8k_memmap(address_map &map);
+	void p8k_16_datamap(address_map &map) ATTR_COLD;
+	void p8k_16_iomap(address_map &map) ATTR_COLD;
+	void p8k_16_memmap(address_map &map) ATTR_COLD;
+	void p8k_iomap(address_map &map) ATTR_COLD;
+	void p8k_memmap(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu; // Z80 or Z8001 depending on the machine
 	optional_device<p8k_16_daisy_device> m_daisy;
@@ -202,14 +204,14 @@ void p8k_state::port0_w(offs_t offset, uint8_t data)
 
 ****************************************************************************/
 
-WRITE_LINE_MEMBER( p8k_state::p8k_daisy_interrupt )
+void p8k_state::p8k_daisy_interrupt(int state)
 {
 	m_maincpu->set_input_line(0, state);
 }
 
 /* Z80 DMA */
 
-WRITE_LINE_MEMBER( p8k_state::p8k_dma_irq_w )
+void p8k_state::p8k_dma_irq_w(int state)
 {
 	m_i8272->tc_w(state);
 	p8k_daisy_interrupt(state);
@@ -257,7 +259,7 @@ static const z80_daisy_config p8k_daisy_chain[] =
 
 /* Intel 8272 Interface */
 
-DECLARE_WRITE_LINE_MEMBER( p8k_state::fdc_irq )
+void p8k_state::fdc_irq(int state)
 {
 	m_pio2->port_b_write(state ? 0x10 : 0x00);
 }
@@ -366,7 +368,7 @@ void p8k_state::p8k_16_iomap(address_map &map)
 
 ****************************************************************************/
 
-WRITE_LINE_MEMBER( p8k_state::p8k_16_daisy_interrupt )
+void p8k_state::p8k_16_daisy_interrupt(int state)
 {
 	m_maincpu->set_input_line(z8001_device::VI_LINE, state ? ASSERT_LINE : CLEAR_LINE);
 }
@@ -562,6 +564,9 @@ ROM_START( p8000_16 )
 	ROM_LOAD("p8t_zs",    0x0000, 0x0800, CRC(f9321251) SHA1(a6a796b58d50ec4a416f2accc34bd76bc83f18ea))
 	ROM_LOAD("p8tdzs.2",  0x0800, 0x0800, CRC(32736503) SHA1(6a1d7c55dddc64a7d601dfdbf917ce1afaefbb0a))
 ROM_END
+
+} // anonymous namespace
+
 
 /* Driver */
 

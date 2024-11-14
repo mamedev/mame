@@ -44,7 +44,7 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 	// configuration
 	required_device<acorn_bus_device> m_bus;
@@ -69,15 +69,15 @@ public:
 
 	address_space &memspace() const { return *m_space; }
 
-	DECLARE_WRITE_LINE_MEMBER(irq_w);
-	DECLARE_WRITE_LINE_MEMBER(nmi_w);
+	void irq_w(int state);
+	void nmi_w(int state);
 
 	void add_slot(acorn_bus_slot_device &slot);
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// internal state
 	required_address_space m_space;

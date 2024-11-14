@@ -67,9 +67,9 @@ public:
 	void yunsung8(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	// video-related
@@ -104,20 +104,18 @@ private:
 	template <uint8_t Which> void paletteram_w(offs_t offset, uint8_t data);
 	void flipscreen_w(uint8_t data);
 	void sound_bankswitch_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(adpcm_int);
+	void adpcm_int(int state);
 
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void main_map(address_map &map);
-	void port_map(address_map &map);
-	void sound_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
+	void port_map(address_map &map) ATTR_COLD;
+	void sound_map(address_map &map) ATTR_COLD;
 };
 
-
-// video
 
 /***************************************************************************
 
@@ -286,8 +284,6 @@ if (machine().input().code_pressed(KEYCODE_Z))
 	return 0;
 }
 
-
-// machine
 
 /***************************************************************************
 
@@ -560,7 +556,7 @@ GFXDECODE_END
 ***************************************************************************/
 
 
-WRITE_LINE_MEMBER(yunsung8_state::adpcm_int)
+void yunsung8_state::adpcm_int(int state)
 {
 	if (!state)
 		return;

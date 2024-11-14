@@ -44,6 +44,30 @@
 #include "softlist_dev.h"
 #include "speaker.h"
 
+#include <iostream>
+
+//**************************************************************************
+//  LOGGING
+//**************************************************************************
+
+#define LOG_CONF      (1U << 1)
+#define LOG_KEYBOARD  (1U << 2)
+#define LOG_DISPLAY   (1U << 3)
+
+//#define VERBOSE (LOG_CONF|LOG_DISPLAY|LOG_KEYBOARD)
+//#define LOG_OUTPUT_STREAM std::cout
+
+#include "logmacro.h"
+
+#define LOGCONF(...)     LOGMASKED(LOG_CONF,  __VA_ARGS__)
+#define LOGKEYBOARD(...) LOGMASKED(LOG_KEYBOARD,  __VA_ARGS__)
+#define LOGDISPLAY(...)  LOGMASKED(LOG_DISPLAY,  __VA_ARGS__)
+
+
+//**************************************************************************
+//  MACROS
+//**************************************************************************
+
 #define I8088_TAG       "8l"
 #define I8253_TAG       "13h"
 #define I8259A_TAG      "7l"
@@ -60,6 +84,9 @@
 #define RS232_B_TAG     "rs232b"
 #define SCREEN_TAG      "screen"
 #define KB_TAG          "kb"
+
+
+namespace {
 
 class victor9k_state : public driver_device
 {
@@ -83,6 +110,7 @@ public:
 		m_rs232a(*this, RS232_A_TAG),
 		m_rs232b(*this, RS232_B_TAG),
 		m_palette(*this, "palette"),
+		m_screen(*this, SCREEN_TAG),
 		m_rom(*this, I8088_TAG),
 		m_video_ram(*this, "video_ram"),
 		m_brt(0),
@@ -116,39 +144,42 @@ private:
 	required_device<rs232_port_device> m_rs232a;
 	required_device<rs232_port_device> m_rs232b;
 	required_device<palette_device> m_palette;
+	required_device<screen_device> m_screen;
 	required_memory_region m_rom;
 	required_shared_ptr<uint8_t> m_video_ram;
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	void via1_pa_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER( write_nfrd );
-	DECLARE_WRITE_LINE_MEMBER( write_ndac );
+	void write_nfrd(int state);
+	void write_ndac(int state);
 	void via1_pb_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER( via1_irq_w );
-	DECLARE_WRITE_LINE_MEMBER( codec_vol_w );
+	void via1_irq_w(int state);
+	void codec_vol_w(int state);
 
 	void via2_pa_w(uint8_t data);
 	void via2_pb_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER( via2_irq_w );
+	void via2_irq_w(int state);
 
 	void via3_pb_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER( via3_irq_w );
+	void via3_irq_w(int state);
 
-	DECLARE_WRITE_LINE_MEMBER( fdc_irq_w );
+	void fdc_irq_w(int state);
 
-	DECLARE_WRITE_LINE_MEMBER( ssda_irq_w );
-	DECLARE_WRITE_LINE_MEMBER( ssda_sm_dtr_w );
+	void ssda_irq_w(int state);
+	void ssda_sm_dtr_w(int state);
 
-	DECLARE_WRITE_LINE_MEMBER( kbrdy_w );
-	DECLARE_WRITE_LINE_MEMBER( kbdata_w );
-	DECLARE_WRITE_LINE_MEMBER( vert_w );
+	void kbrdy_w(int state);
+	void kbdata_w(int state);
+	void vert_w(int state);
+
 
 	MC6845_UPDATE_ROW( crtc_update_row );
+	MC6845_BEGIN_UPDATE( crtc_begin_update );
 
-	DECLARE_WRITE_LINE_MEMBER( mux_serial_b_w );
-	DECLARE_WRITE_LINE_MEMBER( mux_serial_a_w );
+	void mux_serial_b_w(int state);
+	void mux_serial_a_w(int state);
 
 	void victor9k_palette(palette_device &palette) const;
 
@@ -170,17 +201,8 @@ private:
 
 	void update_kback();
 
-	void victor9k_mem(address_map &map);
+	void victor9k_mem(address_map &map) ATTR_COLD;
 };
-
-
-
-//**************************************************************************
-//  MACROS / CONSTANTS
-//**************************************************************************
-
-#define LOG 0
-
 
 
 //**************************************************************************
@@ -246,13 +268,6 @@ MC6845_UPDATE_ROW( victor9k_state::crtc_update_row )
 	int dot_addr = BIT(ma, 12);
 	int width = hires ? 16 : 10;
 
-	if (m_hires != hires)
-	{
-		m_hires = hires;
-		m_crtc->set_unscaled_clock(XTAL(30'000'000) / width);
-		m_crtc->set_hpixels_per_column(width);
-	}
-
 	address_space &program = m_maincpu->space(AS_PROGRAM);
 	const rgb_t *palette = m_palette->palette()->entry_list_raw();
 
@@ -312,19 +327,32 @@ MC6845_UPDATE_ROW( victor9k_state::crtc_update_row )
 	}
 }
 
-WRITE_LINE_MEMBER(victor9k_state::vert_w)
+MC6845_BEGIN_UPDATE( victor9k_state::crtc_begin_update )
+{
+	uint16_t ma = m_crtc->get_ma();
+	int hires = BIT(ma, 13);
+	int width = hires ? 16 : 10;
+	if (hires != m_hires)
+	{
+		//LOGDISPLAY("mc6845 begin update change resolution: %s\n", hires ? "high" : "low");
+		m_crtc->set_hpixels_per_column(width);
+		m_crtc->set_char_width(width);
+		//m_crtc->set_visarea_adjust(0, 0, 0, 10);  //show line 25
+		m_hires = hires;
+	}
+}
+
+void victor9k_state::vert_w(int state)
 {
 	m_via2->write_pa7(state);
 	m_pic->ir7_w(state);
 }
 
-
-
-WRITE_LINE_MEMBER(victor9k_state::mux_serial_b_w)
+void victor9k_state::mux_serial_b_w(int state)
 {
 }
 
-WRITE_LINE_MEMBER(victor9k_state::mux_serial_a_w)
+void victor9k_state::mux_serial_a_w(int state)
 {
 }
 
@@ -351,7 +379,7 @@ WRITE_LINE_MEMBER(victor9k_state::mux_serial_a_w)
 //  MC6852_INTERFACE( ssda_intf )
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( victor9k_state::ssda_irq_w )
+void victor9k_state::ssda_irq_w(int state)
 {
 	m_ssda_irq = state;
 
@@ -359,7 +387,7 @@ WRITE_LINE_MEMBER( victor9k_state::ssda_irq_w )
 }
 
 
-WRITE_LINE_MEMBER( victor9k_state::ssda_sm_dtr_w )
+void victor9k_state::ssda_sm_dtr_w(int state)
 {
 	m_ssda->cts_w(state);
 	m_ssda->dcd_w(!state);
@@ -398,13 +426,13 @@ void victor9k_state::via1_pa_w(uint8_t data)
 	m_ieee488->host_dio_w(data);
 }
 
-DECLARE_WRITE_LINE_MEMBER( victor9k_state::write_nfrd )
+void victor9k_state::write_nfrd(int state)
 {
 	m_via1->write_pb6(state);
 	m_via1->write_ca1(state);
 }
 
-DECLARE_WRITE_LINE_MEMBER( victor9k_state::write_ndac )
+void victor9k_state::write_ndac(int state)
 {
 	m_via1->write_pb7(state);
 	m_via1->write_ca2(state);
@@ -441,11 +469,11 @@ void victor9k_state::via1_pb_w(uint8_t data)
 	m_ieee488->host_ndac_w(BIT(data, 7));
 }
 
-WRITE_LINE_MEMBER( victor9k_state::codec_vol_w )
+void victor9k_state::codec_vol_w(int state)
 {
 }
 
-WRITE_LINE_MEMBER( victor9k_state::via1_irq_w )
+void victor9k_state::via1_irq_w(int state)
 {
 	m_via1_irq = state;
 
@@ -504,10 +532,10 @@ void victor9k_state::via2_pb_w(uint8_t data)
 	// contrast
 	m_cont = data >> 5;
 
-	if (LOG) logerror("BRT %u CONT %u\n", m_brt, m_cont);
+	LOGDISPLAY("BRT %u CONT %u\n", m_brt, m_cont);
 }
 
-WRITE_LINE_MEMBER( victor9k_state::via2_irq_w )
+void victor9k_state::via2_irq_w(int state)
 {
 	m_via2_irq = state;
 
@@ -549,7 +577,7 @@ void victor9k_state::via3_pb_w(uint8_t data)
 	m_cvsd->clock_w(!BIT(data, 7));
 }
 
-WRITE_LINE_MEMBER( victor9k_state::via3_irq_w )
+void victor9k_state::via3_irq_w(int state)
 {
 	m_via3_irq = state;
 
@@ -561,9 +589,9 @@ WRITE_LINE_MEMBER( victor9k_state::via3_irq_w )
 //  VICTOR9K_KEYBOARD_INTERFACE( kb_intf )
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( victor9k_state::kbrdy_w )
+void victor9k_state::kbrdy_w(int state)
 {
-	if (LOG) logerror("KBRDY %u\n", state);
+	LOGKEYBOARD("KBRDY %u\n", state);
 
 	m_via2->write_cb1(state);
 
@@ -571,22 +599,21 @@ WRITE_LINE_MEMBER( victor9k_state::kbrdy_w )
 	update_kback();
 }
 
-WRITE_LINE_MEMBER( victor9k_state::kbdata_w )
+void victor9k_state::kbdata_w(int state)
 {
-	if (LOG) logerror("KBDATA %u\n", state);
+	LOGKEYBOARD("KBDATA %u\n", state);
 
 	m_via2->write_cb2(state);
 	m_via2->write_pa6(state);
 }
 
 
-WRITE_LINE_MEMBER( victor9k_state::fdc_irq_w )
+void victor9k_state::fdc_irq_w(int state)
 {
 	m_fdc_irq = state;
 
 	m_pic->ir3_w(m_ssda_irq || m_via1_irq || m_via3_irq || m_fdc_irq);
 }
-
 
 //**************************************************************************
 //  MACHINE INITIALIZATION
@@ -600,20 +627,20 @@ void victor9k_state::victor9k_palette(palette_device &palette) const
 	// BRT1 39K
 	// BRT2 20K
 	// 12V 220K pullup
-	palette.set_pen_color(1, rgb_t(0x00, 0x10, 0x00));
-	palette.set_pen_color(2, rgb_t(0x00, 0x20, 0x00));
-	palette.set_pen_color(3, rgb_t(0x00, 0x40, 0x00));
-	palette.set_pen_color(4, rgb_t(0x00, 0x60, 0x00));
-	palette.set_pen_color(5, rgb_t(0x00, 0x80, 0x00));
-	palette.set_pen_color(6, rgb_t(0x00, 0xa0, 0x00));
-	palette.set_pen_color(7, rgb_t(0x00, 0xc0, 0x00));
-	palette.set_pen_color(8, rgb_t(0x00, 0xff, 0x00));
+	palette.set_pen_color(1, rgb_t(0x00, 0x10, 0x04));
+	palette.set_pen_color(2, rgb_t(0x00, 0x20, 0x09));
+	palette.set_pen_color(3, rgb_t(0x00, 0x40, 0x11));
+	palette.set_pen_color(4, rgb_t(0x00, 0x60, 0x1a));
+	palette.set_pen_color(5, rgb_t(0x00, 0x80, 0x23));
+	palette.set_pen_color(6, rgb_t(0x00, 0xa0, 0x2c));
+	palette.set_pen_color(7, rgb_t(0x00, 0xc0, 0x34));
+	palette.set_pen_color(8, rgb_t(0x00, 0xff, 0x45));
 
 	// CONT0 620R
 	// CONT1 332R
 	// CONT2 162R
 	// 12V 110R pullup
-	palette.set_pen_color(9, rgb_t(0xff, 0x00, 0x00));
+	palette.set_pen_color(9, rgb_t(0x00, 0xff, 0x45));
 }
 
 void victor9k_state::machine_start()
@@ -631,6 +658,7 @@ void victor9k_state::machine_start()
 
 #ifndef USE_SCP
 	// patch out SCP self test
+	LOGCONF("patch out SCP self test");
 	m_rom->base()[0x11ab] = 0xc3;
 
 	// patch out ROM checksum error
@@ -639,6 +667,20 @@ void victor9k_state::machine_start()
 	m_rom->base()[0x1d53] = 0x90;
 	m_rom->base()[0x1d54] = 0x90;
 #endif
+
+	//update RAM for ramsize
+	int m_ram_size = m_ram->size();
+	u8 *m_ram_ptr = m_ram->pointer();
+
+	int ramsize = m_ram_size;
+	if (ramsize > 0)
+	{
+		address_space& space = m_maincpu->space(AS_PROGRAM);
+		if (ramsize > 0xdffff)   //the 896KB option overlaps 1 bit with
+			ramsize = 0xdffff;   //the I/O memory space, truncating
+		LOGCONF("install_ram ramsize %x\n", ramsize);
+		space.install_ram(0x0, ramsize, m_ram_ptr);
+	}
 }
 
 void victor9k_state::machine_reset()
@@ -666,27 +708,29 @@ void victor9k_state::machine_reset()
 void victor9k_state::victor9k(machine_config &config)
 {
 	// basic machine hardware
-	I8088(config, m_maincpu, XTAL(30'000'000)/6);
+	I8088(config, m_maincpu, 15_MHz_XTAL / 3);
 	m_maincpu->set_addrmap(AS_PROGRAM, &victor9k_state::victor9k_mem);
 	m_maincpu->set_irq_acknowledge_callback(I8259A_TAG, FUNC(pic8259_device::inta_cb));
 
 	// video hardware
-	screen_device &screen(SCREEN(config, SCREEN_TAG, SCREEN_TYPE_RASTER));
-	screen.set_color(rgb_t::green());
-	screen.set_refresh_hz(50);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); // not accurate
-	screen.set_screen_update(HD46505S_TAG, FUNC(hd6845s_device::screen_update));
-	screen.set_size(640, 480);
-	screen.set_visarea(0, 640-1, 0, 480-1);
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_color(rgb_t::green());
+	m_screen->set_refresh_hz(72);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(1200));
+	m_screen->set_size(800, 400);
+	m_screen->set_visarea(0, 799, 0, 399);
+	m_screen->set_screen_update(HD46505S_TAG, FUNC(hd6845s_device::screen_update));
 
 	PALETTE(config, m_palette, FUNC(victor9k_state::victor9k_palette), 16);
-
-	HD6845S(config, m_crtc, XTAL(30'000'000)/10); // HD6845 == HD46505S
+	HD6845S(config, m_crtc, 15_MHz_XTAL / 10); // HD6845 == HD46505S
 	m_crtc->set_screen(SCREEN_TAG);
-	m_crtc->set_show_border_area(true);
+	m_crtc->set_show_border_area(false);
 	m_crtc->set_char_width(10);
+	m_crtc->set_visarea_adjust(0, 0, 0, 10);  //show line 25
+
 	m_crtc->set_update_row_callback(FUNC(victor9k_state::crtc_update_row));
 	m_crtc->out_vsync_callback().set(FUNC(victor9k_state::vert_w));
+	m_crtc->set_begin_update_callback(FUNC(victor9k_state::crtc_begin_update));
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
@@ -717,7 +761,7 @@ void victor9k_state::victor9k(machine_config &config)
 	pit.set_clk<2>(100000);
 	pit.out_handler<2>().set(I8259A_TAG, FUNC(pic8259_device::ir2_w));
 
-	UPD7201(config, m_upd7201, XTAL(30'000'000)/30);
+	UPD7201(config, m_upd7201, 15_MHz_XTAL / 6);
 	m_upd7201->out_txda_callback().set(RS232_A_TAG, FUNC(rs232_port_device::write_txd));
 	m_upd7201->out_dtra_callback().set(RS232_A_TAG, FUNC(rs232_port_device::write_dtr));
 	m_upd7201->out_rtsa_callback().set(RS232_A_TAG, FUNC(rs232_port_device::write_rts));
@@ -726,24 +770,24 @@ void victor9k_state::victor9k(machine_config &config)
 	m_upd7201->out_rtsb_callback().set(RS232_B_TAG, FUNC(rs232_port_device::write_rts));
 	m_upd7201->out_int_callback().set(I8259A_TAG, FUNC(pic8259_device::ir1_w));
 
-	MC6852(config, m_ssda, XTAL(30'000'000)/30);
+	MC6852(config, m_ssda, 15_MHz_XTAL / 15);
 	m_ssda->tx_data_callback().set(HC55516_TAG, FUNC(hc55516_device::digit_w));
 	m_ssda->sm_dtr_callback().set(FUNC(victor9k_state::ssda_sm_dtr_w));
 	m_ssda->irq_callback().set(FUNC(victor9k_state::ssda_irq_w));
 
-	MOS6522(config, m_via1, XTAL(30'000'000)/30);
+	MOS6522(config, m_via1, 15_MHz_XTAL / 15);
 	m_via1->readpa_handler().set(IEEE488_TAG, FUNC(ieee488_device::dio_r));
 	m_via1->writepa_handler().set(FUNC(victor9k_state::via1_pa_w));
 	m_via1->writepb_handler().set(FUNC(victor9k_state::via1_pb_w));
 	m_via1->cb2_handler().set(FUNC(victor9k_state::codec_vol_w));
 	m_via1->irq_handler().set(FUNC(victor9k_state::via1_irq_w));
 
-	MOS6522(config, m_via2, XTAL(30'000'000)/30);
+	MOS6522(config, m_via2, 15_MHz_XTAL / 15);
 	m_via2->writepa_handler().set(FUNC(victor9k_state::via2_pa_w));
 	m_via2->writepb_handler().set(FUNC(victor9k_state::via2_pb_w));
 	m_via2->irq_handler().set(FUNC(victor9k_state::via2_irq_w));
 
-	MOS6522(config, m_via3, XTAL(30'000'000)/30);
+	MOS6522(config, m_via3, 15_MHz_XTAL / 15);
 	m_via3->writepb_handler().set(FUNC(victor9k_state::via3_pb_w));
 	m_via3->irq_handler().set(FUNC(victor9k_state::via3_irq_w));
 
@@ -775,7 +819,7 @@ void victor9k_state::victor9k(machine_config &config)
 	m_fdc->syn_wr_callback().set(I8259A_TAG, FUNC(pic8259_device::ir0_w)).invert();
 	m_fdc->lbrdy_wr_callback().set_inputline(I8088_TAG, INPUT_LINE_TEST).invert();
 
-	RAM(config, m_ram).set_default_size("128K");
+	RAM(config, m_ram).set_default_size("128K").set_extra_options("128K,256K,512K,640K,768K,896K");
 
 	SOFTWARE_LIST(config, "flop_list").set_original("victor9k_flop");
 }
@@ -801,6 +845,7 @@ ROM_START( victor9k )
 	ROMX_LOAD( "v9000 univ. ff f3f7 39fe.8j", 0x1000, 0x1000, CRC(496c7467) SHA1(eccf428f62ef94ab85f4a43ba59ae6a066244a66), ROM_BIOS(1) )
 ROM_END
 
+} // anonymous namespace
 
 
 //**************************************************************************

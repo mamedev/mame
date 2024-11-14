@@ -122,15 +122,15 @@
 #include "emu.h"
 #include "tn_ide.h"
 
-#define LOG_WARN       (1U<<1)
-#define LOG_CRU        (1U<<2)
-#define LOG_RTC        (1U<<3)
-#define LOG_XRAM       (1U<<4)
-#define LOG_SRAM       (1U<<5)
-#define LOG_ATA        (1U<<6)
-#define LOG_SRAMH      (1U<<7)
+#define LOG_WARN       (1U << 1)
+#define LOG_CRU        (1U << 2)
+#define LOG_RTC        (1U << 3)
+#define LOG_XRAM       (1U << 4)
+#define LOG_SRAM       (1U << 5)
+#define LOG_ATA        (1U << 6)
+#define LOG_SRAMH      (1U << 7)
 
-#define VERBOSE ( LOG_GENERAL | LOG_WARN )
+#define VERBOSE (LOG_GENERAL | LOG_WARN)
 
 #include "logmacro.h"
 
@@ -594,7 +594,7 @@ void nouspikel_ide_card_device::cruwrite(offs_t offset, uint8_t data)
 }
 
 template<int rtctype>
-WRITE_LINE_MEMBER(nouspikel_ide_card_device::rtc_int_callback)
+void nouspikel_ide_card_device::rtc_int_callback(int state)
 {
 	if (state)
 		m_rtc_int |= 1 << rtctype;
@@ -605,13 +605,13 @@ WRITE_LINE_MEMBER(nouspikel_ide_card_device::rtc_int_callback)
 		m_slot->set_inta(state ? CLEAR_LINE : ASSERT_LINE);
 }
 
-WRITE_LINE_MEMBER(nouspikel_ide_card_device::ide_interrupt_callback)
+void nouspikel_ide_card_device::ide_interrupt_callback(int state)
 {
 	m_ideint = (state==ASSERT_LINE);
 	if (m_crulatch->q6_r()==1) m_slot->set_inta(state);
 }
 
-WRITE_LINE_MEMBER(nouspikel_ide_card_device::resetdr_callback)
+void nouspikel_ide_card_device::resetdr_callback(int state)
 {
 	if (m_crulatch->q6_r()==1 && (state==0))
 		// not implemented
@@ -703,13 +703,13 @@ INPUT_PORTS_START( tn_ide )
 
 	// The switch should be open (1) on powerup for BQ clock chips
 	PORT_START("MAPMODE")
-	PORT_DIPNAME(0x1, 1, "Map at boot time") PORT_CHANGED_MEMBER(DEVICE_SELF, nouspikel_ide_card_device, mode_changed, 0)
+	PORT_DIPNAME(0x1, 1, "Map at boot time") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(nouspikel_ide_card_device::mode_changed), 0)
 		PORT_DIPSETTING(0, "RTC")
 		PORT_DIPSETTING(1, "SRAM")
 
 	// Set to off as default, because random contents in SRAM may lead to lockup
 	PORT_START("MODE")
-	PORT_DIPNAME(0x3, MODE_OFF, "Card mode") PORT_CHANGED_MEMBER(DEVICE_SELF, nouspikel_ide_card_device, mode_changed, 1)
+	PORT_DIPNAME(0x3, MODE_OFF, "Card mode") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(nouspikel_ide_card_device::mode_changed), 1)
 		PORT_DIPSETTING(MODE_OFF, "Off")
 		PORT_DIPSETTING(MODE_GENEVE, "Geneve")
 		PORT_DIPSETTING(MODE_TI, "TI")

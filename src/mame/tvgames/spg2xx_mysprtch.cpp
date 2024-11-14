@@ -6,6 +6,8 @@
 #include "spg2xx.h"
 
 
+namespace {
+
 class spg2xx_game_mysprt_plus_state : public spg2xx_game_state
 {
 public:
@@ -21,11 +23,11 @@ public:
 	void init_mgt20in1();
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 	virtual void device_post_load() override;
 
-	void mem_map_mysprtch(address_map& map);
+	void mem_map_mysprtch(address_map &map) ATTR_COLD;
 
 	virtual void porta_w(offs_t offset, uint16_t data, uint16_t mem_mask) override;
 
@@ -48,7 +50,7 @@ public:
 	{ }
 
 protected:
-	virtual void machine_reset() override;
+	virtual void machine_reset() override ATTR_COLD;
 	virtual void porta_w(offs_t offset, uint16_t data, uint16_t mem_mask) override;
 
 private:
@@ -454,6 +456,9 @@ ROM_START( mgt20in1 )
 	ROM_REGION( 0x1000000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD16_WORD_SWAP( "m29gl128.u2", 0x000000, 0x1000000, CRC(41d594e3) SHA1(351890455bed28bcaf173d8fd9a4cc997c404d94) )
 ROM_END
+
+} // anonymous namespace
+
 
 // Original release, with 24MB ROM package, Unit has Black surround to power button
 CONS( 200?, mysprtch,  0, 0, mysprtch, mysprtch, spg2xx_game_mysprt_orig_state, init_mysprtcp, "Senario / V-Tac Technology Co Ltd.",                "My Sports Challenge (5-in-1 version)",  MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )

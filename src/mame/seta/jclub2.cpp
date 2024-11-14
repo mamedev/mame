@@ -98,7 +98,7 @@
 ************************************************************************************************************/
 
 #include "emu.h"
-#include "cpu/m68000/m68000.h"
+#include "cpu/m68000/m68020.h"
 #include "machine/eepromser.h"
 #include "machine/nvram.h"
 #include "st0016.h"
@@ -176,7 +176,7 @@ public:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void jclub2(machine_config &config);
-	void jclub2_map(address_map &map);
+	void jclub2_map(address_map &map) ATTR_COLD;
 protected:
 	required_device<st0020_device> m_st0020;
 };
@@ -214,9 +214,9 @@ public:
 	void init_jclub2o();
 
 	void jclub2o(machine_config &config);
-	void jclub2o_map(address_map &map);
-	void st0016_io(address_map &map);
-	void st0016_mem(address_map &map);
+	void jclub2o_map(address_map &map) ATTR_COLD;
+	void st0016_io(address_map &map) ATTR_COLD;
+	void st0016_mem(address_map &map) ATTR_COLD;
 private:
 	uint8_t m_cmd1;
 	uint8_t m_cmd2;
@@ -241,9 +241,10 @@ public:
 	void init_darkhors();
 
 	void darkhors(machine_config &config);
+	void darkhorsa(machine_config &config);
 
 protected:
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	void input_sel_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
@@ -259,7 +260,8 @@ private:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void darkhors_map(address_map &map);
+	void darkhors_map(address_map &map) ATTR_COLD;
+	void darkhorsa_map(address_map &map) ATTR_COLD;
 
 	required_shared_ptr<uint32_t> m_tmapram;
 	required_shared_ptr<uint32_t> m_tmapscroll;
@@ -840,6 +842,15 @@ void darkhors_state::darkhors_map(address_map &map)
 	map(0x8c0130, 0x8c013f).writeonly().share("tmapscroll2");
 }
 
+void darkhors_state::darkhorsa_map(address_map &map)
+{
+	darkhors_map(map);
+
+	map(0x8c0020, 0x8c002f).writeonly().share("tmapscroll");
+	map(0x8c0030, 0x8c003f).writeonly().share("tmapscroll2");
+	map(0x8c0120, 0x8c012f).unmaprw();
+	map(0x8c0130, 0x8c013f).unmaprw();
+}
 
 /***************************************************************************
 
@@ -989,7 +1000,7 @@ static INPUT_PORTS_START( jclub2v100 )
 	PORT_CONFNAME(0x08000000, 0x08000000, "System Int Down")
 	PORT_CONFSETTING(         0x08000000, DEF_STR( Off ) )
 	PORT_CONFSETTING(         0x00000000, DEF_STR( On )  ) // Emergency Error 0002
-	PORT_BIT( 0x80000000, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
+	PORT_BIT( 0x80000000, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", FUNC(eeprom_serial_93cxx_device::do_read))
 
 	PORT_START("COIN") // 580008.w
 	PORT_BIT( 0x00010000, IP_ACTIVE_LOW,  IPT_OTHER   ) PORT_NAME("P1 Payout") PORT_CODE(KEYCODE_LCONTROL)
@@ -998,8 +1009,8 @@ static INPUT_PORTS_START( jclub2v100 )
 	PORT_BIT( 0x00080000, IP_ACTIVE_LOW,  IPT_START1  )
 	PORT_BIT( 0x00100000, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 	PORT_BIT( 0x00200000, IP_ACTIVE_LOW,  IPT_UNKNOWN )
-	PORT_BIT( 0x00400000, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("hopper2", ticket_dispenser_device, line_r) // P2 coin out
-	PORT_BIT( 0x00800000, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("hopper1", ticket_dispenser_device, line_r) // P1 coin out
+	PORT_BIT( 0x00400000, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("hopper2", FUNC(ticket_dispenser_device::line_r)) // P2 coin out
+	PORT_BIT( 0x00800000, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("hopper1", FUNC(ticket_dispenser_device::line_r)) // P1 coin out
 	PORT_BIT( 0x01000000, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 	PORT_BIT( 0x02000000, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 	PORT_BIT( 0x04000000, IP_ACTIVE_LOW,  IPT_COIN1   ) PORT_IMPULSE(15) // P1 coin drop
@@ -1044,7 +1055,7 @@ static INPUT_PORTS_START( jclub2v112 )
 	PORT_CONFNAME(0x08000000, 0x08000000, "Disable Coins?") // causes lockout and coins to not register (same as an hardware error)
 	PORT_CONFSETTING(         0x08000000, DEF_STR( Off ))
 	PORT_CONFSETTING(         0x00000000, DEF_STR( On ))
-	PORT_BIT( 0x80000000, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
+	PORT_BIT( 0x80000000, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", FUNC(eeprom_serial_93cxx_device::do_read))
 INPUT_PORTS_END
 
 
@@ -1084,7 +1095,7 @@ static INPUT_PORTS_START( darkhors )
 	PORT_SERVICE_NO_TOGGLE( 0x00100000, IP_ACTIVE_LOW  ) // test switch (on during boot: service mode, but make sure Config Key is off!)
 	PORT_BIT( 0x00200000, IP_ACTIVE_LOW,  IPT_OTHER    ) PORT_NAME("Door 1") PORT_CODE(KEYCODE_OPENBRACE)  PORT_TOGGLE
 	PORT_BIT( 0x00400000, IP_ACTIVE_LOW,  IPT_OTHER    ) PORT_NAME("Door 2") PORT_CODE(KEYCODE_CLOSEBRACE) PORT_TOGGLE
-	PORT_BIT( 0x00800000, IP_ACTIVE_HIGH, IPT_CUSTOM  ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read) // door 3 in service mode!
+	PORT_BIT( 0x00800000, IP_ACTIVE_HIGH, IPT_CUSTOM  ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", FUNC(eeprom_serial_93cxx_device::do_read)) // door 3 in service mode!
 	PORT_BIT( 0x01000000, IP_ACTIVE_LOW,  IPT_START1   )
 	PORT_BIT( 0x02000000, IP_ACTIVE_LOW,  IPT_OTHER    ) PORT_NAME("P1 Payout") PORT_CODE(KEYCODE_LCONTROL)
 	PORT_BIT( 0x04000000, IP_ACTIVE_LOW,  IPT_OTHER    ) PORT_NAME("P1 Cancel") PORT_CODE(KEYCODE_LALT)
@@ -1157,8 +1168,8 @@ void jclub2o_state::jclub2o(machine_config &config)
 	EEPROM_S29290_16BIT(config, "eeprom");
 	WATCHDOG_TIMER(config, "watchdog");
 
-	TICKET_DISPENSER(config, m_hopper1, attotime::from_msec(200), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH);
-	TICKET_DISPENSER(config, m_hopper2, attotime::from_msec(200), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH);
+	TICKET_DISPENSER(config, m_hopper1, attotime::from_msec(200));
+	TICKET_DISPENSER(config, m_hopper2, attotime::from_msec(200));
 
 	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -1198,8 +1209,8 @@ void jclub2_state::jclub2(machine_config &config)
 	EEPROM_93C46_8BIT(config, "eeprom");
 	WATCHDOG_TIMER(config, "watchdog");
 
-	TICKET_DISPENSER(config, m_hopper1, attotime::from_msec(200), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH);
-	TICKET_DISPENSER(config, m_hopper2, attotime::from_msec(200), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH);
+	TICKET_DISPENSER(config, m_hopper1, attotime::from_msec(200));
+	TICKET_DISPENSER(config, m_hopper2, attotime::from_msec(200));
 
 	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -1242,8 +1253,8 @@ void darkhors_state::darkhors(machine_config &config)
 	EEPROM_93C46_8BIT(config, "eeprom");
 	WATCHDOG_TIMER(config, "watchdog");
 
-	TICKET_DISPENSER(config, m_hopper1, attotime::from_msec(200), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH);
-	TICKET_DISPENSER(config, m_hopper2, attotime::from_msec(200), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH);
+	TICKET_DISPENSER(config, m_hopper1, attotime::from_msec(200));
+	TICKET_DISPENSER(config, m_hopper2, attotime::from_msec(200));
 
 	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -1267,6 +1278,12 @@ void darkhors_state::darkhors(machine_config &config)
 	OKIM6295(config, "oki", 528000, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 1.0); // clock frequency & pin 7 not verified
 }
 
+void darkhors_state::darkhorsa(machine_config &config)
+{
+	darkhors(config);
+
+	m_maincpu->set_addrmap(AS_PROGRAM, &darkhors_state::darkhorsa_map);
+}
 
 /***************************************************************************
 
@@ -1526,6 +1543,30 @@ ROM_START( darkhors )
 ROM_END
 
 
+ROM_START( jclub2bl )
+	ROM_REGION( 0x100000, "maincpu", 0 ) // 68EC020 code
+	ROM_LOAD32_WORD_SWAP( "154.4002", 0x00000, 0x80000, CRC(b892c254) SHA1(c1c31d878f41e4751048c07055d426803cd3332d) ) // 27 JUN. 1997
+	ROM_LOAD32_WORD_SWAP( "155.4002", 0x00002, 0x80000, CRC(3d9061c0) SHA1(efd2c8d742d3ac097f0228c2b71453b3261a6d83) )
+
+	ROM_REGION( 0x400000, "gfx1", 0 ) // not dumped yet, should be closer to the original (no Dark Horse GFX)
+	ROM_LOAD( "gfx1", 0x000000, 0x80000, BAD_DUMP CRC(e9fe9967) SHA1(a79d75c09f0eac6372de8d6e98c5eecf38ef750c) )
+	ROM_LOAD( "gfx2", 0x080000, 0x80000, BAD_DUMP CRC(0853c5c5) SHA1(2b49ffe607278817f1f8219a79f5906be53ee6f4) )
+	ROM_LOAD( "gfx3", 0x100000, 0x80000, BAD_DUMP CRC(6e89278f) SHA1(044c15e00ea95fd3f108fa916000a1000789c8e8) )
+	ROM_LOAD( "gfx4", 0x180000, 0x80000, BAD_DUMP CRC(f28407ab) SHA1(47933719cff8099fc079fd736b4b08176f3aff66) )
+	ROM_LOAD( "gfx5", 0x200000, 0x80000, BAD_DUMP CRC(281402cd) SHA1(77f8e5e02c6e7161299c06e65a078c1cdda1ba66) )
+	ROM_LOAD( "gfx6", 0x280000, 0x80000, BAD_DUMP CRC(8ea0149b) SHA1(7792fd7e07a7baa4e15f50b6528c78fb15b40b40) )
+	ROM_LOAD( "gfx7", 0x300000, 0x80000, BAD_DUMP CRC(504bf849) SHA1(13a184ec9e176371808938015111f8918cb4df7d) ) // FIXED BITS (11111111)
+	ROM_FILL(         0x300000, 0x80000, 0x00 ) // a zero-fill seems fine
+	ROM_LOAD( "gfx8", 0x380000, 0x80000, BAD_DUMP CRC(590bec2a) SHA1(7fdbb21f1a3eccde65e91eb2443a0e01487c59c3) ) // 000xxxxxxxxxxxxxxxx = 0x00
+
+	ROM_REGION( 0x80000, "oki", 0 ) // Samples
+	ROM_LOAD( "snd", 0x00000, 0x80000, CRC(7aeb12d3) SHA1(3e81725fc206baa7559da87552a0cd73b7616155) ) // same as darkhors
+
+	ROM_REGION( 0x80, "eeprom", 0 ) // EEPROM
+	ROM_LOAD( "93c46", 0x000, 0x080, CRC(32ea730a) SHA1(20a6a8259425c3c867319db49b27700b75e8e471) ) // (SETA1997JC2W400 )
+ROM_END
+
+
 /***************************************************************************
 
                                 Game Drivers
@@ -1572,3 +1613,4 @@ GAME( 1997, jclub2v205, jclub2v112, jclub2,   jclub2v112, jclub2_state,   empty_
 GAME( 1998, jclub2v220, jclub2v112, jclub2,   jclub2v112, jclub2_state,   empty_init,    ROT0, "Seta",    "Jockey Club II (v2.20X, newer hardware)",               MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 // Bootleg hardware
 GAME( 2001, darkhors,   jclub2v112, darkhors, darkhors,   darkhors_state, init_darkhors, ROT0, "bootleg", "Dark Horse (USA v4.00, bootleg of Jockey Club II)",     MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1997, jclub2bl,   jclub2v112, darkhorsa,darkhors,   darkhors_state, init_darkhors, ROT0, "bootleg", "Jockey Club II (USA v4.00, bootleg)",                   MACHINE_IMPERFECT_GRAPHICS )

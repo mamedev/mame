@@ -172,8 +172,6 @@ k001604_device::k001604_device(const machine_config &mconfig, const char *tag, d
 
 void k001604_device::device_start()
 {
-	m_irq.resolve_safe();
-
 	if (!palette().device().started())
 		throw device_missing_dependencies();
 
@@ -556,10 +554,7 @@ void k001604_device::reg_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 			// (1 = enable VBLANK IRQ, 0 = clear IRQ?)
 			if ((data & 0x1) == 0)
 			{
-				if (!m_irq.isnull())
-				{
-					m_irq(CLEAR_LINE);
-				}
+				m_irq(CLEAR_LINE);
 			}
 		}
 	}

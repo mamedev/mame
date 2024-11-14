@@ -35,7 +35,7 @@ kl5c80a16_device::kl5c80a16_device(const machine_config &mconfig, const char *ta
 					address_map_constructor(),
 					address_map_constructor(FUNC(kl5c80a16_device::internal_io), this))
 	, m_kp69(*this, "kp69")
-	, m_port_in_callback(*this)
+	, m_port_in_callback(*this, 0)
 	, m_port_out_callback(*this)
 	, m_port_data{0, 0, 0, 0}
 	, m_port_direction{0x0f, 0, 0, 0}
@@ -57,21 +57,6 @@ void kl5c80a16_device::internal_io(address_map &map)
 	map(0x36, 0x36).mirror(0xff00).rw(m_kp69, FUNC(kp69_device::imrl_r), FUNC(kp69_device::imrl_w));
 	map(0x37, 0x37).mirror(0xff00).rw(m_kp69, FUNC(kp69_device::imrh_r), FUNC(kp69_device::ivr_imrh_w));
 	map(0x38, 0x3f).mirror(0xff00).rw(FUNC(kl5c80a16_device::port_r), FUNC(kl5c80a16_device::port_w));
-}
-
-
-//-------------------------------------------------
-//  device_resolve_objects - resolve objects that
-//  may be needed for other devices to set
-//  initial conditions at start time
-//-------------------------------------------------
-
-void kl5c80a16_device::device_resolve_objects()
-{
-	// Resolve parallel port callbacks
-	for (int i = 0; i < 4; i++)
-		m_port_in_callback[i].resolve_safe(m_port_3state[i]);
-	m_port_out_callback.resolve_all_safe();
 }
 
 
@@ -135,7 +120,15 @@ void kl5c80a16_device::device_add_mconfig(machine_config &config)
 
 void kl5c80a16_device::device_config_complete()
 {
+	kc82_device::device_config_complete();
+
 	set_daisy_config(pseudo_daisy_config);
+
+	for (int i = 0; i < 4; i++)
+	{
+		if (m_port_in_callback[i].isunset())
+			m_port_in_callback[i].bind().set_constant(m_port_3state[i]);
+	}
 }
 
 

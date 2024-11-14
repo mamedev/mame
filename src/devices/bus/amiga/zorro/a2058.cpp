@@ -92,7 +92,7 @@ void a2058_device::autoconfig_base_address(offs_t address)
 	m_slot->cfgout_w(0);
 }
 
-WRITE_LINE_MEMBER( a2058_device::cfgin_w )
+void a2058_device::cfgin_w(int state)
 {
 	LOG("%s: configin_w (%d)\n", shortname(), state);
 

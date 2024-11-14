@@ -6,8 +6,8 @@
 
 ***************************************************************************/
 
-#ifndef MAME_MACHINE_CMI_ANKBD_H
-#define MAME_MACHINE_CMI_ANKBD_H
+#ifndef MAME_FAIRLIGHT_CMI_ANKBD_H
+#define MAME_FAIRLIGHT_CMI_ANKBD_H
 
 #pragma once
 
@@ -21,22 +21,21 @@ public:
 	auto txd_handler() { return m_txd_handler.bind(); }
 	auto rts_handler() { return m_rts_handler.bind(); }
 
-	DECLARE_WRITE_LINE_MEMBER( rxd_w );
-	DECLARE_WRITE_LINE_MEMBER( cts_w );
+	void rxd_w(int state);
+	void cts_w(int state);
 
 protected:
-	virtual const tiny_rom_entry *device_rom_region() const override;
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual ioport_constructor device_input_ports() const override;
-	virtual void device_resolve_objects() override;
-	virtual void device_start() override;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
+	virtual void device_start() override ATTR_COLD;
 
 private:
 	u8 col_r();
-	DECLARE_WRITE_LINE_MEMBER( txd_w );
-	DECLARE_WRITE_LINE_MEMBER( rts_w );
+	void txd_w(int state);
+	void rts_w(int state);
 
-	void alphakeys_map(address_map &map);
+	void alphakeys_map(address_map &map) ATTR_COLD;
 
 	devcb_write_line m_txd_handler;
 	devcb_write_line m_rts_handler;
@@ -49,4 +48,4 @@ private:
 
 DECLARE_DEVICE_TYPE(CMI_ALPHANUMERIC_KEYBOARD, cmi_alphanumeric_keyboard_device)
 
-#endif // MAME_MACHINE_CMI_ANKBD_H
+#endif // MAME_FAIRLIGHT_CMI_ANKBD_H

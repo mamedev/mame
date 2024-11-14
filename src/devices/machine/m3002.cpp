@@ -65,18 +65,6 @@ m3000_device::m3000_device(const machine_config &mconfig, const char *tag, devic
 
 
 //-------------------------------------------------
-//  device_resolve_objects - resolve objects that
-//  may be needed for other devices to set
-//  initial conditions at start time
-//-------------------------------------------------
-
-void m3002_device::device_resolve_objects()
-{
-	m_irq_callback.resolve_safe();
-}
-
-
-//-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
 
@@ -112,8 +100,8 @@ void m3002_device::device_clock_changed()
 
 bool m3002_device::nvram_read(util::read_stream &file)
 {
-	size_t actual;
-	return !file.read(&m_ram[0], 0x10, actual) && actual == 0x10;
+	auto const [err, actual] = util::read(file, &m_ram[0], 0x10);
+	return !err && (actual == 0x10);
 }
 
 
@@ -123,8 +111,8 @@ bool m3002_device::nvram_read(util::read_stream &file)
 
 bool m3002_device::nvram_write(util::write_stream &file)
 {
-	size_t actual;
-	return !file.write(&m_ram[0], 0x10, actual) && actual == 0x10;
+	auto const [err, actual] = util::write(file, &m_ram[0], 0x10);
+	return !err;
 }
 
 
@@ -222,7 +210,7 @@ void m3002_device::bcd_increment(u8 location)
 u8 m3002_device::max_date() const
 {
 	if (m_ram[4] == 0x02)
-		return (m_ram[5] & 0x03) == 0x00 ? 0x29 : 0x28;
+		return (m_ram[5] & 0x03) == ((m_ram[5] & 0x10) >> 3) ? 0x29 : 0x28;
 	else
 		return BIT(0x20250, m_ram[4]) ? 0x30 : 0x31;
 }

@@ -17,8 +17,11 @@
 #include "cpu/arm7/arm7.h"
 #include "cpu/arm7/arm7core.h"
 #include "sound/gb.h"
+
 #include "softlist_dev.h"
 #include "speaker.h"
+
+#include <cstdarg>
 
 
 /* Sound Registers */
@@ -146,8 +149,8 @@ void gba_state::request_irq(uint32_t int_type)
 		// master enable?
 		if (IME & 1)
 		{
-			m_maincpu->set_input_line(ARM7_IRQ_LINE, ASSERT_LINE);
-			m_maincpu->set_input_line(ARM7_IRQ_LINE, CLEAR_LINE);
+			m_maincpu->set_input_line(arm7_cpu_device::ARM7_IRQ_LINE, ASSERT_LINE);
+			m_maincpu->set_input_line(arm7_cpu_device::ARM7_IRQ_LINE, CLEAR_LINE);
 		}
 	}
 }
@@ -1180,12 +1183,12 @@ uint32_t gba_state::gba_10000000_r(offs_t offset, uint32_t mem_mask)
 {
 	auto &mspace = m_maincpu->space(AS_PROGRAM);
 	uint32_t data;
-	uint32_t pc = m_maincpu->state_int(ARM7_PC);
+	uint32_t pc = m_maincpu->state_int(arm7_cpu_device::ARM7_PC);
 	if (pc >= 0x10000000)
 	{
 		return 0;
 	}
-	uint32_t cpsr = m_maincpu->state_int(ARM7_CPSR);
+	uint32_t cpsr = m_maincpu->state_int(arm7_cpu_device::ARM7_CPSR);
 	if (T_IS_SET( cpsr))
 	{
 		data = mspace.read_dword(pc + 8);
@@ -1199,22 +1202,22 @@ uint32_t gba_state::gba_10000000_r(offs_t offset, uint32_t mem_mask)
 	return data;
 }
 
-WRITE_LINE_MEMBER(gba_state::int_hblank_callback)
+void gba_state::int_hblank_callback(int state)
 {
 	request_irq(INT_HBL);
 }
 
-WRITE_LINE_MEMBER(gba_state::int_vblank_callback)
+void gba_state::int_vblank_callback(int state)
 {
 	request_irq(INT_VBL);
 }
 
-WRITE_LINE_MEMBER(gba_state::int_vcount_callback)
+void gba_state::int_vcount_callback(int state)
 {
 	request_irq(INT_VCNT);
 }
 
-WRITE_LINE_MEMBER(gba_state::dma_hblank_callback)
+void gba_state::dma_hblank_callback(int state)
 {
 	for (int ch = 0; ch < 4; ch++)
 	{
@@ -1225,7 +1228,7 @@ WRITE_LINE_MEMBER(gba_state::dma_hblank_callback)
 	}
 }
 
-WRITE_LINE_MEMBER(gba_state::dma_vblank_callback)
+void gba_state::dma_vblank_callback(int state)
 {
 	for (int ch = 0; ch < 4; ch++)
 	{
@@ -1239,8 +1242,8 @@ WRITE_LINE_MEMBER(gba_state::dma_vblank_callback)
 void gba_state::gba_map(address_map &map)
 {
 	map.unmap_value_high(); // for "Fruit Mura no Doubutsu Tachi" and "Classic NES Series"
-	map(0x02000000, 0x0203ffff).ram().mirror(0xfc0000);
-	map(0x03000000, 0x03007fff).ram().mirror(0xff8000);
+	map(0x02000000, 0x0203ffff).ram().mirror(0xfc0000); // External RAM (16 bit)
+	map(0x03000000, 0x03007fff).ram().mirror(0xff8000); // Internal RAM (32 bit)
 	map(0x04000000, 0x0400005f).rw("lcd", FUNC(gba_lcd_device::video_r), FUNC(gba_lcd_device::video_w));
 	map(0x04000060, 0x040003ff).rw(FUNC(gba_state::gba_io_r), FUNC(gba_state::gba_io_w));
 	map(0x04000400, 0x04ffffff).noprw();                                         // Not used
@@ -1451,7 +1454,7 @@ static void gba_cart(device_slot_interface &device)
 
 void gba_state::gbadv(machine_config &config)
 {
-	ARM7(config, m_maincpu, XTAL(16'777'216));
+	ARM7(config, m_maincpu, 4.194304_MHz_XTAL * 4);
 	m_maincpu->set_addrmap(AS_PROGRAM, &gba_state::gba_map);
 
 	gba_lcd_device &lcd(GBA_LCD(config, "lcd", 0));
@@ -1463,7 +1466,7 @@ void gba_state::gbadv(machine_config &config)
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
-	CGB04_APU(config, m_gbsound, XTAL(16'777'216)/4);
+	AGB_APU(config, m_gbsound, 4.194304_MHz_XTAL);
 	m_gbsound->add_route(0, "lspeaker", 0.5);
 	m_gbsound->add_route(1, "rspeaker", 0.5);
 

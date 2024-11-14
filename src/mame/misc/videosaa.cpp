@@ -50,6 +50,8 @@
 #include "videosaa.lh"
 
 
+namespace {
+
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
@@ -72,8 +74,8 @@ public:
 	void videosaa(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	required_device<m68hc705c8a_device> m_maincpu;
@@ -384,7 +386,7 @@ void videosaa_state::machine_start()
 	save_pointer(NAME(m_vram0), 0x800);
 	save_pointer(NAME(m_vram1), 0x800);
 	save_item(NAME(m_chip_latch));
-	save_pointer(NAME(m_video_latch), 4);
+	save_item(NAME(m_video_latch));
 }
 
 void videosaa_state::machine_reset()
@@ -534,6 +536,8 @@ ROM_START( toureiff )
 	ROM_REGION( 0x200, "plds", 0 )
 	ROM_LOAD( "pal.9c", 0x000, 0x117, NO_DUMP )
 ROM_END
+
+} // anonymous namespace
 
 
 //**************************************************************************

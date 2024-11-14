@@ -12,6 +12,9 @@
 #include "debugviewinfo.h"
 #include "uimetrics.h"
 
+// devices
+#include "imagedev/cassette.h"
+
 // emu
 #include "debug/debugcon.h"
 #include "debugger.h"
@@ -19,8 +22,8 @@
 #include "softlist_dev.h"
 #include "debug/debugcpu.h"
 
-// devices
-#include "imagedev/cassette.h"
+// util
+#include "util/xmlfile.h"
 
 // osd/windows
 #include "winutf8.h"
@@ -38,6 +41,8 @@
 #include <shtypes.h>
 #include <wrl/client.h>
 
+
+namespace osd::debugger::win {
 
 namespace {
 
@@ -121,7 +126,7 @@ void choose_image(device_image_interface &device, HWND owner, REFCLSID class_id,
 
 	// create file dialog
 	Microsoft::WRL::ComPtr<IFileDialog> dialog;
-	hr = CoCreateInstance(class_id, nullptr, CLSCTX_INPROC_SERVER, IID_PPV_ARGS(dialog.GetAddressOf()));
+	hr = CoCreateInstance(class_id, nullptr, CLSCTX_INPROC_SERVER, IID_PPV_ARGS(&dialog));
 
 	// set file types
 	if (SUCCEEDED(hr))
@@ -154,7 +159,7 @@ void choose_image(device_image_interface &device, HWND owner, REFCLSID class_id,
 			// FIXME: strip off archive names - opening a file inside an archive decompresses it to a temporary location
 			std::wstring wfull = osd::text::to_wstring(full);
 			Microsoft::WRL::ComPtr<IShellItem> item;
-			if (SUCCEEDED(SHCreateItemFromParsingName(wfull.c_str(), nullptr, IID_PPV_ARGS(item.GetAddressOf()))))
+			if (SUCCEEDED(SHCreateItemFromParsingName(wfull.c_str(), nullptr, IID_PPV_ARGS(&item))))
 			{
 				//dialog->SetFolder(item); disabled until
 			}
@@ -171,7 +176,7 @@ void choose_image(device_image_interface &device, HWND owner, REFCLSID class_id,
 	if (SUCCEEDED(hr))
 	{
 		Microsoft::WRL::ComPtr<IShellItem> result;
-		hr = dialog->GetResult(result.GetAddressOf());
+		hr = dialog->GetResult(&result);
 		if (SUCCEEDED(hr))
 		{
 			PWSTR selection = nullptr;
@@ -209,7 +214,7 @@ consolewin_info::consolewin_info(debugger_windows_interface &debugger) :
 	m_current_cpu(nullptr),
 	m_devices_menu(nullptr)
 {
-	if ((window() == nullptr) || (m_views[0] == nullptr))
+	if (!window() || !m_views[0])
 		goto cleanup;
 
 	// create the views
@@ -221,20 +226,29 @@ consolewin_info::consolewin_info(debugger_windows_interface &debugger) :
 		goto cleanup;
 
 	{
-		// Add image menu only if image devices exist
+		// add image menu only if image devices exist
 		image_interface_enumerator iter(machine().root_device());
 		if (iter.first() != nullptr)
 		{
 			m_devices_menu = CreatePopupMenu();
 			for (device_image_interface &img : iter)
 			{
-				if (!img.user_loadable())
-					continue;
-				osd::text::tstring tc_buf = osd::text::to_tstring(string_format("%s : %s", img.device().name(), img.exists() ? img.filename() : "[no image]"));
-				AppendMenu(m_devices_menu, MF_ENABLED, 0, tc_buf.c_str());
+				if (img.user_loadable())
+				{
+					osd::text::tstring tc_buf = osd::text::to_tstring(string_format("%s : %s", img.device().name(), img.exists() ? img.filename() : "[no image]"));
+					AppendMenu(m_devices_menu, MF_ENABLED, 0, tc_buf.c_str());
+				}
 			}
 			AppendMenu(GetMenu(window()), MF_ENABLED | MF_POPUP, (UINT_PTR)m_devices_menu, TEXT("Media"));
 		}
+
+		// add the settings menu
+		HMENU const settingsmenu = CreatePopupMenu();
+		AppendMenu(settingsmenu, MF_ENABLED, ID_SAVE_WINDOWS, TEXT("Save Window Arrangement"));
+		AppendMenu(settingsmenu, MF_DISABLED | MF_SEPARATOR, 0, TEXT(""));
+		AppendMenu(settingsmenu, MF_ENABLED, ID_LIGHT_BACKGROUND, TEXT("Light Background"));
+		AppendMenu(settingsmenu, MF_ENABLED, ID_DARK_BACKGROUND, TEXT("Dark Background"));
+		AppendMenu(GetMenu(window()), MF_ENABLED | MF_POPUP, (UINT_PTR)settingsmenu, TEXT("Settings"));
 
 		// get the work bounds
 		RECT work_bounds, bounds;
@@ -346,7 +360,7 @@ void consolewin_info::update_menu()
 {
 	disasmbasewin_info::update_menu();
 
-	if (m_devices_menu != nullptr)
+	if (m_devices_menu)
 	{
 		// create the image menu
 		uint32_t cnt = 0;
@@ -432,67 +446,94 @@ void consolewin_info::update_menu()
 			cnt++;
 		}
 	}
+
+	HMENU const menu = GetMenu(window());
+	CheckMenuItem(menu, ID_SAVE_WINDOWS, MF_BYCOMMAND | (debugger().get_save_window_arrangement() ? MF_CHECKED : MF_UNCHECKED));
+	CheckMenuItem(menu, ID_LIGHT_BACKGROUND, MF_BYCOMMAND | ((ui_metrics::THEME_LIGHT_BACKGROUND == metrics().get_color_theme()) ? MF_CHECKED : MF_UNCHECKED));
+	CheckMenuItem(menu, ID_DARK_BACKGROUND, MF_BYCOMMAND | ((ui_metrics::THEME_DARK_BACKGROUND == metrics().get_color_theme()) ? MF_CHECKED : MF_UNCHECKED));
 }
 
 
 bool consolewin_info::handle_command(WPARAM wparam, LPARAM lparam)
 {
-	if ((HIWORD(wparam) == 0) && (LOWORD(wparam) >= ID_DEVICE_OPTIONS))
+	if (HIWORD(wparam) == 0)
 	{
-		uint32_t const devid = (LOWORD(wparam) - ID_DEVICE_OPTIONS) / DEVOPTION_MAX;
-		image_interface_enumerator iter(machine().root_device());
-		device_image_interface *const img = iter.byindex(devid);
-		if (img != nullptr)
+		if (LOWORD(wparam) >= ID_DEVICE_OPTIONS)
 		{
-			switch ((LOWORD(wparam) - ID_DEVICE_OPTIONS) % DEVOPTION_MAX)
+			uint32_t const devid = (LOWORD(wparam) - ID_DEVICE_OPTIONS) / DEVOPTION_MAX;
+			image_interface_enumerator iter(machine().root_device());
+			device_image_interface *const img = iter.byindex(devid);
+			if (img != nullptr)
 			{
-			case DEVOPTION_ITEM:
-				// TODO: this is supposed to show a software list item picker - it never worked properly
-				return true;
-			case DEVOPTION_OPEN :
-				open_image_file(*img);
-				return true;
-			case DEVOPTION_CREATE:
-				create_image_file(*img);
-				return true;
-			case DEVOPTION_CLOSE:
-				img->unload();
-				return true;
-			}
-			if (img->device().type() == CASSETTE)
-			{
-				auto *const cassette = downcast<cassette_image_device *>(&img->device());
-				bool s;
 				switch ((LOWORD(wparam) - ID_DEVICE_OPTIONS) % DEVOPTION_MAX)
 				{
-				case DEVOPTION_CASSETTE_STOPPAUSE:
-					cassette->change_state(CASSETTE_STOPPED, CASSETTE_MASK_UISTATE);
+				case DEVOPTION_ITEM:
+					// TODO: this is supposed to show a software list item picker - it never worked properly
 					return true;
-				case DEVOPTION_CASSETTE_PLAY:
-					cassette->change_state(CASSETTE_PLAY, CASSETTE_MASK_UISTATE);
+				case DEVOPTION_OPEN :
+					open_image_file(*img);
 					return true;
-				case DEVOPTION_CASSETTE_RECORD:
-					cassette->change_state(CASSETTE_RECORD, CASSETTE_MASK_UISTATE);
+				case DEVOPTION_CREATE:
+					create_image_file(*img);
 					return true;
-				case DEVOPTION_CASSETTE_REWIND:
-					cassette->seek(0.0, SEEK_SET);  // to start
+				case DEVOPTION_CLOSE:
+					img->unload();
 					return true;
-				case DEVOPTION_CASSETTE_FASTFORWARD:
-					cassette->seek(+300.0, SEEK_CUR); // 5 minutes forward or end, whichever comes first
-					break;
-				case DEVOPTION_CASSETTE_MOTOR:
-					s =((cassette->get_state() & CASSETTE_MASK_MOTOR) == CASSETTE_MOTOR_DISABLED);
-					cassette->change_state(s ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);
-					break;
-				case DEVOPTION_CASSETTE_SOUND:
-					s =((cassette->get_state() & CASSETTE_MASK_SPEAKER) == CASSETTE_SPEAKER_MUTED);
-					cassette->change_state(s ? CASSETTE_SPEAKER_ENABLED : CASSETTE_SPEAKER_MUTED, CASSETTE_MASK_SPEAKER);
-					break;
+				}
+				if (img->device().type() == CASSETTE)
+				{
+					auto *const cassette = downcast<cassette_image_device *>(&img->device());
+					bool s;
+					switch ((LOWORD(wparam) - ID_DEVICE_OPTIONS) % DEVOPTION_MAX)
+					{
+					case DEVOPTION_CASSETTE_STOPPAUSE:
+						cassette->change_state(CASSETTE_STOPPED, CASSETTE_MASK_UISTATE);
+						return true;
+					case DEVOPTION_CASSETTE_PLAY:
+						cassette->change_state(CASSETTE_PLAY, CASSETTE_MASK_UISTATE);
+						return true;
+					case DEVOPTION_CASSETTE_RECORD:
+						cassette->change_state(CASSETTE_RECORD, CASSETTE_MASK_UISTATE);
+						return true;
+					case DEVOPTION_CASSETTE_REWIND:
+						cassette->seek(0.0, SEEK_SET);  // to start
+						return true;
+					case DEVOPTION_CASSETTE_FASTFORWARD:
+						cassette->seek(+300.0, SEEK_CUR); // 5 minutes forward or end, whichever comes first
+						return true;
+					case DEVOPTION_CASSETTE_MOTOR:
+						s = ((cassette->get_state() & CASSETTE_MASK_MOTOR) == CASSETTE_MOTOR_DISABLED);
+						cassette->change_state(s ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);
+						return true;
+					case DEVOPTION_CASSETTE_SOUND:
+						s = ((cassette->get_state() & CASSETTE_MASK_SPEAKER) == CASSETTE_SPEAKER_MUTED);
+						cassette->change_state(s ? CASSETTE_SPEAKER_ENABLED : CASSETTE_SPEAKER_MUTED, CASSETTE_MASK_SPEAKER);
+						return true;
+					}
 				}
 			}
 		}
+		else switch (LOWORD(wparam))
+		{
+		case ID_SAVE_WINDOWS:
+			debugger().set_save_window_arrangement(!debugger().get_save_window_arrangement());
+			return true;
+		case ID_LIGHT_BACKGROUND:
+			debugger().set_color_theme(ui_metrics::THEME_LIGHT_BACKGROUND);
+			return true;
+		case ID_DARK_BACKGROUND:
+			debugger().set_color_theme(ui_metrics::THEME_DARK_BACKGROUND);
+			return true;
+		}
 	}
 	return disasmbasewin_info::handle_command(wparam, lparam);
+}
+
+
+void consolewin_info::save_configuration_to_node(util::xml::data_node &node)
+{
+	disasmbasewin_info::save_configuration_to_node(node);
+	node.set_attribute_int(ATTR_WINDOW_TYPE, WINDOW_TYPE_CONSOLE);
 }
 
 
@@ -515,9 +556,11 @@ void consolewin_info::open_image_file(device_image_interface &device)
 			window(),
 			CLSID_FileOpenDialog,
 			true,
-			[&device] (std::string_view selection)
+			[this, &device] (std::string_view selection)
 			{
-				device.load(selection);
+				auto [err, message] = device.load(selection);
+				if (err)
+					machine().debugger().console().printf("Error mounting image file: %s\n", !message.empty() ? message : err.message());
 			});
 }
 
@@ -529,9 +572,11 @@ void consolewin_info::create_image_file(device_image_interface &device)
 			window(),
 			CLSID_FileSaveDialog,
 			false,
-			[&device] (std::string_view selection)
+			[this, &device] (std::string_view selection)
 			{
-				device.create(selection, device.device_get_indexed_creatable_format(0), nullptr);
+				auto [err, message] = device.create(selection, device.device_get_indexed_creatable_format(0), nullptr);
+				if (err)
+					machine().debugger().console().printf("Error creating image file: %s\n", !message.empty() ? message : err.message());
 			});
 }
 
@@ -589,3 +634,5 @@ bool consolewin_info::get_softlist_info(device_image_interface &device)
 
 	return passes_tests;
 }
+
+} // namespace osd::debugger::win

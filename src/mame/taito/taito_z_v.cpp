@@ -800,7 +800,7 @@ void contcirc_state::contcirc_out_w(u8 data)
 	m_road_palbank = (data & 0xc0) >> 6;
 }
 
-WRITE_LINE_MEMBER(contcirc_state::scope_vblank)
+void contcirc_state::scope_vblank(int state)
 {
 	if (state)
 	{
@@ -972,7 +972,7 @@ u32 spacegun_state::screen_update_spacegun(screen_device &screen, bitmap_ind16 &
 }
 
 
-u32 dblaxle_state::screen_update_dblaxle(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+u32 taitoz_z80_sound_state::screen_update_dblaxle(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	u8 layer[5];
 	u16 priority;

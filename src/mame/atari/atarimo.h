@@ -8,8 +8,8 @@
 
 ***************************************************************************/
 
-#ifndef MAME_VIDEO_ATARIMO_H
-#define MAME_VIDEO_ATARIMO_H
+#ifndef MAME_ATARI_ATARIMO_H
+#define MAME_ATARI_ATARIMO_H
 
 #include "video/sprite.h"
 
@@ -114,8 +114,8 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	TIMER_CALLBACK_MEMBER(force_update);
 
@@ -220,4 +220,4 @@ private:
 };
 
 
-#endif // MAME_VIDEO_ATARIMO_H
+#endif // MAME_ATARI_ATARIMO_H

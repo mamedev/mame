@@ -94,6 +94,8 @@
 #include "tilemap.h"
 
 
+namespace {
+
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
@@ -112,16 +114,15 @@ public:
 		m_spriteram(*this, "spriteram") ,
 		m_txvideoram(*this, "txvideoram"),
 		m_fgvideoram(*this, "fgvideoram"),
-		m_bgvideoram(*this, "bgvideoram"),
-		m_mcu_p3(0xff)
+		m_bgvideoram(*this, "bgvideoram")
 	{ }
 
 	void bionicc(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -136,9 +137,9 @@ private:
 	required_shared_ptr<uint16_t> m_fgvideoram;
 	required_shared_ptr<uint16_t> m_bgvideoram;
 
-	void main_map(address_map &map);
-	void sound_map(address_map &map);
-	void mcu_io(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
+	void sound_map(address_map &map) ATTR_COLD;
+	void mcu_io(address_map &map) ATTR_COLD;
 
 	void output_w(u8 data);
 
@@ -167,7 +168,7 @@ private:
 	u8 m_audiocpu_to_mcu = 0; // ls374 at 4a
 	u8 m_mcu_to_audiocpu = 0; // ls374 at 5a
 	u8 m_mcu_p1 = 0;
-	u8 m_mcu_p3;
+	u8 m_mcu_p3 = 0xff;
 
 	void dmaon_w(u16 data);
 	u8 mcu_dma_r(offs_t offset);
@@ -184,9 +185,9 @@ void bionicc_state::main_map(address_map &map)
 {
 	map.global_mask(0xfffff);
 	map(0x00000, 0x3ffff).rom();
-	map(0xe0000, 0xe07ff).ram(); /* RAM? */
+	map(0xe0000, 0xe07ff).ram(); // RAM?
 	map(0xe0800, 0xe0cff).ram().share("spriteram");
-	map(0xe0d00, 0xe3fff).ram();              /* RAM? */
+	map(0xe0d00, 0xe3fff).ram(); // RAM?
 	map(0xe4000, 0xe4000).mirror(0x3ffc).w(FUNC(bionicc_state::output_w));
 	map(0xe4000, 0xe4001).mirror(0x3ffc).portr("INPUTS");
 	map(0xe4002, 0xe4002).mirror(0x3ffc).w(FUNC(bionicc_state::audiocpu_nmi_w));
@@ -984,6 +985,8 @@ ROM_START( bioniccbl2 ) // only the 4 maincpu ROMs differ, they came from an ori
 	ROM_REGION( 0x0100, "proms", 0 )
 	ROM_LOAD( "63s141.18f",   0x0000, 0x0100, CRC(b58d0023) SHA1(e8a4a2e2951bf73b3d9eed6957e9ee1e61c9c58a) )    /* priority (not used), Labeled "TSB" */
 ROM_END
+
+} // anonymous namespace
 
 
 //**************************************************************************

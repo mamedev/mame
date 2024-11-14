@@ -19,7 +19,8 @@ DEFINE_DEVICE_TYPE(SCC8530, scc8530_legacy_device, "scc8530l", "Zilog 8530 SCC (
     PARAMETERS
 ***************************************************************************/
 
-#define LOG_SCC (0)
+#define VERBOSE (0)
+#include "logmacro.h"
 
 /***************************************************************************
     IMPLEMENTATION
@@ -79,11 +80,8 @@ void scc8530_legacy_device::updateirqs()
 		lastIRQStat = irqstat;
 
 		// tell the driver the new IRQ line status if possible
-#if LOG_SCC
-		printf("SCC8530 IRQ status => %d\n", irqstat);
-#endif
-		if(!intrq_cb.isnull())
-			intrq_cb(irqstat);
+		LOG("SCC8530 IRQ status => %d\n", irqstat);
+		intrq_cb(irqstat);
 	}
 }
 
@@ -111,22 +109,44 @@ void scc8530_legacy_device::resetchannel(int ch)
 }
 
 /*-------------------------------------------------
+    updatebaudtimer - baud rate timer calculation
+-------------------------------------------------*/
+
+void scc8530_legacy_device::updatebaudtimer(int ch)
+{
+	Chan *pChan = &channel[ch];
+	// BR Generator Enable
+	if(!BIT(pChan->reg_val[14], 0))
+	{
+		pChan->baudtimer->adjust(attotime::never, ch, attotime::never);
+		return;
+	}
+
+	// BR Time Constant
+	int brconst = pChan->reg_val[13] << 8 | pChan->reg_val[12];
+
+	// Clock Mode is 1x, 16x, 32x, or 64x
+	int clockmode = pChan->reg_val[4] >> 6;
+	int clockrate = 1;
+	if (clockmode)
+	{
+		clockrate = 8 << clockmode;
+	}
+
+	int baudrate = clock() / ((brconst + 2) * 2 * clockrate);
+	attotime attorate = attotime::from_hz(baudrate);
+	pChan->baudtimer->adjust(attorate, ch, attorate);
+}
+
+/*-------------------------------------------------
     baud_expire - baud rate timer expiry
 -------------------------------------------------*/
 
 TIMER_CALLBACK_MEMBER(scc8530_legacy_device::baud_expire)
 {
 	Chan *pChan = &channel[param];
-	int brconst = pChan->reg_val[13] << 8 | pChan->reg_val[14];
-	int rate = 0;
 
-	if (brconst)
-	{
-		rate = clock() / brconst;
-	}
-
-	// is baud counter IRQ enabled on this channel?
-	// always flag pending in case it's enabled after this
+	// always flag IRQ pending in case baud IRQ is enabled after this
 	pChan->baudIRQPending = 1;
 	if (pChan->baudIRQEnable)
 	{
@@ -137,17 +157,7 @@ TIMER_CALLBACK_MEMBER(scc8530_legacy_device::baud_expire)
 			updateirqs();
 		}
 	}
-
-	// reset timer according to current register values
-	if (rate)
-	{
-		attotime attorate = attotime::from_hz(rate);
-		channel[param].baudtimer->adjust(attorate, param, attorate);
-	}
-	else
-	{
-		channel[param].baudtimer->adjust(attotime::never, param, attotime::never);
-	}
+	updatebaudtimer(param);
 }
 
 /*-------------------------------------------------
@@ -156,8 +166,6 @@ TIMER_CALLBACK_MEMBER(scc8530_legacy_device::baud_expire)
 
 void scc8530_legacy_device::device_start()
 {
-	intrq_cb.resolve();
-
 	memset(channel, 0, sizeof(channel));
 
 	mode = 0;
@@ -203,8 +211,7 @@ void scc8530_legacy_device::set_status(int _status)
 
 void scc8530_legacy_device::acknowledge()
 {
-	if(!intrq_cb.isnull())
-		intrq_cb(0);
+	intrq_cb(0);
 }
 
 /*-------------------------------------------------
@@ -213,10 +220,7 @@ void scc8530_legacy_device::acknowledge()
 
 uint8_t scc8530_legacy_device::getareg()
 {
-	/* Not yet implemented */
-	#if LOG_SCC
-	printf("SCC: port A reg %d read 0x%02x\n", reg, channel[0].reg_val[reg]);
-	#endif
+	LOG("SCC: port A reg %d read 0x%02x\n", reg, channel[0].reg_val[reg]);
 
 	if (reg == 0)
 	{
@@ -245,9 +249,7 @@ uint8_t scc8530_legacy_device::getareg()
 
 uint8_t scc8530_legacy_device::getbreg()
 {
-	#if LOG_SCC
-	printf("SCC: port B reg %i read 0x%02x\n", reg, channel[1].reg_val[reg]);
-	#endif
+	LOG("SCC: port B reg %i read 0x%02x\n", reg, channel[1].reg_val[reg]);
 
 	if (reg == 0)
 	{
@@ -287,9 +289,7 @@ void scc8530_legacy_device::putreg(int ch, uint8_t data)
 	Chan *pChan = &channel[ch];
 
 	channel[ch].reg_val[reg] = data;
-	#if LOG_SCC
-	printf("SCC: port %c reg %d write 0x%02x\n", 'A'+ch, reg, data);
-	#endif
+	LOG("SCC: port %c reg %d write 0x%02x\n", 'A'+ch, reg, data);
 
 	switch (reg)
 	{
@@ -392,13 +392,7 @@ void scc8530_legacy_device::putreg(int ch, uint8_t data)
 			break;
 
 		case 14:    // misc control bits
-			if (data & 0x01)    // baud rate generator enable?
-			{
-				int brconst = pChan->reg_val[13]<<8 | pChan->reg_val[14];
-				int rate = clock() / brconst;
-
-				pChan->baudtimer->adjust(attotime::from_hz(rate), 0, attotime::from_hz(rate));
-			}
+			updatebaudtimer(ch);
 			break;
 
 		case 15:    // external/status interrupt control

@@ -1,8 +1,8 @@
 // license:LGPL-2.1+
 // copyright-holders:Ville Linde, Angelo Salese, hap
 
-#ifndef MAME_VIDEO_TC0780FPA_H
-#define MAME_VIDEO_TC0780FPA_H
+#ifndef MAME_TAITO_TC0780FPA_H
+#define MAME_TAITO_TC0780FPA_H
 
 #pragma once
 
@@ -57,9 +57,9 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_stop() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_stop() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 private:
 	std::unique_ptr<uint8_t[]> m_texture;
@@ -76,4 +76,4 @@ private:
 
 DECLARE_DEVICE_TYPE(TC0780FPA, tc0780fpa_device)
 
-#endif // MAME_VIDEO_TC0780FPA_H
+#endif // MAME_TAITO_TC0780FPA_H

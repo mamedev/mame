@@ -32,22 +32,25 @@
 #include "screen.h"
 #include "speaker.h"
 
-#define LOG_PORT_A      (1 << 1)
-#define LOG_PORT_B      (1 << 2)
-#define LOG_PORT_C      (1 << 3)
-#define LOG_PORT_D      (1 << 4)
-#define LOG_PORT_E      (1 << 5)
-#define LOG_PORT_F      (1 << 6)
-#define LOG_PORT_G      (1 << 7)
-#define LOG_PORT_H      (1 << 8)
-#define LOG_PORT_J      (1 << 9)
-#define LOG_PORT_K      (1 << 10)
-#define LOG_PORT_L      (1 << 11)
-#define LOG_LCD_CLK     (1 << 12)
-#define LOG_LCD_SHIFT   (1 << 13)
+#define LOG_PORT_A      (1U << 1)
+#define LOG_PORT_B      (1U << 2)
+#define LOG_PORT_C      (1U << 3)
+#define LOG_PORT_D      (1U << 4)
+#define LOG_PORT_E      (1U << 5)
+#define LOG_PORT_F      (1U << 6)
+#define LOG_PORT_G      (1U << 7)
+#define LOG_PORT_H      (1U << 8)
+#define LOG_PORT_J      (1U << 9)
+#define LOG_PORT_K      (1U << 10)
+#define LOG_PORT_L      (1U << 11)
+#define LOG_LCD_CLK     (1U << 12)
+#define LOG_LCD_SHIFT   (1U << 13)
 
 #define VERBOSE         (0)
 #include "logmacro.h"
+
+
+namespace {
 
 #define MASTER_CLOCK    16000000
 
@@ -180,13 +183,13 @@ public:
 	void replicator(machine_config &config);
 
 private:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	void palette_init(palette_device &palette) const;
 
-	void prg_map(address_map &map);
-	void data_map(address_map &map);
+	void prg_map(address_map &map) ATTR_COLD;
+	void data_map(address_map &map) ATTR_COLD;
 
 	uint8_t port_a_r();
 	uint8_t port_b_r();
@@ -226,7 +229,7 @@ private:
 
 	uint8_t m_shift_register_value;
 
-	required_device<avr8_device> m_maincpu;
+	required_device<atmega1280_device> m_maincpu;
 	required_device<hd44780_device> m_lcdc;
 	required_device<dac_bit_interface> m_dac;
 	required_ioport m_io_keypad;
@@ -693,29 +696,29 @@ void replicator_state::replicator(machine_config &config)
 	m_maincpu->set_extended_fuses(0xf4);
 	m_maincpu->set_lock_bits(0x0f);
 
-	m_maincpu->gpio_in<AVR8_IO_PORTA>().set(FUNC(replicator_state::port_a_r));
-	m_maincpu->gpio_in<AVR8_IO_PORTB>().set(FUNC(replicator_state::port_b_r));
-	m_maincpu->gpio_in<AVR8_IO_PORTC>().set(FUNC(replicator_state::port_c_r));
-	m_maincpu->gpio_in<AVR8_IO_PORTD>().set(FUNC(replicator_state::port_d_r));
-	m_maincpu->gpio_in<AVR8_IO_PORTE>().set(FUNC(replicator_state::port_e_r));
-	m_maincpu->gpio_in<AVR8_IO_PORTF>().set(FUNC(replicator_state::port_f_r));
-	m_maincpu->gpio_in<AVR8_IO_PORTG>().set(FUNC(replicator_state::port_g_r));
-	m_maincpu->gpio_in<AVR8_IO_PORTH>().set(FUNC(replicator_state::port_h_r));
-	m_maincpu->gpio_in<AVR8_IO_PORTJ>().set(FUNC(replicator_state::port_j_r));
-	m_maincpu->gpio_in<AVR8_IO_PORTK>().set(FUNC(replicator_state::port_k_r));
-	m_maincpu->gpio_in<AVR8_IO_PORTL>().set(FUNC(replicator_state::port_l_r));
+	m_maincpu->gpio_in<atmega1280_device::GPIOA>().set(FUNC(replicator_state::port_a_r));
+	m_maincpu->gpio_in<atmega1280_device::GPIOB>().set(FUNC(replicator_state::port_b_r));
+	m_maincpu->gpio_in<atmega1280_device::GPIOC>().set(FUNC(replicator_state::port_c_r));
+	m_maincpu->gpio_in<atmega1280_device::GPIOD>().set(FUNC(replicator_state::port_d_r));
+	m_maincpu->gpio_in<atmega1280_device::GPIOE>().set(FUNC(replicator_state::port_e_r));
+	m_maincpu->gpio_in<atmega1280_device::GPIOF>().set(FUNC(replicator_state::port_f_r));
+	m_maincpu->gpio_in<atmega1280_device::GPIOG>().set(FUNC(replicator_state::port_g_r));
+	m_maincpu->gpio_in<atmega1280_device::GPIOH>().set(FUNC(replicator_state::port_h_r));
+	m_maincpu->gpio_in<atmega1280_device::GPIOJ>().set(FUNC(replicator_state::port_j_r));
+	m_maincpu->gpio_in<atmega1280_device::GPIOK>().set(FUNC(replicator_state::port_k_r));
+	m_maincpu->gpio_in<atmega1280_device::GPIOL>().set(FUNC(replicator_state::port_l_r));
 
-	m_maincpu->gpio_out<AVR8_IO_PORTA>().set(FUNC(replicator_state::port_a_w));
-	m_maincpu->gpio_out<AVR8_IO_PORTB>().set(FUNC(replicator_state::port_b_w));
-	m_maincpu->gpio_out<AVR8_IO_PORTC>().set(FUNC(replicator_state::port_c_w));
-	m_maincpu->gpio_out<AVR8_IO_PORTD>().set(FUNC(replicator_state::port_d_w));
-	m_maincpu->gpio_out<AVR8_IO_PORTE>().set(FUNC(replicator_state::port_e_w));
-	m_maincpu->gpio_out<AVR8_IO_PORTF>().set(FUNC(replicator_state::port_f_w));
-	m_maincpu->gpio_out<AVR8_IO_PORTG>().set(FUNC(replicator_state::port_g_w));
-	m_maincpu->gpio_out<AVR8_IO_PORTH>().set(FUNC(replicator_state::port_h_w));
-	m_maincpu->gpio_out<AVR8_IO_PORTJ>().set(FUNC(replicator_state::port_j_w));
-	m_maincpu->gpio_out<AVR8_IO_PORTK>().set(FUNC(replicator_state::port_k_w));
-	m_maincpu->gpio_out<AVR8_IO_PORTL>().set(FUNC(replicator_state::port_l_w));
+	m_maincpu->gpio_out<atmega1280_device::GPIOA>().set(FUNC(replicator_state::port_a_w));
+	m_maincpu->gpio_out<atmega1280_device::GPIOB>().set(FUNC(replicator_state::port_b_w));
+	m_maincpu->gpio_out<atmega1280_device::GPIOC>().set(FUNC(replicator_state::port_c_w));
+	m_maincpu->gpio_out<atmega1280_device::GPIOD>().set(FUNC(replicator_state::port_d_w));
+	m_maincpu->gpio_out<atmega1280_device::GPIOE>().set(FUNC(replicator_state::port_e_w));
+	m_maincpu->gpio_out<atmega1280_device::GPIOF>().set(FUNC(replicator_state::port_f_w));
+	m_maincpu->gpio_out<atmega1280_device::GPIOG>().set(FUNC(replicator_state::port_g_w));
+	m_maincpu->gpio_out<atmega1280_device::GPIOH>().set(FUNC(replicator_state::port_h_w));
+	m_maincpu->gpio_out<atmega1280_device::GPIOJ>().set(FUNC(replicator_state::port_j_w));
+	m_maincpu->gpio_out<atmega1280_device::GPIOK>().set(FUNC(replicator_state::port_k_w));
+	m_maincpu->gpio_out<atmega1280_device::GPIOL>().set(FUNC(replicator_state::port_l_w));
 
 	/*TODO: Add an ATMEGA8U2 for USB-Serial communications */
 
@@ -731,7 +734,7 @@ void replicator_state::replicator(machine_config &config)
 	PALETTE(config, "palette", FUNC(replicator_state::palette_init), 2);
 	GFXDECODE(config, "gfxdecode", "palette", gfx_replicator);
 
-	HD44780(config, "hd44780", 0).set_lcd_size(4, 20);
+	HD44780(config, "hd44780", 270'000).set_lcd_size(4, 20); // TODO: clock not measured, datasheet typical clock used
 
 	/* sound hardware */
 	/* A piezo is connected to the PORT G bit 5 (OC0B pin driven by Timer/Counter #4) */
@@ -819,6 +822,9 @@ ROM_START( replica1 )
 	/* on-die 4kbyte eeprom */
 	ROM_REGION( 0x1000, "eeprom", ROMREGION_ERASEFF )
 ROM_END
+
+} // anonymous namespace
+
 
 /*   YEAR  NAME      PARENT  COMPAT  MACHINE     INPUT       CLASS             INIT        COMPANY     FULLNAME */
 COMP(2012, replica1, 0,      0,      replicator, replicator, replicator_state, empty_init, "Makerbot", "Replicator 1 desktop 3d printer", MACHINE_NOT_WORKING)

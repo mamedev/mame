@@ -19,7 +19,7 @@
  *
  * International Amusement Machine (I.A.M.) slots from the second half of the
  * 2000s use very similar PCBs (almost same main components, very similar layout,
- * same encryption.
+ * same encryption).
  *
  * TODO:
  *   - PXA255 peripherals
@@ -29,8 +29,6 @@
  *     from the CPLD (probably)
  *   - 19in1, 48in1, 48in1a, 48in1b, 48in1c, 60in1 have more conditional XORs,
  *     encryption isn't completely beaten yet
- *   - I.A.M. games are all incomplete dumps and they might use different
- *     hardware features. If they diverge too much, move to own driver.
  *
  *
  * 39in1 notes:
@@ -47,7 +45,6 @@
 
 #include "emu.h"
 #include "cpu/arm7/arm7.h"
-#include "cpu/arm7/arm7core.h"
 #include "machine/eepromser.h"
 #include "machine/pxa255.h"
 
@@ -64,6 +61,7 @@ public:
 		, m_eeprom(*this, "eeprom")
 		, m_ram(*this, "ram")
 		, m_mcu_ipt(*this, "MCUIPT")
+		, m_dsw(*this, "DSW")
 	{ }
 
 	void _39in1(machine_config &config);
@@ -82,69 +80,54 @@ public:
 	// I.A.M. slots
 	void init_fruitwld();
 	void init_jumanji();
+	void init_jumanjia();
 	void init_plutus();
 	void init_pokrwild();
 
+	DECLARE_INPUT_CHANGED_MEMBER(set_flip_dip);
+	DECLARE_INPUT_CHANGED_MEMBER(set_res_dip);
+	DECLARE_INPUT_CHANGED_MEMBER(set_hiscore_dip);
+
+protected:
+	virtual void machine_reset() override ATTR_COLD;
+
 private:
-	uint32_t m_seed;
-	uint32_t m_magic;
-	uint32_t m_state;
-	uint32_t m_mcu_ipt_pc;
+	u32 m_seed;
+	u32 m_magic;
+	u32 m_state;
+	u32 m_mcu_ipt_pc;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<pxa255_periphs_device> m_pxa_periphs;
-	required_device<eeprom_serial_93cxx_device> m_eeprom;
-	required_shared_ptr<uint32_t> m_ram;
+	required_device<eeprom_serial_93c66_16bit_device> m_eeprom;
+	required_shared_ptr<u32> m_ram;
 	required_ioport m_mcu_ipt;
+	required_ioport m_dsw;
 
-	uint32_t eeprom_r();
-	void eeprom_w(uint32_t data, uint32_t mem_mask = ~0);
+	u32 cpld_r(offs_t offset);
+	void cpld_w(offs_t offset, u32 data, u32 mem_mask = ~0);
+	u32 prot_cheater_r();
 
-	uint32_t _39in1_cpld_r(offs_t offset);
-	void _39in1_cpld_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
-	uint32_t _39in1_prot_cheater_r();
+	void _39in1_map(address_map &map) ATTR_COLD;
+	void base_map(address_map &map) ATTR_COLD;
 
-	void _39in1_map(address_map &map);
-	void base_map(address_map &map);
-
-	inline void ATTR_PRINTF(3,4) verboselog(int n_level, const char *s_fmt, ... );
-
-	void decrypt(uint8_t xor00, uint8_t xor02, uint8_t xor04, uint8_t xor08, uint8_t xor10, uint8_t xor20, uint8_t xor40, uint8_t xor80, uint8_t bit7, uint8_t bit6, uint8_t bit5, uint8_t bit4, uint8_t bit3, uint8_t bit2, uint8_t bit1, uint8_t bit0);
-	void further_decrypt(uint8_t xor400, uint8_t xor800, uint8_t xor1000, uint8_t xor2000, uint8_t xor4000, uint8_t xor8000);
+	void decrypt(u8 xor00, u8 xor02, u8 xor04, u8 xor08, u8 xor10, u8 xor20, u8 xor40, u8 xor80, u8 bit7, u8 bit6, u8 bit5, u8 bit4, u8 bit3, u8 bit2, u8 bit1, u8 bit0);
+	void further_decrypt(u8 xor400, u8 xor800, u8 xor1000, u8 xor2000, u8 xor4000, u8 xor8000);
 };
 
-
-#define VERBOSE_LEVEL (0)
-
-inline void ATTR_PRINTF(3,4) _39in1_state::verboselog(int n_level, const char *s_fmt, ... )
+void _39in1_state::machine_reset()
 {
-	if (VERBOSE_LEVEL >= n_level)
-	{
-		va_list v;
-		char buf[32768];
-		va_start( v, s_fmt );
-		vsprintf( buf, s_fmt, v );
-		va_end( v );
-		logerror("%s: %s", machine().describe_context(), buf);
-	}
+	m_pxa_periphs->gpio_in<1>(1);
+
+	const u32 dsw = m_dsw->read();
+	m_pxa_periphs->gpio_in<53>(BIT(dsw, 0));
+	m_pxa_periphs->gpio_in<54>(BIT(dsw, 1));
+	m_pxa_periphs->gpio_in<56>(BIT(dsw, 2));
+
+	m_eeprom->di_write(ASSERT_LINE);
 }
 
-uint32_t _39in1_state::eeprom_r()
-{
-	return (m_eeprom->do_read() << 5) | (1 << 1); // Must be on.  Probably a DIP switch.
-}
-
-void _39in1_state::eeprom_w(uint32_t data, uint32_t mem_mask)
-{
-	if (BIT(mem_mask, 2))
-		m_eeprom->cs_write(ASSERT_LINE);
-	if (BIT(mem_mask, 3))
-		m_eeprom->clk_write(BIT(data, 3) ? ASSERT_LINE : CLEAR_LINE);
-	if (BIT(mem_mask, 4))
-		m_eeprom->di_write(BIT(data, 4));
-}
-
-uint32_t _39in1_state::_39in1_cpld_r(offs_t offset)
+u32 _39in1_state::cpld_r(offs_t offset)
 {
 	// if (m_maincpu->pc() != m_mcu_ipt_pc) printf("CPLD read @ %x (PC %x state %d)\n", offset, m_maincpu->pc(), m_state);
 
@@ -179,8 +162,8 @@ uint32_t _39in1_state::_39in1_cpld_r(offs_t offset)
 		}
 		else if (m_state == 2)                      // 29c0: 53 ac 0c 2b a2 07 e6 be 31
 		{
-			uint32_t seed = m_seed;
-			uint32_t magic = m_magic;
+			u32 seed = m_seed;
+			u32 magic = m_magic;
 
 			magic = ( (((~(seed >> 16))       ^ (magic >> 1))        & 0x01) |
 				(((~((seed >> 19) << 1))        ^ ((magic >> 5) << 1)) & 0x02) |
@@ -199,7 +182,7 @@ uint32_t _39in1_state::_39in1_cpld_r(offs_t offset)
 	return 0;
 }
 
-void _39in1_state::_39in1_cpld_w(offs_t offset, uint32_t data, uint32_t mem_mask)
+void _39in1_state::cpld_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	if (mem_mask == 0xffff)
 	{
@@ -226,7 +209,7 @@ void _39in1_state::_39in1_cpld_w(offs_t offset, uint32_t data, uint32_t mem_mask
 #endif
 }
 
-uint32_t _39in1_state::_39in1_prot_cheater_r()
+u32 _39in1_state::prot_cheater_r()
 {
 	return 0x37;
 }
@@ -235,12 +218,7 @@ void _39in1_state::base_map(address_map &map)
 {
 	map(0x00000000, 0x0007ffff).rom();
 	map(0x00400000, 0x007fffff).rom().region("data", 0);
-	map(0x40000000, 0x400002ff).rw(m_pxa_periphs, FUNC(pxa255_periphs_device::dma_r), FUNC(pxa255_periphs_device::dma_w));
-	map(0x40400000, 0x40400083).rw(m_pxa_periphs, FUNC(pxa255_periphs_device::i2s_r), FUNC(pxa255_periphs_device::i2s_w));
-	map(0x40a00000, 0x40a0001f).rw(m_pxa_periphs, FUNC(pxa255_periphs_device::ostimer_r), FUNC(pxa255_periphs_device::ostimer_w));
-	map(0x40d00000, 0x40d00017).rw(m_pxa_periphs, FUNC(pxa255_periphs_device::intc_r), FUNC(pxa255_periphs_device::intc_w));
-	map(0x40e00000, 0x40e0006b).rw(m_pxa_periphs, FUNC(pxa255_periphs_device::gpio_r), FUNC(pxa255_periphs_device::gpio_w));
-	map(0x44000000, 0x4400021f).rw(m_pxa_periphs, FUNC(pxa255_periphs_device::lcd_r), FUNC(pxa255_periphs_device::lcd_w));
+	map(0x40000000, 0x47ffffff).m(m_pxa_periphs, FUNC(pxa255_periphs_device::map));
 	map(0xa0000000, 0xa07fffff).ram().share("ram");
 }
 
@@ -248,8 +226,8 @@ void _39in1_state::_39in1_map(address_map &map)
 {
 	base_map(map);
 
-	map(0x04000000, 0x047fffff).rw(FUNC(_39in1_state::_39in1_cpld_r), FUNC(_39in1_state::_39in1_cpld_w));
-	map(0xa0151648, 0xa015164b).r(FUNC(_39in1_state::_39in1_prot_cheater_r));
+	map(0x04000000, 0x047fffff).rw(FUNC(_39in1_state::cpld_r), FUNC(_39in1_state::cpld_w));
+	map(0xa0151648, 0xa015164b).r(FUNC(_39in1_state::prot_cheater_r));
 }
 
 static INPUT_PORTS_START( 39in1 )
@@ -290,23 +268,35 @@ static INPUT_PORTS_START( 39in1 )
 //  The following dips apply to 39in1 and 48in1. 60in1 is the same but the last unused dipsw#4 is test mode off/on.
 
 	PORT_START("DSW")      // 1x 4-position DIP switch labelled SW3
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Flip_Screen ) )    PORT_DIPLOCATION("SW3:1")
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Flip_Screen ) )    PORT_DIPLOCATION("SW3:1") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(_39in1_state::set_flip_dip), 0)
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x00, "Display Mode" )            PORT_DIPLOCATION("SW3:2")
+	PORT_DIPNAME( 0x02, 0x00, "Display Mode" )            PORT_DIPLOCATION("SW3:2") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(_39in1_state::set_res_dip), 0)
 	PORT_DIPSETTING(    0x02, "VGA 31.5kHz" )
 	PORT_DIPSETTING(    0x00, "CGA 15.75kHz" )
-	PORT_DIPNAME( 0x04, 0x04, "High Score Saver" )        PORT_DIPLOCATION("SW3:3")
+	PORT_DIPNAME( 0x04, 0x04, "High Score Saver" )        PORT_DIPLOCATION("SW3:3") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(_39in1_state::set_hiscore_dip), 0)
 	PORT_DIPSETTING(    0x04, "Disabled" )
 	PORT_DIPSETTING(    0x00, "Enabled" )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unused ) )         PORT_DIPLOCATION("SW3:4")
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
-void _39in1_state::decrypt(uint8_t xor00, uint8_t xor02, uint8_t xor04, uint8_t xor08, uint8_t xor10, uint8_t xor20, uint8_t xor40, uint8_t xor80, uint8_t bit7, uint8_t bit6, uint8_t bit5, uint8_t bit4, uint8_t bit3, uint8_t bit2, uint8_t bit1, uint8_t bit0)
+INPUT_CHANGED_MEMBER(_39in1_state::set_flip_dip)
 {
-	uint8_t *rom = memregion("maincpu")->base();
+	m_pxa_periphs->gpio_in<53>(BIT(m_dsw->read(), 0));
+}
+
+INPUT_CHANGED_MEMBER(_39in1_state::set_res_dip)
+{
+	m_pxa_periphs->gpio_in<54>(BIT(m_dsw->read(), 1));
+}
+
+INPUT_CHANGED_MEMBER(_39in1_state::set_hiscore_dip)
+{
+	m_pxa_periphs->gpio_in<56>(BIT(m_dsw->read(), 2));
+}
+
+void _39in1_state::decrypt(u8 xor00, u8 xor02, u8 xor04, u8 xor08, u8 xor10, u8 xor20, u8 xor40, u8 xor80, u8 bit7, u8 bit6, u8 bit5, u8 bit4, u8 bit3, u8 bit2, u8 bit1, u8 bit0)
+{
+	u8 *rom = memregion("maincpu")->base();
 
 	for (int i = 0; i < 0x80000; i += 2)
 	{
@@ -329,9 +319,9 @@ void _39in1_state::decrypt(uint8_t xor00, uint8_t xor02, uint8_t xor04, uint8_t 
 	}
 }
 
-void _39in1_state::further_decrypt(uint8_t xor400, uint8_t xor800, uint8_t xor1000, uint8_t xor2000, uint8_t xor4000, uint8_t xor8000) // later versions have more conditional XORs
+void _39in1_state::further_decrypt(u8 xor400, u8 xor800, u8 xor1000, u8 xor2000, u8 xor4000, u8 xor8000) // later versions have more conditional XORs
 {
-	uint8_t *rom = memregion("maincpu")->base();
+	u8 *rom = memregion("maincpu")->base();
 
 	for (int i = 0; i < 0x80000; i += 2)
 	{
@@ -351,33 +341,35 @@ void _39in1_state::further_decrypt(uint8_t xor400, uint8_t xor800, uint8_t xor10
 	}
 }
 
-void _39in1_state::init_39in1()  { driver_init(); decrypt(0xc0, 0x00, 0x00, 0x02, 0x40, 0x04, 0x80, 0x00, 7, 2, 5, 6, 0, 3, 1, 4); m_mcu_ipt_pc = 0xe3af4; } // good
-void _39in1_state::init_4in1a()  { driver_init(); decrypt(0x25, 0x00, 0x00, 0x01, 0x80, 0x04, 0x40, 0x00, 6, 0, 2, 1, 7, 5, 4, 3); m_mcu_ipt_pc = 0x45814; } // good
-void _39in1_state::init_4in1b()  { driver_init(); decrypt(0x43, 0x00, 0x00, 0x80, 0x04, 0x40, 0x08, 0x00, 2, 4, 0, 6, 7, 3, 1, 5); m_mcu_ipt_pc = 0x57628; } // good
-void _39in1_state::init_19in1()  { driver_init(); decrypt(0x00, 0x00, 0x00, 0x04, 0x01, 0x80, 0x40, 0x00, 2, 1, 7, 4, 5, 0, 6, 3); further_decrypt(0x00, 0x01, 0x00, 0x10, 0x00, 0x00); m_mcu_ipt_pc = 0x00000; } // TODO: 0x4000, 0x8000, 0x10000, 0x20000, 0x40000 conditional XORs?
-void _39in1_state::init_48in1()  { driver_init(); decrypt(0x00, 0x00, 0x00, 0x01, 0x40, 0x00, 0x20, 0x00, 5, 3, 2, 1, 4, 6, 0, 7); further_decrypt(0x00, 0x01, 0x20, 0x10, 0x00, 0x00); m_mcu_ipt_pc = 0x00000; } // applies to both 48in1 and 48in1b, same main CPU ROM. TODO: see above
+void _39in1_state::init_39in1()  { decrypt(0xc0, 0x00, 0x00, 0x02, 0x40, 0x04, 0x80, 0x00, 7, 2, 5, 6, 0, 3, 1, 4); m_mcu_ipt_pc = 0xe3af4; } // good
+void _39in1_state::init_4in1a()  { decrypt(0x25, 0x00, 0x00, 0x01, 0x80, 0x04, 0x40, 0x00, 6, 0, 2, 1, 7, 5, 4, 3); m_mcu_ipt_pc = 0x45814; } // good
+void _39in1_state::init_4in1b()  { decrypt(0x43, 0x00, 0x00, 0x80, 0x04, 0x40, 0x08, 0x00, 2, 4, 0, 6, 7, 3, 1, 5); m_mcu_ipt_pc = 0x57628; } // good
+void _39in1_state::init_19in1()  { decrypt(0x00, 0x00, 0x00, 0x04, 0x01, 0x80, 0x40, 0x00, 2, 1, 7, 4, 5, 0, 6, 3); further_decrypt(0x00, 0x01, 0x00, 0x10, 0x00, 0x00); m_mcu_ipt_pc = 0x00000; } // TODO: 0x4000, 0x8000, 0x10000, 0x20000, 0x40000 conditional XORs?
+void _39in1_state::init_48in1()  { decrypt(0x00, 0x00, 0x00, 0x01, 0x40, 0x00, 0x20, 0x00, 5, 3, 2, 1, 4, 6, 0, 7); further_decrypt(0x00, 0x01, 0x20, 0x10, 0x00, 0x00); m_mcu_ipt_pc = 0x00000; } // applies to both 48in1 and 48in1b, same main CPU ROM. TODO: see above
 void _39in1_state::init_48in1a() { init_48in1(); m_mcu_ipt_pc = 0x00000; } // same encryption as 48in1
 void _39in1_state::init_48in1c() { init_48in1(); m_mcu_ipt_pc = 0x00000; } // same encryption as 48in1
 void _39in1_state::init_rodent() { init_4in1b(); /*m_mcu_ipt_pc = 0x?????;*/ } // same encryption as 4in1b, thus good, but doesn't boot because of different CPLD calls
-void _39in1_state::init_60in1()  { driver_init(); decrypt(0x00, 0x00, 0x00, 0x40, 0x10, 0x80, 0x20, 0x00, 5, 1, 4, 2, 0, 7, 6, 3); further_decrypt(0x00, 0x01, 0x00, 0x10, 0x00, 0x00); m_mcu_ipt_pc = 0x00000; } // TODO: see 19in1
+void _39in1_state::init_60in1()  { decrypt(0x00, 0x00, 0x00, 0x40, 0x10, 0x80, 0x20, 0x00, 5, 1, 4, 2, 0, 7, 6, 3); further_decrypt(0x00, 0x01, 0x00, 0x10, 0x00, 0x00); m_mcu_ipt_pc = 0x00000; } // TODO: see 19in1
 
 // I.A.M. slots
-void _39in1_state::init_fruitwld()  { driver_init(); decrypt(0x0a, 0x00, 0x00, 0x20, 0x80, 0x00, 0x00, 0x00, 5, 1, 7, 4, 3, 2, 0, 6); /* further_decrypt(0x00, 0x00, 0x00, 0x00, 0x00, 0x00); m_mcu_ipt_pc = 0x00000; */ } // TODO: >= 0x4000 XORs unverified
-void _39in1_state::init_jumanji()   { driver_init(); decrypt(0x00, 0x00, 0x00, 0x02, 0x00, 0x40, 0x08, 0x00, 1, 0, 6, 2, 5, 3, 4, 7); further_decrypt(0x00, 0x08, 0x10, 0x40, 0x00, 0x00); /* m_mcu_ipt_pc = 0x00000; */ } // TODO: >= 0x4000 XORs unverified
-void _39in1_state::init_plutus()    { driver_init(); decrypt(0x00, 0x40, 0x08, 0x01, 0x00, 0x04, 0x80, 0x02, 6, 4, 0, 5, 7, 3, 2, 1); further_decrypt(0x00, 0x00, 0x10, 0x00, 0x00, 0x00); /* m_mcu_ipt_pc = 0x00000; */ } // TODO:  >= 0x4000 XORs unverified
-void _39in1_state::init_pokrwild()  { driver_init(); decrypt(0x20, 0x00, 0x00, 0x40, 0x08, 0x00, 0x00, 0x00, 6, 5, 3, 1, 0, 7, 2, 4); /* further_decrypt(0x00, 0x00, 0x00, 0x00, 0x00, 0x00); m_mcu_ipt_pc = 0x00000; */ } // TODO: >= 0x4000 XORs unverified
+void _39in1_state::init_fruitwld()  { decrypt(0x0a, 0x00, 0x00, 0x20, 0x80, 0x00, 0x00, 0x00, 5, 1, 7, 4, 3, 2, 0, 6); /* further_decrypt(0x00, 0x00, 0x00, 0x00, 0x00, 0x00); m_mcu_ipt_pc = 0x00000; */ } // TODO: >= 0x4000 XORs unverified
+void _39in1_state::init_jumanji()   { decrypt(0x00, 0x00, 0x00, 0x02, 0x00, 0x40, 0x08, 0x00, 1, 0, 6, 2, 5, 3, 4, 7); further_decrypt(0x00, 0x08, 0x10, 0x40, 0x00, 0x00); /* m_mcu_ipt_pc = 0x00000; */ } // TODO: >= 0x4000 XORs unverified
+void _39in1_state::init_jumanjia()  { decrypt(0x00, 0x00, 0x00, 0x40, 0x10, 0x08, 0x04, 0x00, 3, 5, 1, 4, 7, 6, 2, 0); /* further_decrypt(0x00, 0x00, 0x00, 0x00, 0x00, 0x00); m_mcu_ipt_pc = 0x00000; */ } // TODO: >= 0x4000 XORs unverified
+void _39in1_state::init_plutus()    { decrypt(0x00, 0x40, 0x08, 0x01, 0x00, 0x04, 0x80, 0x02, 6, 4, 0, 5, 7, 3, 2, 1); further_decrypt(0x00, 0x00, 0x10, 0x00, 0x00, 0x00); /* m_mcu_ipt_pc = 0x00000; */ } // TODO: >= 0x4000 XORs unverified
+void _39in1_state::init_pokrwild()  { decrypt(0x20, 0x00, 0x00, 0x40, 0x08, 0x00, 0x00, 0x00, 6, 5, 3, 1, 0, 7, 2, 4); /* further_decrypt(0x00, 0x00, 0x00, 0x00, 0x00, 0x00); m_mcu_ipt_pc = 0x00000; */ } // TODO: >= 0x4000 XORs unverified
 
 void _39in1_state::base(machine_config &config)
 {
 	PXA255(config, m_maincpu, 200'000'000);
 	m_maincpu->set_addrmap(AS_PROGRAM, &_39in1_state::base_map);
 
-	EEPROM_93C66_16BIT(config, "eeprom");
+	EEPROM_93C66_16BIT(config, m_eeprom);
+	m_eeprom->do_callback().set(m_pxa_periphs, FUNC(pxa255_periphs_device::gpio_in<5>));
 
 	PXA255_PERIPHERALS(config, m_pxa_periphs, 200'000'000, m_maincpu);
-	m_pxa_periphs->gpio0_write().set(FUNC(_39in1_state::eeprom_w));
-	m_pxa_periphs->gpio0_read().set(FUNC(_39in1_state::eeprom_r));
-	m_pxa_periphs->gpio1_read().set_ioport("DSW").lshift(21);
+	m_pxa_periphs->gpio_out<4>().set(m_eeprom, FUNC(eeprom_serial_93c66_16bit_device::di_write));
+	m_pxa_periphs->gpio_out<2>().set(m_eeprom, FUNC(eeprom_serial_93c66_16bit_device::cs_write));
+	m_pxa_periphs->gpio_out<3>().set(m_eeprom, FUNC(eeprom_serial_93c66_16bit_device::clk_write));
 }
 
 void _39in1_state::_39in1(machine_config &config)
@@ -566,6 +558,17 @@ ROM_START( jumanji ) // PCB383 - CHZ FP100 sticker on RAM under the lid. Dump wa
 	ROM_LOAD( "93c66.u32", 0x000, 0x200, NO_DUMP )
 ROM_END
 
+ROM_START( jumanjia ) // PCB383 - Jumanji FP101 sticker on RAM under the lid.
+	ROM_REGION( 0x80000, "maincpu", 0 )
+	ROM_LOAD( "jumanji_113_fp101.u2", 0x00000, 0x80000, CRC(40a66c50) SHA1(8909db087a8527af8ce229b03e2f7f16160db6f0) )
+
+	ROM_REGION32_LE( 0x400000, "data", 0 )
+	ROM_LOAD( "m5m29gt320.u19", 0x000000, 0x400000, CRC(4cd694fe) SHA1(723c0ed2af994cc584654dbf0d779e1c90827c7b) )
+
+	ROM_REGION16_BE( 0x200, "eeprom", 0 )
+	ROM_LOAD( "at93c66.u32", 0x000, 0x200, CRC(60930a27) SHA1(9222b23d64d85f664037ba180f79045c108fed9c) )
+ROM_END
+
 ROM_START( plutus ) // PCB451 - PLUTUS FP100 sticker on PCB outside the lid
 	ROM_REGION( 0x80000, "maincpu", 0 )
 	ROM_LOAD( "plutus v100.u2", 0x00000, 0x80000, CRC(3ac49895) SHA1(6de3dcac42afc4d9f927c9c9accf592b3d974fd3) )
@@ -606,5 +609,6 @@ GAME(2005, rodent,    0,        base,   39in1, _39in1_state, init_rodent,   ROT0
 GAME(2008, fruitwld,  0,        base,   39in1, _39in1_state, init_fruitwld, ROT0,  "I.A.M.",  "Fruit World (V111)",                                   MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND) // FRUIT_V111.BIN 2008-04-30 15:59:21
 GAME(2007, fruitwlda, fruitwld, base,   39in1, _39in1_state, init_fruitwld, ROT0,  "I.A.M.",  "Fruit World (V110)",                                   MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND) // FRUIT_V110.BIN 2007-07-26 13:46:30
 GAME(2007, jumanji,   0,        base,   39in1, _39in1_state, init_jumanji,  ROT0,  "I.A.M.",  "Jumanji (V502)",                                       MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND) // CHZ_V502.BIN 2007-07-26 13:49:35 in clear text at the end of the main CPU ROM
+GAME(2007, jumanjia,  jumanji,  base,   39in1, _39in1_state, init_jumanjia, ROT0,  "I.A.M.",  "Jumanji (V113)",                                       MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND) // JUMANJI_V113.BIN 2007-07-25 10:54:33
 GAME(200?, plutus,    0,        base,   39in1, _39in1_state, init_plutus,   ROT0,  "I.A.M.",  "Plutus (V100)",                                        MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND) // no string
 GAME(200?, pokrwild,  0,        base,   39in1, _39in1_state, init_pokrwild, ROT0,  "I.A.M.",  "Poker's Wild (V117)",                                  MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND) // no string

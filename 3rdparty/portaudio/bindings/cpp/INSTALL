@@ -124,7 +124,7 @@ architecture at a time in the source code directory.  After you have
 installed the package for one architecture, use `make distclean' before
 reconfiguring for another architecture.
 
-   On MacOS X 10.5 and later systems, you can create libraries and
+   On MacOS X 10.6 and later systems, you can create libraries and
 executables that work on multiple system types--known as "fat" or
 "universal" binaries--by specifying multiple `-arch' options to the
 compiler but only a single `-arch' option to the preprocessor.  Like

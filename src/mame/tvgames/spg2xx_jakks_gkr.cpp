@@ -10,6 +10,8 @@
 #include "softlist_dev.h"
 
 
+namespace {
+
 class jakks_gkr_state : public spg2xx_game_state
 {
 public:
@@ -39,15 +41,15 @@ public:
 	void jakks_gkr_wp(machine_config &config);
 	void jakks_gkr_cb(machine_config &config);
 
-	DECLARE_READ_LINE_MEMBER(i2c_gkr_r);
+	int i2c_gkr_r();
 
 protected:
-	uint16_t jakks_porta_r();
-	void jakks_porta_w(uint16_t data);
+	[[maybe_unused]] uint16_t jakks_porta_r();
+	[[maybe_unused]] void jakks_porta_w(uint16_t data);
 	void jakks_portb_w(uint16_t data);
 
 private:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 	uint16_t joy_x_read();
 	uint16_t joy_y_read();
@@ -58,8 +60,6 @@ private:
 	void jakks_porta_key_io_w(uint16_t data);
 	bool m_porta_key_mode;
 
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load_gamekey);
-
 	optional_device<jakks_gamekey_slot_device> m_cart;
 	memory_region *m_cart_region;
 
@@ -67,7 +67,7 @@ private:
 	optional_ioport m_analog_y;
 };
 
-READ_LINE_MEMBER(jakks_gkr_state::i2c_gkr_r)
+int jakks_gkr_state::i2c_gkr_r()
 {
 	if (m_cart && m_cart->exists())
 	{
@@ -164,7 +164,7 @@ static INPUT_PORTS_START( jak_sith_i2c )
 	PORT_BIT( 0xf3df, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("P3")
-	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(jakks_gkr_state, i2c_gkr_r)
+	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(jakks_gkr_state::i2c_gkr_r))
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_UNKNOWN ) // PAL/NTSC flag, set to NTSC (unverified here)
 	PORT_BIT( 0xfff6, IP_ACTIVE_HIGH, IPT_UNUSED )
 
@@ -220,7 +220,7 @@ static INPUT_PORTS_START( jak_nm_i2c )
 	PORT_BIT( 0x0200, IP_ACTIVE_HIGH, IPT_BUTTON1 )
 
 	PORT_START("P3")
-	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(jakks_gkr_state, i2c_gkr_r)
+	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(jakks_gkr_state::i2c_gkr_r))
 	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_UNKNOWN ) // PAL/NTSC flag, set to NTSC
@@ -243,7 +243,7 @@ static INPUT_PORTS_START( jak_cc_i2c )
 	PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_NAME("D")
 
 	PORT_START("P3")
-	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(jakks_gkr_state, i2c_gkr_r)
+	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(jakks_gkr_state::i2c_gkr_r))
 	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_UNKNOWN ) // PAL/NTSC flag, set to NTSC
@@ -264,7 +264,7 @@ static INPUT_PORTS_START( jak_wf_i2c )
 	PORT_BIT( 0x001f, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("P3")
-	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(jakks_gkr_state, i2c_gkr_r)
+	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(jakks_gkr_state::i2c_gkr_r))
 	PORT_BIT( 0xfff6, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_UNKNOWN ) // PAL/NTSC flag, set to NTSC
 
@@ -355,7 +355,7 @@ static INPUT_PORTS_START( jak_sdoo_i2c ) // GameKeyReady units had 2 main button
 	PORT_BIT( 0x001f, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("P3")
-	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(jakks_gkr_state, i2c_gkr_r) // is this correct? doesn't seem to work
+	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(jakks_gkr_state::i2c_gkr_r)) // is this correct? doesn't seem to work
 	PORT_DIPNAME( 0x0002, 0x0002, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(      0x0002, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
@@ -406,7 +406,7 @@ static INPUT_PORTS_START( jak_gkr_i2c )
 	PORT_INCLUDE(jak_gkr)
 
 	PORT_MODIFY("P3")
-	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(jakks_gkr_state, i2c_gkr_r)
+	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(jakks_gkr_state::i2c_gkr_r))
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( jak_dpr_i2c )
@@ -424,7 +424,7 @@ static INPUT_PORTS_START( jak_dpr_i2c )
 	PORT_BIT( 0x001f, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("P3")
-	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(jakks_gkr_state, i2c_gkr_r)
+	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(jakks_gkr_state::i2c_gkr_r))
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_UNKNOWN ) // PAL/NTSC flag, set to NTSC (unverified here)
 	PORT_BIT( 0xfff6, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
@@ -442,11 +442,6 @@ void jakks_gkr_state::machine_start()
 		m_bank->configure_entries(0, (m_cart_region->bytes() + 0x7fffff) / 0x800000, m_cart_region->base(), 0x800000);
 		m_bank->set_entry(0);
 	}
-}
-
-DEVICE_IMAGE_LOAD_MEMBER(jakks_gkr_state::cart_load_gamekey)
-{
-	return m_cart->call_load();
 }
 
 void jakks_gkr_state::jakks_gkr(machine_config &config)
@@ -711,6 +706,7 @@ ROM_START( jak_capc )
 	ROM_LOAD16_WORD_SWAP( "capcomgkr.bin", 0x000000, 0x200000, CRC(6d47cce4) SHA1(263926a991d55459aa3cee90049d2202c1e3a70e) )
 ROM_END
 
+} // anonymous namespace
 
 
 // 'Game-Key Ready' JAKKS games (these can also take per-game specific expansion cartridges, although not all games had them released)

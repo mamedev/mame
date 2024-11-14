@@ -36,6 +36,10 @@
 #include "bus/generic/carts.h"
 #include "bus/generic/slot.h"
 
+#include "utf8.h"
+
+
+namespace {
 
 class pb1000_state : public driver_device
 {
@@ -69,7 +73,7 @@ private:
 	memory_region *m_card1_reg = nullptr;
 	memory_region *m_card2_reg = nullptr;
 
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 	void gatearray_w(offs_t offset, uint16_t data);
 	uint16_t pb1000_kb_r();
 	uint16_t pb2000c_kb_r();
@@ -80,8 +84,8 @@ private:
 	uint16_t read_touchscreen(uint8_t line);
 	void pb1000_palette(palette_device &palette) const;
 	TIMER_CALLBACK_MEMBER(keyboard_timer);
-	void pb1000_mem(address_map &map);
-	void pb2000c_mem(address_map &map);
+	void pb1000_mem(address_map &map) ATTR_COLD;
+	void pb2000c_mem(address_map &map) ATTR_COLD;
 };
 
 void pb1000_state::pb1000_mem(address_map &map)
@@ -550,6 +554,9 @@ ROM_START( ai1000 )
 	ROM_REGION( 0x0800, "hd44352", 0 )
 	ROM_LOAD( "charset.bin", 0x0000, 0x0800, CRC(7f144716) SHA1(a02f1ecc6dc0ac55b94f00931d8f5cb6b9ffb7b4))
 ROM_END
+
+} // anonymous namespace
+
 
 /* Driver */
 

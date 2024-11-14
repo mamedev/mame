@@ -7,10 +7,10 @@
 //
 //============================================================
 
-#pragma once
+#ifndef MAME_RENDER_BGFX_SUPPRESSOR_H
+#define MAME_RENDER_BGFX_SUPPRESSOR_H
 
-#ifndef __DRAWBGFX_SUPPRESSOR__
-#define __DRAWBGFX_SUPPRESSOR__
+#pragma once
 
 #include <bgfx/bgfx.h>
 
@@ -34,7 +34,7 @@ public:
 		COMBINE_OR
 	};
 
-	bgfx_suppressor(std::vector<bgfx_slider*> sliders, uint32_t condition, combine_mode combine, void* value);
+	bgfx_suppressor(std::vector<bgfx_slider*> &&sliders, uint32_t condition, combine_mode combine, void* value);
 	~bgfx_suppressor();
 
 	// Getters
@@ -48,4 +48,4 @@ private:
 	uint8_t*                    m_value;
 };
 
-#endif // __DRAWBGFX_SUPPRESSOR__
+#endif // MAME_RENDER_BGFX_SUPPRESSOR_H

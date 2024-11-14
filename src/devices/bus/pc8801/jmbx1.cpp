@@ -4,7 +4,7 @@
 
     JMB-X1 sound card
 
-    Used for PC-8001mkII/PC-8801 NRTDRV sound program
+    Used for PC-8001mkII/PC-8801 NRTDRV88J sound program
     http://upd780c1.g1.xrea.com/pc-8001/j80-25.html
 
     TODO:

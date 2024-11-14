@@ -5,8 +5,8 @@
     Combat School
 
 *************************************************************************/
-#ifndef MAME_INCLUDES_COMBATSC_H
-#define MAME_INCLUDES_COMBATSC_H
+#ifndef MAME_KONAMI_COMBATSC_H
+#define MAME_KONAMI_COMBATSC_H
 
 #pragma once
 
@@ -28,7 +28,6 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
 		m_screen(*this, "screen"),
-		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
 		m_soundlatch(*this, "soundlatch"),
 		m_track_ports(*this, {"TRACK0_Y", "TRACK0_X", "TRACK1_Y", "TRACK1_X"}),
@@ -38,8 +37,8 @@ public:
 	}
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	// memory pointers
 	required_shared_ptr_array<uint8_t, 2> m_videoram;
@@ -57,7 +56,6 @@ protected:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_device<screen_device> m_screen;
-	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 	required_device<generic_latch_8_device> m_soundlatch;
 
@@ -89,9 +87,9 @@ public:
 	void init_combatsc();
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	required_device_array<k007121_device, 2> m_k007121;
@@ -122,8 +120,8 @@ private:
 	void palette(palette_device &palette) const;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, const uint8_t *source, int circuit, bitmap_ind8 &priority_bitmap, uint32_t pri_mask);
-	void main_map(address_map &map);
-	void sound_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
+	void sound_map(address_map &map) ATTR_COLD;
 };
 
 class combatscb_state : public combatsc_base_state
@@ -131,6 +129,7 @@ class combatscb_state : public combatsc_base_state
 public:
 	combatscb_state(const machine_config &mconfig, device_type type, const char *tag) :
 		combatsc_base_state(mconfig, type, tag),
+		m_gfxdecode(*this, "gfxdecode"),
 		m_msm(*this, "msm"),
 		m_soundbank(*this, "soundbank"),
 		m_io_ram(*this, "io_ram", 0x4000, ENDIANNESS_BIG),
@@ -141,17 +140,18 @@ public:
 	void combatscb(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
+	optional_device<gfxdecode_device> m_gfxdecode;
 	required_device<msm5205_device> m_msm;
 	required_memory_bank m_soundbank;
 	memory_share_creator<uint8_t> m_io_ram;
 	memory_view m_bank_io_view;
 
-	uint8_t m_bank_select; // 0x00..0x1f
+	uint8_t m_bank_select = 0; // 0x00..0x1f
 
 	void priority_w(uint8_t data);
 	void io_w(offs_t offset, uint8_t data);
@@ -164,8 +164,8 @@ private:
 	void palette(palette_device &palette) const;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, const uint8_t *source, int circuit);
-	void main_map(address_map &map);
-	void sound_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
+	void sound_map(address_map &map) ATTR_COLD;
 };
 
-#endif // MAME_INCLUDES_COMBATSC_H
+#endif // MAME_KONAMI_COMBATSC_H

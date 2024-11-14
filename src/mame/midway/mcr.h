@@ -49,7 +49,8 @@ public:
 		m_squawk_n_talk(*this, "snt"),
 		m_samples(*this, "samples"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette")
+		m_palette(*this, "palette"),
+		m_backlight(*this, "backlight")
 	{ }
 
 	void mcr_control_port_w(uint8_t data);
@@ -95,18 +96,18 @@ public:
 	void mcr_90010_tt(machine_config &config);
 	void mcr_91475(machine_config &config);
 	void mcr_90010(machine_config &config);
-	void cpu_90009_map(address_map &map);
-	void cpu_90009_portmap(address_map &map);
-	void cpu_90009_dp_map(address_map &map);
-	void cpu_90009_dp_portmap(address_map &map);
-	void cpu_90010_map(address_map &map);
-	void cpu_90010_portmap(address_map &map);
-	void cpu_91490_map(address_map &map);
-	void cpu_91490_portmap(address_map &map);
+	void cpu_90009_map(address_map &map) ATTR_COLD;
+	void cpu_90009_portmap(address_map &map) ATTR_COLD;
+	void cpu_90009_dp_map(address_map &map) ATTR_COLD;
+	void cpu_90009_dp_portmap(address_map &map) ATTR_COLD;
+	void cpu_90010_map(address_map &map) ATTR_COLD;
+	void cpu_90010_portmap(address_map &map) ATTR_COLD;
+	void cpu_91490_map(address_map &map) ATTR_COLD;
+	void cpu_91490_portmap(address_map &map) ATTR_COLD;
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 	TILE_GET_INFO_MEMBER(mcr_90009_get_tile_info);
 	TILE_GET_INFO_MEMBER(mcr_90010_get_tile_info);
@@ -140,6 +141,7 @@ protected:
 	required_device<palette_device> m_palette;
 
 private:
+	output_finder<> m_backlight;
 	uint32_t m_mcr_cpu_board = 0;
 	uint32_t m_mcr_sprite_board = 0;
 
@@ -197,8 +199,8 @@ public:
 		m_ipu_pio1(*this, "ipu_pio1")
 	{ }
 
-	DECLARE_WRITE_LINE_MEMBER(sio_txda_w);
-	DECLARE_WRITE_LINE_MEMBER(sio_txdb_w);
+	void sio_txda_w(int state);
+	void sio_txdb_w(int state);
 	void ipu_laserdisk_w(offs_t offset, uint8_t data);
 	uint8_t ipu_watchdog_r();
 	void ipu_watchdog_w(uint8_t data);
@@ -211,10 +213,10 @@ public:
 	void init_nflfoot();
 
 	void mcr_91490_ipu(machine_config &config);
-	void ipu_91695_map(address_map &map);
-	void ipu_91695_portmap(address_map &map);
+	void ipu_91695_map(address_map &map) ATTR_COLD;
+	void ipu_91695_portmap(address_map &map) ATTR_COLD;
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	int m_ipu_sio_txda = 0;

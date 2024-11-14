@@ -52,7 +52,8 @@
 *************************************************************************************************************/
 
 #include "emu.h"
-#include "neogeo.h"
+
+#include "neogeo_spr.h"
 
 #include "cpu/m68000/m68000.h"
 #include "cpu/mcs51/mcs51.h"
@@ -60,7 +61,9 @@
 #include "sound/ymz280b.h"
 #include "machine/eepromser.h"
 #include "machine/ticket.h"
+
 #include "emupal.h"
+#include "screen.h"
 #include "speaker.h"
 
 
@@ -89,9 +92,9 @@ public:
 	void init_livequiz();
 
 protected:
-	virtual void video_start() override;
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void video_start() override ATTR_COLD;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	uint16_t ret_ffff();
@@ -115,10 +118,10 @@ private:
 	required_shared_ptr<uint16_t> m_zoomram;
 	required_region_ptr<uint8_t> m_zoomtable;
 
-	DECLARE_WRITE_LINE_MEMBER(screen_vblank);
+	void screen_vblank(int state);
 
-	void hammer_map(address_map &map);
-	void livequiz_map(address_map &map);
+	void hammer_map(address_map &map) ATTR_COLD;
+	void livequiz_map(address_map &map) ATTR_COLD;
 };
 
 
@@ -181,10 +184,8 @@ void midas_state::zoomtable_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 
 	if (ACCESSING_BITS_0_7)
 	{
-		m_zoomtable[offset+0x00000] = data & 0xff;
-		m_zoomtable[offset+0x10000] = data & 0xff;
+		m_zoomtable[offset] = data & 0xff;
 	}
-
 }
 /***************************************************************************************
                                        Live Quiz Show
@@ -372,7 +373,7 @@ static INPUT_PORTS_START( livequiz )
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW,  IPT_COIN1   )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW,  IPT_UNKNOWN )
-	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read) // EEPROM
+	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", FUNC(eeprom_serial_93cxx_device::do_read)) // EEPROM
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 	PORT_SERVICE_NO_TOGGLE( 0x0040,   IP_ACTIVE_LOW )
@@ -505,7 +506,7 @@ static INPUT_PORTS_START( hammer )
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW,  IPT_COIN1     )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW,  IPT_COIN2     )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW,  IPT_SERVICE1  )
-	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_CUSTOM   ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
+	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_CUSTOM   ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", FUNC(eeprom_serial_93cxx_device::do_read))
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW,  IPT_UNKNOWN   )
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW,  IPT_UNKNOWN   )
 	PORT_SERVICE_NO_TOGGLE( 0x0040,   IP_ACTIVE_LOW )
@@ -578,14 +579,14 @@ static INPUT_PORTS_START( hammer )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("HAMMER")    // bc0000
-	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("prize1", ticket_dispenser_device, line_r) // prize 1 sensor ("tejisw 1")
-	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("prize2", ticket_dispenser_device, line_r) // prize 2 sensor ("tejisw 2")
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW,  IPT_UNKNOWN )
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW,  IPT_UNKNOWN )
-	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("ticket", ticket_dispenser_device, line_r)
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW,  IPT_UNKNOWN )
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW,  IPT_UNKNOWN )
-	PORT_BIT( 0x0080, IP_ACTIVE_LOW,  IPT_BUTTON1 ) PORT_IMPULSE(5) PORT_NAME( "Hammer" )
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("prize1", FUNC(ticket_dispenser_device::line_r)) // prize 1 sensor ("tejisw 1")
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("prize2", FUNC(ticket_dispenser_device::line_r)) // prize 2 sensor ("tejisw 2")
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("ticket", FUNC(ticket_dispenser_device::line_r))
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_IMPULSE(5) PORT_NAME( "Hammer" )
 
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -616,7 +617,7 @@ void midas_state::machine_reset()
 {
 }
 
-WRITE_LINE_MEMBER(midas_state::screen_vblank)
+void midas_state::screen_vblank(int state)
 {
 	if (state) m_sprgen->buffer_vram();
 }
@@ -630,17 +631,17 @@ void midas_state::livequiz(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &midas_state::livequiz_map);
 	m_maincpu->set_vblank_int("screen", FUNC(midas_state::irq1_line_hold));
 
-	pic16c56_device &pic1(PIC16C56(config, "pic1", XTAL(24'000'000) / 6));  // !! PIC12C508 !! unknown MHz
+	pic16c56_device &pic1(PIC16C56(config, "pic1", XTAL(24'000'000) / 6)); // !! PIC12C508 !! unknown MHz
 	pic1.set_disable(); // Currently not hooked up
 
-	pic16c56_device &pic2(PIC16C56(config, "pic2", XTAL(24'000'000) / 6));  // !! PIC12C508 !! unknown MHz
+	pic16c56_device &pic2(PIC16C56(config, "pic2", XTAL(24'000'000) / 6)); // !! PIC12C508 !! unknown MHz
 	pic2.set_disable(); // Currently not hooked up
 
 	EEPROM_93C46_16BIT(config, m_eeprom);
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_raw(NEOGEO_PIXEL_CLOCK, NEOGEO_HTOTAL, NEOGEO_HBEND, NEOGEO_HBSTART, NEOGEO_VTOTAL, NEOGEO_VBEND, NEOGEO_VBSTART);
+	m_screen->set_raw(XTAL(24'000'000) / 4, NEOGEO_HTOTAL, NEOGEO_HBEND, NEOGEO_HBSTART, NEOGEO_VTOTAL, NEOGEO_VBEND, NEOGEO_VBSTART);
 	m_screen->set_screen_update(FUNC(midas_state::screen_update));
 	m_screen->screen_vblank().set(FUNC(midas_state::screen_vblank));
 
@@ -670,21 +671,13 @@ void midas_state::hammer(machine_config &config)
 
 	EEPROM_93C46_16BIT(config, m_eeprom);
 
-	TICKET_DISPENSER(config, m_prize[0], 0);
-	m_prize[0]->set_period(attotime::from_msec(1000*5));
-	m_prize[0]->set_senses(TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_LOW, false);
-
-	TICKET_DISPENSER(config, m_prize[1], 0);
-	m_prize[1]->set_period(attotime::from_msec(1000*5));
-	m_prize[1]->set_senses(TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_LOW, false);
-
-	TICKET_DISPENSER(config, m_ticket, 0);
-	m_ticket->set_period(attotime::from_msec(200));
-	m_ticket->set_senses(TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_LOW, false);
+	TICKET_DISPENSER(config, m_prize[0], attotime::from_msec(1000*5));
+	TICKET_DISPENSER(config, m_prize[1], attotime::from_msec(1000*5));
+	TICKET_DISPENSER(config, m_ticket, attotime::from_msec(200));
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_raw(NEOGEO_PIXEL_CLOCK, NEOGEO_HTOTAL, NEOGEO_HBEND, NEOGEO_HBSTART, NEOGEO_VTOTAL, NEOGEO_VBEND, NEOGEO_VBSTART);
+	m_screen->set_raw(XTAL(24'000'000) / 4, NEOGEO_HTOTAL, NEOGEO_HBEND, NEOGEO_HBSTART, NEOGEO_VTOTAL, NEOGEO_VBEND, NEOGEO_VBSTART);
 	m_screen->set_screen_update(FUNC(midas_state::screen_update));
 	m_screen->screen_vblank().set(FUNC(midas_state::screen_vblank));
 
@@ -811,7 +804,7 @@ ROM_START( livequiz )
 	ROM_REGION( 0x200000, "ymz", 0 )
 	ROM_LOAD( "flash.u5", 0x000000, 0x200000, CRC(dc062792) SHA1(ec415c918c47ce9d181f014cde317af5717600e4) )
 
-	ROM_REGION( 0x20000, "spritegen:zoomy", ROMREGION_ERASE00 )
+	ROM_REGION( 0x10000, "spritegen:zoomy", ROMREGION_ERASE00 )
 	/* uploaded */
 ROM_END
 
@@ -820,7 +813,7 @@ void midas_state::init_livequiz()
 	uint16_t *rom = (uint16_t *) memregion("maincpu")->base();
 
 	// PROTECTION CHECKS
-	rom[0x13345a/2] =   0x4e75;
+	rom[0x13345a/2] = 0x4e75;
 }
 
 /***************************************************************************************
@@ -909,7 +902,7 @@ ROM_START( hammer )
 	ROM_LOAD( "s0.u25", 0x000000, 0x200000, CRC(c049a3e0) SHA1(0c7016c3128c170a84ad3f92fad1165775210e3d) )
 	ROM_LOAD( "s1.u26", 0x200000, 0x200000, CRC(9cc4b3ec) SHA1(b91a8747074a1032eb7f70a015d394fe8e896d7e) )
 
-	ROM_REGION( 0x20000, "spritegen:zoomy", ROMREGION_ERASE00 )
+	ROM_REGION( 0x10000, "spritegen:zoomy", ROMREGION_ERASE00 )
 	/* uploaded */
 ROM_END
 

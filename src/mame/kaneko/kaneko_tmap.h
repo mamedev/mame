@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Luca Elia, David Haywood
-#ifndef MAME_VIDEO_KANEKO_TMAP_H
-#define MAME_VIDEO_KANEKO_TMAP_H
+#ifndef MAME_KANEKO_KANEKO_TMAP_H
+#define MAME_KANEKO_KANEKO_TMAP_H
 
 #pragma once
 
@@ -51,7 +51,7 @@ public:
 
 
 	// access
-	void vram_map(address_map &map);
+	void vram_map(address_map &map) ATTR_COLD;
 
 	u16 regs_r(offs_t offset);
 	void regs_w(offs_t offset, u16 data, u16 mem_mask = u16(~0));
@@ -71,8 +71,8 @@ public:
 	void mark_layer_dirty(u8 Layer);
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 private:
 	template<unsigned Layer> TILE_GET_INFO_MEMBER(get_tile_info);
@@ -93,4 +93,4 @@ private:
 
 DECLARE_DEVICE_TYPE(KANEKO_TMAP, kaneko_view2_tilemap_device)
 
-#endif // MAME_VIDEO_KANEKO_TMAP_H
+#endif // MAME_KANEKO_KANEKO_TMAP_H

@@ -68,6 +68,24 @@ If you hit problems with a set not working, there are several things to check-- 
 ROMs and CHDs
 -------------
 
-ROM chip data tends to be relatively small and gets loaded to system memory outright. Some games also used additional storage mediums such as hard drives, CD-ROMs, DVDs, and Laserdiscs. Those storage mediums are, for multiple technical reasons, not well-suited to being stored the same way as ROM data and won't fit completely in memory in some cases.
+ROM chip data tends to be relatively small and are loaded into system memory in
+their entirety.  Some games also used additional storage media such as hard
+disks, CD-ROMs, DVDs, and LaserDiscs.  Those storage media are, for multiple
+technical reasons, not well-suited to being stored the same way as ROM data and
+won’t fully fit in memory in some cases.
 
-Thus, a new format was created for these in the CHD file. **Compressed Hunks of Data**, or CHD for short, are designed very specifically around the needs of mass storage media. Some arcade games, consoles, and PCs will require a CHD to run. As CHDs are already compressed, they should **NOT** be stored in a ZIP or 7Z file as you would for ROM images.
+Thus, a new format was created for these in the CHD file.  **Compressed Hunks of
+Data** files, or CHD files for short, are designed very specifically around the
+needs of mass storage media.  Some arcade games, consoles, and PCs will require
+one or more CHD files to run.  As CHD files are already compressed, they
+**should not** be stored PKZIP or 7-Zip archives as ROM images would be.
+
+To save space when multiple variants of a system or software item are present,
+MAME supports *delta CHD* files.  A delta CHD file only stores the parts of the
+data that differ from its *parent CHD* file.  This allows large space savings
+when different variants share a lot of data.  Delta CHD files can only be used
+for clone systems, devices with a parent ROM device, and clone software items.
+A delta CHD file must use a (non-delta) CHD file from the parent system, parent
+ROM device or parent software item as its parent CHD file.  The parent CHD file
+must be present to use a delta CHD file, or MAME will not be able to read the
+shared data from it.

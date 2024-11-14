@@ -265,15 +265,6 @@ DEFINE_DEVICE_TYPE(CBUS_SLOT, cbus_slot_device, "cbus_slot", "InterPro CBUS slot
 DEFINE_DEVICE_TYPE(SRX_BUS, srx_bus_device, "srx_bus", "InterPro SRX bus")
 DEFINE_DEVICE_TYPE(SRX_SLOT, srx_slot_device, "srx_slot", "InterPro SRX slot")
 
-void interpro_bus_device::device_resolve_objects()
-{
-	// resolve callbacks
-	m_out_irq0_cb.resolve_safe();
-	m_out_irq1_cb.resolve_safe();
-	m_out_irq2_cb.resolve_safe();
-	m_out_irq3_cb.resolve_safe();
-}
-
 cbus_bus_device::cbus_bus_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: interpro_bus_device(mconfig, CBUS_BUS, tag, owner, clock)
 	, m_slot_count(0)

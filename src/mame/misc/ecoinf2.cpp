@@ -43,7 +43,7 @@ public:
 	void ecoinf2_oxo(machine_config &config);
 
 private:
-	template <unsigned N> DECLARE_WRITE_LINE_MEMBER(reel_optic_cb) { if (state) m_optic_pattern |= (1 << N); else m_optic_pattern &= ~(1 << N); }
+	template <unsigned N> void reel_optic_cb(int state) { if (state) m_optic_pattern |= (1 << N); else m_optic_pattern &= ~(1 << N); }
 
 	void ox_port5c_out_w(uint8_t data);
 
@@ -206,8 +206,8 @@ private:
 		m_coinlamp_outputs.resolve();
 	}
 
-	void oxo_memmap(address_map &map);
-	void oxo_portmap(address_map &map);
+	void oxo_memmap(address_map &map) ATTR_COLD;
+	void oxo_portmap(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	required_device_array<stepper_device, 4> m_reels;

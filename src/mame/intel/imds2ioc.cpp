@@ -2,19 +2,15 @@
 // copyright-holders:F. Ulivi
 // I/O controller for Intel Intellec MDS series-II
 //
-// NOTE:
-// Firmware running on PIO is NOT original because a dump is not available at the moment.
-// Emulator runs a version of PIO firmware that was specifically developed by me to implement
-// line printer output.
-//
 // TODO:
-// - Find a dump of the original PIO firmware
 // - Adjust speed of processors. Wait states are not accounted for yet.
 
 #include "emu.h"
 #include "imds2ioc.h"
 #include "screen.h"
 #include "speaker.h"
+#include "formats/img_dsk.h"
+#include "formats/fs_isis.h"
 
 // Main oscillator of IOC board: 22.032 MHz
 #define IOC_XTAL_Y2     22.032_MHz_XTAL
@@ -97,7 +93,7 @@ uint8_t imds2ioc_device::miscin_r()
 	return res | ((m_beeper_timer == 0) << 2);
 }
 
-WRITE_LINE_MEMBER(imds2ioc_device::beep_timer_w)
+void imds2ioc_device::beep_timer_w(int state)
 {
 	m_beeper_timer = state;
 	update_beeper();
@@ -180,14 +176,14 @@ void imds2ioc_device::kb_port_p1_w(uint8_t data)
 	m_kb_p1 = data;
 }
 
-READ_LINE_MEMBER(imds2ioc_device::kb_port_t0_r)
+int imds2ioc_device::kb_port_t0_r()
 {
 	// T0 tied low
 	// It appears to be some kind of strapping option on kb hw
 	return 0;
 }
 
-READ_LINE_MEMBER(imds2ioc_device::kb_port_t1_r)
+int imds2ioc_device::kb_port_t1_r()
 {
 	// T1 tied low
 	// It appears to be some kind of strapping option on kb hw
@@ -269,7 +265,7 @@ void imds2ioc_device::dbb_master_w(offs_t offset, uint8_t data)
 	m_ioc_ibf = data;
 }
 
-WRITE_LINE_MEMBER(imds2ioc_device::hrq_w)
+void imds2ioc_device::hrq_w(int state)
 {
 	// Should be propagated to HOLD input of IOC CPU
 	m_iocdma->hlda_w(state);
@@ -317,7 +313,7 @@ void imds2ioc_device::pio_port_p2_w(uint8_t data)
 	m_parallel_int_cb(BIT(data, 7));
 }
 
-WRITE_LINE_MEMBER(imds2ioc_device::pio_lpt_ack_w)
+void imds2ioc_device::pio_lpt_ack_w(int state)
 {
 	if (state) {
 		m_device_status_byte |= 0x20;
@@ -326,22 +322,12 @@ WRITE_LINE_MEMBER(imds2ioc_device::pio_lpt_ack_w)
 	}
 }
 
-WRITE_LINE_MEMBER(imds2ioc_device::pio_lpt_busy_w)
+void imds2ioc_device::pio_lpt_busy_w(int state)
 {
-	// Busy is active high in centronics_device whereas it's active low in MDS
-	if (!state) {
+	if (state) {
 		m_device_status_byte |= 0x10;
 	} else {
 		m_device_status_byte &= ~0x10;
-	}
-}
-
-WRITE_LINE_MEMBER(imds2ioc_device::pio_lpt_select_w)
-{
-	if (state) {
-		m_device_status_byte |= 0x40;
-	} else {
-		m_device_status_byte &= ~0x40;
 	}
 }
 
@@ -351,9 +337,10 @@ I8275_DRAW_CHARACTER_MEMBER(imds2ioc_device::crtc_display_pixels)
 	uint8_t const chargen_byte = m_chargen[ (linecount & 7) | ((unsigned)charcode << 3) ];
 	uint16_t pixels;
 
-	if (lten) {
+	using namespace i8275_attributes;
+	if (BIT(attrcode, LTEN)) {
 		pixels = ~0;
-	} else if (vsp != 0 || (linecount & 8) != 0) {
+	} else if (BIT(attrcode, VSP) || (linecount & 8) != 0) {
 		pixels = 0; // VSP is gated with LC3
 	} else {
 		// See hardware ref. manual, pg 58 for the very peculiar way of generating character images
@@ -387,7 +374,7 @@ I8275_DRAW_CHARACTER_MEMBER(imds2ioc_device::crtc_display_pixels)
 		pixels = exp_pix_l | exp_pix_r;
 	}
 
-	if (rvv) {
+	if (BIT(attrcode, RVV)) {
 		pixels = ~pixels;
 	}
 
@@ -404,12 +391,6 @@ uint8_t imds2ioc_device::pio_master_r(offs_t offset)
 void imds2ioc_device::pio_master_w(offs_t offset, uint8_t data)
 {
 	m_iocpio->upi41_master_w(offset, data);
-}
-
-void imds2ioc_device::device_resolve_objects()
-{
-	m_master_intr_cb.resolve_safe();
-	m_parallel_int_cb.resolve_safe();
 }
 
 void imds2ioc_device::device_start()
@@ -562,6 +543,13 @@ static void imds2_floppies(device_slot_interface &device)
 	device.option_add("8sssd", FLOPPY_8_SSSD);
 }
 
+static void imds2_floppy_formats(format_registration &fr)
+{
+	fr.add_fm_containers();
+	fr.add(FLOPPY_IMG_FORMAT);
+	fr.add(fs::ISIS);
+}
+
 void imds2ioc_device::device_add_mconfig(machine_config &config)
 {
 	I8080A(config, m_ioccpu, IOC_XTAL_Y2 / 18);     // 2.448 MHz but running at 50% (due to wait states & DMA usage of bus)
@@ -624,7 +612,7 @@ void imds2ioc_device::device_add_mconfig(machine_config &config)
 
 	I8271(config, m_iocfdc, IOC_XTAL_Y1 / 2);
 	m_iocfdc->drq_wr_callback().set(m_iocdma, FUNC(i8257_device::dreq1_w));
-	FLOPPY_CONNECTOR(config, "iocfdc:0", imds2_floppies, "8sssd", floppy_image_device::default_mfm_floppy_formats, true);
+	FLOPPY_CONNECTOR(config, "iocfdc:0", imds2_floppies, "8sssd", imds2_floppy_formats, true);
 
 	I8041A(config, m_iocpio, IOC_XTAL_Y3);
 	m_iocpio->p1_in_cb().set(FUNC(imds2ioc_device::pio_port_p1_r));
@@ -641,7 +629,6 @@ void imds2ioc_device::device_add_mconfig(machine_config &config)
 	CENTRONICS(config, m_centronics, centronics_devices, "printer");
 	m_centronics->ack_handler().set(FUNC(imds2ioc_device::pio_lpt_ack_w));
 	m_centronics->busy_handler().set(FUNC(imds2ioc_device::pio_lpt_busy_w));
-	m_centronics->perror_handler().set(FUNC(imds2ioc_device::pio_lpt_select_w));
 }
 
 ROM_START(imds2ioc)
@@ -665,10 +652,8 @@ ROM_START(imds2ioc)
 	ROMX_LOAD("104593-004.a53", 0x1800, 0x0800, CRC(04407e2a) SHA1(ecd65e4337d2bb7f5f6fdaae95696c9207ba57ee), ROM_BIOS(2))
 
 	// ROM definition of PIO controller (8041A)
-	// For the time being a specially developed PIO firmware is used until a dump of the original PIO is
-	// available.
 	ROM_REGION(0x400, "iocpio", 0)
-	ROM_LOAD("pio_a72.bin", 0, 0x400, BAD_DUMP CRC(8c8e740b) SHA1(9b9333a9dc9585aa8f630721d13e551a5c87defc))
+	ROM_LOAD("104566-0012.bin", 0, 0x400, CRC(f999e5da) SHA1(77ac1fab5443a16f906b25926ab3ba3ae42db6bb))
 
 	// ROM definition of keyboard controller (8741)
 	ROM_REGION(0x400, "kbcpu", 0)

@@ -3,23 +3,32 @@
 #include "emu.h"
 #include "atapihle.h"
 
-atapi_hle_device::atapi_hle_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
-	: ata_hle_device(mconfig, type, tag, owner, clock),
+atapi_hle_device::atapi_hle_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+	ata_hle_device_base(mconfig, type, tag, owner, clock),
 	m_packet(0),
-	m_data_size(0)
+	m_data_size(0),
+	m_is_ready(false)
 {
 }
 
 void atapi_hle_device::device_start()
 {
 	t10_start(*this);
-	ata_hle_device::device_start();
+	ata_hle_device_base::device_start();
 }
 
 void atapi_hle_device::device_reset()
 {
 	t10_reset();
-	ata_hle_device::device_reset();
+	ata_hle_device_base::device_reset();
+}
+
+void atapi_hle_device::set_is_ready(bool state)
+{
+	if (has_running_machine() && (machine().phase() >= machine_phase::RESET))
+		throw emu_fatalerror("Static ready state should only be set during configuration");
+
+	m_is_ready = state;
 }
 
 void atapi_hle_device::process_buffer()
@@ -227,8 +236,8 @@ void atapi_hle_device::process_command()
 
 		for( int w = 0; w < 256; w++ )
 		{
-			m_buffer[w * 2] = m_identify_buffer[ w ] & 0xff;
-			m_buffer[(w * 2) + 1] = m_identify_buffer[ w ] >> 8;
+			m_buffer[w * 2] = m_identify_buffer[w] & 0xff;
+			m_buffer[(w * 2) + 1] = m_identify_buffer[w] >> 8;
 		}
 
 		m_buffer_size = 512;
@@ -257,7 +266,7 @@ void atapi_hle_device::process_command()
 		break;
 
 	default:
-		ata_hle_device::process_command();
+		ata_hle_device_base::process_command();
 		break;
 	}
 }
@@ -267,7 +276,7 @@ void atapi_hle_device::finished_command()
 	switch (m_command)
 	{
 	default:
-		ata_hle_device::finished_command();
+		ata_hle_device_base::finished_command();
 		break;
 	}
 }

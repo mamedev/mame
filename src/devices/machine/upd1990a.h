@@ -39,22 +39,22 @@ public:
 	auto data_callback() { return m_write_data.bind(); }
 	auto tp_callback() { return m_write_tp.bind(); }
 
-	DECLARE_WRITE_LINE_MEMBER( oe_w );
-	DECLARE_WRITE_LINE_MEMBER( cs_w );
-	DECLARE_WRITE_LINE_MEMBER( stb_w );
-	DECLARE_WRITE_LINE_MEMBER( clk_w );
-	DECLARE_WRITE_LINE_MEMBER( c0_w );
-	DECLARE_WRITE_LINE_MEMBER( c1_w );
-	DECLARE_WRITE_LINE_MEMBER( c2_w );
-	DECLARE_WRITE_LINE_MEMBER( data_in_w );
-	DECLARE_READ_LINE_MEMBER( data_out_r );
-	DECLARE_READ_LINE_MEMBER( tp_r );
+	void oe_w(int state);
+	void cs_w(int state);
+	void stb_w(int state);
+	void clk_w(int state);
+	void c0_w(int state);
+	void c1_w(int state);
+	void c2_w(int state);
+	void data_in_w(int state);
+	int data_out_r();
+	int tp_r();
 
 protected:
 	// device-level overrides
 	upd1990a_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint32_t variant);
 
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 	// device_rtc_interface overrides
 	virtual void rtc_clock_updated(int year, int month, int day, int day_of_week, int hour, int minute, int second) override;

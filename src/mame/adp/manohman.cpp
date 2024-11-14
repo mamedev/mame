@@ -141,6 +141,8 @@
 #include "speaker.h"
 
 
+namespace {
+
 class manohman_state : public driver_device
 {
 public:
@@ -154,9 +156,9 @@ public:
 	void manohman(machine_config &config);
 
 private:
-	virtual void machine_start() override;
-	void mem_map(address_map &map);
-	void cpu_space_map(address_map &map);
+	virtual void machine_start() override ATTR_COLD;
+	void mem_map(address_map &map) ATTR_COLD;
+	void cpu_space_map(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<mc68681_device> m_duart;
@@ -273,6 +275,8 @@ ROM_START( backgamn )
 	ROM_LOAD16_BYTE( "b_f2_i.bin",  0x00000, 0x10000, CRC(9e42937c) SHA1(85d462a560b85b03ee9d341e18815b7c396118ac) )
 	ROM_LOAD16_BYTE( "b_f2_ii.bin", 0x00001, 0x10000, CRC(8e0ee50c) SHA1(2a05c337db1131b873646aa4109593636ebaa356) )
 ROM_END
+
+} // anonymous namespace
 
 
 /*********************************************

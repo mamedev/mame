@@ -1,14 +1,14 @@
 /** @file patest_in_overflow.c
-	@ingroup test_src
-	@brief Count input overflows (using paInputOverflow flag) under 
-	overloaded and normal conditions.
+    @ingroup test_src
+    @brief Count input overflows (using paInputOverflow flag) under
+    overloaded and normal conditions.
     This test uses the same method to overload the stream as does
     patest_out_underflow.c -- it generates sine waves until the cpu load
     exceeds a certain level. However this test is only concerned with
-    input and so doesn't ouput any sound.
-    
+    input and so doesn't output any sound.
+
     @author Ross Bencina <rossb@audiomulch.com>
-	@author Phil Burk <philburk@softsynth.com>
+    @author Phil Burk <philburk@softsynth.com>
 */
 /*
  * $Id$
@@ -38,13 +38,13 @@
  */
 
 /*
- * The text above constitutes the entire PortAudio license; however, 
+ * The text above constitutes the entire PortAudio license; however,
  * the PortAudio community also makes the following non-binding requests:
  *
  * Any person wishing to distribute modifications to the Software is
  * requested to send the modifications to the original developer so that
- * they can be incorporated into the canonical version. It is also 
- * requested that these non-binding requests be included along with the 
+ * they can be incorporated into the canonical version. It is also
+ * requested that these non-binding requests be included along with the
  * license above.
  */
 
@@ -141,8 +141,8 @@ int main(void)
 
     inputParameters.device = Pa_GetDefaultInputDevice();  /* default input device */
     if (inputParameters.device == paNoDevice) {
-      fprintf(stderr,"Error: No default input device.\n");
-      goto error;
+        fprintf(stderr,"Error: No default input device.\n");
+        goto error;
     }
     inputParameters.channelCount = 1;                      /* mono output */
     inputParameters.sampleFormat = paFloat32;              /* 32 bit floating point output */
@@ -157,7 +157,7 @@ int main(void)
               FRAMES_PER_BUFFER,
               paClipOff,    /* we won't output out of range samples so don't bother clipping them */
               patestCallback,
-              &data );    
+              &data );
     if( err != paNoError ) goto error;
     err = Pa_StartStream( stream );
     if( err != paNoError ) goto error;
@@ -187,7 +187,7 @@ int main(void)
         load = Pa_GetStreamCpuLoad( stream );
         printf("STRESSING: sineCount = %d, CPU load = %f\n", data.sineCount, load );
     }
-    
+
     printf("Counting overflows for 5 seconds.\n");
     data.countOverflows = 1;
     Pa_Sleep( 5000 );
@@ -209,14 +209,14 @@ int main(void)
     Pa_Sleep( 5000 );
 
     safeOverflowCount = data.inputOverflowCount;
-    
+
     printf("Stop stream.\n");
     err = Pa_StopStream( stream );
     if( err != paNoError ) goto error;
-    
+
     err = Pa_CloseStream( stream );
     if( err != paNoError ) goto error;
-    
+
     Pa_Terminate();
 
     if( stressedOverflowCount == 0 )
@@ -229,7 +229,7 @@ int main(void)
     return err;
 error:
     Pa_Terminate();
-    fprintf( stderr, "An error occured while using the portaudio stream\n" );
+    fprintf( stderr, "An error occurred while using the portaudio stream\n" );
     fprintf( stderr, "Error number: %d\n", err );
     fprintf( stderr, "Error message: %s\n", Pa_GetErrorText( err ) );
     return err;

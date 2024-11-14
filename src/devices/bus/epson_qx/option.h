@@ -138,18 +138,18 @@ public:
 	}
 	option_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_WRITE_LINE_MEMBER(inth1_w);
-	DECLARE_WRITE_LINE_MEMBER(inth2_w);
-	DECLARE_WRITE_LINE_MEMBER(intl_w);
+	void inth1_w(int state);
+	void inth2_w(int state);
+	void intl_w(int state);
 
-	DECLARE_WRITE_LINE_MEMBER(drqf_w);
-	DECLARE_WRITE_LINE_MEMBER(drqs_w);
+	void drqf_w(int state);
+	void drqs_w(int state);
 
-	DECLARE_WRITE_LINE_MEMBER(rdyf_w);
-	DECLARE_WRITE_LINE_MEMBER(rdys_w);
+	void rdyf_w(int state);
+	void rdys_w(int state);
 
-	DECLARE_WRITE_LINE_MEMBER(eopf);
-	DECLARE_WRITE_LINE_MEMBER(eops);
+	void eopf(int state);
+	void eops(int state);
 
 	auto dmas_w_callback() { m_dmas_w_cb.bind(); }
 	auto dmas_r_callback() { m_dmas_r_cb.bind(); }
@@ -160,7 +160,7 @@ public:
 	auto in_eops_callback() { return m_eops_cb.bind(); }
 protected:
 	// device-level overrides
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 	// configuration
 	required_device<option_bus_device> m_bus;
@@ -224,8 +224,8 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	required_address_space m_iospace;
 	memory_view::memory_view_entry *m_view;

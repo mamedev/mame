@@ -10,7 +10,6 @@
 #include "model2.h"
 
 #include "debug/debugcon.h"
-#include "debug/debugcmd.h"
 #include "debugger.h"
 
 #include <fstream>
@@ -25,7 +24,7 @@ void model2_state::debug_init()
 	}
 }
 
-void model2_state::debug_commands(const std::vector<std::string> &params)
+void model2_state::debug_commands(const std::vector<std::string_view> &params)
 {
 	if (params.size() < 1)
 		return;
@@ -38,7 +37,7 @@ void model2_state::debug_commands(const std::vector<std::string> &params)
 		debug_help_command(params);
 }
 
-void model2_state::debug_help_command(const std::vector<std::string> &params)
+void model2_state::debug_help_command(const std::vector<std::string_view> &params)
 {
 	debugger_console &con = machine().debugger().console();
 
@@ -54,7 +53,7 @@ void model2_state::debug_help_command(const std::vector<std::string> &params)
  *
  ****************************************/
 
-void model2_state::debug_geo_dasm_command(const std::vector<std::string> &params)
+void model2_state::debug_geo_dasm_command(const std::vector<std::string_view> &params)
 {
 	debugger_console &con = machine().debugger().console();
 
@@ -70,10 +69,11 @@ void model2_state::debug_geo_dasm_command(const std::vector<std::string> &params
 		return;
 	}
 
-	std::ofstream f(params[1]);
+	std::string fname(params[1]);
+	std::ofstream f(fname);
 	if (!f)
 	{
-		con.printf("Error: while opening %s for writing\n",params[1].c_str());
+		con.printf("Error: while opening %s for writing\n", params[1]);
 		return;
 	}
 
@@ -264,7 +264,7 @@ void model2_state::debug_geo_dasm_command(const std::vector<std::string> &params
  *
  ****************************************/
 
-void model2_state::debug_tri_dump_command(const std::vector<std::string> &params)
+void model2_state::debug_tri_dump_command(const std::vector<std::string_view> &params)
 {
 	debugger_console &con = machine().debugger().console();
 	FILE *f;
@@ -281,9 +281,10 @@ void model2_state::debug_tri_dump_command(const std::vector<std::string> &params
 		return;
 	}
 
-	if((f = fopen( params[1].c_str(), "w" )) == nullptr)
+	std::string filename(params[1]);
+	if((f = fopen( filename.c_str(), "w" )) == nullptr)
 	{
-		con.printf("Error: while opening %s for writing\n",params[1].c_str());
+		con.printf("Error: while opening %s for writing\n", params[1]);
 		return;
 	}
 

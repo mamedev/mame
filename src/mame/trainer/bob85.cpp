@@ -30,6 +30,8 @@ Test Paste:
 #include "bob85.lh"
 
 
+namespace {
+
 class bob85_state : public driver_device
 {
 public:
@@ -46,18 +48,18 @@ public:
 	void bob85(machine_config &config);
 
 private:
-	void io_map(address_map &map);
-	void mem_map(address_map &map);
+	void io_map(address_map &map) ATTR_COLD;
+	void mem_map(address_map &map) ATTR_COLD;
 	uint8_t bob85_keyboard_r();
 	void bob85_7seg_w(offs_t offset, uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(sod_w);
-	DECLARE_READ_LINE_MEMBER(sid_r);
+	void sod_w(int state);
+	int sid_r();
 	TIMER_DEVICE_CALLBACK_MEMBER(kansas_r);
 	uint8_t m_prev_key = 0;
 	uint8_t m_count_key = 0;
 	u16 m_casscnt = 0;
 	bool m_cassold = false, m_cassbit = false;
-	void machine_start() override;
+	void machine_start() override ATTR_COLD;
 	required_device<i8085a_cpu_device> m_maincpu;
 	required_device<cassette_image_device> m_cass;
 	required_ioport m_line0;
@@ -220,12 +222,12 @@ TIMER_DEVICE_CALLBACK_MEMBER( bob85_state::kansas_r )
 	}
 }
 
-WRITE_LINE_MEMBER( bob85_state::sod_w )
+void bob85_state::sod_w(int state)
 {
 	m_cass->output(state ? +1.0 : -1.0);
 }
 
-READ_LINE_MEMBER( bob85_state::sid_r )
+int bob85_state::sid_r()
 {
 	return m_cassbit;
 }
@@ -255,6 +257,9 @@ ROM_START( bob85 )
 	ROM_REGION( 0x0300, "maincpu", 0 )
 	ROM_LOAD( "bob85.rom", 0x0000, 0x0300, BAD_DUMP CRC(adde33a8) SHA1(00f26dd0c52005e7705e6cc9cb11a20e572682c6) ) // should be 6 separate 74S287's (256x4)
 ROM_END
+
+} // anonymous namespace
+
 
 /* Driver */
 

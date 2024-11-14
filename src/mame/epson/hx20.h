@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Curt Coder
-#ifndef MAME_INCLUDES_HX20_H
-#define MAME_INCLUDES_HX20_H
+#ifndef MAME_EPSON_HX20_H
+#define MAME_EPSON_HX20_H
 
 #pragma once
 
@@ -54,8 +54,8 @@ public:
 	void cm6127(machine_config &config);
 
 private:
-	required_device<hd6301v1_cpu_device> m_maincpu;
-	required_device<hd6301v1_cpu_device> m_subcpu;
+	required_device<hd6301_cpu_device> m_maincpu;
+	required_device<hd6301_cpu_device> m_subcpu;
 	required_device<mc146818_device> m_rtc;
 	required_device_array<upd7227_device, 6> m_lcdc;
 	required_device<speaker_sound_device> m_speaker;
@@ -66,7 +66,7 @@ private:
 	required_ioport_array<8> m_ksc_io;
 	required_ioport m_sw6;
 
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 	void hx20_palette(palette_device &palette) const;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
@@ -90,10 +90,10 @@ private:
 	uint8_t slave_p4_r();
 	void slave_p4_w(uint8_t data);
 
-	DECLARE_WRITE_LINE_MEMBER( rtc_irq_w );
+	void rtc_irq_w(int state);
 
-	DECLARE_WRITE_LINE_MEMBER( sio_rx_w ) { m_sio_rx = state; }
-	DECLARE_WRITE_LINE_MEMBER( sio_pin_w ) { m_sio_pin = state; }
+	void sio_rx_w(int state) { m_sio_rx = state; }
+	void sio_pin_w(int state) { m_sio_pin = state; }
 
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( optrom_load );
 	uint8_t optrom_r(offs_t offset);
@@ -118,10 +118,9 @@ private:
 	int m_sio_rx = 0;
 	int m_sio_pin = 0;
 
-	void hx20_mem(address_map &map);
-	void hx20_sub_mem(address_map &map);
-	void cm6032_mem(address_map &map);
-	void cm6127_mem(address_map &map);
+	void hx20_mem(address_map &map) ATTR_COLD;
+	void cm6032_mem(address_map &map) ATTR_COLD;
+	void cm6127_mem(address_map &map) ATTR_COLD;
 };
 
-#endif // MAME_INCLUDES_HX20_H
+#endif // MAME_EPSON_HX20_H

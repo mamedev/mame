@@ -31,6 +31,9 @@ Oxx,yy          = Out port
 #include "machine/z80pio.h"
 #include "machine/z80sio.h"
 
+
+namespace {
+
 #define Z80_TAG         "u45"
 #define Z80DART_0_TAG   "u14"
 #define Z80DART_1_TAG   "u30"
@@ -62,10 +65,10 @@ public:
 	void superslave(machine_config &config);
 
 private:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	void superslave_io(address_map &map);
-	void superslave_mem(address_map &map);
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	void superslave_io(address_map &map) ATTR_COLD;
+	void superslave_mem(address_map &map) ATTR_COLD;
 
 	uint8_t read(offs_t offset);
 	void write(offs_t offset, uint8_t data);
@@ -441,6 +444,7 @@ ROM_START( superslv )
 	ROM_LOAD( "adcs6_slave_v3.2.bin", 0x000, 0x800, CRC(7f39322d) SHA1(2e9621e09378a1bb6fc05317bb58ae7865e52744) )
 ROM_END
 
+} // anonymous namespace
 
 
 //**************************************************************************

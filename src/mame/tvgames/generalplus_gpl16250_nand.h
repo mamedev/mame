@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood
-#ifndef MAME_INCLUDES_GENERALPLUS_GPL16250_NAND_H
-#define MAME_INCLUDES_GENERALPLUS_GPL16250_NAND_H
+#ifndef MAME_TVGAMES_GENERALPLUS_GPL16250_NAND_H
+#define MAME_TVGAMES_GENERALPLUS_GPL16250_NAND_H
 
 #pragma once
 
@@ -38,8 +38,8 @@ public:
 	void nand_kiugames();
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	uint8_t read_nand(offs_t offset);
 	std::vector<uint16_t> m_sdram;
@@ -86,5 +86,5 @@ private:
 };
 
 
-#endif // MAME_INCLUDES_GENERALPLUS_GPL16250_NAND_H
+#endif // MAME_TVGAMES_GENERALPLUS_GPL16250_NAND_H
 

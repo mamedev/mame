@@ -6,8 +6,8 @@
 
 ***************************************************************************/
 
-#ifndef MAME_MACHINE_MB62H195_H
-#define MAME_MACHINE_MB62H195_H
+#ifndef MAME_ROLAND_MB62H195_H
+#define MAME_ROLAND_MB62H195_H
 
 #pragma once
 
@@ -36,9 +36,9 @@ public:
 
 	// CPU read/write handlers (TODO)
 
-	// device-specific overrides
-	virtual void device_resolve_objects() override;
-	virtual void device_start() override;
+protected:
+	// device_t implementation
+	virtual void device_start() override ATTR_COLD;
 
 private:
 	// callback objects
@@ -57,4 +57,4 @@ private:
 // device type declaration
 DECLARE_DEVICE_TYPE(MB62H195, mb62h195_device)
 
-#endif // MAME_MACHINE_MB62H195_H
+#endif // MAME_ROLAND_MB62H195_H

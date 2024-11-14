@@ -27,9 +27,9 @@
 #include "sound/tms5220.h"
 #include "speaker.h"
 
-#define LOG_READYQ (1 << 0)
-#define LOG_READ (1 << 1)
-#define LOG_WRITE (1 << 2)
+#define LOG_READYQ (1U << 1)
+#define LOG_READ   (1U << 2)
+#define LOG_WRITE  (1U << 3)
 
 //#define VERBOSE (LOG_READYQ | LOG_READ | LOG_WRITE)
 #include "logmacro.h"
@@ -60,9 +60,9 @@ public:
 protected:
 	a2bus_echoii_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual void device_start() override;
-	virtual void device_reset() override;
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 	// overrides of standard a2bus slot functions
 	virtual uint8_t read_c0nx(uint8_t offset) override;
@@ -70,8 +70,8 @@ protected:
 	virtual bool take_c800() override;
 
 private:
-	//DECLARE_WRITE_LINE_MEMBER(tms_irq_callback);
-	DECLARE_WRITE_LINE_MEMBER(tms_readyq_callback);
+	//void tms_irq_callback(int state);
+	void tms_readyq_callback(int state);
 	uint8_t m_writelatch_data; // 74ls373 latch
 	bool m_readlatch_flag; // 74c74 1st half
 	bool m_writelatch_flag; // 74c74 2nd half
@@ -140,13 +140,13 @@ void a2bus_echoii_device::device_reset()
 }
 
 /*
-WRITE_LINE_MEMBER(a2bus_echoii_device::tms_irq_callback)
+void a2bus_echoii_device::tms_irq_callback(int state)
 {
     update_irq_to_maincpu();
 }
 */
 
-WRITE_LINE_MEMBER(a2bus_echoii_device::tms_readyq_callback)
+void a2bus_echoii_device::tms_readyq_callback(int state)
 {
 	if (state == ASSERT_LINE)
 	{

@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Bryan McPhail
-#ifndef MAME_INCLUDES_M90_H
-#define MAME_INCLUDES_M90_H
+#ifndef MAME_IREM_M90_H
+#define MAME_IREM_M90_H
 
 #pragma once
 
@@ -64,8 +64,8 @@ private:
 	void m90_video_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	void bootleg_video_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	TILE_GET_INFO_MEMBER(get_tile_info);
-	virtual void machine_start() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 	void common_tilemap_init();
 	DECLARE_VIDEO_START(bomblord);
 	DECLARE_VIDEO_START(dynablsb);
@@ -74,22 +74,22 @@ private:
 	uint32_t screen_update_dynablsb(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(fake_nmi);
 	INTERRUPT_GEN_MEMBER(bomblord_fake_nmi);
-	DECLARE_WRITE_LINE_MEMBER(dynablsb_vblank_int_w);
-	DECLARE_WRITE_LINE_MEMBER(bomblord_vblank_int_w);
+	void dynablsb_vblank_int_w(int state);
+	void bomblord_vblank_int_w(int state);
 	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap,const rectangle &cliprect);
 	void bomblord_draw_sprites(screen_device &screen, bitmap_ind16 &bitmap,const rectangle &cliprect);
 	void dynablsb_draw_sprites(screen_device &screen, bitmap_ind16 &bitmap,const rectangle &cliprect);
-	void bomblord_main_cpu_map(address_map &map);
-	void dynablsb_main_cpu_io_map(address_map &map);
-	void dynablsb_main_cpu_map(address_map &map);
-	void dynablsb_sound_cpu_io_map(address_map &map);
-	void m90_main_cpu_io_map(address_map &map);
-	void m90_main_cpu_map(address_map &map);
-	void m90_sound_cpu_io_map(address_map &map);
-	void m90_sound_cpu_map(address_map &map);
-	void m99_sound_cpu_io_map(address_map &map);
-	void quizf1_main_cpu_io_map(address_map &map);
-	void quizf1_main_cpu_map(address_map &map);
+	void bomblord_main_cpu_map(address_map &map) ATTR_COLD;
+	void dynablsb_main_cpu_io_map(address_map &map) ATTR_COLD;
+	void dynablsb_main_cpu_map(address_map &map) ATTR_COLD;
+	void dynablsb_sound_cpu_io_map(address_map &map) ATTR_COLD;
+	void m90_main_cpu_io_map(address_map &map) ATTR_COLD;
+	void m90_main_cpu_map(address_map &map) ATTR_COLD;
+	void m90_sound_cpu_io_map(address_map &map) ATTR_COLD;
+	void m90_sound_cpu_map(address_map &map) ATTR_COLD;
+	void m99_sound_cpu_io_map(address_map &map) ATTR_COLD;
+	void quizf1_main_cpu_io_map(address_map &map) ATTR_COLD;
+	void quizf1_main_cpu_map(address_map &map) ATTR_COLD;
 };
 
-#endif // MAME_INCLUDES_M90_H
+#endif // MAME_IREM_M90_H

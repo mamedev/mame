@@ -32,6 +32,8 @@
 #include "summit.lh"
 
 
+namespace {
+
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
@@ -52,7 +54,7 @@ public:
 	void summit(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -63,7 +65,7 @@ private:
 
 	output_finder<16> m_lamps;
 
-	void mainmap(address_map &map);
+	void mainmap(address_map &map) ATTR_COLD;
 
 	void sound_w(uint8_t data);
 	void out2_w(uint8_t data);
@@ -435,6 +437,8 @@ ROM_START( pushover )
 	ROM_LOAD( "prom3.bin", 0x800, 0x400, CRC(fe0fb97a) SHA1(05c41988bd1fe18725023a1a67c1b3cae01b2028) )
 	ROM_LOAD( "prom4.bin", 0xc00, 0x400, CRC(ce26b2c4) SHA1(a44b7a05c0c72592fe6083244c785e9ed1149909) )
 ROM_END
+
+} // anonymous namespace
 
 
 //**************************************************************************

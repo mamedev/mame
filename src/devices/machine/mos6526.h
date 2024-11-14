@@ -91,13 +91,13 @@ public:
 	uint8_t pa_r() { return m_pa; }
 	uint8_t pb_r() { return m_pb; }
 
-	DECLARE_READ_LINE_MEMBER( sp_r ) { return m_sp; }
-	DECLARE_WRITE_LINE_MEMBER( sp_w );
-	DECLARE_READ_LINE_MEMBER( cnt_r ) { return m_cnt; }
-	DECLARE_WRITE_LINE_MEMBER( cnt_w );
-	DECLARE_WRITE_LINE_MEMBER( flag_w );
-	DECLARE_READ_LINE_MEMBER( irq_r ) { return m_irq; }
-	DECLARE_WRITE_LINE_MEMBER( tod_w );
+	int sp_r() { return m_sp; }
+	void sp_w(int state);
+	int cnt_r() { return m_cnt; }
+	void cnt_w(int state);
+	void flag_w(int state);
+	int irq_r() { return m_irq; }
+	void tod_w(int state);
 
 protected:
 	enum
@@ -111,8 +111,8 @@ protected:
 	mos6526_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint32_t variant);
 
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 	virtual void execute_run() override;
 
 	TIMER_CALLBACK_MEMBER(advance_tod_clock);

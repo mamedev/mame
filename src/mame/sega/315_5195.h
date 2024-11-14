@@ -6,8 +6,8 @@
 
 ***************************************************************************/
 
-#ifndef MAME_MACHINE_315_5195_H
-#define MAME_MACHINE_315_5195_H
+#ifndef MAME_SEGA_315_5195_H
+#define MAME_SEGA_315_5195_H
 
 #pragma once
 
@@ -68,8 +68,8 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 private:
 	TIMER_CALLBACK_MEMBER(write_to_sound);
@@ -147,4 +147,4 @@ private:
 DECLARE_DEVICE_TYPE(SEGA_315_5195_MEM_MAPPER, sega_315_5195_mapper_device)
 
 
-#endif // MAME_MACHINE_315_5195_H
+#endif // MAME_SEGA_315_5195_H

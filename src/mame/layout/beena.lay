@@ -1,0 +1,127 @@
+<?xml version="1.0"?>
+<!--
+license:CC0-1.0
+-->
+<mamelayout version="2">
+	<element name="pencursor">
+		<image state="1">
+			<data><![CDATA[
+				<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="1" height="1" viewBox="0 0 1 1">
+					<g fill="none" stroke="#2222cc" stroke-width="0.06" stroke-opacity="1">
+						<circle cx="0.5" cy="0.5" r="0.1" />
+						<circle cx="0.5" cy="0.5" r="0.47" />
+						<line x1="0.03" y1="0.5" x2="0.4" y2="0.5" />
+						<line x1="0.6" y1="0.5" x2="0.97" y2="0.5" />
+						<line x1="0.5" y1="0.03" x2="0.5" y2="0.4" />
+						<line x1="0.5" y1="0.6" x2="0.5" y2="0.97" />
+						<line />
+					</g>
+				</svg>
+			]]></data>
+		</image>
+	</element>
+
+	<element name="leftpage">
+		<!-- force maximum state -->
+		<rect state="0"><color alpha="0" /></rect>
+		<rect state="6"><color alpha="0" /></rect>
+	</element>
+	<element name="rightpage">
+		<!-- force maximum state -->
+		<rect state="0"><color alpha="0" /></rect>
+		<rect state="6"><color alpha="0" /></rect>
+	</element>
+
+	<view name="Default View">
+		<screen index="0">
+			<bounds x="0" y="0" width="4" height="3" />
+		</screen>
+
+		<element id="leftpage" ref="leftpage">
+			<bounds x="0" y="3.1" width="2" height="2.8" />
+		</element>
+		<element id="rightpage" ref="rightpage">
+			<bounds x="2" y="3.1" width="2" height="2.8" />
+		</element>
+
+		<element id="pencursor" ref="pencursor">
+			<!-- will be positioned by script -->
+			<bounds x="0" y="3.1" width="0.2" height="0.2" />
+			<color alpha="0.7" />
+		</element>
+	</view>
+
+	<script><![CDATA[
+		file:set_resolve_tags_callback(
+				function ()
+					-- get memory regions for page scans
+					local pages = { }
+					for i = 1, 12 do
+						local page = file.device:memregion(string.format('cartslot:page%u', i))
+						if page ~= nil then
+							pages[i] = page
+						else
+							break
+						end
+					end
+
+					-- left/right page items are needed on-the-fly
+					local leftpage = file.views['Default View'].items['leftpage']
+					local rightpage = file.views['Default View'].items['rightpage']
+
+					-- recompute target pen cursor size and area when necessary
+					local curxoffs, curyoffs, curxscale, curyscale, curwidth, curheight
+					file.views['Default View']:set_recomputed_callback(
+							function ()
+								local lbounds = leftpage.bounds
+								local rbounds = rightpage.bounds
+								curwidth = lbounds.width / 10
+								curheight = lbounds.height / 14
+								curxoffs = lbounds.x0 - (curwidth * 0.5)
+								curyoffs = lbounds.y0 - (curheight * 0.5)
+								curxscale = (rbounds.x1 - lbounds.x0) / 255
+								curyscale = lbounds.height / 255
+							end)
+
+					-- make page display respond to page selection input
+					local pagectrl = file.device:ioport('PAGE')
+					local function get_page() return pagectrl:read() end
+					leftpage:set_element_state_callback(get_page)
+					rightpage:set_element_state_callback(get_page)
+
+					-- render even pages on the left, odd pages on the right
+					local function draw_page(n, dest)
+						local page = pages[n]
+						if page ~= nil then
+							-- TODO: reduce temporary memory usage when I/O classes are exposed to Lua
+							local data = page:read(0, page.size)
+							local image = emu.bitmap_argb32.load(data)
+							image:resample(dest)
+						end
+					end
+					file.elements['leftpage']:set_draw_callback(
+							function (state, bitmap)
+								draw_page(state * 2, bitmap)
+							end)
+					file.elements['rightpage']:set_draw_callback(
+							function (state, bitmap)
+								draw_page((state * 2) + 1, bitmap)
+							end)
+
+					-- animate the position of the pen cursor
+					local penctrl = file.device:ioport('PEN_LEFT')
+					local penx = file.device:ioport('PENX')
+					local peny = file.device:ioport('PENY')
+					file.views['Default View'].items['pencursor']:set_element_state_callback(
+							function ()
+								return (penctrl:read() & 2) >> 1
+							end)
+					file.views['Default View'].items['pencursor']:set_bounds_callback(
+							function ()
+								local x = curxoffs + (penx:read() * curxscale)
+								local y = curyoffs + (peny:read() * curyscale)
+								return emu.render_bounds(x, y, x + curwidth, y + curheight)
+							end)
+				end)
+	]]></script>
+</mamelayout>

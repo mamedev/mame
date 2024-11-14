@@ -17,11 +17,12 @@ class filter_volume_device : public device_t, public device_sound_interface
 public:
 	filter_volume_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
-	void flt_volume_set_volume(float volume);
+	filter_volume_device &set_gain(float gain); // also may be used in mcfg to set initial value (default is 1.0)
+	float gain() { return m_gain; }
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 	// sound stream update overrides
 	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;

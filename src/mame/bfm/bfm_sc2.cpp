@@ -193,6 +193,19 @@ Adder hardware:
 #include "sc2heypr.lh"
 #include "sc2prem2.lh"
 
+// log serial communication between mainboard (scorpion2) and videoboard (adder2)
+#define LOG_UART   (1U << 1)
+
+#ifdef MAME_DEBUG
+#define VERBOSE (LOG_GENERAL | LOG_UART)
+#else
+#define VERBOSE 0
+#endif
+
+#include "logmacro.h"
+
+
+namespace {
 
 class bfm_sc2_state : public driver_device
 {
@@ -215,7 +228,7 @@ public:
 
 protected:
 	void e2ram_init(nvram_device &nvram, void *data, size_t size);
-	DECLARE_WRITE_LINE_MEMBER(bfmdm01_busy);
+	void bfmdm01_busy(int state);
 	void bankswitch_w(uint8_t data);
 	void mmtr_w(uint8_t data);
 	void mux_output_w(offs_t offset, uint8_t data);
@@ -224,6 +237,7 @@ protected:
 	void dimas_w(uint8_t data);
 	void dimcnt_w(uint8_t data);
 	void unknown_w(uint8_t data);
+	void update_volume();
 	void volume_override_w(uint8_t data);
 	void expansion_latch_w(uint8_t data);
 	uint8_t expansion_latch_r();
@@ -246,17 +260,17 @@ protected:
 	void uart2data_w(uint8_t data);
 	uint8_t key_r(offs_t offset);
 	void vfd1_bd1_w(uint8_t data);
-	void vfd2_data_w(uint8_t data);
+	[[maybe_unused]] void vfd2_data_w(uint8_t data);
 	void e2ram_w(uint8_t data);
 	uint8_t direct_input_r();
 	int recdata(int changed, int data);
 	void nec_reset_w(uint8_t data);
 	void nec_latch_w(uint8_t data);
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 	INTERRUPT_GEN_MEMBER(timer_irq);
 	void on_scorpion2_reset();
 	void Scorpion2_SetSwitchState(int strobe, int data, int state);
-	int Scorpion2_GetSwitchState(int strobe, int data);
+	[[maybe_unused]] int Scorpion2_GetSwitchState(int strobe, int data);
 	void e2ram_reset();
 	int recAck(int changed, int data);
 	int read_e2ram();
@@ -268,7 +282,7 @@ protected:
 	void _3meters(machine_config &config);
 	void _5meters(machine_config &config);
 	void _8meters(machine_config &config);
-	void sc2_basemap(address_map &map);
+	void sc2_basemap(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<upd7759_device> m_upd7759;
@@ -341,12 +355,12 @@ public:
 	void scorpion2_vidm(machine_config &config);
 
 protected:
-	virtual void machine_reset() override;
+	virtual void machine_reset() override ATTR_COLD;
 
 	void reel12_vid_w(uint8_t data);
 	uint8_t vfd_status_hop_r();
 
-	void memmap_vid(address_map &map);
+	void memmap_vid(address_map &map) ATTR_COLD;
 };
 
 
@@ -362,7 +376,7 @@ public:
 	void init_drwho();
 
 protected:
-	template <unsigned N> DECLARE_WRITE_LINE_MEMBER(reel_optic_cb) { if (state) m_optic_pattern |= (1 << N); else m_optic_pattern &= ~(1 << N); }
+	template <unsigned N> void reel_optic_cb(int state) { if (state) m_optic_pattern |= (1 << N); else m_optic_pattern &= ~(1 << N); }
 	void reel12_w(uint8_t data);
 	void reel34_w(uint8_t data);
 	void reel56_w(uint8_t data);
@@ -373,7 +387,7 @@ protected:
 	void sc2awp_common_init(int reels, int decrypt);
 	void sc2awpdmd_common_init(int reels, int decrypt);
 
-	void memmap_no_vid(address_map &map);
+	void memmap_no_vid(address_map &map) ATTR_COLD;
 
 	optional_device<bfm_dm01_device> m_dm01;
 	optional_device_array<stepper_device, 6> m_reel;
@@ -397,7 +411,7 @@ public:
 	void scorpion2(machine_config &config);
 
 protected:
-	virtual void machine_reset() override;
+	virtual void machine_reset() override ATTR_COLD;
 };
 
 
@@ -415,24 +429,13 @@ public:
 	void scorpion2_dm01_3m(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	void vfd1_dmd_w(uint8_t data);
 	void dmd_reset_w(uint8_t data);
 };
 
-
-#ifdef MAME_DEBUG
-#define VERBOSE 1
-#else
-#define VERBOSE 0
-#endif
-
-// log serial communication between mainboard (scorpion2) and videoboard (adder2)
-#define LOG_SERIAL(x) do { if (VERBOSE) logerror x; } while (0)
-#define UART_LOG(x) do { if (VERBOSE) logerror x; } while (0)
-#define LOG(x) do { if (VERBOSE) logerror x; } while (0)
 
 #define MASTER_CLOCK        (XTAL(8'000'000))
 
@@ -698,23 +701,20 @@ void bfm_sc2_state::mmtr_w(uint8_t data)
 void bfm_sc2_state::mux_output_w(offs_t offset, uint8_t data)
 {
 	// this is a useful profiler point to make sure the artwork writes / lookups are performing properly.
-	g_profiler.start(PROFILER_USER6);
+	auto profile = g_profiler.start(PROFILER_USER6);
 
-	int i;
-	int off = offset<<3;
+	int const off = offset<<3;
 
-	for (i = 0; i < 8; i++)
+	for (int i = 0; i < 8; i++)
 	{
-		int oldbit = BIT(m_lamps_old[offset], i);
-		int newbit = BIT(data, i);
+		int const oldbit = BIT(m_lamps_old[offset], i);
+		int const newbit = BIT(data, i);
 
 		if (oldbit != newbit)
 			m_lamps[off + i] = newbit;
 	}
 
 	m_lamps_old[offset] = data;
-
-	g_profiler.stop();
 }
 
 ///////////////////////////////////////////////////////////////////////////
@@ -769,6 +769,22 @@ void bfm_sc2_state::unknown_w(uint8_t data)
 
 ///////////////////////////////////////////////////////////////////////////
 
+void bfm_sc2_state::update_volume()
+{
+	float percent = m_volume_override ? 1.0f : (64 - m_global_volume) / 64.0f;
+
+	if (m_ym2413)
+	{
+		m_ym2413->set_output_gain(0, percent);
+		m_ym2413->set_output_gain(1, percent);
+	}
+
+	if (m_upd7759)
+	{
+		m_upd7759->set_output_gain(0, percent);
+	}
+}
+
 void bfm_sc2_state::volume_override_w(uint8_t data)
 {
 	int old = m_volume_override;
@@ -777,16 +793,7 @@ void bfm_sc2_state::volume_override_w(uint8_t data)
 
 	if ( old != m_volume_override )
 	{
-		ym2413_device *ym = m_ym2413;
-
-		if (!m_ym2413)
-			return;
-
-		float percent = m_volume_override? 1.0f : (32-m_global_volume)/32.0f;
-
-		ym->set_output_gain(0, percent);
-		ym->set_output_gain(1, percent);
-		m_upd7759->set_output_gain(0, percent);
+		update_volume();
 	}
 }
 
@@ -794,8 +801,7 @@ void bfm_sc2_state::volume_override_w(uint8_t data)
 
 void bfm_sc2_state::nec_reset_w(uint8_t data)
 {
-	m_upd7759->start_w(0);
-	m_upd7759->reset_w(data != 0);
+	m_upd7759->reset_w(BIT(data, 0));
 }
 
 ///////////////////////////////////////////////////////////////////////////
@@ -809,7 +815,7 @@ void bfm_sc2_state::nec_latch_w(uint8_t data)
 
 	m_upd7759->set_rom_bank(bank);
 
-	m_upd7759->port_w(data & 0x3f);    // setup sample
+	m_upd7759->port_w(data & 0x7f);    // setup sample
 	m_upd7759->start_w(0);
 	m_upd7759->start_w(1);
 }
@@ -875,19 +881,7 @@ void bfm_sc2_state::expansion_latch_w(uint8_t data)
 			{
 				if ( m_global_volume > 0  ) m_global_volume--;
 			}
-
-			{
-				ym2413_device *ym = m_ym2413;
-
-				if (m_ym2413)
-				{
-					float percent = m_volume_override ? 1.0f : (32 - m_global_volume) / 32.0f;
-
-					ym->set_output_gain(0, percent);
-					ym->set_output_gain(1, percent);
-					m_upd7759->set_output_gain(0, percent);
-				}
-			}
+			update_volume();
 		}
 	}
 }
@@ -1067,7 +1061,7 @@ uint8_t bfm_sc2_state::uart1data_r()
 
 void bfm_sc2_state::uart1ctrl_w(uint8_t data)
 {
-	UART_LOG(("uart1ctrl:%x\n", data));
+	LOGMASKED(LOG_UART, "uart1ctrl:%x\n", data);
 }
 ///////////////////////////////////////////////////////////////////////////
 
@@ -1075,7 +1069,7 @@ void bfm_sc2_state::uart1data_w(uint8_t data)
 {
 	m_data_to_uart2 = 1;
 	m_uart1_data    = data;
-	UART_LOG(("uart1:%x\n", data));
+	LOGMASKED(LOG_UART, "uart1:%x\n", data);
 }
 ///////////////////////////////////////////////////////////////////////////
 
@@ -1099,7 +1093,7 @@ uint8_t bfm_sc2_state::uart2data_r()
 
 void bfm_sc2_state::uart2ctrl_w(uint8_t data)
 {
-	UART_LOG(("uart2ctrl:%x\n", data));
+	LOGMASKED(LOG_UART, "uart2ctrl:%x\n", data);
 }
 
 ///////////////////////////////////////////////////////////////////////////
@@ -1108,7 +1102,7 @@ void bfm_sc2_state::uart2data_w(uint8_t data)
 {
 	m_data_to_uart1 = 1;
 	m_uart2_data    = data;
-	UART_LOG(("uart2:%x\n", data));
+	LOGMASKED(LOG_UART, "uart2:%x\n", data);
 }
 
 
@@ -1175,7 +1169,7 @@ int bfm_sc2_state::recdata(int changed, int data)
 
 			m_e2data_to_read <<= 1;
 
-			LOG(("e2d pin= %d\n", m_e2data_pin));
+			LOG("e2d pin= %d\n", m_e2data_pin);
 
 			m_e2cnt++;
 			if ( m_e2cnt >= 8 )
@@ -1263,7 +1257,7 @@ void bfm_sc2_state::e2ram_w(uint8_t data)
 			{   // X24C08 Start condition (1->0 on SDA while SCL=1)
 				m_e2dummywrite = ( m_e2state == 5 );
 
-				LOG(("e2ram:   c:%d d:%d Start condition dummywrite=%d\n", (data & SCL)?1:0, (data&SDA)?1:0, m_e2dummywrite ));
+				LOG("e2ram:   c:%d d:%d Start condition dummywrite=%d\n", (data & SCL)?1:0, (data&SDA)?1:0, m_e2dummywrite);
 
 				m_e2state = 1; // ready for commands
 				m_e2cnt   = 0;
@@ -1275,7 +1269,7 @@ void bfm_sc2_state::e2ram_w(uint8_t data)
 				( !(changed & SCL) && (data & SCL) )     // SCL=1 and not changed
 				)
 			{   // X24C08 Stop condition (0->1 on SDA while SCL=1)
-				LOG(("e2ram:   c:%d d:%d Stop condition\n", (data & SCL)?1:0, (data&SDA)?1:0 ));
+				LOG("e2ram:   c:%d d:%d Stop condition\n", (data & SCL)?1:0, (data&SDA)?1:0);
 				m_e2state = 0;
 				m_e2data  = 0;
 				break;
@@ -1291,8 +1285,8 @@ void bfm_sc2_state::e2ram_w(uint8_t data)
 						m_e2cnt   = 0;
 						m_e2rw    = m_e2data & 1;
 
-						LOG(("e2ram: Slave address received !!  device id=%01X device adr=%01d high order adr %0X RW=%d) %02X\n",
-							m_e2data>>4, (m_e2data & 0x08)?1:0, (m_e2data>>1) & 0x03, m_e2rw , m_e2data ));
+						LOG("e2ram: Slave address received !!  device id=%01X device adr=%01d high order adr %0X RW=%d) %02X\n",
+							m_e2data>>4, (m_e2data & 0x08)?1:0, (m_e2data>>1) & 0x03, m_e2rw , m_e2data);
 
 						m_e2state = 2;
 					}
@@ -1307,12 +1301,12 @@ void bfm_sc2_state::e2ram_w(uint8_t data)
 
 						if ( ack < 0 )
 						{
-							LOG(("ACK = 0\n"));
+							LOG("ACK = 0\n");
 							m_e2state = 0;
 						}
 						else
 						{
-							LOG(("ACK = 1\n"));
+							LOG("ACK = 1\n");
 							if ( m_e2dummywrite )
 							{
 								m_e2dummywrite = 0;
@@ -1330,14 +1324,14 @@ void bfm_sc2_state::e2ram_w(uint8_t data)
 							switch ( m_e2state )
 							{
 								case 7:
-									LOG(("read address %04X\n",m_e2address));
+									LOG("read address %04X\n",m_e2address);
 									m_e2data_to_read = m_e2ram[m_e2address];
 									break;
 								case 3:
-									LOG(("write, awaiting address\n"));
+									LOG("write, awaiting address\n");
 									break;
 								default:
-									LOG(("?unknow action %04X\n",m_e2address));
+									LOG("?unknow action %04X\n",m_e2address);
 									break;
 							}
 						}
@@ -1352,7 +1346,7 @@ void bfm_sc2_state::e2ram_w(uint8_t data)
 						m_e2data_pin = 0;
 						m_e2address = (m_e2address & 0xFF00) | m_e2data;
 
-						LOG(("write address = %04X waiting for ACK\n", m_e2address));
+						LOG("write address = %04X waiting for ACK\n", m_e2address);
 						m_e2state = 4;
 						m_e2cnt   = 0;
 						m_e2data  = 0;
@@ -1369,12 +1363,12 @@ void bfm_sc2_state::e2ram_w(uint8_t data)
 						if ( ack < 0 )
 						{
 							m_e2state = 0;
-							LOG(("ACK = 0, cancel write\n" ));
+							LOG("ACK = 0, cancel write\n");
 						}
 						else
 						{
 							m_e2state = 5;
-							LOG(("ACK = 1, awaiting data to write\n" ));
+							LOG("ACK = 1, awaiting data to write\n");
 						}
 					}
 					break;
@@ -1382,7 +1376,7 @@ void bfm_sc2_state::e2ram_w(uint8_t data)
 				case 5: // receive data to write
 					if ( recdata(changed, data) )
 					{
-						LOG(("write data = %02X received, awaiting ACK\n", m_e2data));
+						LOG("write data = %02X received, awaiting ACK\n", m_e2data);
 						m_e2cnt   = 0;
 						m_e2state = 6;  // wait ack
 					}
@@ -1396,11 +1390,11 @@ void bfm_sc2_state::e2ram_w(uint8_t data)
 						if ( ack < 0 )
 						{
 							m_e2state = 0;
-							LOG(("ACK=0, write canceled\n"));
+							LOG("ACK=0, write canceled\n");
 						}
 						else
 						{
-							LOG(("ACK=1, writing %02X to %04X\n", m_e2data, m_e2address));
+							LOG("ACK=1, writing %02X to %04X\n", m_e2data, m_e2address);
 
 							m_e2ram[m_e2address] = m_e2data;
 
@@ -1417,7 +1411,7 @@ void bfm_sc2_state::e2ram_w(uint8_t data)
 					{
 						//m_e2data_pin = 0;
 
-						LOG(("address read, data = %02X waiting for ACK\n", m_e2data ));
+						LOG("address read, data = %02X waiting for ACK\n", m_e2data);
 
 						m_e2state = 8;
 					}
@@ -1433,7 +1427,7 @@ void bfm_sc2_state::e2ram_w(uint8_t data)
 
 						m_e2data_to_read = m_e2ram[m_e2address];
 
-						LOG(("ready for next address %04X\n", m_e2address));
+						LOG("ready for next address %04X\n", m_e2address);
 
 						m_e2cnt   = 0;
 						m_e2data  = 0;
@@ -1442,7 +1436,7 @@ void bfm_sc2_state::e2ram_w(uint8_t data)
 
 				case 0:
 
-					LOG(("e2ram: ? c:%d d:%d\n", (data & SCL)?1:0, (data&SDA)?1:0 ));
+					LOG("e2ram: ? c:%d d:%d\n", (data & SCL)?1:0, (data&SDA)?1:0);
 					break;
 			}
 			break;
@@ -1452,7 +1446,7 @@ void bfm_sc2_state::e2ram_w(uint8_t data)
 
 int bfm_sc2_state::read_e2ram()
 {
-	LOG(("e2ram: r %d (%02X) \n", m_e2data_pin, m_e2data_to_read ));
+	LOG("e2ram: r %d (%02X) \n", m_e2data_pin, m_e2data_to_read);
 
 	return m_e2data_pin;
 }
@@ -2677,21 +2671,54 @@ ROM_END
 
 // ROM definition Belgian Slots (Token pay per round) Payslide ////////////
 
+/*
+PR6496V2
+BELGIUM SLOTS GAME 95 750 943 TYPE TOKEN PAYOUT VER. (no more information)
+BELGIUM SLOTS TPO 95 770 121 PROG.
+BELGIUM SLOTS TPO 95 770 122 CHAR.
+BELGIUM SLOTS TPO 95 001 029 SOUND.
+*/
+
 ROM_START( sltblgtk )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD("95750943.bin", 0x00000, 0x10000, CRC(c9fb8153) SHA1(7c1d0660c15f05b1e0784d8322c62981fe8dc4c9))
+	ROM_LOAD("95750943.gam", 0x00000, 0x10000, CRC(c9fb8153) SHA1(7c1d0660c15f05b1e0784d8322c62981fe8dc4c9))
 
 	ROM_REGION( 0x20000, "adder2:cpu", 0 )
-	ROM_LOAD("adder121.bin", 0x00000, 0x20000, CRC(cedbbf28) SHA1(559ae341b55462feea771127394a54fc65266818))
+	ROM_LOAD("95770121.prg", 0x00000, 0x20000, CRC(cedbbf28) SHA1(559ae341b55462feea771127394a54fc65266818))
 
 	ROM_REGION( 0x20000, "upd", 0 )
-	ROM_LOAD("sound029.bin", 0x00000, 0x20000, CRC(7749c724) SHA1(a87cce0c99e392f501bba44b3936a7059d682c9c))
+	ROM_LOAD("95001029.snd", 0x00000, 0x20000, CRC(7749c724) SHA1(a87cce0c99e392f501bba44b3936a7059d682c9c))
 
 	ROM_REGION( 0x40000, "adder2:tiles", ROMREGION_ERASEFF )
-	ROM_LOAD("chr122.bin",   0x00000, 0x20000, CRC(a1e3bdf4) SHA1(f0cabe08dee028e2014cbf0fc3fe0806cdfa60c6))
+	ROM_LOAD("95770122.chr", 0x00000, 0x20000, CRC(a1e3bdf4) SHA1(f0cabe08dee028e2014cbf0fc3fe0806cdfa60c6))
 
 	ROM_REGION( 0x10, "proms", 0 )
-	ROM_LOAD("stsbtpal.bin", 0, 8 , CRC(20e13635) SHA1(5aa7e7cac8c00ebc193d63d0c6795904f42c70fa))
+	ROM_LOAD("95790017.pal", 0, 8 , CRC(20e13635) SHA1(5aa7e7cac8c00ebc193d63d0c6795904f42c70fa))
+ROM_END
+
+/*
+PR6496V1
+BELGIUM SLOTS GAME 95 750 452 TYPE TOKEN PAYOUT VER. BSLT 1.3 B.F.M
+BELGIUM SLOTS TPO 95 770 065 PROG.
+BELGIUM SLOTS TPO 95 770 066 CHAR.
+BELGIUM SLOTS TPO 95 001 029 SOUND.
+*/
+
+ROM_START( sltblgtka )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD("95750452.gam", 0x00000, 0x10000, CRC(5637591d) SHA1(e5ce1e9a06bec7a9c9d1417f61a60bb3d97f4c7d))
+
+	ROM_REGION( 0x20000, "adder2:cpu", 0 )
+	ROM_LOAD("95770065.prg", 0x00000, 0x20000, CRC(28997756) SHA1(9fc0922be20d7dfbc7f5c831b045607e53de0c2a))
+
+	ROM_REGION( 0x20000, "upd", 0 )
+	ROM_LOAD("95001029.snd", 0x00000, 0x20000, CRC(7749c724) SHA1(a87cce0c99e392f501bba44b3936a7059d682c9c))
+
+	ROM_REGION( 0x40000, "adder2:tiles", ROMREGION_ERASEFF )
+	ROM_LOAD("95770066.chr", 0x00000, 0x20000, CRC(a0a3a2dd) SHA1(54f1c0233d5d1b43283c427813195b32a182ec6e))
+
+	ROM_REGION( 0x10, "proms", 0 )
+	ROM_LOAD("95790017.pal", 0, 8 , CRC(20e13635) SHA1(5aa7e7cac8c00ebc193d63d0c6795904f42c70fa))
 ROM_END
 
 // ROM definition Belgian Slots (Cash Payout) /////////////////////////////
@@ -2786,7 +2813,7 @@ void bfm_sc2_state::sc3_expansion_w(offs_t offset, uint8_t data)
 }
 #endif
 
-WRITE_LINE_MEMBER(bfm_sc2_state::bfmdm01_busy)
+void bfm_sc2_state::bfmdm01_busy(int state)
 {
 	Scorpion2_SetSwitchState(4,4, state?0:1);
 }
@@ -5270,6 +5297,9 @@ ROM_END
 ROM_START( sc2majes )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "majestic.p1", 0x0000, 0x010000, CRC(37289a5f) SHA1(a9d86ed16fc2ff2b83b60e48a1704b4e189c3ac7) )
+
+	ROM_REGION( 0x80000, "upd", 0 )
+	ROM_LOAD( "majesticsnd.bin", 0x0000, 0x080000, CRC(3ee3fee3) SHA1(6a5e72e8a808d870a84a0e3523eebfadfab6d5df) )
 
 
 	sc2_plds
@@ -8560,11 +8590,12 @@ ROM_START( sc2cvega4p )
 	sc2_plds
 ROM_END
 
+} // anonymous namespace
 
 
 /* Video Based (Adder 2) */
 
-#define GAME_FLAGS MACHINE_SUPPORTS_SAVE|MACHINE_REQUIRES_ARTWORK|MACHINE_NOT_WORKING|MACHINE_MECHANICAL|MACHINE_CLICKABLE_ARTWORK
+#define GAME_FLAGS MACHINE_SUPPORTS_SAVE|MACHINE_REQUIRES_ARTWORK|MACHINE_NOT_WORKING|MACHINE_MECHANICAL
 
 GAMEL( 1993, quintoon,    0,        scorpion2_vidm, quintoon, bfm_sc2_vid_state,  init_quintoon,    0, "BFM",      "Quintoon (UK, Game Card 95-750-206)",          MACHINE_SUPPORTS_SAVE|MACHINE_IMPERFECT_SOUND,layout_quintoon ) //Current samples need verification
 GAMEL( 1993, quintond,    quintoon, scorpion2_vidm, quintoon, bfm_sc2_vid_state,  init_quintoon,    0, "BFM",      "Quintoon (UK, Game Card 95-751-206, Datapak)", MACHINE_SUPPORTS_SAVE|MACHINE_IMPERFECT_SOUND|MACHINE_NOT_WORKING,layout_quintoon ) //Current samples need verification
@@ -8582,6 +8613,7 @@ GAMEL( 1996, pyramid,     0,        scorpion2_vid,  pyramid,  bfm_sc2_vid_state,
 GAMEL( 1995, slotsnl,     0,        scorpion2_vid,  slotsnl,  bfm_sc2_vid_state,  init_adder_dutch, 0, "BFM/ELAM", "Slots (Dutch, Game Card 95-750-368)",          MACHINE_SUPPORTS_SAVE,layout_slots )
 
 GAMEL( 1996, sltblgtk,    0,        scorpion2_vid,  sltblgtk, bfm_sc2_vid_state,  init_sltsbelg,    0, "BFM/ELAM", "Slots (Belgian Token, Game Card 95-750-943)",  MACHINE_SUPPORTS_SAVE,layout_sltblgtk )
+GAMEL( 1996, sltblgtka,   sltblgtk, scorpion2_vid,  sltblgtk, bfm_sc2_vid_state,  init_sltsbelg,    0, "BFM/ELAM", "Slots (Belgian Token, Game Card 95-750-452)",  MACHINE_SUPPORTS_SAVE,layout_sltblgtk )
 
 GAMEL( 1996, sltblgpo,    0,        scorpion2_vid,  sltblgpo, bfm_sc2_vid_state,  init_sltsbelg,    0, "BFM/ELAM", "Slots (Belgian Cash, Game Card 95-750-938)",   MACHINE_SUPPORTS_SAVE,layout_sltblgpo )
 GAMEL( 1996, sltblgp1,    sltblgpo, scorpion2_vid,  sltblgpo, bfm_sc2_vid_state,  init_sltsbelg,    0, "BFM/ELAM", "Slots (Belgian Cash, Game Card 95-752-008)",   MACHINE_SUPPORTS_SAVE,layout_sltblgpo )

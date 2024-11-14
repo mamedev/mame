@@ -79,6 +79,8 @@ Dumped 06/15/2000
 #include "speaker.h"
 
 
+namespace {
+
 class srmp6_state : public driver_device
 {
 public:
@@ -99,8 +101,8 @@ public:
 	void srmp6(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 	virtual void device_post_load() override { m_gfxdecode->gfx(0)->mark_all_dirty(); }
 
 private:
@@ -137,7 +139,7 @@ private:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 	required_device<buffered_spriteram16_device> m_sprram;
-	void srmp6_map(address_map &map);
+	void srmp6_map(address_map &map) ATTR_COLD;
 };
 
 #define VERBOSE 0
@@ -735,6 +737,7 @@ ROM_START( srmp6 )
 	ROM_LOAD16_WORD_SWAP( "sx011-01.22", 0x1c00000, 0x0400000, CRC(785409d1) SHA1(3e31254452a30d929161a1ea3a3daa69de058364) ) // CHR07
 ROM_END
 
+} // anonymous namespace
 
 
 /***************************************************************************

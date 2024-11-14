@@ -35,9 +35,9 @@
 #include "emu.h"
 #include "st2xxx.h"
 
-#define LOG_IRQ (1 << 1U)
-#define LOG_BT (1 << 2U)
-#define LOG_LCDC (1 << 3U)
+#define LOG_IRQ  (1U << 1)
+#define LOG_BT   (1U << 2)
+#define LOG_LCDC (1U << 3)
 #define VERBOSE LOG_IRQ
 //#define VERBOSE (LOG_IRQ | LOG_BT | LOG_LCDC)
 #include "logmacro.h"
@@ -45,7 +45,7 @@
 st2xxx_device::st2xxx_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, address_map_constructor internal_map, int data_bits, bool has_banked_ram)
 	: w65c02s_device(mconfig, type, tag, owner, clock)
 	, m_data_config("data", ENDIANNESS_LITTLE, 8, data_bits, 0)
-	, m_in_port_cb(*this)
+	, m_in_port_cb(*this, 0xff)
 	, m_out_port_cb(*this)
 	, m_prr_mask(data_bits <= 14 ? 0 : ((u16(1) << (data_bits - 14)) - 1) | (has_banked_ram ? 0x8000 : 0))
 	, m_drr_mask(data_bits <= 15 ? 0 : ((u16(1) << (data_bits - 15)) - 1) | (has_banked_ram ? 0x8000 : 0))
@@ -96,12 +96,6 @@ device_memory_interface::space_config_vector st2xxx_device::memory_space_config(
 		std::make_pair(AS_PROGRAM, &program_config),
 		std::make_pair(AS_DATA, &m_data_config)
 	};
-}
-
-void st2xxx_device::device_resolve_objects()
-{
-	m_in_port_cb.resolve_all_safe(0xff);
-	m_out_port_cb.resolve_all_safe();
 }
 
 TIMER_CALLBACK_MEMBER(st2xxx_device::bt_interrupt)

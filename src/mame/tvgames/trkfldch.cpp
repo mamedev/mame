@@ -2,6 +2,13 @@
 // copyright-holders:David Haywood
 /*
 
+The lexitvsprt contains "W55V9x" strings, which appear to identify the tech used here as the following
+Nuvoton product
+http://e-tech.com.hk/pd_nuvo_at_game.html
+
+
+---
+
 Track & Field Challenge TV Game
 https://www.youtube.com/watch?v=wjn1lLylqog
 
@@ -18,7 +25,7 @@ DDR & TF PCBs look identical, all the parts are in the same place, the traces ar
 Some of m_unkregs must retain value (or return certain things) or RAM containing vectors gets blanked and game crashes.
 The G65816 code on these is VERY ugly and difficult to follow, many redundant statements, excessive mode switching, accessing things via pointers to pointers etc.
 
-One of the vectors points to 0x6000, there is nothing mapped there, could it be a small internal ROM or some debug trap for development?
+One of the vectors points to 0x6000, there is nothing mapped there, could it be a small internal ROM (sound related?) or some debug trap for development?
 
 
 ---
@@ -29,6 +36,20 @@ Mountain Bike Rally uses scrolling / split (helps confirm the same row skip logi
 Turn and Whack (cards) game runs far too quickly (might show us where timer config is)
 The Power Game game also appears to run far too quickly
 Territory Pursuit uses y-flipped sprites
+
+The code to play/request a sample from ROM is at 0D:FB7B
+It is called after pushing 3 words onto the stack containing the sample address
+
+eg.
+05:85B6: pea $0000
+05:85B9: pea $0005
+05:85BC: pea $f8bc
+05:85BF: jsl $0dfb7b    --- play sample
+
+Samples appear to be terminated with 0x8000
+
+The game also has some terrible PSG-like music, is this coming from a secondary MCU as there is an additional glob on
+each of the units using the tech, and the audio quality varies significantly.
 
 */
 
@@ -41,6 +62,8 @@ Territory Pursuit uses y-flipped sprites
 #include "speaker.h"
 #include "machine/timer.h"
 
+
+namespace {
 
 class trkfldch_state : public driver_device
 {
@@ -58,12 +81,15 @@ public:
 	{ }
 
 	void trkfldch(machine_config &config);
-	void vectors_map(address_map &map);
+	void vectors_map(address_map &map) ATTR_COLD;
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
+
+	virtual uint8_t unkregs_r(offs_t offset);
+	virtual void unkregs_w(offs_t offset, uint8_t data);
 
 private:
 
@@ -80,7 +106,7 @@ private:
 	void render_text_tile_layer(screen_device& screen, bitmap_ind16& bitmap, const rectangle& cliprect, uint16_t base);
 	void render_tile_layer(screen_device& screen, bitmap_ind16& bitmap, const rectangle& cliprect, int which);
 	uint32_t screen_update_trkfldch(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void trkfldch_map(address_map &map);
+	void trkfldch_map(address_map &map) ATTR_COLD;
 
 	uint8_t read_vector(offs_t offset);
 
@@ -120,15 +146,36 @@ private:
 
 	uint8_t m_unkregs[0x90]{};
 
-	uint8_t unkregs_r(offs_t offset);
-	void unkregs_w(offs_t offset, uint8_t data);
-
 	uint8_t m_tmapscroll_window[2][0x12]{};
 
 	uint8_t m_unkdata[0x100000]{};
 	int m_unkdata_addr = 0;
 
 };
+
+class trkfldch_lexi_state : public trkfldch_state
+{
+public:
+	trkfldch_lexi_state(const machine_config &mconfig, device_type type, const char *tag) :
+		trkfldch_state(mconfig, type, tag),
+		m_extra(*this, "EXTRA")
+	{ }
+
+
+protected:
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+
+	uint8_t unkregs_r(offs_t offset) override;
+	void unkregs_w(offs_t offset, uint8_t data) override;
+
+private:
+	required_ioport m_extra;
+	uint8_t m_input_bit;
+	uint8_t m_iopos;
+};
+
+
 
 void trkfldch_state::video_start()
 {
@@ -598,11 +645,6 @@ void trkfldch_state::dmaregs_w(offs_t offset, uint8_t data)
 			int readoffset = 0;
 			int readdo = m_dmaregs[0x09];
 
-			if ((m_dmaregs[0x08] != 0x00) || (m_dmaregs[0x0c] != 0x00))
-			{
-				fatalerror("unhandled dma params\n");
-			}
-
 			for (uint32_t j = 0; j < dmalength; j++)
 			{
 				uint8_t byte = mem.read_byte(dmasource + readoffset);
@@ -610,7 +652,7 @@ void trkfldch_state::dmaregs_w(offs_t offset, uint8_t data)
 				if (readdo < 0)
 				{
 					readdo = m_dmaregs[0x09];
-					readoffset += m_dmaregs[0x07];
+					readoffset += m_dmaregs[0x07] | (m_dmaregs[0x08] << 8);
 				}
 				else
 				{
@@ -622,7 +664,7 @@ void trkfldch_state::dmaregs_w(offs_t offset, uint8_t data)
 				if (writedo < 0)
 				{
 					writedo = m_dmaregs[0x0d];
-					writeoffset += m_dmaregs[0xb];
+					writeoffset += m_dmaregs[0xb] | (m_dmaregs[0x0c] << 8);
 				}
 				else
 				{
@@ -767,7 +809,7 @@ void trkfldch_state::trkfldch_map(address_map &map)
 
 	map(0x007870, 0x0078ff).rw(FUNC(trkfldch_state::unkregs_r), FUNC(trkfldch_state::unkregs_w));
 
-	map(0x008000, 0x7fffff).rom().region("maincpu", 0x000000); // good for code mapped at 008000 and 050000 at least
+	map(0x008000, 0xffffff).rom().region("maincpu", 0x000000); // good for code mapped at 008000 and 050000 at least
 }
 
 void trkfldch_state::vectors_map(address_map &map)
@@ -872,6 +914,53 @@ static INPUT_PORTS_START( trkfldch )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_16WAY
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_16WAY
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON1 )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("IN1")
+	PORT_DIPNAME( 0x01, 0x01, "IN1" )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("IN2")
+	PORT_START("IN3")
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( konsb )
+	PORT_START("IN0")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON1 )
 	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
@@ -1013,6 +1102,30 @@ static INPUT_PORTS_START( shtscore )
 
 	PORT_START("IN3")
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( lexi )
+	PORT_START("IN0")
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("IN1")
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("IN2")
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("IN3")
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("EXTRA")
+	PORT_BIT( 0x00008, IP_ACTIVE_LOW, IPT_BUTTON1 )
+	PORT_BIT( 0x00020, IP_ACTIVE_LOW, IPT_BUTTON2 )
+	PORT_BIT( 0x00080, IP_ACTIVE_LOW, IPT_BUTTON3 )
+	PORT_BIT( 0x00200, IP_ACTIVE_LOW, IPT_BUTTON4 )
+	PORT_BIT( 0x00800, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(1)
+	PORT_BIT( 0x02000, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(1)
+	PORT_BIT( 0x08000, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(1)
+	PORT_BIT( 0x20000, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1)
 INPUT_PORTS_END
 
 static const gfx_layout tiles8x8x8_layout =
@@ -1360,6 +1473,63 @@ void trkfldch_state::unkregs_w(offs_t offset, uint8_t data)
 
 }
 
+
+void trkfldch_lexi_state::machine_start()
+{
+	trkfldch_state::machine_start();
+	save_item(NAME(m_input_bit));
+	save_item(NAME(m_iopos));
+}
+
+void trkfldch_lexi_state::machine_reset()
+{
+	trkfldch_state::machine_reset();
+	m_input_bit = 0;
+	m_iopos = 0;
+}
+
+uint8_t trkfldch_lexi_state::unkregs_r(offs_t offset)
+{
+	switch (offset)
+	{
+
+	case 0x00:
+	{
+		uint8_t ret = m_input_bit;
+		logerror("%s: unkregs_r %04x (returning %02x) (Player 1 inputs)\n", machine().describe_context(), offset, ret);
+		return ret;
+	}
+
+	default:
+		return trkfldch_state::unkregs_r(offset);
+	}
+}
+
+
+void trkfldch_lexi_state::unkregs_w(offs_t offset, uint8_t data)
+{
+	switch (offset)
+	{
+	case 0x03:
+		logerror("%s: unkregs_w %04x %02x (io strobe?)\n", machine().describe_context(), offset, data);
+		if (data == 0x03)
+		{
+			m_iopos = 0;
+		}
+		else
+		{
+			m_iopos++;
+		}
+
+		m_input_bit = (m_extra->read() >> m_iopos) & 1;
+		break;
+
+	default:
+		trkfldch_state::unkregs_w(offset, data);
+		break;
+	}
+}
+
 void trkfldch_state::machine_start()
 {
 	save_item(NAME(m_unkdata_addr));
@@ -1448,26 +1618,124 @@ void trkfldch_state::trkfldch(machine_config &config)
 }
 
 ROM_START( trkfldch )
-	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
+	ROM_REGION( 0x1000000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD( "trackandfield.bin", 0x000000, 0x400000,  CRC(f4f1959d) SHA1(344dbfe8df1897adf77da6e5ca0435c4d47d6842) )
 ROM_END
 
 ROM_START( my1stddr )
-	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
+	ROM_REGION( 0x1000000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD( "myfirstddr.bin", 0x000000, 0x400000, CRC(2ef57bfc) SHA1(9feea5adb9de8fe17e915f3a037e8ddd70e58ae7) )
 ROM_END
 
 ROM_START( abl4play )
-	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
+	ROM_REGION( 0x1000000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD( "abl4play.bin", 0x000000, 0x800000, CRC(5d57fb70) SHA1(34cdf80dc8cb08e5cd98c724268e4c5f483780d7) )
 ROM_END
 
 ROM_START( shtscore )
-	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
+	ROM_REGION( 0x1000000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD( "shootnscore.bin", 0x000000, 0x400000, CRC(37aa16bd) SHA1(609d0191301480c51ec1188c67101a4e88a5170f) )
 ROM_END
 
-CONS( 2007, trkfldch,  0,          0,  trkfldch, trkfldch,trkfldch_state,      empty_init,    "Konami",             "Track & Field Challenge", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-CONS( 2006, my1stddr,  0,          0,  trkfldch, my1stddr,trkfldch_state,      empty_init,    "Konami",             "My First Dance Dance Revolution (US)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // Japan version has different songs
-CONS( 200?, abl4play,  0,          0,  trkfldch, abl4play,trkfldch_state,      empty_init,    "Advance Bright Ltd", "4 Player System - 10 in 1", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+ROM_START( lexitvsprt )
+	ROM_REGION( 0x1000000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD( "29l3211.u2a", 0x000000, 0x400000, CRC(65e5223c) SHA1(13eae6e34100fb9761335e87a3cf728bb31e860f) )
+ROM_END
+
+/*
+Included with Orange model
+
+    しあわせのおうじ (イギリス民話)
+        Shiawase no Ouji (English minwa)
+    ほしのぎんか (グリム童話)
+        Hoshi no Ginka (Grimm douwa)
+    おやゆびひめ (アンデルセン)
+        Oyayubi-hime (Anderson)
+    こびととくつや (グリム童話)
+        Kobi to Toku Tsuya (Grimm douwa)
+    みっつのねがい (日本昔話)
+        Mittsu no Negai (Nippon mukashi banashi)
+    うらしまたろう (日本昔話)
+        Urashima Tarou (Nippon mukashi banashi)
+    アフロンとがまじいの ちきゅうにやさしく (オリジナル)
+        Afuron to Gamajii no Chikyuu ni Yasashiku (Original)
+    かさこじぞう (日本昔話)
+        Kasakojizo (Nippon mukashi banashi)
+    きんのがちょう (グリム童話)
+        Kin no Gachou (Grimm douwa)
+    あそんでまなぼう (オリジナル)
+        Asonde Manabou (Original)
+*/
+ROM_START( teleshi )
+	ROM_REGION( 0x1000000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD( "s29gl128n90tfir.bin", 0x000000, 0x1000000, CRC(8c032142) SHA1(7dff151ea1abd5911e753f0708b0b4f66599791f) )
+ROM_END
+
+/*
+Included with Purple model
+
+    ももたろう (日本昔話)
+        Momotarou (Nippon mukashi banashi)
+    あかずきん (グリム童話)
+        Aka Zukin (Grimm douwa)
+    きたかぜのくれたテーブルかけ (ノルウェー民話)
+        Kita Kaze no Kureta Table Kake (Norway minwa)
+    いっすんぼうし (日本昔話)
+        Issun-boushi (Nippon mukashi banashi)
+    おおきなかぶ (ロシア民話)
+        Ookina Kabu (Russia minwa)
+    ありときりぎりす (イソップ童話)
+        Ari to Kirigirisu (Aesop douwa)
+    マッチうりのしょうじょ (アンデルセン)
+        Match Uri no Shoujo (Anderson)
+    かさこじぞう (日本昔話)
+        Kasa Jizou (Nippon mukashi banashi)
+    きんのがちょう (グリム童話)
+        Kin no Gachou (Grimm douwa)
+    あそんでまなぼう2 (オリジナル)
+        Asonde Manabou 2 (Original)
+*/
+ROM_START( teleship )
+	ROM_REGION( 0x1000000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD( "s29gl128n90tfir2.bin", 0x000000, 0x1000000, CRC(28c12a48) SHA1(68557849e2b6f3669de76540de841ca99119ec58) )
+ROM_END
+
+/*
+The following were also available (via the Download service?)
+
+世界のお話 (ナレーション入り) [Sekai no Ohanashi (Narration-iri)]
+
+    ブレーメンのおんがくたい (グリム童話)
+        Bremen no Ongakutai (Grimm douwa)
+    みにくいあひるのこ (アンデルセン)
+        Minikui Ahiru no Ko (Andersen)
+    てぶくろ (ウクライナ民話)
+        Tebukuro (Ukraine minwa)
+    はちかつぎひめ (日本昔話)
+        Hachi Katsugi-hime (Nippon mukashi banashi)
+
+遊んで学ぼう・お歌で遊ぼう [Asonde Manabu - Outa de Asobou]
+
+    あそんでまなぼう (オリジナル)
+        Asonde Manabou (Original)
+    あそんでまなぼう2 (オリジナル)
+        Asonde Manabou 2 (Original)
+    おうたであそぼう3 (オリジナル)
+        Asonde Manabou 3 (Original)
+    おうたであそぼう4 (オリジナル)
+        Asonde Manabou 4 (Original)
+*/
+
+
+} // anonymous namespace
+
+
+CONS( 2007, trkfldch,  0,          0,  trkfldch, trkfldch,trkfldch_state,      empty_init,    "Konami",                                     "Track & Field Challenge", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+CONS( 2006, my1stddr,  0,          0,  trkfldch, my1stddr,trkfldch_state,      empty_init,    "Konami",                                     "My First Dance Dance Revolution (US)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // Japan version has different songs
+CONS( 200?, abl4play,  0,          0,  trkfldch, abl4play,trkfldch_state,      empty_init,    "Advance Bright Ltd",                         "4 Player System - 10 in 1", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 CONS( 200?, shtscore,  0,          0,  trkfldch, shtscore,trkfldch_state,      empty_init,    "Halsall / time4toys.com / Electronic Games", "Shoot n' Score", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+CONS( 200?, lexitvsprt,0,          0,  trkfldch, lexi,    trkfldch_lexi_state, empty_init,    "Lexibook",                                   "TV Sports Plug & Play 5-in-1 (JG7000)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+
+// additional online content could be downloaded onto these if they were connected to a PC via USB
+CONS( 2008, teleshi,   0,          0,  trkfldch, konsb,   trkfldch_state,      empty_init,    "Konami",                                     "Teleshibai (Japan)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // テレしばい - this one is orange
+CONS( 2008, teleship,  0,          0,  trkfldch, konsb,   trkfldch_state,      empty_init,    "Konami",                                     "Teleshibai - Purple Version (Japan)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // テレしばい (パープルバージョン) - this has Purple Version as part of the name  on the box

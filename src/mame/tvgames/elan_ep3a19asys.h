@@ -1,8 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood
 
-#ifndef MAME_MACHINE_ELAN_EP3A19ASYS_H
-#define MAME_MACHINE_ELAN_EP3A19ASYS_H
+#ifndef MAME_TVGAMES_ELAN_EP3A19ASYS_H
+#define MAME_TVGAMES_ELAN_EP3A19ASYS_H
 
 #include "elan_eu3a05commonsys.h"
 
@@ -17,12 +17,12 @@ public:
 	uint8_t dma_param_r(offs_t offset);
 	void dma_param_w(offs_t offset, uint8_t data);
 
-	virtual void map(address_map& map) override;
+	virtual void map(address_map &map) override ATTR_COLD;
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 	virtual space_config_vector memory_space_config() const override;
 
 	void rombank_w(offs_t offset, uint8_t data);
@@ -35,4 +35,4 @@ private:
 
 DECLARE_DEVICE_TYPE(ELAN_EP3A19A_SYS, elan_ep3a19asys_device)
 
-#endif // MAME_MACHINE_ELAN_EP3A19ASYS_H
+#endif // MAME_TVGAMES_ELAN_EP3A19ASYS_H

@@ -74,7 +74,7 @@ public:
 	int fe_r() { return m_fe; }
 	int oe_r() { return m_oe; }
 
-	void write_rri(int state); // receiver register input
+	void rri_w(int state);
 	void rrc_w(int state);
 	void trc_w(int state);
 	void rrd_w(int state);
@@ -90,13 +90,12 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// device_serial_interface overrides
 	virtual void tra_callback() override;
 	virtual void tra_complete() override;
-	virtual void rcv_callback() override;
 	virtual void rcv_complete() override;
 
 private:

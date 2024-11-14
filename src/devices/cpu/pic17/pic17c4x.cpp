@@ -418,12 +418,6 @@ void pic17c4x_device::increment_timers()
 	}
 }
 
-void pic17c4x_device::device_resolve_objects()
-{
-	// Resolve callback objects
-	m_port_out_cb.resolve_all_safe();
-}
-
 void pic17c4x_device::device_start()
 {
 	pic17_cpu_device::device_start();

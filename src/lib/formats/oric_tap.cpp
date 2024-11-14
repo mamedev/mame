@@ -3,6 +3,8 @@
 #include "oric_tap.h"
 #include "imageutl.h"
 
+#include "multibyte.h"
+
 
 #define ORIC_WAV_DEBUG 0
 #define LOG(x) do { if (ORIC_WAV_DEBUG) printf x; } while (0)
@@ -314,8 +316,8 @@ static int oric_cassette_calculate_size_in_samples(const uint8_t *bytes, int len
 					oric.cassette_state = ORIC_CASSETTE_WRITE_DATA;
 					oric.data_count = 0;
 
-					end = (((header[4] & 0x0ff)<<8) | (header[5] & 0x0ff));
-					start = (((header[6] & 0x0ff)<<8) | (header[7] & 0x0ff));
+					end = get_u16be(&header[4]);
+					start = get_u16be(&header[6]);
 					LOG(("start (from header): %02x\n",start));
 					LOG(("end (from header): %02x\n",end));
 										oric.data_length = end - start + 1;
@@ -451,8 +453,8 @@ static int oric_cassette_fill_wave(int16_t *buffer, int length, uint8_t *bytes)
 					oric.cassette_state = ORIC_CASSETTE_WRITE_DATA;
 					oric.data_count = 0;
 
-					end = (((header[4] & 0x0ff)<<8) | (header[5] & 0x0ff));
-					start = (((header[6] & 0x0ff)<<8) | (header[7] & 0x0ff));
+					end = get_u16be(&header[4]);
+					start = get_u16be(&header[6]);
 					LOG(("start (from header): %02x\n",start));
 					LOG(("end (from header): %02x\n",end));
 										oric.data_length = end - start + 1;

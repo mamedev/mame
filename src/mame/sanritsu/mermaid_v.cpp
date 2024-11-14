@@ -72,16 +72,6 @@ void mermaid_state::mermaid_colorram_w(offs_t offset, uint8_t data)
 	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE_LINE_MEMBER(mermaid_state::flip_screen_x_w)
-{
-	flip_screen_x_set(state);
-}
-
-WRITE_LINE_MEMBER(mermaid_state::flip_screen_y_w)
-{
-	flip_screen_y_set(state);
-}
-
 void mermaid_state::mermaid_bg_scroll_w(offs_t offset, uint8_t data)
 {
 	m_bg_scrollram[offset] = data;
@@ -94,25 +84,25 @@ void mermaid_state::mermaid_fg_scroll_w(offs_t offset, uint8_t data)
 	m_fg_tilemap->set_scrolly(offset, data);
 }
 
-WRITE_LINE_MEMBER(mermaid_state::bg_mask_w)
+void mermaid_state::bg_mask_w(int state)
 {
 	m_bg_mask = state;
 	logerror("mask %d\n", state);
 }
 
-WRITE_LINE_MEMBER(mermaid_state::bg_bank_w)
+void mermaid_state::bg_bank_w(int state)
 {
 	m_bg_bank = state ? 0x100 : 0;
 	m_bg_tilemap->mark_all_dirty();
 	logerror("bank %d\n", state);
 }
 
-WRITE_LINE_MEMBER(mermaid_state::rougien_gfxbankswitch1_w)
+void mermaid_state::rougien_gfxbankswitch1_w(int state)
 {
 	m_rougien_gfxbank1 = state;
 }
 
-WRITE_LINE_MEMBER(mermaid_state::rougien_gfxbankswitch2_w)
+void mermaid_state::rougien_gfxbankswitch2_w(int state)
 {
 	m_rougien_gfxbank2 = state;
 }
@@ -574,7 +564,7 @@ void mermaid_state::collision_update()
 	}
 }
 
-WRITE_LINE_MEMBER(mermaid_state::screen_vblank_mermaid)
+void mermaid_state::screen_vblank_mermaid(int state)
 {
 	// rising edge
 	if (state)

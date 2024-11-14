@@ -165,6 +165,9 @@ J4 C02 <> |A02  C02| <- '164 CP   93c46 DI AND '164 IC3 DSB -> |A02  C02| <> J3 
 #include "cpu/i86/i286.h"
 #include "machine/eepromser.h"
 
+
+namespace {
+
 class bpmmicro_state : public driver_device
 {
 public:
@@ -183,10 +186,10 @@ public:
 	void unknown_84018_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	void unknown_8401a_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	void eeprom_8401c_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 	void bpmmicro(machine_config &config);
-	void i286_io(address_map &map);
-	void i286_mem(address_map &map);
+	void i286_io(address_map &map) ATTR_COLD;
+	void i286_mem(address_map &map) ATTR_COLD;
 private:
 	required_device<cpu_device> m_maincpu;
 	required_device<eeprom_serial_93cxx_device> m_eeprom_u38;
@@ -413,6 +416,7 @@ ROM_START(bp1200)
 	ROMX_LOAD("bp-1200_1.03_u9__=c=_1992_rev_c__bp_microsystems.27c64a-12.u9", 0x1c000, 0x2000, CRC(f58ffebb) SHA1(700d3ffed269fff6dc1cf2190bde8b989715c22a), ROM_SKIP(1) | ROM_BIOS(6)) // "BP-1200 1.03 U9 // (C) 1992 REV C // BP Microsystems" 27C64A-12 @ U9
 ROM_END
 
+} // anonymous namespace
 
 
 /******************************************************************************

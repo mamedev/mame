@@ -23,6 +23,8 @@ To diagnose game, turn on service mode and:
 #include "18w.lh"
 
 
+namespace {
+
 class mw18w_state : public driver_device
 {
 public:
@@ -35,7 +37,7 @@ public:
 
 	void mw18w(machine_config &config);
 
-	DECLARE_CUSTOM_INPUT_MEMBER(mw18w_sensors_r);
+	ioport_value mw18w_sensors_r();
 
 private:
 	void mw18w_sound0_w(uint8_t data);
@@ -43,8 +45,8 @@ private:
 	void mw18w_lamps_w(uint8_t data);
 	void mw18w_led_display_w(uint8_t data);
 	void mw18w_irq0_clear_w(uint8_t data);
-	void mw18w_map(address_map &map);
-	void mw18w_portmap(address_map &map);
+	void mw18w_map(address_map &map) ATTR_COLD;
+	void mw18w_portmap(address_map &map) ATTR_COLD;
 
 	virtual void machine_start() override { m_digits.resolve(); m_lamps.resolve(); }
 	required_device<cpu_device> m_maincpu;
@@ -163,7 +165,7 @@ void mw18w_state::mw18w_irq0_clear_w(uint8_t data)
 	m_maincpu->set_input_line(0, CLEAR_LINE);
 }
 
-CUSTOM_INPUT_MEMBER(mw18w_state::mw18w_sensors_r)
+ioport_value mw18w_state::mw18w_sensors_r()
 {
 	// d7: off road
 	// d6: in dock area
@@ -219,7 +221,7 @@ static INPUT_PORTS_START( mw18w )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN ) // left/right sw.
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0xc0, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(mw18w_state, mw18w_sensors_r)
+	PORT_BIT( 0xc0, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(FUNC(mw18w_state::mw18w_sensors_r))
 
 	PORT_START("IN1")
 	PORT_BIT( 0x1f, 0x00, IPT_PEDAL ) PORT_REMAP_TABLE(mw18w_controller_table + 0x20) PORT_SENSITIVITY(100) PORT_KEYDELTA(1) PORT_NAME("Gas Pedal")
@@ -318,6 +320,8 @@ ROM_START( 18w2 )
 	ROM_LOAD( "18w_b3.rom3", 0x1000, 0x0800, CRC(214606f6) SHA1(9a9dc20259b4462661c6be410d98d2be54657a0e) )
 	ROM_LOAD( "18w_b4.rom4", 0x1800, 0x0800, CRC(e88ad6a9) SHA1(ac010aa7e0288197ff9342801522623b64dd2a47) )
 ROM_END
+
+} // anonymous namespace
 
 
 GAMEL( 1979, 18w,  0,   mw18w, mw18w, mw18w_state, empty_init, ROT0, "Midway", "18 Wheeler (set 1)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL, layout_18w )

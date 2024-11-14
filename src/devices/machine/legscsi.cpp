@@ -116,13 +116,7 @@ uint8_t legacy_scsi_host_adapter::get_status()
 	scsihle_device *scsidev = get_device(m_selected);
 	if (scsidev != nullptr)
 	{
-		void *image;
-
-		scsidev->GetDevice(&image);
-		if (image != nullptr)
-			return 0x00;
-
-		return 0x02;
+		return scsidev->exists() ? 0x00 : 0x02;
 	}
 	else
 	{

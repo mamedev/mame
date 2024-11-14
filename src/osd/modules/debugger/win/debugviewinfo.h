@@ -17,6 +17,8 @@
 #include "debug/debugvw.h"
 
 
+namespace osd::debugger::win {
+
 class debugview_info : protected debugbase_info
 {
 public:
@@ -42,6 +44,7 @@ public:
 	bool cursor_supported() const { return m_view->cursor_supported(); }
 	bool cursor_visible() const { return m_view->cursor_visible(); }
 
+	int source_index() const;
 	char const *source_name() const;
 	device_t *source_device() const;
 	bool source_is_visible_cpu() const;
@@ -50,6 +53,9 @@ public:
 	bool set_source_for_visible_cpu();
 
 	HWND create_source_combobox(HWND parent, LONG_PTR userdata);
+
+	virtual void restore_configuration_from_node(util::xml::data_node const &node);
+	virtual void save_configuration_to_node(util::xml::data_node &node);
 
 protected:
 	enum
@@ -86,4 +92,6 @@ private:
 	static bool     s_window_class_registered;
 };
 
-#endif
+} // namespace osd::debugger::win
+
+#endif // MAME_DEBUGGER_WIN_DEBUGVIEWINFO_H

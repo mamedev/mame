@@ -97,6 +97,12 @@ bool b6100_cpu_device::op_is_lb(u8 op)
 //  changed opcodes (no need for separate file)
 //-------------------------------------------------
 
+void b6100_cpu_device::op_tkbs()
+{
+	// TKBS: load segments (no TKB step)
+	seg_w(m_seg | decode_digit(ram_r()));
+}
+
 void b6100_cpu_device::op_read()
 {
 	// READ: add KB to A, skip next on no overflow

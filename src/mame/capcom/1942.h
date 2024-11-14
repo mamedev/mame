@@ -5,8 +5,8 @@
     1942
 
 ***************************************************************************/
-#ifndef MAME_INCLUDES_1942_H
-#define MAME_INCLUDES_1942_H
+#ifndef MAME_CAPCOM_1942_H
+#define MAME_CAPCOM_1942_H
 
 #pragma once
 
@@ -32,7 +32,7 @@ public:
 		, m_soundlatch(*this, "soundlatch")
 	{ }
 
-	void driver_init() override;
+	void driver_init();
 
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
@@ -40,12 +40,12 @@ public:
 	void _1942(machine_config &config);
 
 protected:
-	void machine_start() override;
-	void machine_reset() override;
-	void video_start() override;
+	void machine_start() override ATTR_COLD;
+	void machine_reset() override ATTR_COLD;
+	void video_start() override ATTR_COLD;
 
-	void _1942_map(address_map &map);
-	void sound_map(address_map &map);
+	void _1942_map(address_map &map) ATTR_COLD;
+	void sound_map(address_map &map) ATTR_COLD;
 
 	void _1942_bankswitch_w(uint8_t data);
 	void _1942_fgvideoram_w(offs_t offset, uint8_t data);
@@ -91,11 +91,11 @@ public:
 	void _1942p(machine_config &config);
 
 protected:
-	void video_start() override;
+	void video_start() override ATTR_COLD;
 
-	void _1942p_map(address_map &map);
-	void _1942p_sound_io(address_map &map);
-	void _1942p_sound_map(address_map &map);
+	void _1942p_map(address_map &map) ATTR_COLD;
+	void _1942p_sound_io(address_map &map) ATTR_COLD;
+	void _1942p_sound_map(address_map &map) ATTR_COLD;
 
 	void _1942p_f600_w(uint8_t data);
 	void _1942p_palette_w(offs_t offset, uint8_t data);
@@ -107,4 +107,4 @@ protected:
 	required_shared_ptr<uint8_t> m_protopal;
 };
 
-#endif // MAME_INCLUDES_1942_H
+#endif // MAME_CAPCOM_1942_H

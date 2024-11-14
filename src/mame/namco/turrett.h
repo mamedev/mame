@@ -5,8 +5,8 @@
     Turret Tower hardware
 
 ****************************************************************************/
-#ifndef MAME_INCLUDES_TURRETT_H
-#define MAME_INCLUDES_TURRETT_H
+#ifndef MAME_NAMCO_TURRETT_H
+#define MAME_NAMCO_TURRETT_H
 
 #pragma once
 
@@ -55,8 +55,8 @@ private:
 	void video_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 	uint32_t int_r();
 	void int_w(uint32_t data);
-	DECLARE_READ_LINE_MEMBER(sbrc2_r);
-	DECLARE_READ_LINE_MEMBER(sbrc3_r);
+	int sbrc2_r();
+	int sbrc3_r();
 
 	TIMER_CALLBACK_MEMBER(dma_complete);
 	INTERRUPT_GEN_MEMBER(vblank);
@@ -93,12 +93,12 @@ private:
 	uint8_t   m_frame = 0;
 	uint8_t   m_adc = 0;
 
-	void cpu_map(address_map &map);
-	void turrett_sound_map(address_map &map);
+	void cpu_map(address_map &map) ATTR_COLD;
+	void turrett_sound_map(address_map &map) ATTR_COLD;
 
 	// driver_device overrides
-	virtual void machine_reset() override;
-	virtual void machine_start() override;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void machine_start() override ATTR_COLD;
 };
 
 
@@ -117,8 +117,8 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// device_sound_interface overrides
 	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
@@ -145,4 +145,4 @@ private:
 // device type definition
 DECLARE_DEVICE_TYPE(TURRETT, turrett_device)
 
-#endif // MAME_INCLUDES_TURRETT_H
+#endif // MAME_NAMCO_TURRETT_H

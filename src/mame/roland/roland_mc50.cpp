@@ -12,6 +12,9 @@
 #include "imagedev/floppy.h"
 #include "machine/wd_fdc.h"
 
+
+namespace {
+
 class roland_mc50_state : public driver_device
 {
 public:
@@ -28,9 +31,9 @@ public:
 	void mc50mk2(machine_config &config);
 
 private:
-	void mem_map_mc300(address_map &map);
-	void mem_map_mc50(address_map &map);
-	void io_map(address_map &map);
+	void mem_map_mc300(address_map &map) ATTR_COLD;
+	void mem_map_mc50(address_map &map) ATTR_COLD;
+	void io_map(address_map &map) ATTR_COLD;
 
 	required_device<z180_device> m_mpu;
 	optional_device<wd1772_device> m_wdfdc;
@@ -125,6 +128,9 @@ ROM_START(mc50mk2)
 	ROM_REGION(0x80000, "mpurom", 0)
 	ROM_LOAD("mc50_mkii-firmware-v.0060.ic7", 0x00000, 0x80000, CRC(a428e378) SHA1(ac411c33ef79cf9ae51c5d5dbb1ed9ea5839db3e))
 ROM_END
+
+} // anonymous namespace
+
 
 SYST(1988, mc300,   0, 0, mc300,   mc50, roland_mc50_state, empty_init, "Roland", "MC-300 Micro Composer", MACHINE_IS_SKELETON)
 SYST(1990, mc50,    0, 0, mc50,    mc50, roland_mc50_state, empty_init, "Roland", "MC-50 Micro Composer", MACHINE_IS_SKELETON)

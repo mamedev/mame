@@ -23,7 +23,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-DEFINE_DEVICE_TYPE(C1526, c1526_device, "c1526", "Commodore 1526/MPS802 Printer")
+DEFINE_DEVICE_TYPE(C1526, c1526_device, "c1526", "Commodore 1526/MPS-802 Dot Matrix Printer")
 DEFINE_DEVICE_TYPE(C4023, c4023_device, "c4023", "Commodore 4023 Printer")
 
 

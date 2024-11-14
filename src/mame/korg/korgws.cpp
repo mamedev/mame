@@ -11,6 +11,9 @@
 #include "cpu/m6502/m3745x.h"
 //#include "video/t6963c.h"
 
+
+namespace {
+
 class korgws_state : public driver_device
 {
 public:
@@ -25,8 +28,8 @@ public:
 	void korgwssr(machine_config &config);
 
 private:
-	void h16_map(address_map &map);
-	void wssr_map(address_map &map);
+	void h16_map(address_map &map) ATTR_COLD;
+	void wssr_map(address_map &map) ATTR_COLD;
 
 	required_device<hd641016_device> m_maincpu;
 	required_device<m3745x_device> m_ksp;
@@ -99,6 +102,9 @@ ROM_START(korgwssr)
 	ROM_REGION(0x2000, "ksp", 0)
 	ROM_LOAD("m37450m4-233fp.bin", 0x0000, 0x2000, NO_DUMP)
 ROM_END
+
+} // anonymous namespace
+
 
 SYST(1992, korgwsex, 0, 0, korgws,   korgws, korgws_state, empty_init, "Korg", "WaveStation EX", MACHINE_IS_SKELETON)
 SYST(1991, korgwsad, 0, 0, korgws,   korgws, korgws_state, empty_init, "Korg", "WaveStation A/D", MACHINE_IS_SKELETON)

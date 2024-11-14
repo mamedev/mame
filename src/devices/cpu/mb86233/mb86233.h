@@ -62,20 +62,19 @@ public:
 
 	void stall() { m_stall = true; }
 
-	DECLARE_WRITE_LINE_MEMBER(gpio0_w);
-	DECLARE_WRITE_LINE_MEMBER(gpio1_w);
-	DECLARE_WRITE_LINE_MEMBER(gpio2_w);
-	DECLARE_WRITE_LINE_MEMBER(gpio3_w);
+	void gpio0_w(int state);
+	void gpio1_w(int state);
+	void gpio2_w(int state);
+	void gpio3_w(int state);
 
 protected:
 	mb86233_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	virtual uint32_t execute_min_cycles() const noexcept override { return 1; }
 	virtual uint32_t execute_max_cycles() const noexcept override { return 1; }
-	virtual uint32_t execute_input_lines() const noexcept override { return 4; }
 	virtual void execute_run() override;
 
 	virtual space_config_vector memory_space_config() const override;
@@ -105,7 +104,6 @@ private:
 
 	bool m_stall;
 
-	static s32 s24_32(u32 val);
 	static u32 set_exp(u32 val, u32 exp);
 	static u32 set_mant(u32 val, u32 mant);
 	static u32 get_exp(u32 val);

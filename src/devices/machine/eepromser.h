@@ -36,7 +36,7 @@ protected:
 	eeprom_serial_base_device(const machine_config &mconfig, device_type devtype, const char *tag, device_t *owner, eeprom_serial_streaming enable_streaming);
 
 	// device-level overrides
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 	// read interfaces differ between implementations
 
@@ -122,12 +122,12 @@ class eeprom_serial_93cxx_device : public eeprom_serial_base_device
 {
 public:
 	// read handlers
-	DECLARE_READ_LINE_MEMBER(do_read);  // combined DO+READY/BUSY
+	int do_read();  // combined DO+READY/BUSY
 
 	// write handlers
-	DECLARE_WRITE_LINE_MEMBER(cs_write);        // CS signal (active high)
-	DECLARE_WRITE_LINE_MEMBER(clk_write);       // CLK signal (active high)
-	DECLARE_WRITE_LINE_MEMBER(di_write);        // DI
+	void cs_write(int state);        // CS signal (active high)
+	void clk_write(int state);       // CLK signal (active high)
+	void di_write(int state);        // DI
 
 protected:
 	// construction/destruction
@@ -154,13 +154,13 @@ class eeprom_serial_er5911_device : public eeprom_serial_base_device
 {
 public:
 	// read handlers
-	DECLARE_READ_LINE_MEMBER(do_read);          // DO
-	DECLARE_READ_LINE_MEMBER(ready_read);       // READY/BUSY only
+	int do_read();          // DO
+	int ready_read();       // READY/BUSY only
 
 	// write handlers
-	DECLARE_WRITE_LINE_MEMBER(cs_write);        // CS signal (active high)
-	DECLARE_WRITE_LINE_MEMBER(clk_write);       // CLK signal (active high)
-	DECLARE_WRITE_LINE_MEMBER(di_write);        // DI
+	void cs_write(int state);        // CS signal (active high)
+	void clk_write(int state);       // CLK signal (active high)
+	void di_write(int state);        // DI
 
 protected:
 	// construction/destruction
@@ -179,12 +179,12 @@ class eeprom_serial_x24c44_device : public eeprom_serial_base_device
 		//async store not implemented
 public:
 	// read handlers
-	DECLARE_READ_LINE_MEMBER(do_read);          // DO
+	int do_read();          // DO
 
 	// write handlers
-	DECLARE_WRITE_LINE_MEMBER(cs_write);        // CS signal (active high)
-	DECLARE_WRITE_LINE_MEMBER(clk_write);       // CLK signal (active high)
-	DECLARE_WRITE_LINE_MEMBER(di_write);        // DI
+	void cs_write(int state);        // CS signal (active high)
+	void clk_write(int state);       // CLK signal (active high)
+	void di_write(int state);        // DI
 
 protected:
 	// construction/destruction
@@ -197,7 +197,7 @@ protected:
 	void execute_command() override;
 	void copy_ram_to_eeprom();
 	void copy_eeprom_to_ram();
-	void device_start() override;
+	void device_start() override ATTR_COLD;
 	uint8_t m_ram_length;
 	uint16_t m_ram_data[16];
 	uint16_t m_reading;

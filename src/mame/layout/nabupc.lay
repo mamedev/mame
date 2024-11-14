@@ -1,0 +1,90 @@
+<?xml version="1.0"?>
+<!--
+license:CC0
+-->
+<mamelayout version="2">
+	<element name="yellow" defstate="0">
+		<rect state="1">
+			<color red="0.75" green="0.75" blue="0.0" />
+		</rect>
+		<rect state="0">
+			<color red="0.20" green="0.20" blue="0.0" />
+		</rect>
+	</element>
+	<element name="red" defstate="0">
+		<rect state="1">
+			<color red="0.75" green="0.0" blue="0.0" />
+		</rect>
+		<rect state="0">
+			<color red="0.20" green="0.0" blue="0.0" />
+		</rect>
+	</element>
+	<element name="green" defstate="0">
+		<rect state="1">
+			<color red="0.0" green="0.75" blue="0.0" />
+		</rect>
+		<rect state="0">
+			<color red="0.0" green="0.20" blue="0.0" />
+		</rect>
+	</element>
+
+	<element name="power">
+		<text string="ON">
+			<color red="1.0" green="1.0" blue="1.0" />
+		</text>
+	</element>
+	<element name="pause">
+		<text string="PAUSE">
+			<color red="1.0" green="1.0" blue="1.0" />
+		</text>
+	</element>
+	<element name="alert">
+		<text string="ALERT">
+			<color red="1.0" green="1.0" blue="1.0" />
+		</text>
+	</element>
+	<element name="check">
+		<text string="CHECK">
+			<color red="1.0" green="1.0" blue="1.0" />
+		</text>
+	</element>
+
+	<view name="Default Layout">
+		<screen index="0">
+			<bounds x="0" y="30" width="800" height="600" />
+		</screen>
+
+		<element name="led0" ref="green">
+			<bounds x="30" y="1" width="5" height="15" />
+		</element>
+
+		<element name="led1" ref="yellow">
+			<bounds x="60" y="1" width="5" height="15" />
+		</element>
+
+		<element name="led2" ref="red">
+			<bounds x="90" y="1" width="5" height="15" />
+		</element>
+
+		<element name="led3" ref="green">
+			<bounds x="120" y="1" width="5" height="15" />
+		</element>
+
+		<element name="label1" ref="power">
+			<bounds x="25" y="17" width="15" height="13" />
+		</element>
+
+		<element name="label2" ref="pause">
+			<bounds x="55" y="17" width="15" height="13" />
+		</element>
+
+		<element name="label3" ref="alert">
+			<bounds x="85" y="17" width="15" height="13" />
+		</element>
+
+		<element name="label4" ref="check">
+			<bounds x="115" y="17" width="15" height="13" />
+		</element>
+
+	</view>
+</mamelayout>

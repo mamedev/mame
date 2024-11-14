@@ -7,16 +7,13 @@
 
 
 #include "font_module.h"
-#include "modules/osdmodule.h"
 
 #if defined(OSD_WINDOWS) || defined(SDLMAME_WIN32)
-
-#include "font_module.h"
-#include "modules/osdmodule.h"
 
 #include "strconv.h"
 #include "unicode.h"
 #include "corestr.h"
+#include "osdcore.h"
 
 #include <cstring>
 
@@ -26,6 +23,8 @@
 #include <tchar.h>
 #include <io.h>
 
+
+namespace osd {
 
 namespace {
 
@@ -85,7 +84,7 @@ bool osd_font_windows::open(std::string const &font_path, std::string const &_na
 	logfont.lfPitchAndFamily = DEFAULT_PITCH | FF_DONTCARE;
 
 	// copy in the face name
-	osd::text::tstring face = osd::text::to_tstring(name);
+	text::tstring face = text::to_tstring(name);
 	_tcsncpy(logfont.lfFaceName, face.c_str(), std::size(logfont.lfFaceName));
 	logfont.lfFaceName[sizeof(logfont.lfFaceName) / sizeof(TCHAR)-1] = 0;
 
@@ -110,8 +109,8 @@ bool osd_font_windows::open(std::string const &font_path, std::string const &_na
 	}
 
 	// if it doesn't match our request, fail
-	std::string utf = osd::text::from_tstring(&realname[0]);
-	int result = core_stricmp(utf.c_str(), name.c_str());
+	std::string utf = text::from_tstring(&realname[0]);
+	int result = core_stricmp(utf, name);
 
 	// if we didn't match, nuke our font and fall back
 	if (result != 0)
@@ -290,7 +289,7 @@ class font_win : public osd_module, public font_module
 public:
 	font_win() : osd_module(OSD_FONT_PROVIDER, "win"), font_module() { }
 
-	virtual int init(const osd_options &options) override { return 0; }
+	virtual int init(osd_interface &osd, const osd_options &options) override { return 0; }
 
 	virtual osd_font::ptr font_alloc() override { return std::make_unique<osd_font_windows>(); }
 
@@ -300,7 +299,7 @@ private:
 	static int CALLBACK font_family_callback(LOGFONT const *lpelfe, TEXTMETRIC const *lpntme, DWORD FontType, LPARAM lParam)
 	{
 		auto &result = *reinterpret_cast<std::vector<std::pair<std::string, std::string> > *>(lParam);
-		std::string face = osd::text::from_tstring(lpelfe->lfFaceName);
+		std::string face = text::from_tstring(lpelfe->lfFaceName);
 		if ((face[0] != '@') && (result.empty() || (result.back().first != face))) result.emplace_back(face, face);
 		return TRUE;
 	}
@@ -328,10 +327,12 @@ bool font_win::get_font_families(std::string const &font_path, std::vector<std::
 
 } // anonymous namespace
 
+} // namespace osd
+
 #else // defined(OSD_WINDOWS) || defined(SDLMAME_WIN32)
 
-MODULE_NOT_SUPPORTED(font_win, OSD_FONT_PROVIDER, "win")
+namespace osd { namespace { MODULE_NOT_SUPPORTED(font_win, OSD_FONT_PROVIDER, "win") } }
 
 #endif // defined(OSD_WINDOWS) || defined(SDLMAME_WIN32)
 
-MODULE_DEFINITION(FONT_WINDOWS, font_win)
+MODULE_DEFINITION(FONT_WINDOWS, osd::font_win)

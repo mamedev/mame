@@ -8,8 +8,11 @@
 
 #include "emu.h"
 #include "cpu/mcs96/i8x9x.h"
-#include "sound/rolandpcm.h"
+#include "sound/roland_lp.h"
 #include "speaker.h"
+
+
+namespace {
 
 class roland_u20_state : public driver_device
 {
@@ -25,7 +28,7 @@ public:
 	void u220(machine_config &config);
 
 private:
-	void mem_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
 
 	required_device<i8x9x_device> m_maincpu;
 	required_device<mb87419_mb87420_device> m_pcm;
@@ -97,6 +100,9 @@ ROM_START(u220)
 	ROM_LOAD("roland-e_r15179947_mb834000a-20_3a1-aa.ic23",  0x200000, 0x080000, NO_DUMP)
 	ROM_LOAD("roland-f_r15179948_mb834000a-20_3a2-aa.ic24",  0x280000, 0x080000, NO_DUMP)
 ROM_END
+
+} // anonymous namespace
+
 
 SYST(1989, u20,  0, 0, u20,  u20, roland_u20_state, empty_init, "Roland", "U-20 RS-PCM Keyboard", MACHINE_IS_SKELETON)
 SYST(1989, u220, 0, 0, u220, u20, roland_u20_state, empty_init, "Roland", "U-220 RS-PCM Sound Module", MACHINE_IS_SKELETON)

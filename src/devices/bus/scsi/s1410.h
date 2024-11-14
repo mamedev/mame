@@ -21,16 +21,18 @@ public:
 
 protected:
 	// optional information overrides
-	virtual const tiny_rom_entry *device_rom_region() const override;
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 	virtual void ExecCommand() override;
 	virtual void WriteData( uint8_t *data, int dataLength ) override;
 	virtual void ReadData( uint8_t *data, int dataLength ) override;
 
 private:
-	void s1410_io(address_map &map);
-	void s1410_mem(address_map &map);
+	required_device<harddisk_image_device> m_image;
+
+	void s1410_io(address_map &map) ATTR_COLD;
+	void s1410_mem(address_map &map) ATTR_COLD;
 };
 
 

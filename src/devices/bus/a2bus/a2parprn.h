@@ -46,6 +46,10 @@
     packages.  Common modifications included stretching strobe
     and/or acknowledge pulses to improve reliability.
 
+    The Fourth Dimension board uses a larger EPROM, but still only
+    256 bytes are used.  Instead of the 20-pin header, it has a 16-pin
+    DIP socket, and no jumper block.
+
 ***********************************************************************/
 #ifndef MAME_BUS_A2BUS_A2PARPRN_H
 #define MAME_BUS_A2BUS_A2PARPRN_H
@@ -55,5 +59,6 @@
 #include "a2bus.h"
 
 DECLARE_DEVICE_TYPE(A2BUS_PARPRN, device_a2bus_card_interface)
+DECLARE_DEVICE_TYPE(A2BUS_4DPARPRN, device_a2bus_card_interface)
 
 #endif // MAME_BUS_A2BUS_A2PARPRN_H

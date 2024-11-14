@@ -28,7 +28,7 @@ ROM_END
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-DEFINE_DEVICE_TYPE(PDS030_CB264SE30, nubus_cb264se30_device, "pd3_c264", "RasterOps Colorboard 264/SE30")
+DEFINE_DEVICE_TYPE(PDS030_CB264SE30, nubus_cb264se30_device, "pd3_c264", "RasterOps ColorBoard 264/SE30")
 
 
 //-------------------------------------------------
@@ -39,9 +39,7 @@ void nubus_cb264se30_device::device_add_mconfig(machine_config &config)
 {
 	screen_device &screen(SCREEN(config, CB264SE30_SCREEN_NAME, SCREEN_TYPE_RASTER));
 	screen.set_screen_update(FUNC(nubus_cb264se30_device::screen_update));
-	screen.set_raw(25175000, 800, 0, 640, 525, 0, 480);
-	screen.set_size(1024, 768);
-	screen.set_visarea(0, 640-1, 0, 480-1);
+	screen.set_raw(30.24_MHz_XTAL, 864, 0, 640, 525, 0, 480);
 }
 
 //-------------------------------------------------

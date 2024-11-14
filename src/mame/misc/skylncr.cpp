@@ -134,9 +134,6 @@
 
 namespace {
 
-#define HOPPER_PULSE        50 // guessed
-
-
 class skylncr_state : public driver_device
 {
 public:
@@ -162,6 +159,7 @@ public:
 	void mbutrfly(machine_config &config);
 	void olymp(machine_config &config);
 
+	void init_blshark();
 	void init_butrfly();
 	void init_leadera();
 	void init_mbutrfly() { save_item(NAME(m_mbutrfly_prot)); }
@@ -172,11 +170,11 @@ public:
 	void init_speedwaya();
 	void init_superb2k();
 
-	READ_LINE_MEMBER(mbutrfly_prot_r);
+	int mbutrfly_prot_r();
 
 protected:
-	virtual void machine_start() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	void videoram_w(offs_t offset, uint8_t data);
@@ -195,13 +193,13 @@ private:
 	template<uint8_t Which> TILE_GET_INFO_MEMBER(get_reel_tile_info);
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(vblank_interrupt);
-	void bdream97_opcode_map(address_map &map);
-	void olymp_opcode_map(address_map &map);
-	void io_map_mbutrfly(address_map &map);
-	void io_map_skylncr(address_map &map);
-	void mem_map(address_map &map);
-	void ramdac2_map(address_map &map);
-	void ramdac_map(address_map &map);
+	void bdream97_opcode_map(address_map &map) ATTR_COLD;
+	void olymp_opcode_map(address_map &map) ATTR_COLD;
+	void io_map_mbutrfly(address_map &map) ATTR_COLD;
+	void io_map_skylncr(address_map &map) ATTR_COLD;
+	void mem_map(address_map &map) ATTR_COLD;
+	void ramdac2_map(address_map &map) ATTR_COLD;
+	void ramdac_map(address_map &map) ATTR_COLD;
 
 	tilemap_t *m_tmap = nullptr;
 	required_shared_ptr<uint8_t> m_videoram;
@@ -359,7 +357,7 @@ void skylncr_state::mbutrfly_prot_w(uint8_t data)
 	m_mbutrfly_prot = BIT(data, 7);
 }
 
-READ_LINE_MEMBER(skylncr_state::mbutrfly_prot_r)
+int skylncr_state::mbutrfly_prot_r()
 {
 	return m_mbutrfly_prot;
 }
@@ -679,7 +677,7 @@ static INPUT_PORTS_START( skylncr )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK )
 	PORT_SERVICE_NO_TOGGLE( 0x08, IP_ACTIVE_LOW )   // Settings
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_CUSTOM) PORT_READ_LINE_DEVICE_MEMBER("hopper", ticket_dispenser_device, line_r)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_CUSTOM) PORT_READ_LINE_DEVICE_MEMBER("hopper", FUNC(ticket_dispenser_device::line_r))
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT )
 
@@ -800,7 +798,7 @@ static INPUT_PORTS_START( mbutrfly )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SLOT_STOP1) PORT_NAME("Stop Reel 1, Double Up")
 
 	PORT_MODIFY("IN4")   // $12 (PPI1 port C)
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_READ_LINE_DEVICE_MEMBER(DEVICE_SELF, skylncr_state, mbutrfly_prot_r)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_READ_LINE_MEMBER(FUNC(skylncr_state::mbutrfly_prot_r))
 INPUT_PORTS_END
 
 
@@ -842,7 +840,7 @@ static INPUT_PORTS_START( leader )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK )
 	PORT_SERVICE_NO_TOGGLE( 0x08, IP_ACTIVE_LOW )   // Settings
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_CUSTOM) PORT_READ_LINE_DEVICE_MEMBER("hopper", ticket_dispenser_device, line_r)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_CUSTOM) PORT_READ_LINE_DEVICE_MEMBER("hopper", FUNC(ticket_dispenser_device::line_r))
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT )
 
@@ -984,7 +982,7 @@ static INPUT_PORTS_START( neraidou )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK )
 	PORT_SERVICE_NO_TOGGLE( 0x08, IP_ACTIVE_LOW )   // Settings
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_CUSTOM) PORT_READ_LINE_DEVICE_MEMBER("hopper", ticket_dispenser_device, line_r)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_CUSTOM) PORT_READ_LINE_DEVICE_MEMBER("hopper", FUNC(ticket_dispenser_device::line_r))
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT )
 
@@ -1128,7 +1126,7 @@ static INPUT_PORTS_START( gallag50 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK )
 	PORT_SERVICE_NO_TOGGLE( 0x08, IP_ACTIVE_LOW )   // Settings
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_CUSTOM) PORT_READ_LINE_DEVICE_MEMBER("hopper", ticket_dispenser_device, line_r)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_CUSTOM) PORT_READ_LINE_DEVICE_MEMBER("hopper", FUNC(ticket_dispenser_device::line_r))
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT )
 
@@ -1271,7 +1269,7 @@ static INPUT_PORTS_START( sstar97 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK )
 	PORT_SERVICE_NO_TOGGLE( 0x08, IP_ACTIVE_LOW )   // Settings
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_CUSTOM) PORT_READ_LINE_DEVICE_MEMBER("hopper", ticket_dispenser_device, line_r)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_CUSTOM) PORT_READ_LINE_DEVICE_MEMBER("hopper", FUNC(ticket_dispenser_device::line_r))
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT )
 
@@ -1688,7 +1686,7 @@ void skylncr_state::skylncr(machine_config &config)
 	ppi1.in_pb_callback().set_ioport("IN3");
 	ppi1.in_pc_callback().set_ioport("IN4");
 
-	TICKET_DISPENSER(config, m_hopper, attotime::from_msec(HOPPER_PULSE), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH);
+	TICKET_DISPENSER(config, m_hopper, attotime::from_msec(50)); // duration guessed
 
 	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -2274,6 +2272,17 @@ ROM_START( spcliner ) // on a ROLLA PCB, might actually be another title, won't 
 	ROM_LOAD16_BYTE( "4.u36", 0x00001, 0x20000, CRC(315e7e28) SHA1(c25ca2c9e4bf973cfe9e56a8dc849e53bdc1ebe3) )
 ROM_END
 
+ROM_START( blshark )
+	ROM_REGION( 0x80000, "maincpu", 0 ) // on sub PCB
+	ROM_LOAD( "sub",  0x00000, 0x10000, CRC(ed005267) SHA1(b20c62d76d4d49ee42e1f2f922015bec3cbbd25d) )
+
+	ROM_REGION( 0x80000, "gfx1", 0 )
+	ROM_LOAD( "u32", 0x00000, 0x80000, CRC(3f2f06f1) SHA1(eb1d29da6a454cf45e182f4ce0c8eab66d1d1713) )
+
+	ROM_REGION( 0x80000, "gfx2", 0 )
+	ROM_LOAD( "u33", 0x00000, 0x80000, CRC(e7f53af5) SHA1(49a722e97e384056d36dfa2d4bf754e90505befe) )
+ROM_END
+
 /**********************************
 *           Driver Init           *
 **********************************/
@@ -2461,7 +2470,23 @@ void skylncr_state::init_butrfly()
 		ROM[x] = bitswap<8>(ROM[x] ^ 0x1b, 4, 2, 6, 7, 1, 5, 3, 0);
 }
 
-} // Anonymous namespace
+void skylncr_state::init_blshark() // done by comparing code to skylancr, may be missing something
+{
+	uint8_t *const rom = memregion("maincpu")->base();
+	std::vector<uint8_t> buffer(0x10000);
+
+	memcpy(&buffer[0], rom, 0x10000);
+
+	for (int x = 0x00000; x < 0x10000; x++)
+	{
+		rom[x] = buffer[bitswap<24>(x, 23, 22, 21, 20, 19, 18, 17, 16, 14, 15, 12, 13, 10, 11, 8, 9, 6, 7, 5, 4, 3, 2, 1, 0)];
+
+		if (x >= 0x0b)
+			rom[x] ^= 0xff;
+	}
+}
+
+} // anonymous namespace
 
 
 /****************************************************
@@ -2491,3 +2516,4 @@ GAME( 199?, rolla,     0,        skylncr,  skylncr,  skylncr_state,  empty_init,
 GAME( 2000?,score5,    0,        skylncr,  score5,   skylncr_state,  init_sonikfig,  ROT0, "Z Games",              "Score 5",                                        MACHINE_WRONG_COLORS | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // game runs but screen is completely black due to palette mishandling
 GAME( 2000?,superb2k,  0,        skylncr,  skylncr,  skylncr_state,  init_superb2k,  ROT0, "Random Games",         "Super Butterfly 2000",                           MACHINE_IS_SKELETON ) // encrypted / different CPU type ?
 GAME( 2000, seadevil,  0,        skylncr,  score5,   skylncr_state,  init_sonikfig,  ROT0, "Z Games",              "Sea Devil",                                      MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // GFX ROM loading is wrong, causing severe GFX glitches
+GAME( 2000, blshark,   0,        skylncr,  skylncr,  skylncr_state,  init_blshark,   ROT0, "MDS Hellas",           "Blue Shark (MDS Hellas)",                        MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // protection?

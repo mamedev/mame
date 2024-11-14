@@ -266,6 +266,8 @@ FS 0 to F
 #include "mekd4.lh"
 
 
+namespace {
+
 class mekd4_state : public driver_device
 {
 public:
@@ -301,7 +303,7 @@ public:
 	void mekd4(machine_config &config);
 	void init_mekd4();
 
-	DECLARE_WRITE_LINE_MEMBER(reset_key_w);
+	void reset_key_w(int state);
 	DECLARE_INPUT_CHANGED_MEMBER(keypad_changed);
 	DECLARE_INPUT_CHANGED_MEMBER(rs232_cts_route_change);
 	DECLARE_INPUT_CHANGED_MEMBER(rs232_dcd_route_change);
@@ -317,27 +319,27 @@ private:
 	void stop_pia_pb_w(uint8_t data);
 	uint16_t m_stop_address;
 
-	DECLARE_WRITE_LINE_MEMBER(rs232_route_cts);
-	DECLARE_WRITE_LINE_MEMBER(rs232_route_dcd);
+	void rs232_route_cts(int state);
+	void rs232_route_dcd(int state);
 
 	// Clocks
-	DECLARE_WRITE_LINE_MEMBER(write_f1_clock);
-	DECLARE_WRITE_LINE_MEMBER(write_f3_clock);
-	DECLARE_WRITE_LINE_MEMBER(write_f7_clock);
-	DECLARE_WRITE_LINE_MEMBER(write_f8_clock);
-	DECLARE_WRITE_LINE_MEMBER(write_f9_clock);
-	DECLARE_WRITE_LINE_MEMBER(write_f13_clock);
+	void write_f1_clock(int state);
+	void write_f3_clock(int state);
+	void write_f7_clock(int state);
+	void write_f8_clock(int state);
+	void write_f9_clock(int state);
+	void write_f13_clock(int state);
 
-	DECLARE_READ_LINE_MEMBER(keypad_cb1_r);
+	int keypad_cb1_r();
 	uint8_t keypad_key_r();
 	void led_digit_w(uint8_t data);
 	void led_segment_w(uint8_t data);
 
-	DECLARE_READ_LINE_MEMBER(stop_pia_cb1_r);
-	DECLARE_WRITE_LINE_MEMBER(stop_pia_cb2_w);
+	int stop_pia_cb1_r();
+	void stop_pia_cb2_w(int state);
 
-	void mekd4_stop_mem(address_map &map);
-	void mekd4_mem(address_map &map);
+	void mekd4_stop_mem(address_map &map) ATTR_COLD;
+	void mekd4_mem(address_map &map) ATTR_COLD;
 
 	address_space *m_banked_space;
 
@@ -349,8 +351,8 @@ private:
 	uint8_t m_ram_page; // aka RAP0, RAP1, RAP2
 	uint8_t m_segment;
 	uint8_t m_digit;
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 	required_device<cpu_device> m_maincpu;
 	required_device<address_map_bank_device> m_bankdev;
 	required_device<pia6821_device> m_stop_pia;
@@ -471,17 +473,17 @@ static INPUT_PORTS_START(mekd4)
 	// jumpered to logical low if not driven by the RS232 device. There is
 	// +12 and -12V available at this connector for this purpose.
 	PORT_START("RS232_CTS_ROUTE")
-	PORT_CONFNAME(0x1, 0, "RS232 CTS") PORT_CHANGED_MEMBER(DEVICE_SELF, mekd4_state, rs232_cts_route_change, 0)
+	PORT_CONFNAME(0x1, 0, "RS232 CTS") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(mekd4_state::rs232_cts_route_change), 0)
 	PORT_CONFSETTING(0, "Jumper low")
 	PORT_CONFSETTING(1, "Pass through")
 	PORT_START("RS232_DCD_ROUTE")
-	PORT_CONFNAME(0x1, 0, "RS232 DCD") PORT_CHANGED_MEMBER(DEVICE_SELF, mekd4_state, rs232_dcd_route_change, 0)
+	PORT_CONFNAME(0x1, 0, "RS232 DCD") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(mekd4_state::rs232_dcd_route_change), 0)
 	PORT_CONFSETTING(0, "Jumper low")
 	PORT_CONFSETTING(1, "Pass through")
 
 	// RESET is not wired to the key matrix.
 	PORT_START("RESET")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("RS") PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, mekd4_state, reset_key_w)
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("RS") PORT_WRITE_LINE_MEMBER(FUNC(mekd4_state::reset_key_w))
 
 	// PORT_CODEs are not assigned to the keypad to allow it on screen at
 	// the same time as the terminal or CRT console which also receive
@@ -490,36 +492,36 @@ static INPUT_PORTS_START(mekd4)
 	// machine. If MAME someday allows the keyboard input focus to be
 	// switched then this might be redesigned.
 	PORT_START("COL0")
-	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, mekd4_state, keypad_changed, 0) PORT_NAME("M")
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, mekd4_state, keypad_changed, 0) PORT_NAME("FS")
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, mekd4_state, keypad_changed, 0) PORT_NAME("7")
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, mekd4_state, keypad_changed, 0) PORT_NAME("4")
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, mekd4_state, keypad_changed, 0) PORT_NAME("1")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, mekd4_state, keypad_changed, 0) PORT_NAME("0")
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(mekd4_state::keypad_changed), 0) PORT_NAME("M")
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(mekd4_state::keypad_changed), 0) PORT_NAME("FS")
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(mekd4_state::keypad_changed), 0) PORT_NAME("7")
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(mekd4_state::keypad_changed), 0) PORT_NAME("4")
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(mekd4_state::keypad_changed), 0) PORT_NAME("1")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(mekd4_state::keypad_changed), 0) PORT_NAME("0")
 
 	PORT_START("COL1")
-	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, mekd4_state, keypad_changed, 0) PORT_NAME("EX")
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, mekd4_state, keypad_changed, 0) PORT_NAME("FC")
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, mekd4_state, keypad_changed, 0) PORT_NAME("8")
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, mekd4_state, keypad_changed, 0) PORT_NAME("5")
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, mekd4_state, keypad_changed, 0) PORT_NAME("2")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, mekd4_state, keypad_changed, 0) PORT_NAME("F")
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(mekd4_state::keypad_changed), 0) PORT_NAME("EX")
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(mekd4_state::keypad_changed), 0) PORT_NAME("FC")
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(mekd4_state::keypad_changed), 0) PORT_NAME("8")
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(mekd4_state::keypad_changed), 0) PORT_NAME("5")
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(mekd4_state::keypad_changed), 0) PORT_NAME("2")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(mekd4_state::keypad_changed), 0) PORT_NAME("F")
 
 	PORT_START("COL2")
-	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, mekd4_state, keypad_changed, 0) PORT_NAME("RD")
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, mekd4_state, keypad_changed, 0) PORT_NAME("P/L")
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, mekd4_state, keypad_changed, 0) PORT_NAME("9")
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, mekd4_state, keypad_changed, 0) PORT_NAME("6")
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, mekd4_state, keypad_changed, 0) PORT_NAME("3")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, mekd4_state, keypad_changed, 0) PORT_NAME("E")
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(mekd4_state::keypad_changed), 0) PORT_NAME("RD")
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(mekd4_state::keypad_changed), 0) PORT_NAME("P/L")
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(mekd4_state::keypad_changed), 0) PORT_NAME("9")
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(mekd4_state::keypad_changed), 0) PORT_NAME("6")
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(mekd4_state::keypad_changed), 0) PORT_NAME("3")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(mekd4_state::keypad_changed), 0) PORT_NAME("E")
 
 	PORT_START("COL3")
-	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, mekd4_state, keypad_changed, 0) PORT_NAME("GO")
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, mekd4_state, keypad_changed, 0) PORT_NAME("T/B")
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, mekd4_state, keypad_changed, 0) PORT_NAME("A")
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, mekd4_state, keypad_changed, 0) PORT_NAME("B")
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, mekd4_state, keypad_changed, 0) PORT_NAME("C")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, mekd4_state, keypad_changed, 0) PORT_NAME("D")
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(mekd4_state::keypad_changed), 0) PORT_NAME("GO")
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(mekd4_state::keypad_changed), 0) PORT_NAME("T/B")
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(mekd4_state::keypad_changed), 0) PORT_NAME("A")
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(mekd4_state::keypad_changed), 0) PORT_NAME("B")
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(mekd4_state::keypad_changed), 0) PORT_NAME("C")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(mekd4_state::keypad_changed), 0) PORT_NAME("D")
 
 	// MEK68R2
 
@@ -620,7 +622,7 @@ void mekd4_state::page_w(uint8_t data)
 
 ************************************************************/
 
-WRITE_LINE_MEMBER(mekd4_state::reset_key_w)
+void mekd4_state::reset_key_w(int state)
 {
 	m_maincpu->set_input_line(INPUT_LINE_RESET, state ? CLEAR_LINE : ASSERT_LINE);
 
@@ -640,7 +642,7 @@ INPUT_CHANGED_MEMBER(mekd4_state::keypad_changed)
 	m_kpd_pia->cb1_w(mekd4_state::keypad_key_pressed());
 }
 
-READ_LINE_MEMBER(mekd4_state::keypad_cb1_r)
+int mekd4_state::keypad_cb1_r()
 {
 	return mekd4_state::keypad_key_pressed();
 }
@@ -682,13 +684,13 @@ void mekd4_state::led_digit_w(uint8_t data)
 
 ************************************************************/
 
-READ_LINE_MEMBER(mekd4_state::stop_pia_cb1_r)
+int mekd4_state::stop_pia_cb1_r()
 {
 	uint8_t state = m_cass->input() > +0.0;
 	return state;
 }
 
-WRITE_LINE_MEMBER(mekd4_state::stop_pia_cb2_w)
+void mekd4_state::stop_pia_cb2_w(int state)
 {
 	m_cass->output(state ? -1.0 : +1.0);
 }
@@ -699,7 +701,7 @@ WRITE_LINE_MEMBER(mekd4_state::stop_pia_cb2_w)
 
 ************************************************************/
 
-WRITE_LINE_MEMBER(mekd4_state::rs232_route_cts)
+void mekd4_state::rs232_route_cts(int state)
 {
 	if (m_rs232_cts_route->read())
 		m_acia->write_cts(state);
@@ -708,7 +710,7 @@ WRITE_LINE_MEMBER(mekd4_state::rs232_route_cts)
 	m_cts = state;
 }
 
-WRITE_LINE_MEMBER(mekd4_state::rs232_route_dcd)
+void mekd4_state::rs232_route_dcd(int state)
 {
 	if (m_rs232_dcd_route->read())
 		m_acia->write_dcd(state);
@@ -733,7 +735,7 @@ INPUT_CHANGED_MEMBER(mekd4_state::rs232_dcd_route_change)
 		m_acia->write_dcd(0);
 }
 
-WRITE_LINE_MEMBER(mekd4_state::write_f1_clock)
+void mekd4_state::write_f1_clock(int state)
 {
 	if (BIT(m_rs232_tx_baud->read(), 0))
 		m_acia->write_txc(state);
@@ -741,7 +743,7 @@ WRITE_LINE_MEMBER(mekd4_state::write_f1_clock)
 		m_acia->write_rxc(state);
 }
 
-WRITE_LINE_MEMBER(mekd4_state::write_f3_clock)
+void mekd4_state::write_f3_clock(int state)
 {
 	if (BIT(m_rs232_tx_baud->read(), 1))
 		m_acia->write_txc(state);
@@ -749,7 +751,7 @@ WRITE_LINE_MEMBER(mekd4_state::write_f3_clock)
 		m_acia->write_rxc(state);
 }
 
-WRITE_LINE_MEMBER(mekd4_state::write_f7_clock)
+void mekd4_state::write_f7_clock(int state)
 {
 	if (BIT(m_rs232_tx_baud->read(), 2))
 		m_acia->write_txc(state);
@@ -757,7 +759,7 @@ WRITE_LINE_MEMBER(mekd4_state::write_f7_clock)
 		m_acia->write_rxc(state);
 }
 
-WRITE_LINE_MEMBER(mekd4_state::write_f8_clock)
+void mekd4_state::write_f8_clock(int state)
 {
 	if (BIT(m_rs232_tx_baud->read(), 3))
 		m_acia->write_txc(state);
@@ -765,7 +767,7 @@ WRITE_LINE_MEMBER(mekd4_state::write_f8_clock)
 		m_acia->write_rxc(state);
 }
 
-WRITE_LINE_MEMBER(mekd4_state::write_f9_clock)
+void mekd4_state::write_f9_clock(int state)
 {
 	if (BIT(m_rs232_tx_baud->read(), 4))
 		m_acia->write_txc(state);
@@ -773,7 +775,7 @@ WRITE_LINE_MEMBER(mekd4_state::write_f9_clock)
 		m_acia->write_rxc(state);
 }
 
-WRITE_LINE_MEMBER(mekd4_state::write_f13_clock)
+void mekd4_state::write_f13_clock(int state)
 {
 	if (BIT(m_rs232_tx_baud->read(), 5))
 		m_acia->write_txc(state);
@@ -999,7 +1001,7 @@ void mekd4_state::mekd4(machine_config &config)
 	rs232.set_option_device_input_defaults("terminal", DEVICE_INPUT_DEFAULTS_NAME(terminal));
 
 	// Stop PIA. IRQB is NC.
-	PIA6821(config, m_stop_pia, 0);
+	PIA6821(config, m_stop_pia);
 	m_stop_pia->writepa_handler().set(FUNC(mekd4_state::stop_pia_pa_w));
 	m_stop_pia->writepb_handler().set(FUNC(mekd4_state::stop_pia_pb_w));
 	m_stop_pia->ca2_w(1); // Connected to 'abort' TP2. Can be toggled low to and abort user code.
@@ -1008,7 +1010,7 @@ void mekd4_state::mekd4(machine_config &config)
 	m_stop_pia->irqa_handler().set("mainnmi", FUNC(input_merger_device::in_w<0>));
 
 	// Keypad and display PIA. CA1, CA2, IRQA are NC. CB2 is pulled high.
-	PIA6821(config, m_kpd_pia, 0);
+	PIA6821(config, m_kpd_pia);
 	m_kpd_pia->readpa_handler().set(FUNC(mekd4_state::keypad_key_r));
 	m_kpd_pia->readcb1_handler().set(FUNC(mekd4_state::keypad_cb1_r));
 	m_kpd_pia->writepa_handler().set(FUNC(mekd4_state::led_segment_w));
@@ -1016,7 +1018,7 @@ void mekd4_state::mekd4(machine_config &config)
 	m_kpd_pia->irqb_handler().set("mainnmi", FUNC(input_merger_device::in_w<1>));
 
 	// Keypad and display board User PIA.
-	PIA6821(config, m_user_pia, 0);
+	PIA6821(config, m_user_pia);
 	m_user_pia->irqa_handler().set("mainirq", FUNC(input_merger_device::in_w<0>));
 	m_user_pia->irqb_handler().set("mainirq", FUNC(input_merger_device::in_w<1>));
 
@@ -1044,7 +1046,7 @@ void mekd4_state::mekd4(machine_config &config)
 	// CA2 light pen input.
 	// PB0 is mode flags and light pen control.
 	// CB1 is VSYNC, and CB2 is HSYNC.
-	PIA6821(config, m_r2_pia, 0);
+	PIA6821(config, m_r2_pia);
 	m_r2_pia->readpa_handler().set(FUNC(mekd4_state::r2_pia_pa_r));
 	m_r2_pia->readpb_handler().set(FUNC(mekd4_state::r2_pia_pb_r));
 	m_r2_pia->irqa_handler().set("mainirq", FUNC(input_merger_device::in_w<2>));
@@ -1069,6 +1071,9 @@ ROM_START(mekd4)
 	ROM_REGION(0x0400, "rommap",0)
 	ROM_LOAD("d4map00.rom", 0x0000, 0x0400, CRC(7e676444) SHA1(4f8a7443da509561be958786f9bd72eac3969a89))
 ROM_END
+
+} // anonymous namespace
+
 
 /***************************************************************************
 

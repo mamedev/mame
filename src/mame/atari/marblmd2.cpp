@@ -35,6 +35,9 @@
 #include "speaker.h"
 #include "tilemap.h"
 
+
+namespace {
+
 class marblmd2_state : public driver_device
 {
 public:
@@ -51,8 +54,8 @@ public:
 	void marblmd2(machine_config &config);
 
 protected:
-	virtual void video_start() override;
-	virtual void machine_start() override;
+	virtual void video_start() override ATTR_COLD;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -62,7 +65,7 @@ private:
 	required_device<atari_vad_device> m_vad;
 	required_device<atari_motion_objects_device> m_mob;
 
-	void marblmd2_map(address_map &map);
+	void marblmd2_map(address_map &map) ATTR_COLD;
 
 	void latch_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
@@ -383,5 +386,8 @@ ROM_START( marblmd2 )
 	ROM_LOAD( "sound.19e",  0x00000, 0x20000, CRC(e916bef7) SHA1(e07ddc8a3e1656d7307b767e692cf4a575ca47a3) )
 	ROM_LOAD( "sound.12e",  0x60000, 0x20000, CRC(bab2f8e5) SHA1(bbe2d693d40e5eeba315fe7b6380a2030b66f23e) )
 ROM_END
+
+} // anonymous namespace
+
 
 GAME( 1991, marblmd2, 0, marblmd2, marblmd2, marblmd2_state, empty_init, ROT0,  "Atari Games", "Marble Madness II (prototype)", MACHINE_SUPPORTS_SAVE )

@@ -5,8 +5,8 @@
     Exidy 440 hardware
 
 *************************************************************************/
-#ifndef MAME_INCLUDES_EXIDY440_H
-#define MAME_INCLUDES_EXIDY440_H
+#ifndef MAME_EXIDY_EXIDY440_H
+#define MAME_EXIDY_EXIDY440_H
 
 #pragma once
 
@@ -31,9 +31,9 @@ public:
 		m_palette(*this, "palette")
 	{ }
 
-	DECLARE_READ_LINE_MEMBER(firq_beam_r);
-	DECLARE_READ_LINE_MEMBER(firq_vblank_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(hitnmiss_button1_r);
+	int firq_beam_r();
+	int firq_vblank_r();
+	ioport_value hitnmiss_button1_r();
 	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
 	void init_showdown();
 	void init_yukon();
@@ -62,18 +62,18 @@ protected:
 	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int scroll_offset, int check_collision);
 	void update_screen(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect,  int scroll_offset, int check_collision);
 	uint32_t screen_update_exidy440(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_WRITE_LINE_MEMBER(vblank_interrupt_w);
+	void vblank_interrupt_w(int state);
 	TIMER_CALLBACK_MEMBER(delayed_sound_command_w);
 	TIMER_CALLBACK_MEMBER(beam_firq_callback);
 	TIMER_CALLBACK_MEMBER(collide_firq_callback);
 	void exidy440_update_firq();
 	void exidy440_bank_select(uint8_t bank);
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 	void exidy440_video(machine_config &config);
-	void exidy440_map(address_map &map);
+	void exidy440_map(address_map &map) ATTR_COLD;
 
 	required_shared_ptr<uint8_t> m_imageram;
 	required_shared_ptr<uint8_t> m_spriteram;
@@ -98,8 +98,8 @@ private:
 	uint8_t m_firq_select = 0U;
 	uint8_t m_palettebank_io = 0U;
 	uint8_t m_palettebank_vis = 0U;
-	emu_timer *m_beam_firq_timer = nullptr;
-	emu_timer *m_collide_firq_timer = nullptr;
+	emu_timer *m_beam_firq_timer;
+	emu_timer *m_collide_firq_timer[128];
 	uint8_t m_beam_firq_count = 0U;
 };
 
@@ -117,10 +117,10 @@ protected:
 	void topsecex_yscroll_w(uint8_t data);
 	uint32_t screen_update_topsecex(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	uint8_t m_topsecex_yscroll = 0U;
 };
 
-#endif // MAME_INCLUDES_EXIDY440_H
+#endif // MAME_EXIDY_EXIDY440_H

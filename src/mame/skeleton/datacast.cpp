@@ -54,6 +54,8 @@
 #include "screen.h"
 
 
+namespace {
+
 class datacast_state : public driver_device
 {
 public:
@@ -73,7 +75,7 @@ public:
 	void datacast(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	uint8_t keypad_r();
@@ -81,8 +83,8 @@ private:
 	uint8_t i2c_r();
 	void i2c_w(uint8_t data);
 
-	void mem_map(address_map &map);
-	void saa5240_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
+	void saa5240_map(address_map &map) ATTR_COLD;
 
 	required_device<i80186_cpu_device> m_maincpu;
 	required_device<screen_device> m_screen;
@@ -250,6 +252,8 @@ ROM_START(datacast)
 	ROM_LOAD16_BYTE("v29.ic9",  0x0000, 0x8000, CRC(650e6d34) SHA1(0c8709ce8220bda5da8fd41b81e531fc6f7b8ee4))
 	ROM_LOAD16_BYTE("v29.ic10", 0x0001, 0x8000, CRC(bd39d683) SHA1(9d6cc2d3d6a26ca35e4e38beac64d31e345d6808))
 ROM_END
+
+} // anonymous namespace
 
 
 //   YEAR  NAME      PARENT  COMPAT  MACHINE     INPUT     CLASS           INIT        COMPANY             FULLNAME                                    FLAGS

@@ -44,8 +44,8 @@ public:
 	uint8_t read_reg(int offset);
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	TIMER_CALLBACK_MEMBER(baud_expire);
 
@@ -86,6 +86,7 @@ private:
 
 	devcb_write_line intrq_cb;
 
+	void updatebaudtimer(int ch);
 	void updateirqs();
 	void initchannel(int ch);
 	void resetchannel(int ch);

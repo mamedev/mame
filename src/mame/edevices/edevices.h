@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood
-#ifndef MAME_VIDEO_EDEVICES_H
-#define MAME_VIDEO_EDEVICES_H
+#ifndef MAME_EDEVICES_EDEVICES_H
+#define MAME_EDEVICES_EDEVICES_H
 
 #pragma once
 
@@ -41,8 +41,8 @@ public:
 	uint32_t draw(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	virtual int get_priority(const uint16_t *source);
 private:
@@ -91,4 +91,4 @@ protected:
 DECLARE_DEVICE_TYPE(EDEVICES_VID, edevices_device)
 DECLARE_DEVICE_TYPE(EDEVICES_SFORCE_VID, edevices_sforce_device)
 
-#endif // MAME_VIDEO_EDEVICES_H
+#endif // MAME_EDEVICES_EDEVICES_H

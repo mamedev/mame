@@ -29,12 +29,12 @@ public:
 	virtual uint32_t pci_read(pci_bus_device *pcibus, int function, int offset, uint32_t mem_mask) override;
 	virtual void pci_write(pci_bus_device *pcibus, int function, int offset, uint32_t data, uint32_t mem_mask) override;
 
-	DECLARE_WRITE_LINE_MEMBER(smi_act_w);
+	void smi_act_w(int state);
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	void i82439tx_configure_memory(uint8_t val, offs_t begin, offs_t end);
 	void update_smram_mappings();

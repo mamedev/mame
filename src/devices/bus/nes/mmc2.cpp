@@ -16,12 +16,11 @@
 
 
 #ifdef NES_PCB_DEBUG
-#define VERBOSE 1
+#define VERBOSE (LOG_GENERAL)
 #else
-#define VERBOSE 0
+#define VERBOSE (0)
 #endif
-
-#define LOG_MMC(x) do { if (VERBOSE) logerror x; } while (0)
+#include "logmacro.h"
 
 
 //-------------------------------------------------
@@ -96,7 +95,7 @@ void nes_fxrom_device::pcb_reset()
 
  iNES: mapper 9
 
- In MESS: Supported
+ In MAME: Supported
 
  -------------------------------------------------*/
 
@@ -104,25 +103,25 @@ void nes_pxrom_device::ppu_latch(offs_t offset)
 {
 	if ((offset & 0x3ff0) == 0x0fd0)
 	{
-		LOG_MMC(("mmc2 vrom latch switch (bank 0 low): %02x\n", m_reg[0]));
+		LOG("mmc2 vrom latch switch (bank 0 low): %02x\n", m_reg[0]);
 		m_latch1 = 0xfd;
 		chr4_0(m_reg[0], CHRROM);
 	}
 	else if ((offset & 0x3ff0) == 0x0fe0)
 	{
-		LOG_MMC(("mmc2 vrom latch switch (bank 0 high): %02x\n", m_reg[1]));
+		LOG("mmc2 vrom latch switch (bank 0 high): %02x\n", m_reg[1]);
 		m_latch1 = 0xfe;
 		chr4_0(m_reg[1], CHRROM);
 	}
 	else if ((offset & 0x3ff0) == 0x1fd0)
 	{
-		LOG_MMC(("mmc2 vrom latch switch (bank 1 low): %02x\n", m_reg[2]));
+		LOG("mmc2 vrom latch switch (bank 1 low): %02x\n", m_reg[2]);
 		m_latch2 = 0xfd;
 		chr4_4(m_reg[2], CHRROM);
 	}
 	else if ((offset & 0x3ff0) == 0x1fe0)
 	{
-		LOG_MMC(("mmc2 vrom latch switch (bank 0 high): %02x\n", m_reg[3]));
+		LOG("mmc2 vrom latch switch (bank 0 high): %02x\n", m_reg[3]);
 		m_latch2 = 0xfe;
 		chr4_4(m_reg[3], CHRROM);
 	}
@@ -130,7 +129,7 @@ void nes_pxrom_device::ppu_latch(offs_t offset)
 
 void nes_pxrom_device::pxrom_write(offs_t offset, uint8_t data)
 {
-	LOG_MMC(("pxrom write_h, offset: %04x, data: %02x\n", offset, data));
+	LOG("pxrom write_h, offset: %04x, data: %02x\n", offset, data);
 	switch (offset & 0x7000)
 	{
 		case 0x2000:
@@ -160,7 +159,7 @@ void nes_pxrom_device::pxrom_write(offs_t offset, uint8_t data)
 			set_nt_mirroring(BIT(data, 0) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
 			break;
 		default:
-			LOG_MMC(("MMC2 uncaught w: %04x:%02x\n", offset, data));
+			LOG("MMC2 uncaught w: %04x:%02x\n", offset, data);
 			break;
 	}
 }
@@ -176,13 +175,13 @@ void nes_pxrom_device::pxrom_write(offs_t offset, uint8_t data)
 
  iNES: mapper 10
 
- In MESS: Supported
+ In MAME: Supported
 
  -------------------------------------------------*/
 
 void nes_fxrom_device::write_h(offs_t offset, uint8_t data)
 {
-	LOG_MMC(("fxrom write_h, offset: %04x, data: %02x\n", offset, data));
+	LOG("fxrom write_h, offset: %04x, data: %02x\n", offset, data);
 	switch (offset & 0x7000)
 	{
 		case 0x2000:

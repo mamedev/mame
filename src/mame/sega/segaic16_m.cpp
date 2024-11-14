@@ -11,14 +11,11 @@
 
 #include <algorithm>
 
-//**************************************************************************
-//  DEBUGGING
-//**************************************************************************
+#define LOG_DIVIDE  (1U << 1)
+#define LOG_COMPARE (1U << 2)
 
-#define LOG_MULTIPLY    (0)
-#define LOG_DIVIDE      (0)
-#define LOG_COMPARE     (0)
-
+#define VERBOSE (0)
+#include "logmacro.h"
 
 
 //**************************************************************************
@@ -139,7 +136,7 @@ u16 sega_315_5249_divider_device::read(offs_t offset)
 
 void sega_315_5249_divider_device::write(offs_t offset, u16 data, u16 mem_mask)
 {
-	if (LOG_DIVIDE) logerror("divide_w(%X) = %04X\n", offset, data);
+	LOGMASKED(LOG_DIVIDE, "divide_w(%X) = %04X\n", offset, data);
 
 	// only 4 effective write registers
 	switch (offset & 3)
@@ -265,7 +262,7 @@ sega_315_5250_compare_timer_device::sega_315_5250_compare_timer_device(const mac
 //  exck_w - clock the timer
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER(sega_315_5250_compare_timer_device::exck_w)
+void sega_315_5250_compare_timer_device::exck_w(int state)
 {
 	if (m_exck == bool(state))
 		return;
@@ -283,8 +280,7 @@ WRITE_LINE_MEMBER(sega_315_5250_compare_timer_device::exck_w)
 	// regardless of the enable, a value of 0xfff will generate the IRQ
 	if (old_counter == 0xfff)
 	{
-		if (!m_68kint_callback.isnull())
-			m_68kint_callback(ASSERT_LINE);
+		m_68kint_callback(ASSERT_LINE);
 		m_counter = m_regs[8] & 0xfff;
 	}
 }
@@ -296,8 +292,7 @@ WRITE_LINE_MEMBER(sega_315_5250_compare_timer_device::exck_w)
 
 void sega_315_5250_compare_timer_device::interrupt_ack()
 {
-	if (!m_68kint_callback.isnull())
-		m_68kint_callback(CLEAR_LINE);
+	m_68kint_callback(CLEAR_LINE);
 }
 
 
@@ -307,7 +302,7 @@ void sega_315_5250_compare_timer_device::interrupt_ack()
 
 u16 sega_315_5250_compare_timer_device::read(offs_t offset)
 {
-	if (LOG_COMPARE) logerror("compare_r(%X) = %04X\n", offset, m_regs[offset]);
+	LOGMASKED(LOG_COMPARE, "compare_r(%X) = %04X\n", offset, m_regs[offset]);
 	switch (offset & 15)
 	{
 		case 0x0:   return m_regs[0];
@@ -331,7 +326,7 @@ u16 sega_315_5250_compare_timer_device::read(offs_t offset)
 
 void sega_315_5250_compare_timer_device::write(offs_t offset, u16 data, u16 mem_mask)
 {
-	if (LOG_COMPARE) logerror("compare_w(%X) = %04X\n", offset, data);
+	LOGMASKED(LOG_COMPARE, "compare_w(%X) = %04X\n", offset, data);
 	switch (offset & 15)
 	{
 		case 0x0:   COMBINE_DATA(&m_regs[0]); execute(); break;
@@ -359,10 +354,6 @@ void sega_315_5250_compare_timer_device::write(offs_t offset, u16 data, u16 mem_
 
 void sega_315_5250_compare_timer_device::device_start()
 {
-	// bind our handlers
-	m_68kint_callback.resolve();
-	m_zint_callback.resolve();
-
 	// save states
 	save_item(NAME(m_regs));
 	save_item(NAME(m_counter));
@@ -382,8 +373,7 @@ void sega_315_5250_compare_timer_device::device_reset()
 	m_bit = 0;
 
 	interrupt_ack();
-	if (!m_zint_callback.isnull())
-		m_zint_callback(CLEAR_LINE);
+	m_zint_callback(CLEAR_LINE);
 }
 
 
@@ -394,8 +384,7 @@ void sega_315_5250_compare_timer_device::device_reset()
 TIMER_CALLBACK_MEMBER(sega_315_5250_compare_timer_device::write_to_sound)
 {
 	m_regs[11] = param;
-	if (!m_zint_callback.isnull())
-		m_zint_callback(ASSERT_LINE);
+	m_zint_callback(ASSERT_LINE);
 }
 
 
@@ -405,7 +394,7 @@ TIMER_CALLBACK_MEMBER(sega_315_5250_compare_timer_device::write_to_sound)
 
 u8 sega_315_5250_compare_timer_device::zread()
 {
-	if (!m_zint_callback.isnull() && !machine().side_effects_disabled())
+	if (!machine().side_effects_disabled())
 		m_zint_callback(CLEAR_LINE);
 
 	return m_regs[11];

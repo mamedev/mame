@@ -19,6 +19,7 @@ but the syntax has yet to be worked out. BAUD [0-9] is allowed but what is it do
 ************************************************************************************/
 
 #include "emu.h"
+
 #include "cpu/m6502/m6502.h"
 #include "imagedev/cassette.h"
 #include "imagedev/floppy.h"
@@ -29,10 +30,15 @@ but the syntax has yet to be worked out. BAUD [0-9] is allowed but what is it do
 #include "sound/spkrdev.h"
 #include "video/mc6847.h"
 #include "bus/centronics/ctronics.h"
+
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
+#include "utf8.h"
+
+
+namespace {
 
 class shine_state : public driver_device
 {
@@ -56,10 +62,10 @@ public:
 	void shine(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
-	void shine_mem(address_map &map);
+	void shine_mem(address_map &map) ATTR_COLD;
 	uint8_t via0_pa_r();
 	void via0_pb_w(uint8_t data);
 	void floppy_w(uint8_t data);
@@ -293,6 +299,8 @@ ROM_START( shine )
 	ROM_LOAD("e3.ic61",         0x3000, 0x1000, CRC(5a1624e9) SHA1(b4fbc983c646d4e70dda878d5dd75e45408522a9))
 	ROM_LOAD("f3.ic60",         0x4000, 0x1000, CRC(1549ca2f) SHA1(5b011cdca0121a550af956b6d4580544942459ce))
 ROM_END
+
+} // anonymous namespace
 
 
 /*    YEAR  NAME    PARENT  COMPAT  MACHINE   INPUT   CLASS         INIT         COMPANY                  FULLNAME    FLAGS */

@@ -14,10 +14,10 @@ I/O:    2x 8255, 4x 8-dip banks, 1x single dip switch (at position 11m)
 OSC:    20MHz
 
 Notes:
-- Loosely based off rmhaihai.cpp.
-  Changes needed for merging both implementations seems too trivial to warrant a
+- Loosely based off alba/rmhaihai.cpp.
+  Changes needed for merging both implementations seems too non-trivial to warrant a
   driver merge, basically just the video HW, the CRTC (448x224 clocked at 20 MHz?)
-  and a few I/O bits looks very similar, the odd screen size is also a thing in srmp2.cpp
+  and a few I/O bits looks similar, the odd screen size is also a thing in srmp2.cpp
   and probably other Seta HWs.
 - CPU seems a bit too slow when deciding about what tile to discard,
   it also takes a bit too much to sync when a player takes a tile from the pond in
@@ -68,9 +68,9 @@ public:
 	void init_vsmjtria();
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	required_device_array<cpu_device, 2> m_cpu;
@@ -96,10 +96,10 @@ private:
 	template <uint8_t Which> void colorram_w(offs_t offset, uint8_t data);
 	template <uint8_t Which> uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void main_prg_map(address_map &map);
-	void main_io_map(address_map &map);
-	void sub_prg_map(address_map &map);
-	void sub_io_map(address_map &map);
+	void main_prg_map(address_map &map) ATTR_COLD;
+	void main_io_map(address_map &map) ATTR_COLD;
+	void sub_prg_map(address_map &map) ATTR_COLD;
+	void sub_io_map(address_map &map) ATTR_COLD;
 };
 
 /*
@@ -525,20 +525,20 @@ void vsmjtria_state::vsmjtria(machine_config &config)
 	GENERIC_LATCH_8(config, "latch1");
 
 	i8255_device &ppi0(I8255(config, "ppi0"));
-	ppi0.in_pa_callback().set_log("ppi0 pa read");
+	ppi0.in_pa_callback().set([this]() { logerror("%s ppi0 pa read\n", machine().describe_context()); return 0; });
 	ppi0.in_pb_callback().set(FUNC(vsmjtria_state::keyboard_r<0>));
 	ppi0.in_pc_callback().set_ioport("P1_COIN");
 	ppi0.out_pa_callback().set(FUNC(vsmjtria_state::keyboard_w<0>));
-	ppi0.out_pb_callback().set_log("ppi0 pb write");
-	ppi0.out_pc_callback().set_log("ppi0 pc write");
+	ppi0.out_pb_callback().set([this](uint8_t data) { logerror("%s ppi0 pb write: %02X\n", machine().describe_context(), data); });
+	ppi0.out_pc_callback().set([this](uint8_t data) { logerror("%s ppi0 pc write: %02X\n", machine().describe_context(), data); });
 
 	i8255_device &ppi1(I8255(config, "ppi1"));
-	ppi1.in_pa_callback().set_log("ppi1 pa read");
+	ppi1.in_pa_callback().set([this]() { logerror("%s ppi1 pa read\n", machine().describe_context()); return 0; });
 	ppi1.in_pb_callback().set(FUNC(vsmjtria_state::keyboard_r<1>));
 	ppi1.in_pc_callback().set_ioport("P2_COIN");
 	ppi1.out_pa_callback().set(FUNC(vsmjtria_state::keyboard_w<1>));
-	ppi1.out_pb_callback().set_log("ppi1 pb write");
-	ppi1.out_pc_callback().set_log("ppi1 pc write");
+	ppi1.out_pb_callback().set([this](uint8_t data) { logerror("%s ppi1 pb write: %02X\n", machine().describe_context(), data); });
+	ppi1.out_pc_callback().set([this](uint8_t data) { logerror("%s ppi1 pc write: %02X\n", machine().describe_context(), data); });
 
 	PALETTE(config, "palette0", palette_device::RGB_444_PROMS, "mainproms", 256);
 	PALETTE(config, "palette1", palette_device::RGB_444_PROMS, "subproms", 256);

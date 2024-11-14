@@ -15,17 +15,17 @@ opd_format::opd_format() : wd177x_format(formats)
 {
 }
 
-const char *opd_format::name() const
+const char *opd_format::name() const noexcept
 {
 	return "opd";
 }
 
-const char *opd_format::description() const
+const char *opd_format::description() const noexcept
 {
 	return "Opus Discovery disk image";
 }
 
-const char *opd_format::extensions() const
+const char *opd_format::extensions() const noexcept
 {
 	return "opd,opu";
 }

@@ -3,6 +3,8 @@
 #ifndef MAME_MACHINE_MB8795_H
 #define MAME_MACHINE_MB8795_H
 
+#include "dinetwork.h"
+
 class mb8795_device :   public device_t,
 						public device_network_interface
 {
@@ -17,11 +19,11 @@ public:
 	void tx_dma_w(uint8_t data, bool eof);
 	void rx_dma_r(uint8_t &data, bool &eof);
 
-	void map(address_map &map);
+	void map(address_map &map) ATTR_COLD;
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	virtual void recv_cb(uint8_t *buf, int len) override;
 

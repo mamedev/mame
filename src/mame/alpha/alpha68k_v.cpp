@@ -77,12 +77,12 @@ VIDEO_START_MEMBER(alpha68k_II_state,alpha68k)
 /******************************************************************************/
 
 // TODO: sprite flip select as in snk68.cpp, palette bank for V games if they ever trigger it
-WRITE_LINE_MEMBER(alpha68k_II_state::video_control2_w)
+void alpha68k_II_state::video_control2_w(int state)
 {
 	logerror("%s: Q2 changed to %d\n", machine().describe_context(), state);
 }
 
-WRITE_LINE_MEMBER(alpha68k_II_state::video_control3_w)
+void alpha68k_II_state::video_control3_w(int state)
 {
 	logerror("%s: Q3 changed to %d\n", machine().describe_context(), state);
 }

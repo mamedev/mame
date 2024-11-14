@@ -208,7 +208,7 @@ void tanbus_tug8082_device::write(offs_t offset, uint8_t data, int inhrom, int i
 //  IMPLEMENTATION
 //**************************************************************************
 
-WRITE_LINE_MEMBER(tanbus_tug8082_device::bus_irq_w)
+void tanbus_tug8082_device::bus_irq_w(int state)
 {
 	/* Manual says these DIPs are not used but schematic suggests they are */
 	//switch (m_dips[0]->read() >> 2)
@@ -222,7 +222,7 @@ WRITE_LINE_MEMBER(tanbus_tug8082_device::bus_irq_w)
 	//}
 }
 
-WRITE_LINE_MEMBER(tanbus_tug8082_device::vdu_irq_w)
+void tanbus_tug8082_device::vdu_irq_w(int state)
 {
 	switch (m_dips[0]->read() & 0x03)
 	{

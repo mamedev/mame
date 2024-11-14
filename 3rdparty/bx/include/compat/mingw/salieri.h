@@ -1598,6 +1598,22 @@
 #  define SALIERI_DEFINED_String_length
 #endif
 
+#if defined(_In_count_) && defined(SALIERI_DEFINED_In_count_)
+#  undef _In_count_
+#endif
+#if !defined(_In_count_)
+#  define _In_count_(param)
+#  define SALIERI_DEFINED_In_count_
+#endif
+
+#if defined(_In_opt_count_) && defined(SALIERI_DEFINED_In_opt_count_)
+#  undef _In_opt_count_
+#endif
+#if !defined(_In_opt_count_)
+#  define _In_opt_count_(param)
+#  define SALIERI_DEFINED_In_opt_count_
+#endif
+
 #if defined(SALIERI_VERSION)
 #  undef SALIERI_VERSION
 #endif

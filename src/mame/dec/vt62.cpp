@@ -14,6 +14,8 @@
 #include "screen.h"
 //#include "speaker.h"
 
+namespace {
+
 class vt62_state : public driver_device
 {
 public:
@@ -27,14 +29,14 @@ public:
 	void vt62(machine_config &mconfig);
 
 protected:
-	virtual void machine_reset() override;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	void micro_map(address_map &map);
-	void memory_map(address_map &map);
-	void decode_map(address_map &map);
+	void micro_map(address_map &map) ATTR_COLD;
+	void memory_map(address_map &map) ATTR_COLD;
+	void decode_map(address_map &map) ATTR_COLD;
 
 	required_device<vt61_cpu_device> m_maincpu;
 	required_device<ay31015_device> m_uart;
@@ -116,6 +118,9 @@ ROM_START(vt62)
 	ROM_LOAD_NIB_LOW( "23-050a9_82s131.e16", 0x200, 0x100, CRC(758125a1) SHA1(b1de4448ea90da07f2aacb665542545bbcd17371))
 	ROM_CONTINUE(                            0x100, 0x100)
 ROM_END
+
+} // anonymous namespace
+
 
 //COMP(1977, vt61t, 0, 0, vt61t, vt61t, vt61_state, empty_init, "Digital Equipment Corporation", "VT61/t", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
 COMP(1978, vt62, 0, 0, vt62, vt62, vt62_state, empty_init, "Digital Equipment Corporation", "VT62 DECscope", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)

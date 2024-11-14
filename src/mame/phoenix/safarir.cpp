@@ -58,6 +58,9 @@ modified by Hau
 #include "speaker.h"
 #include "tilemap.h"
 
+
+namespace {
+
 class safarir_state : public driver_device
 {
 public:
@@ -73,8 +76,8 @@ public:
 	void safarir(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -97,7 +100,7 @@ private:
 	void safarir_palette(palette_device &palette) const;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void safarir_audio(machine_config &config);
-	void main_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
 };
 
 
@@ -485,6 +488,7 @@ ROM_START( safarir ) // Taito PCB, labels are the same as Japan ver.
 	ROM_LOAD( "rl-07.40", 0x0000, 0x0400, CRC(ba525203) SHA1(1c261cc1259787a7a248766264fefe140226e465) )
 ROM_END
 
+} // anonymous namespace
 
 
 /*************************************

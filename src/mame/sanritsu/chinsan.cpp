@@ -21,8 +21,7 @@
 
 #include "emu.h"
 
-#include "mc8123.h"
-
+#include "cpu/z80/mc8123.h"
 #include "cpu/z80/z80.h"
 #include "machine/i8255.h"
 #include "machine/nvram.h"
@@ -67,7 +66,7 @@ public:
 	TILE_GET_INFO_MEMBER(tile_info);
 
 	void adpcm_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(adpcm_int_w);
+	void adpcm_int_w(int state);
 
 	INTERRUPT_GEN_MEMBER(vblank_int);
 	void ctrl_w(uint8_t data);
@@ -75,13 +74,13 @@ public:
 
 	void chinsan(machine_config &config);
 	void mayumi(machine_config &config);
-	void chinsan_io_map(address_map &map);
-	void chinsan_map(address_map &map);
-	void decrypted_opcodes_map(address_map &map);
-	void mayumi_io_map(address_map &map);
+	void chinsan_io_map(address_map &map) ATTR_COLD;
+	void chinsan_map(address_map &map) ATTR_COLD;
+	void decrypted_opcodes_map(address_map &map) ATTR_COLD;
+	void mayumi_io_map(address_map &map) ATTR_COLD;
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	required_device<z80_device> m_maincpu;
@@ -412,7 +411,7 @@ void chinsan_state::adpcm_w(uint8_t data)
 	m_adpcm->reset_w(0);
 }
 
-WRITE_LINE_MEMBER( chinsan_state::adpcm_int_w )
+void chinsan_state::adpcm_int_w(int state)
 {
 	if (m_adpcm_pos >= 0x10000 || m_adpcm_idle)
 	{

@@ -9,7 +9,7 @@
     namcofl.cpp (all games)
     namconb1.cpp (all games)
     gal3.cpp (all games)
-    namcos21.cpp (Driver's Eyes, Solvalou, Starblade, Air Combat, Cyber Sled) (everything except Winning Run series)
+    namcos21*.cpp (Driver's Eyes, Solvalou, Starblade, Air Combat, Cyber Sled) (everything except Winning Run series)
     namcos2.cpp (Steel Gunner, Steel Gunner 2, Lucky & Wild, Suzuka 8 Hours, Suzuka 8 Hours 2)
     deco32.cpp (Dragon Gun, Lock 'n' Loaded)
 
@@ -55,11 +55,21 @@
 
 #include <algorithm>
 
+/*************************************
+ *
+ *  Graphics definitions
+ *
+ *************************************/
+
+GFXDECODE_MEMBER(namco_c355spr_device::gfxinfo)
+	GFXDECODE_DEVICE(DEVICE_SELF, 0, gfx_16x16x8_raw, 0, 16)
+GFXDECODE_END
+
 DEFINE_DEVICE_TYPE(NAMCO_C355SPR, namco_c355spr_device, "namco_c355spr", "Namco 186/187 or C355 (Sprites)")
 
 namco_c355spr_device::namco_c355spr_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock) :
 	device_t(mconfig, type, tag, owner, clock),
-	device_gfx_interface(mconfig, *this, nullptr),
+	device_gfx_interface(mconfig, *this),
 	device_video_interface(mconfig, *this),
 	m_pri_cb(*this, DEVICE_SELF, FUNC(namco_c355spr_device::default_priority)),
 	m_read_spritetile(*this, DEVICE_SELF, FUNC(namco_c355spr_device::read_spritetile)),
@@ -70,7 +80,6 @@ namco_c355spr_device::namco_c355spr_device(const machine_config &mconfig, device
 	m_palxor(0),
 	m_buffer(0),
 	m_external_prifill(false),
-	m_gfx_region(*this, DEVICE_SELF),
 	m_colbase(0),
 	m_colors(16),
 	m_granularity(256),
@@ -358,19 +367,12 @@ void namco_c355spr_device::copybitmap(bitmap_rgb32 &dest_bmp, const rectangle &c
 
 void namco_c355spr_device::device_start()
 {
-	m_pri_cb.resolve();
+	decode_gfx(gfxinfo);
+	gfx(0)->set_colors(m_colors);
+	gfx(0)->set_colorbase(m_colbase);
+	gfx(0)->set_granularity(m_granularity);
 
-	gfx_layout obj_layout =
-	{
-		16,16,
-		0,
-		8, /* bits per pixel */
-		{ STEP8(0,1) },
-		{ STEP16(0,8) },
-		{ STEP16(0,8*16) },
-		16*16*8
-	};
-	obj_layout.total = m_gfx_region->bytes() / (16*16*8 / 8);
+	m_pri_cb.resolve();
 
 	std::fill(std::begin(m_position), std::end(m_position), 0x0000);
 
@@ -392,9 +394,6 @@ void namco_c355spr_device::device_start()
 		screen().register_screen_bitmap(m_renderbitmap);
 		screen().register_screen_bitmap(m_screenbitmap);
 	}
-
-	set_gfx(0, std::make_unique<gfx_element>(&palette(), obj_layout, m_gfx_region->base(), 0, m_colors, m_colbase));
-	gfx(0)->set_granularity(m_granularity);
 
 	m_read_spritetile.resolve();
 	m_read_spriteformat.resolve();
@@ -464,7 +463,7 @@ u16 namco_c355spr_device::spriteram_r(offs_t offset)
 	return m_spriteram[0][offset];
 }
 
-WRITE_LINE_MEMBER(namco_c355spr_device::vblank)
+void namco_c355spr_device::vblank(int state)
 {
 	if (state)
 	{
@@ -560,7 +559,6 @@ void namco_c355spr_device::render_sprites(const rectangle cliprect, bitmap_ind8 
 	temp_bitmap.fill(0xffff, cliprect);
 	for (int no = 0; no < 2; no++)
 	{
-		int i = 0;
 		c355_sprite *sprite_ptr = m_spritelist[no].get();
 
 		while (sprite_ptr != m_sprite_end[no])
@@ -602,7 +600,6 @@ void namco_c355spr_device::render_sprites(const rectangle cliprect, bitmap_ind8 
 					}
 				}
 			}
-			i++;
 			sprite_ptr++;
 		}
 	}

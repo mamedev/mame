@@ -6,10 +6,10 @@
 //
 //============================================================
 
-#pragma once
+#ifndef MAME_RENDER_BGFX_DEPTHREADER_H
+#define MAME_RENDER_BGFX_DEPTHREADER_H
 
-#ifndef __DRAWBGFX_DEPTH_READER__
-#define __DRAWBGFX_DEPTH_READER__
+#pragma once
 
 #include <string>
 
@@ -17,11 +17,11 @@
 
 class depth_reader : public state_reader {
 public:
-	static uint64_t read_from_value(const Value& value, std::string prefix);
+	static uint64_t read_from_value(const Value& value, const std::string &prefix);
 
 private:
 	static const int FUNCTION_COUNT = 8;
 	static const string_to_enum FUNCTION_NAMES[FUNCTION_COUNT];
 };
 
-#endif // __DRAWBGFX_DEPTH_READER__
+#endif // MAME_RENDER_BGFX_DEPTHREADER_H

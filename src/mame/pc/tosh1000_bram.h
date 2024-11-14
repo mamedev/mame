@@ -8,8 +8,8 @@
 
 ***************************************************************************/
 
-#ifndef MAME_MACHINE_TOSH1000_BRAM_H
-#define MAME_MACHINE_TOSH1000_BRAM_H
+#ifndef MAME_PC_TOSH1000_BRAM_H
+#define MAME_PC_TOSH1000_BRAM_H
 
 #pragma once
 
@@ -27,8 +27,8 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// device_nvram_interface overrides
 	virtual void nvram_default() override;
@@ -44,4 +44,4 @@ private:
 // device type definition
 DECLARE_DEVICE_TYPE(TOSH1000_BRAM, tosh1000_bram_device)
 
-#endif // MAME_MACHINE_TOSH1000_BRAM_H
+#endif // MAME_PC_TOSH1000_BRAM_H

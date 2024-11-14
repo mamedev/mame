@@ -48,8 +48,8 @@ public:
 	bim68153_channel(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// read register handlers
 	uint8_t do_bimreg_control_r();
@@ -59,7 +59,7 @@ public:
 	void do_bimreg_control_w(uint8_t data);
 	void do_bimreg_vector_w(uint8_t vector);
 
-	DECLARE_WRITE_LINE_MEMBER( int_w );
+	void int_w(int state);
 	devcb_read8 m_out_iack_cb;
 	uint8_t m_int_state;
 
@@ -126,19 +126,19 @@ public:
 	void write(offs_t offset, uint8_t data);
 
 
-	DECLARE_WRITE_LINE_MEMBER( iackin_w ) { m_iackin = state; }
-	DECLARE_WRITE_LINE_MEMBER( int0_w ) { m_chn[CHN_0]->int_w(state); }
-	DECLARE_WRITE_LINE_MEMBER( int1_w ) { m_chn[CHN_1]->int_w(state); }
-	DECLARE_WRITE_LINE_MEMBER( int2_w ) { m_chn[CHN_2]->int_w(state); }
-	DECLARE_WRITE_LINE_MEMBER( int3_w ) { m_chn[CHN_3]->int_w(state); }
+	void iackin_w(int state) { m_iackin = state; }
+	void int0_w(int state) { m_chn[CHN_0]->int_w(state); }
+	void int1_w(int state) { m_chn[CHN_1]->int_w(state); }
+	void int2_w(int state) { m_chn[CHN_2]->int_w(state); }
+	void int3_w(int state) { m_chn[CHN_3]->int_w(state); }
 
 protected:
 	bim68153_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint32_t variant);
 
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 	void trigger_interrupt(int ch);
 	int get_channel_index(bim68153_channel *ch);

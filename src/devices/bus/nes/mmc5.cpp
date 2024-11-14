@@ -20,13 +20,15 @@
 
 #include "speaker.h"
 
-#ifdef NES_PCB_DEBUG
-#define VERBOSE 1
-#else
-#define VERBOSE 0
-#endif
+#define LOG_UNHANDLED (1U << 1)
+#define LOG_BANK_INFO (1U << 2)
 
-#define LOG_MMC(x) do { if (VERBOSE) logerror x; } while (0)
+#ifdef NES_PCB_DEBUG
+#define VERBOSE (LOG_UNHANDLED | LOG_GENERAL)
+#else
+#define VERBOSE (LOG_UNHANDLED)
+#endif
+#include "logmacro.h"
 
 
 #define LAST_CHR_REG_A 0
@@ -432,7 +434,7 @@ uint8_t nes_exrom_device::chr_r(offs_t offset)
 uint8_t nes_exrom_device::read_l(offs_t offset)
 {
 	int value;
-	LOG_MMC(("exrom read_l, offset: %04x\n", offset));
+	LOG("exrom read_l, offset: %04x\n", offset);
 	offset += 0x100;
 
 	if ((offset >= 0x1c00) && (offset <= 0x1fff))
@@ -463,7 +465,7 @@ uint8_t nes_exrom_device::read_l(offs_t offset)
 
 	default:
 		if (!machine().side_effects_disabled())
-			logerror("MMC5 uncaught read, offset: %04x\n", offset + 0x4100);
+			LOGMASKED(LOG_UNHANDLED, "MMC5 uncaught read, offset: %04x\n", offset + 0x4100);
 		return get_open_bus();
 	}
 }
@@ -471,7 +473,7 @@ uint8_t nes_exrom_device::read_l(offs_t offset)
 
 void nes_exrom_device::write_l(offs_t offset, uint8_t data)
 {
-	LOG_MMC(("exrom write_l, offset: %04x, data: %02x\n", offset, data));
+	LOG("exrom write_l, offset: %04x, data: %02x\n", offset, data);
 	offset += 0x100;
 
 	if ((offset >= 0x1000) && (offset <= 0x1015))
@@ -501,29 +503,29 @@ void nes_exrom_device::write_l(offs_t offset, uint8_t data)
 	case 0x1100:
 		m_prg_mode = data & 0x03;
 		update_prg();
-		//LOG_MMC(("MMC5 rom bank mode: %02x\n", data));
+		LOGMASKED(LOG_BANK_INFO, "MMC5 rom bank mode: %02x\n", data);
 		break;
 
 	case 0x1101:
 		m_chr_mode = data & 0x03;
 		m_ex1_chr = 0;
 		m_split_chr = 0;
-		//LOG_MMC(("MMC5 vrom bank mode: %02x\n", data));
+		LOGMASKED(LOG_BANK_INFO, "MMC5 vrom bank mode: %02x\n", data);
 		break;
 
 	case 0x1102:
 		m_wram_protect_1 = data & 0x03;
-		LOG_MMC(("MMC5 vram protect 1: %02x\n", data));
+		LOG("MMC5 vram protect 1: %02x\n", data);
 		break;
 
 	case 0x1103:
 		m_wram_protect_2 = data & 0x03;
-		LOG_MMC(("MMC5 vram protect 2: %02x\n", data));
+		LOG("MMC5 vram protect 2: %02x\n", data);
 		break;
 
 	case 0x1104: // Extra VRAM (EXRAM)
 		m_exram_control = data & 0x03;
-		LOG_MMC(("MMC5 exram control: %02x\n", data));
+		LOG("MMC5 exram control: %02x\n", data);
 		break;
 
 	case 0x1105:
@@ -542,7 +544,7 @@ void nes_exrom_device::write_l(offs_t offset, uint8_t data)
 		break;
 
 	case 0x1113:
-		LOG_MMC(("MMC5 mid RAM bank select: %02x\n", data & 0x07));
+		LOG("MMC5 mid RAM bank select: %02x\n", data & 0x07);
 		m_wram_base = data & 0x07;
 		break;
 
@@ -603,12 +605,12 @@ void nes_exrom_device::write_l(offs_t offset, uint8_t data)
 
 	case 0x1203:
 		m_irq_count = data;
-		LOG_MMC(("MMC5 irq scanline: %d\n", m_irq_count));
+		LOG("MMC5 irq scanline: %d\n", m_irq_count);
 		break;
 
 	case 0x1204:
 		m_irq_enable = data & 0x80;
-		LOG_MMC(("MMC5 irq enable: %02x\n", data));
+		LOG("MMC5 irq enable: %02x\n", data);
 		break;
 
 	case 0x1205:
@@ -620,7 +622,7 @@ void nes_exrom_device::write_l(offs_t offset, uint8_t data)
 		break;
 
 	default:
-		logerror("MMC5 uncaught write, offset: %04x, data: %02x\n", offset + 0x4100, data);
+		LOG("MMC5 uncaught write, offset: %04x, data: %02x\n", offset + 0x4100, data);
 		break;
 	}
 }
@@ -631,7 +633,7 @@ void nes_exrom_device::write_l(offs_t offset, uint8_t data)
 // same mechanism is used also when "WRAM" is mapped in higher banks
 uint8_t nes_exrom_device::read_m(offs_t offset)
 {
-	LOG_MMC(("exrom read_m, offset: %04x\n", offset));
+	LOG("exrom read_m, offset: %04x\n", offset);
 	if (!m_battery.empty() && !m_prgram.empty())  // 2 chips present: first is BWRAM, second is WRAM
 	{
 		if (m_wram_base & 0x04)
@@ -649,7 +651,7 @@ uint8_t nes_exrom_device::read_m(offs_t offset)
 
 void nes_exrom_device::write_m(offs_t offset, uint8_t data)
 {
-	LOG_MMC(("exrom write_m, offset: %04x, data: %02x\n", offset, data));
+	LOG("exrom write_m, offset: %04x, data: %02x\n", offset, data);
 	if (m_wram_protect_1 != 0x02 || m_wram_protect_2 != 0x01)
 		return;
 
@@ -662,7 +664,7 @@ void nes_exrom_device::write_m(offs_t offset, uint8_t data)
 // some games (e.g. Bandit Kings of Ancient China) write to PRG-RAM through 0x8000-0xdfff
 uint8_t nes_exrom_device::read_h(offs_t offset)
 {
-	LOG_MMC(("exrom read_h, offset: %04x\n", offset));
+	LOG("exrom read_h, offset: %04x\n", offset);
 	int bank = offset / 0x2000;
 
 	if (bank < 3 && offset >= bank * 0x2000 && offset < (bank + 1) * 0x2000 && m_prg_ram_mapped[bank])
@@ -678,7 +680,7 @@ uint8_t nes_exrom_device::read_h(offs_t offset)
 
 void nes_exrom_device::write_h(offs_t offset, uint8_t data)
 {
-	LOG_MMC(("exrom write_h, offset: %04x, data: %02x\n", offset, data));
+	LOG("exrom write_h, offset: %04x, data: %02x\n", offset, data);
 	int bank = offset / 0x2000;
 	if (m_wram_protect_1 != 0x02 || m_wram_protect_2 != 0x01 || bank == 3 || !m_prg_ram_mapped[bank])
 		return;

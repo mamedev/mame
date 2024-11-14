@@ -1,14 +1,14 @@
+LUA_VERSION= 5.1
+
 # Installation directories
 # System's libraries directory (where binary libraries are installed)
-LUA_LIBDIR= "c:\lua5.1"
+LUA_LIBDIR= "c:\lua$(LUA_VERSION)"
 
 # Lua includes directory
-LUA_INC= "c:\lua5.1\include"
+LUA_INC= "c:\lua$(LUA_VERSION)\include"
 
 # Lua library
-LUA_LIB= "c:\lua5.1\lua5.1.lib"
-
-LIBNAME= $T.dll
+LUA_LIB= "c:\lua$(LUA_VERSION)\lua$(LUA_VERSION).lib"
 
 # Compilation directives
 WARN= /O2

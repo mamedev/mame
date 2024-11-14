@@ -26,6 +26,8 @@ There is next to no error checking, for example the T command
 #include "screen.h"
 
 
+namespace {
+
 class homez80_state : public driver_device
 {
 public:
@@ -45,11 +47,11 @@ private:
 	INTERRUPT_GEN_MEMBER(homez80_interrupt);
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void mem_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
 
 	bool m_irq = 0;
-	void machine_reset() override;
-	void machine_start() override;
+	void machine_reset() override ATTR_COLD;
+	void machine_start() override ATTR_COLD;
 	required_device<cpu_device> m_maincpu;
 	required_shared_ptr<u8> m_vram;
 	required_region_ptr<u8> m_p_chargen;
@@ -315,6 +317,9 @@ ROM_START( homez80 )
 	ROM_REGION(0x0800, "chargen",0)
 	ROM_LOAD( "chargen.ic12", 0x0000, 0x0800, CRC(93243be3) SHA1(718efc06c131843c15383e50af23f3a5cf44dd9b) ) // 27C256, A11/12/13/14 tied low.
 ROM_END
+
+} // anonymous namespace
+
 
 /* Driver */
 

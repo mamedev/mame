@@ -51,7 +51,7 @@ base_xc1700e_device::base_xc1700e_device(const machine_config &mconfig, device_t
 	: device_t(mconfig, type, tag, owner, clock)
 	, m_capacity(capacity)
 	, m_region(*this, DEVICE_SELF)
-	, m_cascade_cb(*this)
+	, m_cascade_cb(*this, 1)
 	, m_reset(true)
 	, m_address(0)
 {
@@ -59,8 +59,6 @@ base_xc1700e_device::base_xc1700e_device(const machine_config &mconfig, device_t
 
 void base_xc1700e_device::device_start()
 {
-	m_cascade_cb.resolve_safe(1);
-
 	save_item(NAME(m_reset));
 	save_item(NAME(m_address));
 }

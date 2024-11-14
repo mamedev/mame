@@ -5,7 +5,9 @@
 #ifndef __RECTPACKER_H__
 #define __RECTPACKER_H__
 
+#include "bitmap.h"
 
+#include <cstdint>
 #include <vector>
 
 class rectangle_packer
@@ -27,7 +29,7 @@ public:
 	class packable_rectangle
 	{
 	public:
-		packable_rectangle() : m_hash(0), m_width(-1), m_height(-1) { }
+		packable_rectangle() = default;
 		packable_rectangle(uint32_t hash, uint32_t format, int width, int height, int rowpixels, const rgb_t *palette, void *base)
 			: m_hash(hash)
 			, m_format(format)
@@ -48,19 +50,19 @@ public:
 		void* base() const { return m_base; }
 
 	private:
-		uint32_t m_hash;
-		uint32_t m_format;
-		int m_width;
-		int m_height;
-		int m_rowpixels;
-		const rgb_t* m_palette;
-		void* m_base;
+		uint32_t m_hash = 0;
+		uint32_t m_format = 0;
+		int m_width = -1;
+		int m_height = -1;
+		int m_rowpixels = 0;
+		const rgb_t* m_palette = nullptr;
+		void* m_base = nullptr;
 	};
 
 	class packed_rectangle
 	{
 	public:
-		packed_rectangle() : m_hash(0), m_format(0), m_width(-1), m_height(-1), m_x(-1), m_y(-1), m_rowpixels(0), m_palette(nullptr), m_base(nullptr) { }
+		packed_rectangle() = default;
 		packed_rectangle(const packed_rectangle& rect)
 			: m_hash(rect.m_hash)
 			, m_format(rect.m_format)
@@ -97,15 +99,15 @@ public:
 		void* base() const { return m_base; }
 
 	private:
-		uint32_t m_hash;
-		uint32_t m_format;
-		int m_width;
-		int m_height;
-		int m_x;
-		int m_y;
-		int m_rowpixels;
-		const rgb_t* m_palette;
-		void* m_base;
+		uint32_t m_hash = 0;
+		uint32_t m_format = 0;
+		int m_width = -1;
+		int m_height = -1;
+		int m_x = -1;
+		int m_y = -1;
+		int m_rowpixels = 0;
+		const rgb_t* m_palette = nullptr;
+		void* m_base = nullptr;
 	};
 
 	bool pack(const std::vector<packable_rectangle>& rects, std::vector<std::vector<packed_rectangle>>& packs, int pack_size);

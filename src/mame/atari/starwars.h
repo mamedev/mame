@@ -5,13 +5,13 @@
     Atari Star Wars hardware
 
 ***************************************************************************/
-#ifndef MAME_INCLUDES_STARWARS_H
-#define MAME_INCLUDES_STARWARS_H
+#ifndef MAME_ATARI_STARWARS_H
+#define MAME_ATARI_STARWARS_H
 
 #pragma once
 
-#include "machine/6532riot.h"
 #include "machine/gen_latch.h"
+#include "machine/mos6530.h"
 #include "slapstic.h"
 #include "machine/x2212.h"
 #include "sound/pokey.h"
@@ -42,12 +42,12 @@ public:
 	void init_esb();
 	void init_starwars();
 
-	DECLARE_READ_LINE_MEMBER(matrix_flag_r);
+	int matrix_flag_r();
 
 private:
 	required_device<generic_latch_8_device> m_soundlatch;
 	required_device<generic_latch_8_device> m_mainlatch;
-	required_device<riot6532_device> m_riot;
+	required_device<mos6532_device> m_riot;
 	required_shared_ptr<uint8_t> m_mathram;
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
@@ -74,31 +74,28 @@ private:
 	int32_t m_ACC = 0;
 	void irq_ack_w(uint8_t data);
 	void starwars_nstore_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(recall_w);
-	DECLARE_WRITE_LINE_MEMBER(coin1_counter_w);
-	DECLARE_WRITE_LINE_MEMBER(coin2_counter_w);
+	void recall_w(int state);
+	void coin1_counter_w(int state);
+	void coin2_counter_w(int state);
 	uint8_t starwars_prng_r();
-	DECLARE_WRITE_LINE_MEMBER(prng_reset_w);
+	void prng_reset_w(int state);
 	uint8_t starwars_div_reh_r();
 	uint8_t starwars_div_rel_r();
 	void starwars_math_w(offs_t offset, uint8_t data);
 
 	uint8_t starwars_main_ready_flag_r();
-	DECLARE_WRITE_LINE_MEMBER(boost_interleave_hack);
 	void starwars_soundrst_w(uint8_t data);
 	void quad_pokeyn_w(offs_t offset, uint8_t data);
-	virtual void machine_reset() override;
+	virtual void machine_reset() override ATTR_COLD;
 	TIMER_CALLBACK_MEMBER(math_run_clear);
-	uint8_t r6532_porta_r();
-	void r6532_porta_w(uint8_t data);
 
 	void starwars_mproc_init();
 	void starwars_mproc_reset();
 	void run_mproc();
 
-	void esb_main_map(address_map &map);
-	void main_map(address_map &map);
-	void sound_map(address_map &map);
+	void esb_main_map(address_map &map) ATTR_COLD;
+	void main_map(address_map &map) ATTR_COLD;
+	void sound_map(address_map &map) ATTR_COLD;
 };
 
-#endif // MAME_INCLUDES_STARWARS_H
+#endif // MAME_ATARI_STARWARS_H

@@ -528,12 +528,6 @@ void tms3203x_device::device_start()
 	space(AS_PROGRAM).cache(m_cache);
 	space(AS_PROGRAM).specific(m_program);
 
-	// resolve devcb handlers
-	m_xf0_cb.resolve_safe();
-	m_xf1_cb.resolve_safe();
-	m_iack_cb.resolve_safe();
-	m_holda_cb.resolve_safe();
-
 	// set up the internal boot loader ROM
 	if (m_mcbl_mode)
 	{
@@ -857,17 +851,6 @@ uint32_t tms3203x_device::execute_min_cycles() const noexcept
 uint32_t tms3203x_device::execute_max_cycles() const noexcept
 {
 	return 5 * 16; // max opcode cycle * low power operation mode
-}
-
-
-//-------------------------------------------------
-//  execute_input_lines - return the number of
-//  input/interrupt lines
-//-------------------------------------------------
-
-uint32_t tms3203x_device::execute_input_lines() const noexcept
-{
-	return 14;
 }
 
 

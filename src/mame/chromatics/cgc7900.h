@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Curt Coder
-#ifndef MAME_INCLUDES_CGC7900_H
-#define MAME_INCLUDES_CGC7900_H
+#ifndef MAME_CHROMATICS_CGC7900_H
+#define MAME_CHROMATICS_CGC7900_H
 
 #pragma once
 
@@ -78,8 +78,8 @@ public:
 	required_device<i8251_device> m_i8251_0;
 	required_device<i8251_device> m_i8251_1;
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	void cgc7900_palette(palette_device &palette) const;
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -97,7 +97,7 @@ public:
 	u16 sync_r();
 	u16 unmapped_r();
 
-	template <unsigned N> DECLARE_WRITE_LINE_MEMBER(irq) { irq_encoder(N, state); }
+	template <unsigned N> void irq(int state) { irq_encoder(N, state); }
 
 	void update_clut();
 	void draw_bitmap(screen_device *screen, bitmap_rgb32 &bitmap);
@@ -116,9 +116,9 @@ public:
 
 	void cgc7900(machine_config &config);
 	void cgc7900_video(machine_config &config);
-	void cgc7900_mem(address_map &map);
-	void keyboard_mem(address_map &map);
-	void cpu_space_map(address_map &map);
+	void cgc7900_mem(address_map &map) ATTR_COLD;
+	void keyboard_mem(address_map &map) ATTR_COLD;
+	void cpu_space_map(address_map &map) ATTR_COLD;
 private:
 	u16 kbd_mods = 0U;
 	u8 kbd_data = 0U;
@@ -127,4 +127,4 @@ private:
 	void irq_encoder(int pin, int state);
 };
 
-#endif
+#endif // MAME_CHROMATICS_CGC7900_H

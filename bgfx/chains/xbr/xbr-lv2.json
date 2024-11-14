@@ -32,7 +32,6 @@
 	"passes": [
 		{
 			"effect": "xbr/xbr-lv2",
-			"applytint": true,
 			"name": "Main Pass",
 			"input": [
 				{ "sampler": "decal", "texture": "screen" }

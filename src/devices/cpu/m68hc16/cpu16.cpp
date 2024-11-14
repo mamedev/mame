@@ -15,7 +15,7 @@
     interface uses 24-bit physical addresses, with or without a MMU.)
 
     The execution core is currently somewhat incomplete. Indexed jump
-    instructions, extended divisions and the MAC unit are not yet
+    instructions, extended divisions, RMAC, PSHMAC and POPMAC are not yet
     supported. Interrupts have also not been implemented yet.
 
 ***************************************************************************/
@@ -36,6 +36,8 @@ enum class cpu16_device::seq : u16
 	STORE16_EA, STORE16_EXT,
 	ABA,
 	ABX,
+	ACE,
+	ACED, ACED_2,
 	ADDA_IND8, ADDA_IND8_3, ADDA_IMM8, ADDA_IND16, ADDA_IND16_3, ADDA_EXT, ADDA_INDE, ADDA_INDE_3,
 	ADDB_IND8, ADDB_IND8_3, ADDB_IMM8, ADDB_IND16, ADDB_IND16_3, ADDB_EXT, ADDB_INDE, ADDB_INDE_3,
 	ADDD_IND8, ADDD_IND8_3, ADDD_IMM8, ADDD_IMM16, ADDD_IND16, ADDD_IND16_3, ADDD_EXT, ADDD_INDE, ADDD_INDE_3,
@@ -49,11 +51,13 @@ enum class cpu16_device::seq : u16
 	ANDD_IND8, ANDD_IND8_3, ANDD_IMM16, ANDD_IND16, ANDD_IND16_3, ANDD_EXT, ANDD_INDE,
 	ANDE_IMM16, ANDE_IND16, ANDE_IND16_3, ANDE_EXT,
 	ANDP,
+	ASLM, ASLM_2,
 	ASR_IND8, ASR_IND8_3, ASR_IND16, ASR_IND16_3, ASR_EXT,
 	ASRA,
 	ASRB,
 	ASRD,
 	ASRE,
+	ASRM, ASRM_2,
 	ASRW_IND16, ASRW_IND16_3, ASRW_EXT,
 	BCLR_IND16, BCLR_IND16_3, BCLR_EXT, BCLR_IND8, BCLR_IND8_2, BCLR_IND8_3,
 	BCLRW_IND16, BCLRW_IND16_3, BCLRW_EXT,
@@ -104,6 +108,7 @@ enum class cpu16_device::seq : u16
 	LDED, LDED_2, LDED_2B, LDED_3, LDED_3B, LDED_4,
 	LDHI, LDHI_2, LDHI_2B, LDHI_3, LDHI_3B, LDHI_4,
 	LDX_IND8, LDX_IND8_3, LDX_IMM16, LDX_IND16, LDX_IND16_3, LDX_EXT,
+	MAC, MAC_2, MAC_3, MAC_4, MAC_4B, MAC_5,
 	MOVB_IXP_EXT, MOVB_IXP_EXT_3, MOVB_EXT_IXP, MOVB_EXT_IXP_3, MOVB_EXT_EXT, MOVB_EXT_EXT_3,
 	MOVW_IXP_EXT, MOVW_IXP_EXT_3, MOVW_EXT_IXP, MOVW_EXT_IXP_3, MOVW_EXT_EXT, MOVW_EXT_EXT_3,
 	MUL, MUL_2, MUL_3, MUL_4, MUL_5,
@@ -159,7 +164,12 @@ enum class cpu16_device::seq : u16
 	TDMSK,
 	TDP,
 	TED,
+	TEDM, TEDM_2,
+	TEM, TEM_2,
 	TEKB,
+	TMER, TMER_2, TMER_3,
+	TMET,
+	TMXED, TMXED_2, TMXED_3,
 	TPA,
 	TPD,
 	TST_IND8, TST_IND8_3, TST_IND16, TST_IND16_3, TST_EXT,
@@ -273,6 +283,12 @@ void cpu16_device::set_ix(int which, u16 value) noexcept
 	m_index_regs[which] = (m_index_regs[which] & 0xf0000) | value;
 }
 
+u32 cpu16_device::add_ix_masked(int which, int offset) const noexcept
+{
+	u32 mask = m_index_mask[which] != 0 ? m_index_mask[which] : 0xffff;
+	return (m_index_regs[which] & ~mask) | ((m_index_regs[which] + offset) & mask);
+}
+
 u8 cpu16_device::get_xk(int which) const noexcept
 {
 	return (m_index_regs[which] & 0xf0000) >> 16;
@@ -302,9 +318,15 @@ void cpu16_device::device_start()
 
 	using namespace std::placeholders;
 	state_add(CPU16_FWA, "FWA", m_fwa, std::bind(&cpu16_device::debug_set_pcbase, this, _1)).mask(0xffffe);
+	state_add(CPU16_PC, "PC", m_pc, std::bind(&cpu16_device::set_pc, this, _1)).mask(0xffffe);
+	state_add(STATE_GENPC, "GENPC", m_pc, std::bind(&cpu16_device::set_pc, this, _1)).mask(0xffffe).noshow();
+	state_add(STATE_GENPCBASE, "CURPC", m_fwa, std::bind(&cpu16_device::debug_set_pcbase, this, _1)).mask(0xffffe).noshow();
 	state_add(CPU16_IPIPEC, "IPIPEC", m_fetch_pipe[2]);
 	state_add(CPU16_IPIPEB, "IPIPEB", m_fetch_pipe[1]);
 	//state_add(CPU16_IPIPEA, "IPIPEA", m_fetch_pipe[0]);
+	state_add(CPU16_CCR, "CCR", m_ccr, std::bind(&cpu16_device::debug_set_ccr, this, _1));
+	state_add(STATE_GENFLAGS, "CURFLAGS", m_ccr, std::bind(&cpu16_device::debug_set_ccr, this, _1)).noshow().formatstr("%13s");
+	state_add<u16>(CPU16_K, "K", std::bind(&cpu16_device::get_k, this), std::bind(&cpu16_device::set_k, this, _1)).noshow();
 	state_add(CPU16_D, "D", m_d);
 	state_add<u8>(CPU16_A, "A",
 		[this]() { return (m_d & 0xff00) >> 8; },
@@ -328,12 +350,6 @@ void cpu16_device::device_start()
 	state_add<u8>(CPU16_SK, "SK",
 		[this]() { return (m_index_regs[3] & 0xf0000) >> 16; },
 		[this](u8 value) { m_index_regs[3] = (m_index_regs[3] & 0x0ffff) | u32(value) << 16; }).mask(0xf).noshow();
-	state_add(CPU16_PC, "PC", m_pc, std::bind(&cpu16_device::set_pc, this, _1)).mask(0xffffe);
-	state_add(STATE_GENPC, "GENPC", m_pc, std::bind(&cpu16_device::set_pc, this, _1)).mask(0xffffe).noshow();
-	state_add(STATE_GENPCBASE, "CURPC", m_fwa, std::bind(&cpu16_device::debug_set_pcbase, this, _1)).mask(0xffffe).noshow();
-	state_add(CPU16_CCR, "CCR", m_ccr, std::bind(&cpu16_device::debug_set_ccr, this, _1));
-	state_add(STATE_GENFLAGS, "CURFLAGS", m_ccr, std::bind(&cpu16_device::debug_set_ccr, this, _1)).noshow().formatstr("%13s");
-	state_add<u16>(CPU16_K, "K", std::bind(&cpu16_device::get_k, this), std::bind(&cpu16_device::set_k, this, _1)).noshow();
 	state_add(CPU16_HR, "HR", m_hr);
 	state_add(CPU16_IR, "IR", m_ir);
 	state_add(CPU16_AM, "AM", m_am).mask(0xfffffffff);
@@ -392,7 +408,7 @@ const cpu16_device::seq cpu16_device::s_inst_decode[4][256] =
 		seq::SUBA_IND8, seq::ADDA_IND8, seq::SUBA_IND8, seq::ADDA_IND8, seq::EORA_IND8, seq::LDAA_IND8, seq::ANDA_IND8, seq::ORAA_IND8,
 		seq::CMPA_IND8, seq::BITA_IND8, seq::STAA_IND8, seq::INVALID, seq::CPX_IND8, seq::CPX_IND8, seq::CPX_IND8, seq::CPX_IND8,
 		seq::SUBA_IMM8, seq::ADDA_IMM8, seq::SUBA_IMM8, seq::ADDA_IMM8, seq::EORA_IMM8, seq::LDAA_IMM8, seq::ANDA_IMM8, seq::ORAA_IMM8,
-		seq::CMPA_IMM8, seq::BITA_IMM8, seq::JMP_EXT20, seq::INVALID, seq::ADDE_IMM8, seq::INVALID, seq::INVALID, seq::INVALID,
+		seq::CMPA_IMM8, seq::BITA_IMM8, seq::JMP_EXT20, seq::MAC, seq::ADDE_IMM8, seq::INVALID, seq::INVALID, seq::INVALID,
 
 		// AX-BX
 		seq::SUBD_IND8, seq::ADDD_IND8, seq::SUBD_IND8, seq::ADDD_IND8, seq::EORD_IND8, seq::LDD_IND8, seq::ANDD_IND8, seq::ORD_IND8,
@@ -487,8 +503,8 @@ const cpu16_device::seq cpu16_device::s_inst_decode[4][256] =
 		seq::CPD_INDE, seq::INVALID, seq::STD_INDE, seq::INVALID, seq::INVALID, seq::INVALID, seq::INVALID, seq::INVALID,
 		seq::SUBD_INDE, seq::ADDD_INDE, seq::SUBD_INDE, seq::ADDD_INDE, seq::EORD_INDE, seq::LDD_INDE, seq::ANDD_INDE, seq::ORD_INDE,
 		seq::CPD_INDE, seq::INVALID, seq::STD_INDE, seq::INVALID, seq::INVALID, seq::INVALID, seq::INVALID, seq::INVALID,
-		seq::LDHI, seq::INVALID, seq::INVALID, seq::INVALID, seq::INVALID, seq::INVALID, seq::INVALID, seq::CLRM,
-		seq::INVALID, seq::INVALID, seq::INVALID, seq::TEKB, seq::INVALID, seq::INVALID, seq::INVALID, seq::INVALID,
+		seq::LDHI, seq::TEDM, seq::TEM, seq::TMXED, seq::TMER, seq::TMET, seq::ASLM, seq::CLRM,
+		seq::INVALID, seq::INVALID, seq::ASRM, seq::TEKB, seq::INVALID, seq::INVALID, seq::INVALID, seq::INVALID,
 
 		// 27CX-27FX
 		seq::SUBB_INDE, seq::ADDB_INDE, seq::SUBB_INDE, seq::ADDB_INDE, seq::EORB_INDE, seq::LDAB_INDE, seq::ANDB_INDE, seq::ORAB_INDE,
@@ -508,7 +524,7 @@ const cpu16_device::seq cpu16_device::s_inst_decode[4][256] =
 		seq::PSHA, seq::PULA, seq::SBA, seq::ABA, seq::ROLA, seq::ASRA, seq::RORA, seq::RORA,
 		seq::NEGB, seq::DECB, seq::NEGB, seq::INCB, seq::ROLB, seq::CLRB, seq::TSTB, seq::TAB,
 		seq::PSHB, seq::PULB, seq::XGAB, seq::CBA, seq::ROLB, seq::ASRB, seq::RORB, seq::RORB,
-		seq::INVALID, seq::DAA, seq::INVALID, seq::INVALID, seq::MUL, seq::EMUL, seq::EMULS, seq::EMULS,
+		seq::INVALID, seq::DAA, seq::ACE, seq::ACED, seq::MUL, seq::EMUL, seq::EMULS, seq::EMULS,
 		seq::INVALID, seq::INVALID, seq::DIV, seq::DIV, seq::TPD, seq::TDP, seq::INVALID, seq::TDMSK,
 		seq::SUBE_IMM16, seq::ADDE_IMM16, seq::SUBE_IMM16, seq::ADDE_IMM16, seq::EORE_IMM16, seq::LDE_IMM16, seq::ANDE_IMM16, seq::ORE_IMM16,
 		seq::CPE_IMM16, seq::INVALID, seq::ANDP, seq::ORP, seq::AIX_IMM16, seq::AIX_IMM16, seq::AIX_IMM16, seq::AIX_IMM16,
@@ -762,6 +778,76 @@ void cpu16_device::divu16(bool frac) noexcept
 		// Set Z flag if quotient is zero; clear V and C
 		m_ccr = (m_ccr & 0xf8ff) | (get_ix(0) == 0 ? 0x0400 : 0);
 	}
+}
+
+u64 cpu16_device::accumulate32(u32 data, bool v) noexcept
+{
+	u64 sum = (m_am + (v ? data : s64(s32(data)))) & 0xfffffffff;
+
+	// Set or clear extension bit overflow (EV) depending on result
+	if ((sum >> 32) != (BIT(sum, 31) ? 0xf : 0))
+	{
+		m_ccr |= 0x1000;
+
+		// Check for AM overflow and latch sign when it first occurs
+		if (!BIT(m_ccr, 14) && BIT(sum, 35) != BIT(m_am, 35))
+		{
+			m_ccr |= 0x4000;
+			m_sl = BIT(sum, 35);
+		}
+	}
+	else
+		m_ccr &= 0xefff;
+
+	return sum;
+}
+
+void cpu16_device::aslm() noexcept
+{
+	u64 result = (m_am << 1) & 0xfffffffff;
+
+	// Set or clear extension bit overflow (EV) depending on result
+	bool ev = (result >> 32) != (BIT(result, 31) ? 0xf : 0);
+
+	m_ccr = (m_ccr & 0xe6ff)
+			| (ev ? 0x1000 : 0)
+			| (BIT(result, 35) ? 0x0800 : 0)
+			| (BIT(m_am, 35) ? 0x0100 : 0);
+
+	// Check for AM overflow and latch sign when it first occurs
+	if (ev && !BIT(m_ccr, 14) && BIT(result, 35) != BIT(m_am, 35))
+	{
+		m_ccr |= 0x4000;
+		m_sl = BIT(result, 35);
+	}
+
+	m_am = result;
+}
+
+void cpu16_device::asrm() noexcept
+{
+	bool c = BIT(m_am, 0);
+	m_am = (m_am & 0x800000000) | (m_am >> 1);
+	m_ccr = (m_ccr & 0xe6ff)
+			| (((m_am >> 32) != (BIT(m_am, 31) ? 0xf : 0)) ? 0x1000 : 0)
+			| (BIT(m_am, 35) ? 0x0800 : 0)
+			| (c ? 0x0100 : 0);
+}
+
+u16 cpu16_device::saturation_value(u64 sum) const noexcept
+{
+	if (BIT(m_ccr, 4))
+	{
+		// Check MV and EV in saturation mode
+		if (BIT(m_ccr, 14))
+			return m_sl ? 0x7fff : 0x8000;
+		else if (BIT(m_ccr, 12))
+			return BIT(sum, 35) ? 0x8000 : 0x7fff;
+		else
+			return BIT(sum, 16, 16);
+	}
+	else
+		return BIT(sum, 16, 16);
 }
 
 void cpu16_device::pshm_step(int n)
@@ -1138,6 +1224,27 @@ void cpu16_device::execute_run()
 		case seq::ABX:
 			m_fetch_pipe[0] = m_cache.read_word(m_pc);
 			m_index_regs[BIT(m_fetch_pipe[2], 4, 2)] = (m_index_regs[BIT(m_fetch_pipe[2], 4, 2)] + (m_d & 0x00ff)) & 0xfffff; // B is zero-extended to 20 bits
+			advance();
+			m_icount -= 2;
+			break;
+
+		case seq::ACE:
+			m_fetch_pipe[0] = m_cache.read_word(m_pc);
+			m_am = accumulate32(u32(m_e) << 16, false);
+			advance();
+			m_icount -= 2;
+			break;
+
+		case seq::ACED:
+			m_fetch_pipe[0] = m_cache.read_word(m_pc);
+			m_sequence = seq::ACED_2;
+			m_start = false;
+			m_icount -= 2;
+			break;
+
+		case seq::ACED_2:
+			m_am = accumulate32(u32(m_e) << 16 | m_d, false);
+			m_start = true;
 			advance();
 			m_icount -= 2;
 			break;
@@ -1658,6 +1765,20 @@ void cpu16_device::execute_run()
 			m_icount -= 2;
 			break;
 
+		case seq::ASLM:
+			m_fetch_pipe[0] = m_cache.read_word(m_pc);
+			m_sequence = seq::ASLM_2;
+			m_start = false;
+			m_icount -= 2;
+			break;
+
+		case seq::ASLM_2:
+			aslm();
+			m_start = true;
+			advance();
+			m_icount -= 2;
+			break;
+
 		case seq::ASR_IND8:
 			m_fetch_pipe[0] = m_cache.read_word(m_pc);
 			m_ea = (m_index_regs[BIT(m_fetch_pipe[2], 12, 2)] + (m_fetch_pipe[2] & 0x00ff)) & 0xfffff;
@@ -1722,6 +1843,20 @@ void cpu16_device::execute_run()
 		case seq::ASRE:
 			m_fetch_pipe[0] = m_cache.read_word(m_pc);
 			m_e = asr16(m_e);
+			advance();
+			m_icount -= 2;
+			break;
+
+		case seq::ASRM:
+			m_fetch_pipe[0] = m_cache.read_word(m_pc);
+			m_sequence = seq::ASRM_2;
+			m_start = false;
+			m_icount -= 2;
+			break;
+
+		case seq::ASRM_2:
+			asrm();
+			m_start = true;
 			advance();
 			m_icount -= 2;
 			break;
@@ -3557,6 +3692,73 @@ void cpu16_device::execute_run()
 			m_icount -= 2;
 			break;
 
+		case seq::MAC:
+			m_fetch_pipe[0] = m_cache.read_word(m_pc);
+			m_start = false;
+			m_sequence = seq::MAC_2;
+			m_icount -= 2;
+			break;
+
+		case seq::MAC_2:
+		{
+			s32 prod = s32(s16(m_hr)) * s32(s16(m_ir)) * 2;
+			if (u32(prod) == 0x80000000)
+				m_ccr |= 0x0200;
+			else
+				m_ccr &= 0xfdff;
+			m_e = prod >> 16;
+			m_d = prod & 0xffff;
+			m_sequence = seq::MAC_3;
+			m_icount -= 2;
+			break;
+		}
+
+		case seq::MAC_3:
+			m_am = accumulate32(u32(m_e) << 16 | m_d, BIT(m_ccr, 9));
+			m_ea = m_index_regs[0] = add_ix_masked(0, util::sext(m_fetch_pipe[2] >> 4, 4));
+			m_sequence = seq::MAC_4;
+			m_icount -= 2;
+			break;
+
+		case seq::MAC_4:
+			set_ix(2, m_hr); // HR is transferred to IZ after accumulation
+			if (BIT(m_ea, 0))
+			{
+				m_tmp = m_data.read_byte(m_ea);
+				m_ea = (m_ea + 1) & 0xfffff;
+				m_sequence = seq::MAC_4B;
+			}
+			else
+			{
+				m_tmp = m_data.read_word(m_ea);
+				m_sequence = seq::MAC_5;
+			}
+			m_icount -= 2;
+			break;
+
+		case seq::MAC_4B:
+			m_tmp = m_tmp << 8 | m_data.read_byte(m_ea);
+			m_sequence = seq::MAC_5;
+			m_icount -= 2;
+			break;
+
+		case seq::MAC_5:
+			m_hr = m_tmp;
+			m_ea = m_index_regs[1] = add_ix_masked(1, util::sext(m_fetch_pipe[2], 4));
+			if (BIT(m_ea, 0))
+			{
+				m_tmp = m_data.read_byte(m_ea);
+				m_ea = (m_ea + 1) & 0xfffff;
+				m_sequence = seq::LDHI_3B;
+			}
+			else
+			{
+				m_tmp = m_data.read_word(m_ea);
+				m_sequence = seq::LDHI_4;
+			}
+			m_icount -= 2;
+			break;
+
 		case seq::MOVB_IXP_EXT:
 			m_fetch_pipe[0] = m_cache.read_word(m_pc);
 			m_ea = m_index_regs[0];
@@ -4966,6 +5168,90 @@ void cpu16_device::execute_run()
 		case seq::TEKB:
 			m_fetch_pipe[0] = m_cache.read_word(m_pc);
 			set_b(m_ek);
+			advance();
+			m_icount -= 2;
+			break;
+
+		case seq::TEDM:
+			m_fetch_pipe[0] = m_cache.read_word(m_pc);
+			m_sequence = seq::TEDM_2;
+			m_start = false;
+			m_icount -= 2;
+			break;
+
+		case seq::TEDM_2:
+			m_am = u32(m_e) << 16 | m_d;
+			if (s16(m_e) < 0)
+				m_am |= 0xf00000000; // Extend sign into AM[35:32]
+			m_ccr &= 0xafff; // MV and EV flags cleared
+			m_start = true;
+			advance();
+			m_icount -= 2;
+			break;
+
+		case seq::TEM:
+			m_fetch_pipe[0] = m_cache.read_word(m_pc);
+			m_sequence = seq::TEM_2;
+			m_start = false;
+			m_icount -= 2;
+			break;
+
+		case seq::TEM_2:
+			m_am = u32(m_e) << 16;
+			if (s16(m_e) < 0)
+				m_am |= 0xf00000000; // Extend sign into AM[35:32]
+			m_ccr &= 0xafff; // MV and EV flags cleared
+			m_start = true;
+			advance();
+			m_icount -= 2;
+			break;
+
+		case seq::TMER:
+			m_fetch_pipe[0] = m_cache.read_word(m_pc);
+			m_sequence = seq::TMER_2;
+			m_start = false;
+			m_icount -= 2;
+			break;
+
+		case seq::TMER_2:
+			m_tmp = saturation_value(accumulate32(BIT(m_am, 15) && (BIT(m_am, 0, 16) != 0x8000 || BIT(m_am, 16)) ? 0x10000 : 0, false));
+			m_sequence = seq::TMER_3;
+			m_icount -= 2;
+			break;
+
+		case seq::TMER_3:
+			m_e = m_tmp;
+			set_nzv16(m_e, BIT(m_ccr, 9));
+			m_start = true;
+			advance();
+			m_icount -= 2;
+			break;
+
+		case seq::TMET:
+			m_fetch_pipe[0] = m_cache.read_word(m_pc);
+			m_e = saturation_value(m_am);
+			set_nzv16(m_e, BIT(m_ccr, 9));
+			advance();
+			m_icount -= 2;
+			break;
+
+		case seq::TMXED:
+			m_fetch_pipe[0] = m_cache.read_word(m_pc);
+			set_ix(0, util::sext(u16(m_am >> 32), 4));
+			m_sequence = seq::TMXED_2;
+			m_start = false;
+			m_icount -= 2;
+			break;
+
+		case seq::TMXED_2:
+			m_e = BIT(m_am, 16, 16);
+			m_sequence = seq::TMXED_3;
+			m_icount -= 2;
+			break;
+
+		case seq::TMXED_3:
+			m_d = BIT(m_am, 0, 16);
+			m_start = true;
 			advance();
 			m_icount -= 2;
 			break;

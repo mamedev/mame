@@ -33,6 +33,8 @@ Here is a test program. Copy the text and Paste into the emulator.
 #include "savia84.lh"
 
 
+namespace {
+
 class savia84_state : public driver_device
 {
 public:
@@ -48,7 +50,7 @@ public:
 	void savia84(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	uint8_t ppi_portc_r();
@@ -56,8 +58,8 @@ private:
 	void ppi_portb_w(uint8_t data);
 	void ppi_portc_w(uint8_t data);
 
-	void io_map(address_map &map);
-	void mem_map(address_map &map);
+	void io_map(address_map &map) ATTR_COLD;
+	void mem_map(address_map &map) ATTR_COLD;
 
 	uint8_t m_digit = 0U;
 	uint8_t m_seg = 0U;
@@ -200,6 +202,9 @@ ROM_START( savia84 )
 	// Note - the below is a bad dump and does not work
 	//ROM_LOAD("savia84_1kb.bin", 0x0000, 0x0400, CRC(23a5c15e) SHA1(7e769ed8960d8c591a25cfe4effffcca3077c94b))
 ROM_END
+
+} // anonymous namespace
+
 
 /* Driver */
 

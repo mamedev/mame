@@ -2,8 +2,8 @@
 // copyright-holders:Curt Coder
 #pragma once
 
-#ifndef MAME_INCLUDES_COMX35_H
-#define MAME_INCLUDES_COMX35_H
+#ifndef MAME_COMX_COMX35_H
+#define MAME_COMX_COMX35_H
 
 #include "bus/comx35/exp.h"
 #include "cpu/cosmac/cosmac.h"
@@ -63,10 +63,10 @@ private:
 	required_ioport m_modifiers;
 	emu_timer *m_reset_done_timer = nullptr;
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 
 	TIMER_CALLBACK_MEMBER(reset_done);
 
@@ -77,22 +77,22 @@ private:
 	uint8_t io_r(offs_t offset);
 	void io_w(offs_t offset, uint8_t data);
 	void cdp1869_w(offs_t offset, uint8_t data);
-	DECLARE_READ_LINE_MEMBER( clear_r );
-	DECLARE_READ_LINE_MEMBER( ef2_r );
-	DECLARE_READ_LINE_MEMBER( ef4_r );
-	DECLARE_WRITE_LINE_MEMBER( q_w );
+	int clear_r();
+	int ef2_r();
+	int ef4_r();
+	void q_w(int state);
 	void sc_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER( irq_w );
-	DECLARE_WRITE_LINE_MEMBER( prd_w );
-	DECLARE_QUICKLOAD_LOAD_MEMBER( quickload_cb );
+	void irq_w(int state);
+	void prd_w(int state);
+	DECLARE_QUICKLOAD_LOAD_MEMBER(quickload_cb);
 	void image_fread_memory(device_image_interface &image, uint16_t addr, uint32_t count);
 	CDP1869_CHAR_RAM_READ_MEMBER(comx35_charram_r);
 	CDP1869_CHAR_RAM_WRITE_MEMBER(comx35_charram_w);
 	CDP1869_PCB_READ_MEMBER(comx35_pcb_r);
 
-	void cdp1869_page_ram(address_map &map);
-	void comx35_io(address_map &map);
-	void comx35_mem(address_map &map);
+	void cdp1869_page_ram(address_map &map) ATTR_COLD;
+	void comx35_io(address_map &map) ATTR_COLD;
+	void comx35_mem(address_map &map) ATTR_COLD;
 	// processor state
 	int m_clear = 0;                // CPU mode
 	int m_q = 0;                    // Q flag
@@ -103,4 +103,4 @@ private:
 	int m_cr1 = 0;                  // interrupt enable
 };
 
-#endif
+#endif // MAME_COMX_COMX35_H

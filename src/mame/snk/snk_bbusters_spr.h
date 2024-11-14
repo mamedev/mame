@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Bryan McPhail
-#ifndef MAME_VIDEO_SNK_BBUSTERS_SPR_H
-#define MAME_VIDEO_SNK_BBUSTERS_SPR_H
+#ifndef MAME_SNK_SNK_BBUSTERS_SPR_H
+#define MAME_SNK_SNK_BBUSTERS_SPR_H
 
 #pragma once
 
@@ -19,7 +19,7 @@ public:
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 protected:
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 private:
 	DECLARE_GFXDECODE_MEMBER(gfxinfo);
@@ -39,4 +39,4 @@ private:
 
 DECLARE_DEVICE_TYPE(SNK_BBUSTERS_SPR, snk_bbusters_spr_device)
 
-#endif // MAME_VIDEO_SNK_BBUSTERS_SPR_H
+#endif // MAME_SNK_SNK_BBUSTERS_SPR_H

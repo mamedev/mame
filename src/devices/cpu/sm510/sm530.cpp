@@ -64,9 +64,6 @@ void sm530_device::device_start()
 	// common init
 	sm511_device::device_start();
 
-	// resolve callbacks
-	m_write_f.resolve_safe();
-
 	// zerofill
 	m_subdiv = 0;
 	m_count_1s = 0;
@@ -237,7 +234,7 @@ void sm530_device::execute_one()
 			}
 			break; // 0xfc
 
-	} // big switch
+	} // 0xf0
 
 	// SABM/SABL is only valid for 1 step
 	m_bmask = (m_op == 0x72) ? 0x40 : ((m_op == 0x73) ? 0x08 : 0);

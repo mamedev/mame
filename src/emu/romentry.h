@@ -29,18 +29,17 @@ CONSTANTS
 #define ROMENTRY_TYPEMASK           0x0000000f          /* type of entry */
 enum
 {
-	ROMENTRYTYPE_ROM = 0,       /* this entry is an actual ROM definition */
-	ROMENTRYTYPE_REGION,        /* this entry marks the start of a region */
-	ROMENTRYTYPE_END,           /* this entry marks the end of a region */
-	ROMENTRYTYPE_RELOAD,        /* this entry reloads the previous ROM */
-	ROMENTRYTYPE_CONTINUE,      /* this entry continues loading the previous ROM */
-	ROMENTRYTYPE_FILL,          /* this entry fills an area with a constant value */
-	ROMENTRYTYPE_COPY,          /* this entry copies data from another region/offset */
-	ROMENTRYTYPE_CARTRIDGE,     /* this entry specifies a cartridge (MESS) */
-	ROMENTRYTYPE_IGNORE,        /* this entry continues loading the previous ROM but throws the data away */
-	ROMENTRYTYPE_SYSTEM_BIOS,   /* this entry specifies a bios */
-	ROMENTRYTYPE_DEFAULT_BIOS,  /* this entry specifies a default bios */
-	ROMENTRYTYPE_PARAMETER,     /* this entry specifies a per-game parameter */
+	ROMENTRYTYPE_ROM = 0,       // starts loading a ROM file
+	ROMENTRYTYPE_REGION,        // starts a new ROM region
+	ROMENTRYTYPE_END,           // sentinel marking the end of a ROM definition
+	ROMENTRYTYPE_RELOAD,        // starts loading the current ROM file from the beginning again
+	ROMENTRYTYPE_CONTINUE,      // continues loading the current ROM file at a different offset
+	ROMENTRYTYPE_FILL,          // fills an area with a constant value
+	ROMENTRYTYPE_COPY,          // copies data from another region/offset
+	ROMENTRYTYPE_IGNORE,        // ignores a portion of the current ROM file
+	ROMENTRYTYPE_SYSTEM_BIOS,   // specifies a BIOS option
+	ROMENTRYTYPE_DEFAULT_BIOS,  // specifies the default BIOS option
+	ROMENTRYTYPE_PARAMETER,     // specifies a per-game parameter
 	ROMENTRYTYPE_COUNT
 };
 

@@ -86,7 +86,6 @@ input_merger_device::~input_merger_device()
 
 void input_merger_device::device_start()
 {
-	m_output_handler.resolve_safe();
 	save_item(NAME(m_state));
 	m_state = m_initval;
 }

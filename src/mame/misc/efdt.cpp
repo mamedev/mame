@@ -228,13 +228,13 @@ void efdt_state::video_start()
 	m_tilemap[1]->set_transparent_pen(0);
 }
 
-WRITE_LINE_MEMBER(efdt_state::vblank_nmi_w)
+void efdt_state::vblank_nmi_w(int state)
 {
 	if (state && m_vlatch[0]->q0_r())
 		m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 }
 
-WRITE_LINE_MEMBER(efdt_state::nmi_clear_w)
+void efdt_state::nmi_clear_w(int state)
 {
 	if (!state)
 		m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);

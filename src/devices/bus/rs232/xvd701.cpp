@@ -4,7 +4,7 @@
 #include "emu.h"
 #include "xvd701.h"
 
-#define LOG_COMMAND    (1 << 1)
+#define LOG_COMMAND    (1U << 1)
 // #define VERBOSE      (LOG_COMMAND)
 // #define LOG_OUTPUT_STREAM std::cout
 

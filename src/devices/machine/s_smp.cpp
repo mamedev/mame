@@ -61,7 +61,7 @@ s_smp_device::s_smp_device(const machine_config &mconfig, const char *tag, devic
 	: spc700_device(mconfig, S_SMP, tag, owner, clock, address_map_constructor(FUNC(s_smp_device::internal_map), this))
 	, m_data_config("data", ENDIANNESS_LITTLE, 8, 16)
 	, m_ipl_region(*this, "sound_ipl")
-	, m_dsp_io_r_cb(*this)
+	, m_dsp_io_r_cb(*this, 0)
 	, m_dsp_io_w_cb(*this)
 {
 }
@@ -83,9 +83,6 @@ const tiny_rom_entry *s_smp_device::device_rom_region() const
 
 void s_smp_device::device_start()
 {
-	m_dsp_io_r_cb.resolve_safe(0);
-	m_dsp_io_w_cb.resolve_safe();
-
 	space(AS_DATA).specific(m_data);
 	space(AS_DATA).cache(m_dcache);
 
@@ -281,7 +278,7 @@ void s_smp_device::io_w(offs_t offset, u8 data)
 			// osd_printf_debug("%s SPC: %02x to APU @ %d\n", machine().describe_context(), data, offset & 3);
 			m_port_out[offset - 4] = data;
 			// Unneeded, we already run at perfect_interleave
-			// machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(20));
+			// machine().scheduler().perfect_quantum(attotime::from_usec(20));
 			break;
 		case 0xa:       /* Timer 0 */
 		case 0xb:       /* Timer 1 */

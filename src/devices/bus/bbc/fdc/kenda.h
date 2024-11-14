@@ -6,7 +6,6 @@
 
 **********************************************************************/
 
-
 #ifndef MAME_BUS_BBC_FDC_KENDA_H
 #define MAME_BUS_BBC_FDC_KENDA_H
 
@@ -15,7 +14,6 @@
 #include "fdc.h"
 #include "imagedev/floppy.h"
 #include "machine/wd_fdc.h"
-#include "formats/acorn_dsk.h"
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -29,11 +27,11 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 	// optional information overrides
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 
 	virtual uint8_t read(offs_t offset) override;
 	virtual void write(offs_t offset, uint8_t data) override;
@@ -41,7 +39,7 @@ protected:
 private:
 	static void floppy_formats(format_registration &fr);
 
-	DECLARE_WRITE_LINE_MEMBER(motor_w);
+	void motor_w(int state);
 
 	required_device<wd2793_device> m_fdc;
 	required_device_array<floppy_connector, 2> m_floppy;

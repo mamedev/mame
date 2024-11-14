@@ -23,6 +23,8 @@
 #include "screen.h"
 
 
+namespace {
+
 class unistar_state : public driver_device
 {
 public:
@@ -36,7 +38,7 @@ public:
 	void unistar(machine_config &config);
 
 protected:
-	virtual void machine_reset() override;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	u8 dma_mem_r(offs_t offset);
@@ -45,8 +47,8 @@ private:
 	void unistar_palette(palette_device &palette) const;
 	I8275_DRAW_CHARACTER_MEMBER(draw_character);
 
-	void io_map(address_map &map);
-	void mem_map(address_map &map);
+	void io_map(address_map &map) ATTR_COLD;
+	void mem_map(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	required_region_ptr<u8> m_chargen;
@@ -139,15 +141,18 @@ I8275_DRAW_CHARACTER_MEMBER(unistar_state::draw_character)
 	rgb_t const *const palette = m_palette->palette()->entry_list_raw();
 	u8 gfx = m_chargen[(linecount & 15) | (charcode << 4)];
 
-	if (vsp)
+	using namespace i8275_attributes;
+
+	if (BIT(attrcode, VSP))
 		gfx = 0;
 
-	if (lten)
+	if (BIT(attrcode, LTEN))
 		gfx = 0xff;
 
-	if (rvv)
+	if (BIT(attrcode, RVV))
 		gfx ^= 0xff;
 
+	bool hlgt = BIT(attrcode, HLGT);
 	for(u8 i=0;i<8;i++)
 		bitmap.pix(y, x + i) = palette[BIT(gfx, 7-i) ? (hlgt ? 2 : 1) : 0];
 }
@@ -235,6 +240,9 @@ ROM_START( unistar )
 	ROM_REGION( 0x0800, "chargen", 0 )
 	ROM_LOAD( "280014a.u1",  0x0000, 0x0800, CRC(a9e1b5b2) SHA1(6f5b597ee1417f1108ac5957b005a927acb5314a))
 ROM_END
+
+} // anonymous namespace
+
 
 /* Driver */
 

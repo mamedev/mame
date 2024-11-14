@@ -4,7 +4,7 @@
 
     Video Hardware for Video System Mahjong series and Pipe Dream.
 
-    Driver by Takahiro Nogi <nogi@kt.rim.or.jp> 2001/02/04 -
+    Driver by Takahiro Nogi 2001/02/04 -
     and Bryan McPhail, Nicola Salmoria, Aaron Giles
 
 ******************************************************************************/

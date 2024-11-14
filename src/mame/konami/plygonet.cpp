@@ -65,14 +65,15 @@
 #include "emu.h"
 
 #include "cpu/dsp56156/dsp56156.h"
-#include "cpu/m68000/m68000.h"
+#include "cpu/m68000/m68020.h"
 #include "cpu/z80/z80.h"
 #include "machine/eepromser.h"
 #include "machine/k054321.h"
 #include "machine/k056230.h"
 #include "machine/watchdog.h"
 #include "sound/k054539.h"
-#include "k053936.h"
+#include "video/k053936.h"
+
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
@@ -150,14 +151,14 @@ public:
 	void plygonet(machine_config &config);
 
 private:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
-	void main_map(address_map &map);
-	void sound_map(address_map &map);
-	void dsp_program_map(address_map &map);
-	void dsp_data_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
+	void sound_map(address_map &map) ATTR_COLD;
+	void dsp_program_map(address_map &map) ATTR_COLD;
+	void dsp_data_map(address_map &map) ATTR_COLD;
 
 	// Main-board handlers
 	void sys_w(offs_t offset, u8 data);
@@ -204,7 +205,7 @@ private:
 	// Sound handlers
 	void sound_ctrl_w(u8 data);
 	void update_sound_nmi();
-	DECLARE_WRITE_LINE_MEMBER(k054539_nmi_gen);
+	void k054539_nmi_gen(int state);
 
 	template <int PolyPage> void process_polys();
 	template <int PolyPage> void draw_poly(bitmap_rgb32 &bitmap, const u16 raw_color, const u16 span_ptr, const u16 raw_start, const u16 raw_end);
@@ -344,8 +345,8 @@ static INPUT_PORTS_START( polygonet )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("IN2")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_er5911_device, do_read)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_er5911_device, ready_read)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", FUNC(eeprom_serial_er5911_device::do_read))
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", FUNC(eeprom_serial_er5911_device::ready_read))
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED ) // Start 2, unused
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -364,9 +365,9 @@ static INPUT_PORTS_START( polygonet )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START( "EEPROMOUT" )
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_er5911_device, di_write)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_er5911_device, cs_write)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_er5911_device, clk_write)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", FUNC(eeprom_serial_er5911_device::di_write))
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", FUNC(eeprom_serial_er5911_device::cs_write))
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", FUNC(eeprom_serial_er5911_device::clk_write))
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( polynetw )
@@ -418,11 +419,11 @@ void polygonet_state::sys_w(offs_t offset, u8 data)
 				m_maincpu->set_input_line(M68K_IRQ_5, CLEAR_LINE);
 
 			m_sys1 = data;
-			LOGMASKED(LOG_GENERAL, "sys1 write: %02x\n", data);
+			LOG("sys1 write: %02x\n", data);
 			break;
 
 		default:
-			LOGMASKED(LOG_GENERAL, "Unknown sys_w write: %08x = %02x\n", offset, data);
+			LOG("Unknown sys_w write: %08x = %02x\n", offset, data);
 			break;
 	}
 }
@@ -773,7 +774,7 @@ void polygonet_state::draw_poly(bitmap_rgb32 &bitmap, const u16 raw_color, const
 
 	for (s16 y = y_start; y < y_end; y++, start_addr++, end_addr++)
 	{
-		const u16 bitmap_y = (u16)(y + 1024) - 896;
+		const u16 bitmap_y = u16(y + 1024) - 896;
 
 		if (bitmap_y < 256)
 		{
@@ -782,7 +783,7 @@ void polygonet_state::draw_poly(bitmap_rgb32 &bitmap, const u16 raw_color, const
 			u32 *dst = &bitmap.pix(bitmap_y);
 			for (s16 x = x_start; x <= x_end; x++)
 			{
-				const u16 bitmap_x = (u16)(x + 1024) - 832;
+				const u16 bitmap_x = u16(x + 1024) - 832;
 				if (bitmap_x < 384 && (dst[bitmap_x] & 0xff000000) == 0)
 				{
 					dst[bitmap_x] = color888;
@@ -796,22 +797,8 @@ void polygonet_state::draw_poly(bitmap_rgb32 &bitmap, const u16 raw_color, const
 //  Video hardware
 //-------------------------------------------------
 
-static const gfx_layout bglayout =
-{
-	16,16,
-	RGN_FRAC(1,1),
-	4,
-	{ 0, 1, 2, 3 },
-	{ 0*4, 1*4, 2*4, 3*4, 4*4, 5*4, 6*4, 7*4, 8*4,
-		9*4, 10*4, 11*4, 12*4, 13*4, 14*4, 15*4 },
-	{ 0*64, 1*64, 2*64, 3*64, 4*64, 5*64, 6*64, 7*64,
-		8*64, 9*64, 10*64, 11*64, 12*64, 13*64, 14*64, 15*64 },
-
-	128*8
-};
-
 static GFXDECODE_START( gfx_plygonet )
-	GFXDECODE_ENTRY( "gfx2", 0, bglayout, 0x0000, 64 )
+	GFXDECODE_ENTRY( "gfx2", 0, gfx_16x16x4_packed_msb, 0x0000, 64 )
 GFXDECODE_END
 
 TILE_GET_INFO_MEMBER(polygonet_state::ttl_get_tile_info)
@@ -848,13 +835,13 @@ void polygonet_state::ttl_vram_w(offs_t offset, u32 data, u32 mem_mask)
 void polygonet_state::fix_regs_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	COMBINE_DATA(&m_fix_regs[offset]);
-	LOGMASKED(LOG_GENERAL, "fix_regs_w: %08x = %08x & %08x\n", offset, data, mem_mask);
+	LOG("fix_regs_w: %08x = %08x & %08x\n", offset, data, mem_mask);
 }
 
 u32 polygonet_state::fix_regs_r(offs_t offset, u32 mem_mask)
 {
 	const u32 data = m_fix_regs[offset];
-	LOGMASKED(LOG_GENERAL, "fix_regs_r: %08x: %08x & %08x\n", offset, data, mem_mask);
+	LOG("fix_regs_r: %08x: %08x & %08x\n", offset, data, mem_mask);
 	return data;
 }
 
@@ -954,7 +941,7 @@ void polygonet_state::main_map(address_map &map)
 	map(0x540000, 0x540fff).ram().share(m_ttl_vram).w(FUNC(polygonet_state::ttl_vram_w));
 	map(0x541000, 0x54101f).ram().share(m_fix_regs).rw(FUNC(polygonet_state::fix_regs_r), FUNC(polygonet_state::fix_regs_w));
 	map(0x580000, 0x5807ff).rw(m_k056230, FUNC(k056230_device::ram_r), FUNC(k056230_device::ram_w));
-	map(0x580800, 0x580803).rw(m_k056230, FUNC(k056230_device::regs_r), FUNC(k056230_device::regs_w));
+	map(0x580800, 0x580803).m(m_k056230, FUNC(k056230_device::regs_map));
 	map(0x600000, 0x60000f).m(m_k054321, FUNC(k054321_device::main_map));
 	map(0x640000, 0x640003).w(FUNC(polygonet_state::sound_irq_w));
 	map(0x680000, 0x680003).w(m_watchdog, FUNC(watchdog_timer_device::reset32_w));
@@ -979,17 +966,27 @@ void polygonet_state::dsp_data_map(address_map &map)
 {
 	map(0x0000, 0xffff).view(m_dsp_data_view);
 
-	m_dsp_data_view[0](0x0000, 0x5fff).rw(FUNC(polygonet_state::dsp_ram_ab_0_read), FUNC(polygonet_state::dsp_ram_ab_0_write)).share(m_dsp_ab_0);
-	m_dsp_data_view[0](0x6000, 0x6fff).rw(FUNC(polygonet_state::dsp_ram_a_6_read), FUNC(polygonet_state::dsp_ram_a_6_write)).share(m_dsp_a_6);
-	m_dsp_data_view[0](0x7000, 0x7fff).rw(FUNC(polygonet_state::dsp_ram_a_7_read), FUNC(polygonet_state::dsp_ram_a_7_write)).share(m_dsp_a_7);
-	m_dsp_data_view[0](0x8000, 0xbfff).rw(FUNC(polygonet_state::dsp_ram_a_8_read), FUNC(polygonet_state::dsp_ram_a_8_write));
-	m_dsp_data_view[0](0xc000, 0xdfff).rw(FUNC(polygonet_state::dsp_ram_a_c_read), FUNC(polygonet_state::dsp_ram_a_c_write)).share(m_dsp_share);
-	m_dsp_data_view[0](0xe000, 0xffff).rw(FUNC(polygonet_state::dsp_ram_a_e_read), FUNC(polygonet_state::dsp_ram_a_e_write)).share(m_dsp_a_e);
+	if ((VERBOSE & LOG_DSP_AB0) != 0) m_dsp_data_view[0](0x0000, 0x5fff).rw(FUNC(polygonet_state::dsp_ram_ab_0_read), FUNC(polygonet_state::dsp_ram_ab_0_write)).share(m_dsp_ab_0);
+	else                              m_dsp_data_view[0](0x0000, 0x5fff).ram().share(m_dsp_ab_0);
+	if ((VERBOSE & LOG_DSP_A6) != 0)  m_dsp_data_view[0](0x6000, 0x6fff).rw(FUNC(polygonet_state::dsp_ram_a_6_read), FUNC(polygonet_state::dsp_ram_a_6_write)).share(m_dsp_a_6);
+	else                              m_dsp_data_view[0](0x6000, 0x6fff).ram().share(m_dsp_a_6);
+	if ((VERBOSE & LOG_DSP_A7) != 0)  m_dsp_data_view[0](0x7000, 0x7fff).rw(FUNC(polygonet_state::dsp_ram_a_7_read), FUNC(polygonet_state::dsp_ram_a_7_write)).share(m_dsp_a_7);
+	else                              m_dsp_data_view[0](0x7000, 0x7fff).ram().w(FUNC(polygonet_state::dsp_ram_a_7_write)).share(m_dsp_a_7);
+	if ((VERBOSE & LOG_DSP_A8) != 0)  m_dsp_data_view[0](0x8000, 0xbfff).rw(FUNC(polygonet_state::dsp_ram_a_8_read), FUNC(polygonet_state::dsp_ram_a_8_write));
+	else                              m_dsp_data_view[0](0x8000, 0xbfff).bankrw(m_dsp_bank_a_8);
+	if ((VERBOSE & LOG_DSP_AC) != 0)  m_dsp_data_view[0](0xc000, 0xdfff).rw(FUNC(polygonet_state::dsp_ram_a_c_read), FUNC(polygonet_state::dsp_ram_a_c_write)).share(m_dsp_share);
+	else                              m_dsp_data_view[0](0xc000, 0xdfff).ram().share(m_dsp_share);
+	if ((VERBOSE & LOG_DSP_AE) != 0)  m_dsp_data_view[0](0xe000, 0xffff).rw(FUNC(polygonet_state::dsp_ram_a_e_read), FUNC(polygonet_state::dsp_ram_a_e_write)).share(m_dsp_a_e);
+	else                              m_dsp_data_view[0](0xe000, 0xffff).ram().w(FUNC(polygonet_state::dsp_ram_a_e_write)).share(m_dsp_a_e);
 
-	m_dsp_data_view[1](0x0000, 0x5fff).rw(FUNC(polygonet_state::dsp_ram_ab_0_read), FUNC(polygonet_state::dsp_ram_ab_0_write)).share(m_dsp_ab_0);
-	m_dsp_data_view[1](0x6000, 0x6fff).rw(FUNC(polygonet_state::dsp_ram_b_6_read), FUNC(polygonet_state::dsp_ram_b_6_write));
-	m_dsp_data_view[1](0x7000, 0x7fff).rw(FUNC(polygonet_state::dsp_ram_b_7_read), FUNC(polygonet_state::dsp_ram_b_7_write));
-	m_dsp_data_view[1](0x8000, 0xffbf).rw(FUNC(polygonet_state::dsp_ram_b_8_read), FUNC(polygonet_state::dsp_ram_b_8_write));
+	if ((VERBOSE & LOG_DSP_AB0) != 0) m_dsp_data_view[1](0x0000, 0x5fff).rw(FUNC(polygonet_state::dsp_ram_ab_0_read), FUNC(polygonet_state::dsp_ram_ab_0_write)).share(m_dsp_ab_0);
+	else                              m_dsp_data_view[1](0x0000, 0x5fff).ram().share(m_dsp_ab_0);
+	if ((VERBOSE & LOG_DSP_B6) != 0)  m_dsp_data_view[1](0x6000, 0x6fff).rw(FUNC(polygonet_state::dsp_ram_b_6_read), FUNC(polygonet_state::dsp_ram_b_6_write));
+	else                              m_dsp_data_view[1](0x6000, 0x6fff).bankrw(m_dsp_bank_b_6);
+	if ((VERBOSE & LOG_DSP_B7) != 0)  m_dsp_data_view[1](0x7000, 0x7fff).rw(FUNC(polygonet_state::dsp_ram_b_7_read), FUNC(polygonet_state::dsp_ram_b_7_write));
+	else                              m_dsp_data_view[1](0x7000, 0x7fff).bankrw(m_dsp_bank_b_7);
+	if ((VERBOSE & LOG_DSP_B8) != 0)  m_dsp_data_view[1](0x8000, 0xffbf).rw(FUNC(polygonet_state::dsp_ram_b_8_read), FUNC(polygonet_state::dsp_ram_b_8_write));
+	else                              m_dsp_data_view[1](0x8000, 0xffbf).bankrw(m_dsp_bank_b_8);
 }
 
 
@@ -1030,7 +1027,7 @@ void polygonet_state::update_sound_nmi()
 		m_audiocpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 }
 
-WRITE_LINE_MEMBER(polygonet_state::k054539_nmi_gen)
+void polygonet_state::k054539_nmi_gen(int state)
 {
 	m_sound_intck = state;
 	update_sound_nmi();
@@ -1054,7 +1051,7 @@ void polygonet_state::plygonet(machine_config &config)
 	Z80(config, m_audiocpu, 8000000);
 	m_audiocpu->set_addrmap(AS_PROGRAM, &polygonet_state::sound_map);
 
-	config.set_maximum_quantum(attotime::from_hz(600)); // NOTE: This does not appear to be necessary, but is retained for later testing.
+	config.set_maximum_quantum(attotime::from_hz(6000)); // occasional lockup in-game otherwise
 
 	EEPROM_ER5911_8BIT(config, m_eeprom);
 
@@ -1151,5 +1148,5 @@ ROM_END
 //-------------------------------------------------
 
 //    YEAR  NAME      PARENT   MACHINE   INPUT      STATE            INIT
-GAME( 1993, plygonet, 0,       plygonet, polygonet, polygonet_state, empty_init, ROT90, "Konami", "Polygonet Commanders (ver UAA)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE | MACHINE_NODEVICE_LAN )
-GAME( 1993, polynetw, 0,       plygonet, polynetw,  polygonet_state, empty_init, ROT90, "Konami", "Poly-Net Warriors (ver JAA)",    MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE | MACHINE_NODEVICE_LAN )
+GAME( 1993, plygonet, 0,       plygonet, polygonet, polygonet_state, empty_init, ROT90, "Konami", "Polygonet Commanders (ver UAA)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE | MACHINE_NODEVICE_LAN )
+GAME( 1993, polynetw, 0,       plygonet, polynetw,  polygonet_state, empty_init, ROT90, "Konami", "Poly-Net Warriors (ver JAA)",    MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE | MACHINE_NODEVICE_LAN )

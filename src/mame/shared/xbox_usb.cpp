@@ -9,13 +9,15 @@
 #include "machine/pci.h"
 #include "machine/idectrl.h"
 
-//#define LOG_OHCI
+#include "multibyte.h"
+
+#define LOG_OHCI (0)
+
 
 /*
  * OHCI usb controller
  */
 
-#ifdef LOG_OHCI
 static const char *const usbregnames[] = {
 	"HcRevision",
 	"HcControl",
@@ -40,13 +42,10 @@ static const char *const usbregnames[] = {
 	"HcRhStatus",
 	"HcRhPortStatus[1]"
 };
-#endif
 
 ohci_usb_controller::ohci_usb_controller()
 {
-	memset(&ohcist, 0, sizeof(ohcist));
 	m_maincpu = nullptr;
-	irq_callback = nullptr;
 }
 
 void ohci_usb_controller::start()
@@ -75,12 +74,13 @@ uint32_t ohci_usb_controller::read(offs_t offset)
 {
 	uint32_t ret;
 
-#ifdef LOG_OHCI
-	if (offset >= 0x54 / 4)
-		logerror("usb controller 0 register HcRhPortStatus[%d] read\n", (offset - 0x54 / 4) + 1);
-	else
-		logerror("usb controller 0 register %s read\n", usbregnames[offset]);
-#endif
+	if (LOG_OHCI)
+	{
+		if (offset >= 0x54 / 4)
+			m_maincpu->machine().logerror("usb controller 0 register HcRhPortStatus[%d] read\n", (offset - 0x54 / 4) + 1);
+		else
+			m_maincpu->machine().logerror("usb controller 0 register %s read\n", usbregnames[offset]);
+	}
 	ret = ohcist.hc_regs[offset];
 	return ret;
 }
@@ -89,12 +89,13 @@ void ohci_usb_controller::write(offs_t offset, uint32_t data)
 {
 	uint32_t old = ohcist.hc_regs[offset];
 
-#ifdef LOG_OHCI
-	if (offset >= 0x54 / 4)
-		logerror("usb controller 0 register HcRhPortStatus[%d] write %08X\n", (offset - 0x54 / 4) + 1, data);
-	else
-		logerror("usb controller 0 register %s write %08X\n", usbregnames[offset], data);
-#endif
+	if (LOG_OHCI)
+	{
+		if (offset >= 0x54 / 4)
+			m_maincpu->machine().logerror("usb controller 0 register HcRhPortStatus[%d] write %08X\n", (offset - 0x54 / 4) + 1, data);
+		else
+			m_maincpu->machine().logerror("usb controller 0 register %s write %08X\n", usbregnames[offset], data);
+	}
 	if (offset == HcRhStatus) {
 		if (data & CRWE)
 			ohcist.hc_regs[HcRhStatus] &= ~DRWE;
@@ -221,7 +222,7 @@ void ohci_usb_controller::write(offs_t offset, uint32_t data)
 	ohcist.hc_regs[offset] = data;
 }
 
-void ohci_usb_controller::timer(int param)
+void ohci_usb_controller::timer(s32 param)
 {
 	uint32_t plh;
 	int changed = 0;
@@ -900,18 +901,14 @@ void device_usb_ohci_function_interface::add_device_descriptor(const USBStandard
 	uint8_t *const p = &descriptors[descriptors_pos];
 	p[0] = descriptor.bLength;
 	p[1] = descriptor.bDescriptorType;
-	p[2] = descriptor.bcdUSB & 255;
-	p[3] = descriptor.bcdUSB >> 8;
+	put_u16le(&p[2], descriptor.bcdUSB);
 	p[4] = descriptor.bDeviceClass;
 	p[5] = descriptor.bDeviceSubClass;
 	p[6] = descriptor.bDeviceProtocol;
 	p[7] = descriptor.bMaxPacketSize0;
-	p[8] = descriptor.idVendor & 255;
-	p[9] = descriptor.idVendor >> 8;
-	p[10] = descriptor.idProduct & 255;
-	p[11] = descriptor.idProduct >> 8;
-	p[12] = descriptor.bcdDevice & 255;
-	p[13] = descriptor.bcdDevice >> 8;
+	put_u16le(&p[8], descriptor.idVendor);
+	put_u16le(&p[10], descriptor.idProduct);
+	put_u16le(&p[12], descriptor.bcdDevice);
 	p[14] = descriptor.iManufacturer;
 	p[15] = descriptor.iProduct;
 	p[16] = descriptor.iSerialNumber;
@@ -925,8 +922,7 @@ void device_usb_ohci_function_interface::add_configuration_descriptor(const USBS
 	uint8_t *const p = &descriptors[descriptors_pos];
 	p[0] = descriptor.bLength;
 	p[1] = descriptor.bDescriptorType;
-	p[2] = descriptor.wTotalLength & 255;
-	p[3] = descriptor.wTotalLength >> 8;
+	put_u16le(&p[2], descriptor.wTotalLength);
 	p[4] = descriptor.bNumInterfaces;
 	p[5] = descriptor.bConfigurationValue;
 	p[6] = descriptor.iConfiguration;
@@ -1002,8 +998,7 @@ void device_usb_ohci_function_interface::add_endpoint_descriptor(const USBStanda
 	p[1] = descriptor.bDescriptorType;
 	p[2] = descriptor.bEndpointAddress;
 	p[3] = descriptor.bmAttributes;
-	p[4] = descriptor.wMaxPacketSize & 255;
-	p[5] = descriptor.wMaxPacketSize >> 8;
+	put_u16le(&p[4], descriptor.wMaxPacketSize);
 	p[6] = descriptor.bInterval;
 	descriptors_pos += descriptor.bLength;
 
@@ -1525,20 +1520,16 @@ int ohci_game_controller_device::handle_interrupt_pid(int endpoint, int pid, uin
 		buffer[11] = m_TriggerR->read();
 		v = m_ThumbstickLh->read();
 		v = (v - 128) * 256;
-		buffer[12] = (uint16_t)v & 255;
-		buffer[13] = (uint16_t)v >> 8;
+		put_u16le(&buffer[12], v);
 		v = m_ThumbstickLv->read();
 		v = (v - 128) * 256;
-		buffer[14] = (uint16_t)v & 255;
-		buffer[15] = (uint16_t)v >> 8;
+		put_u16le(&buffer[14], v);
 		v = m_ThumbstickRh->read();
 		v = (v - 128) * 256;
-		buffer[16] = (uint16_t)v & 255;
-		buffer[17] = (uint16_t)v >> 8;
+		put_u16le(&buffer[16], v);
 		v = m_ThumbstickRv->read();
 		v = (v - 128) * 256;
-		buffer[18] = (uint16_t)v & 255;
-		buffer[19] = (uint16_t)v >> 8;
+		put_u16le(&buffer[18], v);
 		return size;
 	}
 	return -1;

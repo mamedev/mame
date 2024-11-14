@@ -111,15 +111,15 @@
 
 #include "pcw.lh"
 
-#define LOG_PRN      (1U <<  1)
-#define LOG_STROBE   (1U <<  2)
-#define LOG_PAR      (1U <<  3)
-#define LOG_EXP      (1U <<  4)
-#define LOG_MEM      (1U <<  5)
-#define LOG_SYS      (1U <<  6)
-#define LOG_BANK     (1U <<  7)
-#define LOG_RRAM     (1U <<  8)
-#define LOG_IRQ      (1U <<  9)
+#define LOG_PRN      (1U << 1)
+#define LOG_STROBE   (1U << 2)
+#define LOG_PAR      (1U << 3)
+#define LOG_EXP      (1U << 4)
+#define LOG_MEM      (1U << 5)
+#define LOG_SYS      (1U << 6)
+#define LOG_BANK     (1U << 7)
+#define LOG_RRAM     (1U << 8)
+#define LOG_IRQ      (1U << 9)
 
 //#define VERBOSE (LOG_SYS)
 //#define LOG_OUTPUT_FUNC printf
@@ -193,7 +193,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(pcw_state::pcw_timer_interrupt)
 /* PCW uses UPD765 in NON-DMA mode. FDC Ints are connected to /INT or
  * /NMI depending on choice (see system control below)
  * fdc interrupt callback. set/clear fdc int */
-WRITE_LINE_MEMBER( pcw_state::pcw_fdc_interrupt )
+void pcw_state::pcw_fdc_interrupt(int state)
 {
 	if (!state)
 		m_system_status &= ~(1<<5);
@@ -810,13 +810,13 @@ void pcw_state::mcu_printer_p2_w(uint8_t data)
 }
 
 // Paper sensor
-READ_LINE_MEMBER(pcw_state::mcu_printer_t1_r)
+int pcw_state::mcu_printer_t1_r()
 {
 	return 1;
 }
 
 // Print head location (0 if at left margin, otherwise 1)
-READ_LINE_MEMBER(pcw_state::mcu_printer_t0_r)
+int pcw_state::mcu_printer_t0_r()
 {
 	if(m_printer_headpos == 0)
 		return 0;
@@ -911,12 +911,12 @@ uint8_t pcw_state::mcu_kb_data_r()
 	return 0xff;
 }
 
-READ_LINE_MEMBER(pcw_state::mcu_kb_t1_r)
+int pcw_state::mcu_kb_t1_r()
 {
 	return 1;
 }
 
-READ_LINE_MEMBER(pcw_state::mcu_kb_t0_r)
+int pcw_state::mcu_kb_t0_r()
 {
 	return 0;
 }
@@ -1236,7 +1236,7 @@ static void pcw_ssfloppies(device_slot_interface &device)
 
 static void pcw_dsfloppies(device_slot_interface &device)
 {
-	device.option_add("3dsdd", FLOPPY_3_DSDD);
+	device.option_add("3dsqd", FLOPPY_3_DSQD);
 }
 
 static void pcw_35floppies(device_slot_interface &device)
@@ -1321,7 +1321,7 @@ void pcw_state::pcw8512(machine_config &config)
 	m_palette->set_init(FUNC(pcw_state::set_8xxx_palette));
 
 	FLOPPY_CONNECTOR(config, "upd765:0", pcw_ssfloppies, "3ssdd", floppy_image_device::default_mfm_floppy_formats);
-	FLOPPY_CONNECTOR(config, "upd765:1", pcw_dsfloppies, "3dsdd", floppy_image_device::default_mfm_floppy_formats);
+	FLOPPY_CONNECTOR(config, "upd765:1", pcw_dsfloppies, "3dsqd", floppy_image_device::default_mfm_floppy_formats);
 
 	screen_device &printer(SCREEN(config, "printer", SCREEN_TYPE_RASTER));
 	printer.set_refresh_hz(50);
@@ -1342,7 +1342,7 @@ void pcw_state::pcw9512(machine_config &config)
 	pcw(config);
 	m_palette->set_init(FUNC(pcw_state::set_9xxx_palette));
 
-	FLOPPY_CONNECTOR(config, "upd765:0", pcw_dsfloppies, "3dsdd", floppy_image_device::default_mfm_floppy_formats);
+	FLOPPY_CONNECTOR(config, "upd765:0", pcw_dsfloppies, "3dsqd", floppy_image_device::default_mfm_floppy_formats);
 	FLOPPY_CONNECTOR(config, "upd765:1", pcw_dsfloppies, nullptr, floppy_image_device::default_mfm_floppy_formats);
 
 	m_maincpu->set_addrmap(AS_IO, &pcw_state::pcw9512_io);

@@ -115,9 +115,6 @@ void namco_c148_device::device_validity_check(validity_checker &valid) const
 
 void namco_c148_device::device_start()
 {
-	m_out_ext1_cb.resolve_safe();
-	m_out_ext2_cb.resolve_safe();
-
 	// TODO: link to SCI, EX and the screen device controller devices
 
 	save_item(NAME(m_irqlevel.cpu));

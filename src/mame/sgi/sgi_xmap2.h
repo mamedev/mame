@@ -1,8 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:Patrick Mackinlay
 
-#ifndef MAME_VIDEO_SGI_XMAP2_H
-#define MAME_VIDEO_SGI_XMAP2_H
+#ifndef MAME_SGI_SGI_XMAP2_H
+#define MAME_SGI_SGI_XMAP2_H
 
 #pragma once
 
@@ -14,11 +14,11 @@ public:
 	sgi_xmap2_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock);
 
 	// device_t overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// device_palette_interface overrides
-	virtual u32 palette_entries() const override { return 4096 + 16; }
+	virtual u32 palette_entries() const noexcept override { return 4096 + 16; }
 
 	u8 reg_r(offs_t offset);
 	void reg_w(offs_t offset, u8 data);
@@ -57,4 +57,4 @@ private:
 
 DECLARE_DEVICE_TYPE(SGI_XMAP2, sgi_xmap2_device)
 
-#endif // MAME_VIDEO_SGI_XMAP2_H
+#endif // MAME_SGI_SGI_XMAP2_H

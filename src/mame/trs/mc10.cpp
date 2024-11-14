@@ -79,7 +79,7 @@ protected:
 	mc10cart_slot_device &mc10cart() { return *m_mc10cart; }
 
 private:
-	void mc10_mem(address_map &map);
+	void mc10_mem(address_map &map) ATTR_COLD;
 
 	optional_device<mc6847_base_device> m_mc6847;
 	required_device<dac_bit_interface> m_dac;
@@ -109,8 +109,8 @@ protected:
 	required_device<ef9345_device> m_ef9345;
 
 private:
-	void alice32_mem(address_map &map);
-	void alice90_mem(address_map &map);
+	void alice32_mem(address_map &map) ATTR_COLD;
+	void alice90_mem(address_map &map) ATTR_COLD;
 };
 
 /***************************************************************************
@@ -243,8 +243,6 @@ void mc10_state::driver_reset()
 
 void mc10_state::driver_start()
 {
-	driver_device::driver_start();
-
 	save_item(NAME(m_keyboard_strobe));
 
 	address_space &space = m_maincpu->space(AS_PROGRAM);
@@ -259,8 +257,6 @@ void mc10_state::driver_start()
 
 void alice32_state::driver_start()
 {
-	driver_device::driver_start();
-
 	save_item(NAME(m_keyboard_strobe));
 
 	address_space &space = m_maincpu->space(AS_PROGRAM);
@@ -513,7 +509,7 @@ void mc10_state::mc10_video(machine_config &config)
 	RAM(config, m_ram).set_default_size("4K").set_extra_options("8K,20K,32K");
 
 	/* video hardware */
-	SCREEN(config, "screen", SCREEN_TYPE_RASTER).set_raw(3.579545_MHz_XTAL * 2, 456, 0, 320, 262, 0, 240);
+	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
 
 	mc6847_ntsc_device &vdg(MC6847_NTSC(config, "mc6847", XTAL(3'579'545)));
 	vdg.set_screen("screen");
@@ -618,13 +614,7 @@ ROM_START( alice32 )
 	ROM_LOAD( "charset.rom", 0x0000, 0x2000, BAD_DUMP CRC(b2f49eb3) SHA1(d0ef530be33bfc296314e7152302d95fdf9520fc) )            // from dcvg5k
 ROM_END
 
-ROM_START( alice90 )
-	ROM_REGION(0x4000, "maincpu", 0)
-	ROM_LOAD("alice90.rom", 0x0000, 0x4000, CRC(d0a874bb) SHA1(a65c7be2d516bed2584c51c1ef78b045b91faef6))
-
-	ROM_REGION( 0x2000, "ef9345", 0 )
-	ROM_LOAD( "charset.rom", 0x0000, 0x2000, BAD_DUMP CRC(b2f49eb3) SHA1(d0ef530be33bfc296314e7152302d95fdf9520fc) )            // from dcvg5k
-ROM_END
+#define rom_alice90 rom_alice32
 
 }
 

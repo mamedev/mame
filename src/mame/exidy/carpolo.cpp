@@ -214,6 +214,8 @@ static GFXDECODE_START( gfx_carpolo )
 	GFXDECODE_ENTRY( "gfx3", 0, gfx_8x8x1,    12*2+2*16, 4 )
 GFXDECODE_END
 
+
+
 /*************************************
  *
  *  Machine driver
@@ -222,18 +224,18 @@ GFXDECODE_END
 
 void carpolo_state::carpolo(machine_config &config)
 {
-	/* basic machine hardware */
-	M6502(config, m_maincpu, XTAL(11'289'000)/12); /* 940.75 kHz */
+	// basic machine hardware
+	M6502(config, m_maincpu, XTAL(11'289'000)/12); // 940.75 kHz
 	m_maincpu->set_addrmap(AS_PROGRAM, &carpolo_state::main_map);
 
-	pia6821_device &pia0(PIA6821(config, "pia0", 0));
+	pia6821_device &pia0(PIA6821(config, "pia0"));
 	pia0.readpb_handler().set(FUNC(carpolo_state::pia_0_port_b_r));
 	pia0.writepa_handler().set(FUNC(carpolo_state::pia_0_port_a_w));
 	pia0.writepb_handler().set(FUNC(carpolo_state::pia_0_port_b_w));
 	pia0.ca2_handler().set(FUNC(carpolo_state::coin1_interrupt_clear_w));
 	pia0.cb2_handler().set(FUNC(carpolo_state::coin2_interrupt_clear_w));
 
-	pia6821_device &pia1(PIA6821(config, "pia1", 0));
+	pia6821_device &pia1(PIA6821(config, "pia1"));
 	pia1.readpa_handler().set(FUNC(carpolo_state::pia_1_port_a_r));
 	pia1.readpb_handler().set(FUNC(carpolo_state::pia_1_port_b_r));
 	pia1.ca2_handler().set(FUNC(carpolo_state::coin3_interrupt_clear_w));
@@ -267,10 +269,10 @@ void carpolo_state::carpolo(machine_config &config)
 	m_ttl74153_1k->za_cb().set(FUNC(carpolo_state::ls153_za_w)); // pia1 pb5
 	m_ttl74153_1k->zb_cb().set(FUNC(carpolo_state::ls153_zb_w)); // pia1 pb4
 
-	/* video hardware */
+	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); // not accurate
 	screen.set_size(256, 256);
 	screen.set_visarea(0, 239, 0, 255);
 	screen.set_screen_update(FUNC(carpolo_state::screen_update));
@@ -280,7 +282,7 @@ void carpolo_state::carpolo(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_carpolo);
 	PALETTE(config, m_palette, FUNC(carpolo_state::carpolo_palette), 12*2+2*16+4*2);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
 	NETLIST_SOUND(config, "sound_nl", 48000)
@@ -315,25 +317,25 @@ ROM_START( carpolo )
 	ROM_LOAD( "4006.6l",   0xfc00, 0x0200, CRC(8479c350) SHA1(391c737947498aad4d478639cbbc72181d680fce) )
 	ROM_LOAD( "4007a.6n",  0xfe00, 0x0200, CRC(c6a619de) SHA1(c1b650a0126791fa733f89d9e9bdeeb605486a2c) )
 
-	ROM_REGION( 0x0400, "gfx1", 0 ) /* sprites */
+	ROM_REGION( 0x0400, "gfx1", 0 ) // sprites
 	ROM_LOAD( "1024.10w",  0x0000, 0x0100, CRC(eedacc7e) SHA1(d89628f013039ca387cafe22180de71e1553cffc) )
 	ROM_LOAD( "1023.10v",  0x0100, 0x0100, CRC(45df6c74) SHA1(a986b62b4c263c5d217bae0d51e74197f5288180) )
 	ROM_LOAD( "1022.10u",  0x0200, 0x0100, CRC(00868768) SHA1(2388e428db300a1e0005cccb9165ec604518033d) )
 	ROM_LOAD( "1021.10t",  0x0300, 0x0100, CRC(a508af9c) SHA1(219ba776d8cccf6726519aff17e37f2a6a85d0d1) )
 
-	ROM_REGION( 0x0100, "gfx2", 0 ) /* goal */
+	ROM_REGION( 0x0100, "gfx2", ROMREGION_INVERT ) // goal
 	ROM_LOAD( "1020.6v",   0x0000, 0x0100, CRC(5e89fbcd) SHA1(6be171168924cd8aa94ff5e1994faecb6f303bd9) )
 
-	ROM_REGION( 0x0200, "gfx3", 0 ) /* alpha */
-	ROM_LOAD( "2513.4l",   0x0000, 0x0200, BAD_DUMP CRC(f80d8889) SHA1(ca573543dcce1221459d5693c476cef14bfac4f4)  ) /* MIA - stolen from Night Driver */
+	ROM_REGION( 0x0200, "gfx3", 0 ) // alpha
+	ROM_LOAD( "2513.4l",   0x0000, 0x0200, CRC(2b41dd66) SHA1(8417b51ba2c4ba9989ef6a04a63720ce36e4660f) BAD_DUMP ) // MIA - stolen from Circus and changed the 0
 
 	ROM_REGION( 0x0060, "proms", 0 )
-	ROM_LOAD( "328.5u",    0x0000, 0x0020, CRC(f295e0fc) SHA1(974a0481e0c6d5c0b6f0129653d8ed87880916e0) )       /* color PROM */
-	ROM_LOAD( "325.6t",    0x0020, 0x0020, CRC(b8b44022) SHA1(29fe6159c8d239c322296cef68ad59bcf290f246) )       /* horizontal timing */
-	ROM_LOAD( "326.6w",    0x0040, 0x0020, CRC(628ae3d1) SHA1(e6d43d2b5e8ec4b8c1adf6f29c2c9a43ab67ff50) )       /* vertical timing */
+	ROM_LOAD( "328.5u",    0x0000, 0x0020, CRC(f295e0fc) SHA1(974a0481e0c6d5c0b6f0129653d8ed87880916e0) ) // color PROM
+	ROM_LOAD( "325.6t",    0x0020, 0x0020, CRC(b8b44022) SHA1(29fe6159c8d239c322296cef68ad59bcf290f246) ) // horizontal timing
+	ROM_LOAD( "326.6w",    0x0040, 0x0020, CRC(628ae3d1) SHA1(e6d43d2b5e8ec4b8c1adf6f29c2c9a43ab67ff50) ) // vertical timing
 
 	ROM_REGION( 0x0020, "user1", 0 )
-	ROM_LOAD( "327.10s",   0x0000, 0x0020, CRC(e047d24d) SHA1(2ea7afc8d97c906295bf2af929e0515f6c34137f) )       /* sprite image map */
+	ROM_LOAD( "327.10s",   0x0000, 0x0020, CRC(e047d24d) SHA1(2ea7afc8d97c906295bf2af929e0515f6c34137f) ) // sprite image map
 ROM_END
 
 
@@ -344,13 +346,4 @@ ROM_END
  *
  *************************************/
 
-void carpolo_state::init_carpolo()
-{
-	/* invert gfx PROM since the bits are active LO */
-	uint8_t *ROM = memregion("gfx2")->base();
-	size_t len = memregion("gfx2")->bytes();
-	for (size_t i = 0; i < len; i++)
-		ROM[i] ^= 0x0f;
-}
-
-GAME( 1977, carpolo, 0, carpolo, carpolo, carpolo_state, init_carpolo, ROT0, "Exidy", "Car Polo", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND )
+GAME( 1977, carpolo, 0, carpolo, carpolo, carpolo_state, empty_init, ROT0, "Exidy", "Car Polo", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND )

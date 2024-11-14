@@ -1,6 +1,6 @@
 // Tencent is pleased to support the open source community by making RapidJSON available.
 //
-// Copyright (C) 2015 THL A29 Limited, a Tencent company, and Milo Yip. All rights reserved.
+// Copyright (C) 2015 THL A29 Limited, a Tencent company, and Milo Yip.
 //
 // Licensed under the MIT License (the "License"); you may not use this file except
 // in compliance with the License. You may obtain a copy of the License at
@@ -207,6 +207,7 @@ static void TestParseDouble() {
 
     TEST_DOUBLE(fullPrecision, "0.0", 0.0);
     TEST_DOUBLE(fullPrecision, "-0.0", -0.0); // For checking issue #289
+    TEST_DOUBLE(fullPrecision, "0e100", 0.0); // For checking issue #1249
     TEST_DOUBLE(fullPrecision, "1.0", 1.0);
     TEST_DOUBLE(fullPrecision, "-1.0", -1.0);
     TEST_DOUBLE(fullPrecision, "1.5", 1.5);
@@ -233,7 +234,7 @@ static void TestParseDouble() {
     TEST_DOUBLE(fullPrecision, "1e-10000", 0.0);                                    // must underflow
     TEST_DOUBLE(fullPrecision, "18446744073709551616", 18446744073709551616.0);     // 2^64 (max of uint64_t + 1, force to use double)
     TEST_DOUBLE(fullPrecision, "-9223372036854775809", -9223372036854775809.0);     // -2^63 - 1(min of int64_t + 1, force to use double)
-    TEST_DOUBLE(fullPrecision, "0.9868011474609375", 0.9868011474609375);           // https://github.com/miloyip/rapidjson/issues/120
+    TEST_DOUBLE(fullPrecision, "0.9868011474609375", 0.9868011474609375);           // https://github.com/Tencent/rapidjson/issues/120
     TEST_DOUBLE(fullPrecision, "123e34", 123e34);                                   // Fast Path Cases In Disguise
     TEST_DOUBLE(fullPrecision, "45913141877270640000.0", 45913141877270640000.0);
     TEST_DOUBLE(fullPrecision, "2.2250738585072011e-308", 2.2250738585072011e-308); // http://www.exploringbinary.com/php-hangs-on-numeric-value-2-2250738585072011e-308/
@@ -242,16 +243,18 @@ static void TestParseDouble() {
     TEST_DOUBLE(fullPrecision, "1e-214748363", 0.0);                                  // Maximum supported negative exponent
     TEST_DOUBLE(fullPrecision, "1e-214748364", 0.0);
     TEST_DOUBLE(fullPrecision, "1e-21474836311", 0.0);
+    TEST_DOUBLE(fullPrecision, "1.00000000001e-2147483638", 0.0);
     TEST_DOUBLE(fullPrecision, "0.017976931348623157e+310", 1.7976931348623157e+308); // Max double in another form
+    TEST_DOUBLE(fullPrecision, "128.74836467836484838364836483643636483648e-336", 0.0); // Issue #1251
 
     // Since
-    // abs((2^-1022 - 2^-1074) - 2.2250738585072012e-308) = 3.109754131239141401123495768877590405345064751974375599... �� 10^-324
-    // abs((2^-1022) - 2.2250738585072012e-308) = 1.830902327173324040642192159804623318305533274168872044... �� 10 ^ -324
+    // abs((2^-1022 - 2^-1074) - 2.2250738585072012e-308) = 3.109754131239141401123495768877590405345064751974375599... x 10^-324
+    // abs((2^-1022) - 2.2250738585072012e-308) = 1.830902327173324040642192159804623318305533274168872044... x 10 ^ -324
     // So 2.2250738585072012e-308 should round to 2^-1022 = 2.2250738585072014e-308
     TEST_DOUBLE(fullPrecision, "2.2250738585072012e-308", 2.2250738585072014e-308); // http://www.exploringbinary.com/java-hangs-when-converting-2-2250738585072012e-308/
 
     // More closer to normal/subnormal boundary
-    // boundary = 2^-1022 - 2^-1075 = 2.225073858507201136057409796709131975934819546351645648... �� 10^-308
+    // boundary = 2^-1022 - 2^-1075 = 2.225073858507201136057409796709131975934819546351645648... x 10^-308
     TEST_DOUBLE(fullPrecision, "2.22507385850720113605740979670913197593481954635164564e-308", 2.2250738585072009e-308);
     TEST_DOUBLE(fullPrecision, "2.22507385850720113605740979670913197593481954635164565e-308", 2.2250738585072014e-308);
 
@@ -376,6 +379,208 @@ static void TestParseDouble() {
             d = d.Value() * 0.5;
         }
     }
+
+    // Issue 1249
+    TEST_DOUBLE(fullPrecision, "0e100", 0.0);
+
+    // Issue 1251
+    TEST_DOUBLE(fullPrecision, "128.74836467836484838364836483643636483648e-336", 0.0);
+
+    // Issue 1256
+    TEST_DOUBLE(fullPrecision,
+        "6223372036854775296.1701512723685473547372536854755293372036854685477"
+        "529752233737201701512337200972013723685473123372036872036854236854737"
+        "247372368372367752975258547752975254729752547372368737201701512354737"
+        "83723677529752585477247372368372368547354737253685475529752",
+        6223372036854775808.0);
+
+#if 0
+    // Test (length + exponent) overflow
+    TEST_DOUBLE(fullPrecision, "0e+2147483647", 0.0);
+    TEST_DOUBLE(fullPrecision, "0e-2147483648", 0.0);
+    TEST_DOUBLE(fullPrecision, "1e-2147483648", 0.0);
+    TEST_DOUBLE(fullPrecision, "0e+9223372036854775807", 0.0);
+    TEST_DOUBLE(fullPrecision, "0e-9223372036854775808", 0.0);
+#endif
+
+    if (fullPrecision)
+    {
+        TEST_DOUBLE(fullPrecision, "1e-325", 0.0);
+        TEST_DOUBLE(fullPrecision, "1e-324", 0.0);
+        TEST_DOUBLE(fullPrecision, "2e-324", 0.0);
+        TEST_DOUBLE(fullPrecision, "2.4703282292062327e-324", 0.0);
+        TEST_DOUBLE(fullPrecision, "2.4703282292062328e-324", 5e-324);
+        TEST_DOUBLE(fullPrecision, "2.48e-324",5e-324);
+        TEST_DOUBLE(fullPrecision, "2.5e-324", 5e-324);
+
+        // Slightly above max-normal
+        TEST_DOUBLE(fullPrecision, "1.7976931348623158e+308", 1.7976931348623158e+308);
+
+        TEST_DOUBLE(fullPrecision,
+            "17976931348623157081452742373170435679807056752584499659891747680315726"
+            "07800285387605895586327668781715404589535143824642343213268894641827684"
+            "67546703537516986049910576551282076245490090389328944075868508455133942"
+            "30458323690322294816580855933212334827479782620414472316873817718091929"
+            "9881250404026184124858368",
+            (std::numeric_limits<double>::max)());
+
+        TEST_DOUBLE(fullPrecision,
+            "243546080556034731077856379609316893158278902575447060151047"
+            "212703405344938119816206067372775299130836050315842578309818"
+            "316450894337978612745889730079163798234256495613858256849283"
+            "467066859489192118352020514036083287319232435355752493038825"
+            "828481044358810649108367633313557305310641892225870327827273"
+            "41408256.000000",
+            2.4354608055603473e+307);
+        // 9007199254740991 * 2^971 (max normal)
+        TEST_DOUBLE(fullPrecision,
+            "1.797693134862315708145274237317043567980705675258449965989174768031572607800285"
+            "38760589558632766878171540458953514382464234321326889464182768467546703537516986"
+            "04991057655128207624549009038932894407586850845513394230458323690322294816580855"
+            "9332123348274797826204144723168738177180919299881250404026184124858368e+308",
+            1.797693134862315708e+308 //        0x1.fffffffffffffp1023
+            );
+#if 0
+        // TODO:
+        // Should work at least in full-precision mode...
+        TEST_DOUBLE(fullPrecision,
+            "0.00000000000000000000000000000000000000000000000000000000000"
+            "0000000000000000000000000000000000000000000000000000000000000"
+            "0000000000000000000000000000000000000000000000000000000000000"
+            "0000000000000000000000000000000000000000000000000000000000000"
+            "0000000000000000000000000000000000000000000000000000000000000"
+            "0000000000000000000024703282292062327208828439643411068618252"
+            "9901307162382212792841250337753635104375932649918180817996189"
+            "8982823477228588654633283551779698981993873980053909390631503"
+            "5659515570226392290858392449105184435931802849936536152500319"
+            "3704576782492193656236698636584807570015857692699037063119282"
+            "7955855133292783433840935197801553124659726357957462276646527"
+            "2827220056374006485499977096599470454020828166226237857393450"
+            "7363390079677619305775067401763246736009689513405355374585166"
+            "6113422376667860416215968046191446729184030053005753084904876"
+            "5391711386591646239524912623653881879636239373280423891018672"
+            "3484976682350898633885879256283027559956575244555072551893136"
+            "9083625477918694866799496832404970582102851318545139621383772"
+            "2826145437693412532098591327667236328125",
+            0.0);
+#endif
+        // 9007199254740991 * 2^-1074 = (2^53 - 1) * 2^-1074
+        TEST_DOUBLE(fullPrecision,
+            "4.450147717014402272114819593418263951869639092703291296046852219449644444042153"
+            "89103305904781627017582829831782607924221374017287738918929105531441481564124348"
+            "67599762821265346585071045737627442980259622449029037796981144446145705102663115"
+            "10031828794952795966823603998647925096578034214163701381261333311989876551545144"
+            "03152612538132666529513060001849177663286607555958373922409899478075565940981010"
+            "21612198814605258742579179000071675999344145086087205681577915435923018910334964"
+            "86942061405218289243144579760516365090360651414037721744226256159024466852576737"
+            "24464300755133324500796506867194913776884780053099639677097589658441378944337966"
+            "21993967316936280457084866613206797017728916080020698679408551343728867675409720"
+            "757232455434770912461317493580281734466552734375e-308",
+            4.450147717014402272e-308 //        0x1.fffffffffffffp-1022
+            );
+        // 9007199254740990 * 2^-1074
+        TEST_DOUBLE(fullPrecision,
+            "4.450147717014401778049173752171719775300846224481918930987049605124880018456471"
+            "39035755177760751831052846195619008686241717547743167145836439860405887584484471"
+            "19639655002484083577939142623582164522087943959208000909794783876158397872163051"
+            "22622675229968408654350206725478309956546318828765627255022767720818849892988457"
+            "26333908582101604036318532842699932130356061901518261174396928478121372742040102"
+            "17446565569357687263889031732270082446958029584739170416643195242132750803227473"
+            "16608838720742955671061336566907126801014814608027120593609275183716632624844904"
+            "31985250929886016737037234388448352929102742708402644340627409931664203093081360"
+            "70794835812045179006047003875039546061891526346421705014598610179523165038319441"
+            "51446491086954182492263498716056346893310546875e-308",
+            4.450147717014401778e-308 //        0x1.ffffffffffffep-1022
+            );
+        // half way between the two numbers above.
+        // round to nearest even.
+        TEST_DOUBLE(fullPrecision,
+            "4.450147717014402025081996672794991863585242658592605113516950912287262231249312"
+            "64069530541271189424317838013700808305231545782515453032382772695923684574304409"
+            "93619708911874715081505094180604803751173783204118519353387964161152051487413083"
+            "16327252012460602310586905362063117526562176521464664318142050516404363222266800"
+            "64743260560117135282915796422274554896821334728738317548403413978098469341510556"
+            "19529382191981473003234105366170879223151087335413188049110555339027884856781219"
+            "01775450062980622457102958163711745945687733011032421168917765671370549738710820"
+            "78224775842509670618916870627821633352993761380751142008862499795052791018709663"
+            "46394401564490729731565935244123171539810221213221201847003580761626016356864581"
+            "1358486831521563686919762403704226016998291015625e-308",
+            4.450147717014401778e-308 //        0x1.ffffffffffffep-1022
+            );
+        TEST_DOUBLE(fullPrecision,
+            "4.450147717014402025081996672794991863585242658592605113516950912287262231249312"
+            "64069530541271189424317838013700808305231545782515453032382772695923684574304409"
+            "93619708911874715081505094180604803751173783204118519353387964161152051487413083"
+            "16327252012460602310586905362063117526562176521464664318142050516404363222266800"
+            "64743260560117135282915796422274554896821334728738317548403413978098469341510556"
+            "19529382191981473003234105366170879223151087335413188049110555339027884856781219"
+            "01775450062980622457102958163711745945687733011032421168917765671370549738710820"
+            "78224775842509670618916870627821633352993761380751142008862499795052791018709663"
+            "46394401564490729731565935244123171539810221213221201847003580761626016356864581"
+            "13584868315215636869197624037042260169982910156250000000000000000000000000000000"
+            "00000000000000000000000000000000000000000000000000000000000000000000000000000000"
+            "00000000000000000000000000000000000000000000000000000000000000000000000000000000e-308",
+            4.450147717014401778e-308 //        0x1.ffffffffffffep-1022
+            );
+#if 0
+        // ... round up
+        // TODO:
+        // Should work at least in full-precision mode...
+        TEST_DOUBLE(fullPrecision,
+            "4.450147717014402025081996672794991863585242658592605113516950912287262231249312"
+            "64069530541271189424317838013700808305231545782515453032382772695923684574304409"
+            "93619708911874715081505094180604803751173783204118519353387964161152051487413083"
+            "16327252012460602310586905362063117526562176521464664318142050516404363222266800"
+            "64743260560117135282915796422274554896821334728738317548403413978098469341510556"
+            "19529382191981473003234105366170879223151087335413188049110555339027884856781219"
+            "01775450062980622457102958163711745945687733011032421168917765671370549738710820"
+            "78224775842509670618916870627821633352993761380751142008862499795052791018709663"
+            "46394401564490729731565935244123171539810221213221201847003580761626016356864581"
+            "13584868315215636869197624037042260169982910156250000000000000000000000000000000"
+            "00000000000000000000000000000000000000000000000000000000000000000000000000000000"
+            "00000000000000000000000000000000000000000000000000000000000000000000000000000001e-308",
+            4.450147717014402272e-308 //        0x1.fffffffffffffp-1022
+            );
+#endif
+        // ... round down
+        TEST_DOUBLE(fullPrecision,
+            "4.450147717014402025081996672794991863585242658592605113516950912287262231249312"
+            "64069530541271189424317838013700808305231545782515453032382772695923684574304409"
+            "93619708911874715081505094180604803751173783204118519353387964161152051487413083"
+            "16327252012460602310586905362063117526562176521464664318142050516404363222266800"
+            "64743260560117135282915796422274554896821334728738317548403413978098469341510556"
+            "19529382191981473003234105366170879223151087335413188049110555339027884856781219"
+            "01775450062980622457102958163711745945687733011032421168917765671370549738710820"
+            "78224775842509670618916870627821633352993761380751142008862499795052791018709663"
+            "46394401564490729731565935244123171539810221213221201847003580761626016356864581"
+            "13584868315215636869197624037042260169982910156249999999999999999999999999999999"
+            "99999999999999999999999999999999999999999999999999999999999999999999999999999999"
+            "99999999999999999999999999999999999999999999999999999999999999999999999999999999e-308",
+            4.450147717014401778e-308 //        0x1.ffffffffffffep-1022
+            );
+        // Slightly below half way between max-normal and infinity.
+        // Should round down.
+        TEST_DOUBLE(fullPrecision,
+            "1.797693134862315807937289714053034150799341327100378269361737789804449682927647"
+            "50946649017977587207096330286416692887910946555547851940402630657488671505820681"
+            "90890200070838367627385484581771153176447573027006985557136695962284291481986083"
+            "49364752927190741684443655107043427115596995080930428801779041744977919999999999"
+            "99999999999999999999999999999999999999999999999999999999999999999999999999999999"
+            "99999999999999999999999999999999999999999999999999999999999999999999999999999999"
+            "99999999999999999999999999999999999999999999999999999999999999999999999999999999"
+            "99999999999999999999999999999999999999999999999999999999999999999999999999999999"
+            "99999999999999999999999999999999999999999999999999999999999999999999999999999999"
+            "99999999999999999999999999999999999999999999999999999999999999999999999999999999"
+            "99999999999999999999999999999999999999999999999999999999999999999999999999999999"
+            "99999999999999999999999999999999999999999999999999999999999999999999999999999999"
+            "99999999999999999999999999999999999999999999999999999999999999999999999999999999"
+            "99999999999999999999999999999999999999999999999999999999999999999999999999999999"
+            "99999999999999999999999999999999999999999999999999999999999999999999999999999999"
+            "99999999999999999999999999999999999999999999999999999999999999999999999999999999e+308",
+            1.797693134862315708e+308 //        0x1.fffffffffffffp1023
+            );
+    }
+
 #undef TEST_DOUBLE
 }
 
@@ -415,21 +620,23 @@ TEST(Reader, ParseNumber_NormalPrecisionError) {
         uint64_t bias1 = e.ToBias();
         uint64_t bias2 = a.ToBias();
         double ulp = static_cast<double>(bias1 >= bias2 ? bias1 - bias2 : bias2 - bias1);
-        ulpMax = std::max(ulpMax, ulp);
+        ulpMax = (std::max)(ulpMax, ulp);
         ulpSum += ulp;
     }
     printf("ULP Average = %g, Max = %g \n", ulpSum / count, ulpMax);
 }
 
-TEST(Reader, ParseNumber_Error) {
+template<bool fullPrecision>
+static void TestParseNumberError() {
 #define TEST_NUMBER_ERROR(errorCode, str, errorOffset, streamPos) \
     { \
-        char buffer[1001]; \
+        char buffer[2048]; \
+        ASSERT_LT(std::strlen(str), 2048u); \
         sprintf(buffer, "%s", str); \
         InsituStringStream s(buffer); \
         BaseReaderHandler<> h; \
         Reader reader; \
-        EXPECT_FALSE(reader.Parse(s, h)); \
+        EXPECT_FALSE(reader.Parse<fullPrecision ? kParseFullPrecisionFlag : 0>(s, h)); \
         EXPECT_EQ(errorCode, reader.GetParseErrorCode());\
         EXPECT_EQ(errorOffset, reader.GetErrorOffset());\
         EXPECT_EQ(streamPos, s.Tell());\
@@ -442,19 +649,107 @@ TEST(Reader, ParseNumber_Error) {
         for (int i = 1; i < 310; i++)
             n1e309[i] = '0';
         n1e309[310] = '\0';
-        TEST_NUMBER_ERROR(kParseErrorNumberTooBig, n1e309, 0, 309);
+        TEST_NUMBER_ERROR(kParseErrorNumberTooBig, n1e309, 0u, 310u);
     }
-    TEST_NUMBER_ERROR(kParseErrorNumberTooBig, "1e309", 0, 5);
+    TEST_NUMBER_ERROR(kParseErrorNumberTooBig, "1e309", 0u, 5u);
 
     // Miss fraction part in number.
-    TEST_NUMBER_ERROR(kParseErrorNumberMissFraction, "1.", 2, 2);
-    TEST_NUMBER_ERROR(kParseErrorNumberMissFraction, "1.a", 2, 2);
+    TEST_NUMBER_ERROR(kParseErrorNumberMissFraction, "1.", 2u, 2u);
+    TEST_NUMBER_ERROR(kParseErrorNumberMissFraction, "1.a", 2u, 2u);
 
     // Miss exponent in number.
-    TEST_NUMBER_ERROR(kParseErrorNumberMissExponent, "1e", 2, 2);
-    TEST_NUMBER_ERROR(kParseErrorNumberMissExponent, "1e_", 2, 2);
+    TEST_NUMBER_ERROR(kParseErrorNumberMissExponent, "1e", 2u, 2u);
+    TEST_NUMBER_ERROR(kParseErrorNumberMissExponent, "1e_", 2u, 2u);
+
+    // Issue 849
+    TEST_NUMBER_ERROR(kParseErrorNumberTooBig, "1.8e308", 0u, 7u);
+    TEST_NUMBER_ERROR(kParseErrorNumberTooBig, "5e308", 0u, 5u);
+    TEST_NUMBER_ERROR(kParseErrorNumberTooBig, "1e309", 0u, 5u);
+    TEST_NUMBER_ERROR(kParseErrorNumberTooBig, "1.0e310", 0u, 7u);
+    TEST_NUMBER_ERROR(kParseErrorNumberTooBig, "1.00e310", 0u, 8u);
+    TEST_NUMBER_ERROR(kParseErrorNumberTooBig, "-1.8e308", 0u, 8u);
+    TEST_NUMBER_ERROR(kParseErrorNumberTooBig, "-1e309", 0u, 6u);
+
+    // Issue 1253
+    TEST_NUMBER_ERROR(kParseErrorNumberTooBig, "2e308", 0u, 5u);
+
+    // Issue 1259
+    TEST_NUMBER_ERROR(kParseErrorNumberTooBig,
+        "88474320368547737236837236775298547354737253685475547552933720368546854775297525"
+        "29337203685468547770151233720097201372368547312337203687203685423685123372036872"
+        "03685473724737236837236775297525854775297525472975254737236873720170151235473783"
+        "7236737247372368772473723683723456789012E66", 0u, 283u);
+
+#if 0
+    // Test (length + exponent) overflow
+    TEST_NUMBER_ERROR(kParseErrorNumberTooBig, "1e+2147483647", 0u, 13u);
+    TEST_NUMBER_ERROR(kParseErrorNumberTooBig, "1e+9223372036854775807", 0u, 22u);
+    TEST_NUMBER_ERROR(kParseErrorNumberTooBig, "1e+10000", 0u, 8u);
+    TEST_NUMBER_ERROR(kParseErrorNumberTooBig, "1e+50000", 0u, 8u);
+#endif
+
+    // 9007199254740992 * 2^971 ("infinity")
+    TEST_NUMBER_ERROR(kParseErrorNumberTooBig,
+        "1.797693134862315907729305190789024733617976978942306572734300811577326758055009"
+        "63132708477322407536021120113879871393357658789768814416622492847430639474124377"
+        "76789342486548527630221960124609411945308295208500576883815068234246288147391311"
+        "0540827237163350510684586298239947245938479716304835356329624224137216e+308", 0u, 315u);
+
+    // TODO:
+    // These tests (currently) fail in normal-precision mode
+    if (fullPrecision)
+    {
+        // Half way between max-normal and infinity
+        // Should round to infinity in nearest-even mode.
+        TEST_NUMBER_ERROR(kParseErrorNumberTooBig,
+            "1.797693134862315807937289714053034150799341327100378269361737789804449682927647"
+            "50946649017977587207096330286416692887910946555547851940402630657488671505820681"
+            "90890200070838367627385484581771153176447573027006985557136695962284291481986083"
+            "49364752927190741684443655107043427115596995080930428801779041744977920000000000"
+            "00000000000000000000000000000000000000000000000000000000000000000000000000000000"
+            "00000000000000000000000000000000000000000000000000000000000000000000000000000000"
+            "00000000000000000000000000000000000000000000000000000000000000000000000000000000"
+            "00000000000000000000000000000000000000000000000000000000000000000000000000000000"
+            "00000000000000000000000000000000000000000000000000000000000000000000000000000000"
+            "00000000000000000000000000000000000000000000000000000000000000000000000000000000"
+            "00000000000000000000000000000000000000000000000000000000000000000000000000000000"
+            "00000000000000000000000000000000000000000000000000000000000000000000000000000000"
+            "00000000000000000000000000000000000000000000000000000000000000000000000000000000"
+            "00000000000000000000000000000000000000000000000000000000000000000000000000000000e+308", 0u, 1125u);
+        // ...round up
+        TEST_NUMBER_ERROR(kParseErrorNumberTooBig,
+            "1.797693134862315807937289714053034150799341327100378269361737789804449682927647"
+            "50946649017977587207096330286416692887910946555547851940402630657488671505820681"
+            "90890200070838367627385484581771153176447573027006985557136695962284291481986083"
+            "49364752927190741684443655107043427115596995080930428801779041744977920000000000"
+            "00000000000000000000000000000000000000000000000000000000000000000000000000000000"
+            "00000000000000000000000000000000000000000000000000000000000000000000000000000000"
+            "00000000000000000000000000000000000000000000000000000000000000000000000000000000"
+            "00000000000000000000000000000000000000000000000000000000000000000000000000000000"
+            "00000000000000000000000000000000000000000000000000000000000000000000000000000000"
+            "00000000000000000000000000000000000000000000000000000000000000000000000000000000"
+            "00000000000000000000000000000000000000000000000000000000000000000000000000000000"
+            "00000000000000000000000000000000000000000000000000000000000000000000000000000000"
+            "00000000000000000000000000000000000000000000000000000000000000000000000000000000"
+            "00000000000000000000000000000000000000000000000000000000000000000000000000000000"
+            "00000000000000000000000000000000000000000000000000000000000000000000000000000001e+308", 0u, 1205u);
+    }
+
+    TEST_NUMBER_ERROR(kParseErrorNumberTooBig,
+        "10000000000000000000000000000000000000000000000000000000000000000000000000000000"
+        "00000000000000000000000000000000000000000000000000000000000000000000000000000000"
+        "00000000000000000000000000000000000000000000000000000000000000000000000000000000"
+        "0000000000000000000000000000000000000000000000000000000000000000000001", 0u, 310u);
 
 #undef TEST_NUMBER_ERROR
+}
+
+TEST(Reader, ParseNumberError_NormalPrecisionDouble) {
+    TestParseNumberError<false>();
+}
+
+TEST(Reader, ParseNumberError_FullPrecisionDouble) {
+    TestParseNumberError<true>();
 }
 
 template <typename Encoding>
@@ -636,21 +931,24 @@ TEST(Reader, ParseString_Error) {
     }
 
     // Invalid escape character in string.
-    TEST_STRING_ERROR(kParseErrorStringEscapeInvalid, "[\"\\a\"]", 2, 3);
+    TEST_STRING_ERROR(kParseErrorStringEscapeInvalid, "[\"\\a\"]", 2u, 3u);
 
     // Incorrect hex digit after \\u escape in string.
-    TEST_STRING_ERROR(kParseErrorStringUnicodeEscapeInvalidHex, "[\"\\uABCG\"]", 2, 7);
+    TEST_STRING_ERROR(kParseErrorStringUnicodeEscapeInvalidHex, "[\"\\uABCG\"]", 2u, 7u);
 
     // Quotation in \\u escape in string (Issue #288)
-    TEST_STRING_ERROR(kParseErrorStringUnicodeEscapeInvalidHex, "[\"\\uaaa\"]", 2, 7);
-    TEST_STRING_ERROR(kParseErrorStringUnicodeEscapeInvalidHex, "[\"\\uD800\\uFFF\"]", 2, 13);
+    TEST_STRING_ERROR(kParseErrorStringUnicodeEscapeInvalidHex, "[\"\\uaaa\"]", 2u, 7u);
+    TEST_STRING_ERROR(kParseErrorStringUnicodeEscapeInvalidHex, "[\"\\uD800\\uFFF\"]", 2u, 13u);
 
     // The surrogate pair in string is invalid.
-    TEST_STRING_ERROR(kParseErrorStringUnicodeSurrogateInvalid, "[\"\\uD800X\"]", 2, 8);
-    TEST_STRING_ERROR(kParseErrorStringUnicodeSurrogateInvalid, "[\"\\uD800\\uFFFF\"]", 2, 14);
+    TEST_STRING_ERROR(kParseErrorStringUnicodeSurrogateInvalid, "[\"\\uD800X\"]", 2u, 8u);
+    TEST_STRING_ERROR(kParseErrorStringUnicodeSurrogateInvalid, "[\"\\uD800\\uFFFF\"]", 2u, 14u);
+
+    // Single low surrogate pair in string is invalid.
+    TEST_STRING_ERROR(kParseErrorStringUnicodeSurrogateInvalid, "[\"\\udc4d\"]", 2u, 8u);
 
     // Missing a closing quotation mark in string.
-    TEST_STRING_ERROR(kParseErrorStringMissQuotationMark, "[\"Test]", 7, 7);
+    TEST_STRING_ERROR(kParseErrorStringMissQuotationMark, "[\"Test]", 7u, 7u);
 
     // http://www.cl.cam.ac.uk/~mgk25/ucs/examples/UTF-8-test.txt
 
@@ -673,7 +971,7 @@ TEST(Reader, ParseString_Error) {
         char e[] = { '[', '\"', 0, ' ', '\"', ']', '\0' };
         for (unsigned c = 0xC0u; c <= 0xFFu; c++) {
             e[2] = static_cast<char>(c);
-            int streamPos;
+            unsigned streamPos;
             if (c <= 0xC1u)
                 streamPos = 3; // 0xC0 - 0xC1
             else if (c <= 0xDFu)
@@ -684,7 +982,7 @@ TEST(Reader, ParseString_Error) {
                 streamPos = 6; // 0xF0 - 0xF4
             else
                 streamPos = 3; // 0xF5 - 0xFF
-            TEST_STRING_ERROR(kParseErrorStringInvalidEncoding, e, 2, streamPos);
+            TEST_STRING_ERROR(kParseErrorStringInvalidEncoding, e, 2u, streamPos);
         }
     }
 
@@ -725,6 +1023,8 @@ TEST(Reader, ParseString_Error) {
 
     // Malform ASCII sequence
     TEST_STRINGENCODING_ERROR(ASCII<>, UTF8<>, char, ARRAY('[', '\"', char(0x80u), '\"', ']', '\0'));
+    TEST_STRINGENCODING_ERROR(ASCII<>, UTF8<>, char, ARRAY('[', '\"', char(0x01u), '\"', ']', '\0'));
+    TEST_STRINGENCODING_ERROR(ASCII<>, UTF8<>, char, ARRAY('[', '\"', char(0x1Cu), '\"', ']', '\0'));
 
 #undef ARRAY
 #undef TEST_STRINGARRAY_ERROR
@@ -765,7 +1065,7 @@ TEST(Reader, ParseArray) {
 TEST(Reader, ParseArray_Error) {
 #define TEST_ARRAY_ERROR(errorCode, str, errorOffset) \
     { \
-        int streamPos = errorOffset; \
+        unsigned streamPos = errorOffset; \
         char buffer[1001]; \
         strncpy(buffer, str, 1000); \
         InsituStringStream s(buffer); \
@@ -778,13 +1078,13 @@ TEST(Reader, ParseArray_Error) {
     }
 
     // Missing a comma or ']' after an array element.
-    TEST_ARRAY_ERROR(kParseErrorArrayMissCommaOrSquareBracket, "[1", 2);
-    TEST_ARRAY_ERROR(kParseErrorArrayMissCommaOrSquareBracket, "[1}", 2);
-    TEST_ARRAY_ERROR(kParseErrorArrayMissCommaOrSquareBracket, "[1 2]", 3);
+    TEST_ARRAY_ERROR(kParseErrorArrayMissCommaOrSquareBracket, "[1", 2u);
+    TEST_ARRAY_ERROR(kParseErrorArrayMissCommaOrSquareBracket, "[1}", 2u);
+    TEST_ARRAY_ERROR(kParseErrorArrayMissCommaOrSquareBracket, "[1 2]", 3u);
 
     // Array cannot have a trailing comma (without kParseTrailingCommasFlag);
     // a value must follow a comma
-    TEST_ARRAY_ERROR(kParseErrorValueInvalid, "[1,]", 3);
+    TEST_ARRAY_ERROR(kParseErrorValueInvalid, "[1,]", 3u);
 
 #undef TEST_ARRAY_ERROR
 }
@@ -933,7 +1233,7 @@ TEST(Reader, ParseInsituIterative_MultipleRoot) {
 
 #define TEST_ERROR(errorCode, str, errorOffset) \
     { \
-        int streamPos = errorOffset; \
+        unsigned streamPos = errorOffset; \
         char buffer[1001]; \
         strncpy(buffer, str, 1000); \
         InsituStringStream s(buffer); \
@@ -947,48 +1247,48 @@ TEST(Reader, ParseInsituIterative_MultipleRoot) {
 
 TEST(Reader, ParseDocument_Error) {
     // The document is empty.
-    TEST_ERROR(kParseErrorDocumentEmpty, "", 0);
-    TEST_ERROR(kParseErrorDocumentEmpty, " ", 1);
-    TEST_ERROR(kParseErrorDocumentEmpty, " \n", 2);
+    TEST_ERROR(kParseErrorDocumentEmpty, "", 0u);
+    TEST_ERROR(kParseErrorDocumentEmpty, " ", 1u);
+    TEST_ERROR(kParseErrorDocumentEmpty, " \n", 2u);
 
     // The document root must not follow by other values.
-    TEST_ERROR(kParseErrorDocumentRootNotSingular, "[] 0", 3);
-    TEST_ERROR(kParseErrorDocumentRootNotSingular, "{} 0", 3);
-    TEST_ERROR(kParseErrorDocumentRootNotSingular, "null []", 5);
-    TEST_ERROR(kParseErrorDocumentRootNotSingular, "0 {}", 2);
+    TEST_ERROR(kParseErrorDocumentRootNotSingular, "[] 0", 3u);
+    TEST_ERROR(kParseErrorDocumentRootNotSingular, "{} 0", 3u);
+    TEST_ERROR(kParseErrorDocumentRootNotSingular, "null []", 5u);
+    TEST_ERROR(kParseErrorDocumentRootNotSingular, "0 {}", 2u);
 }
 
 TEST(Reader, ParseValue_Error) {
     // Invalid value.
-    TEST_ERROR(kParseErrorValueInvalid, "nulL", 3);
-    TEST_ERROR(kParseErrorValueInvalid, "truE", 3);
-    TEST_ERROR(kParseErrorValueInvalid, "falsE", 4);
-    TEST_ERROR(kParseErrorValueInvalid, "a]", 0);
-    TEST_ERROR(kParseErrorValueInvalid, ".1", 0);
+    TEST_ERROR(kParseErrorValueInvalid, "nulL", 3u);
+    TEST_ERROR(kParseErrorValueInvalid, "truE", 3u);
+    TEST_ERROR(kParseErrorValueInvalid, "falsE", 4u);
+    TEST_ERROR(kParseErrorValueInvalid, "a]", 0u);
+    TEST_ERROR(kParseErrorValueInvalid, ".1", 0u);
 }
 
 TEST(Reader, ParseObject_Error) {
     // Missing a name for object member.
-    TEST_ERROR(kParseErrorObjectMissName, "{1}", 1);
-    TEST_ERROR(kParseErrorObjectMissName, "{:1}", 1);
-    TEST_ERROR(kParseErrorObjectMissName, "{null:1}", 1);
-    TEST_ERROR(kParseErrorObjectMissName, "{true:1}", 1);
-    TEST_ERROR(kParseErrorObjectMissName, "{false:1}", 1);
-    TEST_ERROR(kParseErrorObjectMissName, "{1:1}", 1);
-    TEST_ERROR(kParseErrorObjectMissName, "{[]:1}", 1);
-    TEST_ERROR(kParseErrorObjectMissName, "{{}:1}", 1);
-    TEST_ERROR(kParseErrorObjectMissName, "{xyz:1}", 1);
+    TEST_ERROR(kParseErrorObjectMissName, "{1}", 1u);
+    TEST_ERROR(kParseErrorObjectMissName, "{:1}", 1u);
+    TEST_ERROR(kParseErrorObjectMissName, "{null:1}", 1u);
+    TEST_ERROR(kParseErrorObjectMissName, "{true:1}", 1u);
+    TEST_ERROR(kParseErrorObjectMissName, "{false:1}", 1u);
+    TEST_ERROR(kParseErrorObjectMissName, "{1:1}", 1u);
+    TEST_ERROR(kParseErrorObjectMissName, "{[]:1}", 1u);
+    TEST_ERROR(kParseErrorObjectMissName, "{{}:1}", 1u);
+    TEST_ERROR(kParseErrorObjectMissName, "{xyz:1}", 1u);
 
     // Missing a colon after a name of object member.
-    TEST_ERROR(kParseErrorObjectMissColon, "{\"a\" 1}", 5);
-    TEST_ERROR(kParseErrorObjectMissColon, "{\"a\",1}", 4);
+    TEST_ERROR(kParseErrorObjectMissColon, "{\"a\" 1}", 5u);
+    TEST_ERROR(kParseErrorObjectMissColon, "{\"a\",1}", 4u);
 
     // Must be a comma or '}' after an object member
-    TEST_ERROR(kParseErrorObjectMissCommaOrCurlyBracket, "{\"a\":1]", 6);
+    TEST_ERROR(kParseErrorObjectMissCommaOrCurlyBracket, "{\"a\":1]", 6u);
 
     // Object cannot have a trailing comma (without kParseTrailingCommasFlag);
     // an object member name must follow a comma
-    TEST_ERROR(kParseErrorObjectMissName, "{\"a\":1,}", 7);
+    TEST_ERROR(kParseErrorObjectMissName, "{\"a\":1,}", 7u);
 
     // This tests that MemoryStream is checking the length in Peek().
     {
@@ -1092,6 +1392,36 @@ private:
     std::istream& is_;
 };
 
+class WIStreamWrapper {
+public:
+  typedef wchar_t Ch;
+
+  WIStreamWrapper(std::wistream& is) : is_(is) {}
+
+  Ch Peek() const {
+    unsigned c = is_.peek();
+    return c == std::char_traits<wchar_t>::eof() ? Ch('\0') : static_cast<Ch>(c);
+  }
+
+  Ch Take() {
+    unsigned c = is_.get();
+    return c == std::char_traits<wchar_t>::eof() ? Ch('\0') : static_cast<Ch>(c);
+  }
+
+  size_t Tell() const { return static_cast<size_t>(is_.tellg()); }
+
+  Ch* PutBegin() { assert(false); return 0; }
+  void Put(Ch) { assert(false); }
+  void Flush() { assert(false); }
+  size_t PutEnd(Ch*) { assert(false); return 0; }
+
+private:
+  WIStreamWrapper(const WIStreamWrapper&);
+  WIStreamWrapper& operator=(const WIStreamWrapper&);
+
+  std::wistream& is_;
+};
+
 TEST(Reader, Parse_IStreamWrapper_StringStream) {
     const char* json = "[1,2,3,4]";
 
@@ -1108,7 +1438,7 @@ TEST(Reader, Parse_IStreamWrapper_StringStream) {
 
 #define TESTERRORHANDLING(text, errorCode, offset)\
 {\
-    int streamPos = offset; \
+    unsigned streamPos = offset; \
     StringStream json(text); \
     BaseReaderHandler<> handler; \
     Reader reader; \
@@ -1157,22 +1487,22 @@ template<typename Encoding = UTF8<> >
 struct IterativeParsingReaderHandler {
     typedef typename Encoding::Ch Ch;
 
-    const static int LOG_NULL = -1;
-    const static int LOG_BOOL = -2;
-    const static int LOG_INT = -3;
-    const static int LOG_UINT = -4;
-    const static int LOG_INT64 = -5;
-    const static int LOG_UINT64 = -6;
-    const static int LOG_DOUBLE = -7;
-    const static int LOG_STRING = -8;
-    const static int LOG_STARTOBJECT = -9;
-    const static int LOG_KEY = -10;
-    const static int LOG_ENDOBJECT = -11;
-    const static int LOG_STARTARRAY = -12;
-    const static int LOG_ENDARRAY = -13;
+    const static uint32_t LOG_NULL        = 0x10000000;
+    const static uint32_t LOG_BOOL        = 0x20000000;
+    const static uint32_t LOG_INT         = 0x30000000;
+    const static uint32_t LOG_UINT        = 0x40000000;
+    const static uint32_t LOG_INT64       = 0x50000000;
+    const static uint32_t LOG_UINT64      = 0x60000000;
+    const static uint32_t LOG_DOUBLE      = 0x70000000;
+    const static uint32_t LOG_STRING      = 0x80000000;
+    const static uint32_t LOG_STARTOBJECT = 0x90000000;
+    const static uint32_t LOG_KEY         = 0xA0000000;
+    const static uint32_t LOG_ENDOBJECT   = 0xB0000000;
+    const static uint32_t LOG_STARTARRAY  = 0xC0000000;
+    const static uint32_t LOG_ENDARRAY    = 0xD0000000;
 
     const static size_t LogCapacity = 256;
-    int Logs[LogCapacity];
+    uint32_t Logs[LogCapacity];
     size_t LogCount;
 
     IterativeParsingReaderHandler() : LogCount(0) {
@@ -1202,8 +1532,8 @@ struct IterativeParsingReaderHandler {
 
     bool EndObject(SizeType c) {
         RAPIDJSON_ASSERT(LogCount < LogCapacity);
-        Logs[LogCount++] = LOG_ENDOBJECT;
-        Logs[LogCount++] = static_cast<int>(c);
+        RAPIDJSON_ASSERT((static_cast<uint32_t>(c) & 0xF0000000) == 0);
+        Logs[LogCount++] = LOG_ENDOBJECT | static_cast<uint32_t>(c);
         return true;
     }
 
@@ -1211,8 +1541,8 @@ struct IterativeParsingReaderHandler {
 
     bool EndArray(SizeType c) {
         RAPIDJSON_ASSERT(LogCount < LogCapacity);
-        Logs[LogCount++] = LOG_ENDARRAY;
-        Logs[LogCount++] = static_cast<int>(c);
+        RAPIDJSON_ASSERT((static_cast<uint32_t>(c) & 0xF0000000) == 0);
+        Logs[LogCount++] = LOG_ENDARRAY | static_cast<uint32_t>(c);
         return true;
     }
 };
@@ -1228,7 +1558,7 @@ TEST(Reader, IterativeParsing_General) {
         EXPECT_FALSE(r.IsError());
         EXPECT_FALSE(reader.HasParseError());
 
-        int e[] = {
+        uint32_t e[] = {
             handler.LOG_STARTARRAY,
             handler.LOG_INT,
             handler.LOG_STARTOBJECT,
@@ -1236,14 +1566,14 @@ TEST(Reader, IterativeParsing_General) {
             handler.LOG_STARTARRAY,
             handler.LOG_INT,
             handler.LOG_INT,
-            handler.LOG_ENDARRAY, 2,
-            handler.LOG_ENDOBJECT, 1,
+            handler.LOG_ENDARRAY | 2,
+            handler.LOG_ENDOBJECT | 1,
             handler.LOG_NULL,
             handler.LOG_BOOL,
             handler.LOG_BOOL,
             handler.LOG_STRING,
             handler.LOG_DOUBLE,
-            handler.LOG_ENDARRAY, 7
+            handler.LOG_ENDARRAY | 7
         };
 
         EXPECT_EQ(sizeof(e) / sizeof(int), handler.LogCount);
@@ -1265,20 +1595,20 @@ TEST(Reader, IterativeParsing_Count) {
         EXPECT_FALSE(r.IsError());
         EXPECT_FALSE(reader.HasParseError());
 
-        int e[] = {
+        uint32_t e[] = {
             handler.LOG_STARTARRAY,
             handler.LOG_STARTOBJECT,
-            handler.LOG_ENDOBJECT, 0,
+            handler.LOG_ENDOBJECT | 0,
             handler.LOG_STARTOBJECT,
             handler.LOG_KEY,
             handler.LOG_INT,
-            handler.LOG_ENDOBJECT, 1,
+            handler.LOG_ENDOBJECT | 1,
             handler.LOG_STARTARRAY,
             handler.LOG_INT,
-            handler.LOG_ENDARRAY, 1,
+            handler.LOG_ENDARRAY | 1,
             handler.LOG_STARTARRAY,
-            handler.LOG_ENDARRAY, 0,
-            handler.LOG_ENDARRAY, 4
+            handler.LOG_ENDARRAY | 0,
+            handler.LOG_ENDARRAY | 4
         };
 
         EXPECT_EQ(sizeof(e) / sizeof(int), handler.LogCount);
@@ -1286,6 +1616,51 @@ TEST(Reader, IterativeParsing_Count) {
         for (size_t i = 0; i < handler.LogCount; ++i) {
             EXPECT_EQ(e[i], handler.Logs[i]) << "i = " << i;
         }
+    }
+}
+
+TEST(Reader, IterativePullParsing_General) {
+    {
+        IterativeParsingReaderHandler<> handler;
+        uint32_t e[] = {
+            handler.LOG_STARTARRAY,
+            handler.LOG_INT,
+            handler.LOG_STARTOBJECT,
+            handler.LOG_KEY,
+            handler.LOG_STARTARRAY,
+            handler.LOG_INT,
+            handler.LOG_INT,
+            handler.LOG_ENDARRAY | 2,
+            handler.LOG_ENDOBJECT | 1,
+            handler.LOG_NULL,
+            handler.LOG_BOOL,
+            handler.LOG_BOOL,
+            handler.LOG_STRING,
+            handler.LOG_DOUBLE,
+            handler.LOG_ENDARRAY | 7
+        };
+
+        StringStream is("[1, {\"k\": [1, 2]}, null, false, true, \"string\", 1.2]");
+        Reader reader;
+
+        reader.IterativeParseInit();
+        while (!reader.IterativeParseComplete()) {
+            size_t oldLogCount = handler.LogCount;
+            EXPECT_TRUE(oldLogCount < sizeof(e) / sizeof(int)) << "overrun";
+
+            EXPECT_TRUE(reader.IterativeParseNext<kParseDefaultFlags>(is, handler)) << "parse fail";
+            EXPECT_EQ(handler.LogCount, oldLogCount + 1) << "handler should be invoked exactly once each time";
+            EXPECT_EQ(e[oldLogCount], handler.Logs[oldLogCount]) << "wrong event returned";
+        }
+
+        EXPECT_FALSE(reader.HasParseError());
+        EXPECT_EQ(sizeof(e) / sizeof(int), handler.LogCount) << "handler invoked wrong number of times";
+
+        // The handler should not be invoked when the JSON has been fully read, but it should not fail
+        size_t oldLogCount = handler.LogCount;
+        EXPECT_TRUE(reader.IterativeParseNext<kParseDefaultFlags>(is, handler)) << "parse-next past complete is allowed";
+        EXPECT_EQ(handler.LogCount, oldLogCount) << "parse-next past complete should not invoke handler";
+        EXPECT_FALSE(reader.HasParseError()) << "parse-next past complete should not generate parse error";
     }
 }
 
@@ -1633,6 +2008,129 @@ TEST(Reader, NumbersAsStrings) {
         Reader reader;
         EXPECT_TRUE(reader.Parse<kParseNumbersAsStringsFlag>(s, h));
     }
+    {
+        char n1e319[321];   // '1' followed by 319 '0'
+        n1e319[0] = '1';
+        for (int i = 1; i < 320; i++)
+            n1e319[i] = '0';
+        n1e319[320] = '\0';
+        StringStream s(n1e319);
+        NumbersAsStringsHandler h(n1e319);
+        Reader reader;
+        EXPECT_TRUE(reader.Parse<kParseNumbersAsStringsFlag>(s, h));
+    }
+}
+
+struct NumbersAsStringsHandlerWChar_t {
+  bool Null() { return true; }
+  bool Bool(bool) { return true; }
+  bool Int(int) { return true; }
+  bool Uint(unsigned) { return true; }
+  bool Int64(int64_t) { return true; }
+  bool Uint64(uint64_t) { return true; }
+  bool Double(double) { return true; }
+  // 'str' is not null-terminated
+  bool RawNumber(const wchar_t* str, SizeType length, bool) {
+    EXPECT_TRUE(str != 0);
+    EXPECT_TRUE(expected_len_ == length);
+    EXPECT_TRUE(wcsncmp(str, expected_, length) == 0);
+    return true;
+  }
+  bool String(const wchar_t*, SizeType, bool) { return true; }
+  bool StartObject() { return true; }
+  bool Key(const wchar_t*, SizeType, bool) { return true; }
+  bool EndObject(SizeType) { return true; }
+  bool StartArray() { return true; }
+  bool EndArray(SizeType) { return true; }
+
+  NumbersAsStringsHandlerWChar_t(const wchar_t* expected)
+    : expected_(expected)
+    , expected_len_(wcslen(expected)) {}
+
+  const wchar_t* expected_;
+  size_t expected_len_;
+};
+
+TEST(Reader, NumbersAsStringsWChar_t) {
+  {
+    const wchar_t* json = L"{ \"pi\": 3.1416 } ";
+    GenericStringStream<UTF16<> > s(json);
+    NumbersAsStringsHandlerWChar_t h(L"3.1416");
+    GenericReader<UTF16<>, UTF16<> > reader;
+    EXPECT_TRUE(reader.Parse<kParseNumbersAsStringsFlag>(s, h));
+  }
+  {
+    wchar_t* json = StrDup(L"{ \"pi\": 3.1416 } ");
+    GenericInsituStringStream<UTF16<> > s(json);
+    NumbersAsStringsHandlerWChar_t h(L"3.1416");
+    GenericReader<UTF16<>, UTF16<> > reader;
+    EXPECT_TRUE(reader.Parse<kParseInsituFlag | kParseNumbersAsStringsFlag>(s, h));
+    free(json);
+  }
+  {
+    const wchar_t* json = L"{ \"gigabyte\": 1.0e9 } ";
+    GenericStringStream<UTF16<> > s(json);
+    NumbersAsStringsHandlerWChar_t h(L"1.0e9");
+    GenericReader<UTF16<>, UTF16<> > reader;
+    EXPECT_TRUE(reader.Parse<kParseNumbersAsStringsFlag>(s, h));
+  }
+  {
+    wchar_t* json = StrDup(L"{ \"gigabyte\": 1.0e9 } ");
+    GenericInsituStringStream<UTF16<> > s(json);
+    NumbersAsStringsHandlerWChar_t h(L"1.0e9");
+    GenericReader<UTF16<>, UTF16<> > reader;
+    EXPECT_TRUE(reader.Parse<kParseInsituFlag | kParseNumbersAsStringsFlag>(s, h));
+    free(json);
+  }
+  {
+    const wchar_t* json = L"{ \"pi\": 314.159e-2 } ";
+    GenericStringStream<UTF16<> > s(json);
+    NumbersAsStringsHandlerWChar_t h(L"314.159e-2");
+    GenericReader<UTF16<>, UTF16<> > reader;
+    EXPECT_TRUE(reader.Parse<kParseNumbersAsStringsFlag>(s, h));
+  }
+  {
+    wchar_t* json = StrDup(L"{ \"gigabyte\": 314.159e-2 } ");
+    GenericInsituStringStream<UTF16<> > s(json);
+    NumbersAsStringsHandlerWChar_t h(L"314.159e-2");
+    GenericReader<UTF16<>, UTF16<> > reader;
+    EXPECT_TRUE(reader.Parse<kParseInsituFlag | kParseNumbersAsStringsFlag>(s, h));
+    free(json);
+  }
+  {
+    const wchar_t* json = L"{ \"negative\": -1.54321 } ";
+    GenericStringStream<UTF16<> > s(json);
+    NumbersAsStringsHandlerWChar_t h(L"-1.54321");
+    GenericReader<UTF16<>, UTF16<> > reader;
+    EXPECT_TRUE(reader.Parse<kParseNumbersAsStringsFlag>(s, h));
+  }
+  {
+    wchar_t* json = StrDup(L"{ \"negative\": -1.54321 } ");
+    GenericInsituStringStream<UTF16<> > s(json);
+    NumbersAsStringsHandlerWChar_t h(L"-1.54321");
+    GenericReader<UTF16<>, UTF16<> > reader;
+    EXPECT_TRUE(reader.Parse<kParseInsituFlag | kParseNumbersAsStringsFlag>(s, h));
+    free(json);
+  }
+  {
+    const wchar_t* json = L"{ \"pi\": 314.159e-2 } ";
+    std::wstringstream ss(json);
+    WIStreamWrapper s(ss);
+    NumbersAsStringsHandlerWChar_t h(L"314.159e-2");
+    GenericReader<UTF16<>, UTF16<> > reader;
+    EXPECT_TRUE(reader.Parse<kParseNumbersAsStringsFlag>(s, h));
+  }
+  {
+    wchar_t n1e319[321];   // '1' followed by 319 '0'
+    n1e319[0] = L'1';
+    for(int i = 1; i < 320; i++)
+      n1e319[i] = L'0';
+    n1e319[320] = L'\0';
+    GenericStringStream<UTF16<> > s(n1e319);
+    NumbersAsStringsHandlerWChar_t h(n1e319);
+    GenericReader<UTF16<>, UTF16<> > reader;
+    EXPECT_TRUE(reader.Parse<kParseNumbersAsStringsFlag>(s, h));
+  }
 }
 
 template <unsigned extraFlags>
@@ -1811,7 +2309,7 @@ TEST(Reader, ParseNanAndInfinity) {
     }
 #define TEST_NAN_INF_ERROR(errorCode, str, errorOffset) \
     { \
-        int streamPos = errorOffset; \
+        unsigned streamPos = errorOffset; \
         char buffer[1001]; \
         strncpy(buffer, str, 1000); \
         InsituStringStream s(buffer); \
@@ -1832,13 +2330,41 @@ TEST(Reader, ParseNanAndInfinity) {
     TEST_NAN_INF("Infinity", inf);
     TEST_NAN_INF("-Inf", -inf);
     TEST_NAN_INF("-Infinity", -inf);
-    TEST_NAN_INF_ERROR(kParseErrorValueInvalid, "nan", 1);
-    TEST_NAN_INF_ERROR(kParseErrorValueInvalid, "-nan", 1);
-    TEST_NAN_INF_ERROR(kParseErrorValueInvalid, "NAN", 1);
-    TEST_NAN_INF_ERROR(kParseErrorValueInvalid, "-Infinty", 6);
+    TEST_NAN_INF_ERROR(kParseErrorValueInvalid, "NInf", 1u);
+    TEST_NAN_INF_ERROR(kParseErrorValueInvalid, "NaInf", 2u);
+    TEST_NAN_INF_ERROR(kParseErrorValueInvalid, "INan", 1u);
+    TEST_NAN_INF_ERROR(kParseErrorValueInvalid, "InNan", 2u);
+    TEST_NAN_INF_ERROR(kParseErrorValueInvalid, "nan", 1u);
+    TEST_NAN_INF_ERROR(kParseErrorValueInvalid, "-nan", 1u);
+    TEST_NAN_INF_ERROR(kParseErrorValueInvalid, "NAN", 1u);
+    TEST_NAN_INF_ERROR(kParseErrorValueInvalid, "-Infinty", 6u);
 
 #undef TEST_NAN_INF_ERROR
 #undef TEST_NAN_INF
+}
+
+TEST(Reader, EscapedApostrophe) {
+    const char json[] = " { \"foo\": \"bar\\'buzz\" } ";
+
+    BaseReaderHandler<> h;
+
+    {
+        StringStream s(json);
+        Reader reader;
+        ParseResult r = reader.Parse<kParseNoFlags>(s, h);
+        EXPECT_TRUE(reader.HasParseError());
+        EXPECT_EQ(kParseErrorStringEscapeInvalid, r.Code());
+        EXPECT_EQ(14u, r.Offset());
+    }
+
+    {
+        StringStream s(json);
+        Reader reader;
+        ParseResult r = reader.Parse<kParseEscapedApostropheFlag>(s, h);
+        EXPECT_FALSE(reader.HasParseError());
+        EXPECT_EQ(kParseErrorNone, r.Code());
+        EXPECT_EQ(0u, r.Offset());
+    }
 }
 
 RAPIDJSON_DIAG_POP

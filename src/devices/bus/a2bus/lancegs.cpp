@@ -67,11 +67,11 @@ public:
 
 protected:
 	a2bus_lancegs_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	virtual uint8_t read_c0nx(uint8_t offset) override;
 	virtual void write_c0nx(uint8_t offset, uint8_t data) override;
@@ -81,7 +81,7 @@ private:
 	required_device<i2c_24c04_device> m_i2cmem;
 	bool m_shadow;
 
-	DECLARE_WRITE_LINE_MEMBER( netinf_irq_w );
+	void netinf_irq_w(int state);
 };
 
 
@@ -185,7 +185,7 @@ void a2bus_lancegs_device::write_c0nx(uint8_t offset, uint8_t data)
 	}
 }
 
-WRITE_LINE_MEMBER( a2bus_lancegs_device::netinf_irq_w )
+void a2bus_lancegs_device::netinf_irq_w(int state)
 {
 	if (state) {
 		raise_slot_irq();

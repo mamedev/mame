@@ -72,8 +72,9 @@
 ****************************************************************************/
 
 #include "imgtool.h"
-#include "formats/imageutl.h"
 #include "iflopimg.h"
+
+#include "multibyte.h"
 
 #include <cstdio>
 #include <cstdlib>
@@ -384,17 +385,17 @@ static imgtoolerr_t rt11_image_open(imgtool::image &image, imgtool::stream::ptr 
 	if (err)
 		return err;
 
-	di->directory_start = pick_integer_le(buffer, 0724, 2);
+	di->directory_start = get_u16le(&buffer[0724]);
 
 	// real-world images seem to never have a valid checksum, but directory_start is always 6
 #if 0
 	uint16_t tmp, cksum;
 
 	tmp = 0;
-	cksum = pick_integer_le(buffer, 0776, 2);
+	cksum = get_u16le(&buffer[0776]);
 	for (int i = 0; i < 510; i+=2)
 	{
-		tmp += pick_integer_le(buffer, i, 2);
+		tmp += get_u16le(&buffer[i]);
 	}
 
 	/* sanity check these values */
@@ -414,9 +415,9 @@ static imgtoolerr_t rt11_image_open(imgtool::image &image, imgtool::stream::ptr 
 	if (err)
 		return err;
 
-	di->total_segments = pick_integer_le(buffer, 0, 2);
-	di->last_segment = pick_integer_le(buffer, 4, 2);
-	di->dirent_size = (pick_integer_le(buffer, 6, 2) + 7) * 2;
+	di->total_segments = get_u16le(&buffer[0]);
+	di->last_segment = get_u16le(&buffer[4]);
+	di->dirent_size = (get_u16le(&buffer[6]) + 7) * 2;
 	di->dirents_per_block = (2 * BLOCK_SIZE - 10) / di->dirent_size;
 
 	return IMGTOOLERR_SUCCESS;
@@ -465,7 +466,7 @@ static imgtoolerr_t rt11_enum_seek(imgtool::image &image,
 				return err;
 			memcpy(&rt11enum->segment_data[BLOCK_SIZE], buffer, sizeof(buffer));
 
-			rt11enum->data = pick_integer_le(rt11enum->segment_data, 8, 2);
+			rt11enum->data = get_u16le(&rt11enum->segment_data[8]);
 		}
 		rt11enum->segment = segment;
 	}
@@ -490,19 +491,19 @@ static imgtoolerr_t rt11_get_next_dirent(imgtool::image &image,
 
 	/* populate the resulting dirent */
 	offset = (rt11enum->index * di->dirent_size) + 10;
-	rt_ent.status = pick_integer_le(rt11enum->segment_data, offset, 2);
+	rt_ent.status = get_u16le(&rt11enum->segment_data[offset]);
 	memcpy(rt_ent.filename, &rt11enum->segment_data[offset + 2], 6);
-	rt_ent.filesize = pick_integer_le(rt11enum->segment_data, offset + 8, 2) * BLOCK_SIZE;
+	rt_ent.filesize = get_u16le(&rt11enum->segment_data[offset + 8]) * BLOCK_SIZE;
 	rt_ent.data = rt11enum->data;
-	rt_ent.time = pick_integer_le(rt11enum->segment_data, offset + 12, 2);
-	rt11enum->data += pick_integer_le(rt11enum->segment_data, offset + 8, 2);
+	rt_ent.time = get_u16le(&rt11enum->segment_data[offset + 12]);
+	rt11enum->data += get_u16le(&rt11enum->segment_data[offset + 8]);
 
 	/* identify next entry */
 	next_segment = rt11enum->segment;
 	next_index = rt11enum->index + 1;
 	if (next_index >= di->dirents_per_block || (rt_ent.status & E_EOS))
 	{
-		next_segment = pick_integer_le(rt11enum->segment_data, 2, 2);
+		next_segment = get_u16le(&rt11enum->segment_data[2]);
 		next_index = 0;
 	}
 

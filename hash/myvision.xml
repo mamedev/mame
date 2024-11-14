@@ -1,7 +1,11 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <!--
-license:CC0
+license:CC0-1.0
+
+  Undumped games:
+    - Mastermind (マスターマインド)     1983, Logitec Corp.
+    - Reversi    (リバーシ)             1983, Logitec Corp.
 -->
 <softwarelist name="myvision" description="Nichibutsu My Vision cartridges">
 
@@ -9,6 +13,7 @@ license:CC0
 		<description>Gomoku Narabe Renju</description>
 		<year>1983</year>
 		<publisher>Nihonbussan</publisher>
+		<info name="alt_title" value="五目並べ" />
 		<info name="label" value="CORTRIDGE LT-0319953" />
 		<info name="pcb" value="KH-1001-A" />
 		<part name="cart" interface="myvision_cart">
@@ -23,6 +28,7 @@ license:CC0
 		<description>Hanafuda</description>
 		<year>1983</year>
 		<publisher>Logitec Corp.</publisher>
+		<info name="alt_title" value="花札" />
 		<info name="label" value="CORTRIDGE LT-0730853" />
 		<info name="pcb" value="KH-1001-A" />
 		<part name="cart" interface="myvision_cart">
@@ -38,6 +44,7 @@ license:CC0
 		<description>Mahjong Nichibutsu</description>
 		<year>1983</year>
 		<publisher>Nihonbussan</publisher>
+		<info name="alt_title" value="マージャン" />
 		<info name="label" value="CORTRIDGE LT-0334653" />
 		<info name="pcb" value="KH-1001-A" />
 		<part name="cart" interface="myvision_cart">
@@ -53,6 +60,7 @@ license:CC0
 		<description>Tsumeshougi</description>
 		<year>1983</year>
 		<publisher>Logitec Corp.</publisher>
+		<info name="alt_title" value="詰将棋" />
 		<info name="label" value="CORTRIDGE LT-0594253" />
 		<info name="pcb" value="KH-1001-A" />
 		<part name="cart" interface="myvision_cart">

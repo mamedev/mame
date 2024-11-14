@@ -49,17 +49,17 @@ ds9_format::ds9_format()
 {
 }
 
-const char *ds9_format::name() const
+const char *ds9_format::name() const noexcept
 {
 	return "a9dsk";
 }
 
-const char *ds9_format::description() const
+const char *ds9_format::description() const noexcept
 {
 	return "Agat-9 840K floppy image";
 }
 
-const char *ds9_format::extensions() const
+const char *ds9_format::extensions() const noexcept
 {
 	return "ds9";
 }
@@ -89,7 +89,7 @@ int ds9_format::identify(util::random_read &io, uint32_t form_factor, const std:
 	return 0;
 }
 
-bool ds9_format::load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image) const
+bool ds9_format::load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image &image) const
 {
 	uint8_t track_count, head_count, sector_count;
 	find_size(io, track_count, head_count, sector_count);
@@ -109,13 +109,12 @@ bool ds9_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 	{
 		for (int head = 0; head < head_count; head++)
 		{
-			size_t actual;
-			io.read_at((track * head_count + head) * track_size, sectdata, track_size, actual);
+			/*auto const [err, actual] =*/ read_at(io, (track * head_count + head) * track_size, sectdata, track_size); // FIXME: check for errors and premature EOF
 			generate_track(ds9_desc, track, head, sectors, sector_count, 104000, image);
 		}
 	}
 
-	image->set_variant(floppy_image::DSQD);
+	image.set_variant(floppy_image::DSQD);
 
 	return true;
 }

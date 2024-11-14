@@ -22,11 +22,11 @@ dxsdk - [DirectX SDK EULA](https://github.com/mamedev/mame/blob/master/3rdparty/
 
 expat - [The MIT License (MIT)](http://opensource.org/licenses/MIT)
 
+flac - [The BSD 3-Clause License](http://opensource.org/licenses/BSD-3-Clause) (codecs), [The GNU General Public License, version 2](https://opensource.org/licenses/GPL-2.0)
+
 genie - [The BSD 3-Clause License](http://opensource.org/licenses/BSD-3-Clause)
 
 glm - [The MIT License (MIT)](http://opensource.org/licenses/MIT)
-
-libflac - [The BSD 3-Clause License](http://opensource.org/licenses/BSD-3-Clause) (codecs), [The GNU General Public License, version 2](https://opensource.org/licenses/GPL-2.0)
 
 libjpeg - [Custom BSD-like](https://github.com/numenta/nupic/blob/master/external/licenses/LICENSE.libjpeg-6b.txt)
 
@@ -56,8 +56,6 @@ pugixml - [The MIT License (MIT)](http://opensource.org/licenses/MIT)
 
 rapidjson - [The MIT License (MIT)](http://opensource.org/licenses/MIT), [The BSD 3-Clause License](http://opensource.org/licenses/BSD-3-Clause) (msinttypes), JSON license (JSON_checker)
 
-sdl2 - [zlib license](http://opensource.org/licenses/Zlib)
-
 softfloat - ["Softfloat 2b" U.C. Berkeley modified license](https://github.com/mamedev/mame/blob/master/3rdparty/softfloat/README.txt) MIT compatible
 
 softfloat3 - [The BSD 3-Clause License](http://opensource.org/licenses/BSD-3-Clause)
@@ -73,3 +71,5 @@ utf8proc - [The MIT License (MIT)](http://opensource.org/licenses/MIT)
 wdlfft - [zlib license](http://opensource.org/licenses/Zlib)
 
 zlib - [zlib license](http://opensource.org/licenses/Zlib)
+
+zstd - Dual-licensed [The BSD 3-Clause License](http://opensource.org/licenses/BSD-3-Clause) and [The GNU General Public License, version 2](https://opensource.org/licenses/GPL-2.0)

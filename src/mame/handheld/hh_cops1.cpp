@@ -1,27 +1,27 @@
 // license:BSD-3-Clause
 // copyright-holders:hap
 // thanks-to:Sean Riddle
-/***************************************************************************
+/*******************************************************************************
 
 National Semiconductor COPS(MM57 MCU series) handhelds
 
 MCU die label for MM5799 games says MM4799, but they are in fact MM5799.
 
-ROM source notes when dumped from another publisher, but confident it's the same:
+ROM source notes when dumped from another title, but confident it's the same:
 - cambrp: Radio Shack EC-4001 Programmable
 
 TODO:
-- qkracerm link cable (already tested locally and it works, so driver notes
+- qkracer link cable (already tested locally and it works, so driver notes
   and MCU serial emulation are good enough)
 
-***************************************************************************/
+*******************************************************************************/
 
 #include "emu.h"
 
 #include "cpu/cops1/mm5799.h"
-#include "machine/ds8874.h"
-#include "video/pwm.h"
 #include "sound/spkrdev.h"
+#include "video/ds8874.h"
+#include "video/pwm.h"
 
 #include "speaker.h"
 
@@ -31,11 +31,13 @@ TODO:
 #include "mhockey.lh"
 #include "mhockeya.lh"
 #include "msoccer.lh"
-#include "qkracerm.lh"
+#include "qkracer.lh"
 #include "qkspeller.lh"
 
 //#include "hh_cops1_test.lh" // common test-layout - use external artwork
 
+
+namespace {
 
 class hh_cops1_state : public driver_device
 {
@@ -49,8 +51,8 @@ public:
 	{ }
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	// devices
 	required_device<cops1_base_device> m_maincpu;
@@ -90,11 +92,11 @@ void hh_cops1_state::machine_reset()
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
   Helper Functions
 
-***************************************************************************/
+*******************************************************************************/
 
 // generic input handlers
 
@@ -104,7 +106,7 @@ u8 hh_cops1_state::read_inputs(int columns)
 
 	// read selected input rows
 	for (int i = 0; i < columns; i++)
-		if (m_inp_mux >> i & 1)
+		if (BIT(m_inp_mux, i))
 			ret |= m_inputs[i]->read();
 
 	return ret;
@@ -112,15 +114,13 @@ u8 hh_cops1_state::read_inputs(int columns)
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
   Minidrivers (subclass, I/O, Inputs, Machine Config, ROM Defs)
 
-***************************************************************************/
+*******************************************************************************/
 
-namespace {
-
-/***************************************************************************
+/*******************************************************************************
 
   Mattel Basketball (model 2437)
   * PCB label: MA 6017/18/19
@@ -143,7 +143,7 @@ namespace {
   This version wasn't sold in the USA. It is commonly known as the Canadian
   version, though it was also released in Europe and Japan.
 
-***************************************************************************/
+*******************************************************************************/
 
 class mbaskb_state : public hh_cops1_state
 {
@@ -218,7 +218,7 @@ u8 mbaskb_state::read_f()
 	return m_inputs[2]->read() | (m_f & 2);
 }
 
-// config
+// inputs
 
 static INPUT_PORTS_START( mbaskb )
 	PORT_START("IN.0") // port K
@@ -242,6 +242,8 @@ static INPUT_PORTS_START( mhockeya )
 	PORT_MODIFY("IN.2") // F2
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_CUSTOM ) // tied high to select Hockey
 INPUT_PORTS_END
+
+// config
 
 void mbaskb_state::mbaskb(machine_config &config)
 {
@@ -331,7 +333,7 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
   National Semiconductor QuizKid Racer (MM5799 version)
   * MM5799 MCU die bonded directly to PCB (die label MM4799 C DUZ)
@@ -342,20 +344,21 @@ ROM_END
   This is the first version of QuizKid Racer, the 2nd release is on a
   COP420 MCU, see hh_cop400.cpp.
 
-***************************************************************************/
+*******************************************************************************/
 
-class qkracerm_state : public hh_cops1_state
+class qkracer_state : public hh_cops1_state
 {
 public:
-	qkracerm_state(const machine_config &mconfig, device_type type, const char *tag) :
+	qkracer_state(const machine_config &mconfig, device_type type, const char *tag) :
 		hh_cops1_state(mconfig, type, tag),
 		m_ds8874(*this, "ds8874")
 	{ }
 
-	void qkracerm(machine_config &config);
+	void qkracer(machine_config &config);
 
 private:
 	required_device<ds8874_device> m_ds8874;
+
 	void ds8874_output_w(u16 data);
 
 	void update_display();
@@ -368,12 +371,12 @@ private:
 
 // handlers
 
-void qkracerm_state::update_display()
+void qkracer_state::update_display()
 {
 	m_display->matrix(m_grid, m_s);
 }
 
-void qkracerm_state::ds8874_output_w(u16 data)
+void qkracer_state::ds8874_output_w(u16 data)
 {
 	// DS8874 outputs: digit select, input mux
 	m_grid = ~data;
@@ -381,7 +384,7 @@ void qkracerm_state::ds8874_output_w(u16 data)
 	update_display();
 }
 
-void qkracerm_state::write_do(u8 data)
+void qkracer_state::write_do(u8 data)
 {
 	// DO1: DS8874 CP
 	// DO4: DS8874 _DATA
@@ -389,7 +392,7 @@ void qkracerm_state::write_do(u8 data)
 	m_ds8874->data_w(BIT(data, 3));
 }
 
-void qkracerm_state::write_s(u8 data)
+void qkracer_state::write_s(u8 data)
 {
 	// Sa-Sg: digit segment data
 	// Sp: link data out
@@ -397,7 +400,7 @@ void qkracerm_state::write_s(u8 data)
 	update_display();
 }
 
-u8 qkracerm_state::read_f()
+u8 qkracer_state::read_f()
 {
 	// F1: N/C
 	// F2: link cable detected
@@ -405,21 +408,21 @@ u8 qkracerm_state::read_f()
 	return m_maincpu->f_output_r() & 1;
 }
 
-u8 qkracerm_state::read_k()
+u8 qkracer_state::read_k()
 {
 	// K: multiplexed inputs
 	return read_inputs(5);
 }
 
-int qkracerm_state::read_si()
+int qkracer_state::read_si()
 {
 	// SI: link master(1)/slave(0)
 	return 0;
 }
 
-// config
+// inputs
 
-static INPUT_PORTS_START( qkracerm )
+static INPUT_PORTS_START( qkracer )
 	PORT_START("IN.0") // DS8874 OUT 4 port K
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_Q) PORT_NAME("Amateur")
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_W) PORT_NAME("Pro")
@@ -451,44 +454,46 @@ static INPUT_PORTS_START( qkracerm )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_PLUS_PAD) PORT_NAME("+")
 INPUT_PORTS_END
 
-void qkracerm_state::qkracerm(machine_config &config)
+// config
+
+void qkracer_state::qkracer(machine_config &config)
 {
 	// basic machine hardware
 	MM5799(config, m_maincpu, 220000); // approximation
 	m_maincpu->set_option_ram_d12(true);
 	m_maincpu->set_option_lb_10(5);
-	m_maincpu->write_do().set(FUNC(qkracerm_state::write_do));
-	m_maincpu->write_s().set(FUNC(qkracerm_state::write_s));
-	m_maincpu->read_f().set(FUNC(qkracerm_state::read_f));
-	m_maincpu->read_k().set(FUNC(qkracerm_state::read_k));
-	m_maincpu->read_si().set(FUNC(qkracerm_state::read_si));
+	m_maincpu->write_do().set(FUNC(qkracer_state::write_do));
+	m_maincpu->write_s().set(FUNC(qkracer_state::write_s));
+	m_maincpu->read_f().set(FUNC(qkracer_state::read_f));
+	m_maincpu->read_k().set(FUNC(qkracer_state::read_k));
+	m_maincpu->read_si().set(FUNC(qkracer_state::read_si));
 
 	// video hardware
-	DS8874(config, m_ds8874).write_output().set(FUNC(qkracerm_state::ds8874_output_w));
+	DS8874(config, m_ds8874).write_output().set(FUNC(qkracer_state::ds8874_output_w));
 	PWM_DISPLAY(config, m_display).set_size(9, 7);
 	m_display->set_segmask(0xdf, 0x7f);
 	m_display->set_segmask(0x20, 0x41); // equals sign
-	config.set_default_layout(layout_qkracerm);
+	config.set_default_layout(layout_qkracer);
 
 	// no sound!
 }
 
 // roms
 
-ROM_START( qkracerm )
+ROM_START( qkracer )
 	ROM_REGION( 0x0800, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD( "mm4799_c_duz", 0x0000, 0x0200, CRC(8b484d2a) SHA1(809e902a11e23bed010ac795ab8dc50e5c1869dc) )
 	ROM_CONTINUE(             0x0400, 0x0400 )
 
 	ROM_REGION( 254, "maincpu:opla", 0 )
-	ROM_LOAD( "mm5799_qkracerm_output.pla", 0, 254, CRC(f095fc51) SHA1(e3321d5cc4ecef363df7ef94f47e860c7a6d8c7e) )
+	ROM_LOAD( "mm5799_qkracer_output.pla", 0, 254, CRC(f095fc51) SHA1(e3321d5cc4ecef363df7ef94f47e860c7a6d8c7e) )
 ROM_END
 
 
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
   National Semiconductor QuizKid Speller
   * MM5799 MCU die bonded directly to PCB (die label MM4799 C NDF)
@@ -502,7 +507,7 @@ ROM_END
   - Learn: same as Spell, but only the 1st letter
   - Game: player 1 enters word, player 2 needs to guess it
 
-***************************************************************************/
+*******************************************************************************/
 
 class qkspeller_state : public hh_cops1_state
 {
@@ -565,7 +570,7 @@ u8 qkspeller_state::read_k()
 	return read_inputs(8);
 }
 
-// config
+// inputs
 
 static INPUT_PORTS_START( qkspeller )
 	PORT_START("IN.0") // Sa port K
@@ -633,6 +638,8 @@ static INPUT_PORTS_START( qkspeller )
 	PORT_CONFSETTING(    0x01, DEF_STR( On ) )
 INPUT_PORTS_END
 
+// config
+
 void qkspeller_state::qkspeller(machine_config &config)
 {
 	// basic machine hardware
@@ -668,7 +675,7 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
   Sinclair Radionics Cambridge Programmable
   * MM5799 MCU (label MM5799NBP/N, die label MM4799 C NBP)
@@ -690,7 +697,7 @@ ROM_END
   - World: Cambridge Programmable, published by Sinclair Radionics
   - USA: EC-4001 Programmable, published by Tandy Corporation, Radio Shack brand
 
-***************************************************************************/
+*******************************************************************************/
 
 class cambrp_state : public hh_cops1_state
 {
@@ -704,6 +711,7 @@ public:
 
 private:
 	required_device<ds8874_device> m_ds8874;
+
 	void ds8874_output_w(u16 data);
 
 	void update_display();
@@ -756,7 +764,7 @@ u8 cambrp_state::read_k()
 	return read_inputs(6);
 }
 
-// config
+// inputs
 
 static INPUT_PORTS_START( cambrp )
 	PORT_START("IN.0") // DS8874 OUT 3 port K
@@ -766,7 +774,7 @@ static INPUT_PORTS_START( cambrp )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_S) PORT_CHAR('S') PORT_NAME("Up/Downshift")
 
 	PORT_START("IN.1") // DS8874 OUT 4 port K
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_1) PORT_CODE(KEYCODE_1_PAD) PORT_CHAR('1') PORT_NAME("1 / " UTF8_SQUAREROOT "x / go if neg")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_1) PORT_CODE(KEYCODE_1_PAD) PORT_CHAR('1') PORT_NAME(u8"1 / \u221ax / go if neg") // U+221A = √
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_7) PORT_CODE(KEYCODE_7_PAD) PORT_CHAR('7') PORT_NAME("7 / sin / arcsin")
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_MINUS_PAD) PORT_CHAR('-') PORT_NAME("- / -x / F")
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_DEL) PORT_CODE(KEYCODE_BACKSPACE) PORT_CHAR('C') PORT_NAME("C/CE / step")
@@ -784,15 +792,17 @@ static INPUT_PORTS_START( cambrp )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("IN.4") // DS8874 OUT 7 port K
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_4) PORT_CODE(KEYCODE_4_PAD) PORT_CHAR('4') PORT_NAME("4 / ln x / e" UTF8_POW_X)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_4) PORT_CODE(KEYCODE_4_PAD) PORT_CHAR('4') PORT_NAME(u8"4 / ln x / eˣ")
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_STOP) PORT_CODE(KEYCODE_DEL_PAD) PORT_CHAR('.') PORT_NAME("./EE/_ / Downshift / A")
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_ASTERISK) PORT_CHAR('*') PORT_NAME("× / x" UTF8_POW_2 " / .")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_ASTERISK) PORT_CHAR('*') PORT_NAME(u8"× / x² / .")
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("IN.5") // DS8874 OUT 8 port K
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_5) PORT_CODE(KEYCODE_5_PAD) PORT_CHAR('5') PORT_NAME("5 / rcl / MEx")
 	PORT_BIT( 0x0e, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
+
+// config
 
 void cambrp_state::cambrp(machine_config &config)
 {
@@ -829,22 +839,22 @@ ROM_END
 
 } // anonymous namespace
 
-/***************************************************************************
+/*******************************************************************************
 
   Game driver(s)
 
-***************************************************************************/
+*******************************************************************************/
 
-//    YEAR  NAME       PARENT  CMP MACHINE    INPUT      CLASS            INIT        COMPANY, FULLNAME, FLAGS
-CONS( 1978, mbaskb,    0,       0, mbaskb,    mbaskb,    mbaskb_state,    empty_init, "Mattel Electronics", "Basketball (Mattel)", MACHINE_SUPPORTS_SAVE )
-CONS( 1978, msoccer,   0,       0, msoccer,   mbaskb,    mbaskb_state,    empty_init, "Mattel Electronics", "Soccer (Mattel)", MACHINE_SUPPORTS_SAVE )
-CONS( 1978, mhockey,   0,       0, mhockey,   mbaskb,    mbaskb_state,    empty_init, "Mattel Electronics", "Hockey (Mattel, US version)", MACHINE_SUPPORTS_SAVE )
-CONS( 1978, mhockeya,  mhockey, 0, mhockeya,  mhockeya,  mbaskb_state,    empty_init, "Mattel Electronics", "Hockey (Mattel, export version)", MACHINE_SUPPORTS_SAVE )
+//    YEAR  NAME       PARENT   COMPAT  MACHINE    INPUT      CLASS            INIT        COMPANY, FULLNAME, FLAGS
+SYST( 1978, mbaskb,    0,       0,      mbaskb,    mbaskb,    mbaskb_state,    empty_init, "Mattel Electronics", "Basketball (Mattel)", MACHINE_SUPPORTS_SAVE )
+SYST( 1978, msoccer,   0,       0,      msoccer,   mbaskb,    mbaskb_state,    empty_init, "Mattel Electronics", "Soccer (Mattel)", MACHINE_SUPPORTS_SAVE )
+SYST( 1978, mhockey,   0,       0,      mhockey,   mbaskb,    mbaskb_state,    empty_init, "Mattel Electronics", "Hockey (Mattel, US version)", MACHINE_SUPPORTS_SAVE )
+SYST( 1978, mhockeya,  mhockey, 0,      mhockeya,  mhockeya,  mbaskb_state,    empty_init, "Mattel Electronics", "Hockey (Mattel, export version)", MACHINE_SUPPORTS_SAVE )
 
-CONS( 1977, qkracerm,  qkracer, 0, qkracerm,  qkracerm,  qkracerm_state,  empty_init, "National Semiconductor", "QuizKid Racer (MM5799 version)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW | MACHINE_NODEVICE_LAN )
-CONS( 1978, qkspeller, 0,       0, qkspeller, qkspeller, qkspeller_state, empty_init, "National Semiconductor", "QuizKid Speller", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW ) // ***
+SYST( 1977, qkracer,   0,       0,      qkracer,   qkracer,   qkracer_state,   empty_init, "National Semiconductor", "QuizKid Racer (MM5799 version)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW | MACHINE_NODEVICE_LAN )
+SYST( 1978, qkspeller, 0,       0,      qkspeller, qkspeller, qkspeller_state, empty_init, "National Semiconductor", "QuizKid Speller", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW ) // ***
 
-COMP( 1977, cambrp,    0,       0, cambrp,    cambrp,    cambrp_state,    empty_init, "Sinclair Radionics", "Cambridge Programmable", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
+SYST( 1977, cambrp,    0,       0,      cambrp,    cambrp,    cambrp_state,    empty_init, "Sinclair Radionics", "Cambridge Programmable", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
 
 // ***: As far as MAME is concerned, the game is emulated fine. But for it to be playable, it requires interaction
 // with other, unemulatable, things eg. game board/pieces, book, playing cards, pen & paper, etc.

@@ -1,4 +1,4 @@
-// license:CC0
+// license:CC0-1.0
 // copyright-holders:Couriersud
 /*
  * cmos_inverter_clk
@@ -11,6 +11,7 @@
 #define USE_CLOCK (1)
 
 NETLIST_START(cmos_inverter_clk)
+{
 	/* Standard stuff */
 
 	//SOLVER(Solver, 480000)
@@ -60,4 +61,4 @@ NETLIST_START(cmos_inverter_clk)
 	LOG(log_D, M.D)
 	LOGD(log_X, RG.1, RG.2)
 #endif
-NETLIST_END()
+}

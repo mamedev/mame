@@ -75,7 +75,7 @@ template<int Width, int AddrShift> void handler_entry_read_units<Width, AddrShif
 }
 
 
-template<int Width, int AddrShift> typename emu::detail::handler_entry_size<Width>::uX handler_entry_read_units<Width, AddrShift>::read(offs_t offset, uX mem_mask) const
+template<int Width, int AddrShift> emu::detail::handler_entry_size_t<Width> handler_entry_read_units<Width, AddrShift>::read(offs_t offset, uX mem_mask) const
 {
 	this->ref();
 
@@ -104,7 +104,12 @@ template<int Width, int AddrShift> typename emu::detail::handler_entry_size<Widt
 	return result;
 }
 
-template<int Width, int AddrShift> std::pair<typename emu::detail::handler_entry_size<Width>::uX, u16> handler_entry_read_units<Width, AddrShift>::read_flags(offs_t offset, uX mem_mask) const
+template<int Width, int AddrShift> emu::detail::handler_entry_size_t<Width> handler_entry_read_units<Width, AddrShift>::read_interruptible(offs_t offset, uX mem_mask) const
+{
+	return read(offset, mem_mask);
+}
+
+template<int Width, int AddrShift> std::pair<emu::detail::handler_entry_size_t<Width>, u16> handler_entry_read_units<Width, AddrShift>::read_flags(offs_t offset, uX mem_mask) const
 {
 	this->ref();
 
@@ -137,7 +142,36 @@ template<int Width, int AddrShift> std::pair<typename emu::detail::handler_entry
 	return std::make_pair(result, flags);
 }
 
-template<int Width, int AddrShift> std::string handler_entry_read_units<Width, AddrShift>::m2r(typename emu::detail::handler_entry_size<Width>::uX mask)
+template<int Width, int AddrShift> u16 handler_entry_read_units<Width, AddrShift>::lookup_flags(offs_t offset, uX mem_mask) const
+{
+	this->ref();
+
+	u16 flags = 0;
+	for (int index = 0; index < m_subunits; index++) {
+		const subunit_info &si = m_subunit_infos[index];
+		if (mem_mask & si.m_amask) {
+			offs_t aoffset = (si.m_ashift >= 0 ? offset >> si.m_ashift : offset << si.m_ashift) + si.m_offset;
+			switch(si.m_width) {
+			case 0:
+				flags |= static_cast<handler_entry_read<0,  0> *>(si.m_handler)->lookup_flags(aoffset, mem_mask >> si.m_dshift);
+				break;
+			case 1:
+				flags |= static_cast<handler_entry_read<1, -1> *>(si.m_handler)->lookup_flags(aoffset, mem_mask >> si.m_dshift);
+				break;
+			case 2:
+				flags |= static_cast<handler_entry_read<2, -2> *>(si.m_handler)->lookup_flags(aoffset, mem_mask >> si.m_dshift);
+				break;
+			default:
+				abort();
+			}
+		}
+	}
+
+	this->unref();
+	return flags;
+}
+
+template<int Width, int AddrShift> std::string handler_entry_read_units<Width, AddrShift>::m2r(emu::detail::handler_entry_size_t<Width> mask)
 {
 	constexpr u32 mbits = 8*sizeof(uX);
 	u32 start, end;
@@ -256,6 +290,11 @@ template<int Width, int AddrShift> void handler_entry_write_units<Width, AddrShi
 	this->unref();
 }
 
+template<int Width, int AddrShift> void handler_entry_write_units<Width, AddrShift>::write_interruptible(offs_t offset, uX data, uX mem_mask) const
+{
+	write(offset, data, mem_mask);
+}
+
 template<int Width, int AddrShift> u16 handler_entry_write_units<Width, AddrShift>::write_flags(offs_t offset, uX data, uX mem_mask) const
 {
 	this->ref();
@@ -285,8 +324,37 @@ template<int Width, int AddrShift> u16 handler_entry_write_units<Width, AddrShif
 	return flags;
 }
 
+template<int Width, int AddrShift> u16 handler_entry_write_units<Width, AddrShift>::lookup_flags(offs_t offset, uX mem_mask) const
+{
+	this->ref();
 
-template<int Width, int AddrShift> std::string handler_entry_write_units<Width, AddrShift>::m2r(typename emu::detail::handler_entry_size<Width>::uX mask)
+	u16 flags = 0;
+	for (int index = 0; index < m_subunits; index++) {
+		const subunit_info &si = m_subunit_infos[index];
+		if (mem_mask & si.m_amask) {
+			offs_t aoffset = (si.m_ashift >= 0 ? offset >> si.m_ashift : offset << si.m_ashift) + si.m_offset;
+			switch(si.m_width) {
+			case 0:
+				flags |= static_cast<handler_entry_write<0,  0> *>(si.m_handler)->lookup_flags(aoffset, mem_mask >> si.m_dshift);
+				break;
+			case 1:
+				flags |= static_cast<handler_entry_write<1, -1> *>(si.m_handler)->lookup_flags(aoffset, mem_mask >> si.m_dshift);
+				break;
+			case 2:
+				flags |= static_cast<handler_entry_write<2, -2> *>(si.m_handler)->lookup_flags(aoffset, mem_mask >> si.m_dshift);
+				break;
+			default:
+				abort();
+			}
+		}
+	}
+
+	this->unref();
+	return flags;
+}
+
+
+template<int Width, int AddrShift> std::string handler_entry_write_units<Width, AddrShift>::m2r(emu::detail::handler_entry_size_t<Width> mask)
 {
 	constexpr u32 mbits = 8*sizeof(uX);
 	u32 start, end;

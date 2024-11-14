@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Nicola Salmoria, Pierpaolo Prazzoli, Quench
-#ifndef MAME_INCLUDES_PLAYMARK_H
-#define MAME_INCLUDES_PLAYMARK_H
+#ifndef MAME_PLAYMARK_PLAYMARK_H
+#define MAME_PLAYMARK_PLAYMARK_H
 
 #pragma once
 
@@ -82,8 +82,8 @@ public:
 	void init_pic_decode();
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	// memory pointers
@@ -177,17 +177,17 @@ private:
 	u8 playmark_asciitohex(u8 data);
 	void playmark_decode_pic_hex_dump(void);
 
-	void bigtwin_main_map(address_map &map);
-	void bigtwinb_main_map(address_map &map);
-	void excelsr_main_map(address_map &map);
-	void hotmind_main_map(address_map &map);
-	void hrdtimes_main_map(address_map &map);
-	void luckboomh_main_map(address_map &map);
-	void oki_map(address_map &map);
-	void wbeachvl_main_map(address_map &map);
-	void wbeachvla_main_map(address_map &map);
+	void bigtwin_main_map(address_map &map) ATTR_COLD;
+	void bigtwinb_main_map(address_map &map) ATTR_COLD;
+	void excelsr_main_map(address_map &map) ATTR_COLD;
+	void hotmind_main_map(address_map &map) ATTR_COLD;
+	void hrdtimes_main_map(address_map &map) ATTR_COLD;
+	void luckboomh_main_map(address_map &map) ATTR_COLD;
+	void oki_map(address_map &map) ATTR_COLD;
+	void wbeachvl_main_map(address_map &map) ATTR_COLD;
+	void wbeachvla_main_map(address_map &map) ATTR_COLD;
 
 	void wbeachvl_base(machine_config &config);
 };
 
-#endif // MAME_INCLUDES_PLAYMARK_H
+#endif // MAME_PLAYMARK_PLAYMARK_H

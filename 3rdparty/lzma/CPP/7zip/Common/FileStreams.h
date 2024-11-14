@@ -1,50 +1,75 @@
 // FileStreams.h
 
-#ifndef __FILE_STREAMS_H
-#define __FILE_STREAMS_H
+#ifndef ZIP7_INC_FILE_STREAMS_H
+#define ZIP7_INC_FILE_STREAMS_H
 
 #ifdef _WIN32
-#define USE_WIN_FILE
-#endif
-
-#include "../../Common/MyString.h"
-
-#ifdef USE_WIN_FILE
-#include "../../Windows/FileIO.h"
-#else
-#include "../../Common/C_FileIO.h"
+#define Z7_FILE_STREAMS_USE_WIN_FILE
 #endif
 
 #include "../../Common/MyCom.h"
+#include "../../Common/MyString.h"
+
+#include "../../Windows/FileIO.h"
 
 #include "../IStream.h"
 
-#ifdef _WIN32
-typedef UINT_PTR My_UINT_PTR;
-#else
-typedef UINT My_UINT_PTR;
-#endif
+#include "UniqBlocks.h"
 
-struct IInFileStream_Callback
+
+class CInFileStream;
+
+Z7_PURE_INTERFACES_BEGIN
+DECLARE_INTERFACE(IInFileStream_Callback)
 {
-  virtual HRESULT InFileStream_On_Error(My_UINT_PTR val, DWORD error) = 0;
-  virtual void InFileStream_On_Destroy(My_UINT_PTR val) = 0;
+  virtual HRESULT InFileStream_On_Error(UINT_PTR val, DWORD error) = 0;
+  virtual void InFileStream_On_Destroy(CInFileStream *stream, UINT_PTR val) = 0;
 };
+Z7_PURE_INTERFACES_END
 
-class CInFileStream:
+
+/*
+Z7_CLASS_IMP_COM_5(
+  CInFileStream
+  , IInStream
+  , IStreamGetSize
+  , IStreamGetProps
+  , IStreamGetProps2
+  , IStreamGetProp
+)
+*/
+Z7_class_final(CInFileStream) :
   public IInStream,
   public IStreamGetSize,
-  #ifdef USE_WIN_FILE
   public IStreamGetProps,
   public IStreamGetProps2,
-  #endif
+  public IStreamGetProp,
   public CMyUnknownImp
 {
+  Z7_COM_UNKNOWN_IMP_5(
+      IInStream,
+      IStreamGetSize,
+      IStreamGetProps,
+      IStreamGetProps2,
+      IStreamGetProp)
+
+  Z7_IFACE_COM7_IMP(ISequentialInStream)
+  Z7_IFACE_COM7_IMP(IInStream)
 public:
-  #ifdef USE_WIN_FILE
+  Z7_IFACE_COM7_IMP(IStreamGetSize)
+private:
+  Z7_IFACE_COM7_IMP(IStreamGetProps)
+public:
+  Z7_IFACE_COM7_IMP(IStreamGetProps2)
+  Z7_IFACE_COM7_IMP(IStreamGetProp)
+
+private:
   NWindows::NFile::NIO::CInFile File;
+public:
+
+  #ifdef Z7_FILE_STREAMS_USE_WIN_FILE
   
-  #ifdef SUPPORT_DEVICE_FILE
+  #ifdef Z7_DEVICE_FILE
   UInt64 VirtPos;
   UInt64 PhyPos;
   UInt64 BufStartPos;
@@ -52,70 +77,68 @@ public:
   UInt32 BufSize;
   #endif
 
-  #else
-  NC::NFile::NIO::CInFile File;
   #endif
 
+ #ifdef _WIN32
+  BY_HANDLE_FILE_INFORMATION _info;
+ #else
+  struct stat _info;
+  UInt32 _uid;
+  UInt32 _gid;
+  UString OwnerName;
+  UString OwnerGroup;
+  bool StoreOwnerId;
+  bool StoreOwnerName;
+ #endif
+
+  bool _info_WasLoaded;
   bool SupportHardLinks;
-
   IInFileStream_Callback *Callback;
-  My_UINT_PTR CallbackRef;
-
-  virtual ~CInFileStream();
+  UINT_PTR CallbackRef;
 
   CInFileStream();
+  ~CInFileStream();
+    
+  void Set_PreserveATime(bool v)
+  {
+    File.PreserveATime = v;
+  }
+
+  bool GetLength(UInt64 &length) const throw()
+  {
+    return File.GetLength(length);
+  }
   
   bool Open(CFSTR fileName)
   {
+    _info_WasLoaded = false;
     return File.Open(fileName);
   }
   
   bool OpenShared(CFSTR fileName, bool shareForWrite)
   {
+    _info_WasLoaded = false;
     return File.OpenShared(fileName, shareForWrite);
   }
-
-  MY_QUERYINTERFACE_BEGIN2(IInStream)
-  MY_QUERYINTERFACE_ENTRY(IStreamGetSize)
-  #ifdef USE_WIN_FILE
-  MY_QUERYINTERFACE_ENTRY(IStreamGetProps)
-  MY_QUERYINTERFACE_ENTRY(IStreamGetProps2)
-  #endif
-  MY_QUERYINTERFACE_END
-  MY_ADDREF_RELEASE
-
-  STDMETHOD(Read)(void *data, UInt32 size, UInt32 *processedSize);
-  STDMETHOD(Seek)(Int64 offset, UInt32 seekOrigin, UInt64 *newPosition);
-
-  STDMETHOD(GetSize)(UInt64 *size);
-  #ifdef USE_WIN_FILE
-  STDMETHOD(GetProps)(UInt64 *size, FILETIME *cTime, FILETIME *aTime, FILETIME *mTime, UInt32 *attrib);
-  STDMETHOD(GetProps2)(CStreamFileProps *props);
-  #endif
 };
 
-class CStdInFileStream:
-  public ISequentialInStream,
-  public CMyUnknownImp
-{
-public:
-  MY_UNKNOWN_IMP
 
-  virtual ~CStdInFileStream() {}
-  STDMETHOD(Read)(void *data, UInt32 size, UInt32 *processedSize);
+Z7_CLASS_IMP_NOQIB_1(
+  CStdInFileStream
+  , ISequentialInStream
+)
 };
 
-class COutFileStream:
-  public IOutStream,
-  public CMyUnknownImp
-{
+
+Z7_CLASS_IMP_COM_1(
+  COutFileStream
+  , IOutStream
+)
+  Z7_IFACE_COM7_IMP(ISequentialOutStream)
 public:
-  #ifdef USE_WIN_FILE
+
   NWindows::NFile::NIO::COutFile File;
-  #else
-  NC::NFile::NIO::COutFile File;
-  #endif
-  virtual ~COutFileStream() {}
+
   bool Create(CFSTR fileName, bool createAlways)
   {
     ProcessedSize = 0;
@@ -131,36 +154,33 @@ public:
   
   UInt64 ProcessedSize;
 
-  #ifdef USE_WIN_FILE
-  bool SetTime(const FILETIME *cTime, const FILETIME *aTime, const FILETIME *mTime)
+  bool SetTime(const CFiTime *cTime, const CFiTime *aTime, const CFiTime *mTime)
   {
     return File.SetTime(cTime, aTime, mTime);
   }
-  bool SetMTime(const FILETIME *mTime) {  return File.SetMTime(mTime); }
-  #endif
+  bool SetMTime(const CFiTime *mTime) {  return File.SetMTime(mTime); }
 
-
-  MY_UNKNOWN_IMP1(IOutStream)
-
-  STDMETHOD(Write)(const void *data, UInt32 size, UInt32 *processedSize);
-  STDMETHOD(Seek)(Int64 offset, UInt32 seekOrigin, UInt64 *newPosition);
-  STDMETHOD(SetSize)(UInt64 newSize);
+  bool SeekToBegin_bool()
+  {
+    #ifdef Z7_FILE_STREAMS_USE_WIN_FILE
+    return File.SeekToBegin();
+    #else
+    return File.seekToBegin() == 0;
+    #endif
+  }
 
   HRESULT GetSize(UInt64 *size);
 };
 
-class CStdOutFileStream:
-  public ISequentialOutStream,
-  public CMyUnknownImp
-{
+
+Z7_CLASS_IMP_NOQIB_1(
+  CStdOutFileStream
+  , ISequentialOutStream
+)
   UInt64 _size;
 public:
-  MY_UNKNOWN_IMP
-
   UInt64 GetSize() const { return _size; }
   CStdOutFileStream(): _size(0) {}
-  virtual ~CStdOutFileStream() {}
-  STDMETHOD(Write)(const void *data, UInt32 size, UInt32 *processedSize);
 };
 
 #endif

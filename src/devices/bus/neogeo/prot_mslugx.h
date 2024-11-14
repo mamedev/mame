@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:S. Smith,David Haywood,Fabio Priuli
+// copyright-holders:S. Smith, David Haywood, Fabio Priuli, iq_132
 
 #ifndef MAME_BUS_NEOGEO_PROT_MSLUGX_H
 #define MAME_BUS_NEOGEO_PROT_MSLUGX_H
@@ -20,8 +20,8 @@ public:
 	uint16_t protection_r(address_space &space, offs_t offset);
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 private:
 	uint16_t     m_counter;

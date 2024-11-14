@@ -15,7 +15,7 @@
  * set and scan codes are very similar to a PC keyboard (scan code "set 3").
  *
  * Sources:
- *   - http://bitsavers.org/pdf/ibm/pc/rt/6489893_RT_PC_Technical_Reference_Volume_1_Nov85.pdf
+ *   - IBM RT PC Hardware Technical Reference Volume I, 75X0232, March 1987
  *
  * Key switches are addressed using an 8 bit code as follows:
  *
@@ -49,13 +49,12 @@
 #include "sound/spkrdev.h"
 #include "speaker.h"
 
-#define LOG_GENERAL (1U << 0)
 #define LOG_PORTS   (1U << 1)
 
 //#define VERBOSE (LOG_GENERAL)
 #include "logmacro.h"
 
-DEFINE_DEVICE_TYPE(RTPC_KBD, rtpc_kbd_device, "rtpc_kbd", "IBM PC RT Keyboard")
+DEFINE_DEVICE_TYPE(RTPC_KBD, rtpc_kbd_device, "rtpc_kbd", "IBM RT PC Keyboard")
 
 rtpc_kbd_device::rtpc_kbd_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, RTPC_KBD, tag, owner, clock)

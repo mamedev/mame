@@ -36,9 +36,9 @@ UNIMPLEMENTED FEATURES :
  **********************************************************************/
 
 #include "emu.h"
-#include "machine/wd2010.h"
+#include "wd2010.h"
 
-#define VERBOSE 1
+//#define VERBOSE 1
 #include "logmacro.h"
 
 #include <cmath>
@@ -57,7 +57,8 @@ UNIMPLEMENTED FEATURES :
 // #define CYLINDER_HIGH_MASK 0x03
 
 // --------------------------------------------------------
-#define MAX_MFM_SECTORS 17      // STANDARD MFM SECTORS/TRACK
+// Maximum sector number before ID not found is returned.
+#define MAX_MFM_SECTORS 32
 // --------------------------------------------------------
 
 // Typical access times for MFM drives (as listed in ST412_OEM Manual_Apr82)
@@ -158,18 +159,18 @@ wd2010_device::wd2010_device(const machine_config &mconfig, const char *tag, dev
 	, m_out_intrq_cb(*this)
 	, m_out_bdrq_cb(*this)
 	, m_out_bcr_cb(*this)
-	, m_in_bcs_cb(*this)
-	, m_in_brdy_cb(*this)
+	, m_in_bcs_cb(*this, 0)
+	, m_in_brdy_cb(*this, 0)
 	, m_out_bcs_cb(*this)
 	, m_out_dirin_cb(*this)
 	, m_out_step_cb(*this)
 	, m_out_rwc_cb(*this)
 	, m_out_wg_cb(*this)
-	, m_in_drdy_cb(*this)
-	, m_in_index_cb(*this)
-	, m_in_wf_cb(*this)
-	, m_in_tk000_cb(*this)
-	, m_in_sc_cb(*this)
+	, m_in_drdy_cb(*this, 0)
+	, m_in_index_cb(*this, 0)
+	, m_in_wf_cb(*this, 0)
+	, m_in_tk000_cb(*this, 0)
+	, m_in_sc_cb(*this, 0)
 	, m_status(0)
 	, m_error(0)
 {
@@ -182,30 +183,13 @@ wd2010_device::wd2010_device(const machine_config &mconfig, const char *tag, dev
 
 void wd2010_device::device_start()
 {
-	// resolve callbacks
-	m_out_intrq_cb.resolve_safe();
-	m_out_bdrq_cb.resolve_safe();
-	m_out_bcr_cb.resolve_safe();
-	m_in_bcs_cb.resolve_safe(0);
-
-	m_in_brdy_cb.resolve_safe(0);
-
-	m_out_bcs_cb.resolve_safe();
-	m_out_dirin_cb.resolve_safe();
-	m_out_step_cb.resolve_safe();
-	m_out_rwc_cb.resolve_safe();
-	m_out_wg_cb.resolve_safe();
-	m_in_drdy_cb.resolve_safe(0);
-	m_in_index_cb.resolve_safe(0);
-	m_in_wf_cb.resolve_safe(0);
-	m_in_tk000_cb.resolve_safe(0);
-	m_in_sc_cb.resolve_safe(0);
-
-	/* allocate a timer for commands */
+	// allocate a timer for commands
 	m_cmd_timer = timer_alloc(FUNC(wd2010_device::command_complete), this);
 	m_complete_write_timer = timer_alloc(FUNC(wd2010_device::complete_write), this);
 	m_deassert_write_timer = timer_alloc(FUNC(wd2010_device::deassert_write), this);
 	m_deassert_read_timer = timer_alloc(FUNC(wd2010_device::deassert_read), this);
+	m_next_sector_timer =  timer_alloc(FUNC(wd2010_device::next_sector), this);
+	m_present_cylinder = 0; // start somewhere
 }
 
 
@@ -218,8 +202,6 @@ void wd2010_device::device_reset()
 	m_out_intrq_cb(CLEAR_LINE);
 
 	buffer_ready(false);
-
-	m_present_cylinder = 0; // start somewhere
 }
 
 
@@ -250,10 +232,10 @@ uint8_t wd2010_device::read(offs_t offset)
 
 		if (offset == TASK_FILE_SDH_REGISTER)
 		{
-			logerror("(READ) %s WD2010 SDH: %u\n", machine().describe_context(), data);
-			logerror("(READ) %s WD2010 Head: %u\n", machine().describe_context(), HEAD);
-			logerror("(READ) %s WD2010 Drive: %u\n", machine().describe_context(), DRIVE);
-			logerror("(READ) %s WD2010 Sector Size: %u\n", machine().describe_context(), SECTOR_SIZE);
+			LOG("(READ) %s WD2010 SDH: %u\n", machine().describe_context(), data);
+			LOG("(READ) %s WD2010 Head: %u\n", machine().describe_context(), HEAD);
+			LOG("(READ) %s WD2010 Drive: %u\n", machine().describe_context(), DRIVE);
+			LOG("(READ) %s WD2010 Sector Size: %u\n", machine().describe_context(), SECTOR_SIZE);
 		}
 
 		break;
@@ -601,9 +583,7 @@ void wd2010_device::read_sector(uint8_t data)
 
 			// FLAG "M" SET? (MULTIPLE SECTOR TRANSFERS)
 			if (data & 4)
-				logerror("WD2010 (READ): MULTIPLE SECTOR READ (M = 1).\n");
-
-			// Assume: NO "M" (MULTIPLE SECTOR TRANSFERS)
+				LOG("WD2010 (READ): MULTIPLE SECTOR READ (M = 1).\n");
 
 			m_out_bcs_cb(0); // deactivate BCS (!)
 
@@ -925,6 +905,23 @@ TIMER_CALLBACK_MEMBER(wd2010_device::deassert_read)
 	}
 }
 
+TIMER_CALLBACK_MEMBER(wd2010_device::next_sector)
+{
+	uint8_t cmd = m_task_file[TASK_FILE_COMMAND];
+
+	switch (cmd & 0xf0)
+	{
+	case 0x20:
+		read_sector(cmd);
+		break;
+	case 0x30:
+		write_sector(cmd);
+		break;
+	default:
+		break;
+	}
+}
+
 // Called by timer callbacks -
 void wd2010_device::complete_immediate(uint8_t status)
 {
@@ -936,6 +933,17 @@ void wd2010_device::complete_immediate(uint8_t status)
 	{
 		status &= ~(STATUS_DRQ);
 		m_out_bdrq_cb(0);
+	}
+
+	uint8_t cmd = m_task_file[TASK_FILE_COMMAND] & 0xf4;
+	if ((cmd == 0x24) || (cmd == 0x34))
+	{
+		if (--m_task_file[TASK_FILE_SECTOR_COUNT] > 1)
+		{
+			m_task_file[TASK_FILE_SECTOR_NUMBER]++;
+			m_next_sector_timer->adjust(attotime::from_usec(100));
+			return;
+		}
 	}
 
 	// Set current status (M_STATUS)

@@ -18,12 +18,11 @@
 
 
 #ifdef NES_PCB_DEBUG
-#define VERBOSE 1
+#define VERBOSE (LOG_GENERAL)
 #else
-#define VERBOSE 0
+#define VERBOSE (0)
 #endif
-
-#define LOG_MMC(x) do { if (VERBOSE) logerror x; } while (0)
+#include "logmacro.h"
 
 
 //-------------------------------------------------
@@ -79,7 +78,7 @@ void nes_jncota_kt1001_device::pcb_reset()
 
 void nes_jncota_kt1001_device::write_l(offs_t offset, u8 data)
 {
-	LOG_MMC(("jncota_kt1001 write_h, offset: %04x, data: %02x\n", offset, data));
+	LOG("jncota_kt1001 write_h, offset: %04x, data: %02x\n", offset, data);
 
 	offset += 0x100;
 	switch (offset & 0x1803)

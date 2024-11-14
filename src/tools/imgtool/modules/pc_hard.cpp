@@ -50,9 +50,9 @@
 
 ****************************************************************************/
 #include "imgtool.h"
-#include "formats/imageutl.h"
 #include "imghd.h"
 
+#include "multibyte.h"
 #include "opresolv.h"
 
 #define FAT_SECLEN  512
@@ -167,16 +167,16 @@ static imgtoolerr_t pc_chd_partition_create(imgtool::image &image, int partition
 
 	/* fill out the partition entry */
 	partition_entry = &header_block[446 + (partition_index * 16)];
-	place_integer_le(partition_entry,  0, 1, 0x80);
-	place_integer_le(partition_entry,  1, 1, first_head);
-	place_integer_le(partition_entry,  2, 1, ((first_sector & 0x3F) | (first_cylinder >> 8 << 2)));
-	place_integer_le(partition_entry,  3, 1, first_cylinder);
-	place_integer_le(partition_entry,  4, 1, partition_type);
-	place_integer_le(partition_entry,  5, 1, last_head);
-	place_integer_le(partition_entry,  6, 1, ((last_sector & 0x3F) | (last_cylinder >> 8 << 2)));
-	place_integer_le(partition_entry,  7, 1, last_cylinder);
-	place_integer_le(partition_entry,  8, 4, first_block);
-	place_integer_le(partition_entry, 12, 4, block_count);
+	partition_entry[0] = 0x80;
+	partition_entry[1] = first_head;
+	partition_entry[2] = ((first_sector & 0x3F) | (first_cylinder >> 8 << 2));
+	partition_entry[3] = first_cylinder;
+	partition_entry[4] = partition_type;
+	partition_entry[5] = last_head;
+	partition_entry[6] = ((last_sector & 0x3F) | (last_cylinder >> 8 << 2));
+	partition_entry[7] = last_cylinder;
+	put_u32le(&partition_entry[ 8], first_block);
+	put_u32le(&partition_entry[12], block_count);
 
 	/* write the partition header */
 	err = image.write_block(0, header_block);
@@ -219,8 +219,8 @@ static imgtoolerr_t pc_chd_read_partition_header(imgtool::image &image)
 		info->partitions[i].ending_track    = ((partition_info[6] << 2) & 0xFF00) | partition_info[7];
 		info->partitions[i].ending_sector   = partition_info[6] & 0x3F;
 
-		info->partitions[i].sector_index    = pick_integer_le(partition_info,  8, 4);
-		info->partitions[i].total_sectors   = pick_integer_le(partition_info, 12, 4);
+		info->partitions[i].sector_index    = get_u32le(&partition_info[ 8]);
+		info->partitions[i].total_sectors   = get_u32le(&partition_info[12]);
 
 		if (info->partitions[i].starting_track > info->partitions[i].ending_track)
 			return IMGTOOLERR_CORRUPTIMAGE;

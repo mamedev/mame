@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <!--
-license:CC0
+license:CC0-1.0
 -->
 <softwarelist name="neocd" description="SNK NeoGeo CD CD-ROMs">
 
@@ -10,7 +10,7 @@ license:CC0
 
 
 	<software name="pbobble">
-		<description>Bust-A-Move (USA) ~ Puzzle Bobble (Jpn)</description>
+		<description>Bust-A-Move (USA) ~ Puzzle Bobble (Japan)</description>
 		<year>1995</year>
 		<publisher>SNK</publisher>
 		<info name="alt_title" value="パズルボブル" />
@@ -24,7 +24,7 @@ license:CC0
 	</software>
 
 	<software name="lbowling">
-		<description>League Bowling (Jpn, USA)</description>
+		<description>League Bowling (Japan, USA)</description>
 		<year>1994</year>
 		<publisher>SNK</publisher>
 		<info name="alt_title" value="リーグボウリング" />
@@ -38,7 +38,7 @@ license:CC0
 	</software>
 
 	<software name="crsword2">
-		<description>Crossed Swords II (Jpn)</description>
+		<description>Crossed Swords II (Japan)</description>
 		<year>1995</year>
 		<publisher>ADK</publisher>
 		<info name="alt_title" value="クロススウォードII" />
@@ -52,7 +52,7 @@ license:CC0
 	</software>
 
 	<software name="zintrick">
-		<description>Oshidashi Zintrick (Jpn)</description>
+		<description>Oshidashi Zintrick (Japan)</description>
 		<year>1996</year>
 		<publisher>ADK</publisher>
 		<info name="alt_title" value="押し出しジントリック" />
@@ -66,7 +66,7 @@ license:CC0
 	</software>
 
 	<software name="fromanc2">
-		<description>Idol Mahjong Final Romance 2 (Jpn)</description>
+		<description>Idol Mahjong Final Romance 2 (Japan)</description>
 		<year>1995</year>
 		<publisher>Video System</publisher>
 		<info name="alt_title" value="アイドル麻雀 ファイナルロマンス2" />
@@ -80,7 +80,7 @@ license:CC0
 	</software>
 
 	<software name="lasthope">
-		<description>Last Hope (Euro)</description>
+		<description>Last Hope (Europe)</description>
 		<year>2007</year>
 		<publisher>NG:DEV.TEAM</publisher>
 		<part name="cdrom" interface="neocd_cdrom">
@@ -91,7 +91,7 @@ license:CC0
 	</software>
 
 	<software name="ironclad">
-		<description>Choutetsu Brikin'ger (Jpn)</description>
+		<description>Choutetsu Brikin'ger (Japan)</description>
 		<year>1996</year>
 		<publisher>Saurus</publisher>
 		<info name="alt_title" value="超鉄ブリキンガー" />
@@ -105,7 +105,7 @@ license:CC0
 	</software>
 
 	<software name="ngcdspec">
-		<description>Neo Geo CD Special (Jpn)</description>
+		<description>Neo Geo CD Special (Japan)</description>
 		<year>1996</year>
 		<publisher>SNK</publisher>
 		<info name="serial" value="NGCD-205" />
@@ -117,9 +117,8 @@ license:CC0
 		</part>
 	</software>
 
-
 	<software name="kof96col">
-		<description>The King of Fighters '96 NEOGEO Collection (Jpn)</description>
+		<description>The King of Fighters '96 NEOGEO Collection (Japan)</description>
 		<year>1997</year>
 		<publisher>SNK</publisher>
 		<info name="alt_title" value="ザ・キング・オブ・ファイターズ '96 ネオジオコレクション" />
@@ -133,7 +132,7 @@ license:CC0
 	</software>
 
 	<software name="trally">
-		<description>Rally Chase (Jpn)</description>
+		<description>Rally Chase (Japan)</description>
 		<year>1994</year>
 		<publisher>ADK</publisher>
 		<info name="alt_title" value="ラリーチェイス" />
@@ -147,7 +146,7 @@ license:CC0
 	</software>
 
 	<software name="adkworld">
-		<description>ADK World (Jpn)</description>
+		<description>ADK World (Japan)</description>
 		<year>1995</year>
 		<publisher>ADK</publisher>
 		<info name="alt_title" value="エーディーケイワールド" />
@@ -161,7 +160,7 @@ license:CC0
 	</software>
 
 	<software name="samsprpg">
-		<description>Shinsetsu Samurai Spirits - Bushidou Retsuden (Jpn)</description>
+		<description>Shinsetsu Samurai Spirits - Bushidou Retsuden (Japan)</description>
 		<year>1997</year>
 		<publisher>SNK</publisher>
 		<info name="alt_title" value="真説サムライスピリッツ 武士道烈伝" />
@@ -175,7 +174,7 @@ license:CC0
 	</software>
 
 	<software name="2020bb">
-		<description>2020 Super Baseball (Jpn, USA)</description>
+		<description>2020 Super Baseball (Japan, USA)</description>
 		<year>1995</year>
 		<publisher>SNK</publisher>
 		<info name="alt_title" value="2020年スーパーベースボール" />
@@ -189,7 +188,7 @@ license:CC0
 	</software>
 
 	<software name="3countb">
-		<description>3 Count Bout (USA) ~ Fire Suplex (Jpn)</description>
+		<description>3 Count Bout (USA) ~ Fire Suplex (Japan)</description>
 		<year>1995</year>
 		<publisher>SNK</publisher>
 		<info name="alt_title" value="ファイヤー・スープレックス" />
@@ -203,7 +202,7 @@ license:CC0
 	</software>
 
 	<software name="sonicwi2">
-		<description>Aero Fighters 2 (USA) ~ Sonic Wings 2 (Jpn)</description>
+		<description>Aero Fighters 2 (USA) ~ Sonic Wings 2 (Japan)</description>
 		<year>1994</year>
 		<publisher>SNK</publisher>
 		<info name="alt_title" value="ソニックウイングス2" />
@@ -217,7 +216,7 @@ license:CC0
 	</software>
 
 	<software name="sonicwi3">
-		<description>Aero Fighters 3 (USA) ~ Sonic Wings 3 (Jpn)</description>
+		<description>Aero Fighters 3 (USA) ~ Sonic Wings 3 (Japan)</description>
 		<year>1995</year>
 		<publisher>SNK</publisher>
 		<info name="alt_title" value="ソニックウイングス3" />
@@ -231,7 +230,7 @@ license:CC0
 	</software>
 
 	<software name="aodk">
-		<description>Aggressors of Dark Kombat (USA) ~ Tsuukai GanGan Koushinkyoku (Jpn)</description>
+		<description>Aggressors of Dark Kombat (USA) ~ Tsuukai GanGan Koushinkyoku (Japan)</description>
 		<year>1995</year>
 		<publisher>ADK</publisher>
 		<info name="alt_title" value="痛快ガンガン行進曲" />
@@ -245,7 +244,7 @@ license:CC0
 	</software>
 
 	<software name="alpham2">
-		<description>Alpha Mission II (USA) ~ ASO II - Last Guardian (Jpn)</description>
+		<description>Alpha Mission II (USA) ~ ASO II - Last Guardian (Japan)</description>
 		<year>1994</year>
 		<publisher>SNK</publisher>
 		<info name="alt_title" value="ASO II - ラストガーディアン" />
@@ -259,7 +258,7 @@ license:CC0
 	</software>
 
 	<software name="aof">
-		<description>Ryuuko no Ken (Jpn)</description>
+		<description>Ryuuko no Ken (Japan)</description>
 		<year>1994</year>
 		<publisher>SNK</publisher>
 		<info name="alt_title" value="龍虎の拳" />
@@ -273,7 +272,7 @@ license:CC0
 	</software>
 
 	<software name="aof2">
-		<description>Art of Fighting 2 (USA) ~ Ryuuko no Ken 2 (Jpn)</description>
+		<description>Art of Fighting 2 (USA) ~ Ryuuko no Ken 2 (Japan)</description>
 		<year>1994</year>
 		<publisher>SNK</publisher>
 		<info name="alt_title" value="龍虎の拳2" />
@@ -287,7 +286,7 @@ license:CC0
 	</software>
 
 	<software name="aof3">
-		<description>Art of Fighting - Ryuuko no Ken Gaiden (Jpn)</description>
+		<description>Art of Fighting - Ryuuko no Ken Gaiden (Japan)</description>
 		<year>1996</year>
 		<publisher>SNK</publisher>
 		<info name="alt_title" value="アート・オブ・ファイティング 龍虎の拳外伝" />
@@ -301,7 +300,7 @@ license:CC0
 	</software>
 
 	<software name="aof3a" cloneof="aof3">
-		<description>Art of Fighting 3 - Path of the Warrior (USA) ~ Art of Fighting - Ryuuko no Ken Gaiden (Jpn)</description>
+		<description>Art of Fighting 3 - Path of the Warrior (USA) ~ Art of Fighting - Ryuuko no Ken Gaiden (Japan)</description>
 		<year>1996</year>
 		<publisher>SNK</publisher>
 		<info name="alt_title" value="アート・オブ・ファイティング 龍虎の拳外伝" />
@@ -316,7 +315,7 @@ license:CC0
 
 	<!-- Resets after loading? -->
 	<software name="lastbld2" supported="no">
-		<description>Bakumatsu Roman Daini Maku - Gekka no Kenshi - Tsuki ni Saku Hana, Chiri Yuku Hana (Jpn)</description>
+		<description>Bakumatsu Roman Daini Maku - Gekka no Kenshi - Tsuki ni Saku Hana, Chiri Yuku Hana (Japan)</description>
 		<year>1999</year>
 		<publisher>SNK</publisher>
 		<info name="alt_title" value="幕末浪漫第二幕 月華の剣士 月に咲く華、散りゆく花" />
@@ -329,8 +328,29 @@ license:CC0
 		</part>
 	</software>
 
+	<!--
+	source: redump.org/disc/80699/
+	<rom name="Bang^2 Busters (France) (En,Ja) (Unl).cue" size="339" crc="6e420f96" sha1="5e26f9c70009278f74bbd9f5db9cb5cdc4f2ef77"/>
+	<rom name="Bang^2 Busters (France) (En,Ja) (Unl) (Track 1).bin" size="7883904" crc="f555da2f" sha1="d9e54974652b9fbbe6c3ac82a70e9c06cc16700f"/>
+	<rom name="Bang^2 Busters (France) (En,Ja) (Unl) (Track 2).bin" size="9988944" crc="77311095" sha1="9b77e1ec7e308a567828b5bf8c1e57147781b9ab"/>
+	<rom name="Bang^2 Busters (France) (En,Ja) (Unl) (Track 3).bin" size="9988944" crc="898b1a26" sha1="771dfb863f36ab898bc7251abe67529d2060a282"/>
+	-->
+	<software name="bbbuster">
+		<description>Bang Bang Busters</description>
+		<year>2011</year>
+		<publisher>Neo Conception International</publisher>
+		<info name="alt_title" value="バンバン バスターズ"/>
+		<info name="language" value="English/Japanese" />
+		<info name="release" value="20111222" />
+		<part name="cdrom" interface="neocd_cdrom">
+			<diskarea name="cdrom">
+				<disk name="Bang Bang Busters (France) (En,Ja) (Unl)" sha1="2112eca62613c4ebaff3a62334b6395009c05c37"/>
+			</diskarea>
+		</part>
+	</software>
+
 	<software name="bstars2">
-		<description>Baseball Stars 2 (Jpn, USA)</description>
+		<description>Baseball Stars 2 (Japan, USA)</description>
 		<year>1994</year>
 		<publisher>SNK</publisher>
 		<info name="alt_title" value="ベースボールスターズ2" />
@@ -344,7 +364,7 @@ license:CC0
 	</software>
 
 	<software name="bstars">
-		<description>Baseball Stars Professional (Jpn, USA)</description>
+		<description>Baseball Stars Professional (Japan, USA)</description>
 		<year>1995</year>
 		<publisher>SNK</publisher>
 		<info name="alt_title" value="ベースボールスターズ プロフェッショナル" />
@@ -358,7 +378,7 @@ license:CC0
 	</software>
 
 	<software name="breakers">
-		<description>Breakers (Jpn)</description>
+		<description>Breakers (Japan)</description>
 		<year>1997</year>
 		<publisher>Visco</publisher>
 		<info name="alt_title" value="ブレイカーズ" />
@@ -372,7 +392,7 @@ license:CC0
 	</software>
 
 	<software name="burningf">
-		<description>Burning Fight (Jpn, USA)</description>
+		<description>Burning Fight (Japan, USA)</description>
 		<year>1994</year>
 		<publisher>SNK</publisher>
 		<info name="alt_title" value="バーニングファイト" />
@@ -386,7 +406,7 @@ license:CC0
 	</software>
 
 	<software name="totc">
-		<description>Treasure of the Caribbean (Fra)</description>
+		<description>Treasure of the Caribbean (France)</description>
 		<year>2011?</year>
 		<publisher>Neo Conception International</publisher>
 		<part name="cdrom" interface="neocd_cdrom">
@@ -396,10 +416,8 @@ license:CC0
 		</part>
 	</software>
 
-
-
 	<software name="crsword">
-		<description>Crossed Swords (Jpn)</description>
+		<description>Crossed Swords (Japan)</description>
 		<year>1994</year>
 		<publisher>ADK</publisher>
 		<info name="alt_title" value="クロスソード" />
@@ -412,10 +430,8 @@ license:CC0
 		</part>
 	</software>
 
-
-
 	<software name="cyberlip">
-		<description>Cyber-Lip (Jpn, USA)</description>
+		<description>Cyber-Lip (Japan, USA)</description>
 		<year>1995</year>
 		<publisher>SNK</publisher>
 		<info name="alt_title" value="サイバーリップ" />
@@ -431,7 +447,7 @@ license:CC0
 	<!-- Hangs during loading due to erasing vectors -->
 	<!-- TODO: user reports indicate this is a bad dump (also hangs in FBA) and CHDs made from other sources play fine in MAME -->
 	<software name="doubledr" supported="no">
-		<description>Double Dragon (Jpn, USA)</description>
+		<description>Double Dragon (Japan, USA)</description>
 		<year>1995</year>
 		<publisher>SNK</publisher>
 		<info name="alt_title" value="ダブルドラゴン" />
@@ -444,8 +460,46 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="doubledra" cloneof="doubledr">
+		<!-- Source: Redump
+		<rom name="Double Dragon (Japan) (En,Ja) (Rev 1).cue" size="2622" crc="713f879b" />
+		<rom name="Double Dragon (Japan) (En,Ja) (Rev 1) (Track 01).bin" size="22988448" crc="3bddb81a" />
+		<rom name="Double Dragon (Japan) (En,Ja) (Rev 1) (Track 02).bin" size="17903424" crc="5e1138f0" />
+		<rom name="Double Dragon (Japan) (En,Ja) (Rev 1) (Track 03).bin" size="17823456" crc="f865e94f" />
+		<rom name="Double Dragon (Japan) (En,Ja) (Rev 1) (Track 04).bin" size="5089728" crc="6f243990" />
+		<rom name="Double Dragon (Japan) (En,Ja) (Rev 1) (Track 05).bin" size="3539760" crc="e76047ad" />
+		<rom name="Double Dragon (Japan) (En,Ja) (Rev 1) (Track 06).bin" size="45224256" crc="fed1ed7d" />
+		<rom name="Double Dragon (Japan) (En,Ja) (Rev 1) (Track 07).bin" size="38913840" crc="25093ae8" />
+		<rom name="Double Dragon (Japan) (En,Ja) (Rev 1) (Track 08).bin" size="47686800" crc="f74c501a" />
+		<rom name="Double Dragon (Japan) (En,Ja) (Rev 1) (Track 09).bin" size="43472016" crc="e6b0116f" />
+		<rom name="Double Dragon (Japan) (En,Ja) (Rev 1) (Track 10).bin" size="45160752" crc="b5319c17" />
+		<rom name="Double Dragon (Japan) (En,Ja) (Rev 1) (Track 11).bin" size="47818512" crc="af19e471" />
+		<rom name="Double Dragon (Japan) (En,Ja) (Rev 1) (Track 12).bin" size="44036496" crc="3d711524" />
+		<rom name="Double Dragon (Japan) (En,Ja) (Rev 1) (Track 13).bin" size="48046656" crc="4c94d4ad" />
+		<rom name="Double Dragon (Japan) (En,Ja) (Rev 1) (Track 14).bin" size="46390848" crc="a139597c" />
+		<rom name="Double Dragon (Japan) (En,Ja) (Rev 1) (Track 15).bin" size="48945120" crc="385af469" />
+		<rom name="Double Dragon (Japan) (En,Ja) (Rev 1) (Track 16).bin" size="47051760" crc="d3df36c1" />
+		<rom name="Double Dragon (Japan) (En,Ja) (Rev 1) (Track 17).bin" size="47188176" crc="90d9fdde" />
+		<rom name="Double Dragon (Japan) (En,Ja) (Rev 1) (Track 18).bin" size="42719376" crc="f053c8ca" />
+		<rom name="Double Dragon (Japan) (En,Ja) (Rev 1) (Track 19).bin" size="26862192" crc="44a21c02" />
+		<rom name="Double Dragon (Japan) (En,Ja) (Rev 1) (Track 20).bin" size="27984096" crc="2b16ee70" />
+		-->
+		<description>Double Dragon (Japan)</description>
+		<year>1995</year>
+		<publisher>SNK</publisher>
+		<info name="alt_title" value="ダブルドラゴン" />
+		<info name="serial" value="NGCD-082" />
+		<info name="release" value="19950602 (JPN)" />
+		<part name="cdrom" interface="neocd_cdrom">
+			<feature name="cd_matrix" value="NGCD-082 MT B06 (JPN)"/>
+			<diskarea name="cdrom">
+				<disk name="double dragon (1995)(snk)(jp)[ngcd-082 mt b06]" sha1="64bf06de31105900dacbdd927ef635f71d264725"/>
+			</diskarea>
+		</part>
+	</software>
+
 	<software name="fatfury1">
-		<description>Fatal Fury - The Battle of Fury (USA) ~ Garou Densetsu - Shukumei no Tatakai (Jpn)</description>
+		<description>Fatal Fury - The Battle of Fury (USA) ~ Garou Densetsu - Shukumei no Tatakai (Japan)</description>
 		<year>1994</year>
 		<publisher>SNK</publisher>
 		<info name="alt_title" value="餓狼伝説 宿命の闘い" />
@@ -459,7 +513,7 @@ license:CC0
 	</software>
 
 	<software name="fatfury2">
-		<description>Fatal Fury 2 (USA) ~ Garou Densetsu 2 - Aratanaru Tatakai (Jpn)</description>
+		<description>Fatal Fury 2 (USA) ~ Garou Densetsu 2 - Aratanaru Tatakai (Japan)</description>
 		<year>1994</year>
 		<publisher>SNK</publisher>
 		<info name="alt_title" value="餓狼伝説2 ―新たなる闘い―" />
@@ -474,7 +528,7 @@ license:CC0
 
 	<!-- Copy protection failure, select demo mode and leave it for a few cycles to see -->
 	<software name="fatfury3" supported="no">
-		<description>Fatal Fury 3 - Road to the Final Victory (USA) ~ Garou Densetsu 3 - Harukanaru Tatakai (Jpn)</description>
+		<description>Fatal Fury 3 - Road to the Final Victory (USA) ~ Garou Densetsu 3 - Harukanaru Tatakai (Japan)</description>
 		<year>1995</year>
 		<publisher>SNK</publisher>
 		<info name="alt_title" value="餓狼伝説3―遥かなる闘い―" />
@@ -500,7 +554,7 @@ license:CC0
 	</software>
 
 	<software name="fatfursp">
-		<description>Fatal Fury Special (USA) ~ Garou Densetsu Special (Jpn)</description>
+		<description>Fatal Fury Special (USA) ~ Garou Densetsu Special (Japan)</description>
 		<year>1994</year>
 		<publisher>SNK</publisher>
 		<info name="alt_title" value="餓狼伝説 スペシャル" />
@@ -514,7 +568,7 @@ license:CC0
 	</software>
 
 	<software name="fbfrenzy">
-		<description>Football Frenzy (Jpn, USA)</description>
+		<description>Football Frenzy (Japan, USA)</description>
 		<year>1994</year>
 		<publisher>SNK</publisher>
 		<info name="alt_title" value="フットボールフレンジー" />
@@ -528,7 +582,7 @@ license:CC0
 	</software>
 
 	<software name="pgoal">
-		<description>Futsal - 5 on 5 Mini Soccer (Jpn)</description>
+		<description>Futsal - 5 on 5 Mini Soccer (Japan)</description>
 		<year>1996</year>
 		<publisher>Saurus</publisher>
 		<info name="alt_title" value="フットサル" />
@@ -542,7 +596,7 @@ license:CC0
 	</software>
 
 	<software name="galaxyfg">
-		<description>Galaxy Fight - Universal Warriors (Jpn, USA)</description>
+		<description>Galaxy Fight - Universal Warriors (Japan, USA)</description>
 		<year>1995</year>
 		<publisher>Sunsoft</publisher>
 		<info name="alt_title" value="ギャラクシーファイト ユニバーサル ウォリアーズ" />
@@ -556,7 +610,7 @@ license:CC0
 	</software>
 
 	<software name="gpilots">
-		<description>Ghost Pilots (Jpn)</description>
+		<description>Ghost Pilots (Japan)</description>
 		<year>1995</year>
 		<publisher>SNK</publisher>
 		<info name="alt_title" value="ゴーストパイロット" />
@@ -569,9 +623,8 @@ license:CC0
 		</part>
 	</software>
 
-
 	<software name="janshin">
-		<description>Janshin Densetsu - Quest of the Jongmaster (Jpn)</description>
+		<description>Janshin Densetsu - Quest of the Jongmaster (Japan)</description>
 		<year>1995</year>
 		<publisher>Aicom</publisher>
 		<info name="alt_title" value="雀神伝説" />
@@ -585,7 +638,7 @@ license:CC0
 	</software>
 
 	<software name="karnovr">
-		<description>Karnov's Revenge (USA) ~ Fighter's History Dynamite (Jpn)</description>
+		<description>Karnov's Revenge (USA) ~ Fighter's History Dynamite (Japan)</description>
 		<year>1994</year>
 		<publisher>Data East</publisher>
 		<info name="alt_title" value="ファイターズヒストリー・ダイナマイト" />
@@ -599,7 +652,7 @@ license:CC0
 	</software>
 
 	<software name="kof94">
-		<description>The King of Fighters '94 (Jpn, USA)</description>
+		<description>The King of Fighters '94 (Japan, USA)</description>
 		<year>1994</year>
 		<publisher>SNK</publisher>
 		<info name="alt_title" value="ザ・キング・オブ・ファイターズ '94" />
@@ -613,7 +666,7 @@ license:CC0
 	</software>
 
 	<software name="kof94a" cloneof="kof94">
-		<description>The King of Fighters '94 (Jpn, USA, Alt)</description>
+		<description>The King of Fighters '94 (Japan, USA, alt)</description>
 		<year>1994</year>
 		<publisher>SNK</publisher>
 		<info name="alt_title" value="ザ・キング・オブ・ファイターズ '94" />
@@ -627,7 +680,7 @@ license:CC0
 	</software>
 
 	<software name="kof95">
-		<description>The King of Fighters '95 (Jpn, USA)</description>
+		<description>The King of Fighters '95 (Japan, USA)</description>
 		<year>1995</year>
 		<publisher>SNK</publisher>
 		<info name="alt_title" value="ザ・キング・オブ・ファイターズ '95" />
@@ -641,7 +694,7 @@ license:CC0
 	</software>
 
 	<software name="kof95a" cloneof="kof95">
-		<description>The King of Fighters '95 (Jpn, USA, Alt)</description>
+		<description>The King of Fighters '95 (Japan, USA, alt)</description>
 		<year>1995</year>
 		<publisher>SNK</publisher>
 		<info name="alt_title" value="ザ・キング・オブ・ファイターズ '95" />
@@ -655,7 +708,7 @@ license:CC0
 	</software>
 
 	<software name="kof96">
-		<description>The King of Fighters '96 (Jpn)</description>
+		<description>The King of Fighters '96 (Japan)</description>
 		<year>1996</year>
 		<publisher>SNK</publisher>
 		<info name="alt_title" value="ザ・キング・オブ・ファイターズ '96" />
@@ -669,7 +722,7 @@ license:CC0
 	</software>
 
 	<software name="kof96a" cloneof="kof96">
-		<description>The King of Fighters '96 (Jpn, USA)</description>
+		<description>The King of Fighters '96 (Japan, USA)</description>
 		<year>1996</year>
 		<publisher>SNK</publisher>
 		<info name="alt_title" value="ザ・キング・オブ・ファイターズ '96" />
@@ -683,7 +736,7 @@ license:CC0
 	</software>
 
 	<software name="kof97">
-		<description>The King of Fighters '97 (Jpn)</description>
+		<description>The King of Fighters '97 (Japan)</description>
 		<year>1997</year>
 		<publisher>SNK</publisher>
 		<info name="alt_title" value="ザ・キング・オブ・ファイターズ '97" />
@@ -697,7 +750,7 @@ license:CC0
 	</software>
 
 	<software name="kof98">
-		<description>The King of Fighters '98 - Dream Match Never Ends (Jpn)</description>
+		<description>The King of Fighters '98 - Dream Match Never Ends (Japan)</description>
 		<year>1998</year>
 		<publisher>SNK</publisher>
 		<info name="alt_title" value="ザ・キング・オブ・ファイターズ '98" />
@@ -711,7 +764,7 @@ license:CC0
 	</software>
 
 	<software name="kof99">
-		<description>The King of Fighters '99 - Millennium Battle (Jpn)</description>
+		<description>The King of Fighters '99 - Millennium Battle (Japan)</description>
 		<year>1999</year>
 		<publisher>SNK</publisher>
 		<info name="alt_title" value="ザ・キング・オブ・ファイターズ '99" />
@@ -725,7 +778,7 @@ license:CC0
 	</software>
 
 	<software name="kotm2">
-		<description>King of the Monsters 2 (Jpn, USA)</description>
+		<description>King of the Monsters 2 (Japan, USA)</description>
 		<year>1994</year>
 		<publisher>SNK</publisher>
 		<info name="alt_title" value="キング・オブ・ザ・モンスターズ2 ―ネクストシング―" />
@@ -739,7 +792,7 @@ license:CC0
 	</software>
 
 	<software name="lastblad">
-		<description>Bakumatsu Roman - Gekka no Kenshi (Jpn)</description>
+		<description>Bakumatsu Roman - Gekka no Kenshi (Japan)</description>
 		<year>1998</year>
 		<publisher>SNK</publisher>
 		<info name="alt_title" value="幕末浪漫 月華の剣士" />
@@ -753,7 +806,7 @@ license:CC0
 	</software>
 
 	<software name="lresort">
-		<description>Last Resort (Jpn, USA)</description>
+		<description>Last Resort (Japan, USA)</description>
 		<year>1994</year>
 		<publisher>SNK</publisher>
 		<info name="alt_title" value="ラストリゾート" />
@@ -766,8 +819,41 @@ license:CC0
 		</part>
 	</software>
 
+	<!--
+	<rom name="looptris.cue" size="110" crc="a946a4fe" sha1="155616504193c31072186cc3e8293032606de859"/>
+	<rom name="looptris.iso" size="1169408" crc="80474c81" sha1="1d31bb4e9df63e3a53aec118a05cf8385c9a314e"/>
+	-->
+	<software name="looptris">
+		<description>Looptris</description>
+		<year>2021</year>
+		<publisher>Blastar</publisher>
+		<info name="release" value="20211226" />
+		<part name="cdrom" interface="neocd_cdrom">
+			<diskarea name="cdrom">
+				<disk name="looptris" sha1="890b3a08bf9a88d5ae6d4fbd73bd903ad929af64"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<!--
+	<rom name="LOOPTRSP.CUE" size="222" crc="3316f9a1" sha1="8a3b53dc63cb063b5f788696a232296cc503989a"/>
+	<rom name="LOOPTRSP_TRACK_01.ISO" size="1187840" crc="6d6b3e92" sha1="bad6e7144e59b0d3f8e196df28e922412bd5e919"/>
+	<rom name="LOOPTRSP_TRACK_02.WAV" size="63702060" crc="0bf2fd1b" sha1="81336d569a7d82fa4b1a9dc469600fa96a03b78a"/>
+	-->
+	<software name="looptrsp">
+		<description>Looptris Plus</description>
+		<year>2022</year>
+		<publisher>Blastar</publisher>
+		<info name="release" value="20221224" />
+		<part name="cdrom" interface="neocd_cdrom">
+			<diskarea name="cdrom">
+				<disk name="Looptris Plus" sha1="154085e56b1bbbba4a866796c3f385da7cb6a3ed"/>
+			</diskarea>
+		</part>
+	</software>
+
 	<software name="magdrop2">
-		<description>Magical Drop 2 (Jpn)</description>
+		<description>Magical Drop 2 (Japan)</description>
 		<year>1996</year>
 		<publisher>Data East</publisher>
 		<info name="alt_title" value="マジカルドロップ2" />
@@ -781,7 +867,7 @@ license:CC0
 	</software>
 
 	<software name="maglord">
-		<description>Magician Lord (Jpn)</description>
+		<description>Magician Lord (Japan)</description>
 		<year>1994</year>
 		<publisher>ADK</publisher>
 		<info name="alt_title" value="マジシャンロード" />
@@ -795,7 +881,7 @@ license:CC0
 	</software>
 
 	<software name="mahretsu">
-		<description>Mahjong Kyo Retsuden - Nishi Nihon Hen (Jpn)</description>
+		<description>Mahjong Kyo Retsuden - Nishi Nihon Hen (Japan)</description>
 		<year>1994</year>
 		<publisher>SNK</publisher>
 		<info name="alt_title" value="麻雀狂列伝 ―西日本編―" />
@@ -809,7 +895,7 @@ license:CC0
 	</software>
 
 	<software name="mslug">
-		<description>Metal Slug (Jpn, USA)</description>
+		<description>Metal Slug (Japan, USA)</description>
 		<year>1996</year>
 		<publisher>SNK</publisher>
 		<info name="alt_title" value="メタルスラッグ" />
@@ -823,7 +909,7 @@ license:CC0
 	</software>
 
 	<software name="mslug2">
-		<description>Metal Slug 2 (Jpn)</description>
+		<description>Metal Slug 2 (Japan)</description>
 		<year>1998</year>
 		<publisher>SNK</publisher>
 		<info name="alt_title" value="メタルスラッグ2" />
@@ -837,7 +923,7 @@ license:CC0
 	</software>
 
 	<software name="mutnat">
-		<description>Mutation Nation (Jpn, USA)</description>
+		<description>Mutation Nation (Japan, USA)</description>
 		<year>1995</year>
 		<publisher>SNK</publisher>
 		<info name="alt_title" value="ミューテイション ネイション" />
@@ -851,7 +937,7 @@ license:CC0
 	</software>
 
 	<software name="nam1975">
-		<description>NAM-1975 (Jpn, USA)</description>
+		<description>NAM-1975 (Japan, USA)</description>
 		<year>1994</year>
 		<publisher>SNK</publisher>
 		<info name="alt_title" value="ナム-1975" />
@@ -865,7 +951,7 @@ license:CC0
 	</software>
 
 	<software name="neodrift">
-		<description>Neo DriftOut (Jpn)</description>
+		<description>Neo DriftOut (Japan)</description>
 		<year>1996</year>
 		<publisher>Visco</publisher>
 		<info name="alt_title" value="NEOドリフトアウト" />
@@ -878,10 +964,8 @@ license:CC0
 		</part>
 	</software>
 
-
-
 	<software name="turfmast">
-		<description>Big Tournament Golf (Jpn)</description>
+		<description>Big Tournament Golf (Japan)</description>
 		<year>1996</year>
 		<publisher>SNK</publisher>
 		<info name="alt_title" value="ビッグトーナメントゴルフ" />
@@ -895,7 +979,7 @@ license:CC0
 	</software>
 
 	<software name="ncombat">
-		<description>Ninja Combat (Jpn)</description>
+		<description>Ninja Combat (Japan)</description>
 		<year>1994</year>
 		<publisher>ADK</publisher>
 		<info name="alt_title" value="ニンジャコンバット" />
@@ -909,7 +993,7 @@ license:CC0
 	</software>
 
 	<software name="ncommand">
-		<description>Ninja Commando (Jpn)</description>
+		<description>Ninja Commando (Japan)</description>
 		<year>1994</year>
 		<publisher>ADK</publisher>
 		<info name="alt_title" value="ニンジャコマンドー" />
@@ -923,7 +1007,7 @@ license:CC0
 	</software>
 
 	<software name="ninjamas">
-		<description>Ninja Master's - Haou Ninpou-Chou (Jpn)</description>
+		<description>Ninja Master's - Haou Ninpou-Chou (Japan)</description>
 		<year>1996</year>
 		<publisher>ADK</publisher>
 		<info name="alt_title" value="ニンジャマスターズ 覇王忍法帖" />
@@ -936,9 +1020,8 @@ license:CC0
 		</part>
 	</software>
 
-
 	<software name="overtop">
-		<description>OverTop (Jpn)</description>
+		<description>OverTop (Japan)</description>
 		<year>1996</year>
 		<publisher>ADK</publisher>
 		<info name="alt_title" value="オーバートップ" />
@@ -952,7 +1035,7 @@ license:CC0
 	</software>
 
 	<software name="pspikes2">
-		<description>Power Spikes II (Jpn)</description>
+		<description>Power Spikes II (Japan)</description>
 		<year>1995</year>
 		<publisher>Video System</publisher>
 		<info name="alt_title" value="パワースパイクスII" />
@@ -966,7 +1049,7 @@ license:CC0
 	</software>
 
 	<software name="pulstar">
-		<description>Pulstar (Jpn, USA)</description>
+		<description>Pulstar (Japan, USA)</description>
 		<year>1995</year>
 		<publisher>SNK</publisher>
 		<info name="alt_title" value="パルスター" />
@@ -980,7 +1063,7 @@ license:CC0
 	</software>
 
 	<software name="joyjoy">
-		<description>Puzzled (USA) ~ Joy Joy Kid (Jpn)</description>
+		<description>Puzzled (USA) ~ Joy Joy Kid (Japan)</description>
 		<year>1994</year>
 		<publisher>SNK</publisher>
 		<info name="alt_title" value="ジョイジョイキッド" />
@@ -994,7 +1077,7 @@ license:CC0
 	</software>
 
 	<software name="quizkof">
-		<description>Quiz King of Fighters (Jpn)</description>
+		<description>Quiz King of Fighters (Japan)</description>
 		<year>1995</year>
 		<publisher>Saurus</publisher>
 		<info name="alt_title" value="クイズ キングオブファイターズ" />
@@ -1008,7 +1091,7 @@ license:CC0
 	</software>
 
 	<software name="bjourney">
-		<description>Raguy (Jpn)</description>
+		<description>Raguy (Japan)</description>
 		<year>1994</year>
 		<publisher>ADK</publisher>
 		<info name="alt_title" value="ラギ" />
@@ -1022,7 +1105,7 @@ license:CC0
 	</software>
 
 	<software name="rbff1">
-		<description>Real Bout Fatal Fury (USA) ~ Real Bout Garou Densetsu (Jpn)</description>
+		<description>Real Bout Fatal Fury (USA) ~ Real Bout Garou Densetsu (Japan)</description>
 		<year>1996</year>
 		<publisher>SNK</publisher>
 		<info name="alt_title" value="リアルバウト餓狼伝説" />
@@ -1036,7 +1119,7 @@ license:CC0
 	</software>
 
 	<software name="rbff2">
-		<description>Real Bout Fatal Fury 2 - The Newcomers (USA) ~ Real Bout Garou Densetsu 2 - The Newcomers (Jpn)</description>
+		<description>Real Bout Fatal Fury 2 - The Newcomers (USA) ~ Real Bout Garou Densetsu 2 - The Newcomers (Japan)</description>
 		<year>1998</year>
 		<publisher>SNK</publisher>
 		<info name="alt_title" value="リアルバウト餓狼伝説2" />
@@ -1050,7 +1133,7 @@ license:CC0
 	</software>
 
 	<software name="rbffspec">
-		<description>Real Bout Special (Jpn)</description>
+		<description>Real Bout Special (Japan)</description>
 		<year>1997</year>
 		<publisher>SNK</publisher>
 		<info name="alt_title" value="リアルバウト餓狼伝説スペシャル" />
@@ -1064,7 +1147,7 @@ license:CC0
 	</software>
 
 	<software name="ridhero">
-		<description>Riding Hero (Jpn, USA)</description>
+		<description>Riding Hero (Japan, USA)</description>
 		<year>1995</year>
 		<publisher>SNK</publisher>
 		<info name="alt_title" value="ライディングヒーロー" />
@@ -1078,7 +1161,7 @@ license:CC0
 	</software>
 
 	<software name="roboarmy">
-		<description>Robo Army (Jpn, USA)</description>
+		<description>Robo Army (Japan, USA)</description>
 		<year>1995</year>
 		<publisher>SNK</publisher>
 		<info name="alt_title" value="ロボアーミー" />
@@ -1092,7 +1175,7 @@ license:CC0
 	</software>
 
 	<software name="samsho">
-		<description>Samurai Shodown (USA) ~ Samurai Spirits (Jpn)</description>
+		<description>Samurai Shodown (USA) ~ Samurai Spirits (Japan)</description>
 		<year>1994</year>
 		<publisher>SNK</publisher>
 		<info name="alt_title" value="サムライスピリッツ" />
@@ -1106,7 +1189,7 @@ license:CC0
 	</software>
 
 	<software name="samsho2">
-		<description>Samurai Shodown II (USA) ~ Shin Samurai Spirits - Haoumaru Jigoku Hen (Jpn)</description>
+		<description>Samurai Shodown II (USA) ~ Shin Samurai Spirits - Haoumaru Jigoku Hen (Japan)</description>
 		<year>1994</year>
 		<publisher>SNK</publisher>
 		<info name="alt_title" value="真 サムライスピリッツ 覇王丸地獄変" />
@@ -1120,7 +1203,7 @@ license:CC0
 	</software>
 
 	<software name="samsho3">
-		<description>Samurai Spirits - Zankurou Musouken (Jpn)</description>
+		<description>Samurai Spirits - Zankurou Musouken (Japan)</description>
 		<year>1995</year>
 		<publisher>SNK</publisher>
 		<info name="alt_title" value="サムライスピリッツ 斬紅郎無双剣" />
@@ -1134,7 +1217,7 @@ license:CC0
 	</software>
 
 	<software name="samsho4">
-		<description>Samurai Shodown IV - Amakusa's Revenge (USA) ~ Samurai Spirits - Amakusa Kourin (Jpn)</description>
+		<description>Samurai Shodown IV - Amakusa's Revenge (USA) ~ Samurai Spirits - Amakusa Kourin (Japan)</description>
 		<year>1996</year>
 		<publisher>SNK</publisher>
 		<info name="alt_title" value="サムライスピリッツ 天草降臨" />
@@ -1148,7 +1231,7 @@ license:CC0
 	</software>
 
 	<software name="savagere">
-		<description>Savage Reign (USA) ~ Fu'un Mokujiroku - Kakutou Sousei (Jpn)</description>
+		<description>Savage Reign (USA) ~ Fu'un Mokujiroku - Kakutou Sousei (Japan)</description>
 		<year>1995</year>
 		<publisher>SNK</publisher>
 		<info name="alt_title" value="風雲黙示録 格闘創世" />
@@ -1162,7 +1245,7 @@ license:CC0
 	</software>
 
 	<software name="sengoku">
-		<description>Sengoku (USA) ~  Sengoku Denshou (Jpn)</description>
+		<description>Sengoku (USA) ~ Sengoku Denshou (Japan)</description>
 		<year>1995</year>
 		<publisher>SNK</publisher>
 		<info name="alt_title" value="戦国伝承" />
@@ -1176,7 +1259,7 @@ license:CC0
 	</software>
 
 	<software name="sengoku2">
-		<description>Sengoku 2 (USA) ~ Sengoku Denshou 2 (Jpn)</description>
+		<description>Sengoku 2 (USA) ~ Sengoku Denshou 2 (Japan)</description>
 		<year>1995</year>
 		<publisher>SNK</publisher>
 		<info name="alt_title" value="戦国伝承2" />
@@ -1190,7 +1273,7 @@ license:CC0
 	</software>
 
 	<software name="ragnagrd">
-		<description>Shin-Oh-Ken (Jpn)</description>
+		<description>Shin-Oh-Ken (Japan)</description>
 		<year>1996</year>
 		<publisher>Saurus</publisher>
 		<info name="alt_title" value="神凰拳" />
@@ -1204,7 +1287,7 @@ license:CC0
 	</software>
 
 	<software name="mosyougi">
-		<description>Shougi no Tatsujin - Master of Syougi (Jpn)</description>
+		<description>Shougi no Tatsujin - Master of Syougi (Japan)</description>
 		<year>1995</year>
 		<publisher>ADK</publisher>
 		<info name="alt_title" value="将棋の達人" />
@@ -1218,7 +1301,7 @@ license:CC0
 	</software>
 
 	<software name="socbrawl">
-		<description>Soccer Brawl (Jpn, USA)</description>
+		<description>Soccer Brawl (Japan, USA)</description>
 		<year>1995</year>
 		<publisher>SNK</publisher>
 		<info name="alt_title" value="サッカーブロール" />
@@ -1232,7 +1315,7 @@ license:CC0
 	</software>
 
 	<software name="stakwin">
-		<description>Stakes Winner - GI Kanzen Seiha e no Machi (Jpn)</description>
+		<description>Stakes Winner - GI Kanzen Seiha e no Machi (Japan)</description>
 		<year>1996</year>
 		<publisher>Saurus</publisher>
 		<info name="alt_title" value="ステークスウィナーGI完全制覇への道" />
@@ -1246,7 +1329,7 @@ license:CC0
 	</software>
 
 	<software name="strhoop">
-		<description>Street Hoop (USA) ~ Dunk Dream (Jpn)</description>
+		<description>Street Hoop (USA) ~ Dunk Dream (Japan)</description>
 		<year>1995</year>
 		<publisher>Data East</publisher>
 		<info name="alt_title" value="ダンク・ドリーム" />
@@ -1260,7 +1343,7 @@ license:CC0
 	</software>
 
 	<software name="ssideki">
-		<description>Super Sidekicks (USA) ~ Tokuten Ou (Jpn)</description>
+		<description>Super Sidekicks (USA) ~ Tokuten Ou (Japan)</description>
 		<year>1995</year>
 		<publisher>SNK</publisher>
 		<info name="alt_title" value="得点王" />
@@ -1274,7 +1357,7 @@ license:CC0
 	</software>
 
 	<software name="ssideki2">
-		<description>Super Sidekicks 2 (USA) ~ Tokuten Ou 2 (Jpn)</description>
+		<description>Super Sidekicks 2 (USA) ~ Tokuten Ou 2 (Japan)</description>
 		<year>1994</year>
 		<publisher>SNK</publisher>
 		<info name="alt_title" value="得点王2" />
@@ -1288,7 +1371,7 @@ license:CC0
 	</software>
 
 	<software name="ssideki3">
-		<description>Super Sidekicks 3 - The Next Glory (USA) ~ Tokuten Ou 3 - Eikou e no Chousen (Jpn)</description>
+		<description>Super Sidekicks 3 - The Next Glory (USA) ~ Tokuten Ou 3 - Eikou e no Chousen (Japan)</description>
 		<year>1995</year>
 		<publisher>SNK</publisher>
 		<info name="alt_title" value="得点王3 栄光への挑戦" />
@@ -1302,7 +1385,7 @@ license:CC0
 	</software>
 
 	<software name="superspy">
-		<description>The Super Spy (Jpn, USA)</description>
+		<description>The Super Spy (Japan, USA)</description>
 		<year>1994</year>
 		<publisher>SNK</publisher>
 		<info name="alt_title" value="ザ・スーパースパイ" />
@@ -1316,7 +1399,7 @@ license:CC0
 	</software>
 
 	<software name="kabukikl">
-		<description>Tengai Makyou Shinden - Far East of Eden (Jpn)</description>
+		<description>Tengai Makyou Shinden - Far East of Eden (Japan)</description>
 		<year>1995</year>
 		<publisher>Hudson</publisher>
 		<info name="alt_title" value="天外魔境 真伝" />
@@ -1330,7 +1413,7 @@ license:CC0
 	</software>
 
 	<software name="tophuntr">
-		<description>Top Hunter - Roddy &amp; Cathy (Jpn, USA)</description>
+		<description>Top Hunter - Roddy &amp; Cathy (Japan, USA)</description>
 		<year>1994</year>
 		<publisher>SNK</publisher>
 		<info name="alt_title" value="トップハンター" />
@@ -1344,7 +1427,7 @@ license:CC0
 	</software>
 
 	<software name="tpgolf">
-		<description>Top Player's Golf (Jpn, USA)</description>
+		<description>Top Player's Golf (Japan, USA)</description>
 		<year>1994</year>
 		<publisher>SNK</publisher>
 		<info name="alt_title" value="トッププレイヤーズ・ゴルフ" />
@@ -1358,7 +1441,7 @@ license:CC0
 	</software>
 
 	<software name="twinspri">
-		<description>Twinkle Star Sprites (Jpn)</description>
+		<description>Twinkle Star Sprites (Japan)</description>
 		<year>1997</year>
 		<publisher>ADK</publisher>
 		<info name="alt_title" value="ティンクルスター スプライツ" />
@@ -1372,7 +1455,7 @@ license:CC0
 	</software>
 
 	<software name="viewpoin">
-		<description>Viewpoint (Jpn, USA)</description>
+		<description>Viewpoint (Japan, USA)</description>
 		<year>1995</year>
 		<publisher>Aicom</publisher>
 		<info name="alt_title" value="ビューポイント" />
@@ -1386,7 +1469,7 @@ license:CC0
 	</software>
 
 	<software name="gowcaizr">
-		<description>Choujin Gakuen Gowcaizer (Jpn)</description>
+		<description>Choujin Gakuen Gowcaizer (Japan)</description>
 		<year>1995</year>
 		<publisher>Technos</publisher>
 		<info name="alt_title" value="超人学園ゴウカイザー" />
@@ -1400,7 +1483,7 @@ license:CC0
 	</software>
 
 	<software name="wjammers">
-		<description>Windjammers (USA) ~ Flying Power Disc (Jpn)</description>
+		<description>Windjammers (USA) ~ Flying Power Disc (Japan)</description>
 		<year>1995</year>
 		<publisher>Data East</publisher>
 		<info name="alt_title" value="フライングパワーディスク" />
@@ -1414,7 +1497,7 @@ license:CC0
 	</software>
 
 	<software name="wh1">
-		<description>World Heroes (Jpn, USA)</description>
+		<description>World Heroes (Japan, USA)</description>
 		<year>1995</year>
 		<publisher>ADK</publisher>
 		<info name="alt_title" value="ワールドヒーローズ" />
@@ -1428,7 +1511,7 @@ license:CC0
 	</software>
 
 	<software name="wh2">
-		<description>World Heroes 2 (Jpn, USA)</description>
+		<description>World Heroes 2 (Japan, USA)</description>
 		<year>1995</year>
 		<publisher>ADK</publisher>
 		<info name="alt_title" value="ワールドヒーローズ2" />
@@ -1442,7 +1525,7 @@ license:CC0
 	</software>
 
 	<software name="wh2j">
-		<description>World Heroes 2 Jet (Jpn)</description>
+		<description>World Heroes 2 Jet (Japan)</description>
 		<year>1994</year>
 		<publisher>ADK</publisher>
 		<info name="alt_title" value="ワールドヒーローズ2ジェット" />
@@ -1456,7 +1539,7 @@ license:CC0
 	</software>
 
 	<software name="whp">
-		<description>World Heroes Perfect (Jpn, USA)</description>
+		<description>World Heroes Perfect (Japan, USA)</description>
 		<year>1995</year>
 		<publisher>ADK</publisher>
 		<info name="alt_title" value="ワールドヒーローズ パーフェクト" />
@@ -1465,6 +1548,78 @@ license:CC0
 		<part name="cdrom" interface="neocd_cdrom">
 			<diskarea name="cdrom">
 				<disk name="world heroes perfect (1995)(adk)(jp-us)" sha1="7d444937c98b08845a00f965ced83e6677109cb7"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<!--
+	source: redump.org/disc/96924/
+	<rom name="Xeno Crisis (World) (Unl).cue" size="5289" crc="0eb03610" sha1="932c61415755579288e8a881e2957c12faa8e5d4"/>
+	<rom name="Xeno Crisis (World) (Unl) (Track 01).bin" size="8069712" crc="97db440b" sha1="11c58e0271e88e92c100211b512bd03c88a0818c"/>
+	<rom name="Xeno Crisis (World) (Unl) (Track 02).bin" size="3083472" crc="1694009d" sha1="570914f1f9aa2b7c58ef9e988b3c619cc428336d"/>
+	<rom name="Xeno Crisis (World) (Unl) (Track 03).bin" size="7399392" crc="fa71c92c" sha1="6f55998ecb7b0c04aeabc83d4d9f739464638d3c"/>
+	<rom name="Xeno Crisis (World) (Unl) (Track 04).bin" size="3528000" crc="179817a2" sha1="8e4ab6e78029b86194992dccdca09051a4dd6537"/>
+	<rom name="Xeno Crisis (World) (Unl) (Track 05).bin" size="7056000" crc="6a96c17d" sha1="59beff874ade95fdc8180e9880029bf4ed69e544"/>
+	<rom name="Xeno Crisis (World) (Unl) (Track 06).bin" size="6174000" crc="7d6012ae" sha1="ac13b0bdcba4954aab6496b9428b100b566cab76"/>
+	<rom name="Xeno Crisis (World) (Unl) (Track 07).bin" size="7399392" crc="a1c7c600" sha1="ac59583304b7c199fbaca8253b605630c35afb31"/>
+	<rom name="Xeno Crisis (World) (Unl) (Track 08).bin" size="3528000" crc="c5962c03" sha1="793be2843501fbcbb9c084951db329e2d66ee534"/>
+	<rom name="Xeno Crisis (World) (Unl) (Track 09).bin" size="7056000" crc="de38ce0d" sha1="e7c1e38f36b3b05b21bd1bf58b6078dcc0a21ca4"/>
+	<rom name="Xeno Crisis (World) (Unl) (Track 10).bin" size="6174000" crc="71121c1f" sha1="c6a86c312ccfb41f63bbefbe2856dff60b102a37"/>
+	<rom name="Xeno Crisis (World) (Unl) (Track 11).bin" size="7592256" crc="41dd641b" sha1="7f686140d7f5c312579ab521a7a1ccaa51f198b6"/>
+	<rom name="Xeno Crisis (World) (Unl) (Track 12).bin" size="42260736" crc="083103c2" sha1="411d520219015638072a10a61d8049d88ae36845"/>
+	<rom name="Xeno Crisis (World) (Unl) (Track 13).bin" size="3880800" crc="a95a22ff" sha1="90e029d6cc7303ac6fca913bec0397145889b6ec"/>
+	<rom name="Xeno Crisis (World) (Unl) (Track 14).bin" size="2730672" crc="40afe1e3" sha1="1a0b82f50aee0ccd46668cdd0f86b3c9a317a88f"/>
+	<rom name="Xeno Crisis (World) (Unl) (Track 15).bin" size="23284800" crc="3f4f6a12" sha1="fc472301783a4c4e49b6d47b5126f3d53047cb56"/>
+	<rom name="Xeno Crisis (World) (Unl) (Track 16).bin" size="3880800" crc="a95a22ff" sha1="90e029d6cc7303ac6fca913bec0397145889b6ec"/>
+	<rom name="Xeno Crisis (World) (Unl) (Track 17).bin" size="3043488" crc="7337edaf" sha1="d6188c3ebf0a8647b5849f83ab21c0d778385611"/>
+	<rom name="Xeno Crisis (World) (Unl) (Track 18).bin" size="48592320" crc="02234c91" sha1="e3d4479138fcab367e0f5f835edf26ad5502b4f3"/>
+	<rom name="Xeno Crisis (World) (Unl) (Track 19).bin" size="3880800" crc="a95a22ff" sha1="90e029d6cc7303ac6fca913bec0397145889b6ec"/>
+	<rom name="Xeno Crisis (World) (Unl) (Track 20).bin" size="2730672" crc="40afe1e3" sha1="1a0b82f50aee0ccd46668cdd0f86b3c9a317a88f"/>
+	<rom name="Xeno Crisis (World) (Unl) (Track 21).bin" size="22061760" crc="686ade16" sha1="48087df9476ef9ce88b50a4dd5d722faa34a95be"/>
+	<rom name="Xeno Crisis (World) (Unl) (Track 22).bin" size="3880800" crc="a95a22ff" sha1="90e029d6cc7303ac6fca913bec0397145889b6ec"/>
+	<rom name="Xeno Crisis (World) (Unl) (Track 23).bin" size="3043488" crc="7337edaf" sha1="d6188c3ebf0a8647b5849f83ab21c0d778385611"/>
+	<rom name="Xeno Crisis (World) (Unl) (Track 24).bin" size="48357120" crc="5f414b58" sha1="71df9fc10af96ba2d5e09f1419dc08548b507652"/>
+	<rom name="Xeno Crisis (World) (Unl) (Track 25).bin" size="3880800" crc="a95a22ff" sha1="90e029d6cc7303ac6fca913bec0397145889b6ec"/>
+	<rom name="Xeno Crisis (World) (Unl) (Track 26).bin" size="3043488" crc="7337edaf" sha1="d6188c3ebf0a8647b5849f83ab21c0d778385611"/>
+	<rom name="Xeno Crisis (World) (Unl) (Track 27).bin" size="49900032" crc="0c89bee3" sha1="c3ed30cfc74a8b7765473926deaed26cb07f5b9e"/>
+	<rom name="Xeno Crisis (World) (Unl) (Track 28).bin" size="3880800" crc="a95a22ff" sha1="90e029d6cc7303ac6fca913bec0397145889b6ec"/>
+	<rom name="Xeno Crisis (World) (Unl) (Track 29).bin" size="2730672" crc="40afe1e3" sha1="1a0b82f50aee0ccd46668cdd0f86b3c9a317a88f"/>
+	<rom name="Xeno Crisis (World) (Unl) (Track 30).bin" size="25768512" crc="56d0a9b1" sha1="7ab0f02c8341951b4bc25cc5aed6209847f5229c"/>
+	<rom name="Xeno Crisis (World) (Unl) (Track 31).bin" size="3880800" crc="a95a22ff" sha1="90e029d6cc7303ac6fca913bec0397145889b6ec"/>
+	<rom name="Xeno Crisis (World) (Unl) (Track 32).bin" size="3043488" crc="7337edaf" sha1="d6188c3ebf0a8647b5849f83ab21c0d778385611"/>
+	<rom name="Xeno Crisis (World) (Unl) (Track 33).bin" size="46127424" crc="64f18280" sha1="349439c294c76aff669433d13539636968d653eb"/>
+	<rom name="Xeno Crisis (World) (Unl) (Track 34).bin" size="3880800" crc="a95a22ff" sha1="90e029d6cc7303ac6fca913bec0397145889b6ec"/>
+	<rom name="Xeno Crisis (World) (Unl) (Track 35).bin" size="2730672" crc="40afe1e3" sha1="1a0b82f50aee0ccd46668cdd0f86b3c9a317a88f"/>
+	<rom name="Xeno Crisis (World) (Unl) (Track 36).bin" size="23284800" crc="3f4f6a12" sha1="fc472301783a4c4e49b6d47b5126f3d53047cb56"/>
+	<rom name="Xeno Crisis (World) (Unl) (Track 37).bin" size="3880800" crc="a95a22ff" sha1="90e029d6cc7303ac6fca913bec0397145889b6ec"/>
+	<rom name="Xeno Crisis (World) (Unl) (Track 38).bin" size="3043488" crc="7337edaf" sha1="d6188c3ebf0a8647b5849f83ab21c0d778385611"/>
+	<rom name="Xeno Crisis (World) (Unl) (Track 39).bin" size="48724032" crc="a3b1f818" sha1="199ac661c2267d711a1e450819d8e4b423e4c8af"/>
+	<rom name="Xeno Crisis (World) (Unl) (Track 40).bin" size="3880800" crc="a95a22ff" sha1="90e029d6cc7303ac6fca913bec0397145889b6ec"/>
+	<rom name="Xeno Crisis (World) (Unl) (Track 41).bin" size="2730672" crc="40afe1e3" sha1="1a0b82f50aee0ccd46668cdd0f86b3c9a317a88f"/>
+	<rom name="Xeno Crisis (World) (Unl) (Track 42).bin" size="22061760" crc="686ade16" sha1="48087df9476ef9ce88b50a4dd5d722faa34a95be"/>
+	<rom name="Xeno Crisis (World) (Unl) (Track 43).bin" size="3880800" crc="a95a22ff" sha1="90e029d6cc7303ac6fca913bec0397145889b6ec"/>
+	<rom name="Xeno Crisis (World) (Unl) (Track 44).bin" size="3043488" crc="7337edaf" sha1="d6188c3ebf0a8647b5849f83ab21c0d778385611"/>
+	<rom name="Xeno Crisis (World) (Unl) (Track 45).bin" size="51913344" crc="9f7024e8" sha1="048fa8d775738577c7aa9fbc5c1cb1ac9e4c2de5"/>
+	<rom name="Xeno Crisis (World) (Unl) (Track 46).bin" size="3880800" crc="a95a22ff" sha1="90e029d6cc7303ac6fca913bec0397145889b6ec"/>
+	<rom name="Xeno Crisis (World) (Unl) (Track 47).bin" size="2730672" crc="40afe1e3" sha1="1a0b82f50aee0ccd46668cdd0f86b3c9a317a88f"/>
+	<rom name="Xeno Crisis (World) (Unl) (Track 48).bin" size="27838272" crc="08eb88b6" sha1="6ca58cd8fb788fcf36e8c2710af0805ff11b9635"/>
+	<rom name="Xeno Crisis (World) (Unl) (Track 49).bin" size="3880800" crc="a95a22ff" sha1="90e029d6cc7303ac6fca913bec0397145889b6ec"/>
+	<rom name="Xeno Crisis (World) (Unl) (Track 50).bin" size="3043488" crc="7337edaf" sha1="d6188c3ebf0a8647b5849f83ab21c0d778385611"/>
+	<rom name="Xeno Crisis (World) (Unl) (Track 51).bin" size="26803392" crc="218c57aa" sha1="69d6d4b415e4dbcb9259c888266221c3aa2bff35"/>
+	<rom name="Xeno Crisis (World) (Unl) (Track 52).bin" size="22964928" crc="120f4e15" sha1="cd25cd94f821d791b234ad3f33e11d9eac887962"/>
+	<rom name="Xeno Crisis (World) (Unl) (Track 53).bin" size="24677184" crc="ec35f233" sha1="62d136023acf3caa0eb440ba4d0f5680a5b05702"/>
+	<rom name="Xeno Crisis (World) (Unl) (Track 54).bin" size="22762656" crc="f0514f38" sha1="802710df8e5edf083849b543edfe17bc8d6d2a64"/>
+	-->
+	<software name="xenocris" supported="no">
+		<description>Xeno Crisis</description>
+		<year>2021</year>
+		<publisher>Bitmap Bureau</publisher>
+		<notes>Freeze after the loading screen</notes>
+		<info name="release" value="20210810" />
+		<info name="serial" value="NGCD-BB01 / NGCD-BB01E" />
+		<part name="cdrom" interface="neocd_cdrom">
+			<diskarea name="cdrom">
+				<disk name="Xeno Crisis (World) (Unl)" sha1="792ee3aa806d06163b4d613f47d8ac9802a20c92"/>
 			</diskarea>
 		</part>
 	</software>

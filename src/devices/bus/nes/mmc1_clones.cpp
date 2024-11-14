@@ -16,12 +16,11 @@
 
 
 #ifdef NES_PCB_DEBUG
-#define VERBOSE 1
+#define VERBOSE (LOG_GENERAL)
 #else
-#define VERBOSE 0
+#define VERBOSE (0)
 #endif
-
-#define LOG_MMC(x) do { if (VERBOSE) logerror x; } while (0)
+#include "logmacro.h"
 
 
 //-------------------------------------------------
@@ -181,7 +180,7 @@ void nes_txc_22110_device::pcb_reset()
 
 void nes_ninjaryu_device::write_h(offs_t offset, u8 data)
 {
-	LOG_MMC(("unl_ninjaryu write_h, offset: %04x, data: %02x\n", offset, data));
+	LOG("unl_ninjaryu write_h, offset: %04x, data: %02x\n", offset, data);
 	u8 reg = BIT(offset, 13, 2);
 	m_reg[reg] = data;
 	update_regs(reg);
@@ -221,7 +220,7 @@ void nes_bmc_jy012005_device::set_chr()
 
 void nes_bmc_jy012005_device::write_m(offs_t offset, u8 data)
 {
-	LOG_MMC(("bmc_jy012005 write_m, offset: %04x, data: %02x\n", offset, data));
+	LOG("bmc_jy012005 write_m, offset: %04x, data: %02x\n", offset, data);
 
 	if (!BIT(m_latch0, 7))    // outer bank lock
 	{
@@ -253,7 +252,7 @@ void nes_bmc_jy820845c_device::update_banks()    // used by menu and MHROM games
 
 void nes_bmc_jy820845c_device::write_m(offs_t offset, u8 data)
 {
-	LOG_MMC(("bmc_jy820845c write_m, offset: %04x, data: %02x\n", offset, data));
+	LOG("bmc_jy820845c write_m, offset: %04x, data: %02x\n", offset, data);
 
 	nes_sxrom_device::write_m(offset, data);    // register overlaid on WRAM
 
@@ -272,7 +271,7 @@ void nes_bmc_jy820845c_device::write_m(offs_t offset, u8 data)
 
 void nes_bmc_jy820845c_device::write_h(offs_t offset, u8 data)
 {
-	LOG_MMC(("bmc_jy820845c write_h, offset: %04x, data: %02x\n", offset, data));
+	LOG("bmc_jy820845c write_h, offset: %04x, data: %02x\n", offset, data);
 
 	m_latch0 = data;
 
@@ -298,7 +297,7 @@ void nes_bmc_jy820845c_device::write_h(offs_t offset, u8 data)
 
 void nes_farid_slrom_device::write_m(offs_t offset, u8 data)
 {
-	LOG_MMC(("farid_slrom write_m, offset: %04x, data: %02x\n", offset, data));
+	LOG("farid_slrom write_m, offset: %04x, data: %02x\n", offset, data);
 	if (!BIT(m_reg[3], 4) && !BIT(m_outer, 3))    // MMC1 WRAM enabled and outer bank not locked
 		m_outer = data;
 }
@@ -342,7 +341,7 @@ void nes_farid_slrom_device::write_m(offs_t offset, u8 data)
 
 void nes_srpg5in1_device::write_l(offs_t offset, u8 data)
 {
-	LOG_MMC(("srpg5in1 write_l, offset: %04x, data: %02x\n", offset, data));
+	LOG("srpg5in1 write_l, offset: %04x, data: %02x\n", offset, data);
 
 	offset += 0x100;
 	if (offset >= 0x1000)
@@ -359,7 +358,7 @@ void nes_srpg5in1_device::write_l(offs_t offset, u8 data)
 
 void nes_srpg5in1_device::write_m(offs_t offset, u8 data)
 {
-	LOG_MMC(("srpg5in1 write_m, offset: %04x, data: %02x\n", offset, data));
+	LOG("srpg5in1 write_m, offset: %04x, data: %02x\n", offset, data);
 
 	u8 bank = BIT(m_outer, 1) ? bitswap<3>(m_outer, 1, 2, 0) : (m_outer & 1) << 1 | BIT(m_reg[1], 3);
 
@@ -369,7 +368,7 @@ void nes_srpg5in1_device::write_m(offs_t offset, u8 data)
 
 u8 nes_srpg5in1_device::read_m(offs_t offset)
 {
-	LOG_MMC(("srpg5in1 read_m, offset: %04x\n", offset));
+	LOG("srpg5in1 read_m, offset: %04x\n", offset);
 
 	u8 bank = BIT(m_outer, 1) ? bitswap<3>(m_outer, 1, 2, 0) : (m_outer & 1) << 1 | BIT(m_reg[1], 3);
 
@@ -405,7 +404,7 @@ void nes_txc_22110_device::update_banks()    // used by menu and Space Shadow
 
 void nes_txc_22110_device::write_l(offs_t offset, u8 data)
 {
-	LOG_MMC(("TXC 22110 write_l, offset: %04x, data: %02x\n", offset, data));
+	LOG("TXC 22110 write_l, offset: %04x, data: %02x\n", offset, data);
 	if (offset < 0x100)        // $4100 - $41ff
 	{
 		m_mode = data;
@@ -421,7 +420,7 @@ void nes_txc_22110_device::write_l(offs_t offset, u8 data)
 
 void nes_txc_22110_device::write_h(offs_t offset, u8 data)
 {
-	LOG_MMC(("TXC 22110 write_h, offset: %04x, data: %02x\n", offset, data));
+	LOG("TXC 22110 write_h, offset: %04x, data: %02x\n", offset, data);
 
 	if (m_mode & 1)
 		nes_sxrom_device::write_h(offset, data);

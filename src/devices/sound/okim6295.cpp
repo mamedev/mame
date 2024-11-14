@@ -85,14 +85,14 @@ const stream_buffer::sample_t okim6295_device::s_volume_table[16] =
 //  okim6295_device - constructor
 //-------------------------------------------------
 
-okim6295_device::okim6295_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, OKIM6295, tag, owner, clock),
-		device_sound_interface(mconfig, *this),
-		device_rom_interface(mconfig, *this),
-		m_region(*this, DEVICE_SELF),
-		m_command(-1),
-		m_stream(nullptr),
-		m_pin7_state(~uint8_t(0))
+okim6295_device::okim6295_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, OKIM6295, tag, owner, clock),
+	device_sound_interface(mconfig, *this),
+	device_rom_interface(mconfig, *this),
+	m_region(*this, DEVICE_SELF),
+	m_command(-1),
+	m_stream(nullptr),
+	m_pin7_state(~uint8_t(0))
 {
 }
 
@@ -190,10 +190,11 @@ void okim6295_device::sound_stream_update(sound_stream &stream, std::vector<read
 
 
 //-------------------------------------------------
-//  rom_bank_updated - the rom bank has changed
+//  rom_bank_pre_change - refresh the stream if the
+//  ROM banking changes
 //-------------------------------------------------
 
-void okim6295_device::rom_bank_updated()
+void okim6295_device::rom_bank_pre_change()
 {
 	m_stream->update();
 }
@@ -325,12 +326,12 @@ void okim6295_device::write(uint8_t command)
 //  okim_voice - constructor
 //-------------------------------------------------
 
-okim6295_device::okim_voice::okim_voice()
-	: m_playing(false),
-		m_base_offset(0),
-		m_sample(0),
-		m_count(0),
-		m_volume(0)
+okim6295_device::okim_voice::okim_voice() :
+	m_playing(false),
+	m_base_offset(0),
+	m_sample(0),
+	m_count(0),
+	m_volume(0)
 {
 }
 

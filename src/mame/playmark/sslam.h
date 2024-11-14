@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Pierpaolo Prazzoli, Quench
-#ifndef MAME_INCLUDES_SSLAM_H
-#define MAME_INCLUDES_SSLAM_H
+#ifndef MAME_PLAYMARK_SSLAM_H
+#define MAME_PLAYMARK_SSLAM_H
 
 #pragma once
 
@@ -34,8 +34,8 @@ public:
 	void init_sslam();
 
 protected:
-	virtual void machine_start() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<mcs51_cpu_device> m_audiocpu;
@@ -87,7 +87,7 @@ protected:
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void sslam_play(int track, int data);
 
-	void sslam_program_map(address_map &map);
+	void sslam_program_map(address_map &map) ATTR_COLD;
 };
 
 class powerbls_state : public sslam_state
@@ -102,10 +102,10 @@ public:
 	void init_powerbls();
 
 protected:
-	virtual void machine_start() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
-	void powerbls_map(address_map &map);
+	void powerbls_map(address_map &map) ATTR_COLD;
 
 	TILE_GET_INFO_MEMBER(get_powerbls_bg_tile_info);
 
@@ -115,4 +115,4 @@ protected:
 	void powerbls_bg_tileram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 };
 
-#endif // MAME_INCLUDES_SSLAM_H
+#endif // MAME_PLAYMARK_SSLAM_H

@@ -5,7 +5,7 @@
 
 template<int Width, int AddrShift> class memory_units_descriptor {
 public:
-	using uX = typename emu::detail::handler_entry_size<Width>::uX;
+	using uX = emu::detail::handler_entry_size_t<Width>;
 
 	struct entry {
 		uX m_amask;

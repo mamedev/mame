@@ -100,6 +100,7 @@
 #include "konamigx.h"
 
 #include "cpu/m68000/m68000.h"
+#include "cpu/m68000/m68020.h"
 #include "cpu/tms57002/tms57002.h"
 #include "cpu/z80/z80.h"
 #include "machine/eepromser.h"
@@ -449,7 +450,7 @@ void konamigx_state::esc_w(address_space &space, uint32_t data)
 /**********************************************************************************/
 /* EEPROM handlers */
 
-CUSTOM_INPUT_MEMBER(konamigx_state::gx_rdport1_3_r)
+ioport_value konamigx_state::gx_rdport1_3_r()
 {
 	return (m_gx_rdport1_3 >> 1);
 }
@@ -1156,7 +1157,7 @@ void konamigx_state::gxtmsmap(address_map &map)
 }
 
 
-WRITE_LINE_MEMBER(konamigx_state::k054539_irq_gen)
+void konamigx_state::k054539_irq_gen(int state)
 {
 	if (m_sound_ctrl & 1)
 	{
@@ -1226,8 +1227,8 @@ static INPUT_PORTS_START( common )
 	//      excpuint stat, objdma stat, eeprom do
 
 	// note: racin' force expects bit 1 of the eeprom port to toggle
-	PORT_BIT( 0x00000001, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
-	PORT_BIT( 0x000000fe, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(konamigx_state, gx_rdport1_3_r)
+	PORT_BIT( 0x00000001, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", FUNC(eeprom_serial_93cxx_device::do_read))
+	PORT_BIT( 0x000000fe, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(FUNC(konamigx_state::gx_rdport1_3_r))
 	PORT_BIT( 0x00000100, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x00000200, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x00000400, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -1260,22 +1261,31 @@ static INPUT_PORTS_START( common )
 	PORT_DIPUNUSED_DIPLOC( 0x00800000, 0x00800000, "SW2:8")
 
 	PORT_START( "EEPROMOUT" )
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, di_write)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, cs_write)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, clk_write)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", FUNC(eeprom_serial_93cxx_device::di_write))
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", FUNC(eeprom_serial_93cxx_device::cs_write))
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", FUNC(eeprom_serial_93cxx_device::clk_write))
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( racinfrc )
-	/* racin force needs Player 2 Button 1 ("IN3" & 0x10) set to get past the calibration screen */
 	PORT_INCLUDE( common )
 
+	PORT_MODIFY("INPUTS")
+	PORT_BIT( 0x000fffff, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	// FIXME: this maps to nowhere according to service mode, verify
+	// Old note: needs Player 2 Button 1 ("IN3" & 0x10) set to get past the calibration screen
+	PORT_BIT( 0x00100000, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Calibration skip?")
+	PORT_BIT( 0x03e00000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x04000000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Gear Shift") PORT_TOGGLE
+	PORT_BIT( 0x08000000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Brake")
+	PORT_BIT( 0xf0000000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
 	PORT_START("ADC-WRPORT")
-	PORT_BIT( 0x1000000, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("adc0834", adc083x_device, clk_write)
-	PORT_BIT( 0x2000000, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("adc0834", adc083x_device, di_write)
-	PORT_BIT( 0x4000000, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("adc0834", adc083x_device, cs_write)
+	PORT_BIT( 0x1000000, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("adc0834", FUNC(adc083x_device::clk_write))
+	PORT_BIT( 0x2000000, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("adc0834", FUNC(adc083x_device::di_write))
+	PORT_BIT( 0x4000000, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("adc0834", FUNC(adc083x_device::cs_write))
 
 	PORT_START("ADC-RDPORT")
-	PORT_BIT( 0x1000000, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("adc0834", adc083x_device, do_read)
+	PORT_BIT( 0x1000000, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("adc0834", FUNC(adc083x_device::do_read))
 
 	PORT_START("AN0")   /* mask default type                     sens delta min max */
 	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_MINMAX(0x38,0xc8) PORT_SENSITIVITY(35) PORT_KEYDELTA(35) PORT_REVERSE
@@ -1306,7 +1316,7 @@ static INPUT_PORTS_START( racinfrc )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( opengolf )
-	PORT_INCLUDE( racinfrc )
+	PORT_INCLUDE( common )
 
 	PORT_MODIFY("INPUTS")
 	PORT_BIT( 0x00000010, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(4) PORT_NAME("P4 Shoot")
@@ -1318,10 +1328,18 @@ static INPUT_PORTS_START( opengolf )
 	PORT_BIT( 0x10000000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1) PORT_NAME("P1 Shoot")
 	PORT_BIT( 0x60000000, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_MODIFY("AN0")
+	PORT_START("ADC-WRPORT")
+	PORT_BIT( 0x1000000, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("adc0834", FUNC(adc083x_device::clk_write))
+	PORT_BIT( 0x2000000, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("adc0834", FUNC(adc083x_device::di_write))
+	PORT_BIT( 0x4000000, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("adc0834", FUNC(adc083x_device::cs_write))
+
+	PORT_START("ADC-RDPORT")
+	PORT_BIT( 0x1000000, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("adc0834", FUNC(adc083x_device::do_read))
+
+	PORT_START("AN0")
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_MODIFY("AN1")
+	PORT_START("AN1")
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_MODIFY("SYSTEM_DSW")
@@ -1601,7 +1619,7 @@ static const gfx_layout t1_charlayout6 =
 	16, 16,
 	RGN_FRAC(1,1),
 	6,
-	{ 20, 16, 12, 8, 4, 0 },
+	{ 16, 20, 8, 12, 0, 4 },
 	{ 0, 12*8, 12*8*2, 12*8*3, 12*8*4, 12*8*5, 12*8*6, 12*8*7,
 		12*8*8, 12*8*9, 12*8*10, 12*8*11, 12*8*12, 12*8*13, 12*8*14, 12*8*15 },
 	{ 3, 2, 1, 0, 27, 26, 25, 24, 51, 50, 49, 48, 75, 74, 73, 72 },
@@ -1613,7 +1631,7 @@ static const gfx_layout t1_charlayout8 =
 	16, 16,
 	RGN_FRAC(1,1),
 	8,
-	{ 28, 24, 20, 16, 12, 8, 4, 0 },
+	{ 24, 28, 16, 20, 8, 12, 0, 4 },
 	{ 0, 16*8, 16*8*2, 16*8*3, 16*8*4, 16*8*5, 16*8*6, 16*8*7,
 		16*8*8, 16*8*9, 16*8*10, 16*8*11, 16*8*12, 16*8*13, 16*8*14, 16*8*15 },
 	{ 3, 2, 1, 0, 35, 34, 33, 32, 67, 66, 65, 64, 99, 98, 97, 96 },
@@ -1621,14 +1639,15 @@ static const gfx_layout t1_charlayout8 =
 };
 
 /* type 1 (opengolf + racinfrc) use 6 and 8 bpp planar layouts for the 53936 */
+// TODO: pinpoint color size
 static GFXDECODE_START( gfx_opengolf )
-	GFXDECODE_ENTRY( "gfx3", 0, t1_charlayout8, 0x0000, 8 )
-	GFXDECODE_ENTRY( "gfx4", 0, t1_charlayout6, 0x0000, 8 )
+	GFXDECODE_ENTRY( "gfx3", 0, t1_charlayout8, 0x0000, 32 )
+	GFXDECODE_ENTRY( "gfx4", 0, t1_charlayout6, 0x0000, 128 )
 GFXDECODE_END
 
 static GFXDECODE_START( gfx_racinfrc )
-	GFXDECODE_ENTRY( "gfx3", 0, t1_charlayout6, 0x0000, 8 )
-	GFXDECODE_ENTRY( "gfx4", 0, t1_charlayout6, 0x0000, 8 )
+	GFXDECODE_ENTRY( "gfx3", 0, t1_charlayout6, 0x0000, 128 )
+	GFXDECODE_ENTRY( "gfx4", 0, t1_charlayout6, 0x0000, 128 )
 GFXDECODE_END
 
 /* type 3 & 4 games use a simple 8bpp decode for the 53936 */
@@ -1640,13 +1659,13 @@ static GFXDECODE_START( gfx_type4 )
 	GFXDECODE_ENTRY( "gfx3", 0, bglayout_8bpp, 0x1800, 8 )
 GFXDECODE_END
 
-WRITE_LINE_MEMBER(konamigx_state::vblank_irq_ack_w)
+void konamigx_state::vblank_irq_ack_w(int state)
 {
 	m_maincpu->set_input_line(1, CLEAR_LINE);
 	m_gx_syncen |= 0x20;
 }
 
-WRITE_LINE_MEMBER(konamigx_state::hblank_irq_ack_w)
+void konamigx_state::hblank_irq_ack_w(int state)
 {
 	m_maincpu->set_input_line(2, CLEAR_LINE);
 	m_gx_syncen |= 0x40;
@@ -4067,7 +4086,7 @@ GAME( 1994, le2j,      le2,      le2,          le2j, konamigx_state, init_konami
 
 GAME( 1994, fantjour,  konamigx, gokuparo,     gokuparo, konamigx_state, init_konamigx, ROT0, "Konami", "Fantastic Journey (ver EAA)", MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1994, fantjoura, fantjour, gokuparo,     gokuparo, konamigx_state, init_konamigx, ROT0, "Konami", "Fantastic Journey (ver AAA)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1994, gokuparo,  fantjour, gokuparo,     gokuparo, konamigx_state, init_konamigx, ROT0, "Konami", "Gokujyou Parodius (ver JAD)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1994, gokuparo,  fantjour, gokuparo,     gokuparo, konamigx_state, init_konamigx, ROT0, "Konami", "Gokujou Parodius: Kako no Eikou o Motomete (ver JAD)", MACHINE_IMPERFECT_GRAPHICS )
 
 GAME( 1994, crzcross,  konamigx, gokuparo,     puzldama, konamigx_state, init_posthack, ROT0, "Konami", "Crazy Cross (ver EAA)", MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1994, puzldama,  crzcross, gokuparo,     puzldama, konamigx_state, init_posthack, ROT0, "Konami", "Taisen Puzzle-dama (ver JAA)", MACHINE_IMPERFECT_GRAPHICS )

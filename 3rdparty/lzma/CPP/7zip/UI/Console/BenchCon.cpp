@@ -7,13 +7,13 @@
 #include "BenchCon.h"
 #include "ConsoleClose.h"
 
-struct CPrintBenchCallback: public IBenchPrintCallback
+struct CPrintBenchCallback Z7_final: public IBenchPrintCallback
 {
   FILE *_file;
 
-  void Print(const char *s);
-  void NewLine();
-  HRESULT CheckBreak();
+  void Print(const char *s) Z7_override;
+  void NewLine() Z7_override;
+  HRESULT CheckBreak() Z7_override;
 };
 
 void CPrintBenchCallback::Print(const char *s)

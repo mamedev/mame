@@ -42,8 +42,8 @@ public:
 
 protected:
 	// device_t implementation
-	virtual void device_resolve_objects() override;
-	virtual void device_start() override;
+	virtual void device_resolve_objects() override ATTR_COLD;
+	virtual void device_start() override ATTR_COLD;
 
 	int m_ltpen;
 	devcb_write_line m_ltpen_handler;
@@ -63,7 +63,7 @@ class device_astrocade_accessory_interface : public device_interface
 public:
 	virtual ~device_astrocade_accessory_interface();
 
-	DECLARE_WRITE_LINE_MEMBER( write_ltpen ) { m_port->m_ltpen = state; m_port->m_ltpen_handler(state); }
+	void write_ltpen(int state) { m_port->m_ltpen = state; m_port->m_ltpen_handler(state); }
 
 protected:
 	device_astrocade_accessory_interface(machine_config const &mconfig, device_t &device);

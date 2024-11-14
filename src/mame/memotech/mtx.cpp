@@ -29,6 +29,8 @@
 #include "softlist_dev.h"
 #include "speaker.h"
 
+#include "utf8.h"
+
 
 /***************************************************************************
     MEMORY MAPS
@@ -188,8 +190,8 @@ static INPUT_PORTS_START( mtx512 )
 	PORT_BIT( 0x200, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_F4)    PORT_CHAR(UCHAR_MAMEKEY(F4))
 
 	PORT_START("RESET")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Reset") PORT_CODE(KEYCODE_LALT) PORT_CHAR(UCHAR_MAMEKEY(LALT)) PORT_CHANGED_MEMBER(DEVICE_SELF, mtx_state, trigger_reset, 0)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Reset") PORT_CODE(KEYCODE_RALT) PORT_CHAR(UCHAR_MAMEKEY(RALT)) PORT_CHANGED_MEMBER(DEVICE_SELF, mtx_state, trigger_reset, 0)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Reset") PORT_CODE(KEYCODE_LALT) PORT_CHAR(UCHAR_MAMEKEY(LALT)) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(mtx_state::trigger_reset), 0)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Reset") PORT_CODE(KEYCODE_RALT) PORT_CHAR(UCHAR_MAMEKEY(RALT)) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(mtx_state::trigger_reset), 0)
 
 	PORT_START("JOY0")
 	PORT_BIT( 0x3ff, IP_ACTIVE_LOW, IPT_UNUSED)
@@ -275,7 +277,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(mtx_state::ctc_tick)
 	m_z80ctc->trg2(0);
 }
 
-WRITE_LINE_MEMBER(mtx_state::ctc_trg1_w)
+void mtx_state::ctc_trg1_w(int state)
 {
 	if (m_z80dart)
 	{
@@ -284,7 +286,7 @@ WRITE_LINE_MEMBER(mtx_state::ctc_trg1_w)
 	}
 }
 
-WRITE_LINE_MEMBER(mtx_state::ctc_trg2_w)
+void mtx_state::ctc_trg2_w(int state)
 {
 	if (m_z80dart)
 	{

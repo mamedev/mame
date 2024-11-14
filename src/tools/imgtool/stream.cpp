@@ -14,13 +14,15 @@
 
 #include "corefile.h"
 #include "ioprocs.h"
+#include "path.h"
 #include "unzip.h"
 
 #include <cassert>
+#include <cstdarg>
 #include <cstdio>
 #include <cstring>
+#include <tuple>
 
-#include <zlib.h> // for crc32
 
 
 namespace imgtool {
@@ -69,7 +71,7 @@ public:
 		return std::error_condition();
 	}
 
-	virtual std::error_condition read(void *buffer, std::size_t length, std::size_t &actual) noexcept override
+	virtual std::error_condition read_some(void *buffer, std::size_t length, std::size_t &actual) noexcept override
 	{
 		actual = m_stream->read(buffer, length);
 		if (actual < length)
@@ -77,7 +79,7 @@ public:
 		return std::error_condition();
 	}
 
-	virtual std::error_condition read_at(std::uint64_t offset, void *buffer, std::size_t length, std::size_t &actual) noexcept override
+	virtual std::error_condition read_some_at(std::uint64_t offset, void *buffer, std::size_t length, std::size_t &actual) noexcept override
 	{
 		std::uint64_t const pos = m_stream->tell();
 		m_stream->seek(offset, SEEK_SET);
@@ -110,7 +112,7 @@ public:
 		return std::error_condition();
 	}
 
-	virtual std::error_condition write(void const *buffer, std::size_t length, std::size_t &actual) noexcept override
+	virtual std::error_condition write_some(void const *buffer, std::size_t length, std::size_t &actual) noexcept override
 	{
 		std::uint64_t const pos = m_stream->tell();
 		std::uint64_t size = m_stream->size();
@@ -123,7 +125,7 @@ public:
 		return (actual == length) ? std::error_condition() : std::errc::io_error;
 	}
 
-	virtual std::error_condition write_at(std::uint64_t offset, void const *buffer, std::size_t length, std::size_t &actual) noexcept override
+	virtual std::error_condition write_some_at(std::uint64_t offset, void const *buffer, std::size_t length, std::size_t &actual) noexcept override
 	{
 		std::uint64_t const pos = m_stream->tell();
 		std::uint64_t size = m_stream->size();
@@ -390,13 +392,14 @@ util::core_file *stream::core_file()
 
 uint32_t stream::read(void *buf, uint32_t sz)
 {
+	std::error_condition err;
 	size_t result = 0;
 
 	switch(imgtype)
 	{
 		case IMG_FILE:
 			if (!file->seek(position, SEEK_SET))
-				file->read(buf, sz, result); // FIXME: check error return
+				std::tie(err, result) = util::read(*file, buf, sz); // FIXME: check error return
 			break;
 
 		case IMG_MEM:
@@ -423,6 +426,7 @@ uint32_t stream::read(void *buf, uint32_t sz)
 
 uint32_t stream::write(const void *buf, uint32_t sz)
 {
+	std::error_condition err;
 	size_t result = 0;
 
 	switch(imgtype)
@@ -454,7 +458,7 @@ uint32_t stream::write(const void *buf, uint32_t sz)
 
 		case IMG_FILE:
 			if (!file->seek(position, SEEK_SET))
-				file->write(buf, sz, result); // FIXME: check error return
+				std::tie(err, result) = util::write(*file, buf, sz); // FIXME: check error return
 			break;
 
 		default:
@@ -479,28 +483,6 @@ uint32_t stream::write(const void *buf, uint32_t sz)
 uint64_t stream::size() const
 {
 	return filesize;
-}
-
-
-//-------------------------------------------------
-//  getptr
-//-------------------------------------------------
-
-void *stream::getptr()
-{
-	void *ptr;
-
-	switch(imgtype)
-	{
-		case IMG_MEM:
-			ptr = buffer;
-			break;
-
-		default:
-			ptr = nullptr;
-			break;
-	}
-	return ptr;
 }
 
 
@@ -569,58 +551,6 @@ uint64_t stream::transfer(stream &dest, stream &source, uint64_t sz)
 uint64_t stream::transfer_all(stream &dest, stream &source)
 {
 	return transfer(dest, source, source.size());
-}
-
-
-//-------------------------------------------------
-//  crc
-//-------------------------------------------------
-
-int stream::crc(unsigned long *result)
-{
-	size_t sz;
-	void *ptr;
-
-	switch(imgtype)
-	{
-		case IMG_MEM:
-			*result = crc32(0, (unsigned char *) buffer, (size_t) filesize);
-			break;
-
-		default:
-			sz = size();
-			ptr = malloc(sz);
-			if (!ptr)
-				return IMGTOOLERR_OUTOFMEMORY;
-			seek(0, SEEK_SET);
-			if (read(ptr, sz) != sz)
-			{
-				free(ptr);
-				return IMGTOOLERR_READERROR;
-			}
-			*result = crc32(0, (const Bytef*)ptr, sz);
-			free(ptr);
-			break;
-	}
-	return 0;
-}
-
-
-//-------------------------------------------------
-//  file_crc
-//-------------------------------------------------
-
-int stream::file_crc(const char *fname, unsigned long *result)
-{
-	int err;
-	stream::ptr f;
-
-	f = stream::open(fname, OSD_FOPEN_READ);
-	if (!f)
-		return IMGTOOLERR_FILENOTFOUND;
-
-	err = f->crc(result);
-	return err;
 }
 
 

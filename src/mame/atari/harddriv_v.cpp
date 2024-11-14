@@ -387,21 +387,21 @@ void harddriv_state::hdgsp_paletteram_hi_w(offs_t offset, uint16_t data, uint16_
  *
  *************************************/
 
-static void display_speedups(void)
+void harddriv_state::display_speedups()
 {
 #if DISPLAY_SPEEDUPS
 	char temp[200];
-	sprintf(temp, "GSP:%d/%d/%d/%d",
-			gsp_speedup_count[0], gsp_speedup_count[1],
-			gsp_speedup_count[2], gsp_speedup_count[3]);
+	snprintf(temp, std::size(temp), "GSP:%d/%d/%d/%d",
+			m_gsp_speedup_count[0], m_gsp_speedup_count[1],
+			m_gsp_speedup_count[2], m_gsp_speedup_count[3]);
 	ui_draw_text(temp, 0, 0);
-	sprintf(temp, "MSP:%d/%d/%d/%d",
-			msp_speedup_count[0], msp_speedup_count[1],
-			msp_speedup_count[2], msp_speedup_count[3]);
+	snprintf(temp, std::size(temp), "MSP:%d/%d/%d/%d",
+			m_msp_speedup_count[0], m_msp_speedup_count[1],
+			m_msp_speedup_count[2], m_msp_speedup_count[3]);
 	ui_draw_text(temp, 0, 10);
-	sprintf(temp, "ADSP:%d/%d/%d/%d",
-			adsp_speedup_count[0], adsp_speedup_count[1],
-			adsp_speedup_count[2], adsp_speedup_count[3]);
+	snprintf(temp, std::size(temp), "ADSP:%d/%d/%d/%d",
+			m_adsp_speedup_count[0], m_adsp_speedup_count[1],
+			m_adsp_speedup_count[2], m_adsp_speedup_count[3]);
 	ui_draw_text(temp, 0, 20);
 #endif
 }

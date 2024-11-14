@@ -6,8 +6,8 @@
 
 ***************************************************************************/
 
-#ifndef MAME_VIDEO_SEIBU_CRTC_H
-#define MAME_VIDEO_SEIBU_CRTC_H
+#ifndef MAME_SEIBU_SEIBU_CRTC_H
+#define MAME_SEIBU_SEIBU_CRTC_H
 
 #pragma once
 
@@ -44,12 +44,12 @@ public:
 	void layer_scroll_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	void layer_scroll_base_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
-	void seibu_crtc_vregs(address_map &map);
+	void seibu_crtc_vregs(address_map &map) ATTR_COLD;
 protected:
 	// device-level overrides
 	virtual void device_validity_check(validity_checker &valid) const override;
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 	virtual space_config_vector memory_space_config() const override;
 
 private:
@@ -69,4 +69,4 @@ private:
 // device type definition
 DECLARE_DEVICE_TYPE(SEIBU_CRTC, seibu_crtc_device)
 
-#endif // MAME_VIDEO_SEIBU_CRTC_H
+#endif // MAME_SEIBU_SEIBU_CRTC_H

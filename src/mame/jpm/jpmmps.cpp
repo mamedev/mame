@@ -132,6 +132,9 @@
 #include "j2trail.lh"
 #include "j2tstplt.lh"
 
+
+namespace {
+
 #define UART_IC5 "tms9902_ic5"
 #define UART_IC10 "tms9902_ic10"
 
@@ -153,10 +156,10 @@ public:
 private:
 	uint8_t m_sound_buffer = 0;
 	uint8_t m_psg_latch = 0;
-	virtual void machine_reset() override;
+	virtual void machine_reset() override ATTR_COLD;
 
-	void jpmmps_io_map(address_map &map);
-	void jpmmps_map(address_map &map);
+	void jpmmps_io_map(address_map &map) ATTR_COLD;
+	void jpmmps_map(address_map &map) ATTR_COLD;
 
 	// devices
 	required_device<tms9995_device> m_maincpu;
@@ -2126,6 +2129,7 @@ ROM_START( j2sset )
 	ROM_LOAD( "sunset_strip_v2_0.bin", 0x0000, 0x008000, CRC(cbd2adea) SHA1(5c7d324d690a2ef0b85f3db323a0b4608b9e59b6) )
 ROM_END
 
+} // anonymous namespace
 
 
 GAMEL( 198?, j2adnote,  0,        jpmmps, jpmmps, jpmmps_state, empty_init, ROT0, "JPM","Add A Note (JPM) (MPS, set 1)", MACHINE_IS_SKELETON_MECHANICAL, layout_j2adnote )

@@ -1,6 +1,6 @@
 INSTALLATION INSTRUCTIONS for the Independent JPEG Group's JPEG software
 
-Copyright (C) 1991-2015, Thomas G. Lane, Guido Vollbeding.
+Copyright (C) 1991-2021, Thomas G. Lane, Guido Vollbeding.
 This file is part of the Independent JPEG Group's software.
 For conditions of distribution and use, see the accompanying README file.
 
@@ -147,10 +147,15 @@ makefile.bcc	jconfig.bcc	MS-DOS or OS/2, Borland C
 makefile.dj	jconfig.dj	MS-DOS, DJGPP (Delorie's port of GNU C)
 makefile.mc6	jconfig.mc6	MS-DOS, Microsoft C (16-bit only)
 makefile.wat	jconfig.wat	MS-DOS, OS/2, or Windows NT, Watcom C
-makefile.vc	jconfig.vc	Windows NT/9x, MS Visual C++
-make*.vc6	jconfig.vc	Windows NT/9x, MS Visual C++ 6
-make*.v10	jconfig.vc	Windows NT/9x, MS Visual C++ 2010 (v10)
-makefile.b32	jconfig.vc	Windows NT/9x, Borland C++ 32-bit (bcc32)
+makefile.vc	jconfig.vc	Windows, MS Visual C++
+makefile.vs	jconfig.vc	Windows, MS Visual C++ 6 Developer Studio
+make*.vc6
+makefile.vs	jconfig.vc	Windows, Visual Studio 2019 Version 16
+make*.v16
+makefile.vs	jconfig.vc	Windows, Visual Studio 2022 Version 17
+make*.v16
+make*.v17
+makefile.b32	jconfig.vc	Windows, Borland C++ 32-bit (bcc32)
 makefile.mms	jconfig.vms	Digital VMS, with MMS software
 makefile.vms	jconfig.vms	Digital VMS, without MMS software
 
@@ -318,6 +323,7 @@ As a quick test of functionality we've included a small sample image in
 several forms:
 	testorig.jpg	Starting point for the djpeg tests.
 	testimg.ppm	The output of djpeg testorig.jpg
+	testimg.gif	The output of djpeg -gif testorig.jpg
 	testimg.bmp	The output of djpeg -bmp -colors 256 testorig.jpg
 	testimg.jpg	The output of cjpeg testimg.ppm
 	testprog.jpg	Progressive-mode equivalent of testorig.jpg.
@@ -1019,57 +1025,142 @@ the configuration to prevent jpeglib.h from using extern "C".
 
 Microsoft Windows, Microsoft Visual C++ 6 Developer Studio:
 
-We include makefiles that should work as project files in DevStudio 6.0 or
-later.  There is a library makefile that builds the IJG library as a static
-Win32 library, and application makefiles that build the sample applications
-as Win32 console applications.  (Even if you only want the library, we
-recommend building the applications so that you can run the self-test.)
-
-To use:
-1. Open the command prompt, change to the main directory and execute the
-   command line
-	NMAKE /f makefile.vc  setup-vc6
-   This will move jconfig.vc to jconfig.h and makefiles to project files.
-   (Note that the renaming is critical!)
-2. Open the workspace file jpeg.dsw, build the library project.
-   (If you are using DevStudio more recent than 6.0, you'll probably
-   get a message saying that the project files are being updated.)
-3. Open the workspace file apps.dsw, build the application projects.
-4. To perform the self-test, execute the command line
-	NMAKE /f makefile.vc  test-build
-5. Move the application .exe files from `app`\Release to an
-   appropriate location on your path.
-
-
-Microsoft Windows, Microsoft Visual C++ 2010 Developer Studio (v10):
-
-We include makefiles that should work as project files in Visual Studio
-2010 or later.  There is a library makefile that builds the IJG library
-as a static Win32 library, and application makefiles that build the sample
+We include makefiles that should work as project files in Developer Studio
+6.0 or later.  There is a library makefile that builds the IJG library as
+a static Win32 library, and application makefiles that build the sample
 applications as Win32 console applications.  (Even if you only want the
 library, we recommend building the applications so that you can run the
 self-test.)
 
 To use:
-1. Open the command prompt, change to the main directory and execute the
-   command line
-	NMAKE /f makefile.vc  setup-v10
+1. Open the Windows Command Prompt, change to the source directory and
+   execute the command line
+	nmake /f makefile.vs setup-vc6
+   If you get an error message saying that the "nmake" command could
+   not be found, execute the command
+	"%ProgramFiles%\Microsoft Visual Studio\VC98\Bin\VCVARS32"
+   to set the environment for using Microsoft Visual C++ tools,
+   and repeat the nmake call.
    This will move jconfig.vc to jconfig.h and makefiles to project files.
    (Note that the renaming is critical!)
-2. Open the solution file jpeg.sln, build the library project.
-   (If you are using Visual Studio more recent than 2010 (v10), you'll
+   Alternatively you can use
+	nmake /f makefile.vs setupcopy-vc6
+   This will create renamed copies of the files, which allows to repeat
+   the setup later.
+2. Open the workspace file jpeg.dsw, build the library project.
+   (If you are using Developer Studio more recent than 6.0, you'll
    probably get a message saying that the project files are being updated.)
-3. Open the solution file apps.sln, build the application projects.
+3. Open the workspace file apps.dsw, build the application projects.
 4. To perform the self-test, execute the command line
-	NMAKE /f makefile.vc  test-build
-5. Move the application .exe files from `app`\Release to an
+	nmake /f makefile.vs test-build
+5. Move the application .exe files from the Release folder to an
    appropriate location on your path.
 
-Note:
-There seems to be an optimization bug in the compiler which causes the
-self-test to fail with the color quantization option.
-We have disabled optimization for the file jquant2.c in the library
-project file which causes the self-test to pass properly.
+
+Microsoft Windows, Visual Studio 2019 Version 16:
+
+We include makefiles that should work as project files in Visual Studio
+2019 Version 16 or later.  There is a library makefile that builds the
+IJG library as a static Win32/x64/ARM/ARM64 library, and application
+makefiles that build the sample applications as Win32/x64/ARM/ARM64
+console applications.  (Even if you only want the library, we recommend
+building the applications so that you can run the self-test.)
+
+To use:
+1. Ensure you’ve checked the item "Desktop development with C++" in the
+   Workloads tab of Visual Studio Installer.
+   Open the Developer Command Prompt for VS 2019, change to the source
+   directory and execute the command line
+	nmake /f makefile.vs setup-v16
+   This will move jconfig.vc to jconfig.h and makefiles to project files.
+   (Note that the renaming is critical!)
+   Alternatively you can use
+	nmake /f makefile.vs setupcopy-v16
+   This will create renamed copies of the files, which allows to repeat
+   the setup later.
+2. Open the solution file jpeg.sln, build the library project.
+     a) If you are using Visual Studio more recent than
+	2019 Version 16, you'll probably get a message
+	saying that the project files are being updated.
+     b) If necessary, open the project properties and
+	adapt the Windows Target Platform Version in
+	the Configuration Properties, General section;
+	we support the latest version at the time of release.
+     c) If you get a warning saying that a platform cannot be found,
+	you can either
+	  * forgo the platform and ignore the warning, or
+	  * remove the platform in the Configuration Manager, or
+	  * install the corresponding platform Buildtools in
+	    Visual Studio Installer (Workloads tab Optional components
+	    or Individual components tab).
+     d) If you want to build x64 code, change the platform setting from
+	Win32 to x64.  You can build Win32 and x64 versions side by side.
+     e) If you want to build ARM/ARM64 code, change the platform setting
+	to ARM/ARM64.  Ensure you've installed the ARM/ARM64-Buildtools
+	in Visual Studio Installer (Workloads tab Optional components
+	or Individual components tab).
+	You can build Win32/x64/ARM/ARM64 versions side by side.
+3. Open the solution file apps.sln, build the application projects.
+4. To perform the self-test, execute the command line
+	nmake /f makefile.vs test-32
+   for the Win32 build, or on a 64-bit system
+	nmake /f makefile.vs test-64
+   for the x64 build.
+5. Move the application .exe files from the Release folder to an
+   appropriate location on your path.
+
+
+Microsoft Windows, Visual Studio 2022 Version 17:
+
+We include makefiles that should work as project files in Visual Studio
+2022 Version 17 or later.  There is a library makefile that builds the
+IJG library as a static Win32/x64/ARM/ARM64 library, and application
+makefiles that build the sample applications as Win32/x64/ARM/ARM64
+console applications.  (Even if you only want the library, we recommend
+building the applications so that you can run the self-test.)
+
+To use:
+1. Ensure you’ve checked the item "Desktop development with C++" in the
+   Workloads tab of Visual Studio Installer.
+   Open the Developer Command Prompt for VS 2022, change to the source
+   directory and execute the command line
+	nmake /f makefile.vs setup-v17
+   This will move jconfig.vc to jconfig.h and makefiles to project files.
+   (Note that the renaming is critical!)
+   Alternatively you can use
+	nmake /f makefile.vs setupcopy-v17
+   This will create renamed copies of the files, which allows to repeat
+   the setup later.
+2. Open the solution file jpeg.sln, build the library project.
+     a) If you are using Visual Studio more recent than
+	2022 Version 17, you'll probably get a message
+	saying that the project files are being updated.
+     b) If necessary, open the project properties and
+	adapt the Windows Target Platform Version in
+	the Configuration Properties, General section;
+	we support the latest version at the time of release.
+     c) If you get a warning saying that a platform cannot be found,
+	you can either
+	  * forgo the platform and ignore the warning, or
+	  * remove the platform in the Configuration Manager, or
+	  * install the corresponding platform Buildtools in
+	    Visual Studio Installer (Workloads tab Optional components
+	    or Individual components tab).
+     d) If you want to build x64 code, change the platform setting from
+	Win32 to x64.  You can build Win32 and x64 versions side by side.
+     e) If you want to build ARM/ARM64 code, change the platform setting
+	to ARM/ARM64.  Ensure you've installed the ARM/ARM64-Buildtools
+	in Visual Studio Installer (Workloads tab Optional components
+	or Individual components tab).
+	You can build Win32/x64/ARM/ARM64 versions side by side.
+3. Open the solution file apps.sln, build the application projects.
+4. To perform the self-test, execute the command line
+	nmake /f makefile.vs test-32
+   for the Win32 build, or on a 64-bit system
+	nmake /f makefile.vs test-64
+   for the x64 build.
+5. Move the application .exe files from the Release folder to an
+   appropriate location on your path.
 
 
 OS/2, Borland C++:

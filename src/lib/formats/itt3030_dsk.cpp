@@ -2,7 +2,7 @@
 // copyright-holders:Olivier Galibert
 /*********************************************************************
 
-    formats/itt3030_dsk.c
+    formats/itt3030_dsk.cpp
 
     ITT3030 560K disk image format
 
@@ -16,17 +16,17 @@ itt3030_format::itt3030_format() : wd177x_format(formats)
 {
 }
 
-const char *itt3030_format::name() const
+const char *itt3030_format::name() const noexcept
 {
 	return "itt3030";
 }
 
-const char *itt3030_format::description() const
+const char *itt3030_format::description() const noexcept
 {
 	return "ITT3030 disk image";
 }
 
-const char *itt3030_format::extensions() const
+const char *itt3030_format::extensions() const noexcept
 {
 	return "dsk";
 }

@@ -56,10 +56,10 @@ public:
 	using opcode_delegate = device_delegate<void (uint16_t)>;
 	using int_delegate = device_delegate<uint8_t (offs_t)>;
 
-	DECLARE_WRITE_LINE_MEMBER(dmar_w);
-	DECLARE_WRITE_LINE_MEMBER(halt_w);
-	DECLARE_WRITE_LINE_MEMBER(status_w);
-	DECLARE_WRITE_LINE_MEMBER(flag_w);
+	void dmar_w(int state);
+	void halt_w(int state);
+	void status_w(int state);
+	void flag_w(int state);
 
 	uint8_t pa_r() const { return m_reg_PA[0]; }
 
@@ -98,12 +98,11 @@ protected:
 	hp_hybrid_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint8_t addrwidth);
 
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// device_execute_interface overrides
 	virtual uint32_t execute_min_cycles() const noexcept override { return m_r_cycles; }
-	virtual uint32_t execute_input_lines() const noexcept override { return 2; }
 	virtual uint32_t execute_default_irq_vector(int inputnum) const noexcept override { return 0xff; }
 	virtual void execute_run() override;
 	virtual void execute_set_input(int inputnum, int state) override;
@@ -254,8 +253,8 @@ public:
 	void set_9845_boot_mode(bool mode) { m_boot_mode = mode; }
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 	// TODO: fix
 	virtual uint32_t execute_max_cycles() const noexcept override { return 237; }       // FMP 15
 
@@ -279,7 +278,7 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 	// device_execute_interface overrides
 	// TODO: fix

@@ -8,21 +8,13 @@
 
 ***************************************************************************/
 
-#ifndef MAME_INCLUDES_COCO3_H
-#define MAME_INCLUDES_COCO3_H
+#ifndef MAME_TRS_COCO3_H
+#define MAME_TRS_COCO3_H
 
 #pragma once
 
 #include "coco12.h"
 #include "gime.h"
-
-
-//**************************************************************************
-//  MACROS / CONSTANTS
-//**************************************************************************
-
-#define GIME_TAG                "gime"
-#define VDG_TAG                 "vdg"
 
 
 //**************************************************************************
@@ -34,8 +26,10 @@ class coco3_state : public coco_state
 public:
 	coco3_state(const machine_config &mconfig, device_type type, const char *tag)
 		: coco_state(mconfig, type, tag)
-		, m_gime(*this, GIME_TAG)
-		, m_screen_config(*this, "screen_config") { }
+		, m_gime(*this, "gime")
+		, m_screen_config(*this, "screen_config")
+	{
+	}
 
 	virtual void ff20_write(offs_t offset, uint8_t data) override;
 	virtual uint8_t ff40_read(offs_t offset) override;
@@ -47,7 +41,7 @@ public:
 	void coco3h(machine_config &config);
 	void coco3dw1(machine_config &config);
 	void coco3(machine_config &config);
-	void coco3_mem(address_map &map);
+	void coco3_mem(address_map &map) ATTR_COLD;
 
 protected:
 	virtual void update_cart_base(uint8_t *cart_base) override;
@@ -63,4 +57,4 @@ private:
 	required_ioport m_screen_config;
 };
 
-#endif // MAME_INCLUDES_COCO3_H
+#endif // MAME_TRS_COCO3_H

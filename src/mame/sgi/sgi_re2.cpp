@@ -15,7 +15,6 @@
 #include "debugger.h"
 #include "sgi_re2.h"
 
-#define LOG_GENERAL   (1U << 0)
 #define LOG_REG       (1U << 1)
 
 //#define VERBOSE       (LOG_GENERAL|LOG_REG)
@@ -64,9 +63,6 @@ sgi_re2_device::sgi_re2_device(machine_config const &mconfig, char const *tag, d
 
 void sgi_re2_device::device_start()
 {
-	m_rdy_cb.resolve();
-	m_drq_cb.resolve();
-
 	m_vram = std::make_unique<u32[]>(1280 * 1024);
 	m_dram = std::make_unique<u32[]>(1280 * 1024);
 
@@ -231,9 +227,9 @@ void sgi_re2_device::execute()
 	m_pupdata = m_reg[REG_PUPDATA];
 	m_pat = (m_reg[REG_PATH] << 16) | m_reg[REG_PATL];
 	m_dz = (s64(u64(m_reg[REG_DZI]) << 40) >> 26) | m_reg[REG_DZF];
-	m_dr = s32(m_reg[REG_DR] << 8) >> 8;
-	m_dg = s32(m_reg[REG_DG] << 12) >> 12;
-	m_db = s32(m_reg[REG_DB] << 12) >> 12;
+	m_dr = util::sext(m_reg[REG_DR], 24);
+	m_dg = util::sext(m_reg[REG_DG], 20);
+	m_db = util::sext(m_reg[REG_DB], 20);
 	m_z = s64(u64(m_reg[REG_Z]) << 40) >> 26;
 	m_r = m_reg[REG_R];
 	m_g = m_reg[REG_G];

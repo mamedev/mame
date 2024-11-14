@@ -6,8 +6,8 @@
 
 *********************************************************************/
 
-#ifndef MAME_MACHINE_TANDY2KB_H
-#define MAME_MACHINE_TANDY2KB_H
+#ifndef MAME_TRS_TANDY2KB_H
+#define MAME_TRS_TANDY2KB_H
 
 #pragma once
 
@@ -37,19 +37,19 @@ public:
 	auto clock_wr_callback() { return m_write_clock.bind(); }
 	auto data_wr_callback() { return m_write_data.bind(); }
 
-	DECLARE_WRITE_LINE_MEMBER( power_w );
-	DECLARE_WRITE_LINE_MEMBER( reset_w );
-	DECLARE_WRITE_LINE_MEMBER( busy_w );
-	DECLARE_READ_LINE_MEMBER( data_r );
+	void power_w(int state);
+	void reset_w(int state);
+	void busy_w(int state);
+	int data_r();
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 	// optional information overrides
-	virtual const tiny_rom_entry *device_rom_region() const override;
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual ioport_constructor device_input_ports() const override;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 
 private:
 	enum
@@ -79,4 +79,4 @@ private:
 // device type definition
 DECLARE_DEVICE_TYPE(TANDY2K_KEYBOARD, tandy2k_keyboard_device)
 
-#endif // MAME_MACHINE_TANDY2KB_H
+#endif // MAME_TRS_TANDY2KB_H

@@ -5,7 +5,6 @@
  *
  */
 
-#include "emu.h"
 #include "modules/osdmodule.h"
 #include "monitor_module.h"
 
@@ -15,6 +14,7 @@
 #include <windows.h>
 #undef interface
 
+#include "osdcore.h"
 #include "strconv.h"
 #include "windows/video.h"
 #include "window.h"

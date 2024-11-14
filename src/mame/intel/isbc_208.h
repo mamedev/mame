@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Carl
-#ifndef MAME_MACHINE_ISBC_208_H
-#define MAME_MACHINE_ISBC_208_H
+#ifndef MAME_INTEL_ISBC_208_H
+#define MAME_INTEL_ISBC_208_H
 
 #pragma once
 
@@ -21,16 +21,16 @@ public:
 
 	isbc_208_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	void map(address_map &map);
+	void map(address_map &map) ATTR_COLD;
 	uint8_t stat_r(offs_t offset);
 	void aux_w(offs_t offset, uint8_t data);
 
 	auto irq_callback() { return m_out_irq_func.bind(); }
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -42,13 +42,13 @@ private:
 	u16 m_seg;
 	address_space *m_maincpu_mem;
 
-	DECLARE_WRITE_LINE_MEMBER(out_eop_w);
-	DECLARE_WRITE_LINE_MEMBER(hreq_w);
+	void out_eop_w(int state);
+	void hreq_w(int state);
 	uint8_t dma_read_byte(offs_t offset);
 	void dma_write_byte(offs_t offset, uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(irq_w);
+	void irq_w(int state);
 };
 
 DECLARE_DEVICE_TYPE(ISBC_208, isbc_208_device)
 
-#endif // MAME_MACHINE_ISBC_208_H
+#endif // MAME_INTEL_ISBC_208_H

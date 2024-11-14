@@ -1,9 +1,8 @@
 /*
- * Copyright 2011-2021 Branimir Karadzic. All rights reserved.
- * License: https://github.com/bkaradzic/bx#license-bsd-2-clause
+ * Copyright 2011-2022 Branimir Karadzic. All rights reserved.
+ * License: https://github.com/bkaradzic/bx/blob/master/LICENSE
  */
 
-#include "bx_p.h"
 #include <bx/hash.h>
 
 namespace bx
@@ -134,7 +133,7 @@ void HashCrc32::begin(Enum _type)
 	m_table = s_crcTable[_type];
 }
 
-void HashCrc32::add(const void* _data, int _len)
+void HashCrc32::add(const void* _data, int32_t _len)
 {
 	const uint8_t* data = (const uint8_t*)_data;
 
@@ -146,6 +145,124 @@ void HashCrc32::add(const void* _data, int _len)
 	}
 
 	m_hash = hash;
+}
+
+struct HashMurmur2APod
+{
+	uint32_t m_hash;
+	uint32_t m_tail;
+	uint32_t m_count;
+	uint32_t m_size;
+};
+BX_STATIC_ASSERT(sizeof(HashMurmur2A) == sizeof(HashMurmur2APod) );
+
+BX_FORCE_INLINE void mmix(uint32_t& _h, uint32_t& _k)
+{
+	constexpr uint32_t kMurmurMul = 0x5bd1e995;
+	constexpr uint32_t kMurmurRightShift = 24;
+
+	_k *= kMurmurMul;
+	_k ^= _k >> kMurmurRightShift;
+	_k *= kMurmurMul;
+	_h *= kMurmurMul;
+	_h ^= _k;
+}
+
+static void mixTail(HashMurmur2APod& _self, const uint8_t*& _data, int32_t& _len)
+{
+	while (_len
+	&&  ( (_len<4) || _self.m_count)
+		)
+	{
+		_self.m_tail |= (*_data++) << (_self.m_count * 8);
+
+		_self.m_count++;
+		_len--;
+
+		if (_self.m_count == 4)
+		{
+			mmix(_self.m_hash, _self.m_tail);
+			_self.m_tail  = 0;
+			_self.m_count = 0;
+		}
+	}
+}
+
+BX_FORCE_INLINE uint32_t readAligned(const uint8_t* _data)
+{
+	return *(uint32_t*)_data;
+}
+
+BX_FORCE_INLINE uint32_t readUnaligned(const uint8_t* _data)
+{
+	if (BX_ENABLED(BX_CPU_ENDIAN_BIG) )
+	{
+		return 0
+			| _data[0]<<24
+			| _data[1]<<16
+			| _data[2]<<8
+			| _data[3]
+			;
+	}
+	else
+	{
+		return 0
+			| _data[0]
+			| _data[1]<<8
+			| _data[2]<<16
+			| _data[3]<<24
+			;
+	}
+}
+
+typedef uint32_t (*ReadDataFn)(const uint8_t* _data);
+
+template<ReadDataFn FnT>
+static void addData(HashMurmur2APod& _self, const uint8_t* _data, int32_t _len)
+{
+	while (_len >= 4)
+	{
+		uint32_t kk = FnT(_data);
+
+		mmix(_self.m_hash, kk);
+
+		_data += 4;
+		_len  -= 4;
+	}
+
+	mixTail(_self, _data, _len);
+}
+
+void HashMurmur2A::add(const void* _data, int32_t _len)
+{
+	HashMurmur2APod& self = *(HashMurmur2APod*)this;
+
+	const uint8_t* data = (const uint8_t*)_data;
+
+	m_size += _len;
+	mixTail(self, data, _len);
+
+	if (BX_UNLIKELY(!isAligned(data, 4) ) )
+	{
+		addData<readUnaligned>(self, data, _len);
+		return;
+	}
+
+	addData<readAligned>(self, data, _len);
+}
+
+uint32_t HashMurmur2A::end()
+{
+	constexpr uint32_t kMurmurMul = 0x5bd1e995;
+
+	mmix(m_hash, m_tail);
+	mmix(m_hash, m_size);
+
+	m_hash ^= m_hash >> 13;
+	m_hash *= kMurmurMul;
+	m_hash ^= m_hash >> 15;
+
+	return m_hash;
 }
 
 } // namespace bx

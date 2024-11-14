@@ -24,7 +24,8 @@ TODO:
 ***************************************************************************/
 
 #include "emu.h"
-#include "video/mb_vcu.h"
+#include "mb_vcu.h"
+
 #include "video/resnet.h"
 
 

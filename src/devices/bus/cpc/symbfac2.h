@@ -27,8 +27,6 @@ public:
 	void ide_cs0_w(offs_t offset, uint8_t data);
 	uint8_t ide_cs1_r(offs_t offset);
 	void ide_cs1_w(offs_t offset, uint8_t data);
-	uint8_t rtc_r(offs_t offset);
-	void rtc_w(offs_t offset, uint8_t data);
 	uint8_t mouse_r();
 	uint8_t rom_rewrite_r();
 	void rom_rewrite_w(uint8_t data);
@@ -47,12 +45,12 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 // optional information overrides
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual ioport_constructor device_input_ports() const override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 
 private:
 	cpc_expansion_slot_device *m_slot;

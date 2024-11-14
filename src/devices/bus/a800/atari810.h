@@ -12,7 +12,7 @@
 #pragma once
 
 #include "a8sio.h"
-#include "machine/mos6530n.h"
+#include "machine/mos6530.h"
 #include "machine/wd_fdc.h"
 
 
@@ -24,25 +24,24 @@ public:
 	static constexpr feature_type unemulated_features() { return feature::DISK; }
 
 protected:
-	virtual void device_start() override;
-	virtual ioport_constructor device_input_ports() const override;
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual void device_start() override ATTR_COLD;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 
-	virtual DECLARE_WRITE_LINE_MEMBER(data_out_w) override;
-	virtual DECLARE_WRITE_LINE_MEMBER(command_w) override;
-	virtual DECLARE_WRITE_LINE_MEMBER(ready_w) override;
+	virtual void data_out_w(int state) override;
+	virtual void command_w(int state) override;
+	virtual void ready_w(int state) override;
 
 private:
 	void step_w(u8 data);
 
-	void mem_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
 
-	required_device<mos6532_new_device> m_pia;
+	required_device<mos6532_device> m_pia;
 	required_device<fd1771_device> m_fdc;
 };
 
-// device type declaration
 DECLARE_DEVICE_TYPE(ATARI810, atari810_device)
 
 #endif // MAME_BUS_A800_ATARI810

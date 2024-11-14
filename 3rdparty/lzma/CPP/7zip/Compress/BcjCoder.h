@@ -1,7 +1,7 @@
 // BcjCoder.h
 
-#ifndef __COMPRESS_BCJ_CODER_H
-#define __COMPRESS_BCJ_CODER_H
+#ifndef ZIP7_INC_COMPRESS_BCJ_CODER_H
+#define ZIP7_INC_COMPRESS_BCJ_CODER_H
 
 #include "../../../C/Bra.h"
 
@@ -12,18 +12,24 @@
 namespace NCompress {
 namespace NBcj {
 
-class CCoder:
-  public ICompressFilter,
-  public CMyUnknownImp
-{
-  UInt32 _bufferPos;
-  UInt32 _prevMask;
-  int _encode;
-public:
-  MY_UNKNOWN_IMP1(ICompressFilter);
-  INTERFACE_ICompressFilter(;)
+/* CCoder in old versions used another constructor parameter CCoder(int encode).
+   And some code called it as CCoder(0).
+   We have changed constructor parameter type.
+   So we have changed the name of class also to CCoder2. */
 
-  CCoder(int encode): _bufferPos(0), _encode(encode) { x86_Convert_Init(_prevMask); }
+Z7_CLASS_IMP_COM_1(
+  CCoder2
+  , ICompressFilter
+)
+  UInt32 _pc;
+  UInt32 _state;
+  z7_Func_BranchConvSt _convFunc;
+public:
+  CCoder2(z7_Func_BranchConvSt convFunc):
+      _pc(0),
+      _state(Z7_BRANCH_CONV_ST_X86_STATE_INIT_VAL),
+      _convFunc(convFunc)
+    {}
 };
 
 }}

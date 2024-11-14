@@ -22,7 +22,7 @@ ym2148_device::ym2148_device(const machine_config &mconfig, const char *tag, dev
 	, m_txd_handler(*this)
 	, m_irq_handler(*this)
 	, m_port_write_handler(*this)
-	, m_port_read_handler(*this)
+	, m_port_read_handler(*this, 0xff)
 	, m_irq_state(CLEAR_LINE)
 	, m_irq_vector(0xff) // guess
 	, m_external_irq_vector(0xff) // guess
@@ -38,11 +38,6 @@ ym2148_device::ym2148_device(const machine_config &mconfig, const char *tag, dev
 
 void ym2148_device::device_start()
 {
-	m_txd_handler.resolve_safe();
-	m_irq_handler.resolve_safe();
-	m_port_write_handler.resolve_safe();
-	m_port_read_handler.resolve_safe(0xff);
-
 	// Start a timer to trigger at clock / 8 / 16
 	const attotime rate = clocks_to_attotime(8 * 16);
 	m_timer = timer_alloc(FUNC(ym2148_device::serial_clock_tick), this);
@@ -212,7 +207,7 @@ uint8_t ym2148_device::get_irq_vector()
 }
 
 
-WRITE_LINE_MEMBER(ym2148_device::write_rxd)
+void ym2148_device::write_rxd(int state)
 {
 	m_rxd = state;
 }

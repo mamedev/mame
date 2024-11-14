@@ -42,10 +42,6 @@ void sn74s381_device::device_start()
 	save_item(NAME(m_f));
 	save_item(NAME(m_p));
 	save_item(NAME(m_g));
-
-	m_f_out.resolve_safe();
-	m_p_out.resolve_safe();
-	m_g_out.resolve_safe();
 }
 
 void sn74s381_device::device_reset()

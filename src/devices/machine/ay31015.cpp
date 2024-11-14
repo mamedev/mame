@@ -104,8 +104,8 @@ Start bit (low), Bit 0, Bit 1... highest bit, Parity bit (if enabled), 1-2 stop 
 DEFINE_DEVICE_TYPE(AY31015, ay31015_device, "ay31015", "AY-3-1015 UART")
 DEFINE_DEVICE_TYPE(AY51013, ay51013_device, "ay51013", "AY-5-1013 UART")
 
-ay31015_device::ay31015_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, type, tag, owner, clock),
+ay31015_device::ay31015_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, type, tag, owner, clock),
 	m_control_reg(0),
 	m_status_reg(0),
 	m_second_stop_bit(0),
@@ -120,7 +120,7 @@ ay31015_device::ay31015_device(const machine_config &mconfig, device_type type, 
 	m_tx_buffer(0),
 	m_tx_parity(0),
 	m_tx_pulses(0),
-	m_read_si_cb(*this),
+	m_read_si_cb(*this, 0),
 	m_write_so_cb(*this),
 	m_write_pe_cb(*this),
 	m_write_fe_cb(*this),
@@ -142,25 +142,6 @@ ay31015_device::ay31015_device(const machine_config &mconfig, const char *tag, d
 ay51013_device::ay51013_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: ay31015_device(mconfig, AY51013, tag, owner, clock)
 {
-}
-
-//-------------------------------------------------
-//  device_resolve_objects - resolve objects that
-//  may be needed for other devices to set
-//  initial conditions at start time
-//-------------------------------------------------
-
-void ay31015_device::device_resolve_objects()
-{
-	m_read_si_cb.resolve();
-	m_write_so_cb.resolve();
-
-	m_write_tbmt_cb.resolve();
-	m_write_dav_cb.resolve();
-	m_write_or_cb.resolve();
-	m_write_fe_cb.resolve();
-	m_write_pe_cb.resolve();
-	m_write_eoc_cb.resolve();
 }
 
 //-------------------------------------------------
@@ -208,7 +189,7 @@ void ay31015_device::device_reset()
 
 inline uint8_t ay31015_device::get_si()
 {
-	if (!m_read_si_cb.isnull())
+	if (!m_read_si_cb.isunset())
 		m_pins[SI] = m_read_si_cb();
 
 	return m_pins[SI];
@@ -218,9 +199,7 @@ inline uint8_t ay31015_device::get_si()
 inline void ay31015_device::set_so( int data )
 {
 	m_pins[SO] = data ? 1 : 0;
-
-	if (!m_write_so_cb.isnull())
-		m_write_so_cb(m_pins[SO]);
+	m_write_so_cb(m_pins[SO]);
 }
 
 
@@ -231,8 +210,7 @@ inline void ay31015_device::update_status_pin(uint8_t reg_bit, ay31015_device::o
 	if (new_value != m_pins[pin])
 	{
 		m_pins[pin] = new_value;
-		if (!write_cb.isnull())
-			write_cb(new_value);
+		write_cb(new_value);
 	}
 }
 

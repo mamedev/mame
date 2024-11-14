@@ -1,8 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood, ElSemi
 
-#ifndef MAME_MACHINE_IGS025_H
-#define MAME_MACHINE_IGS025_H
+#ifndef MAME_IGS_IGS025_H
+#define MAME_IGS_IGS025_H
 
 #pragma once
 
@@ -28,8 +28,8 @@ public:
 
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	igs025_execute_external m_execute_external;
 
@@ -56,4 +56,4 @@ protected:
 
 DECLARE_DEVICE_TYPE(IGS025, igs025_device)
 
-#endif // MAME_MACHINE_IGS025_H
+#endif // MAME_IGS_IGS025_H

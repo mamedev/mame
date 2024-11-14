@@ -31,6 +31,9 @@ ToDo:
 #include "sound/beep.h"
 #include "speaker.h"
 
+
+namespace {
+
 class brandt8641_state : public driver_device
 {
 public:
@@ -49,9 +52,9 @@ public:
 	void brandt8641(machine_config &config);
 
 private:
-	virtual void machine_start() override;
-	void io_map(address_map &map);
-	void mem_map(address_map &map);
+	virtual void machine_start() override ATTR_COLD;
+	void io_map(address_map &map) ATTR_COLD;
+	void mem_map(address_map &map) ATTR_COLD;
 	u8 port08_r();
 	void port08_w(u8 data);
 	void port09_w(u8 data);
@@ -208,6 +211,9 @@ ROM_START( br8641 )
 	ROM_REGION( 0x8000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD( "v0911he.u11", 0x0000, 0x8000, CRC(59a16951) SHA1(893dba60ec8bfa391fb2d2a30db5d42d601f5eb9))
 ROM_END
+
+} // anonymous namespace
+
 
 /* Driver */
 COMP( 1986, br8641, 0, 0, brandt8641, brandt8641, brandt8641_state, empty_init, "Brandt", "Brandt 8641", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )

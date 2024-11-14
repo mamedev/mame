@@ -41,8 +41,8 @@ public:
 	void stadhr96(machine_config &config);
 
 protected:
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -90,7 +90,7 @@ private:
 	void sh96_protection_region_0_146_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	DECLARE_WRITE_LINE_MEMBER(screen_vblank_mlc);
+	void screen_vblank_mlc(int state);
 	TIMER_DEVICE_CALLBACK_MEMBER(interrupt_gen);
 	void draw_sprites( const rectangle &cliprect, int scanline, u32* dest, u8* pri);
 	void drawgfxzoomline(u32* dest, u8* pri,const rectangle &clip,gfx_element *gfx,
@@ -99,7 +99,7 @@ private:
 		int scalex, int srcline, int shadowMode);
 	void descramble_sound();
 
-	void avengrgs_map(address_map &map);
-	void decomlc_146_map(address_map &map);
-	void decomlc_no146_map(address_map &map);
+	void avengrgs_map(address_map &map) ATTR_COLD;
+	void decomlc_146_map(address_map &map) ATTR_COLD;
+	void decomlc_no146_map(address_map &map) ATTR_COLD;
 };

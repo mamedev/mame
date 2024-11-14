@@ -73,11 +73,6 @@ gio64_device::gio64_device(const machine_config &mconfig, device_type type, cons
 {
 }
 
-void gio64_device::device_resolve_objects()
-{
-	m_interrupt_cb.resolve_all_safe();
-}
-
 void gio64_device::device_start()
 {
 	std::fill(std::begin(m_device_list), std::end(m_device_list), nullptr);

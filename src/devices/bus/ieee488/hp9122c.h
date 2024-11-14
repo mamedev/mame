@@ -28,13 +28,13 @@ public:
 	hp9122c_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// device-level overrides
-	virtual ioport_constructor device_input_ports() const override;
-	virtual const tiny_rom_entry *device_rom_region() const override;
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 	// device_ieee488_interface overrides
 	virtual void ieee488_eoi(int state) override;
@@ -91,29 +91,29 @@ private:
 	constexpr static int REG_STATUS_DISKCHG = 1 << 5;
 	constexpr static int REG_STATUS_LOW_DENSITY = 1 << 7;
 
-	DECLARE_WRITE_LINE_MEMBER(i8291a_eoi_w);
-	DECLARE_WRITE_LINE_MEMBER(i8291a_dav_w);
-	DECLARE_WRITE_LINE_MEMBER(i8291a_nrfd_w);
-	DECLARE_WRITE_LINE_MEMBER(i8291a_ndac_w);
-	DECLARE_WRITE_LINE_MEMBER(i8291a_ifc_w);
-	DECLARE_WRITE_LINE_MEMBER(i8291a_srq_w);
-	DECLARE_WRITE_LINE_MEMBER(i8291a_atn_w);
-	DECLARE_WRITE_LINE_MEMBER(i8291a_ren_w);
+	void i8291a_eoi_w(int state);
+	void i8291a_dav_w(int state);
+	void i8291a_nrfd_w(int state);
+	void i8291a_ndac_w(int state);
+	void i8291a_ifc_w(int state);
+	void i8291a_srq_w(int state);
+	void i8291a_atn_w(int state);
+	void i8291a_ren_w(int state);
 
 	uint8_t i8291a_dio_r();
 	void i8291a_dio_w(uint8_t data);
 
-	DECLARE_WRITE_LINE_MEMBER(i8291a_int_w);
-	DECLARE_WRITE_LINE_MEMBER(i8291a_dreq_w);
+	void i8291a_int_w(int state);
+	void i8291a_dreq_w(int state);
 
-	DECLARE_WRITE_LINE_MEMBER(fdc_intrq_w);
-	DECLARE_WRITE_LINE_MEMBER(fdc_drq_w);
+	void fdc_intrq_w(int state);
+	void fdc_drq_w(int state);
 
 	void cmd_w(uint8_t data);
 	uint8_t status_r();
 	void clridx_w(uint8_t data);
 
-	void cpu_map(address_map &map);
+	void cpu_map(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_cpu;
 	required_device<i8291a_device> m_i8291a;

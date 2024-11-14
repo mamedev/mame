@@ -6,8 +6,8 @@
 
 ***************************************************************************/
 
-#ifndef MAME_MACHINE_NMK004_H
-#define MAME_MACHINE_NMK004_H
+#ifndef MAME_NMK_NMK004_H
+#define MAME_NMK_NMK004_H
 
 #include "cpu/tlcs90/tlcs90.h"
 
@@ -23,17 +23,17 @@ public:
 	// host interface
 	void write(uint8_t data);
 	uint8_t read();
-	DECLARE_WRITE_LINE_MEMBER( nmi_w ) { m_cpu->set_input_line(INPUT_LINE_NMI, state); }
+	void nmi_w(int state) { m_cpu->set_input_line(INPUT_LINE_NMI, state); }
 
 	void port4_w(uint8_t data);
 	void ym2203_irq_handler(int irq);
 
-	void nmk004_sound_mem_map(address_map &map);
+	void nmk004_sound_mem_map(address_map &map) ATTR_COLD;
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual const tiny_rom_entry *device_rom_region() const override;
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_start() override ATTR_COLD;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 private:
 	// internal state
@@ -51,4 +51,4 @@ private:
 
 DECLARE_DEVICE_TYPE(NMK004, nmk004_device)
 
-#endif // MAME_MACHINE_NMK004_H
+#endif // MAME_NMK_NMK004_H

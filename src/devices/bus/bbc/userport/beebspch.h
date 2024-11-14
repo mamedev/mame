@@ -27,16 +27,16 @@ public:
 	// construction/destruction
 	bbc_beebspch_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_WRITE_LINE_MEMBER(cb1_w);
-	DECLARE_WRITE_LINE_MEMBER(cb2_w);
+	void cb1_w(int state);
+	void cb2_w(int state);
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 	// optional information overrides
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 
 	virtual void pb_w(uint8_t data) override;
 

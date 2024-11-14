@@ -4,6 +4,8 @@
 
 #include "../../../../C/CpuArch.h"
 
+#include "../../../Common/MyLinux.h"
+#include "../../../Common/StringToInt.h"
 #include "../../../Common/Wildcard.h"
 
 #include "../../Common/CreateCoder.h"
@@ -24,24 +26,43 @@
 namespace NArchive {
 namespace N7z {
 
-
 #define k_X86 k_BCJ
 
 struct CFilterMode
 {
   UInt32 Id;
-  UInt32 Delta;
+  UInt32 Delta;  // required File Size alignment, if Id is not k_Delta.
+                 // (Delta == 0) means unknown alignment
+  UInt32 Offset; // for k_ARM64
+  // UInt32 AlignSizeOpt; // for k_ARM64
 
-  CFilterMode(): Id(0), Delta(0) {}
+  CFilterMode():
+    Id(0),
+    Delta(0),
+    Offset(0)
+    // , AlignSizeOpt(0)
+    {}
 
+  void ClearFilterMode()
+  {
+    Id = 0;
+    Delta = 0;
+    Offset = 0;
+    // AlignSizeOpt = 0;
+  }
+
+  // it sets Delta as Align value, if Id is exe filter
+  // in another cases it sets Delta = 0, that
   void SetDelta()
   {
     if (Id == k_IA64)
       Delta = 16;
-    else if (Id == k_ARM || Id == k_PPC || Id == k_SPARC)
+    else if (Id == k_ARM64 || Id == k_ARM || Id == k_PPC || Id == k_SPARC)
       Delta = 4;
     else if (Id == k_ARMT)
       Delta = 2;
+    else if (Id == k_BCJ || Id == k_BCJ2)
+      Delta = 1; // do we need it?
     else
       Delta = 0;
   }
@@ -55,8 +76,8 @@ struct CFilterMode
 #define PE_SIG 0x00004550
 #define PE_OptHeader_Magic_32 0x10B
 #define PE_OptHeader_Magic_64 0x20B
-#define PE_SectHeaderSize 40
-#define PE_SECT_EXECUTE 0x20000000
+// #define PE_SectHeaderSize 40
+// #define PE_SECT_EXECUTE 0x20000000
 
 static int Parse_EXE(const Byte *buf, size_t size, CFilterMode *filterMode)
 {
@@ -78,6 +99,7 @@ static int Parse_EXE(const Byte *buf, size_t size, CFilterMode *filterMode)
   {
     case 0x014C:
     case 0x8664:  filterId = k_X86; break;
+    case 0xAA64:  filterId = k_ARM64; break;
     
     /*
     IMAGE_FILE_MACHINE_ARM   0x01C0  // ARM LE
@@ -94,6 +116,7 @@ static int Parse_EXE(const Byte *buf, size_t size, CFilterMode *filterMode)
     default:  return 0;
   }
 
+  // const UInt32 numSections = GetUi16(p + 2);
   optHeaderSize = GetUi16(p + 16);
   if (optHeaderSize > (1 << 10))
     return 0;
@@ -109,6 +132,63 @@ static int Parse_EXE(const Byte *buf, size_t size, CFilterMode *filterMode)
       return 0;
   }
 
+  /*
+    // Windows exe file sizes are not aligned for 4 KiB.
+    // So we can't use (CFilterMode::Offset != 0) in solid archives.
+    // So we just don't set Offset here.
+#define NUM_SCAN_SECTIONS_MAX (1 << 6)
+#define EXE_SECTION_OFFSET_MAX (1 << 27)
+#define EXE_SECTION_SIZE_MIN (1 << 8)
+#define EXE_SECTION_SIZE_MAX (1 << 27)
+#define PE_SectHeaderSize 40
+#define PE_SECT_EXECUTE 0x20000000
+
+  if (numSections > NUM_SCAN_SECTIONS_MAX)
+    return 0;
+
+  p += optHeaderSize;
+  // UInt32 numExeSections = 0;
+  // bool execute_finded = false;
+  // UInt32 sect_va = 0;
+  // UInt32 sect_size = 0;
+  // UInt32 sect_offset = 0;
+
+  for (UInt32 i = 0; i < numSections
+        // && numExeSections < numSectionsMax
+        ; i++, p += PE_SectHeaderSize)
+  {
+    UInt32 characts, rawSize, offset;
+    if ((UInt32)(p - buf) + PE_SectHeaderSize > size)
+      return 0;
+    rawSize = GetUi32(p + 16);
+    offset = GetUi32(p + 20);
+    characts = GetUi32(p + 36);
+    if (rawSize >= EXE_SECTION_SIZE_MIN &&
+        rawSize <= EXE_SECTION_SIZE_MAX &&
+        offset <= EXE_SECTION_OFFSET_MAX &&
+        // offset < limit &&
+        offset > 0)
+    {
+      if ((characts & PE_SECT_EXECUTE) != 0)
+      {
+        // execute_finded = true;
+        // sect_va = GetUi32(p + 12);
+        // sect_size = rawSize;
+        // sect_offset = offset;
+        break;
+      }
+    }
+  }
+
+  filterMode->Offset = 0;
+  if (filterId == k_ARM64)
+  {
+    // filterMode->AlignSizeOpt = (1 << 12);
+    // const UInt32 offs = (sect_va - sect_offset) & 0xFFF;
+    // if (offs != 0)
+    // filterMode->Offset = offs; // change it
+  }
+  */
   filterMode->Id = filterId;
   return 1;
 }
@@ -124,13 +204,13 @@ static int Parse_EXE(const Byte *buf, size_t size, CFilterMode *filterMode)
 #define ELF_DATA_2LSB 1
 #define ELF_DATA_2MSB 2
 
-static UInt16 Get16(const Byte *p, Bool be) { if (be) return (UInt16)GetBe16(p); return (UInt16)GetUi16(p); }
-static UInt32 Get32(const Byte *p, Bool be) { if (be) return GetBe32(p); return GetUi32(p); }
-// static UInt64 Get64(const Byte *p, Bool be) { if (be) return GetBe64(p); return GetUi64(p); }
+static UInt16 Get16(const Byte *p, BoolInt be) { if (be) return (UInt16)GetBe16(p); return (UInt16)GetUi16(p); }
+static UInt32 Get32(const Byte *p, BoolInt be) { if (be) return GetBe32(p); return GetUi32(p); }
+// static UInt64 Get64(const Byte *p, BoolInt be) { if (be) return GetBe64(p); return GetUi64(p); }
 
 static int Parse_ELF(const Byte *buf, size_t size, CFilterMode *filterMode)
 {
-  Bool /* is32, */ be;
+  BoolInt /* is32, */ be;
   UInt32 filterId;
 
   if (size < 512 || buf[6] != 1) /* ver */
@@ -164,8 +244,9 @@ static int Parse_ELF(const Byte *buf, size_t size, CFilterMode *filterMode)
     case 20:
     case 21: if (!be) return 0; filterId = k_PPC; break;
     case 40: if ( be) return 0; filterId = k_ARM; break;
-    
-    /* Some IA-64 ELF exacutable have size that is not aligned for 16 bytes.
+    case 183: if (be) return 0; filterId = k_ARM64; break;
+
+    /* Some IA-64 ELF executables have size that is not aligned for 16 bytes.
        So we don't use IA-64 filter for IA-64 ELF */
     // case 50: if ( be) return 0; filterId = k_IA64; break;
 
@@ -192,6 +273,7 @@ static int Parse_ELF(const Byte *buf, size_t size, CFilterMode *filterMode)
 #define MACH_MACHINE_PPC 18
 #define MACH_MACHINE_PPC64 (MACH_ARCH_ABI64 | MACH_MACHINE_PPC)
 #define MACH_MACHINE_AMD64 (MACH_ARCH_ABI64 | MACH_MACHINE_386)
+#define MACH_MACHINE_ARM64 (MACH_ARCH_ABI64 | MACH_MACHINE_ARM)
 
 static unsigned Parse_MACH(const Byte *buf, size_t size, CFilterMode *filterMode)
 {
@@ -200,7 +282,7 @@ static unsigned Parse_MACH(const Byte *buf, size_t size, CFilterMode *filterMode
   if (size < 512)
     return 0;
 
-  Bool /* mode64, */ be;
+  BoolInt /* mode64, */ be;
   switch (GetUi32(buf))
   {
     case MACH_SIG_BE_32: /* mode64 = False; */ be = True; break;
@@ -218,6 +300,7 @@ static unsigned Parse_MACH(const Byte *buf, size_t size, CFilterMode *filterMode
     case MACH_MACHINE_SPARC: if (!be) return 0; filterId = k_SPARC; break;
     case MACH_MACHINE_PPC:
     case MACH_MACHINE_PPC64: if (!be) return 0; filterId = k_PPC; break;
+    case MACH_MACHINE_ARM64: if ( be) return 0; filterId = k_ARM64; break;
     default: return 0;
   }
 
@@ -239,7 +322,7 @@ static unsigned Parse_MACH(const Byte *buf, size_t size, CFilterMode *filterMode
 
 #define RIFF_SIG 0x46464952
 
-static Bool Parse_WAV(const Byte *buf, size_t size, CFilterMode *filterMode)
+static BoolInt Parse_WAV(const Byte *buf, size_t size, CFilterMode *filterMode)
 {
   UInt32 subChunkSize, pos;
   if (size < 0x2C)
@@ -254,10 +337,12 @@ static Bool Parse_WAV(const Byte *buf, size_t size, CFilterMode *filterMode)
   if (subChunkSize < 0x10 || subChunkSize > 0x12 || GetUi16(buf + 0x14) != 1)
     return False;
   
-  unsigned numChannels = GetUi16(buf + 0x16);
-  unsigned bitsPerSample = GetUi16(buf + 0x22);
-
-  if ((bitsPerSample & 0x7) != 0 || bitsPerSample >= 256 || numChannels >= 256)
+  const unsigned numChannels = GetUi16(buf + 0x16);
+  const unsigned bitsPerSample = GetUi16(buf + 0x22);
+  if ((bitsPerSample & 0x7) != 0)
+    return False;
+  const UInt32 delta = (UInt32)numChannels * (bitsPerSample >> 3);
+  if (delta == 0 || delta > 256)
     return False;
 
   pos = 0x14 + subChunkSize;
@@ -271,9 +356,6 @@ static Bool Parse_WAV(const Byte *buf, size_t size, CFilterMode *filterMode)
     subChunkSize = GetUi32(buf + pos + 4);
     if (GetUi32(buf + pos) == WAV_SUBCHUNK_data)
     {
-      unsigned delta = numChannels * (bitsPerSample >> 3);
-      if (delta >= 256)
-        return False;
       filterMode->Id = k_Delta;
       filterMode->Delta = delta;
       return True;
@@ -285,10 +367,15 @@ static Bool Parse_WAV(const Byte *buf, size_t size, CFilterMode *filterMode)
   return False;
 }
 
-static Bool ParseFile(const Byte *buf, size_t size, CFilterMode *filterMode)
+
+/*
+  filterMode->Delta will be set as:
+    = delta value : [1, 256] : for k_Delta
+    = 0 for another filters (branch filters)
+*/
+static BoolInt ParseFile(const Byte *buf, size_t size, CFilterMode *filterMode)
 {
-  filterMode->Id = 0;
-  filterMode->Delta = 0;
+  filterMode->ClearFilterMode();
 
   if (Parse_EXE(buf, size, filterMode)) return True;
   if (Parse_ELF(buf, size, filterMode)) return True;
@@ -316,18 +403,44 @@ struct CFilterMode2: public CFilterMode
     else if (!m.Encrypted)
       return 1;
     
-    if (Id < m.Id) return -1;
-    if (Id > m.Id) return 1;
+    const UInt32 id1 = Id;
+    const UInt32 id2 = m.Id;
+    /*
+    // we can change the order to place k_ARM64 files close to another exe files
+    if (id1 <= k_SPARC &&
+        id2 <= k_SPARC)
+    {
+      #define k_ARM64_FOR_SORT 0x3030901
+      if (id1 == k_ARM64) id1 = k_ARM64_FOR_SORT;
+      if (id2 == k_ARM64) id2 = k_ARM64_FOR_SORT;
+    }
+    */
+    if (id1 < id2) return -1;
+    if (id1 > id2) return 1;
 
     if (Delta < m.Delta) return -1;
     if (Delta > m.Delta) return 1;
 
+    if (Offset < m.Offset) return -1;
+    if (Offset > m.Offset) return 1;
+
+    /* we don't go here, because GetGroup()
+       and operator ==(const CFilterMode2 &m)
+       add only unique CFilterMode2:: { Id, Delta, Offset, Encrypted } items.
+    */
+    /*
+    if (GroupIndex < m.GroupIndex) return -1;
+    if (GroupIndex > m.GroupIndex) return 1;
+    */
     return 0;
   }
   
   bool operator ==(const CFilterMode2 &m) const
   {
-    return Id == m.Id && Delta == m.Delta && Encrypted == m.Encrypted;
+    return Id == m.Id
+        && Delta == m.Delta
+        && Offset == m.Offset
+        && Encrypted == m.Encrypted;
   }
 };
 
@@ -368,6 +481,7 @@ static inline bool IsExeFilter(CMethodId m)
 {
   switch (m)
   {
+    case k_ARM64:
     case k_BCJ:
     case k_BCJ2:
     case k_ARM:
@@ -384,8 +498,9 @@ static unsigned Get_FilterGroup_for_Folder(
     CRecordVector<CFilterMode2> &filters, const CFolderEx &f, bool extractFilter)
 {
   CFilterMode2 m;
-  m.Id = 0;
-  m.Delta = 0;
+  // m.Id = 0;
+  // m.Delta = 0;
+  // m.Offset = 0;
   m.Encrypted = f.IsEncrypted();
 
   if (extractFilter)
@@ -406,6 +521,9 @@ static unsigned Get_FilterGroup_for_Folder(
       if (m.Id == k_BCJ2)
         m.Id = k_BCJ;
       m.SetDelta();
+      if (m.Id == k_ARM64)
+        if (coder.Props.Size() == 4)
+          m.Offset = GetUi32(coder.Props);
     }
   }
   
@@ -418,15 +536,15 @@ static unsigned Get_FilterGroup_for_Folder(
 static HRESULT WriteRange(IInStream *inStream, ISequentialOutStream *outStream,
     UInt64 position, UInt64 size, ICompressProgressInfo *progress)
 {
-  RINOK(inStream->Seek(position, STREAM_SEEK_SET, 0));
+  RINOK(InStream_SeekSet(inStream, position))
   CLimitedSequentialInStream *streamSpec = new CLimitedSequentialInStream;
-  CMyComPtr<CLimitedSequentialInStream> inStreamLimited(streamSpec);
+  CMyComPtr<ISequentialInStream> inStreamLimited(streamSpec);
   streamSpec->SetStream(inStream);
   streamSpec->Init(size);
 
   NCompress::CCopyCoder *copyCoderSpec = new NCompress::CCopyCoder;
   CMyComPtr<ICompressCoder> copyCoder = copyCoderSpec;
-  RINOK(copyCoder->Code(inStreamLimited, outStream, NULL, NULL, progress));
+  RINOK(copyCoder->Code(inStreamLimited, outStream, NULL, NULL, progress))
   return (copyCoderSpec->TotalSize == size ? S_OK : E_FAIL);
 }
 
@@ -446,7 +564,7 @@ UString CUpdateItem::GetExtension() const
 }
 */
 
-#define RINOZ(x) { int __tt = (x); if (__tt != 0) return __tt; }
+#define RINOZ(x) { const int _t_ = (x); if (_t_ != 0) return _t_; }
 
 #define RINOZ_COMP(a, b) RINOZ(MyCompare(a, b))
 
@@ -631,7 +749,7 @@ struct CRefItem
   unsigned NamePos;
   unsigned ExtensionIndex;
   
-  CRefItem() {};
+  CRefItem() {}
   CRefItem(UInt32 index, const CUpdateItem &ui, bool sortByType):
     UpdateItem(&ui),
     Index(index),
@@ -642,13 +760,13 @@ struct CRefItem
     if (sortByType)
     {
       int slashPos = ui.Name.ReverseFind_PathSepar();
-      NamePos = slashPos + 1;
+      NamePos = (unsigned)(slashPos + 1);
       int dotPos = ui.Name.ReverseFind_Dot();
       if (dotPos <= slashPos)
         ExtensionPos = ui.Name.Len();
       else
       {
-        ExtensionPos = dotPos + 1;
+        ExtensionPos = (unsigned)(dotPos + 1);
         if (ExtensionPos != ui.Name.Len())
         {
           AString s;
@@ -711,16 +829,16 @@ static int CompareUpdateItems(const CRefItem *p1, const CRefItem *p2, void *para
   
   // bool sortByType = *(bool *)param;
   const CSortParam *sortParam = (const CSortParam *)param;
-  bool sortByType = sortParam->SortByType;
+  const bool sortByType = sortParam->SortByType;
   if (sortByType)
   {
-    RINOZ_COMP(a1.ExtensionIndex, a2.ExtensionIndex);
-    RINOZ(CompareFileNames(u1.Name.Ptr(a1.ExtensionPos), u2.Name.Ptr(a2.ExtensionPos)));
-    RINOZ(CompareFileNames(u1.Name.Ptr(a1.NamePos), u2.Name.Ptr(a2.NamePos)));
+    RINOZ_COMP(a1.ExtensionIndex, a2.ExtensionIndex)
+    RINOZ(CompareFileNames(u1.Name.Ptr(a1.ExtensionPos), u2.Name.Ptr(a2.ExtensionPos)))
+    RINOZ(CompareFileNames(u1.Name.Ptr(a1.NamePos), u2.Name.Ptr(a2.NamePos)))
     if (!u1.MTimeDefined && u2.MTimeDefined) return 1;
     if (u1.MTimeDefined && !u2.MTimeDefined) return -1;
-    if (u1.MTimeDefined && u2.MTimeDefined) RINOZ_COMP(u1.MTime, u2.MTime);
-    RINOZ_COMP(u1.Size, u2.Size);
+    if (u1.MTimeDefined && u2.MTimeDefined) RINOZ_COMP(u1.MTime, u2.MTime)
+    RINOZ_COMP(u1.Size, u2.Size)
   }
   /*
   int par1 = a1.UpdateItem->ParentFolderIndex;
@@ -766,9 +884,9 @@ static int CompareUpdateItems(const CRefItem *p1, const CRefItem *p2, void *para
   }
   */
   // RINOZ_COMP(a1.UpdateItem->ParentSortIndex, a2.UpdateItem->ParentSortIndex);
-  RINOK(CompareFileNames(u1.Name, u2.Name));
-  RINOZ_COMP(a1.UpdateItem->IndexInClient, a2.UpdateItem->IndexInClient);
-  RINOZ_COMP(a1.UpdateItem->IndexInArchive, a2.UpdateItem->IndexInArchive);
+  RINOK(CompareFileNames(u1.Name, u2.Name))
+  RINOZ_COMP(a1.UpdateItem->IndexInClient, a2.UpdateItem->IndexInClient)
+  RINOZ_COMP(a1.UpdateItem->IndexInArchive, a2.UpdateItem->IndexInArchive)
   return 0;
 }
 
@@ -779,7 +897,7 @@ struct CSolidGroup
   CRecordVector<CFolderRepack> folderRefs;
 };
 
-static const char * const g_ExeExts[] =
+static const char * const g_Exe_Exts[] =
 {
     "dll"
   , "exe"
@@ -788,13 +906,64 @@ static const char * const g_ExeExts[] =
   , "sys"
 };
 
-static bool IsExeExt(const wchar_t *ext)
+static const char * const g_ExeUnix_Exts[] =
 {
-  for (unsigned i = 0; i < ARRAY_SIZE(g_ExeExts); i++)
-    if (StringsAreEqualNoCase_Ascii(ext, g_ExeExts[i]))
+    "so"
+  , "dylib"
+};
+
+static bool IsExt_Exe(const wchar_t *ext)
+{
+  for (unsigned i = 0; i < Z7_ARRAY_SIZE(g_Exe_Exts); i++)
+    if (StringsAreEqualNoCase_Ascii(ext, g_Exe_Exts[i]))
       return true;
   return false;
 }
+
+/*
+static bool IsExt_ExeUnix(const wchar_t *ext)
+{
+  for (unsigned i = 0; i < Z7_ARRAY_SIZE(g_ExeUnix_Exts); i++)
+    if (StringsAreEqualNoCase_Ascii(ext, g_ExeUnix_Exts[i]))
+      return true;
+  return false;
+}
+*/
+
+// we try to find "so" extension in such name: libstdc++.so.6.0.29
+static bool IsExt_ExeUnix_NumericAllowed(const UString &path)
+{
+  unsigned pos = path.Len();
+  unsigned dotPos = pos;
+  for (;;)
+  {
+    if (pos == 0)
+      return false;
+    const wchar_t c = path[--pos];
+    if (IS_PATH_SEPAR(c))
+      return false;
+    if (c == '.')
+    {
+      const unsigned num = (dotPos - pos) - 1;
+      if (num < 1)
+        return false;
+      const wchar_t *cur = path.Ptr(pos + 1);
+      for (unsigned i = 0; i < Z7_ARRAY_SIZE(g_ExeUnix_Exts); i++)
+      {
+        const char *ext = g_ExeUnix_Exts[i];
+        if (num == MyStringLen(ext))
+          if (IsString1PrefixedByString2_NoCase_Ascii(cur, ext))
+            return true;
+      }
+      const wchar_t *end;
+      ConvertStringToUInt32(cur, &end);
+      if ((size_t)(end - cur) != num)
+        return false;
+      dotPos = pos;
+    }
+  }
+}
+
 
 struct CAnalysis
 {
@@ -803,12 +972,26 @@ struct CAnalysis
 
   bool ParseWav;
   bool ParseExe;
+  bool ParseExeUnix;
+  bool ParseNoExt;
   bool ParseAll;
 
+  /*
+  bool Need_ATime;
+  bool ATime_Defined;
+  FILETIME ATime;
+  */
+
   CAnalysis():
-      ParseWav(true),
+      ParseWav(false),
       ParseExe(false),
+      ParseExeUnix(false),
+      ParseNoExt(false),
       ParseAll(false)
+      /*
+      , Need_ATime(false)
+      , ATime_Defined(false)
+      */
   {}
 
   HRESULT GetFilterGroup(UInt32 index, const CUpdateItem &ui, CFilterMode &filterMode);
@@ -820,32 +1003,46 @@ HRESULT CAnalysis::GetFilterGroup(UInt32 index, const CUpdateItem &ui, CFilterMo
 {
   filterMode.Id = 0;
   filterMode.Delta = 0;
+  filterMode.Offset = 0;
 
   CFilterMode filterModeTemp = filterMode;
 
-  int slashPos = ui.Name.ReverseFind_PathSepar();
-  int dotPos = ui.Name.ReverseFind_Dot();
+  const int slashPos = ui.Name.ReverseFind_PathSepar();
+  const int dotPos = ui.Name.ReverseFind_Dot();
 
   // if (dotPos > slashPos)
   {
     bool needReadFile = ParseAll;
-
+    /* if (Callback) is not supported by client,
+       we still try to use file name extension to detect executable file */
     bool probablyIsSameIsa = false;
 
     if (!needReadFile || !Callback)
     {
-      const wchar_t *ext;
+      const wchar_t *ext = NULL;
       if (dotPos > slashPos)
-        ext = ui.Name.Ptr(dotPos + 1);
-      else
-        ext = ui.Name.RightPtr(0);
-      
-      // p7zip uses the trick to store posix attributes in high 16 bits
+        ext = ui.Name.Ptr((unsigned)(dotPos + 1));
+      // 7-zip stores posix attributes in high 16 bits and sets (0x8000) flag
       if (ui.Attrib & 0x8000)
       {
-        unsigned st_mode = ui.Attrib >> 16;
-        // st_mode = 00111;
-        if ((st_mode & 00111) && (ui.Size >= 2048))
+        const unsigned st_mode = ui.Attrib >> 16;
+        /* note: executable ".so" can be without execute permission,
+           and symbolic link to such ".so" file is possible */
+        // st_mode = 00111; // for debug
+        /* in Linux we expect such permissions:
+             0755 : for most executables
+             0644 : for some ".so" files
+             0777 : in WSL for all files.
+                    We can try to exclude some such 0777 cases from analysis,
+                    if there is non-executable extension.
+        */
+
+        if ((st_mode & (
+              MY_LIN_S_IXUSR |
+              MY_LIN_S_IXGRP |
+              MY_LIN_S_IXOTH)) != 0
+            && MY_LIN_S_ISREG(st_mode)
+            && (ui.Size >= (1u << 11)))
         {
           #ifndef _WIN32
           probablyIsSameIsa = true;
@@ -854,73 +1051,114 @@ HRESULT CAnalysis::GetFilterGroup(UInt32 index, const CUpdateItem &ui, CFilterMo
         }
       }
 
-      if (IsExeExt(ext))
+      if (!needReadFile)
       {
-        needReadFile = true;
-        #ifdef _WIN32
-        probablyIsSameIsa = true;
-        needReadFile = ParseExe;
-        #endif
+        if (!ext)
+          needReadFile = ParseNoExt;
+        else
+        {
+          bool isUnixExt = false;
+          if (ParseExeUnix)
+            isUnixExt = IsExt_ExeUnix_NumericAllowed(ui.Name);
+          if (isUnixExt)
+          {
+            needReadFile = true;
+            #ifndef _WIN32
+              probablyIsSameIsa = true;
+            #endif
+          }
+          else if (IsExt_Exe(ext))
+          {
+            needReadFile = ParseExe;
+            #ifdef _WIN32
+              probablyIsSameIsa = true;
+            #endif
+          }
+          else if (StringsAreEqualNoCase_Ascii(ext, "wav"))
+          {
+            if (!needReadFile)
+              needReadFile = ParseWav;
+          }
+        }
       }
-      else if (StringsAreEqualNoCase_Ascii(ext, "wav"))
-      {
-        needReadFile = ParseWav;
-      }
-      /*
-      else if (!needReadFile && ParseUnixExt)
-      {
-        if (StringsAreEqualNoCase_Ascii(ext, "so")
-          || StringsAreEqualNoCase_Ascii(ext, ""))
-          
-          needReadFile = true;
-      }
-      */
     }
 
-    if (needReadFile && Callback)
+    if (needReadFile)
     {
-      if (Buffer.Size() != kAnalysisBufSize)
+      BoolInt parseRes = false;
+      if (Callback)
       {
-        Buffer.Alloc(kAnalysisBufSize);
-      }
-      {
+        if (Buffer.Size() != kAnalysisBufSize)
+          Buffer.Alloc(kAnalysisBufSize);
         CMyComPtr<ISequentialInStream> stream;
         HRESULT result = Callback->GetStream2(index, &stream, NUpdateNotifyOp::kAnalyze);
         if (result == S_OK && stream)
         {
+          /*
+          if (Need_ATime)
+          {
+            // access time could be changed in analysis pass
+            CMyComPtr<IStreamGetProps> getProps;
+            stream.QueryInterface(IID_IStreamGetProps, (void **)&getProps);
+            if (getProps)
+              if (getProps->GetProps(NULL, NULL, &ATime, NULL, NULL) == S_OK)
+                ATime_Defined = true;
+          }
+          */
           size_t size = kAnalysisBufSize;
           result = ReadStream(stream, Buffer, &size);
           stream.Release();
           // RINOK(Callback->SetOperationResult2(index, NUpdate::NOperationResult::kOK));
           if (result == S_OK)
           {
-            Bool parseRes = ParseFile(Buffer, size, &filterModeTemp);
-            if (parseRes && filterModeTemp.Delta == 0)
-            {
-              filterModeTemp.SetDelta();
-              if (filterModeTemp.Delta != 0 && filterModeTemp.Id != k_Delta)
-              {
-                if (ui.Size % filterModeTemp.Delta != 0)
-                {
-                  parseRes = false;
-                }
-              }
-            }
-            if (!parseRes)
-            {
-              filterModeTemp.Id = 0;
-              filterModeTemp.Delta = 0;
-            }
+            parseRes = ParseFile(Buffer, size, &filterModeTemp);
           }
         }
+      } // Callback
+      else if (probablyIsSameIsa)
+      {
+        #ifdef MY_CPU_X86_OR_AMD64
+          filterModeTemp.Id = k_X86;
+        #endif
+        #ifdef MY_CPU_ARM64
+          filterModeTemp.Id = k_ARM64;
+        #endif
+        parseRes = true;
       }
-    }
-    else if ((needReadFile && !Callback) || probablyIsSameIsa)
-    {
-      #ifdef MY_CPU_X86_OR_AMD64
-      if (probablyIsSameIsa)
-        filterModeTemp.Id = k_X86;
-      #endif
+
+      if (parseRes
+          && filterModeTemp.Id != k_Delta
+          && filterModeTemp.Delta == 0)
+      {
+        /* ParseFile() sets (filterModeTemp.Delta == 0) for all
+           methods except of k_Delta. */
+        // it's not k_Delta
+        // So we call SetDelta() to set Delta
+        filterModeTemp.SetDelta();
+        if (filterModeTemp.Delta > 1)
+        {
+          /* If file Size is not aligned, then branch filter
+             will not work for next file in solid block.
+             Maybe we should allow filter for non-aligned-size file in non-solid archives ?
+          */
+          if (ui.Size % filterModeTemp.Delta != 0)
+            parseRes = false;
+          // windows exe files are not aligned for 4 KiB.
+          /*
+          else if (filterModeTemp.Id == k_ARM64 && filterModeTemp.Offset != 0)
+          {
+            if (ui.Size % (1 << 12) != 0)
+            {
+              // If Size is not aligned for 4 KiB, then Offset will not work for next file in solid block.
+              // so we place such file in group with (Offset==0).
+              filterModeTemp.Offset = 0;
+            }
+          }
+          */
+        }
+      }
+      if (!parseRes)
+        filterModeTemp.ClearFilterMode();
     }
   }
   
@@ -989,7 +1227,7 @@ static HRESULT AddBcj2Methods(CCompressionMethodMode &mode)
   mode.Methods.Add(m);
   mode.Methods.Add(m);
   
-  RINOK(AddBondForFilter(mode));
+  RINOK(AddBondForFilter(mode))
   CBond2 bond;
   bond.OutCoder = 0;
   bond.InCoder = methodIndex;      bond.OutStream = 1;  mode.Bonds.Add(bond);
@@ -1003,7 +1241,7 @@ static HRESULT MakeExeMethod(CCompressionMethodMode &mode,
   if (mode.Filter_was_Inserted)
   {
     const CMethodFull &m = mode.Methods[0];
-    CMethodId id = m.Id;
+    const CMethodId id = m.Id;
     if (id == k_BCJ2)
       return AddBcj2Methods(mode);
     if (!m.IsSimpleCoder())
@@ -1018,7 +1256,7 @@ static HRESULT MakeExeMethod(CCompressionMethodMode &mode,
   CMethodFull &m = mode.Methods.InsertNew(0);
 
   {
-    FOR_VECTOR(k, mode.Bonds)
+    FOR_VECTOR (k, mode.Bonds)
     {
       CBond2 &bond = mode.Bonds[k];
       bond.InCoder++;
@@ -1038,23 +1276,32 @@ static HRESULT MakeExeMethod(CCompressionMethodMode &mode,
     GetMethodFull(filterMode.Id, 1, m);
     if (filterMode.Id == k_Delta)
       m.AddProp32(NCoderPropID::kDefaultProp, filterMode.Delta);
+    else if (filterMode.Id == k_ARM64)
+    {
+      // if (filterMode.Offset != 0)
+        m.AddProp32(
+          NCoderPropID::kDefaultProp,
+          // NCoderPropID::kBranchOffset,
+          filterMode.Offset);
+    }
     res = AddFilterBond(mode);
 
     int alignBits = -1;
-    if (filterMode.Id == k_Delta || filterMode.Delta != 0)
     {
-           if (filterMode.Delta == 1) alignBits = 0;
-      else if (filterMode.Delta == 2) alignBits = 1;
-      else if (filterMode.Delta == 4) alignBits = 2;
-      else if (filterMode.Delta == 8) alignBits = 3;
-      else if (filterMode.Delta == 16) alignBits = 4;
+      const UInt32 delta = filterMode.Delta;
+      if (delta == 0 || delta > 16)
+      {
+        // if (delta == 0) alignBits = GetAlignForFilterMethod(filterMode.Id);
+      }
+      else if ((delta & ((1 << 4) - 1)) == 0) alignBits = 4;
+      else if ((delta & ((1 << 3) - 1)) == 0) alignBits = 3;
+      else if ((delta & ((1 << 2) - 1)) == 0) alignBits = 2;
+      else if ((delta & ((1 << 1) - 1)) == 0) alignBits = 1;
+      // else alignBits = 0;
+      /* alignBits=0 is default mode for lzma/lzma2.
+         So we don't set alignBits=0 here. */
     }
-    else
-    {
-      // alignBits = GetAlignForFilterMethod(filterMode.Id);
-    }
-    
-    if (res == S_OK && alignBits >= 0)
+    if (res == S_OK && alignBits > 0)
     {
       unsigned nextCoder = 1;
       if (!mode.Bonds.IsEmpty())
@@ -1071,12 +1318,12 @@ static HRESULT MakeExeMethod(CCompressionMethodMode &mode,
             if (alignBits != 0)
             {
               if (alignBits > 2 || filterMode.Id == k_Delta)
-                nextMethod.AddProp32(NCoderPropID::kPosStateBits, alignBits);
+                nextMethod.AddProp32(NCoderPropID::kPosStateBits, (unsigned)alignBits);
               unsigned lc = 0;
               if (alignBits < 3)
-                lc = 3 - alignBits;
+                lc = (unsigned)(3 - alignBits);
               nextMethod.AddProp32(NCoderPropID::kLitContextBits, lc);
-              nextMethod.AddProp32(NCoderPropID::kLitPosBits, alignBits);
+              nextMethod.AddProp32(NCoderPropID::kLitPosBits, (unsigned)alignBits);
             }
           }
         }
@@ -1088,18 +1335,23 @@ static HRESULT MakeExeMethod(CCompressionMethodMode &mode,
 }
 
 
-static void FromUpdateItemToFileItem(const CUpdateItem &ui,
-    CFileItem &file, CFileItem2 &file2)
+static void UpdateItem_To_FileItem2(const CUpdateItem &ui, CFileItem2 &file2)
 {
-  if (ui.AttribDefined)
-    file.SetAttrib(ui.Attrib);
-  
+  file2.Attrib = ui.Attrib;  file2.AttribDefined = ui.AttribDefined;
   file2.CTime = ui.CTime;  file2.CTimeDefined = ui.CTimeDefined;
   file2.ATime = ui.ATime;  file2.ATimeDefined = ui.ATimeDefined;
   file2.MTime = ui.MTime;  file2.MTimeDefined = ui.MTimeDefined;
   file2.IsAnti = ui.IsAnti;
   // file2.IsAux = false;
   file2.StartPosDefined = false;
+  // file2.StartPos = 0;
+}
+
+
+static void UpdateItem_To_FileItem(const CUpdateItem &ui,
+    CFileItem &file, CFileItem2 &file2)
+{
+  UpdateItem_To_FileItem2(ui, file2);
 
   file.Size = ui.Size;
   file.IsDir = ui.IsDir;
@@ -1107,13 +1359,15 @@ static void FromUpdateItemToFileItem(const CUpdateItem &ui,
   // file.IsAltStream = ui.IsAltStream;
 }
 
-class CRepackInStreamWithSizes:
-  public ISequentialInStream,
-  public ICompressGetSubStreamSize,
-  public CMyUnknownImp
-{
+
+
+Z7_CLASS_IMP_COM_2(
+  CRepackInStreamWithSizes
+  , ISequentialInStream
+  , ICompressGetSubStreamSize
+)
   CMyComPtr<ISequentialInStream> _stream;
-  // UInt64 _size;
+  UInt64 _size;
   const CBoolVector *_extractStatuses;
   UInt32 _startIndex;
 public:
@@ -1123,37 +1377,28 @@ public:
   {
     _startIndex = startIndex;
     _extractStatuses = extractStatuses;
-    // _size = 0;
+    _size = 0;
     _stream = stream;
   }
-  // UInt64 GetSize() const { return _size; }
-
-  MY_UNKNOWN_IMP2(ISequentialInStream, ICompressGetSubStreamSize)
-
-  STDMETHOD(Read)(void *data, UInt32 size, UInt32 *processedSize);
-
-  STDMETHOD(GetSubStreamSize)(UInt64 subStream, UInt64 *value);
+  UInt64 GetSize() const { return _size; }
 };
 
-STDMETHODIMP CRepackInStreamWithSizes::Read(void *data, UInt32 size, UInt32 *processedSize)
+Z7_COM7F_IMF(CRepackInStreamWithSizes::Read(void *data, UInt32 size, UInt32 *processedSize))
 {
-  return _stream->Read(data, size, processedSize);
-  /*
   UInt32 realProcessedSize;
-  HRESULT result = _stream->Read(data, size, &realProcessedSize);
+  const HRESULT result = _stream->Read(data, size, &realProcessedSize);
   _size += realProcessedSize;
   if (processedSize)
     *processedSize = realProcessedSize;
   return result;
-  */
 }
 
-STDMETHODIMP CRepackInStreamWithSizes::GetSubStreamSize(UInt64 subStream, UInt64 *value)
+Z7_COM7F_IMF(CRepackInStreamWithSizes::GetSubStreamSize(UInt64 subStream, UInt64 *value))
 {
   *value = 0;
   if (subStream >= _extractStatuses->Size())
     return S_FALSE; // E_FAIL;
-  unsigned index = (unsigned)subStream;
+  const unsigned index = (unsigned)subStream;
   if ((*_extractStatuses)[index])
   {
     const CFileItem &fi = _db->Files[_startIndex + index];
@@ -1184,7 +1429,7 @@ protected:
 public:
   const CDbEx *_db;
   CMyComPtr<IArchiveUpdateCallbackFile> _opCallback;
-  CMyComPtr<IArchiveExtractCallbackMessage> _extractCallback;
+  CMyComPtr<IArchiveExtractCallbackMessage2> _extractCallback;
 
   HRESULT Init(UInt32 startIndex, const CBoolVector *extractStatuses);
   HRESULT CheckFinishedState() const { return (_currentIndex == _extractStatuses->Size()) ? S_OK: E_FAIL; }
@@ -1213,7 +1458,7 @@ HRESULT CRepackStreamBase::OpenFile()
         NEventIndexType::kInArcIndex, arcIndex,
         _needWrite ?
             NUpdateNotifyOp::kRepack :
-            NUpdateNotifyOp::kSkip));
+            NUpdateNotifyOp::kSkip))
   }
 
   _crc = CRC_INIT_VAL;
@@ -1239,7 +1484,7 @@ HRESULT CRepackStreamBase::CloseFile()
   {
     RINOK(_extractCallback->ReportExtractResult(
         NEventIndexType::kInArcIndex, arcIndex,
-        NExtract::NOperationResult::kCRCError));
+        NExtract::NOperationResult::kCRCError))
   }
   // return S_FALSE;
   return k_My_HRESULT_CRC_ERROR;
@@ -1249,30 +1494,28 @@ HRESULT CRepackStreamBase::ProcessEmptyFiles()
 {
   while (_currentIndex < _extractStatuses->Size() && _db->Files[_startIndex + _currentIndex].Size == 0)
   {
-    RINOK(OpenFile());
-    RINOK(CloseFile());
+    RINOK(OpenFile())
+    RINOK(CloseFile())
   }
   return S_OK;
 }
   
 
 
-#ifndef _7ZIP_ST
+#ifndef Z7_ST
 
-class CFolderOutStream2:
+class CFolderOutStream2 Z7_final:
   public CRepackStreamBase,
   public ISequentialOutStream,
   public CMyUnknownImp
 {
+  Z7_COM_UNKNOWN_IMP_0
+  Z7_IFACE_COM7_IMP(ISequentialOutStream)
 public:
   CMyComPtr<ISequentialOutStream> _stream;
-
-  MY_UNKNOWN_IMP
-
-  STDMETHOD(Write)(const void *data, UInt32 size, UInt32 *processedSize);
 };
 
-STDMETHODIMP CFolderOutStream2::Write(const void *data, UInt32 size, UInt32 *processedSize)
+Z7_COM7F_IMF(CFolderOutStream2::Write(const void *data, UInt32 size, UInt32 *processedSize))
 {
   if (processedSize)
     *processedSize = 0;
@@ -1294,22 +1537,22 @@ STDMETHODIMP CFolderOutStream2::Write(const void *data, UInt32 size, UInt32 *pro
       _rem -= cur;
       if (_rem == 0)
       {
-        RINOK(CloseFile());
-        RINOK(ProcessEmptyFiles());
+        RINOK(CloseFile())
+        RINOK(ProcessEmptyFiles())
       }
-      RINOK(result);
+      RINOK(result)
       if (cur == 0)
         break;
       continue;
     }
 
-    RINOK(ProcessEmptyFiles());
+    RINOK(ProcessEmptyFiles())
     if (_currentIndex == _extractStatuses->Size())
     {
       // we don't support write cut here
       return E_FAIL;
     }
-    RINOK(OpenFile());
+    RINOK(OpenFile())
   }
 
   return S_OK;
@@ -1321,17 +1564,18 @@ STDMETHODIMP CFolderOutStream2::Write(const void *data, UInt32 size, UInt32 *pro
 
 static const UInt32 kTempBufSize = 1 << 16;
 
-class CFolderInStream2:
+class CFolderInStream2 Z7_final:
   public CRepackStreamBase,
   public ISequentialInStream,
   public CMyUnknownImp
 {
+  Z7_COM_UNKNOWN_IMP_0
+  Z7_IFACE_COM7_IMP(ISequentialInStream)
+
   Byte *_buf;
 public:
   CMyComPtr<ISequentialInStream> _inStream;
   HRESULT Result;
-
-  MY_UNKNOWN_IMP
 
   CFolderInStream2():
       Result(S_OK)
@@ -1345,10 +1589,9 @@ public:
   }
 
   void Init() { Result = S_OK; }
-  STDMETHOD(Read)(void *data, UInt32 size, UInt32 *processedSize);
 };
 
-STDMETHODIMP CFolderInStream2::Read(void *data, UInt32 size, UInt32 *processedSize)
+Z7_COM7F_IMF(CFolderInStream2::Read(void *data, UInt32 size, UInt32 *processedSize))
 {
   if (processedSize)
     *processedSize = 0;
@@ -1369,7 +1612,7 @@ STDMETHODIMP CFolderInStream2::Read(void *data, UInt32 size, UInt32 *processedSi
           cur = kTempBufSize;
       }
 
-      HRESULT result = _inStream->Read(buf, cur, &cur);
+      const HRESULT result = _inStream->Read(buf, cur, &cur);
       _crc = CrcUpdate(_crc, buf, cur);
       _rem -= cur;
 
@@ -1386,11 +1629,11 @@ STDMETHODIMP CFolderInStream2::Read(void *data, UInt32 size, UInt32 *processedSi
 
       if (_rem == 0)
       {
-        RINOK(CloseFile());
-        RINOK(ProcessEmptyFiles());
+        RINOK(CloseFile())
+        RINOK(ProcessEmptyFiles())
       }
 
-      RINOK(result);
+      RINOK(result)
       
       if (cur == 0)
         return E_FAIL;
@@ -1398,20 +1641,20 @@ STDMETHODIMP CFolderInStream2::Read(void *data, UInt32 size, UInt32 *processedSi
       continue;
     }
 
-    RINOK(ProcessEmptyFiles());
+    RINOK(ProcessEmptyFiles())
     if (_currentIndex == _extractStatuses->Size())
     {
       return S_OK;
     }
-    RINOK(OpenFile());
+    RINOK(OpenFile())
   }
   
   return S_OK;
 }
 
 
-class CThreadDecoder
-  #ifndef _7ZIP_ST
+class CThreadDecoder Z7_final
+  #ifndef Z7_ST
     : public CVirtThread
   #endif
 {
@@ -1421,7 +1664,7 @@ public:
   CThreadDecoder(bool multiThreadMixer):
       Decoder(multiThreadMixer)
   {
-    #ifndef _7ZIP_ST
+    #ifndef Z7_ST
     if (multiThreadMixer)
     {
       MtMode = false;
@@ -1435,8 +1678,9 @@ public:
     // send_UnpackSize = false;
   }
 
-  #ifndef _7ZIP_ST
+  #ifndef Z7_ST
   
+  bool dataAfterEnd_Error;
   HRESULT Result;
   CMyComPtr<IInStream> InStream;
 
@@ -1445,41 +1689,51 @@ public:
 
   UInt64 StartPos;
   const CFolders *Folders;
-  int FolderIndex;
+  unsigned FolderIndex;
 
   // bool send_UnpackSize;
   // UInt64 UnpackSize;
   
-  #ifndef _NO_CRYPTO
+  #ifndef Z7_NO_CRYPTO
   CMyComPtr<ICryptoGetTextPassword> getTextPassword;
   #endif
 
-  DECL_EXTERNAL_CODECS_LOC_VARS2;
+  DECL_EXTERNAL_CODECS_LOC_VARS_DECL
 
-  #ifndef _7ZIP_ST
+  #ifndef Z7_ST
   bool MtMode;
   UInt32 NumThreads;
   #endif
 
   
-  ~CThreadDecoder() { CVirtThread::WaitThreadFinish(); }
-  virtual void Execute();
+  ~CThreadDecoder() Z7_DESTRUCTOR_override
+  {
+    /* WaitThreadFinish() will be called in ~CVirtThread().
+       But we need WaitThreadFinish() call before
+       destructors of this class members.
+    */
+    CVirtThread::WaitThreadFinish();
+  }
+private:
+  virtual void Execute() Z7_override;
 
   #endif
 };
 
-#ifndef _7ZIP_ST
+#ifndef Z7_ST
 
 void CThreadDecoder::Execute()
 {
   try
   {
-    #ifndef _NO_CRYPTO
+    #ifndef Z7_NO_CRYPTO
       bool isEncrypted = false;
       bool passwordIsDefined = false;
       UString password;
     #endif
-    
+ 
+    dataAfterEnd_Error = false;
+      
     Result = Decoder.Decode(
       EXTERNAL_CODECS_LOC_VARS
       InStream,
@@ -1491,12 +1745,16 @@ void CThreadDecoder::Execute()
       
       Fos,
       NULL, // compressProgress
-      NULL  // *inStreamMainRes
 
-      _7Z_DECODER_CRYPRO_VARS
-      #ifndef _7ZIP_ST
-        , MtMode, NumThreads
+      NULL  // *inStreamMainRes
+      , dataAfterEnd_Error
+
+      Z7_7Z_DECODER_CRYPRO_VARS
+      #ifndef Z7_ST
+        , MtMode, NumThreads,
+        0 // MemUsage
       #endif
+
       );
   }
   catch(...)
@@ -1513,20 +1771,17 @@ void CThreadDecoder::Execute()
 
 #endif
 
-#ifndef _NO_CRYPTO
+#ifndef Z7_NO_CRYPTO
 
-class CCryptoGetTextPassword:
-  public ICryptoGetTextPassword,
-  public CMyUnknownImp
-{
+Z7_CLASS_IMP_NOQIB_1(
+  CCryptoGetTextPassword
+  , ICryptoGetTextPassword
+)
 public:
   UString Password;
-
-  MY_UNKNOWN_IMP
-  STDMETHOD(CryptoGetTextPassword)(BSTR *password);
 };
 
-STDMETHODIMP CCryptoGetTextPassword::CryptoGetTextPassword(BSTR *password)
+Z7_COM7F_IMF(CCryptoGetTextPassword::CryptoGetTextPassword(BSTR *password))
 {
   return StringToBstr(Password, password);
 }
@@ -1541,6 +1796,7 @@ static void GetFile(const CDatabase &inDb, unsigned index, CFileItem &file, CFil
   file2.ATimeDefined = inDb.ATime.GetItem(index, file2.ATime);
   file2.MTimeDefined = inDb.MTime.GetItem(index, file2.MTime);
   file2.StartPosDefined = inDb.StartPos.GetItem(index, file2.StartPos);
+  file2.AttribDefined = inDb.Attrib.GetItem(index, file2.Attrib);
   file2.IsAnti = inDb.IsItemAnti(index);
   // file2.IsAux = inDb.IsItemAux(index);
 }
@@ -1549,52 +1805,72 @@ HRESULT Update(
     DECL_EXTERNAL_CODECS_LOC_VARS
     IInStream *inStream,
     const CDbEx *db,
-    const CObjectVector<CUpdateItem> &updateItems,
+    CObjectVector<CUpdateItem> &updateItems,
     // const CObjectVector<CTreeFolder> &treeFolders,
     // const CUniqBlocks &secureBlocks,
-    COutArchive &archive,
-    CArchiveDatabaseOut &newDatabase,
     ISequentialOutStream *seqOutStream,
     IArchiveUpdateCallback *updateCallback,
-    const CUpdateOptions &options
-    #ifndef _NO_CRYPTO
-    , ICryptoGetTextPassword *getDecoderPassword
-    #endif
-    )
+    const CUpdateOptions &options)
 {
   UInt64 numSolidFiles = options.NumSolidFiles;
   if (numSolidFiles == 0)
     numSolidFiles = 1;
 
-  CMyComPtr<IArchiveUpdateCallbackFile> opCallback;
-  updateCallback->QueryInterface(IID_IArchiveUpdateCallbackFile, (void **)&opCallback);
+  Z7_DECL_CMyComPtr_QI_FROM(
+      IArchiveUpdateCallbackFile,
+      opCallback, updateCallback)
 
-  CMyComPtr<IArchiveExtractCallbackMessage> extractCallback;
-  updateCallback->QueryInterface(IID_IArchiveExtractCallbackMessage, (void **)&extractCallback);
+  Z7_DECL_CMyComPtr_QI_FROM(
+      IArchiveExtractCallbackMessage2,
+      extractCallback, updateCallback)
+
+  /*
+  Z7_DECL_CMyComPtr_QI_FROM(
+      IArchiveUpdateCallbackArcProp,
+      reportArcProp, updateCallback)
+  */
 
   // size_t totalSecureDataSize = (size_t)secureBlocks.GetTotalSizeInBytes();
 
-  /*
-  CMyComPtr<IOutStream> outStream;
-  RINOK(seqOutStream->QueryInterface(IID_IOutStream, (void **)&outStream));
-  if (!outStream)
-    return E_NOTIMPL;
-  */
-
-  UInt64 startBlockSize = db ? db->ArcInfo.StartPosition: 0;
-  if (startBlockSize > 0 && !options.RemoveSfxBlock)
+  CMyComPtr<IStreamSetRestriction> v_StreamSetRestriction;
   {
-    RINOK(WriteRange(inStream, seqOutStream, 0, startBlockSize, NULL));
+    Z7_DECL_CMyComPtr_QI_FROM(
+        IOutStream,
+        outStream, seqOutStream)
+    if (!outStream)
+      return E_NOTIMPL;
+    const UInt64 sfxBlockSize = (db && !options.RemoveSfxBlock) ?
+        db->ArcInfo.StartPosition: 0;
+    seqOutStream->QueryInterface(IID_IStreamSetRestriction, (void **)&v_StreamSetRestriction);
+    if (v_StreamSetRestriction)
+    {
+      UInt64 offset = 0;
+      RINOK(outStream->Seek(0, STREAM_SEEK_CUR, &offset))
+      RINOK(v_StreamSetRestriction->SetRestriction(
+          outStream ? offset + sfxBlockSize : 0,
+          outStream ? offset + sfxBlockSize + k_StartHeadersRewriteSize : 0))
+    }
+    outStream.Release();
+    if (sfxBlockSize != 0)
+    {
+      RINOK(WriteRange(inStream, seqOutStream, 0, sfxBlockSize, NULL))
+    }
   }
 
   CIntArr fileIndexToUpdateIndexMap;
   UInt64 complexity = 0;
   UInt64 inSizeForReduce2 = 0;
+
+ #ifndef Z7_NO_CRYPTO
   bool needEncryptedRepack = false;
+ #endif
 
   CRecordVector<CFilterMode2> filters;
   CObjectVector<CSolidGroup> groups;
+  
+  #ifndef Z7_ST
   bool thereAreRepacks = false;
+  #endif
 
   bool useFilters = options.UseFilters;
   if (useFilters)
@@ -1602,11 +1878,15 @@ HRESULT Update(
     const CCompressionMethodMode &method = *options.Method;
 
     FOR_VECTOR (i, method.Methods)
+    {
+      /* IsFilterMethod() knows only built-in codecs
+         FIXME: we should check IsFilter status for external filters too */
       if (IsFilterMethod(method.Methods[i].Id))
       {
         useFilters = false;
         break;
       }
+    }
   }
   
   if (db)
@@ -1621,24 +1901,27 @@ HRESULT Update(
     {
       int index = updateItems[i].IndexInArchive;
       if (index != -1)
-        fileIndexToUpdateIndexMap[(unsigned)index] = i;
+        fileIndexToUpdateIndexMap[(unsigned)index] = (int)i;
     }
 
     for (i = 0; i < db->NumFolders; i++)
     {
       CNum indexInFolder = 0;
       CNum numCopyItems = 0;
-      CNum numUnpackStreams = db->NumUnpackStreamsVector[i];
+      const CNum numUnpackStreams = db->NumUnpackStreamsVector[i];
       UInt64 repackSize = 0;
       
       for (CNum fi = db->FolderStartFileIndex[i]; indexInFolder < numUnpackStreams; fi++)
       {
+        if (fi >= db->Files.Size())
+          return E_FAIL;
+
         const CFileItem &file = db->Files[fi];
         if (file.HasStream)
         {
           indexInFolder++;
-          int updateIndex = fileIndexToUpdateIndexMap[fi];
-          if (updateIndex >= 0 && !updateItems[updateIndex].NewData)
+          const int updateIndex = fileIndexToUpdateIndexMap[fi];
+          if (updateIndex >= 0 && !updateItems[(unsigned)updateIndex].NewData)
           {
             numCopyItems++;
             repackSize += file.Size;
@@ -1655,11 +1938,13 @@ HRESULT Update(
       CFolderEx f;
       db->ParseFolderEx(i, f);
 
+     #ifndef Z7_NO_CRYPTO
       const bool isEncrypted = f.IsEncrypted();
+     #endif
       const bool needCopy = (numCopyItems == numUnpackStreams);
       const bool extractFilter = (useFilters || needCopy);
 
-      unsigned groupIndex = Get_FilterGroup_for_Folder(filters, f, extractFilter);
+      const unsigned groupIndex = Get_FilterGroup_for_Folder(filters, f, extractFilter);
       
       while (groupIndex >= groups.Size())
         groups.AddNew();
@@ -1670,25 +1955,30 @@ HRESULT Update(
         complexity += db->GetFolderFullPackSize(i);
       else
       {
+        #ifndef Z7_ST
         thereAreRepacks = true;
+        #endif
         complexity += repackSize;
         if (inSizeForReduce2 < repackSize)
           inSizeForReduce2 = repackSize;
+       #ifndef Z7_NO_CRYPTO
         if (isEncrypted)
           needEncryptedRepack = true;
+       #endif
       }
     }
   }
 
   UInt64 inSizeForReduce = 0;
   {
+    bool isSolid = (numSolidFiles > 1 && options.NumSolidBytes != 0);
     FOR_VECTOR (i, updateItems)
     {
       const CUpdateItem &ui = updateItems[i];
       if (ui.NewData)
       {
         complexity += ui.Size;
-        if (numSolidFiles != 1)
+        if (isSolid)
           inSizeForReduce += ui.Size;
         else if (inSizeForReduce < ui.Size)
           inSizeForReduce = ui.Size;
@@ -1699,52 +1989,58 @@ HRESULT Update(
   if (inSizeForReduce < inSizeForReduce2)
     inSizeForReduce = inSizeForReduce2;
 
-  RINOK(updateCallback->SetTotal(complexity));
+  RINOK(updateCallback->SetTotal(complexity))
 
   CLocalProgress *lps = new CLocalProgress;
   CMyComPtr<ICompressProgressInfo> progress = lps;
   lps->Init(updateCallback, true);
 
-  #ifndef _7ZIP_ST
+  #ifndef Z7_ST
   
   CStreamBinder sb;
+  /*
   if (options.MultiThreadMixer)
   {
     RINOK(sb.CreateEvents());
   }
+  */
   
   #endif
 
   CThreadDecoder threadDecoder(options.MultiThreadMixer);
   
-  #ifndef _7ZIP_ST
+  #ifndef Z7_ST
   if (options.MultiThreadMixer && thereAreRepacks)
   {
-    #ifdef EXTERNAL_CODECS
-    threadDecoder.__externalCodecs = __externalCodecs;
+    #ifdef Z7_EXTERNAL_CODECS
+    threadDecoder._externalCodecs = _externalCodecs;
     #endif
-    RINOK(threadDecoder.Create());
+    const WRes wres = threadDecoder.Create();
+    if (wres != 0)
+      return HRESULT_FROM_WIN32(wres);
   }
   #endif
 
   {
     CAnalysis analysis;
-    if (options.AnalysisLevel == 0)
-    {
-      analysis.ParseWav = false;
-      analysis.ParseExe = false;
-      analysis.ParseAll = false;
-    }
-    else
+    // analysis.Need_ATime = options.Need_ATime;
+    int analysisLevel = options.AnalysisLevel;
+    // (analysisLevel < 0) means default level (5)
+    if (analysisLevel < 0)
+      analysisLevel = 5;
+    if (analysisLevel != 0)
     {
       analysis.Callback = opCallback;
-      if (options.AnalysisLevel > 0)
+      analysis.ParseWav = true;
+      if (analysisLevel >= 5)
       {
-        analysis.ParseWav = true;
-        if (options.AnalysisLevel >= 7)
+        analysis.ParseExe = true;
+        analysis.ParseExeUnix = true;
+        // analysis.ParseNoExt = true;
+        if (analysisLevel >= 7)
         {
-          analysis.ParseExe = true;
-          if (options.AnalysisLevel >= 9)
+          analysis.ParseNoExt = true;
+          if (analysisLevel >= 9)
             analysis.ParseAll = true;
         }
       }
@@ -1763,11 +2059,19 @@ HRESULT Update(
       CFilterMode2 fm;
       if (useFilters)
       {
-        RINOK(analysis.GetFilterGroup(i, ui, fm));
+        // analysis.ATime_Defined = false;
+        RINOK(analysis.GetFilterGroup(i, ui, fm))
+        /*
+        if (analysis.ATime_Defined)
+        {
+          ui.ATime = FILETIME_To_UInt64(analysis.ATime);
+          ui.ATime_WasReadByAnalysis = true;
+        }
+        */
       }
       fm.Encrypted = method.PasswordIsDefined;
 
-      unsigned groupIndex = GetGroup(filters, fm);
+      const unsigned groupIndex = GetGroup(filters, fm);
       while (groupIndex >= groups.Size())
         groups.AddNew();
       groups[groupIndex].Indices.Add(i);
@@ -1775,7 +2079,7 @@ HRESULT Update(
   }
 
 
-  #ifndef _NO_CRYPTO
+  #ifndef Z7_NO_CRYPTO
 
   CCryptoGetTextPassword *getPasswordSpec = NULL;
   CMyComPtr<ICryptoGetTextPassword> getTextPassword;
@@ -1784,7 +2088,7 @@ HRESULT Update(
     getPasswordSpec = new CCryptoGetTextPassword;
     getTextPassword = getPasswordSpec;
     
-    #ifndef _7ZIP_ST
+    #ifndef Z7_ST
     threadDecoder.getTextPassword = getPasswordSpec;
     #endif
 
@@ -1792,10 +2096,13 @@ HRESULT Update(
       getPasswordSpec->Password = options.Method->Password;
     else
     {
+      Z7_DECL_CMyComPtr_QI_FROM(
+          ICryptoGetTextPassword,
+          getDecoderPassword, updateCallback)
       if (!getDecoderPassword)
         return E_NOTIMPL;
       CMyComBSTR password;
-      RINOK(getDecoderPassword->CryptoGetTextPassword(&password));
+      RINOK(getDecoderPassword->CryptoGetTextPassword(&password))
       if (password)
         getPasswordSpec->Password = password;
     }
@@ -1803,11 +2110,12 @@ HRESULT Update(
 
   #endif
 
-  
   // ---------- Compress ----------
 
-  RINOK(archive.Create(seqOutStream, false));
-  RINOK(archive.SkipPrefixArchiveHeader());
+  COutArchive archive;
+  CArchiveDatabaseOut newDatabase;
+
+  RINOK(archive.Create_and_WriteStartPrefix(seqOutStream))
 
   /*
   CIntVector treeFolderToArcIndex;
@@ -1837,7 +2145,7 @@ HRESULT Update(
         continue;
       secureID = ui.SecureIndex;
       if (ui.NewProps)
-        FromUpdateItemToFileItem(ui, file, file2);
+        UpdateItem_To_FileItem(ui, file, file2);
       else
         GetFile(*db, ui.IndexInArchive, file, file2);
     }
@@ -1868,7 +2176,7 @@ HRESULT Update(
         if (ui.HasStream())
           continue;
       }
-      else if (ui.IndexInArchive != -1 && db->Files[ui.IndexInArchive].HasStream)
+      else if (ui.IndexInArchive != -1 && db->Files[(unsigned)ui.IndexInArchive].HasStream)
         continue;
       /*
       if (ui.TreeFolderIndex >= 0)
@@ -1887,13 +2195,14 @@ HRESULT Update(
       UString name;
       if (ui.NewProps)
       {
-        FromUpdateItemToFileItem(ui, file, file2);
+        UpdateItem_To_FileItem(ui, file, file2);
+        file.CrcDefined = false;
         name = ui.Name;
       }
       else
       {
-        GetFile(*db, ui.IndexInArchive, file, file2);
-        db->GetPath(ui.IndexInArchive, name);
+        GetFile(*db, (unsigned)ui.IndexInArchive, file, file2);
+        db->GetPath((unsigned)ui.IndexInArchive, name);
       }
       
       /*
@@ -1909,7 +2218,6 @@ HRESULT Update(
 
   {
     // ---------- Sort Filters ----------
-    
     FOR_VECTOR (i, filters)
     {
       filters[i].GroupIndex = i;
@@ -1923,22 +2231,22 @@ HRESULT Update(
 
     CCompressionMethodMode method = *options.Method;
     {
-      HRESULT res = MakeExeMethod(method, filterMode,
-        #ifdef _7ZIP_ST
+      const HRESULT res = MakeExeMethod(method, filterMode,
+        #ifdef Z7_ST
           false
         #else
           options.MaxFilter && options.MultiThreadMixer
         #endif
         );
 
-      RINOK(res);
+      RINOK(res)
     }
 
     if (filterMode.Encrypted)
     {
       if (!method.PasswordIsDefined)
       {
-        #ifndef _NO_CRYPTO
+        #ifndef Z7_NO_CRYPTO
         if (getPasswordSpec)
           method.Password = getPasswordSpec->Password;
         #endif
@@ -1957,13 +2265,13 @@ HRESULT Update(
 
     const CSolidGroup &group = groups[filterMode.GroupIndex];
     
-    FOR_VECTOR(folderRefIndex, group.folderRefs)
+    FOR_VECTOR (folderRefIndex, group.folderRefs)
     {
       const CFolderRepack &rep = group.folderRefs[folderRefIndex];
 
-      unsigned folderIndex = rep.FolderIndex;
+      const unsigned folderIndex = rep.FolderIndex;
       
-      CNum numUnpackStreams = db->NumUnpackStreamsVector[folderIndex];
+      const CNum numUnpackStreams = db->NumUnpackStreamsVector[folderIndex];
 
       if (rep.NumCopyFiles == numUnpackStreams)
       {
@@ -1971,7 +2279,7 @@ HRESULT Update(
         {
           RINOK(opCallback->ReportOperation(
               NEventIndexType::kBlockIndex, (UInt32)folderIndex,
-              NUpdateNotifyOp::kReplicate));
+              NUpdateNotifyOp::kReplicate))
 
           // ---------- Copy old solid block ----------
           {
@@ -1983,21 +2291,27 @@ HRESULT Update(
                 indexInFolder++;
                 RINOK(opCallback->ReportOperation(
                     NEventIndexType::kInArcIndex, (UInt32)fi,
-                    NUpdateNotifyOp::kReplicate));
+                    NUpdateNotifyOp::kReplicate))
               }
             }
           }
         }
 
-        UInt64 packSize = db->GetFolderFullPackSize(folderIndex);
+        const UInt64 packSize = db->GetFolderFullPackSize(folderIndex);
         RINOK(WriteRange(inStream, archive.SeqStream,
-            db->GetFolderStreamPos(folderIndex, 0), packSize, progress));
+            db->GetFolderStreamPos(folderIndex, 0), packSize, progress))
         lps->ProgressOffset += packSize;
-        
+
+        const unsigned folderIndex_New = newDatabase.Folders.Size();
         CFolder &folder = newDatabase.Folders.AddNew();
+        // v23.01: we copy FolderCrc, if FolderCrc was used
+        if (db->FolderCRCs.ValidAndDefined(folderIndex))
+          newDatabase.FolderUnpackCRCs.SetItem(folderIndex_New,
+              true, db->FolderCRCs.Vals[folderIndex]);
+
         db->ParseFolderInfo(folderIndex, folder);
-        CNum startIndex = db->FoStartPackStreamIndex[folderIndex];
-        FOR_VECTOR(j, folder.PackStreams)
+        const CNum startIndex = db->FoStartPackStreamIndex[folderIndex];
+        FOR_VECTOR (j, folder.PackStreams)
         {
           newDatabase.PackSizes.Add(db->GetStreamPackSize(startIndex + j));
           // newDatabase.PackCRCsDefined.Add(db.PackCRCsDefined[startIndex + j]);
@@ -2005,7 +2319,7 @@ HRESULT Update(
         }
 
         size_t indexStart = db->FoToCoderUnpackSizes[folderIndex];
-        size_t indexEnd = db->FoToCoderUnpackSizes[folderIndex + 1];
+        const size_t indexEnd = db->FoToCoderUnpackSizes[folderIndex + 1];
         for (; indexStart < indexEnd; indexStart++)
           newDatabase.CoderUnpackSizes.Add(db->CoderUnpackSizes[indexStart]);
       }
@@ -2044,8 +2358,8 @@ HRESULT Update(
           if (file.HasStream)
           {
             indexInFolder++;
-            int updateIndex = fileIndexToUpdateIndexMap[fi];
-            if (updateIndex >= 0 && !updateItems[updateIndex].NewData)
+            const int updateIndex = fileIndexToUpdateIndexMap[fi];
+            if (updateIndex >= 0 && !updateItems[(unsigned)updateIndex].NewData)
               needExtract = true;
             // decodeSize += file.Size;
           }
@@ -2066,7 +2380,6 @@ HRESULT Update(
         unsigned startPackIndex = newDatabase.PackSizes.Size();
         UInt64 curUnpackSize;
         {
-
           CMyComPtr<ISequentialInStream> sbInStream;
           CRepackStreamBase *repackBase;
           CFolderInStream2 *FosSpec2 = NULL;
@@ -2074,13 +2387,13 @@ HRESULT Update(
           CRepackInStreamWithSizes *inStreamSizeCountSpec = new CRepackInStreamWithSizes;
           CMyComPtr<ISequentialInStream> inStreamSizeCount = inStreamSizeCountSpec;
           {
-            #ifndef _7ZIP_ST
+            #ifndef Z7_ST
             if (options.MultiThreadMixer)
             {
               repackBase = threadDecoder.FosSpec;
               CMyComPtr<ISequentialOutStream> sbOutStream;
-              sb.CreateStreams(&sbInStream, &sbOutStream);
-              sb.ReInit();
+              sb.CreateStreams2(sbInStream, sbOutStream);
+              RINOK(sb.Create_ReInit())
               
               threadDecoder.FosSpec->_stream = sbOutStream;
               
@@ -2100,14 +2413,16 @@ HRESULT Update(
               sbInStream = FosSpec2;
               repackBase = FosSpec2;
 
-              #ifndef _NO_CRYPTO
+              #ifndef Z7_NO_CRYPTO
               bool isEncrypted = false;
               bool passwordIsDefined = false;
               UString password;
               #endif
               
               CMyComPtr<ISequentialInStream> decodedStream;
-              HRESULT res = threadDecoder.Decoder.Decode(
+              bool dataAfterEnd_Error = false;
+
+              const HRESULT res = threadDecoder.Decoder.Decode(
                   EXTERNAL_CODECS_LOC_VARS
                   inStream,
                   db->ArcInfo.DataStartPosition, // db->GetFolderStreamPos(folderIndex, 0);,
@@ -2117,16 +2432,19 @@ HRESULT Update(
                 
                   NULL, // *outStream
                   NULL, // *compressProgress
+
                   &decodedStream
+                  , dataAfterEnd_Error
                 
-                  _7Z_DECODER_CRYPRO_VARS
-                  #ifndef _7ZIP_ST
+                  Z7_7Z_DECODER_CRYPRO_VARS
+                  #ifndef Z7_ST
                     , false // mtMode
                     , 1 // numThreads
+                    , 0 // memUsage
                   #endif
                 );
           
-              RINOK(res);
+              RINOK(res)
               if (!decodedStream)
                 return E_FAIL;
 
@@ -2138,32 +2456,44 @@ HRESULT Update(
             repackBase->_extractCallback = extractCallback;
 
             UInt32 startIndex = db->FolderStartFileIndex[folderIndex];
-            RINOK(repackBase->Init(startIndex, &extractStatuses));
+            RINOK(repackBase->Init(startIndex, &extractStatuses))
 
             inStreamSizeCountSpec->_db = db;
             inStreamSizeCountSpec->Init(sbInStream, startIndex, &extractStatuses);
 
-            #ifndef _7ZIP_ST
+            #ifndef Z7_ST
             if (options.MultiThreadMixer)
             {
-              threadDecoder.Start();
+              WRes wres = threadDecoder.Start();
+              if (wres != 0)
+                return HRESULT_FROM_WIN32(wres);
             }
             #endif
           }
 
+          // curUnpackSize = sizeToEncode;
 
-          HRESULT encodeRes = encoder.Encode(
+          HRESULT encodeRes = encoder.Encode1(
               EXTERNAL_CODECS_LOC_VARS
               inStreamSizeCount,
               // NULL,
               &inSizeForReduce,
-              newDatabase.Folders.AddNew(), newDatabase.CoderUnpackSizes, curUnpackSize,
+              sizeToEncode, // expectedDataSize
+              newDatabase.Folders.AddNew(),
+              // newDatabase.CoderUnpackSizes, curUnpackSize,
               archive.SeqStream, newDatabase.PackSizes, progress);
 
           if (encodeRes == k_My_HRESULT_CRC_ERROR)
             return E_FAIL;
 
-          #ifndef _7ZIP_ST
+          curUnpackSize = inStreamSizeCountSpec->GetSize();
+
+          if (encodeRes == S_OK)
+          {
+            encoder.Encode_Post(curUnpackSize, newDatabase.CoderUnpackSizes);
+          }
+
+          #ifndef Z7_ST
           if (options.MultiThreadMixer)
           {
             // 16.00: hang was fixed : for case if decoding was not finished.
@@ -2171,22 +2501,29 @@ HRESULT Update(
             inStreamSizeCount.Release();
             sbInStream.Release();
             
-            threadDecoder.WaitExecuteFinish();
+            {
+              const WRes wres = threadDecoder.WaitExecuteFinish();
+              if (wres != 0)
+                return HRESULT_FROM_WIN32(wres);
+            }
             
-            HRESULT decodeRes = threadDecoder.Result;
+            const HRESULT decodeRes = threadDecoder.Result;
             // if (res == k_My_HRESULT_CRC_ERROR)
-            if (decodeRes == S_FALSE)
+            if (decodeRes == S_FALSE || threadDecoder.dataAfterEnd_Error)
             {
               if (extractCallback)
               {
                 RINOK(extractCallback->ReportExtractResult(
                     NEventIndexType::kInArcIndex, db->FolderStartFileIndex[folderIndex],
                     // NEventIndexType::kBlockIndex, (UInt32)folderIndex,
-                    NExtract::NOperationResult::kDataError));
+                    (decodeRes != S_OK ?
+                      NExtract::NOperationResult::kDataError :
+                      NExtract::NOperationResult::kDataAfterEnd)))
               }
-              return E_FAIL;
+              if (decodeRes != S_OK)
+                return E_FAIL;
             }
-            RINOK(decodeRes);
+            RINOK(decodeRes)
             if (encodeRes == S_OK)
               if (sb.ProcessedSize != sizeToEncode)
                 encodeRes = E_FAIL;
@@ -2200,15 +2537,15 @@ HRESULT Update(
               {
                 RINOK(extractCallback->ReportExtractResult(
                     NEventIndexType::kBlockIndex, (UInt32)folderIndex,
-                    NExtract::NOperationResult::kDataError));
+                    NExtract::NOperationResult::kDataError))
               }
               return E_FAIL;
             }
-            RINOK(FosSpec2->Result);
+            RINOK(FosSpec2->Result)
           }
 
-          RINOK(encodeRes);
-          RINOK(repackBase->CheckFinishedState());
+          RINOK(encodeRes)
+          RINOK(repackBase->CheckFinishedState())
 
           if (curUnpackSize != sizeToEncode)
             return E_FAIL;
@@ -2224,31 +2561,30 @@ HRESULT Update(
       CNum indexInFolder = 0;
       for (CNum fi = db->FolderStartFileIndex[folderIndex]; indexInFolder < numUnpackStreams; fi++)
       {
-        CFileItem file;
-        CFileItem2 file2;
-        GetFile(*db, fi, file, file2);
-        UString name;
-        db->GetPath(fi, name);
-        if (file.HasStream)
+        if (db->Files[fi].HasStream)
         {
           indexInFolder++;
-          int updateIndex = fileIndexToUpdateIndexMap[fi];
+          const int updateIndex = fileIndexToUpdateIndexMap[fi];
           if (updateIndex >= 0)
           {
-            const CUpdateItem &ui = updateItems[updateIndex];
+            const CUpdateItem &ui = updateItems[(unsigned)updateIndex];
             if (ui.NewData)
               continue;
+
+            UString name;
+            CFileItem file;
+            CFileItem2 file2;
+            GetFile(*db, fi, file, file2);
+
             if (ui.NewProps)
             {
-              CFileItem uf;
-              FromUpdateItemToFileItem(ui, uf, file2);
-              uf.Size = file.Size;
-              uf.Crc = file.Crc;
-              uf.CrcDefined = file.CrcDefined;
-              uf.HasStream = file.HasStream;
-              file = uf;
+              UpdateItem_To_FileItem2(ui, file2);
+              file.IsDir = ui.IsDir;
               name = ui.Name;
             }
+            else
+              db->GetPath(fi, name);
+
             /*
             file.Parent = ui.ParentFolderIndex;
             if (ui.TreeFolderIndex >= 0)
@@ -2265,12 +2601,13 @@ HRESULT Update(
 
     // ---------- Compress files to new solid blocks ----------
 
-    unsigned numFiles = group.Indices.Size();
+    const unsigned numFiles = group.Indices.Size();
     if (numFiles == 0)
       continue;
     CRecordVector<CRefItem> refItems;
     refItems.ClearAndSetSize(numFiles);
-    bool sortByType = (options.UseTypeSorting && numSolidFiles > 1);
+    // bool sortByType = (options.UseTypeSorting && isSoid); // numSolidFiles > 1
+    const bool sortByType = options.UseTypeSorting;
     
     unsigned i;
 
@@ -2286,13 +2623,13 @@ HRESULT Update(
 
     for (i = 0; i < numFiles; i++)
     {
-      UInt32 index = refItems[i].Index;
+      const UInt32 index = refItems[i].Index;
       indices[i] = index;
       /*
       const CUpdateItem &ui = updateItems[index];
       CFileItem file;
       if (ui.NewProps)
-        FromUpdateItemToFileItem(ui, file);
+        UpdateItem_To_FileItem(ui, file);
       else
         file = db.Files[ui.IndexInArchive];
       if (file.IsAnti || file.IsDir)
@@ -2316,9 +2653,9 @@ HRESULT Update(
           break;
         if (options.SolidExtension)
         {
-          int slashPos = ui.Name.ReverseFind_PathSepar();
-          int dotPos = ui.Name.ReverseFind_Dot();
-          const wchar_t *ext = ui.Name.Ptr(dotPos <= slashPos ? ui.Name.Len() : dotPos + 1);
+          const int slashPos = ui.Name.ReverseFind_PathSepar();
+          const int dotPos = ui.Name.ReverseFind_Dot();
+          const wchar_t *ext = ui.Name.Ptr(dotPos <= slashPos ? ui.Name.Len() : (unsigned)(dotPos + 1));
           if (numSubFiles == 0)
             prevExtension = ext;
           else if (!StringsAreEqualNoCase(ext, prevExtension))
@@ -2329,36 +2666,77 @@ HRESULT Update(
       if (numSubFiles < 1)
         numSubFiles = 1;
 
-      RINOK(lps->SetCur());
+      RINOK(lps->SetCur())
+
+      /*
+      const unsigned folderIndex = newDatabase.NumUnpackStreamsVector.Size();
+
+      if (opCallback)
+      {
+        RINOK(opCallback->ReportOperation(
+            NEventIndexType::kBlockIndex, (UInt32)folderIndex,
+            NUpdateNotifyOp::kAdd));
+      }
+      */
+
 
       CFolderInStream *inStreamSpec = new CFolderInStream;
       CMyComPtr<ISequentialInStream> solidInStream(inStreamSpec);
+
+      // inStreamSpec->_reportArcProp = reportArcProp;
+      
+      inStreamSpec->Need_CTime = options.Need_CTime;
+      inStreamSpec->Need_ATime = options.Need_ATime;
+      inStreamSpec->Need_MTime = options.Need_MTime;
+      inStreamSpec->Need_Attrib = options.Need_Attrib;
+      // inStreamSpec->Need_Crc = options.Need_Crc;
+
       inStreamSpec->Init(updateCallback, &indices[i], numSubFiles);
       
       unsigned startPackIndex = newDatabase.PackSizes.Size();
-      UInt64 curFolderUnpackSize;
-      RINOK(encoder.Encode(
+      // UInt64 curFolderUnpackSize = totalSize;
+      // curFolderUnpackSize = (UInt64)(Int64)-1; // for debug
+      const UInt64 expectedDataSize = totalSize;
+
+      // const unsigned folderIndex_New = newDatabase.Folders.Size();
+      
+      RINOK(encoder.Encode1(
           EXTERNAL_CODECS_LOC_VARS
           solidInStream,
           // NULL,
           &inSizeForReduce,
-          newDatabase.Folders.AddNew(), newDatabase.CoderUnpackSizes, curFolderUnpackSize,
-          archive.SeqStream, newDatabase.PackSizes, progress));
+          expectedDataSize, // expected size
+          newDatabase.Folders.AddNew(),
+          // newDatabase.CoderUnpackSizes, curFolderUnpackSize,
+          archive.SeqStream, newDatabase.PackSizes, progress))
 
       if (!inStreamSpec->WasFinished())
         return E_FAIL;
 
-      for (; startPackIndex < newDatabase.PackSizes.Size(); startPackIndex++)
-        lps->OutSize += newDatabase.PackSizes[startPackIndex];
+      /*
+      if (inStreamSpec->Need_FolderCrc)
+        newDatabase.FolderUnpackCRCs.SetItem(folderIndex_New,
+            true, inStreamSpec->GetFolderCrc());
+      */
 
-      lps->InSize += curFolderUnpackSize;
+      const UInt64 curFolderUnpackSize = inStreamSpec->Get_TotalSize_for_Coder();
+      encoder.Encode_Post(curFolderUnpackSize, newDatabase.CoderUnpackSizes);
+
+      UInt64 packSize = 0;
+      // const UInt32 numStreams = newDatabase.PackSizes.Size() - startPackIndex;
+      for (; startPackIndex < newDatabase.PackSizes.Size(); startPackIndex++)
+        packSize += newDatabase.PackSizes[startPackIndex];
+      lps->OutSize += packSize;
+
       // for ()
       // newDatabase.PackCRCsDefined.Add(false);
       // newDatabase.PackCRCs.Add(0);
 
       CNum numUnpackStreams = 0;
       UInt64 skippedSize = 0;
-      
+      UInt64 procSize = 0;
+      // unsigned numProcessedFiles = 0;
+
       for (unsigned subIndex = 0; subIndex < numSubFiles; subIndex++)
       {
         const CUpdateItem &ui = updateItems[indices[i + subIndex]];
@@ -2367,13 +2745,13 @@ HRESULT Update(
         UString name;
         if (ui.NewProps)
         {
-          FromUpdateItemToFileItem(ui, file, file2);
+          UpdateItem_To_FileItem(ui, file, file2);
           name = ui.Name;
         }
         else
         {
-          GetFile(*db, ui.IndexInArchive, file, file2);
-          db->GetPath(ui.IndexInArchive, name);
+          GetFile(*db, (unsigned)ui.IndexInArchive, file, file2);
+          db->GetPath((unsigned)ui.IndexInArchive, name);
         }
         if (file2.IsAnti || file.IsDir)
           return E_FAIL;
@@ -2384,18 +2762,21 @@ HRESULT Update(
         */
         if (!inStreamSpec->Processed[subIndex])
         {
+          // we don't add file here
           skippedSize += ui.Size;
-          continue;
-          // file.Name.AddAscii(".locked");
+          continue; // comment it for debug
+          // name += ".locked"; // for debug
         }
 
+        // if (inStreamSpec->Need_Crc)
         file.Crc = inStreamSpec->CRCs[subIndex];
         file.Size = inStreamSpec->Sizes[subIndex];
         
-        // if (file.Size >= 0) // test purposes
+        procSize += file.Size;
+        // if (file.Size >= 0) // for debug: test purposes
         if (file.Size != 0)
         {
-          file.CrcDefined = true;
+          file.CrcDefined = true; // inStreamSpec->Need_Crc;
           file.HasStream = true;
           numUnpackStreams++;
         }
@@ -2405,6 +2786,23 @@ HRESULT Update(
           file.HasStream = false;
         }
 
+        if (inStreamSpec->TimesDefined[subIndex])
+        {
+          if (inStreamSpec->Need_CTime)
+            { file2.CTimeDefined = true;  file2.CTime = inStreamSpec->CTimes[subIndex]; }
+          if (inStreamSpec->Need_ATime
+              // && !ui.ATime_WasReadByAnalysis
+              )
+            { file2.ATimeDefined = true;  file2.ATime = inStreamSpec->ATimes[subIndex]; }
+          if (inStreamSpec->Need_MTime)
+            { file2.MTimeDefined = true;  file2.MTime = inStreamSpec->MTimes[subIndex]; }
+          if (inStreamSpec->Need_Attrib)
+          {
+            file2.AttribDefined = true;
+            file2.Attrib = inStreamSpec->Attribs[subIndex];
+          }
+        }
+
         /*
         file.Parent = ui.ParentFolderIndex;
         if (ui.TreeFolderIndex >= 0)
@@ -2412,8 +2810,78 @@ HRESULT Update(
         if (totalSecureDataSize != 0)
           newDatabase.SecureIDs.Add(ui.SecureIndex);
         */
+        /*
+        if (reportArcProp)
+        {
+          RINOK(ReportItemProps(reportArcProp, ui.IndexInClient, file.Size,
+              file.CrcDefined ? &file.Crc : NULL))
+        }
+        */
+
+        // numProcessedFiles++;
         newDatabase.AddFile(file, file2, name);
       }
+
+      /*
+      // for debug:
+      // we can write crc to folders area, if folder contains only one file
+      if (numUnpackStreams == 1 && numSubFiles == 1)
+      {
+        const CFileItem &file = newDatabase.Files.Back();
+        if (file.CrcDefined)
+          newDatabase.FolderUnpackCRCs.SetItem(folderIndex_New, true, file.Crc);
+      }
+      */
+
+      /*
+      // it's optional check to ensure that sizes are correct
+      if (inStreamSpec->TotalSize_for_Coder != curFolderUnpackSize)
+        return E_FAIL;
+      */
+      // if (inStreamSpec->AlignLog == 0)
+      {
+        if (procSize != curFolderUnpackSize)
+          return E_FAIL;
+      }
+      // else
+      {
+        /*
+        {
+          const CFolder &old = newDatabase.Folders.Back();
+          CFolder &folder = newDatabase.Folders.AddNew();
+          {
+            const unsigned numBonds = old.Bonds.Size();
+            folder.Bonds.SetSize(numBonds + 1);
+            for (unsigned k = 0; k < numBonds; k++)
+              folder.Bonds[k] = old.Bonds[k];
+            CBond &bond = folder.Bonds[numBonds];
+            bond.PackIndex = 0;
+            bond.UnpackIndex = 0;
+          }
+          {
+            const unsigned numCoders = old.Coders.Size();
+            folder.Coders.SetSize(numCoders + 1);
+            for (unsigned k = 0; k < numCoders; k++)
+              folder.Coders[k] = old.Coders[k];
+            CCoderInfo &cod = folder.Coders[numCoders];
+            cod.Props.Alloc(1);
+            cod.Props[0] = (Byte)inStreamSpec->AlignLog;
+            cod.NumStreams = 1;
+          }
+          {
+            const unsigned numPackStreams = old.Coders.Size();
+            folder.Coders.SetSize(numPackStreams);
+            for (unsigned k = 0; k < numPackStreams; k++)
+              folder.PackStreams[k] = old.PackStreams[k];
+          }
+        }
+        newDatabase.Folders.Delete(newDatabase.Folders.Size() - 2);
+        */
+      }
+
+
+      lps->InSize += procSize;
+      // lps->InSize += curFolderUnpackSize;
 
       // numUnpackStreams = 0 is very bad case for locked files
       // v3.13 doesn't understand it.
@@ -2423,12 +2891,50 @@ HRESULT Update(
       if (skippedSize != 0 && complexity >= skippedSize)
       {
         complexity -= skippedSize;
-        RINOK(updateCallback->SetTotal(complexity));
+        RINOK(updateCallback->SetTotal(complexity))
       }
+
+      /*
+      if (reportArcProp)
+      {
+        PROPVARIANT prop;
+        prop.vt = VT_EMPTY;
+        prop.wReserved1 = 0;
+        {
+          NWindows::NCOM::PropVarEm_Set_UInt32(&prop, numProcessedFiles);
+          RINOK(reportArcProp->ReportProp(
+              NEventIndexType::kBlockIndex, (UInt32)folderIndex, kpidNumSubFiles, &prop));
+        }
+        {
+          NWindows::NCOM::PropVarEm_Set_UInt64(&prop, curFolderUnpackSize);
+          RINOK(reportArcProp->ReportProp(
+              NEventIndexType::kBlockIndex, (UInt32)folderIndex, kpidSize, &prop));
+        }
+        {
+          NWindows::NCOM::PropVarEm_Set_UInt64(&prop, packSize);
+          RINOK(reportArcProp->ReportProp(
+              NEventIndexType::kBlockIndex, (UInt32)folderIndex, kpidPackSize, &prop));
+        }
+        {
+          NWindows::NCOM::PropVarEm_Set_UInt32(&prop, numStreams);
+          RINOK(reportArcProp->ReportProp(
+              NEventIndexType::kBlockIndex, (UInt32)folderIndex, kpidNumStreams, &prop));
+        }
+        RINOK(reportArcProp->ReportFinished(NEventIndexType::kBlockIndex, (UInt32)folderIndex, NUpdate::NOperationResult::kOK));
+      }
+      */
+      /*
+      if (opCallback)
+      {
+        RINOK(opCallback->ReportOperation(
+            NEventIndexType::kBlockIndex, (UInt32)folderIndex,
+            NUpdateNotifyOp::kOpFinished));
+      }
+      */
     }
   }
 
-  RINOK(lps->SetCur());
+  RINOK(lps->SetCur())
 
   /*
   fileIndexToUpdateIndexMap.ClearAndFree();
@@ -2458,10 +2964,26 @@ HRESULT Update(
     }
   }
   */
+
+  {
+    const unsigned numFolders = newDatabase.Folders.Size();
+    if (newDatabase.NumUnpackStreamsVector.Size() != numFolders
+        || newDatabase.FolderUnpackCRCs.Defs.Size() > numFolders)
+      return E_FAIL;
+    newDatabase.FolderUnpackCRCs.if_NonEmpty_FillResedue_with_false(numFolders);
+  }
+  
+  updateItems.ClearAndFree();
   newDatabase.ReserveDown();
 
   if (opCallback)
-    RINOK(opCallback->ReportOperation(NEventIndexType::kNoIndex, (UInt32)(Int32)-1, NUpdateNotifyOp::kHeader));
+    RINOK(opCallback->ReportOperation(NEventIndexType::kNoIndex, (UInt32)(Int32)-1, NUpdateNotifyOp::kHeader))
+
+  RINOK(archive.WriteDatabase(EXTERNAL_CODECS_LOC_VARS
+      newDatabase, options.HeaderMethod, options.HeaderOptions))
+
+  if (v_StreamSetRestriction)
+    RINOK(v_StreamSetRestriction->SetRestriction(0, 0))
 
   return S_OK;
 }

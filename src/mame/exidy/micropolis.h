@@ -9,8 +9,8 @@
 
 *********************************************************************/
 
-#ifndef MAME_MACHINE_MICROPOLIS_H
-#define MAME_MACHINE_MICROPOLIS_H
+#ifndef MAME_EXIDY_MICROPOLIS_H
+#define MAME_EXIDY_MICROPOLIS_H
 
 #pragma once
 
@@ -46,8 +46,8 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 private:
 	// internal state
@@ -90,4 +90,4 @@ private:
 DECLARE_DEVICE_TYPE(MICROPOLIS, micropolis_device)
 
 
-#endif // MAME_MACHINE_MICROPOLIS_H
+#endif // MAME_EXIDY_MICROPOLIS_H

@@ -1,13 +1,23 @@
 // Windows/PropVariantConv.h
 
-#ifndef __PROP_VARIANT_CONV_H
-#define __PROP_VARIANT_CONV_H
+#ifndef ZIP7_INC_PROP_VARIANT_CONV_H
+#define ZIP7_INC_PROP_VARIANT_CONV_H
 
 #include "../Common/MyTypes.h"
 
 // provide at least 32 bytes for buffer including zero-end
-bool ConvertFileTimeToString(const FILETIME &ft, char *s, bool includeTime = true, bool includeSeconds = true) throw();
-void ConvertFileTimeToString(const FILETIME &ft, wchar_t *s, bool includeTime = true, bool includeSeconds = true) throw();
+
+#define kTimestampPrintLevel_DAY -3
+// #define kTimestampPrintLevel_HOUR -2
+#define kTimestampPrintLevel_MIN -1
+#define kTimestampPrintLevel_SEC  0
+#define kTimestampPrintLevel_NTFS 7
+#define kTimestampPrintLevel_NS   9
+
+bool ConvertUtcFileTimeToString(const FILETIME &ft, char *s, int level = kTimestampPrintLevel_SEC) throw();
+bool ConvertUtcFileTimeToString(const FILETIME &ft, wchar_t *s, int level = kTimestampPrintLevel_SEC) throw();
+bool ConvertUtcFileTimeToString2(const FILETIME &ft, unsigned ns100, char *s, int level = kTimestampPrintLevel_SEC) throw();
+bool ConvertUtcFileTimeToString2(const FILETIME &ft, unsigned ns100, wchar_t *s, int level = kTimestampPrintLevel_SEC) throw();
 
 // provide at least 32 bytes for buffer including zero-end
 // don't send VT_BSTR to these functions

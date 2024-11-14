@@ -28,19 +28,19 @@ public:
 	cgenie_printer_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	virtual void pa_w(uint8_t data) override;
 	virtual uint8_t pb_r() override;
 	virtual void pb_w(uint8_t data) override;
 
 private:
-	DECLARE_WRITE_LINE_MEMBER(busy_w);
-	DECLARE_WRITE_LINE_MEMBER(perror_w);
-	DECLARE_WRITE_LINE_MEMBER(select_w);
-	DECLARE_WRITE_LINE_MEMBER(fault_w);
+	void busy_w(int state);
+	void perror_w(int state);
+	void select_w(int state);
+	void fault_w(int state);
 
 	required_device<centronics_device> m_centronics;
 	required_device<output_latch_device> m_latch;

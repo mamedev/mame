@@ -9,6 +9,19 @@
 #include "emu.h"
 #include "amis2000d.h"
 
+
+// common lookup tables
+
+enum amis2000_disassembler::e_mnemonics : unsigned
+{
+	mLAB = 0, mLAE, mLAI, mLBE, mLBEP, mLBF, mLBZ, mXAB, mXABU, mXAE,
+	mLAM, mXC, mXCI, mXCD, mSTM, mRSM,
+	mADD, mADCS, mADIS, mAND, mXOR, mCMA, mSTC, mRSC, mSF1, mRF1, mSF2, mRF2,
+	mSAM, mSZM, mSBE, mSZC, mSOS, mSZK, mSZI, mTF1, mTF2,
+	mPP, mJMP, mJMS, mRT, mRTS, mNOP, mHALT,
+	mINP, mOUT, mDISB, mDISN, mMVS, mPSH, mPSL, mEUR
+};
+
 const char *const amis2000_disassembler::s_mnemonics[] =
 {
 	"LAB", "LAE", "LAI", "LBE", "LBEP", "LBF", "LBZ", "XAB", "XABU", "XAE",
@@ -83,6 +96,9 @@ const u8 amis2000_disassembler::s2000_mnemonic[0x100] =
 	mJMP, mJMP, mJMP, mJMP, mJMP, mJMP, mJMP, mJMP
 };
 
+
+// disasm
+
 offs_t amis2000_disassembler::disassemble(std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params)
 {
 	u8 op = opcodes.r8(pc);
@@ -111,9 +127,4 @@ offs_t amis2000_disassembler::disassemble(std::ostream &stream, offs_t pc, const
 	}
 
 	return 1 | s_flags[instr] | SUPPORTED;
-}
-
-u32 amis2000_disassembler::opcode_alignment() const
-{
-	return 1;
 }

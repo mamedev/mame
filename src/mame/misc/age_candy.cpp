@@ -17,6 +17,8 @@ Device is a 27c256   location U3
 #include "speaker.h"
 
 
+namespace {
+
 class age_candy_state : public driver_device
 {
 public:
@@ -28,10 +30,10 @@ public:
 	void age_candy(machine_config &config);
 
 private:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
-	void age_candy_map(address_map &map);
+	void age_candy_map(address_map &map) ATTR_COLD;
 	required_device<hpc_device> m_maincpu;
 };
 
@@ -68,5 +70,8 @@ ROM_START( age_cand )
 	ROM_REGION( 0x8000, "maincpu", 0 )
 	ROM_LOAD( "agecandy.u3", 0x0000, 0x8000, CRC(c8cfc666) SHA1(a1c475ae105746e984741af0723a712f09d7b847) )
 ROM_END
+
+} // anonymous namespace
+
 
 GAME( 19??, age_cand, 0, age_candy, age_candy, age_candy_state, empty_init, ROT0, "Advanced Games & Engineering", "Candy Crane (AGE)", MACHINE_IS_SKELETON_MECHANICAL )

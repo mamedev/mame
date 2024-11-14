@@ -118,10 +118,12 @@ Hardware:   PPIA 8255
 #include "emu.h"
 #include "atom.h"
 #include "machine/clock.h"
-#include "formats/imageutl.h"
 #include "screen.h"
 #include "softlist_dev.h"
 #include "speaker.h"
+
+#include "multibyte.h"
+#include "utf8.h"
 
 /***************************************************************************
     PARAMETERS
@@ -157,9 +159,9 @@ QUICKLOAD_LOAD_MEMBER(atom_state::quickload_cb)
 
 	image.fread(header, 0x16);
 
-	uint16_t start_address = pick_integer_le(header, 0x10, 2);
-	uint16_t run_address = pick_integer_le(header, 0x12, 2);
-	uint16_t size = pick_integer_le(header, 0x14, 2);
+	uint16_t start_address = get_u16le(&header[0x10]);
+	uint16_t run_address = get_u16le(&header[0x12]);
+	uint16_t size = get_u16le(&header[0x14]);
 
 	if (LOG)
 	{
@@ -186,7 +188,7 @@ QUICKLOAD_LOAD_MEMBER(atom_state::quickload_cb)
 	else
 		m_maincpu->set_state_int(M6502_PC, run_address);   // if not basic, autostart program (set_pc doesn't work)
 
-	return image_init_result::PASS;
+	return std::make_pair(std::error_condition(), std::string());
 }
 
 /***************************************************************************
@@ -272,7 +274,7 @@ void atom_state::atom_mem(address_map &map)
 //  map(0xa000, 0xafff)        // mapped by the cartslot
 	map(0xb000, 0xb003).mirror(0x3fc).rw(m_ppi, FUNC(i8255_device::read), FUNC(i8255_device::write));
 //  map(0xb400, 0xb403).rw(MC6854_TAG, FUNC(mc6854_device::read), FUNC(mc6854_device::write));
-//  map(0xb404, 0xb404).portr("ECONET");
+//  map(0xb404, 0xb404).portr(m_econet);
 	map(0xb800, 0xb80f).mirror(0x3f0).m(m_via, FUNC(via6522_device::map));
 	map(0xc000, 0xffff).rom().region(SY6502_TAG, 0);
 }
@@ -428,7 +430,7 @@ static INPUT_PORTS_START( atom )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("REPT")         PORT_CODE(KEYCODE_RCONTROL)   PORT_CHAR(UCHAR_MAMEKEY(RCONTROL))
 
 	PORT_START("BRK") // This is a full reset - program in memory is lost
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("BREAK")        PORT_CODE(KEYCODE_ESC)        PORT_CHAR(UCHAR_MAMEKEY(F3)) PORT_CHANGED_MEMBER(DEVICE_SELF, atom_state, trigger_reset, 0)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("BREAK")        PORT_CODE(KEYCODE_ESC)        PORT_CHAR(UCHAR_MAMEKEY(F3)) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(atom_state::trigger_reset), 0)
 
 	PORT_START("ECONET")
 	// station ID (0-255)
@@ -560,7 +562,7 @@ void atom_state::ppi_pc_w(uint8_t data)
     i8271 interface
 -------------------------------------------------*/
 
-WRITE_LINE_MEMBER( atom_state::atom_8271_interrupt_callback )
+void atom_state::atom_8271_interrupt_callback(int state)
 {
 	/* I'm assuming that the nmi is edge triggered */
 	/* a interrupt from the fdc will cause a change in line state, and
@@ -581,19 +583,16 @@ WRITE_LINE_MEMBER( atom_state::atom_8271_interrupt_callback )
 	m_previous_i8271_int_state = state;
 }
 
-WRITE_LINE_MEMBER( atom_state::motor_w )
+void atom_state::motor_w(int state)
 {
-	for (u8 i = 0; i < 2; i++)
+	for (auto &con : m_floppies)
 	{
-		char devname[8];
-		sprintf(devname, "%d", i);
-		floppy_connector *con = m_fdc->subdevice<floppy_connector>(devname);
 		if (con)
 			con->get_device()->mon_w(!state);
 	}
 }
 
-WRITE_LINE_MEMBER(atom_state::cassette_output_tick)
+void atom_state::cassette_output_tick(int state)
 {
 	m_hz2400 = state;
 
@@ -678,20 +677,17 @@ void atomeb_state::machine_reset()
     MACHINE DRIVERS
 ***************************************************************************/
 
-image_init_result atom_state::load_cart(device_image_interface &image, generic_slot_device &slot)
+std::pair<std::error_condition, std::string> atom_state::load_cart(device_image_interface &image, generic_slot_device &slot)
 {
 	uint32_t size = slot.common_get_size("rom");
 
 	if (size > 0x1000)
-	{
-		image.seterror(image_error::INVALIDIMAGE, "Unsupported ROM size");
-		return image_init_result::FAIL;
-	}
+		return std::make_pair(image_error::INVALIDIMAGE, "Unsupported ROM size (must be no larger than 4K)");
 
 	slot.rom_alloc(size, GENERIC_ROM8_WIDTH, ENDIANNESS_LITTLE);
 	slot.common_load_rom(slot.get_rom_base(), size, "rom");
 
-	return image_init_result::PASS;
+	return std::make_pair(std::error_condition(), std::string());
 }
 
 static void atom_floppies(device_slot_interface &device)
@@ -711,6 +707,9 @@ void atom_state::floppy_formats(format_registration &fr)
 
 void atom_state::atom_common(machine_config &config)
 {
+	[[maybe_unused]] constexpr auto X1 = 3.579545_MHz_XTAL;    // MC6847 Clock
+	constexpr auto X2 = 4_MHz_XTAL;           // CPU Clock - a divider reduces it to 1MHz
+
 	/* basic machine hardware */
 	M6502(config, m_maincpu, X2/4);
 
@@ -759,11 +758,12 @@ void atom_state::atom(machine_config &config)
 	atom_common(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &atom_state::atom_mem);
 
-	I8271(config, m_fdc, 0);
+	// Atom Disc Pack
+	I8271(config, m_fdc, 4_MHz_XTAL / 2);
 	m_fdc->intrq_wr_callback().set(FUNC(atom_state::atom_8271_interrupt_callback));
 	m_fdc->hdl_wr_callback().set(FUNC(atom_state::motor_w));
-	FLOPPY_CONNECTOR(config, I8271_TAG ":0", atom_floppies, "525sssd", atom_state::floppy_formats).enable_sound(true);
-	FLOPPY_CONNECTOR(config, I8271_TAG ":1", atom_floppies, "525sssd", atom_state::floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, m_floppies[0], atom_floppies, "525sssd", atom_state::floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, m_floppies[1], atom_floppies, "525sssd", atom_state::floppy_formats).enable_sound(true);
 
 	QUICKLOAD(config, "quickload", "atm", attotime::from_seconds(2)).set_load_callback(FUNC(atom_state::quickload_cb));
 

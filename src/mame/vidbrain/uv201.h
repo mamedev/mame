@@ -51,8 +51,8 @@
 
 **********************************************************************/
 
-#ifndef MAME_VIDEO_UV201_H
-#define MAME_VIDEO_UV201_H
+#ifndef MAME_VIDBRAIN_UV201_H
+#define MAME_VIDBRAIN_UV201_H
 
 #pragma once
 
@@ -80,15 +80,15 @@ public:
 	uint8_t read(offs_t offset);
 	void write(offs_t offset, uint8_t data);
 
-	DECLARE_WRITE_LINE_MEMBER( ext_int_w );
-	DECLARE_READ_LINE_MEMBER( kbd_r );
+	void ext_int_w(int state);
+	int kbd_r();
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	TIMER_CALLBACK_MEMBER(y_update_tick);
 	TIMER_CALLBACK_MEMBER(hblank_on);
@@ -126,4 +126,4 @@ private:
 // device type definition
 DECLARE_DEVICE_TYPE(UV201, uv201_device)
 
-#endif // MAME_VIDEO_UV201_H
+#endif // MAME_VIDBRAIN_UV201_H

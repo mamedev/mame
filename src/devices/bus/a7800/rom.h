@@ -25,8 +25,8 @@ protected:
 	a78_rom_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 };
 
 
@@ -45,7 +45,7 @@ public:
 protected:
 	a78_rom_pokey_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 	required_device<pokey_device> m_pokey;
 };
@@ -84,8 +84,8 @@ protected:
 	a78_rom_sg_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	int m_bank;
 };
@@ -104,7 +104,7 @@ public:
 	virtual void write_40xx(offs_t offset, uint8_t data) override;
 
 protected:
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 	required_device<pokey_device> m_pokey;
 };
@@ -158,8 +158,8 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	int m_bank;
 };
@@ -179,8 +179,8 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	int m_bank;
 };
@@ -201,7 +201,7 @@ public:
 	virtual void write_04xx(offs_t offset, uint8_t data) override { if (offset >= 0x50 && offset < 0x60) m_pokey450->write(offset & 0x0f, data); }
 
 protected:
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 	required_device<pokey_device> m_pokey450;
 };
@@ -220,7 +220,7 @@ public:
 	virtual void write_04xx(offs_t offset, uint8_t data) override { if (offset >= 0x50 && offset < 0x60) m_pokey450->write(offset & 0x0f, data); }
 
 protected:
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 	required_device<pokey_device> m_pokey450;
 };
@@ -239,7 +239,7 @@ public:
 	virtual void write_04xx(offs_t offset, uint8_t data) override { if (offset >= 0x50 && offset < 0x60) m_pokey450->write(offset & 0x0f, data); }
 
 protected:
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 	required_device<pokey_device> m_pokey450;
 };
@@ -258,7 +258,7 @@ public:
 	virtual void write_04xx(offs_t offset, uint8_t data) override { if (offset >= 0x50 && offset < 0x60) m_pokey450->write(offset & 0x0f, data); }
 
 protected:
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 	required_device<pokey_device> m_pokey450;
 };

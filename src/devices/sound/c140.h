@@ -38,10 +38,10 @@ protected:
 	c140_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	// device-level overrides
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 	virtual void device_clock_changed() override;
 
-	virtual void rom_bank_updated() override;
+	virtual void rom_bank_pre_change() override;
 
 	// sound stream update overrides
 	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
@@ -94,7 +94,7 @@ protected:
 	int m_baserate;
 	u8 m_REG[0x200];
 
-	s16 m_pcmtbl[256];        //2000.06.26 CAB
+	s16 m_pcmtbl[256];
 
 	C140_VOICE m_voi[MAX_VOICE];
 
@@ -115,7 +115,7 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 	// sound stream update overrides
 	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;

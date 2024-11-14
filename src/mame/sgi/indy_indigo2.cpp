@@ -55,23 +55,21 @@
 
 #include "emu.h"
 
+#include "hpc3.h"
+#include "ioc2.h"
+#include "mc.h"
+#include "vino.h"
+
 #include "bus/gio64/gio64.h"
-
+#include "bus/nscsi/cd.h"
+#include "bus/nscsi/hd.h"
 #include "cpu/mips/mips3.h"
-
 #include "machine/ds1386.h"
 #include "machine/edlc.h"
 #include "machine/eepromser.h"
-#include "hpc3.h"
-#include "ioc2.h"
 #include "machine/nscsi_bus.h"
-#include "bus/nscsi/cd.h"
-#include "bus/nscsi/hd.h"
-#include "sgi.h"
-#include "vino.h"
 #include "machine/saa7191.h"
 #include "machine/wd33c9x.h"
-
 #include "sound/cdda.h"
 
 #include "emupal.h"
@@ -80,13 +78,15 @@
 
 #include "logmacro.h"
 
+
+namespace {
+
 class ip24_state : public driver_device
 {
 public:
 	ip24_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
-		, m_mainram(*this, "mainram")
 		, m_mem_ctrl(*this, "memctrl")
 		, m_scsi_ctrl(*this, "scsibus:0:wd33c93")
 		, m_edlc(*this, "edlc")
@@ -104,38 +104,36 @@ public:
 	{
 	}
 
-	void ip24_base(machine_config &config);
-	void ip24(machine_config &config);
+	void ip24_base(machine_config &config, uint32_t system_clock);
+	void ip24(machine_config &config, uint32_t system_clock);
 	void indy_5015(machine_config &config);
 	void indy_4613(machine_config &config);
 	void indy_4610(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
-	void write_ram(offs_t offset, uint64_t data, uint64_t mem_mask = ~0);
 	template <uint32_t addr_base> uint64_t bus_error_r(offs_t offset, uint64_t mem_mask = ~0);
 	template <uint32_t addr_base> void bus_error_w(offs_t offset, uint64_t data, uint64_t mem_mask = ~0);
 
 	uint8_t volume_r(offs_t offset);
 	void volume_w(offs_t offset, uint8_t data);
 
-	void ip24_map(address_map &map);
-	void ip24_base_map(address_map &map);
-	void pio0_map(address_map &map);
-	void pio1_map(address_map &map);
-	void pio2_map(address_map &map);
-	void pio3_map(address_map &map);
-	void pio5_map(address_map &map);
-	void pio6_map(address_map &map);
+	void ip24_map(address_map &map) ATTR_COLD;
+	void ip24_base_map(address_map &map) ATTR_COLD;
+	void pio0_map(address_map &map) ATTR_COLD;
+	void pio1_map(address_map &map) ATTR_COLD;
+	void pio2_map(address_map &map) ATTR_COLD;
+	void pio3_map(address_map &map) ATTR_COLD;
+	void pio5_map(address_map &map) ATTR_COLD;
+	void pio6_map(address_map &map) ATTR_COLD;
 
 	void wd33c93(device_t *device);
 
 	static void scsi_devices(device_slot_interface &device);
 
 	required_device<mips3_device> m_maincpu;
-	required_shared_ptr<uint64_t> m_mainram;
 	required_device<sgi_mc_device> m_mem_ctrl;
 	required_device<wd33c93b_device> m_scsi_ctrl;
 	required_device<seeq80c03_device> m_edlc;
@@ -171,9 +169,9 @@ private:
 
 	void wd33c93_2(device_t *device);
 
-	void ip22_map(address_map &map);
-	void pio4_map(address_map &map);
-	void pio6_map(address_map &map);
+	void ip22_map(address_map &map) ATTR_COLD;
+	void pio4_map(address_map &map) ATTR_COLD;
+	void pio6_map(address_map &map) ATTR_COLD;
 
 	required_device<wd33c93b_device> m_scsi_ctrl2;
 };
@@ -200,25 +198,6 @@ uint32_t ip22_state::eisa_io_r()
 	return 0xffffffff;
 }
 
-// a bit hackish, but makes the memory detection work properly and allows a big cleanup of the mapping
-void ip24_state::write_ram(offs_t offset, uint64_t data, uint64_t mem_mask)
-{
-	// if banks 2 or 3 are enabled, do nothing, we don't support that much memory
-	if (m_mem_ctrl->get_mem_config(1) & 0x10001000)
-	{
-		// a random perturbation so the memory test fails
-		data ^= 0xffffffffffffffffULL;
-	}
-
-	// if banks 0 or 1 have 2 membanks, also kill it, we only want 128 MB
-	if (m_mem_ctrl->get_mem_config(0) & 0x40004000)
-	{
-		// a random perturbation so the memory test fails
-		data ^= 0xffffffffffffffffULL;
-	}
-	COMBINE_DATA(&m_mainram[offset]);
-}
-
 uint8_t ip24_state::volume_r(offs_t offset)
 {
 	if (offset == 0)
@@ -243,14 +222,11 @@ void ip24_state::volume_w(offs_t offset, uint8_t data)
 
 void ip24_state::ip24_base_map(address_map &map)
 {
-	map(0x00000000, 0x0007ffff).bankrw("bank1");    /* mirror of first 512k of main RAM */
-	map(0x08000000, 0x0fffffff).share("mainram").ram().w(FUNC(ip24_state::write_ram));     /* 128 MB of main RAM */
 	map(0x1f000000, 0x1f9fffff).rw(m_gio64, FUNC(gio64_device::read), FUNC(gio64_device::write));
 	map(0x1fa00000, 0x1fa1ffff).rw(m_mem_ctrl, FUNC(sgi_mc_device::read), FUNC(sgi_mc_device::write));
 	map(0x1fb00000, 0x1fb7ffff).rw(FUNC(ip24_state::bus_error_r<0x1fb00000>), FUNC(ip24_state::bus_error_w<0x1fb00000>));
 	map(0x1fb80000, 0x1fbfffff).m(m_hpc3, FUNC(hpc3_device::map));
 	map(0x1fc00000, 0x1fc7ffff).rom().region("user1", 0);
-	map(0x20000000, 0x27ffffff).share("mainram").ram().w(FUNC(ip24_state::write_ram));
 }
 
 void ip24_state::ip24_map(address_map &map)
@@ -303,9 +279,6 @@ void ip24_state::machine_start()
 
 void ip24_state::machine_reset()
 {
-	// set up low RAM mirror
-	membank("bank1")->set_base(m_mainram);
-
 	//m_maincpu->mips3drc_set_options(MIPS3DRC_COMPATIBLE_OPTIONS | MIPS3DRC_CHECK_OVERFLOWS);
 }
 
@@ -326,9 +299,17 @@ void ip24_state::scsi_devices(device_slot_interface &device)
 	//device.set_option_machine_config("cdrom", cdrom_config);
 }
 
-void ip24_state::ip24_base(machine_config &config)
+static DEVICE_INPUT_DEFAULTS_START(ip22_mc)
+	DEVICE_INPUT_DEFAULTS("VALID", 0x0f, 0x07)
+DEVICE_INPUT_DEFAULTS_END
+
+static DEVICE_INPUT_DEFAULTS_START(ip24_mc)
+	DEVICE_INPUT_DEFAULTS("VALID", 0x0f, 0x03)
+DEVICE_INPUT_DEFAULTS_END
+
+void ip24_state::ip24_base(machine_config &config, uint32_t system_clock)
 {
-	SGI_MC(config, m_mem_ctrl, m_maincpu, m_eeprom);
+	SGI_MC(config, m_mem_ctrl, m_maincpu, m_eeprom, system_clock);
 	m_mem_ctrl->int_dma_done_cb().set(m_ioc2, FUNC(ioc2_device::mc_dma_done_w));
 	m_mem_ctrl->eisa_present().set_constant(1);
 
@@ -384,9 +365,10 @@ void ip24_state::ip24_base(machine_config &config)
 	SOFTWARE_LIST(config, "sgi_mips_hdd").set_original("sgi_mips_hdd");
 }
 
-void ip24_state::ip24(machine_config &config)
+void ip24_state::ip24(machine_config &config, uint32_t system_clock)
 {
-	ip24_base(config);
+	ip24_base(config, system_clock);
+	m_mem_ctrl->set_input_default(DEVICE_INPUT_DEFAULTS_NAME(ip24_mc));
 
 	m_hpc3->set_addrmap(hpc3_device::AS_PIO6, &ip24_state::pio6_map);
 
@@ -405,9 +387,10 @@ void ip24_state::ip24(machine_config &config)
 
 void ip24_state::indy_5015(machine_config &config)
 {
-	ip24(config);
-
-	R5000BE(config, m_maincpu, 75'000'000);
+	constexpr uint32_t system_clock = 50'000'000;
+	ip24(config, system_clock);
+	R5000BE(config, m_maincpu, 3 * system_clock);
+	m_maincpu->set_system_clock(system_clock);
 	m_maincpu->set_icache_size(0x8000);
 	m_maincpu->set_dcache_size(0x8000);
 	m_maincpu->set_addrmap(AS_PROGRAM, &ip24_state::ip24_map);
@@ -415,9 +398,10 @@ void ip24_state::indy_5015(machine_config &config)
 
 void ip24_state::indy_4613(machine_config &config)
 {
-	ip24(config);
-
-	R4600BE(config, m_maincpu, 66'666'666);
+	constexpr uint32_t system_clock = 66'666'666;
+	ip24(config, system_clock);
+	R4600BE(config, m_maincpu, 2 * system_clock);
+	m_maincpu->set_system_clock(system_clock);
 	m_maincpu->set_icache_size(0x4000);
 	m_maincpu->set_dcache_size(0x4000);
 	m_maincpu->set_addrmap(AS_PROGRAM, &ip24_state::ip24_map);
@@ -425,9 +409,10 @@ void ip24_state::indy_4613(machine_config &config)
 
 void ip24_state::indy_4610(machine_config &config)
 {
-	ip24(config);
-
-	R4600BE(config, m_maincpu, 50'000'000);
+	constexpr uint32_t system_clock = 50'000'000;
+	ip24(config, system_clock);
+	R4600BE(config, m_maincpu, 2 * system_clock);
+	m_maincpu->set_system_clock(system_clock);
 	m_maincpu->set_icache_size(0x4000);
 	m_maincpu->set_dcache_size(0x4000);
 	m_maincpu->set_addrmap(AS_PROGRAM, &ip24_state::ip24_map);
@@ -442,12 +427,15 @@ void ip22_state::wd33c93_2(device_t *device)
 
 void ip22_state::indigo2_4415(machine_config &config)
 {
-	R4400BE(config, m_maincpu, 75'000'000);
+	constexpr uint32_t system_clock = 50'000'000;
+	R4400BE(config, m_maincpu, 3 * system_clock);
+	m_maincpu->set_system_clock(system_clock);
 	m_maincpu->set_icache_size(0x4000);
 	m_maincpu->set_dcache_size(0x4000);
 	m_maincpu->set_addrmap(AS_PROGRAM, &ip22_state::ip22_map);
 
-	ip24_base(config);
+	ip24_base(config, system_clock);
+	m_mem_ctrl->set_input_default(DEVICE_INPUT_DEFAULTS_NAME(ip22_mc));
 
 	NSCSI_BUS(config, "scsibus2", 0);
 	NSCSI_CONNECTOR(config, "scsibus2:0").option_set("wd33c93", WD33C93B)
@@ -534,11 +522,14 @@ ROM_END
 
 ROM_START( indigo2_4415 )
 	ROM_REGION64_BE( 0x80000, "user1", 0 )
-	ROM_SYSTEM_BIOS( 0, "e", "Version 5.3 Rev E R4X00 Jan 29, 1996" ) \
+	ROM_SYSTEM_BIOS( 0, "e", "Version 5.3 Rev E R4X00 Jan 29, 1996" )
 	ROMX_LOAD( "ip22prom.070-1367-012.bin", 0x000000, 0x080000, CRC(54460c16) SHA1(330d87b3a02a05fb49c85a569f6f84904587cb35), ROM_GROUPDWORD | ROM_BIOS(0) )
-	ROM_SYSTEM_BIOS( 1, "b4", "Version 5.1.2 Rev B4 R4X00 Dec 9, 1993" ) \
+	ROM_SYSTEM_BIOS( 1, "b4", "Version 5.1.2 Rev B4 R4X00 Dec 9, 1993" )
 	ROMX_LOAD( "ip22prom.070-1367-002.bin", 0x000000, 0x080000, CRC(ae5ecd08) SHA1(422568ae95282ee23b2fe123267f9b915a1dc3dc), ROM_GROUPDWORD | ROM_BIOS(1) )
 ROM_END
+
+} // anonymous namespace
+
 
 //    YEAR  NAME          PARENT     COMPAT  MACHINE       INPUT CLASS       INIT        COMPANY                 FULLNAME                   FLAGS
 COMP( 1993, indy_4610,    0,         0,      indy_4610,    ip24, ip24_state, empty_init, "Silicon Graphics Inc", "Indy (R4600, 100MHz)",    MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NODEVICE_MICROPHONE )

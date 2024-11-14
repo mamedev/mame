@@ -5,8 +5,8 @@
     Pole Position hardware
 
 *************************************************************************/
-#ifndef MAME_INCLUDES_POLEPOS_H
-#define MAME_INCLUDES_POLEPOS_H
+#ifndef MAME_NAMCO_POLEPOS_H
+#define MAME_NAMCO_POLEPOS_H
 
 #pragma once
 
@@ -42,7 +42,7 @@ public:
 		m_palette(*this, "palette")
 	{ }
 
-	DECLARE_READ_LINE_MEMBER(auto_start_r);
+	int auto_start_r();
 
 	void init_polepos2();
 
@@ -51,9 +51,9 @@ public:
 	void polepos(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -92,9 +92,9 @@ private:
 	uint16_t polepos2_ic25_r(offs_t offset);
 	uint8_t analog_r();
 	uint8_t ready_r();
-	DECLARE_WRITE_LINE_MEMBER(gasel_w);
-	DECLARE_WRITE_LINE_MEMBER(sb0_w);
-	DECLARE_WRITE_LINE_MEMBER(chacl_w);
+	void gasel_w(int state);
+	void sb0_w(int state);
+	void chacl_w(int state);
 	template<bool sub1> void z8002_nvi_enable_w(uint16_t data);
 	uint8_t sprite_r(offs_t offset);
 	void sprite_w(offs_t offset, uint8_t data);
@@ -109,7 +109,7 @@ private:
 	uint8_t alpha_r(offs_t offset);
 	void alpha_w(offs_t offset, uint8_t data);
 	void out(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(lockout);
+	void lockout(int state);
 	uint8_t namco_52xx_rom_r(offs_t offset);
 	uint8_t namco_52xx_si_r();
 	uint8_t namco_53xx_k_r();
@@ -124,14 +124,14 @@ private:
 	void draw_road(bitmap_ind16 &bitmap);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect );
 	void zoom_sprite(bitmap_ind16 &bitmap,int big,uint32_t code,uint32_t color,int flipx,int sx,int sy,int sizex,int sizey);
-	void sound_z80_bootleg_iomap(address_map &map);
-	void sound_z80_bootleg_map(address_map &map);
-	void topracern_io(address_map &map);
-	void z8002_map(address_map &map);
-	void z8002_map_1(address_map &map);
-	void z8002_map_2(address_map &map);
-	void z80_io(address_map &map);
-	void z80_map(address_map &map);
+	void sound_z80_bootleg_iomap(address_map &map) ATTR_COLD;
+	void sound_z80_bootleg_map(address_map &map) ATTR_COLD;
+	void topracern_io(address_map &map) ATTR_COLD;
+	void z8002_map(address_map &map) ATTR_COLD;
+	void z8002_map_1(address_map &map) ATTR_COLD;
+	void z8002_map_2(address_map &map) ATTR_COLD;
+	void z80_io(address_map &map) ATTR_COLD;
+	void z80_map(address_map &map) ATTR_COLD;
 };
 
-#endif // MAME_INCLUDES_POLEPOS_H
+#endif // MAME_NAMCO_POLEPOS_H

@@ -31,25 +31,25 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// optional information overrides
-	virtual const tiny_rom_entry *device_rom_region() const override;
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual ioport_constructor device_input_ports() const override;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 
 	// device_pc_kbd_interface overrides
-	virtual DECLARE_WRITE_LINE_MEMBER( clock_write ) override;
-	virtual DECLARE_WRITE_LINE_MEMBER( data_write ) override;
+	virtual void clock_write(int state) override;
+	virtual void data_write(int state) override;
 
 private:
 	uint8_t bus_r();
 	void bus_w(uint8_t data);
 	void p1_w(uint8_t data);
 	void p2_w(uint8_t data);
-	DECLARE_READ_LINE_MEMBER( t0_r );
-	DECLARE_READ_LINE_MEMBER( t1_r );
+	int t0_r();
+	int t1_r();
 
 	required_device<i8048_device> m_maincpu;
 	required_ioport_array<12> m_md;

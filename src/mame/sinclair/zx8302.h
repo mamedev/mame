@@ -29,8 +29,8 @@
 
 **********************************************************************/
 
-#ifndef MAME_MACHINE_ZX8302_H
-#define MAME_MACHINE_ZX8302_H
+#ifndef MAME_SINCLAIR_ZX8302_H
+#define MAME_SINCLAIR_ZX8302_H
 
 #pragma once
 
@@ -77,18 +77,18 @@ public:
 	uint8_t irq_status_r();
 	void irq_acknowledge_w(uint8_t data);
 	void data_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER( vsync_w );
-	DECLARE_WRITE_LINE_MEMBER( comctl_w );
-	DECLARE_WRITE_LINE_MEMBER( comdata_w );
-	DECLARE_WRITE_LINE_MEMBER( extint_w );
+	void vsync_w(int state);
+	void comctl_w(int state);
+	void comdata_w(int state);
+	void extint_w(int state);
 
-	DECLARE_WRITE_LINE_MEMBER( write_netin );
-	DECLARE_WRITE_LINE_MEMBER( write_dtr1 );
-	DECLARE_WRITE_LINE_MEMBER( write_cts2 );
+	void write_netin(int state);
+	void write_dtr1(int state);
+	void write_cts2(int state);
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 	// device_serial_interface overrides
 	virtual void tra_callback() override;
@@ -207,4 +207,4 @@ DECLARE_DEVICE_TYPE(ZX8302, zx8302_device)
 
 
 
-#endif // MAME_MACHINE_ZX8302_H
+#endif // MAME_SINCLAIR_ZX8302_H

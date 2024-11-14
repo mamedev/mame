@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <!--
-license:CC0
+license:CC0-1.0
 -->
 <mamelayout version="2">
 	<element name="digit">
@@ -466,6 +466,12 @@ license:CC0
 		<repeat count="16">
 			<param name="n" start="15" increment="-1"/>
 			<param name="x" start="17" increment="7"/>
+			<element name="vfdblank~n~" ref="vfd0" state="0">
+				<animate name="vfdduty0" />
+				<color state="31" red="0.00" green="0.6" blue="1.00" alpha="0.0"/>
+				<color state="0" red="0.00" green="0.6" blue="1.00" alpha="1.0"/>
+				<bounds x="~x~" y="0" width="7" height="24"/>
+			</element>
 			<element name="vfd~n~" ref="vfd0" state="0">
 				<animate name="vfdduty0" />
 				<color state="0" red="0.00" green="0.6" blue="1.00" alpha="0.0"/>

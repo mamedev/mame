@@ -166,7 +166,7 @@ void human_interface_device::device_reset()
 	m_iocpu->reset();
 }
 
-WRITE_LINE_MEMBER(human_interface_device::reset_in)
+void human_interface_device::reset_in(int state)
 {
 	if (state)
 		device_reset();
@@ -178,7 +178,7 @@ void human_interface_device::update_gpib_irq()
 		((m_ppoll_sc & (PPOLL_IR|PPOLL_IE)) == (PPOLL_IR|PPOLL_IE))) ? ASSERT_LINE : CLEAR_LINE);
 }
 
-WRITE_LINE_MEMBER(human_interface_device::gpib_irq)
+void human_interface_device::gpib_irq(int state)
 {
 	m_gpib_irq_line = state;
 	update_gpib_irq();
@@ -189,7 +189,7 @@ void human_interface_device::update_gpib_dma()
 	dmar0_out(m_gpib_dma_enable && m_gpib_dma_line);
 }
 
-WRITE_LINE_MEMBER(human_interface_device::gpib_dreq)
+void human_interface_device::gpib_dreq(int state)
 {
 	m_gpib_dma_line = state;
 	update_gpib_dma();
@@ -338,7 +338,7 @@ uint8_t human_interface_device::iocpu_test0_r()
 	return !m_mlc->get_int();
 }
 
-WRITE_LINE_MEMBER(human_interface_device::rtc_d0_w)
+void human_interface_device::rtc_d0_w(int state)
 {
 	if (state)
 		m_rtc_data |= 1;
@@ -347,7 +347,7 @@ WRITE_LINE_MEMBER(human_interface_device::rtc_d0_w)
 
 }
 
-WRITE_LINE_MEMBER(human_interface_device::rtc_d1_w)
+void human_interface_device::rtc_d1_w(int state)
 {
 	if (state)
 		m_rtc_data |= 2;
@@ -355,7 +355,7 @@ WRITE_LINE_MEMBER(human_interface_device::rtc_d1_w)
 		m_rtc_data &= ~2;
 }
 
-WRITE_LINE_MEMBER(human_interface_device::rtc_d2_w)
+void human_interface_device::rtc_d2_w(int state)
 {
 	if (state)
 		m_rtc_data |= 4;
@@ -364,7 +364,7 @@ WRITE_LINE_MEMBER(human_interface_device::rtc_d2_w)
 
 }
 
-WRITE_LINE_MEMBER(human_interface_device::rtc_d3_w)
+void human_interface_device::rtc_d3_w(int state)
 {
 	if (state)
 		m_rtc_data |= 8;

@@ -27,6 +27,9 @@
 #include "screen.h"
 #include "speaker.h"
 
+
+namespace {
+
 #define MAIN_CLOCK XTAL(24'000'000)
 
 class kontest_state : public driver_device
@@ -56,14 +59,14 @@ private:
 	// member functions
 	void control_w(uint8_t data);
 
-	void kontest_io(address_map &map);
-	void kontest_map(address_map &map);
+	void kontest_io(address_map &map) ATTR_COLD;
+	void kontest_map(address_map &map) ATTR_COLD;
 
 	// driver_device overrides
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 
 	void kontest_palette(palette_device &palette) const;
 	INTERRUPT_GEN_MEMBER(kontest_interrupt);
@@ -286,5 +289,8 @@ ROM_START( kontest )
 	ROM_REGION( 0x20, "proms", 0 )
 	ROM_LOAD( "800a02.4f",    0x000000, 0x000020, CRC(6d604171) SHA1(6b1366fb53cecbde6fb651142a77917dd16daf69) )
 ROM_END
+
+} // anonymous namespace
+
 
 GAME( 1987?, kontest, 0, kontest, kontest, kontest_state, empty_init, ROT0, "Konami",      "Konami Test Board (GX800, Japan)", MACHINE_SUPPORTS_SAVE ) // late 1987 or early 1988

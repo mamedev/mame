@@ -33,11 +33,11 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual ioport_constructor device_input_ports() const override;
-	virtual const tiny_rom_entry *device_rom_region() const override;
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 private:
 	required_device<i8048_device> m_cpu;
@@ -72,21 +72,21 @@ private:
 	uint8_t m_rxc_sel;
 	uint8_t m_txc_sel;
 
-	void cpu_program_map(address_map &map);
-	void cpu_io_map(address_map &map);
+	void cpu_program_map(address_map &map) ATTR_COLD;
+	void cpu_io_map(address_map &map) ATTR_COLD;
 	uint8_t ram_r(offs_t offset);
 	uint8_t cpu_r(offs_t offset);
 	void cpu_w(offs_t offset, uint8_t data);
 	uint8_t p1_r();
 	void p2_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(sio_int_w);
-	DECLARE_WRITE_LINE_MEMBER(sio_txd_w);
-	DECLARE_WRITE_LINE_MEMBER(rs232_rxd_w);
-	DECLARE_WRITE_LINE_MEMBER(rs232_dcd_w);
-	DECLARE_WRITE_LINE_MEMBER(rs232_dsr_w);
-	DECLARE_WRITE_LINE_MEMBER(rs232_cts_w);
-	DECLARE_WRITE_LINE_MEMBER(rs232_rxc_w);
-	DECLARE_WRITE_LINE_MEMBER(rs232_txc_w);
+	void sio_int_w(int state);
+	void sio_txd_w(int state);
+	void rs232_rxd_w(int state);
+	void rs232_dcd_w(int state);
+	void rs232_dsr_w(int state);
+	void rs232_cts_w(int state);
+	void rs232_rxc_w(int state);
+	void rs232_txc_w(int state);
 	bool rx_fifo_flag() const;
 	bool tx_fifo_flag() const;
 	void update_flg();
@@ -96,8 +96,8 @@ private:
 	void load_tx_fifo();
 	void set_r6_r7_pending(bool state);
 	uint8_t get_hs_input() const;
-	DECLARE_WRITE_LINE_MEMBER(rxc_w);
-	DECLARE_WRITE_LINE_MEMBER(txc_w);
+	void rxc_w(int state);
+	void txc_w(int state);
 	TIMER_CALLBACK_MEMBER(sync_rx_im_w);
 	TIMER_CALLBACK_MEMBER(sync_tx_im_w);
 };

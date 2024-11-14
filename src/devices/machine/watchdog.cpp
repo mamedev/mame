@@ -2,8 +2,6 @@
 // copyright-holders:Aaron Giles
 /***************************************************************************
 
-    watchdog.c
-
     Watchdog timer device.
 
 ***************************************************************************/
@@ -30,6 +28,9 @@ watchdog_timer_device::watchdog_timer_device(const machine_config &mconfig, cons
 	, m_vblank_count(0)
 	, m_time(attotime::zero)
 	, m_screen(*this, finder_base::DUMMY_TAG)
+	, m_enabled(false)
+	, m_reset_line(0)
+	, m_counter(0)
 {
 }
 
@@ -52,14 +53,12 @@ void watchdog_timer_device::device_validity_check(validity_checker &valid) const
 
 
 //-------------------------------------------------
-//  device_start - perform device-specific
-//  startup
+//  device_start - perform device-specific startup
 //-------------------------------------------------
 
 void watchdog_timer_device::device_start()
 {
 	// initialize the watchdog
-	m_counter = 0;
 	m_timer = timer_alloc(FUNC(watchdog_timer_device::watchdog_expired), this);
 
 	if (m_vblank_count != 0)
@@ -68,7 +67,9 @@ void watchdog_timer_device::device_start()
 		if (m_screen)
 			m_screen->register_vblank_callback(vblank_state_delegate(&watchdog_timer_device::watchdog_vblank, this));
 	}
+
 	save_item(NAME(m_enabled));
+	save_item(NAME(m_reset_line));
 	save_item(NAME(m_counter));
 }
 
@@ -121,11 +122,13 @@ void watchdog_timer_device::watchdog_reset()
 
 
 //-------------------------------------------------
-//  watchdog_enable - reset the watchdog timer
+//  watchdog_enable - enable the watchdog timer
 //-------------------------------------------------
 
-void watchdog_timer_device::watchdog_enable(bool enable)
+void watchdog_timer_device::watchdog_enable(int state)
 {
+	const bool enable = bool(state);
+
 	// when re-enabled, we reset our state
 	if (m_enabled != enable)
 	{
@@ -141,14 +144,7 @@ void watchdog_timer_device::watchdog_enable(bool enable)
 
 void watchdog_timer_device::watchdog_fired()
 {
-	logerror("Reset caused by the watchdog!!!\n");
-
-	bool verbose = machine().options().verbose();
-#ifdef MAME_DEBUG
-	verbose = true;
-#endif
-	if (verbose)
-		popmessage("Reset caused by the watchdog!!!\n");
+	logerror("watchdog_fired: reset issued\n");
 
 	machine().schedule_soft_reset();
 }
@@ -180,21 +176,67 @@ void watchdog_timer_device::watchdog_vblank(screen_device &screen, bool vblank_s
 //  8-bit reset read/write handlers
 //-------------------------------------------------
 
-void watchdog_timer_device::reset_w(u8 data) { watchdog_reset(); }
-u8 watchdog_timer_device::reset_r(address_space &space) { watchdog_reset(); return space.unmap(); }
+void watchdog_timer_device::reset_w(u8 data)
+{
+	watchdog_reset();
+}
+
+u8 watchdog_timer_device::reset_r(address_space &space)
+{
+	if (!machine().side_effects_disabled())
+		watchdog_reset();
+
+	return space.unmap();
+}
 
 
 //-------------------------------------------------
 //  16-bit reset read/write handlers
 //-------------------------------------------------
 
-void watchdog_timer_device::reset16_w(u16 data) { watchdog_reset(); }
-u16 watchdog_timer_device::reset16_r(address_space &space) { watchdog_reset(); return space.unmap(); }
+void watchdog_timer_device::reset16_w(u16 data)
+{
+	watchdog_reset();
+}
+
+u16 watchdog_timer_device::reset16_r(address_space &space)
+{
+	if (!machine().side_effects_disabled())
+		watchdog_reset();
+
+	return space.unmap();
+}
 
 
 //-------------------------------------------------
 //  32-bit reset read/write handlers
 //-------------------------------------------------
 
-void watchdog_timer_device::reset32_w(u32 data) { watchdog_reset(); }
-u32 watchdog_timer_device::reset32_r(address_space &space) { watchdog_reset(); return space.unmap(); }
+void watchdog_timer_device::reset32_w(u32 data)
+{
+	watchdog_reset();
+}
+
+u32 watchdog_timer_device::reset32_r(address_space &space)
+{
+	if (!machine().side_effects_disabled())
+		watchdog_reset();
+
+	return space.unmap();
+}
+
+
+//-------------------------------------------------
+//  reset writeline handler
+//-------------------------------------------------
+
+void watchdog_timer_device::reset_line_w(int state)
+{
+	state = state ? 1 : 0;
+
+	// reset watchdog on rising edge
+	if (state && !m_reset_line)
+		watchdog_reset();
+
+	m_reset_line = state;
+}

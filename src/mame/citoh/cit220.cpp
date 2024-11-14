@@ -25,6 +25,8 @@ and the SCN2674 video timing parameters appear to be identical.
 #include "screen.h"
 
 
+namespace {
+
 class cit220_state : public driver_device
 {
 public:
@@ -41,19 +43,19 @@ public:
 	void tabe22(machine_config &config);
 
 private:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
-	DECLARE_WRITE_LINE_MEMBER(sod_w);
-	DECLARE_WRITE_LINE_MEMBER(cols_w);
+	void sod_w(int state);
+	void cols_w(int state);
 	SCN2674_DRAW_CHARACTER_MEMBER(draw_character);
 
-	void cit220p_mem_map(address_map &map);
-	void cit220p_io_map(address_map &map);
-	void vp122_mem_map(address_map &map);
-	void vp122_io_map(address_map &map);
+	void cit220p_mem_map(address_map &map) ATTR_COLD;
+	void cit220p_io_map(address_map &map) ATTR_COLD;
+	void vp122_mem_map(address_map &map) ATTR_COLD;
+	void vp122_io_map(address_map &map) ATTR_COLD;
 
-	void char_map(address_map &map);
-	void attr_map(address_map &map);
+	void char_map(address_map &map) ATTR_COLD;
+	void attr_map(address_map &map) ATTR_COLD;
 
 	required_device<i8085a_cpu_device> m_maincpu;
 	required_device<screen_device> m_screen;
@@ -73,12 +75,12 @@ void cit220_state::machine_start()
 }
 
 
-WRITE_LINE_MEMBER(cit220_state::sod_w)
+void cit220_state::sod_w(int state)
 {
 	// probably asserts PBREQ on SCN2674 to access memory at Exxx
 }
 
-WRITE_LINE_MEMBER(cit220_state::cols_w)
+void cit220_state::cols_w(int state)
 {
 	if (state == m_132_cols)
 	{
@@ -253,6 +255,8 @@ ROM_START(vp122)
 	ROM_REGION(0x2000, "chargen", 0)
 	ROM_LOAD("223-48700.uk4", 0x0000, 0x2000, CRC(4dbab4bd) SHA1(18e9a23ba22e2096fa529541fa329f5a56740e62))
 ROM_END
+
+} // anonymous namespace
 
 
 COMP(1984, cit220p, 0, 0, cit220p, cit220p, cit220_state, empty_init, "C. Itoh Electronics", "CIT-220+ Video Terminal", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND)

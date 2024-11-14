@@ -18,7 +18,7 @@
 
 /*
 
-         OS2 OS3 OS4 K4  K3  K2  K1  GND al  bt  ACL _R1 _Tp NC  NC   note: on SM5L, pin 31=V1, 32=V2, 33=NC
+         OS2 OS3 OS4 K4  K3  K2  K1  GND α   β   ACL _R1 _Tp NC  NC   note: on SM5L, pin 31=V1, 32=V2, 33=NC
          45  44  43  42  41  40  39  38  37  36  35  34  33  32  31
         ____________________________________________________________
        |                                                            |
@@ -65,8 +65,8 @@ public:
 protected:
 	sm5a_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, int stack_levels, int o_pins, int prgwidth, address_map_constructor program, int datawidth, address_map_constructor data);
 
-	void program_1_8k(address_map &map);
-	void data_5x13x4(address_map &map);
+	void program_1_8k(address_map &map) ATTR_COLD;
+	void data_5x13x4(address_map &map) ATTR_COLD;
 
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 	virtual void execute_one() override;

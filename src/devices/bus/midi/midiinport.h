@@ -23,12 +23,12 @@ public:
 	midiin_port_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 	virtual void device_start() override { m_owner = dynamic_cast<midi_port_device *>(owner()); }
 	virtual void device_reset() override { }
 
 private:
-	DECLARE_WRITE_LINE_MEMBER( read ) { output_rxd(state); }
+	void read(int state) { output_rxd(state); }
 
 	required_device<midiin_device> m_midiin;
 };

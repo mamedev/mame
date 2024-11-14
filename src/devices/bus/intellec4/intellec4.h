@@ -167,18 +167,18 @@ public:
 	univ_bus_device(machine_config const &mconfig, char const *tag, device_t *owner, uint32_t clock);
 
 	// input lines
-	DECLARE_WRITE_LINE_MEMBER(sync_in);
-	DECLARE_WRITE_LINE_MEMBER(test_in) {set_test(std::size(m_cards), state); }
-	DECLARE_WRITE_LINE_MEMBER(stop_in) {set_stop(std::size(m_cards), state); }
-	DECLARE_WRITE_LINE_MEMBER(stop_acknowledge_in);
-	DECLARE_WRITE_LINE_MEMBER(cpu_reset_in);
-	DECLARE_WRITE_LINE_MEMBER(reset_4002_in) { set_reset_4002(std::size(m_cards), state); }
+	void sync_in(int state);
+	void test_in(int state) {set_test(std::size(m_cards), state); }
+	void stop_in(int state) {set_stop(std::size(m_cards), state); }
+	void stop_acknowledge_in(int state);
+	void cpu_reset_in(int state);
+	void reset_4002_in(int state) { set_reset_4002(std::size(m_cards), state); }
 
 	// output lines
-	DECLARE_READ_LINE_MEMBER(test_out) const        { return (m_test        & ~(u16(1U) << std::size(m_cards))) ? 0 : 1; }
-	DECLARE_READ_LINE_MEMBER(stop_out) const        { return (m_stop        & ~(u16(1U) << std::size(m_cards))) ? 0 : 1; }
-	DECLARE_READ_LINE_MEMBER(reset_4002_out) const  { return (m_reset_4002  & ~(u16(1U) << std::size(m_cards))) ? 0 : 1; }
-	DECLARE_READ_LINE_MEMBER(user_reset_out) const  { return (m_user_reset  & ~(u16(1U) << std::size(m_cards))) ? 0 : 1; }
+	int test_out() const        { return (m_test        & ~(u16(1U) << std::size(m_cards))) ? 0 : 1; }
+	int stop_out() const        { return (m_stop        & ~(u16(1U) << std::size(m_cards))) ? 0 : 1; }
+	int reset_4002_out() const  { return (m_reset_4002  & ~(u16(1U) << std::size(m_cards))) ? 0 : 1; }
+	int user_reset_out() const  { return (m_user_reset  & ~(u16(1U) << std::size(m_cards))) ? 0 : 1; }
 
 protected:
 	// device_t implementation
@@ -227,18 +227,18 @@ protected:
 	address_space &status_space()       { return *m_bus->m_status_space; }
 	address_space &ram_ports_space()    { return *m_bus->m_ram_ports_space; }
 
-	DECLARE_WRITE_LINE_MEMBER(test_out)         { m_bus->set_test(m_index, state); }
-	DECLARE_WRITE_LINE_MEMBER(stop_out)         { m_bus->set_stop(m_index, state); }
-	DECLARE_WRITE_LINE_MEMBER(reset_4002_out)   { m_bus->set_reset_4002(m_index, state); }
-	DECLARE_WRITE_LINE_MEMBER(user_reset_out)   { m_bus->set_user_reset(m_index, state); }
+	void test_out(int state)            { m_bus->set_test(m_index, state); }
+	void stop_out(int state)            { m_bus->set_stop(m_index, state); }
+	void reset_4002_out(int state)      { m_bus->set_reset_4002(m_index, state); }
+	void user_reset_out(int state)      { m_bus->set_user_reset(m_index, state); }
 
-	virtual DECLARE_WRITE_LINE_MEMBER(sync_in)              { }
-	virtual DECLARE_WRITE_LINE_MEMBER(test_in)              { }
-	virtual DECLARE_WRITE_LINE_MEMBER(stop_in)              { }
-	virtual DECLARE_WRITE_LINE_MEMBER(stop_acknowledge_in)  { }
-	virtual DECLARE_WRITE_LINE_MEMBER(cpu_reset_in)         { }
-	virtual DECLARE_WRITE_LINE_MEMBER(reset_4002_in)        { }
-	virtual DECLARE_WRITE_LINE_MEMBER(user_reset_in)        { }
+	virtual void sync_in(int state)             { }
+	virtual void test_in(int state)             { }
+	virtual void stop_in(int state)             { }
+	virtual void stop_acknowledge_in(int state) { }
+	virtual void cpu_reset_in(int state)        { }
+	virtual void reset_4002_in(int state)       { }
+	virtual void user_reset_in(int state)       { }
 
 private:
 	void set_bus(univ_bus_device &bus);

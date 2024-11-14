@@ -50,12 +50,6 @@ void prom82s129_base_device::device_start()
 	save_item(NAME(m_ce2));
 	save_item(NAME(m_a));
 	save_item(NAME(m_out));
-
-	m_out_func.resolve_safe();
-	m_o1_func.resolve_safe();
-	m_o2_func.resolve_safe();
-	m_o3_func.resolve_safe();
-	m_o4_func.resolve_safe();
 }
 
 void prom82s129_base_device::device_reset()
@@ -100,7 +94,7 @@ void prom82s129_base_device::update()
 	}
 }
 
-WRITE_LINE_MEMBER( prom82s129_base_device::ce1_w )
+void prom82s129_base_device::ce1_w(int state)
 {
 	uint8_t last_ce1 = m_ce1;
 	m_ce1 = state;
@@ -108,7 +102,7 @@ WRITE_LINE_MEMBER( prom82s129_base_device::ce1_w )
 		update();
 }
 
-WRITE_LINE_MEMBER( prom82s129_base_device::ce2_w )
+void prom82s129_base_device::ce2_w(int state)
 {
 	uint8_t last_ce2 = m_ce2;
 	m_ce2 = state;
@@ -133,21 +127,21 @@ void prom82s129_base_device::write_line(uint8_t line, uint8_t state)
 		update();
 }
 
-WRITE_LINE_MEMBER( prom82s129_base_device::a0_w ) { write_line(0, state); }
-WRITE_LINE_MEMBER( prom82s129_base_device::a1_w ) { write_line(1, state); }
-WRITE_LINE_MEMBER( prom82s129_base_device::a2_w ) { write_line(2, state); }
-WRITE_LINE_MEMBER( prom82s129_base_device::a3_w ) { write_line(3, state); }
-WRITE_LINE_MEMBER( prom82s129_base_device::a4_w ) { write_line(4, state); }
-WRITE_LINE_MEMBER( prom82s129_base_device::a5_w ) { write_line(5, state); }
-WRITE_LINE_MEMBER( prom82s129_base_device::a6_w ) { write_line(6, state); }
-WRITE_LINE_MEMBER( prom82s129_base_device::a7_w ) { write_line(7, state); }
+void prom82s129_base_device::a0_w(int state) { write_line(0, state); }
+void prom82s129_base_device::a1_w(int state) { write_line(1, state); }
+void prom82s129_base_device::a2_w(int state) { write_line(2, state); }
+void prom82s129_base_device::a3_w(int state) { write_line(3, state); }
+void prom82s129_base_device::a4_w(int state) { write_line(4, state); }
+void prom82s129_base_device::a5_w(int state) { write_line(5, state); }
+void prom82s129_base_device::a6_w(int state) { write_line(6, state); }
+void prom82s129_base_device::a7_w(int state) { write_line(7, state); }
 
 uint8_t prom82s129_base_device::output_r()
 {
 	return m_out;
 }
 
-READ_LINE_MEMBER( prom82s129_base_device::o1_r ) { return BIT(m_out, 0); }
-READ_LINE_MEMBER( prom82s129_base_device::o2_r ) { return BIT(m_out, 1); }
-READ_LINE_MEMBER( prom82s129_base_device::o3_r ) { return BIT(m_out, 2); }
-READ_LINE_MEMBER( prom82s129_base_device::o4_r ) { return BIT(m_out, 3); }
+int prom82s129_base_device::o1_r() { return BIT(m_out, 0); }
+int prom82s129_base_device::o2_r() { return BIT(m_out, 1); }
+int prom82s129_base_device::o3_r() { return BIT(m_out, 2); }
+int prom82s129_base_device::o4_r() { return BIT(m_out, 3); }

@@ -37,6 +37,9 @@ yet been initialised, it hangs.
 #include "machine/i8255.h"
 #include "bus/rs232/rs232.h"
 
+
+namespace {
+
 class mice_state : public driver_device
 {
 public:
@@ -49,10 +52,10 @@ public:
 	void mice(machine_config &config);
 
 private:
-	void mice2_io(address_map &map);
-	void mice2_mem(address_map &map);
-	void mice_io(address_map &map);
-	void mice_mem(address_map &map);
+	void mice2_io(address_map &map) ATTR_COLD;
+	void mice2_mem(address_map &map) ATTR_COLD;
+	void mice_io(address_map &map) ATTR_COLD;
+	void mice_mem(address_map &map) ATTR_COLD;
 	required_device<cpu_device> m_maincpu;
 };
 
@@ -236,6 +239,9 @@ ROM_START( mice2_6809 )
 	ROM_REGION( 0x8000, "cep", 0 )
 	ROM_LOAD( "6809_u1_v.3.4",  0x0000, 0x8000, CRC(b94d043d) SHA1(822697485f064286155f2a66cdbdcb0bd66ddb8c) )
 ROM_END
+
+} // anonymous namespace
+
 
 /* Driver */
 

@@ -84,19 +84,18 @@ public:
 	auto nviack() { return m_iack_in[2].bind(); }
 	auto viack() { return m_iack_in[3].bind(); }
 	auto mo() { return m_mo_out.bind(); }
-	DECLARE_WRITE_LINE_MEMBER(mi_w) { m_mi = state; } // XXX: this has to apply in the middle of an insn for now
+	void mi_w(int state) { m_mi = state; } // XXX: this has to apply in the middle of an insn for now
 
 protected:
 	z8002_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int addrbits, int vecmult);
 
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// device_execute_interface overrides
 	virtual uint32_t execute_min_cycles() const noexcept override { return 2; }
 	virtual uint32_t execute_max_cycles() const noexcept override { return 744; }
-	virtual uint32_t execute_input_lines() const noexcept override { return 2; }
 	virtual uint32_t execute_default_irq_vector(int inputnum) const noexcept override { return 0xff; }
 	virtual bool execute_input_edge_triggered(int inputnum) const noexcept override { return inputnum == INPUT_LINE_NMI; }
 	virtual void execute_run() override;

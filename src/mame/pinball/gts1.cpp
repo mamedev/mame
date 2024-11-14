@@ -124,6 +124,10 @@ public:
 	void p1(machine_config &config); // ne555 tones
 	void p2(machine_config &config); // multi-mode sound card
 
+protected:
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+
 private:
 	u8 gts1_solenoid_r(offs_t offset);
 	void gts1_solenoid_w(offs_t offset, u8 data);
@@ -139,12 +143,9 @@ private:
 	void gts1_do_w(u8 data);
 	void nvram_w();
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-
-	void gts1_map(address_map &map);
-	void gts1_data(address_map &map);
-	void gts1_io(address_map &map);
+	void gts1_map(address_map &map) ATTR_COLD;
+	void gts1_data(address_map &map) ATTR_COLD;
+	void gts1_io(address_map &map) ATTR_COLD;
 
 	required_device<pps4_2_device> m_maincpu;
 	required_region_ptr<u8> m_pm;
@@ -794,14 +795,14 @@ void gts1_state::p2(machine_config &config)
 {
 	p0(config);
 	SPEAKER(config, "mono").front_center();
-	GOTTLIEB_SOUND_PIN2(config, m_p2_sound, 0).add_route(ALL_OUTPUTS, "mono", 1.0);
+	GOTTLIEB_SOUND_PIN2(config, m_p2_sound).add_route(ALL_OUTPUTS, "mono", 1.0);
 }
 
 
 #define GTS1_BIOS \
 	ROM_REGION( 0x1000, "maincpu", ROMREGION_ERASEFF ) \
-	ROM_LOAD("u5_cf.bin", 0x0000, 0x0800, CRC(e0d4b405) SHA1(17aadd79c0dcbb336aadd5d203bc6ca866492345) ) \
-	ROM_LOAD("u4_ce.bin", 0x0800, 0x0800, CRC(4cd312dd) SHA1(31245daa9972ef8652caee69986585bb8239e86e) )
+	ROM_LOAD("a1752cf.u5", 0x0000, 0x0800, CRC(614a3bd9) SHA1(febca18fb6f96037ca82e515dd161dfcb0e4c776) ) \
+	ROM_LOAD("a1753ce.u4", 0x0800, 0x0800, CRC(4cd312dd) SHA1(31245daa9972ef8652caee69986585bb8239e86e) )
 
 
 ROM_START( gts1 )
@@ -821,8 +822,9 @@ ROM_START(astannie)
 
 	ROM_REGION( 0x1000, "p2sound:audiocpu", 0)
 	ROM_LOAD("442.snd", 0x0400, 0x0400, CRC(c70195b4) SHA1(ff06197f07111d6a4b8942dcfe8d2279bda6f281))
-	ROM_RELOAD( 0x0800, 0x0400)
-	ROM_LOAD("6530sys1.bin", 0x0c00, 0x0400, CRC(b7831321) SHA1(c94f4bee97854d0373653a6867016e27d3fc1340))
+
+	ROM_REGION( 0x0400, "p2sound:r6530", 0 )
+	ROM_LOAD("6530sys1.bin", 0x0000, 0x0400, CRC(b7831321) SHA1(c94f4bee97854d0373653a6867016e27d3fc1340))
 ROM_END
 
 /*-------------------------------------------------------------------
@@ -836,8 +838,9 @@ ROM_START(buckrgrs)
 
 	ROM_REGION( 0x1000, "p2sound:audiocpu", 0)
 	ROM_LOAD("437.snd", 0x0400, 0x0400, CRC(732b5a27) SHA1(7860ea54e75152246c3ac3205122d750b243b40c))
-	ROM_RELOAD( 0x0800, 0x0400)
-	ROM_LOAD("6530sys1.bin", 0x0c00, 0x0400, CRC(b7831321) SHA1(c94f4bee97854d0373653a6867016e27d3fc1340))
+
+	ROM_REGION( 0x0400, "p2sound:r6530", 0 )
+	ROM_LOAD("6530sys1.bin", 0x0000, 0x0400, CRC(b7831321) SHA1(c94f4bee97854d0373653a6867016e27d3fc1340))
 ROM_END
 
 /*-------------------------------------------------------------------
@@ -900,8 +903,9 @@ ROM_START(geniep)
 
 	ROM_REGION( 0x1000, "p2sound:audiocpu", 0)
 	ROM_LOAD("435.snd", 0x0400, 0x0400, CRC(4a98ceed) SHA1(f1d7548e03107033c39953ee04b043b5301dbb47))
-	ROM_RELOAD( 0x0800, 0x0400)
-	ROM_LOAD("6530sys1.bin", 0x0c00, 0x0400, CRC(b7831321) SHA1(c94f4bee97854d0373653a6867016e27d3fc1340))
+
+	ROM_REGION( 0x0400, "p2sound:r6530", 0 )
+	ROM_LOAD("6530sys1.bin", 0x0000, 0x0400, CRC(b7831321) SHA1(c94f4bee97854d0373653a6867016e27d3fc1340))
 ROM_END
 
 /*-------------------------------------------------------------------
@@ -957,8 +961,9 @@ ROM_START(roldisco)
 
 	ROM_REGION( 0x1000, "p2sound:audiocpu", 0)
 	ROM_LOAD("440.snd", 0x0400, 0x0400, CRC(4a0a05ae) SHA1(88f21b5638494d8e78dc0b6b7d69873b76b5f75d))
-	ROM_RELOAD( 0x0800, 0x0400)
-	ROM_LOAD("6530sys1.bin", 0x0c00, 0x0400, CRC(b7831321) SHA1(c94f4bee97854d0373653a6867016e27d3fc1340))
+
+	ROM_REGION( 0x0400, "p2sound:r6530", 0 )
+	ROM_LOAD("6530sys1.bin", 0x0000, 0x0400, CRC(b7831321) SHA1(c94f4bee97854d0373653a6867016e27d3fc1340))
 ROM_END
 
 /*-------------------------------------------------------------------
@@ -985,9 +990,7 @@ ROM_START(sinbad)
 ROM_END
 
 ROM_START(sinbadn)
-	ROM_REGION( 0x1000, "maincpu", 0)
-	ROM_LOAD("u5_cf.bin", 0x0000, 0x0800, CRC(e0d4b405) SHA1(17aadd79c0dcbb336aadd5d203bc6ca866492345))
-	ROM_LOAD("u4_ce.bin", 0x0800, 0x0800, CRC(4cd312dd) SHA1(31245daa9972ef8652caee69986585bb8239e86e))
+	GTS1_BIOS
 
 	ROM_REGION( 0x0400, "module", 0 )
 	ROM_LOAD("412no1.cpu", 0x0000, 0x0400, CRC(f5373f5f) SHA1(027840501416ff01b2adf07188c7d667adf3ad5f))
@@ -1019,8 +1022,9 @@ ROM_START(hulk)
 
 	ROM_REGION( 0x1000, "p2sound:audiocpu", 0)
 	ROM_LOAD("433.snd", 0x0400, 0x0400, CRC(20cd1dff) SHA1(93e7c47ff7051c3c0dc9f8f95aa33ba094e7cf25))
-	ROM_RELOAD( 0x0800, 0x0400)
-	ROM_LOAD("6530sys1.bin", 0x0c00, 0x0400, CRC(b7831321) SHA1(c94f4bee97854d0373653a6867016e27d3fc1340))
+
+	ROM_REGION( 0x0400, "p2sound:r6530", 0 )
+	ROM_LOAD("6530sys1.bin", 0x0000, 0x0400, CRC(b7831321) SHA1(c94f4bee97854d0373653a6867016e27d3fc1340))
 ROM_END
 
 /*-------------------------------------------------------------------
@@ -1034,8 +1038,9 @@ ROM_START(torch)
 
 	ROM_REGION( 0x1000, "p2sound:audiocpu", 0)
 	ROM_LOAD("438.snd", 0x0400, 0x0400, CRC(a9619b48) SHA1(1906bc1b059bf31082e3b4546f5a30159479ad3c))
-	ROM_RELOAD( 0x0800, 0x0400)
-	ROM_LOAD("6530sys1.bin", 0x0c00, 0x0400, CRC(b7831321) SHA1(c94f4bee97854d0373653a6867016e27d3fc1340))
+
+	ROM_REGION( 0x0400, "p2sound:r6530", 0 )
+	ROM_LOAD("6530sys1.bin", 0x0000, 0x0400, CRC(b7831321) SHA1(c94f4bee97854d0373653a6867016e27d3fc1340))
 ROM_END
 
 /*-------------------------------------------------------------------
@@ -1049,8 +1054,9 @@ ROM_START(totem)
 
 	ROM_REGION( 0x1000, "p2sound:audiocpu", 0)
 	ROM_LOAD("429.snd", 0x0400, 0x0400, CRC(5d1b7ed4) SHA1(4a584f880e907fb21da78f3b3a0617f20599688f))
-	ROM_RELOAD( 0x0800, 0x0400)
-	ROM_LOAD("6530sys1.bin", 0x0c00, 0x0400, CRC(b7831321) SHA1(c94f4bee97854d0373653a6867016e27d3fc1340))
+
+	ROM_REGION( 0x0400, "p2sound:r6530", 0 )
+	ROM_LOAD("6530sys1.bin", 0x0000, 0x0400, CRC(b7831321) SHA1(c94f4bee97854d0373653a6867016e27d3fc1340))
 ROM_END
 
 /*-------------------------------------------------------------------
@@ -1065,7 +1071,7 @@ ROM_END
 
 } // Anonymous namespace
 
-GAME(1977,  gts1,     0,      p0,  gts1,     gts1_state, empty_init, ROT0, "Gottlieb",         "System 1",                  MACHINE_IS_BIOS_ROOT | MACHINE_NOT_WORKING)
+GAME(1977,  gts1,     0,      p0,  gts1,     gts1_state, empty_init, ROT0, "Gottlieb",         "System 1",                             MACHINE_IS_BIOS_ROOT | MACHINE_NOT_WORKING)
 GAME(19??,  sys1test, gts1,   p0,  gts1,     gts1_state, empty_init, ROT0, "Gottlieb",         "System 1 Test prom",                   MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
 
 // chimes

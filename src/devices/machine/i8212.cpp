@@ -60,9 +60,9 @@ DEFINE_DEVICE_TYPE(I8212, i8212_device, "i8212", "Intel 8212 I/O Port")
 i8212_device::i8212_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, I8212, tag, owner, clock),
 	m_write_int(*this),
-	m_read_di(*this),
+	m_read_di(*this, 0),
 	m_write_do(*this),
-	m_read_md(*this),
+	m_read_md(*this, 0),
 	m_stb(1), m_data(0)
 {
 }
@@ -74,12 +74,6 @@ i8212_device::i8212_device(const machine_config &mconfig, const char *tag, devic
 
 void i8212_device::device_start()
 {
-	// resolve callbacks
-	m_write_int.resolve_safe();
-	m_read_di.resolve_safe(0);
-	m_write_do.resolve_safe();
-	m_read_md.resolve_safe(0);
-
 	// register for state saving
 	save_item(NAME(m_stb));
 	save_item(NAME(m_data));
@@ -188,7 +182,7 @@ void i8212_device::strobe(uint8_t data)
 //  stb_w - data strobe write
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER(i8212_device::stb_w)
+void i8212_device::stb_w(int state)
 {
 	// active on falling edge
 	if (m_stb && !state)

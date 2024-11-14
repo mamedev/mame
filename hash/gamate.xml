@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <!--
-license:CC0
+license:CC0-1.0
 
 Undumped carts, based on Wikipedia list
 C1010 - Bump N' Run (Unreleased?)
@@ -11,7 +11,6 @@ C1030 - Beach Volleyball (Unreleased?)
 C1034 - Superboy (Unreleased?)
 C1039 - Column #5 (Unreleased?)
 C1040 - ??
-C1041 - Mighty Boxer
 C1055 - ??
 C1059 - ??
 C1062 - ??
@@ -354,9 +353,9 @@ C1066 - ??
 		</part>
 	</software>
 
-<!-- This maybe comes from a cart with "Bomb Blaster" label? -->
+	<!-- This maybe comes from a cart with "Bomb Blaster" label? -->
 	<software name="bomblasta" cloneof="bomblast">
-		<description>Bomb Blaster (Alt)</description>
+		<description>Bomb Blaster (alt)</description>
 		<year>1990</year>
 		<publisher>Bit Corporation</publisher>
 		<info name="serial" value="C1031" />
@@ -447,7 +446,18 @@ C1066 - ??
 
 	<!-- c1-040 - unknown / unreleased -->
 
-	<!-- c1-041 - Mighty Boxer -->
+	<software name="mightbox">
+		<description>Mighty Boxer</description>
+		<year>1991</year>
+		<publisher>Bit Corporation</publisher>
+		<info name="serial" value="C1041" />
+		<part name="cart" interface="gamate_cart">
+			<feature name="slot" value="banked" />
+			<dataarea name="rom" size="131072">
+				<rom name="c1-041.bin" size="131072" crc="515e78b9" sha1="741f56cebe672e93985a2c48368e92bc897952aa"/>
+			</dataarea>
+		</part>
+	</software>
 
 	<software name="flgoblin">
 		<description>Flying Goblin</description>

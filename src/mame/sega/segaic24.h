@@ -5,8 +5,8 @@
 
 */
 
-#ifndef MAME_VIDEO_SEGAIC24_H
-#define MAME_VIDEO_SEGAIC24_H
+#ifndef MAME_SEGA_SEGAIC24_H
+#define MAME_SEGA_SEGAIC24_H
 
 #pragma once
 
@@ -43,7 +43,7 @@ public:
 	auto xvout_write_callback() { return m_xvout_write_cb.bind(); }
 
 protected:
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 private:
 	enum {
@@ -89,7 +89,7 @@ public:
 	void draw(bitmap_ind16 &bitmap, const rectangle &cliprect, bitmap_ind8 &priority_bitmap, const int *spri);
 
 protected:
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 private:
 	std::unique_ptr<uint16_t[]> sprite_ram;
@@ -109,7 +109,7 @@ public:
 	uint16_t get_reg(int reg);
 
 protected:
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 private:
 	uint16_t mixer_reg[16];
@@ -119,4 +119,4 @@ DECLARE_DEVICE_TYPE(S24TILE,   segas24_tile_device)
 DECLARE_DEVICE_TYPE(S24SPRITE, segas24_sprite_device)
 DECLARE_DEVICE_TYPE(S24MIXER,  segas24_mixer_device)
 
-#endif // MAME_VIDEO_SEGAIC24_H
+#endif // MAME_SEGA_SEGAIC24_H

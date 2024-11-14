@@ -145,7 +145,6 @@ public:
 	bool paused() const { return m_paused || (m_current_phase != machine_phase::RUNNING); }
 	bool exit_pending() const { return m_exit_pending; }
 	bool hard_reset_pending() const { return m_hard_reset_pending; }
-	bool ui_active() const { return m_ui_active; }
 	const std::string &basename() const { return m_basename; }
 	int sample_rate() const { return m_sample_rate; }
 	bool save_or_load_pending() const { return !m_saveload_pending_file.empty(); }
@@ -172,7 +171,6 @@ public:
 	void add_notifier(machine_notification event, machine_notify_delegate callback, bool first = false);
 	void call_notifiers(machine_notification which);
 	void add_logerror_callback(logerror_callback callback);
-	void set_ui_active(bool active) { m_ui_active = active; }
 	void debug_break();
 	void export_http_api();
 
@@ -253,7 +251,7 @@ private:
 	void nvram_load();
 	void nvram_save();
 	void popup_clear() const;
-	void popup_message(util::format_argument_pack<std::ostream> const &args) const;
+	void popup_message(util::format_argument_pack<char> const &args) const;
 
 	// internal callbacks
 	void logfile_callback(const char *buffer);
@@ -297,7 +295,6 @@ private:
 
 	// misc state
 	u32                     m_rand_seed;            // current random number seed
-	bool                    m_ui_active;            // ui active or not (useful for games / systems with keyboard inputs)
 	time_t                  m_base_time;            // real time at initial emulation time
 	std::string             m_basename;             // basename used for game-related paths
 	int                     m_sample_rate;          // the digital audio sample rate
@@ -400,7 +397,7 @@ inline void running_machine::logerror(Format &&fmt, Params &&... args) const
 	// process only if there is a target
 	if (allow_logging())
 	{
-		g_profiler.start(PROFILER_LOGERROR);
+		auto profile = g_profiler.start(PROFILER_LOGERROR);
 
 		// dump to the buffer
 		m_string_buffer.clear();
@@ -409,9 +406,7 @@ inline void running_machine::logerror(Format &&fmt, Params &&... args) const
 		m_string_buffer.put('\0');
 
 		strlog(&m_string_buffer.vec()[0]);
-
-		g_profiler.stop();
 	}
 }
 
-#endif  /* MAME_EMU_MACHINE_H */
+#endif // MAME_EMU_MACHINE_H

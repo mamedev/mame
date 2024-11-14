@@ -118,6 +118,8 @@ TODO:
  */
 
 
+namespace {
+
 class pasogo_state : public driver_device
 {
 public:
@@ -169,8 +171,8 @@ private:
 		} pmu;
 	} m_vg230;
 
-	void machine_reset() override;
-	void machine_start() override;
+	void machine_reset() override ATTR_COLD;
+	void machine_start() override ATTR_COLD;
 
 	uint32_t screen_update_pasogo(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(pasogo_interrupt);
@@ -179,9 +181,9 @@ private:
 	memory_region *m_cart_rom = nullptr;
 	uint8_t m_ems_index = 0;
 	uint16_t m_ems_bank[28]{};
-	void emsbank_map(address_map &map);
-	void pasogo_io(address_map &map);
-	void pasogo_mem(address_map &map);
+	void emsbank_map(address_map &map) ATTR_COLD;
+	void pasogo_io(address_map &map) ATTR_COLD;
+	void pasogo_mem(address_map &map) ATTR_COLD;
 };
 
 
@@ -217,7 +219,7 @@ void pasogo_state::machine_start()
 {
 	system_time systime;
 
-	memset(&m_vg230, 0, sizeof(m_vg230));
+	m_vg230 = decltype(m_vg230)();
 	m_vg230.pmu.write_protected = true;
 	machine().base_datetime(systime);
 
@@ -482,7 +484,7 @@ static INPUT_PORTS_START( pasogo )
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("a") PORT_CODE(KEYCODE_A)
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("b") PORT_CODE(KEYCODE_B)
 	PORT_START("COLOR")
-	PORT_CONFNAME(0x01, 0x01, "Contrast") PORT_CHANGED_MEMBER(DEVICE_SELF, pasogo_state, contrast, 0)
+	PORT_CONFNAME(0x01, 0x01, "Contrast") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(pasogo_state::contrast), 0)
 	PORT_CONFSETTING(0x00, "Actual")
 	PORT_CONFSETTING(0x01, "Enhanced")
 INPUT_PORTS_END
@@ -582,6 +584,9 @@ void pasogo_state::pasogo(machine_config &config)
 ROM_START( pasogo )
 	ROM_REGION( 0x10000, "empty", ROMREGION_ERASEFF )
 ROM_END
+
+} // anonymous namespace
+
 
 //    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT        COMPANY  FULLNAME  FLAGS
 CONS( 1996, pasogo, 0,      0,      pasogo,  pasogo, pasogo_state, empty_init, "KOEI",  "PasoGo", MACHINE_NO_SOUND|MACHINE_NOT_WORKING)

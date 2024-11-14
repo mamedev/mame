@@ -55,6 +55,8 @@ To Do:
 #include "emma2.lh"
 
 
+namespace {
+
 class emma2_state : public driver_device
 {
 public:
@@ -74,10 +76,10 @@ private:
 	void segment_w(uint8_t data);
 	void digit_w(uint8_t data);
 	uint8_t keyboard_r();
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
-	void mem_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
 
 	uint8_t m_digit = 0U;
 	uint8_t m_seg = 0U;
@@ -200,7 +202,7 @@ void emma2_state::emma2(machine_config &config)
 	MOS6522(config, m_via, 1'000'000);  // #2 from cpu
 	m_via->irq_handler().set_inputline(m_maincpu, m6502_device::IRQ_LINE);
 
-	PIA6821(config, m_pia, 0);
+	PIA6821(config, m_pia);
 	m_pia->writepa_handler().set(FUNC(emma2_state::segment_w));
 	m_pia->writepb_handler().set(FUNC(emma2_state::digit_w));
 	m_pia->readpb_handler().set(FUNC(emma2_state::keyboard_r));
@@ -224,6 +226,8 @@ ROM_START( emma2 )
 	ROM_LOAD( "se118a_90-97", 0x0000, 0x0800, CRC(32d36938) SHA1(910fd1c18c7deae83933c7c4f397103a35bf574a) ) // 0x9000
 	ROM_LOAD( "se116a_d8-dd_fe-ff", 0x0800, 0x0800, CRC(ef0f1513) SHA1(46089ba0402828b4204812a04134b313d9be0f93) ) // 0xd800
 ROM_END
+
+} // anonymous namespace
 
 
 /* Driver */

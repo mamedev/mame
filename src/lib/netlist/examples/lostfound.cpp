@@ -30,7 +30,8 @@
 	 *          |  1  |  *  |  1  | 1 || TOGGLE  |
 	 *          +-----+-----+-----+---++---+-----+
 	 */
-	TRUTHTABLE_START(TTL_74107, 6, 4, "+CLK,+J,+K,+CLRQ,@VCC,@GND")
+	TRUTH_TABLE(TTL_74107, 6, 4, "+CLK,+J,+K,+CLRQ,@VCC,@GND")
+{
 		TT_HEAD("CLRQ, CLK, _CO,  J, K,_QX | Q, QQ, CO, QX")
 		TT_LINE("  0,   0,    X,  X, X,  X | 0,  1,  0,  0 | 16, 25, 1, 1")
 		TT_LINE("  0,   1,    X,  X, X,  X | 0,  1,  1,  0 | 16, 25, 1, 1")
@@ -62,7 +63,7 @@
 
 		TT_LINE("  1,   0,    1,  1, 1,  1 | 0,  1,  0,  0 | 16, 25, 1, 1")
 		TT_LINE("  1,   0,    1,  1, 1,  0 | 1,  0,  0,  1 | 25, 16, 1, 1")
-	TRUTHTABLE_END()
+	}
 #endif
 
 /// \brief  Use the truthtable implementation of 7448 instead of the coded device
@@ -76,7 +77,8 @@
 #endif
 
 #if (NL_USE_TRUTHTABLE_7448)
-	TRUTHTABLE_START(TTL_7448, 7, 7, "+A,+B,+C,+D,+LTQ,+BIQ,+RBIQ,@VCC,@GND")
+	TRUTH_TABLE(TTL_7448, 7, 7, "+A,+B,+C,+D,+LTQ,+BIQ,+RBIQ,@VCC,@GND")
+{
 		TT_HEAD(" LTQ,BIQ,RBIQ, A , B , C , D | a, b, c, d, e, f, g")
 
 		TT_LINE("  1,  1,  1,   0,  0,  0,  0 | 1, 1, 1, 1, 1, 1, 0|100,100,100,100,100,100,100")
@@ -105,10 +107,11 @@
 		TT_LINE("  X,  0,  X,   X,  X,  X,  X | 0, 0, 0, 0, 0, 0, 0|100,100,100,100,100,100,100") // BI
 		TT_FAMILY("74XX")
 
-	TRUTHTABLE_END()
+	}
 
 	// FIXME: We need a more elegant solution than defining twice
-	TRUTHTABLE_START(TTL_7448_TT, 7, 7, "")
+	TRUTH_TABLE(TTL_7448_TT, 7, 7, "")
+{
 		TT_HEAD(" LTQ,BIQ,RBIQ, A , B , C , D | a, b, c, d, e, f, g")
 
 		TT_LINE("  1,  1,  1,   0,  0,  0,  0 | 1, 1, 1, 1, 1, 1, 0|100,100,100,100,100,100,100")
@@ -137,7 +140,7 @@
 		TT_LINE("  X,  0,  X,   X,  X,  X,  X | 0, 0, 0, 0, 0, 0, 0|100,100,100,100,100,100,100") // BI
 		TT_FAMILY("74XX")
 
-	TRUTHTABLE_END()
+	}
 
 #endif
 

@@ -40,12 +40,12 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// optional information overrides
-	virtual const tiny_rom_entry *device_rom_region() const override;
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 	// device_newbrain_expansion_slot_interface overrides
 	virtual uint8_t mreq_r(offs_t offset, uint8_t data, bool &romov, int &exrm, bool &raminh) override;
@@ -54,9 +54,9 @@ protected:
 	virtual void iorq_w(offs_t offset, uint8_t data, bool &prtov) override;
 
 private:
-	DECLARE_WRITE_LINE_MEMBER( acia_interrupt );
-	DECLARE_WRITE_LINE_MEMBER( ctc_z2_w );
-	DECLARE_WRITE_LINE_MEMBER( adc_eoc_w );
+	void acia_interrupt(int state);
+	void ctc_z2_w(int state);
+	void adc_eoc_w(int state);
 
 	TIMER_DEVICE_CALLBACK_MEMBER(ctc_c2_tick);
 

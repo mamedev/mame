@@ -142,8 +142,8 @@ public:
 	void sfcbox(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_bios;
@@ -159,10 +159,10 @@ private:
 	void port_83_w(uint8_t data);
 	void snes_map_0_w(uint8_t data);
 	void snes_map_1_w(uint8_t data);
-	void sfcbox_io(address_map &map);
-	void sfcbox_map(address_map &map);
-	void snes_map(address_map &map);
-	void spc_map(address_map &map);
+	void sfcbox_io(address_map &map) ATTR_COLD;
+	void sfcbox_map(address_map &map) ATTR_COLD;
+	void snes_map(address_map &map) ATTR_COLD;
+	void spc_map(address_map &map) ATTR_COLD;
 };
 
 uint32_t sfcbox_state::screen_update( screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect )
@@ -297,13 +297,13 @@ void sfcbox_state::sfcbox_io(address_map &map)
 
 static INPUT_PORTS_START( snes )
 	PORT_START("RTC_R")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("s3520cf", s3520cf_device, read_bit)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("s3520cf", FUNC(s3520cf_device::read_bit))
 
 	PORT_START("RTC_W")
-	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("s3520cf", s3520cf_device, set_clock_line)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("s3520cf", s3520cf_device, write_bit)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("s3520cf", s3520cf_device, set_dir_line)
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("s3520cf", s3520cf_device, set_cs_line)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("s3520cf", FUNC(s3520cf_device::set_clock_line))
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("s3520cf", FUNC(s3520cf_device::write_bit))
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("s3520cf", FUNC(s3520cf_device::set_dir_line))
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("s3520cf", FUNC(s3520cf_device::set_cs_line))
 
 	/* TODO: verify these */
 	PORT_START("KEY")
@@ -317,7 +317,7 @@ static INPUT_PORTS_START( snes )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON8 )  PORT_NAME("Play Mode 1 Button")
 
 	PORT_START("OSD_CS")
-	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("mb90082", mb90082_device, set_cs_line)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("mb90082", FUNC(mb90082_device::set_cs_line))
 
 	PORT_START("SERIAL1_DATA1")
 	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("P1 Button B") PORT_PLAYER(1)
@@ -510,9 +510,9 @@ void sfcbox_state::sfcbox(machine_config &config)
 #define SFCBOX_BIOS \
 	ROM_REGION( 0x1000000, "maincpu", ROMREGION_ERASE00 ) \
 	ROM_REGION( 0x20000, "krom", 0 ) \
-	ROM_SYSTEM_BIOS( 0, "2.00", "SFCBox Bios Version 2.00" ) \
+	ROM_SYSTEM_BIOS( 0, "2.00", "SFCBox BIOS Version 2.00" ) \
 	ROMX_LOAD( "krom2.00.ic1", 0x00000, 0x20000, CRC(e31b5580) SHA1(4a6a34a9a94c8249c3b441c2516bdd03e198c458), ROM_BIOS(0) ) \
-	ROM_SYSTEM_BIOS( 1, "1.00", "SFCBox Bios Version 1.00" ) \
+	ROM_SYSTEM_BIOS( 1, "1.00", "SFCBox BIOS Version 1.00" ) \
 	ROMX_LOAD( "krom1.ic1", 0x00000, 0x10000, CRC(c9010002) SHA1(f4c74086a83b728b1c1af3a021a60efa80eff5a4), ROM_BIOS(1) ) \
 	ROM_REGION( 0x100000, "user3", 0 ) \
 	ROM_LOAD( "atrom-4s-0.rom5", 0x00000, 0x80000, CRC(ad3ec05c) SHA1(a3d336db585fe02a37c323422d9db6a33fd489a6) )

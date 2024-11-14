@@ -97,6 +97,8 @@ below could be not working.  FP ]
 #include "cbm_tap.h"
 #include "imageutl.h"
 
+#include "multibyte.h"
+
 
 #define CBM_WAV_FREQUENCY   44100
 
@@ -281,7 +283,7 @@ static int cbm_tap_do_work( int16_t **buffer, int length, const uint8_t *data )
 
 						if (j >= 4)
 						{
-							over_pulse_length = ((over_pulse_bytes[2] << 16) | (over_pulse_bytes[1] << 8) | over_pulse_bytes[0]) >> 3;
+							over_pulse_length = get_u24le(over_pulse_bytes) >> 3;
 							byte_samples = tap_data_to_samplecount(over_pulse_length, tap_frequency);
 							/* waveamp_high = WAVE_PAUSE; */
 							j = 0;

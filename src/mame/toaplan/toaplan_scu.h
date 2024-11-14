@@ -1,8 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:Quench
 /* toaplan SCU */
-#ifndef MAME_VIDEO_TOAPLAN_SCU_H
-#define MAME_VIDEO_TOAPLAN_SCU_H
+#ifndef MAME_TOAPLAN_TOAPLAN_SCU_H
+#define MAME_TOAPLAN_TOAPLAN_SCU_H
 
 #pragma once
 
@@ -25,8 +25,8 @@ public:
 	void draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect, u16* spriteram, u32 bytes);
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 private:
 	template<class BitmapClass> void draw_sprites_common(BitmapClass &bitmap, const rectangle &cliprect, u16* spriteram, u32 bytes);
@@ -42,4 +42,4 @@ private:
 DECLARE_DEVICE_TYPE(TOAPLAN_SCU, toaplan_scu_device)
 
 
-#endif // MAME_VIDEO_TOAPLAN_SCU_H
+#endif // MAME_TOAPLAN_TOAPLAN_SCU_H

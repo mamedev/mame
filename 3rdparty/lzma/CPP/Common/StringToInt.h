@@ -1,7 +1,7 @@
 // Common/StringToInt.h
 
-#ifndef __COMMON_STRING_TO_INT_H
-#define __COMMON_STRING_TO_INT_H
+#ifndef ZIP7_INC_COMMON_STRING_TO_INT_H
+#define ZIP7_INC_COMMON_STRING_TO_INT_H
 
 #include "MyTypes.h"
 
@@ -10,6 +10,7 @@ UInt64 ConvertStringToUInt64(const char *s, const char **end) throw();
 UInt32 ConvertStringToUInt32(const wchar_t *s, const wchar_t **end) throw();
 UInt64 ConvertStringToUInt64(const wchar_t *s, const wchar_t **end) throw();
 
+// Int32 ConvertStringToInt32(const char *s, const char **end) throw();
 Int32 ConvertStringToInt32(const wchar_t *s, const wchar_t **end) throw();
 
 UInt32 ConvertOctStringToUInt32(const char *s, const char **end) throw();

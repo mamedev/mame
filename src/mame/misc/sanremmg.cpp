@@ -33,10 +33,11 @@ M30624FG (M16C/62A family) needs CPU core and dumping of internal ROM
 
 #include "emu.h"
 #include "cpu/arm7/arm7.h"
-#include "cpu/arm7/arm7core.h"
 #include "emupal.h"
 #include "screen.h"
 
+
+namespace {
 
 class sanremmg_state : public driver_device
 {
@@ -49,14 +50,14 @@ public:
 	void sanremmg(machine_config &config);
 
 protected:
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;
 
 	uint32_t screen_update_sanremmg(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void sanremmg_map(address_map &map);
+	void sanremmg_map(address_map &map) ATTR_COLD;
 };
 
 
@@ -138,6 +139,9 @@ ROM_START( elsygame )
 	ROM_LOAD( "mx29lv160bb.2.bin",   0x200000, 0x200000, CRC(9b0cb755) SHA1(e66bac00c219d345cb6a9478e23bee2a2e79398b) )
 	// there is space for what looks like a 3rd rom
 ROM_END
+
+} // anonymous namespace
+
 
 GAME( 2003, sanremmg, 0,        sanremmg,  sanremmg, sanremmg_state, empty_init,  ROT0, "San Remo Games", "unknown San Remo / Elsy Multigame", MACHINE_IS_SKELETON )
 GAME( 200?, elsypokr, 0,        sanremmg,  sanremmg, sanremmg_state, empty_init,  ROT0, "Electro System (Elsy)", "unknown Elsy poker", MACHINE_IS_SKELETON )

@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Vas Crabb
-#ifndef MAME_MACHINE_CPS2COMM_H
-#define MAME_MACHINE_CPS2COMM_H
+#ifndef MAME_CAPCOM_CPS2COMM_H
+#define MAME_CAPCOM_CPS2COMM_H
 
 #pragma once
 
@@ -55,4 +55,4 @@ protected:
 
 DECLARE_DEVICE_TYPE(CAPCOM_CPS2_COMM, cps2_comm_device)
 
-#endif // MAME_MACHINE_CPS2COMM_H
+#endif // MAME_CAPCOM_CPS2COMM_H

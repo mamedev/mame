@@ -172,7 +172,7 @@ VIDEO_START_MEMBER(zaxxon_state,congo)
  *
  *************************************/
 
-WRITE_LINE_MEMBER(zaxxon_state::flipscreen_w)
+void zaxxon_state::flipscreen_w(int state)
 {
 	/* low bit controls flip; background and sprite flip are handled at render time */
 	m_flip_screen = !state;
@@ -180,7 +180,7 @@ WRITE_LINE_MEMBER(zaxxon_state::flipscreen_w)
 }
 
 
-WRITE_LINE_MEMBER(zaxxon_state::fg_color_w)
+void zaxxon_state::fg_color_w(int state)
 {
 	/* low bit selects high color palette index */
 	m_fg_color = state * 0x80;
@@ -198,21 +198,21 @@ void zaxxon_state::bg_position_w(offs_t offset, uint8_t data)
 }
 
 
-WRITE_LINE_MEMBER(zaxxon_state::bg_color_w)
+void zaxxon_state::bg_color_w(int state)
 {
 	/* low bit selects high color palette index */
 	m_bg_color = state * 0x80;
 }
 
 
-WRITE_LINE_MEMBER(zaxxon_state::bg_enable_w)
+void zaxxon_state::bg_enable_w(int state)
 {
 	/* low bit enables/disables the background layer */
 	m_bg_enable = state;
 }
 
 
-WRITE_LINE_MEMBER(zaxxon_state::congo_fg_bank_w)
+void zaxxon_state::congo_fg_bank_w(int state)
 {
 	/* low bit controls the topmost character bit */
 	m_congo_fg_bank = state;
@@ -220,7 +220,7 @@ WRITE_LINE_MEMBER(zaxxon_state::congo_fg_bank_w)
 }
 
 
-WRITE_LINE_MEMBER(zaxxon_state::congo_color_bank_w)
+void zaxxon_state::congo_color_bank_w(int state)
 {
 	/* low bit controls the topmost bit into the color PROM */
 	m_congo_color_bank = state;

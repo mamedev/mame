@@ -7,11 +7,11 @@
 #include "emu.h"
 #include "vt1682_timer.h"
 
-#define LOG_TIMER     (1U << 1)
+#define LOG_TIMER   (1U << 1)
 
-#define LOG_ALL           ( LOG_TIMER )
+#define LOG_ALL     (LOG_TIMER)
 
-#define VERBOSE             (LOG_TIMER)
+#define VERBOSE     (LOG_TIMER)
 #include "logmacro.h"
 
 // NOTE, system timer base clock can also be changed with "0x210B TSYNEN"
@@ -31,8 +31,6 @@ void vrt_vt1682_timer_device::device_start()
 	save_item(NAME(m_timer_preload_7_0));
 	save_item(NAME(m_timer_preload_15_8));
 	save_item(NAME(m_timer_enable));
-
-	m_irq_cb.resolve();
 }
 
 void vrt_vt1682_timer_device::device_reset()

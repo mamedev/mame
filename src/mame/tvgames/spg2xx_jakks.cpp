@@ -8,6 +8,9 @@
 #include "spg2xx.h"
 #include "machine/nvram.h"
 
+
+namespace {
+
 class jakks_state : public spg2xx_game_state
 {
 public:
@@ -22,7 +25,7 @@ public:
 	void jakks_mpac(machine_config& config);
 
 private:
-	void mem_map_2m_mkram(address_map& map);
+	void mem_map_2m_mkram(address_map &map) ATTR_COLD;
 	void portc_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0) override;
 };
 
@@ -48,7 +51,7 @@ static INPUT_PORTS_START( batman )
 	PORT_BIT( 0x00ff, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("P3")
-	PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_READ_LINE_DEVICE_MEMBER("i2cmem", i2cmem_device, read_sda)
+	PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_READ_LINE_DEVICE_MEMBER("i2cmem", FUNC(i2cmem_device::read_sda))
 	PORT_BIT(0xfffe, IP_ACTIVE_HIGH, IPT_UNUSED)
 INPUT_PORTS_END
 
@@ -68,7 +71,7 @@ static INPUT_PORTS_START( spg2xx_jakks )
 	PORT_BIT( 0x000f, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("P3")
-	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("i2cmem", i2cmem_device, read_sda)
+	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("i2cmem", FUNC(i2cmem_device::read_sda))
 	PORT_BIT( 0x0006, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_UNKNOWN ) // PAL/NTSC flag, set to NTSC (unverified here)
 	PORT_BIT( 0xfff0, IP_ACTIVE_HIGH, IPT_UNUSED )
@@ -111,7 +114,7 @@ static INPUT_PORTS_START( jak_mpac )
 	PORT_BIT( 0x0200, IP_ACTIVE_HIGH, IPT_BUTTON1 )
 
 	PORT_START("P3")
-	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("i2cmem", i2cmem_device, read_sda)
+	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("i2cmem", FUNC(i2cmem_device::read_sda))
 	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_UNKNOWN ) // PAL/NTSC flag, set to NTSC
@@ -198,6 +201,8 @@ ROM_START( jak_mpacw )
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD16_WORD_SWAP( "wirelessnamco.bin", 0x000000, 0x200000, CRC(78a318ca) SHA1(3c2601cbb023edb6a1f3d4bce686e0be1ef63eee) )
 ROM_END
+
+} // anonymous namespace
 
 
 // Pre-GameKey units

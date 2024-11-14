@@ -13,20 +13,8 @@
 #include "emu.h"
 #include "zn.h"
 
-#define VERBOSE_LEVEL ( 0 )
-
-inline void ATTR_PRINTF(3,4) zn_state::verboselog( int n_level, const char *s_fmt, ... )
-{
-	if( VERBOSE_LEVEL >= n_level )
-	{
-		va_list v;
-		char buf[ 32768 ];
-		va_start( v, s_fmt );
-		vsprintf( buf, s_fmt, v );
-		va_end( v );
-		logerror( "%s: %s", machine().describe_context(), buf );
-	}
-}
+#define VERBOSE ( 0 )
+#include "logmacro.h"
 
 void zn_state::machine_start()
 {
@@ -48,13 +36,14 @@ inline void zn_state::psxwriteword( uint32_t *p_n_psxram, uint32_t n_address, ui
 
 uint8_t zn_state::znsecsel_r(offs_t offset, uint8_t mem_mask)
 {
-	verboselog(2, "znsecsel_r( %08x, %08x )\n", offset, mem_mask );
+	if (!machine().side_effects_disabled())
+		LOG("%s: znsecsel_r( %08x, %08x )\n", machine().describe_context(), offset, mem_mask);
 	return m_n_znsecsel;
 }
 
 void zn_state::znsecsel_w(offs_t offset, uint8_t data, uint8_t mem_mask)
 {
-	verboselog(2, "znsecsel_w( %08x, %08x, %08x )\n", offset, data, mem_mask );
+	LOG("%s: znsecsel_w( %08x, %08x, %08x )\n", machine().describe_context(), offset, data, mem_mask);
 
 	if (m_cat702[0]) m_cat702[0]->write_select(BIT(data, 2));
 	if (m_cat702[1]) m_cat702[1]->write_select(BIT(data, 3));
@@ -112,7 +101,8 @@ uint8_t zn_state::boardconfig_r()
 
 uint16_t zn_state::unknown_r(offs_t offset, uint16_t mem_mask)
 {
-	verboselog(0, "unknown_r( %08x, %08x )\n", offset, mem_mask );
+	if (!machine().side_effects_disabled())
+		logerror("%s: unknown_r( %08x, %08x )\n", machine().describe_context(), offset, mem_mask);
 	return 0xffff;
 }
 
@@ -126,7 +116,7 @@ void zn_state::coin_w(uint8_t data)
 	*/
 	if( ( data & ~0x23 ) != 0 )
 	{
-		verboselog(0, "coin_w %08x\n", data );
+		logerror("%s: coin_w %08x\n", machine().describe_context(), data );
 	}
 }
 
@@ -364,7 +354,8 @@ Notes:
 uint16_t capcom_zn_state::kickharness_r(offs_t offset, uint16_t mem_mask)
 {
 	/* required for buttons 4,5&6 */
-	verboselog(2, "capcom_kickharness_r( %08x, %08x )\n", offset, mem_mask );
+	if (!machine().side_effects_disabled())
+		LOG("%s: capcom_kickharness_r( %08x, %08x )\n", machine().describe_context(), offset, mem_mask);
 	return 0xffff;
 }
 
@@ -831,7 +822,7 @@ Notes:
 
 void taito_fx_state::bank_w(offs_t offset, uint8_t data, uint8_t mem_mask)
 {
-	verboselog(1, "bank_w( %08x, %08x, %08x )\n", offset, data, mem_mask );
+	LOG("%s: bank_w( %08x, %08x, %08x )\n", machine().describe_context(), offset, data, mem_mask);
 
 	m_mb3773->write_line_ck((data & 0x20) >> 5);
 
@@ -913,8 +904,8 @@ void taito_fx1a_state::coh1000ta(machine_config &config)
 	MB3773(config, m_mb3773);
 
 	tc0140syt_device &tc0140syt(TC0140SYT(config, "tc0140syt", 0));
-	tc0140syt.set_master_tag(m_maincpu);
-	tc0140syt.set_slave_tag(m_audiocpu);
+	tc0140syt.nmi_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
+	tc0140syt.reset_callback().set_inputline(m_audiocpu, INPUT_LINE_RESET);
 }
 
 void taito_fx1b_state::fram_w(offs_t offset, uint8_t data)
@@ -1143,7 +1134,8 @@ uint16_t primrag2_state::vt83c461_16_r(offs_t offset, uint16_t mem_mask)
 	}
 	else
 	{
-		logerror( "unhandled 16 bit read %04x %04x\n", offset, mem_mask );
+		if (!machine().side_effects_disabled())
+			logerror( "unhandled 16 bit read %04x %04x\n", offset, mem_mask);
 		return 0xffff;
 	}
 }
@@ -1166,7 +1158,7 @@ void primrag2_state::vt83c461_16_w(offs_t offset, uint16_t data, uint16_t mem_ma
 	}
 	else
 	{
-		logerror( "unhandled 16 bit write %04x %04x %04x\n", offset, data, mem_mask );
+		logerror("%s: unhandled 16 bit write %04x %04x %04x\n", machine().describe_context(), offset, data, mem_mask);
 	}
 }
 
@@ -1184,14 +1176,15 @@ uint16_t primrag2_state::vt83c461_32_r(offs_t offset, uint16_t mem_mask)
 	}
 	else
 	{
-		logerror( "unhandled 32 bit read %04x %04x\n", offset, mem_mask );
+		if (!machine().side_effects_disabled())
+			logerror("%s: unhandled 32 bit read %04x %04x\n", machine().describe_context(), offset, mem_mask);
 		return 0xffff;
 	}
 }
 
 void primrag2_state::vt83c461_32_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
-	logerror( "unhandled 32 bit write %04x %04x %04x\n", offset, data, mem_mask );
+	logerror("%s: unhandled 32 bit write %04x %04x %04x\n", machine().describe_context(), offset, data, mem_mask);
 }
 
 void primrag2_state::machine_start()
@@ -1548,11 +1541,13 @@ uint16_t bam2_state::mcu_r(offs_t offset, uint16_t mem_mask)
 	switch (offset)
 	{
 	case 0:
-		logerror("BAM2 MCU port 0 read @ PC %08x mask %08x\n", m_maincpu->pc(), mem_mask);
+		if (!machine().side_effects_disabled())
+			logerror("BAM2 MCU port 0 read @ PC %08x mask %08x\n", m_maincpu->pc(), mem_mask);
 		break;
 
 	case 2:
-		logerror("BAM2 MCU status read @ PC %08x mask %08x\n", m_maincpu->pc(), mem_mask);
+		if (!machine().side_effects_disabled())
+			logerror("BAM2 MCU status read @ PC %08x mask %08x\n", m_maincpu->pc(), mem_mask);
 
 		switch (m_mcu_command)
 		{
@@ -1774,12 +1769,12 @@ Notes:
       *         - Unpopulated DIP42 socket
 */
 
-READ_LINE_MEMBER(jdredd_state::gun_mux_r)
+int jdredd_state::gun_mux_r()
 {
 	return m_gun_mux;
 }
 
-WRITE_LINE_MEMBER(jdredd_state::vblank)
+void jdredd_state::vblank(int state)
 {
 	if (state)
 	{
@@ -1808,12 +1803,12 @@ WRITE_LINE_MEMBER(jdredd_state::vblank)
 
 void acclaim_zn_state::acpsx_00_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
-	verboselog(0, "acpsx_00_w( %08x, %08x, %08x )\n", offset, data, mem_mask );
+	logerror("%s: acpsx_00_w( %08x, %08x, %08x )\n", machine().describe_context(), offset, data, mem_mask);
 }
 
 void nbajamex_state::bank_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
-	verboselog(0, "bank_w( %08x, %08x, %08x )\n", offset, data, mem_mask );
+	LOG("%s: bank_w( %08x, %08x, %08x )\n", machine().describe_context(), offset, data, mem_mask);
 
 	if (offset > 1)
 	{
@@ -1822,8 +1817,8 @@ void nbajamex_state::bank_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 
 	m_curr_rombank[offset] = data;
 
-	uint32_t bankbase0 = ((m_curr_rombank[0] & 0x10) ? 1 : 0) | ((m_curr_rombank[0] & 7) << 1);
-	uint32_t bankbase1 = ((m_curr_rombank[1] & 0x10) ? 0 : 1) | ((m_curr_rombank[1] & 7) << 1);
+	uint32_t const bankbase0 = (BIT(m_curr_rombank[0], 4)) | ((m_curr_rombank[0] & 7) << 1);
+	uint32_t const bankbase1 = (BIT(~m_curr_rombank[1], 4)) | ((m_curr_rombank[1] & 7) << 1);
 
 	if (offset == 0)
 	{
@@ -1850,7 +1845,7 @@ void nbajamex_state::bank_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 
 void acclaim_zn_state::acpsx_10_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
-	verboselog(0, "acpsx_10_w( %08x, %08x, %08x )\n", offset, data, mem_mask );
+	logerror("%s: acpsx_10_w( %08x, %08x, %08x )\n", machine().describe_context(), offset, data, mem_mask);
 }
 
 // all 16 bits goes to the external soundboard's latch (see sound test menu)
@@ -1862,13 +1857,15 @@ void nbajamex_state::sound_80_w(uint16_t data)
 uint16_t nbajamex_state::sound_08_r(offs_t offset, uint16_t mem_mask)
 {
 	// Sound related
-	verboselog(0, "nbajamex_08_r( %08x, %08x, %08x )\n", offset, 0, mem_mask );
+	if (!machine().side_effects_disabled())
+		logerror("%s: sound_08_r( %08x, %08x, %08x )\n", machine().describe_context(), offset, 0, mem_mask);
 	return 0x400;
 }
 
 uint16_t nbajamex_state::sound_80_r(offs_t offset, uint16_t mem_mask)
 {
-	verboselog(0, "nbajamex_80_r( %08x, %08x, %08x )\n", offset, 0, mem_mask );
+	if (!machine().side_effects_disabled())
+		logerror("%s: sound_80_r( %08x, %08x, %08x )\n", machine().describe_context(), offset, 0, mem_mask);
 	return 0xffff;
 }
 
@@ -1904,7 +1901,7 @@ void nbajamex_state::bank_map(address_map &map)
 	map(0xa00000, 0xffffff).bankr("rombank2");
 }
 
-void nbajamex_state::driver_init()
+void nbajamex_state::driver_start()
 {
 	m_sram = std::make_unique<uint8_t[]>(0x8000);
 	subdevice<nvram_device>("71256")->set_base(m_sram.get(), 0x8000);
@@ -1964,6 +1961,8 @@ void nbajamex_state::nbajamex(machine_config &config)
 	ADDRESS_MAP_BANK(config, "nbajamex_bankmap").set_map(&nbajamex_state::bank_map).set_options(ENDIANNESS_LITTLE, 32, 24, 0x800000);
 
 	ACCLAIM_RAX(config, m_rax, 0);
+	m_rax->add_route(0, "lspeaker", 1.0);
+	m_rax->add_route(1, "rspeaker", 1.0);
 }
 
 void jdredd_state::jdredd(machine_config &config)
@@ -2362,7 +2361,7 @@ Notes:
 
 void tecmo_zn_state::bank_w(offs_t offset, uint8_t data, uint8_t mem_mask)
 {
-	verboselog(1, "bank_w( %08x, %08x, %08x )\n", offset, data, mem_mask );
+	LOG("%s: bank_w( %08x, %08x, %08x )\n", machine().describe_context(), offset, data, mem_mask);
 	m_rombank->set_entry( data );
 }
 
@@ -2630,7 +2629,7 @@ static INPUT_PORTS_START( jdredd )
 	PORT_BIT( 0x6f, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_MODIFY("SERVICE")
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(jdredd_state, gun_mux_r)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(jdredd_state::gun_mux_r))
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
 
@@ -4261,14 +4260,14 @@ ROM_START( 1on1gov )
 	ROM_REGION32_LE( 0x02800000, "bankedroms", 0 )
 	ROM_LOAD16_BYTE( "1on1.u119", 0x0000001, 0x100000, CRC(10aecc19) SHA1(ad2fe6011551935907568cc3b4028f481034537c) )
 	ROM_LOAD16_BYTE( "1on1.u120", 0x0000000, 0x100000, CRC(eea158bd) SHA1(2b2a56fcce46557201bbbab7b170ee64549ddafe) )
-	ROM_LOAD( "ooo-0.u0217",      0x0800000, 0x400000, CRC(8b42f365) SHA1(6035a370f477f0f33894f642717fa0b012540d36) )
-	ROM_LOAD( "ooo-1.u0218",      0x0c00000, 0x400000, CRC(65162f46) SHA1(db420a2f0d996b32cd4b6e9352d46a36fa31eaaa) )
-	ROM_LOAD( "ooo-2.u0219",      0x1000000, 0x400000, CRC(14cf3a84) SHA1(60175a1fb2c765e4c3d0e30e77961f84cfa8485c) )
-	ROM_LOAD( "ooo-3.u0220",      0x1400000, 0x400000, CRC(9a45f6ff) SHA1(e0ee90c545c821bf1d6b4709b1e40f93314c51a6) )
-	ROM_LOAD( "ooo-4.u0221",      0x1800000, 0x400000, CRC(ba20a1fd) SHA1(7893f50de730624b8447f39fc7e25e4e334df845) )
-	ROM_LOAD( "ooo-5.u0222",      0x1c00000, 0x400000, CRC(eed1953d) SHA1(8d3e738a07b9c6b6ca55be7b47444b5e3725065c) )
-	ROM_LOAD( "ooo-6.u0223",      0x2000000, 0x400000, CRC(f74f38b6) SHA1(ff7f0ebff85fc982f8d1c13d6649d4c7c5da6c45) )
-	ROM_LOAD( "ooo-7.u0323",      0x2400000, 0x400000, CRC(0e58777c) SHA1(9f8ee3c6d6d8b1482522500e18217577056d8c98) )
+	ROM_LOAD( "oog-0.u0217",      0x0800000, 0x400000, CRC(8b42f365) SHA1(6035a370f477f0f33894f642717fa0b012540d36) )
+	ROM_LOAD( "oog-1.u0218",      0x0c00000, 0x400000, CRC(65162f46) SHA1(db420a2f0d996b32cd4b6e9352d46a36fa31eaaa) )
+	ROM_LOAD( "oog-2.u0219",      0x1000000, 0x400000, CRC(14cf3a84) SHA1(60175a1fb2c765e4c3d0e30e77961f84cfa8485c) )
+	ROM_LOAD( "oog-3.u0220",      0x1400000, 0x400000, CRC(9a45f6ff) SHA1(e0ee90c545c821bf1d6b4709b1e40f93314c51a6) )
+	ROM_LOAD( "oog-4.u0221",      0x1800000, 0x400000, CRC(ba20a1fd) SHA1(7893f50de730624b8447f39fc7e25e4e334df845) )
+	ROM_LOAD( "oog-5.u0222",      0x1c00000, 0x400000, CRC(eed1953d) SHA1(8d3e738a07b9c6b6ca55be7b47444b5e3725065c) )
+	ROM_LOAD( "oog-6.u0223",      0x2000000, 0x400000, CRC(f74f38b6) SHA1(ff7f0ebff85fc982f8d1c13d6649d4c7c5da6c45) )
+	ROM_LOAD( "oog-7.u0323",      0x2400000, 0x400000, CRC(0e58777c) SHA1(9f8ee3c6d6d8b1482522500e18217577056d8c98) )
 
 	ROM_REGION( 0x800, "at28c16", 0 ) /* at28c16 */
 	/* Factory defaulted NVRAM, counters blanked, required security code included - region can be changed in test menu (default Japanese) */
@@ -5130,7 +5129,7 @@ ROM_START( bam2 )
 	ROM_REGION( 0x8000, "h83644", 0)
 	ROM_LOAD( "hd64f3644.u2", 0x00000, 0x8000, NO_DUMP )
 
-	DISK_REGION( "ata:0:hdd:image" )
+	DISK_REGION( "ata:0:hdd" )
 	DISK_IMAGE("bam2", 0, SHA1(634d9a745a82c567fc4d7ce48e3570d88326c5f9) )
 
 	ROM_REGION( 0x8, "cat702_2", 0 )
@@ -5163,7 +5162,7 @@ ROM_START( primrag2 )
 	ROM_LOAD16_BYTE( "pr2_036.u17",  0x100001, 0x080000, CRC(3681516c) SHA1(714f73ea4ac190c36a6eb2308616a4aecabc4e69) )
 	ROM_LOAD16_BYTE( "pr2_036.u15",  0x100000, 0x080000, CRC(4b24bd54) SHA1(7f27cd524d10e5869aab6d4dc6a4217d049c475d) )
 
-	DISK_REGION( "ide:0:hdd:image" )
+	DISK_REGION( "ide:0:hdd" )
 	DISK_IMAGE( "primrag2", 0, SHA1(bc615068ddf4fd967f770ee01c02f285c052c4c5) )
 
 	ROM_REGION( 0x8, "cat702_2", 0 )
@@ -5254,7 +5253,7 @@ ROM_START( jdredd )
 	ROM_LOAD16_BYTE( "9e54_01-16-98_1566_u_36.u36",  0x000001, 0x020000, CRC(37addbf9) SHA1(a4061a1ba9e230f080f0bfea69bf77efe9264a92) ) // ROMs for Rev.C hard drive are dated 01-16-98 - still same checksum of 9E54
 	ROM_LOAD16_BYTE( "79d3_01-16-98_1565_u_35.u35",  0x000000, 0x020000, CRC(c1e17191) SHA1(82901439b1a51b9aadb4df4b9d944f26697a1460) ) // ROMs for Rev.C hard drive are dated 01-16-98 - still same checksum of 79D3
 
-	DISK_REGION( "ata:0:hdd:image" )
+	DISK_REGION( "ata:0:hdd" )
 	DISK_IMAGE( "jdreddc", 0, SHA1(eee205f83e5f590f8baf36452c873d7063156bd0) ) // label on drive reads:  1576 Rev.C
 
 	ROM_REGION( 0x8, "cat702_2", 0 )
@@ -5268,7 +5267,7 @@ ROM_START( jdreddb )
 	ROM_LOAD16_BYTE( "9e54_11-21-97_1566_u_36.u36",  0x000001, 0x020000, CRC(37addbf9) SHA1(a4061a1ba9e230f080f0bfea69bf77efe9264a92) ) // ROMs for Rev.B hard drive are dated 11-21-97 - still same checksum of 9E54
 	ROM_LOAD16_BYTE( "79d3_11-21-97_1565_u_35.u35",  0x000000, 0x020000, CRC(c1e17191) SHA1(82901439b1a51b9aadb4df4b9d944f26697a1460) ) // ROMs for Rev.B hard drive are dated 11-21-97 - still same checksum of 79D3
 
-	DISK_REGION( "ata:0:hdd:image" )
+	DISK_REGION( "ata:0:hdd" )
 	DISK_IMAGE( "jdreddb", 0, SHA1(20f696fa6e1fbf97793bac2a794631c5dd4fb39a) ) // label on drive reads:  1576 Rev.B
 
 	ROM_REGION( 0x8, "cat702_2", 0 )
@@ -5319,7 +5318,7 @@ ROM_END
 
 /* Capcom ZN1 */
 GAME( 1995, coh1000c,  0,        coh1000c,    zn,       zn1_state,     empty_init, ROT0, "Capcom",          "ZN1",                                                     MACHINE_IS_BIOS_ROOT )
-GAME( 1995, ts2,       coh1000c, coh1000c,    zn6b,     zn1_state,     empty_init, ROT0, "Capcom / Takara", "Battle Arena Toshinden 2 (Euro 951124)",                  MACHINE_IMPERFECT_SOUND )
+GAME( 1995, ts2,       coh1000c, coh1000c,    zn6b,     zn1_state,     empty_init, ROT0, "Capcom / Takara", "Battle Arena Toshinden 2 (Europe 951124)",                MACHINE_IMPERFECT_SOUND )
 GAME( 1995, ts2u,      ts2,      coh1000c,    zn6b,     zn1_state,     empty_init, ROT0, "Capcom / Takara", "Battle Arena Toshinden 2 (USA 951124)",                   MACHINE_IMPERFECT_SOUND )
 GAME( 1995, ts2ua,     ts2,      coh1000c,    zn6b,     zn1_state,     empty_init, ROT0, "Capcom / Takara", "Battle Arena Toshinden 2 (USA 951124, 32Mb mask ROMs)",   MACHINE_IMPERFECT_SOUND )
 GAME( 1995, ts2j,      ts2,      coh1000c,    zn6b,     zn1_state,     empty_init, ROT0, "Capcom / Takara", "Battle Arena Toshinden 2 (Japan 951124)",                 MACHINE_IMPERFECT_SOUND )
@@ -5328,7 +5327,7 @@ GAME( 1996, starglad,  coh1000c, coh1000c,    zn6b,     zn1_state,     empty_ini
 GAME( 1996, stargladj, starglad, coh1000c,    zn6b,     zn1_state,     empty_init, ROT0, "Capcom",          "Star Gladiator Episode I: Final Crusade (Japan 960627)",  MACHINE_IMPERFECT_SOUND )
 GAME( 1996, glpracr,   coh1000c, coh1000c,    zn,       glpracr_state, empty_init, ROT0, "Tecmo",           "Gallop Racer (English Ver 10.17.K)",                      MACHINE_IMPERFECT_SOUND )
 GAME( 1996, glpracrj,  glpracr,  coh1000c,    zn,       glpracr_state, empty_init, ROT0, "Tecmo",           "Gallop Racer (Japanese Ver 9.01.12)",                     MACHINE_IMPERFECT_SOUND )
-GAME( 1996, sfex,      coh1000c, coh1002c,    zn6b,     zn1_state,     empty_init, ROT0, "Capcom / Arika",  "Street Fighter EX (Euro 961219)",                         MACHINE_IMPERFECT_SOUND )
+GAME( 1996, sfex,      coh1000c, coh1002c,    zn6b,     zn1_state,     empty_init, ROT0, "Capcom / Arika",  "Street Fighter EX (Europe 961219)",                       MACHINE_IMPERFECT_SOUND )
 GAME( 1996, sfexu,     sfex,     coh1002c,    zn6b,     zn1_state,     empty_init, ROT0, "Capcom / Arika",  "Street Fighter EX (USA 961219)",                          MACHINE_IMPERFECT_SOUND )
 GAME( 1996, sfexa,     sfex,     coh1002c,    zn6b,     zn1_state,     empty_init, ROT0, "Capcom / Arika",  "Street Fighter EX (Asia 961219)",                         MACHINE_IMPERFECT_SOUND )
 GAME( 1996, sfexj,     sfex,     coh1002c,    zn6b,     zn1_state,     empty_init, ROT0, "Capcom / Arika",  "Street Fighter EX (Japan 961130)",                        MACHINE_IMPERFECT_SOUND )
@@ -5339,12 +5338,12 @@ GAME( 1997, sfexpj1,   sfexp,    coh1002c,    zn6b,     zn1_state,     empty_ini
 
 /* Capcom ZN2 */
 GAME( 1997, coh3002c,  0,        coh3002c,    zn,       zn2_state, empty_init, ROT0, "Capcom",         "ZN2",                                                      MACHINE_IS_BIOS_ROOT )
-GAME( 1997, rvschool,  coh3002c, coh3002c,    zn6b,     zn2_state, empty_init, ROT0, "Capcom",         "Rival Schools: United By Fate (Euro 971117)",              MACHINE_IMPERFECT_SOUND )
+GAME( 1997, rvschool,  coh3002c, coh3002c,    zn6b,     zn2_state, empty_init, ROT0, "Capcom",         "Rival Schools: United By Fate (Europe 971117)",            MACHINE_IMPERFECT_SOUND )
 GAME( 1997, rvschoolu, rvschool, coh3002c,    zn6b,     zn2_state, empty_init, ROT0, "Capcom",         "Rival Schools: United By Fate (USA 971117)",               MACHINE_IMPERFECT_SOUND )
 GAME( 1997, rvschoola, rvschool, coh3002c,    zn6b,     zn2_state, empty_init, ROT0, "Capcom",         "Rival Schools: United By Fate (Asia 971117)",              MACHINE_IMPERFECT_SOUND )
 GAME( 1997, jgakuen,   rvschool, coh3002c,    zn6b,     zn2_state, empty_init, ROT0, "Capcom",         "Shiritsu Justice Gakuen: Legion of Heroes (Japan 971216)", MACHINE_IMPERFECT_SOUND )
 GAME( 1997, jgakuen1,  rvschool, coh3002c,    zn6b,     zn2_state, empty_init, ROT0, "Capcom",         "Shiritsu Justice Gakuen: Legion of Heroes (Japan 971117)", MACHINE_IMPERFECT_SOUND )
-GAME( 1998, sfex2,     coh3002c, coh3002c,    zn6b,     zn2_state, empty_init, ROT0, "Capcom / Arika", "Street Fighter EX2 (Euro 980312)",                         MACHINE_IMPERFECT_SOUND )
+GAME( 1998, sfex2,     coh3002c, coh3002c,    zn6b,     zn2_state, empty_init, ROT0, "Capcom / Arika", "Street Fighter EX2 (Europe 980312)",                       MACHINE_IMPERFECT_SOUND )
 GAME( 1998, sfex2u,    sfex2,    coh3002c,    zn6b,     zn2_state, empty_init, ROT0, "Capcom / Arika", "Street Fighter EX2 (USA 980526)",                          MACHINE_IMPERFECT_SOUND )
 GAME( 1998, sfex2u1,   sfex2,    coh3002c,    zn6b,     zn2_state, empty_init, ROT0, "Capcom / Arika", "Street Fighter EX2 (USA 980312)",                          MACHINE_IMPERFECT_SOUND )
 GAME( 1998, sfex2a,    sfex2,    coh3002c,    zn6b,     zn2_state, empty_init, ROT0, "Capcom / Arika", "Street Fighter EX2 (Asia 980312)",                         MACHINE_IMPERFECT_SOUND )
@@ -5354,16 +5353,16 @@ GAME( 1998, plsmaswd,  coh3002c, coh3002c,    zn6b,     zn2_state, empty_init, R
 GAME( 1998, plsmaswda, plsmaswd, coh3002c,    zn6b,     zn2_state, empty_init, ROT0, "Capcom",         "Plasma Sword: Nightmare of Bilstein (Asia 980316)",        MACHINE_IMPERFECT_SOUND )
 GAME( 1998, stargld2,  plsmaswd, coh3002c,    zn6b,     zn2_state, empty_init, ROT0, "Capcom",         "Star Gladiator 2: Nightmare of Bilstein (Japan 980316)",   MACHINE_IMPERFECT_SOUND )
 GAME( 1998, tgmj,      coh3002c, coh3002c,    tgm,      zn2_state, empty_init, ROT0, "Arika / Capcom", "Tetris: The Grand Master (Japan 980710)",                  MACHINE_IMPERFECT_SOUND )
-GAME( 1998, techromn,  coh3002c, coh3002c,    zn6b,     zn2_state, empty_init, ROT0, "Capcom",         "Tech Romancer (Euro 980914)",                              MACHINE_IMPERFECT_SOUND )
+GAME( 1998, techromn,  coh3002c, coh3002c,    zn6b,     zn2_state, empty_init, ROT0, "Capcom",         "Tech Romancer (Europe 980914)",                            MACHINE_IMPERFECT_SOUND )
 GAME( 1998, techromnu, techromn, coh3002c,    zn6b,     zn2_state, empty_init, ROT0, "Capcom",         "Tech Romancer (USA 980914)",                               MACHINE_IMPERFECT_SOUND )
 GAME( 1998, techromna, techromn, coh3002c,    zn6b,     zn2_state, empty_init, ROT0, "Capcom",         "Tech Romancer (Asia 980914)",                              MACHINE_IMPERFECT_SOUND )
 GAME( 1998, kikaioh,   techromn, coh3002c,    zn6b,     zn2_state, empty_init, ROT0, "Capcom",         "Choukou Senki Kikaioh (Japan 980914)",                     MACHINE_IMPERFECT_SOUND )
-GAME( 1999, sfex2p,    coh3002c, coh3002c,    zn6b,     zn2_state, empty_init, ROT0, "Capcom / Arika", "Street Fighter EX2 Plus (Euro 990611)",                    MACHINE_IMPERFECT_SOUND )
+GAME( 1999, sfex2p,    coh3002c, coh3002c,    zn6b,     zn2_state, empty_init, ROT0, "Capcom / Arika", "Street Fighter EX2 Plus (Europe 990611)",                  MACHINE_IMPERFECT_SOUND )
 GAME( 1999, sfex2pu,   sfex2p,   coh3002c,    zn6b,     zn2_state, empty_init, ROT0, "Capcom / Arika", "Street Fighter EX2 Plus (USA 990611)",                     MACHINE_IMPERFECT_SOUND )
 GAME( 1999, sfex2pa,   sfex2p,   coh3002c,    zn6b,     zn2_state, empty_init, ROT0, "Capcom / Arika", "Street Fighter EX2 Plus (Asia 990611)",                    MACHINE_IMPERFECT_SOUND )
 GAME( 1999, sfex2ph,   sfex2p,   coh3002c,    zn6b,     zn2_state, empty_init, ROT0, "Capcom / Arika", "Street Fighter EX2 Plus (Hispanic 990611)",                MACHINE_IMPERFECT_SOUND )
 GAME( 1999, sfex2pj,   sfex2p,   coh3002c,    zn6b,     zn2_state, empty_init, ROT0, "Capcom / Arika", "Street Fighter EX2 Plus (Japan 990611)",                   MACHINE_IMPERFECT_SOUND )
-GAME( 1999, strider2,  coh3002c, coh3002c,    zn,       zn2_state, empty_init, ROT0, "Capcom",         "Strider 2 (Euro 991213)",                                  MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) // random hangs / crashes
+GAME( 1999, strider2,  coh3002c, coh3002c,    zn,       zn2_state, empty_init, ROT0, "Capcom",         "Strider 2 (Europe 991213)",                                MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) // random hangs / crashes
 GAME( 1999, strider2u, strider2, coh3002c,    zn,       zn2_state, empty_init, ROT0, "Capcom",         "Strider 2 (USA 991213)",                                   MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
 GAME( 1999, strider2a, strider2, coh3002c,    zn,       zn2_state, empty_init, ROT0, "Capcom",         "Strider 2 (Asia 991213)",                                  MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
 GAME( 1999, shiryu2,   strider2, coh3002c,    zn,       zn2_state, empty_init, ROT0, "Capcom",         "Strider Hiryu 2 (Japan 991213)",                           MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )

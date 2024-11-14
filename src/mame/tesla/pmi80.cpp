@@ -41,6 +41,9 @@ Paste test:
 #include "speaker.h"
 #include "pmi80.lh"
 
+
+namespace {
+
 class pmi80_state : public driver_device
 {
 public:
@@ -63,15 +66,15 @@ private:
 	void keyboard_w(uint8_t data);
 	void leds_w(uint8_t data);
 	TIMER_DEVICE_CALLBACK_MEMBER(kansas_r);
-	void io_map(address_map &map);
-	void mem_map(address_map &map);
+	void io_map(address_map &map) ATTR_COLD;
+	void mem_map(address_map &map) ATTR_COLD;
 
 	uint8_t m_keyrow = 0U;
 	bool m_ledready = false;
 	bool m_cassbit = false, m_cassold = false;
 	u16 m_cass_cnt = 0U;
-	virtual void machine_reset() override;
-	virtual void machine_start() override;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void machine_start() override ATTR_COLD;
 	required_device<cpu_device> m_maincpu;
 	required_device<i8255_device> m_ppi1;
 	required_device<cassette_image_device> m_cass;
@@ -143,8 +146,8 @@ void pmi80_state::io_map(address_map &map)
 /* Input ports */
 static INPUT_PORTS_START( pmi80 )
 	PORT_START("SP")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("RE") PORT_CODE(KEYCODE_LALT) PORT_CHANGED_MEMBER(DEVICE_SELF, pmi80_state, reset_button, 0) PORT_CHAR('W')
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("I") PORT_CODE(KEYCODE_I) PORT_CHANGED_MEMBER(DEVICE_SELF, pmi80_state, int_button, 0) PORT_CHAR('I')
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("RE") PORT_CODE(KEYCODE_LALT) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(pmi80_state::reset_button), 0) PORT_CHAR('W')
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("I") PORT_CODE(KEYCODE_I) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(pmi80_state::int_button), 0) PORT_CHAR('I')
 	PORT_START("X0")
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("=") PORT_CODE(KEYCODE_EQUALS) PORT_CHAR('^')
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("3") PORT_CODE(KEYCODE_3) PORT_CHAR('3')
@@ -242,6 +245,9 @@ ROM_START( pmi80 )
 	ROM_LOAD( "pmi80_monitor.io5", 0x0000, 0x0400, CRC(b93f4407) SHA1(43153441070ed0572f33d2815635eb7bae878e38))
 	//ROM_LOAD("expansion.io11", 0x0400, 0x0400, NO_DUMP)   Empty ROM socket
 ROM_END
+
+} // anonymous namespace
+
 
 /* Driver */
 

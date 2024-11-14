@@ -30,8 +30,8 @@
 
 #include "machine/k053252.h"
 #include "machine/timer.h"
-#include "k051316.h"
 #include "k053246_k053247_k055673.h"
+#include "k053250.h"
 #include "k053251.h"
 #include "konami_helper.h"
 
@@ -42,7 +42,7 @@
 #include "machine/rescap.h"
 #include "sound/k053260.h"
 #include "sound/ymopm.h"
-#include "k053250.h"
+#include "video/k051316.h"
 
 #include "emupal.h"
 #include "screen.h"
@@ -90,13 +90,13 @@ private:
 	K051316_CB_MEMBER(zoom_callback_1);
 	K051316_CB_MEMBER(zoom_callback_2);
 	K053246_CB_MEMBER(sprite_callback);
-	void overdriv_master_map(address_map &map);
-	void overdriv_slave_map(address_map &map);
-	void overdriv_sound_map(address_map &map);
+	void overdriv_master_map(address_map &map) ATTR_COLD;
+	void overdriv_slave_map(address_map &map) ATTR_COLD;
+	void overdriv_sound_map(address_map &map) ATTR_COLD;
 
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	/* video-related */
 	int       m_zoom_colorbase[2]{};
@@ -143,7 +143,7 @@ static const uint16_t overdriv_default_eeprom[64] =
 
 void overdriv_state::eeprom_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
-//logerror("%s: write %04x to eeprom_w\n",machine().describe_context(),data);
+	//logerror("%s: write %04x to eeprom_w\n",machine().describe_context(),data);
 	if (ACCESSING_BITS_0_7)
 	{
 		/* bit 0 is data */
@@ -264,14 +264,12 @@ K053246_CB_MEMBER(overdriv_state::sprite_callback)
 
 K051316_CB_MEMBER(overdriv_state::zoom_callback_1)
 {
-	*flags = (*color & 0x40) ? TILE_FLIPX : 0;
 	*code |= ((*color & 0x03) << 8);
 	*color = m_zoom_colorbase[0] + ((*color & 0x3c) >> 2);
 }
 
 K051316_CB_MEMBER(overdriv_state::zoom_callback_2)
 {
-	*flags = (*color & 0x40) ? TILE_FLIPX : 0;
 	*code |= ((*color & 0x03) << 8);
 	*color = m_zoom_colorbase[1] + ((*color & 0x3c) >> 2);
 }
@@ -390,8 +388,8 @@ static INPUT_PORTS_START( overdriv )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_er5911_device, do_read)
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_er5911_device, ready_read)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", FUNC(eeprom_serial_er5911_device::do_read))
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", FUNC(eeprom_serial_er5911_device::ready_read))
 
 	PORT_START("SYSTEM")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
@@ -401,16 +399,16 @@ static INPUT_PORTS_START( overdriv )
 	PORT_SERVICE_NO_TOGGLE( 0x10, IP_ACTIVE_LOW )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("adc", adc0804_device, intr_r)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("adc", FUNC(adc0804_device::intr_r))
 
 	PORT_START("PADDLE")
 	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_SENSITIVITY(100) PORT_KEYDELTA(50)
 	// POST checks if paddle is at center otherwise throws a "VOLUME ERROR"
 
 	PORT_START( "EEPROMOUT" )
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_er5911_device, di_write)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_er5911_device, clk_write)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_er5911_device, cs_write)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", FUNC(eeprom_serial_er5911_device::di_write))
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", FUNC(eeprom_serial_er5911_device::clk_write))
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", FUNC(eeprom_serial_er5911_device::cs_write))
 INPUT_PORTS_END
 
 

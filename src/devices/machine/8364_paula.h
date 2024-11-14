@@ -60,14 +60,14 @@ public:
 
 	void update();
 
-	template <u8 ch> void audio_channel_map(address_map &map);
+	template <u8 ch> void audio_channel_map(address_map &map) ATTR_COLD;
 	void dmacon_set(u16 data);
 	void adkcon_set(u16 data);
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// sound stream update overrides
 	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
@@ -86,7 +86,7 @@ private:
 	{
 		emu_timer *irq_timer;
 		uint32_t curlocation;
-		uint16_t curlength;
+		uint32_t curlength;
 		uint16_t curticks;
 		uint8_t index;
 		bool dma_enabled;

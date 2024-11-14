@@ -62,6 +62,8 @@ TODO:
 #include "emu.h"
 #include "k053252.h"
 
+#include "multibyte.h"
+
 
 DEFINE_DEVICE_TYPE(K053252, k053252_device, "k053252", "K053252 Timing/Interrupt Controller")
 
@@ -86,12 +88,6 @@ k053252_device::k053252_device(const machine_config &mconfig, const char *tag, d
 
 void k053252_device::device_start()
 {
-	m_int1_en_cb.resolve_safe();
-	m_int2_en_cb.resolve_safe();
-	m_int1_ack_cb.resolve_safe();
-	m_int2_ack_cb.resolve_safe();
-	m_int_time_cb.resolve_safe();
-
 	save_item(NAME(m_regs));
 	save_item(NAME(m_hc));
 	save_item(NAME(m_hfp));
@@ -196,23 +192,20 @@ void k053252_device::write(offs_t offset, uint8_t data)
 	{
 		case 0x00:
 		case 0x01:
-			m_hc  = (m_regs[1]&0xff);
-			m_hc |= ((m_regs[0]&0x03)<<8);
+			m_hc = get_u16be(&m_regs[0])&0x03ff;
 			m_hc++;
 			logerror("%d (%04x) HC set\n",m_hc,m_hc);
 			res_change();
 			break;
 		case 0x02:
 		case 0x03:
-			m_hfp  = (m_regs[3]&0xff);
-			m_hfp |= ((m_regs[2]&0x01)<<8);
+			m_hfp = get_u16be(&m_regs[2])&0x01ff;
 			logerror("%d (%04x) HFP set\n",m_hfp,m_hfp);
 			res_change();
 			break;
 		case 0x04:
 		case 0x05:
-			m_hbp  = (m_regs[5]&0xff);
-			m_hbp |= ((m_regs[4]&0x01)<<8);
+			m_hbp = get_u16be(&m_regs[4])&0x01ff;
 			logerror("%d (%04x) HBP set\n",m_hbp,m_hbp);
 			res_change();
 			break;
@@ -220,26 +213,25 @@ void k053252_device::write(offs_t offset, uint8_t data)
 		case 0x07: m_int2_en_cb(data); break;
 		case 0x08:
 		case 0x09:
-			m_vc  = (m_regs[9]&0xff);
-			m_vc |= ((m_regs[8]&0x01)<<8);
+			m_vc = get_u16be(&m_regs[8])&0x01ff;
 			m_vc++;
 			logerror("%d (%04x) VC set\n",m_vc,m_vc);
 			res_change();
 			break;
 		case 0x0a:
-			m_vfp  = (m_regs[0x0a]&0xff);
+			m_vfp = (m_regs[0x0a]&0xff);
 			logerror("%d (%04x) VFP set\n",m_vfp,m_vfp);
 			res_change();
 			break;
 		case 0x0b:
-			m_vbp  = (m_regs[0x0b]&0xff);
+			m_vbp = (m_regs[0x0b]&0xff);
 			m_vbp++;
 			logerror("%d (%04x) VBP set\n",m_vbp,m_vbp);
 			res_change();
 			break;
 		case 0x0c:
-			m_vsw  = ((m_regs[0x0c]&0xf0) >> 4) + 1;
-			m_hsw  = ((m_regs[0x0c]&0x0f) >> 0) + 1;
+			m_vsw = ((m_regs[0x0c]&0xf0) >> 4) + 1;
+			m_hsw = ((m_regs[0x0c]&0x0f) >> 0) + 1;
 			logerror("%02x VSW / %02x HSW set\n",m_vsw,m_hsw);
 			res_change();
 			break;

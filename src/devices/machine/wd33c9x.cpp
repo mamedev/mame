@@ -18,14 +18,14 @@
 #include "emu.h"
 #include "wd33c9x.h"
 
-#define LOG_READS       (1 << 0)
-#define LOG_WRITES      (1 << 1)
-#define LOG_COMMANDS    (1 << 2)
-#define LOG_ERRORS      (1 << 3)
-#define LOG_MISC        (1 << 4)
-#define LOG_LINES       (1 << 5)
-#define LOG_STATE       (1 << 6)
-#define LOG_STEP        (1 << 7)
+#define LOG_READS       (1U << 1)
+#define LOG_WRITES      (1U << 2)
+#define LOG_COMMANDS    (1U << 3)
+#define LOG_ERRORS      (1U << 4)
+#define LOG_MISC        (1U << 5)
+#define LOG_LINES       (1U << 6)
+#define LOG_STATE       (1U << 7)
+#define LOG_STEP        (1U << 8)
 #define LOG_REGS        (LOG_READS | LOG_WRITES)
 #define LOG_ALL         (LOG_REGS | LOG_COMMANDS | LOG_ERRORS | LOG_MISC | LOG_LINES | LOG_STATE | LOG_STEP)
 
@@ -388,8 +388,6 @@ wd33c9x_base_device::wd33c9x_base_device(const machine_config &mconfig, device_t
 
 void wd33c9x_base_device::device_start()
 {
-	m_irq_cb.resolve_safe();
-	m_drq_cb.resolve_safe();
 	m_timer = timer_alloc(FUNC(wd33c9x_base_device::update_step), this);
 	save_item(NAME(m_addr));
 	save_item(NAME(m_regs));
@@ -670,7 +668,7 @@ void wd33c9x_base_device::indir_reg_w(uint8_t data)
 //  reset - Host reset line handler
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER(wd33c9x_base_device::reset_w)
+void wd33c9x_base_device::reset_w(int state)
 {
 	if (state) {
 		LOGMASKED(LOG_LINES, "Reset via MR line\n");
@@ -1344,7 +1342,7 @@ void wd33c9x_base_device::step(bool timeout)
 		if (sat && m_xfr_phase == S_PHASE_MSG_IN) {
 			if (m_regs[COMMAND_PHASE] <= COMMAND_PHASE_CP_BYTES_C) {
 				switch (m_last_message) {
-				case SM_SAVE_DATA_PTR:
+				case SM_SAVE_DATA_POINTER:
 					set_scsi_state(FINISHED);
 					irq_fifo_push(SCSI_STATUS_SAVE_DATA_POINTERS);
 					m_regs[COMMAND_PHASE] = COMMAND_PHASE_SAVE_DATA_POINTER;

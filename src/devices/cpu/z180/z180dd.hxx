@@ -1,6 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Juergen Buchmueller
-OP(illegal,1) {
+OP(illegal,1)
+{
 	logerror("Z180 '%s' ill. opcode $%02x $%02x\n",
 			tag(), m_copcodes.read_byte((_PCD-1)&0xffff), m_copcodes.read_byte(_PCD));
 }

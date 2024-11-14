@@ -205,13 +205,13 @@ void isa8_aga_pc200_device::device_start()
 		gfx[i] = i;
 }
 
-WRITE_LINE_MEMBER( isa8_aga_device::hsync_changed )
+void isa8_aga_device::hsync_changed(int state)
 {
 	m_hsync = state ? 1 : 0;
 }
 
 
-WRITE_LINE_MEMBER( isa8_aga_device::vsync_changed )
+void isa8_aga_device::vsync_changed(int state)
 {
 	m_vsync = state ? 8 : 0;
 	if (state)

@@ -1,8 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:Ryan Holtz
 
-#ifndef MAME_INCLUDES_TRANZ330_H
-#define MAME_INCLUDES_TRANZ330_H
+#ifndef MAME_VERIFONE_TRANZ330_H
+#define MAME_VERIFONE_TRANZ330_H
 
 #pragma once
 
@@ -45,20 +45,20 @@ public:
 	void tranz330(machine_config &config);
 
 private:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
-	DECLARE_WRITE_LINE_MEMBER(syncb_w);
-	DECLARE_WRITE_LINE_MEMBER(clock_w);
+	void syncb_w(int state);
+	void clock_w(int state);
 
-	DECLARE_WRITE_LINE_MEMBER(sound_w);
+	void sound_w(int state);
 
 	void pio_a_w(uint8_t data);
 	uint8_t pio_b_r();
 	uint8_t card_r();
 
-	void tranz330_mem(address_map &map);
-	void tranz330_io(address_map &map);
+	void tranz330_mem(address_map &map) ATTR_COLD;
+	void tranz330_io(address_map &map) ATTR_COLD;
 
 	required_device<z80_device>             m_cpu;
 	required_device<z80ctc_device>          m_ctc;
@@ -73,4 +73,4 @@ private:
 	uint8_t m_keypad_col_mask = 0;
 };
 
-#endif // VERIFONE_TRANZ330_H
+#endif // MAME_VERIFONE_TRANZ330_H

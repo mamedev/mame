@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Roberto Fresca, Grull Osgo
-#ifndef MAME_INCLUDES_AMPOKER2_H
-#define MAME_INCLUDES_AMPOKER2_H
+#ifndef MAME_MISC_AMPOKER2_H
+#define MAME_MISC_AMPOKER2_H
 
 #pragma once
 
@@ -27,8 +27,8 @@ public:
 	void init_rabbitpk();
 
 protected:
-	virtual void video_start() override;
-	virtual void machine_start() override;
+	virtual void video_start() override ATTR_COLD;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	void port30_w(uint8_t data);
@@ -45,8 +45,8 @@ private:
 	void ampoker2_palette(palette_device &palette) const;
 	DECLARE_VIDEO_START(sigma2k);
 
-	void io_map(address_map &map);
-	void program_map(address_map &map);
+	void io_map(address_map &map) ATTR_COLD;
+	void program_map(address_map &map) ATTR_COLD;
 
 	required_shared_ptr<uint8_t> m_videoram;
 	tilemap_t *m_bg_tilemap = nullptr;
@@ -58,4 +58,4 @@ private:
 	output_finder<10> m_lamps;
 };
 
-#endif // MAME_INCLUDES_AMPOKER2_H
+#endif // MAME_MISC_AMPOKER2_H

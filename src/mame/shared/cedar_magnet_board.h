@@ -2,8 +2,8 @@
 // copyright-holders:David Haywood
 
 // device interface to hold some common functions of the EFO / Cedar Magnet System PCBs
-#ifndef MAME_MACHINE_CEDAR_MAGNET_BOARD_H
-#define MAME_MACHINE_CEDAR_MAGNET_BOARD_H
+#ifndef MAME_SHARED_CEDAR_MAGNET_BOARD_H
+#define MAME_SHARED_CEDAR_MAGNET_BOARD_H
 
 #pragma once
 
@@ -51,4 +51,4 @@ private:
 	emu_timer *m_reset_clear_timer = nullptr;
 };
 
-#endif // MAME_MACHINE_CEDAR_MAGNET_BOARD_H
+#endif // MAME_SHARED_CEDAR_MAGNET_BOARD_H

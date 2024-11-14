@@ -9,7 +9,6 @@
 
 // device type definition
 DECLARE_DEVICE_TYPE(MC10_PAK_MCX128, device_mc10cart_interface)
-DECLARE_DEVICE_TYPE(ALICE_PAK_MCX128, device_mc10cart_interface)
 
 #endif // MAME_BUS_MC10_MC10_MCX128_H
 

@@ -36,18 +36,13 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 	TIMER_CALLBACK_MEMBER(process_timeout);
 	TIMER_CALLBACK_MEMBER(complete_function);
 
 private:
 	static constexpr unsigned MAX_COMMAND_SIZE = 4096;   // The maximum size of a command packet (the controller only has 5K of RAM...)
-
-	enum
-	{
-		TIMER_COMMAND
-	};
 
 	// Sector addressing scheme for Rev B/H drives used in various commands (Called a DADR in the docs)
 	struct dadr_t {
@@ -369,7 +364,7 @@ private:
 	uint8_t corvus_read_firmware_block(uint8_t head, uint8_t sector);
 	uint8_t corvus_write_firmware_block(uint8_t head, uint8_t sector, uint8_t *buffer);
 	uint8_t corvus_format_drive(uint8_t *pattern, uint16_t len);
-	hard_disk_file *corvus_hdc_file(int id);
+	harddisk_image_device *corvus_hdc_file(int id);
 	void corvus_process_command_packet(bool local_invalid_command_flag);
 
 	corvus_cmd_t corvus_cmd[0xf5][0xc1];     // Command sizes and their return sizes

@@ -1,4 +1,4 @@
-.TH CJPEG 1 "26 July 2015"
+.TH CJPEG 1 "28 April 2019"
 .SH NAME
 cjpeg \- compress an image file to a JPEG file
 .SH SYNOPSIS
@@ -16,8 +16,9 @@ cjpeg \- compress an image file to a JPEG file
 compresses the named image file, or the standard input if no file is
 named, and produces a JPEG/JFIF file on the standard output.
 The currently supported input file formats are: PPM (PBMPLUS color
-format), PGM (PBMPLUS grayscale format), BMP, Targa, and RLE (Utah Raster
-Toolkit format).  (RLE is supported only if the URT library is available.)
+format), PGM (PBMPLUS grayscale format), BMP, GIF, Targa, and RLE (Utah Raster
+Toolkit format).  (RLE is supported only if the URT library is available,
+which it isn't on most non-Unix systems.)
 .SH OPTIONS
 All switch names may be abbreviated; for example,
 .B \-grayscale
@@ -42,10 +43,10 @@ Scale quantization tables to adjust image quality.  Quality is 0 (worst) to
 .TP
 .B \-grayscale
 Create monochrome JPEG file from color input.  Be sure to use this switch when
-compressing a grayscale BMP file, because
+compressing a grayscale BMP or GIF file, because
 .B cjpeg
-isn't bright enough to notice whether a BMP file uses only shades of gray.
-By saying
+isn't bright enough to notice whether a BMP or GIF file uses only shades of
+gray.  By saying
 .BR \-grayscale ,
 you'll get a smaller JPEG file that takes less time to process.
 .TP
@@ -375,10 +376,6 @@ Communications of the ACM, April 1991 (vol. 34, no. 4), pp. 30-44.
 .SH AUTHOR
 Independent JPEG Group
 .SH BUGS
-GIF input files are no longer supported, to avoid the Unisys LZW patent
-(now expired).
-(Conversion of GIF files to JPEG is usually a bad idea anyway.)
-.PP
 Not all variants of BMP and Targa file formats are supported.
 .PP
 The

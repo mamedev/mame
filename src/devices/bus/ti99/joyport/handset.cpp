@@ -39,11 +39,11 @@
 #include "emu.h"
 #include "handset.h"
 
-#define LOG_WARN        (1U<<1)   // Warnings
-#define LOG_CONFIG      (1U<<2)   // Configuration
-#define LOG_JOYSTICK    (1U<<3)
-#define LOG_HANDSET     (1U<<4)
-#define LOG_CLOCK       (1U<<5)
+#define LOG_WARN        (1U << 1)   // Warnings
+#define LOG_CONFIG      (1U << 2)   // Configuration
+#define LOG_JOYSTICK    (1U << 3)
+#define LOG_HANDSET     (1U << 4)
+#define LOG_CLOCK       (1U << 5)
 
 #define VERBOSE (LOG_CONFIG | LOG_WARN)
 

@@ -1,5 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:Bryan McPhail
+// thanks-to: Shiriru
 /***************************************************************************
 
     Taito F3 Package System (aka F3 Cybercore System)
@@ -9,48 +10,43 @@
     Major thanks to Aaron Giles for sound info, figuring out the 68K/ES5505
     rom interface and ES5505 emulator!
     Thanks to Acho A. Tang for Kirameki Star Road sound banking info!
-    Thank you to Shiriru for the scanline rendering (including alpha blending),
-    sprite sync fixes, sprite zoom fixes and others!
 
     Other Issues:
-    - Various hacks in video core that needs squashing;
-    - When playing space invaders dx in original mode, t.t. with overlay, the
-      alpha blending effect is wrong (see Taito B version of game)
-    - Bubble Symphony has an alpha transition effect that doesn't appear in Mame
-    - Various other missing blending effects (see Mametesters)
-    - Find how this HW drives the CRTC, and convert video timings to use screen raw params;
+    - Find how this HW drives the CRTC and verify timing of interrupts
 
-    Feel free to report any other issues to me.
+    TODO:
+    - Use TC0640FIO device implementation from taito/taitoio.cpp
 
     Taito custom chips on motherboard:
 
-        TC0630FDP - Playfield generator?  (Nearest tile roms)
-        TC0640FIO - I/O & watchdog?
-        TC0650FDA - Priority mixer?  (Near paletteram & video output)
-        TC0660FCM - Sprites? (Nearest sprite roms)
+        TC0630FDP "Display Processor" - Graphics (sprites, playfields, prio, lineram...)
+        TC0640FIO "I/O"               - I/O ports (buttons, eeprom, and watchdog)
+        TC0650FDA "Digital to Analog" - Blending and RGB output
+        TC0660FCM "Control Module?"   - Misc. control/comm.?
 
 ***************************************************************************/
 
 #include "emu.h"
 #include "taito_f3.h"
 
-#include "cpu/m68000/m68000.h"
+#include "cpu/m68000/m68020.h"
 #include "sound/es5506.h"
 #include "sound/okim6295.h"
+
 #include "speaker.h"
 
 
 /******************************************************************************/
 
 template <int Num>
-CUSTOM_INPUT_MEMBER(taito_f3_state::f3_analog_r)
+ioport_value taito_f3_state::f3_analog_r()
 {
 	const int data = m_dial[Num]->read();
 	return ((data & 0xf) << 12) | ((data & 0xff0) >> 4);
 }
 
 template <int Num>
-CUSTOM_INPUT_MEMBER(taito_f3_state::f3_coin_r)
+ioport_value taito_f3_state::f3_coin_r()
 {
 	return m_coin_word[Num];
 }
@@ -66,40 +62,36 @@ u32 taito_f3_state::f3_control_r(offs_t offset)
 
 void taito_f3_state::f3_control_w(offs_t offset, u32 data, u32 mem_mask)
 {
-	switch (offset)
-	{
-		case 0x00: /* Watchdog */
-			m_watchdog->watchdog_reset();
-			return;
+	switch (offset) {
+	case 0x00: /* Watchdog */
+		m_watchdog->watchdog_reset();
+		return;
 
-		case 0x01: /* Coin counters & lockouts */
-			if (ACCESSING_BITS_24_31)
-			{
-				machine().bookkeeping().coin_lockout_w(0,~data & 0x01000000);
-				machine().bookkeeping().coin_lockout_w(1,~data & 0x02000000);
-				machine().bookkeeping().coin_counter_w(0, data & 0x04000000);
-				machine().bookkeeping().coin_counter_w(1, data & 0x08000000);
-				m_coin_word[0]=(data>>16)&0xffff;
-			}
-			return;
+	case 0x01: /* Coin counters & lockouts */
+		if (ACCESSING_BITS_24_31) {
+			machine().bookkeeping().coin_lockout_w(0,~data & 0x01000000);
+			machine().bookkeeping().coin_lockout_w(1,~data & 0x02000000);
+			machine().bookkeeping().coin_counter_w(0, data & 0x04000000);
+			machine().bookkeeping().coin_counter_w(1, data & 0x08000000);
+			m_coin_word[0]=(data>>16)&0xffff;
+		}
+		return;
 
-		case 0x04: /* Eeprom */
-			if (ACCESSING_BITS_0_7)
-			{
-				m_eepromout->write(data, 0xff);
-			}
-			return;
+	case 0x04: /* Eeprom */
+		if (ACCESSING_BITS_0_7) {
+			m_eepromout->write(data, 0xff);
+		}
+		return;
 
-		case 0x05:  /* Player 3 & 4 coin counters */
-			if (ACCESSING_BITS_24_31)
-			{
-				machine().bookkeeping().coin_lockout_w(2,~data & 0x01000000);
-				machine().bookkeeping().coin_lockout_w(3,~data & 0x02000000);
-				machine().bookkeeping().coin_counter_w(2, data & 0x04000000);
-				machine().bookkeeping().coin_counter_w(3, data & 0x08000000);
-				m_coin_word[1]=(data>>16)&0xffff;
-			}
-			return;
+	case 0x05:  /* Player 3 & 4 coin counters */
+		if (ACCESSING_BITS_24_31) {
+			machine().bookkeeping().coin_lockout_w(2,~data & 0x01000000);
+			machine().bookkeeping().coin_lockout_w(3,~data & 0x02000000);
+			machine().bookkeeping().coin_counter_w(2, data & 0x04000000);
+			machine().bookkeeping().coin_counter_w(3, data & 0x08000000);
+			m_coin_word[1]=(data>>16)&0xffff;
+		}
+		return;
 	}
 	logerror("CPU #0 PC %06x: warning - write unmapped control address %06x %08x\n",m_maincpu->pc(),offset,data);
 }
@@ -116,8 +108,7 @@ void taito_f3_state::sound_reset_1_w(u32 data)
 
 void taito_f3_state::sound_bankswitch_w(offs_t offset, u32 data, u32 mem_mask)
 {
-	if (m_game == KIRAMEKI)
-	{
+	if (m_game == KIRAMEKI) {
 		int idx = (offset << 1) & 0x1e;
 		if (ACCESSING_BITS_0_15)
 			idx += 1;
@@ -126,20 +117,17 @@ void taito_f3_state::sound_bankswitch_w(offs_t offset, u32 data, u32 mem_mask)
 			idx -= 8;
 
 		/* Banks are 0x20000 bytes each, divide by two to get data16
-		pointer rather than byte pointer */
+		   pointer rather than byte pointer */
 		m_taito_en->set_bank(1, idx);
-
-	}
-	else
-	{
+	} else {
 		logerror("Sound bankswitch in unsupported game\n");
 	}
 }
 
-void taito_f3_state::f3_unk_w(offs_t offset, u16 data)
+void taito_f3_state::f3_timer_control_w(offs_t offset, u16 data)
 {
 	/*
-	Several games writes a value here at POST, dunno what kind of config this is ...
+	TODO: Several games configure timer-based pseudo-hblank int5 here at POST
 	ringrage:  0x0000
 	arabianm:  0x0000
 	ridingf: (no init)
@@ -189,7 +177,7 @@ void taito_f3_state::f3_map(address_map &map)
 	map(0x400000, 0x41ffff).mirror(0x20000).ram();
 	map(0x440000, 0x447fff).ram().w(FUNC(taito_f3_state::palette_24bit_w)).share("paletteram");
 	map(0x4a0000, 0x4a001f).rw(FUNC(taito_f3_state::f3_control_r), FUNC(taito_f3_state::f3_control_w));
-	map(0x4c0000, 0x4c0003).w(FUNC(taito_f3_state::f3_unk_w));
+	map(0x4c0000, 0x4c0003).w(FUNC(taito_f3_state::f3_timer_control_w));
 	map(0x600000, 0x60ffff).rw(FUNC(taito_f3_state::spriteram_r), FUNC(taito_f3_state::spriteram_w));
 	map(0x610000, 0x61bfff).rw(FUNC(taito_f3_state::pf_ram_r), FUNC(taito_f3_state::pf_ram_w));
 	map(0x61c000, 0x61dfff).rw(FUNC(taito_f3_state::textram_r), FUNC(taito_f3_state::textram_w));
@@ -207,12 +195,9 @@ void taito_f3_state::bubsympb_oki_w(u8 data) // TODO: this is wrong. PCB referen
 {
 	//printf("write %08x %08x\n",data,mem_mask);
 	const u8 bank = data & 0xf;
-	if (data < 5)
-	{
+	if (data < 5) {
 		m_okibank->set_entry(bank);
-	}
-	else
-	{
+	} else {
 		logerror("unknown oki bank write %02x at %08x\n", bank, m_maincpu->pc());
 	}
 	//printf("oki bank w %08x\n",data);
@@ -227,7 +212,7 @@ void taito_f3_state::bubsympb_map(address_map &map)
 	map(0x4a0000, 0x4a001b).rw(FUNC(taito_f3_state::f3_control_r), FUNC(taito_f3_state::f3_control_w));
 	map(0x4a001d, 0x4a001d).w(FUNC(taito_f3_state::bubsympb_oki_w));
 	map(0x4a001f, 0x4a001f).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
-	map(0x4c0000, 0x4c0003).w(FUNC(taito_f3_state::f3_unk_w));
+	map(0x4c0000, 0x4c0003).w(FUNC(taito_f3_state::f3_timer_control_w));
 	map(0x600000, 0x60ffff).rw(FUNC(taito_f3_state::spriteram_r), FUNC(taito_f3_state::spriteram_w));
 	map(0x610000, 0x61bfff).rw(FUNC(taito_f3_state::pf_ram_r), FUNC(taito_f3_state::pf_ram_w));
 	map(0x61c000, 0x61dfff).rw(FUNC(taito_f3_state::textram_r), FUNC(taito_f3_state::textram_w));
@@ -247,7 +232,7 @@ void taito_f3_state::bubsympb_oki_map(address_map &map)
 
 /******************************************************************************/
 
-CUSTOM_INPUT_MEMBER( taito_f3_state::eeprom_read )
+ioport_value taito_f3_state::eeprom_read()
 {
 	return m_eepromin->read();
 }
@@ -272,8 +257,8 @@ static INPUT_PORTS_START( f3 )
 	PORT_BIT( 0x00002000, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x00004000, IP_ACTIVE_LOW, IPT_START3 )
 	PORT_BIT( 0x00008000, IP_ACTIVE_LOW, IPT_START4 )
-	PORT_BIT( 0x00ff0000, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(taito_f3_state, eeprom_read)
-	PORT_BIT( 0xff000000, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(taito_f3_state, eeprom_read)
+	PORT_BIT( 0x00ff0000, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(FUNC(taito_f3_state::eeprom_read))
+	PORT_BIT( 0xff000000, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(FUNC(taito_f3_state::eeprom_read))
 
 	/* MSW: Coin counters/lockouts are readable, LSW: Joysticks (Player 1 & 2) */
 	PORT_START("IN.1")
@@ -286,7 +271,7 @@ static INPUT_PORTS_START( f3 )
 	PORT_BIT( 0x00000040, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(2)
 	PORT_BIT( 0x00000080, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(2)
 	PORT_BIT( 0x0000ff00, IP_ACTIVE_HIGH, IPT_UNKNOWN ) /* These must be high */
-	PORT_BIT( 0xffff0000, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(taito_f3_state, f3_coin_r<0>)
+	PORT_BIT( 0xffff0000, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(FUNC(taito_f3_state::f3_coin_r<0>))
 
 	/* Player 3 & 4 fire buttons (Player 2 top fire buttons in Kaiser Knuckle) */
 	PORT_START("IN.4")
@@ -312,21 +297,21 @@ static INPUT_PORTS_START( f3 )
 	PORT_BIT( 0x00000040, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(4)
 	PORT_BIT( 0x00000080, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(4)
 	PORT_BIT( 0x0000ff00, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0xffff0000, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(taito_f3_state, f3_coin_r<1>)
+	PORT_BIT( 0xffff0000, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(FUNC(taito_f3_state::f3_coin_r<1>))
 
 	/* Analog control 1 */
 	PORT_START("IN.2")
-	PORT_BIT( 0x0000ffff, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(taito_f3_state, f3_analog_r<0>)
+	PORT_BIT( 0x0000ffff, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(FUNC(taito_f3_state::f3_analog_r<0>))
 	PORT_BIT( 0xffff0000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	/* Analog control 2 */
 	PORT_START("IN.3")
-	PORT_BIT( 0x0000ffff, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(taito_f3_state, f3_analog_r<1>)
+	PORT_BIT( 0x0000ffff, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(FUNC(taito_f3_state::f3_analog_r<1>))
 	PORT_BIT( 0xffff0000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	/* These are not read directly, but through PORT_CUSTOMs above */
 	PORT_START("EEPROMIN")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", FUNC(eeprom_serial_93cxx_device::do_read))
 	PORT_SERVICE_NO_TOGGLE( 0x02, IP_ACTIVE_LOW )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED ) /* Another service mode */
@@ -342,9 +327,9 @@ static INPUT_PORTS_START( f3 )
 	PORT_BIT( 0xfff, 0x000, IPT_DIAL ) PORT_SENSITIVITY(25) PORT_KEYDELTA(25) PORT_CODE_DEC(KEYCODE_N) PORT_CODE_INC(KEYCODE_M) PORT_PLAYER(2)
 
 	PORT_START( "EEPROMOUT" )
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, di_write)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, clk_write)
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, cs_write)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", FUNC(eeprom_serial_93cxx_device::di_write))
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", FUNC(eeprom_serial_93cxx_device::clk_write))
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", FUNC(eeprom_serial_93cxx_device::cs_write))
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( kn )
@@ -369,8 +354,7 @@ INPUT_PORTS_END
 
 /******************************************************************************/
 
-static const gfx_layout charlayout =
-{
+static const gfx_layout charlayout = {
 	8,8,
 	256,
 	4,
@@ -380,8 +364,7 @@ static const gfx_layout charlayout =
 	32*8
 };
 
-static const gfx_layout pivotlayout =
-{
+static const gfx_layout pivotlayout = {
 	8,8,
 	2048,
 	4,
@@ -391,8 +374,7 @@ static const gfx_layout pivotlayout =
 	32*8
 };
 
-static const gfx_layout layout_6bpp_sprite_hi =
-{
+static const gfx_layout layout_6bpp_sprite_hi = {
 	16,16,
 	RGN_FRAC(1,1),
 	6,
@@ -402,8 +384,7 @@ static const gfx_layout layout_6bpp_sprite_hi =
 	16*16*2
 };
 
-static const gfx_layout layout_6bpp_tile_hi =
-{
+static const gfx_layout layout_6bpp_tile_hi = {
 	16,16,
 	RGN_FRAC(1,1),
 	6,
@@ -426,7 +407,9 @@ GFXDECODE_END
 
 TIMER_CALLBACK_MEMBER(taito_f3_state::trigger_int3)
 {
-	m_maincpu->set_input_line(3, HOLD_LINE);    // some signal from video hardware?
+	// some signal from video hardware?
+	// vblank handler will wait until approximately end of vblank for it
+	m_maincpu->set_input_line(3, HOLD_LINE);
 }
 
 INTERRUPT_GEN_MEMBER(taito_f3_state::interrupt2)
@@ -452,7 +435,7 @@ void taito_f3_state::machine_reset()
 void taito_f3_state::f3(machine_config &config)
 {
 	/* basic machine hardware */
-	M68EC020(config, m_maincpu, XTAL(16'000'000));
+	M68EC020(config, m_maincpu, F3_MAIN_CLK);
 	m_maincpu->set_addrmap(AS_PROGRAM, &taito_f3_state::f3_map);
 	m_maincpu->set_vblank_int("screen", FUNC(taito_f3_state::interrupt2));
 
@@ -462,10 +445,14 @@ void taito_f3_state::f3(machine_config &config)
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_refresh_hz(58.97);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(624)); /* 58.97 Hz, 624us vblank time */
-	m_screen->set_size(40*8+48*2, 32*8);
-	m_screen->set_visarea(46, 40*8-1 + 46, 24, 24+232-1);
+	// from taito z system and crystal on board
+	// and measurements from https://www.arcade-projects.com/threads/the-taito-f3-sync.12343/
+	m_screen->set_raw(
+			26.686_MHz_XTAL / 4,
+			432, 46, 320 + 46,
+			262, 24, 232 + 24);
+	// refresh rate = 26686000/4/432/262 = 58.94 Hz
+
 	m_screen->set_screen_update(FUNC(taito_f3_state::screen_update));
 	m_screen->screen_vblank().set(FUNC(taito_f3_state::screen_vblank));
 
@@ -504,8 +491,7 @@ void taito_f3_state::f3_224c(machine_config &config)
 	m_screen->set_visarea(46, 40*8-1 + 46, 24, 24+224-1);
 }
 
-static const gfx_layout bubsympb_sprite_layout =
-{
+static const gfx_layout bubsympb_sprite_layout = {
 	16,16,
 	RGN_FRAC(1,6),
 	6,
@@ -515,8 +501,7 @@ static const gfx_layout bubsympb_sprite_layout =
 	16*16
 };
 
-static const gfx_layout bubsympb_layout_5bpp_tile_hi =
-{
+static const gfx_layout bubsympb_layout_5bpp_tile_hi = {
 	16,16,
 	RGN_FRAC(1,1),
 	5,
@@ -539,7 +524,7 @@ GFXDECODE_END
 void taito_f3_state::bubsympb(machine_config &config)
 {
 	/* basic machine hardware */
-	M68EC020(config, m_maincpu, XTAL(16'000'000));
+	M68EC020(config, m_maincpu, F3_MAIN_CLK);
 	m_maincpu->set_addrmap(AS_PROGRAM, &taito_f3_state::bubsympb_map);
 	m_maincpu->set_vblank_int("screen", FUNC(taito_f3_state::interrupt2));
 
@@ -1133,7 +1118,6 @@ ROM_START( hthero93u )
 	ROM_LOAD ("d29-15.ic29.bin", 0x000000, 0x157, CRC(692eb582) SHA1(db40eb294cecc65d4a0d65e75b6daef75dcc2fb7) )
 	ROM_LOAD ("d29-16.ic7.bin",  0x000000, 0x117, CRC(11875f52) SHA1(2c3a7a15b3184421ca1bc88383eeccf49ee0d22c) )
 	ROM_LOAD ("d29-17.ic16.bin", 0x000000, 0x117, CRC(a0f74b51) SHA1(9d19e9099be965152a3cfbc5593e6abedb7c9d71) )
-
 ROM_END
 
 
@@ -4337,8 +4321,7 @@ void taito_f3_state::tile_decode()
 
 	u8 *dest;
 	// all but bubsymphb (bootleg board with different sprite gfx layout), 2mindril (no sprite gfx roms)
-	if (m_gfxdecode->gfx(5) != nullptr)
-	{
+	if (m_gfxdecode->gfx(5) != nullptr) {
 		gfx_element *spr_gfx = m_gfxdecode->gfx(2);
 		gfx_element *spr_gfx_hi = m_gfxdecode->gfx(5);
 
@@ -4347,14 +4330,12 @@ void taito_f3_state::tile_decode()
 
 		// loop over elements
 		dest = m_decoded_gfx5.get();
-		for (int c = 0; c < spr_gfx->elements(); c++)
-		{
+		for (int c = 0; c < spr_gfx->elements(); c++) {
 			const u8 *c1base = spr_gfx->get_data(c);
 			const u8 *c3base = spr_gfx_hi->get_data(c);
 
 			// loop over height
-			for (int y = 0; y < spr_gfx->height(); y++)
-			{
+			for (int y = 0; y < spr_gfx->height(); y++) {
 				const u8 *c1 = c1base;
 				const u8 *c3 = c3base;
 
@@ -4371,8 +4352,7 @@ void taito_f3_state::tile_decode()
 		m_gfxdecode->set_gfx(5, nullptr);
 	}
 
-	if (m_gfxdecode->gfx(4) != nullptr)
-	{
+	if (m_gfxdecode->gfx(4) != nullptr) {
 		gfx_element *pf_gfx = m_gfxdecode->gfx(3);
 		gfx_element *pf_gfx_hi = m_gfxdecode->gfx(4);
 
@@ -4381,14 +4361,12 @@ void taito_f3_state::tile_decode()
 
 		// loop over elements
 		dest = m_decoded_gfx4.get();
-		for (int c = 0; c < pf_gfx->elements(); c++)
-		{
+		for (int c = 0; c < pf_gfx->elements(); c++) {
 			const u8 *c0base = pf_gfx->get_data(c);
 			const u8 *c2base = pf_gfx_hi->get_data(c);
 
 			// loop over height
-			for (int y = 0; y < pf_gfx->height(); y++)
-			{
+			for (int y = 0; y < pf_gfx->height(); y++) {
 				const u8 *c0 = c0base;
 				const u8 *c2 = c2base;
 
@@ -4724,7 +4702,7 @@ GAME( 1995, spcinv95,   0,        f3_224a, f3, taito_f3_state, init_spcinv95, RO
 GAME( 1995, spcinv95u,  spcinv95, f3_224a, f3, taito_f3_state, init_spcinv95, ROT270, "Taito America Corporation", "Space Invaders '95: The Attack Of Lunar Loonies (Ver 2.5A 1995/06/14)", 0 )
 GAME( 1995, akkanvdr,   spcinv95, f3_224a, f3, taito_f3_state, init_spcinv95, ROT270, "Taito Corporation",         "Akkanbeder (Ver 2.5J 1995/06/14)", 0 )
 GAME( 1995, twinqix,    0,        f3_224a, f3, taito_f3_state, init_twinqix,  ROT0,   "Taito America Corporation", "Twin Qix (Ver 1.0A 1995/01/17, prototype)", 0 )
-GAME( 1995, quizhuhu,   0,        f3,      f3, taito_f3_state, init_quizhuhu, ROT0,   "Taito Corporation",         "Moriguchi Hiroko no Quiz de Hyuu!Hyuu! (Ver 2.2J 1995/05/25)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS ) // quiz text positioning, heavy sprite window usage
+GAME( 1995, quizhuhu,   0,        f3,      f3, taito_f3_state, init_quizhuhu, ROT0,   "Taito Corporation",         "Moriguchi Hiroko no Quiz de Hyuu!Hyuu! (Ver 2.2J 1995/05/25)", 0 )
 GAME( 1995, pbobble2,   0,        f3,      f3, taito_f3_state, init_pbobbl2p, ROT0,   "Taito Corporation Japan",   "Puzzle Bobble 2 (Ver 2.3O 1995/07/31)", 0 )
 GAME( 1995, pbobble2o,  pbobble2, f3,      f3, taito_f3_state, init_pbobble2, ROT0,   "Taito Corporation Japan",   "Puzzle Bobble 2 (Ver 2.2O 1995/07/20)", 0 )
 GAME( 1995, pbobble2j,  pbobble2, f3,      f3, taito_f3_state, init_pbobble2, ROT0,   "Taito Corporation",         "Puzzle Bobble 2 (Ver 2.2J 1995/07/20)", 0 )

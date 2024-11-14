@@ -5,7 +5,7 @@
 Dottori Kun (Head On's mini game)
 (c)1990 SEGA
 
-Driver by Takahiro Nogi (nogi@kt.rim.or.jp) 1999/12/15 -
+Driver by Takahiro Nogi 1999/12/15 -
 
 
 CPU   : Z-80 (4MHz)
@@ -31,6 +31,9 @@ TODO:
 #include "machine/timer.h"
 #include "emupal.h"
 #include "screen.h"
+
+
+namespace {
 
 #define MASTER_CLOCK XTAL(4'000'000)
 
@@ -66,10 +69,10 @@ protected:
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline_off);
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline_on);
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	void dotrikun_map(address_map &map);
-	void io_map(address_map &map);
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	void dotrikun_map(address_map &map) ATTR_COLD;
+	void io_map(address_map &map) ATTR_COLD;
 };
 
 TIMER_DEVICE_CALLBACK_MEMBER(dotrikun_state::interrupt)
@@ -238,6 +241,8 @@ ROM_START( dotriman )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "dotriman.bin", 0x0000, 0x4000, CRC(4ba6d2f5) SHA1(db805e9121ecbd41fac4593b58d7f071e7dbc720) )
 ROM_END
+
+} // anonymous namespace
 
 
 GAME( 1990, dotrikun,  0,        dotrikun, dotrikun, dotrikun_state, empty_init, ROT0, "Sega", "Dottori Kun (new version)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )

@@ -37,17 +37,17 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 private:
 	// input pins state
-	u8 m_data = 0;
-	int m_wr = 0;
-	int m_rd = 0;
-	int m_adr_strobe = 0;
+	u8 m_data;
+	int m_wr;
+	int m_rd;
+	int m_adr_strobe;
 
 	// internal state
-	u8 m_ram_address = 0;
+	u8 m_ram_address;
 	u8 m_ram[0x100];
 };
 

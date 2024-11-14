@@ -31,6 +31,10 @@
 #include "emupal.h"
 #include "screen.h"
 #include "softlist_dev.h"
+#include "utf8.h"
+
+
+namespace {
 
 #define I8080_TAG   "ua2"
 #define TMS5501_TAG "ud2"
@@ -67,21 +71,21 @@ public:
 	required_ioport_array<16> m_y;
 	required_ioport m_y128;
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	uint8_t xi_r();
 	void xo_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER( xmt_w );
+	void xmt_w(int state);
 
 	IRQ_CALLBACK_MEMBER( int_ack );
 
 	uint8_t m_xo;
 	void compucolor2(machine_config &config);
-	void compucolor2_io(address_map &map);
-	void compucolor2_mem(address_map &map);
+	void compucolor2_io(address_map &map) ATTR_COLD;
+	void compucolor2_mem(address_map &map) ATTR_COLD;
 };
 
 void compucolor2_state::compucolor2_mem(address_map &map)
@@ -156,7 +160,7 @@ static INPUT_PORTS_START( compucolor2 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("F10 X BAR XO")
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME(UTF8_DOWN) PORT_CODE(KEYCODE_DOWN) PORT_CHAR(UCHAR_MAMEKEY(DOWN))
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME(UTF8_LEFT) PORT_CODE(KEYCODE_LEFT) PORT_CODE(KEYCODE_BACKSPACE) PORT_CHAR(UCHAR_MAMEKEY(LEFT))
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Keypad " UTF8_MULTIPLY) PORT_CODE(KEYCODE_ASTERISK) PORT_CHAR(UCHAR_MAMEKEY(ASTERISK))
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME(u8"Keypad ×") PORT_CODE(KEYCODE_ASTERISK) PORT_CHAR(UCHAR_MAMEKEY(ASTERISK))
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("Y6")
@@ -360,7 +364,7 @@ void compucolor2_state::xo_w(uint8_t data)
 	}
 }
 
-WRITE_LINE_MEMBER( compucolor2_state::xmt_w )
+void compucolor2_state::xmt_w(int state)
 {
 	switch ((m_xo >> 4) & 0x03)
 	{
@@ -464,5 +468,8 @@ ROM_START( compclr2 )
 	ROM_LOAD( "82s129.ug9", 0x00, 0x20, NO_DUMP ) // Scan Decoder
 	ROM_LOAD( "82s129.ug5", 0x00, 0x20, NO_DUMP ) // Color PROM
 ROM_END
+
+} // anonymous namespace
+
 
 COMP( 1977, compclr2, 0, 0, compucolor2, compucolor2, compucolor2_state, empty_init, "Intelligent Systems Corporation", "Compucolor II", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )

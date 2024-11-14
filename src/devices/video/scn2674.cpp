@@ -10,10 +10,10 @@
 
 #include "screen.h"
 
-#define LOG_IR      (1 << 0)
-#define LOG_COMMAND (1 << 1)
-#define LOG_INTR    (1 << 2)
-#define LOG_READ    (1 << 3)
+#define LOG_IR      (1U << 1)
+#define LOG_COMMAND (1U << 2)
+#define LOG_INTR    (1U << 3)
+#define LOG_READ    (1U << 4)
 #define VERBOSE     (0)
 #include "logmacro.h"
 
@@ -46,10 +46,10 @@ scn2674_device::scn2674_device(const machine_config &mconfig, device_type type, 
 	, m_intr_cb(*this)
 	, m_breq_cb(*this)
 	, m_mbc_cb(*this)
-	, m_mbc_char_cb(*this)
-	, m_mbc_attr_cb(*this)
+	, m_mbc_char_cb(*this, 0)
+	, m_mbc_attr_cb(*this, 0)
 	, m_IR_pointer(0)
-	, m_screen1_address(0), m_screen2_address(0)
+	, m_screen1_address(0), m_screen2_address(0), m_screen2_address_start(0)
 	, m_cursor_address(0)
 	, m_irq_register(0), m_status_register(0), m_irq_mask(0)
 	, m_gfx_enabled(false)
@@ -105,13 +105,9 @@ device_memory_interface::space_config_vector scn2674_device::memory_space_config
 
 void scn2674_device::device_start()
 {
-	// resolve callbacks
-	m_display_cb.resolve();
-	m_intr_cb.resolve_safe();
-	m_breq_cb.resolve_safe();
-	m_mbc_cb.resolve_safe();
-	m_mbc_char_cb.resolve();
-	m_mbc_attr_cb.resolve();
+	// resolve delegates
+	m_display_cb.resolve_safe();
+
 	m_scanline_timer = timer_alloc(FUNC(scn2674_device::scanline_timer), this);
 	m_breq_timer = timer_alloc(FUNC(scn2674_device::breq_timer), this);
 	m_vblank_timer = timer_alloc(FUNC(scn2674_device::vblank_timer), this);
@@ -125,6 +121,7 @@ void scn2674_device::device_start()
 	save_item(NAME(m_linecounter));
 	save_item(NAME(m_screen1_address));
 	save_item(NAME(m_screen2_address));
+	save_item(NAME(m_screen2_address_start));
 	save_item(NAME(m_cursor_address));
 	save_item(NAME(m_IR_pointer));
 	save_item(NAME(m_irq_register));
@@ -178,6 +175,7 @@ void scn2674_device::device_reset()
 {
 	m_screen1_address = 0;
 	m_screen2_address = 0;
+	m_screen2_address_start = 0;
 	m_cursor_address = 0;
 	m_irq_register = 0;
 	m_status_register = 0;
@@ -979,6 +977,7 @@ void scn2674_device::write_screen2_address(bool msb, uint8_t data)
 	}
 	else
 		m_screen2_address = (m_screen2_address & 0x3f00) | data;
+	m_screen2_address_start = m_screen2_address;
 }
 
 void scn2672_device::write_screen2_address(bool msb, uint8_t data)
@@ -1131,12 +1130,12 @@ TIMER_CALLBACK_MEMBER(scn2674_device::scanline_timer)
 	for (int i = 0; i < m_character_per_row; i++)
 	{
 		u8 charcode, attrcode = 0;
-		if (mbc && !m_mbc_char_cb.isnull())
+		if (mbc && !m_mbc_char_cb.isunset())
 		{
 			// row buffering DMA
 			charcode = m_mbc_char_cb(address);
 			m_char_space->write_byte(address, charcode);
-			if (m_attr_space != nullptr && !m_mbc_attr_cb.isnull())
+			if (m_attr_space != nullptr && !m_mbc_attr_cb.isunset())
 			{
 				attrcode = m_mbc_attr_cb(address);
 				m_attr_space->write_byte(address, attrcode);
@@ -1149,7 +1148,7 @@ TIMER_CALLBACK_MEMBER(scn2674_device::scanline_timer)
 				attrcode = m_attr_space->read_byte(address);
 		}
 
-		if (m_display_enabled && !m_display_cb.isnull())
+		if (m_display_enabled)
 		{
 			bool cursor_on = ((address & 0x3fff) == m_cursor_address)
 				&& m_cursor_enabled
@@ -1201,6 +1200,7 @@ TIMER_CALLBACK_MEMBER(scn2674_device::vblank_timer)
 		m_irq_register |= 0x10;
 		m_intr_cb(ASSERT_LINE);
 	}
+	m_screen2_address = m_screen2_address_start;
 }
 
 uint32_t scn2674_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)

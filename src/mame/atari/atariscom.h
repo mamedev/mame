@@ -8,8 +8,8 @@
 
 ***************************************************************************/
 
-#ifndef MAME_MACHINE_ATARISCOM_H
-#define MAME_MACHINE_ATARISCOM_H
+#ifndef MAME_ATARI_ATARISCOM_H
+#define MAME_ATARI_ATARISCOM_H
 
 #pragma once
 
@@ -19,10 +19,10 @@
 //**************************************************************************
 
 #define PORT_ATARI_COMM_SOUND_TO_MAIN_READY(_tag) \
-	PORT_READ_LINE_DEVICE_MEMBER(_tag, atari_sound_comm_device, sound_to_main_ready)
+	PORT_READ_LINE_DEVICE_MEMBER(_tag, FUNC(atari_sound_comm_device::sound_to_main_ready))
 
 #define PORT_ATARI_COMM_MAIN_TO_SOUND_READY(_tag) \
-	PORT_READ_LINE_DEVICE_MEMBER(_tag, atari_sound_comm_device, main_to_sound_ready)
+	PORT_READ_LINE_DEVICE_MEMBER(_tag, FUNC(atari_sound_comm_device::main_to_sound_ready))
 
 
 // ======================> atari_sound_comm_device
@@ -47,8 +47,8 @@ public:
 	auto int_callback() { return m_main_int_cb.bind(); }
 
 	// getters
-	DECLARE_READ_LINE_MEMBER(main_to_sound_ready) { return m_main_to_sound_ready ? ASSERT_LINE : CLEAR_LINE; }
-	DECLARE_READ_LINE_MEMBER(sound_to_main_ready) { return m_sound_to_main_ready ? ASSERT_LINE : CLEAR_LINE; }
+	int main_to_sound_ready() { return m_main_to_sound_ready ? ASSERT_LINE : CLEAR_LINE; }
+	int sound_to_main_ready() { return m_sound_to_main_ready ? ASSERT_LINE : CLEAR_LINE; }
 
 	// main cpu accessors (forward internally to the atari_sound_comm_device)
 	void main_command_w(u8 data);
@@ -67,8 +67,8 @@ protected:
 	TIMER_CALLBACK_MEMBER(delayed_6502_write);
 
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 private:
 	// configuration state
@@ -86,4 +86,4 @@ private:
 };
 
 
-#endif // MAME_MACHINE_ATARISCOM_H
+#endif // MAME_ATARI_ATARISCOM_H

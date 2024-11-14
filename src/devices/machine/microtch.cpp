@@ -138,7 +138,7 @@ void microtouch_device::send_touch_packet()
 	int tx = m_touchx->read();
 	int ty = m_touchy->read();
 
-	if (m_out_touch_cb.isnull() || m_out_touch_cb(&tx, &ty) != 0)
+	if (m_out_touch_cb(&tx, &ty) != 0)
 	{
 		ty = 0x4000 - ty;
 
@@ -241,8 +241,7 @@ void microtouch_device::device_start()
 	set_data_frame(1, 8, PARITY_NONE, STOP_BITS_1); //8N1?
 	set_tra_rate(clock());
 	set_rcv_rate(clock());
-	m_out_touch_cb.resolve();
-	m_out_stx_func.resolve_safe();
+	m_out_touch_cb.resolve_safe(1);
 	m_output_valid = false;
 
 	save_item(NAME(m_output_valid));
@@ -362,7 +361,7 @@ ROM_END
 
 static INPUT_PORTS_START(microtouch)
 	PORT_START("TOUCH")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_BUTTON1) PORT_NAME("Touch screen") PORT_CHANGED_MEMBER(DEVICE_SELF, microtouch_device, touch, 0)
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_BUTTON1) PORT_NAME("Touch screen") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(microtouch_device::touch), 0)
 	PORT_START("TOUCH_X")
 	PORT_BIT(0x3fff, 0x2000, IPT_LIGHTGUN_X) PORT_CROSSHAIR(X, 1.0, 0.0, 0) PORT_SENSITIVITY(45) PORT_KEYDELTA(15)
 	PORT_START("TOUCH_Y")

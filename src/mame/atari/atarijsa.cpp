@@ -173,9 +173,9 @@ INPUT_PORTS_START( jsa_i_ioports )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_COIN3 )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNUSED )    // speech chip ready
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("soundcomm", atari_sound_comm_device, sound_to_main_ready) // output buffer full
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("soundcomm", atari_sound_comm_device, main_to_sound_ready) // input buffer full
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER(DEVICE_SELF, atari_jsa_base_device, main_test_read_line) // self test
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("soundcomm", FUNC(atari_sound_comm_device::sound_to_main_ready)) // output buffer full
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("soundcomm", FUNC(atari_sound_comm_device::main_to_sound_ready)) // input buffer full
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER(DEVICE_SELF, FUNC(atari_jsa_base_device::main_test_read_line)) // self test
 INPUT_PORTS_END
 
 INPUT_PORTS_START( jsa_i_ioports_swapped_coins )
@@ -193,9 +193,9 @@ INPUT_PORTS_START( jsa_ii_ioports )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_COIN3 )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("soundcomm", atari_sound_comm_device, sound_to_main_ready) // output buffer full
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("soundcomm", atari_sound_comm_device, main_to_sound_ready) // input buffer full
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER(DEVICE_SELF, atari_jsa_base_device, main_test_read_line) // self test
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("soundcomm", FUNC(atari_sound_comm_device::sound_to_main_ready)) // output buffer full
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("soundcomm", FUNC(atari_sound_comm_device::main_to_sound_ready)) // input buffer full
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER(DEVICE_SELF, FUNC(atari_jsa_base_device::main_test_read_line)) // self test
 INPUT_PORTS_END
 
 INPUT_PORTS_START( jsa_ii_ioports_swapped_coins )
@@ -212,10 +212,10 @@ INPUT_PORTS_START( jsa_iii_ioports )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN1 )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_TILT )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SERVICE1 )
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER(DEVICE_SELF, atari_jsa_base_device, main_test_read_line) // self test
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("soundcomm", atari_sound_comm_device, sound_to_main_ready) // output buffer full
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("soundcomm", atari_sound_comm_device, main_to_sound_ready) // input buffer full
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER(DEVICE_SELF, atari_jsa_base_device, main_test_read_line) // self test
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER(DEVICE_SELF, FUNC(atari_jsa_base_device::main_test_read_line)) // self test
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("soundcomm", FUNC(atari_sound_comm_device::sound_to_main_ready)) // output buffer full
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("soundcomm", FUNC(atari_sound_comm_device::main_to_sound_ready)) // input buffer full
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER(DEVICE_SELF, FUNC(atari_jsa_base_device::main_test_read_line)) // self test
 INPUT_PORTS_END
 
 INPUT_PORTS_START( jsa_iii_ioports_swapped_coins )
@@ -242,7 +242,7 @@ atari_jsa_base_device::atari_jsa_base_device(const machine_config &mconfig, devi
 		m_ym2151(*this, "ym2151"),
 		m_cpu_region(*this, "cpu"),
 		m_cpu_bank(*this, "cpubank"),
-		m_test_read_cb(*this),
+		m_test_read_cb(*this, 0),
 		m_main_int_cb(*this),
 		m_timed_int(false),
 		m_ym2151_int(false),
@@ -262,10 +262,6 @@ void atari_jsa_base_device::device_start()
 {
 	// configure CPU bank
 	m_cpu_bank->configure_entries(0, 4, m_cpu_region->base(), 0x1000);
-
-	// resolve devices
-	m_test_read_cb.resolve_safe(0);
-	m_main_int_cb.resolve_safe();
 
 	// save states
 	save_item(NAME(m_timed_int));
@@ -340,7 +336,7 @@ void atari_jsa_base_device::ym2151_port_w(uint8_t data)
 //  main's test line, provided by a callback
 //-------------------------------------------------
 
-READ_LINE_MEMBER(atari_jsa_base_device::main_test_read_line)
+int atari_jsa_base_device::main_test_read_line()
 {
 	return !m_test_read_cb();
 }
@@ -351,7 +347,7 @@ READ_LINE_MEMBER(atari_jsa_base_device::main_test_read_line)
 //  from the comm device to the owning callback
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER(atari_jsa_base_device::main_int_write_line)
+void atari_jsa_base_device::main_int_write_line(int state)
 {
 	m_main_int_cb(state);
 }
@@ -397,7 +393,7 @@ void atari_jsa_base_device::sound_irq_ack_w(u8 data)
 //  YM2151's IRQ line.
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER(atari_jsa_base_device::ym2151_irq_gen)
+void atari_jsa_base_device::ym2151_irq_gen(int state)
 {
 	m_ym2151_int = state;
 	update_sound_irq();

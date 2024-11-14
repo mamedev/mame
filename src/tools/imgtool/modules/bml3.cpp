@@ -23,6 +23,7 @@
 #include "iflopimg.h"
 
 #include "corestr.h"
+#include "multibyte.h"
 #include "opresolv.h"
 
 #include <cstdio>
@@ -134,7 +135,7 @@ static floperr_t get_bml3_dirent(imgtool::image &f, int index_loc, struct bml3_d
 		ent->ftype = buf[11];
 		ent->asciiflag = buf[12];
 		ent->first_granule = buf[13];
-		ent->lastsectorbytes = (buf[14] << 8) | buf[15];
+		ent->lastsectorbytes = get_u16be(&buf[14]);
 		break;
 	default:
 		return FLOPPY_ERROR_INVALIDIMAGE;
@@ -167,8 +168,7 @@ static floperr_t put_bml3_dirent(imgtool::image &f, int index_loc, const struct 
 		buf[11] = ent->ftype;
 		buf[12] = ent->asciiflag;
 		buf[13] = ent->first_granule;
-		buf[14] = ent->lastsectorbytes >> 8;
-		buf[15] = ent->lastsectorbytes & 0xff;
+		put_u16be(&buf[14], ent->lastsectorbytes);
 		break;
 	default:
 		return FLOPPY_ERROR_INVALIDIMAGE;
@@ -517,7 +517,10 @@ static imgtoolerr_t bml3_diskimage_open(imgtool::image &image, imgtool::stream::
 	ferr = callbacks->get_sector_length(floppy, 0, 20, 1, &sector_length);
 	if (ferr)
 		return imgtool_floppy_error(ferr);
-	int sectors_per_track = callbacks->get_sectors_per_track(floppy, 0, 20);
+
+	int sectors_per_track = -1;
+	if (callbacks->get_sectors_per_track)
+		sectors_per_track = callbacks->get_sectors_per_track(floppy, 0, 20);
 
 	if (heads_per_disk == 2 && sector_length == 128 && sectors_per_track == 16) {
 		// single-sided, single-density
@@ -837,7 +840,7 @@ static imgtoolerr_t bml3_diskimage_deletefile(imgtool::partition &partition, con
 
 
 
-static imgtoolerr_t bml3_diskimage_suggesttransfer(imgtool::partition &partition, const char *fname, imgtool_transfer_suggestion *suggestions, size_t suggestions_length)
+static imgtoolerr_t bml3_diskimage_suggesttransfer(imgtool::partition &partition, const char *fname, imgtool::transfer_suggestion *suggestions, size_t suggestions_length)
 {
 	imgtoolerr_t err;
 	imgtool::image &image(partition.image());
@@ -853,27 +856,27 @@ static imgtoolerr_t bml3_diskimage_suggesttransfer(imgtool::partition &partition
 		if (ent.asciiflag == 0xFF)
 		{
 			/* ASCII file */
-			suggestions[0].viability = SUGGESTION_RECOMMENDED;
+			suggestions[0].viability = imgtool::SUGGESTION_RECOMMENDED;
 			suggestions[0].filter = filter_eoln_getinfo;
-			suggestions[1].viability = SUGGESTION_POSSIBLE;
-			suggestions[1].filter = NULL;
+			suggestions[1].viability = imgtool::SUGGESTION_POSSIBLE;
+			suggestions[1].filter = nullptr;
 		}
 		else if (ent.ftype == 0)
 		{
 			/* tokenized BASIC file */
-			suggestions[0].viability = SUGGESTION_RECOMMENDED;
-			suggestions[0].filter = NULL;
-			suggestions[1].viability = SUGGESTION_POSSIBLE;
+			suggestions[0].viability = imgtool::SUGGESTION_RECOMMENDED;
+			suggestions[0].filter = nullptr;
+			suggestions[1].viability = imgtool::SUGGESTION_POSSIBLE;
 			suggestions[1].filter = filter_bml3bas_getinfo;
 		}
 	}
 	else
 	{
-		suggestions[0].viability = SUGGESTION_RECOMMENDED;
-		suggestions[0].filter = NULL;
-		suggestions[1].viability = SUGGESTION_POSSIBLE;
+		suggestions[0].viability = imgtool::SUGGESTION_RECOMMENDED;
+		suggestions[0].filter = nullptr;
+		suggestions[1].viability = imgtool::SUGGESTION_POSSIBLE;
 		suggestions[1].filter = filter_eoln_getinfo;
-		suggestions[2].viability = SUGGESTION_POSSIBLE;
+		suggestions[2].viability = imgtool::SUGGESTION_POSSIBLE;
 		suggestions[2].filter = filter_bml3bas_getinfo;
 	}
 
@@ -908,9 +911,9 @@ void bml3_get_info(const imgtool_class *imgclass, uint32_t state, union imgtooli
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 		case IMGTOOLINFO_INT_PREFER_UCASE:                  info->i = 1; break;
 		case IMGTOOLINFO_INT_IMAGE_EXTRA_BYTES:             info->i = sizeof(bml3_diskinfo); break;
-		case IMGTOOLINFO_INT_DIRECTORY_EXTRA_BYTES:             info->i = sizeof(struct bml3_direnum); break;
+		case IMGTOOLINFO_INT_DIRECTORY_EXTRA_BYTES:         info->i = sizeof(struct bml3_direnum); break;
 
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
+		/* --- the following bits of info are returned as NUL-terminated strings --- */
 		case IMGTOOLINFO_STR_NAME:                          strcpy(info->s = imgtool_temp_str(), "bml3"); break;
 		case IMGTOOLINFO_STR_DESCRIPTION:                   strcpy(info->s = imgtool_temp_str(), "Basic Master Level 3 format"); break;
 		case IMGTOOLINFO_STR_FILE:                          strcpy(info->s = imgtool_temp_str(), __FILE__); break;

@@ -8,6 +8,8 @@
 
 #include "vg5k_cas.h"
 
+#include "multibyte.h"
+
 
 #define SMPLO   -32768
 #define SILENCE 0
@@ -143,7 +145,7 @@ static int vg5k_handle_tap(int16_t *buffer, const uint8_t *casdata)
 		else if (casdata[data_pos] == 0xd6)
 		{
 			/* data block size is defined in head block */
-			block_size = (casdata[data_pos - 4] | casdata[data_pos - 3]<<8) +  20;
+			block_size = get_u16le(&casdata[data_pos - 4]) +  20;
 
 			/* 10000 samples of silence before the data block */
 			sample_count += vg5k_cas_silence(buffer, sample_count, 10000);

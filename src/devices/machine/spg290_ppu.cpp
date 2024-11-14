@@ -27,7 +27,7 @@ spg290_ppu_device::spg290_ppu_device(const machine_config &mconfig, const char *
 	, m_voffset_ram(*this, "voffset_ram")
 	, m_sprite_ram(*this, "sprite_ram")
 	, m_vblank_irq_cb(*this)
-	, m_space_read_cb(*this)
+	, m_space_read_cb(*this, 0)
 {
 }
 
@@ -49,9 +49,6 @@ void spg290_ppu_device::map(address_map &map)
 
 void spg290_ppu_device::device_start()
 {
-	m_vblank_irq_cb.resolve_safe();
-	m_space_read_cb.resolve_safe(0);
-
 	save_item(NAME(m_control));
 	save_item(NAME(m_sprite_control));
 	save_item(NAME(m_irq_control));
@@ -335,14 +332,14 @@ inline rgb_t spg290_ppu_device::blend_colors(const rgb_t &c0, const rgb_t &c1, u
 	if (m_blend_mode & 1)
 	{
 		int r = (c0.r() * level / 63) - (c1.r() * (63 - level) / 63);
-		int g = (c0.b() * level / 63) - (c1.b() * (63 - level) / 63);
+		int g = (c0.g() * level / 63) - (c1.g() * (63 - level) / 63);
 		int b = (c0.b() * level / 63) - (c1.b() * (63 - level) / 63);
 		return rgb_t(r, g, b);
 	}
 	else
 	{
 		int r = (c0.r() * level / 63) + (c1.r() * (63 - level) / 63);
-		int g = (c0.b() * level / 63) + (c1.b() * (63 - level) / 63);
+		int g = (c0.g() * level / 63) + (c1.g() * (63 - level) / 63);
 		int b = (c0.b() * level / 63) + (c1.b() * (63 - level) / 63);
 		return rgb_t(r, g, b);
 	}
@@ -382,7 +379,7 @@ void spg290_ppu_device::blit_sprite(bitmap_rgb32 &bitmap, const rectangle &clipr
 	uint8_t  bit_pixel    = ((attribute & 3) + 1) << 1;
 	uint8_t  sprite_flip  = (attribute >> 2) & 0x03;
 	uint16_t pen_bank     = ((attribute >> 8) & 0x1f) * 0x10;
-	uint8_t  blend        = (attribute & 0x8000) ? (attribute >> 26) & 0x3f : 0;
+	uint8_t  blend        = (attribute & 0x8000) ? 0x3f - ((attribute >> 26) & 0x3f) : 0;
 	uint8_t  pixel_word   = 32 / bit_pixel;
 	uint8_t  pixel_byte   = 8 / bit_pixel;
 	uint8_t  word_line    = sprite_hsize / pixel_word;

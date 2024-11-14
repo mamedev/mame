@@ -32,7 +32,7 @@
 
 #include "emu.h"
 #include "bus/rs232/rs232.h"
-#include "cpu/z80/z80.h"
+#include "cpu/z80/nsc800.h"
 #include "machine/mm58274c.h"
 #include "machine/nsc810.h"
 #include "machine/ram.h"
@@ -43,6 +43,8 @@
 #include "screen.h"
 #include "speaker.h"
 
+
+namespace {
 
 class hunter2_state : public driver_device
 {
@@ -68,7 +70,7 @@ public:
 	void init_hunter2();
 
 protected:
-	virtual void machine_reset() override;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	uint8_t keyboard_r();
@@ -84,13 +86,13 @@ private:
 	void memmap_w(uint8_t data);
 	void hunter2_palette(palette_device &palette) const;
 
-	DECLARE_WRITE_LINE_MEMBER(timer0_out);
-	DECLARE_WRITE_LINE_MEMBER(timer1_out);
-	DECLARE_WRITE_LINE_MEMBER(cts_w);
-	DECLARE_WRITE_LINE_MEMBER(rxd_w);
+	void timer0_out(int state);
+	void timer1_out(int state);
+	void cts_w(int state);
+	void rxd_w(int state);
 
-	void hunter2_io(address_map &map);
-	void hunter2_mem(address_map &map);
+	void hunter2_io(address_map &map) ATTR_COLD;
+	void hunter2_mem(address_map &map) ATTR_COLD;
 
 	uint8_t m_keydata = 0;
 	uint8_t m_irq_mask = 0;
@@ -384,19 +386,19 @@ void hunter2_state::hunter2_palette(palette_device &palette) const
 	palette.set_pen_color(1, rgb_t(92, 83, 88));
 }
 
-WRITE_LINE_MEMBER(hunter2_state::timer0_out)
+void hunter2_state::timer0_out(int state)
 {
 	if(state == ASSERT_LINE)
 		m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
-WRITE_LINE_MEMBER(hunter2_state::timer1_out)
+void hunter2_state::timer1_out(int state)
 {
 	if(m_irq_mask & 0x08)
 		m_maincpu->set_input_line(NSC800_RSTA, state);
 }
 
-WRITE_LINE_MEMBER(hunter2_state::cts_w)
+void hunter2_state::cts_w(int state)
 {
 	if(BIT(m_irq_mask, 1))
 	{
@@ -405,7 +407,7 @@ WRITE_LINE_MEMBER(hunter2_state::cts_w)
 	}
 }
 
-WRITE_LINE_MEMBER(hunter2_state::rxd_w)
+void hunter2_state::rxd_w(int state)
 {
 	if(BIT(m_irq_mask, 2))
 		m_maincpu->set_input_line(NSC800_RSTB, ASSERT_LINE);
@@ -498,6 +500,9 @@ ROM_START( hunter2 )
 	ROMX_LOAD( "tr032kx8mrom0.ic50", 0x0000, 0x8000, CRC(694d252c) SHA1(b11dbf24faf648596d92b1823e25a8e4fb7f542c), ROM_BIOS(0) )
 	ROMX_LOAD( "tr032kx8mrom1.ic51", 0x8000, 0x8000, CRC(82901642) SHA1(d84f2bbd2e9e052bd161a313c240a67918f774ad), ROM_BIOS(0) )
 ROM_END
+
+} // anonymous namespace
+
 
 /* Driver */
 

@@ -62,7 +62,6 @@ More info:
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
 #include "cpu/arm7/arm7.h" // wrong, needs CPU core
-#include "cpu/arm7/arm7core.h"
 
 #include "screen.h"
 #include "softlist_dev.h"
@@ -85,11 +84,11 @@ public:
 	void iq7000(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
-	void main_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
@@ -116,12 +115,12 @@ void wizard_state::machine_reset()
 
 DEVICE_IMAGE_LOAD_MEMBER(wizard_state::cart_load)
 {
-	uint32_t size = m_cart->common_get_size("rom");
+	uint32_t const size = m_cart->common_get_size("rom");
 
 	m_cart->rom_alloc(size, GENERIC_ROM8_WIDTH, ENDIANNESS_LITTLE);
 	m_cart->common_load_rom(m_cart->get_rom_base(), size, "rom");
 
-	return image_init_result::PASS;
+	return std::make_pair(std::error_condition(), std::string());
 }
 
 static INPUT_PORTS_START( iq7000 )

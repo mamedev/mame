@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:windyfairy
-#ifndef MAME_MACHINE_K573FPGA_H
-#define MAME_MACHINE_K573FPGA_H
+#ifndef MAME_KONAMI_K573FPGA_H
+#define MAME_KONAMI_K573FPGA_H
 
 #pragma once
 
@@ -16,13 +16,13 @@ class k573fpga_device : public device_t
 public:
 	k573fpga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
-	template <typename... T> void add_route(T &&... args) { subdevice<mas3507d_device>("mpeg")->add_route(std::forward<T>(args)...); }
+	template <typename... T> void add_route(T &&... args) { mas3507d.lookup()->add_route(std::forward<T>(args)...); }
 	template <typename T> void set_ram(T &&tag) { ram.set_tag(std::forward<T>(tag)); }
 
 	void set_ddrsbm_fpga(bool flag) { is_ddrsbm_fpga = flag; }
 
-	DECLARE_WRITE_LINE_MEMBER(mpeg_frame_sync);
-	DECLARE_WRITE_LINE_MEMBER(mas3507d_demand);
+	void mpeg_frame_sync(int state);
+	void mas3507d_demand(int state);
 
 	void set_crypto_key1(uint16_t v);
 	void set_crypto_key2(uint16_t v);
@@ -49,15 +49,16 @@ public:
 	void reset_counter();
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 private:
 	TIMER_CALLBACK_MEMBER(update_stream);
 	void update_counter();
 	void update_mp3_decode_state();
 
+	uint16_t decrypt_common(uint16_t data, uint16_t key);
 	uint16_t decrypt_default(uint16_t data);
 	uint16_t decrypt_ddrsbm(uint16_t data);
 
@@ -108,4 +109,4 @@ private:
 	double counter_value;
 };
 
-#endif // MAME_MACHINE_K573FPGA_H
+#endif // MAME_KONAMI_K573FPGA_H

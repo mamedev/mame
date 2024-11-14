@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood
-#ifndef MAME_MACHINE_CEDAR_MAGNET_FLOP_H
-#define MAME_MACHINE_CEDAR_MAGNET_FLOP_H
+#ifndef MAME_EFO_CEDAR_MAGNET_FLOP_H
+#define MAME_EFO_CEDAR_MAGNET_FLOP_H
 
 #pragma once
 
@@ -28,9 +28,9 @@ public:
 	void write(offs_t offset, u8 data);
 
 protected:
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 private:
 	required_region_ptr<u8> m_disk;
@@ -45,4 +45,4 @@ private:
 
 };
 
-#endif // MAME_MACHINE_CEDAR_MAGNET_FLOP_H
+#endif // MAME_EFO_CEDAR_MAGNET_FLOP_H

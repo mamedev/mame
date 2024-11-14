@@ -1,6 +1,6 @@
 /*
- * Copyright 2011-2021 Branimir Karadzic. All rights reserved.
- * License: https://github.com/bkaradzic/bimg#license-bsd-2-clause
+ * Copyright 2011-2022 Branimir Karadzic. All rights reserved.
+ * License: https://github.com/bkaradzic/bimg/blob/master/LICENSE
  */
 
 #include "bimg_p.h"
@@ -21,7 +21,7 @@ namespace bimg
 		bx::MemoryReader reader(_src, _size);
 
 		uint32_t magic;
-		bx::read(&reader, magic);
+		bx::read(&reader, magic, bx::ErrorIgnore{});
 
 		ImageContainer imageContainer;
 		if (BIMG_CHUNK_MAGIC_GNF != magic

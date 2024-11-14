@@ -2,7 +2,7 @@
 // copyright-holders:R. Belmont, Olivier Galibert
 /*********************************************************************
 
-    formats/esq8_dsk.c
+    formats/esq8_dsk.cpp
 
     Formats for 8-bit Ensoniq synthesizers and samplers
 
@@ -55,22 +55,22 @@ esq8img_format::esq8img_format()
 {
 }
 
-const char *esq8img_format::name() const
+const char *esq8img_format::name() const noexcept
 {
 	return "esq8";
 }
 
-const char *esq8img_format::description() const
+const char *esq8img_format::description() const noexcept
 {
 	return "Ensoniq Mirage/SQ-80 floppy disk image";
 }
 
-const char *esq8img_format::extensions() const
+const char *esq8img_format::extensions() const noexcept
 {
 	return "img";
 }
 
-bool esq8img_format::supports_save() const
+bool esq8img_format::supports_save() const noexcept
 {
 	return true;
 }
@@ -103,7 +103,7 @@ int esq8img_format::identify(util::random_read &io, uint32_t form_factor, const 
 	return 0;
 }
 
-bool esq8img_format::load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image) const
+bool esq8img_format::load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image &image) const
 {
 	int track_count, head_count, sector_count;
 	find_size(io, track_count, head_count, sector_count);
@@ -132,18 +132,17 @@ bool esq8img_format::load(util::random_read &io, uint32_t form_factor, const std
 	{
 		for(int head=0; head < head_count; head++)
 		{
-			size_t actual;
-			io.read_at((track*head_count + head)*track_size, sectdata, track_size, actual);
+			/*auto const [err, actual] =*/ read_at(io, (track*head_count + head)*track_size, sectdata, track_size); // FIXME: check for errors and premature EOF
 			generate_track(esq_6_desc, track, head, sectors, sector_count, 109376, image);
 		}
 	}
 
-	image->set_variant(floppy_image::DSDD);
+	image.set_variant(floppy_image::DSDD);
 
 	return true;
 }
 
-bool esq8img_format::save(util::random_read_write &io, const std::vector<uint32_t> &variants, floppy_image *image) const
+bool esq8img_format::save(util::random_read_write &io, const std::vector<uint32_t> &variants, const floppy_image &image) const
 {
 	uint64_t file_offset = 0;
 	int track_count, head_count, sector_count;
@@ -180,8 +179,7 @@ bool esq8img_format::save(util::random_read_write &io, const std::vector<uint32_
 					return false;
 				}
 
-				size_t actual;
-				io.write_at(file_offset, sectors[sector].data(), sector_expected_size, actual);
+				/*auto const [err, actual] =*/ write_at(io, file_offset, sectors[sector].data(), sector_expected_size); // FIXME: check for errors
 				file_offset += sector_expected_size;
 			}
 		}

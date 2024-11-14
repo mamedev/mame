@@ -27,8 +27,6 @@
 
 #include "speaker.h"
 
-#include "formats/pc_dsk.h"
-
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -58,7 +56,7 @@ public:
 private:
 	uint8_t irq_callback(offs_t offset);
 	TIMER_DEVICE_CALLBACK_MEMBER( timer0_tick );
-	DECLARE_WRITE_LINE_MEMBER( i186_timer1_w );
+	void i186_timer1_w(int state);
 
 	uint8_t nmi_io_r(address_space &space, offs_t offset);
 	void nmi_io_w(address_space &space, offs_t offset, uint8_t data);
@@ -76,19 +74,19 @@ private:
 	uint16_t mem_r(address_space &space, offs_t offset);
 	void mem_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
-	DECLARE_WRITE_LINE_MEMBER(write_scsi_bsy);
-	DECLARE_WRITE_LINE_MEMBER(write_scsi_cd);
-	DECLARE_WRITE_LINE_MEMBER(write_scsi_io);
-	DECLARE_WRITE_LINE_MEMBER(write_scsi_msg);
-	DECLARE_WRITE_LINE_MEMBER(write_scsi_req);
+	void write_scsi_bsy(int state);
+	void write_scsi_cd(int state);
+	void write_scsi_io(int state);
+	void write_scsi_msg(int state);
+	void write_scsi_req(int state);
 
-	void pcd_io(address_map &map);
-	void pcd_map(address_map &map);
-	void pcx_io(address_map &map);
+	void pcd_io(address_map &map) ATTR_COLD;
+	void pcd_map(address_map &map) ATTR_COLD;
+	void pcx_io(address_map &map) ATTR_COLD;
 
 	// driver_device overrides
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	required_device<i80186_cpu_device> m_maincpu;
 	required_device<pic8259_device> m_pic1;
@@ -150,7 +148,7 @@ TIMER_DEVICE_CALLBACK_MEMBER( pcd_state::timer0_tick )
 	m_maincpu->tmrin0_w(1);
 }
 
-WRITE_LINE_MEMBER( pcd_state::i186_timer1_w )
+void pcd_state::i186_timer1_w(int state)
 {
 	if(m_dskctl & 0x20)
 		m_speaker->level_w(state);
@@ -321,29 +319,29 @@ void pcd_state::check_scsi_irq()
 	m_pic1->ir5_w(m_io && m_cd && m_req);
 }
 
-WRITE_LINE_MEMBER(pcd_state::write_scsi_bsy)
+void pcd_state::write_scsi_bsy(int state)
 {
 	m_bsy = state ? 1 : 0;
 	m_scsi->write_sel(0);
 }
-WRITE_LINE_MEMBER(pcd_state::write_scsi_cd)
+void pcd_state::write_scsi_cd(int state)
 {
 	m_cd = state ? 1 : 0;
 	check_scsi_irq();
 }
-WRITE_LINE_MEMBER(pcd_state::write_scsi_io)
+void pcd_state::write_scsi_io(int state)
 {
 	m_io = state ? 1 : 0;
 	if(state)
 		m_scsi_data_out->write(0);
 	check_scsi_irq();
 }
-WRITE_LINE_MEMBER(pcd_state::write_scsi_msg)
+void pcd_state::write_scsi_msg(int state)
 {
 	m_msg = state ? 1 : 0;
 }
 
-WRITE_LINE_MEMBER(pcd_state::write_scsi_req)
+void pcd_state::write_scsi_req(int state)
 {
 	m_req = state ? 1 : 0;
 	if(state)
@@ -529,7 +527,6 @@ void pcd_state::pcd(machine_config &config)
 	MC146818(config, m_rtc, 32.768_kHz_XTAL);
 	m_rtc->irq().set(m_pic1, FUNC(pic8259_device::ir7_w));
 	m_rtc->set_binary(true);
-	m_rtc->set_binary_year(true);
 	m_rtc->set_epoch(1900);
 	m_rtc->set_24hrs(true);
 

@@ -6,8 +6,8 @@
 
 **********************************************************************/
 
-#ifndef MAME_MACHINE_RX01_H
-#define MAME_MACHINE_RX01_H
+#ifndef MAME_DEC_RX01_H
+#define MAME_DEC_RX01_H
 
 #pragma once
 
@@ -31,11 +31,11 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 	// optional information overrides
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 
 	void command_write(uint16_t data);
 	uint16_t status_read();
@@ -50,8 +50,8 @@ protected:
 	void write_sector(int ddam);
 
 private:
-	void firmware_map(address_map &map);
-	void secbuf_map(address_map &map);
+	void firmware_map(address_map &map) ATTR_COLD;
+	void secbuf_map(address_map &map) ATTR_COLD;
 
 	enum rx01_state {
 		RX01_FILL,
@@ -81,4 +81,4 @@ private:
 // device type definition
 DECLARE_DEVICE_TYPE(RX01, rx01_device)
 
-#endif // MAME_MACHINE_RX01_H
+#endif // MAME_DEC_RX01_H

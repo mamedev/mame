@@ -12,6 +12,7 @@
   Robocop 2         (c) 1991 Data East Corporation (World version)
   Stone Age         (Italian bootleg)
   Mutant Fighter    (c) 1991 Data East Corporation (World version)
+  Heroes            (c) 1991 Data East Corporation (World version)
   Death Brade       (c) 1991 Data East Corporation (Japanese version)
 
   Edward Randy runs on the same board as Caveman Ninja but the protection
@@ -65,17 +66,17 @@ void cninja_state::cninja_pf_control_w(offs_t offset, uint16_t data, uint16_t me
 
 uint16_t cninja_state::cninja_protection_region_0_104_r(offs_t offset)
 {
-	int real_address = 0 + (offset *2);
-	int deco146_addr = bitswap<32>(real_address, /* NC */31,30,29,28,27,26,25,24,23,22,21,20,19,18, 13,12,11,/**/      17,16,15,14,    10,9,8, 7,6,5,4, 3,2,1,0) & 0x7fff;
+	int const real_address = 0 + (offset * 2);
+	int const deco146_addr = bitswap<32>(real_address, /* NC */31,30,29,28,27,26,25,24,23,22,21,20,19,18, 13,12,11,/**/      17,16,15,14,    10,9,8, 7,6,5,4, 3,2,1,0) & 0x7fff;
 	uint8_t cs = 0;
-	uint16_t data = m_ioprot->read_data( deco146_addr, cs );
+	uint16_t const data = m_ioprot->read_data( deco146_addr, cs );
 	return data;
 }
 
 void cninja_state::cninja_protection_region_0_104_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
-	int real_address = 0 + (offset *2);
-	int deco146_addr = bitswap<32>(real_address, /* NC */31,30,29,28,27,26,25,24,23,22,21,20,19,18, 13,12,11,/**/      17,16,15,14,    10,9,8, 7,6,5,4, 3,2,1,0) & 0x7fff;
+	int const real_address = 0 + (offset * 2);
+	int const deco146_addr = bitswap<32>(real_address, /* NC */31,30,29,28,27,26,25,24,23,22,21,20,19,18, 13,12,11,/**/      17,16,15,14,    10,9,8, 7,6,5,4, 3,2,1,0) & 0x7fff;
 	uint8_t cs = 0;
 	m_ioprot->write_data( deco146_addr, data, mem_mask, cs );
 }
@@ -94,14 +95,14 @@ void cninja_state::cninja_map(address_map &map)
 	map(0x140000, 0x14000f).w(FUNC(cninja_state::cninja_pf_control_w<0>));
 	map(0x144000, 0x144fff).rw(m_deco_tilegen[0], FUNC(deco16ic_device::pf1_data_r), FUNC(deco16ic_device::pf1_data_w));
 	map(0x146000, 0x146fff).rw(m_deco_tilegen[0], FUNC(deco16ic_device::pf2_data_r), FUNC(deco16ic_device::pf2_data_w));
-	map(0x14c000, 0x14c7ff).writeonly().share("pf1_rowscroll");
-	map(0x14e000, 0x14e7ff).ram().share("pf2_rowscroll");
+	map(0x14c000, 0x14c7ff).writeonly().share(m_pf_rowscroll[0]);
+	map(0x14e000, 0x14e7ff).ram().share(m_pf_rowscroll[1]);
 
 	map(0x150000, 0x15000f).w(FUNC(cninja_state::cninja_pf_control_w<1>));
 	map(0x154000, 0x154fff).rw(m_deco_tilegen[1], FUNC(deco16ic_device::pf1_data_r), FUNC(deco16ic_device::pf1_data_w));
 	map(0x156000, 0x156fff).rw(m_deco_tilegen[1], FUNC(deco16ic_device::pf2_data_r), FUNC(deco16ic_device::pf2_data_w));
-	map(0x15c000, 0x15c7ff).ram().share("pf3_rowscroll");
-	map(0x15e000, 0x15e7ff).ram().share("pf4_rowscroll");
+	map(0x15c000, 0x15c7ff).ram().share(m_pf_rowscroll[2]);
+	map(0x15e000, 0x15e7ff).ram().share(m_pf_rowscroll[3]);
 
 	map(0x184000, 0x187fff).ram();
 	map(0x190000, 0x190007).m("irq", FUNC(deco_irq_device::map)).umask16(0x00ff);
@@ -123,14 +124,14 @@ void cninja_state::cninjabl_map(address_map &map)
 	map(0x140000, 0x14000f).w(FUNC(cninja_state::cninja_pf_control_w<0>));
 	map(0x144000, 0x144fff).rw(m_deco_tilegen[0], FUNC(deco16ic_device::pf1_data_r), FUNC(deco16ic_device::pf1_data_w));
 	map(0x146000, 0x146fff).rw(m_deco_tilegen[0], FUNC(deco16ic_device::pf2_data_r), FUNC(deco16ic_device::pf2_data_w));
-	map(0x14c000, 0x14c7ff).writeonly().share("pf1_rowscroll");
-	map(0x14e000, 0x14e7ff).ram().share("pf2_rowscroll");
+	map(0x14c000, 0x14c7ff).writeonly().share(m_pf_rowscroll[0]);
+	map(0x14e000, 0x14e7ff).ram().share(m_pf_rowscroll[1]);
 
 	map(0x150000, 0x15000f).w(FUNC(cninja_state::cninja_pf_control_w<1>));    // not used / incorrect on this
 	map(0x154000, 0x154fff).rw(m_deco_tilegen[1], FUNC(deco16ic_device::pf1_data_r), FUNC(deco16ic_device::pf1_data_w));
 	map(0x156000, 0x156fff).rw(m_deco_tilegen[1], FUNC(deco16ic_device::pf2_data_r), FUNC(deco16ic_device::pf2_data_w));
-	map(0x15c000, 0x15c7ff).ram().share("pf3_rowscroll");
-	map(0x15e000, 0x15e7ff).ram().share("pf4_rowscroll");
+	map(0x15c000, 0x15c7ff).ram().share(m_pf_rowscroll[2]);
+	map(0x15e000, 0x15e7ff).ram().share(m_pf_rowscroll[3]);
 
 	map(0x17ff22, 0x17ff23).portr("DSW");
 	map(0x17ff28, 0x17ff29).portr("SYSTEM");
@@ -155,17 +156,17 @@ void cninja_state::cninjabl2_map(address_map &map)
 
 uint16_t cninja_state::edrandy_protection_region_8_146_r(offs_t offset)
 {
-	int real_address = 0x1a0000 + (offset *2);
-	int deco146_addr = bitswap<32>(real_address, /* NC */31,30,29,28,27,26,25,24,23,22,21,20,19,18, 13,12,11,/**/      17,16,15,14,    10,9,8, 7,6,5,4, 3,2,1,0) & 0x7fff;
+	int const real_address = 0x1a0000 + (offset * 2);
+	int const deco146_addr = bitswap<32>(real_address, /* NC */31,30,29,28,27,26,25,24,23,22,21,20,19,18, 13,12,11,/**/      17,16,15,14,    10,9,8, 7,6,5,4, 3,2,1,0) & 0x7fff;
 	uint8_t cs = 0;
-	uint16_t data = m_ioprot->read_data( deco146_addr, cs );
+	uint16_t const data = m_ioprot->read_data( deco146_addr, cs );
 	return data;
 }
 
 void cninja_state::edrandy_protection_region_8_146_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
-	int real_address = 0x1a0000 + (offset *2);
-	int deco146_addr = bitswap<32>(real_address, /* NC */31,30,29,28,27,26,25,24,23,22,21,20,19,18, 13,12,11,/**/      17,16,15,14,    10,9,8, 7,6,5,4, 3,2,1,0) & 0x7fff;
+	int const real_address = 0x1a0000 + (offset * 2);
+	int const deco146_addr = bitswap<32>(real_address, /* NC */31,30,29,28,27,26,25,24,23,22,21,20,19,18, 13,12,11,/**/      17,16,15,14,    10,9,8, 7,6,5,4, 3,2,1,0) & 0x7fff;
 	uint8_t cs = 0;
 	m_ioprot->write_data( deco146_addr, data, mem_mask, cs );
 }
@@ -174,11 +175,10 @@ uint16_t cninja_state::edrandy_protection_region_6_146_r(offs_t offset)
 {
 //  uint16_t realdat = deco16_60_prot_r(space,offset&0x3ff,mem_mask);
 
-	int real_address = 0x198000 + (offset *2);
-	int deco146_addr = bitswap<32>(real_address, /* NC */31,30,29,28,27,26,25,24,23,22,21,20,19,18, 13,12,11,/**/      17,16,15,14,    10,9,8, 7,6,5,4, 3,2,1,0) & 0x7fff;
+	int const real_address = 0x198000 + (offset * 2);
+	int const deco146_addr = bitswap<32>(real_address, /* NC */31,30,29,28,27,26,25,24,23,22,21,20,19,18, 13,12,11,/**/      17,16,15,14,    10,9,8, 7,6,5,4, 3,2,1,0) & 0x7fff;
 	uint8_t cs = 0;
-	uint16_t data = m_ioprot->read_data( deco146_addr, cs );
-
+	uint16_t const data = m_ioprot->read_data( deco146_addr, cs );
 
 //  if ((realdat & mem_mask) != (data & mem_mask))
 //      printf("returned %04x instead of %04x (real address %08x)\n", data, realdat, real_address);
@@ -190,9 +190,8 @@ void cninja_state::edrandy_protection_region_6_146_w(offs_t offset, uint16_t dat
 {
 //  deco16_60_prot_w(space,offset&0x3ff,data,mem_mask);
 
-
-	int real_address = 0x198000 + (offset *2);
-	int deco146_addr = bitswap<32>(real_address, /* NC */31,30,29,28,27,26,25,24,23,22,21,20,19,18, 13,12,11,/**/      17,16,15,14,    10,9,8, 7,6,5,4, 3,2,1,0) & 0x7fff;
+	int const real_address = 0x198000 + (offset * 2);
+	int const deco146_addr = bitswap<32>(real_address, /* NC */31,30,29,28,27,26,25,24,23,22,21,20,19,18, 13,12,11,/**/      17,16,15,14,    10,9,8, 7,6,5,4, 3,2,1,0) & 0x7fff;
 	uint8_t cs = 0;
 	m_ioprot->write_data( deco146_addr, data, mem_mask, cs );
 }
@@ -204,14 +203,14 @@ void cninja_state::edrandy_map(address_map &map)
 	map(0x140000, 0x14000f).w(FUNC(cninja_state::cninja_pf_control_w<0>));
 	map(0x144000, 0x144fff).rw(m_deco_tilegen[0], FUNC(deco16ic_device::pf1_data_r), FUNC(deco16ic_device::pf1_data_w));
 	map(0x146000, 0x146fff).rw(m_deco_tilegen[0], FUNC(deco16ic_device::pf2_data_r), FUNC(deco16ic_device::pf2_data_w));
-	map(0x14c000, 0x14c7ff).ram().share("pf1_rowscroll");
-	map(0x14e000, 0x14e7ff).ram().share("pf2_rowscroll");
+	map(0x14c000, 0x14c7ff).ram().share(m_pf_rowscroll[0]);
+	map(0x14e000, 0x14e7ff).ram().share(m_pf_rowscroll[1]);
 
 	map(0x150000, 0x15000f).w(FUNC(cninja_state::cninja_pf_control_w<1>));
 	map(0x154000, 0x154fff).rw(m_deco_tilegen[1], FUNC(deco16ic_device::pf1_data_r), FUNC(deco16ic_device::pf1_data_w));
 	map(0x156000, 0x156fff).rw(m_deco_tilegen[1], FUNC(deco16ic_device::pf2_data_r), FUNC(deco16ic_device::pf2_data_w));
-	map(0x15c000, 0x15c7ff).ram().share("pf3_rowscroll");
-	map(0x15e000, 0x15e7ff).ram().share("pf4_rowscroll");
+	map(0x15c000, 0x15c7ff).ram().share(m_pf_rowscroll[2]);
+	map(0x15e000, 0x15e7ff).ram().share(m_pf_rowscroll[3]);
 
 	map(0x188000, 0x189fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x194000, 0x197fff).ram(); /* Main ram */
@@ -238,14 +237,14 @@ void cninja_state::robocop2_map(address_map &map)
 	map(0x140000, 0x14000f).w(FUNC(cninja_state::cninja_pf_control_w<0>));
 	map(0x144000, 0x144fff).rw(m_deco_tilegen[0], FUNC(deco16ic_device::pf1_data_r), FUNC(deco16ic_device::pf1_data_w));
 	map(0x146000, 0x146fff).rw(m_deco_tilegen[0], FUNC(deco16ic_device::pf2_data_r), FUNC(deco16ic_device::pf2_data_w));
-	map(0x14c000, 0x14c7ff).ram().share("pf1_rowscroll");
-	map(0x14e000, 0x14e7ff).ram().share("pf2_rowscroll");
+	map(0x14c000, 0x14c7ff).ram().share(m_pf_rowscroll[0]);
+	map(0x14e000, 0x14e7ff).ram().share(m_pf_rowscroll[1]);
 
 	map(0x150000, 0x15000f).w(FUNC(cninja_state::cninja_pf_control_w<1>));
 	map(0x154000, 0x154fff).rw(m_deco_tilegen[1], FUNC(deco16ic_device::pf1_data_r), FUNC(deco16ic_device::pf1_data_w));
 	map(0x156000, 0x156fff).rw(m_deco_tilegen[1], FUNC(deco16ic_device::pf2_data_r), FUNC(deco16ic_device::pf2_data_w));
-	map(0x15c000, 0x15c7ff).ram().share("pf3_rowscroll");
-	map(0x15e000, 0x15e7ff).ram().share("pf4_rowscroll");
+	map(0x15c000, 0x15c7ff).ram().share(m_pf_rowscroll[2]);
+	map(0x15e000, 0x15e7ff).ram().share(m_pf_rowscroll[3]);
 
 	map(0x180000, 0x1807ff).ram().share("spriteram1");
 //  map(0x18c000, 0x18c0ff).w(FUNC(cninja_state::cninja_loopback_w)) /* Protection writes */
@@ -264,17 +263,17 @@ void cninja_state::robocop2_map(address_map &map)
 
 uint16_t cninja_state::mutantf_protection_region_0_146_r(offs_t offset)
 {
-	int real_address = 0 + (offset *2);
-	int deco146_addr = bitswap<32>(real_address, /* NC */31,30,29,28,27,26,25,24,23,22,21,20,19,18, 13,12,11,/**/      17,16,15,14,    10,9,8, 7,6,5,4, 3,2,1,0) & 0x7fff;
+	int const real_address = 0 + (offset * 2);
+	int const deco146_addr = bitswap<32>(real_address, /* NC */31,30,29,28,27,26,25,24,23,22,21,20,19,18, 13,12,11,/**/      17,16,15,14,    10,9,8, 7,6,5,4, 3,2,1,0) & 0x7fff;
 	uint8_t cs = 0;
-	uint16_t data = m_ioprot->read_data( deco146_addr, cs );
+	uint16_t const data = m_ioprot->read_data( deco146_addr, cs );
 	return data;
 }
 
 void cninja_state::mutantf_protection_region_0_146_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
-	int real_address = 0 + (offset *2);
-	int deco146_addr = bitswap<32>(real_address, /* NC */31,30,29,28,27,26,25,24,23,22,21,20,19,18, 13,12,11,/**/      17,16,15,14,    10,9,8, 7,6,5,4, 3,2,1,0) & 0x7fff;
+	int const real_address = 0 + (offset * 2);
+	int const deco146_addr = bitswap<32>(real_address, /* NC */31,30,29,28,27,26,25,24,23,22,21,20,19,18, 13,12,11,/**/      17,16,15,14,    10,9,8, 7,6,5,4, 3,2,1,0) & 0x7fff;
 	uint8_t cs = 0;
 	m_ioprot->write_data( deco146_addr, data, mem_mask, cs );
 }
@@ -300,14 +299,14 @@ void cninja_state::mutantf_map(address_map &map)
 	map(0x300000, 0x30000f).w(FUNC(cninja_state::cninja_pf_control_w<0>));
 	map(0x304000, 0x305fff).rw(m_deco_tilegen[0], FUNC(deco16ic_device::pf1_data_r), FUNC(deco16ic_device::pf1_data_w));
 	map(0x306000, 0x307fff).rw(m_deco_tilegen[0], FUNC(deco16ic_device::pf2_data_r), FUNC(deco16ic_device::pf2_data_w));
-	map(0x308000, 0x3087ff).ram().share("pf1_rowscroll");
-	map(0x30a000, 0x30a7ff).ram().share("pf2_rowscroll");
+	map(0x308000, 0x3087ff).ram().share(m_pf_rowscroll[0]);
+	map(0x30a000, 0x30a7ff).ram().share(m_pf_rowscroll[1]);
 
 	map(0x310000, 0x31000f).w(FUNC(cninja_state::cninja_pf_control_w<1>));
 	map(0x314000, 0x315fff).rw(m_deco_tilegen[1], FUNC(deco16ic_device::pf1_data_r), FUNC(deco16ic_device::pf1_data_w));
 	map(0x316000, 0x317fff).rw(m_deco_tilegen[1], FUNC(deco16ic_device::pf2_data_r), FUNC(deco16ic_device::pf2_data_w));
-	map(0x318000, 0x3187ff).ram().share("pf3_rowscroll");
-	map(0x31a000, 0x31a7ff).ram().share("pf4_rowscroll");
+	map(0x318000, 0x3187ff).ram().share(m_pf_rowscroll[2]);
+	map(0x31a000, 0x31a7ff).ram().share(m_pf_rowscroll[3]);
 
 	map(0xad00ac, 0xad00ff).nopr(); /* Reads from here seem to be a game code bug */
 }
@@ -366,7 +365,7 @@ void cninja_state::cninjabl2_s_map(address_map &map)
 void cninja_state::cninjabl2_oki_map(address_map &map)
 {
 	map(0x00000, 0x2ffff).rom().region("oki1", 0);
-	map(0x30000, 0x3ffff).bankr("okibank");
+	map(0x30000, 0x3ffff).bankr(m_okibank);
 }
 
 /***********************************************************
@@ -677,6 +676,16 @@ static GFXDECODE_START( gfx_cninja )
 	GFXDECODE_ENTRY( "chars",    0, charlayout,   0, 32 )  /* Characters 8x8 */
 	GFXDECODE_ENTRY( "tiles1",   0, tilelayout,   0, 32 )  /* Tiles 16x16 */
 	GFXDECODE_ENTRY( "tiles2",   0, tilelayout, 512, 64 )  /* Tiles 16x16 */
+GFXDECODE_END
+
+static GFXDECODE_START( gfx_cninja_spr )
+	GFXDECODE_ENTRY( "sprites1", 0, tilelayout, 768, 32 )  /* Sprites 16x16 */
+GFXDECODE_END
+
+static GFXDECODE_START( gfx_cninjabl )
+	GFXDECODE_ENTRY( "chars",    0, charlayout,   0, 32 )  /* Characters 8x8 */
+	GFXDECODE_ENTRY( "tiles1",   0, tilelayout,   0, 32 )  /* Tiles 16x16 */
+	GFXDECODE_ENTRY( "tiles2",   0, tilelayout, 512, 64 )  /* Tiles 16x16 */
 	GFXDECODE_ENTRY( "sprites1", 0, tilelayout, 768, 32 )  /* Sprites 16x16 */
 GFXDECODE_END
 
@@ -684,7 +693,13 @@ static GFXDECODE_START( gfx_mutantf )
 	GFXDECODE_ENTRY( "chars",    0, charlayout, 0,  64 )  /* Characters 8x8 */
 	GFXDECODE_ENTRY( "tiles1",   0, tilelayout, 0,  64 )  /* Tiles 16x16 */
 	GFXDECODE_ENTRY( "tiles2",   0, tilelayout, 0,  80 )  /* Tiles 16x16 */
+GFXDECODE_END
+
+static GFXDECODE_START( gfx_mutantf_spr1 )
 	GFXDECODE_ENTRY( "sprites1", 0, tilelayout, 0, 128 )  /* Sprites 16x16 */
+GFXDECODE_END
+
+static GFXDECODE_START( gfx_mutantf_spr2 )
 	GFXDECODE_ENTRY( "sprites2", 0, tilelayout, 0,  16 )  /* Sprites 16x16 */
 GFXDECODE_END
 
@@ -808,10 +823,8 @@ void cninja_state::cninja(machine_config &config)
 	m_deco_tilegen[1]->set_pf12_16x16_bank(2);
 	m_deco_tilegen[1]->set_gfxdecode_tag(m_gfxdecode);
 
-	DECO_SPRITE(config, m_sprgen[0], 0);
-	m_sprgen[0]->set_gfx_region(3);
+	DECO_SPRITE(config, m_sprgen[0], 0, m_palette, gfx_cninja_spr);
 	m_sprgen[0]->set_pri_callback(FUNC(cninja_state::pri_callback));
-	m_sprgen[0]->set_gfxdecode_tag(m_gfxdecode);
 
 	DECO104PROT(config, m_ioprot, 0);
 	m_ioprot->port_a_cb().set_ioport("INPUTS");
@@ -891,10 +904,8 @@ void cninja_state::stoneage(machine_config &config)
 	m_deco_tilegen[1]->set_pf12_16x16_bank(2);
 	m_deco_tilegen[1]->set_gfxdecode_tag(m_gfxdecode);
 
-	DECO_SPRITE(config, m_sprgen[0], 0);
-	m_sprgen[0]->set_gfx_region(3);
+	DECO_SPRITE(config, m_sprgen[0], 0, m_palette, gfx_cninja_spr);
 	m_sprgen[0]->set_pri_callback(FUNC(cninja_state::pri_callback));
-	m_sprgen[0]->set_gfxdecode_tag(m_gfxdecode);
 
 	DECO104PROT(config, m_ioprot, 0);
 	m_ioprot->port_a_cb().set_ioport("INPUTS");
@@ -954,7 +965,7 @@ void cninja_state::cninjabl(machine_config &config)
 	m_screen->set_screen_update(FUNC(cninja_state::screen_update_cninjabl));
 	m_screen->set_palette(m_palette);
 
-	GFXDECODE(config, m_gfxdecode, m_palette, gfx_cninja);
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_cninjabl);
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_888, 2048);
 
 	BUFFERED_SPRITERAM16(config, m_spriteram[0]);
@@ -1049,10 +1060,8 @@ void cninja_state::edrandy(machine_config &config)
 	m_deco_tilegen[1]->set_pf12_16x16_bank(2);
 	m_deco_tilegen[1]->set_gfxdecode_tag(m_gfxdecode);
 
-	DECO_SPRITE(config, m_sprgen[0], 0);
-	m_sprgen[0]->set_gfx_region(3);
+	DECO_SPRITE(config, m_sprgen[0], 0, m_palette, gfx_cninja_spr);
 	m_sprgen[0]->set_pri_callback(FUNC(cninja_state::pri_callback));
-	m_sprgen[0]->set_gfxdecode_tag(m_gfxdecode);
 
 	DECO146PROT(config, m_ioprot, 0);
 	m_ioprot->port_a_cb().set_ioport("INPUTS");
@@ -1133,10 +1142,8 @@ void cninja_state::robocop2(machine_config &config)
 	m_deco_tilegen[1]->set_pf12_16x16_bank(2);
 	m_deco_tilegen[1]->set_gfxdecode_tag(m_gfxdecode);
 
-	DECO_SPRITE(config, m_sprgen[0], 0);
-	m_sprgen[0]->set_gfx_region(3);
+	DECO_SPRITE(config, m_sprgen[0], 0, m_palette, gfx_cninja_spr);
 	m_sprgen[0]->set_pri_callback(FUNC(cninja_state::pri_callback));
-	m_sprgen[0]->set_gfxdecode_tag(m_gfxdecode);
 
 	DECO146PROT(config, m_ioprot, 0);
 	m_ioprot->port_a_cb().set_ioport("INPUTS");
@@ -1214,13 +1221,11 @@ void cninja_state::mutantf(machine_config &config)
 	m_deco_tilegen[1]->set_pf12_16x16_bank(2);
 	m_deco_tilegen[1]->set_gfxdecode_tag(m_gfxdecode);
 
-	DECO_SPRITE(config, m_sprgen[0], 0);
-	m_sprgen[0]->set_gfx_region(3);
-	m_sprgen[0]->set_gfxdecode_tag(m_gfxdecode);
+	DECO_SPRITE(config, m_sprgen[0], 0, m_palette, gfx_mutantf_spr1);
+	m_sprgen[0]->set_alt_format(true);
 
-	DECO_SPRITE(config, m_sprgen[1], 0);
-	m_sprgen[1]->set_gfx_region(4);
-	m_sprgen[1]->set_gfxdecode_tag(m_gfxdecode);
+	DECO_SPRITE(config, m_sprgen[1], 0, m_palette, gfx_mutantf_spr2);
+	m_sprgen[1]->set_alt_format(true);
 
 	DECO146PROT(config, m_ioprot, 0);
 	m_ioprot->port_a_cb().set_ioport("INPUTS");
@@ -2130,6 +2135,50 @@ ROM_START( mutantf2 ) /* World ver 2 */
 	ROM_LOAD( "maf-09.18l",    0x00000, 0x80000, CRC(28e7ed81) SHA1(e168a2748b75c647f6f9c0d7d25d4f046aa98094) )
 ROM_END
 
+ROM_START( mutantf1 ) /* World ver 1 DE-0346-4 PCB */
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* 68000 code */
+	ROM_LOAD16_BYTE("hd-03-s.2c", 0x00000, 0x20000, CRC(c80a7f4b) SHA1(7a18bd542c09a6a0d5909a4de27ffa6af530fb4f) )
+	ROM_LOAD16_BYTE("hd-00-s.2a", 0x00001, 0x20000, CRC(ddf7788d) SHA1(7ae13b026b11fbb3c113096cc0043135745b620f) )
+	ROM_LOAD16_BYTE("hd-04-s.4c", 0x40000, 0x20000, CRC(b137d6d1) SHA1(70c819d1618272bfde38fbda08154da9a0cd5120) )
+	ROM_LOAD16_BYTE("hd-01-s.4a", 0x40001, 0x20000, CRC(d76cb272) SHA1(bd29b64003aebfdfcc74a92c7ac14099f0c31b57) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )    /* Sound CPU */
+	ROM_LOAD( "hd-12-s.21j",  0x00000,  0x10000,  CRC(13d55f11) SHA1(6438dca57f43b3ca6d273bf82b62104a49260132) )
+
+	ROM_REGION( 0x0a0000, "chars", 0 ) /* chars */
+	ROM_LOAD16_BYTE( "hd-06-s.8d", 0x000000, 0x10000, CRC(c1d99cd8) SHA1(41536ed114e9288e6b3bb1142c1358886f54d1d0) )
+	ROM_LOAD16_BYTE( "hd-07-s.9d", 0x000001, 0x10000, CRC(b9ea3ec7) SHA1(b0e9f0d4e42935895bc844ef07b572cac5280458) )
+
+	ROM_REGION( 0x080000, "tiles1", 0 )  /* tiles 1 */
+	ROM_LOAD( "maf-00.8a", 0x000000, 0x80000,  CRC(e56f528d) SHA1(3908d9b189fa4895c532d1d1f133df0913810cf9) )
+
+	ROM_REGION( 0x100000, "tiles2", 0 )  /* tiles 2 */
+	ROM_LOAD( "maf-01.9a",  0x000000, 0x40000,  CRC(c3d5173d) SHA1(2b6559bf65d7cc5b957ad347b64cf6a18f661686) )
+	ROM_CONTINUE(           0x080000, 0x40000 )
+	ROM_LOAD( "maf-02.11a", 0x040000, 0x40000,  CRC(0b37d849) SHA1(a0606fb8130a2e86a241ce5ce0b4f61373a88c17) )
+	ROM_CONTINUE(           0x0c0000, 0x40000 )
+
+	ROM_REGION( 0x500000, "sprites1", 0 ) /* sprites */
+	ROM_LOAD( "maf-06.18d",   0x000000, 0x100000, CRC(f5c7a9b5) SHA1(92efc9401347598c90acf62c9aef30109c990ad6) )
+	ROM_LOAD( "maf-07.20d",   0x100000, 0x100000, CRC(fd6008a3) SHA1(7b680424eca3804c70fa0c4dc415d665c8626498) )
+	ROM_LOAD( "maf-08.21d",   0x200000, 0x080000, CRC(e41cf1e7) SHA1(06524e1aed0adc4c32c92e16a00dc983014f4994) )
+	ROM_LOAD( "maf-03.18a",   0x280000, 0x100000, CRC(f4366d2c) SHA1(20964d0e1b879b3e5cb5d18a46d2a17dca2b4171) )
+	ROM_LOAD( "maf-04.20a",   0x380000, 0x100000, CRC(0c8f654e) SHA1(e566d4b789b345e20caf7e061e43be7c2e1be9b2) )
+	ROM_LOAD( "maf-05.21a",   0x480000, 0x080000, CRC(b0cfeb80) SHA1(b8519c604b03eb8bcf26d00a43b39d48f1b45ab5) )
+
+	ROM_REGION( 0x40000, "sprites2", 0 ) /* sprites 2 */
+	ROM_LOAD16_BYTE("hd-08-s.15a", 0x00000, 0x10000, CRC(93b7279f) SHA1(14304a1ffe1bc791bfa83f8200793d897449133c) )
+	ROM_LOAD16_BYTE("hd-09-s.17a", 0x00001, 0x10000, CRC(05e2c074) SHA1(ec95303e8196424864964b5d2ae862bf75571e83) )
+	ROM_LOAD16_BYTE("hd-10-s.15c", 0x20000, 0x10000, CRC(9b06f418) SHA1(d1579ae36676e38c96ee55a1ffa20aa307a21654) )
+	ROM_LOAD16_BYTE("hd-11-s.17c", 0x20001, 0x10000, CRC(3859a531) SHA1(a2a0c1aa28181b5ef6c075ff0118178340389693) )
+
+	ROM_REGION( 0x40000, "oki1", 0 )    /* ADPCM samples */
+	ROM_LOAD( "maf-10.20l",    0x00000, 0x40000, CRC(7c57f48b) SHA1(9a5624553b3b038d70f9b517f410a635c00a8771) )
+
+	ROM_REGION( 0x80000, "oki2", 0 )    /* ADPCM samples */
+	ROM_LOAD( "maf-09.18l",    0x00000, 0x80000, CRC(28e7ed81) SHA1(e168a2748b75c647f6f9c0d7d25d4f046aa98094) )
+ROM_END
+
 ROM_START( deathbrd ) /* Japan ver 3 */
 	ROM_REGION( 0x80000, "maincpu", 0 ) /* 68000 code */
 	ROM_LOAD16_BYTE("hf-03-2.2c", 0x00000, 0x20000, CRC(fb86fff3) SHA1(af4cfc19ec85e0aa49b5e46d95bdd94a20922cce) )
@@ -2219,4 +2268,5 @@ GAME( 1991, mutantf,    0,        mutantf,   mutantf,  cninja_state, init_mutant
 GAME( 1991, mutantf4,   mutantf,  mutantf,   mutantf,  cninja_state, init_mutantf,   ROT0, "Data East Corporation", "Mutant Fighter (World ver EM-4)", MACHINE_SUPPORTS_SAVE )
 GAME( 1991, mutantf3,   mutantf,  mutantf,   mutantf,  cninja_state, init_mutantf,   ROT0, "Data East Corporation", "Mutant Fighter (World ver EM-3)", MACHINE_SUPPORTS_SAVE )
 GAME( 1991, mutantf2,   mutantf,  mutantf,   mutantf,  cninja_state, init_mutantf,   ROT0, "Data East Corporation", "Mutant Fighter (World ver EM-2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, mutantf1,   mutantf,  mutantf,   mutantf,  cninja_state, init_mutantf,   ROT0, "Data East Corporation", "Heroes (World ver EM-1)",         MACHINE_SUPPORTS_SAVE )
 GAME( 1991, deathbrd,   mutantf,  mutantf,   mutantf,  cninja_state, init_mutantf,   ROT0, "Data East Corporation", "Death Brade (Japan ver JM-3)",    MACHINE_SUPPORTS_SAVE )

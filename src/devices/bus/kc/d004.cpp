@@ -348,7 +348,7 @@ void kc_d004_device::hw_terminal_count_w(uint8_t data)
 	m_fdc->tc_w(true);
 }
 
-WRITE_LINE_MEMBER(kc_d004_device::fdc_irq)
+void kc_d004_device::fdc_irq(int state)
 {
 	if (state)
 		m_fdc->tc_w(false);

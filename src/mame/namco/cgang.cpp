@@ -1,6 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:hap
-/******************************************************************************
+/*******************************************************************************
 
 『コズモギャングス』 (COSMOGANGS) by Namco, 1990. USA distribution was handled by
 Data East, they titled it "Cosmo Gang".
@@ -19,7 +19,7 @@ TODO:
   on the real thing as a missed aim. It turns on the lightgun lamp but then
   doesn't read the lightsensor.
 
--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 
 Hardware notes:
 
@@ -51,7 +51,7 @@ Cabinet:
 
 Overall, the hardware has similarities with Wacky Gator, see wacky_gator.cpp.
 
-******************************************************************************/
+*******************************************************************************/
 
 #include "emu.h"
 
@@ -61,7 +61,6 @@ Overall, the hardware has similarities with Wacky Gator, see wacky_gator.cpp.
 #include "machine/pit8253.h"
 #include "machine/ripple_counter.h"
 #include "machine/ticket.h"
-#include "machine/timer.h"
 #include "machine/watchdog.h"
 #include "sound/upd7759.h"
 #include "sound/ymopm.h"
@@ -70,7 +69,7 @@ Overall, the hardware has similarities with Wacky Gator, see wacky_gator.cpp.
 #include "speaker.h"
 
 // internal artwork
-#include "cgang.lh" // clickable
+#include "cgang.lh"
 
 
 namespace {
@@ -115,12 +114,11 @@ public:
 		m_cg_count(*this, "cg_count%u", 0U)
 	{ }
 
-	// machine configs
 	void cgang(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	// devices/pointers
@@ -149,18 +147,35 @@ private:
 	output_finder<5> m_en_count;
 	output_finder<5> m_cg_count;
 
+	int m_watchdog_clk = 0;
+	int m_main_irq = 0;
+	int m_main_firq = 0;
+	u8 m_door_motor_on = 0;
+	int m_door_motor_pos = 0;
+	u8 m_cg_motor_on = 0;
+	u8 m_cg_motor_dir = 0;
+
+	int m_cg_motor_clk[5] = { };
+	int m_cg_motor_pos[5] = { };
+	int m_en_pos[5] = { };
+
+	emu_timer *m_door_timer;
+	emu_timer *m_sol_filter[5];
+
+	TIMER_CALLBACK_MEMBER(output_sol) { m_en_sol[param >> 1] = param & 1; }
+
 	// address maps
-	void main_map(address_map &map);
-	void sound_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
+	void sound_map(address_map &map) ATTR_COLD;
 
 	// I/O handlers
-	DECLARE_WRITE_LINE_MEMBER(main_irq_w);
-	DECLARE_WRITE_LINE_MEMBER(main_firq_w);
+	void main_irq_w(int state);
+	void main_firq_w(int state);
 	void main_irq_clear_w(u8 data);
 	void main_firq_clear_w(u8 data);
-	template<int N> DECLARE_WRITE_LINE_MEMBER(motor_clock_w);
+	template<int N> void motor_clock_w(int state);
 	void cg_motor_tick(int i);
-	TIMER_DEVICE_CALLBACK_MEMBER(door_motor_tick);
+	TIMER_CALLBACK_MEMBER(door_motor_tick);
 	void refresh_motor_output();
 
 	u8 ppi1_b_r();
@@ -183,27 +198,15 @@ private:
 	void ppi5_a_w(u8 data);
 	void ppi5_b_w(u8 data);
 	u8 ppi5_c_r();
-
-	int m_watchdog_clk = 0;
-	int m_main_irq = 0;
-	int m_main_firq = 0;
-	u8 m_door_motor_on = 0;
-	int m_door_motor_pos = 0;
-	u8 m_cg_motor_on = 0;
-	u8 m_cg_motor_dir = 0;
-
-	int m_cg_motor_clk[5];
-	int m_cg_motor_pos[5];
-	int m_en_pos[5];
-
-	emu_timer *m_sol_filter[5];
-	TIMER_CALLBACK_MEMBER(output_sol) { m_en_sol[param >> 1] = param & 1; }
 };
 
 void cgang_state::machine_start()
 {
 	for (int i = 0; i < 5; i++)
 		m_sol_filter[i] = timer_alloc(FUNC(cgang_state::output_sol), this);
+
+	m_door_timer = timer_alloc(FUNC(cgang_state::door_motor_tick), this);
+	m_door_timer->adjust(attotime::from_msec(1), 0, attotime::from_msec(1));
 
 	// resolve outputs
 	m_gun_lamps.resolve();
@@ -253,13 +256,13 @@ void cgang_state::machine_reset()
 
 
 
-/******************************************************************************
+/*******************************************************************************
     I/O
-******************************************************************************/
+*******************************************************************************/
 
 // maincpu (misc)
 
-WRITE_LINE_MEMBER(cgang_state::main_irq_w)
+void cgang_state::main_irq_w(int state)
 {
 	// irq on rising edge
 	if (state && !m_main_irq)
@@ -268,7 +271,7 @@ WRITE_LINE_MEMBER(cgang_state::main_irq_w)
 	m_main_irq = state;
 }
 
-WRITE_LINE_MEMBER(cgang_state::main_firq_w)
+void cgang_state::main_firq_w(int state)
 {
 	// firq on rising edge
 	if (state && !m_main_firq)
@@ -288,7 +291,7 @@ void cgang_state::main_firq_clear_w(u8 data)
 }
 
 template<int N>
-WRITE_LINE_MEMBER(cgang_state::motor_clock_w)
+void cgang_state::motor_clock_w(int state)
 {
 	// clock stepper motors
 	if (state && !m_cg_motor_clk[N] && BIT(m_cg_motor_on, N))
@@ -332,7 +335,7 @@ void cgang_state::cg_motor_tick(int i)
 	refresh_motor_output();
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(cgang_state::door_motor_tick)
+TIMER_CALLBACK_MEMBER(cgang_state::door_motor_tick)
 {
 	if (m_door_motor_on & 2 && m_door_motor_pos < DOOR_MOTOR_LIMIT)
 		m_door_motor_pos++;
@@ -597,9 +600,9 @@ u8 cgang_state::ppi5_c_r()
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Address Maps
-******************************************************************************/
+*******************************************************************************/
 
 void cgang_state::main_map(address_map &map)
 {
@@ -633,9 +636,9 @@ void cgang_state::sound_map(address_map &map)
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Input Ports
-******************************************************************************/
+*******************************************************************************/
 
 static INPUT_PORTS_START( cgang )
 	PORT_START("IN1")
@@ -731,13 +734,13 @@ INPUT_PORTS_END
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Machine Configs
-******************************************************************************/
+*******************************************************************************/
 
 void cgang_state::cgang(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	MC6809(config, m_maincpu, 4_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &cgang_state::main_map);
 
@@ -806,11 +809,9 @@ void cgang_state::cgang(machine_config &config)
 	WATCHDOG_TIMER(config, m_watchdog); // HA1835P
 	m_watchdog->set_time(attotime::from_msec(100)); // approximation
 
-	TICKET_DISPENSER(config, m_ticket, attotime::from_msec(3000), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH);
+	TICKET_DISPENSER(config, m_ticket, attotime::from_msec(3000));
 
-	TIMER(config, "door_motor").configure_periodic(FUNC(cgang_state::door_motor_tick), attotime::from_msec(1));
-
-	/* video hardware */
+	// video hardware
 	PWM_DISPLAY(config, m_digits).set_size(10, 7);
 	m_digits->set_segmask(0x3ff, 0x7f);
 
@@ -820,7 +821,7 @@ void cgang_state::cgang(machine_config &config)
 
 	config.set_default_layout(layout_cgang);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
 	YM2151(config, m_ymsnd, 3.579545_MHz_XTAL);
@@ -834,9 +835,9 @@ void cgang_state::cgang(machine_config &config)
 
 
 
-/******************************************************************************
+/*******************************************************************************
     ROM Definitions
-******************************************************************************/
+*******************************************************************************/
 
 ROM_START( cgang )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -849,16 +850,16 @@ ROM_START( cgang )
 	ROM_LOAD("cg2_9c_e02a.9c", 0x00000, 0x20000, CRC(f9a3f8a0) SHA1(5ad8b408d36397227019afd15c3516f85488c6df) ) // handwritten label seen on one PCB
 
 	ROM_REGION( 0x20000, "adpcm1", 0 )
-	ROM_LOAD("cg2_9e_586e.9e", 0x00000, 0x20000, CRC(40e7f60b) SHA1(af641b0562db1ae033cee67df583d178fd8c93f3) ) // handwritten label seen on one PCB
+	ROM_LOAD("cg2_9e_586e.9e", 0x00000, 0x20000, CRC(40e7f60b) SHA1(af641b0562db1ae033cee67df583d178fd8c93f3) ) // "
 ROM_END
 
 } // anonymous namespace
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Drivers
-******************************************************************************/
+*******************************************************************************/
 
-/*    YEAR  NAME   PARENT  MACHINE  INPUT  CLASS        INIT        MONITOR  COMPANY, FULLNAME, FLAGS */
-GAME( 1990, cgang, 0,      cgang,   cgang, cgang_state, empty_init, ROT0,    "Namco (Data East license)", "Cosmo Gang (US)", MACHINE_SUPPORTS_SAVE | MACHINE_MECHANICAL | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
+//    YEAR  NAME   PARENT  MACHINE  INPUT  CLASS        INIT        MNTR  COMPANY, FULLNAME, FLAGS
+GAME( 1990, cgang, 0,      cgang,   cgang, cgang_state, empty_init, ROT0, "Namco (Data East license)", "Cosmo Gang (US)", MACHINE_SUPPORTS_SAVE | MACHINE_MECHANICAL | MACHINE_IMPERFECT_CONTROLS )

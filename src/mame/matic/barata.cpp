@@ -40,6 +40,9 @@
 
 #include "barata.lh"
 
+
+namespace {
+
 #define CPU_CLOCK       (XTAL(6'000'000))         /* main cpu clock */
 
 class barata_state : public driver_device
@@ -336,7 +339,10 @@ ROM_START( barata )
 	ROM_LOAD( "barata.bin",      0x0000, 0x06a8, CRC(a5b68617) SHA1(4c7cd7c494d20236732c8d1f2b2904bfe99f5252) )
 ROM_END
 
+} // anonymous namespace
+
+
 /*************************
 *      Game Drivers      *
 *************************/
-GAME( 2002, barata, 0, barata, barata, barata_state, empty_init, ROT0, "Eletro Matic Equipamentos Eletromec??nicos", "Dona Barata (early prototype)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 2002, barata, 0, barata, barata, barata_state, empty_init, ROT0, u8"Eletro Matic Equipamentos Eletromecânicos", "Dona Barata (early prototype)", MACHINE_IMPERFECT_GRAPHICS )

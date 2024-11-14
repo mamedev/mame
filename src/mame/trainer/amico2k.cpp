@@ -33,8 +33,12 @@
 #include "emu.h"
 #include "cpu/m6502/m6502.h"
 #include "machine/i8255.h"
+#include "utf8.h"
+
 #include "amico2k.lh"
 
+
+namespace {
 
 class amico2k_state : public driver_device
 {
@@ -48,7 +52,7 @@ public:
 	void amico2k(machine_config &config);
 
 private:
-	void machine_start() override;
+	void machine_start() override ATTR_COLD;
 
 	uint8_t ppi_pa_r();
 	void ppi_pa_w(uint8_t data);
@@ -58,7 +62,7 @@ private:
 	// timers
 	emu_timer *m_led_refresh_timer = nullptr;
 	TIMER_CALLBACK_MEMBER(led_refresh);
-	void amico2k_mem(address_map &map);
+	void amico2k_mem(address_map &map) ATTR_COLD;
 
 	int m_ls145_p = 0;
 	uint8_t m_segment = 0U;
@@ -243,6 +247,8 @@ ROM_START( amico2k )
 	ROM_LOAD( "prom.ic6",  0x000, 0x100, CRC(4005f760) SHA1(7edcd85feb5a576f6da1bbb723b3cf668cf3df45) )
 	ROM_LOAD( "prom.ic7",  0x100, 0x100, CRC(8785d864) SHA1(d169c3b5f5690664083030948db9f33571b08656) )
 ROM_END
+
+} // anonymous namespace
 
 
 /* Driver */

@@ -9,19 +9,24 @@
 ***************************************************************************/
 
 #include "emu.h"
+#include "main.h"
+
 #include "emuopts.h"
 #include "http.h"
 
-machine_manager::machine_manager(emu_options& options, osd_interface& osd)
-  : m_osd(osd),
+
+machine_manager::machine_manager(emu_options& options, osd_interface& osd) :
+	m_osd(osd),
 	m_options(options),
 	m_machine(nullptr)
 {
 }
 
+
 machine_manager::~machine_manager()
 {
 }
+
 
 void machine_manager::start_http_server()
 {

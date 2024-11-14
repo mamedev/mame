@@ -4,7 +4,7 @@
 
 #include "../../../Common/MyWindows.h"
 
-#include <commctrl.h>
+#include "../../../Common/IntToString.h"
 
 #ifndef UNDER_CE
 #include "../../../Windows/CommonDialog.h"
@@ -25,7 +25,6 @@
 #ifdef USE_MY_BROWSE_DIALOG
 
 #include "../../../Common/Defs.h"
-#include "../../../Common/IntToString.h"
 #include "../../../Common/Wildcard.h"
 
 #include "../../../Windows/FileDir.h"
@@ -40,11 +39,11 @@
 #include "PropertyNameRes.h"
 #include "SysIconUtils.h"
 
-#ifndef _SFX
+#ifndef Z7_SFX
 #include "RegistryUtils.h"
 #endif
 
-#endif
+#endif // USE_MY_BROWSE_DIALOG
 
 #include "ComboDialog.h"
 #include "LangUtils.h"
@@ -56,6 +55,11 @@ using namespace NFile;
 using namespace NName;
 using namespace NFind;
 
+static void MessageBox_Error_Global(HWND wnd, const wchar_t *message)
+{
+  ::MessageBoxW(wnd, message, L"7-Zip", MB_ICONERROR);
+}
+
 #ifdef USE_MY_BROWSE_DIALOG
 
 extern bool g_LVN_ITEMACTIVATE_Support;
@@ -63,18 +67,7 @@ extern bool g_LVN_ITEMACTIVATE_Support;
 static const int kParentIndex = -1;
 static const UINT k_Message_RefreshPathEdit = WM_APP + 1;
 
-static HRESULT GetNormalizedError()
-{
-  DWORD errorCode = GetLastError();
-  return errorCode == 0 ? E_FAIL : errorCode;
-}
-
 extern UString HResultToMessage(HRESULT errorCode);
-
-static void MessageBox_Error_Global(HWND wnd, const wchar_t *message)
-{
-  ::MessageBoxW(wnd, message, L"7-Zip", MB_ICONERROR);
-}
 
 static void MessageBox_HResError(HWND wnd, HRESULT errorCode, const wchar_t *name)
 {
@@ -98,17 +91,21 @@ class CBrowseDialog: public NControl::CModalDialog
   CExtToIconMap _extToIconMap;
   int _sortIndex;
   bool _ascending;
+ #ifndef Z7_SFX
   bool _showDots;
+ #endif
   UString _topDirPrefix; // we don't open parent of that folder
   UString DirPrefix;
 
-  virtual bool OnInit();
-  virtual bool OnSize(WPARAM wParam, int xSize, int ySize);
-  virtual bool OnMessage(UINT message, WPARAM wParam, LPARAM lParam);
-  virtual bool OnNotify(UINT controlID, LPNMHDR header);
-  virtual bool OnKeyDown(LPNMLVKEYDOWN keyDownInfo);
-  virtual bool OnButtonClicked(int buttonID, HWND buttonHWND);
-  virtual void OnOK();
+  virtual bool OnInit() Z7_override;
+  virtual bool OnSize(WPARAM wParam, int xSize, int ySize) Z7_override;
+  virtual bool OnMessage(UINT message, WPARAM wParam, LPARAM lParam) Z7_override;
+  virtual bool OnNotify(UINT controlID, LPNMHDR header) Z7_override;
+  virtual bool OnCommand(unsigned code, unsigned itemID, LPARAM lParam) Z7_override;
+  virtual bool OnButtonClicked(unsigned buttonID, HWND buttonHWND) Z7_override;
+  virtual void OnOK() Z7_override;
+
+  bool OnKeyDown(LPNMLVKEYDOWN keyDownInfo);
 
   void Post_RefreshPathEdit() { PostMsg(k_Message_RefreshPathEdit); }
 
@@ -126,59 +123,37 @@ class CBrowseDialog: public NControl::CModalDialog
   int GetRealItemIndex(int indexInListView) const
   {
     LPARAM param;
-    if (!_list.GetItemParam(indexInListView, param))
+    if (!_list.GetItemParam((unsigned)indexInListView, param))
       return (int)-1;
     return (int)param;
   }
 
 public:
-  bool FolderMode;
-  UString Title;
-  UString FilePath;  // input/ result path
-  bool ShowAllFiles;
-  UStringVector Filters;
-  UString FilterDescription;
 
-  CBrowseDialog(): FolderMode(false), _showDots(false), ShowAllFiles(true) {}
-  void SetFilter(const UString &s);
-  INT_PTR Create(HWND parent = 0) { return CModalDialog::Create(IDD_BROWSE, parent); }
-  int CompareItems(LPARAM lParam1, LPARAM lParam2);
+  bool SaveMode;
+  bool FolderMode;
+  int FilterIndex;  // [in / out]
+  CObjectVector<CBrowseFilterInfo> Filters;
+
+  UString FilePath;   // [in / out]
+  UString Title;
+
+  CBrowseDialog():
+   #ifndef Z7_SFX
+      _showDots(false),
+   #endif
+      SaveMode(false)
+      , FolderMode(false)
+      , FilterIndex(-1)
+    {}
+  INT_PTR Create(HWND parent = NULL) { return CModalDialog::Create(IDD_BROWSE, parent); }
+  int CompareItems(LPARAM lParam1, LPARAM lParam2) const;
 };
 
-void CBrowseDialog::SetFilter(const UString &s)
-{
-  Filters.Clear();
-  UString mask;
-  unsigned i;
-  for (i = 0; i < s.Len(); i++)
-  {
-    wchar_t c = s[i];
-    if (c == ';')
-    {
-      if (!mask.IsEmpty())
-        Filters.Add(mask);
-      mask.Empty();
-    }
-    else
-      mask += c;
-  }
-  if (!mask.IsEmpty())
-    Filters.Add(mask);
-  ShowAllFiles = Filters.IsEmpty();
-  for (i = 0; i < Filters.Size(); i++)
-  {
-    const UString &f = Filters[i];
-    if (f == L"*.*" || f == L"*")
-    {
-      ShowAllFiles = true;
-      break;
-    }
-  }
-}
 
 bool CBrowseDialog::OnInit()
 {
-  #ifdef LANG
+  #ifdef Z7_LANG
   LangSetDlgItems(*this, NULL, 0);
   #endif
   if (!Title.IsEmpty())
@@ -187,16 +162,11 @@ bool CBrowseDialog::OnInit()
   _filterCombo.Attach(GetItem(IDC_BROWSE_FILTER));
   _pathEdit.Attach(GetItem(IDE_BROWSE_PATH));
 
-  if (FolderMode)
-    HideItem(IDC_BROWSE_FILTER);
-  else
-    EnableItem(IDC_BROWSE_FILTER, false);
-
   #ifndef UNDER_CE
   _list.SetUnicodeFormat();
   #endif
 
-  #ifndef _SFX
+  #ifndef Z7_SFX
   CFmSettings st;
   st.Load();
   if (st.SingleClick)
@@ -205,22 +175,34 @@ bool CBrowseDialog::OnInit()
   #endif
 
   {
-    UString s;
-    if (!FilterDescription.IsEmpty())
-      s = FilterDescription;
-    else if (ShowAllFiles)
-      s = L"*.*";
-    else
+    /*
+    Filters.Clear(); // for debug
+    if (Filters.IsEmpty() && !FolderMode)
     {
-      FOR_VECTOR (i, Filters)
-      {
-        if (i != 0)
-          s.Add_Space();
-        s += Filters[i];
-      }
+      CBrowseFilterInfo &f = Filters.AddNew();
+      const UString mask("*.*");
+      f.Masks.Add(mask);
+      // f.Description = "(";
+      f.Description += mask;
+      // f.Description += ")";
     }
-    _filterCombo.AddString(s);
-    _filterCombo.SetCurSel(0);
+    */
+
+    FOR_VECTOR (i, Filters)
+    {
+      _filterCombo.AddString(Filters[i].Description);
+    }
+
+    if (Filters.Size() <= 1)
+    {
+      if (FolderMode)
+        HideItem(IDC_BROWSE_FILTER);
+      else
+        EnableItem(IDC_BROWSE_FILTER, false);
+    }
+    
+    if (/* FilterIndex >= 0 && */ (unsigned)FilterIndex < Filters.Size())
+      _filterCombo.SetCurSel(FilterIndex);
   }
 
   _list.SetImageList(GetSysImageList(true), LVSIL_SMALL);
@@ -235,7 +217,7 @@ bool CBrowseDialog::OnInit()
     column.fmt = LVCFMT_RIGHT;
     column.cx = 100;
     const UString s = LangString(IDS_PROP_SIZE);
-    column.pszText = (wchar_t *)(const wchar_t *)s;
+    column.pszText = s.Ptr_non_const();
     _list.InsertColumn(2, &column);
   }
 
@@ -261,7 +243,7 @@ bool CBrowseDialog::OnInit()
 
   _topDirPrefix.Empty();
   {
-    int rootSize = GetRootPrefixSize(FilePath);
+    unsigned rootSize = GetRootPrefixSize(FilePath);
     #if defined(_WIN32) && !defined(UNDER_CE)
     // We can go up from root folder to drives list
     if (IsDrivePath(FilePath))
@@ -301,7 +283,7 @@ bool CBrowseDialog::OnInit()
   #ifndef UNDER_CE
   /* If we clear UISF_HIDEFOCUS, the focus rectangle in ListView will be visible,
      even if we use mouse for pressing the button to open this dialog. */
-  PostMsg(MY__WM_UPDATEUISTATE, MAKEWPARAM(MY__UIS_CLEAR, MY__UISF_HIDEFOCUS));
+  PostMsg(Z7_WIN_WM_UPDATEUISTATE, MAKEWPARAM(Z7_WIN_UIS_CLEAR, Z7_WIN_UISF_HIDEFOCUS));
   #endif
 
   return CModalDialog::OnInit();
@@ -368,6 +350,24 @@ bool CBrowseDialog::OnMessage(UINT message, WPARAM wParam, LPARAM lParam)
   return CModalDialog::OnMessage(message, wParam, lParam);
 }
 
+
+bool CBrowseDialog::OnCommand(unsigned code, unsigned itemID, LPARAM lParam)
+{
+  if (code == CBN_SELCHANGE)
+  {
+    switch (itemID)
+    {
+      case IDC_BROWSE_FILTER:
+      {
+        Reload();
+        return true;
+      }
+    }
+  }
+  return CModalDialog::OnCommand(code, itemID, lParam);
+}
+
+
 bool CBrowseDialog::OnNotify(UINT /* controlID */, LPNMHDR header)
 {
   if (header->hwndFrom != _list)
@@ -385,7 +385,7 @@ bool CBrowseDialog::OnNotify(UINT /* controlID */, LPNMHDR header)
       break;
     case LVN_COLUMNCLICK:
     {
-      int index = LPNMLISTVIEW(header)->iSubItem;
+      const int index = LPNMLISTVIEW(header)->iSubItem;
       if (index == _sortIndex)
         _ascending = !_ascending;
       else
@@ -413,7 +413,7 @@ bool CBrowseDialog::OnNotify(UINT /* controlID */, LPNMHDR header)
 
 bool CBrowseDialog::OnKeyDown(LPNMLVKEYDOWN keyDownInfo)
 {
-  bool ctrl = IsKeyDown(VK_CONTROL);
+  const bool ctrl = IsKeyDown(VK_CONTROL);
 
   switch (keyDownInfo->wVKey)
   {
@@ -434,7 +434,8 @@ bool CBrowseDialog::OnKeyDown(LPNMLVKEYDOWN keyDownInfo)
   return false;
 }
 
-bool CBrowseDialog::OnButtonClicked(int buttonID, HWND buttonHWND)
+
+bool CBrowseDialog::OnButtonClicked(unsigned buttonID, HWND buttonHWND)
 {
   switch (buttonID)
   {
@@ -468,27 +469,27 @@ bool CBrowseDialog::GetParentPath(const UString &path, UString &parentPrefix, US
   if (_topDirPrefix == path)
     return false;
   UString s = path;
-  if (s.Back() == WCHAR_PATH_SEPARATOR)
+  if (IS_PATH_SEPAR(s.Back()))
     s.DeleteBack();
   if (s.IsEmpty())
     return false;
-  if (s.Back() == WCHAR_PATH_SEPARATOR)
+  if (IS_PATH_SEPAR(s.Back()))
     return false;
-  int pos = s.ReverseFind_PathSepar();
-  parentPrefix.SetFrom(s, pos + 1);
-  name = s.Ptr(pos + 1);
+  const unsigned pos1 = (unsigned)(s.ReverseFind_PathSepar() + 1);
+  parentPrefix.SetFrom(s, pos1);
+  name = s.Ptr(pos1);
   return true;
 }
 
-int CBrowseDialog::CompareItems(LPARAM lParam1, LPARAM lParam2)
+int CBrowseDialog::CompareItems(LPARAM lParam1, LPARAM lParam2) const
 {
   if (lParam1 == kParentIndex) return -1;
   if (lParam2 == kParentIndex) return 1;
   const CFileInfo &f1 = _files[(int)lParam1];
   const CFileInfo &f2 = _files[(int)lParam2];
 
-  bool isDir1 = f1.IsDir();
-  bool isDir2 = f2.IsDir();
+  const bool isDir1 = f1.IsDir();
+  const bool isDir2 = f2.IsDir();
   if (isDir1 && !isDir2) return -1;
   if (isDir2 && !isDir1) return 1;
   
@@ -509,16 +510,16 @@ static int CALLBACK CompareItems2(LPARAM lParam1, LPARAM lParam2, LPARAM lpData)
 
 static void ConvertSizeToString(UInt64 v, wchar_t *s)
 {
-  Byte c = 0;
+  char c = 0;
        if (v >= ((UInt64)10000 << 20)) { v >>= 30; c = 'G'; }
   else if (v >= ((UInt64)10000 << 10)) { v >>= 20; c = 'M'; }
   else if (v >= ((UInt64)10000 <<  0)) { v >>= 10; c = 'K'; }
-  ConvertUInt64ToString(v, s);
+  s = ConvertUInt64ToString(v, s);
   if (c != 0)
   {
-    s += MyStringLen(s);
     *s++ = ' ';
-    *s++ = c;
+    *s++ = (wchar_t)c;
+    *s++ = 'B';
     *s++ = 0;
   }
 }
@@ -531,46 +532,62 @@ HRESULT CBrowseDialog::Reload(const UString &pathPrefix, const UString &selected
   
   #ifndef UNDER_CE
   bool isDrive = false;
-  if (pathPrefix.IsEmpty() || pathPrefix == kSuperPathPrefix)
+  if (pathPrefix.IsEmpty() || pathPrefix.IsEqualTo(kSuperPathPrefix))
   {
     isDrive = true;
     FStringVector drives;
     if (!MyGetLogicalDriveStrings(drives))
-      return GetNormalizedError();
+      return GetLastError_noZero_HRESULT();
     FOR_VECTOR (i, drives)
     {
-      FString d = drives[i];
-      if (d.Len() < 3 || d.Back() != '\\')
+      const FString &d = drives[i];
+      if (d.Len() < 2 || d.Back() != '\\')
         return E_FAIL;
-      d.DeleteBack();
       CFileInfo &fi = files.AddNew();
       fi.SetAsDir();
       fi.Name = d;
+      fi.Name.DeleteBack();
     }
   }
   else
   #endif
   {
-    CEnumerator enumerator(us2fs(pathPrefix + L'*'));
+    const UStringVector *masks = NULL;
+    if (!Filters.IsEmpty() && _filterCombo.GetCount() > 0)
+    {
+      const int selected = _filterCombo.GetCurSel();
+            // GetItemData_of_CurSel(); // we don't use data field
+      if (/* selected >= 0 && */ (unsigned)selected < Filters.Size())
+      {
+        const UStringVector &m = Filters[selected].Masks;
+        if (m.Size() > 1 || (m.Size() == 1
+              && !m[0].IsEqualTo("*.*")
+              && !m[0].IsEqualTo("*")))
+          masks = &m;
+      }
+    }
+    CEnumerator enumerator;
+    enumerator.SetDirPrefix(us2fs(pathPrefix));
+    CFileInfo fi;
     for (;;)
     {
       bool found;
-      CFileInfo fi;
       if (!enumerator.Next(fi, found))
-        return GetNormalizedError();
+        return GetLastError_noZero_HRESULT();
       if (!found)
         break;
       if (!fi.IsDir())
       {
         if (FolderMode)
           continue;
-        if (!ShowAllFiles)
+        if (masks)
         {
           unsigned i;
-          for (i = 0; i < Filters.Size(); i++)
-            if (DoesWildcardMatchName(Filters[i], fs2us(fi.Name)))
+          const unsigned numMasks = masks->Size();
+          for (i = 0; i < numMasks; i++)
+            if (DoesWildcardMatchName((*masks)[i], fs2us(fi.Name)))
               break;
-          if (i == Filters.Size())
+          if (i == numMasks)
             continue;
         }
       }
@@ -589,21 +606,21 @@ HRESULT CBrowseDialog::Reload(const UString &pathPrefix, const UString &selected
 
   LVITEMW item;
 
-  int index = 0;
+  unsigned index = 0;
   int cursorIndex = -1;
 
-  #ifndef _SFX
+  #ifndef Z7_SFX
   if (_showDots && _topDirPrefix != DirPrefix)
   {
-    item.iItem = index;
-    const UString itemName = L"..";
+    item.iItem = (int)index;
+    const UString itemName ("..");
     if (selectedName.IsEmpty())
-      cursorIndex = index;
+      cursorIndex = (int)index;
     item.mask = LVIF_TEXT | LVIF_PARAM | LVIF_IMAGE;
-    int subItem = 0;
-    item.iSubItem = subItem++;
+    unsigned subItem = 0;
+    item.iSubItem = (int)(subItem++);
     item.lParam = kParentIndex;
-    item.pszText = (wchar_t *)(const wchar_t *)itemName;
+    item.pszText = itemName.Ptr_non_const();
     item.iImage = _extToIconMap.GetIconIndex(FILE_ATTRIBUTE_DIRECTORY, DirPrefix);
     if (item.iImage < 0)
       item.iImage = 0;
@@ -616,16 +633,16 @@ HRESULT CBrowseDialog::Reload(const UString &pathPrefix, const UString &selected
 
   for (unsigned i = 0; i < _files.Size(); i++, index++)
   {
-    item.iItem = index;
+    item.iItem = (int)index;
     const CFileInfo &fi = _files[i];
     const UString name = fs2us(fi.Name);
     if (!selectedName.IsEmpty() && CompareFileNames(name, selectedName) == 0)
-      cursorIndex = index;
+      cursorIndex = (int)index;
     item.mask = LVIF_TEXT | LVIF_PARAM | LVIF_IMAGE;
-    int subItem = 0;
-    item.iSubItem = subItem++;
-    item.lParam = i;
-    item.pszText = (wchar_t *)(const wchar_t *)name;
+    unsigned subItem = 0;
+    item.iSubItem = (int)(subItem++);
+    item.lParam = (LPARAM)i;
+    item.pszText = name.Ptr_non_const();
 
     const UString fullPath = DirPrefix + name;
     #ifndef UNDER_CE
@@ -642,16 +659,14 @@ HRESULT CBrowseDialog::Reload(const UString &pathPrefix, const UString &selected
     _list.InsertItem(&item);
     wchar_t s[32];
     {
-      FILETIME ft;
       s[0] = 0;
-      if (FileTimeToLocalFileTime(&fi.MTime, &ft))
-        ConvertFileTimeToString(ft, s,
+      ConvertUtcFileTimeToString(fi.MTime, s,
             #ifndef UNDER_CE
-              true
+              kTimestampPrintLevel_MIN
             #else
-              false
+              kTimestampPrintLevel_DAY
             #endif
-            , false);
+              );
       _list.SetSubItem(index, subItem++, s);
     }
     {
@@ -676,14 +691,14 @@ HRESULT CBrowseDialog::Reload(const UString &pathPrefix, const UString &selected
 HRESULT CBrowseDialog::Reload()
 {
   UString selected;
-  int index = _list.GetNextSelectedItem(-1);
+  const int index = _list.GetNextSelectedItem(-1);
   if (index >= 0)
   {
-    int fileIndex = GetRealItemIndex(index);
+    const int fileIndex = GetRealItemIndex(index);
     if (fileIndex != kParentIndex)
       selected = fs2us(_files[fileIndex].Name);
   }
-  UString dirPathTemp = DirPrefix;
+  const UString dirPathTemp = DirPrefix;
   return Reload(dirPathTemp, selected);
 }
 
@@ -699,14 +714,14 @@ void CBrowseDialog::OpenParentFolder()
 
 void CBrowseDialog::SetPathEditText()
 {
-  int index = _list.GetNextSelectedItem(-1);
+  const int index = _list.GetNextSelectedItem(-1);
   if (index < 0)
   {
     if (FolderMode)
       _pathEdit.SetText(DirPrefix);
     return;
   }
-  int fileIndex = GetRealItemIndex(index);
+  const int fileIndex = GetRealItemIndex(index);
   if (fileIndex == kParentIndex)
   {
     if (FolderMode)
@@ -746,7 +761,7 @@ void CBrowseDialog::OnCreateDir()
   {
     if (!NDir::CreateComplexDir(destPath))
     {
-      MessageBox_HResError((HWND)*this, GetNormalizedError(), fs2us(destPath));
+      MessageBox_HResError((HWND)*this, GetLastError_noZero_HRESULT(), fs2us(destPath));
     }
     else
     {
@@ -760,10 +775,10 @@ void CBrowseDialog::OnCreateDir()
 
 void CBrowseDialog::OnItemEnter()
 {
-  int index = _list.GetNextSelectedItem(-1);
+  const int index = _list.GetNextSelectedItem(-1);
   if (index < 0)
     return;
-  int fileIndex = GetRealItemIndex(index);
+  const int fileIndex = GetRealItemIndex(index);
   if (fileIndex == kParentIndex)
     OpenParentFolder();
   else
@@ -780,8 +795,10 @@ void CBrowseDialog::OnItemEnter()
       */
       return;
     }
-    UString s = DirPrefix + fs2us(file.Name) + WCHAR_PATH_SEPARATOR;
-    HRESULT res = Reload(s, L"");
+    UString s = DirPrefix;
+    s += fs2us(file.Name);
+    s.Add_PathSepar();
+    const HRESULT res = Reload(s, UString());
     if (res != S_OK)
       MessageBox_HResError(*this, res, s);
     SetPathEditText();
@@ -801,10 +818,13 @@ void CBrowseDialog::FinishOnOK()
   FilePath = fs2us(destPath);
   if (FolderMode)
     NormalizeDirPathPrefix(FilePath);
+  FilterIndex = _filterCombo.GetCurSel();
   End(IDOK);
 }
 
-#endif
+#endif // USE_MY_BROWSE_DIALOG
+
+
 
 bool MyBrowseForFolder(HWND owner, LPCWSTR title, LPCWSTR path, UString &resultPath)
 {
@@ -812,12 +832,13 @@ bool MyBrowseForFolder(HWND owner, LPCWSTR title, LPCWSTR path, UString &resultP
 
   #ifndef UNDER_CE
 
-  #ifdef USE_MY_BROWSE_DIALOG
+#ifdef USE_MY_BROWSE_DIALOG
   if (!IsSuperOrDevicePath(path))
-  #endif
+  if (MyStringLen(path) < MAX_PATH)
+#endif
     return NShell::BrowseForFolder(owner, title, path, resultPath);
 
-  #endif
+  #endif //  UNDER_CE
 
   #ifdef USE_MY_BROWSE_DIALOG
 
@@ -830,64 +851,107 @@ bool MyBrowseForFolder(HWND owner, LPCWSTR title, LPCWSTR path, UString &resultP
   if (dialog.Create(owner) != IDOK)
     return false;
   resultPath = dialog.FilePath;
-  #endif
-
   return true;
+
+  #endif
 }
 
-bool MyBrowseForFile(HWND owner, LPCWSTR title, LPCWSTR path,
-    LPCWSTR filterDescription, LPCWSTR filter, UString &resultPath)
+
+// LPCWSTR filterDescription, LPCWSTR filter,
+
+bool CBrowseInfo::BrowseForFile(const CObjectVector<CBrowseFilterInfo> &filters)
 {
-  resultPath.Empty();
-
-  #ifndef UNDER_CE
-
-  #ifdef USE_MY_BROWSE_DIALOG
-  if (!IsSuperOrDevicePath(path))
-  #endif
+#ifndef UNDER_CE
+#ifdef USE_MY_BROWSE_DIALOG
+  /* win10:
+     GetOpenFileName() for FilePath doesn't support super prefix "\\\\?\\"
+     GetOpenFileName() for FilePath doesn't support long path
+  */
+  if (!IsSuperOrDevicePath(FilePath))
+  // if (filters.Size() > 100) // for debug
+#endif
   {
-    if (MyGetOpenFileName(owner, title, NULL, path, filterDescription, filter, resultPath))
+    const UString filePath_Store = FilePath;
+    UString dirPrefix;
+    {
+      FString prefix, name;
+      if (NDir::GetFullPathAndSplit(us2fs(FilePath), prefix, name))
+      {
+        dirPrefix = fs2us(prefix);
+        FilePath = fs2us(name);
+      }
+    }
+    UStringVector filters2;
+    FOR_VECTOR (i, filters)
+    {
+      const CBrowseFilterInfo &fi = filters[i];
+      filters2.Add(fi.Description);
+      UString s;
+      FOR_VECTOR (k, fi.Masks)
+      {
+        if (k != 0)
+          s += ";";
+        s += fi.Masks[k];
+      }
+      filters2.Add(s);
+    }
+    if (CommonDlg_BrowseForFile(!dirPrefix.IsEmpty() ? dirPrefix.Ptr(): NULL, filters2))
       return true;
-    #ifdef UNDER_CE
+    FilePath = filePath_Store;
+
+  #ifdef UNDER_CE
     return false;
-    #else
+  #else
     // maybe we must use GetLastError in WinCE.
-    DWORD errorCode = CommDlgExtendedError();
-    const wchar_t *errorMessage = NULL;
-    switch (errorCode)
+    const DWORD errorCode = CommDlgExtendedError();
+  #ifdef USE_MY_BROWSE_DIALOG
+    // FNERR_INVALIDFILENAME is expected error, if long path was used
+    if (errorCode != FNERR_INVALIDFILENAME
+        || FilePath.Len() < MAX_PATH)
+  #endif
     {
-      case 0: return false; // cancel or close obn dialog
-      case FNERR_INVALIDFILENAME: errorMessage = L"Invalid File Name"; break;
-      default: errorMessage = L"Open Dialog Error";
-    }
-    if (!errorMessage)
-      return false;
-    {
-      UString s = errorMessage;
+      if (errorCode == 0)  // cancel or close on dialog
+        return false;
+      const char *message = NULL;
+      if (errorCode == FNERR_INVALIDFILENAME)
+        message = "Invalid file name";
+      UString s ("Open Dialog Error:");
       s.Add_LF();
-      s += path;
-      MessageBox_Error_Global(owner, s);
+      if (message)
+        s += message;
+      else
+      {
+        char temp[16];
+        ConvertUInt32ToHex8Digits(errorCode, temp);
+        s += "Error #";
+        s += temp;
+      }
+      s.Add_LF();
+      s += FilePath;
+      MessageBox_Error_Global(hwndOwner, s);
     }
-    #endif
+  #endif // UNDER_CE
   }
 
-  #endif
+#endif // UNDER_CE
   
-  #ifdef USE_MY_BROWSE_DIALOG
+#ifdef USE_MY_BROWSE_DIALOG
+
   CBrowseDialog dialog;
-  if (title)
-    dialog.Title = title;
-  if (path)
-    dialog.FilePath = path;
+
   dialog.FolderMode = false;
-  if (filter)
-    dialog.SetFilter(filter);
-  if (filterDescription)
-    dialog.FilterDescription = filterDescription;
-  if (dialog.Create(owner) != IDOK)
+  dialog.SaveMode = SaveMode;
+  dialog.FilterIndex = FilterIndex;
+  dialog.Filters = filters;
+
+  if (lpstrTitle)
+    dialog.Title = lpstrTitle;
+  dialog.FilePath = FilePath;
+  if (dialog.Create(hwndOwner) != IDOK)
     return false;
-  resultPath = dialog.FilePath;
-  #endif
+  FilePath = dialog.FilePath;
+  FilterIndex = dialog.FilterIndex;
+#endif
 
   return true;
 }
@@ -912,7 +976,9 @@ bool CorrectFsPath(const UString &relBase, const UString &path2, UString &result
   result.Empty();
 
   UString path = path2;
+  #ifdef _WIN32
   path.Replace(L'/', WCHAR_PATH_SEPARATOR);
+  #endif
   unsigned start = 0;
   UString base;
   
@@ -925,9 +991,7 @@ bool CorrectFsPath(const UString &relBase, const UString &path2, UString &result
       return true;
     }
     #endif
-    int pos = GetRootPrefixSize(path);
-    if (pos > 0)
-      start = pos;
+    start = GetRootPrefixSize(path);
   }
   else
   {
@@ -952,7 +1016,7 @@ bool CorrectFsPath(const UString &relBase, const UString &path2, UString &result
     if (path.Back() == WCHAR_PATH_SEPARATOR)
     {
       path.DeleteBack();
-      result.Insert(0, WCHAR_PATH_SEPARATOR);;
+      result.Insert(0, WCHAR_PATH_SEPARATOR);
     }
     int pos = path.ReverseFind(WCHAR_PATH_SEPARATOR) + 1;
     UString cur = path.Ptr(pos);
@@ -972,8 +1036,8 @@ bool CorrectFsPath(const UString &relBase, const UString &path2, UString &result
   {
     if (start == path.Len())
       break;
-    int slashPos = path.Find(WCHAR_PATH_SEPARATOR, start);
-    cur.SetFrom(path.Ptr(start), (slashPos < 0 ? path.Len() : slashPos) - start);
+    const int slashPos = path.Find(WCHAR_PATH_SEPARATOR, start);
+    cur.SetFrom(path.Ptr(start), (slashPos < 0 ? path.Len() : (unsigned)slashPos) - start);
     if (checkExist)
     {
       CFileInfo fi;
@@ -993,8 +1057,8 @@ bool CorrectFsPath(const UString &relBase, const UString &path2, UString &result
     result += cur;
     if (slashPos < 0)
       break;
+    start = (unsigned)(slashPos + 1);
     result.Add_PathSepar();
-    start = slashPos + 1;
   }
   
   return true;

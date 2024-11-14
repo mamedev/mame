@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood, Andreas Naive, Tomasz Slanina, ElSemi
-#ifndef MAME_INCLUDES_CPS3_H
-#define MAME_INCLUDES_CPS3_H
+#ifndef MAME_CAPCOM_CPS3_H
+#define MAME_CAPCOM_CPS3_H
 
 #pragma once
 
@@ -12,7 +12,7 @@
 ****************************************************************************/
 
 #include "machine/intelfsh.h"
-#include "cpu/sh/sh2.h"
+#include "cpu/sh/sh7604.h"
 #include "cps3_a.h"
 #include "machine/timer.h"
 #include "emupal.h"
@@ -76,13 +76,13 @@ public:
 
 protected:
 	virtual void device_post_load() override;
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 	void copy_from_nvram();
 	u32 m_current_table_address;
-	required_device<sh2_device> m_maincpu;
+	required_device<sh7604_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 	required_device<cps3_sound_device> m_cps3sound;
@@ -168,7 +168,7 @@ private:
 	SH2_DMA_KLUDGE_CB(dma_callback);
 	void draw_fg_layer(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	WRITE_LINE_MEMBER(vbl_interrupt);
+	void vbl_interrupt(int state);
 	TIMER_DEVICE_CALLBACK_MEMBER(dma_interrupt);
 	TIMER_DEVICE_CALLBACK_MEMBER(sprite_dma_cb);
 	u16 rotate_left(u16 value, int n);
@@ -189,8 +189,8 @@ private:
 		u32 code, u32 color, int flipx, int flipy, int sx, int sy,
 		int transparency, int transparent_color,
 		int scalex, int scaley);
-	void cps3_map(address_map &map);
-	void decrypted_opcodes_map(address_map &map);
+	void cps3_map(address_map &map) ATTR_COLD;
+	void decrypted_opcodes_map(address_map &map) ATTR_COLD;
 };
 
-#endif // MAME_INCLUDES_CPS3_H
+#endif // MAME_CAPCOM_CPS3_H

@@ -44,9 +44,9 @@ public:
 	archimedes_podule_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 protected:
-	// device-level overrides
-	virtual void device_resolve_objects() override;
-	virtual void device_start() override;
+	// device_t implementation
+	virtual void device_resolve_objects() override ATTR_COLD;
+	virtual void device_start() override ATTR_COLD;
 
 	required_device<archimedes_exp_device> m_exp;
 };
@@ -91,12 +91,11 @@ public:
 	void pfiq_w(int state) { m_out_pfiq_cb(state); }
 
 protected:
-	// device-level overrides
-	virtual void device_resolve_objects() override;
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	// device_t implementation
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
-	// device_memory_interface overrides
+	// device_memory_interface implementation
 	virtual space_config_vector memory_space_config() const override;
 
 private:
@@ -112,8 +111,8 @@ private:
 	address_space *m_ioc;
 	address_space *m_memc;
 
-	void ioc_map(address_map &map);
-	void memc_map(address_map &map);
+	void ioc_map(address_map &map) ATTR_COLD;
+	void memc_map(address_map &map) ATTR_COLD;
 };
 
 

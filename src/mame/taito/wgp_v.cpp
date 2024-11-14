@@ -437,11 +437,7 @@ void wgp_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const 
 	}
 #if 0
 	if (rotate)
-	{
-		char buf[80];
-		sprintf(buf, "sprite rotate offs %04x ?", rotate);
-		popmessage(buf);
-	}
+		popmessage("sprite rotate offs %04x ?", rotate);
 #endif
 }
 
@@ -678,12 +674,9 @@ u32 wgp_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const 
 	m_tc0100scn->tilemap_draw(screen, bitmap, cliprect, layer[2], 0, 0);
 
 #if 0
-	{
-		char buf[80];
-		sprintf(buf,"piv_ctrl_reg: %04x y zoom: %04x %04x %04x",m_piv_ctrl_reg,
-						m_piv_zoom[0],m_piv_zoom[1],m_piv_zoom[2]);
-		popmessage(buf);
-	}
+	popmessage("piv_ctrl_reg: %04x y zoom: %04x %04x %04x",
+			m_piv_ctrl_reg,
+			m_piv_zoom[0], m_piv_zoom[1], m_piv_zoom[2]);
 #endif
 
 /* Enable this to watch the rotation control words */

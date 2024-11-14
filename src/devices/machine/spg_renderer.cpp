@@ -8,7 +8,7 @@ DEFINE_DEVICE_TYPE(SPG_RENDERER, spg_renderer_device, "spg_renderer", "SunPlus /
 
 spg_renderer_device::spg_renderer_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, type, tag, owner, clock),
-	m_space_read_cb(*this)
+	m_space_read_cb(*this, 0)
 {
 }
 
@@ -19,8 +19,6 @@ spg_renderer_device::spg_renderer_device(const machine_config &mconfig, const ch
 
 void spg_renderer_device::device_start()
 {
-	m_space_read_cb.resolve_safe(0);
-
 	for (uint8_t i = 0; i < 32; i++)
 	{
 		m_rgb5_to_rgb8[i] = (i << 3) | (i >> 2);

@@ -5,8 +5,8 @@
     Taito Yoke + Throttle Flight device
 
 ***************************************************************************/
-#ifndef MAME_MACHINE_TAITO_YOKE_H
-#define MAME_MACHINE_TAITO_YOKE_H
+#ifndef MAME_TAITO_TAITOIO_YOKE_H
+#define MAME_TAITO_TAITOIO_YOKE_H
 
 #pragma once
 
@@ -26,20 +26,20 @@ public:
 	u16 stickx_r();
 	u16 sticky_r();
 
-	DECLARE_READ_LINE_MEMBER( slot_up_r );
-	DECLARE_READ_LINE_MEMBER( slot_down_r );
-	DECLARE_READ_LINE_MEMBER( handle_left_r );
-	DECLARE_READ_LINE_MEMBER( handle_right_r );
-	DECLARE_READ_LINE_MEMBER( handle_up_r );
-	DECLARE_READ_LINE_MEMBER( handle_down_r );
+	int slot_up_r();
+	int slot_down_r();
+	int handle_left_r();
+	int handle_right_r();
+	int handle_up_r();
+	int handle_down_r();
 
 protected:
-	virtual ioport_constructor device_input_ports() const override;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 
 	// device-level overrides
 //  virtual void device_validity_check(validity_checker &valid) const;
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 private:
 	required_ioport m_stick_x;
@@ -51,4 +51,4 @@ private:
 // device type definition
 DECLARE_DEVICE_TYPE(TAITOIO_YOKE, taitoio_yoke_device)
 
-#endif // MAME_MACHINE_TAITO_YOKE_H
+#endif // MAME_TAITO_TAITOIO_YOKE_H

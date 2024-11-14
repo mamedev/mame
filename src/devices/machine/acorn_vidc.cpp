@@ -119,7 +119,7 @@ void acorn_vidc10_device::device_add_mconfig(machine_config &config)
 	}
 }
 
-u32 acorn_vidc10_device::palette_entries() const
+u32 acorn_vidc10_device::palette_entries() const noexcept
 {
 	return 0x100+0x10+4; // 8bpp + 1/2/4bpp + 2bpp for cursor
 }
@@ -148,9 +148,6 @@ void acorn_vidc10_device::device_config_complete()
 
 void acorn_vidc10_device::device_start()
 {
-	m_vblank_cb.resolve_safe();
-	m_sound_drq_cb.resolve_safe();
-
 	for (int i = 0; i < entries(); i++)
 		set_pen_color(i, rgb_t::black());
 
@@ -532,7 +529,7 @@ u32 acorn_vidc10_device::screen_update(screen_device &screen, bitmap_rgb32 &bitm
 	return 0;
 }
 
-READ_LINE_MEMBER(acorn_vidc10_device::flyback_r)
+int acorn_vidc10_device::flyback_r()
 {
 	int vert_pos = screen().vpos();
 	if (vert_pos <= m_crtc_regs[CRTC_VDSR] * (m_crtc_interlace+1))
@@ -605,7 +602,7 @@ void arm_vidc20_device::device_config_complete()
 		screen().set_screen_update(*this, FUNC(arm_vidc20_device::screen_update));
 }
 
-u32 arm_vidc20_device::palette_entries() const
+u32 arm_vidc20_device::palette_entries() const noexcept
 {
 	return 0x100+4; // 8bpp + 2bpp for cursor
 }

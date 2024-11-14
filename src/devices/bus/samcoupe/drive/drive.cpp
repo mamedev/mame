@@ -16,7 +16,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-DEFINE_DEVICE_TYPE(SAMCOUPE_DRIVE_PORT, samcoupe_drive_port_device, "samcoupe_drive_port", "SAM Coupe Drive Port")
+DEFINE_DEVICE_TYPE(SAMCOUPE_DRIVE_PORT, samcoupe_drive_port_device, "samcoupe_drive_port", u8"SAM Coupé Drive Port")
 
 
 //**************************************************************************

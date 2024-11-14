@@ -17,6 +17,9 @@
 
 #include "emu.h"
 
+
+namespace {
+
 class gkidabc_state : public driver_device
 {
 public:
@@ -54,6 +57,9 @@ ROM_START(gjrprofi)
 	ROM_REGION(0x20000, "maincpu", 0)
 	ROM_LOAD("27-5476-00.u1", 0x00000, 0x20000, CRC(ad1ec838) SHA1(0cf90c02762ace656191a38ae423a4fa0e7484f7))
 ROM_END
+
+} // anonymous namespace
+
 
 COMP(1996, gkidabc,   0, 0, gkidabc, gkidabc, gkidabc_state, empty_init, "VTech", "Genius KID ABC Fan (Germany)",   MACHINE_IS_SKELETON)
 COMP(1995, miprimlec, 0, 0, gkidabc, gkidabc, gkidabc_state, empty_init, "VTech", "Mis Primeras Lecciones (Spain)", MACHINE_IS_SKELETON)

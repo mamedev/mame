@@ -1,11 +1,11 @@
 // license:BSD-3-Clause
-// copyright-holders:Robbbert
+// copyright-holders: Robbbert
 /*******************************************************************************************************
 
 PINBALL
 Inder S.A. of Spain
 
-All manuals are in Spanish (including the 'English' ones), so some guesswork will be needed.
+All manuals are in Spanish (including the 'English' ones).
 The schematics for Brave Team, Canasta are too blurry to read.
 Each game has different hardware. Note with switches: "Veleta" is normally closed.
 Order of dips on "new cpu" games: 3,2,1,0,4,5,6,7 (so SL1(1) uses bit 3 of input definition).
@@ -19,8 +19,11 @@ Note
 - La Rana is not a pinball machine - it looks like an upright arcade game with a frog's mouth and some
    holes on a lower panel, while some indicators are on the upper panel. The main scores are on the
    marquee. Each of 4 players has 3 digits. There's other buttons on the marquee too. The game has
-   no screen. The purpose and usage of the game is unknown. Unable to get a manual, although it is known
-   to exist.
+   no screen.
+   Gameplay and description can be found on the patent fill (it's a traditional Spanish game, it's
+   easy to find more info about how to play it):
+     https://worldwide.espacenet.com/patent/search/family/008268025/publication/ES1014799U?q=pn%3DES1014799U
+   Photos and a (partial) manual can be found at: https://www.recreativas.org/la-rana-1051-inder
    It can be played by pressing 5 (insert coin), press 1 (start) for each player, press A (start timer),
    press various keys to score. Don't press X or the game instantly ends. When the timer runs out it
    switches to the next player, or ends.
@@ -29,7 +32,7 @@ Status:
 - All games are playable with sound.
 
 ToDo:
-- The "new cpu" machines are lacking mechanical sounds. The output bits vary per game.
+- The "new CPU" machines are lacking mechanical sounds. The output bits vary per game.
 - La Rana: playable. Needs its own layout. Inputs to be figured out.
 
 ********************************************************************************************************/
@@ -79,8 +82,8 @@ public:
 	void init_1();
 
 private:
-	virtual void machine_reset() override;
-	virtual void machine_start() override;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void machine_start() override ATTR_COLD;
 	u8 ppic_r();
 	void ppia_w(u8 data);
 	void ppib_w(u8 data);
@@ -107,16 +110,16 @@ private:
 	void sndcmd_lapbylap_w(u8 data);
 	void lamp_w(offs_t offset, u8 data) { for (u8 i = 0; i < 8; i++) m_io_outputs[8U+offset*8+i] = BIT(data, i); }
 	void disp_w(offs_t offset, u8 data);
-	DECLARE_WRITE_LINE_MEMBER(qc7a_w);
-	DECLARE_WRITE_LINE_MEMBER(q9a_w);
-	DECLARE_WRITE_LINE_MEMBER(qc9b_w);
+	void qc7a_w(int state);
+	void q9a_w(int state);
+	void qc9b_w(int state);
 	void update_mus();
-	void brvteam_map(address_map &map);
-	void canasta_map(address_map &map);
-	void main_map(address_map &map);
-	void audio_map(address_map &map);
-	void lapbylap_main_map(address_map &map);
-	void lapbylap_audio_map(address_map &map);
+	void brvteam_map(address_map &map) ATTR_COLD;
+	void canasta_map(address_map &map) ATTR_COLD;
+	void main_map(address_map &map) ATTR_COLD;
+	void audio_map(address_map &map) ATTR_COLD;
+	void lapbylap_main_map(address_map &map) ATTR_COLD;
+	void lapbylap_audio_map(address_map &map) ATTR_COLD;
 
 	bool m_pc0 = false;
 	u8 m_game = 0U;
@@ -1280,19 +1283,19 @@ void inder_state::update_mus()
 		m_13->ba_w(0);
 }
 
-WRITE_LINE_MEMBER( inder_state::qc7a_w )
+void inder_state::qc7a_w(int state)
 {
 	m_msm->reset_w(state);
 	m_9a->clear_w(!state);
 	m_9b->clear_w(!state);
 }
 
-WRITE_LINE_MEMBER( inder_state::q9a_w )
+void inder_state::q9a_w(int state)
 {
 	m_pc0 = state;
 }
 
-WRITE_LINE_MEMBER( inder_state::qc9b_w )
+void inder_state::qc9b_w(int state)
 {
 	m_9a->d_w(state);
 	m_9b->d_w(state);
@@ -1554,6 +1557,10 @@ ROM_START(pinmoonl)
 	ROM_LOAD("ci-23.bin", 0x10000, 0x10000, CRC(eac346da) SHA1(7c4c26ae089dda0dcd7300fd1ecabf5a91099c41))
 	ROM_LOAD("ci-22.bin", 0x20000, 0x10000, CRC(379740da) SHA1(83ad13ab7f1f37c78397d8e830bd74c5a7aea758))
 	ROM_LOAD("ci-21.bin", 0x30000, 0x10000, CRC(0febb4a7) SHA1(e6cc1b26ddfe9cd58da29de2a50a83ce50afe323))
+
+	ROM_REGION(0x4000, "bonus", ROMREGION_ERASEFF) // On "Bonus expansion board"
+	ROM_LOAD("inder_sa_m17_moon_ligh_bonus_rom_1.ci1", 0x0000, 0x2000, CRC(2c45fd1e) SHA1(4cd1336271d77d9acb7c81a5461546842e946dc3))
+	ROM_LOAD("inder_sa_m17_moon_ligh_bonus_rom_2.ci2", 0x2000, 0x2000, CRC(c0dc1523) SHA1(511657cc01fbbb5146e32ef26a9b259250df3fb6))
 ROM_END
 
 /*-------------------------------------------------------------------
@@ -1592,6 +1599,12 @@ ROM_END
 
 /*-------------------------------------------------------------------
 / Mundial 90 (1990)
+/ Soon after the launch of Mundial 90, Inder detected a bug on the
+/ program ROM that could cause the catapult frame to break, so they
+/ sent a letter (dated June 1990) with an updated program ROM and
+/ recalling the buggy one. It is unclear if the supported set is the
+/ fixed or the older one, as it matches one dumped from an EEPROM
+/ with an original Inder label dated 18-April-1990.
 /-------------------------------------------------------------------*/
 ROM_START(mundial)
 	ROM_REGION(0x4000, "maincpu", ROMREGION_ERASEFF)
@@ -1632,10 +1645,22 @@ ROM_END
 /-------------------------------------------------------------------*/
 ROM_START(larana)
 	ROM_REGION(0x4000, "maincpu", ROMREGION_ERASEFF)
-	ROM_LOAD("inder_sa_mod_la_rana_0_050790.bin", 0x0000, 0x2000, CRC(ba94618f) SHA1(0fd6ffe9a6ef514c1dbf8856b881a54bf184e863))
+	ROM_LOAD("inder_sa_mod_la_rana_0_050790.bin", 0x00000, 0x02000, CRC(ba94618f) SHA1(0fd6ffe9a6ef514c1dbf8856b881a54bf184e863))
 
 	ROM_REGION(0x2000, "audiocpu", ROMREGION_ERASEFF)
-	ROM_LOAD("inder_sa_mod_la_rana_a_050690.bin", 0x0000, 0x2000, CRC(1513fd92) SHA1(6ca0723f5d7c86b844476a4830c8fc3744cbf918))
+	ROM_LOAD("inder_sa_mod_la_rana_a_050690.bin", 0x00000, 0x02000, CRC(1513fd92) SHA1(6ca0723f5d7c86b844476a4830c8fc3744cbf918))
+
+	ROM_REGION(0x10000, "audiorom", ROMREGION_ERASEFF)
+	ROM_LOAD("inder_sa_mod_la_rana_b_200690.bin", 0x00000, 0x10000, CRC(3aaa7c7d) SHA1(4a8531b6859fc1f2a4bb63a51da35e9081b7e88b))
+ROM_END
+
+// This sets gives, by default, 2 launches per coin. Other changes are unknown.
+ROM_START(larana2)
+	ROM_REGION(0x4000, "maincpu", ROMREGION_ERASEFF)
+	ROM_LOAD("larana_alt.bin",                    0x00000, 0x02000, CRC(81a6c8c3) SHA1(e3678e18704d0be0a1e9ece178babec7d728e510))
+
+	ROM_REGION(0x2000, "audiocpu", ROMREGION_ERASEFF)
+	ROM_LOAD("inder_sa_mod_la_rana_a_050690.bin", 0x00000, 0x02000, CRC(1513fd92) SHA1(6ca0723f5d7c86b844476a4830c8fc3744cbf918))
 
 	ROM_REGION(0x10000, "audiorom", ROMREGION_ERASEFF)
 	ROM_LOAD("inder_sa_mod_la_rana_b_200690.bin", 0x00000, 0x10000, CRC(3aaa7c7d) SHA1(4a8531b6859fc1f2a4bb63a51da35e9081b7e88b))
@@ -1658,23 +1683,47 @@ ROM_START(ind250cc)
 	ROM_LOAD("e-250cc.bin", 0x30000, 0x10000, CRC(538b3274) SHA1(eb76c41a60199bb94aec4666222e405bbcc33494))
 ROM_END
 
+/*---------------------------------------------------------------------------------------------------------------
+/ Unknown gambling game on Inder pinball hardware.
+/ According to PinMAME dev:
+/ By inspecting the program ROMs, it seems that the game will "spin" several lamps so a pattern emerges.
+/ If a certain pattern appears (a win), two to five tries can be made to increase your win, using three buttons.
+/ You may also wait, not pushing anything, in which case the win stays the same.
+/ If a win is made, some sort of payout starts (probably coins being dispensed).
+/--------------------------------------------------------------------------------------------------------------*/
+ROM_START(indunkgam)
+	ROM_REGION(0x4000, "maincpu", ROMREGION_ERASEFF)
+	ROM_LOAD("0.ci3", 0x0000, 0x2000, CRC(f819d4a4) SHA1(f8f73dadbf9d45af8fa004e92e660a6014c31f68))
+	ROM_LOAD("1.ci4", 0x2000, 0x2000, CRC(31837bed) SHA1(27edb9dec0e0368b5144922bc9e23fc9f69da34b))
+
+	ROM_REGION(0x2000, "audiocpu", ROMREGION_ERASEFF)
+	ROM_LOAD("audiocpu.snd", 0x0000, 0x2000, NO_DUMP)
+
+	ROM_REGION(0x40000, "audiorom", ROMREGION_ERASEFF)
+	ROM_LOAD("audiorom.snd", 0x00000, 0x10000, NO_DUMP)
+ROM_END
+
 } // Anonymous namespace
 
 
-// old cpu board, 6 digits, sn76489
+// old CPU board, 6 digits, sn76489
 GAME(1985,  brvteam,  0, brvteam,  brvteam,  inder_state, empty_init,  ROT0, "Inder", "Brave Team",    MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
 
-// old cpu board, 7 digits, ay8910
+// old CPU board, 7 digits, ay8910
 GAME(1986,  canasta,  0, canasta,  canasta,  inder_state, empty_init,  ROT0, "Inder", "Canasta '86'",  MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
 
-// old cpu board, 7 digits, sound cpu with 2x ay8910
+// old CPU board, 7 digits, sound cpu with 2x ay8910
 GAME(1986,  lapbylap, 0, lapbylap, lapbylap, inder_state, empty_init,  ROT0, "Inder", "Lap By Lap",    MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
 
-// new cpu board, sound board with msm5205
-GAME(1987,  pinmoonl, 0, inder,    pinmoonl, inder_state, init_0, ROT0, "Inder",    "Moon Light (Inder)", MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1988,  pinclown, 0, inder,    pinclown, inder_state, init_1, ROT0, "Inder",    "Clown (Inder)",      MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1989,  corsario, 0, inder,    corsario, inder_state, init_1, ROT0, "Inder",    "Corsario",           MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1990,  mundial,  0, inder,    mundial,  inder_state, init_1, ROT0, "Inder",    "Mundial 90",         MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1991,  atleta,   0, inder,    atleta,   inder_state, init_1, ROT0, "Inder",    "Atleta",             MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1991,  larana,   0, inder,    larana,   inder_state, init_0, ROT0, "Inder",    "La Rana",            MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1992,  ind250cc, 0, inder,    ind250cc, inder_state, init_1, ROT0, "Inder",    "250 CC",             MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+// new CPU board, sound board with msm5205
+GAME(1987,  pinmoonl, 0,      inder, pinmoonl, inder_state, init_0, ROT0, "Inder", "Moon Light (Inder)", MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1988,  pinclown, 0,      inder, pinclown, inder_state, init_1, ROT0, "Inder", "Clown (Inder)",      MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1989,  corsario, 0,      inder, corsario, inder_state, init_1, ROT0, "Inder", "Corsario",           MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1990,  mundial,  0,      inder, mundial,  inder_state, init_1, ROT0, "Inder", "Mundial 90",         MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1991,  atleta,   0,      inder, atleta,   inder_state, init_1, ROT0, "Inder", "Atleta",             MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1991,  larana,   0,      inder, larana,   inder_state, init_0, ROT0, "Inder", "La Rana (set 1)",    MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1991,  larana2,  larana, inder, larana,   inder_state, init_0, ROT0, "Inder", "La Rana (set 2)",    MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1992,  ind250cc, 0,      inder, ind250cc, inder_state, init_1, ROT0, "Inder", "250 CC",             MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+
+// Unknown sound hardware, unknown machine (using 'larana' inputs until proper ones are figured out).
+GAME(1991, indunkgam, 0, inder, larana, inder_state, init_0, ROT0, "Inder", "unknown gambling game on Inder pinball hardware", MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )

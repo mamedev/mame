@@ -24,23 +24,23 @@
 DEFINE_DEVICE_TYPE(UPD7725,  upd7725_device,  "upd7725",  "NEC uPD7725")
 DEFINE_DEVICE_TYPE(UPD96050, upd96050_device, "upd96050", "NEC uPD96050")
 
-necdsp_device::necdsp_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint32_t abits, uint32_t dbits)
-	: cpu_device(mconfig, type, tag, owner, clock),
-		m_program_config("program", ENDIANNESS_BIG, 32, abits, -2), // data bus width, address bus width, -2 means DWORD-addressable
-		m_data_config("data", ENDIANNESS_BIG, 16, dbits, -1), m_icount(0),   // -1 for WORD-addressable
-		m_irq(0),
-		m_irq_firing(0),
-		m_in_int_cb(*this),
-		//m_in_si_cb(*this),
-		//m_in_sck_cb(*this),
-		//m_in_sien_cb(*this),
-		//m_in_soen_cb(*this),
-		//m_in_dack_cb(*this),
-		m_out_p0_cb(*this),
-		m_out_p1_cb(*this)
-		//m_out_so_cb(*this),
-		//m_out_sorq_cb(*this),
-		//m_out_drq_cb(*this)
+necdsp_device::necdsp_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint32_t abits, uint32_t dbits) :
+	cpu_device(mconfig, type, tag, owner, clock),
+	m_program_config("program", ENDIANNESS_BIG, 32, abits, -2), // data bus width, address bus width, -2 means DWORD-addressable
+	m_data_config("data", ENDIANNESS_BIG, 16, dbits, -1), m_icount(0),   // -1 for WORD-addressable
+	m_irq(0),
+	m_irq_firing(0),
+	m_in_int_cb(*this, 0),
+	//m_in_si_cb(*this, 0),
+	//m_in_sck_cb(*this, 0),
+	//m_in_sien_cb(*this, 0),
+	//m_in_soen_cb(*this, 0),
+	//m_in_dack_cb(*this, 0),
+	m_out_p0_cb(*this),
+	m_out_p1_cb(*this)
+	//m_out_so_cb(*this),
+	//m_out_sorq_cb(*this),
+	//m_out_drq_cb(*this)
 {
 }
 
@@ -85,19 +85,6 @@ void necdsp_device::device_start()
 	state_add(UPD7725_SI, "SI", regs.si);
 	state_add(UPD7725_SO, "SO", regs.so);
 	state_add(UPD7725_IDB, "IDB", regs.idb);
-
-	// resolve callbacks
-	m_in_int_cb.resolve_safe(0);
-	//m_in_si_cb.resolve_safe(0);
-	//m_in_sck_cb.resolve_safe(0);
-	//m_in_sien_cb.resolve_safe(0);
-	//m_in_soen_cb.resolve_safe(0);
-	//m_in_dack_cb.resolve_safe(0);
-	m_out_p0_cb.resolve_safe();
-	m_out_p1_cb.resolve_safe();
-	//m_out_so_cb.resolve_safe();
-	//m_out_sorq_cb.resolve_safe();
-	//m_out_drq_cb.resolve_safe();
 
 	// save state registrations
 	save_item(NAME(regs.pc));
@@ -282,17 +269,6 @@ uint32_t necdsp_device::execute_max_cycles() const noexcept
 
 
 //-------------------------------------------------
-//  execute_input_lines - return the number of
-//  input/interrupt lines
-//-------------------------------------------------
-
-uint32_t necdsp_device::execute_input_lines() const noexcept
-{
-	return 3; // TODO: there should be 11: INT, SCK, /SIEN, /SOEN, SI, and /DACK, plus SO, /SORQ and DRQ; for now, just INT, P0, and P1 are enough.
-}
-
-
-//-------------------------------------------------
 //  execute_set_input -
 //-------------------------------------------------
 
@@ -397,7 +373,7 @@ void necdsp_device::exec_op(uint32_t opcode) {
 	case 12: regs.idb = bitswap<16>(regs.si, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15); break;  //LSB = first bit in from serial, 'reversed' SI register order
 	case 13: regs.idb = regs.k; break;
 	case 14: regs.idb = regs.l; break;
-	case 15: regs.idb = dataRAM[regs.dp]; break;
+	case 15: regs.idb = dataRAM[regs.dp & 0x07ff]; break;
 	}
 
 	if(alu) {
@@ -437,7 +413,7 @@ void necdsp_device::exec_op(uint32_t opcode) {
 		case 12: r = (q << 1) | (c ? 1 : 0); break;   //SHL1 (ROL)
 		case 13: r = (q << 2) | 3; break;             //SHL2
 		case 14: r = (q << 4) | 15; break;            //SHL4
-		case 15: r = (q << 8) | (q >> 8); break;      //XCHG
+		case 15: r = swapendian_int16(q); break;      //XCHG
 	}
 
 	flag.s0 = (r & 0x8000);
@@ -586,10 +562,10 @@ void necdsp_device::exec_ld(uint32_t opcode) {
 	case  9: regs.so = id; break;  //MSB first output, output tapped at bit 15 shifting left
 	case 10: regs.k = id; break;
 	case 11: regs.k = id; regs.l = m_data.read_word(regs.rp); break;
-	case 12: regs.l = id; regs.k = dataRAM[regs.dp | 0x40]; break;
+	case 12: regs.l = id; regs.k = dataRAM[(regs.dp & 0x7ff) | 0x40]; break;
 	case 13: regs.l = id; break;
 	case 14: regs.trb = id; break;
-	case 15: dataRAM[regs.dp] = id; break;
+	case 15: dataRAM[regs.dp & 0x7ff] = id; break;
 	}
 }
 

@@ -20,6 +20,9 @@
 #include "emu.h"
 #include "cpu/avr8/avr8.h"
 
+
+namespace {
+
 #define MASTER_CLOCK    16000000
 
 /****************************************************\
@@ -38,14 +41,14 @@ public:
 	void rambo(machine_config &config);
 
 private:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
-	void rambo_prg_map(address_map &map);
-	void rambo_data_map(address_map &map);
+	void rambo_prg_map(address_map &map) ATTR_COLD;
+	void rambo_data_map(address_map &map) ATTR_COLD;
 
 	uint8_t m_port_a = 0;
-	required_device<avr8_device> m_maincpu;
+	required_device<atmega2560_device> m_maincpu;
 };
 
 /****************************************************\
@@ -86,8 +89,8 @@ void rambo_state::rambo(machine_config &config)
 	m_maincpu->set_high_fuses(0xda);
 	m_maincpu->set_extended_fuses(0xf4);
 	m_maincpu->set_lock_bits(0x0f);
-	m_maincpu->gpio_in<AVR8_IO_PORTA>().set([this]() { return m_port_a; });
-	m_maincpu->gpio_out<AVR8_IO_PORTA>().set([this](uint8_t data) { m_port_a = data; });
+	m_maincpu->gpio_in<atmega2560_device::GPIOA>().set([this]() { return m_port_a; });
+	m_maincpu->gpio_out<atmega2560_device::GPIOA>().set([this](uint8_t data) { m_port_a = data; });
 
 	/*TODO: Add an ATMEGA32U2 for USB-Serial communications */
 	/*TODO: Emulate the AD5206 digipot */
@@ -160,6 +163,9 @@ ROM_START( metamaq2 )
 	/* on-die 4kbyte eeprom */
 	ROM_REGION( 0x1000, "eeprom", ROMREGION_ERASEFF )
 ROM_END
+
+} // anonymous namespace
+
 
 //   YEAR  NAME      PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY        FULLNAME                            FLAGS
 COMP(2012, metamaq2, 0,      0,      rambo,   0,     rambo_state, empty_init, "Metamaquina", "Metamaquina 2 desktop 3d printer", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)

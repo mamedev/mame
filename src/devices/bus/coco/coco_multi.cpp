@@ -65,7 +65,6 @@
 
 #define SWITCH_CONFIG_TAG   "switch"
 
-//#define LOG_GENERAL   (1U << 0) //defined in logmacro.h already
 #define LOG_CART   (1U << 1) // shows cart line changes
 #define LOG_SWITCH (1U << 2) // shows switch changes
 //#define VERBOSE (LOG_CART|LOG_SWITCH)
@@ -104,8 +103,8 @@ namespace
 		coco_multipak_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
 
 		// device-level overrides
-		virtual void device_start() override;
-		virtual void device_reset() override;
+		virtual void device_start() override ATTR_COLD;
+		virtual void device_reset() override ATTR_COLD;
 		virtual u8 cts_read(offs_t offset) override;
 		virtual void cts_write(offs_t offset, u8 data) override;
 		virtual u8 scs_read(offs_t offset) override;
@@ -113,13 +112,13 @@ namespace
 		virtual void set_sound_enable(bool sound_enable) override;
 
 		// optional information overrides
-		virtual void device_add_mconfig(machine_config &config) override;
+		virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 		virtual u8 *get_cart_base() override;
 		virtual u32 get_cart_size() override;
 
 		virtual address_space &cartridge_space() override;
-		virtual ioport_constructor device_input_ports() const override;
+		virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 
 		// device references
 		required_device_array<cococart_slot_device, 4> m_slots;
@@ -156,7 +155,7 @@ public:
 
 protected:
 	// optional information overrides
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 };
 
 
@@ -190,7 +189,7 @@ void coco_multipak_device::device_add_mconfig(machine_config &config)
 	m_slots[2]->cart_callback().set([this](int state) { update_line(3, line::CART); });
 	m_slots[2]->nmi_callback().set([this](int state) { update_line(3, line::NMI); });
 	m_slots[2]->halt_callback().set([this](int state) { update_line(3, line::HALT); });
-	COCOCART_SLOT(config, m_slots[3], DERIVED_CLOCK(1, 1), coco_cart_slot4, "fdcv11");
+	COCOCART_SLOT(config, m_slots[3], DERIVED_CLOCK(1, 1), coco_cart_slot4, "fdc");
 	m_slots[3]->cart_callback().set([this](int state) { update_line(4, line::CART); });
 	m_slots[3]->nmi_callback().set([this](int state) { update_line(4, line::NMI); });
 	m_slots[3]->halt_callback().set([this](int state) { update_line(4, line::HALT); });
@@ -231,7 +230,7 @@ void dragon_multipak_device::device_add_mconfig(machine_config &config)
 
 INPUT_PORTS_START( coco_multipack )
 	PORT_START( SWITCH_CONFIG_TAG )
-	PORT_CONFNAME( 0x03, 0x03, "Multi-Pak Slot Switch" ) PORT_CHANGED_MEMBER(DEVICE_SELF, coco_multipak_device, switch_changed, 0)
+	PORT_CONFNAME( 0x03, 0x03, "Multi-Pak Slot Switch" ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(coco_multipak_device::switch_changed), 0)
 		PORT_CONFSETTING( 0x00, "Slot 1" )
 		PORT_CONFSETTING( 0x01, "Slot 2" )
 		PORT_CONFSETTING( 0x02, "Slot 3" )

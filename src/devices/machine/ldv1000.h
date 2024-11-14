@@ -35,7 +35,7 @@ DECLARE_DEVICE_TYPE(PIONEER_LDV1000, pioneer_ldv1000_device)
 // ======================> pioneer_ldv1000_device
 
 // base ldv1000 class
-class pioneer_ldv1000_device : public laserdisc_device
+class pioneer_ldv1000_device : public parallel_laserdisc_device
 {
 public:
 	// construction/destruction
@@ -44,18 +44,18 @@ public:
 	auto command_strobe_callback() { return m_command_strobe_cb.bind(); }
 
 	// input and output
-	void data_w(uint8_t data);
-	void enter_w(uint8_t data);
-	uint8_t status_r() const { return m_status; }
-	uint8_t status_strobe_r() const { return (m_portc1 & 0x20) ? ASSERT_LINE : CLEAR_LINE; }
-	uint8_t command_strobe_r() const { return (m_portc1 & 0x10) ? ASSERT_LINE : CLEAR_LINE; }
+	virtual void data_w(uint8_t data) override;
+	virtual void enter_w(int state) override { }
+	virtual uint8_t data_r() override { return m_status; }
+	virtual int status_strobe_r() override { return BIT(m_portc1, 5); }
+	virtual int ready_r() override { return BIT(m_portc1, 4); }
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
-	virtual const tiny_rom_entry *device_rom_region() const override;
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 	// subclass overrides
 	virtual void player_vsync(const vbi_metadata &vbi, int fieldnum, const attotime &curtime) override;
@@ -88,8 +88,8 @@ private:
 	void ppi1_portb_w(uint8_t data);
 	void ppi1_portc_w(uint8_t data);
 
-	void ldv1000_map(address_map &map);
-	void ldv1000_portmap(address_map &map);
+	void ldv1000_map(address_map &map) ATTR_COLD;
+	void ldv1000_portmap(address_map &map) ATTR_COLD;
 
 	// internal state
 	required_device<z80_device> m_z80_cpu;            /* CPU index of the Z80 */

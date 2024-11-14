@@ -8,6 +8,8 @@
 #include "spg2xx.h"
 
 
+namespace {
+
 class wireless60_state : public spg2xx_game_state
 {
 public:
@@ -22,8 +24,8 @@ public:
 	void init_zone100();
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	uint8_t m_w60_controller_input = 0;
 	uint16_t m_w60_porta_data = 0;
@@ -54,11 +56,11 @@ public:
 
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
-	virtual void mem_map_z40(address_map &map);
+	virtual void mem_map_z40(address_map &map) ATTR_COLD;
 	uint16_t z40_rom_r(offs_t offset);
 	uint16_t zone40_porta_r();
 	void zone40_porta_w(uint16_t data);
@@ -356,6 +358,9 @@ ROM_START( lx_jg7410 )
 	ROM_REGION( 0x8000000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD16_WORD_SWAP( "55lv100.u4", 0x0000, 0x8000000, CRC(60476576) SHA1(83592e43d9169c95f6b22903e8d708e96ad02611) )
 ROM_END
+
+} // anonymous namespace
+
 
 // These have games from Waixing and were likely manufactured  by Subor and sold by Ultimate Products Ltd.
 // Many of these games are rewrites of VT1682 based titles, which in turn were based on older NES/VT ones

@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Olivier Galibert
-#ifndef MAME_MACHINE_JVS13551_H
-#define MAME_MACHINE_JVS13551_H
+#ifndef MAME_SEGA_JVS13551_H
+#define MAME_SEGA_JVS13551_H
 
 #pragma once
 
@@ -31,20 +31,20 @@ public:
 		set_port_tags<First + 1>(std::forward<U>(other_tags)...);
 	}
 
-	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 
-	DECLARE_WRITE_LINE_MEMBER(jvs13551_coin_1_w);
-	DECLARE_WRITE_LINE_MEMBER(jvs13551_coin_2_w);
+	void jvs13551_coin_1_w(int state);
+	void jvs13551_coin_2_w(int state);
 	void inc_coin(int coin);
 
 protected:
 	template <uint8_t First> void set_port_tags() { }
 
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual ioport_constructor device_input_ports() const override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 
 	// JVS device overrides
 	virtual const char *device_id() override;
@@ -66,4 +66,4 @@ private:
 
 DECLARE_DEVICE_TYPE(SEGA_837_13551, sega_837_13551_device)
 
-#endif // MAME_MACHINE_JVS13551_H
+#endif // MAME_SEGA_JVS13551_H

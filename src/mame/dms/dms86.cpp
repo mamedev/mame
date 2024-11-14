@@ -52,10 +52,10 @@ public:
 	{ }
 
 	void dms86(machine_config &config);
-	DECLARE_WRITE_LINE_MEMBER(nmi_w);
+	void nmi_w(int state);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	void m1_ack_w(u8 data);
@@ -64,8 +64,8 @@ private:
 	u16 port9c_r();
 	void kbd_put(u8 data);
 
-	void io_map(address_map &map);
-	void mem_map(address_map &map);
+	void io_map(address_map &map) ATTR_COLD;
+	void mem_map(address_map &map) ATTR_COLD;
 
 	u8 m_term_data = 0U;
 	required_device<cpu_device> m_maincpu;
@@ -75,7 +75,7 @@ private:
 };
 
 
-WRITE_LINE_MEMBER(dms86_state::nmi_w)
+void dms86_state::nmi_w(int state)
 {
 	m_maincpu->set_input_line(INPUT_LINE_NMI, state);
 }
@@ -128,7 +128,7 @@ void dms86_state::io_map(address_map &map)
 /* Input ports */
 static INPUT_PORTS_START( dms86 )
 	PORT_START("FRONT")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("Interrupt") PORT_CODE(KEYCODE_F2) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, dms86_state, nmi_w)
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("Interrupt") PORT_CODE(KEYCODE_F2) PORT_WRITE_LINE_MEMBER(FUNC(dms86_state::nmi_w))
 INPUT_PORTS_END
 
 

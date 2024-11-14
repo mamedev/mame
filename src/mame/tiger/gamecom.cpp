@@ -230,7 +230,7 @@ static INPUT_PORTS_START( gamecom )
 	PORT_BIT( 0x080, IP_ACTIVE_HIGH, IPT_OTHER)
 	PORT_BIT( 0x100, IP_ACTIVE_HIGH, IPT_OTHER)
 	PORT_BIT( 0x200, IP_ACTIVE_HIGH, IPT_OTHER)
-	INPUT_PORTS_END
+INPUT_PORTS_END
 
 void gamecom_state::gamecom_palette(palette_device &palette) const
 {
@@ -281,8 +281,8 @@ void gamecom_state::gamecom(machine_config &config)
 	SPEAKER(config, "speaker").front_center();
 	/* TODO: much more complex than this */
 	DAC_8BIT_R2R(config, m_dac, 0).add_route(ALL_OUTPUTS, "speaker", 0.5); // unknown DAC (Digital audio)
-	DAC_4BIT_R2R(config, m_dac0, 0).add_route(ALL_OUTPUTS, "speaker", 0.05); // unknown DAC (Frequency modulation)
-	DAC_4BIT_R2R(config, m_dac1, 0).add_route(ALL_OUTPUTS, "speaker", 0.05); // unknown DAC (Frequency modulation)
+	DAC_4BIT_R2R(config, m_dac0, 0).add_route(ALL_OUTPUTS, "speaker", 0.25); // unknown DAC (Frequency modulation)
+	DAC_4BIT_R2R(config, m_dac1, 0).add_route(ALL_OUTPUTS, "speaker", 0.25); // unknown DAC (Frequency modulation)
 
 	/* cartridge */
 	GENERIC_CARTSLOT(config, "cartslot1", generic_linear_slot, "gamecom_cart", "bin,tgc").set_device_load(FUNC(gamecom_state::cart1_load));
@@ -299,4 +299,4 @@ ROM_START( gamecom )
 ROM_END
 
 //    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS          INIT          COMPANY  FULLNAME    FLAGS
-CONS( 1997, gamecom, 0,      0,      gamecom, gamecom, gamecom_state, init_gamecom, "Tiger", "Game.com", MACHINE_IMPERFECT_SOUND | MACHINE_CLICKABLE_ARTWORK)
+CONS( 1997, gamecom, 0,      0,      gamecom, gamecom, gamecom_state, init_gamecom, "Tiger", "Game.com", MACHINE_IMPERFECT_SOUND )

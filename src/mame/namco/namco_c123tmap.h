@@ -1,8 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood
 
-#ifndef MAME_VIDEO_NAMCO_C123TMAP_H
-#define MAME_VIDEO_NAMCO_C123TMAP_H
+#ifndef MAME_NAMCO_NAMCO_C123TMAP_H
+#define MAME_NAMCO_NAMCO_C123TMAP_H
 
 #pragma once
 
@@ -23,7 +23,7 @@ public:
 	}
 	void set_tmap3_half_height() { m_tmap3_half_height = true; }
 
-	typedef delegate<void(uint16_t, int*, int*)> c123_tilemap_delegate;
+	typedef delegate<void(uint16_t, int&, int&)> c123_tilemap_delegate;
 	void set_tile_callback(c123_tilemap_delegate tilemap_cb) { m_tilemapinfo.cb = tilemap_cb; }
 
 	// 16 bit handlers
@@ -44,7 +44,7 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 private:
 	template<int Offset> TILE_GET_INFO_MEMBER(get_tile_info);
@@ -82,5 +82,5 @@ private:
 // device type definition
 DECLARE_DEVICE_TYPE(NAMCO_C123TMAP, namco_c123tmap_device)
 
-#endif // MAME_VIDEO_NAMCO_C123TMAP_H
+#endif // MAME_NAMCO_NAMCO_C123TMAP_H
 

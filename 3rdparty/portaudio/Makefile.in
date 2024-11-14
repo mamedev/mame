@@ -44,7 +44,7 @@ PALIB = libportaudio.la
 PAINC = include/portaudio.h
 
 PA_LDFLAGS = $(LDFLAGS) $(SHARED_FLAGS) -rpath $(libdir) -no-undefined \
-	     -export-symbols-regex "(Pa|PaMacCore|PaJack|PaAlsa|PaAsio|PaOSS)_.*" \
+	     -export-symbols-regex "(Pa|PaMacCore|PaPulseAudio|PaJack|PaAlsa|PaAsio|PaOSS|PaWasapi|PaWasapiWinrt|PaWinMME)_.*" \
 	     -version-info $(LT_CURRENT):$(LT_REVISION):$(LT_AGE)
 
 COMMON_OBJS = \
@@ -66,7 +66,7 @@ LOOPBACK_OBJS = \
 	qa/loopback/src/test_audio_analyzer.o \
 	qa/loopback/src/write_wav.o \
 	qa/loopback/src/paqa.o
-	
+
 EXAMPLES = \
 	bin/pa_devs \
 	bin/pa_fuzz \
@@ -82,7 +82,7 @@ SELFTESTS = \
 	bin/paqa_devs \
 	bin/paqa_errs \
 	bin/paqa_latency
-	
+
 TESTS = \
 	bin/patest1 \
 	bin/patest_buffer \
@@ -142,10 +142,13 @@ SRC_DIRS = \
 	src/hostapi/alsa \
 	src/hostapi/asihpi \
 	src/hostapi/asio \
+	src/hostapi/audioio \
 	src/hostapi/coreaudio \
 	src/hostapi/dsound \
 	src/hostapi/jack \
+	src/hostapi/pulseaudio \
 	src/hostapi/oss \
+	src/hostapi/skeleton \
 	src/hostapi/wasapi \
 	src/hostapi/wdmks \
 	src/hostapi/wmme \
@@ -220,16 +223,16 @@ clean:
 distclean: clean
 	$(RM) config.log config.status Makefile libtool portaudio-2.0.pc
 
-%.o: %.c $(MAKEFILE) $(PAINC)
+%.o: %.c $(MAKEFILE) $(PAINC) lib-stamp
 	$(CC) -c $(CFLAGS) $< -o $@
 
-%.lo: %.c $(MAKEFILE) $(PAINC)
+%.lo: %.c $(MAKEFILE) $(PAINC) lib-stamp
 	$(LIBTOOL) --mode=compile $(CC) -c $(CFLAGS) $< -o $@
 
-%.lo: %.cpp $(MAKEFILE) $(PAINC)
+%.lo: %.cpp $(MAKEFILE) $(PAINC) lib-stamp
 	$(LIBTOOL) --mode=compile --tag=CXX $(CXX) -c $(CXXFLAGS) $< -o $@
 
-%.o: %.cpp $(MAKEFILE) $(PAINC)
+%.o: %.cpp $(MAKEFILE) $(PAINC) lib-stamp
 	$(CXX) -c $(CXXFLAGS) $< -o $@
 
 %.o: %.asm

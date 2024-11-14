@@ -22,8 +22,6 @@ void swim3_device::device_start()
 {
 	applefdintf_device::device_start();
 
-	m_irq_cb.resolve_safe();
-	m_drq_cb.resolve_safe();
 	m_timer = timer_alloc(FUNC(swim3_device::update), this);
 
 	save_item(NAME(m_mode));

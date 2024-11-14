@@ -44,6 +44,8 @@ Dumped: 06/04/2009 f205v
 #include "speaker.h"
 
 
+namespace {
+
 class murogmbl_state : public driver_device
 {
 public:
@@ -58,7 +60,7 @@ public:
 	void murogmbl(machine_config &config);
 
 protected:
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -70,7 +72,7 @@ private:
 	void murogmbl_palette(palette_device &palette) const;
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void murogmbl_map(address_map &map);
+	void murogmbl_map(address_map &map) ATTR_COLD;
 };
 
 class slotunbl_state : public driver_device
@@ -87,7 +89,7 @@ public:
 	void slotunbl(machine_config &config);
 
 protected:
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -99,7 +101,7 @@ private:
 	void slotunbl_palette(palette_device &palette) const;
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void slotunbl_map(address_map &map);
+	void slotunbl_map(address_map &map) ATTR_COLD;
 };
 
 void murogmbl_state::murogmbl_palette(palette_device &palette) const
@@ -418,6 +420,9 @@ ROM_START(slotunbl)
 	ROM_REGION( 0x0020, "proms", 0 )
 	ROM_LOAD( "74s288.a8",  0x0000, 0x0020, NO_DUMP )
 ROM_END
+
+} // anonymous namespace
+
 
 GAME( 1982, murogmbl,  murogem,   murogmbl, murogmbl, murogmbl_state, empty_init, ROT0, "bootleg?", "Muroge Monaco (bootleg?)", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
 

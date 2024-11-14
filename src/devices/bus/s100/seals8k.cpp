@@ -47,8 +47,8 @@ protected:
 	s100_8k_sc_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
 
 	// device-specific overrides
-	virtual ioport_constructor device_input_ports() const override;
-	virtual void device_start() override;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
+	virtual void device_start() override ATTR_COLD;
 
 	// S-100 memory access handlers
 	virtual u8 s100_smemr_r(offs_t offset) override;
@@ -164,8 +164,8 @@ void s100_8k_sc_device::device_start()
 
 bool s100_8k_sc_bb_device::nvram_read(util::read_stream &file)
 {
-	size_t actual;
-	return !file.read(m_ram.get(), 0x2000, actual) && actual == 0x2000;
+	auto const [err, actual] = read(file, m_ram.get(), 0x2000);
+	return !err && (actual == 0x2000);
 }
 
 
@@ -175,8 +175,8 @@ bool s100_8k_sc_bb_device::nvram_read(util::read_stream &file)
 
 bool s100_8k_sc_bb_device::nvram_write(util::write_stream &file)
 {
-	size_t actual;
-	return !file.write(m_ram.get(), 0x2000, actual) && actual == 0x2000;
+	auto const [err, actual] = write(file, m_ram.get(), 0x2000);
+	return !err;
 }
 
 

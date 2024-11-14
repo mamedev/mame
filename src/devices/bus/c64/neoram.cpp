@@ -76,6 +76,25 @@ uint8_t c64_neoram_cartridge_device::c64_cd_r(offs_t offset, uint8_t data, int s
 }
 
 
+void c64_neoram_cartridge_device::nvram_default()
+{
+}
+
+
+bool c64_neoram_cartridge_device::nvram_read(util::read_stream &file)
+{
+	auto const [err, actual] = read(file, m_nvram.get(), 0x200000);
+	return !err && (actual == 0x200000);
+}
+
+
+bool c64_neoram_cartridge_device::nvram_write(util::write_stream &file)
+{
+	auto const [err, actual] = write(file, m_nvram.get(), 0x200000);
+	return !err;
+}
+
+
 //-------------------------------------------------
 //  c64_cd_w - cartridge data write
 //-------------------------------------------------

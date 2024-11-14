@@ -775,6 +775,15 @@ void tumbleb_state::suprtrio_main_map(address_map &map)
 	map(0xe40000, 0xe40001).portr("SYSTEM");
 	map(0xe80002, 0xe80003).portr("DSW");
 	map(0xec0000, 0xec0001).w(FUNC(tumbleb_state::semicom_soundcmd_w));
+	map(0xee0001, 0xee0001).lw8(
+		NAME([this] (offs_t offset, u8 data) {
+			// writes here after bonus stages,
+			// expects bits 7-4 of SYSTEM port to read back same value.
+			// cfr. https://mametesters.org/view.php?id=7148
+			logerror("Write to prot latch %02x\n", data);
+			m_suprtrio_prot_latch = data & 0xf;
+		})
+	);
 	map(0xf00000, 0xf07fff).ram();
 }
 
@@ -846,7 +855,7 @@ void tumbleb_state::semicom_soundcmd_w(offs_t offset, uint16_t data, uint16_t me
 		m_soundlatch->write(data & 0xff);
 		// needed for Super Trio which reads the sound with polling
 		// m_maincpu->spin_until_time(attotime::from_usec(100));
-		machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(20));
+		machine().scheduler().perfect_quantum(attotime::from_usec(20));
 
 	}
 }
@@ -1103,6 +1112,11 @@ static INPUT_PORTS_START( metlsavr )
 	PORT_DIPSETTING(      0x0000, "80 Seconds" )
 INPUT_PORTS_END
 
+ioport_value tumbleb_state::suprtrio_prot_latch_r()
+{
+	return m_suprtrio_prot_latch;
+}
+
 static INPUT_PORTS_START( suprtrio )
 	PORT_START("PLAYERS")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1)
@@ -1124,7 +1138,8 @@ static INPUT_PORTS_START( suprtrio )
 
 	PORT_START("SYSTEM")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0xfffe, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x00f0, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(FUNC(tumbleb_state::suprtrio_prot_latch_r))
+	PORT_BIT( 0xff0e, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("DSW")   /* Dip switches */
 	PORT_DIPNAME( 0x0007, 0x0000, DEF_STR( Coin_A ) )       PORT_DIPLOCATION("SW:8,7,6")
@@ -2054,10 +2069,8 @@ static const gfx_layout tlayout =
 	RGN_FRAC(1,2),
 	4,
 	{ RGN_FRAC(1,2)+8, RGN_FRAC(1,2)+0, 8, 0 },
-	{ 32*8+0, 32*8+1, 32*8+2, 32*8+3, 32*8+4, 32*8+5, 32*8+6, 32*8+7,
-			0, 1, 2, 3, 4, 5, 6, 7 },
-	{ 0*16, 1*16, 2*16, 3*16, 4*16, 5*16, 6*16, 7*16,
-			8*16, 9*16, 10*16, 11*16, 12*16, 13*16, 14*16, 15*16 },
+	{ STEP8(16*8*2, 1), STEP8(0, 1) },
+	{ STEP16(0, 8*2) },
 	64*8
 };
 
@@ -2079,20 +2092,25 @@ static GFXDECODE_START( gfx_tumbleb )
 	GFXDECODE_ENTRY( "tilegfx", 0, tcharlayout, 256, 16 )  /* Characters 8x8 */
 	GFXDECODE_ENTRY( "tilegfx", 0, tlayout,     512, 16 )  /* Tiles 16x16 */
 	GFXDECODE_ENTRY( "tilegfx", 0, tlayout,     256, 16 )  /* Tiles 16x16 */
-	GFXDECODE_ENTRY( "sprgfx", 0, tlayout,       0, 16 )  /* Sprites 16x16 */
+GFXDECODE_END
+
+static GFXDECODE_START( gfx_tumbleb_spr )
+	GFXDECODE_ENTRY( "sprgfx", 0, tlayout, 0, 16 )  /* Sprites 16x16 */
 GFXDECODE_END
 
 static GFXDECODE_START( gfx_suprtrio )
 	GFXDECODE_ENTRY( "tilegfx", 0, tcharlayout,        256, 16 )   /* Characters 8x8 */
 	GFXDECODE_ENTRY( "tilegfx", 0, suprtrio_tlayout,   512, 16 )   /* Tiles 16x16 */
 	GFXDECODE_ENTRY( "tilegfx", 0, suprtrio_tlayout,   256, 16 )   /* Tiles 16x16 */
-	GFXDECODE_ENTRY( "sprgfx",  0, tlayout,            0, 16 )   /* Sprites 16x16 */
 GFXDECODE_END
 
 static GFXDECODE_START( gfx_fncywld )
 	GFXDECODE_ENTRY( "tilegfx", 0, tcharlayout, 0x400, 0x40 )  /* Characters 8x8 */
 	GFXDECODE_ENTRY( "tilegfx", 0, tlayout,     0x400, 0x40 )  /* Tiles 16x16 */
 	GFXDECODE_ENTRY( "tilegfx", 0, tlayout,     0x200, 0x40 )  /* Tiles 16x16 */
+GFXDECODE_END
+
+static GFXDECODE_START( gfx_fncywld_spr )
 	GFXDECODE_ENTRY( "sprgfx",  0, tlayout,     0x000, 0x40 )  /* Sprites 16x16 */
 GFXDECODE_END
 
@@ -2138,10 +2156,8 @@ void tumbleb_state::tumblepb(machine_config &config)
 	m_screen->set_screen_update(FUNC(tumbleb_state::screen_update_tumblepb));
 	m_screen->set_palette(m_palette);
 
-	DECO_SPRITE(config, m_sprgen, 0);
-	m_sprgen->set_gfx_region(3);
+	DECO_SPRITE(config, m_sprgen, 0, m_palette, gfx_tumbleb_spr);
 	m_sprgen->set_is_bootleg(true);
-	m_sprgen->set_gfxdecode_tag(m_gfxdecode);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_tumbleb);
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_444, 1024);
@@ -2179,10 +2195,8 @@ void tumbleb_state::tumbleb2(machine_config &config)
 	m_screen->set_screen_update(FUNC(tumbleb_state::screen_update_tumblepb));
 	m_screen->set_palette(m_palette);
 
-	DECO_SPRITE(config, m_sprgen, 0);
-	m_sprgen->set_gfx_region(3);
+	DECO_SPRITE(config, m_sprgen, 0, m_palette, gfx_tumbleb_spr);
 	m_sprgen->set_is_bootleg(true);
-	m_sprgen->set_gfxdecode_tag(m_gfxdecode);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_tumbleb);
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_444, 1024);
@@ -2237,10 +2251,8 @@ void tumbleb_state::jumpkids(machine_config &config) // OSCs: 12MHz, 8MHz & 14.3
 	m_screen->set_screen_update(FUNC(tumbleb_state::screen_update_jumpkids));
 	m_screen->set_palette(m_palette);
 
-	DECO_SPRITE(config, m_sprgen, 0);
-	m_sprgen->set_gfx_region(3);
+	DECO_SPRITE(config, m_sprgen, 0, m_palette, gfx_tumbleb_spr);
 	m_sprgen->set_is_bootleg(true);
-	m_sprgen->set_gfxdecode_tag(m_gfxdecode);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_tumbleb);
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_444, 1024);
@@ -2274,11 +2286,9 @@ void tumbleb_state::fncywld(machine_config &config) // OSCs: 12MHz, 4MHz & 28.63
 	m_screen->set_screen_update(FUNC(tumbleb_state::screen_update_fncywld));
 	m_screen->set_palette(m_palette);
 
-	DECO_SPRITE(config, m_sprgen, 0);
-	m_sprgen->set_gfx_region(3);
+	DECO_SPRITE(config, m_sprgen, 0, m_palette, gfx_fncywld_spr);
 	m_sprgen->set_is_bootleg(true);
 	m_sprgen->set_transpen(15);
-	m_sprgen->set_gfxdecode_tag(m_gfxdecode);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_fncywld);
 	PALETTE(config, m_palette).set_format(palette_device::xRGB_444, 0x800);
@@ -2312,11 +2322,9 @@ void tumbleb_state::magipur(machine_config &config) // OSCs: 12MHz, 4MHz, 28.636
 	m_screen->set_screen_update(FUNC(tumbleb_state::screen_update_fncywld));
 	m_screen->set_palette(m_palette);
 
-	DECO_SPRITE(config, m_sprgen, 0);
-	m_sprgen->set_gfx_region(3);
+	DECO_SPRITE(config, m_sprgen, 0, m_palette, gfx_fncywld_spr);
 	m_sprgen->set_is_bootleg(true);
 	m_sprgen->set_transpen(15);
-	m_sprgen->set_gfxdecode_tag(m_gfxdecode);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_fncywld);
 	PALETTE(config, m_palette).set_format(palette_device::xRGB_444, 0x800);
@@ -2369,10 +2377,8 @@ void tumbleb_state::htchctch(machine_config &config) // OSCs: 15MHz, 4.096MHz
 	m_screen->set_screen_update(FUNC(tumbleb_state::screen_update_semicom));
 	m_screen->set_palette(m_palette);
 
-	DECO_SPRITE(config, m_sprgen, 0);
-	m_sprgen->set_gfx_region(3);
+	DECO_SPRITE(config, m_sprgen, 0, m_palette, gfx_tumbleb_spr);
 	m_sprgen->set_is_bootleg(true);
-	m_sprgen->set_gfxdecode_tag(m_gfxdecode);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_tumbleb);
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 1024);
@@ -2475,17 +2481,19 @@ void tumbleb_state::suprtrio(machine_config &config) // OSCs: 14MHz, 12MHz & 8MH
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_refresh_hz(60);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(529));
-	m_screen->set_size(40*8, 32*8);
-	m_screen->set_visarea(0*8, 40*8-1, 1*8-1, 31*8-2);
+//  m_screen->set_refresh_hz(60);
+//  m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(529));
+//  m_screen->set_size(40*8, 32*8);
+//  m_screen->set_visarea(0*8, 40*8-1, 1*8-1, 31*8-2);
+	// not measured, assume same as tumblep for now.
+	// Game has a very dull irq routine to stay at the mercy of set_vblank_time,
+	// reportedly happens to randomly crash at stage 3 boss + be laggy on later levels otherwise.
+	m_screen->set_raw(XTAL(14'000'000) / 2, 442, 0, 320, 274, 8, 248);
 	m_screen->set_screen_update(FUNC(tumbleb_state::screen_update_suprtrio));
 	m_screen->set_palette("palette");
 
-	DECO_SPRITE(config, m_sprgen, 0);
-	m_sprgen->set_gfx_region(3);
+	DECO_SPRITE(config, m_sprgen, 0, m_palette, gfx_tumbleb_spr);
 	m_sprgen->set_is_bootleg(true);
-	m_sprgen->set_gfxdecode_tag(m_gfxdecode);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_suprtrio);
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 1024);
@@ -2520,10 +2528,8 @@ void tumbleb_state::pangpang(machine_config &config) // OSCs: 14MHz, 12MHz & 8MH
 	m_screen->set_screen_update(FUNC(tumbleb_state::screen_update_pangpang));
 	m_screen->set_palette(m_palette);
 
-	DECO_SPRITE(config, m_sprgen, 0);
-	m_sprgen->set_gfx_region(3);
+	DECO_SPRITE(config, m_sprgen, 0, m_palette, gfx_tumbleb_spr);
 	m_sprgen->set_is_bootleg(true);
-	m_sprgen->set_gfxdecode_tag(m_gfxdecode);
 
 	GFXDECODE(config, m_gfxdecode, "palette", gfx_tumbleb);
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_444, 1024);

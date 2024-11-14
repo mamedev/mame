@@ -18,6 +18,9 @@
 #include "video/mc6845.h"
 #include "bus/rs232/rs232.h"
 
+
+namespace {
+
 class pwrview_state : public driver_device
 {
 public:
@@ -37,8 +40,8 @@ public:
 	void pwrview(machine_config &config);
 
 private:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	TIMER_CALLBACK_MEMBER(update_tmr0);
 	TIMER_CALLBACK_MEMBER(update_kbd);
@@ -68,10 +71,10 @@ private:
 	u8 err_r();
 	MC6845_UPDATE_ROW(update_row);
 
-	void bios_bank(address_map &map);
-	void pwrview_fetch_map(address_map &map);
-	void pwrview_io(address_map &map);
-	void pwrview_map(address_map &map);
+	void bios_bank(address_map &map) ATTR_COLD;
+	void pwrview_fetch_map(address_map &map) ATTR_COLD;
+	void pwrview_io(address_map &map) ATTR_COLD;
+	void pwrview_map(address_map &map) ATTR_COLD;
 
 	required_device<i80186_cpu_device> m_maincpu;
 	required_device<pit8253_device> m_pit;
@@ -552,5 +555,8 @@ ROM_START(pwrview)
 	ROMX_LOAD("215856-003.bin", 0x0000, 0x4000, CRC(1fa2cd11) SHA1(b4755c7d5200a423a750ecf71c0aed33e364138b), ROM_SKIP(1) | ROM_BIOS(0))
 	ROMX_LOAD("215856-004.bin", 0x0001, 0x4000, CRC(4fd01e0a) SHA1(c4d1d40d4e8e529c03857f4a3c8428ccf6b8ff99), ROM_SKIP(1) | ROM_BIOS(0))
 ROM_END
+
+} // anonymous namespace
+
 
 COMP(1984, pwrview, 0, 0, pwrview, 0, pwrview_state, empty_init, "Compugraphic", "MCS PowerView 10", MACHINE_NOT_WORKING)

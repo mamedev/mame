@@ -259,14 +259,6 @@ void sorcerer_state::port34_w(u8 data)
 }
 
 // ************ DIGITRIO DMA **************
-void sorcerer_state::busreq_w(bool state)
-{
-// since our Z80 has no support for BUSACK, we assume it is granted immediately
-	m_maincpu->set_input_line(Z80_INPUT_LINE_BUSRQ, state);
-	m_maincpu->set_input_line(INPUT_LINE_HALT, state);
-	m_dma->bai_w(state); // tell dma that bus has been granted
-}
-
 u8 sorcerer_state::memory_read_byte(offs_t offset)
 {
 	address_space& prog_space = m_maincpu->space(AS_PROGRAM);
@@ -533,15 +525,15 @@ QUICKLOAD_LOAD_MEMBER(sorcerer_state::quickload_cb)
 		u16 execute_address, start_address, end_address;
 
 		// load the binary into memory
-		if (z80bin_load_file(image, space, execute_address, start_address, end_address) != image_init_result::PASS)
-			return image_init_result::FAIL;
+		auto err = z80bin_load_file(image, space, execute_address, start_address, end_address);
+		if (err.first)
+			return err;
 
 		// is this file executable?
 		if (execute_address != 0xffff)
 		{
-
 			if ((execute_address >= 0xc000) && (execute_address <= 0xdfff) && (space.read_byte(0xdffa) != 0xc3))
-				return image_init_result::FAIL;     // can't run a program if the cartridge isn't in
+				return std::make_pair(image_error::UNSUPPORTED, std::string()); // can't run a program if the cartridge isn't in
 
 			/* Since Exidy Basic is by Microsoft, it needs some preprocessing before it can be run.
 			1. A start address of 01D5 indicates a basic program which needs its pointers fixed up.
@@ -587,11 +579,7 @@ QUICKLOAD_LOAD_MEMBER(sorcerer_state::quickload_cb)
 		// SNP extension
 		// check size
 		if (image.length() != 0x1001c)
-		{
-			image.seterror(image_error::INVALIDIMAGE, "Snapshot must be 65564 bytes");
-			image.message("Snapshot must be 65564 bytes");
-			return image_init_result::FAIL;
-		}
+			return std::make_pair(image_error::INVALIDLENGTH, "Snapshot must be 65564 bytes");
 
 		/* get the header */
 		u8 header[28];
@@ -651,6 +639,6 @@ QUICKLOAD_LOAD_MEMBER(sorcerer_state::quickload_cb)
 			m_maincpu->set_pc(0xe000);  // SNP destroys workspace, so do cold start.
 	}
 
-	return image_init_result::PASS;
+	return std::make_pair(std::error_condition(), std::string());
 }
 

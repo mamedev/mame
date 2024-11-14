@@ -39,14 +39,14 @@ public:
 	virtual void bk32_w(int state) override;
 
 protected:
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual void device_start() override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual void device_start() override ATTR_COLD;
 
 private:
 	// from slots
-	WRITE_LINE_MEMBER( int_w );
-	WRITE_LINE_MEMBER( romdis_w );
-	WRITE_LINE_MEMBER( ramdis_w );
+	void int_w(int state);
+	void romdis_w(int state);
+	void ramdis_w(int state);
 
 	required_device<svi_slot_bus_device> m_slotbus;
 };

@@ -15,6 +15,9 @@
 #include "nes_vt369_vtunknown_soc.h"
 #include "nes_vt32_soc.h"
 
+
+namespace {
+
 class nes_vt32_base_state : public driver_device
 {
 public:
@@ -28,14 +31,14 @@ public:
 	{ }
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	virtual uint8_t in0_r();
 	virtual uint8_t in1_r();
 	virtual void in0_w(uint8_t data);
 
-	void nes_vt32_map(address_map& map);
+	void nes_vt32_map(address_map &map) ATTR_COLD;
 
 	optional_ioport m_io0;
 	optional_ioport m_io1;
@@ -56,7 +59,7 @@ protected:
 	required_region_ptr<uint8_t> m_prgrom;
 
 	uint8_t vt_rom_r(offs_t offset);
-	void vtspace_w(offs_t offset, uint8_t data);
+	[[maybe_unused]] void vtspace_w(offs_t offset, uint8_t data);
 
 	void configure_soc(nes_vt02_vt03_soc_device* soc);
 
@@ -77,7 +80,7 @@ public:
 		m_soc(*this, "soc")
 	{ }
 
-	void vt_external_space_map_32mbyte(address_map& map);
+	void vt_external_space_map_32mbyte(address_map &map) ATTR_COLD;
 
 protected:
 	required_device<nes_vt02_vt03_soc_device> m_soc;
@@ -98,7 +101,7 @@ public:
 
 private:
 	uint8_t vt_rom_banked_r(offs_t offset);
-	void vt_external_space_map_fp_2x32mbyte(address_map& map);
+	void vt_external_space_map_fp_2x32mbyte(address_map &map) ATTR_COLD;
 
 	uint8_t fcpocket_412d_r();
 	void fcpocket_412c_w(uint8_t data);
@@ -362,6 +365,8 @@ ROM_START( fcpocket )
 	ROM_REGION( 0x8000000, "mainrom", 0 )
 	ROM_LOAD( "s29gl01gp.bin", 0x00000, 0x8000000, CRC(8703b18a) SHA1(07943443294e80ca93f83181c8bdbf950b87c52f) ) // 2nd half = 0x00 (so 64MByte of content)
 ROM_END
+
+} // anonymous namespace
 
 
 CONS( 2015, dgun2573,  0,         0,  nes_vt32_32mb,     nes_vt32, nes_vt32_unk_state, empty_init, "dreamGEAR", "My Arcade Gamer V Portable Gaming System (DGUN-2573) (set 1, newer)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )

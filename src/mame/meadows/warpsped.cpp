@@ -91,6 +91,9 @@ L10, L15, L18 and G18 all read the same
 #include "screen.h"
 #include "tilemap.h"
 
+
+namespace {
+
 class warpspeed_state : public driver_device
 {
 public:
@@ -121,13 +124,13 @@ private:
 	TILE_GET_INFO_MEMBER(get_text_tile_info);
 	TILE_GET_INFO_MEMBER(get_starfield_tile_info);
 
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 	void warpsped_palette(palette_device &palette) const;
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_circles(bitmap_ind16 &bitmap);
-	void warpspeed_io_map(address_map &map);
-	void warpspeed_map(address_map &map);
+	void warpspeed_io_map(address_map &map) ATTR_COLD;
+	void warpspeed_map(address_map &map) ATTR_COLD;
 };
 
 void warpspeed_state::hardware_w(offs_t offset, uint8_t data)
@@ -378,6 +381,8 @@ ROM_START( warpsped )
 	ROM_LOAD( "k1.k1",  0x0000, 0x0200, CRC(76b10d47) SHA1(e644a50df06535fe1fbfb8754cfc7b4a49fcb05e) )
 
 ROM_END
+
+} // anonymous namespace
 
 
 GAME( 1979?, warpsped,  0,      warpspeed, warpspeed, warpspeed_state, empty_init, ROT0, "Meadows Games, Inc.", "Warp Speed (prototype)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_COLORS | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE ) // year not shown, 1979 is according to date stamps on PCB chips.

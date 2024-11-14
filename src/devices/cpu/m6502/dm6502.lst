@@ -1,6 +1,6 @@
 # license:BSD-3-Clause
 # copyright-holders:Olivier Galibert
-# m6502_family_device - 6502, 6504
+# m6502_family_device - 6502, 6503, 6504, 6507
 brk_imp     ora_idx     kil_non     slo_idx     nop_zpg     ora_zpg     asl_zpg     slo_zpg     php_imp     ora_imm     asl_acc     anc_imm     nop_aba     ora_aba     asl_aba     slo_aba
 bpl_rel     ora_idy     kil_non     slo_idy     nop_zpx     ora_zpx     asl_zpx     slo_zpx     clc_imp     ora_aby     nop_imp     slo_aby     nop_abx     ora_abx     asl_abx     slo_abx
 jsr_adr     and_idx     kil_non     rla_idx     bit_zpg     and_zpg     rol_zpg     rla_zpg     plp_imp     and_imm     rol_acc     anc_imm     bit_aba     and_aba     rol_aba     rla_aba

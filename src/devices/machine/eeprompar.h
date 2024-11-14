@@ -22,8 +22,8 @@ protected:
 	eeprom_parallel_base_device(const machine_config &mconfig, device_type devtype, const char *tag, device_t *owner);
 
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 };
 
 class eeprom_parallel_28xx_device : public eeprom_parallel_base_device
@@ -37,7 +37,7 @@ public:
 	uint8_t read(address_space &space, offs_t offset);
 
 	// control lines
-	DECLARE_WRITE_LINE_MEMBER(oe_w);
+	void oe_w(int state);
 	void unlock_write8(uint8_t data);
 	void unlock_write16(uint16_t data);
 	void unlock_write32(uint32_t data);
@@ -47,8 +47,8 @@ protected:
 	eeprom_parallel_28xx_device(const machine_config &mconfig, device_type devtype, const char *tag, device_t *owner);
 
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 private:
 	// configuration state

@@ -30,8 +30,8 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 	// device_vip_expansion_card_interface overrides
 	virtual uint8_t vip_program_r(offs_t offset, int cs, int cdef, int *minh) override;
@@ -52,23 +52,23 @@ protected:
 private:
 	static constexpr unsigned MAX_SLOTS = 5;
 
-	DECLARE_WRITE_LINE_MEMBER( exp1_int_w ) { m_int[0] = state; update_interrupts(); }
-	DECLARE_WRITE_LINE_MEMBER( exp2_int_w ) { m_int[1] = state; update_interrupts(); }
-	DECLARE_WRITE_LINE_MEMBER( exp3_int_w ) { m_int[2] = state; update_interrupts(); }
-	DECLARE_WRITE_LINE_MEMBER( exp4_int_w ) { m_int[3] = state; update_interrupts(); }
-	DECLARE_WRITE_LINE_MEMBER( exp5_int_w ) { m_int[4] = state; update_interrupts(); }
+	void exp1_int_w(int state) { m_int[0] = state; update_interrupts(); }
+	void exp2_int_w(int state) { m_int[1] = state; update_interrupts(); }
+	void exp3_int_w(int state) { m_int[2] = state; update_interrupts(); }
+	void exp4_int_w(int state) { m_int[3] = state; update_interrupts(); }
+	void exp5_int_w(int state) { m_int[4] = state; update_interrupts(); }
 
-	DECLARE_WRITE_LINE_MEMBER( exp1_dma_out_w ) { m_dma_out[0] = state; update_interrupts(); }
-	DECLARE_WRITE_LINE_MEMBER( exp2_dma_out_w ) { m_dma_out[1] = state; update_interrupts(); }
-	DECLARE_WRITE_LINE_MEMBER( exp3_dma_out_w ) { m_dma_out[2] = state; update_interrupts(); }
-	DECLARE_WRITE_LINE_MEMBER( exp4_dma_out_w ) { m_dma_out[3] = state; update_interrupts(); }
-	DECLARE_WRITE_LINE_MEMBER( exp5_dma_out_w ) { m_dma_out[4] = state; update_interrupts(); }
+	void exp1_dma_out_w(int state) { m_dma_out[0] = state; update_interrupts(); }
+	void exp2_dma_out_w(int state) { m_dma_out[1] = state; update_interrupts(); }
+	void exp3_dma_out_w(int state) { m_dma_out[2] = state; update_interrupts(); }
+	void exp4_dma_out_w(int state) { m_dma_out[3] = state; update_interrupts(); }
+	void exp5_dma_out_w(int state) { m_dma_out[4] = state; update_interrupts(); }
 
-	DECLARE_WRITE_LINE_MEMBER( exp1_dma_in_w ) { m_dma_in[0] = state; update_interrupts(); }
-	DECLARE_WRITE_LINE_MEMBER( exp2_dma_in_w ) { m_dma_in[1] = state; update_interrupts(); }
-	DECLARE_WRITE_LINE_MEMBER( exp3_dma_in_w ) { m_dma_in[2] = state; update_interrupts(); }
-	DECLARE_WRITE_LINE_MEMBER( exp4_dma_in_w ) { m_dma_in[3] = state; update_interrupts(); }
-	DECLARE_WRITE_LINE_MEMBER( exp5_dma_in_w ) { m_dma_in[4] = state; update_interrupts(); }
+	void exp1_dma_in_w(int state) { m_dma_in[0] = state; update_interrupts(); }
+	void exp2_dma_in_w(int state) { m_dma_in[1] = state; update_interrupts(); }
+	void exp3_dma_in_w(int state) { m_dma_in[2] = state; update_interrupts(); }
+	void exp4_dma_in_w(int state) { m_dma_in[3] = state; update_interrupts(); }
+	void exp5_dma_in_w(int state) { m_dma_in[4] = state; update_interrupts(); }
 
 	void update_interrupts();
 

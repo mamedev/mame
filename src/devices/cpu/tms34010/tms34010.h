@@ -255,14 +255,13 @@ protected:
 	tms340x0_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, address_map_constructor internal_regs_map, bool is_34020);
 
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 	virtual void device_post_load() override;
 
 	// device_execute_interface overrides
 	virtual uint32_t execute_min_cycles() const noexcept override { return 1; }
 	virtual uint32_t execute_max_cycles() const noexcept override { return 10000; }
-	virtual uint32_t execute_input_lines() const noexcept override { return 2; }
 	virtual void execute_run() override;
 	virtual void execute_set_input(int inputnum, int state) override;
 
@@ -966,12 +965,12 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 	virtual uint64_t execute_clocks_to_cycles(uint64_t clocks) const noexcept override { return (clocks + 8 - 1) / 8; }
 	virtual uint64_t execute_cycles_to_clocks(uint64_t cycles) const noexcept override { return (cycles * 8); }
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
-	void internal_regs_map(address_map &map);
+	void internal_regs_map(address_map &map) ATTR_COLD;
 
 	virtual uint16_t ROPCODE() override;
 	virtual void execute_op(uint16_t op) override;
@@ -1006,12 +1005,12 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 	virtual uint64_t execute_clocks_to_cycles(uint64_t clocks) const noexcept override { return (clocks + 4 - 1) / 4; }
 	virtual uint64_t execute_cycles_to_clocks(uint64_t cycles) const noexcept override { return (cycles * 4); }
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
-	void internal_regs_map(address_map &map);
+	void internal_regs_map(address_map &map) ATTR_COLD;
 
 	virtual uint16_t ROPCODE() override;
 	virtual void execute_op(uint16_t op) override;

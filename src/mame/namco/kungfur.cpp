@@ -90,8 +90,8 @@ public:
 	void kungfur(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	// devices/pointers
@@ -103,7 +103,7 @@ private:
 	output_finder<8> m_lamps;
 
 	// address maps
-	void main_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
 
 	// I/O handlers
 	INTERRUPT_GEN_MEMBER(interrupt);
@@ -111,7 +111,7 @@ private:
 	void control_w(u8 data);
 	template<int N> void digit_data_w(u8 data) { m_digit_data[N] = data; }
 	template<int N> void adpcm_data_w(u8 data) { m_adpcm_data[N] = data; }
-	template<int N> DECLARE_WRITE_LINE_MEMBER(adpcm_int);
+	template<int N> void adpcm_int(int state);
 
 	u8 m_control = 0;
 	u8 m_digit_data[3] = { 0, 0, 0 };
@@ -207,7 +207,7 @@ void kungfur_state::control_w(u8 data)
 }
 
 template<int N>
-WRITE_LINE_MEMBER(kungfur_state::adpcm_int)
+void kungfur_state::adpcm_int(int state)
 {
 	if (!state)
 		return;

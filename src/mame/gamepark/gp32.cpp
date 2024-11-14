@@ -35,12 +35,10 @@
 #include "gp32.h"
 
 #include "cpu/arm7/arm7.h"
-#include "cpu/arm7/arm7core.h"
 
 #include "softlist_dev.h"
 #include "speaker.h"
 
-#define LOG_GENERAL   (1U << 0)
 #define LOG_STARTSTOP (1U << 1)
 #define LOG_TIMER     (1U << 2)
 #define LOG_VRAM      (1U << 3)
@@ -269,7 +267,7 @@ TIMER_CALLBACK_MEMBER(gp32_state::s3c240x_lcd_timer_exp)
 			case BPPMODE_TFT_04 : s3c240x_lcd_render_04(); break;
 			case BPPMODE_TFT_08 : s3c240x_lcd_render_08(); break;
 			case BPPMODE_TFT_16 : s3c240x_lcd_render_16(); break;
-			default : LOGMASKED(LOG_GENERAL, "s3c240x_lcd_timer_exp: bppmode %d not supported\n", m_s3c240x_lcd.bppmode); break;
+			default : LOG("s3c240x_lcd_timer_exp: bppmode %d not supported\n", m_s3c240x_lcd.bppmode); break;
 		}
 		if ((m_s3c240x_lcd.vpos == 0) && (m_s3c240x_lcd.hpos == 0)) break;
 	}
@@ -392,7 +390,7 @@ void gp32_state::s3c240x_lcd_palette_w(offs_t offset, uint32_t data, uint32_t me
 	COMBINE_DATA(&m_s3c240x_lcd_palette[offset]);
 	if (mem_mask != 0xffffffff)
 	{
-		LOGMASKED(LOG_GENERAL, "s3c240x_lcd_palette_w: unknown mask %08x\n", mem_mask);
+		LOG("s3c240x_lcd_palette_w: unknown mask %08x\n", mem_mask);
 	}
 	m_palette->set_pen_color( offset, s3c240x_get_color_5551( data & 0xFFFF));
 }
@@ -472,11 +470,11 @@ void gp32_state::s3c240x_check_pending_irq()
 		}
 		m_s3c240x_irq_regs[4] |= (1 << int_type); // INTPND
 		m_s3c240x_irq_regs[5] = int_type; // INTOFFSET
-		m_maincpu->set_input_line(ARM7_IRQ_LINE, ASSERT_LINE);
+		m_maincpu->set_input_line(arm7_cpu_device::ARM7_IRQ_LINE, ASSERT_LINE);
 	}
 	else
 	{
-		m_maincpu->set_input_line(ARM7_IRQ_LINE, CLEAR_LINE);
+		m_maincpu->set_input_line(arm7_cpu_device::ARM7_IRQ_LINE, CLEAR_LINE);
 	}
 }
 
@@ -488,7 +486,7 @@ void gp32_state::s3c240x_request_irq(uint32_t int_type)
 		m_s3c240x_irq_regs[0] |= (1 << int_type); // SRCPND
 		m_s3c240x_irq_regs[4] |= (1 << int_type); // INTPND
 		m_s3c240x_irq_regs[5] = int_type; // INTOFFSET
-		m_maincpu->set_input_line(ARM7_IRQ_LINE, ASSERT_LINE);
+		m_maincpu->set_input_line(arm7_cpu_device::ARM7_IRQ_LINE, ASSERT_LINE);
 	}
 	else
 	{

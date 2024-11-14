@@ -122,11 +122,6 @@ mb88303_device::mb88303_device(const machine_config &mconfig, const char *tag, d
 
 void mb88303_device::device_start()
 {
-	// resolve callbacks
-	m_write_vow.resolve_safe();
-	m_write_vobn.resolve_safe();
-	m_write_do.resolve_safe();
-
 	// register for state saving
 	save_item(NAME(m_display_mem));
 	save_item(NAME(m_horiz_display_pos));

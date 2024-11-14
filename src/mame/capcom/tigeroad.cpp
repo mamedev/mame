@@ -20,6 +20,9 @@ TODO:
   010C70: 4E90           jsr     (A0)               ; throws address error here
   None of the available 5 vectors seems to fit here, btanb?
 
+BTANB:
+- race track fg tiles have priority over minimap in f1dream
+
 **************************************************************************
 
 Memory Overview:
@@ -634,7 +637,7 @@ void tigeroad_state::tigeroad(machine_config &config)
 
 	// Timings may be different, driver originally had 60.08Hz vblank.
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_raw(6000000, 384, 128, 0, 262, 22, 246); // hsync is 50..77, vsync is 257..259
+	screen.set_raw(XTAL(24'000'000)/4, 384, 128, 0, 262, 22, 246); // hsync is 50..77, vsync is 257..259
 	screen.set_screen_update(FUNC(tigeroad_state::screen_update));
 	screen.screen_vblank().set("spriteram", FUNC(buffered_spriteram16_device::vblank_copy_rising));
 	screen.set_palette(m_palette);
@@ -672,7 +675,7 @@ void f1dream_state::f1dream(machine_config &config)
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &f1dream_state::f1dream_map);
 
-	I8751(config, m_mcu, XTAL(10'000'000)); // ???
+	I8751(config, m_mcu, XTAL(10'000'000)); // 8MHz rated chip, 24.0000MHz/3???
 	m_mcu->set_addrmap(AS_IO, &f1dream_state::f1dream_mcu_io);
 	m_mcu->port_out_cb<1>().set("soundlatch", FUNC(generic_latch_8_device::write));
 	m_mcu->port_out_cb<3>().set(FUNC(f1dream_state::out3_w));
@@ -685,7 +688,7 @@ void tigeroad_state::toramich(machine_config &config)
 
 	// basic machine hardware
 
-	z80_device &sample(Z80(config, "sample", 3579545)); // ?
+	z80_device &sample(Z80(config, "sample", XTAL(3'579'545)));
 	sample.set_addrmap(AS_PROGRAM, &tigeroad_state::sample_map);
 	sample.set_addrmap(AS_IO, &tigeroad_state::sample_port_map);
 	sample.set_periodic_int(FUNC(tigeroad_state::irq0_line_hold), attotime::from_hz(4000));  // ?
@@ -696,14 +699,14 @@ void tigeroad_state::toramich(machine_config &config)
 	m_msm->add_route(ALL_OUTPUTS, "mono", 1.0);
 }
 
-void tigeroad_state::f1dream_comad(machine_config &config)
+void tigeroad_state::f1dream_comad(machine_config &config) // COMAD-01 PCB with 24.0000MHz, 10.0000MHz & 8.0000MHz OSCs
 {
 	// basic machine hardware
-	M68000(config, m_maincpu, 8000000);
+	M68000(config, m_maincpu, XTAL(10'000'000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &tigeroad_state::main_map);
 	m_maincpu->set_vblank_int("screen", FUNC(tigeroad_state::irq2_line_hold));
 
-	Z80(config, m_audiocpu, 4000000);
+	Z80(config, m_audiocpu, XTAL(8'000'000)/2); // 4MHz
 	m_audiocpu->set_addrmap(AS_PROGRAM, &tigeroad_state::comad_sound_map);
 	m_audiocpu->set_addrmap(AS_IO, &tigeroad_state::comad_sound_io_map);
 
@@ -713,7 +716,7 @@ void tigeroad_state::f1dream_comad(machine_config &config)
 	BUFFERED_SPRITERAM16(config, "spriteram");
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_raw(6000000, 384, 128, 0, 262, 22, 246); // hsync is 50..77, vsync is 257..259
+	screen.set_raw(XTAL(24'000'000)/4, 384, 128, 0, 262, 22, 246); // hsync is 50..77, vsync is 257..259
 	screen.set_screen_update(FUNC(tigeroad_state::screen_update));
 	screen.screen_vblank().set("spriteram", FUNC(buffered_spriteram16_device::vblank_copy_rising));
 	screen.set_palette(m_palette);
@@ -731,11 +734,11 @@ void tigeroad_state::f1dream_comad(machine_config &config)
 
 	GENERIC_LATCH_8(config, "soundlatch");
 
-	ym2203_device &ym1(YM2203(config, "ym1", 2000000));
+	ym2203_device &ym1(YM2203(config, "ym1", XTAL(8'000'000)/4)); // 2MHz
 	ym1.irq_handler().set_inputline("audiocpu", 0);
 	ym1.add_route(ALL_OUTPUTS, "mono", 0.40);
 
-	ym2203_device &ym2(YM2203(config, "ym2", 2000000));
+	ym2203_device &ym2(YM2203(config, "ym2", XTAL(8'000'000)/4)); // 2MHz
 	ym2.add_route(ALL_OUTPUTS, "mono", 0.40);
 }
 
@@ -750,12 +753,15 @@ void pushman_state::machine_start()
 	save_item(NAME(m_mcu_latch_ctl));
 }
 
-void pushman_state::pushman(machine_config &config)
+void pushman_state::pushman(machine_config &config) // all clocks measured on PCB
 {
 	f1dream_comad(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &pushman_state::pushman_map);
+	m_maincpu->set_clock(XTAL(8'000'000));
 
-	M68705R3(config, m_mcu, 4000000);    // No idea
+	m_audiocpu->set_clock(XTAL(10'000'000) / 2);
+
+	M68705R3(config, m_mcu, XTAL(8'000'000) / 2);
 	m_mcu->porta_w().set(FUNC(pushman_state::mcu_pa_w));
 	m_mcu->portb_w().set(FUNC(pushman_state::mcu_pb_w));
 	m_mcu->portc_w().set(FUNC(pushman_state::mcu_pc_w));
@@ -806,8 +812,8 @@ ROM_START( tigeroad ) // N86614A-5 + N86614B-6 board combo - ECT program roms
 	ROM_LOAD32_BYTE( "tr-11a.3d", 0x00001, 0x20000, CRC(cd9152e5) SHA1(6df3c43c0c41289890296c2b2aeca915dfdae3b0) )
 	ROM_LOAD32_BYTE( "tr-12a.2d", 0x00000, 0x20000, CRC(7d8a99d0) SHA1(af8221cfd2ce9aa3bf296981fb7fddd1e9ef4599) )
 
-	ROM_REGION( 0x08000, "bgmap", 0 )
-	ROM_LOAD( "tr_13.7l", 0x0000, 0x8000, CRC(a79be1eb) SHA1(4191ccd48f7650930f9a4c2be0790239d7420bb1) )
+	ROM_REGION16_LE( 0x08000, "bgmap", 0 )
+	ROM_LOAD16_WORD( "tr_13.7l", 0x0000, 0x8000, CRC(a79be1eb) SHA1(4191ccd48f7650930f9a4c2be0790239d7420bb1) )
 
 	ROM_REGION( 0x0100, "proms", 0 )
 	ROM_LOAD( "tr.9e", 0x0000, 0x0100, CRC(ec80ae36) SHA1(397ec8fc1b106c8b8d4bf6798aa429e8768a101a) )    // priority (not used) - N82S129A or compatible
@@ -844,8 +850,8 @@ ROM_START( tigeroadu ) // N86614A-5 + N86614B-6 board combo - US ROMSTAR program
 	ROM_LOAD32_BYTE( "tr-11a.3d", 0x00001, 0x20000, CRC(cd9152e5) SHA1(6df3c43c0c41289890296c2b2aeca915dfdae3b0) )
 	ROM_LOAD32_BYTE( "tr-12a.2d", 0x00000, 0x20000, CRC(7d8a99d0) SHA1(af8221cfd2ce9aa3bf296981fb7fddd1e9ef4599) )
 
-	ROM_REGION( 0x08000, "bgmap", 0 )
-	ROM_LOAD( "tr_13.7l", 0x0000, 0x8000, CRC(a79be1eb) SHA1(4191ccd48f7650930f9a4c2be0790239d7420bb1) )
+	ROM_REGION16_LE( 0x08000, "bgmap", 0 )
+	ROM_LOAD16_WORD( "tr_13.7l", 0x0000, 0x8000, CRC(a79be1eb) SHA1(4191ccd48f7650930f9a4c2be0790239d7420bb1) )
 
 	ROM_REGION( 0x0100, "proms", 0 )
 	ROM_LOAD( "tr.9e", 0x0000, 0x0100, CRC(ec80ae36) SHA1(397ec8fc1b106c8b8d4bf6798aa429e8768a101a) )    // priority (not used) - N82S129A or compatible
@@ -883,8 +889,8 @@ ROM_START( toramich ) // N86614A-5 + N86614B-6 board combo
 	ROM_LOAD32_BYTE( "tr-11a.3d", 0x00001, 0x20000, CRC(cd9152e5) SHA1(6df3c43c0c41289890296c2b2aeca915dfdae3b0) )
 	ROM_LOAD32_BYTE( "tr-12a.2d", 0x00000, 0x20000, CRC(7d8a99d0) SHA1(af8221cfd2ce9aa3bf296981fb7fddd1e9ef4599) )
 
-	ROM_REGION( 0x08000, "bgmap", 0 )
-	ROM_LOAD( "tr_13.7l", 0x0000, 0x8000, CRC(a79be1eb) SHA1(4191ccd48f7650930f9a4c2be0790239d7420bb1) )
+	ROM_REGION16_LE( 0x08000, "bgmap", 0 )
+	ROM_LOAD16_WORD( "tr_13.7l", 0x0000, 0x8000, CRC(a79be1eb) SHA1(4191ccd48f7650930f9a4c2be0790239d7420bb1) )
 
 	ROM_REGION( 0x0100, "proms", 0 )
 	ROM_LOAD( "tr.9e", 0x0000, 0x0100, CRC(ec80ae36) SHA1(397ec8fc1b106c8b8d4bf6798aa429e8768a101a) )    // priority (not used) - N82S129A or compatible
@@ -1022,8 +1028,8 @@ ROM_START( tigeroadb )
 	ROM_LOAD32_BYTE( "gfx.ic2",  0x40002, 0x10000, CRC(a0b4615c) SHA1(f9df393c1f4a7b88fbc4c870da1819f36f29e111) )
 	ROM_LOAD32_BYTE( "gfx.ic3",  0x40003, 0x10000, CRC(f956392e) SHA1(e0da0c353067e32fc6015e84b00070a7c7fa1de9) )
 
-	ROM_REGION( 0x08000, "bgmap", 0 )
-	ROM_LOAD( "gfx.ic175", 0x0000, 0x8000, CRC(a79be1eb) SHA1(4191ccd48f7650930f9a4c2be0790239d7420bb1) )
+	ROM_REGION16_LE( 0x08000, "bgmap", 0 )
+	ROM_LOAD16_WORD( "gfx.ic175", 0x0000, 0x8000, CRC(a79be1eb) SHA1(4191ccd48f7650930f9a4c2be0790239d7420bb1) )
 
 	ROM_REGION( 0x0100, "proms", 0 )
 	ROM_LOAD( "82s129.ic74", 0x0000, 0x0100, CRC(ec80ae36) SHA1(397ec8fc1b106c8b8d4bf6798aa429e8768a101a) )    // priority (not used)
@@ -1057,8 +1063,8 @@ ROM_START( f1dream ) // N86614A-5 + N86614B-6 board combo
 	ROM_LOAD32_BYTE( "f1_08.3d", 0x00001, 0x10000, CRC(811f2e22) SHA1(cca7e8cc43408c2c3067a731a98a8a6418a000aa) )
 	ROM_LOAD32_BYTE( "f1_07.2d", 0x00000, 0x10000, CRC(aa9a1233) SHA1(c2079ad81d67b54483ea5f69ac2edf276ad58ca9) )
 
-	ROM_REGION( 0x08000, "bgmap", 0 )
-	ROM_LOAD( "f1_15.7l", 0x0000, 0x8000, CRC(978758b7) SHA1(ebd415d70e2f1af3b1bd51f40e7d60f22369638c) )
+	ROM_REGION16_LE( 0x08000, "bgmap", 0 )
+	ROM_LOAD16_WORD( "f1_15.7l", 0x0000, 0x8000, CRC(978758b7) SHA1(ebd415d70e2f1af3b1bd51f40e7d60f22369638c) )
 
 	ROM_REGION( 0x0100, "proms", 0 )
 	ROM_LOAD( "tr.9e", 0x0000, 0x0100, CRC(ec80ae36) SHA1(397ec8fc1b106c8b8d4bf6798aa429e8768a101a) ) // priority (not used) - N82S129A or compatible
@@ -1091,8 +1097,8 @@ ROM_START( f1dreamb )
 	ROM_LOAD32_BYTE( "03d_08.bin",   0x00001, 0x10000, CRC(811f2e22) SHA1(cca7e8cc43408c2c3067a731a98a8a6418a000aa) )
 	ROM_LOAD32_BYTE( "02d_07.bin",   0x00000, 0x10000, CRC(aa9a1233) SHA1(c2079ad81d67b54483ea5f69ac2edf276ad58ca9) )
 
-	ROM_REGION( 0x08000, "bgmap", 0 )
-	ROM_LOAD( "07l_15.bin",   0x0000, 0x8000, CRC(978758b7) SHA1(ebd415d70e2f1af3b1bd51f40e7d60f22369638c) )
+	ROM_REGION16_LE( 0x08000, "bgmap", 0 )
+	ROM_LOAD16_WORD( "07l_15.bin",   0x0000, 0x8000, CRC(978758b7) SHA1(ebd415d70e2f1af3b1bd51f40e7d60f22369638c) )
 
 	ROM_REGION( 0x0100, "proms", 0 )
 	ROM_LOAD( "09e_tr.bin",   0x0000, 0x0100, CRC(ec80ae36) SHA1(397ec8fc1b106c8b8d4bf6798aa429e8768a101a) )    // priority (not used)
@@ -1125,45 +1131,52 @@ ROM_START( f1dreamba )
 	ROM_LOAD32_BYTE( "03d_08.bin",   0x00001, 0x10000, CRC(811f2e22) SHA1(cca7e8cc43408c2c3067a731a98a8a6418a000aa) )
 	ROM_LOAD32_BYTE( "02d_07.bin",   0x00000, 0x10000, CRC(aa9a1233) SHA1(c2079ad81d67b54483ea5f69ac2edf276ad58ca9) )
 
-	ROM_REGION( 0x08000, "bgmap", 0 )
-	ROM_LOAD( "07l_15.bin",   0x0000, 0x8000, CRC(978758b7) SHA1(ebd415d70e2f1af3b1bd51f40e7d60f22369638c) )
+	ROM_REGION16_LE( 0x08000, "bgmap", 0 )
+	ROM_LOAD16_WORD( "07l_15.bin",   0x0000, 0x8000, CRC(978758b7) SHA1(ebd415d70e2f1af3b1bd51f40e7d60f22369638c) )
 
 	ROM_REGION( 0x0100, "proms", 0 )
 	ROM_LOAD( "09e_tr.bin",   0x0000, 0x0100, CRC(ec80ae36) SHA1(397ec8fc1b106c8b8d4bf6798aa429e8768a101a) )    // priority (not used)
 ROM_END
 
 
+// Seen on both COMAD-01 and COMAD-01A PCBs. Dumps match.
 ROM_START( pushman )
 	ROM_REGION( 0x40000, "maincpu", 0 )
-	ROM_LOAD16_BYTE( "pushman.012", 0x000000, 0x10000, CRC(330762bc) SHA1(c769b68da40183e6eb84212636bfd1265e5ed2d8) )
-	ROM_LOAD16_BYTE( "pushman.011", 0x000001, 0x10000, CRC(62636796) SHA1(1a205c1b0efff4158439bc9a21cfe3cd8834aef9) )
+	ROM_LOAD16_BYTE( "12.ic212.16n", 0x000000, 0x10000, CRC(330762bc) SHA1(c769b68da40183e6eb84212636bfd1265e5ed2d8) )
+	ROM_LOAD16_BYTE( "11.ic197.16l", 0x000001, 0x10000, CRC(62636796) SHA1(1a205c1b0efff4158439bc9a21cfe3cd8834aef9) )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )
-	ROM_LOAD( "pushman.013", 0x00000, 0x08000,  CRC(adfe66c1) SHA1(fa4ed13d655c664b06e9b91292d2c0a88cb5a569) )
+	ROM_LOAD( "13.ic216.4n", 0x00000, 0x08000,  CRC(adfe66c1) SHA1(fa4ed13d655c664b06e9b91292d2c0a88cb5a569) )
 
 	ROM_REGION( 0x01000, "mcu", 0 ) // Verified same for all 4 currently dumped versions
-	ROM_LOAD( "pushman68705r3p.ic23",  0x00000, 0x01000, CRC(d7916657) SHA1(89c14c6044f082fffe2a8f86d0a82336f4a110a2) )
+	ROM_LOAD( "pushman68705r3p.ic234",  0x00000, 0x01000, CRC(d7916657) SHA1(89c14c6044f082fffe2a8f86d0a82336f4a110a2) )
 
 	ROM_REGION( 0x10000, "text", 0 )
-	ROM_LOAD( "pushman.001",  0x00000, 0x08000, CRC(626e5865) SHA1(4ab96c8512f439d18390094d71a898f5c576399c) )
+	ROM_LOAD( "1.ic130.20g",  0x00000, 0x08000, CRC(626e5865) SHA1(4ab96c8512f439d18390094d71a898f5c576399c) )
 
 	ROM_REGION( 0x40000, "spritegen", 0 )
-	ROM_LOAD32_BYTE( "pushman.004", 0x00000, 0x10000, CRC(87aafa70) SHA1(560661b23ddac106a3d2762fc32da666b31e7424) )
-	ROM_LOAD32_BYTE( "pushman.005", 0x00001, 0x10000, CRC(7fd1200c) SHA1(15d6781a2d7e3ec2e8f85f8585b1e3fd9fe4fd1d) )
-	ROM_LOAD32_BYTE( "pushman.002", 0x00002, 0x10000, CRC(0a094ab0) SHA1(2ff5dcf0d9439eeadd61601170c9767f4d81f022) )
-	ROM_LOAD32_BYTE( "pushman.003", 0x00003, 0x10000, CRC(73d1f29d) SHA1(0a87fe02b1efd04c540f016b2626d32da70219db) )
+	ROM_LOAD32_BYTE( "4.ic58.1d", 0x00000, 0x10000, CRC(87aafa70) SHA1(560661b23ddac106a3d2762fc32da666b31e7424) )
+	ROM_LOAD32_BYTE( "5.ic59.3d", 0x00001, 0x10000, CRC(7fd1200c) SHA1(15d6781a2d7e3ec2e8f85f8585b1e3fd9fe4fd1d) )
+	ROM_LOAD32_BYTE( "2.ic56.1c", 0x00002, 0x10000, CRC(0a094ab0) SHA1(2ff5dcf0d9439eeadd61601170c9767f4d81f022) )
+	ROM_LOAD32_BYTE( "3.ic57.3c", 0x00003, 0x10000, CRC(73d1f29d) SHA1(0a87fe02b1efd04c540f016b2626d32da70219db) )
 
 	ROM_REGION( 0x40000, "tiles", 0 )
-	ROM_LOAD( "pushman.006", 0x20000, 0x10000, CRC(48ef3da6) SHA1(407d50c2030584bb17a4d4a1bb45e0b04e1a95a4) )
-	ROM_LOAD( "pushman.008", 0x30000, 0x10000, CRC(4b6a3e88) SHA1(c57d0528e942dd77a13e5a4bf39053f52915d44c) )
-	ROM_LOAD( "pushman.007", 0x00000, 0x10000, CRC(b70020bd) SHA1(218ca4a08b87b7dc5c1eed99960f4098c4fc7e0c) )
-	ROM_LOAD( "pushman.009", 0x10000, 0x10000, CRC(cc555667) SHA1(6c79e14fc18d1d836392044779cb3219494a3447) )
+	ROM_LOAD( "6.ic131.1h", 0x20000, 0x10000, CRC(48ef3da6) SHA1(407d50c2030584bb17a4d4a1bb45e0b04e1a95a4) )
+	ROM_LOAD( "8.ic148.1j", 0x30000, 0x10000, CRC(4b6a3e88) SHA1(c57d0528e942dd77a13e5a4bf39053f52915d44c) )
+	ROM_LOAD( "7.ic132.3h", 0x00000, 0x10000, CRC(b70020bd) SHA1(218ca4a08b87b7dc5c1eed99960f4098c4fc7e0c) )
+	ROM_LOAD( "9.ic149.3j", 0x10000, 0x10000, CRC(cc555667) SHA1(6c79e14fc18d1d836392044779cb3219494a3447) )
 
-	ROM_REGION( 0x10000, "bgmap", 0 )
-	ROM_LOAD( "pushman.010", 0x00000, 0x08000, CRC(a500132d) SHA1(26b02c9fea69b51c5f7dc1b43b838cd336ebf862) )
+	ROM_REGION16_LE( 0x08000, "bgmap", 0 )
+	ROM_LOAD16_WORD( "10.ic189.7l", 0x00000, 0x08000, CRC(a500132d) SHA1(26b02c9fea69b51c5f7dc1b43b838cd336ebf862) )
 
 	ROM_REGION( 0x0100, "proms", 0 ) // this is the same as tiger road / f1-dream
-	ROM_LOAD( "n82s129an.ic82",   0x0000, 0x0100, CRC(ec80ae36) SHA1(397ec8fc1b106c8b8d4bf6798aa429e8768a101a) ) // priority (not used)
+	ROM_LOAD( "n82s129an.ic82.9e",   0x0000, 0x0100, CRC(ec80ae36) SHA1(397ec8fc1b106c8b8d4bf6798aa429e8768a101a) ) // priority (not used)
+
+	ROM_REGION( 0x0a00, "plds", ROMREGION_ERASE00 )
+	ROM_LOAD( "ep600pc-3.ic193.11l",   0x0000, 0x32f, CRC(e2659b20) SHA1(2f0448d9e1bdd7e98a6e6ddfb6039824271961af) )
+	ROM_LOAD( "hy18cv8s-30.ic245.20p", 0x0400, 0x155, CRC(c7b824f7) SHA1(70c166b74fabcd1502b446b0b24100324c0f06e1) )
+	ROM_LOAD( "pal16r8acn.ic35.16b",   0x0600, 0x104, CRC(bfe1accc) SHA1(d9d779457f59ff4d9b33af20bdcab2012fda06e0) )
+	ROM_LOAD( "pal16r8acn.ic52.17c",   0x0800, 0x104, CRC(5d032a7b) SHA1(11a3bea070bed09a419a5a5de69b50f7faf8349c) )
 ROM_END
 
 ROM_START( pushmana )
@@ -1192,8 +1205,9 @@ ROM_START( pushmana )
 	ROM_LOAD( "pushman.007", 0x00000, 0x10000, CRC(b70020bd) SHA1(218ca4a08b87b7dc5c1eed99960f4098c4fc7e0c) ) // .132
 	ROM_LOAD( "pushman.009", 0x10000, 0x10000, CRC(cc555667) SHA1(6c79e14fc18d1d836392044779cb3219494a3447) ) // .149
 
-	ROM_REGION( 0x10000, "bgmap", 0 )
-	ROM_LOAD( "pushmana.189", 0x00000, 0x10000, CRC(59f25598) SHA1(ace33afd6e6d07376ed01048db99b13bcec790d7) )
+	ROM_REGION16_LE( 0x08000, "bgmap", 0 )
+	ROM_LOAD16_WORD( "pushmana.189", 0x00000, 0x08000, CRC(59f25598) SHA1(ace33afd6e6d07376ed01048db99b13bcec790d7) ) // 1st and 2nd half identical
+	ROM_IGNORE( 0x08000 )
 
 	ROM_REGION( 0x0100, "proms", 0 ) // this is the same as tiger road / f1-dream
 	ROM_LOAD( "n82s129an.ic82",   0x0000, 0x0100, CRC(ec80ae36) SHA1(397ec8fc1b106c8b8d4bf6798aa429e8768a101a) ) // priority (not used)
@@ -1225,8 +1239,8 @@ ROM_START( pushmans )
 	ROM_LOAD( "pman-7.ic132", 0x00000, 0x10000, CRC(208cb197) SHA1(161633b6b0acf25447a5c0b3c6fbf18adc6e2243) )
 	ROM_LOAD( "pman-9.ic149", 0x10000, 0x10000, CRC(77ee8577) SHA1(63d13683dd097d8e7cb71ad3abe04e11f2a58bd3) )
 
-	ROM_REGION( 0x10000, "bgmap", 0 )
-	ROM_LOAD( "pman-10.ic189", 0x00000, 0x08000, CRC(5f9ae9a1) SHA1(87619918c28c942780f6dbd3818d4cc69932eefc) )
+	ROM_REGION16_LE( 0x08000, "bgmap", 0 )
+	ROM_LOAD16_WORD( "pman-10.ic189", 0x00000, 0x08000, CRC(5f9ae9a1) SHA1(87619918c28c942780f6dbd3818d4cc69932eefc) )
 
 	ROM_REGION( 0x0100, "proms", 0 ) // this is the same as tiger road / f1-dream
 	ROM_LOAD( "n82s129an.ic82",   0x0000, 0x0100, CRC(ec80ae36) SHA1(397ec8fc1b106c8b8d4bf6798aa429e8768a101a) ) // priority (not used)
@@ -1258,8 +1272,8 @@ ROM_START( pushmant ) // Single plane PCB
 	ROM_LOAD( "7.ic132", 0x00000, 0x10000, CRC(208cb197) SHA1(161633b6b0acf25447a5c0b3c6fbf18adc6e2243) )
 	ROM_LOAD( "9.ic149", 0x10000, 0x10000, CRC(77ee8577) SHA1(63d13683dd097d8e7cb71ad3abe04e11f2a58bd3) )
 
-	ROM_REGION( 0x10000, "bgmap", 0 )
-	ROM_LOAD( "10.ic189", 0x00000, 0x08000, CRC(5f9ae9a1) SHA1(87619918c28c942780f6dbd3818d4cc69932eefc) ) // Same as the Sammy set
+	ROM_REGION16_LE( 0x08000, "bgmap", 0 )
+	ROM_LOAD16_WORD( "10.ic189", 0x00000, 0x08000, CRC(5f9ae9a1) SHA1(87619918c28c942780f6dbd3818d4cc69932eefc) ) // Same as the Sammy set
 
 	ROM_REGION( 0x0100, "proms", 0 ) // this is the same as tiger road / f1-dream
 	ROM_LOAD( "n82s129an.ic82",   0x0000, 0x0100, CRC(ec80ae36) SHA1(397ec8fc1b106c8b8d4bf6798aa429e8768a101a) ) // priority (not used)
@@ -1291,8 +1305,8 @@ ROM_START( bballs )
 	ROM_LOAD( "bb7.h2", 0x00000, 0x10000, CRC(a352d53b) SHA1(c71e976b7c28630d7af11fffe0d1cfd7d611ee8b) )
 	ROM_LOAD( "bb9.j2", 0x10000, 0x10000, CRC(78d185ac) SHA1(6ed6e1f5eeb93129eeeab6bae22b640c9782f7fc) )
 
-	ROM_REGION( 0x10000, "bgmap", 0 )
-	ROM_LOAD( "bb10.l6", 0x00000, 0x08000, CRC(d06498f9) SHA1(9f33bbc40ebe11c03aec29289f76f1c3ca5bf009) )
+	ROM_REGION16_LE( 0x08000, "bgmap", 0 )
+	ROM_LOAD16_WORD( "bb10.l6", 0x00000, 0x08000, CRC(d06498f9) SHA1(9f33bbc40ebe11c03aec29289f76f1c3ca5bf009) )
 
 	ROM_REGION( 0x0100, "proms", 0 ) // this is the same as tiger road / f1-dream
 	ROM_LOAD( "bb_prom.e9",   0x0000, 0x0100, CRC(ec80ae36) SHA1(397ec8fc1b106c8b8d4bf6798aa429e8768a101a) )    // priority (not used) N82S129 BPROM
@@ -1324,8 +1338,8 @@ ROM_START( bballsa )
 	ROM_LOAD( "7.ic132", 0x00000, 0x10000, CRC(2289393a) SHA1(e1370925a92f7d9f96c9431cf1b8dd262c41017e) )
 	ROM_LOAD( "9.ic149", 0x10000, 0x10000, CRC(1fe3d172) SHA1(f7415e8633507a507ec1cd68de224722a726a473) )
 
-	ROM_REGION( 0x10000, "bgmap", 0 )
-	ROM_LOAD( "10.ic189", 0x00000, 0x08000, CRC(52e4ab27) SHA1(c9ae15f970b4bf120a4bbee9adcf0e5e4de001e7) )
+	ROM_REGION16_LE( 0x08000, "bgmap", 0 )
+	ROM_LOAD16_WORD( "10.ic189", 0x00000, 0x08000, CRC(52e4ab27) SHA1(c9ae15f970b4bf120a4bbee9adcf0e5e4de001e7) )
 
 	ROM_REGION( 0x0100, "proms", 0 ) // this is the same as tiger road / f1-dream
 	ROM_LOAD( "bb_prom.e9",   0x0000, 0x0100, CRC(ec80ae36) SHA1(397ec8fc1b106c8b8d4bf6798aa429e8768a101a) )    // priority (not used) N82S129 BPROM

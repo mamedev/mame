@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <!--
-license:CC0
+license:CC0-1.0
 
 LED layout for Wicat WS-150
 -->
@@ -11,6 +11,81 @@ LED layout for Wicat WS-150
 		<disk state="1">
 			<color red="1.0" green="0.0" blue="0.0" />
 		</disk>
+	</element>
+	<element name="ON">
+		<text string="ON">
+			<color red="1.0" green="1.0" blue="1.0" />
+		</text>
+	</element>
+	<element name="LINE">
+		<text string="LINE">
+			<color red="1.0" green="1.0" blue="1.0" />
+		</text>
+	</element>
+	<element name="LOCAL">
+		<text string="LOCAL">
+			<color red="1.0" green="1.0" blue="1.0" />
+		</text>
+	</element>
+	<element name="PROT">
+		<text string="PROT">
+			<color red="1.0" green="1.0" blue="1.0" />
+		</text>
+	</element>
+	<element name="MODE">
+		<text string="MODE">
+			<color red="1.0" green="1.0" blue="1.0" />
+		</text>
+	</element>
+	<element name="GRAPH">
+		<text string="GRAPH">
+			<color red="1.0" green="1.0" blue="1.0" />
+		</text>
+	</element>
+	<element name="KEYPD">
+		<text string="KEYPD">
+			<color red="1.0" green="1.0" blue="1.0" />
+		</text>
+	</element>
+	<element name="ESC">
+		<text string="ESC">
+			<color red="1.0" green="1.0" blue="1.0" />
+		</text>
+	</element>
+	<element name="SCROLL">
+		<text string="SCROLL">
+			<color red="1.0" green="1.0" blue="1.0" />
+		</text>
+	</element>
+	<element name="DISABL">
+		<text string="DISABL">
+			<color red="1.0" green="1.0" blue="1.0" />
+		</text>
+	</element>
+	<element name="KEYBD">
+		<text string="KEYBD">
+			<color red="1.0" green="1.0" blue="1.0" />
+		</text>
+	</element>
+	<element name="LOCKED">
+		<text string="LOCKED">
+			<color red="1.0" green="1.0" blue="1.0" />
+		</text>
+	</element>
+	<element name="ERROR">
+		<text string="ERROR">
+			<color red="1.0" green="1.0" blue="1.0" />
+		</text>
+	</element>
+	<element name="CAPS">
+		<text string="CAPS">
+			<color red="1.0" green="1.0" blue="1.0" />
+		</text>
+	</element>
+	<element name="LOCK">
+		<text string="LOCK">
+			<color red="1.0" green="1.0" blue="1.0" />
+		</text>
 	</element>
 
 	<view name="LEDs">
@@ -34,6 +109,84 @@ LED layout for Wicat WS-150
 		</element>
 		<element name="led1" ref="led">
 			<bounds left="50" right="58" top="0" bottom="8" />
+		</element>
+		<element name="all_caps_text1" ref="CAPS">
+			<bounds left="0" right="24" top="318" bottom="324" />
+		</element>
+		<element name="all_caps_text2" ref="LOCK">
+			<bounds left="0" right="24" top="324" bottom="330" />
+		</element>
+		<element name="all_caps" ref="led">
+			<bounds left="8" right="16" top="330" bottom="338" />
+		</element>
+		<element name="kbd_led1_text1" ref="ON">
+			<bounds left="80" right="104" top="318" bottom="324" />
+		</element>
+		<element name="kbd_led1_text2" ref="LINE">
+			<bounds left="80" right="104" top="324" bottom="330" />
+		</element>
+		<element name="kbd_led1" ref="led">
+			<bounds left="88" right="96" top="330" bottom="338" />
+		</element>
+		<element name="kbd_led2_text2" ref="LOCAL">
+			<bounds left="104" right="128" top="324" bottom="330" />
+		</element>
+		<element name="kbd_led2" ref="led">
+			<bounds left="112" right="120" top="330" bottom="338" />
+		</element>
+		<element name="kbd_led3_text1" ref="PROT">
+			<bounds left="128" right="152" top="318" bottom="324" />
+		</element>
+		<element name="kbd_led3_text2" ref="MODE">
+			<bounds left="128" right="152" top="324" bottom="330" />
+		</element>
+		<element name="kbd_led3" ref="led">
+			<bounds left="136" right="144" top="330" bottom="338" />
+		</element>
+		<element name="kbd_led4_text1" ref="GRAPH">
+			<bounds left="152" right="176" top="318" bottom="324" />
+		</element>
+		<element name="kbd_led4_text2" ref="MODE">
+			<bounds left="152" right="176" top="324" bottom="330" />
+		</element>
+		<element name="kbd_led4" ref="led">
+			<bounds left="160" right="168" top="330" bottom="338" />
+		</element>
+		<element name="kbd_led5_text0" ref="KEYPD">
+			<bounds left="176" right="200" top="312" bottom="318" />
+		</element>
+		<element name="kbd_led5_text1" ref="ESC">
+			<bounds left="176" right="200" top="318" bottom="324" />
+		</element>
+		<element name="kbd_led5_text2" ref="MODE">
+			<bounds left="176" right="200" top="324" bottom="330" />
+		</element>
+		<element name="kbd_led5" ref="led">
+			<bounds left="184" right="192" top="330" bottom="338" />
+		</element>
+		<element name="kbd_led6_text1" ref="SCROLL">
+			<bounds left="200" right="224" top="318" bottom="324" />
+		</element>
+		<element name="kbd_led6_text2" ref="DISABL">
+			<bounds left="200" right="224" top="324" bottom="330" />
+		</element>
+		<element name="kbd_led6" ref="led">
+			<bounds left="208" right="216" top="330" bottom="338" />
+		</element>
+		<element name="kbd_led7_text1" ref="KEYBD">
+			<bounds left="224" right="248" top="318" bottom="324" />
+		</element>
+		<element name="kbd_led7_text2" ref="LOCKED">
+			<bounds left="224" right="248" top="324" bottom="330" />
+		</element>
+		<element name="kbd_led7" ref="led">
+			<bounds left="232" right="240" top="330" bottom="338" />
+		</element>
+		<element name="kbd_led8_text2" ref="ERROR">
+			<bounds left="248" right="272" top="324" bottom="330" />
+		</element>
+		<element name="kbd_led8" ref="led">
+			<bounds left="256" right="264" top="330" bottom="338" />
 		</element>
 	</view>
 

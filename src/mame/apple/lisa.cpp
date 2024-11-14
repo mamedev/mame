@@ -33,7 +33,7 @@ void lisa_state::lisa_fdc_map(address_map &map)
 	map(0x0000, 0x03ff).ram().share("fdc_ram");             /* RAM (shared with 68000) */
 	map(0x0400, 0x07ff).rw(FUNC(lisa_state::lisa_fdc_io_r), FUNC(lisa_state::lisa_fdc_io_w)); /* disk controller (IWM and TTL logic) */
 	map(0x0800, 0x0fff).noprw();
-	map(0x1000, 0x1fff).rom().region("fdccpu", 0x1000);     /* ROM */
+	map(0x1000, 0x1fff).rom().region("fdccpu", 0);     /* ROM */
 }
 
 void lisa_state::lisa210_fdc_map(address_map &map)
@@ -43,54 +43,8 @@ void lisa_state::lisa210_fdc_map(address_map &map)
 	map(0x0400, 0x07ff).noprw();                                     /* nothing, or RAM wrap-around ??? */
 	map(0x0800, 0x0bff).rw(FUNC(lisa_state::lisa_fdc_io_r), FUNC(lisa_state::lisa_fdc_io_w)); /* disk controller (IWM and TTL logic) */
 	map(0x0c00, 0x0fff).noprw();                                     /* nothing, or IO port wrap-around ??? */
-	map(0x1000, 0x1fff).rom().region("fdccpu", 0x1000);         /* ROM */
+	map(0x1000, 0x1fff).rom().region("fdccpu", 0);         /* ROM */
 }
-
-
-
-/***************************************************************************
-    DEVICE CONFIG
-***************************************************************************/
-
-static void lisa2_set_iwm_enable_lines(device_t *device,int enable_mask)
-{
-	/* E1 & E2 is connected to the Sony SEL line (?) */
-	/*logerror("new sel line state %d\n", (enable_mask) ? 0 : 1);*/
-	sony_set_sel_line(device,(enable_mask) ? 0 : 1);
-}
-
-static void lisa210_set_iwm_enable_lines(device_t *device,int enable_mask)
-{
-	/* E2 is connected to the Sony enable line (?) */
-	sony_set_enable_lines(device,enable_mask >> 1);
-}
-
-static const applefdc_interface lisa2_fdc_interface =
-{
-	sony_set_lines,
-	lisa2_set_iwm_enable_lines,
-
-	sony_read_data,
-	sony_write_data,
-	sony_read_status
-};
-
-static const applefdc_interface lisa210_fdc_interface =
-{
-	sony_set_lines,
-	lisa210_set_iwm_enable_lines,
-
-	sony_read_data,
-	sony_write_data,
-	sony_read_status
-};
-
-static const floppy_interface lisa_floppy_interface =
-{
-	FLOPPY_STANDARD_5_25_DSHD,
-	LEGACY_FLOPPY_OPTIONS_NAME(apple35_mac),
-	"floppy_5_25"
-};
 
 /***************************************************************************
     MACHINE DRIVER
@@ -147,8 +101,12 @@ void lisa_state::lisa(machine_config &config)
 	m_nvram->set_custom_handler(FUNC(lisa_state::nvram_init));
 
 	/* devices */
-	LEGACY_IWM(config, m_fdc, &lisa2_fdc_interface);
-	sonydriv_floppy_image_device::legacy_2_drives_add(config, &lisa_floppy_interface);
+	IWM(config, m_fdc, 8_MHz_XTAL);
+//  m_iwm->phases_cb().set(FUNC(mac128_state::phases_w));
+//  m_iwm->devsel_cb().set(FUNC(mac128_state::devsel_w));
+
+	applefdintf_device::add_35(config, m_floppy[0]);
+	applefdintf_device::add_35(config, m_floppy[1]);
 
 	/* software lists */
 	SOFTWARE_LIST(config, "disk_list").set_original("lisa");
@@ -170,9 +128,6 @@ void lisa_state::lisa210(machine_config &config)
 {
 	lisa(config);
 	m_fdc_cpu->set_addrmap(AS_PROGRAM, &lisa_state::lisa210_fdc_map);
-
-	/* Lisa 2/10 and MacXL had a slightly different FDC interface */
-	m_fdc->set_config(&lisa210_fdc_interface);
 
 	/* via */
 	m_via0->set_clock(1250000);
@@ -369,9 +324,9 @@ ROM_START( lisa ) /* with twiggy drives, io40 i/o rom; technically any of the bo
 	ROM_REGION( 0x400, "kbcop", 0 )
 	ROM_LOAD("341-0064a.u9f", 0x000, 0x400, CRC(e6849910) SHA1(d46e67df75c9e3e773d20542fb9d5b1d2ac0fb9b))
 
-	ROM_REGION(0x2000,"fdccpu",0)       // 6504 RAM and ROM
+	ROM_REGION(0x1000,"fdccpu",0)       // 6504 RAM and ROM
 	// note: other ?prototype? revisions of this rom for the lisa probably exist as well
-	ROM_LOAD( "341-0138f.bin", 0x001000, 0x001000, CRC(edd8d560) SHA1(872211d21386cd9625b3735d7682e2b2ecff05b4) )
+	ROM_LOAD( "341-0138f.bin", 0x0000, 0x1000, CRC(edd8d560) SHA1(872211d21386cd9625b3735d7682e2b2ecff05b4) )
 
 	ROM_REGION(0x4000,"profile", 0)     // Profile/5 HDD
 	ROM_LOAD_OPTIONAL("341-0080-b", 0x0000, 0x800, CRC(26df0b8d) SHA1(08f6689afb517e0a2bdaa48433003e62a66ae3c7)) // 341-0080-B z8 MCU piggyback ROM
@@ -412,8 +367,8 @@ ROM_START( lisa2 ) /* internal apple codename was 'pepsi'; has one SSDD 400K dri
 	ROM_REGION( 0x400, "kbcop", 0 )
 	ROM_LOAD("341-0064a.u9f", 0x000, 0x400, CRC(e6849910) SHA1(d46e67df75c9e3e773d20542fb9d5b1d2ac0fb9b))
 
-	ROM_REGION(0x2000,"fdccpu",0)       // 6504 RAM and ROM
-	ROM_LOAD("341-0290-b", 0x1000, 0x1000, CRC(bc6364f1) SHA1(f3164923330a51366a06d9d8a4a01ec7b0d3a8aa)) // 341-0290-B LISA 2/5 Disk Rom (ioa8), supports profile on external port
+	ROM_REGION(0x1000,"fdccpu",0)       // 6504 RAM and ROM
+	ROM_LOAD("341-0290-b", 0x0000, 0x1000, CRC(bc6364f1) SHA1(f3164923330a51366a06d9d8a4a01ec7b0d3a8aa)) // 341-0290-B LISA 2/5 Disk Rom (ioa8), supports profile on external port
 
 	ROM_REGION(0x4000,"profile", 0)     // Profile/5 HDD
 	ROM_LOAD_OPTIONAL("341-0080-b", 0x0000, 0x800, CRC(26df0b8d) SHA1(08f6689afb517e0a2bdaa48433003e62a66ae3c7)) // 341-0080-B z8 MCU piggyback ROM
@@ -446,11 +401,11 @@ ROM_START( lisa210 ) /* newer motherboard and i/o board; has io88 i/o rom, built
 	ROM_LOAD("341-0064a.u9f", 0x000, 0x400, CRC(e6849910) SHA1(d46e67df75c9e3e773d20542fb9d5b1d2ac0fb9b))
 
 #if 1
-	ROM_REGION(0x2000,"fdccpu", 0)      // 6504 RAM and ROM
-	ROM_LOAD("341-0281-d", 0x1000, 0x1000, CRC(e343fe74) SHA1(a0e484ead2d2315fca261f39fff2f211ff61b0ef)) // 341-0281-D LISA 2/10 Disk Rom (io88), supports widget on internal port
+	ROM_REGION(0x1000,"fdccpu", 0)      // 6504 RAM and ROM
+	ROM_LOAD("341-0281-d", 0x0000, 0x1000, CRC(e343fe74) SHA1(a0e484ead2d2315fca261f39fff2f211ff61b0ef)) // 341-0281-D LISA 2/10 Disk Rom (io88), supports widget on internal port
 #else
-	ROM_REGION(0x2000,"fdccpu", 0)      // 6504 RAM and ROM
-	ROM_LOAD("341-8003-c", 0x1000, 0x1000, CRC(8c67959a) SHA1(aa446b0c4acb4cb6c9d0adfbbea900fb8c04c1e9)) // 341-8003-C Sun Mac XL Disk rom for 800k drives (Rev C, from Goodwill XL) (io88800k)
+	ROM_REGION(0x1000,"fdccpu", 0)      // 6504 RAM and ROM
+	ROM_LOAD("341-8003-c", 0x0000, 0x1000, CRC(8c67959a) SHA1(aa446b0c4acb4cb6c9d0adfbbea900fb8c04c1e9)) // 341-8003-C Sun Mac XL Disk rom for 800k drives (Rev C, from Goodwill XL) (io88800k)
 	// Note: there are two earlier/alternate versions of this rom as well which are dumped */
 #endif
 
@@ -474,11 +429,11 @@ ROM_START( macxl )
 	ROM_LOAD("341-0064a.u9f", 0x000, 0x400, CRC(e6849910) SHA1(d46e67df75c9e3e773d20542fb9d5b1d2ac0fb9b))
 
 #if 1
-	ROM_REGION(0x2000,"fdccpu", 0)      // 6504 RAM and ROM
-	ROM_LOAD("341-0281-d", 0x1000, 0x1000, CRC(e343fe74) SHA1(a0e484ead2d2315fca261f39fff2f211ff61b0ef)) // 341-0281-D LISA 2/10 Disk Rom (io88), supports widget on internal port
+	ROM_REGION(0x1000,"fdccpu", 0)      // 6504 RAM and ROM
+	ROM_LOAD("341-0281-d", 0x0000, 0x1000, CRC(e343fe74) SHA1(a0e484ead2d2315fca261f39fff2f211ff61b0ef)) // 341-0281-D LISA 2/10 Disk Rom (io88), supports widget on internal port
 #else
-	ROM_REGION(0x2000,"fdccpu", 0)      // 6504 RAM and ROM
-	ROM_LOAD("341-8003-c", 0x1000, 0x1000, CRC(8c67959a) SHA1(aa446b0c4acb4cb6c9d0adfbbea900fb8c04c1e9)) // 341-8003-C Sun Mac XL Disk rom for 800k drives (Rev C, from Goodwill XL) (io88800k)
+	ROM_REGION(0x1000,"fdccpu", 0)      // 6504 RAM and ROM
+	ROM_LOAD("341-8003-c", 0x0000, 0x1000, CRC(8c67959a) SHA1(aa446b0c4acb4cb6c9d0adfbbea900fb8c04c1e9)) // 341-8003-C Sun Mac XL Disk rom for 800k drives (Rev C, from Goodwill XL) (io88800k)
 	// Note: there are two earlier/alternate versions of this ROM as well which are dumped
 #endif
 
@@ -486,10 +441,6 @@ ROM_START( macxl )
 	ROM_LOAD("vidstatem.rom", 0x00, 0x100, BAD_DUMP CRC(75904783) SHA1(3b0023bd90f2ca1be0b099160a566b044856885d))
 ROM_END
 
-/*
-    Lisa drivers boot MacWorks, but do not boot the Lisa OS, which is why we set
-    the MACHINE_NOT_WORKING flag...
-*/
 /*    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT  CLASS       INIT          COMPANY           FULLNAME */
 COMP( 1983, lisa,    0,      0,      lisa,    lisa,  lisa_state, init_lisa2,   "Apple Computer", "Lisa",         MACHINE_NOT_WORKING )
 COMP( 1984, lisa2,   0,      0,      lisa,    lisa,  lisa_state, init_lisa2,   "Apple Computer", "Lisa2",        MACHINE_NOT_WORKING )

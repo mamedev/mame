@@ -44,10 +44,6 @@ ttl153_device::ttl153_device(const machine_config &mconfig, const char *tag, dev
 
 void ttl153_device::device_start()
 {
-	// resolve callbacks
-	m_za_cb.resolve_safe();
-	m_zb_cb.resolve_safe();
-
 	// register for save states
 	save_pointer(NAME(m_s), 2);
 	save_pointer(NAME(m_ia), 4);
@@ -112,14 +108,14 @@ void ttl153_device::update_b()
 //  INTERFACE
 //**************************************************************************
 
-WRITE_LINE_MEMBER( ttl153_device::s0_w )
+void ttl153_device::s0_w(int state)
 {
 	m_s[0] = bool(state);
 	update_a();
 	update_b();
 }
 
-WRITE_LINE_MEMBER( ttl153_device::s1_w )
+void ttl153_device::s1_w(int state)
 {
 	m_s[1] = bool(state);
 	update_a();
@@ -134,25 +130,25 @@ void ttl153_device::s_w(uint8_t data)
 	update_b();
 }
 
-WRITE_LINE_MEMBER( ttl153_device::i0a_w )
+void ttl153_device::i0a_w(int state)
 {
 	m_ia[0] = bool(state);
 	update_a();
 }
 
-WRITE_LINE_MEMBER( ttl153_device::i1a_w )
+void ttl153_device::i1a_w(int state)
 {
 	m_ia[1] = bool(state);
 	update_a();
 }
 
-WRITE_LINE_MEMBER( ttl153_device::i2a_w )
+void ttl153_device::i2a_w(int state)
 {
 	m_ia[2] = bool(state);
 	update_a();
 }
 
-WRITE_LINE_MEMBER( ttl153_device::i3a_w )
+void ttl153_device::i3a_w(int state)
 {
 	m_ia[3] = bool(state);
 	update_a();
@@ -167,25 +163,25 @@ void ttl153_device::ia_w(uint8_t data)
 	update_a();
 }
 
-WRITE_LINE_MEMBER( ttl153_device::i0b_w )
+void ttl153_device::i0b_w(int state)
 {
 	m_ib[0] = bool(state);
 	update_b();
 }
 
-WRITE_LINE_MEMBER( ttl153_device::i1b_w )
+void ttl153_device::i1b_w(int state)
 {
 	m_ib[1] = bool(state);
 	update_b();
 }
 
-WRITE_LINE_MEMBER( ttl153_device::i2b_w )
+void ttl153_device::i2b_w(int state)
 {
 	m_ib[2] = bool(state);
 	update_b();
 }
 
-WRITE_LINE_MEMBER( ttl153_device::i3b_w )
+void ttl153_device::i3b_w(int state)
 {
 	m_ib[3] = bool(state);
 	update_b();
@@ -200,12 +196,12 @@ void ttl153_device::ib_w(uint8_t data)
 	update_b();
 }
 
-READ_LINE_MEMBER( ttl153_device::za_r )
+int ttl153_device::za_r()
 {
 	return m_z[0] ? 1 : 0;
 }
 
-READ_LINE_MEMBER( ttl153_device::zb_r )
+int ttl153_device::zb_r()
 {
 	return m_z[1] ? 1 : 0;
 }

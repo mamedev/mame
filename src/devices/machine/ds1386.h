@@ -88,9 +88,9 @@ public:
 	void data_w(offs_t offset, uint8_t data);
 	uint8_t data_r(offs_t offset);
 
-	DECLARE_WRITE_LINE_MEMBER( ce_w );
-	DECLARE_WRITE_LINE_MEMBER( oe_w );
-	DECLARE_WRITE_LINE_MEMBER( we_w );
+	void ce_w(int state);
+	void oe_w(int state);
+	void we_w(int state);
 
 protected:
 	enum
@@ -124,7 +124,7 @@ protected:
 	ds1386_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, size_t size);
 
 	// device-level overrides
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 	// device_nvram_interface overrides
 	virtual void nvram_default() override;
@@ -165,8 +165,6 @@ protected:
 	void safe_inta_cb(int state);
 	void safe_intb_cb(int state);
 	void safe_sqw_cb(int state);
-
-	void set_current_time();
 
 	void check_tod_alarm();
 	void time_of_day_alarm();

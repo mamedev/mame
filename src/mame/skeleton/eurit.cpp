@@ -7,11 +7,16 @@
 ****************************************************************************/
 
 #include "emu.h"
+
 #include "cpu/m37710/m37710.h"
 #include "machine/am79c30.h"
 #include "video/hd44780.h"
+
 #include "emupal.h"
 #include "screen.h"
+
+
+namespace {
 
 class eurit_state : public driver_device
 {
@@ -27,7 +32,7 @@ public:
 	void eurit30(machine_config &mconfig);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	HD44780_PIXEL_UPDATE(lcd_pixel_update);
@@ -35,7 +40,7 @@ private:
 	void key_scan_w(u8 data);
 	u8 key_matrix_r();
 
-	void mem_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
 
 	void palette_init(palette_device &palette);
 
@@ -120,8 +125,8 @@ static INPUT_PORTS_START(eurit30)
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("2  DEF") PORT_CODE(KEYCODE_2)
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("1  ABC") PORT_CODE(KEYCODE_1)
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("Unknown Key D5")
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME(UTF8_RIGHT) PORT_CODE(KEYCODE_RIGHT)
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME(UTF8_LEFT) PORT_CODE(KEYCODE_LEFT)
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME(u8"\u2192") PORT_CODE(KEYCODE_RIGHT) // →
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME(u8"\u2190") PORT_CODE(KEYCODE_LEFT) // ←
 
 	PORT_START("KEYE")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("Fox Key Center Right") PORT_CODE(KEYCODE_F)
@@ -165,7 +170,8 @@ void eurit_state::eurit30(machine_config &config)
 
 	PALETTE(config, "palette", FUNC(eurit_state::palette_init), 2);
 
-	hd44780_device &lcdc(SED1278_0B(config, "lcdc", 0));
+	hd44780_device &lcdc(SED1278(config, "lcdc", 270'000)); // TODO: clock not measured, datasheet typical clock used
+	lcdc.set_default_bios_tag("0b");
 	lcdc.set_lcd_size(2, 20);
 	lcdc.set_pixel_update_cb(FUNC(eurit_state::lcd_pixel_update));
 }
@@ -175,6 +181,8 @@ ROM_START(eurit30)
 	ROM_REGION16_LE(0x20000, "firmware", 0) // Firmware 2.210 deutsch
 	ROM_LOAD("d_2.210", 0x00000, 0x20000, CRC(c77be0ac) SHA1(1eaba66dcb4f64cc33565ca85de25341572ddb2e))
 ROM_END
+
+} // anonymous namespace
 
 
 SYST(1996, eurit30, 0, 0, eurit30, eurit30, eurit_state, empty_init, "Ascom", "Eurit 30", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)

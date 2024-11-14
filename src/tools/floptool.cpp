@@ -8,9 +8,11 @@
 
 #include "image_handler.h"
 
-#include "corefile.h"
+#include "formats/fsblk.h"
+
 #include "corestr.h"
 #include "ioprocs.h"
+#include "path.h"
 #include "strformat.h"
 
 #include "osdcomm.h"
@@ -212,14 +214,14 @@ static int flopconvert(int argc, char *argv[])
 		return 1;
 	}
 
-	if(ih.floppy_load(source_format)) {
+	if(ih.floppy_load(*source_format)) {
 		fprintf(stderr, "Error: Loading as format '%s' failed\n", source_format->m_format->name());
 		return 1;
 	}
 
 	ih.set_on_disk_path(argv[5]);
 
-	if(ih.floppy_save(dest_format)) {
+	if(ih.floppy_save(*dest_format)) {
 		fprintf(stderr, "Error: Saving as format '%s' failed\n", dest_format->m_format->name());
 		return 1;
 	}
@@ -227,8 +229,39 @@ static int flopconvert(int argc, char *argv[])
 	return 0;
 }
 
+static fs::meta_data extract_meta_data(int &argc, char *argv[])
+{
+	fs::meta_data result;
+
+	int new_argc = 0;
+	for (int i = 0; i < argc; i++)
+	{
+		std::optional<fs::meta_name> attrname;
+		if (argv[i][0] == '-' && i < argc - 1)
+			attrname = fs::meta_data::from_entry_name(&argv[i][1]);
+
+		if (attrname)
+		{
+			// we found a metadata variable; set it
+			result.set(*attrname, argv[i + 1]);
+			i++;
+		}
+		else
+		{
+			// we didn't; update argv
+			argv[new_argc++] = argv[i];
+		}
+	}
+
+	// we're done; update the argument count
+	argc = new_argc;
+	return result;
+}
+
 static int flopcreate(int argc, char *argv[])
 {
+	fs::meta_data meta = extract_meta_data(argc, argv);
+
 	if(argc!=5) {
 		fprintf(stderr, "Incorrect number of arguments.\n\n");
 		display_usage(argv[0]);
@@ -255,55 +288,49 @@ static int flopcreate(int argc, char *argv[])
 		return 1;
 	}
 
-	fs::meta_data meta;
 	image_handler ih;
 	ih.set_on_disk_path(argv[4]);
 
-	ih.floppy_create(create_fs, meta);
-	return ih.floppy_save(dest_format);
+	ih.floppy_create(*create_fs, meta);
+	return ih.floppy_save(*dest_format);
 }
 
-static void dir_scan(u32 depth, fs::filesystem_t::dir_t dir, std::vector<std::vector<std::string>> &entries, const std::unordered_map<fs::meta_name, size_t> &nmap, size_t nc, const std::vector<fs::meta_description> &dmetad, const std::vector<fs::meta_description> &fmetad)
+static void dir_scan(fs::filesystem_t *fs, u32 depth, const std::vector<std::string> &path, std::vector<std::vector<std::string>> &entries, const std::unordered_map<fs::meta_name, size_t> &nmap, size_t nc, const std::vector<fs::meta_description> &dmetad, const std::vector<fs::meta_description> &fmetad)
 {
 	std::string head;
 	for(u32 i = 0; i != depth; i++)
 		head += "  ";
-	auto contents = dir.contents();
+	auto [err, contents] = fs->directory_contents(path);
+	if(err)
+		return;
 	for(const auto &c : contents) {
 		size_t id = entries.size();
 		entries.resize(id+1);
 		entries[id].resize(nc);
 		switch(c.m_type) {
 		case fs::dir_entry_type::dir: {
-			auto subdir = dir.dir_get(c.m_key);
-			auto meta = subdir.metadata();
-			if (!meta.has(fs::meta_name::name))
-				meta.set(fs::meta_name::name, c.m_name);
 			for(const auto &m : dmetad) {
-				if(!meta.has(m.m_name))
+				if(!c.m_meta.has(m.m_name))
 					continue;
 				size_t slot = nmap.find(m.m_name)->second;
-				std::string val = meta.get(m.m_name).to_string();
+				std::string val = c.m_meta.get(m.m_name).as_string();
 				if(slot == 0)
 					val = head + "dir  " + val;
 				entries[id][slot] = val;
 			}
-			dir_scan(depth+1, subdir, entries, nmap, nc, dmetad, fmetad);
+			auto npath = path;
+			npath.push_back(c.m_name);
+			dir_scan(fs, depth+1, npath, entries, nmap, nc, dmetad, fmetad);
 			break;
 		}
-		case fs::dir_entry_type::file:
-		case fs::dir_entry_type::system_file: {
-			auto file = dir.file_get(c.m_key);
-			auto meta = file.metadata();
-			if (!meta.has(fs::meta_name::name))
-				meta.set(fs::meta_name::name, c.m_name);
+		case fs::dir_entry_type::file: {
 			for(const auto &m : fmetad) {
-				if(!meta.has(m.m_name))
+				if(!c.m_meta.has(m.m_name))
 					continue;
 				size_t slot = nmap.find(m.m_name)->second;
-				std::string val = meta.get(m.m_name).to_string();
+				std::string val = c.m_meta.get(m.m_name).as_string();
 				if(slot == 0)
-					val = head + (c.m_type == fs::dir_entry_type::system_file ? "sys  " : "file ") + val;
+					val = head + "file " + val;
 				entries[id][slot] = val;
 			}
 			break;
@@ -319,11 +346,11 @@ static int generic_dir(image_handler &ih)
 	auto fmetad = fsm->file_meta_description();
 	auto dmetad = fsm->directory_meta_description();
 
-	auto vmeta = fs->metadata();
+	auto vmeta = fs->volume_metadata();
 	if(!vmeta.empty()) {
 		std::string vinf = "Volume:";
 		for(const auto &e : vmetad)
-			vinf += util::string_format(" %s=%s", fs::meta_data::entry_name(e.m_name), vmeta.get(e.m_name).to_string());
+			vinf += util::string_format(" %s=%s", fs::meta_data::entry_name(e.m_name), vmeta.get(e.m_name).as_string());
 		printf("%s\n\n", vinf.c_str());
 	}
 
@@ -340,14 +367,13 @@ static int generic_dir(image_handler &ih)
 	for(size_t i = 0; i != names.size(); i++)
 		nmap[names[i]] = i;
 
-	auto root = fs->root();
 	std::vector<std::vector<std::string>> entries;
 
 	entries.resize(1);
 	for(fs::meta_name n : names)
 		entries[0].push_back(fs::meta_data::entry_name(n));
 
-	dir_scan(0, root, entries, nmap, names.size(), dmetad, fmetad);
+	dir_scan(fs, 0, std::vector<std::string>(), entries, nmap, names.size(), dmetad, fmetad);
 
 	std::vector<u32> sizes(names.size());
 
@@ -394,12 +420,12 @@ static int flopdir(int argc, char *argv[])
 		return 1;
 	}
 
-	if(ih.floppy_load(source_format)) {
+	if(ih.floppy_load(*source_format)) {
 		fprintf(stderr, "Error: Loading as format '%s' failed\n", source_format->m_format->name());
 		return 1;
 	}
 
-	if(ih.floppy_mount_fs(fs)) {
+	if(ih.floppy_mount_fs(*fs)) {
 		fprintf(stderr, "Error: Parsing as filesystem '%s' failed\n", fs->m_manager->name());
 		return 1;
 	}
@@ -429,7 +455,7 @@ static int hddir(int argc, char *argv[])
 		return 1;
 	}
 
-	if(ih.hd_mount_fs(fs)) {
+	if(ih.hd_mount_fs(*fs)) {
 		fprintf(stderr, "Error: Parsing as filesystem '%s' failed\n", fs->m_manager->name());
 		return 1;
 	}
@@ -441,52 +467,23 @@ static int hddir(int argc, char *argv[])
 static int generic_read(image_handler &ih, const char *srcpath, const char *dstpath)
 {
 	auto [fsm, fs] = ih.get_fs();
+	std::ignore = fsm;
 
 	std::vector<std::string> path = ih.path_split(srcpath);
-
-	auto dir = fs->root();
-	std::string apath;
-	for(unsigned int i = 0; i < path.size() - 1; i++) {
-		auto c = dir.contents();
-		unsigned int j;
-		for(j = 0; j != c.size(); j++)
-			if(c[j].m_name == path[i])
-				break;
-		if(j == c.size()) {
-			fprintf(stderr, "Error: directory %s%c%s not found\n", apath.c_str(), fsm->directory_separator(), path[i].c_str());
-			return 1;
-		}
-		if(c[j].m_type != fs::dir_entry_type::dir) {
-			fprintf(stderr, "Error: %s%c%s is not a directory\n", apath.c_str(), fsm->directory_separator(), path[i].c_str());
-			return 1;
-		}
-		dir = dir.dir_get(c[j].m_key);
-		apath += fsm->directory_separator() + path[i];
-	}
-
-	auto c = dir.contents();
-	unsigned int j;
-	for(j = 0; j != c.size(); j++)
-		if(c[j].m_name == path.back())
-			break;
-	if(j == c.size()) {
-		fprintf(stderr, "Error: file %s%c%s not found\n", apath.c_str(), fsm->directory_separator(), path.back().c_str());
-		return 1;
-	}
-	auto file = dir.file_get(c[j].m_key);
-	auto meta = file.metadata();
-
-	if(!meta.has(fs::meta_name::length)) {
-		fprintf(stderr, "Error: %s%c%s is not a readable file\n", apath.c_str(), fsm->directory_separator(), path.back().c_str());
+	auto [err, dfork] = fs->file_read(path);
+	if(err) {
+		if(err == fs::ERR_NOT_FOUND)
+			fprintf(stderr, "File not found.\n");
+		else
+			fprintf(stderr, "Unknown error (%d).\n", err);
 		return 1;
 	}
 
-	image_handler::fsave(dstpath, file.read_all());
+	image_handler::fsave(dstpath, dfork);
 
-	bool has_rsrc = fsm->has_rsrc() && meta.has(fs::meta_name::rsrc_length);
-
-	if(has_rsrc)
-		image_handler::fsave_rsrc(image_handler::path_make_rsrc(dstpath), file.rsrc_read_all());
+	auto [err2, rfork] = fs->file_rsrc_read(path);
+	if(!err2 && !rfork.empty())
+		image_handler::fsave_rsrc(image_handler::path_make_rsrc(dstpath), rfork);
 
 	return 0;
 }
@@ -518,12 +515,12 @@ static int flopread(int argc, char *argv[])
 		return 1;
 	}
 
-	if(ih.floppy_load(source_format)) {
+	if(ih.floppy_load(*source_format)) {
 		fprintf(stderr, "Error: Loading as format '%s' failed\n", source_format->m_format->name());
 		return 1;
 	}
 
-	if(ih.floppy_mount_fs(fs)) {
+	if(ih.floppy_mount_fs(*fs)) {
 		fprintf(stderr, "Error: Parsing as filesystem '%s' failed\n", fs->m_manager->name());
 		return 1;
 	}
@@ -553,7 +550,7 @@ static int hdread(int argc, char *argv[])
 		return 1;
 	}
 
-	if(ih.hd_mount_fs(fs)) {
+	if(ih.hd_mount_fs(*fs)) {
 		fprintf(stderr, "Error: Parsing as filesystem '%s' failed\n", fs->m_manager->name());
 		return 1;
 	}
@@ -568,44 +565,38 @@ static int generic_write(image_handler &ih, const char *srcpath, const char *dst
 	auto [fsm, fs] = ih.get_fs();
 
 	std::vector<std::string> path = ih.path_split(dstpath);
+	auto [err, meta] = fs->metadata(path);
+	std::ignore = meta;
 
-	auto dir = fs->root();
-	std::string apath;
-	for(unsigned int i = 0; i < path.size() - 1; i++) {
-		auto c = dir.contents();
-		unsigned int j;
-		for(j = 0; j != c.size(); j++)
-			if(c[j].m_name == path[i])
-				break;
-		if(j == c.size()) {
-			fprintf(stderr, "Error: directory %s%c%s not found\n", apath.c_str(), fsm->directory_separator(), path[i].c_str());
+	if(err) {
+		fs::meta_data meta;
+		meta.set(fs::meta_name::name, path.back());
+		auto dpath = path;
+		dpath.pop_back();
+		err = fs->file_create(dpath, meta);
+		if(err) {
+			fprintf(stderr, "File creation failure.\n");
 			return 1;
 		}
-		if(c[j].m_type != fs::dir_entry_type::dir) {
-			fprintf(stderr, "Error: %s%c%s is not a directory\n", apath.c_str(), fsm->directory_separator(), path[i].c_str());
-			return 1;
-		}
-		dir = dir.dir_get(c[j].m_key);
-		apath += fsm->directory_separator() + path[i];
 	}
 
+	auto dfork = image_handler::fload(srcpath);
+	err = fs->file_write(path, dfork);
+	if(err) {
+		fprintf(stderr, "File writing failure.\n");
+		return 1;
+	}
 
-	fs::meta_data meta;
-	meta.set(fs::meta_name::name, path.back());
-
-	auto file = dir.file_create(meta);
-	auto filedata = image_handler::fload(srcpath);
-	file.replace(filedata);
-
-	bool has_rsrc = fsm->has_rsrc();
-
-	if(has_rsrc) {
+	if(fsm->has_rsrc()) {
 		std::string rpath = image_handler::path_make_rsrc(dstpath);
 
 		if(image_handler::fexists(rpath)) {
-			filedata = image_handler::fload_rsrc(rpath);
-			if(!filedata.empty())
-				file.rsrc_replace(filedata);
+			auto rfork = image_handler::fload_rsrc(rpath);
+			if(!rfork.empty()) {
+				err = fs->file_rsrc_write(path, rfork);
+				fprintf(stderr, "File resource fork writing failure.\n");
+				return 1;
+			}
 		}
 	}
 
@@ -639,12 +630,12 @@ static int flopwrite(int argc, char *argv[])
 		return 1;
 	}
 
-	if(ih.floppy_load(source_format)) {
+	if(ih.floppy_load(*source_format)) {
 		fprintf(stderr, "Error: Loading as format '%s' failed\n", source_format->m_format->name());
 		return 1;
 	}
 
-	if(ih.floppy_mount_fs(fs)) {
+	if(ih.floppy_mount_fs(*fs)) {
 		fprintf(stderr, "Error: Parsing as filesystem '%s' failed\n", fs->m_manager->name());
 		return 1;
 	}
@@ -654,7 +645,7 @@ static int flopwrite(int argc, char *argv[])
 		return err;
 
 	ih.fs_to_floppy();
-	if(ih.floppy_save(source_format))
+	if(ih.floppy_save(*source_format))
 		return 1;
 
 	return 0;
@@ -683,7 +674,7 @@ static int hdwrite(int argc, char *argv[])
 		return 1;
 	}
 
-	if(ih.hd_mount_fs(fs)) {
+	if(ih.hd_mount_fs(*fs)) {
 		fprintf(stderr, "Error: Parsing as filesystem '%s' failed\n", fs->m_manager->name());
 		return 1;
 	}
@@ -734,7 +725,7 @@ int CLIB_DECL main(int argc, char *argv[])
 			return 1;
 		}
 	} catch(const std::exception &err) {
-		fprintf(stderr, "Error: %s", err.what());
+		fprintf(stderr, "Error: %s\n", err.what());
 		return 1;
 	}
 }

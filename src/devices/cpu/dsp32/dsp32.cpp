@@ -185,8 +185,6 @@ dsp32c_device::dsp32c_device(const machine_config &mconfig, const char *tag, dev
 
 void dsp32c_device::device_start()
 {
-	m_output_pins_changed.resolve_safe();
-
 	// get our address spaces
 	space(AS_PROGRAM).cache(m_cache);
 	space(AS_PROGRAM).specific(m_program);
@@ -552,17 +550,6 @@ uint32_t dsp32c_device::execute_min_cycles() const noexcept
 uint32_t dsp32c_device::execute_max_cycles() const noexcept
 {
 	return 4;
-}
-
-
-//-------------------------------------------------
-//  execute_input_lines - return the number of
-//  input/interrupt lines
-//-------------------------------------------------
-
-uint32_t dsp32c_device::execute_input_lines() const noexcept
-{
-	return 2;
 }
 
 

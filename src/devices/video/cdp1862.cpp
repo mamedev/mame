@@ -78,12 +78,12 @@ inline void cdp1862_device::initialize_palette()
 //  cdp1862_device - constructor
 //-------------------------------------------------
 
-cdp1862_device::cdp1862_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, CDP1862, tag, owner, clock),
-		device_video_interface(mconfig, *this),
-		m_read_rd(*this),
-		m_read_bd(*this),
-		m_read_gd(*this)
+cdp1862_device::cdp1862_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, CDP1862, tag, owner, clock),
+	device_video_interface(mconfig, *this),
+	m_read_rd(*this, 0),
+	m_read_bd(*this, 0),
+	m_read_gd(*this, 0)
 {
 }
 
@@ -94,11 +94,6 @@ cdp1862_device::cdp1862_device(const machine_config &mconfig, const char *tag, d
 
 void cdp1862_device::device_start()
 {
-	// resolve callbacks
-	m_read_rd.resolve_safe(0);
-	m_read_bd.resolve_safe(0);
-	m_read_gd.resolve_safe(0);
-
 	// find devices
 	screen().register_screen_bitmap(m_bitmap);
 

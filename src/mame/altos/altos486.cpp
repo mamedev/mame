@@ -15,6 +15,9 @@
 #include "machine/i8255.h"
 #include "bus/rs232/rs232.h"
 
+
+namespace {
+
 class altos486_state : public driver_device
 {
 public:
@@ -35,10 +38,10 @@ private:
 	void mmu_ram_w(offs_t offset, uint16_t data);
 	void mmu_io_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
-	void altos486_io(address_map &map);
-	void altos486_mem(address_map &map);
-	void altos486_z80_io(address_map &map);
-	void altos486_z80_mem(address_map &map);
+	void altos486_io(address_map &map) ATTR_COLD;
+	void altos486_mem(address_map &map) ATTR_COLD;
+	void altos486_z80_io(address_map &map) ATTR_COLD;
+	void altos486_z80_mem(address_map &map) ATTR_COLD;
 
 	required_device<i80186_cpu_device> m_maincpu;
 	required_shared_ptr<uint16_t> m_ram;
@@ -236,5 +239,8 @@ ROM_START( altos486 )
 	ROM_REGION( 0x0020, "proms", 0 )
 	ROM_LOAD( "15020.bin",    0x0000, 0x0020, CRC(6a2bd961) SHA1(e9a9ed235574c9871dc32a80ff5ca4df6bd531e1) )
 ROM_END
+
+} // anonymous namespace
+
 
 COMP( 1984, altos486, 0, 0, altos486, 0, altos486_state, empty_init, "Altos Computer Systems", "Altos 486", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)

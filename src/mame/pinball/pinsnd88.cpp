@@ -179,7 +179,7 @@ void pinsnd88_device::sync_w(uint8_t data)
 	machine().scheduler().synchronize(timer_expired_delegate(FUNC(pinsnd88_device::deferred_sync_w),this), 0);
 }
 
-WRITE_LINE_MEMBER(pinsnd88_device::strobe_w)
+void pinsnd88_device::strobe_w(int state)
 {
 	m_inputlatch->write(m_data_in);
 }
@@ -189,7 +189,7 @@ void pinsnd88_device::data_w(uint8_t data)
 	m_data_in = data;
 }
 
-WRITE_LINE_MEMBER(pinsnd88_device::resetq_w)
+void pinsnd88_device::resetq_w(int state)
 {
 	if ((m_old_resetq_state != CLEAR_LINE) && (state == CLEAR_LINE))
 	{
@@ -225,9 +225,6 @@ void pinsnd88_device::device_start()
 	u8 *rom = memregion("cpu")->base();
 	m_cpubank->configure_entries(0, 8, &rom[0x0], 0x8000);
 	m_cpubank->set_entry(0);
-
-	/* resolve lines */
-	m_syncq_cb.resolve_safe();
 
 	/* timer */
 	m_sync_timer = timer_alloc(FUNC(pinsnd88_device::sync_callback), this);

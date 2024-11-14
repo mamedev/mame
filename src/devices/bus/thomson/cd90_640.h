@@ -15,17 +15,17 @@
 class cd90_640_device : public device_t, public thomson_extension_interface
 {
 public:
-	cd90_640_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	cd90_640_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	virtual ~cd90_640_device() = default;
 
-	virtual void rom_map(address_map &map) override;
-	virtual void io_map(address_map &map) override;
+	virtual void rom_map(address_map &map) override ATTR_COLD;
+	virtual void io_map(address_map &map) override ATTR_COLD;
 
 protected:
-	virtual const tiny_rom_entry *device_rom_region() const override;
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 private:
 	required_device<wd1770_device> m_fdc;

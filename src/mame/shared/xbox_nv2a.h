@@ -3,12 +3,11 @@
 /*
  * geforce 3d (NV2A) vertex program disassembler
  */
-#ifndef MAME_INCLUDES_XBOX_NV2A_H
-#define MAME_INCLUDES_XBOX_NV2A_H
+#ifndef MAME_SHARED_XBOX_NV2A_H
+#define MAME_SHARED_XBOX_NV2A_H
 
 #pragma once
 
-#include "machine/pic8259.h"
 #include "video/poly.h"
 
 class vertex_program_disassembler {
@@ -653,7 +652,7 @@ public:
 	running_machine &machine() { return mach; }
 	uint32_t geforce_r(offs_t offset, uint32_t mem_mask = ~0);
 	void geforce_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
-	DECLARE_WRITE_LINE_MEMBER(vblank_callback);
+	void vblank_callback(int state);
 	uint32_t screen_update_callback(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	bool update_interrupts();
 	void set_irq_callbaclk(std::function<void(int state)> callback) { irq_callback = callback; }
@@ -892,4 +891,4 @@ public:
 	bool enable_clipping_w = false;
 };
 
-#endif // MAME_INCLUDES_XBOX_NV2A_H
+#endif // MAME_SHARED_XBOX_NV2A_H

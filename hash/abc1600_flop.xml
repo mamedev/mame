@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <!--
-license:CC0
+license:CC0-1.0
 -->
 <softwarelist name="abc1600_flop" description="Luxor ABC 1600 diskettes">
 
@@ -168,6 +168,27 @@ license:CC0
 			<feature name="part_id" value="uppg5_18"/>
 			<dataarea name="flop" size="596556">
 				<rom name="uppg5_18.td0" size="596556" crc="0e6d00e2" sha1="77538ce8260ca52cb328d08901443fa2ba7ee778"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="systest">
+		<description>ABC1600 Test Program v5.0</description>
+		<year>1985</year>
+		<publisher>Luxor</publisher>
+		<info name="usage" value="mf(2,0)&#10;mf(2,0)&#10;systest1600" />
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Binary"/>
+			<dataarea name="flop" size="655360">
+				<rom name="mount1600_systest1600_bootpar.img" size="655360" crc="d37ad6b9" sha1="ddd82bf8e2c661c4404e9d687e3b1ccbc0898507"/>
+			</dataarea>
+		</part>
+
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Source"/>
+			<dataarea name="flop" size="655360">
+				<rom name="test1600.img" size="655360" crc="a3894e07" sha1="49850f5283f231b61026b9aa32496c74b58d8d74"/>
 			</dataarea>
 		</part>
 	</software>

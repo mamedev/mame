@@ -60,7 +60,10 @@
 
 #include "emu.h"
 #include "logmacro.h"
-#include "cpu/m68000/m68000.h"
+#include "cpu/m68000/m68010.h"
+#include "cpu/m68000/m68020.h"
+#include "cpu/m68000/m68030.h"
+#include "cpu/m68000/m68040.h"
 #include "machine/6840ptm.h"
 #include "bus/hp_dio/hp_dio.h"
 
@@ -94,13 +97,12 @@ public:
 	void hp9k382(machine_config &config);
 
 protected:
-	virtual void machine_reset() override;
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 	virtual void driver_start() override;
 
 private:
 	void hp9k300(machine_config &config);
-	required_device<m68000_base_device> m_maincpu;
+	required_device<m68000_musashi_device> m_maincpu;
 
 	output_finder<8> m_diag_led;
 
@@ -113,26 +115,26 @@ private:
 
 	void led_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
-	void hp9k310_map(address_map &map);
-	void hp9k320_map(address_map &map);
-	void hp9k330_map(address_map &map);
-	void hp9k332_map(address_map &map);
-	void hp9k360_map(address_map &map);
-	void hp9k370_map(address_map &map);
-	void hp9k380_map(address_map &map);
-	void hp9k382_map(address_map &map);
-	void hp9k3xx_common(address_map &map);
+	void hp9k310_map(address_map &map) ATTR_COLD;
+	void hp9k320_map(address_map &map) ATTR_COLD;
+	void hp9k330_map(address_map &map) ATTR_COLD;
+	void hp9k332_map(address_map &map) ATTR_COLD;
+	void hp9k360_map(address_map &map) ATTR_COLD;
+	void hp9k370_map(address_map &map) ATTR_COLD;
+	void hp9k380_map(address_map &map) ATTR_COLD;
+	void hp9k382_map(address_map &map) ATTR_COLD;
+	void hp9k3xx_common(address_map &map) ATTR_COLD;
 
 	void add_dio16_bus(machine_config &mconfig);
 	void add_dio32_bus(machine_config &mconfig);
 
-	DECLARE_WRITE_LINE_MEMBER(dio_irq1_w) { m_maincpu->set_input_line(M68K_IRQ_1, state); };
-	DECLARE_WRITE_LINE_MEMBER(dio_irq2_w) { m_maincpu->set_input_line(M68K_IRQ_2, state); };
-	DECLARE_WRITE_LINE_MEMBER(dio_irq3_w) { m_maincpu->set_input_line(M68K_IRQ_3, state); };
-	DECLARE_WRITE_LINE_MEMBER(dio_irq4_w) { m_maincpu->set_input_line(M68K_IRQ_4, state); };
-	DECLARE_WRITE_LINE_MEMBER(dio_irq5_w) { m_maincpu->set_input_line(M68K_IRQ_5, state); };
-	DECLARE_WRITE_LINE_MEMBER(dio_irq6_w) { m_maincpu->set_input_line(M68K_IRQ_6, state); };
-	DECLARE_WRITE_LINE_MEMBER(dio_irq7_w) { m_maincpu->set_input_line(M68K_IRQ_7, state); };
+	void dio_irq1_w(int state) { m_maincpu->set_input_line(M68K_IRQ_1, state); }
+	void dio_irq2_w(int state) { m_maincpu->set_input_line(M68K_IRQ_2, state); }
+	void dio_irq3_w(int state) { m_maincpu->set_input_line(M68K_IRQ_3, state); }
+	void dio_irq4_w(int state) { m_maincpu->set_input_line(M68K_IRQ_4, state); }
+	void dio_irq5_w(int state) { m_maincpu->set_input_line(M68K_IRQ_5, state); }
+	void dio_irq6_w(int state) { m_maincpu->set_input_line(M68K_IRQ_6, state); }
+	void dio_irq7_w(int state) { m_maincpu->set_input_line(M68K_IRQ_7, state); }
 
 	bool m_bus_error = false;
 	emu_timer *m_bus_error_timer = nullptr;
@@ -224,13 +226,6 @@ void hp9k3xx_state::driver_start()
 	m_diag_led.resolve();
 }
 
-void hp9k3xx_state::machine_reset()
-{
-	auto *dio = subdevice<bus::hp_dio::dio16_device>("diobus");
-	if (dio)
-		m_maincpu->set_reset_callback(*dio, FUNC(bus::hp_dio::dio16_device::reset_in));
-}
-
 void hp9k3xx_state::machine_start()
 {
 	m_bus_error_timer = timer_alloc(FUNC(hp9k3xx_state::bus_error_timeout), this);
@@ -264,6 +259,7 @@ void hp9k3xx_state::add_dio16_bus(machine_config &config)
 {
 	bus::hp_dio::dio16_device &dio16(DIO16(config, "diobus", 0));
 	dio16.set_program_space(m_maincpu, AS_PROGRAM);
+	m_maincpu->reset_cb().set(dio16, FUNC(bus::hp_dio::dio16_device::reset_in));
 
 	dio16.irq1_out_cb().set(FUNC(hp9k3xx_state::dio_irq1_w));
 	dio16.irq2_out_cb().set(FUNC(hp9k3xx_state::dio_irq2_w));

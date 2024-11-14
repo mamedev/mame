@@ -332,7 +332,7 @@ Type 3 (PCMCIA Compact Flash Adaptor + Compact Flash card, sealed together with 
 #include "emu.h"
 #include "zn.h"
 
-#include "machine/ataflash.h"
+#include "bus/pccard/ataflash.h"
 #include "machine/intelfsh.h"
 #include "machine/rf5c296.h"
 
@@ -383,12 +383,12 @@ private:
 	uint8_t gnet_mahjong_panel_r();
 	uint32_t zsg2_ext_r(offs_t offset);
 
-	void flashbank_map(address_map &map);
-	void main_map(address_map &map);
-	void main_mp_map(address_map &map);
+	void flashbank_map(address_map &map) ATTR_COLD;
+	void main_map(address_map &map) ATTR_COLD;
+	void main_mp_map(address_map &map) ATTR_COLD;
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	required_device<cpu_device> m_mn10200;
 	required_device<pccard_slot_device> m_pccard;
@@ -771,7 +771,7 @@ static INPUT_PORTS_START( coh3002t )
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("JP1")
-	PORT_DIPNAME( 0x01, 0x00, "Bios Flash" )            PORT_DIPLOCATION("JP1:1")
+	PORT_DIPNAME( 0x01, 0x00, "BIOS Flash" )            PORT_DIPLOCATION("JP1:1")
 	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 INPUT_PORTS_END
@@ -836,7 +836,7 @@ INPUT_PORTS_END
 static INPUT_PORTS_START(coh3002t_jp1)
 	PORT_INCLUDE(coh3002t)
 	PORT_MODIFY("JP1")
-	PORT_DIPNAME( 0x01, 0x01, "Bios Flash")
+	PORT_DIPNAME( 0x01, 0x01, "BIOS Flash")
 	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 INPUT_PORTS_END
@@ -855,9 +855,9 @@ INPUT_PORTS_END
 	ROM_REGION16_LE( 0x200000, "biosflash", 0 ) \
 	ROM_LOAD( "flash.u30", 0x000000, 0x200000, CRC(c48c8236) SHA1(c6dad60266ce2ff635696bc0d91903c543273559) ) \
 	ROM_REGION16_LE( 0x100000, "bioseprom", 0 ) \
-	ROM_SYSTEM_BIOS( 0, "v1", "G-NET Bios v1 flasher" ) \
+	ROM_SYSTEM_BIOS( 0, "v1", "G-NET BIOS v1 flasher" ) \
 	ROMX_LOAD( "f35-01_m27c800_v1.bin", 0x000000, 0x100000, CRC(cd15cc30) SHA1(78361f46fa7186d5058937c86c66247a86b1257f), ROM_BIOS(0) ) /* hand made */ \
-	ROM_SYSTEM_BIOS( 1, "v2", "G-NET Bios v2 flasher" ) \
+	ROM_SYSTEM_BIOS( 1, "v2", "G-NET BIOS v2 flasher" ) \
 	ROMX_LOAD( "f35-01_m27c800.bin", 0x000000, 0x100000, CRC(6225ec11) SHA1(047852d456b6ff85f8e640887caa03cf3e63ffad), ROM_BIOS(1) ) \
 	ROM_REGION( 0x80000, "taito_zoom:mn10200", 0 ) \
 	ROM_FILL( 0, 0x80000, 0xff ) \
@@ -873,91 +873,91 @@ ROM_END
 ROM_START(raycris)
 	TAITOGNET_BIOS
 
-	DISK_REGION( "pccard:taitopccard1:image" )
+	DISK_REGION( "pccard:taitopccard1" )
 	DISK_IMAGE( "raycris", 0, SHA1(9d255710c87c3286542d357820d828807cc6ca07))
 ROM_END
 
 ROM_START(raycrisj)
 	TAITOGNET_BIOS
 
-	DISK_REGION( "pccard:taitopccard1:image" )
+	DISK_REGION( "pccard:taitopccard1" )
 	DISK_IMAGE( "raycrisj", 0, SHA1(015cb0e6c4421cc38809de28c4793b4491386aee))
 ROM_END
 
 ROM_START(gobyrc)
 	TAITOGNET_BIOS
 
-	DISK_REGION( "pccard:taitopccard2:image" )
+	DISK_REGION( "pccard:taitopccard2" )
 	DISK_IMAGE( "gobyrc", 0, SHA1(0bee1f495fc8b033fd56aad9260ae94abb35eb58))
 ROM_END
 
 ROM_START(rcdego)
 	TAITOGNET_BIOS
 
-	DISK_REGION( "pccard:taitopccard1:image" )
+	DISK_REGION( "pccard:taitopccard1" )
 	DISK_IMAGE( "rcdego", 0, SHA1(9e177f2a3954cfea0c8c5a288e116324d10f5dd1))
 ROM_END
 
 ROM_START(chaoshea)
 	TAITOGNET_BIOS
 
-	DISK_REGION( "pccard:taitopccard1:image" )
+	DISK_REGION( "pccard:taitopccard1" )
 	DISK_IMAGE( "chaosheat", 0, SHA1(c13b7d7025eee05f1f696d108801c7bafb3f1356))
 ROM_END
 
 ROM_START(chaosheaj)
 	TAITOGNET_BIOS
 
-	DISK_REGION( "pccard:taitopccard1:image" )
+	DISK_REGION( "pccard:taitopccard1" )
 	DISK_IMAGE( "chaosheatj", 0, SHA1(2f211ac08675ea8ec33c7659a13951db94eaa627))
 ROM_END
 
 ROM_START(flipmaze)
 	TAITOGNET_BIOS
 
-	DISK_REGION( "pccard:taitopccard1:image" )
+	DISK_REGION( "pccard:taitopccard1" )
 	DISK_IMAGE( "flipmaze", 0, SHA1(423b6c06f4f2d9a608ce20b61a3ac11687d22c40) )
 ROM_END
 
 ROM_START(spuzbobl)
 	TAITOGNET_BIOS
 
-	DISK_REGION( "pccard:taitopccard2:image" )
+	DISK_REGION( "pccard:taitopccard2" )
 	DISK_IMAGE( "spuzbobl", 0, SHA1(1b1c72fb7e5656021485fefaef8f2ba48e2b4ea8))
 ROM_END
 
 ROM_START(spuzboblj)
 	TAITOGNET_BIOS
 
-	DISK_REGION( "pccard:taitopccard2:image" )
+	DISK_REGION( "pccard:taitopccard2" )
 	DISK_IMAGE( "spuzbobj", 0, SHA1(dac433cf88543d2499bf797d7406b82ae4338726))
 ROM_END
 
 ROM_START(soutenry)
 	TAITOGNET_BIOS
 
-	DISK_REGION( "pccard:taitopccard1:image" )
+	DISK_REGION( "pccard:taitopccard1" )
 	DISK_IMAGE( "soutenry", 0, SHA1(9204d0be833d29f37b8cd3fbdf09da69b622254b))
 ROM_END
 
 ROM_START(shanghss)
 	TAITOGNET_BIOS
 
-	DISK_REGION( "pccard:taitopccard1:image" )
+	DISK_REGION( "pccard:taitopccard1" )
 	DISK_IMAGE( "shanghss", 0, SHA1(7964f71ec5c81d2120d83b63a82f97fbad5a8e6d))
 ROM_END
 
 ROM_START(sianniv)
 	TAITOGNET_BIOS
 
-	DISK_REGION( "pccard:taitopccard1:image" )
+	DISK_REGION( "pccard:taitopccard1" )
 	DISK_IMAGE( "sianniv", 0, SHA1(1e08b813190a9e1baf29bc16884172d6c8da7ae3))
 ROM_END
 
 ROM_START(kollon)
 	TAITOGNET_BIOS
 
-	DISK_REGION( "pccard:taitopccard1:image" )
+	DISK_REGION( "pccard:taitopccard1" )
 	DISK_IMAGE( "kollon", 0, SHA1(d8ea5b5b0ee99004b16ef89883e23de6c7ddd7ce))
 ROM_END
 
@@ -965,21 +965,21 @@ ROM_START(kollonc)
 	TAITOGNET_BIOS
 	ROM_DEFAULT_BIOS( "v2" )
 
-	DISK_REGION( "pccard:taitocf:image" )
+	DISK_REGION( "pccard:taitocf" )
 	DISK_IMAGE( "kollonc", 0, SHA1(ce62181659701cfb8f7c564870ab902be4d8e060)) /* Original Taito Compact Flash version */
 ROM_END
 
 ROM_START(shikigam)
 	TAITOGNET_BIOS
 
-	DISK_REGION( "pccard:taitopccard1:image" )
+	DISK_REGION( "pccard:taitopccard1" )
 	DISK_IMAGE( "shikigam", 0, SHA1(fa49a0bc47f5cb7c30d7e49e2c3696b21bafb840))
 ROM_END
 
 ROM_START(shikigama)
 	TAITOGNET_BIOS
 
-	DISK_REGION( "pccard:taitopccard1:image" )
+	DISK_REGION( "pccard:taitopccard1" )
 	DISK_IMAGE( "shikigama", 0, SHA1(a6fe194c86730963301be9710782ca4ac1bf3e8d))
 ROM_END
 
@@ -989,50 +989,57 @@ ROM_END
 ROM_START(otenamih)
 	TAITOGNET_BIOS
 
-	DISK_REGION( "pccard:taitopccard1:image" )
+	DISK_REGION( "pccard:taitopccard1" )
 	DISK_IMAGE( "otenamih", 0, SHA1(b3babe3a1876c43745616ee1e7d87276ce7dad0b) )
 ROM_END
 
 ROM_START(psyvaria)
 	TAITOGNET_BIOS
 
-	DISK_REGION( "pccard:taitopccard1:image" )
+	DISK_REGION( "pccard:taitopccard1" )
 	DISK_IMAGE( "psyvaria", 0,  SHA1(3c7fca5180356190a8bf94b22a847fdd2e6a4e13))
 ROM_END
 
 ROM_START(psyvarij)
 	TAITOGNET_BIOS
 
-	DISK_REGION( "pccard:taitopccard1:image" )
+	DISK_REGION( "pccard:taitopccard1" )
 	DISK_IMAGE( "psyvarij", 0,  SHA1(b981a42a10069322b77f7a268beae1d409b4156d))
 ROM_END
 
 ROM_START(psyvarrv)
 	TAITOGNET_BIOS
 
-	DISK_REGION( "pccard:taitopccard1:image" )
+	DISK_REGION( "pccard:taitopccard1" )
 	DISK_IMAGE( "psyvarrv", 0, SHA1(277c4f52502bcd7acc1889840962ec80d56465f3))
 ROM_END
 
 ROM_START(zooo)
 	TAITOGNET_BIOS
 
-	DISK_REGION( "pccard:taitopccard1:image" )
+	DISK_REGION( "pccard:taitopccard1" )
 	DISK_IMAGE( "zooo", 0, SHA1(e275b3141b2bc49142990e6b497a5394a314a30b))
 ROM_END
 
 ROM_START(zokuoten)
 	TAITOGNET_BIOS
 
-	DISK_REGION( "pccard:taitopccard1:image" )
-	DISK_IMAGE( "zokuoten", 0, SHA1(5ce13db00518f96af64935176c71ec68d2a51938))
+	DISK_REGION( "pccard:taitopccard2" )
+	DISK_IMAGE( "zokuoten", 0, SHA1(116e58c90f39a3c18ca6fe0216c998ba02c58814))
+ROM_END
+
+ROM_START(zokuotena)
+	TAITOGNET_BIOS
+
+	DISK_REGION( "pccard:taitopccard1" )
+	DISK_IMAGE( "zokuotena", 0, SHA1(5ce13db00518f96af64935176c71ec68d2a51938))
 ROM_END
 
 ROM_START(otenamhf)
 	TAITOGNET_BIOS
 	ROM_DEFAULT_BIOS( "v2" )
 
-	DISK_REGION( "pccard:taitocf:image" )
+	DISK_REGION( "pccard:taitocf" )
 	DISK_IMAGE( "otenamhf", 0, SHA1(5b15c33bf401e5546d78e905f538513d6ffcf562)) /* Original Taito Compact Flash version */
 ROM_END
 
@@ -1042,14 +1049,14 @@ ROM_END
 ROM_START(nightrai)
 	TAITOGNET_BIOS
 
-	DISK_REGION( "pccard:taitopccard1:image" )
+	DISK_REGION( "pccard:taitopccard1" )
 	DISK_IMAGE( "nightrai", 0, SHA1(74d0458f851cbcf10453c5cc4c47bb4388244cdf))
 ROM_END
 
 ROM_START(otenki)
 	TAITOGNET_BIOS
 
-	DISK_REGION( "pccard:taitopccard1:image" )
+	DISK_REGION( "pccard:taitopccard1" )
 	DISK_IMAGE( "otenki", 0, SHA1(7e745ca4c4570215f452fd09cdd56a42c39caeba))
 ROM_END
 
@@ -1059,21 +1066,21 @@ ROM_END
 ROM_START(usagi)
 	TAITOGNET_BIOS
 
-	DISK_REGION( "pccard:taitopccard2:image" )
+	DISK_REGION( "pccard:taitopccard2" )
 	DISK_IMAGE( "usagi", 0, SHA1(edf9dd271957f6cb06feed238ae21100514bef8e))
 ROM_END
 
 ROM_START(mahjngoh)
 	TAITOGNET_BIOS
 
-	DISK_REGION( "pccard:taitopccard1:image" )
+	DISK_REGION( "pccard:taitopccard1" )
 	DISK_IMAGE( "mahjngoh", 0, SHA1(3ef1110d15582d7c0187438d7ad61765dd121cff))
 ROM_END
 
 ROM_START(shangtou)
 	TAITOGNET_BIOS
 
-	DISK_REGION( "pccard:taitopccard1:image" )
+	DISK_REGION( "pccard:taitopccard1" )
 	DISK_IMAGE( "shanghaito", 0, SHA1(9901db5a9aae77e3af4157aa2c601eaab5b7ca85) )
 ROM_END
 
@@ -1083,7 +1090,7 @@ ROM_END
 ROM_START(xiistag)
 	TAITOGNET_BIOS
 
-	DISK_REGION( "pccard:taitopccard1:image" )
+	DISK_REGION( "pccard:taitopccard1" )
 	DISK_IMAGE( "xiistag", 0, SHA1(586e37c8d926293b2bd928e5f0d693910cfb05a2))
 ROM_END
 
@@ -1116,7 +1123,8 @@ GAME( 1999, otenamih,  coh3002t, coh3002t_t1,    coh3002t,     taitogn_state, in
 GAME( 2000, psyvaria,  coh3002t, coh3002t_t1,    coh3002t,     taitogn_state, empty_init, ROT270, "Success", "Psyvariar -Medium Unit- (V2.02O 2000/02/22 13:00)", MACHINE_IMPERFECT_SOUND )
 GAME( 2000, psyvarij,  psyvaria, coh3002t_t1,    coh3002t,     taitogn_state, empty_init, ROT270, "Success", "Psyvariar -Medium Unit- (V2.04J 2000/02/15 11:00)", MACHINE_IMPERFECT_SOUND )
 GAME( 2000, psyvarrv,  coh3002t, coh3002t_t1,    coh3002t,     taitogn_state, empty_init, ROT270, "Success", "Psyvariar -Revision- (V2.04J 2000/08/11 22:00)", MACHINE_IMPERFECT_SOUND )
-GAME( 2001, zokuoten,  coh3002t, coh3002t_t1,    coh3002t,     taitogn_state, init_nozoom,ROT0,   "Success", "Zoku Otenamihaiken (V2.03J 2001/02/16 16:00)", 0 ) // boots the soundcpu without any valid code, causing an infinite NMI loop (currently circumvented)
+GAME( 2003, zokuoten,  coh3002t, coh3002t_t2,    coh3002t,     taitogn_state, init_nozoom,ROT0,   "Success", "Zoku Otenamihaiken (V2.05J 2003/05/12 18:00)", 0 )
+GAME( 2001, zokuotena, zokuoten, coh3002t_t1,    coh3002t,     taitogn_state, init_nozoom,ROT0,   "Success", "Zoku Otenamihaiken (V2.03J 2001/02/16 16:00)", 0 ) // boots the soundcpu without any valid code, causing an infinite NMI loop (currently circumvented)
 GAME( 2004, zooo,      coh3002t, coh3002t_t1,    coh3002t,     taitogn_state, init_nozoom,ROT0,   "Success", "Zooo (V2.01JA 2004/04/13 12:00)", 0 )
 GAME( 2005, otenamhf,  coh3002t, coh3002t_cf,    coh3002t_jp1, taitogn_state, init_nozoom,ROT0,   "Success / Warashi", "Otenami Haiken Final (V2.07JC 2005/04/20 15:36)", 0 )
 

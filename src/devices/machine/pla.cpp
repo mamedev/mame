@@ -11,7 +11,7 @@
 #include "jedparse.h"
 #include "plaparse.h"
 
-#define LOG_TERMS (1 << 0U)
+#define LOG_TERMS (1U << 1)
 //#define VERBOSE (LOG_TERMS)
 #include "logmacro.h"
 

@@ -251,7 +251,7 @@ static float128 poly_l2p1(float128 x)
 //       1-u             3     5     7           2n+1
 //
 
-static floatx80 fyl2x(floatx80 a, floatx80 b)
+floatx80 fyl2x(floatx80 a, floatx80 b)
 {
 	uint64_t aSig = extractFloatx80Frac(a);
 	int32_t aExp = extractFloatx80Exp(a);

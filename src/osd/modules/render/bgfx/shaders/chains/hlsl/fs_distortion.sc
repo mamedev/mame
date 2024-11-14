@@ -134,11 +134,11 @@ vec2 GetDistortedCoords(vec2 centerCoord, float amount, float amountCube)
 	float r2 = centerCoord.x * centerCoord.x + centerCoord.y * centerCoord.y;
 	float f = kcube == 0.0 ? 1.0 + r2 * k : 1.0 + r2 * (k + kcube * sqrt(r2));
 
-   	// fit screen bounds
+	// fit screen bounds
 	f /= 1.0 + amount * 0.25 + amountCube * 0.125;
 
 	// apply cubic distortion factor
-   	centerCoord *= f;
+	centerCoord *= f;
 
 	return centerCoord;
 }

@@ -20,19 +20,22 @@
 #include "speaker.h"
 
 
+namespace {
+
 class xtheball_state : public driver_device
 {
 public:
-	xtheball_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-			m_maincpu(*this, "maincpu"),
-			m_watchdog(*this, "watchdog"),
-			m_tlc34076(*this, "tlc34076"),
-			m_ticket(*this, "ticket"),
-			m_vram_bg(*this, "vrabg"),
-			m_vram_fg(*this, "vrafg"),
-			m_analog_x(*this, "ANALOGX"),
-			m_analog_y(*this, "ANALOGY") { }
+	xtheball_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_watchdog(*this, "watchdog"),
+		m_tlc34076(*this, "tlc34076"),
+		m_ticket(*this, "ticket"),
+		m_vram_bg(*this, "vrabg"),
+		m_vram_fg(*this, "vrafg"),
+		m_analog_x(*this, "ANALOGX"),
+		m_analog_y(*this, "ANALOGY")
+	{ }
 
 	void xtheball(machine_config &config);
 
@@ -50,16 +53,16 @@ private:
 	required_ioport m_analog_x;
 	required_ioport m_analog_y;
 
-	DECLARE_WRITE_LINE_MEMBER(foreground_mode_w);
+	void foreground_mode_w(int state);
 	uint16_t analogx_r();
 	uint16_t analogy_watchdog_r();
 
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 	TMS340X0_TO_SHIFTREG_CB_MEMBER(to_shiftreg);
 	TMS340X0_FROM_SHIFTREG_CB_MEMBER(from_shiftreg);
 	TMS340X0_SCANLINE_RGB32_CB_MEMBER(scanline_update);
-	void main_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
 };
 
 
@@ -151,7 +154,7 @@ TMS340X0_FROM_SHIFTREG_CB_MEMBER(xtheball_state::from_shiftreg)
  *
  *************************************/
 
-WRITE_LINE_MEMBER(xtheball_state::foreground_mode_w)
+void xtheball_state::foreground_mode_w(int state)
 {
 	m_foreground_mode = state;
 }
@@ -173,7 +176,9 @@ uint16_t xtheball_state::analogx_r()
 uint16_t xtheball_state::analogy_watchdog_r()
 {
 	/* doubles as a watchdog address */
-	m_watchdog->watchdog_reset();
+	if (!machine().side_effects_disabled())
+		m_watchdog->watchdog_reset();
+
 	return (m_analog_y->read() << 8) | 0x00ff;
 }
 
@@ -220,7 +225,7 @@ void xtheball_state::main_map(address_map &map)
 static INPUT_PORTS_START( xtheball )
 	PORT_START("DSW")
 	PORT_BIT( 0x000f, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("ticket", ticket_dispenser_device, line_r)
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("ticket", FUNC(ticket_dispenser_device::line_r))
 	PORT_BIT( 0x00e0, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_DIPNAME( 0x0700, 0x0000, "Target Tickets")
 	PORT_DIPSETTING(      0x0000, "3" )
@@ -315,7 +320,7 @@ void xtheball_state::xtheball(machine_config &config)
 	latch3.q_out_cb<3>().set(FUNC(xtheball_state::foreground_mode_w));
 	// Q3 = video foreground control?
 
-	TICKET_DISPENSER(config, m_ticket, attotime::from_msec(100), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH);
+	TICKET_DISPENSER(config, m_ticket, attotime::from_msec(100));
 
 	WATCHDOG_TIMER(config, m_watchdog);
 
@@ -354,6 +359,7 @@ ROM_START( xtheball )
 	ROM_LOAD16_BYTE( "xtb-2h.ic11", 0x200001, 0x80000, CRC(50c27558) SHA1(ecfb7d918868d35a8cde45f7d04fdfc3ffc06328) )
 ROM_END
 
+} // anonymous namespace
 
 
 /*************************************

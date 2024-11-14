@@ -23,17 +23,17 @@ protected:
 	lle_device_base(machine_config const &mconfig, device_type type, char const *tag, device_t *owner, u32 clock);
 
 	// device overrides
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
-	virtual void io_map(address_map &map);
-	virtual void ext_map(address_map &map);
+	virtual void io_map(address_map &map) ATTR_COLD;
+	virtual void ext_map(address_map &map) ATTR_COLD;
 
-	DECLARE_WRITE_LINE_MEMBER(input_txd) override { m_txd = state; }
+	void input_txd(int state) override { m_txd = state; }
 
-	DECLARE_READ_LINE_MEMBER(t0_r);
-	DECLARE_READ_LINE_MEMBER(t1_r);
+	int t0_r();
+	int t1_r();
 	void p1_w(u8 data);
 	void p2_w(u8 data);
 	u8 bus_r();
@@ -62,8 +62,8 @@ class lle_en_us_device : public lle_device_base
 public:
 	lle_en_us_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock);
 
-	virtual ioport_constructor device_input_ports() const override;
-	virtual tiny_rom_entry const *device_rom_region() const override;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
+	virtual tiny_rom_entry const *device_rom_region() const override ATTR_COLD;
 };
 
 } // namespace bus::interpro::keyboard

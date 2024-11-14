@@ -28,6 +28,9 @@
 #include "cpu/z80/z80.h"
 #include "machine/terminal.h"
 
+
+namespace {
+
 class zexall_state : public driver_device
 {
 public:
@@ -48,7 +51,7 @@ private:
 	void output_req_w(uint8_t data);
 	void output_data_w(uint8_t data);
 
-	void mem_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<generic_terminal_device> m_terminal;
@@ -58,8 +61,8 @@ private:
 	uint8_t m_out_req_last = 0U; // old value at 0xFFFE before the most recent write
 	uint8_t m_out_ack = 0U; // byte written to 0xFFFC
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 };
 
 
@@ -178,6 +181,8 @@ ROM_START( zexall )
 	ROM_LOAD( "interface.bin", 0x0000, 0x0051, CRC(4292a574) SHA1(d3ed6d84e2b64e51598f36b4f290972963e1eb6d) ) // written directly in machine code
 	ROM_LOAD( "zexall.bin",    0x0100, 0x2189, CRC(b6f869c3) SHA1(14021f75c1bc9f26688969581065a0efff3af59c) )
 ROM_END
+
+} // anonymous namespace
 
 
 /******************************************************************************

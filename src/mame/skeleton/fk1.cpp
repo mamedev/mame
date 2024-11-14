@@ -19,6 +19,8 @@ FK-1
 #include "screen.h"
 
 
+namespace {
+
 class fk1_state : public driver_device
 {
 public:
@@ -51,9 +53,9 @@ private:
 	uint8_t ppi3_a_r();
 	uint8_t ppi3_b_r();
 	uint8_t ppi3_c_r();
-	DECLARE_WRITE_LINE_MEMBER(pit_out0);
-	DECLARE_WRITE_LINE_MEMBER(pit_out1);
-	DECLARE_WRITE_LINE_MEMBER(pit_out2);
+	void pit_out0(int state);
+	void pit_out1(int state);
+	void pit_out2(int state);
 	void intr_w(uint8_t data);
 	uint8_t bank_ram_r();
 	uint8_t bank_rom_r();
@@ -62,14 +64,14 @@ private:
 	void reset_int_w(uint8_t data);
 	uint8_t m_video_rol;
 	uint8_t m_int_vector;
-	void machine_start() override;
-	void machine_reset() override;
+	void machine_start() override ATTR_COLD;
+	void machine_reset() override ATTR_COLD;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(keyboard_callback);
 	TIMER_DEVICE_CALLBACK_MEMBER(vsync_callback);
 	IRQ_CALLBACK_MEMBER(irq_callback);
-	void io_map(address_map &map);
-	void mem_map(address_map &map);
+	void io_map(address_map &map) ATTR_COLD;
+	void mem_map(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	required_region_ptr<u8> m_rom;
@@ -234,22 +236,22 @@ uint8_t fk1_state::ppi3_c_r()
 	return 0;
 }
 
-WRITE_LINE_MEMBER( fk1_state::pit_out0 )
+void fk1_state::pit_out0(int state)
 {
 	// System time
-	logerror("WRITE_LINE_MEMBER(fk1_pit_out0)\n");
+	logerror("fk1_pit_out0\n");
 }
 
-WRITE_LINE_MEMBER( fk1_state::pit_out1 )
+void fk1_state::pit_out1(int state)
 {
 	// Timeout for disk operation
-	logerror("WRITE_LINE_MEMBER(fk1_pit_out1)\n");
+	logerror("fk1_pit_out1\n");
 }
 
-WRITE_LINE_MEMBER( fk1_state::pit_out2 )
+void fk1_state::pit_out2(int state)
 {
 	// Overflow for disk operations
-	logerror("WRITE_LINE_MEMBER(fk1_pit_out2)\n");
+	logerror("fk1_pit_out2\n");
 }
 
 /*
@@ -485,6 +487,9 @@ ROM_START( fk1 )
 	ROM_SYSTEM_BIOS( 1, "diag", "Diag BIOS" )
 	ROMX_LOAD( "fk1-diag.u65", 0x0000, 0x0800, CRC(e0660ae1) SHA1(6ad609049b28f27126af0a8a6224362351073dee), ROM_BIOS(1))
 ROM_END
+
+} // anonymous namespace
+
 
 /* Driver */
 

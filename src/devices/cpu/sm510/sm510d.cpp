@@ -46,6 +46,38 @@ offs_t sm510_common_disassembler::increment_pc(offs_t pc, u8 pclen)
 
 // common lookup tables
 
+enum sm510_common_disassembler::e_mnemonics : unsigned
+{
+	// SM510 common
+	mILL /* 0! */, mEXT,
+	mLB, mLBL, mSBM, mEXBLA, mINCB, mDECB,
+	mATPL, mRTN0, mRTN1, mTL, mTML, mTM, mT,
+	mEXC, mBDC, mEXCI, mEXCD, mLDA, mLAX, mPTW, mWR, mWS,
+	mKTA, mATBP, mATX, mATL, mATFC, mATR,
+	mADD, mADD11, mADX, mCOMA, mROT, mRC, mSC,
+	mTB, mTC, mTAM, mTMI, mTA0, mTABL, mTIS, mTAL, mTF1, mTF4,
+	mRM, mSM,
+	mPRE, mSME, mRME, mTMEL,
+	mSKIP, mCEND, mIDIV, mDR, mDTA, mCLKLO, mCLKHI,
+
+	// SM500 common
+	mCOMCB, mRTN, mRTNS, mSSR, mTR, mTRS, mRBM,
+	mADDC, mPDTW, mTW, mDTW,
+	mATS, mEXKSA, mEXKFA,
+	mRMF, mSMF, mCOMCN,
+	mTA, mTM2, mTG,
+
+	// SM530 common
+	mSABM, mSABL, mEXBL,
+	mTG2, mTBA,
+	mKETA, mATF, mSDS, mRDS,
+	mINIS,
+
+	// SM590 common
+	mTAX, mLBLX, mMTR, mSTR, mINBM, mDEBM, mRTA, mBLTA, mEXAX, mTBA2, mADS, mADC, mLBMX, mTLS,
+	mNOP, mCCTRL, mINBL, mDEBL, mXBLA, mADCS, mTR7 // aliases
+};
+
 const char *const sm510_common_disassembler::s_mnemonics[] =
 {
 	// SM510
@@ -199,7 +231,7 @@ offs_t sm510_common_disassembler::common_disasm(const u8 *lut_mnemonic, const u8
 
 const u8 sm510_disassembler::sm510_mnemonic[0x100] =
 {
-/*  0      1      2      3      4      5      6      7      8      9      A      B      C      D      E      F  */
+//  0      1      2      3      4      5      6      7      8      9      A      B      C      D      E      F
 	mSKIP, mATBP, mSBM,  mATPL, mRM,   mRM,   mRM,   mRM,   mADD,  mADD11,mCOMA, mEXBLA,mSM,   mSM,   mSM,   mSM,   // 0
 	mEXC,  mEXC,  mEXC,  mEXC,  mEXCI, mEXCI, mEXCI, mEXCI, mLDA,  mLDA,  mLDA,  mLDA,  mEXCD, mEXCD, mEXCD, mEXCD, // 1
 	mLAX,  mLAX,  mLAX,  mLAX,  mLAX,  mLAX,  mLAX,  mLAX,  mLAX,  mLAX,  mLAX,  mLAX,  mLAX,  mLAX,  mLAX,  mLAX,  // 2
@@ -231,7 +263,7 @@ offs_t sm510_disassembler::disassemble(std::ostream &stream, offs_t pc, const da
 
 const u8 sm511_disassembler::sm511_mnemonic[0x100] =
 {
-/*  0      1      2      3      4      5      6      7      8      9      A      B      C      D      E      F  */
+//  0      1      2      3      4      5      6      7      8      9      A      B      C      D      E      F
 	mROT,  mDTA,  mSBM,  mATPL, mRM,   mRM,   mRM,   mRM,   mADD,  mADD11,mCOMA, mEXBLA,mSM,   mSM,   mSM,   mSM,   // 0
 	mEXC,  mEXC,  mEXC,  mEXC,  mEXCI, mEXCI, mEXCI, mEXCI, mLDA,  mLDA,  mLDA,  mLDA,  mEXCD, mEXCD, mEXCD, mEXCD, // 1
 	mLAX,  mLAX,  mLAX,  mLAX,  mLAX,  mLAX,  mLAX,  mLAX,  mLAX,  mLAX,  mLAX,  mLAX,  mLAX,  mLAX,  mLAX,  mLAX,  // 2
@@ -273,7 +305,7 @@ offs_t sm511_disassembler::disassemble(std::ostream &stream, offs_t pc, const da
 
 const u8 sm500_disassembler::sm500_mnemonic[0x100] =
 {
-/*  0      1      2      3      4      5      6      7      8      9      A      B      C      D      E      F  */
+//  0      1      2      3      4      5      6      7      8      9      A      B      C      D      E      F
 	mSKIP, mATR,  mEXKSA,mATBP, mRM,   mRM,   mRM,   mRM,   mADD,  mADDC, mCOMA, mEXBLA,mSM,   mSM,   mSM,   mSM,   // 0
 	mEXC,  mEXC,  mEXC,  mEXC,  mEXCI, mEXCI, mEXCI, mEXCI, mLDA,  mLDA,  mLDA,  mLDA,  mEXCD, mEXCD, mEXCD, mEXCD, // 1
 	mLAX,  mLAX,  mLAX,  mLAX,  mLAX,  mLAX,  mLAX,  mLAX,  mLAX,  mLAX,  mLAX,  mLAX,  mLAX,  mLAX,  mLAX,  mLAX,  // 2
@@ -315,7 +347,7 @@ offs_t sm500_disassembler::disassemble(std::ostream &stream, offs_t pc, const da
 
 const u8 sm5a_disassembler::sm5a_mnemonic[0x100] =
 {
-/*  0      1      2      3      4      5      6      7      8      9      A      B      C      D      E      F  */
+//  0      1      2      3      4      5      6      7      8      9      A      B      C      D      E      F
 	mSKIP, mATR,  mSBM,  mATBP, mRM,   mRM,   mRM,   mRM,   mADD,  mADDC, mCOMA, mEXBLA,mSM,   mSM,   mSM,   mSM,   // 0
 	mEXC,  mEXC,  mEXC,  mEXC,  mEXCI, mEXCI, mEXCI, mEXCI, mLDA,  mLDA,  mLDA,  mLDA,  mEXCD, mEXCD, mEXCD, mEXCD, // 1
 	mLAX,  mLAX,  mLAX,  mLAX,  mLAX,  mLAX,  mLAX,  mLAX,  mLAX,  mLAX,  mLAX,  mLAX,  mLAX,  mLAX,  mLAX,  mLAX,  // 2
@@ -357,7 +389,7 @@ offs_t sm5a_disassembler::disassemble(std::ostream &stream, offs_t pc, const dat
 
 const u8 sm530_disassembler::sm530_mnemonic[0x100] =
 {
-/*  0      1      2      3      4      5      6      7      8      9      A      B      C      D      E      F  */
+//  0      1      2      3      4      5      6      7      8      9      A      B      C      D      E      F
 	mSKIP, mADX,  mADX,  mADX,  mADX,  mADX,  mADX,  mADX,  mADX,  mADX,  mADX,  mADX,  mADX,  mADX,  mADX,  mADX,  // 0
 	mLAX,  mLAX,  mLAX,  mLAX,  mLAX,  mLAX,  mLAX,  mLAX,  mLAX,  mLAX,  mLAX,  mLAX,  mLAX,  mLAX,  mLAX,  mLAX,  // 1
 	mLDA,  mLDA,  mLDA,  mLDA,  mEXC,  mEXC,  mEXC,  mEXC,  mEXCI, mEXCI, mEXCI, mEXCI, mEXCD, mEXCD, mEXCD, mEXCD, // 2
@@ -389,7 +421,7 @@ offs_t sm530_disassembler::disassemble(std::ostream &stream, offs_t pc, const da
 
 const u8 sm590_disassembler::sm590_mnemonic[0x100] =
 {
-/*  0      1      2      3      4      5      6      7      8      9      A      B      C      D      E      F  */
+//  0      1      2      3      4      5      6      7      8      9      A      B      C      D      E      F
 	mNOP,  mADX,  mADX,  mADX,  mADX,  mADX,  mADX,  mADX,  mADX,  mADX,  mADX,  mADX,  mADX,  mADX,  mADX,  mADX,  // 0
 	mTAX,  mTAX,  mTAX,  mTAX,  mTAX,  mTAX,  mTAX,  mTAX,  mTAX,  mTAX,  mTAX,  mTAX,  mTAX,  mTAX,  mTAX,  mTAX,  // 1
 	mLBLX, mLBLX, mLBLX, mLBLX, mLBLX, mLBLX, mLBLX, mLBLX, mLBLX, mLBLX, mLBLX, mLBLX, mLBLX, mLBLX, mLBLX, mLBLX, // 2

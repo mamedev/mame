@@ -1,0 +1,525 @@
+<?xml version="1.0"?>
+
+<!--
+license: CC0-1.0
+copyright-holders: natarii, Dirk Best
+
+Gerät 32620 (Sprach-Morsegenerator)
+-->
+
+<mamelayout version="2">
+
+	<element name="panel">
+		<rect>
+			<bounds left="0" top="0" right="1" bottom="1" />
+			<color red="0.87" green="0.92" blue="0.86" />
+		</rect>
+	</element>
+
+	<element name="background">
+		<rect>
+			<bounds left="0" top="0" right="1" bottom="1" />
+			<color red="0.04" green="0.05" blue="0.03" />
+		</rect>
+	</element>
+
+	<element name="led">
+		<disk>
+			<bounds left="0" top="0" right="1" bottom="1" />
+			<color red="0.12" green="0.13" blue="0.10" />
+		</disk>
+		<disk state="0">
+			<bounds left="0.2" top="0.2" right="0.8" bottom="0.8" />
+			<color red="0.38" green="0.26" blue="0.22" />
+		</disk>
+		<disk state="1">
+			<bounds left="0.2" top="0.2" right="0.8" bottom="0.8" />
+			<color red="0.91" green="0.28" blue="0.29" />
+		</disk>
+	</element>
+
+	<element name="txt_speech">
+		<rect><color red="0.87" green="0.92" blue="0.86" /></rect>
+		<text string="SPEECH" align="2"><color red="0.12" green="0.13" blue="0.10" /></text>
+	</element>
+
+	<element name="txt_morse">
+		<rect><color red="0.87" green="0.92" blue="0.86" /></rect>
+		<text string="MORSE" align="2"><color red="0.12" green="0.13" blue="0.10" /></text>
+	</element>
+
+	<element name="txt_standard">
+		<rect><color red="0.87" green="0.92" blue="0.86" /></rect>
+		<text string="STANDARD" align="2"><color red="0.12" green="0.13" blue="0.10" /></text>
+	</element>
+
+	<element name="background_vqc10">
+		<rect>
+			<color red="0.20" green="0.02" blue="0.02" />
+		</rect>
+	</element>
+
+	<element name="matrix_vqc10">
+		<rect state="0">
+			<color red="0.64" green="0.13" blue="0.15" />
+		</rect>
+		<rect state="1">
+			<color red="1.00" green="0.51" blue="0.54" />
+		</rect>
+	</element>
+
+	<element name="matrix5dot_vqc10">
+		<rect>
+			<bounds left="0" top="0" right="9" bottom="1" />
+			<color red="0.30" green="0.03" blue="0.03" />
+		</rect>
+		<disk statemask="0x10" state="0">
+			<bounds x="0" /><color red="0.44" green="0.03" blue="0.05" />
+		</disk>
+		<disk statemask="0x10">
+			<bounds x="0" /><color red="1.00" green="0.41" blue="0.44" />
+		</disk>
+		<disk statemask="0x08" state="0">
+			<bounds x="2" /><color red="0.44" green="0.03" blue="0.05" />
+		</disk>
+		<disk statemask="0x08">
+			<bounds x="2" /><color red="1.00" green="0.41" blue="0.44" />
+		</disk>
+		<disk statemask="0x04" state="0">
+			<bounds x="4" /><color red="0.44" green="0.03" blue="0.05" />
+		</disk>
+		<disk statemask="0x04">
+			<bounds x="4" /><color red="1.00" green="0.41" blue="0.44" />
+		</disk>
+		<disk statemask="0x02" state="0">
+			<bounds x="6" /><color red="0.44" green="0.03" blue="0.05" />
+		</disk>
+		<disk statemask="0x02">
+			<bounds x="6" /><color red="1.00" green="0.41" blue="0.44" />
+		</disk>
+		<disk statemask="0x01" state="0">
+			<bounds x="8" /><color red="0.44" green="0.03" blue="0.05" />
+		</disk>
+		<disk statemask="0x01">
+			<bounds x="8" /><color red="1.00" green="0.41" blue="0.44" />
+		</disk>
+	</element>
+
+	<element name="button_white">
+		<rect>
+			<color red="0.79" green="0.77" blue="0.67" />
+		</rect>
+		<rect>
+			<color red="0.99" green="0.97" blue="0.87" />
+			<bounds left="0.05" top="0.05" right="0.95" bottom="0.95" />
+		</rect>
+	</element>
+
+	<element name="button_green">
+		<rect>
+			<color red="0.0" green="0.55" blue="0.38" />
+		</rect>
+		<rect>
+			<color red="0.02" green="0.75" blue="0.58" />
+			<bounds left="0.05" top="0.05" right="0.95" bottom="0.95" />
+		</rect>
+	</element>
+
+	<element name="button_red">
+		<rect>
+			<color red="0.80" green="0.17" blue="0.06" />
+		</rect>
+		<rect>
+			<color red="1.00" green="0.37" blue="0.26" />
+			<bounds left="0.05" top="0.05" right="0.95" bottom="0.95" />
+		</rect>
+	</element>
+
+	<element name="line">
+		<rect><color red="0.12" green="0.13" blue="0.10" /></rect>
+	</element>
+
+	<element name="txt_res">
+		<rect><color red="1.00" green="0.37" blue="0.26" /></rect>
+		<text string="RES"><color red="0.12" green="0.13" blue="0.10" /></text>
+	</element>
+	<element name="txt_sta">
+		<rect><color red="0.02" green="0.75" blue="0.58" /></rect>
+		<text string="STA"><color red="0.12" green="0.13" blue="0.10" /></text>
+	</element>
+	<element name="txt_stp">
+		<rect><color red="0.02" green="0.75" blue="0.58" /></rect>
+		<text string="STP"><color red="0.12" green="0.13" blue="0.10" /></text>
+	</element>
+	<element name="txt_7">
+		<rect><color red="0.99" green="0.97" blue="0.87" /></rect>
+		<text string="7"><color red="0.12" green="0.13" blue="0.10" /></text>
+	</element>
+	<element name="txt_8">
+		<rect><color red="0.99" green="0.97" blue="0.87" /></rect>
+		<text string="8"><color red="0.12" green="0.13" blue="0.10" /></text>
+	</element>
+	<element name="txt_9">
+		<rect><color red="0.99" green="0.97" blue="0.87" /></rect>
+		<text string="9"><color red="0.12" green="0.13" blue="0.10" /></text>
+	</element>
+	<element name="txt_colon">
+		<rect><color red="0.99" green="0.97" blue="0.87" /></rect>
+		<text string=":"><color red="0.12" green="0.13" blue="0.10" /></text>
+	</element>
+	<element name="txt_right">
+		<rect><color red="0.99" green="0.97" blue="0.87" /></rect>
+		<text string=">"><color red="0.12" green="0.13" blue="0.10" /></text>
+	</element>
+	<element name="txt_left">
+		<rect><color red="0.99" green="0.97" blue="0.87" /></rect>
+		<text string="&lt;"><color red="0.12" green="0.13" blue="0.10" /></text>
+	</element>
+	<element name="txt_4">
+		<rect><color red="0.99" green="0.97" blue="0.87" /></rect>
+		<text string="4"><color red="0.12" green="0.13" blue="0.10" /></text>
+	</element>
+	<element name="txt_5">
+		<rect><color red="0.99" green="0.97" blue="0.87" /></rect>
+		<text string="5"><color red="0.12" green="0.13" blue="0.10" /></text>
+	</element>
+	<element name="txt_6">
+		<rect><color red="0.99" green="0.97" blue="0.87" /></rect>
+		<text string="6"><color red="0.12" green="0.13" blue="0.10" /></text>
+	</element>
+	<element name="txt_slash">
+		<rect><color red="0.99" green="0.97" blue="0.87" /></rect>
+		<text string="/"><color red="0.12" green="0.13" blue="0.10" /></text>
+	</element>
+	<element name="txt_mode">
+		<rect><color red="0.02" green="0.75" blue="0.58" /></rect>
+		<text string="MODE"><color red="0.12" green="0.13" blue="0.10" /></text>
+	</element>
+	<element name="txt_inp">
+		<rect><color red="0.02" green="0.75" blue="0.58" /></rect>
+		<text string="INP"><color red="0.12" green="0.13" blue="0.10" /></text>
+	</element>
+	<element name="txt_1">
+		<rect><color red="0.99" green="0.97" blue="0.87" /></rect>
+		<text string="1"><color red="0.12" green="0.13" blue="0.10" /></text>
+	</element>
+	<element name="txt_yes">
+		<rect><color red="0.99" green="0.97" blue="0.87" /></rect>
+		<text string="YES"><color red="0.12" green="0.13" blue="0.10" /></text>
+	</element>
+	<element name="txt_2">
+		<rect><color red="0.99" green="0.97" blue="0.87" /></rect>
+		<text string="2"><color red="0.12" green="0.13" blue="0.10" /></text>
+	</element>
+	<element name="txt_dot">
+		<rect><color red="0.99" green="0.97" blue="0.87" /></rect>
+		<text string="."><color red="0.12" green="0.13" blue="0.10" /></text>
+	</element>
+	<element name="txt_3">
+		<rect><color red="0.99" green="0.97" blue="0.87" /></rect>
+		<text string="3"><color red="0.12" green="0.13" blue="0.10" /></text>
+	</element>
+	<element name="txt_dash">
+		<rect><color red="0.99" green="0.97" blue="0.87" /></rect>
+		<text string="-"><color red="0.12" green="0.13" blue="0.10" /></text>
+	</element>
+	<element name="txt_plus">
+		<rect><color red="0.99" green="0.97" blue="0.87" /></rect>
+		<text string="+"><color red="0.12" green="0.13" blue="0.10" /></text>
+	</element>
+	<element name="txt_ex">
+		<rect><color red="0.02" green="0.75" blue="0.58" /></rect>
+		<text string="EX"><color red="0.12" green="0.13" blue="0.10" /></text>
+	</element>
+	<element name="txt_out">
+		<rect><color red="0.02" green="0.75" blue="0.58" /></rect>
+		<text string="OUT"><color red="0.12" green="0.13" blue="0.10" /></text>
+	</element>
+	<element name="txt_clr">
+		<rect><color red="0.02" green="0.75" blue="0.58" /></rect>
+		<text string="CLR"><color red="0.12" green="0.13" blue="0.10" /></text>
+	</element>
+	<element name="txt_0">
+		<rect><color red="0.99" green="0.97" blue="0.87" /></rect>
+		<text string="0"><color red="0.12" green="0.13" blue="0.10" /></text>
+	</element>
+	<element name="txt_no">
+		<rect><color red="0.99" green="0.97" blue="0.87" /></rect>
+		<text string="NO"><color red="0.12" green="0.13" blue="0.10" /></text>
+	</element>
+	<element name="txt_equals">
+		<rect><color red="0.99" green="0.97" blue="0.87" /></rect>
+		<text string="="><color red="0.12" green="0.13" blue="0.10" /></text>
+	</element>
+	<element name="txt_questionmark">
+		<rect><color red="0.99" green="0.97" blue="0.87" /></rect>
+		<text string="?"><color red="0.12" green="0.13" blue="0.10" /></text>
+	</element>
+	<element name="txt_spc">
+		<rect><color red="0.99" green="0.97" blue="0.87" /></rect>
+		<text string="SPC"><color red="0.12" green="0.13" blue="0.10" /></text>
+	</element>
+
+	<view name="Default Layout">
+
+		<element ref="panel">
+			<bounds left="0" top="0" right="529" bottom="445" />
+		</element>
+
+		<!-- LEDs -->
+
+		<element ref="txt_speech">
+			<bounds left="25" top="39" right="97" bottom="55" />
+		</element>
+		<element ref="led" name="led_speech">
+			<bounds left="103" top="35" right="129" bottom="61" />
+		</element>
+
+		<element ref="txt_morse">
+			<bounds left="25" top="71" right="97" bottom="87" />
+		</element>
+		<element ref="led" name="led_morse">
+			<bounds left="103" top="66" right="129" bottom="92" />
+		</element>
+
+		<element ref="txt_standard">
+			<bounds left="25" top="103" right="97" bottom="119" />
+		</element>
+		<element ref="led" name="led_standard">
+			<bounds left="103" top="99" right="129" bottom="125" />
+		</element>
+
+		<!-- Dot Matrix -->
+
+		<element ref="background">
+			<bounds left="167" top="54" right="440" bottom="104" />
+		</element>
+
+		<element ref="background_vqc10">
+			<bounds left="187" top="57" right="302" bottom="101" />
+		</element>
+
+		<repeat count="7">
+			<param name="y" start="65" increment="4" />
+			<param name="row" start="0" increment="1" />
+			<repeat count="4">
+				<param name="x" start="192" increment="29" />
+				<param name="idx" start="0" increment="1" />
+				<element ref="matrix5dot_vqc10" name="dot~idx~~row~">
+					<bounds x="~x~" y="~y~" width="18" height="2" />
+				</element>
+			</repeat>
+		</repeat>
+
+		<element ref="background_vqc10">
+			<bounds left="307" top="57" right="422" bottom="101" />
+		</element>
+
+		<repeat count="7">
+			<param name="y" start="65" increment="4" />
+			<param name="row" start="0" increment="1" />
+			<repeat count="4">
+				<param name="x" start="312" increment="29" />
+				<param name="idx" start="4" increment="1" />
+				<element ref="matrix5dot_vqc10" name="dot~idx~~row~">
+					<bounds x="~x~" y="~y~" width="18" height="2" />
+				</element>
+			</repeat>
+		</repeat>
+
+		<!-- Keypad -->
+
+		<element ref="background">
+			<bounds left="93" top="351" right="150" bottom="410" />
+		</element>
+		<element ref="background">
+			<bounds left="150" top="180" right="494" bottom="410" />
+		</element>
+
+		<element ref="button_red" inputtag="reset" inputmask="0x01">
+			<bounds x="152" y="182" width="55" height="55" />
+		</element>
+		<element ref="txt_res">
+			<bounds xc="180" yc="210" width="28" height="20" />
+		</element>
+		<element ref="button_green" inputtag="special" inputmask="0x20">
+			<bounds x="209" y="182" width="55" height="55" />
+		</element>
+		<element ref="txt_sta">
+			<bounds xc="237" yc="198" width="28" height="20" />
+		</element>
+		<element ref="line">
+			<bounds xc="237" yc="210" width="28" height="2" />
+		</element>
+		<element ref="txt_stp">
+			<bounds xc="237" yc="220" width="28" height="20" />
+		</element>
+		<element ref="button_white" inputtag="keypad4" inputmask="0x08">
+			<bounds x="266" y="182" width="55" height="55" />
+		</element>
+		<element ref="txt_7">
+			<bounds xc="294" yc="210" width="28" height="20" />
+		</element>
+		<element ref="button_white" inputtag="keypad3" inputmask="0x08">
+			<bounds x="323" y="182" width="55" height="55" />
+		</element>
+		<element ref="txt_8">
+			<bounds xc="351" yc="210" width="28" height="20" />
+		</element>
+		<element ref="button_white" inputtag="keypad2" inputmask="0x08">
+			<bounds x="380" y="182" width="55" height="55" />
+		</element>
+		<element ref="txt_9">
+			<bounds xc="408" yc="210" width="28" height="20" />
+		</element>
+		<element ref="button_white" inputtag="keypad1" inputmask="0x08">
+			<bounds x="437" y="182" width="55" height="55" />
+		</element>
+		<element ref="txt_colon">
+			<bounds xc="465" yc="210" width="28" height="20" />
+		</element>
+
+		<element ref="button_white" inputtag="keypad0" inputmask="0x08">
+			<bounds x="152" y="239" width="55" height="55" />
+		</element>
+		<element ref="txt_right">
+			<bounds xc="180" yc="267" width="28" height="20" />
+		</element>
+		<element ref="button_white" inputtag="keypad0" inputmask="0x04">
+			<bounds x="209" y="239" width="55" height="55" />
+		</element>
+		<element ref="txt_left">
+			<bounds xc="237" yc="267" width="28" height="20" />
+		</element>
+		<element ref="button_white" inputtag="keypad4" inputmask="0x04">
+			<bounds x="266" y="239" width="55" height="55" />
+		</element>
+		<element ref="txt_4">
+			<bounds xc="294" yc="267" width="28" height="20" />
+		</element>
+		<element ref="button_white" inputtag="keypad3" inputmask="0x04">
+			<bounds x="323" y="239" width="55" height="55" />
+		</element>
+		<element ref="txt_5">
+			<bounds xc="351" yc="267" width="28" height="20" />
+		</element>
+		<element ref="button_white" inputtag="keypad2" inputmask="0x04">
+			<bounds x="380" y="239" width="55" height="55" />
+		</element>
+		<element ref="txt_6">
+			<bounds xc="408" yc="267" width="28" height="20" />
+		</element>
+		<element ref="button_white" inputtag="keypad1" inputmask="0x04">
+			<bounds x="437" y="239" width="55" height="55" />
+		</element>
+		<element ref="txt_slash">
+			<bounds xc="465" yc="267" width="28" height="20" />
+		</element>
+
+		<element ref="button_green" inputtag="keypad2" inputmask="0x10">
+			<bounds x="152" y="296" width="55" height="55" />
+		</element>
+		<element ref="txt_mode">
+			<bounds xc="180" yc="324" width="38" height="20" />
+		</element>
+		<element ref="button_green" inputtag="keypad4" inputmask="0x10">
+			<bounds x="209" y="296" width="55" height="55" />
+		</element>
+		<element ref="txt_inp">
+			<bounds xc="237" yc="324" width="28" height="20" />
+		</element>
+		<element ref="button_white" inputtag="keypad4" inputmask="0x02">
+			<bounds x="266" y="296" width="55" height="55" />
+		</element>
+		<element ref="txt_1">
+			<bounds xc="294" yc="312" width="28" height="20" />
+		</element>
+		<element ref="line">
+			<bounds xc="294" yc="324" width="28" height="2" />
+		</element>
+		<element ref="txt_yes">
+			<bounds xc="294" yc="334" width="28" height="20" />
+		</element>
+		<element ref="button_white" inputtag="keypad3" inputmask="0x02">
+			<bounds x="323" y="296" width="55" height="55" />
+		</element>
+		<element ref="txt_2">
+			<bounds xc="351" yc="312" width="28" height="20" />
+		</element>
+		<element ref="line">
+			<bounds xc="351" yc="324" width="28" height="2" />
+		</element>
+		<element ref="txt_dot">
+			<bounds xc="351" yc="334" width="28" height="20" />
+		</element>
+		<element ref="button_white" inputtag="keypad2" inputmask="0x02">
+			<bounds x="380" y="296" width="55" height="55" />
+		</element>
+		<element ref="txt_3">
+			<bounds xc="408" yc="312" width="28" height="20" />
+		</element>
+		<element ref="line">
+			<bounds xc="408" yc="324" width="28" height="2" />
+		</element>
+		<element ref="txt_dash">
+			<bounds xc="408" yc="334" width="28" height="20" />
+		</element>
+		<element ref="button_white" inputtag="keypad1" inputmask="0x02">
+			<bounds x="437" y="296" width="55" height="55" />
+		</element>
+		<element ref="txt_plus">
+			<bounds xc="465" yc="324" width="28" height="20" />
+		</element>
+
+		<element ref="button_green" inputtag="keypad0" inputmask="0x02">
+			<bounds x="95" y="353" width="55" height="55" />
+		</element>
+		<element ref="txt_ex">
+			<bounds xc="123" yc="381" width="28" height="20" />
+		</element>
+		<element ref="button_green" inputtag="keypad3" inputmask="0x10">
+			<bounds x="152" y="353" width="55" height="55" />
+		</element>
+		<element ref="txt_out">
+			<bounds xc="180" yc="381" width="28" height="20" />
+		</element>
+		<element ref="button_green" inputtag="keypad1" inputmask="0x10">
+			<bounds x="209" y="353" width="55" height="55" />
+		</element>
+		<element ref="txt_clr">
+			<bounds xc="237" yc="381" width="28" height="20" />
+		</element>
+		<element ref="button_white" inputtag="keypad4" inputmask="0x01">
+			<bounds x="266" y="353" width="55" height="55" />
+		</element>
+		<element ref="txt_0">
+			<bounds xc="294" yc="369" width="28" height="20" />
+		</element>
+		<element ref="line">
+			<bounds xc="294" yc="381" width="28" height="2" />
+		</element>
+		<element ref="txt_no">
+			<bounds xc="294" yc="391" width="28" height="20" />
+		</element>
+		<element ref="button_white" inputtag="keypad3" inputmask="0x01">
+			<bounds x="323" y="353" width="55" height="55" />
+		</element>
+		<element ref="txt_equals">
+			<bounds xc="351" yc="381" width="28" height="20" />
+		</element>
+		<element ref="button_white" inputtag="keypad2" inputmask="0x01">
+			<bounds x="380" y="353" width="55" height="55" />
+		</element>
+		<element ref="txt_questionmark">
+			<bounds xc="408" yc="381" width="28" height="20" />
+		</element>
+		<element ref="button_white" inputtag="keypad1" inputmask="0x01">
+			<bounds x="437" y="353" width="55" height="55" />
+		</element>
+		<element ref="txt_spc">
+			<bounds xc="465" yc="381" width="28" height="20" />
+		</element>
+
+	</view>
+
+</mamelayout>

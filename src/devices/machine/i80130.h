@@ -27,27 +27,27 @@ public:
 	auto delay() { return m_write_delay.bind(); }
 	auto baud() { return m_write_baud.bind(); }
 
-	virtual void rom_map(address_map &map);
-	virtual void io_map(address_map &map);
+	virtual void rom_map(address_map &map) ATTR_COLD;
+	virtual void io_map(address_map &map) ATTR_COLD;
 
 	uint8_t inta_r() { return m_pic->acknowledge(); }
 
-	DECLARE_WRITE_LINE_MEMBER( ir0_w ) { m_pic->ir0_w(state); }
-	DECLARE_WRITE_LINE_MEMBER( ir1_w ) { m_pic->ir1_w(state); }
-	DECLARE_WRITE_LINE_MEMBER( ir2_w ) { m_pic->ir2_w(state); }
-	DECLARE_WRITE_LINE_MEMBER( ir3_w ) { m_pic->ir3_w(state); }
-	DECLARE_WRITE_LINE_MEMBER( ir4_w ) { m_pic->ir4_w(state); }
-	DECLARE_WRITE_LINE_MEMBER( ir5_w ) { m_pic->ir5_w(state); }
-	DECLARE_WRITE_LINE_MEMBER( ir6_w ) { m_pic->ir6_w(state); }
-	DECLARE_WRITE_LINE_MEMBER( ir7_w ) { m_pic->ir7_w(state); }
+	void ir0_w(int state) { m_pic->ir0_w(state); }
+	void ir1_w(int state) { m_pic->ir1_w(state); }
+	void ir2_w(int state) { m_pic->ir2_w(state); }
+	void ir3_w(int state) { m_pic->ir3_w(state); }
+	void ir4_w(int state) { m_pic->ir4_w(state); }
+	void ir5_w(int state) { m_pic->ir5_w(state); }
+	void ir6_w(int state) { m_pic->ir6_w(state); }
+	void ir7_w(int state) { m_pic->ir7_w(state); }
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 	// optional information overrides
-//  virtual const tiny_rom_entry *device_rom_region() const override;
-	virtual void device_add_mconfig(machine_config &config) override;
+//  virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 private:
 	required_device<pic8259_device> m_pic;
@@ -60,10 +60,10 @@ private:
 	devcb_write_line m_write_delay;
 	devcb_write_line m_write_baud;
 
-	DECLARE_WRITE_LINE_MEMBER( irq_w ) { m_write_irq(state); }
-	DECLARE_WRITE_LINE_MEMBER( systick_w ) { m_write_systick(state); }
-	DECLARE_WRITE_LINE_MEMBER( delay_w ) { m_write_delay(state); }
-	DECLARE_WRITE_LINE_MEMBER( baud_w ) { m_write_baud(state); }
+	void irq_w(int state) { m_write_irq(state); }
+	void systick_w(int state) { m_write_systick(state); }
+	void delay_w(int state) { m_write_delay(state); }
+	void baud_w(int state) { m_write_baud(state); }
 
 	uint16_t io_r(offs_t offset, uint16_t mem_mask = ~0);
 	void io_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);

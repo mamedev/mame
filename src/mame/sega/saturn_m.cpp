@@ -45,14 +45,7 @@
 
 #include "emu.h"
 #include "saturn.h"
-#include "cpu/sh/sh2.h"
 #include "cpu/scudsp/scudsp.h"
-
-/* TODO: do this in a verboselog style */
-#define LOG_CDB  0
-#define LOG_SCU  1
-#define LOG_IRQ  0
-#define LOG_IOGA 0
 
 
 
@@ -76,7 +69,7 @@ uint16_t saturn_state::saturn_soundram_r(offs_t offset)
 void saturn_state::minit_w(uint32_t data)
 {
 	//logerror("%s MINIT write = %08x\n", machine().describe_context(),data);
-	machine().scheduler().boost_interleave(m_minit_boost_timeslice, attotime::from_usec(m_minit_boost));
+	machine().scheduler().add_quantum(m_minit_boost_timeslice, attotime::from_usec(m_minit_boost));
 	machine().scheduler().trigger(1000);
 	machine().scheduler().synchronize(); // force resync
 	m_slave->pulse_frt_input();
@@ -85,7 +78,7 @@ void saturn_state::minit_w(uint32_t data)
 void saturn_state::sinit_w(uint32_t data)
 {
 	//logerror("%s SINIT write = %08x\n", machine().describe_context(),data);
-	machine().scheduler().boost_interleave(m_sinit_boost_timeslice, attotime::from_usec(m_sinit_boost));
+	machine().scheduler().add_quantum(m_sinit_boost_timeslice, attotime::from_usec(m_sinit_boost));
 	machine().scheduler().synchronize(); // force resync
 	m_maincpu->pulse_frt_input();
 }
@@ -116,7 +109,7 @@ void saturn_state::saturn_minit_w(uint32_t data)
 		machine().scheduler().synchronize(); // force resync
 	else
 	{
-		machine().scheduler().boost_interleave(m_minit_boost_timeslice, attotime::from_usec(m_minit_boost));
+		machine().scheduler().add_quantum(m_minit_boost_timeslice, attotime::from_usec(m_minit_boost));
 		machine().scheduler().trigger(1000);
 	}
 
@@ -129,7 +122,7 @@ void saturn_state::saturn_sinit_w(uint32_t data)
 	if(m_fake_comms->read() & 1)
 		machine().scheduler().synchronize(); // force resync
 	else
-		machine().scheduler().boost_interleave(m_sinit_boost_timeslice, attotime::from_usec(m_sinit_boost));
+		machine().scheduler().add_quantum(m_sinit_boost_timeslice, attotime::from_usec(m_sinit_boost));
 
 	m_maincpu->pulse_frt_input();
 }
@@ -152,11 +145,10 @@ void saturn_state::saturn_backupram_w(offs_t offset, uint8_t data)
 }
 
 
-WRITE_LINE_MEMBER(saturn_state::m68k_reset_callback)
+void saturn_state::m68k_reset_callback(int state)
 {
+	logerror("m68k RESET opcode triggered\n");
 	m_smpc_hle->m68k_reset_trigger();
-
-	printf("m68k RESET opcode triggered\n");
 }
 
 void saturn_state::scsp_irq(offs_t offset, uint8_t data)
@@ -327,30 +319,30 @@ GFXDECODE_START( gfx_stv )
 GFXDECODE_END
 
 
-WRITE_LINE_MEMBER( saturn_state::master_sh2_reset_w )
+void saturn_state::master_sh2_reset_w(int state)
 {
 	m_maincpu->set_input_line(INPUT_LINE_RESET, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
-WRITE_LINE_MEMBER(saturn_state::master_sh2_nmi_w)
+void saturn_state::master_sh2_nmi_w(int state)
 {
 	m_maincpu->set_input_line(INPUT_LINE_NMI, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
-WRITE_LINE_MEMBER( saturn_state::slave_sh2_reset_w )
+void saturn_state::slave_sh2_reset_w(int state)
 {
 	m_slave->set_input_line(INPUT_LINE_RESET, state ? ASSERT_LINE : CLEAR_LINE);
 //  m_smpc.slave_on = state;
 }
 
-WRITE_LINE_MEMBER( saturn_state::sound_68k_reset_w )
+void saturn_state::sound_68k_reset_w(int state)
 {
 	m_audiocpu->set_input_line(INPUT_LINE_RESET, state ? ASSERT_LINE : CLEAR_LINE);
 	m_en_68k = state ^ 1;
 }
 
 // TODO: edge triggered?
-WRITE_LINE_MEMBER( saturn_state::system_reset_w )
+void saturn_state::system_reset_w(int state)
 {
 	if(!state)
 		return;
@@ -368,14 +360,14 @@ WRITE_LINE_MEMBER( saturn_state::system_reset_w )
 	//A-Bus
 }
 
-WRITE_LINE_MEMBER(saturn_state::system_halt_w)
+void saturn_state::system_halt_w(int state)
 {
 	m_maincpu->set_input_line(INPUT_LINE_HALT, state ? ASSERT_LINE : CLEAR_LINE);
 	m_slave->set_input_line(INPUT_LINE_HALT, state ? ASSERT_LINE : CLEAR_LINE);
 	m_audiocpu->set_input_line(INPUT_LINE_HALT, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
-WRITE_LINE_MEMBER(saturn_state::dot_select_w)
+void saturn_state::dot_select_w(int state)
 {
 	const XTAL &xtal = state ? MASTER_CLOCK_320 : MASTER_CLOCK_352;
 

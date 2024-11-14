@@ -63,16 +63,14 @@ public:
 	template <unsigned CH> auto in_ior_callback() { return m_in_ior_cb[CH].bind(); }
 	template <unsigned CH> auto out_iow_callback() { return m_out_iow_cb[CH].bind(); }
 
-	template <unsigned CH> DECLARE_WRITE_LINE_MEMBER( dreq_w ) { dma_request(CH, state); }
+	template <unsigned CH> void dreq_w(int state) { dma_request(CH, state); }
 
-	DECLARE_WRITE_LINE_MEMBER( dgrnt_w ){ m_dgrnt = state; trigger(1); }
+	void dgrnt_w(int state) { m_dgrnt = state; trigger(1); }
 
 protected:
-	// device-level overrides
-	//virtual void device_validity_check(validity_checker &valid) const override;
-	virtual void device_resolve_objects() override;
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	// device_t implementation
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 	virtual void execute_run() override;
 
 	devcb_write_line    m_out_int_cb;

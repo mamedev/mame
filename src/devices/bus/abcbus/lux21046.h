@@ -14,7 +14,6 @@
 #include "abcbus.h"
 #include "cpu/z80/z80.h"
 #include "machine/z80daisy.h"
-#include "formats/abc800_dsk.h"
 #include "imagedev/floppy.h"
 #include "machine/wd_fdc.h"
 #include "machine/z80dma.h"
@@ -59,13 +58,13 @@ protected:
 	luxor_55_21046_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// optional information overrides
-	virtual const tiny_rom_entry *device_rom_region() const override;
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual ioport_constructor device_input_ports() const override;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 
 	// device_abcbus_interface overrides
 	virtual void abcbus_cs(uint8_t data) override;
@@ -79,18 +78,17 @@ protected:
 
 	static void floppy_formats(format_registration &fr);
 
-	required_device<floppy_connector> m_floppy0;
-	required_device<floppy_connector> m_floppy1;
+	required_device_array<floppy_connector, 2> m_floppy;
 
 private:
-	DECLARE_WRITE_LINE_MEMBER( dma_int_w );
+	void dma_int_w(int state);
 
 	uint8_t memory_read_byte(offs_t offset);
 	void memory_write_byte(offs_t offset, uint8_t data);
 	uint8_t io_read_byte(offs_t offset);
 	void io_write_byte(offs_t offset, uint8_t data);
 
-	DECLARE_WRITE_LINE_MEMBER( fdc_intrq_w );
+	void fdc_intrq_w(int state);
 
 	uint8_t out_r();
 	void inp_w(uint8_t data);
@@ -99,21 +97,21 @@ private:
 	void _8a_w(uint8_t data);
 	uint8_t _9a_r(offs_t offset);
 
-	void luxor_55_21046_io(address_map &map);
-	void luxor_55_21046_mem(address_map &map);
+	void luxor_55_21046_io(address_map &map) ATTR_COLD;
+	void luxor_55_21046_mem(address_map &map) ATTR_COLD;
 
 	required_device<z80_device> m_maincpu;
 	required_device<z80dma_device> m_dma;
 	required_device<fd1793_device> m_fdc;
-	floppy_image_device *m_floppy;
+	floppy_image_device *m_selected_floppy;
 	required_ioport m_sw1;
 	required_ioport m_sw2;
 	required_ioport m_sw3;
 
 	bool m_cs;                  // card selected
-	uint8_t m_status;             // ABC BUS status
-	uint8_t m_out;                // ABC BUS data in
-	uint8_t m_inp;                // ABC BUS data out
+	uint8_t m_status;           // ABC BUS status
+	uint8_t m_out;              // ABC BUS data in
+	uint8_t m_inp;              // ABC BUS data out
 	bool m_fdc_irq;             // FDC interrupt
 	int m_dma_irq;              // DMA interrupt
 	int m_busy;                 // busy bit
@@ -131,8 +129,8 @@ public:
 
 protected:
 	// optional information overrides
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual ioport_constructor device_input_ports() const override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 };
 
 
@@ -146,8 +144,8 @@ public:
 
 protected:
 	// optional information overrides
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual ioport_constructor device_input_ports() const override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 };
 
 
@@ -161,8 +159,8 @@ public:
 
 protected:
 	// optional information overrides
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual ioport_constructor device_input_ports() const override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 };
 
 
@@ -176,8 +174,8 @@ public:
 
 protected:
 	// optional information overrides
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual ioport_constructor device_input_ports() const override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 };
 
 
@@ -191,8 +189,8 @@ public:
 
 protected:
 	// optional information overrides
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual ioport_constructor device_input_ports() const override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 };
 
 

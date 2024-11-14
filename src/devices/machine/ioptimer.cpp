@@ -36,8 +36,6 @@ iop_timer_device::iop_timer_device(const machine_config &mconfig, const char *ta
 
 void iop_timer_device::device_start()
 {
-	m_int_cb.resolve_safe();
-
 	if (!m_compare_timer)
 		m_compare_timer = timer_alloc(FUNC(iop_timer_device::compare), this);
 
@@ -79,11 +77,8 @@ void iop_timer_device::update_gate()
 
 void iop_timer_device::update_interrupts()
 {
-	if (!m_int_cb.isnull())
-	{
-		bool interrupt = m_ienable && ((m_ovf_int && m_ovf_int_enabled) || (m_cmp_int && m_cmp_int_enabled));
-		m_int_cb(interrupt);
-	}
+	bool interrupt = m_ienable && ((m_ovf_int && m_ovf_int_enabled) || (m_cmp_int && m_cmp_int_enabled));
+	m_int_cb(interrupt);
 }
 
 void iop_timer_device::update_compare_timer()

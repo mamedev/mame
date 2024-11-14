@@ -74,11 +74,14 @@ To Do / Status:
 - none of my collection of lnw80-specific floppies will work; some crash MAME
 
 *******************************************************************************************************/
+
 #include "emu.h"
 #include "trs80.h"
+#include "trs80_quik.h"
 #include "machine/input_merger.h"
 #include "formats/td0_dsk.h"
 #include "softlist_dev.h"
+#include "utf8.h"
 
 namespace {
 
@@ -94,8 +97,8 @@ public:
 	void lnw80(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	static void floppy_formats(format_registration &fr);
@@ -104,8 +107,8 @@ private:
 	void lnw80_palette(palette_device &palette) const;
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void lnw80_io(address_map &map);
-	void lnw80_mem(address_map &map);
+	void lnw80_io(address_map &map) ATTR_COLD;
+	void lnw80_mem(address_map &map) ATTR_COLD;
 
 	u8 m_lnw_mode = 0U;
 	required_shared_ptr<u8> m_p_gfxram;
@@ -241,7 +244,7 @@ static INPUT_PORTS_START( lnw80 )
 	PORT_BIT(0xee, 0x00, IPT_UNUSED)
 
 	PORT_START("RESET")
-	PORT_BIT(0x01, 0x00, IPT_KEYBOARD) PORT_NAME("Reset") PORT_CODE(KEYCODE_DEL) PORT_CHAR(UCHAR_MAMEKEY(PAUSE)) PORT_WRITE_LINE_DEVICE_MEMBER("nmigate", input_merger_device, in_w<0>)
+	PORT_BIT(0x01, 0x00, IPT_KEYBOARD) PORT_NAME("Reset") PORT_CODE(KEYCODE_DEL) PORT_CHAR(UCHAR_MAMEKEY(PAUSE)) PORT_WRITE_LINE_DEVICE_MEMBER("nmigate", FUNC(input_merger_device::in_w<0>))
 
 	PORT_START("CONFIG")
 	PORT_CONFNAME(    0x80, 0x00,   "Floppy Disc Drives")
@@ -608,9 +611,7 @@ void lnw80_state::lnw80(machine_config &config)
 	m_cassette->add_route(ALL_OUTPUTS, "mono", 0.05);
 	m_cassette->set_interface("trs80_cass");
 
-	quickload_image_device &quickload(QUICKLOAD(config, "quickload", "cmd", attotime::from_seconds(1)));
-	quickload.set_load_callback(FUNC(lnw80_state::quickload_cb));
-	quickload.set_interface("trs80_quik");
+	TRS80_QUICKLOAD(config, "quickload", m_maincpu, attotime::from_seconds(1));
 
 	FD1771(config, m_fdc, 4_MHz_XTAL / 4);
 	m_fdc->intrq_wr_callback().set(FUNC(lnw80_state::intrq_w));

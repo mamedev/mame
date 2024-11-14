@@ -5,8 +5,8 @@
     Track'n'Field
 
 ***************************************************************************/
-#ifndef MAME_INCLUDES_TRACKFLD_H
-#define MAME_INCLUDES_TRACKFLD_H
+#ifndef MAME_KONAMI_TRACKFLD_H
+#define MAME_KONAMI_TRACKFLD_H
 
 #pragma once
 
@@ -69,16 +69,16 @@ private:
 	void konami_SN76496_latch_w(uint8_t data) { m_SN76496_latch = data; }
 	void konami_SN76496_w(uint8_t data) { m_sn->write(m_SN76496_latch); }
 
-	void hyprolyb_sound_map(address_map &map);
-	void main_map(address_map &map);
-	void mastkin_map(address_map &map);
-	void reaktor_io_map(address_map &map);
-	void reaktor_map(address_map &map);
-	void sound_map(address_map &map);
-	void vlm_map(address_map &map);
-	void wizzquiz_map(address_map &map);
-	void yieartf_map(address_map &map);
-	void hyprolyb_adpcm_map(address_map &map);
+	void hyprolyb_sound_map(address_map &map) ATTR_COLD;
+	void main_map(address_map &map) ATTR_COLD;
+	void mastkin_map(address_map &map) ATTR_COLD;
+	void reaktor_io_map(address_map &map) ATTR_COLD;
+	void reaktor_map(address_map &map) ATTR_COLD;
+	void sound_map(address_map &map) ATTR_COLD;
+	void vlm_map(address_map &map) ATTR_COLD;
+	void wizzquiz_map(address_map &map) ATTR_COLD;
+	void yieartf_map(address_map &map) ATTR_COLD;
+	void hyprolyb_adpcm_map(address_map &map) ATTR_COLD;
 
 	/* memory pointers */
 	required_shared_ptr<uint8_t> m_spriteram2;
@@ -113,11 +113,10 @@ private:
 
 	uint8_t m_SN76496_latch = 0;
 
-	DECLARE_WRITE_LINE_MEMBER(coin_counter_1_w);
-	DECLARE_WRITE_LINE_MEMBER(coin_counter_2_w);
-	DECLARE_WRITE_LINE_MEMBER(irq_mask_w);
-	DECLARE_WRITE_LINE_MEMBER(nmi_mask_w);
-	DECLARE_WRITE_LINE_MEMBER(flipscreen_w);
+	void coin_counter_1_w(int state);
+	void coin_counter_2_w(int state);
+	void irq_mask_w(int state);
+	void nmi_mask_w(int state);
 
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	DECLARE_MACHINE_START(trackfld);
@@ -126,10 +125,10 @@ private:
 	void trackfld_palette(palette_device &palette) const;
 	DECLARE_VIDEO_START(atlantol);
 	uint32_t screen_update_trackfld(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
-	DECLARE_WRITE_LINE_MEMBER(vblank_nmi);
+	void vblank_irq(int state);
+	void vblank_nmi(int state);
 	INTERRUPT_GEN_MEMBER(yieartf_timer_irq);
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
 };
 
-#endif // MAME_INCLUDES_TRACKFLD_H
+#endif // MAME_KONAMI_TRACKFLD_H

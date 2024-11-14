@@ -36,60 +36,61 @@
 #include "pgm.h"
 #include "pgmprot_igs027a_type2.h"
 
+#define LOG_PROT    (1U << 1)
+#define LOG_ALL     (LOG_PROT)
+
+#define VERBOSE (0)
+#include "logmacro.h"
+
+#define LOGPROT(...) LOGMASKED(LOG_PROT, __VA_ARGS__)
+
 u32 pgm_arm_type2_state::arm7_latch_arm_r(offs_t offset, u32 mem_mask)
 {
 	if (!machine().side_effects_disabled())
-		m_prot->set_input_line(ARM7_FIRQ_LINE, CLEAR_LINE ); // guess
+		m_prot->set_input_line(arm7_cpu_device::ARM7_FIRQ_LINE, CLEAR_LINE); // guess
 
-	if (PGMARM7LOGERROR)
-		logerror("%s ARM7: Latch read: %08x (%08x)\n", machine().describe_context(), m_kov2_latchdata_68k_w, mem_mask);
+	LOGPROT("%s ARM7: Latch read: %08x (%08x)\n", machine().describe_context(), m_kov2_latchdata_68k_w, mem_mask);
 	return m_kov2_latchdata_68k_w;
 }
 
 void pgm_arm_type2_state::arm7_latch_arm_w(offs_t offset, u32 data, u32 mem_mask)
 {
-	if (PGMARM7LOGERROR)
-		logerror("%s ARM7: Latch write: %08x (%08x)\n", machine().describe_context(), data, mem_mask);
+	LOGPROT("%s ARM7: Latch write: %08x (%08x)\n", machine().describe_context(), data, mem_mask);
 
 	COMBINE_DATA(&m_kov2_latchdata_arm_w);
 }
 
 u32 pgm_arm_type2_state::arm7_shareram_r(offs_t offset, u32 mem_mask)
 {
-	if (PGMARM7LOGERROR)
-		logerror("%s ARM7: ARM7 Shared RAM Read: %04x = %08x (%08x)\n", machine().describe_context(), offset << 2, m_arm7_shareram[offset], mem_mask);
+	LOGPROT("%s ARM7: ARM7 Shared RAM Read: %04x = %08x (%08x)\n", machine().describe_context(), offset << 2, m_arm7_shareram[offset], mem_mask);
 	return m_arm7_shareram[offset];
 }
 
 void pgm_arm_type2_state::arm7_shareram_w(offs_t offset, u32 data, u32 mem_mask)
 {
-	if (PGMARM7LOGERROR)
-		logerror("%s ARM7: ARM7 Shared RAM Write: %04x = %08x (%08x)\n", machine().describe_context(), offset << 2, data, mem_mask);
+	LOGPROT("%s ARM7: ARM7 Shared RAM Write: %04x = %08x (%08x)\n", machine().describe_context(), offset << 2, data, mem_mask);
 	COMBINE_DATA(&m_arm7_shareram[offset]);
 }
 
 u16 pgm_arm_type2_state::arm7_latch_68k_r(offs_t offset, u16 mem_mask)
 {
-	if (PGMARM7LOGERROR)
-		logerror("%s M68K: Latch read: %04x (%04x)\n", machine().describe_context(), m_kov2_latchdata_arm_w & 0x0000ffff, mem_mask);
+	LOGPROT("%s M68K: Latch read: %04x (%04x)\n", machine().describe_context(), m_kov2_latchdata_arm_w & 0x0000ffff, mem_mask);
 	return m_kov2_latchdata_arm_w;
 }
 
 void pgm_arm_type2_state::arm7_latch_68k_w(offs_t offset, u16 data, u16 mem_mask)
 {
-	if (PGMARM7LOGERROR)
-		logerror("%s M68K: Latch write: %04x (%04x)\n", machine().describe_context(), data & 0x0000ffff, mem_mask);
+	LOGPROT("%s M68K: Latch write: %04x (%04x)\n", machine().describe_context(), data & 0x0000ffff, mem_mask);
 	COMBINE_DATA(&m_kov2_latchdata_68k_w);
 
-	m_prot->set_input_line(ARM7_FIRQ_LINE, ASSERT_LINE ); // guess
+	m_prot->set_input_line(arm7_cpu_device::ARM7_FIRQ_LINE, ASSERT_LINE); // guess
 }
 
 u16 pgm_arm_type2_state::arm7_ram_r(offs_t offset, u16 mem_mask)
 {
 	const u16 *share16 = reinterpret_cast<u16 *>(m_arm7_shareram.target());
 
-	if (PGMARM7LOGERROR)
-		logerror("%s M68K: ARM7 Shared RAM Read: %04x = %04x (%08x)\n", machine().describe_context(), BYTE_XOR_LE(offset), share16[BYTE_XOR_LE(offset)], mem_mask);
+	LOGPROT("%s M68K: ARM7 Shared RAM Read: %04x = %04x (%08x)\n", machine().describe_context(), BYTE_XOR_LE(offset), share16[BYTE_XOR_LE(offset)], mem_mask);
 	return share16[BYTE_XOR_LE(offset)];
 }
 
@@ -97,8 +98,7 @@ void pgm_arm_type2_state::arm7_ram_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	u16 *share16 = reinterpret_cast<u16 *>(m_arm7_shareram.target());
 
-	if (PGMARM7LOGERROR)
-		logerror("%s M68K: ARM7 Shared RAM Write: %04x = %04x (%04x)\n", machine().describe_context(), BYTE_XOR_LE(offset), data, mem_mask);
+	LOGPROT("%s M68K: ARM7 Shared RAM Write: %04x = %04x (%04x)\n", machine().describe_context(), BYTE_XOR_LE(offset), data, mem_mask);
 	COMBINE_DATA(&share16[BYTE_XOR_LE(offset)]);
 }
 
@@ -113,16 +113,25 @@ void pgm_arm_type2_state::kov2_mem(address_map &map)
 	map(0xd10000, 0xd10001).rw(FUNC(pgm_arm_type2_state::arm7_latch_68k_r), FUNC(pgm_arm_type2_state::arm7_latch_68k_w)); /* ARM7 Latch */
 }
 
+u32 pgm_arm_type2_state::external_rom_r(offs_t offset)
+{
+	return m_external_rom[offset] ^ m_xor_table[offset & 0x00ff];
+}
+
+void pgm_arm_type2_state::xor_table_w(offs_t offset, u8 data)
+{
+	m_xor_table[offset] = (u32(data) << 24) | (u32(data) << 8);
+}
 
 void pgm_arm_type2_state::_55857F_arm7_map(address_map &map)
 {
 	map(0x00000000, 0x00003fff).rom();
-	map(0x08000000, 0x083fffff).rom().region("user1", 0);
+	map(0x08000000, 0x083fffff).rom().r(FUNC(pgm_arm_type2_state::external_rom_r));
 	map(0x10000000, 0x100003ff).ram();
 	map(0x18000000, 0x1800ffff).ram().share("arm_ram");
 	map(0x38000000, 0x38000003).rw(FUNC(pgm_arm_type2_state::arm7_latch_arm_r), FUNC(pgm_arm_type2_state::arm7_latch_arm_w)); /* 68k Latch */
 	map(0x48000000, 0x4800ffff).rw(FUNC(pgm_arm_type2_state::arm7_shareram_r), FUNC(pgm_arm_type2_state::arm7_shareram_w)).share("arm7_shareram");
-	map(0x50000000, 0x500003ff).ram();
+	map(0x50000000, 0x500003ff).ram().umask32(0x000000ff).w(FUNC(pgm_arm_type2_state::xor_table_w));
 }
 
 /******* ARM 55857F *******/
@@ -150,9 +159,11 @@ void pgm_arm_type2_state::kov2_latch_init()
 {
 	m_kov2_latchdata_68k_w = 0;
 	m_kov2_latchdata_arm_w = 0;
+	std::fill(std::begin(m_xor_table), std::end(m_xor_table), 0);
 
 	save_item(NAME(m_kov2_latchdata_68k_w));
 	save_item(NAME(m_kov2_latchdata_arm_w));
+	save_item(NAME(m_xor_table));
 }
 
 void pgm_arm_type2_state::kov2_arm_region_w(offs_t offset, u32 data, u32 mem_mask)
@@ -225,7 +236,7 @@ u32 pgm_arm_type2_state::ddp2_speedup_r(address_space &space)
 	if (pc == 0x080109b4)
 	{
 		/* if we've hit the loop where this is read and both values are 0 then the only way out is an interrupt */
-		int r4 = (m_prot->state_int(ARM7_R4));
+		int r4 = (m_prot->state_int(arm7_cpu_device::ARM7_R4));
 		r4 += 0xe;
 
 		if (r4 == 0x18002f9e)
@@ -320,6 +331,7 @@ INPUT_PORTS_START( dw2001 )
 	PORT_INCLUDE ( pgm )
 
 	PORT_MODIFY("Region")   /* Region - supplied by protection device */
+	PORT_BIT(      0xfff0, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_CONFNAME( 0x000f, 0x0005, DEF_STR( Region ) )
 	PORT_CONFSETTING(      0x0000, DEF_STR( China ) )
 	PORT_CONFSETTING(      0x0001, DEF_STR( Taiwan ) )

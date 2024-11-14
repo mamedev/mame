@@ -94,7 +94,7 @@ void crbaloon_state::draw_sprite_and_check_collision(bitmap_ind16 &bitmap)
 
 
 	if (flip_screen())
-		sy += 32;
+		sy += 1;
 
 	/* assume no collision */
 	m_collision_address = 0xffff;
@@ -103,7 +103,7 @@ void crbaloon_state::draw_sprite_and_check_collision(bitmap_ind16 &bitmap)
 	{
 		int x;
 		uint8_t data = 0;
-		uint8_t sx = m_spriteram[1];
+		uint8_t sx = flip_screen() ? m_spriteram[1] + 1 : m_spriteram[1];
 
 		for (x = 0x1f; x >= 0; x--)
 		{

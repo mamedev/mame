@@ -9,9 +9,11 @@
 #include "emu.h"
 #include "cpu/z180/z180.h"
 #include "imagedev/floppy.h"
-#include "formats/imd_dsk.h"
 #include "machine/upd765.h"
 #include "bus/rs232/rs232.h"
+
+
+namespace {
 
 #define FDC9266_TAG "u24"
 
@@ -28,10 +30,10 @@ public:
 	void sb180(machine_config &config);
 
 private:
-	virtual void machine_reset() override;
+	virtual void machine_reset() override ATTR_COLD;
 
-	void sb180_io(address_map &map);
-	void sb180_mem(address_map &map);
+	void sb180_io(address_map &map) ATTR_COLD;
+	void sb180_mem(address_map &map) ATTR_COLD;
 
 	required_device<z180_device> m_maincpu;
 	required_device<upd765a_device> m_fdc;
@@ -73,12 +75,6 @@ static void sb180_floppies(device_slot_interface &device)
 	device.option_add("35dd", FLOPPY_35_DD);
 }
 
-static void sb180_floppy_formats(format_registration &fr)
-{
-	fr.add_mfm_containers();
-	fr.add(FLOPPY_IMD_FORMAT);
-}
-
 static DEVICE_INPUT_DEFAULTS_START( terminal )
 	DEVICE_INPUT_DEFAULTS( "RS232_RXBAUD", 0xff, RS232_BAUD_9600 )
 	DEVICE_INPUT_DEFAULTS( "RS232_TXBAUD", 0xff, RS232_BAUD_9600 )
@@ -102,10 +98,10 @@ void sb180_state::sb180(machine_config &config)
 	m_fdc->drq_wr_callback().set_inputline(m_maincpu, Z180_INPUT_LINE_DREQ1);
 
 	/* floppy drives */
-	FLOPPY_CONNECTOR(config, m_floppy[0], sb180_floppies, "35dd", sb180_floppy_formats);
-	FLOPPY_CONNECTOR(config, m_floppy[1], sb180_floppies, "35dd", sb180_floppy_formats);
-	FLOPPY_CONNECTOR(config, m_floppy[2], sb180_floppies, "35dd", sb180_floppy_formats);
-	FLOPPY_CONNECTOR(config, m_floppy[3], sb180_floppies, "35dd", sb180_floppy_formats);
+	FLOPPY_CONNECTOR(config, m_floppy[0], sb180_floppies, "35dd", floppy_image_device::default_mfm_floppy_formats);
+	FLOPPY_CONNECTOR(config, m_floppy[1], sb180_floppies, "35dd", floppy_image_device::default_mfm_floppy_formats);
+	FLOPPY_CONNECTOR(config, m_floppy[2], sb180_floppies, "35dd", floppy_image_device::default_mfm_floppy_formats);
+	FLOPPY_CONNECTOR(config, m_floppy[3], sb180_floppies, "35dd", floppy_image_device::default_mfm_floppy_formats);
 
 	rs232_port_device &rs232(RS232_PORT(config, "rs232", default_rs232_devices, "terminal"));
 	rs232.set_option_device_input_defaults("terminal", DEVICE_INPUT_DEFAULTS_NAME(terminal)); // must be below the DEVICE_INPUT_DEFAULTS_START block
@@ -117,6 +113,9 @@ ROM_START( sb180 )
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD( "monitor.bin", 0x0000, 0x2000, CRC(49640012) SHA1(ea571dc7476430e31b74bd1ab7a577e9013ad0bd))
 ROM_END
+
+} // anonymous namespace
+
 
 /* Driver */
 

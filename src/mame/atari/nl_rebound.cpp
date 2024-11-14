@@ -68,6 +68,7 @@
 #include "netlist/devices/net_lib.h"
 
 static NETLIST_START(rebound_schematics)
+{
 
 	 ANALOG_INPUT(V5, 5)
 
@@ -1289,9 +1290,10 @@ static NETLIST_START(rebound_schematics)
 			   H1.7,  H2.7,  H3.10, H4.7,  H5.10, H6.7,  H7.7,  H8.7,  H9.7,
 			   J1.7,  J2.7,  J3.10, J4.7,  J5.7,  J6.7,  J7.7,  J8.8,  J9.10,
 					  K2.10, K3.8,  K4.7,  K5.7,  K6.7,  K7.8,  K8.8,  K9.10)
-NETLIST_END()
+}
 
 NETLIST_START(rebound)
+{
 
 	LOCAL_SOURCE(rebound_schematics)
 	SOLVER(Solver, 480)
@@ -1304,4 +1306,4 @@ NETLIST_START(rebound)
 	HINT(F9.B, NO_DEACTIVATE)
 	INCLUDE(rebound_schematics)
 
-NETLIST_END()
+}

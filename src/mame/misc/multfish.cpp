@@ -187,99 +187,95 @@ below are simply made to the banking address to run on other boards.
 #include "speaker.h"
 
 
-TILE_GET_INFO_MEMBER(igrosoft_gamble_state::get_igrosoft_gamble_tile_info)
+TILE_GET_INFO_MEMBER(igrosoft_gamble_state::get_static_tile_info)
 {
-	int code = m_vid[tile_index*2+0x0000] | (m_vid[tile_index*2+0x0001] << 8);
-	int attr = m_vid[tile_index*2+0x1000] | (m_vid[tile_index*2+0x1001] << 8);
+	uint16_t const code = m_vid[tile_index * 2 + 0x0000] | (m_vid[tile_index * 2 + 0x0001] << 8);
+	uint16_t const attr = m_vid[tile_index * 2 + 0x1000] | (m_vid[tile_index * 2 + 0x1001] << 8);
 
-	tileinfo.category = (attr&0x100)>>8;
+	tileinfo.category = BIT(attr, 8);
 
 	tileinfo.set(0,
-			code&0x1fff,
-			attr&0x7,
+			code & 0x1fff,
+			attr & 0x7,
 			0);
 }
 
-TILE_GET_INFO_MEMBER(igrosoft_gamble_state::get_igrosoft_gamble_reel_tile_info)
+TILE_GET_INFO_MEMBER(igrosoft_gamble_state::get_reel_tile_info)
 {
-	int code = m_vid[tile_index*2+0x2000] | (m_vid[tile_index*2+0x2001] << 8);
+	uint16_t const code = m_vid[tile_index * 2 + 0x2000] | (m_vid[tile_index * 2 + 0x2001] << 8);
 
 	tileinfo.set(0,
-			(code&0x1fff)+0x2000,
-			(code>>14)+0x8,
+			(code & 0x1fff) + 0x2000,
+			(code >> 14) + 0x8,
 			0);
 }
 
 void igrosoft_gamble_state::video_start()
 {
-	memset(m_vid,0x00,sizeof(m_vid));
-	save_item(NAME(m_vid));
+	uint32_t const vidram_size = (0x2000 * 0x04);
+	m_vid = make_unique_clear<uint8_t[]>(vidram_size);
 
-	m_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(igrosoft_gamble_state::get_igrosoft_gamble_tile_info)), TILEMAP_SCAN_ROWS, 16,16, 64, 32);
+	m_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(igrosoft_gamble_state::get_static_tile_info)), TILEMAP_SCAN_ROWS, 16,16, 64, 32);
 	m_tilemap->set_transparent_pen(255);
 
-	m_reel_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(igrosoft_gamble_state::get_igrosoft_gamble_reel_tile_info)), TILEMAP_SCAN_ROWS, 16,16, 64, 64);
+	m_reel_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(igrosoft_gamble_state::get_reel_tile_info)), TILEMAP_SCAN_ROWS, 16,16, 64, 64);
 	m_reel_tilemap->set_transparent_pen(255);
 	m_reel_tilemap->set_scroll_cols(64);
+
+	save_pointer(NAME(m_vid), vidram_size);
 }
 
-uint32_t igrosoft_gamble_state::screen_update_igrosoft_gamble(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t igrosoft_gamble_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	int i;
-
 	bitmap.fill(m_palette->black_pen(), cliprect);
 
 	if (!m_disp_enable) return 0;
 
-	/* Draw lower part of static tilemap (low pri tiles) */
-	m_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_CATEGORY(1),0);
+	// Draw lower part of static tilemap (low pri tiles)
+	m_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_CATEGORY(1), 0);
 
-	/* Setup the column scroll and draw the reels */
-	for (i=0;i<64;i++)
+	// Setup the column scroll and draw the reels
+	for (int i = 0; i < 64; i++)
 	{
-		int colscroll = (m_vid[i*2] | m_vid[i*2+1] << 8);
-		m_reel_tilemap->set_scrolly(i, colscroll );
+		int const colscroll = (m_vid[i * 2] | m_vid[i * 2 + 1] << 8);
+		m_reel_tilemap->set_scrolly(i, colscroll);
 	}
 	m_reel_tilemap->draw(screen, bitmap, cliprect, 0,0);
 
-	/* Draw upper part of static tilemap (high pri tiles) */
-	m_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_CATEGORY(0),0);
+	// Draw upper part of static tilemap (high pri tiles)
+	m_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_CATEGORY(0), 0);
 
 	return 0;
 }
 
-void igrosoft_gamble_state::igrosoft_gamble_vid_w(offs_t offset, uint8_t data)
+void igrosoft_gamble_state::vid_w(offs_t offset, uint8_t data)
 {
 	m_vid[offset]=data;
 
 	// 0x0000 - 0x1fff is normal tilemap
 	if (offset < 0x2000)
 	{
-		m_tilemap->mark_tile_dirty((offset&0xfff)/2);
-
+		m_tilemap->mark_tile_dirty((offset & 0xfff) / 2);
 	}
 	// 0x2000 - 0x2fff is for the reels
 	else if (offset < 0x4000)
 	{
-		m_reel_tilemap->mark_tile_dirty((offset&0x1fff)/2);
+		m_reel_tilemap->mark_tile_dirty((offset & 0x1fff) / 2);
 	}
 	else if (offset < 0x6000)
 	{
-		int r,g,b;
-		int coldat;
+		uint16_t coldat = m_vid[offset & ~1] | (m_vid[offset | 1] << 8);
 
-		coldat = m_vid[(offset&0xfffe)] | (m_vid[(offset&0xfffe)^1] << 8);
-
-		/* xor and bitswap palette */
+		// xor and bitswap palette
 		switch (m_xor_paltype) {
 			case 1:
 				coldat ^= m_xor_palette;
-				coldat ^= ((coldat&0x2) >>1) | ((coldat&0x80) >>3) ;
+				coldat ^= ((coldat & 0x2) >> 1) | ((coldat & 0x80) >> 3) ;
 				coldat = bitswap<16>(coldat,10,15,5,13,8,12,11,2,0,4,7,14,9,3,1,6);
 				break;
 			case 2:
 				coldat ^= m_xor_palette;
-				coldat ^= ((coldat&0x0001) <<1) ^ ((coldat&0x0010) <<1) ^ ((coldat&0x0010) <<2) ^ ((coldat&0x0020) <<1) ^ ((coldat&0x0080) >>1);
+				coldat ^= ((coldat & 0x0001) << 1) ^ ((coldat & 0x0010) << 1) ^ ((coldat & 0x0010) << 2) ^ ((coldat&0x0020) <<1) ^ ((coldat&0x0080) >>1);
 				coldat = bitswap<16>(coldat,4,10,13,14,8,11,15,12,2,6,5,0,7,3,1,9);
 				break;
 			case 3:
@@ -289,12 +285,12 @@ void igrosoft_gamble_state::igrosoft_gamble_vid_w(offs_t offset, uint8_t data)
 				break;
 		}
 
-		r = ( (coldat &0x001f)>> 0);
-		g = ( (coldat &0x1f00)>> 8);
-		b = ( (coldat &0x00e0)>> (5));
-		b|= ( (coldat &0xe000)>> (8+5-3));
+		uint8_t const r = ((coldat & 0x001f) >> 0);
+		uint8_t const g = ((coldat & 0x1f00) >> 8);
+		uint8_t const b = ((coldat & 0x00e0) >> (5))
+						| ((coldat & 0xe000) >> (8+5-3));
 
-		m_palette->set_pen_color((offset-0x4000)/2, r<<3, g<<3, b<<2);
+		m_palette->set_pen_color((offset - 0x4000) / 2, r << 3, g << 3, b << 2);
 	}
 	else
 	{
@@ -302,17 +298,17 @@ void igrosoft_gamble_state::igrosoft_gamble_vid_w(offs_t offset, uint8_t data)
 	}
 }
 
-void igrosoft_gamble_state::igrosoft_gamble_bank_w(uint8_t data)
+void igrosoft_gamble_state::rombank_w(uint8_t data)
 {
-	membank("bank1")->set_entry(data & 0x0f);
+	m_mainbank->set_entry(data & 0x0f);
 }
 
-uint8_t igrosoft_gamble_state::igrosoft_gamble_timekeeper_r(offs_t offset)
+uint8_t igrosoft_gamble_state::timekeeper_r(offs_t offset)
 {
 	return m_m48t35->read(offset + 0x6000);
 }
 
-void igrosoft_gamble_state::igrosoft_gamble_timekeeper_w(offs_t offset, uint8_t data)
+void igrosoft_gamble_state::timekeeper_w(offs_t offset, uint8_t data)
 {
 	m_m48t35->write(offset + 0x6000, data);
 }
@@ -321,11 +317,11 @@ uint8_t igrosoft_gamble_state::bankedram_r(offs_t offset)
 {
 	if ((m_rambk & 0x80) == 0x00)
 	{
-		return m_m48t35->read(offset + 0x2000*(m_rambk & 0x03));
+		return m_m48t35->read(offset + 0x2000 * (m_rambk & 0x03));
 	}
 	else
 	{
-		return m_vid[offset+0x2000*(m_rambk & 0x03)];
+		return m_vid[offset + 0x2000 * (m_rambk & 0x03)];
 	}
 
 }
@@ -334,15 +330,15 @@ void igrosoft_gamble_state::bankedram_w(offs_t offset, uint8_t data)
 {
 	if ((m_rambk & 0x80) == 0x00)
 	{
-		m_m48t35->write(offset + 0x2000*(m_rambk & 0x03), data);
+		m_m48t35->write(offset + 0x2000 * (m_rambk & 0x03), data);
 	}
 	else
 	{
-		igrosoft_gamble_vid_w(offset+0x2000*(m_rambk & 0x03), data);
+		vid_w(offset + 0x2000 * (m_rambk & 0x03), data);
 	}
 }
 
-void igrosoft_gamble_state::igrosoft_gamble_rambank_w(uint8_t data)
+void igrosoft_gamble_state::rambank_w(uint8_t data)
 {
 	m_rambk = data;
 }
@@ -355,7 +351,7 @@ uint8_t igrosoft_gamble_state::ray_r()
 	return m_screen->vpos();
 }
 
-void igrosoft_gamble_state::igrosoft_gamble_hopper_w(uint8_t data)
+void igrosoft_gamble_state::hopper_w(uint8_t data)
 {
 /*  Port 0x33
 
@@ -365,16 +361,15 @@ void igrosoft_gamble_state::igrosoft_gamble_hopper_w(uint8_t data)
     ---X ---- Hopper Motor 33B
 */
 
-
-	m_hopper->motor_w(data & 0x10);
-	machine().bookkeeping().coin_lockout_w(0, data & 0x01);
-	machine().bookkeeping().coin_lockout_w(1, data & 0x01);
-	machine().bookkeeping().coin_lockout_w(2, data & 0x01);
-	machine().bookkeeping().coin_lockout_w(3, data & 0x01);
-	machine().bookkeeping().coin_lockout_w(4, data & 0x04);
-	machine().bookkeeping().coin_lockout_w(5, data & 0x04);
-	machine().bookkeeping().coin_lockout_w(6, data & 0x04);
-	machine().bookkeeping().coin_lockout_w(7, data & 0x04);
+	m_hopper->motor_w(BIT(data, 4));
+	machine().bookkeeping().coin_lockout_w(0, BIT(data, 0));
+	machine().bookkeeping().coin_lockout_w(1, BIT(data, 0));
+	machine().bookkeeping().coin_lockout_w(2, BIT(data, 0));
+	machine().bookkeeping().coin_lockout_w(3, BIT(data, 0));
+	machine().bookkeeping().coin_lockout_w(4, BIT(data, 2));
+	machine().bookkeeping().coin_lockout_w(5, BIT(data, 2));
+	machine().bookkeeping().coin_lockout_w(6, BIT(data, 2));
+	machine().bookkeeping().coin_lockout_w(7, BIT(data, 2));
 }
 
 void igrosoft_gamble_state::rollfr_hopper_w(uint8_t data)
@@ -383,17 +378,17 @@ void igrosoft_gamble_state::rollfr_hopper_w(uint8_t data)
     By default RollFruit use inverted coinlock bit.
 */
 
-
-	m_hopper->motor_w(data & 0x10);
-	machine().bookkeeping().coin_lockout_w(0,~data & 0x01);
-	machine().bookkeeping().coin_lockout_w(1,~data & 0x01);
-	machine().bookkeeping().coin_lockout_w(2,~data & 0x01);
-	machine().bookkeeping().coin_lockout_w(3,~data & 0x01);
-	machine().bookkeeping().coin_lockout_w(4, data & 0x04);
-	machine().bookkeeping().coin_lockout_w(5, data & 0x04);
-	machine().bookkeeping().coin_lockout_w(6, data & 0x04);
-	machine().bookkeeping().coin_lockout_w(7, data & 0x04);
+	m_hopper->motor_w(BIT(data, 4));
+	machine().bookkeeping().coin_lockout_w(0, BIT(~data, 0));
+	machine().bookkeeping().coin_lockout_w(1, BIT(~data, 0));
+	machine().bookkeeping().coin_lockout_w(2, BIT(~data, 0));
+	machine().bookkeeping().coin_lockout_w(3, BIT(~data, 0));
+	machine().bookkeeping().coin_lockout_w(4, BIT(data, 2));
+	machine().bookkeeping().coin_lockout_w(5, BIT(data, 2));
+	machine().bookkeeping().coin_lockout_w(6, BIT(data, 2));
+	machine().bookkeeping().coin_lockout_w(7, BIT(data, 2));
 }
+
 
 void igrosoft_gamble_state::init_customl()
 {
@@ -424,256 +419,247 @@ A10 <-> A18
 A12 <-> A13
 */
 
-	uint32_t i,j,jscr,romoffset;
-	uint8_t *igrosoft_gamble_gfx = memregion("gfx")->base();
-	std::vector<uint8_t> temprom(igrosoft_gamble_ROM_SIZE);
+	uint32_t jscr,romoffset;
+	uint8_t *gfx = memregion("gfx")->base();
+	std::vector<uint8_t> temprom(ROM_SIZE);
 
-
-	/* ROM 1 decode */
+	// ROM 1 decode
 	romoffset = 0x000000;
-	for (i = 0; i < igrosoft_gamble_ROM_SIZE; i++)
+	for (uint32_t i = 0; i < ROM_SIZE; i++)
 	{
-		jscr = ((i & 0x8000)>>15) | ((i & 0x4000)>>13) | ((i & 0x0080)>>5) | ((i & 0x0040)>>3);
-		igrosoft_gamble_gfx[romoffset+i] = (((0x0f & igrosoft_gamble_gfx[romoffset+i])<<4) | ((0xf0 & igrosoft_gamble_gfx[romoffset+i])>>4)) ^ jscr;
+		jscr = ((i & 0x8000) >> 15) | ((i & 0x4000) >> 13) | ((i & 0x0080) >> 5) | ((i & 0x0040) >> 3);
+		gfx[romoffset + i] = (((0x0f & gfx[romoffset + i]) << 4) | ((0xf0 & gfx[romoffset + i]) >> 4)) ^ jscr;
 	}
-		/* ROM 2 decode */
+		// ROM 2 decode
 	romoffset = 0x100000;
-	for (i = 0; i < igrosoft_gamble_ROM_SIZE; i++)
+	for (uint32_t i = 0; i < ROM_SIZE; i++)
 	{
-		igrosoft_gamble_gfx[romoffset+i] ^=  (0x0f & igrosoft_gamble_gfx[romoffset+i])<<4;
+		gfx[romoffset + i] ^= (0x0f & gfx[romoffset + i]) << 4;
 	}
-	/* ROM 3 decode */
+	// ROM 3 decode
 	romoffset = 0x200000;
-	for (i = 0; i < igrosoft_gamble_ROM_SIZE; i++)
+	for (uint32_t i = 0; i < ROM_SIZE; i++)
 	{
-		jscr = ((i & 0x300)>>6) | ((i & 0x30000)>>16);
-		igrosoft_gamble_gfx[romoffset+i] = (((0x0f & igrosoft_gamble_gfx[romoffset+i])<<4) | ((0xf0 & igrosoft_gamble_gfx[romoffset+i])>>4)) ^ jscr;
+		jscr = ((i & 0x300) >> 6) | ((i & 0x30000) >> 16);
+		gfx[romoffset + i] = (((0x0f & gfx[romoffset + i]) << 4) | ((0xf0 & gfx[romoffset + i]) >> 4)) ^ jscr;
 	}
-	/* ROM 4 decode */
+	// ROM 4 decode
 	romoffset = 0x300000;
-	for (i = 0; i < igrosoft_gamble_ROM_SIZE; i++)
+	for (uint32_t i = 0; i < ROM_SIZE; i++)
 	{
-		igrosoft_gamble_gfx[romoffset+i] ^= (0x0f & igrosoft_gamble_gfx[romoffset+i])<<4;
+		gfx[romoffset + i] ^= (0x0f & gfx[romoffset + i]) << 4;
 	}
 
-	/* Deshuffle all roms*/
-	for (i = 0;i < 8;i++)
+	// Deshuffle all roms*/
+	for (uint32_t i = 0; i < 8; i++)
 	{
-		romoffset = i * igrosoft_gamble_ROM_SIZE;
+		romoffset = i * ROM_SIZE;
 
-		for (j = 0; j < (igrosoft_gamble_ROM_SIZE/0x40); j++)
+		for (uint32_t j = 0; j < (ROM_SIZE / 0x40); j++)
 		{
 			jscr =  bitswap<16>(j,15,14,13,4,3,2,0,1,6,7,5,12,11,10,8,9);
-			memcpy(&temprom[j*0x40],&igrosoft_gamble_gfx[romoffset+(jscr*0x40)],0x40);
+			memcpy(&temprom[j * 0x40], &gfx[romoffset + (jscr * 0x40)], 0x40);
 
 		}
-		memcpy(&igrosoft_gamble_gfx[romoffset],&temprom[0],igrosoft_gamble_ROM_SIZE);
+		memcpy(&gfx[romoffset], &temprom[0], ROM_SIZE);
 	}
 }
 
-static inline void rom_decodel(uint8_t *romptr, uint8_t *tmprom, uint8_t xor_data, uint32_t xor_add)
+inline void igrosoft_gamble_state::rom_decodel(uint8_t *romptr, uint8_t *tmprom, uint8_t xor_data, uint32_t xor_add)
 {
-	uint32_t i, jscr;
-
-	for (i = 0; i < igrosoft_gamble_ROM_SIZE; i++)
+	for (uint32_t i = 0; i < ROM_SIZE; i++)
 	{
-		jscr =  bitswap<24>(i,23,22,21,20,19,17,14,18,16,15,12,13,11,9,6,10,8,7,4,5,3,2,1,0) ^ xor_add ^ 8;
+		uint32_t const jscr =  bitswap<24>(i,23,22,21,20,19,17,14,18,16,15,12,13,11,9,6,10,8,7,4,5,3,2,1,0) ^ xor_add ^ 8;
 		tmprom[i] = romptr[jscr] ^ xor_data;
 	}
-	memcpy(romptr,tmprom,igrosoft_gamble_ROM_SIZE);
+	memcpy(romptr,tmprom,ROM_SIZE);
 }
-static inline void rom_decodeh(uint8_t *romptr, uint8_t *tmprom, uint8_t xor_data, uint32_t xor_add)
+inline void igrosoft_gamble_state::rom_decodeh(uint8_t *romptr, uint8_t *tmprom, uint8_t xor_data, uint32_t xor_add)
 {
-	uint32_t i, jscr;
-
-	for (i = 0; i < igrosoft_gamble_ROM_SIZE; i++)
+	for (uint32_t i = 0; i < ROM_SIZE; i++)
 	{
-		jscr =  bitswap<24>(i,23,22,21,20,19,17,14,18,16,15,12,13,11,9,6,10,8,7,4,5,2,3,1,0) ^ xor_add;
+		uint32_t const jscr =  bitswap<24>(i,23,22,21,20,19,17,14,18,16,15,12,13,11,9,6,10,8,7,4,5,2,3,1,0) ^ xor_add;
 		tmprom[i] = romptr[jscr] ^ xor_data;
 	}
-	memcpy(romptr,tmprom,igrosoft_gamble_ROM_SIZE);
+	memcpy(romptr,tmprom,ROM_SIZE);
 }
 
-static void lottery_decode(running_machine &machine, uint8_t xor12, uint8_t xor34, uint8_t xor56, uint8_t xor78, uint32_t xor_addr)
+void igrosoft_gamble_state::lottery_decode(uint8_t xor12, uint8_t xor34, uint8_t xor56, uint8_t xor78, uint32_t xor_addr)
 {
-	uint8_t *igrosoft_gamble_gfx = machine.root_device().memregion("gfx")->base();
-	std::vector<uint8_t> temprom(igrosoft_gamble_ROM_SIZE);
+	uint8_t *gfx = memregion("gfx")->base();
+	std::vector<uint8_t> temprom(ROM_SIZE);
 
-	/* ROMs decode */
-	rom_decodel(&igrosoft_gamble_gfx[0x000000], &temprom[0], xor12, xor_addr);
-	rom_decodel(&igrosoft_gamble_gfx[0x100000], &temprom[0], xor12, xor_addr);
-	rom_decodel(&igrosoft_gamble_gfx[0x200000], &temprom[0], xor34, xor_addr);
-	rom_decodel(&igrosoft_gamble_gfx[0x300000], &temprom[0], xor34, xor_addr);
-	rom_decodeh(&igrosoft_gamble_gfx[0x080000], &temprom[0], xor56, xor_addr);
-	rom_decodeh(&igrosoft_gamble_gfx[0x180000], &temprom[0], xor56, xor_addr);
-	rom_decodeh(&igrosoft_gamble_gfx[0x280000], &temprom[0], xor78, xor_addr);
-	rom_decodeh(&igrosoft_gamble_gfx[0x380000], &temprom[0], xor78, xor_addr);
+	// ROMs decode
+	rom_decodel(&gfx[0x000000], &temprom[0], xor12, xor_addr);
+	rom_decodel(&gfx[0x100000], &temprom[0], xor12, xor_addr);
+	rom_decodel(&gfx[0x200000], &temprom[0], xor34, xor_addr);
+	rom_decodel(&gfx[0x300000], &temprom[0], xor34, xor_addr);
+	rom_decodeh(&gfx[0x080000], &temprom[0], xor56, xor_addr);
+	rom_decodeh(&gfx[0x180000], &temprom[0], xor56, xor_addr);
+	rom_decodeh(&gfx[0x280000], &temprom[0], xor78, xor_addr);
+	rom_decodeh(&gfx[0x380000], &temprom[0], xor78, xor_addr);
 }
 
-static inline void roment_decodel(uint8_t *romptr, uint8_t *tmprom, uint8_t xor_data, uint32_t xor_add)
+inline void igrosoft_gamble_state::roment_decodel(uint8_t *romptr, uint8_t *tmprom, uint8_t xor_data, uint32_t xor_add)
 {
-	uint32_t i, jscr;
-
-	for (i = 0; i < igrosoft_gamble_ROM_SIZE; i++)
+	for (uint32_t i = 0; i < ROM_SIZE; i++)
 	{
-		jscr =  bitswap<24>(i,23,22,21,20,19,16,18,17,14,15,12,13,11,8,10,9,6,7,4,5,3,2,1,0) ^ xor_add ^ 8;
+		uint32_t const jscr =  bitswap<24>(i,23,22,21,20,19,16,18,17,14,15,12,13,11,8,10,9,6,7,4,5,3,2,1,0) ^ xor_add ^ 8;
 		tmprom[i] = romptr[jscr] ^ xor_data;
 	}
-	memcpy(romptr,tmprom,igrosoft_gamble_ROM_SIZE);
+	memcpy(romptr,tmprom,ROM_SIZE);
 }
-static inline void roment_decodeh(uint8_t *romptr, uint8_t *tmprom, uint8_t xor_data, uint32_t xor_add)
+inline void igrosoft_gamble_state::roment_decodeh(uint8_t *romptr, uint8_t *tmprom, uint8_t xor_data, uint32_t xor_add)
 {
-	uint32_t i, jscr;
-
-	for (i = 0; i < igrosoft_gamble_ROM_SIZE; i++)
+	for (uint32_t i = 0; i < ROM_SIZE; i++)
 	{
-		jscr =  bitswap<24>(i,23,22,21,20,19,16,18,17,14,15,12,13,11,8,10,9,6,7,4,5,2,3,1,0) ^ xor_add;
+		uint32_t const jscr =  bitswap<24>(i,23,22,21,20,19,16,18,17,14,15,12,13,11,8,10,9,6,7,4,5,2,3,1,0) ^ xor_add;
 		tmprom[i] = romptr[jscr] ^ xor_data;
 	}
-	memcpy(romptr,tmprom,igrosoft_gamble_ROM_SIZE);
+	memcpy(romptr,tmprom,ROM_SIZE);
 }
 
-static void ent_decode(running_machine &machine, uint8_t xor12, uint8_t xor34, uint8_t xor56, uint8_t xor78, uint32_t xor_addr)
+void igrosoft_gamble_state::ent_decode(uint8_t xor12, uint8_t xor34, uint8_t xor56, uint8_t xor78, uint32_t xor_addr)
 {
-	uint8_t *igrosoft_gamble_gfx = machine.root_device().memregion("gfx")->base();
-	std::vector<uint8_t> temprom(igrosoft_gamble_ROM_SIZE);
+	uint8_t *gfx = memregion("gfx")->base();
+	std::vector<uint8_t> temprom(ROM_SIZE);
 
-	/* ROMs decode */
-	roment_decodel(&igrosoft_gamble_gfx[0x000000], &temprom[0], xor12, xor_addr);
-	roment_decodel(&igrosoft_gamble_gfx[0x100000], &temprom[0], xor12, xor_addr);
-	roment_decodel(&igrosoft_gamble_gfx[0x200000], &temprom[0], xor34, xor_addr);
-	roment_decodel(&igrosoft_gamble_gfx[0x300000], &temprom[0], xor34, xor_addr);
-	roment_decodeh(&igrosoft_gamble_gfx[0x080000], &temprom[0], xor56, xor_addr);
-	roment_decodeh(&igrosoft_gamble_gfx[0x180000], &temprom[0], xor56, xor_addr);
-	roment_decodeh(&igrosoft_gamble_gfx[0x280000], &temprom[0], xor78, xor_addr);
-	roment_decodeh(&igrosoft_gamble_gfx[0x380000], &temprom[0], xor78, xor_addr);
+	// ROMs decode
+	roment_decodel(&gfx[0x000000], &temprom[0], xor12, xor_addr);
+	roment_decodel(&gfx[0x100000], &temprom[0], xor12, xor_addr);
+	roment_decodel(&gfx[0x200000], &temprom[0], xor34, xor_addr);
+	roment_decodel(&gfx[0x300000], &temprom[0], xor34, xor_addr);
+	roment_decodeh(&gfx[0x080000], &temprom[0], xor56, xor_addr);
+	roment_decodeh(&gfx[0x180000], &temprom[0], xor56, xor_addr);
+	roment_decodeh(&gfx[0x280000], &temprom[0], xor78, xor_addr);
+	roment_decodeh(&gfx[0x380000], &temprom[0], xor78, xor_addr);
 }
 
 void igrosoft_gamble_state::init_island2l()
 {
 	m_xor_palette = 0x8bf7;
 	m_xor_paltype = 1;
-	lottery_decode(machine(), 0xff, 0x11, 0x77, 0xee, 0x44c40);
+	lottery_decode(0xff, 0x11, 0x77, 0xee, 0x44c40);
 }
 void igrosoft_gamble_state::init_keksl()
 {
 	m_xor_palette = 0x41f3;
 	m_xor_paltype = 1;
-	lottery_decode(machine(), 0xdd, 0xaa, 0x22, 0x55, 0x2cac0);
+	lottery_decode(0xdd, 0xaa, 0x22, 0x55, 0x2cac0);
 }
 void igrosoft_gamble_state::init_pirate2l()
 {
 	m_xor_palette = 0x8bfb;
 	m_xor_paltype = 1;
-	lottery_decode(machine(), 0xaa, 0x11, 0x22, 0xee, 0x48480);
+	lottery_decode(0xaa, 0x11, 0x22, 0xee, 0x48480);
 }
 void igrosoft_gamble_state::init_fcockt2l()
 {
 	m_xor_palette = 0xedfb;
 	m_xor_paltype = 1;
-	lottery_decode(machine(), 0x55, 0x11, 0xff, 0xee, 0x78780);
+	lottery_decode(0x55, 0x11, 0xff, 0xee, 0x78780);
 }
 void igrosoft_gamble_state::init_sweetl2l()
 {
 	m_xor_palette = 0x4bf7;
 	m_xor_paltype = 1;
-	lottery_decode(machine(), 0xdd, 0x33, 0x33, 0x77, 0x00800);
+	lottery_decode(0xdd, 0x33, 0x33, 0x77, 0x00800);
 }
 void igrosoft_gamble_state::init_gnomel()
 {
 	m_xor_palette = 0x49ff;
 	m_xor_paltype = 1;
-	lottery_decode(machine(), 0xcc, 0x22, 0x33, 0x66, 0x14940);
+	lottery_decode(0xcc, 0x22, 0x33, 0x66, 0x14940);
 }
 void igrosoft_gamble_state::init_crzmonent()
 {
 	m_xor_palette = 0x1cdb;
 	m_xor_paltype = 2;
-	ent_decode(machine(), 0xaa, 0x44, 0x55, 0x55, 0x1c9c0);
+	ent_decode(0xaa, 0x44, 0x55, 0x55, 0x1c9c0);
 }
 void igrosoft_gamble_state::init_fcocktent()
 {
 	m_xor_palette = 0x2cdb;
 	m_xor_paltype = 2;
-	ent_decode(machine(), 0x77, 0x55, 0x22, 0x44, 0x18180);
+	ent_decode(0x77, 0x55, 0x22, 0x44, 0x18180);
 }
 void igrosoft_gamble_state::init_garageent()
 {
 	m_xor_palette = 0x7adb;
 	m_xor_paltype = 2;
-	ent_decode(machine(), 0x88, 0x66, 0x66, 0x99, 0x28280);
+	ent_decode(0x88, 0x66, 0x66, 0x99, 0x28280);
 }
 void igrosoft_gamble_state::init_rclimbent()
 {
 	m_xor_palette = 0x5edb;
 	m_xor_paltype = 2;
-	ent_decode(machine(), 0x55, 0xaa, 0x44, 0xff, 0x74740);
+	ent_decode(0x55, 0xaa, 0x44, 0xff, 0x74740);
 }
 void igrosoft_gamble_state::init_sweetl2ent()
 {
 	m_xor_palette = 0xdcdb;
 	m_xor_paltype = 2;
-	ent_decode(machine(), 0xee, 0x77, 0x88, 0x11, 0x5c5c0);
+	ent_decode(0xee, 0x77, 0x88, 0x11, 0x5c5c0);
 }
 void igrosoft_gamble_state::init_resdntent()
 {
 	m_xor_palette = 0x6edb;
 	m_xor_paltype = 2;
-	ent_decode(machine(), 0xaa, 0xcc, 0xaa, 0xaa, 0x78780);
+	ent_decode(0xaa, 0xcc, 0xaa, 0xaa, 0x78780);
 }
 void igrosoft_gamble_state::init_island2ent()
 {
 	m_xor_palette = 0xecdb;
 	m_xor_paltype = 2;
-	ent_decode(machine(), 0x88, 0x55, 0xff, 0x99, 0x58d80);
+	ent_decode(0x88, 0x55, 0xff, 0x99, 0x58d80);
 }
 void igrosoft_gamble_state::init_pirate2ent()
 {
 	m_xor_palette = 0xbadb;
 	m_xor_paltype = 2;
-	ent_decode(machine(), 0x33, 0xbb, 0x77, 0x55, 0x68e80);
+	ent_decode(0x33, 0xbb, 0x77, 0x55, 0x68e80);
 }
 void igrosoft_gamble_state::init_keksent()
 {
 	m_xor_palette = 0xaedb;
 	m_xor_paltype = 2;
-	ent_decode(machine(), 0x55, 0xff, 0xaa, 0x22, 0x38b80);
+	ent_decode(0x55, 0xff, 0xaa, 0x22, 0x38b80);
 }
 void igrosoft_gamble_state::init_gnomeent()
 {
 	m_xor_palette = 0x9edb;
 	m_xor_paltype = 2;
-	ent_decode(machine(), 0x22, 0x77, 0x11, 0xbb, 0x34b40);
+	ent_decode(0x22, 0x77, 0x11, 0xbb, 0x34b40);
 }
 void igrosoft_gamble_state::init_lhauntent()
 {
 	m_xor_palette = 0x1adb;
 	m_xor_paltype = 2;
-	ent_decode(machine(), 0x22, 0x44, 0x44, 0xbb, 0x24240);
+	ent_decode(0x22, 0x44, 0x44, 0xbb, 0x24240);
 }
 void igrosoft_gamble_state::init_fcockt2ent()
 {
 	m_xor_palette = 0x7cdb;
 	m_xor_paltype = 2;
-	ent_decode(machine(), 0x33, 0xcc, 0xaa, 0x88, 0x14140);
+	ent_decode(0x33, 0xcc, 0xaa, 0x88, 0x14140);
 }
 void igrosoft_gamble_state::init_sweetlent()
 {
 	m_xor_palette = 0xeadb;
 	m_xor_paltype = 2;
-	ent_decode(machine(), 0x44, 0xdd, 0xdd, 0x22, 0x6c6c0);
+	ent_decode(0x44, 0xdd, 0xdd, 0x22, 0x6c6c0);
 }
 void igrosoft_gamble_state::init_islandent()
 {
 	m_xor_palette = 0xdadb;
 	m_xor_paltype = 2;
-	ent_decode(machine(), 0x66, 0x22, 0x33, 0xcc, 0x64e40);
+	ent_decode(0x66, 0x22, 0x33, 0xcc, 0x64e40);
 }
 void igrosoft_gamble_state::init_pirateent()
 {
 	m_xor_palette = 0xbcdb;
 	m_xor_paltype = 2;
-	ent_decode(machine(), 0x99, 0x22, 0xee, 0x66, 0x54d40);
+	ent_decode(0x99, 0x22, 0xee, 0x66, 0x54d40);
 }
 
 void igrosoft_gamble_state::init_rollfruit()
@@ -704,11 +690,11 @@ void igrosoft_gamble_state::init_crzmon2ent()
 	// needs gfx (and palette) descrambles
 }
 
-void igrosoft_gamble_state::igrosoft_gamble_map(address_map &map)
+void igrosoft_gamble_state::base_prgmap(address_map &map)
 {
-	map(0x0000, 0x7fff).rom().w(FUNC(igrosoft_gamble_state::igrosoft_gamble_vid_w));
-	map(0x8000, 0xbfff).bankr("bank1");
-	map(0xc000, 0xdfff).rw(FUNC(igrosoft_gamble_state::igrosoft_gamble_timekeeper_r), FUNC(igrosoft_gamble_state::igrosoft_gamble_timekeeper_w));
+	map(0x0000, 0x7fff).rom().w(FUNC(igrosoft_gamble_state::vid_w));
+	map(0x8000, 0xbfff).bankr(m_mainbank);
+	map(0xc000, 0xdfff).rw(FUNC(igrosoft_gamble_state::timekeeper_r), FUNC(igrosoft_gamble_state::timekeeper_w));
 	map(0xe000, 0xffff).rw(FUNC(igrosoft_gamble_state::bankedram_r), FUNC(igrosoft_gamble_state::bankedram_w));
 }
 
@@ -731,7 +717,7 @@ INPUT_PORTS_START( igrosoft_gamble )
 	PORT_BIT( 0xe0, IP_ACTIVE_LOW, IPT_UNUSED ) // unused?
 
 	PORT_START("IN1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("hopper", ticket_dispenser_device, line_r)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("hopper", FUNC(ticket_dispenser_device::line_r))
 	PORT_DIPNAME(     0x02, 0x02, "BK Door (17 A)"  )
 	PORT_DIPSETTING(  0x02, DEF_STR( Off ) )
 	PORT_DIPSETTING(  0x00, DEF_STR( On ) )
@@ -824,7 +810,7 @@ static INPUT_PORTS_START( rollfr )
 	PORT_BIT( 0xfc, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("IN1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("hopper", ticket_dispenser_device, line_r)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("hopper", FUNC(ticket_dispenser_device::line_r))
 	PORT_DIPNAME(     0x02, 0x02, "BK Door (17 A)"  )
 	PORT_DIPSETTING(  0x02, DEF_STR( Off ) )
 	PORT_DIPSETTING(  0x00, DEF_STR( On ) )
@@ -857,7 +843,7 @@ static INPUT_PORTS_START( rollfr )
 INPUT_PORTS_END
 
 
-void igrosoft_gamble_state::igrosoft_gamble_lamps1_w(uint8_t data)
+void igrosoft_gamble_state::lamps1_w(uint8_t data)
 {
 /*  Port 0x30
 
@@ -871,17 +857,17 @@ void igrosoft_gamble_state::igrosoft_gamble_lamps1_w(uint8_t data)
     -X-- ---- Start Lamp 34A
     X--- ---- Bet/Double Lamp 29B
 */
-	m_lamps[1] = BIT(data, 0); /* Hold 1 Lamp */
-	m_lamps[2] = BIT(data, 1); /* Hold 2 Lamp */
-	m_lamps[3] = BIT(data, 2); /* Hold 3 Lamp */
-	m_lamps[4] = BIT(data, 3); /* Hold 4 Lamp */
-	m_lamps[5] = BIT(data, 4); /* Hold 5 Lamp */
-	m_lamps[8] = BIT(data, 5); /* Help Lamp */
-	m_lamps[6] = BIT(data, 6); /* Start Lamp */
-	m_lamps[0] = BIT(data, 7); /* Bet/Double Lamp */
+	m_lamps[1] = BIT(data, 0); // Hold 1 Lamp
+	m_lamps[2] = BIT(data, 1); // Hold 2 Lamp
+	m_lamps[3] = BIT(data, 2); // Hold 3 Lamp
+	m_lamps[4] = BIT(data, 3); // Hold 4 Lamp
+	m_lamps[5] = BIT(data, 4); // Hold 5 Lamp
+	m_lamps[8] = BIT(data, 5); // Help Lamp
+	m_lamps[6] = BIT(data, 6); // Start Lamp
+	m_lamps[0] = BIT(data, 7); // Bet/Double Lamp
 }
 
-void igrosoft_gamble_state::igrosoft_gamble_lamps2_w(uint8_t data)
+void igrosoft_gamble_state::lamps2_w(uint8_t data)
 {
 /*  Port 0x34
 
@@ -891,23 +877,23 @@ void igrosoft_gamble_state::igrosoft_gamble_lamps2_w(uint8_t data)
     ---- -X-- Maxbet Lamp 30B
     ---X ---- Upper Lamp Green 25B  (Demo Mode)
 */
-	m_lamps[9] = BIT(data, 0);  /* Payout Lamp */
-	m_lamps[12] = BIT(data, 1); /* Upper Lamp Yellow */
-	m_lamps[7] = BIT(data, 2);  /* Maxbet Lamp */
-	m_lamps[10] = BIT(data, 4); /* Upper Lamp Green */
+	m_lamps[9] = BIT(data, 0);  // Payout Lamp
+	m_lamps[12] = BIT(data, 1); // Upper Lamp Yellow
+	m_lamps[7] = BIT(data, 2);  // Maxbet Lamp
+	m_lamps[10] = BIT(data, 4); // Upper Lamp Green
 }
 
-void igrosoft_gamble_state::igrosoft_gamble_lamps3_w(uint8_t data)
+void igrosoft_gamble_state::lamps3_w(uint8_t data)
 {
 /*  Port 0x35
 
     7654 3210
     ---- --X- Upper Lamp Red 26B (Service Mode)
 */
-	m_lamps[11] = BIT(data, 1); /* Upper Lamp Red */
+	m_lamps[11] = BIT(data, 1); // Upper Lamp Red
 }
 
-void igrosoft_gamble_state::igrosoft_gamble_counters_w(uint8_t data)
+void igrosoft_gamble_state::counters_w(uint8_t data)
 {
 /*  Port 0x31
 
@@ -919,26 +905,26 @@ void igrosoft_gamble_state::igrosoft_gamble_counters_w(uint8_t data)
     -X-- ---- Key Out Counter 27A
     X--- ---- Total Bet Counter 28B
 */
-		machine().bookkeeping().coin_counter_w(0, data & 0x01);
-		machine().bookkeeping().coin_counter_w(1, data & 0x02);
-		machine().bookkeeping().coin_counter_w(2, data & 0x04);
-		machine().bookkeeping().coin_counter_w(3, data & 0x10);
-		machine().bookkeeping().coin_counter_w(4, data & 0x40);
-		machine().bookkeeping().coin_counter_w(5, data & 0x80);
+		machine().bookkeeping().coin_counter_w(0, BIT(data, 0));
+		machine().bookkeeping().coin_counter_w(1, BIT(data, 1));
+		machine().bookkeeping().coin_counter_w(2, BIT(data, 2));
+		machine().bookkeeping().coin_counter_w(3, BIT(data, 4));
+		machine().bookkeeping().coin_counter_w(4, BIT(data, 6));
+		machine().bookkeeping().coin_counter_w(5, BIT(data, 7));
 }
 
-void igrosoft_gamble_state::igrosoft_gamble_f3_w(uint8_t data)
+void igrosoft_gamble_state::f3_w(uint8_t data)
 {
-	//popmessage("igrosoft_gamble_f3_w %02x",data);
+	//popmessage("f3_w %02x",data);
 }
 
-void igrosoft_gamble_state::igrosoft_gamble_dispenable_w(uint8_t data)
+void igrosoft_gamble_state::dispenable_w(uint8_t data)
 {
 	//popmessage("igrosoft_gamble_f4_w %02x",data); // display enable?
 	m_disp_enable = data;
 }
 
-void igrosoft_gamble_state::igrosoft_gamble_portmap(address_map &map)
+void igrosoft_gamble_state::base_portmap(address_map &map)
 {
 	map.global_mask(0xff);
 	map(0x10, 0x10).portr("IN0");
@@ -950,66 +936,66 @@ void igrosoft_gamble_state::igrosoft_gamble_portmap(address_map &map)
 	map(0x16, 0x16).portr("IN6");
 	map(0x17, 0x17).portr("IN7");
 
-	/* Write ports not hooked up yet */
-	map(0x30, 0x30).w(FUNC(igrosoft_gamble_state::igrosoft_gamble_lamps1_w));
-		map(0x31, 0x31).w(FUNC(igrosoft_gamble_state::igrosoft_gamble_counters_w));
+	// Write ports not hooked up yet
+	map(0x30, 0x30).w(FUNC(igrosoft_gamble_state::lamps1_w));
+	map(0x31, 0x31).w(FUNC(igrosoft_gamble_state::counters_w));
 //  map(0x32, 0x32).w(FUNC(igrosoft_gamble_state::igrosoft_gamble_port32_w));
-	map(0x33, 0x33).w(FUNC(igrosoft_gamble_state::igrosoft_gamble_hopper_w));
-	map(0x34, 0x34).w(FUNC(igrosoft_gamble_state::igrosoft_gamble_lamps2_w));
-	map(0x35, 0x35).w(FUNC(igrosoft_gamble_state::igrosoft_gamble_lamps3_w));
+	map(0x33, 0x33).w(FUNC(igrosoft_gamble_state::hopper_w));
+	map(0x34, 0x34).w(FUNC(igrosoft_gamble_state::lamps2_w));
+	map(0x35, 0x35).w(FUNC(igrosoft_gamble_state::lamps3_w));
 //  map(0x36, 0x36).w(FUNC(igrosoft_gamble_state::igrosoft_gamble_port36_w));
 	map(0x37, 0x37).w("watchdog", FUNC(watchdog_timer_device::reset_w));
 	map(0x38, 0x38).w("aysnd", FUNC(ay8910_device::address_w));
 	map(0x39, 0x39).w("aysnd", FUNC(ay8910_device::data_w));
 	map(0x3a, 0x3a).r("aysnd", FUNC(ay8910_device::data_r));
 
-	map(0x60, 0x60).w(FUNC(igrosoft_gamble_state::igrosoft_gamble_dispenable_w)); // display enable mirror for lottery sets
+	map(0x60, 0x60).w(FUNC(igrosoft_gamble_state::dispenable_w)); // display enable mirror for lottery sets
 
 	map(0x90, 0x90).r(FUNC(igrosoft_gamble_state::ray_r));
 
-	map(0xa0, 0xa0).w(FUNC(igrosoft_gamble_state::igrosoft_gamble_bank_w)); // Crazy Monkey 2 banking
-	map(0xa5, 0xa5).w(FUNC(igrosoft_gamble_state::igrosoft_gamble_bank_w)); // Crazy Monkey 2 Ent banking
-	map(0xb0, 0xb0).w(FUNC(igrosoft_gamble_state::igrosoft_gamble_bank_w)); // Fruit Cocktail 2 lottery banking
-	map(0xb1, 0xb1).w(FUNC(igrosoft_gamble_state::igrosoft_gamble_bank_w)); // Crazy Monkey Ent banking
-	map(0xb2, 0xb2).w(FUNC(igrosoft_gamble_state::igrosoft_gamble_bank_w)); // Lacky Haunter Ent banking
-	map(0xb3, 0xb3).w(FUNC(igrosoft_gamble_state::igrosoft_gamble_bank_w)); // Fruit Cocktail Ent banking
-	map(0xb4, 0xb4).w(FUNC(igrosoft_gamble_state::igrosoft_gamble_bank_w)); // Fruit Cocktail 2 Ent banking
-	map(0xb5, 0xb5).w(FUNC(igrosoft_gamble_state::igrosoft_gamble_bank_w)); // Garage Ent banking
-	map(0xb6, 0xb6).w(FUNC(igrosoft_gamble_state::igrosoft_gamble_bank_w)); // Resident Ent banking
-	map(0xb7, 0xb7).w(FUNC(igrosoft_gamble_state::igrosoft_gamble_bank_w)); // Rock Climber Ent banking
-	map(0xb8, 0xb8).w(FUNC(igrosoft_gamble_state::igrosoft_gamble_bank_w)); // Sweet Life Ent banking
-	map(0xb9, 0xb9).w(FUNC(igrosoft_gamble_state::igrosoft_gamble_bank_w)); // Sweet Life 2 Ent banking
-	map(0xba, 0xba).w(FUNC(igrosoft_gamble_state::igrosoft_gamble_bank_w)); // Island Ent banking
-	map(0xbb, 0xbb).w(FUNC(igrosoft_gamble_state::igrosoft_gamble_bank_w)); // Island 2 Ent banking
-	map(0xbc, 0xbc).w(FUNC(igrosoft_gamble_state::igrosoft_gamble_bank_w)); // Pirate Ent banking
-	map(0xbd, 0xbd).w(FUNC(igrosoft_gamble_state::igrosoft_gamble_bank_w)); // Pirate 2 Ent banking
-	map(0xbe, 0xbe).w(FUNC(igrosoft_gamble_state::igrosoft_gamble_bank_w)); // Keks Ent banking
-	map(0xbf, 0xbf).w(FUNC(igrosoft_gamble_state::igrosoft_gamble_bank_w)); // Gnome Ent banking
-	map(0xc7, 0xc7).w(FUNC(igrosoft_gamble_state::igrosoft_gamble_bank_w)); // Resident lottery banking
-	map(0xca, 0xca).w(FUNC(igrosoft_gamble_state::igrosoft_gamble_bank_w)); // Gnome lottery banking
-	map(0xcb, 0xcb).w(FUNC(igrosoft_gamble_state::igrosoft_gamble_bank_w)); // Keks lottery banking
-	map(0xcc, 0xcc).w(FUNC(igrosoft_gamble_state::igrosoft_gamble_bank_w)); // Sweet Life 2 lottery banking
-	map(0xcd, 0xcd).w(FUNC(igrosoft_gamble_state::igrosoft_gamble_bank_w)); // Island 2 lottery banking
-	map(0xce, 0xce).w(FUNC(igrosoft_gamble_state::igrosoft_gamble_bank_w)); // Pirate 2 lottery banking
-	map(0xd0, 0xd0).w(FUNC(igrosoft_gamble_state::igrosoft_gamble_bank_w)); // rollfr_4 rollfr_5 banking
-	map(0xe1, 0xe1).w(FUNC(igrosoft_gamble_state::igrosoft_gamble_bank_w)); // Island 2 banking
-	map(0xe5, 0xe5).w(FUNC(igrosoft_gamble_state::igrosoft_gamble_bank_w)); // Gnome banking
-	map(0xe8, 0xe8).w(FUNC(igrosoft_gamble_state::igrosoft_gamble_bank_w)); // Sweet Life 2 banking
-	map(0xea, 0xea).w(FUNC(igrosoft_gamble_state::igrosoft_gamble_bank_w)); // Fruit Cocktail 2 banking
-	map(0xec, 0xec).w(FUNC(igrosoft_gamble_state::igrosoft_gamble_bank_w)); // Crazy Monkey lottery banking
+	map(0xa0, 0xa0).w(FUNC(igrosoft_gamble_state::rombank_w)); // Crazy Monkey 2 banking
+	map(0xa5, 0xa5).w(FUNC(igrosoft_gamble_state::rombank_w)); // Crazy Monkey 2 Ent banking
+	map(0xb0, 0xb0).w(FUNC(igrosoft_gamble_state::rombank_w)); // Fruit Cocktail 2 lottery banking
+	map(0xb1, 0xb1).w(FUNC(igrosoft_gamble_state::rombank_w)); // Crazy Monkey Ent banking
+	map(0xb2, 0xb2).w(FUNC(igrosoft_gamble_state::rombank_w)); // Lacky Haunter Ent banking
+	map(0xb3, 0xb3).w(FUNC(igrosoft_gamble_state::rombank_w)); // Fruit Cocktail Ent banking
+	map(0xb4, 0xb4).w(FUNC(igrosoft_gamble_state::rombank_w)); // Fruit Cocktail 2 Ent banking
+	map(0xb5, 0xb5).w(FUNC(igrosoft_gamble_state::rombank_w)); // Garage Ent banking
+	map(0xb6, 0xb6).w(FUNC(igrosoft_gamble_state::rombank_w)); // Resident Ent banking
+	map(0xb7, 0xb7).w(FUNC(igrosoft_gamble_state::rombank_w)); // Rock Climber Ent banking
+	map(0xb8, 0xb8).w(FUNC(igrosoft_gamble_state::rombank_w)); // Sweet Life Ent banking
+	map(0xb9, 0xb9).w(FUNC(igrosoft_gamble_state::rombank_w)); // Sweet Life 2 Ent banking
+	map(0xba, 0xba).w(FUNC(igrosoft_gamble_state::rombank_w)); // Island Ent banking
+	map(0xbb, 0xbb).w(FUNC(igrosoft_gamble_state::rombank_w)); // Island 2 Ent banking
+	map(0xbc, 0xbc).w(FUNC(igrosoft_gamble_state::rombank_w)); // Pirate Ent banking
+	map(0xbd, 0xbd).w(FUNC(igrosoft_gamble_state::rombank_w)); // Pirate 2 Ent banking
+	map(0xbe, 0xbe).w(FUNC(igrosoft_gamble_state::rombank_w)); // Keks Ent banking
+	map(0xbf, 0xbf).w(FUNC(igrosoft_gamble_state::rombank_w)); // Gnome Ent banking
+	map(0xc7, 0xc7).w(FUNC(igrosoft_gamble_state::rombank_w)); // Resident lottery banking
+	map(0xca, 0xca).w(FUNC(igrosoft_gamble_state::rombank_w)); // Gnome lottery banking
+	map(0xcb, 0xcb).w(FUNC(igrosoft_gamble_state::rombank_w)); // Keks lottery banking
+	map(0xcc, 0xcc).w(FUNC(igrosoft_gamble_state::rombank_w)); // Sweet Life 2 lottery banking
+	map(0xcd, 0xcd).w(FUNC(igrosoft_gamble_state::rombank_w)); // Island 2 lottery banking
+	map(0xce, 0xce).w(FUNC(igrosoft_gamble_state::rombank_w)); // Pirate 2 lottery banking
+	map(0xd0, 0xd0).w(FUNC(igrosoft_gamble_state::rombank_w)); // rollfr_4 rollfr_5 banking
+	map(0xe1, 0xe1).w(FUNC(igrosoft_gamble_state::rombank_w)); // Island 2 banking
+	map(0xe5, 0xe5).w(FUNC(igrosoft_gamble_state::rombank_w)); // Gnome banking
+	map(0xe8, 0xe8).w(FUNC(igrosoft_gamble_state::rombank_w)); // Sweet Life 2 banking
+	map(0xea, 0xea).w(FUNC(igrosoft_gamble_state::rombank_w)); // Fruit Cocktail 2 banking
+	map(0xec, 0xec).w(FUNC(igrosoft_gamble_state::rombank_w)); // Crazy Monkey lottery banking
 
-	map(0xf0, 0xf0).w(FUNC(igrosoft_gamble_state::igrosoft_gamble_bank_w)); // Gold Fish banking
-	map(0xf1, 0xf1).w(FUNC(igrosoft_gamble_state::igrosoft_gamble_rambank_w));
-	map(0xf3, 0xf3).w(FUNC(igrosoft_gamble_state::igrosoft_gamble_f3_w)); // from 00->01 at startup, irq enable maybe?
-	map(0xf4, 0xf4).w(FUNC(igrosoft_gamble_state::igrosoft_gamble_dispenable_w)); // display enable
+	map(0xf0, 0xf0).w(FUNC(igrosoft_gamble_state::rombank_w)); // Gold Fish banking
+	map(0xf1, 0xf1).w(FUNC(igrosoft_gamble_state::rambank_w));
+	map(0xf3, 0xf3).w(FUNC(igrosoft_gamble_state::f3_w)); // from 00->01 at startup, irq enable maybe?
+	map(0xf4, 0xf4).w(FUNC(igrosoft_gamble_state::dispenable_w)); // display enable
 
-	/* mirrors of the rom banking */
-	map(0xf8, 0xfd).w(FUNC(igrosoft_gamble_state::igrosoft_gamble_bank_w));
+	// mirrors of the rom banking
+	map(0xf8, 0xfd).w(FUNC(igrosoft_gamble_state::rombank_w));
 }
 
 void igrosoft_gamble_state::rollfr_portmap(address_map &map)
 {
-	igrosoft_gamble_portmap(map);
+	base_portmap(map);
 	map(0x33, 0x33).w(FUNC(igrosoft_gamble_state::rollfr_hopper_w));
 }
 
@@ -1040,14 +1026,15 @@ void igrosoft_gamble_state::machine_start()
 {
 	m_lamps.resolve();
 
+	m_mainbank->configure_entries(0, 16, memregion("maincpu")->base(), 0x4000);
+
 	save_item(NAME(m_disp_enable));
 	save_item(NAME(m_rambk));
 }
 
 void igrosoft_gamble_state::machine_reset()
 {
-	membank("bank1")->configure_entries(0, 16, memregion("maincpu")->base(), 0x4000);
-	membank("bank1")->set_entry(0);
+	m_mainbank->set_entry(0);
 
 	m_disp_enable = 0;
 	m_rambk = 0;
@@ -1055,32 +1042,31 @@ void igrosoft_gamble_state::machine_reset()
 
 void igrosoft_gamble_state::igrosoft_gamble(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	Z80(config, m_maincpu, XTAL(24'000'000)/4);
-	m_maincpu->set_addrmap(AS_PROGRAM, &igrosoft_gamble_state::igrosoft_gamble_map);
-	m_maincpu->set_addrmap(AS_IO, &igrosoft_gamble_state::igrosoft_gamble_portmap);
+	m_maincpu->set_addrmap(AS_PROGRAM, &igrosoft_gamble_state::base_prgmap);
+	m_maincpu->set_addrmap(AS_IO, &igrosoft_gamble_state::base_portmap);
 	m_maincpu->set_vblank_int("screen", FUNC(igrosoft_gamble_state::irq0_line_hold));
 
 	WATCHDOG_TIMER(config, "watchdog");
 
-	/* video hardware */
+	// video hardware
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	m_screen->set_size(64*16, 32*16);
 	m_screen->set_visarea(17*16, 1024-16*7-1, 1*16, 32*16-1*16-1);
-	m_screen->set_screen_update(FUNC(igrosoft_gamble_state::screen_update_igrosoft_gamble));
+	m_screen->set_screen_update(FUNC(igrosoft_gamble_state::screen_update));
 	m_screen->set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_igrosoft_gamble);
 	PALETTE(config, m_palette).set_entries(0x1000);
 
-
 	SPEAKER(config, "mono").front_center();
 	AY8910(config, "aysnd", 6000000/4).add_route(ALL_OUTPUTS, "mono", 0.30);
 
 	M48T35(config, m_m48t35, 0);
-	HOPPER(config, m_hopper, attotime::from_msec(100), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH);
+	HOPPER(config, m_hopper, attotime::from_msec(100));
 }
 
 void igrosoft_gamble_state::rollfr(machine_config &config)
@@ -1121,7 +1107,7 @@ ROM_START( goldfish ) // Gold Fish 020903 prototype of Multi Fish
 	ROM_LOAD( "gf_020903.rom", 0x00000, 0x40000, CRC(705304fc) SHA1(f02336066ba2ff394ac153107e308d5356e99eca) )
 
 	ROM_REGION( 0x400000, "gfx", 0 )
-	/* did it really use these graphic ROMs? they include the screens used by the games not included in 'Gold Fish' */
+	// did it really use these graphic ROMs? they include the screens used by the games not included in 'Gold Fish'
 	ROM_LOAD( "multi_fish.001", 0x000000, 0x80000, CRC(2f2a7367) SHA1(ce7ee9ca4f374ec61edc3b89d4752f0edb64a910) )
 	ROM_LOAD( "multi_fish.002", 0x100000, 0x80000, CRC(606acd73) SHA1(ce5f7b1366dbb16d57fe4b7f395f08725e3cf756) )
 	ROM_LOAD( "multi_fish.003", 0x200000, 0x80000, CRC(33759c2a) SHA1(6afcee2e00a27542fc9751702abcc84cd7d3a2a8) )
@@ -1929,7 +1915,7 @@ ROM_START( fcockt_9 ) // 070305
 	ROM_LOAD( "fc_070305.rom", 0x00000, 0x40000, CRC(4eb835d9) SHA1(406b2fcad0ca587eacee123ac4b040cb6f6db18c) )
 
 	ROM_REGION( 0x400000, "gfx", 0 )
-	ROM_LOAD( "fruitcocktail.001",   0x000000, 0x80000, CRC(735fbe79) SHA1(6ab590e00043dcb6648fd942e11747486d497df1) ) /* Only this set is listed as official hashes */
+	ROM_LOAD( "fruitcocktail.001",   0x000000, 0x80000, CRC(735fbe79) SHA1(6ab590e00043dcb6648fd942e11747486d497df1) ) // Only this set is listed as official hashes
 	ROM_LOAD( "fruitcocktail.002",   0x100000, 0x80000, CRC(28fc888e) SHA1(2b8c55675bf61203682d560c9b3f29568719113f) )
 	ROM_LOAD( "fruitcocktail.003",   0x200000, 0x80000, CRC(01fc1a18) SHA1(4f73c6cde6ed741cc8c1bc32442f572ee7ba208a) )
 	ROM_LOAD( "fruitcocktail.004",   0x300000, 0x80000, CRC(68daa864) SHA1(b05c455e23ace80e102699616b75f3a0946c04bc) )
@@ -1947,7 +1933,7 @@ ROM_START( fcockt_10 ) // 070517
 	ROM_LOAD( "fc_070517.rom", 0x00000, 0x40000, CRC(8b43f765) SHA1(86412c37252cf1f12a3acd9359bbf1cdcf52da9f) )
 
 	ROM_REGION( 0x400000, "gfx", 0 )
-	ROM_LOAD( "fruitcocktail.001",   0x000000, 0x80000, CRC(735fbe79) SHA1(6ab590e00043dcb6648fd942e11747486d497df1) ) /* Only this set is listed as official hashes */
+	ROM_LOAD( "fruitcocktail.001",   0x000000, 0x80000, CRC(735fbe79) SHA1(6ab590e00043dcb6648fd942e11747486d497df1) ) // Only this set is listed as official hashes
 	ROM_LOAD( "fruitcocktail.002",   0x100000, 0x80000, CRC(28fc888e) SHA1(2b8c55675bf61203682d560c9b3f29568719113f) )
 	ROM_LOAD( "fruitcocktail.003",   0x200000, 0x80000, CRC(01fc1a18) SHA1(4f73c6cde6ed741cc8c1bc32442f572ee7ba208a) )
 	ROM_LOAD( "fruitcocktail.004",   0x300000, 0x80000, CRC(68daa864) SHA1(b05c455e23ace80e102699616b75f3a0946c04bc) )
@@ -1965,7 +1951,7 @@ ROM_START( fcockt_11 ) // 070822
 	ROM_LOAD( "fc_070822.rom", 0x00000, 0x40000, CRC(f156657d) SHA1(bd538e714a87461bdf84df18ae3f8caeee876747) )
 
 	ROM_REGION( 0x400000, "gfx", 0 )
-	ROM_LOAD( "fruitcocktail.001",   0x000000, 0x80000, CRC(735fbe79) SHA1(6ab590e00043dcb6648fd942e11747486d497df1) ) /* Only this set is listed as official hashes */
+	ROM_LOAD( "fruitcocktail.001",   0x000000, 0x80000, CRC(735fbe79) SHA1(6ab590e00043dcb6648fd942e11747486d497df1) ) // Only this set is listed as official hashes
 	ROM_LOAD( "fruitcocktail.002",   0x100000, 0x80000, CRC(28fc888e) SHA1(2b8c55675bf61203682d560c9b3f29568719113f) )
 	ROM_LOAD( "fruitcocktail.003",   0x200000, 0x80000, CRC(01fc1a18) SHA1(4f73c6cde6ed741cc8c1bc32442f572ee7ba208a) )
 	ROM_LOAD( "fruitcocktail.004",   0x300000, 0x80000, CRC(68daa864) SHA1(b05c455e23ace80e102699616b75f3a0946c04bc) )
@@ -1983,7 +1969,7 @@ ROM_START( fcockt_12 ) // 070911
 	ROM_LOAD( "fc_070911.rom", 0x00000, 0x40000, CRC(17c015bb) SHA1(5369549853f1c463b999bb4ff9d06c5d8e467c5b) )
 
 	ROM_REGION( 0x400000, "gfx", 0 )
-	ROM_LOAD( "fruitcocktail.001",   0x000000, 0x80000, CRC(735fbe79) SHA1(6ab590e00043dcb6648fd942e11747486d497df1) ) /* Only this set is listed as official hashes */
+	ROM_LOAD( "fruitcocktail.001",   0x000000, 0x80000, CRC(735fbe79) SHA1(6ab590e00043dcb6648fd942e11747486d497df1) ) // Only this set is listed as official hashes
 	ROM_LOAD( "fruitcocktail.002",   0x100000, 0x80000, CRC(28fc888e) SHA1(2b8c55675bf61203682d560c9b3f29568719113f) )
 	ROM_LOAD( "fruitcocktail.003",   0x200000, 0x80000, CRC(01fc1a18) SHA1(4f73c6cde6ed741cc8c1bc32442f572ee7ba208a) )
 	ROM_LOAD( "fruitcocktail.004",   0x300000, 0x80000, CRC(68daa864) SHA1(b05c455e23ace80e102699616b75f3a0946c04bc) )
@@ -4876,7 +4862,7 @@ ROM_END
 
 ROM_START( fcockt2 ) // 080707
 	ROM_REGION( 0x40000, "maincpu", 0 ) // z80 code, banked
-	ROM_LOAD( "fc2_080707.rom", 0x00000, 0x40000, CRC(3a42f27d) SHA1(7ba91f52b1b0ac4513caebc2989f3b9d6f9dfde4) ) /* Not officially listed on Igrosoft's web site hash page */
+	ROM_LOAD( "fc2_080707.rom", 0x00000, 0x40000, CRC(3a42f27d) SHA1(7ba91f52b1b0ac4513caebc2989f3b9d6f9dfde4) ) // Not officially listed on Igrosoft's web site hash page
 
 	ROM_REGION( 0x400000, "gfx", 0 )
 	ROM_LOAD( "fruitcocktail2.001",  0x000000, 0x80000, CRC(d1b9416d) SHA1(4d3cb0a6dbcf02bbd20d5c43df358882b2ad794d) )
@@ -5401,258 +5387,438 @@ Most games had a revision in early 2007 to meet the standards of the "Government
 
 
 
-GAME( 2002, goldfish,    mfish_13, igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, empty_init,      ROT0, "Igrosoft", "Gold Fish (020903, prototype)", MACHINE_SUPPORTS_SAVE ) /* World */
-GAME( 2002, mfish,       mfish_13, igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, empty_init,      ROT0, "Igrosoft", "Multi Fish (021120)",           MACHINE_SUPPORTS_SAVE ) /* World */
-GAME( 2002, mfish_2,     mfish_13, igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, empty_init,      ROT0, "Igrosoft", "Multi Fish (021121)",           MACHINE_SUPPORTS_SAVE ) /* World */
-GAME( 2002, mfish_3,     mfish_13, igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, empty_init,      ROT0, "Igrosoft", "Multi Fish (021124)",           MACHINE_SUPPORTS_SAVE ) /* World */
-GAME( 2002, mfish_4,     mfish_13, igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, empty_init,      ROT0, "Igrosoft", "Multi Fish (021219)",           MACHINE_SUPPORTS_SAVE ) /* World */
-GAME( 2002, mfish_5,     mfish_13, igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, empty_init,      ROT0, "Igrosoft", "Multi Fish (021227)",           MACHINE_SUPPORTS_SAVE ) /* World */
-GAME( 2002, mfish_6,     mfish_13, igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, empty_init,      ROT0, "Igrosoft", "Multi Fish (030124)",           MACHINE_SUPPORTS_SAVE ) /* World */
-GAME( 2002, mfish_7,     mfish_13, igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, empty_init,      ROT0, "Igrosoft", "Multi Fish (030511)",           MACHINE_SUPPORTS_SAVE ) /* World */
-GAME( 2002, mfish_8,     mfish_13, igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, empty_init,      ROT0, "Igrosoft", "Multi Fish (030522)",           MACHINE_SUPPORTS_SAVE ) /* World */
-GAME( 2002, mfish_9,     mfish_13, igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, empty_init,      ROT0, "Igrosoft", "Multi Fish (031026)",           MACHINE_SUPPORTS_SAVE ) /* World */
-GAME( 2002, mfish_10,    mfish_13, igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, empty_init,      ROT0, "Igrosoft", "Multi Fish (031117)",           MACHINE_SUPPORTS_SAVE ) /* World */
-GAME( 2002, mfish_11,    mfish_13, igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, empty_init,      ROT0, "Igrosoft", "Multi Fish (031124)",           MACHINE_SUPPORTS_SAVE ) /* World */
-GAME( 2002, mfish_12,    mfish_13, igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, empty_init,      ROT0, "Igrosoft", "Multi Fish (040308)",           MACHINE_SUPPORTS_SAVE ) /* World */
-GAME( 2002, mfish_13,    0,        igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, empty_init,      ROT0, "Igrosoft", "Multi Fish (040316)",           MACHINE_SUPPORTS_SAVE ) /* World */
+GAME( 2002, goldfish,    mfish_13, igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, empty_init,      ROT0, "Igrosoft", "Gold Fish (020903, prototype)", MACHINE_SUPPORTS_SAVE ) // World
+GAME( 2002, mfish,       mfish_13, igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, empty_init,      ROT0, "Igrosoft", "Multi Fish (021120)",           MACHINE_SUPPORTS_SAVE ) // World
+GAME( 2002, mfish_2,     mfish_13, igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, empty_init,      ROT0, "Igrosoft", "Multi Fish (021121)",           MACHINE_SUPPORTS_SAVE ) // World
+GAME( 2002, mfish_3,     mfish_13, igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, empty_init,      ROT0, "Igrosoft", "Multi Fish (021124)",           MACHINE_SUPPORTS_SAVE ) // World
+GAME( 2002, mfish_4,     mfish_13, igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, empty_init,      ROT0, "Igrosoft", "Multi Fish (021219)",           MACHINE_SUPPORTS_SAVE ) // World
+GAME( 2002, mfish_5,     mfish_13, igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, empty_init,      ROT0, "Igrosoft", "Multi Fish (021227)",           MACHINE_SUPPORTS_SAVE ) // World
+GAME( 2002, mfish_6,     mfish_13, igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, empty_init,      ROT0, "Igrosoft", "Multi Fish (030124)",           MACHINE_SUPPORTS_SAVE ) // World
+GAME( 2002, mfish_7,     mfish_13, igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, empty_init,      ROT0, "Igrosoft", "Multi Fish (030511)",           MACHINE_SUPPORTS_SAVE ) // World
+GAME( 2002, mfish_8,     mfish_13, igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, empty_init,      ROT0, "Igrosoft", "Multi Fish (030522)",           MACHINE_SUPPORTS_SAVE ) // World
+GAME( 2002, mfish_9,     mfish_13, igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, empty_init,      ROT0, "Igrosoft", "Multi Fish (031026)",           MACHINE_SUPPORTS_SAVE ) // World
+GAME( 2002, mfish_10,    mfish_13, igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, empty_init,      ROT0, "Igrosoft", "Multi Fish (031117)",           MACHINE_SUPPORTS_SAVE ) // World
+GAME( 2002, mfish_11,    mfish_13, igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, empty_init,      ROT0, "Igrosoft", "Multi Fish (031124)",           MACHINE_SUPPORTS_SAVE ) // World
+GAME( 2002, mfish_12,    mfish_13, igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, empty_init,      ROT0, "Igrosoft", "Multi Fish (040308)",           MACHINE_SUPPORTS_SAVE ) // World
+GAME( 2002, mfish_13,    0,        igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, empty_init,      ROT0, "Igrosoft", "Multi Fish (040316)",           MACHINE_SUPPORTS_SAVE ) // World
 
-GAME( 2002, windjamr,    0,        igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, empty_init,      ROT0, "Igrosoft", "Windjammer (021216)", MACHINE_SUPPORTS_SAVE ) /* World */
+GAME( 2002, windjamr,    0,        igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, empty_init,      ROT0, "Igrosoft", "Windjammer (021216)", MACHINE_SUPPORTS_SAVE ) // World
 
-GAME( 2003, czmon,       czmon_13, igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, empty_init,      ROT0, "Igrosoft", "Crazy Monkey (030217 World)",         MACHINE_SUPPORTS_SAVE ) /* World */
-GAME( 2003, czmon_2,     czmon_13, igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, empty_init,      ROT0, "Igrosoft", "Crazy Monkey (030225 World)",         MACHINE_SUPPORTS_SAVE ) /* World */
-GAME( 2003, czmon_3,     czmon_13, igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, empty_init,      ROT0, "Igrosoft", "Crazy Monkey (030227 World)",         MACHINE_SUPPORTS_SAVE ) /* World */
-GAME( 2003, czmon_4,     czmon_13, igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, empty_init,      ROT0, "Igrosoft", "Crazy Monkey (030404 World)",         MACHINE_SUPPORTS_SAVE ) /* World */
-GAME( 2003, czmon_5,     czmon_13, igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, empty_init,      ROT0, "Igrosoft", "Crazy Monkey (030421 World)",         MACHINE_SUPPORTS_SAVE ) /* World */
-GAME( 2003, czmon_6,     czmon_13, igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, empty_init,      ROT0, "Igrosoft", "Crazy Monkey (031016 World)",         MACHINE_SUPPORTS_SAVE ) /* World */
-GAME( 2003, czmon_7,     czmon_13, igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, empty_init,      ROT0, "Igrosoft", "Crazy Monkey (031110 World)",         MACHINE_SUPPORTS_SAVE ) /* World */
-GAME( 2003, czmon_8,     czmon_13, igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, empty_init,      ROT0, "Igrosoft", "Crazy Monkey (050120 World)",         MACHINE_SUPPORTS_SAVE ) /* World */
-GAME( 2003, czmon_9,     czmon_13, igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, empty_init,      ROT0, "Igrosoft", "Crazy Monkey (070315 Russia)",        MACHINE_SUPPORTS_SAVE ) /* Russia */
-GAME( 2003, czmon_12,    czmon_13, igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_crzmonent,  ROT0, "Igrosoft", "Crazy Monkey (090711 Entertainment)", MACHINE_SUPPORTS_SAVE ) /* Entertainment */
-GAME( 2003, czmon_13,    0,        igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, empty_init,      ROT0, "Igrosoft", "Crazy Monkey (100311 World)",         MACHINE_SUPPORTS_SAVE ) /* World */
-GAME( 2003, czmon_15,    czmon_13, igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_crzmonent,  ROT0, "Igrosoft", "Crazy Monkey (100311 Entertainment)", MACHINE_SUPPORTS_SAVE ) /* Entertainment */
-GAME( 2003, czmon_16,    czmon_13, igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, empty_init,      ROT0, "Igrosoft", "Crazy Monkey (100312 Russia)",        MACHINE_SUPPORTS_SAVE ) /* Russia */
-GAME( 2003, czmon_17,    czmon_13, igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_crzmonent,  ROT0, "Igrosoft", "Crazy Monkey (100324 Entertainment X)", MACHINE_SUPPORTS_SAVE ) /* Entertainment X */
-GAME( 2003, czmon_18,    czmon_13, igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_crzmonent,  ROT0, "Igrosoft", "Crazy Monkey (100331 Entertainment X)", MACHINE_SUPPORTS_SAVE ) /* Entertainment X */
-GAME( 2003, czmon_19,    czmon_13, igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_crzmonent,  ROT0, "Igrosoft", "Crazy Monkey (101208 Entertainment N)", MACHINE_SUPPORTS_SAVE ) /* Entertainment N */
-GAME( 2003, czmon_20,    czmon_13, igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_crzmonent,  ROT0, "Igrosoft", "Crazy Monkey (110111 Entertainment A)", MACHINE_SUPPORTS_SAVE ) /* Entertainment A */
-GAME( 2003, czmon_21,    czmon_13, igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_crzmonent,  ROT0, "Igrosoft", "Crazy Monkey (110124 Entertainment A)", MACHINE_SUPPORTS_SAVE ) /* Entertainment A */
-GAME( 2003, czmon_22,    czmon_13, igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_crzmonent,  ROT0, "Igrosoft", "Crazy Monkey (110204 Entertainment A)", MACHINE_SUPPORTS_SAVE ) /* Entertainment A */
-GAME( 2003, czmon_23,    czmon_13, igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_crzmonent,  ROT0, "Igrosoft", "Crazy Monkey (110311 Entertainment B)", MACHINE_SUPPORTS_SAVE ) /* Entertainment B */
-GAME( 2003, czmon_24,    czmon_13, igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_crzmonent,  ROT0, "Igrosoft", "Crazy Monkey (140526 Entertainment B)", MACHINE_SUPPORTS_SAVE ) /* Entertainment B */
-GAME( 2003, czmon_25,    czmon_13, igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_crzmonent,  ROT0, "Igrosoft", "Crazy Monkey (110411 Entertainment C)", MACHINE_SUPPORTS_SAVE ) /* Entertainment C */
+GAME( 2003, czmon,       czmon_13, igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, empty_init,      ROT0, "Igrosoft", "Crazy Monkey (030217 World)",         MACHINE_SUPPORTS_SAVE ) // World
+GAME( 2003, czmon_2,     czmon_13, igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, empty_init,      ROT0, "Igrosoft", "Crazy Monkey (030225 World)",         MACHINE_SUPPORTS_SAVE ) // World
+GAME( 2003, czmon_3,     czmon_13, igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, empty_init,      ROT0, "Igrosoft", "Crazy Monkey (030227 World)",         MACHINE_SUPPORTS_SAVE ) // World
+GAME( 2003, czmon_4,     czmon_13, igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, empty_init,      ROT0, "Igrosoft", "Crazy Monkey (030404 World)",         MACHINE_SUPPORTS_SAVE ) // World
+GAME( 2003, czmon_5,     czmon_13, igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, empty_init,      ROT0, "Igrosoft", "Crazy Monkey (030421 World)",         MACHINE_SUPPORTS_SAVE ) // World
+GAME( 2003, czmon_6,     czmon_13, igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, empty_init,      ROT0, "Igrosoft", "Crazy Monkey (031016 World)",         MACHINE_SUPPORTS_SAVE ) // World
+GAME( 2003, czmon_7,     czmon_13, igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, empty_init,      ROT0, "Igrosoft", "Crazy Monkey (031110 World)",         MACHINE_SUPPORTS_SAVE ) // World
+GAME( 2003, czmon_8,     czmon_13, igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, empty_init,      ROT0, "Igrosoft", "Crazy Monkey (050120 World)",         MACHINE_SUPPORTS_SAVE ) // World
+GAME( 2003, czmon_9,     czmon_13, igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, empty_init,      ROT0, "Igrosoft", "Crazy Monkey (070315 Russia)",        MACHINE_SUPPORTS_SAVE ) // Russia
+GAME( 2003, czmon_12,    czmon_13, igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_crzmonent,  ROT0, "Igrosoft", "Crazy Monkey (090711 Entertainment)", MACHINE_SUPPORTS_SAVE ) // Entertainment
+GAME( 2003, czmon_13,    0,        igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, empty_init,      ROT0, "Igrosoft", "Crazy Monkey (100311 World)",         MACHINE_SUPPORTS_SAVE ) // World
+GAME( 2003, czmon_15,    czmon_13, igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_crzmonent,  ROT0, "Igrosoft", "Crazy Monkey (100311 Entertainment)", MACHINE_SUPPORTS_SAVE ) // Entertainment
+GAME( 2003, czmon_16,    czmon_13, igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, empty_init,      ROT0, "Igrosoft", "Crazy Monkey (100312 Russia)",        MACHINE_SUPPORTS_SAVE ) // Russia
+GAME( 2003, czmon_17,    czmon_13, igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_crzmonent,  ROT0, "Igrosoft", "Crazy Monkey (100324 Entertainment X)", MACHINE_SUPPORTS_SAVE ) // Entertainment X
+GAME( 2003, czmon_18,    czmon_13, igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_crzmonent,  ROT0, "Igrosoft", "Crazy Monkey (100331 Entertainment X)", MACHINE_SUPPORTS_SAVE ) // Entertainment X
+GAME( 2003, czmon_19,    czmon_13, igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_crzmonent,  ROT0, "Igrosoft", "Crazy Monkey (101208 Entertainment N)", MACHINE_SUPPORTS_SAVE ) // Entertainment N
+GAME( 2003, czmon_20,    czmon_13, igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_crzmonent,  ROT0, "Igrosoft", "Crazy Monkey (110111 Entertainment A)", MACHINE_SUPPORTS_SAVE ) // Entertainment A
+GAME( 2003, czmon_21,    czmon_13, igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_crzmonent,  ROT0, "Igrosoft", "Crazy Monkey (110124 Entertainment A)", MACHINE_SUPPORTS_SAVE ) // Entertainment A
+GAME( 2003, czmon_22,    czmon_13, igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_crzmonent,  ROT0, "Igrosoft", "Crazy Monkey (110204 Entertainment A)", MACHINE_SUPPORTS_SAVE ) // Entertainment A
+GAME( 2003, czmon_23,    czmon_13, igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_crzmonent,  ROT0, "Igrosoft", "Crazy Monkey (110311 Entertainment B)", MACHINE_SUPPORTS_SAVE ) // Entertainment B
+GAME( 2003, czmon_24,    czmon_13, igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_crzmonent,  ROT0, "Igrosoft", "Crazy Monkey (140526 Entertainment B)", MACHINE_SUPPORTS_SAVE ) // Entertainment B
+GAME( 2003, czmon_25,    czmon_13, igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_crzmonent,  ROT0, "Igrosoft", "Crazy Monkey (110411 Entertainment C)", MACHINE_SUPPORTS_SAVE ) // Entertainment C
 
-GAME( 2003, fcockt,      fcockt_8, igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, empty_init,      ROT0, "Igrosoft", "Fruit Cocktail (030505 World)",         MACHINE_SUPPORTS_SAVE ) /* World */
-GAME( 2003, fcockt_2,    fcockt_8, igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, empty_init,      ROT0, "Igrosoft", "Fruit Cocktail (030512 World)",         MACHINE_SUPPORTS_SAVE ) /* World */
-GAME( 2003, fcockt_3,    fcockt_8, igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, empty_init,      ROT0, "Igrosoft", "Fruit Cocktail (030623 World)",         MACHINE_SUPPORTS_SAVE ) /* World */
-GAME( 2003, fcockt_4,    fcockt_8, igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, empty_init,      ROT0, "Igrosoft", "Fruit Cocktail (031028 World)",         MACHINE_SUPPORTS_SAVE ) /* World */
-GAME( 2003, fcockt_5,    fcockt_8, igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, empty_init,      ROT0, "Igrosoft", "Fruit Cocktail (031111 World)",         MACHINE_SUPPORTS_SAVE ) /* World */
-GAME( 2003, fcockt_6,    fcockt_8, igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, empty_init,      ROT0, "Igrosoft", "Fruit Cocktail (040216 World)",         MACHINE_SUPPORTS_SAVE ) /* World */
-GAME( 2003, fcockt_7,    fcockt_8, igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, empty_init,      ROT0, "Igrosoft", "Fruit Cocktail (050118 World)",         MACHINE_SUPPORTS_SAVE ) /* World */
-GAME( 2003, fcockt_8,    0,        igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, empty_init,      ROT0, "Igrosoft", "Fruit Cocktail (060111 World)",         MACHINE_SUPPORTS_SAVE ) /* World */
-GAME( 2003, fcockt_9,    fcockt_8, igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, empty_init,      ROT0, "Igrosoft", "Fruit Cocktail (070305 Russia)",        MACHINE_SUPPORTS_SAVE ) /* Russia */
-GAME( 2003, fcockt_10,   fcockt_8, igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, empty_init,      ROT0, "Igrosoft", "Fruit Cocktail (070517 Russia)",        MACHINE_SUPPORTS_SAVE ) /* Russia */
-GAME( 2003, fcockt_11,   fcockt_8, igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, empty_init,      ROT0, "Igrosoft", "Fruit Cocktail (070822 Russia)",        MACHINE_SUPPORTS_SAVE ) /* Russia */
-GAME( 2003, fcockt_12,   fcockt_8, igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, empty_init,      ROT0, "Igrosoft", "Fruit Cocktail (070911 Russia)",        MACHINE_SUPPORTS_SAVE ) /* Russia */
-GAME( 2003, fcockt_14,   fcockt_8, igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_fcocktent,  ROT0, "Igrosoft", "Fruit Cocktail (090708 Entertainment)", MACHINE_SUPPORTS_SAVE ) /* Entertainment */
-GAME( 2003, fcockt_15,   fcockt_8, igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_fcocktent,  ROT0, "Igrosoft", "Fruit Cocktail (100324 Entertainment X)", MACHINE_SUPPORTS_SAVE ) /* Entertainment X */
-GAME( 2003, fcockt_16,   fcockt_8, igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_fcocktent,  ROT0, "Igrosoft", "Fruit Cocktail (100331 Entertainment X)", MACHINE_SUPPORTS_SAVE ) /* Entertainment X */
-GAME( 2003, fcockt_17,   fcockt_8, igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_fcocktent,  ROT0, "Igrosoft", "Fruit Cocktail (101208 Entertainment N)", MACHINE_SUPPORTS_SAVE ) /* Entertainment N */
-GAME( 2003, fcockt_18,   fcockt_8, igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_fcocktent,  ROT0, "Igrosoft", "Fruit Cocktail (110111 Entertainment A)", MACHINE_SUPPORTS_SAVE ) /* Entertainment A */
-GAME( 2003, fcockt_19,   fcockt_8, igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_fcocktent,  ROT0, "Igrosoft", "Fruit Cocktail (110124 Entertainment A)", MACHINE_SUPPORTS_SAVE ) /* Entertainment A */
-GAME( 2003, fcockt_20,   fcockt_8, igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_fcocktent,  ROT0, "Igrosoft", "Fruit Cocktail (110204 Entertainment A)", MACHINE_SUPPORTS_SAVE ) /* Entertainment A */
-GAME( 2003, fcockt_21,   fcockt_8, igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_fcocktent,  ROT0, "Igrosoft", "Fruit Cocktail (110311 Entertainment B)", MACHINE_SUPPORTS_SAVE ) /* Entertainment B */
-GAME( 2003, fcockt_22,   fcockt_8, igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_fcocktent,  ROT0, "Igrosoft", "Fruit Cocktail (140526 Entertainment B)", MACHINE_SUPPORTS_SAVE ) /* Entertainment B */
+GAME( 2003, fcockt,      fcockt_8, igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, empty_init,      ROT0, "Igrosoft", "Fruit Cocktail (030505 World)",         MACHINE_SUPPORTS_SAVE ) // World
+GAME( 2003, fcockt_2,    fcockt_8, igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, empty_init,      ROT0, "Igrosoft", "Fruit Cocktail (030512 World)",         MACHINE_SUPPORTS_SAVE ) // World
+GAME( 2003, fcockt_3,    fcockt_8, igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, empty_init,      ROT0, "Igrosoft", "Fruit Cocktail (030623 World)",         MACHINE_SUPPORTS_SAVE ) // World
+GAME( 2003, fcockt_4,    fcockt_8, igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, empty_init,      ROT0, "Igrosoft", "Fruit Cocktail (031028 World)",         MACHINE_SUPPORTS_SAVE ) // World
+GAME( 2003, fcockt_5,    fcockt_8, igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, empty_init,      ROT0, "Igrosoft", "Fruit Cocktail (031111 World)",         MACHINE_SUPPORTS_SAVE ) // World
+GAME( 2003, fcockt_6,    fcockt_8, igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, empty_init,      ROT0, "Igrosoft", "Fruit Cocktail (040216 World)",         MACHINE_SUPPORTS_SAVE ) // World
+GAME( 2003, fcockt_7,    fcockt_8, igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, empty_init,      ROT0, "Igrosoft", "Fruit Cocktail (050118 World)",         MACHINE_SUPPORTS_SAVE ) // World
+GAME( 2003, fcockt_8,    0,        igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, empty_init,      ROT0, "Igrosoft", "Fruit Cocktail (060111 World)",         MACHINE_SUPPORTS_SAVE ) // World
+GAME( 2003, fcockt_9,    fcockt_8, igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, empty_init,      ROT0, "Igrosoft", "Fruit Cocktail (070305 Russia)",        MACHINE_SUPPORTS_SAVE ) // Russia
+GAME( 2003, fcockt_10,   fcockt_8, igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, empty_init,      ROT0, "Igrosoft", "Fruit Cocktail (070517 Russia)",        MACHINE_SUPPORTS_SAVE ) // Russia
+GAME( 2003, fcockt_11,   fcockt_8, igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, empty_init,      ROT0, "Igrosoft", "Fruit Cocktail (070822 Russia)",        MACHINE_SUPPORTS_SAVE ) // Russia
+GAME( 2003, fcockt_12,   fcockt_8, igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, empty_init,      ROT0, "Igrosoft", "Fruit Cocktail (070911 Russia)",        MACHINE_SUPPORTS_SAVE ) // Russia
+GAME( 2003, fcockt_14,   fcockt_8, igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_fcocktent,  ROT0, "Igrosoft", "Fruit Cocktail (090708 Entertainment)", MACHINE_SUPPORTS_SAVE ) // Entertainment
+GAME( 2003, fcockt_15,   fcockt_8, igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_fcocktent,  ROT0, "Igrosoft", "Fruit Cocktail (100324 Entertainment X)", MACHINE_SUPPORTS_SAVE ) // Entertainment X
+GAME( 2003, fcockt_16,   fcockt_8, igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_fcocktent,  ROT0, "Igrosoft", "Fruit Cocktail (100331 Entertainment X)", MACHINE_SUPPORTS_SAVE ) // Entertainment X
+GAME( 2003, fcockt_17,   fcockt_8, igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_fcocktent,  ROT0, "Igrosoft", "Fruit Cocktail (101208 Entertainment N)", MACHINE_SUPPORTS_SAVE ) // Entertainment N
+GAME( 2003, fcockt_18,   fcockt_8, igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_fcocktent,  ROT0, "Igrosoft", "Fruit Cocktail (110111 Entertainment A)", MACHINE_SUPPORTS_SAVE ) // Entertainment A
+GAME( 2003, fcockt_19,   fcockt_8, igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_fcocktent,  ROT0, "Igrosoft", "Fruit Cocktail (110124 Entertainment A)", MACHINE_SUPPORTS_SAVE ) // Entertainment A
+GAME( 2003, fcockt_20,   fcockt_8, igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_fcocktent,  ROT0, "Igrosoft", "Fruit Cocktail (110204 Entertainment A)", MACHINE_SUPPORTS_SAVE ) // Entertainment A
+GAME( 2003, fcockt_21,   fcockt_8, igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_fcocktent,  ROT0, "Igrosoft", "Fruit Cocktail (110311 Entertainment B)", MACHINE_SUPPORTS_SAVE ) // Entertainment B
+GAME( 2003, fcockt_22,   fcockt_8, igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_fcocktent,  ROT0, "Igrosoft", "Fruit Cocktail (140526 Entertainment B)", MACHINE_SUPPORTS_SAVE ) // Entertainment B
 
-GAME( 2003, lhaunt,      lhaunt_6, igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, empty_init,      ROT0, "Igrosoft", "Lucky Haunter (030707 World)",         MACHINE_SUPPORTS_SAVE ) /* World */
-GAME( 2003, lhaunt_2,    lhaunt_6, igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, empty_init,      ROT0, "Igrosoft", "Lucky Haunter (030804 World)",         MACHINE_SUPPORTS_SAVE ) /* World */
-GAME( 2003, lhaunt_3,    lhaunt_6, igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, empty_init,      ROT0, "Igrosoft", "Lucky Haunter (031027 World)",         MACHINE_SUPPORTS_SAVE ) /* World */
-GAME( 2003, lhaunt_4,    lhaunt_6, igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, empty_init,      ROT0, "Igrosoft", "Lucky Haunter (031111 World)",         MACHINE_SUPPORTS_SAVE ) /* World */
-GAME( 2003, lhaunt_5,    lhaunt_6, igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, empty_init,      ROT0, "Igrosoft", "Lucky Haunter (040216 World)",         MACHINE_SUPPORTS_SAVE ) /* World */
-GAME( 2003, lhaunt_6,    0,        igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, empty_init,      ROT0, "Igrosoft", "Lucky Haunter (040825 World)",         MACHINE_SUPPORTS_SAVE ) /* World */
-GAME( 2003, lhaunt_7,    lhaunt_6, igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, empty_init,      ROT0, "Igrosoft", "Lucky Haunter (070402 Russia)",        MACHINE_SUPPORTS_SAVE ) /* Russia */
-GAME( 2003, lhaunt_8,    lhaunt_6, igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, empty_init,      ROT0, "Igrosoft", "Lucky Haunter (070604 Russia)",        MACHINE_SUPPORTS_SAVE ) /* Russia */
-GAME( 2003, lhaunt_10,   lhaunt_6, igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_lhauntent,  ROT0, "Igrosoft", "Lucky Haunter (090712 Entertainment)", MACHINE_SUPPORTS_SAVE ) /* Entertainment */
-GAME( 2003, lhaunt_11,   lhaunt_6, igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_lhauntent,  ROT0, "Igrosoft", "Lucky Haunter (100331 Entertainment X)", MACHINE_SUPPORTS_SAVE ) /* Entertainment X */
-GAME( 2003, lhaunt_12,   lhaunt_6, igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_lhauntent,  ROT0, "Igrosoft", "Lucky Haunter (101209 Entertainment N)", MACHINE_SUPPORTS_SAVE ) /* Entertainment N */
-GAME( 2003, lhaunt_13,   lhaunt_6, igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_lhauntent,  ROT0, "Igrosoft", "Lucky Haunter (110111 Entertainment A)", MACHINE_SUPPORTS_SAVE ) /* Entertainment A */
-GAME( 2003, lhaunt_14,   lhaunt_6, igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_lhauntent,  ROT0, "Igrosoft", "Lucky Haunter (110204 Entertainment A)", MACHINE_SUPPORTS_SAVE ) /* Entertainment A */
-GAME( 2003, lhaunt_15,   lhaunt_6, igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_lhauntent,  ROT0, "Igrosoft", "Lucky Haunter (110311 Entertainment B)", MACHINE_SUPPORTS_SAVE ) /* Entertainment B */
-GAME( 2003, lhaunt_16,   lhaunt_6, igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_lhauntent,  ROT0, "Igrosoft", "Lucky Haunter (140526 Entertainment B)", MACHINE_SUPPORTS_SAVE ) /* Entertainment B */
+GAME( 2003, lhaunt,      lhaunt_6, igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, empty_init,      ROT0, "Igrosoft", "Lucky Haunter (030707 World)",         MACHINE_SUPPORTS_SAVE ) // World
+GAME( 2003, lhaunt_2,    lhaunt_6, igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, empty_init,      ROT0, "Igrosoft", "Lucky Haunter (030804 World)",         MACHINE_SUPPORTS_SAVE ) // World
+GAME( 2003, lhaunt_3,    lhaunt_6, igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, empty_init,      ROT0, "Igrosoft", "Lucky Haunter (031027 World)",         MACHINE_SUPPORTS_SAVE ) // World
+GAME( 2003, lhaunt_4,    lhaunt_6, igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, empty_init,      ROT0, "Igrosoft", "Lucky Haunter (031111 World)",         MACHINE_SUPPORTS_SAVE ) // World
+GAME( 2003, lhaunt_5,    lhaunt_6, igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, empty_init,      ROT0, "Igrosoft", "Lucky Haunter (040216 World)",         MACHINE_SUPPORTS_SAVE ) // World
+GAME( 2003, lhaunt_6,    0,        igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, empty_init,      ROT0, "Igrosoft", "Lucky Haunter (040825 World)",         MACHINE_SUPPORTS_SAVE ) // World
+GAME( 2003, lhaunt_7,    lhaunt_6, igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, empty_init,      ROT0, "Igrosoft", "Lucky Haunter (070402 Russia)",        MACHINE_SUPPORTS_SAVE ) // Russia
+GAME( 2003, lhaunt_8,    lhaunt_6, igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, empty_init,      ROT0, "Igrosoft", "Lucky Haunter (070604 Russia)",        MACHINE_SUPPORTS_SAVE ) // Russia
+GAME( 2003, lhaunt_10,   lhaunt_6, igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_lhauntent,  ROT0, "Igrosoft", "Lucky Haunter (090712 Entertainment)", MACHINE_SUPPORTS_SAVE ) // Entertainment
+GAME( 2003, lhaunt_11,   lhaunt_6, igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_lhauntent,  ROT0, "Igrosoft", "Lucky Haunter (100331 Entertainment X)", MACHINE_SUPPORTS_SAVE ) // Entertainment X
+GAME( 2003, lhaunt_12,   lhaunt_6, igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_lhauntent,  ROT0, "Igrosoft", "Lucky Haunter (101209 Entertainment N)", MACHINE_SUPPORTS_SAVE ) // Entertainment N
+GAME( 2003, lhaunt_13,   lhaunt_6, igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_lhauntent,  ROT0, "Igrosoft", "Lucky Haunter (110111 Entertainment A)", MACHINE_SUPPORTS_SAVE ) // Entertainment A
+GAME( 2003, lhaunt_14,   lhaunt_6, igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_lhauntent,  ROT0, "Igrosoft", "Lucky Haunter (110204 Entertainment A)", MACHINE_SUPPORTS_SAVE ) // Entertainment A
+GAME( 2003, lhaunt_15,   lhaunt_6, igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_lhauntent,  ROT0, "Igrosoft", "Lucky Haunter (110311 Entertainment B)", MACHINE_SUPPORTS_SAVE ) // Entertainment B
+GAME( 2003, lhaunt_16,   lhaunt_6, igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_lhauntent,  ROT0, "Igrosoft", "Lucky Haunter (140526 Entertainment B)", MACHINE_SUPPORTS_SAVE ) // Entertainment B
 
-GAME( 2003, rollfr,      rollfr_4, rollfr,          rollfr,          igrosoft_gamble_state, empty_init,      ROT0, "Igrosoft", "Roll Fruit (030821)", MACHINE_SUPPORTS_SAVE ) /* World */
-GAME( 2003, rollfr_2,    rollfr_4, rollfr,          rollfr,          igrosoft_gamble_state, empty_init,      ROT0, "Igrosoft", "Roll Fruit (040318)", MACHINE_SUPPORTS_SAVE ) /* World */
-GAME( 2003, rollfr_3,    rollfr_4, rollfr,          rollfr,          igrosoft_gamble_state, empty_init,      ROT0, "Igrosoft", "Roll Fruit (080327)", MACHINE_SUPPORTS_SAVE ) /* World */
-GAME( 2003, rollfr_4,    0,        rollfr,          rollfr,          igrosoft_gamble_state, empty_init,      ROT0, "Igrosoft", "Roll Fruit (080331)", MACHINE_SUPPORTS_SAVE ) /* World */
-GAME( 2003, rollfr_5,    rollfr_4, rollfr,          rollfr,          igrosoft_gamble_state, init_rollfruit,  ROT0, "Igrosoft", "Roll Fruit (100924)", MACHINE_NOT_WORKING|MACHINE_SUPPORTS_SAVE ) /* World */
+GAME( 2003, rollfr,      rollfr_4, rollfr,          rollfr,          igrosoft_gamble_state, empty_init,      ROT0, "Igrosoft", "Roll Fruit (030821)", MACHINE_SUPPORTS_SAVE ) // World
+GAME( 2003, rollfr_2,    rollfr_4, rollfr,          rollfr,          igrosoft_gamble_state, empty_init,      ROT0, "Igrosoft", "Roll Fruit (040318)", MACHINE_SUPPORTS_SAVE ) // World
+GAME( 2003, rollfr_3,    rollfr_4, rollfr,          rollfr,          igrosoft_gamble_state, empty_init,      ROT0, "Igrosoft", "Roll Fruit (080327)", MACHINE_SUPPORTS_SAVE ) // World
+GAME( 2003, rollfr_4,    0,        rollfr,          rollfr,          igrosoft_gamble_state, empty_init,      ROT0, "Igrosoft", "Roll Fruit (080331)", MACHINE_SUPPORTS_SAVE ) // World
+GAME( 2003, rollfr_5,    rollfr_4, rollfr,          rollfr,          igrosoft_gamble_state, init_rollfruit,  ROT0, "Igrosoft", "Roll Fruit (100924)", MACHINE_NOT_WORKING|MACHINE_SUPPORTS_SAVE ) // World
 
-GAME( 2004, garage,      garage_5, igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, empty_init,      ROT0, "Igrosoft", "Garage (040122 World)",         MACHINE_SUPPORTS_SAVE ) /* World */
-GAME( 2004, garage_2,    garage_5, igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, empty_init,      ROT0, "Igrosoft", "Garage (040123 World)",         MACHINE_SUPPORTS_SAVE ) /* World */
-GAME( 2004, garage_3,    garage_5, igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, empty_init,      ROT0, "Igrosoft", "Garage (040216 World)",         MACHINE_SUPPORTS_SAVE ) /* World */
-GAME( 2004, garage_4,    garage_5, igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, empty_init,      ROT0, "Igrosoft", "Garage (040219 World)",         MACHINE_SUPPORTS_SAVE ) /* World */
-GAME( 2004, garage_5,    0,        igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, empty_init,      ROT0, "Igrosoft", "Garage (050311 World)",         MACHINE_SUPPORTS_SAVE ) /* World */
-GAME( 2004, garage_6,    garage_5, igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, empty_init,      ROT0, "Igrosoft", "Garage (070213 Russia)",        MACHINE_SUPPORTS_SAVE ) /* Russia */
-GAME( 2004, garage_7,    garage_5, igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, empty_init,      ROT0, "Igrosoft", "Garage (070329 Russia)",        MACHINE_SUPPORTS_SAVE ) /* Russia */
-GAME( 2004, garage_9,    garage_5, igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_garageent,  ROT0, "Igrosoft", "Garage (090715 Entertainment)", MACHINE_SUPPORTS_SAVE ) /* Entertainment */
-GAME( 2004, garage_10,   garage_5, igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_garageent,  ROT0, "Igrosoft", "Garage (100331 Entertainment X)", MACHINE_SUPPORTS_SAVE ) /* Entertainment X */
-GAME( 2004, garage_11,   garage_5, igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_garageent,  ROT0, "Igrosoft", "Garage (101208 Entertainment N)", MACHINE_SUPPORTS_SAVE ) /* Entertainment N */
-GAME( 2004, garage_12,   garage_5, igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_garageent,  ROT0, "Igrosoft", "Garage (110111 Entertainment A)", MACHINE_SUPPORTS_SAVE ) /* Entertainment A */
-GAME( 2004, garage_13,   garage_5, igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_garageent,  ROT0, "Igrosoft", "Garage (110124 Entertainment A)", MACHINE_SUPPORTS_SAVE ) /* Entertainment A */
-GAME( 2004, garage_14,   garage_5, igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_garageent,  ROT0, "Igrosoft", "Garage (110204 Entertainment A)", MACHINE_SUPPORTS_SAVE ) /* Entertainment A */
-GAME( 2004, garage_15,   garage_5, igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_garageent,  ROT0, "Igrosoft", "Garage (110311 Entertainment B)", MACHINE_SUPPORTS_SAVE ) /* Entertainment B */
-GAME( 2004, garage_16,   garage_5, igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_garageent,  ROT0, "Igrosoft", "Garage (140526 Entertainment B)", MACHINE_SUPPORTS_SAVE ) /* Entertainment B */
-GAME( 2004, garage_17,   garage_5, igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_garageent,  ROT0, "Igrosoft", "Garage (110411 Entertainment C)", MACHINE_SUPPORTS_SAVE ) /* Entertainment C */
+GAME( 2004, garage,      garage_5, igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, empty_init,      ROT0, "Igrosoft", "Garage (040122 World)",         MACHINE_SUPPORTS_SAVE ) // World
+GAME( 2004, garage_2,    garage_5, igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, empty_init,      ROT0, "Igrosoft", "Garage (040123 World)",         MACHINE_SUPPORTS_SAVE ) // World
+GAME( 2004, garage_3,    garage_5, igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, empty_init,      ROT0, "Igrosoft", "Garage (040216 World)",         MACHINE_SUPPORTS_SAVE ) // World
+GAME( 2004, garage_4,    garage_5, igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, empty_init,      ROT0, "Igrosoft", "Garage (040219 World)",         MACHINE_SUPPORTS_SAVE ) // World
+GAME( 2004, garage_5,    0,        igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, empty_init,      ROT0, "Igrosoft", "Garage (050311 World)",         MACHINE_SUPPORTS_SAVE ) // World
+GAME( 2004, garage_6,    garage_5, igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, empty_init,      ROT0, "Igrosoft", "Garage (070213 Russia)",        MACHINE_SUPPORTS_SAVE ) // Russia
+GAME( 2004, garage_7,    garage_5, igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, empty_init,      ROT0, "Igrosoft", "Garage (070329 Russia)",        MACHINE_SUPPORTS_SAVE ) // Russia
+GAME( 2004, garage_9,    garage_5, igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_garageent,  ROT0, "Igrosoft", "Garage (090715 Entertainment)", MACHINE_SUPPORTS_SAVE ) // Entertainment
+GAME( 2004, garage_10,   garage_5, igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_garageent,  ROT0, "Igrosoft", "Garage (100331 Entertainment X)", MACHINE_SUPPORTS_SAVE ) // Entertainment X
+GAME( 2004, garage_11,   garage_5, igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_garageent,  ROT0, "Igrosoft", "Garage (101208 Entertainment N)", MACHINE_SUPPORTS_SAVE ) // Entertainment N
+GAME( 2004, garage_12,   garage_5, igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_garageent,  ROT0, "Igrosoft", "Garage (110111 Entertainment A)", MACHINE_SUPPORTS_SAVE ) // Entertainment A
+GAME( 2004, garage_13,   garage_5, igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_garageent,  ROT0, "Igrosoft", "Garage (110124 Entertainment A)", MACHINE_SUPPORTS_SAVE ) // Entertainment A
+GAME( 2004, garage_14,   garage_5, igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_garageent,  ROT0, "Igrosoft", "Garage (110204 Entertainment A)", MACHINE_SUPPORTS_SAVE ) // Entertainment A
+GAME( 2004, garage_15,   garage_5, igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_garageent,  ROT0, "Igrosoft", "Garage (110311 Entertainment B)", MACHINE_SUPPORTS_SAVE ) // Entertainment B
+GAME( 2004, garage_16,   garage_5, igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_garageent,  ROT0, "Igrosoft", "Garage (140526 Entertainment B)", MACHINE_SUPPORTS_SAVE ) // Entertainment B
+GAME( 2004, garage_17,   garage_5, igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_garageent,  ROT0, "Igrosoft", "Garage (110411 Entertainment C)", MACHINE_SUPPORTS_SAVE ) // Entertainment C
 
-GAME( 2004, rclimb,      rclimb_3, igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, empty_init,      ROT0, "Igrosoft", "Rock Climber (040815 World)", MACHINE_SUPPORTS_SAVE ) /* World */
-GAME( 2004, rclimb_2,    rclimb_3, igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, empty_init,      ROT0, "Igrosoft", "Rock Climber (040823 World)", MACHINE_SUPPORTS_SAVE ) /* World */
-GAME( 2004, rclimb_3,    0,        igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, empty_init,      ROT0, "Igrosoft", "Rock Climber (040827 World)", MACHINE_SUPPORTS_SAVE ) /* World */
-GAME( 2004, rclimb_4,    rclimb_3, igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, empty_init,      ROT0, "Igrosoft", "Rock Climber (070322 Russia)", MACHINE_SUPPORTS_SAVE ) /* Russia */
-GAME( 2004, rclimb_5,    rclimb_3, igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, empty_init,      ROT0, "Igrosoft", "Rock Climber (070621 Russia)", MACHINE_SUPPORTS_SAVE ) /* Russia */
-GAME( 2004, rclimb_7,    rclimb_3, igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_rclimbent,  ROT0, "Igrosoft", "Rock Climber (090716 Entertainment)", MACHINE_SUPPORTS_SAVE ) /* Entertainment */
-GAME( 2004, rclimb_8,    rclimb_3, igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_rclimbent,  ROT0, "Igrosoft", "Rock Climber (100331 Entertainment X)", MACHINE_SUPPORTS_SAVE ) /* Entertainment X */
-GAME( 2004, rclimb_9,    rclimb_3, igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_rclimbent,  ROT0, "Igrosoft", "Rock Climber (101209 Entertainment N)", MACHINE_SUPPORTS_SAVE ) /* Entertainment N */
-GAME( 2004, rclimb_10,   rclimb_3, igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_rclimbent,  ROT0, "Igrosoft", "Rock Climber (110111 Entertainment A)", MACHINE_SUPPORTS_SAVE ) /* Entertainment A */
-GAME( 2004, rclimb_11,   rclimb_3, igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_rclimbent,  ROT0, "Igrosoft", "Rock Climber (110124 Entertainment A)", MACHINE_SUPPORTS_SAVE ) /* Entertainment A */
-GAME( 2004, rclimb_12,   rclimb_3, igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_rclimbent,  ROT0, "Igrosoft", "Rock Climber (110204 Entertainment A)", MACHINE_SUPPORTS_SAVE ) /* Entertainment A */
-GAME( 2004, rclimb_13,   rclimb_3, igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_rclimbent,  ROT0, "Igrosoft", "Rock Climber (110311 Entertainment B)", MACHINE_SUPPORTS_SAVE ) /* Entertainment B */
-GAME( 2004, rclimb_14,   rclimb_3, igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_rclimbent,  ROT0, "Igrosoft", "Rock Climber (110411 Entertainment C)", MACHINE_SUPPORTS_SAVE ) /* Entertainment C */
+GAME( 2004, rclimb,      rclimb_3, igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, empty_init,      ROT0, "Igrosoft", "Rock Climber (040815 World)", MACHINE_SUPPORTS_SAVE ) // World
+GAME( 2004, rclimb_2,    rclimb_3, igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, empty_init,      ROT0, "Igrosoft", "Rock Climber (040823 World)", MACHINE_SUPPORTS_SAVE ) // World
+GAME( 2004, rclimb_3,    0,        igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, empty_init,      ROT0, "Igrosoft", "Rock Climber (040827 World)", MACHINE_SUPPORTS_SAVE ) // World
+GAME( 2004, rclimb_4,    rclimb_3, igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, empty_init,      ROT0, "Igrosoft", "Rock Climber (070322 Russia)", MACHINE_SUPPORTS_SAVE ) // Russia
+GAME( 2004, rclimb_5,    rclimb_3, igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, empty_init,      ROT0, "Igrosoft", "Rock Climber (070621 Russia)", MACHINE_SUPPORTS_SAVE ) // Russia
+GAME( 2004, rclimb_7,    rclimb_3, igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_rclimbent,  ROT0, "Igrosoft", "Rock Climber (090716 Entertainment)", MACHINE_SUPPORTS_SAVE ) // Entertainment
+GAME( 2004, rclimb_8,    rclimb_3, igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_rclimbent,  ROT0, "Igrosoft", "Rock Climber (100331 Entertainment X)", MACHINE_SUPPORTS_SAVE ) // Entertainment X
+GAME( 2004, rclimb_9,    rclimb_3, igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_rclimbent,  ROT0, "Igrosoft", "Rock Climber (101209 Entertainment N)", MACHINE_SUPPORTS_SAVE ) // Entertainment N
+GAME( 2004, rclimb_10,   rclimb_3, igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_rclimbent,  ROT0, "Igrosoft", "Rock Climber (110111 Entertainment A)", MACHINE_SUPPORTS_SAVE ) // Entertainment A
+GAME( 2004, rclimb_11,   rclimb_3, igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_rclimbent,  ROT0, "Igrosoft", "Rock Climber (110124 Entertainment A)", MACHINE_SUPPORTS_SAVE ) // Entertainment A
+GAME( 2004, rclimb_12,   rclimb_3, igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_rclimbent,  ROT0, "Igrosoft", "Rock Climber (110204 Entertainment A)", MACHINE_SUPPORTS_SAVE ) // Entertainment A
+GAME( 2004, rclimb_13,   rclimb_3, igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_rclimbent,  ROT0, "Igrosoft", "Rock Climber (110311 Entertainment B)", MACHINE_SUPPORTS_SAVE ) // Entertainment B
+GAME( 2004, rclimb_14,   rclimb_3, igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_rclimbent,  ROT0, "Igrosoft", "Rock Climber (110411 Entertainment C)", MACHINE_SUPPORTS_SAVE ) // Entertainment C
 
-GAME( 2004, sweetl,      0,        igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, empty_init,      ROT0, "Igrosoft", "Sweet Life (041220 World)",         MACHINE_SUPPORTS_SAVE ) /* World */
-GAME( 2004, sweetl_2,    sweetl,   igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, empty_init,      ROT0, "Igrosoft", "Sweet Life (070412 Russia)",        MACHINE_SUPPORTS_SAVE ) /* Russia */
-GAME( 2004, sweetl_3,    sweetl,   igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_sweetlent,  ROT0, "Igrosoft", "Sweet Life (090720 Entertainment)", MACHINE_SUPPORTS_SAVE ) /* Entertainment */
+GAME( 2004, sweetl,      0,        igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, empty_init,      ROT0, "Igrosoft", "Sweet Life (041220 World)",         MACHINE_SUPPORTS_SAVE ) // World
+GAME( 2004, sweetl_2,    sweetl,   igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, empty_init,      ROT0, "Igrosoft", "Sweet Life (070412 Russia)",        MACHINE_SUPPORTS_SAVE ) // Russia
+GAME( 2004, sweetl_3,    sweetl,   igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_sweetlent,  ROT0, "Igrosoft", "Sweet Life (090720 Entertainment)", MACHINE_SUPPORTS_SAVE ) // Entertainment
 
-GAME( 2004, resdnt,      resdnt_6, igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, empty_init,      ROT0, "Igrosoft", "Resident (040415 World)",         MACHINE_SUPPORTS_SAVE ) /* World */
-GAME( 2004, resdnt_2,    resdnt_6, igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, empty_init,      ROT0, "Igrosoft", "Resident (040513 World)",         MACHINE_SUPPORTS_SAVE ) /* World */
-GAME( 2004, resdnt_3,    resdnt_6, igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, empty_init,      ROT0, "Igrosoft", "Resident (070222 Russia)",        MACHINE_SUPPORTS_SAVE ) /* Russia */
-GAME( 2004, resdnt_5,    resdnt_6, igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_resdntent,  ROT0, "Igrosoft", "Resident (090722 Entertainment)", MACHINE_SUPPORTS_SAVE ) /* Entertainment */
-GAME( 2004, resdnt_6,    0,        igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, empty_init,      ROT0, "Igrosoft", "Resident (100311 World)",         MACHINE_SUPPORTS_SAVE ) /* World */
-GAME( 2004, resdnt_8,    resdnt_6, igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_resdntent,  ROT0, "Igrosoft", "Resident (100311 Entertainment)", MACHINE_SUPPORTS_SAVE ) /* Entertainment */
-GAME( 2004, resdnt_9,    resdnt_6, igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, empty_init,      ROT0, "Igrosoft", "Resident (100316 Russia)",        MACHINE_SUPPORTS_SAVE ) /* Russia */
-GAME( 2004, resdnt_10,   resdnt_6, igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_resdntent,  ROT0, "Igrosoft", "Resident (100331 Entertainment X)", MACHINE_SUPPORTS_SAVE ) /* Entertainment X */
-GAME( 2004, resdnt_11,   resdnt_6, igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_resdntent,  ROT0, "Igrosoft", "Resident (101209 Entertainment N)", MACHINE_SUPPORTS_SAVE ) /* Entertainment N */
-GAME( 2004, resdnt_12,   resdnt_6, igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_resdntent,  ROT0, "Igrosoft", "Resident (110111 Entertainment A)", MACHINE_SUPPORTS_SAVE ) /* Entertainment A */
-GAME( 2004, resdnt_13,   resdnt_6, igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_resdntent,  ROT0, "Igrosoft", "Resident (110124 Entertainment A)", MACHINE_SUPPORTS_SAVE ) /* Entertainment A */
-GAME( 2004, resdnt_14,   resdnt_6, igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_resdntent,  ROT0, "Igrosoft", "Resident (110204 Entertainment A)", MACHINE_SUPPORTS_SAVE ) /* Entertainment A */
-GAME( 2004, resdnt_15,   resdnt_6, igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_resdntent,  ROT0, "Igrosoft", "Resident (110311 Entertainment A)", MACHINE_SUPPORTS_SAVE ) /* Entertainment B */
-GAME( 2004, resdnt_16,   resdnt_6, igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_resdntent,  ROT0, "Igrosoft", "Resident (140526 Entertainment A)", MACHINE_SUPPORTS_SAVE ) /* Entertainment B */
-GAME( 2004, resdnt_17,   resdnt_6, igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_resdntent,  ROT0, "Igrosoft", "Resident (110411 Entertainment A)", MACHINE_SUPPORTS_SAVE ) /* Entertainment C */
+GAME( 2004, resdnt,      resdnt_6, igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, empty_init,      ROT0, "Igrosoft", "Resident (040415 World)",         MACHINE_SUPPORTS_SAVE ) // World
+GAME( 2004, resdnt_2,    resdnt_6, igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, empty_init,      ROT0, "Igrosoft", "Resident (040513 World)",         MACHINE_SUPPORTS_SAVE ) // World
+GAME( 2004, resdnt_3,    resdnt_6, igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, empty_init,      ROT0, "Igrosoft", "Resident (070222 Russia)",        MACHINE_SUPPORTS_SAVE ) // Russia
+GAME( 2004, resdnt_5,    resdnt_6, igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_resdntent,  ROT0, "Igrosoft", "Resident (090722 Entertainment)", MACHINE_SUPPORTS_SAVE ) // Entertainment
+GAME( 2004, resdnt_6,    0,        igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, empty_init,      ROT0, "Igrosoft", "Resident (100311 World)",         MACHINE_SUPPORTS_SAVE ) // World
+GAME( 2004, resdnt_8,    resdnt_6, igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_resdntent,  ROT0, "Igrosoft", "Resident (100311 Entertainment)", MACHINE_SUPPORTS_SAVE ) // Entertainment
+GAME( 2004, resdnt_9,    resdnt_6, igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, empty_init,      ROT0, "Igrosoft", "Resident (100316 Russia)",        MACHINE_SUPPORTS_SAVE ) // Russia
+GAME( 2004, resdnt_10,   resdnt_6, igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_resdntent,  ROT0, "Igrosoft", "Resident (100331 Entertainment X)", MACHINE_SUPPORTS_SAVE ) // Entertainment X
+GAME( 2004, resdnt_11,   resdnt_6, igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_resdntent,  ROT0, "Igrosoft", "Resident (101209 Entertainment N)", MACHINE_SUPPORTS_SAVE ) // Entertainment N
+GAME( 2004, resdnt_12,   resdnt_6, igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_resdntent,  ROT0, "Igrosoft", "Resident (110111 Entertainment A)", MACHINE_SUPPORTS_SAVE ) // Entertainment A
+GAME( 2004, resdnt_13,   resdnt_6, igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_resdntent,  ROT0, "Igrosoft", "Resident (110124 Entertainment A)", MACHINE_SUPPORTS_SAVE ) // Entertainment A
+GAME( 2004, resdnt_14,   resdnt_6, igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_resdntent,  ROT0, "Igrosoft", "Resident (110204 Entertainment A)", MACHINE_SUPPORTS_SAVE ) // Entertainment A
+GAME( 2004, resdnt_15,   resdnt_6, igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_resdntent,  ROT0, "Igrosoft", "Resident (110311 Entertainment A)", MACHINE_SUPPORTS_SAVE ) // Entertainment B
+GAME( 2004, resdnt_16,   resdnt_6, igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_resdntent,  ROT0, "Igrosoft", "Resident (140526 Entertainment A)", MACHINE_SUPPORTS_SAVE ) // Entertainment B
+GAME( 2004, resdnt_17,   resdnt_6, igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_resdntent,  ROT0, "Igrosoft", "Resident (110411 Entertainment A)", MACHINE_SUPPORTS_SAVE ) // Entertainment C
 
-GAME( 2005, island,      0,        igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, empty_init,      ROT0, "Igrosoft", "Island (050713 World)",         MACHINE_SUPPORTS_SAVE ) /* World */
-GAME( 2005, island_2,    island,   igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, empty_init,      ROT0, "Igrosoft", "Island (070409 Russia)",        MACHINE_SUPPORTS_SAVE ) /* Russia */
-GAME( 2005, island_3,    island,   igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_islandent,  ROT0, "Igrosoft", "Island (090806 Entertainment)", MACHINE_SUPPORTS_SAVE ) /* Entertainment */
+GAME( 2005, island,      0,        igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, empty_init,      ROT0, "Igrosoft", "Island (050713 World)",         MACHINE_SUPPORTS_SAVE ) // World
+GAME( 2005, island_2,    island,   igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, empty_init,      ROT0, "Igrosoft", "Island (070409 Russia)",        MACHINE_SUPPORTS_SAVE ) // Russia
+GAME( 2005, island_3,    island,   igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_islandent,  ROT0, "Igrosoft", "Island (090806 Entertainment)", MACHINE_SUPPORTS_SAVE ) // Entertainment
 
-GAME( 2005, pirate,      pirate_3, igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, empty_init,      ROT0, "Igrosoft", "Pirate (051229 World)",         MACHINE_SUPPORTS_SAVE ) /* World */
-GAME( 2005, pirate_2,    pirate_3, igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, empty_init,      ROT0, "Igrosoft", "Pirate (060210 World)",         MACHINE_SUPPORTS_SAVE ) /* World */
-GAME( 2005, pirate_3,    0,        igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, empty_init,      ROT0, "Igrosoft", "Pirate (060803 World)",         MACHINE_SUPPORTS_SAVE ) /* World */
-GAME( 2005, pirate_4,    pirate_3, igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, empty_init,      ROT0, "Igrosoft", "Pirate (070412 Russia)",        MACHINE_SUPPORTS_SAVE ) /* Russia */
-GAME( 2005, pirate_5,    pirate_3, igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_pirateent,  ROT0, "Igrosoft", "Pirate (090803 Entertainment)", MACHINE_SUPPORTS_SAVE ) /* Entertainment */
+GAME( 2005, pirate,      pirate_3, igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, empty_init,      ROT0, "Igrosoft", "Pirate (051229 World)",         MACHINE_SUPPORTS_SAVE ) // World
+GAME( 2005, pirate_2,    pirate_3, igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, empty_init,      ROT0, "Igrosoft", "Pirate (060210 World)",         MACHINE_SUPPORTS_SAVE ) // World
+GAME( 2005, pirate_3,    0,        igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, empty_init,      ROT0, "Igrosoft", "Pirate (060803 World)",         MACHINE_SUPPORTS_SAVE ) // World
+GAME( 2005, pirate_4,    pirate_3, igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, empty_init,      ROT0, "Igrosoft", "Pirate (070412 Russia)",        MACHINE_SUPPORTS_SAVE ) // Russia
+GAME( 2005, pirate_5,    pirate_3, igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_pirateent,  ROT0, "Igrosoft", "Pirate (090803 Entertainment)", MACHINE_SUPPORTS_SAVE ) // Entertainment
 
-GAME( 2006, island2,     0,        igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, empty_init,      ROT0, "Igrosoft", "Island 2 (060529 World)",         MACHINE_SUPPORTS_SAVE ) /* World */
-GAME( 2006, island2_2,   island2,  igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, empty_init,      ROT0, "Igrosoft", "Island 2 (061214 World)",         MACHINE_SUPPORTS_SAVE ) /* World */
-GAME( 2006, island2_3,   island2,  igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, empty_init,      ROT0, "Igrosoft", "Island 2 (061218 World)",         MACHINE_SUPPORTS_SAVE ) /* World */
-GAME( 2006, island2_4,   island2,  igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, empty_init,      ROT0, "Igrosoft", "Island 2 (070205 Russia)",        MACHINE_SUPPORTS_SAVE ) /* Russia */
-GAME( 2006, island2_5,   island2,  igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_island2l,   ROT0, "Igrosoft", "Island 2 (090528 Lottery)",       MACHINE_SUPPORTS_SAVE ) /* Lottery */
-GAME( 2006, island2_6,   island2,  igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_island2ent, ROT0, "Igrosoft", "Island 2 (090724 Entertainment)", MACHINE_SUPPORTS_SAVE ) /* Entertainment */
-GAME( 2006, island2_7,   island2,  igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_island2ent, ROT0, "Igrosoft", "Island 2 (100401 Entertainment X)", MACHINE_SUPPORTS_SAVE ) /* Entertainment X */
-GAME( 2006, island2_8,   island2,  igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_island2ent, ROT0, "Igrosoft", "Island 2 (101208 Entertainment N)", MACHINE_SUPPORTS_SAVE ) /* Entertainment N */
-GAME( 2006, island2_9,   island2,  igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_island2ent, ROT0, "Igrosoft", "Island 2 (110111 Entertainment A)", MACHINE_SUPPORTS_SAVE ) /* Entertainment A */
-GAME( 2006, island2_10,  island2,  igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_island2ent, ROT0, "Igrosoft", "Island 2 (110124 Entertainment A)", MACHINE_SUPPORTS_SAVE ) /* Entertainment A */
-GAME( 2006, island2_11,  island2,  igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_island2ent, ROT0, "Igrosoft", "Island 2 (110204 Entertainment A)", MACHINE_SUPPORTS_SAVE ) /* Entertainment A */
-GAME( 2006, island2_12,  island2,  igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_island2ent, ROT0, "Igrosoft", "Island 2 (110311 Entertainment B)", MACHINE_SUPPORTS_SAVE ) /* Entertainment B */
-GAME( 2006, island2_13,  island2,  igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_island2ent, ROT0, "Igrosoft", "Island 2 (140526 Entertainment B)", MACHINE_SUPPORTS_SAVE ) /* Entertainment B */
-GAME( 2006, island2_14,  island2,  igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_island2ent, ROT0, "Igrosoft", "Island 2 (110411 Entertainment C)", MACHINE_SUPPORTS_SAVE ) /* Entertainment C */
+GAME( 2006, island2,     0,        igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, empty_init,      ROT0, "Igrosoft", "Island 2 (060529 World)",         MACHINE_SUPPORTS_SAVE ) // World
+GAME( 2006, island2_2,   island2,  igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, empty_init,      ROT0, "Igrosoft", "Island 2 (061214 World)",         MACHINE_SUPPORTS_SAVE ) // World
+GAME( 2006, island2_3,   island2,  igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, empty_init,      ROT0, "Igrosoft", "Island 2 (061218 World)",         MACHINE_SUPPORTS_SAVE ) // World
+GAME( 2006, island2_4,   island2,  igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, empty_init,      ROT0, "Igrosoft", "Island 2 (070205 Russia)",        MACHINE_SUPPORTS_SAVE ) // Russia
+GAME( 2006, island2_5,   island2,  igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_island2l,   ROT0, "Igrosoft", "Island 2 (090528 Lottery)",       MACHINE_SUPPORTS_SAVE ) // Lottery
+GAME( 2006, island2_6,   island2,  igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_island2ent, ROT0, "Igrosoft", "Island 2 (090724 Entertainment)", MACHINE_SUPPORTS_SAVE ) // Entertainment
+GAME( 2006, island2_7,   island2,  igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_island2ent, ROT0, "Igrosoft", "Island 2 (100401 Entertainment X)", MACHINE_SUPPORTS_SAVE ) // Entertainment X
+GAME( 2006, island2_8,   island2,  igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_island2ent, ROT0, "Igrosoft", "Island 2 (101208 Entertainment N)", MACHINE_SUPPORTS_SAVE ) // Entertainment N
+GAME( 2006, island2_9,   island2,  igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_island2ent, ROT0, "Igrosoft", "Island 2 (110111 Entertainment A)", MACHINE_SUPPORTS_SAVE ) // Entertainment A
+GAME( 2006, island2_10,  island2,  igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_island2ent, ROT0, "Igrosoft", "Island 2 (110124 Entertainment A)", MACHINE_SUPPORTS_SAVE ) // Entertainment A
+GAME( 2006, island2_11,  island2,  igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_island2ent, ROT0, "Igrosoft", "Island 2 (110204 Entertainment A)", MACHINE_SUPPORTS_SAVE ) // Entertainment A
+GAME( 2006, island2_12,  island2,  igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_island2ent, ROT0, "Igrosoft", "Island 2 (110311 Entertainment B)", MACHINE_SUPPORTS_SAVE ) // Entertainment B
+GAME( 2006, island2_13,  island2,  igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_island2ent, ROT0, "Igrosoft", "Island 2 (140526 Entertainment B)", MACHINE_SUPPORTS_SAVE ) // Entertainment B
+GAME( 2006, island2_14,  island2,  igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_island2ent, ROT0, "Igrosoft", "Island 2 (110411 Entertainment C)", MACHINE_SUPPORTS_SAVE ) // Entertainment C
 
-GAME( 2006, pirate2,     0,        igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, empty_init,      ROT0, "Igrosoft", "Pirate 2 (061005 World)",         MACHINE_SUPPORTS_SAVE ) /* World */
-GAME( 2006, pirate2_2,   pirate2,  igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, empty_init,      ROT0, "Igrosoft", "Pirate 2 (070126 Russia)",        MACHINE_SUPPORTS_SAVE ) /* Russia */
-GAME( 2006, pirate2_3,   pirate2,  igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_pirate2l,   ROT0, "Igrosoft", "Pirate 2 (090528 Lottery)",       MACHINE_SUPPORTS_SAVE ) /* Lottery */
-GAME( 2006, pirate2_4,   pirate2,  igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_pirate2ent, ROT0, "Igrosoft", "Pirate 2 (090730 Entertainment)", MACHINE_SUPPORTS_SAVE ) /* Entertainment */
-GAME( 2006, pirate2_5,   pirate2,  igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_pirate2ent, ROT0, "Igrosoft", "Pirate 2 (100406 Entertainment X)", MACHINE_SUPPORTS_SAVE ) /* Entertainment X */
-GAME( 2006, pirate2_6,   pirate2,  igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_pirate2ent, ROT0, "Igrosoft", "Pirate 2 (101209 Entertainment N)", MACHINE_SUPPORTS_SAVE ) /* Entertainment N */
-GAME( 2006, pirate2_7,   pirate2,  igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_pirate2ent, ROT0, "Igrosoft", "Pirate 2 (110111 Entertainment A)", MACHINE_SUPPORTS_SAVE ) /* Entertainment A */
-GAME( 2006, pirate2_8,   pirate2,  igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_pirate2ent, ROT0, "Igrosoft", "Pirate 2 (110124 Entertainment A)", MACHINE_SUPPORTS_SAVE ) /* Entertainment A */
-GAME( 2006, pirate2_9,   pirate2,  igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_pirate2ent, ROT0, "Igrosoft", "Pirate 2 (110204 Entertainment A)", MACHINE_SUPPORTS_SAVE ) /* Entertainment A */
-GAME( 2006, pirate2_10,  pirate2,  igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_pirate2ent, ROT0, "Igrosoft", "Pirate 2 (110311 Entertainment B)", MACHINE_SUPPORTS_SAVE ) /* Entertainment B */
-GAME( 2006, pirate2_11,  pirate2,  igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_pirate2ent, ROT0, "Igrosoft", "Pirate 2 (140526 Entertainment B)", MACHINE_SUPPORTS_SAVE ) /* Entertainment B */
-GAME( 2006, pirate2_12,  pirate2,  igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_pirate2ent, ROT0, "Igrosoft", "Pirate 2 (110411 Entertainment C)", MACHINE_SUPPORTS_SAVE ) /* Entertainment C */
+GAME( 2006, pirate2,     0,        igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, empty_init,      ROT0, "Igrosoft", "Pirate 2 (061005 World)",         MACHINE_SUPPORTS_SAVE ) // World
+GAME( 2006, pirate2_2,   pirate2,  igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, empty_init,      ROT0, "Igrosoft", "Pirate 2 (070126 Russia)",        MACHINE_SUPPORTS_SAVE ) // Russia
+GAME( 2006, pirate2_3,   pirate2,  igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_pirate2l,   ROT0, "Igrosoft", "Pirate 2 (090528 Lottery)",       MACHINE_SUPPORTS_SAVE ) // Lottery
+GAME( 2006, pirate2_4,   pirate2,  igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_pirate2ent, ROT0, "Igrosoft", "Pirate 2 (090730 Entertainment)", MACHINE_SUPPORTS_SAVE ) // Entertainment
+GAME( 2006, pirate2_5,   pirate2,  igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_pirate2ent, ROT0, "Igrosoft", "Pirate 2 (100406 Entertainment X)", MACHINE_SUPPORTS_SAVE ) // Entertainment X
+GAME( 2006, pirate2_6,   pirate2,  igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_pirate2ent, ROT0, "Igrosoft", "Pirate 2 (101209 Entertainment N)", MACHINE_SUPPORTS_SAVE ) // Entertainment N
+GAME( 2006, pirate2_7,   pirate2,  igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_pirate2ent, ROT0, "Igrosoft", "Pirate 2 (110111 Entertainment A)", MACHINE_SUPPORTS_SAVE ) // Entertainment A
+GAME( 2006, pirate2_8,   pirate2,  igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_pirate2ent, ROT0, "Igrosoft", "Pirate 2 (110124 Entertainment A)", MACHINE_SUPPORTS_SAVE ) // Entertainment A
+GAME( 2006, pirate2_9,   pirate2,  igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_pirate2ent, ROT0, "Igrosoft", "Pirate 2 (110204 Entertainment A)", MACHINE_SUPPORTS_SAVE ) // Entertainment A
+GAME( 2006, pirate2_10,  pirate2,  igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_pirate2ent, ROT0, "Igrosoft", "Pirate 2 (110311 Entertainment B)", MACHINE_SUPPORTS_SAVE ) // Entertainment B
+GAME( 2006, pirate2_11,  pirate2,  igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_pirate2ent, ROT0, "Igrosoft", "Pirate 2 (140526 Entertainment B)", MACHINE_SUPPORTS_SAVE ) // Entertainment B
+GAME( 2006, pirate2_12,  pirate2,  igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_pirate2ent, ROT0, "Igrosoft", "Pirate 2 (110411 Entertainment C)", MACHINE_SUPPORTS_SAVE ) // Entertainment C
 
-GAME( 2006, keks,        keks_6,   igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, empty_init,      ROT0, "Igrosoft", "Keks (060328 World)",         MACHINE_SUPPORTS_SAVE ) /* World */
-GAME( 2006, keks_2,      keks_6,   igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, empty_init,      ROT0, "Igrosoft", "Keks (060403 World)",         MACHINE_SUPPORTS_SAVE ) /* World */
-GAME( 2006, keks_3,      keks_6,   igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, empty_init,      ROT0, "Igrosoft", "Keks (070119 Russia)",        MACHINE_SUPPORTS_SAVE )  /* Russia */
-GAME( 2006, keks_4,      keks_6,   igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_keksl,      ROT0, "Igrosoft", "Keks (090604 Lottery)",       MACHINE_SUPPORTS_SAVE )  /* Lottery */
-GAME( 2006, keks_5,      keks_6,   igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_keksent,    ROT0, "Igrosoft", "Keks (090727 Entertainment)", MACHINE_SUPPORTS_SAVE )  /* Entertainment */
-GAME( 2006, keks_6,      0,        igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, empty_init,      ROT0, "Igrosoft", "Keks (110816 World)",         MACHINE_SUPPORTS_SAVE ) /* World */
-GAME( 2006, keks_7,      keks_6,   igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, empty_init,      ROT0, "Igrosoft", "Keks (110816 Russia)",        MACHINE_SUPPORTS_SAVE ) /* Russia */
-GAME( 2006, keks_8,      keks_6,   igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_keksent,    ROT0, "Igrosoft", "Keks (100330 Entertainment X)", MACHINE_SUPPORTS_SAVE )  /* Entertainment X */
-GAME( 2006, keks_9,      keks_6,   igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_keksent,    ROT0, "Igrosoft", "Keks (100331 Entertainment X)", MACHINE_SUPPORTS_SAVE )  /* Entertainment X */
-GAME( 2006, keks_10,     keks_6,   igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_keksent,    ROT0, "Igrosoft", "Keks (110816 Entertainment X)", MACHINE_SUPPORTS_SAVE )  /* Entertainment X */
-GAME( 2006, keks_11,     keks_6,   igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_keksent,    ROT0, "Igrosoft", "Keks (101209 Entertainment N)", MACHINE_SUPPORTS_SAVE )  /* Entertainment N */
-GAME( 2006, keks_12,     keks_6,   igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_keksent,    ROT0, "Igrosoft", "Keks (110816 Entertainment N)", MACHINE_SUPPORTS_SAVE )  /* Entertainment N */
-GAME( 2006, keks_13,     keks_6,   igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_keksent,    ROT0, "Igrosoft", "Keks (110204 Entertainment A)", MACHINE_SUPPORTS_SAVE )  /* Entertainment A */
-GAME( 2006, keks_14,     keks_6,   igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_keksent,    ROT0, "Igrosoft", "Keks (110208 Entertainment A)", MACHINE_SUPPORTS_SAVE )  /* Entertainment A */
-GAME( 2006, keks_15,     keks_6,   igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_keksent,    ROT0, "Igrosoft", "Keks (110816 Entertainment A)", MACHINE_SUPPORTS_SAVE )  /* Entertainment A */
-GAME( 2006, keks_16,     keks_6,   igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_keksent,    ROT0, "Igrosoft", "Keks (110311 Entertainment B)", MACHINE_SUPPORTS_SAVE )  /* Entertainment B */
-GAME( 2006, keks_17,     keks_6,   igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_keksent,    ROT0, "Igrosoft", "Keks (110816 Entertainment B)", MACHINE_SUPPORTS_SAVE )  /* Entertainment B */
-GAME( 2006, keks_18,     keks_6,   igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_keksent,    ROT0, "Igrosoft", "Keks (140526 Entertainment B)", MACHINE_SUPPORTS_SAVE )  /* Entertainment B */
-GAME( 2006, keks_19,     keks_6,   igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_keksent,    ROT0, "Igrosoft", "Keks (110411 Entertainment C)", MACHINE_SUPPORTS_SAVE )  /* Entertainment C */
+GAME( 2006, keks,        keks_6,   igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, empty_init,      ROT0, "Igrosoft", "Keks (060328 World)",         MACHINE_SUPPORTS_SAVE ) // World
+GAME( 2006, keks_2,      keks_6,   igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, empty_init,      ROT0, "Igrosoft", "Keks (060403 World)",         MACHINE_SUPPORTS_SAVE ) // World
+GAME( 2006, keks_3,      keks_6,   igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, empty_init,      ROT0, "Igrosoft", "Keks (070119 Russia)",        MACHINE_SUPPORTS_SAVE )  // Russia
+GAME( 2006, keks_4,      keks_6,   igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_keksl,      ROT0, "Igrosoft", "Keks (090604 Lottery)",       MACHINE_SUPPORTS_SAVE )  // Lottery
+GAME( 2006, keks_5,      keks_6,   igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_keksent,    ROT0, "Igrosoft", "Keks (090727 Entertainment)", MACHINE_SUPPORTS_SAVE )  // Entertainment
+GAME( 2006, keks_6,      0,        igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, empty_init,      ROT0, "Igrosoft", "Keks (110816 World)",         MACHINE_SUPPORTS_SAVE ) // World
+GAME( 2006, keks_7,      keks_6,   igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, empty_init,      ROT0, "Igrosoft", "Keks (110816 Russia)",        MACHINE_SUPPORTS_SAVE ) // Russia
+GAME( 2006, keks_8,      keks_6,   igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_keksent,    ROT0, "Igrosoft", "Keks (100330 Entertainment X)", MACHINE_SUPPORTS_SAVE )  // Entertainment X
+GAME( 2006, keks_9,      keks_6,   igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_keksent,    ROT0, "Igrosoft", "Keks (100331 Entertainment X)", MACHINE_SUPPORTS_SAVE )  // Entertainment X
+GAME( 2006, keks_10,     keks_6,   igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_keksent,    ROT0, "Igrosoft", "Keks (110816 Entertainment X)", MACHINE_SUPPORTS_SAVE )  // Entertainment X
+GAME( 2006, keks_11,     keks_6,   igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_keksent,    ROT0, "Igrosoft", "Keks (101209 Entertainment N)", MACHINE_SUPPORTS_SAVE )  // Entertainment N
+GAME( 2006, keks_12,     keks_6,   igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_keksent,    ROT0, "Igrosoft", "Keks (110816 Entertainment N)", MACHINE_SUPPORTS_SAVE )  // Entertainment N
+GAME( 2006, keks_13,     keks_6,   igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_keksent,    ROT0, "Igrosoft", "Keks (110204 Entertainment A)", MACHINE_SUPPORTS_SAVE )  // Entertainment A
+GAME( 2006, keks_14,     keks_6,   igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_keksent,    ROT0, "Igrosoft", "Keks (110208 Entertainment A)", MACHINE_SUPPORTS_SAVE )  // Entertainment A
+GAME( 2006, keks_15,     keks_6,   igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_keksent,    ROT0, "Igrosoft", "Keks (110816 Entertainment A)", MACHINE_SUPPORTS_SAVE )  // Entertainment A
+GAME( 2006, keks_16,     keks_6,   igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_keksent,    ROT0, "Igrosoft", "Keks (110311 Entertainment B)", MACHINE_SUPPORTS_SAVE )  // Entertainment B
+GAME( 2006, keks_17,     keks_6,   igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_keksent,    ROT0, "Igrosoft", "Keks (110816 Entertainment B)", MACHINE_SUPPORTS_SAVE )  // Entertainment B
+GAME( 2006, keks_18,     keks_6,   igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_keksent,    ROT0, "Igrosoft", "Keks (140526 Entertainment B)", MACHINE_SUPPORTS_SAVE )  // Entertainment B
+GAME( 2006, keks_19,     keks_6,   igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_keksent,    ROT0, "Igrosoft", "Keks (110411 Entertainment C)", MACHINE_SUPPORTS_SAVE )  // Entertainment C
 
-GAME( 2007, gnome,       gnome_9,  igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, empty_init,      ROT0, "Igrosoft", "Gnome (070906 Russia)",        MACHINE_SUPPORTS_SAVE ) /* Russia */
-GAME( 2007, gnome_2,     gnome_9,  igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, empty_init,      ROT0, "Igrosoft", "Gnome (071115 Russia)",        MACHINE_SUPPORTS_SAVE ) /* Russia */
-GAME( 2007, gnome_3,     gnome_9,  igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, empty_init,      ROT0, "Igrosoft", "Gnome (080303 World)",         MACHINE_SUPPORTS_SAVE ) /* World */
-GAME( 2007, gnome_4,     gnome_9,  igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, empty_init,      ROT0, "Igrosoft", "Gnome (090402 Russia)",        MACHINE_SUPPORTS_SAVE ) /* Russia */
-GAME( 2007, gnome_5,     gnome_9,  igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, empty_init,      ROT0, "Igrosoft", "Gnome (090406 World)",         MACHINE_SUPPORTS_SAVE ) /* World */
-GAME( 2007, gnome_7,     gnome_9,  igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_gnomel,     ROT0, "Igrosoft", "Gnome (090708 Lottery)",       MACHINE_SUPPORTS_SAVE ) /* Lottery */
-GAME( 2007, gnome_8,     gnome_9,  igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_gnomeent,   ROT0, "Igrosoft", "Gnome (090810 Entertainment)", MACHINE_SUPPORTS_SAVE ) /* Entertainment */
-GAME( 2007, gnome_9,     0,        igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, empty_init,      ROT0, "Igrosoft", "Gnome (100326 World)",         MACHINE_SUPPORTS_SAVE ) /* World */
-GAME( 2007, gnome_10,    gnome_9,  igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_gnomel,     ROT0, "Igrosoft", "Gnome (100326 Lottery)",       MACHINE_SUPPORTS_SAVE ) /* Lottery */
-GAME( 2007, gnome_11,    gnome_9,  igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_gnomeent,   ROT0, "Igrosoft", "Gnome (100326 Entertainment)", MACHINE_SUPPORTS_SAVE ) /* Entertainment */
-GAME( 2007, gnome_12,    gnome_9,  igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, empty_init,      ROT0, "Igrosoft", "Gnome (100326 Russia)",        MACHINE_SUPPORTS_SAVE ) /* Russia */
-GAME( 2007, gnome_13,    gnome_9,  igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_gnomeent,   ROT0, "Igrosoft", "Gnome (100407 Entertainment X)", MACHINE_SUPPORTS_SAVE ) /* Entertainment X */
-GAME( 2007, gnome_14,    gnome_9,  igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_gnomeent,   ROT0, "Igrosoft", "Gnome (101208 Entertainment N)", MACHINE_SUPPORTS_SAVE ) /* Entertainment N */
-GAME( 2007, gnome_15,    gnome_9,  igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_gnomeent,   ROT0, "Igrosoft", "Gnome (110124 Entertainment A)", MACHINE_SUPPORTS_SAVE ) /* Entertainment A */
-GAME( 2007, gnome_16,    gnome_9,  igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_gnomeent,   ROT0, "Igrosoft", "Gnome (110204 Entertainment A)", MACHINE_SUPPORTS_SAVE ) /* Entertainment A */
-GAME( 2007, gnome_17,    gnome_9,  igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_gnomeent,   ROT0, "Igrosoft", "Gnome (110311 Entertainment B)", MACHINE_SUPPORTS_SAVE ) /* Entertainment B */
-GAME( 2007, gnome_18,    gnome_9,  igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_gnomeent,   ROT0, "Igrosoft", "Gnome (140526 Entertainment B)", MACHINE_SUPPORTS_SAVE ) /* Entertainment B */
-GAME( 2007, gnome_19,    gnome_9,  igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_gnomeent,   ROT0, "Igrosoft", "Gnome (110411 Entertainment C)", MACHINE_SUPPORTS_SAVE ) /* Entertainment C */
+GAME( 2007, gnome,       gnome_9,  igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, empty_init,      ROT0, "Igrosoft", "Gnome (070906 Russia)",        MACHINE_SUPPORTS_SAVE ) // Russia
+GAME( 2007, gnome_2,     gnome_9,  igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, empty_init,      ROT0, "Igrosoft", "Gnome (071115 Russia)",        MACHINE_SUPPORTS_SAVE ) // Russia
+GAME( 2007, gnome_3,     gnome_9,  igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, empty_init,      ROT0, "Igrosoft", "Gnome (080303 World)",         MACHINE_SUPPORTS_SAVE ) // World
+GAME( 2007, gnome_4,     gnome_9,  igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, empty_init,      ROT0, "Igrosoft", "Gnome (090402 Russia)",        MACHINE_SUPPORTS_SAVE ) // Russia
+GAME( 2007, gnome_5,     gnome_9,  igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, empty_init,      ROT0, "Igrosoft", "Gnome (090406 World)",         MACHINE_SUPPORTS_SAVE ) // World
+GAME( 2007, gnome_7,     gnome_9,  igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_gnomel,     ROT0, "Igrosoft", "Gnome (090708 Lottery)",       MACHINE_SUPPORTS_SAVE ) // Lottery
+GAME( 2007, gnome_8,     gnome_9,  igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_gnomeent,   ROT0, "Igrosoft", "Gnome (090810 Entertainment)", MACHINE_SUPPORTS_SAVE ) // Entertainment
+GAME( 2007, gnome_9,     0,        igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, empty_init,      ROT0, "Igrosoft", "Gnome (100326 World)",         MACHINE_SUPPORTS_SAVE ) // World
+GAME( 2007, gnome_10,    gnome_9,  igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_gnomel,     ROT0, "Igrosoft", "Gnome (100326 Lottery)",       MACHINE_SUPPORTS_SAVE ) // Lottery
+GAME( 2007, gnome_11,    gnome_9,  igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_gnomeent,   ROT0, "Igrosoft", "Gnome (100326 Entertainment)", MACHINE_SUPPORTS_SAVE ) // Entertainment
+GAME( 2007, gnome_12,    gnome_9,  igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, empty_init,      ROT0, "Igrosoft", "Gnome (100326 Russia)",        MACHINE_SUPPORTS_SAVE ) // Russia
+GAME( 2007, gnome_13,    gnome_9,  igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_gnomeent,   ROT0, "Igrosoft", "Gnome (100407 Entertainment X)", MACHINE_SUPPORTS_SAVE ) // Entertainment X
+GAME( 2007, gnome_14,    gnome_9,  igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_gnomeent,   ROT0, "Igrosoft", "Gnome (101208 Entertainment N)", MACHINE_SUPPORTS_SAVE ) // Entertainment N
+GAME( 2007, gnome_15,    gnome_9,  igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_gnomeent,   ROT0, "Igrosoft", "Gnome (110124 Entertainment A)", MACHINE_SUPPORTS_SAVE ) // Entertainment A
+GAME( 2007, gnome_16,    gnome_9,  igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_gnomeent,   ROT0, "Igrosoft", "Gnome (110204 Entertainment A)", MACHINE_SUPPORTS_SAVE ) // Entertainment A
+GAME( 2007, gnome_17,    gnome_9,  igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_gnomeent,   ROT0, "Igrosoft", "Gnome (110311 Entertainment B)", MACHINE_SUPPORTS_SAVE ) // Entertainment B
+GAME( 2007, gnome_18,    gnome_9,  igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_gnomeent,   ROT0, "Igrosoft", "Gnome (140526 Entertainment B)", MACHINE_SUPPORTS_SAVE ) // Entertainment B
+GAME( 2007, gnome_19,    gnome_9,  igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_gnomeent,   ROT0, "Igrosoft", "Gnome (110411 Entertainment C)", MACHINE_SUPPORTS_SAVE ) // Entertainment C
 
-GAME( 2007, sweetl2,     0,        igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, empty_init,      ROT0, "Igrosoft", "Sweet Life 2 (071217 Russia)",        MACHINE_SUPPORTS_SAVE ) /* Russia */
-GAME( 2007, sweetl2_2,   sweetl2,  igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, empty_init,      ROT0, "Igrosoft", "Sweet Life 2 (080320 World)",         MACHINE_SUPPORTS_SAVE ) /* World */
-GAME( 2007, sweetl2_3,   sweetl2,  igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_sweetl2l,   ROT0, "Igrosoft", "Sweet Life 2 (090525 Lottery)",       MACHINE_SUPPORTS_SAVE ) /* Lottery */
-GAME( 2007, sweetl2_4,   sweetl2,  igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_sweetl2ent, ROT0, "Igrosoft", "Sweet Life 2 (090812 Entertainment)", MACHINE_SUPPORTS_SAVE ) /* Entertainment */
-GAME( 2007, sweetl2_5,   sweetl2,  igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_sweetl2ent, ROT0, "Igrosoft", "Sweet Life 2 (100408 Entertainment X)", MACHINE_SUPPORTS_SAVE ) /* Entertainment X */
-GAME( 2007, sweetl2_6,   sweetl2,  igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_sweetl2ent, ROT0, "Igrosoft", "Sweet Life 2 (101209 Entertainment N)", MACHINE_SUPPORTS_SAVE ) /* Entertainment N */
-GAME( 2007, sweetl2_7,   sweetl2,  igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_sweetl2ent, ROT0, "Igrosoft", "Sweet Life 2 (110111 Entertainment A)", MACHINE_SUPPORTS_SAVE ) /* Entertainment A */
-GAME( 2007, sweetl2_8,   sweetl2,  igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_sweetl2ent, ROT0, "Igrosoft", "Sweet Life 2 (110124 Entertainment A)", MACHINE_SUPPORTS_SAVE ) /* Entertainment A */
-GAME( 2007, sweetl2_9,   sweetl2,  igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_sweetl2ent, ROT0, "Igrosoft", "Sweet Life 2 (110204 Entertainment A)", MACHINE_SUPPORTS_SAVE ) /* Entertainment A */
-GAME( 2007, sweetl2_10,  sweetl2,  igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_sweetl2ent, ROT0, "Igrosoft", "Sweet Life 2 (110311 Entertainment B)", MACHINE_SUPPORTS_SAVE ) /* Entertainment B */
-GAME( 2007, sweetl2_11,  sweetl2,  igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_sweetl2ent, ROT0, "Igrosoft", "Sweet Life 2 (140526 Entertainment B)", MACHINE_SUPPORTS_SAVE ) /* Entertainment B */
-GAME( 2007, sweetl2_12,  sweetl2,  igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_sweetl2ent, ROT0, "Igrosoft", "Sweet Life 2 (110411 Entertainment C)", MACHINE_SUPPORTS_SAVE ) /* Entertainment C */
+GAME( 2007, sweetl2,     0,        igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, empty_init,      ROT0, "Igrosoft", "Sweet Life 2 (071217 Russia)",        MACHINE_SUPPORTS_SAVE ) // Russia
+GAME( 2007, sweetl2_2,   sweetl2,  igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, empty_init,      ROT0, "Igrosoft", "Sweet Life 2 (080320 World)",         MACHINE_SUPPORTS_SAVE ) // World
+GAME( 2007, sweetl2_3,   sweetl2,  igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_sweetl2l,   ROT0, "Igrosoft", "Sweet Life 2 (090525 Lottery)",       MACHINE_SUPPORTS_SAVE ) // Lottery
+GAME( 2007, sweetl2_4,   sweetl2,  igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_sweetl2ent, ROT0, "Igrosoft", "Sweet Life 2 (090812 Entertainment)", MACHINE_SUPPORTS_SAVE ) // Entertainment
+GAME( 2007, sweetl2_5,   sweetl2,  igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_sweetl2ent, ROT0, "Igrosoft", "Sweet Life 2 (100408 Entertainment X)", MACHINE_SUPPORTS_SAVE ) // Entertainment X
+GAME( 2007, sweetl2_6,   sweetl2,  igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_sweetl2ent, ROT0, "Igrosoft", "Sweet Life 2 (101209 Entertainment N)", MACHINE_SUPPORTS_SAVE ) // Entertainment N
+GAME( 2007, sweetl2_7,   sweetl2,  igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_sweetl2ent, ROT0, "Igrosoft", "Sweet Life 2 (110111 Entertainment A)", MACHINE_SUPPORTS_SAVE ) // Entertainment A
+GAME( 2007, sweetl2_8,   sweetl2,  igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_sweetl2ent, ROT0, "Igrosoft", "Sweet Life 2 (110124 Entertainment A)", MACHINE_SUPPORTS_SAVE ) // Entertainment A
+GAME( 2007, sweetl2_9,   sweetl2,  igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_sweetl2ent, ROT0, "Igrosoft", "Sweet Life 2 (110204 Entertainment A)", MACHINE_SUPPORTS_SAVE ) // Entertainment A
+GAME( 2007, sweetl2_10,  sweetl2,  igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_sweetl2ent, ROT0, "Igrosoft", "Sweet Life 2 (110311 Entertainment B)", MACHINE_SUPPORTS_SAVE ) // Entertainment B
+GAME( 2007, sweetl2_11,  sweetl2,  igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_sweetl2ent, ROT0, "Igrosoft", "Sweet Life 2 (140526 Entertainment B)", MACHINE_SUPPORTS_SAVE ) // Entertainment B
+GAME( 2007, sweetl2_12,  sweetl2,  igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_sweetl2ent, ROT0, "Igrosoft", "Sweet Life 2 (110411 Entertainment C)", MACHINE_SUPPORTS_SAVE ) // Entertainment C
 
-GAME( 2008, fcockt2,     0,        igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, empty_init,      ROT0, "Igrosoft", "Fruit Cocktail 2 (080707 Russia)",        MACHINE_SUPPORTS_SAVE ) /* Russia */
-GAME( 2008, fcockt2_2,   fcockt2,  igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, empty_init,      ROT0, "Igrosoft", "Fruit Cocktail 2 (080904 Russia)",        MACHINE_SUPPORTS_SAVE ) /* World */
-GAME( 2008, fcockt2_3,   fcockt2,  igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, empty_init,      ROT0, "Igrosoft", "Fruit Cocktail 2 (080909 World)",         MACHINE_SUPPORTS_SAVE ) /* World */
-GAME( 2008, fcockt2_4,   fcockt2,  igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, empty_init,      ROT0, "Igrosoft", "Fruit Cocktail 2 (081105 World)",         MACHINE_SUPPORTS_SAVE ) /* World */
-GAME( 2008, fcockt2_5,   fcockt2,  igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, empty_init,      ROT0, "Igrosoft", "Fruit Cocktail 2 (081106 Russia)",        MACHINE_SUPPORTS_SAVE ) /* Russia */
-GAME( 2008, fcockt2_6,   fcockt2,  igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_fcockt2l,   ROT0, "Igrosoft", "Fruit Cocktail 2 (090525 Lottery)",       MACHINE_SUPPORTS_SAVE ) /* Lottery */
-GAME( 2008, fcockt2_7,   fcockt2,  igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_fcockt2ent, ROT0, "Igrosoft", "Fruit Cocktail 2 (090813 Entertainment)", MACHINE_SUPPORTS_SAVE ) /* Entertainment */
-GAME( 2008, fcockt2_8,   fcockt2,  igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_fcockt2ent, ROT0, "Igrosoft", "Fruit Cocktail 2 (100412 Entertainment X)", MACHINE_SUPPORTS_SAVE ) /* Entertainment X */
-GAME( 2008, fcockt2_9,   fcockt2,  igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_fcockt2ent, ROT0, "Igrosoft", "Fruit Cocktail 2 (101208 Entertainment N)", MACHINE_SUPPORTS_SAVE ) /* Entertainment N */
-GAME( 2008, fcockt2_10,  fcockt2,  igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_fcockt2ent, ROT0, "Igrosoft", "Fruit Cocktail 2 (110111 Entertainment A)", MACHINE_SUPPORTS_SAVE ) /* Entertainment A */
-GAME( 2008, fcockt2_11,  fcockt2,  igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_fcockt2ent, ROT0, "Igrosoft", "Fruit Cocktail 2 (110124 Entertainment A)", MACHINE_SUPPORTS_SAVE ) /* Entertainment A */
-GAME( 2008, fcockt2_12,  fcockt2,  igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_fcockt2ent, ROT0, "Igrosoft", "Fruit Cocktail 2 (110204 Entertainment A)", MACHINE_SUPPORTS_SAVE ) /* Entertainment A */
-GAME( 2008, fcockt2_13,  fcockt2,  igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_fcockt2ent, ROT0, "Igrosoft", "Fruit Cocktail 2 (110311 Entertainment B)", MACHINE_SUPPORTS_SAVE ) /* Entertainment B */
-GAME( 2008, fcockt2_14,  fcockt2,  igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_fcockt2ent, ROT0, "Igrosoft", "Fruit Cocktail 2 (140526 Entertainment B)", MACHINE_SUPPORTS_SAVE ) /* Entertainment B */
-GAME( 2008, fcockt2_15,  fcockt2,  igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_fcockt2ent, ROT0, "Igrosoft", "Fruit Cocktail 2 (110411 Entertainment C)", MACHINE_SUPPORTS_SAVE ) /* Entertainment C */
+GAME( 2008, fcockt2,     0,        igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, empty_init,      ROT0, "Igrosoft", "Fruit Cocktail 2 (080707 Russia)",        MACHINE_SUPPORTS_SAVE ) // Russia
+GAME( 2008, fcockt2_2,   fcockt2,  igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, empty_init,      ROT0, "Igrosoft", "Fruit Cocktail 2 (080904 Russia)",        MACHINE_SUPPORTS_SAVE ) // World
+GAME( 2008, fcockt2_3,   fcockt2,  igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, empty_init,      ROT0, "Igrosoft", "Fruit Cocktail 2 (080909 World)",         MACHINE_SUPPORTS_SAVE ) // World
+GAME( 2008, fcockt2_4,   fcockt2,  igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, empty_init,      ROT0, "Igrosoft", "Fruit Cocktail 2 (081105 World)",         MACHINE_SUPPORTS_SAVE ) // World
+GAME( 2008, fcockt2_5,   fcockt2,  igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, empty_init,      ROT0, "Igrosoft", "Fruit Cocktail 2 (081106 Russia)",        MACHINE_SUPPORTS_SAVE ) // Russia
+GAME( 2008, fcockt2_6,   fcockt2,  igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_fcockt2l,   ROT0, "Igrosoft", "Fruit Cocktail 2 (090525 Lottery)",       MACHINE_SUPPORTS_SAVE ) // Lottery
+GAME( 2008, fcockt2_7,   fcockt2,  igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_fcockt2ent, ROT0, "Igrosoft", "Fruit Cocktail 2 (090813 Entertainment)", MACHINE_SUPPORTS_SAVE ) // Entertainment
+GAME( 2008, fcockt2_8,   fcockt2,  igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_fcockt2ent, ROT0, "Igrosoft", "Fruit Cocktail 2 (100412 Entertainment X)", MACHINE_SUPPORTS_SAVE ) // Entertainment X
+GAME( 2008, fcockt2_9,   fcockt2,  igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_fcockt2ent, ROT0, "Igrosoft", "Fruit Cocktail 2 (101208 Entertainment N)", MACHINE_SUPPORTS_SAVE ) // Entertainment N
+GAME( 2008, fcockt2_10,  fcockt2,  igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_fcockt2ent, ROT0, "Igrosoft", "Fruit Cocktail 2 (110111 Entertainment A)", MACHINE_SUPPORTS_SAVE ) // Entertainment A
+GAME( 2008, fcockt2_11,  fcockt2,  igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_fcockt2ent, ROT0, "Igrosoft", "Fruit Cocktail 2 (110124 Entertainment A)", MACHINE_SUPPORTS_SAVE ) // Entertainment A
+GAME( 2008, fcockt2_12,  fcockt2,  igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_fcockt2ent, ROT0, "Igrosoft", "Fruit Cocktail 2 (110204 Entertainment A)", MACHINE_SUPPORTS_SAVE ) // Entertainment A
+GAME( 2008, fcockt2_13,  fcockt2,  igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_fcockt2ent, ROT0, "Igrosoft", "Fruit Cocktail 2 (110311 Entertainment B)", MACHINE_SUPPORTS_SAVE ) // Entertainment B
+GAME( 2008, fcockt2_14,  fcockt2,  igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_fcockt2ent, ROT0, "Igrosoft", "Fruit Cocktail 2 (140526 Entertainment B)", MACHINE_SUPPORTS_SAVE ) // Entertainment B
+GAME( 2008, fcockt2_15,  fcockt2,  igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_fcockt2ent, ROT0, "Igrosoft", "Fruit Cocktail 2 (110411 Entertainment C)", MACHINE_SUPPORTS_SAVE ) // Entertainment C
 
-GAME( 2010, crzmon2,     0,        igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_crzmon2,    ROT0, "Igrosoft", "Crazy Monkey 2 (100310 World)",          MACHINE_NOT_WORKING|MACHINE_SUPPORTS_SAVE ) /* World */ // xored and bitswapped palette and gfx roms
-GAME( 2010, crzmon2_2,   crzmon2,  igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_crzmon2lot, ROT0, "Igrosoft", "Crazy Monkey 2 (100311 Lottery)",        MACHINE_NOT_WORKING|MACHINE_SUPPORTS_SAVE ) /* Lottery */
-GAME( 2010, crzmon2_3,   crzmon2,  igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_crzmon2ent, ROT0, "Igrosoft", "Crazy Monkey 2 (100315 Entertainment)",  MACHINE_NOT_WORKING|MACHINE_SUPPORTS_SAVE ) /* Entertainment */
-GAME( 2010, crzmon2_4,   crzmon2,  igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_crzmon2,    ROT0, "Igrosoft", "Crazy Monkey 2 (100618 Russia)",         MACHINE_NOT_WORKING|MACHINE_SUPPORTS_SAVE ) /* Russia */
-GAME( 2010, crzmon2_5,   crzmon2,  igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_crzmon2ent, ROT0, "Igrosoft", "Crazy Monkey 2 (100413 Entertainment X)",  MACHINE_NOT_WORKING|MACHINE_SUPPORTS_SAVE ) /* Entertainment X */
-GAME( 2010, crzmon2_6,   crzmon2,  igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_crzmon2ent, ROT0, "Igrosoft", "Crazy Monkey 2 (101220 Entertainment X)",  MACHINE_NOT_WORKING|MACHINE_SUPPORTS_SAVE ) /* Entertainment X */
-GAME( 2010, crzmon2_7,   crzmon2,  igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_crzmon2ent, ROT0, "Igrosoft", "Crazy Monkey 2 (101208 Entertainment N)",  MACHINE_NOT_WORKING|MACHINE_SUPPORTS_SAVE ) /* Entertainment N */
-GAME( 2010, crzmon2_8,   crzmon2,  igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_crzmon2ent, ROT0, "Igrosoft", "Crazy Monkey 2 (101220 Entertainment N)",  MACHINE_NOT_WORKING|MACHINE_SUPPORTS_SAVE ) /* Entertainment N */
-GAME( 2010, crzmon2_9,   crzmon2,  igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_crzmon2ent, ROT0, "Igrosoft", "Crazy Monkey 2 (110111 Entertainment A)",  MACHINE_NOT_WORKING|MACHINE_SUPPORTS_SAVE ) /* Entertainment A */
-GAME( 2010, crzmon2_10,  crzmon2,  igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_crzmon2ent, ROT0, "Igrosoft", "Crazy Monkey 2 (110124 Entertainment A)",  MACHINE_NOT_WORKING|MACHINE_SUPPORTS_SAVE ) /* Entertainment A */
-GAME( 2010, crzmon2_11,  crzmon2,  igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_crzmon2ent, ROT0, "Igrosoft", "Crazy Monkey 2 (110204 Entertainment A)",  MACHINE_NOT_WORKING|MACHINE_SUPPORTS_SAVE ) /* Entertainment A */
-GAME( 2010, crzmon2_12,  crzmon2,  igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_crzmon2ent, ROT0, "Igrosoft", "Crazy Monkey 2 (110311 Entertainment B)",  MACHINE_NOT_WORKING|MACHINE_SUPPORTS_SAVE ) /* Entertainment B */
-GAME( 2010, crzmon2_13,  crzmon2,  igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_crzmon2ent, ROT0, "Igrosoft", "Crazy Monkey 2 (140526 Entertainment B)",  MACHINE_NOT_WORKING|MACHINE_SUPPORTS_SAVE ) /* Entertainment B */
-GAME( 2010, crzmon2_14,  crzmon2,  igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_crzmon2ent, ROT0, "Igrosoft", "Crazy Monkey 2 (110411 Entertainment C)",  MACHINE_NOT_WORKING|MACHINE_SUPPORTS_SAVE ) /* Entertainment C */
+GAME( 2010, crzmon2,     0,        igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_crzmon2,    ROT0, "Igrosoft", "Crazy Monkey 2 (100310 World)",          MACHINE_NOT_WORKING|MACHINE_SUPPORTS_SAVE ) // World // xored and bitswapped palette and gfx roms
+GAME( 2010, crzmon2_2,   crzmon2,  igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_crzmon2lot, ROT0, "Igrosoft", "Crazy Monkey 2 (100311 Lottery)",        MACHINE_NOT_WORKING|MACHINE_SUPPORTS_SAVE ) // Lottery
+GAME( 2010, crzmon2_3,   crzmon2,  igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_crzmon2ent, ROT0, "Igrosoft", "Crazy Monkey 2 (100315 Entertainment)",  MACHINE_NOT_WORKING|MACHINE_SUPPORTS_SAVE ) // Entertainment
+GAME( 2010, crzmon2_4,   crzmon2,  igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_crzmon2,    ROT0, "Igrosoft", "Crazy Monkey 2 (100618 Russia)",         MACHINE_NOT_WORKING|MACHINE_SUPPORTS_SAVE ) // Russia
+GAME( 2010, crzmon2_5,   crzmon2,  igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_crzmon2ent, ROT0, "Igrosoft", "Crazy Monkey 2 (100413 Entertainment X)",  MACHINE_NOT_WORKING|MACHINE_SUPPORTS_SAVE ) // Entertainment X
+GAME( 2010, crzmon2_6,   crzmon2,  igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_crzmon2ent, ROT0, "Igrosoft", "Crazy Monkey 2 (101220 Entertainment X)",  MACHINE_NOT_WORKING|MACHINE_SUPPORTS_SAVE ) // Entertainment X
+GAME( 2010, crzmon2_7,   crzmon2,  igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_crzmon2ent, ROT0, "Igrosoft", "Crazy Monkey 2 (101208 Entertainment N)",  MACHINE_NOT_WORKING|MACHINE_SUPPORTS_SAVE ) // Entertainment N
+GAME( 2010, crzmon2_8,   crzmon2,  igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_crzmon2ent, ROT0, "Igrosoft", "Crazy Monkey 2 (101220 Entertainment N)",  MACHINE_NOT_WORKING|MACHINE_SUPPORTS_SAVE ) // Entertainment N
+GAME( 2010, crzmon2_9,   crzmon2,  igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_crzmon2ent, ROT0, "Igrosoft", "Crazy Monkey 2 (110111 Entertainment A)",  MACHINE_NOT_WORKING|MACHINE_SUPPORTS_SAVE ) // Entertainment A
+GAME( 2010, crzmon2_10,  crzmon2,  igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_crzmon2ent, ROT0, "Igrosoft", "Crazy Monkey 2 (110124 Entertainment A)",  MACHINE_NOT_WORKING|MACHINE_SUPPORTS_SAVE ) // Entertainment A
+GAME( 2010, crzmon2_11,  crzmon2,  igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_crzmon2ent, ROT0, "Igrosoft", "Crazy Monkey 2 (110204 Entertainment A)",  MACHINE_NOT_WORKING|MACHINE_SUPPORTS_SAVE ) // Entertainment A
+GAME( 2010, crzmon2_12,  crzmon2,  igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_crzmon2ent, ROT0, "Igrosoft", "Crazy Monkey 2 (110311 Entertainment B)",  MACHINE_NOT_WORKING|MACHINE_SUPPORTS_SAVE ) // Entertainment B
+GAME( 2010, crzmon2_13,  crzmon2,  igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_crzmon2ent, ROT0, "Igrosoft", "Crazy Monkey 2 (140526 Entertainment B)",  MACHINE_NOT_WORKING|MACHINE_SUPPORTS_SAVE ) // Entertainment B
+GAME( 2010, crzmon2_14,  crzmon2,  igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_crzmon2ent, ROT0, "Igrosoft", "Crazy Monkey 2 (110411 Entertainment C)",  MACHINE_NOT_WORKING|MACHINE_SUPPORTS_SAVE ) // Entertainment C
+
+
+// The following sets are known to exist based on official documentation, but have not been dumped.
+
+#if 0
+
+ROM_START( czmon_10 ) // 081027 lottery
+	ROM_REGION( 0x40000, "maincpu", 0 ) // z80 code, banked
+	ROM_LOAD( "cm_l_081027.rom", 0x00000, 0x40000, SHA1(11a1523bc0ce5cf43534b34201f59784283693f0) )
+
+	ROM_REGION( 0x400000, "gfx", 0 )
+	ROM_LOAD( "crazymonkey_loto.001", 0x000000, 0x80000, SHA1(bf953dc53ec85f4841fe7ada7e480520b3bce1d7) )
+	ROM_LOAD( "crazymonkey_loto.002", 0x100000, 0x80000, SHA1(57db2212b690a8a92034ba4993526c34cbf48c09) )
+	ROM_LOAD( "crazymonkey_loto.003", 0x200000, 0x80000, SHA1(4551494b883f8076931bb22fd0541b193039dfdc) )
+	ROM_LOAD( "crazymonkey_loto.004", 0x300000, 0x80000, SHA1(b33d5007b649661a3d811139c2b40d036863343d) )
+	ROM_LOAD( "crazymonkey_m.005",    0x080000, 0x80000, CRC(9d4d2a94) SHA1(c714e110de628b343dfc7fff23befaa1276056a9) )
+	ROM_LOAD( "crazymonkey_m.006",    0x180000, 0x80000, CRC(a15f0fee) SHA1(3f06d5a1a41e1335bcc7586a5ea95b9b734155c0) )
+	ROM_LOAD( "crazymonkey_m.007",    0x280000, 0x80000, CRC(715a2528) SHA1(6c4c72592568ecbaa9518fb7271d2714dd22dbbb) )
+	ROM_LOAD( "crazymonkey_m.008",    0x380000, 0x80000, CRC(6fdb6fd5) SHA1(f40916112365de258956ec033aff79aae1f58690) )
+ROM_END
+
+ROM_START( czmon_11 ) // 081113 lottery
+	ROM_REGION( 0x40000, "maincpu", 0 ) // z80 code, banked
+	ROM_LOAD( "cm_l_081113.rom", 0x00000, 0x40000, SHA1(7196c301691b47a572cefc090888db550f10998c) )
+
+	ROM_REGION( 0x400000, "gfx", 0 )
+	ROM_LOAD( "crazymonkey_loto.001", 0x000000, 0x80000, SHA1(bf953dc53ec85f4841fe7ada7e480520b3bce1d7) )
+	ROM_LOAD( "crazymonkey_loto.002", 0x100000, 0x80000, SHA1(57db2212b690a8a92034ba4993526c34cbf48c09) )
+	ROM_LOAD( "crazymonkey_loto.003", 0x200000, 0x80000, SHA1(4551494b883f8076931bb22fd0541b193039dfdc) )
+	ROM_LOAD( "crazymonkey_loto.004", 0x300000, 0x80000, SHA1(b33d5007b649661a3d811139c2b40d036863343d) )
+	ROM_LOAD( "crazymonkey_m.005",    0x080000, 0x80000, CRC(9d4d2a94) SHA1(c714e110de628b343dfc7fff23befaa1276056a9) )
+	ROM_LOAD( "crazymonkey_m.006",    0x180000, 0x80000, CRC(a15f0fee) SHA1(3f06d5a1a41e1335bcc7586a5ea95b9b734155c0) )
+	ROM_LOAD( "crazymonkey_m.007",    0x280000, 0x80000, CRC(715a2528) SHA1(6c4c72592568ecbaa9518fb7271d2714dd22dbbb) )
+	ROM_LOAD( "crazymonkey_m.008",    0x380000, 0x80000, CRC(6fdb6fd5) SHA1(f40916112365de258956ec033aff79aae1f58690) )
+ROM_END
+
+
+ROM_START( czmon_14 ) // 100311 lottery
+	ROM_REGION( 0x40000, "maincpu", 0 ) // z80 code, banked
+	ROM_LOAD( "cm_l_100311.rom", 0x00000, 0x40000, CRC(8a766a31) SHA1(2dc50aabf2b027a578d433714023290ad320ea00) )
+
+	ROM_REGION( 0x400000, "gfx", 0 )
+	ROM_LOAD( "crazymonkey_loto.001", 0x000000, 0x80000, SHA1(bf953dc53ec85f4841fe7ada7e480520b3bce1d7) )
+	ROM_LOAD( "crazymonkey_loto.002", 0x100000, 0x80000, SHA1(57db2212b690a8a92034ba4993526c34cbf48c09) )
+	ROM_LOAD( "crazymonkey_loto.003", 0x200000, 0x80000, SHA1(4551494b883f8076931bb22fd0541b193039dfdc) )
+	ROM_LOAD( "crazymonkey_loto.004", 0x300000, 0x80000, SHA1(b33d5007b649661a3d811139c2b40d036863343d) )
+	ROM_LOAD( "crazymonkey_m.005",    0x080000, 0x80000, CRC(9d4d2a94) SHA1(c714e110de628b343dfc7fff23befaa1276056a9) )
+	ROM_LOAD( "crazymonkey_m.006",    0x180000, 0x80000, CRC(a15f0fee) SHA1(3f06d5a1a41e1335bcc7586a5ea95b9b734155c0) )
+	ROM_LOAD( "crazymonkey_m.007",    0x280000, 0x80000, CRC(715a2528) SHA1(6c4c72592568ecbaa9518fb7271d2714dd22dbbb) )
+	ROM_LOAD( "crazymonkey_m.008",    0x380000, 0x80000, CRC(6fdb6fd5) SHA1(f40916112365de258956ec033aff79aae1f58690) )
+ROM_END
+
+
+ROM_START( fcockt_13 ) // 081124 lottery
+	ROM_REGION( 0x40000, "maincpu", 0 ) // z80 code, banked
+	ROM_LOAD( "fc_l_081124.rom", 0x00000, 0x40000, SHA1(896252194f32842f784463668e6416cbfe9687a0) )
+
+	ROM_REGION( 0x400000, "gfx", 0 )
+	ROM_LOAD( "fruitcocktail_loto.001", 0x000000, 0x80000, SHA1(bb2b518dc166836f7cedd4ec443b50687e8927e1) ) // Only this set is listed as official hashes
+	ROM_LOAD( "fruitcocktail_loto.002", 0x100000, 0x80000, SHA1(2621e2644ebec3959c49905c54eb20a83d5a7bd6) )
+	ROM_LOAD( "fruitcocktail_loto.003", 0x200000, 0x80000, SHA1(ffe11deef6b3b86b4b78e2e4d96c30f820e77971) )
+	ROM_LOAD( "fruitcocktail_loto.004", 0x300000, 0x80000, SHA1(fa88d113721ce7c0b3418614cd6bb974c20df644) )
+	ROM_LOAD( "fruitcocktail_m.005",    0x080000, 0x80000, CRC(f0176b60) SHA1(f764aea00ed306a28cacc62f8d2db9cc42895db8) )
+	ROM_LOAD( "fruitcocktail_m.006",    0x180000, 0x80000, CRC(ef24f255) SHA1(6ff924627c179868a25f180f79cd57182b72d9d4) )
+	ROM_LOAD( "fruitcocktail_m.007",    0x280000, 0x80000, CRC(20f87a15) SHA1(cb60866a3543668f3592c270b445dee881d78128) )
+	ROM_LOAD( "fruitcocktail_m.008",    0x380000, 0x80000, CRC(d282e42e) SHA1(eac9c3eaef39b1805f863ade5da47d6274d20a55) )
+ROM_END
+
+
+ROM_START( lhaunt_9 ) // 081208 lottery
+	ROM_REGION( 0x40000, "maincpu", 0 ) // z80 code, banked
+	ROM_LOAD( "lh_l_081208.rom", 0x00000, 0x40000, SHA1(4962bfc9c3aadd45fdb30bb159aaaed463e4d06b) )
+
+	ROM_REGION( 0x400000, "gfx", 0 )
+	ROM_LOAD( "luckyhaunter_loto.001",   0x000000, 0x80000, SHA1(961f832654f2cdb844e36a1a9034b87b5e3750f5) )
+	ROM_LOAD( "luckyhaunter_loto.002",   0x100000, 0x80000, SHA1(20ac980f4f8b502773845d2e1350b960ea707d83) )
+	ROM_LOAD( "luckyhaunter_loto.003",   0x200000, 0x80000, SHA1(e4cf08104e7717d9706105ad52ade6bf9a782d76) )
+	ROM_LOAD( "luckyhaunter_loto.004",   0x300000, 0x80000, SHA1(ceb4a5e9912f5d98483cb75e871c925dffbb8e72) )
+	ROM_LOAD( "luckyhaunter_m.005",      0x080000, 0x80000, CRC(b50c90a3) SHA1(74749f4ffb5b0630631b511fc3230c6e7b50dc3b) )
+	ROM_LOAD( "luckyhaunter_m.006",      0x180000, 0x80000, CRC(4eaaab64) SHA1(9fed16f8e0308200fd16c4b1e511e1bf6c22ae66) )
+	ROM_LOAD( "luckyhaunter_m.007",      0x280000, 0x80000, CRC(64d16ba9) SHA1(3b897183d6e0f1256be7657441f234fc72077682) )
+	ROM_LOAD( "luckyhaunter_m.008",      0x380000, 0x80000, CRC(1bdf6252) SHA1(7b5ae82a95a744b236e109024d47b526dccf9c14) )
+ROM_END
+
+
+ROM_START( garage_8 ) // 081229 lottery
+	ROM_REGION( 0x40000, "maincpu", 0 ) // z80 code, banked
+	ROM_LOAD( "gg_l_081229.rom", 0x00000, 0x40000, SHA1(6bc22aeb6d8d5ffbc556d9056a25e6506bb8f118) )
+
+	ROM_REGION( 0x400000, "gfx", 0 )
+	ROM_LOAD( "garage_loto.001", 0x000000, 0x80000, SHA1(50de46c4ae28f70c96da03391446cca0cb91f43b) )
+	ROM_LOAD( "garage_loto.002", 0x100000, 0x80000, SHA1(df5c1684f1a29f77a3fa79b35a9a0b9371c1b8a3) )
+	ROM_LOAD( "garage_loto.003", 0x200000, 0x80000, SHA1(47e81aa034c1ac717b1715c521cbaa8ff4d336c5) )
+	ROM_LOAD( "garage_loto.004", 0x300000, 0x80000, SHA1(71dbcd71ee5bddeda77a012c243981e0960e0c9e) )
+	ROM_LOAD( "garage_m.005",    0x080000, 0x80000, CRC(5bf85bc5) SHA1(ff9d2b9cbcd2af6f5fda972e387820d830c196a9) )
+	ROM_LOAD( "garage_m.006",    0x180000, 0x80000, CRC(e5082b26) SHA1(6547409d39dd51498ce8e3f82ff813a8ac3c6522) )
+	ROM_LOAD( "garage_m.007",    0x280000, 0x80000, CRC(dfa2ceb1) SHA1(ec7de8a8f6e7785a563df973841cc1f1603f79fc) )
+	ROM_LOAD( "garage_m.008",    0x380000, 0x80000, CRC(90c5416b) SHA1(583bfb517bc2e30d7b7903aa19fc3b4b5188d7d2) )
+ROM_END
+
+ROM_START( rclimb_6 ) // 090217 lottery
+	ROM_REGION( 0x40000, "maincpu", 0 ) // z80 code, banked
+	ROM_LOAD( "rc_l_090217.rom", 0x00000, 0x40000, SHA1(587be46d846fa7288227179bacedcc1ad5c2cd67) )
+
+	ROM_REGION( 0x400000, "gfx", 0 )
+	ROM_LOAD( "rockclimber_loto.001", 0x000000, 0x80000, SHA1(50fd1548e9f6736c5bb34d75ebd36e233e8773c2) )
+	ROM_LOAD( "rockclimber_loto.002", 0x100000, 0x80000, SHA1(50b4807becf3386ce7f4492f71f833973bf764d0) )
+	ROM_LOAD( "rockclimber_loto.003", 0x200000, 0x80000, SHA1(ab3401f624fa6b5ef2fe0dcdd0dc94b7a0eabece) )
+	ROM_LOAD( "rockclimber_loto.004", 0x300000, 0x80000, SHA1(e34b17e323542b368f8613cf2bc42a0c3b98fd29) )
+	ROM_LOAD( "rockclimber_m.005",    0x080000, 0x80000, CRC(ea127c3d) SHA1(a6391eed69a4723b68d727f59b6baebe51633e66) )
+	ROM_LOAD( "rockclimber_m.006",    0x180000, 0x80000, CRC(277fa273) SHA1(6320e6c5b5e48dc451cc48189054c42d85e8ccc1) )
+	ROM_LOAD( "rockclimber_m.007",    0x280000, 0x80000, CRC(3ca7f69a) SHA1(878cca181d915dc3548d5285a4bbb51aef31a64e) )
+	ROM_LOAD( "rockclimber_m.008",    0x380000, 0x80000, CRC(8cf6b4c2) SHA1(4c36c217b83c82acfdd615f5547bf597af7b8833) )
+ROM_END
+
+ROM_START( resdnt_4 ) // 090129 lottery
+	ROM_REGION( 0x40000, "maincpu", 0 ) // z80 code, banked
+	ROM_LOAD( "rs_l_090129.rom", 0x00000, 0x40000, SHA1(5728b019241359d83abc117157ebf62a52457917) )
+
+	ROM_REGION( 0x400000, "gfx", 0 )
+	ROM_LOAD( "resident_loto.001", 0x000000, 0x80000, SHA1(acd8b424cab982e471c7d3a56ccd6e1720fd8ceb) )
+	ROM_LOAD( "resident_loto.002", 0x100000, 0x80000, SHA1(83b9cf3a28e93e31d3a5cff01e5d0b9356e112cf) )
+	ROM_LOAD( "resident_loto.003", 0x200000, 0x80000, SHA1(30ccd372f1a5ad9a600099cf1ac31d9b235f88b9) )
+	ROM_LOAD( "resident_loto.004", 0x300000, 0x80000, SHA1(acfec89793a591d32a90bb7ba82514d97b2652f8) )
+	ROM_LOAD( "resident_m.005",    0x080000, 0x80000, CRC(0cfe7d44) SHA1(9f0e4925e815ff9f79188f18e78c0a7b377daa3f) )
+	ROM_LOAD( "resident_m.006",    0x180000, 0x80000, CRC(7437904f) SHA1(630c79cd6a990ce7658a1ffabba5a27efba985a1) )
+	ROM_LOAD( "resident_m.007",    0x280000, 0x80000, CRC(6e94728a) SHA1(ab414879cb957d9bc8d653b5e3bb2bbf91139ec0) )
+	ROM_LOAD( "resident_m.008",    0x380000, 0x80000, CRC(a9f55043) SHA1(4771df3d45bdc0a21b1c479f45e09ac5bab6c94f) )
+ROM_END
+
+ROM_START( resdnt_7 ) // 100311 lottery
+	ROM_REGION( 0x40000, "maincpu", 0 ) // z80 code, banked
+	ROM_LOAD( "rs_l_100311.rom", 0x00000, 0x40000, CRC(9969562e) SHA1(08052c1e9f3415ac005e5f67411e15d0c8f7450e) )
+
+	ROM_REGION( 0x400000, "gfx", 0 )
+	ROM_LOAD( "resident_loto.001", 0x000000, 0x80000, SHA1(acd8b424cab982e471c7d3a56ccd6e1720fd8ceb) )
+	ROM_LOAD( "resident_loto.002", 0x100000, 0x80000, SHA1(83b9cf3a28e93e31d3a5cff01e5d0b9356e112cf) )
+	ROM_LOAD( "resident_loto.003", 0x200000, 0x80000, SHA1(30ccd372f1a5ad9a600099cf1ac31d9b235f88b9) )
+	ROM_LOAD( "resident_loto.004", 0x300000, 0x80000, SHA1(acfec89793a591d32a90bb7ba82514d97b2652f8) )
+	ROM_LOAD( "resident_m.005",    0x080000, 0x80000, CRC(0cfe7d44) SHA1(9f0e4925e815ff9f79188f18e78c0a7b377daa3f) )
+	ROM_LOAD( "resident_m.006",    0x180000, 0x80000, CRC(7437904f) SHA1(630c79cd6a990ce7658a1ffabba5a27efba985a1) )
+	ROM_LOAD( "resident_m.007",    0x280000, 0x80000, CRC(6e94728a) SHA1(ab414879cb957d9bc8d653b5e3bb2bbf91139ec0) )
+	ROM_LOAD( "resident_m.008",    0x380000, 0x80000, CRC(a9f55043) SHA1(4771df3d45bdc0a21b1c479f45e09ac5bab6c94f) )
+ROM_END
+
+
+ROM_START( gnome_6 ) // 090604 lottery
+	ROM_REGION( 0x40000, "maincpu", 0 ) // z80 code, banked
+	ROM_LOAD( "gn_l_090604.rom", 0x00000, 0x40000, SHA1(5c736c974011980b343cf131b54f00aede5ef0ef) )
+
+	ROM_REGION( 0x400000, "gfx", 0 )
+	ROM_LOAD( "gnome_loto.001", 0x000000, 0x80000, CRC(15f75190) SHA1(85587a008889b5e34f5f79ceb1abfcd9a6c53cec) )
+	ROM_LOAD( "gnome_loto.002", 0x100000, 0x80000, CRC(26f9af6a) SHA1(131b26e035b4cfd9d36ab8a7f2957e77170a529d) )
+	ROM_LOAD( "gnome_loto.003", 0x200000, 0x80000, CRC(7d388bd5) SHA1(2f2eadc44f35033d61dbab390a4dbfec23f31c85) )
+	ROM_LOAD( "gnome_loto.004", 0x300000, 0x80000, CRC(7bad4ac5) SHA1(2cfac6462b666b4bb0d546932b6784a80cf8d0d4) )
+	ROM_LOAD( "gnome_loto.005", 0x080000, 0x80000, CRC(f86a7d02) SHA1(1e7da8ac89eb8b1d2c293d2cfead7a52524fc674) )
+	ROM_LOAD( "gnome_loto.006", 0x180000, 0x80000, CRC(d66f1ab8) SHA1(27b612ab42008f8673a0508a1b813c63a0e2ba4c) )
+	ROM_LOAD( "gnome_loto.007", 0x280000, 0x80000, CRC(99ae985c) SHA1(f0fe5a0dbc289a93246a825f32a726cf62ccb9aa) )
+	ROM_LOAD( "gnome_loto.008", 0x380000, 0x80000, CRC(4dc3f777) SHA1(3352170877c59daff63c056dfca00915f87b5795) )
+ROM_END
+
+
+//GAME( 2003, czmon_10,   czmon_13,   igrosoft_gamble, igrosoft_gamble, driver_device,  empty_init,            ROT0, "Igrosoft", "Crazy Monkey (081027 Lottery)", MACHINE_SUPPORTS_SAVE ) // Lottery
+//GAME( 2003, czmon_11,   czmon_13,   igrosoft_gamble, igrosoft_gamble, driver_device,  empty_init,            ROT0, "Igrosoft", "Crazy Monkey (081113 Lottery)", MACHINE_SUPPORTS_SAVE ) // Lottery
+//GAME( 2003, czmon_14,   czmon_13,   igrosoft_gamble, igrosoft_gamble, driver_device,  empty_init,            ROT0, "Igrosoft", "Crazy Monkey (100311 Lottery)", MACHINE_SUPPORTS_SAVE ) // Lottery
+
+//GAME( 2003, fcockt_13,   fcockt_8,   igrosoft_gamble, igrosoft_gamble, driver_device,  empty_init,           ROT0, "Igrosoft", "Fruit Cocktail (081124 Lottery)", MACHINE_SUPPORTS_SAVE ) // Lottery
+
+//GAME( 2003, lhaunt_9,    lhaunt_6,   igrosoft_gamble, igrosoft_gamble, driver_device,  empty_init,           ROT0, "Igrosoft", "Lucky Haunter (081208 Lottery)", MACHINE_SUPPORTS_SAVE ) // Lottery
+
+//GAME( 2004, garage_8,    garage_5,   igrosoft_gamble, igrosoft_gamble, driver_device,  empty_init,           ROT0, "Igrosoft", "Garage (081229 Lottery)", MACHINE_SUPPORTS_SAVE ) // Lottery
+
+//GAME( 2004, rclimb_6,    rclimb_3,   igrosoft_gamble, igrosoft_gamble, driver_device,  empty_init,           ROT0, "Igrosoft", "Rock Climber (090217 Lottery)", MACHINE_SUPPORTS_SAVE ) // Lottery
+
+//GAME( 2004, resdnt_4,    resdnt_6,   igrosoft_gamble, igrosoft_gamble, driver_device,  empty_init,           ROT0, "Igrosoft", "Resident (090129 Lottery)", MACHINE_SUPPORTS_SAVE ) // Lottery
+//GAME( 2004, resdnt_7,    resdnt_6,   igrosoft_gamble, igrosoft_gamble, driver_device,  empty_init,           ROT0, "Igrosoft", "Resident (100311 Lottery)", MACHINE_SUPPORTS_SAVE ) // Lottery
+
+//GAME( 2007, gnome_6,     gnome_9,    igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_gnomel,   ROT0, "Igrosoft", "Gnome (090604 Lottery)", MACHINE_SUPPORTS_SAVE ) // Lottery
+
+#endif

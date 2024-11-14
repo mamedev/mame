@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Frank Palazzolo, Ryan Holtz
-#ifndef MAME_INCLUDES_STARCRUS_H
-#define MAME_INCLUDES_STARCRUS_H
+#ifndef MAME_RAMTEK_STARCRUS_H
+#define MAME_RAMTEK_STARCRUS_H
 
 #pragma once
 
@@ -41,8 +41,8 @@ private:
 	void proj_parm_2_w(uint8_t data);
 	uint8_t coll_det_r();
 
-	virtual void machine_start() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -77,12 +77,12 @@ private:
 	int collision_check_s1p1p2();
 	int collision_check_s2p1p2();
 
-	void starcrus_io_map(address_map &map);
-	void starcrus_map(address_map &map);
+	void starcrus_io_map(address_map &map) ATTR_COLD;
+	void starcrus_map(address_map &map) ATTR_COLD;
 
 	required_device_array<netlist_mame_logic_input_device, 2> m_explode;
 	required_device_array<netlist_mame_logic_input_device, 2> m_launch;
 	required_device_array<netlist_mame_logic_input_device, 2> m_engine;
 };
 
-#endif // MAME_INCLUDES_STARCRUS_H
+#endif // MAME_RAMTEK_STARCRUS_H

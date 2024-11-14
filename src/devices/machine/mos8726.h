@@ -63,14 +63,14 @@ public:
 	uint8_t read(offs_t offset);
 	void write(offs_t offset, uint8_t data);
 
-	DECLARE_WRITE_LINE_MEMBER( bs_w );
+	void bs_w(int state);
 
 	int romsel_r(int roml, int romh);
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 	virtual void execute_run() override;
 
 	int m_icount;

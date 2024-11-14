@@ -1426,7 +1426,7 @@ void lucky74_state::sound_start()
 	m_adpcm_busy_line = 0x01;    // free and ready
 }
 
-WRITE_LINE_MEMBER(lucky74_state::adpcm_int)
+void lucky74_state::adpcm_int(int state)
 {
 	if (m_adpcm_reg[05] == 0x01) // register 0x05 (bit 0 activated), trigger the sample
 	{

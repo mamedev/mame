@@ -765,7 +765,7 @@ u16 tc0080vco_device::scrram_r(int offset)
 	return m_scroll_ram[offset];
 }
 
-READ_LINE_MEMBER( tc0080vco_device::flipscreen_r )
+int tc0080vco_device::flipscreen_r()
 {
 	return m_flipscreen;
 }

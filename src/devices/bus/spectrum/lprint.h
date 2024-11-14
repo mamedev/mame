@@ -27,26 +27,26 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// optional information overrides
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 
 	virtual void pre_opcode_fetch(offs_t offset) override;
 	virtual void pre_data_fetch(offs_t offset) override;
 	virtual uint8_t mreq_r(offs_t offset) override;
 	virtual uint8_t iorq_r(offs_t offset) override;
 	virtual void iorq_w(offs_t offset, uint8_t data) override;
-	virtual DECLARE_READ_LINE_MEMBER(romcs) override;
+	virtual bool romcs() override;
 
-	DECLARE_WRITE_LINE_MEMBER(busy_w) { m_busy = state; }
+	void busy_w(int state) { m_busy = state; }
 
 	required_memory_region m_rom;
 	required_device<centronics_device> m_centronics;
 
-	int m_romcs;
+	bool m_romcs;
 	int m_busy;
 };
 
@@ -61,17 +61,17 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// optional information overrides
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 
 	virtual uint8_t mreq_r(offs_t offset) override;
 	virtual uint8_t iorq_r(offs_t offset) override;
 	virtual void iorq_w(offs_t offset, uint8_t data) override;
-	virtual DECLARE_READ_LINE_MEMBER(romcs) override;
+	virtual bool romcs() override;
 
 	// passthru
 	virtual void pre_opcode_fetch(offs_t offset) override { m_exp->pre_opcode_fetch(offset); }
@@ -80,14 +80,14 @@ protected:
 	virtual void post_data_fetch(offs_t offset) override { m_exp->post_data_fetch(offset); }
 	virtual void mreq_w(offs_t offset, uint8_t data) override { if (m_exp->romcs()) m_exp->mreq_w(offset, data); }
 
-	DECLARE_WRITE_LINE_MEMBER(busy_w) { m_busy = state; }
+	void busy_w(int state) { m_busy = state; }
 
 	required_memory_region m_rom;
 	required_device<centronics_device> m_centronics;
 	required_device<rs232_port_device> m_rs232;
 	required_device<spectrum_expansion_slot_device> m_exp;
 
-	int m_romcs;
+	bool m_romcs;
 	int m_busy;
 };
 
@@ -102,16 +102,16 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// optional information overrides
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 	virtual uint8_t iorq_r(offs_t offset) override;
 	virtual void iorq_w(offs_t offset, uint8_t data) override;
 
-	DECLARE_WRITE_LINE_MEMBER(busy_w) { m_busy = state; }
+	void busy_w(int state) { m_busy = state; }
 
 	required_device<centronics_device> m_centronics;
 
@@ -131,27 +131,27 @@ protected:
 	spectrum_kempcentre_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// optional information overrides
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 
 	virtual void pre_opcode_fetch(offs_t offset) override;
 	virtual void pre_data_fetch(offs_t offset) override;
 	virtual uint8_t mreq_r(offs_t offset) override;
 	virtual uint8_t iorq_r(offs_t offset) override;
 	virtual void iorq_w(offs_t offset, uint8_t data) override;
-	virtual DECLARE_READ_LINE_MEMBER(romcs) override;
+	virtual bool romcs() override;
 
-	DECLARE_WRITE_LINE_MEMBER(busy_w) { m_busy = state; }
+	void busy_w(int state) { m_busy = state; }
 
 	required_memory_region m_rom;
 	required_device<centronics_device> m_centronics;
 
 	int m_active;
-	int m_romcs;
+	bool m_romcs;
 	int m_busy;
 };
 
@@ -164,10 +164,10 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 	// optional information overrides
-	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 
 	virtual void pre_opcode_fetch(offs_t offset) override;
 	virtual uint8_t iorq_r(offs_t offset) override;

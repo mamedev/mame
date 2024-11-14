@@ -13,6 +13,9 @@ Skeleton driver for Data General Dasher 400 series terminals.
 #include "video/crt9007.h"
 #include "screen.h"
 
+
+namespace {
+
 class d400_state : public driver_device
 {
 public:
@@ -28,7 +31,7 @@ private:
 
 	u8 novram_recall_r();
 	u8 novram_store_r();
-	void mem_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<x2210_device> m_novram;
@@ -112,5 +115,8 @@ ROM_START( d461 )
 	ROM_REGION(0x10000, "maincpu", 0)
 	ROM_LOAD( "dgc_100_5776-05.bin", 0x0000, 0x8000, CRC(fdce2132) SHA1(82eac1751c31f99d4490505e16af5e7e7a52b310) )
 ROM_END
+
+} // anonymous namespace
+
 
 COMP( 1986, d461, 0, 0, d461, d461, d400_state, empty_init, "Data General", "Dasher D461", MACHINE_IS_SKELETON )

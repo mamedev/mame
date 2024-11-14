@@ -29,6 +29,9 @@
 #include "emupal.h"
 #include "screen.h"
 
+
+namespace {
+
 class att610_state : public driver_device
 {
 public:
@@ -44,16 +47,16 @@ public:
 	void att610(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	void cart_select_w(u8 data);
 
-	void mem_map(address_map &map);
-	void io_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
+	void io_map(address_map &map) ATTR_COLD;
 
 	required_device<z80_device> m_maincpu;
 	required_device<z80sio_device> m_sio;
@@ -180,6 +183,9 @@ ROM_START( att615 )
 	ROM_REGION(0x1000, "keyboard", 0)
 	ROM_LOAD("20417-21_8031.bin", 0x0000, 0x1000, CRC(c48b4a2a) SHA1(f01dadc0239f81a58d50ae077f5cb3a029bad110))
 ROM_END
+
+} // anonymous namespace
+
 
 COMP(1986, att610, 0, 0, att610, att610, att610_state, empty_init, "AT&T", "610 Business Communication Terminal", MACHINE_IS_SKELETON)
 COMP(1987, att615, 0, 0, att610, att610, att610_state, empty_init, "AT&T", "615 MT", MACHINE_IS_SKELETON)

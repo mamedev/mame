@@ -14,12 +14,13 @@ public:
 	}
 	smbus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
+	void map(address_map &map) ATTR_COLD;
+
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 private:
-	void map(address_map &map);
 
 	uint8_t hst_sts_r();
 	void hst_sts_w(uint8_t data);

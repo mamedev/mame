@@ -36,13 +36,13 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// optional information overrides
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual const tiny_rom_entry *device_rom_region() const override;
-	virtual ioport_constructor device_input_ports() const override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 
 	virtual uint8_t read(offs_t offset, int inhrom, int inhram, int be) override;
 	virtual void write(offs_t offset, uint8_t data, int inhrom, int inhram, int be) override;
@@ -50,18 +50,18 @@ protected:
 private:
 	enum { IRQ_VIA_0, IRQ_VIA_1, IRQ_ACIA };
 
-	DECLARE_WRITE_LINE_MEMBER(bus_irq_w);
-	DECLARE_WRITE_LINE_MEMBER(bus_so_w);
+	void bus_irq_w(int state);
+	void bus_so_w(int state);
 	TIMER_DEVICE_CALLBACK_MEMBER(read_cassette);
 	uint8_t via_0_in_a();
 	void via_0_out_a(uint8_t data);
 	void via_0_out_b(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(via_0_out_ca2);
-	DECLARE_WRITE_LINE_MEMBER(via_0_out_cb2);
+	void via_0_out_ca2(int state);
+	void via_0_out_cb2(int state);
 	void via_1_out_a(uint8_t data);
 	void via_1_out_b(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(via_1_out_ca2);
-	DECLARE_WRITE_LINE_MEMBER(via_1_out_cb2);
+	void via_1_out_ca2(int state);
+	void via_1_out_cb2(int state);
 
 	required_memory_region m_rom_tanex;
 	required_memory_region m_rom_h2;

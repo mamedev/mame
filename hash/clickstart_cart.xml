@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <!--
-license:CC0
+license:CC0-1.0
 
 It is unclear how to calculate the checksum that's stored as ASCII at the start of some of these, however there is a secondary checksum in a footer area at the end that works out correctly, so the ROMs should be good
 -->

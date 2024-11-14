@@ -18,16 +18,16 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// optional information overrides
-	virtual const tiny_rom_entry *device_rom_region() const override;
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 private:
-	DECLARE_READ_LINE_MEMBER(bio_line_r);
-	DECLARE_WRITE_LINE_MEMBER(clock_w);
+	int bio_line_r();
+	void clock_w(int state);
 
 	void write(offs_t offset, uint8_t data);
 	uint8_t read(offs_t offset);
@@ -45,16 +45,16 @@ private:
 	void output_ctl_w(uint16_t data);
 	void irq_line_w(uint16_t data);
 
-	void dectalk_cpu_io(address_map &map);
-	void dectalk_cpu_map(address_map &map);
-	void dectalk_dsp_io(address_map &map);
-	void dectalk_dsp_map(address_map &map);
+	void dectalk_cpu_io(address_map &map) ATTR_COLD;
+	void dectalk_cpu_map(address_map &map) ATTR_COLD;
+	void dectalk_dsp_io(address_map &map) ATTR_COLD;
+	void dectalk_dsp_map(address_map &map) ATTR_COLD;
 
 	uint16_t m_cmd, m_stat, m_data, m_dsp_dma, m_ctl;
 	uint8_t m_dma, m_vol, m_bio;
 
 	required_device<i80186_cpu_device> m_cpu;
-	required_device<dac_12bit_r2r_device> m_dac;
+	required_device<dac_12bit_r2r_twos_complement_device> m_dac;
 	required_device<tms32015_device> m_dsp;
 };
 

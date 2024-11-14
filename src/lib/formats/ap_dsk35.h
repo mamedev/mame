@@ -13,17 +13,6 @@
 #pragma once
 
 #include "flopimg.h"
-#include "flopimg_legacy.h"
-
-void sony_filltrack(uint8_t *buffer, size_t buffer_len, size_t *pos, uint8_t data);
-uint8_t sony_fetchtrack(const uint8_t *buffer, size_t buffer_len, size_t *pos);
-
-int apple35_sectors_per_track(floppy_image_legacy *image, int track);
-
-/**************************************************************************/
-
-LEGACY_FLOPPY_OPTIONS_EXTERN(apple35_mac);
-LEGACY_FLOPPY_OPTIONS_EXTERN(apple35_iigs);
 
 class dc42_format : public floppy_image_format_t
 {
@@ -31,13 +20,13 @@ public:
 	dc42_format();
 
 	virtual int identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants) const override;
-	virtual bool load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image) const override;
-	virtual bool save(util::random_read_write &io, const std::vector<uint32_t> &variants, floppy_image *image) const override;
+	virtual bool load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image &image) const override;
+	virtual bool save(util::random_read_write &io, const std::vector<uint32_t> &variants, const floppy_image &image) const override;
 
-	virtual const char *name() const override;
-	virtual const char *description() const override;
-	virtual const char *extensions() const override;
-	virtual bool supports_save() const override;
+	virtual const char *name() const noexcept override;
+	virtual const char *description() const noexcept override;
+	virtual const char *extensions() const noexcept override;
+	virtual bool supports_save() const noexcept override;
 
 private:
 	static void update_chk(const uint8_t *data, int size, uint32_t &chk);
@@ -51,13 +40,13 @@ public:
 	apple_gcr_format();
 
 	virtual int identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants) const override;
-	virtual bool load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image) const override;
-	virtual bool save(util::random_read_write &io, const std::vector<uint32_t> &variants, floppy_image *image) const override;
+	virtual bool load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image &image) const override;
+	virtual bool save(util::random_read_write &io, const std::vector<uint32_t> &variants, const floppy_image &image) const override;
 
-	virtual const char *name() const override;
-	virtual const char *description() const override;
-	virtual const char *extensions() const override;
-	virtual bool supports_save() const override;
+	virtual const char *name() const noexcept override;
+	virtual const char *description() const noexcept override;
+	virtual const char *extensions() const noexcept override;
+	virtual bool supports_save() const noexcept override;
 };
 
 extern const apple_gcr_format FLOPPY_APPLE_GCR_FORMAT;
@@ -68,13 +57,13 @@ public:
 	apple_2mg_format();
 
 	virtual int identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants) const override;
-	virtual bool load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image) const override;
-	virtual bool save(util::random_read_write &io, const std::vector<uint32_t> &variants, floppy_image *image) const override;
+	virtual bool load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image &image) const override;
+	virtual bool save(util::random_read_write &io, const std::vector<uint32_t> &variants, const floppy_image &image) const override;
 
-	virtual const char *name() const override;
-	virtual const char *description() const override;
-	virtual const char *extensions() const override;
-	virtual bool supports_save() const override;
+	virtual const char *name() const noexcept override;
+	virtual const char *description() const noexcept override;
+	virtual const char *extensions() const noexcept override;
+	virtual bool supports_save() const noexcept override;
 };
 
 extern const apple_2mg_format FLOPPY_APPLE_2MG_FORMAT;

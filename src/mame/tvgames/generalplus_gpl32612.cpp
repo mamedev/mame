@@ -23,13 +23,15 @@
 #include "emu.h"
 
 #include "cpu/arm7/arm7.h"
-#include "cpu/arm7/arm7core.h"
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
 #include "softlist_dev.h"
 
 #include "screen.h"
 #include "speaker.h"
+
+
+namespace {
 
 class generalplus_gpl32612_game_state : public driver_device
 {
@@ -43,12 +45,13 @@ public:
 	void gpl32612(machine_config &config);
 
 	void nand_init840();
+	void nand_init880();
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
-	void arm_map(address_map &map);
+	void arm_map(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<screen_device> m_screen;
@@ -82,7 +85,7 @@ public:
 	void zippity(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load);
 
@@ -198,12 +201,12 @@ void generalplus_zippity_game_state::machine_start()
 
 DEVICE_IMAGE_LOAD_MEMBER(generalplus_zippity_game_state::cart_load)
 {
-	uint32_t size = m_cart->common_get_size("rom");
+	uint32_t const size = m_cart->common_get_size("rom");
 
 	m_cart->rom_alloc(size, GENERIC_ROM16_WIDTH, ENDIANNESS_LITTLE);
 	m_cart->common_load_rom(m_cart->get_rom_base(), size, "rom");
 
-	return image_init_result::PASS;
+	return std::make_pair(std::error_condition(), std::string());
 }
 
 
@@ -262,14 +265,40 @@ ROM_END
 
 // uncertain hardware type, ARM based, has GPNAND strings
 ROM_START( zippity )
-	ROM_REGION( 0x10800000, "nandrom", ROMREGION_ERASE00 )
+	ROM_REGION( 0x10800000, "nand", ROMREGION_ERASE00 )
 	ROM_LOAD( "zippity_mt29f2g08aacwp_2cda8015.bin", 0x0000, 0x10800000, CRC(16248b63) SHA1(3607337588a68052ef5c495b496aa3e0449d3eb6) )
 ROM_END
 
 ROM_START( zippityuk )
-	ROM_REGION( 0x10800000, "nandrom", ROMREGION_ERASE00 )
+	ROM_REGION( 0x10800000, "nand", ROMREGION_ERASE00 )
 	ROM_LOAD( "29f2c08aacwp.u2", 0x0000, 0x10800000, CRC(27d172ae) SHA1(9ade19d7aa28fba13581e6879b39e3a7702260b0) )
 ROM_END
+
+ROM_START( kidizmp )
+	ROM_REGION( 0x10800000, "nand", ROMREGION_ERASE00 )
+	ROM_LOAD( "s34ml02g1_withspare.u13", 0x0000, 0x10800000, CRC(c5d55bdc) SHA1(073fc3fd56c532750b4e2020abe27d3448999d56) )
+ROM_END
+
+ROM_START( kidizmb )
+	ROM_REGION(  0x8400000, "nand", ROMREGION_ERASE00 )
+	ROM_LOAD( "hy27uf081g2a_withspare.bin", 0x0000, 0x8400000, CRC(b87861c4) SHA1(8b5cc2557b54a37928be818430b91c48db98758f) )
+ROM_END
+
+ROM_START( pocketmp )
+	ROM_REGION(  0x8800000, "nand", ROMREGION_ERASE00 )
+	ROM_LOAD( "tc58nvg0s3hta00.u3", 0x0000, 0x8800000, CRC(aabf2deb) SHA1(ee3118377c21b1fb28ff262484c9b587b394bd80) )
+ROM_END
+
+ROM_START( pocketmr )
+	ROM_REGION(  0x8800000, "nand", ROMREGION_ERASE00 )
+	ROM_LOAD( "tc58nvg0s3hta00_withspare.u6", 0x0000, 0x8800000, CRC(ec839dde) SHA1(18b77c7e1cf3c66787ccfde9f450671e3d1b0e36) )
+ROM_END
+
+ROM_START( sanxpet )
+	ROM_REGION(  0x800000, "spi", ROMREGION_ERASE00 )
+	ROM_LOAD( "25l64.u1", 0x0000, 0x800000, CRC(f28b9fd3) SHA1(8ed4668f271cbe01065bc0836e49ce70faf10834) )
+ROM_END
+
 
 void generalplus_gpl32612_game_state::nand_init(int blocksize, int blocksize_stripped)
 {
@@ -294,10 +323,8 @@ void generalplus_gpl32612_game_state::nand_init(int blocksize, int blocksize_str
 	// debug to allow for easy use of unidasm.exe
 	if (0)
 	{
-		FILE *fp;
-		char filename[256];
-		sprintf(filename,"stripped_%s", machine().system().name);
-		fp=fopen(filename, "w+b");
+		auto filename = "stripped_" + std::string(machine().system().name);
+		auto fp = fopen(filename.c_str(), "w+b");
 		if (fp)
 		{
 			fwrite(&m_strippedrom[0], blocksize_stripped * numblocks, 1, fp);
@@ -312,6 +339,14 @@ void generalplus_gpl32612_game_state::nand_init840()
 	bootstrap();
 }
 
+void generalplus_gpl32612_game_state::nand_init880()
+{
+	nand_init(0x880, 0x800);
+	bootstrap();
+}
+
+} // anonymous namespace
+
 
 //    year, name,         parent,  compat, machine,      input,        class,              init,       company,  fullname,                             flags
 CONS( 200?, jak_swbstrik,    0,       0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, nand_init840, "JAKKS Pacific Inc", "Star Wars Blaster Strike", MACHINE_IS_SKELETON )
@@ -324,3 +359,15 @@ CONS( 200?, jak_dchp,        0,       0,      gpl32612, gpl32612, generalplus_gp
 CONS( 201?, zippity,         0,       0,      zippity, gpl32612, generalplus_zippity_game_state, empty_init,  "LeapFrog",         "Zippity (US)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
 // TODO, check if code differs, or just unused areas of the NAND
 CONS( 201?, zippityuk,       zippity, 0,      zippity, gpl32612, generalplus_zippity_game_state, empty_init,  "LeapFrog",         "Zippity (UK)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+
+// GP32C01 (maybe, picture is unclear) - Camera for kids
+CONS( 2013, kidizmp,         0,        0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, empty_init,  "VTech",         "Kidizoom Connect (Germany, pink camera)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+// seems to be older tech, just glob + ROM, assuming it's a GP32 series based on above and due to having ARM code
+CONS( 201?, kidizmb,         0,        0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, empty_init,  "VTech",         "Kidizoom (Germany, blue camera)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+
+CONS( 2019, pocketmp,        0,        0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, nand_init880,  "Takara Tomy",        "Pocket Monsters PC",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+CONS( 2019, pocketmr,        0,        0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, nand_init880,  "Takara Tomy",        "Pocket Monsters Rotom Tablet",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+
+// uses GP327902, might not fit here, 2019 date from case
+// すみっコぐらし すみっコさがし
+CONS( 2019, sanxpet,         0,        0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, empty_init,  "San-X / Tomy",        "Sumikko Gurashi - Sumikko Sagashi",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)

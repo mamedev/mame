@@ -59,8 +59,8 @@ public:
 
 protected:
 	// device-specific overrides
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual void device_start() override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual void device_start() override ATTR_COLD;
 
 	// interface-specific overrides
 	virtual uint8_t register_read(offs_t offset) override;
@@ -93,7 +93,7 @@ void ss50_piaide_device::device_start()
 
 void ss50_piaide_device::device_add_mconfig(machine_config &config)
 {
-	PIA6821(config, m_pia, 0);
+	PIA6821(config, m_pia);
 	m_pia->readpa_handler().set(FUNC(ss50_piaide_device::pia_a_r));
 	m_pia->readpb_handler().set(FUNC(ss50_piaide_device::pia_b_r));
 	m_pia->writepa_handler().set(FUNC(ss50_piaide_device::pia_a_w));

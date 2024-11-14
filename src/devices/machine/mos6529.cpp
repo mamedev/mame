@@ -45,8 +45,6 @@ mos6529_device::mos6529_device(const machine_config &mconfig, const char *tag, d
 
 void mos6529_device::device_start()
 {
-	// resolve callbacks
-	m_p_handler.resolve_all_safe();
 }
 
 

@@ -31,7 +31,7 @@ public:
 	virtual void data_w(u8 data) override;
 
 	// reset line, active LOW
-	DECLARE_WRITE_LINE_MEMBER(reset_w);
+	void reset_w(int state);
 
 protected:
 	// internal state

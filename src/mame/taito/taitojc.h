@@ -137,19 +137,19 @@ private:
 	void taitojc_char_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 
 	TILE_GET_INFO_MEMBER(taitojc_tile_info);
-	virtual void machine_reset() override;
-	virtual void machine_start() override;
-	virtual void video_start() override;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 	uint32_t screen_update_taitojc(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_dendego(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(taitojc_vblank);
 	void draw_object(bitmap_ind16 &bitmap, const rectangle &cliprect, uint32_t w1, uint32_t w2, uint8_t bank_type);
 	void draw_object_bank(bitmap_ind16 &bitmap, const rectangle &cliprect, uint8_t bank_type, uint8_t pri);
 
-	void dendego_map(address_map &map);
-	void hc11_pgm_map(address_map &map);
-	void taitojc_map(address_map &map);
-	void tms_data_map(address_map &map);
-	void tms_program_map(address_map &map);
-	void cpu_space_map(address_map &map);
+	void dendego_map(address_map &map) ATTR_COLD;
+	void hc11_pgm_map(address_map &map) ATTR_COLD;
+	void taitojc_map(address_map &map) ATTR_COLD;
+	void tms_data_map(address_map &map) ATTR_COLD;
+	void tms_program_map(address_map &map) ATTR_COLD;
+	void cpu_space_map(address_map &map) ATTR_COLD;
 };

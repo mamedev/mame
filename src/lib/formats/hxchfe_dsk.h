@@ -48,15 +48,15 @@ public:
 	hfe_format();
 
 	virtual int identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants) const override;
-	virtual bool load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image) const override;
+	virtual bool load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image &image) const override;
 
-	virtual const char *name() const override;
-	virtual const char *description() const override;
-	virtual const char *extensions() const override;
-	virtual bool supports_save() const override;
+	virtual const char *name() const noexcept override;
+	virtual const char *description() const noexcept override;
+	virtual const char *extensions() const noexcept override;
+	virtual bool supports_save() const noexcept override;
 
 private:
-	static void generate_track_from_hfe_bitstream(int track, int head, int samplelength, const uint8_t *trackbuf, int track_end, floppy_image *image);
+	static void generate_track_from_hfe_bitstream(int track, int head, int samplelength, const uint8_t *trackbuf, int track_end, floppy_image &image);
 
 	// Header fields from the HFE format
 	struct header_info {

@@ -1,6 +1,6 @@
 /*
- * Copyright 2010-2021 Branimir Karadzic. All rights reserved.
- * License: https://github.com/bkaradzic/bx#license-bsd-2-clause
+ * Copyright 2010-2022 Branimir Karadzic. All rights reserved.
+ * License: https://github.com/bkaradzic/bx/blob/master/LICENSE
  */
 
 #ifndef BX_ENDIAN_H_HEADER_GUARD
@@ -28,13 +28,13 @@ namespace bx
 	///
 	uint64_t endianSwap(uint64_t _in);
 
-	/// Input argument is encoded as little endian, convert it if neccessary
-	/// depending on host CPU endianess.
+	/// Input argument is encoded as little endian, convert it if necessary
+	/// depending on host CPU endianness.
 	template <typename Ty>
 	Ty toLittleEndian(const Ty _in);
 
-	/// Input argument is encoded as big endian, convert it if neccessary
-	/// depending on host CPU endianess.
+	/// Input argument is encoded as big endian, convert it if necessary
+	/// depending on host CPU endianness.
 	template <typename Ty>
 	Ty toBigEndian(const Ty _in);
 

@@ -223,9 +223,10 @@ To Do:
 ***************************************************************************/
 
 #include "emu.h"
-#include "subsino_m.h"
+#include "subsino_crypt.h"
 
 #include "cpu/z180/hd647180x.h"
+#include "cpu/z80/z80.h"
 #include "machine/i8255.h"
 #include "machine/nvram.h"
 #include "machine/ticket.h"
@@ -276,6 +277,8 @@ public:
 	void victor21(machine_config &config);
 	void sharkpy(machine_config &config);
 	void victor5(machine_config &config);
+	void newhunterb(machine_config &config);
+	void newhunterd(machine_config &config);
 
 	void init_stbsub();
 	void init_stisub();
@@ -288,14 +291,16 @@ public:
 	void init_crsbingo();
 	void init_victor21();
 	void init_victor5();
-	void init_tisuba();
 	void init_tisubb();
+	void init_newhunterb();
+	void init_newhunterc();
 	void init_sharkpye();
 	void init_tisub();
+	void init_grndprix();
 	void init_mtrainnv();
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	required_shared_ptr<uint8_t> m_colorram;
@@ -327,6 +332,7 @@ private:
 	uint8_t flash_r();
 	void flash_w(uint8_t data);
 	uint8_t hwcheck_r();
+	uint8_t out_c_r();
 	void out_c_w(uint8_t data);
 	void reel_scrollattr_w(offs_t offset, uint8_t data);
 	uint8_t reel_scrollattr_r(offs_t offset);
@@ -344,17 +350,20 @@ private:
 	uint32_t screen_update_reels(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_stbsub_reels(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void crsbingo_map(address_map &map);
-	void dinofmly_map(address_map &map);
-	void mtrainnv_map(address_map &map);
-	void ramdac_map(address_map &map);
-	void sharkpy_map(address_map &map);
-	void srider_map(address_map &map);
-	void stbsub_map(address_map &map);
-	void subsino_iomap(address_map &map);
-	void tisub_map(address_map &map);
-	void victor21_map(address_map &map);
-	void victor5_map(address_map &map);
+	void crsbingo_map(address_map &map) ATTR_COLD;
+	void dinofmly_map(address_map &map) ATTR_COLD;
+	void mtrainnv_map(address_map &map) ATTR_COLD;
+	void newhunterb_map(address_map &map) ATTR_COLD;
+	void newhunterd_map(address_map &map) ATTR_COLD;
+	void ramdac_map(address_map &map) ATTR_COLD;
+	void sharkpy_map(address_map &map) ATTR_COLD;
+	void srider_map(address_map &map) ATTR_COLD;
+	void stbsub_map(address_map &map) ATTR_COLD;
+	void subsino_iomap(address_map &map) ATTR_COLD;
+	void tisub_base_map(address_map &map) ATTR_COLD;
+	void tisub_map(address_map &map) ATTR_COLD;
+	void victor21_map(address_map &map) ATTR_COLD;
+	void victor5_map(address_map &map) ATTR_COLD;
 };
 
 void subsino_state::machine_start()
@@ -457,7 +466,6 @@ VIDEO_START_MEMBER(subsino_state, reels)
 	m_reel_tilemap[0]->set_scroll_cols(64);
 	m_reel_tilemap[1]->set_scroll_cols(64);
 	m_reel_tilemap[2]->set_scroll_cols(64);
-
 }
 
 VIDEO_START_MEMBER(subsino_state,stbsub)
@@ -641,10 +649,10 @@ void subsino_state::out_a_w(uint8_t data)
 	for (int i = 0; i < 8; i++) // Lamps 8 - 15
 		m_lamps[i + 8] = BIT(data, i);
 
-	machine().bookkeeping().coin_counter_w(0, data & 0x01 );    /* coin / keyin */
-	machine().bookkeeping().coin_counter_w(1, data & 0x02 );    /* keyin / coin */
-	machine().bookkeeping().coin_counter_w(2, data & 0x10 );    /* keyout */
-	machine().bookkeeping().coin_counter_w(3, data & 0x20 );    /* payout */
+	machine().bookkeeping().coin_counter_w(0, data & 0x01 );    // coin / keyin
+	machine().bookkeeping().coin_counter_w(1, data & 0x02 );    // keyin / coin
+	machine().bookkeeping().coin_counter_w(2, data & 0x10 );    // keyout
+	machine().bookkeeping().coin_counter_w(3, data & 0x20 );    // payout
 
 	m_hopper->motor_w(BIT(data, 5));   // hopper motor
 
@@ -826,19 +834,19 @@ void subsino_state::dinofmly_map(address_map &map)
 
 void subsino_state::sharkpy_map(address_map &map)
 {
-	map(0x00000, 0x13fff).rom(); //overlap unmapped regions
-	map(0x09800, 0x09fff).ram();
-	map(0x09000, 0x09002).r("ppi1", FUNC(i8255_device::read));
-	map(0x09004, 0x09006).r("ppi2", FUNC(i8255_device::read));
-	map(0x09009, 0x09009).w(FUNC(subsino_state::out_b_w));
-	map(0x0900a, 0x0900a).w(FUNC(subsino_state::out_a_w));
-	map(0x0900c, 0x0900c).portr("INC");
-	map(0x09016, 0x09017).w("ymsnd", FUNC(ym3812_device::write));
-	map(0x09018, 0x09018).w("oki", FUNC(okim6295_device::write));
-	map(0x0901b, 0x0901b).w(FUNC(subsino_state::tiles_offset_w));
-	map(0x07800, 0x07fff).ram();
-	map(0x08000, 0x087ff).ram().w(FUNC(subsino_state::colorram_w)).share("colorram");
-	map(0x08800, 0x08fff).ram().w(FUNC(subsino_state::videoram_w)).share("videoram");
+	map(0x06000, 0x0d7ff).rom().region("program", 0x6000);
+	map(0x0d800, 0x0dfff).ram();
+	map(0x0e000, 0x0e7ff).ram().w(FUNC(subsino_state::colorram_w)).share("colorram");
+	map(0x0e800, 0x0efff).ram().w(FUNC(subsino_state::videoram_w)).share("videoram");
+	map(0x0f000, 0x0f002).r("ppi1", FUNC(i8255_device::read));
+	map(0x0f004, 0x0f006).r("ppi2", FUNC(i8255_device::read));
+	map(0x0f009, 0x0f009).w(FUNC(subsino_state::out_b_w));
+	map(0x0f00a, 0x0f00a).w(FUNC(subsino_state::out_a_w));
+	map(0x0f00c, 0x0f00c).portr("INC");
+	map(0x0f016, 0x0f017).w("ymsnd", FUNC(ym3812_device::write));
+	map(0x0f018, 0x0f018).w("oki", FUNC(okim6295_device::write));
+	map(0x0f01b, 0x0f01b).w(FUNC(subsino_state::tiles_offset_w));
+	map(0x10000, 0x15fff).rom().region("program", 0);
 }
 
 /*
@@ -849,22 +857,21 @@ this event makes the game to reset without any money in the bank.
 
 void subsino_state::victor21_map(address_map &map)
 {
-	map(0x00000, 0x08fff).rom(); //overlap unmapped regions
-	map(0x09800, 0x09fff).ram();
-	map(0x09000, 0x09003).rw("ppi", FUNC(i8255_device::read), FUNC(i8255_device::write));
-	map(0x09004, 0x09004).portr("INA");
-	map(0x09005, 0x09005).portr("INB");
-	map(0x09006, 0x09006).portr("SW1");
-	map(0x09007, 0x09007).portr("SW2");
-	map(0x09008, 0x09008).portr("SW3");
-	map(0x0900b, 0x0900b).ram(); //protection
-	map(0x0900c, 0x0900c).w("oki", FUNC(okim6295_device::write));
-	map(0x0900e, 0x0900f).w("ymsnd", FUNC(ym2413_device::write));
-	map(0x0900d, 0x0900d).w(FUNC(subsino_state::tiles_offset_w));
-	map(0x07800, 0x07fff).ram();
-	map(0x08000, 0x087ff).ram().w(FUNC(subsino_state::videoram_w)).share("videoram");
-	map(0x08800, 0x08fff).ram().w(FUNC(subsino_state::colorram_w)).share("colorram");
-	map(0x10000, 0x13fff).rom();
+	map(0x06000, 0x0d7ff).rom().region("program", 0x4000);
+	map(0x0d800, 0x0dfff).ram();
+	map(0x0e000, 0x0e7ff).ram().w(FUNC(subsino_state::videoram_w)).share("videoram");
+	map(0x0e800, 0x0efff).ram().w(FUNC(subsino_state::colorram_w)).share("colorram");
+	map(0x0f000, 0x0f003).rw("ppi", FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0x0f004, 0x0f004).portr("INA");
+	map(0x0f005, 0x0f005).portr("INB");
+	map(0x0f006, 0x0f006).portr("SW1");
+	map(0x0f007, 0x0f007).portr("SW2");
+	map(0x0f008, 0x0f008).portr("SW3");
+	map(0x0f00b, 0x0f00b).ram(); //protection
+	map(0x0f00c, 0x0f00c).w("oki", FUNC(okim6295_device::write));
+	map(0x0f00e, 0x0f00f).w("ymsnd", FUNC(ym2413_device::write));
+	map(0x0f00d, 0x0f00d).w(FUNC(subsino_state::tiles_offset_w));
+	map(0x10000, 0x13fff).rom().region("program", 0);
 }
 
 
@@ -922,50 +929,51 @@ void subsino_state::flash_w(uint8_t data)
 void subsino_state::victor5_map(address_map &map)
 {
 	victor21_map(map);
-	map(0x0900a, 0x0900a).rw(FUNC(subsino_state::flash_r), FUNC(subsino_state::flash_w));
-	map(0x0900b, 0x0900b).nopr(); //"flash" status, bit 0
-	map(0x0900c, 0x0900c).w("oki", FUNC(okim6295_device::write));
+	map(0x0f00a, 0x0f00a).rw(FUNC(subsino_state::flash_r), FUNC(subsino_state::flash_w));
+	map(0x0f00b, 0x0f00b).nopr(); //"flash" status, bit 0
+	map(0x0f00c, 0x0f00c).w("oki", FUNC(okim6295_device::write));
 }
 
 
 uint8_t subsino_state::hwcheck_r()
 {
-	/* Wants this at POST otherwise an "Hardware Error" occurs. */
+	// Wants this at POST otherwise an "Hardware Error" occurs.
 	return 0x55;
 }
 
 void subsino_state::crsbingo_map(address_map &map)
 {
-	map(0x00000, 0x8fff).rom(); //overlap unmapped regions
+	map(0x06000, 0x0d7ff).rom().region("program", 0x4000);
+	map(0x0d800, 0x0dfff).ram();
+	map(0x0e000, 0x0e7ff).ram().w(FUNC(subsino_state::videoram_w)).share("videoram");
+	map(0x0e800, 0x0efff).ram().w(FUNC(subsino_state::colorram_w)).share("colorram");
 
-	map(0x09800, 0x09fff).ram();
+	map(0x0f000, 0x0f000).portr("SW1");
+	map(0x0f001, 0x0f001).portr("SW2");
+	map(0x0f002, 0x0f002).portr("INA");
+	map(0x0f003, 0x0f003).portr("INB");
+	map(0x0f004, 0x0f004).portr("INC");
+	map(0x0f005, 0x0f005).w(FUNC(subsino_state::out_a_w));
 
-	map(0x09000, 0x09000).portr("SW1");
-	map(0x09001, 0x09001).portr("SW2");
-	map(0x09002, 0x09002).portr("INA");
-	map(0x09003, 0x09003).portr("INB");
-	map(0x09004, 0x09004).portr("INC");
-	map(0x09005, 0x09005).w(FUNC(subsino_state::out_a_w));
+	map(0x0f008, 0x0f008).portr("SW4");
+	map(0x0f009, 0x0f009).portr("SW3");  // .w(FUNC(subsino_state::out_a_w));
+	map(0x0f00a, 0x0f00a).rw(FUNC(subsino_state::hwcheck_r), FUNC(subsino_state::out_b_w));
 
-	map(0x09008, 0x09008).portr("SW4");
-	map(0x09009, 0x09009).portr("SW3");  // .w(FUNC(subsino_state::out_a_w));
-	map(0x0900a, 0x0900a).rw(FUNC(subsino_state::hwcheck_r), FUNC(subsino_state::out_b_w));
+	map(0x0f010, 0x0f010).rw(FUNC(subsino_state::flash_r), FUNC(subsino_state::flash_w));
+//  map(0x0f011, 0x0f011) //"flash" status, bit 0
+//  map(0x0f00c, 0x0f00c).portr("INC");
+	map(0x0f00c, 0x0f00d).w("ymsnd", FUNC(ym2413_device::write));
 
-	map(0x09010, 0x09010).rw(FUNC(subsino_state::flash_r), FUNC(subsino_state::flash_w));
-//  map(0x09011, 0x09011) //"flash" status, bit 0
-//  map(0x0900c, 0x0900c).portr("INC");
-	map(0x0900c, 0x0900d).w("ymsnd", FUNC(ym2413_device::write));
+//  map(0x0f018, 0x0f018).w("oki", FUNC(okim6295_device::write));
 
-//  map(0x09018, 0x09018).w("oki", FUNC(okim6295_device::write));
+//  map(0x0f00d, 0x0f00d).w(FUNC(subsino_state::tiles_offset_w));
 
-//  map(0x0900d, 0x0900d).w(FUNC(subsino_state::tiles_offset_w));
+	map(0x10000, 0x13fff).rom().region("program", 0); //overlap unmapped regions
+}
 
-	map(0x07800, 0x07fff).ram();
-	map(0x08000, 0x087ff).ram().w(FUNC(subsino_state::videoram_w)).share("videoram");
-	map(0x08800, 0x08fff).ram().w(FUNC(subsino_state::colorram_w)).share("colorram");
-
-	map(0x10000, 0x13fff).rom(); //overlap unmapped regions
-
+uint8_t subsino_state::out_c_r()
+{
+	return m_out_c;
 }
 
 void subsino_state::out_c_w(uint8_t data)
@@ -982,41 +990,69 @@ void subsino_state::out_c_w(uint8_t data)
 //  popmessage("data %02x\n",data);
 }
 
+void subsino_state::tisub_base_map(address_map &map)
+{
+	map(0x0d800, 0x0dfff).ram();
+	map(0x0e000, 0x0e7ff).ram().w(FUNC(subsino_state::colorram_w)).share("colorram");
+	map(0x0e800, 0x0efff).ram().w(FUNC(subsino_state::videoram_w)).share("videoram");
+	map(0x0f000, 0x0f002).r("ppi1", FUNC(i8255_device::read));
+	map(0x0f004, 0x0f006).r("ppi2", FUNC(i8255_device::read));
+	map(0x0f008, 0x0f008).rw(FUNC(subsino_state::out_c_r), FUNC(subsino_state::out_c_w));
+	map(0x0f009, 0x0f009).w(FUNC(subsino_state::out_b_w));
+	map(0x0f00a, 0x0f00a).w(FUNC(subsino_state::out_a_w));
+	map(0x10000, 0x13fff).rom().region("program", 0);
+	map(0x1e0c0, 0x1e0ff).ram().share("reel_scroll.2");
+	map(0x1e140, 0x1e17f).ram().share("reel_scroll.1");
+	map(0x1e180, 0x1e1bf).ram().share("reel_scroll.0");
+	map(0x1e800, 0x1e9ff).ram().w(FUNC(subsino_state::reel_ram_w<0>)).share("reel_ram.0");
+	map(0x1ea00, 0x1ebff).ram().w(FUNC(subsino_state::reel_ram_w<1>)).share("reel_ram.1");
+	map(0x1ec00, 0x1edff).ram().w(FUNC(subsino_state::reel_ram_w<2>)).share("reel_ram.2");
+}
+
 void subsino_state::tisub_map(address_map &map)
 {
-	map(0x00000, 0x0bfff).rom(); // overlap unmapped regions
-	map(0x09800, 0x09fff).ram();
+	tisub_base_map(map);
 
+	map(0x06000, 0x0d7ff).rom().region("program", 0x4000);
+	map(0x0f00c, 0x0f00c).portr("INC");
+	map(0x0f016, 0x0f017).w("ymsnd", FUNC(ym3812_device::write));
+	map(0x0f01b, 0x0f01b).w(FUNC(subsino_state::tiles_offset_w));
+	map(0x1d000, 0x1dfff).rom().region("program", 0xd000); // reads the card face data here
+}
+
+void subsino_state::newhunterb_map(address_map &map)
+{
+	tisub_base_map(map);
+
+	map(0x06000, 0x0d7ff).rom().region("program", 0x6000);
+	map(0x0f00c, 0x0f00d).w("ymsnd", FUNC(ym3812_device::write));
+	map(0x0f00e, 0x0f00e).portr("INC");
+	map(0x0f00f, 0x0f00f).w(FUNC(subsino_state::tiles_offset_w));
+	map(0x14000, 0x15fff).rom().region("program", 0x4000);
+}
+
+void subsino_state::newhunterd_map(address_map &map)
+{
+	map(0x00000, 0x06fff).rom().region("maincpu", 0x0000); // 0x7000 - 0x9fff are 0xff filled
+	map(0x07000, 0x07fff).ram();
+	map(0x08000, 0x087ff).ram().w(FUNC(subsino_state::colorram_w)).share("colorram");
+	map(0x08800, 0x08fff).ram().w(FUNC(subsino_state::videoram_w)).share("videoram");
 	map(0x09000, 0x09002).r("ppi1", FUNC(i8255_device::read));
 	map(0x09004, 0x09006).r("ppi2", FUNC(i8255_device::read));
-
-	/* 0x09008: is marked as OUTPUT C in the test mode. */
-	map(0x09008, 0x09008).w(FUNC(subsino_state::out_c_w));
+	map(0x09008, 0x09008).rw(FUNC(subsino_state::out_c_r), FUNC(subsino_state::out_c_w));
 	map(0x09009, 0x09009).w(FUNC(subsino_state::out_b_w));
 	map(0x0900a, 0x0900a).w(FUNC(subsino_state::out_a_w));
-
-	map(0x0900c, 0x0900c).portr("INC");
-
-	map(0x09016, 0x09017).w("ymsnd", FUNC(ym3812_device::write));
-
-//  map(0x0900c, 0x0900c).w("oki", FUNC(okim6295_device::write));
-
-	map(0x0901b, 0x0901b).w(FUNC(subsino_state::tiles_offset_w));
-
-	map(0x07800, 0x07fff).ram();
-	map(0x08800, 0x08fff).ram().w(FUNC(subsino_state::videoram_w)).share("videoram");
-	map(0x08000, 0x087ff).ram().w(FUNC(subsino_state::colorram_w)).share("colorram");
-
-	map(0x10000, 0x13fff).rom();
-	map(0x14000, 0x14fff).rom(); // reads the card face data here (see rom copy in rom loading)
-
-	map(0x150c0, 0x150ff).ram().share("reel_scroll.2");
-	map(0x15140, 0x1517f).ram().share("reel_scroll.1");
-	map(0x15180, 0x151bf).ram().share("reel_scroll.0");
-
-	map(0x15800, 0x159ff).ram().w(FUNC(subsino_state::reel_ram_w<0>)).share("reel_ram.0");
-	map(0x15a00, 0x15bff).ram().w(FUNC(subsino_state::reel_ram_w<1>)).share("reel_ram.1");
-	map(0x15c00, 0x15dff).ram().w(FUNC(subsino_state::reel_ram_w<2>)).share("reel_ram.2");
+	map(0x0900c, 0x0900d).w("ymsnd", FUNC(ym3812_device::write));
+	map(0x0900e, 0x0900e).portr("INC");
+	map(0x0900f, 0x0900f).w(FUNC(subsino_state::tiles_offset_w));
+	map(0x09800, 0x09fff).ram();
+	map(0x0a000, 0x0dfff).rom().region("maincpu", 0xa000);
+	map(0x0f0c0, 0x0f0ff).ram().share("reel_scroll.2");
+	map(0x0f140, 0x0f17f).ram().share("reel_scroll.1");
+	map(0x0f180, 0x0f1bf).ram().share("reel_scroll.0");
+	map(0x0f800, 0x0f9ff).ram().w(FUNC(subsino_state::reel_ram_w<0>)).share("reel_ram.0");
+	map(0x0fa00, 0x0fbff).ram().w(FUNC(subsino_state::reel_ram_w<1>)).share("reel_ram.1");
+	map(0x0fc00, 0x0fdff).ram().w(FUNC(subsino_state::reel_ram_w<2>)).share("reel_ram.2");
 }
 
 void subsino_state::ramdac_map(address_map &map)
@@ -1679,7 +1715,7 @@ static INPUT_PORTS_START( stbsub )
 
 	PORT_START("INC")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SLOT_STOP3 )                             PORT_NAME("Small / Black / Stop 3")
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("hopper", ticket_dispenser_device, line_r) // hopper sensor
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("hopper", FUNC(ticket_dispenser_device::line_r)) // hopper sensor
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MEMORY_RESET )                           PORT_NAME("Reset")  // hard reset
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_HIGH )    PORT_CODE(KEYCODE_B)    PORT_NAME("Big / Red")
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -1815,7 +1851,7 @@ static INPUT_PORTS_START( tesorone )
 
 	PORT_START("INC")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SLOT_STOP3 )                             PORT_NAME("Small / Black / Stop 3")
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("hopper", ticket_dispenser_device, line_r) // hopper sensor
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("hopper", FUNC(ticket_dispenser_device::line_r)) // hopper sensor
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MEMORY_RESET )                           PORT_NAME("Reset")  // hard reset
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_HIGH )    PORT_CODE(KEYCODE_B)    PORT_NAME("Big / Red")
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -2237,7 +2273,7 @@ static INPUT_PORTS_START( smoto16 )
 	PORT_START( "INB" ) // d006
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )          PORT_IMPULSE(3) // coin
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("hopper", ticket_dispenser_device, line_r) // hopper sensor
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("hopper", FUNC(ticket_dispenser_device::line_r)) // hopper sensor
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK )                            PORT_NAME("Stats / Test")   // Bookkeeping.
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_GAMBLE_SERVICE )                         PORT_NAME("Settings")   // Game Rate & others.
@@ -2246,7 +2282,7 @@ static INPUT_PORTS_START( smoto16 )
 
 	PORT_START( "INC" ) // d00c
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("hopper", ticket_dispenser_device, line_r) // hopper sensor
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("hopper", FUNC(ticket_dispenser_device::line_r)) // hopper sensor
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MEMORY_RESET )                           PORT_NAME("Reset")  // hard reset
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -2333,7 +2369,7 @@ static INPUT_PORTS_START( smoto20 )
 	PORT_START( "INB" ) // d006
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )          PORT_IMPULSE(3) // coin
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("hopper", ticket_dispenser_device, line_r) // hopper sensor
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("hopper", FUNC(ticket_dispenser_device::line_r)) // hopper sensor
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK )                            PORT_NAME("Stats / Test")   // Bookkeeping.
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_GAMBLE_SERVICE )                         PORT_NAME("Settings")   // Game Rate & others.
@@ -2342,7 +2378,7 @@ static INPUT_PORTS_START( smoto20 )
 
 	PORT_START( "INC" ) // d00c
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("hopper", ticket_dispenser_device, line_r) // hopper sensor
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("hopper", FUNC(ticket_dispenser_device::line_r)) // hopper sensor
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MEMORY_RESET )                           PORT_NAME("Reset")  // hard reset
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -2761,8 +2797,8 @@ GFXDECODE_END
 
 void subsino_state::victor21(machine_config &config)
 {
-	/* basic machine hardware */
-	HD647180X(config, m_maincpu, XTAL(12'000'000));   /* Unknown clock */
+	// basic machine hardware
+	HD647180X(config, m_maincpu, XTAL(12'000'000));   // Unknown clock
 	m_maincpu->set_addrmap(AS_PROGRAM, &subsino_state::victor21_map);
 	m_maincpu->set_addrmap(AS_IO, &subsino_state::subsino_iomap);
 
@@ -2773,9 +2809,9 @@ void subsino_state::victor21(machine_config &config)
 	ppi.tri_pb_callback().set_constant(0);
 	ppi.in_pc_callback().set_ioport("INC");
 
-	TICKET_DISPENSER(config, m_hopper, attotime::from_msec(200), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_LOW);
+	TICKET_DISPENSER(config, m_hopper, attotime::from_msec(200));
 
-	/* video hardware */
+	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
@@ -2790,34 +2826,34 @@ void subsino_state::victor21(machine_config &config)
 
 	MCFG_VIDEO_START_OVERRIDE(subsino_state,subsino)
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
 	YM2413(config, "ymsnd", XTAL(3'579'545)).add_route(ALL_OUTPUTS, "mono", 1.0);
 
-	OKIM6295(config, "oki", XTAL(4'433'619) / 4, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 1.0);  /* Clock frequency & pin 7 not verified */
+	OKIM6295(config, "oki", XTAL(4'433'619) / 4, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 1.0);  // Clock frequency & pin 7 not verified
 }
 
-/* same but with an additional protection. */
+// same but with an additional protection.
 void subsino_state::victor5(machine_config &config)
 {
 	victor21(config);
 
-	/* basic machine hardware */
+	// basic machine hardware
 	m_maincpu->set_addrmap(AS_PROGRAM, &subsino_state::victor5_map);
 }
 
 
 void subsino_state::crsbingo(machine_config &config)
 {
-	/* basic machine hardware */
-	HD647180X(config, m_maincpu, XTAL(12'000'000));   /* Unknown CPU and clock */
+	// basic machine hardware
+	HD647180X(config, m_maincpu, XTAL(12'000'000));   // Unknown CPU and clock
 	m_maincpu->set_addrmap(AS_PROGRAM, &subsino_state::crsbingo_map);
 	m_maincpu->set_addrmap(AS_IO, &subsino_state::subsino_iomap);
 
-	TICKET_DISPENSER(config, m_hopper, attotime::from_msec(200), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_LOW);
+	TICKET_DISPENSER(config, m_hopper, attotime::from_msec(200));
 
-	/* video hardware */
+	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
@@ -2832,17 +2868,17 @@ void subsino_state::crsbingo(machine_config &config)
 
 	MCFG_VIDEO_START_OVERRIDE(subsino_state,subsino)
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
-	YM2413(config, "ymsnd", XTAL(3'579'545)).add_route(ALL_OUTPUTS, "mono", 1.0);   /* Unknown clock */
+	YM2413(config, "ymsnd", XTAL(3'579'545)).add_route(ALL_OUTPUTS, "mono", 1.0);   // Unknown clock
 }
 
 
 void subsino_state::srider(machine_config &config)
 {
-	/* basic machine hardware */
-	HD647180X(config, m_maincpu, XTAL(12'000'000));   /* Unknown clock */
+	// basic machine hardware
+	HD647180X(config, m_maincpu, XTAL(12'000'000));   // Unknown clock
 	m_maincpu->set_addrmap(AS_PROGRAM, &subsino_state::srider_map);
 	m_maincpu->set_addrmap(AS_IO, &subsino_state::subsino_iomap);
 
@@ -2856,9 +2892,9 @@ void subsino_state::srider(machine_config &config)
 	ppi2.in_pb_callback().set_ioport("INA");
 	ppi2.in_pc_callback().set_ioport("INB");
 
-	TICKET_DISPENSER(config, m_hopper, attotime::from_msec(200), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_LOW);
+	TICKET_DISPENSER(config, m_hopper, attotime::from_msec(200));
 
-	/* video hardware */
+	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
@@ -2873,19 +2909,19 @@ void subsino_state::srider(machine_config &config)
 
 	MCFG_VIDEO_START_OVERRIDE(subsino_state,subsino)
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
 	YM3812(config, "ymsnd", XTAL(3'579'545)).add_route(ALL_OUTPUTS, "mono", 1.0);
 
-	OKIM6295(config, "oki", XTAL(4'433'619) / 4, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 1.0);  /* Clock frequency & pin 7 not verified */
+	OKIM6295(config, "oki", XTAL(4'433'619) / 4, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 1.0);  // Clock frequency & pin 7 not verified
 }
 
 void subsino_state::sharkpy(machine_config &config)
 {
 	srider(config);
 
-	/* basic machine hardware */
+	// basic machine hardware
 	m_maincpu->set_addrmap(AS_PROGRAM, &subsino_state::sharkpy_map);
 }
 
@@ -2904,8 +2940,8 @@ void subsino_state::dinofmly(machine_config &config)
 
 void subsino_state::tisub(machine_config &config)
 {
-	/* basic machine hardware */
-	HD647180X(config, m_maincpu, XTAL(12'000'000));   /* Unknown CPU and clock */
+	// basic machine hardware
+	HD647180X(config, m_maincpu, XTAL(12'000'000));   // Unknown CPU and clock
 	m_maincpu->set_addrmap(AS_PROGRAM, &subsino_state::tisub_map);
 	m_maincpu->set_addrmap(AS_IO, &subsino_state::subsino_iomap);
 
@@ -2919,9 +2955,9 @@ void subsino_state::tisub(machine_config &config)
 	ppi2.in_pb_callback().set_ioport("INA");
 	ppi2.in_pc_callback().set_ioport("INB");
 
-	TICKET_DISPENSER(config, m_hopper, attotime::from_msec(200), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_LOW);
+	TICKET_DISPENSER(config, m_hopper, attotime::from_msec(200));
 
-	/* video hardware */
+	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
@@ -2936,16 +2972,33 @@ void subsino_state::tisub(machine_config &config)
 
 	MCFG_VIDEO_START_OVERRIDE(subsino_state, reels)
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
-	YM3812(config, "ymsnd", XTAL(3'579'545)).add_route(ALL_OUTPUTS, "mono", 1.0);   /* Unknown clock */
+	YM3812(config, "ymsnd", XTAL(3'579'545)).add_route(ALL_OUTPUTS, "mono", 1.0);   // Unknown clock
+}
+
+void subsino_state::newhunterb(machine_config &config)
+{
+	tisub(config);
+
+	m_maincpu->set_addrmap(AS_PROGRAM, &subsino_state::newhunterb_map);
+}
+
+void subsino_state::newhunterd(machine_config &config)
+{
+	tisub(config);
+
+	Z80(config.replace(), m_maincpu, 6'000'000); // unknown clock
+	m_maincpu->set_addrmap(AS_PROGRAM, &subsino_state::newhunterd_map);
+
+	subdevice<screen_device>("screen")->screen_vblank().set_inputline(m_maincpu, 0, HOLD_LINE); // ? (needs some kind of source for IM 1 interrupt)
 }
 
 void subsino_state::stbsub(machine_config &config)
 {
-	/* basic machine hardware */
-	HD647180X(config, m_maincpu, XTAL(12'000'000));   /* Unknown clock */
+	// basic machine hardware
+	HD647180X(config, m_maincpu, XTAL(12'000'000));   // Unknown clock
 	m_maincpu->set_addrmap(AS_PROGRAM, &subsino_state::stbsub_map);
 	m_maincpu->set_addrmap(AS_IO, &subsino_state::subsino_iomap);
 
@@ -2960,9 +3013,9 @@ void subsino_state::stbsub(machine_config &config)
 	ppi2.in_pc_callback().set_ioport("INA");
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
-	TICKET_DISPENSER(config, m_hopper, attotime::from_msec(200), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_LOW);
+	TICKET_DISPENSER(config, m_hopper, attotime::from_msec(200));
 
-	/* video hardware */
+	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
@@ -2981,7 +3034,7 @@ void subsino_state::stbsub(machine_config &config)
 
 	MCFG_VIDEO_START_OVERRIDE(subsino_state,stbsub)
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
 	YM3812(config, "ymsnd", XTAL(3'579'545)).add_route(ALL_OUTPUTS, "mono", 1.0);
@@ -2991,7 +3044,7 @@ void subsino_state::mtrainnv(machine_config &config)
 {
 	stbsub(config);
 
-	/* basic machine hardware */
+	// basic machine hardware
 	m_maincpu->set_addrmap(AS_PROGRAM, &subsino_state::mtrainnv_map);
 }
 
@@ -2999,6 +3052,16 @@ void subsino_state::mtrainnv(machine_config &config)
 /***************************************************************************
 *                               ROMs Loading                               *
 ***************************************************************************/
+
+#define HD647180X_FAKE_INTERNAL_ROM \
+	ROM_FILL( 0x0000, 1, 0x3e ) \
+	ROM_FILL( 0x0001, 1, 0x01 ) \
+	ROM_FILL( 0x0002, 1, 0xed ) \
+	ROM_FILL( 0x0003, 1, 0x39 ) \
+	ROM_FILL( 0x0004, 1, 0x38 ) \
+	ROM_FILL( 0x0005, 1, 0xc3 ) \
+	ROM_FILL( 0x0006, 1, 0x16 ) \
+	ROM_FILL( 0x0007, 1, 0xf0 )
 
 /***************************************************************************
 
@@ -3013,9 +3076,11 @@ void subsino_state::mtrainnv(machine_config &config)
 ***************************************************************************/
 
 ROM_START( victor5 )
-	ROM_REGION( 0x14000, "maincpu", 0 )
-	ROM_LOAD( "1.u1", 0x10000, 0x4000, CRC(bc4d6ed6) SHA1(6b2087360ea0ae9e48a623934cb2fb973a80f1ec) )
-	ROM_CONTINUE(0x0000,0xc000)
+	ROM_REGION( 0x4000, "maincpu", 0 )
+	HD647180X_FAKE_INTERNAL_ROM
+
+	ROM_REGION( 0x10000, "program", 0 )
+	ROM_LOAD( "1.u1", 0x00000, 0x10000, CRC(bc4d6ed6) SHA1(6b2087360ea0ae9e48a623934cb2fb973a80f1ec) )
 
 	ROM_REGION( 0x18000, "tilemap", 0 )
 	ROM_LOAD( "2.u24", 0x10000, 0x8000, CRC(f7026c74) SHA1(75a72839ad6b349563110ed10ad235958d5c0170) )
@@ -3067,9 +3132,11 @@ Info by f205v (26/03/2008)
 ***************************************************************************/
 
 ROM_START( victor5a )
-	ROM_REGION( 0x14000, "maincpu", 0 )
-	ROM_LOAD( "1.u1", 0x10000, 0x4000, CRC(e3ada2fc) SHA1(eddb460dcb80a29fbbe3ed6c4733c75b892baf52) )
-	ROM_CONTINUE(0x0000,0xc000)
+	ROM_REGION( 0x4000, "maincpu", 0 )
+	HD647180X_FAKE_INTERNAL_ROM
+
+	ROM_REGION( 0x10000, "program", 0 )
+	ROM_LOAD( "1.u1", 0x00000, 0x10000, CRC(e3ada2fc) SHA1(eddb460dcb80a29fbbe3ed6c4733c75b892baf52) )
 
 	ROM_REGION( 0x18000, "tilemap", 0 )
 	ROM_LOAD( "2.u24", 0x10000, 0x8000, CRC(1229e951) SHA1(1e548625bb60e2d6f52a376a0dea9e5709f94135) )
@@ -3123,9 +3190,18 @@ Info by f205v, Corrado Tomaselli (20/04/2008)
 ***************************************************************************/
 
 ROM_START( victor21 )
-	ROM_REGION( 0x14000, "maincpu", 0 )
-	ROM_LOAD( "1.u1", 0x10000, 0x4000, CRC(43999b2d) SHA1(7ce26fd332ffe35fd826a1a6166b228d4bc370b8) )
-	ROM_CONTINUE(     0x00000, 0xc000)
+	ROM_REGION( 0x4000, "maincpu", 0 )
+	ROM_FILL( 0x0000, 1, 0x3e )
+	ROM_FILL( 0x0001, 1, 0x01 )
+	ROM_FILL( 0x0002, 1, 0xed )
+	ROM_FILL( 0x0003, 1, 0x39 )
+	ROM_FILL( 0x0004, 1, 0x38 )
+	ROM_FILL( 0x0005, 1, 0xc3 )
+	ROM_FILL( 0x0006, 1, 0x15 ) // entrypoint is slightly different
+	ROM_FILL( 0x0007, 1, 0xf0 )
+
+	ROM_REGION( 0x10000, "program", 0 )
+	ROM_LOAD( "1.u1", 0x00000, 0x10000, CRC(43999b2d) SHA1(7ce26fd332ffe35fd826a1a6166b228d4bc370b8) )
 
 	ROM_REGION( 0x18000, "tilemap", 0 )
 	ROM_LOAD( "2.u24", 0x10000, 0x8000, CRC(f1181b93) SHA1(53cd4d2ce13973495b51d911a4745a69a9784983) )
@@ -3150,10 +3226,11 @@ ROM_END
 ***************************************************************************/
 
 ROM_START( tisub )
-	ROM_REGION( 0x18000, "maincpu", 0 )
-	ROM_LOAD( "rom_1.bin", 0x10000, 0x4000,  CRC(ed3b4a69) SHA1(c57985e8d19b2b495fc768e52b83cbbd75f027ad) )
-	ROM_CONTINUE(0x0000,0xc000)
-	ROM_COPY( "maincpu", 0x09000, 0x14000, 0x1000)
+	ROM_REGION( 0x4000, "maincpu", 0 )
+	HD647180X_FAKE_INTERNAL_ROM
+
+	ROM_REGION( 0x10000, "program", 0 )
+	ROM_LOAD( "rom_1.bin", 0x00000, 0x10000, CRC(ed3b4a69) SHA1(c57985e8d19b2b495fc768e52b83cbbd75f027ad) )
 
 	ROM_REGION( 0x40000, "tilemap", 0 )
 	ROM_LOAD( "rom_6.bin", 0x00000, 0x10000, CRC(c2c226df) SHA1(39762b390d6b271c3252342e843a181dd152a0cc) )
@@ -3190,10 +3267,11 @@ ROM_END
 */
 
 ROM_START( tisuba )
-	ROM_REGION( 0x18000, "maincpu", 0 )
-	ROM_LOAD( "01.bin", 0x10000, 0x4000,  CRC(9967dd38) SHA1(63b74bc0c0952114b7321e8f399bd64dc293aade) )
-	ROM_CONTINUE(0x0000,0xc000)
-	ROM_COPY( "maincpu", 0x09000, 0x14000, 0x1000)
+	ROM_REGION( 0x4000, "maincpu", 0 )
+	HD647180X_FAKE_INTERNAL_ROM
+
+	ROM_REGION( 0x10000, "program", 0 )
+	ROM_LOAD( "01.bin", 0x00000, 0x10000, CRC(9967dd38) SHA1(63b74bc0c0952114b7321e8f399bd64dc293aade) )
 
 	ROM_REGION( 0x40000, "tilemap", 0 )
 	ROM_LOAD( "rom_6.bin", 0x00000, 0x10000, CRC(c2c226df) SHA1(39762b390d6b271c3252342e843a181dd152a0cc) )
@@ -3214,10 +3292,11 @@ ROM_START( tisuba )
 ROM_END
 
 ROM_START( tisubb )
-	ROM_REGION( 0x18000, "maincpu", 0 )
-	ROM_LOAD( "ti alpha rom_1 ver3.0n.u6", 0x10000, 0x4000,  CRC(7f0756cc) SHA1(e383b6abea136b79acabbffd9d247cc51c9aaa85) )
-	ROM_CONTINUE(0x0000,0xc000)
-	ROM_COPY( "maincpu", 0x09000, 0x14000, 0x1000)
+	ROM_REGION( 0x4000, "maincpu", 0 )
+	HD647180X_FAKE_INTERNAL_ROM
+
+	ROM_REGION( 0x10000, "program", 0 )
+	ROM_LOAD( "ti alpha rom_1 ver3.0n.u6", 0x00000, 0x10000, CRC(7f0756cc) SHA1(e383b6abea136b79acabbffd9d247cc51c9aaa85) )
 
 	ROM_REGION( 0x40000, "tilemap", 0 )
 	ROM_LOAD( "ti alpha rom_6 ver1.1.u43", 0x00000, 0x10000, CRC(e7abd3b6) SHA1(bb22161b6c082d3ea0c80e0ff413bc43edd6e678) )
@@ -3235,6 +3314,219 @@ ROM_START( tisubb )
 	ROM_LOAD( "n82s129n.u39", 0x000, 0x100, BAD_DUMP CRC(971843e5) SHA1(4cb5fc1085503dae2f2f02eb49cca051ac84b890) )
 	ROM_LOAD( "n82s129n.u40", 0x100, 0x100, BAD_DUMP CRC(b4bd872c) SHA1(c0f9fe68186636d6d6bc6f81415459631cf38edd) )
 	ROM_LOAD( "n82s129n.u41", 0x200, 0x100, BAD_DUMP CRC(db99f6da) SHA1(d281a2fa06f1890ef0b1c4d099e6828827db14fd) )
+ROM_END
+
+/* This bootleg shows year 1989 on title screen, but it's from 1992 (there are 1992 strings on the ROMs). Probably Karam
+   modified the New HUNTer set from Mecca, which also shows 1989, and was legally registered on Korea on 1989-8-25.
+   Hardware:
+    - Sound: SM64 + SM65 + 12.000 MHz xtal (currently, the pitch is wrong, you have to overclock ymsnd to 112% to get the same as the PCB).
+    - Five positions for banks of eight DIP switches, but four of them unpopulated (only one present on the PCB).
+    - MCU with its surface scratched out, probably an HD647180X0CP8L + 12.000 MHz xtal.
+    - TI TPC1020AFN-084C.
+    - Unpopulated locations on the PCB for a battery and a reset switch. */
+ROM_START( newhunter )
+	ROM_REGION( 0x4000, "maincpu", 0 )  // The MCU had its surface scratched out, but almost sure it's an HD647180X0CP8L
+	ROM_LOAD( "hd647180.bin", 0x00000, 0x04000, NO_DUMP )
+	HD647180X_FAKE_INTERNAL_ROM
+
+	ROM_REGION( 0x10000, "program", 0 )
+	ROM_LOAD( "27c512.u18",   0x00000, 0x10000, CRC(d0d863a7) SHA1(0ee5ee04c3da83320bea8130be30f7fe6446b32f) )
+
+	ROM_REGION( 0x40000, "tilemap", 0 )
+	ROM_LOAD( "d27c010a.u16", 0x00000, 0x08000, CRC(c1daa20f) SHA1(c46278a00b6cbbd79c4184db910bf2770d77d92f) )
+	ROM_CONTINUE(             0x10000, 0x08000 )
+	ROM_CONTINUE(             0x08000, 0x08000 )
+	ROM_CONTINUE(             0x18000, 0x08000 )
+	ROM_LOAD( "27c010.u17",   0x20000, 0x08000, CRC(bfd2bfb5) SHA1(4ee11e2a86f36744eff347df4e3801c731406147) )
+	ROM_CONTINUE(             0x30000, 0x08000 )
+	ROM_CONTINUE(             0x28000, 0x08000 )
+	ROM_CONTINUE(             0x38000, 0x08000 )
+
+	ROM_REGION( 0x08000, "reels", 0 )
+	ROM_LOAD( "27c512.u14",   0x00000, 0x04000, CRC(e7632aaa) SHA1(e502554f84130f5a8cd86007f20f958cd303c0eb) )
+	ROM_IGNORE(0xc000)
+	ROM_LOAD( "27c512.u15",   0x04000, 0x04000, CRC(44933beb) SHA1(a19ed785cc3b38c2a2a6a08e9d639361ee118343) )
+	ROM_IGNORE(0xc000)
+
+	ROM_REGION( 0x00300, "proms", 0 )
+	ROM_LOAD( "hu-1.bin",     0x00000, 0x00100, CRC(971843e5) SHA1(4cb5fc1085503dae2f2f02eb49cca051ac84b890) )
+	ROM_LOAD( "hu-2.bin",     0x00100, 0x00100, CRC(b4bd872c) SHA1(c0f9fe68186636d6d6bc6f81415459631cf38edd) )
+	ROM_LOAD( "hu-3.bin",     0x00200, 0x00100, CRC(db99f6da) SHA1(d281a2fa06f1890ef0b1c4d099e6828827db14fd) )
+
+	ROM_REGION( 0x00100, "xtraprom", 0 )
+	ROM_LOAD( "82s129.u34",   0x00000, 0x00100, CRC(72d30ca3) SHA1(1054da8e0c18fac8d9fd93cfa441a17df430686b) ) // There's an additional PROM near the MCU
+
+	ROM_REGION( 0x00045c, "plds", 0 )
+	ROM_LOAD( "ht-1.bin",     0x00000, 0x00117, CRC(fdb4cd61) SHA1(f510077b707864b2536942db6157118ca15922de) )
+	ROM_LOAD( "ht-2.bin",     0x00117, 0x00117, CRC(0cf55cec) SHA1(845395ca0587627331b9ac48777f7cb6b54b9401) )
+	ROM_LOAD( "ht-3.bin",     0x0022e, 0x00117, CRC(8272668f) SHA1(9037f0d9c7625d05d2087e6f2d159dece934a945) )
+	ROM_LOAD( "ht-4.bin",     0x00345, 0x00117, CRC(f4f78925) SHA1(738281c05c0f51c0edcf65bacc18ebc87c2408c1) )
+ROM_END
+
+/*  The PCB had five positions for banks of eight DIP switches, but four of them were unpopulated (only one was present on the PCB).
+    The position for the reset switch was also unpopulated, and there wasn't battery-backed RAM on the PCB
+    (present on most games on this hardware). */
+ROM_START( newhunterb )
+	ROM_REGION( 0x04000, "maincpu", 0 )
+	ROM_LOAD( "hd647180.bin", 0x00000, 0x04000, NO_DUMP ) // HD647180X0CP8L
+	HD647180X_FAKE_INTERNAL_ROM
+
+	ROM_REGION( 0x10000, "program", 0 )
+	ROM_LOAD( "tms27c512.u26", 0x00000, 0x10000, CRC(a155197c) SHA1(01c53b436de14717260c88352b09f1a01b6fd8b2) )
+
+	ROM_REGION( 0x40000, "tilemap", 0 )
+	ROM_LOAD( "am27c010.u24", 0x00000, 0x08000, CRC(e712ab8a) SHA1(ddeb92213124c6114951b9b5739eed25efe3c7a6) )
+	ROM_CONTINUE(             0x10000, 0x08000 )
+	ROM_CONTINUE(             0x08000, 0x08000 )
+	ROM_CONTINUE(             0x18000, 0x08000 )
+	ROM_LOAD( "i27c010.u25",  0x20000, 0x08000, CRC(f13c08e3) SHA1(f25ce6e73be9ee23f8a75fc6771d8224c4dd07b8) )
+	ROM_CONTINUE(             0x30000, 0x08000 )
+	ROM_CONTINUE(             0x28000, 0x08000 )
+	ROM_CONTINUE(             0x38000, 0x08000 )
+
+	ROM_REGION( 0x08000, "reels", 0 )
+	ROM_LOAD( "27c512.u29",   0x00000, 0x04000, CRC(dbe8bacd) SHA1(a0bdcb62b3a3b0d649c3cc63123882c33bcf17bd) )
+	ROM_IGNORE(0xc000)
+	ROM_LOAD( "m27512.u30",   0x04000, 0x04000, CRC(74d9b34f) SHA1(355157cf019a4fb3177ecf129b5237502bc8026b) )
+	ROM_IGNORE(0xc000)
+
+	ROM_REGION( 0x00300, "proms", 0 )
+	ROM_LOAD( "hu-1.bin",     0x00000, 0x00100, CRC(971843e5) SHA1(4cb5fc1085503dae2f2f02eb49cca051ac84b890) )
+	ROM_LOAD( "hu-2.bin",     0x00100, 0x00100, CRC(b4bd872c) SHA1(c0f9fe68186636d6d6bc6f81415459631cf38edd) )
+	ROM_LOAD( "hu-3.bin",     0x00200, 0x00100, CRC(db99f6da) SHA1(d281a2fa06f1890ef0b1c4d099e6828827db14fd) )
+
+	ROM_REGION( 0x00045c, "plds", 0 )
+	ROM_LOAD( "ht-1.bin",     0x00000, 0x00117, CRC(fdb4cd61) SHA1(f510077b707864b2536942db6157118ca15922de) )
+	ROM_LOAD( "ht-2.bin",     0x00117, 0x00117, CRC(0cf55cec) SHA1(845395ca0587627331b9ac48777f7cb6b54b9401) )
+	ROM_LOAD( "ht-3.bin",     0x0022e, 0x00117, CRC(8272668f) SHA1(9037f0d9c7625d05d2087e6f2d159dece934a945) )
+	ROM_LOAD( "ht-4.bin",     0x00345, 0x00117, CRC(f4f78925) SHA1(738281c05c0f51c0edcf65bacc18ebc87c2408c1) )
+ROM_END
+
+/*  Several custom modifications on this PCB:
+     -3V battery directly soldered to the main HM62256ALP-10 RAM.
+     -One bank of 8 DIP switches soldered to a 74LS245.
+     -One bank of 5 DIP switches soldered to another 74LS245.
+     -A single switch button soldered to another 74LS245.
+   And the usual hardware configuration:
+     -One 12.000 MHz xtal.
+     -HD647180X0CP6.
+     -12 MHz xtal.
+     -One bank of 8 DIP switches, plus the other two banks described before.
+     -Sound: K-666 + K-664.
+     -TI TPC1020AFN-084C. */
+ROM_START( newhunterc )
+	ROM_REGION( 0x04000, "maincpu", 0 )
+	ROM_LOAD( "hd647180.bin", 0x00000, 0x04000, NO_DUMP ) // HD647180X0CP8L
+	HD647180X_FAKE_INTERNAL_ROM
+
+	ROM_REGION( 0x10000, "program", 0 )
+	ROM_LOAD( "nm27c512q.u26", 0x00000, 0x10000, CRC(fe79a7da) SHA1(f326070f8a15aa518e1c928890549e63a99e6961) )
+
+	ROM_REGION( 0x40000, "tilemap", 0 )
+	ROM_LOAD( "e27c010u.u24",  0x00000, 0x08000, CRC(893d8e6d) SHA1(e18fa4db54230eef92b78ccd5fe3ea509b83a1ec) )
+	ROM_CONTINUE(              0x10000, 0x08000 )
+	ROM_CONTINUE(              0x08000, 0x08000 )
+	ROM_CONTINUE(              0x18000, 0x08000 )
+	ROM_LOAD( "ds40986.u25",   0x20000, 0x08000, CRC(3b46a3a1) SHA1(db98ed804def24d069e09623588f37a60a2cce46) )
+	ROM_CONTINUE(              0x30000, 0x08000 )
+	ROM_CONTINUE(              0x28000, 0x08000 )
+	ROM_CONTINUE(              0x38000, 0x08000 )
+
+	ROM_REGION( 0x08000, "reels", 0 )
+	ROM_LOAD( "tms27c512.u29", 0x00000, 0x04000, CRC(ad203af2) SHA1(58314dc795fba157bd9c3da64e7e158e13376860) )
+	ROM_IGNORE(0xc000)
+	ROM_LOAD( "tms27c512.u30", 0x04000, 0x04000, CRC(27a3910e) SHA1(6c9f5061f8a278d5a570f0f10f4f01b86558fe46) )
+	ROM_IGNORE(0xc000)
+
+	ROM_REGION( 0x00300, "proms", 0 )
+	ROM_LOAD( "n82s129an.u1",  0x00000, 0x00100, CRC(69af17fc) SHA1(38546f5665cf731195ac384aca182c56884333f0) )
+	ROM_LOAD( "n82s129an.u2",  0x00100, 0x00100, CRC(4b5f288a) SHA1(b6b9f9067afe93bd13ea17311484e2a2af01a0ed) )
+	ROM_LOAD( "n82s129an.u3",  0x00200, 0x00100, CRC(a1c0d069) SHA1(794df68451525901ebd5895feb26fcda2c517c3f) )
+
+	ROM_REGION( 0x00045c, "plds", 0 )
+	ROM_LOAD( "gal16v8b.u41",  0x00000, 0x00117, CRC(fdb4cd61) SHA1(f510077b707864b2536942db6157118ca15922de) )
+	ROM_LOAD( "gal16v8b.s63",  0x00117, 0x00117, CRC(f4f78925) SHA1(738281c05c0f51c0edcf65bacc18ebc87c2408c1) )
+	ROM_LOAD( "gal16v8b.u42",  0x0022e, 0x00117, CRC(0cf55cec) SHA1(845395ca0587627331b9ac48777f7cb6b54b9401) )
+	ROM_LOAD( "gal16v8b.u9",   0x00345, 0x00117, CRC(8272668f) SHA1(9037f0d9c7625d05d2087e6f2d159dece934a945) )
+ROM_END
+
+/* Hardware:
+    - Sound: SM64 + SM65.
+    - 12.000 MHz xtal (only one xtal on the PCB).
+    - Five positions for banks of eight DIP switches, but four of them unpopulated (only one present on the PCB).
+    - MCU with its surface scratched out. Appears to run in external ROM mode.
+   Direct recording from PCB for reference: https://youtu.be/0cFNFCqEEQo */
+ROM_START( newhunterd )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "1_am27c512.u44", 0x00000, 0x10000, CRC(456bdb88) SHA1(7135584576f7761b4a0b4c66318cd0cb649eeb93) )
+
+	ROM_REGION( 0x40000, "tilemap", 0 )
+	ROM_LOAD( "4_d27c010a.u42", 0x00000, 0x08000, CRC(c1daa20f) SHA1(c46278a00b6cbbd79c4184db910bf2770d77d92f) )
+	ROM_CONTINUE(               0x10000, 0x08000 )
+	ROM_CONTINUE(               0x08000, 0x08000 )
+	ROM_CONTINUE(               0x18000, 0x08000 )
+	ROM_LOAD( "5_am27c010.u41", 0x20000, 0x08000, CRC(b1f7bdde) SHA1(1b258450e8e73fd35feb2048a19659546cdceabd) )
+	ROM_CONTINUE(               0x30000, 0x08000 )
+	ROM_CONTINUE(               0x28000, 0x08000 )
+	ROM_CONTINUE(               0x38000, 0x08000 )
+
+	ROM_REGION( 0x08000, "reels", 0 )
+	ROM_LOAD( "2_27c512.u3",    0x00000, 0x04000, CRC(bafd35ef) SHA1(5ef297e03d11faa97a79ed87eb73debf81af2b91) )
+	ROM_IGNORE(0xc000)
+	ROM_LOAD( "3_m27512.u43",   0x04000, 0x04000, CRC(44933beb) SHA1(a19ed785cc3b38c2a2a6a08e9d639361ee118343) )
+	ROM_IGNORE(0xc000)
+
+	ROM_REGION( 0x00300, "proms", 0 ) // Not dumped for this set, the ones from newhunterb seem to fit
+	ROM_LOAD( "n82s129an.u67",  0x00000, 0x00100, BAD_DUMP CRC(971843e5) SHA1(4cb5fc1085503dae2f2f02eb49cca051ac84b890) )
+	ROM_LOAD( "n82s129an.u68",  0x00100, 0x00100, BAD_DUMP CRC(b4bd872c) SHA1(c0f9fe68186636d6d6bc6f81415459631cf38edd) )
+	ROM_LOAD( "n82s129an.u69",  0x00200, 0x00100, BAD_DUMP CRC(db99f6da) SHA1(d281a2fa06f1890ef0b1c4d099e6828827db14fd) )
+
+	ROM_REGION( 0x00045c, "plds", 0 )
+	ROM_LOAD( "palce16v8h.u61", 0x00000, 0x00117, NO_DUMP )
+	ROM_LOAD( "palce16v8h.u6",  0x00117, 0x00117, NO_DUMP )
+	ROM_LOAD( "palce16v8h.u30", 0x0022e, 0x00117, NO_DUMP )
+	ROM_LOAD( "palce16v8h.u59", 0x00345, 0x00117, NO_DUMP )
+	ROM_LOAD( "palce16v8h.u29", 0x00000, 0x00117, NO_DUMP )
+	ROM_LOAD( "palce16v8h.u35", 0x00000, 0x00117, NO_DUMP )
+ROM_END
+
+/*  Korean title: 뉴 동물 동물
+    PCB silkscreened "V 98.03.18". Four banks of eight DIP switches, unpopulated socket (SW5) for reset switch.
+    Hardware: K-664 + K-666, HD647180X0CP8L, QL8X12B-XPL68C, 12.000 MHz xtal.
+    Video from the real hardware: https://youtu.be/VtPV3DonIsY */
+ROM_START( ndongmul )
+	ROM_REGION( 0x04000, "maincpu", 0 )
+	ROM_LOAD( "hd647180.bin", 0x00000, 0x04000, NO_DUMP ) // HD647180X0CP8L
+	HD647180X_FAKE_INTERNAL_ROM
+
+	ROM_REGION( 0x20000, "program", 0 )
+	ROM_LOAD( "tms27c010a.u26", 0x10000, 0x10000, CRC(cf30ed7e) SHA1(138bbfa252769d19b976906a057e54e41135ebe7) )
+	ROM_CONTINUE(               0x00000, 0x10000 )
+
+	ROM_REGION( 0x40000, "tilemap", 0 )
+	ROM_LOAD( "m27512.u24",     0x00000, 0x08000, CRC(c3a4460c) SHA1(a8c663354faded0012e8fc18d37fdbe76e301fc1) )
+	ROM_CONTINUE(               0x10000, 0x08000 )
+	ROM_LOAD( "nm27c512q.u24a", 0x08000, 0x08000, CRC(e86f4432) SHA1(d545087561c93690438affea8994da1e6e3ce8af) )
+	ROM_CONTINUE(               0x18000, 0x08000 )
+	ROM_LOAD( "d27c512.u25",    0x20000, 0x08000, CRC(9ca948c1) SHA1(bf407820b10bea1726e00786892188e3dc07018f) )
+	ROM_CONTINUE(               0x30000, 0x08000 )
+	ROM_LOAD( "m27c512.u25a",   0x28000, 0x08000, CRC(1b943b64) SHA1(518c0e18bb942c8756364d60d9390e02e79e94f4) )
+	ROM_CONTINUE(               0x38000, 0x08000 )
+
+	ROM_REGION( 0x20000, "reels", 0 )
+	ROM_LOAD( "tms27c512.u29",  0x00000, 0x10000, BAD_DUMP CRC(c271fb5f) SHA1(980ab3f14b84dcb1802519047b6afdf0671259d2) ) // Bitrotten, address 0x00410 sometimes reads as 0002 and others as 0003
+	ROM_LOAD( "d27512.u30",     0x10000, 0x10000, CRC(55ddc00a) SHA1(8d6287f22a73792a438214098451809604186cb0) )
+
+	ROM_REGION( 0x00300, "proms", 0 )
+	ROM_LOAD( "n82s129an.u1",   0x00000, 0x00100, CRC(69af17fc) SHA1(38546f5665cf731195ac384aca182c56884333f0) )
+	ROM_LOAD( "n82s129an.u2",   0x00100, 0x00100, CRC(4b5f288a) SHA1(b6b9f9067afe93bd13ea17311484e2a2af01a0ed) )
+	ROM_LOAD( "n82s129an.u3",   0x00200, 0x00100, CRC(a1c0d069) SHA1(794df68451525901ebd5895feb26fcda2c517c3f) )
+
+	ROM_REGION( 0x00045c, "plds", 0 )
+	ROM_LOAD( "palce16v8h.u27", 0x00000, 0x00117, CRC(bf7e1812) SHA1(f299fda423fce9f8ffd4df07e315bea3662479b4) )
+	ROM_LOAD( "palce16v8h.u42", 0x00117, 0x00117, CRC(0cf55cec) SHA1(845395ca0587627331b9ac48777f7cb6b54b9401) )
+	ROM_LOAD( "palce16v8h.u9",  0x0022e, 0x00117, CRC(8272668f) SHA1(9037f0d9c7625d05d2087e6f2d159dece934a945) )
+	ROM_LOAD( "palce16v8h.u31", 0x00345, 0x00117, CRC(c40859b3) SHA1(e25e1c4311deaa174c8a7e015e55a1aecd83005e) )
 ROM_END
 
 /***************************************************************************
@@ -3275,9 +3567,11 @@ Info by f205v (14/12/2008)
 ***************************************************************************/
 
 ROM_START( crsbingo )
-	ROM_REGION( 0x14000, "maincpu", 0 )
-	ROM_LOAD( "1.u36", 0x10000, 0x4000, CRC(c5aff4eb) SHA1(74f06d7735975657fca9be5fff9e7d53f38fcd02) )
-	ROM_CONTINUE(0x0000,0xc000)
+	ROM_REGION( 0x4000, "maincpu", 0 )
+	HD647180X_FAKE_INTERNAL_ROM
+
+	ROM_REGION( 0x10000, "program", 0 )
+	ROM_LOAD( "1.u36", 0x00000, 0x10000, CRC(c5aff4eb) SHA1(74f06d7735975657fca9be5fff9e7d53f38fcd02) )
 
 	ROM_REGION( 0x20000, "tilemap", 0 )
 	ROM_LOAD( "2.u4",  0x00000, 0x10000, CRC(ce527722) SHA1(f3759cefab902259eb25f8d4be2fcafc1afd90b9) )
@@ -3336,9 +3630,11 @@ Info by f205v (25/03/2008)
 ***************************************************************************/
 
 ROM_START( sharkpy )
-	ROM_REGION( 0x14000, "maincpu", 0 )
-	ROM_LOAD( "shark_n.1.u18", 0x0a000, 0x6000, CRC(25aeac2f) SHA1(d94e3e5cfffd150ac48e1463493a8323f42e7a89) ) // is this mapped correctly? - used during gameplay?
-	ROM_CONTINUE(0x0000, 0xa000)
+	ROM_REGION( 0x4000, "maincpu", 0 )
+	HD647180X_FAKE_INTERNAL_ROM
+
+	ROM_REGION( 0x10000, "program", 0 )
+	ROM_LOAD( "shark_n.1.u18", 0x00000, 0x10000, CRC(25aeac2f) SHA1(d94e3e5cfffd150ac48e1463493a8323f42e7a89) )
 
 	ROM_REGION( 0x40000, "tilemap", 0 )
 	ROM_LOAD( "shark_n.3.u16", 0x00000, 0x08000, CRC(a7a715ce) SHA1(38b93e05377d9cb816688f5070e847480f195c6b) )
@@ -3400,9 +3696,11 @@ Info by f205v (25/03/2008)
 ***************************************************************************/
 
 ROM_START( sharkpya )
-	ROM_REGION( 0x14000, "maincpu", 0 )
-	ROM_LOAD( "shark1.6.u18", 0x0a000, 0x6000, CRC(365312a0) SHA1(de8370b1f35e8d071185d2e5f2fbd2fdf74c55ac) )
-	ROM_CONTINUE(0x0000, 0xa000)
+	ROM_REGION( 0x4000, "maincpu", 0 )
+	HD647180X_FAKE_INTERNAL_ROM
+
+	ROM_REGION( 0x10000, "program", 0 )
+	ROM_LOAD( "shark1.6.u18", 0x00000, 0x10000, CRC(365312a0) SHA1(de8370b1f35e8d071185d2e5f2fbd2fdf74c55ac) )
 
 	ROM_REGION( 0x40000, "tilemap", 0 )
 	ROM_LOAD( "shark_n.3.u16", 0x00000, 0x08000, CRC(a7a715ce) SHA1(38b93e05377d9cb816688f5070e847480f195c6b) )
@@ -3434,9 +3732,11 @@ ROM_END
 ***************************************************************************/
 
 ROM_START( sharkpye )
-	ROM_REGION( 0x14000, "maincpu", 0 )
-	ROM_LOAD( "sharkpye.u18", 0x0a000, 0x6000, CRC(12473814) SHA1(9c24ed41781aefee0161add912e730ba0d4f4d3e) )
-	ROM_CONTINUE(0x0000, 0xa000)
+	ROM_REGION( 0x4000, "maincpu", 0 )
+	HD647180X_FAKE_INTERNAL_ROM
+
+	ROM_REGION( 0x10000, "program", 0 )
+	ROM_LOAD( "sharkpye.u18", 0x00000, 0x10000, CRC(12473814) SHA1(9c24ed41781aefee0161add912e730ba0d4f4d3e) )
 
 	ROM_REGION( 0x40000, "tilemap", 0 )
 	ROM_LOAD( "sharkpye.u16", 0x00000, 0x08000, CRC(90862185) SHA1(9d632bfa707d3449a87d7f370eb2b5c36e61aadd) )
@@ -3472,9 +3772,11 @@ ROM_END
 ****************************************************************************/
 
 ROM_START( victor6 )
-	ROM_REGION( 0x14000, "maincpu", 0 )
-	ROM_LOAD( "victor_6ii-rom_1.ver2.3n.u18", 0x0a000, 0x6000, CRC(d496ecbd) SHA1(1f982b42bc46c09298916a6cb2db0b38c6451ec3) )
-	ROM_CONTINUE(0x0000, 0xa000)
+	ROM_REGION( 0x4000, "maincpu", 0 )
+	HD647180X_FAKE_INTERNAL_ROM
+
+	ROM_REGION( 0x10000, "program", 0 )
+	ROM_LOAD( "victor_6ii-rom_1.ver2.3n.u18", 0x00000, 0x10000, CRC(d496ecbd) SHA1(1f982b42bc46c09298916a6cb2db0b38c6451ec3) )
 
 	ROM_REGION( 0x40000, "tilemap", 0 )
 	ROM_LOAD( "victor_6ii-rom_3_ver1.0.u16", 0x00000, 0x08000, CRC(4e96c30a) SHA1(4989b10a52ba61459864aa44be9ebafe68b4d231) )
@@ -3496,9 +3798,11 @@ ROM_START( victor6 )
 ROM_END
 
 ROM_START( victor6a )
-	ROM_REGION( 0x14000, "maincpu", 0 )
-	ROM_LOAD( "victor_6ii_alpha_1_ver2.3.u18", 0x0a000, 0x6000, CRC(2a3eaecd) SHA1(18bf2dfec8cd5690d6465f750093942afda66475) )
-	ROM_CONTINUE(0x0000, 0xa000)
+	ROM_REGION( 0x4000, "maincpu", 0 )
+	HD647180X_FAKE_INTERNAL_ROM
+
+	ROM_REGION( 0x10000, "program", 0 )
+	ROM_LOAD( "victor_6ii_alpha_1_ver2.3.u18", 0x00000, 0x10000, CRC(2a3eaecd) SHA1(18bf2dfec8cd5690d6465f750093942afda66475) )
 
 	ROM_REGION( 0x40000, "tilemap", 0 )
 	ROM_LOAD( "victor_6ii-rom_3_ver1.0.u16", 0x00000, 0x08000, CRC(4e96c30a) SHA1(4989b10a52ba61459864aa44be9ebafe68b4d231) )
@@ -3520,9 +3824,11 @@ ROM_START( victor6a )
 ROM_END
 
 ROM_START( victor6b )
-	ROM_REGION( 0x14000, "maincpu", 0 )
-	ROM_LOAD( "victor_6ii_rom_1_ver1.2.u18", 0x0a000, 0x6000, CRC(309876fc) SHA1(305c4cf347b512607e2c58a580075a34b48bedd5) )
-	ROM_CONTINUE(0x0000, 0xa000)
+	ROM_REGION( 0x4000, "maincpu", 0 )
+	HD647180X_FAKE_INTERNAL_ROM
+
+	ROM_REGION( 0x10000, "program", 0 )
+	ROM_LOAD( "victor_6ii_rom_1_ver1.2.u18", 0x00000, 0x10000, CRC(309876fc) SHA1(305c4cf347b512607e2c58a580075a34b48bedd5) )
 
 	ROM_REGION( 0x40000, "tilemap", 0 )
 	ROM_LOAD( "victor_6ii-rom_3_ver1.0.u16", 0x00000, 0x08000, CRC(4e96c30a) SHA1(4989b10a52ba61459864aa44be9ebafe68b4d231) )
@@ -3857,6 +4163,102 @@ ROM_START( mtrainnv )
 	ROM_COPY( "maincpu", 0x000000, 0x00000, 0x10000 ) // just to show something
 ROM_END
 
+/*
+ Seven Land (Korea, probably a bootleg of Super Treasure Island). String "KAM 1.2" on program ROM.
+   MCU Hitachi HD64180RP6.
+   Actel A40MX04-F.
+   Sound: U6612 (YM3812) + U6614 (YM3014) + 12.000 MHz xtal.
+   HM86171-80 RAMDAC.
+   Four banks of 8 DIP switches labeled SW1 to SW4.
+   Reset switch near the DIP switches banks.
+   One unpopulated location on the PCB (near the sound chips) for another bank of 8 DIP switches, labeled SW0.
+   3.6V battery near the HD64180RP6
+   No bipolar PROMs on this PCB.
+ Known issues:
+   When setting "Clear Ticket Unit" DIP switch to 100, the game resets after betting 120.
+   Lamps aren't working properly.
+   There's a gray stripe on the title screen that isn't present on the real hardware.
+*/
+
+ROM_START( sevenlnd )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "a_am27c512.u58", 0x00000, 0x10000, CRC(7abaca14) SHA1(48e4eb4ef7df09f29a382167291ee6385279d1f5) )
+
+	ROM_REGION( 0x100000, "tilemap", 0 )
+	ROM_LOAD( "sevenlnd_tilemap_1.u30", 0x00000, 0x40000, CRC(17ebde1c) SHA1(8588830628ce09de57acf287b983bfcfcb0e35f2) ) // A278308
+	ROM_LOAD( "sevenlnd_tilemap_3.u28", 0x40000, 0x40000, CRC(615f6f8f) SHA1(e75e935fd7e5d1a68c0e22d8dddcb706278833db) ) // A278308
+	ROM_LOAD( "sevenlnd_tilemap_4.u27", 0x80000, 0x40000, CRC(f78b273e) SHA1(20bb58042db14af6c65804dfd24e5fb38ce68bd2) ) // A278308
+	ROM_LOAD( "sevenlnd_tilemap_2.u29", 0xc0000, 0x40000, CRC(be95e805) SHA1(8d920e4a04a1f53f3354b031d1cc3bda5f13df44) ) // A278308
+
+	ROM_REGION( 0x80000, "reels", 0 )
+	ROM_LOAD( "sevenlnd_reels_1.u25", 0x00000, 0x20000, CRC(49ce7fea) SHA1(eed75c012da5cbcee0762a5692f81b824e9715c4) ) // 27C010
+	ROM_LOAD( "sevenlnd_reels_2.u24", 0x20000, 0x20000, CRC(4d5c4550) SHA1(c78adf8ee38d82251bcb26d7b693a5155997c2d1) ) // 27C010
+	ROM_LOAD( "sevenlnd_reels_3.u23", 0x40000, 0x20000, CRC(31b7e157) SHA1(5e07725a91d5087e97b2299e5e81356b6d0fb5e9) ) // 27C010
+	ROM_LOAD( "sevenlnd_reels_4.u22", 0x60000, 0x20000, CRC(27d575bc) SHA1(e2a0164cf57f39554cace53b3d894c0e32ad2f56) ) // 27C010
+
+	ROM_REGION( 0x157, "plds", 0 )
+	ROM_LOAD( "gal16v8d_1.bin", 0x000, 0x117, NO_DUMP )
+	ROM_LOAD( "gal16v8d_2.bin", 0x000, 0x117, NO_DUMP )
+	ROM_LOAD( "gal16v8d_3.bin", 0x000, 0x117, NO_DUMP )
+	ROM_LOAD( "gal16v8d_4.bin", 0x000, 0x117, NO_DUMP )
+	ROM_LOAD( "palce20v8h.bin", 0x000, 0x157, NO_DUMP )
+ROM_END
+
+/* Lucky Seven. String "KAM 1.2" on program ROM.
+   Same PCB as "sevenlnd", but with a PAL soldered to SW0 dip switches bank (this socket is empty on "sevenlnd").
+   Bad graphics on title screen, but happens also on real hardware. Mismatched program and tile ROMs,
+   a poor effort at a hack, or a buggy development version?
+   There's a gray stripe on the title screen that isn't present on the real hardware.
+   Recording from real hardware: https://youtu.be/By7Xi5jf2Qc
+*/
+ROM_START( luckyseven )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "m27c512.u12",         0x00000, 0x10000, CRC(7abaca14) SHA1(48e4eb4ef7df09f29a382167291ee6385279d1f5) )
+
+	ROM_REGION( 0x100000, "tilemap", 0 )
+	ROM_LOAD( "m27c2001.u30",        0x00000, 0x40000, CRC(7fe8562c) SHA1(dec6d1bf4026a0cc5afb34838a5a5d7e480d2e9d) )
+	ROM_LOAD( "tms27c020.u29",       0x40000, 0x40000, CRC(61208b5b) SHA1(148c1e639245169b7ebfd0f2b75de4f179cdfc54) )
+	ROM_LOAD( "m27c2001.u28",        0x80000, 0x40000, CRC(0eef9939) SHA1(50268863df7602fe5264867eb9b65f00e78f424a) )
+	ROM_LOAD( "am27c020.u27",        0xc0000, 0x40000, CRC(1502d4c7) SHA1(a5b7897004d70aa1b69a547e8c6a1756bd83ccb6) )
+
+	ROM_REGION( 0x80000, "reels", 0 )
+	ROM_LOAD( "tms27c010a.u25",      0x00000, 0x20000, CRC(4f28aeb0) SHA1(686d003d674186d95eeda8139d89f2a39a703b41) )
+	ROM_LOAD( "am27c010.u24",        0x20000, 0x20000, CRC(4f28aeb0) SHA1(686d003d674186d95eeda8139d89f2a39a703b41) ) // Same content as U25
+	ROM_LOAD( "m27c1001.u23",        0x40000, 0x20000, CRC(fdea6687) SHA1(7d352b1675380a8bb61af2a73ac3b85ce5ac433c) )
+	ROM_LOAD( "am27c010.u22",        0x60000, 0x20000, CRC(c8b90af5) SHA1(ff1bf2c6d2b8d0f2926127bc74bc4488c7771cdd) )
+
+	ROM_REGION( 0x157, "plds", 0 )
+	ROM_LOAD( "palce16v8h-25.u1",    0x00000, 0x00117, CRC(57e44e7e) SHA1(ca92a40f2781ac11ffcfd9a7ef1e852b719fe35c) )
+	ROM_LOAD( "palce16v8h-25.u2",    0x00000, 0x00117, CRC(8272668f) SHA1(9037f0d9c7625d05d2087e6f2d159dece934a945) )
+	ROM_LOAD( "palce16v8h-25.u18",   0x00000, 0x00117, CRC(d88c5718) SHA1(80914932b3fd5b200ffb5fb8ac30b8636cfa72de) )
+	ROM_LOAD( "palce16v8h-25.u43",   0x00000, 0x00117, CRC(cca094fd) SHA1(9c6b10e0c831b7ab5fd0c91bd357be38bc3df020) )
+	ROM_LOAD( "palce20v8h-25pc.u55", 0x00000, 0x00157, CRC(c6c6fa81) SHA1(05fbd86db3624f67f766817d18f8b7d386d67b74) )
+	ROM_LOAD( "palce16v8h-25.sw0",   0x00000, 0x00117, CRC(92bb58d6) SHA1(73e0626354738f74d1624d5a430a00b3e6e227d7) ) // Soldered to dip switches bank SW0
+ROM_END
+
+ROM_START( grndprix )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "m27c512.u12", 0x00000, 0x10000, CRC(d624ef87) SHA1(77c03cf4715906d64531abf1e3e85212107f1cde) )
+
+	ROM_REGION( 0x100000, "tilemap", ROMREGION_ERASE00 )
+	ROM_LOAD( "tms27c020.u30", 0x00000, 0x40000, NO_DUMP )
+	ROM_LOAD( "am27c020.u29",  0x40000, 0x40000, CRC(a2ecf811) SHA1(10c1339040f39f63b5d3b706b35b417f244981a6) )
+	ROM_LOAD( "m27c2001.u28",  0x80000, 0x40000, CRC(a923eb32) SHA1(b5da49cab5be7832592633bd4d8a7e37dc545e2a) )
+	ROM_LOAD( "m27c2001.u27",  0xc0000, 0x40000, CRC(822f9138) SHA1(5673796684aa157288fbe02eab75598c61735fa9) )
+
+	ROM_REGION( 0x80000, "reels", 0 )
+	ROM_LOAD( "m27c1001.u25",   0x00000, 0x20000, CRC(42f3bac5) SHA1(33bff2c9904c3188d5d1076363fab4cf1b1f3946) )
+	ROM_LOAD( "tms27c010a.u24", 0x20000, 0x20000, CRC(675a4e94) SHA1(c501e5f53b5c2610212d776341a14d692fc1a175) )
+	ROM_LOAD( "27c010a.u23",    0x40000, 0x20000, CRC(7de68191) SHA1(0ca2869fbe146393bb567e28d937702892e0b2fd) )
+	ROM_LOAD( "27c010a.u22",    0x60000, 0x20000, CRC(ff2c3e13) SHA1(cdaeb16a55487afdc53b4105d3dc653f20b21df4) )
+
+	ROM_REGION( 0xa00, "plds", ROMREGION_ERASE00 )
+	ROM_LOAD( "palce16v8h-25.u1",    0x000, 0x117, CRC(57e44e7e) SHA1(ca92a40f2781ac11ffcfd9a7ef1e852b719fe35c) )
+	ROM_LOAD( "palce16v8h-25.u2",    0x200, 0x117, CRC(8272668f) SHA1(9037f0d9c7625d05d2087e6f2d159dece934a945) )
+	ROM_LOAD( "palce16v8h-25.u18",   0x400, 0x117, CRC(d88c5718) SHA1(80914932b3fd5b200ffb5fb8ac30b8636cfa72de) )
+	ROM_LOAD( "palce16v8h-25.u43",   0x600, 0x117, CRC(cca094fd) SHA1(9c6b10e0c831b7ab5fd0c91bd357be38bc3df020) )
+	ROM_LOAD( "palce20v8h-25pc.u55", 0x800, 0x157, CRC(c6c6fa81) SHA1(05fbd86db3624f67f766817d18f8b7d386d67b74) )
+ROM_END
 
 ROM_START( dinofmly ) // very similar PCB to the smoto set, but instead of 3 PROMs it has a RAMDAC.
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -3901,7 +4303,8 @@ ROM_END
 
 void subsino_state::init_victor5()
 {
-	subsino_decrypt(machine(), victor5_bitswaps, victor5_xors, 0xc000);
+	uint8_t *rom = memregion( "program" )->base() + 0x4000;
+	subsino_decrypt(rom, victor5_bitswaps, victor5_xors, 0x8000);
 
 	m_flash_packet = 0;
 	m_flash_packet_start = 0;
@@ -3914,12 +4317,14 @@ void subsino_state::init_victor5()
 
 void subsino_state::init_victor21()
 {
-	subsino_decrypt(machine(), victor21_bitswaps, victor21_xors, 0xc000);
+	uint8_t *rom = memregion( "program" )->base() + 0x4000;
+	subsino_decrypt(rom, victor21_bitswaps, victor21_xors, 0x8000);
 }
 
 void subsino_state::init_crsbingo()
 {
-	subsino_decrypt(machine(), crsbingo_bitswaps, crsbingo_xors, 0xc000);
+	uint8_t *rom = memregion( "program" )->base() + 0x4000;
+	subsino_decrypt(rom, crsbingo_bitswaps, crsbingo_xors, 0x8000);
 
 	m_flash_packet = 0;
 	m_flash_packet_start = 0;
@@ -3932,12 +4337,14 @@ void subsino_state::init_crsbingo()
 
 void subsino_state::init_sharkpy()
 {
-	subsino_decrypt(machine(), sharkpy_bitswaps, sharkpy_xors, 0xa000);
+	uint8_t *rom = memregion( "program" )->base() + 0x6000;
+	subsino_decrypt(rom, sharkpy_bitswaps, sharkpy_xors, 0x8000);
 }
 
 void subsino_state::init_sharkpye()
 {
-	subsino_decrypt(machine(), victor5_bitswaps, victor5_xors, 0xa000);
+	uint8_t *rom = memregion( "program" )->base() + 0x6000;
+	subsino_decrypt(rom, victor5_bitswaps, victor5_xors, 0x8000);
 }
 
 void subsino_state::init_smoto20()
@@ -3954,55 +4361,26 @@ void subsino_state::init_smoto13()
 
 void subsino_state::init_tisub()
 {
-	uint8_t *rom = memregion( "maincpu" )->base();
-
-	init_victor5();
-
-	/* this trips a z180 MMU core bug? It unmaps a region then the program code jumps to that region... */
-	rom[0x64c8] = 0x00;
-	rom[0x64c9] = 0x00;
-	rom[0x64ca] = 0x00;
-	rom[0x64cd] = 0x00;
-	rom[0x64ce] = 0x00;
-	rom[0x64cf] = 0x00;
-}
-
-void subsino_state::init_tisuba()
-{
-	uint8_t *rom = memregion( "maincpu" )->base();
-
-	init_victor5();
-
-	/* this trips a z180 MMU core bug? It unmaps a region then the program code jumps to that region... */
-	rom[0x6491] = 0x00;
-	rom[0x6492] = 0x00;
-	rom[0x6493] = 0x00;
-	rom[0x6496] = 0x00;
-	rom[0x6497] = 0x00;
-	rom[0x6498] = 0x00;
+	uint8_t *rom = memregion( "program" )->base() + 0x4000;
+	subsino_decrypt(rom, victor5_bitswaps, victor5_xors, 0x8000);
 }
 
 void subsino_state::init_tisubb()
 {
-	subsino_decrypt(machine(), tisubb_bitswaps, tisubb_xors, 0xc000);
+	uint8_t *rom = memregion( "program" )->base() + 0x4000;
+	subsino_decrypt(rom, tisubb_bitswaps, tisubb_xors, 0x8000);
+}
 
-	uint8_t *rom = memregion( "maincpu" )->base();
+void subsino_state::init_newhunterb()
+{
+	uint8_t *rom = memregion( "program" )->base() + 0x6000;
+	subsino_decrypt(rom, tisubb_bitswaps, tisubb_xors, 0x8000);
+}
 
-	/* this trips a z180 MMU core bug? It unmaps a region then the program code jumps to that region... */
-	rom[0x60da] = 0x00;
-	rom[0x60db] = 0x00;
-	rom[0x60dc] = 0x00;
-	rom[0x60df] = 0x00;
-	rom[0x60e0] = 0x00;
-	rom[0x60e1] = 0x00;
-
-	m_flash_packet = 0;
-	m_flash_packet_start = 0;
-	m_flash_val = 0;
-
-	save_item(NAME(m_flash_packet));
-	save_item(NAME(m_flash_packet_start));
-	save_item(NAME(m_flash_val));
+void subsino_state::init_newhunterc()
+{
+	uint8_t *rom = memregion( "program" )->base() + 0x6000;
+	subsino_decrypt(rom, newhunterc_bitswaps, newhunterc_xors, 0x8000);
 }
 
 void subsino_state::init_stbsub()
@@ -4074,6 +4452,23 @@ void subsino_state::init_tesorone230()
 	}
 }
 
+void subsino_state::init_grndprix()
+{
+#if 1
+	uint8_t *rom = memregion( "maincpu" )->base();
+	rom[0x1464] = 0x18; //patch protection check
+	rom[0x1465] = 0x11;
+	rom[0x7ab] = 0x18; //patch "winning protection" check
+	rom[0x96f] = 0x18; //patch "losing protection" check
+#endif
+
+	for (uint8_t reel = 0; reel < 3; reel++)
+	{
+		m_reel_attr[reel] = std::make_unique<uint8_t[]>(0x200);
+
+		save_pointer(NAME(m_reel_attr[reel]), 0x200, reel);
+	}
+}
 
 void subsino_state::init_mtrainnv()
 {
@@ -4092,37 +4487,49 @@ void subsino_state::init_mtrainnv()
 *                               Game Drivers                               *
 ***************************************************************************/
 
-//     YEAR  NAME         PARENT   MACHINE   INPUT     CLASS          INIT              ROT   COMPANY            FULLNAME                                       FLAGS                LAYOUT
-GAMEL( 1990, victor21,    0,       victor21, victor21, subsino_state, init_victor21,    ROT0, "Subsino / Buffy", "Victor 21",                                   0,                   layout_victor21 )
+//     YEAR  NAME         PARENT   MACHINE     INPUT     CLASS          INIT              ROT   COMPANY            FULLNAME                                       FLAGS                LAYOUT
+GAMEL( 1990, victor21,    0,       victor21,   victor21, subsino_state, init_victor21,    ROT0, "Subsino / Buffy", "Victor 21",                                   0,                   layout_victor21 )
 
-GAMEL( 1991, victor5,     0,       victor5,  victor5,  subsino_state, init_victor5,     ROT0, "Subsino / Buffy", "Victor 5",                                    0,                   layout_victor5  ) // Original PCB and game from Subsino.
-GAMEL( 1991, victor5a,    victor5, victor5,  victor5,  subsino_state, init_victor5,     ROT0, "Subsino",         "G.E.A.",                                      0,                   layout_victor5  ) // PCB black-box was marked 'victor 5' - in-game says G.E.A with no manufacturer info?
+GAMEL( 1991, victor5,     0,       victor5,    victor5,  subsino_state, init_victor5,     ROT0, "Subsino / Buffy", "Victor 5",                                    0,                   layout_victor5  ) // Original PCB and game from Subsino.
+GAMEL( 1991, victor5a,    victor5, victor5,    victor5,  subsino_state, init_victor5,     ROT0, "Subsino",         "G.E.A.",                                      0,                   layout_victor5  ) // PCB black-box was marked 'victor 5' - in-game says G.E.A with no manufacturer info?
 
-GAMEL( 1992, tisub,       0,       tisub,    tisub,    subsino_state, init_tisub,       ROT0, "Subsino",         "Treasure Island (Subsino, set 1)",            0,                   layout_tisub    )
-GAMEL( 1992, tisuba,      tisub,   tisub,    tisub,    subsino_state, init_tisuba,      ROT0, "Subsino",         "Treasure Island (Subsino, set 2)",            0,                   layout_tisub    )
-GAMEL( 1992, tisubb,      tisub,   tisub,    tisubb,   subsino_state, init_tisubb,      ROT0, "American Alpha",  "Treasure Island (American Alpha, v3.0N)",     0,                   layout_tisubb   )
+GAMEL( 1992, tisub,       0,       tisub,      tisub,    subsino_state, init_tisub,       ROT0, "Subsino",         "Treasure Island (Subsino, set 1)",            0,                   layout_tisub    )
+GAMEL( 1992, tisuba,      tisub,   tisub,      tisub,    subsino_state, init_tisub,       ROT0, "Subsino",         "Treasure Island (Subsino, set 2)",            0,                   layout_tisub    )
+GAMEL( 1992, tisubb,      tisub,   tisub,      tisubb,   subsino_state, init_tisubb,      ROT0, "American Alpha",  "Treasure Island (American Alpha, v3.0N)",     0,                   layout_tisubb   )
 
-GAMEL( 1991, crsbingo,    0,       crsbingo, crsbingo, subsino_state, init_crsbingo,    ROT0, "Subsino",         "Poker Carnival",                              0,                   layout_crsbingo )
+// tilemaps, lamps and inputs troubles.
+GAMEL( 1992, newhunter,   tisub,   tisub,      tisub,    subsino_state, init_tisubb,      ROT0, "Karam",           "New HUNTer",                                  MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING, layout_tisubb   ) // 1989 on screen, but this bootleg is from 1992
+GAMEL( 1993, newhunterb,  tisub,   newhunterb, tisub,    subsino_state, init_newhunterb,  ROT0, "bootleg",         "New HUNTer (bootleg, set 1)",                 MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING, layout_tisubb   )
 
-GAMEL( 1994, dinofmly,    0,       dinofmly, sharkpy,  subsino_state, empty_init,       ROT0, "Subsino",         "Dino Family",                                 MACHINE_NOT_WORKING, layout_sharkpy ) // stops with 'error password' message during boot
-GAMEL( 1995, dinofmlya,   dinofmly,dinofmly, sharkpy,  subsino_state, empty_init,       ROT0, "Tangasoft",       "Dino Family (Portuguese, Tangasoft license)", MACHINE_NOT_WORKING, layout_sharkpy ) // stops with 'error password' message during boot
+GAMEL( 1993, newhunterc,  tisub,   newhunterb, tisub,    subsino_state, init_newhunterc,  ROT0, "bootleg",         "New HUNTer (bootleg, set 2)",                 MACHINE_NOT_WORKING, layout_tisubb   ) // 1989 on screen, but "Copyright 1993 SubSino Corp. Taipei, Taiwan." on program ROM
+GAMEL( 1993, newhunterd,  tisub,   newhunterd, tisub,    subsino_state, empty_init,       ROT0, "bootleg",         "New HUNTer (bootleg, set 3)",                 MACHINE_NOT_WORKING, layout_tisubb   ) // reel GFX don't appear, inputs
+GAMEL( 1998, ndongmul,    0,       newhunterb, tisub,    subsino_state, init_newhunterc,  ROT0, "Hyoja Game",      "New DongmulDongmul",                          MACHINE_NOT_WORKING, layout_tisubb   ) // hangs after a while, bad reels GFX loading / decode
 
-GAMEL( 1995, stbsub,      0,       stbsub,   stbsub,   subsino_state, init_stbsub,      ROT0, "American Alpha",  "Treasure Bonus (Subsino, v1.6)",              0,                   layout_stisub   ) // board CPU module marked 'Super Treasure Island' (alt title?)
-GAMEL( 1995, stisub,      stbsub,  stbsub,   stbsub,   subsino_state, init_stisub,      ROT0, "Subsino",         "Super Treasure Island (Italy, v1.6)",         0,                   layout_stisub   )
-GAMEL( 1995, tesorone,    stbsub,  stbsub,   tesorone, subsino_state, init_tesorone,    ROT0, "Subsino",         "Tesorone Dell'Isola (Italy, v2.41)",          0,                   layout_stisub   )
-GAMEL( 1995, tesorone240, stbsub,  stbsub,   tesorone, subsino_state, init_tesorone,    ROT0, "Subsino",         "Tesorone Dell'Isola (Italy, v2.40)",          0,                   layout_stisub   )
-GAMEL( 1995, tesorone230, stbsub,  stbsub,   tesorone, subsino_state, init_tesorone230, ROT0, "Subsino",         "Tesorone Dell'Isola (Italy, v2.30)",          0,                   layout_stisub   )
 
-GAMEL( 1996, sharkpy,     0,       sharkpy,  sharkpy,  subsino_state, init_sharkpy,     ROT0, "Subsino",         "Shark Party (Italy, v1.3)",                   0,                   layout_sharkpy  ) // missing POST messages?
-GAMEL( 1996, sharkpya,    sharkpy, sharkpy,  sharkpy,  subsino_state, init_sharkpy,     ROT0, "Subsino",         "Shark Party (Italy, v1.6)",                   0,                   layout_sharkpy  ) // missing POST messages?
-GAMEL( 1995, sharkpye,    sharkpy, sharkpy,  sharkpye, subsino_state, init_sharkpye,    ROT0, "American Alpha",  "Shark Party (English, Alpha license)",        0,                   layout_sharkpye ) // PCB black-box was marked 'victor 6'
+GAMEL( 1991, crsbingo,    0,       crsbingo,   crsbingo, subsino_state, init_crsbingo,    ROT0, "Subsino",         "Poker Carnival",                              0,                   layout_crsbingo )
 
-GAMEL( 1995, victor6,     0,       sharkpy,  victor6,  subsino_state, init_sharkpye,    ROT0, "American Alpha",  "Victor 6 (v2.3N)",                            0,                   layout_sharkpye ) // ^^
-GAMEL( 1995, victor6a,    victor6, sharkpy,  victor6a, subsino_state, init_sharkpye,    ROT0, "American Alpha",  "Victor 6 (v2.3)",                             0,                   layout_sharkpye ) // ^^
-GAMEL( 1995, victor6b,    victor6, sharkpy,  victor6b, subsino_state, init_sharkpye,    ROT0, "American Alpha",  "Victor 6 (v1.2)",                             0,                   layout_sharkpye ) // ^^ Version # according to label, not displayed
+GAMEL( 1994, dinofmly,    0,       dinofmly,   sharkpy,  subsino_state, empty_init,       ROT0, "Subsino",         "Dino Family",                                 MACHINE_NOT_WORKING, layout_sharkpy  ) // stops with 'error password' message during boot
+GAMEL( 1995, dinofmlya,   dinofmly,dinofmly,   sharkpy,  subsino_state, empty_init,       ROT0, "Tangasoft",       "Dino Family (Portuguese, Tangasoft license)", MACHINE_NOT_WORKING, layout_sharkpy  ) // stops with 'error password' message during boot
 
-GAMEL( 1996, smoto20,     0,       srider,   smoto20,  subsino_state, init_smoto20,     ROT0, "Subsino",         "Super Rider (Italy, v2.0)",                   0,                   layout_smoto    )
-GAMEL( 1996, smoto16,     smoto20, srider,   smoto16,  subsino_state, init_smoto16,     ROT0, "Subsino",         "Super Moto (Italy, v1.6)",                    0,                   layout_smoto    )
-GAMEL( 1996, smoto13,     smoto20, srider,   smoto16,  subsino_state, init_smoto13,     ROT0, "Subsino",         "Super Rider (v1.3)",                          0,                   layout_smoto    )
+GAMEL( 1995, stbsub,      0,       stbsub,     stbsub,   subsino_state, init_stbsub,      ROT0, "American Alpha",  "Treasure Bonus (Subsino, v1.6)",              0,                   layout_stisub   ) // board CPU module marked 'Super Treasure Island' (alt title?)
+GAMEL( 1995, stisub,      stbsub,  stbsub,     stbsub,   subsino_state, init_stisub,      ROT0, "Subsino",         "Super Treasure Island (Italy, v1.6)",         0,                   layout_stisub   )
+GAMEL( 1995, tesorone,    stbsub,  stbsub,     tesorone, subsino_state, init_tesorone,    ROT0, "Subsino",         "Tesorone Dell'Isola (Italy, v2.41)",          0,                   layout_stisub   )
+GAMEL( 1995, tesorone240, stbsub,  stbsub,     tesorone, subsino_state, init_tesorone,    ROT0, "Subsino",         "Tesorone Dell'Isola (Italy, v2.40)",          0,                   layout_stisub   )
+GAMEL( 1995, tesorone230, stbsub,  stbsub,     tesorone, subsino_state, init_tesorone230, ROT0, "Subsino",         "Tesorone Dell'Isola (Italy, v2.30)",          0,                   layout_stisub   )
+GAMEL( 1995, sevenlnd,    stbsub,  mtrainnv,   stbsub,   subsino_state, init_mtrainnv,    ROT0, "bootleg",         "Seven Land",                                  MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING, layout_stisub   )
+GAMEL( 1995, luckyseven,  stbsub,  mtrainnv,   stbsub,   subsino_state, init_mtrainnv,    ROT0, "bootleg",         "Lucky Seven",                                 MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING, layout_stisub   )
+GAMEL( 1995, grndprix,    stbsub,  mtrainnv,   stbsub,   subsino_state, init_grndprix,    ROT0, "bootleg",         "Grand Prix (Treasure Bonus bootleg)",         MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING, layout_stisub   ) // bad dump of a GFX ROM
 
-GAME(  1996, mtrainnv,    mtrain,  mtrainnv, stbsub,   subsino_state, init_mtrainnv,    ROT0, "Subsino",         "Magic Train (Clear NVRAM ROM?)",              MACHINE_NOT_WORKING )
+GAMEL( 1996, sharkpy,     0,       sharkpy,    sharkpy,  subsino_state, init_sharkpy,     ROT0, "Subsino",         "Shark Party (Italy, v1.3)",                   0,                   layout_sharkpy  ) // missing POST messages?
+GAMEL( 1996, sharkpya,    sharkpy, sharkpy,    sharkpy,  subsino_state, init_sharkpy,     ROT0, "Subsino",         "Shark Party (Italy, v1.6)",                   0,                   layout_sharkpy  ) // missing POST messages?
+GAMEL( 1995, sharkpye,    sharkpy, sharkpy,    sharkpye, subsino_state, init_sharkpye,    ROT0, "American Alpha",  "Shark Party (English, Alpha license)",        0,                   layout_sharkpye ) // PCB black-box was marked 'victor 6'
+
+GAMEL( 1995, victor6,     0,       sharkpy,    victor6,  subsino_state, init_sharkpye,    ROT0, "American Alpha",  "Victor 6 (v2.3N)",                            0,                   layout_sharkpye ) // ^^
+GAMEL( 1995, victor6a,    victor6, sharkpy,    victor6a, subsino_state, init_sharkpye,    ROT0, "American Alpha",  "Victor 6 (v2.3)",                             0,                   layout_sharkpye ) // ^^
+GAMEL( 1995, victor6b,    victor6, sharkpy,    victor6b, subsino_state, init_sharkpye,    ROT0, "American Alpha",  "Victor 6 (v1.2)",                             0,                   layout_sharkpye ) // ^^ Version # according to label, not displayed
+
+GAMEL( 1996, smoto20,     0,       srider,     smoto20,  subsino_state, init_smoto20,     ROT0, "Subsino",         "Super Rider (Italy, v2.0)",                   0,                   layout_smoto    )
+GAMEL( 1996, smoto16,     smoto20, srider,     smoto16,  subsino_state, init_smoto16,     ROT0, "Subsino",         "Super Moto (Italy, v1.6)",                    0,                   layout_smoto    )
+GAMEL( 1996, smoto13,     smoto20, srider,     smoto16,  subsino_state, init_smoto13,     ROT0, "Subsino",         "Super Rider (v1.3)",                          0,                   layout_smoto    )
+
+GAME(  1996, mtrainnv,    mtrain,  mtrainnv,   stbsub,   subsino_state, init_mtrainnv,    ROT0, "Subsino",         "Magic Train (Clear NVRAM ROM?)",              MACHINE_NOT_WORKING )

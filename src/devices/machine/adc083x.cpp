@@ -11,6 +11,8 @@
 #include "emu.h"
 #include "adc083x.h"
 
+#include <cstdarg>
+
 #define VERBOSE_LEVEL ( 0 )
 
 static inline void ATTR_PRINTF( 3, 4 ) verboselog( int n_level, device_t &device, const char *s_fmt, ... )
@@ -137,7 +139,7 @@ void adc083x_device::clear_sars()
     adc083x_device::cs_write
 -------------------------------------------------*/
 
-WRITE_LINE_MEMBER( adc083x_device::cs_write )
+void adc083x_device::cs_write(int state)
 {
 	if( m_cs != state )
 	{
@@ -252,7 +254,7 @@ uint8_t adc083x_device::conversion()
     adc083x_device::clk_write
 -------------------------------------------------*/
 
-WRITE_LINE_MEMBER( adc083x_device::clk_write )
+void adc083x_device::clk_write(int state)
 {
 	if( m_clk != state )
 	{
@@ -400,7 +402,7 @@ WRITE_LINE_MEMBER( adc083x_device::clk_write )
     adc083x_device::di_write
 -------------------------------------------------*/
 
-WRITE_LINE_MEMBER( adc083x_device::di_write )
+void adc083x_device::di_write(int state)
 {
 	if( m_di != state )
 	{
@@ -414,7 +416,7 @@ WRITE_LINE_MEMBER( adc083x_device::di_write )
     adc083x_device::se_write
 -------------------------------------------------*/
 
-WRITE_LINE_MEMBER( adc083x_device::se_write )
+void adc083x_device::se_write(int state)
 {
 	if( m_se != state )
 	{
@@ -428,7 +430,7 @@ WRITE_LINE_MEMBER( adc083x_device::se_write )
     adc083x_device::sars_read
 -------------------------------------------------*/
 
-READ_LINE_MEMBER( adc083x_device::sars_read )
+int adc083x_device::sars_read()
 {
 	verboselog( 1, *this, "adc083x_sars_read( %s ) %d\n", tag(), m_sars );
 	return m_sars;
@@ -438,7 +440,7 @@ READ_LINE_MEMBER( adc083x_device::sars_read )
     adc083x_device::do_read
 -------------------------------------------------*/
 
-READ_LINE_MEMBER( adc083x_device::do_read )
+int adc083x_device::do_read()
 {
 	verboselog( 1, *this, "adc083x_do_read( %s ) %d\n", tag(), m_do );
 	return m_do;

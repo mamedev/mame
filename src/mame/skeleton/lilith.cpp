@@ -10,6 +10,9 @@ CPU consists of various parts including AM2901 and AM2911.
 
 #include "emu.h"
 
+
+namespace {
+
 class lilith_state : public driver_device
 {
 public:
@@ -55,5 +58,8 @@ ROM_START( lilith )
 	// keyboard
 	ROM_LOAD( "kbd_eprom.bin", 0x000000, 0x000800, CRC(40fa5230) SHA1(473ca714959fc35aa2a0ab9310aee2aedffa2163) )
 ROM_END
+
+} // anonymous namespace
+
 
 COMP( 1984, lilith, 0, 0, lilith, lilith, lilith_state, empty_init, "DISER", "Lilith", MACHINE_IS_SKELETON )

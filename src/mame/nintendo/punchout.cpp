@@ -135,7 +135,7 @@ DIP locations verified for:
 
 // Z80 (main)
 
-WRITE_LINE_MEMBER(punchout_state::nmi_mask_w)
+void punchout_state::nmi_mask_w(int state)
 {
 	m_nmi_mask = state;
 	if (!m_nmi_mask)
@@ -256,6 +256,7 @@ void punchout_state::spnchout_io_map(address_map &map)
 void punchout_state::punchout_sound_map(address_map &map)
 {
 	map(0x0000, 0x07ff).ram();
+	map(0x4000, 0x400f).nopr();
 	map(0x4016, 0x4016).r("soundlatch", FUNC(generic_latch_8_device::read));
 	map(0x4017, 0x4017).r("soundlatch2", FUNC(generic_latch_8_device::read));
 	map(0xe000, 0xffff).rom();
@@ -328,7 +329,7 @@ static INPUT_PORTS_START( punchout )
 	PORT_DIPSETTING(    0x0a, DEF_STR( 1C_5C ) )
 	PORT_DIPSETTING(    0x07, DEF_STR( 1C_6C ) )
 	PORT_DIPSETTING(    0x0f, DEF_STR( Free_Play ) )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("vlm", vlm5030_device, bsy) /* VLM5030 busy signal */
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("vlm", FUNC(vlm5030_device::bsy)) /* VLM5030 busy signal */
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_DIPUNUSED_DIPLOC( 0x40, 0x00, "R18:!1" )       /* Not documented, R18 resistor */
 	PORT_DIPNAME( 0x80, 0x00, "Copyright" )             PORT_DIPLOCATION("R19:!1") /* Not documented, R19 resistor */
@@ -561,7 +562,7 @@ bit 3210 5432  L  R  C
 	PORT_DIPSETTING(    0x0d, "1101" )
 	PORT_DIPSETTING(    0x0e, "1110" )
 	PORT_DIPSETTING(    0x0f, "1111" )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("vlm", vlm5030_device, bsy) /* VLM5030 busy signal */
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("vlm", FUNC(vlm5030_device::bsy)) /* VLM5030 busy signal */
 	PORT_DIPNAME( 0x40, 0x00, "Coin Slots" )            PORT_DIPLOCATION("R18:!1") /* R18 resistor */
 	PORT_DIPSETTING(    0x40, "1" )
 	PORT_DIPSETTING(    0x00, "2" )
@@ -592,7 +593,7 @@ static GFXDECODE_START( gfx_armwrest )
 GFXDECODE_END
 
 
-WRITE_LINE_MEMBER(punchout_state::vblank_irq)
+void punchout_state::vblank_irq(int state)
 {
 	if (state && m_nmi_mask)
 		m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
@@ -612,7 +613,7 @@ void punchout_state::punchout(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &punchout_state::punchout_map);
 	m_maincpu->set_addrmap(AS_IO, &punchout_state::punchout_io_map);
 
-	N2A03(config, m_audiocpu, NTSC_APU_CLOCK);
+	RP2A03(config, m_audiocpu, NTSC_APU_CLOCK);
 	m_audiocpu->set_addrmap(AS_PROGRAM, &punchout_state::punchout_sound_map);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
@@ -657,7 +658,7 @@ void punchout_state::punchout(machine_config &config)
 	GENERIC_LATCH_8(config, "soundlatch");
 	GENERIC_LATCH_8(config, "soundlatch2");
 
-	VLM5030(config, m_vlm, N2A03_NTSC_XTAL/6);
+	VLM5030(config, m_vlm, RP2A03_NTSC_XTAL/6);
 	m_vlm->set_addrmap(0, &punchout_state::punchout_vlm_map);
 	m_vlm->add_route(ALL_OUTPUTS, "lspeaker", 0.50);
 	m_audiocpu->add_route(ALL_OUTPUTS, "rspeaker", 0.50);

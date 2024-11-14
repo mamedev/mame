@@ -1,0 +1,526 @@
+<?xml version="1.0"?>
+<!--
+license:CC0-1.0
+-->
+<mamelayout version="2">
+
+	<!-- general grey backdrop -->
+	<element name="greyback">
+		<rect>
+			<bounds left="0" top="0" right="1" bottom="1" />
+			<color red="0.2" green="0.2" blue="0.2" />
+		</rect>
+	</element>
+
+	<!-- container boxes for top sections -->
+	<element name="box-624">
+		<rect>
+			<bounds left="0" top="0" right="624" bottom="276" />
+			<color red="0.0" green="0.0" blue="0.0" />
+		</rect>
+		<rect>
+			<bounds left="4" top="0" right="632" bottom="284" />
+			<color red="0.2" green="0.2" blue="0.2" />
+		</rect>
+	</element>
+	<element name="box-174">
+		<rect>
+			<bounds left="0" top="0" right="174" bottom="276" />
+			<color red="0.0" green="0.0" blue="0.0" />
+		</rect>
+		<rect>
+			<bounds left="4" top="0" right="180" bottom="284" />
+			<color red="0.2" green="0.2" blue="0.2" />
+		</rect>
+	</element>
+	<element name="box-522">
+		<rect>
+			<bounds left="0" top="0" right="552" bottom="276" />
+			<color red="0.0" green="0.0" blue="0.0" />
+		</rect>
+		<rect>
+			<bounds left="4" top="0" right="560" bottom="284" />
+			<color red="0.2" green="0.2" blue="0.2" />
+		</rect>
+	</element>
+	<element name="box-860">
+		<rect>
+			<bounds left="0" top="0" right="860" bottom="276" />
+			<color red="0.0" green="0.0" blue="0.0" />
+		</rect>
+		<rect>
+			<bounds left="4" top="0" right="868" bottom="284" />
+			<color red="0.2" green="0.2" blue="0.2" />
+		</rect>
+	</element>
+	<element name="box-590">
+		<rect>
+			<bounds left="0" top="0" right="590" bottom="276" />
+			<color red="0.0" green="0.0" blue="0.0" />
+		</rect>
+		<rect>
+			<bounds left="4" top="0" right="598" bottom="284" />
+			<color red="0.2" green="0.2" blue="0.2" />
+		</rect>
+	</element>
+	<element name="box-260">
+		<rect>
+			<bounds left="0" top="0" right="260" bottom="276" />
+			<color red="0.0" green="0.0" blue="0.0" />
+		</rect>
+		<rect>
+			<bounds left="4" top="0" right="268" bottom="284" />
+			<color red="0.2" green="0.2" blue="0.2" />
+		</rect>
+	</element>
+
+	<!-- logo substitutes -->
+	<element name="yamaha"><text string="YAMAHA" align="1" /></element>
+	<element name="psr11"><text string="PSR-11" align="1" /></element>
+
+	<!-- slider labels -->
+	<element name="slidermin"><text string="MIN" align="1" /></element>
+	<element name="slidermax"><text string="MAX" align="1" /></element>
+	<element name="sliderdash"><text string="-" align="1" /></element>
+
+	<!-- power section text -->
+	<element name="power"><text string="POWER" align="0" /></element>
+	<element name="master"><text string="MASTER" align="0" /></element>
+	<element name="volume"><text string="VOLUME" align="0" /></element>
+
+	<!-- pitch section text -->
+	<element name="pitch"><text string="PITCH" align="0" /></element>
+	<element name="uparrow"><text string="▲" align="0" /></element>
+	<element name="downarrow"><text string="▼" align="0" /></element>
+
+	<!-- auto bass chord section text -->
+	<element name="autobasschord"><text string="AUTO BASS CHORD" align="1" /></element>
+	<element name="off"><text string="OFF" align="1" /></element>
+	<element name="mode"><text string="MODE" align="0" /></element>
+	<element name="voicevariation"><text string="VOICE VARIATION" align="0" /></element>
+	<element name="manualbass"><text string="MANUAL BASS" align="1" /></element>
+	<element name="singlefinger"><text string="SINGLE FINGER" align="1" /></element>
+	<element name="fingered"><text string="FINGERED" align="1" /></element>
+	<element name="synth"><text string="SYNTH" align="1" /></element>
+	<element name="brass"><text string="BRASS" align="1" /></element>
+	<element name="guitar"><text string="GUITAR" align="1" /></element>
+	<element name="piano"><text string="PIANO" align="1" /></element>
+	<element name="tuba"><text string="TUBA" align="1" /></element>
+	<element name="ebass"><text string="E BASS" align="1" /></element>
+	<element name="bass"><text string="BASS" align="1" /></element>
+	<element name="chord"><text string="CHORD" align="1" /></element>
+	<element name="fillin"><text string="FILL IN" align="0" /></element>
+
+	<!-- rhythm section text -->
+	<element name="rhythm"><text string="RHYTHM" align="0" /></element>
+	<element name="bigband"><text string="BIG BAND" align="0" /></element>
+	<element name="reggae"><text string="REGGAE" align="0" /></element>
+	<element name="disco"><text string="DISCO" align="0" /></element>
+	<element name="pops"><text string="POPS" align="0" /></element>
+	<element name="swing"><text string="SWING" align="0" /></element>
+	<element name="slowrock"><text string="SLOW ROCK" align="0" /></element>
+	<element name="heavymetal"><text string="HEAVY METAL" align="0" /></element>
+	<element name="16beat"><text string="16 BEAT" align="0" /></element>
+	<element name="rocknroll"><text string="ROCK N ROLL" align="0" /></element>
+	<element name="salsa"><text string="SALSA" align="0" /></element>
+	<element name="samba"><text string="SAMBA" align="0" /></element>
+	<element name="marchpolka"><text string="MARCH/POLKA" align="0" /></element>
+	<element name="country"><text string="COUNTRY" align="0" /></element>
+	<element name="rhumba"><text string="RHUMBA" align="0" /></element>
+	<element name="bossanova"><text string="BOSSANOVA" align="0" /></element>
+	<element name="waltz"><text string="WALTZ" align="0" /></element>
+	<element name="synchrostart"><text string="SYNCHRO START" align="0" /></element>
+	<element name="start"><text string="START" align="0" /></element>
+	<element name="stop"><text string="STOP" align="0" /></element>
+	<element name="tempo"><text string="TEMPO" align="0" /></element>
+
+	<!-- orchestra section text -->
+	<element name="orchestra"><text string="ORCHESTRA" align="0" /></element>
+	<element name="sustain"><text string="SUSTAIN" align="0" /></element>
+	<element name="vibrato"><text string="VIBRATO" align="0" /></element>
+	<element name="cosmic"><text string="COSMIC" align="0" /></element>
+	<element name="popsynth"><text string="POPSYNTH" align="0" /></element>
+	<element name="funksynth"><text string="FUNKSYNTH" align="0" /></element>
+	<element name="percus"><text string="PERCUS" align="0" /></element>
+	<element name="jazzorgan"><text string="JAZZ ORGAN" align="0" /></element>
+	<element name="pipeorgan"><text string="PIPE ORGAN" align="0" /></element>
+	<element name="strings"><text string="STRINGS" align="0" /></element>
+	<element name="brass1"><text string="BRASS 1" align="0" /></element>
+	<element name="brass2"><text string="BRASS 2" align="0" /></element>
+	<element name="flute"><text string="FLUTE" align="0" /></element>
+	<element name="clarinet"><text string="CLARINET" align="0" /></element>
+	<element name="musicbox"><text string="MUSIC BOX" align="0" /></element>
+	<element name="harpsichord"><text string="HARPSICHORD" align="0" /></element>
+	<element name="jazzguitar"><text string="JAZZ GUITAR" align="0" /></element>
+	<element name="vibes"><text string="VIBES" align="0" /></element>
+	<element name="on"><text string="ON" align="1" /></element>
+
+	<!-- demo text -->
+	<element name="startstop"><text string="START STOP" align="0" /></element>
+	<element name="demon"><text string="DEMON-" align="0" /></element>
+	<element name="stration"><text string="STRATION" align="0" /></element>
+
+	<!-- button primitives -->
+	<element name="button-wide" defstate="0">
+		<rect><bounds x="0" y="0" width="64" height="20" /><color red="0.6" green="0.6" blue="0.6" /></rect>
+	</element>
+
+	<element name="button-blue" defstate="0">
+		<rect><bounds x="0" y="0" width="28" height="80" /><color red="0.0" green="0.0" blue="0.6" /></rect>
+	</element>
+
+	<element name="button-green" defstate="0">
+		<rect><bounds x="0" y="0" width="28" height="80" /><color red="0.0" green="0.6" blue="0.0" /></rect>
+	</element>
+
+	<element name="button-orange" defstate="0">
+		<rect><bounds x="0" y="0" width="28" height="80" /><color red="0.6" green="0.3" blue="0.0" /></rect>
+	</element>
+
+	<element name="button-gray" defstate="0">
+		<rect><bounds x="0" y="0" width="28" height="80" /><color red="0.6" green="0.6" blue="0.6" /></rect>
+	</element>
+
+	<!-- slider primitives -->
+	<element name="slider">
+		<rect><bounds x="0" y="0" width="28" height="160" /><color red="0.0" green="0.0" blue="0.0" /></rect>
+	</element>
+
+	<!-- LED primitive -->
+	<element name="led" defstate="0">
+		<rect state="0"><bounds x="0" y="0" width="18" height="8" /><color red="0.4" green="0.3" blue="0.3" /></rect>
+		<rect state="1"><bounds x="0" y="0" width="18" height="8" /><color red="1.0" green="0.1" blue="0.1" /></rect>
+	</element>
+
+	<!-- keyboard primitives -->
+	<element name="keyfill"><rect><color red="0.0" green="0.0" blue="0.0" /></rect></element>
+	<element name="whitekey" defstate="0">
+		<rect state="0"><bounds x="0" y="0" width="45" height="504" /><color red="1.0" green="1.0" blue="1.0" /></rect>
+		<rect state="1"><bounds x="0" y="0" width="45" height="504" /><color red="0.9" green="0.9" blue="0.9" /></rect>
+	</element>
+	<element name="whitekey-l" defstate="0">
+		<rect state="0"><bounds x="0" y="0" width="45" height="332" /><color red="1.0" green="1.0" blue="1.0" /></rect>
+		<rect state="0"><bounds x="0" y="332" width="79" height="172" /><color red="1.0" green="1.0" blue="1.0" /></rect>
+		<rect state="1"><bounds x="0" y="0" width="45" height="332" /><color red="0.9" green="0.9" blue="0.9" /></rect>
+		<rect state="1"><bounds x="0" y="332" width="79" height="172" /><color red="0.9" green="0.9" blue="0.9" /></rect>
+	</element>
+	<element name="whitekey-m" defstate="0">
+		<rect state="0"><bounds x="13" y="0" width="53" height="332" /><color red="1.0" green="1.0" blue="1.0" /></rect>
+		<rect state="0"><bounds x="0" y="332" width="79" height="172" /><color red="1.0" green="1.0" blue="1.0" /></rect>
+		<rect state="1"><bounds x="13" y="0" width="53" height="332" /><color red="0.9" green="0.9" blue="0.9" /></rect>
+		<rect state="1"><bounds x="0" y="332" width="79" height="172" /><color red="0.9" green="0.9" blue="0.9" /></rect>
+	</element>
+	<element name="whitekey-lm" defstate="0">
+		<rect state="0"><bounds x="10" y="0" width="44" height="332" /><color red="1.0" green="1.0" blue="1.0" /></rect>
+		<rect state="0"><bounds x="0" y="332" width="79" height="172" /><color red="1.0" green="1.0" blue="1.0" /></rect>
+		<rect state="1"><bounds x="10" y="0" width="44" height="332" /><color red="0.9" green="0.9" blue="0.9" /></rect>
+		<rect state="1"><bounds x="0" y="332" width="79" height="172" /><color red="0.9" green="0.9" blue="0.9" /></rect>
+	</element>
+	<element name="whitekey-rm" defstate="0">
+		<rect state="0"><bounds x="22" y="0" width="44" height="332" /><color red="1.0" green="1.0" blue="1.0" /></rect>
+		<rect state="0"><bounds x="0" y="332" width="79" height="172" /><color red="1.0" green="1.0" blue="1.0" /></rect>
+		<rect state="1"><bounds x="22" y="0" width="44" height="332" /><color red="0.9" green="0.9" blue="0.9" /></rect>
+		<rect state="1"><bounds x="0" y="332" width="79" height="172" /><color red="0.9" green="0.9" blue="0.9" /></rect>
+	</element>
+	<element name="whitekey-r" defstate="0">
+		<rect state="0"><bounds x="34" y="0" width="45" height="332" /><color red="1.0" green="1.0" blue="1.0" /></rect>
+		<rect state="0"><bounds x="0" y="332" width="79" height="172" /><color red="1.0" green="1.0" blue="1.0" /></rect>
+		<rect state="1"><bounds x="34" y="0" width="45" height="332" /><color red="0.9" green="0.9" blue="0.9" /></rect>
+		<rect state="1"><bounds x="0" y="332" width="79" height="172" /><color red="0.9" green="0.9" blue="0.9" /></rect>
+	</element>
+	<element name="blackkey" defstate="0">
+		<rect state="0"><bounds x="0" y="0" width="44" height="324" /><color red="0.0" green="0.0" blue="0.0" /></rect>
+		<rect state="0"><bounds x="4" y="0" width="36" height="320" /><color red="0.1" green="0.1" blue="0.1" /></rect>
+		<rect state="1"><bounds x="0" y="0" width="44" height="324" /><color red="0.1" green="0.1" blue="0.1" /></rect>
+		<rect state="1"><bounds x="4" y="0" width="36" height="320" /><color red="0.1" green="0.1" blue="0.1" /></rect>
+	</element>
+
+	<!-- speaker grill -->
+	<element name="speaker">
+		<rect><bounds x="0" y="0" width="500" height="462" /><color red="0.1" green="0.1" blue="0.1" /></rect>
+		<disk><bounds x="29" y="10" width="442" height="442" /><color red="0.0" green="0.0" blue="0.0" /></disk>
+		<rect><bounds x="10" y="10" width="480" height="11" /><color red="0.2" green="0.2" blue="0.2" /></rect>
+		<rect><bounds x="10" y="26" width="480" height="11" /><color red="0.2" green="0.2" blue="0.2" /></rect>
+		<rect><bounds x="10" y="42" width="480" height="11" /><color red="0.2" green="0.2" blue="0.2" /></rect>
+		<rect><bounds x="10" y="58" width="480" height="11" /><color red="0.2" green="0.2" blue="0.2" /></rect>
+		<rect><bounds x="10" y="74" width="480" height="11" /><color red="0.2" green="0.2" blue="0.2" /></rect>
+		<rect><bounds x="10" y="90" width="480" height="11" /><color red="0.2" green="0.2" blue="0.2" /></rect>
+		<rect><bounds x="10" y="106" width="480" height="11" /><color red="0.2" green="0.2" blue="0.2" /></rect>
+		<rect><bounds x="10" y="122" width="480" height="11" /><color red="0.2" green="0.2" blue="0.2" /></rect>
+		<rect><bounds x="10" y="138" width="480" height="11" /><color red="0.2" green="0.2" blue="0.2" /></rect>
+		<rect><bounds x="10" y="154" width="480" height="11" /><color red="0.2" green="0.2" blue="0.2" /></rect>
+		<rect><bounds x="10" y="170" width="480" height="11" /><color red="0.2" green="0.2" blue="0.2" /></rect>
+		<rect><bounds x="10" y="186" width="480" height="11" /><color red="0.2" green="0.2" blue="0.2" /></rect>
+		<rect><bounds x="10" y="202" width="480" height="11" /><color red="0.2" green="0.2" blue="0.2" /></rect>
+		<rect><bounds x="10" y="218" width="480" height="11" /><color red="0.2" green="0.2" blue="0.2" /></rect>
+		<rect><bounds x="10" y="234" width="480" height="11" /><color red="0.2" green="0.2" blue="0.2" /></rect>
+		<rect><bounds x="10" y="250" width="480" height="11" /><color red="0.2" green="0.2" blue="0.2" /></rect>
+		<rect><bounds x="10" y="266" width="480" height="11" /><color red="0.2" green="0.2" blue="0.2" /></rect>
+		<rect><bounds x="10" y="282" width="480" height="11" /><color red="0.2" green="0.2" blue="0.2" /></rect>
+		<rect><bounds x="10" y="298" width="480" height="11" /><color red="0.2" green="0.2" blue="0.2" /></rect>
+		<rect><bounds x="10" y="314" width="480" height="11" /><color red="0.2" green="0.2" blue="0.2" /></rect>
+		<rect><bounds x="10" y="330" width="480" height="11" /><color red="0.2" green="0.2" blue="0.2" /></rect>
+		<rect><bounds x="10" y="346" width="480" height="11" /><color red="0.2" green="0.2" blue="0.2" /></rect>
+		<rect><bounds x="10" y="362" width="480" height="11" /><color red="0.2" green="0.2" blue="0.2" /></rect>
+		<rect><bounds x="10" y="378" width="480" height="11" /><color red="0.2" green="0.2" blue="0.2" /></rect>
+		<rect><bounds x="10" y="394" width="480" height="11" /><color red="0.2" green="0.2" blue="0.2" /></rect>
+		<rect><bounds x="10" y="410" width="480" height="11" /><color red="0.2" green="0.2" blue="0.2" /></rect>
+		<rect><bounds x="10" y="426" width="480" height="11" /><color red="0.2" green="0.2" blue="0.2" /></rect>
+		<rect><bounds x="10" y="442" width="480" height="11" /><color red="0.2" green="0.2" blue="0.2" /></rect>
+	</element>
+
+	<!-- logo group -->
+	<group name="group-logo">
+		<element ref="box-624"><bounds x="0" y="0" width="632" height="284" /></element>
+		<element ref="yamaha"><bounds x="66" y="92" width="153" height="40" /></element>
+		<element ref="psr11"><bounds x="66" y="149" width="383" height="72" /></element>
+		<element ref="button-gray" inputtag="P14" inputmask="0x80"><bounds x="556" y="140" width="28" height="80" /></element>
+		<element ref="startstop"><bounds x="537" y="227" width="66" height="10" /></element>
+		<element ref="demon"><bounds x="531" y="241" width="78" height="17" /></element>
+		<element ref="stration"><bounds x="524" y="256" width="95" height="17" /></element>
+	</group>
+
+	<!-- pitch group -->
+	<group name="group-pitch">
+		<element ref="box-174"><bounds x="632" y="0" width="180" height="284" /></element>
+		<element ref="pitch"><bounds x="690" y="256" width="60" height="18" /></element>
+		<element ref="downarrow"><bounds x="678" y="220" width="16" height="16" /></element>
+		<element ref="uparrow"><bounds x="744" y="220" width="16" height="16" /></element>
+		<element ref="button-blue" inputtag="P12" inputmask="0x80"><bounds x="672" y="140" width="28" height="80" /></element>
+		<element ref="button-blue" inputtag="P12" inputmask="0x40"><bounds x="738" y="140" width="28" height="80" /></element>
+	</group>
+
+	<!-- auto bass chord group -->
+	<group name="group-autobasschord">
+		<element ref="box-522"><bounds x="812" y="0" width="560" height="284" /></element>
+		<element ref="autobasschord"><bounds x="980" y="252" width="190" height="18" /></element>
+		<element ref="button-orange" inputtag="P14" inputmask="0x20"><bounds x="856" y="140" width="28" height="80" /></element>
+		<element ref="fillin"><bounds x="853" y="227" width="39" height="10" /></element>
+		<element ref="volume"><bounds x="916" y="227" width="45" height="10" /></element>
+		<element ref="voicevariation"><bounds x="1027" y="227" width="93" height="10" /></element>
+		<element ref="mode"><bounds x="1203" y="227" width="31" height="10" /></element>
+		<element ref="bass"><bounds x="1040" y="211" width="28" height="10" /></element>
+		<element ref="chord"><bounds x="1138" y="211" width="40" height="10" /></element>
+		<element ref="slidermin"><bounds x="968" y="128" width="20" height="10" /></element>
+		<element ref="slidermax"><bounds x="968" y="62" width="23" height="10" /></element>
+		<element ref="bass"><bounds x="1050" y="128" width="28" height="10" /></element>
+		<element ref="ebass"><bounds x="1050" y="112" width="42" height="10" /></element>
+		<element ref="tuba"><bounds x="1050" y="96" width="28" height="10" /></element>
+		<element ref="synth"><bounds x="1050" y="80" width="35" height="10" /></element>
+		<element ref="piano"><bounds x="1150" y="128" width="34" height="10" /></element>
+		<element ref="guitar"><bounds x="1150" y="112" width="40" height="10" /></element>
+		<element ref="brass"><bounds x="1150" y="96" width="34" height="10" /></element>
+		<element ref="synth"><bounds x="1150" y="80" width="35" height="10" /></element>
+		<element ref="off"><bounds x="1250" y="128" width="19" height="10" /></element>
+		<element ref="singlefinger"><bounds x="1250" y="112" width="82" height="10" /></element>
+		<element ref="fingered"><bounds x="1250" y="96" width="52" height="10" /></element>
+		<element ref="manualbass"><bounds x="1250" y="80" width="80" height="10" /></element>
+		<element ref="slider"><bounds x="923" y="60" width="28" height="160" /></element>
+		<element ref="slider"><bounds x="1008" y="60" width="28" height="160" /></element>
+		<element ref="slider"><bounds x="1102" y="60" width="28" height="160" /></element>
+		<element ref="slider"><bounds x="1202" y="60" width="28" height="160" /></element>
+	</group>
+
+	<!-- rhythm group -->
+	<group name="group-rhythm">
+		<element ref="box-860"><bounds x="1364" y="0" width="868" height="284" /></element>
+		<element ref="rhythm"><bounds x="1735" y="252" width="80" height="18" /></element>
+		<element ref="tempo"><bounds x="1410" y="224" width="38" height="10" /></element>
+		<element ref="downarrow"><bounds x="1391" y="220" width="16" height="16" /></element>
+		<element ref="uparrow"><bounds x="1459" y="220" width="16" height="16" /></element>
+		<element ref="button-green" inputtag="P15" inputmask="0x80"><bounds x="1384" y="140" width="28" height="80" /></element>
+		<element ref="button-green" inputtag="P15" inputmask="0x40"><bounds x="1453" y="140" width="28" height="80" /></element>
+		<element ref="led" name="led"><bounds x="1422" y="127" width="18" height="8" /></element>
+		<element ref="volume"><bounds x="1508" y="224" width="45" height="10" /></element>
+		<element ref="slidermin"><bounds x="1566" y="128" width="20" height="10" /></element>
+		<element ref="slidermax"><bounds x="1566" y="62" width="23" height="10" /></element>
+		<element ref="slider"><bounds x="1516" y="60" width="28" height="160" /></element>
+		<element ref="bigband"><bounds x="1614" y="79" width="54" height="10" /></element>
+		<element ref="reggae"><bounds x="1711" y="79" width="43" height="10" /></element>
+		<element ref="disco"><bounds x="1809" y="79" width="32" height="10" /></element>
+		<element ref="pops"><bounds x="1893" y="79" width="28" height="10" /></element>
+		<element ref="swing"><bounds x="1625" y="128" width="36" height="10" /></element>
+		<element ref="slowrock"><bounds x="1700" y="128" width="63" height="10" /></element>
+		<element ref="heavymetal"><bounds x="1785" y="128" width="74" height="10" /></element>
+		<element ref="16beat"><bounds x="1892" y="128" width="39" height="10" /></element>
+		<element ref="rocknroll"><bounds x="1607" y="177" width="73" height="10" /></element>
+		<element ref="salsa"><bounds x="1715" y="177" width="37" height="10" /></element>
+		<element ref="samba"><bounds x="1803" y="177" width="37" height="10" /></element>
+		<element ref="marchpolka"><bounds x="1871" y="177" width="80" height="10" /></element>
+		<element ref="country"><bounds x="1618" y="224" width="51" height="10" /></element>
+		<element ref="rhumba"><bounds x="1710" y="224" width="46" height="10" /></element>
+		<element ref="bossanova"><bounds x="1789" y="224" width="64" height="10" /></element>
+		<element ref="waltz"><bounds x="1892" y="224" width="36" height="10" /></element>
+		<element ref="button-wide" inputtag="P16" inputmask="0x08"><bounds x="1610" y="60" width="64" height="20" /></element>
+		<element ref="button-wide" inputtag="P16" inputmask="0x80"><bounds x="1699" y="60" width="64" height="20" /></element>
+		<element ref="button-wide" inputtag="P8"  inputmask="0x08"><bounds x="1790" y="60" width="64" height="20" /></element>
+		<element ref="button-wide" inputtag="P8"  inputmask="0x80"><bounds x="1877" y="60" width="64" height="20" /></element>
+		<element ref="button-wide" inputtag="P16" inputmask="0x04"><bounds x="1610" y="106" width="64" height="20" /></element>
+		<element ref="button-wide" inputtag="P16" inputmask="0x40"><bounds x="1699" y="106" width="64" height="20" /></element>
+		<element ref="button-wide" inputtag="P8"  inputmask="0x04"><bounds x="1790" y="106" width="64" height="20" /></element>
+		<element ref="button-wide" inputtag="P8"  inputmask="0x40"><bounds x="1877" y="106" width="64" height="20" /></element>
+		<element ref="button-wide" inputtag="P16" inputmask="0x02"><bounds x="1610" y="154" width="64" height="20" /></element>
+		<element ref="button-wide" inputtag="P16" inputmask="0x20"><bounds x="1699" y="154" width="64" height="20" /></element>
+		<element ref="button-wide" inputtag="P8"  inputmask="0x02"><bounds x="1790" y="154" width="64" height="20" /></element>
+		<element ref="button-wide" inputtag="P8"  inputmask="0x20"><bounds x="1877" y="154" width="64" height="20" /></element>
+		<element ref="button-wide" inputtag="P16" inputmask="0x01"><bounds x="1610" y="202" width="64" height="20" /></element>
+		<element ref="button-wide" inputtag="P16" inputmask="0x10"><bounds x="1699" y="202" width="64" height="20" /></element>
+		<element ref="button-wide" inputtag="P8"  inputmask="0x01"><bounds x="1790" y="202" width="64" height="20" /></element>
+		<element ref="button-wide" inputtag="P8"  inputmask="0x10"><bounds x="1877" y="202" width="64" height="20" /></element>
+		<element ref="synchrostart"><bounds x="1966" y="224" width="90" height="10" /></element>
+		<element ref="start"><bounds x="2063" y="224" width="35" height="10" /></element>
+		<element ref="stop"><bounds x="2136" y="224" width="26" height="10" /></element>
+		<element ref="button-green" inputtag="P9" inputmask="0x01"><bounds x="1998" y="140" width="28" height="80" /></element>
+		<element ref="button-green" inputtag="P9" inputmask="0x02"><bounds x="2066" y="140" width="28" height="80" /></element>
+		<element ref="button-orange" inputtag="P9" inputmask="0x04"><bounds x="2134" y="140" width="28" height="80" /></element>
+	</group>
+
+	<!-- orchestra group -->
+	<group name="group-orchestra">
+		<element ref="box-590"><bounds x="2232" y="0" width="598" height="284" /></element>
+		<element ref="orchestra"><bounds x="2454" y="252" width="116" height="18" /></element>
+		<element ref="sustain"><bounds x="2239" y="224" width="47" height="10" /></element>
+		<element ref="vibrato"><bounds x="2319" y="224" width="45" height="10" /></element>
+		<element ref="off"><bounds x="2292" y="128" width="19" height="10" /></element>
+		<element ref="on"><bounds x="2292" y="112" width="17" height="10" /></element>
+		<element ref="off"><bounds x="2373" y="128" width="19" height="10" /></element>
+		<element ref="on"><bounds x="2373" y="112" width="17" height="10" /></element>
+		<element ref="slider"><bounds x="2246" y="60" width="28" height="160" /></element>
+		<element ref="slider"><bounds x="2327" y="60" width="28" height="160" /></element>
+		<element ref="cosmic"><bounds x="2424" y="79" width="42" height="10" /></element>
+		<element ref="popsynth"><bounds x="2506" y="79" width="59" height="10" /></element>
+		<element ref="funksynth"><bounds x="2592" y="79" width="67" height="10" /></element>
+		<element ref="percus"><bounds x="2687" y="79" width="43" height="10" /></element>
+		<element ref="jazzorgan"><bounds x="2412" y="128" width="67" height="10" /></element>
+		<element ref="pipeorgan"><bounds x="2501" y="128" width="66" height="10" /></element>
+		<element ref="strings"><bounds x="2602" y="128" width="46" height="10" /></element>
+		<element ref="brass1"><bounds x="2690" y="128" width="46" height="10" /></element>
+		<element ref="brass2"><bounds x="2421" y="177" width="49" height="10" /></element>
+		<element ref="flute"><bounds x="2520" y="177" width="32" height="10" /></element>
+		<element ref="clarinet"><bounds x="2599" y="177" width="52" height="10" /></element>
+		<element ref="musicbox"><bounds x="2682" y="177" width="60" height="10" /></element>
+		<element ref="piano"><bounds x="2434" y="224" width="32" height="10" /></element>
+		<element ref="harpsichord"><bounds x="2497" y="224" width="78" height="10" /></element>
+		<element ref="jazzguitar"><bounds x="2590" y="224" width="72" height="10" /></element>
+		<element ref="vibes"><bounds x="2700" y="224" width="32" height="10" /></element>
+		<element ref="button-wide" inputtag="P10" inputmask="0x08"><bounds x="2412" y="60" width="64" height="20" /></element>
+		<element ref="button-wide" inputtag="P10" inputmask="0x80"><bounds x="2502" y="60" width="64" height="20" /></element>
+		<element ref="button-wide" inputtag="P11"  inputmask="0x08"><bounds x="2591" y="60" width="64" height="20" /></element>
+		<element ref="button-wide" inputtag="P11"  inputmask="0x80"><bounds x="2680" y="60" width="64" height="20" /></element>
+		<element ref="button-wide" inputtag="P10" inputmask="0x04"><bounds x="2412" y="106" width="64" height="20" /></element>
+		<element ref="button-wide" inputtag="P10" inputmask="0x40"><bounds x="2502" y="106" width="64" height="20" /></element>
+		<element ref="button-wide" inputtag="P11"  inputmask="0x04"><bounds x="2591" y="106" width="64" height="20" /></element>
+		<element ref="button-wide" inputtag="P11"  inputmask="0x40"><bounds x="2680" y="106" width="64" height="20" /></element>
+		<element ref="button-wide" inputtag="P10" inputmask="0x02"><bounds x="2412" y="154" width="64" height="20" /></element>
+		<element ref="button-wide" inputtag="P10" inputmask="0x20"><bounds x="2502" y="154" width="64" height="20" /></element>
+		<element ref="button-wide" inputtag="P11"  inputmask="0x02"><bounds x="2591" y="154" width="64" height="20" /></element>
+		<element ref="button-wide" inputtag="P11"  inputmask="0x20"><bounds x="2680" y="154" width="64" height="20" /></element>
+		<element ref="button-wide" inputtag="P10" inputmask="0x01"><bounds x="2412" y="202" width="64" height="20" /></element>
+		<element ref="button-wide" inputtag="P10" inputmask="0x10"><bounds x="2502" y="202" width="64" height="20" /></element>
+		<element ref="button-wide" inputtag="P11"  inputmask="0x01"><bounds x="2591" y="202" width="64" height="20" /></element>
+		<element ref="button-wide" inputtag="P11"  inputmask="0x10"><bounds x="2680" y="202" width="64" height="20" /></element>
+	</group>
+
+	<!-- power group -->
+	<group name="group-power">
+		<element ref="box-260"><bounds x="2830" y="0" width="268" height="284" /></element>
+		<element ref="volume"><bounds x="2826" y="252" width="82" height="18" /></element>
+		<element ref="power"><bounds x="2915" y="252" width="72" height="18" /></element>
+		<element ref="master"><bounds x="2827" y="237" width="80" height="18" /></element>
+		<element ref="off"><bounds x="2972" y="128" width="19" height="10" /></element>
+		<element ref="on"><bounds x="2972" y="112" width="17" height="10" /></element>
+		<element ref="slidermin"><bounds x="2897" y="128" width="20" height="10" /></element>
+		<element ref="slidermax"><bounds x="2897" y="62" width="23" height="10" /></element>
+		<element ref="slider"><bounds x="2852" y="60" width="28" height="160" /></element>
+		<element ref="slider"><bounds x="2928" y="60" width="28" height="160" /></element>
+	</group>
+
+	<!-- keyboard group -->
+	<group name="keyboard">
+		<!-- octave 0 -->
+		<element ref="blackkey" inputtag="P7" inputmask="0x20"><bounds x="622" y="504" width="44" height="324" /></element>
+		<element ref="blackkey" inputtag="P7" inputmask="0x08"><bounds x="725" y="504" width="44" height="324" /></element>
+		<element ref="blackkey" inputtag="P7" inputmask="0x01"><bounds x="865" y="504" width="44" height="324" /></element>
+		<element ref="blackkey" inputtag="P6" inputmask="0x10"><bounds x="959" y="504" width="44" height="324" /></element>
+		<element ref="blackkey" inputtag="P6" inputmask="0x04"><bounds x="1053" y="504" width="44" height="324" /></element>
+		<element ref="whitekey-l" inputtag="P7" inputmask="0x40"><bounds x="574" y="504" width="79" height="504" /></element>
+		<element ref="whitekey-m" inputtag="P7" inputmask="0x10"><bounds x="656" y="504" width="79" height="504" /></element>
+		<element ref="whitekey-r" inputtag="P7" inputmask="0x04"><bounds x="738" y="504" width="79" height="504" /></element>
+		<element ref="whitekey-l" inputtag="P7" inputmask="0x02"><bounds x="820" y="504" width="79" height="504" /></element>
+		<element ref="whitekey-lm" inputtag="P6" inputmask="0x20"><bounds x="902" y="504" width="79" height="504" /></element>
+		<element ref="whitekey-rm" inputtag="P6" inputmask="0x08"><bounds x="984" y="504" width="79" height="504" /></element>
+		<element ref="whitekey-r" inputtag="P6" inputmask="0x02"><bounds x="1066" y="504" width="79" height="504" /></element>
+
+		<!-- octave 1 -->
+		<element ref="blackkey" inputtag="P5" inputmask="0x20"><bounds x="1196" y="504" width="44" height="324" /></element>
+		<element ref="blackkey" inputtag="P5" inputmask="0x08"><bounds x="1299" y="504" width="44" height="324" /></element>
+		<element ref="blackkey" inputtag="P5" inputmask="0x01"><bounds x="1439" y="504" width="44" height="324" /></element>
+		<element ref="blackkey" inputtag="P4" inputmask="0x10"><bounds x="1533" y="504" width="44" height="324" /></element>
+		<element ref="blackkey" inputtag="P4" inputmask="0x04"><bounds x="1627" y="504" width="44" height="324" /></element>
+		<element ref="whitekey-l" inputtag="P6" inputmask="0x01"><bounds x="1148" y="504" width="79" height="504" /></element>
+		<element ref="whitekey-m" inputtag="P5" inputmask="0x10"><bounds x="1230" y="504" width="79" height="504" /></element>
+		<element ref="whitekey-r" inputtag="P5" inputmask="0x04"><bounds x="1312" y="504" width="79" height="504" /></element>
+		<element ref="whitekey-l" inputtag="P5" inputmask="0x02"><bounds x="1394" y="504" width="79" height="504" /></element>
+		<element ref="whitekey-lm" inputtag="P4" inputmask="0x20"><bounds x="1476" y="504" width="79" height="504" /></element>
+		<element ref="whitekey-rm" inputtag="P4" inputmask="0x08"><bounds x="1558" y="504" width="79" height="504" /></element>
+		<element ref="whitekey-r" inputtag="P4" inputmask="0x02"><bounds x="1640" y="504" width="79" height="504" /></element>
+
+		<!-- octave 2 -->
+		<element ref="blackkey" inputtag="P3" inputmask="0x20"><bounds x="1770" y="504" width="44" height="324" /></element>
+		<element ref="blackkey" inputtag="P3" inputmask="0x08"><bounds x="1873" y="504" width="44" height="324" /></element>
+		<element ref="blackkey" inputtag="P3" inputmask="0x01"><bounds x="2013" y="504" width="44" height="324" /></element>
+		<element ref="blackkey" inputtag="P2" inputmask="0x10"><bounds x="2107" y="504" width="44" height="324" /></element>
+		<element ref="blackkey" inputtag="P2" inputmask="0x04"><bounds x="2201" y="504" width="44" height="324" /></element>
+		<element ref="whitekey-l" inputtag="P4" inputmask="0x01"><bounds x="1722" y="504" width="79" height="504" /></element>
+		<element ref="whitekey-m" inputtag="P3" inputmask="0x10"><bounds x="1804" y="504" width="79" height="504" /></element>
+		<element ref="whitekey-r" inputtag="P3" inputmask="0x04"><bounds x="1886" y="504" width="79" height="504" /></element>
+		<element ref="whitekey-l" inputtag="P3" inputmask="0x02"><bounds x="1968" y="504" width="79" height="504" /></element>
+		<element ref="whitekey-lm" inputtag="P2" inputmask="0x20"><bounds x="2050" y="504" width="79" height="504" /></element>
+		<element ref="whitekey-rm" inputtag="P2" inputmask="0x08"><bounds x="2132" y="504" width="79" height="504" /></element>
+		<element ref="whitekey-r" inputtag="P2" inputmask="0x02"><bounds x="2214" y="504" width="79" height="504" /></element>
+
+		<!-- octave 3 -->
+		<element ref="blackkey" inputtag="P1" inputmask="0x20"><bounds x="2344" y="504" width="44" height="324" /></element>
+		<element ref="blackkey" inputtag="P1" inputmask="0x08"><bounds x="2447" y="504" width="44" height="324" /></element>
+		<element ref="blackkey" inputtag="P1" inputmask="0x01"><bounds x="2587" y="504" width="44" height="324" /></element>
+		<element ref="blackkey" inputtag="P0" inputmask="0x10"><bounds x="2681" y="504" width="44" height="324" /></element>
+		<element ref="blackkey" inputtag="P0" inputmask="0x04"><bounds x="2775" y="504" width="44" height="324" /></element>
+		<element ref="whitekey-l" inputtag="P2" inputmask="0x01"><bounds x="2296" y="504" width="79" height="504" /></element>
+		<element ref="whitekey-m" inputtag="P1" inputmask="0x10"><bounds x="2378" y="504" width="79" height="504" /></element>
+		<element ref="whitekey-r" inputtag="P1" inputmask="0x04"><bounds x="2460" y="504" width="79" height="504" /></element>
+		<element ref="whitekey-l" inputtag="P1" inputmask="0x02"><bounds x="2542" y="504" width="79" height="504" /></element>
+		<element ref="whitekey-lm" inputtag="P0" inputmask="0x20"><bounds x="2624" y="504" width="79" height="504" /></element>
+		<element ref="whitekey-rm" inputtag="P0" inputmask="0x08"><bounds x="2706" y="504" width="79" height="504" /></element>
+		<element ref="whitekey-r" inputtag="P0" inputmask="0x02"><bounds x="2788" y="504" width="79" height="504" /></element>
+
+		<!-- final key -->
+		<element ref="whitekey" inputtag="P0" inputmask="0x01"><bounds x="2870" y="504" width="79" height="504" /></element>
+	</group>
+
+	<view name="Keyboard">
+		<!-- logo group -->
+		<group ref="group-logo"><bounds x="0" y="0" width="632" height="284" /></group>
+
+		<!-- pitch group -->
+		<group ref="group-pitch"><bounds x="632" y="0" width="180" height="284" /></group>
+
+		<!-- auto bass chord group -->
+		<group ref="group-autobasschord"><bounds x="812" y="0" width="560" height="284" /></group>
+
+		<!-- rhythm group -->
+		<group ref="group-rhythm"><bounds x="1372" y="0" width="868" height="284" /></group>
+
+		<!-- orchestra group -->
+		<group ref="group-orchestra"><bounds x="2240" y="0" width="598" height="284" /></group>
+
+		<!-- power group -->
+		<group ref="group-power"><bounds x="2830" y="0" width="260" height="284" /></group>
+
+		<!-- left speaker -->
+		<element ref="speaker"><bounds x="34" y="314" width="500" height="462" /></element>
+
+		<!-- keyboard -->
+		<group ref="keyboard"><bounds x="558" y="314" width="2395" height="524" /></group>
+	</view>
+
+</mamelayout>

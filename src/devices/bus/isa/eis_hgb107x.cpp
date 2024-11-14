@@ -351,13 +351,13 @@ uint8_t isa8_epc_mda_device::io_read(offs_t offset)
 	return data;
 }
 
-WRITE_LINE_MEMBER( isa8_epc_mda_device::hsync_changed )
+void isa8_epc_mda_device::hsync_changed(int state)
 {
 	m_hsync = state ? 1 : 0;
 }
 
 
-WRITE_LINE_MEMBER( isa8_epc_mda_device::vsync_changed )
+void isa8_epc_mda_device::vsync_changed(int state)
 {
 	m_vsync = state ? 0x80 : 0;
 	if ( state )
@@ -580,7 +580,7 @@ static INPUT_PORTS_START( epc_mda )
 	PORT_DIPUNUSED_DIPLOC(0x02, 0x02, "S1:2")
 
 	PORT_START( "MONITOR" )
-	PORT_CONFNAME( 0x01, 0x00, "Ericsson Monochrome HR Monitors") PORT_CHANGED_MEMBER( DEVICE_SELF, isa8_epc_mda_device, monitor_changed, 0 )
+	PORT_CONFNAME( 0x01, 0x00, "Ericsson Monochrome HR Monitors") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(isa8_epc_mda_device::monitor_changed), 0)
 	PORT_CONFSETTING(    0x00, "Amber 3111")
 	PORT_CONFSETTING(    0x01, "B&W 3712/3715")
 INPUT_PORTS_END

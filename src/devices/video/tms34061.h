@@ -52,14 +52,18 @@ public:
 	u8 const &vram(unsigned row) const { return m_display.vram[row << m_rowshift]; }
 	u16 xyoffset() const { return m_display.regs[TMS34061_XYOFFSET]; }
 	u16 xyaddress() const { return m_display.regs[TMS34061_XYADDRESS]; }
+	u16 hvisible() const { return (m_display.regs[TMS34061_HORENDBLNK] - m_display.regs[TMS34061_HORSTARTBLNK]) << 2; }
+	u16 vvisible() const { return (m_display.regs[TMS34061_VERENDBLNK] - m_display.regs[TMS34061_VERSTARTBLNK]); }
+	u16 htotal() const { return m_display.regs[TMS34061_HORTOTAL]; }
+	u16 vtotal() const { return m_display.regs[TMS34061_VERTOTAL]; }
 
 	// TODO: encapsulate this properly
 	tms34061_display m_display;
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 private:
 	/* register constants */

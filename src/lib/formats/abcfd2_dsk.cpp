@@ -2,7 +2,7 @@
 // copyright-holders:Curt Coder
 /*********************************************************************
 
-    formats/abcfd2_dsk.c
+    formats/abcfd2_dsk.cpp
 
     Scandia Metric ABC FD2 disk image formats
 
@@ -14,17 +14,17 @@ abc_fd2_format::abc_fd2_format() : wd177x_format(formats)
 {
 }
 
-const char *abc_fd2_format::name() const
+const char *abc_fd2_format::name() const noexcept
 {
 	return "abc_fd2";
 }
 
-const char *abc_fd2_format::description() const
+const char *abc_fd2_format::description() const noexcept
 {
 	return "Scandia Metric ABC FD2 disk image";
 }
 
-const char *abc_fd2_format::extensions() const
+const char *abc_fd2_format::extensions() const noexcept
 {
 	return "dsk";
 }

@@ -930,7 +930,7 @@ u32 voodoo_2_device::reg_intrctrl_w(u32 chipmask, u32 regnum, u32 data)
 		m_reg.write(regnum, data);
 
 		// Setting bit 31 clears the PCI interrupts
-		if (BIT(data, 31) && !m_pciint_cb.isnull())
+		if (BIT(data, 31))
 			m_pciint_cb(false);
 	}
 	return 0;
@@ -999,9 +999,8 @@ u32 voodoo_2_device::reg_userintr_w(u32 chipmask, u32 regnum, u32 data)
 			reg_intr_ctrl::EXTERNAL_PIN_ACTIVE | reg_intr_ctrl::USER_INTERRUPT_TAG_MASK,
 			((data << 10) & reg_intr_ctrl::USER_INTERRUPT_TAG_MASK) | reg_intr_ctrl::USER_INTERRUPT_GENERATED);
 
-		// Signal pci interrupt handler
-		if (!m_pciint_cb.isnull())
-			m_pciint_cb(true);
+		// Signal PCI interrupt handler
+		m_pciint_cb(true);
 	}
 	return 0;
 }
@@ -1157,8 +1156,7 @@ void voodoo_2_device::vblank_start(s32 param)
 	if (m_reg.intr_ctrl().vsync_rising_enable())
 	{
 		m_reg.clear_set(voodoo_regs::reg_intrCtrl, reg_intr_ctrl::EXTERNAL_PIN_ACTIVE, reg_intr_ctrl::VSYNC_RISING_GENERATED);
-		if (!m_pciint_cb.isnull())
-			m_pciint_cb(true);
+		m_pciint_cb(true);
 	}
 }
 
@@ -1176,8 +1174,7 @@ void voodoo_2_device::vblank_stop(s32 param)
 	if (m_reg.intr_ctrl().vsync_falling_enable())
 	{
 		m_reg.clear_set(voodoo_regs::reg_intrCtrl, reg_intr_ctrl::EXTERNAL_PIN_ACTIVE, reg_intr_ctrl::VSYNC_FALLING_GENERATED);
-		if (!m_pciint_cb.isnull())
-			m_pciint_cb(true);
+		m_pciint_cb(true);
 	}
 }
 

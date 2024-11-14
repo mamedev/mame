@@ -381,7 +381,7 @@ void ppc_device::code_compile_block(uint8_t mode, offs_t pc)
 	const opcode_desc *desclist;
 	bool override = false;
 
-	g_profiler.start(PROFILER_DRC_COMPILE);
+	auto profile = g_profiler.start(PROFILER_DRC_COMPILE);
 
 	/* get a description of this sequence */
 	desclist = m_drcfe->describe_code(pc);
@@ -465,7 +465,6 @@ void ppc_device::code_compile_block(uint8_t mode, offs_t pc)
 
 			/* end the sequence */
 			block.end();
-			g_profiler.stop();
 			succeeded = true;
 		}
 		catch (drcuml_block::abort_compilation &)
@@ -776,11 +775,11 @@ void ppc_device::static_generate_tlb_mismatch()
 	UML_SHR(block, I1, I0, 12);                                             // shr     i1,i0,12
 	UML_LOAD(block, I2, (void *)vtlb_table(), I1, SIZE_DWORD, SCALE_x4);    // load    i2,[vtlb],i1,dword
 	UML_MOV(block, mem(&m_core->param0), I0);                               // mov     [param0],i0
-	UML_MOV(block, mem(&m_core->param1), TRANSLATE_FETCH);                  // mov     [param1],TRANSLATE_FETCH
+	UML_MOV(block, mem(&m_core->param1), TR_FETCH);                         // mov     [param1],TR_FETCH
 	UML_CALLC(block, (c_function)cfunc_ppccom_mismatch, this);
 	UML_CALLC(block, (c_function)cfunc_ppccom_tlb_fill, this);              // callc   tlbfill,ppc
 	UML_LOAD(block, I1, (void *)vtlb_table(), I1, SIZE_DWORD, SCALE_x4);    // load    i1,[vtlb],i1,dword
-	UML_TEST(block, I1, VTLB_FETCH_ALLOWED);                                // test    i1,VTLB_FETCH_ALLOWED
+	UML_TEST(block, I1, FETCH_ALLOWED);                                     // test    i1,FETCH_ALLOWED
 	UML_JMPc(block, COND_Z, isi = label++);                                 // jmp     isi,z
 	UML_CMP(block, I2, 0);                                                  // cmp     i2,0
 	UML_JMPc(block, COND_NZ, exit = label++);                               // jmp     exit,nz
@@ -1008,9 +1007,9 @@ void ppc_device::static_generate_memory_accessor(int mode, int size, int iswrite
 	int ramnum;
 
 	if (mode & MODE_USER)
-		translate_type = iswrite ? TRANSLATE_WRITE_USER : TRANSLATE_READ_USER;
+		translate_type = iswrite ? TR_UWRITE : TR_UREAD;
 	else
-		translate_type = iswrite ? TRANSLATE_WRITE : TRANSLATE_READ;
+		translate_type = iswrite ? TR_WRITE : TR_READ;
 
 	/* begin generating */
 	drcuml_block &block(m_drcuml->begin_block(1024));
@@ -1466,7 +1465,7 @@ void ppc_device::static_generate_lsw_entries(int mode)
 		char temp[20];
 
 		/* allocate a handle */
-		sprintf(temp, "lsw%d", regnum);
+		snprintf(temp, 20, "lsw%d", regnum);
 		alloc_handle(m_drcuml.get(), &m_lsw[mode][regnum], temp);
 		UML_HANDLE(block, *m_lsw[mode][regnum]);                               // handle  lsw<regnum>
 		UML_LABEL(block, regnum);                                                       // regnum:
@@ -1518,7 +1517,7 @@ void ppc_device::static_generate_stsw_entries(int mode)
 		char temp[20];
 
 		/* allocate a handle */
-		sprintf(temp, "stsw%d", regnum);
+		snprintf(temp, 20, "stsw%d", regnum);
 		alloc_handle(m_drcuml.get(), &m_stsw[mode][regnum], temp);
 		UML_HANDLE(block, *m_stsw[mode][regnum]);                              // handle  stsw<regnum>
 		UML_LABEL(block, regnum);                                                       // regnum:
@@ -2257,12 +2256,15 @@ bool ppc_device::generate_opcode(drcuml_block &block, compiler_state *compiler, 
 		case 0x2e:  /* LMW */
 			UML_MAPVAR(block, MAPVAR_DSISR, DSISR_IMMU(op));                                // mapvar  dsisr,DSISR_IMMU(op)
 			UML_MOV(block, mem(&m_core->tempaddr), R32Z(G_RA(op)));                  // mov     [tempaddr],ra
+
 			for (int regnum = G_RD(op); regnum < 32; regnum++)
 			{
 				UML_ADD(block, I0, mem(&m_core->tempaddr), (int16_t)G_SIMM(op) + 4 * (regnum - G_RD(op)));
 																							// add     i0,[tempaddr],simm + 4*(regnum-rd)
 				UML_CALLH(block, *m_read32align[m_core->mode]);         // callh   read32align
-				UML_MOV(block, R32(regnum), I0);                                        // mov     regnum,i0
+
+				if (regnum != G_RA(op) || ((m_cap & PPCCAP_4XX) && regnum == 31))
+					UML_MOV(block, R32(regnum), I0);                                        // mov     regnum,i0
 			}
 			generate_update_cycles(block, compiler, desc->pc + 4, true);           // <update cycles>
 			return true;

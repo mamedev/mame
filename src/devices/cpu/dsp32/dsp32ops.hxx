@@ -261,7 +261,7 @@ inline void dsp32c_device::cau_write_pi_4byte(int pi, uint32_t val)
 	int i = (pi >> 0) & 0x1f;
 	if (p)
 	{
-		WLONG(m_r[p], (int32_t)(val << 8) >> 8);
+		WLONG(m_r[p], util::sext(val, 24));
 		if (i < 22 || i > 23)
 			m_r[p] = TRUNCATE24(m_r[p] + m_r[i]);
 		else
@@ -1844,7 +1844,7 @@ void dsp32c_device::store_i(uint32_t op)
 
 void dsp32c_device::store_ei(uint32_t op)
 {
-	WLONG(EXTEND16_TO_24(op), (int32_t)(REG24((op >> 16) & 0x1f) << 8) >> 8);
+	WLONG(EXTEND16_TO_24(op), util::sext(REG24((op >> 16) & 0x1f), 24));
 }
 
 
@@ -2431,7 +2431,7 @@ void dsp32c_device::d5_ifagt(uint32_t op)
 
 void dsp32c_device::d5_float24(uint32_t op)
 {
-	double res = (double)((int32_t)(dau_read_pi_4bytes(op >> 7) << 8) >> 8);
+	double res = (double)util::sext(dau_read_pi_4bytes(op >> 7), 24);
 	int zpi = (op >> 0) & 0x7f;
 	if (zpi != 7)
 		dau_write_pi_double(zpi, res);
@@ -2443,14 +2443,11 @@ void dsp32c_device::d5_int24(uint32_t op)
 {
 	double val = dau_read_pi_double_1st(op >> 7, 0);
 	int zpi = (op >> 0) & 0x7f;
-	int32_t res;
 	if (!(DAUC & 0x10)) val = floor(val + 0.5);
 	else val = ceil(val - 0.5);
-	res = (int32_t)val;
-	if (res > 0x7fffff) res = 0x7fffff;
-	else if (res < -0x800000) res = -0x800000;
+	int32_t res = int32_t(std::clamp<double>(val, -0x800000, 0x7fffff));
 	if (zpi != 7)
-		dau_write_pi_4bytes(zpi, (int32_t)(res << 8) >> 8);
+		dau_write_pi_4bytes(zpi, res);
 	dau_set_val_noflags((op >> 21) & 3, dsp_to_double(res << 8));
 }
 

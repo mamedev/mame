@@ -97,15 +97,15 @@ protected:
 
 	// device overrides
 	virtual void device_config_complete() override;
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 	virtual void device_post_load() override;
 
 	// device_memory_interface overrides
 	virtual space_config_vector memory_space_config() const override;
 
 	virtual void palette_init() = 0;
-	virtual u32 palette_entries() const override { return 16 + 256; }
+	virtual u32 palette_entries() const noexcept override { return 16 + 256; }
 
 	TIMER_CALLBACK_MEMBER(update_line);
 
@@ -192,7 +192,7 @@ private:
 	uint8_t command_unit_w(uint8_t Op);
 	void update_command();
 
-	void memmap(address_map &map);
+	void memmap(address_map &map) ATTR_COLD;
 
 	// general
 	int m_offset_x, m_offset_y, m_visible_y, m_mode;

@@ -36,12 +36,10 @@ address lines), and then reading it from the 051962.
 - misc interface stuff
 - ROM bank selector (CAB1-CAB2)
 - character "code" (VC0-VC10)
-- character "color" (COL0-COL7); used foc color but also bank switching and tile
-  flipping. Exact meaning depends on externl connections. All evidence indicates
-  that COL2 and COL3 select the tile bank, and are replaced with the low 2 bits
-  from the bank register. The top 2 bits of the register go to CAB1-CAB2.
-  However, this DOES NOT WORK with Gradius III. "color" seems to pass through
-  unaltered.
+- character "color" (COL0-COL7); used for color but also bank switching and tile
+  flipping. Exact meaning depends on external connections. COL2 and COL3 select
+  the tile bank, and may be replaced with the low 2 bits from the bank register.
+  The top 2 bits of the register go to CAB1-CAB2.
 - layer A horizontal scroll (ZA1H-ZA4H)
 - layer B horizontal scroll (ZB1H-ZB4H)
 - ????? (BEN)
@@ -74,7 +72,17 @@ address lines), and then reading it from the 051962.
 1000-17ff: layer B tilemap (attributes)
 180c-1833: A y scroll
 1a00-1bff: A x scroll
-1c00     : ?
+1c00     : Maps the three 8kB RAM chips to memory addresses.
+            ------xx select the configuration from this table
+               RAM0 RAM1 RAM2
+            00 A~B  6~7  8~9  Reset state
+            01 8~9  4~5  6~7
+            10 6~7  2~3  4~5
+            11 4~5  0~1  2~3  TMNT setting
+            ---xxx-- affects how RAMs are accessed
+            -x------
+                     0 = replace bits 5:4 of color attribute by bits 1:0
+                     1 = do not alter color attribute (gradius3,xmen)
 1c80     : row/column scroll control
            ------xx layer A row scroll
                     00 = disabled
@@ -118,8 +126,8 @@ EXTRA ADDRESSING SPACE USED BY X-MEN:
 4800-4fff: layer A tilemap (code high bits)
 5000-57ff: layer B tilemap (code high bits)
 
-The main CPU doesn't have direct acces to the RAM used by the 052109, it has
-to through the chip.
+The main CPU doesn't have direct access to the RAM used by the 052109; it has
+to go through the chip (8 bits at a time, even on 68000-based systems).
 */
 
 #include "emu.h"
@@ -223,12 +231,8 @@ void k052109_device::device_start()
 		screen().register_vblank_callback(vblank_state_delegate(&k052109_device::vblank_callback, this));
 	}
 
-	// resolve callbacks
+	// resolve delegates
 	m_k052109_cb.resolve();
-
-	m_irq_handler.resolve_safe();
-	m_firq_handler.resolve_safe();
-	m_nmi_handler.resolve_safe();
 
 	decode_gfx();
 	gfx(0)->set_colors(palette().entries() / gfx(0)->depth());
@@ -267,6 +271,7 @@ void k052109_device::device_start()
 	save_item(NAME(m_irq_enabled));
 	save_item(NAME(m_charrombank));
 	save_item(NAME(m_charrombank_2));
+	save_item(NAME(m_addrmap));
 	save_item(NAME(m_has_extra_video_ram));
 }
 
@@ -280,7 +285,7 @@ void k052109_device::device_reset()
 	m_irq_enabled = 0;
 	m_romsubbank = 0;
 	m_scrollctrl = 0;
-
+	m_addrmap    = 0;
 	m_has_extra_video_ram = 0;
 
 	for (int i = 0; i < 4; i++)
@@ -331,8 +336,7 @@ u8 k052109_device::read(offs_t offset)
 			{   /* B y scroll */    }
 			else if (offset >= 0x3a00 && offset < 0x3c00)
 			{   /* B x scroll */    }
-//          else
-//logerror("%s: read from unknown 052109 address %04x\n",m_maincpu->pc(),offset);
+			//else logerror("%s: read from unknown 052109 address %04x\n",machine().describe_context(),offset);
 		}
 
 		return m_ram[offset];
@@ -350,15 +354,15 @@ u8 k052109_device::read(offs_t offset)
 
 		bank |= (m_charrombank_2[(color & 0x0c) >> 2] >> 2); // Surprise Attack uses this 2nd bank in the rom test
 
-	if (m_has_extra_video_ram)
-		code |= color << 8; /* kludge for X-Men */
-	else
-		m_k052109_cb(0, bank, &code, &color, &flags, &priority);
+		if (m_has_extra_video_ram)
+			code |= color << 8; /* kludge for X-Men */
+		else
+			m_k052109_cb(0, bank, &code, &color, &flags, &priority);
 
-	addr = (code << 5) + (offset & 0x1f);
-	addr &= m_char_rom.length() - 1;
+		addr = (code << 5) + (offset & 0x1f);
+		addr &= m_char_rom.length() - 1;
 
-//      logerror("%s: off = %04x sub = %02x (bnk = %x) adr = %06x\n", m_maincpu->pc(), offset, m_romsubbank, bank, addr);
+		//logerror("%s: off = %04x sub = %02x (bnk = %x) adr = %06x\n", machine().describe_context(), offset, m_romsubbank, bank, addr);
 
 		return m_char_rom[addr];
 	}
@@ -382,18 +386,22 @@ void k052109_device::write(offs_t offset, u8 data)
 		{   /* A y scroll */    }
 		else if (offset >= 0x1a00 && offset < 0x1c00)
 		{   /* A x scroll */    }
+		else if (offset == 0x1c00)
+		{
+			m_addrmap = data;
+		}
 		else if (offset == 0x1c80)
 		{
 			if (m_scrollctrl != data)
 			{
-//popmessage("scrollcontrol = %02x", data);
-//logerror("%s: rowscrollcontrol = %02x\n", m_maincpu->pc(), data);
+				//popmessage("scrollcontrol = %02x", data);
+				//logerror("%s: rowscrollcontrol = %02x\n", machine().describe_context(), data);
 				m_scrollctrl = data;
 			}
 		}
 		else if (offset == 0x1d00)
 		{
-//logerror("%s: 052109 register 1d00 = %02x\n", m_maincpu->pc(), data);
+			//logerror("%s: 052109 register 1d00 = %02x\n", machine().describe_context(), data);
 			/* bit 2 = irq enable */
 			/* the custom chip can also generate NMI and FIRQ, for use with a 6809 */
 			m_irq_enabled = data & 0x04;
@@ -428,12 +436,12 @@ void k052109_device::write(offs_t offset, u8 data)
 		}
 		else if (offset == 0x1e00 || offset == 0x3e00) // Surprise Attack uses offset 0x3e00
 		{
-//logerror("%s: 052109 register 1e00 = %02x\n",m_maincpu->pc(),data);
+			//logerror("%s: 052109 register 1e00 = %02x\n",machine().describe_context(),data);
 			m_romsubbank = data;
 		}
 		else if (offset == 0x1e80)
 		{
-//if ((data & 0xfe)) logerror("%s: 052109 register 1e80 = %02x\n",m_maincpu->pc(),data);
+			//if ((data & 0xfe)) logerror("%s: 052109 register 1e80 = %02x\n",machine().describe_context(),data);
 			m_tilemap[0]->set_flip((data & 1) ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
 			m_tilemap[1]->set_flip((data & 1) ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
 			m_tilemap[2]->set_flip((data & 1) ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
@@ -487,22 +495,8 @@ void k052109_device::write(offs_t offset, u8 data)
 			m_charrombank_2[2] = data & 0x0f;
 			m_charrombank_2[3] = (data >> 4) & 0x0f;
 		}
-//      else
-//          logerror("%s: write %02x to unknown 052109 address %04x\n",m_maincpu->pc(),data,offset);
+		//else logerror("%s: write %02x to unknown 052109 address %04x\n",machine().describe_context(),data,offset);
 	}
-}
-
-u16 k052109_device::word_r(offs_t offset)
-{
-	return read(offset + 0x2000) | (read(offset) << 8);
-}
-
-void k052109_device::word_w(offs_t offset, u16 data, u16 mem_mask)
-{
-	if (ACCESSING_BITS_8_15)
-		write(offset, (data >> 8) & 0xff);
-	if (ACCESSING_BITS_0_7)
-		write(offset + 0x2000, data & 0xff);
 }
 
 void k052109_device::set_rmrd_line( int state )
@@ -516,27 +510,20 @@ int k052109_device::get_rmrd_line( )
 }
 
 
-void k052109_device::tilemap_mark_dirty( int tmap_num )
-{
-	m_tilemap[tmap_num]->mark_all_dirty();
-}
-
-
 void k052109_device::tilemap_update( )
 {
 	int xscroll, yscroll, offs;
 
 #if 0
-{
-popmessage("%x %x %x %x",
-	m_charrombank[0],
-	m_charrombank[1],
-	m_charrombank[2],
-	m_charrombank[3]);
-}
+	popmessage("%x %x %x %x",
+			m_charrombank[0],
+			m_charrombank[1],
+			m_charrombank[2],
+			m_charrombank[3]);
+	//popmessage("%x",m_addrmap);
 #endif
 
-// note: this chip can do both per-column and per-row scroll in the same time, currently not emulated.
+	// note: this chip can do both per-column and per-row scroll in the same time, currently not emulated.
 
 	if ((m_scrollctrl & 0x03) == 0x02)
 	{
@@ -654,24 +641,24 @@ popmessage("%x %x %x %x",
 	}
 
 #if 0
-if ((m_scrollctrl & 0x03) == 0x01 ||
-		(m_scrollctrl & 0x18) == 0x08 ||
-		((m_scrollctrl & 0x04) && (m_scrollctrl & 0x03)) ||
-		((m_scrollctrl & 0x20) && (m_scrollctrl & 0x18)) ||
-		(m_scrollctrl & 0xc0) != 0)
-	popmessage("scrollcontrol = %02x", m_scrollctrl);
+	if ((m_scrollctrl & 0x03) == 0x01 ||
+			(m_scrollctrl & 0x18) == 0x08 ||
+			((m_scrollctrl & 0x04) && (m_scrollctrl & 0x03)) ||
+			((m_scrollctrl & 0x20) && (m_scrollctrl & 0x18)) ||
+			(m_scrollctrl & 0xc0) != 0)
+		popmessage("scrollcontrol = %02x", m_scrollctrl);
 
-if (machine().input().code_pressed(KEYCODE_F))
-{
-	FILE *fp;
-	fp=fopen("TILE.DMP", "w+b");
-	if (fp)
+	if (machine().input().code_pressed(KEYCODE_F))
 	{
-		fwrite(m_ram, 0x6000, 1, fp);
-		popmessage("saved");
-		fclose(fp);
+		FILE *fp;
+		fp=fopen("TILE.DMP", "w+b");
+		if (fp)
+		{
+			fwrite(m_ram, 0x6000, 1, fp);
+			popmessage("saved");
+			fclose(fp);
+		}
 	}
-}
 #endif
 }
 
@@ -706,10 +693,11 @@ void k052109_device::get_tile_info( tile_data &tileinfo, int tile_index, int lay
 	int flags = 0;
 	int priority = 0;
 	int bank = m_charrombank[(color & 0x0c) >> 2];
-	if (m_has_extra_video_ram)
-		bank = (color & 0x0c) >> 2; /* kludge for X-Men */
+	if (!BIT(m_addrmap,6))
+	{
+		color = (color & 0xf3) | ((bank & 0x03) << 2);
+	}
 
-	color = (color & 0xf3) | ((bank & 0x03) << 2);
 	bank >>= 2;
 
 	flipy = color & 0x02;

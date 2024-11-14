@@ -38,14 +38,14 @@ void sh7604_sci_device::serial_mode_w(uint8_t data)
 {
 	m_smr = data;
 
-	logerror("%s: serial mode set:\n",tag());
-	logerror("\tCommunication Mode: %s mode\n",data & 0x80 ? "clocked synchronous" : "asynchronous");
-	logerror("\tCharacter Length: %s mode\n",data & 0x40 ? "7-bit" : "8-bit");
-	logerror("\tParity Enable: %s\n",data & 0x20 ? "yes" : "no");
-	logerror("\tParity Mode: %s\n",data & 0x10 ? "Odd" : "Even");
-	logerror("\tStop bits: %s\n",data & 0x08 ? "2" : "1");
-	logerror("\tMultiprocessor mode: %s\n",data & 0x04 ? "yes" : "no");
-	logerror("\tClock select: clock/%d\n",4 << ((data & 0x03)*2));
+	logerror("%s: serial mode set:\n", tag());
+	logerror("\tCommunication Mode: %s mode\n", data & 0x80 ? "clocked synchronous" : "asynchronous");
+	logerror("\tCharacter Length: %s mode\n", data & 0x40 ? "7-bit" : "8-bit");
+	logerror("\tParity Enable: %s\n", data & 0x20 ? "yes" : "no");
+	logerror("\tParity Mode: %s\n", data & 0x10 ? "Odd" : "Even");
+	logerror("\tStop bits: %s\n", data & 0x08 ? "2" : "1");
+	logerror("\tMultiprocessor mode: %s\n", data & 0x04 ? "yes" : "no");
+	logerror("\tClock select: clock/%d\n", 4 << ((data & 0x03) * 2));
 }
 
 uint8_t sh7604_sci_device::serial_control_r()
@@ -57,8 +57,8 @@ void sh7604_sci_device::serial_control_w(uint8_t data)
 {
 	m_scr = data;
 
-	if(data & 0x30)
-		throw emu_fatalerror("%s: enabled serial control %02x\n", tag(),data);
+	if (data & 0x30)
+		throw emu_fatalerror("%s: enabled serial control %02x\n", tag(), data);
 }
 
 uint8_t sh7604_sci_device::serial_status_r()
@@ -153,5 +153,5 @@ uint8_t sh7604_sci_device::read(address_space &space, offs_t offset)
 
 void sh7604_sci_device::write(address_space &space, offs_t offset, uint8_t data)
 {
-	space.write_byte(offset,data);
+	space.write_byte(offset, data);
 }

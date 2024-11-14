@@ -75,7 +75,8 @@ TODO: others.
 
 TODO:
 - exact cycles/scanlines for VBLANK and 256V int assert/clear need to be figured out and implemented.
-- bubble system needs a delay (and auto-sound-nmi hookup) so the 'getting ready... 49...' countdown actually plays before the simulated MCU releases the 68k and the load (and morning music) begins.
+- bubble system needs a delay (and auto-sound-nmi hookup) so the 'getting ready... 49...' countdown actually
+  plays before the simulated MCU releases the 68k and the load (and morning music) begins.
 - hcrash: Konami GT-type inputs doesn't work properly.
 - gradiusb: still needs proper MCU emulation;
 
@@ -124,19 +125,19 @@ initials
 #include "konamigt.lh"
 
 
-WRITE_LINE_MEMBER(nemesis_state::nemesis_vblank_irq)
+void nemesis_state::nemesis_vblank_irq(int state)
 {
 	if (state && m_irq_on)
 		m_maincpu->set_input_line(1, HOLD_LINE);
 }
 
-WRITE_LINE_MEMBER(nemesis_state::blkpnthr_vblank_irq)
+void nemesis_state::blkpnthr_vblank_irq(int state)
 {
 	if (state && m_irq_on)
 		m_maincpu->set_input_line(2, HOLD_LINE);
 }
 
-WRITE_LINE_MEMBER(nemesis_state::bubsys_vblank_irq)
+void nemesis_state::bubsys_vblank_irq(int state)
 {
 	if (state && m_irq_on)
 		m_maincpu->set_input_line(4, HOLD_LINE);
@@ -145,24 +146,33 @@ WRITE_LINE_MEMBER(nemesis_state::bubsys_vblank_irq)
 TIMER_DEVICE_CALLBACK_MEMBER(nemesis_state::bubsys_interrupt)
 {
 	// process these in priority order
-
 	int scanline = param;
 	m_scanline_counter++;
 	if (m_scanline_counter >= 72)
 	{
 		m_scanline_counter = 0;
-		if (m_irq4_on) // the int4 fires every 72 scanlines of a counter that is NOT reset by VBLANK, and acts as a sort of constant timer
+
+		// the int4 fires every 72 scanlines of a counter that is NOT reset by VBLANK, and acts as a sort of constant timer
+		if (m_irq4_on)
 			m_maincpu->set_input_line(4, HOLD_LINE);
 	}
 
-	// based on tracing, the VBLANK int rising edge is 16 full scanlines before the rising edge of the VSYNC pulse on CSYNC, and the VBLANK int falling edge is 16 full scanlines after the falling edge of the VSYNC pulse on CSYNC. What we don't know is where exactly "scanline 0" is within that block.
-	// we know from traces of VBLANK vs 256V below (which is inverted the same cycle that the VBLANK int edge rises) that that cycle must be the transition from scanline 255 to 256, so presumably the vblank area is 'after' the display lines of a particular frame.
+	// based on tracing, the VBLANK int rising edge is 16 full scanlines before the rising edge of the VSYNC pulse on CSYNC,
+	// and the VBLANK int falling edge is 16 full scanlines after the falling edge of the VSYNC pulse on CSYNC. What we don't
+	// know is where exactly "scanline 0" is within that block.
+	// we know from traces of VBLANK vs 256V below (which is inverted the same cycle that the VBLANK int edge rises) that that
+	// cycle must be the transition from scanline 255 to 256, so presumably the vblank area is 'after' the display lines of a
+	// particular frame.
 	// TODO: actually implement this. The behavior may differ in the (unused(?) and untested) 288 scanline mode, as well.
 	if (scanline == 0 && m_irq2_on)
 		m_maincpu->set_input_line(2, HOLD_LINE);
 
-	if (scanline == 0 && m_irq1_on && (m_screen->frame_number() & 1) == 0) // 'INT32' is tied to 256V, which is inverted exactly at the same time as the rising edge of the VBLANK int above in 256 scanline mode. Its behavior in 288 scanline mode is unknown/untested.
+	if (scanline == 0 && m_irq1_on && (m_screen->frame_number() & 1) == 0)
+	{
+		// 'INT32' is tied to 256V, which is inverted exactly at the same time as the rising edge of the VBLANK int above in 256 scanline mode.
+		// Its behavior in 288 scanline mode is unknown/untested.
 		m_maincpu->set_input_line(1, ASSERT_LINE);
+	}
 	else if (scanline == 0 && m_irq1_on && (m_screen->frame_number() & 1) != 0)
 		m_maincpu->set_input_line(1, CLEAR_LINE);
 
@@ -207,48 +217,53 @@ TIMER_DEVICE_CALLBACK_MEMBER(nemesis_state::gx400_interrupt)
 }
 
 
-WRITE_LINE_MEMBER(nemesis_state::irq_enable_w)
+void nemesis_state::irq_enable_w(int state)
 {
 	m_irq_on = state;
 }
 
-WRITE_LINE_MEMBER(nemesis_state::irq1_enable_w)
+void nemesis_state::irq1_enable_w(int state)
 {
 	m_irq1_on = state;
 }
 
-WRITE_LINE_MEMBER(nemesis_state::irq2_enable_w)
+void nemesis_state::irq2_enable_w(int state)
 {
 	m_irq2_on = state;
 }
 
-WRITE_LINE_MEMBER(nemesis_state::irq4_enable_w)
+void nemesis_state::irq4_enable_w(int state)
 {
 	m_irq4_on = state;
 }
 
-WRITE_LINE_MEMBER(nemesis_state::coin1_lockout_w)
+void nemesis_state::coin1_lockout_w(int state)
 {
 	machine().bookkeeping().coin_lockout_w(0, state);
 }
 
-WRITE_LINE_MEMBER(nemesis_state::coin2_lockout_w)
+void nemesis_state::coin2_lockout_w(int state)
 {
 	machine().bookkeeping().coin_lockout_w(1, state);
 }
 
-WRITE_LINE_MEMBER(nemesis_state::sound_irq_w)
+void nemesis_state::sound_irq_w(int state)
 {
-	// This asserts the Z80 /irq pin by setting a 74ls74 latch; the Z80 pulses /IOREQ low during servicing of the interrupt, which clears the latch automatically, so HOLD_LINE is correct in this case
+	// This asserts the Z80 /irq pin by setting a 74ls74 latch; the Z80 pulses /IOREQ low during servicing of the interrupt,
+	// which clears the latch automatically, so HOLD_LINE is correct in this case
 	if (state)
 		m_audiocpu->set_input_line_and_vector(0, HOLD_LINE, 0xff); // Z80
 }
 
-WRITE_LINE_MEMBER(nemesis_state::sound_nmi_w)
+void nemesis_state::sound_nmi_w(int state)
 {
-	// On Bubble System at least, this goes to an LS02 NOR before the Z80, whose other input is tied to ???, acting as an inverter. Effectively, if the bit is 1, NMI is asserted, otherwise it is cleared. This is also cleared on reset.
-	// the ??? input is likely either tied to VBLANK or 256V, or tied to one of those two through a 74ls74 enable latch, controlled by something else (probably either the one of the two output/int enable latches of the 68k, or by exx0/exx7 address-latched accesses from the sound z80, though technically it could be anything, even the /BS signal from the mcu to the 68k)
-	// TODO: trace implement the other NMI source; without this, the 'getting ready' pre-bubble-ready countdown in bubble system cannot work, since it requires a sequence of NMIs in order to function.
+	// On Bubble System at least, this goes to an LS02 NOR before the Z80, whose other input is tied to ???, acting as an inverter.
+	// Effectively, if the bit is 1, NMI is asserted, otherwise it is cleared. This is also cleared on reset.
+	// The ??? input is likely either tied to VBLANK or 256V, or tied to one of those two through a 74ls74 enable latch, controlled
+	// by something else (probably either the one of the two output/int enable latches of the 68k, or by exx0/exx7 address-latched
+	// accesses from the sound z80, though technically it could be anything, even the /BS signal from the mcu to the 68k)
+	// TODO: trace implement the other NMI source; without this, the 'getting ready' pre-bubble-ready countdown in bubble system cannot work,
+	// since it requires a sequence of NMIs in order to function.
 	m_audiocpu->set_input_line(INPUT_LINE_NMI, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
@@ -288,7 +303,8 @@ void nemesis_state::bubsys_mcu_w(offs_t offset, uint16_t data, uint16_t mem_mask
 	else
 	{
 		//logerror("bubsys_mcu_trigger_w (%08x) %d (%02x %02x %02x %02x)\n", m_maincpu->pc(), state, m_bubsys_control_ram[0], m_bubsys_control_ram[1], m_bubsys_control_ram[2], m_bubsys_control_ram[3]);
-		m_maincpu->set_input_line(5, CLEAR_LINE); // Not confirmed the clear happens here; clear is done by the MCU code itself, presumably some number of cycles after the assert.
+		// Not confirmed the clear happens here; clear is done by the MCU code itself, presumably some number of cycles after the assert.
+		m_maincpu->set_input_line(5, CLEAR_LINE);
 	}
 }
 
@@ -364,13 +380,16 @@ void nemesis_state::nemesis_filter_w(offs_t offset, uint8_t data)
 
 void nemesis_state::gx400_speech_w(offs_t offset, uint8_t data)
 {
-	m_vlm->rst(BIT(offset, 4));
-	m_vlm->st(BIT(offset, 5));
-	// bits 3, 6 also used (one is OE for VLM data?)
-	// data is irrelevant for most writes
-
-	if (offset == 0)
+	// bit 3 falling edge: latch VLM data (databus is irrelevant for other writes)
+	// bit 4 is also used (OE for VLM data?)
+	if (BIT(~offset, 3) && BIT(m_gx400_speech_offset, 3))
 		m_vlm->data_w(data);
+
+	// bit 5: ST, bit 6: RST
+	m_vlm->st(BIT(offset, 5));
+	m_vlm->rst(BIT(offset, 6));
+
+	m_gx400_speech_offset = offset;
 }
 
 void nemesis_state::salamand_speech_start_w(uint8_t data)
@@ -378,6 +397,11 @@ void nemesis_state::salamand_speech_start_w(uint8_t data)
 	m_vlm->rst(BIT(data, 0));
 	m_vlm->st(BIT(data, 1));
 	// bit 2 is OE for VLM data
+}
+
+uint8_t nemesis_state::salamand_speech_busy_r()
+{
+	return m_vlm->bsy();
 }
 
 uint8_t nemesis_state::nemesis_portA_r()
@@ -724,12 +748,6 @@ void nemesis_state::nyanpani_map(address_map &map)
 	map(0x311000, 0x311fff).ram();
 }
 
-uint8_t nemesis_state::wd_r()
-{
-	m_frame_counter ^= 1;
-	return m_frame_counter;
-}
-
 void nemesis_state::sal_sound_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
@@ -738,7 +756,7 @@ void nemesis_state::sal_sound_map(address_map &map)
 	map(0xb000, 0xb00d).rw(m_k007232, FUNC(k007232_device::read), FUNC(k007232_device::write));
 	map(0xc000, 0xc001).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write));
 	map(0xd000, 0xd000).w(m_vlm, FUNC(vlm5030_device::data_w));
-	map(0xe000, 0xe000).r(FUNC(nemesis_state::wd_r)); /* watchdog?? */
+	map(0xe000, 0xe000).r(FUNC(nemesis_state::salamand_speech_busy_r));
 	map(0xf000, 0xf000).w(FUNC(nemesis_state::salamand_speech_start_w));
 }
 
@@ -755,7 +773,6 @@ void nemesis_state::blkpnthr_sound_map(address_map &map)
 	map(0xa000, 0xa000).r("soundlatch", FUNC(generic_latch_8_device::read));
 	map(0xb000, 0xb00d).rw(m_k007232, FUNC(k007232_device::read), FUNC(k007232_device::write));
 	map(0xc000, 0xc001).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write));
-	map(0xe000, 0xe000).r(FUNC(nemesis_state::wd_r)); /* watchdog?? */
 }
 
 void nemesis_state::city_sound_map(address_map &map)
@@ -1368,7 +1385,7 @@ static INPUT_PORTS_START( citybomb )
 
 	PORT_START("IN2")
 	KONAMI8_B123(2)
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("adc", adc0804_device, intr_r)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("adc", FUNC(adc0804_device::intr_r))
 
 	PORT_START("DSW0")
 	KONAMI_COINAGE_LOC(DEF_STR( Free_Play ), "Invalid", SW1)
@@ -1456,7 +1473,7 @@ static INPUT_PORTS_START( hcrash )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNKNOWN ) PORT_CONDITION("DSW1", 0x03, NOTEQUALS, 0x02) // player 2?
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON3 )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_CUSTOM )   // must be 0 otherwise game freezes when using WEC Le Mans 24 cabinet
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("adc", adc0804_device, intr_r)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("adc", FUNC(adc0804_device::intr_r))
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
 	PORT_START("IN2")
@@ -1737,9 +1754,9 @@ void nemesis_state::machine_start()
 	save_item(NAME(m_irq1_on));
 	save_item(NAME(m_irq2_on));
 	save_item(NAME(m_irq4_on));
-	save_item(NAME(m_frame_counter));
 	save_item(NAME(m_scanline_counter));
 	save_item(NAME(m_gx400_irq1_cnt));
+	save_item(NAME(m_gx400_speech_offset));
 	save_item(NAME(m_selected_ip));
 	save_item(NAME(m_tilemap_flip));
 	save_item(NAME(m_flipscreen));
@@ -1750,7 +1767,7 @@ void nemesis_state::machine_reset()
 {
 	m_irq_on = 0;
 	m_gx400_irq1_cnt = 0;
-	m_frame_counter = 1;
+	m_gx400_speech_offset = 0;
 	m_scanline_counter = 0;
 	m_selected_ip = 0;
 
@@ -2398,21 +2415,45 @@ ROM_START( salamandj )
 	ROM_LOAD(      "587-c01.10a",      0x00000, 0x20000, CRC(09fe0632) SHA1(4c3b29c623d70bbe8a938a0beb4638912c46fb6a) ) /* Mask rom */
 ROM_END
 
+// Original Konami PCBs PWB (B) 201012A GX587 + GX400PWD(A)200204C
+ROM_START( salamandt )
+	ROM_REGION( 0x80000, "maincpu", 0 )  // Same program ROMs content as 'salamand', but with smaller ROMs
+	ROM_LOAD16_BYTE( "5_27512.18b",  0x00000, 0x10000, CRC(a42297f9) SHA1(7c974779e438eae649b39b36f6f6d24847099a6e) )
+	ROM_LOAD16_BYTE( "6_27512.18c",  0x00001, 0x10000, CRC(f9130b0a) SHA1(925ea65c13fc87fc59f893cc0ead2c82fd0bed6f) )
+	ROM_LOAD16_BYTE( "10_27512.17b", 0x40000, 0x10000, CRC(b83e8724) SHA1(69707a98ac3e15f240b24812ff639cafd99c306d) )
+	ROM_LOAD16_BYTE( "4_27512.17c",  0x40001, 0x10000, CRC(a6ef6dc4) SHA1(639113b506fce4318d4b79efd8717232c31dd748) )
+	ROM_LOAD16_BYTE( "9_27512.17b",  0x60000, 0x10000, CRC(b4d2fec9) SHA1(b095e003d86f6d5f486a1d9a4cf02572ff20edeb) )
+	ROM_LOAD16_BYTE( "3_27512.17c",  0x60001, 0x10000, CRC(6ea59643) SHA1(cb2ba819a601eb417eb67d50568126269fa613a4) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 ) // 64k for sound
+	ROM_LOAD( "2_tmm24256ap.11j",    0x00000, 0x08000, CRC(7eb8bb88) SHA1(8eb3063b0f4b0775b80f25cc6588661c0e61227d) ) // Unique for this set
+
+	ROM_REGION( 0x04000, "vlm", 0 )      // VLM5030 data
+	ROM_LOAD( "1_27128.8g",          0x00000, 0x04000, CRC(f9ac6b82) SHA1(3370fc3a7f82e922e19d54afb3bca7b07fa4aa9a) )
+
+	ROM_REGION( 0x20000, "k007232", 0 )  // 007232 data
+	ROM_LOAD( "8_27512.10a",         0x00000, 0x10000, CRC(cf477da4) SHA1(92867b3488228a802f0176139040c4eaf2b92700) )
+	ROM_LOAD( "7_27512.10a",         0x10000, 0x10000, CRC(52384e79) SHA1(06d7003d8746287d95710dc6b52556aa642ccc83) )
+
+	ROM_REGION( 0x20, "pld", 0 )
+	ROM_LOAD( "007366_pal8l14a.19d", 0x00000, 0x00020, CRC(77304735) SHA1(1f9dc7b78d4f7a40e7886d106d07b6349abaaa57) )
+ROM_END
+
 ROM_START( lifefrce )
 	ROM_REGION( 0x80000, "maincpu", 0 )
-	ROM_LOAD16_BYTE( "587-k02.18b",  0x00000, 0x10000, CRC(4a44da18) SHA1(8e76bc2b9c48bfc65664fb6ee4d1d33622ee1eb8) )
-	ROM_LOAD16_BYTE( "587-k05.18c",  0x00001, 0x10000, CRC(2f8c1cbd) SHA1(aa309d509be69f315e50047abff42d9b30334e1d) )
-	ROM_LOAD16_BYTE( "587-c03.17b",  0x40000, 0x20000, CRC(e5caf6e6) SHA1(f5df4fbc43cfa6e2866558c99dd95ba8dc89dc7a) ) /* Mask rom */
-	ROM_LOAD16_BYTE( "587-c06.17c",  0x40001, 0x20000, CRC(c2f567ea) SHA1(0c38fea53f3d4a9ae0deada5669deca4be8c9fd3) ) /* Mask rom */
+	ROM_LOAD16_BYTE( "587-l02.18b",  0x00000, 0x10000, CRC(4a44da18) SHA1(8e76bc2b9c48bfc65664fb6ee4d1d33622ee1eb8) )
+	ROM_LOAD16_BYTE( "587-l05.18c",  0x00001, 0x10000, CRC(2f8c1cbd) SHA1(aa309d509be69f315e50047abff42d9b30334e1d) )
+	ROM_LOAD16_BYTE( "6107.17b",     0x40000, 0x20000, CRC(e5caf6e6) SHA1(f5df4fbc43cfa6e2866558c99dd95ba8dc89dc7a) ) /* Mask rom */
+	ROM_LOAD16_BYTE( "6108.17c",     0x40001, 0x20000, CRC(c2f567ea) SHA1(0c38fea53f3d4a9ae0deada5669deca4be8c9fd3) ) /* Mask rom */
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )    /* 64k for sound */
-	ROM_LOAD(      "587-k09.11j",  0x00000, 0x08000, CRC(2255fe8c) SHA1(6ee35575a15f593642b29020857ec466094ef495) )
+	ROM_LOAD(      "587-k09.11j",    0x00000, 0x08000, CRC(2255fe8c) SHA1(6ee35575a15f593642b29020857ec466094ef495) )
 
 	ROM_REGION( 0x04000, "vlm", 0 )    /* VLM5030 data */
-	ROM_LOAD(      "587-k08.8g",  0x00000, 0x04000, CRC(7f0e9b41) SHA1(c9fc2723fac55691dfbb4cf9b3c472a42efa97c9) )
+	ROM_LOAD(      "587-k08.8g",     0x00000, 0x04000, CRC(7f0e9b41) SHA1(c9fc2723fac55691dfbb4cf9b3c472a42efa97c9) )
 
 	ROM_REGION( 0x20000, "k007232", 0 )    /* 007232 data */
-	ROM_LOAD(      "587-c01.10a",      0x00000, 0x20000, CRC(09fe0632) SHA1(4c3b29c623d70bbe8a938a0beb4638912c46fb6a) ) /* Mask rom */
+	ROM_LOAD(      "6106.10a",       0x00000, 0x20000, CRC(09fe0632) SHA1(4c3b29c623d70bbe8a938a0beb4638912c46fb6a) ) /* Mask rom */
 ROM_END
 
 ROM_START( lifefrcej )
@@ -2484,8 +2525,8 @@ ROM_END
 
 ROM_START( kittenk )
 	ROM_REGION( 0x140000, "maincpu", 0 )
-	ROM_LOAD16_BYTE( "kitten.15k",   0x000000, 0x10000, CRC(8267cb2b) SHA1(63c4ebef834850eff379141b8eb0fafbdcf26d0e) )
-	ROM_LOAD16_BYTE( "kitten.15h",   0x000001, 0x10000, CRC(eb41cfa5) SHA1(d481e63faea098625a42613c13f82fec310a7c62) )
+	ROM_LOAD16_BYTE( "712-b10.15k",  0x000000, 0x10000, CRC(8267cb2b) SHA1(63c4ebef834850eff379141b8eb0fafbdcf26d0e) )
+	ROM_LOAD16_BYTE( "712-b09.15h",  0x000001, 0x10000, CRC(eb41cfa5) SHA1(d481e63faea098625a42613c13f82fec310a7c62) )
 	ROM_LOAD16_BYTE( "712-b08.15f",  0x100000, 0x20000, CRC(e6d71611) SHA1(89fced4074c491c211fea908f08be94595c57f31) )
 	ROM_LOAD16_BYTE( "712-b07.15d",  0x100001, 0x20000, CRC(30f75c9f) SHA1(0cbc247ff37800dd3275d2ff23a63ed19ec4cef2) )
 
@@ -2654,24 +2695,25 @@ ROM_END
 
 
 
-GAME(  1985, nemesis,   0,         nemesis,    nemesis,  nemesis_state, empty_init, ROT0,   "Konami", "Nemesis (ROM version)",          MACHINE_SUPPORTS_SAVE )
-GAME(  1985, nemesisuk, nemesis,   nemesis,    nemesuk,  nemesis_state, empty_init, ROT0,   "Konami", "Nemesis (World?, ROM version)",  MACHINE_SUPPORTS_SAVE )
-GAMEL( 1985, konamigt,  0,         konamigt,   konamigt, nemesis_state, empty_init, ROT0,   "Konami", "Konami GT",                      MACHINE_SUPPORTS_SAVE, layout_konamigt )
-GAME(  1985, rf2,       konamigt,  rf2_gx400,  rf2,      nemesis_state, empty_init, ROT0,   "Konami", "Konami RF2 - Red Fighter",       MACHINE_SUPPORTS_SAVE )
-GAME(  1985, twinbee,   0,         gx400,      twinbee,  nemesis_state, empty_init, ROT90,  "Konami", "TwinBee (ROM version)",          MACHINE_SUPPORTS_SAVE )
-GAME(  1985, gradius,   nemesis,   gx400,      gradius,  nemesis_state, empty_init, ROT0,   "Konami", "Gradius (Japan, ROM version)",   MACHINE_SUPPORTS_SAVE )
-GAME(  1985, gwarrior,  0,         gx400,      gwarrior, nemesis_state, empty_init, ROT0,   "Konami", "Galactic Warriors",              MACHINE_SUPPORTS_SAVE )
-GAME(  1986, salamand,  0,         salamand,   salamand, nemesis_state, empty_init, ROT0,   "Konami", "Salamander (version D)",         MACHINE_SUPPORTS_SAVE )
-GAME(  1986, salamandj, salamand,  salamand,   salamand, nemesis_state, empty_init, ROT0,   "Konami", "Salamander (version J)",         MACHINE_SUPPORTS_SAVE )
-GAME(  1986, lifefrce,  salamand,  salamand,   salamand, nemesis_state, empty_init, ROT0,   "Konami", "Lifeforce (US)",                 MACHINE_SUPPORTS_SAVE )
-GAME(  1987, lifefrcej, salamand,  salamand,   lifefrcj, nemesis_state, empty_init, ROT0,   "Konami", "Lifeforce (Japan)",              MACHINE_SUPPORTS_SAVE )
-GAME(  1987, blkpnthr,  0,         blkpnthr,   blkpnthr, nemesis_state, empty_init, ROT0,   "Konami", "Black Panther",                  MACHINE_SUPPORTS_SAVE )
-GAME(  1987, citybomb,  0,         citybomb,   citybomb, nemesis_state, empty_init, ROT270, "Konami", "City Bomber (World)",            MACHINE_SUPPORTS_SAVE )
-GAME(  1987, citybombj, citybomb,  citybomb,   citybomb, nemesis_state, empty_init, ROT270, "Konami", "City Bomber (Japan)",            MACHINE_SUPPORTS_SAVE )
-GAME(  1987, hcrash,    0,         hcrash,     hcrash,   nemesis_state, empty_init, ROT0,   "Konami", "Hyper Crash (version D)",        MACHINE_SUPPORTS_SAVE )
-GAME(  1987, hcrashc,   hcrash,    hcrash,     hcrash,   nemesis_state, empty_init, ROT0,   "Konami", "Hyper Crash (version C)",        MACHINE_SUPPORTS_SAVE )
-GAME(  1988, kittenk,   0,         nyanpani,   nyanpani, nemesis_state, empty_init, ROT0,   "Konami", "Kitten Kaboodle",                MACHINE_SUPPORTS_SAVE )
-GAME(  1988, nyanpani,  kittenk,   nyanpani,   nyanpani, nemesis_state, empty_init, ROT0,   "Konami", "Nyan Nyan Panic (Japan)",        MACHINE_SUPPORTS_SAVE )
+GAME(  1985, nemesis,   0,        nemesis,   nemesis,  nemesis_state, empty_init, ROT0,   "Konami",                  "Nemesis (ROM version)",         MACHINE_SUPPORTS_SAVE )
+GAME(  1985, nemesisuk, nemesis,  nemesis,   nemesuk,  nemesis_state, empty_init, ROT0,   "Konami",                  "Nemesis (World?, ROM version)", MACHINE_SUPPORTS_SAVE )
+GAMEL( 1985, konamigt,  0,        konamigt,  konamigt, nemesis_state, empty_init, ROT0,   "Konami",                  "Konami GT",                     MACHINE_SUPPORTS_SAVE, layout_konamigt )
+GAME(  1985, rf2,       konamigt, rf2_gx400, rf2,      nemesis_state, empty_init, ROT0,   "Konami",                  "Konami RF2 - Red Fighter",      MACHINE_SUPPORTS_SAVE )
+GAME(  1985, twinbee,   0,        gx400,     twinbee,  nemesis_state, empty_init, ROT90,  "Konami",                  "TwinBee (ROM version)",         MACHINE_SUPPORTS_SAVE )
+GAME(  1985, gradius,   nemesis,  gx400,     gradius,  nemesis_state, empty_init, ROT0,   "Konami",                  "Gradius (Japan, ROM version)",  MACHINE_SUPPORTS_SAVE )
+GAME(  1985, gwarrior,  0,        gx400,     gwarrior, nemesis_state, empty_init, ROT0,   "Konami",                  "Galactic Warriors",             MACHINE_SUPPORTS_SAVE )
+GAME(  1986, salamand,  0,        salamand,  salamand, nemesis_state, empty_init, ROT0,   "Konami",                  "Salamander (version D)",        MACHINE_SUPPORTS_SAVE )
+GAME(  1986, salamandj, salamand, salamand,  salamand, nemesis_state, empty_init, ROT0,   "Konami",                  "Salamander (version J)",        MACHINE_SUPPORTS_SAVE )
+GAME(  1986, salamandt, salamand, salamand,  salamand, nemesis_state, empty_init, ROT0,   "Konami (Tecfri license)", "Salamander (Tecfri license)",   MACHINE_SUPPORTS_SAVE )
+GAME(  1986, lifefrce,  salamand, salamand,  salamand, nemesis_state, empty_init, ROT0,   "Konami",                  "Lifeforce (US)",                MACHINE_SUPPORTS_SAVE )
+GAME(  1987, lifefrcej, salamand, salamand,  lifefrcj, nemesis_state, empty_init, ROT0,   "Konami",                  "Lifeforce (Japan)",             MACHINE_SUPPORTS_SAVE )
+GAME(  1987, blkpnthr,  0,        blkpnthr,  blkpnthr, nemesis_state, empty_init, ROT0,   "Konami",                  "Black Panther",                 MACHINE_SUPPORTS_SAVE )
+GAME(  1987, citybomb,  0,        citybomb,  citybomb, nemesis_state, empty_init, ROT270, "Konami",                  "City Bomber (World)",           MACHINE_SUPPORTS_SAVE )
+GAME(  1987, citybombj, citybomb, citybomb,  citybomb, nemesis_state, empty_init, ROT270, "Konami",                  "City Bomber (Japan)",           MACHINE_SUPPORTS_SAVE )
+GAME(  1987, hcrash,    0,        hcrash,    hcrash,   nemesis_state, empty_init, ROT0,   "Konami",                  "Hyper Crash (version D)",       MACHINE_SUPPORTS_SAVE )
+GAME(  1987, hcrashc,   hcrash,   hcrash,    hcrash,   nemesis_state, empty_init, ROT0,   "Konami",                  "Hyper Crash (version C)",       MACHINE_SUPPORTS_SAVE )
+GAME(  1988, kittenk,   0,        nyanpani,  nyanpani, nemesis_state, empty_init, ROT0,   "Konami",                  "Kitten Kaboodle",               MACHINE_SUPPORTS_SAVE )
+GAME(  1988, nyanpani,  kittenk,  nyanpani,  nyanpani, nemesis_state, empty_init, ROT0,   "Konami",                  "Nyan Nyan Panic (Japan)",       MACHINE_SUPPORTS_SAVE )
 
 /*
 
@@ -2976,7 +3018,10 @@ void nemesis_state::bubsys(machine_config &config)
 	set_screen_raw_params(config);
 	m_screen->set_screen_update(FUNC(nemesis_state::screen_update_nemesis));
 	m_screen->set_palette(m_palette);
-	//m_screen->screen_vblank().set_inputline("audiocpu", INPUT_LINE_NMI); // TODO: This is supposed to be gated by something on bubble system, unclear what. it should only be active while the bubble memory is warming up, and disabled after the bubble mcu 'releases' the 68k from reset.
+	// TODO: This is supposed to be gated by something on bubble system, unclear what.
+	// it should only be active while the bubble memory is warming up, and disabled after
+	// the bubble mcu 'releases' the 68k from reset.
+	//m_screen->screen_vblank().set_inputline("audiocpu", INPUT_LINE_NMI);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_nemesis);
 	PALETTE(config, m_palette).set_entries(2048);

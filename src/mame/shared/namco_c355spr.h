@@ -1,8 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood
 
-#ifndef MAME_VIDEO_NAMCO_C355SPR_H
-#define MAME_VIDEO_NAMCO_C355SPR_H
+#ifndef MAME_SHARED_NAMCO_C355SPR_H
+#define MAME_SHARED_NAMCO_C355SPR_H
 
 #pragma once
 
@@ -39,7 +39,7 @@ public:
 	void spriteram_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 	u16 position_r(offs_t offset);
 	void position_w(offs_t offset, u16 data, u16 mem_mask = ~0);
-	DECLARE_WRITE_LINE_MEMBER(vblank);
+	void vblank(int state);
 
 	typedef delegate<int (int)> c355_obj_code2tile_delegate;
 	typedef device_delegate<u16(int, u8)> c355_obj_entry_attr_delegate;
@@ -75,8 +75,8 @@ protected:
 	namco_c355spr_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock = 0);
 
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_stop() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_stop() override ATTR_COLD;
 
 	c355_obj_code2tile_delegate m_code2tile;
 	c355_priority_delegate m_pri_cb;
@@ -93,6 +93,9 @@ protected:
 	u16 read_spritelist(int entry, int whichlist);
 
 	int default_priority(int pal_pri) { return ((pal_pri >> 4) & 0xf); }
+
+	// decoding info
+	DECLARE_GFXDECODE_MEMBER(gfxinfo);
 
 	// general
 	template<class BitmapClass>
@@ -152,7 +155,6 @@ private:
 	int m_buffer;
 	bool m_external_prifill;
 
-	required_memory_region m_gfx_region;
 	u16 m_colbase;
 	int m_colors;
 	int m_granularity;
@@ -163,4 +165,4 @@ private:
 // device type definition
 DECLARE_DEVICE_TYPE(NAMCO_C355SPR, namco_c355spr_device)
 
-#endif // MAME_VIDEO_NAMCO_C355SPR_H
+#endif // MAME_SHARED_NAMCO_C355SPR_H

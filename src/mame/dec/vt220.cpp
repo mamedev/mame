@@ -42,6 +42,8 @@
 #include "screen.h"
 
 
+namespace {
+
 class vt220_state : public driver_device
 {
 public:
@@ -55,15 +57,15 @@ public:
 	void vt220a(machine_config &config);
 
 private:
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 	uint32_t screen_update_vt220(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<i8051_device> m_maincpu;
 	required_device<ram_device> m_ram;
-	void vt220_io(address_map &map);
-	void vt220_mem(address_map &map);
-	void vt220a_io(address_map &map);
-	void vt220a_mem(address_map &map);
+	void vt220_io(address_map &map) ATTR_COLD;
+	void vt220_mem(address_map &map) ATTR_COLD;
+	void vt220a_io(address_map &map) ATTR_COLD;
+	void vt220a_mem(address_map &map) ATTR_COLD;
 };
 
 
@@ -174,6 +176,9 @@ ROM_START(vt220a)
 #endif
 	ROM_LOAD("23-348e4.e13", 0x0000, 0x2000, CRC(994f3e37) SHA1(fe72a9fe9adb3a24743a6288d88ae07570cfea9a)) // this can maybe be read as well as a read/writable ram for custom characters which lives ?above? it in chargen address space by setting a bit in a config register. I haven't figured out where in 8051 address space it appears when readable nor where the ram appears.
 ROM_END
+
+} // anonymous namespace
+
 
 /* Driver */
 

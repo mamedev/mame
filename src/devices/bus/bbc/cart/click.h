@@ -32,9 +32,9 @@ public:
 
 protected:
 	// device-level overrides
-	virtual ioport_constructor device_input_ports() const override;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 	// bbc_cart_interface overrides
 	virtual uint8_t read(offs_t offset, int infc, int infd, int romqa, int oe, int oe2) override;

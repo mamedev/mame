@@ -19,34 +19,6 @@
 
 #include <type_traits>
 
-
-//**************************************************************************
-//  CONSTANTS
-//**************************************************************************
-
-// Translation intentions
-constexpr int TRANSLATE_TYPE_MASK       = 0x03;     // read write or fetch
-constexpr int TRANSLATE_USER_MASK       = 0x04;     // user mode or fully privileged
-constexpr int TRANSLATE_DEBUG_MASK      = 0x08;     // debug mode (no side effects)
-
-constexpr int TRANSLATE_READ            = 0;        // translate for read
-constexpr int TRANSLATE_WRITE           = 1;        // translate for write
-constexpr int TRANSLATE_FETCH           = 2;        // translate for instruction fetch
-constexpr int TRANSLATE_READ_USER       = (TRANSLATE_READ | TRANSLATE_USER_MASK);
-constexpr int TRANSLATE_WRITE_USER      = (TRANSLATE_WRITE | TRANSLATE_USER_MASK);
-constexpr int TRANSLATE_FETCH_USER      = (TRANSLATE_FETCH | TRANSLATE_USER_MASK);
-constexpr int TRANSLATE_READ_DEBUG      = (TRANSLATE_READ | TRANSLATE_DEBUG_MASK);
-constexpr int TRANSLATE_WRITE_DEBUG     = (TRANSLATE_WRITE | TRANSLATE_DEBUG_MASK);
-constexpr int TRANSLATE_FETCH_DEBUG     = (TRANSLATE_FETCH | TRANSLATE_DEBUG_MASK);
-
-
-
-//**************************************************************************
-//  TYPE DEFINITIONS
-//**************************************************************************
-
-// ======================> device_memory_interface
-
 class device_memory_interface : public device_interface
 {
 	friend class device_scheduler;
@@ -57,6 +29,13 @@ class device_memory_interface : public device_interface
 	template <typename T, typename U> using is_unrelated_interface = std::bool_constant<emu::detail::is_device_interface<T>::value && !is_related_class<T, U>::value >;
 
 public:
+	// Translation intentions for the translate() call
+	enum {
+		TR_READ,
+		TR_WRITE,
+		TR_FETCH
+	};
+
 	// construction/destruction
 	device_memory_interface(const machine_config &mconfig, device_t &device);
 	virtual ~device_memory_interface();
@@ -85,7 +64,7 @@ public:
 	address_space &space(int index = 0) const { assert(index >= 0 && index < int(m_addrspace.size()) && m_addrspace[index]); return *m_addrspace[index]; }
 
 	// address translation
-	bool translate(int spacenum, int intention, offs_t &address) { return memory_translate(spacenum, intention, address); }
+	bool translate(int spacenum, int intention, offs_t &address, address_space *&target_space) { return memory_translate(spacenum, intention, address, target_space); }
 
 	// deliberately ambiguous functions; if you have the memory interface
 	// just use it
@@ -110,7 +89,7 @@ protected:
 	virtual space_config_vector memory_space_config() const = 0;
 
 	// optional operation overrides
-	virtual bool memory_translate(int spacenum, int intention, offs_t &address);
+	virtual bool memory_translate(int spacenum, int intention, offs_t &address, address_space *&target_space);
 
 	// interface-level overrides
 	virtual void interface_config_complete() override;

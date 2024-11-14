@@ -17,7 +17,8 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-DEFINE_DEVICE_TYPE(TANBUS_RA32K, tanbus_ra32k_device, "tanbus_ra32k", "Ralph Allen 32K EPROM-RAM Card")
+DEFINE_DEVICE_TYPE(TANBUS_RA32KRAM, tanbus_ra32kram_device, "tanbus_ra32kram", "Ralph Allen 32K EPROM-RAM Card (RAM)")
+DEFINE_DEVICE_TYPE(TANBUS_RA32KROM, tanbus_ra32krom_device, "tanbus_ra32krom", "Ralph Allen 32K EPROM-RAM Card (RALBUG)")
 
 
 //-------------------------------------------------
@@ -97,10 +98,9 @@ INPUT_PORTS_START( ra32k )
 	PORT_DIPSETTING(0x0b, "$F000-$6FFF")
 
 	PORT_START("LNK1")
-	PORT_CONFNAME(0x03, 0x00, "Block Enable")
-	PORT_CONFSETTING(0x00, "RAM (permanent)")
-	PORT_CONFSETTING(0x01, "RAM (page selectable)")
-	PORT_CONFSETTING(0x02, "EPROM (page selectable)")
+	PORT_CONFNAME(0x01, 0x00, "Block Enable")
+	PORT_CONFSETTING(0x00, "Permanent")
+	PORT_CONFSETTING(0x01, "Page selectable")
 INPUT_PORTS_END
 
 
@@ -114,20 +114,20 @@ ioport_constructor tanbus_ra32k_device::device_input_ports() const
 }
 
 //-------------------------------------------------
-//  ROM( ra32k )
+//  ROM( ra32krom )
 //-------------------------------------------------
 
-ROM_START(ra32k)
+ROM_START(ra32krom)
 	ROM_REGION(0x8000, "rom", 0)
-	ROM_LOAD("data_v1.4.rom", 0x0000, 0x0800, CRC(de61f11d) SHA1(3e6ddc5dba47d9136f58abc9475c3e73fc8cc0c2))
-	ROM_LOAD("syntax_v1.4.rom", 0x0800, 0x0800, CRC(17438c4c) SHA1(46bf4e33544c19e142b380095736c5c3eb885ba0))
-	ROM_LOAD("ascii_v1.4.rom", 0x1000, 0x0800, CRC(93244a81) SHA1(6149eec9904438a0d23529d2c2428a594d5b1fb9))
-	ROM_LOAD("graph_v1.4.rom", 0x1800, 0x0800, CRC(159eb1f6) SHA1(5e49edda4b550506aca70d1f7e7de7a352f0359f))
+	ROM_LOAD("data_v1.4.rom",   0x2000, 0x0800, CRC(de61f11d) SHA1(3e6ddc5dba47d9136f58abc9475c3e73fc8cc0c2))
+	ROM_LOAD("syntax_v1.4.rom", 0x2800, 0x0800, CRC(17438c4c) SHA1(46bf4e33544c19e142b380095736c5c3eb885ba0))
+	ROM_LOAD("ascii_v1.4.rom",  0x3000, 0x0800, CRC(93244a81) SHA1(6149eec9904438a0d23529d2c2428a594d5b1fb9))
+	ROM_LOAD("graph_v1.4.rom",  0x3800, 0x0800, CRC(159eb1f6) SHA1(5e49edda4b550506aca70d1f7e7de7a352f0359f))
 ROM_END
 
-const tiny_rom_entry *tanbus_ra32k_device::device_rom_region() const
+const tiny_rom_entry *tanbus_ra32krom_device::device_rom_region() const
 {
-	return ROM_NAME(ra32k);
+	return ROM_NAME(ra32krom);
 }
 
 //**************************************************************************
@@ -138,12 +138,22 @@ const tiny_rom_entry *tanbus_ra32k_device::device_rom_region() const
 //  tanbus_ra32k_device - constructor
 //-------------------------------------------------
 
-tanbus_ra32k_device::tanbus_ra32k_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, TANBUS_RA32K, tag, owner, clock)
+tanbus_ra32k_device::tanbus_ra32k_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, type, tag, owner, clock)
 	, device_tanbus_interface(mconfig, *this)
-	, m_rom(*this, "rom")
 	, m_dsw(*this, "DSW%u", 1)
 	, m_link(*this, "LNK1")
+{
+}
+
+tanbus_ra32kram_device::tanbus_ra32kram_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: tanbus_ra32k_device(mconfig, TANBUS_RA32KRAM, tag, owner, clock)
+{
+}
+
+tanbus_ra32krom_device::tanbus_ra32krom_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: tanbus_ra32k_device(mconfig, TANBUS_RA32KROM, tag, owner, clock)
+	, m_rom(*this, "rom")
 {
 }
 
@@ -151,82 +161,27 @@ tanbus_ra32k_device::tanbus_ra32k_device(const machine_config &mconfig, const ch
 //  device_start - device-specific startup
 //-------------------------------------------------
 
-void tanbus_ra32k_device::device_start()
+void tanbus_ra32kram_device::device_start()
 {
-	m_ram = std::make_unique<uint8_t[]>(0x8000);
+	m_ram = make_unique_clear<uint8_t[]>(0x8000);
 
 	save_pointer(NAME(m_ram), 0x8000);
 }
 
-//-------------------------------------------------
-//  device_reset - device-specific reset
-//-------------------------------------------------
-
-void tanbus_ra32k_device::device_reset()
+void tanbus_ra32krom_device::device_start()
 {
 }
 
-//-------------------------------------------------
-//  read - card read
-//-------------------------------------------------
-
-uint8_t tanbus_ra32k_device::read(offs_t offset, int inhrom, int inhram, int be)
-{
-	uint8_t data = 0xff;
-
-	switch (m_link->read() & 0x02)
-	{
-	case 0x00:
-		/* 32K dynamic RAM */
-		if (block_enabled(offset, inhrom, inhram, be))
-		{
-			//logerror("ram read %04x\n", offset);
-			data = m_ram[offset & 0x7fff];
-		}
-		break;
-	case 0x02:
-		/* ROM selected */
-		if (block_enabled(offset, inhrom, inhram, be))
-		{
-			//logerror("rom read %04x\n", offset);
-			data = m_rom->base()[(offset - m_addr_start) & 0x7fff];
-		}
-		break;
-	}
-
-	return data;
-}
-
-//-------------------------------------------------
-//  write - card write
-//-------------------------------------------------
-
-void tanbus_ra32k_device::write(offs_t offset, uint8_t data, int inhrom, int inhram, int be)
-{
-	switch (m_link->read() & 0x02)
-	{
-	case 0x00:
-		/* 32K dynamic RAM */
-		if (block_enabled(offset, inhrom, inhram, be))
-		{
-			//logerror("ram write %04x %02x\n", offset, data);
-			m_ram[offset & 0x7fff] = data;
-		}
-		break;
-	case 0x02:
-		/* ROM selected */
-		break;
-	}
-}
 
 bool tanbus_ra32k_device::block_enabled(offs_t offset, int inhrom, int inhram, int be)
 {
-	m_addr_start = ((bitswap<4>(m_dsw[2]->read(), 1, 0, 3, 2) << 12) + 0x1000) & 0xffff;
-	m_addr_end = (m_addr_start + 0x7fff) & 0xffff;
+	offs_t addr_start = ((bitswap<4>(m_dsw[2]->read(), 1, 0, 3, 2) << 12) + 0x1000) & 0xffff;
+	offs_t addr_end = (addr_start + 0x7fff) & 0xffff;
 
-	//uint8_t block_start = (bitswap<4>(m_dsw[2]->read(), 1, 0, 3, 2) + 1) & 0x0f;
-	uint8_t block = offset >> 12;
-	//logerror("%04x start %04x current %04x\n", offset, block_start, block);
+	uint8_t block = (offset & 0x7800) >> 12;
+
+	if (offset < addr_start || offset > addr_end)
+		return false;
 
 	if (offset & 0x0800)
 	{
@@ -254,4 +209,38 @@ bool tanbus_ra32k_device::block_enabled(offs_t offset, int inhrom, int inhram, i
 		return false;
 
 	return true;
+}
+
+//-------------------------------------------------
+//  read - card read
+//-------------------------------------------------
+
+uint8_t tanbus_ra32kram_device::read(offs_t offset, int inhrom, int inhram, int be)
+{
+	if (block_enabled(offset, inhrom, inhram, be))
+	{
+		return m_ram[offset & 0x7fff];
+	}
+	return 0xff;
+}
+
+uint8_t tanbus_ra32krom_device::read(offs_t offset, int inhrom, int inhram, int be)
+{
+	if (block_enabled(offset, inhrom, inhram, be))
+	{
+		return m_rom[offset & 0x7fff];
+	}
+	return 0xff;
+}
+
+//-------------------------------------------------
+//  write - card write
+//-------------------------------------------------
+
+void tanbus_ra32kram_device::write(offs_t offset, uint8_t data, int inhrom, int inhram, int be)
+{
+	if (block_enabled(offset, inhrom, inhram, be))
+	{
+		m_ram[offset & 0x7fff] = data;
+	}
 }

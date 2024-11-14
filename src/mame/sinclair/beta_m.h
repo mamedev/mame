@@ -9,8 +9,8 @@
     04/05/2008 Created by Miodrag Milanovic
 
 *********************************************************************/
-#ifndef MAME_MACHINE_BETA_H
-#define MAME_MACHINE_BETA_H
+#ifndef MAME_SINCLAIR_BETA_M_H
+#define MAME_SINCLAIR_BETA_M_H
 
 #pragma once
 
@@ -36,6 +36,7 @@ public:
 	void track_w(uint8_t data);
 	void sector_w(uint8_t data);
 	void data_w(uint8_t data);
+	void turbo_w(int state);
 
 	int is_active();
 	void enable();
@@ -43,19 +44,17 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
-	virtual const tiny_rom_entry *device_rom_region() const override;
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 private:
 	uint8_t m_betadisk_active;
 
 	required_device<kr1818vg93_device> m_wd179x;
-	required_device<floppy_connector> m_floppy0;
-	required_device<floppy_connector> m_floppy1;
-	required_device<floppy_connector> m_floppy2;
-	required_device<floppy_connector> m_floppy3;
+	required_device_array<floppy_connector, 4> m_floppy;
+	output_finder<4> m_floppy_led;
 	void fdc_hld_w(int state);
 	void motors_control();
 	u8 m_control;
@@ -67,4 +66,4 @@ private:
 DECLARE_DEVICE_TYPE(BETA_DISK, beta_disk_device)
 
 
-#endif // MAME_MACHINE_BETA_H
+#endif // MAME_SINCLAIR_BETA_M_H

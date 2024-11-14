@@ -19,13 +19,15 @@
 #include "ggenie.h"
 #include "bus/nes/nes_carts.h"
 
-#ifdef NES_PCB_DEBUG
-#define VERBOSE 1
-#else
-#define VERBOSE 0
-#endif
+#define LOG_HIFREQ (1U << 1)
+#define LOG_INFO   (1U << 2)
 
-#define LOG_MMC(x) do { if (VERBOSE) logerror x; } while (0)
+#ifdef NES_PCB_DEBUG
+#define VERBOSE (LOG_INFO | LOG_GENERAL)
+#else
+#define VERBOSE (LOG_INFO)
+#endif
+#include "logmacro.h"
 
 
 //-------------------------------------------------
@@ -93,7 +95,7 @@ void nes_ggenie_device::pcb_reset()
 
 void nes_ggenie_device::write_h(offs_t offset, u8 data)
 {
-//  LOG_MMC(("ggenie write_h, offset: %04x, data: %02x\n", offset, data));
+	LOGMASKED(LOG_HIFREQ, "ggenie write_h, offset: %04x, data: %02x\n", offset, data);
 
 	if (m_gg_bypass)
 	{
@@ -142,16 +144,16 @@ void nes_ggenie_device::write_h(offs_t offset, u8 data)
 		}
 		// bit 7 is unused and always zero
 
-		logerror("Game Genie Summary:\n");
+		LOGMASKED(LOG_INFO, "Game Genie Summary:\n");
 		for (int i = 0; i < 3; i++)
 		{
-			logerror("Code %d: %s\n", i, m_gg_enable[i] ? "Yes" : "No");
+			LOGMASKED(LOG_INFO, "Code %d: %s\n", i, m_gg_enable[i] ? "Yes" : "No");
 			if (m_gg_enable[i])
 			{
-				logerror("\tAddr: 0x%X\n", m_gg_addr[i]);
-				logerror("\tValue: 0x%X\n", m_gg_repl[i]);
+				LOGMASKED(LOG_INFO, "\tAddr: 0x%X\n", m_gg_addr[i]);
+				LOGMASKED(LOG_INFO, "\tValue: 0x%X\n", m_gg_repl[i]);
 				if (m_gg_is_comp[i])
-					logerror("\t if equals: 0x%X\n", m_gg_comp[i]);
+					LOGMASKED(LOG_INFO, "\t if equals: 0x%X\n", m_gg_comp[i]);
 			}
 		}
 	}

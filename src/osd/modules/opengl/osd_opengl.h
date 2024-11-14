@@ -36,35 +36,38 @@
 		#include <OpenGL/gl.h>
 		#include <OpenGL/glext.h>
 	#else
-	#include <SDL2/SDL_version.h>
-
-	#if (SDL_VERSION_ATLEAST(1,2,10))
-	#if defined(SDLMAME_WIN32)
-		// Avoid that winnt.h (included via sdl_opengl.h, windows.h, windef.h includes intrin.h
-		#define __INTRIN_H_
-	#endif
-	#include <SDL2/SDL_opengl.h>
-	#endif
+		#include <SDL2/SDL_version.h>
+		#include <SDL2/SDL_opengl.h>
 	#endif
 
 	class osd_gl_context
 	{
 	public:
-		osd_gl_context() { }
-		virtual ~osd_gl_context() { }
-		virtual void MakeCurrent() = 0;
-		virtual const char *LastErrorMsg() = 0;
-		virtual void *getProcAddress(const char *proc) = 0;
+		virtual ~osd_gl_context() = default;
+
+		virtual explicit operator bool() const = 0;
+
+		virtual void make_current() = 0;
+		virtual const char *last_error_message() = 0;
+		virtual void *get_proc_address(const char *proc) = 0;
+
 		/*
 		 *  0 for immediate updates,
 		 *  1 for updates synchronized with the vertical retrace,
 		 *  -1 for late swap tearing
 		 *
-		 *  returns -1 if swap interval is not supported
-		 *
+		 *  returns false if swap interval is not supported
 		 */
-		virtual int SetSwapInterval(const int swap) = 0;
-		virtual void SwapBuffer() = 0;
+		virtual bool set_swap_interval(const int swap) = 0;
+
+		virtual void swap_buffer() = 0;
+
+		template <typename T>
+		bool get_proc_address(T &ptr, const char *name)
+		{
+			ptr = T(uintptr_t(get_proc_address(name)));
+			return bool(ptr);
+		}
 	};
 
 
@@ -100,11 +103,6 @@
 	#undef OSD_GL
 	#undef OSD_GL_UNUSED
 
-#ifdef _MSC_VER
-	extern "C" osd_gl_dispatch *gl_dispatch;
-#endif
-	extern osd_gl_dispatch *gl_dispatch;
-
 	/*
 	 * Use gl_mangle to map function names
 	 */
@@ -127,67 +125,67 @@
 	 *
 	 ***************************************************************/
 
-	#define glAccum     MANGLE(Accum)
-	#define glActiveStencilFaceEXT      MANGLE(ActiveStencilFaceEXT)
-	#define glActiveTextureARB      MANGLE(ActiveTextureARB)
-	#define glActiveTexture     MANGLE(ActiveTexture)
-	#define glAlphaFragmentOp1ATI       MANGLE(AlphaFragmentOp1ATI)
-	#define glAlphaFragmentOp2ATI       MANGLE(AlphaFragmentOp2ATI)
-	#define glAlphaFragmentOp3ATI       MANGLE(AlphaFragmentOp3ATI)
-	#define glAlphaFunc     MANGLE(AlphaFunc)
-	#define glApplyTextureEXT       MANGLE(ApplyTextureEXT)
-	#define glAreProgramsResidentNV     MANGLE(AreProgramsResidentNV)
+	#define glAccum                         MANGLE(Accum)
+	#define glActiveStencilFaceEXT          MANGLE(ActiveStencilFaceEXT)
+	#define glActiveTextureARB              MANGLE(ActiveTextureARB)
+	#define glActiveTexture                 MANGLE(ActiveTexture)
+	#define glAlphaFragmentOp1ATI           MANGLE(AlphaFragmentOp1ATI)
+	#define glAlphaFragmentOp2ATI           MANGLE(AlphaFragmentOp2ATI)
+	#define glAlphaFragmentOp3ATI           MANGLE(AlphaFragmentOp3ATI)
+	#define glAlphaFunc                     MANGLE(AlphaFunc)
+	#define glApplyTextureEXT               MANGLE(ApplyTextureEXT)
+	#define glAreProgramsResidentNV         MANGLE(AreProgramsResidentNV)
 	#define glAreTexturesResidentEXT        MANGLE(AreTexturesResidentEXT)
-	#define glAreTexturesResident       MANGLE(AreTexturesResident)
-	#define glArrayElementEXT       MANGLE(ArrayElementEXT)
-	#define glArrayElement      MANGLE(ArrayElement)
-	#define glArrayObjectATI        MANGLE(ArrayObjectATI)
-	#define glAsyncMarkerSGIX       MANGLE(AsyncMarkerSGIX)
-	#define glAttachObjectARB       MANGLE(AttachObjectARB)
-	#define glAttachShader      MANGLE(AttachShader)
+	#define glAreTexturesResident           MANGLE(AreTexturesResident)
+	#define glArrayElementEXT               MANGLE(ArrayElementEXT)
+	#define glArrayElement                  MANGLE(ArrayElement)
+	#define glArrayObjectATI                MANGLE(ArrayObjectATI)
+	#define glAsyncMarkerSGIX               MANGLE(AsyncMarkerSGIX)
+	#define glAttachObjectARB               MANGLE(AttachObjectARB)
+	#define glAttachShader                  MANGLE(AttachShader)
 	#define glBeginFragmentShaderATI        MANGLE(BeginFragmentShaderATI)
-	#define glBegin     MANGLE(Begin)
-	#define glBeginOcclusionQueryNV     MANGLE(BeginOcclusionQueryNV)
-	#define glBeginQueryARB     MANGLE(BeginQueryARB)
-	#define glBeginQuery        MANGLE(BeginQuery)
-	#define glBeginVertexShaderEXT      MANGLE(BeginVertexShaderEXT)
-	#define glBindAttribLocationARB     MANGLE(BindAttribLocationARB)
-	#define glBindAttribLocation        MANGLE(BindAttribLocation)
-	#define glBindBufferARB     MANGLE(BindBufferARB)
-	#define glBindBuffer        MANGLE(BindBuffer)
-	#define glBindFragmentShaderATI     MANGLE(BindFragmentShaderATI)
-	#define glBindFramebufferEXT        MANGLE(BindFramebufferEXT)
-	#define glBindLightParameterEXT     MANGLE(BindLightParameterEXT)
+	#define glBegin                         MANGLE(Begin)
+	#define glBeginOcclusionQueryNV         MANGLE(BeginOcclusionQueryNV)
+	#define glBeginQueryARB                 MANGLE(BeginQueryARB)
+	#define glBeginQuery                    MANGLE(BeginQuery)
+	#define glBeginVertexShaderEXT          MANGLE(BeginVertexShaderEXT)
+	#define glBindAttribLocationARB         MANGLE(BindAttribLocationARB)
+	#define glBindAttribLocation            MANGLE(BindAttribLocation)
+	#define glBindBufferARB                 MANGLE(BindBufferARB)
+	#define glBindBuffer                    MANGLE(BindBuffer)
+	#define glBindFragmentShaderATI         MANGLE(BindFragmentShaderATI)
+	#define glBindFramebufferEXT            MANGLE(BindFramebufferEXT)
+	#define glBindLightParameterEXT         MANGLE(BindLightParameterEXT)
 	#define glBindMaterialParameterEXT      MANGLE(BindMaterialParameterEXT)
-	#define glBindParameterEXT      MANGLE(BindParameterEXT)
-	#define glBindProgramARB        MANGLE(BindProgramARB)
-	#define glBindProgramNV     MANGLE(BindProgramNV)
-	#define glBindRenderbufferEXT       MANGLE(BindRenderbufferEXT)
+	#define glBindParameterEXT              MANGLE(BindParameterEXT)
+	#define glBindProgramARB                MANGLE(BindProgramARB)
+	#define glBindProgramNV                 MANGLE(BindProgramNV)
+	#define glBindRenderbufferEXT           MANGLE(BindRenderbufferEXT)
 	#define glBindTexGenParameterEXT        MANGLE(BindTexGenParameterEXT)
-	#define glBindTextureEXT        MANGLE(BindTextureEXT)
-	#define glBindTexture       MANGLE(BindTexture)
-	#define glBindTextureUnitParameterEXT       MANGLE(BindTextureUnitParameterEXT)
-	#define glBindVertexArrayAPPLE      MANGLE(BindVertexArrayAPPLE)
-	#define glBindVertexShaderEXT       MANGLE(BindVertexShaderEXT)
-	#define glBinormal3bEXT     MANGLE(Binormal3bEXT)
-	#define glBinormal3bvEXT        MANGLE(Binormal3bvEXT)
-	#define glBinormal3dEXT     MANGLE(Binormal3dEXT)
-	#define glBinormal3dvEXT        MANGLE(Binormal3dvEXT)
-	#define glBinormal3fEXT     MANGLE(Binormal3fEXT)
-	#define glBinormal3fvEXT        MANGLE(Binormal3fvEXT)
-	#define glBinormal3iEXT     MANGLE(Binormal3iEXT)
-	#define glBinormal3ivEXT        MANGLE(Binormal3ivEXT)
-	#define glBinormal3sEXT     MANGLE(Binormal3sEXT)
-	#define glBinormal3svEXT        MANGLE(Binormal3svEXT)
-	#define glBinormalPointerEXT        MANGLE(BinormalPointerEXT)
-	#define glBitmap        MANGLE(Bitmap)
-	#define glBlendColorEXT     MANGLE(BlendColorEXT)
-	#define glBlendColor        MANGLE(BlendColor)
-	#define glBlendEquationEXT      MANGLE(BlendEquationEXT)
-	#define glBlendEquation     MANGLE(BlendEquation)
+	#define glBindTextureEXT                MANGLE(BindTextureEXT)
+	#define glBindTexture                   MANGLE(BindTexture)
+	#define glBindTextureUnitParameterEXT   MANGLE(BindTextureUnitParameterEXT)
+	#define glBindVertexArrayAPPLE          MANGLE(BindVertexArrayAPPLE)
+	#define glBindVertexShaderEXT           MANGLE(BindVertexShaderEXT)
+	#define glBinormal3bEXT                 MANGLE(Binormal3bEXT)
+	#define glBinormal3bvEXT                MANGLE(Binormal3bvEXT)
+	#define glBinormal3dEXT                 MANGLE(Binormal3dEXT)
+	#define glBinormal3dvEXT                MANGLE(Binormal3dvEXT)
+	#define glBinormal3fEXT                 MANGLE(Binormal3fEXT)
+	#define glBinormal3fvEXT                MANGLE(Binormal3fvEXT)
+	#define glBinormal3iEXT                 MANGLE(Binormal3iEXT)
+	#define glBinormal3ivEXT                MANGLE(Binormal3ivEXT)
+	#define glBinormal3sEXT                 MANGLE(Binormal3sEXT)
+	#define glBinormal3svEXT                MANGLE(Binormal3svEXT)
+	#define glBinormalPointerEXT            MANGLE(BinormalPointerEXT)
+	#define glBitmap                        MANGLE(Bitmap)
+	#define glBlendColorEXT                 MANGLE(BlendColorEXT)
+	#define glBlendColor                    MANGLE(BlendColor)
+	#define glBlendEquationEXT              MANGLE(BlendEquationEXT)
+	#define glBlendEquation                 MANGLE(BlendEquation)
 	#define glBlendEquationSeparateATI      MANGLE(BlendEquationSeparateATI)
 	#define glBlendEquationSeparateEXT      MANGLE(BlendEquationSeparateEXT)
-	#define glBlendEquationSeparate     MANGLE(BlendEquationSeparate)
+	#define glBlendEquationSeparate         MANGLE(BlendEquationSeparate)
 	#define glBlendFunc     MANGLE(BlendFunc)
 	#define glBlendFuncSeparateEXT      MANGLE(BlendFuncSeparateEXT)
 	#define glBlendFuncSeparateINGR     MANGLE(BlendFuncSeparateINGR)

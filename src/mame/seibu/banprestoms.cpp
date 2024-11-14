@@ -5,8 +5,10 @@
 Banpresto medal games with Seibu customs
 
 Confirmed games (but there are probably several more):
-Mario Undoukai
 Terebi Denwa Doraemon
+Terebi Denwa Super Mario World
+Terebi Denwa Thomas the Tank Engine and Friends
+Mario Undoukai
 
 The following is from Mario Undoukai PCB pics:
 
@@ -32,14 +34,17 @@ TODO:
 - verify Oki banking (needs someone who understands Japanese to check if speech makes sense when it gets called)
 - lamps
 - controls / dips need to be completed and better arranged
+- identify and hookup RTC
 */
 
 #include "emu.h"
 
+#include "sei021x_sei0220_spr.h"
 #include "seibu_crtc.h"
 
 #include "cpu/m68000/m68000.h"
 #include "machine/nvram.h"
+#include "machine/rp5c01.h"
 #include "machine/ticket.h"
 #include "sound/okim6295.h"
 
@@ -54,15 +59,17 @@ namespace {
 class banprestoms_state : public driver_device
 {
 public:
-	banprestoms_state(const machine_config &mconfig, device_type type, const char *tag) :
-		driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu"),
-		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette"),
-		m_ticket(*this, "ticket"),
-		m_vram(*this, "vram%u", 0U),
-		m_spriteram(*this, "sprite_ram"),
-		m_okibank(*this, "okibank")
+	banprestoms_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_gfxdecode(*this, "gfxdecode")
+		, m_palette(*this, "palette")
+		, m_spritegen(*this, "spritegen")
+		, m_ticket(*this, "ticket")
+		, m_rtc(*this, "rtc")
+		, m_vram(*this, "vram%u", 0U)
+		, m_spriteram(*this, "sprite_ram")
+		, m_okibank(*this, "okibank")
 	{ }
 
 	void banprestoms(machine_config &config);
@@ -70,14 +77,16 @@ public:
 	void init_oki();
 
 protected:
-	virtual void machine_start() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+	required_device<sei0211_device> m_spritegen;
 	required_device<ticket_dispenser_device> m_ticket;
+	required_device<lh5045_device> m_rtc;
 
 	required_shared_ptr_array<uint16_t, 4> m_vram;
 	required_shared_ptr<uint16_t> m_spriteram;
@@ -97,11 +106,11 @@ private:
 
 	template <uint8_t Which> TILE_GET_INFO_MEMBER(tile_info);
 
-	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int pri);
+	uint32_t pri_cb(uint8_t pri, uint8_t ext);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void prg_map(address_map &map);
-	void oki_map(address_map &map);
+	void prg_map(address_map &map) ATTR_COLD;
+	void oki_map(address_map &map) ATTR_COLD;
 };
 
 
@@ -149,62 +158,24 @@ TILE_GET_INFO_MEMBER(banprestoms_state::tile_info)
 {
 	int tile = m_vram[Which][tile_index] & 0xfff;
 	int color = (m_vram[Which][tile_index] >> 12) & 0x0f;
-	tileinfo.set(Which + 1, tile, color, 0);
+	tileinfo.set(Which, tile, color, 0);
 }
 
-void banprestoms_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int pri)
+uint32_t banprestoms_state::pri_cb(uint8_t pri, uint8_t ext)
 {
-	for (int offs = 0x400 - 4; offs >= 0; offs -= 4)
+	switch (pri)
 	{
-		if ((m_spriteram[offs] & 0x8000) != 0x8000) continue;
-		int sprite = m_spriteram[offs + 1];
-		if ((sprite >> 14) != pri) continue;
-		sprite &= 0x1fff;
-
-		int y = m_spriteram[offs + 3];
-		int x = m_spriteram[offs + 2];
-
-		int color = m_spriteram[offs] & 0x3f;
-		int fx = m_spriteram[offs] & 0x4000;
-		int fy = m_spriteram[offs] & 0x2000;
-		int dy = ((m_spriteram[offs] & 0x0380) >> 7) + 1;
-		int dx = ((m_spriteram[offs] & 0x1c00) >> 10) + 1;
-
-		// co-ordinates don't have a sign bit, there must be wrapping logic
-		// co-ordinate masking might need to be applied during drawing instead
-		x &= 0x1ff;
-		if (x >= 0x180)
-			x -= 0x200;
-
-		y &= 0x1ff;
-		if (y >= 0x180)
-			y -= 0x200;
-
-		for (int ax = 0; ax < dx; ax++)
-		{
-			for (int ay = 0; ay < dy; ay++)
-			{
-				if (!fy)
-				{
-					if (!fx)
-						m_gfxdecode->gfx(0)->transpen(bitmap, cliprect, sprite++, color, fx, fy, x + ax * 16, y + ay * 16, 15);
-					else
-						m_gfxdecode->gfx(0)->transpen(bitmap, cliprect, sprite++, color, fx, fy, x + (dx - 1 - ax) * 16, y + ay * 16, 15);
-				}
-				else
-				{
-					if (!fx)
-						m_gfxdecode->gfx(0)->transpen(bitmap, cliprect, sprite++, color, fx, fy, x + ax * 16, y + (dy - 1 - ay) * 16, 15);
-					else
-						m_gfxdecode->gfx(0)->transpen(bitmap, cliprect, sprite++, color, fx, fy, x + (dx - 1 - ax) * 16, y + (dy - 1 - ay) * 16, 15);
-				}
-			}
-		}
+		case 0: return GFX_PMASK_8;
+		case 1: return GFX_PMASK_8 | GFX_PMASK_4;
+		case 2: return GFX_PMASK_8 | GFX_PMASK_4 | GFX_PMASK_2;
+		case 3:
+		default: return 0;
 	}
 }
 
 uint32_t banprestoms_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
+	screen.priority().fill(0, cliprect);
 	bitmap.fill(m_palette->pen(0x7ff), cliprect); //black pen
 
 	m_tilemap[0]->set_scrollx(0, m_scrollram[0]);
@@ -216,14 +187,11 @@ uint32_t banprestoms_state::screen_update(screen_device &screen, bitmap_ind16 &b
 	m_tilemap[3]->set_scrollx(0, 128);
 	m_tilemap[3]->set_scrolly(0, -16);
 
-	if (!(m_layer_en & 0x0001)) { m_tilemap[0]->draw(screen, bitmap, cliprect, 0, 0); }
-	if (!(m_layer_en & 0x0010)) { draw_sprites(bitmap, cliprect, 2); }
-	if (!(m_layer_en & 0x0002)) { m_tilemap[1]->draw(screen, bitmap, cliprect, 0, 0); }
-	if (!(m_layer_en & 0x0010)) { draw_sprites(bitmap, cliprect, 1); }
-	if (!(m_layer_en & 0x0004)) { m_tilemap[2]->draw(screen, bitmap, cliprect, 0, 0); }
-	if (!(m_layer_en & 0x0010)) { draw_sprites(bitmap, cliprect, 0); }
-	if (!(m_layer_en & 0x0008)) { m_tilemap[3]->draw(screen, bitmap, cliprect, 0, 0); }
-	if (!(m_layer_en & 0x0010)) { draw_sprites(bitmap, cliprect, 3); }
+	if (BIT(~m_layer_en, 0)) { m_tilemap[0]->draw(screen, bitmap, cliprect, 0, 1); }
+	if (BIT(~m_layer_en, 1)) { m_tilemap[1]->draw(screen, bitmap, cliprect, 0, 2); }
+	if (BIT(~m_layer_en, 2)) { m_tilemap[2]->draw(screen, bitmap, cliprect, 0, 4); }
+	if (BIT(~m_layer_en, 3)) { m_tilemap[3]->draw(screen, bitmap, cliprect, 0, 8); }
+	if (BIT(~m_layer_en, 4)) { m_spritegen->draw_sprites(screen, bitmap, cliprect, m_spriteram, m_spriteram.bytes()); }
 
 	return 0;
 }
@@ -241,23 +209,27 @@ void banprestoms_state::layer_scroll_w(offs_t offset, uint16_t data, uint16_t me
 
 void banprestoms_state::prg_map(address_map &map)
 {
-	map(0x00000, 0x3ffff).rom().region("maincpu", 0);
-	map(0x80000, 0x807ff).ram().share("nvram");
-	map(0x80800, 0x80fff).ram().w(FUNC(banprestoms_state::vram_w<0>)).share(m_vram[0]);
-	map(0x81000, 0x817ff).ram().w(FUNC(banprestoms_state::vram_w<1>)).share(m_vram[1]);
-	map(0x81800, 0x81fff).ram().w(FUNC(banprestoms_state::vram_w<2>)).share(m_vram[2]);
-	map(0x82000, 0x82fff).ram().w(FUNC(banprestoms_state::vram_w<3>)).share(m_vram[3]);
-	map(0x83000, 0x837ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
-	map(0x83800, 0x83fff).ram().share(m_spriteram);
-	map(0xa0001, 0xa0001).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
-	map(0xc0000, 0xc004f).rw("crtc", FUNC(seibu_crtc_device::read), FUNC(seibu_crtc_device::write));
-	map(0xc0080, 0xc0081).nopw(); // CRTC related ?
-	map(0xc00c0, 0xc00c1).nopw(); // CRTC related ?
-	map(0xc0100, 0xc0101).w(FUNC(banprestoms_state::okibank_w));
-	//map(0xc0140, 0xc0141).nopw(); // in marioun bit 3 is lamp according to test mode
-	map(0xe0000, 0xe0001).portr("DSW1");
-	map(0xe0002, 0xe0003).portr("IN1");
-	map(0xe0004, 0xe0005).portr("IN2");
+	map(0x000000, 0x03ffff).rom().region("maincpu", 0);
+	map(0x080000, 0x0807ff).ram().share("nvram");
+	map(0x080800, 0x080fff).ram().w(FUNC(banprestoms_state::vram_w<0>)).share(m_vram[0]);
+	map(0x081000, 0x0817ff).ram().w(FUNC(banprestoms_state::vram_w<1>)).share(m_vram[1]);
+	map(0x081800, 0x081fff).ram().w(FUNC(banprestoms_state::vram_w<2>)).share(m_vram[2]);
+	map(0x082000, 0x082fff).ram().w(FUNC(banprestoms_state::vram_w<3>)).share(m_vram[3]);
+	map(0x083000, 0x0837ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
+	map(0x083800, 0x083fff).ram().share(m_spriteram);
+	map(0x0a0001, 0x0a0001).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0x0c0000, 0x0c004f).rw("crtc", FUNC(seibu_crtc_device::read), FUNC(seibu_crtc_device::write));
+	map(0x0c0080, 0x0c0081).nopw(); // CRTC related ?
+	map(0x0c00c0, 0x0c00c1).nopw(); // CRTC related ?
+	map(0x0c0100, 0x0c0101).w(FUNC(banprestoms_state::okibank_w));
+//  map(0x0c0140, 0x0c0141).nopw(); // in marioun bit 3 is lamp according to test mode
+	map(0x0e0000, 0x0e0001).portr("DSW1");
+	map(0x0e0002, 0x0e0003).portr("IN1");
+	map(0x0e0004, 0x0e0005).portr("IN2");
+
+	// Expects a '1' when entering RTC test (RTC /BSY line?)
+	map(0x0e0006, 0x0e0007).lr8(NAME([](offs_t offset) { return 1; }));
+	map(0x100000, 0x10001f).rw(m_rtc, FUNC(lh5045_device::read), FUNC(lh5045_device::write)).umask16(0x00ff);
 }
 
 void banprestoms_state::oki_map(address_map &map)
@@ -268,6 +240,7 @@ void banprestoms_state::oki_map(address_map &map)
 
 static INPUT_PORTS_START( tvdenwad )
 	PORT_START("IN1")
+	// TODO: convert to keypad
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON1 ) // 1
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_BUTTON2 ) // 2
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_BUTTON3 ) // 3
@@ -288,7 +261,7 @@ static INPUT_PORTS_START( tvdenwad )
 	PORT_START("IN2")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON13 ) // Card Emp in switch test
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_BUTTON14 ) // Card Pos in switch test
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("ticket", ticket_dispenser_device, line_r) // Card Pay in switch test
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("ticket", FUNC(ticket_dispenser_device::line_r)) // Card Pay in switch test
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_START )
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_UNUSED ) // ?
 	PORT_SERVICE( 0x0020, IP_ACTIVE_LOW )
@@ -352,7 +325,7 @@ static INPUT_PORTS_START( marioun ) // inputs defined as IPT_UNKNOWN don't show 
 	PORT_START("IN2")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON7 ) // Card Emp
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_BUTTON8 ) // Card Pos
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("ticket", ticket_dispenser_device, line_r) // Card Pay
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("ticket", FUNC(ticket_dispenser_device::line_r)) // Card Pay
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_SERVICE1 )
@@ -420,11 +393,14 @@ static const gfx_layout charlayout =
 };
 
 static GFXDECODE_START( gfx_banprestoms )
-	GFXDECODE_ENTRY( "spr_gfx",0, tilelayout, 0x000, 0x40 )
 	GFXDECODE_ENTRY( "bg_gfx", 0, tilelayout, 0x100, 0x10 ) // TODO, doesn't seem to be used by the dumped games
 	GFXDECODE_ENTRY( "md_gfx", 0, tilelayout, 0x100, 0x10 ) // TODO, doesn't seem to be used by the dumped games
 	GFXDECODE_ENTRY( "fg_gfx", 0, tilelayout, 0x100, 0x10 )
 	GFXDECODE_ENTRY( "tx_gfx", 0, charlayout, 0x200, 0x10 )
+GFXDECODE_END
+
+static GFXDECODE_START( gfx_banprestoms_spr )
+	GFXDECODE_ENTRY( "spr_gfx",0, tilelayout, 0x000, 0x40 )
 GFXDECODE_END
 
 
@@ -437,7 +413,7 @@ void banprestoms_state::banprestoms(machine_config &config)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	TICKET_DISPENSER(config, m_ticket, attotime::from_msec(100), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH); // TODO: period is guessed
+	TICKET_DISPENSER(config, m_ticket, attotime::from_msec(100)); // TODO: period is guessed
 
 	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER)); // TODO: copied from other drivers using the same CRTC
@@ -452,8 +428,13 @@ void banprestoms_state::banprestoms(machine_config &config)
 	crtc.layer_en_callback().set(FUNC(banprestoms_state::layer_en_w));
 	crtc.layer_scroll_callback().set(FUNC(banprestoms_state::layer_scroll_w));
 
+	LH5045(config, m_rtc, XTAL(32'768));
+
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_banprestoms);
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 0x400); // TODO: copied from other drivers using the same CRTC
+
+	SEI0211(config, m_spritegen, XTAL(14'318'181), m_palette, gfx_banprestoms_spr);
+	m_spritegen->set_pri_callback(FUNC(banprestoms_state::pri_cb));
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
@@ -489,6 +470,74 @@ ROM_START( tvdenwad )
 
 	ROM_REGION( 0x100000, "oki", 0 )
 	ROM_LOAD( "s82_a03.u17", 0x000000, 0x100000, CRC(80014273) SHA1(9155248e9b7f8b7a9962b29b9063f9fe5ba471de) )
+
+	ROM_REGION( 0xa00, "plds", 0 )
+	ROM_LOAD( "sc001.u110", 0x000, 0x104, NO_DUMP ) // tibpal16l8-25cn
+	ROM_LOAD( "sc002.u235", 0x200, 0x104, NO_DUMP ) // tibpal16l8-25cn
+	ROM_LOAD( "sc003.u36",  0x400, 0x155, NO_DUMP ) // 18cv8pc-25
+	ROM_LOAD( "sc004c.u68", 0x600, 0x117, NO_DUMP ) // gal16v8a
+	ROM_LOAD( "sc006.u248", 0x800, 0x117, NO_DUMP ) // gal16v8a
+ROM_END
+
+ROM_START( tvdenwam )
+	ROM_REGION( 0x100000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "s40_b02.u15",  0x00000, 0x20000, CRC(9d633126) SHA1(5879d84ace23927fd85f6d32c7d94f0ff8d52927) )
+	ROM_LOAD16_BYTE( "s40_b01.u14",  0x00001, 0x20000, CRC(72973fba) SHA1(584a7fd7e82a1797c134ffbb81cf256f79f6f915) )
+
+	ROM_REGION( 0x80000, "spr_gfx", 0 )
+	ROM_LOAD( "s40_a05.u119", 0x00000, 0x80000, CRC(bec55644) SHA1(e3a7ad626845d709bc6cd6a70bda6686b07c0c5f) )
+
+	ROM_REGION( 0x80000, "gfx_tiles", 0 )
+	ROM_LOAD( "s40_a04.u18", 0x00000, 0x80000, CRC(49d21bb1) SHA1(42080305ed2125207427e37e260c655b79d7d170) )
+
+	ROM_REGION( 0x80000, "bg_gfx", 0 )
+	ROM_COPY( "gfx_tiles" , 0x00000, 0x00000, 0x80000)
+
+	ROM_REGION( 0x80000, "md_gfx", 0 )
+	ROM_COPY( "gfx_tiles" , 0x00000, 0x00000, 0x80000)
+
+	ROM_REGION( 0x80000, "fg_gfx", 0 )
+	ROM_COPY( "gfx_tiles" , 0x00000, 0x00000, 0x80000)
+
+	ROM_REGION( 0x80000, "tx_gfx", 0 )
+	ROM_COPY( "gfx_tiles" , 0x00000, 0x00000, 0x80000)
+
+	ROM_REGION( 0x100000, "oki", 0 )
+	ROM_LOAD( "s40_a03.u17", 0x000000, 0x100000, CRC(55591e28) SHA1(b7edc7ff9f009805c16ca0d10f938540b30907e7) )
+
+	ROM_REGION( 0xa00, "plds", 0 )
+	ROM_LOAD( "sc001.u110", 0x000, 0x104, NO_DUMP ) // tibpal16l8-25cn
+	ROM_LOAD( "sc002.u235", 0x200, 0x104, NO_DUMP ) // tibpal16l8-25cn
+	ROM_LOAD( "sc003.u36",  0x400, 0x155, NO_DUMP ) // 18cv8pc-25
+	ROM_LOAD( "sc004c.u68", 0x600, 0x117, NO_DUMP ) // gal16v8a
+	ROM_LOAD( "sc006.u248", 0x800, 0x117, NO_DUMP ) // gal16v8a
+ROM_END
+
+ROM_START( tvdenwat )
+	ROM_REGION( 0x100000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "s72_b02.u15",  0x00000, 0x20000, CRC(db713202) SHA1(4883152273925207929757da0eae333ac18aa585) )
+	ROM_LOAD16_BYTE( "s72_b01.u14",  0x00001, 0x20000, CRC(fe4e48ff) SHA1(2a31520ddd3c4a61daf2868114cfd1f1a5f3f201) )
+
+	ROM_REGION( 0x80000, "spr_gfx", 0 )
+	ROM_LOAD( "s72_a05.u119", 0x00000, 0x80000, CRC(9fda5789) SHA1(5d1e37d42c9f255253bcb3714be8fd04238b47fa) )
+
+	ROM_REGION( 0x80000, "gfx_tiles", 0 )
+	ROM_LOAD( "s72_a04.u18", 0x00000, 0x80000, CRC(66fbbf66) SHA1(4d46204661282c311ace3c749d9484c2e3e69500) )
+
+	ROM_REGION( 0x80000, "bg_gfx", 0 )
+	ROM_COPY( "gfx_tiles" , 0x00000, 0x00000, 0x80000)
+
+	ROM_REGION( 0x80000, "md_gfx", 0 )
+	ROM_COPY( "gfx_tiles" , 0x00000, 0x00000, 0x80000)
+
+	ROM_REGION( 0x80000, "fg_gfx", 0 )
+	ROM_COPY( "gfx_tiles" , 0x00000, 0x00000, 0x80000)
+
+	ROM_REGION( 0x80000, "tx_gfx", 0 )
+	ROM_COPY( "gfx_tiles" , 0x00000, 0x00000, 0x80000)
+
+	ROM_REGION( 0x100000, "oki", 0 )
+	ROM_LOAD( "s72_a03.u17", 0x000000, 0x100000, CRC(e7d09642) SHA1(0cee5193497698239f44ef457d92f1d1d042c42b) )
 
 	ROM_REGION( 0xa00, "plds", 0 )
 	ROM_LOAD( "sc001.u110", 0x000, 0x104, NO_DUMP ) // tibpal16l8-25cn
@@ -566,5 +615,7 @@ void banprestoms_state::init_oki() // The Oki mask ROM is in an unusual format, 
 } // Anonymous namespace
 
 
-GAME( 1991, tvdenwad, 0, banprestoms, tvdenwad, banprestoms_state, init_oki, ROT0, "Banpresto", "Terebi Denwa Doraemon", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1993, marioun,  0, banprestoms, marioun,  banprestoms_state, init_oki, ROT0, "Banpresto", "Super Mario World - Mario Undoukai",  MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1991, tvdenwad, 0, banprestoms, tvdenwad, banprestoms_state, init_oki, ROT0, "Banpresto", "Terebi Denwa Doraemon",                            MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1992, tvdenwam, 0, banprestoms, tvdenwad, banprestoms_state, init_oki, ROT0, "Banpresto", "Terebi Denwa Super Mario World",                   MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1992, tvdenwat, 0, banprestoms, tvdenwad, banprestoms_state, init_oki, ROT0, "Banpresto", "Terebi Denwa Thomas the Tank Engine and Friends",  MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1993, marioun,  0, banprestoms, marioun,  banprestoms_state, init_oki, ROT0, "Banpresto", "Super Mario World - Mario Undoukai",               MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )

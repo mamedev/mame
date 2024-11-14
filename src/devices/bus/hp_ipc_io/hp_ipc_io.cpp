@@ -35,7 +35,6 @@ hp_ipc_io_slot_device::~hp_ipc_io_slot_device()
 
 void hp_ipc_io_slot_device::device_start()
 {
-	m_irq_cb_func.resolve_all_safe();
 }
 
 uint32_t hp_ipc_io_slot_device::get_slot_base_addr() const

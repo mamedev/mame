@@ -100,8 +100,8 @@ private:
 	uint8_t m_tigerhb_cmd = 0;
 
 	uint8_t tigerh_mcu_status_r();
-	DECLARE_WRITE_LINE_MEMBER(sound_reset_w);
-	DECLARE_WRITE_LINE_MEMBER(irq_enable_w);
+	void sound_reset_w(int state);
+	void irq_enable_w(int state);
 	uint8_t vblank_r();
 	void sound_nmi_enable_w(offs_t offset, uint8_t data);
 	void videoram_w(offs_t offset, uint8_t data);
@@ -111,8 +111,8 @@ private:
 	void scrollx_lo_w(uint8_t data);
 	void scrollx_hi_w(uint8_t data);
 	void scrolly_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(flipscreen_w);
-	DECLARE_WRITE_LINE_MEMBER(palette_bank_w);
+	void flipscreen_w(int state);
+	void palette_bank_w(int state);
 
 	void scroll_from_mcu_w(offs_t offset, uint8_t data);
 
@@ -123,8 +123,8 @@ private:
 	uint8_t tigerhb1_prot_r();
 	void tigerhb1_prot_w(uint8_t data);
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	TILE_GET_INFO_MEMBER(get_pf_tile_info);
 	TILE_GET_INFO_MEMBER(get_pf1_tile_info);
@@ -137,25 +137,25 @@ private:
 	uint32_t screen_update_perfrman(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_slapfight(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
+	void vblank_irq(int state);
 	INTERRUPT_GEN_MEMBER(sound_nmi);
 
-	void getstar_map(address_map &map);
-	void getstarb1_io_map(address_map &map);
-	void getstarb2_io_map(address_map &map);
-	void io_map_mcu(address_map &map);
-	void io_map_nomcu(address_map &map);
-	void perfrman_map(address_map &map);
-	void perfrman_sound_map(address_map &map);
-	void slapfigh_map(address_map &map);
-	void slapfigh_map_mcu(address_map &map);
-	void slapfighb1_map(address_map &map);
-	void slapfighb2_map(address_map &map);
-	void tigerh_map(address_map &map);
-	void tigerh_map_mcu(address_map &map);
-	void tigerh_sound_map(address_map &map);
-	void tigerhb1_map(address_map &map);
-	void tigerhb2_map(address_map &map);
+	void getstar_map(address_map &map) ATTR_COLD;
+	void getstarb1_io_map(address_map &map) ATTR_COLD;
+	void getstarb2_io_map(address_map &map) ATTR_COLD;
+	void io_map_mcu(address_map &map) ATTR_COLD;
+	void io_map_nomcu(address_map &map) ATTR_COLD;
+	void perfrman_map(address_map &map) ATTR_COLD;
+	void perfrman_sound_map(address_map &map) ATTR_COLD;
+	void slapfigh_map(address_map &map) ATTR_COLD;
+	void slapfigh_map_mcu(address_map &map) ATTR_COLD;
+	void slapfighb1_map(address_map &map) ATTR_COLD;
+	void slapfighb2_map(address_map &map) ATTR_COLD;
+	void tigerh_map(address_map &map) ATTR_COLD;
+	void tigerh_map_mcu(address_map &map) ATTR_COLD;
+	void tigerh_sound_map(address_map &map) ATTR_COLD;
+	void tigerhb1_map(address_map &map) ATTR_COLD;
+	void tigerhb2_map(address_map &map) ATTR_COLD;
 };
 
 #endif // MAME_TOAPLAN_SLAPFGHT_H

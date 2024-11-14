@@ -25,6 +25,9 @@ Todo:
 #include "emupal.h"
 #include "speaker.h"
 
+
+namespace {
+
 #define SCHEMATIC_CLOCK (20000000)
 
 class segald_state : public driver_device
@@ -68,15 +71,15 @@ private:
 	void astron_COLOR_write(offs_t offset, uint8_t data);
 	void astron_FIX_write(offs_t offset, uint8_t data);
 	void astron_io_bankswitch_w(uint8_t data);
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 	uint32_t screen_update_astron(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void astron_draw_characters(bitmap_rgb32 &bitmap,const rectangle &cliprect);
 	void astron_draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
-	void mainmem(address_map &map);
-	void mainport(address_map &map);
+	void mainmem(address_map &map) ATTR_COLD;
+	void mainport(address_map &map) ATTR_COLD;
 };
 
 /* VIDEO GOODS */
@@ -134,7 +137,7 @@ uint32_t segald_state::screen_update_astron(screen_device &screen, bitmap_rgb32 
 uint8_t segald_state::astron_DISC_read(offs_t offset)
 {
 	if (m_nmi_enable)
-		m_ldv1000_input_latch = m_laserdisc->status_r();
+		m_ldv1000_input_latch = m_laserdisc->data_r();
 
 	logerror("DISC read   (0x%04x) @ 0x%04x [0x%x]\n", m_ldv1000_input_latch, offset, m_maincpu->pc());
 
@@ -604,6 +607,8 @@ void segald_state::init_astron()
 	uint8_t *ROM = memregion("maincpu")->base();
 	membank("bank1")->configure_entries(0, 2, &ROM[0x8000], 0x4000);
 }
+
+} // anonymous namespace
 
 
 //    YEAR, NAME,     PARENT,  MACHINE,INPUT,  STATE,        INIT,   MONITOR,COMPANY,FULLNAME,FLAGS

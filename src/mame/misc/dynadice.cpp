@@ -45,6 +45,8 @@ dy_6.bin (near Z80)
 #include "tilemap.h"
 
 
+namespace {
+
 class dynadice_state : public driver_device
 {
 public:
@@ -61,9 +63,9 @@ public:
 	void init_dynadice();
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	/* memory pointers */
@@ -89,10 +91,10 @@ private:
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void dynadice_io_map(address_map &map);
-	void dynadice_map(address_map &map);
-	void dynadice_sound_io_map(address_map &map);
-	void dynadice_sound_map(address_map &map);
+	void dynadice_io_map(address_map &map) ATTR_COLD;
+	void dynadice_map(address_map &map) ATTR_COLD;
+	void dynadice_sound_io_map(address_map &map) ATTR_COLD;
+	void dynadice_sound_map(address_map &map) ATTR_COLD;
 };
 
 
@@ -316,5 +318,8 @@ void dynadice_state::init_dynadice()
 		for (int j = 0; j < 8; j++)
 			gfx2[(i << 3) + j] = (gfx1[i] & (0x80 >> j)) ? (usr1[i] & 7) : (usr1[i] >> 4);
 }
+
+} // anonymous namespace
+
 
 GAME( 19??, dynadice, 0, dynadice, dynadice, dynadice_state, init_dynadice, ROT90, "<unknown>", "Dynamic Dice", MACHINE_SUPPORTS_SAVE )

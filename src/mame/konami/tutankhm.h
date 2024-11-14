@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Mirko Buffoni
-#ifndef MAME_INCLUDES_TUTANKHM_H
-#define MAME_INCLUDES_TUTANKHM_H
+#ifndef MAME_KONAMI_TUTANKHM_H
+#define MAME_KONAMI_TUTANKHM_H
 
 #pragma once
 
@@ -43,21 +43,21 @@ public:
 	void tutankhm(machine_config &config);
 
 protected:
-	DECLARE_WRITE_LINE_MEMBER(irq_enable_w);
+	void irq_enable_w(int state);
 	void tutankhm_bankselect_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(coin_counter_1_w);
-	DECLARE_WRITE_LINE_MEMBER(coin_counter_2_w);
+	void coin_counter_1_w(int state);
+	void coin_counter_2_w(int state);
 	void sound_on_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(flip_screen_x_w);
-	DECLARE_WRITE_LINE_MEMBER(flip_screen_y_w);
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	void flip_screen_x_w(int state);
+	void flip_screen_y_w(int state);
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 	uint32_t screen_update_tutankhm_bootleg(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_tutankhm_scramble(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_tutankhm(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
-	void main_map(address_map &map);
-	virtual void video_start() override;
+	void vblank_irq(int state);
+	void main_map(address_map &map) ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 	void galaxian_palette(palette_device &palette);
 	static rgb_t raw_to_rgb_func(u32 raw);
 
@@ -98,4 +98,4 @@ protected:
 	uint8_t m_stars_blink_state = 0;
 };
 
-#endif // MAME_INCLUDES_TUTANKHM_H
+#endif // MAME_KONAMI_TUTANKHM_H

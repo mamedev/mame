@@ -135,8 +135,8 @@ protected:
 					u32 clock, psg_type_t psg_type, int streams, int ioports, int feature = PSG_DEFAULT);
 
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 	virtual void device_clock_changed() override;
 
 	// sound stream update overrides

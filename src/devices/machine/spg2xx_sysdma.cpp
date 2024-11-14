@@ -11,7 +11,7 @@
 
 DEFINE_DEVICE_TYPE(SPG2XX_SYSDMA, spg2xx_sysdma_device, "spg2xx_sysdma", "SPG240-series System-on-a-Chip System DMA")
 
-#define LOG_DMA             (1U << 9)
+#define LOG_DMA             (1U << 1)
 #define LOG_ALL             (LOG_DMA)
 
 #define VERBOSE             (0)

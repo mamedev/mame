@@ -65,9 +65,9 @@ static const uint8_t track_SD[][2] = {
 
 DEFINE_DEVICE_TYPE(MICROPOLIS, micropolis_device, "micropolis", "Micropolis FDC")
 
-micropolis_device::micropolis_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, MICROPOLIS, tag, owner, clock),
-	m_read_dden(*this),
+micropolis_device::micropolis_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, MICROPOLIS, tag, owner, clock),
+	m_read_dden(*this, 1),
 	m_write_intrq(*this),
 	m_write_drq(*this),
 	m_floppy_drive(*this, {finder_base::DUMMY_TAG, finder_base::DUMMY_TAG, finder_base::DUMMY_TAG, finder_base::DUMMY_TAG}),
@@ -92,10 +92,6 @@ micropolis_device::micropolis_device(const machine_config &mconfig, const char *
 
 void micropolis_device::device_start()
 {
-	m_read_dden.resolve_safe(1);
-	m_write_intrq.resolve_safe();
-	m_write_drq.resolve_safe();
-
 	save_item(NAME(m_data));
 	save_item(NAME(m_drive_num));
 	save_item(NAME(m_track));

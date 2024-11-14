@@ -65,8 +65,8 @@ public:
 private:
 	required_device<cpu_device> m_maincpu;
 
-	void io_map(address_map &map);
-	void prg_map(address_map &map);
+	void io_map(address_map &map) ATTR_COLD;
+	void prg_map(address_map &map) ATTR_COLD;
 };
 
 void cirsa820xxx_state::prg_map(address_map &map)

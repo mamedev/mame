@@ -95,7 +95,7 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "machine/v3021.h"
+#include "v3021.h"
 
 
 //**************************************************************************
@@ -224,7 +224,7 @@ void v3021_device::write(u8 data)
 //  cs_w - CS pin handler
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER(v3021_device::cs_w)
+void v3021_device::cs_w(int state)
 {
 	if (m_cs != state)
 	{
@@ -275,7 +275,7 @@ WRITE_LINE_MEMBER(v3021_device::cs_w)
 //  io_w - I/O pin write handler
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER(v3021_device::io_w)
+void v3021_device::io_w(int state)
 {
 	m_io = state;
 }
@@ -284,7 +284,7 @@ WRITE_LINE_MEMBER(v3021_device::io_w)
 //  io_r - I/O pin read handler
 //-------------------------------------------------
 
-READ_LINE_MEMBER(v3021_device::io_r)
+int v3021_device::io_r()
 {
 	return m_data & 1;
 }

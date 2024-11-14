@@ -48,6 +48,8 @@ This PCB plugs into the external expansion connector on the right side of the ma
 #include "emu.h"
 #include "exdos.h"
 
+#include "formats/ep64_dsk.h"
+
 
 
 //**************************************************************************
@@ -109,10 +111,9 @@ void ep64_exdos_device::device_add_mconfig(machine_config &config)
 {
 	WD1770(config, m_fdc, 8_MHz_XTAL);
 
-	FLOPPY_CONNECTOR(config, m_floppy0, ep64_exdos_floppies, "35dd", ep64_exdos_device::floppy_formats);
-	FLOPPY_CONNECTOR(config, m_floppy1, ep64_exdos_floppies, nullptr, ep64_exdos_device::floppy_formats);
-	FLOPPY_CONNECTOR(config, m_floppy2, ep64_exdos_floppies, nullptr, ep64_exdos_device::floppy_formats);
-	FLOPPY_CONNECTOR(config, m_floppy3, ep64_exdos_floppies, nullptr, ep64_exdos_device::floppy_formats);
+	for (auto &floppy : m_floppy)
+		FLOPPY_CONNECTOR(config, floppy, ep64_exdos_floppies, nullptr, ep64_exdos_device::floppy_formats);
+	m_floppy[0]->set_default_option("35dd");
 }
 
 
@@ -128,11 +129,8 @@ ep64_exdos_device::ep64_exdos_device(const machine_config &mconfig, const char *
 	device_t(mconfig, EP64_EXDOS, tag, owner, clock),
 	device_ep64_expansion_bus_card_interface(mconfig, *this),
 	m_fdc(*this, WD1770_TAG),
-	m_floppy0(*this, WD1770_TAG":0"),
-	m_floppy1(*this, WD1770_TAG":1"),
-	m_floppy2(*this, WD1770_TAG":2"),
-	m_floppy3(*this, WD1770_TAG":3"),
-	m_floppy(nullptr),
+	m_floppy(*this, WD1770_TAG":%u", 0U),
+	m_selected_floppy(nullptr),
 	m_rom(*this, "rom")
 {
 }
@@ -159,8 +157,8 @@ void ep64_exdos_device::device_reset()
 {
 	m_fdc->reset();
 
-	m_floppy = nullptr;
-	m_fdc->set_floppy(m_floppy);
+	m_selected_floppy = nullptr;
+	m_fdc->set_floppy(m_selected_floppy);
 	m_fdc->dden_w(0);
 }
 
@@ -191,7 +189,7 @@ uint8_t ep64_exdos_device::read()
 	data |= m_fdc->intrq_r() << 1;
 	data |= m_fdc->drq_r() << 7;
 
-	data |= (m_floppy ? m_floppy->dskchg_r() : 1) << 6;
+	data |= (m_selected_floppy ? m_selected_floppy->dskchg_r() : 1) << 6;
 
 	return data;
 }
@@ -218,19 +216,18 @@ void ep64_exdos_device::write(uint8_t data)
 
 	*/
 
-	m_floppy = nullptr;
+	m_selected_floppy = nullptr;
 
-	if (BIT(data, 0)) m_floppy = m_floppy0->get_device();
-	if (BIT(data, 1)) m_floppy = m_floppy1->get_device();
-	if (BIT(data, 2)) m_floppy = m_floppy2->get_device();
-	if (BIT(data, 3)) m_floppy = m_floppy3->get_device();
-
-	m_fdc->set_floppy(m_floppy);
-
-	if (m_floppy)
+	for (int n = 0; n < 4; n++)
 	{
-		m_floppy->ss_w(BIT(data, 4));
+		if (BIT(data, n))
+			m_selected_floppy = m_floppy[n]->get_device();
 	}
+
+	m_fdc->set_floppy(m_selected_floppy);
+
+	if (m_selected_floppy)
+		m_selected_floppy->ss_w(BIT(data, 4));
 
 	m_fdc->dden_w(BIT(data, 5));
 }

@@ -67,8 +67,8 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual void device_start() override ATTR_COLD;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 
 	inline u16 ef9340_get_c_addr(u8 x, u8 y);
 	inline void ef9340_inc_c();
@@ -84,8 +84,8 @@ protected:
 
 	bitmap_ind16 m_tmp_bitmap;
 
-	int m_offset_x = 0;
-	int m_offset_y = 0;
+	int m_offset_x;
+	int m_offset_y;
 
 	struct
 	{

@@ -6,8 +6,8 @@
     HAR MadMax hardware
 
 **************************************************************************/
-#ifndef MAME_INCLUDES_DCHEESE_H
-#define MAME_INCLUDES_DCHEESE_H
+#ifndef MAME_MISC_DCHEESE_H
+#define MAME_MISC_DCHEESE_H
 
 #pragma once
 
@@ -37,8 +37,8 @@ public:
 	void dcheese(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	required_region_ptr<u16> m_palrom;
@@ -81,7 +81,7 @@ private:
 	u16 blitter_vidparam_r(offs_t offset);
 	void dcheese_palette(palette_device &palette) const;
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_WRITE_LINE_MEMBER(vblank);
+	void vblank(int state);
 	TIMER_CALLBACK_MEMBER(blitter_done);
 	TIMER_CALLBACK_MEMBER(signal_irq);
 	void update_irq_state();
@@ -90,9 +90,9 @@ private:
 	void do_clear();
 	void do_blit();
 
-	void main_cpu_map(address_map &map);
-	void main_fc7_map(address_map &map);
-	void sound_cpu_map(address_map &map);
+	void main_cpu_map(address_map &map) ATTR_COLD;
+	void main_fc7_map(address_map &map) ATTR_COLD;
+	void sound_cpu_map(address_map &map) ATTR_COLD;
 };
 
-#endif // MAME_INCLUDES_DCHEESE_H
+#endif // MAME_MISC_DCHEESE_H

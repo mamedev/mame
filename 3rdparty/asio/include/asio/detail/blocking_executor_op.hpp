@@ -2,7 +2,7 @@
 // detail/blocking_executor_op.hpp
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //
-// Copyright (c) 2003-2021 Christopher M. Kohlhoff (chris at kohlhoff dot com)
+// Copyright (c) 2003-2024 Christopher M. Kohlhoff (chris at kohlhoff dot com)
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -18,7 +18,6 @@
 #include "asio/detail/config.hpp"
 #include "asio/detail/event.hpp"
 #include "asio/detail/fenced_block.hpp"
-#include "asio/detail/handler_invoke_helpers.hpp"
 #include "asio/detail/mutex.hpp"
 #include "asio/detail/scheduler_operation.hpp"
 
@@ -77,6 +76,7 @@ public:
       const asio::error_code& /*ec*/,
       std::size_t /*bytes_transferred*/)
   {
+    ASIO_ASSUME(base != 0);
     blocking_executor_op* o(static_cast<blocking_executor_op*>(base));
 
     typename blocking_executor_op_base<Operation>::do_complete_cleanup
@@ -90,7 +90,7 @@ public:
     {
       fenced_block b(fenced_block::half);
       ASIO_HANDLER_INVOCATION_BEGIN(());
-      asio_handler_invoke_helpers::invoke(o->handler_, o->handler_);
+      static_cast<Handler&&>(o->handler_)();
       ASIO_HANDLER_INVOCATION_END;
     }
   }

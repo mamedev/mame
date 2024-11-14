@@ -7,11 +7,14 @@
 **********************************************************************/
 
 #include "emu.h"
+
 #include "snes_carts.h"
 
+#include "bsx.h"
+#include "event.h"
 #include "rom.h"
 #include "rom21.h"
-#include "bsx.h"
+#include "profighter.h"
 #include "sa1.h"
 #include "sdd1.h"
 #include "sfx.h"
@@ -19,7 +22,6 @@
 #include "spc7110.h"
 #include "sufami.h"
 #include "upd.h"
-#include "event.h"
 
 
 void snes_cart(device_slot_interface &device)
@@ -66,4 +68,9 @@ void snes_cart(device_slot_interface &device)
 	device.option_add_internal("hirom_dsp1leg", SNS_HIROM_NECDSP1_LEG);
 	device.option_add_internal("lorom_st10leg", SNS_LOROM_SETA10_LEG);
 	device.option_add_internal("lorom_st11leg", SNS_LOROM_SETA11_LEG);
+	// copiers
+	device.option_add("profighterq",  SNS_PRO_FIGHTER_Q);
+	device.option_add("profighterqa", SNS_PRO_FIGHTER_QA);
+	device.option_add("profighterqb", SNS_PRO_FIGHTER_QB);
+	device.option_add("profighterx",  SNS_PRO_FIGHTER_X);
 }

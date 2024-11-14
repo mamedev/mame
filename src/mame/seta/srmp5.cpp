@@ -42,6 +42,9 @@ This is not a bug (real machine behaves the same).
 #include "emupal.h"
 #include "speaker.h"
 
+
+namespace {
+
 #define DEBUG_CHAR
 
 #define SPRITE_GLOBAL_X 0
@@ -126,13 +129,13 @@ private:
 	uint8_t cmd1_r();
 	uint8_t cmd2_r();
 	uint8_t cmd_stat8_r();
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	void st0016_rom_bank_w(uint8_t data);
-	void srmp5_mem(address_map &map);
-	void st0016_io(address_map &map);
-	void st0016_mem(address_map &map);
+	void srmp5_mem(address_map &map) ATTR_COLD;
+	void st0016_io(address_map &map) ATTR_COLD;
+	void st0016_mem(address_map &map) ATTR_COLD;
 };
 
 
@@ -637,5 +640,8 @@ void srmp5_state::init_srmp5()
 	m_tileduty= make_unique_clear<uint8_t[]>(0x2000);
 #endif
 }
+
+} // anonymous namespace
+
 
 GAME( 1994, srmp5, 0, srmp5, srmp5, srmp5_state, init_srmp5, ROT0, "Seta", "Super Real Mahjong P5", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )

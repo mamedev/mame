@@ -34,6 +34,9 @@
 #include "screen.h"
 #include "speaker.h"
 
+
+namespace {
+
 class tg100_state : public driver_device
 {
 public:
@@ -48,14 +51,15 @@ public:
 private:
 	required_device<h8520_device> m_maincpu;
 	required_device<multipcm_device> m_ymw258;
-	void tg100_map(address_map &map);
-	void ymw258_map(address_map &map);
+	void tg100_map(address_map &map) ATTR_COLD;
+	void ymw258_map(address_map &map) ATTR_COLD;
 };
 
 /* all memory accesses are decoded by the gate array... */
 void tg100_state::tg100_map(address_map &map)
 {
 	map(0x00000000, 0x0007ffff).ram(); /* gate array stuff */
+	map(0x00000000, 0x000000ff).rom().region("prgrom", 0x00000);
 	map(0x00080000, 0x0009ffff).rom().region("prgrom", 0x00000);
 }
 
@@ -87,13 +91,14 @@ ROM_START( tg100 )
 	ROM_LOAD( "xk731c0.ic4", 0x00000, 0x20000, CRC(8fb6139c) SHA1(483103a2ffc63a90a2086c597baa2b2745c3a1c2) )
 
 	ROM_REGION(0x4000, "maincpu", 0)
-	ROM_LOAD( "hd6435208a00p.bin", 0x0000, 0x4000, NO_DUMP )
 	ROM_COPY( "prgrom", 0x0000, 0x0000, 0x4000 )
 
 	ROM_REGION(0x200000, "ymw258", 0)
 	ROM_LOAD( "xk992a0.ic6", 0x000000, 0x200000, CRC(01dc6954) SHA1(32ec77a46f4d005538c735f56ad48fa7243c63be) )
-
 ROM_END
+
+} // anonymous namespace
+
 
 //    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY   FULLNAME      FLAGS
 CONS( 1991, tg100, 0,      0,      tg100,   tg100, tg100_state, empty_init, "Yamaha", "TG100",      MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

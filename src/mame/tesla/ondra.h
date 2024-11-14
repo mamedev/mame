@@ -5,8 +5,8 @@
  * includes/ondra.h
  *
  ****************************************************************************/
-#ifndef MAME_INCLUDES_ONDRA_H
-#define MAME_INCLUDES_ONDRA_H
+#ifndef MAME_TESLA_ONDRA_H
+#define MAME_TESLA_ONDRA_H
 
 #pragma once
 
@@ -38,13 +38,13 @@ private:
 	u8 port09_r();
 	void port0a_w(u8 data);
 	u32 screen_update_ondra(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
+	void vblank_irq(int state);
 
-	void io_map(address_map &map);
-	void mem_map(address_map &map);
+	void io_map(address_map &map) ATTR_COLD;
+	void mem_map(address_map &map) ATTR_COLD;
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	void update_banks();
 
@@ -62,4 +62,4 @@ private:
 	required_ioport_array<10> m_io_keyboard;
 };
 
-#endif // MAME_INCLUDES_ONDRA_H
+#endif // MAME_TESLA_ONDRA_H

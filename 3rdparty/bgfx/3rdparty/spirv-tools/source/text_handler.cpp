@@ -29,6 +29,7 @@
 #include "source/util/bitutils.h"
 #include "source/util/hex_float.h"
 #include "source/util/parse_number.h"
+#include "source/util/string_utils.h"
 
 namespace spvtools {
 namespace {
@@ -61,28 +62,29 @@ spv_result_t advanceLine(spv_text text, spv_position position) {
 // parameters, its the users responsibility to ensure these are non null.
 spv_result_t advance(spv_text text, spv_position position) {
   // NOTE: Consume white space, otherwise don't advance.
-  if (position->index >= text->length) return SPV_END_OF_STREAM;
-  switch (text->str[position->index]) {
-    case '\0':
-      return SPV_END_OF_STREAM;
-    case ';':
-      if (spv_result_t error = advanceLine(text, position)) return error;
-      return advance(text, position);
-    case ' ':
-    case '\t':
-    case '\r':
-      position->column++;
-      position->index++;
-      return advance(text, position);
-    case '\n':
-      position->column = 0;
-      position->line++;
-      position->index++;
-      return advance(text, position);
-    default:
-      break;
+  while (true) {
+    if (position->index >= text->length) return SPV_END_OF_STREAM;
+    switch (text->str[position->index]) {
+      case '\0':
+        return SPV_END_OF_STREAM;
+      case ';':
+        if (spv_result_t error = advanceLine(text, position)) return error;
+        continue;
+      case ' ':
+      case '\t':
+      case '\r':
+        position->column++;
+        position->index++;
+        continue;
+      case '\n':
+        position->column = 0;
+        position->line++;
+        position->index++;
+        continue;
+      default:
+        return SPV_SUCCESS;
+    }
   }
-  return SPV_SUCCESS;
 }
 
 // Fetches the next word from the given text stream starting from the given
@@ -120,7 +122,8 @@ spv_result_t getWord(spv_text text, spv_position position, std::string* word) {
         case '\n':
         case '\r':
           if (escaping || quoting) break;
-        // Fall through.
+          word->assign(text->str + start_index, text->str + position->index);
+          return SPV_SUCCESS;
         case '\0': {  // NOTE: End of word found!
           word->assign(text->str + start_index, text->str + position->index);
           return SPV_SUCCESS;
@@ -306,14 +309,8 @@ spv_result_t AssemblyContext::binaryEncodeString(const char* value,
                         << SPV_LIMIT_INSTRUCTION_WORD_COUNT_MAX << " words.";
   }
 
-  pInst->words.resize(newWordCount);
-
-  // Make sure all the bytes in the last word are 0, in case we only
-  // write a partial word at the end.
-  pInst->words.back() = 0;
-
-  char* dest = (char*)&pInst->words[oldWordCount];
-  strncpy(dest, value, length + 1);
+  pInst->words.reserve(newWordCount);
+  spvtools::utils::AppendToVector(value, &pInst->words);
 
   return SPV_SUCCESS;
 }

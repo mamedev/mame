@@ -326,7 +326,7 @@ void dgn_beta_state::dgnbeta(machine_config &config)
 	PALETTE(config, m_palette, FUNC(dgn_beta_state::dgn_beta_palette), std::size(dgnbeta_pens));
 
 	/* PIA 0 at $FC20-$FC23 I46 */
-	PIA6821(config, m_pia_0, 0);
+	PIA6821(config, m_pia_0);
 	m_pia_0->readpa_handler().set(FUNC(dgn_beta_state::d_pia0_pa_r));
 	m_pia_0->readpb_handler().set(FUNC(dgn_beta_state::d_pia0_pb_r));
 	m_pia_0->writepa_handler().set(FUNC(dgn_beta_state::d_pia0_pa_w));
@@ -336,7 +336,7 @@ void dgn_beta_state::dgnbeta(machine_config &config)
 	m_pia_0->irqb_handler().set(FUNC(dgn_beta_state::d_pia0_irq_b));
 
 	/* PIA 1 at $FC24-$FC27 I63 */
-	PIA6821(config, m_pia_1, 0);
+	PIA6821(config, m_pia_1);
 	m_pia_1->readpa_handler().set(FUNC(dgn_beta_state::d_pia1_pa_r));
 	m_pia_1->readpb_handler().set(FUNC(dgn_beta_state::d_pia1_pb_r));
 	m_pia_1->writepa_handler().set(FUNC(dgn_beta_state::d_pia1_pa_w));
@@ -347,7 +347,7 @@ void dgn_beta_state::dgnbeta(machine_config &config)
 	/* PIA 2 at FCC0-FCC3 I28 */
 	/* This seems to control the RAM paging system, and have the DRQ */
 	/* from the WD2797 */
-	PIA6821(config, m_pia_2, 0);
+	PIA6821(config, m_pia_2);
 	m_pia_2->readpa_handler().set(FUNC(dgn_beta_state::d_pia2_pa_r));
 	m_pia_2->readpb_handler().set(FUNC(dgn_beta_state::d_pia2_pb_r));
 	m_pia_2->writepa_handler().set(FUNC(dgn_beta_state::d_pia2_pa_w));

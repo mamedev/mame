@@ -9,7 +9,7 @@
 
     The key components are a DSP16A, a TDA1543 dual 16-bit DAC with I2S
     input, and a TC9185P electronic volume control.  The TDA1543 is
-    simulated here; no attempt is being made to emulate theTC9185P.
+    simulated here; no attempt is being made to emulate the TC9185P.
 
     Commands work by writing an address/data word pair to be written to
     DSP's internal RAM.  In theory it's possible to write anywhere in
@@ -26,7 +26,7 @@
     is needed because DSP16 has latent PIO reads in active mode).  I've
     assumed that reading PIO with PSEL low when INT is asserted will
     return the address and cause INT to be de-asserted, and reading PIO
-    with PSEL low when int is not asserted will return the data word.
+    with PSEL low when INT is not asserted will return the data word.
     The DSP program will only respond to one external interrupt per
     sample interval (i.e. the maximum command rate is the same as the
     sample rate).
@@ -102,7 +102,6 @@
 #include <algorithm>
 #include <fstream>
 
-#define LOG_GENERAL     (1U << 0)
 #define LOG_COMMAND     (1U << 1)
 #define LOG_SAMPLE      (1U << 2)
 
@@ -137,6 +136,10 @@ qsound_device::qsound_device(machine_config const &mconfig, char const *tag, dev
 	, m_dsp(*this, "dsp"), m_stream(nullptr)
 	, m_rom_bank(0U), m_rom_offset(0U), m_cmd_addr(0U), m_cmd_data(0U), m_new_data(0U), m_cmd_pending(0U), m_dsp_ready(1U)
 	, m_samples{ 0, 0 }, m_sr(0U), m_fsr(0U), m_ock(1U), m_old(1U), m_ready(0U), m_channel(0U)
+{
+}
+
+qsound_device::~qsound_device()
 {
 }
 
@@ -262,10 +265,11 @@ void qsound_device::sound_stream_update(sound_stream &stream, std::vector<read_s
 
 
 //-------------------------------------------------
-//  rom_bank_updated - the rom bank has changed
+//  rom_bank_post_change - called after the ROM
+//  bank is changed
 //-------------------------------------------------
 
-void qsound_device::rom_bank_updated()
+void qsound_device::rom_bank_post_change()
 {
 	machine().scheduler().synchronize();
 }
@@ -288,7 +292,7 @@ u16 qsound_device::dsp_sample_r(offs_t offset)
 	return u16(byte) << 8;
 }
 
-WRITE_LINE_MEMBER(qsound_device::dsp_ock_w)
+void qsound_device::dsp_ock_w(int state)
 {
 	// detect active edge
 	if (bool(state) == bool(m_ock))

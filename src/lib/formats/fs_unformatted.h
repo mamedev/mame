@@ -10,6 +10,8 @@
 
 #include "fsmgr.h"
 
+class floppy_image;
+
 namespace fs {
 
 class unformatted_image : public manager_t {
@@ -23,10 +25,14 @@ public:
 
 		FSI_525_SSSD,
 		FSI_525_SSDD,
+		FSI_525_SSDD16,
 		FSI_525_SSQD,
+		FSI_525_SSQD16,
 		FSI_525_DSSD,
 		FSI_525_DSDD,
+		FSI_525_DSDD16,
 		FSI_525_DSQD,
+		FSI_525_DSQD16,
 		FSI_525_DSHD,
 
 		FSI_35_SSDD,
@@ -45,7 +51,7 @@ public:
 
 	static void format(u32 key, floppy_image *image);
 
-	virtual void enumerate_f(floppy_enumerator &fe, u32 form_factor, const std::vector<u32> &variants) const override;
+	virtual void enumerate_f(floppy_enumerator &fe) const override;
 	virtual std::unique_ptr<filesystem_t> mount(fsblk_t &blockdev) const override;
 
 	virtual bool can_format() const override;

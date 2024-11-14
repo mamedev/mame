@@ -95,9 +95,6 @@ const char sharc_disassembler::mr_regnames[16][8] =
 #define GET_DAG2_L(x)   (GET_UREG(0x30 | (8 + (x & 0x7))))
 #define GET_DAG2_B(x)   (GET_UREG(0x40 | (8 + (x & 0x7))))
 
-#define SIGN_EXTEND6(x)     ((x & 0x20) ? (0xffffffc0 | x) : x)
-#define SIGN_EXTEND24(x)    ((x & 0x800000) ? (0xff000000 | x) : x)
-
 
 void sharc_disassembler::compute(std::ostream &stream, uint32_t opcode)
 {
@@ -715,7 +712,7 @@ uint32_t sharc_disassembler::dasm_direct_jump(std::ostream &stream, uint32_t pc,
 
 	if (opcode & 0x10000000000U)    /* PC-relative branch */
 	{
-		util::stream_format(stream, " (0x%08X)", pc + SIGN_EXTEND24(addr));
+		util::stream_format(stream, " (0x%08X)", pc + util::sext(addr, 24));
 	}
 	else                                /* Indirect branch */
 	{
@@ -761,7 +758,7 @@ uint32_t sharc_disassembler::dasm_indirect_jump_compute(std::ostream &stream, ui
 
 	if (opcode & 0x10000000000U)    /* PC-relative branch */
 	{
-		util::stream_format(stream, " (0x%08X)", pc + SIGN_EXTEND6(reladdr));
+		util::stream_format(stream, " (0x%08X)", pc + util::sext(reladdr, 6));
 	}
 	else                                /* Indirect branch */
 	{
@@ -808,7 +805,7 @@ uint32_t sharc_disassembler::dasm_indirect_jump_compute_dregdm(std::ostream &str
 
 	if (opcode & 0x200000000000U)   /* PC-relative branch */
 	{
-		util::stream_format(stream, " (0x%08X)", pc + SIGN_EXTEND6(reladdr));
+		util::stream_format(stream, " (0x%08X)", pc + util::sext(reladdr, 6));
 	}
 	else                                /* Indirect branch */
 	{
@@ -886,12 +883,12 @@ uint32_t sharc_disassembler::dasm_do_until_counter(std::ostream &stream, uint32_
 	if (opcode & 0x10000000000U)    /* Loop counter from universal register */
 	{
 		util::stream_format(stream, "LCNTR = %s, ", GET_UREG(ureg));
-		util::stream_format(stream, "DO (0x%08X)", pc + SIGN_EXTEND24(addr));
+		util::stream_format(stream, "DO (0x%08X)", pc + util::sext(addr, 24));
 	}
 	else                                /* Loop counter from immediate */
 	{
 		util::stream_format(stream, "LCNTR = 0x%04X, ", data);
-		util::stream_format(stream, "DO (0x%08X) UNTIL LCE", pc + SIGN_EXTEND24(addr));
+		util::stream_format(stream, "DO (0x%08X) UNTIL LCE", pc + util::sext(addr, 24));
 	}
 	return 0;
 }
@@ -901,7 +898,7 @@ uint32_t sharc_disassembler::dasm_do_until(std::ostream &stream, uint32_t pc, ui
 	int term = (opcode >> 33) & 0x1f;
 	uint32_t addr = opcode & 0xffffff;
 
-	util::stream_format(stream, "DO (0x%08X) UNTIL %s", pc + SIGN_EXTEND24(addr), condition_codes_do[term]);
+	util::stream_format(stream, "DO (0x%08X) UNTIL %s", pc + util::sext(addr, 24), condition_codes_do[term]);
 	return 0;
 }
 

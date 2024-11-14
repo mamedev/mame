@@ -47,7 +47,7 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "machine/eeprompar.h"
+#include "eeprompar.h"
 
 //#define VERBOSE 1
 #include "logmacro.h"
@@ -180,7 +180,7 @@ uint8_t eeprom_parallel_28xx_device::read(address_space &space, offs_t offset)
 //  oe_w - direct write to /OE (true line state)
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER(eeprom_parallel_28xx_device::oe_w)
+void eeprom_parallel_28xx_device::oe_w(int state)
 {
 	LOG("%s: EEPROM %s for writing\n", machine().describe_context(), state ? "unlocked" : "locked");
 	m_oe = state ? 1 : 0;

@@ -42,10 +42,9 @@ public:
 	auto out_pf_callback() { return m_port_output_cb[5].bind(); }
 
 protected:
-	// device-specific overrides
-	virtual void device_resolve_objects() override;
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	// device_t implementation
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// z180_device overrides
 	virtual uint8_t z180_internal_port_read(uint8_t port) override;
@@ -53,7 +52,7 @@ protected:
 
 private:
 	// internal memory map
-	void internal_map(address_map &map);
+	void internal_map(address_map &map) ATTR_COLD;
 
 	// port callbacks
 	devcb_read8::array<7> m_port_input_cb;

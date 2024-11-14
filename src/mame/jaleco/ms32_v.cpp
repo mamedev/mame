@@ -696,7 +696,7 @@ u32 ms32_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const
 	return 0;
 }
 
-WRITE_LINE_MEMBER(ms32_state::screen_vblank)
+void ms32_state::screen_vblank(int state)
 {
 	if (state)
 	{
@@ -704,7 +704,7 @@ WRITE_LINE_MEMBER(ms32_state::screen_vblank)
 	}
 }
 
-WRITE_LINE_MEMBER(ms32_state::flipscreen_w)
+void ms32_state::flipscreen_w(int state)
 {
 	m_tx_tilemap->set_flip(state ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
 	m_bg_tilemap->set_flip(state ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);

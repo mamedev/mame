@@ -9,6 +9,9 @@
 #include "emu.h"
 #include "swim1.h"
 
+#define VERBOSE (0)
+#include "logmacro.h"
+
 DEFINE_DEVICE_TYPE(SWIM1, swim1_device, "swim1", "Apple SWIM1 (Sander/Wozniak Integrated Machine) version 1 floppy controller")
 
 swim1_device::swim1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
@@ -23,6 +26,8 @@ void swim1_device::device_start()
 	applefdintf_device::device_start();
 
 	m_timer = timer_alloc(FUNC(swim1_device::update), this);
+	m_sync_timer = timer_alloc(FUNC(swim1_device::ism_periodic_sync), this);
+
 	save_item(NAME(m_last_sync));
 	save_item(NAME(m_flux_write_start));
 	save_item(NAME(m_flux_write));
@@ -101,7 +106,7 @@ void swim1_device::device_reset()
 	m_devsel_cb(0);
 	m_sel35_cb(true);
 	m_hdsel_cb(false);
-	m_dat1byte_cb(0);
+	m_dat1byte_cb(CLEAR_LINE);
 }
 
 void swim1_device::set_floppy(floppy_image_device *floppy)
@@ -112,7 +117,7 @@ void swim1_device::set_floppy(floppy_image_device *floppy)
 	sync();
 	flush_write();
 
-	logerror("floppy %s\n", floppy ? floppy->tag() : "-");
+	LOG("floppy %s\n", floppy ? floppy->tag() : "-");
 
 	m_floppy = floppy;
 	update_phases();
@@ -127,7 +132,7 @@ floppy_image_device *swim1_device::get_floppy() const
 
 void swim1_device::ism_show_mode() const
 {
-	logerror("ism mode%s %s hdsel=%c %c%s %c%c%s\n",
+	LOG("ism mode%s %s hdsel=%c %c%s %c%c%s\n",
 			 m_ism_mode & 0x80 ? " motoron" : "",
 			 m_ism_mode & 0x40 ? "ism" : "iwm",
 			 m_ism_mode & 0x20 ? '1' : '0',
@@ -171,11 +176,11 @@ u8 swim1_device::ism_read(offs_t offset)
 {
 	ism_sync();
 
-	//  static const char *const names[] = {
-	//      "data", "mark", "crc", "param", "phases", "setup", "status", "handshake"
-	//  };
+	  static const char *const names[] = {
+		  "data", "mark", "crc", "param", "phases", "setup", "status", "handshake"
+	  };
 
-	//  logerror("read ism %s\n", names[offset & 7]);
+	LOG("read ism %s\n", names[offset & 7]);
 	switch(offset & 7) {
 	case 0x0: { // data
 		u16 r = ism_fifo_pop();
@@ -224,9 +229,9 @@ u8 swim1_device::ism_read(offs_t offset)
 			if(!(m_ism_fifo[m_ism_fifo_pos - 1] & M_CRC0))
 				h |= 0x02;
 		}
-		// rddata on 4
+		// rddata on 3
 		if(!m_floppy || m_floppy->wpt_r())
-			h |= 0x08;
+			h |= 0x0c;
 		if(m_ism_error)
 			h |= 0x20;
 		if(m_ism_mode & 0x10) {
@@ -246,7 +251,7 @@ u8 swim1_device::ism_read(offs_t offset)
 	}
 
 	default:
-		//      logerror("read %s\n", names[offset & 7]);
+			  logerror("read %s\n", names[offset & 7]);
 		break;
 	}
 	return 0xff;
@@ -282,14 +287,14 @@ void swim1_device::ism_write(offs_t offset, u8 data)
 			"minct", "mult", "ssl", "sss", "sll", "sls", "rpt", "csls",
 			"lsl", "lss", "lll", "lls", "late", "time0", "early", "time1"
 		};
-		logerror("param[%s] = %02x\n", pname[m_ism_param_idx], data);
+		LOG("param[%s] = %02x\n", pname[m_ism_param_idx], data);
 		m_ism_param[m_ism_param_idx] = data;
 		m_ism_param_idx = (m_ism_param_idx + 1) & 15;
 		break;
 	}
 
 	case 0x4: {
-		logerror("ism phases %02x\n", data);
+		LOG("ism phases %02x\n", data);
 		m_phases = data;
 		update_phases();
 		break;
@@ -297,7 +302,7 @@ void swim1_device::ism_write(offs_t offset, u8 data)
 
 	case 0x5:
 		m_ism_setup = data;
-		logerror("setup timer=%s tsm=%s %s ecm=%s %s %s 3.5=%s %s\n",
+		LOG("setup timer=%s tsm=%s %s ecm=%s %s %s 3.5=%s %s\n",
 				 m_ism_setup & 0x80 ? "on" : "off",
 				 m_ism_setup & 0x40 ? "off" : "on",
 				 m_ism_setup & 0x20 ? "ibm" : "apple",
@@ -312,10 +317,9 @@ void swim1_device::ism_write(offs_t offset, u8 data)
 		m_ism_mode &= ~data;
 		m_ism_param_idx = 0;
 		ism_show_mode();
-		if(data & 0x10)
-			m_dat1byte_cb((m_ism_fifo_pos != 0) ? 1 : 0);
+		ism_update_dat1byte();
 		if(!(m_ism_mode & 0x40)) {
-			logerror("switch to iwm\n");
+			LOG("switch to iwm\n");
 			u8 ism_devsel = m_ism_mode & 0x80 ? (m_ism_mode >> 1) & 3 : 0;
 			if(ism_devsel != m_iwm_devsel)
 				m_devsel_cb(m_iwm_devsel);
@@ -325,8 +329,7 @@ void swim1_device::ism_write(offs_t offset, u8 data)
 	case 0x7:
 		m_ism_mode |= data;
 		ism_show_mode();
-		if(data & 0x10)
-			m_dat1byte_cb((m_ism_fifo_pos != 2) ? 1 : 0);
+		ism_update_dat1byte();
 		break;
 
 	default:
@@ -342,10 +345,17 @@ void swim1_device::ism_write(offs_t offset, u8 data)
 	if((m_ism_mode ^ prev_mode) & 0x20)
 		m_hdsel_cb((m_ism_mode >> 5) & 1);
 
+	if ((m_ism_mode ^ prev_mode) & 0x40) {
+		if (m_ism_mode & 0x40)
+			m_sync_timer->adjust(attotime::zero, 0, attotime::from_hz(clock()/16));
+		else
+			m_sync_timer->adjust(attotime::never);
+	}
+
 	if((m_ism_mode & 0x18) == 0x18 && ((prev_mode & 0x18) != 0x18)) {
 		// Entering write mode
 		m_ism_current_bit = 0;
-		logerror("%s write start %s %s floppy=%p\n", machine().time().to_string(), m_ism_setup & 0x40 ? "gcr" : "mfm", m_ism_setup & 0x08 ? "fclk/2" : "fclk", m_floppy);
+		LOG("%s write start %s %s floppy=%p\n", machine().time().to_string(), m_ism_setup & 0x40 ? "gcr" : "mfm", m_ism_setup & 0x08 ? "fclk/2" : "fclk", m_floppy);
 		m_flux_write_start = m_last_sync;
 		m_flux_write_count = 0;
 
@@ -355,7 +365,7 @@ void swim1_device::ism_write(offs_t offset, u8 data)
 		m_flux_write_start = 0;
 		m_ism_current_bit = 0xff;
 		m_ism_half_cycles_before_change = 0;
-		logerror("%s write end\n", machine().time().to_string());
+		LOG("%s write end\n", machine().time().to_string());
 	}
 
 	if((m_ism_mode & 0x18) == 0x08 && ((prev_mode & 0x18) != 0x08)) {
@@ -370,14 +380,14 @@ void swim1_device::ism_write(offs_t offset, u8 data)
 		m_ism_csm_pair_side = 0;
 		m_ism_csm_min_count = 0;
 
-		logerror("%s read start %s %s floppy=%p\n", machine().time().to_string(), m_ism_setup & 0x04 ? "gcr" : "mfm", m_ism_setup & 0x08 ? "fclk/2" : "fclk", m_floppy);
+		LOG("%s read start %s %s floppy=%p\n", machine().time().to_string(), m_ism_setup & 0x04 ? "gcr" : "mfm", m_ism_setup & 0x08 ? "fclk/2" : "fclk", m_floppy);
 
 	} else if((prev_mode & 0x18) == 0x08 && (m_ism_mode & 0x18) != 0x08) {
 		// Exiting read mode
 		flush_write();
 		m_ism_current_bit = 0xff;
 		m_ism_half_cycles_before_change = 0;
-		logerror("%s read end\n", machine().time().to_string());
+		LOG("%s read end\n", machine().time().to_string());
 	}
 }
 
@@ -522,7 +532,7 @@ void swim1_device::iwm_control(int offset, u8 data)
 		if(s == 0xc0 && m_iwm_active)
 			slot = "write load / write data";
 
-		logerror("%s control %c%c %c%c %c%c%c%c (%s) [%s, %s] whd=%02x data=%02x\n",
+		LOG("%s control %c%c %c%c %c%c%c%c (%s) [%s, %s] whd=%02x data=%02x\n",
 				 machine().time().to_string(),
 				 m_iwm_control & 0x80 ? '1' : '0',
 				 m_iwm_control & 0x40 ? '1' : '0',
@@ -554,10 +564,13 @@ void swim1_device::iwm_control(int offset, u8 data)
 		case 3:
 			if(data & 0x40) {
 				m_ism_mode |= 0x40;
-				logerror("switch to ism\n");
+				LOG("switch to ism\n");
+
 				u8 ism_devsel = m_ism_mode & 0x80 ? (m_ism_mode >> 1) & 3 : 0;
 				if(ism_devsel != m_iwm_devsel)
 					m_devsel_cb(ism_devsel);
+
+				m_sync_timer->adjust(attotime::zero, 0, attotime::from_hz(clock()/16));
 			}
 			break;
 		}
@@ -565,7 +578,7 @@ void swim1_device::iwm_control(int offset, u8 data)
 	if(m_iwm_to_ism_counter != prev_iwm_to_ism_counter+1)
 		m_iwm_to_ism_counter = 0;
 	else
-		logerror("iwm counter = %d\n", m_iwm_to_ism_counter);
+		LOG("iwm counter = %d\n", m_iwm_to_ism_counter);
 
 	if((m_iwm_control & 0xc0) == 0xc0 && (offset & 1))
 	{
@@ -604,24 +617,18 @@ attotime swim1_device::cycles_to_time(u64 cycles) const
 void swim1_device::ism_fifo_clear()
 {
 	m_ism_fifo_pos = 0;
-	m_dat1byte_cb((m_ism_mode & 0x10) ? 1 : 0);
+	ism_update_dat1byte();
 	ism_crc_clear();
 }
 
 bool swim1_device::ism_fifo_push(u16 data)
 {
 	if(m_ism_fifo_pos == 2)
+	{
 		return true;
-	m_ism_fifo[m_ism_fifo_pos ++] = data;
-	if(m_ism_mode & 0x10) {
-		// write
-		if(m_ism_fifo_pos == 2)
-			m_dat1byte_cb(0);
-	} else {
-		// read
-		if(m_ism_fifo_pos == 1)
-			m_dat1byte_cb(1);
 	}
+	m_ism_fifo[m_ism_fifo_pos ++] = data;
+	ism_update_dat1byte();
 	return false;
 }
 
@@ -632,15 +639,7 @@ u16 swim1_device::ism_fifo_pop()
 	u16 r = m_ism_fifo[0];
 	m_ism_fifo[0] = m_ism_fifo[1];
 	m_ism_fifo_pos --;
-	if(m_ism_mode & 0x10) {
-		// write
-		if(m_ism_fifo_pos == 1)
-			m_dat1byte_cb(1);
-	} else {
-		// read
-		if(m_ism_fifo_pos == 0)
-			m_dat1byte_cb(0);
-	}
+	ism_update_dat1byte();
 	return r;
 }
 
@@ -648,7 +647,7 @@ void swim1_device::iwm_mode_w(u8 data)
 {
 	m_iwm_mode = data;
 	m_iwm_status = (m_iwm_status & 0xe0) | (data & 0x1f);
-	logerror("mode %02x%s%s%s%s%s%s%s\n", m_iwm_mode,
+	LOG("mode %02x%s%s%s%s%s%s%s\n", m_iwm_mode,
 			 m_iwm_mode & 0x80 ? " b7" : "",
 			 m_iwm_mode & 0x40 ? " mz-reset" : "",
 			 m_iwm_mode & 0x20 ? " test" : " normal",
@@ -806,7 +805,7 @@ void swim1_device::iwm_sync()
 
 			case SW_WINDOW_LOAD:
 				if(m_iwm_whd & 0x80) {
-					logerror("underrun\n");
+					LOG("underrun\n");
 					flush_write();
 					m_flux_write_start = 0;
 					m_iwm_whd &= ~0x40;
@@ -855,6 +854,14 @@ void swim1_device::iwm_sync()
 		}
 		break;
 	}
+	}
+}
+
+TIMER_CALLBACK_MEMBER(swim1_device::ism_periodic_sync)
+{
+	if (m_ism_mode & 0x40)
+	{
+		ism_sync();
 	}
 }
 
@@ -916,7 +923,7 @@ void swim1_device::ism_sync()
 						m_ism_current_bit = 0xff;
 						m_ism_half_cycles_before_change = 0;
 						m_ism_mode &= ~8;
-						logerror("write end on underrun\n");
+						LOG("write end on underrun\n");
 						break;
 					}
 					if(r & M_CRC)
@@ -1177,7 +1184,6 @@ void swim1_device::ism_sync()
 									val |= M_CRC0;
 								if(ism_fifo_push(val) && !m_ism_error)
 									m_ism_error |= 0x01;
-								machine().debug_break();
 								m_ism_tsm_bits = 0;
 							}
 						}
@@ -1207,4 +1213,18 @@ void swim1_device::sync()
 		return ism_sync();
 	else
 		return iwm_sync();
+}
+
+void swim1_device::ism_update_dat1byte()
+{
+	if (m_ism_mode & 0x10)
+	{
+		// write: Does FIFO have room?
+		m_dat1byte_cb((m_ism_fifo_pos < 2) ? ASSERT_LINE : CLEAR_LINE);
+	}
+	else
+	{
+		// read: is FIFO not empty?
+		m_dat1byte_cb((m_ism_fifo_pos > 0) ? ASSERT_LINE : CLEAR_LINE);
+	}
 }

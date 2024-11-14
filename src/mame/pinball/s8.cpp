@@ -154,8 +154,8 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(audio_nmi);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	TIMER_CALLBACK_MEMBER(irq_timer);
 
@@ -172,16 +172,16 @@ private:
 	void sound_w(u8 data);
 	u8 switch_r();
 	void switch_w(u8 data);
-	DECLARE_WRITE_LINE_MEMBER(pia21_ca2_w);
-	DECLARE_WRITE_LINE_MEMBER(pia21_cb2_w) { } // enable solenoids
-	DECLARE_WRITE_LINE_MEMBER(pia24_cb2_w) { m_io_outputs[16] = state; } // dummy to stop error log filling up
-	DECLARE_WRITE_LINE_MEMBER(pia28_ca2_w) { m_comma34 = state; } // comma3&4
-	DECLARE_WRITE_LINE_MEMBER(pia28_cb2_w) { m_comma12 = state; } // comma1&2
-	DECLARE_WRITE_LINE_MEMBER(pia_irq);
+	void pia21_ca2_w(int state);
+	void pia21_cb2_w(int state) { } // enable solenoids
+	void pia24_cb2_w(int state) { m_io_outputs[16] = state; } // dummy to stop error log filling up
+	void pia28_ca2_w(int state) { m_comma34 = state; } // comma3&4
+	void pia28_cb2_w(int state) { m_comma12 = state; } // comma1&2
+	void pia_irq(int state);
 
-	void audio_map(address_map &map);
-	void main_map(address_map &map);
-	void scrzy_map(address_map &map);
+	void audio_map(address_map &map) ATTR_COLD;
+	void main_map(address_map &map) ATTR_COLD;
+	void scrzy_map(address_map &map) ATTR_COLD;
 
 	u8 m_sound_data = 0U;
 	u8 m_strobe = 0U;
@@ -272,8 +272,8 @@ static INPUT_PORTS_START( pfevr )
 	PORT_START("X7")
 
 	PORT_START("DIAGS")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("Audio Diag") PORT_CODE(KEYCODE_9_PAD) PORT_CHANGED_MEMBER(DEVICE_SELF, s8_state, audio_nmi, 1)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("Main Diag") PORT_CODE(KEYCODE_0_PAD) PORT_CHANGED_MEMBER(DEVICE_SELF, s8_state, main_nmi, 1)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("Audio Diag") PORT_CODE(KEYCODE_9_PAD) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(s8_state::audio_nmi), 1)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("Main Diag") PORT_CODE(KEYCODE_0_PAD) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(s8_state::main_nmi), 1)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("Advance") PORT_CODE(KEYCODE_1_PAD)
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("Up/Down") PORT_CODE(KEYCODE_2_PAD) PORT_TOGGLE
 INPUT_PORTS_END
@@ -307,7 +307,7 @@ static INPUT_PORTS_START( scrzy )
 	PORT_START("X7")
 
 	PORT_START("DIAGS")
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("Main Diag") PORT_CODE(KEYCODE_0_PAD) PORT_CHANGED_MEMBER(DEVICE_SELF, s8_state, main_nmi, 1)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("Main Diag") PORT_CODE(KEYCODE_0_PAD) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(s8_state::main_nmi), 1)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("Advance") PORT_CODE(KEYCODE_1_PAD)
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("Up/Down") PORT_CODE(KEYCODE_2_PAD) PORT_TOGGLE
 INPUT_PORTS_END
@@ -383,7 +383,7 @@ static INPUT_PORTS_START( ratrc )
 	PORT_BIT( 0x11, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_Z) PORT_NAME("INP57") // Ball entering play (bit 0 = P1, bit 4 = P2)
 
 	PORT_START("DIAGS")
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("Main Diag") PORT_CODE(KEYCODE_0_PAD) PORT_CHANGED_MEMBER(DEVICE_SELF, s8_state, main_nmi, 1)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("Main Diag") PORT_CODE(KEYCODE_0_PAD) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(s8_state::main_nmi), 1)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("Advance") PORT_CODE(KEYCODE_1_PAD)
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("Up/Down") PORT_CODE(KEYCODE_2_PAD) PORT_TOGGLE
 INPUT_PORTS_END
@@ -425,7 +425,7 @@ void s8_state::sound_w(u8 data)
 	m_sound_data = data;
 }
 
-WRITE_LINE_MEMBER( s8_state::pia21_ca2_w )
+void s8_state::pia21_ca2_w(int state)
 {
 // sound ns
 	if (m_pias)
@@ -506,7 +506,7 @@ u8 s8_state::sound_r()
 	return m_sound_data;
 }
 
-WRITE_LINE_MEMBER( s8_state::pia_irq )
+void s8_state::pia_irq(int state)
 {
 	if(state == CLEAR_LINE)
 	{
@@ -574,7 +574,7 @@ void s8_state::psound(machine_config &config)
 	SPEAKER(config, "speaker").front_center();
 	MC1408(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.5);
 
-	PIA6821(config, m_pias, 0);
+	PIA6821(config, m_pias);
 	m_pias->readpa_handler().set(FUNC(s8_state::sound_r));
 	m_pias->set_port_a_input_overrides_output_mask(0xff);
 	m_pias->writepb_handler().set("dac", FUNC(dac_byte_interface::data_w));
@@ -593,7 +593,7 @@ void s8_state::s8(machine_config &config)
 	genpin_audio(config);
 
 	/* Devices */
-	PIA6821(config, m_pia21, 0);
+	PIA6821(config, m_pia21);
 	m_pia21->readpa_handler().set(FUNC(s8_state::sound_r));
 	m_pia21->set_port_a_input_overrides_output_mask(0xff);
 	m_pia21->ca1_w(1); // sound busy
@@ -604,14 +604,14 @@ void s8_state::s8(machine_config &config)
 	m_pia21->irqa_handler().set(FUNC(s8_state::pia_irq));
 	m_pia21->irqb_handler().set(FUNC(s8_state::pia_irq));
 
-	PIA6821(config, m_pia24, 0);
+	PIA6821(config, m_pia24);
 	m_pia24->writepa_handler().set(FUNC(s8_state::lamp0_w));
 	m_pia24->writepb_handler().set(FUNC(s8_state::lamp1_w));
 	m_pia24->cb2_handler().set(FUNC(s8_state::pia24_cb2_w));
 	m_pia24->irqa_handler().set(FUNC(s8_state::pia_irq));
 	m_pia24->irqb_handler().set(FUNC(s8_state::pia_irq));
 
-	PIA6821(config, m_pia28, 0);
+	PIA6821(config, m_pia28);
 	m_pia28->writepa_handler().set(FUNC(s8_state::dig0_w));
 	m_pia28->writepb_handler().set(FUNC(s8_state::dig1_w));
 	m_pia28->ca2_handler().set(FUNC(s8_state::pia28_ca2_w));
@@ -619,7 +619,7 @@ void s8_state::s8(machine_config &config)
 	m_pia28->irqa_handler().set(FUNC(s8_state::pia_irq));
 	m_pia28->irqb_handler().set(FUNC(s8_state::pia_irq));
 
-	PIA6821(config, m_pia30, 0);
+	PIA6821(config, m_pia30);
 	m_pia30->readpa_handler().set(FUNC(s8_state::switch_r));
 	m_pia30->set_port_a_input_overrides_output_mask(0xff);
 	m_pia30->writepb_handler().set(FUNC(s8_state::switch_w));

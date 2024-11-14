@@ -17,24 +17,25 @@
 #include <array>
 #include <vector>
 
-// Geometry constants
-constexpr unsigned HPI_TRACKS = 77;
-constexpr unsigned HPI_HEADS = 2;
-constexpr unsigned HPI_SECTORS = 30;
-constexpr unsigned HPI_SECTOR_SIZE = 256;
-
 class hpi_format : public floppy_image_format_t
 {
 public:
+	// Geometry constants
+	static constexpr unsigned HPI_TRACKS = 77;
+	static constexpr unsigned HPI_9885_TRACKS = 67; // Tracks visible to HP9885 drives
+	static constexpr unsigned HPI_HEADS = 2;
+	static constexpr unsigned HPI_SECTORS = 30;
+	static constexpr unsigned HPI_SECTOR_SIZE = 256;
+
 	hpi_format();
 
 	virtual int identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants) const override;
-	virtual bool load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image) const override;
-	virtual bool save(util::random_read_write &io, const std::vector<uint32_t> &variants, floppy_image *image) const override;
-	virtual const char *name() const override;
-	virtual const char *description() const override;
-	virtual const char *extensions() const override;
-	virtual bool supports_save() const override;
+	virtual bool load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image &image) const override;
+	virtual bool save(util::random_read_write &io, const std::vector<uint32_t> &variants, const floppy_image &image) const override;
+	virtual const char *name() const noexcept override;
+	virtual const char *description() const noexcept override;
+	virtual const char *extensions() const noexcept override;
+	virtual bool supports_save() const noexcept override;
 
 private:
 	typedef std::array<uint8_t , HPI_SECTORS> sector_list_t;

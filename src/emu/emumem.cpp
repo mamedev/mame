@@ -861,6 +861,38 @@ void address_space_installer::populate_map_entry(const address_map_entry &entry,
 				install_view(entry.m_addrstart, entry.m_addrend, entry.m_addrmirror, *entry.m_view);
 			break;
 	}
+
+	if (data.m_type == AMH_VIEW)
+		return;
+
+	offs_t lowbits_mask = (m_config.data_width() >> (3 - m_config.addr_shift())) - 1;
+
+	if (!entry.m_before_time.isnull()) {
+		auto d = entry.m_before_time;
+		d.resolve();
+		if (readorwrite == read_or_write::READ)
+			install_read_before_time(entry.m_addrstart & ~lowbits_mask, entry.m_addrend | lowbits_mask, entry.m_addrmirror, d);
+		else
+			install_write_before_time(entry.m_addrstart & ~lowbits_mask, entry.m_addrend | lowbits_mask, entry.m_addrmirror, d);
+	}
+
+	if (!entry.m_before_delay.isnull()) {
+		auto d = entry.m_before_delay;
+		d.resolve();
+		if (readorwrite == read_or_write::READ)
+			install_read_before_delay(entry.m_addrstart & ~lowbits_mask, entry.m_addrend | lowbits_mask, entry.m_addrmirror, d);
+		else
+			install_write_before_delay(entry.m_addrstart & ~lowbits_mask, entry.m_addrend | lowbits_mask, entry.m_addrmirror, d);
+	}
+
+	if (!entry.m_after_delay.isnull()) {
+		auto d = entry.m_after_delay;
+		d.resolve();
+		if (readorwrite == read_or_write::READ)
+			install_read_after_delay(entry.m_addrstart & ~lowbits_mask, entry.m_addrend | lowbits_mask, entry.m_addrmirror, d);
+		else
+			install_write_after_delay(entry.m_addrstart & ~lowbits_mask, entry.m_addrend | lowbits_mask, entry.m_addrmirror, d);
+	}
 }
 
 
@@ -984,7 +1016,7 @@ void memory_bank::set_entry(int entrynum)
 
 	// validate
 	if (entrynum < 0 || entrynum >= int(m_entries.size()))
-		throw emu_fatalerror("memory_bank::set_entry called with out-of-range entry %d", entrynum);
+		throw emu_fatalerror("memory_bank::set_entry called for bank '%s' with out-of-range entry %d", m_tag, entrynum);
 	if (m_entries[entrynum] == nullptr)
 		throw emu_fatalerror("memory_bank::set_entry called for bank '%s' with invalid bank entry %d", m_tag, entrynum);
 

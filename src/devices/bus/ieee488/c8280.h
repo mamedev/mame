@@ -12,10 +12,8 @@
 #pragma once
 
 #include "ieee488.h"
-#include "cpu/m6502/m6502.h"
-#include "formats/c8280_dsk.h"
 #include "imagedev/floppy.h"
-#include "machine/mos6530n.h"
+#include "machine/mos6530.h"
 #include "machine/wd_fdc.h"
 
 
@@ -34,13 +32,13 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// optional information overrides
-	virtual const tiny_rom_entry *device_rom_region() const override;
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual ioport_constructor device_input_ports() const override;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 
 	// device_ieee488_interface overrides
 	void ieee488_atn(int state) override;
@@ -58,20 +56,19 @@ private:
 	uint8_t fk5_r();
 	void fk5_w(uint8_t data);
 
-	void c8280_fdc_mem(address_map &map);
-	void c8280_main_mem(address_map &map);
+	void c8280_fdc_mem(address_map &map) ATTR_COLD;
+	void c8280_main_mem(address_map &map) ATTR_COLD;
 
 	static void floppy_formats(format_registration &fr);
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_fdccpu;
-	required_device<mos6532_new_device> m_riot0;
-	required_device<mos6532_new_device> m_riot1;
+	required_device<mos6532_device> m_riot0;
+	required_device<mos6532_device> m_riot1;
 	required_device<fd1797_device> m_fdc;
-	required_device<floppy_connector> m_floppy0;
-	required_device<floppy_connector> m_floppy1;
+	required_device_array<floppy_connector, 2> m_floppy;
 	required_ioport m_address;
-	floppy_image_device *m_floppy;
+	floppy_image_device *m_selected_floppy;
 	output_finder<4> m_leds;
 
 	// IEEE-488 bus

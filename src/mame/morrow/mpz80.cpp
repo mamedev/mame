@@ -639,14 +639,14 @@ INPUT_PORTS_END
 //  S100_INTERFACE( s100_intf )
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( mpz80_state::s100_pint_w )
+void mpz80_state::s100_pint_w(int state)
 {
 	m_pint = (state == ASSERT_LINE) ? 0 : 1;
 
 	check_interrupt();
 }
 
-WRITE_LINE_MEMBER( mpz80_state::s100_nmi_w )
+void mpz80_state::s100_nmi_w(int state)
 {
 	if (state == ASSERT_LINE)
 	{
@@ -723,7 +723,7 @@ void mpz80_state::mpz80(machine_config &config)
 	S100_BUS(config, m_s100, XTAL(4'000'000) / 2);
 	m_s100->irq().set(FUNC(mpz80_state::s100_pint_w));
 	m_s100->nmi().set(FUNC(mpz80_state::s100_nmi_w));
-	m_s100->rdy().set_inputline(m_maincpu, Z80_INPUT_LINE_BOGUSWAIT);
+	//m_s100->rdy().set_inputline(m_maincpu, Z80_INPUT_LINE_WAIT);
 	S100_SLOT(config, S100_TAG ":1", mpz80_s100_cards, "mm65k16s");
 	S100_SLOT(config, S100_TAG ":2", mpz80_s100_cards, "wunderbus");
 	S100_SLOT(config, S100_TAG ":3", mpz80_s100_cards, "dj2db");

@@ -25,7 +25,7 @@ public:
 
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	DECLARE_WRITE_LINE_MEMBER(vblank);
+	void vblank(int state);
 
 	uint16_t video_r(offs_t offset);
 	void video_w(offs_t offset, uint16_t data);
@@ -35,9 +35,9 @@ public:
 	auto write_video_irq_callback() { return m_video_irq_cb.bind(); }
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 	void check_video_irq();
 	TIMER_CALLBACK_MEMBER(screenpos_hit);

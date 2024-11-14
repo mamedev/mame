@@ -1,8 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:AJR
 
-#ifndef MAME_MACHINE_MACSCSI_H
-#define MAME_MACHINE_MACSCSI_H
+#ifndef MAME_APPLE_MACSCSI_H
+#define MAME_APPLE_MACSCSI_H
 
 #pragma once
 
@@ -27,13 +27,12 @@ public:
 	u8 read_wrapper(bool pseudo_dma, offs_t offset);
 	void write_wrapper(bool pseudo_dma, offs_t offset, u8 data);
 
-	DECLARE_WRITE_LINE_MEMBER(drq_w);
+	void drq_w(int state);
 
 protected:
-	// device-level overrides
-	virtual void device_resolve_objects() override;
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	// device_t implementation
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 private:
 	enum class mode : u8 { NON_DMA, READ_WAIT_DRQ, READ_DMA, WRITE_DMA, BAD_DMA };
@@ -67,4 +66,4 @@ private:
 // device type declaration
 DECLARE_DEVICE_TYPE(MAC_SCSI_HELPER, mac_scsi_helper_device)
 
-#endif // MAME_MACHINE_MACSCSI_H
+#endif // MAME_APPLE_MACSCSI_H

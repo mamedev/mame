@@ -31,16 +31,15 @@ public:
 	auto swrite_callback() { return m_swrite_callback.bind(); }
 
 	// microprocessor interface
-	void mpu_map(address_map &map);
+	void mpu_map(address_map &map) ATTR_COLD;
 
 	// port B DMA interface
-	DECLARE_WRITE_LINE_MEMBER(breq_w);
+	void breq_w(int state);
 
 protected:
-	// device-specific overrides
-	virtual void device_resolve_objects() override;
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	// device_t implementation
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 private:
 	// register handlers

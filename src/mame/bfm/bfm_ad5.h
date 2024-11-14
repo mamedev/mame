@@ -1,11 +1,11 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood
-#ifndef MAME_INCLUDES_BFM_AD5_H
-#define MAME_INCLUDES_BFM_AD5_H
+#ifndef MAME_BFM_BFM_AD5_H
+#define MAME_BFM_BFM_AD5_H
 
 #pragma once
 
-#include "cpu/m68000/m68000.h"
+#include "cpu/m68000/mcf5206e.h"
 
 
 class adder5_state : public driver_device
@@ -21,7 +21,7 @@ public:
 
 protected:
 	INTERRUPT_GEN_MEMBER(ad5_fake_timer_int);
-	void ad5_map(address_map &map);
+	void ad5_map(address_map &map) ATTR_COLD;
 
 private:
 	// devices
@@ -30,4 +30,4 @@ private:
 
 INPUT_PORTS_EXTERN( bfm_ad5 );
 
-#endif // MAME_INCLUDES_BFM_AD5_H
+#endif // MAME_BFM_BFM_AD5_H

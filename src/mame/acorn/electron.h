@@ -9,8 +9,8 @@
  * Driver by Wilbert Pol
  *
  ****************************************************************************/
-#ifndef MAME_INCLUDES_ELECTRON_H
-#define MAME_INCLUDES_ELECTRON_H
+#ifndef MAME_ACORN_ELECTRON_H
+#define MAME_ACORN_ELECTRON_H
 
 #pragma once
 
@@ -92,13 +92,13 @@ protected:
 	inline void electron_plot_pixel(bitmap_ind16 &bitmap, int x, int y, uint32_t color);
 	void electron_interrupt_handler(int mode, int interrupt);
 
-	void electron_mem(address_map &map);
+	void electron_mem(address_map &map) ATTR_COLD;
 
-	void electron64_opcodes(address_map &map);
+	void electron64_opcodes(address_map &map) ATTR_COLD;
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<input_merger_device> m_irqs;
@@ -169,7 +169,7 @@ protected:
 	virtual uint8_t electron_fred_r(offs_t offset) override;
 	virtual void electron_fred_w(offs_t offset, uint8_t data) override;
 
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	required_memory_region m_region_sp64;
@@ -181,10 +181,10 @@ private:
 	uint8_t m_sp64_bank = 0;
 	std::unique_ptr<uint8_t[]> m_sp64_ram;
 
-	image_init_result load_rom(device_image_interface &image, generic_slot_device *slot);
+	std::pair<std::error_condition, std::string> load_rom(device_image_interface &image, generic_slot_device *slot);
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(rom1_load) { return load_rom(image, m_romi[0]); }
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(rom2_load) { return load_rom(image, m_romi[1]); }
 };
 
 
-#endif // MAME_INCLUDES_ELECTRON_H
+#endif // MAME_ACORN_ELECTRON_H

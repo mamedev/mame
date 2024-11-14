@@ -9,12 +9,11 @@
 #include "emu.h"
 #include "wd1010.h"
 
-//#define LOG_GENERAL (1U <<  0)
-#define LOG_CMD     (1U <<  1)
-#define LOG_INT     (1U <<  2)
-#define LOG_SEEK    (1U <<  3)
-#define LOG_REGS    (1U <<  4)
-#define LOG_DATA    (1U <<  5)
+#define LOG_CMD     (1U << 1)
+#define LOG_INT     (1U << 2)
+#define LOG_SEEK    (1U << 3)
+#define LOG_REGS    (1U << 4)
+#define LOG_DATA    (1U << 5)
 
 #define VERBOSE  (LOG_CMD | LOG_INT | LOG_SEEK | LOG_REGS | LOG_DATA)
 //#define LOG_OUTPUT_STREAM std::cout
@@ -51,7 +50,7 @@ wd1010_device::wd1010_device(const machine_config &mconfig, const char *tag, dev
 	m_out_bcr_cb(*this),
 	m_out_dirin_cb(*this),
 	m_out_wg_cb(*this),
-	m_in_data_cb(*this),
+	m_in_data_cb(*this, 0),
 	m_out_data_cb(*this),
 	m_intrq(0),
 	m_brdy(0),
@@ -84,16 +83,6 @@ void wd1010_device::device_start()
 		m_drives[i].cylinder = 0;
 		m_drives[i].sector = 0;
 	}
-
-	// resolve callbacks
-	m_out_intrq_cb.resolve_safe();
-	m_out_bdrq_cb.resolve_safe();
-	m_out_bcs_cb.resolve_safe();
-	m_out_bcr_cb.resolve_safe();
-	m_out_dirin_cb.resolve_safe();
-	m_out_wg_cb.resolve_safe();
-	m_in_data_cb.resolve_safe(0);
-	m_out_data_cb.resolve_safe();
 
 	// allocate timer
 	m_seek_timer = timer_alloc(FUNC(wd1010_device::update_seek), this);
@@ -305,7 +294,7 @@ void wd1010_device::end_command()
 
 int wd1010_device::get_lbasector()
 {
-	hard_disk_file *file = m_drives[drive()].drive->get_hard_disk_file();
+	harddisk_image_device *file = m_drives[drive()].drive;
 	const auto &info = file->get_info();
 	int lbasector;
 
@@ -537,7 +526,7 @@ void wd1010_device::cmd_read_sector()
 		}
 	}
 
-	hard_disk_file *file = m_drives[drive()].drive->get_hard_disk_file();
+	harddisk_image_device *file = m_drives[drive()].drive;
 	const auto &info = file->get_info();
 
 	// verify that we can read
@@ -605,7 +594,7 @@ void wd1010_device::cmd_write_sector()
 		return;
 	}
 
-	hard_disk_file *file = m_drives[drive()].drive->get_hard_disk_file();
+	harddisk_image_device *file = m_drives[drive()].drive;
 	uint8_t buffer[512];
 
 	set_bdrq(0);

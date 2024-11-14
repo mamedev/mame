@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Ryan Holtz, David Haywood
-#ifndef MAME_INCLUDES_SPG2XX_H
-#define MAME_INCLUDES_SPG2XX_H
+#ifndef MAME_TVGAMES_SPG2XX_H
+#define MAME_TVGAMES_SPG2XX_H
 
 #pragma once
 
@@ -36,6 +36,7 @@ public:
 	void spg2xx_base(machine_config &config);
 	void spg2xx(machine_config &config);
 	void spg2xx_pal(machine_config &config);
+	void spg28x(machine_config &config);
 
 	void rad_skat(machine_config &config);
 	void rad_skatp(machine_config &config);
@@ -53,8 +54,8 @@ public:
 	void init_itvphone();
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	void decrypt_ac_ff(uint16_t* ROM, int size);
 
@@ -78,9 +79,9 @@ protected:
 	optional_memory_bank m_bank;
 
 
-	virtual void mem_map_4m(address_map &map);
-	virtual void mem_map_2m(address_map &map);
-	virtual void mem_map_1m(address_map &map);
+	virtual void mem_map_4m(address_map &map) ATTR_COLD;
+	virtual void mem_map_2m(address_map &map) ATTR_COLD;
+	virtual void mem_map_1m(address_map &map) ATTR_COLD;
 
 	uint32_t m_current_bank;
 
@@ -216,8 +217,8 @@ public:
 	void gssytts(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	virtual void portc_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0) override;
 
@@ -225,7 +226,7 @@ protected:
 
 private:
 
-	void mem_map_upperbank(address_map& map);
+	void mem_map_upperbank(address_map &map) ATTR_COLD;
 };
 
 class spg2xx_game_senwfit_state : public spg2xx_game_gssytts_state
@@ -269,8 +270,8 @@ public:
 
 	void fordrace(machine_config &config);
 
-	DECLARE_CUSTOM_INPUT_MEMBER(wheel_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(wheel2_r);
+	ioport_value wheel_r();
+	ioport_value wheel2_r();
 
 private:
 };
@@ -287,15 +288,33 @@ public:
 	void wfcentro(machine_config &config);
 
 protected:
-//  virtual void machine_start() override;
-//  virtual void machine_reset() override;
+//  virtual void machine_start() override ATTR_COLD;
+//  virtual void machine_reset() override ATTR_COLD;
 
 //  virtual void portc_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0) override;
 
 private:
 
-	void mem_map_wfcentro(address_map& map);
+	void mem_map_wfcentro(address_map &map) ATTR_COLD;
 };
+
+
+class spg2xx_game_lexiart_state : public spg2xx_game_state
+{
+public:
+	spg2xx_game_lexiart_state(const machine_config &mconfig, device_type type, const char *tag) :
+		spg2xx_game_state(mconfig, type, tag)
+	{ }
+
+	void lexiart(machine_config &config);
+
+protected:
+
+private:
+
+	void mem_map_lexiart(address_map &map) ATTR_COLD;
+};
+
 
 class spg2xx_game_ordentv_state : public spg2xx_game_state
 {
@@ -307,6 +326,7 @@ public:
 	void ordentv(machine_config &config);
 
 	void init_ordentv();
+	void init_jeuint();
 
 protected:
 
@@ -346,6 +366,7 @@ public:
 	{ }
 
 	void doraphone(machine_config &config);
+	void doraphonep(machine_config &config);
 
 private:
 	uint16_t porta_r(offs_t offset, uint16_t mem_mask = ~0);
@@ -356,6 +377,18 @@ private:
 	required_ioport_array<6> m_io_p1_rows;
 };
 
+class spg2xx_game_ddr33v_state : public spg2xx_game_state
+{
+public:
+	spg2xx_game_ddr33v_state(const machine_config &mconfig, device_type type, const char *tag) :
+		spg2xx_game_state(mconfig, type, tag)
+	{ }
+
+	void init_ddr33v();
+
+protected:
+private:
+};
 
 
-#endif // MAME_INCLUDES_SPG2XX_H
+#endif // MAME_TVGAMES_SPG2XX_H

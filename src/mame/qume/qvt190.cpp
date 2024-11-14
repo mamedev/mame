@@ -26,6 +26,9 @@
 #include "emupal.h"
 #include "screen.h"
 
+
+namespace {
+
 class qvt190_state : public driver_device
 {
 public:
@@ -42,7 +45,7 @@ public:
 private:
 	MC6845_UPDATE_ROW(update_row);
 
-	void qvt190_mem_map(address_map &map);
+	void qvt190_mem_map(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<palette_device> m_palette;
@@ -145,5 +148,8 @@ ROM_START( qvt190 )
 	ROM_REGION(0x2000, "chargen", 0)
 	ROM_LOAD( "95864-304.u17", 0x0000, 0x2000, CRC(2792e99b) SHA1(4a84d029d0e63975fc95dc7056d2523193dff986) )
 ROM_END
+
+} // anonymous namespace
+
 
 COMP( 1987, qvt190, 0, 0, qvt190, qvt190, qvt190_state, empty_init, "Qume", "QVT-190", MACHINE_IS_SKELETON )

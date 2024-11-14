@@ -139,17 +139,17 @@ void mermaid_state::mermaid_ay8910_control_port_w(uint8_t data)
 }
 
 
-WRITE_LINE_MEMBER(mermaid_state::ay1_enable_w)
+void mermaid_state::ay1_enable_w(int state)
 {
 	m_ay8910_enable[0] = state;
 }
 
-WRITE_LINE_MEMBER(mermaid_state::ay2_enable_w)
+void mermaid_state::ay2_enable_w(int state)
 {
 	m_ay8910_enable[1] = state;
 }
 
-WRITE_LINE_MEMBER(mermaid_state::nmi_mask_w)
+void mermaid_state::nmi_mask_w(int state)
 {
 	m_nmi_mask = state;
 	if (!m_nmi_mask)
@@ -179,19 +179,19 @@ void mermaid_state::mermaid_map(address_map &map)
 	map(0xf807, 0xf807).w(FUNC(mermaid_state::mermaid_ay8910_control_port_w));
 }
 
-WRITE_LINE_MEMBER(mermaid_state::rougien_sample_rom_lo_w)
+void mermaid_state::rougien_sample_rom_lo_w(int state)
 {
 	m_adpcm_rom_sel = state | (m_adpcm_rom_sel & 2);
 	m_adpcm_counter->set_rom_bank(m_adpcm_rom_sel);
 }
 
-WRITE_LINE_MEMBER(mermaid_state::rougien_sample_rom_hi_w)
+void mermaid_state::rougien_sample_rom_hi_w(int state)
 {
 	m_adpcm_rom_sel = (state <<1) | (m_adpcm_rom_sel & 1);
 	m_adpcm_counter->set_rom_bank(m_adpcm_rom_sel);
 }
 
-WRITE_LINE_MEMBER(mermaid_state::rougien_sample_playback_w)
+void mermaid_state::rougien_sample_playback_w(int state)
 {
 	if (state)
 	{
@@ -408,7 +408,7 @@ void mermaid_state::adpcm_data_w(uint8_t data)
 	m_adpcm->data_w(m_adpcm_trigger ? (data & 0x0f) : (data & 0xf0) >> 4);
 }
 
-WRITE_LINE_MEMBER(mermaid_state::rougien_adpcm_int)
+void mermaid_state::rougien_adpcm_int(int state)
 {
 	if (!state)
 		return;
@@ -436,8 +436,8 @@ void mermaid_state::mermaid(machine_config &config)
 	m_latch[0]->q_out_cb<2>().set([this](int state){ logerror("02 = %d\n", state); }); // plays sample
 	m_latch[0]->q_out_cb<3>().set([this](int state){ logerror("03 = %d\n", state); }); // ???
 	m_latch[0]->q_out_cb<4>().set([this](int state){ logerror("04 = %d\n", state); }); // ???
-	m_latch[0]->q_out_cb<5>().set(FUNC(mermaid_state::flip_screen_x_w));
-	m_latch[0]->q_out_cb<6>().set(FUNC(mermaid_state::flip_screen_y_w));
+	m_latch[0]->q_out_cb<5>().set(FUNC(mermaid_state::flip_screen_x_set));
+	m_latch[0]->q_out_cb<6>().set(FUNC(mermaid_state::flip_screen_y_set));
 	m_latch[0]->q_out_cb<7>().set(FUNC(mermaid_state::nmi_mask_w));
 
 	LS259(config, m_latch[1]);

@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:smf
-#ifndef MAME_MACHINE_K573DIO_H
-#define MAME_MACHINE_K573DIO_H
+#ifndef MAME_KONAMI_K573DIO_H
+#define MAME_KONAMI_K573DIO_H
 
 #pragma once
 
@@ -15,7 +15,7 @@ public:
 
 	auto output_callback() { return output_cb.bind(); }
 
-	void amap(address_map &map);
+	void amap(address_map &map) ATTR_COLD;
 	void set_ddrsbm_fpga(bool flag) { is_ddrsbm_fpga = flag; }
 
 	uint16_t a00_r();
@@ -71,10 +71,10 @@ public:
 	void network_id_w(uint16_t data);
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
-	virtual const tiny_rom_entry *device_rom_region() const override;
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 private:
 	memory_share_creator<uint16_t> ram;
@@ -96,4 +96,4 @@ private:
 
 DECLARE_DEVICE_TYPE(KONAMI_573_DIGITAL_IO_BOARD, k573dio_device)
 
-#endif // MAME_MACHINE_K573DIO_H
+#endif // MAME_KONAMI_K573DIO_H

@@ -91,8 +91,8 @@ static constexpr s32 clip18(int x) { return std::clamp(x, -131072, 131071); }
 #define DISDL(slot)     ((slot->udata.data[0x24 / 2] >> 0x8) & 0x000F)
 #define DIPAN(slot)     (MONO() ? 0 : ((slot->udata.data[0x24 / 2] >> 0x0) & 0x001F))
 
-#define EFSDL(slot)     ((m_EFSPAN[slot * 4] >> 8) & 0x000f)
-#define EFPAN(slot)     (MONO() ? 0 : ((m_EFSPAN[slot * 4] >> 0) & 0x001f))
+#define EFSDL(slot)     ((m_EFSPAN[slot] >> 8) & 0x000f)
+#define EFPAN(slot)     (MONO() ? 0 : ((m_EFSPAN[slot] >> 0) & 0x001f))
 
 //Unimplemented
 #define Q(slot)         ((slot->udata.data[0x28 / 2] >> 0x0) & 0x001F) // (0.75 × register value - 3)
@@ -436,8 +436,6 @@ void aica_device::StopSlot(AICA_SLOT *slot,int keyoff)
 
 void aica_device::Init()
 {
-	int i;
-
 	m_IrqTimA = m_IrqTimBC = m_IrqMidi = 0;
 	m_MidiR = m_MidiW = 0;
 	m_MidiOutR = m_MidiOutW = 0;
@@ -448,14 +446,14 @@ void aica_device::Init()
 	m_timerB = timer_alloc(FUNC(aica_device::timerB_cb), this);
 	m_timerC = timer_alloc(FUNC(aica_device::timerC_cb), this);
 
-	for (i = 0; i < 0x400; ++i)
+	for (int i = 0; i < 0x400; ++i)
 	{
 		float envDB = ((float)(3 * (i - 0x3ff))) / 32.0f;
 		float scale = (float)(1 << SHIFT);
 		m_EG_TABLE[i] = (s32)(powf(10.0f, envDB / 20.0f) * scale);
 	}
 
-	for (i = 0; i < 0x20000; ++i)
+	for (int i = 0; i < 0x20000; ++i)
 	{
 		int iTL  = (i >> 0x0) & 0xff;
 		int iPAN = (i >> 0x8) & 0x1f;
@@ -507,7 +505,7 @@ void aica_device::Init()
 
 	m_ARTABLE[0] = m_DRTABLE[0] = 0;    //Infinite time
 	m_ARTABLE[1] = m_DRTABLE[1] = 0;    //Infinite time
-	for (i=2; i < 64; ++i)
+	for (int i=2; i < 64; ++i)
 	{
 		double step,scale;
 		double t = ARTimes[i];   //In ms
@@ -528,7 +526,7 @@ void aica_device::Init()
 	ClockChange();
 
 	// make sure all the slots are off
-	for (i = 0; i < 64; ++i)
+	for (int i = 0; i < 64; ++i)
 	{
 		m_Slots[i].slot = i;
 		m_Slots[i].active = 0;
@@ -662,7 +660,7 @@ void aica_device::UpdateReg(int reg)
 
 		case 0x90:
 		case 0x91:
-			if (!m_irq_cb.isnull())
+			if (!m_irq_cb.isunset())
 			{
 				u32 time;
 
@@ -681,7 +679,7 @@ void aica_device::UpdateReg(int reg)
 			break;
 		case 0x94:
 		case 0x95:
-			if (!m_irq_cb.isnull())
+			if (!m_irq_cb.isunset())
 			{
 				u32 time;
 
@@ -700,7 +698,7 @@ void aica_device::UpdateReg(int reg)
 			break;
 		case 0x98:
 		case 0x99:
-			if (!m_irq_cb.isnull())
+			if (!m_irq_cb.isunset())
 			{
 				u32 time;
 
@@ -727,7 +725,7 @@ void aica_device::UpdateReg(int reg)
 		case 0xa4:  //SCIRE
 		case 0xa5:
 
-			if (!m_irq_cb.isnull())
+			if (!m_irq_cb.isunset())
 			{
 				m_udata.data[0xa0 / 2] &= ~m_udata.data[0xa4 / 2];
 				ResetInterrupts();
@@ -754,7 +752,7 @@ void aica_device::UpdateReg(int reg)
 		case 0xad:
 		case 0xb0:
 		case 0xb1:
-			if (!m_irq_cb.isnull())
+			if (!m_irq_cb.isunset())
 			{
 				m_IrqTimA = DecodeSCI(SCITMA);
 				m_IrqTimBC = DecodeSCI(SCITMB);
@@ -874,7 +872,7 @@ void aica_device::w16(u32 addr,u16 val)
 		if (addr <= 0x2044)
 		{
 //          printf("%x to EFSxx slot %d (addr %x)\n", val, (addr - 0x2000)/4, addr & 0x7f);
-			m_EFSPAN[addr & 0x7f] = val;
+			m_EFSPAN[(addr & 0x7f) >> 2] = val;
 		}
 	}
 	else if (addr < 0x3000)
@@ -976,7 +974,7 @@ u16 aica_device::r16(u32 addr)
 	{
 		if (addr <= 0x2044)
 		{
-			v = m_EFSPAN[addr & 0x7f];
+			v = m_EFSPAN[(addr & 0x7f) >> 2];
 		}
 		else if (addr < 0x2800)
 		{
@@ -1300,6 +1298,7 @@ void aica_device::DoMasterSamples(std::vector<read_stream_view> const &inputs, w
 		}
 
 		bufl.put_int(s, smpl * m_LPANTABLE[MVOL() << 0xd], 32768 << SHIFT);
+		// TODO: diverges with SCSP, also wut?
 		bufr.put_int(s, smpr * m_LPANTABLE[MVOL() << 0xd], 32768 << SHIFT);
 	}
 }
@@ -1402,10 +1401,6 @@ void aica_device::device_start()
 
 	// init the emulation
 	Init();
-
-	// set up the IRQ callbacks
-	m_irq_cb.resolve_safe();
-	m_main_irq_cb.resolve_safe();
 
 	m_stream = stream_alloc(2, 2, (int)m_rate);
 
@@ -1557,7 +1552,6 @@ aica_device::aica_device(const machine_config &mconfig, const char *tag, device_
 	, m_MidiR(0)
 	, m_mcieb(0)
 	, m_mcipd(0)
-
 {
 	memset(&m_udata.data, 0, sizeof(m_udata.data));
 	std::fill(std::begin(m_EFSPAN), std::end(m_EFSPAN), 0);
@@ -1574,7 +1568,7 @@ aica_device::aica_device(const machine_config &mconfig, const char *tag, device_
 	std::fill(std::begin(m_ARTABLE), std::end(m_ARTABLE), 0);
 	std::fill(std::begin(m_DRTABLE), std::end(m_DRTABLE), 0);
 
-	memset(&m_DSP, 0, sizeof(m_DSP));
+	m_DSP.init();
 
 	std::fill(std::begin(m_EG_TABLE), std::end(m_EG_TABLE), 0);
 	std::fill(std::begin(m_PLFO_TRI), std::end(m_PLFO_TRI), 0);

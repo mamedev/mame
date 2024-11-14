@@ -35,19 +35,19 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 	// optional information overrides
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual const tiny_rom_entry *device_rom_region() const override;
-	virtual ioport_constructor device_input_ports() const override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 
 	virtual uint8_t read(offs_t offset, int inhrom, int inhram, int be) override;
 	virtual void write(offs_t offset, uint8_t data, int inhrom, int inhram, int be) override;
 
 private:
-	DECLARE_WRITE_LINE_MEMBER(bus_irq_w);
-	DECLARE_WRITE_LINE_MEMBER(vdu_irq_w);
+	void bus_irq_w(int state);
+	void vdu_irq_w(int state);
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
@@ -59,7 +59,7 @@ private:
 	required_device<palette_device> m_palette;
 	required_shared_ptr<uint8_t> m_videoram;
 
-	void vid8082_map(address_map &map);
+	void vid8082_map(address_map &map) ATTR_COLD;
 };
 
 

@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<!--
+license:CC0-1.0
+authors:hap
+-->
+<mamelayout version="2">
+
+	<element name="lcdm"><rect><color red="0.7" green="0.71" blue="0.72" /></rect></element>
+
+	<view name="LCD Pixel Aspect (~scr0nativexaspect~:~scr0nativeyaspect~)">
+		<screen index="0"><bounds left="0" top="0" right="~scr0width~" bottom="~scr0height~" /></screen>
+		<element ref="lcdm" blend="multiply"><bounds left="0" top="0" right="~scr0width~" bottom="~scr0height~" /></element>
+	</view>
+
+</mamelayout>

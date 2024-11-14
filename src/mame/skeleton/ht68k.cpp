@@ -36,6 +36,9 @@ Lot of infos available at: http://www.classiccmp.org/cini/ht68k.htm
 #include "machine/wd_fdc.h"
 #include "softlist_dev.h"
 
+
+namespace {
+
 class ht68k_state : public driver_device
 {
 public:
@@ -56,11 +59,11 @@ private:
 	required_device<wd1770_device> m_fdc;
 	required_device_array<floppy_connector, 4> m_floppy;
 
-	DECLARE_WRITE_LINE_MEMBER(duart_txb);
+	void duart_txb(int state);
 	void duart_output(uint8_t data);
 	required_shared_ptr<uint16_t> m_ram;
-	void machine_reset() override;
-	void mem_map(address_map &map);
+	void machine_reset() override ATTR_COLD;
+	void mem_map(address_map &map) ATTR_COLD;
 };
 
 
@@ -90,7 +93,7 @@ void ht68k_state::machine_reset()
 	m_fdc->dden_w(0);
 }
 
-WRITE_LINE_MEMBER(ht68k_state::duart_txb)
+void ht68k_state::duart_txb(int state)
 {
 	//This is the second serial channel named AUX, for modem or other serial devices.
 }
@@ -155,6 +158,9 @@ ROM_START( ht68k )
 	ROM_LOAD16_BYTE( "ht68k-u4.bin", 0x0001, 0x4000, CRC(3fbcdd0a) SHA1(45fcbbf920dc1e9eada3b7b0a55f5720d08ffdd5))
 	ROM_LOAD16_BYTE( "ht68k-u3.bin", 0x0000, 0x4000, CRC(1d85d101) SHA1(8ba01e1595b0b3c4fb128a4a50242f3588b89c43))
 ROM_END
+
+} // anonymous namespace
+
 
 /* Driver */
 

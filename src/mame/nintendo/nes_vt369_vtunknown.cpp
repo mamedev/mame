@@ -26,6 +26,9 @@
 #include "nes_vt369_vtunknown_soc.h"
 #include "nes_vt32_soc.h"
 
+
+namespace {
+
 class nes_vt369_vtunknown_base_state : public driver_device
 {
 public:
@@ -39,14 +42,14 @@ public:
 	{ }
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	virtual uint8_t in0_r();
 	virtual uint8_t in1_r();
 	virtual void in0_w(uint8_t data);
 
-	void nes_vt369_vtunknown_map(address_map& map);
+	void nes_vt369_vtunknown_map(address_map &map) ATTR_COLD;
 
 	optional_ioport m_io0;
 	optional_ioport m_io1;
@@ -67,7 +70,7 @@ protected:
 	required_region_ptr<uint8_t> m_prgrom;
 
 	uint8_t vt_rom_r(offs_t offset);
-	void vtspace_w(offs_t offset, uint8_t data);
+	[[maybe_unused]] void vtspace_w(offs_t offset, uint8_t data);
 
 	void configure_soc(nes_vt02_vt03_soc_device* soc);
 
@@ -91,13 +94,13 @@ public:
 	void nes_vt369_vtunknown_4k_ram(machine_config& config);
 	void nes_vt369_vtunknown_4k_ram_16mb(machine_config& config);
 
-	void vt_external_space_map_32mbyte(address_map& map);
-	void vt_external_space_map_16mbyte(address_map& map);
-	void vt_external_space_map_8mbyte(address_map& map);
-	void vt_external_space_map_4mbyte(address_map& map);
-	void vt_external_space_map_2mbyte(address_map& map);
-	void vt_external_space_map_1mbyte(address_map& map);
-	void vt_external_space_map_512kbyte(address_map& map);
+	void vt_external_space_map_32mbyte(address_map &map) ATTR_COLD;
+	void vt_external_space_map_16mbyte(address_map &map) ATTR_COLD;
+	void vt_external_space_map_8mbyte(address_map &map) ATTR_COLD;
+	void vt_external_space_map_4mbyte(address_map &map) ATTR_COLD;
+	[[maybe_unused]] void vt_external_space_map_2mbyte(address_map &map) ATTR_COLD;
+	void vt_external_space_map_1mbyte(address_map &map) ATTR_COLD;
+	[[maybe_unused]] void vt_external_space_map_512kbyte(address_map &map) ATTR_COLD;
 
 	void init_lxcmcypp();
 
@@ -117,7 +120,7 @@ public:
 	void nes_vt369_vtunknown_bt(machine_config& config);
 	void nes_vt369_vtunknown_bt_2x16mb(machine_config& config);
 
-	void vt_external_space_map_bitboy_2x16mbyte(address_map& map);
+	void vt_external_space_map_bitboy_2x16mbyte(address_map &map) ATTR_COLD;
 
 private:
 
@@ -138,11 +141,11 @@ public:
 	void nes_vt369_vtunknown_fa_4x16mb(machine_config& config);
 
 protected:
-	virtual void machine_reset() override;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	uint8_t vt_rom_banked_r(offs_t offset);
-	void vt_external_space_map_fapocket_4x16mbyte(address_map& map);
+	void vt_external_space_map_fapocket_4x16mbyte(address_map &map) ATTR_COLD;
 
 	uint8_t fapocket_412c_r();
 	void fapocket_412c_w(uint8_t data);
@@ -174,7 +177,7 @@ public:
 
 private:
 	uint8_t vt_rom_banked_r(offs_t offset);
-	void vt_external_space_map_fp_2x32mbyte(address_map& map);
+	[[maybe_unused]] void vt_external_space_map_fp_2x32mbyte(address_map &map) ATTR_COLD;
 };
 
 uint8_t nes_vt369_vtunknown_base_state::vt_rom_r(offs_t offset)
@@ -703,6 +706,27 @@ ROM_START( mc_hh210 )
 	ROM_LOAD( "msp55lv128t.u4", 0x00000, 0x1000000, CRC(9ba520d4) SHA1(627f811b24314197e289a2ade668ff4115421bed) )
 ROM_END
 
+ROM_START( q5_500in1 )
+	ROM_REGION( 0x1000000, "mainrom", 0 )
+	ROM_LOAD( "s29gl128.u1", 0x00000, 0x1000000, CRC(de779dd7) SHA1(ac6d3fa6f18ceb795532ba9e85edffc040d74347) )
+ROM_END
+
+ROM_START( nubsupmf )
+	ROM_REGION( 0x400000, "mainrom", 0 )
+	ROM_LOAD( "w25q32fv.bin", 0x00000, 0x400000,  CRC(5ca234b2) SHA1(3eba3e690f68116fd3e5e914f8bd16b1dc2c0bc4) )
+ROM_END
+
+ROM_START( unk2019hh )
+	ROM_REGION( 0x1000000, "mainrom", 0 )
+	ROM_LOAD( "fgb2019.bin", 0x00000, 0x1000000, CRC(7ef130d5) SHA1(00f45974494707fdac78153b13d8cfb503716ad0) )
+ROM_END
+
+ROM_START( unk2020hh )
+	ROM_REGION( 0x1000000, "mainrom", 0 )
+	ROM_LOAD( "fgb2020.bin", 0x00000, 0x1000000, CRC(a685d943) SHA1(9b272daccd8fe244c910f031466a4fedd83d5236) )
+ROM_END
+
+
 ROM_START( dvnimbus )
 	ROM_REGION( 0x1000000, "mainrom", 0 )
 	ROM_LOAD( "2012-7-4-v1.bin", 0x00000, 0x1000000, CRC(a91d7aa6) SHA1(9421b70b281bb630752bc352c3715258044c0bbe) )
@@ -858,6 +882,13 @@ ROM_START( otrail )
 ROM_END
 
 
+
+
+ROM_START( hhgc319 )
+	ROM_REGION( 0x1000000, "mainrom", 0 )
+	ROM_LOAD( "s29gl128n10tfi01.u3", 0x000000, 0x1000000, CRC(4b51125f) SHA1(bab3981ae1652cf6620c7c6769a6729a1e4d588f) )
+ROM_END
+
 void nes_vt369_vtunknown_state::init_lxcmcypp()
 {
 	int size = memregion("mainrom")->bytes()/2;
@@ -868,6 +899,9 @@ void nes_vt369_vtunknown_state::init_lxcmcypp()
 		ROM[i] = bitswap<16>(ROM[i], 4, 5, 6, 7, 0, 1, 2, 3, 12, 13, 14, 15, 8, 9, 10, 11);
 	}
 }
+
+} // anonymous namespace
+
 
 // Runs well, only issues in SMB3 which crashes
 CONS( 2017, bittboy,    0,        0,  nes_vt369_vtunknown_bt_2x16mb, nes_vt369_vtunknown, nes_vt369_vtunknown_cy_state, empty_init, "BittBoy",   "BittBoy Mini FC 300 in 1", MACHINE_IMPERFECT_GRAPHICS ) // has external banking (2x 16mbyte banks)
@@ -961,6 +995,20 @@ CONS( 200?, gcs2mgp,   0,  0,  nes_vt369_vtunknown_cy_bigger, nes_vt369_vtunknow
 // Several of the games contained in here are buggy / broken on real hardware (see https://www.youtube.com/watch?v=-mgGNaDQ1HE )
 CONS( 201?, 240in1ar,  0,  0,  nes_vt369_vtunknown_cy_bigger, nes_vt369_vtunknown, nes_vt369_vtunknown_cy_state, empty_init, "Thumbs Up", "Mini Arcade Machine (Thumbs Up, 240IN1ARC)", MACHINE_NOT_WORKING ) // 128Mbyte ROM, must be externally banked or different addressing scheme
 
+// is one of these bad? where do they fit? the former boots, but banking is wrong (incorrect games selected, gfx corruption) the 2nd looks encrypted or bad
+CONS( 2019, unk2019hh,  0,        0,  nes_vt369_vtunknown_hh_8mb, nes_vt369_vtunknown, nes_vt369_vtunknown_unk_state, empty_init, "<unknown>", "unknown VTxx based GameBoy style handheld (2019 PCB)", MACHINE_NOT_WORKING )
+CONS( 2020, unk2020hh,  unk2019hh,0,  nes_vt369_vtunknown_hh_8mb, nes_vt369_vtunknown, nes_vt369_vtunknown_unk_state, empty_init, "<unknown>", "unknown VTxx based GameBoy style handheld (2020 PCB)", MACHINE_NOT_WORKING )
+
+
+/*****************************************************************************
+* below are VT369? games that use flash ROM
+*****************************************************************************/
+
+// portable fan + famiclone combo handheld
+CONS( 2020, nubsupmf,   0,      0,  nes_vt369_vtunknown_hh_4mb, nes_vt369_vtunknown, nes_vt369_vtunknown_unk_state, empty_init, "<unknown>", "NubSup Mini Game Fan", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
+
+// unknown tech level, might be scrambled as default codebank/boot vectors don't seem valid
+CONS( 201?, hhgc319,  0,        0,  nes_vt369_vtunknown_hh_16mb, nes_vt369_vtunknown, nes_vt369_vtunknown_unk_state, empty_init, "<unknown>", "Handheld Game Console 319-in-1", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
 
 /*****************************************************************************
 * below are VT369 games that use BGA on sub
@@ -972,6 +1020,9 @@ CONS( 201?, retro400,  0,        0,  nes_vt369_vtunknown_hh_16mb, nes_vt369_vtun
 /*****************************************************************************
 * below are VT369 games that use SQI / SPI ROM
 *****************************************************************************/
+
+// doesn't boot
+CONS( 201?, q5_500in1,  0,        0,  nes_vt369_vtunknown_hh_8mb, nes_vt369_vtunknown, nes_vt369_vtunknown_unk_state, empty_init, "<unknown>", "Q5 500 in 1 Handheld", MACHINE_NOT_WORKING )
 
 // Runs well, minor GFX issues in intro
 CONS( 2017, sy889,      0,        0,  nes_vt369_vtunknown_hh_8mb, nes_vt369_vtunknown, nes_vt369_vtunknown_unk_state, empty_init, "SY Corp",   "SY-889 300 in 1 Handheld", MACHINE_IMPERFECT_GRAPHICS )

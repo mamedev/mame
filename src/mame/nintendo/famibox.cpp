@@ -62,9 +62,11 @@ Notes/ToDo:
 ***************************************************************************/
 
 #include "emu.h"
-#include "video/ppu2c0x.h"
-#include "cpu/m6502/n2a03.h"
+
 #include "bus/nes_ctrl/ctrl.h"
+#include "cpu/m6502/rp2a03.h"
+#include "video/ppu2c0x.h"
+
 #include "debugger.h"
 #include "screen.h"
 #include "speaker.h"
@@ -89,16 +91,16 @@ public:
 	void init_famibox();
 	void init_famistat();
 
-	DECLARE_READ_LINE_MEMBER(coin_r);
+	int coin_r();
 	DECLARE_INPUT_CHANGED_MEMBER(famibox_keyswitch_changed);
 	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
-	required_device<n2a03_device> m_maincpu;
+	required_device<rp2a03_device> m_maincpu;
 	required_device<ppu2c0x_device> m_ppu;
 	required_device<screen_device> m_screen;
 	optional_device_array<nes_control_port_device, 3> m_ctrl;
@@ -124,7 +126,6 @@ private:
 	uint8_t       m_money_reg = 0;
 
 	void set_mirroring(int mirroring);
-	void sprite_dma_w(address_space &space, uint8_t data);
 	uint8_t famibox_IN0_r();
 	uint8_t famibox_IN1_r();
 	void famibox_IN0_w(uint8_t data);
@@ -134,8 +135,8 @@ private:
 	TIMER_CALLBACK_MEMBER(famicombox_gameplay_timer_callback);
 	void famibox_cartswitch(u8 data);
 	void famibox_reset();
-	void famibox_map(address_map &map);
-	void famibox_ppu_map(address_map &map);
+	void famibox_map(address_map &map) ATTR_COLD;
+	void famibox_ppu_map(address_map &map) ATTR_COLD;
 };
 
 /******************************************************
@@ -167,19 +168,6 @@ void famibox_state::set_mirroring(int mirroring)
 			break;
 	}
 }
-
-/******************************************************
-
-   NES interface
-
-*******************************************************/
-
-void famibox_state::sprite_dma_w(address_space &space, uint8_t data)
-{
-	int source = data & 7;
-	m_ppu->spriteram_dma(space, source);
-}
-
 
 /******************************************************
 
@@ -394,7 +382,7 @@ void famibox_state::famibox_map(address_map &map)
 {
 	map(0x0000, 0x1fff).ram();
 	map(0x2000, 0x3fff).rw(m_ppu, FUNC(ppu2c0x_device::read), FUNC(ppu2c0x_device::write));
-	map(0x4014, 0x4014).w(FUNC(famibox_state::sprite_dma_w));
+	map(0x4014, 0x4014).w(m_ppu, FUNC(ppu2c0x_device::spriteram_dma));
 	map(0x4016, 0x4016).rw(FUNC(famibox_state::famibox_IN0_r), FUNC(famibox_state::famibox_IN0_w)); // IN0 - input port 1
 	map(0x4017, 0x4017).r(FUNC(famibox_state::famibox_IN1_r));     // IN1 - input port 2 / PSG second control register
 	map(0x5000, 0x5fff).rw(FUNC(famibox_state::famibox_system_r), FUNC(famibox_state::famibox_system_w));
@@ -446,7 +434,7 @@ INPUT_CHANGED_MEMBER(famibox_state::coin_inserted)
 	}
 }
 
-READ_LINE_MEMBER(famibox_state::coin_r)
+int famibox_state::coin_r()
 {
 	return m_coins > 0;
 }
@@ -477,17 +465,17 @@ static INPUT_PORTS_START( famibox )
 	PORT_DIPSETTING(    0xc0, "FREEPLAY" )
 
 	PORT_START("KEYSWITCH")
-	PORT_DIPNAME( 0x3f, 0x01, "Key switch" ) PORT_CHANGED_MEMBER(DEVICE_SELF, famibox_state, famibox_keyswitch_changed, 0)
+	PORT_DIPNAME( 0x3f, 0x01, "Key switch" ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(famibox_state::famibox_keyswitch_changed), 0)
 	PORT_DIPSETTING(    0x20, "Game Count" )
 	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( Free_Play ) )
 	PORT_DIPSETTING(    0x08, "Self Test" )
 	PORT_DIPSETTING(    0x10, DEF_STR( Unused ) )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(famibox_state, coin_r)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(famibox_state::coin_r))
 
 	PORT_START("COIN")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, famibox_state, coin_inserted, 0)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(famibox_state::coin_inserted), 0)
 INPUT_PORTS_END
 
 /******************************************************
@@ -523,7 +511,7 @@ void famibox_state::machine_start()
 void famibox_state::famibox(machine_config &config)
 {
 	// basic machine hardware
-	N2A03(config, m_maincpu, NTSC_APU_CLOCK);
+	RP2A03G(config, m_maincpu, NTSC_APU_CLOCK);
 	m_maincpu->set_addrmap(AS_PROGRAM, &famibox_state::famibox_map);
 
 	// video hardware

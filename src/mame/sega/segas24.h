@@ -4,8 +4,8 @@
  * Sega System 24
  *
  */
-#ifndef MAME_INCLUDES_SEGAS24_H
-#define MAME_INCLUDES_SEGAS24_H
+#ifndef MAME_SEGA_SEGAS24_H
+#define MAME_SEGA_SEGAS24_H
 
 #pragma once
 
@@ -132,7 +132,7 @@ private:
 	required_device<segas24_sprite_device> m_vsprite;
 	required_device<segas24_mixer_device> m_vmixer;
 
-	DECLARE_WRITE_LINE_MEMBER(irq_ym);
+	void irq_ym(int state);
 	uint16_t paletteram_r(offs_t offset);
 	void paletteram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	uint16_t irq_r(offs_t offset);
@@ -166,9 +166,9 @@ private:
 	void irq_init();
 	void irq_timer_sync();
 	void irq_timer_start(int old_tmode);
-	WRITE_LINE_MEMBER(cnt1);
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	void cnt1(int state);
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(irq_timer_cb);
 	TIMER_DEVICE_CALLBACK_MEMBER(irq_timer_clear_cb);
@@ -184,21 +184,21 @@ private:
 	optional_ioport m_paddle;
 	optional_ioport_array<8> m_mj_inputs;
 
-	void common_map(address_map &map);
-	void cpu1_map(address_map &map);
-	void cpu2_map(address_map &map);
-	void decrypted_opcodes_map(address_map &map);
-	void hotrod_common_map(address_map &map);
-	void hotrod_cpu1_map(address_map &map);
-	void hotrod_cpu2_map(address_map &map);
-	void rombd_common_map(address_map &map);
-	void rombd_cpu1_map(address_map &map);
-	void rombd_cpu2_map(address_map &map);
-	void roughrac_common_map(address_map &map);
-	void roughrac_cpu1_map(address_map &map);
-	void roughrac_cpu2_map(address_map &map);
-	void dcclubj_cpu1_map(address_map &map);
-	void dcclubj_cpu2_map(address_map &map);
+	void common_map(address_map &map) ATTR_COLD;
+	void cpu1_map(address_map &map) ATTR_COLD;
+	void cpu2_map(address_map &map) ATTR_COLD;
+	void decrypted_opcodes_map(address_map &map) ATTR_COLD;
+	void hotrod_common_map(address_map &map) ATTR_COLD;
+	void hotrod_cpu1_map(address_map &map) ATTR_COLD;
+	void hotrod_cpu2_map(address_map &map) ATTR_COLD;
+	void rombd_common_map(address_map &map) ATTR_COLD;
+	void rombd_cpu1_map(address_map &map) ATTR_COLD;
+	void rombd_cpu2_map(address_map &map) ATTR_COLD;
+	void roughrac_common_map(address_map &map) ATTR_COLD;
+	void roughrac_cpu1_map(address_map &map) ATTR_COLD;
+	void roughrac_cpu2_map(address_map &map) ATTR_COLD;
+	void dcclubj_cpu1_map(address_map &map) ATTR_COLD;
+	void dcclubj_cpu2_map(address_map &map) ATTR_COLD;
 };
 
-#endif // MAME_INCLUDES_SEGAS24_H
+#endif // MAME_SEGA_SEGAS24_H

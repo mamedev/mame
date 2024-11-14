@@ -8,8 +8,8 @@
 
  ****************************************************************************/
 
-#ifndef MAME_INCLUDES_NES_H
-#define MAME_INCLUDES_NES_H
+#ifndef MAME_NINTENDO_NES_H
+#define MAME_NINTENDO_NES_H
 
 #pragma once
 
@@ -64,11 +64,10 @@ public:
 	uint8_t fc_in0_r();
 	uint8_t fc_in1_r();
 	void fc_in0_w(uint8_t data);
-	void nes_vh_sprite_dma_w(address_space &space, uint8_t data);
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
-	virtual void video_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
+	virtual void video_reset() override ATTR_COLD;
 	uint32_t screen_update_nes(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void screen_vblank_nes(int state);
 
@@ -79,17 +78,21 @@ public:
 	DECLARE_MACHINE_START(famitwin);
 	DECLARE_MACHINE_RESET(fds);
 	DECLARE_MACHINE_RESET(famitwin);
+	DECLARE_MACHINE_RESET(famitvc1);
 	void setup_disk(nes_disksys_device *slot);
 
 	void suborkbd(machine_config &config);
 	void famipalc(machine_config &config);
 	void famicom(machine_config &config);
+	void famicomo(machine_config &config);
+	void famitvc1(machine_config &config);
 	void famitwin(machine_config &config);
+	void fctitler(machine_config &config);
 	void nespal(machine_config &config);
 	void nespalc(machine_config &config);
 	void nes(machine_config &config);
 	void fds(machine_config &config);
-	void nes_map(address_map &map);
+	void nes_map(address_map &map) ATTR_COLD;
 
 private:
 	// video-related
@@ -111,4 +114,4 @@ private:
 	memory_bank_array_creator<4> m_prg_bank;
 };
 
-#endif // MAME_INCLUDES_NES_H
+#endif // MAME_NINTENDO_NES_H

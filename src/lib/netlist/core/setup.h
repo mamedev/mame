@@ -78,17 +78,40 @@ namespace netlist
 
 	namespace detail
 	{
-		// -----------------------------------------------------------------------------
-		// abstract_t
-		// -----------------------------------------------------------------------------
+		struct alias_t
+		{
+			alias_t(alias_type type, pstring alias, pstring references)
+			: m_type(type)
+			, m_alias(alias)
+			, m_references(references)
+			{}
 
+			alias_t(const alias_t &) = default;
+			alias_t &operator=(const alias_t &) = default;
+			alias_t(alias_t &&) noexcept = default;
+			alias_t &operator=(alias_t &&) noexcept = default;
+
+			pstring name() const { return m_alias; }
+			pstring references() const { return m_references; }
+			alias_type type() const { return m_type; }
+		private:
+			alias_type m_type;
+			pstring m_alias;
+			pstring m_references;
+		};
+
+		///
+		/// \brief class containing the abstract net list
+		///
+		/// After parsing a net list this class contains all raw
+		/// connections, parameter values and devices.
 		struct abstract_t
 		{
-			using link_t = std::pair<pstring, pstring>;
+			using connection_t = std::pair<pstring, pstring>;
 
 			abstract_t(log_type &log) : m_factory(log) { }
-			std::unordered_map<pstring, pstring>        m_alias;
-			std::vector<link_t>                         m_links;
+			std::unordered_map<pstring, alias_t>        m_aliases;
+			std::vector<connection_t>                   m_connections;
 			std::unordered_map<pstring, pstring>        m_param_values;
 			models_t::raw_map_t                         m_models;
 

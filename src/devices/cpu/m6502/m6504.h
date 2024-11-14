@@ -20,9 +20,7 @@ public:
 
 
 enum {
-	M6504_IRQ_LINE = m6502_device::IRQ_LINE,
-	M6504_NMI_LINE = m6502_device::NMI_LINE,
-	M6504_SET_OVERFLOW = m6502_device::V_LINE
+	M6504_IRQ_LINE = m6502_device::IRQ_LINE
 };
 
 DECLARE_DEVICE_TYPE(M6504, m6504_device);

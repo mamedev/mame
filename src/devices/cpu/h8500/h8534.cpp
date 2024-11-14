@@ -53,6 +53,7 @@ void h8534_device::internal_map(address_map &map)
 {
 	if (mode_control() == 2 || mode_control() == 4 || mode_control() == 7)
 		map(0x0000, 0x7fff).rom().region(DEVICE_SELF, 0);
+	map(0xf680, 0xfe7f).ram(); // TODO: may be disabled by writing 0 to RAME bit in RAMCR
 	register_field_map(map);
 }
 
@@ -62,6 +63,7 @@ void h8536_device::internal_map(address_map &map)
 		map(0x0000, 0xee7f).rom().region(DEVICE_SELF, 0);
 	else if (mode_control() == 4 || mode_control() == 7)
 		map(0x0000, 0xf67f).rom().region(DEVICE_SELF, 0);
+	map(0xf680, 0xfe7f).ram(); // TODO: may be disabled by writing 0 to RAME bit in RAMCR
 	register_field_map(map);
 }
 

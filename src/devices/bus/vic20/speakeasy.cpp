@@ -37,7 +37,7 @@ void vic20_speakeasy_device::device_add_mconfig(machine_config &config)
 {
 	SPEAKER(config, "mono").front_center();
 
-	VOTRAX_SC01(config, m_votrax, 720000).add_route(ALL_OUTPUTS, "mono", 0.85);
+	VOTRAX_SC01A(config, m_votrax, 720000).add_route(ALL_OUTPUTS, "mono", 0.85);
 }
 
 

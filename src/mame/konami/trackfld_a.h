@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Chris Hardy
-#ifndef MAME_AUDIO_TRACKFLD_H
-#define MAME_AUDIO_TRACKFLD_H
+#ifndef MAME_KONAMI_TRACKFLD_A_H
+#define MAME_KONAMI_TRACKFLD_A_H
 
 #pragma once
 
@@ -21,7 +21,7 @@ public:
 
 	trackfld_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_WRITE_LINE_MEMBER(sh_irqtrigger_w);
+	void sh_irqtrigger_w(int state);
 	uint8_t trackfld_sh_timer_r();
 	uint8_t trackfld_speech_r();
 	void trackfld_sound_w(offs_t offset, uint8_t data);
@@ -30,8 +30,8 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 private:
 	optional_device<cpu_device> m_audiocpu;
@@ -44,4 +44,4 @@ private:
 
 DECLARE_DEVICE_TYPE(TRACKFLD_AUDIO, trackfld_audio_device)
 
-#endif // MAME_AUDIO_TRACKFLD_H
+#endif // MAME_KONAMI_TRACKFLD_A_H

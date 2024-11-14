@@ -21,10 +21,10 @@ class aha154x_device : public device_t, public device_isa16_card_interface
 protected:
 	aha154x_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
 
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
-	void i8085_base_map(address_map &map);
+	void i8085_base_map(address_map &map) ATTR_COLD;
 	void scsi_add(machine_config &config);
 	void scsic_config(device_t *device);
 
@@ -41,13 +41,13 @@ public:
 
 	static constexpr feature_type unemulated_features() { return feature::DISK; }
 
-	DECLARE_READ_LINE_MEMBER(host_int_r);
-	DECLARE_READ_LINE_MEMBER(scsi_rstreq_r);
+	int host_int_r();
+	int scsi_rstreq_r();
 
 protected:
-	virtual ioport_constructor device_input_ports() const override;
-	virtual const tiny_rom_entry *device_rom_region() const override;
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 private:
 	void local_status_w(u8 data);
@@ -55,7 +55,7 @@ private:
 	void srst_clear_w(u8 data);
 	void scsi_rstreq_clear_w(u8 data);
 
-	void i8085_map(address_map &map);
+	void i8085_map(address_map &map) ATTR_COLD;
 };
 
 class aha1542b_device : public aha154x_device
@@ -66,12 +66,12 @@ public:
 	static constexpr feature_type unemulated_features() { return feature::DISK; }
 
 protected:
-	virtual ioport_constructor device_input_ports() const override;
-	virtual const tiny_rom_entry *device_rom_region() const override;
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 private:
-	void i8085_map(address_map &map);
+	void i8085_map(address_map &map) ATTR_COLD;
 
 	required_device<aic565_device> m_busaic;
 };

@@ -73,12 +73,18 @@ void jvs_device::message(uint8_t dest, const uint8_t *send_buffer, uint32_t send
 			} else
 				s += len;
 		}
-		recv_size = d - recv_buffer;
+
+		// d will always have at least a 1 byte difference due to adding the status code byte before processing messages.
+		// Don't count the status code in the received message size unless we're at the end of the device chain so the
+		// message buffer can be chained to slave devices. Required for resets to be chained.
+		const uint32_t new_recv_size = d - recv_buffer;
+		if (!next_device || new_recv_size > 1)
+			recv_size = new_recv_size;
 	}
 
 	// Pass along the message if the device hasn't replied
 	// Should we cumulate answers instead?
-	if(next_device && !recv_size)
+	if(next_device && (dest == 0xff || !recv_size))
 		next_device->message(dest, send_buffer, send_size, recv_buffer, recv_size);
 }
 

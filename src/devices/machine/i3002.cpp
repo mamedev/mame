@@ -108,7 +108,7 @@ void i3002_device::fc_kbus_w(uint8_t fc , uint8_t k)
 	m_kbus = k & WORD_MASK;
 }
 
-WRITE_LINE_MEMBER(i3002_device::clk_w)
+void i3002_device::clk_w(int state)
 {
 	if (state) {
 		update();
@@ -125,7 +125,7 @@ bool i3002_device::update_ro()
 	decode_fc(m_fc , fg , rg , reg);
 
 	if (fg == 0 && rg == 2) {
-		uint8_t ik = m_ibus_handler() & m_kbus;
+		uint8_t ik = !m_ibus_handler.isnull() ? m_ibus_handler() & m_kbus : 0;
 		uint8_t at = m_reg[ reg ];
 		set_ro(BIT(at , 0) && !BIT(ik , 0));
 		return true;

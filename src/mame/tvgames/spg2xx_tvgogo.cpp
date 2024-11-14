@@ -9,6 +9,8 @@
 #include "softlist_dev.h"
 
 
+namespace {
+
 class tvgogo_state : public spg2xx_game_state
 {
 public:
@@ -23,8 +25,8 @@ public:
 private:
 	uint8_t m_i2cunk = 0;
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	void tvg_i2c_w(offs_t offset, uint8_t data);
 	uint8_t tvg_i2c_r(offs_t offset);
@@ -207,18 +209,15 @@ void tvgogo_state::machine_reset()
 
 DEVICE_IMAGE_LOAD_MEMBER(tvgogo_state::cart_load_tvgogo)
 {
-	uint32_t size = m_cart->common_get_size("rom");
+	uint32_t const size = m_cart->common_get_size("rom");
 
-	if (size > 0x800000)
-	{
-		image.seterror(image_error::INVALIDIMAGE, "Unsupported cartridge size");
-		return image_init_result::FAIL;
-	}
+	if (size > 0x80'0000)
+		return std::make_pair(image_error::INVALIDLENGTH, "Unsupported cartridge size (must be no more than 8M)");
 
 	m_cart->rom_alloc(0x800000, GENERIC_ROM16_WIDTH, ENDIANNESS_LITTLE);
 	m_cart->common_load_rom(m_cart->get_rom_base(), size, "rom");
 
-	return image_init_result::PASS;
+	return std::make_pair(std::error_condition(), std::string());
 }
 
 
@@ -263,6 +262,8 @@ ROM_START( tvgogo )
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
 	// no internal ROM? (Camera might have an MCU tho)
 ROM_END
+
+} // anonymous namespace
 
 
 // Toyquest games

@@ -5,34 +5,23 @@
 
 DEFINE_DEVICE_TYPE(NSCSI_CB, nscsi_callback_device, "nscsi_cb", "SCSI callback (new)")
 
-nscsi_callback_device::nscsi_callback_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: nscsi_device(mconfig, NSCSI_CB, tag, owner, clock),
-		nscsi_slot_card_interface(mconfig, *this, DEVICE_SELF),
-		m_write_rst(*this),
-		m_write_atn(*this),
-		m_write_ack(*this),
-		m_write_req(*this),
-		m_write_msg(*this),
-		m_write_io(*this),
-		m_write_cd(*this),
-		m_write_sel(*this),
-		m_write_bsy(*this), m_ctrl(0)
+nscsi_callback_device::nscsi_callback_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	nscsi_device(mconfig, NSCSI_CB, tag, owner, clock),
+	nscsi_slot_card_interface(mconfig, *this, DEVICE_SELF),
+	m_write_rst(*this),
+	m_write_atn(*this),
+	m_write_ack(*this),
+	m_write_req(*this),
+	m_write_msg(*this),
+	m_write_io(*this),
+	m_write_cd(*this),
+	m_write_sel(*this),
+	m_write_bsy(*this), m_ctrl(0)
 {
 }
 
 void nscsi_callback_device::device_start()
 {
-	// resolve callbacks
-	m_write_rst.resolve_safe();
-	m_write_atn.resolve_safe();
-	m_write_ack.resolve_safe();
-	m_write_req.resolve_safe();
-	m_write_msg.resolve_safe();
-	m_write_io.resolve_safe();
-	m_write_cd.resolve_safe();
-	m_write_sel.resolve_safe();
-	m_write_bsy.resolve_safe();
-
 	// state saving
 	save_item(NAME(m_ctrl));
 }

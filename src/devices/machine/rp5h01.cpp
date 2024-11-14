@@ -17,7 +17,7 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "machine/rp5h01.h"
+#include "rp5h01.h"
 
 // this is the contents of an unprogrammed PROM
 uint8_t const rp5h01_device::s_initial_data[0x10] =
@@ -80,7 +80,7 @@ void rp5h01_device::device_reset()
     enable_w
 -------------------------------------------------*/
 
-WRITE_LINE_MEMBER( rp5h01_device::enable_w )
+void rp5h01_device::enable_w(int state)
 {
 	/* process the /CE signal and enable/disable the IC */
 	m_enabled = state ? 0 : 1;
@@ -90,7 +90,7 @@ WRITE_LINE_MEMBER( rp5h01_device::enable_w )
     reset_w
 -------------------------------------------------*/
 
-WRITE_LINE_MEMBER( rp5h01_device::reset_w )
+void rp5h01_device::reset_w(int state)
 {
 	/* if it's not enabled, ignore */
 	if (!m_enabled)
@@ -111,7 +111,7 @@ WRITE_LINE_MEMBER( rp5h01_device::reset_w )
     cs_w
 -------------------------------------------------*/
 
-WRITE_LINE_MEMBER( rp5h01_device::cs_w )
+void rp5h01_device::cs_w(int state)
 {
 	/* if it's not enabled, ignore */
 	if (!m_enabled)
@@ -128,7 +128,7 @@ WRITE_LINE_MEMBER( rp5h01_device::cs_w )
     clock_w
 -------------------------------------------------*/
 
-WRITE_LINE_MEMBER( rp5h01_device::clock_w )
+void rp5h01_device::clock_w(int state)
 {
 	/* if it's not enabled, ignore */
 	if (!m_enabled)
@@ -149,7 +149,7 @@ WRITE_LINE_MEMBER( rp5h01_device::clock_w )
     test_w
 -------------------------------------------------*/
 
-WRITE_LINE_MEMBER( rp5h01_device::test_w )
+void rp5h01_device::test_w(int state)
 {
 	/* if it's not enabled, ignore */
 	if (!m_enabled)
@@ -163,7 +163,7 @@ WRITE_LINE_MEMBER( rp5h01_device::test_w )
     counter_r
 -------------------------------------------------*/
 
-READ_LINE_MEMBER( rp5h01_device::counter_r )
+int rp5h01_device::counter_r()
 {
 	/* if it's not enabled, ignore */
 	if (!m_enabled)
@@ -177,7 +177,7 @@ READ_LINE_MEMBER( rp5h01_device::counter_r )
     data_r
 -------------------------------------------------*/
 
-READ_LINE_MEMBER( rp5h01_device::data_r )
+int rp5h01_device::data_r()
 {
 	/* if it's not enabled, ignore */
 	if (!m_enabled)

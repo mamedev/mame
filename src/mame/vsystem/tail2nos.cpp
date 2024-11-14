@@ -18,13 +18,12 @@
 
 #include "vsystem_gga.h"
 
-#include "k051316.h"
-
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
 #include "machine/6850acia.h"
 #include "machine/gen_latch.h"
 #include "sound/ymopn.h"
+#include "video/k051316.h"
 
 #include "emupal.h"
 #include "screen.h"
@@ -55,11 +54,11 @@ public:
 
 	void tail2nos(machine_config &config);
 
-	template <int N> DECLARE_CUSTOM_INPUT_MEMBER(analog_in_r);
+	template <int N> ioport_value analog_in_r();
 
 protected:
-	virtual void machine_start() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	// memory pointers
@@ -89,19 +88,18 @@ private:
 	void zoomdata_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	void gfxbank_w(uint8_t data);
 	void sound_bankswitch_w(uint8_t data);
-	uint8_t sound_semaphore_r();
+	uint8_t soundlatch_pending_r();
+	void soundlatch_pending_w(int state);
 	TILE_GET_INFO_MEMBER(get_tile_info);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void postload();
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	K051316_CB_MEMBER(zoom_callback);
-	void main_map(address_map &map);
-	void sound_map(address_map &map);
-	void sound_port_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
+	void sound_map(address_map &map) ATTR_COLD;
+	void sound_port_map(address_map &map) ATTR_COLD;
 };
 
-
-// video
 
 /***************************************************************************
 
@@ -268,11 +266,19 @@ uint32_t tail2nos_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 }
 
 
-// machine
-
-uint8_t tail2nos_state::sound_semaphore_r()
+uint8_t tail2nos_state::soundlatch_pending_r()
 {
 	return m_soundlatch->pending_r();
+}
+
+void tail2nos_state::soundlatch_pending_w(int state)
+{
+	m_audiocpu->set_input_line(INPUT_LINE_NMI, state ? ASSERT_LINE : CLEAR_LINE);
+
+	// sound comms is 2-way (see soundlatch_pending_r),
+	// NMI routine is very short, so briefly set perfect_quantum to make sure that the timing is right
+	if (state)
+		machine().scheduler().perfect_quantum(attotime::from_usec(100));
 }
 
 void tail2nos_state::sound_bankswitch_w(uint8_t data)
@@ -297,7 +303,7 @@ void tail2nos_state::main_map(address_map &map)
 	map(0xfff001, 0xfff001).w(FUNC(tail2nos_state::gfxbank_w));
 	map(0xfff002, 0xfff003).portr("IN1");
 	map(0xfff004, 0xfff005).portr("DSW");
-	map(0xfff009, 0xfff009).r(FUNC(tail2nos_state::sound_semaphore_r)).w(m_soundlatch, FUNC(generic_latch_8_device::write)).umask16(0x00ff);
+	map(0xfff009, 0xfff009).r(FUNC(tail2nos_state::soundlatch_pending_r)).w(m_soundlatch, FUNC(generic_latch_8_device::write)).umask16(0x00ff);
 	map(0xfff020, 0xfff023).w("gga", FUNC(vsystem_gga_device::write)).umask16(0x00ff);
 	map(0xfff030, 0xfff033).rw(m_acia, FUNC(acia6850_device::read), FUNC(acia6850_device::write)).umask16(0x00ff);
 }
@@ -320,7 +326,7 @@ void tail2nos_state::sound_port_map(address_map &map)
 }
 
 template <int N>
-CUSTOM_INPUT_MEMBER(tail2nos_state::analog_in_r)
+ioport_value tail2nos_state::analog_in_r()
 {
 	int delta = m_analog[N]->read();
 
@@ -336,7 +342,7 @@ static INPUT_PORTS_START( tail2nos )
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_CONDITION("DSW", 0x4000, EQUALS, 0x4000) PORT_NAME("Brake (standard BD)")
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_CONDITION("DSW", 0x4000, EQUALS, 0x4000) PORT_NAME("Accelerate (standard BD)")
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNKNOWN ) PORT_CONDITION("DSW", 0x4000, EQUALS, 0x4000)
-	PORT_BIT( 0x0070, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(tail2nos_state, analog_in_r<0>) PORT_CONDITION("DSW", 0x4000, NOTEQUALS, 0x4000)
+	PORT_BIT( 0x0070, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(FUNC(tail2nos_state::analog_in_r<0>)) PORT_CONDITION("DSW", 0x4000, NOTEQUALS, 0x4000)
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_COIN2 )
@@ -348,7 +354,7 @@ static INPUT_PORTS_START( tail2nos )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("IN1")
-	PORT_BIT( 0x0070, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(tail2nos_state, analog_in_r<1>) PORT_CONDITION("DSW", 0x4000, NOTEQUALS, 0x4000)
+	PORT_BIT( 0x0070, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(FUNC(tail2nos_state::analog_in_r<1>)) PORT_CONDITION("DSW", 0x4000, NOTEQUALS, 0x4000)
 	PORT_BIT( 0x0070, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_CONDITION("DSW", 0x4000, EQUALS, 0x4000)
 	PORT_BIT( 0xff8f, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
@@ -474,11 +480,11 @@ void tail2nos_state::machine_start()
 void tail2nos_state::tail2nos(machine_config &config)
 {
 	// basic machine hardware
-	M68000(config, m_maincpu, XTAL(20'000'000) / 2);    // verified on PCB
+	M68000(config, m_maincpu, XTAL(20'000'000) / 2); // verified on PCB
 	m_maincpu->set_addrmap(AS_PROGRAM, &tail2nos_state::main_map);
 	m_maincpu->set_vblank_int("screen", FUNC(tail2nos_state::irq6_line_hold));
 
-	Z80(config, m_audiocpu, XTAL(20'000'000) / 4);  // verified on PCB
+	Z80(config, m_audiocpu, XTAL(20'000'000) / 4); // verified on PCB
 	m_audiocpu->set_addrmap(AS_PROGRAM, &tail2nos_state::sound_map);
 	m_audiocpu->set_addrmap(AS_IO, &tail2nos_state::sound_port_map);
 								// IRQs are triggered by the YM2608
@@ -514,10 +520,10 @@ void tail2nos_state::tail2nos(machine_config &config)
 	SPEAKER(config, "rspeaker").front_right();
 
 	GENERIC_LATCH_8(config, m_soundlatch);
-	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
+	m_soundlatch->data_pending_callback().set(FUNC(tail2nos_state::soundlatch_pending_w));
 	m_soundlatch->set_separate_acknowledge(true);
 
-	ym2608_device &ymsnd(YM2608(config, "ymsnd", XTAL(8'000'000)));  // verified on PCB
+	ym2608_device &ymsnd(YM2608(config, "ymsnd", XTAL(8'000'000))); // verified on PCB
 	ymsnd.irq_handler().set_inputline(m_audiocpu, 0);
 	ymsnd.port_b_write_callback().set(FUNC(tail2nos_state::sound_bankswitch_w));
 	ymsnd.add_route(0, "lspeaker", 0.25);

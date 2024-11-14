@@ -234,7 +234,7 @@ void usb_sound_device::data_w(u8 data)
 	machine().scheduler().synchronize(timer_expired_delegate(FUNC(usb_sound_device::delayed_usb_data_w), this), data);
 
 	// boost the interleave so that sequences can be sent
-	machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(250));
+	machine().scheduler().perfect_quantum(attotime::from_usec(250));
 }
 
 
@@ -299,7 +299,7 @@ void usb_sound_device::p2_w(u8 data)
 }
 
 
-READ_LINE_MEMBER( usb_sound_device::t1_r )
+int usb_sound_device::t1_r()
 {
 	// T1 returns 1 based on the value of the T1 clock; the exact
 	// pattern is determined by one or more jumpers on the board.

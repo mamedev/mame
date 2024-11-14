@@ -7,8 +7,8 @@
    Hewlett Packard HP48 S/SX & G/GX and HP49 G
 
 **********************************************************************/
-#ifndef MAME_INCLUDES_HP84_H
-#define MAME_INCLUDES_HP84_H
+#ifndef MAME_HP_HP84_H
+#define MAME_HP_HP84_H
 
 #pragma once
 
@@ -89,7 +89,7 @@ public:
 	hp48_module m_modules[6];
 
 private:
-	virtual void machine_reset() override;
+	virtual void machine_reset() override ATTR_COLD;
 	void base_machine_start(hp48_models model);
 
 	void hp48_palette(palette_device &palette) const;
@@ -118,7 +118,7 @@ private:
 	void reset_modules();
 
 	/* memory controller */
-	DECLARE_WRITE_LINE_MEMBER(mem_reset);
+	void mem_reset(int state);
 	void mem_config(uint32_t data);
 	void mem_unconfig(uint32_t data);
 	uint32_t mem_id();
@@ -131,9 +131,9 @@ private:
 	void reg_out(uint32_t data);
 
 	/* keyboard interrupt system */
-	DECLARE_WRITE_LINE_MEMBER(rsi);
+	void rsi(int state);
 	void hp48_common(machine_config &config);
-	void hp48(address_map &map);
+	void hp48(address_map &map) ATTR_COLD;
 
 	required_device<saturn_device> m_maincpu;
 	required_device<dac_bit_interface> m_dac;
@@ -215,4 +215,4 @@ private:
 #define HP48_NCE3 4
 #define HP48_NCE1 5
 
-#endif // MAME_INCLUDES_HP84_H
+#endif // MAME_HP_HP84_H

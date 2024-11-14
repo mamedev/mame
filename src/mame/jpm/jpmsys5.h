@@ -51,21 +51,21 @@ public:
 	void jpmsys5(machine_config &config);
 	void jpmsys5_ym(machine_config &config);
 
-	DECLARE_WRITE_LINE_MEMBER(ptm_irq);
-	DECLARE_WRITE_LINE_MEMBER(u26_o1_callback);
-	DECLARE_WRITE_LINE_MEMBER(pia_irq);
-	DECLARE_WRITE_LINE_MEMBER(u29_ca2_w);
-	DECLARE_WRITE_LINE_MEMBER(u29_cb2_w);
-	DECLARE_WRITE_LINE_MEMBER(a0_tx_w);
-	DECLARE_WRITE_LINE_MEMBER(a1_tx_w);
-	DECLARE_WRITE_LINE_MEMBER(a2_tx_w);
+	void ptm_irq(int state);
+	void u26_o1_callback(int state);
+	void pia_irq(int state);
+	void u29_ca2_w(int state);
+	void u29_cb2_w(int state);
+	void a0_tx_w(int state);
+	void a1_tx_w(int state);
+	void a2_tx_w(int state);
 
 	uint8_t u29_porta_r();
 	void u29_portb_w(uint8_t data);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	void jpmsys5_common(machine_config &config);
 	void ymsound(machine_config &config);
@@ -90,13 +90,13 @@ protected:
 	optional_ioport m_strobe4;
 	optional_ioport m_unknown_port;
 
-	void jpm_sys5_common_map(address_map &map);
+	void jpm_sys5_common_map(address_map &map) ATTR_COLD;
 
 protected:
-	void m68000_ym_map(address_map &map);
+	void m68000_ym_map(address_map &map) ATTR_COLD;
 
 private:
-	template <unsigned N> DECLARE_WRITE_LINE_MEMBER(reel_optic_cb) { if (state) m_optic_pattern |= (1 << ((7-N)^3)); else m_optic_pattern &= ~(1 << ((7-N)^3)); }
+	template <unsigned N> void reel_optic_cb(int state) { if (state) m_optic_pattern |= (1 << ((7-N)^3)); else m_optic_pattern &= ~(1 << ((7-N)^3)); }
 
 	uint16_t unknown_port_r(offs_t offset, uint16_t mem_mask = ~0);
 
@@ -113,6 +113,8 @@ private:
 
 	uint16_t unk_r(offs_t offset, uint16_t mem_mask = ~0);
 
+	static inline constexpr uint8_t reel_interface_table[4] = {0x0a, 0x09, 0x06, 0x05};//An interface maps the 2-bit values to meaningful Starpoint patterns (Proconn do this too, put in steppers?)
+
 	uint16_t reellamps_0123_r(offs_t offset, uint16_t mem_mask = ~0);
 	void reellamps_0123_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	uint16_t reellamps_4567_r(offs_t offset, uint16_t mem_mask = ~0);
@@ -127,8 +129,8 @@ private:
 	void sys5_draw_lamps();
 
 
-	void m68000_awp_map(address_map &map);
-	void m68000_awp_map_saa(address_map &map);
+	void m68000_awp_map(address_map &map) ATTR_COLD;
+	void m68000_awp_map_saa(address_map &map) ATTR_COLD;
 
 	required_ioport m_direct_port;
 	optional_device<meters_device> m_meters; //jpmsys5v doesn't use this
@@ -165,12 +167,12 @@ public:
 	void jpmsys5v(machine_config &config);
 
 private:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	void tmsvideo(machine_config &config);
 
-	DECLARE_WRITE_LINE_MEMBER(generate_tms34061_interrupt);
+	void generate_tms34061_interrupt(int state);
 	void sys5_tms34061_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	uint16_t sys5_tms34061_r(offs_t offset, uint16_t mem_mask = ~0);
 	void ramdac_w(offs_t offset, uint16_t data);
@@ -178,7 +180,7 @@ private:
 	uint32_t screen_update_jpmsys5v(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(touch_cb);
 
-	void m68000_map(address_map &map);
+	void m68000_map(address_map &map) ATTR_COLD;
 
 	required_device<tms34061_device> m_tms34061;
 	required_device<palette_device> m_palette;

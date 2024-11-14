@@ -17,15 +17,15 @@ public:
 	he191_3425_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 	// miscellanous handlers
-	DECLARE_WRITE_LINE_MEMBER(shift_reset);
+	void shift_reset(int state);
 
 protected:
 	// device-level overrides
-	virtual void device_resolve_objects() override;
-	virtual void device_start() override;
-	virtual ioport_constructor device_input_ports() const override;
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual void device_resolve_objects() override ATTR_COLD;
+	virtual void device_start() override ATTR_COLD;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 
 	// device_z29_keyboard_interface overrides
 	virtual void receive_data(bool state) override;
@@ -35,7 +35,7 @@ private:
 	u8 mcu_pa_r();
 	void mcu_pb_w(u8 data);
 	void mcu_pc_w(u8 data);
-	DECLARE_READ_LINE_MEMBER(mcu_t1_r);
+	int mcu_t1_r();
 
 	// misc. helpers
 	TIMER_CALLBACK_MEMBER(receive_data_synced);

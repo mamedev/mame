@@ -5,14 +5,15 @@
     Midway MCR-3 system
 
 **************************************************************************/
-#ifndef MAME_INCLUDES_MCR3_H
-#define MAME_INCLUDES_MCR3_H
+#ifndef MAME_MIDWAY_MCR3_H
+#define MAME_MIDWAY_MCR3_H
 
 #pragma once
 
 #include "mcr.h"
 
 #include "machine/74259.h"
+#include "machine/adc0804.h"
 #include "machine/adc0844.h"
 
 #include "screen.h"
@@ -65,13 +66,13 @@ protected:
 	uint32_t screen_update_mcr3(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_spyhunt(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void mcrmono_map(address_map &map);
-	void mcrmono_portmap(address_map &map);
-	void spyhunt_map(address_map &map);
-	void spyhunt_portmap(address_map &map);
+	void mcrmono_map(address_map &map) ATTR_COLD;
+	void mcrmono_portmap(address_map &map) ATTR_COLD;
+	void spyhunt_map(address_map &map) ATTR_COLD;
+	void spyhunt_portmap(address_map &map) ATTR_COLD;
 
 	virtual void machine_start() override { m_lamps.resolve(); }
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 
 	optional_shared_ptr<uint8_t> m_spyhunt_alpharam;
 	required_device<screen_device> m_screen;
@@ -124,10 +125,14 @@ class mcrsc_csd_state : public mcr3_state
 public:
 	mcrsc_csd_state(const machine_config &mconfig, device_type type, const char *tag)
 		: mcr3_state(mconfig, type, tag)
+		, m_adc(*this, "adc")
 		, m_lamplatch(*this, "lamplatch")
+		, m_analog_inputs(*this, {"ssio:IP2", "ssio:IP2.ALT"})
 	{ }
 
 	void mcrsc_csd(machine_config &config);
+	void spyhunt(machine_config &config);
+	void turbotag(machine_config &config);
 
 	void init_spyhunt();
 	void init_turbotag();
@@ -139,7 +144,9 @@ private:
 	uint8_t turbotag_ip2_r();
 	uint8_t turbotag_kludge_r();
 
+	required_device<adc0804_device> m_adc;
 	optional_device<cd4099_device> m_lamplatch;
+	required_ioport_array<2> m_analog_inputs;
 };
 
-#endif // MAME_INCLUDES_MCR3_H
+#endif // MAME_MIDWAY_MCR3_H

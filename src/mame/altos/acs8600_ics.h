@@ -1,8 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:Carl
 
-#ifndef MAME_MACHINE_ACS8600_ICS_H
-#define MAME_MACHINE_ACS8600_ICS_H
+#ifndef MAME_ALTOS_ACS8600_ICS_H
+#define MAME_ALTOS_ACS8600_ICS_H
 
 #pragma once
 
@@ -13,25 +13,24 @@ class acs8600_ics_device : public device_t
 public:
 	acs8600_ics_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_WRITE_LINE_MEMBER(attn_w);
+	void attn_w(int state);
 
 	auto irq1_callback() { return m_out_irq1_func.bind(); }
 	auto irq2_callback() { return m_out_irq2_func.bind(); }
 	template <typename T> void set_host_space(T &&tag, int index) { m_host_space.set_tag(std::forward<T>(tag), index); }
-	const tiny_rom_entry *device_rom_region() const override;
+	const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 
 protected:
-	virtual void device_resolve_objects() override;
-	virtual void device_start() override;
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 	void hiaddr_w(u8 data);
 	void ctrl_w(u8 data);
 	u8 hostram_r(offs_t offset);
 	void hostram_w(offs_t offset, u8 data);
 
-	void ics_io(address_map &map);
-	void ics_mem(address_map &map);
+	void ics_io(address_map &map) ATTR_COLD;
+	void ics_mem(address_map &map) ATTR_COLD;
 
 private:
 	required_device<z80_device> m_icscpu;
@@ -44,4 +43,4 @@ private:
 
 DECLARE_DEVICE_TYPE(ACS8600_ICS, acs8600_ics_device)
 
-#endif // MAME_MACHINE_ACS8600_ICS_H
+#endif // MAME_ALTOS_ACS8600_ICS_H

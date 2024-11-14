@@ -145,31 +145,31 @@ void legionna_state::text_w(offs_t offset, u16 data, u16 mem_mask)
 TILE_GET_INFO_MEMBER(legionna_state::get_back_tile_info)
 {
 	const u16 tile = m_back_data[tile_index];
-	tileinfo.set(2, (tile & 0xfff) | m_back_gfx_bank, (tile >> 12) & 0xf, 0);
+	tileinfo.set(1, (tile & 0xfff) | m_back_gfx_bank, (tile >> 12) & 0xf, 0);
 }
 
 TILE_GET_INFO_MEMBER(legionna_state::get_mid_tile_info_split)
 {
 	const u16 tile = m_mid_data[tile_index];
-	tileinfo.set(4, (tile & 0xfff) | m_mid_gfx_bank, (tile >> 12) & 0xf, 0);
+	tileinfo.set(3, (tile & 0xfff) | m_mid_gfx_bank, (tile >> 12) & 0xf, 0);
 }
 
 TILE_GET_INFO_MEMBER(legionna_state::get_mid_tile_info_share_bgrom)
 {
 	const u16 tile = m_mid_data[tile_index];
-	tileinfo.set(2, (tile & 0xfff) | 0x1000, ((tile >> 12) & 0xf) | 0x10, 0);
+	tileinfo.set(1, (tile & 0xfff) | 0x1000, ((tile >> 12) & 0xf) | 0x10, 0);
 }
 
 TILE_GET_INFO_MEMBER(legionna_state::get_fore_tile_info)
 {
 	const u16 tile = m_fore_data[tile_index];
-	tileinfo.set(3, (tile & 0xfff) | m_fore_gfx_bank, (tile >> 12) & 0xf, 0);
+	tileinfo.set(2, (tile & 0xfff) | m_fore_gfx_bank, (tile >> 12) & 0xf, 0);
 }
 
 TILE_GET_INFO_MEMBER(legionna_state::get_text_tile_info)
 {
 	const u16 tile = m_textram[tile_index];
-	tileinfo.set(1, tile & 0xfff, (tile >> 12) & 0xf, 0);
+	tileinfo.set(0, tile & 0xfff, (tile >> 12) & 0xf, 0);
 }
 
 void legionna_state::common_video_allocate_ptr()
@@ -181,9 +181,6 @@ void legionna_state::common_video_allocate_ptr()
 	m_scrollram16 = std::make_unique<u16[]>(0x60/2);
 	m_paletteram = make_unique_clear<u16[]>(0x1000/2);
 	m_palette->basemem().set(m_paletteram.get(), 0x1000/2 * sizeof(u16), 16, ENDIANNESS_BIG, 2);
-
-	m_sprite_xoffs = 0;
-	m_sprite_yoffs = 0;
 
 	save_pointer(NAME(m_back_data), 0x800/2);
 	save_pointer(NAME(m_fore_data), 0x800/2);
@@ -200,7 +197,7 @@ void legionna_state::common_video_allocate_ptr()
 	save_item(NAME(m_layer_disable));
 }
 
-void legionna_state::common_video_start(bool split, bool has_extended_banking, bool has_extended_priority)
+void legionna_state::common_video_start(bool split)
 {
 	common_video_allocate_ptr();
 
@@ -216,9 +213,6 @@ void legionna_state::common_video_start(bool split, bool has_extended_banking, b
 	m_foreground_layer = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(legionna_state::get_fore_tile_info)),                TILEMAP_SCAN_ROWS,16,16,32,32);
 	m_text_layer =       &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(legionna_state::get_text_tile_info)),                TILEMAP_SCAN_ROWS, 8, 8,64,32);
 
-	m_has_extended_banking = has_extended_banking;
-	m_has_extended_priority = has_extended_priority;
-
 	m_background_layer->set_transparent_pen(15);
 	m_midground_layer->set_transparent_pen(15);
 	m_foreground_layer->set_transparent_pen(15);
@@ -227,7 +221,7 @@ void legionna_state::common_video_start(bool split, bool has_extended_banking, b
 
 VIDEO_START_MEMBER(legionna_state,legionna)
 {
-	common_video_start(false, false, false);
+	common_video_start(false);
 
 	m_sprite_pri_mask[0] = 0x0000;
 	m_sprite_pri_mask[1] = 0xfff0;
@@ -237,7 +231,7 @@ VIDEO_START_MEMBER(legionna_state,legionna)
 
 VIDEO_START_MEMBER(legionna_state,heatbrl)
 {
-	common_video_start(true, false, false);
+	common_video_start(true);
 
 	m_sprite_pri_mask[0] = 0xfff0;
 	m_sprite_pri_mask[1] = 0xfffc;
@@ -248,7 +242,7 @@ VIDEO_START_MEMBER(legionna_state,heatbrl)
 
 VIDEO_START_MEMBER(legionna_state,godzilla)
 {
-	common_video_start(false, true, false);
+	common_video_start(false);
 
 	m_sprite_pri_mask[0] = 0xfff0;
 	m_sprite_pri_mask[1] = 0xfffc;
@@ -259,7 +253,7 @@ VIDEO_START_MEMBER(legionna_state,godzilla)
 
 VIDEO_START_MEMBER(legionna_state,denjinmk)
 {
-	common_video_start(true, true, false);
+	common_video_start(true);
 
 	m_sprite_pri_mask[0] = 0xfff0; // normal sprites
 	m_sprite_pri_mask[1] = 0xfffc; // luna park horse rides
@@ -271,7 +265,7 @@ VIDEO_START_MEMBER(legionna_state,denjinmk)
 
 VIDEO_START_MEMBER(legionna_state,cupsoc)
 {
-	common_video_start(false, false, false);
+	common_video_start(false);
 
 	m_sprite_pri_mask[0] = 0xfff0; // title screen "Seibu Cup Soccer" elements
 	m_sprite_pri_mask[1] = 0xfffc; // ?
@@ -281,8 +275,8 @@ VIDEO_START_MEMBER(legionna_state,cupsoc)
 
 VIDEO_START_MEMBER(legionna_state,grainbow)
 {
-	common_video_start(false, false, true);
-	m_sprite_xoffs = m_sprite_yoffs = 16;
+	common_video_start(false);
+
 	m_sprite_pri_mask[0] = 0xfff0; //
 	m_sprite_pri_mask[1] = 0xfffc; // level 2 and 3
 	m_sprite_pri_mask[2] = 0xfffe; // swamp monster mask effect
@@ -317,127 +311,26 @@ VIDEO_START_MEMBER(legionna_state,grainbow)
 
 *************************************************************************/
 
-void legionna_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap,const rectangle &cliprect)
+u32 legionna_state::pri_cb(u8 pri, u8 ext)
 {
-	for (int offs = 0; offs < 0x400; offs += 4)
-	{
-		const u16 data = m_spriteram[offs];
-		if (!(data & 0x8000)) continue;
+	return m_sprite_pri_mask[pri];
+}
 
-		u8 cur_pri = 0;
-		int pri_mask = 0;
+u32 legionna_state::grainbow_pri_cb(u8 pri, u8 ext)
+{
+	// SD Gundam uses this arrangement, with bit 14 seemingly unused
+	// side effect of using the COP sprite DMA?
+	pri = (pri & 2) | (ext & 1);
+	return m_sprite_pri_mask[pri];
+}
 
-		if (m_has_extended_priority)
-		{
-			// SD Gundam uses this arrangement, with bit 14 seemingly unused
-			// side effect of using the COP sprite DMA?
-			cur_pri = (m_spriteram[offs+1] & 0x8000) >> 14;
-
-			if (data & 0x0040)
-				cur_pri |= 1;
-		}
-		else
-			cur_pri = (m_spriteram[offs+1] & 0xc000) >> 14;
-
-		pri_mask = m_sprite_pri_mask[cur_pri];
-
-		u32 sprite = m_spriteram[offs+1];
-
-		sprite &= 0x3fff;
-
-		if (m_has_extended_banking)
-		{
-			if (data & 0x0040)
-			{
-				sprite |= 0x4000;//tile banking,used in Denjin Makai
-			}
-			if (m_spriteram[offs+3] & 0x8000)
-			{
-				sprite |= 0x8000;//tile banking?,used in Denjin Makai
-			}
-		}
-
-		int y = m_spriteram[offs+3];
-		int x = m_spriteram[offs+2];
-
-		/* heated barrel hardware seems to need 0x1ff with 0x100 sign bit for sprite wrap,
-		   this doesn't work on denjin makai as the visible area is larger */
-		if (cliprect.max_x<(320-1))
-		{
-			x &= 0x1ff;
-			y &= 0x1ff;
-
-			if (x & 0x100) x -= 0x200;
-			if (y & 0x100) y -= 0x200;
-		}
-		else
-		{
-			x &= 0xfff;
-			y &= 0xfff;
-
-			if (x & 0x800) x -= 0x1000;
-			if (y & 0x800) y -= 0x1000;
-
-		}
-
-
-		const u32 color =  (data & 0x003f);
-		const u8 fx     =  (data & 0x4000) >> 14;
-		const u8 fy     =  (data & 0x2000) >> 13;
-		const u8 dy     = ((data & 0x0380) >> 7)  + 1;
-		const u8 dx     = ((data & 0x1c00) >> 10) + 1;
-
-		if (!fx)
-		{
-			if (!fy)
-			{
-				for (int ax = 0; ax < dx; ax++)
-					for (int ay = 0; ay < dy; ay++)
-					{
-						m_gfxdecode->gfx(0)->prio_transpen(bitmap,cliprect,
-						sprite++,
-						color,fx,fy,(x+ax*16)+m_sprite_xoffs,y+ay*16+m_sprite_yoffs,
-						screen.priority(),pri_mask, 15);
-					}
-			}
-			else
-			{
-				for (int ax = 0; ax < dx; ax++)
-					for (int ay = 0; ay < dy; ay++)
-					{
-						m_gfxdecode->gfx(0)->prio_transpen(bitmap,cliprect,
-						sprite++,
-						color,fx,fy,(x+ax*16)+m_sprite_xoffs,y+(dy-ay-1)*16+m_sprite_yoffs,
-						screen.priority(),pri_mask,15);
-					}
-			}
-		}
-		else
-		{
-			if (!fy)
-			{
-				for (int ax = 0; ax < dx; ax++)
-					for (int ay = 0; ay < dy; ay++)
-					{
-						m_gfxdecode->gfx(0)->prio_transpen(bitmap,cliprect,
-						sprite++,
-						color,fx,fy,(x+(dx-ax-1)*16)+m_sprite_xoffs,y+ay*16+m_sprite_yoffs,
-						screen.priority(),pri_mask,15);
-					}
-			}
-			else
-			{
-				for (int ax = 0; ax < dx; ax++)
-					for (int ay = 0; ay < dy; ay++)
-					{
-						m_gfxdecode->gfx(0)->prio_transpen(bitmap,cliprect,
-						sprite++,
-						color,fx,fy,(x+(dx-ax-1)*16)+m_sprite_xoffs,y+(dy-ay-1)*16+m_sprite_yoffs,
-						screen.priority(),pri_mask, 15);
-					}
-			}
-		}
-	}
+u32 legionna_state::godzilla_tile_cb(u32 code, u8 ext, u8 y)
+{
+	if (ext)
+		code |= 0x4000; //tile banking,used in Denjin Makai
+	if (y)
+		code |= 0x8000; //tile banking?,used in Denjin Makai
+	return code;
 }
 
 u32 legionna_state::screen_update_legionna(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -446,13 +339,13 @@ u32 legionna_state::screen_update_legionna(screen_device &screen, bitmap_ind16 &
 	screen.priority().fill(0, cliprect);
 	bitmap.fill(m_palette->black_pen(), cliprect);    /* wrong color? */
 
-	if (!(m_layer_disable & 0x0001)) m_midground_layer->draw(screen, bitmap, cliprect, 0, 0);
-	if (!(m_layer_disable & 0x0002)) m_background_layer->draw(screen, bitmap, cliprect, 0, 1);
-	if (!(m_layer_disable & 0x0004)) m_foreground_layer->draw(screen, bitmap, cliprect, 0, 2);
-	if (!(m_layer_disable & 0x0008)) m_text_layer->draw(screen, bitmap, cliprect, 0, 4);
+	if (BIT(~m_layer_disable, 0)) m_midground_layer->draw(screen, bitmap, cliprect, 0, 0);
+	if (BIT(~m_layer_disable, 1)) m_background_layer->draw(screen, bitmap, cliprect, 0, 1);
+	if (BIT(~m_layer_disable, 2)) m_foreground_layer->draw(screen, bitmap, cliprect, 0, 2);
+	if (BIT(~m_layer_disable, 3)) m_text_layer->draw(screen, bitmap, cliprect, 0, 4);
 
-	if (!(m_layer_disable & 0x0010))
-		draw_sprites(screen,bitmap,cliprect);
+	if (BIT(~m_layer_disable, 4))
+		m_spritegen->draw_sprites(screen, bitmap, cliprect, m_spriteram, m_spriteram.bytes());
 
 	//if (machine().input().code_pressed_once(KEYCODE_Z))
 	//  if (m_raiden2cop) m_raiden2cop->dump_table();
@@ -467,13 +360,13 @@ u32 legionna_state::screen_update_heatbrl(screen_device &screen, bitmap_ind16 &b
 	bitmap.fill(m_palette->black_pen(), cliprect);    /* wrong color? */
 
 	// TODO: priority order is different than anything else?
-	if (!(m_layer_disable & 0x0004)) m_foreground_layer->draw(screen, bitmap, cliprect, 0, 0);
-	if (!(m_layer_disable & 0x0002)) m_midground_layer->draw(screen, bitmap, cliprect, 0, 1);
-	if (!(m_layer_disable & 0x0001)) m_background_layer->draw(screen, bitmap, cliprect, 0, 2);
-	if (!(m_layer_disable & 0x0008)) m_text_layer->draw(screen, bitmap, cliprect, 0, 4);
+	if (BIT(~m_layer_disable, 2)) m_foreground_layer->draw(screen, bitmap, cliprect, 0, 0);
+	if (BIT(~m_layer_disable, 1)) m_midground_layer->draw(screen, bitmap, cliprect, 0, 1);
+	if (BIT(~m_layer_disable, 0)) m_background_layer->draw(screen, bitmap, cliprect, 0, 2);
+	if (BIT(~m_layer_disable, 3)) m_text_layer->draw(screen, bitmap, cliprect, 0, 4);
 
-	if (!(m_layer_disable & 0x0010))
-		draw_sprites(screen,bitmap,cliprect);
+	if (BIT(~m_layer_disable, 4))
+		m_spritegen->draw_sprites(screen, bitmap, cliprect, m_spriteram, m_spriteram.bytes());
 
 	//if (machine().input().code_pressed_once(KEYCODE_Z))
 	//  if (m_raiden2cop) m_raiden2cop->dump_table();
@@ -488,13 +381,13 @@ u32 legionna_state::screen_update_godzilla(screen_device &screen, bitmap_ind16 &
 	// matches PCB recording for Denjin Makai, settable thru CRTC?
 	bitmap.fill(0xff, cliprect);
 
-	if (!(m_layer_disable & 0x0001)) m_background_layer->draw(screen, bitmap, cliprect, 0, 0);
-	if (!(m_layer_disable & 0x0002)) m_midground_layer->draw(screen, bitmap, cliprect, 0, 1);
-	if (!(m_layer_disable & 0x0004)) m_foreground_layer->draw(screen, bitmap, cliprect, 0, 2);
-	if (!(m_layer_disable & 0x0008)) m_text_layer->draw(screen, bitmap, cliprect, 0, 4);
+	if (BIT(~m_layer_disable, 0)) m_background_layer->draw(screen, bitmap, cliprect, 0, 0);
+	if (BIT(~m_layer_disable, 1)) m_midground_layer->draw(screen, bitmap, cliprect, 0, 1);
+	if (BIT(~m_layer_disable, 2)) m_foreground_layer->draw(screen, bitmap, cliprect, 0, 2);
+	if (BIT(~m_layer_disable, 3)) m_text_layer->draw(screen, bitmap, cliprect, 0, 4);
 
-	if (!(m_layer_disable & 0x0010))
-		draw_sprites(screen,bitmap,cliprect);
+	if (BIT(~m_layer_disable, 4))
+		m_spritegen->draw_sprites(screen, bitmap, cliprect, m_spriteram, m_spriteram.bytes());
 
 	//if (machine().input().code_pressed_once(KEYCODE_Z))
 	//  if (m_raiden2cop) m_raiden2cop->dump_table();
@@ -508,20 +401,13 @@ u32 legionna_state::screen_update_grainbow(screen_device &screen, bitmap_ind16 &
 	bitmap.fill(m_palette->black_pen(), cliprect);
 	screen.priority().fill(0, cliprect);
 
-	if (!(m_layer_disable & 1))
-		m_background_layer->draw(screen, bitmap, cliprect, 0,0);
+	if (BIT(~m_layer_disable, 0)) m_background_layer->draw(screen, bitmap, cliprect, 0, 0);
+	if (BIT(~m_layer_disable, 1)) m_midground_layer->draw(screen, bitmap, cliprect, 0, 1);
+	if (BIT(~m_layer_disable, 2)) m_foreground_layer->draw(screen, bitmap, cliprect, 0, 2);
+	if (BIT(~m_layer_disable, 3)) m_text_layer->draw(screen, bitmap, cliprect, 0, 4);
 
-	if (!(m_layer_disable & 2))
-		m_midground_layer->draw(screen, bitmap, cliprect, 0,1);
-
-	if (!(m_layer_disable & 4))
-		m_foreground_layer->draw(screen, bitmap, cliprect, 0,2);
-
-	if (!(m_layer_disable & 8))
-		m_text_layer->draw(screen, bitmap, cliprect, 0,4);
-
-	if (!(m_layer_disable & 0x0010))
-		draw_sprites(screen,bitmap,cliprect);
+	if (BIT(~m_layer_disable, 4))
+		m_spritegen->draw_sprites(screen, bitmap, cliprect, m_spriteram, m_spriteram.bytes());
 
 	//if (machine().input().code_pressed_once(KEYCODE_Z))
 	//  if (m_raiden2cop) m_raiden2cop->dump_table();

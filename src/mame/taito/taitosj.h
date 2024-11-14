@@ -1,7 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:Nicola Salmoria
 
-
 #include "machine/input_merger.h"
 #include "sound/ay8910.h"
 #include "sound/dac.h"
@@ -16,8 +15,8 @@
 class taitosj_state : public driver_device
 {
 public:
-	taitosj_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	taitosj_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_videoram(*this, "videoram_%u", 1U),
 		m_spriteram(*this, "spriteram"),
 		m_paletteram(*this, "paletteram"),
@@ -55,13 +54,13 @@ public:
 	void init_junglhbr();
 	void init_spacecr();
 
-	DECLARE_CUSTOM_INPUT_MEMBER(input_port_4_f0_r);
-	template <int Player> DECLARE_CUSTOM_INPUT_MEMBER(kikstart_gear_r);
+	ioport_value input_port_4_f0_r();
+	template <int Player> ioport_value kikstart_gear_r();
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 	virtual void device_post_load() override;
 
 private:
@@ -127,8 +126,8 @@ private:
 	uint8_t fake_status_r();
 	uint8_t mcu_mem_r(offs_t offset);
 	void mcu_mem_w(offs_t offset, uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(mcu_intrq_w);
-	DECLARE_WRITE_LINE_MEMBER(mcu_busrq_w);
+	void mcu_intrq_w(int state);
+	void mcu_busrq_w(int state);
 	uint8_t spacecr_prot_r();
 	void alpine_protection_w(uint8_t data);
 	void alpinea_bankswitch_w(uint8_t data);
@@ -164,8 +163,8 @@ private:
 	void copy_layers(bitmap_ind16 &bitmap, const rectangle &cliprect, copy_layer_func_t copy_layer_func, int *sprites_on, rectangle *sprite_areas);
 	int video_update_common(bitmap_ind16 &bitmap, const rectangle &cliprect, copy_layer_func_t copy_layer_func);
 
-	void kikstart_main_map(address_map &map);
-	void taitosj_audio_map(address_map &map);
-	void main_mcu_map(address_map &map);
-	void main_nomcu_map(address_map &map);
+	void kikstart_main_map(address_map &map) ATTR_COLD;
+	void taitosj_audio_map(address_map &map) ATTR_COLD;
+	void main_mcu_map(address_map &map) ATTR_COLD;
+	void main_nomcu_map(address_map &map) ATTR_COLD;
 };

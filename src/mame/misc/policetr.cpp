@@ -109,7 +109,7 @@ PC5380-9651            5380-JY3306A           5380-N1045503A
  *
  *************************************/
 
-WRITE_LINE_MEMBER(policetr_state::vblank)
+void policetr_state::vblank(int state)
 {
 	m_maincpu->set_input_line(state ? INPUT_LINE_IRQ4 : INPUT_LINE_IRQ5, ASSERT_LINE);
 }
@@ -192,7 +192,7 @@ void policetr_state::bsmt2000_data_w(offs_t offset, uint32_t data, uint32_t mem_
 }
 
 
-READ_LINE_MEMBER(policetr_state::bsmt_status_r)
+int policetr_state::bsmt_status_r()
 {
 	return m_bsmt->read_status();
 }
@@ -327,13 +327,13 @@ static INPUT_PORTS_START( policetr )
 	PORT_BIT( 0x00100000, IP_ACTIVE_LOW, IPT_UNUSED )   /* /TILT (note 1) */
 	PORT_BIT( 0x00200000, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x00400000, IP_ACTIVE_LOW, IPT_UNUSED )   /* /SERVICE (note 1) */
-	PORT_BIT( 0x00800000, IP_ACTIVE_HIGH, IPT_CUSTOM )  PORT_READ_LINE_MEMBER(policetr_state, bsmt_status_r)
+	PORT_BIT( 0x00800000, IP_ACTIVE_HIGH, IPT_CUSTOM )  PORT_READ_LINE_MEMBER(FUNC(policetr_state::bsmt_status_r))
 	PORT_BIT( 0x01000000, IP_ACTIVE_LOW, IPT_BUTTON1 )  PORT_PLAYER(1)
 	PORT_BIT( 0x02000000, IP_ACTIVE_LOW, IPT_UNKNOWN )  /* /XSW2 (note 2) */
 	PORT_BIT( 0x04000000, IP_ACTIVE_LOW, IPT_BUTTON1 )  PORT_PLAYER(2)
 	PORT_BIT( 0x08000000, IP_ACTIVE_LOW, IPT_UNKNOWN )  /* /XSW2 (note 2) */
 	PORT_BIT( 0x10000000, IP_ACTIVE_LOW, IPT_UNUSED )   /* TKTSNS (note 3) */
-	PORT_BIT( 0x20000000, IP_ACTIVE_HIGH, IPT_CUSTOM )  PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read) /* EEPROM read */
+	PORT_BIT( 0x20000000, IP_ACTIVE_HIGH, IPT_CUSTOM )  PORT_READ_LINE_DEVICE_MEMBER("eeprom", FUNC(eeprom_serial_93cxx_device::do_read)) /* EEPROM read */
 	PORT_BIT( 0x40000000, IP_ACTIVE_LOW, IPT_UNUSED )   /* /VOLMDN (note 1) */
 	PORT_BIT( 0x80000000, IP_ACTIVE_LOW, IPT_UNUSED )   /* /VOLMUP (note 1) */
 
@@ -740,7 +740,7 @@ ROM_END
  *
  *************************************/
 
-void policetr_state::driver_init()
+void policetr_state::driver_start()
 {
 	m_maincpu->space(AS_PROGRAM).install_write_handler(m_speedup_addr, m_speedup_addr+3, write32s_delegate(*this, FUNC(policetr_state::speedup_w)));
 	m_speedup_data = m_rambase + m_speedup_addr/4;

@@ -75,16 +75,12 @@ void digdug_state::digdug_palette(palette_device &palette) const
 /* convert from 32x32 to 36x28 */
 TILEMAP_MAPPER_MEMBER(digdug_state::tilemap_scan)
 {
-	int offs;
-
 	row += 2;
 	col -= 2;
 	if (col & 0x20)
-		offs = row + ((col & 0x1f) << 5);
+		return row + ((col & 0x1f) << 5);
 	else
-		offs = col + (row << 5);
-
-	return offs;
+		return col + (row << 5);
 }
 
 
@@ -188,14 +184,14 @@ void digdug_state::bg_select_w(uint8_t data)
 	}
 }
 
-WRITE_LINE_MEMBER(digdug_state::tx_color_mode_w)
+void digdug_state::tx_color_mode_w(int state)
 {
 	// select alpha layer color mode (see tx_get_tile_info)
 	m_tx_color_mode = state;
 	m_fg_tilemap->mark_all_dirty();
 }
 
-WRITE_LINE_MEMBER(digdug_state::bg_disable_w)
+void digdug_state::bg_disable_w(int state)
 {
 	// "disable" background (see bg_get_tile_info)
 	m_bg_disable = state;

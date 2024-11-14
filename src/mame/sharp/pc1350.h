@@ -8,8 +8,8 @@
  *
  ****************************************************************************/
 
-#ifndef MAME_INCLUDES_PC1350_H
-#define MAME_INCLUDES_PC1350_H
+#ifndef MAME_SHARP_PC1350_H
+#define MAME_SHARP_PC1350_H
 
 #include "pocketc.h"
 #include "machine/ram.h"
@@ -28,11 +28,11 @@ public:
 	void pc1350(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void pc1350_mem(address_map &map);
+	void pc1350_mem(address_map &map) ATTR_COLD;
 
 	void out_b_w(uint8_t data);
 	void out_c_w(uint8_t data);
@@ -57,4 +57,4 @@ private:
 	static const char* const s_sml[5];
 };
 
-#endif // MAME_INCLUDES_PC1350_H
+#endif // MAME_SHARP_PC1350_H

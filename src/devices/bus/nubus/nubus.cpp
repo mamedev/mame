@@ -53,7 +53,7 @@ void nubus_slot_device::device_resolve_objects()
 	if (dev)
 	{
 		dev->set_nubus_tag(m_nubus.target(), m_nubus_slottag);
-		m_nubus->add_nubus_card(dev);
+		m_nubus->add_nubus_card(*dev);
 	}
 }
 
@@ -94,23 +94,11 @@ nubus_device::nubus_device(const machine_config &mconfig, device_type type, cons
 	m_out_irqd_cb(*this),
 	m_out_irqe_cb(*this)
 {
+	m_addr_mask = 0xffffffff;
 }
 
-//-------------------------------------------------
-//  device_resolve_objects - resolve objects that
-//  may be needed for other devices to set
-//  initial conditions at start time
-//-------------------------------------------------
-
-void nubus_device::device_resolve_objects()
+nubus_device::~nubus_device()
 {
-	// resolve callbacks
-	m_out_irq9_cb.resolve_safe();
-	m_out_irqa_cb.resolve_safe();
-	m_out_irqb_cb.resolve_safe();
-	m_out_irqc_cb.resolve_safe();
-	m_out_irqd_cb.resolve_safe();
-	m_out_irqe_cb.resolve_safe();
 }
 
 //-------------------------------------------------
@@ -121,15 +109,17 @@ void nubus_device::device_start()
 {
 }
 
-void nubus_device::add_nubus_card(device_nubus_card_interface *card)
+void nubus_device::add_nubus_card(device_nubus_card_interface &card)
 {
-	m_device_list.append(*card);
+	m_device_list.emplace_back(card);
 }
 
 template <typename R, typename W>
 void nubus_device::install_device(offs_t start, offs_t end, R rhandler, W whandler, uint32_t mask)
 {
-	int buswidth = m_space->data_width();
+	const int buswidth = m_space->data_width();
+	start &= m_addr_mask;
+	end &= m_addr_mask;
 	switch(buswidth)
 	{
 		case 32:
@@ -159,7 +149,9 @@ template void nubus_device::install_device<read32smo_delegate, write32smo_delega
 template <typename R>
 void nubus_device::install_readonly_device(offs_t start, offs_t end, R rhandler, uint32_t mask)
 {
-	int buswidth = m_space->data_width();
+	const int buswidth = m_space->data_width();
+	start &= m_addr_mask;
+	end &= m_addr_mask;
 	switch(buswidth)
 	{
 		case 32:
@@ -189,7 +181,9 @@ template void nubus_device::install_readonly_device<read32smo_delegate>(offs_t s
 template <typename W>
 void nubus_device::install_writeonly_device(offs_t start, offs_t end, W whandler, uint32_t mask)
 {
-	int buswidth = m_space->data_width();
+	const int buswidth = m_space->data_width();
+	start &= m_addr_mask;
+	end &= m_addr_mask;
 	switch(buswidth)
 	{
 		case 32:
@@ -218,13 +212,15 @@ template void nubus_device::install_writeonly_device<write32smo_delegate>(offs_t
 
 void nubus_device::install_bank(offs_t start, offs_t end, void *data)
 {
-//  printf("install_bank: %s @ %x->%x\n", tag, start, end);
+	start &= m_addr_mask;
+	end &= m_addr_mask;
 	m_space->install_ram(start, end, data);
 }
 
 void nubus_device::install_view(offs_t start, offs_t end, memory_view &view)
 {
-//  printf("install_view: %s @ %x->%x\n", tag, start, end);
+	start &= m_addr_mask;
+	end &= m_addr_mask;
 	m_space->install_view(start, end, view);
 }
 
@@ -242,12 +238,12 @@ void nubus_device::set_irq_line(int slot, int state)
 }
 
 // interrupt request from nubus card
-WRITE_LINE_MEMBER( nubus_device::irq9_w ) { m_out_irq9_cb(state); }
-WRITE_LINE_MEMBER( nubus_device::irqa_w ) { m_out_irqa_cb(state); }
-WRITE_LINE_MEMBER( nubus_device::irqb_w ) { m_out_irqb_cb(state); }
-WRITE_LINE_MEMBER( nubus_device::irqc_w ) { m_out_irqc_cb(state); }
-WRITE_LINE_MEMBER( nubus_device::irqd_w ) { m_out_irqd_cb(state); }
-WRITE_LINE_MEMBER( nubus_device::irqe_w ) { m_out_irqe_cb(state); }
+void nubus_device::irq9_w(int state) { m_out_irq9_cb(state); }
+void nubus_device::irqa_w(int state) { m_out_irqa_cb(state); }
+void nubus_device::irqb_w(int state) { m_out_irqb_cb(state); }
+void nubus_device::irqc_w(int state) { m_out_irqc_cb(state); }
+void nubus_device::irqd_w(int state) { m_out_irqd_cb(state); }
+void nubus_device::irqe_w(int state) { m_out_irqe_cb(state); }
 
 //**************************************************************************
 //  DEVICE CONFIG NUBUS CARD INTERFACE
@@ -262,10 +258,11 @@ WRITE_LINE_MEMBER( nubus_device::irqe_w ) { m_out_irqe_cb(state); }
 //  device_nubus_card_interface - constructor
 //-------------------------------------------------
 
-device_nubus_card_interface::device_nubus_card_interface(const machine_config &mconfig, device_t &device)
-	: device_interface(device, "nubus"),
-		m_nubus(nullptr),
-		m_nubus_slottag(nullptr), m_slot(0), m_next(nullptr)
+device_nubus_card_interface::device_nubus_card_interface(const machine_config &mconfig, device_t &device) :
+	device_interface(device, "nubus"),
+	m_nubus(nullptr),
+	m_nubus_slottag(nullptr),
+	m_slot(0)
 {
 }
 
@@ -280,13 +277,13 @@ device_nubus_card_interface::~device_nubus_card_interface()
 
 void device_nubus_card_interface::interface_pre_start()
 {
-	if (!strncmp(m_nubus_slottag, "pds030", 6))
+	if ((!strncmp(m_nubus_slottag, "pds030", 6)) || (!strcmp(m_nubus_slottag, "siexp")))
 	{
-		m_slot = 0x9;   // '030 PDS slots phantom slot as NuBus slots $9, $A, and $B
+		m_slot = 0x9;   // '030 PDS slots phantom slot as whatever they want but default to 9
 	}
 	else if (!strncmp(m_nubus_slottag, "lcpds", 6))
 	{
-		m_slot = 0xe;   // LC PDS slots phantom slot as NuBus slot $E
+		m_slot = 0xe; // LC PDS phantom slots as slot $E in most cases
 	}
 	else
 	{
@@ -456,7 +453,6 @@ void device_nubus_card_interface::install_declaration_rom(const char *romregion,
 	// now install the ROM
 	uint32_t addr = get_slotspace() + 0x01000000;
 	addr -= romlen;
-//  printf("Installing ROM at %x, length %x\n", addr, romlen);
 	if (mirror_all_mb)  // mirror the declaration ROM across all 16 megs of the slot space
 	{
 		uint32_t off = 0;

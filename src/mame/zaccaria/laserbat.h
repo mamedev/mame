@@ -5,8 +5,8 @@
     Laser Battle / Lazarian - Cat and Mouse
 
 *************************************************************************/
-#ifndef MAME_INCLUDES_LASERBAT_H
-#define MAME_INCLUDES_LASERBAT_H
+#ifndef MAME_ZACCARIA_LASERBAT_H
+#define MAME_ZACCARIA_LASERBAT_H
 
 #pragma once
 
@@ -30,8 +30,8 @@ class laserbat_state_base : public driver_device
 {
 public:
 	void laserbat_base(machine_config &config);
-	void laserbat_io_map(address_map &map);
-	void laserbat_map(address_map &map);
+	void laserbat_io_map(address_map &map) ATTR_COLD;
+	void laserbat_map(address_map &map) ATTR_COLD;
 
 protected:
 	laserbat_state_base(const machine_config &mconfig, device_type type, const char *tag, uint8_t eff2_mask)
@@ -71,7 +71,7 @@ protected:
 	virtual void csound2_w(uint8_t data);
 
 	// running the video
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 	uint32_t screen_update_laserbat(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	// video functions
@@ -147,7 +147,7 @@ public:
 
 protected:
 	// initialisation/startup
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 	// video initialisation
 	void laserbat_palette(palette_device &palette) const;
@@ -188,4 +188,4 @@ protected:
 	required_device<zac1b11107_audio_device>    m_audiopcb;
 };
 
-#endif // MAME_INCLUDES_LASERBAT_H
+#endif // MAME_ZACCARIA_LASERBAT_H

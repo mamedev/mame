@@ -36,6 +36,9 @@
 #include "machine/bankdev.h"
 #include "sound/msm5205.h"
 
+
+namespace {
+
 class galspanic_ms_state : public driver_device
 {
 public:
@@ -81,9 +84,9 @@ private:
 	required_device<address_map_bank_device> m_soundrom;
 	required_device<generic_latch_8_device> m_soundlatch;
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 	void galspanic_ms_palette(palette_device &palette) const;
 
 	uint32_t screen_update_backgrounds(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -91,9 +94,9 @@ private:
 
 	// comad
 	uint16_t comad_timer_r();
-	void newquiz_map(address_map &map);
-	void sound_map(address_map &map);
-	void soundrom_map(address_map &map);
+	void newquiz_map(address_map &map) ATTR_COLD;
+	void sound_map(address_map &map) ATTR_COLD;
+	void soundrom_map(address_map &map) ATTR_COLD;
 
 	uint8_t unk_r()
 	{
@@ -107,9 +110,9 @@ private:
 
 	tilemap_t *m_bg_tilemap2 = nullptr;
 
-	DECLARE_WRITE_LINE_MEMBER(splash_msm5205_int);
-	void splash_adpcm_data_w(uint8_t data);
-	void splash_adpcm_control_w(uint8_t data);
+	void splash_msm5205_int(int state);
+	[[maybe_unused]] void splash_adpcm_data_w(uint8_t data);
+	[[maybe_unused]] void splash_adpcm_control_w(uint8_t data);
 	int m_adpcm_data = 0;
 
 	void descramble_16x16tiles(uint8_t* src, int len);
@@ -221,7 +224,7 @@ void galspanic_ms_state::splash_adpcm_control_w(uint8_t data)
 	m_soundrom->set_bank(bank & 0xf);
 }
 
-WRITE_LINE_MEMBER(galspanic_ms_state::splash_msm5205_int)
+void galspanic_ms_state::splash_msm5205_int(int state)
 {
 	m_msm->data_w(m_adpcm_data >> 4);
 	m_adpcm_data = (m_adpcm_data << 4) & 0xf0;
@@ -581,6 +584,7 @@ void galspanic_ms_state::init_galpanicms()
 	descramble_16x16tiles(memregion("bgtile")->base(), memregion("bgtile")->bytes());
 }
 
+} // anonymous namespace
 
 
 GAME( 1991, galpanicms,  galsnew,  newquiz,  newquiz,  galspanic_ms_state, init_galpanicms, ROT90, "bootleg (Kaenko)", "New Quiz (Modular System bootleg of Gals Panic)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

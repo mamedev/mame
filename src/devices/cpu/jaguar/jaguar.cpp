@@ -22,10 +22,6 @@
 
 #include <algorithm>
 
-#define LOG_GPU_IO      0
-#define LOG_DSP_IO      0
-
-
 /***************************************************************************
     CONSTANTS
 ***************************************************************************/
@@ -357,7 +353,6 @@ void jaguar_cpu_device::device_start()
 	space(AS_PROGRAM).cache(m_cache);
 	space(AS_PROGRAM).specific(m_program);
 	space(AS_IO).specific(m_io);
-	m_cpu_interrupt.resolve_safe();
 
 	save_item(NAME(m_r));
 	save_item(NAME(m_a));
@@ -1014,7 +1009,7 @@ void jaguar_cpu_device::ror_rn_rn(u16 op)
 	const u8 dreg = op & 31;
 	const u32 r1 = m_r[(op >> 5) & 31] & 31;
 	const u32 r2 = m_r[dreg];
-	const u32 res = (r2 >> r1) | (r2 << (32 - r1));
+	const u32 res = rotr_32(r2, r1);
 	m_r[dreg] = res;
 	CLR_ZNC(); SET_ZN(res); m_flags |= (r2 >> 30) & 2;
 }
@@ -1024,7 +1019,7 @@ void jaguar_cpu_device::rorq_n_rn(u16 op)
 	const u8 dreg = op & 31;
 	const u32 r1 = convert_zero[(op >> 5) & 31];
 	const u32 r2 = m_r[dreg];
-	const u32 res = (r2 >> r1) | (r2 << (32 - r1));
+	const u32 res = rotr_32(r2, r1);
 	m_r[dreg] = res;
 	CLR_ZNC(); SET_ZN(res); m_flags |= (r2 >> 30) & 2;
 }
@@ -1414,7 +1409,7 @@ u32 jaguar_cpu_device::status_r()
 	return result;
 }
 
-WRITE_LINE_MEMBER(jaguar_cpu_device::go_w)
+void jaguar_cpu_device::go_w(int state)
 {
 	m_go = state;
 	set_input_line(INPUT_LINE_HALT, (m_go == true) ? CLEAR_LINE : ASSERT_LINE);

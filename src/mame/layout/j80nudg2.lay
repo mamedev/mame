@@ -310,7 +310,7 @@
 		<disk state="0">
 			<color red="0.25" green="0.25" blue="0.00"/>
 		</disk>
-		<text string="&#xA3;1.50">
+		<text string="£1.50">
 			<color red="0.0" green="0.0" blue="0.0"/>
 			<bounds x="0.10" y="0.10" width="0.80" height="0.80"/>
 		</text>

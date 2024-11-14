@@ -10,8 +10,8 @@
 
 ***************************************************************************/
 
-#ifndef MAME_MACHINE_MODEL1IO_H
-#define MAME_MACHINE_MODEL1IO_H
+#ifndef MAME_SEGA_MODEL1IO_H
+#define MAME_SEGA_MODEL1IO_H
 
 #pragma once
 
@@ -37,14 +37,14 @@ public:
 	template <unsigned N> auto an_callback() { return m_an_cb[N].bind(); }
 	auto output_callback() { return m_output_cb.bind(); }
 
-	void mem_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual const tiny_rom_entry *device_rom_region() const override;
-	virtual ioport_constructor device_input_ports() const override;
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_start() override ATTR_COLD;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 private:
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
@@ -82,4 +82,4 @@ private:
 // device type definition
 DECLARE_DEVICE_TYPE(SEGA_MODEL1IO, model1io_device)
 
-#endif // MAME_MACHINE_MODEL1IO_H
+#endif // MAME_SEGA_MODEL1IO_H

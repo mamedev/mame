@@ -43,7 +43,7 @@ protected:
 	sed1500_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u8 cmax, u8 smax);
 
 	// device-level overrides
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 	TIMER_CALLBACK_MEMBER(update_segs);
 
@@ -51,8 +51,8 @@ protected:
 
 	const u8 m_cmax; // number of COL pins
 	const u8 m_smax; // number of SEG pins
-	u8 m_mode = 0;
-	u8 m_cout = 0;
+	u8 m_mode;
+	u8 m_cout;
 	u8 m_ram[0x80];
 
 	// callbacks

@@ -19,6 +19,8 @@
 #include <algorithm>
 
 
+namespace {
+
 class lee1220_state : public driver_device
 {
 public:
@@ -32,7 +34,7 @@ public:
 	void lee1220(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	MC6845_UPDATE_ROW(update_row);
@@ -41,8 +43,8 @@ private:
 	void sdlc_w(offs_t offset, u8 data);
 	u8 c0_r();
 
-	void mem_map(address_map &map);
-	void io_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
+	void io_map(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	//required_device<wd1933_device> m_sdlc;
@@ -142,5 +144,8 @@ ROM_START(lee1220)
 	ROM_REGION(0x400, "kbdmcu", 0)
 	ROM_LOAD("03278_d8748.2", 0x000, 0x400, CRC(a63ce4d8) SHA1(a713f3aae5e9096a627fab13573eee2170b42b1a))
 ROM_END
+
+} // anonymous namespace
+
 
 COMP(1983, lee1220, 0, 0, lee1220, lee1220, lee1220_state, empty_init, "Lee Data", "1220 Display Terminal", MACHINE_IS_SKELETON)

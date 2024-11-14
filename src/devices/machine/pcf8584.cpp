@@ -54,7 +54,7 @@ const char *const pcf8584_device::s_bus_function[4] = { "NOP", "stop", "start", 
 
 pcf8584_device::pcf8584_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, PCF8584, tag, owner, clock)
-	, m_sda_callback(*this)
+	, m_sda_callback(*this, 1)
 	, m_sda_out_callback(*this)
 	, m_scl_callback(*this)
 	, m_int_callback(*this)
@@ -67,21 +67,6 @@ pcf8584_device::pcf8584_device(const machine_config &mconfig, const char *tag, d
 	, m_s2_clock(0)
 	, m_s3_vector(0)
 {
-}
-
-
-//-------------------------------------------------
-//  device_resolve_objects - resolve objects that
-//  may be needed for other devices to set
-//  initial conditions at start time
-//-------------------------------------------------
-
-void pcf8584_device::device_resolve_objects()
-{
-	m_sda_callback.resolve_safe(1);
-	m_sda_out_callback.resolve_safe();
-	m_scl_callback.resolve_safe();
-	m_int_callback.resolve_safe();
 }
 
 

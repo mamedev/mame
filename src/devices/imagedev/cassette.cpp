@@ -17,10 +17,12 @@
 #include "util/ioprocs.h"
 #include "util/ioprocsfilter.h"
 
-#define LOG_WARN          (1U<<1)   // Warnings
-#define LOG_DETAIL        (1U<<2)   // Details
+#include <regex>
 
-#define VERBOSE ( LOG_WARN )
+#define LOG_WARN          (1U << 1)   // Warnings
+#define LOG_DETAIL        (1U << 2)   // Details
+
+#define VERBOSE (LOG_WARN)
 
 #include "logmacro.h"
 
@@ -248,17 +250,27 @@ const software_list_loader &cassette_image_device::get_software_list_loader() co
 	return image_software_list_loader::instance();
 }
 
-image_init_result cassette_image_device::call_create(int format_type, util::option_resolution *format_options)
+std::pair<std::error_condition, std::string> cassette_image_device::call_create(int format_type, util::option_resolution *format_options)
 {
-	return internal_load(true);
+	return std::make_pair(internal_load(true), std::string());
 }
 
-image_init_result cassette_image_device::call_load()
+std::pair<std::error_condition, std::string> cassette_image_device::call_load()
 {
-	return internal_load(false);
+	return std::make_pair(internal_load(false), std::string());
 }
 
-image_init_result cassette_image_device::internal_load(bool is_create)
+bool cassette_image_device::has_any_extension(std::string_view candidate_extensions) const
+{
+	const char separator = ',';
+	std::istringstream extension_stream(std::string{candidate_extensions});
+	for (std::string extension; std::getline(extension_stream, extension, separator);)
+		if (is_filetype(extension))
+			return true;
+	return false;
+}
+
+std::error_condition cassette_image_device::internal_load(bool is_create)
 {
 	cassette_image::error err;
 	device_image_interface *image = nullptr;
@@ -270,10 +282,9 @@ image_init_result cassette_image_device::internal_load(bool is_create)
 		auto io = util::random_read_write_fill(image_core_file(), 0x00);
 		if (io)
 		{
-			// creating an image
 			err = cassette_image::create(
 					std::move(io),
-					&cassette_image::wavfile_format,
+					has_any_extension(cassette_image::flacfile_format.extensions) ? &cassette_image::flacfile_format : &cassette_image::wavfile_format,
 					m_create_opts,
 					cassette_image::FLAG_READWRITE|cassette_image::FLAG_SAVEONEXIT,
 					m_cassette);
@@ -335,7 +346,7 @@ image_init_result cassette_image_device::internal_load(bool is_create)
 		m_speed = 1;
 		m_direction = 1;
 
-		return image_init_result::PASS;
+		return std::error_condition();
 	}
 	else
 	{
@@ -358,8 +369,7 @@ image_init_result cassette_image_device::internal_load(bool is_create)
 				imgerr = image_error::UNSPECIFIED;
 				break;
 		}
-		image->seterror(imgerr, nullptr);
-		return image_init_result::FAIL;
+		return imgerr;
 	}
 }
 
@@ -451,9 +461,13 @@ void cassette_image_device::sound_stream_update(sound_stream &stream, std::vecto
 		if (m_samples.size() < outputs[0].samples())
 			m_samples.resize(outputs[0].samples());
 
+		const cassette_image::Info info = cassette->get_info();
 		for (int ch = 0; ch < outputs.size(); ch++)
 		{
-			cassette->get_samples(0, time_index, duration, outputs[0].samples(), 2, &m_samples[0], cassette_image::WAVEFORM_16BIT);
+			if (ch < info.channels)
+				cassette->get_samples(ch, time_index, duration, outputs[0].samples(), 2, &m_samples[0], cassette_image::WAVEFORM_16BIT);
+			else
+				cassette->get_samples(0, time_index, duration, outputs[0].samples(), 2, &m_samples[0], cassette_image::WAVEFORM_16BIT);
 			for (int sampindex = 0; sampindex < outputs[ch].samples(); sampindex++)
 				outputs[ch].put_int(sampindex, m_samples[sampindex], 32768);
 		}

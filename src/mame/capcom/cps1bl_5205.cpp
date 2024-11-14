@@ -39,6 +39,8 @@ knightsb3:       OK.
 #include "speaker.h"
 
 
+namespace {
+
 #define CPS1_ROWSCROLL_OFFS  (0x20/2)    /* base of row scroll offsets in other RAM */
 #define CODE_SIZE            0x400000
 
@@ -72,17 +74,17 @@ private:
 	void captcommb2_soundlatch_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	uint8_t captcommb2_soundlatch_r();
 	void captcommb2_snd_bankswitch_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(captcommb2_mux_select_w);
+	void captcommb2_mux_select_w(int state);
 	void knightsb_layer_w(offs_t offset, uint16_t data);
 	void sf2b_layer_w(offs_t offset, uint16_t data);
 	void sf2mdt_layer_w(offs_t offset, uint16_t data);
 	void sf2mdt_soundlatch_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	void sf2mdta_layer_w(offs_t offset, uint16_t data);
 
-	void captcommb2_map(address_map &map);
-	void sf2b_map(address_map &map);
-	void sf2mdt_map(address_map &map);
-	void captcommb2_z80map(address_map &map);
+	void captcommb2_map(address_map &map) ATTR_COLD;
+	void sf2b_map(address_map &map) ATTR_COLD;
+	void sf2mdt_map(address_map &map) ATTR_COLD;
+	void captcommb2_z80map(address_map &map) ATTR_COLD;
 
 	bool m_captcommb2_mux_toggle = false;
 
@@ -161,7 +163,7 @@ void cps1bl_5205_state::captcommb2_snd_bankswitch_w(uint8_t data)
 	membank("bank1")->set_entry(data & 0x0f);
 }
 
-WRITE_LINE_MEMBER(cps1bl_5205_state::captcommb2_mux_select_w)
+void cps1bl_5205_state::captcommb2_mux_select_w(int state)
 {
 	// toggle both mux select pins (and fire /nmi)
 	// vck halved by flipflop IC186  ~2kHz
@@ -1362,6 +1364,9 @@ ROM_START( sf2mdtb )
 	ROM_LOAD( "5.ic28", 0x00000, 0x20000, CRC(d5bee9cc) SHA1(e638cb5ce7a22c18b60296a7defe8b03418da56c) )
 	ROM_RELOAD(         0x10000, 0x20000 )
 ROM_END
+
+} // anonymous namespace
+
 
 // ************************************************************************* DRIVER MACROS
 

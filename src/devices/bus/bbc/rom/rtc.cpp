@@ -82,22 +82,22 @@ uint8_t bbc_stlrtc_device::read(offs_t offset)
 	switch (offset & 0x3fc0)
 	{
 	case 0x3e00:
-		data = m_rtc->read(1);
+		data = m_rtc->data_r();
 		break;
 	case 0x3e40:
 		if (!machine().side_effects_disabled())
-			m_rtc->write(0, data);
+			m_rtc->address_w(data);
 		break;
 	case 0x3e80:
 	case 0x3ec0:
-		data = m_rtc->read(0);
+		data = m_rtc->get_address(); // FIXME: really?
 		break;
 	case 0x3f00:
 	case 0x3f40:
 	case 0x3f80:
 	case 0x3fc0:
 		if (!machine().side_effects_disabled())
-			m_rtc->write(1, data);
+			m_rtc->data_w(data);
 		break;
 	}
 	return data;

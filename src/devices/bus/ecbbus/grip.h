@@ -39,13 +39,13 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// optional information overrides
-	virtual const tiny_rom_entry *device_rom_region() const override;
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual ioport_constructor device_input_ports() const override;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 
 	// device_ecbbus_card_interface overrides
 	virtual uint8_t ecbbus_io_r(offs_t offset) override;
@@ -57,12 +57,12 @@ private:
 	uint8_t ppi_pb_r();
 	void ppi_pc_w(uint8_t data);
 	uint8_t sti_gpio_r();
-	DECLARE_WRITE_LINE_MEMBER( speaker_w );
+	void speaker_w(int state);
 
 	void kb_w(uint8_t data);
 
-	DECLARE_WRITE_LINE_MEMBER( write_centronics_busy );
-	DECLARE_WRITE_LINE_MEMBER( write_centronics_fault );
+	void write_centronics_busy(int state);
+	void write_centronics_fault(int state);
 
 	MC6845_UPDATE_ROW( crtc_update_row );
 
@@ -110,8 +110,8 @@ private:
 	uint8_t cxstb_r();
 	void cxstb_w(uint8_t data);
 
-	void grip_io(address_map &map);
-	void grip_mem(address_map &map);
+	void grip_io(address_map &map) ATTR_COLD;
+	void grip_mem(address_map &map) ATTR_COLD;
 
 	/*
 	required_device<hd6345_device> m_crtc;

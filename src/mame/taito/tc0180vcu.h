@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Nicola Salmoria
-#ifndef MAME_VIDEO_TC0180VCU_H
-#define MAME_VIDEO_TC0180VCU_H
+#ifndef MAME_TAITO_TC0180VCU_H
+#define MAME_TAITO_TC0180VCU_H
 
 #pragma once
 
@@ -30,12 +30,11 @@ public:
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	void draw_framebuffer( bitmap_ind16 &bitmap, const rectangle &cliprect, int priority );
 
-	void tc0180vcu_memrw(address_map &map);
+	void tc0180vcu_memrw(address_map &map) ATTR_COLD;
 protected:
-	// device-level overrides
-	virtual void device_resolve_objects() override;
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	// device_t implementation
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	TIMER_CALLBACK_MEMBER(update_intl);
 
@@ -79,4 +78,4 @@ private:
 
 DECLARE_DEVICE_TYPE(TC0180VCU, tc0180vcu_device)
 
-#endif // MAME_VIDEO_TC0180VCU_H
+#endif // MAME_TAITO_TC0180VCU_H

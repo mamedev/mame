@@ -3138,11 +3138,11 @@ GAME( 1988, srangern,  sranger,  rranger,  rranger,  suna8_state, init_suna8,   
 GAME( 1988, srangerw,  sranger,  rranger,  rranger,  suna8_state, init_suna8,     ROT0,  "SunA (WDK license)",         "Super Ranger (older, WDK license)",  MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1988, srangerb,  sranger,  rranger,  rranger,  suna8_state, init_suna8,     ROT0,  "bootleg (NYWA)",             "Super Ranger (older, bootleg)",      MACHINE_IMPERFECT_GRAPHICS )
 
-GAME( 1988, hardhead,  0,        hardhead, hardhead, suna8_state, init_hardhead,  ROT0,  "SunA",                       "Hard Head",                   0 )
-GAME( 1988, hardheadb, hardhead, hardhead, hardhead, suna8_state, init_hardhedb,  ROT0,  "bootleg",                    "Hard Head (bootleg, set 1)",  0 )
-GAME( 1988, hardheadb2,hardhead, hardhead, hardhead, suna8_state, init_hardhedb,  ROT0,  "bootleg",                    "Hard Head (bootleg, set 2)",  MACHINE_NOT_WORKING )
-GAME( 1989, hardheadb3,hardhead, hardhead, hardhead, suna8_state, init_hardhedb,  ROT0,  "bootleg",                    "Hard Head (bootleg, set 3)",  0 )
-GAME( 1989, pop_hh,    hardhead, hardhead, hardhead, suna8_state, init_hardhedb,  ROT0,  "bootleg",                    "Popper (Hard Head bootleg)",  0 )
+GAME( 1988, hardhead,  0,        hardhead, hardhead, suna8_state, init_hardhead,  ROT0,  "SunA",                       "Hard Head",                     0 )
+GAME( 1988, hardheadb, hardhead, hardhead, hardhead, suna8_state, init_hardhedb,  ROT0,  "bootleg",                    "Hard Head (bootleg, set 1)",    0 )
+GAME( 1988, hardheadb2,hardhead, hardhead, hardhead, suna8_state, init_hardhedb,  ROT0,  "bootleg",                    "Hard Head (bootleg, set 2)",    MACHINE_NOT_WORKING )
+GAME( 1989, hardheadb3,hardhead, hardhead, hardhead, suna8_state, init_hardhedb,  ROT0,  "bootleg",                    "Hard Head (bootleg, set 3)",    0 )
+GAME( 1989, pop_hh,    hardhead, hardhead, hardhead, suna8_state, init_hardhedb,  ROT0,  "bootleg",                    "Popper (bootleg of Hard Head)", 0 )
 
 GAME( 1989, sparkman,  0,        sparkman, sparkman, suna8_state, init_sparkman,  ROT0,  "SunA",                       "Spark Man (v2.0, set 1)",     0 )
 GAME( 1989, sparkmana, sparkman, sparkman, sparkman, suna8_state, init_sparkman,  ROT0,  "SunA",                       "Spark Man (v2.0, set 2)",     0 )

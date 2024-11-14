@@ -49,7 +49,6 @@
     converting to fractional sample position; fixed ADPCM
     decoding bugs; added documentation.
 
-
 *********************************************************/
 
 #include "emu.h"
@@ -70,7 +69,8 @@ DEFINE_DEVICE_TYPE(K053260, k053260_device, "k053260", "K053260 KDSC")
 // Pan multipliers.  Set according to integer angles in degrees, amusingly.
 // Exact precision hard to know, the floating point-ish output format makes
 // comparisons iffy.  So we used a 1.16 format.
-const int k053260_device::pan_mul[8][2] = {
+const int k053260_device::pan_mul[8][2] =
+{
 	{     0,     0 }, // No sound for pan 0
 	{ 65536,     0 }, //  0 degrees
 	{ 59870, 26656 }, // 24 degrees
@@ -100,6 +100,7 @@ k053260_device::k053260_device(const machine_config &mconfig, const char *tag, d
 	, m_timer(nullptr)
 	, m_keyon(0)
 	, m_mode(0)
+	, m_timer_state(0)
 	, m_voice{ { *this }, { *this }, { *this }, { *this } }
 {
 	std::fill(std::begin(m_portdata), std::end(m_portdata), 0);
@@ -112,10 +113,7 @@ k053260_device::k053260_device(const machine_config &mconfig, const char *tag, d
 
 void k053260_device::device_start()
 {
-	m_sh1_cb.resolve_safe();
-	m_sh2_cb.resolve_safe();
-
-	m_stream = stream_alloc( 0, 2, clock() / CLOCKS_PER_SAMPLE );
+	m_stream = stream_alloc(0, 2, clock() / CLOCKS_PER_SAMPLE);
 
 	/* register with the save state system */
 	save_item(NAME(m_portdata));
@@ -137,7 +135,8 @@ void k053260_device::device_start()
 void k053260_device::device_clock_changed()
 {
 	m_stream->set_sample_rate(clock() / CLOCKS_PER_SAMPLE);
-	m_timer->adjust(attotime::from_ticks(16, clock()), 0, attotime::from_ticks(16, clock()));
+	attotime period = attotime::from_ticks(16, clock());
+	m_timer->adjust(period, 0, period);
 }
 
 
@@ -147,18 +146,20 @@ void k053260_device::device_clock_changed()
 
 void k053260_device::device_reset()
 {
-	m_timer->adjust(attotime::from_ticks(16, clock()), 0, attotime::from_ticks(16, clock()));
+	attotime period = attotime::from_ticks(16, clock());
+	m_timer->adjust(period, 0, period);
 
-	for (auto & elem : m_voice)
-		elem.voice_reset();
+	for (auto & voice : m_voice)
+		voice.voice_reset();
 }
 
 
 //-------------------------------------------------
-//  rom_bank_updated - the rom bank has changed
+//  rom_bank_pre_change - refresh the stream if the
+//  ROM banking changes
 //-------------------------------------------------
 
-void k053260_device::rom_bank_updated()
+void k053260_device::rom_bank_pre_change()
 {
 	m_stream->update();
 }
@@ -166,11 +167,12 @@ void k053260_device::rom_bank_updated()
 
 TIMER_CALLBACK_MEMBER(k053260_device::update_state_outputs)
 {
-	switch(m_timer_state) {
-	case 0: m_sh1_cb(ASSERT_LINE); break;
-	case 1: m_sh1_cb(CLEAR_LINE); break;
-	case 2: m_sh2_cb(ASSERT_LINE); break;
-	case 3: m_sh2_cb(CLEAR_LINE); break;
+	switch (m_timer_state)
+	{
+		case 0: m_sh1_cb(ASSERT_LINE); break;
+		case 1: m_sh1_cb(CLEAR_LINE); break;
+		case 2: m_sh2_cb(ASSERT_LINE); break;
+		case 3: m_sh2_cb(CLEAR_LINE); break;
 	}
 	m_timer_state = (m_timer_state+1) & 3;
 }
@@ -245,15 +247,17 @@ void k053260_device::write(offs_t offset, u8 data)
 
 		// 0x04 through 0x07 seem to be unused
 
-		case 0x28: // key on/off
+		case 0x28: // key on/off and reverse
 		{
 			u8 rising_edge = data & ~m_keyon;
 
 			for (int i = 0; i < 4; i++)
 			{
-				if (rising_edge & (1 << i))
+				m_voice[i].set_reverse(BIT(data, i | 4));
+
+				if (BIT(rising_edge, i))
 					m_voice[i].key_on();
-				else if (!(data & (1 << i)))
+				else if (!BIT(data, i))
 					m_voice[i].key_off();
 			}
 			m_keyon = data;
@@ -263,10 +267,10 @@ void k053260_device::write(offs_t offset, u8 data)
 		// 0x29 is a read register
 
 		case 0x2a: // loop and pcm/adpcm select
-			for (auto & elem : m_voice)
+			for (int i = 0; i < 4; i++)
 			{
-				elem.set_loop_kadpcm(data);
-				data >>= 1;
+				m_voice[i].set_loop(BIT(data, i));
+				m_voice[i].set_kadpcm(BIT(data, i | 4));
 			}
 			break;
 
@@ -309,7 +313,7 @@ void k053260_device::sound_stream_update(sound_stream &stream, std::vector<read_
 {
 	if (m_mode & 2)
 	{
-		for ( int j = 0; j < outputs[0].samples(); j++ )
+		for (int j = 0; j < outputs[0].samples(); j++)
 		{
 			s32 buffer[2] = {0, 0};
 
@@ -351,6 +355,7 @@ void k053260_device::KDSC_Voice::voice_start(int index)
 	m_device.save_item(NAME(m_pan), index);
 	m_device.save_item(NAME(m_loop), index);
 	m_device.save_item(NAME(m_kadpcm), index);
+	m_device.save_item(NAME(m_reverse), index);
 }
 
 void k053260_device::KDSC_Voice::voice_reset()
@@ -366,6 +371,7 @@ void k053260_device::KDSC_Voice::voice_reset()
 	m_pan = 0;
 	m_loop = false;
 	m_kadpcm = false;
+	m_reverse = false;
 	update_pan_volume();
 }
 
@@ -400,10 +406,19 @@ void k053260_device::KDSC_Voice::set_register(offs_t offset, u8 data)
 	}
 }
 
-void k053260_device::KDSC_Voice::set_loop_kadpcm(u8 data)
+void k053260_device::KDSC_Voice::set_loop(int state)
 {
-	m_loop = BIT(data, 0);
-	m_kadpcm = BIT(data, 4);
+	m_loop = bool(state);
+}
+
+void k053260_device::KDSC_Voice::set_kadpcm(int state)
+{
+	m_kadpcm = bool(state);
+}
+
+void k053260_device::KDSC_Voice::set_reverse(int state)
+{
+	m_reverse = bool(state);
 }
 
 void k053260_device::KDSC_Voice::set_pan(u8 data)
@@ -424,8 +439,15 @@ void k053260_device::KDSC_Voice::key_on()
 	m_counter = 0x1000 - CLOCKS_PER_SAMPLE; // force update on next sound_stream_update
 	m_output = 0;
 	m_playing = true;
-	if (LOG) m_device.logerror("K053260: start = %06x, length = %06x, pitch = %04x, vol = %02x:%x, loop = %s, %s\n",
-							   m_start, m_length, m_pitch, m_volume, m_pan, m_loop ? "yes" : "no", m_kadpcm ? "KADPCM" : "PCM" );
+
+	if (LOG)
+	{
+		m_device.logerror("K053260: start = %06x, length = %06x, pitch = %04x, vol = %02x:%x, loop = %s, reverse = %s, %s\n",
+				m_start, m_length, m_pitch, m_volume, m_pan,
+				m_loop ? "yes" : "no",
+				m_reverse ? "yes" : "no",
+				m_kadpcm ? "KADPCM" : "PCM");
+	}
 }
 
 void k053260_device::KDSC_Voice::key_off()
@@ -443,7 +465,7 @@ void k053260_device::KDSC_Voice::play(s32 *outputs)
 	{
 		m_counter = m_counter - 0x1000 + m_pitch;
 
-		u32 bytepos = ++m_position >> ( m_kadpcm ? 1 : 0 );
+		u32 bytepos = ++m_position >> (m_kadpcm ? 1 : 0);
 		/*
 		Yes, _pre_increment. Playback must start 1 byte position after the
 		start address written to the register, or else ADPCM sounds will
@@ -467,7 +489,7 @@ void k053260_device::KDSC_Voice::play(s32 *outputs)
 			}
 		}
 
-		u8 romdata = m_device.read_byte(m_start + bytepos);
+		u8 romdata = m_device.read_byte(m_start + (m_reverse ? -bytepos : +bytepos));
 
 		if (m_kadpcm)
 		{

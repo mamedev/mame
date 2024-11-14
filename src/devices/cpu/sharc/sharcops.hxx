@@ -1,8 +1,5 @@
 // license:BSD-3-Clause
 // copyright-holders:Ville Linde
-#define SIGN_EXTEND6(x)     (((x) & 0x20) ? (0xffffffc0 | (x)) : (x))
-#define SIGN_EXTEND24(x)    (((x) & 0x800000) ? (0xff000000 | (x)) : (x))
-
 #define PM_REG_I(x)         (m_core->dag2.i[x])
 #define PM_REG_M(x)         (m_core->dag2.m[x])
 #define PM_REG_B(x)         (m_core->dag2.b[x])
@@ -457,8 +454,6 @@ void adsp21062_device::SET_UREG(int ureg, uint32_t data)
 
 #define SET_FLAG_SZ(x)                  if((x) == 0) m_core->astat |= SZ
 
-#define MAKE_EXTRACT_MASK(start_bit, length)    ((0xffffffff << start_bit) & (((uint32_t)0xffffffff) >> (32 - (start_bit + length))))
-
 void adsp21062_device::SHIFT_OPERATION_IMM(int shiftop, int data, int rn, int rx)
 {
 	int8_t shift = data & 0xff;
@@ -504,18 +499,7 @@ void adsp21062_device::SHIFT_OPERATION_IMM(int shiftop, int data, int rn, int rx
 
 		case 0x02:      /* ROT Rx BY <data8> */
 		{
-			if (shift < 0)
-			{
-				int s = (-shift) & 0x1f;
-				REG(rn) = (((uint32_t)REG(rx) >> s) & ((uint32_t)(0xffffffff) >> s)) |
-								(((uint32_t)REG(rx) << (32-s)) & ((uint32_t)(0xffffffff) << (32-s)));
-			}
-			else
-			{
-				int s = shift & 0x1f;
-				REG(rn) = (((uint32_t)REG(rx) << s) & ((uint32_t)(0xffffffff) << s)) |
-								(((uint32_t)REG(rx) >> (32-s)) & ((uint32_t)(0xffffffff) >> (32-s)));
-			}
+			REG(rn) = rotl_32(REG(rx), shift);
 			SET_FLAG_SZ(REG(rn));
 			break;
 		}
@@ -541,8 +525,10 @@ void adsp21062_device::SHIFT_OPERATION_IMM(int shiftop, int data, int rn, int rx
 
 		case 0x10:      /* FEXT Rx BY <bit6>:<len6> */
 		{
-			uint32_t ext = REG(rx) & MAKE_EXTRACT_MASK(bit, len);
-			REG(rn) = ext >> bit;
+			if (len == 0 || bit >= 32)
+				REG(rn) = 0;
+			else
+				REG(rn) = BIT(REG(rx), bit, std::min(len, 32));
 
 			SET_FLAG_SZ(REG(rn));
 			if (bit+len > 32)
@@ -554,9 +540,10 @@ void adsp21062_device::SHIFT_OPERATION_IMM(int shiftop, int data, int rn, int rx
 
 		case 0x11:      /* Rn = Rn FDEP Rx BY <bit6>:<len6> */
 		{
-			uint32_t ext = REG(rx) & MAKE_EXTRACT_MASK(0, len);
-
-			REG(rn) = ext << bit;
+			if (len == 0 || bit >= 32)
+				REG(rn) = 0;
+			else
+				REG(rn) = (REG(rx) & util::make_bitmask<uint32_t>(std::min(len, 32))) << bit;
 
 			SET_FLAG_SZ(REG(rn));
 			if (bit+len > 32)
@@ -568,11 +555,10 @@ void adsp21062_device::SHIFT_OPERATION_IMM(int shiftop, int data, int rn, int rx
 
 		case 0x12:      /* FEXT Rx BY <bit6>:<len6> (Sign Extended) */
 		{
-			uint32_t ext = (REG(rx) & MAKE_EXTRACT_MASK(bit, len)) >> bit;
-			if (ext & (1 << (len-1))) {
-				ext |= (uint32_t)0xffffffff << (len-1);
-			}
-			REG(rn) = ext;
+			if (len == 0 || bit >= 32)
+				REG(rn) = 0;
+			else
+				REG(rn) = util::sext(REG(rx) >> bit, std::min(len, 32));
 
 			SET_FLAG_SZ(REG(rn));
 			if (bit+len > 32)
@@ -584,11 +570,10 @@ void adsp21062_device::SHIFT_OPERATION_IMM(int shiftop, int data, int rn, int rx
 
 		case 0x13:      /* FDEP Rx BY Ry <bit6>:<len6> (Sign Extended) */
 		{
-			uint32_t ext = REG(rx) & MAKE_EXTRACT_MASK(0, len);
-			if (ext & (1 << (len-1))) {
-				ext |= (uint32_t)0xffffffff << (len-1);
-			}
-			REG(rn) = ext << bit;
+			if (len == 0 || bit >= 32)
+				REG(rn) = 0;
+			else
+				REG(rn) = util::sext(REG(rx), std::min(len, 32)) << bit;
 
 			SET_FLAG_SZ(REG(rn));
 			if (bit+len > 32)
@@ -600,9 +585,8 @@ void adsp21062_device::SHIFT_OPERATION_IMM(int shiftop, int data, int rn, int rx
 
 		case 0x19:      /* Rn = Rn OR FDEP Rx BY <bit6>:<len6> */
 		{
-			uint32_t ext = REG(rx) & MAKE_EXTRACT_MASK(0, len);
-
-			REG(rn) |= ext << bit;
+			if (len != 0 && bit < 32)
+				REG(rn) |= (REG(rx) & util::make_bitmask<uint32_t>(std::min(len, 32))) << bit;
 
 			SET_FLAG_SZ(REG(rn));
 			if (bit+len > 32)
@@ -908,15 +892,11 @@ void adsp21062_device::COMPUTE(uint32_t opcode)
 						int shift = REG(ry);
 						if (shift < 0)
 						{
-							int s = (-shift) & 0x1f;
-							REG(rn) = (((uint32_t)REG(rx) >> s) & ((uint32_t)(0xffffffff) >> s)) |
-										(((uint32_t)REG(rx) << (32-s)) & ((uint32_t)(0xffffffff) << (32-s)));
+							REG(rn) = rotr_32(REG(rx), -shift);
 						}
 						else
 						{
-							int s = shift & 0x1f;
-							REG(rn) = (((uint32_t)REG(rx) << s) & ((uint32_t)(0xffffffff) << s)) |
-										(((uint32_t)REG(rx) >> (32-s)) & ((uint32_t)(0xffffffff) >> (32-s)));
+							REG(rn) = rotl_32(REG(rx), shift);
 							if (shift > 0)
 							{
 								m_core->astat |= SV;
@@ -946,8 +926,10 @@ void adsp21062_device::COMPUTE(uint32_t opcode)
 					{
 						int bit = REG(ry) & 0x3f;
 						int len = (REG(ry) >> 6) & 0x3f;
-						uint32_t ext = REG(rx) & MAKE_EXTRACT_MASK(bit, len);
-						REG(rn) = ext >> bit;
+						if (len == 0 || bit >= 32)
+							REG(rn) = 0;
+						else
+							REG(rn) = BIT(REG(rx), bit, std::min(len, 32));
 
 						SET_FLAG_SZ(REG(rn));
 						if (bit+len > 32)
@@ -961,11 +943,10 @@ void adsp21062_device::COMPUTE(uint32_t opcode)
 					{
 						int bit = REG(ry) & 0x3f;
 						int len = (REG(ry) >> 6) & 0x3f;
-						uint32_t ext = (REG(rx) & MAKE_EXTRACT_MASK(bit, len)) >> bit;
-						if (ext & (1 << (len-1))) {
-							ext |= (uint32_t)0xffffffff << (len-1);
-						}
-						REG(rn) = ext;
+						if (len == 0 || bit >= 32)
+							REG(rn) = 0;
+						else
+							REG(rn) = util::sext(REG(rx) >> bit, std::min(len, 32));
 
 						SET_FLAG_SZ(REG(rn));
 						if (bit+len > 32)
@@ -979,9 +960,9 @@ void adsp21062_device::COMPUTE(uint32_t opcode)
 					{
 						int bit = REG(ry) & 0x3f;
 						int len = (REG(ry) >> 6) & 0x3f;
-						uint32_t ext = REG(rx) & MAKE_EXTRACT_MASK(0, len);
 
-						REG(rn) |= ext << bit;
+						if (len != 0 && bit < 32)
+							REG(rn) |= (REG(rx) & util::make_bitmask<uint32_t>(std::min(len, 32))) << bit;
 
 						SET_FLAG_SZ(REG(rn));
 						if (bit+len > 32)
@@ -1484,7 +1465,7 @@ void adsp21062_device::sharcop_compute_dm_to_dreg_immmod()
 	int u = (m_core->opcode >> 38) & 0x1;
 	int dreg = (m_core->opcode >> 23) & 0xf;
 	int i = (m_core->opcode >> 41) & 0x7;
-	int mod = SIGN_EXTEND6((m_core->opcode >> 27) & 0x3f);
+	int mod = util::sext((m_core->opcode >> 27) & 0x3f, 6);
 	int compute = m_core->opcode & 0x7fffff;
 
 	if (IF_CONDITION_CODE(cond))
@@ -1514,7 +1495,7 @@ void adsp21062_device::sharcop_compute_dreg_to_dm_immmod()
 	int u = (m_core->opcode >> 38) & 0x1;
 	int dreg = (m_core->opcode >> 23) & 0xf;
 	int i = (m_core->opcode >> 41) & 0x7;
-	int mod = SIGN_EXTEND6((m_core->opcode >> 27) & 0x3f);
+	int mod = util::sext((m_core->opcode >> 27) & 0x3f, 6);
 	int compute = m_core->opcode & 0x7fffff;
 
 	/* due to parallelity issues, source REG must be saved */
@@ -1548,7 +1529,7 @@ void adsp21062_device::sharcop_compute_pm_to_dreg_immmod()
 	int u = (m_core->opcode >> 38) & 0x1;
 	int dreg = (m_core->opcode >> 23) & 0xf;
 	int i = (m_core->opcode >> 41) & 0x7;
-	int mod = SIGN_EXTEND6((m_core->opcode >> 27) & 0x3f);
+	int mod = util::sext((m_core->opcode >> 27) & 0x3f, 6);
 	int compute = m_core->opcode & 0x7fffff;
 
 	if (IF_CONDITION_CODE(cond))
@@ -1578,7 +1559,7 @@ void adsp21062_device::sharcop_compute_dreg_to_pm_immmod()
 	int u = (m_core->opcode >> 38) & 0x1;
 	int dreg = (m_core->opcode >> 23) & 0xf;
 	int i = (m_core->opcode >> 41) & 0x7;
-	int mod = SIGN_EXTEND6((m_core->opcode >> 27) & 0x3f);
+	int mod = util::sext((m_core->opcode >> 27) & 0x3f, 6);
 	int compute = m_core->opcode & 0x7fffff;
 
 	/* due to parallelity issues, source REG must be saved */
@@ -1822,12 +1803,12 @@ void adsp21062_device::sharcop_relative_call()
 		if (j)
 		{
 			PUSH_PC(m_core->pc+3);  /* 1 instruction + 2 delayed instructions */
-			CHANGE_PC_DELAYED(m_core->pc + SIGN_EXTEND24(address));
+			CHANGE_PC_DELAYED(m_core->pc + util::sext(address, 24));
 		}
 		else
 		{
 			PUSH_PC(m_core->pc+1);
-			CHANGE_PC(m_core->pc + SIGN_EXTEND24(address));
+			CHANGE_PC(m_core->pc + util::sext(address, 24));
 		}
 	}
 }
@@ -1864,11 +1845,11 @@ void adsp21062_device::sharcop_relative_jump()
 
 		if (j)
 		{
-			CHANGE_PC_DELAYED(m_core->pc + SIGN_EXTEND24(address));
+			CHANGE_PC_DELAYED(m_core->pc + util::sext(address, 24));
 		}
 		else
 		{
-			CHANGE_PC(m_core->pc + SIGN_EXTEND24(address));
+			CHANGE_PC(m_core->pc + util::sext(address, 24));
 		}
 	}
 }
@@ -2053,11 +2034,11 @@ void adsp21062_device::sharcop_relative_jump_compute()
 
 			if (j)
 			{
-				CHANGE_PC_DELAYED(m_core->pc + SIGN_EXTEND6((m_core->opcode >> 27) & 0x3f));
+				CHANGE_PC_DELAYED(m_core->pc + util::sext((m_core->opcode >> 27) & 0x3f, 6));
 			}
 			else
 			{
-				CHANGE_PC(m_core->pc + SIGN_EXTEND6((m_core->opcode >> 27) & 0x3f));
+				CHANGE_PC(m_core->pc + util::sext((m_core->opcode >> 27) & 0x3f, 6));
 			}
 		}
 		else
@@ -2085,11 +2066,11 @@ void adsp21062_device::sharcop_relative_jump_compute()
 
 			if (j)
 			{
-				CHANGE_PC_DELAYED(m_core->pc + SIGN_EXTEND6((m_core->opcode >> 27) & 0x3f));
+				CHANGE_PC_DELAYED(m_core->pc + util::sext((m_core->opcode >> 27) & 0x3f, 6));
 			}
 			else
 			{
-				CHANGE_PC(m_core->pc + SIGN_EXTEND6((m_core->opcode >> 27) & 0x3f));
+				CHANGE_PC(m_core->pc + util::sext((m_core->opcode >> 27) & 0x3f, 6));
 			}
 		}
 	}
@@ -2111,13 +2092,13 @@ void adsp21062_device::sharcop_relative_call_compute()
 			{
 				//PUSH_PC(m_core->pc+3);  /* 1 instruction + 2 delayed instructions */
 				PUSH_PC(m_core->nfaddr);    /* 1 instruction + 2 delayed instructions */
-				CHANGE_PC_DELAYED(m_core->pc + SIGN_EXTEND6((m_core->opcode >> 27) & 0x3f));
+				CHANGE_PC_DELAYED(m_core->pc + util::sext((m_core->opcode >> 27) & 0x3f, 6));
 			}
 			else
 			{
 				//PUSH_PC(m_core->pc+1);
 				PUSH_PC(m_core->daddr);
-				CHANGE_PC(m_core->pc + SIGN_EXTEND6((m_core->opcode >> 27) & 0x3f));
+				CHANGE_PC(m_core->pc + util::sext((m_core->opcode >> 27) & 0x3f, 6));
 			}
 		}
 		else
@@ -2141,13 +2122,13 @@ void adsp21062_device::sharcop_relative_call_compute()
 			{
 				//PUSH_PC(m_core->pc+3);  /* 1 instruction + 2 delayed instructions */
 				PUSH_PC(m_core->nfaddr);    /* 1 instruction + 2 delayed instructions */
-				CHANGE_PC_DELAYED(m_core->pc + SIGN_EXTEND6((m_core->opcode >> 27) & 0x3f));
+				CHANGE_PC_DELAYED(m_core->pc + util::sext((m_core->opcode >> 27) & 0x3f, 6));
 			}
 			else
 			{
 				//PUSH_PC(m_core->pc+1);
 				PUSH_PC(m_core->daddr);
-				CHANGE_PC(m_core->pc + SIGN_EXTEND6((m_core->opcode >> 27) & 0x3f));
+				CHANGE_PC(m_core->pc + util::sext((m_core->opcode >> 27) & 0x3f, 6));
 			}
 		}
 	}
@@ -2212,7 +2193,7 @@ void adsp21062_device::sharcop_relative_jump_compute_dreg_dm()
 
 	if (IF_CONDITION_CODE(cond))
 	{
-		CHANGE_PC(m_core->pc + SIGN_EXTEND6((m_core->opcode >> 27) & 0x3f));
+		CHANGE_PC(m_core->pc + util::sext((m_core->opcode >> 27) & 0x3f, 6));
 	}
 	else
 	{
@@ -2368,7 +2349,7 @@ void adsp21062_device::sharcop_rti()
 void adsp21062_device::sharcop_do_until_counter_imm()
 {
 	uint16_t data = (uint16_t)(m_core->opcode >> 24);
-	int offset = SIGN_EXTEND24(m_core->opcode & 0xffffff);
+	int offset = util::sext(m_core->opcode & 0xffffff, 24);
 	uint32_t address = m_core->pc + offset;
 	int type;
 	int cond = 0xf;     /* until LCE (loop counter expired */
@@ -2402,7 +2383,7 @@ void adsp21062_device::sharcop_do_until_counter_imm()
 void adsp21062_device::sharcop_do_until_counter_ureg()
 {
 	int ureg = (m_core->opcode >> 32) & 0xff;
-	int offset = SIGN_EXTEND24(m_core->opcode & 0xffffff);
+	int offset = util::sext(m_core->opcode & 0xffffff, 24);
 	uint32_t address = m_core->pc + offset;
 	int type;
 	int cond = 0xf;     /* until LCE (loop counter expired */
@@ -2436,7 +2417,7 @@ void adsp21062_device::sharcop_do_until_counter_ureg()
 void adsp21062_device::sharcop_do_until()
 {
 	int cond = (m_core->opcode >> 33) & 0x1f;
-	int offset = SIGN_EXTEND24(m_core->opcode & 0xffffff);
+	int offset = util::sext(m_core->opcode & 0xffffff, 24);
 	uint32_t address = (m_core->pc + offset);
 
 	PUSH_PC(m_core->pc+1);

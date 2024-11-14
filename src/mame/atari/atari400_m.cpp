@@ -14,42 +14,6 @@
 #include "atari400.h"
 #include "sound/pokey.h"
 
-#define VERBOSE_POKEY   1
-#define VERBOSE_SERIAL  1
-#define VERBOSE_TIMERS  1
-
-
-POKEY_INTERRUPT_CB_MEMBER(atari_common_state::interrupt_cb)
-{
-	if (VERBOSE_POKEY)
-	{
-		if (mask & 0x80)
-			logerror("atari interrupt_cb BREAK\n");
-		if (mask & 0x40)
-			logerror("atari interrupt_cb KBCOD\n");
-	}
-	if (VERBOSE_SERIAL)
-	{
-		if (mask & 0x20)
-			logerror("atari interrupt_cb SERIN\n");
-		if (mask & 0x10)
-			logerror("atari interrupt_cb SEROR\n");
-		if (mask & 0x08)
-			logerror("atari interrupt_cb SEROC\n");
-	}
-	if (VERBOSE_TIMERS)
-	{
-		if (mask & 0x04)
-			logerror("atari interrupt_cb TIMR4\n");
-		if (mask & 0x02)
-			logerror("atari interrupt_cb TIMR2\n");
-		if (mask & 0x01)
-			logerror("atari interrupt_cb TIMR1\n");
-	}
-
-	m_maincpu->set_input_line(0, HOLD_LINE);
-}
-
 
 /**************************************************************
  *
@@ -144,8 +108,9 @@ POKEY_KEYBOARD_CB_MEMBER(atari_common_state::a800_keyboard)
         x10  |Pause|  6  |  5  |  4  |
         x11  |Start|  3  |  2  |  1  |
 
-    K0 & K5 are ignored (we send them as 1, see the code below where
-    we pass "(atari_code << 1) | 0x21" )
+    K0 & K5 are ignored. Ignoring K5 doubles the rate at which the
+    matrix is scanned, and ignoring K0 allows the POKEY to register
+    keypresses with "debounce" mode disabled.
 
     To Do: investigate implementation of KR2 to read accurately the
     secondary Fire button (primary read through GTIA).
@@ -174,10 +139,6 @@ POKEY_KEYBOARD_CB_MEMBER(atari_common_state::a5200_keypads)
 	}
 
 	/* decode regular key */
-	/* if kr5 and kr0 not set just return */
-	if ((k543210 & 0x21) != 0x21)
-		return ret;
-
 	k543210 = (k543210 >> 1) & 0x0f;
 
 	/* return on BREAK key now! */

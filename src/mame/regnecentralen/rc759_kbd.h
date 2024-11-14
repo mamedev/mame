@@ -6,8 +6,8 @@
 
 ***************************************************************************/
 
-#ifndef MAME_MACHINE_RC759_KBD_H
-#define MAME_MACHINE_RC759_KBD_H
+#ifndef MAME_REGNECENTRALEN_RC759_KBD_H
+#define MAME_REGNECENTRALEN_RC759_KBD_H
 
 #pragma once
 
@@ -34,9 +34,9 @@ public:
 
 protected:
 	// device_t overrides
-	virtual ioport_constructor device_input_ports() const override;
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// device_matrix_keyboard_interface overrides
 	virtual void key_make(uint8_t row, uint8_t column) override;
@@ -52,4 +52,4 @@ private:
 // device type definition
 DECLARE_DEVICE_TYPE(RC759_KBD_HLE, rc759_kbd_hle_device)
 
-#endif // MAME_MACHINE_RC759_KBD_H
+#endif // MAME_REGNECENTRALEN_RC759_KBD_H

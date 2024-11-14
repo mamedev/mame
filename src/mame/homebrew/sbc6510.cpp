@@ -62,6 +62,8 @@ ToDo:
 #include "speaker.h"
 
 
+namespace {
+
 class sbc6510_state : public driver_device
 {
 public:
@@ -83,16 +85,16 @@ private:
 	void key_w(u8 data);
 	u8 key_r();
 
-	void main_mem_map(address_map &map);
-	void video_data_map(address_map &map);
-	void video_mem_map(address_map &map);
+	void main_mem_map(address_map &map) ATTR_COLD;
+	void video_data_map(address_map &map) ATTR_COLD;
+	void video_mem_map(address_map &map) ATTR_COLD;
 
 	u8 m_key_row = 0U;
 	u8 m_2 = 0U;
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 	required_device<cpu_device> m_maincpu;
-	required_device<avr8_device> m_videocpu;
+	required_device<atmega88_device> m_videocpu;
 	required_device<generic_terminal_device> m_terminal;
 	required_ioport_array<9> m_keyboard;
 };
@@ -320,6 +322,9 @@ ROM_START( sbc6510 )
 
 	ROM_REGION( 0x2000, "eeprom", ROMREGION_ERASEFF )
 ROM_END
+
+} // anonymous namespace
+
 
 /* Driver */
 

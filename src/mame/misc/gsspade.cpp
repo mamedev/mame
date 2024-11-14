@@ -17,6 +17,9 @@
 #include "sound/ymopl.h"
 #include "speaker.h"
 
+
+namespace {
+
 class gsspade_state : public driver_device
 {
 public:
@@ -29,8 +32,8 @@ public:
 	void gsspade(machine_config &config);
 
 private:
-	void prog_map(address_map &map);
-	void ext_map(address_map &map);
+	void prog_map(address_map &map) ATTR_COLD;
+	void ext_map(address_map &map) ATTR_COLD;
 
 	required_device<mcs51_cpu_device> m_soundcpu;
 };
@@ -86,6 +89,8 @@ ROM_START(gsspade)
 	ROM_REGION(0x2000, "soundcpu", 0)
 	ROM_LOAD("spade-gs-dm-5.u2", 0x0000, 0x2000, CRC(c359201b) SHA1(5e5ac815bcd50f918f9c8b7447bcf6cf9426ae74))
 ROM_END
+
+} // anonymous namespace
 
 
 GAME(199?, gsspade, 0, gsspade, gsspade, gsspade_state, empty_init, ROT0, "Guan Shing", "Spade", MACHINE_NOT_WORKING | MACHINE_MECHANICAL)

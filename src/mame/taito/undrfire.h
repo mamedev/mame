@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Bryan McPhail, David Graves
-#ifndef MAME_INCLUDES_UNDRFIRE_H
-#define MAME_INCLUDES_UNDRFIRE_H
+#ifndef MAME_TAITO_UNDRFIRE_H
+#define MAME_TAITO_UNDRFIRE_H
 
 #pragma once
 
@@ -31,19 +31,19 @@ public:
 		m_spritemaphi(*this, "spritemaphi"),
 		m_in_gunx(*this, "GUNX%u", 1U),
 		m_in_guny(*this, "GUNY%u", 1U),
-		m_io_fake(*this, "FAKE")
+		m_io_fake(*this, "FAKE"),
+		m_lamp_start(*this, "P%u_lamp_start", 1U),
+		m_gun_recoil(*this, "P%u_gun_recoil", 1U),
+		m_lamp(*this, "Lamp_%u", 1U),
+		m_wheel_vibration(*this, "Wheel_vibration")
 	{ }
 
 	void undrfire(machine_config &config);
 	void cbombers(machine_config &config);
 
 protected:
-	enum
-	{
-		TIMER_INTERRUPT5
-	};
-
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	struct uf_tempsprite
@@ -81,6 +81,10 @@ private:
 	optional_ioport_array<2> m_in_gunx;
 	optional_ioport_array<2> m_in_guny;
 	optional_ioport m_io_fake;
+	output_finder<2> m_lamp_start;
+	output_finder<2> m_gun_recoil;
+	output_finder<6> m_lamp;
+	output_finder<> m_wheel_vibration;
 
 	void coin_word_w(u8 data);
 	u16 shared_ram_r(offs_t offset);
@@ -89,16 +93,16 @@ private:
 	void rotate_control_w(offs_t offset, u16 data);
 	void motor_control_w(u8 data);
 	void cbombers_cpua_ctrl_w(u32 data);
-	DECLARE_READ_LINE_MEMBER(frame_counter_r);
+	int frame_counter_r();
 	u32 screen_update_undrfire(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	u32 screen_update_cbombers(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(undrfire_interrupt);
 	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap,const rectangle &cliprect,const u32 *primasks,int x_offs,int y_offs);
 	void draw_sprites_cbombers(screen_device &screen, bitmap_ind16 &bitmap,const rectangle &cliprect,const u8* pritable,int x_offs,int y_offs);
 
-	void cbombers_cpua_map(address_map &map);
-	void cbombers_cpub_map(address_map &map);
-	void undrfire_map(address_map &map);
+	void cbombers_cpua_map(address_map &map) ATTR_COLD;
+	void cbombers_cpub_map(address_map &map) ATTR_COLD;
+	void undrfire_map(address_map &map) ATTR_COLD;
 };
 
-#endif // MAME_INCLUDES_UNDRFIRE_H
+#endif // MAME_TAITO_UNDRFIRE_H

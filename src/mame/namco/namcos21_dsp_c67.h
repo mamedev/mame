@@ -1,14 +1,15 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood
-#ifndef MAME_VIDEO_NAMCOS21_DSP_C67_H
-#define MAME_VIDEO_NAMCOS21_DSP_C67_H
+#ifndef MAME_NAMCO_NAMCOS21_DSP_C67_H
+#define MAME_NAMCO_NAMCOS21_DSP_C67_H
 
 #pragma once
 
-#include "namco_c67.h"
+#include "namco_dsp.h"
 #include "namcos21_3d.h"
 
 #include <algorithm>
+#include <memory>
 
 
 #define ENABLE_LOGGING      0
@@ -48,10 +49,10 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 private:
 	static constexpr unsigned DSP_BUF_MAX = 4096*12;
@@ -81,7 +82,7 @@ private:
 	required_device<cpu_device> m_c67master;
 	required_device_array<cpu_device,4> m_c67slave;
 	required_region_ptr<int32_t> m_ptrom24;
-	std::vector<uint16_t> m_dspram16;
+	std::unique_ptr<uint16_t []> m_dspram16;
 
 	required_shared_ptr<uint16_t> m_master_dsp_ram;
 
@@ -90,7 +91,7 @@ private:
 
 	std::unique_ptr<dsp_state> m_mpDspState;
 
-	std::unique_ptr<uint8_t[]> m_pointram;
+	std::unique_ptr<uint8_t []> m_pointram;
 	int m_pointram_idx;
 	uint16_t m_pointram_control;
 	uint32_t m_pointrom_idx;
@@ -142,15 +143,15 @@ private:
 	void slave_XF_output_w(uint16_t data);
 	uint16_t slave_portf_r();
 
-	void master_dsp_data(address_map &map);
-	void master_dsp_io(address_map &map);
-	void master_dsp_program(address_map &map);
+	void master_dsp_data(address_map &map) ATTR_COLD;
+	void master_dsp_io(address_map &map) ATTR_COLD;
+	void master_dsp_program(address_map &map) ATTR_COLD;
 
-	void slave_dsp_data(address_map &map);
-	void slave_dsp_io(address_map &map);
-	void slave_dsp_program(address_map &map);
+	void slave_dsp_data(address_map &map) ATTR_COLD;
+	void slave_dsp_io(address_map &map) ATTR_COLD;
+	void slave_dsp_program(address_map &map) ATTR_COLD;
 };
 
 DECLARE_DEVICE_TYPE(NAMCOS21_DSP_C67, namcos21_dsp_c67_device)
 
-#endif // MAME_VIDEO_NAMCOS21_DSP_C67_H
+#endif // MAME_NAMCO_NAMCOS21_DSP_C67_H

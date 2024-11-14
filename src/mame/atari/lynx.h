@@ -5,8 +5,8 @@
  Atari Lynx
 
 ******************************************************************************/
-#ifndef MAME_INCLUDES_LYNX_H
-#define MAME_INCLUDES_LYNX_H
+#ifndef MAME_ATARI_LYNX_H
+#define MAME_ATARI_LYNX_H
 
 #pragma once
 
@@ -45,9 +45,9 @@ public:
 	void lynx(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 	virtual void device_post_load() override;
 
@@ -211,14 +211,6 @@ private:
 		bool      timer_active = false;
 	};
 
-	enum
-	{
-		TIMER_BLITTER,
-		TIMER_SHOT,
-		TIMER_UART_LOOPBACK,
-		TIMER_UART
-	};
-
 	// devices
 	required_shared_ptr<u8> m_dram; // 2 64Kx4 bit DRAMs connected to CPU
 	required_device<cpu_device> m_maincpu;
@@ -268,7 +260,7 @@ private:
 	bitmap_rgb32 m_bitmap;
 	bitmap_rgb32 m_bitmap_temp;
 
-	void cpu_map(address_map &map);
+	void cpu_map(address_map &map) ATTR_COLD;
 
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
@@ -310,7 +302,7 @@ private:
 	void uart_reset();
 	void interrupt_set(u8 line);
 	void interrupt_update();
-	image_verify_result verify_cart(char *header, int kind);
+	std::pair<std::error_condition, std::string> verify_cart(const char *header, int kind);
 	DECLARE_QUICKLOAD_LOAD_MEMBER(quickload_cb);
 };
 
@@ -418,4 +410,4 @@ private:
 #define SCB_STRETCH     0x0F    // L H H/V Size Adder
 #define SCB_TILT        0x11    // L,H H Position Adder
 
-#endif // MAME_INCLUDES_LYNX_H
+#endif // MAME_ATARI_LYNX_H

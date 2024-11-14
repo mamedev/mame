@@ -43,20 +43,19 @@ public:
 protected:
 	ie15_keyboard_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual void device_start() override;
-	virtual void device_reset() override;
-	virtual ioport_constructor device_input_ports() const override;
-	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 	virtual void key_make(uint8_t row, uint8_t column) override;
 
 	required_ioport m_io_kbdc;
 
 private:
-	bool m_ruslat;
-	uint8_t *m_rom;
-
+	required_region_ptr<uint8_t> m_rom;
 	devcb_write16 m_keyboard_cb;
 	devcb_write_line m_sdv_cb;
+	bool m_ruslat;
 };
 
 DECLARE_DEVICE_TYPE(IE15_KEYBOARD, ie15_keyboard_device)

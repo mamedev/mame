@@ -61,41 +61,40 @@ public:
 		return m_portd_out[Bit - 1].bind();
 	}
 
-	DECLARE_WRITE_LINE_MEMBER(porta0_w);
-	DECLARE_WRITE_LINE_MEMBER(porta1_w);
-	DECLARE_WRITE_LINE_MEMBER(porta2_w);
-	DECLARE_WRITE_LINE_MEMBER(porta3_w);
-	DECLARE_WRITE_LINE_MEMBER(porta4_w);
-	DECLARE_WRITE_LINE_MEMBER(porta5_w);
+	void porta0_w(int state);
+	void porta1_w(int state);
+	void porta2_w(int state);
+	void porta3_w(int state);
+	void porta4_w(int state);
+	void porta5_w(int state);
 
-	DECLARE_WRITE_LINE_MEMBER(portb4_w);
-	DECLARE_WRITE_LINE_MEMBER(portb5_w);
-	DECLARE_WRITE_LINE_MEMBER(portb6_w);
+	void portb4_w(int state);
+	void portb5_w(int state);
+	void portb6_w(int state);
 
-	DECLARE_WRITE_LINE_MEMBER(portc4_w);
-	DECLARE_WRITE_LINE_MEMBER(portc5_w);
-	DECLARE_WRITE_LINE_MEMBER(portc6_w);
-	DECLARE_WRITE_LINE_MEMBER(portc7_w);
+	void portc4_w(int state);
+	void portc5_w(int state);
+	void portc6_w(int state);
+	void portc7_w(int state);
 
-	DECLARE_WRITE_LINE_MEMBER(portd1_w);
-	DECLARE_WRITE_LINE_MEMBER(portd2_w);
-	DECLARE_WRITE_LINE_MEMBER(portd3_w);
-	DECLARE_WRITE_LINE_MEMBER(portd4_w);
-	DECLARE_WRITE_LINE_MEMBER(portd5_w);
-	DECLARE_WRITE_LINE_MEMBER(portd6_w);
-	DECLARE_WRITE_LINE_MEMBER(portd7_w);
+	void portd1_w(int state);
+	void portd2_w(int state);
+	void portd3_w(int state);
+	void portd4_w(int state);
+	void portd5_w(int state);
+	void portd6_w(int state);
+	void portd7_w(int state);
 
-	DECLARE_WRITE_LINE_MEMBER(timer_w);
+	void timer_w(int state);
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// device_execute_interface overrides
 	virtual uint32_t execute_min_cycles() const noexcept override;
 	virtual uint32_t execute_max_cycles() const noexcept override;
-	virtual uint32_t execute_input_lines() const noexcept override;
 	virtual void execute_run() override;
 	virtual void execute_set_input(int inputnum, int state) override;
 
@@ -109,8 +108,8 @@ protected:
 	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
 
 	// address spaces
-	void st6228_program_map(address_map &map);
-	void st6228_data_map(address_map &map);
+	void st6228_program_map(address_map &map) ATTR_COLD;
+	void st6228_data_map(address_map &map) ATTR_COLD;
 
 	void unimplemented_opcode(uint8_t op);
 

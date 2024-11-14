@@ -624,7 +624,7 @@ void mystwarr_state::mystwarr_sound_map(address_map &map)
 }
 
 
-WRITE_LINE_MEMBER(mystwarr_state::k054539_nmi_gen)
+void mystwarr_state::k054539_nmi_gen(int state)
 {
 	if (m_sound_ctrl & 0x10)
 	{
@@ -652,8 +652,8 @@ static INPUT_PORTS_START( mystwarr )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("IN1")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_er5911_device, do_read)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_er5911_device, ready_read)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", FUNC(eeprom_serial_er5911_device::do_read))
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", FUNC(eeprom_serial_er5911_device::ready_read))
 	PORT_SERVICE_NO_TOGGLE( 0x04, IP_ACTIVE_LOW )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM )   /* game loops if this is set */
 	PORT_DIPNAME( 0x10, 0x00, "Sound Output" )      PORT_DIPLOCATION("SW1:1")
@@ -676,9 +676,9 @@ static INPUT_PORTS_START( mystwarr )
 	KONAMI16_MSB(4, IPT_BUTTON3, IPT_START4 )
 
 	PORT_START( "EEPROMOUT" )
-	PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_er5911_device, di_write)
-	PORT_BIT( 0x0200, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_er5911_device, cs_write)
-	PORT_BIT( 0x0400, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_er5911_device, clk_write)
+	PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", FUNC(eeprom_serial_er5911_device::di_write))
+	PORT_BIT( 0x0200, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", FUNC(eeprom_serial_er5911_device::cs_write))
+	PORT_BIT( 0x0400, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", FUNC(eeprom_serial_er5911_device::clk_write))
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( metamrph )
@@ -693,8 +693,8 @@ static INPUT_PORTS_START( metamrph )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("IN1")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_er5911_device, do_read)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_er5911_device, ready_read)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", FUNC(eeprom_serial_er5911_device::do_read))
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", FUNC(eeprom_serial_er5911_device::ready_read))
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_CUSTOM )
 	PORT_SERVICE_NO_TOGGLE( 0x08, IP_ACTIVE_LOW )
 	PORT_DIPNAME( 0x10, 0x00, "Sound Output" )          PORT_DIPLOCATION("SW1:1")
@@ -719,9 +719,9 @@ static INPUT_PORTS_START( metamrph )
 	KONAMI16_MSB(4, IPT_BUTTON3, IPT_START4 )
 
 	PORT_START( "EEPROMOUT" )
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_er5911_device, di_write)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_er5911_device, cs_write)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_er5911_device, clk_write)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", FUNC(eeprom_serial_er5911_device::di_write))
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", FUNC(eeprom_serial_er5911_device::cs_write))
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", FUNC(eeprom_serial_er5911_device::clk_write))
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( viostorm )
@@ -736,8 +736,8 @@ static INPUT_PORTS_START( viostorm )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("IN1")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_er5911_device, do_read)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_er5911_device, ready_read)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", FUNC(eeprom_serial_er5911_device::do_read))
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", FUNC(eeprom_serial_er5911_device::ready_read))
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_CUSTOM )
 	PORT_SERVICE_NO_TOGGLE( 0x08, IP_ACTIVE_LOW )
 	PORT_DIPNAME( 0x10, 0x00, "Sound Output" )          PORT_DIPLOCATION("SW1:1")
@@ -762,9 +762,9 @@ static INPUT_PORTS_START( viostorm )
 	KONAMI16_MSB(4, IPT_BUTTON3, IPT_START4 )
 
 	PORT_START( "EEPROMOUT" )
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_er5911_device, di_write)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_er5911_device, cs_write)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_er5911_device, clk_write)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", FUNC(eeprom_serial_er5911_device::di_write))
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", FUNC(eeprom_serial_er5911_device::cs_write))
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", FUNC(eeprom_serial_er5911_device::clk_write))
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( dadandrn )
@@ -780,8 +780,8 @@ static INPUT_PORTS_START( dadandrn )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("IN1")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_er5911_device, do_read)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_er5911_device, ready_read)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", FUNC(eeprom_serial_er5911_device::do_read))
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", FUNC(eeprom_serial_er5911_device::ready_read))
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_CUSTOM )
 	PORT_SERVICE_NO_TOGGLE( 0x08, IP_ACTIVE_LOW )
 	PORT_DIPNAME( 0x10, 0x00, "Sound Output" )          PORT_DIPLOCATION("SW1:1")
@@ -803,9 +803,9 @@ static INPUT_PORTS_START( dadandrn )
 	KONAMI8_B123_START(4)
 
 	PORT_START( "EEPROMOUT" )
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_er5911_device, di_write)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_er5911_device, cs_write)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_er5911_device, clk_write)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", FUNC(eeprom_serial_er5911_device::di_write))
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", FUNC(eeprom_serial_er5911_device::cs_write))
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", FUNC(eeprom_serial_er5911_device::clk_write))
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( martchmp )
@@ -820,8 +820,8 @@ static INPUT_PORTS_START( martchmp )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("IN1")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_er5911_device, do_read)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_er5911_device, ready_read)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", FUNC(eeprom_serial_er5911_device::do_read))
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", FUNC(eeprom_serial_er5911_device::ready_read))
 	PORT_SERVICE_NO_TOGGLE( 0x04, IP_ACTIVE_LOW )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM )   /* NCPU game loops if this is set */
 	PORT_DIPNAME( 0x10, 0x00, "Sound Output" )          PORT_DIPLOCATION("SW1:1")
@@ -842,9 +842,9 @@ static INPUT_PORTS_START( martchmp )
 	KONAMI16_MSB(4, IPT_BUTTON3, IPT_START4 )
 
 	PORT_START( "EEPROMOUT" )
-	PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_er5911_device, di_write)
-	PORT_BIT( 0x0200, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_er5911_device, cs_write)
-	PORT_BIT( 0x0400, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_er5911_device, clk_write)
+	PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", FUNC(eeprom_serial_er5911_device::di_write))
+	PORT_BIT( 0x0200, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", FUNC(eeprom_serial_er5911_device::cs_write))
+	PORT_BIT( 0x0400, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", FUNC(eeprom_serial_er5911_device::clk_write))
 INPUT_PORTS_END
 
 /**********************************************************************************/
@@ -1532,6 +1532,61 @@ ROM_START( viostormub )
 	ROM_REGION( 0x400000, "k054539", 0)
 	ROM_LOAD( "168a06.1c", 0x000000, 2*1024*1024, CRC(25404fd7) SHA1(282cf523728b38d0bf14d765dd7257aa1fb2af39) )
 	ROM_LOAD( "168a07.1e", 0x200000, 2*1024*1024, CRC(fdbbf8cc) SHA1(a8adf72a25fe2b9c4c338350d02c92deb5f8c8e9) )
+
+	ROM_REGION( 0x80, "eeprom", 0 ) // default eeprom to prevent game booting upside down with error
+	ROM_LOAD( "viostormub.nv", 0x0000, 0x080, CRC(b6937413) SHA1(eabc2ea661201f5ed42ab541aee765480bbdd5bc) )
+ROM_END
+
+ROM_START( viostormubbl ) // this is a bootleg conversion, running on a Metamorphic Force PCB with proto ROM PCB
+	/* main program */
+	ROM_REGION( 0x200000, "maincpu", 0)
+	ROM_LOAD16_BYTE( "168_ua7_01.bin", 0x000001, 0x80000, CRC(97d3df09) SHA1(3b61409376ed4a2a9d70324c86ed170392526b70) )
+	ROM_LOAD16_BYTE( "168_ua7_02.bin", 0x000000, 0x80000, CRC(2c591f92) SHA1(8bdc149e8270fdf160940fe3b8d616d8c504e985) )
+
+	/* sound program */
+	ROM_REGION( 0x40000, "soundcpu", 0 )
+	ROM_LOAD("168_a_05.bin", 0x00000, 0x20000, CRC(507fb3eb) SHA1(a4f676e3caaafe86918c76ded08d0c202969adf6) )
+	ROM_RELOAD(              0x20000, 0x20000 )
+
+	/* tiles */
+	ROM_REGION( 0x600000, "k056832", ROMREGION_ERASE00 )
+	ROMX_LOAD( "168_a_09_h.bin", 0x000000, 0x80000, CRC(4ffd6e92) SHA1(f83ea4cb0248253928d0a474745da5c5d6bb1b4c), ROM_SKIP(4) )
+	ROMX_LOAD( "168_a_09_l.bin", 0x000001, 0x80000, CRC(f657bddd) SHA1(89e9e857f5e3e53c4c1e46b8df51f669a1b8719a), ROM_SKIP(4) )
+	ROMX_LOAD( "168_a_08_h.bin", 0x000002, 0x80000, CRC(143ce52e) SHA1(d1db5b9369ff0750da3db05868fb742bde93618e), ROM_SKIP(4) )
+	ROMX_LOAD( "168_a_08_l.bin", 0x000003, 0x80000, CRC(4f656594) SHA1(675b2da642ad362ab389b52340f41959b5e723b3), ROM_SKIP(4) )
+
+	/* sprites */
+	ROM_REGION( 0x800000, "k055673", ROMREGION_ERASE00 )
+	ROM_LOAD64_BYTE( "168_a_10_al.bin", 0x000000, 0x080000, CRC(e6570da5) SHA1(b5d68ca1a4b690d11808fcaaf05e8ec12eb6a4d2) )
+	ROM_LOAD64_BYTE( "168_a_10_ah.bin", 0x000001, 0x080000, CRC(e8ce69b1) SHA1(06f355120abef55403ef91f2cbbeb180e09b69ae) )
+	ROM_LOAD64_BYTE( "168_a_11_al.bin", 0x000002, 0x080000, CRC(252cc0bc) SHA1(ef122f9a16863630358bdd0b6f2cfe36fa0075b2) )
+	ROM_LOAD64_BYTE( "168_a_11_ah.bin", 0x000003, 0x080000, CRC(c2db121c) SHA1(39fb7b5ef13d434b84c27e7924cd27eb7863d815) )
+	ROM_LOAD64_BYTE( "168_a_12_al.bin", 0x000004, 0x080000, CRC(e86258c1) SHA1(440089284962ff65e77a1b711ca3258dc6d8989e) )
+	ROM_LOAD64_BYTE( "168_a_12_ah.bin", 0x000005, 0x080000, CRC(92180725) SHA1(a39715ce78773c1ea6486f7a6eebad88e5862024) )
+	ROM_LOAD64_BYTE( "168_a_13_al.bin", 0x000006, 0x080000, CRC(aef49217) SHA1(e22c9ccca47950f4faf9c4d9564b2af0f433fadf) )
+	ROM_LOAD64_BYTE( "168_a_13_ah.bin", 0x000007, 0x080000, CRC(9694f82b) SHA1(8f656ac0cb6809bf4314629ef25ae59edd890de1) )
+	ROM_LOAD64_BYTE( "168_a_10_bl.bin", 0x400000, 0x080000, CRC(90bfdf5c) SHA1(fd24aa10ff39dbadae29efcd8774c758e7dd49e8) )
+	ROM_LOAD64_BYTE( "168_a_10_bh.bin", 0x400001, 0x080000, CRC(1699d50e) SHA1(d96da93923f4469af469645fec92c2f2c6581332) )
+	ROM_LOAD64_BYTE( "168_a_11_bl.bin", 0x400002, 0x080000, CRC(9b85594e) SHA1(39e34c5490c3324e1aa8f976b36f270fb8e1708c) )
+	ROM_LOAD64_BYTE( "168_a_11_bh.bin", 0x400003, 0x080000, CRC(57efd95f) SHA1(1f1198892763f89b10dc4d8818805241e3a56a37) )
+	ROM_LOAD64_BYTE( "168_a_12_bl.bin", 0x400004, 0x080000, CRC(3c7fde2c) SHA1(54e4612f99d916595b996f5ea5f2e1fbbaf04d5e) )
+	ROM_LOAD64_BYTE( "168_a_12_bh.bin", 0x400005, 0x080000, CRC(77dbd7b0) SHA1(b71f5bd27d2fd9fef96f7f49d94804cd37822bac) )
+	ROM_LOAD64_BYTE( "168_a_13_bl.bin", 0x400006, 0x080000, CRC(26326a3c) SHA1(fc7ca1716c8b2e9268c51cdcafe262cbd8e79bf6) )
+	ROM_LOAD64_BYTE( "168_a_13_bh.bin", 0x400007, 0x080000, CRC(3cc402fb) SHA1(37cc7c21e59d641064b653f57b52c66c822114af) )
+
+	/* road generator */
+	ROM_REGION( 0x40000, "gfx3", ROMREGION_ERASE00 )
+
+	/* sound data */
+	ROM_REGION( 0x400000, "k054539", 0 )
+	ROM_LOAD( "168_a_06_a.bin", 0x000000, 0x80000, CRC(bf42efc1) SHA1(585af7d15bba1c0c821029c384bd313d28814396) )
+	ROM_LOAD( "168_a_06_b.bin", 0x080000, 0x80000, CRC(97c3e6d2) SHA1(097327b8d5be81fcff745dc7bf108ebcad17f5e7) )
+	ROM_LOAD( "168_a_06_c.bin", 0x100000, 0x80000, CRC(b5a67bf0) SHA1(5e26120b94e6eafb755104c086b2e371a89022c1) )
+	ROM_LOAD( "168_a_06_d.bin", 0x180000, 0x80000, CRC(58c407f1) SHA1(de8f050fa38a618c5e06342adec82813df230ab8) )
+	ROM_LOAD( "168_a_07_a.bin", 0x200000, 0x80000, CRC(39af77b8) SHA1(0757188842a92a3a26ca7bbcb5f5020b05fa3786) )
+	ROM_LOAD( "168_a_07_b.bin", 0x280000, 0x80000, CRC(0ad59b02) SHA1(9e26e161f39b780c4b496b88a2dce020160ba81b) )
+	ROM_LOAD( "168_a_07_c.bin", 0x300000, 0x80000, CRC(31f2a927) SHA1(6ef363462dedf8b2e816968502956dec56d26ddb) )
+	ROM_LOAD( "168_a_07_d.bin", 0x380000, 0x80000, CRC(4a2ea6f6) SHA1(fab0ec82c6a01ad49b1da09c4799fa64847d8644) )
 
 	ROM_REGION( 0x80, "eeprom", 0 ) // default eeprom to prevent game booting upside down with error
 	ROM_LOAD( "viostormub.nv", 0x0000, 0x080, CRC(b6937413) SHA1(eabc2ea661201f5ed42ab541aee765480bbdd5bc) )
@@ -2328,6 +2383,7 @@ GAME( 1993, viostorm,     0,        viostorm,   viostorm, mystwarr_state, empty_
 GAME( 1993, viostormeb,   viostorm, viostorm,   viostorm, mystwarr_state, empty_init, ROT0,  "Konami",  "Violent Storm (ver EAB)", MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1993, viostormu,    viostorm, viostorm,   viostorm, mystwarr_state, empty_init, ROT0,  "Konami",  "Violent Storm (ver UAC)", MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1993, viostormub,   viostorm, viostorm,   viostorm, mystwarr_state, empty_init, ROT0,  "Konami",  "Violent Storm (ver UAB)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1993, viostormubbl, viostorm, viostorm,   viostorm, mystwarr_state, empty_init, ROT0,  "bootleg (Eye Pro)", "Violent Storm (ver UAB, bootleg)", MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1993, viostormj,    viostorm, viostorm,   viostorm, mystwarr_state, empty_init, ROT0,  "Konami",  "Violent Storm (ver JAC)", MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1993, viostorma,    viostorm, viostorm,   viostorm, mystwarr_state, empty_init, ROT0,  "Konami",  "Violent Storm (ver AAC)", MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1993, viostormab,   viostorm, viostorm,   viostorm, mystwarr_state, empty_init, ROT0,  "Konami",  "Violent Storm (ver AAB)", MACHINE_IMPERFECT_GRAPHICS )

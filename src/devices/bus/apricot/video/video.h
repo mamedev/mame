@@ -43,7 +43,7 @@ public:
 	auto apvid_handler() { return m_apvid_handler.bind(); }
 
 	// called from cart device
-	DECLARE_WRITE_LINE_MEMBER( apvid_w ) { m_apvid_handler(state); }
+	void apvid_w(int state) { m_apvid_handler(state); }
 
 	// called from host
 	bool mem_r(offs_t offset, uint16_t &data, uint16_t mem_mask);
@@ -53,7 +53,7 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 private:
 	devcb_write_line m_apvid_handler;

@@ -75,6 +75,7 @@ void bbcm_cart(device_slot_interface &device)
 	device.option_add_internal("aqr", ELECTRON_AQR);
 	device.option_add_internal("click", BBC_CLICK);
 	device.option_add_internal("mastersd", BBC_MASTERSD);
+	device.option_add_internal("mastersdr2", BBC_MASTERSDR2);
 	device.option_add_internal("mega256", BBC_MEGA256);
 	device.option_add_internal("mr8000", BBC_MR8000);
 	device.option_add_internal("msc", BBC_MSC);

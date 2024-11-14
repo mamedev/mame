@@ -19,8 +19,9 @@
 ****************************************************************************/
 
 #include "emu.h"
-#include "cpu/z80/z80.h"
-#include "machine/mm58274c.h"
+#include "cpu/z80/nsc800.h"
+#include "machine/74259.h"
+#include "machine/mm58174.h"
 #include "machine/nsc810.h"
 #include "machine/ram.h"
 #include "machine/nvram.h"
@@ -30,6 +31,8 @@
 #include "screen.h"
 #include "speaker.h"
 
+
+namespace {
 
 class husky_state : public driver_device
 {
@@ -59,8 +62,8 @@ public:
 	void init_husky();
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	uint8_t porta_r();
@@ -68,22 +71,25 @@ private:
 	uint8_t portb_r();
 	uint8_t portc_r();
 	void portc_w(uint8_t data);
-	void serial_tx_w(uint8_t data);
+	void serial_tx_w(int state);
 	void cursor_w(uint8_t data);
-	void curinh_w(uint8_t data);
+	void curinh_w(int state);
 	void irqctrl_w(uint8_t data);
-	void page_w(offs_t offset, uint8_t data);
+	void paga16_w(int state);
+	void paga17_w(int state);
+	void paga18_w(int state);
+	void update_page();
 	void husky_palette(palette_device &palette) const;
 
-	DECLARE_WRITE_LINE_MEMBER(timer0_out);
-	DECLARE_WRITE_LINE_MEMBER(timer1_out);
-	DECLARE_WRITE_LINE_MEMBER(cts_w);
-	DECLARE_WRITE_LINE_MEMBER(rxd_w);
+	void timer0_out(int state);
+	void timer1_out(int state);
+	void cts_w(int state);
+	void rxd_w(int state);
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	void husky_io(address_map &map);
-	void husky_mem(address_map &map);
+	void husky_io(address_map &map) ATTR_COLD;
+	void husky_mem(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	required_ioport_array<4> m_kbd;
@@ -126,13 +132,8 @@ void husky_state::husky_io(address_map &map)
 	map.global_mask(0xff);
 	map(0x00, 0x1f).rw("iotimer", FUNC(nsc810_device::read), FUNC(nsc810_device::write));
 	map(0x20, 0x20).mirror(0x1f).w(FUNC(husky_state::cursor_w));
-	map(0x40, 0x4f).rw("rtc", FUNC(mm58274c_device::read), FUNC(mm58274c_device::write));
-	map(0x80, 0x80).mirror(0x18).noprw(); /* POWSAV - Power save control */
-	map(0x81, 0x81).mirror(0x18).w(FUNC(husky_state::serial_tx_w));
-	map(0x82, 0x82).mirror(0x18).w(FUNC(husky_state::curinh_w));
-	map(0x83, 0x83).mirror(0x18).nopw(); /* POWHLD - Power control */
-	map(0x84, 0x84).mirror(0x18).nopw(); /* INVCON - V24 inverter control */
-	map(0x85, 0x87).mirror(0x18).w(FUNC(husky_state::page_w));
+	map(0x40, 0x4f).rw("rtc", FUNC(mm58174_device::read), FUNC(mm58174_device::write));
+	map(0x80, 0x87).mirror(0x18).w("outlatch", FUNC(addressable_latch_device::write_d0));
 	map(0xbb, 0xbb).w(FUNC(husky_state::irqctrl_w));
 	map(0xc0, 0xc0).noprw(); /* PPORT0 - Parallel port 0 */
 	map(0xc1, 0xc1).noprw(); /* PPORT1 - Parallel port 1 */
@@ -263,18 +264,18 @@ void husky_state::cursor_w(uint8_t data)
 /*
 CURINH - Inhibit cursor. BIT0 = 1 : Cursor off, BIT0 = 0 : Cursor on
 */
-void husky_state::curinh_w(uint8_t data)
+void husky_state::curinh_w(int state)
 {
-	m_curinh = BIT(data, 0);
+	m_curinh = state;
 }
 
 /*
 V24OUT - Directly outputs to the V24 data line signal on bit 0.
 The output is voltage inverted ie. 0 = +ve, 1 = -ve
 */
-void husky_state::serial_tx_w(uint8_t data)
+void husky_state::serial_tx_w(int state)
 {
-	m_rs232->write_txd(data & 0x01);
+	m_rs232->write_txd(state);
 }
 
 /*
@@ -298,41 +299,55 @@ void husky_state::irqctrl_w(uint8_t data)
 /*
 PAGA 16, 17, 18 - Memory paging addresses
 */
-void husky_state::page_w(offs_t offset, uint8_t data)
+void husky_state::paga16_w(int state)
 {
-	if (offset == 0x02)
-	{
-		logerror("PAGA18 not implemented!");
-	}
+	if (state)
+		m_page |= 1 << 0;
 	else
-	{
-		if (BIT(data, 0))
-			m_page |= 1 << offset;
-		else
-			m_page &= ~(1 << offset);
+		m_page &= ~(1 << 0);
 
-		/* ROM banks */
-		m_rombank0->set_entry(m_page & 0x03);
-		m_rombank1->set_entry(m_page & 0x03);
-		m_rombank2->set_entry(m_page & 0x03);
-		m_rombank3->set_entry(m_page & 0x03);
+	update_page();
+}
 
-		/* RAM banks */
-		m_rambank1->set_entry(m_page & 0x03);
-		m_rambank2->set_entry(m_page & 0x03);
+void husky_state::paga17_w(int state)
+{
+	if (state)
+		m_page |= 1 << 1;
+	else
+		m_page &= ~(1 << 1);
 
-		address_space &prog_space = m_maincpu->space(AS_PROGRAM);
+	update_page();
+}
 
-		if (m_ram->size() > 0x4000 + (0x8000 * (m_page & 0x03)))
-			prog_space.install_readwrite_bank(0x8000, 0xbfff, m_rambank1);
-		else
-			prog_space.nop_readwrite(0x8000, 0xbfff);
+void husky_state::paga18_w(int state)
+{
+	if (state)
+		logerror("PAGA18 not implemented!\n");
+}
 
-		if (m_ram->size() > 0x8000 + (0x8000 * (m_page & 0x03)))
-			prog_space.install_readwrite_bank(0xc000, 0xffff, m_rambank2);
-		else
-			prog_space.nop_readwrite(0xc000, 0xffff);
-	}
+void husky_state::update_page()
+{
+	/* ROM banks */
+	m_rombank0->set_entry(m_page & 0x03);
+	m_rombank1->set_entry(m_page & 0x03);
+	m_rombank2->set_entry(m_page & 0x03);
+	m_rombank3->set_entry(m_page & 0x03);
+
+	/* RAM banks */
+	m_rambank1->set_entry(m_page & 0x03);
+	m_rambank2->set_entry(m_page & 0x03);
+
+	address_space &prog_space = m_maincpu->space(AS_PROGRAM);
+
+	if (m_ram->size() > 0x4000 + (0x8000 * (m_page & 0x03)))
+		prog_space.install_readwrite_bank(0x8000, 0xbfff, m_rambank1);
+	else
+		prog_space.nop_readwrite(0x8000, 0xbfff);
+
+	if (m_ram->size() > 0x8000 + (0x8000 * (m_page & 0x03)))
+		prog_space.install_readwrite_bank(0xc000, 0xffff, m_rambank2);
+	else
+		prog_space.nop_readwrite(0xc000, 0xffff);
 }
 
 void husky_state::machine_start()
@@ -432,25 +447,25 @@ void husky_state::husky_palette(palette_device &palette) const
 	palette.set_pen_color(2, rgb_t(131, 136, 139)); // LCD pixel off
 }
 
-WRITE_LINE_MEMBER(husky_state::timer0_out)
+void husky_state::timer0_out(int state)
 {
 	if(state == ASSERT_LINE)
 		m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
-WRITE_LINE_MEMBER(husky_state::timer1_out)
+void husky_state::timer1_out(int state)
 {
 	if(BIT(m_irq_mask, 7))
 		m_maincpu->set_input_line(NSC800_RSTA, state);
 }
 
-WRITE_LINE_MEMBER(husky_state::cts_w)
+void husky_state::cts_w(int state)
 {
 	if(BIT(m_irq_mask, 1))
 		m_maincpu->set_input_line(NSC800_RSTC, state);
 }
 
-WRITE_LINE_MEMBER(husky_state::rxd_w)
+void husky_state::rxd_w(int state)
 {
 	if(BIT(m_irq_mask, 2))
 		m_maincpu->set_input_line(NSC800_RSTB, ASSERT_LINE);
@@ -462,6 +477,16 @@ void husky_state::husky(machine_config &config)
 	NSC800(config, m_maincpu, 2_MHz_XTAL / 2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &husky_state::husky_mem);
 	m_maincpu->set_addrmap(AS_IO, &husky_state::husky_io);
+
+	cd4099_device &outlatch(CD4099(config, "outlatch")); // HCF4099BE
+	outlatch.q_out_cb<0>().set_nop(); // POWSAV - Power save control
+	outlatch.q_out_cb<1>().set(FUNC(husky_state::serial_tx_w));
+	outlatch.q_out_cb<2>().set(FUNC(husky_state::curinh_w));
+	outlatch.q_out_cb<3>().set_nop(); // POWHLD - Power control
+	outlatch.q_out_cb<4>().set_nop(); // INVCON - V24 inverter control
+	outlatch.q_out_cb<5>().set(FUNC(husky_state::paga16_w));
+	outlatch.q_out_cb<6>().set(FUNC(husky_state::paga17_w));
+	outlatch.q_out_cb<7>().set(FUNC(husky_state::paga18_w));
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
@@ -480,9 +505,7 @@ void husky_state::husky(machine_config &config)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* Devices */
-	mm58274c_device &rtc(MM58274C(config, "rtc", 32.768_kHz_XTAL)); /* MM58174A */
-	rtc.set_mode24(1); // 24 hour
-	rtc.set_day1(1);   // monday
+	MM58174(config, "rtc", 32.768_kHz_XTAL); // MM58174A
 
 	nsc810_device &iotimer(NSC810(config, "iotimer", 0, 2_MHz_XTAL / 2, 2_MHz_XTAL / 2));
 	iotimer.portA_read_callback().set(FUNC(husky_state::porta_r));
@@ -532,6 +555,9 @@ ROM_START( husky )
 	ROMX_LOAD( "03-jun-03.ic24", 0xc000, 0x2000, CRC(8fd629d1) SHA1(ef2821c9ce1c1375326d80cad3bfc74e75548172), ROM_BIOS(2) )
 	ROM_RELOAD(                  0xe000, 0x2000)
 ROM_END
+
+} // anonymous namespace
+
 
 //    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY                 FULLNAME  FLAGS
 COMP( 1981, husky, 0,      0,      husky,   husky, husky_state, init_husky, "DVW Microelectronics", "Husky",  0 )

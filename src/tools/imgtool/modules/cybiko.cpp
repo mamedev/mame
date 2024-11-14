@@ -10,6 +10,7 @@
 
 #include "imgtool.h"
 
+#include "multibyte.h"
 #include "opresolv.h"
 
 #include <zlib.h>
@@ -54,8 +55,8 @@ enum
 };
 
 #define BLOCK_USED(x)      (x[0] & 0x80)
-#define BLOCK_FILE_ID(x)   buffer_read_16_be( x + 2)
-#define BLOCK_PART_ID(x)   buffer_read_16_be( x + 4)
+#define BLOCK_FILE_ID(x)   get_u16be( x + 2)
+#define BLOCK_PART_ID(x)   get_u16be( x + 4)
 #define BLOCK_FILENAME(x)  (char*)(x + 7)
 
 #define FILE_HEADER_SIZE  0x48
@@ -81,30 +82,6 @@ uint32_t cybiko_time_setup(const imgtool::datetime &t)
 	return cybiko_time_point.time_since_epoch().count();
 }
 
-static uint32_t buffer_read_32_be( uint8_t *buffer)
-{
-	return (buffer[0] << 24) | (buffer[1] << 16) | (buffer[2] << 8) | (buffer[3] << 0);
-}
-
-static uint16_t buffer_read_16_be( uint8_t *buffer)
-{
-	return (buffer[0] << 8) | (buffer[1] << 0);
-}
-
-static void buffer_write_32_be( uint8_t *buffer, uint32_t data)
-{
-	buffer[0] = (data >> 24) & 0xFF;
-	buffer[1] = (data >> 16) & 0xFF;
-	buffer[2] = (data >>  8) & 0xFF;
-	buffer[3] = (data >>  0) & 0xFF;
-}
-
-static void buffer_write_16_be( uint8_t *buffer, uint16_t data)
-{
-	buffer[0] = (data >> 8) & 0xFF;
-	buffer[1] = (data >> 0) & 0xFF;
-}
-
 // page = crc1 (4) + wcnt (2) + crc2 (2) + data (x) + unk (2)
 
 static uint32_t page_buffer_calc_checksum_1( uint8_t *buffer, uint32_t size, int block_type)
@@ -115,9 +92,9 @@ static uint32_t page_buffer_calc_checksum_1( uint8_t *buffer, uint32_t size, int
 static uint16_t page_buffer_calc_checksum_2( uint8_t *buffer)
 {
 	uint16_t val = 0xAF17;
-	val ^= buffer_read_16_be( buffer + 0);
-	val ^= buffer_read_16_be( buffer + 2);
-	val ^= buffer_read_16_be( buffer + 4);
+	val ^= get_u16be( buffer + 0);
+	val ^= get_u16be( buffer + 2);
+	val ^= get_u16be( buffer + 4);
 	return swapendian_int16(val);
 }
 
@@ -126,11 +103,11 @@ static int page_buffer_verify( uint8_t *buffer, uint32_t size, int block_type)
 	uint32_t checksum_page, checksum_calc;
 	// checksum 1
 	checksum_calc = page_buffer_calc_checksum_1( buffer, size, block_type);
-	checksum_page = buffer_read_32_be( buffer + 0);
+	checksum_page = get_u32be( buffer + 0);
 	if (checksum_calc != checksum_page) return false;
 	// checksum 2
 	checksum_calc = page_buffer_calc_checksum_2( buffer);
-	checksum_page = buffer_read_16_be( buffer + 6);
+	checksum_page = get_u16be( buffer + 6);
 	if (checksum_calc != checksum_page) return false;
 	// ok
 	return true;
@@ -200,10 +177,10 @@ static int cfs_block_write( cybiko_file_system *cfs, uint8_t *buffer, int block_
 	uint8_t buffer_page[MAX_PAGE_SIZE];
 	uint32_t page;
 	memcpy( buffer_page + 8, buffer, cfs->page_size - 10);
-	buffer_write_32_be( buffer_page + 0, page_buffer_calc_checksum_1( buffer_page, cfs->page_size, block_type));
-	buffer_write_16_be( buffer_page + 4, cfs->write_count++);
-	buffer_write_16_be( buffer_page + 6, page_buffer_calc_checksum_2( buffer_page));
-	buffer_write_16_be( buffer_page + cfs->page_size - 2, 0xFFFF);
+	put_u32be( buffer_page + 0, page_buffer_calc_checksum_1( buffer_page, cfs->page_size, block_type));
+	put_u16be( buffer_page + 4, cfs->write_count++);
+	put_u16be( buffer_page + 6, page_buffer_calc_checksum_2( buffer_page));
+	put_u16be( buffer_page + cfs->page_size - 2, 0xFFFF);
 	if (!cfs_block_to_page( cfs, block_type, block, &page)) return false;
 	if (!cfs_page_write( cfs, buffer_page, page)) return false;
 	return true;
@@ -238,7 +215,7 @@ static int cfs_file_info( cybiko_file_system *cfs, uint16_t file_id, cfs_file *f
 			if (BLOCK_PART_ID(buffer) == 0)
 			{
 				strcpy( file->name, BLOCK_FILENAME(buffer));
-				file->date = buffer_read_32_be( buffer + 6 + FILE_HEADER_SIZE - 4);
+				file->date = get_u32be( buffer + 6 + FILE_HEADER_SIZE - 4);
 			}
 			file->size += buffer[1];
 			file->blocks++;
@@ -501,13 +478,13 @@ static imgtoolerr_t cybiko_image_write_file(imgtool::partition &partition, const
 			buffer[0] = 0x80;
 			buffer[1] = cfs->page_size - 0x10 - ((part_id == 0) ? FILE_HEADER_SIZE : 0);
 			if (bytes_left < buffer[1]) buffer[1] = bytes_left;
-			buffer_write_16_be( buffer + 2, file_id);
-			buffer_write_16_be( buffer + 4, part_id);
+			put_u16be( buffer + 2, file_id);
+			put_u16be( buffer + 4, part_id);
 			if (part_id == 0)
 			{
 				buffer[6] = 0;
 				strcpy(BLOCK_FILENAME(buffer), filename);
-				buffer_write_32_be(buffer + 6 + FILE_HEADER_SIZE - 4, cybiko_time_setup(imgtool::datetime::now(imgtool::datetime::datetime_type::LOCAL)));
+				put_u32be(buffer + 6 + FILE_HEADER_SIZE - 4, cybiko_time_setup(imgtool::datetime::now(imgtool::datetime::datetime_type::LOCAL)));
 				sourcef.read(buffer + 6 + FILE_HEADER_SIZE, buffer[1]);
 			}
 			else

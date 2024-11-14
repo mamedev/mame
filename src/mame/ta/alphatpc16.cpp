@@ -58,6 +58,7 @@ via the PC 16 Terminal, operates independently after programming), connects to t
 #include "sound/beep.h"
 #include "cpu/mcs48/mcs48.h"
 #include "cpu/z80/z80.h"
+
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
@@ -77,10 +78,7 @@ public:
 		m_wdfdc(*this, "wdfdc"),
 		m_ram(*this, RAM_TAG),
 		m_z80(*this, "z80"),
-		m_flop0(*this, "wdfdc:0"),
-		m_flop1(*this, "wdfdc:1"),
-		m_flop2(*this, "wdfdc:2"),
-		m_flop3(*this, "wdfdc:3"),
+		m_flop(*this, "wdfdc:%u", 0),
 		m_keys(*this, "KEYS.%u", 0)
 	{ }
 
@@ -88,14 +86,14 @@ public:
 	void alphatpc16(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
-	void apc16_io(address_map &map);
-	void apc16_map(address_map &map);
-	void apc16_z80_io(address_map &map);
-	void apc16_z80_map(address_map &map);
-	void ef9345(address_map &map);
+	void apc16_io(address_map &map) ATTR_COLD;
+	void apc16_map(address_map &map) ATTR_COLD;
+	void apc16_z80_io(address_map &map) ATTR_COLD;
+	void apc16_z80_map(address_map &map) ATTR_COLD;
+	void ef9345(address_map &map) ATTR_COLD;
 
 	u8 p1_r();
 	void p1_w(u8 data);
@@ -115,10 +113,7 @@ private:
 	required_device<wd1770_device> m_wdfdc;
 	required_device<ram_device> m_ram;
 	required_device<cpu_device> m_z80;
-	required_device<floppy_connector> m_flop0;
-	required_device<floppy_connector> m_flop1;
-	required_device<floppy_connector> m_flop2;
-	required_device<floppy_connector> m_flop3;
+	required_device_array<floppy_connector, 4> m_flop;
 	required_ioport_array<8> m_keys;
 
 	u8 m_p1 = 0, m_p2 = 0, m_data = 0, m_p40 = 0;
@@ -128,7 +123,7 @@ private:
 void alphatpc16_state::machine_start()
 {
 	m_maincpu->space(AS_PROGRAM).install_ram(0, m_ram->size() - 1, m_ram->pointer());
-	m_wdfdc->set_floppy(m_flop0->get_device());
+	m_wdfdc->set_floppy(m_flop[0]->get_device());
 
 	m_bsy = false;
 	m_req = false;
@@ -171,16 +166,16 @@ u8 alphatpc16_state::p00_r()
 	switch(m_p40 & 0xf0)
 	{
 		case 0x00:
-			ret |= m_flop0->get_device()->exists() << 3;
+			ret |= m_flop[0]->get_device()->exists() << 3;
 			break;
 		case 0x10:
-			ret |= m_flop1->get_device()->exists() << 3;
+			ret |= m_flop[1]->get_device()->exists() << 3;
 			break;
 		case 0x20:
-			ret |= m_flop2->get_device()->exists() << 3;
+			ret |= m_flop[2]->get_device()->exists() << 3;
 			break;
 		case 0x40:
-			ret |= m_flop3->get_device()->exists() << 3;
+			ret |= m_flop[3]->get_device()->exists() << 3;
 			break;
 	}
 	return ret;
@@ -191,20 +186,20 @@ void alphatpc16_state::p40_w(u8 data)
 	switch(data & 0xf0)
 	{
 		case 0x00:
-			m_wdfdc->set_floppy(m_flop0->get_device());
-			m_flop0->get_device()->ss_w(BIT(data, 2));
+			m_wdfdc->set_floppy(m_flop[0]->get_device());
+			m_flop[0]->get_device()->ss_w(BIT(data, 2));
 			break;
 		case 0x10:
-			m_wdfdc->set_floppy(m_flop1->get_device());
-			m_flop1->get_device()->ss_w(BIT(data, 2));
+			m_wdfdc->set_floppy(m_flop[1]->get_device());
+			m_flop[1]->get_device()->ss_w(BIT(data, 2));
 			break;
 		case 0x20:
-			m_wdfdc->set_floppy(m_flop2->get_device());
-			m_flop2->get_device()->ss_w(BIT(data, 2));
+			m_wdfdc->set_floppy(m_flop[2]->get_device());
+			m_flop[2]->get_device()->ss_w(BIT(data, 2));
 			break;
 		case 0x40:
-			m_wdfdc->set_floppy(m_flop3->get_device());
-			m_flop3->get_device()->ss_w(BIT(data, 2));
+			m_wdfdc->set_floppy(m_flop[3]->get_device());
+			m_flop[3]->get_device()->ss_w(BIT(data, 2));
 			break;
 	}
 	m_p40 = data;
@@ -396,7 +391,7 @@ static INPUT_PORTS_START( alphatpc16 )
 	PORT_START("KEYS.3")
 	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("GRAPH")
 	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_ESC) PORT_CHAR(UCHAR_MAMEKEY(ESC))
-	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME(U_UMLAUT)
+	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME(u8"Ü")
 	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_TAB) PORT_CHAR(9)
 	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("# ^") PORT_CHAR('#') PORT_CHAR('^')
 	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_UNUSED )
@@ -412,7 +407,7 @@ static INPUT_PORTS_START( alphatpc16 )
 	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_START("KEYS.4")
 	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_3_PAD) PORT_CHAR('3')
-	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME(O_UMLAUT)
+	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME(u8"Ö")
 	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Unknown 0x7f")
 	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_UP) PORT_CHAR(UCHAR_MAMEKEY(UP))
 	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_DEL_PAD) PORT_CHAR('.')
@@ -503,11 +498,11 @@ void alphatpc16_state::alphatpc16(machine_config &config)
 	m_z80->set_addrmap(AS_PROGRAM, &alphatpc16_state::apc16_z80_map);
 	m_z80->set_addrmap(AS_IO, &alphatpc16_state::apc16_z80_io);
 	WD1770(config, m_wdfdc, 8_MHz_XTAL);
-	FLOPPY_CONNECTOR(config, m_flop0, atpc16_floppies, "525dd", floppy_image_device::default_mfm_floppy_formats);
-	dynamic_cast<device_slot_interface *>(m_flop0.target())->set_fixed(true);
-	FLOPPY_CONNECTOR(config, m_flop1, atpc16_floppies, "525dd", floppy_image_device::default_mfm_floppy_formats);
-	FLOPPY_CONNECTOR(config, m_flop2, atpc16_floppies, "525dd", floppy_image_device::default_mfm_floppy_formats);
-	FLOPPY_CONNECTOR(config, m_flop3, atpc16_floppies, "525dd", floppy_image_device::default_mfm_floppy_formats);
+	FLOPPY_CONNECTOR(config, m_flop[0], atpc16_floppies, "525dd", floppy_image_device::default_mfm_floppy_formats);
+	dynamic_cast<device_slot_interface *>(m_flop[0].target())->set_fixed(true);
+	FLOPPY_CONNECTOR(config, m_flop[1], atpc16_floppies, "525dd", floppy_image_device::default_mfm_floppy_formats);
+	FLOPPY_CONNECTOR(config, m_flop[2], atpc16_floppies, "525dd", floppy_image_device::default_mfm_floppy_formats);
+	FLOPPY_CONNECTOR(config, m_flop[3], atpc16_floppies, "525dd", floppy_image_device::default_mfm_floppy_formats);
 
 	i8741a_device& i8741(I8741A(config, "i8741", 4.608_MHz_XTAL));
 	i8741.p1_in_cb().set(FUNC(alphatpc16_state::p1_r));

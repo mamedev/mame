@@ -6,15 +6,13 @@
 //
 //============================================================
 
-#include <string>
-
 #include "paramreader.h"
 
-#include "parameter.h"
-#include "frameparameter.h"
-#include "windowparameter.h"
-#include "timeparameter.h"
 #include "chainmanager.h"
+#include "frameparameter.h"
+#include "parameter.h"
+#include "timeparameter.h"
+#include "windowparameter.h"
 
 const parameter_reader::string_to_enum parameter_reader::TYPE_NAMES[parameter_reader::TYPE_COUNT] = {
 	{ "frame",  bgfx_parameter::parameter_type::PARAM_FRAME },
@@ -22,7 +20,7 @@ const parameter_reader::string_to_enum parameter_reader::TYPE_NAMES[parameter_re
 	{ "time",   bgfx_parameter::parameter_type::PARAM_TIME }
 };
 
-bgfx_parameter* parameter_reader::read_from_value(const Value& value, std::string prefix, chain_manager& chains)
+bgfx_parameter* parameter_reader::read_from_value(const Value& value, const std::string &prefix, chain_manager& chains)
 {
 	if (!validate_parameters(value, prefix))
 	{
@@ -35,32 +33,32 @@ bgfx_parameter* parameter_reader::read_from_value(const Value& value, std::strin
 	if (type == bgfx_parameter::parameter_type::PARAM_FRAME)
 	{
 		uint32_t period = int(value["period"].GetDouble());
-		return new bgfx_frame_parameter(name, type, period);
+		return new bgfx_frame_parameter(std::move(name), type, period);
 	}
 	else if (type == bgfx_parameter::parameter_type::PARAM_WINDOW)
 	{
-		return new bgfx_window_parameter(name, type, chains.window_index());
+		return new bgfx_window_parameter(std::move(name), type, chains.window_index());
 	}
 	else if (type == bgfx_parameter::parameter_type::PARAM_TIME)
 	{
 		auto limit = float(value["limit"].GetDouble());
-		return new bgfx_time_parameter(name, type, limit);
+		return new bgfx_time_parameter(std::move(name), type, limit);
 	}
 	else
 	{
-		READER_CHECK(false, (prefix + "Unknown parameter type '" + std::string(value["type"].GetString()) + "'\n").c_str());
+		READER_CHECK(false, "%sUnknown parameter type '%s'\n", prefix, value["type"].GetString());
 	}
 
 	return nullptr;
 }
 
-bool parameter_reader::validate_parameters(const Value& value, std::string prefix)
+bool parameter_reader::validate_parameters(const Value& value, const std::string &prefix)
 {
-	if (!READER_CHECK(value.HasMember("name"), (prefix + "Must have string value 'name'\n").c_str())) return false;
-	if (!READER_CHECK(value["name"].IsString(), (prefix + "Value 'name' must be a string\n").c_str())) return false;
-	if (!READER_CHECK(value.HasMember("type"), (prefix + "Must have string value 'type'\n").c_str())) return false;
-	if (!READER_CHECK(value["type"].IsString(), (prefix + "Value 'type' must be a string\n").c_str())) return false;
-	if (!READER_CHECK(!value.HasMember("period") || value["period"].IsNumber(), (prefix + "Value 'period' must be numeric\n").c_str())) return false;
-	if (!READER_CHECK(!value.HasMember("limit") || value["limit"].IsNumber(), (prefix + "Value 'period' must be numeric\n").c_str())) return false;
+	if (!READER_CHECK(value.HasMember("name"), "%sMust have string value 'name'\n", prefix)) return false;
+	if (!READER_CHECK(value["name"].IsString(), "%sValue 'name' must be a string\n", prefix)) return false;
+	if (!READER_CHECK(value.HasMember("type"), "%sMust have string value 'type'\n", prefix)) return false;
+	if (!READER_CHECK(value["type"].IsString(), "%sValue 'type' must be a string\n", prefix)) return false;
+	if (!READER_CHECK(!value.HasMember("period") || value["period"].IsNumber(), "%sValue 'period' must be numeric\n", prefix)) return false;
+	if (!READER_CHECK(!value.HasMember("limit") || value["limit"].IsNumber(), "%sValue 'period' must be numeric\n", prefix)) return false;
 	return true;
 }

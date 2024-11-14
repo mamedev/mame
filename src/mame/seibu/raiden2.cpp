@@ -1368,6 +1368,47 @@ ROM_START( raiden2g )
 	ROM_LOAD( "raiden_2_pcm.u1018", 0x00000, 0x40000, CRC(8cf0d17e) SHA1(0fbe0b1e1ca5360c7c8329331408e3d799b4714c) )
 ROM_END
 
+ROM_START( raiden2gb ) // original board with serial number on sticker on u0212
+	ROM_REGION( 0x200000, "maincpu", 0 ) /* v30 main cpu */
+	ROM_LOAD16_BYTE("prg0.u0211",   0x000000, 0x80000, CRC(09475ec4) SHA1(05027f2d8f9e11fcbd485659eda68ada286dae32) )
+	ROM_RELOAD(0x100000, 0x80000)
+	ROM_LOAD16_BYTE("prg1.u0212",   0x000001, 0x80000, CRC(4b9e3024) SHA1(10f0384cff6acac5823c77277b3c75e83d34589c) )
+	ROM_RELOAD(0x100001, 0x80000)
+
+	ROM_REGION( 0x20000, "audiocpu", ROMREGION_ERASEFF ) /* 64k code for sound Z80 */
+	ROM_LOAD( "snd.u1110",  0x000000, 0x08000, CRC(f51a28f9) SHA1(7ae2e2ba0c8159a544a8fd2bb0c2c694ba849302) )
+	ROM_CONTINUE(0x10000,0x8000)
+	ROM_COPY( "audiocpu", 0x000000, 0x018000, 0x08000 )
+
+	ROM_REGION( 0x020000, "gfx1", 0 ) /* chars */
+	ROM_LOAD( "seibu7.u0724", 0x000000, 0x020000, CRC(c9ec9469) SHA1(a29f480a1bee073be7a177096ef58e1887a5af24) ) /* PCB silkscreened FX0 */
+
+	ROM_REGION( 0x100000, "oki1", 0 )   /* ADPCM samples */
+	ROM_LOAD( "seibu6.u1017", 0x00000, 0x40000, CRC(fb0fca23) SHA1(4b2217b121a66c5ab6015537609cf908ffedaf86) ) /* PCB silkscreened VOICE1 */
+
+	// Common Raiden II PALs below
+	ROM_REGION( 0x10000, "pals", 0 )    /* PALS */
+	ROM_LOAD( "jj4b02__ami18cv8-15.u0342",   0x0000, 0x155, CRC(057a9cdc) SHA1(8b46f6673ddf11efbc3394ae423ec89d4a1283bf) )
+	ROM_LOAD( "jj4b01__mmipal16l8bcn.u0341", 0x0000, 0x117, CRC(20931f21) SHA1(95ce9cfbfb280dfc6a326e378684eff3c6f54701) )
+
+	// Common Raiden II soldered mask ROMs below
+	ROM_REGION( 0x40000, "user2", 0 )   /* COPX */
+	ROM_LOAD( "copx-d2.u0313", 0x00000, 0x40000, CRC(a6732ff9) SHA1(c4856ec77869d9098da24b1bb3d7d58bb74b4cda) )
+
+	ROM_REGION( 0x400000, "gfx2", 0 ) /* background gfx */
+	ROM_LOAD( "raiden_2_seibu_bg-1.u0714", 0x000000, 0x200000, CRC(e61ad38e) SHA1(63b06cd38db946ad3fc5c1482dc863ef80b58fec) )
+	ROM_LOAD( "raiden_2_seibu_bg-2.u075",  0x200000, 0x200000, CRC(a694a4bb) SHA1(39c2614d0effc899fe58f735604283097769df77) )
+
+	ROM_REGION32_LE( 0x800000, "gfx3", 0 ) /* sprite gfx (encrypted) */
+	ROM_LOAD32_WORD( "raiden_2_seibu_obj-1.u0811", 0x000000, 0x200000, CRC(ff08ef0b) SHA1(a1858430e8171ca8bab785457ef60e151b5e5cf1) )
+	ROM_LOAD32_WORD( "raiden_2_seibu_obj-2.u082",  0x000002, 0x200000, CRC(638eb771) SHA1(9774cc070e71668d7d1d20795502dccd21ca557b) )
+	ROM_LOAD32_WORD( "raiden_2_seibu_obj-3.u0837", 0x400000, 0x200000, CRC(897a0322) SHA1(abb2737a2446da5b364fc2d96524b43d808f4126) )
+	ROM_LOAD32_WORD( "raiden_2_seibu_obj-4.u0836", 0x400002, 0x200000, CRC(b676e188) SHA1(19cc838f1ccf9c4203cd0e5365e5d99ff3a4ff0f) )
+
+	ROM_REGION( 0x100000, "oki2", 0 )   /* ADPCM samples */
+	ROM_LOAD( "raiden_2_pcm.u1018", 0x00000, 0x40000, CRC(8cf0d17e) SHA1(0fbe0b1e1ca5360c7c8329331408e3d799b4714c) )
+ROM_END
+
 /*
 
 ---------------------------------------
@@ -1748,6 +1789,48 @@ ROM_START( raiden2i )
 
 	ROM_REGION( 0x100000, "oki2", 0 )   /* ADPCM samples */
 	ROM_LOAD( "raiden_2_pcm.u1018", 0x00000, 0x40000, CRC(8cf0d17e) SHA1(0fbe0b1e1ca5360c7c8329331408e3d799b4714c) )
+ROM_END
+
+
+ROM_START( raiden2au )
+	ROM_REGION( 0x200000, "maincpu", 0 ) /* v30 main cpu */
+	ROM_LOAD16_BYTE("1.u0211",   0x000000, 0x80000, CRC(c1fc70f5) SHA1(a054f5ae9583972c406d9cf871340d5e072d71a3) )
+	ROM_RELOAD(                  0x100000, 0x80000)
+	ROM_LOAD16_BYTE("2.u0212",   0x000001, 0x80000, CRC(396410f9) SHA1(a3f737ae1fb6229388d3ebec93e880218d09fed5) ) // Australian set
+	ROM_RELOAD(                  0x100001, 0x80000)
+
+	ROM_REGION( 0x20000, "audiocpu", ROMREGION_ERASEFF )
+	ROM_LOAD( "5.u1110",  0x000000, 0x08000, CRC(c2028ba2) SHA1(f6a9322b669ff82dea6ecf52ad3bd5d0901cce1b) )
+	ROM_CONTINUE(0x10000,0x8000)
+	ROM_COPY( "audiocpu", 0x000000, 0x018000, 0x08000 )
+
+	ROM_REGION( 0x020000, "gfx1", 0 ) /* chars */
+	ROM_LOAD( "7.u0724", 0x000000, 0x020000, CRC(c9ec9469) SHA1(a29f480a1bee073be7a177096ef58e1887a5af24) )
+
+	ROM_REGION( 0x100000, "oki1", 0 )   /* ADPCM samples */
+	ROM_LOAD( "6.u1017", 0x00000, 0x40000, CRC(fb0fca23) SHA1(4b2217b121a66c5ab6015537609cf908ffedaf86) )
+
+	// Common Raiden II PALs below
+	ROM_REGION( 0x10000, "pals", 0 )    /* PALS */
+	ROM_LOAD( "jj4b02__ami18cv8-15.u0342",   0x0000, 0x155, CRC(057a9cdc) SHA1(8b46f6673ddf11efbc3394ae423ec89d4a1283bf) )
+	ROM_LOAD( "jj4b01__mmipal16l8bcn.u0341", 0x0000, 0x117, CRC(20931f21) SHA1(95ce9cfbfb280dfc6a326e378684eff3c6f54701) )
+
+	// Common Raiden II soldered mask ROMs below
+	ROM_REGION( 0x40000, "user2", 0 )   /* COPX */
+	ROM_LOAD( "copx-d2.u0313", 0x00000, 0x40000, CRC(a6732ff9) SHA1(c4856ec77869d9098da24b1bb3d7d58bb74b4cda) )
+
+	ROM_REGION( 0x400000, "gfx2", 0 ) /* background gfx */
+	ROM_LOAD( "raiden_2_seibu_bg-1.u0714", 0x000000, 0x200000, CRC(e61ad38e) SHA1(63b06cd38db946ad3fc5c1482dc863ef80b58fec) )
+	ROM_LOAD( "raiden_2_seibu_bg-2.u075",  0x200000, 0x200000, CRC(a694a4bb) SHA1(39c2614d0effc899fe58f735604283097769df77) )
+
+	ROM_REGION32_LE( 0x800000, "gfx3", 0 ) /* sprite gfx (encrypted) */
+	ROM_LOAD32_WORD( "raiden_2_seibu_obj-1.u0811", 0x000000, 0x200000, CRC(ff08ef0b) SHA1(a1858430e8171ca8bab785457ef60e151b5e5cf1) )
+	ROM_LOAD32_WORD( "raiden_2_seibu_obj-2.u082",  0x000002, 0x200000, CRC(638eb771) SHA1(9774cc070e71668d7d1d20795502dccd21ca557b) )
+	ROM_LOAD32_WORD( "raiden_2_seibu_obj-3.u0837", 0x400000, 0x200000, CRC(897a0322) SHA1(abb2737a2446da5b364fc2d96524b43d808f4126) )
+	ROM_LOAD32_WORD( "raiden_2_seibu_obj-4.u0836", 0x400002, 0x200000, CRC(b676e188) SHA1(19cc838f1ccf9c4203cd0e5365e5d99ff3a4ff0f) )
+
+	ROM_REGION( 0x100000, "oki2", 0 )   /* ADPCM samples */
+	ROM_LOAD( "voice_2.u1018", 0x00000, 0x40000, CRC(8cf0d17e) SHA1(0fbe0b1e1ca5360c7c8329331408e3d799b4714c) )
 ROM_END
 
 
@@ -2831,6 +2914,43 @@ ROM_START( zeroteamd ) // Dream Soft, Korea licensee, no special word under logo
 ROM_END
 // A version of the above exists (which dr.kitty used to own) which DOES have 'Korea' under the logo on title, needs dumping
 
+ROM_START( zeroteame ) // shares chars ROMs with zeroteama
+	ROM_REGION( 0x200000, "maincpu", 0 ) /* v30 main cpu */
+	ROM_LOAD32_BYTE("seibu_1_u024.5k",   0x000000, 0x40000, CRC(76e69af5) SHA1(c5a4b2491cee3f4f9694e454f3828fda33fff3ab) )
+	ROM_LOAD32_BYTE("seibu_3_u023.6k",   0x000002, 0x40000, CRC(4a904880) SHA1(4a85a62446ea11d57369dfd65f143475063abc31) )
+	ROM_LOAD32_BYTE("seibu_2_u025.6l",   0x000001, 0x40000, CRC(b97ab448) SHA1(82d9e7aa6b69c214ad82e5ff30a049cecab607c0) )
+	ROM_LOAD32_BYTE("seibu_4_u026.5l",   0x000003, 0x40000, CRC(1d43b9c1) SHA1(b1144d49f8fddf416fe2e3eae4040b369eb212cf) )
+
+	ROM_REGION( 0x40000, "user2", 0 )   /* COPX */
+	ROM_LOAD( "copx-d2.u0313.6n",   0x00000, 0x40000, CRC(a6732ff9) SHA1(c4856ec77869d9098da24b1bb3d7d58bb74b4cda) )
+
+	ROM_REGION( 0x20000, "audiocpu", ROMREGION_ERASEFF ) /* 64k code for sound Z80 */
+	ROM_LOAD( "seibu_5_u1110.5b",  0x000000, 0x08000, CRC(efc484ca) SHA1(c34b8e3e7f4c2967bc6414348993478ed637d338) )
+	ROM_CONTINUE(0x10000,0x8000)
+	ROM_COPY( "audiocpu", 0x000000, 0x018000, 0x08000 )
+
+	ROM_REGION( 0x020000, "gfx1", 0 ) /* chars */
+	ROM_LOAD16_BYTE( "seibu_7_u072.5s", 0x000000,   0x010000, CRC(eb10467f) SHA1(fc7d576dc41bc878ff20f0370e669e19d54fcefb) )
+	ROM_LOAD16_BYTE( "seibu_8_u077.5r", 0x000001,   0x010000, CRC(a0b2a09a) SHA1(9b1f6c732000b84b1ad635f332ebead5d65cc491) )
+
+	ROM_REGION( 0x400000, "gfx2", 0 ) /* background gfx */
+	ROM_LOAD( "musha_back-1.u075.4s",   0x000000, 0x100000, CRC(8b7f9219) SHA1(3412b6f8a4fe245e521ddcf185a53f2f4520eb57) )
+	ROM_LOAD( "musha_back-2.u0714.2s",   0x100000, 0x080000, CRC(ce61c952) SHA1(52a843c8ba428b121fab933dd3b313b2894d80ac) )
+
+	ROM_REGION32_LE( 0x800000, "gfx3", ROMREGION_ERASEFF ) /* sprite gfx (encrypted) (diff encrypt to raiden2? ) */
+	ROM_LOAD32_WORD( "musha_obj-1.u0811.6f",  0x000000, 0x200000, CRC(45be8029) SHA1(adc164f9dede9a86b96a4d709e9cba7d2ad0e564) )
+	ROM_LOAD32_WORD( "musha_obj-2.u082.5f",  0x000002, 0x200000, CRC(cb61c19d) SHA1(151a2ce9c32f3321a974819e9b165dddc31c8153) )
+
+	ROM_REGION( 0x100000, "oki", 0 )    /* ADPCM samples */
+	ROM_LOAD( "seibu_6_u105.4a", 0x00000, 0x40000,  CRC(48be32b1) SHA1(969d2191a3c46871ee8bf93088b3cecce3eccf0c) ) // 6.bin
+
+	ROM_REGION( 0x10000, "pals", 0 )    /* PALS */
+	ROM_LOAD( "v3c001.pal.u0310",            0x0000, 0x288, NO_DUMP) // located UNDER v3c004x, unknown pal type
+	ROM_LOAD( "v3c002.tibpal16l8-25.u0322",  0x0000, 0x288, NO_DUMP)
+	ROM_LOAD( "v3c003.ami18cv8p-15.u0619",   0x0000, 0x288, NO_DUMP)
+	ROM_LOAD( "v3c004x.ami18cv8pc-25.u0310", 0x0000, 0x288, NO_DUMP) // located piggybacking on v3c001 and attached to some rework wires
+ROM_END
+
 ROM_START( zeroteams ) // No license, displays 'Selection' under logo
 	ROM_REGION( 0x200000, "maincpu", 0 ) /* v30 main cpu */
 	ROM_LOAD32_BYTE("1_sel.bin",   0x000000, 0x40000, CRC(d99d6273) SHA1(21dccd5d71c720b8364406835812b3c9defaff6c) )
@@ -3114,6 +3234,7 @@ void raiden2_state::init_zeroteam()
 // code rev with first ROM having checksum 09475ec4
 GAME( 1993, raiden2,    0,        raiden2,  raiden2,  raiden2_state, init_raiden2,  ROT270, "Seibu Kaihatsu (Fabtek license)", "Raiden II (US, set 1)", MACHINE_SUPPORTS_SAVE )
 GAME( 1993, raiden2g,   raiden2,  raiden2,  raiden2,  raiden2_state, init_raiden2,  ROT270, "Seibu Kaihatsu (Tuning license)", "Raiden II (Germany)", MACHINE_SUPPORTS_SAVE )
+GAME( 1993, raiden2gb,  raiden2,  raiden2,  raiden2,  raiden2_state, init_raiden2,  ROT270, "Seibu Kaihatsu", "Raiden II (Great Britain)", MACHINE_SUPPORTS_SAVE )
 GAME( 1993, raiden2hk,  raiden2,  raiden2,  raiden2,  raiden2_state, init_raiden2,  ROT270, "Seibu Kaihatsu (Metrotainment license)", "Raiden II (Hong Kong)", MACHINE_SUPPORTS_SAVE )
 GAME( 1993, raiden2j,   raiden2,  raiden2,  raiden2,  raiden2_state, init_raiden2,  ROT270, "Seibu Kaihatsu", "Raiden II (Japan)", MACHINE_SUPPORTS_SAVE )
 GAME( 1993, raiden2sw,  raiden2,  raiden2,  raiden2,  raiden2_state, init_raiden2,  ROT270, "Seibu Kaihatsu", "Raiden II (Switzerland)", MACHINE_SUPPORTS_SAVE )
@@ -3125,6 +3246,7 @@ GAME( 1993, raiden2nl,  raiden2,  raiden2,  raiden2,  raiden2_state, init_raiden
 GAME( 1993, raiden2es,  raiden2,  raiden2,  raiden2,  raiden2_state, init_raiden2,  ROT270, "Seibu Kaihatsu", "Raiden II (Spain)", MACHINE_SUPPORTS_SAVE )
 // code rev with first ROM having checksum c1fc70f5
 GAME( 1993, raiden2i,   raiden2,  raiden2,  raiden2,  raiden2_state, init_raiden2,  ROT270, "Seibu Kaihatsu", "Raiden II (Italy)", MACHINE_SUPPORTS_SAVE )
+GAME( 1993, raiden2au,  raiden2,  raiden2,  raiden2,  raiden2_state, init_raiden2,  ROT270, "Seibu Kaihatsu", "Raiden II (Australia)", MACHINE_SUPPORTS_SAVE )
 
 // Easy version - Coloured high score table background, different enemy placement
 
@@ -3177,10 +3299,11 @@ GAME( 1994, raidendxch, raidendx, raidendx, raidendx, raiden2_state, init_raiden
 // Zero Team sets
 
 GAME( 1993, zeroteam,   0,        zeroteam, zeroteam, raiden2_state, init_zeroteam, ROT0,   "Seibu Kaihatsu (Fabtek license)", "Zero Team USA (US)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
-GAME( 1993, zeroteama,  zeroteam, zeroteam, zeroteam, raiden2_state, init_zeroteam, ROT0,   "Seibu Kaihatsu", "Zero Team (Japan?, earlier?)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+GAME( 1993, zeroteama,  zeroteam, zeroteam, zeroteam, raiden2_state, init_zeroteam, ROT0,   "Seibu Kaihatsu", "Zero Team (Japan?, earlier?, set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
 GAME( 1993, zeroteamb,  zeroteam, zeroteam, zeroteam, raiden2_state, init_zeroteam, ROT0,   "Seibu Kaihatsu", "Zero Team (Japan?, later batteryless)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING ) // reprograms the sprite decrypt data of the SEI251 on every boot, like raiden2 does. hack?
 GAME( 1993, zeroteamc,  zeroteam, zeroteam, zeroteam, raiden2_state, init_zeroteam, ROT0,   "Seibu Kaihatsu (Liang Hwa license)", "Zero Team (Taiwan)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
 GAME( 1993, zeroteamd,  zeroteam, zeroteam, zeroteam, raiden2_state, init_zeroteam, ROT0,   "Seibu Kaihatsu (Dream Soft license)", "Zero Team (Korea)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+GAME( 1993, zeroteame,  zeroteam, zeroteam, zeroteam, raiden2_state, init_zeroteam, ROT0,   "Seibu Kaihatsu", "Zero Team (Japan?, earlier?, set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
 GAME( 1993, zeroteams,  zeroteam, zeroteam, zeroteam, raiden2_state, init_zeroteam, ROT0,   "Seibu Kaihatsu", "Zero Team Selection", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
 GAME( 1993, zeroteamsr, zeroteam, zeroteam, zeroteam, raiden2_state, init_zeroteam, ROT0,   "Seibu Kaihatsu", "Zero Team Suicide Revival Kit", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING ) // reprograms the sprite decrypt data of the SEI251 only, no game code
 

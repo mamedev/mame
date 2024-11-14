@@ -10,7 +10,9 @@
 
 #include "emu.h"
 #include "midiin.h"
+
 #include "osdepend.h"
+
 
 /***************************************************************************
     IMPLEMENTATION
@@ -49,16 +51,20 @@ INPUT_PORTS_END
 -------------------------------------------------*/
 
 midiin_device::midiin_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, MIDIIN, tag, owner, clock),
-		device_image_interface(mconfig, *this),
-		device_serial_interface(mconfig, *this),
-		m_midi(),
-		m_config(*this, "CFG"),
-		m_timer(nullptr),
-		m_input_cb(*this),
-		m_xmit_read(0),
-		m_xmit_write(0),
-		m_tx_busy(false)
+	: device_t(mconfig, MIDIIN, tag, owner, clock)
+	, device_image_interface(mconfig, *this)
+	, device_serial_interface(mconfig, *this)
+	, m_midi()
+	, m_config(*this, "CFG")
+	, m_timer(nullptr)
+	, m_input_cb(*this)
+	, m_xmit_read(0)
+	, m_xmit_write(0)
+	, m_tx_busy(false)
+{
+}
+
+midiin_device::~midiin_device()
 {
 }
 
@@ -73,7 +79,6 @@ ioport_constructor midiin_device::device_input_ports() const
 
 void midiin_device::device_start()
 {
-	m_input_cb.resolve_safe();
 	m_timer = timer_alloc(FUNC(midiin_device::midi_update), this);
 	m_midi.reset();
 	m_timer->enable(false);
@@ -161,35 +166,33 @@ TIMER_CALLBACK_MEMBER(midiin_device::midi_update)
     call_load
 -------------------------------------------------*/
 
-image_init_result midiin_device::call_load()
+std::pair<std::error_condition, std::string> midiin_device::call_load()
 {
 	// attempt to load if it's a real file
-	m_err = load_image_by_path(OPEN_FLAG_READ, filename());
-	if (!m_err)
+	std::error_condition err = load_image_by_path(OPEN_FLAG_READ, filename());
+	if (!err)
 	{
 		// if the parsing succeeds, schedule the start to happen at least
 		// 10 seconds after starting to allow the keyboards to initialize
 		// TODO: this should perhaps be a driver-configurable parameter?
-		if (m_sequence.parse(image_core_file(), length()))
+		err = m_sequence.parse(image_core_file(), length());
+		if (!err)
 		{
 			m_sequence_start = std::max(machine().time(), attotime(10, 0));
 			m_timer->adjust(attotime::zero);
-			return image_init_result::PASS;
 		}
-		return image_init_result::FAIL;
+		return std::make_pair(err, std::string());
 	}
 	else
 	{
-		m_midi = machine().osd().create_midi_device();
-
-		if (!m_midi->open_input(filename()))
+		m_midi = machine().osd().create_midi_input(filename());
+		if (!m_midi)
 		{
-			m_midi.reset();
-			return image_init_result::FAIL;
+			return std::make_pair(image_error::UNSPECIFIED, std::string());
 		}
 
 		m_timer->adjust(attotime::from_hz(1500), 0, attotime::from_hz(1500));
-		return image_init_result::PASS;
+		return std::make_pair(std::error_condition(), std::string());
 	}
 }
 
@@ -199,9 +202,15 @@ image_init_result midiin_device::call_load()
 
 void midiin_device::call_unload()
 {
-	if (m_midi)
+	if (!m_midi)
 	{
-		m_midi->close();
+		// send "all notes off" CC if unloading a MIDI file
+		for (u8 channel = 0; channel < 0x10; channel++)
+		{
+			xmit_char(0xb0 | channel);
+			xmit_char(123);
+			xmit_char(0);
+		}
 	}
 	m_midi.reset();
 	m_sequence.clear();
@@ -333,8 +342,8 @@ u8 midiin_device::midi_parser::byte()
 	check_bounds(1);
 
 	u8 result = 0;
-	std::size_t actual = 0;
-	if (m_stream.read_at(m_offset, &result, 1, actual) || actual != 1)
+	auto const [err, actual] = read_at(m_stream, m_offset, &result, 1);
+	if (err || actual != 1)
 		throw error("Error reading data");
 	m_offset++;
 	return result;
@@ -350,8 +359,8 @@ u16 midiin_device::midi_parser::word_be()
 	check_bounds(2);
 
 	u16 result = 0;
-	std::size_t actual = 0;
-	if (m_stream.read_at(m_offset, &result, 2, actual) || actual != 2)
+	auto const [err, actual] = read_at(m_stream, m_offset, &result, 2);
+	if (err || actual != 2)
 		throw error("Error reading data");
 	m_offset += 2;
 	return big_endianize_int16(result);
@@ -367,8 +376,8 @@ u32 midiin_device::midi_parser::triple_be()
 	check_bounds(3);
 
 	u32 result = 0;
-	std::size_t actual = 0;
-	if (m_stream.read_at(m_offset, &result, 3, actual) || actual != 3)
+	auto const [err, actual] = read_at(m_stream, m_offset, &result, 3);
+	if (err || actual != 3)
 		throw error("Error reading data");
 	m_offset += 3;
 	return big_endianize_int32(result) >> 8;
@@ -384,8 +393,8 @@ u32 midiin_device::midi_parser::dword_be()
 	check_bounds(4);
 
 	u32 result = 0;
-	std::size_t actual = 0;
-	if (m_stream.read_at(m_offset, &result, 4, actual) || actual != 4)
+	auto const [err, actual] = read_at(m_stream, m_offset, &result, 4);
+	if (err || actual != 4)
 		throw error("Error reading data");
 	m_offset += 4;
 	return big_endianize_int32(result);
@@ -401,8 +410,8 @@ u32 midiin_device::midi_parser::dword_le()
 	check_bounds(4);
 
 	u32 result = 0;
-	std::size_t actual = 0;
-	if (m_stream.read_at(m_offset, &result, 4, actual) || actual != 4)
+	auto const [err, actual] = read_at(m_stream, m_offset, &result, 4);
+	if (err || actual != 4)
 		throw error("Error reading data");
 	m_offset += 4;
 	return little_endianize_int32(result);
@@ -446,7 +455,7 @@ midiin_device::midi_event &midiin_device::midi_sequence::event_at(u32 tick)
 //  parse - parse a MIDI sequence from a buffer
 //-------------------------------------------------
 
-bool midiin_device::midi_sequence::parse(util::random_read &stream, u32 length)
+std::error_condition midiin_device::midi_sequence::parse(util::random_read &stream, u32 length)
 {
 	// start with an empty list of events
 	m_list.clear();
@@ -457,10 +466,8 @@ bool midiin_device::midi_sequence::parse(util::random_read &stream, u32 length)
 	// catch errors to make parsing easier
 	try
 	{
-		// if not a RIFF-encoed MIDI, just parse as-is
-		if (buffer.dword_le() != fourcc_le("RIFF"))
-			parse_midi_data(buffer.reset());
-		else
+		const u32 type = buffer.dword_le();
+		if (type == fourcc_le("RIFF"))
 		{
 			// check the RIFF type and size
 			u32 riffsize = buffer.dword_le();
@@ -482,15 +489,20 @@ bool midiin_device::midi_sequence::parse(util::random_read &stream, u32 length)
 				}
 			}
 		}
+		else if ((u8)type == 0xf0)
+			parse_sysex_data(buffer.reset());
+		else
+			parse_midi_data(buffer.reset());
+
 		m_iterator = m_list.begin();
-		return true;
+		return std::error_condition();
 	}
 	catch (midi_parser::error &err)
 	{
 		osd_printf_error("MIDI file error: %s\n", err.description());
 		m_list.clear();
 		m_iterator = m_list.begin();
-		return false;
+		return image_error::UNSPECIFIED;
 	}
 }
 
@@ -625,4 +637,28 @@ u32 midiin_device::midi_sequence::parse_track_data(midi_parser &buffer, u32 star
 		}
 	}
 	return curtick;
+}
+
+//-------------------------------------------------
+//  parse_sysex_data - parse a sysex dump into a
+//  single MIDI event
+//-------------------------------------------------
+
+void midiin_device::midi_sequence::parse_sysex_data(midi_parser &buffer)
+{
+	u32 msg = 0;
+	attotime curtime;
+	while (!buffer.eob())
+	{
+		midi_event &event = event_at(msg++);
+		event.set_time(curtime);
+
+		u8 data = 0;
+		while (!buffer.eob() && data != 0xf7)
+			event.append(data = buffer.byte());
+
+		// add 100 ms between the end of this sysex and the start of the next one, if there is one
+		curtime += attotime::from_ticks((u64)10 * event.data().size(), 31250)
+			+ attotime::from_msec(100);
+	}
 }

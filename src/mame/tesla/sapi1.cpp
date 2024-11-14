@@ -82,8 +82,8 @@ public:
 	void init_sapizps3b();
 
 protected:
-	virtual void machine_reset() override;
-	virtual void machine_start() override;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	optional_shared_ptr<uint8_t> m_p_videoram;
@@ -105,29 +105,29 @@ private:
 	uint8_t port40_r();
 	uint8_t port41_r();
 	MC6845_UPDATE_ROW(crtc_update_row);
-	DECLARE_READ_LINE_MEMBER(si);
-	DECLARE_WRITE_LINE_MEMBER(so);
+	int si();
+	void so(int state);
 
 	uint32_t screen_update_sapi1(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_sapi3(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void sapi1_mem(address_map &map);
-	void sapi1_io(address_map &map);
-	void sapi2_mem(address_map &map);
-	void sapi2_io(address_map &map);
-	void sapi3_io(address_map &map);
-	void sapi3_mem(address_map &map);
-	void sapi3a_io(address_map &map);
-	void sapi3a_mem(address_map &map);
-	void sapi3b_io(address_map &map);
-	void sapi3b_mem(address_map &map);
+	void sapi1_mem(address_map &map) ATTR_COLD;
+	void sapi1_io(address_map &map) ATTR_COLD;
+	void sapi2_mem(address_map &map) ATTR_COLD;
+	void sapi2_io(address_map &map) ATTR_COLD;
+	void sapi3_io(address_map &map) ATTR_COLD;
+	void sapi3_mem(address_map &map) ATTR_COLD;
+	void sapi3a_io(address_map &map) ATTR_COLD;
+	void sapi3a_mem(address_map &map) ATTR_COLD;
+	void sapi3b_io(address_map &map) ATTR_COLD;
+	void sapi3b_mem(address_map &map) ATTR_COLD;
 
 	uint8_t m_term_data = 0U;
 	uint8_t m_keyboard_mask = 0U;
 	uint8_t m_refresh_counter = 0U;
 	uint8_t m_zps3_25 = 0U;
 	TIMER_DEVICE_CALLBACK_MEMBER(kansas_r);
-	DECLARE_WRITE_LINE_MEMBER(kansas_w);
+	void kansas_w(int state);
 	u8 m_cass_data[4]{};
 	bool m_cassinbit = 0, m_cassoutbit = 0, m_cassold = 0;
 	bool m_ier = 0, m_iet = 0;
@@ -623,17 +623,17 @@ void sapi_state::port43_w(uint8_t data)
 	m_uart->transmit(~data);
 }
 
-READ_LINE_MEMBER( sapi_state::si )
+int sapi_state::si()
 {
 	return m_cassinbit;
 }
 
-WRITE_LINE_MEMBER( sapi_state::so )
+void sapi_state::so(int state)
 {
 	m_cassoutbit = state;
 }
 
-WRITE_LINE_MEMBER( sapi_state::kansas_w )
+void sapi_state::kansas_w(int state)
 {
 	if ((m_cass->get_state() & CASSETTE_MASK_UISTATE) == CASSETTE_RECORD)
 	{

@@ -6,8 +6,8 @@
 
 ***************************************************************************/
 
-#ifndef MAME_MACHINE_INFORMER_207_376_KBD_H
-#define MAME_MACHINE_INFORMER_207_376_KBD_H
+#ifndef MAME_INFORMER_INFORMER_207_376_KBD_H
+#define MAME_INFORMER_INFORMER_207_376_KBD_H
 
 #pragma once
 
@@ -37,9 +37,9 @@ public:
 
 protected:
 	// device_t overrides
-	virtual ioport_constructor device_input_ports() const override;
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// device_buffered_serial_interface overrides
 	virtual void tra_callback() override;
@@ -57,4 +57,4 @@ private:
 // device type definition
 DECLARE_DEVICE_TYPE(INFORMER_207_376_KBD_HLE, informer_207_376_kbd_hle_device)
 
-#endif // MAME_MACHINE_INFORMER_207_376_KBD_H
+#endif // MAME_INFORMER_INFORMER_207_376_KBD_H

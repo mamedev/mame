@@ -24,6 +24,8 @@
 #include "blockade.lh"
 
 
+namespace {
+
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
@@ -45,7 +47,7 @@ public:
 	{ }
 
 	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
-	DECLARE_READ_LINE_MEMBER(coin_r);
+	int coin_r();
 	void coin_latch_w(uint8_t data);
 
 	void videoram_w(offs_t offset, uint8_t data);
@@ -57,11 +59,11 @@ public:
 	void env_off_w(uint8_t data);
 
 	void blockade(machine_config &config);
-	void main_io_map(address_map &map);
-	void main_map(address_map &map);
+	void main_io_map(address_map &map) ATTR_COLD;
+	void main_map(address_map &map) ATTR_COLD;
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	TIMER_CALLBACK_MEMBER(vblank_tick);
 
@@ -108,7 +110,7 @@ void blockade_state::main_io_map(address_map &map)
 
 static INPUT_PORTS_START( blockade )
 	PORT_START("coin")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_COIN1) PORT_IMPULSE(24) PORT_CHANGED_MEMBER(DEVICE_SELF, blockade_state, coin_inserted, 0)
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_COIN1) PORT_IMPULSE(24) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(blockade_state::coin_inserted), 0)
 
 	// These are not dip switches, they are mapped to connectors on the board.  Different games
 	// had different harnesses which plugged in here, and some pins were unused.
@@ -124,7 +126,7 @@ static INPUT_PORTS_START( blockade )
 	PORT_CONFSETTING(   0x50, "4" )
 	PORT_CONFSETTING(   0x30, "5" )
 	PORT_CONFSETTING(   0x70, "6" )
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_CUSTOM) PORT_READ_LINE_MEMBER(blockade_state, coin_r)
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_CUSTOM) PORT_READ_LINE_MEMBER(FUNC(blockade_state::coin_r))
 
 	PORT_START("IN1")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP)    PORT_4WAY PORT_PLAYER(2)
@@ -155,7 +157,7 @@ static INPUT_PORTS_START( comotion )
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_START1)
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_UNUSED)
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_UNUSED)
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_CUSTOM) PORT_READ_LINE_MEMBER(blockade_state, coin_r)
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_CUSTOM) PORT_READ_LINE_MEMBER(FUNC(blockade_state::coin_r))
 
 	PORT_MODIFY("IN1")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP)    PORT_4WAY PORT_PLAYER(1)
@@ -194,7 +196,7 @@ static INPUT_PORTS_START( blasto )
 	PORT_CONFSETTING(   0x00, "70 Secs") // though service manual says 60
 	PORT_CONFSETTING(   0x08, "90 Secs")
 	PORT_BIT(0x70, IP_ACTIVE_LOW, IPT_UNUSED)
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_CUSTOM) PORT_READ_LINE_MEMBER(blockade_state, coin_r)
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_CUSTOM) PORT_READ_LINE_MEMBER(FUNC(blockade_state::coin_r))
 
 	PORT_MODIFY("IN1")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_BUTTON1) PORT_PLAYER(2)
@@ -229,7 +231,7 @@ static INPUT_PORTS_START( hustle )
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_START1)
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_START2)
 	PORT_BIT(0x60, IP_ACTIVE_LOW, IPT_UNUSED)
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_CUSTOM) PORT_READ_LINE_MEMBER(blockade_state, coin_r)
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_CUSTOM) PORT_READ_LINE_MEMBER(FUNC(blockade_state::coin_r))
 
 	PORT_MODIFY("IN1")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP)    PORT_4WAY PORT_PLAYER(2)
@@ -266,7 +268,7 @@ static INPUT_PORTS_START( mineswpr )
 	PORT_CONFSETTING(   0x50, "4")
 	PORT_CONFSETTING(   0x30, "5")
 	PORT_CONFSETTING(   0x70, "6")
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_CUSTOM) PORT_READ_LINE_MEMBER(blockade_state, coin_r)
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_CUSTOM) PORT_READ_LINE_MEMBER(FUNC(blockade_state::coin_r))
 
 	PORT_MODIFY("IN1")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP)    PORT_4WAY PORT_PLAYER(1)
@@ -297,7 +299,7 @@ static INPUT_PORTS_START( mineswpr4 )
 	PORT_CONFSETTING(   0x50, "4")
 	PORT_CONFSETTING(   0x30, "5")
 	PORT_CONFSETTING(   0x70, "6")
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_CUSTOM) PORT_READ_LINE_MEMBER(blockade_state, coin_r)
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_CUSTOM) PORT_READ_LINE_MEMBER(FUNC(blockade_state::coin_r))
 
 	PORT_MODIFY("IN1")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP)    PORT_4WAY PORT_PLAYER(1)
@@ -333,7 +335,7 @@ INPUT_CHANGED_MEMBER( blockade_state::coin_inserted )
 		m_maincpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
 }
 
-READ_LINE_MEMBER( blockade_state::coin_r )
+int blockade_state::coin_r()
 {
 	return m_coin_latch;
 }
@@ -579,6 +581,8 @@ ROM_START( mineswpr4 )
 	ROM_LOAD_NIB_HIGH("mineswee.cms", 0x000, 0x200, CRC(aad3ce0c) SHA1(92257706ae0c9c1a258eed3311116063e647e1ae))
 	ROM_LOAD_NIB_LOW( "mineswee.cls", 0x000, 0x200, CRC(70959755) SHA1(f62d448742da3fae8bbd96eb3a2714db500cecce))
 ROM_END
+
+} // anonymous namespace
 
 
 //**************************************************************************

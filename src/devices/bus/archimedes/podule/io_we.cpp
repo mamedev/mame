@@ -31,16 +31,16 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// optional information overrides
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 
 	// device_archimedes_podule_interface overrides
-	virtual void ioc_map(address_map &map) override;
-	virtual void memc_map(address_map &map) override;
+	virtual void ioc_map(address_map &map) override ATTR_COLD;
+	virtual void memc_map(address_map &map) override ATTR_COLD;
 
 private:
 	required_memory_region m_podule_rom;
@@ -169,7 +169,7 @@ void arc_bbcio_we_device::device_reset()
 
 int arc_bbcio_we_device::get_analogue_input(int channel_number)
 {
-	return (0xff - m_analog->ch_r(channel_number)) << 8;
+	return m_analog->ch_r(channel_number) << 8;
 }
 
 void arc_bbcio_we_device::upd7002_eoc(int state)

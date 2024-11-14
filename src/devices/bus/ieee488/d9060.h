@@ -14,7 +14,7 @@
 #include "ieee488.h"
 #include "cpu/m6502/m6502.h"
 #include "machine/6522via.h"
-#include "machine/mos6530n.h"
+#include "machine/mos6530.h"
 #include "bus/scsi/scsi.h"
 
 
@@ -39,13 +39,13 @@ protected:
 	d9060_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint32_t variant);
 
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// optional information overrides
-	virtual const tiny_rom_entry *device_rom_region() const override;
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual ioport_constructor device_input_ports() const override;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 
 	// device_ieee488_interface overrides
 	void ieee488_atn(int state) override;
@@ -61,14 +61,14 @@ private:
 	uint8_t riot1_pb_r();
 	void riot1_pb_w(uint8_t data);
 	void via_pb_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER( ack_w );
-	DECLARE_WRITE_LINE_MEMBER( enable_w );
+	void ack_w(int state);
+	void enable_w(int state);
 	void scsi_data_w(uint8_t data);
 
 	required_device<m6502_device> m_maincpu;
 	required_device<m6502_device> m_hdccpu;
-	required_device<mos6532_new_device> m_riot0;
-	required_device<mos6532_new_device> m_riot1;
+	required_device<mos6532_device> m_riot0;
+	required_device<mos6532_device> m_riot1;
 	required_device<via6522_device> m_via;
 	required_device<scsi_port_device> m_sasibus;
 	required_device<output_latch_device> m_sasi_data_out;
@@ -86,8 +86,8 @@ private:
 	uint8_t m_data;
 
 	int m_variant;
-	void hdc_mem(address_map &map);
-	void main_mem(address_map &map);
+	void hdc_mem(address_map &map) ATTR_COLD;
+	void main_mem(address_map &map) ATTR_COLD;
 };
 
 

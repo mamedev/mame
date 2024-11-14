@@ -1,9 +1,8 @@
 /*
- * Copyright 2011-2021 Branimir Karadzic. All rights reserved.
+ * Copyright 2011-2022 Branimir Karadzic. All rights reserved.
  * License: https://github.com/bkaradzic/bnet#license-bsd-2-clause
  */
 
-#include "bx_p.h"
 #include <bx/url.h>
 
 namespace bx

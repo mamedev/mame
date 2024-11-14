@@ -50,7 +50,7 @@ void segas18_state::video_start()
  *
  *************************************/
 
-WRITE_LINE_MEMBER(segas18_state::set_grayscale)
+void segas18_state::set_grayscale(int state)
 {
 	if (state != m_grayscale_enable)
 	{
@@ -61,7 +61,7 @@ WRITE_LINE_MEMBER(segas18_state::set_grayscale)
 }
 
 
-WRITE_LINE_MEMBER(segas18_state::set_vdp_enable)
+void segas18_state::set_vdp_enable(int state)
 {
 	if (state != m_vdp_enable)
 	{

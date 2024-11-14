@@ -96,9 +96,6 @@ ecbbus_device::ecbbus_device(const machine_config &mconfig, const char *tag, dev
 
 void ecbbus_device::device_start()
 {
-	// resolve callbacks
-	m_write_irq.resolve_safe();
-	m_write_nmi.resolve_safe();
 }
 
 

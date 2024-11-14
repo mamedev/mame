@@ -114,6 +114,8 @@ silkscreened by Falgas and the cab contains Falgas logos with a small note that 
 #include "imolagp.lh"
 
 
+namespace {
+
 class imolagp_state : public driver_device
 {
 public:
@@ -128,12 +130,12 @@ public:
 
 	void imolagp(machine_config &config);
 
-	DECLARE_CUSTOM_INPUT_MEMBER(imolagp_steerlatch_r);
+	ioport_value imolagp_steerlatch_r();
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -159,15 +161,15 @@ private:
 	uint8_t imola_draw_mode_r(offs_t offset);
 	void vreg_control_w(uint8_t data);
 	void vreg_data_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
+	void vblank_irq(int state);
 	TIMER_DEVICE_CALLBACK_MEMBER(imolagp_pot_callback);
 
 	void imolagp_palette(palette_device &palette) const;
 	uint32_t screen_update_imolagp(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void imolagp_master_io(address_map &map);
-	void imolagp_master_map(address_map &map);
-	void imolagp_slave_io(address_map &map);
-	void imolagp_slave_map(address_map &map);
+	void imolagp_master_io(address_map &map) ATTR_COLD;
+	void imolagp_master_map(address_map &map) ATTR_COLD;
+	void imolagp_slave_io(address_map &map) ATTR_COLD;
+	void imolagp_slave_map(address_map &map) ATTR_COLD;
 };
 
 
@@ -259,7 +261,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(imolagp_state::imolagp_pot_callback)
 		m_steer_pot_timer->adjust(attotime::from_msec(20));
 }
 
-WRITE_LINE_MEMBER(imolagp_state::vblank_irq)
+void imolagp_state::vblank_irq(int state)
 {
 	if (state)
 	{
@@ -414,7 +416,7 @@ void imolagp_state::imolagp_slave_io(address_map &map)
 
 ***************************************************************************/
 
-CUSTOM_INPUT_MEMBER(imolagp_state::imolagp_steerlatch_r)
+ioport_value imolagp_state::imolagp_steerlatch_r()
 {
 	return m_steerlatch & 0xf;
 }
@@ -473,7 +475,7 @@ static INPUT_PORTS_START( imolagp )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 
 	PORT_START("IN0")
-	PORT_BIT( 0x0f, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(imolagp_state, imolagp_steerlatch_r)
+	PORT_BIT( 0x0f, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(FUNC(imolagp_state::imolagp_steerlatch_r))
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2 )
@@ -504,7 +506,7 @@ static INPUT_PORTS_START( imolagpo )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_MODIFY("IN1")
-	PORT_BIT( 0x0f, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(imolagp_state, imolagp_steerlatch_r)
+	PORT_BIT( 0x0f, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(FUNC(imolagp_state::imolagp_steerlatch_r))
 INPUT_PORTS_END
 
 
@@ -552,8 +554,7 @@ void imolagp_state::imolagp(machine_config &config)
 	i8255_device &ppi(I8255A(config, "ppi8255", 0));
 	// mode $91 - ports A & C-lower as input, ports B & C-upper as output
 	ppi.in_pa_callback().set_ioport("IN0");
-	ppi.in_pb_callback().set_log("PPI8255 - unmapped read port B");
-	ppi.out_pb_callback().set_log("PPI8255 - unmapped write port B");
+	ppi.out_pb_callback().set([this](uint8_t data) { logerror("%s PPI write port B: %02X\n", machine().describe_context(), data); });
 	ppi.in_pc_callback().set_ioport("IN1");
 
 	/* video hardware */
@@ -621,6 +622,8 @@ ROM_START( imolagpo )
 	ROM_LOAD( "xr.bin",   0x3800, 0x0400, CRC(8a8667aa) SHA1(53f34b6c5327d4398de644d7f318d460da56c2de) ) // ? gfx: sign+explosion
 	ROM_LOAD( "xe.bin",   0x3c00, 0x0400, CRC(e0e81120) SHA1(14a77dfd069be342df4dbb1b747443c6d121d3fe) ) // ? car+misc
 ROM_END
+
+} // anonymous namespace
 
 
 //    YEAR,  NAME,     PARENT,  MACHINE, INPUT,    CLASS,         INIT,       MONITOR, COMPANY,      FULLNAME,                   FLAGS

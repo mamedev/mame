@@ -41,13 +41,13 @@ public:
 	void write(offs_t offset, u8 data);
 
 	// control lines
-	DECLARE_WRITE_LINE_MEMBER(cs_w);
-	DECLARE_WRITE_LINE_MEMBER(array_recall_w);
-	DECLARE_WRITE_LINE_MEMBER(store_w);
+	void cs_w(int state);
+	void array_recall_w(int state);
+	void store_w(int state);
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 	// device_nvram_interface overrides
 	virtual void nvram_default() override;

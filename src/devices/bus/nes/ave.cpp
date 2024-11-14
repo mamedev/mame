@@ -21,12 +21,11 @@
 
 
 #ifdef NES_PCB_DEBUG
-#define VERBOSE 1
+#define VERBOSE (LOG_GENERAL)
 #else
-#define VERBOSE 0
+#define VERBOSE (0)
 #endif
-
-#define LOG_MMC(x) do { if (VERBOSE) logerror x; } while (0)
+#include "logmacro.h"
 
 
 //-------------------------------------------------
@@ -94,7 +93,7 @@ void nes_maxi15_device::pcb_reset()
 
 void nes_nina001_device::write_m(offs_t offset, u8 data)
 {
-	LOG_MMC(("nina-001 write_m, offset: %04x, data: %02x\n", offset, data));
+	LOG("nina-001 write_m, offset: %04x, data: %02x\n", offset, data);
 
 	device_nes_cart_interface::write_m(offset, data); // write WRAM
 
@@ -127,7 +126,7 @@ void nes_nina001_device::write_m(offs_t offset, u8 data)
 
 void nes_nina006_device::write_l(offs_t offset, u8 data)
 {
-	LOG_MMC(("nina-006 write_l, offset: %04x, data: %02x\n", offset, data));
+	LOG("nina-006 write_l, offset: %04x, data: %02x\n", offset, data);
 
 	offset += 0x100;
 	if (BIT(offset, 8)) // $41xx, $43xx, ... $5fxx
@@ -151,7 +150,7 @@ void nes_nina006_device::write_l(offs_t offset, u8 data)
 
 u8 nes_maxi15_device::read_h(offs_t offset)
 {
-	LOG_MMC(("Maxi 15 read_h, offset: %04x\n", offset));
+	LOG("Maxi 15 read_h, offset: %04x\n", offset);
 
 	u8 temp = hi_access_rom(offset);
 

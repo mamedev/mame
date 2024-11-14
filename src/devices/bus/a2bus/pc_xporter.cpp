@@ -114,9 +114,10 @@ public:
 protected:
 	a2bus_pcxporter_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual void device_start() override;
-	virtual void device_reset() override;
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual void device_resolve_objects() override ATTR_COLD;
 
 	// overrides of standard a2bus slot functions
 	virtual uint8_t read_c0nx(uint8_t offset) override;
@@ -155,14 +156,14 @@ private:
 	uint8_t m_6845_reg;
 
 	// interface to the keyboard
-	DECLARE_WRITE_LINE_MEMBER( keyboard_clock_w );
-	DECLARE_WRITE_LINE_MEMBER( keyboard_data_w );
+	void keyboard_clock_w(int state);
+	void keyboard_data_w(int state);
 
-	DECLARE_WRITE_LINE_MEMBER( pc_pit8253_out1_changed );
-	DECLARE_WRITE_LINE_MEMBER( pc_pit8253_out2_changed );
+	void pc_pit8253_out1_changed(int state);
+	void pc_pit8253_out2_changed(int state);
 
-	DECLARE_WRITE_LINE_MEMBER( pc_dma_hrq_changed );
-	DECLARE_WRITE_LINE_MEMBER( pc_dma8237_out_eop );
+	void pc_dma_hrq_changed(int state);
+	void pc_dma8237_out_eop(int state);
 	uint8_t pc_dma_read_byte(offs_t offset);
 	void pc_dma_write_byte(offs_t offset, uint8_t data);
 	uint8_t pc_dma8237_1_dack_r();
@@ -172,24 +173,24 @@ private:
 	void pc_dma8237_2_dack_w(uint8_t data);
 	void pc_dma8237_3_dack_w(uint8_t data);
 	void pc_dma8237_0_dack_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER( pc_dack0_w );
-	DECLARE_WRITE_LINE_MEMBER( pc_dack1_w );
-	DECLARE_WRITE_LINE_MEMBER( pc_dack2_w );
-	DECLARE_WRITE_LINE_MEMBER( pc_dack3_w );
+	void pc_dack0_w(int state);
+	void pc_dack1_w(int state);
+	void pc_dack2_w(int state);
+	void pc_dack3_w(int state);
 
 	uint8_t kbd_6502_r(offs_t offset);
 	void kbd_6502_w(offs_t offset, uint8_t data);
 
-	[[maybe_unused]] DECLARE_WRITE_LINE_MEMBER( pc_speaker_set_spkrdata ); // TODO: hook up to something?
+	[[maybe_unused]] void pc_speaker_set_spkrdata(int state); // TODO: hook up to something?
 
 	void pc_page_w(offs_t offset, uint8_t data);
 	void nmi_enable_w(uint8_t data);
-	[[maybe_unused]] DECLARE_WRITE_LINE_MEMBER(iochck_w); // TODO: hook up to something?
+	[[maybe_unused]] void iochck_w(int state); // TODO: hook up to something?
 
 	void pc_select_dma_channel(int channel, bool state);
 
-	void pc_io(address_map &map);
-	void pc_map(address_map &map);
+	void pc_io(address_map &map) ATTR_COLD;
+	void pc_map(address_map &map) ATTR_COLD;
 };
 
 void a2bus_pcxporter_device::pc_map(address_map &map)
@@ -218,21 +219,18 @@ void a2bus_pcxporter_device::pc_io(address_map &map)
 
 void a2bus_pcxporter_device::device_add_mconfig(machine_config &config)
 {
-	V30(config, m_v30, A2BUS_7M_CLOCK);    // 7.16 MHz as per manual
+	V30(config, m_v30, DERIVED_CLOCK(1, 1));    // 7.16 MHz as per manual
 	m_v30->set_addrmap(AS_PROGRAM, &a2bus_pcxporter_device::pc_map);
 	m_v30->set_addrmap(AS_IO, &a2bus_pcxporter_device::pc_io);
 	m_v30->set_irq_acknowledge_callback("pic8259", FUNC(pic8259_device::inta_cb));
 	m_v30->set_disable();
 
 	PIT8253(config, m_pit8253);
-	m_pit8253->set_clk<0>(A2BUS_7M_CLOCK / 6.0); // heartbeat IRQ
 	m_pit8253->out_handler<0>().set(m_pic8259, FUNC(pic8259_device::ir0_w));
-	m_pit8253->set_clk<1>(A2BUS_7M_CLOCK / 6.0); // DRAM refresh
 	m_pit8253->out_handler<1>().set(FUNC(a2bus_pcxporter_device::pc_pit8253_out1_changed));
-	m_pit8253->set_clk<2>(A2BUS_7M_CLOCK / 6.0); // PIO port C pin 4, and speaker polling enough
 	m_pit8253->out_handler<2>().set(FUNC(a2bus_pcxporter_device::pc_pit8253_out2_changed));
 
-	PCXPORT_DMAC(config, m_dma8237, A2BUS_7M_CLOCK / 2);
+	PCXPORT_DMAC(config, m_dma8237, DERIVED_CLOCK(1, 2));
 	m_dma8237->out_hreq_callback().set(FUNC(a2bus_pcxporter_device::pc_dma_hrq_changed));
 	m_dma8237->out_eop_callback().set(FUNC(a2bus_pcxporter_device::pc_dma8237_out_eop));
 	m_dma8237->in_memr_callback().set(FUNC(a2bus_pcxporter_device::pc_dma_read_byte));
@@ -275,6 +273,14 @@ void a2bus_pcxporter_device::device_add_mconfig(machine_config &config)
 
 	ISA8_SLOT(config, "isa1", 0, m_isabus, pc_isa8_cards, "cga", true); // FIXME: determine ISA bus clock
 	ISA8_SLOT(config, "isa2", 0, m_isabus, pc_isa8_cards, "fdc_xt", true);
+}
+
+void a2bus_pcxporter_device::device_resolve_objects()
+{
+	// DERIVED_CLOCK doesn't work for this case, so do this here instead
+	m_pit8253->set_clk<0>(clock() / 6.0); // heartbeat IRQ
+	m_pit8253->set_clk<1>(clock() / 6.0); // DRAM refresh
+	m_pit8253->set_clk<2>(clock() / 6.0); // PIO port C pin 4, and speaker polling enough
 }
 
 //**************************************************************************
@@ -580,7 +586,7 @@ void a2bus_pcxporter_device::pc_page_w(offs_t offset, uint8_t data)
 }
 
 
-WRITE_LINE_MEMBER( a2bus_pcxporter_device::pc_dma_hrq_changed )
+void a2bus_pcxporter_device::pc_dma_hrq_changed(int state)
 {
 	m_v30->set_input_line(INPUT_LINE_HALT, state ? ASSERT_LINE : CLEAR_LINE);
 
@@ -651,7 +657,7 @@ void a2bus_pcxporter_device::pc_dma8237_0_dack_w(uint8_t data)
 }
 
 
-WRITE_LINE_MEMBER( a2bus_pcxporter_device::pc_dma8237_out_eop )
+void a2bus_pcxporter_device::pc_dma8237_out_eop(int state)
 {
 	m_cur_eop = state == ASSERT_LINE;
 	if(m_dma_channel != -1 && m_cur_eop)
@@ -672,10 +678,10 @@ void a2bus_pcxporter_device::pc_select_dma_channel(int channel, bool state)
 	}
 }
 
-WRITE_LINE_MEMBER( a2bus_pcxporter_device::pc_dack0_w ) { pc_select_dma_channel(0, state); }
-WRITE_LINE_MEMBER( a2bus_pcxporter_device::pc_dack1_w ) { pc_select_dma_channel(1, state); }
-WRITE_LINE_MEMBER( a2bus_pcxporter_device::pc_dack2_w ) { pc_select_dma_channel(2, state); }
-WRITE_LINE_MEMBER( a2bus_pcxporter_device::pc_dack3_w ) { pc_select_dma_channel(3, state); }
+void a2bus_pcxporter_device::pc_dack0_w(int state) { pc_select_dma_channel(0, state); }
+void a2bus_pcxporter_device::pc_dack1_w(int state) { pc_select_dma_channel(1, state); }
+void a2bus_pcxporter_device::pc_dack2_w(int state) { pc_select_dma_channel(2, state); }
+void a2bus_pcxporter_device::pc_dack3_w(int state) { pc_select_dma_channel(3, state); }
 
 /*************************************************************
  *
@@ -683,7 +689,7 @@ WRITE_LINE_MEMBER( a2bus_pcxporter_device::pc_dack3_w ) { pc_select_dma_channel(
  *
  *************************************************************/
 
-WRITE_LINE_MEMBER(a2bus_pcxporter_device::pc_speaker_set_spkrdata)
+void a2bus_pcxporter_device::pc_speaker_set_spkrdata(int state)
 {
 	m_pc_spkrdata = state ? 1 : 0;
 	m_speaker->level_w(m_pc_spkrdata & m_pit_out2);
@@ -696,7 +702,7 @@ WRITE_LINE_MEMBER(a2bus_pcxporter_device::pc_speaker_set_spkrdata)
  *
  *************************************************************/
 
-WRITE_LINE_MEMBER( a2bus_pcxporter_device::pc_pit8253_out1_changed )
+void a2bus_pcxporter_device::pc_pit8253_out1_changed(int state)
 {
 	/* Trigger DMA channel #0 */
 	if ( m_out1 == 0 && state == 1 && m_u73_q2 == 0 )
@@ -708,19 +714,19 @@ WRITE_LINE_MEMBER( a2bus_pcxporter_device::pc_pit8253_out1_changed )
 }
 
 
-WRITE_LINE_MEMBER( a2bus_pcxporter_device::pc_pit8253_out2_changed )
+void a2bus_pcxporter_device::pc_pit8253_out2_changed(int state)
 {
 	m_pit_out2 = state ? 1 : 0;
 	m_speaker->level_w(m_pc_spkrdata & m_pit_out2);
 }
 
 
-WRITE_LINE_MEMBER( a2bus_pcxporter_device::keyboard_clock_w )
+void a2bus_pcxporter_device::keyboard_clock_w(int state)
 {
 }
 
 
-WRITE_LINE_MEMBER( a2bus_pcxporter_device::keyboard_data_w )
+void a2bus_pcxporter_device::keyboard_data_w(int state)
 {
 }
 
@@ -737,7 +743,7 @@ void a2bus_pcxporter_device::nmi_enable_w(uint8_t data)
 		m_v30->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 }
 
-WRITE_LINE_MEMBER( a2bus_pcxporter_device::iochck_w )
+void a2bus_pcxporter_device::iochck_w(int state)
 {
 	if (m_nmi_enabled && !state)
 		m_v30->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);

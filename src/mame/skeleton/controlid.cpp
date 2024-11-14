@@ -34,6 +34,9 @@
 #include "emupal.h"
 #include "screen.h"
 
+
+namespace {
+
 class controlidx628_state : public driver_device
 {
 public:
@@ -45,7 +48,7 @@ public:
 	void controlidx628(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	void p0_w(uint8_t data);
@@ -56,7 +59,7 @@ private:
 	void p3_w(uint8_t data);
 	void controlidx628_palette(palette_device &palette) const;
 
-	void io_map(address_map &map);
+	void io_map(address_map &map) ATTR_COLD;
 
 	required_device<nt7534_device> m_lcdc;
 
@@ -179,5 +182,8 @@ ROM_START( cidx628 )
 	ROM_REGION( 0x2000, "maincpu", 0 )
 	ROM_LOAD( "controlid_x628.u1",   0x0000, 0x2000, CRC(500d79b4) SHA1(5522115f2da622db389e067fcdd4bccb7aa8561a) )
 ROM_END
+
+} // anonymous namespace
+
 
 COMP(200?, cidx628, 0, 0, controlidx628, 0, controlidx628_state, empty_init, "ControlID", "X628", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)

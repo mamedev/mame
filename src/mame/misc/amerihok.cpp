@@ -25,6 +25,8 @@ Processor is a ROMless MCU from the Z8 family.
 #include "amerihok.lh"
 
 
+namespace {
+
 class amerihok_state : public driver_device
 {
 public:
@@ -39,8 +41,8 @@ public:
 	void amerihok(machine_config &config);
 
 private:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	void control_w(u8 data);
 	void p2_w(u8 data);
@@ -48,8 +50,8 @@ private:
 
 	required_device<z8_device> m_maincpu;
 	required_device<okim6376_device> m_oki;
-	void amerihok_data_map(address_map &map);
-	void amerihok_map(address_map &map);
+	void amerihok_data_map(address_map &map) ATTR_COLD;
+	void amerihok_map(address_map &map) ATTR_COLD;
 
 	u32 m_outputs[2]{};
 	u8 m_old_p2 = 0U;
@@ -133,7 +135,7 @@ static INPUT_PORTS_START( amerihok )
 
 	PORT_START("P3")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_UNUSED)
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_READ_LINE_DEVICE_MEMBER("oki", okim6376_device, nar_r)
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_READ_LINE_DEVICE_MEMBER("oki", FUNC(okim6376_device::nar_r))
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_COIN1)
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_COIN2)
 INPUT_PORTS_END
@@ -184,5 +186,8 @@ ROM_START( amerihok )
 	ROM_LOAD( "air-h-u9", 0x40000, 0x40000, CRC(be01ca4a) SHA1(87513a5c547633d5a3f09e931bd7ec78bcaa94dc) )
 	ROM_LOAD( "airh-u10", 0x80000, 0x40000, CRC(71ee6421) SHA1(10131fc7c009158308c4a8bb2b037101622c07a1) )
 ROM_END
+
+} // anonymous namespace
+
 
 GAMEL( 199?, amerihok, 0, amerihok, amerihok, amerihok_state, empty_init, ROT0, "Ameri", "Ameri-Hockey", MACHINE_NOT_WORKING | MACHINE_MECHANICAL, layout_amerihok )

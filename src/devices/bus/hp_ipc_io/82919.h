@@ -27,26 +27,26 @@ public:
 	uint8_t read(offs_t addr);
 	void write(offs_t addr , uint8_t data);
 
-	DECLARE_WRITE_LINE_MEMBER(uart_irq);
-	DECLARE_WRITE_LINE_MEMBER(uart_a_tx);
-	DECLARE_WRITE_LINE_MEMBER(uart_b_tx);
+	void uart_irq(int state);
+	void uart_a_tx(int state);
+	void uart_b_tx(int state);
 	void uart_output(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(prim_rxd);
-	DECLARE_WRITE_LINE_MEMBER(prim_dcd);
-	DECLARE_WRITE_LINE_MEMBER(prim_dsr);
-	DECLARE_WRITE_LINE_MEMBER(prim_ri);
-	DECLARE_WRITE_LINE_MEMBER(prim_cts);
-	DECLARE_WRITE_LINE_MEMBER(sec_rxd);
-	DECLARE_WRITE_LINE_MEMBER(sec_dcd);
-	DECLARE_WRITE_LINE_MEMBER(sec_cts);
+	void prim_rxd(int state);
+	void prim_dcd(int state);
+	void prim_dsr(int state);
+	void prim_ri(int state);
+	void prim_cts(int state);
+	void sec_rxd(int state);
+	void sec_dcd(int state);
+	void sec_cts(int state);
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// device-level overrides
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual ioport_constructor device_input_ports() const override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 
 	virtual void install_read_write_handlers(address_space& space , uint32_t base_addr) override;
 

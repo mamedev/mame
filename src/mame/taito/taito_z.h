@@ -5,8 +5,8 @@
     Taito Z system
 
 *************************************************************************/
-#ifndef MAME_INCLUDES_TAITO_Z_H
-#define MAME_INCLUDES_TAITO_Z_H
+#ifndef MAME_TAITO_TAITO_Z_H
+#define MAME_TAITO_TAITO_Z_H
 
 #pragma once
 
@@ -45,12 +45,13 @@ public:
 		m_brake(*this, "BRAKE"),
 		m_steer(*this, "STEER"),
 		m_stickx(*this, "STICKX"),
-		m_sticky(*this, "STICKY")
+		m_sticky(*this, "STICKY"),
+		m_cpua_out(*this, "genout%u", 0U)
 	{ }
 
-	DECLARE_CUSTOM_INPUT_MEMBER(gas_pedal_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(brake_pedal_r);
-	template <int axis> DECLARE_CUSTOM_INPUT_MEMBER(adstick_r);
+	ioport_value gas_pedal_r();
+	ioport_value brake_pedal_r();
+	template <int axis> ioport_value adstick_r();
 
 	void bshark_base(machine_config &config);
 	void bshark(machine_config &config);
@@ -58,8 +59,8 @@ public:
 
 protected:
 	virtual void device_post_load() override;
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	void screen_config(machine_config &config, int vdisp_start, int vdisp_end);
 
@@ -92,6 +93,7 @@ protected:
 	optional_ioport m_steer;
 	optional_ioport m_stickx;
 	optional_ioport m_sticky;
+	output_finder<8> m_cpua_out;
 
 	/* misc */
 	u16      m_cpua_ctrl;
@@ -100,9 +102,9 @@ private:
 	u32 screen_update_bshark(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void parse_cpu_control();
 
-	void bshark_cpub_map(address_map &map);
-	void bshark_map(address_map &map);
-	void bsharkjjs_map(address_map &map);
+	void bshark_cpub_map(address_map &map) ATTR_COLD;
+	void bshark_map(address_map &map) ATTR_COLD;
+	void bsharkjjs_map(address_map &map) ATTR_COLD;
 };
 
 
@@ -117,15 +119,16 @@ public:
 	}
 
 	void aquajack(machine_config &config);
+	void dblaxle(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 	u16 dblaxle_steer_input_r(offs_t offset);
 
 	u32 screen_update_chasehq(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void z80_sound_map(address_map &map);
+	void z80_sound_map(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_audiocpu;
 
@@ -136,9 +139,12 @@ private:
 	void chasehq_draw_sprites_16x16(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int y_offs);
 	void aquajack_draw_sprites_16x8(screen_device &screen, bitmap_ind16 &bitmap,const rectangle &cliprect,int y_offs);
 	u32 screen_update_aquajack(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	u32 screen_update_dblaxle(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void aquajack_map(address_map &map);
-	void aquajack_cpub_map(address_map &map);
+	void aquajack_map(address_map &map) ATTR_COLD;
+	void aquajack_cpub_map(address_map &map) ATTR_COLD;
+	void dblaxle_map(address_map &map) ATTR_COLD;
+	void dblaxle_cpub_map(address_map &map) ATTR_COLD;
 
 	required_memory_bank m_z80bank;
 };
@@ -157,21 +163,21 @@ public:
 	void enforce(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	u8 contcirc_input_bypass_r();
 	void contcirc_out_w(u8 data);
-	DECLARE_WRITE_LINE_MEMBER(scope_vblank);
+	void scope_vblank(int state);
 
 	void contcirc_draw_sprites_16x8(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int y_offs);
 	u32 screen_update_contcirc(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void contcirc_map(address_map &map);
-	void contcirc_cpub_map(address_map &map);
-	void enforce_map(address_map &map);
-	void enforce_cpub_map(address_map &map);
+	void contcirc_map(address_map &map) ATTR_COLD;
+	void contcirc_cpub_map(address_map &map) ATTR_COLD;
+	void enforce_map(address_map &map) ATTR_COLD;
+	void enforce_cpub_map(address_map &map) ATTR_COLD;
 
 	output_finder<2> m_shutter_out;
 
@@ -186,27 +192,21 @@ class chasehq_state : public taitoz_z80_sound_state
 public:
 	chasehq_state(const machine_config &mconfig, device_type type, const char *tag) :
 		taitoz_z80_sound_state(mconfig, type, tag),
-		m_unknown_io(*this, "UNK%u", 1U),
-		m_lamps(*this, "lamp%u", 0U)
+		m_unknown_io(*this, "UNK%u", 1U)
 	{
 	}
 
 	void chasehq(machine_config &config);
 
-protected:
-	virtual void machine_start() override;
-
 private:
-	void chasehq_cpua_ctrl_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 	u8 chasehq_input_bypass_r();
 	u16 chasehq_motor_r(offs_t offset);
 	void chasehq_motor_w(offs_t offset, u16 data);
 
-	void chasehq_map(address_map &map);
-	void chasehq_cpub_map(address_map &map);
+	void chasehq_map(address_map &map) ATTR_COLD;
+	void chasehq_cpub_map(address_map &map) ATTR_COLD;
 
 	required_ioport_array<4> m_unknown_io;
-	output_finder<2> m_lamps;
 };
 
 
@@ -222,9 +222,9 @@ public:
 	void racingb(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 	TIMER_CALLBACK_MEMBER(trigger_int6);
 
@@ -239,10 +239,10 @@ private:
 	u32 screen_update_sci(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	u32 screen_update_racingb(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void sci_map(address_map &map);
-	void sci_cpub_map(address_map &map);
-	void racingb_map(address_map &map);
-	void racingb_cpub_map(address_map &map);
+	void sci_map(address_map &map) ATTR_COLD;
+	void sci_cpub_map(address_map &map) ATTR_COLD;
+	void racingb_map(address_map &map) ATTR_COLD;
+	void racingb_cpub_map(address_map &map) ATTR_COLD;
 
 	int        m_sci_spriteframe = 0;
 	s32        m_sci_int6 = 0;
@@ -257,24 +257,27 @@ public:
 		taitoz_z80_sound_state(mconfig, type, tag),
 		m_motor_dir(*this, "Motor_%u_Direction", 1U),
 		m_motor_speed(*this, "Motor_%u_Speed", 1U),
-		m_motor_debug(*this, "motor_debug")
+		m_motor_debug(*this, "motor_debug"),
+		m_lamps(*this, "lamp%u", 0U)
 	{
 	}
 
 	void nightstr(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	void nightstr_motor_w(offs_t offset, u16 data);
+	void nightstr_lamps_w(u8 data);
 
-	void nightstr_map(address_map &map);
-	void nightstr_cpub_map(address_map &map);
+	void nightstr_map(address_map &map) ATTR_COLD;
+	void nightstr_cpub_map(address_map &map) ATTR_COLD;
 
 	output_finder<3> m_motor_dir;
 	output_finder<3> m_motor_speed;
 	output_finder<> m_motor_debug;
+	output_finder<8> m_lamps;
 };
 
 
@@ -292,7 +295,7 @@ public:
 	void spacegun(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	void spacegun_eeprom_w(u8 data);
@@ -301,40 +304,12 @@ private:
 	void spacegun_draw_sprites_16x8(screen_device &screen, bitmap_ind16 &bitmap,const rectangle &cliprect,int y_offs);
 	u32 screen_update_spacegun(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void spacegun_map(address_map &map);
-	void spacegun_cpub_map(address_map &map);
+	void spacegun_map(address_map &map) ATTR_COLD;
+	void spacegun_cpub_map(address_map &map) ATTR_COLD;
 
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
 	required_ioport m_io_eepromout;
 	output_finder<2> m_recoil;
-
-	u8       m_eep_latch;
 };
 
-
-class dblaxle_state : public taitoz_z80_sound_state
-{
-public:
-	dblaxle_state(const machine_config &mconfig, device_type type, const char *tag) :
-		taitoz_z80_sound_state(mconfig, type, tag),
-		m_wheel_vibration(*this, "Wheel_Vibration")
-	{
-	}
-
-	void dblaxle(machine_config &config);
-
-protected:
-	virtual void machine_start() override;
-
-private:
-	void dblaxle_cpua_ctrl_w(offs_t offset, u16 data, u16 mem_mask = ~0);
-
-	u32 screen_update_dblaxle(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-
-	void dblaxle_map(address_map &map);
-	void dblaxle_cpub_map(address_map &map);
-
-	output_finder<> m_wheel_vibration;
-};
-
-#endif // MAME_INCLUDES_TAITO_Z_H
+#endif // MAME_TAITO_TAITO_Z_H

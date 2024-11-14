@@ -2,13 +2,13 @@
 // copyright-holders:Curt Coder
 #pragma once
 
-#ifndef MAME_INCLUDES_ABC1600_H
-#define MAME_INCLUDES_ABC1600_H
+#ifndef MAME_LUXOR_ABC1600_H
+#define MAME_LUXOR_ABC1600_H
 
 #include "bus/abcbus/abcbus.h"
 #include "bus/abckb/abckb.h"
 #include "bus/rs232/rs232.h"
-#include "cpu/m68000/m68000.h"
+#include "cpu/m68000/m68008.h"
 #include "formats/abc1600_dsk.h"
 #include "imagedev/floppy.h"
 #include "abc1600mac.h"
@@ -74,19 +74,20 @@ public:
 		m_rtc(*this, E050_C16PC_TAG),
 		m_nvram(*this, NMC9306_TAG),
 		m_ram(*this, RAM_TAG),
-		m_floppy0(*this, SAB1797_02P_TAG":0"),
-		m_floppy1(*this, SAB1797_02P_TAG":1"),
-		m_floppy2(*this, SAB1797_02P_TAG":2"),
+		m_floppy(*this, SAB1797_02P_TAG":%u", 0U),
 		m_bus0i(*this, BUS0I_TAG),
 		m_bus0x(*this, BUS0X_TAG),
 		m_bus1(*this, BUS1_TAG),
-		m_bus2(*this, BUS2_TAG)
+		m_bus2(*this, BUS2_TAG),
+		m_kb(*this, ABC_KEYBOARD_PORT_TAG)
 	{ }
 
 	void abc1600(machine_config &config);
 
+	DECLARE_INPUT_CHANGED_MEMBER( reset );
+
 private:
-	required_device<m68000_base_device> m_maincpu;
+	required_device<m68008_device> m_maincpu;
 	required_device<abc1600_mac_device> m_mac;
 	required_device<z80dma_device> m_dma0;
 	required_device<z80dma_device> m_dma1;
@@ -98,16 +99,15 @@ private:
 	required_device<e0516_device> m_rtc;
 	required_device<nmc9306_device> m_nvram;
 	required_device<ram_device> m_ram;
-	required_device<floppy_connector> m_floppy0;
-	required_device<floppy_connector> m_floppy1;
-	required_device<floppy_connector> m_floppy2;
+	required_device_array<floppy_connector, 3> m_floppy;
 	required_device<abcbus_slot_device> m_bus0i;
 	required_device<abcbus_slot_device> m_bus0x;
 	required_device<abcbus_slot_device> m_bus1;
 	required_device<abcbus_slot_device> m_bus2;
+	required_device<abc_keyboard_port_device> m_kb;
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	static void floppy_formats(format_registration &fr);
 
@@ -121,9 +121,16 @@ private:
 	void cio_w(offs_t offset, uint8_t data);
 	void fw0_w(uint8_t data);
 	void fw1_w(uint8_t data);
-	void spec_contr_reg_w(uint8_t data);
 
-	void dbrq_w(int state);
+	void cs7_w(int state);
+	void btce_w(int state);
+	void atce_w(int state);
+	void dmadis_w(int state);
+	void sysscc_w(int state);
+	void sysfs_w(int state);
+	void dbrq0_w(int state) { m_dbrq0 = state; update_br(); }
+	void dbrq1_w(int state) { m_dbrq1 = state; update_br(); }
+	void dbrq2_w(int state) { m_dbrq2 = state; update_br(); }
 
 	uint8_t cio_pa_r();
 	uint8_t cio_pb_r();
@@ -132,10 +139,10 @@ private:
 	void cio_pc_w(uint8_t data);
 
 	void nmi_w(int state);
-	void buserr_w(offs_t offset, uint8_t data);
 
-	void cpu_space_map(address_map &map);
+	void cpu_space_map(address_map &map) ATTR_COLD;
 
+	void update_br();
 	void update_pren0(int state);
 	void update_pren1(int state);
 	void update_drdy0(int state);
@@ -149,9 +156,12 @@ private:
 	int m_dmadis = 0;
 	int m_sysscc = 0;
 	int m_sysfs = 0;
+	int m_dbrq0 = CLEAR_LINE;
+	int m_dbrq1 = CLEAR_LINE;
+	int m_dbrq2 = CLEAR_LINE;
 
-	void abc1600_mem(address_map &map);
-	void mac_mem(address_map &map);
+	void abc1600_mem(address_map &map) ATTR_COLD;
+	void mac_mem(address_map &map) ATTR_COLD;
 
 	// peripherals
 	int m_cs7 = 0;                  // card select address bit 7
@@ -167,4 +177,4 @@ private:
 
 
 
-#endif
+#endif // MAME_LUXOR_ABC1600_H

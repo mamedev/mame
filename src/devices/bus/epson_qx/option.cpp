@@ -7,7 +7,12 @@
  *******************************************************************/
 #include "emu.h"
 #include "option.h"
+
+#include "cqgmem.h"
+#include "cr1510.h"
+#include "ide.h"
 #include "multifont.h"
+#include "sound_card.h"
 
 DEFINE_DEVICE_TYPE(EPSON_QX_OPTION_BUS_SLOT, bus::epson_qx::option_slot_device, "epson_qx_option_slot", "QX-10 Option slot")
 DEFINE_DEVICE_TYPE(EPSON_QX_OPTION_BUS, bus::epson_qx::option_bus_device, "epson_qx_option_bus", "QX-10 Option Bus")
@@ -25,9 +30,9 @@ option_slot_device::option_slot_device(const machine_config &mconfig, const char
 	device_single_card_slot_interface<device_option_expansion_interface>(mconfig, *this),
 	m_bus(*this, finder_base::DUMMY_TAG),
 	m_dmas_w_cb(*this),
-	m_dmas_r_cb(*this),
+	m_dmas_r_cb(*this, 0xff),
 	m_dmaf_w_cb(*this),
-	m_dmaf_r_cb(*this),
+	m_dmaf_r_cb(*this, 0),
 	m_eopf_cb(*this),
 	m_eops_cb(*this),
 	m_slot(-1)
@@ -39,14 +44,6 @@ option_slot_device::option_slot_device(const machine_config &mconfig, const char
 //-------------------------------------------------
 void option_slot_device::device_start()
 {
-	m_dmas_w_cb.resolve_safe();
-	m_dmas_r_cb.resolve_safe(0xff);
-	m_dmaf_w_cb.resolve();
-	m_dmaf_r_cb.resolve();
-
-	m_eopf_cb.resolve_safe();
-	m_eops_cb.resolve_safe();
-
 	device_option_expansion_interface *const intf(get_card_device());
 	if (intf) {
 		intf->set_option_bus(*m_bus, m_slot);
@@ -55,18 +52,18 @@ void option_slot_device::device_start()
 	m_bus->add_slot(*this);
 }
 
-WRITE_LINE_MEMBER(option_slot_device::eopf) { m_eopf_cb(state); }
-WRITE_LINE_MEMBER(option_slot_device::eops) { m_eops_cb(state); }
+void option_slot_device::eopf(int state) { m_eopf_cb(state); }
+void option_slot_device::eops(int state) { m_eops_cb(state); }
 
-WRITE_LINE_MEMBER(option_slot_device::inth1_w) { (*m_bus).set_inth1_line(state, m_slot); }
-WRITE_LINE_MEMBER(option_slot_device::inth2_w) { (*m_bus).set_inth2_line(state, m_slot); }
-WRITE_LINE_MEMBER(option_slot_device::intl_w) { (*m_bus).set_intl_line(state, m_slot); }
+void option_slot_device::inth1_w(int state) { (*m_bus).set_inth1_line(state, m_slot); }
+void option_slot_device::inth2_w(int state) { (*m_bus).set_inth2_line(state, m_slot); }
+void option_slot_device::intl_w(int state) { (*m_bus).set_intl_line(state, m_slot); }
 
-WRITE_LINE_MEMBER(option_slot_device::drqf_w) { (*m_bus).set_drqf_line(state, m_slot); }
-WRITE_LINE_MEMBER(option_slot_device::drqs_w) { (*m_bus).set_drqs_line(state, m_slot); }
+void option_slot_device::drqf_w(int state) { (*m_bus).set_drqf_line(state, m_slot); }
+void option_slot_device::drqs_w(int state) { (*m_bus).set_drqs_line(state, m_slot); }
 
-WRITE_LINE_MEMBER(option_slot_device::rdyf_w) { (*m_bus).set_rdyf_line(state, m_slot); }
-WRITE_LINE_MEMBER(option_slot_device::rdys_w) { (*m_bus).set_rdys_line(state, m_slot); }
+void option_slot_device::rdyf_w(int state) { (*m_bus).set_rdyf_line(state, m_slot); }
+void option_slot_device::rdys_w(int state) { (*m_bus).set_rdys_line(state, m_slot); }
 
 //**************************************************************************
 //  EPSON OPTION BUS DEVICE
@@ -103,13 +100,6 @@ void option_bus_device::add_slot(option_slot_device &slot)
 //-------------------------------------------------
 void option_bus_device::device_start()
 {
-	m_inth1_cb.resolve_safe();
-	m_inth2_cb.resolve_safe();
-	m_intl_cb.resolve_all_safe();
-	m_drqf_cb.resolve_safe();
-	m_drqs_cb.resolve_all_safe();
-	m_rdyf_cb.resolve_safe();
-	m_rdys_cb.resolve_safe();
 }
 
 //-------------------------------------------------
@@ -127,9 +117,7 @@ void option_bus_device::device_reset()
 void option_bus_device::dackf_w(uint8_t data)
 {
 	for (int i = 0; i < m_slot_list.size(); ++i) {
-		if (!m_slot_list[i]->m_dmaf_w_cb.isnull()) {
-			m_slot_list[i]->m_dmaf_w_cb(data);
-		}
+		m_slot_list[i]->m_dmaf_w_cb(data);
 	}
 }
 
@@ -138,7 +126,7 @@ uint8_t option_bus_device::dackf_r()
 	uint8_t value = 0;
 	bool found = false;
 	for (int i = 0; i < m_slot_list.size(); ++i) {
-		if (!m_slot_list[i]->m_dmaf_r_cb.isnull()) {
+		if (!m_slot_list[i]->m_dmaf_r_cb.isunset()) {
 			found = true;
 			value |= m_slot_list[i]->m_dmaf_r_cb();
 		}
@@ -206,7 +194,11 @@ void device_option_expansion_interface::interface_pre_start()
 
 void option_bus_devices(device_slot_interface &device)
 {
+	device.option_add("cqgmem", EPSON_QX_OPTION_CQGMEM);
+	device.option_add("cr1510", EPSON_QX_OPTION_CR1510);
+	device.option_add("ide", EPSON_QX_OPTION_IDE);
 	device.option_add("multifont", EPSON_QX_OPTION_MULTIFONT);
+	device.option_add("ym2149", EPSON_QX_OPTION_YM2149);
 }
 
 }  // namespace bus::epson_qx

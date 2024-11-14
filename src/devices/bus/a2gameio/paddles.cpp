@@ -21,18 +21,18 @@ public:
 
 protected:
 	// device-level overrides
-	virtual ioport_constructor device_input_ports() const override;
-	virtual void device_start() override;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
+	virtual void device_start() override ATTR_COLD;
 
 	// device_a2gameio_interface overrides
 	virtual u8 pdl0_r() override;
 	virtual u8 pdl1_r() override;
 	virtual u8 pdl2_r() override;
 	virtual u8 pdl3_r() override;
-	virtual DECLARE_READ_LINE_MEMBER(sw0_r) override;
-	virtual DECLARE_READ_LINE_MEMBER(sw1_r) override;
-	virtual DECLARE_READ_LINE_MEMBER(sw2_r) override;
-	virtual DECLARE_READ_LINE_MEMBER(sw3_r) override;
+	virtual int sw0_r() override;
+	virtual int sw1_r() override;
+	virtual int sw2_r() override;
+	virtual int sw3_r() override;
 
 private:
 	// input ports
@@ -105,22 +105,22 @@ u8 apple2_paddles_device::pdl3_r()
 	return m_pdl[3]->read();
 }
 
-READ_LINE_MEMBER(apple2_paddles_device::sw0_r)
+int apple2_paddles_device::sw0_r()
 {
 	return BIT(m_buttons->read(), 4);
 }
 
-READ_LINE_MEMBER(apple2_paddles_device::sw1_r)
+int apple2_paddles_device::sw1_r()
 {
 	return BIT(m_buttons->read(), 5);
 }
 
-READ_LINE_MEMBER(apple2_paddles_device::sw2_r)
+int apple2_paddles_device::sw2_r()
 {
 	return BIT(m_buttons->read(), 6);
 }
 
-READ_LINE_MEMBER(apple2_paddles_device::sw3_r)
+int apple2_paddles_device::sw3_r()
 {
 	return BIT(m_buttons->read(), 7);
 }

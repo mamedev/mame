@@ -104,13 +104,13 @@ public:
 	void init_3() { m_game = 3; }
 
 private:
-	virtual void machine_reset() override;
-	virtual void machine_start() override;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void machine_start() override ATTR_COLD;
 	u8 ram_r(offs_t);
 	void ram_w(offs_t, u8);
 	u8 sw_r(offs_t offset);
-	DECLARE_WRITE_LINE_MEMBER(irq_w);
-	void ltd3_map(address_map &map);
+	void irq_w(int state);
+	void ltd3_map(address_map &map) ATTR_COLD;
 	u8 m_game = 0;
 	u8 m_ram[0x80]{};
 	u8 m_segment = 0;
@@ -131,9 +131,9 @@ public:
 	void ltd4(machine_config &config);
 
 private:
-	virtual void machine_reset() override;
-	virtual void machine_start() override;
-	void ltd4_map(address_map &map);
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void machine_start() override ATTR_COLD;
+	void ltd4_map(address_map &map) ATTR_COLD;
 	u8 port1_r();
 	void port1_w(u8 data);
 	u8 port2_r();
@@ -176,7 +176,7 @@ void ltd4_state::ltd4_map(address_map &map)
 // bits 6,7 not connected to data bus
 static INPUT_PORTS_START( ltd3 )
 	PORT_START("FICHA")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(1) PORT_CHANGED_MEMBER(DEVICE_SELF, ltd_state, ficha, 0)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(1) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(ltd_state::ficha), 0)
 
 	PORT_START("X0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_9) PORT_NAME("Tilt")
@@ -532,7 +532,7 @@ void ltd4_state::machine_reset()
 	mr_common();
 }
 
-WRITE_LINE_MEMBER( ltd3_state::irq_w )
+void ltd3_state::irq_w(int state)
 {
 	// Using /Q output
 	m_maincpu->set_input_line(M6802_IRQ_LINE, !state ? CLEAR_LINE : ASSERT_LINE);
@@ -690,8 +690,8 @@ ROM_END
 /-------------------------------------------------------------------*/
 
 ROM_START(spcpoker)
-	ROM_REGION(0x1000, "roms", 0) // the bad dump was hacked to make it work
-	ROM_LOAD( "spoker.bin",   0x0000, 0x0800, BAD_DUMP CRC(98918b19) SHA1(b1bb3f408dae9fc77d396894c3c4ef08bce8c345) )
+	ROM_REGION(0x1000, "roms", 0)
+	ROM_LOAD( "space_poker_16_jp.bin", 0x0000, 0x0800, CRC(8fc2bdf6) SHA1(48eeae7ef21adbb4801e339565e55a03db6de179) )
 	ROM_RELOAD(0x0800, 0x0800)
 ROM_END
 

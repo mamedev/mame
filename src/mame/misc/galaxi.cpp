@@ -44,6 +44,9 @@
 
 #include "galaxi.lh"
 
+
+namespace {
+
 #define CPU_CLOCK       (XTAL(10'000'000))
 #define SND_CLOCK       (XTAL(16'000'000))/16
 
@@ -70,13 +73,13 @@ public:
 	void lastfour(machine_config &config);
 	void magjoker(machine_config &config);
 
-	DECLARE_READ_LINE_MEMBER(ticket_r);
-	DECLARE_READ_LINE_MEMBER(hopper_r);
+	int ticket_r();
+	int hopper_r();
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	/* memory pointers */
@@ -127,8 +130,8 @@ private:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void show_out();
 
-	void galaxi_map(address_map &map);
-	void lastfour_map(address_map &map);
+	void galaxi_map(address_map &map) ATTR_COLD;
+	void lastfour_map(address_map &map) ATTR_COLD;
 };
 
 
@@ -297,12 +300,12 @@ void galaxi_state::_500004_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 	show_out();
 }
 
-READ_LINE_MEMBER(galaxi_state::ticket_r)
+int galaxi_state::ticket_r()
 {
 	return m_ticket && !(m_screen->frame_number() % 10);
 }
 
-READ_LINE_MEMBER(galaxi_state::hopper_r)
+int galaxi_state::hopper_r()
 {
 	return m_hopper && !(m_screen->frame_number() % 10);
 }
@@ -376,11 +379,11 @@ static INPUT_PORTS_START( galaxi )
 	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_POKER_HOLD5 )
 	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_START1 )
 	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_GAMBLE_PAYOUT )
-	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_READ_LINE_MEMBER(galaxi_state, hopper_r)   // hopper sensor
+	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_READ_LINE_MEMBER(FUNC(galaxi_state::hopper_r))   // hopper sensor
 	PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_IMPULSE(5)   // coin a
 	PORT_BIT( 0x0200, IP_ACTIVE_HIGH, IPT_COIN2 ) PORT_IMPULSE(5)   // coin b (token)
 	PORT_BIT( 0x0400, IP_ACTIVE_HIGH, IPT_COIN3 )   // pin 25LC
-	PORT_BIT( 0x0800, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(galaxi_state, ticket_r)  // ticket sensor
+	PORT_BIT( 0x0800, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(galaxi_state::ticket_r))  // ticket sensor
 	PORT_BIT( 0x1000, IP_ACTIVE_HIGH, IPT_CUSTOM ) // hopper out (pin 14LS)
 	PORT_SERVICE_NO_TOGGLE( 0x2000, IP_ACTIVE_HIGH )    // test
 	PORT_BIT( 0x4000, IP_ACTIVE_HIGH, IPT_CUSTOM ) // (pin 26LC)
@@ -396,11 +399,11 @@ static INPUT_PORTS_START( magjoker )
 	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_POKER_HOLD5 )
 	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_START1 )
 	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_GAMBLE_PAYOUT )
-	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(galaxi_state, hopper_r)   // hopper sensor
+	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(galaxi_state::hopper_r))   // hopper sensor
 	PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_IMPULSE(5)   // coin a
 	PORT_BIT( 0x0200, IP_ACTIVE_HIGH, IPT_COIN2 ) PORT_IMPULSE(5)   // coin b (token)
 	PORT_BIT( 0x0400, IP_ACTIVE_HIGH, IPT_SERVICE ) PORT_NAME("Hopper Refill") PORT_CODE(KEYCODE_H)
-	PORT_BIT( 0x0800, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(galaxi_state, ticket_r)  // ticket sensor
+	PORT_BIT( 0x0800, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(galaxi_state::ticket_r))  // ticket sensor
 	PORT_BIT( 0x1000, IP_ACTIVE_HIGH, IPT_CUSTOM ) // hopper out (pin 14LS)
 	PORT_SERVICE_NO_TOGGLE( 0x2000, IP_ACTIVE_HIGH )    // test
 	PORT_BIT( 0x4000, IP_ACTIVE_HIGH, IPT_GAMBLE_KEYOUT )   // (pin 26LC)
@@ -589,6 +592,8 @@ ROM_START( lastfour )
 	ROM_REGION( 0x40000, "oki", 0 ) /* 4-bit ADPCM mono @ 6 kHz.*/
 	ROM_LOAD( "21.u38", 0x00000, 0x20000, CRC(e48523dd) SHA1(47bc2e5c2164b93d685fa134397845e0ed7aaa5f) )
 ROM_END
+
+} // anonymous namespace
 
 
 /***************************************************************************

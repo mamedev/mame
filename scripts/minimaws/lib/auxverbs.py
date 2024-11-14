@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 ##
 ## license:BSD-3-Clause
 ## copyright-holders:Vas Crabb
@@ -11,12 +11,13 @@ import os
 import os.path
 import struct
 import sys
+import zipfile
 import zlib
 
 
 class _Identifier(object):
     def __init__(self, dbcurs, **kwargs):
-        super(_Identifier, self).__init__(**kwargs)
+        super().__init__(**kwargs)
         self.dbcurs = dbcurs
         self.shortnamewidth = 0
         self.pathwidth = 0
@@ -129,8 +130,15 @@ class _Identifier(object):
 
     def processFile(self, path):
         if os.path.splitext(path)[1].lower() != '.chd':
-            with open(path, mode='rb', buffering=0) as f:
-                self.processRomFile(path, f)
+            if zipfile.is_zipfile(path):
+                with zipfile.ZipFile(path, 'r') as zip:
+                    for info in zip.infolist():
+                        if info.filename[-1] != '/':
+                            with zip.open(info, mode='r') as f:
+                                self.processRomFile(path + '/' + info.filename, f)
+            else:
+                with open(path, mode='rb', buffering=0) as f:
+                    self.processRomFile(path, f)
         else:
             with open(path, mode='rb') as f:
                 sha1 = self.probeChd(f)

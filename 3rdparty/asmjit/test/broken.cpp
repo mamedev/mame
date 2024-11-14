@@ -25,12 +25,11 @@
 //
 // For more information, please refer to <http://unlicense.org>
 
-#include "./broken.h"
+#include "broken.h"
 #include <stdarg.h>
 
-// ============================================================================
-// [Broken - Global]
-// ============================================================================
+// Broken - Globals
+// ================
 
 // Zero initialized globals.
 struct BrokenGlobal {
@@ -56,9 +55,8 @@ struct BrokenGlobal {
 };
 static BrokenGlobal _brokenGlobal;
 
-// ============================================================================
-// [Broken - API]
-// ============================================================================
+// Broken - API
+// ============
 
 // Get whether the string `a` starts with string `b`.
 static bool BrokenAPI_startsWith(const char* a, const char* b) noexcept {
@@ -185,7 +183,7 @@ bool BrokenAPI::hasArg(const char* name) noexcept {
   return _brokenGlobal.hasArg(name);
 }
 
-void BrokenAPI::add(Unit* unit) noexcept {
+void BrokenAPI::addUnit(Unit* unit) noexcept {
   Unit** pPrev = &_brokenGlobal._unitList;
   Unit* current = *pPrev;
 
@@ -308,5 +306,5 @@ void BrokenAPI::fail(const char* file, int line, const char* expression, const c
   fprintf(dst, "  SOURCE: %s (Line: %d)\n", file, line);
   fflush(dst);
 
-  exit(1);
+  abort();
 }

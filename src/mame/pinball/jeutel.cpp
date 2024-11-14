@@ -61,8 +61,8 @@ public:
 	void jeutel(machine_config &config);
 
 private:
-	virtual void machine_reset() override;
-	virtual void machine_start() override;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void machine_start() override ATTR_COLD;
 	u8 portb_r();
 	void porta_w(u8 data);
 	void ppi0a_w(u8 data) { m_row = data; }
@@ -78,11 +78,11 @@ private:
 	void tmaddr_w(u8 data);
 	void tminc_w(u8);
 	u8 tmdata_r();
-	DECLARE_WRITE_LINE_MEMBER(clock_w);
-	void cpu2_map(address_map &map);
-	void audio_main_map(address_map &map);
-	void audio_io_map(address_map &map);
-	void main_map(address_map &map);
+	void clock_w(int state);
+	void cpu2_map(address_map &map) ATTR_COLD;
+	void audio_main_map(address_map &map) ATTR_COLD;
+	void audio_io_map(address_map &map) ATTR_COLD;
+	void main_map(address_map &map) ATTR_COLD;
 
 	u8 m_sndcmd = 0U;
 	u8 m_digit = 0U;
@@ -430,7 +430,7 @@ void jeutel_state::machine_reset()
 	m_tmbit = 0U;
 }
 
-WRITE_LINE_MEMBER( jeutel_state::clock_w )
+void jeutel_state::clock_w(int state)
 {
 	m_cpu2->set_input_line(0, (state) ? ASSERT_LINE : CLEAR_LINE);
 	if (m_cpu2->state_int(Z80_HALT))

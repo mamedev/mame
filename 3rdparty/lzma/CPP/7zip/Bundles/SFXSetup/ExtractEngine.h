@@ -1,7 +1,7 @@
 // ExtractEngine.h
 
-#ifndef __EXTRACT_ENGINE_H
-#define __EXTRACT_ENGINE_H
+#ifndef ZIP7_INC_EXTRACT_ENGINE_H
+#define ZIP7_INC_EXTRACT_ENGINE_H
 
 #include "../../UI/Common/LoadCodecs.h"
 

@@ -34,12 +34,12 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// optional information overrides
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual ioport_constructor device_input_ports() const override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 
 	// device_abcbus_interface overrides
 	virtual void abcbus_cs(uint8_t data) override;
@@ -61,11 +61,11 @@ private:
 	void write_dma_register(uint8_t data);
 	void write_sasi_data(uint8_t data);
 
-	DECLARE_WRITE_LINE_MEMBER( write_sasi_bsy );
-	DECLARE_WRITE_LINE_MEMBER( write_sasi_cd );
-	DECLARE_WRITE_LINE_MEMBER( write_sasi_req );
-	DECLARE_WRITE_LINE_MEMBER( write_sasi_msg );
-	DECLARE_WRITE_LINE_MEMBER( write_sasi_io );
+	void write_sasi_bsy(int state);
+	void write_sasi_cd(int state);
+	void write_sasi_req(int state);
+	void write_sasi_msg(int state);
+	void write_sasi_io(int state);
 
 	required_device<nscsi_callback_device> m_sasi;
 	required_ioport m_1e;

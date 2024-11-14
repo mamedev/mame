@@ -82,14 +82,15 @@ public:
 	int hrtc_r();
 	int vrtc_r();
 	int lines_per_char() { return m_r; }
+	bool is_gfx_color_mode();
 	bool get_display_status();
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 	virtual void device_clock_changed() override;
 
 	TIMER_CALLBACK_MEMBER(hrtc_update);

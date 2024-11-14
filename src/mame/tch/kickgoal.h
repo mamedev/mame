@@ -5,8 +5,8 @@
     Kick Goal - Action Hollywood
 
 *************************************************************************/
-#ifndef MAME_INCLUDES_KICKGOAL_H
-#define MAME_INCLUDES_KICKGOAL_H
+#ifndef MAME_TCH_KICKGOAL_H
+#define MAME_TCH_KICKGOAL_H
 
 #pragma once
 
@@ -44,8 +44,8 @@ public:
 	void init_actionhw();
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	void fgram_w(offs_t offset, u16 data, u16 mem_mask = ~0);
@@ -74,8 +74,8 @@ private:
 
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void program_map(address_map &map);
-	void oki_map(address_map &map);
+	void program_map(address_map &map) ATTR_COLD;
+	void oki_map(address_map &map) ATTR_COLD;
 
 	/* video-related */
 	tilemap_t     *m_fgtm = nullptr;
@@ -121,4 +121,4 @@ private:
 	required_device<generic_latch_8_device> m_soundlatch;
 };
 
-#endif // MAME_INCLUDES_KICKGOAL_H
+#endif // MAME_TCH_KICKGOAL_H

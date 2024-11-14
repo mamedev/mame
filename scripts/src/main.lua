@@ -11,7 +11,7 @@
 
 function mainProject(_target, _subtarget)
 local projname
-if (_OPTIONS["SOURCES"] == nil) then
+if (_OPTIONS["SOURCES"] == nil) and (_OPTIONS["SOURCEFILTER"] == nil) then
 	if (_target == _subtarget) then
 		projname = _target
 	else
@@ -76,26 +76,30 @@ end
 	configuration { }
 
 	if _OPTIONS["targetos"]=="android" then
-		includedirs {
-			MAME_DIR .. "3rdparty/SDL2/include",
-		}
-
 		files {
-			MAME_DIR .. "3rdparty/SDL2/src/main/android/SDL_android_main.c",
+			MAME_DIR .. "src/osd/sdl/android_main.cpp",
 		}
 		targetsuffix ""
 		if _OPTIONS["SEPARATE_BIN"]~="1" then
 			if _OPTIONS["PLATFORM"]=="arm" then
 				targetdir(MAME_DIR .. "android-project/app/src/main/libs/armeabi-v7a")
+				os.copyfile(_OPTIONS["SDL_INSTALL_ROOT"] .. "/lib/libSDL2.so", MAME_DIR .. "android-project/app/src/main/libs/armeabi-v7a/libSDL2.so")
+				os.copyfile(androidToolchainRoot() .. "/sysroot/usr/lib/arm-linux-androideabi/libc++_shared.so", MAME_DIR .. "android-project/app/src/main/libs/armeabi-v7a/libc++_shared.so")
 			end
 			if _OPTIONS["PLATFORM"]=="arm64" then
 				targetdir(MAME_DIR .. "android-project/app/src/main/libs/arm64-v8a")
+				os.copyfile(_OPTIONS["SDL_INSTALL_ROOT"] .. "/lib/libSDL2.so", MAME_DIR .. "android-project/app/src/main/libs/arm64-v8a/libSDL2.so")
+				os.copyfile(androidToolchainRoot() .. "/sysroot/usr/lib/aarch64-linux-android/libc++_shared.so", MAME_DIR .. "android-project/app/src/main/libs/arm64-v8a/libc++_shared.so")
 			end
 			if _OPTIONS["PLATFORM"]=="x86" then
 				targetdir(MAME_DIR .. "android-project/app/src/main/libs/x86")
+				os.copyfile(_OPTIONS["SDL_INSTALL_ROOT"] .. "/lib/libSDL2.so", MAME_DIR .. "android-project/app/src/main/libs/x86/libSDL2.so")
+				os.copyfile(androidToolchainRoot() .. "/sysroot/usr/lib/i686-linux-android/libc++_shared.so", MAME_DIR .. "android-project/app/src/main/libs/x86/libc++_shared.so")
 			end
 			if _OPTIONS["PLATFORM"]=="x64" then
 				targetdir(MAME_DIR .. "android-project/app/src/main/libs/x86_64")
+				os.copyfile(_OPTIONS["SDL_INSTALL_ROOT"] .. "/lib/libSDL2.so", MAME_DIR .. "android-project/app/src/main/libs/x86_64/libSDL2.so")
+				os.copyfile(androidToolchainRoot() .. "/sysroot/usr/lib/x86_64-linux-android/libc++_shared.so", MAME_DIR .. "android-project/app/src/main/libs/x86_64/libc++_shared.so")
 			end
 		end
 	else
@@ -161,6 +165,7 @@ if (STANDALONE~=true) then
 end
 	links {
 		ext_lib("zlib"),
+		ext_lib("zstd"),
 		ext_lib("flac"),
 		ext_lib("utf8proc"),
 	}
@@ -282,68 +287,80 @@ if (STANDALONE~=true) then
 		GEN_DIR .. _target .. "/" .. _subtarget .. "/drivlist.cpp",
 	}
 
-	if (_OPTIONS["SOURCES"] == nil) then
-
-		if os.isfile(MAME_DIR .. "src/" .. _target .."/" .. _subtarget ..".flt") then
-			dependency {
-				{ GEN_DIR  .. _target .. "/" .. _subtarget .."/drivlist.cpp", MAME_DIR .. "src/".._target .."/" .. _target ..".lst", true },
-			}
-			custombuildtask {
+	local driverlist = MAME_DIR .. "src/" .. _target .. "/" .. _target .. ".lst"
+	local driverssrc = GEN_DIR .. _target .. "/" .. _subtarget .. "/drivlist.cpp"
+	if _OPTIONS["SOURCES"] ~= nil then
+		dependency {
+			{ driverssrc, driverlist, true },
+		}
+		custombuildtask {
+			{
+				GEN_DIR .. _target .."/" .. _subtarget .. ".flt" ,
+				driverssrc,
+				{ MAME_DIR .. "scripts/build/makedep.py", driverlist },
 				{
-					MAME_DIR .. "src/" .. _target .. "/" .. _subtarget .. ".flt",
-					GEN_DIR .. _target .. "/" .. _subtarget .. "/drivlist.cpp",
-					{ MAME_DIR .. "scripts/build/makedep.py", MAME_DIR .. "src/" .. _target .."/" .. _target .. ".lst" },
-					{
-						"@echo Building driver list...",
-						PYTHON .. " $(1) driverlist $(2) -f $(<) > $(@)"
-					}
-				},
-			}
-		elseif os.isfile(MAME_DIR .. "src/" .._target .. "/" .. _subtarget ..".lst") then
-			custombuildtask {
+					"@echo Building driver list...",
+					PYTHON .. " $(1) -r " .. MAME_DIR .. " driverlist $(2) -f $(<) > $(@)"
+				}
+			},
+		}
+	elseif _OPTIONS["SOURCEFILTER"] ~= nil then
+		dependency {
+			{ driverssrc, driverlist, true },
+		}
+		custombuildtask {
+			{
+				MAME_DIR .. _OPTIONS["SOURCEFILTER"],
+				driverssrc,
+				{ MAME_DIR .. "scripts/build/makedep.py", driverlist },
 				{
-					MAME_DIR .. "src/" .. _target .. "/" .. _subtarget .. ".lst",
-					GEN_DIR .. _target .. "/" .. _subtarget .."/drivlist.cpp",
-					{ MAME_DIR .. "scripts/build/makedep.py" },
-					{
-						"@echo Building driver list...",
-						PYTHON .. " $(1) driverlist $(<) > $(@)"
-					}
-				},
-			}
-		else
-			dependency {
-				{ GEN_DIR .. _target .. "/" .. _target .."/drivlist.cpp", MAME_DIR .. "src/".._target .."/" .. _target ..".lst", true },
-			}
-			custombuildtask {
+					"@echo Building driver list...",
+					PYTHON .. " $(1) -r " .. MAME_DIR .. " driverlist $(2) -f $(<) > $(@)"
+				}
+			},
+		}
+	elseif os.isfile(MAME_DIR .. "src/" .. _target .."/" .. _subtarget ..".flt") then
+		dependency {
+			{ driverssrc, driverlist, true },
+		}
+		custombuildtask {
+			{
+				MAME_DIR .. "src/" .. _target .. "/" .. _subtarget .. ".flt",
+				driverssrc,
+				{ MAME_DIR .. "scripts/build/makedep.py", driverlist },
 				{
-					MAME_DIR .. "src/" .. _target .. "/" .. _target .. ".lst",
-					GEN_DIR .. _target .. "/" .. _target .. "/drivlist.cpp",
-					{  MAME_DIR .. "scripts/build/makedep.py" },
-					{
-						"@echo Building driver list...",
-						PYTHON .. " $(1) driverlist $(<) > $(@)"
-					}
-				},
-			}
-		end
-	end
-
-	if (_OPTIONS["SOURCES"] ~= nil) then
-			dependency {
-				{ GEN_DIR .. _target .. "/" .. _subtarget .."/drivlist.cpp",  MAME_DIR .. "src/".._target .."/" .. _target ..".lst", true },
-			}
-			custombuildtask {
+					"@echo Building driver list...",
+					PYTHON .. " $(1) -r " .. MAME_DIR .. " driverlist $(2) -f $(<) > $(@)"
+				}
+			},
+		}
+	elseif os.isfile(MAME_DIR .. "src/" .._target .. "/" .. _subtarget ..".lst") then
+		custombuildtask {
+			{
+				MAME_DIR .. "src/" .. _target .. "/" .. _subtarget .. ".lst",
+				driverssrc,
+				{ MAME_DIR .. "scripts/build/makedep.py" },
 				{
-					GEN_DIR .. _target .."/" .. _subtarget ..".flt" ,
-					GEN_DIR  .. _target .. "/" .. _subtarget .."/drivlist.cpp",
-					{ MAME_DIR .. "scripts/build/makedep.py", MAME_DIR .. "src/".._target .."/" .. _target ..".lst"  },
-					{
-						"@echo Building driver list...",
-						PYTHON .. " $(1) driverlist $(2) -f $(<) > $(@)"
-					}
-				},
-			}
+					"@echo Building driver list...",
+					PYTHON .. " $(1) -r " .. MAME_DIR .. " driverlist $(<) > $(@)"
+				}
+			},
+		}
+	else
+		dependency {
+			{ driverssrc, driverlist, true },
+		}
+		custombuildtask {
+			{
+				driverlist,
+				driverssrc,
+				{ MAME_DIR .. "scripts/build/makedep.py" },
+				{
+					"@echo Building driver list...",
+					PYTHON .. " $(1) -r " .. MAME_DIR .. " driverlist $(<) > $(@)"
+				}
+			},
+		}
 	end
 
 	configuration { "mingw*" }
@@ -357,7 +374,7 @@ if (STANDALONE~=true) then
 				{ MAME_DIR .. "scripts/build/verinfo.py" },
 				{
 					"@echo Emitting " .. _target .. "_" .. _subtarget .. "_vers.rc" .. "...",
-					PYTHON .. " $(1) -f rc -t " .. _target .. " -s " .. _subtarget .. " -e " .. exename .. " -r " .. rcincfile .. " -o $(@) $(<)"
+					PYTHON .. " $(1) -f rc -t " .. _target .. " -s " .. _subtarget .. " -e " .. exename .. " -r " .. path.getname(rcincfile) .. " -o $(@) $(<)"
 				}
 			},
 		}
@@ -370,7 +387,7 @@ if (STANDALONE~=true) then
 			"mkdir \"" .. path.translate(GEN_DIR .. "resource/", "\\") .. "\" 2>NUL",
 			"mkdir \"" .. path.translate(GEN_DIR .. _target .. "/" .. _subtarget .. "/", "\\") .. "\" 2>NUL",
 			"@echo Emitting " .. _target .. "_" .. _subtarget .. "_vers.rc" .. "...",
-			PYTHON .. " \"" .. path.translate(MAME_DIR .. "scripts/build/verinfo.py", "\\") .. "\" -f rc -t " .. _target .. " -s " .. _subtarget .. " -e " .. exename .. " -o \"" .. path.translate(rcversfile) .. "\" -r \"" .. path.translate(rcincfile, "\\") .. "\" \"" .. path.translate(GEN_DIR .. "version.cpp", "\\") .. "\"",
+			PYTHON .. " \"" .. path.translate(MAME_DIR .. "scripts/build/verinfo.py", "\\") .. "\" -f rc -t " .. _target .. " -s " .. _subtarget .. " -e " .. exename .. " -o \"" .. path.translate(rcversfile) .. "\" -r \"" .. path.getname(rcincfile) .. "\" \"" .. path.translate(GEN_DIR .. "version.cpp", "\\") .. "\"",
 		}
 end
 

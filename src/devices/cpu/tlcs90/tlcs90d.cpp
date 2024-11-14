@@ -2,25 +2,39 @@
 // copyright-holders:Luca Elia
 /*************************************************************************************************************
 
-    Toshiba TLCS-90 Series MCU's
-
-    emulation by Luca Elia, based on the Z80 core by Juergen Buchmueller
-
-    ChangeLog:
-
-    20150517 Fixed TRUN bit masking (timers start/stop handling) [Rainer Keuchel]
+    Toshiba TLCS-90 Series MCU's disassembler
 
 *************************************************************************************************************/
 
 #include "emu.h"
 #include "tlcs90d.h"
 
-const char *const tlcs90_disassembler::op_names[] =   {   "??",       "nop",  "ex",   "exx",  "ld",   "ldw",  "lda",  "ldi",  "ldir", "ldd",  "lddr", "cpi",  "cpir", "cpd",  "cpdr", "push", "pop",  "jp",   "jr",   "call", "callr",    "ret",  "reti", "halt", "di",   "ei",   "swi",  "daa",  "cpl",  "neg",  "ldar", "rcf",  "scf",  "ccf",  "tset", "bit",  "set",  "res",  "inc",  "dec",  "incx", "decx", "incw", "decw", "add",  "adc",  "sub",  "sbc",  "and",  "xor",  "or",   "cp",   "rlc",  "rrc",  "rl",   "rr",   "sla",  "sra",  "sll",  "srl",  "rld",  "rrd",  "djnz", "mul",  "div"   };
+const char *const tlcs90_disassembler::op_names[] =
+{
+	"??",
+	"nop",  "ex",   "exx",  "ld",   "ldw",  "lda",  "ldi",  "ldir",
+	"ldd",  "lddr", "cpi",  "cpir", "cpd",  "cpdr", "push", "pop",
+	"jp",   "jr",   "call", "callr","ret",  "reti", "halt", "di",
+	"ei",   "swi",  "daa",  "cpl",  "neg",  "ldar", "rcf",  "scf",
+	"ccf",  "tset", "bit",  "set",  "res",  "inc",  "dec",  "incx",
+	"decx", "incw", "decw", "add",  "adc",  "sub",  "sbc",  "and",
+	"xor",  "or",   "cp",   "rlc",  "rrc",  "rl",   "rr",   "sla",
+	"sra",  "sll",  "srl",  "rld",  "rrd",  "djnz", "mul",  "div"
+};
 
-const char *const tlcs90_disassembler::r8_names[] =   {   "b",    "c",    "d",    "e",    "h",    "l",    "a"                             };
-const char *const tlcs90_disassembler::r16_names[]    =   {   "bc",   "de",   "hl",   "??",   "ix",   "iy",   "sp",   "af",   "af'",  "pc"    };
+const char *const tlcs90_disassembler::r8_names[] =
+{
+	"b",    "c",    "d",    "e",    "h",    "l",    "a"
+};
+const char *const tlcs90_disassembler::r16_names[] =
+{
+	"bc",   "de",   "hl",   "??",   "ix",   "iy",   "sp",   "af",   "af'",  "pc"
+};
 
-const char *const tlcs90_disassembler::cc_names[] =   {   "f",    "lt",   "le",   "ule",  "ov",   "mi",   "z",    "c",    "",     "ge",   "gt",   "ugt",  "nov",  "pl",   "nz",   "nc"    };
+const char *const tlcs90_disassembler::cc_names[] =
+{
+	"f",    "lt",   "le",   "ule",  "ov",   "mi",   "z",    "c",    "",     "ge",   "gt",   "ugt",  "nov",  "pl",   "nz",   "nc"
+};
 
 u32 tlcs90_disassembler::opcode_alignment() const
 {
@@ -32,7 +46,8 @@ tlcs90_disassembler::tlcs90_disassembler(uint16_t iobase, const char *const ir_n
 {
 }
 
-const char *const tmp90840_disassembler::ir_names[0x40] =   {
+const char *const tmp90840_disassembler::ir_names[0x40] =
+{
 	"P0",       "P1",       "P01CR/IRFL",   "IRFH",     "P2",       "P2CR",     "P3",       "P3CR",
 	"P4",       "P4CR",     "P5",           "SMMOD",    "P6",       "P7",       "P67CR",    "SMCR",
 	"P8",       "P8CR",     "WDMOD",        "WDCR",     "TREG0",    "TREG1",    "TREG2",    "TREG3",
@@ -48,7 +63,8 @@ tmp90840_disassembler::tmp90840_disassembler()
 {
 }
 
-const char *const tmp90844_disassembler::ir_names[0x40] =   {
+const char *const tmp90844_disassembler::ir_names[0x40] =
+{
 	"P0",           "P0CR",         "P1",           "P1CR",         "P2",       "P2CR",     "P3",       "P3CR",
 	"P4",           "P4CR",         "P5",           "P6",           "P7",       "P67CR",    "P23FR",    "P4FR",
 	"P67FR",        "P25FR",        "WDMOD",        "WDCR",         "TREG0",    "TREG1",    "TREG2",    "TREG3",
@@ -64,7 +80,8 @@ tmp90844_disassembler::tmp90844_disassembler()
 {
 }
 
-const char *const tmp90c051_disassembler::ir_names[0x4c] =   {
+const char *const tmp90c051_disassembler::ir_names[0x4c] =
+{
 											"P2",     "P2CR",   "P3",     "P3CR",
 	"P3FR",   "P4",     "P5",     "P45CR",  "P45FR",  "P6",     "P6CR",   "P6FR",
 	"TREG0",  "TREG1",  "TREG2",  "TREG3",  "T01MOD", "T23MOD", "TFFCR",  "TRDC",
@@ -143,28 +160,28 @@ const char *tlcs90_disassembler::internal_registers_names(uint16_t x) const
 #define ZF  0x40
 #define SF  0x80
 
-#define OP(   X,CT )        m_op = X;
-#define OP16( X,CT )        m_op = X;
+#define OP(   X,CT )       m_op = X;
+#define OP16( X,CT )       m_op = X;
 
-#define OPCC(   X,CF,CT )   m_op = X;
-#define OPCC16( X,CF,CT )   m_op = X;
+#define OPCC(   X,CF,CT )  m_op = X;
+#define OPCC16( X,CF,CT )  m_op = X;
 
-#define BIT8( N,I )         m_mode##N = e_mode::BIT8;  m_r##N = I;
-#define I8( N,I )           m_mode##N = e_mode::I8;        m_r##N = I;
-#define D8( N,I )           m_mode##N = e_mode::D8;        m_r##N = I;
-#define I16( N,I )          m_mode##N = e_mode::I16;       m_r##N = I;
-#define D16( N,I )          m_mode##N = e_mode::D16;       m_r##N = I;
-#define R8( N,R )           m_mode##N = e_mode::R8;        m_r##N = R;
-#define R16( N,R )          m_mode##N = e_mode::R16;       m_r##N = R;
-#define Q16( N,R )          m_mode##N = e_mode::R16;       m_r##N = R; if (m_r##N == SP) m_r##N = AF;
-#define MI16( N,I )         m_mode##N = e_mode::MI16;  m_r##N = I;
-#define MR16( N,R )         m_mode##N = e_mode::MR16;  m_r##N = R;
-#define MR16D8( N,R,I )     m_mode##N = e_mode::MR16D8;    m_r##N = R; m_r##N##b = I;
-#define MR16R8( N,R,g )     m_mode##N = e_mode::MR16R8;    m_r##N = R; m_r##N##b = g;
-#define NONE( N )           m_mode##N = e_mode::NONE;
-#define CC( N,cc )          m_mode##N = e_mode::CC;        m_r##N = cc;
-#define R16D8( N,R,I )      m_mode##N = e_mode::R16D8; m_r##N = R; m_r##N##b = I;
-#define R16R8( N,R,g )      m_mode##N = e_mode::R16R8; m_r##N = R; m_r##N##b = g;
+#define BIT8( N,I )        m_mode##N = e_mode::BIT8;    m_r##N = I;
+#define I8( N,I )          m_mode##N = e_mode::I8;      m_r##N = I;
+#define D8( N,I )          m_mode##N = e_mode::D8;      m_r##N = I;
+#define I16( N,I )         m_mode##N = e_mode::I16;     m_r##N = I;
+#define D16( N,I )         m_mode##N = e_mode::D16;     m_r##N = I;
+#define R8( N,R )          m_mode##N = e_mode::R8;      m_r##N = R;
+#define R16( N,R )         m_mode##N = e_mode::R16;     m_r##N = R;
+#define Q16( N,R )         m_mode##N = e_mode::R16;     m_r##N = R; if (m_r##N == SP) m_r##N = AF;
+#define MI16( N,I )        m_mode##N = e_mode::MI16;    m_r##N = I;
+#define MR16( N,R )        m_mode##N = e_mode::MR16;    m_r##N = R;
+#define MR16D8( N,R,I )    m_mode##N = e_mode::MR16D8;  m_r##N = R; m_r##N##b = I;
+#define MR16R8( N,R,g )    m_mode##N = e_mode::MR16R8;  m_r##N = R; m_r##N##b = g;
+#define NONE( N )          m_mode##N = e_mode::NONE;
+#define CC( N,cc )         m_mode##N = e_mode::CC;      m_r##N = cc;
+#define R16D8( N,R,I )     m_mode##N = e_mode::R16D8;   m_r##N = R; m_r##N##b = I;
+#define R16R8( N,R,g )     m_mode##N = e_mode::R16R8;   m_r##N = R; m_r##N##b = g;
 
 uint8_t  tlcs90_disassembler::READ8()
 {
@@ -960,7 +977,7 @@ bool tlcs90_disassembler::stream_arg(std::ostream &stream, uint32_t pc, const ch
 		if (reg_name)
 			util::stream_format(stream, "%s(%s)", pre, reg_name);
 		else
-			util::stream_format(stream, "%s($%04X)",       pre,    r                                   );
+			util::stream_format(stream, "%s($%04X)", pre, r);
 		return true;
 	case e_mode::R8:     util::stream_format(stream, "%s%s",            pre,    r8_names[r]                         );   return true;
 	case e_mode::R16:    util::stream_format(stream, "%s%s",            pre,    r16_names[r]                        );   return true;

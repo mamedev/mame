@@ -22,6 +22,8 @@
 #include "tilemap.h"
 
 
+namespace {
+
 class sf_state : public driver_device
 {
 public:
@@ -87,21 +89,21 @@ private:
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	TILE_GET_INFO_MEMBER(get_tx_tile_info);
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	inline int invert( int nb );
 	void draw_sprites( bitmap_ind16 &bitmap,const rectangle &cliprect );
 	void write_dword( address_space &space, offs_t offset, uint32_t data );
 
-	void sfan_map(address_map &map);
-	void sfjp_map(address_map &map);
-	void sfus_map(address_map &map);
-	void sound2_io_map(address_map &map);
-	void sound2_map(address_map &map);
-	void sound_map(address_map &map);
-	void prot_map(address_map &map);
+	void sfan_map(address_map &map) ATTR_COLD;
+	void sfjp_map(address_map &map) ATTR_COLD;
+	void sfus_map(address_map &map) ATTR_COLD;
+	void sound2_io_map(address_map &map) ATTR_COLD;
+	void sound2_map(address_map &map) ATTR_COLD;
+	void sound_map(address_map &map) ATTR_COLD;
+	void prot_map(address_map &map) ATTR_COLD;
 };
 
 void sf_state::coin_w(u8 data)
@@ -1413,6 +1415,7 @@ ROM_START( sfp )
 	ROM_LOAD( "mmi-7603.13h", 0x0300, 0x0020, CRC(06bcda53) SHA1(fa69b77697bb12aa6012d82ef5b504d3a1d20232) ) /* unknown */
 ROM_END
 
+} // anonymous namespace
 
 
 GAME( 1987, sf,     0, sfus, sfus, sf_state, empty_init, ROT0, "Capcom",  "Street Fighter (US, set 1)", MACHINE_SUPPORTS_SAVE ) // Shows Capcom copyright

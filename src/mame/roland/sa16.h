@@ -6,8 +6,8 @@
 
 ***************************************************************************/
 
-#ifndef MAME_MACHINE_SA16_H
-#define MAME_MACHINE_SA16_H
+#ifndef MAME_ROLAND_SA16_H
+#define MAME_ROLAND_SA16_H
 
 #pragma once
 
@@ -32,10 +32,9 @@ protected:
 	// base type constructor
 	sa16_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
 
-	// device-specific overrides
-	virtual void device_resolve_objects() override;
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	// device_t implementation
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 private:
 	// line callbacks
@@ -67,4 +66,4 @@ public:
 DECLARE_DEVICE_TYPE(RF5C36, rf5c36_device)
 DECLARE_DEVICE_TYPE(SA16, sa16_device)
 
-#endif // MAME_MACHINE_SA16_H
+#endif // MAME_ROLAND_SA16_H

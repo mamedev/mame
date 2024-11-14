@@ -6,9 +6,10 @@
 
 **********************************************************************/
 
-
 #include "emu.h"
 #include "discpack.h"
+
+#include "formats/acorn_dsk.h"
 
 
 //**************************************************************************
@@ -99,20 +100,20 @@ void atom_discpack_device::device_start()
 //  IMPLEMENTATION
 //**************************************************************************
 
-WRITE_LINE_MEMBER(atom_discpack_device::motor_w)
+void atom_discpack_device::motor_w(int state)
 {
 	if (m_floppy[0]->get_device()) m_floppy[0]->get_device()->mon_w(!state);
 	if (m_floppy[1]->get_device()) m_floppy[1]->get_device()->mon_w(!state);
 	m_fdc->ready_w(!state);
 }
 
-WRITE_LINE_MEMBER(atom_discpack_device::side_w)
+void atom_discpack_device::side_w(int state)
 {
 	if (m_floppy[0]->get_device()) m_floppy[0]->get_device()->ss_w(state);
 	if (m_floppy[1]->get_device()) m_floppy[1]->get_device()->ss_w(state);
 }
 
-WRITE_LINE_MEMBER(atom_discpack_device::fdc_intrq_w)
+void atom_discpack_device::fdc_intrq_w(int state)
 {
 	m_bus->nmi_w(state);
 }

@@ -192,6 +192,7 @@ Beeper Circuit, all ICs shown:
 
 
 #include "emu.h"
+
 #include "cpu/mcs48/mcs48.h"        //Keyboard MCU ... talks to the 8278 on the keyboard circuit
 #include "cpu/z80/z80.h"
 #include "imagedev/floppy.h"
@@ -200,12 +201,18 @@ Beeper Circuit, all ICs shown:
 #include "machine/wd_fdc.h"
 #include "sound/beep.h"
 #include "video/tms9927.h"          //Display hardware
+
 #include "emupal.h"
 #include "screen.h"
 #include "softlist_dev.h"
 #include "speaker.h"
+
 #include "formats/itt3030_dsk.h"
-#include "debugger.h"
+
+#include "utf8.h"
+
+
+namespace {
 
 #define MAIN_CLOCK XTAL_4.194MHz
 
@@ -237,8 +244,8 @@ public:
 
 protected:
 	// driver_device overrides
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	// screen updates
@@ -247,7 +254,7 @@ private:
 	uint8_t vsync_r();
 	void beep_w(uint8_t data);
 	void bank_w(uint8_t data);
-	DECLARE_READ_LINE_MEMBER(kbd_matrix_r);
+	int kbd_matrix_r();
 	void kbd_matrix_w(uint8_t data);
 	uint8_t kbd_port2_r();
 	void kbd_port2_w(uint8_t data);
@@ -257,14 +264,14 @@ private:
 	void fdc_cmd_w(uint8_t data);
 	static void itt3030_floppy_formats(format_registration &fr);
 
-	DECLARE_WRITE_LINE_MEMBER(fdcirq_w);
-	DECLARE_WRITE_LINE_MEMBER(fdcdrq_w);
-	DECLARE_WRITE_LINE_MEMBER(fdchld_w);
+	void fdcirq_w(int state);
+	void fdcdrq_w(int state);
+	void fdchld_w(int state);
 	void itt3030_palette(palette_device &palette) const;
 
-	void itt3030_io(address_map &map);
-	void itt3030_map(address_map &map);
-	void lower48_map(address_map &map);
+	void itt3030_io(address_map &map) ATTR_COLD;
+	void itt3030_map(address_map &map) ATTR_COLD;
+	void lower48_map(address_map &map) ATTR_COLD;
 
 	// devices
 	required_device<cpu_device> m_maincpu;
@@ -327,7 +334,7 @@ void itt3030_state::itt3030_io(address_map &map)
 //  INPUTS
 //**************************************************************************
 
-READ_LINE_MEMBER(itt3030_state::kbd_matrix_r)
+int itt3030_state::kbd_matrix_r()
 {
 	return m_kbdread;
 }
@@ -555,18 +562,18 @@ void itt3030_state::beep_w(uint8_t data)
 //  FLOPPY
 //**************************************************************************
 
-WRITE_LINE_MEMBER(itt3030_state::fdcirq_w)
+void itt3030_state::fdcirq_w(int state)
 {
 	m_fdc_irq = state;
 }
 
 
-WRITE_LINE_MEMBER(itt3030_state::fdcdrq_w)
+void itt3030_state::fdcdrq_w(int state)
 {
 	m_fdc_drq = state;
 }
 
-WRITE_LINE_MEMBER(itt3030_state::fdchld_w)
+void itt3030_state::fdchld_w(int state)
 {
 	m_fdc_hld = state;
 }
@@ -767,6 +774,9 @@ ROM_START( itt3030 )
 	ROM_REGION( 0x0400, "kbdmcu", ROMREGION_ERASE00 )
 	ROM_LOAD( "8741ad.bin", 0x0000, 0x0400, CRC(cabf4394) SHA1(e5d1416b568efa32b578ca295a29b7b5d20c0def))
 ROM_END
+
+} // anonymous namespace
+
 
 //**************************************************************************
 //  SYSTEM DRIVERS

@@ -34,7 +34,6 @@ enum save_error
 {
 	STATERR_NONE,
 	STATERR_NOT_FOUND,
-	STATERR_ILLEGAL_REGISTRATIONS,
 	STATERR_INVALID_HEADER,
 	STATERR_READ_ERROR,
 	STATERR_WRITE_ERROR,
@@ -334,7 +333,6 @@ private:
 	running_machine &         m_machine;              // reference to our machine
 	std::unique_ptr<rewinder> m_rewind;               // rewinder
 	bool                      m_reg_allowed;          // are registrations allowed?
-	s32                       m_illegal_regs;         // number of illegal registrations
 
 	std::vector<std::unique_ptr<state_entry>>    m_entry_list;       // list of registered entries
 	std::vector<std::unique_ptr<ram_state>>      m_ramstate_list;    // list of ram states

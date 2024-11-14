@@ -50,6 +50,8 @@ testmode (hold 9, press F2). Voice language cannot be changed here though.
 #include "30test.lh"
 
 
+namespace {
+
 class namco_30test_state : public driver_device
 {
 public:
@@ -65,7 +67,7 @@ public:
 	void namco_30test(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	required_device<mc68hc11_cpu_device> m_maincpu;
@@ -74,7 +76,7 @@ private:
 	output_finder<72> m_digits;
 	output_finder<8> m_lamps;
 
-	void main_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
 
 	void output_digit(int i, u8 data);
 	void led_w(offs_t offset, u8 data);
@@ -176,7 +178,6 @@ void namco_30test_state::okibank_w(u8 data)
 
 void namco_30test_state::main_map(address_map &map)
 {
-	map(0x0d80, 0x0dbf).ram(); // EEPROM read-back data goes there
 	map(0x2000, 0x2000).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0x4000, 0x401f).w(FUNC(namco_30test_state::led_w));
 	map(0x6000, 0x6003).w(FUNC(namco_30test_state::led_rank_w));
@@ -282,6 +283,7 @@ ROM_START( 30test )
 	ROM_LOAD( "tt1-voi0.7p",   0x0000, 0x80000, CRC(b4fc5921) SHA1(92a88d5adb50dae48715847f12e88a35e37ef78c) )
 ROM_END
 
+} // anonymous namespace
 
 
 /******************************************************************************
@@ -289,4 +291,4 @@ ROM_END
 ******************************************************************************/
 
 /*     YEAR  NAME    PARENT  MACHINE       INPUT   CLASS               INIT        MONITOR  COMPANY, FULLNAME, FLAGS */
-GAMEL( 1997, 30test, 0,      namco_30test, 30test, namco_30test_state, empty_init, ROT0,    "Namco", "30 Test (remake)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK, layout_30test )
+GAMEL( 1997, 30test, 0,      namco_30test, 30test, namco_30test_state, empty_init, ROT0,    "Namco", "30 Test (remake)", MACHINE_SUPPORTS_SAVE, layout_30test )

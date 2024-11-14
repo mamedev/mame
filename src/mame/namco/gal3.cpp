@@ -129,6 +129,7 @@ better notes (complete chip lists) for each board still needed
 #include "emu.h"
 
 #include "cpu/m68000/m68000.h"
+#include "cpu/m68000/m68020.h"
 #include "cpu/tms32025/tms32025.h"
 #include "machine/nvram.h"
 #include "sound/c140.h"
@@ -138,6 +139,9 @@ better notes (complete chip lists) for each board still needed
 #include "namcos21_dsp_c67.h"
 #include "namcos21_3d.h"
 #include "emupal.h"
+
+
+namespace {
 
 class gal3_state : public driver_device
 {
@@ -156,8 +160,8 @@ public:
 	void gal3(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	required_device_array<namco_c355spr_device, 2> m_c355spr;
@@ -185,11 +189,11 @@ private:
 	// using ind16 for now because namco_c355spr_device::zdrawgfxzoom does not support rgb32, will probably need to be improved for LD use
 	uint32_t screen_update_left(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_right(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void cpu_mst_map(address_map &map);
-	void cpu_slv_map(address_map &map);
-	void psn_b1_cpu_map(address_map &map);
-	void rs_cpu_map(address_map &map);
-	void sound_cpu_map(address_map &map);
+	void cpu_mst_map(address_map &map) ATTR_COLD;
+	void cpu_slv_map(address_map &map) ATTR_COLD;
+	void psn_b1_cpu_map(address_map &map) ATTR_COLD;
+	void rs_cpu_map(address_map &map) ATTR_COLD;
+	void sound_cpu_map(address_map &map) ATTR_COLD;
 };
 
 
@@ -901,6 +905,9 @@ ROM_START( gal3 )
 	DISK_REGION( "laserdisc2" )
 	DISK_IMAGE_READONLY( "gal3_ld2", 0, NO_DUMP )
 ROM_END
+
+} // anonymous namespace
+
 
 /*     YEAR  NAME     PARENT  MACHINE  INPUT  CLASS       INIT        MONITOR  COMPANY  FULLNAME                                    FLAGS */
 GAMEL( 1992, gal3,    0,      gal3,    gal3,  gal3_state, empty_init, ROT0,    "Namco", "Galaxian 3 - Theater 6 : Project Dragoon", MACHINE_NOT_WORKING | MACHINE_NO_SOUND, layout_dualhsxs )

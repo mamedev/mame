@@ -71,6 +71,7 @@
 #define SLOW_BUT_ACCURATE (0)
 
 NETLIST_START(breakout)
+{
 
 #if (SLOW_BUT_ACCURATE)
 	SOLVER(Solver, 16000)
@@ -1861,7 +1862,7 @@ NETLIST_START(breakout)
 	HINT(N7.C, NO_DEACTIVATE)
 
 
-NETLIST_END()
+}
 
 /*
  * MCR106-2 model from http://www.duncanamps.com/

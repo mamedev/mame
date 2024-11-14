@@ -1,9 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood
-/* paint & puzzle */
-/* video is standard VGA */
 /*
-OK, here's a somewhat complete rundown of the PCB.
+paint & puzzle
+
+video is standard VGA
 
 Main PCB
 Reb B
@@ -138,21 +138,34 @@ CN1 standard DB15 VGA connector (15KHz)
 */
 
 #include "emu.h"
+
 #include "cpu/m68000/m68000.h"
 #include "cpu/mcs96/i8x9x.h"
 #include "machine/6522via.h"
 #include "machine/eepromser.h"
-#include "video/pc_vga.h"
+#include "video/pc_vga_trident.h"
+
 #include "screen.h"
 
+//#define VERBOSE 1
+#include "logmacro.h"
+
+#include "pntnpuzl.lh"
+
+
+namespace {
 
 class pntnpuzl_state : public driver_device
 {
 public:
-	pntnpuzl_state(const machine_config &mconfig, device_type type, const char *tag) :
-		driver_device(mconfig, type, tag),
-		m_maincpu(*this,"maincpu"),
-		m_via(*this, "via")
+	pntnpuzl_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this,"maincpu")
+		, m_svga(*this, "svga")
+		, m_via(*this, "via")
+		, m_screen(*this, "screen")
+		, m_in0(*this, "IN0")
+		, m_touch(*this, { "TOUCHX", "TOUCHY" })
 	{ }
 
 	void pntnpuzl(machine_config &config);
@@ -162,13 +175,19 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
 
 private:
+	required_device<cpu_device> m_maincpu;
+	required_device<tvga9000_device> m_svga;
+	required_device<via6522_device> m_via;
+	required_device<screen_device> m_screen;
+	required_ioport m_in0;
+	required_ioport_array<2> m_touch;
+
 	uint16_t m_pntpzl_200000 = 0;
 	uint16_t m_serial = 0;
 	uint16_t m_serial_out = 0;
 	uint16_t m_read_count = 0;
 	int m_touchscr[5]{};
 
-	required_device<cpu_device> m_maincpu;
 	void pntnpuzl_200000_w(uint16_t data);
 	void pntnpuzl_280018_w(uint16_t data);
 	uint16_t pntnpuzl_280014_r();
@@ -176,9 +195,8 @@ private:
 	uint16_t irq1_ack_r();
 	uint16_t irq2_ack_r();
 	uint16_t irq4_ack_r();
-	required_device<via6522_device> m_via;
-	void mcu_map(address_map &map);
-	void pntnpuzl_map(address_map &map);
+	void mcu_map(address_map &map) ATTR_COLD;
+	void pntnpuzl_map(address_map &map) ATTR_COLD;
 };
 
 
@@ -207,7 +225,7 @@ write                                     read
 
 void pntnpuzl_state::pntnpuzl_200000_w(uint16_t data)
 {
-// logerror("200000: %04x\n",data);
+	LOG("200000: %04x\n", data);
 	// bit 12: set to 1 when going to serial output to 280018
 	if ((m_pntpzl_200000 & 0x1000) && !(data & 0x1000))
 	{
@@ -221,7 +239,7 @@ void pntnpuzl_state::pntnpuzl_200000_w(uint16_t data)
 
 void pntnpuzl_state::pntnpuzl_280018_w(uint16_t data)
 {
-// logerror("%04x: 280018: %04x\n",m_maincpu->pc(),data);
+	LOG("%04x: 280018: %04x\n", m_maincpu->pc(), data);
 	m_serial >>= 1;
 	if (data & 0x2000)
 		m_serial |= 0x400;
@@ -231,56 +249,67 @@ void pntnpuzl_state::pntnpuzl_280018_w(uint16_t data)
 
 uint16_t pntnpuzl_state::pntnpuzl_280014_r()
 {
-	static const int startup[3] = { 0x80, 0x0c, 0x00 };
+	constexpr int startup[3] = { 0x80, 0x0c, 0x00 };
 	int res;
 
 	(void)m_via->read(0x14/2);
 
-	if (m_serial_out == 0x11)
+	if (!machine().side_effects_disabled())
 	{
-		if (ioport("IN0")->read() & 0x10)
+		if (m_serial_out == 0x11)
 		{
-			m_touchscr[0] = 0x1b;
-			m_touchscr[2] = bitswap<8>(ioport("TOUCHX")->read(),0,1,2,3,4,5,6,7);
-			m_touchscr[4] = bitswap<8>(ioport("TOUCHY")->read(),0,1,2,3,4,5,6,7);
+			if (m_in0->read() & 0x10)
+			{
+				m_touchscr[0] = 0x1b;
+				m_touchscr[2] = bitswap<8>(m_touch[0]->read(), 0, 1, 2, 3, 4, 5, 6, 7);
+				m_touchscr[4] = bitswap<8>(m_touch[1]->read(), 0, 1, 2, 3, 4, 5, 6, 7);
+			}
+			else
+			{
+				m_touchscr[0] = 0;
+			}
+
+			if (m_read_count >= 10)
+				m_read_count = 0;
+			res = m_touchscr[m_read_count / 2];
+			m_read_count++;
 		}
 		else
-			m_touchscr[0] = 0;
-
-		if (m_read_count >= 10) m_read_count = 0;
-		res = m_touchscr[m_read_count/2];
-		m_read_count++;
+		{
+			if (m_read_count >= 6)
+				m_read_count = 0;
+			res = startup[m_read_count / 2];
+			m_read_count++;
+		}
+		logerror("read 280014: %02x\n",res);
 	}
 	else
 	{
-		if (m_read_count >= 6) m_read_count = 0;
-		res = startup[m_read_count/2];
-		m_read_count++;
+		res = (m_serial_out == 0x11) ? m_touchscr[m_read_count / 2] : startup[m_read_count / 2];
 	}
-	logerror("read 280014: %02x\n",res);
 	return res << 8;
 }
 
 uint16_t pntnpuzl_state::pntnpuzl_28001a_r()
 {
-	return 0x4c00;
+	return 0x0c00 | (m_via->read(0x1a / 2) << 8);
 }
 
 uint16_t pntnpuzl_state::irq1_ack_r()
 {
-//  m_maincpu->set_input_line(1, CLEAR_LINE);
+	//if (!machine().side_effects_disabled()) m_maincpu->set_input_line(1, CLEAR_LINE);
 	return 0;
 }
 
 uint16_t pntnpuzl_state::irq2_ack_r()
 {
-//  m_maincpu->set_input_line(2, CLEAR_LINE);
+	//if (!machine().side_effects_disabled()) m_maincpu->set_input_line(2, CLEAR_LINE);
 	return 0;
 }
 
 uint16_t pntnpuzl_state::irq4_ack_r()
 {
-//  m_maincpu->set_input_line(4, CLEAR_LINE);
+	//if (!machine().side_effects_disabled()) m_maincpu->set_input_line(4, CLEAR_LINE);
 	return 0;
 }
 
@@ -297,11 +326,11 @@ void pntnpuzl_state::pntnpuzl_map(address_map &map)
 	map(0x280018, 0x280019).w(FUNC(pntnpuzl_state::pntnpuzl_280018_w));
 	map(0x28001a, 0x28001b).r(FUNC(pntnpuzl_state::pntnpuzl_28001a_r));
 
-	/* standard VGA */
-	map(0x3a0000, 0x3bffff).rw("vga", FUNC(vga_device::mem_r), FUNC(vga_device::mem_w));
-	map(0x3c03b0, 0x3c03bf).rw("vga", FUNC(vga_device::port_03b0_r), FUNC(vga_device::port_03b0_w));
-	map(0x3c03c0, 0x3c03cf).rw("vga", FUNC(vga_device::port_03c0_r), FUNC(vga_device::port_03c0_w));
-	map(0x3c03d0, 0x3c03df).rw("vga", FUNC(vga_device::port_03d0_r), FUNC(vga_device::port_03d0_w));
+	map(0x3a0000, 0x3bffff).rw(m_svga, FUNC(tvga9000_device::mem_r), FUNC(tvga9000_device::mem_w));
+	map(0x3c03b0, 0x3c03df).m(m_svga, FUNC(tvga9000_device::io_map));
+	// TODO: accesses $46e8 & 4ae8 at POST
+	map(0x3c43c4, 0x3c43cb).rw(m_svga, FUNC(tvga9000_device::port_43c6_r), FUNC(tvga9000_device::port_43c6_w));
+	map(0x3c83c4, 0x3c83cb).rw(m_svga, FUNC(tvga9000_device::port_83c6_r), FUNC(tvga9000_device::port_83c6_w));
 
 	map(0x400000, 0x407fff).ram();
 }
@@ -314,18 +343,18 @@ void pntnpuzl_state::mcu_map(address_map &map)
 
 INPUT_CHANGED_MEMBER(pntnpuzl_state::coin_inserted)
 {
-	/* TODO: change this! */
-	if(newval)
-		m_maincpu->pulse_input_line((uint8_t)param, m_maincpu->minimum_quantum_time());
+	// TODO: change this!
+	if (newval)
+		m_maincpu->pulse_input_line(uint8_t(param), m_maincpu->minimum_quantum_time());
 }
 
 static INPUT_PORTS_START( pntnpuzl )
-	PORT_START("IN0")   /* fake inputs */
+	PORT_START("IN0")   // fake inputs
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, pntnpuzl_state,coin_inserted, 1) PORT_IMPULSE(1)
-	PORT_SERVICE_NO_TOGGLE( 0x04, IP_ACTIVE_HIGH )PORT_CHANGED_MEMBER(DEVICE_SELF, pntnpuzl_state,coin_inserted, 2) PORT_IMPULSE(1)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_COIN2 ) PORT_CHANGED_MEMBER(DEVICE_SELF, pntnpuzl_state,coin_inserted, 4) PORT_IMPULSE(1)
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1 )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(pntnpuzl_state::coin_inserted), 1) PORT_IMPULSE(1)
+	PORT_SERVICE_NO_TOGGLE( 0x04, IP_ACTIVE_HIGH )PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(pntnpuzl_state::coin_inserted), 2) PORT_IMPULSE(1)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_COIN2 ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(pntnpuzl_state::coin_inserted), 4) PORT_IMPULSE(1)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Touch screen");
 
 	/* game uses a touch screen */
 	PORT_START("TOUCHX")
@@ -335,22 +364,22 @@ static INPUT_PORTS_START( pntnpuzl )
 	PORT_BIT( 0x7f, 0x40, IPT_LIGHTGUN_X ) PORT_CROSSHAIR(Y, -1.0, 0.0, 0) PORT_MINMAX(0,0x7f) PORT_SENSITIVITY(25) PORT_KEYDELTA(13)
 
 	PORT_START("IN1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_S)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_A)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON10 ) PORT_NAME("Brown")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON11 ) PORT_NAME("Tan")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN ) // Ticket Notch
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", FUNC(eeprom_serial_93cxx_device::do_read))
 	PORT_BIT( 0x70, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN ) // Ticket Motor
 
 	PORT_START("IN2")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_B)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_V)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_C)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_X)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_Z)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_G)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_F)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_D)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("White")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Yellow")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("Green")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("Blue")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_NAME("Red")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON7 ) PORT_NAME("Pink")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON8 ) PORT_NAME("Light Blue")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON9 ) PORT_NAME("Light Green")
 INPUT_PORTS_END
 
 void pntnpuzl_state::pntnpuzl(machine_config &config)
@@ -378,14 +407,15 @@ void pntnpuzl_state::pntnpuzl(machine_config &config)
 
 	EEPROM_93C46_16BIT(config, "mcu_eeprom").do_callback().set_inputline("mcu", i8x9x_device::HSI3_LINE);
 
-	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_raw(XTAL(25'174'800),900,0,640,526,0,480);
-	screen.set_screen_update("vga", FUNC(vga_device::screen_update));
+	TVGA9000_VGA(config, m_svga, 0);
+	m_svga->set_screen(m_screen);
+	m_svga->set_vram_size(0x100000);
 
-	vga_device &vga(VGA(config, "vga", 0));
-	vga.set_screen("screen");
-	vga.set_vram_size(0x100000);
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	// TODO: XTAL is not right and likely not the source,
+	// selects xtal mode 3 (36 MHz) / 2 plus another / 2 for module testing bit 7
+	m_screen->set_raw(XTAL(40'000'000) / 2, 1080, 0, 400, 265, 0, 240);
+	m_screen->set_screen_update(m_svga, FUNC(tvga9000_device::screen_update));
 }
 
 ROM_START( pntnpuzl )
@@ -413,4 +443,7 @@ void pntnpuzl_state::init_pip()
 
 }
 
-GAME( 1993, pntnpuzl, 0, pntnpuzl, pntnpuzl, pntnpuzl_state, init_pip, ROT90, "Century Vending", "Paint 'N Puzzle", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+} // anonymous namespace
+
+
+GAMEL( 1993, pntnpuzl, 0, pntnpuzl, pntnpuzl, pntnpuzl_state, init_pip, ROT90, "Century Vending", "Paint 'N Puzzle", MACHINE_NO_SOUND | MACHINE_NOT_WORKING, layout_pntnpuzl )

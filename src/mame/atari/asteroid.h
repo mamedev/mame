@@ -10,10 +10,9 @@
 
 #pragma once
 
-#include "avgdvg.h"
-
 #include "machine/74153.h"
 #include "machine/er2055.h"
+#include "video/avgdvg.h"
 #include "sound/discrete.h"
 
 class asteroid_state : public driver_device
@@ -49,9 +48,9 @@ public:
 	memory_share_creator<u8> m_sram1;
 	memory_share_creator<u8> m_sram2;
 
-	DECLARE_WRITE_LINE_MEMBER(coin_counter_left_w);
-	DECLARE_WRITE_LINE_MEMBER(coin_counter_center_w);
-	DECLARE_WRITE_LINE_MEMBER(coin_counter_right_w);
+	void coin_counter_left_w(int state);
+	void coin_counter_center_w(int state);
+	void coin_counter_right_w(int state);
 	uint8_t asteroid_IN0_r(offs_t offset);
 	uint8_t asterock_IN0_r(offs_t offset);
 	uint8_t asteroid_IN1_r(offs_t offset);
@@ -66,19 +65,19 @@ public:
 	void earom_write(offs_t offset, uint8_t data);
 	void earom_control_w(uint8_t data);
 
-	DECLARE_READ_LINE_MEMBER(clock_r);
+	int clock_r();
 
 	INTERRUPT_GEN_MEMBER(asteroid_interrupt);
 	INTERRUPT_GEN_MEMBER(asterock_interrupt);
 	INTERRUPT_GEN_MEMBER(llander_interrupt);
 
-	DECLARE_WRITE_LINE_MEMBER(cocktail_inv_w);
+	void cocktail_inv_w(int state);
 
 	void init_asterock();
 	void init_asteroidb();
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 	void asteroid_base(machine_config &config);
 	void asterock(machine_config &config);
 	void asteroid(machine_config &config);
@@ -87,9 +86,9 @@ public:
 	void asteroid_sound(machine_config &config);
 	void astdelux_sound(machine_config &config);
 	void llander_sound(machine_config &config);
-	void astdelux_map(address_map &map);
-	void asteroid_map(address_map &map);
-	void llander_map(address_map &map);
+	void astdelux_map(address_map &map) ATTR_COLD;
+	void asteroid_map(address_map &map) ATTR_COLD;
+	void llander_map(address_map &map) ATTR_COLD;
 };
 
 #endif // MAME_ATARI_ASTEROID_H

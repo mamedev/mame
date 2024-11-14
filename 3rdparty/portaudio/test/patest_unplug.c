@@ -1,7 +1,7 @@
 /** @file patest_unplug.c
-	@ingroup test_src
-	@brief Debug a crash involving unplugging a USB device.
-	@author Phil Burk  http://www.softsynth.com
+    @ingroup test_src
+    @brief Debug a crash involving unplugging a USB device.
+    @author Phil Burk  http://www.softsynth.com
 */
 /*
  * $Id$
@@ -59,9 +59,9 @@
 typedef struct
 {
     short sine[TABLE_SIZE];
-    int32_t phases[MAX_CHANNELS];
-    int32_t numChannels;
-    int32_t sampsToGo;
+    int   phases[MAX_CHANNELS];
+    int   numChannels;
+    int   sampsToGo;
 }
 paTestData;
 
@@ -131,10 +131,10 @@ int main(int argc, char **args)
     printf("Test unplugging a USB device.\n");
 
     if( argc > 1 ) {
-       inputDevice = outputDevice = atoi( args[1] );
-       printf("Using device number %d.\n\n", inputDevice );
+        inputDevice = outputDevice = atoi( args[1] );
+        printf("Using device number %d.\n\n", inputDevice );
     } else {
-       printf("Using default device.\n\n" );
+        printf("Using default device.\n\n" );
     }
 
     memset(&data, 0, sizeof(data));
@@ -235,7 +235,7 @@ int main(int argc, char **args)
     return paNoError;
 error:
     Pa_Terminate();
-    fprintf( stderr, "An error occured while using the portaudio stream\n" );
+    fprintf( stderr, "An error occurred while using the portaudio stream\n" );
     fprintf( stderr, "Error number: %d\n", err );
     fprintf( stderr, "Error message: %s\n", Pa_GetErrorText( err ) );
     fprintf( stderr, "Host Error message: %s\n", Pa_GetLastHostErrorInfo()->errorText );

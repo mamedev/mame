@@ -1,7 +1,7 @@
 // Windows/Registry.h
 
-#ifndef __WINDOWS_REGISTRY_H
-#define __WINDOWS_REGISTRY_H
+#ifndef ZIP7_INC_WINDOWS_REGISTRY_H
+#define ZIP7_INC_WINDOWS_REGISTRY_H
 
 #include "../Common/MyBuffer.h"
 #include "../Common/MyString.h"

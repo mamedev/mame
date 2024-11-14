@@ -331,7 +331,7 @@ uint32_t mw8080bw_state::screen_update_phantom2(screen_device &screen, bitmap_rg
 }
 
 
-WRITE_LINE_MEMBER(mw8080bw_state::screen_vblank_phantom2)
+void mw8080bw_state::screen_vblank_phantom2(int state)
 {
 	// falling edge
 	if (!state)

@@ -14,7 +14,6 @@
 #include "exp.h"
 #include "imagedev/floppy.h"
 #include "machine/wd_fdc.h"
-#include "formats/ql_dsk.h"
 
 
 
@@ -34,12 +33,12 @@ protected:
 	ql_trump_card_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int ram_size);
 
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// optional information overrides
-	virtual const tiny_rom_entry *device_rom_region() const override;
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 	// device_ql_expansion_card_interface overrides
 	virtual uint8_t read(offs_t offset, uint8_t data) override;
@@ -50,8 +49,7 @@ private:
 	static void floppy_formats(format_registration &fr);
 
 	required_device<wd1772_device> m_fdc;
-	required_device<floppy_connector> m_floppy0;
-	required_device<floppy_connector> m_floppy1;
+	required_device_array<floppy_connector, 2> m_floppy;
 	required_memory_region m_rom;
 	memory_share_creator<uint8_t> m_ram;
 

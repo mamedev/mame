@@ -1,10 +1,11 @@
 // license:BSD-3-Clause
 // copyright-holders:Luca Elia
-#ifndef MAME_VIDEO_X1_012_H
-#define MAME_VIDEO_X1_012_H
+#ifndef MAME_SETA_X1_012_H
+#define MAME_SETA_X1_012_H
 
 #pragma once
 
+#include "screen.h"
 #include "tilemap.h"
 
 class x1_012_device : public device_t, public device_gfx_interface
@@ -20,6 +21,7 @@ public:
 
 	// configuration
 	template <typename... T> void set_tile_offset_callback(T &&... args) { m_tile_offset_callback.set(std::forward<T>(args)...); }
+	template <typename T> void set_screen(T &&tag) { m_screen.set_tag(std::forward<T>(tag)); }
 	void set_xoffsets(int flip, int noflip) { m_xoffsets[1] = flip; m_xoffsets[0] = noflip; }
 
 	void vram_w(offs_t offset, u16 data, u16 mem_mask = 0xffff);
@@ -36,8 +38,8 @@ public:
 	void draw_tilemap_palette_effect(bitmap_ind16 &bitmap, const rectangle &cliprect, bool flipscreen);
 
 protected:
-	virtual void device_resolve_objects() override;
-	virtual void device_start() override;
+	virtual void device_resolve_objects() override ATTR_COLD;
+	virtual void device_start() override ATTR_COLD;
 
 private:
 	TILE_GET_INFO_MEMBER(get_tile_info);
@@ -45,6 +47,8 @@ private:
 	device_delegate<u16 (u16 code)> m_tile_offset_callback;
 
 	required_shared_ptr<u16> m_vram;
+
+	required_device<screen_device> m_screen;
 
 	tilemap_t *m_tilemap;
 
@@ -56,5 +60,5 @@ private:
 
 DECLARE_DEVICE_TYPE(X1_012, x1_012_device)
 
-#endif // MAME_VIDEO_X1_012_H
+#endif // MAME_SETA_X1_012_H
 

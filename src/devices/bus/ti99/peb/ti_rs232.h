@@ -38,31 +38,31 @@ public:
 	void cruwrite(offs_t offset, uint8_t data) override;
 
 protected:
-	void device_start() override;
-	void device_reset() override;
-	void device_stop() override;
-	const tiny_rom_entry *device_rom_region() const override;
-	void device_add_mconfig(machine_config &config) override;
-	ioport_constructor device_input_ports() const override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+	virtual void device_stop() override ATTR_COLD;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 
 private:
-	DECLARE_WRITE_LINE_MEMBER(int0_callback);
-	DECLARE_WRITE_LINE_MEMBER(int1_callback);
-	DECLARE_WRITE_LINE_MEMBER(rcv0_callback);
-	DECLARE_WRITE_LINE_MEMBER(rcv1_callback);
+	void int0_callback(int state);
+	void int1_callback(int state);
+	void rcv0_callback(int state);
+	void rcv1_callback(int state);
 	void xmit0_callback(uint8_t data);
 	void xmit1_callback(uint8_t data);
 	void ctrl0_callback(offs_t offset, uint8_t data);
 	void ctrl1_callback(offs_t offset, uint8_t data);
 
-	DECLARE_WRITE_LINE_MEMBER(selected_w);
-	DECLARE_WRITE_LINE_MEMBER(pio_direction_in_w);
-	DECLARE_WRITE_LINE_MEMBER(pio_handshake_out_w);
-	DECLARE_WRITE_LINE_MEMBER(pio_spareout_w);
-	DECLARE_WRITE_LINE_MEMBER(flag0_w);
-	DECLARE_WRITE_LINE_MEMBER(cts0_w);
-	DECLARE_WRITE_LINE_MEMBER(cts1_w);
-	DECLARE_WRITE_LINE_MEMBER(led_w);
+	void selected_w(int state);
+	void pio_direction_in_w(int state);
+	void pio_handshake_out_w(int state);
+	void pio_spareout_w(int state);
+	void flag0_w(int state);
+	void cts0_w(int state);
+	void cts1_w(int state);
+	void led_w(int state);
 
 	void        incoming_dtr(int uartind, line_state value);
 	void        transmit_data(int uartind, uint8_t value);
@@ -146,7 +146,7 @@ public:
 
 protected:
 	void device_start() override { }
-	image_init_result    call_load() override;
+	std::pair<std::error_condition, std::string>    call_load() override;
 	void    call_unload() override;
 
 private:
@@ -159,6 +159,7 @@ private:
 */
 class ti_pio_attached_device : public device_t, public device_image_interface
 {
+	friend class ti_rs232_pio_device;
 public:
 	ti_pio_attached_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
@@ -174,8 +175,12 @@ public:
 
 protected:
 	void    device_start() override { }
-	image_init_result    call_load() override;
+	std::pair<std::error_condition, std::string>    call_load() override;
 	void    call_unload() override;
+
+private:
+	ti_rs232_pio_device* m_card;
+	void set_card(ti_rs232_pio_device* card) { m_card = card; }
 };
 
 } // end namespace bus::ti99::peb

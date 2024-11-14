@@ -18,8 +18,8 @@ public:
 	auto irq_cb() { return m_irq_cb.bind(); }
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 	virtual void device_clock_changed() override;
 
 	TIMER_CALLBACK_MEMBER(timer_update);

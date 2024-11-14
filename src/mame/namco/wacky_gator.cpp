@@ -30,6 +30,8 @@
 #include "wackygtr.lh"
 
 
+namespace {
+
 class wackygtr_state : public driver_device
 {
 public:
@@ -45,16 +47,16 @@ public:
 		m_lamps(*this, "lamp%u", 0U)
 	{ }
 
-	DECLARE_CUSTOM_INPUT_MEMBER(alligators_rear_sensors_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(alligators_front_sensors_r);
+	ioport_value alligators_rear_sensors_r();
+	ioport_value alligators_front_sensors_r();
 
 	void wackygtr(machine_config &config);
 
 private:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
-	DECLARE_WRITE_LINE_MEMBER(adpcm_int);
+	void adpcm_int(int state);
 	void sample_ctrl_w(uint8_t data);
 	void alligators_ctrl1_w(uint8_t data);
 	void alligators_ctrl2_w(uint8_t data);
@@ -67,14 +69,14 @@ private:
 	template <unsigned N> void disp_w(uint8_t data) { set_digits(N << 1, data); }
 
 	void pmm8713_ck(int i, int state);
-	template <unsigned N> DECLARE_WRITE_LINE_MEMBER(alligator_ck) { pmm8713_ck(N, state); }
+	template <unsigned N> void alligator_ck(int state) { pmm8713_ck(N, state); }
 
 	void irq_ack_w(uint8_t data)            { m_maincpu->set_input_line(M6809_IRQ_LINE, CLEAR_LINE); }
 	void firq_ack_w(uint8_t data)           { m_maincpu->set_input_line(M6809_FIRQ_LINE, CLEAR_LINE); }
 
 	TIMER_DEVICE_CALLBACK_MEMBER(nmi_timer)     { m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero); }
 
-	void program_map(address_map &map);
+	void program_map(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<msm5205_device> m_msm;
@@ -90,7 +92,7 @@ private:
 	uint8_t   m_adpcm_ctrl;
 
 	uint8_t   m_alligators_ctrl;
-	int     m_motors_pos[5];
+	int       m_motors_pos[5] = { };
 };
 
 
@@ -160,7 +162,7 @@ void wackygtr_state::pmm8713_ck(int i, int state)
 	}
 }
 
-CUSTOM_INPUT_MEMBER(wackygtr_state::alligators_rear_sensors_r)
+ioport_value wackygtr_state::alligators_rear_sensors_r()
 {
 	return  ((m_motors_pos[0] < 10) ? 0x01 : 0) |
 			((m_motors_pos[1] < 10) ? 0x02 : 0) |
@@ -170,7 +172,7 @@ CUSTOM_INPUT_MEMBER(wackygtr_state::alligators_rear_sensors_r)
 			(m_alligators_ctrl ^ 0x1f);
 }
 
-CUSTOM_INPUT_MEMBER(wackygtr_state::alligators_front_sensors_r)
+ioport_value wackygtr_state::alligators_front_sensors_r()
 {
 	return  ((m_motors_pos[0] < 5 || m_motors_pos[0] > 55) ? 0x01 : 0) |
 			((m_motors_pos[1] < 5 || m_motors_pos[1] > 55) ? 0x02 : 0) |
@@ -197,6 +199,7 @@ void wackygtr_state::machine_reset()
 	m_adpcm_pos = 0;
 	m_adpcm_sel = 0;
 	m_adpcm_ctrl = 0x80;
+	m_alligators_ctrl = 0;
 }
 
 void wackygtr_state::set_digits(int p, uint8_t value)
@@ -214,13 +217,13 @@ void wackygtr_state::set_lamps(int p, uint8_t value)
 
 static INPUT_PORTS_START( wackygtr )
 	PORT_START("IN0")
-	PORT_BIT(0x1f, IP_ACTIVE_LOW, IPT_CUSTOM) PORT_CUSTOM_MEMBER(wackygtr_state, alligators_rear_sensors_r)
+	PORT_BIT(0x1f, IP_ACTIVE_LOW, IPT_CUSTOM) PORT_CUSTOM_MEMBER(FUNC(wackygtr_state::alligators_rear_sensors_r))
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_SERVICE)
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_SERVICE1)
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_COIN1)
 
 	PORT_START("IN1")
-	PORT_BIT(0x1f, IP_ACTIVE_LOW, IPT_CUSTOM) PORT_CUSTOM_MEMBER(wackygtr_state, alligators_front_sensors_r)
+	PORT_BIT(0x1f, IP_ACTIVE_LOW, IPT_CUSTOM) PORT_CUSTOM_MEMBER(FUNC(wackygtr_state::alligators_front_sensors_r))
 	PORT_DIPNAME( 0xe0, 0x00, DEF_STR( Coin_A ) ) PORT_DIPLOCATION("SW:1,2,3")
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( 1C_1C ) )
@@ -248,7 +251,7 @@ static INPUT_PORTS_START( wackygtr )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 INPUT_PORTS_END
 
-WRITE_LINE_MEMBER(wackygtr_state::adpcm_int)
+void wackygtr_state::adpcm_int(int state)
 {
 	if (!(m_adpcm_ctrl & 0x80))
 	{
@@ -334,7 +337,7 @@ void wackygtr_state::wackygtr(machine_config &config)
 	m_pit8253[1]->set_clk<2>(XTAL(3'579'545)/16);  // this is a guess
 	m_pit8253[1]->out_handler<2>().set(FUNC(wackygtr_state::alligator_ck<4>));
 
-	TICKET_DISPENSER(config, "ticket", attotime::from_msec(200), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH);
+	TICKET_DISPENSER(config, "ticket", attotime::from_msec(200));
 }
 
 
@@ -346,4 +349,7 @@ ROM_START( wackygtr )
 	ROM_LOAD("wp3-vo0.2h", 0x0000, 0x10000, CRC(91c7986f) SHA1(bc9fa0d41c1caa0f909a349f511d022b7e42c6cd))
 ROM_END
 
-GAME(1988, wackygtr,    0, wackygtr,  wackygtr, wackygtr_state, empty_init, ROT0, "Namco (Data East license)", "Wacky Gator (US)", MACHINE_IS_SKELETON_MECHANICAL | MACHINE_CLICKABLE_ARTWORK)
+} // anonymous namespace
+
+
+GAME(1988, wackygtr,    0, wackygtr,  wackygtr, wackygtr_state, empty_init, ROT0, "Namco (Data East license)", "Wacky Gator (US)", MACHINE_IS_SKELETON_MECHANICAL)

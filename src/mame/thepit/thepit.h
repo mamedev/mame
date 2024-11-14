@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Zsolt Vasvari
-#ifndef MAME_INCLUDES_THEPIT_H
-#define MAME_INCLUDES_THEPIT_H
+#ifndef MAME_THEPIT_THEPIT_H
+#define MAME_THEPIT_THEPIT_H
 
 #pragma once
 
@@ -40,8 +40,8 @@ public:
 	void init_rtriv();
 
 protected:
-	virtual void machine_start() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -70,20 +70,20 @@ private:
 	int m_question_rom = 0;
 	int m_remap_address[16]{};
 
-	DECLARE_WRITE_LINE_MEMBER(coin_lockout_w);
-	DECLARE_WRITE_LINE_MEMBER(sound_enable_w);
-	DECLARE_WRITE_LINE_MEMBER(nmi_mask_w);
-	DECLARE_WRITE_LINE_MEMBER(vblank_w);
+	void coin_lockout_w(int state);
+	void sound_enable_w(int state);
+	void nmi_mask_w(int state);
+	void vblank_w(int state);
 	TIMER_CALLBACK_MEMBER(vsync_callback);
 	IRQ_CALLBACK_MEMBER(vsync_int_ack);
 	void videoram_w(offs_t offset, uint8_t data);
 	void colorram_w(offs_t offset, uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(flip_screen_x_w);
-	DECLARE_WRITE_LINE_MEMBER(flip_screen_y_w);
+	void flip_screen_x_w(int state);
+	void flip_screen_y_w(int state);
 	uint8_t input_port_0_r();
 
 	uint8_t intrepid_colorram_mirror_r(offs_t offset);
-	DECLARE_WRITE_LINE_MEMBER(intrepid_graphics_bank_w);
+	void intrepid_graphics_bank_w(int state);
 
 	uint8_t rtriv_question_r(offs_t offset);
 
@@ -97,13 +97,13 @@ private:
 	uint32_t screen_update_desertdan(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int priority_to_draw);
 
-	void audio_io_map(address_map &map);
-	void audio_map(address_map &map);
-	void desertdan_main_map(address_map &map);
-	void dockmanb_main_map(address_map &map);
-	void intrepid_main_map(address_map &map);
-	void thepit_main_map(address_map &map);
-	void theportr_main_map(address_map &map);
+	void audio_io_map(address_map &map) ATTR_COLD;
+	void audio_map(address_map &map) ATTR_COLD;
+	void desertdan_main_map(address_map &map) ATTR_COLD;
+	void dockmanb_main_map(address_map &map) ATTR_COLD;
+	void intrepid_main_map(address_map &map) ATTR_COLD;
+	void thepit_main_map(address_map &map) ATTR_COLD;
+	void theportr_main_map(address_map &map) ATTR_COLD;
 };
 
-#endif // MAME_INCLUDES_THEPIT_H
+#endif // MAME_THEPIT_THEPIT_H

@@ -18,6 +18,8 @@ Floppies were 8 inch IBM format.
 #include "screen.h"
 
 
+namespace {
+
 class terak_state : public driver_device
 {
 public:
@@ -35,12 +37,12 @@ private:
 	void terak_fdc_data_w(uint16_t data);
 	uint32_t screen_update_terak(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void mem_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
 
 	uint8_t m_unit = 0;
 	uint8_t m_cmd = 0;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 	required_device<t11_device> m_maincpu;
 };
 
@@ -132,6 +134,9 @@ ROM_START( terak )
 	ROM_LOAD( "82s129.z2", 0x0000, 0x0100, CRC(a5dce419) SHA1(819197a03eb9b6ea3318f5afc37c0b436dd747a7) )
 	ROM_LOAD( "82s129.z1", 0x0100, 0x0100, CRC(f34e061f) SHA1(3cb354b2680056d4b3234c680958d4591279ac8a) )
 ROM_END
+
+} // anonymous namespace
+
 
 /* Driver */
 

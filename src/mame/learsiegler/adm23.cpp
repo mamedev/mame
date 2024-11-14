@@ -11,6 +11,9 @@
 #include "video/mc6845.h"
 #include "screen.h"
 
+
+namespace {
+
 class adm23_state : public driver_device
 {
 public:
@@ -26,7 +29,7 @@ private:
 	MC6845_UPDATE_ROW(update_row);
 	MC6845_ON_UPDATE_ADDR_CHANGED(addr_changed);
 
-	void mem_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
 
 	required_region_ptr<u8> m_chargen;
 };
@@ -81,6 +84,8 @@ ROM_START(adm23)
 	ROM_REGION(0x0020, "proms", 0)
 	ROM_LOAD("129253-61_u3.bin", 0x0000, 0x0020, NO_DUMP) // N82S123N at location labeled "S288"
 ROM_END
+
+} // anonymous namespace
 
 
 COMP(1982, adm23, 0, 0, adm23, adm23, adm23_state, empty_init, "Lear Siegler", "ADM 23 Smart Terminal", MACHINE_IS_SKELETON)

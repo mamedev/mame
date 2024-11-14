@@ -27,6 +27,8 @@
 #include "tecnbras.lh"
 
 
+namespace {
+
 class tecnbras_state : public driver_device
 {
 public:
@@ -39,16 +41,16 @@ public:
 	void tecnbras(machine_config &config);
 
 private:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	void set_x_position_w(offs_t offset, uint8_t data);
 	void print_column_w(offs_t offset, uint8_t data);
 
 	//void tecnbras_io_w(uint8_t data);
 	//uint8_t tecnbras_io_r();
-	void i80c31_io(address_map &map);
-	void i80c31_prg(address_map &map);
+	void i80c31_io(address_map &map) ATTR_COLD;
+	void i80c31_prg(address_map &map) ATTR_COLD;
 
 	required_device<i80c31_device> m_maincpu;
 	output_finder<14 * 7> m_dmds;
@@ -141,6 +143,9 @@ ROM_START( tecnbras )
 	ROM_REGION( 0x8000, "maincpu", 0 )
 	ROM_LOAD( "tecnbras.u2",  0x0000, 0x8000, CRC(1a1e18fc) SHA1(8907e72f0356a2e2e1097dabac6d6b0b3d717f85) )
 ROM_END
+
+} // anonymous namespace
+
 
 //    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT  CLASS           INIT        COMPANY     FULLNAME                            FLAGS
 COMP( 200?, tecnbras, 0,      0,      tecnbras, 0,     tecnbras_state, empty_init, "Tecnbras", "Dot Matrix Display (70x7 pixels)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND )

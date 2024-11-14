@@ -55,6 +55,8 @@
 #include "formats/uef_cas.h"
 #include "formats/csw_cas.h"
 
+#include "utf8.h"
+
 #include "bbc.lh"
 #include "bbcm.lh"
 
@@ -153,7 +155,7 @@ void bbc_state::bbc_base(address_map &map)
 	map(0xfe01, 0xfe01).mirror(0x06).rw(m_hd6845, FUNC(hd6845s_device::register_r), FUNC(hd6845s_device::register_w));
 	map(0xfe08, 0xfe0f).rw(m_acia, FUNC(acia6850_device::read), FUNC(acia6850_device::write));                        //    fe08-fe0f  6850 ACIA      Serial controller
 	map(0xfe10, 0xfe17).w(FUNC(bbc_state::serial_ula_w));                                                             //    fe10-fe17  Serial ULA     Serial system chip
-	map(0xfe18, 0xfe1f).portr("STATID");                                                                              //    fe18-fe1f  INTOFF/STATID  ECONET Interrupt Off / ID No.
+	map(0xfe18, 0xfe1f).portr(m_statid);                                                                              //    fe18-fe1f  INTOFF/STATID  ECONET Interrupt Off / ID No.
 	map(0xfe20, 0xfe2f).w(FUNC(bbc_state::video_ula_w));                                                              // W: fe20-fe2f  Video ULA      Video system chip
 	map(0xfe40, 0xfe5f).m(m_via6522_0, FUNC(via6522_device::map));                                                    //    fe40-fe5f  6522 VIA       SYSTEM VIA
 	map(0xfe60, 0xfe7f).m(m_via6522_1, FUNC(via6522_device::map));                                                    //    fe60-fe7f  6522 VIA       USER VIA
@@ -454,7 +456,7 @@ static INPUT_PORTS_START(bbc_keyboard)
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME(UTF8_RIGHT)           PORT_CODE(KEYCODE_RIGHT)        PORT_CHAR(UCHAR_MAMEKEY(RIGHT))
 
 	PORT_START("BRK")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("BREAK")              PORT_CODE(KEYCODE_F12)          PORT_CHAR(UCHAR_MAMEKEY(F12)) PORT_CHANGED_MEMBER(DEVICE_SELF, bbc_state, trigger_reset, 0)
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("BREAK")              PORT_CODE(KEYCODE_F12)          PORT_CHAR(UCHAR_MAMEKEY(F12)) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(bbc_state::trigger_reset), 0)
 
 	/* Keyboard columns 10 -> 12 are reserved for BBC Master */
 	PORT_START("COL10")
@@ -789,7 +791,7 @@ static INPUT_PORTS_START(torchi_keyboard)
 	PORT_BIT(0xff, IP_ACTIVE_LOW, IPT_UNUSED)
 
 	PORT_START("BRK")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("BREAK")              PORT_CODE(KEYCODE_F12)          PORT_CHAR(UCHAR_MAMEKEY(F12)) PORT_CHANGED_MEMBER(DEVICE_SELF, bbc_state, trigger_reset, 0)
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("BREAK")              PORT_CODE(KEYCODE_F12)          PORT_CHAR(UCHAR_MAMEKEY(F12)) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(bbc_state::trigger_reset), 0)
 INPUT_PORTS_END
 
 
@@ -964,7 +966,7 @@ INPUT_CHANGED_MEMBER(bbc_state::reset_palette)
 
 static INPUT_PORTS_START(bbc_config)
 	PORT_START("BBCCONFIG")
-	PORT_CONFNAME( 0x03, 0x00, "Monitor") PORT_CHANGED_MEMBER(DEVICE_SELF, bbc_state, reset_palette, 0) PORT_CONDITION("BBCCONFIG", 0x08, EQUALS, 0x00)
+	PORT_CONFNAME( 0x03, 0x00, "Monitor") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(bbc_state::reset_palette), 0) PORT_CONDITION("BBCCONFIG", 0x08, EQUALS, 0x00)
 	PORT_CONFSETTING(    0x00, "Colour")
 	PORT_CONFSETTING(    0x01, "B&W")
 	PORT_CONFSETTING(    0x02, "Green")
@@ -972,7 +974,7 @@ static INPUT_PORTS_START(bbc_config)
 	PORT_CONFNAME( 0x04, 0x00, "Econet")
 	PORT_CONFSETTING(    0x00, DEF_STR( No ))
 	PORT_CONFSETTING(    0x04, DEF_STR( Yes ))
-	PORT_CONFNAME( 0x08, 0x00, "VideoNuLA") PORT_CHANGED_MEMBER(DEVICE_SELF, bbc_state, reset_palette, 0)
+	PORT_CONFNAME( 0x08, 0x00, "VideoNuLA") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(bbc_state::reset_palette), 0)
 	PORT_CONFSETTING(    0x00, DEF_STR( No ))
 	PORT_CONFSETTING(    0x08, DEF_STR( Yes ))
 INPUT_PORTS_END
@@ -1076,7 +1078,7 @@ static const char *const bbc_sample_names[] =
 };
 
 
-WRITE_LINE_MEMBER(bbc_state::adlc_irq_w)
+void bbc_state::adlc_irq_w(int state)
 {
 	m_adlc_irq = state;
 	update_nmi();
@@ -2293,7 +2295,7 @@ ROM_START(torchh)
 	ROM_REGION(0x4000, "vsm", 0) /* system speech PHROM */
 	ROM_LOAD("phrom_us.bin", 0x0000, 0x4000, CRC(bf4b3b64) SHA1(66876702d1d95eecc034d20f25047f893a27cde5))
 
-	DISK_REGION("1mhzbus:torchhd:sasi:0:s1410:image")
+	DISK_REGION("1mhzbus:torchhd:sasi:0:s1410")
 	DISK_IMAGE("torch_utilities", 0, BAD_DUMP SHA1(33a5f169bd91b9c6049e8bd0b237429c091fddd0)) /* NEC D5126 contains Standard and Hard Disc Utilities, not known what was factory installed */
 ROM_END
 

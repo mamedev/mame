@@ -165,22 +165,22 @@ void mb86233_device::state_string_export(const device_state_entry &entry, std::s
 {
 }
 
-WRITE_LINE_MEMBER(mb86233_device::gpio0_w)
+void mb86233_device::gpio0_w(int state)
 {
 	m_gpio0 = state;
 }
 
-WRITE_LINE_MEMBER(mb86233_device::gpio1_w)
+void mb86233_device::gpio1_w(int state)
 {
 	m_gpio1 = state;
 }
 
-WRITE_LINE_MEMBER(mb86233_device::gpio2_w)
+void mb86233_device::gpio2_w(int state)
 {
 	m_gpio2 = state;
 }
 
-WRITE_LINE_MEMBER(mb86233_device::gpio3_w)
+void mb86233_device::gpio3_w(int state)
 {
 	m_gpio3 = state;
 }
@@ -220,14 +220,6 @@ void mb86233_device::device_reset()
 	std::fill(std::begin(m_pcs), std::end(m_pcs), 0);
 
 	m_stall = false;
-}
-
-s32 mb86233_device::s24_32(u32 val)
-{
-	if(val & 0x00800000)
-		return val | 0xff000000;
-	else
-		return val & 0x00ffffff;
 }
 
 u32 mb86233_device::set_exp(u32 val, u32 exp)
@@ -571,12 +563,8 @@ void mb86233_device::ea_post_0(u32 r)
 		return;
 	if(!(r & 0x080))
 		m_x0 += m_i0;
-	else {
-		if(r & 0x10)
-			m_x0 += (r & 0xf) - 0x10;
-		else
-			m_x0 += r & 0xf;
-	}
+	else
+		m_x0 += util::sext(r, 5);
 }
 
 u16 mb86233_device::ea_pre_1(u32 r)
@@ -602,12 +590,8 @@ void mb86233_device::ea_post_1(u32 r)
 		return;
 	if(!(r & 0x080))
 		m_x1 += m_i1;
-	else {
-		if(r & 0x10)
-			m_x1 += (r & 0xf) - 0x10;
-		else
-			m_x1 += r & 0xf;
-	}
+	else
+		m_x1 += util::sext(r, 5);
 }
 
 u32 mb86233_device::read_reg(u32 r)
@@ -992,13 +976,13 @@ void mb86233_device::execute_run()
 				m_p = (m_p & 0xffffff000000) | (opcode & 0xffffff);
 				break;
 			case 1:
-				m_a = s24_32(opcode);
+				m_a = util::sext(opcode, 24);
 				break;
 			case 2:
-				m_b = s24_32(opcode);
+				m_b = util::sext(opcode, 24);
 				break;
 			case 3:
-				m_d = s24_32(opcode);
+				m_d = util::sext(opcode, 24);
 				testdz();
 				break;
 			}
@@ -1049,7 +1033,7 @@ void mb86233_device::execute_run()
 		case 0x10: case 0x11: case 0x12: case 0x13: case 0x14: case 0x15: case 0x16: case 0x17:
 		case 0x18: case 0x19: case 0x1a: case 0x1b: case 0x1c: case 0x1d: case 0x1e: case 0x1f: {
 			// ldi
-			write_reg(opcode >> 24, s24_32(opcode));
+			write_reg(opcode >> 24, util::sext(opcode, 24));
 			break;
 		}
 

@@ -40,14 +40,14 @@ public:
 	uint8_t read();
 	void write(uint8_t data);
 
-	DECLARE_WRITE_LINE_MEMBER(clock_w);
+	void clock_w(int state);
 
 	uint8_t do_r() { return m_data; }
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 private:
 	void set_sr_line(bool state);

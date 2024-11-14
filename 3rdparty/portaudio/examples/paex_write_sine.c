@@ -1,7 +1,7 @@
 /** @file paex_write_sine.c
-	@ingroup examples_src
-	@brief Play a sine wave for several seconds using the blocking API (Pa_WriteStream())
-	@author Ross Bencina <rossb@audiomulch.com>
+    @ingroup examples_src
+    @brief Play a sine wave for several seconds using the blocking API (Pa_WriteStream())
+    @author Ross Bencina <rossb@audiomulch.com>
     @author Phil Burk <philburk@softsynth.com>
 */
 /*
@@ -32,13 +32,13 @@
  */
 
 /*
- * The text above constitutes the entire PortAudio license; however, 
+ * The text above constitutes the entire PortAudio license; however,
  * the PortAudio community also makes the following non-binding requests:
  *
  * Any person wishing to distribute modifications to the Software is
  * requested to send the modifications to the original developer so that
- * they can be incorporated into the canonical version. It is also 
- * requested that these non-binding requests be included along with the 
+ * they can be incorporated into the canonical version. It is also
+ * requested that these non-binding requests be included along with the
  * license above.
  */
 
@@ -71,23 +71,23 @@ int main(void)
     int right_inc = 3; /* higher pitch so we can distinguish left and right. */
     int i, j, k;
     int bufferCount;
-    
+
     printf("PortAudio Test: output sine wave. SR = %d, BufSize = %d\n", SAMPLE_RATE, FRAMES_PER_BUFFER);
-    
+
     /* initialise sinusoidal wavetable */
     for( i=0; i<TABLE_SIZE; i++ )
     {
         sine[i] = (float) sin( ((double)i/(double)TABLE_SIZE) * M_PI * 2. );
     }
 
-    
+
     err = Pa_Initialize();
     if( err != paNoError ) goto error;
 
     outputParameters.device = Pa_GetDefaultOutputDevice(); /* default output device */
     if (outputParameters.device == paNoDevice) {
-      fprintf(stderr,"Error: No default output device.\n");
-      goto error;
+        fprintf(stderr,"Error: No default output device.\n");
+        goto error;
     }
     outputParameters.channelCount = 2;       /* stereo output */
     outputParameters.sampleFormat = paFloat32; /* 32 bit floating point output */
@@ -107,7 +107,7 @@ int main(void)
 
 
     printf( "Play 3 times, higher each time.\n" );
-    
+
     for( k=0; k < 3; ++k )
     {
         err = Pa_StartStream( stream );
@@ -131,7 +131,7 @@ int main(void)
 
             err = Pa_WriteStream( stream, buffer, FRAMES_PER_BUFFER );
             if( err != paNoError ) goto error;
-        }   
+        }
 
         err = Pa_StopStream( stream );
         if( err != paNoError ) goto error;
@@ -147,20 +147,20 @@ int main(void)
 
     Pa_Terminate();
     printf("Test finished.\n");
-    
+
     return err;
 
 error:
-    fprintf( stderr, "An error occured while using the portaudio stream\n" );
+    fprintf( stderr, "An error occurred while using the portaudio stream\n" );
     fprintf( stderr, "Error number: %d\n", err );
     fprintf( stderr, "Error message: %s\n", Pa_GetErrorText( err ) );
-	// Print more information about the error.
-	if( err == paUnanticipatedHostError )
-	{
-		const PaHostErrorInfo *hostErrorInfo = Pa_GetLastHostErrorInfo();
-		fprintf( stderr, "Host API error = #%ld, hostApiType = %d\n", hostErrorInfo->errorCode, hostErrorInfo->hostApiType );
-		fprintf( stderr, "Host API error = %s\n", hostErrorInfo->errorText );
-	}
+    // Print more information about the error.
+    if( err == paUnanticipatedHostError )
+    {
+        const PaHostErrorInfo *hostErrorInfo = Pa_GetLastHostErrorInfo();
+        fprintf( stderr, "Host API error = #%ld, hostApiType = %d\n", hostErrorInfo->errorCode, hostErrorInfo->hostApiType );
+        fprintf( stderr, "Host API error = %s\n", hostErrorInfo->errorText );
+    }
     Pa_Terminate();
     return err;
 }

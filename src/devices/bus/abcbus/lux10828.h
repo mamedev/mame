@@ -14,7 +14,6 @@
 #include "abcbus.h"
 #include "cpu/z80/z80.h"
 #include "machine/z80daisy.h"
-#include "formats/abc800_dsk.h"
 #include "imagedev/floppy.h"
 #include "machine/wd_fdc.h"
 #include "machine/z80pio.h"
@@ -58,13 +57,13 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// optional information overrides
-	virtual const tiny_rom_entry *device_rom_region() const override;
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual ioport_constructor device_input_ports() const override;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 
 	// device_abcbus_interface overrides
 	virtual void abcbus_cs(uint8_t data) override;
@@ -80,8 +79,8 @@ private:
 	uint8_t pio_pb_r();
 	void pio_pb_w(uint8_t data);
 
-	DECLARE_WRITE_LINE_MEMBER( fdc_intrq_w );
-	DECLARE_WRITE_LINE_MEMBER( fdc_drq_w );
+	void fdc_intrq_w(int state);
+	void fdc_drq_w(int state);
 
 	void ctrl_w(uint8_t data);
 	void status_w(uint8_t data);
@@ -90,25 +89,23 @@ private:
 
 	static void floppy_formats(format_registration &fr);
 
-	void luxor_55_10828_io(address_map &map);
-	void luxor_55_10828_mem(address_map &map);
+	void luxor_55_10828_io(address_map &map) ATTR_COLD;
+	void luxor_55_10828_mem(address_map &map) ATTR_COLD;
 
 	required_device<z80_device> m_maincpu;
 	required_device<z80pio_device> m_pio;
 	required_device<mb8876_device> m_fdc;
-	required_device<floppy_connector> m_floppy0;
-	required_device<floppy_connector> m_floppy1;
+	required_device_array<floppy_connector, 2> m_floppy;
 	required_ioport m_sw1;
 	required_ioport m_s1;
 
 	bool m_cs;              // card selected
-	uint8_t m_status;         // ABC BUS status
-	uint8_t m_data;           // ABC BUS data
+	uint8_t m_status;       // ABC BUS status
+	uint8_t m_data;         // ABC BUS data
 	bool m_fdc_irq;         // floppy interrupt
 	bool m_fdc_drq;         // floppy data request
 	int m_wait_enable;      // wait enable
-	int m_sel0;             // drive select 0
-	int m_sel1;             // drive select 1
+	uint8_t m_sel;          // drive select
 };
 
 

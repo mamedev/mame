@@ -7,9 +7,10 @@
 
 #include "emu.h"
 #include "cd90_640.h"
+#include "formats/sap_dsk.h"
 #include "formats/thom_dsk.h"
 
-DEFINE_DEVICE_TYPE(CD90_640, cd90_640_device, "cd90_640", "Thomson CD90-640 floppy drive controller")
+DEFINE_DEVICE_TYPE(CD90_640, cd90_640_device, "cd90_640", "Thomson CD 90-640 floppy drive controller")
 
 cd90_640_device::cd90_640_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, CD90_640, tag, owner, clock),
@@ -32,8 +33,8 @@ void cd90_640_device::rom_map(address_map &map)
 
 void cd90_640_device::io_map(address_map &map)
 {
-	map(0, 3).rw(m_fdc, FUNC(wd1770_device::read), FUNC(wd1770_device::write));
-	map(8, 8).rw(FUNC(cd90_640_device::control_r), FUNC(cd90_640_device::control_w));
+	map(0x10, 0x13).rw(m_fdc, FUNC(wd1770_device::read), FUNC(wd1770_device::write));
+	map(0x18, 0x18).rw(FUNC(cd90_640_device::control_r), FUNC(cd90_640_device::control_w));
 }
 
 const tiny_rom_entry *cd90_640_device::device_rom_region() const
@@ -43,18 +44,19 @@ const tiny_rom_entry *cd90_640_device::device_rom_region() const
 
 void cd90_640_device::floppy_drives(device_slot_interface &device)
 {
-	device.option_add("dd90_640", FLOPPY_525_DD);
+	device.option_add("dd90_320", FLOPPY_525_DD);
 }
 
 void cd90_640_device::floppy_formats(format_registration &fr)
 {
 	fr.add(FLOPPY_THOMSON_525_FORMAT);
+	fr.add(FLOPPY_SAP_FORMAT);
 }
 
 void cd90_640_device::device_add_mconfig(machine_config &config)
 {
 	WD1770(config, m_fdc, 8_MHz_XTAL);
-	FLOPPY_CONNECTOR(config, m_floppy[0], floppy_drives, "dd90_640", floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, m_floppy[0], floppy_drives, "dd90_320", floppy_formats).enable_sound(true);
 	FLOPPY_CONNECTOR(config, m_floppy[1], floppy_drives, nullptr,    floppy_formats).enable_sound(true);
 }
 

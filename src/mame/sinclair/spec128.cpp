@@ -168,7 +168,7 @@ void spectrum_128_state::video_start()
 {
 	spectrum_state::video_start();
 	m_screen_location = m_ram->pointer() + (5 << 14);
-	m_border4t_render_at = 6;
+	m_border4t_render_at = 3;
 }
 
 uint8_t spectrum_128_state::spectrum_128_pre_opcode_fetch_r(offs_t offset)
@@ -298,10 +298,11 @@ void spectrum_128_state::machine_start()
 	memory_region *rom = memregion("maincpu");
 	m_bank_rom[0]->configure_entries(0, 2, rom->base() + 0x10000, 0x4000);
 
+	auto ram_entries = m_ram->size() / 0x4000;
 	for (auto i = 1; i < 4; i++)
-		m_bank_ram[i]->configure_entries(0, m_ram->size() / 0x4000, m_ram->pointer(), 0x4000);
+		m_bank_ram[i]->configure_entries(0, ram_entries, m_ram->pointer(), 0x4000);
 
-	m_bank_ram[1]->set_entry(5); /* Bank 5 is always in 0x4000 - 0x7fff */
+	m_bank_ram[1]->set_entry(ram_entries > 5 ? 5 : (ram_entries - 1)); /* Bank 5 is always in 0x4000 - 0x7fff */
 	m_bank_ram[2]->set_entry(2); /* Bank 2 is always in 0x8000 - 0xbfff */
 }
 
@@ -352,9 +353,9 @@ void spectrum_128_state::spectrum_128(machine_config &config)
 	spectrum(config);
 
 	Z80(config.replace(), m_maincpu, X1_128_SINCLAIR / 10);
-	m_maincpu->set_addrmap(AS_PROGRAM, &spectrum_128_state::spectrum_128_mem);
-	m_maincpu->set_addrmap(AS_IO, &spectrum_128_state::spectrum_128_io);
-	m_maincpu->set_addrmap(AS_OPCODES, &spectrum_128_state::spectrum_128_fetch);
+	m_maincpu->set_memory_map(&spectrum_128_state::spectrum_128_mem);
+	m_maincpu->set_io_map(&spectrum_128_state::spectrum_128_io);
+	m_maincpu->set_m1_map(&spectrum_128_state::spectrum_128_fetch);
 	m_maincpu->set_vblank_int("screen", FUNC(spectrum_128_state::spec_interrupt));
 	m_maincpu->nomreq_cb().set(FUNC(spectrum_128_state::spectrum_nomreq));
 

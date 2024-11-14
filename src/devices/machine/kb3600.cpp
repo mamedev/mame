@@ -40,17 +40,17 @@ DEFINE_DEVICE_TYPE(AY3600, ay3600_device, "ay3600", "AY-5-3600 Keyboard Encoder"
 
 ay3600_device::ay3600_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, AY3600, tag, owner, clock),
-	m_read_x0(*this),
-	m_read_x1(*this),
-	m_read_x2(*this),
-	m_read_x3(*this),
-	m_read_x4(*this),
-	m_read_x5(*this),
-	m_read_x6(*this),
-	m_read_x7(*this),
-	m_read_x8(*this),
-	m_read_shift(*this),
-	m_read_control(*this),
+	m_read_x0(*this, 0),
+	m_read_x1(*this, 0),
+	m_read_x2(*this, 0),
+	m_read_x3(*this, 0),
+	m_read_x4(*this, 0),
+	m_read_x5(*this, 0),
+	m_read_x6(*this, 0),
+	m_read_x7(*this, 0),
+	m_read_x8(*this, 0),
+	m_read_shift(*this, 0),
+	m_read_control(*this, 0),
 	m_write_data_ready(*this),
 	m_write_ako(*this)
 {
@@ -66,21 +66,6 @@ ay3600_device::ay3600_device(const machine_config &mconfig, const char *tag, dev
 
 void ay3600_device::device_start()
 {
-	// resolve callbacks
-	m_read_x0.resolve_safe(0);
-	m_read_x1.resolve_safe(0);
-	m_read_x2.resolve_safe(0);
-	m_read_x3.resolve_safe(0);
-	m_read_x4.resolve_safe(0);
-	m_read_x5.resolve_safe(0);
-	m_read_x6.resolve_safe(0);
-	m_read_x7.resolve_safe(0);
-	m_read_x8.resolve_safe(0);
-	m_read_shift.resolve_safe(0);
-	m_read_control.resolve_safe(0);
-	m_write_data_ready.resolve_safe();
-	m_write_ako.resolve_safe();
-
 	// allocate timers
 	m_scan_timer = timer_alloc(FUNC(ay3600_device::perform_scan), this);
 	m_scan_timer->adjust(attotime::from_hz(60), 0, attotime::from_hz(60));

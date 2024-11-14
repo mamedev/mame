@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:R. Belmont, Acho A. Tang, Phil Stroffolino, Olivier Galibert
-#ifndef MAME_INCLUDES_KONAMIGX_H
-#define MAME_INCLUDES_KONAMIGX_H
+#ifndef MAME_KONAMI_KONAMIGX_H
+#define MAME_KONAMI_KONAMIGX_H
 
 #pragma once
 
@@ -13,7 +13,7 @@
 #include "sound/k054539.h"
 #include "k053246_k053247_k055673.h"
 #include "k053250.h"
-#include "k053936.h"
+#include "video/k053936.h"
 #include "k054156_k054157_k056832.h"
 #include "k054338.h"
 #include "k055555.h"
@@ -83,9 +83,9 @@ public:
 	void konamigx_tilebank_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 	void konamigx_t1_psacmap_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 	void konamigx_t4_psacmap_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
-	DECLARE_WRITE_LINE_MEMBER(vblank_irq_ack_w);
-	DECLARE_WRITE_LINE_MEMBER(hblank_irq_ack_w);
-	DECLARE_CUSTOM_INPUT_MEMBER(gx_rdport1_3_r);
+	void vblank_irq_ack_w(int state);
+	void hblank_irq_ack_w(int state);
+	ioport_value gx_rdport1_3_r();
 	void init_konamigx();
 	TILE_GET_INFO_MEMBER(get_gx_psac_tile_info);
 	TILE_GET_INFO_MEMBER(get_gx_psac3_tile_info);
@@ -110,7 +110,7 @@ public:
 	INTERRUPT_GEN_MEMBER(konamigx_type2_vblank_irq);
 	TIMER_DEVICE_CALLBACK_MEMBER(konamigx_type2_scanline);
 	TIMER_DEVICE_CALLBACK_MEMBER(konamigx_type4_scanline);
-	DECLARE_WRITE_LINE_MEMBER(k054539_irq_gen);
+	void k054539_irq_gen(int state);
 	TIMER_CALLBACK_MEMBER(dmaend_callback);
 	TIMER_CALLBACK_MEMBER(boothack_callback);
 	double adc0834_callback(uint8_t input);
@@ -187,14 +187,14 @@ public:
 	void tbyahhoo(machine_config &config);
 	void gokuparo(machine_config &config);
 	void sexyparo(machine_config &config);
-	void gx_base_memmap(address_map &map);
-	void racinfrc_map(address_map &map);
-	void gx_type1_map(address_map &map);
-	void gx_type2_map(address_map &map);
-	void gx_type3_map(address_map &map);
-	void gx_type4_map(address_map &map);
-	void gxsndmap(address_map &map);
-	void gxtmsmap(address_map &map);
+	void gx_base_memmap(address_map &map) ATTR_COLD;
+	void racinfrc_map(address_map &map) ATTR_COLD;
+	void gx_type1_map(address_map &map) ATTR_COLD;
+	void gx_type2_map(address_map &map) ATTR_COLD;
+	void gx_type3_map(address_map &map) ATTR_COLD;
+	void gx_type4_map(address_map &map) ATTR_COLD;
+	void gxsndmap(address_map &map) ATTR_COLD;
+	void gxtmsmap(address_map &map) ATTR_COLD;
 
 protected:
 	required_device<cpu_device> m_maincpu;
@@ -348,4 +348,4 @@ protected:
 #define GXSUB_5BPP      0x05    //  32 colors
 #define GXSUB_8BPP      0x08    // 256 colors
 
-#endif // MAME_INCLUDES_KONAMIGX_H
+#endif // MAME_KONAMI_KONAMIGX_H

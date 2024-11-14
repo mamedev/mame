@@ -111,7 +111,7 @@ void dragon_sprites_device::cts_write(offs_t offset, u8 data)
 }
 
 
-WRITE_LINE_MEMBER(dragon_sprites_device::nmi_w)
+void dragon_sprites_device::nmi_w(int state)
 {
 	// set the NMI line
 	set_line_value(line::NMI, state);

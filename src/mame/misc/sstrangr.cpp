@@ -333,6 +333,8 @@ TODO:
 #include "sstrangr.lh"
 
 
+namespace {
+
 class sstrangr_state : public driver_device
 {
 public:
@@ -349,7 +351,7 @@ public:
 	void sstrangr(machine_config &config);
 
 protected:
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -367,8 +369,8 @@ private:
 
 	uint32_t screen_update_sstrangr(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_sstrngr2(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	void sstrangr_io_map(address_map &map);
-	void sstrangr_map(address_map &map);
+	void sstrangr_io_map(address_map &map) ATTR_COLD;
+	void sstrangr_map(address_map &map) ATTR_COLD;
 };
 
 
@@ -684,6 +686,8 @@ ROM_START( sstrangr2 )
 	ROM_REGION( 0x0400, "proms", 0 )        // color maps player 1/player 2
 	ROM_LOAD( "2708.15",      0x0000, 0x0400, CRC(c176a89d) SHA1(955dd540dc3787091c3f34ae122a13e6b7523414) )
 ROM_END
+
+} // anonymous namespace
 
 
 GAMEL( 1978, sstrangr,  0,        sstrangr, sstrangr, sstrangr_state, empty_init, ROT270, "Yachiyo Electronics, Ltd.", "Space Stranger",   MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_sstrangr )

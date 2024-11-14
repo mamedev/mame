@@ -11,7 +11,7 @@
 ****************************************************************************/
 
 #include "emu.h"
-#include "cpu/m68000/m68000.h"
+#include "cpu/m68000/m68020.h"
 #include "machine/mc68681.h"
 #include "machine/msm58321.h"
 #include "machine/timer.h"
@@ -19,6 +19,9 @@
 #include "machine/68230pit.h"
 #include "bus/rs232/rs232.h"
 #include "softlist.h"
+
+
+namespace {
 
 #define MAINCPU_TAG "maincpu"
 #define DUART_A_TAG "duarta"
@@ -49,23 +52,23 @@ private:
 	required_device<pit68230_device> m_pit;
 	required_device<msm58321_device> m_rtc;
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
-	DECLARE_WRITE_LINE_MEMBER(m68k_reset_callback);
+	void m68k_reset_callback(int state);
 	u32 buserror_r();
 
 	TIMER_DEVICE_CALLBACK_MEMBER(micro20_timer);
-	DECLARE_WRITE_LINE_MEMBER(h4_w);
+	void h4_w(int state);
 	void portb_w(u8 data);
 	void portc_w(u8 data);
 
-	DECLARE_WRITE_LINE_MEMBER(timerirq_w)
+	void timerirq_w(int state)
 	{
 		m_maincpu->set_input_line(M68K_IRQ_4, state);
 	}
 
-	void micro20_map(address_map &map);
+	void micro20_map(address_map &map) ATTR_COLD;
 
 	u8 m_tin;
 	u8 m_h4;
@@ -84,8 +87,6 @@ void micro20_state::machine_reset()
 	pRAM[1] = pROM[3];
 	m_maincpu->reset();
 
-	m_maincpu->set_reset_callback(*this, FUNC(micro20_state::m68k_reset_callback));
-
 	m_tin = 0;
 }
 
@@ -98,13 +99,13 @@ TIMER_DEVICE_CALLBACK_MEMBER(micro20_state::micro20_timer)
 	m_tin ^= 1;
 }
 
-WRITE_LINE_MEMBER(micro20_state::h4_w)
+void micro20_state::h4_w(int state)
 {
 	printf("h4_w: %d\n", state);
 	m_h4 = state ^ 1;
 }
 
-WRITE_LINE_MEMBER(micro20_state::m68k_reset_callback)
+void micro20_state::m68k_reset_callback(int state)
 {
 	// startup test explicitly checks if the m68k RESET opcode resets the 68230
 	m_pit->reset();
@@ -168,6 +169,7 @@ void micro20_state::micro20(machine_config &config)
 	/* basic machine hardware */
 	M68020(config, m_maincpu, 16.67_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &micro20_state::micro20_map);
+	m_maincpu->reset_cb().set(FUNC(micro20_state::m68k_reset_callback));
 
 	mc68681_device &duart_a(MC68681(config, DUART_A_TAG, 3.6864_MHz_XTAL));
 	duart_a.a_tx_cb().set("rs232", FUNC(rs232_port_device::write_txd));
@@ -214,5 +216,8 @@ ROM_START( micro20 )
 	ROM_LOAD32_BYTE( "d16-23_u10_e5b0.bin", 0x000001, 0x010000, CRC(cd7acf86) SHA1(db994ed714a1079fbb66616355e8f18d2d1a2005) )
 	ROM_LOAD32_BYTE( "d24-31_u13_d115.bin", 0x000000, 0x010000, CRC(3646d943) SHA1(97ee54063e2fe49fef2ff68d0f2e39345a75eac5) )
 ROM_END
+
+} // anonymous namespace
+
 
 COMP( 1984, micro20, 0, 0, micro20, micro20, micro20_state, empty_init, "GMX", "Micro 20", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

@@ -34,13 +34,13 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// optional information overrides
-	virtual const tiny_rom_entry *device_rom_region() const override;
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual ioport_constructor device_input_ports() const override;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 
 	// device_s100_card_interface overrides
 	virtual uint8_t s100_smemr_r(offs_t offset) override;
@@ -50,8 +50,8 @@ protected:
 	virtual void s100_phantom_w(int state) override;
 
 private:
-	DECLARE_WRITE_LINE_MEMBER( fdc_intrq_w );
-	DECLARE_WRITE_LINE_MEMBER( fdc_drq_w );
+	void fdc_intrq_w(int state);
+	void fdc_drq_w(int state);
 
 	// internal state
 	required_device<mb8866_device> m_fdc;

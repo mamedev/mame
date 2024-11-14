@@ -201,6 +201,8 @@
 #include "tilemap.h"
 
 
+namespace {
+
 #define MASTER_CLOCK    XTAL(10'000'000)
 #define SND_CLOCK       XTAL(3'579'545)
 
@@ -232,10 +234,10 @@ private:
 	void counters_w(uint8_t data);
 	TILE_GET_INFO_MEMBER(get_tile_info);
 
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	void gluck2_map(address_map &map);
+	void gluck2_map(address_map &map) ATTR_COLD;
 };
 
 
@@ -547,6 +549,8 @@ ROM_START( gluck2 )
 	ROM_LOAD( "v2.u26",  0x0100, 0x0100, CRC(8da53489) SHA1(b90f5dd4bc5b64009e8bfad8f79f23d4020e537b) )
 	ROM_LOAD( "v3.u25",  0x0200, 0x0100, CRC(a4d2c9c3) SHA1(a799875b8b92391696419081244da2e56216e024) )
 ROM_END
+
+} // anonymous namespace
 
 
 /*********************************************

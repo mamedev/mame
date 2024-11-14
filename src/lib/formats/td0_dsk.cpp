@@ -2,7 +2,7 @@
 // copyright-holders:Miodrag Milanovic
 /*********************************************************************
 
-    formats/td0_dsk.c
+    formats/td0_dsk.cpp
 
     TD0 disk images
 
@@ -17,8 +17,10 @@
 #include "flopimg_legacy.h"
 
 #include "ioprocs.h"
+#include "multibyte.h"
 
 #include <cstring>
+#include <tuple>
 
 
 #define BUFSZ           512     // new input buffer
@@ -90,7 +92,7 @@ private:
 	uint8_t getlen;
 
 	int data_read(uint8_t *buf, uint16_t size);
-	int next_word();
+	int next_word(int needed);
 	int GetBit();
 	int GetByte();
 	void StartHuff();
@@ -174,7 +176,7 @@ static floperr_t get_offset(floppy_image_legacy *floppy, int head, int track, in
 		offs+= 6;
 		if ((header[4] & 0x30)==0) {
 			offs+= 2;
-			offs+= header[6] + (header[7]<<8);
+			offs+= get_u16le(&header[6]);
 		}
 	}
 	// read size of sector
@@ -213,7 +215,7 @@ static floperr_t internal_td0_read_sector(floppy_image_legacy *floppy, int head,
 
 	offset+=3;
 	// take data size
-	size = header[6] + (header[7]<<8)-1;
+	size = get_u16le(&header[6])-1;
 	// take real sector size
 	realsize =  1 << (header[3] + 7);
 
@@ -234,7 +236,7 @@ static floperr_t internal_td0_read_sector(floppy_image_legacy *floppy, int head,
 				//  - 2 bytes of data
 				//  data is reapeted specified number of times
 				while(buff_pos<realsize) {
-					for (i=0;i<data[data_pos]+(data[data_pos+1] << 8);i++) {
+					for (i=0;i<get_u16le(&data[data_pos]);i++) {
 						buf[buff_pos] = data[data_pos+2];buff_pos++;
 						buf[buff_pos] = data[data_pos+3];buff_pos++;
 					}
@@ -329,8 +331,7 @@ int td0dsk_t::data_read(uint8_t *buf, uint16_t size)
 	if (size > image_size - floppy_file_offset) {
 		size = image_size - floppy_file_offset;
 	}
-	size_t actual;
-	floppy_file.read_at(floppy_file_offset, buf, size, actual);
+	/*auto const [err, actual] =*/ read_at(floppy_file, floppy_file_offset, buf, size); // FIXME: check for errors and premature EOF
 	floppy_file_offset += size;
 	return size;
 }
@@ -412,16 +413,15 @@ static const uint8_t d_len[256] = {
 	0x08, 0x08, 0x08, 0x08, 0x08, 0x08, 0x08, 0x08,
 };
 
-int td0dsk_t::next_word()
+int td0dsk_t::next_word(int needed)
 {
-	if(tdctl.ibufndx >= tdctl.ibufcnt)
-	{
-		tdctl.ibufndx = 0;
-		tdctl.ibufcnt = data_read(tdctl.inbuf,BUFSZ);
-		if(tdctl.ibufcnt <= 0)
-			return(-1);
-	}
 	while (getlen <= 8) { // typically reads a word at a time
+		if(tdctl.ibufndx >= tdctl.ibufcnt) {
+			tdctl.ibufndx = 0;
+			tdctl.ibufcnt = data_read(tdctl.inbuf,BUFSZ);
+			if(tdctl.ibufcnt <= 0)
+				return(getlen >= needed ? 0 : -1);
+		}
 		getbuf |= tdctl.inbuf[tdctl.ibufndx++] << (8 - getlen);
 		getlen += 8;
 	}
@@ -432,7 +432,7 @@ int td0dsk_t::next_word()
 int td0dsk_t::GetBit()    /* get one bit */
 {
 	int16_t i;
-	if(next_word() < 0)
+	if(next_word(1) < 0)
 		return(-1);
 	i = getbuf;
 	getbuf <<= 1;
@@ -446,7 +446,7 @@ int td0dsk_t::GetBit()    /* get one bit */
 int td0dsk_t::GetByte()    /* get a byte */
 {
 	uint16_t i;
-	if(next_word() != 0)
+	if(next_word(8) != 0)
 		return(-1);
 	i = getbuf;
 	getbuf <<= 8;
@@ -643,7 +643,7 @@ int td0dsk_t::Decode(uint8_t *buf, int len)  /* Decoding/Uncompressing */
 				}
 				else {
 					if((pos = DecodePosition()) < 0)
-							return(count); // fatal error
+						return(count); // fatal error
 					tdctl.bufpos = (tdctl.r - pos - 1) & (N - 1);
 					tdctl.bufcnt = c - 255 + THRESHOLD;
 					tdctl.bufndx = 0;
@@ -732,7 +732,7 @@ FLOPPY_CONSTRUCT( td0_dsk_construct )
 	//  header len + comment header + comment len
 	position = 12;
 	if (header[7] & 0x80) {
-		position += 10 + header[14] + (header[15]<<8);
+		position += 10 + get_u16le(&header[14]);
 	}
 	tag->tracks = 0;
 	do {
@@ -753,7 +753,7 @@ FLOPPY_CONSTRUCT( td0_dsk_construct )
 					header = tag->data + position;
 					position+=2;
 					// skip sector data
-					position+= header[0] + (header[1]<<8);
+					position+= get_u16le(&header[0]);
 				}
 			}
 			tag->tracks++;
@@ -781,7 +781,7 @@ FLOPPY_DESTRUCT( td0_dsk_destruct )
 
 /*********************************************************************
 
-    formats/td0_dsk.h
+    formats/td0_dsk.cpp
 
     Teledisk disk images
 
@@ -793,27 +793,30 @@ td0_format::td0_format()
 {
 }
 
-const char *td0_format::name() const
+const char *td0_format::name() const noexcept
 {
 	return "td0";
 }
 
-const char *td0_format::description() const
+const char *td0_format::description() const noexcept
 {
 	return "Teledisk disk image";
 }
 
-const char *td0_format::extensions() const
+const char *td0_format::extensions() const noexcept
 {
 	return "td0";
 }
 
 int td0_format::identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants) const
 {
-	size_t actual;
 	uint8_t h[7];
+	auto const [err, actual] = read_at(io, 0, h, 7); // FIXME: does this need to read 7 bytes?  it only check 2 bytes.  Also check for premature EOF.
+	if(err)
+	{
+		return 0;
+	}
 
-	io.read_at(0, h, 7, actual);
 	if(((h[0] == 'T') && (h[1] == 'D')) || ((h[0] == 't') && (h[1] == 'd')))
 	{
 		return FIFID_SIGN;
@@ -821,8 +824,9 @@ int td0_format::identify(util::random_read &io, uint32_t form_factor, const std:
 	return 0;
 }
 
-bool td0_format::load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image) const
+bool td0_format::load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image &image) const
 {
+	std::error_condition err;
 	size_t actual;
 	int track_count = 0;
 	int head_count = 0;
@@ -830,9 +834,11 @@ bool td0_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 	int offset = 0;
 	const int max_size = 4*1024*1024; // 4MB ought to be large enough for any floppy
 	std::vector<uint8_t> imagebuf(max_size);
-	uint8_t header[12];
 
-	io.read_at(0, header, 12, actual);
+	uint8_t header[12];
+	std::tie(err, actual) = read_at(io, 0, header, 12);
+	if(err || (actual != 12))
+		return false;
 	head_count = header[9];
 
 	if(header[0] == 't')
@@ -841,18 +847,21 @@ bool td0_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 
 		disk_decode.init_Decode();
 		disk_decode.set_floppy_file_offset(12);
-		disk_decode.Decode(&imagebuf[0], max_size);
+		actual = disk_decode.Decode(&imagebuf[0], max_size);
 	}
 	else
 	{
 		uint64_t image_size;
 		if(io.length(image_size))
 			return false;
-		io.read_at(12, &imagebuf[0], image_size, actual);
+		std::tie(err, actual) = read_at(io, 12, &imagebuf[0], image_size - 12);
+		if(err || (actual != (image_size - 12)))
+			return false;
 	}
 
+	// skip optional comment section
 	if(header[7] & 0x80)
-		offset = 10 + imagebuf[2] + (imagebuf[3] << 8);
+		offset = 10 + get_u16le(&imagebuf[2]);
 
 	track_spt = imagebuf[offset];
 	if(track_spt == 255) // Empty file?
@@ -864,7 +873,7 @@ bool td0_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 			if((imagebuf[offset + 2] & 0x7f) == 2) // ?
 			{
 				if(head_count == 2)
-					image->set_variant(floppy_image::DSHD);
+					image.set_variant(floppy_image::DSHD);
 				else
 					return false; // single side hd?
 				break;
@@ -873,36 +882,36 @@ bool td0_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 			[[fallthrough]];
 		case 1:
 			if(head_count == 2)
-				image->set_variant(floppy_image::DSDD);
+				image.set_variant(floppy_image::DSDD);
 			else
-				image->set_variant(floppy_image::SSDD);
+				image.set_variant(floppy_image::SSDD);
 			break;
 		case 4:
 			if((imagebuf[offset + 2] & 0x7f) == 2) // ?
 			{
 				if(head_count == 2)
-					image->set_variant(floppy_image::DSHD);
+					image.set_variant(floppy_image::DSHD);
 				else
 					return false; // single side 3.5?
 				break;
 			} else
-				image->set_variant(floppy_image::SSDD);
+				image.set_variant(floppy_image::SSDD);
 			break; // FIXME: comment below says "no break" but this is a breal
 			/* no break */
 		case 3:
 			if(head_count == 2)
 			{
 				if(form_factor == floppy_image::FF_525)
-					image->set_variant(floppy_image::DSQD);
+					image.set_variant(floppy_image::DSQD);
 				else
-					image->set_variant(floppy_image::DSDD);
+					image.set_variant(floppy_image::DSDD);
 			}
 			else
 			{
 				if(form_factor == floppy_image::FF_525)
-					image->set_variant(floppy_image::SSQD);
+					image.set_variant(floppy_image::SSQD);
 				else
-					return false; // single side 3.5?
+					image.set_variant(floppy_image::SSDD);
 			}
 			break;
 		case 5:
@@ -918,6 +927,9 @@ bool td0_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 
 	while(track_spt != 255)
 	{
+		if(actual < offset + 4)
+			return false;
+
 		desc_pc_sector sects[256];
 		uint8_t sect_data[65536];
 		int sdatapos = 0;
@@ -927,6 +939,9 @@ bool td0_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 		offset += 4;
 		for(int i = 0; i < track_spt; i++)
 		{
+			if(actual < offset + 6)
+				return false;
+
 			uint8_t *hs = &imagebuf[offset];
 			uint16_t size;
 			offset += 6;
@@ -943,6 +958,8 @@ bool td0_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 			else
 			{
 				offset += 3;
+				if(actual < offset)
+					return false;
 				size = 128 << hs[3];
 				int j, k;
 				switch(hs[8])
@@ -950,12 +967,16 @@ bool td0_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 					default:
 						return false;
 					case 0:
+						if(actual < offset + size)
+							return false;
 						memcpy(&sect_data[sdatapos], &imagebuf[offset], size);
 						offset += size;
 						break;
 					case 1:
 						offset += 4;
-						k = (hs[9] + (hs[10] << 8)) * 2;
+						if(actual < offset)
+							return false;
+						k = get_u16le(&hs[9]) * 2;
 						k = (k <= size) ? k : size;
 						for(j = 0; j < k; j += 2)
 						{
@@ -969,11 +990,15 @@ bool td0_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 						k = 0;
 						while(k < size)
 						{
+							if(actual < offset + 2)
+								return false;
 							uint16_t len = imagebuf[offset];
 							uint16_t rep = imagebuf[offset + 1];
 							offset += 2;
 							if(!len)
 							{
+								if(actual < offset + rep)
+									return false;
 								memcpy(&sect_data[sdatapos + k], &imagebuf[offset], rep);
 								offset += rep;
 								k += rep;
@@ -981,6 +1006,8 @@ bool td0_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 							else
 							{
 								len = (1 << len);
+								if(actual < offset + len)
+									return false;
 								rep = len * rep;
 								rep = ((rep + k) <= size) ? rep : (size - k);
 								for(j = 0; j < rep; j += len)
@@ -1010,20 +1037,22 @@ bool td0_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 		else
 			build_pc_track_mfm(track, head, image, base_cell_count*2, track_spt, sects, calc_default_pc_gap3_size(form_factor, sects[0].actual_size));
 
+		if(actual <= offset)
+			return false;
 		track_spt = imagebuf[offset];
 	}
 	if((track_count > 50) && (form_factor == floppy_image::FF_525)) // ?
 	{
-		if(image->get_variant() == floppy_image::DSDD)
-			image->set_variant(floppy_image::DSQD);
-		else if(image->get_variant() == floppy_image::SSDD)
-			image->set_variant(floppy_image::SSQD);
+		if(image.get_variant() == floppy_image::DSDD)
+			image.set_variant(floppy_image::DSQD);
+		else if(image.get_variant() == floppy_image::SSDD)
+			image.set_variant(floppy_image::SSQD);
 	}
 	return true;
 }
 
 
-bool td0_format::supports_save() const
+bool td0_format::supports_save() const noexcept
 {
 	return false;
 }

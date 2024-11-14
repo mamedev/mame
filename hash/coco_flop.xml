@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <!--
-license:CC0
+license:CC0-1.0
 -->
 
 <softwarelist name="coco_flop" description="Tandy Radio Shack Color Computer disk images">
@@ -1953,6 +1953,20 @@ license:CC0
 		<part name="flop0" interface="floppy_5_25">
 			<dataarea name="flop" size="161280">
 				<rom name="coco max ii (1985)(colorware)[m input selection][p].dsk" size="161280" crc="92725c9c" sha1="a02867e80563f243dd632e8c4e4a459b17869e50" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="zonx">
+		<description>Zonx (The Rainbow)</description>
+		<year>1985</year>
+		<publisher>Falsoft</publisher>
+		<info name="author" value="David Billen" />
+		<info name="usage" value="LOADM&quot;ZONX&quot;:EXEC" />
+		<sharedfeat name="compatibility" value="COCO,COCO3" />
+		<part name="flop0" interface="floppy_5_25">
+			<dataarea name="flop" size="161280">
+				<rom name="ZONX.DSK" size="161280" crc="da6a8b6c" sha1="fdd3ef04a6e2fcc854a467ae735f2af43c838af2" />
 			</dataarea>
 		</part>
 	</software>

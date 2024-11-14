@@ -8,7 +8,6 @@
 
 #include "cpu/m6502/m6502.h"
 #include "cpu/t11/t11.h"
-#include "machine/bankdev.h"
 #include "machine/gen_latch.h"
 #include "slapstic.h"
 #include "machine/timer.h"
@@ -63,10 +62,9 @@ public:
 	void csprint(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void device_post_load() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	void update_interrupts();
@@ -127,11 +125,7 @@ private:
 	void int_enable_w(uint8_t data);
 	INTERRUPT_GEN_MEMBER(sound_irq_gen);
 	void sound_irq_ack_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(boost_interleave_hack);
 	void bankselect_w(offs_t offset, uint16_t data);
-	uint16_t switch_r();
-	uint8_t switch_6502_r();
-	void switch_6502_w(uint8_t data);
 	uint8_t leta_r(offs_t offset);
 	void mixer_w(uint8_t data);
 	void sndrst_6502_w(uint8_t data);
@@ -141,13 +135,14 @@ private:
 	void tms5220_w(uint8_t data);
 	void tms5220_strobe_w(offs_t offset, uint8_t data);
 	void coincount_w(uint8_t data);
+	void switch_6502_w(uint8_t data);
 
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline_update);
 
 	TILE_GET_INFO_MEMBER(get_alpha_tile_info);
 	TILE_GET_INFO_MEMBER(get_playfield_tile_info);
 	uint32_t screen_update_atarisy2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_WRITE_LINE_MEMBER(vblank_int);
+	void vblank_int(int state);
 	TIMER_CALLBACK_MEMBER(delayed_int_enable_w);
 	TIMER_CALLBACK_MEMBER(reset_yscroll_callback);
 	void yscroll_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
@@ -158,6 +153,6 @@ private:
 	static rgb_t RRRRGGGGBBBBIIII(uint32_t raw);
 
 	static const atari_motion_objects_config s_mob_config;
-	void main_map(address_map &map);
-	void sound_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
+	void sound_map(address_map &map) ATTR_COLD;
 };

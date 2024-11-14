@@ -18,6 +18,7 @@
 //
 
 NETLIST_START(tankbatt)
+{
 
 	SOLVER(Solver, 48000)
 	ANALOG_INPUT(V5, 5)
@@ -161,4 +162,4 @@ NETLIST_START(tankbatt)
 	//NET_C(R56_2.2, R59.2)
 	NET_C(R35.2, R36.2, R56_1.2, R56_2.2, R59.2)
 	//NET_C(R41.2, GND)
-NETLIST_END()
+}

@@ -6,7 +6,6 @@
 
 **********************************************************************/
 
-
 #ifndef MAME_BUS_BBC_FDC_SOLIDISK_H
 #define MAME_BUS_BBC_FDC_SOLIDISK_H
 
@@ -16,8 +15,6 @@
 #include "machine/i8271.h"
 #include "imagedev/floppy.h"
 #include "machine/wd_fdc.h"
-#include "formats/acorn_dsk.h"
-#include "formats/fsd_dsk.h"
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -35,8 +32,8 @@ protected:
 	// construction/destruction
 	bbc_stlfdc_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_WRITE_LINE_MEMBER(motor_w);
-	DECLARE_WRITE_LINE_MEMBER(side_w);
+	void motor_w(int state);
+	void side_w(int state);
 
 	required_device<wd1770_device> m_wd1770;
 	optional_device<i8271_device> m_i8271;
@@ -54,7 +51,7 @@ protected:
 	bbc_stl1770_1_device(const machine_config& mconfig, device_type type, const char* tag, device_t* owner, uint32_t clock);
 
 	// device-level overrides
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 	virtual void device_add_mconfig(machine_config& config) override;
 	virtual const tiny_rom_entry* device_rom_region() const override;
@@ -73,7 +70,7 @@ protected:
 	bbc_stl1770_2_device(const machine_config& mconfig, device_type type, const char* tag, device_t* owner, uint32_t clock);
 
 	// device-level overrides
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 	virtual void device_add_mconfig(machine_config& config) override;
 	virtual const tiny_rom_entry* device_rom_region() const override;
@@ -91,13 +88,13 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// optional information overrides
 	virtual void device_add_mconfig(machine_config& config) override;
 	virtual const tiny_rom_entry* device_rom_region() const override;
-	virtual ioport_constructor device_input_ports() const override;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 
 	virtual uint8_t read(offs_t offset) override;
 	virtual void write(offs_t offset, uint8_t data) override;

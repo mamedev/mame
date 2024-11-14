@@ -42,24 +42,23 @@ public:
 	auto rs232_conn_txd_handler() { return m_rs232_conn_txd_handler.bind(); }
 	auto rs232_conn_dtr_handler() { return m_rs232_conn_dtr_handler.bind(); }
 	auto rs232_conn_rts_handler() { return m_rs232_conn_rts_handler.bind(); }
-	DECLARE_WRITE_LINE_MEMBER(rs232_conn_dcd_w);
-	DECLARE_WRITE_LINE_MEMBER(rs232_conn_dsr_w);
-	DECLARE_WRITE_LINE_MEMBER(rs232_conn_ri_w);
-	DECLARE_WRITE_LINE_MEMBER(rs232_conn_cts_w);
-	DECLARE_WRITE_LINE_MEMBER(rs232_conn_rxd_w);
+	void rs232_conn_dcd_w(int state);
+	void rs232_conn_dsr_w(int state);
+	void rs232_conn_ri_w(int state);
+	void rs232_conn_cts_w(int state);
+	void rs232_conn_rxd_w(int state);
 
-	DECLARE_WRITE_LINE_MEMBER(update_serial);
+	void update_serial(int state);
 
 protected:
 	ie15_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual void device_resolve_objects() override;
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual ioport_constructor device_input_ports() const override;
-	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 
 	TIMER_CALLBACK_MEMBER(hblank_onoff_tick);
 
@@ -76,7 +75,7 @@ private:
 	void ie15core(machine_config &config);
 
 	void kbd_put(uint16_t data);
-	DECLARE_WRITE_LINE_MEMBER(kbd_sdv);
+	void kbd_sdv(int state);
 	void mem_w(uint8_t data);
 	uint8_t mem_r();
 	void mem_addr_lo_w(uint8_t data);
@@ -101,8 +100,8 @@ private:
 	void serial_speed_w(uint8_t data);
 	TIMER_CALLBACK_MEMBER(ie15_beepoff);
 
-	void ie15_io(address_map &map);
-	void ie15_mem(address_map &map);
+	void ie15_io(address_map &map) ATTR_COLD;
+	void ie15_mem(address_map &map) ATTR_COLD;
 
 	std::unique_ptr<uint32_t[]> m_tmpbmp;
 

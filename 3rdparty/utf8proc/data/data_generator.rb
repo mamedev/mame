@@ -67,7 +67,7 @@
 #  authorization of the copyright holder.
 
 
-$ignorable_list = File.read("DerivedCoreProperties.txt")[/# Derived Property: Default_Ignorable_Code_Point.*?# Total code points:/m]
+$ignorable_list = File.read("DerivedCoreProperties.txt", :encoding => 'utf-8')[/# Derived Property: Default_Ignorable_Code_Point.*?# Total code points:/m]
 $ignorable = []
 $ignorable_list.each_line do |entry|
   if entry =~ /^([0-9A-F]+)\.\.([0-9A-F]+)/
@@ -77,7 +77,7 @@ $ignorable_list.each_line do |entry|
   end
 end
 
-$uppercase_list = File.read("DerivedCoreProperties.txt")[/# Derived Property: Uppercase.*?# Total code points:/m]
+$uppercase_list = File.read("DerivedCoreProperties.txt", :encoding => 'utf-8')[/# Derived Property: Uppercase.*?# Total code points:/m]
 $uppercase = []
 $uppercase_list.each_line do |entry|
   if entry =~ /^([0-9A-F]+)\.\.([0-9A-F]+)/
@@ -87,7 +87,7 @@ $uppercase_list.each_line do |entry|
   end
 end
 
-$lowercase_list = File.read("DerivedCoreProperties.txt")[/# Derived Property: Lowercase.*?# Total code points:/m]
+$lowercase_list = File.read("DerivedCoreProperties.txt", :encoding => 'utf-8')[/# Derived Property: Lowercase.*?# Total code points:/m]
 $lowercase = []
 $lowercase_list.each_line do |entry|
   if entry =~ /^([0-9A-F]+)\.\.([0-9A-F]+)/
@@ -97,7 +97,33 @@ $lowercase_list.each_line do |entry|
   end
 end
 
-$grapheme_boundclass_list = File.read("GraphemeBreakProperty.txt")
+$icb_linker_list = File.read("DerivedCoreProperties.txt", :encoding => 'utf-8')[/# Indic_Conjunct_Break=Linker.*?# Total code points:/m]
+$icb = Hash.new("UTF8PROC_INDIC_CONJUNCT_BREAK_NONE")
+$icb_linker_list.each_line do |entry|
+  if entry =~ /^([0-9A-F]+)\.\.([0-9A-F]+)/
+    $1.hex.upto($2.hex) { |e2| $icb[e2] = "UTF8PROC_INDIC_CONJUNCT_BREAK_LINKER" }
+  elsif entry =~ /^[0-9A-F]+/
+    $icb[$&.hex] = "UTF8PROC_INDIC_CONJUNCT_BREAK_LINKER"
+  end
+end
+$icb_consonant_list = File.read("DerivedCoreProperties.txt", :encoding => 'utf-8')[/# Indic_Conjunct_Break=Consonant.*?# Total code points:/m]
+$icb_consonant_list.each_line do |entry|
+  if entry =~ /^([0-9A-F]+)\.\.([0-9A-F]+)/
+    $1.hex.upto($2.hex) { |e2| $icb[e2] = "UTF8PROC_INDIC_CONJUNCT_BREAK_CONSONANT" }
+  elsif entry =~ /^[0-9A-F]+/
+    $icb[$&.hex] = "UTF8PROC_INDIC_CONJUNCT_BREAK_CONSONANT"
+  end
+end
+$icb_extend_list = File.read("DerivedCoreProperties.txt", :encoding => 'utf-8')[/# Indic_Conjunct_Break=Extend.*?# Total code points:/m]
+$icb_extend_list.each_line do |entry|
+  if entry =~ /^([0-9A-F]+)\.\.([0-9A-F]+)/
+    $1.hex.upto($2.hex) { |e2| $icb[e2] = "UTF8PROC_INDIC_CONJUNCT_BREAK_EXTEND" }
+  elsif entry =~ /^[0-9A-F]+/
+    $icb[$&.hex] = "UTF8PROC_INDIC_CONJUNCT_BREAK_EXTEND"
+  end
+end
+
+$grapheme_boundclass_list = File.read("GraphemeBreakProperty.txt", :encoding => 'utf-8')
 $grapheme_boundclass = Hash.new("UTF8PROC_BOUNDCLASS_OTHER")
 $grapheme_boundclass_list.each_line do |entry|
   if entry =~ /^([0-9A-F]+)\.\.([0-9A-F]+)\s*;\s*([A-Za-z_]+)/
@@ -107,7 +133,7 @@ $grapheme_boundclass_list.each_line do |entry|
   end
 end
 
-$emoji_data_list = File.read("emoji-data.txt")
+$emoji_data_list = File.read("emoji-data.txt", :encoding => 'utf-8')
 $emoji_data_list.each_line do |entry|
   if entry =~ /^([0-9A-F]+)\.\.([0-9A-F]+)\s*;\s*Extended_Pictographic\W/
     $1.hex.upto($2.hex) { |e2| $grapheme_boundclass[e2] = "UTF8PROC_BOUNDCLASS_EXTENDED_PICTOGRAPHIC" }
@@ -120,7 +146,7 @@ $emoji_data_list.each_line do |entry|
   end
 end
 
-$charwidth_list = File.read("CharWidths.txt")
+$charwidth_list = File.read("CharWidths.txt", :encoding => 'utf-8')
 $charwidth = Hash.new(0)
 $charwidth_list.each_line do |entry|
   if entry =~ /^([0-9A-F]+)\.\.([0-9A-F]+)\s*;\s*([0-9]+)/
@@ -130,13 +156,13 @@ $charwidth_list.each_line do |entry|
   end
 end
 
-$exclusions = File.read("CompositionExclusions.txt")[/# \(1\) Script Specifics.*?# Total code points:/m]
+$exclusions = File.read("CompositionExclusions.txt", :encoding => 'utf-8')[/# \(1\) Script Specifics.*?# Total code points:/m]
 $exclusions = $exclusions.chomp.split("\n").collect { |e| e.hex }
 
-$excl_version = File.read("CompositionExclusions.txt")[/# \(2\) Post Composition Version precomposed characters.*?# Total code points:/m]
+$excl_version = File.read("CompositionExclusions.txt", :encoding => 'utf-8')[/# \(2\) Post Composition Version precomposed characters.*?# Total code points:/m]
 $excl_version = $excl_version.chomp.split("\n").collect { |e| e.hex }
 
-$case_folding_string = File.open("CaseFolding.txt", :encoding => 'utf-8').read
+$case_folding_string = File.read("CaseFolding.txt", :encoding => 'utf-8')
 $case_folding = {}
 $case_folding_string.chomp.split("\n").each do |line|
   next unless line =~ /([0-9A-F]+); [CF]; ([0-9A-F ]+);/i
@@ -174,13 +200,13 @@ def cpary2c(array)
   return "UINT16_MAX" if array.nil? || array.length == 0
   lencode = array.length - 1 #no sequence has len 0, so we encode len 1 as 0, len 2 as 1, ...
   array = cpary2utf16encoded(array)
-  if lencode >= 7 #we have only 3 bits for the length (which is already cutting it close. might need to change it to 2 bits in future Unicode versions)
+  if lencode >= 3 #we have only 2 bits for the length
     array = [lencode] + array
-    lencode = 7
+    lencode = 3
   end
   idx = pushary(array)
-  raise "Array index out of bound" if idx > 0x1FFF
-  return "#{idx | (lencode << 13)}"
+  raise "Array index out of bound" if idx > 0x3FFF
+  return "#{idx | (lencode << 14)}"
 end
 def singlecpmap(cp)
   return "UINT16_MAX" if cp == nil
@@ -249,7 +275,8 @@ class UnicodeChar
     "#{$ignorable.include?(code)}, " <<
     "#{%W[Zl Zp Cc Cf].include?(category) and not [0x200C, 0x200D].include?(category)}, " <<
     "#{$charwidth[code]}, 0, " <<
-    "#{$grapheme_boundclass[code]}},\n"
+    "#{$grapheme_boundclass[code]}, " <<
+    "#{$icb[code]}},\n"
   end
 end
 
@@ -415,7 +442,7 @@ end
 $stdout << "};\n\n"
 
 $stdout << "static const utf8proc_property_t utf8proc_properties[] = {\n"
-$stdout << "  {0, 0, 0, 0, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX,  false,false,false,false, 1, 0, UTF8PROC_BOUNDCLASS_OTHER},\n"
+$stdout << "  {0, 0, 0, 0, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX,  false,false,false,false, 1, 0, UTF8PROC_BOUNDCLASS_OTHER, UTF8PROC_INDIC_CONJUNCT_BREAK_NONE},\n"
 properties.each { |line|
   $stdout << line
 }

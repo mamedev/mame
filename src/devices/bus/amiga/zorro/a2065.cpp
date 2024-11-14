@@ -105,7 +105,7 @@ void a2065_device::autoconfig_base_address(offs_t address)
 	m_slot->cfgout_w(0);
 }
 
-WRITE_LINE_MEMBER( a2065_device::cfgin_w )
+void a2065_device::cfgin_w(int state)
 {
 	LOG("%s: configin_w (%d)\n", shortname(), state);
 
@@ -158,7 +158,7 @@ void a2065_device::lance_ram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 	COMBINE_DATA(&m_ram[offset]);
 }
 
-WRITE_LINE_MEMBER( a2065_device::lance_irq_w )
+void a2065_device::lance_irq_w(int state)
 {
 	// default is irq 2, can be changed via jumper
 	m_slot->int2_w(!state);

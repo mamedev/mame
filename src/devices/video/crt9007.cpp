@@ -476,29 +476,6 @@ crt9007_device::crt9007_device(const machine_config &mconfig, const char *tag, d
 
 
 //-------------------------------------------------
-//  device_resolve_objects - resolve objects that
-//  may be needed for other devices to set
-//  initial conditions at start time
-//-------------------------------------------------
-
-void crt9007_device::device_resolve_objects()
-{
-	// resolve callbacks
-	m_write_int.resolve_safe();
-	m_write_dmar.resolve_safe();
-	m_write_hs.resolve_safe();
-	m_write_vs.resolve_safe();
-	m_write_vlt.resolve_safe();
-	m_write_curs.resolve_safe();
-	m_write_drb.resolve_safe();
-	m_write_wben.resolve_safe();
-	m_write_cblank.resolve_safe();
-	m_write_slg.resolve_safe();
-	m_write_sld.resolve_safe();
-}
-
-
-//-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
 
@@ -972,4 +949,14 @@ void crt9007_device::set_character_width(unsigned value)
 
 	if (started())
 		recompute_parameters();
+}
+
+
+//-------------------------------------------------
+//  cursor_active - is cursor active at location
+//-------------------------------------------------
+
+bool crt9007_device::cursor_active(unsigned x, unsigned y)
+{
+	return (x == HORIZONTAL_CURSOR && y == VERTICAL_CURSOR);
 }

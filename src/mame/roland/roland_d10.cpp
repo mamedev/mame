@@ -27,6 +27,9 @@
 #include "emupal.h"
 #include "screen.h"
 
+
+namespace {
+
 static INPUT_PORTS_START( d10 )
 INPUT_PORTS_END
 
@@ -70,8 +73,8 @@ public:
 	void d110(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	void bank_w(uint8_t data);
@@ -88,10 +91,10 @@ private:
 	void d10_palette(palette_device &palette) const;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void d10_map(address_map &map);
-	void d10_bank_map(address_map &map);
-	void d110_map(address_map &map);
-	void d110_bank_map(address_map &map);
+	void d10_map(address_map &map) ATTR_COLD;
+	void d10_bank_map(address_map &map) ATTR_COLD;
+	void d110_map(address_map &map) ATTR_COLD;
+	void d110_bank_map(address_map &map) ATTR_COLD;
 
 	uint8_t  m_lcd_data_buffer[256]{};
 	int      m_lcd_data_buffer_pos = 0;
@@ -366,6 +369,9 @@ ROM_START( d110 )
 	ROM_REGION( 0x8000, "boss", 0 )
 	ROM_LOAD(  "r15179879.ic6.bin",            0,   0x8000, CRC(5d34174e) SHA1(17bd2887711c5c5458aba6d3be5972b2096eb450) )
 ROM_END
+
+} // anonymous namespace
+
 
 SYST( 1988, d10,  0,   0, d10,  d10,  roland_d10_state, empty_init, "Roland", "D-10 Multi Timbral Linear Synthesizer", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 SYST( 1988, d110, d10, 0, d110, d110, roland_d10_state, empty_init, "Roland", "D-110 Multi Timbral Sound Module",      MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

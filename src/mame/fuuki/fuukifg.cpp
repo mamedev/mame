@@ -1,7 +1,6 @@
 // license:BSD-3-Clause
-// copyright-holders:Luca Elia, David Haywood
-/*
-*/
+// copyright-holders: Luca Elia, David Haywood
+
 
 #include "emu.h"
 #include "fuukifg.h"
@@ -23,7 +22,7 @@ fuukivid_device::fuukivid_device(const machine_config &mconfig, const char *tag,
 
 void fuukivid_device::device_start()
 {
-	/* 16x16x4 */
+	// 16x16x4
 	gfx_layout layout_16x16x4 =
 	{
 		16,16,
@@ -40,10 +39,6 @@ void fuukivid_device::device_start()
 	m_colpri_cb.resolve();
 
 	set_gfx(0, std::make_unique<gfx_element>(&palette(), layout_16x16x4, m_gfx_region->base(), 0, m_colnum, m_colbase));
-}
-
-void fuukivid_device::device_reset()
-{
 }
 
 
@@ -96,7 +91,7 @@ void fuukivid_device::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, 
 	if (priority)             { start = size - 4; end =   -4; inc = -4; }
 	else                      { start =        0; end = size; inc = +4; }
 
-	/* Draw them backwards, for pdrawgfx */
+	// Draw them backwards, for pdrawgfx
 	for (int offs = start; offs != end; offs += inc)
 	{
 		const u16 data0 = spriteram[offs + 0];
@@ -146,14 +141,14 @@ void fuukivid_device::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, 
 				if (priority)
 				{
 					if (xzoom == (16*8) && yzoom == (16*8))
-						gfx(0)->prio_transpen(bitmap,spriteclip,
+						gfx(0)->prio_transpen(bitmap, spriteclip,
 										code++,
 										colour,
 										flipx, flipy,
 										sx + x * 16, sy + y * 16,
 										screen.priority(), pri_mask, 15);
 					else
-						gfx(0)->prio_zoom_transpen(bitmap,spriteclip,
+						gfx(0)->prio_zoom_transpen(bitmap, spriteclip,
 										code++,
 										colour,
 										flipx, flipy,
@@ -164,14 +159,14 @@ void fuukivid_device::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, 
 				else
 				{
 					if (xzoom == (16*8) && yzoom == (16*8))
-						gfx(0)->transpen(bitmap,spriteclip,
+						gfx(0)->transpen(bitmap, spriteclip,
 										code++,
 										colour,
 										flipx, flipy,
 										sx + x * 16, sy + y * 16,
 										15);
 					else
-						gfx(0)->zoom_transpen(bitmap,spriteclip,
+						gfx(0)->zoom_transpen(bitmap, spriteclip,
 										code++,
 										colour,
 										flipx, flipy,

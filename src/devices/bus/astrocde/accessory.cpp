@@ -66,8 +66,6 @@ void astrocade_accessory_port_device::device_resolve_objects()
 	m_device = get_card_device();
 	if (m_device)
 		m_device->set_screen(m_screen);
-
-	m_ltpen_handler.resolve_safe();
 }
 
 void astrocade_accessory_port_device::device_start()

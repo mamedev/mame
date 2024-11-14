@@ -56,7 +56,7 @@ public:
 	void init_1() { m_game = 1; }
 
 private:
-	DECLARE_WRITE_LINE_MEMBER(reset2_w) { m_audiocpu->reset(); }
+	void reset2_w(int state) { m_audiocpu->reset(); }
 	void ckdis_w(u8);
 	void cdig_w(u8);
 	void cdriv_w(offs_t, u8);
@@ -64,16 +64,16 @@ private:
 	u8 csw1_r();
 	u8 csw2_r();
 
-	void audiocpu_io(address_map &map);
-	void audiocpu_map(address_map &map);
-	void maincpu_io(address_map &map);
-	void maincpu_map(address_map &map);
+	void audiocpu_io(address_map &map) ATTR_COLD;
+	void audiocpu_map(address_map &map) ATTR_COLD;
+	void maincpu_io(address_map &map) ATTR_COLD;
+	void maincpu_map(address_map &map) ATTR_COLD;
 	u8 m_segment[5]{};
 	u8 m_game = 0U;
 	u8 m_row = 0U;
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 	required_device<z80_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_device<z80ctc_device> m_ctc;
@@ -98,7 +98,7 @@ void stargame_state::maincpu_io(address_map &map)
 	map(0x20, 0x2f).r(FUNC(stargame_state::csw2_r)).w(FUNC(stargame_state::csw2_w)); // CSW2 - input lines (spcship), output lines (whtforce)
 	map(0x30, 0x3f).r(FUNC(stargame_state::csw1_r)); // CSW1 - input lines
 	map(0x40, 0x4f).w(FUNC(stargame_state::cdig_w)); // CDIG - score display
-	map(0x50, 0x57).mirror(0x08).w(FUNC(stargame_state::cdriv_w));; // CDRIV - lamps and solenoids
+	map(0x50, 0x57).mirror(0x08).w(FUNC(stargame_state::cdriv_w)); // CDRIV - lamps and solenoids
 	map(0x60, 0x67).mirror(0x08).w("mainlatch", FUNC(ls259_device::write_d0)); // CPOR
 	map(0x68, 0x68).mirror(0x06).w(FUNC(stargame_state::ckdis_w)); // 68=CKDIS (sch has 68 and 69 the wrong way around)
 	map(0x69, 0x69).mirror(0x06); // 69=CKPRI (not used?)

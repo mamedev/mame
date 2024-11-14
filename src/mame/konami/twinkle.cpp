@@ -18,12 +18,14 @@ The SPU has an IRQ2 handler that doesn't do anything, find out if or to what it 
 
 
 Konami Twinkle Hardware Overview
-Konami 1999-2002
+Konami 1997-2002
 
 The following games are known to exist on this hardware (there may be more)
                                                                   Video CD      Security
 Game Title                            Year     Program CD       6/7/8 use DVD   Dongle      HDD label
 -----------------------------------------------------------------------------------------------------
+Ugoke! Purimucho                      1997     GQ751?           (not used)     ?           (not used)
+
 beatmania IIDX (English)              1999     GQ863 A01        GQ863 A04      863 A02!    863 HDD A01
 beatmania IIDX (Japanese)             1999     GQ863-JA B01     GQ863 A04      863 A02!    863 HDD A01
 beatmania IIDX + DDR Club Kit         1999     896 JA ABM       GQ863 A04      863 A02!    863 HDD A01
@@ -256,31 +258,43 @@ Notes:
       863A05.2X- 27C4096 EPROM (DIP40)
 
 
+Ugoke! Purimucho notes:
+Ugoke! Purimucho's schematic shows TWINKLE/SUB GQ751PWB(B1) as the subboard instead of the SUB2 used by beatmania IIDX
+"VENDER GQ751PWB(C2)" for vendor box hardware
+Has an LCD with a touch panel overlayed on it
+Also includes a camera and printer (Mitsubishi CP700A, used to print pictures for keyholders)
+
 */
 
 #include "emu.h"
-#include "cpu/psx/psx.h"
-#include "cpu/m68000/m68000.h"
-#include "video/psx.h"
+
 #include "bus/ata/ataintf.h"
-#include "bus/scsi/scsi.h"
-#include "bus/scsi/scsicd.h"
+#include "bus/nscsi/cd.h"
 #include "bus/rs232/xvd701.h"
-#include "machine/am53cf96.h"
+#include "cpu/m68000/m68000.h"
+#include "cpu/psx/psx.h"
 #include "machine/fdc37c665gt.h"
 #include "machine/i2cmem.h"
 #include "machine/mb8421.h"
+#include "machine/ncr53c90.h"
 #include "machine/ram.h"
 #include "machine/rtc65271.h"
 #include "machine/watchdog.h"
 #include "machine/x76f041.h"
-#include "sound/spu.h"
 #include "sound/cdda.h"
 #include "sound/rf5c400.h"
+#include "sound/spu.h"
+#include "video/psx.h"
+
 #include "screen.h"
 #include "speaker.h"
 
+#include "endianness.h"
+
 #include "bmiidx.lh"
+
+
+namespace {
 
 class twinkle_state : public driver_device
 {
@@ -289,15 +303,22 @@ public:
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
-		m_am53cf96(*this, "am53cf96"),
+		m_ncr53cf96(*this, "scsi:7:ncr53cf96"),
 		m_ata(*this, "ata"),
 		m_dpram(*this, "dpram"),
 		m_waveram(*this, "rfsnd"),
+		m_in(*this, "IN%u", 0U),
 		m_led_displays(*this, "led%u", 0U),
 		m_spotlights(*this, "spotlight%u", 0U),
 		m_main_leds(*this, "main_led%u", 0U),
 		m_key_leds(*this, "key%u-%u", 1U, 1U),
 		m_spu_leds(*this, "spu_led%u", 0U),
+		m_player_lamps(*this, "%up", 1U),
+		m_vefx_lamp(*this, "vefx"),
+		m_effect_lamp(*this, "effect"),
+		m_credit_lamp(*this, "credit"),
+		m_neon_lamp(*this, "neonlamp"),
+		m_unknown_outputs(*this, "unknown%u", 1U),
 		m_spu_ata_dma(0),
 		m_spu_ata_dmarq(0),
 		m_wave_bank(0)
@@ -312,7 +333,8 @@ public:
 	void twinkle_dvd_type2(machine_config &config);
 
 private:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	void twinkle_io_w(offs_t offset, uint8_t data);
 	uint8_t twinkle_io_r(offs_t offset);
@@ -327,36 +349,54 @@ private:
 	void twinkle_waveram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	void spu_led_w(uint16_t data);
 	void spu_wavebank_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-	DECLARE_WRITE_LINE_MEMBER(spu_ata_irq);
-	DECLARE_WRITE_LINE_MEMBER(spu_ata_dmarq);
-	void scsi_dma_read( uint32_t *p_n_psxram, uint32_t n_address, int32_t n_size );
-	void scsi_dma_write( uint32_t *p_n_psxram, uint32_t n_address, int32_t n_size );
+	void spu_ata_irq(int state);
+	void spu_ata_dmarq(int state);
+	void scsi_dma_read(uint32_t *p_n_psxram, uint32_t n_address, int32_t n_size);
+	void scsi_dma_write(uint32_t *p_n_psxram, uint32_t n_address, int32_t n_size);
+	void scsi_drq(int state);
 
-	void main_map(address_map &map);
-	void rf5c400_map(address_map &map);
-	void sound_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
+	void rf5c400_map(address_map &map) ATTR_COLD;
+	void sound_map(address_map &map) ATTR_COLD;
+
+	TIMER_CALLBACK_MEMBER(scsi_dma_transfer);
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
-	required_device<am53cf96_device> m_am53cf96;
+	required_device<ncr53cf96_device> m_ncr53cf96;
 	required_device<ata_interface_device> m_ata;
 	required_device<cy7c131_device> m_dpram;
 	required_shared_ptr<uint16_t> m_waveram;
+
+	required_ioport_array<6> m_in;
 
 	output_finder<9> m_led_displays;
 	output_finder<8> m_spotlights;
 	output_finder<9> m_main_leds;
 	output_finder<2, 7> m_key_leds;
 	output_finder<8> m_spu_leds;
+	output_finder<2> m_player_lamps;
+	output_finder<> m_vefx_lamp;
+	output_finder<> m_effect_lamp;
+	output_finder<> m_credit_lamp;
+	output_finder<> m_neon_lamp;
+	output_finder<4> m_unknown_outputs;
+
+	emu_timer *m_dma_timer = nullptr;
 
 	uint16_t m_spu_ctrl = 0;      // SPU board control register
 	uint32_t m_spu_ata_dma = 0;
 	int m_spu_ata_dmarq = 0;
 	uint32_t m_wave_bank = 0;
 
+	uint32_t *m_dma_data_ptr = nullptr;
+	uint32_t m_dma_offset = 0;
+	int32_t m_dma_size = 0;
+	bool m_dma_is_write = false;
+	bool m_dma_requested = false;
+
 	int m_io_offset = 0;
 	int m_output_last[ 0x100 ]{};
-	uint8_t m_sector_buffer[ 4096 ]{};
 
 	int m_serial_shift = 0;
 	int m_serial_bits = 0;
@@ -367,8 +407,6 @@ private:
 	int m_output_bits = 0;
 	int m_output_cs = 0;
 	int m_output_clock = 0;
-
-	static void cdrom_config(device_t *device);
 };
 
 #define LED_A1 0x0001
@@ -537,20 +575,32 @@ static const uint16_t asciicharset[]=
 
 void twinkle_state::machine_start()
 {
+	m_dma_timer = timer_alloc(FUNC(twinkle_state::scsi_dma_transfer), this);
+
 	m_led_displays.resolve();
 	m_spotlights.resolve();
 	m_main_leds.resolve();
 	m_key_leds.resolve();
 	m_spu_leds.resolve();
+	m_player_lamps.resolve();
+	m_vefx_lamp.resolve();
+	m_effect_lamp.resolve();
+	m_credit_lamp.resolve();
+	m_neon_lamp.resolve();
+	m_unknown_outputs.resolve();
 
 	save_item(NAME(m_spu_ctrl));
 	save_item(NAME(m_spu_ata_dma));
 	save_item(NAME(m_spu_ata_dmarq));
 	save_item(NAME(m_wave_bank));
 
+	save_item(NAME(m_dma_offset));
+	save_item(NAME(m_dma_size));
+	save_item(NAME(m_dma_is_write));
+	save_item(NAME(m_dma_requested));
+
 	save_item(NAME(m_io_offset));
 	save_item(NAME(m_output_last));
-	save_item(NAME(m_sector_buffer));
 
 	save_item(NAME(m_serial_shift));
 	save_item(NAME(m_serial_bits));
@@ -562,6 +612,16 @@ void twinkle_state::machine_start()
 	save_item(NAME(m_output_cs));
 	save_item(NAME(m_output_clock));
 }
+
+void twinkle_state::machine_reset()
+{
+	m_dma_timer->adjust(attotime::never);
+	m_dma_data_ptr = nullptr;
+	m_dma_offset = 0;
+	m_dma_size = 0;
+	m_dma_requested = m_dma_is_write = false;
+}
+
 
 void twinkle_state::twinkle_io_w(offs_t offset, uint8_t data)
 {
@@ -588,11 +648,11 @@ void twinkle_state::twinkle_io_w(offs_t offset, uint8_t data)
 				break;
 
 			case 0x37:
-				output().set_value("1p", (~data >> 0) & 1);
-				output().set_value("2p", (~data >> 1) & 1);
-				output().set_value("vefx", (~data >> 2) & 1);
-				output().set_value("effect", (~data >> 3) & 1);
-				output().set_value("credit", (~data >> 4) & 1);
+				m_player_lamps[0] = BIT(~data, 0);
+				m_player_lamps[1] = BIT(~data, 1);
+				m_vefx_lamp = BIT(~data, 2);
+				m_effect_lamp = BIT(~data, 3);
+				m_credit_lamp = BIT(~data, 4);
 
 				if ((data & 0xe0) != 0xe0)
 				{
@@ -624,9 +684,9 @@ void twinkle_state::twinkle_io_w(offs_t offset, uint8_t data)
 				break;
 
 			case 0x8f:
-				output().set_value( "neonlamp", ( ~data >> 0 ) & 1 );
-				output().set_value( "unknown1", ( ~data >> 1 ) & 1 );
-				output().set_value( "unknown2", ( ~data >> 2 ) & 1 );
+				m_neon_lamp = BIT(~data, 0);
+				m_unknown_outputs[0] = BIT(~data, 1);
+				m_unknown_outputs[1] = BIT(~data, 2);
 
 				if( ( data & 0xf8 ) != 0xf8 )
 				{
@@ -657,27 +717,27 @@ uint8_t twinkle_state::twinkle_io_r(offs_t offset)
 		switch( m_io_offset )
 		{
 			case 0x07:
-				data = ioport( "IN0" )->read();
+				data = m_in[0]->read();
 				break;
 
 			case 0x0f:
-				data = ioport( "IN1" )->read();
+				data = m_in[1]->read();
 				break;
 
 			case 0x17:
-				data = ioport( "IN2" )->read();
+				data = m_in[2]->read();
 				break;
 
 			case 0x1f:
-				data = ioport( "IN3" )->read();
+				data = m_in[3]->read();
 				break;
 
 			case 0x27:
-				data = ioport( "IN4" )->read();
+				data = m_in[4]->read();
 				break;
 
 			case 0x2f:
-				data = ioport( "IN5" )->read();
+				data = m_in[5]->read();
 				break;
 
 			default:
@@ -837,8 +897,8 @@ void twinkle_state::key_led_w(uint16_t data)
 	m_key_leds[1][4] = BIT(data, 11);
 	m_key_leds[1][5] = BIT(data, 12);
 	m_key_leds[1][6] = BIT(data, 13);
-	output().set_value("unknown3", (data >> 14) & 1);
-	output().set_value("unknown4", (data >> 15) & 1);
+	m_unknown_outputs[2] = BIT(data, 14);
+	m_unknown_outputs[3] = BIT(data, 15);
 }
 
 void twinkle_state::serial_w(uint16_t data)
@@ -874,7 +934,7 @@ void twinkle_state::serial_w(uint16_t data)
 void twinkle_state::main_map(address_map &map)
 {
 	map(0x1f000000, 0x1f0007ff).rw(m_dpram, FUNC(cy7c131_device::right_r), FUNC(cy7c131_device::right_w)).umask32(0x00ff00ff);
-	map(0x1f200000, 0x1f20001f).rw(m_am53cf96, FUNC(am53cf96_device::read), FUNC(am53cf96_device::write)).umask32(0x00ff00ff);
+	map(0x1f200000, 0x1f20001f).m(m_ncr53cf96, FUNC(ncr53cf96_device::map)).umask16(0x00ff);
 	map(0x1f20a01c, 0x1f20a01f).nopw(); /* scsi? */
 	map(0x1f210000, 0x1f2107ff).rw("fdc37c665gt", FUNC(fdc37c665gt_device::read), FUNC(fdc37c665gt_device::write)).umask32(0x00ff00ff);
 	map(0x1f218000, 0x1f218000).w("watchdog", FUNC(watchdog_timer_device::reset_w)); /* LTC1232 */
@@ -893,7 +953,7 @@ void twinkle_state::main_map(address_map &map)
 
 /* SPU board */
 
-WRITE_LINE_MEMBER(twinkle_state::spu_ata_irq)
+void twinkle_state::spu_ata_irq(int state)
 {
 	if ((state) && (m_spu_ctrl & 0x0400))
 	{
@@ -945,7 +1005,7 @@ void twinkle_state::spu_ata_dma_high_w(uint16_t data)
 	//printf("DMA now %x\n", m_spu_ata_dma);
 }
 
-WRITE_LINE_MEMBER(twinkle_state::spu_ata_dmarq)
+void twinkle_state::spu_ata_dmarq(int state)
 {
 	if (m_spu_ata_dmarq != state)
 	{
@@ -1028,90 +1088,49 @@ void twinkle_state::rf5c400_map(address_map &map)
 	map(0x0000000, 0x1ffffff).ram().share("rfsnd");
 }
 
-/* SCSI */
+// SCSI
 
-void twinkle_state::scsi_dma_read( uint32_t *p_n_psxram, uint32_t n_address, int32_t n_size )
+void twinkle_state::scsi_dma_read(uint32_t *p_n_psxram, uint32_t n_address, int32_t n_size)
 {
-	int i;
-	int n_this;
+	m_dma_data_ptr = p_n_psxram;
+	m_dma_offset = n_address;
+	m_dma_size = n_size * 4;
+	m_dma_is_write = false;
+	m_dma_timer->adjust(attotime::zero);
+}
 
-	while( n_size > 0 )
+void twinkle_state::scsi_dma_write(uint32_t *p_n_psxram, uint32_t n_address, int32_t n_size)
+{
+	m_dma_data_ptr = p_n_psxram;
+	m_dma_offset = n_address;
+	m_dma_size = n_size * 4;
+	m_dma_is_write = true;
+	m_dma_timer->adjust(attotime::zero);
+}
+
+TIMER_CALLBACK_MEMBER(twinkle_state::scsi_dma_transfer)
+{
+	// TODO: Figure out proper DMA timings
+	while (m_dma_requested && m_dma_data_ptr != nullptr && m_dma_size > 0)
 	{
-		if( n_size > sizeof( m_sector_buffer ) / 4 )
-		{
-			n_this = sizeof( m_sector_buffer ) / 4;
-		}
+		if (m_dma_is_write)
+			m_ncr53cf96->dma_w(util::little_endian_cast<const uint8_t>(m_dma_data_ptr)[m_dma_offset]);
 		else
-		{
-			n_this = n_size;
-		}
-		if( n_this < 2048 / 4 )
-		{
-			/* non-READ commands */
-			m_am53cf96->dma_read_data( n_this * 4, m_sector_buffer );
-		}
-		else
-		{
-			/* assume normal 2048 byte data for now */
-			m_am53cf96->dma_read_data( 2048, m_sector_buffer );
-			n_this = 2048 / 4;
-		}
-		n_size -= n_this;
+			util::little_endian_cast<uint8_t>(m_dma_data_ptr)[m_dma_offset] = m_ncr53cf96->dma_r();
 
-		i = 0;
-		while( n_this > 0 )
-		{
-			p_n_psxram[ n_address / 4 ] =
-				( m_sector_buffer[ i + 0 ] << 0 ) |
-				( m_sector_buffer[ i + 1 ] << 8 ) |
-				( m_sector_buffer[ i + 2 ] << 16 ) |
-				( m_sector_buffer[ i + 3 ] << 24 );
-			n_address += 4;
-			i += 4;
-			n_this--;
-		}
+		m_dma_offset++;
+		m_dma_size--;
 	}
 }
 
-void twinkle_state::scsi_dma_write( uint32_t *p_n_psxram, uint32_t n_address, int32_t n_size )
+void twinkle_state::scsi_drq(int state)
 {
-	int i;
-	int n_this;
+	if (!m_dma_requested && state)
+		m_dma_timer->adjust(attotime::zero);
 
-	while( n_size > 0 )
-	{
-		if( n_size > sizeof( m_sector_buffer ) / 4 )
-		{
-			n_this = sizeof( m_sector_buffer ) / 4;
-		}
-		else
-		{
-			n_this = n_size;
-		}
-		n_size -= n_this;
-
-		i = 0;
-		while( n_this > 0 )
-		{
-			m_sector_buffer[ i + 0 ] = ( p_n_psxram[ n_address / 4 ] >> 0 ) & 0xff;
-			m_sector_buffer[ i + 1 ] = ( p_n_psxram[ n_address / 4 ] >> 8 ) & 0xff;
-			m_sector_buffer[ i + 2 ] = ( p_n_psxram[ n_address / 4 ] >> 16 ) & 0xff;
-			m_sector_buffer[ i + 3 ] = ( p_n_psxram[ n_address / 4 ] >> 24 ) & 0xff;
-			n_address += 4;
-			i += 4;
-			n_this--;
-		}
-
-		m_am53cf96->dma_write_data( n_this * 4, m_sector_buffer );
-	}
+	m_dma_requested = state;
 }
 
-
-void twinkle_state::cdrom_config(device_t *device)
-{
-	device->subdevice<cdda_device>("cdda")->add_route(0, "^^speakerleft", 1.0);
-	device->subdevice<cdda_device>("cdda")->add_route(1, "^^speakerright", 1.0);
-}
 
 void twinkle_state::twinkle(machine_config &config)
 {
@@ -1131,13 +1150,20 @@ void twinkle_state::twinkle(machine_config &config)
 	CY7C131(config, m_dpram); // or IDT7130 at some PCBs
 	m_dpram->intl_callback().set_inputline(m_audiocpu, M68K_IRQ_4);
 
-	scsi_port_device &scsi(SCSI_PORT(config, "scsi", 0));
-	scsi.set_slot_device(1, "cdrom", SCSICD, DEVICE_INPUT_DEFAULTS_NAME(SCSI_ID_4));
-	scsi.slot(1).set_option_machine_config("cdrom", cdrom_config);
-
-	AM53CF96(config, m_am53cf96, 0);
-	m_am53cf96->set_scsi_port("scsi");
-	m_am53cf96->irq_handler().set("maincpu:irq", FUNC(psxirq_device::intin10));
+	NSCSI_BUS(config, "scsi");
+	NSCSI_CONNECTOR(config, "scsi:4").option_set("cdrom", NSCSI_XM5401).machine_config(
+			[](device_t *device)
+			{
+				device->subdevice<cdda_device>("cdda")->add_route(0, "^^speakerleft", 1.0);
+				device->subdevice<cdda_device>("cdda")->add_route(1, "^^speakerright", 1.0);
+			});
+	NSCSI_CONNECTOR(config, "scsi:7").option_set("ncr53cf96", NCR53CF96).clock(32_MHz_XTAL/2).machine_config(
+			[this](device_t *device)
+			{
+				ncr53cf96_device &adapter = downcast<ncr53cf96_device &>(*device);
+				adapter.irq_handler_cb().set(":maincpu:irq", FUNC(psxirq_device::intin10));
+				adapter.drq_handler_cb().set(*this, FUNC(twinkle_state::scsi_drq));
+			});
 
 	ATA_INTERFACE(config, m_ata).options(ata_devices, "hdd", nullptr, true);
 	m_ata->irq_handler().set(FUNC(twinkle_state::spu_ata_irq));
@@ -1311,23 +1337,23 @@ static INPUT_PORTS_START( twinklex )
 	PORT_INCLUDE( twinkle )
 
 	PORT_MODIFY("OUTSEC")
-	PORT_BIT( 0x00000010, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("security", x76f041_device, write_scl)
-	PORT_BIT( 0x00000008, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("security", x76f041_device, write_sda)
-	PORT_BIT( 0x00000004, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("security", x76f041_device, write_cs)
+	PORT_BIT( 0x00000010, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("security", FUNC(x76f041_device::write_scl))
+	PORT_BIT( 0x00000008, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("security", FUNC(x76f041_device::write_sda))
+	PORT_BIT( 0x00000004, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("security", FUNC(x76f041_device::write_cs))
 
 	PORT_MODIFY("INSEC")
-	PORT_BIT( 0x00001000, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("security", x76f041_device, read_sda)
+	PORT_BIT( 0x00001000, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("security", FUNC(x76f041_device::read_sda))
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( twinklei )
 	PORT_INCLUDE( twinkle )
 
 	PORT_MODIFY("OUTSEC")
-	PORT_BIT( 0x00000010, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("security", i2cmem_device, write_scl)
-	PORT_BIT( 0x00000008, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("security", i2cmem_device, write_sda)
+	PORT_BIT( 0x00000010, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("security", FUNC(i2cmem_device::write_scl))
+	PORT_BIT( 0x00000008, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("security", FUNC(i2cmem_device::write_sda))
 
 	PORT_MODIFY("INSEC")
-	PORT_BIT( 0x00001000, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_READ_LINE_DEVICE_MEMBER("security", i2cmem_device, read_sda)
+	PORT_BIT( 0x00001000, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_READ_LINE_DEVICE_MEMBER("security", FUNC(i2cmem_device::read_sda))
 INPUT_PORTS_END
 
 #define TWINKLE_BIOS    \
@@ -1347,13 +1373,13 @@ ROM_START( bmiidx )
 	ROM_REGION( 0x224, "security", 0 )
 	ROM_LOAD( "863a02", 0x000000, 0x000224, BAD_DUMP CRC(078be99f) SHA1(7def88d18a9250a8e4b54a51bf663161676cd9be) )
 
-	DISK_REGION( "scsi:" SCSI_PORT_DEVICE1 ":cdrom" ) // program
+	DISK_REGION( "scsi:4:cdrom" ) // program
 	DISK_IMAGE_READONLY( "gq863-jab01", 0, SHA1(331f80b40ed560c7e017621b7daeeb8275d92b9a) )
 
 	DISK_REGION( "cdrom1" ) // video CD
 	DISK_IMAGE_READONLY( "gq863a04", 0, SHA1(25359f0eaff3749a6194a6b9d93f6aec67d94819) )
 
-	DISK_REGION( "ata:0:hdd:image" )
+	DISK_REGION( "ata:0:hdd" )
 	DISK_IMAGE_READONLY( "863hdda01", 0, SHA1(0b8dbf1c9caf4abf965dbc6e1a8e6329d48b1c90) )
 ROM_END
 
@@ -1363,13 +1389,13 @@ ROM_START( bmiidxa )
 	ROM_REGION( 0x224, "security", 0 )
 	ROM_LOAD( "863a02", 0x000000, 0x000224, BAD_DUMP CRC(078be99f) SHA1(7def88d18a9250a8e4b54a51bf663161676cd9be) )
 
-	DISK_REGION( "scsi:" SCSI_PORT_DEVICE1 ":cdrom" ) // program
+	DISK_REGION( "scsi:4:cdrom" ) // program
 	DISK_IMAGE_READONLY( "gq863a01", 0, SHA1(07fc467f6500504729becbaf77dabc093a134e65) )
 
 	DISK_REGION( "cdrom1" ) // video CD
 	DISK_IMAGE_READONLY( "gq863a04", 0, SHA1(25359f0eaff3749a6194a6b9d93f6aec67d94819) )
 
-	DISK_REGION( "ata:0:hdd:image" )
+	DISK_REGION( "ata:0:hdd" )
 	DISK_IMAGE_READONLY( "863hdda01", 0, SHA1(0b8dbf1c9caf4abf965dbc6e1a8e6329d48b1c90) )
 ROM_END
 
@@ -1379,13 +1405,13 @@ ROM_START( bmiidx2 )
 	ROM_REGION( 0x100, "security", 0 )
 	ROM_LOAD( "985a02", 0x000000, 0x000100, CRC(059c1f99) SHA1(f094a12c9a56d351667746a765804c94cb3f96bb) )
 
-	DISK_REGION( "scsi:" SCSI_PORT_DEVICE1 ":cdrom" )
+	DISK_REGION( "scsi:4:cdrom" )
 	DISK_IMAGE_READONLY( "gc985a01", 0, SHA1(0b783f11317f64552ebf3323459139529e7f315f) )
 
 	DISK_REGION( "cdrom1" ) // video CD
 	DISK_IMAGE_READONLY( "gc985a04", 0, SHA1(4306417f61eb1ea92894d288cdb7c385eb4610f2) )
 
-	DISK_REGION( "ata:0:hdd:image" )
+	DISK_REGION( "ata:0:hdd" )
 	DISK_IMAGE_READONLY( "985hdda01", 0, SHA1(a5b9ec9a5afa38f36af529d3aea5355ea7d022ca) )
 ROM_END
 
@@ -1395,13 +1421,13 @@ ROM_START( bmiidx3 )
 	ROM_REGION( 0x100, "security", 0 )
 	ROM_LOAD( "992a02", 0x000000, 0x000100, CRC(92520992) SHA1(c4a47dd0e805807df0f086fd9602c000fe2baa61) )
 
-	DISK_REGION( "scsi:" SCSI_PORT_DEVICE1 ":cdrom" )
+	DISK_REGION( "scsi:4:cdrom" )
 	DISK_IMAGE_READONLY( "gc992-jac01", 0, SHA1(c02d6e58439be678ec0d7171eae2dfd53a21acc7) )
 
 	DISK_REGION( "cdrom1" ) // video CD
 	DISK_IMAGE_READONLY( "gc992-jaa04", 0, SHA1(66d0b9ac793ff3fdddd0aa2aa5f2809d0c295944) )
 
-	DISK_REGION( "ata:0:hdd:image" )
+	DISK_REGION( "ata:0:hdd" )
 	DISK_IMAGE_READONLY( "992hdda01", 0, SHA1(c3936ae9368b23a3a6a876b668cac67a4c9d1287) )
 ROM_END
 
@@ -1411,13 +1437,13 @@ ROM_START( bmiidx3b )
 	ROM_REGION( 0x100, "security", 0 )
 	ROM_LOAD( "992a02", 0x000000, 0x000100, CRC(92520992) SHA1(c4a47dd0e805807df0f086fd9602c000fe2baa61) )
 
-	DISK_REGION( "scsi:" SCSI_PORT_DEVICE1 ":cdrom" )
+	DISK_REGION( "scsi:4:cdrom" )
 	DISK_IMAGE_READONLY( "gc992-jab01", 0, SHA1(7a5bc08e5723c2705fb7954a8bb727f96514ec2e) )
 
 	DISK_REGION( "cdrom1" ) // video CD
 	DISK_IMAGE_READONLY( "gc992-jaa04", 0, SHA1(66d0b9ac793ff3fdddd0aa2aa5f2809d0c295944) )
 
-	DISK_REGION( "ata:0:hdd:image" )
+	DISK_REGION( "ata:0:hdd" )
 	DISK_IMAGE_READONLY( "992hdda01", 0, SHA1(c3936ae9368b23a3a6a876b668cac67a4c9d1287) )
 ROM_END
 
@@ -1427,13 +1453,13 @@ ROM_START( bmiidx3a )
 	ROM_REGION( 0x100, "security", 0 )
 	ROM_LOAD( "992a02", 0x000000, 0x000100, CRC(92520992) SHA1(c4a47dd0e805807df0f086fd9602c000fe2baa61) )
 
-	DISK_REGION( "scsi:" SCSI_PORT_DEVICE1 ":cdrom" )
+	DISK_REGION( "scsi:4:cdrom" )
 	DISK_IMAGE_READONLY( "gc992-jaa01", 0, SHA1(d86dab5c8130859e73a3e2936b7fd6231e1c025d) )
 
 	DISK_REGION( "cdrom1" ) // video CD
 	DISK_IMAGE_READONLY( "gc992-jaa04", 0, SHA1(66d0b9ac793ff3fdddd0aa2aa5f2809d0c295944) )
 
-	DISK_REGION( "ata:0:hdd:image" )
+	DISK_REGION( "ata:0:hdd" )
 	DISK_IMAGE_READONLY( "992hdda01", 0, SHA1(c3936ae9368b23a3a6a876b668cac67a4c9d1287) )
 ROM_END
 
@@ -1443,13 +1469,13 @@ ROM_START( bmiidx4 )
 	ROM_REGION( 0x100, "security", 0 )
 	ROM_LOAD( "a03", 0x000000, 0x000100, CRC(9ccf71f9) SHA1(01c4060ac6e2cdc156c034797ea2e305cbbc31ef) )
 
-	DISK_REGION( "scsi:" SCSI_PORT_DEVICE1 ":cdrom" )
+	DISK_REGION( "scsi:4:cdrom" )
 	DISK_IMAGE_READONLY( "a03jaa01", 0, SHA1(f54fc778c2187ccd950402a159babef956b71492) )
 
 	DISK_REGION( "cdrom1" ) // video CD
 	DISK_IMAGE_READONLY( "a03jaa02", 0, SHA1(d6f01d666e8de285a02215f7ef987073e2b25019) )
 
-	DISK_REGION( "ata:0:hdd:image" )
+	DISK_REGION( "ata:0:hdd" )
 	DISK_IMAGE_READONLY( "a03jaa03", 0, SHA1(a9814c60d2ed98b8c4f6e11ea762518a1712e7b5) )
 ROM_END
 
@@ -1459,13 +1485,13 @@ ROM_START( bmiidx5 )
 	ROM_REGION( 0x100, "security", 0 )
 	ROM_LOAD( "a17", 0x000000, 0x000100, CRC(70ae9983) SHA1(de0b9ce8ca09e794a35722737958fa7ee6eef6ce) )
 
-	DISK_REGION( "scsi:" SCSI_PORT_DEVICE1 ":cdrom" )
+	DISK_REGION( "scsi:4:cdrom" )
 	DISK_IMAGE_READONLY( "a17jaa01", 0, SHA1(5ac46973b42b2c66ae63297d1a7fd69b33ef4d1d) )
 
 	DISK_REGION( "cdrom1" ) // video CD
 	DISK_IMAGE_READONLY( "a17jaa02", 0, SHA1(cc24a4c3f5e7c77dbeee7db94c0cc8a330e2b51b) )
 
-	DISK_REGION( "ata:0:hdd:image" )
+	DISK_REGION( "ata:0:hdd" )
 	DISK_IMAGE_READONLY( "a17jaa03", 0, SHA1(f8c9b1af4ad15bb9cc37f0d234949a4342f1ca34) )
 ROM_END
 
@@ -1475,13 +1501,13 @@ ROM_START( bmiidx6 )
 	ROM_REGION( 0x100, "security", 0 )
 	ROM_LOAD( "b4u", 0x000000, 0x000100, CRC(5c134715) SHA1(2bc40388c5e2d54e99e9fdfd63216820b5c939c0) )
 
-	DISK_REGION( "scsi:" SCSI_PORT_DEVICE1 ":cdrom" )
+	DISK_REGION( "scsi:4:cdrom" )
 	DISK_IMAGE_READONLY( "b4ujab01", 0, SHA1(aaae77f473c4a44ce6838da3ef6dab27e4afa0e4) )
 
 	DISK_REGION( "cdrom1" ) // DVD
 	DISK_IMAGE_READONLY( "b4ujaa02", 0, SHA1(70c85f6df6f21b96c02e4eefc224593edcaf9e63) )
 
-	DISK_REGION( "ata:0:hdd:image" )
+	DISK_REGION( "ata:0:hdd" )
 	DISK_IMAGE_READONLY( "b4ujaa03", 0, SHA1(cfcbdfab157a864cbd4ac83247be5d62218f5b72) )
 ROM_END
 
@@ -1491,13 +1517,13 @@ ROM_START( bmiidx6a )
 	ROM_REGION( 0x100, "security", 0 )
 	ROM_LOAD( "b4u", 0x000000, 0x000100, CRC(5c134715) SHA1(2bc40388c5e2d54e99e9fdfd63216820b5c939c0) )
 
-	DISK_REGION( "scsi:" SCSI_PORT_DEVICE1 ":cdrom" )
+	DISK_REGION( "scsi:4:cdrom" )
 	DISK_IMAGE_READONLY( "b4ujaa01", 0, SHA1(22589f2a2b421e910d8dc3d98b375d7939a94921) )
 
 	DISK_REGION( "cdrom1" ) // DVD
 	DISK_IMAGE_READONLY( "b4ujaa02", 0, SHA1(70c85f6df6f21b96c02e4eefc224593edcaf9e63) )
 
-	DISK_REGION( "ata:0:hdd:image" )
+	DISK_REGION( "ata:0:hdd" )
 	DISK_IMAGE_READONLY( "b4ujaa03", 0, SHA1(cfcbdfab157a864cbd4ac83247be5d62218f5b72) )
 ROM_END
 
@@ -1507,13 +1533,13 @@ ROM_START( bmiidx7 )
 	ROM_REGION( 0x100, "security", 0 )
 	ROM_LOAD( "b44", 0x000000, 0x000100, CRC(fb6aaa40) SHA1(7a93a8b69d71c2e448d176a6a9d175a01bd8a5f1) )
 
-	DISK_REGION( "scsi:" SCSI_PORT_DEVICE1 ":cdrom" )
+	DISK_REGION( "scsi:4:cdrom" )
 	DISK_IMAGE_READONLY( "b44jab01", 0, SHA1(f04411b2c7a671dc9544635b187db7a5f3eae6aa) )
 
 	DISK_REGION( "cdrom1" ) // DVD
 	DISK_IMAGE_READONLY( "b44jaa02", 0, SHA1(a45726d99025f4d824ec143ef92957c76c08a13a) )
 
-	DISK_REGION( "ata:0:hdd:image" )
+	DISK_REGION( "ata:0:hdd" )
 	DISK_IMAGE_READONLY( "b44jaa03", 0, SHA1(1adb8e4874e26e8ccd9822e6f9dd12f6e6f8af05) )
 ROM_END
 
@@ -1523,13 +1549,13 @@ ROM_START( bmiidx7a )
 	ROM_REGION( 0x100, "security", 0 )
 	ROM_LOAD( "b44", 0x000000, 0x000100, CRC(fb6aaa40) SHA1(7a93a8b69d71c2e448d176a6a9d175a01bd8a5f1) )
 
-	DISK_REGION( "scsi:" SCSI_PORT_DEVICE1 ":cdrom" )
+	DISK_REGION( "scsi:4:cdrom" )
 	DISK_IMAGE_READONLY( "b44jaa01", 0, SHA1(57fb0312d8102e959658e48a97e46aa16e592b60) )
 
 	DISK_REGION( "cdrom1" ) // DVD
 	DISK_IMAGE_READONLY( "b44jaa02", 0, SHA1(a45726d99025f4d824ec143ef92957c76c08a13a) )
 
-	DISK_REGION( "ata:0:hdd:image" )
+	DISK_REGION( "ata:0:hdd" )
 	DISK_IMAGE_READONLY( "b44jaa03", 0, SHA1(1adb8e4874e26e8ccd9822e6f9dd12f6e6f8af05) )
 ROM_END
 
@@ -1539,13 +1565,13 @@ ROM_START( bmiidx8 )
 	ROM_REGION( 0x100, "security", 0 )
 	ROM_LOAD( "c44", 0x000000, 0x000100, CRC(3afc8048) SHA1(36cf01288a5ca4f03060de44a89472650e9f8dcc) )
 
-	DISK_REGION( "scsi:" SCSI_PORT_DEVICE1 ":cdrom" )
+	DISK_REGION( "scsi:4:cdrom" )
 	DISK_IMAGE_READONLY( "c44jaa01", 0, SHA1(dd2aeb925182ed75ade510ca3a0f913d667a2be2) )
 
 	DISK_REGION( "cdrom1" ) // DVD
 	DISK_IMAGE_READONLY( "c44jaa02", 0, SHA1(f4c454a6360c507a122888d5bc3311eed5ce083b) )
 
-	DISK_REGION( "ata:0:hdd:image" )
+	DISK_REGION( "ata:0:hdd" )
 	DISK_IMAGE_READONLY( "c44jaa03", 0, SHA1(14df5039a4f5a648f1a2d12a35c16f56d0f9cd28) )
 ROM_END
 
@@ -1555,13 +1581,13 @@ ROM_START( bmiidxc )
 	ROM_REGION( 0x224, "security", 0 )
 	ROM_LOAD( "863a02", 0x000000, 0x000224, BAD_DUMP CRC(078be99f) SHA1(7def88d18a9250a8e4b54a51bf663161676cd9be) )
 
-	DISK_REGION( "scsi:" SCSI_PORT_DEVICE1 ":cdrom" )
+	DISK_REGION( "scsi:4:cdrom" )
 	DISK_IMAGE_READONLY( "896jabbm", 0, SHA1(09fb638bc5b3e64af13ae3df66ba25e490440946) )
 
 	DISK_REGION( "cdrom1" ) // video CD, same as bmiidx
 	DISK_IMAGE_READONLY( "gq863a04", 0, SHA1(25359f0eaff3749a6194a6b9d93f6aec67d94819) )
 
-	DISK_REGION( "ata:0:hdd:image" )
+	DISK_REGION( "ata:0:hdd" )
 	DISK_IMAGE_READONLY( "863hdda01", 0, SHA1(0b8dbf1c9caf4abf965dbc6e1a8e6329d48b1c90) )
 ROM_END
 
@@ -1571,13 +1597,13 @@ ROM_START( bmiidxca )
 	ROM_REGION( 0x224, "security", 0 )
 	ROM_LOAD( "863a02", 0x000000, 0x000224, BAD_DUMP CRC(078be99f) SHA1(7def88d18a9250a8e4b54a51bf663161676cd9be) )
 
-	DISK_REGION( "scsi:" SCSI_PORT_DEVICE1 ":cdrom" )
+	DISK_REGION( "scsi:4:cdrom" )
 	DISK_IMAGE_READONLY( "896jaabm", 0, SHA1(ea7205f86543d9273efcc226666ab530c32b23c1) )
 
 	DISK_REGION( "cdrom1" ) // video CD, same as bmiidx
 	DISK_IMAGE_READONLY( "gq863a04", 0, SHA1(25359f0eaff3749a6194a6b9d93f6aec67d94819) )
 
-	DISK_REGION( "ata:0:hdd:image" )
+	DISK_REGION( "ata:0:hdd" )
 	DISK_IMAGE_READONLY( "863hdda01", 0, SHA1(0b8dbf1c9caf4abf965dbc6e1a8e6329d48b1c90) )
 ROM_END
 
@@ -1587,13 +1613,13 @@ ROM_START( bmiidxs )
 	ROM_REGION( 0x224, "security", 0 )
 	ROM_LOAD( "983a02", 0x000000, 0x000224, BAD_DUMP CRC(6a6ace82) SHA1(1e1373f40c469c117316c03db414d9984567dd42) )
 
-	DISK_REGION( "scsi:" SCSI_PORT_DEVICE1 ":cdrom" )
+	DISK_REGION( "scsi:4:cdrom" )
 	DISK_IMAGE_READONLY( "gc983a01", 0, SHA1(7a80380f9c18c7da9643e0b9954ad8367eda5948) )
 
 	DISK_REGION( "cdrom1" ) // video CD
 	DISK_IMAGE_READONLY( "gc983a04", 0, SHA1(73454f2acb5a1e6b9e21140eb7b93a4827072d63) )
 
-	DISK_REGION( "ata:0:hdd:image" )
+	DISK_REGION( "ata:0:hdd" )
 	DISK_IMAGE_READONLY( "983hdda01", 0, SHA1(bcbbf55acf8bebc5773ffc5769420a0129f4da57) )
 ROM_END
 
@@ -1603,13 +1629,13 @@ ROM_START( bmiidxsa )
 	ROM_REGION( 0x224, "security", 0 )
 	ROM_LOAD( "983aa02", 0x000000, 0x000224, BAD_DUMP CRC(bcc8965c) SHA1(e152d19a92544212e321a332c6e6678d623dab21) )
 
-	DISK_REGION( "scsi:" SCSI_PORT_DEVICE1 ":cdrom" )
+	DISK_REGION( "scsi:4:cdrom" )
 	DISK_IMAGE_READONLY( "gc983aa,a01", 0, SHA1(9ef5725fc79a7f4f524ef93849af42b2758102cd) )
 
 	DISK_REGION( "cdrom1" ) // video CD
 	DISK_IMAGE_READONLY( "gc983a04", 0, SHA1(73454f2acb5a1e6b9e21140eb7b93a4827072d63) )
 
-	DISK_REGION( "ata:0:hdd:image" )
+	DISK_REGION( "ata:0:hdd" )
 	DISK_IMAGE_READONLY( "983hdda01", 0, SHA1(bcbbf55acf8bebc5773ffc5769420a0129f4da57) )
 ROM_END
 
@@ -1619,15 +1645,18 @@ ROM_START( bmiidxc2 )
 	ROM_REGION( 0x224, "security", 0 )
 	ROM_LOAD( "984a02", 0x000000, 0x000224, BAD_DUMP CRC(786db814) SHA1(722c709d95d54cd519856ddea64b9176ef191b0d) )
 
-	DISK_REGION( "scsi:" SCSI_PORT_DEVICE1 ":cdrom" )
+	DISK_REGION( "scsi:4:cdrom" )
 	DISK_IMAGE_READONLY( "ge984a01,bm", 0, SHA1(03b083ba09652dfab6f328000c3c9de2a7a4e618) )
 
 	DISK_REGION( "cdrom1" ) // video CD, same as bmiidxs
 	DISK_IMAGE_READONLY( "gc983a04", 0, SHA1(73454f2acb5a1e6b9e21140eb7b93a4827072d63) )
 
-	DISK_REGION( "ata:0:hdd:image" )
+	DISK_REGION( "ata:0:hdd" )
 	DISK_IMAGE_READONLY( "983hdda01", 0, SHA1(bcbbf55acf8bebc5773ffc5769420a0129f4da57) )
 ROM_END
+
+} // anonymous namespace
+
 
 GAMEL( 1999, gq863,    0,       twinkle,  twinkle,  twinkle_state, empty_init, ROT0, "Konami", "Twinkle System", MACHINE_IS_BIOS_ROOT, layout_bmiidx )
 

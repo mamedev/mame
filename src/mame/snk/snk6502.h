@@ -5,15 +5,17 @@
     rokola hardware
 
 *************************************************************************/
-#ifndef MAME_INCLUDES_SNK6502_H
-#define MAME_INCLUDES_SNK6502_H
+#ifndef MAME_SNK_SNK6502_H
+#define MAME_SNK_SNK6502_H
 
 #pragma once
 
 #include "machine/bankdev.h"
 #include "machine/timer.h"
+
 #include "emupal.h"
 #include "tilemap.h"
+
 
 class fantasy_sound_device;
 
@@ -34,7 +36,7 @@ public:
 	void satansat(machine_config &config);
 	void sasuke(machine_config &config);
 
-	DECLARE_CUSTOM_INPUT_MEMBER(sasuke_count_r);
+	ioport_value sasuke_count_r();
 	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
 
 	DECLARE_VIDEO_START(pballoon);
@@ -74,7 +76,7 @@ protected:
 	TILE_GET_INFO_MEMBER(satansat_get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(satansat_get_fg_tile_info);
 
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 	DECLARE_MACHINE_RESET(sasuke);
 	DECLARE_VIDEO_START(satansat);
 	void satansat_palette(palette_device &palette);
@@ -90,8 +92,8 @@ protected:
 	void sasuke_start_counter();
 	void postload();
 
-	void sasuke_map(address_map &map);
-	void satansat_map(address_map &map);
+	void sasuke_map(address_map &map) ATTR_COLD;
+	void satansat_map(address_map &map) ATTR_COLD;
 };
 
 class vanguard_state : public snk6502_state
@@ -112,8 +114,8 @@ protected:
 	required_device<address_map_bank_device> m_highmem;
 
 private:
-	void vanguard_map(address_map &map);
-	void vanguard_upper_map(address_map &map);
+	void vanguard_map(address_map &map) ATTR_COLD;
+	void vanguard_upper_map(address_map &map) ATTR_COLD;
 };
 
 class fantasy_state : public vanguard_state
@@ -132,11 +134,11 @@ public:
 private:
 	void fantasy_flipscreen_w(offs_t offset, uint8_t data);
 
-	void fantasy_map(address_map &map);
-	void pballoon_map(address_map &map);
-	void pballoon_upper_map(address_map &map);
+	void fantasy_map(address_map &map) ATTR_COLD;
+	void pballoon_map(address_map &map) ATTR_COLD;
+	void pballoon_upper_map(address_map &map) ATTR_COLD;
 
 	required_device<fantasy_sound_device> m_sound;
 };
 
-#endif // MAME_INCLUDES_SNK6502_H
+#endif // MAME_SNK_SNK6502_H

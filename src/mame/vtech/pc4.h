@@ -5,8 +5,8 @@
         VTech Laser PC4
 
 ****************************************************************************/
-#ifndef MAME_INCLUDES_PC4_H
-#define MAME_INCLUDES_PC4_H
+#ifndef MAME_VTECH_PC4_H
+#define MAME_VTECH_PC4_H
 
 #pragma once
 
@@ -28,7 +28,7 @@ public:
 	void pc4(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 	TIMER_CALLBACK_MEMBER(clear_busy_flag);
 	TIMER_CALLBACK_MEMBER(blink_tick);
@@ -52,8 +52,8 @@ private:
 
 	void pc4_palette(palette_device &palette) const;
 
-	void pc4_io(address_map &map);
-	void pc4_mem(address_map &map);
+	void pc4_io(address_map &map) ATTR_COLD;
+	void pc4_mem(address_map &map) ATTR_COLD;
 
 	emu_timer *m_blink_timer = nullptr;
 	emu_timer *m_busy_timer = nullptr;
@@ -81,4 +81,4 @@ private:
 	ioport_port *io_port[8];
 };
 
-#endif // MAME_INCLUDES_PC4_H
+#endif // MAME_VTECH_PC4_H

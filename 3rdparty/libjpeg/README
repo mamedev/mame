@@ -1,7 +1,7 @@
 The Independent JPEG Group's JPEG software
 ==========================================
 
-README for release 9b of 17-Jan-2016
+README for release 9e of 16-Jan-2022
 ====================================
 
 This distribution contains the ninth public release of the Independent JPEG
@@ -10,8 +10,8 @@ to use it for any purpose, subject to the conditions under LEGAL ISSUES, below.
 
 This software is the work of Tom Lane, Guido Vollbeding, Philip Gladstone,
 Bill Allombert, Jim Boucher, Lee Crocker, Bob Friesenhahn, Ben Jackson,
-Julian Minguillon, Luis Ortiz, George Phillips, Davide Rossi, Ge' Weijers,
-and other members of the Independent JPEG Group.
+John Korejwa, Julian Minguillon, Luis Ortiz, George Phillips, Davide Rossi,
+Ge' Weijers, and other members of the Independent JPEG Group.
 
 IJG is not affiliated with the ISO/IEC JTC1/SC29/WG1 standards committee
 (previously known as JPEG, together with ITU-T SG16).
@@ -38,6 +38,7 @@ User documentation:
                     rdjpgcom, and wrjpgcom.
   *.1               Unix-style man pages for programs (same info as usage.txt).
   wizard.txt        Advanced usage instructions for JPEG wizards only.
+  cdaltui.txt       Description of alternate user interface for cjpeg/djpeg.
   change.log        Version-to-version change highlights.
 Programmer and internal documentation:
   libjpeg.txt       How to use the JPEG library in your own programs.
@@ -115,7 +116,7 @@ with respect to this software, its quality, accuracy, merchantability, or
 fitness for a particular purpose.  This software is provided "AS IS", and you,
 its user, assume the entire risk as to its quality and accuracy.
 
-This software is copyright (C) 1991-2016, Thomas G. Lane, Guido Vollbeding.
+This software is copyright (C) 1991-2022, Thomas G. Lane, Guido Vollbeding.
 All Rights Reserved except as specified below.
 
 Permission is hereby granted to use, copy, modify, and distribute this
@@ -152,13 +153,6 @@ The same holds for its supporting scripts (config.guess, config.sub,
 ltmain.sh).  Another support script, install-sh, is copyright by X Consortium
 but is also freely distributable.
 
-The IJG distribution formerly included code to read and write GIF files.
-To avoid entanglement with the Unisys LZW patent (now expired), GIF reading
-support has been removed altogether, and the GIF writer has been simplified
-to produce "uncompressed GIFs".  This technique does not use the LZW
-algorithm; the resulting GIF files are larger than usual, but are readable
-by all standard GIF decoders.
-
 
 REFERENCES
 ==========
@@ -172,7 +166,7 @@ The best short technical introduction to the JPEG compression algorithm is
 (Adjacent articles in that issue discuss MPEG motion picture compression,
 applications of JPEG, and related topics.)  If you don't have the CACM issue
 handy, a PDF file containing a revised version of Wallace's article is
-available at http://www.ijg.org/files/Wallace.JPEG.pdf.  The file (actually
+available at https://www.ijg.org/files/Wallace.JPEG.pdf.  The file (actually
 a preprint for an article that appeared in IEEE Trans. Consumer Electronics)
 omits the sample images that appeared in CACM, but it includes corrections
 and some added material.  Note: the Wallace article is copyright ACM and IEEE,
@@ -216,17 +210,16 @@ document is Revision 3.  And a contributed document ISO/IEC JTC1/SC29/WG1 N
 5799 with title "Evolution of JPEG", June/July 2011, Berlin, Germany.
 IJG JPEG 9 introduces a reversible color transform for improved lossless
 compression which is described in a contributed document ISO/IEC JTC1/SC29/
-WG1 N 6080 with title "JPEG 9 Lossless Coding", June/July 2012, Paris,
-France.
+WG1 N 6080 with title "JPEG 9 Lossless Coding", June/July 2012, Paris, France.
 
 The JPEG standard does not specify all details of an interchangeable file
 format.  For the omitted details we follow the "JFIF" conventions, version 2.
 JFIF version 1 has been adopted as Recommendation ITU-T T.871 (05/2011) :
 Information technology - Digital compression and coding of continuous-tone
 still images: JPEG File Interchange Format (JFIF).  It is available as a
-free download in PDF file format from http://www.itu.int/rec/T-REC-T.871.
+free download in PDF file format from https://www.itu.int/rec/T-REC-T.871.
 A PDF file of the older JFIF document is available at
-http://www.w3.org/Graphics/JPEG/jfif3.pdf.
+https://www.w3.org/Graphics/JPEG/jfif3.pdf.
 
 The TIFF 6.0 file format specification can be obtained by FTP from
 ftp://ftp.sgi.com/graphics/tiff/TIFF6.ps.gz.  The JPEG incorporation scheme
@@ -234,7 +227,7 @@ found in the TIFF 6.0 spec of 3-June-92 has a number of serious problems.
 IJG does not recommend use of the TIFF 6.0 design (TIFF Compression tag 6).
 Instead, we recommend the JPEG design proposed by TIFF Technical Note #2
 (Compression tag 7).  Copies of this Note can be obtained from
-http://www.ijg.org/files/.  It is expected that the next revision
+https://www.ijg.org/files/.  It is expected that the next revision
 of the TIFF spec will replace the 6.0 JPEG design with the Note's design.
 Although IJG's own code does not support TIFF/JPEG, the free libtiff library
 uses our library to implement TIFF/JPEG per the Note.
@@ -245,9 +238,11 @@ ARCHIVE LOCATIONS
 
 The "official" archive site for this software is www.ijg.org.
 The most recent released version can always be found there in
-directory "files".  This particular version will be archived as
-http://www.ijg.org/files/jpegsrc.v9b.tar.gz, and in Windows-compatible
-"zip" archive format as http://www.ijg.org/files/jpegsr9b.zip.
+directory "files".  This particular version will be archived
+in Windows-compatible "zip" archive format as
+https://www.ijg.org/files/jpegsr9e.zip, and
+in Unix-compatible "tar.gz" archive format as
+https://www.ijg.org/files/jpegsrc.v9e.tar.gz.
 
 The JPEG FAQ (Frequently Asked Questions) article is a source of some
 general information about JPEG.
@@ -293,8 +288,12 @@ communication about JPEG configuration in Sigma Photo Pro software.
 
 Thank to Andrew Finkenstadt for hosting the ijg.org site.
 
-Last but not least special thank to Thomas G. Lane for the original
-design and development of this singular software package.
+Thank to Thomas G. Lane for the original design and development
+of this singular software package.
+
+Thank to Lars Goehler, Andreas Heinecke, Sebastian Fuss,
+Yvonne Roebert, Andrej Werner, Ulf-Dietrich Braumann,
+and Nina Ssymank for support and public relations.
 
 
 FILE FORMAT WARS

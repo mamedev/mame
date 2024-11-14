@@ -12,6 +12,8 @@
 
 #import "debugcommandhistory.h"
 
+#include "util/xmlfile.h"
+
 
 @implementation MAMEDebugCommandHistory
 
@@ -54,9 +56,9 @@
 
 - (void)add:(NSString *)entry {
 	if (([history count] == 0) || ![[history objectAtIndex:0] isEqualToString:entry]) {
-		[history insertObject:entry atIndex:0];
-		while ([history count] > length)
+		while ([history count] >= length)
 			[history removeLastObject];
+		[history insertObject:entry atIndex:0];
 	}
 	position = 0;
 }
@@ -108,6 +110,32 @@
 		current = nil;
 	}
 	[history removeAllObjects];
+}
+
+
+- (void)saveConfigurationToNode:(util::xml::data_node *)node {
+	util::xml::data_node *const hist = node->add_child(osd::debugger::NODE_WINDOW_HISTORY, nullptr);
+	if (hist) {
+		for (NSInteger i = [history count]; 0 < i; --i)
+			hist->add_child(osd::debugger::NODE_HISTORY_ITEM, [[history objectAtIndex:(i - 1)] UTF8String]);
+	}
+}
+
+
+- (void)restoreConfigurationFromNode:(util::xml::data_node const *)node {
+	[self clear];
+	util::xml::data_node const *const hist = node->get_child(osd::debugger::NODE_WINDOW_HISTORY);
+	if (hist) {
+		util::xml::data_node const *item = hist->get_child(osd::debugger::NODE_HISTORY_ITEM);
+		while (item) {
+			if (item->get_value() && *item->get_value()) {
+				while ([history count] >= length)
+					[history removeLastObject];
+				[history insertObject:[NSString stringWithUTF8String:item->get_value()] atIndex:0];
+			}
+			item = item->get_next_sibling(osd::debugger::NODE_HISTORY_ITEM);
+		}
+	}
 }
 
 @end

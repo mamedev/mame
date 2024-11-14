@@ -9,6 +9,8 @@
 #include "emu.h"
 #include "c64_nl10.h"
 
+#include "cpu/m6800/m6801.h"
+
 
 
 //**************************************************************************
@@ -51,6 +53,28 @@ c64_nl10_interface_device::c64_nl10_interface_device(const machine_config &mconf
 	: device_t(mconfig, C64_NL10_INTERFACE, tag, owner, clock)
 	, device_cbm_iec_interface(mconfig, *this)
 {
+}
+
+
+//-------------------------------------------------
+//  mem_map - CPU memory map
+//-------------------------------------------------
+
+void c64_nl10_interface_device::mem_map(address_map &map)
+{
+	map(0x6000, 0x7fff).ram();
+	map(0x8000, 0xffff).rom().region("rom", 0);
+}
+
+
+//-------------------------------------------------
+//  device_add_mconfig - machine configuration
+//-------------------------------------------------
+
+void c64_nl10_interface_device::device_add_mconfig(machine_config &config)
+{
+	hd6303y_cpu_device &bufcpu(HD6303Y(config, "bufcpu", 8'000'000));
+	bufcpu.set_addrmap(AS_PROGRAM, &c64_nl10_interface_device::mem_map);
 }
 
 

@@ -29,7 +29,8 @@ size_t skipspaces(const unsigned char *buf, size_t i)
    in dest, returning the number of bytes read from buf */
 size_t encode(unsigned char *dest, const unsigned char *buf)
 {
-     size_t i = 0, j, d = 0;
+     size_t i = 0, j;
+     utf8proc_ssize_t d = 0;
      for (;;) {
           int c;
           i = skipspaces(buf, i);

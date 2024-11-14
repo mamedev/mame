@@ -66,6 +66,9 @@
 #include "tilemap.h"
 
 
+
+namespace {
+
 #define MASTER_CLOCK    XTAL(22'118'400)
 
 
@@ -83,8 +86,8 @@ public:
 	void nsmpoker(machine_config &config);
 
 protected:
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 private:
 	required_shared_ptr<uint8_t> m_videoram;
 	required_shared_ptr<uint8_t> m_colorram;
@@ -99,8 +102,8 @@ private:
 	void nsmpoker_palette(palette_device &palette) const;
 	uint32_t screen_update_nsmpoker(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(nsmpoker_interrupt);
-	void nsmpoker_map(address_map &map);
-	void nsmpoker_portmap(address_map &map);
+	void nsmpoker_map(address_map &map) ATTR_COLD;
+	void nsmpoker_portmap(address_map &map) ATTR_COLD;
 };
 
 
@@ -463,6 +466,8 @@ ROM_START( nsmpoker )
 	ROM_LOAD( "113_280.3g", 0x6000, 0x2000, CRC(9b9be79d) SHA1(8301e74c4869d04eba680d156de9edaadd7ff83b) )
 	ROM_LOAD( "113_281.2g", 0xb000, 0x2000, CRC(4b9b448a) SHA1(3ca1f5714cf5535d2ea1e7e03bca456c89af222c) )
 ROM_END
+
+} // anonymous namespace
 
 
 /*************************

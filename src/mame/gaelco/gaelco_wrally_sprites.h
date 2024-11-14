@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Manuel Abadia, Mike Coates, Nicola Salmoria, Miguel Angel Horna, Luca Elia, David Haywood
-#ifndef MAME_VIDEO_GAELCO_WRALLY_SPRITES_H
-#define MAME_VIDEO_GAELCO_WRALLY_SPRITES_H
+#ifndef MAME_GAELCO_GAELCO_WRALLY_SPRITES_H
+#define MAME_GAELCO_GAELCO_WRALLY_SPRITES_H
 
 #pragma once
 
@@ -21,8 +21,8 @@ public:
 protected:
 	gaelco_wrally_sprites_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	virtual void get_sprites_info(uint16_t* spriteram, int& sx, int& sy, int& number, int& color, int& color_effect, int& attr, int& high_priotiy, int &end);
 
@@ -45,4 +45,4 @@ protected:
 DECLARE_DEVICE_TYPE(GAELCO_WRALLY_SPRITES, gaelco_wrally_sprites_device)
 DECLARE_DEVICE_TYPE(BLMBYCAR_SPRITES, blmbycar_sprites_device)
 
-#endif // MAME_VIDEO_GAELCO_WRALLY_SPRITES_H
+#endif // MAME_GAELCO_GAELCO_WRALLY_SPRITES_H

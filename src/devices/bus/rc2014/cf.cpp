@@ -25,11 +25,11 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
-	DECLARE_WRITE_LINE_MEMBER( tx_w ) { m_bus->tx_w(state); }
+	void tx_w(int state) { m_bus->tx_w(state); }
 
 	uint8_t ide_cs0_r(offs_t offset) { return m_ata->cs0_r(offset); }
 	void ide_cs0_w(offs_t offset, uint8_t data) { m_ata->cs0_w(offset, data); }
@@ -56,7 +56,7 @@ void compact_flash_device::device_reset()
 
 void compact_flash_device::device_add_mconfig(machine_config &config)
 {
-	ATA_INTERFACE(config, m_ata).options(ata_devices, "hdd", nullptr, true);
+	ATA_INTERFACE(config, m_ata).options(ata_devices, "cf", nullptr, true);
 }
 
 }

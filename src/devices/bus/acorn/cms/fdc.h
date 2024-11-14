@@ -6,7 +6,6 @@
 
 **********************************************************************/
 
-
 #ifndef MAME_BUS_ACORN_CMS_FDC_H
 #define MAME_BUS_ACORN_CMS_FDC_H
 
@@ -15,7 +14,6 @@
 #include "bus/acorn/bus.h"
 #include "imagedev/floppy.h"
 #include "machine/wd_fdc.h"
-#include "formats/acorn_dsk.h"
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -33,10 +31,10 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 	// optional information overrides
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 private:
 	uint8_t wd1770_state_r();

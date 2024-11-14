@@ -17,6 +17,8 @@ Status: Boots into monitor, some commands work, some freeze.
 #include "machine/z80sio.h"
 
 
+namespace {
+
 class pm68k_state : public driver_device
 {
 public:
@@ -29,8 +31,8 @@ public:
 	void pm68k(machine_config &config);
 
 private:
-	void mem_map(address_map &map);
-	virtual void machine_reset() override;
+	void mem_map(address_map &map) ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 	required_shared_ptr<uint16_t> m_p_base;
 	required_device<cpu_device> m_maincpu;
 };
@@ -96,6 +98,8 @@ ROM_START( pm68k )
 	ROM_LOAD16_BYTE("u104", 0x02000, 0x2000, CRC(ccd2ba4d) SHA1(5cdcf875e136aa9af5f150e0102cd209c496885e) )
 	ROM_LOAD16_BYTE("u102", 0x02001, 0x2000, CRC(48182abd) SHA1(a6e4fb62c5f04cb397c6c3294723ec1f7bc3b680) )
 ROM_END
+
+} // anonymous namespace
 
 
 /* Driver */

@@ -26,14 +26,13 @@ CPU speed. It should be around 14-16MHz. The ARM CPU is rated 12MHz, they
 probably went for this solution to get optimum possible speed for each module.
 
 TODO:
-- PC version still gives a sync error on boot sometimes, probably related to quantum
 - is interrupt handling correct?
 - timer shouldn't be needed for disabling bootrom, real ARM has already read the next opcode
 
 */
 
 #include "emu.h"
-#include "machine/chessmachine.h"
+#include "chessmachine.h"
 
 
 DEFINE_DEVICE_TYPE(CHESSMACHINE, chessmachine_device, "chessmachine", "Tasc ChessMachine")
@@ -45,9 +44,7 @@ DEFINE_DEVICE_TYPE(CHESSMACHINE, chessmachine_device, "chessmachine", "Tasc Ches
 chessmachine_device::chessmachine_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, CHESSMACHINE, tag, owner, clock),
 	m_maincpu(*this, "maincpu"),
-	m_bootrom(*this, "bootrom"),
-	m_ram(*this, "ram"),
-	m_disable_bootrom(*this, "disable_bootrom"),
+	m_boot_view(*this, "boot_view"),
 	m_data_out(*this)
 { }
 
@@ -59,11 +56,10 @@ chessmachine_device::chessmachine_device(const machine_config &mconfig, const ch
 
 void chessmachine_device::device_start()
 {
-	// resolve callbacks
-	m_data_out.resolve_safe();
+	memset(m_latch, 0, sizeof(m_latch));
+	m_boot_timer = timer_alloc(FUNC(chessmachine_device::disable_bootrom), this);
 
 	// register for savestates
-	save_item(NAME(m_bootrom_enabled));
 	save_item(NAME(m_latch));
 }
 
@@ -73,35 +69,52 @@ void chessmachine_device::device_start()
 //  external handlers
 //-------------------------------------------------
 
-void chessmachine_device::sync0_callback(s32 param)
+void chessmachine_device::data0_w_sync(s32 param)
 {
-	m_latch[0] = (m_latch[0] & 0x80) | param;
+	if ((m_latch[0] & 1) != param)
+	{
+		machine().scheduler().perfect_quantum(attotime::from_usec(50));
+		m_latch[0] = (m_latch[0] & 0x80) | param;
+	}
 }
 
 void chessmachine_device::data0_w(int state)
 {
-	machine().scheduler().synchronize(timer_expired_delegate(FUNC(chessmachine_device::sync0_callback), this), state ? 1 : 0);
+	machine().scheduler().synchronize(timer_expired_delegate(FUNC(chessmachine_device::data0_w_sync), this), state ? 1 : 0);
 }
 
-void chessmachine_device::sync1_callback(s32 param)
+void chessmachine_device::data1_w_sync(s32 param)
 {
-	m_latch[0] = (m_latch[0] & 1) | param;
+	if ((m_latch[0] & 0x80) != param)
+	{
+		machine().scheduler().perfect_quantum(attotime::from_usec(50));
+		m_latch[0] = (m_latch[0] & 1) | param;
 
-	// cause interrupt?
-	m_maincpu->set_input_line(ARM_FIRQ_LINE, param ? ASSERT_LINE : CLEAR_LINE);
+		// cause interrupt?
+		m_maincpu->set_input_line(ARM_FIRQ_LINE, param ? ASSERT_LINE : CLEAR_LINE);
+	}
 }
 
 void chessmachine_device::data1_w(int state)
 {
-	machine().scheduler().synchronize(timer_expired_delegate(FUNC(chessmachine_device::sync1_callback), this), state ? 0x80 : 0);
+	machine().scheduler().synchronize(timer_expired_delegate(FUNC(chessmachine_device::data1_w_sync), this), state ? 0x80 : 0);
+}
+
+void chessmachine_device::reset_w_sync(s32 param)
+{
+	m_maincpu->set_input_line(INPUT_LINE_RESET, param ? ASSERT_LINE : CLEAR_LINE);
+
+	if (param)
+	{
+		// enable bootrom
+		m_boot_view.select(0);
+		m_boot_timer->adjust(attotime::never);
+	}
 }
 
 void chessmachine_device::reset_w(int state)
 {
-	m_maincpu->set_input_line(INPUT_LINE_RESET, state ? ASSERT_LINE : CLEAR_LINE);
-
-	if (!m_bootrom_enabled && state)
-		install_bootrom(true);
+	machine().scheduler().synchronize(timer_expired_delegate(FUNC(chessmachine_device::reset_w_sync), this), state ? 1 : 0);
 }
 
 
@@ -110,31 +123,22 @@ void chessmachine_device::reset_w(int state)
 //  internal
 //-------------------------------------------------
 
-void chessmachine_device::install_bootrom(bool enable)
-{
-	address_space &program = m_maincpu->space(AS_PROGRAM);
-	program.unmap_readwrite(0, m_bootrom.bytes() - 1);
-
-	if (enable)
-		program.install_rom(0, m_bootrom.bytes() - 1, m_bootrom);
-	else
-		program.install_ram(0, m_ram.bytes() - 1, m_ram);
-
-	m_bootrom_enabled = enable;
-}
-
 u32 chessmachine_device::disable_bootrom_r()
 {
 	// disconnect bootrom from the bus after next opcode
-	if (m_bootrom_enabled && !m_disable_bootrom->enabled() && !machine().side_effects_disabled())
-		m_disable_bootrom->adjust(m_maincpu->cycles_to_attotime(5));
+	if (!machine().side_effects_disabled() && m_boot_timer->remaining().is_never())
+		m_boot_timer->adjust(m_maincpu->cycles_to_attotime(5));
 
 	return 0;
 }
 
 void chessmachine_device::main_map(address_map &map)
 {
-	map(0x00000000, 0x000fffff).ram().share("ram");
+	map(0x00000000, 0x000fffff).ram();
+
+	map(0x00000000, 0x0000007f).view(m_boot_view);
+	m_boot_view[0](0x00000000, 0x0000007f).rom().region("bootrom", 0);
+
 	map(0x00400000, 0x00400003).mirror(0x003ffffc).rw(FUNC(chessmachine_device::internal_r), FUNC(chessmachine_device::internal_w)).umask32(0x000000ff);
 	map(0x01800000, 0x01800003).r(FUNC(chessmachine_device::disable_bootrom_r));
 }
@@ -144,8 +148,6 @@ void chessmachine_device::device_add_mconfig(machine_config &config)
 	ARM(config, m_maincpu, DERIVED_CLOCK(1,1));
 	m_maincpu->set_addrmap(AS_PROGRAM, &chessmachine_device::main_map);
 	m_maincpu->set_copro_type(arm_cpu_device::copro_type::VL86C020);
-
-	TIMER(config, "disable_bootrom").configure_generic(FUNC(chessmachine_device::disable_bootrom));
 }
 
 

@@ -6,15 +6,14 @@
 
     emulation by Luca Elia, based on the Z80 core by Juergen Buchmueller
 
-    ChangeLog:
-
-    20150517 Fixed TRUN bit masking (timers start/stop handling) [Rainer Keuchel]
-
 *************************************************************************************************************/
 
 #include "emu.h"
 #include "tlcs90.h"
 #include "tlcs90d.h"
+
+#define VERBOSE     0
+#include "logmacro.h"
 
 ALLOW_SAVE_TYPE(tlcs90_device::e_mode); // allow save_item on a non-fundamental type
 
@@ -31,11 +30,11 @@ void tlcs90_device::tmp90840_regs(address_map &map)
 {
 	map(0xffc0, 0xffef).rw(FUNC(tlcs90_device::reserved_r), FUNC(tlcs90_device::reserved_w));
 	//map(0xffc0, 0xffc0).rw(FUNC(tlcs90_device::p0_r), FUNC(tlcs90_device::p0_w));
-	//map(0xffc1, 0xffc1).rw(FUNC(tlcs90_device::p1_r), FUNC(tlcs90_device::p1_w));
-	//map(0xffc2, 0xffc2).rw(FUNC(tlcs90_device::irfl_r), FUNC(tlcs90_device::p01cr_w));
+	map(0xffc1, 0xffc1).rw(FUNC(tlcs90_device::p1_r), FUNC(tlcs90_device::p1_w));
+	map(0xffc2, 0xffc2). /*r(FUNC(tlcs90_device::irfl_r)).*/ w(FUNC(tlcs90_device::p01cr_w));
 	map(0xffc3, 0xffc3). /*r(FUNC(tlcs90_device::irfh_r)).*/ w(FUNC(tlcs90_device::irf_clear_w));
-	//map(0xffc4, 0xffc4).rw(FUNC(tlcs90_device::p2_r), FUNC(tlcs90_device::p2_w));
-	//map(0xffc5, 0xffc5).w(FUNC(tlcs90_device::p2cr_w));
+	map(0xffc4, 0xffc4).rw(FUNC(tlcs90_device::p2_r), FUNC(tlcs90_device::p2_w));
+	map(0xffc5, 0xffc5).w(FUNC(tlcs90_device::p2cr_w));
 	map(0xffc6, 0xffc6).rw(FUNC(tlcs90_device::p3_r), FUNC(tlcs90_device::p3_w));
 	//map(0xffc7, 0xffc7).w(FUNC(tlcs90_device::p3cr_w));
 	map(0xffc8, 0xffc8).rw(FUNC(tlcs90_device::p4_r), FUNC(tlcs90_device::p4_w));
@@ -106,8 +105,8 @@ void tlcs90_device::tmp90844_regs(address_map &map)
 	//map(0xffc1, 0xffc1).w(FUNC(tlcs90_device::p0cr_w));
 	//map(0xffc2, 0xffc2).rw(FUNC(tlcs90_device::p1_r), FUNC(tlcs90_device::p1_w));
 	//map(0xffc3, 0xffc3).w(FUNC(tlcs90_device::p1cr_w));
-	//map(0xffc4, 0xffc4).rw(FUNC(tlcs90_device::p2_r), FUNC(tlcs90_device::p2_w));
-	//map(0xffc5, 0xffc5).w(FUNC(tlcs90_device::p2cr_w));
+	map(0xffc4, 0xffc4).rw(FUNC(tlcs90_device::p2_r), FUNC(tlcs90_device::p2_w));
+	map(0xffc5, 0xffc5).w(FUNC(tlcs90_device::p2cr_w));
 	map(0xffc6, 0xffc6).rw(FUNC(tlcs90_device::p3_r), FUNC(tlcs90_device::p3_w));
 	//map(0xffc7, 0xffc7).w(FUNC(tlcs90_device::p3cr_w));
 	map(0xffc8, 0xffc8).rw(FUNC(tlcs90_device::p4_r), FUNC(tlcs90_device::p4_w));
@@ -157,7 +156,7 @@ void tlcs90_device::tmp90ph44_mem(address_map &map)
 tlcs90_device::tlcs90_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, address_map_constructor program_map)
 	: cpu_device(mconfig, type, tag, owner, clock)
 	, m_program_config("program", ENDIANNESS_LITTLE, 8, 20, 0, program_map)
-	, m_port_read_cb(*this)
+	, m_port_read_cb(*this, 0xff)
 	, m_port_write_cb(*this)
 {
 }
@@ -208,7 +207,7 @@ device_memory_interface::space_config_vector tlcs90_device::memory_space_config(
 enum    {
 		T90_B,  T90_C,  T90_D,  T90_E,  T90_H,  T90_L,  T90_A,
 		T90_BC, T90_DE, T90_HL, T90_XX, T90_IX, T90_IY, T90_SP,
-		T90_AF, T90_PC
+		T90_AF, T90_PC, T90_HA
 };
 
 // Regs
@@ -281,31 +280,28 @@ static uint8_t SZHV_dec[256]; /* zero, sign, half carry and overflow flags DEC r
 #define OP_16 0x80
 
 
+#define OP(   X,CT )       m_op = X; m_cyc_t = (CT*2);
+#define OP16( X,CT )       OP( (X)|OP_16,CT )
 
+#define OPCC(   X,CF,CT )  OP( X, CT ) m_cyc_f = (CF*2);
+#define OPCC16( X,CF,CT )  OPCC( (X)|OP_16,CF,CT )
 
-
-#define OP(   X,CT )        m_op = X;       m_cyc_t = (CT*2);
-#define OP16( X,CT )        OP( (X)|OP_16,CT )
-
-#define OPCC(   X,CF,CT )   OP( X, CT ) m_cyc_f = (CF*2);
-#define OPCC16( X,CF,CT )   OPCC( (X)|OP_16,CF,CT )
-
-#define BIT8( N,I )         m_mode##N = e_mode::BIT8;  m_r##N = I;
-#define I8( N,I )           m_mode##N = e_mode::I8;        m_r##N = I;
-#define D8( N,I )           m_mode##N = e_mode::D8;        m_r##N = I;
-#define I16( N,I )          m_mode##N = e_mode::I16;       m_r##N = I;
-#define D16( N,I )          m_mode##N = e_mode::D16;       m_r##N = I;
-#define R8( N,R )           m_mode##N = e_mode::R8;        m_r##N = R;
-#define R16( N,R )          m_mode##N = e_mode::R16;       m_r##N = R;
-#define Q16( N,R )          m_mode##N = e_mode::R16;       m_r##N = R; if (m_r##N == SP) m_r##N = AF;
-#define MI16( N,I )         m_mode##N = e_mode::MI16;  m_r##N = I;
-#define MR16( N,R )         m_mode##N = e_mode::MR16;  m_r##N = R;
-#define MR16D8( N,R,I )     m_mode##N = e_mode::MR16D8;    m_r##N = R; m_r##N##b = I;
-#define MR16R8( N,R,g )     m_mode##N = e_mode::MR16R8;    m_r##N = R; m_r##N##b = g;
-#define NONE( N )           m_mode##N = e_mode::NONE;
-#define CC( N,cc )          m_mode##N = e_mode::CC;        m_r##N = cc;
-#define R16D8( N,R,I )      m_mode##N = e_mode::R16D8; m_r##N = R; m_r##N##b = I;
-#define R16R8( N,R,g )      m_mode##N = e_mode::R16R8; m_r##N = R; m_r##N##b = g;
+#define BIT8( N,I )        m_mode##N = e_mode::BIT8;    m_r##N = I;
+#define I8( N,I )          m_mode##N = e_mode::I8;      m_r##N = I;
+#define D8( N,I )          m_mode##N = e_mode::D8;      m_r##N = I;
+#define I16( N,I )         m_mode##N = e_mode::I16;     m_r##N = I;
+#define D16( N,I )         m_mode##N = e_mode::D16;     m_r##N = I;
+#define R8( N,R )          m_mode##N = e_mode::R8;      m_r##N = R;
+#define R16( N,R )         m_mode##N = e_mode::R16;     m_r##N = R;
+#define Q16( N,R )         m_mode##N = e_mode::R16;     m_r##N = R; if (m_r##N == SP) m_r##N = AF;
+#define MI16( N,I )        m_mode##N = e_mode::MI16;    m_r##N = I;
+#define MR16( N,R )        m_mode##N = e_mode::MR16;    m_r##N = R;
+#define MR16D8( N,R,I )    m_mode##N = e_mode::MR16D8;  m_r##N = R; m_r##N##b = I;
+#define MR16R8( N,R,g )    m_mode##N = e_mode::MR16R8;  m_r##N = R; m_r##N##b = g;
+#define NONE( N )          m_mode##N = e_mode::NONE;
+#define CC( N,cc )         m_mode##N = e_mode::CC;      m_r##N = cc;
+#define R16D8( N,R,I )     m_mode##N = e_mode::R16D8;   m_r##N = R; m_r##N##b = I;
+#define R16R8( N,R,g )     m_mode##N = e_mode::R16R8;   m_r##N = R; m_r##N##b = g;
 
 uint8_t  tlcs90_device::RM8 (uint32_t a)    { return m_program->read_byte( a ); }
 uint16_t tlcs90_device::RM16(uint32_t a)    { return RM8(a) | (RM8( (a+1) & 0xffff ) << 8); }
@@ -1100,7 +1096,7 @@ uint16_t tlcs90_device::r8( const uint16_t r )
 		case L: return m_hl.b.l;
 
 		default:
-			fatalerror("%04x: unimplemented r8 register index = %d\n",m_pc.w.l,r);
+			fatalerror("%04x: unimplemented r8 register index = %d\n",m_prvpc.w.l,r);
 	}
 }
 
@@ -1117,7 +1113,7 @@ void tlcs90_device::w8( const uint16_t r, uint16_t value )
 		case L: m_hl.b.l = value;   return;
 
 		default:
-			fatalerror("%04x: unimplemented w8 register index = %d\n",m_pc.w.l,r);
+			fatalerror("%04x: unimplemented w8 register index = %d\n",m_prvpc.w.l,r);
 	}
 }
 
@@ -1138,7 +1134,7 @@ uint16_t tlcs90_device::r16( const uint16_t r )
 		case PC:    return m_pc.w.l;
 
 		default:
-			fatalerror("%04x: unimplemented r16 register index = %d\n",m_pc.w.l,r);
+			fatalerror("%04x: unimplemented r16 register index = %d\n",m_prvpc.w.l,r);
 	}
 }
 
@@ -1157,7 +1153,7 @@ void tlcs90_device::w16( const uint16_t r, uint16_t value )
 		case PC:    m_pc.d = value; return;
 
 		default:
-			fatalerror("%04x: unimplemented w16 register index = %d\n",m_pc.w.l,r);
+			fatalerror("%04x: unimplemented w16 register index = %d\n",m_prvpc.w.l,r);
 	}
 }
 
@@ -1290,7 +1286,7 @@ int tlcs90_device::Test( uint8_t cond )
 		case NZ:    return !(F & ZF);
 		case NC:    return !(F & CF);
 		default:
-			fatalerror("%04x: unimplemented condition = %d\n",m_pc.w.l,cond);
+			fatalerror("%04x: unimplemented condition = %d\n",m_prvpc.w.l,cond);
 	}
 
 	// never executed
@@ -1343,12 +1339,19 @@ INT2        P82         Rising Edge     -
 
 *************************************************************************************************************/
 
+void tlcs90_device::halt()
+{
+	LOG("%04X: halt\n", m_prvpc.w.l);
+	m_halt = 1;
+}
+
 void tlcs90_device::leave_halt()
 {
 	if( m_halt )
 	{
+		LOG("%04X: leave_halt\n", m_pc.w.l);
 		m_halt = 0;
-		m_pc.w.l++;
+		//m_pc.w.l++;
 	}
 }
 
@@ -1391,8 +1394,10 @@ void tlcs90_device::check_interrupts()
 	{
 		mask = (1 << irq);
 		if(irq >= INT0) mask &= m_irq_mask;
+
 		if (m_irq_state & mask)
 		{
+			LOG("%04X: check_interrupts: taking interrupt: %d. Current state: %x. Current mask: %x\n", m_pc.w.l, irq, m_irq_state, mask);
 			take_interrupt( irq );
 			return;
 		}
@@ -1449,14 +1454,20 @@ void tlcs90_device::execute_run()
 
 	do
 	{
-		m_prvpc.d = m_pc.d;
-		debugger_instruction_hook(m_pc.d);
-
 		check_interrupts();
 
-		m_addr = m_pc.d;
-		decode();
-		m_pc.d = m_addr;
+		// when in HALT state, the fetched opcode is not dispatched (aka a NOP) and the PC is not increased
+		if (m_halt)
+			m_op = NOP;
+		else
+		{
+			m_prvpc.d = m_pc.d;
+			debugger_instruction_hook(m_pc.d);
+
+			m_addr = m_pc.d;
+			decode();
+			m_pc.d = m_addr;
+		}
 
 		switch ( m_op )
 		{
@@ -1630,9 +1641,10 @@ void tlcs90_device::execute_run()
 				Cyc();
 				break;
 
-//          case HALT:
-//              Cyc();
-//              break;
+			case HALT:
+				halt();
+				Cyc();
+				break;
 			case DI:
 				m_after_EI = 0;
 				F &= ~IF;
@@ -2078,6 +2090,8 @@ void tlcs90_device::execute_run()
 
 void tlcs90_device::device_reset()
 {
+	leave_halt();
+
 	m_irq_state = 0;
 	m_irq_mask = 0;
 	m_pc.d = 0x0000;
@@ -2091,6 +2105,8 @@ void tlcs90_device::device_reset()
 */
 
 	std::fill(std::begin(m_port_latch), std::end(m_port_latch), 0);
+	m_p01cr = 0;
+	m_p2cr = 0;
 	m_p4cr = 0;
 	m_p67cr = 0;
 	m_p8cr = 0;
@@ -2105,11 +2121,6 @@ void tlcs90_device::device_reset()
 	m_t4mod = 0;
 	std::fill(std::begin(m_treg_8bit), std::end(m_treg_8bit), 0);
 	std::fill(std::begin(m_treg_16bit), std::end(m_treg_16bit), 0);
-}
-
-void tlcs90_device::execute_burn(int32_t cycles)
-{
-	m_icount -= 4 * ((cycles + 3) / 4);
 }
 
 
@@ -2383,6 +2394,89 @@ FFED    BX      R/W     Reset   Description
  0      BY0     R W     0       IY bank register bit 0
 
 *************************************************************************************************************/
+
+uint8_t tlcs90_device::p1_r()
+{
+	if ((m_p01cr & 0x04) != 0)
+	{
+		if (!machine().side_effects_disabled())
+			logerror("%04X: Read from P1 but it's configured as part of address bus\n", m_prvpc.w.l);
+
+		return 0;
+	}
+
+	if ((m_p01cr & 0x02) != 0)
+	{
+		if (!machine().side_effects_disabled())
+			logerror("%04X: Read from P1 but it's configured as output\n", m_prvpc.w.l);
+
+		return 0;
+	}
+
+	return m_port_read_cb[1]();
+}
+
+void tlcs90_device::p1_w(uint8_t data)
+{
+	if ((m_p01cr & 0x04) != 0)
+	{
+		if (!machine().side_effects_disabled())
+			logerror("%04X: Read from P1 but it's configured as part of address bus\n", m_prvpc.w.l);
+
+		return;
+	}
+
+	if ((m_p01cr & 0x02) == 0)
+	{
+		if (!machine().side_effects_disabled())
+			logerror("%04X: Write to P1 but it's configured as input\n", m_prvpc.w.l);
+
+		return;
+	}
+
+	m_port_write_cb[1](m_port_latch[1]);
+}
+
+void tlcs90_device::p01cr_w(uint8_t data)
+{
+	m_p01cr = data;
+}
+
+uint8_t tlcs90_device::p2_r()
+{
+	if ((m_p01cr & 0x04) != 0)
+	{
+		if (!machine().side_effects_disabled())
+			logerror("%04X: Read from P2 but it's configured as part of address bus\n", m_prvpc.w.l);
+
+		return 0;
+	}
+
+	return m_port_read_cb[2]();
+}
+
+void tlcs90_device::p2_w(uint8_t data)
+{
+	if ((m_p01cr & 0x04) != 0)
+	{
+		if (!machine().side_effects_disabled())
+			logerror("%04X: Read from P1 but it's configured as part of address bus\n", m_prvpc.w.l);
+
+		return;
+	}
+
+	m_port_latch[2] = data;
+	uint8_t out_mask = m_p2cr;
+	if (out_mask)
+	{
+		m_port_write_cb[2](m_port_latch[2] & out_mask);
+	}
+}
+
+void tlcs90_device::p2cr_w(uint8_t data)
+{
+	m_p2cr = data;
+}
 
 uint8_t tlcs90_device::p3_r()
 {
@@ -2672,14 +2766,14 @@ uint8_t tlcs90_device::reserved_r(offs_t offset)
 {
 	uint16_t iobase = 0xffc0;
 	if (!machine().side_effects_disabled())
-		logerror("%04X: Read from unimplemented SFR at %04X\n", m_pc.w.l, iobase + offset);
+		logerror("%04X: Read from unimplemented SFR at %04X\n", m_prvpc.w.l, iobase + offset);
 	return 0;
 }
 
 void tlcs90_device::reserved_w(offs_t offset, uint8_t data)
 {
 	uint16_t iobase = 0xffc0;
-	logerror("%04X: Write %02X to unimplemented SFR at %04X\n", m_pc.w.l, data, iobase + offset);
+	logerror("%04X: Write %02X to unimplemented SFR at %04X\n", m_prvpc.w.l, data, iobase + offset);
 }
 
 void tlcs90_device::t90_start_timer(int i)
@@ -2721,7 +2815,7 @@ void tlcs90_device::t90_start_timer(int i)
 
 	m_timer[i]->adjust(period, i, period);
 
-	logerror("%04X: CPU Timer %d started at %f Hz\n", m_pc.w.l, i, 1.0 / period.as_double());
+	LOG("%04X: CPU Timer %d started at %f Hz\n", m_pc.w.l, i, 1.0 / period.as_double());
 }
 
 void tlcs90_device::t90_start_timer4()
@@ -2743,14 +2837,14 @@ void tlcs90_device::t90_start_timer4()
 
 	m_timer[4]->adjust(period, 4, period);
 
-	logerror("%04X: CPU Timer 4 started at %f Hz\n", m_pc.w.l, 1.0 / period.as_double());
+	LOG("%04X: CPU Timer 4 started at %f Hz\n", m_pc.w.l, 1.0 / period.as_double());
 }
 
 
 void tlcs90_device::t90_stop_timer(int i)
 {
 	m_timer[i]->adjust(attotime::never, i);
-	logerror("%04X: CPU Timer %d stopped\n", m_pc.w.l, i);
+	LOG("%04X: CPU Timer %d stopped\n", m_pc.w.l, i);
 }
 
 void tlcs90_device::t90_stop_timer4()
@@ -2850,9 +2944,6 @@ TIMER_CALLBACK_MEMBER( tlcs90_device::t90_timer4_callback )
 
 void tlcs90_device::device_start()
 {
-	m_port_read_cb.resolve_all_safe(0xff);
-	m_port_write_cb.resolve_all_safe();
-
 	save_item(NAME(m_prvpc.w.l));
 	save_item(NAME(m_pc.w.l));
 	save_item(NAME(m_sp.w.l));
@@ -2874,6 +2965,8 @@ void tlcs90_device::device_start()
 	save_item(NAME(m_extra_cycles));
 
 	save_item(NAME(m_port_latch));
+	save_item(NAME(m_p01cr));
+	save_item(NAME(m_p2cr));
 	save_item(NAME(m_p4cr));
 	save_item(NAME(m_p67cr));
 	save_item(NAME(m_p8cr));
@@ -2969,6 +3062,7 @@ void tlcs90_device::device_start()
 	state_add( T90_HL, "HL", m_hl.w.l).formatstr("%04X");
 	state_add( T90_IX, "IX", m_ix.w.l).formatstr("%04X");
 	state_add( T90_IY, "IY", m_iy.w.l).formatstr("%04X");
+	state_add( T90_HA, "HALT", m_halt).formatstr("%01X");
 
 	state_add(STATE_GENPC, "GENPC", m_pc.w.l).formatstr("%04X").noshow();
 	state_add(STATE_GENPCBASE, "CURPC", m_prvpc.w.l).formatstr("%04X").noshow();

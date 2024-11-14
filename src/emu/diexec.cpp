@@ -70,8 +70,6 @@ device_execute_interface::device_execute_interface(const machine_config &mconfig
 	, m_attoseconds_per_cycle(0)
 	, m_spin_end_timer(nullptr)
 {
-	memset(&m_localtime, 0, sizeof(m_localtime));
-
 	// configure the fast accessor
 	assert(!device.interfaces().m_execute);
 	device.interfaces().m_execute = this;
@@ -285,17 +283,6 @@ u32 device_execute_interface::execute_max_cycles() const noexcept
 
 
 //-------------------------------------------------
-//  execute_input_lines - return the total number
-//  of input lines for the device
-//-------------------------------------------------
-
-u32 device_execute_interface::execute_input_lines() const noexcept
-{
-	return 0;
-}
-
-
-//-------------------------------------------------
 //  execute_default_irq_vector - return the default
 //  IRQ vector when an acknowledge is processed
 //-------------------------------------------------
@@ -314,18 +301,6 @@ u32 device_execute_interface::execute_default_irq_vector(int linenum) const noex
 bool device_execute_interface::execute_input_edge_triggered(int linenum) const noexcept
 {
 	return false;
-}
-
-
-//-------------------------------------------------
-//  execute_burn - called after we consume a bunch
-//  of cycles for artifical reasons (such as
-//  spinning devices for performance optimization)
-//-------------------------------------------------
-
-void device_execute_interface::execute_burn(s32 cycles)
-{
-	// by default, do nothing
 }
 
 
@@ -520,17 +495,12 @@ void device_execute_interface::interface_clock_changed(bool sync_on_new_clock_do
 
 
 //-------------------------------------------------
-//  standard_irq_callback_member - IRQ acknowledge
+//  standard_irq_callback - IRQ acknowledge
 //  callback; handles HOLD_LINE case and signals
 //  to the debugger
 //-------------------------------------------------
 
-IRQ_CALLBACK_MEMBER( device_execute_interface::standard_irq_callback_member )
-{
-	return device.execute().standard_irq_callback(irqline);
-}
-
-int device_execute_interface::standard_irq_callback(int irqline)
+int device_execute_interface::standard_irq_callback(int irqline, offs_t pc)
 {
 	// get the default vector and acknowledge the interrupt if needed
 	int vector = m_input[irqline].default_irq_callback();
@@ -543,7 +513,7 @@ int device_execute_interface::standard_irq_callback(int irqline)
 
 	// notify the debugger
 	if (device().machine().debug_flags & DEBUG_FLAG_ENABLED)
-		device().debug()->interrupt_hook(irqline);
+		device().debug()->interrupt_hook(irqline, pc);
 
 	return vector;
 }

@@ -2,7 +2,7 @@
 // detail/impl/resolver_service_base.ipp
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //
-// Copyright (c) 2003-2021 Christopher M. Kohlhoff (chris at kohlhoff dot com)
+// Copyright (c) 2003-2024 Christopher M. Kohlhoff (chris at kohlhoff dot com)
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -105,14 +105,14 @@ void resolver_service_base::destroy(
 void resolver_service_base::move_construct(implementation_type& impl,
     implementation_type& other_impl)
 {
-  impl = ASIO_MOVE_CAST(implementation_type)(other_impl);
+  impl = static_cast<implementation_type&&>(other_impl);
 }
 
 void resolver_service_base::move_assign(implementation_type& impl,
     resolver_service_base&, implementation_type& other_impl)
 {
   destroy(impl);
-  impl = ASIO_MOVE_CAST(implementation_type)(other_impl);
+  impl = static_cast<implementation_type&&>(other_impl);
 }
 
 void resolver_service_base::cancel(

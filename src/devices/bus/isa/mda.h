@@ -31,8 +31,8 @@ public:
 	virtual uint8_t status_r();
 	virtual void mode_control_w(uint8_t data);
 
-	DECLARE_WRITE_LINE_MEMBER(hsync_changed);
-	DECLARE_WRITE_LINE_MEMBER(vsync_changed);
+	void hsync_changed(int state);
+	void vsync_changed(int state);
 
 	virtual MC6845_UPDATE_ROW( crtc_update_row );
 
@@ -40,18 +40,18 @@ protected:
 	isa8_mda_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// optional information overrides
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 
 	required_device<mc6845_device> m_crtc;
 	optional_device<pc_lpt_device> m_lpt;
 
 private:
-	WRITE_LINE_MEMBER(pc_cpu_line);
+	void pc_cpu_line(int state);
 
 	MC6845_UPDATE_ROW( mda_text_inten_update_row );
 	MC6845_UPDATE_ROW( mda_text_blink_update_row );
@@ -90,12 +90,12 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// optional information overrides
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 
 private:
 	virtual MC6845_UPDATE_ROW( crtc_update_row ) override;
@@ -119,11 +119,11 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// optional information overrides
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 private:
 	virtual void mode_control_w(uint8_t data) override;

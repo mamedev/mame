@@ -33,6 +33,7 @@
 #define _DD4 1
 
 NETLIST_START(tp1985)
+{
 
 	SOLVER(Solver, 48000)
 //  PARAM(Solver.PARALLEL, 0) // Don't do parallel solvers
@@ -243,5 +244,5 @@ NETLIST_START(tp1985)
 	HINT(clk, NO_DEACTIVATE)
 #endif
 
-NETLIST_END()
+}
 

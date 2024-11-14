@@ -2,7 +2,7 @@
 // copyright-holders:Olivier Galibert
 /*********************************************************************
 
-    formats/smx_dsk.c
+    formats/smx_dsk.cpp
 
     Specialist MX format
 
@@ -14,17 +14,17 @@ smx_format::smx_format() : wd177x_format(formats)
 {
 }
 
-const char *smx_format::name() const
+const char *smx_format::name() const noexcept
 {
 	return "smx";
 }
 
-const char *smx_format::description() const
+const char *smx_format::description() const noexcept
 {
 	return "Specialist MX/Orion/B2M disk image";
 }
 
-const char *smx_format::extensions() const
+const char *smx_format::extensions() const noexcept
 {
 	return "odi,cpm,img";
 }

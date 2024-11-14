@@ -1,68 +1,15 @@
 // license:BSD-3-Clause
-// copyright-holders:K.Wilkins,Derrick Renaud
+// copyright-holders: K.Wilkins, Derrick Renaud
+
 /*************************************************************************
 
-    audio\firetrk.cpp
+    atari/firetrk_a.cpp
 
 *************************************************************************/
 
 #include "emu.h"
-#include "firetrk.h"
-#include "sound/discrete.h"
 
-
-void firetrk_state::firetrk_skid_reset_w(uint8_t data)
-{
-	m_skid[0] = 0;
-	m_skid[1] = 0;
-
-	// also SUPERBUG_SKID_EN
-	m_discrete->write(FIRETRUCK_SKID_EN, 1);
-}
-
-
-void firetrk_state::montecar_skid_reset_w(uint8_t data)
-{
-	m_discrete->write(MONTECAR_SKID_EN, 1);
-}
-
-
-void firetrk_state::firetrk_crash_snd_w(uint8_t data)
-{
-	// also SUPERBUG_CRASH_DATA and MONTECAR_CRASH_DATA
-	m_discrete->write(FIRETRUCK_CRASH_DATA, data >> 4);
-}
-
-
-void firetrk_state::firetrk_skid_snd_w(uint8_t data)
-{
-	// also SUPERBUG_SKID_EN and MONTECAR_SKID_EN
-	m_discrete->write(FIRETRUCK_SKID_EN, 0);
-}
-
-
-void firetrk_state::firetrk_motor_snd_w(uint8_t data)
-{
-	// also MONTECAR_DRONE_MOTOR_DATA
-	m_discrete->write(FIRETRUCK_SIREN_DATA, data >> 4);
-
-	// also MONTECAR_MOTOR_DATA
-	m_discrete->write(FIRETRUCK_MOTOR_DATA, data & 0x0f);
-}
-
-
-void firetrk_state::superbug_motor_snd_w(uint8_t data)
-{
-	m_discrete->write(SUPERBUG_SPEED_DATA, data & 0x0f);
-}
-
-
-void firetrk_state::firetrk_xtndply_w(uint8_t data)
-{
-	// also SUPERBUG_ASR_EN (extended play)
-	m_discrete->write(FIRETRUCK_XTNDPLY_EN, data);
-}
-
+#include "firetrk_a.h"
 
 #define FIRETRUCK_HSYNC 15750.0     /* not checked */
 #define FIRETRUCK_1V    FIRETRUCK_HSYNC/2
@@ -198,7 +145,7 @@ DISCRETE_SOUND_START(firetrk_discrete)
 	/************************************************/
 	/* Motor sound circuit is based on a 556 VCO    */
 	/* with the input frequency set by the MotorSND */
-	/* latch (4 bit). This freqency is then used to */
+	/* latch (4 bit). This frequency is then used to*/
 	/* drive a modulo 12 counter, with div6 & div12 */
 	/* summed as the output of the circuit.         */
 	/************************************************/
@@ -283,7 +230,7 @@ DISCRETE_SOUND_START(firetrk_discrete)
 	/* counter.                                     */
 	/************************************************/
 	DISCRETE_RCDISC2(NODE_70, FIRETRUCK_BELL_EN,
-				4.4, 10,        // Q3 instantally charges C42
+				4.4, 10,        // Q3 instantaneously charges C42
 				0, RES_K(33),   // discharges through R66
 				CAP_U(10))      // C42
 	DISCRETE_TRANSFORM2(NODE_71, NODE_70,
@@ -402,7 +349,7 @@ DISCRETE_SOUND_START(superbug_discrete)
 	/************************************************/
 	/* Motor sound circuit is based on a 556 VCO    */
 	/* with the input frequency set by the MotorSND */
-	/* latch (4 bit). This freqency is then used to */
+	/* latch (4 bit). This frequency is then used to*/
 	/* drive a modulo 12 counter.                   */
 	/************************************************/
 	DISCRETE_ADJUSTMENT(NODE_20,
@@ -585,7 +532,7 @@ DISCRETE_SOUND_START(montecar_discrete)
 	/************************************************/
 	/* Motor sound circuit is based on a 556 VCO    */
 	/* with the input frequency set by the MotorSND */
-	/* latch (4 bit). This freqency is then used to */
+	/* latch (4 bit). This frequency is then used to*/
 	/* driver a modulo 12 counter, with div6, 4 & 3 */
 	/* summed as the output of the circuit.         */
 	/************************************************/

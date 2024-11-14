@@ -17,6 +17,8 @@
 #include "speaker.h"
 
 
+namespace {
+
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
@@ -35,9 +37,9 @@ private:
 	uint8_t vic_videoram_r(offs_t offset);
 	uint8_t vic_colorram_r(offs_t offset);
 
-	void cpu_map(address_map &map);
-	void vic_colorram_map(address_map &map);
-	void vic_videoram_map(address_map &map);
+	void cpu_map(address_map &map) ATTR_COLD;
+	void vic_colorram_map(address_map &map) ATTR_COLD;
+	void vic_videoram_map(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 };
@@ -124,7 +126,7 @@ void attckufo_state::attckufo(machine_config &config)
 	M6502(config, m_maincpu, XTAL(14'318'181) / 14);
 	m_maincpu->set_addrmap(AS_PROGRAM, &attckufo_state::cpu_map);
 
-	pia6821_device &pia(PIA6821(config, "pia", 0));
+	pia6821_device &pia(PIA6821(config, "pia"));
 	pia.readpa_handler().set_ioport("DSW");
 	pia.readpb_handler().set_ioport("INPUT");
 
@@ -160,6 +162,8 @@ ROM_START( attckufo )
 	ROM_LOAD("7", 0x1800, 0x0400, CRC(43a41012) SHA1(edd14f49dc9ae7a5a14583b9a92ebbbdd021d7b1))
 	ROM_LOAD("8", 0x1c00, 0x0400, CRC(9ce93eb0) SHA1(68753e88db4e920446b9582b5cb713b1beec3b27))
 ROM_END
+
+} // anonymous namespace
 
 
 //**************************************************************************

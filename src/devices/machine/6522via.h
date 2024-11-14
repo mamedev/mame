@@ -84,7 +84,7 @@ public:
 	auto cb2_handler() { return m_cb2_handler.bind(); }
 	auto irq_handler() { return m_irq_handler.bind(); }
 
-	void map(address_map &map);
+	void map(address_map &map) ATTR_COLD;
 
 	u8 read(offs_t offset);
 	void write(offs_t offset, u8 data);
@@ -97,7 +97,7 @@ public:
 	void write_pa5(int state) { set_pa_line(5, state); }
 	void write_pa6(int state) { set_pa_line(6, state); }
 	void write_pa7(int state) { set_pa_line(7, state); }
-	void write_pa( u8 data );
+	void write_pa(u8 data);
 	void write_ca1(int state);
 	void write_ca2(int state);
 
@@ -109,7 +109,7 @@ public:
 	void write_pb5(int state) { set_pb_line(5, state); }
 	void write_pb6(int state) { set_pb_line(6, state); }
 	void write_pb7(int state) { set_pb_line(7, state); }
-	void write_pb( u8 data );
+	void write_pb(u8 data);
 	void write_cb1(int state);
 	void write_cb2(int state);
 
@@ -121,8 +121,8 @@ protected:
 	via6522_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	TIMER_CALLBACK_MEMBER(shift_irq_tick);
 	TIMER_CALLBACK_MEMBER(shift_tick);

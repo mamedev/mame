@@ -1,8 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood
 
-#ifndef MAME_MACHINE_XAVIX_MTRK_WHEEL_H
-#define MAME_MACHINE_XAVIX_MTRK_WHEEL_H
+#ifndef MAME_TVGAMES_XAVIX_MTRK_WHEEL_H
+#define MAME_TVGAMES_XAVIX_MTRK_WHEEL_H
 
 #pragma once
 
@@ -23,9 +23,9 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER( changed );
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
-	virtual ioport_constructor device_input_ports() const override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 
 private:
 	devcb_write_line m_event_out_cb;
@@ -37,4 +37,4 @@ private:
 	int m_is_running;
 };
 
-#endif // MAME_MACHINE_XAVIX_MTRK_WHEEL_H
+#endif // MAME_TVGAMES_XAVIX_MTRK_WHEEL_H

@@ -99,9 +99,9 @@ i8279_device::i8279_device(const machine_config &mconfig, const char *tag, devic
 	m_out_sl_cb(*this),
 	m_out_disp_cb(*this),
 	m_out_bd_cb(*this),
-	m_in_rl_cb(*this),
-	m_in_shift_cb(*this),
-	m_in_ctrl_cb(*this)
+	m_in_rl_cb(*this, 0xff),
+	m_in_shift_cb(*this, 1),
+	m_in_ctrl_cb(*this, 1)
 {
 }
 
@@ -111,14 +111,6 @@ i8279_device::i8279_device(const machine_config &mconfig, const char *tag, devic
 
 void i8279_device::device_start()
 {
-	/* resolve callbacks */
-	m_out_irq_cb.resolve();
-	m_out_sl_cb.resolve();
-	m_out_disp_cb.resolve();
-	m_out_bd_cb.resolve();
-	m_in_rl_cb.resolve();
-	m_in_shift_cb.resolve();
-	m_in_ctrl_cb.resolve();
 	m_scanclock = clock();
 	m_timer = timer_alloc(FUNC(i8279_device::timerproc_callback), this);
 
@@ -208,15 +200,8 @@ void i8279_device::clear_display()
 		m_status &= 0x80; // blow away fifo
 		m_s_ram_ptr = 0; // reset sensor pointer
 		m_debounce = 0; // reset debounce logic
-		set_irq(0); // reset irq
+		m_out_irq_cb(0); // reset irq
 	}
-}
-
-
-void i8279_device::set_irq(bool state)
-{
-	if ( !m_out_irq_cb.isnull() )
-		m_out_irq_cb( state );
 }
 
 
@@ -249,7 +234,7 @@ void i8279_device::new_fifo(u8 data)
 		m_status = (m_status & 0xe8) + fifo_size + 1;
 
 	if (!fifo_size)
-		set_irq(1); // something just went into fifo, so int
+		m_out_irq_cb(1); // something just went into fifo, so int
 }
 
 
@@ -270,8 +255,6 @@ void i8279_device::timer_mainloop()
 	u8 scanner_mask = BIT(m_cmd[0], 0) ? 3 : BIT(m_cmd[0], 3) ? 15 : 7;
 	bool decoded = BIT(m_cmd[0], 0);
 	u8 kbd_type = (m_cmd[0] & 6) >> 1;
-	bool shift_key = 1;
-	bool ctrl_key = 1;
 	bool strobe_pulse = 0;
 
 	// keyboard
@@ -281,12 +264,8 @@ void i8279_device::timer_mainloop()
 	// type 3 = strobed
 
 	// Get shift keys
-	if ( !m_in_shift_cb.isnull() )
-		shift_key = m_in_shift_cb();
-
-	if ( !m_in_ctrl_cb.isnull() )
-		ctrl_key = m_in_ctrl_cb();
-
+	bool shift_key = m_in_shift_cb();
+	bool ctrl_key = m_in_ctrl_cb();
 	if (ctrl_key && !m_ctrl_key)
 		strobe_pulse = 1; // low-to-high is a strobe
 
@@ -294,7 +273,7 @@ void i8279_device::timer_mainloop()
 
 	// Read a row of keys
 
-	if ( !m_in_rl_cb.isnull() )
+	if ( !m_in_rl_cb.isunset() )
 	{
 		u8 rl = m_in_rl_cb(0) ^ 0xff;     // inverted
 		u8 addr = m_scanner & 7;
@@ -354,7 +333,7 @@ void i8279_device::timer_mainloop()
 							if (m_se_mode && !BIT(m_status, 6))
 							{
 								m_status |= 0x40;
-								set_irq(1);
+								m_out_irq_cb(1);
 							}
 #endif // EMULATE_KEY_LOCKOUT
 						}
@@ -381,7 +360,7 @@ void i8279_device::timer_mainloop()
 				m_s_ram[addr] = rl;
 
 				// IRQ line goes high if a row changes value
-				set_irq(1);
+				m_out_irq_cb(1);
 			}
 			break;
 
@@ -397,19 +376,15 @@ void i8279_device::timer_mainloop()
 
 	m_scanner = (m_scanner + 1) & (decoded ? 3 : 15);
 
-	if ( !m_out_sl_cb.isnull() )
-	{
-		// Active low strobed output in decoded mode
-		if (decoded)
-			m_out_sl_cb((offs_t)0, (1 << m_scanner) ^ 15);
-		else
-			m_out_sl_cb((offs_t)0, m_scanner);
-	}
+	// Active low strobed output in decoded mode
+	if (decoded)
+		m_out_sl_cb(offs_t(0), (1 << m_scanner) ^ 15);
+	else
+		m_out_sl_cb(offs_t(0), m_scanner);
 
 	// output a digit
 
-	if ( !m_out_disp_cb.isnull() )
-		m_out_disp_cb((offs_t)0, m_d_ram[m_scanner & scanner_mask] );
+	m_out_disp_cb(offs_t(0), m_d_ram[m_scanner & scanner_mask]);
 }
 
 
@@ -454,7 +429,7 @@ u8 i8279_device::data_r()
 			}
 			else
 			{
-				set_irq(0);
+				m_out_irq_cb(0);
 			}
 		}
 	}
@@ -476,7 +451,7 @@ u8 i8279_device::data_r()
 							m_fifo[i-1] = m_fifo[i];
 						fifo_size--;
 						if (!fifo_size)
-							set_irq(0);
+							m_out_irq_cb(0);
 					}
 					break;
 				case 0x28: // overrun
@@ -551,7 +526,7 @@ void i8279_device::cmd_w(u8 data)
 			clear_display();
 			break;
 		case 7:
-			set_irq(0);
+			m_out_irq_cb(0);
 			m_se_mode = BIT(data, 4);
 			m_status &= 0xbf;
 			break;

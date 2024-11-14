@@ -1,7 +1,7 @@
 // 7zOut.h
 
-#ifndef __7Z_OUT_H
-#define __7Z_OUT_H
+#ifndef ZIP7_INC_7Z_OUT_H
+#define ZIP7_INC_7Z_OUT_H
 
 #include "7zCompressionMode.h"
 #include "7zEncode.h"
@@ -13,6 +13,8 @@
 
 namespace NArchive {
 namespace N7z {
+
+const unsigned k_StartHeadersRewriteSize = 32;
 
 class CWriteBufferLoc
 {
@@ -45,6 +47,7 @@ public:
   size_t GetPos() const { return _pos; }
 };
 
+
 struct CHeaderOptions
 {
   bool CompressMainHeader;
@@ -71,23 +74,30 @@ struct CFileItem2
   UInt64 ATime;
   UInt64 MTime;
   UInt64 StartPos;
+  UInt32 Attrib;
+
   bool CTimeDefined;
   bool ATimeDefined;
   bool MTimeDefined;
   bool StartPosDefined;
+  bool AttribDefined;
   bool IsAnti;
   // bool IsAux;
 
+  /*
   void Init()
   {
     CTimeDefined = false;
     ATimeDefined = false;
     MTimeDefined = false;
     StartPosDefined = false;
+    AttribDefined = false;
     IsAnti = false;
     // IsAux = false;
   }
+  */
 };
+
 
 struct COutFolders
 {
@@ -111,6 +121,7 @@ struct COutFolders
   }
 };
 
+
 struct CArchiveDatabaseOut: public COutFolders
 {
   CRecordVector<UInt64> PackSizes;
@@ -123,10 +134,11 @@ struct CArchiveDatabaseOut: public COutFolders
   CUInt64DefVector ATime;
   CUInt64DefVector MTime;
   CUInt64DefVector StartPos;
-  CRecordVector<bool> IsAnti;
+  CUInt32DefVector Attrib;
+  CBoolVector IsAnti;
 
   /*
-  CRecordVector<bool> IsAux;
+  CBoolVector IsAux;
 
   CByteBuffer SecureBuf;
   CRecordVector<UInt32> SecureSizes;
@@ -154,6 +166,7 @@ struct CArchiveDatabaseOut: public COutFolders
     ATime.Clear();
     MTime.Clear();
     StartPos.Clear();
+    Attrib.Clear();
     IsAnti.Clear();
 
     /*
@@ -176,6 +189,7 @@ struct CArchiveDatabaseOut: public COutFolders
     ATime.ReserveDown();
     MTime.ReserveDown();
     StartPos.ReserveDown();
+    Attrib.ReserveDown();
     IsAnti.ReserveDown();
 
     /*
@@ -196,11 +210,12 @@ struct CArchiveDatabaseOut: public COutFolders
   {
     unsigned size = Files.Size();
     return (
-      CTime.CheckSize(size) &&
-      ATime.CheckSize(size) &&
-      MTime.CheckSize(size) &&
-      StartPos.CheckSize(size) &&
-      (size == IsAnti.Size() || IsAnti.Size() == 0));
+           CTime.CheckSize(size)
+        && ATime.CheckSize(size)
+        && MTime.CheckSize(size)
+        && StartPos.CheckSize(size)
+        && Attrib.CheckSize(size)
+        && (size == IsAnti.Size() || IsAnti.Size() == 0));
   }
 
   bool IsItemAnti(unsigned index) const { return (index < IsAnti.Size() && IsAnti[index]); }
@@ -224,10 +239,9 @@ struct CArchiveDatabaseOut: public COutFolders
   void AddFile(const CFileItem &file, const CFileItem2 &file2, const UString &name);
 };
 
+
 class COutArchive
 {
-  UInt64 _prefixHeaderPos;
-
   HRESULT WriteDirect(const void *data, UInt32 size) { return WriteStream(SeqStream, data, size); }
   
   UInt64 GetPos() const;
@@ -261,8 +275,8 @@ class COutArchive
       const CRecordVector<UInt64> &unpackSizes,
       const CUInt32DefVector &digests);
 
-  void SkipAlign(unsigned pos, unsigned alignSize);
-  void WriteAlignedBoolHeader(const CBoolVector &v, unsigned numDefined, Byte type, unsigned itemSize);
+  void SkipToAligned(unsigned pos, unsigned alignShifts);
+  void WriteAlignedBools(const CBoolVector &v, unsigned numDefined, Byte type, unsigned itemSizeShifts);
   void WriteUInt64DefVector(const CUInt64DefVector &v, Byte type);
 
   HRESULT EncodeStream(
@@ -276,44 +290,39 @@ class COutArchive
   
   bool _countMode;
   bool _writeToStream;
-  size_t _countSize;
-  UInt32 _crc;
-  COutBuffer _outByte;
-  CWriteBufferLoc _outByte2;
-
-  #ifdef _7Z_VOL
+  bool _useAlign;
+  #ifdef Z7_7Z_VOL
   bool _endMarker;
   #endif
+  UInt32 _crc;
+  size_t _countSize;
+  CWriteBufferLoc _outByte2;
+  COutBuffer _outByte;
+  UInt64 _signatureHeaderPos;
+  CMyComPtr<IOutStream> Stream;
 
-  bool _useAlign;
-
-  HRESULT WriteSignature();
-  #ifdef _7Z_VOL
+  #ifdef Z7_7Z_VOL
   HRESULT WriteFinishSignature();
-  #endif
-  HRESULT WriteStartHeader(const CStartHeader &h);
-  #ifdef _7Z_VOL
   HRESULT WriteFinishHeader(const CFinishHeader &h);
   #endif
-  CMyComPtr<IOutStream> Stream;
+  HRESULT WriteStartHeader(const CStartHeader &h);
+
 public:
+  CMyComPtr<ISequentialOutStream> SeqStream;
 
   COutArchive() { _outByte.Create(1 << 16); }
-  CMyComPtr<ISequentialOutStream> SeqStream;
-  HRESULT Create(ISequentialOutStream *stream, bool endMarker);
+  HRESULT Create_and_WriteStartPrefix(ISequentialOutStream *stream /* , bool endMarker */);
   void Close();
-  HRESULT SkipPrefixArchiveHeader();
   HRESULT WriteDatabase(
       DECL_EXTERNAL_CODECS_LOC_VARS
       const CArchiveDatabaseOut &db,
       const CCompressionMethodMode *options,
       const CHeaderOptions &headerOptions);
 
-  #ifdef _7Z_VOL
+  #ifdef Z7_7Z_VOL
   static UInt32 GetVolHeadersSize(UInt64 dataSize, int nameLength = 0, bool props = false);
   static UInt64 GetVolPureSize(UInt64 volSize, int nameLength = 0, bool props = false);
   #endif
-
 };
 
 }}

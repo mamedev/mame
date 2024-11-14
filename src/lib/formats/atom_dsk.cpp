@@ -6,17 +6,17 @@ atom_format::atom_format() : wd177x_format(formats)
 {
 }
 
-const char *atom_format::name() const
+const char *atom_format::name() const noexcept
 {
 	return "atom";
 }
 
-const char *atom_format::description() const
+const char *atom_format::description() const noexcept
 {
 	return "Acorn Atom disk image";
 }
 
-const char *atom_format::extensions() const
+const char *atom_format::extensions() const noexcept
 {
 	return "40t,dsk";
 }

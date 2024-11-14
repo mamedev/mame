@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Olivier Galibert
-#ifndef MAME_MACHINE_NAOMIM2_H
-#define MAME_MACHINE_NAOMIM2_H
+#ifndef MAME_SEGA_NAOMIM2_H
+#define MAME_SEGA_NAOMIM2_H
 
 #pragma once
 
@@ -25,9 +25,9 @@ public:
 	std::unique_ptr<uint8_t[]> ram;
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 	virtual void board_setup_address(uint32_t address, bool is_dma) override;
 	virtual void board_get_buffer(uint8_t *&base, uint32_t &limit) override;
@@ -43,4 +43,4 @@ private:
 
 DECLARE_DEVICE_TYPE(NAOMI_M2_BOARD, naomi_m2_board)
 
-#endif // MAME_MACHINE_NAOMIM2_H
+#endif // MAME_SEGA_NAOMIM2_H

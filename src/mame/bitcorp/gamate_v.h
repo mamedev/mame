@@ -1,8 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood, Peter Wilhelmsen, Kevtris
 
-#ifndef MAME_VIDEO_GAMATE_H
-#define MAME_VIDEO_GAMATE_H
+#ifndef MAME_BITCORP_GAMATE_V_H
+#define MAME_BITCORP_GAMATE_V_H
 
 #pragma once
 
@@ -25,13 +25,13 @@ public:
 	uint8_t vram_r();
 	void vram_w(uint8_t data);
 
-	void regs_map(address_map &map);
-	void vram_map(address_map &map);
+	void regs_map(address_map &map) ATTR_COLD;
+	void vram_map(address_map &map) ATTR_COLD;
 
 protected:
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	virtual space_config_vector memory_space_config() const override;
 
@@ -60,4 +60,4 @@ private:
 	int m_displayblank;
 };
 
-#endif // MAME_VIDEO_GAMATE_H
+#endif // MAME_BITCORP_GAMATE_V_H

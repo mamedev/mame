@@ -29,10 +29,10 @@ public:
 	cop452_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 
 	// SPI I/O
-	DECLARE_WRITE_LINE_MEMBER(cs_w);
-	DECLARE_WRITE_LINE_MEMBER(sk_w);
-	DECLARE_WRITE_LINE_MEMBER(di_w);
-	DECLARE_READ_LINE_MEMBER(do_r);
+	void cs_w(int state);
+	void sk_w(int state);
+	void di_w(int state);
+	int do_r();
 
 	// Signal outputs
 	auto oa_w() { return m_out_handlers[0].bind(); }
@@ -40,8 +40,8 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	TIMER_CALLBACK_MEMBER(timer_tick);
 

@@ -294,6 +294,8 @@ Sound Board 9/2
 #include "machine/bankdev.h"
 
 
+namespace {
+
 class bigkarnk_ms_state : public driver_device
 {
 public:
@@ -319,7 +321,7 @@ public:
 	void init_bigkarnkm();
 
 protected:
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -338,14 +340,14 @@ private:
 	required_shared_ptr<uint16_t> m_scrollregs;
 	required_device<address_map_bank_device> m_soundrom;
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void bigkarnkm_map(address_map &map);
-	void sound_map(address_map &map);
-	void soundrom_map(address_map &map);
+	void bigkarnkm_map(address_map &map) ATTR_COLD;
+	void sound_map(address_map &map) ATTR_COLD;
+	void soundrom_map(address_map &map) ATTR_COLD;
 
 	uint16_t vram1_r(offs_t offset, uint16_t mem_mask);
 	uint16_t vram2_r(offs_t offset, uint16_t mem_mask);
@@ -363,20 +365,13 @@ private:
 	tilemap_t *m_bg_tilemap2 = nullptr;
 	tilemap_t *m_bg_tilemap3 = nullptr;
 
-	uint16_t unknown_0x40000x_r();
-
-	DECLARE_WRITE_LINE_MEMBER(splash_msm5205_int);
+	void splash_msm5205_int(int state);
 	void splash_adpcm_data_w(uint8_t data);
 	void splash_adpcm_control_w(uint8_t data);
 	int m_adpcm_data = 0;
 
 	void descramble_16x16tiles(uint8_t* src, int len);
 };
-
-uint16_t bigkarnk_ms_state::unknown_0x40000x_r()
-{
-	return 0xffff;
-}
 
 TILE_GET_INFO_MEMBER(bigkarnk_ms_state::get_tile_info_tilemap1)
 {
@@ -683,7 +678,7 @@ void bigkarnk_ms_state::splash_adpcm_control_w(uint8_t data)
 	m_soundrom->set_bank(bank & 0xf);
 }
 
-WRITE_LINE_MEMBER(bigkarnk_ms_state::splash_msm5205_int)
+void bigkarnk_ms_state::splash_msm5205_int(int state)
 {
 	m_msm->data_w(m_adpcm_data >> 4);
 	m_adpcm_data = (m_adpcm_data << 4) & 0xf0;
@@ -837,5 +832,8 @@ ROM_START( bigkarnkm )
 	ROM_LOAD( "snd_9248_gal20v8-25lp.ic18", 0, 1, NO_DUMP )
 	ROM_LOAD( "snd_9348_gal16v8-25hb1.ic10", 0, 1, NO_DUMP )
 ROM_END
+
+} // anonymous namespace
+
 
 GAME( 1991, bigkarnkm,  bigkarnk,  bigkarnkm,  bigkarnkm,  bigkarnk_ms_state, init_bigkarnkm, ROT0, "Gaelco", "Big Karnak (Modular System)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

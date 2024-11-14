@@ -5,8 +5,8 @@
  * includes/pcw.h
  *
  ****************************************************************************/
-#ifndef MAME_INCLUDES_PCW_H
-#define MAME_INCLUDES_PCW_H
+#ifndef MAME_AMSTRAD_PCW_H
+#define MAME_AMSTRAD_PCW_H
 
 #pragma once
 
@@ -62,9 +62,9 @@ public:
 	void init_pcw();
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	int m_boot = 0;
@@ -116,15 +116,15 @@ private:
 	void mcu_printer_p1_w(uint8_t data);
 	uint8_t mcu_printer_p2_r();
 	void mcu_printer_p2_w(uint8_t data);
-	DECLARE_READ_LINE_MEMBER(mcu_printer_t1_r);
-	DECLARE_READ_LINE_MEMBER(mcu_printer_t0_r);
+	int mcu_printer_t1_r();
+	int mcu_printer_t0_r();
 	uint8_t mcu_kb_scan_r();
 	void mcu_kb_scan_w(uint8_t data);
 	uint8_t mcu_kb_scan_high_r();
 	void mcu_kb_scan_high_w(uint8_t data);
 	uint8_t mcu_kb_data_r();
-	DECLARE_READ_LINE_MEMBER(mcu_kb_t1_r);
-	DECLARE_READ_LINE_MEMBER(mcu_kb_t0_r);
+	int mcu_kb_t1_r();
+	int mcu_kb_t0_r();
 	uint8_t pcw9512_parallel_r(offs_t offset);
 	void pcw9512_parallel_w(offs_t offset, uint8_t data);
 	void mcu_transmit_serial(uint8_t bit);
@@ -142,7 +142,7 @@ private:
 
 	static void floppy_formats(format_registration &fr);
 
-	DECLARE_WRITE_LINE_MEMBER( pcw_fdc_interrupt );
+	void pcw_fdc_interrupt(int state);
 	required_device<cpu_device> m_maincpu;
 	required_device<upi41_cpu_device> m_printer_mcu;
 	required_device<i8048_device> m_keyboard_mcu;
@@ -164,9 +164,9 @@ private:
 	void pcw_update_mem(int block, int data);
 	int pcw_get_sys_status();
 	void pcw_printer_fire_pins(uint16_t pins);
-	void pcw9512_io(address_map &map);
-	void pcw_io(address_map &map);
-	void pcw_map(address_map &map);
+	void pcw9512_io(address_map &map) ATTR_COLD;
+	void pcw_io(address_map &map) ATTR_COLD;
+	void pcw_map(address_map &map) ATTR_COLD;
 };
 
-#endif // MAME_INCLUDES_PCW_H
+#endif // MAME_AMSTRAD_PCW_H

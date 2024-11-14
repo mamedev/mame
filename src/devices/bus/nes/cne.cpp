@@ -20,12 +20,11 @@
 
 
 #ifdef NES_PCB_DEBUG
-#define VERBOSE 1
+#define VERBOSE (LOG_GENERAL)
 #else
-#define VERBOSE 0
+#define VERBOSE (0)
 #endif
-
-#define LOG_MMC(x) do { if (VERBOSE) logerror x; } while (0)
+#include "logmacro.h"
 
 
 //-------------------------------------------------
@@ -84,7 +83,7 @@ void nes_cne_fsb_device::pcb_reset()
 
 void nes_cne_decathl_device::write_h(offs_t offset, u8 data)
 {
-	LOG_MMC(("cne_decathl_w, offset: %04x, data: %02x\n", offset, data));
+	LOG("cne_decathl_w, offset: %04x, data: %02x\n", offset, data);
 
 	if (offset >= 0x0065)
 	{
@@ -114,7 +113,7 @@ void nes_cne_decathl_device::write_h(offs_t offset, u8 data)
 
 void nes_cne_fsb_device::write_m(offs_t offset, u8 data)
 {
-	LOG_MMC(("cne_fsb write_m, offset: %04x, data: %02x\n", offset, data));
+	LOG("cne_fsb write_m, offset: %04x, data: %02x\n", offset, data);
 
 	if (offset < 0x0800)
 	{
@@ -140,7 +139,7 @@ void nes_cne_fsb_device::write_m(offs_t offset, u8 data)
 
 u8 nes_cne_fsb_device::read_m(offs_t offset)
 {
-	LOG_MMC(("cne_fsb read_m, offset: %04x\n", offset));
+	LOG("cne_fsb read_m, offset: %04x\n", offset);
 
 	if (offset >= 0x0800)
 		return device_nes_cart_interface::read_m(offset);
@@ -167,7 +166,7 @@ u8 nes_cne_fsb_device::read_m(offs_t offset)
 
 void nes_cne_shlz_device::write_l(offs_t offset, u8 data)
 {
-	LOG_MMC(("cne_shlz write_l, offset: %04x, data: %02x\n", offset, data));
+	LOG("cne_shlz write_l, offset: %04x, data: %02x\n", offset, data);
 
 	prg32(data >> 4);
 	chr8(data & 0x0f, CHRROM);

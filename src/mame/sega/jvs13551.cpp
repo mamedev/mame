@@ -7,13 +7,13 @@
 
 DEFINE_DEVICE_TYPE(SEGA_837_13551, sega_837_13551_device, "jvs13551", "Sega 837-13551 I/O Board")
 
-WRITE_LINE_MEMBER(sega_837_13551_device::jvs13551_coin_1_w)
+void sega_837_13551_device::jvs13551_coin_1_w(int state)
 {
 	if(state)
 		inc_coin(0);
 }
 
-WRITE_LINE_MEMBER(sega_837_13551_device::jvs13551_coin_2_w)
+void sega_837_13551_device::jvs13551_coin_2_w(int state)
 {
 	if(state)
 		inc_coin(1);
@@ -21,8 +21,8 @@ WRITE_LINE_MEMBER(sega_837_13551_device::jvs13551_coin_2_w)
 
 static INPUT_PORTS_START(sega_837_13551_coins)
 	PORT_START("COINS")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_COIN1) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, sega_837_13551_device, jvs13551_coin_1_w)
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_COIN2) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, sega_837_13551_device, jvs13551_coin_2_w)
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_COIN1) PORT_WRITE_LINE_MEMBER(FUNC(sega_837_13551_device::jvs13551_coin_1_w))
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_COIN2) PORT_WRITE_LINE_MEMBER(FUNC(sega_837_13551_device::jvs13551_coin_2_w))
 INPUT_PORTS_END
 
 ROM_START( jvs13551 )

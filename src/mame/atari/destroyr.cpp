@@ -25,6 +25,8 @@ TODO:
 #include "destroyr.lh"
 
 
+namespace {
+
 class destroyr_state : public driver_device
 {
 public:
@@ -54,10 +56,10 @@ public:
 	void destroyr(machine_config &config);
 
 private:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
-	void main_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
 
 	void misc_w(uint8_t data);
 	void cursor_load_w(uint8_t data);
@@ -565,6 +567,8 @@ ROM_START( destroyr1 )
 	ROM_LOAD( "030131-01.m1", 0x0000, 0x0100, CRC(b8094b4c) SHA1(82dc6799a19984f3b204ee3aeeb007e55afc8be3) )
 ROM_END
 
+} // anonymous namespace
 
-GAMEL( 1977, destroyr,  0,        destroyr, destroyr, destroyr_state, empty_init, ORIENTATION_FLIP_X, "Atari", "Destroyer (version O2)", MACHINE_SUPPORTS_SAVE, layout_destroyr )
-GAMEL( 1977, destroyr1, destroyr, destroyr, destroyr, destroyr_state, empty_init, ORIENTATION_FLIP_X, "Atari", "Destroyer (version O1)", MACHINE_SUPPORTS_SAVE, layout_destroyr )
+
+GAMEL( 1977, destroyr,  0,        destroyr, destroyr, destroyr_state, empty_init, ORIENTATION_FLIP_X, "Atari", "Destroyer (Atari, version O2)", MACHINE_SUPPORTS_SAVE, layout_destroyr )
+GAMEL( 1977, destroyr1, destroyr, destroyr, destroyr, destroyr_state, empty_init, ORIENTATION_FLIP_X, "Atari", "Destroyer (Atari, version O1)", MACHINE_SUPPORTS_SAVE, layout_destroyr )

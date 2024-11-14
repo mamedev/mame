@@ -5,8 +5,8 @@
  * includes/vtech2.h
  *
  ****************************************************************************/
-#ifndef MAME_INCLUDES_VTECH2_H
-#define MAME_INCLUDES_VTECH2_H
+#ifndef MAME_VTECH_VTECH2_H
+#define MAME_VTECH_VTECH2_H
 
 #pragma once
 
@@ -51,8 +51,8 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(reset_button);
 
 protected:
-	virtual void machine_reset() override;
-	virtual void machine_start() override;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	void laser_fdc_w(offs_t offset, uint8_t data);
@@ -69,11 +69,11 @@ private:
 	void laser_get_track();
 	void laser_put_track();
 
-	void io_map(address_map &map);
-	void mem_map(address_map &map);
-	void m_map350(address_map &map);
-	void m_map500(address_map &map);
-	void m_map700(address_map &map);
+	void io_map(address_map &map) ATTR_COLD;
+	void mem_map(address_map &map) ATTR_COLD;
+	void m_map350(address_map &map) ATTR_COLD;
+	void m_map500(address_map &map) ATTR_COLD;
+	void m_map700(address_map &map) ATTR_COLD;
 
 	void init_waitstates();
 
@@ -116,4 +116,4 @@ private:
 	memory_region *m_cart_rom = nullptr;
 };
 
-#endif // MAME_INCLUDES_VTECH2_H
+#endif // MAME_VTECH_VTECH2_H

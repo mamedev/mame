@@ -5,8 +5,8 @@
     Sega Zaxxon hardware
 
 ***************************************************************************/
-#ifndef MAME_INCLUDES_ZAXXON_H
-#define MAME_INCLUDES_ZAXXON_H
+#ifndef MAME_SEGA_ZAXXON_H
+#define MAME_SEGA_ZAXXON_H
 
 #pragma once
 
@@ -48,8 +48,8 @@ public:
 	void init_razmataz();
 	void init_zaxxonj();
 
-	template <int Num> DECLARE_CUSTOM_INPUT_MEMBER(razmataz_dial_r);
-	template <int Num> DECLARE_READ_LINE_MEMBER(zaxxon_coin_r);
+	template <int Num> ioport_value razmataz_dial_r();
+	template <int Num> int zaxxon_coin_r();
 	DECLARE_INPUT_CHANGED_MEMBER(service_switch);
 	DECLARE_INPUT_CHANGED_MEMBER(zaxxon_coin_inserted);
 
@@ -88,19 +88,19 @@ private:
 	const uint8_t *m_color_codes;
 	tilemap_t *m_fg_tilemap = nullptr;
 	tilemap_t *m_bg_tilemap = nullptr;
-	DECLARE_WRITE_LINE_MEMBER(int_enable_w);
+	void int_enable_w(int state);
 	uint8_t razmataz_counter_r();
 	void zaxxon_control_w(offs_t offset, uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(coin_counter_a_w);
-	DECLARE_WRITE_LINE_MEMBER(coin_counter_b_w);
-	DECLARE_WRITE_LINE_MEMBER(coin_enable_w);
-	DECLARE_WRITE_LINE_MEMBER(flipscreen_w);
-	DECLARE_WRITE_LINE_MEMBER(fg_color_w);
+	void coin_counter_a_w(int state);
+	void coin_counter_b_w(int state);
+	void coin_enable_w(int state);
+	void flipscreen_w(int state);
+	void fg_color_w(int state);
 	void bg_position_w(offs_t offset, uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(bg_color_w);
-	DECLARE_WRITE_LINE_MEMBER(bg_enable_w);
-	DECLARE_WRITE_LINE_MEMBER(congo_fg_bank_w);
-	DECLARE_WRITE_LINE_MEMBER(congo_color_bank_w);
+	void bg_color_w(int state);
+	void bg_enable_w(int state);
+	void congo_fg_bank_w(int state);
+	void congo_color_bank_w(int state);
 	void zaxxon_videoram_w(offs_t offset, uint8_t data);
 	void congo_colorram_w(offs_t offset, uint8_t data);
 	void congo_sprite_custom_w(address_space &space, offs_t offset, uint8_t data);
@@ -109,8 +109,8 @@ private:
 	TILE_GET_INFO_MEMBER(zaxxon_get_fg_tile_info);
 	TILE_GET_INFO_MEMBER(razmataz_get_fg_tile_info);
 	TILE_GET_INFO_MEMBER(congo_get_fg_tile_info);
-	virtual void machine_start() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 	void zaxxon_palette(palette_device &palette);
 	DECLARE_VIDEO_START(razmataz);
 	DECLARE_VIDEO_START(congo);
@@ -119,7 +119,7 @@ private:
 	uint32_t screen_update_razmataz(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_ixion(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_congo(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_WRITE_LINE_MEMBER(vblank_int);
+	void vblank_int(int state);
 	void zaxxon_sound_a_w(uint8_t data);
 	void zaxxon_sound_b_w(uint8_t data);
 	void zaxxon_sound_c_w(uint8_t data);
@@ -131,11 +131,11 @@ private:
 	inline int find_minimum_x(uint8_t value, int flip);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, uint16_t flipxmask, uint16_t flipymask);
 
-	void congo_map(address_map &map);
-	void congo_sound_map(address_map &map);
-	void decrypted_opcodes_map(address_map &map);
-	void ixion_map(address_map &map);
-	void zaxxon_map(address_map &map);
+	void congo_map(address_map &map) ATTR_COLD;
+	void congo_sound_map(address_map &map) ATTR_COLD;
+	void decrypted_opcodes_map(address_map &map) ATTR_COLD;
+	void ixion_map(address_map &map) ATTR_COLD;
+	void zaxxon_map(address_map &map) ATTR_COLD;
 };
 
-#endif // MAME_INCLUDES_ZAXXON_H
+#endif // MAME_SEGA_ZAXXON_H

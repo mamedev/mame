@@ -128,10 +128,10 @@ public:
 	auto porta_w() { return m_port_cb_w[0].bind(); }
 	auto portb_w() { return m_port_cb_w[1].bind(); }
 	auto portc_w() { return m_port_cb_w[2].bind(); }
+	template <std::size_t N> auto portan_r() { return m_portan_cb_r[N].bind(); }
 
-	WRITE_LINE_MEMBER(timer_w) { m_timer.timer_w(state); }
+	void timer_w(int state) { m_timer.timer_w(state); }
 
-protected:
 	// state index constants
 	enum
 	{
@@ -162,12 +162,13 @@ protected:
 		M68705_MOR
 	};
 
+protected:
 	static unsigned const PORT_COUNT = 4;
 
 	m6805_hmos_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock, device_type type, u32 addr_width, unsigned ram_size);
 
 	void map(address_map &map) { internal_map(map); }
-	virtual void internal_map(address_map &map);
+	virtual void internal_map(address_map &map) ATTR_COLD;
 
 	template <std::size_t N> void set_port_open_drain(bool value);
 	template <std::size_t N> void set_port_mask(u8 mask);
@@ -186,8 +187,8 @@ protected:
 	u8 arr_r();
 	void arr_w(u8 data);
 
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 	virtual void execute_set_input(int inputnum, int state) override;
 
 	virtual void interrupt() override;
@@ -211,6 +212,10 @@ private:
 	devcb_read8::array<PORT_COUNT> m_port_cb_r;
 	devcb_write8::array<PORT_COUNT> m_port_cb_w;
 
+	// analog input ports
+	devcb_read8::array<4> m_portan_cb_r;
+	u8 m_acr_mux;
+
 	// miscellaneous register
 	enum mr_mask : u8
 	{
@@ -230,7 +235,7 @@ protected:
 	{
 	}
 
-	virtual void internal_map(address_map &map) override;
+	virtual void internal_map(address_map &map) override ATTR_COLD;
 };
 
 class m68705_device : public m6805_hmos_device, public device_nvram_interface
@@ -246,7 +251,7 @@ public:
 	};
 
 protected:
-	virtual void internal_map(address_map &map) override;
+	virtual void internal_map(address_map &map) override ATTR_COLD;
 
 	m68705_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock, device_type type, u32 addr_width, unsigned ram_size);
 
@@ -256,8 +261,8 @@ protected:
 	u8 pcr_r();
 	void pcr_w(u8 data);
 
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 	virtual void execute_set_input(int inputnum, int state) override;
 	virtual void nvram_default() override;
 	virtual bool nvram_read(util::read_stream &file) override;
@@ -288,11 +293,11 @@ public:
 	void pc_w(u8 data) { port_input_w<2>(data); }
 
 protected:
-	virtual void internal_map(address_map &map) override;
+	virtual void internal_map(address_map &map) override ATTR_COLD;
 
 	m68705p_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock, device_type type);
 
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 };
@@ -306,26 +311,23 @@ public:
 	void pd_w(u8 data) { port_input_w<3>(data); } // TODO: PD6 is also /INT2
 
 protected:
-	virtual void internal_map(address_map &map) override;
+	virtual void internal_map(address_map &map) override ATTR_COLD;
 
 	m68705u_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock, device_type type);
 
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 };
 
 class m68705r_device : public m68705u_device
 {
-public:
-	// TODO: voltage inputs for ADC (shared with digital port D pins)
-
 protected:
-	virtual void internal_map(address_map &map) override;
+	virtual void internal_map(address_map &map) override ATTR_COLD;
 
 	m68705r_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock, device_type type);
 
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 };
@@ -361,7 +363,7 @@ public:
 	void set_timer_external_source(bool external) { m_timer.set_source(external ? m6805_timer::TIMER : m6805_timer::CLOCK_TIMER); }
 
 protected:
-	virtual void internal_map(address_map &map) override;
+	virtual void internal_map(address_map &map) override ATTR_COLD;
 };
 
 class m6805r3_device : public m6805_mrom_device
@@ -370,7 +372,7 @@ public:
 	m6805r3_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock);
 
 protected:
-	virtual void internal_map(address_map &map) override;
+	virtual void internal_map(address_map &map) override ATTR_COLD;
 };
 
 class m6805u2_device : public m6805_mrom_device
@@ -409,7 +411,7 @@ public:
 	m68705p3_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock);
 
 protected:
-	virtual tiny_rom_entry const *device_rom_region() const override;
+	virtual tiny_rom_entry const *device_rom_region() const override ATTR_COLD;
 
 	virtual u8 get_mask_options() const override;
 };
@@ -420,7 +422,7 @@ public:
 	m68705p5_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock);
 
 protected:
-	virtual tiny_rom_entry const *device_rom_region() const override;
+	virtual tiny_rom_entry const *device_rom_region() const override ATTR_COLD;
 
 	virtual u8 get_mask_options() const override;
 };
@@ -431,7 +433,7 @@ public:
 	m68705r3_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock);
 
 protected:
-	virtual tiny_rom_entry const *device_rom_region() const override;
+	virtual tiny_rom_entry const *device_rom_region() const override ATTR_COLD;
 
 	virtual u8 get_mask_options() const override;
 };
@@ -444,7 +446,7 @@ public:
 	static auto parent_rom_device_type() { return &M68705R3; }
 
 protected:
-	virtual tiny_rom_entry const *device_rom_region() const override;
+	virtual tiny_rom_entry const *device_rom_region() const override ATTR_COLD;
 
 	virtual u8 get_mask_options() const override;
 };

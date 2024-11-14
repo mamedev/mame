@@ -8,8 +8,8 @@
     see cpu/apexc.cpp for background and tech info
 */
 
-#ifndef MAME_MACHINE_APEXC
-#define MAME_MACHINE_APEXC
+#ifndef MAME_BOOTH_APEXC_M_H
+#define MAME_BOOTH_APEXC_M_H
 
 #pragma once
 
@@ -43,7 +43,7 @@ public:
 	virtual const char *image_type_name() const noexcept override { return "cylinder"; }
 	virtual const char *image_brief_type_name() const noexcept override { return "cyln"; }
 
-	virtual image_init_result call_load() override;
+	virtual std::pair<std::error_condition, std::string> call_load() override;
 	virtual void call_unload() override;
 	virtual const char *image_interface() const noexcept override { return "apexc_cyl"; }
 	virtual const software_list_loader &get_software_list_loader() const override { return image_software_list_loader::instance(); }
@@ -138,4 +138,4 @@ DECLARE_DEVICE_TYPE(APEXC_CYLINDER, apexc_cylinder_image_device)
 DECLARE_DEVICE_TYPE(APEXC_TAPE_PUNCHER, apexc_tape_puncher_image_device)
 DECLARE_DEVICE_TYPE(APEXC_TAPE_READER, apexc_tape_reader_image_device)
 
-#endif // MAME_MACHINE_APEXC
+#endif // MAME_BOOTH_APEXC_M_H

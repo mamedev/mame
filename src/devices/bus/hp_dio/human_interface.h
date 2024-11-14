@@ -27,11 +27,11 @@ public:
 protected:
 	human_interface_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 
 private:
 
@@ -46,16 +46,16 @@ private:
 	void gpib_w(offs_t offset, uint8_t data);
 	void ieee488_dio_w(uint8_t data);
 
-	DECLARE_WRITE_LINE_MEMBER(gpib_irq);
-	DECLARE_WRITE_LINE_MEMBER(gpib_dreq);
+	void gpib_irq(int state);
+	void gpib_dreq(int state);
 
 	/* RTC */
-	DECLARE_WRITE_LINE_MEMBER(rtc_d0_w);
-	DECLARE_WRITE_LINE_MEMBER(rtc_d1_w);
-	DECLARE_WRITE_LINE_MEMBER(rtc_d2_w);
-	DECLARE_WRITE_LINE_MEMBER(rtc_d3_w);
+	void rtc_d0_w(int state);
+	void rtc_d1_w(int state);
+	void rtc_d2_w(int state);
+	void rtc_d3_w(int state);
 
-	DECLARE_WRITE_LINE_MEMBER(reset_in) override;
+	void reset_in(int state) override;
 
 	void dmack_w_in(int channel, uint8_t data) override;
 	uint8_t dmack_r_in(int channel) override;
@@ -69,7 +69,7 @@ private:
 	required_device<msm58321_device> m_rtc;
 	required_device<ieee488_device> m_ieee488;
 
-	void iocpu_map(address_map &map);
+	void iocpu_map(address_map &map) ATTR_COLD;
 
 	static constexpr uint8_t HIL_CS = 0x01;
 	static constexpr uint8_t HIL_WE = 0x02;

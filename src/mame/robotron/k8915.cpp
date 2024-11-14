@@ -18,6 +18,9 @@ When it says DIAGNOSTIC RAZ P, press enter.
 #include "emupal.h"
 #include "screen.h"
 
+
+namespace {
+
 class k8915_state : public driver_device
 {
 public:
@@ -37,12 +40,12 @@ private:
 	void k8915_a8_w(u8 data);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void io_map(address_map &map);
-	void mem_map(address_map &map);
+	void io_map(address_map &map) ATTR_COLD;
+	void mem_map(address_map &map) ATTR_COLD;
 
 	u8 m_framecnt = 0U;
-	void machine_start() override;
-	void machine_reset() override;
+	void machine_start() override ATTR_COLD;
+	void machine_reset() override ATTR_COLD;
 	required_device<cpu_device> m_maincpu;
 	required_region_ptr<u8> m_rom;
 	required_shared_ptr<u8> m_ram;
@@ -179,6 +182,9 @@ ROM_START( k8915 )
 	ROM_REGION( 0x2000, "chargen", 0 )
 	ROM_LOAD( "c10_char.bin", 0x0000, 0x2000, BAD_DUMP CRC(cb530b6f) SHA1(95590bbb433db9c4317f535723b29516b9b9fcbf))
 ROM_END
+
+} // anonymous namespace
+
 
 /* Driver */
 

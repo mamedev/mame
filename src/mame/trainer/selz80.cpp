@@ -41,6 +41,8 @@ ToDo:
 #include "selz80.lh"
 
 
+namespace {
+
 class selz80_state : public driver_device
 {
 public:
@@ -60,12 +62,12 @@ protected:
 	void digit_w(uint8_t data);
 	uint8_t kbd_r();
 
-	void selz80_io(address_map &map);
+	void selz80_io(address_map &map) ATTR_COLD;
 
 	u8 m_digit = 0U;
 	u8 m_seg = 0U;
 	void setup_baud();
-	void machine_start() override;
+	void machine_start() override ATTR_COLD;
 	required_device<cpu_device> m_maincpu;
 	optional_shared_ptr<u8> m_p_ram;
 	required_ioport_array<4> m_io_keyboard;
@@ -73,8 +75,8 @@ protected:
 	required_device<pwm_display_device> m_display;
 
 private:
-	void selz80_mem(address_map &map);
-	void machine_reset() override;
+	void selz80_mem(address_map &map) ATTR_COLD;
+	void machine_reset() override ATTR_COLD;
 
 };
 
@@ -85,8 +87,8 @@ public:
 	void dagz80(machine_config &config);
 
 private:
-	void dagz80_mem(address_map &map);
-	void machine_reset() override;
+	void dagz80_mem(address_map &map) ATTR_COLD;
+	void machine_reset() override ATTR_COLD;
 };
 
 void dagz80_state::dagz80_mem(address_map &map)
@@ -290,6 +292,8 @@ ROM_START( dagz80 )
 	ROM_REGION( 0x2000, "user1", ROMREGION_ERASEFF )
 	ROM_LOAD( "moni_1.5_15.08.1988.bin", 0x0000, 0x2000, CRC(318aee6e) SHA1(c698fdee401b88e673791aabcba6a9628938a075) )
 ROM_END
+
+} // anonymous namespace
 
 
 /* Driver */

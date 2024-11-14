@@ -14,7 +14,8 @@
 #include "imagedev/snapquik.h"
 #include "jag_blitter.h"
 #include "cdrom.h"
-#include "imagedev/chd_cd.h"
+#include "bus/generic/slot.h"
+#include "imagedev/cdromimg.h"
 #include "screen.h"
 #include "emupal.h"
 
@@ -102,14 +103,14 @@ public:
 	void init_area51a();
 
 protected:
-	void console_base_map(address_map &map);
-	void console_base_gpu_map(address_map &map);
+	void console_base_map(address_map &map) ATTR_COLD;
+	void console_base_gpu_map(address_map &map) ATTR_COLD;
 
 	// device overrides
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 	virtual void sound_start() override;
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 	virtual void device_postload();
 
 	void video_config(machine_config &config, const XTAL clock);
@@ -267,22 +268,22 @@ private:
 	TIMER_CALLBACK_MEMBER(pit_update);
 	TIMER_CALLBACK_MEMBER(gpu_sync);
 
-	DECLARE_WRITE_LINE_MEMBER( gpu_cpu_int );
-	DECLARE_WRITE_LINE_MEMBER( dsp_cpu_int );
-	DECLARE_WRITE_LINE_MEMBER( external_int );
+	void gpu_cpu_int(int state);
+	void dsp_cpu_int(int state);
+	void external_int(int state);
 
-	image_init_result quickload_cb(device_image_interface &image);
+	std::pair<std::error_condition, std::string> quickload_cb(snapshot_image_device &image);
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( cart_load );
-	void cpu_space_map(address_map &map);
-	void dsp_map(address_map &map);
-	void dsp_rom_map(address_map &map);
-	void gpu_map(address_map &map);
-	void gpu_rom_map(address_map &map);
-	void jag_gpu_dsp_map(address_map &map);
-	void jaguar_map(address_map &map);
-	void m68020_map(address_map &map);
-	void r3000_map(address_map &map);
-	void r3000_rom_map(address_map &map);
+	void cpu_space_map(address_map &map) ATTR_COLD;
+	void dsp_map(address_map &map) ATTR_COLD;
+	void dsp_rom_map(address_map &map) ATTR_COLD;
+	void gpu_map(address_map &map) ATTR_COLD;
+	void gpu_rom_map(address_map &map) ATTR_COLD;
+	void jag_gpu_dsp_map(address_map &map) ATTR_COLD;
+	void jaguar_map(address_map &map) ATTR_COLD;
+	void m68020_map(address_map &map) ATTR_COLD;
+	void r3000_map(address_map &map) ATTR_COLD;
+	void r3000_rom_map(address_map &map) ATTR_COLD;
 
 	void gpu_suspend() { m_gpu->suspend(SUSPEND_REASON_SPIN, 1); }
 	void gpu_resume() { m_gpu->resume(SUSPEND_REASON_SPIN); }
@@ -310,9 +311,9 @@ private:
 
 	/* from jagobj.cpp */
 	void jagobj_init();
-	uint32_t *process_bitmap(uint16_t *scanline, uint32_t *objdata, int vc, bool logit);
-	uint32_t *process_scaled_bitmap(uint16_t *scanline, uint32_t *objdata, int vc, bool logit);
-	uint32_t *process_branch(uint32_t *objdata, int vc, bool logit);
+	uint32_t *process_bitmap(uint16_t *scanline, uint32_t *objdata, int vc);
+	uint32_t *process_scaled_bitmap(uint16_t *scanline, uint32_t *objdata, int vc);
+	uint32_t *process_branch(uint32_t *objdata, int vc);
 	void process_object_list(int vc, uint16_t *_scanline);
 	void bitmap_4_draw(uint16_t *scanline, int32_t firstpix, int32_t iwidth, uint32_t *src, int32_t xpos, uint8_t flags, int32_t dxpos, uint16_t *clutbase);
 	void bitmap_4_0(uint16_t *scanline, int32_t firstpix, int32_t iwidth, uint32_t *src, int32_t xpos, uint16_t *clutbase);
@@ -383,7 +384,7 @@ public:
 	void init_jaguarcd();
 
 protected:
-	virtual void machine_reset() override;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	uint16_t butch_regs_r16(offs_t offset);
@@ -393,8 +394,8 @@ private:
 
 	uint32_t cd_bios_r(offs_t offset);
 
-	void jaguarcd_map(address_map &map);
-	void jagcd_gpu_dsp_map(address_map &map);
+	void jaguarcd_map(address_map &map) ATTR_COLD;
+	void jagcd_gpu_dsp_map(address_map &map) ATTR_COLD;
 
 	// devices
 	required_device<cdrom_image_device> m_cdrom;
@@ -404,7 +405,4 @@ private:
 	uint32_t m_butch_cmd_response[0x102]{};
 	uint8_t m_butch_cmd_index = 0U;
 	uint8_t m_butch_cmd_size = 0U;
-
-	cdrom_file  *m_cd_file = nullptr;
-	//const cdrom_toc*    m_toc = nullptr;
 };

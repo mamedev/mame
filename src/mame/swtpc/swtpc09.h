@@ -6,8 +6,8 @@
 
 ****************************************************************************/
 
-#ifndef MAME_INCLUDES_SWTPC09_H
-#define MAME_INCLUDES_SWTPC09_H
+#ifndef MAME_SWTPC_SWTPC09_H
+#define MAME_SWTPC_SWTPC09_H
 
 #pragma once
 
@@ -75,23 +75,23 @@ private:
 	static void floppy_uniflex_formats(format_registration &fr);
 
 	uint8_t pia0_a_r();
-	DECLARE_WRITE_LINE_MEMBER( pia0_irq_a );
+	void pia0_irq_a(int state);
 
-	DECLARE_WRITE_LINE_MEMBER(io_irq_w);
+	void io_irq_w(int state);
 
-	DECLARE_WRITE_LINE_MEMBER( ptm_o1_callback );
-	DECLARE_WRITE_LINE_MEMBER( ptm_o3_callback );
-	DECLARE_WRITE_LINE_MEMBER( ptm_irq );
+	void ptm_o1_callback(int state);
+	void ptm_o3_callback(int state);
+	void ptm_irq(int state);
 
-	DECLARE_WRITE_LINE_MEMBER( fdc_intrq_w );
-	DECLARE_WRITE_LINE_MEMBER( fdc_drq_w );
-	DECLARE_WRITE_LINE_MEMBER( fdc_sso_w );
+	void fdc_intrq_w(int state);
+	void fdc_drq_w(int state);
+	void fdc_sso_w(int state);
 
 	uint8_t dmaf3_via_read_porta();
 	uint8_t dmaf3_via_read_portb();
 	void dmaf3_via_write_porta(uint8_t data);
 	void dmaf3_via_write_portb(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER( dmaf3_via_irq );
+	void dmaf3_via_irq(int state);
 
 	TIMER_CALLBACK_MEMBER(floppy_motor_callback);
 
@@ -109,8 +109,8 @@ private:
 	uint8_t dmaf3_control_reg_r();
 	void dmaf3_control_reg_w(uint8_t data);
 
-	DECLARE_WRITE_LINE_MEMBER(dmaf3_hdc_intrq_w);
-	DECLARE_WRITE_LINE_MEMBER( dmaf3_hdc_drq_w );
+	void dmaf3_hdc_intrq_w(int state);
+	void dmaf3_hdc_drq_w(int state);
 	uint8_t dmaf3_hdc_control_r();
 	void dmaf3_hdc_control_w(uint8_t data);
 	uint8_t dmaf3_hdc_reset_r();
@@ -129,15 +129,15 @@ private:
 	uint8_t unmapped_r(offs_t offset);
 	void unmapped_w(offs_t offset, uint8_t data);
 
-	void flex_dc5_piaide_mem(address_map &map);
-	void flex_dmaf2_mem(address_map &map);
-	void mp09_mem(address_map &map);
-	void uniflex_dmaf2_mem(address_map &map);
-	void uniflex_dmaf3_mem(address_map &map);
-	void os9_mem(address_map &map);
+	void flex_dc5_piaide_mem(address_map &map) ATTR_COLD;
+	void flex_dmaf2_mem(address_map &map) ATTR_COLD;
+	void mp09_mem(address_map &map) ATTR_COLD;
+	void uniflex_dmaf2_mem(address_map &map) ATTR_COLD;
+	void uniflex_dmaf3_mem(address_map &map) ATTR_COLD;
+	void os9_mem(address_map &map) ATTR_COLD;
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	void swtpc09_irq_handler(uint8_t peripheral, uint8_t state);
 
@@ -237,4 +237,4 @@ private:
 	void m6844_hdc_dma_transfer(uint8_t channel);
 };
 
-#endif // MAME_INCLUDES_SWTPC09_H
+#endif // MAME_SWTPC_SWTPC09_H

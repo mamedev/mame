@@ -28,6 +28,8 @@
 #include <algorithm>
 
 
+namespace {
+
 class ecoinf3_state : public driver_device
 {
 public:
@@ -58,7 +60,7 @@ private:
 		save_item(NAME(m_percent_mux));
 	}
 
-	template <unsigned N> DECLARE_WRITE_LINE_MEMBER(reel_optic_cb) { if (state) m_optic_pattern |= (1 << N); else m_optic_pattern &= ~(1 << N); }
+	template <unsigned N> void reel_optic_cb(int state) { if (state) m_optic_pattern |= (1 << N); else m_optic_pattern &= ~(1 << N); }
 
 	uint8_t ppi8255_intf_a_read_a() { int ret = 0x00; logerror("%04x - ppi8255_intf_a_read_a %02x\n", m_maincpu->pcbase(), ret); return ret; }
 	uint8_t ppi8255_intf_a_read_b()
@@ -267,8 +269,8 @@ private:
 	void ppi8255_intf_h_write_b(uint8_t data) { logerror("%04x - ppi8255_intf_h_(used)write_b %02x\n", m_maincpu->pcbase(), data); }
 	void ppi8255_intf_h_write_c(uint8_t data) { logerror("%04x - ppi8255_intf_h_(used)write_c %02x\n", m_maincpu->pcbase(), data); }
 
-	void pyramid_memmap(address_map &map);
-	void pyramid_portmap(address_map &map);
+	void pyramid_memmap(address_map &map) ATTR_COLD;
+	void pyramid_portmap(address_map &map) ATTR_COLD;
 
 	required_device<z180_device> m_maincpu;
 	required_device_array<stepper_device, 4> m_reels;
@@ -848,6 +850,7 @@ void ecoinf3_state::init_ecoinf3_swap()
 
 }
 
+} // anonymous namespace
 
 
 // another hw type (similar to stuff in ecoinf2.c) (watchdog on port 58?)

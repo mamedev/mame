@@ -5,8 +5,8 @@
  *
  */
 
-#ifndef MAME_AUDIO_PINSND88_H
-#define MAME_AUDIO_PINSND88_H
+#ifndef MAME_PINBALL_PINSND88_H
+#define MAME_PINBALL_PINSND88_H
 
 #pragma once
 
@@ -23,26 +23,26 @@ public:
 	pinsnd88_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	// overrides
-	virtual void device_reset() override; // power up reset
+	virtual void device_reset() override ATTR_COLD; // power up reset
 
 	// note to keep synchronization working, the host machine should have synchronization timer expired delegates
 	// if possible, before writing to the following things:
-	DECLARE_WRITE_LINE_MEMBER(strobe_w); // external write to board (J1 pin 13)
+	void strobe_w(int state); // external write to board (J1 pin 13)
 	void data_w(uint8_t data); // external write to board data bus (J1 pins 3 thru 10 for D0-D7)
-	DECLARE_WRITE_LINE_MEMBER(resetq_w); // external write to board /RESET (J1 pin 18)
+	void resetq_w(int state); // external write to board /RESET (J1 pin 18)
 
 	// callbacks
 	auto syncq_cb() { return m_syncq_cb.bind(); }
 
-	void pinsnd88_map(address_map &map);
+	void pinsnd88_map(address_map &map) ATTR_COLD;
 
 protected:
 	// constructor with overridable type for subclass, in case we want to put NARC's sound board in here eventually
 	//pinsnd88_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	// overrides
-	virtual void device_start() override;
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 	TIMER_CALLBACK_MEMBER(deferred_sync_w);
 
@@ -69,4 +69,4 @@ private:
 
 DECLARE_DEVICE_TYPE(PINSND88, pinsnd88_device)
 
-#endif // MAME_AUDIO_PINSND88_H
+#endif // MAME_PINBALL_PINSND88_H

@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Nicola Salmoria, Phil Stroffolino, Mirko Buffoni
-#ifndef MAME_INCLUDES_SYSTEM16_H
-#define MAME_INCLUDES_SYSTEM16_H
+#ifndef MAME_SEGA_SYSTEM16_H
+#define MAME_SEGA_SYSTEM16_H
 
 #pragma once
 
@@ -70,6 +70,7 @@ public:
 	void tturfbl(machine_config &config);
 	void altbeastbl(machine_config &config);
 	void system18(machine_config &config);
+	void bloxeedbl(machine_config &config);
 
 	void init_passsht();
 	void init_wb3bbl();
@@ -168,47 +169,48 @@ private:
 	void set_fg_page( int data );
 	void set_bg_page( int data );
 	void datsu_set_pages(  );
-	DECLARE_WRITE_LINE_MEMBER(tturfbl_msm5205_callback);
-	DECLARE_WRITE_LINE_MEMBER(datsu_msm5205_callback);
-	DECLARE_WRITE_LINE_MEMBER(shdancbl_msm5205_callback);
-	DECLARE_WRITE_LINE_MEMBER(sound_cause_nmi);
+	void tturfbl_msm5205_callback(int state);
+	void datsu_msm5205_callback(int state);
+	void shdancbl_msm5205_callback(int state);
+	void sound_cause_nmi(int state);
 
-	void bayrouteb1_map(address_map &map);
-	void bayrouteb2_map(address_map &map);
-	void beautyb_map(address_map &map);
-	void ddcrewbl_map(address_map &map);
-	void dduxbl_map(address_map &map);
-	void decrypted_opcodes_map(address_map &map);
-	void eswatbl2_map(address_map &map);
-	void eswatbl_map(address_map &map);
-	void goldnaxeb1_map(address_map &map);
-	void goldnaxeb2_map(address_map &map);
-	void mwalkbl_map(address_map &map);
-	void passht4b_map(address_map &map);
-	void passshtb_map(address_map &map);
-	void pcm_map(address_map &map);
-	void shdancbl_map(address_map &map);
-	void shdancbl_sound_io_map(address_map &map);
-	void shdancbl_sound_map(address_map &map);
-	void shdancbla_map(address_map &map);
-	void shdancbla_sound_map(address_map &map);
-	void shinobi_datsu_sound_map(address_map &map);
-	void shinobib_map(address_map &map);
-	void sound_18_io_map(address_map &map);
-	void sound_18_map(address_map &map);
-	void sound_7759_io_map(address_map &map);
-	void sound_7759_map(address_map &map);
-	void sound_io_map(address_map &map);
-	void sound_map(address_map &map);
-	void sys18bl_oki_map(address_map &map);
-	void sys18bl_sound_map(address_map &map);
-	void tetrisbl_map(address_map &map);
-	void tturfbl_map(address_map &map);
-	void tturfbl_sound_io_map(address_map &map);
-	void tturfbl_sound_map(address_map &map);
-	void wb3bbl_map(address_map &map);
-	void wb3bble_map(address_map &map);
-	void wb3bble_decrypted_opcodes_map(address_map &map);
+	void bayrouteb1_map(address_map &map) ATTR_COLD;
+	void bayrouteb2_map(address_map &map) ATTR_COLD;
+	void beautyb_map(address_map &map) ATTR_COLD;
+	void bloxeedbl_map(address_map &map) ATTR_COLD;
+	void ddcrewbl_map(address_map &map) ATTR_COLD;
+	void dduxbl_map(address_map &map) ATTR_COLD;
+	void decrypted_opcodes_map(address_map &map) ATTR_COLD;
+	void eswatbl2_map(address_map &map) ATTR_COLD;
+	void eswatbl_map(address_map &map) ATTR_COLD;
+	void goldnaxeb1_map(address_map &map) ATTR_COLD;
+	void goldnaxeb2_map(address_map &map) ATTR_COLD;
+	void mwalkbl_map(address_map &map) ATTR_COLD;
+	void passht4b_map(address_map &map) ATTR_COLD;
+	void passshtb_map(address_map &map) ATTR_COLD;
+	void pcm_map(address_map &map) ATTR_COLD;
+	void shdancbl_map(address_map &map) ATTR_COLD;
+	void shdancbl_sound_io_map(address_map &map) ATTR_COLD;
+	void shdancbl_sound_map(address_map &map) ATTR_COLD;
+	void shdancbla_map(address_map &map) ATTR_COLD;
+	void shdancbla_sound_map(address_map &map) ATTR_COLD;
+	void shinobi_datsu_sound_map(address_map &map) ATTR_COLD;
+	void shinobib_map(address_map &map) ATTR_COLD;
+	void sound_18_io_map(address_map &map) ATTR_COLD;
+	void sound_18_map(address_map &map) ATTR_COLD;
+	void sound_7759_io_map(address_map &map) ATTR_COLD;
+	void sound_7759_map(address_map &map) ATTR_COLD;
+	void sound_io_map(address_map &map) ATTR_COLD;
+	void sound_map(address_map &map) ATTR_COLD;
+	void sys18bl_oki_map(address_map &map) ATTR_COLD;
+	void sys18bl_sound_map(address_map &map) ATTR_COLD;
+	void tetrisbl_map(address_map &map) ATTR_COLD;
+	void tturfbl_map(address_map &map) ATTR_COLD;
+	void tturfbl_sound_io_map(address_map &map) ATTR_COLD;
+	void tturfbl_sound_map(address_map &map) ATTR_COLD;
+	void wb3bbl_map(address_map &map) ATTR_COLD;
+	void wb3bble_map(address_map &map) ATTR_COLD;
+	void wb3bble_decrypted_opcodes_map(address_map &map) ATTR_COLD;
 
 	virtual void machine_start() override { m_leds.resolve(); }
 
@@ -310,4 +312,4 @@ private:
 	output_finder<2> m_leds;
 };
 
-#endif // MAME_INCLUDES_SYSTEM16_H
+#endif // MAME_SEGA_SYSTEM16_H

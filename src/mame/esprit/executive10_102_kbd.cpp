@@ -1,0 +1,278 @@
+// license: BSD-3-Clause
+// copyright-holders: Dirk Best
+/***************************************************************************
+
+    Esprit Systems Executive 10/102 Keyboard
+
+    Hardware:
+    - Intel D8749
+    - 6.144 MHz XTAL
+    - NE556
+    - Buzzer
+    - 8 LEDs
+
+    TODO:
+    - Verify Break/No Scroll key
+    - LEDs
+
+    Notes:
+    - A/N 9102 754 2200
+    - P/N 3001 900 8108
+
+***************************************************************************/
+
+#include "emu.h"
+#include "executive10_102_kbd.h"
+
+#include "speaker.h"
+
+
+//**************************************************************************
+//  TYPE DEFINITIONS
+//**************************************************************************
+
+DEFINE_DEVICE_TYPE(EXECUTIVE10_102_KBD, executive10_102_kbd_device, "executive10_102_kbd", "Executive 10/102 Keyboard")
+
+executive10_102_kbd_device::executive10_102_kbd_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, EXECUTIVE10_102_KBD, tag, owner, 0U),
+	m_mcu(*this, "mcu"),
+	m_buzzer(*this, "buzzer"),
+	m_shift(*this, "shift"),
+	m_ctrl(*this, "ctrl"),
+	m_keys(*this, "row_%x", 0U),
+	m_txd_cb(*this),
+	m_cts_cb(*this)
+{
+}
+
+
+//**************************************************************************
+//  ROM DEFINITIONS
+//**************************************************************************
+
+ROM_START( firmware )
+	ROM_REGION(0x800, "mcu", 0)
+	ROM_LOAD("118-01-1.u1", 0x000, 0x800, CRC(311ed6a6) SHA1(2701ab4eaaf89270575ecff841f813db1907a434))
+ROM_END
+
+const tiny_rom_entry *executive10_102_kbd_device::device_rom_region() const
+{
+	return ROM_NAME( firmware );
+}
+
+
+//**************************************************************************
+//  MACHINE DEFINITIONS
+//**************************************************************************
+
+void executive10_102_kbd_device::device_add_mconfig(machine_config &config)
+{
+	I8749(config, m_mcu, 6.144_MHz_XTAL);
+	m_mcu->t0_in_cb().set(FUNC(executive10_102_kbd_device::t0_r));
+	m_mcu->t1_in_cb().set(FUNC(executive10_102_kbd_device::t1_r));
+	m_mcu->bus_in_cb().set(FUNC(executive10_102_kbd_device::bus_r));
+	m_mcu->p1_out_cb().set(FUNC(executive10_102_kbd_device::p1_w));
+	m_mcu->p2_out_cb().set(FUNC(executive10_102_kbd_device::p2_w));
+
+	SPEAKER(config, "mono").front_center();
+
+	BEEP(config, m_buzzer, 786); // unknown frequency
+	m_buzzer->add_route(ALL_OUTPUTS, "mono", 0.5);
+}
+
+
+//**************************************************************************
+//  INPUT PORT DEFINITIONS
+//**************************************************************************
+
+static INPUT_PORTS_START( keyboard )
+	PORT_START("shift")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_LSHIFT) PORT_CODE(KEYCODE_RSHIFT) PORT_CHAR(UCHAR_SHIFT_1) PORT_NAME("Shift")
+
+	PORT_START("ctrl")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_LCONTROL) PORT_CODE(KEYCODE_RCONTROL) PORT_CHAR(UCHAR_MAMEKEY(LCONTROL)) PORT_NAME("Ctrl")
+
+	PORT_START("row_0")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_X)   PORT_CHAR('x') PORT_CHAR('X')
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_Z)   PORT_CHAR('z') PORT_CHAR('Z')
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_A)   PORT_CHAR('a') PORT_CHAR('A')
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_Q)   PORT_CHAR('q') PORT_CHAR('Q')
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_ESC) PORT_CHAR(UCHAR_MAMEKEY(ESC))
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_1)   PORT_CHAR('1') PORT_CHAR('!')
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_TAB) PORT_CHAR(9)
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_F5)                                PORT_NAME("Set Up")
+
+	PORT_START("row_1")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_V) PORT_CHAR('v') PORT_CHAR('V')
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_C) PORT_CHAR('c') PORT_CHAR('C')
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_D) PORT_CHAR('d') PORT_CHAR('D')
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_S) PORT_CHAR('s') PORT_CHAR('S')
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_E) PORT_CHAR('e') PORT_CHAR('E')
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_W) PORT_CHAR('w') PORT_CHAR('W')
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_3) PORT_CHAR('3') PORT_CHAR('#')
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_2) PORT_CHAR('2') PORT_CHAR('@')
+
+	PORT_START("row_2")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_B) PORT_CHAR('b') PORT_CHAR('B')
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_G) PORT_CHAR('g') PORT_CHAR('G')
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_F) PORT_CHAR('f') PORT_CHAR('F')
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_R) PORT_CHAR('r') PORT_CHAR('R')
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_T) PORT_CHAR('t') PORT_CHAR('T')
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_5) PORT_CHAR('5') PORT_CHAR('%')
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_4) PORT_CHAR('4') PORT_CHAR('$')
+
+	PORT_START("row_3")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_SLASH) PORT_CHAR('/') PORT_CHAR('?')
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_STOP)  PORT_CHAR('.') PORT_CHAR('>')
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_COMMA) PORT_CHAR(',') PORT_CHAR('<')
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_M)     PORT_CHAR('m') PORT_CHAR('M')
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_N)     PORT_CHAR('n') PORT_CHAR('N')
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_H)     PORT_CHAR('h') PORT_CHAR('H')
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_Y)     PORT_CHAR('y') PORT_CHAR('Y')
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_6)     PORT_CHAR('6') PORT_CHAR('^')
+
+	PORT_START("row_4")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_QUOTE) PORT_CHAR('\'') PORT_CHAR('"')
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_COLON) PORT_CHAR(';')  PORT_CHAR(':')
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_L)     PORT_CHAR('l')  PORT_CHAR('L')
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_K)     PORT_CHAR('k')  PORT_CHAR('K')
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_J)     PORT_CHAR('j')  PORT_CHAR('J')
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_U)     PORT_CHAR('u')  PORT_CHAR('U')
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_8)     PORT_CHAR('8')  PORT_CHAR('*')
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_7)     PORT_CHAR('7')  PORT_CHAR('&')
+
+	PORT_START("row_5")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_ENTER)      PORT_CHAR(13)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_CLOSEBRACE) PORT_CHAR(']') PORT_CHAR('}')
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_OPENBRACE)  PORT_CHAR('[') PORT_CHAR('{')
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_P)          PORT_CHAR('p') PORT_CHAR('P')
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_I)          PORT_CHAR('i') PORT_CHAR('I')
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_O)          PORT_CHAR('o') PORT_CHAR('O')
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_0)          PORT_CHAR('0') PORT_CHAR(')')
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_9)          PORT_CHAR('9') PORT_CHAR('(')
+
+	PORT_START("row_6")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_TILDE)  PORT_CHAR('`') PORT_CHAR('~')
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_EQUALS) PORT_CHAR('=') PORT_CHAR('+')
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_MINUS)  PORT_CHAR('-') PORT_CHAR('_')
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_RIGHT)  PORT_CHAR(UCHAR_MAMEKEY(RIGHT)) PORT_NAME(u8"\u2192") // →
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_LEFT)   PORT_CHAR(UCHAR_MAMEKEY(LEFT))  PORT_NAME(u8"\u2190") // ←
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_DOWN)   PORT_CHAR(UCHAR_MAMEKEY(DOWN))  PORT_NAME(u8"\u2193") // ↓
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_UP)     PORT_CHAR(UCHAR_MAMEKEY(UP))    PORT_NAME(u8"\u2191") // ↑
+
+	PORT_START("row_7")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD)                              PORT_CHAR(10)                    PORT_NAME("Line Feed")
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_BACKSLASH) PORT_CHAR('\\') PORT_CHAR('|')
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_DEL)       PORT_CHAR(UCHAR_MAMEKEY(DEL))
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_CANCEL)    PORT_CHAR(UCHAR_MAMEKEY(CANCEL)) PORT_NAME("Break")
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_BACKSPACE) PORT_CHAR(8)
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_UNUSED)
+
+	PORT_START("row_8")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_ENTER_PAD) PORT_CHAR(UCHAR_MAMEKEY(ENTER_PAD))
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD)                                                                  PORT_NAME("Keypad .")
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_0_PAD)     PORT_CHAR(UCHAR_MAMEKEY(0_PAD))
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_2_PAD)     PORT_CHAR(UCHAR_MAMEKEY(2_PAD))
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_1_PAD)     PORT_CHAR(UCHAR_MAMEKEY(1_PAD))
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_4_PAD)     PORT_CHAR(UCHAR_MAMEKEY(4_PAD))
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_7_PAD)     PORT_CHAR(UCHAR_MAMEKEY(7_PAD))
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_F1)        PORT_CHAR(UCHAR_MAMEKEY(F1))        PORT_NAME("PF1")
+
+	PORT_START("row_9")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_3_PAD) PORT_CHAR(UCHAR_MAMEKEY(3_PAD))
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_6_PAD) PORT_CHAR(UCHAR_MAMEKEY(6_PAD))
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_5_PAD) PORT_CHAR(UCHAR_MAMEKEY(5_PAD))
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_9_PAD) PORT_CHAR(UCHAR_MAMEKEY(9_PAD))
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_8_PAD) PORT_CHAR(UCHAR_MAMEKEY(8_PAD))
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_F3)    PORT_CHAR(UCHAR_MAMEKEY(F3))    PORT_NAME("PF3")
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_F2)    PORT_CHAR(UCHAR_MAMEKEY(F2))    PORT_NAME("PF2")
+
+	PORT_START("row_a")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_SPACE)     PORT_CHAR(' ')
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD)                                                                  PORT_NAME("No Scroll")
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_COMMA_PAD) PORT_CHAR(UCHAR_MAMEKEY(COMMA_PAD))
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_MINUS_PAD) PORT_CHAR(UCHAR_MAMEKEY(MINUS_PAD))
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_F4)        PORT_CHAR(UCHAR_MAMEKEY(F4))        PORT_NAME("PF4")
+
+	PORT_START("row_b")
+	PORT_BIT(0xff, 0xff, IPT_UNUSED)
+
+	PORT_START("row_c")
+	PORT_BIT(0xff, 0xff, IPT_UNUSED)
+
+	PORT_START("row_d")
+	PORT_BIT(0xff, 0xff, IPT_UNUSED)
+
+	PORT_START("row_e")
+	PORT_BIT(0xff, 0xff, IPT_UNUSED)
+
+	PORT_START("row_f")
+	PORT_BIT(0xff, 0xff, IPT_UNUSED)
+INPUT_PORTS_END
+
+ioport_constructor executive10_102_kbd_device::device_input_ports() const
+{
+	return INPUT_PORTS_NAME( keyboard );
+}
+
+
+//**************************************************************************
+//  MACHINE EMULATION
+//**************************************************************************
+
+void executive10_102_kbd_device::device_start()
+{
+	// register for save states
+	save_item(NAME(m_key_row));
+}
+
+void executive10_102_kbd_device::device_reset()
+{
+	// signal we are connected to the host
+	m_cts_cb(0);
+}
+
+void executive10_102_kbd_device::rxd_w(int state)
+{
+	m_mcu->set_input_line(MCS48_INPUT_IRQ, state ? CLEAR_LINE : ASSERT_LINE);
+}
+
+int executive10_102_kbd_device::t0_r()
+{
+	return m_shift->read();
+}
+
+int executive10_102_kbd_device::t1_r()
+{
+	return m_ctrl->read();
+}
+
+uint8_t executive10_102_kbd_device::bus_r()
+{
+	return m_keys[m_key_row]->read();
+}
+
+void executive10_102_kbd_device::p1_w(uint8_t data)
+{
+	// LEDs
+}
+
+void executive10_102_kbd_device::p2_w(uint8_t data)
+{
+	// 76------  unknown
+	// --5-----  serial data output
+	// ---4----  buzzer
+	// ----3210  key row to scan
+
+	m_key_row = data & 0x0f;
+	m_buzzer->set_state(BIT(~data, 4));
+	m_txd_cb(BIT(data, 5));
+}

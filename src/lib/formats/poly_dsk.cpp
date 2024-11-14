@@ -19,22 +19,22 @@ poly_cpm_format::poly_cpm_format()
 {
 }
 
-const char *poly_cpm_format::name() const
+const char *poly_cpm_format::name() const noexcept
 {
 	return "cpm";
 }
 
-const char *poly_cpm_format::description() const
+const char *poly_cpm_format::description() const noexcept
 {
 	return "Poly CP/M disk image";
 }
 
-const char *poly_cpm_format::extensions() const
+const char *poly_cpm_format::extensions() const noexcept
 {
 	return "cpm";
 }
 
-bool poly_cpm_format::supports_save() const
+bool poly_cpm_format::supports_save() const noexcept
 {
 	return true;
 }
@@ -50,9 +50,8 @@ int poly_cpm_format::identify(util::random_read &io, uint32_t form_factor, const
 	{
 		// check for Poly CP/M boot sector
 		uint8_t boot[16];
-		size_t actual;
-		io.read_at(0, boot, 16, actual);
-		if (memcmp(boot, "\x86\xc3\xb7\x00\x00\x8e\x10\xc0\xbf\x00\x01\xbf\xe0\x60\x00\x00", 16) == 0)
+		auto const [err, actual] = read_at(io, 0, boot, 16);
+		if (!err && (16 == actual) && !memcmp(boot, "\x86\xc3\xb7\x00\x00\x8e\x10\xc0\xbf\x00\x01\xbf\xe0\x60\x00\x00", 16))
 		{
 			return FIFID_SIZE|FIFID_SIGN;
 		}
@@ -61,7 +60,7 @@ int poly_cpm_format::identify(util::random_read &io, uint32_t form_factor, const
 	return 0;
 }
 
-bool poly_cpm_format::load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image) const
+bool poly_cpm_format::load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image &image) const
 {
 	uint64_t size;
 	if (io.length(size) || io.seek(0, SEEK_SET))
@@ -114,8 +113,7 @@ bool poly_cpm_format::load(util::random_read &io, uint32_t form_factor, const st
 				sects[i].deleted = false;
 				sects[i].bad_crc = false;
 				sects[i].data = &sect_data[sdatapos];
-				size_t actual;
-				io.read(sects[i].data, bps, actual);
+				/*auto const [err, actual] =*/ read(io, sects[i].data, bps); // FIXME: check for errors and premature EOF
 				sdatapos += bps;
 			}
 			// gap sizes unverified

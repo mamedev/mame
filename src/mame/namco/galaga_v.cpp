@@ -11,7 +11,7 @@
 #include "emu.h"
 #include "galaga.h"
 
-#define LOG_DEBUG           (1 << 0U)
+#define LOG_DEBUG           (1U << 1)
 #define LOG_ALL             (LOG_DEBUG)
 
 #define VERBOSE             (LOG_ALL)
@@ -100,16 +100,12 @@ void galaga_state::galaga_palette(palette_device &palette) const
 /* convert from 32x32 to 36x28 */
 TILEMAP_MAPPER_MEMBER(galaga_state::tilemap_scan)
 {
-	int offs;
-
 	row += 2;
 	col -= 2;
 	if (col & 0x20)
-		offs = row + ((col & 0x1f) << 5);
+		return row + ((col & 0x1f) << 5);
 	else
-		offs = col + (row << 5);
-
-	return offs;
+		return col + (row << 5);
 }
 
 
@@ -161,7 +157,7 @@ void galaga_state::galaga_videoram_w(offs_t offset, uint8_t data)
 	m_fg_tilemap->mark_tile_dirty(offset & 0x3ff);
 }
 
-WRITE_LINE_MEMBER(galaga_state::gatsbee_bank_w)
+void galaga_state::gatsbee_bank_w(int state)
 {
 	m_galaga_gfxbank = state;
 	m_fg_tilemap->mark_all_dirty();
@@ -234,7 +230,7 @@ uint32_t galaga_state::screen_update_galaga(screen_device &screen, bitmap_ind16 
 
 
 
-WRITE_LINE_MEMBER(galaga_state::screen_vblank_galaga)
+void galaga_state::screen_vblank_galaga(int state)
 {
 	// falling edge
 	if (!state)

@@ -3,11 +3,11 @@
 
 @section comp_mac_ca_1 Requirements
 
-* OS X 10.4 or later. PortAudio v19 currently only compiles and runs on OS X version 10.4 or later. Because of its heavy reliance on memory barriers, it's not clear how easy it would be to back-port PortAudio to OS X version 10.3. Leopard support requires the 2007 snapshot or later.
+* OS X 10.6 or later. PortAudio v19.7 currently only compiles and runs on OS X version 10.6 or later.
 
 * Apple's Xcode and its related tools installed in the default location. There is no Xcode project for PortAudio.
 
-* Mac 10.4 SDK. Look for "/Developer/SDKs/MacOSX10.4u.sdk" folder on your system. It may be installed with XCode. If not then you can download it from Apple Developer Connection. http://connect.apple.com/
+* Mac 10.6 SDK. Look for "/Developer/SDKs/MacOSX10.6.sdk" folder on your system. It may be installed with XCode. If not then you can download it from Apple Developer Connection. http://connect.apple.com/
 
 @section comp_mac_ca_2 Building
 
@@ -29,7 +29,7 @@ There are a variety of other options for building PortAudio. The default describ
 
 @subsection comp_mac_ca_3.1 Building Non-Universal Libraries
 
-By default, PortAudio is built as a universal binary. This includes 64-bit versions if you are compiling on 10.5, Leopard. If you want a "thin", or single architecture library, you have two options:
+By default, PortAudio is built as a universal binary. This includes 64-bit versions if you are compiling on 10.6, Snow Leopard. If you want a "thin", or single architecture library, you have two options:
 
  * build a non-universal library using configure options.
  * use lipo(1) on whatever part of the library you plan to use.
@@ -44,11 +44,11 @@ To build a non-universal library for the host architecture, simply use the <i>--
  ./configure --disable-mac-universal && make
 @endcode
 
-The <i>--disable-mac-universal</i> option may also be used in conjunction with environment variables to give you more control over the universal binary build process. For example, to build a universal binary for the i386 and ppc architectures using the 10.4u sdk (which is the default on 10.4, but not 10.5), you might specify this configure command line:
+The <i>--disable-mac-universal</i> option may also be used in conjunction with environment variables to give you more control over the universal binary build process. For example, to build a universal binary for the i386 and ppc architectures using the 10.6 sdk, you might specify this configure command line:
 
 @code
- CFLAGS="-O2 -g -Wall -arch i386 -arch ppc -isysroot /Developer/SDKs/MacOSX10.4u.sdk -mmacosx-version-min=10.3" \
-   LDFLAGS="-arch i386 -arch ppc -isysroot /Developer/SDKs/MacOSX10.4u.sdk -mmacosx-version-min=10.3" \
+ CFLAGS="-O2 -g -Wall -arch i386 -arch ppc -isysroot /Developer/SDKs/MacOSX10.6.sdk -mmacosx-version-min=10.6" \
+   LDFLAGS="-arch i386 -arch ppc -isysroot /Developer/SDKs/MacOSX10.6.sdk -mmacosx-version-min=10.6" \
    ./configure --disable-mac-universal --disable-dependency-tracking
 @endcode
 
@@ -99,7 +99,7 @@ You will need to add the following frameworks to your XCode project:
  - AudioToolbox.framework
  - AudioUnit.framework
  - CoreServices.framework
- - Carbon.framework
+ - CoreFoundation.framework
 
 @section comp_mac_ca_5 Using the Library in Other Projects
 

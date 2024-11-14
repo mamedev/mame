@@ -51,6 +51,8 @@ TODO:
 #include "formats/fc100_cas.h"
 
 
+namespace {
+
 class fc100_state : public driver_device
 {
 public:
@@ -87,11 +89,11 @@ private:
 	{
 		return m_p_chargen[(ch * 16 + line) & 0xfff];
 	}
-	void io_map(address_map &map);
-	void mem_map(address_map &map);
+	void io_map(address_map &map) ATTR_COLD;
+	void mem_map(address_map &map) ATTR_COLD;
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	// graphics signals
 	uint8_t m_ag = 0U;
@@ -134,7 +136,7 @@ void fc100_state::io_map(address_map &map)
 {
 	map.unmap_value_high();
 	map.global_mask(0xff);
-	map(0x00, 0x0F).r(FUNC(fc100_state::port00_r));
+	map(0x00, 0x0f).r(FUNC(fc100_state::port00_r));
 	// map(0x10, 0x10).w(FUNC(fc100_state::port10_w));  // vdg, unknown effects
 	map(0x21, 0x21).w("psg", FUNC(ay8910_device::data_w));
 	map(0x22, 0x22).r("psg", FUNC(ay8910_device::data_r));
@@ -577,11 +579,17 @@ ROM_START( fc100 )
 	ROM_LOAD( "08-02.u49",     0x2000, 0x2000, CRC(e14fc7e9) SHA1(9c5821e65c1efe698e25668d24c36929ea4c3ad7) )
 	ROM_LOAD( "06-03.u50",     0x4000, 0x2000, CRC(d783c84e) SHA1(6d1bf53995e08724d5ecc24198cdda4442eb2eb9) )
 
+	ROM_REGION( 0x800, "mcu", ROMREGION_ERASE00 )
+	ROM_LOAD( "mcu.bin", 0x000, 0x800, NO_DUMP )
+
 	ROM_REGION( 0x800, "ram", ROMREGION_ERASE00 )
 
 	ROM_REGION( 0x1000, "chargen", 0 )
 	ROM_LOAD( "cg-04-01.u53",  0x0000, 0x1000, CRC(2de75b7f) SHA1(464369d98cbae92ffa322ebaa4404cf5b26825f1) )
 ROM_END
+
+} // anonymous namespace
+
 
 /* Driver */
 

@@ -30,9 +30,9 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	virtual bool mem_r(offs_t offset, uint16_t &data, uint16_t mem_mask) override;
 	virtual bool mem_w(offs_t offset, uint16_t data, uint16_t mem_mask) override;

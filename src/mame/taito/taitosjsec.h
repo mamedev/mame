@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Vas Crabb
-#ifndef MAME_MACHINE_TAITSJSEC_H
-#define MAME_MACHINE_TAITSJSEC_H
+#ifndef MAME_TAITO_TAITSJSEC_H
+#define MAME_TAITO_TAITSJSEC_H
 
 #pragma once
 
@@ -37,13 +37,13 @@ public:
 	u8 data_r(address_space &space, offs_t offset);
 	void data_w(offs_t offset, u8 data);
 
-	DECLARE_WRITE_LINE_MEMBER(busak_w);
-	DECLARE_WRITE_LINE_MEMBER(reset_w);
+	void busak_w(int state);
+	void reset_w(int state);
 
 protected:
-	void device_start() override;
-	void device_reset() override;
-	void device_add_mconfig(machine_config &config) override;
+	void device_start() override ATTR_COLD;
+	void device_reset() override ATTR_COLD;
+	void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 	u8 mcu_pa_r();
 	u8 mcu_pc_r();
@@ -91,4 +91,4 @@ private:
 	bool m_busak, m_reset;
 };
 
-#endif // MAME_MACHINE_TATISJSEC_H
+#endif // MAME_TAITO_TATISJSEC_H

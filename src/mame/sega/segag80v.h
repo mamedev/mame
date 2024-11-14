@@ -5,8 +5,8 @@
     Sega vector hardware
 
 *************************************************************************/
-#ifndef MAME_INCLUDES_SEGAG80V_H
-#define MAME_INCLUDES_SEGAG80V_H
+#ifndef MAME_SEGA_SEGAG80V_H
+#define MAME_SEGA_SEGAG80V_H
 
 #pragma once
 
@@ -81,13 +81,13 @@ public:
 	void init_spacfury();
 	void init_spacfurybl();
 
-	DECLARE_READ_LINE_MEMBER(elim4_joint_coin_r);
-	DECLARE_READ_LINE_MEMBER(draw_r);
-	DECLARE_WRITE_LINE_MEMBER(service_switch_w);
-	DECLARE_WRITE_LINE_MEMBER(irq_ack_w);
+	int elim4_joint_coin_r();
+	int draw_r();
+	void service_switch_w(int state);
+	void irq_ack_w(int state);
 
 	template<int Index>
-	DECLARE_WRITE_LINE_MEMBER( coin_w )
+	void coin_w(int state)
 	{
 		const u8 mask = 1 << Index;
 
@@ -157,19 +157,19 @@ private:
 
 	void usb_ram_w(offs_t offset, u8 data);
 
-	virtual void machine_start() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 	uint32_t screen_update_segag80v(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	inline bool adjust_xy(int rawx, int rawy, int &outx, int &outy);
 	void sega_generate_vector_list();
 	offs_t decrypt_offset(offs_t offset);
 	inline u8 demangle(u8 d7d6, u8 d5d4, u8 d3d2, u8 d1d0);
 
-	void main_map(address_map &map);
-	void opcodes_map(address_map &map);
-	void main_portmap(address_map &map);
-	void spacfurybl_speech_prg_map(address_map &map);
-	void spacfurybl_speech_io_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
+	void opcodes_map(address_map &map) ATTR_COLD;
+	void main_portmap(address_map &map) ATTR_COLD;
+	void spacfurybl_speech_prg_map(address_map &map) ATTR_COLD;
+	void spacfurybl_speech_io_map(address_map &map) ATTR_COLD;
 };
 
-#endif // MAME_INCLUDES_SEGAG80V_H
+#endif // MAME_SEGA_SEGAG80V_H

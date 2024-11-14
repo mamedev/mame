@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:David Haywood, Angelo Salese
+// copyright-holders:David Haywood
 /***************************************************************************
 
 Janshi / Pinkiri 8 / Ron Jan
@@ -45,18 +45,25 @@ Dumped by Chackn
 #include "screen.h"
 #include "speaker.h"
 
+#define LOG_VRAM (1U << 1)
+
+#define VERBOSE (0)
+//#define LOG_OUTPUT_FUNC printf
+#include "logmacro.h"
+
+
 /* VDP device to give us our own memory map */
 class janshi_vdp_device : public device_t, public device_memory_interface
 {
 public:
 	janshi_vdp_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	void map(address_map &map);
+	void map(address_map &map) ATTR_COLD;
 
 protected:
 	virtual void device_validity_check(validity_checker &valid) const override;
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 	virtual space_config_vector memory_space_config() const override;
 
 private:
@@ -96,15 +103,15 @@ protected:
 	void ronjan_prot_w(uint8_t data);
 	uint8_t ronjan_prot_status_r();
 	uint8_t ronjan_patched_prot_r();
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 	uint32_t screen_update_pinkiri8(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void draw_background(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void pinkiri8_io(address_map &map);
-	void pinkiri8_map(address_map &map);
-	void ronjan_io(address_map &map);
+	void pinkiri8_io(address_map &map) ATTR_COLD;
+	void pinkiri8_map(address_map &map) ATTR_COLD;
+	void ronjan_io(address_map &map) ATTR_COLD;
 
 private:
 	required_shared_ptr<uint8_t> m_janshi_back_vram;
@@ -407,33 +414,31 @@ void pinkiri8_state::output_regs_w(uint8_t data)
 }
 
 
-#define LOG_VRAM 0
-
 void pinkiri8_state::pinkiri8_vram_w(offs_t offset, uint8_t data)
 {
 	switch(offset)
 	{
 		case 0:
 			m_vram_addr = (data << 0)  | (m_vram_addr&0xffff00);
-			if (LOG_VRAM) printf("\n prev writes was %04x\n\naddress set to %04x -\n", m_prev_writes, m_vram_addr );
+			LOGMASKED(LOG_VRAM, "\n prev writes was %04x\n\naddress set to %04x -\n", m_prev_writes, m_vram_addr);
 			m_prev_writes = 0;
 			break;
 
 		case 1:
 			m_vram_addr = (data << 8)  | (m_vram_addr & 0xff00ff);
-			if (LOG_VRAM)printf("\naddress set to %04x\n", m_vram_addr);
+			LOGMASKED(LOG_VRAM, "\naddress set to %04x\n", m_vram_addr);
 			break;
 
 		case 2:
 			m_vram_addr = (data << 16) | (m_vram_addr & 0x00ffff);
-			if (LOG_VRAM)printf("\naddress set to %04x\n", m_vram_addr);
+			LOGMASKED(LOG_VRAM, "\naddress set to %04x\n", m_vram_addr);
 			break;
 
 		case 3:
 		{
 			address_space &vdp_space = m_vdp->space();
 
-			if (LOG_VRAM) printf("%02x ", data);
+			LOGMASKED(LOG_VRAM, "%02x ", data);
 			m_prev_writes++;
 			m_vram_addr++;
 

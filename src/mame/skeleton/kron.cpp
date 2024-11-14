@@ -129,6 +129,9 @@
 #define FUNCNAME __PRETTY_FUNCTION__
 #endif
 
+
+namespace {
+
 class kron180_state : public driver_device
 {
 public:
@@ -144,7 +147,7 @@ public:
 
 private:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_WRITE_LINE_MEMBER(keyb_interrupt);
+	void keyb_interrupt(int state);
 	void sn74259_w(offs_t offset, uint8_t data) { LOGIO("%s %02x = %02x\n", FUNCNAME, offset & 0x07, offset & 0x08 ? 1 : 0); }
 	void ap5_w(offs_t offset, uint8_t data) { LOGIO("%s %02x = %02x\n", FUNCNAME, offset, data); }
 	uint8_t ap5_r(offs_t offset) { LOGIO("%s() %02x = %02x\n", FUNCNAME, offset, 1); return 1; }
@@ -154,8 +157,8 @@ private:
 	void txen_w(offs_t offset, uint8_t data) { LOGIO("%s %02x = %02x\n", FUNCNAME, offset, data); }
 	void kbd_reset_w(offs_t offset, uint8_t data) { LOGIO("%s %02x = %02x\n", FUNCNAME, offset, data); }
 	void dreq_w(offs_t offset, uint8_t data) { LOGIO("%s %02x = %02x\n", FUNCNAME, offset, data); }
-	void kron180_iomap(address_map &map);
-	void kron180_mem(address_map &map);
+	void kron180_iomap(address_map &map) ATTR_COLD;
+	void kron180_mem(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	required_region_ptr<uint8_t> m_chargen;
@@ -271,7 +274,7 @@ INTERRUPT_GEN_MEMBER(kron180_state::interrupt)
 }
 #endif
 
-WRITE_LINE_MEMBER(kron180_state::keyb_interrupt)
+void kron180_state::keyb_interrupt(int state)
 {
 	if(state && (m_kbd_data = m_keyboard->read()))
 	{
@@ -314,6 +317,9 @@ ROM_START (kron180)
 	ROM_REGION(0x1000, "chargen",0) /* TODO: This character rom is taken from ibmjr rom set and will be replaced */
 	ROM_LOAD( "cga.chr", 0x0000, 0x1000, CRC(42009069) SHA1(ed08559ce2d7f97f68b9f540bddad5b6295294dd) )
 ROM_END
+
+} // anonymous namespace
+
 
 /* Driver */
 //     YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS          INIT        COMPANY     FULLNAME      FLAGS

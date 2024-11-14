@@ -53,8 +53,8 @@ public:
 
 private:
 	required_device<cpu_device> m_maincpu;
-	void extrema_map(address_map &map);
-	void extrema_portmap(address_map &map);
+	void extrema_map(address_map &map) ATTR_COLD;
+	void extrema_portmap(address_map &map) ATTR_COLD;
 };
 
 
@@ -84,7 +84,7 @@ void extrema_state::extrema(machine_config &config)
 
 
 #define MISSING_DISK \
-	DISK_REGION( "ata:0:hdd:image" ) \
+	DISK_REGION( "ata:0:hdd" ) \
 	DISK_IMAGE( "extrema_hdd", 0, NO_DUMP )
 
 ROM_START( maski )

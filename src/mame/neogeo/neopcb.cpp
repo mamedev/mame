@@ -11,6 +11,8 @@
 #include "bus/neogeo/prot_pvc.h"
 
 
+namespace {
+
 class neopcb_state : public ngarcade_base_state
 {
 public:
@@ -34,7 +36,7 @@ public:
 
 protected:
 	// device overrides
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 	virtual void device_post_load() override;
 
@@ -98,7 +100,7 @@ static INPUT_PORTS_START( dualbios )
 
 	/* the rom banking seems to be tied directly to the dipswitch */
 	PORT_MODIFY("DSW")
-	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Region ) ) PORT_DIPLOCATION("SW:3") PORT_CHANGED_MEMBER(DEVICE_SELF, neopcb_state, select_bios, 0)
+	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Region ) ) PORT_DIPLOCATION("SW:3") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(neopcb_state::select_bios), 0)
 	PORT_DIPSETTING(    0x00, DEF_STR( Asia ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( Japan ) )
 INPUT_PORTS_END
@@ -555,6 +557,8 @@ void neopcb_state::init_kf2k3pcb()
 
 	m_maincpu->space(AS_PROGRAM).install_rom(0xc00000, 0xc7ffff, 0x080000, memregion("mainbios")->base());  // 512k bios
 }
+
+} // anonymous namespace
 
 
 GAME( 2003, ms5pcb,     0,        neopcb,   dualbios, neopcb_state, init_ms5pcb,   ROT0, "SNK Playmore", "Metal Slug 5 (JAMMA PCB)", MACHINE_SUPPORTS_SAVE )

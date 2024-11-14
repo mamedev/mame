@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Robert Hildinger
-#ifndef MAME_VIDEO_STARFIELD_05XX_H
-#define MAME_VIDEO_STARFIELD_05XX_H
+#ifndef MAME_NAMCO_STARFIELD_05XX_H
+#define MAME_NAMCO_STARFIELD_05XX_H
 
 // used by galaga, bosconian, and their various clones
 class starfield_05xx_device : public device_t
@@ -16,8 +16,8 @@ public:
 	void draw_starfield(bitmap_ind16 &bitmap, const rectangle &cliprect, int flip);
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 private:
 	uint16_t get_next_lfsr_state(uint16_t lfsr);
@@ -37,4 +37,4 @@ private:
 
 DECLARE_DEVICE_TYPE(STARFIELD_05XX, starfield_05xx_device)
 
-#endif // MAME_VIDEO_STARFIELD_05XX_H
+#endif // MAME_NAMCO_STARFIELD_05XX_H

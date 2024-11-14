@@ -7,7 +7,7 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "video/pcd8544.h"
+#include "pcd8544.h"
 
 #include "screen.h"
 
@@ -175,12 +175,12 @@ void pcd8544_device::write_data(uint8_t data)
 	}
 }
 
-WRITE_LINE_MEMBER(pcd8544_device::sdin_w)
+void pcd8544_device::sdin_w(int state)
 {
 	m_sdin = state;
 }
 
-WRITE_LINE_MEMBER(pcd8544_device::sclk_w)
+void pcd8544_device::sclk_w(int state)
 {
 	if (!m_sclk && state)
 	{
@@ -201,7 +201,7 @@ WRITE_LINE_MEMBER(pcd8544_device::sclk_w)
 	m_sclk = state;
 }
 
-WRITE_LINE_MEMBER(pcd8544_device::dc_w)
+void pcd8544_device::dc_w(int state)
 {
 	m_dc = state;
 }

@@ -1,0 +1,70 @@
+<?xml version="1.0"?>
+<!--
+license:CC0-1.0
+-->
+<mamelayout version="2">
+
+<!-- define elements -->
+
+	<element name="bgcol_rect"><rect><color red="0.886" green="0.925" blue="0.878" /></rect></element>
+	<element name="penbox_rect"><rect><color red="0.475" green="0.49" blue="0.494" /></rect></element>
+	<element name="action_disk"><disk><color red="0.475" green="0.49" blue="0.494" /></disk></element>
+	<element name="applications_label">
+		<text string="APPLICATIONS">
+			<bounds x="0.0" y="0.0" width="1.0" height="1.0" />
+			<color red="0.475" green="0.49" blue="0.494" />
+		</text>
+	</element>
+	<element name="menu_label">
+		<text string="MENU">
+			<bounds x="0.0" y="0.0" width="1.0" height="1.0" />
+			<color red="0.475" green="0.49" blue="0.494" />
+		</text>
+	</element>
+	<element name="calculator_label">
+		<text string="CALCULATOR">
+			<bounds x="0.0" y="0.0" width="1.0" height="1.0" />
+			<color red="0.475" green="0.49" blue="0.494" />
+		</text>
+	</element>
+	<element name="find_label">
+		<text string="FIND">
+			<bounds x="0.0" y="0.0" width="1.0" height="1.0" />
+			<color red="0.475" green="0.49" blue="0.494" />
+		</text>
+	</element>
+	<element name="abcde_label">
+		<text string="abcde" align="1">
+			<bounds x="0.0" y="0.0" width="1.0" height="1.0" />
+			<color red="0.475" green="0.49" blue="0.494" />
+		</text>
+	</element>
+	<element name="12345_label">
+		<text string="12345" align="2">
+			<bounds x="0.0" y="0.0" width="1.0" height="1.0" />
+			<color red="0.475" green="0.49" blue="0.494" />
+		</text>
+	</element>
+
+	<view name="Internal Layout">
+		<bounds left="0" right="160" top="0" bottom="220" />
+
+		<screen index="0">
+			<bounds left="0" top="0" right="160" bottom="220" />
+		</screen>
+
+		<element ref="bgcol_rect"><bounds x="0" y="160" width="160" height="60" /></element>
+		<element ref="penbox_rect"><bounds x="32" y="162" width="96" height="56" /></element>
+		<element ref="bgcol_rect"><bounds x="34" y="164" width="92" height="52" /></element>
+		<element name="apps_disk" ref="action_disk"><bounds x="6" y="162" width="20" height="20" /></element>
+		<element name="calc_disk" ref="action_disk"><bounds x="134" y="162" width="20" height="20" /></element>
+		<element name="menu_disk" ref="action_disk"><bounds x="6" y="194" width="20" height="20" /></element>
+		<element name="find_disk" ref="action_disk"><bounds x="134" y="194" width="20" height="20" /></element>
+		<element name="apps_text" ref="applications_label"><bounds x="0" y="183" width="32" height="5" /></element>
+		<element name="calc_text" ref="calculator_label"><bounds x="128" y="183" width="32" height="5" /></element>
+		<element name="menu_text" ref="menu_label"><bounds x="0" y="215" width="32" height="5" /></element>
+		<element name="find_text" ref="find_label"><bounds x="128" y="215" width="32" height="5" /></element>
+		<element name="abcde_text" ref="abcde_label"><bounds x="35" y="200" width="32" height="5" /></element>
+		<element name="12345_text" ref="12345_label"><bounds x="93" y="200" width="32" height="5" /></element>
+	</view>
+</mamelayout>

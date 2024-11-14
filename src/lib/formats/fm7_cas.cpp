@@ -6,6 +6,8 @@
 
 #include "fm7_cas.h"
 
+#include "multibyte.h"
+
 #include <cstring>
 
 #define WAVE_HIGH        0x5a9e
@@ -13,9 +15,8 @@
 
 static int cas_size; // FIXME: global variable prevents multiple instances
 
-static int fm7_fill_wave(int16_t* buffer, uint8_t high, uint8_t low, int sample_pos)
+static int fm7_fill_wave(int16_t* buffer, uint16_t data, int sample_pos)
 {
-	uint16_t data = (high << 8) + low;
 	int sample_count = 0;
 	int x = 0;
 	int count = (data & 0x7fff);
@@ -51,7 +52,7 @@ static int fm7_handle_t77(int16_t* buffer, const uint8_t* casdata)
 
 	while(data_pos < cas_size)
 	{
-		sample_count += fm7_fill_wave(buffer,casdata[data_pos],casdata[data_pos+1],sample_count);
+		sample_count += fm7_fill_wave(buffer,get_u16be(&casdata[data_pos]),sample_count);
 		data_pos+=2;
 	}
 

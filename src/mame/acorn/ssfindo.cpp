@@ -71,7 +71,7 @@ Notes:
 
 ===================================================================================================
 
-Pong Pong Car
+Pang Pang Car
 Icarus, 1999
 
 This game runs on hardware that is similar to that used on 'See See Find Out'
@@ -128,11 +128,11 @@ Notes:
 
 #include "emu.h"
 #include "cpu/arm7/arm7.h"
-#include "cpu/arm7/arm7core.h"
 #include "machine/acorn_vidc.h"
 #include "machine/arm_iomd.h"
 #include "machine/i2cmem.h"
 #include "sound/qs1000.h"
+#include "diserial.h"
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
@@ -140,17 +140,20 @@ Notes:
 
 namespace {
 
-class ssfindo_state : public driver_device
+class ssfindo_state : public driver_device, public device_serial_interface
 {
 public:
 	ssfindo_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
+		, device_serial_interface(mconfig, *this)
 		, m_maincpu(*this, "maincpu")
 		, m_vidc(*this, "vidc")
 		, m_iomd(*this, "iomd")
 		, m_i2cmem(*this, "i2cmem")
 		, m_flashrom(*this, "flash")
 		, m_qs1000(*this, "qs1000")
+		, m_in(*this, "IN%u", 0U)
+		, m_dsw(*this, "DSW")
 		{ }
 
 	void ssfindo(machine_config &config);
@@ -166,10 +169,12 @@ protected:
 	optional_device<i2cmem_device> m_i2cmem;
 	required_region_ptr<uint16_t> m_flashrom;
 	required_device<qs1000_device> m_qs1000;
+	required_ioport_array<2> m_in;
+	required_ioport m_dsw;
 
 	void init_common();
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	typedef void (ssfindo_state::*speedup_func)();
 	speedup_func m_speedup{};
@@ -178,6 +183,7 @@ protected:
 
 	bool m_i2cmem_clock = false;
 
+	virtual void tra_callback() override;
 	void sound_w(uint8_t data);
 
 private:
@@ -203,12 +209,14 @@ private:
 	void ssfindo_speedups();
 	void ppcar_speedups();
 
-	void ppcar_map(address_map &map);
-	void ssfindo_map(address_map &map);
+	void ppcar_map(address_map &map) ATTR_COLD;
+	void ssfindo_map(address_map &map) ATTR_COLD;
 
 	uint8_t iolines_r();
 	void iolines_w(uint8_t data);
 	bool m_flash_bank_select = false;
+
+	bool m_txd = true;
 };
 
 class tetfight_state : public ssfindo_state
@@ -226,12 +234,12 @@ protected:
 private:
 	bool m_i2cdata_hack = false;
 
-	void tetfight_map(address_map &map);
+	void tetfight_map(address_map &map) ATTR_COLD;
 
-	DECLARE_READ_LINE_MEMBER(iocr_od0_r);
-	DECLARE_READ_LINE_MEMBER(iocr_od1_r);
-	DECLARE_WRITE_LINE_MEMBER(iocr_od0_w);
-	DECLARE_WRITE_LINE_MEMBER(iocr_od1_w);
+	int iocr_od0_r();
+	int iocr_od1_r();
+	void iocr_od0_w(int state);
+	void iocr_od1_w(int state);
 	uint32_t tetfight_unk_r();
 };
 
@@ -258,19 +266,19 @@ void ssfindo_state::iolines_w(uint8_t data)
 
 // inverted compared to riscpc.cpp
 // TODO: simplify hookup over i2cmem having AND 1 on state for a writeline (?)
-READ_LINE_MEMBER(tetfight_state::iocr_od1_r)
+int tetfight_state::iocr_od1_r()
 {
 	// TODO: completely get rid of this speedup fn or move anywhere else
 	//if (m_speedup) (this->*m_speedup)();
 	return (m_i2cmem->read_sda() ? 1 : 0); //eeprom read
 }
 
-READ_LINE_MEMBER(tetfight_state::iocr_od0_r)
+int tetfight_state::iocr_od0_r()
 {
 	return (m_i2cmem_clock == true ? 1 : 0); //eeprom read
 }
 
-WRITE_LINE_MEMBER(tetfight_state::iocr_od1_w)
+void tetfight_state::iocr_od1_w(int state)
 {
 	// TODO: i2c cares about the order of this!?
 	// tetfight reaches PC=0x106c if initialization has success
@@ -280,7 +288,7 @@ WRITE_LINE_MEMBER(tetfight_state::iocr_od1_w)
 	//m_i2cmem->write_sda(state == true ? 1 : 0);
 }
 
-WRITE_LINE_MEMBER(tetfight_state::iocr_od0_w)
+void tetfight_state::iocr_od0_w(int state)
 {
 	m_i2cmem_clock = state;
 	m_i2cmem->write_scl(state == true ? 1 : 0);
@@ -371,7 +379,7 @@ uint32_t ssfindo_state::randomized_r()
 
 void ssfindo_state::sound_w(uint8_t data)
 {
-	m_qs1000->serial_in(data);
+	transmit_register_setup(data);
 	m_maincpu->spin_until_time(attotime::from_usec(2000)); // give time to the QS1000 CPU to react. TODO: sync things correctly
 }
 
@@ -385,10 +393,10 @@ void ssfindo_state::ssfindo_map(address_map &map)
 	map(0x03012ff4, 0x03012ff7).nopw().r(FUNC(ssfindo_state::ff4_r)); //status flag ?
 	map(0x03012ff8, 0x03012fff).noprw();
 	map(0x03200000, 0x032001ff).m(m_iomd, FUNC(arm7500fe_iomd_device::map));
-	map(0x03240000, 0x03240003).portr("IN0").nopw();
-	map(0x03241000, 0x03241003).portr("IN1").nopw();
+	map(0x03240000, 0x03240003).portr(m_in[0]).nopw();
+	map(0x03241000, 0x03241003).portr(m_in[1]).nopw();
 	map(0x03242000, 0x03242003).r(FUNC(ssfindo_state::io_r)).w(FUNC(ssfindo_state::io_w));
-	map(0x03243000, 0x03243003).portr("DSW").nopw();
+	map(0x03243000, 0x03243003).portr(m_dsw).nopw();
 	map(0x03245002, 0x03245002).w(FUNC(ssfindo_state::sound_w));
 	map(0x0324f000, 0x0324f003).r(FUNC(ssfindo_state::SIMPLEIO_r));
 	map(0x03400000, 0x037fffff).w(m_vidc, FUNC(arm_vidc20_device::write));
@@ -400,11 +408,11 @@ void ssfindo_state::ppcar_map(address_map &map)
 	map(0x00000000, 0x000fffff).rom();
 	//map(0x03012be0, 0x03012be0).w(FUNC(ssfindo_state::sound_w)); // once the internal ROM is dumped
 	map(0x03012bf4, 0x03012bf7).r(FUNC(ssfindo_state::randomized_r)).nopw();
-	map(0x03012de0, 0x03012de3).portr("DSW");
+	map(0x03012de0, 0x03012de3).portr(m_dsw);
 	map(0x03012e60, 0x03012e67).nopw();
-	map(0x03012ff8, 0x03012ffb).portr("IN0").nopw();
+	map(0x03012ff8, 0x03012ffb).portr(m_in[0]).nopw();
 	map(0x03200000, 0x032001ff).m(m_iomd, FUNC(arm7500fe_iomd_device::map));
-	map(0x032c0000, 0x032c0003).portr("IN1").nopw();
+	map(0x032c0000, 0x032c0003).portr(m_in[1]).nopw();
 	map(0x03340000, 0x03340007).nopw();
 	map(0x03341000, 0x0334101f).nopw();
 	map(0x033c0000, 0x033c0003).r(FUNC(ssfindo_state::io_r)).w(FUNC(ssfindo_state::io_w));
@@ -423,9 +431,9 @@ void tetfight_state::tetfight_map(address_map &map)
 {
 	map(0x00000000, 0x001fffff).rom();
 	map(0x03200000, 0x032001ff).m(m_iomd, FUNC(arm7500fe_iomd_device::map));
-	map(0x03240000, 0x03240003).portr("IN0");
-	map(0x03240004, 0x03240007).portr("IN1");
-	map(0x03240008, 0x0324000b).portr("DSW2");
+	map(0x03240000, 0x03240003).portr(m_in[0]);
+	map(0x03240004, 0x03240007).portr(m_in[1]);
+	map(0x03240008, 0x0324000b).portr(m_dsw);
 	map(0x03240020, 0x03240023).r(FUNC(tetfight_state::tetfight_unk_r));
 	map(0x03240020, 0x03240020).w(FUNC(tetfight_state::sound_w));
 	map(0x03400000, 0x037fffff).w(m_vidc, FUNC(arm_vidc20_device::write));
@@ -441,11 +449,23 @@ void ssfindo_state::machine_start()
 	save_item(NAME(m_flashN));
 	save_item(NAME(m_i2cmem_clock));
 	save_item(NAME(m_flash_bank_select));
+
+	set_data_frame(1, 8, PARITY_NONE, STOP_BITS_1);
+	set_rate(31250);
 }
 
 void ssfindo_state::machine_reset()
 {
 	// ...
+	receive_register_reset();
+	transmit_register_reset();
+
+	m_txd = true;
+}
+
+void ssfindo_state::tra_callback()
+{
+	m_txd = transmit_register_get_data_bit();
 }
 
 static INPUT_PORTS_START( ssfindo )
@@ -562,7 +582,7 @@ static INPUT_PORTS_START( tetfight )
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON2    ) PORT_PLAYER(2)
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_BUTTON3    ) PORT_PLAYER(2)
 
-	PORT_START("DSW2")
+	PORT_START("DSW")
 	PORT_DIPNAME( 0x01, 0x01, "Test Mode" )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -616,6 +636,7 @@ void ssfindo_state::ssfindo(machine_config &config)
 	qs1000_device &qs1000(QS1000(config, "qs1000", 24_MHz_XTAL));
 	qs1000.set_external_rom(true);
 	// qs1000.p1_out().set(FUNC()); // TODO: writes something here
+	qs1000.p3_in().set([this]() { return u8(0xfeU | m_txd); });
 	qs1000.add_route(0, "lspeaker", 0.25);
 	qs1000.add_route(1, "rspeaker", 0.25);
 }

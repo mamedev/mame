@@ -6,8 +6,8 @@
 
 ***************************************************************************/
 
-#ifndef MAME_MACHINE_CMI_MKBD_H
-#define MAME_MACHINE_CMI_MKBD_H
+#ifndef MAME_FAIRLIGHT_CMI_MKBD_H
+#define MAME_FAIRLIGHT_CMI_MKBD_H
 
 #pragma once
 
@@ -25,39 +25,126 @@ public:
 	auto kbd_txd_handler() { return m_kbd_txd.bind(); }
 	auto kbd_rts_handler() { return m_kbd_rts.bind(); }
 
-	DECLARE_WRITE_LINE_MEMBER( cmi_rxd_w );
-	DECLARE_WRITE_LINE_MEMBER( cmi_cts_w );
-	DECLARE_WRITE_LINE_MEMBER( kbd_rxd_w );
-	DECLARE_WRITE_LINE_MEMBER( kbd_cts_w );
+	void cmi_rxd_w(int state);
+	void cmi_cts_w(int state);
+	void kbd_rxd_w(int state);
+	void kbd_cts_w(int state);
+
+	DECLARE_INPUT_CHANGED_MEMBER(key_changed);
+
+	enum : u32
+	{
+		KEY_F1,
+		KEY_F1S,
+		KEY_G1,
+		KEY_G1S,
+		KEY_A1,
+		KEY_A1S,
+		KEY_B1,
+		KEY_C2,
+		KEY_C2S,
+		KEY_D2,
+		KEY_D2S,
+		KEY_E2,
+		KEY_F2,
+		KEY_F2S,
+		KEY_G2,
+		KEY_G2S,
+		KEY_A2,
+		KEY_A2S,
+		KEY_B2,
+		KEY_C3,
+		KEY_C3S,
+		KEY_D3,
+		KEY_D3S,
+		KEY_E3,
+		KEY_F3,
+		KEY_F3S,
+		KEY_G3,
+		KEY_G3S,
+		KEY_A3,
+		KEY_A3S,
+		KEY_B3,
+		KEY_C4,
+		KEY_C4S,
+		KEY_D4,
+		KEY_D4S,
+		KEY_E4,
+		KEY_F4,
+		KEY_F4S,
+		KEY_G4,
+		KEY_G4S,
+		KEY_A4,
+		KEY_A4S,
+		KEY_B4,
+		KEY_C5,
+		KEY_C5S,
+		KEY_D5,
+		KEY_D5S,
+		KEY_E5,
+		KEY_F5,
+		KEY_F5S,
+		KEY_G5,
+		KEY_G5S,
+		KEY_A5,
+		KEY_A5S,
+		KEY_B5,
+		KEY_C6,
+		KEY_C6S,
+		KEY_D6,
+		KEY_D6S,
+		KEY_E6,
+		KEY_F6,
+		KEY_F6S,
+		KEY_G6,
+		KEY_G6S,
+		KEY_A6,
+		KEY_A6S,
+		KEY_B6,
+		KEY_C7,
+		KEY_C7S,
+		KEY_D7,
+		KEY_D7S,
+		KEY_E7,
+		KEY_F7,
+
+		KEY_COUNT
+	};
 
 protected:
-	virtual const tiny_rom_entry *device_rom_region() const override;
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual ioport_constructor device_input_ports() const override;
-	virtual void device_resolve_objects() override;
-	virtual void device_start() override;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
+	virtual void device_resolve_objects() override ATTR_COLD;
+	virtual void device_start() override ATTR_COLD;
 
 	TIMER_CALLBACK_MEMBER(scnd_update);
+	TIMER_CALLBACK_MEMBER(velkey_down);
 
 private:
+	void kbd_acia_w(offs_t offset, u8 data);
+	u8 kbd_acia_r(offs_t offset);
+
 	void cmi10_u20_a_w(u8 data);
 	void cmi10_u20_b_w(u8 data);
-	DECLARE_READ_LINE_MEMBER( cmi10_u20_cb1_r );
-	DECLARE_WRITE_LINE_MEMBER( cmi10_u20_cb2_w );
-	DECLARE_WRITE_LINE_MEMBER( cmi10_u21_cb2_w );
+	int cmi10_u20_cb1_r();
+	void cmi10_u20_cb2_w(int state);
+	void cmi10_u21_cb2_w(int state);
 	u8 cmi10_u21_a_r();
 
-	DECLARE_WRITE_LINE_MEMBER( kbd_acia_int );
-	DECLARE_WRITE_LINE_MEMBER( cmi_acia_int );
+	u32 get_key_for_indices(int mux, int module, int key);
 
-	DECLARE_WRITE_LINE_MEMBER( cmi_txd_w );
-	DECLARE_WRITE_LINE_MEMBER( cmi_rts_w );
-	DECLARE_WRITE_LINE_MEMBER( kbd_txd_w );
-	DECLARE_WRITE_LINE_MEMBER( kbd_rts_w );
+	void kbd_acia_int(int state);
+	void cmi_acia_int(int state);
+
+	void cmi_txd_w(int state);
+	void cmi_rts_w(int state);
+	void kbd_txd_w(int state);
+	void kbd_rts_w(int state);
 
 	template <unsigned N> void update_dp(offs_t offset, u16 data);
 
-	void muskeys_map(address_map &map);
+	void muskeys_map(address_map &map) ATTR_COLD;
 
 	devcb_write_line m_cmi_txd;
 	devcb_write_line m_cmi_rts;
@@ -82,6 +169,8 @@ private:
 	output_finder<12> m_digit;
 
 	emu_timer *m_cmi10_scnd_timer;
+	emu_timer *m_velocity_timers[KEY_COUNT];
+	bool m_key_held[KEY_COUNT];
 
 	int     m_kbd_acia_irq;
 	int     m_cmi_acia_irq;
@@ -91,4 +180,4 @@ private:
 
 DECLARE_DEVICE_TYPE(CMI_MUSIC_KEYBOARD, cmi_music_keyboard_device)
 
-#endif // MAME_MACHINE_CMI_MKBD_H
+#endif // MAME_FAIRLIGHT_CMI_MKBD_H

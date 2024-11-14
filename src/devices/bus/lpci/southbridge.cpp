@@ -282,19 +282,19 @@ void southbridge_device::at_speaker_set_spkrdata(uint8_t data)
  *
  *************************************************************/
 
-WRITE_LINE_MEMBER( southbridge_device::at_pit8254_out0_changed )
+void southbridge_device::at_pit8254_out0_changed(int state)
 {
 	if (m_pic8259_master)
 		m_pic8259_master->ir0_w(state);
 }
 
-WRITE_LINE_MEMBER( southbridge_device::at_pit8254_out1_changed )
+void southbridge_device::at_pit8254_out1_changed(int state)
 {
 	if(state)
 		m_refresh = !m_refresh;
 }
 
-WRITE_LINE_MEMBER( southbridge_device::at_pit8254_out2_changed )
+void southbridge_device::at_pit8254_out2_changed(int state)
 {
 	m_pit_out2 = state ? 1 : 0;
 	m_speaker->level_w(m_at_spkrdata & m_pit_out2);
@@ -353,7 +353,7 @@ void southbridge_device::at_page8_w(offs_t offset, uint8_t data)
 }
 
 
-WRITE_LINE_MEMBER( southbridge_device::pc_dma_hrq_changed )
+void southbridge_device::pc_dma_hrq_changed(int state)
 {
 	m_maincpu->set_input_line(INPUT_LINE_HALT, state ? ASSERT_LINE : CLEAR_LINE);
 
@@ -428,7 +428,7 @@ void southbridge_device::pc_dma8237_5_dack_w(uint8_t data) { m_isabus->dack_w(5,
 void southbridge_device::pc_dma8237_6_dack_w(uint8_t data) { m_isabus->dack_w(6, data); }
 void southbridge_device::pc_dma8237_7_dack_w(uint8_t data) { m_isabus->dack_w(7, data); }
 
-WRITE_LINE_MEMBER( southbridge_device::at_dma8237_out_eop )
+void southbridge_device::at_dma8237_out_eop(int state)
 {
 	m_cur_eop = state == ASSERT_LINE;
 	if(m_dma_channel != -1)
@@ -450,14 +450,14 @@ void southbridge_device::pc_select_dma_channel(int channel, bool state)
 }
 
 
-WRITE_LINE_MEMBER( southbridge_device::pc_dack0_w ) { pc_select_dma_channel(0, state); }
-WRITE_LINE_MEMBER( southbridge_device::pc_dack1_w ) { pc_select_dma_channel(1, state); }
-WRITE_LINE_MEMBER( southbridge_device::pc_dack2_w ) { pc_select_dma_channel(2, state); }
-WRITE_LINE_MEMBER( southbridge_device::pc_dack3_w ) { pc_select_dma_channel(3, state); }
-WRITE_LINE_MEMBER( southbridge_device::pc_dack4_w ) { m_dma8237_1->hack_w( state ? 0 : 1); } // it's inverted
-WRITE_LINE_MEMBER( southbridge_device::pc_dack5_w ) { pc_select_dma_channel(5, state); }
-WRITE_LINE_MEMBER( southbridge_device::pc_dack6_w ) { pc_select_dma_channel(6, state); }
-WRITE_LINE_MEMBER( southbridge_device::pc_dack7_w ) { pc_select_dma_channel(7, state); }
+void southbridge_device::pc_dack0_w(int state) { pc_select_dma_channel(0, state); }
+void southbridge_device::pc_dack1_w(int state) { pc_select_dma_channel(1, state); }
+void southbridge_device::pc_dack2_w(int state) { pc_select_dma_channel(2, state); }
+void southbridge_device::pc_dack3_w(int state) { pc_select_dma_channel(3, state); }
+void southbridge_device::pc_dack4_w(int state) { m_dma8237_1->hack_w( state ? 0 : 1); } // it's inverted
+void southbridge_device::pc_dack5_w(int state) { pc_select_dma_channel(5, state); }
+void southbridge_device::pc_dack6_w(int state) { pc_select_dma_channel(6, state); }
+void southbridge_device::pc_dack7_w(int state) { pc_select_dma_channel(7, state); }
 
 uint8_t southbridge_device::at_portb_r()
 {
@@ -485,7 +485,7 @@ void southbridge_device::at_portb_w(uint8_t data)
 		m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 }
 
-WRITE_LINE_MEMBER( southbridge_device::iochck_w )
+void southbridge_device::iochck_w(int state)
 {
 	if (!state && !m_channel_check && m_nmi_enabled)
 		m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
@@ -561,7 +561,8 @@ void southbridge_extended_device::device_start()
 
 	spaceio.install_readwrite_handler(0x0060, 0x0063, read8smo_delegate(*m_keybc, FUNC(at_keyboard_controller_device::data_r)), write8smo_delegate(*m_keybc, FUNC(at_keyboard_controller_device::data_w)), 0x000000ff);
 	spaceio.install_readwrite_handler(0x0064, 0x0067, read8smo_delegate(*m_keybc, FUNC(at_keyboard_controller_device::status_r)), write8smo_delegate(*m_keybc, FUNC(at_keyboard_controller_device::command_w)), 0xffffffff);
-	spaceio.install_readwrite_handler(0x0070, 0x007f, read8sm_delegate(*m_ds12885, FUNC(ds12885_device::read)), write8sm_delegate(*m_ds12885, FUNC(ds12885_device::write)), 0xffffffff);
+	spaceio.install_write_handler(0x0070, 0x007f, write8smo_delegate(*this, FUNC(southbridge_extended_device::rtc_nmi_w)), 0x00ff00ff);
+	spaceio.install_readwrite_handler(0x0070, 0x007f, read8smo_delegate(*m_ds12885, FUNC(ds12885_device::data_r)), write8smo_delegate(*m_ds12885, FUNC(ds12885_device::data_w)), 0xff00ff00);
 }
 
 //-------------------------------------------------
@@ -573,15 +574,10 @@ void southbridge_extended_device::device_reset()
 	southbridge_device::device_reset();
 }
 
-void southbridge_extended_device::write_rtc(offs_t offset, uint8_t data)
+void southbridge_extended_device::rtc_nmi_w(uint8_t data)
 {
-	if (offset==0) {
-		m_nmi_enabled = BIT(data,7);
-		if (!m_nmi_enabled)
-			m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
-		m_ds12885->write(0,data);
-	}
-	else {
-		m_ds12885->write(offset,data);
-	}
+	m_nmi_enabled = BIT(data,7);
+	if (!m_nmi_enabled)
+		m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
+	m_ds12885->address_w(data);
 }

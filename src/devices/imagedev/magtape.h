@@ -28,6 +28,7 @@ public:
 	virtual bool is_writeable() const noexcept override { return true; }
 	virtual bool is_creatable() const noexcept override { return true; }
 	virtual bool is_reset_on_load() const noexcept override { return false; }
+	virtual bool support_command_line_image_creation() const noexcept override { return true; }
 	virtual const char *image_type_name() const noexcept override { return "magtape"; }
 	virtual const char *image_brief_type_name() const noexcept override { return "mtap"; }
 

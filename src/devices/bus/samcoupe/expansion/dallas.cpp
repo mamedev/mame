@@ -67,8 +67,8 @@ uint8_t sam_dallas_clock_device::iorq_r(offs_t offset)
 {
 	uint8_t data = 0xff;
 
-	if (m_print && (offset & 0xfe07) == 0xfe07)
-		data &= m_rtc->read((offset >> 8) & 0x01);
+	if (m_print && (offset & 0xff07) == 0xff07)
+		data &= m_rtc->data_r();
 
 	return data;
 }
@@ -76,5 +76,10 @@ uint8_t sam_dallas_clock_device::iorq_r(offs_t offset)
 void sam_dallas_clock_device::iorq_w(offs_t offset, uint8_t data)
 {
 	if (m_print && (offset & 0xfe07) == 0xfe07)
-		m_rtc->write((offset >> 8) & 0x01, data);
+	{
+		if (BIT(offset, 8))
+			m_rtc->data_w(data);
+		else
+			m_rtc->address_w(data);
+	}
 }

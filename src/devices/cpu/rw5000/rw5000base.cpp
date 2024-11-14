@@ -30,8 +30,8 @@ rw5000_base_device::rw5000_base_device(const machine_config &mconfig, device_typ
 	m_data_config("data", ENDIANNESS_LITTLE, 8, datawidth, 0, data),
 	m_prgwidth(prgwidth),
 	m_datawidth(datawidth),
-	m_read_kb(*this),
-	m_read_din(*this),
+	m_read_kb(*this, 0),
+	m_read_din(*this, 0),
 	m_write_str(*this),
 	m_write_seg(*this),
 	m_write_spk(*this)
@@ -48,13 +48,6 @@ void rw5000_base_device::device_start()
 	m_data = &space(AS_DATA);
 	m_prgmask = (1 << m_prgwidth) - 1;
 	m_datamask = (1 << m_datawidth) - 1;
-
-	// resolve callbacks
-	m_read_kb.resolve_safe(0);
-	m_read_din.resolve_safe(0);
-	m_write_str.resolve_safe();
-	m_write_seg.resolve_safe();
-	m_write_spk.resolve_safe();
 
 	// zerofill
 	m_pc = 0;

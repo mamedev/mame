@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Wilbert Pol,Stefan Jokisch
-#ifndef MAME_VIDEO_VIDEO_TIA_H
-#define MAME_VIDEO_VIDEO_TIA_H
+#ifndef MAME_ATARI_TIA_H
+#define MAME_ATARI_TIA_H
 
 #pragma once
 
@@ -57,11 +57,11 @@ protected:
 	template <typename T> void set_tia_tag(T &&tag) { m_tia.set_tag(std::forward<T>(tag)); }
 
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// device_palette_interface overrides
-	virtual uint32_t palette_entries() const override { return TIA_PALETTE_LENGTH; }
+	virtual uint32_t palette_entries() const noexcept override { return TIA_PALETTE_LENGTH; }
 
 	void extend_palette();
 	virtual void init_palette() = 0;
@@ -242,4 +242,4 @@ protected:
 DECLARE_DEVICE_TYPE(TIA_PAL_VIDEO, tia_pal_video_device)
 DECLARE_DEVICE_TYPE(TIA_NTSC_VIDEO, tia_ntsc_video_device)
 
-#endif // MAME_VIDEO_TIA_H
+#endif // MAME_ATARI_TIA_H

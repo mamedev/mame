@@ -10,6 +10,9 @@ Advanced Computer Design computer. CPU is WD9000. Some details at bitsavers.
 
 #include "emu.h"
 
+
+namespace {
+
 class acd_state : public driver_device
 {
 public:
@@ -42,5 +45,8 @@ ROM_START( acd )
 	ROM_LOAD( "d7_cpu_c5.bin", 0x000000, 0x000200, CRC(7db9ecca) SHA1(535a34608e59c72d13434e3fc2892db9841a0f60) )
 	ROM_LOAD( "d9_cpu_b14_rev_1.2.bin", 0x000000, 0x000200, CRC(5572ff8b) SHA1(9e8158c338b2798f7fb1d9c4fa6dd99592d2fae3) )
 ROM_END
+
+} // anonymous namespace
+
 
 COMP( 198?, acd, 0, 0, acd, acd, acd_state, empty_init, "Advanced Computer Design", "unknown ACD computer", MACHINE_IS_SKELETON )

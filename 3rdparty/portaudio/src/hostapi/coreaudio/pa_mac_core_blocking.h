@@ -15,7 +15,7 @@
  * Olivier Tristan for feedback and testing
  * Glenn Zelniker and Z-Systems engineering for sponsoring the Blocking I/O
  * interface.
- * 
+ *
  *
  * Based on the Open Source API proposed by Ross Bencina
  * Copyright (c) 1999-2002 Ross Bencina, Phil Burk
@@ -41,13 +41,13 @@
  */
 
 /*
- * The text above constitutes the entire PortAudio license; however, 
+ * The text above constitutes the entire PortAudio license; however,
  * the PortAudio community also makes the following non-binding requests:
  *
  * Any person wishing to distribute modifications to the Software is
  * requested to send the modifications to the original developer so that
- * they can be incorporated into the canonical version. It is also 
- * requested that these non-binding requests be included along with the 
+ * they can be incorporated into the canonical version. It is also
+ * requested that these non-binding requests be included along with the
  * license above.
  */
 
@@ -112,12 +112,12 @@ PaMacBlio;
  */
 
 PaError initializeBlioRingBuffers(
-                                       PaMacBlio *blio,
-                                       PaSampleFormat inputSampleFormat,
-                                       PaSampleFormat outputSampleFormat,
-                                       long ringBufferSizeInFrames,
-                                       int inChan,
-                                       int outChan );
+        PaMacBlio *blio,
+        PaSampleFormat inputSampleFormat,
+        PaSampleFormat outputSampleFormat,
+        long ringBufferSizeInFrames,
+        int inChan,
+        int outChan );
 PaError destroyBlioRingBuffers( PaMacBlio *blio );
 PaError resetBlioRingBuffers( PaMacBlio *blio );
 
@@ -129,6 +129,6 @@ int BlioCallback(
         void *userData );
 
 PaError waitUntilBlioWriteBufferIsEmpty( PaMacBlio *blio, double sampleRate,
-                                        size_t framesPerBuffer );
+        size_t framesPerBuffer );
 
 #endif /*PA_MAC_CORE_BLOCKING_H_*/

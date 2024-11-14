@@ -25,8 +25,8 @@ public:
 	virtual ~menu_input_devices();
 
 private:
-	virtual void populate(float &customtop, float &custombottom) override;
-	virtual void handle(event const *ev) override;
+	virtual void populate() override;
+	virtual bool handle(event const *ev) override;
 };
 
 } // namespace ui

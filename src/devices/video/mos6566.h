@@ -202,11 +202,11 @@ public:
 	uint8_t read(offs_t offset);
 	void write(offs_t offset, uint8_t data);
 
-	DECLARE_WRITE_LINE_MEMBER( lp_w );
+	void lp_w(int state);
 
-	DECLARE_READ_LINE_MEMBER( phi0_r ) { return m_phi0; } // phi 0
-	DECLARE_READ_LINE_MEMBER( ba_r )   { return m_ba; }   // bus available
-	DECLARE_READ_LINE_MEMBER( aec_r )  { return m_aec; }  // address enable control
+	int phi0_r() { return m_phi0; } // phi 0
+	int ba_r()   { return m_ba; }   // bus available
+	int aec_r()  { return m_aec; }  // address enable control
 
 	uint8_t bus_r() { return m_last_data; }
 
@@ -231,8 +231,8 @@ protected:
 	mos6566_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint32_t variant);
 
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 	virtual void execute_run() override;
 
 	inline void set_interrupt( int mask );
@@ -260,8 +260,8 @@ protected:
 	void draw_graphics();
 	void draw_sprites();
 
-	void mos6566_colorram_map(address_map &map);
-	void mos6566_videoram_map(address_map &map);
+	void mos6566_colorram_map(address_map &map) ATTR_COLD;
+	void mos6566_videoram_map(address_map &map) ATTR_COLD;
 
 	int m_icount;
 	const int m_variant;

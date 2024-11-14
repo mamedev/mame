@@ -1,9 +1,9 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <!--
-license:CC0
+license:CC0-1.0
 -->
-<softwarelist name="gcslottv" description="Gachinko Contest! Slot machine TV cartridges">
+<softwarelist name="gcslottv" description="Gachinko Shōbu! PachisloTV cartridges">
 	<!-- cartridges contain the ROM only, the XaviX CPU and BIOS are in the base unit
 
 	***********************************************************************************
@@ -21,7 +21,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="ginginma" supported="no">
+	<software name="ginginma" supported="no"> <!-- inputs do not respond on this one -->
 		<description>Ginginmaru TV</description>
 		<year>2002</year>
 		<publisher>Sammy</publisher>
@@ -34,7 +34,7 @@ license:CC0
 	</software>
 
 	<software name="salarymn" supported="no">
-		<description>Salaryman Kintaro</description>
+		<description>Salaryman Kintarō</description>
 		<year>2002</year>
 		<publisher>Sammy</publisher>
 		<info name="alt_title" value="サラリーマン金太郎"/>
@@ -45,8 +45,21 @@ license:CC0
 		</part>
 	</software>
 
+	<!-- green cartridge -->
+	<software name="juojr" supported="no">
+		<description>Jū-ō Junior</description>
+		<year>2002</year>
+		<publisher>Sammy</publisher>
+		<info name="alt_title" value="獣王 Junior"/>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x200000">
+				<rom name="beastkingjr.u1" size="0x200000" crc="3e940c19" sha1="34bb55d8b8a574478d2e3646b73b6fe5d4ca46a9"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="mojuotv" supported="no">
-		<description>Moju-o TV</description>
+		<description>Mōjū-ō TV</description>
 		<year>2002</year>
 		<publisher>Sammy</publisher>
 		<info name="alt_title" value="猛獣王TV"/>

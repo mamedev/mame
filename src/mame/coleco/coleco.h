@@ -2,8 +2,8 @@
 // copyright-holders:Mike Balfour, Ben Bruscella, Sean Young, Frank Palazzolo
 #pragma once
 
-#ifndef MAME_INCLUDES_COLECO_H
-#define MAME_INCLUDES_COLECO_H
+#ifndef MAME_COLECO_COLECO_H
+#define MAME_COLECO_COLECO_H
 
 
 #include "cpu/z80/z80.h"
@@ -40,10 +40,12 @@ public:
 			m_roller_y(*this, "ROLLER_Y")
 	{ }
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	uint8_t cart_r(offs_t offset);
+	void cart_w(offs_t offset, uint8_t data);
+
 	uint8_t paddle_1_r();
 	uint8_t paddle_2_r();
 	void paddle_off_w(uint8_t data);
@@ -53,8 +55,7 @@ public:
 	TIMER_CALLBACK_MEMBER(paddle_irqreset_callback);
 	TIMER_CALLBACK_MEMBER(paddle_pulse_callback);
 	TIMER_DEVICE_CALLBACK_MEMBER(paddle_update_callback);
-	DECLARE_WRITE_LINE_MEMBER(coleco_vdp_interrupt);
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(czz50_cart);
+	void coleco_vdp_interrupt(int state);
 
 	uint8_t coleco_paddle_read(int port, int joy_mode, uint8_t joy_status);
 	uint8_t coleco_scan_paddles(uint8_t *joy_status0, uint8_t *joy_status1);
@@ -63,9 +64,9 @@ public:
 	void coleco(machine_config &config);
 	void czz50(machine_config &config);
 	void dina(machine_config &config);
-	void coleco_io_map(address_map &map);
-	void coleco_map(address_map &map);
-	void czz50_map(address_map &map);
+	void coleco_io_map(address_map &map) ATTR_COLD;
+	void coleco_map(address_map &map) ATTR_COLD;
+	void czz50_map(address_map &map) ATTR_COLD;
 protected:
 	required_device<cpu_device> m_maincpu;
 	required_device<colecovision_cartridge_slot_device> m_cart;
@@ -112,8 +113,8 @@ public:
 			m_io_keyboard(*this, {"ROW0", "ROW1", "ROW2", "ROW3", "ROW4", "ROW5", "ROW6", "ROW7"})
 		{}
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	void bit90(machine_config &config);
 
@@ -130,11 +131,11 @@ protected:
 	required_ioport_array<8> m_io_keyboard;
 
 private:
-	void bit90_map(address_map &map);
-	void bit90_io_map(address_map &map);
+	void bit90_map(address_map &map) ATTR_COLD;
+	void bit90_io_map(address_map &map) ATTR_COLD;
 
 	uint8_t m_keyselect = 0U;
 	uint8_t m_unknown = 0U;
 };
 
-#endif
+#endif // MAME_COLECO_COLECO_H

@@ -64,6 +64,8 @@ Notes:
 #include "tilemap.h"
 
 
+namespace {
+
 #define DUNHUANG_DEBUG  0
 
 
@@ -107,13 +109,13 @@ private:
 	uint8_t dsw_r();
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void dunhuang_io_map(address_map &map);
-	void dunhuang_map(address_map &map);
-	void ramdac_map(address_map &map);
+	void dunhuang_io_map(address_map &map) ATTR_COLD;
+	void dunhuang_map(address_map &map) ATTR_COLD;
+	void ramdac_map(address_map &map) ATTR_COLD;
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 	/* video-related */
 	tilemap_t         *m_tmap;
@@ -863,5 +865,8 @@ ROM_START( dunhuang )
 	ROM_REGION( 0x40000, "oki", 0 )
 	ROM_LOAD( "rom6.u1", 0x00000, 0x20000, CRC(31cfdc29) SHA1(725249eae9227eadf05418b799e0da0254bb2f51) )
 ROM_END
+
+} // anonymous namespace
+
 
 GAME( 1995, dunhuang, 0, dunhuang, dunhuang, dunhuang_state, empty_init, ROT0, "Spirit", "Mahjong Dunhuang", MACHINE_SUPPORTS_SAVE )

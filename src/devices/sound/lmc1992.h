@@ -62,13 +62,13 @@ public:
 	// construction/destruction
 	lmc1992_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
-	DECLARE_WRITE_LINE_MEMBER( clock_w );
-	DECLARE_WRITE_LINE_MEMBER( data_w );
-	DECLARE_WRITE_LINE_MEMBER( enable_w );
+	void clock_w(int state);
+	void data_w(int state);
+	void enable_w(int state);
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 	// internal callbacks
 	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;

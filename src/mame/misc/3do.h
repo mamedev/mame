@@ -6,8 +6,8 @@
  *
  ****************************************************************************/
 
-#ifndef MAME_INCLUDES_3DO_H
-#define MAME_INCLUDES_3DO_H
+#ifndef MAME_MISC_3DO_H
+#define MAME_MISC_3DO_H
 
 #include "machine/nvram.h"
 #include "machine/timer.h"
@@ -30,9 +30,9 @@ public:
 	void _3do_pal(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	struct SLOW2 {
@@ -188,7 +188,7 @@ private:
 
 	TIMER_DEVICE_CALLBACK_MEMBER( timer_x16_cb );
 
-	void main_mem(address_map &map);
+	void main_mem(address_map &map) ATTR_COLD;
 
 	void m_slow2_init( void );
 	void m_madam_init( void );
@@ -198,4 +198,4 @@ private:
 };
 
 
-#endif // MAME_INCLUDES_3DO_H
+#endif // MAME_MISC_3DO_H

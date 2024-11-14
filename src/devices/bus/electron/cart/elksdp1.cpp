@@ -12,12 +12,46 @@
 #include "emu.h"
 #include "elksdp1.h"
 
+#include "machine/spi_sdcard.h"
+
+
+namespace {
 
 //**************************************************************************
-//  DEVICE DEFINITIONS
+//  TYPE DEFINITIONS
 //**************************************************************************
 
-DEFINE_DEVICE_TYPE(ELECTRON_ELKSDP1, electron_elksdp1_device, "electron_elksdp1", "ElkSD-Plus 1 Electron SD Cartridge")
+class electron_elksdp1_device : public device_t, public device_electron_cart_interface
+{
+public:
+	// construction/destruction
+	electron_elksdp1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+protected:
+	// device_t implementation
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+
+	// device_electron_cart_interface implementation
+	virtual uint8_t read(offs_t offset, int infc, int infd, int romqa, int oe, int oe2) override;
+	virtual void write(offs_t offset, uint8_t data, int infc, int infd, int romqa, int oe, int oe2) override;
+
+private:
+	TIMER_CALLBACK_MEMBER(spi_clock);
+
+	required_device<spi_sdcard_device> m_sdcard;
+
+	emu_timer *m_spi_clock;
+	bool m_spi_clock_state;
+	bool m_spi_clock_sysclk;
+	int m_spi_clock_cycles;
+	int m_in_bit;
+	uint8_t m_in_latch;
+	uint8_t m_out_latch;
+
+	std::unique_ptr<uint8_t[]> m_ram;
+};
 
 
 //-------------------------------------------------
@@ -27,6 +61,7 @@ DEFINE_DEVICE_TYPE(ELECTRON_ELKSDP1, electron_elksdp1_device, "electron_elksdp1"
 void electron_elksdp1_device::device_add_mconfig(machine_config &config)
 {
 	SPI_SDCARD(config, m_sdcard, 0);
+	m_sdcard->set_prefer_sdhc();
 	m_sdcard->spi_miso_callback().set([this](int state) { m_in_bit = state; });
 }
 
@@ -182,3 +217,12 @@ TIMER_CALLBACK_MEMBER(electron_elksdp1_device::spi_clock)
 		m_spi_clock->adjust(attotime::never);
 	}
 }
+
+} // anonymous namespace
+
+
+//**************************************************************************
+//  DEVICE DEFINITIONS
+//**************************************************************************
+
+DEFINE_DEVICE_TYPE_PRIVATE(ELECTRON_ELKSDP1, device_electron_cart_interface, electron_elksdp1_device, "electron_elksdp1", "ElkSD-Plus 1 Electron SD Cartridge")

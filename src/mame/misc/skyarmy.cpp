@@ -34,6 +34,8 @@
 #include "tilemap.h"
 
 
+namespace {
+
 class skyarmy_state : public driver_device
 {
 public:
@@ -51,8 +53,8 @@ public:
 	void skyarmy(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -67,12 +69,10 @@ private:
 	tilemap_t* m_tilemap = nullptr;
 	int m_nmi = 0;
 
-	DECLARE_WRITE_LINE_MEMBER(flip_screen_x_w);
-	DECLARE_WRITE_LINE_MEMBER(flip_screen_y_w);
 	void videoram_w(offs_t offset, uint8_t data);
 	void colorram_w(offs_t offset, uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(coin_counter_w);
-	DECLARE_WRITE_LINE_MEMBER(nmi_enable_w);
+	void coin_counter_w(int state);
+	void nmi_enable_w(int state);
 
 	TILE_GET_INFO_MEMBER(get_tile_info);
 
@@ -81,23 +81,13 @@ private:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	INTERRUPT_GEN_MEMBER(nmi_source);
-	void skyarmy_io_map(address_map &map);
-	void skyarmy_map(address_map &map);
+	void skyarmy_io_map(address_map &map) ATTR_COLD;
+	void skyarmy_map(address_map &map) ATTR_COLD;
 };
 
 void skyarmy_state::machine_start()
 {
 	save_item(NAME(m_nmi));
-}
-
-WRITE_LINE_MEMBER(skyarmy_state::flip_screen_x_w)
-{
-	flip_screen_x_set(state);
-}
-
-WRITE_LINE_MEMBER(skyarmy_state::flip_screen_y_w)
-{
-	flip_screen_y_set(state);
 }
 
 TILE_GET_INFO_MEMBER(skyarmy_state::get_tile_info)
@@ -197,13 +187,13 @@ INTERRUPT_GEN_MEMBER(skyarmy_state::nmi_source)
 }
 
 
-WRITE_LINE_MEMBER(skyarmy_state::coin_counter_w)
+void skyarmy_state::coin_counter_w(int state)
 {
 	machine().bookkeeping().coin_counter_w(0, state);
 }
 
 
-WRITE_LINE_MEMBER(skyarmy_state::nmi_enable_w)
+void skyarmy_state::nmi_enable_w(int state)
 {
 	m_nmi = state;
 	if (!m_nmi)
@@ -332,8 +322,8 @@ void skyarmy_state::skyarmy(machine_config &config)
 	ls259_device &latch(LS259(config, "latch")); // 11C
 	latch.q_out_cb<0>().set(FUNC(skyarmy_state::coin_counter_w));
 	latch.q_out_cb<4>().set(FUNC(skyarmy_state::nmi_enable_w)); // ???
-	latch.q_out_cb<5>().set(FUNC(skyarmy_state::flip_screen_x_w));
-	latch.q_out_cb<6>().set(FUNC(skyarmy_state::flip_screen_y_w));
+	latch.q_out_cb<5>().set(FUNC(skyarmy_state::flip_screen_x_set));
+	latch.q_out_cb<6>().set(FUNC(skyarmy_state::flip_screen_y_set));
 	latch.q_out_cb<7>().set_nop(); // video RAM buffering?
 
 	/* video hardware */
@@ -373,5 +363,8 @@ ROM_START( skyarmy )
 	ROM_REGION( 0x0020, "proms", 0 )
 	ROM_LOAD( "a6.bin",  0x0000, 0x0020, CRC(c721220b) SHA1(61b3320fb616c0600d56840cb6438616c7e0c6eb) )
 ROM_END
+
+} // anonymous namespace
+
 
 GAME( 1982, skyarmy, 0, skyarmy, skyarmy, skyarmy_state, empty_init, ROT90, "Shoei", "Sky Army", MACHINE_SUPPORTS_SAVE )

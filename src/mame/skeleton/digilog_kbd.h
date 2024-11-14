@@ -6,8 +6,8 @@
 
 ***************************************************************************/
 
-#ifndef MAME_MACHINE_DIGILOG_KBD_H
-#define MAME_MACHINE_DIGILOG_KBD_H
+#ifndef MAME_SKELETON_DIGILOG_KBD_H
+#define MAME_SKELETON_DIGILOG_KBD_H
 
 #pragma once
 
@@ -31,11 +31,11 @@ public:
 
 protected:
 	// device_t overrides
-	virtual const tiny_rom_entry *device_rom_region() const override;
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual ioport_constructor device_input_ports() const override;
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 private:
 	required_device<i8748_device> m_mcu;
@@ -56,4 +56,4 @@ private:
 // device type definition
 DECLARE_DEVICE_TYPE(DIGILOG_KBD, digilog_kbd_device)
 
-#endif // MAME_MACHINE_DIGILOG_KBD_H
+#endif // MAME_SKELETON_DIGILOG_KBD_H

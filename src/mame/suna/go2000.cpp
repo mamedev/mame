@@ -60,7 +60,7 @@ public:
 	void go2000(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	// memory pointers
@@ -78,9 +78,9 @@ private:
 	void pcm_1_bankswitch_w(uint8_t data);
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void main_map(address_map &map);
-	void sound_io(address_map &map);
-	void sound_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
+	void sound_io(address_map &map) ATTR_COLD;
+	void sound_map(address_map &map) ATTR_COLD;
 };
 
 
@@ -376,4 +376,4 @@ ROM_END
 } // Anonymous namespace
 
 
-GAME( 2000, go2000, 0, go2000, go2000, go2000_state, empty_init, ROT0, "SunA?", "Go 2000", MACHINE_SUPPORTS_SAVE )
+GAME( 2000, go2000, 0, go2000, go2000, go2000_state, empty_init, ROT0, "SunA", "Go 2000", MACHINE_SUPPORTS_SAVE ) // manufacturer confirmed from https://web.archive.org/web/20160624224827/http://www.grb.or.kr/download/GameImage/2000/2000-A0055.jpg

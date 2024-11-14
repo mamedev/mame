@@ -37,10 +37,10 @@ public:
 	address_map_bank_device& stride(u32 stride) { m_stride = stride; return *this; }
 	address_map_bank_device& shift(u32 shift) { m_shift = shift; return *this; }
 
-	void amap8(address_map &map);
-	void amap16(address_map &map);
-	void amap32(address_map &map);
-	void amap64(address_map &map);
+	void amap8(address_map &map) ATTR_COLD;
+	void amap16(address_map &map) ATTR_COLD;
+	void amap32(address_map &map) ATTR_COLD;
+	void amap64(address_map &map) ATTR_COLD;
 
 	void write8(offs_t offset, u8 data);
 	void write16(offs_t offset, u16 data, u16 mem_mask = 0xffff);
@@ -55,7 +55,7 @@ public:
 	void set_bank(offs_t offset);
 
 protected:
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 	virtual void device_config_complete() override;
 
 	// device_memory_interface overrides

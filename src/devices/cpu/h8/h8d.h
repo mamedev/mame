@@ -17,16 +17,16 @@ class h8_disassembler : public util::disasm_interface
 {
 protected:
 	struct disasm_entry {
-		int slot;
-		u32 val, mask;
-		u16 val0, mask0;
-		const char *opcode;
-		int am1, am2;
-		offs_t flags;
+		int m_slot;
+		u32 m_val, m_mask;
+		u16 m_val0, m_mask0;
+		const char *m_opcode;
+		int m_am1, m_am2;
+		offs_t m_flags;
 	};
 
 public:
-	h8_disassembler(const disasm_entry *_table, bool _advanced);
+	h8_disassembler(const disasm_entry *table, bool advanced);
 	h8_disassembler();
 
 	virtual u32 opcode_alignment() const override;
@@ -70,6 +70,7 @@ protected:
 		DASM_abs32,    /* 32-bit address present at end of instruction */
 		DASM_abs8i,    /* 8-bit indirect jump address present at +1 */
 		DASM_abs16e,   /* 16-bit jump address present at +2 */
+		DASM_abs22e,   /* 22-bit jump address present at +1 (GT913) */
 		DASM_abs24e,   /* 24-bit jump address present at +1 */
 
 		DASM_rel8,     /* 8-bit pc-relative jump address at +1, offset=2 */
@@ -80,9 +81,8 @@ protected:
 		DASM_four,     /* immediate value 4 */
 
 		DASM_imm2,     /* 2-bit immediate in bits 4-5 (trapa) */
-		DASM_imm2l,    /* 2-bit immediate in bits 0-1 (GT913) */
 		DASM_imm3,     /* 3-bit immediate in bits 4-6 (bit selection */
-		DASM_imm4l,    /* 4-bit immediate in bits 0-3 (GT913) */
+		DASM_imm6l,    /* 6-bit immediate in bits 0-5 (GT913) */
 		DASM_imm8,     /* 8-bit immediate at +1 */
 		DASM_imm16,    /* 16-bit immediate at +2 */
 		DASM_imm32,    /* 32-bit immediate at +2 */
@@ -90,15 +90,15 @@ protected:
 		DASM_ccr,      /* internal register ccr */
 		DASM_exr,      /* internal register exr */
 		DASM_bankl,    /* internal register bankl (GT913) */
-		DASM_bankh,    /* internal register bankl (GT913) */
+		DASM_bankh,    /* internal register bankh (GT913) */
 		DASM_macl,     /* internal register macl */
 		DASM_mach      /* internal register mach */
 	};
 
 	void disassemble_am(std::ostream &stream, int am, offs_t pc, const data_buffer &opcodes, u32 opcode, int slot, int offset);
 
-	const disasm_entry *const table;
-	const bool advanced;
+	const disasm_entry *const m_table;
+	const bool m_advanced;
 
 	static const disasm_entry disasm_entries[];
 };

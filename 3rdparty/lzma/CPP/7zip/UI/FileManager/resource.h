@@ -26,6 +26,14 @@
 #define IDM_SHA1                 104
 #define IDM_SHA256               105
 
+
+#define IDM_FILE                 500
+#define IDM_EDIT                 501
+#define IDM_VIEW                 502
+#define IDM_FAVORITES            503
+#define IDM_TOOLS                504
+#define IDM_HELP                 505
+
 #define IDM_OPEN                 540
 #define IDM_OPEN_INSIDE          541
 #define IDM_OPEN_OUTSIDE         542
@@ -46,6 +54,11 @@
 // #define IDM_EXIT                 557
 #define IDM_LINK                 558
 #define IDM_ALT_STREAMS          559
+
+#define IDM_VER_EDIT             580
+#define IDM_VER_COMMIT           581
+#define IDM_VER_REVERT           582
+#define IDM_VER_DIFF             583
 
 #define IDM_OPEN_INSIDE_ONE      590
 #define IDM_OPEN_INSIDE_PARSER   591
@@ -85,6 +98,10 @@
 #define IDM_VIEW_TOOLBARS_LARGE_BUTTONS     752
 #define IDM_VIEW_TOOLBARS_SHOW_BUTTONS_TEXT 753
 
+#define IDM_VIEW_TIME_POPUP      760
+#define IDM_VIEW_TIME            761
+
+#define IDM_ADD_TO_FAVORITES     800
 #define IDS_BOOKMARK             801
 
 #define IDM_OPTIONS              900

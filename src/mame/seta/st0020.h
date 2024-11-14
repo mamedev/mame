@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Luca Elia,David Haywood
-#ifndef MAME_VIDEO_ST0020_H
-#define MAME_VIDEO_ST0020_H
+#ifndef MAME_SETA_ST0020_H
+#define MAME_SETA_ST0020_H
 
 #pragma once
 
@@ -29,8 +29,8 @@ public:
 	void sprram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 private:
 	// see if we can handle the difference between this and the st0032 in here, or if we need another device
@@ -73,4 +73,4 @@ private:
 DECLARE_DEVICE_TYPE(ST0020_SPRITES, st0020_device)
 
 
-#endif // MAME_VIDEO_ST0020_H
+#endif // MAME_SETA_ST0020_H

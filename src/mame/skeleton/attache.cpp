@@ -88,6 +88,8 @@
 #include "speaker.h"
 
 
+namespace {
+
 class attache_state : public driver_device
 {
 public:
@@ -137,12 +139,9 @@ public:
 	uint8_t dma_mem_r(offs_t offset);
 	void dma_mem_w(offs_t offset, uint8_t data);
 
-	uint8_t fdc_dma_r();
-	void fdc_dma_w(uint8_t data);
-
-	DECLARE_WRITE_LINE_MEMBER(hreq_w);
-	DECLARE_WRITE_LINE_MEMBER(eop_w);
-	DECLARE_WRITE_LINE_MEMBER(fdc_dack_w);
+	void hreq_w(int state);
+	void eop_w(int state);
+	[[maybe_unused]] void fdc_dack_w(int state);
 
 protected:
 	// PIO port B operation select
@@ -173,8 +172,8 @@ protected:
 
 	// overrides
 	virtual void driver_start() override;
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	uint8_t rom_r(offs_t offset);
 	void rom_w(offs_t offset, uint8_t data);
@@ -188,13 +187,14 @@ protected:
 	uint8_t memmap_r();
 	void memmap_w(uint8_t data);
 
+	void set_latch(uint8_t data);
 	void operation_strobe(uint8_t data);
 	void keyboard_clock_w(bool state);
 	uint8_t keyboard_data_r();
 	uint16_t get_key();
 
-	void attache_io(address_map &map);
-	void attache_map(address_map &map);
+	void attache_io(address_map &map) ATTR_COLD;
+	void attache_map(address_map &map) ATTR_COLD;
 
 	required_device<z80_device> m_maincpu;
 	required_memory_region m_rom;
@@ -270,14 +270,14 @@ private:
 	void z80_comms_w(uint8_t data);
 	uint8_t z80_comms_status_r();
 	void z80_comms_ctrl_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(ppi_irq);
-	DECLARE_WRITE_LINE_MEMBER(x86_dsr);
+	void ppi_irq(int state);
+	void x86_dsr(int state);
 
-	virtual void machine_reset() override;
+	virtual void machine_reset() override ATTR_COLD;
 
-	void attache816_io(address_map &map);
-	void attache_x86_io(address_map &map);
-	void attache_x86_map(address_map &map);
+	[[maybe_unused]] void attache816_io(address_map &map) ATTR_COLD;
+	void attache_x86_io(address_map &map) ATTR_COLD;
+	void attache_x86_map(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_extcpu;
 	required_device<i8255_device> m_ppi;
@@ -552,6 +552,16 @@ uint8_t attache_state::pio_portB_r()
 	return ret;
 }
 
+void attache_state::set_latch(uint8_t data)
+{
+	m_pio_latch = data;
+	m_rom_active = ~data & 0x04;
+	m_floppy0->mon_w((data & 0x01) ? 0 : 1);
+	m_floppy1->mon_w((data & 0x01) ? 0 : 1);
+	m_gfx_enabled = data & 0x02;
+	// TODO: display brightness
+}
+
 void attache_state::operation_strobe(uint8_t data)
 {
 	//logerror("PIO: Port A write operation %i, data %02x\n",m_pio_select,data);
@@ -588,12 +598,7 @@ void attache_state::operation_strobe(uint8_t data)
 		logerror("CMOS: write %01x to byte %02x (read)\n",data & 0x0f, m_cmos_select);
 		break;
 	case PIO_SEL_LATCH:
-		m_pio_latch = data;
-		m_rom_active = ~data & 0x04;
-		m_floppy0->mon_w((data & 0x01) ? 0 : 1);
-		m_floppy1->mon_w((data & 0x01) ? 0 : 1);
-		m_gfx_enabled = data & 0x02;
-		// TODO: display brightness
+		set_latch(data);
 		break;
 	case PIO_SEL_NOP:
 		logerror("PIO: NOP write\n");
@@ -777,17 +782,6 @@ void attache_state::dma_mask_w(uint8_t data)
 	m_dma->write(0x0f,data);
 }
 
-uint8_t attache_state::fdc_dma_r()
-{
-	uint8_t ret = m_fdc->dma_r();
-	return ret;
-}
-
-void attache_state::fdc_dma_w(uint8_t data)
-{
-	m_fdc->dma_w(data);
-}
-
 uint8_t attache_state::dma_mem_r(offs_t offset)
 {
 	return m_maincpu->space(AS_PROGRAM).read_byte(offset);
@@ -798,19 +792,19 @@ void attache_state::dma_mem_w(offs_t offset, uint8_t data)
 	m_maincpu->space(AS_PROGRAM).write_byte(offset,data);
 }
 
-WRITE_LINE_MEMBER( attache_state::hreq_w )
+void attache_state::hreq_w(int state)
 {
 	m_maincpu->set_input_line(INPUT_LINE_HALT, state ? ASSERT_LINE : CLEAR_LINE);
 
 	m_dma->hack_w(state);
 }
 
-WRITE_LINE_MEMBER(attache_state::eop_w)
+void attache_state::eop_w(int state)
 {
 	m_fdc->tc_w(state);
 }
 
-WRITE_LINE_MEMBER( attache_state::fdc_dack_w )
+void attache_state::fdc_dack_w(int state)
 {
 }
 
@@ -901,13 +895,13 @@ void attache816_state::z80_comms_ctrl_w(uint8_t data)
 	m_extcpu->set_input_line(INPUT_LINE_RESET,(data & 0x01) ? ASSERT_LINE : CLEAR_LINE);
 }
 
-WRITE_LINE_MEMBER(attache816_state::ppi_irq)
+void attache816_state::ppi_irq(int state)
 {
 	if(m_x86_irq_enable & 0x01)
 		m_extcpu->set_input_line_and_vector(0,state,0x03); // I8086
 }
 
-WRITE_LINE_MEMBER(attache816_state::x86_dsr)
+void attache816_state::x86_dsr(int state)
 {
 	// TODO: /DSR to Z8530 SCC
 }
@@ -1111,6 +1105,7 @@ void attache_state::machine_start()
 void attache_state::machine_reset()
 {
 	m_kb_bitpos = 0;
+	set_latch(0);
 }
 
 void attache816_state::machine_reset()
@@ -1173,8 +1168,8 @@ void attache_state::attache(machine_config &config)
 	m_dma->out_eop_callback().set(FUNC(attache_state::eop_w));
 	m_dma->in_memr_callback().set(FUNC(attache_state::dma_mem_r));
 	m_dma->out_memw_callback().set(FUNC(attache_state::dma_mem_w));
-	m_dma->in_ior_callback<0>().set(FUNC(attache_state::fdc_dma_r));
-	m_dma->out_iow_callback<0>().set(FUNC(attache_state::fdc_dma_w));
+	m_dma->in_ior_callback<0>().set(m_fdc, FUNC(upd765a_device::dma_r));
+	m_dma->out_iow_callback<0>().set(m_fdc, FUNC(upd765a_device::dma_w));
 	// m_dma->out_dack_callback<0>().set(FUNC(attache_state::fdc_dack_w));
 
 	UPD765A(config, m_fdc, 8_MHz_XTAL, true, true);
@@ -1262,8 +1257,8 @@ void attache816_state::attache816(machine_config &config)
 	m_dma->out_eop_callback().set(FUNC(attache_state::eop_w));
 	m_dma->in_memr_callback().set(FUNC(attache_state::dma_mem_r));
 	m_dma->out_memw_callback().set(FUNC(attache_state::dma_mem_w));
-	m_dma->in_ior_callback<0>().set(FUNC(attache_state::fdc_dma_r));
-	m_dma->out_iow_callback<0>().set(FUNC(attache_state::fdc_dma_w));
+	m_dma->in_ior_callback<0>().set(m_fdc, FUNC(upd765a_device::dma_r));
+	m_dma->out_iow_callback<0>().set(m_fdc, FUNC(upd765a_device::dma_w));
 	// m_dma->out_dack_callback<0>().set(FUNC(attache_state::fdc_dack_w));
 
 	UPD765A(config, m_fdc, 8_MHz_XTAL, true, true);
@@ -1341,6 +1336,9 @@ ROM_START( attache816 )
 
 ROM_END
 
-//    YEAR  NAME        PARENT   COMPAT  MACHINE     INPUT    CLASS             INIT        COMPANY   FULLNAME               FLAGS
-COMP( 1982, attache,    0,       0,      attache,    attache, attache_state,    empty_init, "Otrona", "Attach\xC3\xA9",      MACHINE_IMPERFECT_GRAPHICS )
-COMP( 1983, attache816, attache, 0,      attache816, attache, attache816_state, empty_init, "Otrona", "Attach\xC3\xA9 8:16", MACHINE_IMPERFECT_GRAPHICS )
+} // anonymous namespace
+
+
+//    YEAR  NAME        PARENT   COMPAT  MACHINE     INPUT    CLASS             INIT        COMPANY   FULLNAME          FLAGS
+COMP( 1982, attache,    0,       0,      attache,    attache, attache_state,    empty_init, "Otrona", u8"Attaché",      MACHINE_IMPERFECT_GRAPHICS )
+COMP( 1983, attache816, attache, 0,      attache816, attache, attache816_state, empty_init, "Otrona", u8"Attaché 8:16", MACHINE_IMPERFECT_GRAPHICS )

@@ -8,6 +8,7 @@
 
 #pragma once
 
+#include "formats/flopimg.h"
 #include "formats/fsmgr.h"
 #include "harddisk.h"
 
@@ -83,12 +84,12 @@ public:
 
 	std::vector<std::pair<u8, const floppy_format_info *>> identify(const formats_table &formats);
 
-	bool floppy_load(const floppy_format_info *format);
-	bool floppy_save(const floppy_format_info *format);
+	bool floppy_load(const floppy_format_info &format);
+	bool floppy_save(const floppy_format_info &format) const;
 
-	void floppy_create(const floppy_create_info *format, fs::meta_data meta);
-	bool floppy_mount_fs(const filesystem_format *format);
-	bool hd_mount_fs(const filesystem_format *format);
+	void floppy_create(const floppy_create_info &format, fs::meta_data meta);
+	bool floppy_mount_fs(const filesystem_format &format);
+	bool hd_mount_fs(const filesystem_format &format);
 	void fs_to_floppy();
 
 	std::pair<const fs::manager_t *, fs::filesystem_t *> get_fs() const { return std::make_pair(m_fsm, m_fs.get()); }

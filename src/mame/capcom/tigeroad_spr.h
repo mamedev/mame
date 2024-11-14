@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood
-#ifndef MAME_VIDEO_TIGEROAD_SPR_H
-#define MAME_VIDEO_TIGEROAD_SPR_H
+#ifndef MAME_CAPCOM_TIGEROAD_SPR_H
+#define MAME_CAPCOM_TIGEROAD_SPR_H
 
 #pragma once
 
@@ -16,8 +16,8 @@ public:
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, u16* ram, u32 size, bool flip_screen, bool rev_y);
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 private:
 	required_memory_region m_gfx_region;
@@ -28,4 +28,4 @@ private:
 
 DECLARE_DEVICE_TYPE(TIGEROAD_SPRITE, tigeroad_spr_device)
 
-#endif // MAME_VIDEO_TIGEROAD_SPR_H
+#endif // MAME_CAPCOM_TIGEROAD_SPR_H

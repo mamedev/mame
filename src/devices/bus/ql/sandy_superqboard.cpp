@@ -9,6 +9,8 @@
 #include "emu.h"
 #include "sandy_superqboard.h"
 
+#include "formats/ql_dsk.h"
+
 
 
 //**************************************************************************
@@ -86,7 +88,7 @@ void sandy_superqboard_device::floppy_formats(format_registration &fr)
 //  centronics
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( sandy_superqboard_device::busy_w )
+void sandy_superqboard_device::busy_w(int state)
 {
 	if (state)
 	{
@@ -108,8 +110,8 @@ WRITE_LINE_MEMBER( sandy_superqboard_device::busy_w )
 void sandy_superqboard_device::device_add_mconfig(machine_config &config)
 {
 	WD1772(config, m_fdc, XTAL(16'000'000)/2);
-	FLOPPY_CONNECTOR(config, m_floppy0, sandy_superqboard_floppies, "35hd", sandy_superqboard_device::floppy_formats);
-	FLOPPY_CONNECTOR(config, m_floppy1, sandy_superqboard_floppies, nullptr, sandy_superqboard_device::floppy_formats);
+	FLOPPY_CONNECTOR(config, m_floppy[0], sandy_superqboard_floppies, "35hd", sandy_superqboard_device::floppy_formats);
+	FLOPPY_CONNECTOR(config, m_floppy[1], sandy_superqboard_floppies, nullptr, sandy_superqboard_device::floppy_formats);
 
 	CENTRONICS(config, m_centronics, centronics_devices, "printer");
 	m_centronics->ack_handler().set(FUNC(sandy_superqboard_device::busy_w));
@@ -166,10 +168,10 @@ INPUT_CHANGED_MEMBER( sandy_superqboard_device::mouse_y_changed )
 
 INPUT_PORTS_START( sandy_superqmouse )
 	PORT_START("mouse_x")
-	PORT_BIT( 0xff, 0x00, IPT_MOUSE_X ) PORT_SENSITIVITY(50) PORT_KEYDELTA(5) PORT_MINMAX(0, 255) PORT_CHANGED_MEMBER(DEVICE_SELF, sandy_superqboard_device, mouse_x_changed, 0)
+	PORT_BIT( 0xff, 0x00, IPT_MOUSE_X ) PORT_SENSITIVITY(50) PORT_KEYDELTA(5) PORT_MINMAX(0, 255) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(sandy_superqboard_device::mouse_x_changed), 0)
 
 	PORT_START("mouse_y")
-	PORT_BIT( 0xff, 0x00, IPT_MOUSE_Y ) PORT_SENSITIVITY(50) PORT_KEYDELTA(5) PORT_MINMAX(0, 255) PORT_CHANGED_MEMBER(DEVICE_SELF, sandy_superqboard_device, mouse_y_changed, 0)
+	PORT_BIT( 0xff, 0x00, IPT_MOUSE_Y ) PORT_SENSITIVITY(50) PORT_KEYDELTA(5) PORT_MINMAX(0, 255) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(sandy_superqboard_device::mouse_y_changed), 0)
 
 	PORT_START("mouse_buttons")
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Middle Mouse Button") PORT_CODE(MOUSECODE_BUTTON3)
@@ -216,8 +218,7 @@ sandy_superqboard_device::sandy_superqboard_device(const machine_config &mconfig
 	device_t(mconfig, type, tag, owner, clock),
 	device_ql_expansion_card_interface(mconfig, *this),
 	m_fdc(*this, WD1772_TAG),
-	m_floppy0(*this, WD1772_TAG":0"),
-	m_floppy1(*this, WD1772_TAG":1"),
+	m_floppy(*this, WD1772_TAG":%u", 0U),
 	m_centronics(*this, CENTRONICS_TAG),
 	m_latch(*this, TTL74273_TAG),
 	m_rom(*this, "rom"),
@@ -377,11 +378,11 @@ void sandy_superqboard_device::write(offs_t offset, uint8_t data)
 
 				if (BIT(data, 1))
 				{
-					floppy = m_floppy0->get_device();
+					floppy = m_floppy[0]->get_device();
 				}
 				else if (BIT(data, 2))
 				{
-					floppy = m_floppy1->get_device();
+					floppy = m_floppy[1]->get_device();
 				}
 
 				m_fdc->set_floppy(floppy);

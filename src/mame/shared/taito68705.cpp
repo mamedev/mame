@@ -74,7 +74,7 @@ void taito68705_mcu_device_base::data_w(u8 data)
 	m_mcu->set_input_line(M68705_IRQ_LINE, m_host_flag ? ASSERT_LINE : CLEAR_LINE);
 }
 
-WRITE_LINE_MEMBER(taito68705_mcu_device_base::reset_w)
+void taito68705_mcu_device_base::reset_w(int state)
 {
 	m_reset_input = ASSERT_LINE == state;
 	if (CLEAR_LINE != state)
@@ -112,8 +112,6 @@ void taito68705_mcu_device_base::mcu_pa_w(u8 data)
 
 void taito68705_mcu_device_base::device_start()
 {
-	m_semaphore_cb.resolve_safe();
-
 	save_item(NAME(m_latch_driven));
 	save_item(NAME(m_reset_input));
 	save_item(NAME(m_host_flag));
@@ -202,9 +200,6 @@ void taito68705_mcu_device::device_start()
 {
 	taito68705_mcu_device_base::device_start();
 
-	m_aux_out_cb.resolve_all_safe();
-	m_aux_strobe_cb.resolve_safe();
-
 	save_item(NAME(m_pb_output));
 
 	m_pb_output = 0xff;
@@ -282,7 +277,7 @@ arkanoid_mcu_device_base::arkanoid_mcu_device_base(
 		device_t *owner,
 		u32 clock)
 	: taito68705_mcu_device_base(mconfig, type, tag, owner, clock)
-	, m_portb_r_cb(*this)
+	, m_portb_r_cb(*this, 0xff)
 	, m_pc_output(0xff)
 {
 }
@@ -309,8 +304,6 @@ void arkanoid_mcu_device_base::mcu_pc_w(u8 data)
 void arkanoid_mcu_device_base::device_start()
 {
 	taito68705_mcu_device_base::device_start();
-
-	m_portb_r_cb.resolve_safe(0xff);
 
 	save_item(NAME(m_pc_output));
 

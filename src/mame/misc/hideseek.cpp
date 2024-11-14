@@ -27,11 +27,13 @@ Other stuff: NEC D4992 (RTC?) and xtal possibly 32.768kHz, 3V coin battery, 93L4
 
 
 #include "emu.h"
-#include "cpu/sh/sh2.h"
+#include "cpu/sh/sh7604.h"
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
+
+namespace {
 
 class hideseek_state : public driver_device
 {
@@ -47,13 +49,13 @@ public:
 	void init_hideseek();
 
 protected:
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	void hideseek_palette(palette_device &palette) const;
 	uint32_t screen_update_hideseek(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void mem_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 };
@@ -106,7 +108,7 @@ void hideseek_state::hideseek_palette(palette_device &palette) const
 void hideseek_state::hideseek(machine_config &config)
 {
 	/* basic machine hardware */
-	SH2(config, m_maincpu, 7372800 * 4);
+	SH7604(config, m_maincpu, 7372800 * 4);
 	m_maincpu->set_addrmap(AS_PROGRAM, &hideseek_state::mem_map);
 //  TIMER(config, "scantimer").configure_scanline(FUNC(hideseek_state::hideseek_scanline), "screen", 0, 1);
 
@@ -161,6 +163,8 @@ ROM_END
 void hideseek_state::init_hideseek()
 {
 }
+
+} // anonymous namespace
 
 
 GAME( 200?, hideseek, 0, hideseek, hideseek, hideseek_state, init_hideseek, ROT0, "<unknown>", "Hide & Seek", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

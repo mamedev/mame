@@ -201,6 +201,9 @@
 #include "screen.h"
 #include "tilemap.h"
 
+
+namespace {
+
 #define MASTER_CLOCK    XTAL(6'000'000)              /* confirmed */
 #define CPU_CLOCK       MASTER_CLOCK           /* guess */
 #define CRTC_CLOCK     (MASTER_CLOCK / 8)      /* guess */
@@ -228,11 +231,11 @@ private:
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	uint32_t screen_update_jubileep(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(jubileep_interrupt);
-	void jubileep_cru_map(address_map &map);
-	void jubileep_map(address_map &map);
+	void jubileep_cru_map(address_map &map) ATTR_COLD;
+	void jubileep_map(address_map &map) ATTR_COLD;
 
 	virtual void machine_start() override { m_lamps.resolve(); }
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 
 	uint8_t mux_sel = 0;
 	uint8_t muxlamps = 0;
@@ -717,6 +720,8 @@ ROM_START( jubileep )
 	ROM_REGION( 0x0800, "videoworkram", 0 )    /* default NVRAM */
 	ROM_LOAD( "jubileep_videoworkram.bin", 0x0000, 0x0800, CRC(595bf2b3) SHA1(ae311873b15d8cebfb6ef6a80f27fafc9544178c) )
 ROM_END
+
+} // anonymous namespace
 
 
 /*************************

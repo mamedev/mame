@@ -1,14 +1,13 @@
 // license:BSD-3-Clause
 // copyright-holders:Lukasz Markowski
-#ifndef MAME_INCLUDES_CXHUMAX_H
-#define MAME_INCLUDES_CXHUMAX_H
+#ifndef MAME_SKELETON_CXHUMAX_H
+#define MAME_SKELETON_CXHUMAX_H
 
 #pragma once
 
 #include "cpu/arm7/arm7.h"
-#include "cpu/arm7/arm7core.h"
-#include "machine/intelfsh.h"
 #include "machine/i2cmem.h"
+#include "machine/intelfsh.h"
 #include "machine/terminal.h"
 
 
@@ -164,12 +163,12 @@ private:
 	uint32_t m_hdmi_regs[0x400/4]{};
 
 	uint32_t m_gxa_cmd_regs[0x130/4]{};
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 	uint32_t screen_update_cxhumax(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(timer_tick);
-	void cxhumax_map(address_map &map);
+	void cxhumax_map(address_map &map) ATTR_COLD;
 };
 
 #define INTDEST         0   // Interrupt destination (1=IRQ, 0=FIQ)
@@ -283,4 +282,4 @@ private:
 #define DRM_BCKGND_REG                  3
 #define DRM_OSD_PTR_REG                 32
 
-#endif // MAME_INCLUDES_CXHUMAX_H
+#endif // MAME_SKELETON_CXHUMAX_H

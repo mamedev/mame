@@ -97,11 +97,20 @@
 #include "machine/ram.h"
 #include "screen.h"
 
+#define LOG_VID     (1U << 1)
+#define LOG_IRQ     (1U << 2)
+#define LOG_UNKNOWN (1U << 3)
+#define LOG_VGA     (1U << 4)
+#define LOG_CRTC    (1U << 5)
+#define LOG_SPR     (1U << 6)
+
+#define VERBOSE (LOG_GENERAL | LOG_UNKNOWN)
+#include "logmacro.h"
+
 
 //#define CRTC_REG_DISP 1
 //#define SPR_DEBUG 1
 #define LAYER_DISABLE 0  // for debugging, allow the Q and W keys to be used for disabling graphic layers
-#define LOG_VID 0
 
 //static uint32_t pshift;  // for debugging
 
@@ -302,7 +311,8 @@ uint8_t towns_state::towns_video_cff80_r(offs_t offset)
 			else
 				return 0x00;
 		default:
-			logerror("VGA: read from invalid or unimplemented memory-mapped port %05x\n",0xcff80+offset*4);
+			LOGMASKED(LOG_UNKNOWN, "VGA: read from invalid or unimplemented memory-mapped port %05x\n",0xcff80+offset*4);
+			break;
 	}
 
 	return 0;
@@ -319,7 +329,7 @@ void towns_state::towns_video_cff80_w(offs_t offset, uint8_t data)
 			m_video.towns_vram_wplane = data & 0x0f;
 			m_video.towns_vram_rplane = (data & 0xc0) >> 6;
 			towns_update_video_banks();
-			//logerror("VGA: VRAM wplane select = 0x%02x\n",towns_vram_wplane);
+			LOGMASKED(LOG_VGA, "VGA: VRAM wplane select = 0x%02x\n", m_video.towns_vram_wplane);
 			break;
 		case 0x02:  // display plane (bits 0-2), display page select (bit 4)
 			m_video.towns_display_plane = data & 0x27;
@@ -331,19 +341,20 @@ void towns_state::towns_video_cff80_w(offs_t offset, uint8_t data)
 		case 0x14:  // Kanji offset (high)
 			m_video.towns_kanji_code_h = data & 0x7f;
 			towns_update_kanji_offset();
-			//if(LOG_VID) logerror("VID: Kanji code set (high) = %02x %02x\n",towns_kanji_code_h,towns_kanji_code_l);
+			//LOGMASKED(LOG_VID, "VID: Kanji code set (high) = %02x %02x\n",towns_kanji_code_h,towns_kanji_code_l);
 			break;
 		case 0x15:  // Kanji offset (low)
 			m_video.towns_kanji_code_l = data & 0x7f;
 			towns_update_kanji_offset();
-			//if(LOG_VID) logerror("VID: Kanji code set (low) = %02x %02x\n",towns_kanji_code_h,towns_kanji_code_l);
+			//LOGMASKED(LOG_VID, "VID: Kanji code set (low) = %02x %02x\n",towns_kanji_code_h,towns_kanji_code_l);
 			break;
 		case 0x19:  // ANK CG ROM
 			m_towns_ankcg_enable = data & 0x01;
 			towns_update_video_banks();
 			break;
 		default:
-			logerror("VID: write %08x to invalid or unimplemented memory-mapped port %05x\n",data,0xcff80+offset);
+			LOGMASKED(LOG_UNKNOWN, "VID: write %08x to invalid or unimplemented memory-mapped port %05x\n",data,0xcff80+offset);
+			break;
 	}
 }
 
@@ -383,12 +394,12 @@ uint8_t towns_state::towns_video_440_r(offs_t offset)
 		case 0x00:
 			return m_video.towns_crtc_sel;
 		case 0x02:
-//          logerror("CRTC: reading register %i (0x442) [%04x]\n",towns_crtc_sel,towns_crtc_reg[towns_crtc_sel]);
+			LOGMASKED(LOG_CRTC, "CRTC: reading register %i (0x442) [%04x]\n", m_video.towns_crtc_sel, m_video.towns_crtc_reg[m_video.towns_crtc_sel]);
 			if(m_video.towns_crtc_sel == 30)
 					return 0x00;
 			return m_video.towns_crtc_reg[m_video.towns_crtc_sel] & 0x00ff;
 		case 0x03:
-//          logerror("CRTC: reading register %i (0x443) [%04x]\n",towns_crtc_sel,towns_crtc_reg[towns_crtc_sel]);
+			LOGMASKED(LOG_CRTC, "CRTC: reading register %i (0x443) [%04x]\n", m_video.towns_crtc_sel, m_video.towns_crtc_reg[m_video.towns_crtc_sel]);
 			if(m_video.towns_crtc_sel == 30)
 			{
 				// check video position
@@ -414,7 +425,7 @@ uint8_t towns_state::towns_video_440_r(offs_t offset)
 		case 0x08:
 			return m_video.towns_video_sel;
 		case 0x0a:
-			if(LOG_VID) logerror("Video: reading register %i (0x44a) [%02x]\n",m_video.towns_video_sel,m_video.towns_video_reg[m_video.towns_video_sel]);
+			LOGMASKED(LOG_VID, "Video: reading register %i (0x44a) [%02x]\n", m_video.towns_video_sel, m_video.towns_video_reg[m_video.towns_video_sel]);
 			return m_video.towns_video_reg[m_video.towns_video_sel];
 		case 0x0c:
 			if(m_video.towns_dpmd_flag != 0)
@@ -428,7 +439,7 @@ uint8_t towns_state::towns_video_440_r(offs_t offset)
 		case 0x10:
 			return m_video.towns_sprite_sel;
 		case 0x12:
-			if(LOG_VID) logerror("SPR: reading register %i (0x452) [%02x]\n",m_video.towns_sprite_sel,m_video.towns_sprite_reg[m_video.towns_sprite_sel]);
+			LOGMASKED(LOG_VID, "SPR: reading register %i (0x452) [%02x]\n", m_video.towns_sprite_sel, m_video.towns_sprite_reg[m_video.towns_sprite_sel]);
 			if(m_video.towns_sprite_sel == 6)
 				return m_video.towns_sprite_page & 0x01 ? 0x10 : 0;
 			return m_video.towns_sprite_reg[m_video.towns_sprite_sel];
@@ -441,7 +452,7 @@ uint8_t towns_state::towns_video_440_r(offs_t offset)
 			return m_vram_mask[idx];
 		}
 		//default:
-			//if(LOG_VID) logerror("VID: read port %04x\n",offset+0x440);
+			//LOGMASKED(LOG_VID, "VID: read port %04x\n", offset + 0x440);
 	}
 	return 0x00;
 }
@@ -454,13 +465,13 @@ void towns_state::towns_video_440_w(offs_t offset, uint8_t data)
 			m_video.towns_crtc_sel = data;
 			break;
 		case 0x02:
-//          logerror("CRTC: writing register %i (0x442) [%02x]\n",towns_crtc_sel,data);
+			LOGMASKED(LOG_CRTC, "CRTC: writing register %i (0x442) [%02x]\n", m_video.towns_crtc_sel, data);
 			m_video.towns_crtc_reg[m_video.towns_crtc_sel] =
 				(m_video.towns_crtc_reg[m_video.towns_crtc_sel] & 0xff00) | data;
 			towns_crtc_refresh_mode();
 			break;
 		case 0x03:
-//          logerror("CRTC: writing register %i (0x443) [%02x]\n",towns_crtc_sel,data);
+			LOGMASKED(LOG_CRTC, "CRTC: writing register %i (0x443) [%02x]\n", m_video.towns_crtc_sel, data);
 			if((m_video.towns_crtc_sel == 21) && (m_video.towns_sprite_reg[1] & 0x80))
 			{
 				m_video.towns_crtc_reg[m_video.towns_crtc_sel] =
@@ -475,14 +486,14 @@ void towns_state::towns_video_440_w(offs_t offset, uint8_t data)
 			m_video.towns_video_sel = data & 0x01;
 			break;
 		case 0x0a:
-			logerror("Video: writing register %i (0x44a) [%02x]\n",m_video.towns_video_sel,data);
+			LOG("Video: writing register %i (0x44a) [%02x]\n", m_video.towns_video_sel, data);
 			m_video.towns_video_reg[m_video.towns_video_sel] = data;
 			break;
 		case 0x10:
 			m_video.towns_sprite_sel = data & 0x07;
 			break;
 		case 0x12:
-			logerror("SPR: writing register %i (0x452) [%02x]\n",m_video.towns_sprite_sel,data);
+			LOG("SPR: writing register %i (0x452) [%02x]\n", m_video.towns_sprite_sel, data);
 			if(m_video.towns_sprite_sel == 6)
 				m_video.towns_sprite_page = data & 0x80 ? 1 : 0;
 			else
@@ -499,13 +510,14 @@ void towns_state::towns_video_440_w(offs_t offset, uint8_t data)
 			break;
 		}
 		default:
-			if(LOG_VID) logerror("VID: wrote 0x%02x to port %04x\n",data,offset+0x440);
+			LOGMASKED(LOG_VID, "VID: wrote 0x%02x to port %04x\n", data, offset + 0x440);
+			break;
 	}
 }
 
 uint8_t towns_state::towns_video_5c8_r(offs_t offset)
 {
-	//if(LOG_VID) logerror("VID: read port %04x\n",offset+0x5c8);
+	//LOGMASKED(LOG_VID, "VID: read port %04x\n",offset+0x5c8);
 	switch(offset)
 	{
 		case 0x00:  // 0x5c8 - disable TVRAM?
@@ -526,11 +538,11 @@ void towns_state::towns_video_5c8_w(offs_t offset, uint8_t data)
 	{
 		case 0x02:  // 0x5ca - VSync clear?
 			m_pic_slave->ir3_w(0);
-			if(IRQ_LOG) logerror("PIC: IRQ11 (VSync) set low\n");
+			LOGMASKED(LOG_IRQ, "PIC: IRQ11 (VSync) set low\n");
 			//towns_vblank_flag = 0;
 			break;
 	}
-	if(LOG_VID) logerror("VID: wrote 0x%02x to port %04x\n",data,offset+0x5c8);
+	LOGMASKED(LOG_VID, "VID: wrote 0x%02x to port %04x\n",data,offset+0x5c8);
 }
 
 void towns_state::towns_update_palette()
@@ -571,7 +583,7 @@ uint8_t towns_state::towns_video_fd90_r(offs_t offset)
 		pal = m_palette;
 	else
 		pal = m_palette16[(m_video.towns_video_reg[1] & 0x20) >> 5];
-//    if(LOG_VID) logerror("VID: read port %04x\n",offset+0xfd90);
+//    LOGMASKED(LOG_VID, "VID: read port %04x\n",offset+0xfd90);
 	switch(offset)
 	{
 		case 0x00:
@@ -638,7 +650,7 @@ void towns_state::towns_video_fd90_w(offs_t offset, uint8_t data)
 			m_video.towns_layer_ctrl = data;
 			break;
 	}
-	if(LOG_VID) logerror("VID: wrote 0x%02x to port %04x\n",data,offset+0xfd90);
+	LOGMASKED(LOG_VID, "VID: wrote 0x%02x to port %04x\n",data,offset+0xfd90);
 }
 
 uint8_t towns_state::towns_video_ff81_r()
@@ -651,7 +663,7 @@ void towns_state::towns_video_ff81_w(uint8_t data)
 	m_video.towns_vram_wplane = data & 0x0f;
 	m_video.towns_vram_rplane = (data & 0xc0) >> 6;
 	towns_update_video_banks();
-	logerror("VID: VRAM wplane select (I/O) = 0x%02x\n",m_video.towns_vram_wplane);
+	LOG("VID: VRAM wplane select (I/O) = 0x%02x\n",m_video.towns_vram_wplane);
 }
 
 uint8_t towns_state::towns_video_unknown_r()
@@ -1022,20 +1034,16 @@ TIMER_CALLBACK_MEMBER(towns_state::draw_sprites)
 		{
 			poffset = (attr & 0x3ff) << 7;
 			coffset = (colour & 0xfff) << 5;
-#ifdef SPR_DEBUG
-			logerror("Sprite4 #%i, X %i Y %i Attr %04x Col %04x Poff %08x Coff %08x\n",
+			LOGMASKED(LOG_SPR, "Sprite4 #%i, X %i Y %i Attr %04x Col %04x Poff %08x Coff %08x\n",
 				n,x,y,attr,colour,poffset,coffset);
-#endif
 			if(!(colour & 0x2000))
 				render_sprite_4((poffset)&0x1ffff,coffset,x,y,xflip,yflip,xhalfsize,yhalfsize,rotation,rect);
 		}
 		else
 		{
 			poffset = (attr & 0x3ff) << 7;
-#ifdef SPR_DEBUG
-			logerror("Sprite16 #%i, X %i Y %i Attr %04x Col %04x Poff %08x\n",
+			LOGMASKED(LOG_SPR, "Sprite16 #%i, X %i Y %i Attr %04x Col %04x Poff %08x\n",
 				n,x,y,attr,colour,poffset);
-#endif
 			if(!(colour & 0x2000))
 				render_sprite_16((poffset)&0x1ffff,x,y,xflip,yflip,xhalfsize,yhalfsize,rotation,rect);
 		}
@@ -1474,14 +1482,14 @@ TIMER_CALLBACK_MEMBER(towns_state::towns_vblank_end)
 {
 	// here we'll clear the vsync signal, I presume it goes low on it's own eventually
 	m_pic_slave->ir3_w(0);  // IRQ11 = VSync
-	if(IRQ_LOG) logerror("PIC: IRQ11 (VSync) set low\n");
+	LOGMASKED(LOG_IRQ, "PIC: IRQ11 (VSync) set low\n");
 	m_video.towns_vblank_flag = 0;
 }
 
 INTERRUPT_GEN_MEMBER(towns_state::towns_vsync_irq)
 {
 	m_pic_slave->ir3_w(1);  // IRQ11 = VSync
-	if(IRQ_LOG) logerror("PIC: IRQ11 (VSync) set high\n");
+	LOGMASKED(LOG_IRQ, "PIC: IRQ11 (VSync) set high\n");
 	m_video.towns_vblank_flag = 1;
 	m_video.vblank_end_timer->adjust(m_screen->time_until_vblank_end());
 	if(m_video.towns_tvram_enable)

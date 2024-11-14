@@ -29,7 +29,7 @@ public:
 
 protected:
 	// device-specific overrides
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 private:
 	// internal state

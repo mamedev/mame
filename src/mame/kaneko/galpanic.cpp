@@ -89,7 +89,6 @@ public:
 	galpanic_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
-		, m_gfxdecode(*this, "gfxdecode")
 		, m_screen(*this, "screen")
 		, m_palette(*this, "palette")
 		, m_pandora(*this, "pandora")
@@ -102,12 +101,11 @@ public:
 	void galpanic(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;
-	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 	required_device<kaneko_pandora_device> m_pandora;
@@ -125,17 +123,15 @@ private:
 	void palette(palette_device &palette) const;
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_WRITE_LINE_MEMBER(screen_vblank);
+	void screen_vblank(int state);
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline);
 	void draw_fgbitmap(bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void galpanic_map(address_map &map);
-	void oki_map(address_map &map);
-	void galpanica_map(address_map &map);
+	void galpanic_map(address_map &map) ATTR_COLD;
+	void oki_map(address_map &map) ATTR_COLD;
+	void galpanica_map(address_map &map) ATTR_COLD;
 };
 
-
-// video
 
 void galpanic_state::video_start()
 {
@@ -188,14 +184,12 @@ uint32_t galpanic_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 }
 
 
-// machine
-
 void galpanic_state::machine_start()
 {
 	m_okibank->configure_entries(0, 16, memregion("oki")->base(), 0x10000);
 }
 
-WRITE_LINE_MEMBER(galpanic_state::screen_vblank)
+void galpanic_state::screen_vblank(int state)
 {
 	// rising edge
 	if (state)
@@ -326,7 +320,7 @@ static INPUT_PORTS_START( galpanica )
 INPUT_PORTS_END
 
 
-static GFXDECODE_START( gfx_galpanic )
+static GFXDECODE_START( gfx_galpanic_spr )
 	GFXDECODE_ENTRY( "sprites", 0, gfx_8x8x4_row_2x2_group_packed_msb, 256, 16 )
 GFXDECODE_END
 
@@ -350,13 +344,11 @@ void galpanic_state::galpanic(machine_config &config)
 	m_screen->screen_vblank().set(FUNC(galpanic_state::screen_vblank));
 	m_screen->set_palette(m_palette);
 
-	GFXDECODE(config, m_gfxdecode, m_palette, gfx_galpanic);
 	// fg palette RAM, bit 0 seems to be a transparency flag for the front bitmap
 	PALETTE(config, m_palette, FUNC(galpanic_state::palette)).set_format(palette_device::GRBx_555, 1024 + 32768);
 
-	KANEKO_PANDORA(config, m_pandora, 0);
+	KANEKO_PANDORA(config, m_pandora, 0, m_palette, gfx_galpanic_spr);
 	m_pandora->set_offsets(0, -16);
-	m_pandora->set_gfxdecode_tag(m_gfxdecode);
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
@@ -386,7 +378,28 @@ void galpanic_state::galpanica(machine_config &config)
 
 ***************************************************************************/
 
-ROM_START( galpanic ) // PAMERA-04 PCB with the PAMERA-SUB daughter card and unpopulated CALC1 ULA socket
+ROM_START( galpanic ) // PAMERA-04 PCB with the PAMERA-SUB daughter card and unpopulated CALC1 ULA socket, has ROM for real women (same as the galsnew sets in expro02.cpp)
+	ROM_REGION( 0x400000, "maincpu", 0 )    // 68000 code
+	ROM_LOAD16_BYTE( "ver.2.0_pm_112-subic5.subic5", 0x000000, 0x20000, CRC(8bf38add) SHA1(fc31fbe1c449a776175a4e3ecbed08ec5551a9ae) ) // Located on the PAMERA-SUB daughter card
+	ROM_LOAD16_BYTE( "ver.2.0_pm_111-subic6.subic6", 0x000001, 0x20000, CRC(6dc4b075) SHA1(41a529a0e5808f902f6ac11681daae7545739ab0) ) // Located on the PAMERA-SUB daughter card
+	ROM_LOAD16_WORD_SWAP( "pm017e",                  0x080000, 0x80000, CRC(bc41b6ca) SHA1(0aeaf024dd7c84550e7df27230a1d4f04cc1d61c) ) // contains real (non-cartoon) women, used after each 3rd round
+	ROM_LOAD16_BYTE( "pm004e.8",                     0x100001, 0x80000, CRC(d3af52bc) SHA1(46be057106388578defecab1cdd1793ec76ebe92) )
+	ROM_LOAD16_BYTE( "pm005e.7",                     0x100000, 0x80000, CRC(d7ec650c) SHA1(6c2250c74381497154bf516e0cf1db6bb56bb446) )
+	ROM_LOAD16_BYTE( "pm000e.15",                    0x200001, 0x80000, CRC(5d220f3f) SHA1(7ff373e01027c8832712f7a2d732f8e49b875878) )
+	ROM_LOAD16_BYTE( "pm001e.14",                    0x200000, 0x80000, CRC(90433eb1) SHA1(8688a85747ad9ecac395d782f130baa64fb9d12b) )
+	ROM_LOAD16_BYTE( "pm002e.17",                    0x300001, 0x80000, CRC(713ee898) SHA1(c9f608a57fb90e5ee15eb76a74a7afcc406d5b4e) )
+	ROM_LOAD16_BYTE( "pm003e.16",                    0x300000, 0x80000, CRC(6bb060fd) SHA1(4fc3946866c5a55e8340b62b5ad9beae723ce0da) )
+
+	ROM_REGION( 0x100000, "sprites", 0 )
+	ROM_LOAD( "pm006e.67",    0x000000, 0x100000, CRC(57aec037) SHA1(e6ba095b6892d4dcd76ba3343a97dd98ae29dc24) )
+
+	ROM_REGION( 0x100000, "oki", 0 )
+	// 00000-2ffff is fixed, 30000-3ffff is bank switched from all the ROMs
+	ROM_LOAD( "pm008e.l",     0x00000, 0x80000, CRC(d9379ba8) SHA1(5ae7c743319b1a12f2b101a9f0f8fe0728ed1476) )
+	ROM_LOAD( "pm007e.u",     0x80000, 0x80000, CRC(c7ed7950) SHA1(133258b058d3c562208d0d00b9fac71202647c32) )
+ROM_END
+
+ROM_START( galpanica ) // PAMERA-04 PCB with the PAMERA-SUB daughter card and unpopulated CALC1 ULA socket
 	ROM_REGION( 0x400000, "maincpu", 0 )    // 68000 code
 	ROM_LOAD16_BYTE( "pm110.4m2",    0x000000, 0x80000, CRC(ae6b17a8) SHA1(f3a625eef45cc85cdf9760f77ea7ce93387911f9) )
 	ROM_LOAD16_BYTE( "pm109.4m1",    0x000001, 0x80000, CRC(b85d792d) SHA1(0ed78e15f6e58285ce6944200b023ada1e673b0e) )
@@ -408,7 +421,7 @@ ROM_START( galpanic ) // PAMERA-04 PCB with the PAMERA-SUB daughter card and unp
 	ROM_LOAD( "pm007e.u",     0x80000, 0x80000, CRC(c7ed7950) SHA1(133258b058d3c562208d0d00b9fac71202647c32) )
 ROM_END
 
-ROM_START( galpanica ) // PAMERA-04 PCB with the CALC1 ULA used
+ROM_START( galpanicb ) // PAMERA-04 PCB with the CALC1 ULA used
 	ROM_REGION( 0x400000, "maincpu", 0 )    // 68000 code
 	ROM_LOAD16_BYTE( "pm110.4m2",    0x000000, 0x80000, CRC(ae6b17a8) SHA1(f3a625eef45cc85cdf9760f77ea7ce93387911f9) )
 	ROM_LOAD16_BYTE( "pm109.4m1",    0x000001, 0x80000, CRC(b85d792d) SHA1(0ed78e15f6e58285ce6944200b023ada1e673b0e) )
@@ -428,7 +441,7 @@ ROM_START( galpanica ) // PAMERA-04 PCB with the CALC1 ULA used
 	ROM_LOAD( "pm007e.u",     0x80000, 0x80000, CRC(c7ed7950) SHA1(133258b058d3c562208d0d00b9fac71202647c32) )
 ROM_END
 
-ROM_START( galpanicb ) // PAMERA-04 PCB with the CALC1 ULA used
+ROM_START( galpanicc ) // PAMERA-04 PCB with the CALC1 ULA used
 	ROM_REGION( 0x400000, "maincpu", 0 )    // 68000 code
 	ROM_LOAD16_BYTE( "pm109p.u88-01.ic6", 0x000000, 0x20000, CRC(a6d60dba) SHA1(2a63642709051c27b9a366c433127426bb579c35) ) // read as 27C010
 	ROM_LOAD16_BYTE( "pm110p.u87-01.ic5", 0x000001, 0x20000, CRC(3214fd48) SHA1(d8d77cb6b74caea2545f4e62eb9223aaf770785a) ) // read as 27C010
@@ -451,6 +464,7 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 1990, galpanic,  0,        galpanic,  galpanic,  galpanic_state, empty_init, ROT90, "Kaneko", "Gals Panic (unprotected)",          MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1990, galpanica, galpanic, galpanica, galpanica, galpanic_state, empty_init, ROT90, "Kaneko", "Gals Panic (ULA protected, set 1)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1990, galpanicb, galpanic, galpanica, galpanica, galpanic_state, empty_init, ROT90, "Kaneko", "Gals Panic (ULA protected, set 2)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1990, galpanic,  0,        galpanic,  galpanic,  galpanic_state, empty_init, ROT90, "Kaneko", "Gals Panic (unprotected, ver. 2.0)",MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1990, galpanica, galpanic, galpanic,  galpanic,  galpanic_state, empty_init, ROT90, "Kaneko", "Gals Panic (unprotected)",          MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1990, galpanicb, galpanic, galpanica, galpanica, galpanic_state, empty_init, ROT90, "Kaneko", "Gals Panic (ULA protected, set 1)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1990, galpanicc, galpanic, galpanica, galpanica, galpanic_state, empty_init, ROT90, "Kaneko", "Gals Panic (ULA protected, set 2)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )

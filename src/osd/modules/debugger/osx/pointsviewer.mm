@@ -33,7 +33,7 @@
 	// create the subview popup
 	subviewButton = [[NSPopUpButton alloc] initWithFrame:NSMakeRect(0, 0, 100, 19)];
 	[subviewButton setAutoresizingMask:(NSViewWidthSizable | NSViewMinYMargin)];
-	[subviewButton setBezelStyle:NSShadowlessSquareBezelStyle];
+	[subviewButton setBezelStyle:NSBezelStyleShadowlessSquare];
 	[subviewButton setFocusRingType:NSFocusRingTypeNone];
 	[subviewButton setFont:defaultFont];
 	[subviewButton setTarget:self];
@@ -139,17 +139,23 @@
 
 	// calculate the optimal size for everything
 	NSSize const breakDesired = [NSScrollView frameSizeForContentSize:[breakView maximumFrameSize]
-												hasHorizontalScroller:YES
-												  hasVerticalScroller:YES
-														   borderType:[breakScroll borderType]];
+											  horizontalScrollerClass:[NSScroller class]
+												verticalScrollerClass:[NSScroller class]
+														   borderType:[breakScroll borderType]
+														  controlSize:NSControlSizeRegular
+														scrollerStyle:NSScrollerStyleOverlay];
 	NSSize const watchDesired = [NSScrollView frameSizeForContentSize:[watchView maximumFrameSize]
-												hasHorizontalScroller:YES
-												  hasVerticalScroller:YES
-														   borderType:[watchScroll borderType]];
+											  horizontalScrollerClass:[NSScroller class]
+												verticalScrollerClass:[NSScroller class]
+														   borderType:[watchScroll borderType]
+														  controlSize:NSControlSizeRegular
+														scrollerStyle:NSScrollerStyleOverlay];
 	NSSize const registerDesired = [NSScrollView frameSizeForContentSize:[registerView maximumFrameSize]
-												   hasHorizontalScroller:YES
-													 hasVerticalScroller:YES
-															  borderType:[registerScroll borderType]];
+												 horizontalScrollerClass:[NSScroller class]
+												   verticalScrollerClass:[NSScroller class]
+															  borderType:[registerScroll borderType]
+															 controlSize:NSControlSizeRegular
+														   scrollerStyle:NSScrollerStyleOverlay];
 	NSSize const desired = NSMakeSize(std::max({ breakDesired.width, watchDesired.width, registerDesired.width }),
 									  std::max({ breakDesired.height, watchDesired.height, registerDesired.height }));
 	[self cascadeWindowWithDesiredSize:desired forView:tabs];
@@ -172,14 +178,14 @@
 
 - (void)saveConfigurationToNode:(util::xml::data_node *)node {
 	[super saveConfigurationToNode:node];
-	node->set_attribute_int("type", MAME_DEBUGGER_WINDOW_TYPE_POINTS_VIEWER);
-	node->set_attribute_int("bwtype", [tabs indexOfTabViewItem:[tabs selectedTabViewItem]]);
+	node->set_attribute_int(osd::debugger::ATTR_WINDOW_TYPE, osd::debugger::WINDOW_TYPE_POINTS_VIEWER);
+	node->set_attribute_int(osd::debugger::ATTR_WINDOW_POINTS_TYPE, [tabs indexOfTabViewItem:[tabs selectedTabViewItem]]);
 }
 
 
 - (void)restoreConfigurationFromNode:(util::xml::data_node const *)node {
 	[super restoreConfigurationFromNode:node];
-	int const tab = node->get_attribute_int("bwtype", [tabs indexOfTabViewItem:[tabs selectedTabViewItem]]);
+	int const tab = node->get_attribute_int(osd::debugger::ATTR_WINDOW_POINTS_TYPE, [tabs indexOfTabViewItem:[tabs selectedTabViewItem]]);
 	if ((0 <= tab) && ([tabs numberOfTabViewItems] > tab))
 	{
 		[subviewButton selectItemAtIndex:tab];

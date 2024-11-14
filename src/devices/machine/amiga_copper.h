@@ -27,7 +27,7 @@ public:
 	void set_ecs_mode(bool ecs_mode) { m_cdang_min_reg = ecs_mode ? 0x00 : 0x20; }
 
 	// I/O operations
-	void regs_map(address_map &map);
+	void regs_map(address_map &map) ATTR_COLD;
 	void dmacon_set(u16 data);
 	void copcon_w(u16 data);
 
@@ -38,9 +38,9 @@ public:
 protected:
 	// device-level overrides
 	//virtual void device_validity_check(validity_checker &valid) const override;
-	//virtual void device_add_mconfig(machine_config &config) override;
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	//virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 private:
 	required_device <cpu_device> m_host_cpu;

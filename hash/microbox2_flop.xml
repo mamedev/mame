@@ -1,0 +1,31 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0-1.0
+-->
+
+<softwarelist name="microbox2_flop" description="Microbox II diskettes">
+
+	<software name="mb2_dist">
+		<description>Microbox II Distribution</description>
+		<year>1984</year>
+		<publisher>Micro Concepts</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="102400">
+				<rom name="MB2_Distribution.dsk" size="102400" crc="223dd63e" sha1="4194e3b0176fa9ff2a6600d85738da930dee58f0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mb2_flex">
+		<description>Microbox II 6809 FLEX V3.01</description>
+		<year>1984</year>
+		<publisher>Micro Concepts</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="102400">
+				<rom name="MB2_FLEX_V3.01.dsk" size="102400" crc="7d38f5b8" sha1="a9127400be7250bf459bea278ba491f9b9a550b2"/>
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>

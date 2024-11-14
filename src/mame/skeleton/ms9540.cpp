@@ -28,6 +28,8 @@ Chips:
 #include "machine/terminal.h"
 
 
+namespace {
+
 class ms9540_state : public driver_device
 {
 public:
@@ -46,12 +48,12 @@ private:
 	uint8_t latch_1f001_r();
 	void latch_1f001_w(u8 data);
 	void kbd_put(u8 data);
-	void mem_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
 	uint8_t m_term_data = 0U;
 	uint8_t m_latch_1e001 = 0U;
 	uint8_t m_latch_1f001 = 0U;
-	void machine_reset() override;
-	void machine_start() override;
+	void machine_reset() override ATTR_COLD;
+	void machine_start() override ATTR_COLD;
 	required_shared_ptr<uint16_t> m_ram;
 	required_device<cpu_device> m_maincpu;
 	required_device<generic_terminal_device> m_terminal;
@@ -135,6 +137,8 @@ ROM_START( ms9540 )
 	ROM_LOAD( "z80-hd.bin",   0x0000, 0x1000, CRC(b1c37286) SHA1(36b38fec9ef46e3e594423bbd1c64c5e9a4bc74d) )
 	ROM_LOAD( "z80-flp.bin",  0x1000, 0x0800, CRC(f256b8c3) SHA1(780b444e999c3149eb0f137733703682d65746b4) )
 ROM_END
+
+} // anonymous namespace
 
 
 /* Driver */

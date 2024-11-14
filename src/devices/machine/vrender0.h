@@ -20,14 +20,6 @@
 #include "diserial.h"
 
 //**************************************************************************
-//  INTERFACE CONFIGURATION MACROS
-//**************************************************************************
-
-#define IDLE_LOOP_SPEEDUP
-
-
-
-//**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
 
@@ -42,14 +34,14 @@ public:
 	// construction/destruction
 	vr0uart_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	void regs_map(address_map &map);
+	void regs_map(address_map &map) ATTR_COLD;
 	void set_channel_num(int ch) { m_channel_num = ch; }
 	void set_parent(vrender0soc_device *parent) { m_parent = parent; }
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 private:
 	uint32_t control_r();
@@ -89,10 +81,10 @@ public:
 	// construction/destruction
 	vrender0soc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	void regs_map(address_map &map);
-	void audiovideo_map(address_map &map);
-	void texture_map(address_map &map);
-	void frame_map(address_map &map);
+	void regs_map(address_map &map) ATTR_COLD;
+	void audiovideo_map(address_map &map) ATTR_COLD;
+	void texture_map(address_map &map) ATTR_COLD;
+	void frame_map(address_map &map) ATTR_COLD;
 	template<class T> void set_host_cpu_tag(T &&tag) { m_host_cpu.set_tag(std::forward<T>(tag)); }
 	void set_external_vclk(const uint32_t vclk) { m_ext_vclk = vclk; }
 	void set_external_vclk(const XTAL vclk) { m_ext_vclk = vclk.value(); }
@@ -103,14 +95,14 @@ public:
 	bool irq_pending() { return m_intst; }
 	void write_line_tx(int port, uint8_t value);
 	template <int Port> auto tx_callback() { return write_tx[Port].bind(); }
-	template <int Port> DECLARE_WRITE_LINE_MEMBER(rx_w) { m_uart[Port]->rx_w((uint8_t)state); }
+	template <int Port> void rx_w(int state) { m_uart[Port]->rx_w((uint8_t)state); }
 
 protected:
 	// device-level overrides
 	//virtual void device_validity_check(validity_checker &valid) const override;
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 private:
 	required_device <se3208_device> m_host_cpu;
@@ -143,7 +135,7 @@ private:
 	uint32_t intst_r();
 	void intst_w(uint32_t data);
 
-	DECLARE_WRITE_LINE_MEMBER(soundirq_cb);
+	void soundirq_cb(int state);
 
 	// Timer
 	template<int Which> void tmcon_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
@@ -185,19 +177,12 @@ private:
 	uint32_t cfgr_r();
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_WRITE_LINE_MEMBER(screen_vblank);
+	void screen_vblank(int state);
 
 	uint16_t textureram_r(offs_t offset);
 	void textureram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	uint16_t frameram_r(offs_t offset);
 	void frameram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-
-	// Hacks
-#ifdef IDLE_LOOP_SPEEDUP
-	uint8_t     m_FlipCntRead = 0;
-	DECLARE_WRITE_LINE_MEMBER(idle_skip_resume_w);
-	DECLARE_WRITE_LINE_MEMBER(idle_skip_speedup_w);
-#endif
 };
 
 

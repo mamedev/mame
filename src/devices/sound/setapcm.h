@@ -34,14 +34,14 @@ protected:
 	setapcm_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
 
 	// device-level overrides
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 	virtual void device_clock_changed() override;
 
 	// sound stream update overrides
 	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
 
 	// device_rom_interface implementation
-	virtual void rom_bank_updated() override;
+	virtual void rom_bank_pre_change() override;
 
 	static constexpr unsigned MAX_VOICES = MaxVoices;  // max voices
 	static constexpr unsigned CLOCK_DIVIDER = Divider; // clock divider for generate output rate

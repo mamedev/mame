@@ -150,8 +150,8 @@ static INPUT_PORTS_START( s11 )
 	PORT_START("X7")
 
 	PORT_START("DIAGS")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("Audio Diag") PORT_CODE(KEYCODE_9_PAD) PORT_CHANGED_MEMBER(DEVICE_SELF, s11_state, audio_nmi, 1)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("Main Diag") PORT_CODE(KEYCODE_0_PAD) PORT_CHANGED_MEMBER(DEVICE_SELF, s11_state, main_nmi, 1)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("Audio Diag") PORT_CODE(KEYCODE_9_PAD) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(s11_state::audio_nmi), 1)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("Main Diag") PORT_CODE(KEYCODE_0_PAD) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(s11_state::main_nmi), 1)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("Advance") PORT_CODE(KEYCODE_1_PAD)
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("Up/Down") PORT_CODE(KEYCODE_2_PAD) PORT_TOGGLE
 	PORT_CONFNAME( 0x10, 0x10, "Language" )
@@ -202,13 +202,13 @@ INPUT_CHANGED_MEMBER( s11_state::audio_nmi )
 			m_audiocpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
-WRITE_LINE_MEMBER( s11_state::pia_irq )
+void s11_state::pia_irq(int state)
 {
 	m_pia_irq_active = state;
 	m_mainirq->in_w<1>(state);
 }
 
-WRITE_LINE_MEMBER( s11_state::main_irq )
+void s11_state::main_irq(int state)
 {
 	// handle the fact that the Advance and Up/Down switches are gated by the combined timer/pia irq signal
 	if(state == CLEAR_LINE)
@@ -229,7 +229,7 @@ void s11_state::sound_w(u8 data)
 	m_sound_data = data;
 }
 
-WRITE_LINE_MEMBER( s11_state::pia21_ca2_w )
+void s11_state::pia21_ca2_w(int state)
 {
 // sound ns
 	if(m_pias)
@@ -353,7 +353,7 @@ void s11_state::pia34_pb_w(u8 data)
 		m_ps88->data_w(data);
 }
 
-WRITE_LINE_MEMBER( s11_state::pia34_cb2_w )
+void s11_state::pia34_cb2_w(int state)
 {
 	if(m_bg)
 		m_bg->ctrl_w(state); // MCB2 through CPU interface
@@ -367,14 +367,14 @@ void s11_state::bank_w(u8 data)
 	membank("bank1")->set_entry(BIT(data, 0));
 }
 
-WRITE_LINE_MEMBER( s11_state::pias_ca2_w )
+void s11_state::pias_ca2_w(int state)
 {
 // speech clock
 	if(m_hc55516)
 		m_hc55516->clock_w(state);
 }
 
-WRITE_LINE_MEMBER( s11_state::pias_cb2_w )
+void s11_state::pias_cb2_w(int state)
 {
 // speech data
 	if(m_hc55516)
@@ -441,7 +441,7 @@ void s11_state::s11(machine_config &config)
 	genpin_audio(config);
 
 	/* Devices */
-	PIA6821(config, m_pia21, 0);
+	PIA6821(config, m_pia21);
 	m_pia21->readpa_handler().set(FUNC(s11_state::sound_r));
 	m_pia21->set_port_a_input_overrides_output_mask(0xff);
 	m_pia21->writepa_handler().set(FUNC(s11_state::sound_w));
@@ -451,14 +451,14 @@ void s11_state::s11(machine_config &config)
 	m_pia21->irqa_handler().set(m_piairq, FUNC(input_merger_device::in_w<1>));
 	m_pia21->irqb_handler().set(m_piairq, FUNC(input_merger_device::in_w<2>));
 
-	PIA6821(config, m_pia24, 0);
+	PIA6821(config, m_pia24);
 	m_pia24->writepa_handler().set(FUNC(s11_state::lamp0_w));
 	m_pia24->writepb_handler().set(FUNC(s11_state::lamp1_w));
 	m_pia24->cb2_handler().set(FUNC(s11_state::pia24_cb2_w));
 	m_pia24->irqa_handler().set(m_piairq, FUNC(input_merger_device::in_w<3>));
 	m_pia24->irqb_handler().set(m_piairq, FUNC(input_merger_device::in_w<4>));
 
-	PIA6821(config, m_pia28, 0);
+	PIA6821(config, m_pia28);
 	m_pia28->readpa_handler().set(FUNC(s11_state::pia28_w7_r));
 	m_pia28->set_port_a_input_overrides_output_mask(0xff);
 	m_pia28->writepa_handler().set(FUNC(s11_state::dig0_w));
@@ -468,7 +468,7 @@ void s11_state::s11(machine_config &config)
 	m_pia28->irqa_handler().set(m_piairq, FUNC(input_merger_device::in_w<5>));
 	m_pia28->irqb_handler().set(m_piairq, FUNC(input_merger_device::in_w<6>));
 
-	PIA6821(config, m_pia2c, 0);
+	PIA6821(config, m_pia2c);
 	m_pia2c->writepa_handler().set(FUNC(s11_state::pia2c_pa_w));
 	m_pia2c->writepb_handler().set(FUNC(s11_state::pia2c_pb_w));
 	m_pia2c->ca2_handler().set(FUNC(s11_state::pia2c_ca2_w));
@@ -476,7 +476,7 @@ void s11_state::s11(machine_config &config)
 	m_pia2c->irqa_handler().set(m_piairq, FUNC(input_merger_device::in_w<7>));
 	m_pia2c->irqb_handler().set(m_piairq, FUNC(input_merger_device::in_w<8>));
 
-	PIA6821(config, m_pia30, 0);
+	PIA6821(config, m_pia30);
 	m_pia30->readpa_handler().set(FUNC(s11_state::switch_r));
 	m_pia30->set_port_a_input_overrides_output_mask(0xff);
 	m_pia30->writepb_handler().set(FUNC(s11_state::switch_w));
@@ -485,7 +485,7 @@ void s11_state::s11(machine_config &config)
 	m_pia30->irqa_handler().set(m_piairq, FUNC(input_merger_device::in_w<9>));
 	m_pia30->irqb_handler().set(m_piairq, FUNC(input_merger_device::in_w<10>));
 
-	PIA6821(config, m_pia34, 0);
+	PIA6821(config, m_pia34);
 	m_pia34->writepa_handler().set(FUNC(s11_state::pia34_pa_w));
 	m_pia34->writepb_handler().set(FUNC(s11_state::pia34_pb_w));
 	m_pia34->ca2_handler().set_nop();
@@ -516,7 +516,7 @@ void s11_state::s11(machine_config &config)
 	m_cvsd_filter->add_route(ALL_OUTPUTS, m_cvsd_filter2, 1.0);
 	HC55516(config, m_hc55516, 0).add_route(ALL_OUTPUTS, m_cvsd_filter, 1.0);
 
-	PIA6821(config, m_pias, 0);
+	PIA6821(config, m_pias);
 	m_pias->readpa_handler().set(FUNC(s11_state::sound_r));
 	m_pias->set_port_a_input_overrides_output_mask(0xff);
 	m_pias->writepa_handler().set(FUNC(s11_state::sound_w));
@@ -592,6 +592,22 @@ ROM_START(grand_l3)
 	ROM_FILL(0x6035, 1, 0x00) // default to English
 
 	// according to the manual these should be 32K roms just like the other games here
+	ROM_REGION(0x10000, "audiocpu", ROMREGION_ERASEFF)
+	ROM_LOAD("lzrd_u21.l1", 0xc000, 0x4000, CRC(98859d37) SHA1(08429b9e6a3b3007815373dc280b985e3441aa9f))
+	ROM_RELOAD( 0x8000, 0x4000)
+	ROM_LOAD("lzrd_u22.l1", 0x4000, 0x4000, CRC(4e782eba) SHA1(b44ab499128300175bdb57f07ffe2992c82e47e4))
+	ROM_RELOAD( 0x0000, 0x4000)
+
+	ROM_REGION(0x80000, "bg:cpu", ROMREGION_ERASEFF)
+	ROM_LOAD("lzrd_u4.l1", 0x0000, 0x8000, CRC(4baafc11) SHA1(3507f5f37e02688fa56cf5bb303eaccdcedede06))
+ROM_END
+
+ROM_START(grand_l1)
+	ROM_REGION(0x10000, "maincpu", ROMREGION_ERASEFF)
+	ROM_LOAD("lzrd_u26.l1", 0x4000, 0x2000, CRC(540c80c3) SHA1(9da1f9683be5bc6b82cd5fb53dd9e74010a6c92b))
+	ROM_RELOAD(             0x6000, 0x2000)
+	ROM_LOAD("lzrd_u27.l1", 0x8000, 0x8000, CRC(63072df5) SHA1(57f39f8b80e71cc3df0d5a186d7227af3c0ed4cc))
+
 	ROM_REGION(0x10000, "audiocpu", ROMREGION_ERASEFF)
 	ROM_LOAD("lzrd_u21.l1", 0xc000, 0x4000, CRC(98859d37) SHA1(08429b9e6a3b3007815373dc280b985e3441aa9f))
 	ROM_RELOAD( 0x8000, 0x4000)
@@ -693,6 +709,7 @@ ROM_END
 // Pinball
 GAME( 1986, grand_l4, 0,        s11_bgs,  s11, s11_state, init_s11, ROT0, "Williams", "Grand Lizard (L-4)",             MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
 GAME( 1986, grand_l3, grand_l4, s11_bgs,  s11, s11_state, init_s11, ROT0, "Williams", "Grand Lizard (L-3)",             MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME( 1986, grand_l1, grand_l4, s11_bgs,  s11, s11_state, init_s11, ROT0, "Williams", "Grand Lizard (L-1)",             MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
 GAME( 1986, hs_l4,    0,        s11_bgs,  s11, s11_state, init_s11, ROT0, "Williams", "High Speed (L-4)",               MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
 GAME( 1986, hs_l3,    hs_l4,    s11_bgs,  s11, s11_state, init_s11, ROT0, "Williams", "High Speed (L-3)",               MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
 GAME( 1986, rdkng_l4, 0,        s11_bgm,  s11, s11_state, init_s11, ROT0, "Williams", "Road Kings (L-4)",               MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )

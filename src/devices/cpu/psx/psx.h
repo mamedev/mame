@@ -160,10 +160,9 @@ public:
 	void com_delay_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 	uint32_t com_delay_r(offs_t offset, uint32_t mem_mask = ~0);
 
-	static psxcpu_device *getcpu( device_t &device, const char *cputag ) { return downcast<psxcpu_device *>( device.subdevice( cputag ) ); }
 	void set_disable_rom_berr(bool mode);
 
-	void psxcpu_internal_map(address_map &map);
+	void psxcpu_internal_map(address_map &map) ATTR_COLD;
 protected:
 	static constexpr unsigned ICACHE_ENTRIES = 0x400;
 	static constexpr unsigned DCACHE_ENTRIES = 0x100;
@@ -171,15 +170,14 @@ protected:
 	psxcpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 	virtual void device_post_load() override;
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 	// device_execute_interface overrides
 	virtual uint32_t execute_min_cycles() const noexcept override { return 1; }
 	virtual uint32_t execute_max_cycles() const noexcept override { return 40; }
-	virtual uint32_t execute_input_lines() const noexcept override { return 6; }
 	virtual uint64_t execute_clocks_to_cycles(uint64_t clocks) const noexcept override { return ( clocks + 3 ) / 4; }
 	virtual uint64_t execute_cycles_to_clocks(uint64_t cycles) const noexcept override { return cycles * 4; }
 	virtual void execute_run() override;
@@ -310,7 +308,7 @@ protected:
 	devcb_read8 m_cd_read_handler;
 	devcb_write8 m_cd_write_handler;
 	required_device<ram_device> m_ram;
-	memory_region *m_rom;
+	required_memory_region m_rom;
 	bool m_disable_rom_berr;
 
 private:

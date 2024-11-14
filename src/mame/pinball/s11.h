@@ -6,8 +6,8 @@
  *  Created on: 2013-01-01
  */
 
-#ifndef MAME_INCLUDES_S11_H
-#define MAME_INCLUDES_S11_H
+#ifndef MAME_PINBALL_S11_H
+#define MAME_PINBALL_S11_H
 
 #include "cpu/m6800/m6800.h"
 #include "pinsnd88.h"
@@ -75,11 +75,11 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(audio_nmi);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
-	void s11_main_map(address_map &map);
-	void s11_audio_map(address_map &map);
+	void s11_main_map(address_map &map) ATTR_COLD;
+	void s11_audio_map(address_map &map) ATTR_COLD;
 
 	TIMER_CALLBACK_MEMBER(irq_timer);
 
@@ -96,22 +96,22 @@ protected:
 	void pia2c_pb_w(u8 data);
 	void pia34_pa_w(u8 data);
 	void pia34_pb_w(u8 data);
-	DECLARE_WRITE_LINE_MEMBER(pia34_cb2_w);
+	void pia34_cb2_w(int state);
 
-	DECLARE_WRITE_LINE_MEMBER(pias_ca2_w);
-	DECLARE_WRITE_LINE_MEMBER(pias_cb2_w);
-	DECLARE_WRITE_LINE_MEMBER(pia21_ca2_w);
-	DECLARE_WRITE_LINE_MEMBER(pia21_cb2_w) { } // enable solenoids
-	DECLARE_WRITE_LINE_MEMBER(pia24_ca2_w) { m_io_outputs[20] = state; } // E
-	DECLARE_WRITE_LINE_MEMBER(pia24_cb2_w) { m_io_outputs[21] = state; } // F
-	DECLARE_WRITE_LINE_MEMBER(pia28_ca2_w) { } // comma3&4 (not used)
-	DECLARE_WRITE_LINE_MEMBER(pia28_cb2_w) { } // comma1&2 (not used)
-	DECLARE_WRITE_LINE_MEMBER(pia2c_ca2_w) { m_io_outputs[17] = state; } // B
-	DECLARE_WRITE_LINE_MEMBER(pia2c_cb2_w) { m_io_outputs[18] = state; } // C
-	DECLARE_WRITE_LINE_MEMBER(pia30_ca2_w) { m_io_outputs[16] = state; } // D
-	DECLARE_WRITE_LINE_MEMBER(pia30_cb2_w) { m_io_outputs[19] = state; } // A
-	DECLARE_WRITE_LINE_MEMBER(pia_irq);
-	DECLARE_WRITE_LINE_MEMBER(main_irq);
+	void pias_ca2_w(int state);
+	void pias_cb2_w(int state);
+	void pia21_ca2_w(int state);
+	void pia21_cb2_w(int state) { } // enable solenoids
+	void pia24_ca2_w(int state) { m_io_outputs[20] = state; } // E
+	void pia24_cb2_w(int state) { m_io_outputs[21] = state; } // F
+	void pia28_ca2_w(int state) { } // comma3&4 (not used)
+	void pia28_cb2_w(int state) { } // comma1&2 (not used)
+	void pia2c_ca2_w(int state) { m_io_outputs[17] = state; } // B
+	void pia2c_cb2_w(int state) { m_io_outputs[18] = state; } // C
+	void pia30_ca2_w(int state) { m_io_outputs[16] = state; } // D
+	void pia30_cb2_w(int state) { m_io_outputs[19] = state; } // A
+	void pia_irq(int state);
+	void main_irq(int state);
 
 	u8 switch_r();
 	void switch_w(u8 data);
@@ -210,8 +210,8 @@ public:
 	void init_s11bi7();  // invert and 7seg34
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 	bool m_invert = false;  // later System 11B games expect inverted data to the display LED segments.
 	void set_invert(bool i) { m_invert = i; }
 	bool m_is7seg34 = false;  // some games use 7-segment displays for players 3 and 4
@@ -237,8 +237,8 @@ public:
 	void init_s11c7();
 
 protected:
-	virtual void machine_reset() override;
+	virtual void machine_reset() override ATTR_COLD;
 };
 
 
-#endif // MAME_INCLUDES_S11_H
+#endif // MAME_PINBALL_S11_H

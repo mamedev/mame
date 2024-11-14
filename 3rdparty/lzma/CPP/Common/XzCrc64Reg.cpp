@@ -9,34 +9,31 @@
 
 #include "../7zip/Common/RegisterCodec.h"
 
-class CXzCrc64Hasher:
-  public IHasher,
-  public CMyUnknownImp
-{
+Z7_CLASS_IMP_COM_1(
+  CXzCrc64Hasher
+  , IHasher
+)
   UInt64 _crc;
-  Byte mtDummy[1 << 7];
-
 public:
-  CXzCrc64Hasher(): _crc(CRC64_INIT_VAL) {}
+  Byte _mtDummy[1 << 7];  // it's public to eliminate clang warning: unused private field
 
-  MY_UNKNOWN_IMP1(IHasher)
-  INTERFACE_IHasher(;)
+  CXzCrc64Hasher(): _crc(CRC64_INIT_VAL) {}
 };
 
-STDMETHODIMP_(void) CXzCrc64Hasher::Init() throw()
+Z7_COM7F_IMF2(void, CXzCrc64Hasher::Init())
 {
   _crc = CRC64_INIT_VAL;
 }
 
-STDMETHODIMP_(void) CXzCrc64Hasher::Update(const void *data, UInt32 size) throw()
+Z7_COM7F_IMF2(void, CXzCrc64Hasher::Update(const void *data, UInt32 size))
 {
   _crc = Crc64Update(_crc, data, size);
 }
 
-STDMETHODIMP_(void) CXzCrc64Hasher::Final(Byte *digest) throw()
+Z7_COM7F_IMF2(void, CXzCrc64Hasher::Final(Byte *digest))
 {
-  UInt64 val = CRC64_GET_DIGEST(_crc);
-  SetUi64(digest, val);
+  const UInt64 val = CRC64_GET_DIGEST(_crc);
+  SetUi64(digest, val)
 }
 
 REGISTER_HASHER(CXzCrc64Hasher, 0x4, "CRC64", 8)

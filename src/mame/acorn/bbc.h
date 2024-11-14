@@ -7,8 +7,8 @@
  * Driver by Gordon Jefferyes <mess_bbc@romvault.com>
  *
  ****************************************************************************/
-#ifndef MAME_INCLUDES_BBC_H
-#define MAME_INCLUDES_BBC_H
+#ifndef MAME_ACORN_BBC_H
+#define MAME_ACORN_BBC_H
 
 #pragma once
 
@@ -100,6 +100,7 @@ public:
 		, m_bank2(*this, "bank2")
 		, m_bankdev(*this, "bankdev")
 		, m_bbcconfig(*this, "BBCCONFIG")
+		, m_statid(*this, "STATID")
 		, m_motor_led(*this, "motor_led")
 	{ }
 
@@ -152,36 +153,36 @@ public:
 	INTERRUPT_GEN_MEMBER(bbcb_keyscan);
 	TIMER_CALLBACK_MEMBER(tape_timer_cb);
 	TIMER_CALLBACK_MEMBER(reset_timer_cb);
-	DECLARE_WRITE_LINE_MEMBER(write_acia_clock);
-	DECLARE_WRITE_LINE_MEMBER(adlc_irq_w);
-	DECLARE_WRITE_LINE_MEMBER(bus_nmi_w);
-	DECLARE_WRITE_LINE_MEMBER(snd_enable_w);
-	DECLARE_WRITE_LINE_MEMBER(speech_rsq_w);
-	DECLARE_WRITE_LINE_MEMBER(speech_wsq_w);
-	DECLARE_WRITE_LINE_MEMBER(kbd_enable_w);
+	void write_acia_clock(int state);
+	void adlc_irq_w(int state);
+	void bus_nmi_w(int state);
+	void snd_enable_w(int state);
+	void speech_rsq_w(int state);
+	void speech_wsq_w(int state);
+	void kbd_enable_w(int state);
 	uint8_t via_system_porta_r();
 	void via_system_porta_w(uint8_t data);
 	uint8_t via_system_portb_r();
 	void via_system_portb_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(lpstb_w);
-	DECLARE_WRITE_LINE_MEMBER(bbc_hsync_changed);
-	DECLARE_WRITE_LINE_MEMBER(bbc_vsync_changed);
-	DECLARE_WRITE_LINE_MEMBER(bbc_de_changed);
+	void lpstb_w(int state);
+	void bbc_hsync_changed(int state);
+	void bbc_vsync_changed(int state);
+	void bbc_de_changed(int state);
 	DECLARE_INPUT_CHANGED_MEMBER(reset_palette);
 	void update_palette(monitor_type monitor_type);
 
 	void update_acia_rxd();
 	void update_acia_dcd();
 	void update_acia_cts();
-	DECLARE_WRITE_LINE_MEMBER(write_rts);
-	DECLARE_WRITE_LINE_MEMBER(write_txd);
-	DECLARE_WRITE_LINE_MEMBER(write_rxd);
-	DECLARE_WRITE_LINE_MEMBER(write_dcd);
-	DECLARE_WRITE_LINE_MEMBER(write_cts);
+	void write_rts(int state);
+	void write_txd(int state);
+	void write_rxd(int state);
+	void write_dcd(int state);
+	void write_cts(int state);
 
 	DECLARE_INPUT_CHANGED_MEMBER(trigger_reset);
-	DECLARE_WRITE_LINE_MEMBER(fdc_intrq_w);
-	DECLARE_WRITE_LINE_MEMBER(fdc_drq_w);
+	void fdc_intrq_w(int state);
+	void fdc_drq_w(int state);
 
 	int get_analogue_input(int channel_number);
 	void upd7002_eoc(int data);
@@ -198,20 +199,20 @@ public:
 	void bbcb_us(machine_config &config);
 	void sist1(machine_config &config);
 
-	void bbca_mem(address_map &map);
-	void bbc_base(address_map &map);
-	void bbcb_mem(address_map &map);
+	void bbca_mem(address_map &map) ATTR_COLD;
+	void bbc_base(address_map &map) ATTR_COLD;
+	void bbcb_mem(address_map &map) ATTR_COLD;
 
 	void init_bbc();
 	void init_ltmp();
 	void init_cfa();
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
-	virtual void video_start() override;
-	virtual void video_reset() override;
+	virtual void video_start() override ATTR_COLD;
+	virtual void video_reset() override ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<ram_device> m_ram;
@@ -256,6 +257,7 @@ protected:
 	optional_memory_bank m_bank2; //           bbcbp bbcbp128 bbcm
 	optional_device<address_map_bank_device> m_bankdev; //    bbcm
 	optional_ioport m_bbcconfig;
+	optional_ioport m_statid;
 
 	output_finder<> m_motor_led;
 
@@ -411,12 +413,12 @@ public:
 	void reutapm(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
-	void bbcbp_mem(address_map &map);
-	void reutapm_mem(address_map &map);
-	void bbcbp_fetch(address_map &map);
+	void bbcbp_mem(address_map &map) ATTR_COLD;
+	void reutapm_mem(address_map &map) ATTR_COLD;
+	void bbcbp_fetch(address_map &map) ATTR_COLD;
 };
 
 
@@ -448,19 +450,19 @@ public:
 	static void mpc_prisma_default(device_t *device);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
-	void bbcm_mem(address_map &map);
-	void bbcm_bankdev(address_map &map);
-	void bbcmet_bankdev(address_map &map);
-	void bbcmc_mem(address_map &map);
-	void bbcmc_bankdev(address_map &map);
-	void autoc15_bankdev(address_map &map);
-	void bbcm_fetch(address_map &map);
+	void bbcm_mem(address_map &map) ATTR_COLD;
+	void bbcm_bankdev(address_map &map) ATTR_COLD;
+	void bbcmet_bankdev(address_map &map) ATTR_COLD;
+	void bbcmc_mem(address_map &map) ATTR_COLD;
+	void bbcmc_bankdev(address_map &map) ATTR_COLD;
+	void autoc15_bankdev(address_map &map) ATTR_COLD;
+	void bbcm_fetch(address_map &map) ATTR_COLD;
 
 	output_finder<> m_power_led;
 };
 
 
-#endif // MAME_INCLUDES_BBC_H
+#endif // MAME_ACORN_BBC_H

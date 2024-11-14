@@ -12,14 +12,13 @@
 ****************************************************************************/
 
 #include "emu.h"
-#include "machine/ie15.h"
+#include "ie15.h"
 
 #include "emupal.h"
 
 #include "ie15.lh"
 
 
-//#define LOG_GENERAL (1U << 0) //defined in logmacro.h already
 #define LOG_RAM      (1U << 1)
 #define LOG_CPU      (1U << 2)
 #define LOG_KBD      (1U << 3)
@@ -246,7 +245,7 @@ TIMER_CALLBACK_MEMBER(ie15_device::hblank_onoff_tick)
 
 /* serial port */
 
-WRITE_LINE_MEMBER(ie15_device::rs232_conn_rxd_w)
+void ie15_device::rs232_conn_rxd_w(int state)
 {
 	device_serial_interface::rx_w(state);
 }
@@ -302,7 +301,7 @@ void ie15_device::serial_speed_w(uint8_t data)
 	return;
 }
 
-WRITE_LINE_MEMBER(ie15_device::update_serial)
+void ie15_device::update_serial(int state)
 {
 	int startbits = 1;
 	int databits = m_rs232_databits->read();
@@ -415,7 +414,7 @@ INPUT_PORTS_START( ie15 )
 
 	// Until the UART is implemented
 	PORT_START("RS232_RXBAUD")
-	PORT_CONFNAME(0xffff, 9600, "RX Baud") PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, ie15_device, update_serial)
+	PORT_CONFNAME(0xffff, 9600, "RX Baud") PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, FUNC(ie15_device::update_serial))
 	PORT_CONFSETTING(300, "300")
 	PORT_CONFSETTING(600, "600")
 	PORT_CONFSETTING(1200, "1200")
@@ -425,7 +424,7 @@ INPUT_PORTS_START( ie15 )
 	PORT_CONFSETTING(19200, "19200")
 
 	PORT_START("RS232_TXBAUD")
-	PORT_CONFNAME(0xffff, 9600, "TX Baud") PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, ie15_device, update_serial)
+	PORT_CONFNAME(0xffff, 9600, "TX Baud") PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, FUNC(ie15_device::update_serial))
 	PORT_CONFSETTING(300, "300")
 	PORT_CONFSETTING(600, "600")
 	PORT_CONFSETTING(1200, "1200")
@@ -435,12 +434,12 @@ INPUT_PORTS_START( ie15 )
 	PORT_CONFSETTING(19200, "19200")
 
 	PORT_START("RS232_DATABITS")
-	PORT_CONFNAME(0xf, 8, "Data Bits") PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, ie15_device, update_serial)
+	PORT_CONFNAME(0xf, 8, "Data Bits") PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, FUNC(ie15_device::update_serial))
 	PORT_CONFSETTING(7, "7")
 	PORT_CONFSETTING(8, "8")
 
 	PORT_START("RS232_PARITY")
-	PORT_CONFNAME(0x7, 0, "Parity") PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, ie15_device, update_serial)
+	PORT_CONFNAME(0x7, 0, "Parity") PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, FUNC(ie15_device::update_serial))
 	PORT_CONFSETTING(0, "None")
 	PORT_CONFSETTING(1, "Odd")
 	PORT_CONFSETTING(2, "Even")
@@ -448,7 +447,7 @@ INPUT_PORTS_START( ie15 )
 	PORT_CONFSETTING(4, "Space")
 
 	PORT_START("RS232_STOPBITS")
-	PORT_CONFNAME(0x3, 1, "Stop Bits") PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, ie15_device, update_serial)
+	PORT_CONFNAME(0x3, 1, "Stop Bits") PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, FUNC(ie15_device::update_serial))
 	PORT_CONFSETTING(1, "1")
 	PORT_CONFSETTING(2, "2")
 
@@ -466,16 +465,9 @@ void ie15_device::kbd_put(uint16_t data)
 	}
 }
 
-WRITE_LINE_MEMBER( ie15_device::kbd_sdv )
+void ie15_device::kbd_sdv(int state)
 {
 	m_kbd_sdv = state;
-}
-
-void ie15_device::device_resolve_objects()
-{
-	m_rs232_conn_dtr_handler.resolve_safe();
-	m_rs232_conn_rts_handler.resolve_safe();
-	m_rs232_conn_txd_handler.resolve_safe();
 }
 
 void ie15_device::device_start()
@@ -502,7 +494,7 @@ void ie15_device::device_reset()
 {
 	update_serial(0);
 
-	memset(&m_video, 0, sizeof(m_video));
+	m_video = decltype(m_video)();
 	m_kb_ruslat = m_long_beep = m_kb_control = m_kb_data = m_kb_flag0 = 0;
 	m_kb_flag = IE_TRUE;
 	m_kbd_sdv = false;

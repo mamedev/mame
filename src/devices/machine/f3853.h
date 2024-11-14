@@ -76,8 +76,8 @@ public:
 	virtual uint8_t read(offs_t offset);
 	virtual void write(offs_t offset, uint8_t data);
 
-	DECLARE_WRITE_LINE_MEMBER(ext_int_w);
-	DECLARE_WRITE_LINE_MEMBER(pri_in_w);
+	void ext_int_w(int state);
+	void pri_in_w(int state);
 
 	virtual TIMER_CALLBACK_MEMBER(timer_callback);
 
@@ -86,10 +86,10 @@ public:
 protected:
 	f3853_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
-	// device-level overrides
-	virtual void device_resolve_objects() override;
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	// device_t implementation
+	virtual void device_resolve_objects() override ATTR_COLD;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	uint16_t timer_interrupt_vector() const { return m_int_vector & ~uint16_t(0x0080); }
 	uint16_t external_interrupt_vector() const { return m_int_vector | uint16_t(0x0080); }
@@ -136,8 +136,6 @@ public:
 protected:
 	f3851_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual void device_resolve_objects() override;
-
 	devcb_read8::array<2> m_read_port;
 	devcb_write8::array<2> m_write_port;
 };
@@ -155,7 +153,7 @@ public:
 protected:
 	f3856_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 	virtual void timer_start(uint8_t value) override;
 

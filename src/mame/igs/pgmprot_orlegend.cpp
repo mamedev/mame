@@ -189,6 +189,7 @@ INPUT_PORTS_START( orlegend )
 	PORT_INCLUDE ( pgm )
 
 	PORT_MODIFY("Region")
+	PORT_BIT(     0xfffc, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_DIPNAME( 0x0003, 0x0000, DEF_STR( Region ) )
 	PORT_CONFSETTING(      0x0000, DEF_STR( World ) )
 	PORT_CONFSETTING(      0x0001, "World (duplicate)" ) // again?
@@ -200,6 +201,7 @@ INPUT_PORTS_START( orlegendt )
 	PORT_INCLUDE ( pgm )
 
 	PORT_MODIFY("Region")
+	PORT_BIT(     0xfff8, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_DIPNAME( 0x0007, 0x0004, DEF_STR( Region ) )
 	PORT_CONFSETTING(      0x0000, "Invalid 00?" )
 	PORT_CONFSETTING(      0x0001, "Invalid 01?" )
@@ -213,6 +215,7 @@ INPUT_PORTS_START( orlegendk )
 	PORT_INCLUDE ( pgm )
 
 	PORT_MODIFY("Region")
+	PORT_BIT(     0xfff8, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_DIPNAME( 0x0007, 0x0002, DEF_STR( Region ) )
 	PORT_CONFSETTING(      0x0000, "Invalid 00?" )
 	PORT_CONFSETTING(      0x0001, "Invalid 01?" )

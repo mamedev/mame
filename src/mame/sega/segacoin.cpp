@@ -25,6 +25,8 @@ TODO:
 #include "speaker.h"
 
 
+namespace {
+
 class segacoin_state : public driver_device
 {
 public:
@@ -39,10 +41,10 @@ public:
 private:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
-	void main_map(address_map &map);
-	void main_portmap(address_map &map);
-	void sound_map(address_map &map);
-	void sound_portmap(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
+	void main_portmap(address_map &map) ATTR_COLD;
+	void sound_map(address_map &map) ATTR_COLD;
+	void sound_portmap(address_map &map) ATTR_COLD;
 };
 
 
@@ -174,6 +176,8 @@ ROM_START( westdrm )
 	ROM_LOAD( "epr-15152.bin",   0x00000, 0x10000, CRC(565d6559) SHA1(2c7d961b6dc5020994cbd005efbfd27ccf59569d) ) // mostly empty
 	ROM_IGNORE(                           0x10000 )
 ROM_END
+
+} // anonymous namespace
 
 
 GAME( 1992, westdrm, 0, westdrm, westdrm, segacoin_state, empty_init, ROT0, "Sega", "Western Dream", MACHINE_IS_SKELETON_MECHANICAL )

@@ -8,8 +8,8 @@
 
 ***************************************************************************/
 
-#ifndef MAME_VIDEO_ATARIVAD_H
-#define MAME_VIDEO_ATARIVAD_H
+#ifndef MAME_ATARI_ATARIVAD_H
+#define MAME_ATARI_ATARIVAD_H
 
 #include "atarimo.h"
 #include "tilemap.h"
@@ -59,8 +59,8 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 private:
 	// internal helpers
@@ -101,4 +101,4 @@ private:
 };
 
 
-#endif // MAME_VIDEO_ATARIVAD_H
+#endif // MAME_ATARI_ATARIVAD_H

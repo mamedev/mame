@@ -15,8 +15,8 @@ public:
 							uint64_t io_window_start, uint64_t io_window_end, uint64_t io_offset, address_space *io_space) override;
 
 protected:
-	void device_start() override;
-	void device_reset() override;
+	void device_start() override ATTR_COLD;
+	void device_reset() override ATTR_COLD;
 
 private:
 	uint32_t pm1_cnt, proc_cnt, gpe0_sts, gpe0_en, smi_en, smi_sts;
@@ -25,7 +25,7 @@ private:
 	uint8_t  tco_rld, tco_tmr, tco_dat_in, tco_dat_out, tco_message1, tco_message2;
 	uint8_t  tco_wdstatus, sw_irq_gen;
 
-	void map(address_map &map);
+	void map(address_map &map) ATTR_COLD;
 
 	uint16_t pm1_sts_r();
 	void pm1_sts_w(uint16_t data);

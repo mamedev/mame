@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Phil Stroffolino
-#ifndef MAME_INCLUDES_SHANGKID_H
-#define MAME_INCLUDES_SHANGKID_H
+#ifndef MAME_MISC_SHANGKID_H
+#define MAME_MISC_SHANGKID_H
 
 #pragma once
 
@@ -23,7 +23,7 @@ public:
 	void dynamski(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -32,8 +32,8 @@ protected:
 
 	bool m_int_enable[2];
 
-	DECLARE_WRITE_LINE_MEMBER(int_enable_1_w);
-	DECLARE_WRITE_LINE_MEMBER(irq_1_w);
+	void int_enable_1_w(int state);
+	void irq_1_w(int state);
 
 private:
 	void palette(palette_device &palette) const;
@@ -42,8 +42,8 @@ private:
 	void draw_background(bitmap_ind16 &bitmap, const rectangle &cliprect, int pri);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec );
 
-	void prgmap(address_map &map);
-	void portmap(address_map &map);
+	void prgmap(address_map &map) ATTR_COLD;
+	void portmap(address_map &map) ATTR_COLD;
 };
 
 class chinhero_state : public dynamski_state
@@ -60,8 +60,8 @@ public:
 	void chinhero(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 	required_device<cpu_device> m_audiocpu;
 	required_device<cpu_device> m_bbx;
@@ -80,13 +80,13 @@ private:
 
 	void ay8910_porta_w(uint8_t data);
 
-	DECLARE_WRITE_LINE_MEMBER(sound_enable_w);
-	DECLARE_WRITE_LINE_MEMBER(int_enable_2_w);
-	DECLARE_WRITE_LINE_MEMBER(nmi_enable_1_w);
-	DECLARE_WRITE_LINE_MEMBER(nmi_enable_2_w);
-	DECLARE_WRITE_LINE_MEMBER(irq_2_w);
-	DECLARE_WRITE_LINE_MEMBER(coin_counter_1_w);
-	DECLARE_WRITE_LINE_MEMBER(coin_counter_2_w);
+	void sound_enable_w(int state);
+	void int_enable_2_w(int state);
+	void nmi_enable_1_w(int state);
+	void nmi_enable_2_w(int state);
+	void irq_2_w(int state);
+	void coin_counter_1_w(int state);
+	void coin_counter_2_w(int state);
 
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 
@@ -95,11 +95,11 @@ private:
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprite(const uint8_t *source, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void bbx_map(address_map &map);
-	void bbx_portmap(address_map &map);
-	void main_map(address_map &map);
-	void sound_map(address_map &map);
-	void sound_portmap(address_map &map);
+	void bbx_map(address_map &map) ATTR_COLD;
+	void bbx_portmap(address_map &map) ATTR_COLD;
+	void main_map(address_map &map) ATTR_COLD;
+	void sound_map(address_map &map) ATTR_COLD;
+	void sound_portmap(address_map &map) ATTR_COLD;
 };
 
 class shangkid_state : public chinhero_state
@@ -113,18 +113,18 @@ public:
 	void shangkid(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	required_memory_bank m_soundbank;
 
 	void ay8910_porta_w(uint8_t data);
 
-	void bbx_map(address_map &map);
-	void bbx_portmap(address_map &map);
-	void main_map(address_map &map);
-	void sound_map(address_map &map);
+	void bbx_map(address_map &map) ATTR_COLD;
+	void bbx_portmap(address_map &map) ATTR_COLD;
+	void main_map(address_map &map) ATTR_COLD;
+	void sound_map(address_map &map) ATTR_COLD;
 };
 
-#endif // MAME_INCLUDES_SHANGKID_H
+#endif // MAME_MISC_SHANGKID_H

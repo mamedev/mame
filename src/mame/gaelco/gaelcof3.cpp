@@ -52,6 +52,8 @@
 #include "speaker.h"
 
 
+namespace {
+
 class gaelcof3_state : public driver_device
 {
 public:
@@ -136,6 +138,9 @@ ROM_START( susanita )
 	ROM_REGION( 0x40000, "oki", 0 )
 	ROM_LOAD( "susanita.u1", 0x00000, 0x40000, CRC(766868cb) SHA1(eb42dc46b865bc448052d9d67c840e51c49ce49a) )
 ROM_END
+
+} // anonymous namespace
+
 
 GAME( 199?, autopapa,  0, gaelcof3, gaelcof3, gaelcof3_state, empty_init, ROT0, "Gaelco", "El auto feo",     MACHINE_IS_SKELETON_MECHANICAL )
 GAME( 199?, donpepito, 0, gaelcof3, gaelcof3, gaelcof3_state, empty_init, ROT0, "Gaelco", "Hola Don Pepito", MACHINE_IS_SKELETON_MECHANICAL )

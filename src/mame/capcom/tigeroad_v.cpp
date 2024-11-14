@@ -64,11 +64,9 @@ void tigeroad_state::scroll_w(offs_t offset, u16 data, u16 mem_mask)
 
 TILE_GET_INFO_MEMBER(tigeroad_state::get_bg_tile_info)
 {
-	u8 *tilerom = memregion("bgmap")->base();
-
-	int data = tilerom[tile_index];
-	int attr = tilerom[tile_index + 1];
-	int code = data + ((attr & 0xc0) << 2) + (m_bgcharbank << 10);
+	int data = m_bgmap[tile_index];
+	int attr = data >> 8;
+	int code = (data & 0xff) + ((attr & 0xc0) << 2) + (m_bgcharbank << 10);
 	int color = attr & 0x0f;
 	int flags = (attr & 0x20) ? TILE_FLIPX : 0;
 
@@ -90,7 +88,7 @@ TILE_GET_INFO_MEMBER(tigeroad_state::get_fg_tile_info)
 TILEMAP_MAPPER_MEMBER(tigeroad_state::tigeroad_tilemap_scan)
 {
 	// logical (col,row) -> memory offset
-	return 2 * (col % 8) + 16 * ((127 - row) % 8) + 128 * (col / 8) + 2048 * ((127 - row) / 8);
+	return (col % 8) + 8 * ((127 - row) % 8) + 0x40 * (col / 8) + 0x400 * ((127 - row) / 8);
 }
 
 void tigeroad_state::video_start()

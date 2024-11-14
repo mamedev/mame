@@ -40,7 +40,7 @@ DEFINE_DEVICE_TYPE(LC7535, lc7535_device, "lc7535", "Sanyo LC7535")
 
 lc7535_device::lc7535_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, LC7535, tag, owner, clock),
-	m_select_cb(*this),
+	m_select_cb(*this, 1),
 	m_volume_cb(*this),
 	m_addr(0), m_data(0),
 	m_count(0),
@@ -54,8 +54,7 @@ lc7535_device::lc7535_device(const machine_config &mconfig, const char *tag, dev
 
 void lc7535_device::device_start()
 {
-	// resolve callbacks
-	m_select_cb.resolve();
+	// resolve delegates
 	m_volume_cb.resolve();
 
 	// register for save states
@@ -89,17 +88,17 @@ float lc7535_device::normalize(int attenuation)
 //  INTERFACE
 //**************************************************************************
 
-WRITE_LINE_MEMBER( lc7535_device::ce_w )
+void lc7535_device::ce_w(int state)
 {
 	m_ce = state;
 }
 
-WRITE_LINE_MEMBER( lc7535_device::di_w )
+void lc7535_device::di_w(int state)
 {
 	m_di = state;
 }
 
-WRITE_LINE_MEMBER( lc7535_device::clk_w )
+void lc7535_device::clk_w(int state)
 {
 	if (m_clk == 0 && state == 1)
 	{

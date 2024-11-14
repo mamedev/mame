@@ -22,6 +22,8 @@ TODO:
 #include "speaker.h"
 
 
+namespace {
+
 class buster_state : public driver_device
 {
 public:
@@ -36,9 +38,9 @@ public:
 	void coin_output_w(uint8_t data);
 	uint32_t screen_update_buster(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void buster(machine_config &config);
-	void mainmap(address_map &map);
+	void mainmap(address_map &map) ATTR_COLD;
 protected:
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 private:
 	required_device<cpu_device> m_maincpu;
 	required_shared_ptr<uint8_t> m_vram;
@@ -364,6 +366,8 @@ ROM_START( buster )
 	ROM_LOAD( "b-grn.bin", 0x02000, 0x2000, CRC(acdbb44f) SHA1(41f6a2d4a6b12f506588379f2ed3df48fbc8184e) )
 	ROM_LOAD( "b-blu.bin", 0x04000, 0x2000, CRC(3b6bfe7b) SHA1(1888149a2ef85db59845d7e6e9227449f80c8f22) )
 ROM_END
+
+} // anonymous namespace
 
 
 GAME( 1982, buster, 0, buster, buster, buster_state, empty_init, ROT0, "Marian Electronics Ltd.", "Buster", MACHINE_NOT_WORKING|MACHINE_NO_SOUND )

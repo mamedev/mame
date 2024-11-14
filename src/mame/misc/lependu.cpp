@@ -77,7 +77,6 @@
 
 #include "cpu/m6502/m6502.h"
 #include "machine/6821pia.h"
-#include "machine/bankdev.h"
 #include "machine/nvram.h"
 #include "sound/discrete.h"
 #include "video/mc6845.h"
@@ -88,6 +87,9 @@
 #include "tilemap.h"
 
 #include "lependu.lh"
+
+
+namespace {
 
 #define MASTER_CLOCK    XTAL(10'000'000)
 #define CPU_CLOCK       (MASTER_CLOCK/16)
@@ -123,10 +125,10 @@ public:
 	uint32_t screen_update_lependu(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 
 	void lependu_videoram_w(offs_t offset, uint8_t data);
 	void lependu_colorram_w(offs_t offset, uint8_t data);
@@ -141,7 +143,7 @@ protected:
 private:
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	void lependu_palette(palette_device &palette) const;
-	void lependu_map(address_map &map);
+	void lependu_map(address_map &map) ATTR_COLD;
 
 	uint8_t lependu_mux_port_r();
 
@@ -544,11 +546,11 @@ void lependu_state::lependu(machine_config &config)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	PIA6821(config, m_pia[0], 0);
+	PIA6821(config, m_pia[0]);
 	m_pia[0]->readpa_handler().set(FUNC(lependu_state::lependu_mux_port_r));
 	m_pia[0]->writepb_handler().set(FUNC(lependu_state::lamps_w));
 
-	PIA6821(config, m_pia[1], 0);
+	PIA6821(config, m_pia[1]);
 	m_pia[1]->readpa_handler().set_ioport("SW1");
 	m_pia[1]->readpb_handler().set_ioport("SW2");
 	m_pia[1]->writepa_handler().set(FUNC(lependu_state::sound_w));
@@ -626,6 +628,8 @@ void lependu_state::init_lependu()
 	// fix checksum to avoid RAM clear
 	ROM[0xdd79] = 0xb7;
 }
+
+} // anonymous namespace
 
 
 /*********************************************

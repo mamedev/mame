@@ -28,13 +28,13 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 	// optional information overrides
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 private:
-	DECLARE_WRITE_LINE_MEMBER(bus_irq_w);
+	void bus_irq_w(int state);
 
 	required_device<ieee488_device> m_ieee;
 	required_device<tms9914_device> m_tms9914;

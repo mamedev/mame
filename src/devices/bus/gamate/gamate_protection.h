@@ -16,12 +16,12 @@ public:
 
 	bool is_protection_passed();
 
-	DECLARE_WRITE_LINE_MEMBER( prot_w );
-	DECLARE_READ_LINE_MEMBER( prot_r );
+	void prot_w(int state);
+	int prot_r();
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 private:
 	int m_is_protection_passed;

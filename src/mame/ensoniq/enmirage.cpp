@@ -79,8 +79,8 @@
 
 #include "enmirage.lh"
 
-#define LOG_ADC_READ        (1U <<  1)
-#define LOG_FILTER_WRITE    (1U <<  2)
+#define LOG_ADC_READ        (1U << 1)
+#define LOG_FILTER_WRITE    (1U << 2)
 #define VERBOSE (0)
 //#define VERBOSE (LOG_ADC_READ)
 //#define VERBOSE (LOG_ADC_READ|LOG_FILTER_WRITE)
@@ -89,6 +89,9 @@
 
 #define LOGADCREAD(...)     LOGMASKED(LOG_ADC_READ, __VA_ARGS__)
 #define LOGFILTERWRITE(...) LOGMASKED(LOG_FILTER_WRITE, __VA_ARGS__)
+
+
+namespace {
 
 #define PITCH_TAG "pitch"
 #define MOD_TAG "mod"
@@ -114,14 +117,14 @@ public:
 	}
 
 	void mirage(machine_config &config);
-	void enmirage_es5503_map(address_map &map);
+	void enmirage_es5503_map(address_map &map) ATTR_COLD;
 
 	void init_mirage();
 	DECLARE_INPUT_CHANGED_MEMBER(input_changed);
 	static void floppy_formats(format_registration &fr);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 	void coefficients_w(offs_t offset, uint8_t data);
 
 private:
@@ -132,9 +135,9 @@ private:
 	void mirage_via_write_portb(uint8_t data);
 	uint8_t mirage_adc_read();
 
-	void mirage_map(address_map &map);
+	void mirage_map(address_map &map) ATTR_COLD;
 
-	virtual void machine_reset() override;
+	virtual void machine_reset() override ATTR_COLD;
 
 	required_device<mc6809e_device> m_maincpu;
 	memory_share_creator<uint8_t> m_sample_ram;
@@ -386,32 +389,32 @@ void enmirage_state::mirage(machine_config &config)
 
 static INPUT_PORTS_START(mirage)
 	PORT_START("pb5") /* KEY ROW 0 */
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Load Upper")         PORT_CODE(KEYCODE_A) PORT_CHANGED_MEMBER(DEVICE_SELF, enmirage_state, input_changed, 0)
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Load Lower")         PORT_CODE(KEYCODE_B) PORT_CHANGED_MEMBER(DEVICE_SELF, enmirage_state, input_changed, 0)
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Sample Upper")       PORT_CODE(KEYCODE_C) PORT_CHANGED_MEMBER(DEVICE_SELF, enmirage_state, input_changed, 0)
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Play Sequence")      PORT_CODE(KEYCODE_D) PORT_CHANGED_MEMBER(DEVICE_SELF, enmirage_state, input_changed, 0)
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Load Sequence")      PORT_CODE(KEYCODE_E) PORT_CHANGED_MEMBER(DEVICE_SELF, enmirage_state, input_changed, 0)
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Save Sequence")      PORT_CODE(KEYCODE_F) PORT_CHANGED_MEMBER(DEVICE_SELF, enmirage_state, input_changed, 0)
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Record Sequence")    PORT_CODE(KEYCODE_G) PORT_CHANGED_MEMBER(DEVICE_SELF, enmirage_state, input_changed, 0)
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Sample Lower")       PORT_CODE(KEYCODE_H) PORT_CHANGED_MEMBER(DEVICE_SELF, enmirage_state, input_changed, 0)
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Load Upper")         PORT_CODE(KEYCODE_A) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(enmirage_state::input_changed), 0)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Load Lower")         PORT_CODE(KEYCODE_B) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(enmirage_state::input_changed), 0)
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Sample Upper")       PORT_CODE(KEYCODE_C) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(enmirage_state::input_changed), 0)
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Play Sequence")      PORT_CODE(KEYCODE_D) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(enmirage_state::input_changed), 0)
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Load Sequence")      PORT_CODE(KEYCODE_E) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(enmirage_state::input_changed), 0)
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Save Sequence")      PORT_CODE(KEYCODE_F) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(enmirage_state::input_changed), 0)
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Record Sequence")    PORT_CODE(KEYCODE_G) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(enmirage_state::input_changed), 0)
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Sample Lower")       PORT_CODE(KEYCODE_H) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(enmirage_state::input_changed), 0)
 	PORT_START("pb6") /* KEY ROW 1 */
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("3")      PORT_CODE(KEYCODE_3)        PORT_CHANGED_MEMBER(DEVICE_SELF, enmirage_state, input_changed, 0)
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("6")      PORT_CODE(KEYCODE_6)        PORT_CHANGED_MEMBER(DEVICE_SELF, enmirage_state, input_changed, 0)
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("9")      PORT_CODE(KEYCODE_9)        PORT_CHANGED_MEMBER(DEVICE_SELF, enmirage_state, input_changed, 0)
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("5")      PORT_CODE(KEYCODE_5)        PORT_CHANGED_MEMBER(DEVICE_SELF, enmirage_state, input_changed, 0)
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("8")      PORT_CODE(KEYCODE_8)        PORT_CHANGED_MEMBER(DEVICE_SELF, enmirage_state, input_changed, 0)
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("0/Prog") PORT_CODE(KEYCODE_0)        PORT_CHANGED_MEMBER(DEVICE_SELF, enmirage_state, input_changed, 0)
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("2")      PORT_CODE(KEYCODE_2)        PORT_CHANGED_MEMBER(DEVICE_SELF, enmirage_state, input_changed, 0)
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Enter")  PORT_CODE(KEYCODE_ENTER)    PORT_CHANGED_MEMBER(DEVICE_SELF, enmirage_state, input_changed, 0)
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("3")      PORT_CODE(KEYCODE_3)        PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(enmirage_state::input_changed), 0)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("6")      PORT_CODE(KEYCODE_6)        PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(enmirage_state::input_changed), 0)
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("9")      PORT_CODE(KEYCODE_9)        PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(enmirage_state::input_changed), 0)
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("5")      PORT_CODE(KEYCODE_5)        PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(enmirage_state::input_changed), 0)
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("8")      PORT_CODE(KEYCODE_8)        PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(enmirage_state::input_changed), 0)
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("0/Prog") PORT_CODE(KEYCODE_0)        PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(enmirage_state::input_changed), 0)
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("2")      PORT_CODE(KEYCODE_2)        PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(enmirage_state::input_changed), 0)
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Enter")  PORT_CODE(KEYCODE_ENTER)    PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(enmirage_state::input_changed), 0)
 	PORT_START("pb7") /* KEY ROW 2 */
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("1")          PORT_CODE(KEYCODE_1)    PORT_CHANGED_MEMBER(DEVICE_SELF, enmirage_state, input_changed, 0)
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("4")          PORT_CODE(KEYCODE_4)    PORT_CHANGED_MEMBER(DEVICE_SELF, enmirage_state, input_changed, 0)
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("7")          PORT_CODE(KEYCODE_7)    PORT_CHANGED_MEMBER(DEVICE_SELF, enmirage_state, input_changed, 0)
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("On/Up")      PORT_CODE(KEYCODE_UP)   PORT_CHANGED_MEMBER(DEVICE_SELF, enmirage_state, input_changed, 0)
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Param")      PORT_CODE(KEYCODE_I)    PORT_CHANGED_MEMBER(DEVICE_SELF, enmirage_state, input_changed, 0)
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Off/Down")   PORT_CODE(KEYCODE_DOWN) PORT_CHANGED_MEMBER(DEVICE_SELF, enmirage_state, input_changed, 0)
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Value")      PORT_CODE(KEYCODE_J)    PORT_CHANGED_MEMBER(DEVICE_SELF, enmirage_state, input_changed, 0)
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Cancel")     PORT_CODE(KEYCODE_K)    PORT_CHANGED_MEMBER(DEVICE_SELF, enmirage_state, input_changed, 0)
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("1")          PORT_CODE(KEYCODE_1)    PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(enmirage_state::input_changed), 0)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("4")          PORT_CODE(KEYCODE_4)    PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(enmirage_state::input_changed), 0)
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("7")          PORT_CODE(KEYCODE_7)    PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(enmirage_state::input_changed), 0)
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("On/Up")      PORT_CODE(KEYCODE_UP)   PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(enmirage_state::input_changed), 0)
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Param")      PORT_CODE(KEYCODE_I)    PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(enmirage_state::input_changed), 0)
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Off/Down")   PORT_CODE(KEYCODE_DOWN) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(enmirage_state::input_changed), 0)
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Value")      PORT_CODE(KEYCODE_J)    PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(enmirage_state::input_changed), 0)
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Cancel")     PORT_CODE(KEYCODE_K)    PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(enmirage_state::input_changed), 0)
 
 	PORT_START(PITCH_TAG)
 	PORT_BIT(0xff, 0x7f, IPT_PADDLE) PORT_NAME("Pitch Wheel") PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_MINMAX(0x00,0xff) PORT_CODE_INC(KEYCODE_4_PAD) PORT_CODE_DEC(KEYCODE_1_PAD) PORT_PLAYER(1)
@@ -434,5 +437,8 @@ void enmirage_state::init_mirage()
 		m_fdc->set_floppy(floppy);
 	}
 }
+
+} // anonymous namespace
+
 
 CONS(1984, enmirage, 0, 0, mirage, mirage, enmirage_state, init_mirage, "Ensoniq", "Mirage DMS-8", MACHINE_NOT_WORKING)

@@ -45,6 +45,9 @@
 #include "screen.h"
 #include "speaker.h"
 
+
+namespace {
+
 class tecnodar_state : public driver_device
 {
 public:
@@ -64,7 +67,7 @@ public:
 	void tecnodar(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	void bank_w(offs_t offset, u8 data);
@@ -75,8 +78,8 @@ private:
 	void ppi_pb_w(u8 data);
 	void ppi_pc_w(u8 data);
 
-	void mem_map(address_map &map);
-	void io_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
+	void io_map(address_map &map) ATTR_COLD;
 
 	required_device<z80_device> m_maincpu;
 	required_device<i8255_device> m_ppi;
@@ -352,6 +355,8 @@ ROM_START(tecnodargr)
 	ROM_REGION(0x117, "plds", 0)
 	ROM_LOAD("16as25hb1.bin", 0x000, 0x117, NO_DUMP)
 ROM_END
+
+} // anonymous namespace
 
 
 GAME(1991, tecnodar,   0,        tecnodar, tecnodar, tecnodar_state, empty_init, ROT0, "Automatics Pasqual",                    "Tecnodarts",                            MACHINE_MECHANICAL | MACHINE_NOT_WORKING)

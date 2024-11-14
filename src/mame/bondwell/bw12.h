@@ -1,8 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:Curt Coder
 
-#ifndef MAME_INCLUDES_BW12_H
-#define MAME_INCLUDES_BW12_H
+#ifndef MAME_BONDWELL_BW12_H
+#define MAME_BONDWELL_BW12_H
 
 #include "cpu/z80/z80.h"
 #include "machine/ram.h"
@@ -53,8 +53,7 @@ public:
 		, m_palette(*this, "palette")
 		, m_centronics(*this, CENTRONICS_TAG)
 		, m_ram(*this, RAM_TAG)
-		, m_floppy0(*this, UPD765_TAG ":1:525dd")
-		, m_floppy1(*this, UPD765_TAG ":2:525dd")
+		, m_floppy(*this, UPD765_TAG ":%u:525dd", 1U)
 		, m_floppy_timer(*this, FLOPPY_TIMER_TAG)
 		, m_rom(*this, Z80_TAG)
 		, m_char_rom(*this, "chargen")
@@ -69,19 +68,19 @@ public:
 private:
 	void bankswitch();
 
-	DECLARE_WRITE_LINE_MEMBER( ls138_a0_w );
-	DECLARE_WRITE_LINE_MEMBER( ls138_a1_w );
-	DECLARE_WRITE_LINE_MEMBER( init_w );
-	DECLARE_WRITE_LINE_MEMBER( motor0_w );
-	DECLARE_WRITE_LINE_MEMBER( motor1_w );
+	void ls138_a0_w(int state);
+	void ls138_a1_w(int state);
+	void init_w(int state);
+	void motor0_w(int state);
+	void motor1_w(int state);
 
 	uint8_t ls259_r(offs_t offset);
 	uint8_t pia_pa_r();
-	DECLARE_WRITE_LINE_MEMBER( pia_cb2_w );
-	DECLARE_WRITE_LINE_MEMBER( pit_out2_w );
-	DECLARE_READ_LINE_MEMBER( ay3600_shift_r );
-	DECLARE_READ_LINE_MEMBER( ay3600_control_r );
-	DECLARE_WRITE_LINE_MEMBER( ay3600_data_ready_w );
+	void pia_cb2_w(int state);
+	void pit_out2_w(int state);
+	int ay3600_shift_r();
+	int ay3600_control_r();
+	void ay3600_data_ready_w(int state);
 	MC6845_UPDATE_ROW( crtc_update_row );
 
 	void floppy_motor_on_off();
@@ -89,17 +88,17 @@ private:
 	static void bw12_floppy_formats(format_registration &fr);
 	static void bw14_floppy_formats(format_registration &fr);
 
-	DECLARE_WRITE_LINE_MEMBER(write_centronics_busy);
-	DECLARE_WRITE_LINE_MEMBER(write_centronics_fault);
-	DECLARE_WRITE_LINE_MEMBER(write_centronics_perror);
+	void write_centronics_busy(int state);
+	void write_centronics_fault(int state);
+	void write_centronics_perror(int state);
 
 	void common(machine_config &config);
-	void bw12_io(address_map &map);
-	void bw12_mem(address_map &map);
+	void bw12_io(address_map &map) ATTR_COLD;
+	void bw12_mem(address_map &map) ATTR_COLD;
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<ls259_device> m_latch;
@@ -112,8 +111,7 @@ protected:
 	required_device<palette_device> m_palette;
 	required_device<centronics_device> m_centronics;
 	required_device<ram_device> m_ram;
-	required_device<floppy_image_device> m_floppy0;
-	required_device<floppy_image_device> m_floppy1;
+	required_device_array<floppy_image_device, 2> m_floppy;
 	required_device<timer_device> m_floppy_timer;
 	required_memory_region m_rom;
 	required_memory_region m_char_rom;
@@ -143,4 +141,4 @@ protected:
 	int m_centronics_perror = 0;
 };
 
-#endif
+#endif // MAME_BONDWELL_BW12_H

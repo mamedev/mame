@@ -9,10 +9,10 @@
 #include "paramuniformreader.h"
 
 #include "entryuniform.h"
-#include "paramuniform.h"
 #include "parameter.h"
+#include "paramuniform.h"
 
-bgfx_entry_uniform* param_uniform_reader::read_from_value(const Value& value, std::string prefix, bgfx_uniform* uniform, std::map<std::string, bgfx_parameter*>& params)
+bgfx_entry_uniform* param_uniform_reader::read_from_value(const Value& value, const std::string &prefix, bgfx_uniform* uniform, std::map<std::string, bgfx_parameter*>& params)
 {
 	if (!validate_parameters(value, prefix))
 	{
@@ -24,9 +24,9 @@ bgfx_entry_uniform* param_uniform_reader::read_from_value(const Value& value, st
 	return new bgfx_param_uniform(uniform, params[parameter]);
 }
 
-bool param_uniform_reader::validate_parameters(const Value& value, std::string prefix)
+bool param_uniform_reader::validate_parameters(const Value& value, const std::string &prefix)
 {
-	if (!READER_CHECK(value.HasMember("parameter"), (prefix + "Must have string value 'parameter' (what parameter is being mapped?)\n").c_str())) return false;
-	if (!READER_CHECK(value["parameter"].IsString(), (prefix + "Value 'parameter' must be a string\n").c_str())) return false;
+	if (!READER_CHECK(value.HasMember("parameter"), "%sMust have string value 'parameter' (what parameter is being mapped?)\n", prefix)) return false;
+	if (!READER_CHECK(value["parameter"].IsString(), "%sValue 'parameter' must be a string\n", prefix)) return false;
 	return true;
 }

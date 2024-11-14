@@ -1,7 +1,7 @@
 // Common/MyInitGuid.h
 
-#ifndef __COMMON_MY_INITGUID_H
-#define __COMMON_MY_INITGUID_H
+#ifndef ZIP7_INC_COMMON_MY_INITGUID_H
+#define ZIP7_INC_COMMON_MY_INITGUID_H
 
 /*
 This file must be included only to one C++ file in project before
@@ -19,12 +19,25 @@ Also we need IID_IUnknown that is initialized in some file for linking:
   Other: we define IID_IUnknown in this file
 */
 
+// #include "Common.h"
+/* vc6 without sdk needs <objbase.h> before <initguid.h>,
+   but it doesn't work in new msvc.
+   So we include full "MyWindows.h" instead of <objbase.h> */
+// #include <objbase.h>
+#include "MyWindows.h"
+
 #ifdef _WIN32
+
+#ifdef __clang__
+  // #pragma GCC diagnostic ignored "-Wmissing-variable-declarations"
+#endif
 
 #ifdef UNDER_CE
 #include <basetyps.h>
 #endif
 
+// for vc6 without sdk we must define INITGUID here
+#define INITGUID
 #include <initguid.h>
 
 #ifdef UNDER_CE
@@ -32,14 +45,13 @@ DEFINE_GUID(IID_IUnknown,
 0x00000000, 0x0000, 0x0000, 0xC0, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x46);
 #endif
 
-#else
+#else // _WIN32
 
 #define INITGUID
 #include "MyGuidDef.h"
 DEFINE_GUID(IID_IUnknown,
 0x00000000, 0x0000, 0x0000, 0xC0, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x46);
 
-#endif
-
+#endif // _WIN32
 
 #endif

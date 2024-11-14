@@ -76,18 +76,15 @@ pet_datassette_port_device::~pet_datassette_port_device()
 void pet_datassette_port_device::device_start()
 {
 	m_cart = get_card_device();
-
-	// resolve callbacks
-	m_read_handler.resolve_safe();
 }
 
 
-READ_LINE_MEMBER( pet_datassette_port_device::read ) { int state = 1; if (m_cart != nullptr) state = m_cart->datassette_read(); return state; }
-WRITE_LINE_MEMBER( pet_datassette_port_device::write ) { if (m_cart != nullptr) m_cart->datassette_write(state); }
-READ_LINE_MEMBER( pet_datassette_port_device::sense_r ) { int state = 1; if (m_cart != nullptr) state = m_cart->datassette_sense(); return state; }
-WRITE_LINE_MEMBER( pet_datassette_port_device::motor_w ) { if (m_cart != nullptr) m_cart->datassette_motor(state); }
+int pet_datassette_port_device::read() { int state = 1; if (m_cart != nullptr) state = m_cart->datassette_read(); return state; }
+void pet_datassette_port_device::write(int state) { if (m_cart != nullptr) m_cart->datassette_write(state); }
+int pet_datassette_port_device::sense_r() { int state = 1; if (m_cart != nullptr) state = m_cart->datassette_sense(); return state; }
+void pet_datassette_port_device::motor_w(int state) { if (m_cart != nullptr) m_cart->datassette_motor(state); }
 
-WRITE_LINE_MEMBER( pet_datassette_port_device::read_w ) { m_read_handler(state); }
+void pet_datassette_port_device::read_w(int state) { m_read_handler(state); }
 
 
 // slot devices

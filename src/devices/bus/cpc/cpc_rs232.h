@@ -31,21 +31,21 @@ protected:
 	cpc_rs232_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
-	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 
 	// optional information overrides
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 	required_device<pit8253_device> m_pit;
 	required_device<z80dart_device> m_dart;
 	required_device<rs232_port_device> m_rs232;
 
 private:
-	DECLARE_WRITE_LINE_MEMBER(pit_out0_w);
-	DECLARE_WRITE_LINE_MEMBER(pit_out1_w);
-	DECLARE_WRITE_LINE_MEMBER(pit_out2_w);
+	void pit_out0_w(int state);
+	void pit_out1_w(int state);
+	void pit_out2_w(int state);
 
 	cpc_expansion_slot_device *m_slot;
 };
@@ -57,7 +57,7 @@ public:
 	cpc_ams_rs232_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
-	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 };
 
 // device type definition

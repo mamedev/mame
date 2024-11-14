@@ -13,6 +13,8 @@
 #include "tilemap.h"
 
 
+namespace {
+
 class cball_state : public driver_device
 {
 public:
@@ -46,15 +48,15 @@ public:
 
 	TILE_GET_INFO_MEMBER(get_tile_info);
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 	void cball_palette(palette_device &palette) const;
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void cball(machine_config &config);
-	void cpu_map(address_map &map);
+	void cpu_map(address_map &map) ATTR_COLD;
 };
 
 
@@ -287,6 +289,8 @@ ROM_START( cball )
 	ROM_REGION( 0x0100, "proms", 0 )
 	ROM_LOAD( "canball.6h", 0x0000, 0x0100, CRC(b8094b4c) SHA1(82dc6799a19984f3b204ee3aeeb007e55afc8be3) ) /* sync */
 ROM_END
+
+} // anonymous namespace
 
 
 GAME( 1976, cball, 0, cball, cball, cball_state, empty_init, ROT0, "Atari", "Cannonball (Atari, prototype)", MACHINE_NO_SOUND | MACHINE_WRONG_COLORS | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )

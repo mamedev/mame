@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Steve Ellenoff,Jarek Parchanski
-#ifndef MAME_INCLUDES_GSWORD_H
-#define MAME_INCLUDES_GSWORD_H
+#ifndef MAME_TAITO_GSWORD_H
+#define MAME_TAITO_GSWORD_H
 
 #pragma once
 
@@ -65,13 +65,13 @@ protected:
 
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 	uint32_t screen_update_gsword(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void cpu1_map(address_map &map);
+	void cpu1_map(address_map &map) ATTR_COLD;
 };
 
 
@@ -108,13 +108,13 @@ protected:
 
 	void gsword_palette(palette_device &palette) const;
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
-	void cpu1_io_map(address_map &map);
-	void cpu2_io_map(address_map &map);
-	void cpu2_map(address_map &map);
-	void cpu3_map(address_map &map);
+	void cpu1_io_map(address_map &map) ATTR_COLD;
+	void cpu2_io_map(address_map &map) ATTR_COLD;
+	void cpu2_map(address_map &map) ATTR_COLD;
+	void cpu3_map(address_map &map) ATTR_COLD;
 
 private:
 	required_device<generic_latch_8_device> m_soundlatch;
@@ -133,6 +133,7 @@ class josvolly_state : public gsword_state_base
 public:
 	josvolly_state(const machine_config &mconfig, device_type type, const char *tag)
 		: gsword_state_base(mconfig, type, tag)
+		, m_dip_switches(*this, "DSW%u", 1U)
 		, m_cpu2_nmi_enable(false)
 		, m_mcu1_p1(0xffU)
 		, m_mcu1_p2(0xffU)
@@ -157,18 +158,20 @@ protected:
 
 	void josvolly_palette(palette_device &palette) const;
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
-	void josvolly_cpu1_io_map(address_map &map);
-	void josvolly_cpu2_io_map(address_map &map);
-	void josvolly_cpu2_map(address_map &map);
+	void josvolly_cpu1_io_map(address_map &map) ATTR_COLD;
+	void josvolly_cpu2_io_map(address_map &map) ATTR_COLD;
+	void josvolly_cpu2_map(address_map &map) ATTR_COLD;
 
 private:
+	required_ioport_array<2> m_dip_switches;
+
 	bool    m_cpu2_nmi_enable;
 	u8      m_mcu1_p1;
 	u8      m_mcu1_p2;
 	u8      m_mcu2_p1;
 };
 
-#endif // MAME_INCLUDES_GSWORD_H
+#endif // MAME_TAITO_GSWORD_H

@@ -6,8 +6,8 @@
 
 ***************************************************************************/
 
-#ifndef MAME_AUDIO_FLOWER_H
-#define MAME_AUDIO_FLOWER_H
+#ifndef MAME_MISC_FLOWER_A_H
+#define MAME_MISC_FLOWER_A_H
 
 #pragma once
 
@@ -28,16 +28,16 @@ public:
 	// I/O operations
 	void lower_write(offs_t offset, u8 data);
 	void upper_write(offs_t offset, u8 data);
-//  virtual void lower_map(address_map &map);
-//  virtual void upper_map(address_map &map);
+//  virtual void lower_map(address_map &map) ATTR_COLD;
+//  virtual void upper_map(address_map &map) ATTR_COLD;
 
-	void regs_map(address_map &map);
+	void regs_map(address_map &map) ATTR_COLD;
 protected:
 	// device-level overrides
 	//virtual void device_validity_check(validity_checker &valid) const override;
-	//virtual void device_add_mconfig(machine_config &config) override;
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	//virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 	virtual space_config_vector memory_space_config() const override;
 	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
 
@@ -91,4 +91,4 @@ private:
 DECLARE_DEVICE_TYPE(FLOWER_CUSTOM, flower_sound_device)
 
 
-#endif // MAME_AUDIO_FLOWER_H
+#endif // MAME_MISC_FLOWER_A_H

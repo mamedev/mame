@@ -2,7 +2,7 @@
 // copyright-holders:Aaron Giles, Vas Crabb
 //============================================================
 //
-//  logwininfo.c - Win32 debug window handling
+//  logwininfo.cpp - Win32 debug window handling
 //
 //============================================================
 
@@ -12,6 +12,10 @@
 #include "debugviewinfo.h"
 #include "logviewinfo.h"
 
+#include "util/xmlfile.h"
+
+
+namespace osd::debugger::win {
 
 logwin_info::logwin_info(debugger_windows_interface &debugger) :
 	debugwin_info(debugger, false, std::string("Errorlog: ").append(debugger.machine().system().type.fullname()).append(" [").append(debugger.machine().system().name).append("]").c_str(), nullptr)
@@ -41,11 +45,9 @@ logwin_info::logwin_info(debugger_windows_interface &debugger) :
 	// clamp the min/max size
 	set_maxwidth(bounds.right - bounds.left);
 
-	// position the window at the bottom-right
-	SetWindowPos(window(), HWND_TOP, 100, 100, bounds.right - bounds.left, bounds.bottom - bounds.top, SWP_SHOWWINDOW);
-
-	// recompute the children
-	debugwin_info::recompute_children();
+	// position the window and recompute children
+	debugger.stagger_window(window(), bounds.right - bounds.left, bounds.bottom - bounds.top);
+	recompute_children();
 }
 
 
@@ -63,3 +65,12 @@ bool logwin_info::handle_command(WPARAM wparam, LPARAM lparam)
 	}
 	return debugwin_info::handle_command(wparam, lparam);
 }
+
+
+void logwin_info::save_configuration_to_node(util::xml::data_node &node)
+{
+	debugwin_info::save_configuration_to_node(node);
+	node.set_attribute_int(ATTR_WINDOW_TYPE, WINDOW_TYPE_ERROR_LOG_VIEWER);
+}
+
+} // namespace osd::debugger::win

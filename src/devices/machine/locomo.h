@@ -20,8 +20,8 @@ public:
 	void write(offs_t offset, uint32_t data, uint32_t mem_mask = ~0U);
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	uint16_t m_kbd_cmd;
 	uint16_t m_kbd_row;

@@ -1,7 +1,7 @@
 // license:GPL-2.0+
 // copyright-holders:Peter Trauner
-#ifndef MAME_AUDIO_ARCADIA_H
-#define MAME_AUDIO_ARCADIA_H
+#ifndef MAME_ARCADIA_ARCADIA_A_H
+#define MAME_ARCADIA_ARCADIA_A_H
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -19,8 +19,8 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
 
 	sound_stream *m_channel = nullptr;
@@ -34,4 +34,4 @@ protected:
 // device type definition
 DECLARE_DEVICE_TYPE(ARCADIA_SOUND, arcadia_sound_device)
 
-#endif // MAME_AUDIO_ARCADIA_H
+#endif // MAME_ARCADIA_ARCADIA_A_H

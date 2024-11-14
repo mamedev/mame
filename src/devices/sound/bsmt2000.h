@@ -42,20 +42,20 @@ public:
 	void write_reg(uint16_t data);
 	void write_data(uint16_t data);
 
-	void tms_io_map(address_map &map);
-	void tms_program_map(address_map &map);
+	void tms_io_map(address_map &map) ATTR_COLD;
+	void tms_program_map(address_map &map) ATTR_COLD;
 protected:
 	// device-level overrides
-	virtual const tiny_rom_entry *device_rom_region() const override;
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// device_sound_interface overrides
 	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
 
 	// device_rom_interface overrides
-	virtual void rom_bank_updated() override;
+	virtual void rom_bank_pre_change() override;
 
 	TIMER_CALLBACK_MEMBER(deferred_reset);
 	TIMER_CALLBACK_MEMBER(deferred_reg_write);
@@ -72,13 +72,6 @@ public:
 	void tms_right_w(uint16_t data);
 
 private:
-	// timers
-	enum
-	{
-		TIMER_ID_REG_WRITE,
-		TIMER_ID_DATA_WRITE
-	};
-
 	// configuration state
 	ready_callback              m_ready_callback;
 
@@ -96,7 +89,7 @@ private:
 	emu_timer *                 m_deferred_reg_write;
 	emu_timer *                 m_deferred_data_write;
 
-	DECLARE_READ_LINE_MEMBER( tms_write_pending_r );
+	int tms_write_pending_r();
 };
 
 

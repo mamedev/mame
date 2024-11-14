@@ -7,8 +7,8 @@
     driver by Aaron Giles
 
 ***************************************************************************/
-#ifndef MAME_INCLUDES_GRIDLEE_H
-#define MAME_INCLUDES_GRIDLEE_H
+#ifndef MAME_MIDWAY_GRIDLEE_H
+#define MAME_MIDWAY_GRIDLEE_H
 
 #pragma once
 
@@ -48,8 +48,8 @@ public:
 private:
 	uint8_t analog_port_r(offs_t offset);
 	uint8_t random_num_r();
-	DECLARE_WRITE_LINE_MEMBER(coin_counter_w);
-	DECLARE_WRITE_LINE_MEMBER(cocktail_flip_w);
+	void coin_counter_w(int state);
+	void cocktail_flip_w(int state);
 	void gridlee_videoram_w(offs_t offset, uint8_t data);
 	void gridlee_palette_select_w(uint8_t data);
 	void gridlee_palette(palette_device &palette) const;
@@ -60,11 +60,11 @@ private:
 	TIMER_CALLBACK_MEMBER(firq_timer_tick);
 	void expand_pixels();
 	void poly17_init();
-	void cpu1_map(address_map &map);
+	void cpu1_map(address_map &map) ATTR_COLD;
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 	required_shared_ptr<uint8_t> m_spriteram;
 	required_shared_ptr<uint8_t> m_videoram;
@@ -98,7 +98,7 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 	// sound stream update overrides
 	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
@@ -121,4 +121,4 @@ private:
 
 DECLARE_DEVICE_TYPE(GRIDLEE, gridlee_sound_device)
 
-#endif // MAME_INCLUDES_GRIDLEE_H
+#endif // MAME_MIDWAY_GRIDLEE_H

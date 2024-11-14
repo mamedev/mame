@@ -5,8 +5,8 @@
     rokola hardware
 
 *************************************************************************/
-#ifndef MAME_AUDIO_SNK6502_H
-#define MAME_AUDIO_SNK6502_H
+#ifndef MAME_SNK_SNK6502_A_H
+#define MAME_SNK_SNK6502_A_H
 
 #pragma once
 
@@ -19,7 +19,7 @@ class snk6502_sound_device : public device_t, public device_sound_interface
 public:
 	snk6502_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_READ_LINE_MEMBER(music0_playing);
+	int music0_playing();
 
 	void set_music_freq(int freq);
 	void set_music_clock(double clock_time);
@@ -37,7 +37,7 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 	// sound stream update overrides
 	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
@@ -85,9 +85,9 @@ public:
 	void speech_w(uint8_t data);
 
 protected:
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 private:
 	required_device<snk6502_sound_device> m_custom;
@@ -109,9 +109,9 @@ public:
 protected:
 	fantasy_sound_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	required_device<snk6502_sound_device> m_custom;
 
@@ -128,7 +128,7 @@ public:
 	nibbler_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 };
 
 
@@ -138,8 +138,8 @@ public:
 	pballoon_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual void device_reset() override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 };
 
 
@@ -151,9 +151,9 @@ public:
 	void sound_w(offs_t offset, uint8_t data);
 
 protected:
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 private:
 	required_device<snk6502_sound_device> m_custom;
@@ -171,9 +171,9 @@ public:
 	void sound_w(offs_t offset, uint8_t data);
 
 protected:
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 private:
 	required_device<snk6502_sound_device> m_custom;
@@ -192,4 +192,4 @@ DECLARE_DEVICE_TYPE(PBALLOON_SOUND, pballoon_sound_device)
 DECLARE_DEVICE_TYPE(SASUKE_SOUND,   sasuke_sound_device)
 DECLARE_DEVICE_TYPE(SATANSAT_SOUND, satansat_sound_device)
 
-#endif // MAME_AUDIO_SNK6502_H
+#endif // MAME_SNK_SNK6502_A_H

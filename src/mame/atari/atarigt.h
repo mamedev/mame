@@ -48,8 +48,8 @@ public:
 	void init_tmek();
 
 protected:
-	virtual void machine_start() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 
@@ -93,7 +93,7 @@ private:
 	std::unique_ptr<uint8_t[]> m_protdata;
 
 	INTERRUPT_GEN_MEMBER(scanline_int_gen);
-	DECLARE_WRITE_LINE_MEMBER(video_int_write_line);
+	void video_int_write_line(int state);
 	void scanline_int_ack_w(uint32_t data = 0);
 	void video_int_ack_w(uint32_t data = 0);
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline_update);
@@ -118,7 +118,7 @@ private:
 	TILE_GET_INFO_MEMBER(get_playfield_tile_info);
 	TILEMAP_MAPPER_MEMBER(playfield_scan);
 	uint32_t screen_update_atarigt(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	void main_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
 
 	void tmek_update_mode(offs_t offset);
 	void tmek_protection_w(address_space &space, offs_t offset, uint16_t data);

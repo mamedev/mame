@@ -5,8 +5,8 @@
     Atari GX2 hardware
 
 *************************************************************************/
-#ifndef MAME_INCLUDES_ATARIGX2_H
-#define MAME_INCLUDES_ATARIGX2_H
+#ifndef MAME_ATARI_ATARIGX2_H
+#define MAME_ATARI_ATARIGX2_H
 
 #pragma once
 
@@ -40,7 +40,7 @@ public:
 	void atarigx2_0x400(machine_config &config);
 
 protected:
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 	void video_int_ack_w(uint32_t data = 0);
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline_update);
 	uint32_t special_port2_r();
@@ -58,7 +58,7 @@ protected:
 	void atarigx2_mo_control_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
 	void atarigx2(machine_config &config);
-	void main_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
 
 private:
 	uint16_t          m_playfield_base = 0U;
@@ -86,4 +86,4 @@ private:
 	uint32_t          m_protection_ram[0x1000]{};
 };
 
-#endif // MAME_INCLUDES_ATARIGX2_H
+#endif // MAME_ATARI_ATARIGX2_H

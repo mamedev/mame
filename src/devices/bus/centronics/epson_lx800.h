@@ -34,13 +34,13 @@ protected:
 	epson_lx800_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// optional information overrides
-	virtual const tiny_rom_entry *device_rom_region() const override;
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual ioport_constructor device_input_ports() const override;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 
 	virtual bool supports_pin35_5v() override { return true; }
 
@@ -50,18 +50,18 @@ private:
 	uint8_t portc_r(offs_t offset);
 	void portc_w(offs_t offset, uint8_t data);
 
-	DECLARE_READ_LINE_MEMBER(an0_r);
-	DECLARE_READ_LINE_MEMBER(an1_r);
-	DECLARE_READ_LINE_MEMBER(an2_r);
-	DECLARE_READ_LINE_MEMBER(an3_r);
-	DECLARE_READ_LINE_MEMBER(an4_r);
-	DECLARE_READ_LINE_MEMBER(an5_r);
+	int an0_r();
+	int an1_r();
+	int an2_r();
+	int an3_r();
+	int an4_r();
+	int an5_r();
 
 	uint8_t centronics_data_r();
-	DECLARE_WRITE_LINE_MEMBER(centronics_pe_w);
-	DECLARE_WRITE_LINE_MEMBER(reset_w);
+	void centronics_pe_w(int state);
+	void reset_w(int state);
 
-	void lx800_mem(address_map &map);
+	void lx800_mem(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<beep_device> m_beep;

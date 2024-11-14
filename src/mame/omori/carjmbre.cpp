@@ -51,6 +51,9 @@
 #include "speaker.h"
 #include "tilemap.h"
 
+
+namespace {
+
 class carjmbre_state : public driver_device
 {
 public:
@@ -88,12 +91,12 @@ public:
 	TILE_GET_INFO_MEMBER(get_tile_info);
 
 	void carjmbre(machine_config &config);
-	void main_map(address_map &map);
-	void sound_io_map(address_map &map);
-	void sound_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
+	void sound_io_map(address_map &map) ATTR_COLD;
+	void sound_map(address_map &map) ATTR_COLD;
 protected:
-	virtual void machine_start() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 };
 
 void carjmbre_state::machine_start()
@@ -426,6 +429,8 @@ ROM_START( carjmbre )
 	ROM_LOAD( "c.d19", 0x0000, 0x0020, CRC(220bceeb) SHA1(46b9f867d014596e2aa7503f104dc721965f0ed5) )
 	ROM_LOAD( "c.d18", 0x0020, 0x0020, CRC(7b9ed1b0) SHA1(ec5e1f56e5a2fc726083866c08ac0e1de0ed6ace) )
 ROM_END
+
+} // anonymous namespace
 
 
 GAME( 1983, carjmbre, 0, carjmbre, carjmbre, carjmbre_state, empty_init, ROT90, "Omori Electric Co., Ltd.", "Car Jamboree", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_GRAPHICS )

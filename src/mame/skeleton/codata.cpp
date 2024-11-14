@@ -17,6 +17,9 @@
 #include "machine/am9513.h"
 #include "machine/z80sio.h"
 
+
+namespace {
+
 class codata_state : public driver_device
 {
 public:
@@ -29,8 +32,8 @@ public:
 	void codata(machine_config &config);
 
 private:
-	void mem_map(address_map &map);
-	virtual void machine_reset() override;
+	void mem_map(address_map &map) ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 	required_shared_ptr<u16> m_ram;
 	required_device<cpu_device> m_maincpu;
 };
@@ -106,6 +109,9 @@ ROM_START( codata )
 	ROM_LOAD( "p1.u602", 0x0020, 0x0020, CRC(ee1e5a14) SHA1(0d3346cb3b647fa2475bd7b4fa36ea6ecfdaf805) )
 	ROM_LOAD( "p2.u503", 0x0040, 0x0200, CRC(12d9a6be) SHA1(fca99f9c5afc630ac67cbd4e5ba4e5242b826848) )
 ROM_END
+
+} // anonymous namespace
+
 
 /* Driver */
 

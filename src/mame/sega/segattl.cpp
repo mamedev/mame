@@ -62,6 +62,9 @@
 #include "netlist/devices/net_lib.h"
 #include "video/fixfreq.h"
 
+
+namespace {
+
 // copied by Pong, not accurate for this driver!
 // start
 #define MASTER_CLOCK    7159000
@@ -92,10 +95,10 @@ public:
 protected:
 
 	// driver_device overrides
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	// devices
@@ -105,6 +108,7 @@ private:
 
 
 static NETLIST_START(segattl)
+{
 	SOLVER(Solver, 48000)
 //  PARAM(Solver.FREQ, 48000)
 	PARAM(Solver.ACCURACY, 1e-4) // works and is sufficient
@@ -114,7 +118,7 @@ static NETLIST_START(segattl)
 
 	//  NETDEV_ANALOG_CALLBACK(sound_cb, sound, exidyttl_state, sound_cb, "")
 	//  NETDEV_ANALOG_CALLBACK(video_cb, videomix, fixedfreq_device, update_vid, "fixfreq")
-NETLIST_END()
+}
 
 
 
@@ -171,5 +175,7 @@ ROM_START( fonz )
 	ROM_LOAD( "pr-08.50",     0x500, 0x100, CRC(6c763af7) SHA1(fdfa310f54b88610c1f59345f5fc72b3b90641ad) )
 ROM_END
 
+} // anonymous namespace
 
-GAME( 1976, fonz, 0, segattl, 0, segattl_state, empty_init, ROT0, "Sega", "Fonz [TTL]", MACHINE_IS_SKELETON )
+
+GAME( 1976, fonz, 0, segattl, 0, segattl_state, empty_init, ROT0, "Sega", "Fonz", MACHINE_IS_SKELETON )

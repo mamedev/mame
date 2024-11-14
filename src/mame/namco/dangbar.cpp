@@ -48,13 +48,13 @@ public:
 	void dangbar(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	required_device<mc68hc11_cpu_device> m_maincpu;
 
-	void main_map(address_map &map);
-	void audio_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
+	void audio_map(address_map &map) ATTR_COLD;
 };
 
 

@@ -5,8 +5,8 @@
     Bally Astrocade-based hardware
 
 ***************************************************************************/
-#ifndef MAME_INCLUDES_ASTROCDE_H
-#define MAME_INCLUDES_ASTROCDE_H
+#ifndef MAME_MIDWAY_ASTROCDE_H
+#define MAME_MIDWAY_ASTROCDE_H
 
 #pragma once
 
@@ -16,6 +16,7 @@
 #include "sound/astrocde.h"
 #include "sound/samples.h"
 #include "sound/votrax.h"
+
 #include "emupal.h"
 #include "screen.h"
 
@@ -34,8 +35,7 @@ public:
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_votrax(*this, "votrax"),
-		m_astrocade_sound1(*this, "astrocade1"),
-		m_astrocade_sound2(*this, "astrocade2"),
+		m_astrocade_sound(*this, "astrocade%u", 0),
 		m_videoram(*this, "videoram"),
 		m_protected_ram(*this, "protected_ram"),
 		m_nvram(*this, "nvram"),
@@ -44,14 +44,12 @@ public:
 		m_soundlatch(*this, "soundlatch"),
 		m_bank4000(*this, "bank4000"),
 		m_bank8000(*this, "bank8000"),
-		m_handle(*this, "P%uHANDLE", 1U),
-		m_interrupt_scanline(0xff)
+		m_handle(*this, "P%uHANDLE", 1U)
 	{ }
 
 	required_device<cpu_device> m_maincpu;
 	optional_device<votrax_sc01_device> m_votrax;
-	optional_device<astrocade_io_device> m_astrocade_sound1;
-	optional_device<astrocade_io_device> m_astrocade_sound2;
+	optional_device_array<astrocade_io_device, 2> m_astrocade_sound;
 	optional_shared_ptr<uint8_t> m_videoram;
 	optional_shared_ptr<uint8_t> m_protected_ram;
 	optional_shared_ptr<uint8_t> m_nvram;
@@ -73,7 +71,7 @@ public:
 	std::unique_ptr<uint8_t[]> m_sparklestar{};
 	uint8_t m_interrupt_enabl = 0U;
 	uint8_t m_interrupt_vector = 0U;
-	uint8_t m_interrupt_scanline = 0U;
+	uint8_t m_interrupt_scanline = 0xff;
 	uint8_t m_vertical_feedback = 0U;
 	uint8_t m_horizontal_feedback = 0U;
 	emu_timer *m_scanline_timer = nullptr;
@@ -107,13 +105,14 @@ public:
 	uint8_t m_profpac_writemode = 0U;
 	uint16_t m_profpac_writemask = 0U;
 	uint8_t m_profpac_vw = 0U;
+
 	void protected_ram_enable_w(uint8_t data);
 	uint8_t protected_ram_r(offs_t offset);
 	void protected_ram_w(offs_t offset, uint8_t data);
 	uint8_t input_mux_r(offs_t offset);
-	template<int Coin> DECLARE_WRITE_LINE_MEMBER(coin_counter_w);
-	template<int Bit> DECLARE_WRITE_LINE_MEMBER(sparkle_w);
-	DECLARE_WRITE_LINE_MEMBER(gorf_sound_switch_w);
+	template<int Coin> void coin_counter_w(int state);
+	template<int Bit> void sparkle_w(int state);
+	void gorf_sound_switch_w(int state);
 	void profpac_banksw_w(uint8_t data);
 	void demndrgn_banksw_w(uint8_t data);
 	uint8_t video_register_r(offs_t offset);
@@ -127,7 +126,7 @@ public:
 	uint8_t profpac_videoram_r(offs_t offset);
 	void profpac_videoram_w(offs_t offset, uint8_t data);
 	DECLARE_INPUT_CHANGED_MEMBER(spacezap_monitor);
-	DECLARE_WRITE_LINE_MEMBER(lightpen_trigger_w);
+	void lightpen_trigger_w(int state);
 	void init_profpac();
 	void init_spacezap();
 	void init_robby();
@@ -153,7 +152,7 @@ public:
 	void init_sparklestar();
 
 	void votrax_speech_w(uint8_t data);
-	DECLARE_READ_LINE_MEMBER( votrax_speech_status_r );
+	int votrax_speech_status_r();
 
 	void astrocade_base(machine_config &config);
 	void astrocade_16color_base(machine_config &config);
@@ -164,23 +163,23 @@ public:
 	void profpac(machine_config &config);
 	void robby(machine_config &config);
 	void wow(machine_config &config);
-	void bank4000_map(address_map &map);
-	void demndrgn_map(address_map &map);
-	void port_map(address_map &map);
-	void port_map_16col_pattern(address_map &map);
-	void port_map_16col_pattern_nosound(address_map &map);
-	void port_map_mono_pattern(address_map &map);
-	void port_map_stereo_pattern(address_map &map);
-	void profpac_bank4000_map(address_map &map);
-	void profpac_map(address_map &map);
-	void robby_map(address_map &map);
-	void seawolf2_map(address_map &map);
-	void spacezap_map(address_map &map);
-	void wow_map(address_map &map);
+	void bank4000_map(address_map &map) ATTR_COLD;
+	void demndrgn_map(address_map &map) ATTR_COLD;
+	void port_map(address_map &map) ATTR_COLD;
+	void port_map_16col_pattern(address_map &map) ATTR_COLD;
+	void port_map_16col_pattern_nosound(address_map &map) ATTR_COLD;
+	void port_map_mono_pattern(address_map &map) ATTR_COLD;
+	void port_map_stereo_pattern(address_map &map) ATTR_COLD;
+	void profpac_bank4000_map(address_map &map) ATTR_COLD;
+	void profpac_map(address_map &map) ATTR_COLD;
+	void robby_map(address_map &map) ATTR_COLD;
+	void seawolf2_map(address_map &map) ATTR_COLD;
+	void spacezap_map(address_map &map) ATTR_COLD;
+	void wow_map(address_map &map) ATTR_COLD;
 
 protected:
-	virtual void machine_start() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 };
 
 class seawolf2_state : public astrocde_state
@@ -192,13 +191,15 @@ public:
 	{ }
 
 	void seawolf2(machine_config &config);
+
+protected:
+	virtual void machine_start() override ATTR_COLD;
+
 private:
 	void sound_1_w(uint8_t data);
 	void sound_2_w(uint8_t data);
 
-	void port_map_discrete(address_map &map);
-
-	virtual void machine_start() override;
+	void port_map_discrete(address_map &map) ATTR_COLD;
 
 	required_device<samples_device> m_samples;
 	uint8_t m_port_1_last = 0U;
@@ -214,34 +215,45 @@ public:
 	{ }
 
 	void ebases(machine_config &config);
-	DECLARE_CUSTOM_INPUT_MEMBER(trackball_r);
+	ioport_value trackball_r();
+
+protected:
+	virtual void machine_start() override ATTR_COLD;
+
 private:
 	void trackball_select_w(uint8_t data);
 	void coin_w(uint8_t data);
 
-	void ebases_map(address_map &map);
-	void port_map_ebases(address_map &map);
+	void ebases_map(address_map &map) ATTR_COLD;
+	void port_map_ebases(address_map &map) ATTR_COLD;
 
 	required_ioport_array<4> m_trackball;
+	uint8_t m_trackball_last = 0U;
 };
 
 class demndrgn_state : public astrocde_state
 {
 public:
-	demndrgn_state(const machine_config &mconfig, device_type type, const char *tag)
-		: astrocde_state(mconfig, type, tag)
-		, m_joystick(*this, {"MOVEX", "MOVEY"})
+	demndrgn_state(const machine_config &mconfig, device_type type, const char *tag) :
+		astrocde_state(mconfig, type, tag),
+		m_trackball(*this, {"MOVEX", "MOVEY"})
 	{ }
 
 	void demndrgn(machine_config &config);
-	DECLARE_CUSTOM_INPUT_MEMBER(joystick_r);
+	ioport_value trackball_r();
+
+protected:
+	virtual void machine_start() override ATTR_COLD;
+
 private:
-	DECLARE_WRITE_LINE_MEMBER(input_select_w);
+	void input_select_w(int state);
 	void sound_w(uint8_t data);
+	void trackball_reset_w(uint8_t data);
 
-	void port_map_16col_pattern_demndrgn(address_map &map);
+	void port_map_16col_pattern_demndrgn(address_map &map) ATTR_COLD;
 
-	required_ioport_array<2> m_joystick;
+	required_ioport_array<2> m_trackball;
+	uint8_t m_trackball_last = 0U;
 };
 
 class tenpindx_state : public astrocde_state
@@ -259,14 +271,14 @@ private:
 	void counter_w(uint8_t data);
 	void lights_w(uint8_t data);
 
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
-	void port_map_16col_pattern_tenpindx(address_map &map);
-	void sub_io_map(address_map &map);
-	void sub_map(address_map &map);
+	void port_map_16col_pattern_tenpindx(address_map &map) ATTR_COLD;
+	void sub_io_map(address_map &map) ATTR_COLD;
+	void sub_map(address_map &map) ATTR_COLD;
 
 	required_device<z80_device> m_subcpu;
 	output_finder<19> m_lamps;
 };
 
-#endif // MAME_INCLUDES_ASTROCDE_H
+#endif // MAME_MIDWAY_ASTROCDE_H

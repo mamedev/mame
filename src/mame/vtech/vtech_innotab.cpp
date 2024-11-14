@@ -15,7 +15,6 @@
 #include "emu.h"
 
 #include "cpu/arm7/arm7.h"
-#include "cpu/arm7/arm7core.h"
 
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
@@ -23,6 +22,9 @@
 #include "screen.h"
 #include "softlist_dev.h"
 #include "speaker.h"
+
+
+namespace {
 
 class vtech_innotab_state : public driver_device
 {
@@ -38,7 +40,7 @@ public:
 	void vtech_innotab(machine_config &config);
 
 private:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load);
 
@@ -67,12 +69,12 @@ void vtech_innotab_state::machine_start()
 
 DEVICE_IMAGE_LOAD_MEMBER(vtech_innotab_state::cart_load)
 {
-	uint32_t size = m_cart->common_get_size("rom");
+	uint32_t const size = m_cart->common_get_size("rom");
 
 	m_cart->rom_alloc(size, GENERIC_ROM16_WIDTH, ENDIANNESS_LITTLE);
 	m_cart->common_load_rom(m_cart->get_rom_base(), size, "rom");
 
-	return image_init_result::PASS;
+	return std::make_pair(std::error_condition(), std::string());
 }
 
 static INPUT_PORTS_START( vtech_innotab )
@@ -214,5 +216,8 @@ ROM_START( innotab2 )
 	// this appears to be a project file used by the dumping software, not a ROM
 	//ROM_LOAD( "emmc_ghost.mpj", 0x000000, 0x3712, CRC(16b705da) SHA1(fdb576385cf46984ea40d8e8b83758d94f67507e) )
 ROM_END
+
+} // anonymous namespace
+
 
 CONS( 2011, innotab2,     0,       0,      vtech_innotab, vtech_innotab, vtech_innotab_state, empty_init, "VTech", "InnoTAB 2 (UK)",   MACHINE_IS_SKELETON )

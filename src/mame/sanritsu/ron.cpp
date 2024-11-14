@@ -26,6 +26,9 @@ Debug cheats:
 #include "speaker.h"
 #include "debugger.h"
 
+
+namespace {
+
 // TBD
 #define MAIN_CLOCK (XTAL(15'468'480) / 4)
 #define VIDEO_CLOCK (XTAL(15'468'480) / 3)
@@ -57,7 +60,7 @@ private:
 	// screen updates
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void ron_palette(palette_device &palette) const;
-	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
+	void vblank_irq(int state);
 
 	void output_w(uint8_t data);
 	uint8_t p1_mux_r(offs_t offset);
@@ -67,19 +70,19 @@ private:
 	uint8_t audio_cmd_r();
 	void audio_p1_w(uint8_t data);
 	void audio_p2_w(uint8_t data);
-	DECLARE_READ_LINE_MEMBER(audio_t1_r);
+	int audio_t1_r();
 	void ay_pa_w(uint8_t data);
 
-	void ron_audio_io(address_map &map);
-	void ron_audio_map(address_map &map);
-	void ron_io(address_map &map);
-	void ron_map(address_map &map);
+	void ron_audio_io(address_map &map) ATTR_COLD;
+	void ron_audio_map(address_map &map) ATTR_COLD;
+	void ron_io(address_map &map) ATTR_COLD;
+	void ron_map(address_map &map) ATTR_COLD;
 
 	// driver_device overrides
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 
 	// devices
 	required_device<cpu_device> m_maincpu;
@@ -421,7 +424,7 @@ void ron_state::ron_palette(palette_device &palette) const
 }
 
 
-WRITE_LINE_MEMBER(ron_state::vblank_irq)
+void ron_state::vblank_irq(int state)
 {
 	if (state && m_nmi_enable)
 		m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
@@ -465,7 +468,7 @@ void ron_state::audio_p2_w(uint8_t data)
 //  machine().debug_break();
 }
 
-READ_LINE_MEMBER(ron_state::audio_t1_r)
+int ron_state::audio_t1_r()
 {
 	// TODO: what controls this?
 	return !BIT(m_sound_command, 6);
@@ -547,5 +550,8 @@ ROM_START( ron2 )
 	ROM_LOAD( "82s129_3.2n",  0x000, 0x100, CRC(018ab2a0) SHA1(039c574d8fd3c1a8e9eca6a7c79fe92e8496b157) )
 	ROM_LOAD( "82s129_4.2m",  0x100, 0x100, CRC(f3c05d59) SHA1(bd48963aa9f2bedaa0c1fd031d7c93089161d1d9) )
 ROM_END
+
+} // anonymous namespace
+
 
 GAME( 1981, ron2,  0,   ron,  ron, ron_state, empty_init, ROT270, "Sanritsu", "Futari Mahjong Ron II", MACHINE_IMPERFECT_SOUND | MACHINE_WRONG_COLORS )

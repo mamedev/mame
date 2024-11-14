@@ -7,18 +7,19 @@
 //
 //============================================================
 
-#include "emu.h"
 #include "suppressor.h"
 
 #include "slider.h"
 
-bgfx_suppressor::bgfx_suppressor(std::vector<bgfx_slider*> sliders, uint32_t condition, combine_mode combine, void* value)
-	: m_sliders(sliders)
+#include <cstring>
+
+bgfx_suppressor::bgfx_suppressor(std::vector<bgfx_slider*> &&sliders, uint32_t condition, combine_mode combine, void* value)
+	: m_sliders(std::move(sliders))
 	, m_condition(condition)
 	, m_combine(combine)
 	, m_value(nullptr)
 {
-	uint32_t size = sliders[0]->size();
+	uint32_t size = m_sliders[0]->size();
 	m_value = new uint8_t[size];
 	memcpy(m_value, value, size);
 }

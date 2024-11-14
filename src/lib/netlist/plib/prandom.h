@@ -190,8 +190,8 @@ namespace plib
 				FT v2;
 				do
 				{
-					v1 = normalize_uniform(p, constants<FT>::two(), constants<FT>::one()); // [-1..1[
-					v2 = normalize_uniform(p, constants<FT>::two(), constants<FT>::one()); // [-1..1[
+					v1 = normalize_uniform(p, constants<FT>::two(), constants<FT>::one()); // [-1..1]
+					v2 = normalize_uniform(p, constants<FT>::two(), constants<FT>::one()); // [-1..1]
 					s = v1 * v1 + v2 * v2;
 				} while (s >= constants<FT>::one());
 				if (s == constants<FT>::zero())

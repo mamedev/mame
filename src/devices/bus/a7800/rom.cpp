@@ -243,12 +243,11 @@ void a78_rom_pokey_device::write_40xx(offs_t offset, uint8_t data)
 		m_pokey->write(offset & 0x0f, data);
 }
 
-// TO DO: do we need a PAL variant?!?
 void a78_rom_pokey_device::device_add_mconfig(machine_config &config)
 {
 	SPEAKER(config, "addon").front_center();
 
-	POKEY(config, m_pokey, XTAL(14'318'181)/8).add_route(ALL_OUTPUTS, "addon", 1.00);
+	POKEY(config, m_pokey, DERIVED_CLOCK(1, 1)).add_route(ALL_OUTPUTS, "addon", 1.00);
 }
 
 /*-------------------------------------------------
@@ -346,7 +345,7 @@ void a78_rom_sg_pokey_device::device_add_mconfig(machine_config &config)
 {
 	SPEAKER(config, "addon").front_center();
 
-	POKEY(config, m_pokey, XTAL(14'318'181)/8).add_route(ALL_OUTPUTS, "addon", 1.00);
+	POKEY(config, m_pokey, DERIVED_CLOCK(1, 1)).add_route(ALL_OUTPUTS, "addon", 1.00);
 }
 
 
@@ -445,13 +444,12 @@ void a78_rom_abs_device::write_40xx(offs_t offset, uint8_t data)
 
  Carts with Activision bankswitch:
  128K games. 8 x 16K banks (0-7) to be mapped at
- 0xa000-0xdfff. Bank is selected depending on the
- address written in 0xff80-0xff87.
+ 0xa000-0xdfff. Bank is selected by writing above
+ 0xe000 and depends on A2-A0.
  The rest of the memory is as follows:
- 0x4000-0x5fff second 8kb of bank 6
- 0x6000-0x7fff first 8kb of bank 6
- 0x8000-0x9fff second 8kb of bank 7
- 0xe000-0xffff first 8kb of bank 7
+ 0x4000-0x7fff bank 6
+ 0x8000-0x9fff first 8K of bank 7
+ 0xe000-0xffff second 8K of bank 7
 
  GAMES: Double Dragon, Rampage.
 
@@ -459,38 +457,25 @@ void a78_rom_abs_device::write_40xx(offs_t offset, uint8_t data)
 
 uint8_t a78_rom_act_device::read_40xx(offs_t offset)
 {
-	uint8_t data = 0xff;
-	uint16_t addr = offset & 0x1fff;
-
-	// offset goes from 0 to 0xc000
+	// offset goes from 0 to 0xbfff
 	switch (offset & 0xe000)
 	{
+		default: // unreachable: appease compiler
 		case 0x0000:
-			data = m_rom[addr + 0x1a000];
-			break;
 		case 0x2000:
-			data = m_rom[addr + 0x18000];
-			break;
-		case 0x4000:
-			data = m_rom[addr + 0x1e000];
-			break;
+			return m_rom[offset | 0x18000];
 		case 0x6000:
-			data = m_rom[addr + (m_bank * 0x4000)];
-			break;
 		case 0x8000:
-			data = m_rom[addr + (m_bank * 0x4000) + 0x2000];
-			break;
+			return m_rom[(offset & 0x3fff) | (m_bank * 0x4000)];
+		case 0x4000:
 		case 0xa000:
-			data = m_rom[addr + 0x1c000];
-			break;
+			return m_rom[offset | 0x1c000];
 	}
-
-	return data;
 }
 
 void a78_rom_act_device::write_40xx(offs_t offset, uint8_t data)
 {
-	if (offset >= 0xbf80 && offset <= 0xbf8f)
+	if (offset >= 0xa000)
 		m_bank = offset & 7;
 }
 
@@ -501,16 +486,16 @@ void a78_rom_p450_device::device_add_mconfig(machine_config &config)
 {
 	SPEAKER(config, "pokey_450").front_center();
 
-	POKEY(config, m_pokey450, XTAL(14'318'181)/8).add_route(ALL_OUTPUTS, "pokey_450", 1.00);
+	POKEY(config, m_pokey450, DERIVED_CLOCK(1, 1)).add_route(ALL_OUTPUTS, "pokey_450", 1.00);
 }
 
 void a78_rom_p450_pokey_device::device_add_mconfig(machine_config &config)
 {
 	SPEAKER(config, "addon").front_center();
 
-	POKEY(config, m_pokey, XTAL(14'318'181)/8).add_route(ALL_OUTPUTS, "addon", 1.00);
+	POKEY(config, m_pokey, DERIVED_CLOCK(1, 1)).add_route(ALL_OUTPUTS, "addon", 1.00);
 
-	POKEY(config, m_pokey450, XTAL(14'318'181)/8).add_route(ALL_OUTPUTS, "addon", 1.00);
+	POKEY(config, m_pokey450, DERIVED_CLOCK(1, 1)).add_route(ALL_OUTPUTS, "addon", 1.00);
 }
 
 
@@ -518,12 +503,12 @@ void a78_rom_p450_sg_ram_device::device_add_mconfig(machine_config &config)
 {
 	SPEAKER(config, "pokey_450").front_center();
 
-	POKEY(config, m_pokey450, XTAL(14'318'181)/8).add_route(ALL_OUTPUTS, "pokey_450", 1.00);
+	POKEY(config, m_pokey450, DERIVED_CLOCK(1, 1)).add_route(ALL_OUTPUTS, "pokey_450", 1.00);
 }
 
 void a78_rom_p450_sg9_device::device_add_mconfig(machine_config &config)
 {
 	SPEAKER(config, "pokey_450").front_center();
 
-	POKEY(config, m_pokey450, XTAL(14'318'181)/8).add_route(ALL_OUTPUTS, "pokey_450", 1.00);
+	POKEY(config, m_pokey450, DERIVED_CLOCK(1, 1)).add_route(ALL_OUTPUTS, "pokey_450", 1.00);
 }

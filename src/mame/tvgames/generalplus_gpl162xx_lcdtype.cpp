@@ -18,6 +18,7 @@
    (bkid218 cursor in test menu can't be moved in emulation, works on unit, why?)
 */
 
+// TODO: convert to use generic_spi_flash.cpp (but there seems to be some buffering of writes / reads?)
 
 #include "emu.h"
 
@@ -38,6 +39,8 @@
 #include "logmacro.h"
 
 
+namespace {
+
 class gpl162xx_lcdtype_state : public driver_device
 {
 public:
@@ -57,8 +60,8 @@ public:
 	void gpl162xx_lcdtype(machine_config &config);
 
 private:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
@@ -69,7 +72,7 @@ private:
 	required_device<palette_device> m_palette;
 	required_device<screen_device> m_screen;
 
-	void map(address_map &map);
+	void map(address_map &map) ATTR_COLD;
 
 	required_region_ptr<uint8_t> m_spirom;
 
@@ -170,7 +173,7 @@ private:
 	required_ioport m_io_in1;
 	required_device<bl_handhelds_menucontrol_device> m_menucontrol;
 
-	DECLARE_WRITE_LINE_MEMBER(screen_vblank);
+	void screen_vblank(int state);
 };
 
 uint32_t gpl162xx_lcdtype_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
@@ -207,8 +210,8 @@ static INPUT_PORTS_START( gpl162xx_lcdtype )
 	PORT_DIPNAME( 0x0004, 0x0000, "Show Vs in Test Mode" )
 	PORT_DIPSETTING(      0x0000, "0000" )
 	PORT_DIPSETTING(      0x0004, "0004" )
-	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("menucontrol", bl_handhelds_menucontrol_device, status_r)
-	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("menucontrol", bl_handhelds_menucontrol_device, data_r)
+	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("menucontrol", FUNC(bl_handhelds_menucontrol_device::status_r))
+	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("menucontrol", FUNC(bl_handhelds_menucontrol_device::data_r))
 	PORT_DIPNAME( 0x0020, 0x0020, "P0:0020" )
 	PORT_DIPSETTING(      0x0000, "0000" )
 	PORT_DIPSETTING(      0x0020, "0020" )
@@ -817,7 +820,7 @@ void gpl162xx_lcdtype_state::machine_reset()
 //  m_spirom[0x16001] = (gamenum>>8) & 0xff;
 }
 
-WRITE_LINE_MEMBER(gpl162xx_lcdtype_state::screen_vblank)
+void gpl162xx_lcdtype_state::screen_vblank(int state)
 {
 	if (state)
 	{
@@ -879,6 +882,8 @@ ROM_START( bkid218 )
 	ROM_REGION( 0x800000, "spi", ROMREGION_ERASEFF )
 	ROM_LOAD( "218n1_25q64csig_c84017.bin", 0x000000, 0x800000, CRC(94f35dbd) SHA1(a1bd6defd2465ae14753cd83be5c31f99e9158ec) )
 ROM_END
+
+} // anonymous namespace
 
 
 CONS( 200?, pcp8718,      0,       0,      gpl162xx_lcdtype,   gpl162xx_lcdtype, gpl162xx_lcdtype_state, empty_init, "PCP", "PCP 8718 - HD 360 Degrees Rocker Palm Eyecare Console - 788 in 1", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

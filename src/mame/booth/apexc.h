@@ -1,7 +1,7 @@
 // license:GPL-2.0+
 // copyright-holders:Raphael Nabet, Robbbert
-#ifndef MAME_INCLUDES_APEXC
-#define MAME_INCLUDES_APEXC
+#ifndef MAME_BOOTH_APEXC_H
+#define MAME_BOOTH_APEXC_H
 
 #pragma once
 
@@ -34,8 +34,8 @@ public:
 	void apexc(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 	TIMER_CALLBACK_MEMBER(check_inputs);
 
@@ -51,7 +51,7 @@ private:
 	void teletyper_linefeed();
 	void teletyper_putchar(int character);
 
-	void mem(address_map &map);
+	void mem(address_map &map) ATTR_COLD;
 
 	uint32_t m_panel_data_reg = 0;    /* value of a data register on the control panel which can
 	                            be edited - the existence of this register is a personnal
@@ -81,4 +81,4 @@ private:
 	static const rgb_t palette_table[4];
 };
 
-#endif // MAME_INCLUDES_APEXC
+#endif // MAME_BOOTH_APEXC_H

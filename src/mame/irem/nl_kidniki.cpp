@@ -75,6 +75,7 @@
  * ---------------------------------------------------------------------------*/
 
 static NETLIST_START(kidniki_schematics)
+{
 	//  EESCHEMA NETLIST VERSION 1.1 (SPICE FORMAT) CREATION DATE: SAT 06 JUN 2015 01:06:26 PM CEST
 	//  TO EXCLUDE A COMPONENT FROM THE SPICE NETLIST ADD [SPICE_NETLIST_ENABLED] USER FIELD SET TO: N
 	//  TO REORDER THE COMPONENT SPICE NODE SEQUENCE ADD [SPICE_NODE_SEQUENCE] USER FIELD AND DEFINE SEQUENCE: 2,1,0
@@ -349,13 +350,14 @@ static NETLIST_START(kidniki_schematics)
 	NET_C(R25.2, R26.1, C29.1)
 	NET_C(R26.2, C29.2, GND)
 
-NETLIST_END()
+}
 
 /* ----------------------------------------------------------------------------
  *  Kidniki audio
  * ---------------------------------------------------------------------------*/
 
 NETLIST_START(kidniki)
+{
 
 #if (1 || USE_FRONTIERS)
 	SOLVER(Solver, 48000)
@@ -456,4 +458,4 @@ NETLIST_START(kidniki)
 	OPTIMIZE_FRONTIER(R84.2, RES_K(50), RES_K(5))
 	#endif
 
-NETLIST_END()
+}

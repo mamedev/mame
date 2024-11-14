@@ -16,6 +16,9 @@ TeleVideo 9320 appears to run on similar hardware with a 2681 DUART replacing th
 #include "video/scn2674.h"
 #include "screen.h"
 
+
+namespace {
+
 class tv965_state : public driver_device
 {
 public:
@@ -31,8 +34,8 @@ private:
 
 	u8 ga_hack_r();
 
-	void mem_map(address_map &map);
-	void program_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
+	void program_map(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<screen_device> m_screen;
@@ -111,5 +114,8 @@ ROM_START( tv965 )
 	ROM_REGION(0x10000, "eprom2", ROMREGION_ERASE00)
 	ROM_LOAD( "180003-38h.u9", 0x00000, 0x08000, CRC(30fae408) SHA1(f05bb2a9ce2df60b046733f746d8d8a1eb3ac8bc) )
 ROM_END
+
+} // anonymous namespace
+
 
 COMP( 1989, tv965, 0, 0, tv965, tv965, tv965_state, empty_init, "TeleVideo Systems", "TeleVideo 965", MACHINE_IS_SKELETON )

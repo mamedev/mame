@@ -532,7 +532,7 @@ void deco_mlc_state::draw_sprites(const rectangle &cliprect, int scanline, u32* 
 	}
 }
 
-WRITE_LINE_MEMBER(deco_mlc_state::screen_vblank_mlc)
+void deco_mlc_state::screen_vblank_mlc(int state)
 {
 	// rising edge
 	if (state)

@@ -75,20 +75,21 @@
 #include "hx5102.h"
 #include "formats/ti99_dsk.h"
 
-#define LOG_HEXBUS         (1U<<1)   // Hexbus operation
-#define LOG_RESET          (1U<<2)   // Reset
-#define LOG_WARN           (1U<<3)   // Warnings
-#define LOG_READY          (1U<<4)   // READY
-#define LOG_SIGNALS        (1U<<5)   // IRQ/DRQ
-#define LOG_CRU            (1U<<6)   // CRU
-#define LOG_RAM            (1U<<7)   // RAM
-#define LOG_DMA            (1U<<8)   // DMA
-#define LOG_MOTOR          (1U<<9)   // Motor activity
-#define LOG_STATUS         (1U<<10)  // Main status register
-#define LOG_FIFO           (1U<<11)  // Data register
+#define LOG_HEXBUS         (1U << 1)   // Hexbus operation
+#define LOG_RESET          (1U << 2)   // Reset
+#define LOG_WARN           (1U << 3)   // Warnings
+#define LOG_READY          (1U << 4)   // READY
+#define LOG_SIGNALS        (1U << 5)   // IRQ/DRQ
+#define LOG_CRU            (1U << 6)   // CRU
+#define LOG_RAM            (1U << 7)   // RAM
+#define LOG_DMA            (1U << 8)   // DMA
+#define LOG_MOTOR          (1U << 9)   // Motor activity
+#define LOG_STATUS         (1U << 10)  // Main status register
+#define LOG_FIFO           (1U << 11)  // Data register
+#define LOG_CONFIG         (1U << 12)  // Configuration
 
 // Minimum log should be config and warnings
-#define VERBOSE ( LOG_GENERAL | LOG_WARN )
+#define VERBOSE (LOG_GENERAL | LOG_WARN | LOG_CONFIG)
 
 #include "logmacro.h"
 
@@ -103,6 +104,9 @@
 #define RAM2_TAG      "u19_ram"
 #define ROM1_TAG      "u25_rom"
 #define ROM2_TAG      "u29_rom"
+
+#define FLOP0           "d0"
+#define FLOP1           "d1"
 
 #define MOTOR_TIMER 1
 #define UNDEF -1
@@ -133,10 +137,13 @@ hx5102_device::hx5102_device(const machine_config &mconfig, const char *tag, dev
 	m_motor_on(false),
 	m_mspeed_on(false),
 	m_pending_int(false),
+	m_pending_drq(false),
 	m_dcs(false),
 	m_dack(false),
 	m_dacken(false),
 	m_wait(false),
+	m_flopcon0(*this, FLOP0),
+	m_flopcon1(*this, FLOP1),
 	m_current_floppy(nullptr),
 	m_floppy_select(0),
 	m_floppy_select_last(UNDEF),
@@ -299,7 +306,7 @@ void hx5102_device::write(offs_t offset, uint8_t data)
 /*
     Clock line from the CPU. Used to control wait state generation.
 */
-WRITE_LINE_MEMBER( hx5102_device::clock_out )
+void hx5102_device::clock_out(int state)
 {
 	m_readyff->clock_w(state);
 }
@@ -316,7 +323,7 @@ void hx5102_device::hexbus_value_changed(uint8_t data)
     Propagate READY signals to the CPU. This is used to hold the CPU
     during DMA accesses.
 */
-WRITE_LINE_MEMBER( hx5102_device::board_ready )
+void hx5102_device::board_ready(int state)
 {
 	if (m_ready_old != state)
 	{
@@ -330,7 +337,7 @@ WRITE_LINE_MEMBER( hx5102_device::board_ready )
 /*
     Trigger RESET.
 */
-WRITE_LINE_MEMBER( hx5102_device::board_reset )
+void hx5102_device::board_reset(int state)
 {
 	LOGMASKED(LOG_RESET, "Incoming RESET line = %d\n", state);
 
@@ -345,7 +352,7 @@ WRITE_LINE_MEMBER( hx5102_device::board_reset )
 /*
     Effect from the motor monoflop.
 */
-WRITE_LINE_MEMBER( hx5102_device::motor_w )
+void hx5102_device::motor_w(int state)
 {
 	m_motor_on = (state==ASSERT_LINE);
 	LOGMASKED(LOG_MOTOR, "Motor %s\n", m_motor_on? "start" : "stop");
@@ -359,7 +366,7 @@ WRITE_LINE_MEMBER( hx5102_device::motor_w )
     Effect from the speed monoflop. This is essentially a watchdog to
     check whether the lock on the CPU must be released due to an error.
 */
-WRITE_LINE_MEMBER( hx5102_device::mspeed_w )
+void hx5102_device::mspeed_w(int state)
 {
 	m_mspeed_on = (state==ASSERT_LINE);
 	LOGMASKED(LOG_READY, "Speedcheck %s\n", m_mspeed_on? "on" : "off");
@@ -448,7 +455,7 @@ void hx5102_device::hexbus_out(uint8_t data)
 /*
     Latch the HSK* to low.
 */
-WRITE_LINE_MEMBER(hx5102_device::hsklatch_out)
+void hx5102_device::hsklatch_out(int state)
 {
 	LOGMASKED(LOG_HEXBUS, "Latching HSK*\n");
 	m_myvalue &= ~HEXBUS_LINE_HSK;
@@ -483,27 +490,27 @@ uint8_t hx5102_device::cruread(offs_t offset)
 /*
     CRU write access.
 */
-WRITE_LINE_MEMBER(hx5102_device::nocomp_w)
+void hx5102_device::nocomp_w(int state)
 {
 	// unused right now
 	LOGMASKED(LOG_CRU, "Set precompensation = %d\n", state);
 }
 
-WRITE_LINE_MEMBER(hx5102_device::diren_w)
+void hx5102_device::diren_w(int state)
 {
 	LOGMASKED(LOG_CRU, "Set step direction = %d\n", state);
 	if (m_current_floppy != nullptr)
 		m_current_floppy->dir_w((state==0)? 1 : 0);
 }
 
-WRITE_LINE_MEMBER(hx5102_device::dacken_w)
+void hx5102_device::dacken_w(int state)
 {
 	if (state==1)
 		LOGMASKED(LOG_CRU, "Assert DACK*\n");
 	m_dacken = (state != 0);
 }
 
-WRITE_LINE_MEMBER(hx5102_device::stepen_w)
+void hx5102_device::stepen_w(int state)
 {
 	if (state==1)
 		LOGMASKED(LOG_CRU, "Step pulse\n");
@@ -511,7 +518,7 @@ WRITE_LINE_MEMBER(hx5102_device::stepen_w)
 		m_current_floppy->stp_w((state==0)? 1 : 0);
 }
 
-WRITE_LINE_MEMBER(hx5102_device::ds1_w)
+void hx5102_device::ds1_w(int state)
 {
 	LOGMASKED(LOG_CRU, "Set drive select 0 to %d\n", state);
 	if (state == 1)
@@ -521,7 +528,7 @@ WRITE_LINE_MEMBER(hx5102_device::ds1_w)
 	update_drive_select();
 }
 
-WRITE_LINE_MEMBER(hx5102_device::ds2_w)
+void hx5102_device::ds2_w(int state)
 {
 	LOGMASKED(LOG_CRU, "Set drive select 1 to %d\n", state);
 	if (state == 1)
@@ -531,25 +538,25 @@ WRITE_LINE_MEMBER(hx5102_device::ds2_w)
 	update_drive_select();
 }
 
-WRITE_LINE_MEMBER(hx5102_device::ds3_w)
+void hx5102_device::ds3_w(int state)
 {
 	// External drive; not implemented
 	LOGMASKED(LOG_CRU, "Set drive select 2 to %d\n", state);
 }
 
-WRITE_LINE_MEMBER(hx5102_device::ds4_w)
+void hx5102_device::ds4_w(int state)
 {
 	// External drive; not implemented
 	LOGMASKED(LOG_CRU, "Set drive select 3 to %d\n", state);
 }
 
-WRITE_LINE_MEMBER(hx5102_device::aux_motor_w)
+void hx5102_device::aux_motor_w(int state)
 {
 	// External drive; not implemented
 	LOGMASKED(LOG_CRU, "Set auxiliary motor line to %d\n", state);
 }
 
-WRITE_LINE_MEMBER(hx5102_device::wait_w)
+void hx5102_device::wait_w(int state)
 {
 	m_wait = (state!=0);
 	LOGMASKED(LOG_CRU, "READY circuit %s\n", m_wait? "active" : "inactive" );
@@ -580,13 +587,21 @@ void hx5102_device::update_drive_select()
 */
 void hx5102_device::device_start()
 {
-	m_floppy[0] = m_floppy[1] = nullptr;
-
-	if (subdevice("d0")!=nullptr) m_floppy[0] = static_cast<floppy_image_device*>(subdevice("d0")->subdevices().first());
-	if (subdevice("d1")!=nullptr) m_floppy[1] = static_cast<floppy_image_device*>(subdevice("d1")->subdevices().first());
-
 	m_rom1 = (uint8_t*)memregion(DSR_TAG)->base();
 	m_rom2 = (uint8_t*)memregion(DSR_TAG)->base() + 0x2000;
+
+	m_floppy[0] = m_flopcon0->get_device();
+	m_floppy[1] = m_flopcon1->get_device();
+
+	if (m_floppy[0] != nullptr)
+		LOGMASKED(LOG_CONFIG, "Internal floppy drive connected\n");
+	else
+		LOGMASKED(LOG_WARN, "Internal floppy drive not found\n");
+
+	if (m_floppy[1] != nullptr)
+		LOGMASKED(LOG_CONFIG, "External floppy drive connected\n");
+	else
+		LOGMASKED(LOG_CONFIG, "External floppy drive not connected\n");
 }
 
 /*
@@ -602,7 +617,7 @@ void hx5102_device::device_reset()
     Callbacks from the i8272A chip
     Interrupt
 */
-WRITE_LINE_MEMBER( hx5102_device::fdc_irq_w )
+void hx5102_device::fdc_irq_w(int state)
 {
 	line_state irq = state? ASSERT_LINE : CLEAR_LINE;
 	LOGMASKED(LOG_SIGNALS, "INTRQ callback = %d\n", irq);
@@ -614,7 +629,7 @@ WRITE_LINE_MEMBER( hx5102_device::fdc_irq_w )
     Callbacks from the i8272A chip
     DMA request
 */
-WRITE_LINE_MEMBER( hx5102_device::fdc_drq_w )
+void hx5102_device::fdc_drq_w(int state)
 {
 	line_state drq = state? ASSERT_LINE : CLEAR_LINE;
 	LOGMASKED(LOG_SIGNALS, "DRQ callback = %d\n", drq);
@@ -685,8 +700,8 @@ void hx5102_device::device_add_mconfig(machine_config& config)
 	m_floppy_ctrl->intrq_wr_callback().set(FUNC(hx5102_device::fdc_irq_w));
 	m_floppy_ctrl->drq_wr_callback().set(FUNC(hx5102_device::fdc_drq_w));
 
-	FLOPPY_CONNECTOR(config, "d0", hx5102_drive, "525dd", hx5102_device::floppy_formats).enable_sound(true);
-	FLOPPY_CONNECTOR(config, "d1", hx5102_drive, nullptr, hx5102_device::floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, m_flopcon0, hx5102_drive, "525dd", hx5102_device::floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, m_flopcon1, hx5102_drive, nullptr, hx5102_device::floppy_formats).enable_sound(true);
 
 	// Addressable latches
 	LS259(config, m_crulatch[0]); // U18

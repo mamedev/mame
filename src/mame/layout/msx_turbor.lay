@@ -1,0 +1,91 @@
+<?xml version="1.0"?>
+<!--
+license:CC0-1.0
+-->
+
+<mamelayout version="2">
+	<element name="green_led">
+		<rect state="0">
+			<color red="0.2" green="0.2" blue="0.2" />
+		</rect>
+		<rect state="1">
+			<color red="0.0" green="1.0" blue="0.0" />
+		</rect>
+	</element>
+	<element name="orange_led">
+		<rect state="0">
+			<color red="0.2" green="0.2" blue="0.2" />
+		</rect>
+		<rect state="1">
+			<color red="1.0" green="0.6" blue="0.0" />
+		</rect>
+	</element>
+	<element name="caps_name">
+		<text string="Caps" align="1">
+			<color red="1.0" green="1.0" blue="1.0" />
+		</text>
+	</element>
+	<element name="code_name">
+		<text string="かな" align="1">
+			<color red="1.0" green="1.0" blue="1.0" />
+		</text>
+	</element>
+	<element name="pause_name">
+		<text string="Pause" align="1">
+			<color red="1.0" green="1.0" blue="1.0" />
+		</text>
+	</element>
+	<element name="r800_name">
+		<text string="高速モード" align="1">
+			<color red="1.0" green="1.0" blue="1.0" />
+		</text>
+	</element>
+	<element name="drv0">
+		<text string="Drive A" align="1">
+			<color red="1.0" green="1.0" blue="1.0" />
+		</text>
+	</element>
+	<element name="not_present" />
+
+	<view name="System LEDs">
+		<screen index="0">
+			<bounds x="75" y="0" width="1024" height="768" />
+		</screen>
+		<element name="caps_led_name" ref="caps_name">
+			<bounds left="0" right="74" top="0" bottom="30" />
+		</element>
+		<element name="caps_led" ref="green_led">
+			<bounds left="0" right="20" top="31" bottom="39" />
+		</element>
+		<element name="code_led_name" ref="code_name">
+			<bounds left="0" right="74" top="40" bottom="70" />
+		</element>
+		<element name="code_led" ref="green_led">
+			<bounds left="0" right="20" top="71" bottom="79" />
+		</element>
+		<element name="pause_led_name" ref="pause_name">
+			<bounds left="0" right="74" top="80" bottom="110" />
+		</element>
+		<element name="pause_led" ref="green_led">
+			<bounds left="0" right="20" top="111" bottom="119" />
+		</element>
+		<element name="r800_led_name" ref="r800_name">
+			<bounds left="0" right="74" top="120" bottom="150" />
+		</element>
+		<element name="r800_led" ref="green_led">
+			<bounds left="0" right="20" top="151" bottom="159" />
+		</element>
+		<element name="internal_drive0_name" ref="drv0">
+			<bounds left="0" right="74" top="160" bottom="190" />
+		</element>
+		<element name="internal_drive0_led" ref="orange_led">
+			<bounds left="0" right="20" top="191" bottom="199" />
+		</element>
+		<element name="internal_drive1_name" ref="not_present">
+			<bounds left="0" right="74" top="200" bottom="230" />
+		</element>
+		<element name="internal_drive1_led" ref="not_present">
+			<bounds left="0" right="20" top="231" bottom="239" />
+		</element>
+	</view>
+</mamelayout>

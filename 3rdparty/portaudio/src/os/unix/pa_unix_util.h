@@ -27,13 +27,13 @@
  */
 
 /*
- * The text above constitutes the entire PortAudio license; however, 
+ * The text above constitutes the entire PortAudio license; however,
  * the PortAudio community also makes the following non-binding requests:
  *
  * Any person wishing to distribute modifications to the Software is
  * requested to send the modifications to the original developer so that
- * they can be incorporated into the canonical version. It is also 
- * requested that these non-binding requests be included along with the 
+ * they can be incorporated into the canonical version. It is also
+ * requested that these non-binding requests be included along with the
  * license above.
  */
 
@@ -44,6 +44,7 @@
 #ifndef PA_UNIX_UTIL_H
 #define PA_UNIX_UTIL_H
 
+#include "pa_util.h"
 #include "pa_cpuload.h"
 #include <assert.h>
 #include <pthread.h>
@@ -64,14 +65,11 @@ extern "C"
 #define UNLIKELY(expr) (expr)
 #endif
 
-#define STRINGIZE_HELPER(expr) #expr
-#define STRINGIZE(expr) STRINGIZE_HELPER(expr)
-
 #define PA_UNLESS(expr, code) \
     do { \
         if( UNLIKELY( (expr) == 0 ) ) \
         { \
-            PaUtil_DebugPrint(( "Expression '" #expr "' failed in '" __FILE__ "', line: " STRINGIZE( __LINE__ ) "\n" )); \
+            PaUtil_DebugPrint(( "Expression '" #expr "' failed in '" __FILE__ "', line: " PA_STRINGIZE( __LINE__ ) "\n" )); \
             result = (code); \
             goto error; \
         } \
@@ -84,7 +82,7 @@ static PaError paUtilErr_;          /* Used with PA_ENSURE */
     do { \
         if( UNLIKELY( (paUtilErr_ = (expr)) < paNoError ) ) \
         { \
-            PaUtil_DebugPrint(( "Expression '" #expr "' failed in '" __FILE__ "', line: " STRINGIZE( __LINE__ ) "\n" )); \
+            PaUtil_DebugPrint(( "Expression '" #expr "' failed in '" __FILE__ "', line: " PA_STRINGIZE( __LINE__ ) "\n" )); \
             result = paUtilErr_; \
             goto error; \
         } \
@@ -103,7 +101,7 @@ static PaError paUtilErr_;          /* Used with PA_ENSURE */
             { \
                 PaUtil_SetLastHostErrorInfo( paALSA, paUtilErr_, strerror( paUtilErr_ ) ); \
             } \
-            PaUtil_DebugPrint( "Expression '" #expr "' failed in '" __FILE__ "', line: " STRINGIZE( __LINE__ ) "\n" ); \
+            PaUtil_DebugPrint( "Expression '" #expr "' failed in '" __FILE__ "', line: " PA_STRINGIZE( __LINE__ ) "\n" ); \
             result = paUnanticipatedHostError; \
             goto error; \
         } \
@@ -157,7 +155,7 @@ typedef struct
 
 /** Initialize global threading state.
  */
-PaError PaUnixThreading_Initialize();
+PaError PaUnixThreading_Initialize( void );
 
 /** Perish, passing on eventual error code.
  *
@@ -182,7 +180,7 @@ PaError PaUnixThreading_Initialize();
 /** Spawn a thread.
  *
  * Intended for spawning the callback thread from the main thread. This function can even block (for a certain
- * time or indefinitely) untill notified by the callback thread (using PaUnixThread_NotifyParent), which can be
+ * time or indefinitely) until notified by the callback thread (using PaUnixThread_NotifyParent), which can be
  * useful in order to make sure that callback has commenced before returning from Pa_StartStream.
  * @param threadFunc: The function to be executed in the child thread.
  * @param waitForChild: If not 0, wait for child thread to call PaUnixThread_NotifyParent. Less than 0 means
@@ -195,7 +193,7 @@ PaError PaUnixThread_New( PaUnixThread* self, void* (*threadFunc)( void* ), void
 
 /** Terminate thread.
  *
- * @param wait: If true, request that background thread stop and wait untill it does, else cancel it.
+ * @param wait: If true, request that background thread stop and wait until it does, else cancel it.
  * @param exitResult: If non-null this will upon return contain the exit status of the thread.
  */
 PaError PaUnixThread_Terminate( PaUnixThread* self, int wait, PaError* exitResult );

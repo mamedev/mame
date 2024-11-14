@@ -86,8 +86,6 @@ uint32_t arm_aic_device::firq_vector_r()
 
 void arm_aic_device::device_start()
 {
-	m_irq_out.resolve_safe();
-
 	save_item(NAME(m_irqs_enabled));
 	save_item(NAME(m_irqs_pending));
 	save_item(NAME(m_current_irq_vector));

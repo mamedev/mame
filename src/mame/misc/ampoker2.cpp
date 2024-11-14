@@ -49,7 +49,7 @@
 
   To 'init' (boot) the machine:
   1) Turn ON the Operator Key (9).
-  2) Keep pressed the DOOR key (W). You are entering the Operator Mode.
+  2) Keep pressed the DOOR key (O). You are entering the Operator Mode.
   3) Turn OFF the Operator Key (9).
   4) Reset the machine. (you must reset manually the machine due to watchdog issues).
 

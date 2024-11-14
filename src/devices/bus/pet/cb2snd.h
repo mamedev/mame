@@ -25,13 +25,13 @@ public:
 	// construction/destruction
 	pet_userport_cb2_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual DECLARE_WRITE_LINE_MEMBER( input_m ) override;
+	virtual void input_m(int state) override;
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 	required_device<dac_bit_interface> m_dac;
 };

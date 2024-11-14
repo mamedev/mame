@@ -417,20 +417,20 @@ void segaorun_state::bankmotor_control_w(uint8_t data)
 	if (data < 8)
 	{
 		// left
-		output().set_value("Bank_Motor_Direction", 1);
-		output().set_value("Bank_Motor_Speed", 8 - data);
+		m_bank_motor_direction = 1;
+		m_bank_motor_speed = 8 - data;
 	}
 	else if (data == 8)
 	{
 		// no movement
-		output().set_value("Bank_Motor_Direction", 0);
-		output().set_value("Bank_Motor_Speed", 0);
+		m_bank_motor_direction = 0;
+		m_bank_motor_speed = 0;
 	}
 	else
 	{
 		// right
-		output().set_value("Bank_Motor_Direction", 2);
-		output().set_value("Bank_Motor_Speed", data - 8);
+		m_bank_motor_direction = 2;
+		m_bank_motor_speed = data - 8;
 	}
 }
 
@@ -530,6 +530,15 @@ void segaorun_state::nop_w(address_space &space, offs_t offset, uint16_t data, u
 //  DRIVER OVERRIDES
 //**************************************************************************
 
+void segaorun_state::machine_start()
+{
+	m_bank_motor_direction.resolve();
+	m_bank_motor_speed.resolve();
+	m_vibration_motor.resolve();
+	m_start_lamp.resolve();
+	m_brake_lamp.resolve();
+}
+
 //-------------------------------------------------
 //  machine_reset - reset the state of the machine
 //-------------------------------------------------
@@ -540,9 +549,6 @@ void segaorun_state::machine_reset()
 	if (m_custom_map != nullptr)
 		m_mapper->configure_explicit(m_custom_map);
 	m_segaic16vid->tilemap_reset(*m_screen);
-
-	// hook the RESET line, which resets CPU #1
-	m_maincpu->set_reset_callback(*this, FUNC(segaorun_state::m68k_reset_callback));
 
 	// start timers to track interrupts
 	m_scanline_timer->adjust(m_screen->time_until_pos(223), 223);
@@ -689,9 +695,9 @@ void segaorun_state::outrun_custom_io_w(offs_t offset, uint16_t data, uint16_t m
 				//  D1: Brake lamp
 				//  other bits: ?
 				machine().sound().system_mute(!BIT(data, 7));
-				output().set_value("Vibration_motor", BIT(data, 5));
-				output().set_value("Start_lamp", BIT(data, 2));
-				output().set_value("Brake_lamp", BIT(data, 1));
+				m_vibration_motor = BIT(data, 5);
+				m_start_lamp = BIT(data, 2);
+				m_brake_lamp = BIT(data, 1);
 			}
 			return;
 
@@ -765,9 +771,9 @@ void segaorun_state::shangon_custom_io_w(offs_t offset, uint16_t data, uint16_t 
 				//  D2: Start lamp
 				//  other bits: ?
 				m_adc_select = data >> 6 & 3;
-				m_segaic16vid->set_display_enable(data >> 5 & 1);
-				output().set_value("Vibration_motor", data >> 3 & 1);
-				output().set_value("Start_lamp", data >> 2 & 1);
+				m_segaic16vid->set_display_enable(BIT(data, 5));
+				m_vibration_motor = BIT(data, 3);
+				m_start_lamp = BIT(data, 2);
 			}
 			return;
 
@@ -825,7 +831,7 @@ void segaorun_state::update_main_irqs()
 
 	// boost interleave during VBLANK and IRQ2 signals
 	if (m_vblank_irq_state || m_irq2_state)
-		machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(100));
+		machine().scheduler().perfect_quantum(attotime::from_usec(100));
 }
 
 
@@ -834,7 +840,7 @@ void segaorun_state::update_main_irqs()
 //  main 68000 is reset
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER(segaorun_state::m68k_reset_callback)
+void segaorun_state::m68k_reset_callback(int state)
 {
 	m_subcpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
 }
@@ -906,7 +912,7 @@ void segaorun_state::sound_portmap(address_map &map)
 //  GENERIC PORT DEFINITIONS
 //**************************************************************************
 
-CUSTOM_INPUT_MEMBER(segaorun_state::bankmotor_pos_r)
+ioport_value segaorun_state::bankmotor_pos_r()
 {
 	return m_bankmotor_pos >> 8 & 0xff;
 }
@@ -957,7 +963,7 @@ static INPUT_PORTS_START( outrun_generic )
 	PORT_BIT( 0xff, 0x00, IPT_PEDAL2 ) PORT_SENSITIVITY(100) PORT_KEYDELTA(40)
 
 	PORT_START("ADC.3")
-	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(segaorun_state, bankmotor_pos_r)
+	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(FUNC(segaorun_state::bankmotor_pos_r))
 INPUT_PORTS_END
 
 
@@ -1155,6 +1161,7 @@ void segaorun_state::outrun_base(machine_config &config)
 	// basic machine hardware
 	M68000(config, m_maincpu, MASTER_CLOCK/4);
 	m_maincpu->set_addrmap(AS_PROGRAM, &segaorun_state::outrun_map);
+	m_maincpu->reset_cb().set(FUNC(segaorun_state::m68k_reset_callback));
 
 	M68000(config, m_subcpu, MASTER_CLOCK/4);
 	m_subcpu->set_addrmap(AS_PROGRAM, &segaorun_state::sub_map);
@@ -1238,6 +1245,7 @@ void segaorun_state::outrun_fd1094(machine_config &config)
 	FD1094(config.replace(), m_maincpu, MASTER_CLOCK/4);
 	m_maincpu->set_addrmap(AS_PROGRAM, &segaorun_state::outrun_map);
 	m_maincpu->set_addrmap(AS_OPCODES, &segaorun_state::decrypted_opcodes_map);
+	m_maincpu->reset_cb().set(FUNC(segaorun_state::m68k_reset_callback));
 }
 
 void segaorun_state::outrun_fd1089a(machine_config &config)
@@ -1247,6 +1255,7 @@ void segaorun_state::outrun_fd1089a(machine_config &config)
 	// basic machine hardware
 	FD1089A(config.replace(), m_maincpu, MASTER_CLOCK/4);
 	m_maincpu->set_addrmap(AS_PROGRAM, &segaorun_state::outrun_map);
+	m_maincpu->reset_cb().set(FUNC(segaorun_state::m68k_reset_callback));
 }
 
 void segaorun_state::shangon(machine_config &config)
@@ -1277,6 +1286,7 @@ void segaorun_state::shangon_fd1089b(machine_config &config)
 	// basic machine hardware
 	FD1089B(config.replace(), m_maincpu, MASTER_CLOCK/4);
 	m_maincpu->set_addrmap(AS_PROGRAM, &segaorun_state::outrun_map);
+	m_maincpu->reset_cb().set(FUNC(segaorun_state::m68k_reset_callback));
 }
 
 

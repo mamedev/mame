@@ -6,8 +6,8 @@
 
 ***************************************************************************/
 
-#ifndef MAME_VIDEO_ALPHA68K_PALETTE_H
-#define MAME_VIDEO_ALPHA68K_PALETTE_H
+#ifndef MAME_SHARED_ALPHA68K_PALETTE_H
+#define MAME_SHARED_ALPHA68K_PALETTE_H
 
 #pragma once
 
@@ -42,10 +42,10 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
-	virtual uint32_t palette_entries() const override { return m_entries; }
+	virtual uint32_t palette_entries() const noexcept override { return m_entries; }
 private:
 	std::vector<uint16_t> m_paletteram;
 	u32 m_entries = 0;
@@ -65,4 +65,4 @@ DECLARE_DEVICE_TYPE(ALPHA68K_PALETTE, alpha68k_palette_device)
 //**************************************************************************
 
 
-#endif // MAME_VIDEO_ALPHA68K_PALETTE_H
+#endif // MAME_SHARED_ALPHA68K_PALETTE_H

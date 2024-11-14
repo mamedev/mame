@@ -12,8 +12,6 @@
 #pragma once
 
 #include "cbmiec.h"
-#include "cpu/m6502/m6502.h"
-#include "formats/d81_dsk.h"
 #include "imagedev/floppy.h"
 #include "machine/mos6526.h"
 #include "machine/wd_fdc.h"
@@ -44,13 +42,13 @@ protected:
 	c1581_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// optional information overrides
-	virtual const tiny_rom_entry *device_rom_region() const override;
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual ioport_constructor device_input_ports() const override;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 
 	// device_cbm_iec_interface overrides
 	virtual void cbm_iec_srq(int state) override;
@@ -67,14 +65,14 @@ private:
 
 	void update_iec();
 
-	DECLARE_WRITE_LINE_MEMBER( cnt_w );
-	DECLARE_WRITE_LINE_MEMBER( sp_w );
+	void cnt_w(int state);
+	void sp_w(int state);
 	uint8_t cia_pa_r();
 	void cia_pa_w(uint8_t data);
 	uint8_t cia_pb_r();
 	void cia_pb_w(uint8_t data);
 
-	void c1581_mem(address_map &map);
+	void c1581_mem(address_map &map) ATTR_COLD;
 
 	static void floppy_formats(format_registration &fr);
 
@@ -102,7 +100,7 @@ public:
 	c1563_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// optional information overrides
-	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 };
 
 

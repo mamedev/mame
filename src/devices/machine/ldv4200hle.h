@@ -2,7 +2,7 @@
 // copyright-holders:Ryan Holtz
 /*************************************************************************
 
-    ldv1000hle.h
+    ldv4200hle.h
 
     Pioneer LD-V4200 laserdisc player simulation.
 
@@ -52,8 +52,8 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// laserdisc overrides
 	virtual void player_vsync(const vbi_metadata &vbi, int fieldnum, const attotime &curtime) override;

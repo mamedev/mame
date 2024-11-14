@@ -68,22 +68,22 @@ public:
 	virtual uint8_t read(offs_t offset);
 	virtual void write(offs_t offset, uint8_t data);
 
-	DECLARE_WRITE_LINE_MEMBER( hack_w );
-	DECLARE_WRITE_LINE_MEMBER( ready_w );
-	DECLARE_WRITE_LINE_MEMBER( eop_w );
+	void hack_w(int state);
+	void ready_w(int state);
+	void eop_w(int state);
 
-	template <unsigned C> DECLARE_WRITE_LINE_MEMBER( dreq_w ) { dma_request(C, state); }
-	DECLARE_WRITE_LINE_MEMBER( dreq0_w );
-	DECLARE_WRITE_LINE_MEMBER( dreq1_w );
-	DECLARE_WRITE_LINE_MEMBER( dreq2_w );
-	DECLARE_WRITE_LINE_MEMBER( dreq3_w );
+	template <unsigned C> void dreq_w(int state) { dma_request(C, state); }
+	void dreq0_w(int state);
+	void dreq1_w(int state);
+	void dreq2_w(int state);
+	void dreq3_w(int state);
 
 protected:
 	am9517a_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 	virtual void execute_run() override;
 
 	virtual void end_of_process();
@@ -160,8 +160,8 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	virtual void dma_read() override;
 	virtual void dma_write() override;
@@ -187,7 +187,7 @@ public:
 	pcxport_dmac_device(const machine_config &mconfig,  const char *tag, device_t *owner, uint32_t clock);
 
 protected:
-	virtual void device_reset() override;
+	virtual void device_reset() override ATTR_COLD;
 
 	virtual void end_of_process() override;
 };
@@ -231,7 +231,7 @@ public:
 	}
 
 protected:
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 private:
 	u32 m_stop[4];

@@ -8,22 +8,25 @@
 
 ***************************************************************************/
 
-#ifndef MAME_INCLUDES_COCO_H
-#define MAME_INCLUDES_COCO_H
+#ifndef MAME_TRS_COCO_H
+#define MAME_TRS_COCO_H
 
 #pragma once
 
-#include "imagedev/cassette.h"
-#include "bus/rs232/rs232.h"
-#include "machine/6821pia.h"
-#include "bus/coco/cococart.h"
 #include "coco_vhd.h"
+
 #include "bus/coco/coco_dwsock.h"
-#include "machine/ram.h"
+#include "bus/coco/cococart.h"
+#include "bus/rs232/rs232.h"
+#include "imagedev/cassette.h"
+#include "machine/6821pia.h"
 #include "machine/bankdev.h"
-#include "sound/dac.h"
-#include "screen.h"
 #include "machine/input_merger.h"
+#include "machine/ram.h"
+#include "sound/dac.h"
+
+#include "screen.h"
+
 
 //**************************************************************************
 //  MACROS / CONSTANTS
@@ -31,9 +34,7 @@
 
 INPUT_PORTS_EXTERN( coco_analog_control );
 INPUT_PORTS_EXTERN( coco_joystick );
-INPUT_PORTS_EXTERN( coco_rtc );
 INPUT_PORTS_EXTERN( coco_beckerport );
-INPUT_PORTS_EXTERN( coco_beckerport_dw );
 
 void coco_cart(device_slot_interface &device);
 
@@ -43,17 +44,7 @@ void coco_cart(device_slot_interface &device);
 
 // devices
 #define MAINCPU_TAG                 "maincpu"
-#define PIA0_TAG                    "pia0"
-#define PIA1_TAG                    "pia1"
-#define SAM_TAG                     "sam"
-#define VDG_TAG                     "vdg"
-#define SCREEN_TAG                  "screen"
-#define CARTRIDGE_TAG               "ext"
 #define RS232_TAG                   "rs232"
-#define DWSOCK_TAG                  "dwsock"
-#define VHD0_TAG                    "vhd0"
-#define VHD1_TAG                    "vhd1"
-#define FLOATING_TAG                "floating"
 
 // inputs
 #define CTRL_SEL_TAG                "ctrl_sel"
@@ -99,16 +90,16 @@ public:
 	// PIA0
 	void pia0_pa_w(uint8_t data);
 	void pia0_pb_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER( pia0_ca2_w );
-	DECLARE_WRITE_LINE_MEMBER( pia0_cb2_w );
+	void pia0_ca2_w(int state);
+	void pia0_cb2_w(int state);
 
 	// PIA1
 	uint8_t pia1_pa_r();
 	uint8_t pia1_pb_r();
 	void pia1_pa_w(uint8_t data);
 	void pia1_pb_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER( pia1_ca2_w );
-	DECLARE_WRITE_LINE_MEMBER( pia1_cb2_w );
+	void pia1_ca2_w(int state);
+	void pia1_cb2_w(int state);
 
 	// floating bus & "space"
 	uint8_t floating_bus_r()   { return floating_bus_read(); }
@@ -116,7 +107,7 @@ public:
 	void floating_space_write(offs_t offset, uint8_t data);
 
 	// cartridge stuff
-	DECLARE_WRITE_LINE_MEMBER( cart_w ) { cart_w((bool) state); }
+	void cart_w(int state) { cart_w((bool) state); }
 	virtual address_space &cartridge_space() override;
 
 	// disassembly override
@@ -126,12 +117,12 @@ public:
 	void coco_sound(machine_config &config);
 	void coco_floating(machine_config &config);
 
-	void coco_floating_map(address_map &map);
+	void coco_floating_map(address_map &map) ATTR_COLD;
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// changed handlers
 	virtual void pia1_pa_changed(uint8_t data);
@@ -182,31 +173,31 @@ protected:
 		ioport_port *m_buttons{};
 
 		uint32_t input(int joystick, int axis) const { return m_input[joystick][axis] ? m_input[joystick][axis]->read() : 0x00; }
-		uint8_t buttons(void) const { return m_buttons ? m_buttons->read() : 0x00; }
+		uint8_t buttons() const { return m_buttons ? m_buttons->read() : 0x00; }
 	};
 
 	void analog_port_start(analog_input_t *analog, const char *rx_tag, const char *ry_tag, const char *lx_tag, const char *ly_tag, const char *buttons_tag);
 
 	// wrappers for configuration
 	joystick_type_t joystick_type(int index);
-	hires_type_t hires_interface_type(void);
+	hires_type_t hires_interface_type();
 	bool is_joystick_hires(int joystick_index);
 
-	soundmux_status_t soundmux_status(void);
-	void update_sound(void);
-	bool poll_joystick(void);
-	uint8_t poll_joystick_buttons(void);
-	void poll_keyboard(void);
-	void poll_hires_joystick(void);
+	soundmux_status_t soundmux_status();
+	void update_sound();
+	bool poll_joystick();
+	uint8_t poll_joystick_buttons();
+	void poll_keyboard();
+	void poll_hires_joystick();
 	void update_cassout(int cassout);
 	void update_prinout(bool prinout);
-	void diecom_lightgun_clock(void);
+	void diecom_lightgun_clock();
 
 	// thin wrappers for PIA output
-	uint8_t dac_output(void)  { return m_dac_output; }    // PA drives the DAC
-	bool sel1(void)         { return m_pia_0->ca2_output() ? true : false; }
-	bool sel2(void)         { return m_pia_0->cb2_output() ? true : false; }
-	bool snden(void)        { return m_pia_1->cb2_output() ? true : false; }
+	uint8_t dac_output()    { return m_dac_output; }    // PA drives the DAC
+	bool sel1()             { return m_pia_0->ca2_output() ? true : false; }
+	bool sel2()             { return m_pia_0->cb2_output() ? true : false; }
+	bool snden()            { return m_pia_1->cb2_output() ? true : false; }
 
 	// VHD selection
 	coco_vhd_image_device *current_vhd();
@@ -270,4 +261,4 @@ protected:
 	bool m_in_floating_bus_read = false;
 };
 
-#endif // MAME_INCLUDES_COCO_H
+#endif // MAME_TRS_COCO_H

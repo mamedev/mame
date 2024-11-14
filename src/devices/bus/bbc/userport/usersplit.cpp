@@ -23,7 +23,7 @@ DEFINE_DEVICE_TYPE(BBC_USERSPLIT, bbc_usersplit_device, "bbc_usersplit", "BBC Mi
 
 static INPUT_PORTS_START( usersplit )
 	PORT_START("SELECT")
-	PORT_CONFNAME(0x01, 0x00, "User Port") PORT_CHANGED_MEMBER(DEVICE_SELF, bbc_usersplit_device, userport_changed, 0)
+	PORT_CONFNAME(0x01, 0x00, "User Port") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(bbc_usersplit_device::userport_changed), 0)
 	PORT_CONFSETTING(0x00, "A")
 	PORT_CONFSETTING(0x01, "B")
 INPUT_PORTS_END
@@ -109,25 +109,25 @@ void bbc_usersplit_device::write_cb2(int state)
 }
 
 
-WRITE_LINE_MEMBER(bbc_usersplit_device::cb1a_w)
+void bbc_usersplit_device::cb1a_w(int state)
 {
 	if (m_selected == 0x00)
 		m_slot->cb1_w(state);
 }
 
-WRITE_LINE_MEMBER(bbc_usersplit_device::cb2a_w)
+void bbc_usersplit_device::cb2a_w(int state)
 {
 	if (m_selected == 0x00)
 		m_slot->cb2_w(state);
 }
 
-WRITE_LINE_MEMBER(bbc_usersplit_device::cb1b_w)
+void bbc_usersplit_device::cb1b_w(int state)
 {
 	if (m_selected == 0x01)
 		m_slot->cb1_w(state);
 }
 
-WRITE_LINE_MEMBER(bbc_usersplit_device::cb2b_w)
+void bbc_usersplit_device::cb2b_w(int state)
 {
 	if (m_selected == 0x01)
 		m_slot->cb2_w(state);

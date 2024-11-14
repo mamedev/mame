@@ -14,7 +14,6 @@ How to play
 6. To miss, press the wrong button, it says OOPS.
 7. After 3 misses, the game ends.
 
-
 ****************************************************************************/
 
 #include "emu.h"
@@ -28,29 +27,35 @@ How to play
 #include "icecold.lh"
 
 
+namespace {
+
 class icecold_state : public driver_device
 {
 public:
-	icecold_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-			m_maincpu(*this, "maincpu"),
-			m_ay8910(*this, "ay%u", 0U),
-			m_pia1(*this, "pia1"),
-			m_digit_outputs(*this, "digit%u", 0U),
-			m_lamp_outputs(*this, "lamp%u", 1U),
-			m_lmotor_output(*this, "lmotor"),
-			m_rmotor_output(*this, "rmotor"),
-			m_in_play(*this, "in_play"),
-			m_good_game(*this, "good_game"),
-			m_game_over(*this, "game_over"),
-			m_tilt_output(*this, "tilt"),
-			m_start_output(*this, "start")
+	icecold_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_ay8910(*this, "ay%u", 0U),
+		m_pia1(*this, "pia1"),
+		m_digit_outputs(*this, "digit%u", 0U),
+		m_lamp_outputs(*this, "lamp%u", 1U),
+		m_lmotor_output(*this, "lmotor"),
+		m_rmotor_output(*this, "rmotor"),
+		m_in_play(*this, "in_play"),
+		m_good_game(*this, "good_game"),
+		m_game_over(*this, "game_over"),
+		m_tilt_output(*this, "tilt"),
+		m_start_output(*this, "start")
 	{ }
 
 	void icecold(machine_config &config);
 
 	DECLARE_INPUT_CHANGED_MEMBER( test_switch_press );
-	DECLARE_CUSTOM_INPUT_MEMBER( motors_limit_r );
+	ioport_value motors_limit_r();
+
+protected:
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	void scanlines_w(uint8_t data);
@@ -63,10 +68,6 @@ private:
 	void ay8910_1_a_w(uint8_t data);
 	void ay8910_1_b_w(uint8_t data);
 	void motors_w(uint8_t data);
-
-	// driver_device overrides
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
 
 	// devices
 	required_device<cpu_device> m_maincpu;
@@ -84,10 +85,10 @@ private:
 	output_finder<> m_tilt_output;
 	output_finder<> m_start_output;
 
-	uint8_t   m_digit = 0;            // scanlines from i8279
-	uint8_t   m_sound_latch = 0;      // sound bus latch
-	uint8_t   m_ay_ctrl = 0;          // ay controls line
-	uint8_t   m_motors_ctrl = 0;      // motors control
+	uint8_t m_digit = 0;            // scanlines from i8279
+	uint8_t m_sound_latch = 0;      // sound bus latch
+	uint8_t m_ay_ctrl = 0;          // ay controls line
+	uint8_t m_motors_ctrl = 0;      // motors control
 	int     m_sint = 0;             // SINT line
 	int     m_motenbl = 0;          // /MOTENBL line
 	int     m_ball_gate_sw = 0;     // ball gate switch
@@ -97,7 +98,7 @@ private:
 	int     m_lmotor = 0;           // left motor position (0-100)
 	TIMER_DEVICE_CALLBACK_MEMBER(icecold_sint_timer);
 	TIMER_DEVICE_CALLBACK_MEMBER(icecold_motors_timer);
-	void icecold_map(address_map &map);
+	void icecold_map(address_map &map) ATTR_COLD;
 };
 
 void icecold_state::icecold_map(address_map &map)
@@ -160,14 +161,14 @@ static INPUT_PORTS_START( icecold )
 	PORT_DIPSETTING(    0xc0, "X-Fast" )
 
 	PORT_START("TEST")  // service switch is directly hard-wired with the NMI line
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_SERVICE) PORT_CHANGED_MEMBER(DEVICE_SELF, icecold_state, test_switch_press, 1)
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_SERVICE) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(icecold_state::test_switch_press), 1)
 
 	PORT_START("JOY")
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_JOYSTICKRIGHT_DOWN)
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_JOYSTICKLEFT_DOWN)
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_JOYSTICKRIGHT_UP)
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_JOYSTICKLEFT_UP)
-	PORT_BIT(0x55, IP_ACTIVE_LOW, IPT_CUSTOM)          PORT_CUSTOM_MEMBER(icecold_state, motors_limit_r)
+	PORT_BIT(0x55, IP_ACTIVE_LOW, IPT_CUSTOM)          PORT_CUSTOM_MEMBER(FUNC(icecold_state::motors_limit_r))
 
 	PORT_START("X0")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_START1)
@@ -224,7 +225,7 @@ void icecold_state::machine_reset()
 	m_ball_gate_sw = 1;
 }
 
-CUSTOM_INPUT_MEMBER( icecold_state::motors_limit_r )
+ioport_value icecold_state::motors_limit_r()
 {
 	uint8_t data = 0;
 
@@ -379,20 +380,20 @@ void icecold_state::icecold(machine_config &config)
 	MC6809E(config, m_maincpu, XTAL(6'000'000)/4); // 68A09E
 	m_maincpu->set_addrmap(AS_PROGRAM, &icecold_state::icecold_map);
 
-	pia6821_device &pia0(PIA6821(config, "pia0", 0));
+	pia6821_device &pia0(PIA6821(config, "pia0"));
 	pia0.readpa_handler().set_ioport("JOY");
 	pia0.readpb_handler().set_ioport("DSW3");
 	pia0.irqa_handler().set_inputline("maincpu", M6809_IRQ_LINE);
 	pia0.irqb_handler().set_inputline("maincpu", M6809_IRQ_LINE);
 
-	PIA6821(config, m_pia1, 0);
+	PIA6821(config, m_pia1);
 	m_pia1->readpa_handler().set(FUNC(icecold_state::ay_r));
 	m_pia1->writepa_handler().set(FUNC(icecold_state::ay_w));
 	m_pia1->writepb_handler().set(FUNC(icecold_state::snd_ctrl_w));
 	m_pia1->irqa_handler().set_inputline("maincpu", M6809_FIRQ_LINE);
 	m_pia1->irqb_handler().set_inputline("maincpu", M6809_FIRQ_LINE);
 
-	pia6821_device &pia2(PIA6821(config, "pia2", 0));
+	pia6821_device &pia2(PIA6821(config, "pia2"));
 	pia2.irqa_handler().set_inputline("maincpu", M6809_IRQ_LINE);
 	pia2.irqb_handler().set_inputline("maincpu", M6809_IRQ_LINE);
 
@@ -447,6 +448,8 @@ ROM_START(zekepeak)
 	ROM_LOAD("zp23.bin", 0xe000, 0x2000, CRC(ef959586) SHA1(7f8a4787b340bfa34180164806b181b5fb4e5cfa))
 	ROM_LOAD("zp24.bin", 0xc000, 0x2000, CRC(ee90c8f5) SHA1(27a513000e90536e485ccdf43786b415b3c95bd7))
 ROM_END
+
+} // anonymous namespace
 
 
 GAME( 1983, icecold,  0,       icecold, icecold, icecold_state, empty_init, ROT0, "Taito", "Ice Cold Beer (set 1)", MACHINE_NOT_WORKING | MACHINE_MECHANICAL)

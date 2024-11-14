@@ -40,6 +40,7 @@
 #include "emu.h"
 
 #include "cpu/es5510/es5510.h"
+#include "cpu/m68000/m68000.h"
 #include "machine/68340.h"
 #include "esqvfd.h"
 #include "machine/upd765.h"
@@ -48,6 +49,8 @@
 
 #include "speaker.h"
 
+
+namespace {
 
 class esqasr_state : public driver_device
 {
@@ -71,15 +74,15 @@ private:
 	optional_device<esq_5505_5510_pump_device> m_pump;
 	required_device<esq2x40_sq1_device> m_sq1vfd;
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
-	DECLARE_WRITE_LINE_MEMBER(esq5506_otto_irq);
+	void esq5506_otto_irq(int state);
 	u16 esq5506_read_adc();
 	void es5506_clock_changed(u32 data);
 
-	void asr_map(address_map &map);
-	void asrx_map(address_map &map);
+	void asr_map(address_map &map) ATTR_COLD;
+	void asrx_map(address_map &map) ATTR_COLD;
 };
 
 void esqasr_state::machine_start()
@@ -103,7 +106,7 @@ void esqasr_state::asrx_map(address_map &map)
 	map(0x0be00000, 0x0befffff).ram();
 }
 
-WRITE_LINE_MEMBER(esqasr_state::esq5506_otto_irq)
+void esqasr_state::esq5506_otto_irq(int state)
 {
 }
 
@@ -219,6 +222,9 @@ ROM_END
 void esqasr_state::init_asr()
 {
 }
+
+} // anonymous namespace
+
 
 CONS( 1992, asr10, 0, 0, asr, asr, esqasr_state, init_asr, "Ensoniq", "ASR-10", MACHINE_NOT_WORKING )
 CONS( 1997, asrx,  0, 0, asrx,asr, esqasr_state, init_asr, "Ensoniq", "ASR-X",  MACHINE_NOT_WORKING )

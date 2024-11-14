@@ -18,9 +18,9 @@ class c3040_format : public d64_format {
 public:
 	c3040_format();
 
-	virtual const char *name() const override;
-	virtual const char *description() const override;
-	virtual const char *extensions() const override;
+	virtual const char *name() const noexcept override;
+	virtual const char *description() const noexcept override;
+	virtual const char *extensions() const noexcept override;
 
 protected:
 	virtual int get_sectors_per_track(const format &f, int track) const override { return c3040_sectors_per_track[track]; }

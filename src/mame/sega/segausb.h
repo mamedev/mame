@@ -5,8 +5,8 @@
     Sega g80 common sound hardware
 
 *************************************************************************/
-#ifndef MAME_AUDIO_SEGAUSB_H
-#define MAME_AUDIO_SEGAUSB_H
+#ifndef MAME_SEGA_SEGAUSB_H
+#define MAME_SEGA_SEGAUSB_H
 
 #pragma once
 
@@ -43,9 +43,9 @@ public:
 
 	TIMER_DEVICE_CALLBACK_MEMBER( increment_t1_clock_timer_cb );
 
-	void usb_map(address_map &map);
-	void usb_map_rom(address_map &map);
-	void usb_portmap(address_map &map);
+	void usb_map(address_map &map) ATTR_COLD;
+	void usb_map_rom(address_map &map) ATTR_COLD;
+	void usb_portmap(address_map &map) ATTR_COLD;
 
 #if (ENABLE_SEGAUSB_NETLIST)
 	TIMER_DEVICE_CALLBACK_MEMBER( gos_timer );
@@ -56,9 +56,9 @@ protected:
 	usb_sound_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
 
 	// device-level overrides
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 #if (!ENABLE_SEGAUSB_NETLIST)
 	// sound stream update overrides
@@ -165,7 +165,7 @@ private:
 	uint8_t p1_r();
 	void p1_w(uint8_t data);
 	void p2_w(uint8_t data);
-	DECLARE_READ_LINE_MEMBER( t1_r );
+	int t1_r();
 };
 
 DECLARE_DEVICE_TYPE(SEGAUSB, usb_sound_device)
@@ -184,9 +184,9 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 };
 
 DECLARE_DEVICE_TYPE(SEGAUSBROM, usb_rom_sound_device)
 
-#endif // MAME_AUDIO_SEGAUSB_H
+#endif // MAME_SEGA_SEGAUSB_H

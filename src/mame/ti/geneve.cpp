@@ -191,19 +191,22 @@
 
 #include "speaker.h"
 
-#define LOG_WARN    (1U<<1)
-#define LOG_CRU     (1U<<4)
-#define LOG_CRUKEY  (1U<<5)
-#define LOG_READ     (1U<<6)
-#define LOG_READG    (1U<<7)
-#define LOG_WRITE    (1U<<8)
-#define LOG_CONFIG   (1U<<9)
-#define LOG_PFM      (1U<<10)
+#define LOG_WARN     (1U << 1)
+#define LOG_CRU      (1U << 2)
+#define LOG_CRUKEY   (1U << 3)
+#define LOG_READ     (1U << 4)
+#define LOG_READG    (1U << 5)
+#define LOG_WRITE    (1U << 6)
+#define LOG_CONFIG   (1U << 7)
+#define LOG_PFM      (1U << 8)
 
 // Minimum log should be settings and warnings
 #define VERBOSE ( LOG_GENERAL | LOG_CONFIG | LOG_WARN )
 
 #include "logmacro.h"
+
+
+namespace {
 
 #define GENEVE_SRAM_TAG  "sram"
 #define GENEVE_SRAMX_TAG "sramexp"
@@ -276,23 +279,23 @@ private:
 
 	// Connections with the system interface TMS9901
 	uint8_t psi_input(offs_t offset);
-	DECLARE_WRITE_LINE_MEMBER(peripheral_bus_reset);
-	DECLARE_WRITE_LINE_MEMBER(VDP_reset);
-	DECLARE_WRITE_LINE_MEMBER(joystick_select);
-	DECLARE_WRITE_LINE_MEMBER(keyboard_reset);
-	DECLARE_WRITE_LINE_MEMBER(video_wait_states);
-	DECLARE_WRITE_LINE_MEMBER(left_mouse_button);
+	void peripheral_bus_reset(int state);
+	void VDP_reset(int state);
+	void joystick_select(int state);
+	void keyboard_reset(int state);
+	void video_wait_states(int state);
+	void left_mouse_button(int state);
 
-	DECLARE_WRITE_LINE_MEMBER(keyboard_clock_line);
-	DECLARE_WRITE_LINE_MEMBER(keyboard_data_line);
+	void keyboard_clock_line(int state);
+	void keyboard_data_line(int state);
 
-	DECLARE_WRITE_LINE_MEMBER(clock_out);
+	void clock_out(int state);
 
 	void external_operation(offs_t offset, uint8_t data);
 
 	void tms9901_interrupt(offs_t offset, uint8_t data);
 
-	DECLARE_WRITE_LINE_MEMBER( keyboard_interrupt );
+	void keyboard_interrupt(int state);
 
 	required_device<tms9995_device>     m_cpu;
 	required_device<tms9901_device>     m_tms9901;
@@ -319,19 +322,19 @@ private:
 	void read_eprom_or_pfm(offs_t offset, uint8_t& value);
 	void write_pfm(offs_t offset, uint8_t data);
 
-	DECLARE_WRITE_LINE_MEMBER( pfm_a17 );
-	DECLARE_WRITE_LINE_MEMBER( pfm_a18 );
-	DECLARE_WRITE_LINE_MEMBER( pfm_oe );
+	void pfm_a17(int state);
+	void pfm_a18(int state);
+	void pfm_oe(int state);
 
 	// Interrupts
-	DECLARE_WRITE_LINE_MEMBER( inta );
-	DECLARE_WRITE_LINE_MEMBER( intb );
-	DECLARE_WRITE_LINE_MEMBER( keyboard_int );
-	DECLARE_WRITE_LINE_MEMBER( int2_from_v9938 );
+	void inta(int state);
+	void intb(int state);
+	void keyboard_int(int state);
+	void int2_from_v9938(int state);
 
 	// READY line contributors
-	DECLARE_WRITE_LINE_MEMBER( extready );
-	DECLARE_WRITE_LINE_MEMBER( sndready );
+	void extready(int state);
+	void sndready(int state);
 
 	// Memory bus
 	void setaddress_debug(bool debug, offs_t address, uint8_t busctrl);
@@ -339,13 +342,13 @@ private:
 	uint8_t memread(offs_t offset);
 	void memwrite(offs_t offset, uint8_t data);
 
-	void crumap(address_map &map);
-	void memmap(address_map &map);
-	void memmap_setaddress(address_map &map);
+	void crumap(address_map &map) ATTR_COLD;
+	void memmap(address_map &map) ATTR_COLD;
+	void memmap_setaddress(address_map &map) ATTR_COLD;
 
 	// General device lifecycle
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	// Members
 	int  m_inta = 0;
@@ -396,7 +399,7 @@ void geneve_state::crumap(address_map &map)
 static INPUT_PORTS_START(geneve_common)
 
 	PORT_START( "BOOTROM" )
-	PORT_CONFNAME( 0x03, GENEVE_EPROM, "Boot from" ) PORT_CHANGED_MEMBER(DEVICE_SELF, geneve_state, settings_changed, 3)
+	PORT_CONFNAME( 0x03, GENEVE_EPROM, "Boot from" ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(geneve_state::settings_changed), 3)
 		PORT_CONFSETTING( GENEVE_EPROM, "EPROM" )
 		PORT_CONFSETTING( GENEVE_PFM512, "PFM 512" )
 		PORT_CONFSETTING( GENEVE_PFM512A, "PFM 512A" )
@@ -422,10 +425,10 @@ static INPUT_PORTS_START(genmod)
 	PORT_INCLUDE(geneve_common)
 
 	PORT_START( "GENMODDIPS" )
-	PORT_DIPNAME( GENEVE_GM_TURBO, 0x00, "Genmod Turbo mode") PORT_CHANGED_MEMBER(DEVICE_SELF, geneve_state, setgm_changed, 1)
+	PORT_DIPNAME( GENEVE_GM_TURBO, GENEVE_GM_TURBO, "Genmod Turbo mode") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(geneve_state::setgm_changed), 1)
 		PORT_CONFSETTING( 0x00, DEF_STR( Off ))
 		PORT_CONFSETTING( GENEVE_GM_TURBO, DEF_STR( On ))
-	PORT_DIPNAME( GENEVE_GM_TIM, GENEVE_GM_TIM, "Genmod TI mode") PORT_CHANGED_MEMBER(DEVICE_SELF, geneve_state, setgm_changed, 2)
+	PORT_DIPNAME( GENEVE_GM_TIM, 0, "Genmod TI mode") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(geneve_state::setgm_changed), 2)
 		PORT_CONFSETTING( 0x00, DEF_STR( Off ))
 		PORT_CONFSETTING( GENEVE_GM_TIM, DEF_STR( On ))
 
@@ -735,19 +738,19 @@ void geneve_state::memwrite(offs_t offset, uint8_t data)
     PFM handling
 *****************************************************************************/
 
-WRITE_LINE_MEMBER( geneve_state::pfm_a17 )
+void geneve_state::pfm_a17(int state)
 {
 	if (state==ASSERT_LINE) m_pfm_prefix |= 0x20000;
 	else m_pfm_prefix &= ~0x20000;
 }
 
-WRITE_LINE_MEMBER( geneve_state::pfm_a18 )
+void geneve_state::pfm_a18(int state)
 {
 	if (state==ASSERT_LINE) m_pfm_prefix |= 0x40000;
 	else m_pfm_prefix &= ~0x40000;
 }
 
-WRITE_LINE_MEMBER( geneve_state::pfm_oe )
+void geneve_state::pfm_oe(int state)
 {
 	// Negative logic
 	LOGMASKED(LOG_PFM, "PFM output %s\n", (state==0)? "enable" : "disable");
@@ -905,7 +908,7 @@ uint8_t geneve_state::psi_input(offs_t offset)
 	}
 }
 
-WRITE_LINE_MEMBER( geneve_state::left_mouse_button )
+void geneve_state::left_mouse_button(int state)
 {
 	m_left_button = state;
 }
@@ -913,7 +916,7 @@ WRITE_LINE_MEMBER( geneve_state::left_mouse_button )
 /*
     Write PE bus reset line
 */
-WRITE_LINE_MEMBER( geneve_state::peripheral_bus_reset )
+void geneve_state::peripheral_bus_reset(int state)
 {
 	m_peribox->reset_in(state);
 }
@@ -921,7 +924,7 @@ WRITE_LINE_MEMBER( geneve_state::peripheral_bus_reset )
 /*
     Write VDP reset line
 */
-WRITE_LINE_MEMBER( geneve_state::VDP_reset )
+void geneve_state::VDP_reset(int state)
 {
 	m_video->reset_line(state);
 }
@@ -929,7 +932,7 @@ WRITE_LINE_MEMBER( geneve_state::VDP_reset )
 /*
     Write joystick select line. 1 selects joystick 1 (pin 7), 0 selects joystick 2 (pin 2)
 */
-WRITE_LINE_MEMBER( geneve_state::joystick_select )
+void geneve_state::joystick_select(int state)
 {
 	m_joyport->write_port((state==ASSERT_LINE)? 1:2);
 }
@@ -938,10 +941,10 @@ WRITE_LINE_MEMBER( geneve_state::joystick_select )
    Keyboard reset (active low). Most keyboards do not use a dedicated reset
    line but trigger a reset when the clock line is held low for some time.
 */
-WRITE_LINE_MEMBER( geneve_state::keyboard_reset )
+void geneve_state::keyboard_reset(int state)
 {
 	if (state==CLEAR_LINE)
-		LOGMASKED(LOG_GENERAL, "Keyboard reset (line not connected)\n");
+		LOG("Keyboard reset (line not connected)\n");
 }
 
 /*
@@ -963,7 +966,7 @@ void geneve_state::tms9901_interrupt(offs_t offset, uint8_t data)
 /*
     inta is connected to both tms9901 IRQ1 line and to tms9995 INT4/EC line.
 */
-WRITE_LINE_MEMBER( geneve_state::inta )
+void geneve_state::inta(int state)
 {
 	m_inta = (state!=0)? ASSERT_LINE : CLEAR_LINE;
 	m_tms9901->set_int_line(1, state);
@@ -973,7 +976,7 @@ WRITE_LINE_MEMBER( geneve_state::inta )
 /*
     intb is connected to tms9901 IRQ12 line.
 */
-WRITE_LINE_MEMBER( geneve_state::intb )
+void geneve_state::intb(int state)
 {
 	m_intb = (state!=0)? ASSERT_LINE : CLEAR_LINE;
 	m_tms9901->set_int_line(12, state);
@@ -982,7 +985,7 @@ WRITE_LINE_MEMBER( geneve_state::intb )
 /*
     set the state of int2 (called by the v9938 core)
 */
-WRITE_LINE_MEMBER(geneve_state::int2_from_v9938)
+void geneve_state::int2_from_v9938(int state)
 {
 	// This method is frequently called without level change, so we only
 	// react on changes
@@ -996,7 +999,7 @@ WRITE_LINE_MEMBER(geneve_state::int2_from_v9938)
 /*
     Interrupt from the keyboard.
 */
-WRITE_LINE_MEMBER( geneve_state::keyboard_interrupt )
+void geneve_state::keyboard_interrupt(int state)
 {
 	m_keyint = (state!=0)? ASSERT_LINE : CLEAR_LINE;
 	m_tms9901->set_int_line(8, state);
@@ -1005,7 +1008,7 @@ WRITE_LINE_MEMBER( geneve_state::keyboard_interrupt )
 /*
     READY from the box is connected to the Gate Array and the Genmod board.
 */
-WRITE_LINE_MEMBER( geneve_state::extready )
+void geneve_state::extready(int state)
 {
 	m_gatearray->extready_in(state);
 	if (m_genmod)
@@ -1015,7 +1018,7 @@ WRITE_LINE_MEMBER( geneve_state::extready )
 /*
     READY from the sound chip is connected to the Gate Array and the Genmod board.
 */
-WRITE_LINE_MEMBER( geneve_state::sndready )
+void geneve_state::sndready(int state)
 {
 	m_gatearray->sndready_in(state);
 	if (m_genmod)
@@ -1032,7 +1035,7 @@ void geneve_state::external_operation(offs_t offset, uint8_t data)
 /*
     Clock line from the CPU. Used to control wait state generation.
 */
-WRITE_LINE_MEMBER( geneve_state::clock_out )
+void geneve_state::clock_out(int state)
 {
 	m_tms9901->phi_line(state);
 	m_gatearray->clock_in(state);
@@ -1182,12 +1185,12 @@ void geneve_state::geneve_common(machine_config &config)
 	video.int_cb().set(FUNC(geneve_state::int2_from_v9938));
 	video.set_screen(GENEVE_SCREEN_TAG);
 	screen_device& screen(SCREEN(config, GENEVE_SCREEN_TAG, SCREEN_TYPE_RASTER));
-	screen.set_raw(XTAL(21'477'272), \
-		v99x8_device::HTOTAL, \
-		0, \
-		v99x8_device::HVISIBLE - 1, \
-		v99x8_device::VTOTAL_NTSC * 2, \
-		v99x8_device::VERTICAL_ADJUST * 2, \
+	screen.set_raw(XTAL(21'477'272),
+		v99x8_device::HTOTAL,
+		0,
+		v99x8_device::HVISIBLE - 1,
+		v99x8_device::VTOTAL_NTSC * 2,
+		v99x8_device::VERTICAL_ADJUST * 2,
 		v99x8_device::VVISIBLE_NTSC * 2 - 1 - v99x8_device::VERTICAL_ADJUST * 2);
 	screen.set_screen_update(TIGEN_V9938_TAG, FUNC(v99x8_device::screen_update));
 
@@ -1266,6 +1269,9 @@ ROM_START(genmod)
 	ROM_SYSTEM_BIOS(1, "2.00", "Geneve Mod Boot ROM 2.00 (2021)")
 	ROMX_LOAD("gnmbt200.bin", 0x0000, 0x4000, CRC(0a66c714) SHA1(139ed03d365b21123295cd99c73736ee424dbb74), ROM_BIOS(1))
 ROM_END
+
+} // anonymous namespace
+
 
 //    YEAR  NAME    PARENT  COMPAT  MACHINE      INPUT   CLASS         INIT         COMPANY  FULLNAME       FLAGS
 COMP( 1987, geneve, 0,      0,      geneve,      geneve, geneve_state, init_geneve, "Myarc", "Geneve 9640", MACHINE_SUPPORTS_SAVE)

@@ -91,7 +91,7 @@ protected:
 		m_dce_port->txc_handler().set(FUNC(rs232_patch_box_device::signal_in<TXC>));
 	}
 
-	virtual ioport_constructor device_input_ports() const override;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 
 	virtual void device_resolve_objects() override
 	{
@@ -127,15 +127,15 @@ protected:
 		m_dce_port->write_spds(m_signals[m_sources[SPDS]] ^ m_invert[SPDS]);
 	}
 
-	virtual DECLARE_WRITE_LINE_MEMBER( input_txd ) override { signal_in<TXD>(state); }
-	virtual DECLARE_WRITE_LINE_MEMBER( input_dtr ) override { signal_in<DTR>(state); }
-	virtual DECLARE_WRITE_LINE_MEMBER( input_rts ) override { signal_in<RTS>(state); }
-	virtual DECLARE_WRITE_LINE_MEMBER( input_etc ) override { signal_in<ETC>(state); }
-	virtual DECLARE_WRITE_LINE_MEMBER( input_spds ) override { signal_in<SPDS>(state); }
+	virtual void input_txd(int state) override { signal_in<TXD>(state); }
+	virtual void input_dtr(int state) override { signal_in<DTR>(state); }
+	virtual void input_rts(int state) override { signal_in<RTS>(state); }
+	virtual void input_etc(int state) override { signal_in<ETC>(state); }
+	virtual void input_spds(int state) override { signal_in<SPDS>(state); }
 
 private:
 	template <ioport_value Signal>
-	DECLARE_WRITE_LINE_MEMBER( signal_in )
+	void signal_in(int state)
 	{
 		state = state ? 1 : 0;
 		if (m_signals[Signal] != state)
@@ -169,7 +169,7 @@ private:
 
 #define SOURCE_OPTIONS(prtname, dflt, cnfname) \
 		PORT_START(prtname) \
-		PORT_CONFNAME(0x0f, dflt, cnfname) PORT_CHANGED_MEMBER(DEVICE_SELF, rs232_patch_box_device, source_changed, dflt) \
+		PORT_CONFNAME(0x0f, dflt, cnfname) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(rs232_patch_box_device::source_changed), dflt) \
 		PORT_CONFSETTING(TXD,      "TxD") \
 		PORT_CONFSETTING(RXD,      "RxD") \
 		PORT_CONFSETTING(RTS,      "RTS") \

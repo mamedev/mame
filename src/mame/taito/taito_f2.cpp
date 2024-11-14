@@ -1859,7 +1859,14 @@ static INPUT_PORTS_START( footchmp )
 	TAITO_JOY_UDLR_2_BUTTONS_START( 4 )
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( hthero )
+static INPUT_PORTS_START( htherou )
+	PORT_INCLUDE(footchmp)
+
+	PORT_MODIFY("DSWB")
+	PORT_DIPUNUSED_DIPLOC( 0x80, 0x80, "SW2:8" )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( htheroj )
 	PORT_INCLUDE(footchmp)
 
 	PORT_MODIFY("DSWA")
@@ -2807,8 +2814,8 @@ void taitof2_state::taito_f2(machine_config &config)
 	ymsnd.add_route(2, "rspeaker", 1.0);
 
 	tc0140syt_device &tc0140syt(TC0140SYT(config, "tc0140syt", 0));
-	tc0140syt.set_master_tag(m_maincpu);
-	tc0140syt.set_slave_tag(m_audiocpu);
+	tc0140syt.nmi_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
+	tc0140syt.reset_callback().set_inputline(m_audiocpu, INPUT_LINE_RESET);
 }
 
 void taitof2_state::taito_f2_tc0220ioc(machine_config &config)
@@ -2923,6 +2930,7 @@ void taitof2_state::megab(machine_config &config)
 	/* video hardware */
 	MCFG_VIDEO_START_OVERRIDE(taitof2_state,megab)
 	m_screen->set_screen_update(FUNC(taitof2_state::screen_update_pri));
+	m_screen->screen_vblank().set(FUNC(taitof2_state::screen_vblank_partial_buffer_delayed));
 
 	TC0100SCN(config, m_tc0100scn[0], 0);
 	m_tc0100scn[0]->set_offsets(3, 0);
@@ -3558,8 +3566,8 @@ void taitof2_state::cameltrya(machine_config &config)
 	m_oki->add_route(ALL_OUTPUTS, "mono", 0.10);
 
 	pc060ha_device &ciu(PC060HA(config, "ciu", 0));
-	ciu.set_master_tag(m_maincpu);
-	ciu.set_slave_tag(m_audiocpu);
+	ciu.nmi_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
+	ciu.reset_callback().set_inputline(m_audiocpu, INPUT_LINE_RESET);
 }
 
 void taitof2_state::driveout(machine_config &config)
@@ -3615,8 +3623,8 @@ void taitof2_state::driveout(machine_config &config)
 	m_oki->add_route(ALL_OUTPUTS, "rspeaker", 1.0);
 
 	tc0140syt_device &tc0140syt(TC0140SYT(config, "tc0140syt", 0));
-	tc0140syt.set_master_tag(m_maincpu);
-	tc0140syt.set_slave_tag(m_audiocpu);
+	tc0140syt.nmi_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
+	tc0140syt.reset_callback().set_inputline(m_audiocpu, INPUT_LINE_RESET);
 }
 
 
@@ -3626,16 +3634,16 @@ void taitof2_state::driveout(machine_config &config)
 
 ROM_START( finalb )
 	ROM_REGION( 0x40000, "maincpu", 0 )     /* 256k for 68000 code */
-	ROM_LOAD16_BYTE( "b82-09.10",  0x00000, 0x20000, CRC(632f1ecd) SHA1(aa3d1c2059b0dd619d1f6e3e0705b65b4f4be74e) )
-	ROM_LOAD16_BYTE( "b82-17.11",  0x00001, 0x20000, CRC(e91b2ec9) SHA1(c854104b8d48d20ab9278ecd122c987c3d886a26) )
+	ROM_LOAD16_BYTE( "b82-09.ic23",  0x00000, 0x20000, CRC(632f1ecd) SHA1(aa3d1c2059b0dd619d1f6e3e0705b65b4f4be74e) )
+	ROM_LOAD16_BYTE( "b82-17.ic11",  0x00001, 0x20000, CRC(e91b2ec9) SHA1(c854104b8d48d20ab9278ecd122c987c3d886a26) )
 
 	ROM_REGION( 0x040000, "tc0100scn_1", 0 )   /* SCR */
-	ROM_LOAD16_BYTE( "b82-06.19",  0x00001, 0x20000, CRC(fc450a25) SHA1(6929bd2d47549cab037e8807b778741b3c215788) )
-	ROM_LOAD16_BYTE( "b82-07.18",  0x00000, 0x20000, CRC(ec3df577) SHA1(37a0bb87a12f0332c8e67b22f91c24584f3d46ce) )
+	ROM_LOAD16_BYTE( "b82-06.ic33", 0x00001, 0x20000, CRC(fc450a25) SHA1(6929bd2d47549cab037e8807b778741b3c215788) )
+	ROM_LOAD16_BYTE( "b82-07.ic34", 0x00000, 0x20000, CRC(ec3df577) SHA1(37a0bb87a12f0332c8e67b22f91c24584f3d46ce) )
 
 	ROM_REGION( 0x100000, "sprites", 0 )   /* OBJ */
-	ROM_LOAD16_BYTE( "b82-04.4",   0x000001, 0x80000, CRC(6346f98e) SHA1(3fac5ea56b5ae280cd7ca0e0c6c308376056e1ba) ) /* sprites 4-bit format*/
-	ROM_LOAD16_BYTE( "b82-03.5",   0x000000, 0x80000, CRC(daa11561) SHA1(81dd596c1b36138904971c36466ec29d08d4fd84) ) /* sprites 4-bit format*/
+	ROM_LOAD16_BYTE( "b82-04.ic8", 0x000001, 0x80000, CRC(6346f98e) SHA1(3fac5ea56b5ae280cd7ca0e0c6c308376056e1ba) ) /* sprites 4-bit format*/
+	ROM_LOAD16_BYTE( "b82-03.ic9", 0x000000, 0x80000, CRC(daa11561) SHA1(81dd596c1b36138904971c36466ec29d08d4fd84) ) /* sprites 4-bit format*/
 
 	/* Note: this is intentional to load at 0x180000, not at 0x100000
 	   because finalb_driver_init will move some bits around before data
@@ -3643,16 +3651,16 @@ ROM_START( finalb )
 	   while above is 4bits-packed format, for a total of 6 bits per pixel. */
 
 	ROM_REGION( 0x080000, "sprites_hi", 0 )
-	ROM_LOAD       ( "b82-05.3",   0x000000, 0x80000, CRC(aa90b93a) SHA1(06f41052659959c58d72c9f68f9f6069cb835672) ) /* sprites 2-bit format */
+	ROM_LOAD ( "b82-05.ic7", 0x000000, 0x80000, CRC(aa90b93a) SHA1(06f41052659959c58d72c9f68f9f6069cb835672) ) /* sprites 2-bit format */
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )      /* sound cpu */
-	ROM_LOAD( "b82_10.16",   0x00000, 0x10000, CRC(a38aaaed) SHA1(d476ea516a797e71e0306da54c17ed1759fe1ccd) )
+	ROM_LOAD( "b82_10.ic5", 0x00000, 0x10000, CRC(a38aaaed) SHA1(d476ea516a797e71e0306da54c17ed1759fe1ccd) )
 
 	ROM_REGION( 0x80000, "ymsnd:adpcma", 0 )   /* ADPCM samples */
-	ROM_LOAD( "b82-02.1",    0x00000, 0x80000, CRC(5dd06bdd) SHA1(6eeaec6743805ba429b0ef58a530bc0740646324) )
+	ROM_LOAD( "b82-02.ic1", 0x00000, 0x80000, CRC(5dd06bdd) SHA1(6eeaec6743805ba429b0ef58a530bc0740646324) )
 
 	ROM_REGION( 0x80000, "ymsnd:adpcmb", 0 )    /* Delta-T samples */
-	ROM_LOAD( "b82-01.2",    0x00000, 0x80000, CRC(f0eb6846) SHA1(4697c3fd61ac0d55c0d2a4354ff74719947397c5) )
+	ROM_LOAD( "b82-01.ic2", 0x00000, 0x80000, CRC(f0eb6846) SHA1(4697c3fd61ac0d55c0d2a4354ff74719947397c5) )
 
 	ROM_REGION( 0x0c00, "plds", 0 )
 	ROM_LOAD( "tibpal16l8.ic41", 0x0000, 0x0104, CRC(11a0a19a) SHA1(0c195a1808dad21130dd377531ed5b8228981581) )
@@ -3664,16 +3672,16 @@ ROM_END
 
 ROM_START( finalbj )
 	ROM_REGION( 0x40000, "maincpu", 0 )     /* 256k for 68000 code */
-	ROM_LOAD16_BYTE( "b82-09.10",  0x00000, 0x20000, CRC(632f1ecd) SHA1(aa3d1c2059b0dd619d1f6e3e0705b65b4f4be74e) )
-	ROM_LOAD16_BYTE( "b82-08.11",  0x00001, 0x20000, CRC(07154fe5) SHA1(4772362375c8c2984a305c3bb0320ea80a2e9a40) )
+	ROM_LOAD16_BYTE( "b82-09.ic23",  0x00000, 0x20000, CRC(632f1ecd) SHA1(aa3d1c2059b0dd619d1f6e3e0705b65b4f4be74e) )
+	ROM_LOAD16_BYTE( "b82-08.ic11",  0x00001, 0x20000, CRC(07154fe5) SHA1(4772362375c8c2984a305c3bb0320ea80a2e9a40) )
 
 	ROM_REGION( 0x040000, "tc0100scn_1", 0 )   /* SCR */
-	ROM_LOAD16_BYTE( "b82-06.19",  0x00001, 0x20000, CRC(fc450a25) SHA1(6929bd2d47549cab037e8807b778741b3c215788) )
-	ROM_LOAD16_BYTE( "b82-07.18",  0x00000, 0x20000, CRC(ec3df577) SHA1(37a0bb87a12f0332c8e67b22f91c24584f3d46ce) )
+	ROM_LOAD16_BYTE( "b82-06.ic33", 0x00001, 0x20000, CRC(fc450a25) SHA1(6929bd2d47549cab037e8807b778741b3c215788) )
+	ROM_LOAD16_BYTE( "b82-07.ic34", 0x00000, 0x20000, CRC(ec3df577) SHA1(37a0bb87a12f0332c8e67b22f91c24584f3d46ce) )
 
 	ROM_REGION( 0x100000, "sprites", 0 )   /* OBJ */
-	ROM_LOAD16_BYTE( "b82-04.4",   0x000001, 0x80000, CRC(6346f98e) SHA1(3fac5ea56b5ae280cd7ca0e0c6c308376056e1ba) ) /* sprites 4-bit format*/
-	ROM_LOAD16_BYTE( "b82-03.5",   0x000000, 0x80000, CRC(daa11561) SHA1(81dd596c1b36138904971c36466ec29d08d4fd84) ) /* sprites 4-bit format*/
+	ROM_LOAD16_BYTE( "b82-04.ic8", 0x000001, 0x80000, CRC(6346f98e) SHA1(3fac5ea56b5ae280cd7ca0e0c6c308376056e1ba) ) /* sprites 4-bit format*/
+	ROM_LOAD16_BYTE( "b82-03.ic9", 0x000000, 0x80000, CRC(daa11561) SHA1(81dd596c1b36138904971c36466ec29d08d4fd84) ) /* sprites 4-bit format*/
 
 	/* Note: this is intentional to load at 0x180000, not at 0x100000
 	   because finalb_driver_init will move some bits around before data
@@ -3681,16 +3689,16 @@ ROM_START( finalbj )
 	   while above is 4bits-packed format, for a total of 6 bits per pixel. */
 
 	ROM_REGION( 0x080000, "sprites_hi", 0 )
-	ROM_LOAD       ( "b82-05.3",   0x000000, 0x80000, CRC(aa90b93a) SHA1(06f41052659959c58d72c9f68f9f6069cb835672) ) /* sprites 2-bit format */
+	ROM_LOAD ( "b82-05.ic7", 0x000000, 0x80000, CRC(aa90b93a) SHA1(06f41052659959c58d72c9f68f9f6069cb835672) ) /* sprites 2-bit format */
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )      /* sound cpu */
-	ROM_LOAD( "b82_10.16",   0x00000, 0x10000, CRC(a38aaaed) SHA1(d476ea516a797e71e0306da54c17ed1759fe1ccd) )
+	ROM_LOAD( "b82_10.ic5", 0x00000, 0x10000, CRC(a38aaaed) SHA1(d476ea516a797e71e0306da54c17ed1759fe1ccd) )
 
 	ROM_REGION( 0x80000, "ymsnd:adpcma", 0 )   /* ADPCM samples */
-	ROM_LOAD( "b82-02.1",    0x00000, 0x80000, CRC(5dd06bdd) SHA1(6eeaec6743805ba429b0ef58a530bc0740646324) )
+	ROM_LOAD( "b82-02.ic1", 0x00000, 0x80000, CRC(5dd06bdd) SHA1(6eeaec6743805ba429b0ef58a530bc0740646324) )
 
 	ROM_REGION( 0x80000, "ymsnd:adpcmb", 0 )    /* Delta-T samples */
-	ROM_LOAD( "b82-01.2",    0x00000, 0x80000, CRC(f0eb6846) SHA1(4697c3fd61ac0d55c0d2a4354ff74719947397c5) )
+	ROM_LOAD( "b82-01.ic2", 0x00000, 0x80000, CRC(f0eb6846) SHA1(4697c3fd61ac0d55c0d2a4354ff74719947397c5) )
 
 	ROM_REGION( 0x0c00, "plds", 0 )
 	ROM_LOAD( "tibpal16l8.ic41", 0x0000, 0x0104, CRC(11a0a19a) SHA1(0c195a1808dad21130dd377531ed5b8228981581) )
@@ -3703,16 +3711,16 @@ ROM_END
 ROM_START( finalbu )
 	ROM_REGION( 0x40000, "maincpu", 0 )     /* 256k for 68000 code */
 	/* are these even good dumps / legit ? there are some strange changes around 0x00fxx as well as the region byte */
-	ROM_LOAD16_BYTE( "b82-09-1",  0x00000, 0x20000, CRC(66729cb9) SHA1(f265c07966cf3930a9b5e2dd63d49554705c60f7) )
-	ROM_LOAD16_BYTE( "b82-6-14",  0x00001, 0x20000, CRC(879387fa) SHA1(9d7aa8ece6cfc66e7c131d9c7a3db792a0336e09) )
+	ROM_LOAD16_BYTE( "b82-09-1.ic23",  0x00000, 0x20000, CRC(66729cb9) SHA1(f265c07966cf3930a9b5e2dd63d49554705c60f7) )
+	ROM_LOAD16_BYTE( "b82-16-1.ic11",  0x00001, 0x20000, CRC(879387fa) SHA1(9d7aa8ece6cfc66e7c131d9c7a3db792a0336e09) )
 
 	ROM_REGION( 0x040000, "tc0100scn_1", 0 )   /* SCR */
-	ROM_LOAD16_BYTE( "b82-06.19",  0x00001, 0x20000, CRC(fc450a25) SHA1(6929bd2d47549cab037e8807b778741b3c215788) )
-	ROM_LOAD16_BYTE( "b82-07.18",  0x00000, 0x20000, CRC(ec3df577) SHA1(37a0bb87a12f0332c8e67b22f91c24584f3d46ce) )
+	ROM_LOAD16_BYTE( "b82-06.ic33", 0x00001, 0x20000, CRC(fc450a25) SHA1(6929bd2d47549cab037e8807b778741b3c215788) )
+	ROM_LOAD16_BYTE( "b82-07.ic34", 0x00000, 0x20000, CRC(ec3df577) SHA1(37a0bb87a12f0332c8e67b22f91c24584f3d46ce) )
 
 	ROM_REGION( 0x100000, "sprites", 0 )   /* OBJ */
-	ROM_LOAD16_BYTE( "b82-04.4",   0x000001, 0x80000, CRC(6346f98e) SHA1(3fac5ea56b5ae280cd7ca0e0c6c308376056e1ba) ) /* sprites 4-bit format*/
-	ROM_LOAD16_BYTE( "b82-03.5",   0x000000, 0x80000, CRC(daa11561) SHA1(81dd596c1b36138904971c36466ec29d08d4fd84) ) /* sprites 4-bit format*/
+	ROM_LOAD16_BYTE( "b82-04.ic8", 0x000001, 0x80000, CRC(6346f98e) SHA1(3fac5ea56b5ae280cd7ca0e0c6c308376056e1ba) ) /* sprites 4-bit format*/
+	ROM_LOAD16_BYTE( "b82-03.ic9", 0x000000, 0x80000, CRC(daa11561) SHA1(81dd596c1b36138904971c36466ec29d08d4fd84) ) /* sprites 4-bit format*/
 
 	/* Note: this is intentional to load at 0x180000, not at 0x100000
 	   because finalb_driver_init will move some bits around before data
@@ -3720,16 +3728,16 @@ ROM_START( finalbu )
 	   while above is 4bits-packed format, for a total of 6 bits per pixel. */
 
 	ROM_REGION( 0x080000, "sprites_hi", 0 )
-	ROM_LOAD       ( "b82-05.3",   0x000000, 0x80000, CRC(aa90b93a) SHA1(06f41052659959c58d72c9f68f9f6069cb835672) ) /* sprites 2-bit format */
+	ROM_LOAD ( "b82-05.ic7", 0x000000, 0x80000, CRC(aa90b93a) SHA1(06f41052659959c58d72c9f68f9f6069cb835672) ) /* sprites 2-bit format */
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )      /* sound cpu */
-	ROM_LOAD( "b82_10.16",   0x00000, 0x10000, CRC(a38aaaed) SHA1(d476ea516a797e71e0306da54c17ed1759fe1ccd) )
+	ROM_LOAD( "b82_10.ic5", 0x00000, 0x10000, CRC(a38aaaed) SHA1(d476ea516a797e71e0306da54c17ed1759fe1ccd) )
 
 	ROM_REGION( 0x80000, "ymsnd:adpcma", 0 )   /* ADPCM samples */
-	ROM_LOAD( "b82-02.1",    0x00000, 0x80000, CRC(5dd06bdd) SHA1(6eeaec6743805ba429b0ef58a530bc0740646324) )
+	ROM_LOAD( "b82-02.ic1", 0x00000, 0x80000, CRC(5dd06bdd) SHA1(6eeaec6743805ba429b0ef58a530bc0740646324) )
 
 	ROM_REGION( 0x80000, "ymsnd:adpcmb", 0 )    /* Delta-T samples */
-	ROM_LOAD( "b82-01.2",    0x00000, 0x80000, CRC(f0eb6846) SHA1(4697c3fd61ac0d55c0d2a4354ff74719947397c5) )
+	ROM_LOAD( "b82-01.ic2", 0x00000, 0x80000, CRC(f0eb6846) SHA1(4697c3fd61ac0d55c0d2a4354ff74719947397c5) )
 
 	ROM_REGION( 0x0c00, "plds", 0 )
 	ROM_LOAD( "tibpal16l8.ic41", 0x0000, 0x0104, CRC(11a0a19a) SHA1(0c195a1808dad21130dd377531ed5b8228981581) )
@@ -4630,7 +4638,6 @@ ROM_START( growlp )
 	ROM_REGION( 0x080000, "ymsnd:adpcmb", 0 )   /* Delta-T samples */
 	ROM_LOAD( "growl_ic21_ch-b-0_d743.bin",   0x00000, 0x40000, CRC(7a7eab62) SHA1(268d900f84162ba655cb652a1c1865dfc25da4de) )
 	ROM_LOAD( "growl_ic22_ch-b-1_a5f1.bin",   0x40000, 0x40000, CRC(567df833) SHA1(1ad019a9f938ebe2f09bc68b57b6c2623ecd9f46) )
-
 ROM_END
 
 ROM_START( mjnquest )   /* Mahjong Quest */
@@ -4705,7 +4712,35 @@ ROM_START( footchmp )
 	ROM_LOAD( "c80-09.ic46", 0x200, 0x104, CRC(4ca48869) SHA1(8ba46ab625d3cbf3431ca2e6f3a9207d402202ef) ) // pal16l8bcn
 ROM_END
 
-ROM_START( hthero )
+ROM_START( htherou )
+	ROM_REGION( 0x80000, "maincpu", 0 )     // 512k for 68000 code
+	ROM_LOAD16_BYTE( "c80-11.6", 0x00000, 0x20000, CRC(f78630fb) SHA1(37da34401f664caaf5113a9abad78e447f4f4651) )
+	ROM_LOAD16_BYTE( "c80-10.4", 0x00001, 0x20000, CRC(32c109cb) SHA1(46a116127bcea18cc15ddf297e5e0d5cdcac9842) )
+	ROM_LOAD16_BYTE( "c80-12.7", 0x40000, 0x20000, CRC(80d46fef) SHA1(cc81c8ba19321e8bae9054021bfb61cb11c2aba5) )
+	ROM_LOAD16_BYTE( "c80-13.5", 0x40001, 0x20000, CRC(37ab78be) SHA1(d258420cdf88f023577276c8abb54934d375b38f) )
+
+	ROM_REGION( 0x100000, "tc0480scp", 0 )   // SCR
+	ROM_LOAD32_WORD( "c80-04.1", 0x00000, 0x80000, CRC(9a17fe8c) SHA1(d2ea72743151f0f7bf78f33dba526214afb07389) )
+	ROM_LOAD32_WORD( "c80-05.2", 0x00002, 0x80000, CRC(acde7071) SHA1(23637238d122b13edb6025418bf482cc210ef6a9) )
+
+	ROM_REGION( 0x200000, "sprites", 0 )   // OBJ
+	ROM_LOAD( "c80-01.9",  0x000000, 0x100000, CRC(f43782e6) SHA1(53ff6cc433673f307a91e8db74428aa6172ffad4) )
+	ROM_LOAD( "c80-02.10", 0x100000, 0x100000, CRC(060a8b61) SHA1(b1888d8bce4c4624dc5bb64168c604ec64537c0e) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )    // 64k for Z80 code
+	ROM_LOAD( "c80-15.70", 0x00000, 0x10000, CRC(05aa7fd7) SHA1(7eb10964ea9f43abcda8444f13733a0753a04580) )
+
+	ROM_REGION( 0x100000, "ymsnd:adpcma", 0 )     // YM2610 samples
+	ROM_LOAD( "c80-03.57", 0x000000, 0x100000, CRC(609938d5) SHA1(54c7a7265dee5cb031fd402f4c74858d73bec652) )
+
+	// no Delta-T samples
+
+	ROM_REGION( 0x400, "plds", 0 )
+	ROM_LOAD( "c80-08.ic45", 0x000, 0x104, CRC(6137dd15) SHA1(fb20df118da69b52767d5e6c81fa85174c50c5c5) ) // pal16l8bcn
+	ROM_LOAD( "c80-09.ic46", 0x200, 0x104, CRC(4ca48869) SHA1(8ba46ab625d3cbf3431ca2e6f3a9207d402202ef) ) // pal16l8bcn
+ROM_END
+
+ROM_START( htheroj )
 	ROM_REGION( 0x80000, "maincpu", 0 )     /* 512k for 68000 code */
 	ROM_LOAD16_BYTE( "c80-16.6", 0x00000, 0x20000, CRC(4e795b52) SHA1(90a32133a68de4d0410935e5039d4dec37836a13) )
 	ROM_LOAD16_BYTE( "c80-17.4", 0x00001, 0x20000, CRC(42c0a838) SHA1(4ba96a7248715562668994a4bf974e8ce4c44fd3) )
@@ -4751,6 +4786,30 @@ ROM_START( euroch92 )
 	ROM_LOAD( "c80-03.57", 0x000000, 0x100000, CRC(609938d5) SHA1(54c7a7265dee5cb031fd402f4c74858d73bec652) )   // ec92_03.rom
 
 	/* no Delta-T samples */
+ROM_END
+
+ROM_START( euroch92j )
+	ROM_REGION( 0x80000, "maincpu", 0 )     // 512k for 68000 code
+	ROM_LOAD16_BYTE( "c80-25.ic6", 0x00000, 0x20000, CRC(98482202) SHA1(4fc03fb2a2c21f302d95047535f66d26421dcda2) )
+	ROM_LOAD16_BYTE( "c80-23.ic4", 0x00001, 0x20000, CRC(ae5e75e9) SHA1(82d935684182bfb42367232a3b71d4664b170ffe) )
+	ROM_LOAD16_BYTE( "c80-26.ic7", 0x40000, 0x20000, CRC(b986ccb2) SHA1(862a5da1bd4e8743d55f2e5bab2ade6c3dec682c) )
+	ROM_LOAD16_BYTE( "c80-28.ic5", 0x40001, 0x20000, CRC(5d13f580) SHA1(402aad6ece4d735b0770bf64b80a08313abc3ac4) )
+
+	ROM_REGION( 0x100000, "tc0480scp", 0 )   // SCR
+	ROM_LOAD32_WORD( "c80-21.ic1", 0x00000, 0x80000, CRC(5759ed37) SHA1(2a661ea40735afbda3d0141ce3f706c64281097b) )
+	ROM_LOAD32_WORD( "c80-22.ic2", 0x00002, 0x80000, CRC(d9a0d38e) SHA1(192f0303f4f64df46dc20701ed4362a4e14e40e7) )
+
+	ROM_REGION( 0x200000, "sprites", 0 )   // OBJ
+	ROM_LOAD( "c80-19.ic9",  0x000000, 0x100000, CRC(219141a5) SHA1(b549e91049dcb796d4104b4426674dd87589efde) )
+	ROM_LOAD( "c80-20.ic10", 0x100000, 0x100000, CRC(060a8b61) SHA1(b1888d8bce4c4624dc5bb64168c604ec64537c0e) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )    // 64k for Z80 code
+	ROM_LOAD( "c80-27.ic70", 0x00000, 0x10000, CRC(2db48e65) SHA1(43a47ebc91c043a996e966cf808d71256e158494) )
+
+	ROM_REGION( 0x100000, "ymsnd:adpcma", 0 )  // YM2610 samples
+	ROM_LOAD( "c80-03.ic57", 0x000000, 0x100000, CRC(609938d5) SHA1(54c7a7265dee5cb031fd402f4c74858d73bec652) )
+
+	// no Delta-T samples
 ROM_END
 
 ROM_START( footchmpbl )
@@ -4962,6 +5021,7 @@ ROM_START( qzquest )    /* Quiz Quest */
 	/* no Delta-T samples */
 ROM_END
 
+// Dual PCB version (main and sound program ROMs cannot be used on the single PCB version)
 ROM_START( pulirula )
 	ROM_REGION( 0xc0000, "maincpu", 0 )     /* 768k for 68000 code */
 	ROM_LOAD16_BYTE( "c98-12.rom", 0x00000, 0x40000, CRC(816d6cde) SHA1(cac583440cca9aa57373f4a6c9a68c5442a5258b) )
@@ -5014,6 +5074,7 @@ ROM_START( pulirulaj )
 	/* no Delta-T samples */
 ROM_END
 
+// Single PCB version (main and sound program ROMs cannot be used on the dual PCB version)
 ROM_START( pulirulaa ) // dumped from an original PCB without original ROM labels. The maincpu and audiocpu ROMs differ from the parent.
 	ROM_REGION( 0xc0000, "maincpu", 0 )     /* 768k for 68000 code */
 	ROM_LOAD16_BYTE( "ic46.bin", 0x00000, 0x40000, CRC(584ae599) SHA1(c114442d93080aaf0641c1a9204569f0017af000) )
@@ -5062,6 +5123,36 @@ ROM_START( metalb )
 
 	ROM_REGION( 0x080000, "ymsnd:adpcmb", 0 )   /* Delta-T samples */
 	ROM_LOAD( "d12-05.16", 0x000000, 0x080000, CRC(7fd036c5) SHA1(f412c6302cfba73df110943d7d6679dc908479f7) )
+ROM_END
+
+// this set comes from a single PCB (K1100698A) and the program is the same revision as metalbj
+ROM_START( metalba )
+	ROM_REGION( 0xc0000, "maincpu", 0 )     /* 768k for 68000 code */
+	ROM_LOAD16_BYTE( "ic48",          0x00000, 0x40000, CRC(556f82b2) SHA1(fbce771eda99fd8b778f64fdc314ada4b6fdffde) ) // blank label
+	ROM_LOAD16_BYTE( "ic37",          0x00001, 0x40000, CRC(419083a1) SHA1(51bef1c60ad154c7a1a9ca761618e8dcdf2d56a4) ) // blank label
+	ROM_LOAD16_BYTE( "d12-07.ic47",   0x80000, 0x20000, CRC(e07f5136) SHA1(27df1a1f21c27feb91801e3cc304ee534969f792) )
+	ROM_LOAD16_BYTE( "d12-06.ic36",   0x80001, 0x20000, CRC(131df731) SHA1(537a9f404d797db051a5aaf0afa2cd1e9c0bdcfb) )
+
+	ROM_REGION( 0x100000, "tc0480scp", 0 )   /* SCR */
+	ROM_LOAD32_WORD( "d12-03.ic55",  0x00000, 0x80000, CRC(46b498c0) SHA1(c2ec7ce9ac7874d1bc54ce4b5d428d73c5a16549) )
+	ROM_LOAD32_WORD( "d12-04.ic54",  0x00002, 0x80000, CRC(ab66d141) SHA1(e7f82b297dd2ae0b5d29886e5393cece61b742bb) )
+
+	ROM_REGION( 0x100000, "sprites", 0 )   /* OBJ */
+	ROM_LOAD( "d12-01.ic19", 0x000000, 0x100000, CRC(b81523b9) SHA1(e688e88008db87fed0051fbcb28d3e3ae7e945a8) )
+
+	ROM_REGION( 0x20000, "audiocpu", 0 )      /* sound cpu */
+	ROM_LOAD( "ic57", 0x00000, 0x20000, CRC(bcca2649) SHA1(d932134416c951d849ae41598f75609d453ed520) ) // blank label
+
+	ROM_REGION( 0x100000, "ymsnd:adpcma", 0 )  /* ADPCM samples */
+	ROM_LOAD( "d12-02.ic29", 0x000000, 0x100000, CRC(79263e74) SHA1(f9ef222239855d593b5855dbf9ea0376ea349c4b) )
+
+	ROM_REGION( 0x080000, "ymsnd:adpcmb", 0 )   /* Delta-T samples */
+	ROM_LOAD( "d12-05.ic30", 0x000000, 0x080000, CRC(7fd036c5) SHA1(f412c6302cfba73df110943d7d6679dc908479f7) )
+
+	ROM_REGION( 0x600, "plds", ROMREGION_ERASE00 )
+	ROM_LOAD( "d12-8.ic28",  0x000, 0x117, NO_DUMP ) // PAL16L8BCN
+	ROM_LOAD( "d12-9.ic27",  0x200, 0x117, NO_DUMP ) // PAL16L8BCN
+	ROM_LOAD( "d12-10.ic50", 0x400, 0x117, NO_DUMP ) // PAL16L8BCN
 ROM_END
 
 ROM_START( metalbj )
@@ -5295,6 +5386,8 @@ ROM_START( qcrayon )    /* Quiz Crayon */
 	ROM_REGION( 0x200000, "sprites", 0 )   /* OBJ */
 	ROM_LOAD16_BYTE( "d55-05", 0x000000, 0x100000, CRC(f0e59902) SHA1(44d93e0e9622a98796a128a0273065947f586a1d) )
 	ROM_LOAD16_BYTE( "d55-04", 0x000001, 0x100000, CRC(412975ce) SHA1(32058a87947d6b6cdc8b147ddfcf359792f9c9fc) )
+	// also seen with a single mask ROM containing the same content:
+	//ROM_LOAD( "d55-06", 0x000000, 0x200000, CRC(26db21b3) SHA1(78dab15a585b7180acd170f618947728a2ca022d) )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )    /* sound cpu */
 	ROM_LOAD( "d55-15",  0x00000, 0x10000, CRC(ba782eff) SHA1(ce24654db49b9694e444e93b9a8d529a86729e03) )
@@ -5505,22 +5598,23 @@ void taitof2_state::init_driveout()
 	save_item(NAME(m_nibble));
 }
 
+//    YEAR  NAME        PARENT    MACHINE    INPUT       CLASS          INIT           ROT     COMPANY                      FULLNAME
 
 GAME( 1988, finalb,     0,        finalb,    finalb,     taitof2_state, init_finalb,   ROT0,   "Taito Corporation Japan",   "Final Blow (World)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, finalbu,    finalb,   finalb,    finalbu,    taitof2_state, init_finalb,   ROT0,   "Taito America Corporation", "Final Blow (US)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, finalbu,    finalb,   finalb,    finalbu,    taitof2_state, init_finalb,   ROT0,   "Taito America Corporation", "Final Blow (US, rev 1)", MACHINE_SUPPORTS_SAVE )
 GAME( 1988, finalbj,    finalb,   finalb,    finalbj,    taitof2_state, init_finalb,   ROT0,   "Taito Corporation",         "Final Blow (Japan)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1989, dondokod,   0,        dondokod,  dondokod,   taitof2_state, empty_init,    ROT0,   "Taito Corporation Japan",   "Don Doko Don (World)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, dondokodu,  dondokod, dondokod,  dondokodu,  taitof2_state, empty_init,    ROT0,   "Taito America Corporation", "Don Doko Don (US)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, dondokodj,  dondokod, dondokod,  dondokodj,  taitof2_state, empty_init,    ROT0,   "Taito Corporation",         "Don Doko Don (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, dondokod,   0,        dondokod,  dondokod,   taitof2_state, empty_init,    ROT0,   "Taito Corporation Japan",   "Don Doko Don (World, rev 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, dondokodu,  dondokod, dondokod,  dondokodu,  taitof2_state, empty_init,    ROT0,   "Taito America Corporation", "Don Doko Don (US, rev 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, dondokodj,  dondokod, dondokod,  dondokodj,  taitof2_state, empty_init,    ROT0,   "Taito Corporation",         "Don Doko Don (Japan, rev 1)", MACHINE_SUPPORTS_SAVE )
 
 GAME( 1989, megablst,   0,        megab,     megab,      taitof2_state, empty_init,    ROT0,   "Taito Corporation Japan",   "Mega Blast (World)", MACHINE_SUPPORTS_SAVE )
 GAME( 1989, megablstu,  megablst, megab,     megabu,     taitof2_state, empty_init,    ROT0,   "Taito America Corporation", "Mega Blast (US)", MACHINE_SUPPORTS_SAVE )
 GAME( 1989, megablstj,  megablst, megab,     megabj,     taitof2_state, empty_init,    ROT0,   "Taito Corporation",         "Mega Blast (Japan)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1990, thundfox,   0,        thundfox,  thundfox,   taitof2_state, empty_init,    ROT0,   "Taito Corporation Japan",   "Thunder Fox (World)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, thundfoxu,  thundfox, thundfox,  thundfoxu,  taitof2_state, empty_init,    ROT0,   "Taito America Corporation", "Thunder Fox (US)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, thundfoxj,  thundfox, thundfox,  thundfoxj,  taitof2_state, empty_init,    ROT0,   "Taito Corporation",         "Thunder Fox (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, thundfox,   0,        thundfox,  thundfox,   taitof2_state, empty_init,    ROT0,   "Taito Corporation Japan",   "Thunder Fox (World, rev 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, thundfoxu,  thundfox, thundfox,  thundfoxu,  taitof2_state, empty_init,    ROT0,   "Taito America Corporation", "Thunder Fox (US, rev 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, thundfoxj,  thundfox, thundfox,  thundfoxj,  taitof2_state, empty_init,    ROT0,   "Taito Corporation",         "Thunder Fox (Japan, rev 1)", MACHINE_SUPPORTS_SAVE )
 
 GAME( 1989, cameltry,   0,        cameltry,  cameltry,   taitof2_state, init_cameltry, ROT0,   "Taito America Corporation", "Cameltry (US, YM2610)", MACHINE_SUPPORTS_SAVE )
 GAME( 1989, cameltryj,  cameltry, cameltry,  cameltryj,  taitof2_state, init_cameltry, ROT0,   "Taito Corporation",         "Cameltry (Japan, YM2610)", MACHINE_SUPPORTS_SAVE )
@@ -5557,10 +5651,12 @@ GAME( 1990, mjnquest,   0,        mjnquest,  mjnquest,   taitof2_state, init_mjn
 GAME( 1990, mjnquestb,  mjnquest, mjnquest,  mjnquest,   taitof2_state, init_mjnquest, ROT0,   "Taito Corporation",         "Mahjong Quest (No Nudity)", MACHINE_SUPPORTS_SAVE )
 
 GAME( 1990, footchmp,   0,        footchmp,  footchmp,   taitof2_state, empty_init,    ROT0,   "Taito Corporation Japan",   "Football Champ / Euro Football Champ (World)", MACHINE_SUPPORTS_SAVE ) // title depends on dipswitch
-GAME( 1990, hthero,     footchmp, hthero,    hthero,     taitof2_state, empty_init,    ROT0,   "Taito Corporation",         "Hat Trick Hero (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, htherou,    footchmp, footchmp,  htherou,    taitof2_state, empty_init,    ROT0,   "Taito Corporation",         "Hat Trick Hero (US)", MACHINE_SUPPORTS_SAVE ) // Single PCB
+GAME( 1990, htheroj,    footchmp, hthero,    htheroj,    taitof2_state, empty_init,    ROT0,   "Taito Corporation",         "Hat Trick Hero (Japan)", MACHINE_SUPPORTS_SAVE ) // Dual PCB
 GAME( 1992, footchmpbl, footchmp, footchmpbl,footchmpbl, taitof2_state, empty_init,    ROT0,   "bootleg",                   "Football Champ / Euro Football Champ (World) (bootleg)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING ) // very different hw register etc.
 
 GAME( 1992, euroch92,   0,        footchmp,  footchmp,   taitof2_state, empty_init,    ROT0,   "Taito Corporation Japan",   "Euro Champ '92 (World)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, euroch92j,  euroch92, footchmp,  footchmp,   taitof2_state, empty_init,    ROT0,   "Taito Corporation Japan",   "Euro Champ '92 (Japan)", MACHINE_SUPPORTS_SAVE )
 
 GAME( 1990, koshien,    0,        koshien,   koshien,    taitof2_state, empty_init,    ROT0,   "Taito Corporation",         "Ah Eikou no Koshien (Japan)", MACHINE_SUPPORTS_SAVE )
 
@@ -5574,11 +5670,12 @@ GAME( 1991, solfigtr,   0,        solfigtr,  solfigtr,   taitof2_state, empty_in
 
 GAME( 1991, qzquest,    0,        qzquest ,  qzquest,    taitof2_state, empty_init,    ROT0,   "Taito Corporation",         "Quiz Quest - Hime to Yuusha no Monogatari (Japan)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1991, pulirula,   0,        pulirula,  pulirula,   taitof2_state, empty_init,    ROT0,   "Taito Corporation Japan",   "PuLiRuLa (World)", MACHINE_SUPPORTS_SAVE )
-GAME( 1991, pulirulaa,  pulirula, pulirula,  pulirulaj,  taitof2_state, empty_init,    ROT0,   "Taito Corporation",         "PuLiRuLa (World, earlier?)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, pulirula,   0,        pulirula,  pulirula,   taitof2_state, empty_init,    ROT0,   "Taito Corporation Japan",   "PuLiRuLa (World, dual PCB)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, pulirulaa,  pulirula, pulirula,  pulirulaj,  taitof2_state, empty_init,    ROT0,   "Taito Corporation",         "PuLiRuLa (World, single PCB)", MACHINE_SUPPORTS_SAVE )
 GAME( 1991, pulirulaj,  pulirula, pulirula,  pulirulaj,  taitof2_state, empty_init,    ROT0,   "Taito Corporation",         "PuLiRuLa (Japan)", MACHINE_SUPPORTS_SAVE )
 
 GAME( 1991, metalb,     0,        metalb,    metalb,     taitof2_state, empty_init,    ROT0,   "Taito Corporation Japan",   "Metal Black (World)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, metalba,    metalb,   metalb,    metalb,     taitof2_state, empty_init,    ROT0,   "Taito Corporation Japan",   "Metal Black (World, single PCB)", MACHINE_SUPPORTS_SAVE )
 GAME( 1991, metalbj,    metalb,   metalb,    metalbj,    taitof2_state, empty_init,    ROT0,   "Taito Corporation",         "Metal Black (Japan)", MACHINE_SUPPORTS_SAVE )
 
 GAME( 1991, qzchikyu,   0,        qzchikyu,  qzchikyu,   taitof2_state, empty_init,    ROT0,   "Taito Corporation",         "Quiz Chikyu Bouei Gun (Japan)", MACHINE_SUPPORTS_SAVE )

@@ -37,12 +37,12 @@ protected:
 	mufdc_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// optional information overrides
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual ioport_constructor device_input_ports() const override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 
 	// device_isa8_card_interface
 	virtual uint8_t dack_r(int line) override;
@@ -54,8 +54,8 @@ private:
 	static void floppy_formats(format_registration &fr);
 
 	uint8_t fdc_input_r();
-	DECLARE_WRITE_LINE_MEMBER( fdc_irq_w );
-	DECLARE_WRITE_LINE_MEMBER( fdc_drq_w );
+	void fdc_irq_w(int state);
+	void fdc_drq_w(int state);
 
 	required_device<mcs3201_device> m_fdc;
 	required_ioport m_config;
@@ -67,7 +67,7 @@ public:
 	// construction/destruction
 	fdc344_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 };
 
 class fdcmag_device : public mufdc_device
@@ -76,7 +76,7 @@ public:
 	// construction/destruction
 	fdcmag_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 };
 
 // device type definition

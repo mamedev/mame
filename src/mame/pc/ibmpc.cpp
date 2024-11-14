@@ -263,6 +263,9 @@ XT U44 IBM.bin: IBM 5160 PC/XT Bank-selection decoding ROM (256x4 bit). Not mapp
 #include "machine/genpc.h"
 #include "softlist_dev.h"
 
+
+namespace {
+
 class ibmpc_state : public driver_device
 {
 public:
@@ -276,8 +279,8 @@ public:
 
 private:
 	required_device<cpu_device> m_maincpu;
-	void pc8_io(address_map &map);
-	void pc8_map(address_map &map);
+	void pc8_io(address_map &map) ATTR_COLD;
+	void pc8_map(address_map &map) ATTR_COLD;
 };
 
 void ibmpc_state::pc8_map(address_map &map)
@@ -578,6 +581,7 @@ ROM_START( ibm5160 )
 //      ROM_LOAD("1504162.u26", 0x02000, 0x2000, CRC(59e1dc32) SHA1(337b5cced203345a5acfb02532d6b5f526902ee7)) /* silkscreen: "AMI 8607MAH // 9591-042 // S2364B // 1504162 // PHILIPPINES" - Purpose: Pixel 8 of built-in 3270 terminal font*/
 ROM_END
 
+} // anonymous namespace
 
 
 /***************************************************************************

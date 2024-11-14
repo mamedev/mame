@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood
-#ifndef MAME_VIDEO_NAMCOS21_3D_H
-#define MAME_VIDEO_NAMCOS21_3D_H
+#ifndef MAME_NAMCO_NAMCOS21_3D_H
+#define MAME_NAMCO_NAMCOS21_3D_H
 
 #pragma once
 
@@ -32,8 +32,8 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 private:
 	struct n21_vertex
@@ -68,4 +68,4 @@ private:
 
 DECLARE_DEVICE_TYPE(NAMCOS21_3D, namcos21_3d_device)
 
-#endif // MAME_VIDEO_NAMCOS21_3D_H
+#endif // MAME_NAMCO_NAMCOS21_3D_H

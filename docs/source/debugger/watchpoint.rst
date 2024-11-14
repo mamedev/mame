@@ -75,7 +75,7 @@ Examples:
     execution.
 ``temp0 = 0 ; wp 45678,1,w,wpdata==f0,{ temp0++ ; g }``
     Set a watchpoint for the visible CPU that will halt execution
-    whenever a write do the first address space occurs at address 45678
+    whenever a write to the first address space occurs at address 45678
     where the value being written is equal to f0.  When this happens,
     increment the variable **temp0** and resume execution.
 

@@ -14,10 +14,10 @@
 #include "osdcore.h"
 #include "strconv.h"
 
-#ifdef OSD_WINDOWS
 #include "winutf8.h"
-#endif
+#include "winutil.h"
 
+#include <algorithm>
 #include <cstdio>
 #include <cstdlib>
 
@@ -168,25 +168,92 @@ static std::string convert_ansi(LPCVOID data)
 //  osd_get_clipboard_text
 //============================================================
 
-std::string osd_get_clipboard_text()
+std::string osd_get_clipboard_text() noexcept
 {
 	std::string result;
 
-	// try to access unicode text
-	if (!get_clipboard_text_by_format(result, CF_UNICODETEXT, convert_wide))
+	// TODO: better error handling
+	try
 	{
-		// try to access ANSI text
-		get_clipboard_text_by_format(result, CF_TEXT, convert_ansi);
+		// try to access unicode text
+		if (!get_clipboard_text_by_format(result, CF_UNICODETEXT, convert_wide))
+		{
+			// try to access ANSI text
+			get_clipboard_text_by_format(result, CF_TEXT, convert_ansi);
+		}
+	}
+	catch (...)
+	{
 	}
 
 	return result;
 }
 
 //============================================================
+//  osd_set_clipboard_text
+//============================================================
+
+std::error_condition osd_set_clipboard_text(std::string_view text) noexcept
+{
+	try
+	{
+		// convert the text to a wide char string and create a moveable global block
+		std::wstring const wtext = osd::text::to_wstring(text);
+		HGLOBAL const clip = GlobalAlloc(GMEM_MOVEABLE, (text.length() + 1) * sizeof(wchar_t));
+		if (!clip)
+			return win_error_to_error_condition(GetLastError());
+		LPWSTR const lock = reinterpret_cast<LPWSTR>(GlobalLock(clip));
+		if (!lock)
+		{
+			DWORD const err(GetLastError());
+			GlobalFree(clip);
+			return win_error_to_error_condition(err);
+		}
+
+		// clear current clipboard contents
+		if (!OpenClipboard(nullptr))
+		{
+			DWORD const err(GetLastError());
+			GlobalUnlock(clip);
+			GlobalFree(clip);
+			return win_error_to_error_condition(err);
+		}
+		if (!EmptyClipboard())
+		{
+			DWORD const err(GetLastError());
+			CloseClipboard();
+			GlobalUnlock(clip);
+			GlobalFree(clip);
+			return win_error_to_error_condition(err);
+		}
+
+		// copy the text (plus NUL terminator) to the moveable block and put it on the clipboard
+		std::copy_n(wtext.c_str(), wtext.length() + 1, lock);
+		GlobalUnlock(clip);
+		if (!SetClipboardData(CF_UNICODETEXT, clip))
+		{
+			DWORD const err(GetLastError());
+			CloseClipboard();
+			GlobalFree(clip);
+			return win_error_to_error_condition(err);
+		}
+
+		// clean up
+		if (!CloseClipboard())
+			return win_error_to_error_condition(GetLastError());
+		return std::error_condition();
+	}
+	catch (std::bad_alloc const &)
+	{
+		return std::errc::not_enough_memory;
+	}
+}
+
+//============================================================
 //  osd_getpid
 //============================================================
 
-int osd_getpid()
+int osd_getpid() noexcept
 {
 	return GetCurrentProcessId();
 }
@@ -257,13 +324,13 @@ private:
 } // anonymous namespace
 
 
-bool invalidate_instruction_cache(void const *start, std::size_t size)
+bool invalidate_instruction_cache(void const *start, std::size_t size) noexcept
 {
 	return FlushInstructionCache(GetCurrentProcess(), start, size) != 0;
 }
 
 
-void *virtual_memory_allocation::do_alloc(std::initializer_list<std::size_t> blocks, unsigned intent, std::size_t &size, std::size_t &page_size)
+void *virtual_memory_allocation::do_alloc(std::initializer_list<std::size_t> blocks, unsigned intent, std::size_t &size, std::size_t &page_size) noexcept
 {
 	SYSTEM_INFO info;
 	GetSystemInfo(&info);
@@ -282,19 +349,19 @@ void *virtual_memory_allocation::do_alloc(std::initializer_list<std::size_t> blo
 	return result;
 }
 
-void virtual_memory_allocation::do_free(void *start, std::size_t size)
+void virtual_memory_allocation::do_free(void *start, std::size_t size) noexcept
 {
 	VirtualFree(start, 0, MEM_RELEASE);
 }
 
-bool virtual_memory_allocation::do_set_access(void *start, std::size_t size, unsigned access)
+bool virtual_memory_allocation::do_set_access(void *start, std::size_t size, unsigned access) noexcept
 {
-	DWORD p, o;
+	DWORD p;
 	if (access & EXECUTE)
 		p = (access & WRITE) ? PAGE_EXECUTE_READWRITE : (access & READ) ? PAGE_EXECUTE_READ : PAGE_EXECUTE;
 	else
 		p = (access & WRITE) ? PAGE_READWRITE : (access & READ) ? PAGE_READONLY : PAGE_NOACCESS;
-	return VirtualProtect(start, size, p, &o) != 0;
+	return VirtualAlloc(start, size, MEM_COMMIT, p) != nullptr;
 }
 
 

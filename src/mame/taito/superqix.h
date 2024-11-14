@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Mirko Buffoni, Nicola Salmoria, Tomasz Slanina
-#ifndef MAME_INCLUDES_SUPERQIX_H
-#define MAME_INCLUDES_SUPERQIX_H
+#ifndef MAME_TAITO_SUPERQIX_H
+#define MAME_TAITO_SUPERQIX_H
 
 #pragma once
 
@@ -74,7 +74,7 @@ protected:
 	uint32_t screen_update_superqix(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void superqix_draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect);
 
-	void main_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
 
 	virtual void machine_init_common();
 };
@@ -93,12 +93,12 @@ public:
 	void sqix_8031(machine_config &config);
 	void sqix_nomcu(machine_config &config);
 
-	DECLARE_READ_LINE_MEMBER(fromz80_semaphore_input_r);
-	DECLARE_READ_LINE_MEMBER(frommcu_semaphore_input_r);
+	int fromz80_semaphore_input_r();
+	int frommcu_semaphore_input_r();
 
 protected:
-	virtual void machine_start() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	required_device<ay8910_device>    m_ay2;
@@ -124,8 +124,8 @@ private:
 	INTERRUPT_GEN_MEMBER(sqix_timer_irq);
 	DECLARE_MACHINE_RESET(superqix);
 
-	void sqix_port_map(address_map &map);
-	void sqix_8031_map(address_map &map);
+	void sqix_port_map(address_map &map) ATTR_COLD;
+	void sqix_8031_map(address_map &map) ATTR_COLD;
 
 	virtual void machine_init_common() override;
 
@@ -160,11 +160,11 @@ public:
 	void pbillian(machine_config &config);
 	void pbillianb(machine_config &config);
 
-	DECLARE_CUSTOM_INPUT_MEMBER(pbillian_semaphore_input_r);
+	ioport_value pbillian_semaphore_input_r();
 
 protected:
-	virtual void machine_start() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	u8 hotsmash_68705_porta_r();
@@ -176,7 +176,7 @@ private:
 	void pbillian_sample_trigger_w(u8 data);
 	void pbillian_0410_w(u8 data);
 
-	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
+	void vblank_irq(int state);
 
 	SAMPLES_START_CB_MEMBER(pbillian_sh_start);
 
@@ -184,8 +184,8 @@ private:
 
 	u32 screen_update_pbillian(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void pbillian_port_map(address_map &map);
-	void pbillianb_port_map(address_map &map);
+	void pbillian_port_map(address_map &map) ATTR_COLD;
+	void pbillianb_port_map(address_map &map) ATTR_COLD;
 
 	virtual void machine_init_common() override;
 
@@ -212,4 +212,4 @@ private:
 	int m_dial_sign[2];
 };
 
-#endif // MAME_INCLUDES_SUPERQIX_H
+#endif // MAME_TAITO_SUPERQIX_H

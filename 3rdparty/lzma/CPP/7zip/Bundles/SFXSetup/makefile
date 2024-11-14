@@ -1,10 +1,12 @@
 PROG = 7zS.sfx
+MY_FIXED = 1
+
 CFLAGS = $(CFLAGS) \
-  -DNO_REGISTRY \
-  -DEXTRACT_ONLY \
-  -DNO_READ_FROM_CODER \
-  -D_SFX \
-  -D_NO_CRYPTO \
+  -DZ7_NO_REGISTRY \
+  -DZ7_EXTRACT_ONLY \
+  -DZ7_NO_READ_FROM_CODER \
+  -DZ7_SFX \
+  -DZ7_NO_CRYPTO \
 
 CURRENT_OBJS = \
   $O\SfxSetup.obj \
@@ -33,6 +35,7 @@ WIN_OBJS = \
   $O\PropVariant.obj \
   $O\ResourceString.obj \
   $O\Synchronization.obj \
+  $O\System.obj \
   $O\Window.obj \
 
 WIN_CTRL_OBJS = \
@@ -40,6 +43,7 @@ WIN_CTRL_OBJS = \
 
 7ZIP_COMMON_OBJS = \
   $O\CreateCoder.obj \
+  $O\CWrappers.obj \
   $O\FileStreams.obj \
   $O\InBuffer.obj \
   $O\FilterCoder.obj \
@@ -93,6 +97,7 @@ COMPRESS_OBJS = \
   $O\LzmaRegister.obj \
 
 C_OBJS = \
+  $O\7zStream.obj \
   $O\Alloc.obj \
   $O\Bcj2.obj \
   $O\Bra.obj \
@@ -102,9 +107,12 @@ C_OBJS = \
   $O\Delta.obj \
   $O\DllSecur.obj \
   $O\Lzma2Dec.obj \
+  $O\Lzma2DecMt.obj \
   $O\LzmaDec.obj \
+  $O\MtDec.obj \
   $O\Threads.obj \
 
 !include "../../Crc.mak"
+!include "../../LzmaDec.mak"
 
 !include "../../7zip.mak"

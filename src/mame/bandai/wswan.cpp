@@ -12,6 +12,8 @@
 
   Based on the WStech documentation by Judge and Dox.
 
+  These systems were developed by Koto Laboratory
+
   Usage:
     Keep START button pressed during startup (or reset) to enter the internal
     configuration menu.
@@ -63,8 +65,11 @@ public:
 	{ }
 
 	void wswan(machine_config &config);
+	void pockchv2(machine_config &config);
 
 protected:
+	void wswan_base(machine_config &config);
+
 	// Interrupt flags
 	static constexpr u8 WSWAN_IFLAG_STX    = 0x01;
 	static constexpr u8 WSWAN_IFLAG_KEY    = 0x02;
@@ -107,28 +112,28 @@ protected:
 	required_device<wswan_sound_device> m_sound;
 	required_device<ws_cart_slot_device> m_cart;
 
-	u16 m_ws_portram[128];
-	u8 m_internal_eeprom[INTERNAL_EEPROM_SIZE * 2];
-	u8 m_system_type;
+	u16 m_ws_portram[128] = { };
+	u8 m_internal_eeprom[INTERNAL_EEPROM_SIZE * 2] = { };
+	u8 m_system_type = 0;
 	sound_dma_t m_sound_dma;
-	u16 m_dma_source_offset;
-	u16 m_dma_source_segment;
-	u16 m_dma_destination;
-	u16 m_dma_length;
-	u16 m_dma_control;
-	u8 m_bios_disabled;
-	u8 m_rotate;
-	u32 m_vector;
-	u8 m_sys_control;
-	u8 m_irq_vector_base;
-	u8 m_serial_data;
-	u8 m_serial_control;
-	u8 m_irq_enable;
-	u8 m_irq_active;
-	u16 m_internal_eeprom_data;
-	u16 m_internal_eeprom_address;
-	u8 m_internal_eeprom_command;
-	u8 m_keypad;
+	u16 m_dma_source_offset = 0;
+	u16 m_dma_source_segment = 0;
+	u16 m_dma_destination = 0;
+	u16 m_dma_length = 0;
+	u16 m_dma_control = 0;
+	u8 m_bios_disabled = 0;
+	u8 m_rotate = 0;
+	u32 m_vector = 0;
+	u8 m_sys_control = 0;
+	u8 m_irq_vector_base = 0;
+	u8 m_serial_data = 0;
+	u8 m_serial_control = 0;
+	u8 m_irq_enable = 0;
+	u8 m_irq_active = 0;
+	u16 m_internal_eeprom_data = 0;
+	u16 m_internal_eeprom_address = 0;
+	u8 m_internal_eeprom_command = 0;
+	u8 m_keypad = 0;
 
 	required_memory_region m_region_maincpu;
 	required_ioport m_cursx;
@@ -143,13 +148,13 @@ protected:
 	void set_irq_line(int irq);
 	void dma_sound_cb();
 	void common_start();
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 	void palette(palette_device &palette) const;
 
-	void io_map(address_map &map);
-	void mem_map(address_map &map);
-	void snd_map(address_map &map);
+	void io_map(address_map &map) ATTR_COLD;
+	void mem_map(address_map &map) ATTR_COLD;
+	void snd_map(address_map &map) ATTR_COLD;
 
 	void register_save();
 	void handle_irqs();
@@ -168,8 +173,8 @@ public:
 	void wscolor(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	void mem_map(address_map &map);
+	virtual void machine_start() override ATTR_COLD;
+	void mem_map(address_map &map) ATTR_COLD;
 	void palette(palette_device &palette) const;
 	virtual u16 get_internal_eeprom_address() override;
 };
@@ -204,15 +209,15 @@ void wswan_state::snd_map(address_map &map)
 
 static INPUT_PORTS_START(wswan)
 	PORT_START("CURSX")
-	PORT_BIT( 0x8, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_NAME("X4 - Left")
-	PORT_BIT( 0x4, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_NAME("X3 - Down")
-	PORT_BIT( 0x2, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_NAME("X2 - Right")
-	PORT_BIT( 0x1, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_NAME("X1 - Up")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_NAME("X4 - Left")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_NAME("X3 - Down")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_NAME("X2 - Right")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_NAME("X1 - Up")
 
 	PORT_START("BUTTONS")
-	PORT_BIT( 0x8, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Button B")
-	PORT_BIT( 0x4, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Button A")
-	PORT_BIT( 0x2, IP_ACTIVE_HIGH, IPT_START1 ) PORT_NAME("Start")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Button B")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Button A")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START ) PORT_NAME("Start")
 
 	PORT_START("CURSY")
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Y4 - Left") PORT_CODE(KEYCODE_A)
@@ -258,7 +263,7 @@ static void wswan_cart(device_slot_interface &device)
 }
 
 
-void wswan_state::wswan(machine_config &config)
+void wswan_state::wswan_base(machine_config &config)
 {
 	// Basic machine hardware
 	V30MZ(config, m_maincpu, X1 / 4);
@@ -298,13 +303,26 @@ void wswan_state::wswan(machine_config &config)
 	// cartridge
 	WS_CART_SLOT(config, m_cart, X1 / 32, wswan_cart, nullptr);
 
+
+}
+
+void wswan_state::wswan(machine_config &config)
+{
+	wswan_base(config);
+
 	// software lists
 	SOFTWARE_LIST(config, "cart_list").set_original("wswan");
 	SOFTWARE_LIST(config, "wsc_list").set_compatible("wscolor");
-
-	SOFTWARE_LIST(config, "pc2_list").set_compatible("pockchalv2");
 }
 
+// while the pc2 software is compatible with a Wonderswan, the physical cartridges are not
+void wswan_state::pockchv2(machine_config &config)
+{
+	wswan_base(config);
+
+	// software lists
+	SOFTWARE_LIST(config, "pc2_list").set_original("pockchalv2");
+}
 
 void wscolor_state::wscolor(machine_config &config)
 {
@@ -556,7 +574,7 @@ u16 wswan_state::port_r(offs_t offset, u16 mem_mask)
 			return m_vdp->reg_r(offset, mem_mask);
 		case 0xa0 / 2:
 			// Hardware type
-			// Bit 0 - Disable/enable Bios
+			// Bit 0 - Disable/enable BIOS
 			// Bit 1 - Determine mono/color
 			// Bit 2 - Unknown, used to determine color/crystal
 			// Bit 3 - Unknown
@@ -911,41 +929,48 @@ void wswan_state::port_w(offs_t offset, u16 data, u16 mem_mask)
 }
 
 
-void wswan_state::set_icons(u8 data) {
+void wswan_state::set_icons(u8 data)
+{
 	// Bit 0 - LCD sleep icon enable
 	// Bit 1 - Vertical position icon enable
 	// Bit 2 - Horizontal position icon enable
 	// Bit 3 - Dot 1 icon enable
 	// Bit 4 - Dot 2 icon enable
 	// Bit 5 - Dot 3 icon enable
-	for (int i = 0; i < 6; i++) {
+	for (int i = 0; i < 6; i++)
+	{
 		m_icons[i] = BIT(data, i);
 	}
 
 	u8 old_rotate = m_rotate;
 
-	if ((!BIT(data, 2) && BIT(data, 1)) || (BIT(data, 2) && !BIT(data, 1))) {
+	if ((!BIT(data, 2) && BIT(data, 1)) || (BIT(data, 2) && !BIT(data, 1)))
+	{
 		m_rotate = (!BIT(data, 2) && BIT(data, 1)) ? 1 : 0;
 
-		if (old_rotate != m_rotate) {
+		if (old_rotate != m_rotate)
+		{
 				set_rotate_view();
 		}
 	}
 }
 
 
-void wswan_state::set_rotate_view() {
+void wswan_state::set_rotate_view()
+{
 	render_target *target = machine().render().first_target();
 	target->set_view(m_rotate);
 }
 
 
-u16 wswan_state::get_internal_eeprom_address() {
+u16 wswan_state::get_internal_eeprom_address()
+{
 	return (m_internal_eeprom_address & 0x3f) << 1;
 }
 
 
-u16 wscolor_state::get_internal_eeprom_address() {
+u16 wscolor_state::get_internal_eeprom_address()
+{
 	return (m_internal_eeprom_address & 0x1ff) << 1;
 }
 
@@ -975,11 +1000,24 @@ ROM_START(wscolor)
 	ROM_LOAD("internal_eeprom.wsc", 0x000, 0x800, BAD_DUMP CRC(ca11afc9) SHA1(0951845f01f83bee497268a63b5fb7baccfeff7c))
 ROM_END
 
+// this currently uses the wswan internal ROMs, the real ones should be different
+ROM_START(pockchv2)
+	ROM_REGION(0x1000, "maincpu", 0)
+	ROM_LOAD("boot.rom", 0x0000, 0x1000, BAD_DUMP CRC(7f35f890) SHA1(4015bcacea76bb0b5bbdb13c5358f7e1abb986a1))
+
+	ROM_REGION(0x80, "nvram", 0)
+	// Need a dump from an original new unit
+	// Empty file containing just the name 'WONDERSAN'
+	ROM_LOAD("internal_eeprom.ws", 0x00, 0x80, BAD_DUMP CRC(b1dff316) SHA1(7b76c3d59c9add9501f95e8bfc34427773fcbd28))
+ROM_END
+
 // SwanCrystal has the name 'SWANCRYSTAL' (from Youtube videos)
 
 } // anonymous namespace
 
 
-//    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT  CLASS          INIT        COMPANY   FULLNAME
-CONS( 1999, wswan,   0,      0,      wswan,   wswan, wswan_state,   empty_init, "Bandai", "WonderSwan",       MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-CONS( 2000, wscolor, wswan,  0,      wscolor, wswan, wscolor_state, empty_init, "Bandai", "WonderSwan Color", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+//    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT  CLASS          INIT        COMPANY   FULLNAME
+CONS( 1999, wswan,    0,      0,      wswan,    wswan, wswan_state,   empty_init, "Bandai", "WonderSwan",       MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+CONS( 2000, wscolor,  wswan,  0,      wscolor,  wswan, wscolor_state, empty_init, "Bandai", "WonderSwan Color", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+
+CONS( 2002, pockchv2, wswan,  0,      pockchv2, wswan, wswan_state,   empty_init, "Benesse Corporation", "Pocket Challenge V2",       MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

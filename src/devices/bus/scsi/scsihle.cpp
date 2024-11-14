@@ -405,7 +405,7 @@ void scsihle_device::scsi_change_phase(uint8_t newphase)
 	}
 }
 
-WRITE_LINE_MEMBER( scsihle_device::input_sel )
+void scsihle_device::input_sel(int state)
 {
 //  printf( "sel %d %d %02x\n", state, m_phase, m_input_data );
 	switch (m_phase)
@@ -415,11 +415,9 @@ WRITE_LINE_MEMBER( scsihle_device::input_sel )
 		// only one line active.
 		if (scsibus_driveno(m_input_data) == scsiID)
 		{
-			void *hdfile = nullptr;
 			// Check to see if device had image file mounted, if not, do not set busy,
 			// and stay busfree.
-			GetDevice(&hdfile);
-			if (hdfile != nullptr)
+			if (exists())
 			{
 				if (!state)
 				{
@@ -435,7 +433,7 @@ WRITE_LINE_MEMBER( scsihle_device::input_sel )
 	}
 }
 
-WRITE_LINE_MEMBER( scsihle_device::input_ack )
+void scsihle_device::input_ack(int state)
 {
 	switch (m_phase)
 	{
@@ -494,7 +492,7 @@ WRITE_LINE_MEMBER( scsihle_device::input_ack )
 
 				if (IS_COMMAND(SCSI_CMD_FORMAT_UNIT))
 				{
-					// If we have the first byte, then cancel the dataout timout
+					// If we have the first byte, then cancel the dataout timeout
 					if (data_idx == 1)
 						dataout_timer->adjust(attotime::never);
 
@@ -573,7 +571,7 @@ WRITE_LINE_MEMBER( scsihle_device::input_ack )
 	}
 }
 
-WRITE_LINE_MEMBER( scsihle_device::input_rst )
+void scsihle_device::input_rst(int state)
 {
 	if (state)
 	{

@@ -5,8 +5,8 @@
     Mermaid
 
 *************************************************************************/
-#ifndef MAME_INCLUDES_MERMAID_H
-#define MAME_INCLUDES_MERMAID_H
+#ifndef MAME_SANRITSU_MERMAID_H
+#define MAME_SANRITSU_MERMAID_H
 
 #pragma once
 
@@ -90,40 +90,38 @@ private:
 	uint8_t    m_nmi_mask = 0;
 	void mermaid_ay8910_write_port_w(uint8_t data);
 	void mermaid_ay8910_control_port_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(ay1_enable_w);
-	DECLARE_WRITE_LINE_MEMBER(ay2_enable_w);
-	DECLARE_WRITE_LINE_MEMBER(nmi_mask_w);
-	DECLARE_WRITE_LINE_MEMBER(rougien_sample_rom_lo_w);
-	DECLARE_WRITE_LINE_MEMBER(rougien_sample_rom_hi_w);
-	DECLARE_WRITE_LINE_MEMBER(rougien_sample_playback_w);
+	void ay1_enable_w(int state);
+	void ay2_enable_w(int state);
+	void nmi_mask_w(int state);
+	void rougien_sample_rom_lo_w(int state);
+	void rougien_sample_rom_hi_w(int state);
+	void rougien_sample_playback_w(int state);
 	void adpcm_data_w(uint8_t data);
 	void mermaid_videoram2_w(offs_t offset, uint8_t data);
 	void mermaid_videoram_w(offs_t offset, uint8_t data);
 	void mermaid_colorram_w(offs_t offset, uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(flip_screen_x_w);
-	DECLARE_WRITE_LINE_MEMBER(flip_screen_y_w);
 	void mermaid_bg_scroll_w(offs_t offset, uint8_t data);
 	void mermaid_fg_scroll_w(offs_t offset, uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(bg_mask_w);
-	DECLARE_WRITE_LINE_MEMBER(bg_bank_w);
-	DECLARE_WRITE_LINE_MEMBER(rougien_gfxbankswitch1_w);
-	DECLARE_WRITE_LINE_MEMBER(rougien_gfxbankswitch2_w);
+	void bg_mask_w(int state);
+	void bg_bank_w(int state);
+	void rougien_gfxbankswitch1_w(int state);
+	void rougien_gfxbankswitch2_w(int state);
 	uint8_t mermaid_collision_r();
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 	void common_palette(palette_device &palette) const;
 	void mermaid_palette(palette_device &palette) const;
 	void rougien_palette(palette_device &palette) const;
 	uint32_t screen_update_mermaid(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_WRITE_LINE_MEMBER(screen_vblank_mermaid);
+	void screen_vblank_mermaid(int state);
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	uint8_t collision_check( rectangle& rect );
 	void collision_update();
-	DECLARE_WRITE_LINE_MEMBER(rougien_adpcm_int);
-	void mermaid_map(address_map &map);
+	void rougien_adpcm_int(int state);
+	void mermaid_map(address_map &map) ATTR_COLD;
 };
 
-#endif // MAME_INCLUDES_MERMAID_H
+#endif // MAME_SANRITSU_MERMAID_H

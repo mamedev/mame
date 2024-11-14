@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Sergey Svishchev
-#ifndef MAME_MACHINE_AGATKEYB_H
-#define MAME_MACHINE_AGATKEYB_H
+#ifndef MAME_AGAT_AGATKEYB_H
+#define MAME_AGAT_AGATKEYB_H
 
 #pragma once
 
@@ -29,7 +29,7 @@ public:
 		device_t *owner,
 		u32 clock);
 
-	virtual ioport_constructor device_input_ports() const override;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 
 	auto out_callback() { return m_keyboard_cb.bind(); }
 	auto out_meta_callback() { return m_out_meta_cb.bind(); }
@@ -45,8 +45,8 @@ protected:
 		char const *tag,
 		device_t *owner,
 		u32 clock);
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 	virtual void key_make(u8 row, u8 column) override;
 	virtual void key_repeat(u8 row, u8 column) override;
 
@@ -67,4 +67,4 @@ private:
 	devcb_write_line m_out_reset_cb;
 };
 
-#endif // MAME_MACHINE_AGATKEYB_H
+#endif // MAME_AGAT_AGATKEYB_H

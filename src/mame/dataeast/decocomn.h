@@ -5,8 +5,8 @@
     decocomn.h
 
 **************************************************************************/
-#ifndef MAME_VIDEO_DECOCOMN_H
-#define MAME_VIDEO_DECOCOMN_H
+#ifndef MAME_DATAEAST_DECOCOMN_H
+#define MAME_DATAEAST_DECOCOMN_H
 
 #pragma once
 
@@ -35,8 +35,8 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 private:
 	// internal state
@@ -49,4 +49,4 @@ private:
 DECLARE_DEVICE_TYPE(DECOCOMN, decocomn_device)
 
 
-#endif // MAME_VIDEO_DECOCOMN_H
+#endif // MAME_DATAEAST_DECOCOMN_H

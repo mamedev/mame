@@ -14,9 +14,6 @@
 #pragma once
 
 #include "debugvw.h"
-#include "debugbuf.h"
-
-#include "vecstream.h"
 
 
 //**************************************************************************
@@ -37,6 +34,9 @@ enum disasm_right_column
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
+
+// forward declaration
+class debug_disasm_buffer;
 
 // a disassembly view_source
 class debug_view_disasm_source : public debug_view_source
@@ -119,7 +119,7 @@ private:
 	void complete_information(const debug_view_disasm_source &source, debug_disasm_buffer &buffer, offs_t pc);
 
 	void enumerate_sources();
-	void print(int row, std::string text, int start, int end, u8 attrib);
+	void print(u32 row, std::string text, s32 start, s32 end, u8 attrib);
 	void redraw();
 
 	// internal state

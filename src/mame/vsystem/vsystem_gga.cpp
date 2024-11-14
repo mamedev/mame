@@ -23,10 +23,10 @@ DEFINE_DEVICE_TYPE(VSYSTEM_GGA, vsystem_gga_device, "vsystem_gga", "Video System
 //  vsystem_gga_device - constructor
 //-------------------------------------------------
 
-vsystem_gga_device::vsystem_gga_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: device_t(mconfig, VSYSTEM_GGA, tag, owner, clock),
-		device_video_interface(mconfig, *this, false),
-		m_write_cb(*this)
+vsystem_gga_device::vsystem_gga_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
+	device_t(mconfig, VSYSTEM_GGA, tag, owner, clock),
+	device_video_interface(mconfig, *this, false),
+	m_write_cb(*this)
 {
 }
 
@@ -36,8 +36,6 @@ vsystem_gga_device::vsystem_gga_device(const machine_config &mconfig, const char
 
 void vsystem_gga_device::device_start()
 {
-	m_write_cb.resolve();
-
 	m_address_latch = 0;
 	for (u8 &reg : m_regs)
 		reg = 0;
@@ -61,7 +59,7 @@ void vsystem_gga_device::write(offs_t offset, u8 data)
 	{
 		// data write
 		m_regs[m_address_latch] = data;
-		if (m_write_cb.isnull())
+		if (m_write_cb.isunset())
 			logerror("Setting register $%02x = %02x\n", m_address_latch, data);
 		else
 			m_write_cb(m_address_latch, data, 0xff);

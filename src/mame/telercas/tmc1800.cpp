@@ -432,7 +432,7 @@ static INPUT_PORTS_START( tmc2000 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_F) PORT_CHAR('F')
 
 	PORT_START("RUN")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Run/Reset") PORT_CODE(KEYCODE_R) PORT_TOGGLE PORT_CHANGED_MEMBER(DEVICE_SELF, tmc2000_state, run_pressed, 0)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Run/Reset") PORT_CODE(KEYCODE_R) PORT_TOGGLE PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(tmc2000_state::run_pressed), 0)
 
 	PORT_START("Y2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_G) PORT_CHAR('G')
@@ -541,78 +541,78 @@ static INPUT_PORTS_START( nano )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_F) PORT_CHAR('F')
 
 	PORT_START("RUN")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_NAME("RUN") PORT_CODE(KEYCODE_R) PORT_CHANGED_MEMBER(DEVICE_SELF, nano_state, run_pressed, 0)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_NAME("RUN") PORT_CODE(KEYCODE_R) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(nano_state::run_pressed), 0)
 
 	PORT_START("MONITOR")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_NAME("MONITOR") PORT_CODE(KEYCODE_M) PORT_CHANGED_MEMBER(DEVICE_SELF, nano_state, monitor_pressed, 0)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_NAME("MONITOR") PORT_CODE(KEYCODE_M) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(nano_state::monitor_pressed), 0)
 INPUT_PORTS_END
 
 /* CDP1802 Interfaces */
 
 // Telmac 1800
 
-READ_LINE_MEMBER( tmc1800_state::clear_r )
+int tmc1800_state::clear_r()
 {
 	return BIT(m_run->read(), 0);
 }
 
-READ_LINE_MEMBER( tmc1800_state::ef2_r )
+int tmc1800_state::ef2_r()
 {
 	return m_cassette->input() < 0;
 }
 
-READ_LINE_MEMBER( tmc1800_state::ef3_r )
+int tmc1800_state::ef3_r()
 {
 	return CLEAR_LINE; // TODO
 }
 
-WRITE_LINE_MEMBER( tmc1800_state::q_w )
+void tmc1800_state::q_w(int state)
 {
 	m_cassette->output(state ? 1.0 : -1.0);
 }
 
 // Oscom 1000B
 
-READ_LINE_MEMBER( osc1000b_state::clear_r )
+int osc1000b_state::clear_r()
 {
 	return BIT(m_run->read(), 0);
 }
 
-READ_LINE_MEMBER( osc1000b_state::ef2_r )
+int osc1000b_state::ef2_r()
 {
 	return m_cassette->input() < 0;
 }
 
-READ_LINE_MEMBER( osc1000b_state::ef3_r )
+int osc1000b_state::ef3_r()
 {
 	return CLEAR_LINE; // TODO
 }
 
-WRITE_LINE_MEMBER( osc1000b_state::q_w )
+void osc1000b_state::q_w(int state)
 {
 	m_cassette->output(state ? 1.0 : -1.0);
 }
 
 // Telmac 2000
 
-READ_LINE_MEMBER( tmc2000_state::clear_r )
+int tmc2000_state::clear_r()
 {
 	return BIT(m_run->read(), 0);
 }
 
-READ_LINE_MEMBER( tmc2000_state::ef2_r )
+int tmc2000_state::ef2_r()
 {
 	return (m_cassette)->input() < 0;
 }
 
-READ_LINE_MEMBER( tmc2000_state::ef3_r )
+int tmc2000_state::ef3_r()
 {
 	uint8_t data = ~m_key_row[m_keylatch / 8]->read();
 
 	return BIT(data, m_keylatch % 8);
 }
 
-WRITE_LINE_MEMBER( tmc2000_state::q_w )
+void tmc2000_state::q_w(int state)
 {
 	/* CDP1864 audio output enable */
 	m_cti->aoe_w(state);
@@ -634,7 +634,7 @@ void tmc2000_state::dma_w(offs_t offset, uint8_t data)
 
 // OSCOM Nano
 
-READ_LINE_MEMBER( nano_state::clear_r )
+int nano_state::clear_r()
 {
 	int run = BIT(m_run->read(), 0);
 	int monitor = BIT(m_monitor->read(), 0);
@@ -642,12 +642,12 @@ READ_LINE_MEMBER( nano_state::clear_r )
 	return run && monitor;
 }
 
-READ_LINE_MEMBER( nano_state::ef2_r )
+int nano_state::ef2_r()
 {
 	return m_cassette->input() < 0;
 }
 
-READ_LINE_MEMBER( nano_state::ef3_r )
+int nano_state::ef3_r()
 {
 	uint8_t data = 0xff;
 
@@ -657,7 +657,7 @@ READ_LINE_MEMBER( nano_state::ef3_r )
 	return !BIT(data, m_keylatch & 0x07);
 }
 
-WRITE_LINE_MEMBER( nano_state::q_w )
+void nano_state::q_w(int state)
 {
 	/* CDP1864 audio output enable */
 	m_cti->aoe_w(state);
@@ -766,17 +766,17 @@ void nano_state::machine_reset()
 
 QUICKLOAD_LOAD_MEMBER(tmc1800_base_state::quickload_cb)
 {
-	uint8_t *ptr = m_rom->base();
-	int size = image.length();
+	int const size = image.length();
 
-	if (size > m_ram->size())
+	if (size > m_ram->size()) // FIXME: comparing size to RAM size, but loading to ROM - seems incorrect
 	{
-		return image_init_result::FAIL;
+		return std::make_pair(image_error::INVALIDLENGTH, std::string());
 	}
 
-	image.fread( ptr, size);
+	uint8_t *const ptr = m_rom->base();
+	image.fread(ptr, size);
 
-	return image_init_result::PASS;
+	return std::make_pair(std::error_condition(), std::string());
 }
 
 void tmc1800_state::tmc1800(machine_config &config)

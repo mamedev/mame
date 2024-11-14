@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <!--
-license:CC0
+license:CC0-1.0
 -->
 <softwarelist name="adam_cass" description="Coleco Adam Digital Data Packs">
 
@@ -67,7 +67,7 @@ license:CC0
 	</software>
 
 	<software name="addictusa" cloneof="addictus">
-		<description>Addictus (Alt)</description>
+		<description>Addictus (alt)</description>
 		<year>1989</year>
 		<publisher>Reedy Software</publisher>
 
@@ -134,7 +134,7 @@ license:CC0
 	</software>
 
 	<software name="bestbroda" cloneof="bestbrod">
-		<description>The Best of Brøderbund (Alt)</description>
+		<description>The Best of Brøderbund (alt)</description>
 		<year>1984</year>
 		<publisher>Coleco</publisher>
 
@@ -146,7 +146,7 @@ license:CC0
 	</software>
 
 	<software name="bestea">
-		<description>Best of Electronic Arts (Prototype)</description>
+		<description>Best of Electronic Arts (prototype)</description>
 		<year>1985</year>
 		<publisher>Coleco</publisher>
 
@@ -170,7 +170,7 @@ license:CC0
 	</software>
 
 	<software name="buckroga" cloneof="buckrog">
-		<description>Buck Rogers - Planet of Zoom (Alt)</description>
+		<description>Buck Rogers - Planet of Zoom (alt)</description>
 		<year>1983</year>
 		<publisher>Coleco</publisher>
 
@@ -266,7 +266,7 @@ license:CC0
 	</software>
 
 	<software name="dkongjrp14" cloneof="dkongjr">
-		<description>Donkey Kong Junior (Prototype, Rev. 14, 5 Screen)</description>
+		<description>Donkey Kong Junior (prototype, rev. 14, 5 screen)</description>
 		<year>1984</year>
 		<publisher>Coleco</publisher>
 
@@ -278,7 +278,7 @@ license:CC0
 	</software>
 
 	<software name="dkongjrp13" cloneof="dkongjr">
-		<description>Donkey Kong Junior (Prototype, Rev. 13, 5 Screen)</description>
+		<description>Donkey Kong Junior (prototype, rev. 13, 5 screen)</description>
 		<year>1984</year>
 		<publisher>Coleco</publisher>
 
@@ -422,7 +422,7 @@ license:CC0
 	</software>
 
 	<software name="fffbacka" cloneof="fffback">
-		<description>Flash Facts - Flashbacks (Alt)</description>
+		<description>Flash Facts - Flashbacks (alt)</description>
 		<year>1984</year>
 		<publisher>Coleco</publisher>
 
@@ -458,7 +458,7 @@ license:CC0
 	</software>
 
 	<software name="godosd">
-		<description>GoDOS (v1.2, Demo)</description>
+		<description>GoDOS (v1.2, demo)</description>
 		<year>1990</year>
 		<publisher>Phoenix 2000</publisher>
 
@@ -470,7 +470,7 @@ license:CC0
 	</software>
 
 	<software name="godosda" cloneof="godosd">
-		<description>GoDOS (v1.2, Demo, Alt)</description>
+		<description>GoDOS (v1.2, demo, alt)</description>
 		<year>1990</year>
 		<publisher>Phoenix 2000</publisher>
 
@@ -506,7 +506,7 @@ license:CC0
 	</software>
 
 	<software name="jeopardy">
-		<description>Jeopardy (Prototype)</description>
+		<description>Jeopardy (prototype)</description>
 		<year>1984</year>
 		<publisher>Coleco</publisher>
 
@@ -638,7 +638,7 @@ license:CC0
 	</software>
 
 	<software name="scarrya" cloneof="scarry">
-		<description>Richard Scarry's Best Electronic Wordbook Ever (Alt)</description>
+		<description>Richard Scarry's Best Electronic Wordbook Ever (alt)</description>
 		<year>1984</year>
 		<publisher>Coleco</publisher>
 
@@ -698,7 +698,7 @@ license:CC0
 	</software>
 
 	<software name="smartbasa" cloneof="smartbas">
-		<description>SmartBASIC (v1.0, Alt)</description>
+		<description>SmartBASIC (v1.0, alt)</description>
 		<year>1983</year>
 		<publisher>Coleco</publisher>
 
@@ -770,7 +770,7 @@ license:CC0
 	</software>
 
 	<software name="subroc">
-		<description>SubRoc (Prototype)</description>
+		<description>SubRoc (prototype)</description>
 		<year>1984</year>
 		<publisher>Coleco</publisher>
 
@@ -794,7 +794,7 @@ license:CC0
 	</software>
 
 	<software name="troltale">
-		<description>Troll's Tale (Prototype)</description>
+		<description>Troll's Tale (prototype)</description>
 		<year>198?</year>
 		<publisher>Coleco</publisher>
 
@@ -959,7 +959,7 @@ license:CC0
 	</software>
 
 	<software name="blankddpa" cloneof="blankddp">
-		<description>Blank Digital Data Pack (Alt)</description>
+		<description>Blank Digital Data Pack (alt)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 

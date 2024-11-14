@@ -154,7 +154,7 @@ public:
 
 protected:
 	virtual void driver_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	memory_view m_rom_ram_view;
@@ -162,26 +162,26 @@ private:
 
 	void wardner_bank_w(uint8_t data);
 
-	DECLARE_WRITE_LINE_MEMBER(wardner_vblank_irq);
-	DECLARE_WRITE_LINE_MEMBER(int_enable_w);
+	void wardner_vblank_irq(int state);
+	void int_enable_w(int state);
 
-	void dsp_io_map(address_map &map);
-	void dsp_program_map(address_map &map);
-	void main_bank_map(address_map &map);
-	void main_io_map(address_map &map);
-	void main_program_map(address_map &map);
-	void sound_io_map(address_map &map);
-	void sound_program_map(address_map &map);
+	void dsp_io_map(address_map &map) ATTR_COLD;
+	void dsp_program_map(address_map &map) ATTR_COLD;
+	void main_bank_map(address_map &map) ATTR_COLD;
+	void main_io_map(address_map &map) ATTR_COLD;
+	void main_program_map(address_map &map) ATTR_COLD;
+	void sound_io_map(address_map &map) ATTR_COLD;
+	void sound_program_map(address_map &map) ATTR_COLD;
 };
 
 
-WRITE_LINE_MEMBER(wardner_state::wardner_vblank_irq)
+void wardner_state::wardner_vblank_irq(int state)
 {
 	if (state && m_intenable)
 		m_maincpu->set_input_line(0, ASSERT_LINE);
 }
 
-WRITE_LINE_MEMBER(wardner_state::int_enable_w)
+void wardner_state::int_enable_w(int state)
 {
 	m_intenable = state;
 	if (!state)

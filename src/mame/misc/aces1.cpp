@@ -50,6 +50,7 @@ JPM style Reel MCU? Certainly reel data seems to be muxed together in a weird wa
 #include "ac1taklv.lh"
 
 
+namespace {
 
 class aces1_state : public driver_device
 {
@@ -67,8 +68,8 @@ public:
 	void aces1(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	int m_input_strobe = 0;
@@ -235,8 +236,8 @@ private:
 
 	TIMER_CALLBACK_MEMBER(m_aces1_irq_timer_callback);
 	TIMER_CALLBACK_MEMBER(m_aces1_nmi_timer_callback);
-	void aces1_map(address_map &map);
-	void aces1_portmap(address_map &map);
+	void aces1_map(address_map &map) ATTR_COLD;
+	void aces1_portmap(address_map &map) ATTR_COLD;
 };
 
 
@@ -860,6 +861,9 @@ ROM_END
 void aces1_state::init_aces1()
 {
 }
+
+} // anonymous namespace
+
 
 GAMEL( 199?, ac1clbmn,  0,        aces1, aces1, aces1_state, init_aces1, ROT0, "Ace", "Club Money (Ace) (ACESYS1) (set 1)",          MACHINE_IS_SKELETON_MECHANICAL, layout_ac1clbmn )
 GAMEL( 199?, ac1gogld,  0,        aces1, aces1, aces1_state, init_aces1, ROT0, "Ace", "Go For Gold (Ace) (ACESYS1) (set 1)",         MACHINE_IS_SKELETON_MECHANICAL, layout_ac1gogld )

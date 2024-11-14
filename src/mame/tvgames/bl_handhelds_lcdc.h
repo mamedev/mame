@@ -1,8 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood
 
-#ifndef MAME_MACHINE_BL_HANDHELDS_LCDC_H
-#define MAME_MACHINE_BL_HANDHELDS_LCDC_H
+#ifndef MAME_TVGAMES_BL_HANDHELDS_LCDC_H
+#define MAME_TVGAMES_BL_HANDHELDS_LCDC_H
 
 #pragma once
 
@@ -21,8 +21,8 @@ public:
 	u32 render_to_bitmap(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 private:
 	u8 m_displaybuffer[256 * 256 * 2]{};
@@ -34,4 +34,4 @@ private:
 
 };
 
-#endif // MAME_MACHINE_BL_HANDHELDS_LCDC_H
+#endif // MAME_TVGAMES_BL_HANDHELDS_LCDC_H

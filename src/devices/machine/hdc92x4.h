@@ -47,8 +47,8 @@ public:
 	// Accessors from the CPU side
 	uint8_t read(offs_t offset);
 	void write(offs_t offset, uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER( reset );
-	DECLARE_WRITE_LINE_MEMBER( dmaack );
+	void reset(int state);
+	void dmaack(int state);
 
 	// Callbacks
 	auto intrq_cb() { return m_out_intrq.bind(); }
@@ -80,8 +80,8 @@ public:
 protected:
 	hdc92x4_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, bool is_hdc9234);
 
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	TIMER_CALLBACK_MEMBER(gen_timer_expired);
 	TIMER_CALLBACK_MEMBER(com_timer_expired);

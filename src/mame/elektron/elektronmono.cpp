@@ -109,11 +109,13 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "cpu/m68000/m68000.h"
+#include "cpu/m68000/mcf5206e.h"
 #include "machine/mcf5206e.h"
 #include "machine/intelfsh.h"
 #include "speaker.h"
 
+
+namespace {
 
 class elekmono_state : public driver_device
 {
@@ -126,10 +128,10 @@ public:
 	void elektron(machine_config &config);
 
 private:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
-	void elektron_map(address_map &map);
+	void elektron_map(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 };
@@ -175,6 +177,9 @@ ROM_START( machdrum )
 	ROM_REGION(0x800000, "maincpu", 0)
 	ROM_LOAD( "elektron_sps1-1uw_os1.63.bin", 0x000000, 0x800000, CRC(3d552c99) SHA1(a872a2f3527063673d6ea6d3080c4c62ef0cadc1) )
 ROM_END
+
+} // anonymous namespace
+
 
 CONS( 2004, monomach, 0, 0, elektron, elektron, elekmono_state, empty_init, "Elektron", "Monomachine SFX6 MK2",  MACHINE_NOT_WORKING|MACHINE_NO_SOUND )
 CONS( 2007, machdrum, 0, 0, elektron, elektron, elekmono_state, empty_init, "Elektron", "Machinedrum SPS-1 MK2", MACHINE_NOT_WORKING|MACHINE_NO_SOUND )

@@ -10,6 +10,7 @@
 
 #include "agatkeyb.h"
 #include "machine/keyboard.ipp"
+#include "utf8.h"
 
 
 /***************************************************************************
@@ -20,8 +21,8 @@ INPUT_PORTS_START( agat_keyboard )
 	PORT_START("AGATKBD_MOD")
 	PORT_BIT(0x0001U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Ctrl")  PORT_CODE(KEYCODE_LCONTROL) PORT_CODE(KEYCODE_RCONTROL)             PORT_CHAR(UCHAR_MAMEKEY(LCONTROL))
 	PORT_BIT(0x0002U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Shift") PORT_CODE(KEYCODE_LSHIFT)   PORT_CODE(KEYCODE_RSHIFT)               PORT_CHAR(UCHAR_SHIFT_1)
-	PORT_BIT(0x0004U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Meta")  PORT_CODE(KEYCODE_LALT)     PORT_CHAR(UCHAR_MAMEKEY(LALT)) PORT_CHANGED_MEMBER(DEVICE_SELF, agat_keyboard_device, meta_changed, 0)
-	PORT_BIT(0x0008U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Reset") PORT_CODE(KEYCODE_F10)      PORT_CHAR(UCHAR_MAMEKEY(F10)) PORT_CHANGED_MEMBER(DEVICE_SELF, agat_keyboard_device, reset_changed, 0)
+	PORT_BIT(0x0004U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Meta")  PORT_CODE(KEYCODE_LALT)     PORT_CHAR(UCHAR_MAMEKEY(LALT)) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(agat_keyboard_device::meta_changed), 0)
+	PORT_BIT(0x0008U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Reset") PORT_CODE(KEYCODE_F10)      PORT_CHAR(UCHAR_MAMEKEY(F10)) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(agat_keyboard_device::reset_changed), 0)
 
 	PORT_START("AGATKBD_ROW0")
 	PORT_BIT(0x0001U, IP_ACTIVE_HIGH, IPT_UNUSED   )
@@ -178,10 +179,6 @@ ioport_constructor agat_keyboard_device::device_input_ports() const
 
 void agat_keyboard_device::device_start()
 {
-	m_keyboard_cb.resolve();
-	m_out_meta_cb.resolve();
-	m_out_reset_cb.resolve();
-
 	save_item(NAME(m_last_modifiers));
 	save_item(NAME(m_meta));
 }

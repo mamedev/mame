@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Joakim Larsson Edström
-#ifndef MAME_MACHINE_EISPC_KB_H
-#define MAME_MACHINE_EISPC_KB_H
+#ifndef MAME_ERICSSON_EISPC_KB_H
+#define MAME_ERICSSON_EISPC_KB_H
 
 #pragma once
 
@@ -20,15 +20,15 @@ public:
 	eispc_keyboard_device(machine_config const &mconfig, char const *tag, device_t *owner, uint32_t clock = 0);
 
 	DECLARE_INPUT_CHANGED_MEMBER(key);
-	DECLARE_WRITE_LINE_MEMBER(rxd_w);
-	DECLARE_WRITE_LINE_MEMBER(hold_w);
-	DECLARE_WRITE_LINE_MEMBER(rst_line_w);
+	void rxd_w(int state);
+	void hold_w(int state);
+	void rst_line_w(int state);
 
 protected:
-	virtual void device_start() override;
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual ioport_constructor device_input_ports() const override;
-	virtual tiny_rom_entry const *device_rom_region() const override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
+	virtual tiny_rom_entry const *device_rom_region() const override ATTR_COLD;
 
 	required_device<m6801_cpu_device> m_mcu;
 	required_ioport_array<6>       m_rows;
@@ -43,7 +43,7 @@ protected:
 	uint16_t m_col_select;
 	uint8_t m_p1;
 
-	void eispc_kb_mem(address_map &map);
+	void eispc_kb_mem(address_map &map) ATTR_COLD;
 };
 
-#endif // MAME_MACHINE_EISPC_KB_H
+#endif // MAME_ERICSSON_EISPC_KB_H

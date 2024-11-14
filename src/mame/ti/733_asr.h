@@ -1,12 +1,13 @@
 // license:GPL-2.0+
 // copyright-holders:Raphael Nabet
-#ifndef MAME_VIDEO_733_ASR
-#define MAME_VIDEO_733_ASR
+#ifndef MAME_TI_733_ASR_H
+#define MAME_TI_733_ASR_H
 
 #pragma once
 
 #include "emupal.h"
 #include "screen.h"
+
 #define asr733_chr_region ":gfx1"
 
 class asr733_device : public device_t, public device_gfx_interface
@@ -29,9 +30,9 @@ public:
 
 protected:
 	// device-level overrides
-	void device_start() override;
-	void device_reset() override;
-	virtual void device_add_mconfig(machine_config &config) override;
+	void device_start() override ATTR_COLD;
+	void device_reset() override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 	ioport_constructor device_input_ports() const override;
 
 	TIMER_CALLBACK_MEMBER(line_tick);
@@ -79,4 +80,4 @@ private:
 
 DECLARE_DEVICE_TYPE(ASR733, asr733_device)
 
-#endif // MAME_VIDEO_733_ASR
+#endif // MAME_TI_733_ASR_H

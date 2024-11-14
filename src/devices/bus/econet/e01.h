@@ -23,7 +23,6 @@
 #include "machine/mc6854.h"
 #include "machine/ram.h"
 #include "machine/wd_fdc.h"
-#include "formats/afs_dsk.h"
 
 class econet_e01_device : public device_t,
 	public device_econet_interface
@@ -42,28 +41,28 @@ protected:
 	econet_e01_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int variant);
 
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// optional information overrides
-	virtual const tiny_rom_entry *device_rom_region() const override;
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual ioport_constructor device_input_ports() const override;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 
 	// device_econet_interface overrides
 	virtual void econet_data(int state) override;
 	virtual void econet_clk(int state) override;
 
 private:
-	DECLARE_WRITE_LINE_MEMBER( rtc_irq_w );
-	DECLARE_WRITE_LINE_MEMBER( adlc_irq_w );
-	DECLARE_WRITE_LINE_MEMBER( econet_data_w );
-	DECLARE_WRITE_LINE_MEMBER( via_irq_w );
-	DECLARE_WRITE_LINE_MEMBER( clk_en_w );
-	DECLARE_WRITE_LINE_MEMBER( fdc_irq_w );
-	DECLARE_WRITE_LINE_MEMBER( fdc_drq_w );
-	DECLARE_WRITE_LINE_MEMBER( scsi_bsy_w );
-	DECLARE_WRITE_LINE_MEMBER( scsi_req_w );
+	void rtc_irq_w(int state);
+	void adlc_irq_w(int state);
+	void econet_data_w(int state);
+	void via_irq_w(int state);
+	void clk_en_w(int state);
+	void fdc_irq_w(int state);
+	void fdc_drq_w(int state);
+	void scsi_bsy_w(int state);
+	void scsi_req_w(int state);
 
 	TIMER_CALLBACK_MEMBER(clk_tick);
 
@@ -79,10 +78,6 @@ private:
 	void hdc_data_w(uint8_t data);
 	void hdc_select_w(uint8_t data);
 	void hdc_irq_enable_w(uint8_t data);
-	uint8_t rtc_address_r();
-	void rtc_address_w(uint8_t data);
-	uint8_t rtc_data_r();
-	void rtc_data_w(uint8_t data);
 
 	static void floppy_formats_afs(format_registration &fr);
 
@@ -98,6 +93,7 @@ private:
 	required_device_array<floppy_connector, 2> m_floppy;
 	required_memory_region m_rom;
 	required_device<centronics_device> m_centronics;
+	required_ioport m_flap;
 
 	output_finder<> m_led;
 
@@ -105,7 +101,7 @@ private:
 	inline void network_irq_enable(int enabled);
 	inline void hdc_irq_enable(int enabled);
 
-	void e01_mem(address_map &map);
+	void e01_mem(address_map &map) ATTR_COLD;
 
 	// interrupt state
 	int m_adlc_ie;

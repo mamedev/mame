@@ -154,9 +154,17 @@ ht1080z    works
 
 #include "emu.h"
 #include "trs80.h"
+
+#include "trs80_quik.h"
+
 #include "machine/input_merger.h"
 #include "sound/ay8910.h"
+
 #include "softlist_dev.h"
+
+#include "formats/dmk_dsk.h"
+
+#include "utf8.h"
 
 
 void trs80_state::trs80_mem(address_map &map)
@@ -323,7 +331,7 @@ static INPUT_PORTS_START( trs80 )
 	PORT_BIT(0xfe, 0x00, IPT_UNUSED)
 
 	PORT_START("RESET") // special button
-	PORT_BIT(0x01, 0x00, IPT_OTHER) PORT_NAME("Reset") PORT_CODE(KEYCODE_DEL) PORT_WRITE_LINE_DEVICE_MEMBER("nmigate", input_merger_device, in_w<0>)
+	PORT_BIT(0x01, 0x00, IPT_OTHER) PORT_NAME("Reset") PORT_CODE(KEYCODE_DEL) PORT_WRITE_LINE_DEVICE_MEMBER("nmigate", FUNC(input_merger_device::in_w<0>))
 INPUT_PORTS_END
 
 static INPUT_PORTS_START(trs80l2)
@@ -410,6 +418,7 @@ GFXDECODE_END
 
 void trs80_state::floppy_formats(format_registration &fr)
 {
+	fr.add(FLOPPY_DMK_FORMAT);
 	fr.add(FLOPPY_JV1_FORMAT);
 }
 
@@ -471,9 +480,7 @@ void trs80_state::level2(machine_config &config)      // model I, level II
 	/* devices */
 	m_cassette->set_formats(trs80l2_cassette_formats);
 
-	quickload_image_device &quickload(QUICKLOAD(config, "quickload", "cmd", attotime::from_seconds(1)));
-	quickload.set_load_callback(FUNC(trs80_state::quickload_cb));
-	quickload.set_interface("trs80_quik");
+	TRS80_QUICKLOAD(config, "quickload", m_maincpu, attotime::from_seconds(1));
 
 	FD1771(config, m_fdc, 4_MHz_XTAL / 4);
 	m_fdc->intrq_wr_callback().set(FUNC(trs80_state::intrq_w));

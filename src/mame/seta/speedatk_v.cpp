@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Angelo Salese, Pierpaolo Prazzoli
+// copyright-holders:Angelo Salese, Pierpaolo Prazzoli, Takahiro Nogi
 /*****************************************************************************************
 
  Speed Attack video hardware emulation

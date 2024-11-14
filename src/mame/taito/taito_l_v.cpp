@@ -33,7 +33,7 @@ void horshoes_state::bankg_w(u8 data)
 
 ***************************************************************************/
 
-WRITE_LINE_MEMBER(taitol_state::screen_vblank_taitol)
+void taitol_state::screen_vblank_taitol(int state)
 {
 	// rising edge
 	if (state)

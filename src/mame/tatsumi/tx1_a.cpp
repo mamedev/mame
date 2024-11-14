@@ -57,40 +57,42 @@ static const double tx1_engine_gains[16] =
 DEFINE_DEVICE_TYPE(TX1_SOUND, tx1_sound_device, "tx1_sound", "TX-1 Custom Sound")
 DEFINE_DEVICE_TYPE(TX1J_SOUND, tx1j_sound_device, "tx1j_sound", "TX-1 Custom Sound (Japan)")
 
-tx1_sound_device::tx1_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: tx1_sound_device(mconfig, TX1_SOUND, tag, owner, clock)
+tx1_sound_device::tx1_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	tx1_sound_device(mconfig, TX1_SOUND, tag, owner, clock)
 {
 }
 
-tx1_sound_device::tx1_sound_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, type, tag, owner, clock),
-		device_sound_interface(mconfig, *this),
-		m_audiocpu(*this, "audio_cpu"),
-		m_z80_ram(*this, "z80_ram"),
-		m_ppi(*this, "ppi8255"),
-		m_dsw(*this, "DSW"),
-		m_steering(*this, "AN_STEERING"),
-		m_accelerator(*this, "AN_ACCELERATOR"),
-		m_brake(*this, "AN_BRAKE"),
-		m_ppi_portd(*this, "PPI_PORTD"),
-		m_stream(nullptr),
-		m_freq_to_step(0),
-		m_step0(0),
-		m_step1(0),
-		m_step2(0),
-		m_ay_outputa(0),
-		m_ay_outputb(0),
-		m_pit0(0),
-		m_pit1(0),
-		m_pit2(0),
-		m_noise_lfsra(0),
-		m_noise_lfsrb(1),
-		m_noise_lfsrc(0),
-		m_noise_lfsrd(0),
-		m_noise_counter(0),
-		m_ym1_outputa(0),
-		m_ym2_outputa(0),
-		m_ym2_outputb(0)
+tx1_sound_device::tx1_sound_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, type, tag, owner, clock),
+	device_sound_interface(mconfig, *this),
+	m_audiocpu(*this, "audio_cpu"),
+	m_z80_ram(*this, "z80_ram"),
+	m_ppi(*this, "ppi8255"),
+	m_dsw(*this, "DSW"),
+	m_steering(*this, "AN_STEERING"),
+	m_accelerator(*this, "AN_ACCELERATOR"),
+	m_brake(*this, "AN_BRAKE"),
+	m_stream(nullptr),
+	m_freq_to_step(0),
+	m_step0(0),
+	m_step1(0),
+	m_step2(0),
+	m_ay_outputa(0),
+	m_ay_outputb(0),
+	m_ppi_latch_a(0),
+	m_ppi_latch_b(0),
+	m_ts(0),
+	m_pit0(0),
+	m_pit1(0),
+	m_pit2(0),
+	m_noise_lfsra(0),
+	m_noise_lfsrb(1),
+	m_noise_lfsrc(0),
+	m_noise_lfsrd(0),
+	m_noise_counter(0),
+	m_ym1_outputa(0),
+	m_ym2_outputa(0),
+	m_ym2_outputb(0)
 {
 }
 
@@ -109,7 +111,6 @@ void tx1_sound_device::device_start()
 	static const int r1[3] = { static_cast<int>(180e3), static_cast<int>(390e3), static_cast<int>(56e3) };
 	static const int r2[3] = { static_cast<int>(390e3), static_cast<int>(390e3), static_cast<int>(180e3) };
 
-
 	/* Allocate the stream */
 	m_stream = stream_alloc(0, 2, machine().sample_rate());
 	m_freq_to_step = (double)(1 << TX1_FRAC) / (double)machine().sample_rate();
@@ -119,6 +120,10 @@ void tx1_sound_device::device_start()
 			4, &r0[0], m_weights0, 0, 0,
 			3, &r1[0], m_weights1, 0, 0,
 			3, &r2[0], m_weights2, 0, 0);
+
+	std::fill(std::begin(m_eng0), std::end(m_eng0), 0.0);
+	std::fill(std::begin(m_eng1), std::end(m_eng1), 0.0);
+	std::fill(std::begin(m_eng2), std::end(m_eng2), 0.0);
 }
 
 //-------------------------------------------------
@@ -186,7 +191,7 @@ uint16_t tx1_sound_device::dipswitches_r()
 uint8_t buggyboy_sound_device::bb_analog_r(offs_t offset)
 {
 	if (offset == 0)
-		return bit_reverse8(((m_accelerator->read() & 0xf) << 4) | m_steering->read());
+		return bit_reverse8(((m_accelerator->read() & 0xf) << 4) | (m_steering->read() & 0xf));
 	else
 		return bit_reverse8((m_brake->read() & 0xf) << 4);
 }
@@ -194,7 +199,7 @@ uint8_t buggyboy_sound_device::bb_analog_r(offs_t offset)
 uint8_t buggyboyjr_sound_device::bbjr_analog_r(offs_t offset)
 {
 	if (offset == 0)
-		return ((m_accelerator->read() & 0xf) << 4) | m_steering->read();
+		return ((m_accelerator->read() & 0xf) << 4) | (m_steering->read() & 0xf);
 	else
 		return (m_brake->read() & 0xf) << 4;
 }
@@ -203,7 +208,6 @@ void tx1_sound_device::tx1_coin_cnt_w(uint8_t data)
 {
 	machine().bookkeeping().coin_counter_w(0, data & 0x80);
 	machine().bookkeeping().coin_counter_w(1, data & 0x40);
-//  machine().bookkeeping().coin_counter_w(2, data & 0x40);
 }
 
 void buggyboy_sound_device::bb_coin_cnt_w(uint8_t data)
@@ -216,7 +220,7 @@ void buggyboy_sound_device::bb_coin_cnt_w(uint8_t data)
 void tx1_sound_device::tx1_ppi_latch_w(uint8_t data)
 {
 	m_ppi_latch_a = ((m_brake->read() & 0xf) << 4) | (m_accelerator->read() & 0xf);
-	m_ppi_latch_b = m_steering->read();
+	m_ppi_latch_b = m_steering->read() & 0xf;
 }
 
 uint8_t tx1_sound_device::tx1_ppi_porta_r()
@@ -226,13 +230,15 @@ uint8_t tx1_sound_device::tx1_ppi_porta_r()
 
 uint8_t tx1_sound_device::tx1_ppi_portb_r()
 {
-	return m_ppi_portd->read() | m_ppi_latch_b;
+	// upper nibble goes to unpopulated DS.3
+	return m_ppi_latch_b & 0xf;
 }
 
 void tx1_sound_device::pit8253_w(offs_t offset, uint8_t data)
 {
 	m_stream->update();
 
+	// TODO: use pit8253_device
 	if (offset < 3)
 	{
 		if (m_pit8253.idx[offset] == 0)
@@ -477,7 +483,7 @@ INPUT_PORTS_START( tx1_inputs )
 	PORT_DIPSETTING(      0xe000, "No Bonus" )
 
 	PORT_START("AN_STEERING")
-	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(20) PORT_KEYDELTA(6)
+	PORT_BIT( 0x0f, 0x00, IPT_DIAL ) PORT_SENSITIVITY(20) PORT_KEYDELTA(6)
 
 	PORT_START("AN_ACCELERATOR")
 	PORT_BIT( 0x1f, 0x00, IPT_PEDAL ) PORT_MINMAX(0x00,0x1f) PORT_SENSITIVITY(25) PORT_KEYDELTA(10)
@@ -490,15 +496,6 @@ INPUT_PORTS_START( tx1_inputs )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 )
 	PORT_SERVICE( 0x04, IP_ACTIVE_HIGH )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("Gear Change") PORT_TOGGLE
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_COIN3 )
-
-	PORT_START("PPI_PORTD")
-	/* Wire jumper setting on sound PCB - actually unpopulated 4 switch DS.3 */
-	PORT_DIPNAME( 0xf0, 0x80, "Sound PCB Jumper (DS.3)" )
-	PORT_DIPSETTING(    0x10, "1" )
-	PORT_DIPSETTING(    0x20, "2" )
-	PORT_DIPSETTING(    0x40, "3" )
-	PORT_DIPSETTING(    0x80, "4" )
 INPUT_PORTS_END
 
 ioport_constructor tx1_sound_device::device_input_ports() const
@@ -560,6 +557,7 @@ void tx1_sound_device::device_add_mconfig(machine_config &config)
 	m_ppi->in_pb_callback().set(FUNC(tx1_sound_device::tx1_ppi_portb_r));
 	m_ppi->in_pc_callback().set_ioport("PPI_PORTC");
 	m_ppi->out_pc_callback().set(FUNC(tx1_sound_device::tx1_coin_cnt_w));
+	m_ppi->tri_pc_callback().set_constant(0);
 
 	SPEAKER(config, "frontleft", -0.2, 0.0, 1.0);
 	SPEAKER(config, "frontright", 0.2, 0.0, 1.0);
@@ -619,19 +617,19 @@ static const double bb_engine_gains[16] =
 DEFINE_DEVICE_TYPE(BUGGYBOY_SOUND, buggyboy_sound_device, "buggyboy_sound", "Buggy Boy Custom Sound")
 DEFINE_DEVICE_TYPE(BUGGYBOYJR_SOUND, buggyboyjr_sound_device, "buggyboyjr_sound", "Buggy Boy Jr. Custom Sound")
 
-buggyboy_sound_device::buggyboy_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: buggyboy_sound_device(mconfig, BUGGYBOY_SOUND, tag, owner, clock)
+buggyboy_sound_device::buggyboy_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	buggyboy_sound_device(mconfig, BUGGYBOY_SOUND, tag, owner, clock)
 {
 }
 
-buggyboy_sound_device::buggyboy_sound_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
-	: tx1_sound_device(mconfig, type, tag, owner, clock)
-	, m_ym(*this, "ym%u", 1U)
+buggyboy_sound_device::buggyboy_sound_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+	tx1_sound_device(mconfig, type, tag, owner, clock),
+	m_ym(*this, "ym%u", 1U)
 {
 }
 
-buggyboyjr_sound_device::buggyboyjr_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: buggyboy_sound_device(mconfig, BUGGYBOYJR_SOUND, tag, owner, clock)
+buggyboyjr_sound_device::buggyboyjr_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	buggyboy_sound_device(mconfig, BUGGYBOYJR_SOUND, tag, owner, clock)
 {
 }
 
@@ -643,7 +641,6 @@ void buggyboy_sound_device::device_start()
 {
 	static const int resistors[4] = { 330000, 220000, 330000, 220000 };
 	double aweights[4];
-	int i;
 	static const int tmp[16] =
 	{
 		0x0, 0x1, 0xe, 0xf, 0x8, 0x9, 0x6, 0x7, 0xc, 0xd, 0xe, 0xf, 0x4, 0x5, 0x6, 0x7
@@ -654,7 +651,7 @@ void buggyboy_sound_device::device_start()
 							0, nullptr, nullptr, 0, 0,
 							0, nullptr, nullptr, 0, 0 );
 
-	for (i = 0; i < 16; i++)
+	for (int i = 0; i < 16; i++)
 		m_eng_voltages[i] = combine_weights(aweights, BIT(tmp[i], 0), BIT(tmp[i], 1), BIT(tmp[i], 2), BIT(tmp[i], 3));
 
 	/* Allocate the stream */
@@ -732,12 +729,6 @@ void buggyboy_sound_device::ym2_b_w(uint8_t data)
 
 	m_ym2_outputb = data ^ 0xff;
 
-	if (has_coin_counters())
-	{
-		machine().bookkeeping().coin_counter_w(0, data & 0x01);
-		machine().bookkeeping().coin_counter_w(1, data & 0x02);
-	}
-
 	/*
 	    Until we support > 2 speakers, double the gain of the front speakers
 
@@ -755,6 +746,14 @@ void buggyboy_sound_device::ym2_b_w(uint8_t data)
 	m_ym[1]->set_output_gain(0, gain);
 	m_ym[1]->set_output_gain(1, gain);
 	m_ym[1]->set_output_gain(2, gain);
+}
+
+void buggyboyjr_sound_device::ym2_b_w(uint8_t data)
+{
+	buggyboy_sound_device::ym2_b_w(data);
+
+	machine().bookkeeping().coin_counter_w(0, ~data & 0x01);
+	machine().bookkeeping().coin_counter_w(1, ~data & 0x02);
 }
 
 
@@ -790,13 +789,12 @@ void buggyboy_sound_device::sound_stream_update(sound_stream &stream, std::vecto
 
 	for (int sampindex = 0; sampindex < fl.samples(); sampindex++)
 	{
-		int i;
 		s32 pit0, pit1, n1, n2;
 		pit0 = m_eng_voltages[(m_step0 >> 24) & 0xf];
 		pit1 = m_eng_voltages[(m_step1 >> 24) & 0xf];
 
 		/* Calculate the tyre screech noise source */
-		for (i = 0; i < BUGGYBOY_NOISE_CLOCK / machine().sample_rate(); ++i)
+		for (int i = 0; i < BUGGYBOY_NOISE_CLOCK / machine().sample_rate(); ++i)
 		{
 			/* CD4006 is a 4-4-1-4-4-1 shift register */
 			int p13 = BIT(m_noise_lfsra, 3);
@@ -811,14 +809,14 @@ void buggyboy_sound_device::sound_stream_update(sound_stream &stream, std::vecto
 			m_noise_lfsrd = p10 | ((m_noise_lfsrd << 1) & 0x1f);
 
 			/* 4040 12-bit counter is clocked on the falling edge of Q13 */
-			if ( !BIT(m_noise_lfsrc, 3) && p10 )
+			if (!BIT(m_noise_lfsrc, 3) && p10)
 				m_noise_counter = (m_noise_counter + 1) & 0x0fff;
 		}
 
 		if (n1_en)
 		{
 			n1 = !BIT(m_noise_counter, 7-1) * 16000;
-			if ( BIT(m_noise_counter, 11-1) ) n1 /=2;
+			if (BIT(m_noise_counter, 11-1)) n1 /=2;
 		}
 		else
 			n1 = 8192;
@@ -826,7 +824,7 @@ void buggyboy_sound_device::sound_stream_update(sound_stream &stream, std::vecto
 		if (n2_en)
 		{
 			n2 = !BIT(m_noise_counter, 6-1) * 16000;
-			if ( BIT(m_noise_counter, 11-1) ) n2 /=2;
+			if (BIT(m_noise_counter, 11-1)) n2 /=2;
 		}
 		else
 			n2 = 8192;
@@ -930,7 +928,7 @@ INPUT_PORTS_START( buggyboy_inputs )
 	PORT_START("PPI_PORTA")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 )
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_COIN3 )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SERVICE1 )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("Gear Change") PORT_TOGGLE
 	PORT_SERVICE( 0x80, IP_ACTIVE_HIGH )
 
@@ -1019,7 +1017,7 @@ INPUT_PORTS_START( buggyboyjr_inputs )
 	PORT_START("YM2149_IC19_A")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 )
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_COIN3 )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SERVICE1 )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("Gear Change") PORT_TOGGLE
 	PORT_SERVICE( 0x80, IP_ACTIVE_HIGH )
 
@@ -1062,6 +1060,7 @@ void buggyboy_sound_device::device_add_mconfig(machine_config &config)
 	/* Buggy Boy uses an 8255 PPI instead of YM2149 ports for inputs! */
 	m_ppi->in_pa_callback().set_ioport("PPI_PORTA");
 	m_ppi->out_pb_callback().set(FUNC(buggyboy_sound_device::bb_coin_cnt_w));
+	m_ppi->tri_pb_callback().set_constant(0);
 	m_ppi->in_pc_callback().set_ioport("PPI_PORTC");
 
 	SPEAKER(config, "frontleft", -0.2, 0.0, 1.0);
@@ -1087,7 +1086,7 @@ void buggyboyjr_sound_device::device_add_mconfig(machine_config &config)
 	Z80(config, m_audiocpu, BUGGYBOY_ZCLK / 2);
 	m_audiocpu->set_addrmap(AS_PROGRAM, &buggyboyjr_sound_device::buggybjr_sound_prg);
 	m_audiocpu->set_addrmap(AS_IO, &buggyboyjr_sound_device::buggyboy_sound_io);
-	m_audiocpu->set_periodic_int(DEVICE_SELF, FUNC(buggyboy_sound_device::z80_irq), attotime::from_hz(BUGGYBOY_ZCLK / 2 / 4 / 2048));
+	m_audiocpu->set_periodic_int(DEVICE_SELF, FUNC(buggyboyjr_sound_device::z80_irq), attotime::from_hz(BUGGYBOY_ZCLK / 2 / 4 / 2048));
 
 	SPEAKER(config, "frontleft", -0.2, 0.0, 1.0);
 	SPEAKER(config, "frontright", 0.2, 0.0, 1.0);
@@ -1100,8 +1099,8 @@ void buggyboyjr_sound_device::device_add_mconfig(machine_config &config)
 	m_ym[0]->add_route(ALL_OUTPUTS, "frontleft", 0.15);
 
 	YM2149(config, m_ym[1], BUGGYBOY_ZCLK / 4); /* YM2149 IC24 */
-	m_ym[1]->port_a_write_callback().set(FUNC(buggyboy_sound_device::ym2_a_w));
-	m_ym[1]->port_b_write_callback().set(FUNC(buggyboy_sound_device::ym2_b_w));
+	m_ym[1]->port_a_write_callback().set(FUNC(buggyboyjr_sound_device::ym2_a_w));
+	m_ym[1]->port_b_write_callback().set(FUNC(buggyboyjr_sound_device::ym2_b_w));
 	m_ym[1]->add_route(ALL_OUTPUTS, "frontright", 0.15);
 
 	this->add_route(0, "frontleft", 0.2);

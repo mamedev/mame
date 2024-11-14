@@ -64,7 +64,7 @@ the extent to which PA will attempt to "play nice" and to what extent it
 will interrupt other apps to improve performance. For example, if 44100 Hz
 sample rate is requested but the device is set at 48000 Hz, PA can either
 change the device for optimal playback ("Pro" mode), which may interrupt
-other programs playing back audio, or simple use a sample-rate coversion,
+other programs playing back audio, or simple use a sample-rate conversion,
 which allows for friendlier sharing of the device ("Play Nice" mode).
 
 Additionally, the user may define a "channel mapping" by calling
@@ -81,7 +81,7 @@ latency will be provided even if a large latency setting is selected.
 - Latency: Latency settings are generally ignored. They may be used as a
 hint for buffer size in paHostFramesPerBufferUnspecified, or the value may
 be used in cases where additional buffering is needed, such as doing input and
-output on seperate devices. Latency settings are always automatically bound
+output on separate devices. Latency settings are always automatically bound
 to "safe" values, however, so setting extreme values here should not be
 an issue.
 

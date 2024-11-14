@@ -98,7 +98,7 @@ Part list of Goldstar 3DO Interactive Multiplayer
 
 #include "cpu/arm/arm.h"
 #include "cpu/arm7/arm7.h"
-#include "imagedev/chd_cd.h"
+#include "imagedev/cdromimg.h"
 
 
 #define X2_CLOCK_PAL    59000000
@@ -250,7 +250,7 @@ ROM_END
 	/* TC544000AF-150, 1xxxxxxxxxxxxxxxxxx = 0xFF */ \
 	ROM_LOAD( "saot_rom2.bin", 0x000000, 0x80000, CRC(b832da9a) SHA1(520d3d1b5897800af47f92efd2444a26b7a7dead) )  \
 	ROM_REGION32_BE( 0x200000, "overlay", 0 ) \
-	ROM_COPY( "bios", 0, 0, 0x200000 ) \
+	ROM_COPY( "bios", 0, 0, 0x200000 )
 
 
 ROM_START(alg3do)
@@ -286,14 +286,14 @@ CONS( 1993, 3do_pal, 3do,    0,      _3do_pal,   3do,    _3do_state, empty_init,
 
 /*    YEAR  NAME     PARENT   MACHINE  INPUT  STATE       INIT        MONITOR   COMPANY                 FULLNAME               FLAGS */
 // Misc 3do Arcade games
-GAME( 1993, 3dobios, 0,       _3do,    3do,   _3do_state, empty_init, ROT0,     "The 3DO Company",      "3DO Bios",            MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IS_BIOS_ROOT )
+GAME( 1993, 3dobios, 0,       _3do,    3do,   _3do_state, empty_init, ROT0,     "The 3DO Company",      "3DO BIOS",            MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IS_BIOS_ROOT )
 
 GAME( 1995, orbatak, 3dobios, _3do,    3do,   _3do_state, empty_init, ROT0,     "American Laser Games", "Orbatak (prototype)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 // Beavis and Butthead (prototype)
 
 
 // American Laser Games uses its own BIOS (with additional protection according to serial output?)
-GAME( 1993, alg3do, 0,       _3do,    3do,   _3do_state, empty_init, ROT0,     "American Laser Games / The 3DO Company", "ALG 3DO Bios",            MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IS_BIOS_ROOT )
+GAME( 1993, alg3do, 0,       _3do,    3do,   _3do_state, empty_init, ROT0,     "American Laser Games / The 3DO Company", "ALG 3DO BIOS",            MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IS_BIOS_ROOT )
 
 GAME( 199?, md23do,  alg3do, _3do,    3do,   _3do_state, empty_init, ROT0,     "American Laser Games", "Mad Dog II: The Lost Gold (3DO hardware)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 GAME( 1994, sht3do,  alg3do, _3do,    3do,   _3do_state, empty_init, ROT0,     "American Laser Games", "Shootout at Old Tucson (3DO hardware)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

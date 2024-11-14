@@ -52,12 +52,12 @@ public:
 	void strobe(uint8_t data);
 
 	// line write handlers
-	DECLARE_WRITE_LINE_MEMBER(stb_w);
+	void stb_w(int state);
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 private:
 	// helpers

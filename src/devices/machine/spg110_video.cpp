@@ -697,8 +697,6 @@ void spg110_video_device::device_start()
 	save_item(NAME(m_bg_scrollx));
 	save_item(NAME(m_bg_scrolly));
 	save_item(NAME(m_2036_scroll));
-
-	m_video_irq_cb.resolve();
 }
 
 void spg110_video_device::device_reset()
@@ -756,7 +754,7 @@ uint32_t spg110_video_device::screen_update(screen_device &screen, bitmap_rgb32 
 	return 0;
 }
 
-WRITE_LINE_MEMBER(spg110_video_device::vblank)
+void spg110_video_device::vblank(int state)
 {
 	const int i = 0x0008;
 

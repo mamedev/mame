@@ -5,12 +5,12 @@
     Sharp MZ-2500 (c) 1985 Sharp Corporation
 
 ********************************************************************************************************************************/
-#ifndef MAME_INCLUDES_MZ2500_H
-#define MAME_INCLUDES_MZ2500_H
+#ifndef MAME_SHARP_MZ2500_H
+#define MAME_SHARP_MZ2500_H
 
 #pragma once
 
-
+#include "bus/msx/ctrl/ctrl.h"
 #include "cpu/z80/z80.h"
 #include "machine/i8255.h"
 #include "machine/pit8253.h"
@@ -42,12 +42,10 @@ public:
 		m_pit(*this, "pit"),
 		m_beeper(*this, "beeper"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_fdc(*this, "mb8877a"),
-		m_floppy0(*this, "mb8877a:0"),
-		m_floppy1(*this, "mb8877a:1"),
-		m_floppy2(*this, "mb8877a:2"),
-		m_floppy3(*this, "mb8877a:3"),
-		m_floppy(nullptr),
+		m_fdc(*this, "mb8876"),
+		m_floppy(*this, "mb8876:%u", 0U),
+		m_selected_floppy(nullptr),
+		m_joy(*this, "joy%u", 1U),
 		m_palette(*this, "palette"),
 		m_rambank(*this, "rambank%u", 0),
 		m_tvram(*this, "tvram"),
@@ -64,12 +62,10 @@ private:
 	required_device<pit8253_device> m_pit;
 	required_device<beep_device> m_beeper;
 	required_device<gfxdecode_device> m_gfxdecode;
-	required_device<mb8877_device> m_fdc;
-	required_device<floppy_connector> m_floppy0;
-	required_device<floppy_connector> m_floppy1;
-	required_device<floppy_connector> m_floppy2;
-	required_device<floppy_connector> m_floppy3;
-	floppy_image_device *m_floppy;
+	required_device<mb8876_device> m_fdc;
+	required_device_array<floppy_connector, 4> m_floppy;
+	floppy_image_device *m_selected_floppy;
+	required_device_array<msx_general_purpose_port_device, 2> m_joy;
 	required_device<palette_device> m_palette;
 	required_device_array<address_map_bank_device, 8> m_rambank;
 	required_shared_ptr<uint8_t> m_tvram;
@@ -167,17 +163,16 @@ private:
 	uint8_t dict_rom_r(offs_t offset);
 
 	uint8_t mz2500_cg_latch_compare();
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 	void mz2500_palette(palette_device &palette) const;
 	uint32_t screen_update_mz2500(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(mz2500_vbl);
 
-	uint8_t fdc_r(offs_t offset);
-	void fdc_w(offs_t offset, uint8_t data);
 	void floppy_select_w(uint8_t data);
 	void floppy_side_w(uint8_t data);
+	void floppy_dden_w(uint8_t data);
 
 	uint8_t mz2500_porta_r();
 	uint8_t mz2500_portb_r();
@@ -189,8 +184,8 @@ private:
 	uint8_t mz2500_pio1_porta_r();
 	uint8_t opn_porta_r();
 	void opn_porta_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(pit8253_clk0_irq);
-	DECLARE_WRITE_LINE_MEMBER(mz2500_rtc_alarm_irq);
+	void pit8253_clk0_irq(int state);
+	void mz2500_rtc_alarm_irq(int state);
 	IRQ_CALLBACK_MEMBER( mz2500_irq_ack );
 
 	void draw_80x25(bitmap_ind16 &bitmap,const rectangle &cliprect,uint16_t map_addr);
@@ -206,9 +201,9 @@ private:
 	static uint8_t pal_256_param(int index, int param);
 	void reset_banks(uint8_t type);
 
-	void mz2500_io(address_map &map);
-	void mz2500_map(address_map &map);
-	void mz2500_bank_window_map(address_map &map);
+	void mz2500_io(address_map &map) ATTR_COLD;
+	void mz2500_map(address_map &map) ATTR_COLD;
+	void mz2500_bank_window_map(address_map &map) ATTR_COLD;
 };
 
-#endif // MAME_INCLUDES_MZ2500_H
+#endif // MAME_SHARP_MZ2500_H

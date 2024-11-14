@@ -38,6 +38,8 @@
 #include "speaker.h"
 
 
+namespace {
+
 #define MASTER_CLOCK XTAL(6'144'000)
 
 class namcos16_state : public driver_device
@@ -86,7 +88,7 @@ private:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	TIMER_DEVICE_CALLBACK_MEMBER(master_scanline);
-	DECLARE_WRITE_LINE_MEMBER(slave_vblank_irq);
+	void slave_vblank_irq(int state);
 
 	uint8_t irq_enable_r();
 	void irq_disable_w(uint8_t data);
@@ -108,17 +110,17 @@ private:
 	uint8_t bg_rmw_r(offs_t offset);
 	void bg_rmw_w(offs_t offset, uint8_t data);
 
-	void master_liblrabl_map(address_map &map);
-	void master_toypop_map(address_map &map);
-	void namcos16_master_base_map(address_map &map);
-	void slave_map(address_map &map);
-	void sound_map(address_map &map);
+	void master_liblrabl_map(address_map &map) ATTR_COLD;
+	void master_toypop_map(address_map &map) ATTR_COLD;
+	void namcos16_master_base_map(address_map &map) ATTR_COLD;
+	void slave_map(address_map &map) ATTR_COLD;
+	void sound_map(address_map &map) ATTR_COLD;
 
 	// driver_device overrides
-//  virtual void machine_start() override;
-	virtual void machine_reset() override;
+//  virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
-//  virtual void video_start() override;
+//  virtual void video_start() override ATTR_COLD;
 
 	bool m_master_irq_enable = false;
 	bool m_slave_irq_enable = false;
@@ -688,7 +690,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(namcos16_state::master_scanline)
 	}
 }
 
-WRITE_LINE_MEMBER(namcos16_state::slave_vblank_irq)
+void namcos16_state::slave_vblank_irq(int state)
 {
 	if (state && m_slave_irq_enable == true)
 		m_slave_cpu->set_input_line(6, HOLD_LINE);
@@ -805,6 +807,9 @@ ROM_START( toypop )
 	ROM_REGION( 0x0100, "namco", 0 )
 	ROM_LOAD( "tp1-6.3d", 0x0000, 0x0100, CRC(16a9166a) SHA1(847cbaf7c88616576c410177e066ae1d792ac0ba) )
 ROM_END
+
+} // anonymous namespace
+
 
 GAME( 1983, liblrabl, 0,     liblrabl, liblrabl, namcos16_state, empty_init, ROT0,   "Namco", "Libble Rabble", 0 )
 GAME( 1986, toypop,   0,     toypop,   toypop,   namcos16_state, empty_init, ROT180, "Namco", "Toypop",        0 )

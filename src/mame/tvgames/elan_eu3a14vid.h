@@ -1,8 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood
 
-#ifndef MAME_VIDEO_ELAN_EU3A14VID_H
-#define MAME_VIDEO_ELAN_EU3A14VID_H
+#ifndef MAME_TVGAMES_ELAN_EU3A14VID_H
+#define MAME_TVGAMES_ELAN_EU3A14VID_H
 
 #include "elan_eu3a05commonvid.h"
 #include "cpu/m6502/m6502.h"
@@ -18,7 +18,7 @@ public:
 	template <typename T> void set_addrbank(T &&tag) { m_bank.set_tag(std::forward<T>(tag)); }
 	template <typename T> void set_screen(T &&tag) { m_screen.set_tag(std::forward<T>(tag)); }
 
-	void map(address_map& map);
+	void map(address_map &map) ATTR_COLD;
 
 	void set_tilerambase(int tilerambase) { m_tilerambase = tilerambase; }
 
@@ -28,8 +28,8 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 	virtual space_config_vector memory_space_config() const override;
 
 private:
@@ -99,4 +99,4 @@ private:
 
 DECLARE_DEVICE_TYPE(ELAN_EU3A14_VID, elan_eu3a14vid_device)
 
-#endif // MAME_VIDEO_ELAN_EU3A14VID_H
+#endif // MAME_TVGAMES_ELAN_EU3A14VID_H

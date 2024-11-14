@@ -106,14 +106,14 @@
 
 DEFINE_DEVICE_TYPE(TPI6525, tpi6525_device, "tpi6525", "6525 TPI")
 
-tpi6525_device::tpi6525_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, TPI6525, tag, owner, clock),
+tpi6525_device::tpi6525_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, TPI6525, tag, owner, clock),
 	m_out_irq_cb(*this),
-	m_in_pa_cb(*this),
+	m_in_pa_cb(*this, 0xff),
 	m_out_pa_cb(*this),
-	m_in_pb_cb(*this),
+	m_in_pb_cb(*this, 0xff),
 	m_out_pb_cb(*this),
-	m_in_pc_cb(*this),
+	m_in_pc_cb(*this, 0xff),
 	m_out_pc_cb(*this),
 	m_out_ca_cb(*this),
 	m_out_cb_cb(*this),
@@ -144,16 +144,10 @@ tpi6525_device::tpi6525_device(const machine_config &mconfig, const char *tag, d
 
 void tpi6525_device::device_start()
 {
-	// resolve callbacks
-	m_out_irq_cb.resolve_safe();
-	m_in_pa_cb.resolve();
-	m_out_pa_cb.resolve_safe();
-	m_in_pb_cb.resolve();
-	m_out_pb_cb.resolve_safe();
-	m_in_pc_cb.resolve();
-	m_out_pc_cb.resolve_safe();
-	m_out_ca_cb.resolve_safe();
-	m_out_cb_cb.resolve_safe();
+	/* setup some initial values */
+	m_in_a = 0xff;
+	m_in_b = 0xff;
+	m_in_c = 0xff;
 
 	/* register for state saving */
 	save_item(NAME(m_port_a));
@@ -179,10 +173,6 @@ void tpi6525_device::device_start()
 
 void tpi6525_device::device_reset()
 {
-	/* setup some initial values */
-	m_in_a = 0xff;
-	m_in_b = 0xff;
-	m_in_c = 0xff;
 }
 
 
@@ -216,7 +206,7 @@ void tpi6525_device::clear_interrupt()
 }
 
 
-WRITE_LINE_MEMBER( tpi6525_device::i0_w )
+void tpi6525_device::i0_w(int state)
 {
 	if (INTERRUPT_MODE && (state != m_irq_level[0]))
 	{
@@ -231,7 +221,7 @@ WRITE_LINE_MEMBER( tpi6525_device::i0_w )
 }
 
 
-WRITE_LINE_MEMBER( tpi6525_device::i1_w )
+void tpi6525_device::i1_w(int state)
 {
 	if (INTERRUPT_MODE && (state != m_irq_level[1]))
 	{
@@ -246,7 +236,7 @@ WRITE_LINE_MEMBER( tpi6525_device::i1_w )
 }
 
 
-WRITE_LINE_MEMBER( tpi6525_device::i2_w )
+void tpi6525_device::i2_w(int state)
 {
 	if (INTERRUPT_MODE && (state != m_irq_level[2]))
 	{
@@ -261,7 +251,7 @@ WRITE_LINE_MEMBER( tpi6525_device::i2_w )
 }
 
 
-WRITE_LINE_MEMBER( tpi6525_device::i3_w )
+void tpi6525_device::i3_w(int state)
 {
 	if (INTERRUPT_MODE && (state != m_irq_level[3]))
 	{
@@ -278,7 +268,7 @@ WRITE_LINE_MEMBER( tpi6525_device::i3_w )
 }
 
 
-WRITE_LINE_MEMBER( tpi6525_device::i4_w )
+void tpi6525_device::i4_w(int state)
 {
 	if (INTERRUPT_MODE && (state != m_irq_level[4]) )
 	{
@@ -298,7 +288,7 @@ uint8_t tpi6525_device::pa_r()
 {
 	uint8_t data = m_in_a;
 
-	if (!m_in_pa_cb.isnull())
+	if (!m_in_pa_cb.isunset())
 		data = m_in_pa_cb();
 
 	data = (data & ~m_ddr_a) | (m_ddr_a & m_port_a);
@@ -317,7 +307,7 @@ uint8_t tpi6525_device::pb_r()
 {
 	uint8_t data = m_in_b;
 
-	if (!m_in_pb_cb.isnull())
+	if (!m_in_pb_cb.isunset())
 		data = m_in_pb_cb();
 
 	data = (data & ~m_ddr_b) | (m_ddr_b & m_port_b);
@@ -336,7 +326,7 @@ uint8_t tpi6525_device::pc_r()
 {
 	uint8_t data = m_in_c;
 
-	if (!m_in_pc_cb.isnull())
+	if (!m_in_pc_cb.isunset())
 		data &= m_in_pc_cb();
 
 	data = (data & ~m_ddr_c) | (m_ddr_c & m_port_c);
@@ -360,7 +350,7 @@ uint8_t tpi6525_device::read(offs_t offset)
 	case 0:
 		data = m_in_a;
 
-		if (!m_in_pa_cb.isnull())
+		if (!m_in_pa_cb.isunset())
 			data &= m_in_pa_cb(0);
 
 		data = (data & ~m_ddr_a) | (m_ddr_a & m_port_a);
@@ -370,7 +360,7 @@ uint8_t tpi6525_device::read(offs_t offset)
 	case 1:
 		data = m_in_b;
 
-		if (!m_in_pb_cb.isnull())
+		if (!m_in_pb_cb.isunset())
 			data &= m_in_pb_cb(0);
 
 		data = (data & ~m_ddr_b) | (m_ddr_b & m_port_b);
@@ -395,7 +385,7 @@ uint8_t tpi6525_device::read(offs_t offset)
 		{
 			data = m_in_c;
 
-			if (!m_in_pc_cb.isnull())
+			if (!m_in_pc_cb.isunset())
 				data &= m_in_pc_cb(0);
 
 			data = (data & ~m_ddr_c) | (m_ddr_c & m_port_c);

@@ -6,6 +6,9 @@
 
 #include "machine/eepromser.h"
 
+
+namespace {
+
 class dreamlif_state : public spg2xx_game_state
 {
 public:
@@ -100,6 +103,8 @@ ROM_START( dsgnwrld )
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD16_WORD_SWAP( "designersworld.bin", 0x000000, 0x800000, CRC(b3987161) SHA1(f7d03b172fd0accc6370d9ccc340b3aa6317426f) )
 ROM_END
+
+} // anonymous namespace
 
 
 // Hasbro games

@@ -115,6 +115,8 @@ val (hex):  27  20  22  04  26  00  20  20  00  07  00  00  80  00  00  00  ns  
 #include "speaker.h"
 
 
+namespace {
+
 class murogem_state : public driver_device
 {
 public:
@@ -141,7 +143,7 @@ private:
 	void murogem_palette(palette_device &palette) const;
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	void murogem_map(address_map &map);
+	void murogem_map(address_map &map) ATTR_COLD;
 };
 
 
@@ -331,6 +333,9 @@ ROM_START( lasvegas )
 	ROM_REGION( 0x0020, "proms", 0 )
 	ROM_LOAD( "a3.1b", 0x0000, 0x0020, CRC(abddfb6b) SHA1(ed78b93701b5a3bf2053d2584e9a354fb6cec203) )   /* 74s288 at 1B */
 ROM_END
+
+} // anonymous namespace
+
 
 GAME( 198?, murogem,  0,       murogem, murogem, murogem_state, empty_init, ROT0, "<unknown>", "Muroge Monaco (set 1)", MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE )
 GAME( 198?, murogema, murogem, murogem, murogem, murogem_state, empty_init, ROT0, "<unknown>", "Muroge Monaco (set 2)", MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE )

@@ -26,6 +26,8 @@
 #include "speaker.h"
 
 
+namespace {
+
 #define MASTER_CLOCK            (XTAL(10'000'000))
 #define CPU_CLOCK               (MASTER_CLOCK / 4)
 #define PIXEL_CLOCK             (MASTER_CLOCK / 1)
@@ -57,14 +59,14 @@ private:
 	std::unique_ptr<uint8_t[]> m_ram_palette;
 	uint8_t palette_r(offs_t offset);
 	void palette_w(offs_t offset, uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(hsync_changed);
+	void hsync_changed(int state);
 	MC6845_BEGIN_UPDATE(crtc_begin_update);
 	MC6845_UPDATE_ROW(crtc_update_row);
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 	required_device<cpu_device> m_maincpu;
 	required_device<screen_device> m_screen;
-	void slotcarn_map(address_map &map);
-	void spielbud_io_map(address_map &map);
+	void slotcarn_map(address_map &map) ATTR_COLD;
+	void spielbud_io_map(address_map &map) ATTR_COLD;
 };
 
 
@@ -154,7 +156,7 @@ MC6845_UPDATE_ROW( slotcarn_state::crtc_update_row )
 }
 
 
-WRITE_LINE_MEMBER(slotcarn_state::hsync_changed)
+void slotcarn_state::hsync_changed(int state)
 {
 	/* update any video up to the current scanline */
 //  m_screen->update_now();
@@ -695,6 +697,8 @@ ROM_START( spielbud )
 	ROM_REGION( 0x4000, "gfx2", 0 )
 	ROM_LOAD( "spielbud.09", 0x0000, 0x2000, CRC(d88c72f2) SHA1(bb015685f4c2cc7723c24880c11cb6d31f71e73f) )
 ROM_END
+
+} // anonymous namespace
 
 
 /*********************************************

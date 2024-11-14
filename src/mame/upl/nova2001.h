@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Howie Cohen, Frank Palazzolo, Alex Pasadyn, David Haywood, Phil Stroffolino, Uki
-#ifndef MAME_INCLUDES_NOVA2001_H
-#define MAME_INCLUDES_NOVA2001_H
+#ifndef MAME_UPL_NOVA2001_H
+#define MAME_UPL_NOVA2001_H
 
 #pragma once
 
@@ -31,7 +31,7 @@ public:
 	void init_raiders5();
 	void init_pkunwar();
 
-	DECLARE_CUSTOM_INPUT_MEMBER(ninjakun_io_A002_ctrl_r);
+	ioport_value ninjakun_io_A002_ctrl_r();
 
 private:
 	required_device<z80_device> m_maincpu;
@@ -83,15 +83,15 @@ private:
 	void nova2001_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect );
 	void pkunwar_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect );
 	void lineswap_gfx_roms(const char *region, const int bit);
-	void ninjakun_cpu1_map(address_map &map);
-	void ninjakun_cpu2_map(address_map &map);
-	void ninjakun_shared_map(address_map &map);
-	void nova2001_map(address_map &map);
-	void pkunwar_io(address_map &map);
-	void pkunwar_map(address_map &map);
-	void raiders5_cpu1_map(address_map &map);
-	void raiders5_cpu2_map(address_map &map);
-	void raiders5_io(address_map &map);
+	void ninjakun_cpu1_map(address_map &map) ATTR_COLD;
+	void ninjakun_cpu2_map(address_map &map) ATTR_COLD;
+	void ninjakun_shared_map(address_map &map) ATTR_COLD;
+	void nova2001_map(address_map &map) ATTR_COLD;
+	void pkunwar_io(address_map &map) ATTR_COLD;
+	void pkunwar_map(address_map &map) ATTR_COLD;
+	void raiders5_cpu1_map(address_map &map) ATTR_COLD;
+	void raiders5_cpu2_map(address_map &map) ATTR_COLD;
+	void raiders5_io(address_map &map) ATTR_COLD;
 };
 
-#endif // MAME_INCLUDES_NOVA2001_H
+#endif // MAME_UPL_NOVA2001_H

@@ -24,8 +24,8 @@ public:
 
 	ds2401_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_WRITE_LINE_MEMBER( write );
-	DECLARE_READ_LINE_MEMBER( read );
+	void write(int state);
+	int read();
 	uint8_t direct_read(int index);
 
 protected:
@@ -46,8 +46,8 @@ protected:
 	};
 
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	TIMER_CALLBACK_MEMBER(reset_tick);
 	TIMER_CALLBACK_MEMBER(main_tick);

@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Olivier Galibert
-#ifndef MAME_MACHINE_NAOMIM1_H
-#define MAME_MACHINE_NAOMIM1_H
+#ifndef MAME_SEGA_NAOMIM1_H
+#define MAME_SEGA_NAOMIM1_H
 
 #pragma once
 
@@ -20,13 +20,13 @@ public:
 
 	naomi_m1_board(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual void submap(address_map &map) override;
+	virtual void submap(address_map &map) override ATTR_COLD;
 
 	uint16_t actel_id_r();
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	virtual void board_setup_address(uint32_t address, bool is_dma) override;
 	virtual void board_get_buffer(uint8_t *&base, uint32_t &limit) override;
@@ -60,4 +60,4 @@ private:
 
 DECLARE_DEVICE_TYPE(NAOMI_M1_BOARD, naomi_m1_board)
 
-#endif // MAME_MACHINE_NAOMIM1_H
+#endif // MAME_SEGA_NAOMIM1_H

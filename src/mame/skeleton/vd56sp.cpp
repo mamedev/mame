@@ -10,6 +10,9 @@
 #include "emu.h"
 #include "cpu/m6502/r65c19.h"
 
+
+namespace {
+
 class vd56sp_state : public driver_device
 {
 public:
@@ -22,7 +25,7 @@ public:
 	void vd56sp(machine_config &mconfig);
 
 private:
-	void exp_map(address_map &map);
+	void exp_map(address_map &map) ATTR_COLD;
 
 	required_device<r65c19_device> m_maincpu;
 };
@@ -52,6 +55,8 @@ ROM_START(vd56sp)
 	ROM_REGION(0x40000, "firmware", 0)
 	ROM_LOAD("vd56sp_v2.2_8904005.u10", 0x00000, 0x40000, CRC(23ddae13) SHA1(7a194f681389c2923ea6848b3a25f26c532a3200))
 ROM_END
+
+} // anonymous namespace
 
 
 SYST(199?, vd56sp, 0, 0, vd56sp, vd56sp, vd56sp_state, empty_init, "Pro-Nets Technology", "Speedcom VD56SP", MACHINE_IS_SKELETON)

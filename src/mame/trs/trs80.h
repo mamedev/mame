@@ -2,8 +2,8 @@
 // copyright-holders:Juergen Buchmueller, Robbbert
 //*****************************************************************************
 
-#ifndef MAME_INCLUDES_TRS80_H
-#define MAME_INCLUDES_TRS80_H
+#ifndef MAME_TRS_TRS80_H
+#define MAME_TRS_TRS80_H
 
 #pragma once
 
@@ -11,7 +11,6 @@
 #include "cpu/z80/z80.h"
 #include "imagedev/cassette.h"
 #include "imagedev/floppy.h"
-#include "imagedev/snapquik.h"
 #include "machine/ay31015.h"
 #include "machine/clock.h"
 #include "machine/com8116.h"
@@ -58,8 +57,8 @@ public:
 	void init_trs80l2();
 
 protected:
-	void machine_start() override;
-	void machine_reset() override;
+	void machine_start() override ATTR_COLD;
+	void machine_reset() override ATTR_COLD;
 
 	void port_ff_w(u8 data);
 	void sys80_fe_w(u8 data);
@@ -82,8 +81,7 @@ protected:
 	INTERRUPT_GEN_MEMBER(rtc_interrupt);
 	INTERRUPT_GEN_MEMBER(fdc_interrupt);
 	TIMER_CALLBACK_MEMBER(cassette_data_callback);
-	DECLARE_WRITE_LINE_MEMBER(intrq_w);
-	DECLARE_QUICKLOAD_LOAD_MEMBER(quickload_cb);
+	void intrq_w(int state);
 
 	u8 m_irq = 0U;
 	u8 m_mask = 0U;
@@ -96,7 +94,7 @@ protected:
 	u8 m_cols = 0xffU;
 	bool m_7bit = false;
 	u16 m_timeout = 600U;
-	void trs80_io(address_map &map);
+	void trs80_io(address_map &map) ATTR_COLD;
 	floppy_image_device *m_fdd;
 	required_device<z80_device> m_maincpu;
 	required_memory_region m_region_maincpu;
@@ -116,11 +114,11 @@ protected:
 	required_ioport_array<8> m_io_keyboard;
 
 private:
-	void m1_io(address_map &map);
-	void m1_mem(address_map &map);
-	void sys80_io(address_map &map);
-	void trs80_mem(address_map &map);
-	void ht1080z_io(address_map &map);
+	void m1_io(address_map &map) ATTR_COLD;
+	void m1_mem(address_map &map) ATTR_COLD;
+	void sys80_io(address_map &map) ATTR_COLD;
+	void trs80_mem(address_map &map) ATTR_COLD;
+	void ht1080z_io(address_map &map) ATTR_COLD;
 
 	u32 screen_update_trs80(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	u32 screen_update_sys80(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -128,4 +126,4 @@ private:
 	static void floppy_formats(format_registration &fr);
 };
 
-#endif // MAME_INCLUDES_TRS80_H
+#endif // MAME_TRS_TRS80_H

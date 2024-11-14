@@ -41,15 +41,15 @@ cops1_base_device::cops1_base_device(const machine_config &mconfig, device_type 
 	m_prgwidth(prgwidth),
 	m_datawidth(datawidth),
 	m_opla(*this, "opla"),
-	m_read_k(*this),
-	m_read_inb(*this),
-	m_read_f(*this),
+	m_read_k(*this, 0),
+	m_read_inb(*this, 0),
+	m_read_f(*this, 0),
 	m_write_f(*this),
-	m_read_do3(*this),
+	m_read_do3(*this, 0),
 	m_write_do(*this),
 	m_write_s(*this),
 	m_write_blk(*this),
-	m_read_si(*this),
+	m_read_si(*this, 0),
 	m_write_so(*this)
 { }
 
@@ -64,18 +64,6 @@ void cops1_base_device::device_start()
 	m_data = &space(AS_DATA);
 	m_prgmask = (1 << m_prgwidth) - 1;
 	m_datamask = (1 << m_datawidth) - 1;
-
-	// resolve callbacks
-	m_read_k.resolve_safe(0);
-	m_read_inb.resolve_safe(0);
-	m_read_f.resolve();
-	m_write_f.resolve_safe();
-	m_read_do3.resolve();
-	m_write_do.resolve_safe();
-	m_write_s.resolve_safe();
-	m_write_blk.resolve_safe();
-	m_read_si.resolve_safe(0);
-	m_write_so.resolve_safe();
 
 	// zerofill
 	m_pc = 0;

@@ -4,11 +4,13 @@
 #include "emu.h"
 #include "vt1682_alu.h"
 
+#include "multibyte.h"
+
 #define LOG_ALU     (1U << 1)
 
-#define LOG_ALL           ( LOG_ALU )
+#define LOG_ALL     (LOG_ALU)
 
-#define VERBOSE             (0)
+#define VERBOSE     (0)
 #include "logmacro.h"
 
 
@@ -22,26 +24,12 @@ vrt_vt1682_alu_device::vrt_vt1682_alu_device(const machine_config &mconfig, cons
 void vrt_vt1682_alu_device::device_start()
 {
 	save_item(NAME(m_alu_oprand));
-	save_item(NAME(m_alu_oprand_mult));
-	save_item(NAME(m_alu_oprand_div));
-	save_item(NAME(m_alu_out));
-
-
 }
 
 void vrt_vt1682_alu_device::device_reset()
 {
-	for (int i=0;i<4;i++)
+	for (int i=0;i<8;i++)
 		m_alu_oprand[i] = 0;
-
-	for (int i = 0; i < 2; i++)
-	{
-		m_alu_oprand_mult[i] = 0;
-		m_alu_oprand_div[i] = 0;
-	}
-
-	for (int i=0;i<6;i++)
-		m_alu_out[i] = 0;
 }
 
 
@@ -72,7 +60,7 @@ void vrt_vt1682_alu_device::device_reset()
 
 uint8_t vrt_vt1682_alu_device::alu_out_1_r()
 {
-	uint8_t ret = m_alu_out[0];
+	uint8_t ret = m_alu_oprand[0];
 	if (!m_is_sound_alu) LOGMASKED(LOG_ALU, "%s: alu_out_1_r returning: %02x\n", machine().describe_context(), ret);
 	return ret;
 }
@@ -109,7 +97,7 @@ void vrt_vt1682_alu_device::alu_oprand_1_w(uint8_t data)
 
 uint8_t vrt_vt1682_alu_device::alu_out_2_r()
 {
-	uint8_t ret = m_alu_out[1];
+	uint8_t ret = m_alu_oprand[1];
 	if (!m_is_sound_alu) LOGMASKED(LOG_ALU, "%s: alu_out_2_r returning: %02x\n", machine().describe_context(), ret);
 	return ret;
 }
@@ -146,7 +134,7 @@ void vrt_vt1682_alu_device::alu_oprand_2_w(uint8_t data)
 
 uint8_t vrt_vt1682_alu_device::alu_out_3_r()
 {
-	uint8_t ret = m_alu_out[2];
+	uint8_t ret = m_alu_oprand[2];
 	if (!m_is_sound_alu) LOGMASKED(LOG_ALU, "%s: alu_out_3_r returning: %02x\n", machine().describe_context(), ret);
 	return ret;
 }
@@ -184,7 +172,7 @@ void vrt_vt1682_alu_device::alu_oprand_3_w(uint8_t data)
 
 uint8_t vrt_vt1682_alu_device::alu_out_4_r()
 {
-	uint8_t ret = m_alu_out[3];
+	uint8_t ret = m_alu_oprand[3];
 	if (!m_is_sound_alu) LOGMASKED(LOG_ALU, "%s: alu_out_4_r returning: %02x\n", machine().describe_context(), ret);
 	return ret;
 }
@@ -222,7 +210,7 @@ void vrt_vt1682_alu_device::alu_oprand_4_w(uint8_t data)
 
 uint8_t vrt_vt1682_alu_device::alu_out_5_r()
 {
-	uint8_t ret = m_alu_out[4];
+	uint8_t ret = m_alu_oprand[4];
 	if (!m_is_sound_alu) LOGMASKED(LOG_ALU, "%s: alu_out_5_r returning: %02x\n", machine().describe_context(), ret);
 	return ret;
 }
@@ -231,7 +219,7 @@ uint8_t vrt_vt1682_alu_device::alu_out_5_r()
 void vrt_vt1682_alu_device::alu_oprand_5_mult_w(uint8_t data)
 {
 	if (!m_is_sound_alu) LOGMASKED(LOG_ALU, "%s: alu_oprand_5_mult_w writing: %02x\n", machine().describe_context(), data);
-	m_alu_oprand_mult[0] = data;
+	m_alu_oprand[4] = data;
 }
 
 
@@ -261,7 +249,7 @@ void vrt_vt1682_alu_device::alu_oprand_5_mult_w(uint8_t data)
 
 uint8_t vrt_vt1682_alu_device::alu_out_6_r()
 {
-	uint8_t ret = m_alu_out[5];
+	uint8_t ret = m_alu_oprand[5];
 	if (!m_is_sound_alu) LOGMASKED(LOG_ALU, "%s: alu_out_6_r returning: %02x\n", machine().describe_context(), ret);
 	return ret;
 }
@@ -272,18 +260,17 @@ void vrt_vt1682_alu_device::alu_oprand_6_mult_w(uint8_t data)
 
 	if (!m_is_sound_alu) LOGMASKED(LOG_ALU, "%s: alu_oprand_6_mult_w writing: %02x\n", machine().describe_context(), data);
 	if (!m_is_sound_alu) LOGMASKED(LOG_ALU, "------------------------------------------ MULTIPLICATION REQUESTED ------------------------------------\n");
-	m_alu_oprand_mult[1] = data;
+	m_alu_oprand[5] = data;
 
-	int param1 = (m_alu_oprand_mult[1] << 8) | m_alu_oprand_mult[0];
-	int param2 = (m_alu_oprand[1] << 8) | m_alu_oprand[0];
+	int param1 = get_u16le(&m_alu_oprand[4]);
+	int param2 = get_u16le(&m_alu_oprand[0]);
 
 	uint32_t result = param1 * param2;
 
-	m_alu_out[0] = result & 0xff;
-	m_alu_out[1] = (result >> 8) & 0xff;
-	m_alu_out[2] = (result >> 16) & 0xff;
-	m_alu_out[3] = (result >> 24) & 0xff;
-	// 4/5 untouched? or set to 0?
+	put_u32le(&m_alu_oprand[0], result);
+
+	// lxts3 (Sunnyside Race) reads result from 4/5 instead of 0/1
+	put_u16le(&m_alu_oprand[4], result & 0xffff);
 }
 
 
@@ -304,7 +291,7 @@ void vrt_vt1682_alu_device::alu_oprand_6_mult_w(uint8_t data)
 void vrt_vt1682_alu_device::alu_oprand_5_div_w(uint8_t data)
 {
 	if (!m_is_sound_alu) LOGMASKED(LOG_ALU, "%s: alu_oprand_5_div_w writing: %02x\n", machine().describe_context(), data);
-	m_alu_oprand_div[0] = data;
+	m_alu_oprand[6] = data;
 }
 
 /*
@@ -323,25 +310,19 @@ void vrt_vt1682_alu_device::alu_oprand_5_div_w(uint8_t data)
 void vrt_vt1682_alu_device::alu_oprand_6_div_w(uint8_t data)
 {
 	//LOGMASKED(LOG_ALU, "%s: alu_oprand_6_div_w writing: %02x\n", machine().describe_context(), data);
-	m_alu_oprand_div[1] = data;
+	m_alu_oprand[7] = data;
 
-	uint32_t param1 = (m_alu_oprand[3] << 24) | (m_alu_oprand[2] << 16) | (m_alu_oprand[1] << 8) | m_alu_oprand[0];
-	// sources say the mult registers are used here, but that makes little sense?
-	uint32_t param2 = (m_alu_oprand_div[1] << 8) | m_alu_oprand_div[0];
+	uint32_t param1 = get_u32le(&m_alu_oprand[0]);
+	uint16_t param2 = get_u16le(&m_alu_oprand[6]);
 
 	if (param2 != 0)
 	{
 		//if (!m_is_sound_alu) popmessage("------------------------------------------ DIVISION REQUESTED ------------------------------------\n");
 
-		uint32_t result = param1 / param2;
-		uint32_t remainder = param1 % param2;
+		uint32_t quotient = param1 / param2;
+		uint16_t remainder = param1 - param2 * (quotient & ~uint32_t(1));
 
-		m_alu_out[0] = result & 0xff;
-		m_alu_out[1] = (result >> 8) & 0xff;
-		m_alu_out[2] = (result >> 16) & 0xff;
-		m_alu_out[3] = (result >> 24) & 0xff;
-
-		m_alu_out[4] = remainder & 0xff;
-		m_alu_out[5] = (remainder >> 8) & 0xff;
+		put_u32le(&m_alu_oprand[0], quotient);
+		put_u16le(&m_alu_oprand[4], (remainder >> 1) | (remainder << 15));
 	}
 }

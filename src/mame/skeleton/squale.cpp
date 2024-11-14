@@ -95,6 +95,10 @@ TODO
 #include "softlist_dev.h"
 #include "speaker.h"
 
+#include "utf8.h"
+
+
+namespace {
 
 #define MAIN_CLOCK           14_MHz_XTAL
 #define AY_CLOCK             MAIN_CLOCK / 8     /* 1.75 Mhz */
@@ -143,14 +147,14 @@ private:
 	void ay_porta_w(uint8_t data);
 	void ay_portb_w(uint8_t data);
 
-	DECLARE_WRITE_LINE_MEMBER(pia_u72_ca2_w);
-	DECLARE_WRITE_LINE_MEMBER(pia_u72_cb2_w);
+	void pia_u72_ca2_w(int state);
+	void pia_u72_cb2_w(int state);
 
-	DECLARE_WRITE_LINE_MEMBER(pia_u75_cb2_w);
+	void pia_u75_cb2_w(int state);
 
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( cart_load );
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	uint8_t keyboard_line = 0U;
 	uint8_t fdc_sel0 = 0U;
@@ -162,7 +166,7 @@ private:
 
 	TIMER_DEVICE_CALLBACK_MEMBER(squale_scanline);
 
-	void squale_mem(address_map &map);
+	void squale_mem(address_map &map) ATTR_COLD;
 
 	required_device<acia6850_device> m_acia;
 	required_device<ay8910_device> m_ay8910;
@@ -206,7 +210,7 @@ uint8_t  squale_state::video_ram_read_reg1()
 
 	for(p = 0; p < 4 ; p++)
 	{
-		if( m_ef9365->get_last_readback_word(p, 0) & 8 )
+		if( m_ef9365->get_last_readback_word(p, nullptr) & 8 )
 		{
 			data |= (0x01 << p);
 		}
@@ -216,7 +220,7 @@ uint8_t  squale_state::video_ram_read_reg1()
 
 	for(p = 0; p < 4 ; p++)
 	{
-		if( m_ef9365->get_last_readback_word(p, 0) & 4 )
+		if( m_ef9365->get_last_readback_word(p, nullptr) & 4 )
 		{
 			data |= (0x01 << p);
 		}
@@ -241,7 +245,7 @@ uint8_t squale_state::video_ram_read_reg2()
 
 	for(p = 0; p < 4 ; p++)
 	{
-		if( m_ef9365->get_last_readback_word(p, 0) & 2 )
+		if( m_ef9365->get_last_readback_word(p, nullptr) & 2 )
 		{
 			data |= (0x01 << p);
 		}
@@ -251,7 +255,7 @@ uint8_t squale_state::video_ram_read_reg2()
 
 	for(p = 0; p < 4 ; p++)
 	{
-		if( m_ef9365->get_last_readback_word(p, 0) & 1 )
+		if( m_ef9365->get_last_readback_word(p, nullptr) & 1 )
 		{
 			data |= (0x01 << p);
 		}
@@ -542,7 +546,7 @@ void squale_state::pia_u72_porta_w(uint8_t data)
 	return;
 }
 
-WRITE_LINE_MEMBER( squale_state::pia_u72_ca2_w )
+void squale_state::pia_u72_ca2_w(int state)
 {
 	// U72 PIA CA2 : Cartridge address control
 
@@ -566,7 +570,7 @@ WRITE_LINE_MEMBER( squale_state::pia_u72_ca2_w )
 	}
 }
 
-WRITE_LINE_MEMBER( squale_state::pia_u75_cb2_w )
+void squale_state::pia_u75_cb2_w(int state)
 {
 	// U75 PIA CB2 : Cartridge address reset
 
@@ -614,7 +618,7 @@ void squale_state::pia_u72_portb_w(uint8_t data)
 	return;
 }
 
-WRITE_LINE_MEMBER( squale_state::pia_u72_cb2_w )
+void squale_state::pia_u72_cb2_w(int state)
 {
 	// U72 PIA CB2 : Printer Data Strobe line
 
@@ -625,18 +629,15 @@ WRITE_LINE_MEMBER( squale_state::pia_u72_cb2_w )
 
 DEVICE_IMAGE_LOAD_MEMBER( squale_state::cart_load )
 {
-	uint32_t size = m_cart->common_get_size("rom");
+	uint32_t const size = m_cart->common_get_size("rom");
 
-	if ( ! size || size > 0x10000)
-	{
-		image.seterror(image_error::INVALIDIMAGE, "Unsupported cartridge size");
-		return image_init_result::FAIL;
-	}
+	if (!size || size > 0x1'0000)
+		return std::make_pair(image_error::INVALIDLENGTH, "Unsupported cartridge size (must be more than 64K)");
 
 	m_cart->rom_alloc(size, GENERIC_ROM8_WIDTH, ENDIANNESS_LITTLE);
 	m_cart->common_load_rom(m_cart->get_rom_base(), size, "rom");
 
-	return image_init_result::PASS;
+	return std::make_pair(std::error_condition(), std::string());
 }
 
 TIMER_DEVICE_CALLBACK_MEMBER( squale_state::squale_scanline )
@@ -812,7 +813,7 @@ void squale_state::squale(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &squale_state::squale_mem);
 
 	/* Cartridge pia */
-	PIA6821(config, m_pia_u72, 0);
+	PIA6821(config, m_pia_u72);
 	m_pia_u72->readpa_handler().set(FUNC(squale_state::pia_u72_porta_r));
 	m_pia_u72->readpb_handler().set(FUNC(squale_state::pia_u72_portb_r));
 	m_pia_u72->writepa_handler().set(FUNC(squale_state::pia_u72_porta_w));
@@ -821,7 +822,7 @@ void squale_state::squale(machine_config &config)
 	m_pia_u72->cb2_handler().set(FUNC(squale_state::pia_u72_cb2_w));
 
 	/* Keyboard pia */
-	PIA6821(config, m_pia_u75, 0);
+	PIA6821(config, m_pia_u75);
 	m_pia_u75->readpa_handler().set(FUNC(squale_state::pia_u75_porta_r));
 	m_pia_u75->readpb_handler().set(FUNC(squale_state::pia_u75_portb_r));
 	m_pia_u75->writepa_handler().set(FUNC(squale_state::pia_u75_porta_w));
@@ -878,6 +879,9 @@ ROM_START( squale )
 
 	// place ROM v1.2 signature here.
 ROM_END
+
+} // anonymous namespace
+
 
 /* Driver */
 

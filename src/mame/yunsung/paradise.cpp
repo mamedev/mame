@@ -102,8 +102,8 @@ sticker from Jan 95 and factory sticker 94*41.
 #include "tilemap.h"
 
 // configurable logging
-#define LOG_CPUBANK     (1U <<  1)
-#define LOG_OKIBANK     (1U <<  2)
+#define LOG_CPUBANK     (1U << 1)
+#define LOG_OKIBANK     (1U << 2)
 
 //#define VERBOSE (LOG_GENERAL | LOG_CPUBANK | LOG_OKIBANK)
 
@@ -144,9 +144,9 @@ public:
 	void init_tgtball();
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	// devices
@@ -202,16 +202,14 @@ private:
 
 	void update_pix_palbank();
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void base_map(address_map &map);
-	void paradise_io_map(address_map &map);
-	void paradise_map(address_map &map);
-	void tgtball_map(address_map &map);
-	void torus_io_map(address_map &map);
-	void torus_map(address_map &map);
+	void base_map(address_map &map) ATTR_COLD;
+	void paradise_io_map(address_map &map) ATTR_COLD;
+	void paradise_map(address_map &map) ATTR_COLD;
+	void tgtball_map(address_map &map) ATTR_COLD;
+	void torus_io_map(address_map &map) ATTR_COLD;
+	void torus_map(address_map &map) ATTR_COLD;
 };
 
-
-// video
 
 /***************************************************************************
 
@@ -497,8 +495,6 @@ uint32_t paradise_state::screen_update_madball(screen_device &screen, bitmap_ind
 	draw_sprites(bitmap, cliprect);
 	return 0;
 }
-
-// machine
 
 /***************************************************************************
 
@@ -1827,9 +1823,9 @@ GAME( 199?,  paradlx,  0,         paradise, paradise, paradise_state, init_parad
 GAME( 199?,  para2dx,  0,         paradise, para2dx,  paradise_state, init_paradise, ROT90, "Yun Sung",                      "Paradise 2 Deluxe",           MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // year not shown, but should be >=1994
 GAME( 1996,  tgtbal96, 0,         tgtball,  tgtball,  paradise_state, init_tgtball,  ROT0,  "Yun Sung",                      "Target Ball '96",             MACHINE_SUPPORTS_SAVE ) // With nudity
 GAME( 1995,  tgtball,  tgtbal96,  tgtball,  tgtball,  paradise_state, init_tgtball,  ROT0,  "Yun Sung",                      "Target Ball",                 MACHINE_SUPPORTS_SAVE )
-GAME( 1995,  tgtballn, tgtbal96,  tgtball,  tgtball,  paradise_state, init_tgtball,  ROT0,  "Yun Sung",                      "Target Ball (With Nudity)",   MACHINE_SUPPORTS_SAVE )
+GAME( 1995,  tgtballn, tgtbal96,  tgtball,  tgtball,  paradise_state, init_tgtball,  ROT0,  "Yun Sung",                      "Target Ball (with nudity)",   MACHINE_SUPPORTS_SAVE )
 GAME( 1996,  penky,    0,         penky,    penky,    paradise_state, init_tgtball,  ROT0,  "Yun Sung",                      "Penky",                       MACHINE_SUPPORTS_SAVE )
 GAME( 1996,  penkyi,   penky,     penkyi,   penkyi,   paradise_state, init_tgtball,  ROT0,  "Yun Sung (Impeuropex license)", "Penky (Italian)",             MACHINE_SUPPORTS_SAVE )
 GAME( 1996,  torus,    0,         torus,    torus,    paradise_state, init_torus,    ROT90, "Yun Sung",                      "Torus",                       MACHINE_SUPPORTS_SAVE )
-GAME( 1998,  madball,  0,         madball,  madball,  paradise_state, init_tgtball,  ROT0,  "Yun Sung",                      "Mad Ball V2.0",               MACHINE_SUPPORTS_SAVE )
-GAME( 1997,  madballn, madball,   madball,  madball,  paradise_state, init_tgtball,  ROT0,  "Yun Sung",                      "Mad Ball V2.0 (With Nudity)", MACHINE_SUPPORTS_SAVE )
+GAME( 1998,  madball,  0,         madball,  madball,  paradise_state, init_tgtball,  ROT0,  "Yun Sung",                      "Mad Ball (V2.0)",             MACHINE_SUPPORTS_SAVE )
+GAME( 1997,  madballn, madball,   madball,  madball,  paradise_state, init_tgtball,  ROT0,  "Yun Sung",                      "Mad Ball (V2.0, with nudity)", MACHINE_SUPPORTS_SAVE )

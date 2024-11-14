@@ -68,17 +68,10 @@ constexpr uint32_t DATA_CD_PATTERN = 0x55552a44;    // C/D pattern of 0xff + DAT
 constexpr unsigned GAP1_SIZE    = 17;   // Size of gap 1 (+1)
 constexpr unsigned GAP2_SIZE    = 35;   // Size of gap 2 (+1)
 constexpr int ID_DATA_OFFSET = 30 * 16; // Nominal distance (in cells) between ID & DATA AM
-// Size of image file (holding 77 cylinders)
-constexpr unsigned HPI_IMAGE_SIZE = HPI_TRACKS * HPI_HEADS * HPI_SECTORS * HPI_SECTOR_SIZE;
 constexpr unsigned HPI_RED_TRACKS = 75; // Reduced number of tracks
-constexpr unsigned HPI_9885_TRACKS = 67;    // Tracks visible to HP9885 drives
-// Size of reduced image file (holding 75 cylinders)
-constexpr unsigned HPI_RED_IMAGE_SIZE = HPI_RED_TRACKS * HPI_HEADS * HPI_SECTORS * HPI_SECTOR_SIZE;
 
 hpi_format::hpi_format()
 {
-	(void)HPI_IMAGE_SIZE;
-	(void)HPI_RED_IMAGE_SIZE;
 }
 
 int hpi_format::identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants) const
@@ -148,7 +141,7 @@ bool hpi_format::geometry_from_size(uint64_t image_size , unsigned& heads , unsi
 	}
 }
 
-bool hpi_format::load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image) const
+bool hpi_format::load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image &image) const
 {
 	unsigned heads;
 	unsigned cylinders;
@@ -162,16 +155,17 @@ bool hpi_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 	}
 	int max_tracks;
 	int max_heads;
-	image->get_maximal_geometry(max_tracks , max_heads);
+	image.get_maximal_geometry(max_tracks , max_heads);
 	if (cylinders > max_tracks || heads > max_heads) {
 		return false;
 	}
-	image->set_variant(heads == 2 ? floppy_image::DSDD : floppy_image::SSDD);
+	image.set_variant(heads == 2 ? floppy_image::DSDD : floppy_image::SSDD);
 
 	// Suck in the whole image
-	std::vector<uint8_t> image_data(size);
-	size_t actual;
-	io.read_at(0, image_data.data(), size, actual);
+	auto const [err, image_data, actual] = read_at(io, 0, size);
+	if (err || (actual != size)) {
+		return false;
+	}
 
 	// Get interleave factor from image
 	unsigned il = (unsigned)image_data[ IL_OFFSET ] * 256 + image_data[ IL_OFFSET + 1 ];
@@ -201,11 +195,11 @@ bool hpi_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 	return true;
 }
 
-bool hpi_format::save(util::random_read_write &io, const std::vector<uint32_t> &variants, floppy_image *image) const
+bool hpi_format::save(util::random_read_write &io, const std::vector<uint32_t> &variants, const floppy_image &image) const
 {
 	int tracks;
 	int heads;
-	image->get_actual_geometry(tracks, heads);
+	image.get_actual_geometry(tracks, heads);
 
 	for (int cyl = 0; cyl < tracks; cyl++) {
 		for (int head = 0; head < heads; head++) {
@@ -216,8 +210,7 @@ bool hpi_format::save(util::random_read_write &io, const std::vector<uint32_t> &
 			while (get_next_sector(bitstream , pos , track_no , head_no , sector_no , sector_data)) {
 				if (track_no == cyl && head_no == head && sector_no < HPI_SECTORS) {
 					unsigned offset_in_image = chs_to_lba(cyl, head, sector_no, heads) * HPI_SECTOR_SIZE;
-					size_t actual;
-					io.write_at(offset_in_image, sector_data, HPI_SECTOR_SIZE, actual);
+					/*auto const [err, actual] =*/ write_at(io, offset_in_image, sector_data, HPI_SECTOR_SIZE); // FIXME: check for errors
 				}
 			}
 		}
@@ -225,22 +218,22 @@ bool hpi_format::save(util::random_read_write &io, const std::vector<uint32_t> &
 	return true;
 }
 
-const char *hpi_format::name() const
+const char *hpi_format::name() const noexcept
 {
 	return "hpi";
 }
 
-const char *hpi_format::description() const
+const char *hpi_format::description() const noexcept
 {
 	return "HP9895A floppy disk image";
 }
 
-const char *hpi_format::extensions() const
+const char *hpi_format::extensions() const noexcept
 {
 	return "hpi";
 }
 
-bool hpi_format::supports_save() const
+bool hpi_format::supports_save() const noexcept
 {
 	return true;
 }

@@ -1,37 +1,39 @@
 // license:BSD-3-Clause
 // copyright-holders:Barry Rodewald
-#ifndef MAME_INCLUDES_FMTOWNS_H
-#define MAME_INCLUDES_FMTOWNS_H
+#ifndef MAME_FUJITSU_FMTOWNS_H
+#define MAME_FUJITSU_FMTOWNS_H
 
 #pragma once
 
+#include "fmt_icmem.h"
+
 #include "cpu/i386/i386.h"
-#include "imagedev/chd_cd.h"
+#include "imagedev/cdromimg.h"
 #include "imagedev/floppy.h"
 #include "machine/fm_scsi.h"
-#include "fmt_icmem.h"
+#include "machine/i8251.h"
+#include "machine/msm58321.h"
 #include "machine/nvram.h"
 #include "machine/pic8259.h"
 #include "machine/pit8253.h"
 #include "machine/ram.h"
 #include "machine/upd71071.h"
 #include "machine/wd_fdc.h"
-#include "machine/i8251.h"
-#include "machine/msm58321.h"
 #include "sound/cdda.h"
 #include "sound/rf5c68.h"
 #include "sound/spkrdev.h"
 #include "sound/ymopn.h"
 
+#include "bus/fmt_scsi/fmt121.h"
+#include "bus/fmt_scsi/fmt_scsi.h"
 #include "bus/generic/carts.h"
 #include "bus/generic/slot.h"
 #include "bus/rs232/rs232.h"
-#include "bus/fmt_scsi/fmt_scsi.h"
-#include "bus/fmt_scsi/fmt121.h"
-
-#include "formats/fmtowns_dsk.h"
+#include "bus/msx/ctrl/ctrl.h"
 
 #include "emupal.h"
+
+#include "formats/fmtowns_dsk.h"
 
 
 #define IRQ_LOG 0  // set to 1 to log IRQ line activity
@@ -91,7 +93,7 @@ struct towns_video_controller
 
 class towns_state : public driver_device
 {
-	public:
+public:
 	towns_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_ram(*this, RAM_TAG)
@@ -99,6 +101,7 @@ class towns_state : public driver_device
 		, m_dma(*this, "dma_%u", 1U)
 		, m_scsi(*this, "fmscsi")
 		, m_flop(*this, "fdc:%u", 0U)
+		, m_pad_ports(*this, "pad%u", 1U)
 		, m_speaker(*this, "speaker")
 		, m_pic_master(*this, "pic8259_master")
 		, m_pic_slave(*this, "pic8259_slave")
@@ -121,19 +124,7 @@ class towns_state : public driver_device
 		, m_bank_f8000_w(*this, "bank_f8000_w")
 		, m_nvram(*this, "nvram")
 		, m_nvram16(*this, "nvram16")
-		, m_ctrltype(*this, "ctrltype")
 		, m_kb_ports(*this, "key%u", 1U)
-		, m_joy1(*this, "joy1")
-		, m_joy2(*this, "joy2")
-		, m_joy1_ex(*this, "joy1_ex")
-		, m_joy2_ex(*this, "joy2_ex")
-		, m_6b_joy1(*this, "6b_joy1")
-		, m_6b_joy2(*this, "6b_joy2")
-		, m_6b_joy1_ex(*this, "6b_joy1_ex")
-		, m_6b_joy2_ex(*this, "6b_joy2_ex")
-		, m_mouse1(*this, "mouse1")
-		, m_mouse2(*this, "mouse2")
-		, m_mouse3(*this, "mouse3")
 		, m_user(*this,"user")
 		, m_serial(*this,"serial")
 	{ }
@@ -150,20 +141,20 @@ class towns_state : public driver_device
 protected:
 	uint16_t m_towns_machine_id;  // default is 0x0101
 
-	void marty_mem(address_map &map);
-	void pcm_mem(address_map &map);
-	void towns16_io(address_map &map);
-	void towns_io(address_map &map);
-	void towns_1g_io(address_map &map);
-	void towns2_io(address_map &map);
-	void townsux_io(address_map &map);
-	void towns_mem(address_map &map);
-	void ux_mem(address_map &map);
+	void marty_mem(address_map &map) ATTR_COLD;
+	void pcm_mem(address_map &map) ATTR_COLD;
+	void towns16_io(address_map &map) ATTR_COLD;
+	void towns_io(address_map &map) ATTR_COLD;
+	void towns_1g_io(address_map &map) ATTR_COLD;
+	void towns2_io(address_map &map) ATTR_COLD;
+	void townsux_io(address_map &map) ATTR_COLD;
+	void towns_mem(address_map &map) ATTR_COLD;
+	void ux_mem(address_map &map) ATTR_COLD;
 
 	virtual void driver_start() override;
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 	required_device<ram_device> m_ram;
 	required_device<cpu_device> m_maincpu;
@@ -171,10 +162,13 @@ protected:
 	required_device_array<upd71071_device, 2> m_dma;
 	optional_device<fmscsi_device> m_scsi;
 	required_device_array<floppy_connector, 2> m_flop;
+
+	required_device_array<msx_general_purpose_port_device, 2U> m_pad_ports;
+
 	static void floppy_formats(format_registration &fr);
 
-	DECLARE_WRITE_LINE_MEMBER(towns_scsi_irq);
-	DECLARE_WRITE_LINE_MEMBER(towns_scsi_drq);
+	void towns_scsi_irq(int state);
+	void towns_scsi_drq(int state);
 
 private:
 	/* devices */
@@ -231,15 +225,11 @@ private:
 	uint8_t m_towns_kb_output = 0;  // key output
 	uint8_t m_towns_kb_extend = 0;  // extended key output
 	emu_timer* m_towns_kb_timer = nullptr;
-	emu_timer* m_towns_mouse_timer = nullptr;
 	uint8_t m_towns_fm_irq_flag = 0;
 	uint8_t m_towns_pcm_irq_flag = 0;
 	uint8_t m_towns_pcm_channel_flag = 0;
 	uint8_t m_towns_pcm_channel_mask = 0;
 	uint8_t m_towns_pad_mask = 0;
-	uint8_t m_towns_mouse_output = 0;
-	uint8_t m_towns_mouse_x = 0;
-	uint8_t m_towns_mouse_y = 0;
 	uint8_t m_towns_volume[4]{};  // volume ports
 	uint8_t m_towns_volume_select = 0;
 	uint8_t m_towns_scsi_control = 0;
@@ -269,6 +259,7 @@ private:
 	emu_timer* m_towns_wait_timer = nullptr;
 	emu_timer* m_towns_status_timer = nullptr;
 	emu_timer* m_towns_cdda_timer = nullptr;
+	emu_timer* m_towns_seek_timer = nullptr;
 	struct towns_cdrom_controller m_towns_cd;
 	struct towns_video_controller m_video;
 
@@ -344,22 +335,22 @@ private:
 	uint8_t towns_spriteram_r(offs_t offset);
 	void towns_spriteram_w(offs_t offset, uint8_t data);
 
-	DECLARE_WRITE_LINE_MEMBER(mb8877a_irq_w);
-	DECLARE_WRITE_LINE_MEMBER(mb8877a_drq_w);
-	DECLARE_WRITE_LINE_MEMBER(pit_out2_changed);
+	void mb8877a_irq_w(int state);
+	void mb8877a_drq_w(int state);
+	void pit_out2_changed(int state);
 
-	DECLARE_WRITE_LINE_MEMBER(towns_serial_irq);
-	DECLARE_WRITE_LINE_MEMBER(towns_rxrdy_irq);
-	DECLARE_WRITE_LINE_MEMBER(towns_txrdy_irq);
-	DECLARE_WRITE_LINE_MEMBER(towns_syndet_irq);
+	void towns_serial_irq(int state);
+	void towns_rxrdy_irq(int state);
+	void towns_txrdy_irq(int state);
+	void towns_syndet_irq(int state);
 	uint8_t towns_serial_r(offs_t offset);
 	void towns_serial_w(offs_t offset, uint8_t data);
 
-	DECLARE_WRITE_LINE_MEMBER(rtc_d0_w);
-	DECLARE_WRITE_LINE_MEMBER(rtc_d1_w);
-	DECLARE_WRITE_LINE_MEMBER(rtc_d2_w);
-	DECLARE_WRITE_LINE_MEMBER(rtc_d3_w);
-	DECLARE_WRITE_LINE_MEMBER(rtc_busy_w);
+	void rtc_d0_w(int state);
+	void rtc_d1_w(int state);
+	void rtc_d2_w(int state);
+	void rtc_d3_w(int state);
+	void rtc_busy_w(int state);
 
 	RF5C68_SAMPLE_END_CB_MEMBER(towns_pcm_irq);
 
@@ -371,26 +362,13 @@ private:
 	uint8_t towns_cdrom_read_byte_software();
 	void cdda_db_to_gain(float db);
 
-	required_ioport m_ctrltype;
 	required_ioport_array<4> m_kb_ports;
-	required_ioport m_joy1;
-	required_ioport m_joy2;
-	required_ioport m_joy1_ex;
-	required_ioport m_joy2_ex;
-	required_ioport m_6b_joy1;
-	required_ioport m_6b_joy2;
-	required_ioport m_6b_joy1_ex;
-	required_ioport m_6b_joy2_ex;
-	required_ioport m_mouse1;
-	required_ioport m_mouse2;
-	required_ioport m_mouse3;
 	required_memory_region m_user;
 	optional_memory_region m_serial;
 
 	TIMER_CALLBACK_MEMBER(freerun_inc);
 	TIMER_CALLBACK_MEMBER(intervaltimer2_timeout);
 	TIMER_CALLBACK_MEMBER(poll_keyboard);
-	TIMER_CALLBACK_MEMBER(mouse_timeout);
 	TIMER_CALLBACK_MEMBER(wait_end);
 	void towns_cd_set_status(uint8_t st0, uint8_t st1, uint8_t st2, uint8_t st3);
 	void towns_cdrom_execute_command(cdrom_image_device* device);
@@ -398,6 +376,7 @@ private:
 	void towns_cdrom_read(cdrom_image_device* device);
 	TIMER_CALLBACK_MEMBER(towns_cd_status_ready);
 	TIMER_CALLBACK_MEMBER(towns_delay_cdda);
+	TIMER_CALLBACK_MEMBER(towns_delay_seek);
 
 	u8 m_rtc_d = 0;
 	bool m_rtc_busy = false;
@@ -407,11 +386,11 @@ private:
 	TIMER_CALLBACK_MEMBER(towns_cdrom_read_byte);
 	TIMER_CALLBACK_MEMBER(towns_vblank_end);
 	TIMER_CALLBACK_MEMBER(draw_sprites);
-	DECLARE_WRITE_LINE_MEMBER(towns_pit_out0_changed);
-	DECLARE_WRITE_LINE_MEMBER(towns_pit_out1_changed);
-	DECLARE_WRITE_LINE_MEMBER(pit2_out1_changed);
+	void towns_pit_out0_changed(int state);
+	void towns_pit_out1_changed(int state);
+	void pit2_out1_changed(int state);
 	uint8_t get_slave_ack(offs_t offset);
-	DECLARE_WRITE_LINE_MEMBER(towns_fm_irq);
+	void towns_fm_irq(int state);
 	void towns_sprite_start();
 	void towns_crtc_refresh_mode();
 	void towns_update_kanji_offset();
@@ -456,4 +435,4 @@ protected:
 	virtual void driver_start() override;
 };
 
-#endif // MAME_INCLUDES_FMTOWNS_H
+#endif // MAME_FUJITSU_FMTOWNS_H

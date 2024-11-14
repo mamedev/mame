@@ -20,7 +20,7 @@
 DEFINE_DEVICE_TYPE(WAFADRIVE_IMAGE, wafadrive_image_device, "wafadrive_image", "Sinclair Wafadrive Image")
 
 //-------------------------------------------------
-//  microdrive_image_device - constructor
+//  wafadrive_image_device - constructor
 //-------------------------------------------------
 
 wafadrive_image_device::wafadrive_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
@@ -29,7 +29,7 @@ wafadrive_image_device::wafadrive_image_device(const machine_config &mconfig, co
 }
 
 //-------------------------------------------------
-//  microdrive_image_device - destructor
+//  wafadrive_image_device - destructor
 //-------------------------------------------------
 
 wafadrive_image_device::~wafadrive_image_device()
@@ -41,9 +41,9 @@ void wafadrive_image_device::device_start()
 {
 }
 
-image_init_result wafadrive_image_device::call_load()
+std::pair<std::error_condition, std::string> wafadrive_image_device::call_load()
 {
-	return image_init_result::PASS;
+	return std::make_pair(std::error_condition(), std::string());
 }
 
 void wafadrive_image_device::call_unload()

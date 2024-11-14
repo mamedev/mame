@@ -29,6 +29,9 @@
 #include "video/tms9927.h"
 #include "screen.h"
 
+
+namespace {
+
 class adm31_state : public driver_device
 {
 public:
@@ -48,8 +51,8 @@ public:
 	void adm31(machine_config &mconfig);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -58,7 +61,7 @@ private:
 	u8 kbd_scan_r();
 	void kbd_status_w(u8 data);
 
-	void mem_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	required_device_array<acia6850_device, 2> m_acia;
@@ -508,6 +511,8 @@ ROM_START(adm31)
 	ROM_REGION(0x0800, "chargen", 0)
 	ROM_LOAD("chargen.bin", 0x0000, 0x0800, NO_DUMP)
 ROM_END
+
+} // anonymous namespace
 
 
 COMP(1978, adm31, 0, 0, adm31, adm31, adm31_state, empty_init, "Lear Siegler", "ADM-31 Data Display Terminal", MACHINE_IS_SKELETON)

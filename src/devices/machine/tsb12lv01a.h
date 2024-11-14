@@ -26,12 +26,12 @@ public:
 	auto phy_read() { return m_phy_read_cb.bind(); }
 	auto phy_write() { return m_phy_write_cb.bind(); }
 
-	DECLARE_WRITE_LINE_MEMBER(phy_reset_w);
+	void phy_reset_w(int state);
 
 private:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	void set_interrupt(uint32_t bit);
 	void check_interrupts();

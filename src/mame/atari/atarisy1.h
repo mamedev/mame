@@ -5,8 +5,8 @@
     Atari System 1 hardware
 
 *************************************************************************/
-#ifndef MAME_INCLUDES_ATARISY1_H
-#define MAME_INCLUDES_ATARISY1_H
+#ifndef MAME_ATARI_ATARISY1_H
+#define MAME_ATARI_ATARISY1_H
 
 #pragma once
 
@@ -67,9 +67,9 @@ public:
 	void init_indytemp();
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
@@ -124,8 +124,8 @@ protected:
 	void adc_w(offs_t offset, uint8_t data);
 	uint16_t trakball_r(offs_t offset);
 	uint8_t switch_6502_r();
-	DECLARE_WRITE_LINE_MEMBER(coin_counter_right_w);
-	DECLARE_WRITE_LINE_MEMBER(coin_counter_left_w);
+	void coin_counter_right_w(int state);
+	void coin_counter_left_w(int state);
 	void via_pb_w(uint8_t data);
 	uint8_t via_pb_r();
 	TILE_GET_INFO_MEMBER(get_alpha_tile_info);
@@ -149,9 +149,9 @@ protected:
 	void add_speech(machine_config &config);
 	void atarisy1(machine_config &config);
 
-	void main_map(address_map &map);
-	void sound_map(address_map &map);
-	void sound_ext_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
+	void sound_map(address_map &map) ATTR_COLD;
+	void sound_ext_map(address_map &map) ATTR_COLD;
 
 	void init_slapstic();
 };
@@ -164,4 +164,4 @@ public:
 	virtual void update_timers(int scanline) override;
 };
 
-#endif // MAME_INCLUDES_ATARISY1_H
+#endif // MAME_ATARI_ATARISY1_H

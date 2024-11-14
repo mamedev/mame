@@ -127,12 +127,10 @@ public:
 
 	//  void update_screen(bitmap_t &bitmap, const rectangle &cliprect);
 
-	// some bootleg / clone hardware appears to ignore this
-	void use_sprite_write_limitation_disable() { m_use_sprite_write_limitation = false; }
 	uint16_t get_vram_dest();
 	void set_vram_dest(uint16_t dest);
 
-	void ppu2c0x(address_map &map);
+	void ppu2c0x(address_map &map) ATTR_COLD;
 
 	bool in_vblanking() { return (m_scanline >= m_vblank_first_scanline - 1); }
 protected:
@@ -176,7 +174,7 @@ protected:
 	// construction/destruction
 	ppu2c0x_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock = 0);
 
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 	virtual void device_config_complete() override;
 
 	// device_config_memory_interface overrides
@@ -244,8 +242,6 @@ private:
 	emu_timer                   *m_hblank_timer;        /* hblank period at end of each scanline */
 	emu_timer                   *m_nmi_timer;           /* NMI timer */
 	emu_timer                   *m_scanline_timer;      /* scanline timer */
-
-	bool m_use_sprite_write_limitation;
 };
 
 class ppu2c0x_rgb_device : public ppu2c0x_device {
@@ -317,7 +313,7 @@ public:
 	virtual void init_palette_tables() override;
 
 protected:
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 private:
 	required_region_ptr<uint8_t> m_palette_data;

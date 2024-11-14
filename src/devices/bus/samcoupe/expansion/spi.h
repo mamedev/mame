@@ -34,14 +34,14 @@ public:
 	virtual void iorq_w(offs_t offset, uint8_t data) override;
 
 protected:
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual void device_start() override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual void device_start() override ATTR_COLD;
 
 private:
 	required_device<output_latch_device> m_data_out;
 	required_device<centronics_device> m_centronics;
 
-	DECLARE_WRITE_LINE_MEMBER(centronics_busy_w);
+	void centronics_busy_w(int state);
 
 	int m_print;
 	int m_busy;

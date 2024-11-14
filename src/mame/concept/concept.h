@@ -10,8 +10,8 @@
  *
  ****************************************************************************/
 
-#ifndef MAME_INCLUDES_CONCEPT_H
-#define MAME_INCLUDES_CONCEPT_H
+#ifndef MAME_CONCEPT_CONCEPT_H
+#define MAME_CONCEPT_CONCEPT_H
 
 #include "cpu/m68000/m68000.h"
 #include "machine/6522via.h"
@@ -41,7 +41,7 @@ public:
 		m_videoram(*this,"videoram")
 	{ }
 
-	void concept(machine_config &config);
+	void corvus_concept(machine_config &config);
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -54,26 +54,22 @@ private:
 	required_device<a2bus_device> m_a2bus;
 	required_shared_ptr<uint16_t> m_videoram;
 
-	uint8_t m_pending_interrupts = 0U;
 	bool m_clock_enable = false;
 	uint8_t m_clock_address = 0U;
 	uint8_t io_r(offs_t offset);
 	void io_w(offs_t offset, uint8_t data);
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	uint8_t via_in_a();
 	void via_out_a(uint8_t data);
 	uint8_t via_in_b();
 	void via_out_b(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(via_out_cb2);
-	DECLARE_WRITE_LINE_MEMBER(via_irq_func);
-	DECLARE_WRITE_LINE_MEMBER(ioc_interrupt);
-	void concept_set_interrupt(int level, int state);
+	void via_out_cb2(int state);
 
-	void concept_memmap(address_map &map);
+	void concept_memmap(address_map &map) ATTR_COLD;
 };
 
-#endif // MAME_INCLUDES_CONCEPT_H
+#endif // MAME_CONCEPT_CONCEPT_H

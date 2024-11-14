@@ -2,7 +2,7 @@
 // copyright-holders:R. Belmont
 /*********************************************************************
 
-    a2eext80col.c
+    a2eext80col.h
 
     Apple IIe Extended 80 Column Card
 
@@ -30,17 +30,18 @@ public:
 protected:
 	a2eaux_ext80col_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
-	virtual uint8_t read_auxram(uint16_t offset) override;
-	virtual void write_auxram(uint16_t offset, uint8_t data) override;
-	virtual uint8_t *get_vram_ptr() override;
-	virtual uint8_t *get_auxbank_ptr() override;
+	virtual u8 read_auxram(uint16_t offset) override;
+	virtual void write_auxram(uint16_t offset, u8 data) override;
+	virtual u8 *get_vram_ptr() override;
+	virtual u8 *get_auxbank_ptr() override;
+	virtual u16 get_auxbank_mask() override;
 	virtual bool allow_dhr() override { return true; }
 
 private:
-	uint8_t m_ram[64*1024];
+	u8 m_ram[64*1024];
 };
 
 // device type definition

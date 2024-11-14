@@ -34,21 +34,20 @@
 #include "bus/generic/carts.h"
 #include "bus/generic/slot.h"
 #include "cpu/arm7/arm7.h"
-#include "cpu/arm7/arm7core.h"
 #include "sound/dac.h"
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
-#define LOG_UNKNOWN (1 << 0)
-#define LOG_FTLB    (1 << 1)
-#define LOG_IRQS    (1 << 2)
-#define LOG_INTC    (1 << 3)
-#define LOG_TIMER   (1 << 4)
-#define LOG_CLOCK   (1 << 5)
-#define LOG_RTC     (1 << 6)
-#define LOG_LCD     (1 << 7)
-#define LOG_AUDIO   (1 << 8)
+#define LOG_UNKNOWN (1U << 1)
+#define LOG_FTLB    (1U << 2)
+#define LOG_IRQS    (1U << 3)
+#define LOG_INTC    (1U << 4)
+#define LOG_TIMER   (1U << 5)
+#define LOG_CLOCK   (1U << 6)
+#define LOG_RTC     (1U << 7)
+#define LOG_LCD     (1U << 8)
+#define LOG_AUDIO   (1U << 9)
 #define LOG_ALL     (LOG_UNKNOWN | LOG_FTLB | LOG_IRQS | LOG_INTC | LOG_TIMER | LOG_CLOCK | LOG_RTC | LOG_LCD | LOG_AUDIO)
 #define LOG_DEFAULT LOG_ALL
 
@@ -73,11 +72,11 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(input_update);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
-	void mem_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
 
 	uint32_t screen_update_pockstat(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
@@ -336,21 +335,21 @@ void pockstat_state::set_interrupt_line(uint32_t line, int state)
 	const uint32_t new_irq = m_intc_regs.hold & m_intc_regs.enable & INT_IRQ_MASK;
 	if (new_irq)
 	{
-		m_maincpu->set_input_line(ARM7_IRQ_LINE, ASSERT_LINE);
+		m_maincpu->set_input_line(arm7_cpu_device::ARM7_IRQ_LINE, ASSERT_LINE);
 	}
 	else
 	{
-		m_maincpu->set_input_line(ARM7_IRQ_LINE, CLEAR_LINE);
+		m_maincpu->set_input_line(arm7_cpu_device::ARM7_IRQ_LINE, CLEAR_LINE);
 	}
 
 	const uint32_t new_fiq = m_intc_regs.hold & m_intc_regs.enable & INT_FIQ_MASK;
 	if (new_fiq)
 	{
-		m_maincpu->set_input_line(ARM7_FIRQ_LINE, ASSERT_LINE);
+		m_maincpu->set_input_line(arm7_cpu_device::ARM7_FIRQ_LINE, ASSERT_LINE);
 	}
 	else
 	{
-		m_maincpu->set_input_line(ARM7_FIRQ_LINE, CLEAR_LINE);
+		m_maincpu->set_input_line(arm7_cpu_device::ARM7_FIRQ_LINE, CLEAR_LINE);
 	}
 }
 
@@ -870,11 +869,11 @@ void pockstat_state::mem_map(address_map &map)
 /* Input ports */
 static INPUT_PORTS_START( pockstat )
 	PORT_START("BUTTONS")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1)        PORT_NAME("Action Button")  PORT_CHANGED_MEMBER(DEVICE_SELF, pockstat_state, input_update, 0)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT) PORT_NAME("Right")          PORT_CHANGED_MEMBER(DEVICE_SELF, pockstat_state, input_update, 0)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT)  PORT_NAME("Left")           PORT_CHANGED_MEMBER(DEVICE_SELF, pockstat_state, input_update, 0)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN)  PORT_NAME("Down")           PORT_CHANGED_MEMBER(DEVICE_SELF, pockstat_state, input_update, 0)
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP)    PORT_NAME("Up")             PORT_CHANGED_MEMBER(DEVICE_SELF, pockstat_state, input_update, 0)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1)        PORT_NAME("Action Button")  PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(pockstat_state::input_update), 0)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT) PORT_NAME("Right")          PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(pockstat_state::input_update), 0)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT)  PORT_NAME("Left")           PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(pockstat_state::input_update), 0)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN)  PORT_NAME("Down")           PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(pockstat_state::input_update), 0)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP)    PORT_NAME("Up")             PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(pockstat_state::input_update), 0)
 	PORT_BIT( 0xe0, IP_ACTIVE_HIGH, IPT_UNUSED)
 INPUT_PORTS_END
 
@@ -934,7 +933,7 @@ void pockstat_state::machine_start()
 
 void pockstat_state::machine_reset()
 {
-	m_maincpu->set_state_int(ARM7_R15, 0x4000000);
+	m_maincpu->set_state_int(arm7_cpu_device::ARM7_R15, 0x4000000);
 
 	m_flash_write_enable_count = 0;
 	m_flash_write_count = 0;
@@ -965,23 +964,23 @@ DEVICE_IMAGE_LOAD_MEMBER(pockstat_state::flash_load)
 {
 	static const char *gme_id = "123-456-STD";
 	char cart_id[0xf40];
-	uint32_t size = image.length();
+	uint32_t const size = image.length();
 
 	if (size != 0x20f40)
-		return image_init_result::FAIL;
+		return std::make_pair(image_error::INVALIDLENGTH, std::string());
 
 	image.fread(cart_id, 0xf40);
 
 	for (int i = 0; i < strlen(gme_id); i++)
 	{
 		if (cart_id[i] != gme_id[i])
-			return image_init_result::FAIL;
+			return std::make_pair(image_error::INVALIDIMAGE, std::string());
 	}
 
 	m_cart->rom_alloc(0x20000, GENERIC_ROM32_WIDTH, ENDIANNESS_LITTLE);
 	image.fread(m_cart->get_rom_base(), 0x20000);
 
-	return image_init_result::PASS;
+	return std::make_pair(std::error_condition(), std::string());
 }
 
 void pockstat_state::pockstat(machine_config &config)

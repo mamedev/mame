@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood
-#ifndef MAME_MACHINE_DECOCPU6_H
-#define MAME_MACHINE_DECOCPU6_H
+#ifndef MAME_DATAEAST_DECOCPU6_H
+#define MAME_DATAEAST_DECOCPU6_H
 
 #pragma once
 
@@ -26,11 +26,11 @@ protected:
 		virtual u8 decrypt8(u8 value, offs_t pc, bool opcode) const override;
 	};
 
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 };
 
 DECLARE_DEVICE_TYPE(DECO_CPU6, deco_cpu6_device)
 
-#endif // MAME_MACHINE_DECOCPU6_H
+#endif // MAME_DATAEAST_DECOCPU6_H

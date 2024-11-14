@@ -11,8 +11,8 @@
 
 *************************************************************************/
 
-#ifndef MAME_INCLUDES_SLAPSTIC_H
-#define MAME_INCLUDES_SLAPSTIC_H
+#ifndef MAME_ATARI_SLAPSTIC_H
+#define MAME_ATARI_SLAPSTIC_H
 
 #pragma once
 
@@ -50,8 +50,8 @@ public:
 	void set_chipnum(int chipnum) { m_chipnum = chipnum; }
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 	virtual void device_validity_check(validity_checker &valid) const override;
 	virtual void device_pre_save() override;
 	virtual void device_post_load() override;
@@ -290,4 +290,4 @@ private:
 	void commit_bank();
 };
 
-#endif // MAME_INCLUDES_SLAPSTIC_H
+#endif // MAME_ATARI_SLAPSTIC_H

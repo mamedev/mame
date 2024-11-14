@@ -28,13 +28,13 @@
  */
 
 /*
- * The text above constitutes the entire PortAudio license; however, 
+ * The text above constitutes the entire PortAudio license; however,
  * the PortAudio community also makes the following non-binding requests:
  *
  * Any person wishing to distribute modifications to the Software is
  * requested to send the modifications to the original developer so that
- * they can be incorporated into the canonical version. It is also 
- * requested that these non-binding requests be included along with the 
+ * they can be incorporated into the canonical version. It is also
+ * requested that these non-binding requests be included along with the
  * license above.
  */
 
@@ -51,7 +51,7 @@ extern "C" {
     specified device. Returns 0 if the query fails for any reason.
 
     @param wcharDevicePath A system level PnP interface path, supplied as a WCHAR unicode string.
-    Declard as void* to avoid introducing a dependency on wchar_t here.
+    Declared as void* to avoid introducing a dependency on wchar_t here.
 
     @param isInput A flag specifying whether to query for input (non-zero) or output (zero) channels.
 */

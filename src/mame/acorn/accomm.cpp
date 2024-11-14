@@ -24,6 +24,7 @@
 ****************************************************************************/
 
 #include "emu.h"
+
 #include "cpu/g65816/g65816.h"
 #include "machine/6522via.h"
 #include "machine/6850acia.h"
@@ -34,18 +35,21 @@
 #include "machine/nvram.h"
 #include "machine/pcf8573.h"
 #include "machine/scn_pci.h"
-#include "machine/bankdev.h"
 #include "sound/beep.h"
 #include "sound/pcd3311.h"
 #include "video/saa5240.h"
 #include "bus/econet/econet.h"
 #include "bus/centronics/ctronics.h"
 #include "bus/rs232/rs232.h"
+
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
 #include "accomm.lh"
+
+
+namespace {
 
 /* Interrupts */
 #define INT_HIGH_TONE       0x40
@@ -90,9 +94,9 @@ public:
 
 protected:
 	// driver_device overrides
-	virtual void machine_reset() override;
-	virtual void machine_start() override;
-	virtual void video_start() override;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 	TIMER_CALLBACK_MEMBER(scanline_interrupt_check);
 
@@ -109,8 +113,8 @@ private:
 
 	void accomm_palette(palette_device &palette) const;
 
-	void main_map(address_map &map);
-	void saa5240_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
+	void saa5240_map(address_map &map) ATTR_COLD;
 
 	// devices
 	required_device<g65816_device> m_maincpu;
@@ -775,8 +779,8 @@ static INPUT_PORTS_START( accomm )
 	PORT_START("LINE1.9")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_DEL)        PORT_CHAR(UCHAR_MAMEKEY(BACKSPACE)) PORT_NAME("Del CE")
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_END)        PORT_CHAR(UCHAR_MAMEKEY(END))       PORT_NAME("Copy EE")
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_DOWN)       PORT_CHAR(10)                       PORT_NAME(UTF8_DOWN" +")
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_HOME)       PORT_CHAR(UCHAR_MAMEKEY(HOME))      PORT_NAME("Home %")
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_DOWN)       PORT_CHAR(10)                       PORT_NAME(u8"\u2193  +") // U+2193 = ↓
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_HOME)       PORT_CHAR(UCHAR_MAMEKEY(HOME))      PORT_NAME("Home  %")
 
 	PORT_START("LINE1.10")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_DEL_PAD)    PORT_CHAR(UCHAR_MAMEKEY(DEL_PAD))   PORT_NAME("Keypad .")
@@ -857,10 +861,10 @@ static INPUT_PORTS_START( accomm )
 	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_UNUSED)
 
 	PORT_START("LINE2.9")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_RIGHT)      PORT_CHAR(UCHAR_MAMEKEY(RIGHT))    PORT_NAME(UTF8_RIGHT" -")
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_INSERT)     PORT_CHAR(UCHAR_MAMEKEY(INSERT))   PORT_NAME("Insert " UTF8_DIVIDE)
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_UP)         PORT_CHAR(UCHAR_MAMEKEY(UP))       PORT_NAME(UTF8_UP" " UTF8_MULTIPLY)
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_LEFT)       PORT_CHAR(UCHAR_MAMEKEY(LEFT))     PORT_NAME(UTF8_LEFT" AC")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_RIGHT)      PORT_CHAR(UCHAR_MAMEKEY(RIGHT))    PORT_NAME(u8"\u2192  -") // U+2192 = →
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_INSERT)     PORT_CHAR(UCHAR_MAMEKEY(INSERT))   PORT_NAME(u8"Insert  ÷")
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_UP)         PORT_CHAR(UCHAR_MAMEKEY(UP))       PORT_NAME(u8"\u2191  ×") // U+2191 = ↑
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_LEFT)       PORT_CHAR(UCHAR_MAMEKEY(LEFT))     PORT_NAME(u8"\u2190  AC") // U+2190 = ←
 
 	PORT_START("LINE2.10")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_8_PAD)      PORT_CHAR(UCHAR_MAMEKEY(8_PAD))
@@ -887,7 +891,7 @@ static INPUT_PORTS_START( accomm )
 	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_UNUSED)
 
 	PORT_START("STOP")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_F12)        PORT_CHAR(UCHAR_MAMEKEY(F12))      PORT_NAME("Stop") PORT_CHANGED_MEMBER(DEVICE_SELF, accomm_state, trigger_reset, 0)
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_F12)        PORT_CHAR(UCHAR_MAMEKEY(F12))      PORT_NAME("Stop") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(accomm_state::trigger_reset), 0)
 INPUT_PORTS_END
 
 void accomm_state::accomm(machine_config &config)
@@ -928,8 +932,7 @@ void accomm_state::accomm(machine_config &config)
 	MOS6522(config, m_via, 16_MHz_XTAL / 16);
 	m_via->writepa_handler().set("cent_data_out", FUNC(output_latch_device::write));
 	m_via->ca2_handler().set("centronics", FUNC(centronics_device::write_strobe));
-	m_via->readpb_handler().set(m_rtc, FUNC(pcf8573_device::sda_r)).bit(0);
-	m_via->readpb_handler().append(m_cct, FUNC(saa5240a_device::read_sda)).bit(0);
+	m_via->readpb_handler().set([this] () { return uint8_t(m_rtc->sda_r() & m_cct->read_sda()); });
 	m_via->writepb_handler().set(m_rtc, FUNC(pcf8573_device::sda_w)).bit(1).invert();
 	m_via->writepb_handler().append(m_rtc, FUNC(pcf8573_device::scl_w)).bit(2).invert();
 	m_via->writepb_handler().append(m_cct, FUNC(saa5240a_device::write_sda)).bit(1).invert();
@@ -1078,6 +1081,8 @@ ROM_START(accommi)
 
 	ROM_REGION(0x380000, "ext", ROMREGION_ERASEFF)
 ROM_END
+
+} // anonymous namespace
 
 
 /*    YEAR  NAME     PARENT  COMPAT MACHINE  INPUT   CLASS         INIT        COMPANY            FULLNAME                          FLAGS */

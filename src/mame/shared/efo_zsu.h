@@ -32,24 +32,24 @@ public:
 protected:
 	efo_zsu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
 
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual void device_start() override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual void device_start() override ATTR_COLD;
 
 private:
 	void adpcm_fifo_w(u8 data);
 
-	void zsu_io(address_map &map);
-	void zsu_map(address_map &map);
+	void zsu_io(address_map &map) ATTR_COLD;
+	void zsu_map(address_map &map) ATTR_COLD;
 
 	void ay1_porta_w(u8 data);
 
-	DECLARE_WRITE_LINE_MEMBER(ctc1_z0_w);
-	DECLARE_WRITE_LINE_MEMBER(ctc1_z1_w);
-	DECLARE_WRITE_LINE_MEMBER(ctc1_z2_w);
-	DECLARE_WRITE_LINE_MEMBER(ctc0_z0_w);
-	DECLARE_WRITE_LINE_MEMBER(ctc0_z1_w);
-	DECLARE_WRITE_LINE_MEMBER(ctc0_z2_w);
-	DECLARE_WRITE_LINE_MEMBER(fifo_dor_w);
+	void ctc1_z0_w(int state);
+	void ctc1_z1_w(int state);
+	void ctc1_z2_w(int state);
+	void ctc0_z0_w(int state);
+	void ctc0_z1_w(int state);
+	void ctc0_z2_w(int state);
+	void fifo_dor_w(int state);
 
 	TIMER_CALLBACK_MEMBER(fifo_shift);
 	TIMER_CALLBACK_MEMBER(adpcm_clock);
@@ -86,12 +86,12 @@ public:
 	cedar_magnet_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 protected:
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 	virtual TIMER_CALLBACK_MEMBER(reset_assert_callback) override;
 
 private:
-	void cedar_magnet_sound_map(address_map &map);
+	void cedar_magnet_sound_map(address_map &map) ATTR_COLD;
 
 	void ay0_porta_w(u8 data);
 };

@@ -31,6 +31,8 @@
 #include "speaker.h"
 
 
+namespace {
+
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
@@ -55,8 +57,8 @@ public:
 	void informer_213(machine_config &config);
 
 protected:
-	void machine_start() override;
-	void machine_reset() override;
+	void machine_start() override ATTR_COLD;
+	void machine_reset() override ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -70,7 +72,7 @@ private:
 	required_shared_ptr<uint8_t> m_aram;
 	required_region_ptr<uint8_t> m_chargen;
 
-	void mem_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void vblank_w(int state);
@@ -478,6 +480,8 @@ ROM_START( in213ae )
 	// 79747-002  V.32 ME C.G.  V3.1 CK=D68C (checksum matches)
 	ROM_LOAD("79747-002.bin", 0x0000, 0x4000, CRC(7425327f) SHA1(e3e67305b3b8936683724d1347a451fffe96bf0e))
 ROM_END
+
+} // anonymous namespace
 
 
 //**************************************************************************

@@ -8,12 +8,16 @@
 
 #include "emu.h"
 #include "cpu/arm7/arm7.h"
+#include "machine/nandflash.h"
 #include "machine/s3c2440.h"
-#include "machine/smartmed.h"
 #include "sound/dac.h"
 #include "screen.h"
 #include "speaker.h"
 
+#include <cstdarg>
+
+
+namespace {
 
 #define VERBOSE_LEVEL ( 0 )
 
@@ -39,15 +43,15 @@ public:
 private:
 	required_device<cpu_device> m_maincpu;
 	required_device<s3c2440_device> m_s3c2440;
-	required_device<nand_device> m_nand;
+	required_device<samsung_k9f1g08u0b_device> m_nand;
 	required_device<dac_word_interface> m_ldac;
 	required_device<dac_word_interface> m_rdac;
 	required_ioport m_penx;
 	required_ioport m_peny;
 
 	uint32_t m_port[9] = { };
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 	inline void verboselog(int n_level, const char *s_fmt, ...) ATTR_PRINTF(3,4);
 	uint32_t s3c2440_gpio_port_r(offs_t offset);
 	void s3c2440_gpio_port_w(offs_t offset, uint32_t data);
@@ -59,7 +63,7 @@ private:
 	void s3c2440_i2s_data_w(offs_t offset, uint16_t data);
 	uint32_t s3c2440_adc_data_r(offs_t offset);
 
-	void mini2440_map(address_map &map);
+	void mini2440_map(address_map &map) ATTR_COLD;
 };
 
 inline void mini2440_state::verboselog(int n_level, const char *s_fmt, ...)
@@ -196,7 +200,6 @@ INPUT_CHANGED_MEMBER(mini2440_state::mini2440_input_changed)
 
 void mini2440_state::machine_start()
 {
-	m_nand->set_data_ptr(memregion("nand")->base());
 }
 
 void mini2440_state::machine_reset()
@@ -256,14 +259,13 @@ void mini2440_state::mini2440(machine_config &config)
 	m_s3c2440->nand_data_r_callback().set(FUNC(mini2440_state::s3c2440_nand_data_r));
 	m_s3c2440->nand_data_w_callback().set(FUNC(mini2440_state::s3c2440_nand_data_w));
 
-	NAND(config, m_nand, 0);
-	m_nand->set_nand_type(nand_device::chip::K9F1G08U0B);
+	SAMSUNG_K9F1G08U0B(config, m_nand, 0);
 	m_nand->rnb_wr_callback().set(m_s3c2440, FUNC(s3c2440_device::frnb_w));
 }
 
 static INPUT_PORTS_START( mini2440 )
 	PORT_START( "PENB" )
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Pen Button") PORT_CHANGED_MEMBER(DEVICE_SELF, mini2440_state, mini2440_input_changed, 0) PORT_PLAYER(1)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Pen Button") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(mini2440_state::mini2440_input_changed), 0) PORT_PLAYER(1)
 	PORT_START( "PENX" )
 	PORT_BIT( 0x3ff, 0x200, IPT_LIGHTGUN_X ) PORT_NAME("Pen X") PORT_MINMAX(80, 950) PORT_SENSITIVITY(50) PORT_CROSSHAIR(X, 1.0, 0.0, 0) PORT_KEYDELTA(30) PORT_PLAYER(1)
 	PORT_START( "PENY" )
@@ -283,5 +285,8 @@ ROM_START( mini2440 )
 	ROM_SYSTEM_BIOS( 2, "android", "Android 1.5 (2009/05/13)" )
 	ROMX_LOAD( "android.bin", 0, 0x8400000, CRC(4721837d) SHA1(88fcf553b106d9fc624c9615d9c1da9c705ccb46), ROM_BIOS(2) )
 ROM_END
+
+} // anonymous namespace
+
 
 COMP(2009, mini2440, 0, 0, mini2440, mini2440, mini2440_state, init_mini2440, "FriendlyARM", "Mini2440", 0)

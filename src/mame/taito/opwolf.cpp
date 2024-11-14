@@ -328,12 +328,12 @@ public:
 	void init_opwolfb();
 	void init_opwolfp();
 
-	DECLARE_CUSTOM_INPUT_MEMBER(opwolf_gun_x_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(opwolf_gun_y_r);
+	ioport_value opwolf_gun_x_r();
+	ioport_value opwolf_gun_y_r();
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	uint16_t cchip_r(offs_t offset);
@@ -351,13 +351,13 @@ private:
 	void opwolf_colpri_cb(u32 &sprite_colbank, u32 &pri_mask, u16 sprite_ctrl);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void opwolf_msm5205_vck(msm5205_device *device, int chip);
-	template<int N> DECLARE_WRITE_LINE_MEMBER(msm5205_vck_w);
+	template<int N> void msm5205_vck_w(int state);
 
-	void opwolf_map(address_map &map);
-	void opwolf_sound_z80_map(address_map &map);
-	void opwolfb_map(address_map &map);
-	void opwolfb_sub_z80_map(address_map &map);
-	void opwolfp_map(address_map &map);
+	void opwolf_map(address_map &map) ATTR_COLD;
+	void opwolf_sound_z80_map(address_map &map) ATTR_COLD;
+	void opwolfb_map(address_map &map) ATTR_COLD;
+	void opwolfb_sub_z80_map(address_map &map) ATTR_COLD;
+	void opwolfp_map(address_map &map) ATTR_COLD;
 
 	/* memory pointers */
 	optional_shared_ptr<uint8_t> m_cchip_ram;
@@ -507,7 +507,7 @@ static INPUT_PORTS_START( opwolf )
 	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
 	PORT_SERVICE( 0x04, IP_ACTIVE_LOW ) PORT_DIPLOCATION("SW1:3")
 	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SW1:4")
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) ) \
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
 	TAITO_COINAGE_WORLD_LOC(SW1)
 
@@ -549,11 +549,11 @@ static INPUT_PORTS_START( opwolf )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 
 	PORT_START("IN2")
-	PORT_BIT( 0x01ff, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(opwolf_state, opwolf_gun_x_r)
+	PORT_BIT( 0x01ff, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(FUNC(opwolf_state::opwolf_gun_x_r))
 	PORT_BIT( 0xfe00, IP_ACTIVE_LOW,  IPT_UNUSED )
 
 	PORT_START("IN3")
-	PORT_BIT( 0x01ff, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(opwolf_state, opwolf_gun_y_r)
+	PORT_BIT( 0x01ff, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(FUNC(opwolf_state::opwolf_gun_y_r))
 	PORT_BIT( 0xfe00, IP_ACTIVE_LOW,  IPT_UNUSED )
 
 	PORT_START(P1X_PORT_TAG)  /* P1X (span allows you to shoot enemies behind status bar) */
@@ -628,14 +628,14 @@ void opwolf_state::counters_w(uint8_t data)
 	machine().bookkeeping().coin_counter_w(0, ~data & 0x10);
 }
 
-CUSTOM_INPUT_MEMBER(opwolf_state::opwolf_gun_x_r )
+ioport_value opwolf_state::opwolf_gun_x_r()
 {
 	/* P1X - Have to remap 8 bit input value, into 0-319 visible range */
 	int scaled = (ioport(P1X_PORT_TAG)->read() * 320 ) / 256;
 	return (scaled + 0x15 + m_opwolf_gun_xoffs);
 }
 
-CUSTOM_INPUT_MEMBER(opwolf_state::opwolf_gun_y_r )
+ioport_value opwolf_state::opwolf_gun_y_r()
 {
 	return (ioport(P1Y_PORT_TAG)->read() - 0x24 + m_opwolf_gun_yoffs);
 }
@@ -719,7 +719,7 @@ GFXDECODE_END
 //7 - N/C
 
 template<int N>
-WRITE_LINE_MEMBER(opwolf_state::msm5205_vck_w)
+void opwolf_state::msm5205_vck_w(int state)
 {
 	if (m_adpcm_data[N] != -1)
 	{
@@ -913,12 +913,9 @@ void opwolf_state::opwolf(machine_config &config)
 	screen.set_screen_update(FUNC(opwolf_state::screen_update));
 	screen.set_palette("palette");
 
-	GFXDECODE(config, "gfxdecode", "palette", gfx_opwolf);
 	PALETTE(config, "palette").set_format(palette_device::xRGBRRRRGGGGBBBB_bit0, 2048);
 
-	PC080SN(config, m_pc080sn, 0);
-	m_pc080sn->set_gfx_region(0);
-	m_pc080sn->set_gfxdecode_tag("gfxdecode");
+	PC080SN(config, m_pc080sn, 0, "palette", gfx_opwolf);
 
 	PC090OJ(config, m_pc090oj, 0);
 	m_pc090oj->set_palette("palette");
@@ -947,8 +944,8 @@ void opwolf_state::opwolf(machine_config &config)
 	m_msm[1]->add_route(ALL_OUTPUTS, "rspeaker", 1.0);
 
 	pc060ha_device &ciu(PC060HA(config, "ciu", 0));
-	ciu.set_master_tag(m_maincpu);
-	ciu.set_slave_tag(m_audiocpu);
+	ciu.nmi_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
+	ciu.reset_callback().set_inputline(m_audiocpu, INPUT_LINE_RESET);
 }
 
 void opwolf_state::opwolfp(machine_config &config)
@@ -987,12 +984,9 @@ void opwolf_state::opwolfb(machine_config &config) /* OSC clocks unknown for the
 	screen.set_screen_update(FUNC(opwolf_state::screen_update));
 	screen.set_palette("palette");
 
-	GFXDECODE(config, "gfxdecode", "palette", gfx_opwolf);
 	PALETTE(config, "palette").set_format(palette_device::xRGBRRRRGGGGBBBB_bit0, 2048);
 
-	PC080SN(config, m_pc080sn, 0);
-	m_pc080sn->set_gfx_region(0);
-	m_pc080sn->set_gfxdecode_tag("gfxdecode");
+	PC080SN(config, m_pc080sn, 0, "palette", gfx_opwolf);
 
 	PC090OJ(config, m_pc090oj, 0);
 	m_pc090oj->set_palette("palette");
@@ -1021,8 +1015,8 @@ void opwolf_state::opwolfb(machine_config &config) /* OSC clocks unknown for the
 	m_msm[1]->add_route(ALL_OUTPUTS, "rspeaker", 1.0);
 
 	pc060ha_device &ciu(PC060HA(config, "ciu", 0));
-	ciu.set_master_tag(m_maincpu);
-	ciu.set_slave_tag(m_audiocpu);
+	ciu.nmi_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
+	ciu.reset_callback().set_inputline(m_audiocpu, INPUT_LINE_RESET);
 }
 
 
@@ -1232,10 +1226,10 @@ ROM_END
 // C-Chip includes the string 'By_TAITO_Copration_On_OSAKA_BUNSHITU._01.Sep.1987_Toshiaki.Kato_Tsutomuawa_4
 
 //    year  rom       parent    machine   inp      state          init
-GAME( 1987, opwolf,   0,        opwolf,   opwolf,  opwolf_state,  init_opwolf,   ROT0, "Taito Corporation Japan",          "Operation Wolf (World, set 1)",              MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1987, opwolfa,  opwolf,   opwolf,   opwolf,  opwolf_state,  init_opwolf,   ROT0, "Taito Corporation Japan",          "Operation Wolf (World, set 2)",              MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1987, opwolfj,  opwolf,   opwolf,   opwolfu, opwolf_state,  init_opwolf,   ROT0, "Taito Corporation",                "Operation Wolf (Japan)",                     MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1987, opwolf,   0,        opwolf,   opwolf,  opwolf_state,  init_opwolf,   ROT0, "Taito Corporation Japan",          "Operation Wolf (World, rev 2, set 1)",       MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1987, opwolfa,  opwolf,   opwolf,   opwolf,  opwolf_state,  init_opwolf,   ROT0, "Taito Corporation Japan",          "Operation Wolf (World, rev 2, set 2)",       MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1987, opwolfj,  opwolf,   opwolf,   opwolfu, opwolf_state,  init_opwolf,   ROT0, "Taito Corporation",                "Operation Wolf (Japan, rev 2)",              MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1987, opwolfjsc,opwolf,   opwolf,   opwolfu, opwolf_state,  init_opwolf,   ROT0, "Taito Corporation",                "Operation Wolf (Japan, SC)",                 MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1987, opwolfu,  opwolf,   opwolf,   opwolfu, opwolf_state,  init_opwolf,   ROT0, "Taito America Corporation",        "Operation Wolf (US)",                        MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1987, opwolfu,  opwolf,   opwolf,   opwolfu, opwolf_state,  init_opwolf,   ROT0, "Taito America Corporation",        "Operation Wolf (US, rev 2)",                 MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1987, opwolfb,  opwolf,   opwolfb,  opwolfb, opwolf_state,  init_opwolfb,  ROT0, "bootleg (Bear Corporation Korea)", "Operation Bear (bootleg of Operation Wolf)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1987, opwolfp,  opwolf,   opwolfp,  opwolfp, opwolf_state,  init_opwolfp,  ROT0, "Taito Corporation",                "Operation Wolf (Japan, prototype)",          MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // unprotected

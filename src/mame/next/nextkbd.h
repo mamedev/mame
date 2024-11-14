@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Olivier Galibert
-#ifndef MAME_MACHINE_NEXTKBD_H
-#define MAME_MACHINE_NEXTKBD_H
+#ifndef MAME_NEXT_NEXTKBD_H
+#define MAME_NEXT_NEXTKBD_H
 
 #pragma once
 
@@ -14,7 +14,7 @@ public:
 	auto int_power_wr_callback() { return int_power_cb.bind(); }
 	auto int_nmi_wr_callback() { return int_nmi_cb.bind(); }
 
-	void amap(address_map &map);
+	void amap(address_map &map) ATTR_COLD;
 
 	uint8_t status_snd_r();
 	uint8_t status_kms_r();
@@ -33,9 +33,9 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(update);
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
-	virtual ioport_constructor device_input_ports() const override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 
 	TIMER_CALLBACK_MEMBER(update_tick);
 
@@ -109,4 +109,4 @@ private:
 
 DECLARE_DEVICE_TYPE(NEXTKBD, nextkbd_device)
 
-#endif // MAME_MACHINE_NEXTKBD_H
+#endif // MAME_NEXT_NEXTKBD_H

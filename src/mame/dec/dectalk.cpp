@@ -248,6 +248,8 @@ dgc (dg(no!spam)cx@mac.com)
 #include "speaker.h"
 
 
+namespace {
+
 class dectalk_state : public driver_device
 {
 public:
@@ -291,7 +293,7 @@ private:
 	required_device<scn2681_device> m_duart;
 	required_device<x2212_device> m_nvram;
 	required_device<dac_word_interface> m_dac;
-	DECLARE_WRITE_LINE_MEMBER(duart_txa);
+	void duart_txa(int state);
 	uint8_t duart_input();
 	void duart_output(uint8_t data);
 	uint8_t nvram_recall(offs_t offset);
@@ -306,20 +308,19 @@ private:
 	void spc_latch_outfifo_error_stats(uint16_t data);
 	uint16_t spc_infifo_data_r();
 	void spc_outfifo_data_w(uint16_t data);
-	DECLARE_READ_LINE_MEMBER(spc_semaphore_r);
-	virtual void machine_reset() override;
-	virtual void machine_start() override;
+	int spc_semaphore_r();
+	virtual void machine_start() override ATTR_COLD;
 	TIMER_CALLBACK_MEMBER(outfifo_read_cb);
 	emu_timer *m_outfifo_read_timer = nullptr;
 	void outfifo_check();
 	void clear_all_fifos();
 	void dsp_semaphore_w(bool state);
 	uint16_t dsp_outfifo_r();
-	DECLARE_WRITE_LINE_MEMBER(dectalk_reset);
+	void dectalk_reset(int state);
 
-	void m68k_mem(address_map &map);
-	void tms32010_io(address_map &map);
-	void tms32010_mem(address_map &map);
+	void m68k_mem(address_map &map) ATTR_COLD;
+	void tms32010_io(address_map &map) ATTR_COLD;
+	void tms32010_mem(address_map &map) ATTR_COLD;
 };
 
 
@@ -342,7 +343,7 @@ void dectalk_state::duart_output(uint8_t data)
 #endif
 }
 
-WRITE_LINE_MEMBER(dectalk_state::duart_txa)
+void dectalk_state::duart_txa(int state)
 {
 	//TODO: this needs to be plumbed so it shows up optionally on a second terminal somehow, or connects to diserial
 	// it is the second 'alternate' serial connection on the DTC-01, used for a serial passthru and other stuff.
@@ -399,7 +400,7 @@ uint16_t dectalk_state::dsp_outfifo_r (  )
 #ifdef USE_LOOSE_TIMING_OUTPUT
 	// if outfifo count is less than two, boost the interleave to prevent running the fifo out
 	if (m_outfifo_count < 2)
-	machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(25));
+	machine().scheduler().perfect_quantum(attotime::from_usec(25));
 #endif
 #ifdef VERBOSE
 	if (m_outfifo_count == 0) logerror("output fifo is EMPTY! repeating previous sample!\n");
@@ -418,7 +419,7 @@ uint16_t dectalk_state::dsp_outfifo_r (  )
 }
 
 /* Machine reset and friends: stuff that needs setting up which IS directly affected by reset */
-WRITE_LINE_MEMBER(dectalk_state::dectalk_reset)
+void dectalk_state::dectalk_reset(int state)
 {
 	m_hack_self_test_is_second_read = false; // hack
 	// stuff that is DIRECTLY affected by the RESET line
@@ -467,12 +468,6 @@ void dectalk_state::machine_start()
 	m_simulate_outfifo_error = false; // TODO: HACK for now, should be hooked to a fake dipswitch to simulate fifo errors
 }
 
-void dectalk_state::machine_reset()
-{
-	/* hook the RESET line, which resets a slew of other components */
-	m_maincpu->set_reset_callback(*this, FUNC(dectalk_state::dectalk_reset));
-}
-
 /* Begin 68k i/o handlers */
 
 uint8_t dectalk_state::nvram_recall(offs_t offset)// recall from x2212 nvram chip
@@ -508,7 +503,7 @@ void dectalk_state::nvram_store(offs_t offset, uint8_t data) // store to X2212 N
 void dectalk_state::m68k_infifo_w(uint16_t data)// 68k write to the speech input fifo
 {
 #ifdef USE_LOOSE_TIMING
-	machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(25));
+	machine().scheduler().perfect_quantum(attotime::from_usec(25));
 #endif
 #ifdef SPC_LOG_68K
 	logerror("m68k: SPC infifo written with data = %04X, fifo head was: %02X; fifo tail: %02X\n",data, m_infifo_head_ptr, m_infifo_tail_ptr);
@@ -542,7 +537,7 @@ uint16_t dectalk_state::m68k_spcflags_r()// 68k read from the speech flags
 void dectalk_state::m68k_spcflags_w(uint16_t data)// 68k write to the speech flags (only 3 bits do anything)
 {
 #ifdef USE_LOOSE_TIMING
-	machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(25));
+	machine().scheduler().perfect_quantum(attotime::from_usec(25));
 #endif
 #ifdef SPC_LOG_68K
 	logerror("m68k: SPC flags written with %04X, only storing %04X\n",data, data&0x41);
@@ -687,7 +682,7 @@ uint16_t dectalk_state::m68k_tlc_dtmf_r()// dtmf chip read
 void dectalk_state::spc_latch_outfifo_error_stats(uint16_t data)// latch 74ls74 @ E64 upper and lower halves with d0 and 1 respectively
 {
 #ifdef USE_LOOSE_TIMING
-	machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(25));
+	machine().scheduler().perfect_quantum(attotime::from_usec(25));
 #endif
 #ifdef SPC_LOG_DSP
 	logerror("dsp: set fifo semaphore and set error status = %01X\n",data&1);
@@ -735,7 +730,7 @@ void dectalk_state::spc_outfifo_data_w(uint16_t data)
 	//outfifo_check(); // outfifo check should only be done in the audio 10khz polling function
 }
 
-READ_LINE_MEMBER(dectalk_state::spc_semaphore_r)// Return state of d-latch 74ls74 @ E64 'lower half' in d0 which indicates whether infifo is readable
+int dectalk_state::spc_semaphore_r()// Return state of d-latch 74ls74 @ E64 'lower half' in d0 which indicates whether infifo is readable
 {
 #ifdef SPC_LOG_DSP
 	//logerror("dsp: read infifo semaphore, returned %d\n", m_infifo_semaphore); // commented due to extreme annoyance factor
@@ -854,6 +849,7 @@ void dectalk_state::dectalk(machine_config &config)
 	/* basic machine hardware */
 	M68000(config, m_maincpu, XTAL(20'000'000)/2); /* E74 20MHz OSC (/2) */
 	m_maincpu->set_addrmap(AS_PROGRAM, &dectalk_state::m68k_mem);
+	m_maincpu->reset_cb().set(FUNC(dectalk_state::dectalk_reset));
 
 	SCN2681(config, m_duart, XTAL(3'686'400)); // MC2681 DUART ; Y3 3.6864MHz xtal */
 	m_duart->irq_cb().set_inputline(m_maincpu, M68K_IRQ_6);
@@ -979,8 +975,10 @@ ROM_START( dectalk )
 	ROM_FILL(0xfd, 0x01, 0x02) // "
 	ROM_FILL(0xfe, 0x01, 0x05) // "
 	ROM_FILL(0xff, 0x01, 0x0b) // "
-
 ROM_END
+
+} // anonymous namespace
+
 
 /******************************************************************************
  Drivers

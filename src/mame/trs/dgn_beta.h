@@ -6,8 +6,8 @@
  *
  ****************************************************************************/
 
-#ifndef MAME_INCLUDES_DGN_BETA_H
-#define MAME_INCLUDES_DGN_BETA_H
+#ifndef MAME_TRS_DGN_BETA_H
+#define MAME_TRS_DGN_BETA_H
 
 #pragma once
 
@@ -56,8 +56,8 @@ public:
 	void dgnbeta(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	static constexpr unsigned RamSize           = 256;          // 256K by default
@@ -182,24 +182,24 @@ private:
 	void d_pia0_pa_w(uint8_t data);
 	uint8_t d_pia0_pb_r();
 	void d_pia0_pb_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(d_pia0_cb2_w);
-	DECLARE_WRITE_LINE_MEMBER(d_pia0_irq_a);
-	DECLARE_WRITE_LINE_MEMBER(d_pia0_irq_b);
+	void d_pia0_cb2_w(int state);
+	void d_pia0_irq_a(int state);
+	void d_pia0_irq_b(int state);
 	uint8_t d_pia1_pa_r();
 	void d_pia1_pa_w(uint8_t data);
 	uint8_t d_pia1_pb_r();
 	void d_pia1_pb_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(d_pia1_irq_a);
-	DECLARE_WRITE_LINE_MEMBER(d_pia1_irq_b);
+	void d_pia1_irq_a(int state);
+	void d_pia1_irq_b(int state);
 	uint8_t d_pia2_pa_r();
 	void d_pia2_pa_w(uint8_t data);
 	uint8_t d_pia2_pb_r();
 	void d_pia2_pb_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(d_pia2_irq_a);
-	DECLARE_WRITE_LINE_MEMBER(d_pia2_irq_b);
-	DECLARE_WRITE_LINE_MEMBER(dgnbeta_fdc_intrq_w);
-	DECLARE_WRITE_LINE_MEMBER(dgnbeta_fdc_drq_w);
-	DECLARE_WRITE_LINE_MEMBER(dgnbeta_vsync_changed);
+	void d_pia2_irq_a(int state);
+	void d_pia2_irq_b(int state);
+	void dgnbeta_fdc_intrq_w(int state);
+	void dgnbeta_fdc_drq_w(int state);
+	void dgnbeta_vsync_changed(int state);
 	/* 74HC670 4x4bit colour ram */
 	void dgnbeta_colour_ram_w(offs_t offset, uint8_t data);
 	// Page IO at FE00
@@ -226,10 +226,10 @@ private:
 
 	offs_t dgnbeta_dasm_override(std::ostream &stream, offs_t pc, const util::disasm_interface::data_buffer &opcodes, const util::disasm_interface::data_buffer &params);
 
-	void dgnbeta_map(address_map &map);
+	void dgnbeta_map(address_map &map) ATTR_COLD;
 
-	void execute_beta_key_dump(const std::vector<std::string> &params);
-	void execute_beta_dat_log(const std::vector<std::string> &params);
+	void execute_beta_key_dump(const std::vector<std::string_view> &params);
+	void execute_beta_dat_log(const std::vector<std::string_view> &params);
 };
 
-#endif // MAME_INCLUDES_DGN_BETA_H
+#endif // MAME_TRS_DGN_BETA_H

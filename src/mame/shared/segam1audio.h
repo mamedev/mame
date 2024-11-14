@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:R. Belmont
-#ifndef MAME_AUDIO_SEGAM1AUDIO_H
-#define MAME_AUDIO_SEGAM1AUDIO_H
+#ifndef MAME_SHARED_SEGAM1AUDIO_H
+#define MAME_SHARED_SEGAM1AUDIO_H
 
 #include "cpu/m68000/m68000.h"
 #include "machine/i8251.h"
@@ -32,16 +32,16 @@ public:
 	void m1_snd_mpcm_bnk1_w(uint16_t data);
 	void m1_snd_mpcm_bnk2_w(uint16_t data);
 
-	DECLARE_WRITE_LINE_MEMBER(write_txd);
+	void write_txd(int state);
 
-	void mpcm1_map(address_map &map);
-	void mpcm2_map(address_map &map);
-	void segam1audio_map(address_map &map);
+	void mpcm1_map(address_map &map) ATTR_COLD;
+	void mpcm2_map(address_map &map) ATTR_COLD;
+	void segam1audio_map(address_map &map) ATTR_COLD;
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_audiocpu;
@@ -58,11 +58,11 @@ private:
 
 	devcb_write_line   m_rxd_handler;
 
-	DECLARE_WRITE_LINE_MEMBER(output_txd);
+	void output_txd(int state);
 };
 
 
 // device type definition
 DECLARE_DEVICE_TYPE(SEGAM1AUDIO, segam1audio_device)
 
-#endif  // MAME_AUDIO_SEGAM1AUDIO_H
+#endif  // MAME_SHARED_SEGAM1AUDIO_H

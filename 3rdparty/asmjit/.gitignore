@@ -1,6 +1,3 @@
 /build
 /build_*
-/tools/asmdb
 .vscode
-.kdev4
-*.kdev4

@@ -67,6 +67,8 @@
 #include "meybjack.lh"
 
 
+namespace {
+
 class meyc8080_state : public driver_device
 {
 public:
@@ -91,7 +93,7 @@ private:
 	void meyc8080_dac_3_w(uint8_t data);
 	void meyc8080_dac_4_w(uint8_t data);
 	uint32_t screen_update_meyc8080(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	void meyc8080_map(address_map &map);
+	void meyc8080_map(address_map &map) ATTR_COLD;
 
 	virtual void machine_start() override { m_lamps.resolve(); }
 
@@ -725,6 +727,8 @@ ROM_START( casbjack )
 	ROM_LOAD( "k3", 0x2800, 0x0800, CRC(9cd6b843) SHA1(fb9c5c5ba96ebb75dc42e7c891d6da2a8a1ea6c1) )
 	ROM_LOAD( "k2", 0x3000, 0x0800, CRC(5f82eafa) SHA1(4f5a4dc773ceae9a69ec532166047867db4ddadf) )
 ROM_END
+
+} // anonymous namespace
 
 
 /*************************************

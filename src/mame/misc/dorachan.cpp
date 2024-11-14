@@ -23,6 +23,8 @@ It appears that unused bits in port 03 are to operate the discrete sound channel
 #include "screen.h"
 
 
+namespace {
+
 class dorachan_state : public driver_device
 {
 public:
@@ -43,15 +45,15 @@ private:
 	uint8_t protection_r();
 	uint8_t v128_r();
 	uint32_t screen_update_dorachan(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	void dorachan_io_map(address_map &map);
-	void dorachan_map(address_map &map);
+	void dorachan_io_map(address_map &map) ATTR_COLD;
+	void dorachan_map(address_map &map) ATTR_COLD;
 
 	// internal state
 	uint8_t m_flip_screen = 0;
 	uint16_t m_prot_value = 0;
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	// devices, memory pointers
 	required_device<cpu_device> m_maincpu;
@@ -271,6 +273,7 @@ ROM_START( dorachan )
 	ROM_LOAD( "d14.rom",    0x0000, 0x0400, CRC(c0d3ee84) SHA1(f2207c685ce8d5144a373c28f11d2cebf9518b65) )
 ROM_END
 
+} // anonymous namespace
 
 
 /*************************************

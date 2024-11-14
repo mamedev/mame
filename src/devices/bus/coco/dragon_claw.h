@@ -26,12 +26,12 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// optional information overrides
 	virtual void device_add_mconfig(machine_config& config) override;
-	virtual ioport_constructor device_input_ports() const override;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 
 	virtual u8 cts_read(offs_t offset) override;
 	virtual void cts_write(offs_t offset, u8 data) override;
@@ -45,7 +45,7 @@ protected:
 	virtual address_space &cartridge_space() override;
 
 private:
-	DECLARE_WRITE_LINE_MEMBER(irq_w);
+	void irq_w(int state);
 
 	required_device<via6522_device> m_via;
 	required_device<cococart_slot_device> m_slot;

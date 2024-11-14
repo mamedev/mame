@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood, Charles MacDonald
-#ifndef MAME_MACHINE_DECO146_H
-#define MAME_MACHINE_DECO146_H
+#ifndef MAME_DATAEAST_DECO146_H
+#define MAME_DATAEAST_DECO146_H
 
 #pragma once
 
@@ -96,8 +96,8 @@ public:
 protected:
 	deco_146_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
 
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	u16 read_protport(u16 address);
 	virtual void write_protport(u16 address, u16 data, u16 mem_mask);
@@ -133,4 +133,4 @@ public:
 
 DECLARE_DEVICE_TYPE(DECO146PROT, deco146_device)
 
-#endif // MAME_MACHINE_DECO146_H
+#endif // MAME_DATAEAST_DECO146_H

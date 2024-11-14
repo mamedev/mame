@@ -53,8 +53,8 @@ public:
 
 	u8 data_r();
 	void address_w(u8 data);
-	DECLARE_WRITE_LINE_MEMBER(start_w);
-	DECLARE_READ_LINE_MEMBER(eoc_r);
+	void start_w(int state);
+	int eoc_r();
 
 	// common hookups
 	void address_offset_start_w(offs_t offset, u8 data); // start and ale connected, address to the address bus
@@ -64,7 +64,7 @@ protected:
 	adc0808_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	// device-level overrides
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 	TIMER_CALLBACK_MEMBER(update_state);
 

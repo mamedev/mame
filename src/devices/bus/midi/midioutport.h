@@ -22,12 +22,12 @@ class midiout_port_device : public device_t,
 public:
 	midiout_port_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual DECLARE_WRITE_LINE_MEMBER( input_txd ) override { if (started()) m_midiout->tx(state); }
+	virtual void input_txd(int state) override { if (started()) m_midiout->tx(state); }
 
 protected:
 	virtual void device_start() override { }
 	virtual void device_reset() override { }
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 private:
 	required_device<midiout_device> m_midiout;

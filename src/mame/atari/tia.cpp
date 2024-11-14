@@ -353,8 +353,8 @@ tia_video_device::tia_video_device(const machine_config &mconfig, device_type ty
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_video_interface(mconfig, *this)
 	, device_palette_interface(mconfig, *this)
-	, m_read_input_port_cb(*this)
-	, m_databus_contents_cb(*this)
+	, m_read_input_port_cb(*this, TIA_INPUT_PORT_ALWAYS_ON)
+	, m_databus_contents_cb(*this, 0x3f)
 	, m_vsync_cb(*this)
 	, m_maincpu(*this, "^maincpu")
 	, m_tia(*this, finder_base::DUMMY_TAG)
@@ -391,11 +391,6 @@ tia_ntsc_video_device::tia_ntsc_video_device(const machine_config &mconfig, cons
 
 void tia_video_device::device_start()
 {
-	// resolve callbacks
-	m_read_input_port_cb.resolve();
-	m_databus_contents_cb.resolve();
-	m_vsync_cb.resolve();
-
 	init_palette();
 
 	int cx = screen().width();
@@ -998,13 +993,9 @@ void tia_video_device::VSYNC_w(uint8_t data)
 			int curr_y = current_y();
 
 			if ( curr_y > 5 )
-				update_bitmap(
-					screen().width(),
-					screen().height());
+				update_bitmap(screen().width(), screen().height());
 
-			if ( !m_vsync_cb.isnull() ) {
-				m_vsync_cb(0, curr_y, 0xFFFF );
-			}
+			m_vsync_cb(0, curr_y, 0xFFFF);
 
 			prev_y = 0;
 			prev_x = 0;
@@ -1774,19 +1765,15 @@ void tia_video_device::GRP1_w(uint8_t data)
 
 uint8_t tia_video_device::INPT_r(offs_t offset)
 {
-	uint64_t elapsed = m_maincpu->total_cycles() - paddle_start;
-	uint16_t input = TIA_INPUT_PORT_ALWAYS_ON;
-	if ( !m_read_input_port_cb.isnull() )
-	{
-		input = m_read_input_port_cb(offset & 3, 0xFFFF);
-	}
+	const uint64_t elapsed = m_maincpu->total_cycles() - paddle_start;
+	const uint16_t input = m_read_input_port_cb(offset & 3, 0xffff);
 
-	if ( input == TIA_INPUT_PORT_ALWAYS_ON )
+	if (input == TIA_INPUT_PORT_ALWAYS_ON)
 		return 0x80;
-	if ( input == TIA_INPUT_PORT_ALWAYS_OFF )
+	if (input == TIA_INPUT_PORT_ALWAYS_OFF)
 		return 0x00;
 
-	uint16_t paddle_cycles = input * 76;
+	const uint16_t paddle_cycles = input * 76;
 	return elapsed > paddle_cycles ? 0x80 : 0x00;
 }
 
@@ -1800,7 +1787,7 @@ uint8_t tia_video_device::read(offs_t offset)
 	*/
 	uint8_t data = offset & 0x3f;
 
-	if ( !m_databus_contents_cb.isnull() )
+	if (!m_databus_contents_cb.isunset())
 	{
 		data = m_databus_contents_cb(offset) & 0x3f;
 	}
@@ -1838,13 +1825,13 @@ uint8_t tia_video_device::read(offs_t offset)
 		return data | INPT_r(3);
 	case 0xC:
 		{
-			int button = !m_read_input_port_cb.isnull() ? ( m_read_input_port_cb(4,0xFFFF) & 0x80 ) : 0x80;
+			int button = !m_read_input_port_cb.isunset() ? ( m_read_input_port_cb(4,0xFFFF) & 0x80 ) : 0x80;
 			INPT4 = ( VBLANK & 0x40) ? ( INPT4 & button ) : button;
 		}
 		return data | INPT4;
 	case 0xD:
 		{
-			int button = !m_read_input_port_cb.isnull() ? ( m_read_input_port_cb(5,0xFFFF) & 0x80 ) : 0x80;
+			int button = !m_read_input_port_cb.isunset() ? ( m_read_input_port_cb(5,0xFFFF) & 0x80 ) : 0x80;
 			INPT5 = ( VBLANK & 0x40) ? ( INPT5 & button ) : button;
 		}
 		return data | INPT5;

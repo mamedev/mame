@@ -39,11 +39,11 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "machine/mpu401.h"
+#include "mpu401.h"
+
 #include "bus/midi/midi.h"
 
 #define M6801_TAG   "mpu6801"
-#define ROM_TAG     "mpurom"
 #define MIDIIN_TAG  "mdin"
 #define MIDIOUT_TAG "mdout"
 
@@ -59,15 +59,12 @@
 
 void mpu401_device::mpu401_map(address_map &map)
 {
-	map(0x0000, 0x001f).m(m_ourcpu, FUNC(m6801_cpu_device::m6801_io));
 	map(0x0020, 0x0021).rw(FUNC(mpu401_device::asic_r), FUNC(mpu401_device::asic_w));
-	map(0x0080, 0x00ff).ram(); // on-chip RAM
 	map(0x0800, 0x0fff).ram(); // external RAM
-	map(0xf000, 0xffff).rom().region(ROM_TAG, 0);
 }
 
 ROM_START( mpu401 )
-	ROM_REGION(0x1000, ROM_TAG, 0)
+	ROM_REGION(0x1000, M6801_TAG, 0)
 	ROM_LOAD( "roland__6801v0b55p__15179222.bin", 0x000000, 0x001000, CRC(65d3a151) SHA1(00efbfb96aeb997b69bb16981c6751d3c784bb87) ) /* Mask MCU; Label: "Roland // 6801V0B55P // 5A1 JAPAN // 15179222"; This is the final version (1.5A) of the mpu401 firmware; version is located at offsets 0x649 (0x15) and 0x64f (0x01) */
 ROM_END
 
@@ -83,7 +80,7 @@ DEFINE_DEVICE_TYPE(MPU401, mpu401_device, "mpu401", "Roland MPU-401 I/O box")
 
 void mpu401_device::device_add_mconfig(machine_config &config)
 {
-	M6801(config, m_ourcpu, 4000000); /* 4 MHz as per schematics */
+	HD6801V0(config, m_ourcpu, 4000000); /* 4 MHz as per schematics */
 	m_ourcpu->set_addrmap(AS_PROGRAM, &mpu401_device::mpu401_map);
 	m_ourcpu->in_p1_cb().set(FUNC(mpu401_device::port1_r));
 	m_ourcpu->out_p1_cb().set(FUNC(mpu401_device::port1_w));
@@ -126,7 +123,6 @@ mpu401_device::mpu401_device(const machine_config &mconfig, const char *tag, dev
 
 void mpu401_device::device_start()
 {
-	write_irq.resolve_safe();
 	m_timer = timer_alloc(FUNC(mpu401_device::serial_tick), this);
 }
 
@@ -150,7 +146,7 @@ void mpu401_device::device_reset()
 
 TIMER_CALLBACK_MEMBER(mpu401_device::serial_tick)
 {
-	m_ourcpu->m6801_clock_serial();
+	m_ourcpu->clock_serial();
 }
 
 uint8_t mpu401_device::port1_r()

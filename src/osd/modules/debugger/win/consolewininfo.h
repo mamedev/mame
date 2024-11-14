@@ -15,6 +15,8 @@
 #include "disasmbasewininfo.h"
 
 
+namespace osd::debugger::win {
+
 class consolewin_info : public disasmbasewin_info
 {
 public:
@@ -27,6 +29,7 @@ protected:
 	virtual void recompute_children() override;
 	virtual void update_menu() override;
 	virtual bool handle_command(WPARAM wparam, LPARAM lparam) override;
+	virtual void save_configuration_to_node(util::xml::data_node &node) override;
 
 private:
 	enum
@@ -52,8 +55,10 @@ private:
 	bool get_softlist_info(device_image_interface &img);
 
 	device_t *m_current_cpu;
-	HMENU   m_devices_menu;
+	HMENU m_devices_menu;
 	std::map<std::string,std::string> slmap;
 };
+
+} // namespace osd::debugger::win
 
 #endif // MAME_DEBUGGER_WIN_CONSOLEWININFO_H

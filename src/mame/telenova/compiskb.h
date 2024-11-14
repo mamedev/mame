@@ -6,8 +6,8 @@
 
 *********************************************************************/
 
-#ifndef MAME_INCLUDES_COMPISKB_H
-#define MAME_INCLUDES_COMPISKB_H
+#ifndef MAME_TELENOVA_COMPISKB_H
+#define MAME_TELENOVA_COMPISKB_H
 
 #pragma once
 
@@ -29,16 +29,16 @@ public:
 
 	auto out_tx_handler() { return m_out_tx_handler.bind(); }
 
-	DECLARE_WRITE_LINE_MEMBER( si_w );
+	void si_w(int state);
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 	// optional information overrides
-	virtual const tiny_rom_entry *device_rom_region() const override;
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual ioport_constructor device_input_ports() const override;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 
 private:
 	required_device<i8748_device> m_maincpu;
@@ -61,4 +61,4 @@ private:
 // device type definition
 DECLARE_DEVICE_TYPE(COMPIS_KEYBOARD, compis_keyboard_device)
 
-#endif // MAME_INCLUDES_COMPISKB_H
+#endif // MAME_TELENOVA_COMPISKB_H

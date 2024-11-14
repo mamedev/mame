@@ -1,0 +1,178 @@
+<?xml version="1.0"?>
+<!--
+license:CC0-1.0
+authors:hap
+-->
+<mamelayout version="2">
+
+<!-- define elements -->
+
+	<element name="white"><rect><color red="0.85" green="0.85" blue="0.86" /></rect></element>
+	<element name="black"><rect><color red="0.07" green="0.07" blue="0.07" /></rect></element>
+	<element name="blackb"><rect><color red="0" green="0" blue="0" /></rect></element>
+	<element name="lcdm"><rect><color red="0.7" green="0.71" blue="0.72" /></rect></element>
+
+
+<!-- button panel -->
+
+	<element name="text_l11"><text string="7"><color red="0.05" green="0.05" blue="0.05" /></text></element>
+	<element name="text_l12"><text string="6"><color red="0.05" green="0.05" blue="0.05" /></text></element>
+	<element name="text_l13"><text string="5"><color red="0.05" green="0.05" blue="0.05" /></text></element>
+	<element name="text_l14"><text string="4"><color red="0.05" green="0.05" blue="0.05" /></text></element>
+	<element name="text_l15"><text string="3"><color red="0.05" green="0.05" blue="0.05" /></text></element>
+	<element name="text_l16"><text string="2"><color red="0.05" green="0.05" blue="0.05" /></text></element>
+	<element name="text_l17"><text string="ENTER"><color red="0.05" green="0.05" blue="0.05" /></text></element>
+
+	<element name="text_l21"><text string="8"><color red="0.05" green="0.05" blue="0.05" /></text></element>
+	<element name="text_l22"><text string="9"><color red="0.05" green="0.05" blue="0.05" /></text></element>
+	<element name="text_l23"><text string="10"><color red="0.05" green="0.05" blue="0.05" /></text></element>
+	<element name="text_l24"><text string="J"><color red="0.05" green="0.05" blue="0.05" /></text></element>
+	<element name="text_l25"><text string="Q"><color red="0.05" green="0.05" blue="0.05" /></text></element>
+	<element name="text_l26"><text string="K"><color red="0.05" green="0.05" blue="0.05" /></text></element>
+	<element name="text_l27"><text string="A"><color red="0.05" green="0.05" blue="0.05" /></text></element>
+
+	<element name="text_l31"><text string=" "><color red="0.05" green="0.05" blue="0.05" /></text></element>
+	<element name="text_l32"><text string=" "><color red="0.05" green="0.05" blue="0.05" /></text></element>
+	<element name="text_l33"><text string=" "><color red="0.05" green="0.05" blue="0.05" /></text></element>
+	<element name="text_l34"><text string=" "><color red="0.05" green="0.05" blue="0.05" /></text></element>
+	<element name="text_l35"><text string="NO TRUMP"><color red="0.05" green="0.05" blue="0.05" /></text></element>
+	<element name="text_l36"><text string="DOUBLE"><color red="0.05" green="0.05" blue="0.05" /></text></element>
+	<element name="text_l37"><text string="PASS"><color red="0.05" green="0.05" blue="0.05" /></text></element>
+
+	<element name="text_l41"><text string="DEAL"><color red="0.05" green="0.05" blue="0.05" /></text></element>
+	<element name="text_l42"><text string="NEW"><color red="0.05" green="0.05" blue="0.05" /></text></element>
+	<element name="text_l42a"><text string="RUBBER"><color red="0.05" green="0.05" blue="0.05" /></text></element>
+	<element name="text_l43"><text string="SCORE"><color red="0.05" green="0.05" blue="0.05" /></text></element>
+	<element name="text_l44"><text string="CHANGE"><color red="0.05" green="0.05" blue="0.05" /></text></element>
+	<element name="text_l44a"><text string="SIDE"><color red="0.05" green="0.05" blue="0.05" /></text></element>
+	<element name="text_l45"><text string="LEVEL"><color red="0.05" green="0.05" blue="0.05" /></text></element>
+	<element name="text_l46"><text string="PARTNER"><color red="0.05" green="0.05" blue="0.05" /></text></element>
+	<element name="text_l47"><text string="DUMMY"><color red="0.05" green="0.05" blue="0.05" /></text></element>
+
+	<element name="text_l31a"><text string="&#x2660;"><color red="0.05" green="0.05" blue="0.05" /></text></element>
+	<element name="text_l32a"><text string="&#x2665;"><color red="0.85" green="0.35" blue="0.3" /></text></element>
+	<element name="text_l33a"><text string="&#x2666;"><color red="0.85" green="0.35" blue="0.3" /></text></element>
+	<element name="text_l34a"><text string="&#x2663;"><color red="0.05" green="0.05" blue="0.05" /></text></element>
+
+	<element name="butg" defstate="0">
+		<rect>
+			<bounds xc="0" yc="0" width="2" height="1" />
+			<color red="0.01" green="0.01" blue="0.01" />
+		</rect>
+		<rect>
+			<bounds xc="0" yc="0" width="1.84" height="0.92" />
+			<color red="0.5" green="0.5" blue="0.5" />
+		</rect>
+		<rect state="1">
+			<bounds xc="0" yc="0" width="1.84" height="0.92" />
+			<color red="1" green="1" blue="1" alpha="0.22" />
+		</rect>
+	</element>
+
+	<element name="butr" defstate="0">
+		<rect>
+			<bounds xc="0" yc="0" width="2" height="1" />
+			<color red="0.01" green="0.01" blue="0.01" />
+		</rect>
+		<rect>
+			<bounds xc="0" yc="0" width="1.84" height="0.92" />
+			<color red="0.85" green="0.35" blue="0.3" />
+		</rect>
+		<rect state="1">
+			<bounds xc="0" yc="0" width="1.84" height="0.92" />
+			<color red="1" green="1" blue="1" alpha="0.20" />
+		</rect>
+	</element>
+
+	<element name="butb" defstate="0">
+		<rect>
+			<bounds xc="0" yc="0" width="2" height="1" />
+			<color red="0.01" green="0.01" blue="0.01" />
+		</rect>
+		<rect>
+			<bounds xc="0" yc="0" width="1.84" height="0.92" />
+			<color red="0.25" green="0.25" blue="0.25" />
+		</rect>
+		<rect state="1">
+			<bounds xc="0" yc="0" width="1.84" height="0.92" />
+			<color red="1" green="1" blue="1" alpha="0.16" />
+		</rect>
+	</element>
+
+	<element name="buty" defstate="0">
+		<rect>
+			<bounds xc="0" yc="0" width="2" height="1" />
+			<color red="0.01" green="0.01" blue="0.01" />
+		</rect>
+		<rect>
+			<bounds xc="0" yc="0" width="1.84" height="0.92" />
+			<color red="0.85" green="0.72" blue="0.32" />
+		</rect>
+		<rect state="1">
+			<bounds xc="0" yc="0" width="1.84" height="0.92" />
+			<color red="0" green="0" blue="0" alpha="0.13" />
+		</rect>
+	</element>
+
+	<group name="buttons">
+		<bounds x="0" y="0" width="50" height="50" />
+
+		<repeat count="7">
+			<param name="y" start="2" increment="5" />
+			<param name="mask" start="0x40" rshift="1" />
+			<element ref="butg" inputtag="IN.3" inputmask="~mask~"><bounds xc="4" yc="~y~" width="4" height="2" /></element>
+			<element ref="butg" inputtag="IN.2" inputmask="~mask~"><bounds xc="10" yc="~y~" width="4" height="2" /></element>
+			<element ref="butg" inputtag="IN.1" inputmask="~mask~"><bounds xc="16" yc="~y~" width="4" height="2" /></element>
+		</repeat>
+
+		<repeat count="7">
+			<param name="y" start="2" increment="5" />
+			<param name="mask" start="0x40" rshift="1" />
+			<element ref="buty" inputtag="IN.0" inputmask="~mask~"><bounds xc="22" yc="~y~" width="4" height="2" /></element>
+		</repeat>
+
+		<element ref="white"><bounds x="1" y="29.5" width="6" height="5" /></element>
+		<element ref="white"><bounds x="13" y="19.5" width="6" height="15" /></element>
+
+		<element ref="butr" inputtag="IN.3" inputmask="0x01"><bounds xc="4" yc="32" width="4" height="2" /></element>
+		<element ref="butb" inputtag="IN.1" inputmask="0x04"><bounds xc="16" yc="22" width="4" height="2" /></element>
+		<element ref="butb" inputtag="IN.1" inputmask="0x02"><bounds xc="16" yc="27" width="4" height="2" /></element>
+		<element ref="butb" inputtag="IN.1" inputmask="0x01"><bounds xc="16" yc="32" width="4" height="2" /></element>
+
+		<repeat count="7">
+			<param name="y" start="3" increment="5" />
+			<param name="i" start="1" increment="1" />
+			<element ref="text_l1~i~"><bounds xc="4" y="~y~" width="7" height="1.1" /></element>
+			<element ref="text_l2~i~"><bounds xc="10" y="~y~" width="7" height="1.1" /></element>
+			<element ref="text_l3~i~"><bounds xc="16" y="~y~" width="7" height="1.1" /></element>
+			<element ref="text_l4~i~"><bounds xc="22" y="~y~" width="7" height="1.1" /></element>
+		</repeat>
+
+		<repeat count="4">
+			<param name="y" start="2.65" increment="5" />
+			<param name="i" start="1" increment="1" />
+			<element ref="text_l3~i~a"><bounds xc="16" y="~y~" width="7" height="1.6" /></element>
+		</repeat>
+
+		<element ref="text_l42a"><bounds xc="22" y="9" width="7" height="1.1" /></element>
+		<element ref="text_l44a"><bounds xc="22" y="19" width="7" height="1.1" /></element>
+	</group>
+
+
+<!-- build screen -->
+
+	<view name="Internal Layout">
+		<bounds left="-3.75" right="73.75" top="-3" bottom="35" />
+
+		<element ref="white"><bounds x="-3.75" y="-3" width="77.5" height="38" /></element>
+
+		<element ref="black"><bounds xc="20" yc="12.5" width="39.5" height="25" /></element>
+		<screen index="0"><bounds xc="20" yc="12.5" width="36.854" height="20.5" /></screen>
+		<element ref="lcdm" blend="multiply"><bounds xc="20" yc="12.5" width="39.5" height="25" /></element>
+
+		<element ref="blackb"><bounds xc="43.75" y="-10" width="0.3" height="50" /><color alpha="0.2" /></element>
+
+		<group ref="buttons"><bounds x="45.75" y="-1" width="50" height="50" /></group>
+	</view>
+
+</mamelayout>

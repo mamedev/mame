@@ -20,6 +20,14 @@
 #include "emu.h"
 #include "nes_vt09_soc.h"
 
+#include "bus/generic/slot.h"
+#include "bus/generic/carts.h"
+
+#include "softlist_dev.h"
+
+
+namespace {
+
 class nes_vt09_common_base_state : public driver_device
 {
 public:
@@ -32,14 +40,14 @@ public:
 	{ }
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	virtual uint8_t in0_r();
 	virtual uint8_t in1_r();
 	virtual void in0_w(uint8_t data);
 
-	void nes_vt09_map(address_map& map);
+	void nes_vt09_map(address_map &map) ATTR_COLD;
 
 	optional_ioport m_io0;
 	optional_ioport m_io1;
@@ -53,7 +61,7 @@ protected:
 	required_region_ptr<uint8_t> m_prgrom;
 
 	uint8_t vt_rom_r(offs_t offset);
-	void vtspace_w(offs_t offset, uint8_t data);
+	[[maybe_unused]] void vtspace_w(offs_t offset, uint8_t data);
 
 	void configure_soc(nes_vt02_vt03_soc_device* soc);
 
@@ -74,13 +82,13 @@ public:
 		m_soc(*this, "soc")
 	{ }
 
-	void vt_external_space_map_32mbyte(address_map& map);
-	void vt_external_space_map_16mbyte(address_map& map);
-	void vt_external_space_map_8mbyte(address_map& map);
-	void vt_external_space_map_4mbyte(address_map& map);
-	void vt_external_space_map_2mbyte(address_map& map);
-	void vt_external_space_map_1mbyte(address_map& map);
-	void vt_external_space_map_512kbyte(address_map& map);
+	void vt_external_space_map_32mbyte(address_map &map) ATTR_COLD;
+	void vt_external_space_map_16mbyte(address_map &map) ATTR_COLD;
+	void vt_external_space_map_8mbyte(address_map &map) ATTR_COLD;
+	void vt_external_space_map_4mbyte(address_map &map) ATTR_COLD;
+	void vt_external_space_map_2mbyte(address_map &map) ATTR_COLD;
+	void vt_external_space_map_1mbyte(address_map &map) ATTR_COLD;
+	[[maybe_unused]] void vt_external_space_map_512kbyte(address_map &map) ATTR_COLD;
 
 
 protected:
@@ -104,6 +112,58 @@ public:
 
 private:
 };
+
+class nes_vt09_cart_state : public nes_vt09_state
+{
+public:
+	nes_vt09_cart_state(const machine_config& mconfig, device_type type, const char* tag) :
+		nes_vt09_state(mconfig, type, tag),
+		m_bank(*this, "cartbank"),
+		m_cart(*this, "cartslot"),
+		m_cart_region(nullptr)
+	{ }
+
+	void nes_vt09_cart(machine_config& config);
+
+protected:
+	void machine_start() override ATTR_COLD;
+
+private:
+	void vt_external_space_map_cart(address_map &map) ATTR_COLD;
+
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load);
+
+	required_memory_bank m_bank;
+	required_device<generic_slot_device> m_cart;
+	memory_region *m_cart_region;
+};
+
+void nes_vt09_cart_state::machine_start()
+{
+	nes_vt09_state::machine_start();
+
+	m_bank->configure_entries(0, 1, memregion("mainrom")->base(), 0x200000);
+	m_bank->set_entry(0);
+
+	// if there's a cart, override the standard banking
+	if (m_cart && m_cart->exists())
+	{
+		m_cart_region = memregion(std::string(m_cart->tag()) + GENERIC_ROM_REGION_TAG);
+		m_bank->configure_entries(0, 1, m_cart_region->base(), 0x200000);
+		m_bank->set_entry(0);
+	}
+}
+
+DEVICE_IMAGE_LOAD_MEMBER(nes_vt09_cart_state::cart_load)
+{
+	uint32_t size = m_cart->common_get_size("rom");
+
+	m_cart->rom_alloc(size, GENERIC_ROM8_WIDTH, ENDIANNESS_LITTLE);
+	m_cart->common_load_rom(m_cart->get_rom_base(), size, "rom");
+
+	return std::make_pair(std::error_condition(), std::string());
+}
+
 
 uint8_t nes_vt09_common_base_state::vt_rom_r(offs_t offset)
 {
@@ -150,6 +210,12 @@ void nes_vt09_common_state::vt_external_space_map_512kbyte(address_map &map)
 {
 	map(0x0000000, 0x007ffff).mirror(0x1f80000).r(FUNC(nes_vt09_common_state::vt_rom_r));
 }
+
+void nes_vt09_cart_state::vt_external_space_map_cart(address_map &map)
+{
+	map(0x0000000, 0x01fffff).mirror(0x1e00000).bankr("cartbank");
+}
+
 
 template <uint8_t NUM> uint8_t nes_vt09_common_base_state::extrain_r()
 {
@@ -296,7 +362,17 @@ void nes_vt09_state::nes_vt09_4mb_rasterhack(machine_config& config)
 	m_soc->force_raster_timing_hack();
 }
 
+void nes_vt09_cart_state::nes_vt09_cart(machine_config& config)
+{
+	nes_vt09(config);
+	m_soc->set_addrmap(AS_PROGRAM, &nes_vt09_cart_state::vt_external_space_map_cart);
 
+	GENERIC_CARTSLOT(config, m_cart, generic_plain_slot, "nes_vt_cart");
+	m_cart->set_width(GENERIC_ROM8_WIDTH);
+	m_cart->set_device_load(FUNC(nes_vt09_cart_state::cart_load));
+
+	SOFTWARE_LIST(config, "cart_list").set_original("nes_vt_cart");
+}
 
 static INPUT_PORTS_START( nes_vt09 )
 	PORT_START("IO0")
@@ -461,6 +537,15 @@ ROM_START( timetp25 )
 	ROM_FILL(0x1fce36, 0x01, 0x04 | 0x40) // the code doesn't set the 'alt 4bpp' mode bit, but needs it? why? it isn't hardcoded as the system takes cartridges which don't want it
 ROM_END
 
+ROM_START( wfmotor )
+	ROM_REGION( 0x400000, "mainrom", 0 )
+	ROM_LOAD( "motorcycle.bin", 0x00000, 0x400000, CRC(978f12f0) SHA1(a0230cfe4398d3971d487ff5d4b7107341799424) )
+ROM_END
+
+
+} // anonymous namespace
+
+
 // MSI Entertainment games (MSI previously operated as Majesco Entertainment)
 
 // There are meant to be multiple revisions of this software, some with theme tunes for the new wrestlers, some without. This one appears to lack them.
@@ -493,6 +578,7 @@ CONS( 200?, rcapnp,    0,  0,  nes_vt09_2mb, nes_vt09, nes_vt09_state, empty_ini
 CONS( 200?, dturbogt,  0,  0,  nes_vt09_8mb, nes_vt09, nes_vt09_state, empty_init, "dreamGEAR / JungleTac",                     "Turbo GT 50-in-1", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 CONS( 200?, ventur25,  0,  0,  nes_vt09_4mb, nes_vt09, nes_vt09_state, empty_init, "<unknown> / JungleTac",                     "Venturer '25 Games' 25-in-1", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 CONS( 200?, joypad65,  0,  0,  nes_vt09_8mb, nes_vt09, nes_vt09_state, empty_init, "WinFun / JungleTac",                        "Joypad 65", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+CONS( 200?, wfmotor,   0,  0,  nes_vt09_4mb, nes_vt09, nes_vt09_state, empty_init, "WinFun / JungleTac",                        "Motorcycle 30-in-1", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 CONS( 2005, vgpocket,  0,  0,  nes_vt09_4mb, nes_vt09, nes_vt09_state, empty_init, "Performance Designed Products / JungleTac", "VG Pocket (VG-2000)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 CONS( 200?, vgpmini,   0,  0,  nes_vt09_4mb, nes_vt09, nes_vt09_state, empty_init, "Performance Designed Products / JungleTac", "VG Pocket Mini (VG-1500)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 // VG Pocket Max (VG-2500) (blue case, 75 games)
@@ -505,4 +591,4 @@ CONS( 200?, jl2050,  0,  0,  nes_vt09_16mb,nes_vt09, nes_vt09_state, empty_init,
 // might be VT369 based, if so, move
 CONS( 2018, rbbrite,    0,  0,  nes_vt09_1mb, nes_vt09, nes_vt09_state, empty_init, "Coleco", "Rainbow Brite (mini-arcade)", MACHINE_NOT_WORKING )
 
-CONS( 200?, timetp25, 0,  0,  nes_vt09_2mb, nes_vt09, nes_vt09_state, empty_init, "Timetop", "Super Game 25-in-1 (GM-228)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+CONS( 200?, timetp25, 0,  0,  nes_vt09_cart, nes_vt09, nes_vt09_cart_state, empty_init, "Timetop", "Super Game 25-in-1 (GM-228)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )

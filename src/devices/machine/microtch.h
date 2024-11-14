@@ -15,17 +15,17 @@ public:
 	typedef device_delegate<int (int *, int *)> touch_cb;
 
 	microtouch_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
 	auto stx() { return m_out_stx_func.bind(); }
-
-	DECLARE_WRITE_LINE_MEMBER(rx) { device_serial_interface::rx_w(state); }
-	DECLARE_INPUT_CHANGED_MEMBER(touch);
-
 	template <typename... T> void set_touch_callback(T &&... args) { m_out_touch_cb.set(std::forward<T>(args)...); }
+
+	void rx(int state) { device_serial_interface::rx_w(state); }
+	DECLARE_INPUT_CHANGED_MEMBER(touch);
 
 protected:
 	// device_t implementation
-	virtual ioport_constructor device_input_ports() const override;
-	virtual void device_start() override;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
+	virtual void device_start() override ATTR_COLD;
 
 	// device_serial_interface implementation
 	virtual void tra_callback() override;
@@ -33,7 +33,7 @@ protected:
 	virtual void rcv_complete() override;
 
 	// ROM region (unused, as the device is HLE'd)
-	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 
 	TIMER_CALLBACK_MEMBER(update_output);
 

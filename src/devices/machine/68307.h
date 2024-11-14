@@ -36,27 +36,25 @@ protected:
 	class m68307_mbus;
 	class m68307_timer;
 
-	virtual void device_start() override;
-	virtual void device_reset() override;
-	virtual void device_add_mconfig(machine_config &config) override;
-
-	virtual void m68k_reset_peripherals() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 private:
+	void reset_peripherals(int state);
+
 	void set_ipl(int level);
-	DECLARE_WRITE_LINE_MEMBER(timer0_interrupt);
-	DECLARE_WRITE_LINE_MEMBER(timer1_interrupt);
-	DECLARE_WRITE_LINE_MEMBER(mbus_interrupt);
+	void timer0_interrupt(int state);
+	void timer1_interrupt(int state);
+	void mbus_interrupt(int state);
 
 	uint8_t int_ack(offs_t offset);
 
-	DECLARE_WRITE_LINE_MEMBER(m68307_duart_irq_handler);
-	DECLARE_WRITE_LINE_MEMBER(m68307_duart_txa) { m_write_a_tx(state); }
-	DECLARE_WRITE_LINE_MEMBER(m68307_duart_txb) { m_write_b_tx(state);  }
+	void m68307_duart_irq_handler(int state);
+	void m68307_duart_txa(int state) { m_write_a_tx(state); }
+	void m68307_duart_txb(int state) { m_write_b_tx(state);  }
 	uint8_t m68307_duart_input_r() { return m_read_inport();  }
 	void m68307_duart_output_w(uint8_t data) { m_write_outport(data);  }
-
-	void init16_m68307(address_space &space);
 
 	int calc_cs(offs_t address) const;
 
@@ -71,8 +69,8 @@ private:
 	uint8_t m68307_internal_mbus_r(offs_t offset);
 	void m68307_internal_mbus_w(offs_t offset, uint8_t data);
 
-	void internal_map(address_map &map);
-	void cpu_space_map(address_map &map);
+	void internal_map(address_map &map) ATTR_COLD;
+	void cpu_space_map(address_map &map) ATTR_COLD;
 
 	devcb_write_line m_write_irq, m_write_a_tx, m_write_b_tx;
 	devcb_read8 m_read_inport;

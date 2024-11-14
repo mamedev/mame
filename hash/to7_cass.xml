@@ -1,11 +1,11 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <!--
-license:CC0
+license:CC0-1.0
 
 Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 -->
-<softwarelist name="to7_cass" description="Thomson TO7 &amp; TO7/70 cassetes">
+<softwarelist name="to7_cass" description="Thomson TO7 &amp; TO7/70 cassettes">
 
 	<software name="3duss">
 		<description>3-D USS</description>
@@ -57,7 +57,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="5emeaxea" cloneof="5emeaxe">
-		<description>Le 5eme Axe (Alt)</description>
+		<description>Le 5eme Axe (alt)</description>
 		<year>1986</year>
 		<publisher>Loriciels</publisher>
 
@@ -178,7 +178,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="veracruza" cloneof="veracruz">
-		<description>L'Affaire Vera Cruz (Alt)</description>
+		<description>L'Affaire Vera Cruz (alt)</description>
 		<year>1986</year>
 		<publisher>Infogrames</publisher>
 
@@ -202,7 +202,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="aigleora" cloneof="aigleor">
-		<description>L'Aigle d'Or (Alt)</description>
+		<description>L'Aigle d'Or (alt)</description>
 		<year>1985</year>
 		<publisher>Loriciels</publisher>
 
@@ -216,7 +216,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	<software name="aattack">
 		<description>Air Attack</description>
 		<year>1985</year>
-		<publisher>Microids</publisher>
+		<publisher>Microïds</publisher>
 
 		<part name="cass1" interface="to_cass">
 			<dataarea name="cass" size="50545">
@@ -262,7 +262,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="androida" cloneof="android">
-		<description>Androides (Alt)</description>
+		<description>Androides (alt)</description>
 		<year>1985</year>
 		<publisher>Infogrames</publisher>
 
@@ -293,7 +293,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="anglais1a" cloneof="anglais1">
-		<description>Anglais - Volume 1 (Alt)</description>
+		<description>Anglais - Volume 1 (alt)</description>
 		<year>1984</year>
 		<publisher>VIFI-Nathan</publisher>
 
@@ -331,7 +331,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="anglais2a" cloneof="anglais2">
-		<description>Anglais - Volume 2 (Alt)</description>
+		<description>Anglais - Volume 2 (alt)</description>
 		<year>1984</year>
 		<publisher>VIFI-Nathan</publisher>
 
@@ -443,7 +443,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="arkanoida" cloneof="arkanoid">
-		<description>Arkanoid (Alt)</description>
+		<description>Arkanoid (alt)</description>
 		<year>1987</year>
 		<publisher>France Image Logiciel (FIL)</publisher>
 
@@ -505,7 +505,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	<software name="astrcoup">
 		<description>Astro-Couple</description>
 		<year>1985</year>
-		<publisher>Answare</publisher>
+		<publisher>Answare-Diffusion</publisher>
 
 		<part name="cass1" interface="to_cass">
 			<dataarea name="cass" size="37511">
@@ -570,7 +570,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="ainitbasa" cloneof="ainitbas">
-		<description>Auto-initiation au BASIC TO7 (Alt)</description>
+		<description>Auto-initiation au BASIC TO7 (alt)</description>
 		<year>1984</year>
 		<publisher>Cedic/Nathan - TO TEK International</publisher>
 
@@ -990,7 +990,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="cadavexqa" cloneof="cadavexq">
-		<description>Le Cadavre Exquis de la Grammaire (Alt Tape 3)</description>
+		<description>Le Cadavre Exquis de la Grammaire (alt tape 3)</description>
 		<year>1983</year>
 		<publisher>Edition Informatique Logiciel (EDIL)</publisher>
 
@@ -1161,7 +1161,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="cartefraa" cloneof="cartefra">
-		<description>La Carte de France (Alt)</description>
+		<description>La Carte de France (alt)</description>
 		<year>1983</year>
 		<publisher>VIFI-Nathan</publisher>
 
@@ -1182,7 +1182,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	<software name="cartciel">
 		<description>Carte du Ciel</description>
 		<year>1984</year>
-		<publisher>Answare</publisher>
+		<publisher>Answare-Diffusion</publisher>
 
 		<part name="cass1" interface="to_cass">
 			<dataarea name="cass" size="30649">
@@ -1264,7 +1264,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="chaomegaa" cloneof="chaomega">
-		<description>Chasseur Omega (Alt)</description>
+		<description>Chasseur Omega (alt)</description>
 		<year>1983</year>
 		<publisher>Infogrames</publisher>
 
@@ -1312,7 +1312,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="chenill1a" cloneof="chenill1">
-		<description>Chenille (Sylvain Huet, Password Required)</description>
+		<description>Chenille (Sylvain Huet, password required)</description>
 		<year>198?</year>
 		<publisher>Sylvain Huet</publisher>
 
@@ -1420,7 +1420,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="codessc">
-		<description>Code-ssc (Password Required)</description>
+		<description>Code-ssc (password required)</description>
 		<year>198?</year>
 		<publisher>Sylvain Huet</publisher>
 
@@ -1456,7 +1456,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="coliseuma" cloneof="coliseum">
-		<description>Coliseum (Alt)</description>
+		<description>Coliseum (alt)</description>
 		<year>1985</year>
 		<publisher>Loriciels</publisher>
 
@@ -1492,7 +1492,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="comptrona" cloneof="comptron">
-		<description>Le Compte est Rond (Alt)</description>
+		<description>Le Compte est Rond (alt)</description>
 		<year>1984</year>
 		<publisher>Hatier</publisher>
 
@@ -1540,7 +1540,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="contea" cloneof="conte">
-		<description>Conte (Alt, Split?)</description>
+		<description>Conte (alt, split?)</description>
 		<year>1985</year>
 		<publisher>France Image Logiciel (FIL)</publisher>
 
@@ -1590,7 +1590,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	<software name="courrier">
 		<description>Courrier</description>
 		<year>1984</year>
-		<publisher>Answare</publisher>
+		<publisher>Answare-Diffusion</publisher>
 
 		<part name="cass1" interface="to_cass">
 			<dataarea name="cass" size="21360">
@@ -1624,7 +1624,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="crystanna" cloneof="crystann">
-		<description>Crystann (Alt)</description>
+		<description>Crystann (alt)</description>
 		<year>1985</year>
 		<publisher>Loriciels</publisher>
 
@@ -1648,7 +1648,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="cyberlaba" cloneof="cyberlab">
-		<description>Cyberlab (Alt)</description>
+		<description>Cyberlab (alt)</description>
 		<year>1984</year>
 		<publisher>TO TEK International</publisher>
 
@@ -1768,7 +1768,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="sauterela" cloneof="sauterel">
-		<description>Dialogue avec une sauterelle (Alt)</description>
+		<description>Dialogue avec une sauterelle (alt)</description>
 		<year>1983</year>
 		<publisher>VIFI-Nathan</publisher>
 
@@ -1780,7 +1780,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="sauterelb" cloneof="sauterel">
-		<description>Dialogue avec une sauterelle (Alt 2)</description>
+		<description>Dialogue avec une sauterelle (alt 2)</description>
 		<year>1983</year>
 		<publisher>VIFI-Nathan</publisher>
 
@@ -1828,7 +1828,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="dicologoa" cloneof="dicologo">
-		<description>Dicologo (Alt)</description>
+		<description>Dicologo (alt)</description>
 		<year>1985</year>
 		<publisher>Act Informatique</publisher>
 
@@ -1920,7 +1920,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="dieuxstaa" cloneof="dieuxsta">
-		<description>Les Dieux du Stade (Alt)</description>
+		<description>Les Dieux du Stade (alt)</description>
 		<year>1985</year>
 		<publisher>Infogrames</publisher>
 
@@ -2150,7 +2150,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="eliminata" cloneof="eliminat">
-		<description>Eliminator (Alt)</description>
+		<description>Eliminator (alt)</description>
 		<year>1984</year>
 		<publisher>Loriciels</publisher>
 
@@ -2307,7 +2307,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="subjoncta" cloneof="subjonct">
-		<description>Emploi du Subjonctif (Alt)</description>
+		<description>Emploi du Subjonctif (alt)</description>
 		<year>198?</year>
 		<publisher>Centre National de Documentation Pedagogique (CNDP)</publisher>
 
@@ -2340,7 +2340,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	<software name="enigmati">
 		<description>Enigmatika</description>
 		<year>1984</year>
-		<publisher>Answare</publisher>
+		<publisher>Answare-Diffusion</publisher>
 
 		<part name="cass1" interface="to_cass">
 			<feature name="part_id" value="Tape 1"/>
@@ -2375,9 +2375,9 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="enigmatia" cloneof="enigmati">
-		<description>Enigmatika (Alt)</description>
+		<description>Enigmatika (alt)</description>
 		<year>1984</year>
-		<publisher>Answare</publisher>
+		<publisher>Answare-Diffusion</publisher>
 
 		<part name="cass1" interface="to_cass">
 			<feature name="part_id" value="Tape 1"/>
@@ -2469,7 +2469,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	<software name="eparempr">
 		<description>Epargne - Emprunt</description>
 		<year>1984</year>
-		<publisher>Answare</publisher>
+		<publisher>Answare-Diffusion</publisher>
 
 		<part name="cass1" interface="to_cass">
 			<dataarea name="cass" size="15195">
@@ -2551,7 +2551,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="fbia" cloneof="fbi">
-		<description>F.B.I. (Alt)</description>
+		<description>F.B.I. (alt)</description>
 		<year>1984</year>
 		<publisher>Infogrames</publisher>
 
@@ -2563,7 +2563,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="fbib" cloneof="fbi">
-		<description>F.B.I. (Alt 2)</description>
+		<description>F.B.I. (alt 2)</description>
 		<year>1984</year>
 		<publisher>Infogrames</publisher>
 
@@ -2575,7 +2575,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="fbic" cloneof="fbi">
-		<description>F.B.I. (Alt 3)</description>
+		<description>F.B.I. (alt 3)</description>
 		<year>1984</year>
 		<publisher>Infogrames</publisher>
 
@@ -2801,7 +2801,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="fractals">
-		<description>Fractals (Source Code)</description>
+		<description>Fractals (source code)</description>
 		<year>198?</year>
 		<publisher>Sylvain Huet</publisher>
 
@@ -2813,7 +2813,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="cegram1">
-		<description>Francais - Grammaire et Orthographe (1) - CE</description>
+		<description>Français - Grammaire et Orthographe (1) - CE</description>
 		<year>1985</year>
 		<publisher>VIFI-Nathan</publisher>
 
@@ -2832,7 +2832,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="ceaccord">
-		<description>Francais CE - Grammaire et Orthographe (1) - Accord Parfait</description>
+		<description>Français CE - Grammaire et Orthographe (1) - Accord Parfait</description>
 		<year>1985</year>
 		<publisher>VIFI-Nathan</publisher>
 
@@ -2844,7 +2844,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="cemotscr">
-		<description>Francais CE - Grammaire et Orthographe (1) - Mots Croises Images</description>
+		<description>Français CE - Grammaire et Orthographe (1) - Mots Croises Images</description>
 		<year>1985</year>
 		<publisher>VIFI-Nathan</publisher>
 
@@ -2856,7 +2856,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="cecmatel">
-		<description>Francais CE/CM - Aide a l'Orthographe - Atelier des phrases</description>
+		<description>Français CE/CM - Aide a l'Orthographe - Atelier des phrases</description>
 		<year>1985</year>
 		<publisher>VIFI-Nathan</publisher>
 
@@ -2868,7 +2868,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="cecmatela" cloneof="cecmatel">
-		<description>Francais CE/CM - Aide a l'Orthographe - Atelier des phrases (Alt)</description>
+		<description>Français CE/CM - Aide a l'Orthographe - Atelier des phrases (alt)</description>
 		<year>1985</year>
 		<publisher>VIFI-Nathan</publisher>
 
@@ -2880,7 +2880,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="cecmponc">
-		<description>Francais CE/CM - Aide a l'Orthographe - Ponctuation</description>
+		<description>Français CE/CM - Aide a l'Orthographe - Ponctuation</description>
 		<year>1985</year>
 		<publisher>VIFI-Nathan</publisher>
 
@@ -2892,7 +2892,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="cecmponca" cloneof="cecmponc">
-		<description>Francais CE/CM - Aide a l'Orthographe - Ponctuation (Alt)</description>
+		<description>Français CE/CM - Aide a l'Orthographe - Ponctuation (alt)</description>
 		<year>1985</year>
 		<publisher>VIFI-Nathan</publisher>
 
@@ -2904,7 +2904,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="ce1conju">
-		<description>Francais CE1 - Grammaire et Orthographe (2) - Conjugaison</description>
+		<description>Français CE1 - Grammaire et Orthographe (2) - Conjugaison</description>
 		<year>1985</year>
 		<publisher>VIFI-Nathan</publisher>
 
@@ -2916,7 +2916,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="cmchenil">
-		<description>Francais CM - Grammaire et vocabulaire (1) - Chenille Savante</description>
+		<description>Français CM - Grammaire et vocabulaire (1) - Chenille Savante</description>
 		<year>1985</year>
 		<publisher>VIFI-Nathan</publisher>
 
@@ -2928,7 +2928,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="cmclass">
-		<description>Francais CM - Grammaire et vocabulaire (2) - Classement Alphabetique</description>
+		<description>Français CM - Grammaire et vocabulaire (2) - Classement Alphabetique</description>
 		<year>1985</year>
 		<publisher>VIFI-Nathan</publisher>
 
@@ -2940,7 +2940,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="cmapi">
-		<description>Francais CM - Vocabulaire et orthographe - A.P.I.</description>
+		<description>Français CM - Vocabulaire et orthographe - A.P.I.</description>
 		<year>1985</year>
 		<publisher>VIFI-Nathan</publisher>
 
@@ -2952,7 +2952,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="cm26emem">
-		<description>Francais CM2/6eme - Vocabulaire et Orthographe - Memotex</description>
+		<description>Français CM2/6eme - Vocabulaire et Orthographe - Memotex</description>
 		<year>1985</year>
 		<publisher>VIFI-Nathan</publisher>
 
@@ -2964,7 +2964,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="cm26esyn">
-		<description>Francais CM2/6eme - Vocabulaire et orthographe - Synonymes &amp; Contraires</description>
+		<description>Français CM2/6eme - Vocabulaire et orthographe - Synonymes &amp; Contraires</description>
 		<year>1985</year>
 		<publisher>VIFI-Nathan</publisher>
 
@@ -2976,7 +2976,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="cploto">
-		<description>Francais CP - Aide a la lecture (2) - Loto</description>
+		<description>Français CP - Aide a la lecture (2) - Loto</description>
 		<year>1985</year>
 		<publisher>VIFI-Nathan</publisher>
 
@@ -2988,7 +2988,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="cpmemoje">
-		<description>Francais CP - Aide a la Lecture (2) - Memo-Jeu</description>
+		<description>Français CP - Aide a la Lecture (2) - Memo-Jeu</description>
 		<year>1985</year>
 		<publisher>VIFI-Nathan</publisher>
 
@@ -3000,7 +3000,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="cpfamile">
-		<description>Francais CP - Aide a la Lecture - Famille</description>
+		<description>Français CP - Aide a la Lecture - Famille</description>
 		<year>1985</year>
 		<publisher>VIFI-Nathan</publisher>
 
@@ -3012,7 +3012,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="cptrain">
-		<description>Francais CP - Aide a la Lecture - Le train de la Lecture</description>
+		<description>Français CP - Aide a la Lecture - Le train de la Lecture</description>
 		<year>1985</year>
 		<publisher>VIFI-Nathan</publisher>
 
@@ -3024,7 +3024,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="cpcealer">
-		<description>Francais CP/CE - Aide a la Lecture - Alerte</description>
+		<description>Français CP/CE - Aide a la Lecture - Alerte</description>
 		<year>1985</year>
 		<publisher>VIFI-Nathan</publisher>
 
@@ -3036,7 +3036,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="cpcepele">
-		<description>Francais CP/CE - Aide a la Lecture - Pele-Mele</description>
+		<description>Français CP/CE - Aide a la Lecture - Pele-Mele</description>
 		<year>1985</year>
 		<publisher>VIFI-Nathan</publisher>
 
@@ -3048,7 +3048,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="cpcerada">
-		<description>Francais CP/CE - Aide a la Lecture - Radar</description>
+		<description>Français CP/CE - Aide a la Lecture - Radar</description>
 		<year>1985</year>
 		<publisher>VIFI-Nathan</publisher>
 
@@ -3120,7 +3120,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="gasp8x8">
-		<description>Gasp 8x8 (Source Code)</description>
+		<description>Gasp 8x8 (source code)</description>
 		<year>198?</year>
 		<publisher>Sylvain Huet</publisher>
 
@@ -3235,7 +3235,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="grandsaua" cloneof="grandsau">
-		<description>Le Grand Saut (Alt)</description>
+		<description>Le Grand Saut (alt)</description>
 		<year>1987</year>
 		<publisher>Coktel Vision</publisher>
 
@@ -3283,7 +3283,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="greenbera" cloneof="greenber">
-		<description>Green Beret (Alt)</description>
+		<description>Green Beret (alt)</description>
 		<year>1986</year>
 		<publisher>France Image Logiciel (FIL)</publisher>
 
@@ -3295,7 +3295,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="greenberb" cloneof="greenber">
-		<description>Green Beret (Alt 2)</description>
+		<description>Green Beret (alt 2)</description>
 		<year>1986</year>
 		<publisher>France Image Logiciel (FIL)</publisher>
 
@@ -3387,7 +3387,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="helicosr">
-		<description>Helico (Source Code)</description>
+		<description>Helico (source code)</description>
 		<year>198?</year>
 		<publisher>Sylvain Huet</publisher>
 
@@ -3490,7 +3490,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 		</part>
 		<part name="cass2" interface="to_cass">
 			<feature name="part_id" value="Side B"/>
-			<dataarea name="cass" size="0">
+			<dataarea name="cass" size="1">
 				<rom name="image-et-signes-2_to7.k7" size="0" crc="00000000" status="nodump" />
 			</dataarea>
 		</part>
@@ -3609,7 +3609,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="einfubas" cloneof="initbas">
-		<description>Einfuehrung in Basic (Ger)</description>
+		<description>Einfuehrung in Basic (Germany)</description>
 		<year>1985</year>
 		<publisher>Infogrames</publisher>
 
@@ -4340,7 +4340,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="karatea" cloneof="karate">
-		<description>Karate (Alt)</description>
+		<description>Karate (alt)</description>
 		<year>1985</year>
 		<publisher>Infogrames</publisher>
 
@@ -4503,7 +4503,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="lasvegasa" cloneof="lasvegas">
-		<description>Las Vegas (Alt)</description>
+		<description>Las Vegas (alt)</description>
 		<year>1985</year>
 		<publisher>Infogrames</publisher>
 
@@ -4674,7 +4674,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="folibusa" cloneof="folibus">
-		<description>Maison du Pr. Folibus (Alt)</description>
+		<description>Maison du Pr. Folibus (alt)</description>
 		<year>198?</year>
 		<publisher>Sylvain Huet</publisher>
 
@@ -4698,7 +4698,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="malthaara" cloneof="malthaar">
-		<description>La Malediction de Thaar (Alt)</description>
+		<description>La Malediction de Thaar (alt)</description>
 		<year>1986</year>
 		<publisher>Coktel Vision</publisher>
 
@@ -4760,7 +4760,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="mandrago_de" cloneof="mandrago">
-		<description>Mandragore (Ger)</description>
+		<description>Mandragore (Germany)</description>
 		<year>1985</year>
 		<publisher>Infogrames</publisher>
 
@@ -4851,7 +4851,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="cecmgeom">
-		<description>Mathematiques - Geometrie CE/CM</description>
+		<description>Mathématiques - Geometrie CE/CM</description>
 		<year>1985</year>
 		<publisher>VIFI-Nathan</publisher>
 
@@ -4870,7 +4870,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="calccarr">
-		<description>Mathematiques Calculs - Carre Magique</description>
+		<description>Mathématiques Calculs - Carre Magique</description>
 		<year>1984</year>
 		<publisher>Nathan Ecoles</publisher>
 
@@ -4882,7 +4882,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="calcinva">
-		<description>Mathematiques Calculs - Invasion des Chiffres</description>
+		<description>Mathématiques Calculs - Invasion des Chiffres</description>
 		<year>1984</year>
 		<publisher>Nathan Ecoles</publisher>
 
@@ -4894,7 +4894,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="calcmult">
-		<description>Mathematiques Calculs - Multiplication</description>
+		<description>Mathématiques Calculs - Multiplication</description>
 		<year>1984</year>
 		<publisher>Nathan Ecoles</publisher>
 
@@ -4906,7 +4906,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="calcrang">
-		<description>Mathematiques Calculs - Ranger des Nombres</description>
+		<description>Mathématiques Calculs - Ranger des Nombres</description>
 		<year>1984</year>
 		<publisher>Nathan Ecoles</publisher>
 
@@ -4918,7 +4918,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="ceavant">
-		<description>Mathematiques CE - Avant et Apres</description>
+		<description>Mathématiques CE - Avant et Apres</description>
 		<year>1985</year>
 		<publisher>VIFI-Nathan</publisher>
 
@@ -4930,7 +4930,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="ceprodui">
-		<description>Mathematiques CE - Produits et Surfaces</description>
+		<description>Mathématiques CE - Produits et Surfaces</description>
 		<year>1985</year>
 		<publisher>VIFI-Nathan</publisher>
 
@@ -4942,7 +4942,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="cecmgolf">
-		<description>Mathematiques CE/CM - Golf</description>
+		<description>Mathématiques CE/CM - Golf</description>
 		<year>1985</year>
 		<publisher>VIFI-Nathan</publisher>
 
@@ -4954,7 +4954,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="cmaires">
-		<description>Mathematiques CM - Mesures et grandeurs - Aires et Volumes</description>
+		<description>Mathématiques CM - Mesures et grandeurs - Aires et Volumes</description>
 		<year>1985</year>
 		<publisher>VIFI-Nathan</publisher>
 
@@ -4973,7 +4973,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="cmmesure">
-		<description>Mathematiques CM - Mesures et grandeurs - Mesure du Temps</description>
+		<description>Mathématiques CM - Mesures et grandeurs - Mesure du Temps</description>
 		<year>1985</year>
 		<publisher>VIFI-Nathan</publisher>
 
@@ -4985,7 +4985,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="cpmoins">
-		<description>Mathematiques CP - Moins, Autant, Plus</description>
+		<description>Mathématiques CP - Moins, Autant, Plus</description>
 		<year>1985</year>
 		<publisher>VIFI-Nathan</publisher>
 
@@ -4997,7 +4997,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="cppromen">
-		<description>Mathematiques CP - Promenade</description>
+		<description>Mathématiques CP - Promenade</description>
 		<year>1985</year>
 		<publisher>VIFI-Nathan</publisher>
 
@@ -5009,7 +5009,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="cppuzzle">
-		<description>Mathematiques CP - Puzzle</description>
+		<description>Mathématiques CP - Puzzle</description>
 		<year>1985</year>
 		<publisher>VIFI-Nathan</publisher>
 
@@ -5021,7 +5021,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="cpcefris">
-		<description>Mathematiques CP/CE - Frises</description>
+		<description>Mathématiques CP/CE - Frises</description>
 		<year>1985</year>
 		<publisher>VIFI-Nathan</publisher>
 
@@ -5033,7 +5033,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="cpcesyme">
-		<description>Mathematiques CP/CE - Symetries et Translations</description>
+		<description>Mathématiques CP/CE - Symetries et Translations</description>
 		<year>1985</year>
 		<publisher>VIFI-Nathan</publisher>
 
@@ -5045,7 +5045,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="cpcetabl">
-		<description>Mathematiques CP/CE - Tables d'operations</description>
+		<description>Mathématiques CP/CE - Tables d'operations</description>
 		<year>1985</year>
 		<publisher>VIFI-Nathan</publisher>
 
@@ -5168,7 +5168,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="micrjeuxa" cloneof="micrjeux">
-		<description>Microjeux - Cocktail de Jeux (Alt)</description>
+		<description>Microjeux - Cocktail de Jeux (alt)</description>
 		<year>1984</year>
 		<publisher>VIFI-Nathan</publisher>
 
@@ -5192,7 +5192,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="minediama" cloneof="minediam">
-		<description>La Mine aux Diamants (Alt)</description>
+		<description>La Mine aux Diamants (alt)</description>
 		<year>1986</year>
 		<publisher>Infogrames</publisher>
 
@@ -5216,7 +5216,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="mine2049a" cloneof="mine2049">
-		<description>Miner 2049er (Alt)</description>
+		<description>Miner 2049er (alt)</description>
 		<year>1985</year>
 		<publisher>France Image Logiciel (FIL)</publisher>
 
@@ -5264,7 +5264,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="minota3da" cloneof="minota3d">
-		<description>Minotaure 3D (Alt)</description>
+		<description>Minotaure 3D (alt)</description>
 		<year>1985</year>
 		<publisher>Loriciels</publisher>
 
@@ -5312,7 +5312,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="missrafaa" cloneof="missrafa">
-		<description>Missions en Rafale (Alt)</description>
+		<description>Missions en Rafale (alt)</description>
 		<year>1987</year>
 		<publisher>France Image Logiciel (FIL)</publisher>
 
@@ -5324,7 +5324,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="missrafab" cloneof="missrafa">
-		<description>Missions en Rafale (Alt 2)</description>
+		<description>Missions en Rafale (alt 2)</description>
 		<year>1987</year>
 		<publisher>France Image Logiciel (FIL)</publisher>
 
@@ -5348,7 +5348,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="monopolc_de" cloneof="monopolc">
-		<description>Monopolic (Ger)</description>
+		<description>Monopolic (Germany)</description>
 		<year>1985</year>
 		<publisher>Free Game Blot</publisher>
 
@@ -5372,7 +5372,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="monopolya" cloneof="monopoly">
-		<description>Monopoly (Alt)</description>
+		<description>Monopoly (alt)</description>
 		<year>1986</year>
 		<publisher>France Image Logiciel (FIL)</publisher>
 
@@ -5476,7 +5476,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="naval">
-		<description>Naval (Password Required)</description>
+		<description>Naval (password required)</description>
 		<year>198?</year>
 		<publisher>Sylvain Huet</publisher>
 
@@ -5512,7 +5512,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="nuittempa" cloneof="nuittemp">
-		<description>La Nuit des Templiers (Alt)</description>
+		<description>La Nuit des Templiers (alt)</description>
 		<year>1986</year>
 		<publisher>France Image Logiciel (FIL)</publisher>
 
@@ -5578,7 +5578,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	<software name="oceania">
 		<description>Oceania</description>
 		<year>1985</year>
-		<publisher>Microids</publisher>
+		<publisher>Microïds</publisher>
 
 		<part name="cass1" interface="to_cass">
 			<dataarea name="cass" size="35088">
@@ -5703,7 +5703,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="orthcrk3a" cloneof="orthcrk3">
-		<description>Orthocrack 3 (Alt)</description>
+		<description>Orthocrack 3 (alt)</description>
 		<year>1984</year>
 		<publisher>Hatier</publisher>
 
@@ -5715,7 +5715,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="othelsrc">
-		<description>Othello (Source Code)</description>
+		<description>Othello (source code)</description>
 		<year>198?</year>
 		<publisher>Sylvain Huet</publisher>
 
@@ -5739,7 +5739,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="othelloa" cloneof="othello">
-		<description>Othello (Alt)</description>
+		<description>Othello (alt)</description>
 		<year>198?</year>
 		<publisher>Sylvain Huet</publisher>
 
@@ -5751,7 +5751,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="othellob" cloneof="othello">
-		<description>Othello (Alt 2)</description>
+		<description>Othello (alt 2)</description>
 		<year>198?</year>
 		<publisher>Sylvain Huet</publisher>
 
@@ -6115,7 +6115,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="pingoa" cloneof="pingo">
-		<description>Pingo (Alt)</description>
+		<description>Pingo (alt)</description>
 		<year>1983</year>
 		<publisher>Infogrames</publisher>
 
@@ -6139,9 +6139,9 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="epargne">
-		<description>Les Placements d'Epargne</description>
+		<description>Les Placements d'Épargne - Gérez le Patrimoine de Tante Ursule</description>
 		<year>1984</year>
-		<publisher>Answare</publisher>
+		<publisher>Answare-Diffusion</publisher>
 
 		<part name="cass1" interface="to_cass">
 			<dataarea name="cass" size="13808">
@@ -6151,7 +6151,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="planetin">
-		<description>La Planete Inconnue</description>
+		<description>La Planète Inconnue</description>
 		<year>1985</year>
 		<publisher>France Image Logiciel (FIL)</publisher>
 
@@ -6259,7 +6259,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="poker1">
-		<description>Poker (Unknown 1)</description>
+		<description>Poker (unknown 1)</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 
@@ -6271,7 +6271,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="poker2">
-		<description>Poker (Unknown 2)</description>
+		<description>Poker (unknown 2)</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 
@@ -6307,9 +6307,9 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="poliecon">
-		<description>Politique Economique</description>
+		<description>Politique Économique</description>
 		<year>1984</year>
-		<publisher>Answare</publisher>
+		<publisher>Answare-Diffusion</publisher>
 
 		<part name="cass1" interface="to_cass">
 			<dataarea name="cass" size="22495">
@@ -6446,7 +6446,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="pouvoira" cloneof="pouvoir">
-		<description>Pouvoir (Alt)</description>
+		<description>Pouvoir (alt)</description>
 		<year>1986</year>
 		<publisher>Loriciels</publisher>
 
@@ -6518,7 +6518,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="pulsar2a" cloneof="pulsar2">
-		<description>Pulsar II (Alt)</description>
+		<description>Pulsar II (alt)</description>
 		<year>1984</year>
 		<publisher>Loriciels</publisher>
 
@@ -6638,7 +6638,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="reversea" cloneof="reverse">
-		<description>Reverse (Alt)</description>
+		<description>Reverse (alt)</description>
 		<year>198?</year>
 		<publisher>Gasoline Software</publisher>
 
@@ -6676,7 +6676,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	<software name="rodeo">
 		<description>Rodeo</description>
 		<year>1986</year>
-		<publisher>Microids</publisher>
+		<publisher>Microïds</publisher>
 
 		<part name="cass1" interface="to_cass">
 			<dataarea name="cass" size="44635">
@@ -6729,7 +6729,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="rotorwara" cloneof="rotorwar">
-		<description>Rotorwar (No Loader Screen)</description>
+		<description>Rotorwar (no loader screen)</description>
 		<year>1984</year>
 		<publisher>VIFI-Nathan</publisher>
 
@@ -6858,7 +6858,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="scarfinga" cloneof="scarfing">
-		<description>Scarfinger (Alt)</description>
+		<description>Scarfinger (alt)</description>
 		<year>1985</year>
 		<publisher>Nice Ideas</publisher>
 
@@ -7004,7 +7004,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	<software name="solenoir">
 		<description>Soleil Noir</description>
 		<year>1985</year>
-		<publisher>Microids</publisher>
+		<publisher>Microïds</publisher>
 
 		<part name="cass1" interface="to_cass">
 			<dataarea name="cass" size="35862">
@@ -7062,7 +7062,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="sorcerya" cloneof="sorcery">
-		<description>Sorcery (Alt)</description>
+		<description>Sorcery (alt)</description>
 		<year>1986</year>
 		<publisher>France Image Logiciel (FIL)</publisher>
 
@@ -7074,7 +7074,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="sorceryb" cloneof="sorcery">
-		<description>Sorcery (Alt 2)</description>
+		<description>Sorcery (alt 2)</description>
 		<year>1986</year>
 		<publisher>France Image Logiciel (FIL)</publisher>
 
@@ -7086,7 +7086,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="sorceryc" cloneof="sorcery">
-		<description>Sorcery (Alt 3)</description>
+		<description>Sorcery (alt 3)</description>
 		<year>1986</year>
 		<publisher>France Image Logiciel (FIL)</publisher>
 
@@ -7110,7 +7110,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="sortilega" cloneof="sortileg">
-		<description>Sortileges (Alt)</description>
+		<description>Sortileges (alt)</description>
 		<year>1986</year>
 		<publisher>Infogrames</publisher>
 
@@ -7122,7 +7122,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="sortilegb" cloneof="sortileg">
-		<description>Sortileges (Alt 2)</description>
+		<description>Sortileges (alt 2)</description>
 		<year>1986</year>
 		<publisher>Infogrames</publisher>
 
@@ -7134,7 +7134,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="sortilegc" cloneof="sortileg">
-		<description>Sortileges (Alt 3)</description>
+		<description>Sortileges (alt 3)</description>
 		<year>1986</year>
 		<publisher>Infogrames</publisher>
 
@@ -7302,7 +7302,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="strip21a" cloneof="strip21">
-		<description>Strip 21 (Alt)</description>
+		<description>Strip 21 (alt)</description>
 		<year>1985</year>
 		<publisher>Patrick Lahbib</publisher>
 
@@ -7333,7 +7333,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="sujeta" cloneof="sujet">
-		<description>Sujet/Complement (Alt)</description>
+		<description>Sujet/Complement (alt)</description>
 		<year>1987</year>
 		<publisher>Carraz Editions</publisher>
 
@@ -7366,7 +7366,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	<software name="stennisa" cloneof="stennis">
 		<description>Super Tennis (Answare)</description>
 		<year>1985</year>
-		<publisher>Answare</publisher>
+		<publisher>Answare-Diffusion</publisher>
 
 		<part name="cass1" interface="to_cass">
 			<dataarea name="cass" size="19774">
@@ -7472,7 +7472,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="quauhtlia" cloneof="quauhtli">
-		<description>Le Temple de Quauhtli (Alt)</description>
+		<description>Le Temple de Quauhtli (alt)</description>
 		<year>1986</year>
 		<publisher>Loriciels</publisher>
 
@@ -7605,7 +7605,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="toutankha" cloneof="toutankh">
-		<description>Toutankhamon (Alt)</description>
+		<description>Toutankhamon (alt)</description>
 		<year>1985</year>
 		<publisher>No Man's Land</publisher>
 
@@ -7667,7 +7667,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="trona" cloneof="tron">
-		<description>Tron (Password Required)</description>
+		<description>Tron (password required)</description>
 		<year>198?</year>
 		<publisher>Sylvain Huet</publisher>
 
@@ -7758,7 +7758,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="vampirea" cloneof="vampire">
-		<description>Vampire (Alt)</description>
+		<description>Vampire (alt)</description>
 		<year>1986</year>
 		<publisher>Infogrames</publisher>
 
@@ -7770,7 +7770,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="vampireb" cloneof="vampire">
-		<description>Vampire (Alt 2)</description>
+		<description>Vampire (alt 2)</description>
 		<year>1986</year>
 		<publisher>Infogrames</publisher>
 
@@ -7782,7 +7782,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="vampirec" cloneof="vampire">
-		<description>Vampire (Alt 3)</description>
+		<description>Vampire (alt 3)</description>
 		<year>1986</year>
 		<publisher>Infogrames</publisher>
 
@@ -7856,7 +7856,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	<software name="votrauto">
 		<description>Votre Auto</description>
 		<year>1984</year>
-		<publisher>Answare</publisher>
+		<publisher>Answare-Diffusion</publisher>
 
 		<part name="cass1" interface="to_cass">
 			<dataarea name="cass" size="19049">
@@ -7916,7 +7916,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	<software name="xray">
 		<description>X-Ray</description>
 		<year>1986</year>
-		<publisher>Microids</publisher>
+		<publisher>Microïds</publisher>
 
 		<part name="cass1" interface="to_cass">
 			<dataarea name="cass" size="20372977">
@@ -7926,9 +7926,9 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="xraya" cloneof="xray">
-		<description>X-Ray (Alt)</description>
+		<description>X-Ray (alt)</description>
 		<year>1986</year>
-		<publisher>Microids</publisher>
+		<publisher>Microïds</publisher>
 
 		<part name="cass1" interface="to_cass">
 			<dataarea name="cass" size="32924">
@@ -7950,7 +7950,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="yetia" cloneof="yeti">
-		<description>Yeti (Alt)</description>
+		<description>Yeti (alt)</description>
 		<year>1984</year>
 		<publisher>Loriciels</publisher>
 
@@ -7974,7 +7974,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="yiear2a" cloneof="yiear2">
-		<description>Yie Ar Kung Fu II (Alt)</description>
+		<description>Yie Ar Kung Fu II (alt)</description>
 		<year>1986</year>
 		<publisher>France Image Logiciel (FIL)</publisher>
 

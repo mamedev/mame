@@ -53,14 +53,11 @@ uint16_t dectalk_isa_device::host_irq_r()
 
 uint8_t dectalk_isa_device::dma_r()
 {
-	if (!machine().side_effects_disabled())
-		m_cpu->drq1_w(0);
 	return m_dma;
 }
 
 void dectalk_isa_device::dma_w(uint8_t data)
 {
-	m_cpu->drq1_w(0);
 	m_dma = data;
 }
 
@@ -88,7 +85,6 @@ void dectalk_isa_device::output_ctl_w(uint16_t data)
 uint16_t dectalk_isa_device::dsp_dma_r()
 {
 	m_bio = ASSERT_LINE;
-	m_cpu->drq1_w(0);
 	return m_dsp_dma;
 }
 
@@ -98,11 +94,11 @@ void dectalk_isa_device::dsp_dma_w(uint16_t data)
 	m_dsp_dma = data;
 }
 
-READ_LINE_MEMBER(dectalk_isa_device::bio_line_r)
+int dectalk_isa_device::bio_line_r()
 {
 	// TODO: reading the bio line doesn't cause any direct external effects so this is wrong
 	if(m_bio == ASSERT_LINE)
-		m_cpu->drq0_w(1);
+		m_cpu->dma_sync_req(0);
 	return m_bio;
 }
 
@@ -111,7 +107,7 @@ void dectalk_isa_device::irq_line_w(uint16_t data)
 	m_cpu->int1_w(0);
 }
 
-WRITE_LINE_MEMBER(dectalk_isa_device::clock_w)
+void dectalk_isa_device::clock_w(int state)
 {
 	m_dsp->set_input_line(INPUT_LINE_IRQ0, (!(m_ctl & 0x20) || state) ? CLEAR_LINE : ASSERT_LINE);
 }
@@ -159,18 +155,18 @@ const tiny_rom_entry* dectalk_isa_device::device_rom_region() const
 
 void dectalk_isa_device::device_add_mconfig(machine_config &config)
 {
-	I80186(config, m_cpu, XTAL(20'000'000));
+	I80186(config, m_cpu, 20_MHz_XTAL);
 	m_cpu->set_addrmap(AS_PROGRAM, &dectalk_isa_device::dectalk_cpu_map);
 	m_cpu->set_addrmap(AS_IO, &dectalk_isa_device::dectalk_cpu_io);
 	m_cpu->tmrout0_handler().set(FUNC(dectalk_isa_device::clock_w));
 
-	TMS32015(config, m_dsp, XTAL(20'000'000));
+	TMS32015(config, m_dsp, 80'000'000); // the a 20MHz oscillator is present - clock frequency hacked to make it "work"
 	m_dsp->set_addrmap(AS_PROGRAM, &dectalk_isa_device::dectalk_dsp_map);
 	m_dsp->set_addrmap(AS_IO, &dectalk_isa_device::dectalk_dsp_io);
 	m_dsp->bio().set(FUNC(dectalk_isa_device::bio_line_r));
 
 	SPEAKER(config, "speaker").front_center();
-	DAC_12BIT_R2R(config, m_dac, 0).add_route(0, "speaker", 1.0); // unknown DAC
+	DAC_12BIT_R2R_TWOS_COMPLEMENT(config, m_dac, 0).add_route(0, "speaker", 1.0); // AD7541 DAC
 }
 
 void dectalk_isa_device::write(offs_t offset, uint8_t data)
@@ -191,7 +187,7 @@ void dectalk_isa_device::write(offs_t offset, uint8_t data)
 			break;
 		case 4:
 			m_dma = data;
-			m_cpu->drq1_w(1);
+			m_cpu->dma_sync_req(1);
 			break;
 		case 6:
 			m_cpu->int1_w(1);
@@ -213,7 +209,7 @@ uint8_t dectalk_isa_device::read(offs_t offset)
 			return m_data >> 8;
 		case 4:
 			if (!machine().side_effects_disabled())
-				m_cpu->drq1_w(1);
+				m_cpu->dma_sync_req(1);
 			return m_dma;
 	}
 	return 0;

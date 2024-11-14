@@ -119,17 +119,17 @@ void cpc_rs232_device::device_reset()
 }
 
 
-WRITE_LINE_MEMBER(cpc_rs232_device::pit_out0_w)
+void cpc_rs232_device::pit_out0_w(int state)
 {
 	m_dart->txca_w(state);
 }
 
-WRITE_LINE_MEMBER(cpc_rs232_device::pit_out1_w)
+void cpc_rs232_device::pit_out1_w(int state)
 {
 	m_dart->rxca_w(state);
 }
 
-WRITE_LINE_MEMBER(cpc_rs232_device::pit_out2_w)
+void cpc_rs232_device::pit_out2_w(int state)
 {
 	m_dart->txcb_w(state);
 	m_dart->rxcb_w(state);

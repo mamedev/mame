@@ -34,8 +34,6 @@ clock_device::clock_device(const machine_config &mconfig, const char *tag, devic
 
 void clock_device::device_start()
 {
-	m_signal_handler.resolve_safe();
-
 	save_item(NAME(m_signal));
 	save_item(NAME(m_output));
 	save_item(NAME(m_duty));

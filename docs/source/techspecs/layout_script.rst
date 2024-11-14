@@ -36,9 +36,8 @@ Practical examples
 Before diving into the technical details of how it works, we’ll start with some
 example layout files using Lua script for enhancement.  It’s assumed that you’re
 familiar with MAME’s artwork system and have a basic understanding of Lua
-scripting.  For details on MAME’s layout file, see :ref:`layfile`; for an
-introduction to Lua scripting in MAME, see :ref:`luaengine`; for detailed
-descriptions of MAME’s Lua classes, see :ref:`luareference`.
+scripting.  For details on MAME’s layout file, see :ref:`layfile`;  for detailed
+descriptions of MAME’s Lua interface, see :ref:`luascript`.
 
 .. _layscript-examples-espial:
 
@@ -188,19 +187,21 @@ as a function by the layout plugin when the layout file is loaded.  The layout
 views have been built at this point, but the emulated system has not finished
 starting.  In particular, it’s not safe to access inputs and outputs at this
 time.  The key variable in the script environment is ``file``, which gives the
-script access to its layout file.
+script access to its :ref:`layout file <luascript-ref-renderlayfile>`.
 
 We supply a function to be called after tags in the layout file have been
 resolved.  At this point, the emulated system will have completed starting.
 This function does the following tasks:
 
-* Looks up the two I/O ports used for player input.  I/O ports can be looked up
-  by tag relative to the device that caused the layout file to be loaded.
-* Looks up the two view items used to display joystick state.  Views can be
-  looked up by name (i.e. value of the ``name`` attribute), and items within a
-  view can be looked up by ID (i.e. the value of the ``id`` attribute).
+* Looks up the two :ref:`I/O ports <luascript-ref-ioport>` used for player
+  input.  I/O ports can be looked up by tag relative to the device that caused
+  the layout file to be loaded.
+* Looks up the two :ref:`view items <luascript-ref-renderlayitem>` used to
+  display joystick state.  Views can be looked up by name (i.e. value of the
+  ``name`` attribute), and items within a view can be looked up by ID (i.e. the
+  value of the ``id`` attribute).
 * Supplies a function to be called before view items are added to the render
-  target.
+  target when drawing a frame.
 * Hides the warning that reminds the user to enable the layout plugin by setting
   the element state for the item to 0 (the text component is only drawn when
   the element state is 1).
@@ -414,20 +415,20 @@ Here’s our layout file:
 The layout has a ``script`` element containing the Lua script, to be called as a
 function by the layout plugin when the layout file is loaded.  This happens
 after the layout views have been build, but before the emulated system has
-finished starting.  The layout file object is supplied to the script in the
-``file`` variable.
+finished starting.  The :ref:`layout file <luascript-ref-renderlayfile>` object
+is supplied to the script in the ``file`` variable.
 
 We supply a function to be called after tags in the layout file have been
 resolved.  This function does the following:
 
-* Looks up the analog axis inputs.
-* Looks up the view item that draws the outline of area where the yoke position
-  is displayed.
+* Looks up the analog axis :ref:`inputs <luascript-ref-ioport>`.
+* Looks up the :ref:`view item <luascript-ref-renderlayitem>` that draws the
+  outline of area where the yoke position is displayed.
 * Declares some variables to hold calculated values across function calls.
 * Supplies a function to be called when the view’s dimensions have been
   recomputed.
 * Supplies a function to be called before adding view items to the render
-  container.
+  container when drawing a frame.
 * Supplies functions that will supply the bounds for the animated items.
 * Hides the warning that reminds the user to enable the layout plugin by setting
   the element state for the item to 0 (the text component is only drawn when
@@ -472,18 +473,31 @@ The layout script environment
 The Lua environment is provided by the layout plugin.  It’s fairly minimal, only
 providing what’s needed:
 
-* ``file`` giving the script’s layout file object.  Has a ``device`` property
-  for obtaining the device that caused the layout file to be loaded, and a
-  ``views`` property for obtaining the layout’s views (indexed by name).
-* ``machine`` giving MAME’s current running machine.
-* ``emu.render_bounds`` and ``emu.render_color`` functions for creating bounds
-  and colour objects.
-* ``emu.print_error``, ``emu.print_info`` and ``emu.print_debug`` functions for
-  diagnostic output.
-* Standard Lua ``pairs``, ``ipairs``, ``table.insert`` and ``table.remove``
-  functions for manipulating tables and other containers.
+* ``file`` giving the script’s :ref:`layout file <luascript-ref-renderlayfile>`
+  object.  Has a ``device`` property for obtaining the :ref:`device
+  <luascript-ref-device>` that caused the layout file to be loaded, and a
+  ``views`` property for obtaining the layout’s :ref:`views
+  <luascript-ref-renderlayview>` (indexed by name).
+* ``machine`` giving MAME’s current :ref:`running machine
+  <luascript-ref-machine>`.
+* ``emu.device_enumerator``, ``emu.palette_enumerator``,
+  ``emu.screen_enumerator``, ``emu.cassette_enumerator``,
+  ``emu.image_enumerator`` and ``emu.slot_enumerator`` functions for obtaining
+  specific device interfaces.
+* ``emu.attotime``, ``emu.render_bounds`` and ``emu.render_color`` functions for
+  creating :ref:`attotime <luascript-ref-attotime>`, :ref:`bounds
+  <luascript-ref-renderbounds>` and :ref:`colour <luascript-ref-rendercolor>`
+  objects.
+* ``emu.bitmap_ind8``, ``emu.bitmap_ind16``, ``emu.bitmap_ind32``,
+  ``emu.bitmap_ind64``, ``emu.bitmap_yuy16``, ``emu.bitmap_rgb32`` and
+  ``emu.bitmap_argb32`` objects for creating
+  :ref:`bitmaps <luascript-ref-bitmap>`.
+* ``emu.print_verbose``, ``emu.print_error``, ``emu.print_warning``,
+  ``emu.print_info`` and ``emu.print_debug`` functions for diagnostic output.
+* Standard Lua ``tonumber``, ``tostring``, ``pairs`` and ``ipairs`` functions,
+  and ``math``, ``table`` and ``string`` objects for manipulating numbers,
+  strings, tables and other containers.
 * Standard Lua ``print`` function for text output to the console.
-* Standard Lua ``string.format`` function for string formatting.
 
 
 .. _layscript-events:
@@ -546,6 +560,96 @@ Dimensions recomputed
     screen mode, toggling visibility of item collections, and changes to the
     rotation and zoom to screen area settings.  If you’re animating the position
     of view items, this is a good time to calculate positions and scale factors.
+
+    The callback function has no return value and takes no parameters.  Call
+    with ``nil`` as the argument to remove the event handler.
+Pointer updated
+    ``view:set_pointer_updated_callback(cb)``
+
+    Called when a pointer enters, moves or changes button state over the view.
+
+    The callback function is passed nine arguments:
+
+    * The pointer type as a string.  This will be ``mouse``, ``pen``, ``touch``
+      or ``unknown``, and will not change for the lifetime of a pointer.
+    * The pointer ID.  This will be a non-negative integer that will not change
+      for the lifetime of a pointer.  Pointer ID values are recycled
+      aggressively.
+    * The device ID.  This will be a non-negative integer that can be used to
+      group pointers for recognising multi-touch gestures.
+    * The horizontal position of the pointer in layout coordinates.
+    * The vertical position of the pointer in layout coordinates.
+    * A bit mask representing the currently pressed buttons.  The primary button
+      is the least significant bit.
+    * A bit mask representing the buttons that were pressed in this update.  The
+      primary button is the least significant bit.
+    * A bit mask representing the buttons that were released in this update.
+      The primary button is the least significant bit.
+    * The click count.  This is positive for multi-click actions, or negative if
+      a click is turned into a hold or drag.  This only applies to the primary
+      button.
+
+    The callback function has no return value.  Call with ``nil`` as the
+    argument to remove the event handler.
+Pointer left
+    ``view:set_pointer_left_callback(cb)``
+
+    Called when a pointer leaves the view normally.  After receiving this event,
+    the pointer ID may be reused for a new pointer.
+
+    The callback function is passed seven arguments:
+
+    * The pointer type as a string.  This will be ``mouse``, ``pen``, ``touch``
+      or ``unknown``, and will not change for the lifetime of a pointer.
+    * The pointer ID.  This will be a non-negative integer that will not change
+      for the lifetime of a pointer.  Pointer ID values are recycled
+      aggressively.
+    * The device ID.  This will be a non-negative integer that can be used to
+      group pointers for recognising multi-touch gestures.
+    * The horizontal position of the pointer in layout coordinates.
+    * The vertical position of the pointer in layout coordinates.
+    * A bit mask representing the buttons that were released in this update.
+      The primary button is the least significant bit.
+    * The click count.  This is positive for multi-click actions, or negative if
+      a click is turned into a hold or drag.  This only applies to the primary
+      button.
+
+    The callback function has no return value.  Call with ``nil`` as the
+    argument to remove the event handler.
+Pointer aborted
+    ``view:set_pointer_aborted_callback(cb)``
+
+    Called when a pointer leaves the view abnormally.  After receiving this
+    event, the pointer ID may be reused for a new pointer.
+
+    The callback function is passed seven arguments:
+
+    * The pointer type as a string.  This will be ``mouse``, ``pen``, ``touch``
+      or ``unknown``, and will not change for the lifetime of a pointer.
+    * The pointer ID.  This will be a non-negative integer that will not change
+      for the lifetime of a pointer.  Pointer ID values are recycled
+      aggressively.
+    * The device ID.  This will be a non-negative integer that can be used to
+      group pointers for recognising multi-touch gestures.
+    * The horizontal position of the pointer in layout coordinates.
+    * The vertical position of the pointer in layout coordinates.
+    * A bit mask representing the buttons that were released in this update.
+      The primary button is the least significant bit.
+    * The click count.  This is positive for multi-click actions, or negative if
+      a click is turned into a hold or drag.  This only applies to the primary
+      button.
+
+    The callback function has no return value.  Call with ``nil`` as the
+    argument to remove the event handler.
+Forget pointers
+    ``view:set_forget_pointers_callback(cb)``
+
+    Called when the view should stop processing pointer input.  This can happen
+    in a number of situations, including:
+
+    * The user activated a menu.
+    * The view configuration will change.
+    * The view will be deactivated.
 
     The callback function has no return value and takes no parameters.  Call
     with ``nil`` as the argument to remove the event handler.
@@ -617,7 +721,7 @@ Get item horizontal scroll window size
     horizontal window size as a proportion of the associated element’s width,
     and takes no parameters.  A value of 1.0 will display the entire width of
     the element; smaller values will display proportionally smaller parts of the
-    element.  Call with ``nil`` as the argument to to restore the default
+    element.  Call with ``nil`` as the argument to restore the default
     horizontal scroll window size handler (based on the ``xscroll`` child
     element).
 Get item vertical scroll window size
@@ -632,7 +736,7 @@ Get item vertical scroll window size
     vertical window size as a proportion of the associated element’s height, and
     takes no parameters.  A value of 1.0 will display the entire height of the
     element; smaller values will display proportionally smaller parts of the
-    element.  Call with ``nil`` as the argument to to restore the default
+    element.  Call with ``nil`` as the argument to restore the default
     vertical scroll window size handler (based on the ``xscroll`` child
     element).
 Get item horizontal scroll position
@@ -661,3 +765,22 @@ Get item vertical scroll position
     item; larger values pan down.  Call with ``nil`` as the argument to restore
     the default vertical scroll position handler (based on bindings in the
     ``yscroll`` child element).
+
+.. _layscript-events-element:
+
+Layout element events
+~~~~~~~~~~~~~~~~~~~~~
+
+Layout element events apply to an individual visual element definition.
+
+Draw
+    ``element:set_draw_callback(cb)``
+
+    Set callback for additional drawing after the element’s components have been
+    drawn.  This gives the script direct control over the final texture when an
+    element item is drawn.
+
+    The callback is passed two arguments: the element state (an integer) and the
+    32-bit ARGB bitmap at the required size.  The callback must not attempt to
+    resize the bitmap.  Call with ``nil`` as the argument to remove the event
+    handler.

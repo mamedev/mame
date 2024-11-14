@@ -1,11 +1,9 @@
-// license:BSD-3-Clause
-// copyright-holders:Angelo Salese
+// license: BSD-3-Clause
+// copyright-holders: Angelo Salese
+// thanks-to: Tomasz Slanina, Sarah Walker
 /***************************************************************************
 
     Acorn RiscPC line of computers
-
-    preliminary driver by Angelo Salese,
-    based on work by Tomasz Slanina and Sarah Walker
 
     TODO:
     - IOMD currently hardwired with ARM7500FE flavour for all machines, needs information about
@@ -18,7 +16,6 @@
 
 #include "emu.h"
 #include "cpu/arm7/arm7.h"
-#include "cpu/arm7/arm7core.h"
 #include "machine/acorn_vidc.h"
 #include "machine/arm_iomd.h"
 #include "machine/i2cmem.h"
@@ -29,6 +26,9 @@
 #include "screen.h"
 #include "speaker.h"
 #include "debugger.h"
+
+
+namespace {
 
 class riscpc_state : public driver_device
 {
@@ -41,6 +41,7 @@ public:
 		, m_screen(*this, "screen")
 		, m_i2cmem(*this, "i2cmem")
 		, m_kbdc(*this, "kbdc")
+		, m_mouse(*this, "MOUSE")
 	{ }
 
 	void rpc700(machine_config &config);
@@ -59,37 +60,38 @@ private:
 	required_device<screen_device> m_screen;
 	required_device<i2cmem_device> m_i2cmem;
 	required_device<ps2_keyboard_controller_device> m_kbdc;
+	required_ioport m_mouse;
 
-	virtual void machine_reset() override;
-	virtual void machine_start() override;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void machine_start() override ATTR_COLD;
 
-	void a7000_map(address_map &map);
-	void riscpc_map(address_map &map);
+	void a7000_map(address_map &map) ATTR_COLD;
+	void riscpc_map(address_map &map) ATTR_COLD;
 
 	bool m_i2cmem_clock = false;
-	DECLARE_READ_LINE_MEMBER(iocr_od0_r);
-	DECLARE_READ_LINE_MEMBER(iocr_od1_r);
-	DECLARE_WRITE_LINE_MEMBER(iocr_od0_w);
-	DECLARE_WRITE_LINE_MEMBER(iocr_od1_w);
+	int iocr_od0_r();
+	int iocr_od1_r();
+	void iocr_od0_w(int state);
+	void iocr_od1_w(int state);
 };
 
-READ_LINE_MEMBER(riscpc_state::iocr_od1_r)
+int riscpc_state::iocr_od1_r()
 {
 	// TODO: presuming same as Acorn Archimedes, where i2c clock can be readback
 	return (m_i2cmem_clock == true) ? 1 : 0;
 }
 
-READ_LINE_MEMBER(riscpc_state::iocr_od0_r)
+int riscpc_state::iocr_od0_r()
 {
 	return (m_i2cmem->read_sda() ? 1 : 0); //eeprom read
 }
 
-WRITE_LINE_MEMBER(riscpc_state::iocr_od0_w)
+void riscpc_state::iocr_od0_w(int state)
 {
 	m_i2cmem->write_sda(state == true ? 1 : 0);
 }
 
-WRITE_LINE_MEMBER(riscpc_state::iocr_od1_w)
+void riscpc_state::iocr_od1_w(int state)
 {
 	m_i2cmem_clock = state;
 	m_i2cmem->write_scl(state == true ? 1 : 0);
@@ -108,7 +110,7 @@ void riscpc_state::a7000_map(address_map &map)
 //  AM_RANGE(0x03040000, 0x0304ffff) //podule space 0,1,2,3
 //  AM_RANGE(0x03070000, 0x0307ffff) //podule space 4,5,6,7
 	map(0x03200000, 0x032001ff).m(m_iomd, FUNC(arm7500fe_iomd_device::map));
-	map(0x03310000, 0x03310003).portr("MOUSE");
+	map(0x03310000, 0x03310003).portr(m_mouse);
 
 	map(0x03400000, 0x037fffff).w(m_vidc, FUNC(arm_vidc20_device::write));
 //  AM_RANGE(0x08000000, 0x08ffffff) AM_MIRROR(0x07000000) //EASI space
@@ -321,6 +323,9 @@ ROM_START(sarpc_j233)
 	ROMX_LOAD("1203,261-01.bin", 0x000000, 0x200000, CRC(8e3c570a) SHA1(ffccb52fa8e165d3f64545caae1c349c604386e9), ROM_GROUPWORD | ROM_SKIP(2) | ROM_BIOS(0))
 	ROMX_LOAD("1203,262-01.bin", 0x000002, 0x200000, CRC(cf4615b4) SHA1(c340f29aeda3557ebd34419fcb28559fc9b620f8), ROM_GROUPWORD | ROM_SKIP(2) | ROM_BIOS(0))
 ROM_END
+
+} // anonymous namespace
+
 
 /***************************************************************************
 

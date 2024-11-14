@@ -60,6 +60,8 @@ Thanks to HIGHWAYMAN for providing info on how to get to these epoxies
 #include "tilemap.h"
 
 
+namespace {
+
 class wallc_state : public driver_device
 {
 public:
@@ -71,6 +73,7 @@ public:
 	{ }
 
 	void sidampkr(machine_config &config);
+	void sidampkra(machine_config &config);
 	void unkitpkr(machine_config &config);
 	void wallc(machine_config &config);
 	void wallca(machine_config &config);
@@ -81,11 +84,11 @@ public:
 	void init_unkitpkr();
 
 protected:
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 
 private:
-	void unkitpkr_map(address_map &map);
-	void wallc_map(address_map &map);
+	void unkitpkr_map(address_map &map) ATTR_COLD;
+	void wallc_map(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -290,8 +293,8 @@ void wallc_state::unkitpkr_out2_w(uint8_t data)
 void wallc_state::wallc_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
-	map(0x8000, 0x83ff).ram().w(FUNC(wallc_state::videoram_w)).mirror(0xc00).share("videoram");   /* 2114, 2114 */
-	map(0xa000, 0xa3ff).ram();     /* 2114, 2114 */
+	map(0x8000, 0x83ff).ram().w(FUNC(wallc_state::videoram_w)).mirror(0xc00).share("videoram");   // 2114, 2114
+	map(0xa000, 0xa3ff).ram();     // 2114, 2114
 
 	map(0xb000, 0xb000).portr("DSW1");
 	map(0xb200, 0xb200).portr("SYSTEM");
@@ -307,8 +310,8 @@ void wallc_state::wallc_map(address_map &map)
 void wallc_state::unkitpkr_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
-	map(0x8000, 0x83ff).ram().w(FUNC(wallc_state::videoram_w)).mirror(0xc00).share("videoram");   /* 2114, 2114 */
-	map(0xa000, 0xa3ff).ram();     /* 2114, 2114 */
+	map(0x8000, 0x83ff).ram().w(FUNC(wallc_state::videoram_w)).mirror(0xc00).share("videoram");   // 2114, 2114
+	map(0xa000, 0xa3ff).ram();     // 2114, 2114
 
 	map(0xb000, 0xb000).portr("DSW1");
 	map(0xb100, 0xb100).portr("IN1");
@@ -325,7 +328,7 @@ void wallc_state::unkitpkr_map(address_map &map)
 
 
 static INPUT_PORTS_START( wallc )
-	PORT_START("SYSTEM")    /* b200 */
+	PORT_START("SYSTEM")    // b200
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON2 )    //Right curve button; select current playfield in test mode
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )    //not used ?
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE1 )   //service?? plays loud,high-pitched sound
@@ -335,10 +338,10 @@ static INPUT_PORTS_START( wallc )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN3 )  //ok
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START1 ) //ok
 
-	PORT_START("DIAL")      /* b400 - player position 8 bit analog input - value read is used as position of the player directly - what type of input is that ? DIAL ?*/
+	PORT_START("DIAL")      // b400 - player position 8 bit analog input - value read is used as position of the player directly - what type of input is that ? DIAL ?
 	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(50) PORT_KEYDELTA(3) PORT_REVERSE PORT_PLAYER(1)
 
-	PORT_START("DSW1")      /* b000 */
+	PORT_START("DSW1")      // b000
 	PORT_DIPNAME( 0x03, 0x01, DEF_STR( Lives ) )            PORT_DIPLOCATION("SW1:1,2")
 	PORT_DIPSETTING(    0x03, "5" )
 	PORT_DIPSETTING(    0x02, "4" )
@@ -361,7 +364,7 @@ static INPUT_PORTS_START( wallc )
 	PORT_DIPSETTING(    0x80, "Free Play With Level Select" )
 	PORT_DIPSETTING(    0x00, DEF_STR( Normal ) )
 
-	PORT_START("DSW2")      /* b600 */
+	PORT_START("DSW2")      // b600
 	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Coin_A ) )           PORT_DIPLOCATION("SW2:1,2")
 	PORT_DIPSETTING(    0x03, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
@@ -377,12 +380,12 @@ static INPUT_PORTS_START( wallc )
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( 1C_5C ) )
-	PORT_DIPUNUSED_DIPLOC( 0x40, 0x40, "SW2:7" ) /* Shown as "Unused" in the manual */
-	PORT_DIPUNUSED_DIPLOC( 0x80, 0x80, "SW2:8" ) /* Shown as "Unused" in the manual */
+	PORT_DIPUNUSED_DIPLOC( 0x40, 0x40, "SW2:7" ) // Shown as "Unused" in the manual
+	PORT_DIPUNUSED_DIPLOC( 0x80, 0x80, "SW2:8" ) // Shown as "Unused" in the manual
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( unkitpkr )
-	PORT_START("DSW1")    /* b000 */
+	PORT_START("DSW1")    // b000
 	PORT_DIPUNKNOWN_DIPLOC(0x01, 0x01, "SW1:1")
 	PORT_DIPUNKNOWN_DIPLOC(0x02, 0x02, "SW1:2")
 	PORT_DIPUNKNOWN_DIPLOC(0x04, 0x04, "SW1:3")
@@ -392,7 +395,7 @@ static INPUT_PORTS_START( unkitpkr )
 	PORT_DIPUNKNOWN_DIPLOC(0x40, 0x40, "SW1:7")
 	PORT_DIPUNKNOWN_DIPLOC(0x80, 0x80, "SW1:8")
 
-	PORT_START("IN1")    /* b100 */
+	PORT_START("IN1")    // b100
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT ) // coin out
@@ -402,7 +405,7 @@ static INPUT_PORTS_START( unkitpkr )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN3 )
 
-	PORT_START("IN2")    /* b200 */
+	PORT_START("IN2")    // b200
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK )
@@ -412,7 +415,7 @@ static INPUT_PORTS_START( unkitpkr )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_POKER_HOLD4 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_POKER_HOLD5 )
 
-	PORT_START("IN3")    /* b300 */
+	PORT_START("IN3")    // b300
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_POKER_CANCEL )
@@ -422,7 +425,7 @@ static INPUT_PORTS_START( unkitpkr )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_GAMBLE_DEAL )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START1 )
 
-	PORT_START("DSW2")      /* b600 */
+	PORT_START("DSW2")      // b600
 	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Coin_A ) )   PORT_DIPLOCATION("SW2:1,2") // ok
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( 1C_2C ) )
@@ -445,7 +448,7 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( sidampkr )
 	PORT_INCLUDE(unkitpkr)
 
-	PORT_MODIFY("DSW1")    /* b000 */
+	PORT_MODIFY("DSW1")    // b000
 	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Language ) ) PORT_DIPLOCATION("SW1:1")
 	PORT_DIPSETTING(    0x00, DEF_STR( English ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( French ) )
@@ -464,15 +467,34 @@ static INPUT_PORTS_START( sidampkr )
 	PORT_DIPUNKNOWN_DIPLOC( 0x80, 0x80, "SW1:8" )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( sidampkra )
+	PORT_INCLUDE(unkitpkr)
+
+	PORT_MODIFY("DSW1")
+	PORT_DIPUNKNOWN_DIPLOC( 0x01, 0x01, "SW1:1" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x02, 0x02, "SW1:2" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x04, 0x04, "SW1:3" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x08, 0x08, "SW1:4" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x10, 0x10, "SW1:5" )
+	PORT_DIPNAME( 0x60, 0x60, "Min/Max Bet" )  PORT_DIPLOCATION("SW1:6,7")
+	PORT_DIPSETTING(    0x00, "Min:1; Max:5" )
+	PORT_DIPSETTING(    0x20, "Min:1; Max:10" )
+	PORT_DIPSETTING(    0x40, "Min:1; Max:20" )
+	PORT_DIPSETTING(    0x60, "Min:1; Max:40" )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Language ) ) PORT_DIPLOCATION("SW1:8")
+	PORT_DIPSETTING(    0x00, DEF_STR( English ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( French ) )
+INPUT_PORTS_END
+
 static const gfx_layout charlayout =
 {
-	8,8,    /* 8*8 characters */
+	8,8,    // 8*8 characters
 	RGN_FRAC(1,3),
-	3,  /* 3 bits per pixel */
-	{ RGN_FRAC(0,3),RGN_FRAC(1,3),RGN_FRAC(2,3) }, /* the bitplanes are separated */
+	3,  // 3 bits per pixel
+	{ RGN_FRAC(0,3),RGN_FRAC(1,3),RGN_FRAC(2,3) }, // the bitplanes are separated
 	{ 7, 6, 5, 4, 3, 2, 1, 0 },
 	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
-	8*8 /* every char takes 8 consecutive bytes */
+	8*8 // every char takes 8 consecutive bytes
 };
 
 static GFXDECODE_START( gfx_wallc )
@@ -486,8 +508,8 @@ void wallc_state::init_wallc()
 
 	for (uint32_t i = 0; i < 0x2000 * 2; i++)
 	{
-		uint8_t c = ROM[ i ] ^ 0x55 ^ 0xff; /* NOTE: this can be shortened but now it fully reflects what the bigger module really does */
-		c = bitswap<8>(c, 4,2,6,0,7,1,3,5); /* also swapped inside of the bigger module */
+		uint8_t c = ROM[ i ] ^ 0x55 ^ 0xff; // NOTE: this can be shortened but now it fully reflects what the bigger module really does
+		c = bitswap<8>(c, 4,2,6,0,7,1,3,5); // also swapped inside of the bigger module
 		ROM[ i ] = c;
 	}
 }
@@ -517,14 +539,14 @@ void wallc_state::init_wallca()
 
 void wallc_state::wallc(machine_config &config)
 {
-	/* basic machine hardware */
-	Z80(config, m_maincpu, 12.288_MHz_XTAL / 4);  /* 3.072 MHz ? */
+	// basic machine hardware
+	Z80(config, m_maincpu, 12.288_MHz_XTAL / 4);  // 3.072 MHz ?
 	m_maincpu->set_addrmap(AS_PROGRAM, &wallc_state::wallc_map);
 	m_maincpu->set_vblank_int("screen", FUNC(wallc_state::irq0_line_hold));
 
 	ADC0804(config, "adc", 640000).vin_callback().set_ioport("DIAL"); // clock not verified
 
-	/* video hardware */
+	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);
@@ -536,7 +558,7 @@ void wallc_state::wallc(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, "palette", gfx_wallc);
 	PALETTE(config, "palette", FUNC(wallc_state::wallc_palette), 32);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 	ay8912_device &aysnd(AY8912(config, "aysnd", 12288000 / 8));
 	aysnd.port_a_read_callback().set_ioport("DSW2");
@@ -549,23 +571,29 @@ void wallc_state::wallca(machine_config &config)
 	m_maincpu->set_clock(12_MHz_XTAL / 4);
 }
 
-void wallc_state::unkitpkr(machine_config &config)
+void wallc_state::sidampkra(machine_config &config)
 {
 	wallc(config);
 	config.device_remove("adc");
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &wallc_state::unkitpkr_map);
 
-	MCFG_VIDEO_START_OVERRIDE(wallc_state, unkitpkr)
 	subdevice<palette_device>("palette")->set_init(FUNC(wallc_state::unkitpkr_palette));
 
-	/* sound hardware */
+	// sound hardware
 	subdevice<ay8912_device>("aysnd")->reset_routes().add_route(ALL_OUTPUTS, "mono", 0.50);
+}
+
+void wallc_state::unkitpkr(machine_config &config)
+{
+	sidampkra(config);
+
+	MCFG_VIDEO_START_OVERRIDE(wallc_state, unkitpkr)
 }
 
 void wallc_state::sidampkr(machine_config &config)
 {
-	unkitpkr(config);
+	sidampkra(config);
 
 	MCFG_VIDEO_START_OVERRIDE(wallc_state, sidampkr)
 }
@@ -590,7 +618,7 @@ ROM_START( wallc )
 	ROM_LOAD( "74s288.c2",  0x0000, 0x0020, CRC(83e3e293) SHA1(a98c5e63b688de8d175adb6539e0cdc668f313fd) )
 ROM_END
 
-/* this set uses a different encryption, but the decrypted code is the same */
+// this set uses a different encryption, but the decrypted code is the same
 ROM_START( wallca )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "rom4.rom",     0x0000, 0x2000, CRC(ce43af1b) SHA1(c05419cb4aa57c6187b469573a3787d9123c4a05) )
@@ -607,7 +635,7 @@ ROM_END
 
 ROM_START( brkblast )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "fadesa-r0.6m",     0x0000, 0x4000, CRC(4e96ca15) SHA1(87f1a3538712aa3d6c3713b845679dd42a4ba5a4) )
+	ROM_LOAD( "fadesa-r0.6m", 0x0000, 0x4000, CRC(4e96ca15) SHA1(87f1a3538712aa3d6c3713b845679dd42a4ba5a4) )
 
 	ROM_REGION( 0x3000, "gfx1", 0 )
 	ROM_LOAD( "rom3.rom",     0x0800, 0x0800, CRC(6634db73) SHA1(fe6104f974495a250e0cd14c0745eec8e44b8d3a) )
@@ -615,7 +643,10 @@ ROM_START( brkblast )
 	ROM_LOAD( "rom1.rom",     0x2800, 0x0800, CRC(3884fd4f) SHA1(47254c8828128ac48fc15f05b52fe4d42d4919e7) )
 
 	ROM_REGION( 0x0020, "proms", 0 )
-	ROM_LOAD( "74s288.c2",  0x0000, 0x0020, CRC(83e3e293) SHA1(a98c5e63b688de8d175adb6539e0cdc668f313fd) )
+	ROM_LOAD( "74s288.c2",    0x0000, 0x0020, CRC(83e3e293) SHA1(a98c5e63b688de8d175adb6539e0cdc668f313fd) )
+
+	ROM_REGION( 0x00eb, "plds", 0 )
+	ROM_LOAD( "82s153.h8",    0x0000, 0x00eb, CRC(a6db7c28) SHA1(023f393c45ae35c0008f61af6c3a1b21f7fe7c79) ) // On the CPU subboard
 ROM_END
 
 
@@ -667,18 +698,40 @@ D7 to cpu
 
 */
 
-ROM_START( sidampkr )
+ROM_START( sidampkr ) // 11600 PCB + small riser PCB with Z80 and PAL (epoxy cover removed but etched 11610 on PCB)
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "11600.0",     0x0000, 0x1000, CRC(88cac4d2) SHA1(a369da3dc80671eeff549077cf2ce860d5f4ea35) )
-	ROM_LOAD( "11600.1",     0x1000, 0x1000, CRC(96cca320) SHA1(85326f7126c8250a22f35f6eed138051a9ab35cb) )
+	ROM_LOAD( "11600.0.h6",     0x0000, 0x1000, CRC(88cac4d2) SHA1(a369da3dc80671eeff549077cf2ce860d5f4ea35) )
+	ROM_LOAD( "11600.1.h5",     0x1000, 0x1000, CRC(96cca320) SHA1(85326f7126c8250a22f35f6eed138051a9ab35cb) )
 
 	ROM_REGION( 0x3000, "gfx1", 0 )
-	ROM_LOAD( "11605.b",     0x0800, 0x0800, CRC(a7800f8a) SHA1(3955e0f71ced6fd759f52d12c0b39ab6aab31ca4) )
-	ROM_LOAD( "11605.g",     0x1800, 0x0800, CRC(b7bebf1e) SHA1(764536989ba4c4c143a61d4453c3bba547bc630a) )
-	ROM_LOAD( "11605.r",     0x2800, 0x0800, CRC(4d645b8d) SHA1(d4f8d11c4ef796cf66ebf2e6b8a11247d630951a) )
+	ROM_LOAD( "11605.b.e1",     0x0800, 0x0800, CRC(a7800f8a) SHA1(3955e0f71ced6fd759f52d12c0b39ab6aab31ca4) )
+	ROM_LOAD( "11605.g.e2",     0x1800, 0x0800, CRC(b7bebf1e) SHA1(764536989ba4c4c143a61d4453c3bba547bc630a) )
+	ROM_LOAD( "11605.r.e3",     0x2800, 0x0800, CRC(4d645b8d) SHA1(d4f8d11c4ef796cf66ebf2e6b8a11247d630951a) )
 
 	ROM_REGION( 0x0020, "proms", 0 )
-	ROM_LOAD( "11607-74.288",  0x0000, 0x0020, CRC(e14bf545) SHA1(5e8c5a9ea6e4842f27a47c1d7224ed294bbaa40b) )
+	ROM_LOAD( "11607-74.288.c3",  0x0000, 0x0020, CRC(e14bf545) SHA1(5e8c5a9ea6e4842f27a47c1d7224ed294bbaa40b) )
+
+	ROM_REGION( 0x0104, "plds", 0 ) // probably encryption related
+	ROM_LOAD( "pal16r4anc.sub",  0x0000, 0x0104, NO_DUMP )
+ROM_END
+
+ROM_START( sidampkra ) // 11700B PCB + small riser PCB with Z80 and PAL (with 11610 epoxy cover)
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "11704.0.h6",     0x0000, 0x2000, CRC(62a7ff4f) SHA1(66ed12e5ec9da5e97fabf37e971342c0cfbce372) )
+
+	ROM_REGION( 0x3000, "gfx1", 0 )
+	ROM_LOAD( "11705.b.e1",     0x0800, 0x0800, CRC(50a9a468) SHA1(182a753748296df859f938655e9fa27889d5cd3f) )
+	ROM_LOAD( "11705.g.e2",     0x1800, 0x0800, CRC(d3366b36) SHA1(e1eb148b07a302f2ba66ad196959f019a81145f6) )
+	ROM_LOAD( "11705.r.e3",     0x2800, 0x0800, CRC(d51df283) SHA1(46bd52e156be99db731e6d56ab8241d1c396ab99) )
+
+	ROM_REGION( 0x0040, "proms", ROMREGION_ERASE00 )
+	ROM_LOAD( "11707.c3",         0x0000, 0x0020, NO_DUMP )
+	ROM_LOAD( "11708.c2",         0x0020, 0x0020, NO_DUMP )
+	ROM_LOAD( "74s288.c2",        0x0000, 0x0020, CRC(83e3e293) SHA1(a98c5e63b688de8d175adb6539e0cdc668f313fd) ) //  using the one from unkitpkr for now
+
+
+	ROM_REGION( 0x0104, "plds", 0 ) // probably encryption related
+	ROM_LOAD( "pal16r4anc.sub",  0x0000, 0x0104, NO_DUMP )
 ROM_END
 
 void wallc_state::init_sidam()
@@ -775,11 +828,14 @@ void wallc_state::init_unkitpkr()
 	save_item(NAME(m_bookkeeping_mode));
 }
 
+} // anonymous namespace
 
-//    YEAR  NAME      PARENT  MACHINE   INPUT     STATE        INIT      ROT      COMPANY             FULLNAME                              FLAGS
-GAME( 1984, wallc,    0,      wallc,    wallc,    wallc_state, init_wallc,    ROT0,   "Midcoin",          "Wall Crash (set 1)",                  MACHINE_SUPPORTS_SAVE )
-GAME( 1984, wallca,   wallc,  wallca,   wallc,    wallc_state, init_wallca,   ROT0,   "Midcoin",          "Wall Crash (set 2)",                  MACHINE_SUPPORTS_SAVE )
-GAME( 1984, brkblast, wallc,  wallc,    wallc,    wallc_state, init_wallca,   ROT0,   "bootleg (Fadesa)", "Brick Blast (bootleg of Wall Crash)", MACHINE_SUPPORTS_SAVE ) // Spanish bootleg board, Fadesa stickers / text on various components
 
-GAME( 1984, sidampkr, 0,      sidampkr, sidampkr, wallc_state, init_sidam,    ROT270, "Sidam",            "unknown Sidam poker",                 MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE ) // colors should be verified
-GAME( 198?, unkitpkr, 0,      unkitpkr, unkitpkr, wallc_state, init_unkitpkr, ROT0,   "<unknown>",        "unknown Italian poker game",          MACHINE_SUPPORTS_SAVE )
+//    YEAR  NAME       PARENT    MACHINE    INPUT      STATE        INIT           ROT     COMPANY             FULLNAME                               FLAGS
+GAME( 1984, wallc,     0,        wallc,     wallc,     wallc_state, init_wallc,    ROT0,   "Midcoin",          "Wall Crash (set 1)",                  MACHINE_SUPPORTS_SAVE )
+GAME( 1984, wallca,    wallc,    wallca,    wallc,     wallc_state, init_wallca,   ROT0,   "Midcoin",          "Wall Crash (set 2)",                  MACHINE_SUPPORTS_SAVE )
+GAME( 1984, brkblast,  wallc,    wallc,     wallc,     wallc_state, init_wallca,   ROT0,   "bootleg (Fadesa)", "Brick Blast (bootleg of Wall Crash)", MACHINE_SUPPORTS_SAVE ) // Spanish bootleg board, Fadesa stickers / text on various components
+
+GAME( 1984, sidampkr,  0,        sidampkr,  sidampkr,  wallc_state, init_sidam,    ROT270, "Sidam",            "unknown Sidam poker (vertical)",      MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE ) // colors should be verified
+GAME( 1984, sidampkra, sidampkr, sidampkra, sidampkra, wallc_state, init_sidam,    ROT0,   "Sidam",            "unknown Sidam poker (horizontal)",    MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE ) // colors should be verified, cards GFX look wrong
+GAME( 198?, unkitpkr,  0,        unkitpkr,  unkitpkr,  wallc_state, init_unkitpkr, ROT0,   "<unknown>",        "unknown Italian poker game",          MACHINE_SUPPORTS_SAVE )

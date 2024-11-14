@@ -1,7 +1,7 @@
 // PercentPrinter.h
 
-#ifndef __PERCENT_PRINTER_H
-#define __PERCENT_PRINTER_H
+#ifndef ZIP7_INC_PERCENT_PRINTER_H
+#define ZIP7_INC_PERCENT_PRINTER_H
 
 #include "../../../Common/StdOutStream.h"
 

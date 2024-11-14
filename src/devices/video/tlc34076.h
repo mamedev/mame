@@ -46,11 +46,11 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// device_palette_interface overrides
-	virtual uint32_t palette_entries() const override { return 0x100; }
+	virtual uint32_t palette_entries() const noexcept override { return 0x100; }
 
 private:
 	// internal helpers

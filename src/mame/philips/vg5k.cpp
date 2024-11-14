@@ -64,6 +64,8 @@
 #include "formats/vg5k_cas.h"
 
 
+namespace {
+
 class vg5k_state : public driver_device
 {
 public:
@@ -96,8 +98,8 @@ private:
 	uint8_t m_printer_signal = 0;
 	emu_timer *m_z80_irq_clear_timer = nullptr;
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	void z80_m1_w(uint8_t data);
 	uint8_t printer_state_r();
@@ -111,8 +113,8 @@ private:
 	TIMER_CALLBACK_MEMBER(z80_irq_clear);
 	TIMER_DEVICE_CALLBACK_MEMBER(z80_irq);
 	TIMER_DEVICE_CALLBACK_MEMBER(vg5k_scanline);
-	void vg5k_io(address_map &map);
-	void vg5k_mem(address_map &map);
+	void vg5k_io(address_map &map) ATTR_COLD;
+	void vg5k_mem(address_map &map) ATTR_COLD;
 };
 
 void vg5k_state::z80_m1_w(uint8_t data)
@@ -321,7 +323,7 @@ static INPUT_PORTS_START( vg5k )
 		PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
 		PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_START("direct")
-		PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD)        PORT_CODE(KEYCODE_END)                              PORT_NAME("DELTA")          PORT_CHANGED_MEMBER(DEVICE_SELF, vg5k_state, delta_button, 0)
+		PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD)        PORT_CODE(KEYCODE_END)                              PORT_NAME("DELTA")          PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(vg5k_state::delta_button), 0)
 INPUT_PORTS_END
 
 
@@ -468,6 +470,9 @@ ROM_START( vg5k )
 	ROM_REGION( 0x4000, "ef9345", 0 )
 	ROM_LOAD( "charset.rom", 0x0000, 0x2000, BAD_DUMP CRC(b2f49eb3) SHA1(d0ef530be33bfc296314e7152302d95fdf9520fc) )                // from dcvg5k
 ROM_END
+
+} // anonymous namespace
+
 
 /* Driver */
 //    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  CLASS       INIT       COMPANY    FULLNAME   FLAGS

@@ -329,7 +329,7 @@ void a2bus_hsscsi_device::write_c800(uint16_t offset, uint8_t data)
 	}
 }
 
-WRITE_LINE_MEMBER( a2bus_hsscsi_device::drq_w )
+void a2bus_hsscsi_device::drq_w(int state)
 {
 	m_drq = (state ? 0x80 : 0x00);
 //  printf("DRQ to %d\n", state);

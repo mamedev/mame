@@ -28,8 +28,8 @@ protected:
 	virtual void menu_activated() override;
 
 private:
-	virtual void populate(float &customtop, float &custombottom) override;
-	virtual void handle(event const *ev) override;
+	virtual void populate() override;
+	virtual bool handle(event const *ev) override;
 
 	machine_phase m_phase;
 };

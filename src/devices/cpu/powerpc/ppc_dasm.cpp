@@ -238,9 +238,9 @@ const powerpc_disassembler::IDESCR powerpc_disassembler::itab[] =
 	{ "oris",   D_OP(25),           M_RT|M_RA|M_UIMM,           F_RA_RT_UIMM,   0,              I_POWERPC },
 	{ "oriu",   D_OP(25),           M_RT|M_RA|M_UIMM,           F_RA_RT_UIMM,   0,              I_POWER },
 	{ "rac",    D_OP(31)|D_XO(818), M_RT|M_RA|M_RB|M_RC,        F_RT_RA_0_RB,   FL_RC,          I_POWER },
-	{ "rfi",    D_OP(19)|D_XO(50),  0,                          F_NONE,         0,              I_COMMON },
-	{ "rfci",   D_OP(19)|D_XO(51),  0,                          F_NONE,         0,              I_POWERPC },
-	{ "rfsvc",  D_OP(19)|D_XO(82),  M_LK,                       F_NONE,         FL_LK,          I_POWER },
+	{ "rfi",    D_OP(19)|D_XO(50),  0,                          F_NONE,         FL_SO,          I_COMMON },
+	{ "rfci",   D_OP(19)|D_XO(51),  0,                          F_NONE,         FL_SO,          I_POWERPC },
+	{ "rfsvc",  D_OP(19)|D_XO(82),  M_LK,                       F_NONE,         FL_LK|FL_SO,    I_POWER },
 	{ "rlimi",  D_OP(20),           M_RT|M_RA|M_SH|M_MB|M_ME|M_RC, F_RA_RT_SH_MB_ME,   FL_RC,   I_POWER },
 	{ "rlinm",  D_OP(21),           M_RT|M_RA|M_SH|M_MB|M_ME|M_RC, F_RA_RT_SH_MB_ME,   FL_RC,   I_POWER },
 	{ "rlmi",   D_OP(22),           M_RT|M_RA|M_RB|M_MB|M_ME|M_RC, F_RA_RT_RB_MB_ME,   FL_RC,   I_POWER },
@@ -319,7 +319,7 @@ const powerpc_disassembler::IDESCR powerpc_disassembler::itab[] =
 	{ "subfic", D_OP(8),            M_RT|M_RA|M_SIMM,           F_RT_RA_SIMM,   0,              I_POWERPC },
 	{ "subfme", D_OP(31)|D_XO(232), M_RT|M_RA|M_OE|M_RC,        F_RT_RA,        FL_OE|FL_RC,    I_POWERPC },
 	{ "subfze", D_OP(31)|D_XO(200), M_RT|M_RA|M_OE|M_RC,        F_RT_RA,        FL_OE|FL_RC,    I_POWERPC },
-	{ "svc",    D_OP(17)|2,         M_BD|M_AA|M_LK,             F_NONE,         FL_AA|FL_LK,    I_POWER }, // TODO: operands
+	{ "svc",    D_OP(17)|2,         M_BD|M_AA|M_LK,             F_SC,           FL_AA|FL_LK,    I_POWER },
 	{ "sync",   D_OP(31)|D_XO(598), 0,                          F_NONE,         0,              I_POWERPC },
 	{ "t",      D_OP(31)|D_XO(4),   M_TO|M_RA|M_RB,             F_TW,           0,              I_POWER },
 	{ "ti",     D_OP(3),            M_TO|M_RA|M_SIMM,           F_TWI,          0,              I_POWER },
@@ -559,8 +559,8 @@ std::string powerpc_disassembler::DecodeSigned16(uint32_t op, int do_unsigned)
 	int16_t s;
 
 	s = G_SIMM(op);
-	if (do_unsigned)    // sign extend to unsigned 32-bits
-		return util::string_format("0x%04X", (uint32_t) s);
+	if (do_unsigned)
+		return util::string_format("0x%04X", (uint16_t) s);
 	else                // print as signed 16 bits
 	{
 		if (s < 0)
@@ -593,7 +593,7 @@ uint32_t powerpc_disassembler::Mask(unsigned const mb, unsigned const me)
  * otherwise false to indicate disassembly should carry on as normal.
  */
 
-bool powerpc_disassembler::Simplified(uint32_t op, uint32_t vpc, std::string &signed16, std::string &mnem, std::string &oprs)
+bool powerpc_disassembler::Simplified(uint32_t op, uint32_t vpc, std::string &signed16, std::string &mnem, std::string &oprs, offs_t &flags)
 {
 	uint32_t  value, disp;
 
@@ -680,16 +680,20 @@ bool powerpc_disassembler::Simplified(uint32_t op, uint32_t vpc, std::string &si
 			case 0x04:  case 0x05:  case 0x06:  case 0x07:
 				mnem += "b";
 				mnem += crnbit[G_BI(op) & 3];
+				flags |= STEP_COND;
 				break;
 			case 0x0c:  case 0x0d:  case 0x0e:  case 0x0f:
 				mnem += "b";
 				mnem += crbit[G_BI(op) & 3];
+				flags |= STEP_COND;
 				break;
 			case 0x10:  case 0x11:  case 0x18:  case 0x19:
 				mnem += "bdnz";
+				flags |= STEP_COND;
 				break;
 			case 0x12:  case 0x13:  case 0x1a:  case 0x1b:
 				mnem += "bdz";
+				flags |= STEP_COND;
 				break;
 			case 0x14:  case 0x15:  case 0x16:  case 0x17:
 			case 0x1c:  case 0x1d:  case 0x1e:  case 0x1f:
@@ -699,7 +703,11 @@ bool powerpc_disassembler::Simplified(uint32_t op, uint32_t vpc, std::string &si
 				return false;
 		}
 
-		if (op & M_LK)  mnem += "l";
+		if (op & M_LK)
+		{
+			mnem += "l";
+			flags |= STEP_OVER;
+		}
 		if (op & M_AA)  mnem += "a";
 
 		if (!(G_BO(op) & 0x10) && G_BI(op) / 4 != 0)
@@ -714,16 +722,20 @@ bool powerpc_disassembler::Simplified(uint32_t op, uint32_t vpc, std::string &si
 			case 0x04:  case 0x05:  case 0x06:  case 0x07:
 				mnem += "b";
 				mnem += crnbit[G_BI(op) & 3];
+				flags |= STEP_COND;
 				break;
 			case 0x0c:  case 0x0d:  case 0x0e:  case 0x0f:
 				mnem += "b";
 				mnem += crbit[G_BI(op) & 3];
+				flags |= STEP_COND;
 				break;
 			case 0x10:  case 0x11:  case 0x18:  case 0x19:
 				mnem += "bdnz";
+				flags |= STEP_COND;
 				break;
 			case 0x12:  case 0x13:  case 0x1a:  case 0x1b:
 				mnem += "bdz";
+				flags |= STEP_COND;
 				break;
 			case 0x14:  case 0x15:  case 0x16:  case 0x17:
 			case 0x1c:  case 0x1d:  case 0x1e:  case 0x1f:
@@ -733,8 +745,19 @@ bool powerpc_disassembler::Simplified(uint32_t op, uint32_t vpc, std::string &si
 				return false;
 		}
 
-		mnem += (G_XO(op) == 528) ? "ctr" : "lr";
-		if (op & M_LK)  mnem += "l";
+		if (G_XO(op) == 528)
+			mnem += "ctr";
+		else
+		{
+			mnem += "lr";
+			if (!(op & M_LK))
+				flags |= STEP_OUT;
+		}
+		if (op & M_LK)
+		{
+			mnem += "l";
+			flags |= STEP_OVER;
+		}
 		if (op & M_AA)  mnem += "a";
 
 		if (!(G_BO(op) & 0x10) && G_BI(op) / 4 != 0)
@@ -777,7 +800,7 @@ offs_t powerpc_disassembler::dasm_one(std::ostream &stream, uint32_t pc, uint32_
 	 * Try simplified forms first, then real instructions
 	 */
 
-	if( Simplified(op, pc, signed16, mnem, oprs) ) {
+	if( Simplified(op, pc, signed16, mnem, oprs, flags) ) {
 		util::stream_format(stream, "%s", mnem);
 		for( j = mnem.size(); j < 10; j++ ) {
 			util::stream_format(stream, " ");
@@ -845,16 +868,12 @@ offs_t powerpc_disassembler::dasm_one(std::ostream &stream, uint32_t pc, uint32_
 				break;
 
 			case F_LI:
-				disp = G_LI(op) * 4;
-				if (disp & 0x02000000)  // sign extend
-					disp |= 0xfc000000;
+				disp = util::sext(G_LI(op) * 4, 26);
 				oprs = util::string_format("0x%08X", disp + ((op & M_AA) ? 0 : pc));
 				break;
 
 			case F_BCx:
-				disp = G_BD(op) * 4;
-				if (disp & 0x00008000)
-					disp |= 0xffff0000;
+				disp = util::sext(G_BD(op) * 4, 16);
 
 				if (G_BO(op) & 0x10)    // BI is ignored (don't print CR bit)
 					oprs = util::string_format("0x%02X,%d,0x%08X", G_BO(op), G_BI(op), disp + ((op & M_AA) ? 0 : pc));
@@ -1066,7 +1085,18 @@ offs_t powerpc_disassembler::dasm_one(std::ostream &stream, uint32_t pc, uint32_
 				oprs = util::string_format("%d,r%d,%s", G_TO(op), G_RA(op), signed16);
 				break;
 
+			case F_SC:
+				if (op & M_AA)
+					oprs = util::string_format("0x%04X", (op & 0x0000fffc) >> 2);
+				else
+					oprs = util::string_format("%d,%d,%d", (op & 0x00000fe0) >> 5, (op & 0x0000f000) >> 12, (op & 0x0000001c) >> 2);
+				break;
+
 			case F_NONE:
+				if ((op >> 26) == 17) // SC (PowerPC)
+					flags |= STEP_OVER;
+				[[fallthrough]];
+
 			default:
 				break;
 			}

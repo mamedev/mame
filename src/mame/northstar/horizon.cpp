@@ -39,9 +39,20 @@ involves replacing the XTAL and reconnecting one jumper.
 #include "emu.h"
 #include "bus/rs232/rs232.h"
 #include "bus/s100/s100.h"
+#include "bus/s100/am310.h"
+//#include "bus/s100/dj2db.h"
+//#include "bus/s100/djdma.h"
+//#include "bus/s100/mm65k16s.h"
+#include "bus/s100/nsmdsa.h"
+#include "bus/s100/nsmdsad.h"
+#include "bus/s100/seals8k.h"
+//#include "bus/s100/wunderbus.h"
 #include "cpu/z80/z80.h"
 #include "machine/i8251.h"
 #include "softlist_dev.h"
+
+
+namespace {
 
 #define Z80_TAG         "z80"
 #define I8251_L_TAG     "3a"
@@ -67,10 +78,10 @@ public:
 private:
 	uint8_t ff_r();
 
-	void horizon_io(address_map &map);
-	void horizon_mem(address_map &map);
+	void horizon_io(address_map &map) ATTR_COLD;
+	void horizon_mem(address_map &map) ATTR_COLD;
 
-	virtual void machine_reset() override;
+	virtual void machine_reset() override ATTR_COLD;
 	required_device<cpu_device> m_maincpu;
 	required_device<i8251_device> m_usart_l;
 	required_device<i8251_device> m_usart_r;
@@ -150,16 +161,6 @@ DEVICE_INPUT_DEFAULTS_END
 //  S100_INTERFACE( s100_intf )
 //-------------------------------------------------
 
-// slot devices
-#include "bus/s100/am310.h"
-//#include "bus/s100/dj2db.h"
-//#include "bus/s100/djdma.h"
-//#include "bus/s100/mm65k16s.h"
-#include "bus/s100/nsmdsa.h"
-#include "bus/s100/nsmdsad.h"
-#include "bus/s100/seals8k.h"
-//#include "bus/s100/wunderbus.h"
-
 static void horizon_s100_cards(device_slot_interface &device)
 {
 	device.option_add("mdsa", S100_MDS_A);
@@ -212,7 +213,7 @@ void horizon_state::horizon(machine_config &config)
 
 	// S-100
 	S100_BUS(config, m_s100, XTAL(8'000'000) / 4);
-	m_s100->rdy().set_inputline(m_maincpu, Z80_INPUT_LINE_BOGUSWAIT);
+	//m_s100->rdy().set_inputline(m_maincpu, Z80_INPUT_LINE_WAIT);
 	//S100_SLOT(config, S100_TAG":1", horizon_s100_cards, nullptr, nullptr); // CPU
 	S100_SLOT(config, "s100:2", horizon_s100_cards, nullptr); // RAM
 	S100_SLOT(config, "s100:3", horizon_s100_cards, "mdsad"); // MDS
@@ -264,6 +265,7 @@ ROM_START( vector1 ) // This one have different I/O
 	ROM_LOAD( "horizon.bin", 0x0000, 0x0100, CRC(7aafa134) SHA1(bf1552c4818f30473798af4f54e65e1957e0db48))
 ROM_END
 
+} // anonymous namespace
 
 
 //**************************************************************************

@@ -2,8 +2,8 @@
 // copyright-holders:Curt Coder
 #pragma once
 
-#ifndef MAME_INCLUDES_TMC2000E_H
-#define MAME_INCLUDES_TMC2000E_H
+#ifndef MAME_TELERCAS_TMC2000E_H
+#define MAME_TELERCAS_TMC2000E_H
 
 
 #include "cpu/cosmac/cosmac.h"
@@ -44,13 +44,13 @@ private:
 	void io_w(uint8_t data);
 	void io_select_w(uint8_t data);
 	void keyboard_latch_w(uint8_t data);
-	DECLARE_READ_LINE_MEMBER( rdata_r );
-	DECLARE_READ_LINE_MEMBER( bdata_r );
-	DECLARE_READ_LINE_MEMBER( gdata_r );
-	DECLARE_READ_LINE_MEMBER( clear_r );
-	DECLARE_READ_LINE_MEMBER( ef2_r );
-	DECLARE_READ_LINE_MEMBER( ef3_r );
-	DECLARE_WRITE_LINE_MEMBER( q_w );
+	int rdata_r();
+	int bdata_r();
+	int gdata_r();
+	int clear_r();
+	int ef2_r();
+	int ef3_r();
+	void q_w(int state);
 	void dma_w(offs_t offset, uint8_t data);
 
 	/* video state */
@@ -59,11 +59,11 @@ private:
 
 	/* keyboard state */
 	int m_keylatch = 0;         /* key latch */
-	void tmc2000e_io_map(address_map &map);
-	void tmc2000e_map(address_map &map);
+	void tmc2000e_io_map(address_map &map) ATTR_COLD;
+	void tmc2000e_map(address_map &map) ATTR_COLD;
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	required_device<cosmac_device> m_maincpu;
 	required_device<cdp1864_device> m_cti;
@@ -74,4 +74,4 @@ private:
 	output_finder<> m_led;
 };
 
-#endif
+#endif // MAME_TELERCAS_TMC2000E_H

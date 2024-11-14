@@ -782,7 +782,7 @@ void nycaptor_state::nycaptor(machine_config &config)
 	ay2.add_route(ALL_OUTPUTS, "speaker", 0.15);
 
 	MSM5232(config, m_msm, 2000000);
-	m_msm->set_capacitors(0.65e-6, 0.65e-6, 0.65e-6, 0.65e-6, 0.65e-6, 0.65e-6, 0.65e-6, 0.65e-6); /* 0.65 (???) uF capacitors (match the sample, not verified) */
+	m_msm->set_capacitors(1e-6, 1e-6, 1e-6, 1e-6, 1e-6, 1e-6, 1e-6, 1e-6); /* 1 uF capacitors (match the sample, not verified, standard) */
 	m_msm->add_route(0, "speaker", 1.0);   // pin 28  2'-1
 	m_msm->add_route(1, "speaker", 1.0);   // pin 29  4'-1
 	m_msm->add_route(2, "speaker", 1.0);   // pin 30  8'-1
@@ -849,7 +849,7 @@ void nycaptor_state::cyclshtg(machine_config &config)
 	ay2.add_route(ALL_OUTPUTS, "speaker", 0.15);
 
 	MSM5232(config, m_msm, 2000000);
-	m_msm->set_capacitors(0.65e-6, 0.65e-6, 0.65e-6, 0.65e-6, 0.65e-6, 0.65e-6, 0.65e-6, 0.65e-6); /* 0.65 (???) uF capacitors (match the sample, not verified) */
+	m_msm->set_capacitors(1e-6, 1e-6, 1e-6, 1e-6, 1e-6, 1e-6, 1e-6, 1e-6); /* 1 uF capacitors (match the sample, not verified, standard) */
 	m_msm->add_route(0, "speaker", 1.0);   // pin 28  2'-1
 	m_msm->add_route(1, "speaker", 1.0);   // pin 29  4'-1
 	m_msm->add_route(2, "speaker", 1.0);   // pin 30  8'-1
@@ -913,7 +913,7 @@ void nycaptor_state::bronx(machine_config &config)
 	ay2.add_route(ALL_OUTPUTS, "speaker", 0.15);
 
 	MSM5232(config, m_msm, 2000000);
-	m_msm->set_capacitors(0.65e-6, 0.65e-6, 0.65e-6, 0.65e-6, 0.65e-6, 0.65e-6, 0.65e-6, 0.65e-6); /* 0.65 (???) uF capacitors (match the sample, not verified) */
+	m_msm->set_capacitors(1e-6, 1e-6, 1e-6, 1e-6, 1e-6, 1e-6, 1e-6, 1e-6); /* 1 uF capacitors (match the sample, not verified, standard) */
 	m_msm->add_route(0, "speaker", 1.0);   // pin 28  2'-1
 	m_msm->add_route(1, "speaker", 1.0);   // pin 29  4'-1
 	m_msm->add_route(2, "speaker", 1.0);   // pin 30  8'-1
@@ -1292,8 +1292,8 @@ void nycaptor_state::init_colt()
 	m_gametype = 2;
 }
 
-GAME( 1985, nycaptor, 0,        nycaptor, nycaptor, nycaptor_state, init_nycaptor, ROT0,  "Taito",   "N.Y. Captor",    MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1986, colt,     nycaptor, bronx,    colt,     nycaptor_state, init_colt,     ROT0,  "bootleg", "Colt",           MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1985, nycaptor, 0,        nycaptor, nycaptor, nycaptor_state, init_nycaptor, ROT0,  "Taito",   "N.Y. Captor (rev 2)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1986, colt,     nycaptor, bronx,    colt,     nycaptor_state, init_colt,     ROT0,  "bootleg", "Colt",                MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 
-GAME( 1986, cyclshtg, 0,        cyclshtg, cyclshtg, nycaptor_state, init_cyclshtg, ROT90, "Taito",   "Cycle Shooting", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-GAME( 1986, bronx,    cyclshtg, bronx,    bronx,    nycaptor_state, init_bronx,    ROT90, "bootleg", "Bronx",          MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1986, cyclshtg, 0,        cyclshtg, cyclshtg, nycaptor_state, init_cyclshtg, ROT90, "Taito",   "Cycle Shooting",      MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1986, bronx,    cyclshtg, bronx,    bronx,    nycaptor_state, init_bronx,    ROT90, "bootleg", "Bronx",               MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

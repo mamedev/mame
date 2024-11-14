@@ -36,6 +36,8 @@
 #include "tilemap.h"
 
 
+namespace {
+
 class limenko_state : public driver_device
 {
 public:
@@ -67,10 +69,10 @@ public:
 	void init_legendoh();
 	void init_spotty();
 
-	DECLARE_READ_LINE_MEMBER(spriteram_bit_r);
+	int spriteram_bit_r();
 
 protected:
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -124,10 +126,10 @@ private:
 	void draw_sprites();
 	void copy_sprites(bitmap_ind16 &bitmap, bitmap_ind16 &sprites_bitmap, bitmap_ind8 &priority_bitmap, const rectangle &cliprect);
 
-	void limenko_io_map(address_map &map);
-	void limenko_map(address_map &map);
-	void spotty_io_map(address_map &map);
-	void spotty_map(address_map &map);
+	void limenko_io_map(address_map &map) ATTR_COLD;
+	void limenko_map(address_map &map) ATTR_COLD;
+	void spotty_io_map(address_map &map) ATTR_COLD;
+	void spotty_map(address_map &map) ATTR_COLD;
 
 	// spotty audiocpu
 	uint8_t audiocpu_p1_r();
@@ -167,7 +169,7 @@ void limenko_state::fg_videoram_w(offs_t offset, u32 data, u32 mem_mask)
 	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
-READ_LINE_MEMBER(limenko_state::spriteram_bit_r)
+int limenko_state::spriteram_bit_r()
 {
 	return m_spriteram_bit;
 }
@@ -566,7 +568,7 @@ static INPUT_PORTS_START(legendoh)
 	PORT_BIT(0x00100000, IP_ACTIVE_LOW, IPT_SERVICE1)
 	PORT_SERVICE_NO_TOGGLE(0x00200000, IP_ACTIVE_LOW)
 	PORT_BIT(0x00400000, IP_ACTIVE_HIGH, IPT_CUSTOM) //security bit
-	PORT_BIT(0x00800000, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
+	PORT_BIT(0x00800000, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_READ_LINE_DEVICE_MEMBER("eeprom", FUNC(eeprom_serial_93cxx_device::do_read))
 	PORT_BIT(0x01000000, IP_ACTIVE_LOW, IPT_START3)
 	PORT_BIT(0x02000000, IP_ACTIVE_LOW, IPT_START4)
 	PORT_BIT(0x04000000, IP_ACTIVE_LOW, IPT_COIN3)
@@ -575,13 +577,13 @@ static INPUT_PORTS_START(legendoh)
 	PORT_DIPNAME(0x20000000, 0x00000000, "Sound Enable")
 	PORT_DIPSETTING(         0x20000000, DEF_STR(Off))
 	PORT_DIPSETTING(         0x00000000, DEF_STR(On))
-	PORT_BIT(0x80000000, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_READ_LINE_MEMBER(limenko_state, spriteram_bit_r) //changes spriteram location
+	PORT_BIT(0x80000000, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_READ_LINE_MEMBER(FUNC(limenko_state::spriteram_bit_r)) //changes spriteram location
 	PORT_BIT(0x4000ffff, IP_ACTIVE_LOW, IPT_UNUSED)
 
 	PORT_START("EEPROMOUT")
-	PORT_BIT(0x00010000, IP_ACTIVE_HIGH, IPT_OUTPUT) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, cs_write)
-	PORT_BIT(0x00020000, IP_ACTIVE_HIGH, IPT_OUTPUT) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, clk_write)
-	PORT_BIT(0x00040000, IP_ACTIVE_HIGH, IPT_OUTPUT) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, di_write)
+	PORT_BIT(0x00010000, IP_ACTIVE_HIGH, IPT_OUTPUT) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", FUNC(eeprom_serial_93cxx_device::cs_write))
+	PORT_BIT(0x00020000, IP_ACTIVE_HIGH, IPT_OUTPUT) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", FUNC(eeprom_serial_93cxx_device::clk_write))
+	PORT_BIT(0x00040000, IP_ACTIVE_HIGH, IPT_OUTPUT) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", FUNC(eeprom_serial_93cxx_device::di_write))
 //  PORT_BIT(0x00080000, IP_ACTIVE_HIGH, IPT_UNKNOWN) // 0x80000 -> video disabled?
 INPUT_PORTS_END
 
@@ -615,18 +617,18 @@ static INPUT_PORTS_START(sb2003)
 	PORT_BIT(0x00080000, IP_ACTIVE_LOW, IPT_COIN2)
 	PORT_SERVICE_NO_TOGGLE(0x00200000, IP_ACTIVE_LOW)
 	PORT_BIT(0x00400000, IP_ACTIVE_LOW, IPT_CUSTOM) //security bit
-	PORT_BIT(0x00800000, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
+	PORT_BIT(0x00800000, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_READ_LINE_DEVICE_MEMBER("eeprom", FUNC(eeprom_serial_93cxx_device::do_read))
 	PORT_DIPNAME(0x20000000, 0x00000000, "Sound Enable")
 	PORT_DIPSETTING(         0x20000000, DEF_STR(Off))
 	PORT_DIPSETTING(         0x00000000, DEF_STR(On))
-	PORT_BIT(0x80000000, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_READ_LINE_MEMBER(limenko_state, spriteram_bit_r) //changes spriteram location
+	PORT_BIT(0x80000000, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_READ_LINE_MEMBER(FUNC(limenko_state::spriteram_bit_r)) //changes spriteram location
 	PORT_BIT(0x00100000, IP_ACTIVE_LOW, IPT_SERVICE1) // checked in dynabomb I/O test, but doesn't work in game
 	PORT_BIT(0x5f00ffff, IP_ACTIVE_LOW, IPT_UNUSED)
 
 	PORT_START("EEPROMOUT")
-	PORT_BIT(0x00010000, IP_ACTIVE_HIGH, IPT_OUTPUT) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, cs_write)
-	PORT_BIT(0x00020000, IP_ACTIVE_HIGH, IPT_OUTPUT) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, clk_write)
-	PORT_BIT(0x00040000, IP_ACTIVE_HIGH, IPT_OUTPUT) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, di_write)
+	PORT_BIT(0x00010000, IP_ACTIVE_HIGH, IPT_OUTPUT) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", FUNC(eeprom_serial_93cxx_device::cs_write))
+	PORT_BIT(0x00020000, IP_ACTIVE_HIGH, IPT_OUTPUT) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", FUNC(eeprom_serial_93cxx_device::clk_write))
+	PORT_BIT(0x00040000, IP_ACTIVE_HIGH, IPT_OUTPUT) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", FUNC(eeprom_serial_93cxx_device::di_write))
 //  PORT_BIT(0x00080000, IP_ACTIVE_HIGH, IPT_UNKNOWN) // 0x80000 -> video disabled?
 INPUT_PORTS_END
 
@@ -657,10 +659,10 @@ static INPUT_PORTS_START(spotty)
 	PORT_BIT(0x00010000, IP_ACTIVE_LOW, IPT_START1)
 	PORT_BIT(0x00020000, IP_ACTIVE_LOW, IPT_UNUSED)
 	PORT_BIT(0x00040000, IP_ACTIVE_LOW, IPT_COIN1)
-	PORT_BIT(0x00080000, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_READ_LINE_MEMBER(limenko_state, spriteram_bit_r) //changes spriteram location
+	PORT_BIT(0x00080000, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_READ_LINE_MEMBER(FUNC(limenko_state::spriteram_bit_r)) //changes spriteram location
 	PORT_SERVICE_NO_TOGGLE(0x00200000, IP_ACTIVE_LOW)
 	PORT_BIT(0x00400000, IP_ACTIVE_LOW, IPT_CUSTOM) //security bit
-	PORT_BIT(0x00800000, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
+	PORT_BIT(0x00800000, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_READ_LINE_DEVICE_MEMBER("eeprom", FUNC(eeprom_serial_93cxx_device::do_read))
 	PORT_DIPNAME(0x20000000, 0x20000000, DEF_STR(Demo_Sounds))
 	PORT_DIPSETTING(         0x00000000, DEF_STR(Off))
 	PORT_DIPSETTING(         0x20000000, DEF_STR(On))
@@ -668,9 +670,9 @@ static INPUT_PORTS_START(spotty)
 	PORT_BIT(0x5f10ffff, IP_ACTIVE_LOW, IPT_UNUSED)
 
 	PORT_START("EEPROMOUT")
-	PORT_BIT(0x00010000, IP_ACTIVE_HIGH, IPT_OUTPUT) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, cs_write)
-	PORT_BIT(0x00020000, IP_ACTIVE_HIGH, IPT_OUTPUT) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, clk_write)
-	PORT_BIT(0x00040000, IP_ACTIVE_HIGH, IPT_OUTPUT) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, di_write)
+	PORT_BIT(0x00010000, IP_ACTIVE_HIGH, IPT_OUTPUT) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", FUNC(eeprom_serial_93cxx_device::cs_write))
+	PORT_BIT(0x00020000, IP_ACTIVE_HIGH, IPT_OUTPUT) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", FUNC(eeprom_serial_93cxx_device::clk_write))
+	PORT_BIT(0x00040000, IP_ACTIVE_HIGH, IPT_OUTPUT) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", FUNC(eeprom_serial_93cxx_device::di_write))
 //  PORT_BIT(0x00080000, IP_ACTIVE_HIGH, IPT_UNKNOWN) // 0x80000 -> video disabled?
 INPUT_PORTS_END
 
@@ -1123,6 +1125,9 @@ void limenko_state::init_spotty()
 	save_item(NAME(m_audiocpu_p1));
 	save_item(NAME(m_audiocpu_p3));
 }
+
+} // anonymous namespace
+
 
 GAME(2000, dynabomb, 0,      limenko, sb2003,   limenko_state, init_dynabomb, ROT0, "Limenko",    "Dynamite Bomber (Korea, Rev 1.5)",   MACHINE_SUPPORTS_SAVE)
 GAME(2000, legendoh, 0,      limenko, legendoh, limenko_state, init_legendoh, ROT0, "Limenko",    "Legend of Heroes",                   MACHINE_SUPPORTS_SAVE)

@@ -54,8 +54,8 @@ public:
 protected:
 	// device-level overrides
 	virtual void device_validity_check(validity_checker &valid) const override;
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 	virtual void device_post_load() override;
 	virtual void device_clock_changed() override;
 
@@ -63,7 +63,7 @@ protected:
 	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
 
 	// device_rom_interface overrides
-	virtual void rom_bank_updated() override;
+	virtual void rom_bank_pre_change() override;
 
 	// a single voice
 	class okim_voice

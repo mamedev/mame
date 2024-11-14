@@ -2,7 +2,7 @@
 // copyright-holders:Sergey Svishchev
 /*********************************************************************
 
-    formats/aim_dsk.h
+    formats/aim_dsk.cpp
 
     AIM disk images
 
@@ -22,19 +22,19 @@ aim_format::aim_format()
 }
 
 
-const char *aim_format::name() const
+const char *aim_format::name() const noexcept
 {
 	return "aim";
 }
 
 
-const char *aim_format::description() const
+const char *aim_format::description() const noexcept
 {
 	return "AIM disk image";
 }
 
 
-const char *aim_format::extensions() const
+const char *aim_format::extensions() const noexcept
 {
 	return "aim";
 }
@@ -53,9 +53,9 @@ int aim_format::identify(util::random_read &io, uint32_t form_factor, const std:
 }
 
 
-bool aim_format::load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image) const
+bool aim_format::load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image &image) const
 {
-	image->set_variant(floppy_image::DSQD);
+	image.set_variant(floppy_image::DSQD);
 
 	const int tracks = 80;
 	const int track_size = 6464 * 2;
@@ -72,8 +72,8 @@ bool aim_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 			bool header = false;
 
 			// Read track
-			size_t actual;
-			io.read_at((heads * track + head) * track_size, &track_data[0], track_size, actual);
+			/*auto const [err, actual] =*/ read_at(io, (heads * track + head) * track_size, &track_data[0], track_size);
+			// FIXME: check for error and premature EOF
 
 			// Find first sector header or index mark
 			for (int offset = 0; offset < track_size; offset += 2)

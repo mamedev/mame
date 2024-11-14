@@ -23,11 +23,12 @@ public:
 	tigeroad_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
+		, m_audiocpu(*this, "audiocpu")
 		, m_palette(*this, "palette")
 		, m_has_coinlock(true)
 		, m_spriteram(*this, "spriteram")
 		, m_videoram(*this, "videoram")
-		, m_audiocpu(*this, "audiocpu")
+		, m_bgmap(*this, "bgmap")
 		, m_msm(*this, "msm")
 		, m_gfxdecode(*this, "gfxdecode")
 		, m_spritegen(*this, "spritegen")
@@ -41,6 +42,7 @@ public:
 
 protected:
 	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_audiocpu;
 	required_device<palette_device> m_palette;
 
 	void soundcmd_w(offs_t offset, u16 data, u16 mem_mask = ~0);
@@ -48,14 +50,13 @@ protected:
 	void videoctrl_w(u8 data);
 	void scroll_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 
-	void main_map(address_map &map);
-	// misc
+	void main_map(address_map &map) ATTR_COLD;
 	bool m_has_coinlock;
 
 private:
 	required_device<buffered_spriteram16_device> m_spriteram;
 	required_shared_ptr<u16> m_videoram;
-	required_device<cpu_device> m_audiocpu;
+	required_region_ptr<u16> m_bgmap;
 	optional_device<msm5205_device> m_msm;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<tigeroad_spr_device> m_spritegen;
@@ -64,18 +65,18 @@ private:
 	tilemap_t *m_bg_tilemap = nullptr;
 	tilemap_t *m_fg_tilemap = nullptr;
 
-	void comad_sound_io_map(address_map &map);
-	void comad_sound_map(address_map &map);
-	void sample_map(address_map &map);
-	void sample_port_map(address_map &map);
-	void sound_map(address_map &map);
-	void sound_port_map(address_map &map);
+	void comad_sound_io_map(address_map &map) ATTR_COLD;
+	void comad_sound_map(address_map &map) ATTR_COLD;
+	void sample_map(address_map &map) ATTR_COLD;
+	void sample_port_map(address_map &map) ATTR_COLD;
+	void sound_map(address_map &map) ATTR_COLD;
+	void sound_port_map(address_map &map) ATTR_COLD;
 
 	void msm5205_w(u8 data);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	TILEMAP_MAPPER_MEMBER(tigeroad_tilemap_scan);
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
@@ -100,7 +101,7 @@ public:
 	void bballs(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	u16 mcu_comm_r(offs_t offset, u16 mem_mask = ~0);
@@ -111,8 +112,8 @@ private:
 	void mcu_pb_w(u8 data);
 	void mcu_pc_w(u8 data);
 
-	void bballs_map(address_map &map);
-	void pushman_map(address_map &map);
+	void bballs_map(address_map &map) ATTR_COLD;
+	void pushman_map(address_map &map) ATTR_COLD;
 
 	required_device<m68705u_device> m_mcu;
 
@@ -136,11 +137,11 @@ public:
 	void f1dream(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
-	void f1dream_map(address_map &map);
-	void f1dream_mcu_io(address_map &map);
+	void f1dream_map(address_map &map) ATTR_COLD;
+	void f1dream_mcu_io(address_map &map) ATTR_COLD;
 
 	void out3_w(u8 data);
 

@@ -2,8 +2,13 @@
 // copyright-holders:R. Belmont, Olivier Galibert
 /*************************************************************************************
 
-    Yamaha MU-80 and MU-100 : 32-voice polyphonic/multitimbral General MIDI/GS/XG tone modules
+    Yamaha MU-100 : 32-part, 64-voice polyphonic/multitimbral General MIDI/GS/XG
+                    tone module
     Preliminary driver by R. Belmont and O. Galibert
+
+    The successor to the mu90, uses the same one-chip SWP30 with a better sample rom.
+    Exists in rackable (mu100r) and screenless (mu100b), and single board (xt446)
+    variants.
 
     MU100 CPU: Hitachi H8S/2655 (HD6432655F), strapped for mode 4 (24-bit address, 16-bit data, no internal ROM)
     Sound ASIC: Yamaha XS725A0/SWP30
@@ -122,10 +127,13 @@
 #include "cpu/h8/h8s2655.h"
 #include "mulcd.h"
 #include "sound/swp30.h"
+#include "bus/plg1x0/plg1x0.h"
 
 #include "debugger.h"
 #include "speaker.h"
 
+
+namespace {
 
 static INPUT_PORTS_START( mu100 )
 	PORT_START("P7")
@@ -157,151 +165,65 @@ public:
 		, m_maincpu(*this, "maincpu")
 		, m_swp30(*this, "swp30")
 		, m_lcd(*this, "lcd")
+		, m_ext1(*this, "ext1")
+		, m_ext2(*this, "ext2")
 		, m_ioport_p7(*this, "P7")
 		, m_ioport_p8(*this, "P8")
 	{ }
 
 	void mu100(machine_config &config);
-
-	void regs_s1_write_tap(offs_t address, u16 data, u16 mem_mask);
-	void regs_s2_write_tap(offs_t address, u16 data, u16 mem_mask);
-	void regs_s3_write_tap(offs_t address, u16 data, u16 mem_mask);
-	void regs_s4a_write_tap(offs_t address, u16 data, u16 mem_mask);
-	void regs_s4b_write_tap(offs_t address, u16 data, u16 mem_mask);
-	void regs_s4c_write_tap(offs_t address, u16 data, u16 mem_mask);
-	void regs_lfo_write_tap(offs_t address, u16 data, u16 mem_mask);
-	void regs_s6_write_tap(offs_t address, u16 data, u16 mem_mask);
-	void regs_fp_read_tap(offs_t address, u16 data, u16 mem_mask);
-	void regs_fp_write_tap(offs_t address, u16 data, u16 mem_mask);
-	void regs_int_read_tap(offs_t address, u16 data, u16 mem_mask);
-	void regs_int_write_tap(offs_t address, u16 data, u16 mem_mask);
-	void voice_write_tap(offs_t address, u16 data, u16 mem_mask);
-	void voice_read_tap(offs_t address, u16 data, u16 mem_mask);
-	void chan_write_tap(offs_t address, u16 data, u16 mem_mask);
-	void prg_write_tap(offs_t address, u16 data, u16 mem_mask);
-
-	virtual void machine_reset() override {
-		if(0)
-		m_maincpu->space(0).install_write_tap(0x214cb8, 0x214cbf, "prg select", [this](offs_t offset, u16 &data, u16 mem_mask) {
-												   prg_write_tap(offset, data, mem_mask);
-											   });
-		if(0)
-		m_maincpu->space(0).install_write_tap(0x20cb10, 0x20cb10 + 0x122*0x22 - 1, "chan debug", [this](offs_t offset, u16 &data, u16 mem_mask) {
-												   chan_write_tap(offset, data, mem_mask);
-											   });
-		if(0)
-		m_maincpu->space(0).install_write_tap(0x20f03e, 0x20f03e + 0x92*0x40 - 1, "voice debug", [this](offs_t offset, u16 &data, u16 mem_mask) {
-												  voice_write_tap(offset, data, mem_mask);
-											   });
-		if(0)
-		m_maincpu->space(0).install_read_tap(0x20f03e, 0x20f03e + 0x92*0x40 - 1, "voice debug", [this](offs_t offset, u16 &data, u16 mem_mask) {
-												  voice_read_tap(offset, data, mem_mask);
-											   });
-		if(0)
-		m_maincpu->space(0).install_readwrite_tap(0x214ca2+0x20, 0x214ca2+0x320-1, "regs fp",
-												  [this](offs_t offset, u16 &data, u16 mem_mask) {
-													  regs_fp_read_tap(offset, data, mem_mask);
-												  },
-												  [this](offs_t offset, u16 &data, u16 mem_mask) {
-													  regs_fp_write_tap(offset, data, mem_mask);
-												  });
-		if(0)
-		m_maincpu->space(0).install_readwrite_tap(0x214ca2+0x320, 0x214ca2+0x420-1, "regs int",
-												  [this](offs_t offset, u16 &data, u16 mem_mask) {
-													  regs_int_read_tap(offset, data, mem_mask);
-												  },
-												  [this](offs_t offset, u16 &data, u16 mem_mask) {
-													  regs_int_write_tap(offset, data, mem_mask);
-												  });
-		if(0)
-		m_maincpu->space(0).install_write_tap(0x214ca2+0x420, 0x214ca2+0x440-1, "regs s1", [this](offs_t offset, u16 &data, u16 mem_mask) {
-												  regs_s1_write_tap(offset, data, mem_mask);
-											   });
-		if(0)
-		m_maincpu->space(0).install_write_tap(0x214ca2+0x440, 0x214ca2+0x460-1, "regs s2", [this](offs_t offset, u16 &data, u16 mem_mask) {
-												  regs_s2_write_tap(offset, data, mem_mask);
-											   });
-		if(0)
-		m_maincpu->space(0).install_write_tap(0x214ca2+0x460, 0x214ca2+0x480-1, "regs s3", [this](offs_t offset, u16 &data, u16 mem_mask) {
-												  regs_s3_write_tap(offset, data, mem_mask);
-											   });
-		if(0)
-		m_maincpu->space(0).install_write_tap(0x214ca2+0x480, 0x214ca2+0x4a0-1, "regs s4a", [this](offs_t offset, u16 &data, u16 mem_mask) {
-												  regs_s4a_write_tap(offset, data, mem_mask);
-											   });
-		if(0)
-		m_maincpu->space(0).install_write_tap(0x214ca2+0x4a0, 0x214ca2+0x4c0-1, "regs s4b", [this](offs_t offset, u16 &data, u16 mem_mask) {
-												  regs_s4b_write_tap(offset, data, mem_mask);
-											   });
-		if(0)
-		m_maincpu->space(0).install_write_tap(0x214ca2+0x4c0, 0x214ca2+0x4e0-1, "regs s4c", [this](offs_t offset, u16 &data, u16 mem_mask) {
-												  regs_s4c_write_tap(offset, data, mem_mask);
-											   });
-		if(0)
-		m_maincpu->space(0).install_write_tap(0x214ca2+0x4e0, 0x214ca2+0x510-1, "regs lfo", [this](offs_t offset, u16 &data, u16 mem_mask) {
-												  regs_lfo_write_tap(offset, data, mem_mask);
-											   });
-		if(0)
-		m_maincpu->space(0).install_write_tap(0x214ca2+0x510, 0x214ca2+0x520-1, "regs s6", [this](offs_t offset, u16 &data, u16 mem_mask) {
-												  regs_s6_write_tap(offset, data, mem_mask);
-											   });
-	}
+	void mu100b(machine_config &config);
 
 protected:
 	virtual u16 adc_type_r();
 
-private:
 	enum {
 		P2_LCD_RS     = 0x01,
 		P2_LCD_RW     = 0x02,
 		P2_LCD_ENABLE = 0x04
 	};
 
-	enum {
-		P6_LCD_RS     = 0x04,
-		P6_LCD_RW     = 0x02,
-		P6_LCD_ENABLE = 0x01
-	};
-
-	enum {
-		PA_LCD_RS     = 0x02,
-		PA_LCD_ENABLE = 0x20,
-		PA_LCD_RW     = 0x40
-	};
-
 	required_device<h8s2655_device> m_maincpu;
 	required_device<swp30_device> m_swp30;
-	required_device<mulcd_device> m_lcd;
+	optional_device<mulcd_device> m_lcd;
+	required_device<plg1x0_connector> m_ext1;
+	optional_device<plg1x0_connector> m_ext2;
 	required_ioport m_ioport_p7;
 	required_ioport m_ioport_p8;
 
-	u8 cur_p1, cur_p2, cur_p3, cur_p5, cur_p6, cur_pa, cur_pb, cur_pc, cur_pf, cur_pg;
-	u8 cur_ic32;
+	u8 m_cur_p1, m_cur_p2, m_cur_p3, m_cur_p5, m_cur_p6, m_cur_pa, m_cur_pb, m_cur_pc, m_cur_pf, m_cur_pg;
+	u8 m_cur_ic32, m_cur_sw;
+	int m_h8_tx, m_e1_tx, m_e2_tx;
 
-	u16 adc_zero_r();
 	u16 adc_ar_r();
 	u16 adc_al_r();
 	u16 adc_midisw_r();
 	u16 adc_battery_r();
 
-	void p1_w(u16 data);
-	u16 p1_r();
-	void p2_w(u16 data);
-	void p3_w(u16 data);
-	void p5_w(u16 data);
-	void p6_w(u16 data);
-	u16 p6_r();
-	void pa_w(u16 data);
-	u16 pa_r();
-	void pb_w(u16 data);
-	u16 pb_r();
-	void pf_w(u16 data);
-	void pg_w(u16 data);
+	void p1_w(u8 data);
+	u8 p1_r();
+	void p2_w(u8 data);
+	void p3_w(u8 data);
+	void p5_w(u8 data);
+	void p6_w(u8 data);
+	u8 p6_r();
+	void pa_w(u8 data);
+	u8 pa_r();
+	void pb_w(u8 data);
+	u8 pb_r();
+	void pf_w(u8 data);
+	void pg_w(u8 data);
 
-	virtual void machine_start() override;
-	void mu100_iomap(address_map &map);
-	void mu100_map(address_map &map);
-	void swp30_map(address_map &map);
+	void ext_serial_update();
+	void h8_tx(int state);
+	void e1_tx(int state);
+	void e2_tx(int state);
+
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+
+	void mu100_map(address_map &map) ATTR_COLD;
+	void swp30_map(address_map &map) ATTR_COLD;
 };
 
 class mu100r_state : public mu100_state {
@@ -310,220 +232,36 @@ public:
 		: mu100_state(mconfig, type, tag)
 	{ }
 
+	void mu100r(machine_config &config);
+
 private:
 	virtual u16 adc_type_r() override;
 };
 
-void mu100_state::prg_write_tap(offs_t address, u16 data, u16 mem_mask)
-{
-	if(mem_mask == 0x00ff) {
-		static const char *names[4] = { "chorus", "variation", "insertion1", "insertion2" };
-		logerror("prg_select %s %d\n", names[(address - 0x214cb8)/2], data);
-	}
-}
-
-void mu100_state::regs_s1_write_tap(offs_t address, u16 data, u16 mem_mask)
-{
-	offs_t pc = m_maincpu->pc();
-	offs_t reg = (address - 0x214ca2-0x420)/2;
-	if(pc != 0x72912)
-		logerror("regs_s1_w %03x, %04x @ %04x (%06x)\n", reg, data, mem_mask, pc);
-}
-
-void mu100_state::regs_s2_write_tap(offs_t address, u16 data, u16 mem_mask)
-{
-	offs_t pc = m_maincpu->pc();
-	offs_t reg = (address - 0x214ca2-0x440)/2;
-	if(pc != 0x72912)
-		logerror("regs_s2_w %03x, %04x @ %04x (%06x)\n", reg, data, mem_mask, pc);
-}
-
-void mu100_state::regs_s3_write_tap(offs_t address, u16 data, u16 mem_mask)
-{
-	offs_t pc = m_maincpu->pc();
-	offs_t reg = (address - 0x214ca2-0x460)/2;
-	if(pc != 0x72912)
-		logerror("regs_s3_w %03x, %04x @ %04x (%06x)\n", reg, data, mem_mask, pc);
-}
-
-void mu100_state::regs_s4a_write_tap(offs_t address, u16 data, u16 mem_mask)
-{
-	offs_t pc = m_maincpu->pc();
-	offs_t reg = (address - 0x214ca2-0x480)/2;
-	if(pc != 0x72912)
-		logerror("regs_s4a_w %03x, %04x @ %04x (%06x)\n", reg, data, mem_mask, pc);
-}
-
-void mu100_state::regs_s4b_write_tap(offs_t address, u16 data, u16 mem_mask)
-{
-	offs_t pc = m_maincpu->pc();
-	offs_t reg = (address - 0x214ca2-0x4a0)/2;
-	if(pc != 0x72912)
-		logerror("regs_s4b_w %03x, %04x @ %04x (%06x)\n", reg, data, mem_mask, pc);
-}
-
-void mu100_state::regs_s4c_write_tap(offs_t address, u16 data, u16 mem_mask)
-{
-	offs_t pc = m_maincpu->pc();
-	offs_t reg = (address - 0x214ca2-0x4c0)/2;
-	if(pc != 0x72912)
-		logerror("regs_s4c_w %03x, %04x @ %04x (%06x)\n", reg, data, mem_mask, pc);
-}
-
-void mu100_state::regs_lfo_write_tap(offs_t address, u16 data, u16 mem_mask)
-{
-	offs_t pc = m_maincpu->pc();
-	offs_t reg = (address - 0x214ca2-0x4e0)/2;
-	if(pc != 0x72912)
-		logerror("regs_lfo_w %03x, %04x @ %04x (%06x)\n", reg, data, mem_mask, pc);
-}
-
-void mu100_state::regs_s6_write_tap(offs_t address, u16 data, u16 mem_mask)
-{
-	offs_t pc = m_maincpu->pc();
-	offs_t reg = (address - 0x214ca2-0x510)/2;
-	if(pc != 0x72912)
-		logerror("regs_s6_w %03x, %04x @ %04x (%06x)\n", reg, data, mem_mask, pc);
-}
-
-void mu100_state::regs_fp_read_tap(offs_t address, u16 data, u16 mem_mask)
-{
-	offs_t pc = m_maincpu->pc();
-	offs_t reg = (address - 0x214ca2-0x20)/2;
-	if(pc != 0x72912)
-		logerror("regs_fp_r %03x, %04x @ %04x (%06x)\n", reg, data, mem_mask, pc);
-}
-
-void mu100_state::regs_fp_write_tap(offs_t address, u16 data, u16 mem_mask)
-{
-	offs_t pc = m_maincpu->pc();
-	offs_t reg = (address - 0x214ca2-0x20)/2;
-	logerror("regs_fp_w %03x, %04x @ %04x (%06x)\n", reg, data, mem_mask, pc);
-}
-
-void mu100_state::regs_int_read_tap(offs_t address, u16 data, u16 mem_mask)
-{
-	offs_t pc = m_maincpu->pc();
-	offs_t reg = (address - 0x214ca2-0x320)/2;
-	if(pc != 0x729c6)
-		logerror("regs_int_r %03x, %04x @ %04x (%06x)\n", reg, data, mem_mask, pc);
-}
-
-void mu100_state::regs_int_write_tap(offs_t address, u16 data, u16 mem_mask)
-{
-	offs_t pc = m_maincpu->pc();
-	offs_t reg = (address - 0x214ca2-0x320)/2;
-	logerror("regs_int_w %03x, %04x @ %04x (%06x)\n", reg, data, mem_mask, pc);
-}
-
-struct xmap {
-	int slot;
-	const char *name;
-};
-
-static xmap vmap[] = {
-	{ 0x00, "instrumenthi" },
-	{ 0x02, "instrumentlo" },
-	{ 0x04, "midi_channelhi" },
-	{ 0x06, "midi_channello" },
-	{ 0x0c, "lpf_cutoff" },
-	{ 0x42, "delay_time" },
-	{ 0x48, "active" },
-	{ 0x4a, "velocity" },
-	{ 0x51, "inverse_velocity" },
-	{ -1, "" },
-};
-
-void mu100_state::voice_write_tap(offs_t address, u16 data, u16 mem_mask)
-{
-	offs_t pc = m_maincpu->pc();
-	offs_t off = address - 0x20f03e;
-	int voice = off / 0x92;
-	int slot = off % 0x92;
-
-	if(mem_mask == 0xff00)
-		data >>= 8;
-	else if(mem_mask == 0x00ff)
-		slot++;
-
-	std::string slotname = util::string_format("%02x", slot);
-	for(int i=0; vmap[i].slot != -1; i++)
-		if(vmap[i].slot == slot)
-			slotname = vmap[i].name;
-
-	if(mem_mask == 0xffff) {
-		logerror("voice_w %02x:%s, %04x (%06x)\n", voice, slotname, data, pc);
-	} else {
-		logerror("voice_w %02x:%s, %02x (%06x)\n", voice, slotname, data, pc);
-	}
-}
-
-void mu100_state::voice_read_tap(offs_t address, u16 data, u16 mem_mask)
-{
-	offs_t pc = m_maincpu->pc();
-	offs_t off = address - 0x20f03e;
-	int voice = off / 0x92;
-	int slot = off % 0x92;
-
-	logerror("off %x voice %x slot %x mask %04x\n", off, voice, slot, mem_mask);
-	data &= mem_mask;
-	if(mem_mask == 0xff00)
-		data >>= 8;
-	else if(mem_mask == 0x00ff)
-		slot++;
-
-	std::string slotname = util::string_format("%02x", slot);
-	for(int i=0; vmap[i].slot != -1; i++)
-		if(vmap[i].slot == slot)
-			slotname = vmap[i].name;
-
-	if(mem_mask == 0xffff) {
-		logerror("voice_r %02x:%s, %04x (%06x)\n", voice, slotname, data, pc);
-	} else {
-		logerror("voice_r %02x:%s, %02x (%06x)\n", voice, slotname, data, pc);
-	}
-}
-
-void mu100_state::chan_write_tap(offs_t address, u16 data, u16 mem_mask)
-{
-	offs_t pc = m_maincpu->pc();
-	offs_t off = address - 0x20cb10;
-	int voice = off / 0x112;
-	int slot = off % 0x112;
-	if(mem_mask == 0xffff) {
-		if(slot == 0x102 && data == 0)
-			return;
-		if(slot == 0x100 && data == 0)
-			return;
-		if(slot == 0x0fe && data == 0)
-			return;
-		logerror("chan_w %02x:%03x, %04x (%06x)\n", voice, slot, data, pc);
-	} else {
-		if(mem_mask == 0xff00)
-			data >>= 8;
-		else
-			slot++;
-		if(slot == 0x106 && data == 0)
-			return;
-		if(slot == 0x108 && data == 0)
-			return;
-		if(slot == 0x105) // volume
-			return;
-		if(slot == 0x109 && data == 0)
-			return;
-		if(slot == 0x0e7 && data == 0)
-			return;
-		if(slot == 0x0e5 && data == 0)
-			return;
-		if(slot == 0x111 && data == 0x40)
-			return;
-		logerror("chan_w %02x:%03x, %02x (%06x)\n", voice, slot, data, pc);
-	}
-}
-
 void mu100_state::machine_start()
 {
-	cur_p1 = cur_p2 = cur_p3 = cur_p5 = cur_p6 = cur_pa = cur_pc = cur_pf = cur_pg = cur_ic32 = 0xff;
+	save_item(NAME(m_cur_p1));
+	save_item(NAME(m_cur_p2));
+	save_item(NAME(m_cur_p3));
+	save_item(NAME(m_cur_p5));
+	save_item(NAME(m_cur_p6));
+	save_item(NAME(m_cur_pa));
+	save_item(NAME(m_cur_pc));
+	save_item(NAME(m_cur_pf));
+	save_item(NAME(m_cur_pg));
+	save_item(NAME(m_cur_ic32));
+	save_item(NAME(m_cur_sw));
+	save_item(NAME(m_h8_tx));
+	save_item(NAME(m_e1_tx));
+	save_item(NAME(m_e2_tx));
+}
+
+void mu100_state::machine_reset()
+{
+	m_cur_p1 = m_cur_p2 = m_cur_p3 = m_cur_p5 = m_cur_p6 = m_cur_pa = m_cur_pc = m_cur_pf = m_cur_pg = m_cur_ic32 = 0xff;
+	m_cur_sw = 0;
+	m_h8_tx = m_e1_tx = m_e2_tx = 1;
+	ext_serial_update();
 }
 
 void mu100_state::mu100_map(address_map &map)
@@ -531,12 +269,6 @@ void mu100_state::mu100_map(address_map &map)
 	map(0x000000, 0x1fffff).rom().region("maincpu", 0);
 	map(0x200000, 0x21ffff).ram(); // 128K work RAM
 	map(0x400000, 0x401fff).m(m_swp30, FUNC(swp30_device::map));
-}
-
-// Grounded adc input
-u16 mu100_state::adc_zero_r()
-{
-	return 0;
 }
 
 // Analog input right (also sent to the swp)
@@ -566,7 +298,7 @@ u16 mu100_state::adc_battery_r()
 // model detect.  pulled to GND (0) on MU100, to 0.5Vcc on the card version, to Vcc on MU100R
 u16 mu100_state::adc_type_r()
 {
-	return 0;
+	return m_lcd ? 0 : 0x200;
 }
 
 u16 mu100r_state::adc_type_r()
@@ -574,28 +306,29 @@ u16 mu100r_state::adc_type_r()
 	return 0x3ff;
 }
 
-void mu100_state::p1_w(u16 data)
+void mu100_state::p1_w(u8 data)
 {
-	cur_p1 = data;
+	m_cur_p1 = data;
 }
 
-u16 mu100_state::p1_r()
+u8 mu100_state::p1_r()
 {
-	if((cur_p2 & P2_LCD_ENABLE)) {
-		if(cur_p2 & P2_LCD_RW) {
-			if(cur_p2 & P2_LCD_RS)
-				return m_lcd->data_read();
-			else
-				return m_lcd->control_read();
-		} else
-			return 0x00;
-	}
+	if(m_lcd)
+		if((m_cur_p2 & P2_LCD_ENABLE)) {
+			if(m_cur_p2 & P2_LCD_RW) {
+				if(m_cur_p2 & P2_LCD_RS)
+					return m_lcd->data_read();
+				else
+					return m_lcd->control_read();
+			} else
+				return 0x00;
+		}
 
-	if(!(cur_pf & 0x02)) {
+	if(!(m_cur_pf & 0x02)) {
 		u8 val = 0xff;
-		if(!(cur_ic32 & 0x20))
+		if(!(m_cur_ic32 & 0x20))
 			val &= m_ioport_p7->read();
-		if(!(cur_ic32 & 0x40))
+		if(!(m_cur_ic32 & 0x40))
 			val &= m_ioport_p8->read();
 		return val;
 	}
@@ -603,126 +336,183 @@ u16 mu100_state::p1_r()
 	return 0xff;
 }
 
-void mu100_state::p2_w(u16 data)
+void mu100_state::p2_w(u8 data)
 {
-	// LCB enable edge
-	if(!(cur_p2 & P2_LCD_ENABLE) && (data & P2_LCD_ENABLE)) {
-		if(!(cur_p2 & P2_LCD_RW)) {
-			if(cur_p2 & P2_LCD_RS)
-				m_lcd->data_write(cur_p1);
-			else
-				m_lcd->control_write(cur_p1);
+	if(m_lcd) {
+	// LCD enable edge
+		if((m_cur_p2 & P2_LCD_ENABLE) && !(data & P2_LCD_ENABLE)) {
+			if(!(m_cur_p2 & P2_LCD_RW)) {
+				if(m_cur_p2 & P2_LCD_RS)
+					m_lcd->data_write(m_cur_p1);
+				else
+					m_lcd->control_write(m_cur_p1);
+			}
 		}
+		m_lcd->set_contrast((data >> 3) & 7);
 	}
-	m_lcd->set_contrast((data >> 3) & 7);
-	cur_p2 = data;
+	m_cur_p2 = data;
 }
 
-void mu100_state::p3_w(u16 data)
+void mu100_state::p3_w(u8 data)
 {
-	cur_p3 = data;
+	m_cur_p3 = data;
 	logerror("A/D gain control %d\n", (data >> 4) & 3);
 }
 
-void mu100_state::p5_w(u16 data)
+void mu100_state::p5_w(u8 data)
 {
-	cur_p5 = data;
+	m_cur_p5 = data;
 	logerror("Rotary reset %d\n", (data >> 3) & 1);
 }
 
-void mu100_state::p6_w(u16 data)
+void mu100_state::p6_w(u8 data)
 {
-	cur_p6 = data;
-	logerror("pbsel %d pbreset %d soundreset %d\n", (data >> 2) & 3, (data >> 4) & 1, (data >> 5) & 1);
+	m_cur_p6 = data;
+	m_cur_sw = (m_cur_sw & 0xc) | BIT(m_cur_pf, 2, 2);
+	ext_serial_update();
 }
 
-u16 mu100_state::p6_r()
+u8 mu100_state::p6_r()
 {
 	//  logerror("plug in detect read\n");
 	return 0x00;
 }
 
-void mu100_state::pa_w(u16 data)
+void mu100_state::pa_w(u8 data)
 {
-	cur_pa = data;
+	m_cur_pa = data;
 	logerror("rotary encoder %d\n", (data >> 6) & 3);
 }
 
-u16 mu100_state::pa_r()
+u8 mu100_state::pa_r()
 {
 	logerror("offline detect read\n");
 	return 0x00;
 }
 
-void mu100_state::pf_w(u16 data)
+void mu100_state::pf_w(u8 data)
 {
-	if(!(cur_pf & 0x01) && (data & 0x01)) {
-		cur_ic32 = cur_p1;
-		m_lcd->set_leds((cur_p1 & 0x1f) | ((cur_p1 & 0x80) >> 2));
+	if(!(m_cur_pf & 0x01) && (data & 0x01)) {
+		m_cur_ic32 = m_cur_p1;
+		if(m_lcd)
+			m_lcd->set_leds((m_cur_p1 & 0x1f) | ((m_cur_p1 & 0x80) >> 2));
 	}
-	cur_pf = data;
+	m_cur_pf = data;
+	m_cur_sw = (m_cur_sw & 0x7) | (BIT(m_cur_pf, 2) << 3);
+	ext_serial_update();
 }
 
-void mu100_state::pg_w(u16 data)
+void mu100_state::pg_w(u8 data)
 {
-	cur_pg = data;
-	logerror("pbsel3 %d\n", data & 1);
+	m_cur_pg = data;
+	m_cur_sw = (m_cur_sw & 0xb) | (BIT(m_cur_pg, 0) << 2);
+	ext_serial_update();
 }
 
-void mu100_state::mu100_iomap(address_map &map)
+void mu100_state::ext_serial_update()
 {
-	map(h8_device::PORT_1, h8_device::PORT_1).rw(FUNC(mu100_state::p1_r), FUNC(mu100_state::p1_w));
-	map(h8_device::PORT_2, h8_device::PORT_2).w(FUNC(mu100_state::p2_w));
-	map(h8_device::PORT_3, h8_device::PORT_3).w(FUNC(mu100_state::p3_w));
-	map(h8_device::PORT_5, h8_device::PORT_5).w(FUNC(mu100_state::p5_w));
-	map(h8_device::PORT_6, h8_device::PORT_6).rw(FUNC(mu100_state::p6_r), FUNC(mu100_state::p6_w));
-	map(h8_device::PORT_A, h8_device::PORT_A).rw(FUNC(mu100_state::pa_r), FUNC(mu100_state::pa_w));
-	map(h8_device::PORT_F, h8_device::PORT_F).w(FUNC(mu100_state::pf_w));
-	map(h8_device::PORT_G, h8_device::PORT_G).w(FUNC(mu100_state::pg_w));
-	map(h8_device::ADC_0, h8_device::ADC_0).r(FUNC(mu100_state::adc_ar_r));
-	map(h8_device::ADC_1, h8_device::ADC_1).r(FUNC(mu100_state::adc_zero_r));
-	map(h8_device::ADC_2, h8_device::ADC_2).r(FUNC(mu100_state::adc_al_r));
-	map(h8_device::ADC_1, h8_device::ADC_3).r(FUNC(mu100_state::adc_zero_r));
-	map(h8_device::ADC_4, h8_device::ADC_4).r(FUNC(mu100_state::adc_midisw_r));
-	map(h8_device::ADC_5, h8_device::ADC_5).r(FUNC(mu100_state::adc_zero_r));
-	map(h8_device::ADC_6, h8_device::ADC_6).r(FUNC(mu100_state::adc_battery_r));
-	map(h8_device::ADC_7, h8_device::ADC_7).r(FUNC(mu100_state::adc_type_r));
+	m_ext1->midi_rx(BIT(m_cur_sw, 3) ? m_h8_tx : 1);
+	if(m_ext2)
+		m_ext2->midi_rx(BIT(m_cur_sw, 1) ? m_h8_tx : 1);
+	if(BIT(m_cur_sw, 2))
+		if(BIT(m_cur_sw, 0))
+			m_maincpu->sci_rx_w<2>(m_e1_tx && m_e2_tx);
+		else
+			m_maincpu->sci_rx_w<2>(m_e1_tx);
+	else
+		if(BIT(m_cur_sw, 0))
+			m_maincpu->sci_rx_w<2>(m_e2_tx);
+		else
+			m_maincpu->sci_rx_w<2>(1);
+}
+
+void mu100_state::h8_tx(int state)
+{
+	m_h8_tx = state;
+	ext_serial_update();
+}
+
+void mu100_state::e1_tx(int state)
+{
+	m_e1_tx = state;
+	ext_serial_update();
+}
+
+void mu100_state::e2_tx(int state)
+{
+	m_e2_tx = state;
+	ext_serial_update();
 }
 
 void mu100_state::swp30_map(address_map &map)
 {
-	map(0x000000*4, 0x200000*4-1).rom().region("swp30",         0).mirror(4*0x200000);
-	map(0x400000*4, 0x500000*4-1).rom().region("swp30",  0x800000).mirror(4*0x300000);
-	map(0x800000*4, 0xa00000*4-1).rom().region("swp30", 0x1000000).mirror(4*0x200000);
+	map(0x000000, 0x1fffff).rom().region("swp30",         0).mirror(0x200000);
+	map(0x400000, 0x4fffff).rom().region("swp30",  0x800000).mirror(0x300000);
+	map(0x800000, 0x9fffff).rom().region("swp30", 0x1000000).mirror(0x200000);
 }
 
-void mu100_state::mu100(machine_config &config)
+void mu100_state::mu100b(machine_config &config)
 {
 	H8S2655(config, m_maincpu, 16_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &mu100_state::mu100_map);
-	m_maincpu->set_addrmap(AS_IO, &mu100_state::mu100_iomap);
+	m_maincpu->read_adc<0>().set(FUNC(mu100_state::adc_ar_r));
+	m_maincpu->read_adc<1>().set_constant(0);
+	m_maincpu->read_adc<2>().set(FUNC(mu100_state::adc_al_r));
+	m_maincpu->read_adc<3>().set_constant(0);
+	m_maincpu->read_adc<4>().set(FUNC(mu100_state::adc_midisw_r));
+	m_maincpu->read_adc<5>().set_constant(0);
+	m_maincpu->read_adc<6>().set(FUNC(mu100_state::adc_battery_r));
+	m_maincpu->read_adc<7>().set(FUNC(mu100_state::adc_type_r));
+	m_maincpu->read_port1().set(FUNC(mu100_state::p1_r));
+	m_maincpu->write_port1().set(FUNC(mu100_state::p1_w));
+	m_maincpu->write_port2().set(FUNC(mu100_state::p2_w));
+	m_maincpu->write_port3().set(FUNC(mu100_state::p3_w));
+	m_maincpu->write_port5().set(FUNC(mu100_state::p5_w));
+	m_maincpu->read_port6().set(FUNC(mu100_state::p6_r));
+	m_maincpu->write_port6().set(FUNC(mu100_state::p6_w));
+	m_maincpu->read_porta().set(FUNC(mu100_state::pa_r));
+	m_maincpu->write_porta().set(FUNC(mu100_state::pa_w));
+	m_maincpu->write_portf().set(FUNC(mu100_state::pf_w));
+	m_maincpu->write_portg().set(FUNC(mu100_state::pg_w));
+	m_maincpu->write_sci_tx<2>().set(FUNC(mu100_state::h8_tx));
 
-	MULCD(config, m_lcd);
+	PLG1X0_CONNECTOR(config, m_ext1, plg1x0_intf, nullptr);
+	m_ext1->midi_tx().set(FUNC(mu100_state::e1_tx));
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
 	SWP30(config, m_swp30);
-	m_swp30->set_addrmap(0, &mu100_state::swp30_map);
+	m_swp30->set_addrmap(AS_DATA, &mu100_state::swp30_map);
 	m_swp30->add_route(0, "lspeaker", 1.0);
 	m_swp30->add_route(1, "rspeaker", 1.0);
 
 	auto &mdin_a(MIDI_PORT(config, "mdin_a"));
 	midiin_slot(mdin_a);
-	mdin_a.rxd_handler().set("maincpu:sci1", FUNC(h8_sci_device::rx_w));
+	mdin_a.rxd_handler().set(m_maincpu, FUNC(h8s2655_device::sci_rx_w<1>));
 
 	auto &mdin_b(MIDI_PORT(config, "mdin_b"));
 	midiin_slot(mdin_b);
-	mdin_b.rxd_handler().set("maincpu:sci0", FUNC(h8_sci_device::rx_w));
+	mdin_b.rxd_handler().set(m_maincpu, FUNC(h8s2655_device::sci_rx_w<0>));
 
 	auto &mdout(MIDI_PORT(config, "mdout"));
 	midiout_slot(mdout);
-	m_maincpu->subdevice<h8_sci_device>("sci0")->tx_handler().set(mdout, FUNC(midi_port_device::write_txd));
+	m_maincpu->write_sci_tx<0>().set(mdout, FUNC(midi_port_device::write_txd));
+}
+
+void mu100_state::mu100(machine_config &config)
+{
+	mu100b(config);
+
+	MULCD(config, m_lcd);
+}
+
+void mu100r_state::mu100r(machine_config &config)
+{
+	mu100(config);
+
+	PLG1X0_CONNECTOR(config, m_ext2, plg1x0_intf, nullptr);
+	m_ext2->midi_tx().set(FUNC(mu100r_state::e2_tx));
 }
 
 #define ROM_LOAD16_WORD_SWAP_BIOS(bios,name,offset,length,hash) \
@@ -730,47 +520,34 @@ void mu100_state::mu100(machine_config &config)
 
 ROM_START( mu100 )
 	ROM_REGION( 0x200000, "maincpu", 0 )
-	ROM_SYSTEM_BIOS( 0, "bios0", "xu50720 (v1.11, Aug. 3, 1999)" )
+	ROM_DEFAULT_BIOS("v111")
+	ROM_SYSTEM_BIOS( 0, "v111", "xu50720 (v1.11, Aug. 3, 1999)" )
 	ROM_LOAD16_WORD_SWAP_BIOS( 0, "xu50720.ic11", 0x000000, 0x200000, CRC(1126a8a4) SHA1(e90b8bd9d14297da26ba12f4d9a4f2d22cd7d34a) )
-	ROM_SYSTEM_BIOS( 1, "bios1", "xt71420 (v1.05, Sep. 19, 1997)" )
-	ROM_LOAD16_WORD_SWAP_BIOS( 1, "xt71420.ic11", 0x000000, 0x200000, CRC(0e5b3bae) SHA1(3148c5bd59a3d00809d3ab1921216215fe2582c5) )
-	ROM_SYSTEM_BIOS( 2, "bios2", "xt714e0 (v1.03, Jul. 25, 1997)" )
-	ROM_LOAD16_WORD_SWAP_BIOS( 2, "xt714e0.ic11", 0x000000, 0x200000, CRC(2d8cf9fc) SHA1(a81f988a315efe92106f1e7d407cd3626c4f843f) )
+	ROM_SYSTEM_BIOS( 1, "v106", "xt714h0 (v1.06, Oct. 14, 1997)" )
+	ROM_LOAD16_WORD_SWAP_BIOS( 1, "xt714h0.ic11", 0x000000, 0x200000, CRC(aa96ab38) SHA1(ec39eeab55d7d55b4f6d2b4b4cac2a01f98db8a0) )
+	ROM_SYSTEM_BIOS( 2, "v105", "xt71420 (v1.05, Sep. 19, 1997)" )
+	ROM_LOAD16_WORD_SWAP_BIOS( 2, "xt71420.ic11", 0x000000, 0x200000, CRC(0e5b3bae) SHA1(3148c5bd59a3d00809d3ab1921216215fe2582c5) )
+	ROM_SYSTEM_BIOS( 3, "v103", "xt714e0 (v1.03, Jul. 25, 1997)" )
+	ROM_LOAD16_WORD_SWAP_BIOS( 3, "xt714e0.ic11", 0x000000, 0x200000, CRC(2d8cf9fc) SHA1(a81f988a315efe92106f1e7d407cd3626c4f843f) )
 
-	ROM_REGION( 0x1800000, "swp30", ROMREGION_ERASE00 )
-	ROM_LOAD32_WORD( "sx518b0.ic34", 0x0000000, 0x400000, CRC(2550d44f) SHA1(fd3cce228c7d389a2fde25c808a5b26080588cba) )
-	ROM_LOAD32_WORD( "sx743b0.ic35", 0x0000002, 0x400000, CRC(a9109a6c) SHA1(a67bb49378a38a2d809bd717d286e18bc6496db0) )
+	ROM_REGION32_LE( 0x1800000, "swp30", ROMREGION_ERASE00 )
+	ROM_LOAD32_WORD( "xs518b0.ic34", 0x0000000, 0x400000, CRC(2550d44f) SHA1(fd3cce228c7d389a2fde25c808a5b26080588cba) )
+	ROM_LOAD32_WORD( "xs743b0.ic35", 0x0000002, 0x400000, CRC(a9109a6c) SHA1(a67bb49378a38a2d809bd717d286e18bc6496db0) )
 	ROM_LOAD32_WORD( "xt445a0-828.ic36", 0x0800000, 0x200000, CRC(225c2280) SHA1(23b5e046fd2e2ac01af3e6dc6357c5c6547b286b) )
 	ROM_LOAD32_WORD( "xt461a0-829.ic37", 0x0800002, 0x200000, CRC(a1d138a3) SHA1(46a7a7225cd7e1818ba551325d2af5ac1bf5b2bf) )
 	ROM_LOAD32_WORD( "xt462a0.ic39", 0x1000000, 0x400000, CRC(2e82cbd4) SHA1(d1f0e2713bf2cca9156c562e23fcce4fa5d7cfb3) )
 	ROM_LOAD32_WORD( "xt463a0.ic38", 0x1000002, 0x400000, CRC(cce5f8d3) SHA1(bdca8c5158f452f2b5535c7d658c9b22c6d66048) )
 ROM_END
 
-// Identical to the mu100
-ROM_START( mu100r )
-	ROM_REGION( 0x200000, "maincpu", 0 )
-	ROM_SYSTEM_BIOS( 0, "bios0", "xu50720 (v1.11, Aug. 3, 1999)" )
-	ROM_LOAD16_WORD_SWAP_BIOS( 0, "xu50720.ic11", 0x000000, 0x200000, CRC(1126a8a4) SHA1(e90b8bd9d14297da26ba12f4d9a4f2d22cd7d34a) )
-	ROM_SYSTEM_BIOS( 1, "bios1", "xt71420 (v1.05, Sep. 19, 1997)" )
-	ROM_LOAD16_WORD_SWAP_BIOS( 1, "xt71420.ic11", 0x000000, 0x200000, CRC(0e5b3bae) SHA1(3148c5bd59a3d00809d3ab1921216215fe2582c5) )
-	ROM_SYSTEM_BIOS( 2, "bios2", "xt714e0 (v1.03, Jul. 25, 1997)" )
-	ROM_LOAD16_WORD_SWAP_BIOS( 2, "xt714e0.ic11", 0x000000, 0x200000, CRC(2d8cf9fc) SHA1(a81f988a315efe92106f1e7d407cd3626c4f843f) )
-
-	ROM_REGION( 0x1800000, "swp30", ROMREGION_ERASE00 )
-	ROM_LOAD32_WORD( "sx518b0.ic34", 0x000000, 0x400000, CRC(2550d44f) SHA1(fd3cce228c7d389a2fde25c808a5b26080588cba) )
-	ROM_LOAD32_WORD( "sx743b0.ic35", 0x000002, 0x400000, CRC(a9109a6c) SHA1(a67bb49378a38a2d809bd717d286e18bc6496db0) )
-	ROM_LOAD32_WORD( "xt445a0-828.ic36", 0x800000, 0x200000, CRC(225c2280) SHA1(23b5e046fd2e2ac01af3e6dc6357c5c6547b286b) )
-	ROM_LOAD32_WORD( "xt461a0-829.ic37", 0x800002, 0x200000, CRC(a1d138a3) SHA1(46a7a7225cd7e1818ba551325d2af5ac1bf5b2bf) )
-	ROM_LOAD32_WORD( "xt462a0.ic39", 0x1000000, 0x400000, CRC(2e82cbd4) SHA1(d1f0e2713bf2cca9156c562e23fcce4fa5d7cfb3) )
-	ROM_LOAD32_WORD( "xt463a0.ic38", 0x1000002, 0x400000, CRC(cce5f8d3) SHA1(bdca8c5158f452f2b5535c7d658c9b22c6d66048) )
-ROM_END
+// mu100r roms are identical to the mu100
+#define rom_mu100r rom_mu100
 
 ROM_START( mu100b )
 	ROM_REGION( 0x200000, "maincpu", 0 )
 	// MU-100B v1.08 (Nov. 28, 1997)
-	ROM_LOAD16_WORD_SWAP( "xu50710-m27c160.bin", 0x000000, 0x200000, CRC(4b10bd27) SHA1(12d7c6e1bce7974b34916e1bfa5057ab55867476) )
+	ROM_LOAD16_WORD_SWAP( "xu50710.bin", 0x000000, 0x200000, CRC(4b10bd27) SHA1(12d7c6e1bce7974b34916e1bfa5057ab55867476) )
 
-	ROM_REGION( 0x1800000, "swp30", ROMREGION_ERASE00 )
+	ROM_REGION32_LE( 0x1800000, "swp30", ROMREGION_ERASE00 )
 	ROM_LOAD32_WORD( "sx518b0.ic34", 0x0000000, 0x400000, CRC(2550d44f) SHA1(fd3cce228c7d389a2fde25c808a5b26080588cba) )
 	ROM_LOAD32_WORD( "sx743b0.ic35", 0x0000002, 0x400000, CRC(a9109a6c) SHA1(a67bb49378a38a2d809bd717d286e18bc6496db0) )
 	ROM_LOAD32_WORD( "xt445a0-828.ic36", 0x0800000, 0x200000, CRC(225c2280) SHA1(23b5e046fd2e2ac01af3e6dc6357c5c6547b286b) )
@@ -779,6 +556,9 @@ ROM_START( mu100b )
 	ROM_LOAD32_WORD( "xt463a0.ic38", 0x1000002, 0x400000, CRC(cce5f8d3) SHA1(bdca8c5158f452f2b5535c7d658c9b22c6d66048) )
 ROM_END
 
-SYST( 1997, mu100,  0,     0, mu100, mu100, mu100_state,  empty_init, "Yamaha", "MU100",                  MACHINE_NOT_WORKING )
-SYST( 1997, mu100r, mu100, 0, mu100, mu100, mu100r_state, empty_init, "Yamaha", "MU100 Rackable version", MACHINE_NOT_WORKING )
-SYST( 1998, mu100b, mu100, 0, mu100, mu100, mu100_state,  empty_init, "Yamaha", "MU100B",                 MACHINE_NOT_WORKING )
+} // anonymous namespace
+
+
+SYST( 1997, mu100,  0,     0, mu100,  mu100, mu100_state,  empty_init, "Yamaha", "MU100",                    MACHINE_NOT_WORKING )
+SYST( 1997, mu100r, mu100, 0, mu100r, mu100, mu100r_state, empty_init, "Yamaha", "MU100 Rackable version",   MACHINE_NOT_WORKING )
+SYST( 1998, mu100b, mu100, 0, mu100b, mu100, mu100_state,  empty_init, "Yamaha", "MU100 Screenless version", MACHINE_NOT_WORKING )

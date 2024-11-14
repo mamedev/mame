@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Curt Coder
-#ifndef MAME_INCLUDES_PC1512_H
-#define MAME_INCLUDES_PC1512_H
+#ifndef MAME_AMSTRAD_PC1512_H
+#define MAME_AMSTRAD_PC1512_H
 
 #pragma once
 
@@ -24,8 +24,6 @@
 #include "machine/ram.h"
 #include "sound/spkrdev.h"
 #include "ams40041.h"
-
-#include "formats/pc_dsk.h"
 
 #define I8086_TAG       "ic120"
 #define I8087_TAG       "ic119"
@@ -98,8 +96,8 @@ public:
 	required_device<isa8_device> m_bus;
 	required_ioport m_lk;
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	void update_speaker();
 	void update_fdc_int();
@@ -115,12 +113,12 @@ public:
 	void nmi_mask_w(uint8_t data);
 	uint8_t printer_r(offs_t offset);
 	void printer_w(offs_t offset, uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER( kbdata_w );
-	DECLARE_WRITE_LINE_MEMBER( kbclk_w );
-	DECLARE_WRITE_LINE_MEMBER( pit1_w );
-	DECLARE_WRITE_LINE_MEMBER( pit2_w );
-	DECLARE_WRITE_LINE_MEMBER( hrq_w );
-	DECLARE_WRITE_LINE_MEMBER( eop_w );
+	void kbdata_w(int state);
+	void kbclk_w(int state);
+	void pit1_w(int state);
+	void pit2_w(int state);
+	void hrq_w(int state);
+	void eop_w(int state);
 	uint8_t memr_r(offs_t offset);
 	void memw_w(offs_t offset, uint8_t data);
 	uint8_t ior1_r();
@@ -130,18 +128,18 @@ public:
 	void iow1_w(uint8_t data);
 	void iow2_w(uint8_t data);
 	void iow3_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER( dack0_w );
-	DECLARE_WRITE_LINE_MEMBER( dack1_w );
-	DECLARE_WRITE_LINE_MEMBER( dack2_w );
-	DECLARE_WRITE_LINE_MEMBER( dack3_w );
-	DECLARE_WRITE_LINE_MEMBER( fdc_int_w );
-	DECLARE_WRITE_LINE_MEMBER( fdc_drq_w );
+	void dack0_w(int state);
+	void dack1_w(int state);
+	void dack2_w(int state);
+	void dack3_w(int state);
+	void fdc_int_w(int state);
+	void fdc_drq_w(int state);
 	void drive_select_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER( write_centronics_ack );
-	DECLARE_WRITE_LINE_MEMBER( write_centronics_busy );
-	DECLARE_WRITE_LINE_MEMBER( write_centronics_perror );
-	DECLARE_WRITE_LINE_MEMBER( write_centronics_select );
-	DECLARE_WRITE_LINE_MEMBER( write_centronics_fault );
+	void write_centronics_ack(int state);
+	void write_centronics_busy(int state);
+	void write_centronics_perror(int state);
+	void write_centronics_select(int state);
+	void write_centronics_fault(int state);
 	void mouse_x_w(uint8_t data);
 	void mouse_y_w(uint8_t data);
 
@@ -201,14 +199,14 @@ public:
 		, m_vdu(*this, AMS40041_TAG)
 	{ }
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	void pc1512hd(machine_config &config);
 	void pc1512(machine_config &config);
 	void pc1512dd(machine_config &config);
-	void pc1512_io(address_map &map);
-	void pc1512_mem(address_map &map);
+	void pc1512_io(address_map &map) ATTR_COLD;
+	void pc1512_mem(address_map &map) ATTR_COLD;
 
 	required_device<ams40041_device> m_vdu;
 };
@@ -222,7 +220,7 @@ public:
 		, m_opt(0)
 	{ }
 
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 	uint8_t io_r(offs_t offset);
 	uint8_t printer_r(offs_t offset);
@@ -233,8 +231,8 @@ public:
 	void pc1640hd(machine_config &config);
 	void pc1640(machine_config &config);
 	void pc1640dd(machine_config &config);
-	void pc1640_io(address_map &map);
-	void pc1640_mem(address_map &map);
+	void pc1640_io(address_map &map) ATTR_COLD;
+	void pc1640_mem(address_map &map) ATTR_COLD;
 };
 
-#endif // MAME_INCLUDES_PC1512_H
+#endif // MAME_AMSTRAD_PC1512_H

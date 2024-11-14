@@ -110,7 +110,7 @@ control registers
      -----x-- firq enable
      ----x--- flip screen
      ---x---- unknown (contra, labyrunr)
-     */
+*/
 
 #include "emu.h"
 #include "k007121.h"
@@ -125,8 +125,8 @@ DEFINE_DEVICE_TYPE(K007121, k007121_device, "k007121", "K007121 Sprite/Tilemap C
 
 k007121_device::k007121_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, K007121, tag, owner, clock)
-	, m_flipscreen(0)
-	, m_palette(*this, finder_base::DUMMY_TAG)
+	, device_gfx_interface(mconfig, *this)
+	, m_flipscreen(false)
 {
 }
 
@@ -146,7 +146,7 @@ void k007121_device::device_start()
 
 void k007121_device::device_reset()
 {
-	m_flipscreen = 0;
+	m_flipscreen = false;
 
 	for (int i = 0; i < 8; i++)
 		m_ctrlram[i] = 0;
@@ -177,7 +177,7 @@ void k007121_device::ctrl_w(offs_t offset, uint8_t data)
 			machine().tilemap().mark_all_dirty();
 		break;
 	case 7:
-		m_flipscreen = data & 0x08;
+		m_flipscreen = BIT(data, 3);
 		break;
 	}
 
@@ -208,27 +208,22 @@ void k007121_device::ctrl_w(offs_t offset, uint8_t data)
  *
  */
 
-void k007121_device::sprites_draw( bitmap_ind16 &bitmap, const rectangle &cliprect, gfx_element *gfx, device_palette_interface &palette,
-							const uint8_t *source, int base_color, int global_x_offset, int bank_base, bitmap_ind8 &priority_bitmap, uint32_t pri_mask, bool is_flakatck )
+void k007121_device::sprites_draw( bitmap_ind16 &bitmap, const rectangle &cliprect,
+		const uint8_t *source, int base_color, int global_x_offset, int bank_base, bitmap_ind8 &priority_bitmap, uint32_t pri_mask, bool is_flakatck )
 {
-	//  gfx_element *gfx = gfxs[chip];
-	int flipscreen = m_flipscreen;
-	int i, num, inc;
-
-
 	// TODO: sprite limit is supposed to be per-line! (check MT #00185)
-	num = 0x40;
+	int num = 0x40;
 	//num = (k007121->ctrlram[0x03] & 0x40) ? 0x80 : 0x40; /* WRONG!!! (needed by combatsc)  */
 
-	inc = 5;
+	int inc = 5;
 	/* when using priority buffer, draw front to back */
-	if (pri_mask != -1)
+	if (pri_mask != (uint32_t)-1)
 	{
 		source += (num - 1)*inc;
 		inc = -inc;
 	}
 
-	for (i = 0; i < num; i++)
+	for (int i = 0; i < num; i++)
 	{
 		int number = source[0];               /* sprite number */
 		int sprite_bank = source[1] & 0x0f;   /* sprite bank */
@@ -242,7 +237,7 @@ void k007121_device::sprites_draw( bitmap_ind16 &bitmap, const rectangle &clipre
 		int transparent_mask;
 		static const int x_offset[4] = {0x0,0x1,0x4,0x5};
 		static const int y_offset[4] = {0x0,0x2,0x8,0xa};
-		int x,y, ex, ey, flipx, flipy, destx, desty;
+		int flipx, flipy, destx, desty;
 
 		if (attr & 0x01) sx -= 256;
 		if (sy >= 240) sy -= 256;
@@ -257,7 +252,7 @@ void k007121_device::sprites_draw( bitmap_ind16 &bitmap, const rectangle &clipre
 		if (is_flakatck)
 			transparent_mask = 1 << 0;
 		else
-			transparent_mask = palette.transpen_mask(*gfx, color, 0);
+			transparent_mask = palette().transpen_mask(*gfx(0), color, 0);
 
 		number += bank_base;
 
@@ -269,18 +264,18 @@ void k007121_device::sprites_draw( bitmap_ind16 &bitmap, const rectangle &clipre
 			case 0x00: width = height = 2; number &= (~3); break;
 			case 0x08: width = height = 4; number &= (~3); break;
 			default: width = 1; height = 1;
-//                  logerror("Unknown sprite size %02x\n", attr & 0xe);
-//                  popmessage("Unknown sprite size %02x\n", attr & 0xe);
+				//logerror("Unknown sprite size %02x\n", attr & 0xe);
+				break;
 		}
 
-		for (y = 0; y < height; y++)
+		for (int y = 0; y < height; y++)
 		{
-			for (x = 0; x < width; x++)
+			for (int x = 0; x < width; x++)
 			{
-				ex = xflip ? (width - 1 - x) : x;
-				ey = yflip ? (height - 1 - y) : y;
+				int ex = xflip ? (width - 1 - x) : x;
+				int ey = yflip ? (height - 1 - y) : y;
 
-				if (flipscreen)
+				if (m_flipscreen)
 				{
 					flipx = !xflip;
 					flipy = !yflip;
@@ -295,21 +290,25 @@ void k007121_device::sprites_draw( bitmap_ind16 &bitmap, const rectangle &clipre
 					desty = sy + y * 8;
 				}
 
-				if (pri_mask != -1)
-					gfx->prio_transmask(bitmap,cliprect,
-						number + x_offset[ex] + y_offset[ey],
-						color,
-						flipx,flipy,
-						destx,desty,
-						priority_bitmap,pri_mask,
-						transparent_mask);
+				if (pri_mask != (uint32_t)-1)
+				{
+					gfx(0)->prio_transmask(bitmap,cliprect,
+							number + x_offset[ex] + y_offset[ey],
+							color,
+							flipx,flipy,
+							destx,desty,
+							priority_bitmap,pri_mask,
+							transparent_mask);
+				}
 				else
-					gfx->transmask(bitmap,cliprect,
-						number + x_offset[ex] + y_offset[ey],
-						color,
-						flipx,flipy,
-						destx,desty,
-						transparent_mask);
+				{
+					gfx(0)->transmask(bitmap,cliprect,
+							number + x_offset[ex] + y_offset[ey],
+							color,
+							flipx,flipy,
+							destx,desty,
+							transparent_mask);
+				}
 			}
 		}
 

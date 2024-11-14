@@ -13,6 +13,8 @@
 #include "emupal.h"
 #include "speaker.h"
 
+namespace {
+
 #define MASTER_CLOCK        20000000
 
 #define VISIBLE_CYCLES      480
@@ -39,11 +41,11 @@ public:
 	void craft(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
-	void prg_map(address_map &map);
-	void data_map(address_map &map);
+	void prg_map(address_map &map) ATTR_COLD;
+	void data_map(address_map &map) ATTR_COLD;
 
 	void port_b_w(uint8_t data);
 	void port_c_w(uint8_t data);
@@ -53,7 +55,7 @@ protected:
 	void video_update();
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	required_device<avr8_device> m_maincpu;
+	required_device<atmega88_device> m_maincpu;
 	required_device<dac_byte_interface> m_dac;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
@@ -200,11 +202,11 @@ void lft_craft_state::craft(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &lft_craft_state::prg_map);
 	m_maincpu->set_addrmap(AS_DATA, &lft_craft_state::data_map);
 	m_maincpu->set_eeprom_tag("eeprom");
-	m_maincpu->gpio_in<AVR8_IO_PORTB>().set([this]() { return m_gpio_b; });
-	m_maincpu->gpio_in<AVR8_IO_PORTC>().set([this]() { return m_gpio_c; });
-	m_maincpu->gpio_out<AVR8_IO_PORTB>().set(FUNC(lft_craft_state::port_b_w));
-	m_maincpu->gpio_out<AVR8_IO_PORTC>().set(FUNC(lft_craft_state::port_c_w));
-	m_maincpu->gpio_out<AVR8_IO_PORTD>().set(FUNC(lft_craft_state::port_d_w));
+	m_maincpu->gpio_in<atmega88_device::GPIOB>().set([this]() { return m_gpio_b; });
+	m_maincpu->gpio_in<atmega88_device::GPIOC>().set([this]() { return m_gpio_c; });
+	m_maincpu->gpio_out<atmega88_device::GPIOB>().set(FUNC(lft_craft_state::port_b_w));
+	m_maincpu->gpio_out<atmega88_device::GPIOC>().set(FUNC(lft_craft_state::port_c_w));
+	m_maincpu->gpio_out<atmega88_device::GPIOD>().set(FUNC(lft_craft_state::port_d_w));
 
 	PALETTE(config, m_palette, FUNC(lft_craft_state::init_palette), 64);
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
@@ -222,6 +224,9 @@ ROM_START( craft )
 	ROM_REGION( 0x200, "eeprom", 0 )
 	ROM_LOAD( "eeprom.raw", 0x0000, 0x0200, CRC(e18a2af9) SHA1(81fc6f2d391edfd3244870214fac37929af0ac0c) )
 ROM_END
+
+} // anonymous namespace
+
 
 /*   YEAR  NAME      PARENT  COMPAT  MACHINE     INPUT        CLASS            INIT        COMPANY            FULLNAME */
 CONS(2008, craft,    0,      0,      craft,      empty_input, lft_craft_state, empty_init, u8"Linus Åkesson", "Craft", MACHINE_IMPERFECT_GRAPHICS)

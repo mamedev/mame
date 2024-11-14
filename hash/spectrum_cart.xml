@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <!--
-license:CC0
+license:CC0-1.0
 
   Only 10 cartridge titles were released to be used with the ZX Spectrum "Interface 2" peripheral.
 
@@ -139,7 +139,7 @@ license:CC0
 	<!-- Prototypes -->
 
 	<software name="gyruss">
-		<description>Gyruss (Prototype)</description>
+		<description>Gyruss (prototype)</description>
 		<year>1984</year>
 		<publisher>Parker Software</publisher>
 		<part name="cart" interface="spectrum_cart">
@@ -150,7 +150,7 @@ license:CC0
 	</software>
 
 	<software name="locomotn">
-		<description>Loco Motion (Prototype)</description>
+		<description>Loco Motion (prototype)</description>
 		<year>1984</year>
 		<publisher>Amazon Systems</publisher>
 		<part name="cart" interface="spectrum_cart">
@@ -161,7 +161,7 @@ license:CC0
 	</software>
 
 	<software name="montezum">
-		<description>Montezuma's Revenge (Prototype)</description>
+		<description>Montezuma's Revenge (prototype)</description>
 		<year>1984</year>
 		<publisher>Parker Software</publisher>
 		<part name="cart" interface="spectrum_cart">
@@ -172,7 +172,7 @@ license:CC0
 	</software>
 
 	<software name="montezum1" cloneof="montezum">
-		<description>Montezuma's Revenge (Prototype, Alt)</description>
+		<description>Montezuma's Revenge (prototype, alt)</description>
 		<year>1984</year>
 		<publisher>Parker Software</publisher>
 		<part name="cart" interface="spectrum_cart">
@@ -183,7 +183,7 @@ license:CC0
 	</software>
 
 	<software name="popeye">
-		<description>Popeye (Prototype)</description>
+		<description>Popeye (prototype)</description>
 		<year>1984</year>
 		<publisher>Parker Software</publisher>
 		<part name="cart" interface="spectrum_cart">
@@ -194,7 +194,7 @@ license:CC0
 	</software>
 
 	<software name="qbert">
-		<description>Q*Bert (Prototype)</description>
+		<description>Q*Bert (prototype)</description>
 		<year>1984</year>
 		<publisher>Parker Software</publisher>
 		<part name="cart" interface="spectrum_cart">
@@ -205,7 +205,7 @@ license:CC0
 	</software>
 
 	<software name="jedi">
-		<description>Return Of The Jedi - Death Star Battle (Prototype)</description>
+		<description>Return Of The Jedi - Death Star Battle (prototype)</description>
 		<year>1984</year>
 		<publisher>Parker Software</publisher>
 		<part name="cart" interface="spectrum_cart">
@@ -216,7 +216,7 @@ license:CC0
 	</software>
 
 	<software name="starwars">
-		<description>Star Wars (Prototype)</description>
+		<description>Star Wars (prototype)</description>
 		<year>1984</year>
 		<publisher>Parker Software</publisher>
 		<part name="cart" interface="spectrum_cart">
@@ -227,7 +227,7 @@ license:CC0
 	</software>
 
 	<software name="starwars1" cloneof="starwars">
-		<description>Star Wars (Prototype, Alt)</description>
+		<description>Star Wars (prototype, alt)</description>
 		<year>1984</year>
 		<publisher>Parker Software</publisher>
 		<part name="cart" interface="spectrum_cart">

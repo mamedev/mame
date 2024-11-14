@@ -1,8 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood
 
-#ifndef MAME_MACHINE_VT1682_IO_H
-#define MAME_MACHINE_VT1682_IO_H
+#ifndef MAME_NINTENDO_VT1682_IO_H
+#define MAME_NINTENDO_VT1682_IO_H
 
 #pragma once
 
@@ -35,8 +35,8 @@ public:
 
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 private:
 	uint8_t m_210d_ioconfig;
@@ -52,4 +52,4 @@ private:
 	devcb_read8 m_portd_in;
 };
 
-#endif // MAME_MACHINE_VT1682_IO_H
+#endif // MAME_NINTENDO_VT1682_IO_H

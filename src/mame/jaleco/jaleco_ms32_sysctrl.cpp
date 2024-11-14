@@ -109,16 +109,6 @@ void jaleco_ms32_sysctrl_device::device_add_mconfig(machine_config &config)
 //  device_start - device-specific startup
 //-------------------------------------------------
 
-void jaleco_ms32_sysctrl_device::device_resolve_objects()
-{
-	m_flip_screen_cb.resolve();
-	m_vblank_cb.resolve();
-	m_field_cb.resolve();
-	m_prg_timer_cb.resolve();
-	m_sound_reset_cb.resolve();
-	m_sound_ack_cb.resolve();
-}
-
 void jaleco_ms32_sysctrl_device::device_start()
 {
 	save_item(NAME(m_dotclock_setting));

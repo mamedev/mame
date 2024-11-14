@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:David Graves, Bryan McPhail, Brad Oliver, Andrew Prime, Brian Troha, Nicola Salmoria
-#ifndef MAME_INCLUDES_TAITO_F2_H
-#define MAME_INCLUDES_TAITO_F2_H
+#ifndef MAME_TAITO_TAITO_F2_H
+#define MAME_TAITO_TAITO_F2_H
 
 #pragma once
 
@@ -96,8 +96,8 @@ public:
 	void init_finalb();
 
 protected:
-	virtual void machine_start() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 	TIMER_CALLBACK_MEMBER(trigger_int6);
 
@@ -233,11 +233,11 @@ protected:
 	u32 screen_update_deadconx(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	u32 screen_update_yesnoj(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	u32 screen_update_metalb(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_WRITE_LINE_MEMBER(screen_vblank_no_buffer);
-	DECLARE_WRITE_LINE_MEMBER(screen_vblank_partial_buffer_delayed);
-	DECLARE_WRITE_LINE_MEMBER(screen_vblank_partial_buffer_delayed_thundfox);
-	DECLARE_WRITE_LINE_MEMBER(screen_vblank_full_buffer_delayed);
-	DECLARE_WRITE_LINE_MEMBER(screen_vblank_partial_buffer_delayed_qzchikyu);
+	void screen_vblank_no_buffer(int state);
+	void screen_vblank_partial_buffer_delayed(int state);
+	void screen_vblank_partial_buffer_delayed_thundfox(int state);
+	void screen_vblank_full_buffer_delayed(int state);
+	void screen_vblank_partial_buffer_delayed_qzchikyu(int state);
 	INTERRUPT_GEN_MEMBER(interrupt);
 	INTERRUPT_GEN_MEMBER(megab_interrupt);
 	TIMER_DEVICE_CALLBACK_MEMBER(cchip_irq_clear_cb);
@@ -250,41 +250,41 @@ protected:
 	void taito_f2_tc360_spritemixdraw(screen_device &screen, bitmap_ind16 &dest_bmp, const rectangle &clip, gfx_element *gfx,
 	u32 code, u32 color, int flipx, int flipy, int sx, int sy, int scalex, int scaley, u64 primask = 0, bool use_mixer = false);
 
-	void cameltry_map(address_map &map);
-	void cameltrya_map(address_map &map);
-	void cameltrya_sound_map(address_map &map);
-	void deadconx_map(address_map &map);
-	void dinorex_map(address_map &map);
-	void dondokod_map(address_map &map);
-	void driftout_map(address_map &map);
-	void driftoutct_map(address_map &map);
-	void driveout_map(address_map &map);
-	void driveout_oki_map(address_map &map);
-	void driveout_sound_map(address_map &map);
-	void finalb_map(address_map &map);
-	void footchmp_map(address_map &map);
-	void growl_map(address_map &map);
-	void gunfront_map(address_map &map);
-	void koshien_map(address_map &map);
-	void liquidk_map(address_map &map);
-	void megab_map(address_map &map);
-	void metalb_map(address_map &map);
-	void mjnquest_map(address_map &map);
-	void ninjak_map(address_map &map);
-	void pulirula_map(address_map &map);
-	void qcrayon2_map(address_map &map);
-	void qcrayon_map(address_map &map);
-	void qjinsei_map(address_map &map);
-	void qtorimon_map(address_map &map);
-	void quizhq_map(address_map &map);
-	void qzchikyu_map(address_map &map);
-	void qzquest_map(address_map &map);
-	void solfigtr_map(address_map &map);
-	void sound_map(address_map &map);
-	void ssi_map(address_map &map);
-	void thundfox_map(address_map &map);
-	void yesnoj_map(address_map &map);
-	void yuyugogo_map(address_map &map);
+	void cameltry_map(address_map &map) ATTR_COLD;
+	void cameltrya_map(address_map &map) ATTR_COLD;
+	void cameltrya_sound_map(address_map &map) ATTR_COLD;
+	void deadconx_map(address_map &map) ATTR_COLD;
+	void dinorex_map(address_map &map) ATTR_COLD;
+	void dondokod_map(address_map &map) ATTR_COLD;
+	void driftout_map(address_map &map) ATTR_COLD;
+	void driftoutct_map(address_map &map) ATTR_COLD;
+	void driveout_map(address_map &map) ATTR_COLD;
+	void driveout_oki_map(address_map &map) ATTR_COLD;
+	void driveout_sound_map(address_map &map) ATTR_COLD;
+	void finalb_map(address_map &map) ATTR_COLD;
+	void footchmp_map(address_map &map) ATTR_COLD;
+	void growl_map(address_map &map) ATTR_COLD;
+	void gunfront_map(address_map &map) ATTR_COLD;
+	void koshien_map(address_map &map) ATTR_COLD;
+	void liquidk_map(address_map &map) ATTR_COLD;
+	void megab_map(address_map &map) ATTR_COLD;
+	void metalb_map(address_map &map) ATTR_COLD;
+	void mjnquest_map(address_map &map) ATTR_COLD;
+	void ninjak_map(address_map &map) ATTR_COLD;
+	void pulirula_map(address_map &map) ATTR_COLD;
+	void qcrayon2_map(address_map &map) ATTR_COLD;
+	void qcrayon_map(address_map &map) ATTR_COLD;
+	void qjinsei_map(address_map &map) ATTR_COLD;
+	void qtorimon_map(address_map &map) ATTR_COLD;
+	void quizhq_map(address_map &map) ATTR_COLD;
+	void qzchikyu_map(address_map &map) ATTR_COLD;
+	void qzquest_map(address_map &map) ATTR_COLD;
+	void solfigtr_map(address_map &map) ATTR_COLD;
+	void sound_map(address_map &map) ATTR_COLD;
+	void ssi_map(address_map &map) ATTR_COLD;
+	void thundfox_map(address_map &map) ATTR_COLD;
+	void yesnoj_map(address_map &map) ATTR_COLD;
+	void yuyugogo_map(address_map &map) ATTR_COLD;
 };
 
-#endif // MAME_INCLUDES_TAITO_F2_H
+#endif // MAME_TAITO_TAITO_F2_H

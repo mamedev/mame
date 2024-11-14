@@ -167,6 +167,9 @@ JC-301-00  W11 9510K7059    23C16000        U85
 #include "screen.h"
 #include "speaker.h"
 
+
+namespace {
+
 class jchan_state : public driver_device
 {
 public:
@@ -219,13 +222,13 @@ private:
 	void sub2main_cmd_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 	template<int Chip> void sknsspr_sprite32regs_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	TIMER_DEVICE_CALLBACK_MEMBER(vblank);
-	void jchan_main(address_map &map);
-	void jchan_sub(address_map &map);
+	void jchan_main(address_map &map) ATTR_COLD;
+	void jchan_sub(address_map &map) ATTR_COLD;
 };
 
 
@@ -752,6 +755,8 @@ void jchan_state::init_jchan()
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0x403ffe, 0x403fff, write16s_delegate(*this, FUNC(jchan_state::main2sub_cmd_w)));
 	m_subcpu->space(AS_PROGRAM).install_write_handler(0x400000, 0x400001, write16s_delegate(*this, FUNC(jchan_state::sub2main_cmd_w)));
 }
+
+} // anonymous namespace
 
 
 /* game drivers */

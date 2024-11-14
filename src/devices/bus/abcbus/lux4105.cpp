@@ -94,7 +94,7 @@ INPUT_PORTS_START( luxor_4105 )
 	PORT_DIPSETTING(    0x01, "Half (Seagate/Texas)" )
 	PORT_DIPSETTING(    0x02, "Half (Tandon)" )
 	PORT_DIPSETTING(    0x03, "Buffered" )
-	PORT_DIPNAME( 0x0c, 0x0c, "Heads" ) PORT_DIPLOCATION("1E:3,4")
+	PORT_DIPNAME( 0x0c, 0x04, "Heads" ) PORT_DIPLOCATION("1E:3,4")
 	PORT_DIPSETTING(    0x00, "2" )
 	PORT_DIPSETTING(    0x04, "4" )
 	PORT_DIPSETTING(    0x08, "6" )
@@ -106,7 +106,7 @@ INPUT_PORTS_START( luxor_4105 )
 	PORT_DIPSETTING(    0x30, "Seagate ST412" )
 
 	PORT_START("5E")
-	PORT_DIPNAME( 0x7f, 0x25, "Card Address" ) PORT_DIPLOCATION("5E:1,2,3,4,5,6,7")
+	PORT_DIPNAME( 0x3f, 0x25, "Card Address" ) PORT_DIPLOCATION("5E:1,2,3,4,5,6")
 	PORT_DIPSETTING(    0x25, "37" )
 	PORT_DIPSETTING(    0x2d, "45" )
 
@@ -286,7 +286,7 @@ void luxor_4105_device::write_sasi_data(uint8_t data)
 }
 
 
-WRITE_LINE_MEMBER( luxor_4105_device::write_sasi_bsy )
+void luxor_4105_device::write_sasi_bsy(int state)
 {
 	if (state)
 	{
@@ -295,13 +295,13 @@ WRITE_LINE_MEMBER( luxor_4105_device::write_sasi_bsy )
 }
 
 
-WRITE_LINE_MEMBER( luxor_4105_device::write_sasi_cd )
+void luxor_4105_device::write_sasi_cd(int state)
 {
 	update_dma();
 }
 
 
-WRITE_LINE_MEMBER( luxor_4105_device::write_sasi_req )
+void luxor_4105_device::write_sasi_req(int state)
 {
 	if (LOG) logerror("%s REQ %u\n", machine().describe_context(), state);
 
@@ -316,13 +316,13 @@ WRITE_LINE_MEMBER( luxor_4105_device::write_sasi_req )
 }
 
 
-WRITE_LINE_MEMBER( luxor_4105_device::write_sasi_msg )
+void luxor_4105_device::write_sasi_msg(int state)
 {
 	update_ack();
 }
 
 
-WRITE_LINE_MEMBER( luxor_4105_device::write_sasi_io )
+void luxor_4105_device::write_sasi_io(int state)
 {
 	if (state)
 	{

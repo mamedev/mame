@@ -43,10 +43,10 @@ LRESULT CComboBox::GetLBText(int index, UString &s)
   s.Empty();
   if (g_IsNT)
   {
-    LRESULT len = SendMsgW(CB_GETLBTEXTLEN, index, 0);
+    LRESULT len = SendMsgW(CB_GETLBTEXTLEN, MY_int_TO_WPARAM(index), 0);
     if (len == CB_ERR)
       return len;
-    LRESULT len2 = SendMsgW(CB_GETLBTEXT, index, (LPARAM)s.GetBuf((unsigned)len));
+    LRESULT len2 = SendMsgW(CB_GETLBTEXT, MY_int_TO_WPARAM(index), (LPARAM)s.GetBuf((unsigned)len));
     if (len2 == CB_ERR)
       return len;
     if (len > len2)
@@ -55,11 +55,11 @@ LRESULT CComboBox::GetLBText(int index, UString &s)
     return len;
   }
   AString sa;
-  LRESULT len = GetLBText(index, sa);
+  const LRESULT len = GetLBText(index, sa);
   if (len == CB_ERR)
     return len;
   s = GetUnicodeString(sa);
-  return s.Len();
+  return (LRESULT)s.Len();
 }
 #endif
 

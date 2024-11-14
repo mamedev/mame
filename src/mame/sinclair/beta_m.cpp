@@ -31,10 +31,8 @@ beta_disk_device::beta_disk_device(const machine_config &mconfig, const char *ta
 	: device_t(mconfig, BETA_DISK, tag, owner, clock)
 	, m_betadisk_active(0)
 	, m_wd179x(*this, "wd179x")
-	, m_floppy0(*this, "wd179x:0")
-	, m_floppy1(*this, "wd179x:1")
-	, m_floppy2(*this, "wd179x:2")
-	, m_floppy3(*this, "wd179x:3")
+	, m_floppy(*this, "wd179x:%u", 0U)
+	, m_floppy_led(*this, "fdd%u_led", 0U)
 	, m_control(0)
 	, m_motor_active(false)
 {
@@ -49,6 +47,8 @@ void beta_disk_device::device_start()
 	save_item(NAME(m_betadisk_active));
 	save_item(NAME(m_control));
 	save_item(NAME(m_motor_active));
+
+	m_floppy_led.resolve();
 }
 
 //-------------------------------------------------
@@ -58,6 +58,8 @@ void beta_disk_device::device_start()
 void beta_disk_device::device_reset()
 {
 	m_control = 0;
+	for (int i = 0; i < m_floppy_led.size(); i++)
+		m_floppy_led[i] = 0;
 }
 
 int beta_disk_device::is_active()
@@ -127,8 +129,7 @@ void beta_disk_device::param_w(uint8_t data)
 {
 	if (m_betadisk_active == 1)
 	{
-		floppy_connector* connectors[] = { m_floppy0, m_floppy1, m_floppy2, m_floppy3 };
-		floppy_image_device* floppy = connectors[data & 3]->get_device();
+		floppy_image_device* floppy = m_floppy[data & 3]->get_device();
 
 		m_control = data;
 		m_wd179x->set_floppy(floppy);
@@ -172,6 +173,14 @@ void beta_disk_device::data_w(uint8_t data)
 	}
 }
 
+void beta_disk_device::turbo_w(int state)
+{
+	if (m_betadisk_active == 1)
+	{
+		m_wd179x->set_clock_scale(1 << (state & 1));
+	}
+}
+
 void beta_disk_device::fdc_hld_w(int state)
 {
 	m_wd179x->set_force_ready(state); // HLD connected to RDY pin
@@ -181,25 +190,34 @@ void beta_disk_device::fdc_hld_w(int state)
 
 void beta_disk_device::motors_control()
 {
-	floppy_connector* connectors[] = { m_floppy0, m_floppy1, m_floppy2, m_floppy3 };
 	for (int i = 0; i < 4; i++)
 	{
 		if (m_motor_active && (m_control & 3) == i)
-			connectors[i]->get_device()->mon_w(CLEAR_LINE);
+		{
+			m_floppy[i]->get_device()->mon_w(CLEAR_LINE);
+			m_floppy_led[i] = 1;
+		}
 		else
-			connectors[i]->get_device()->mon_w(ASSERT_LINE);
+		{
+			m_floppy[i]->get_device()->mon_w(ASSERT_LINE);
+			m_floppy_led[i] = 0;
+		}
 	}
 }
 
 void beta_disk_device::floppy_formats(format_registration &fr)
 {
 	fr.add_mfm_containers();
+	fr.add_pc_formats();
 	fr.add(FLOPPY_TRD_FORMAT);
 }
 
 static void beta_disk_floppies(device_slot_interface &device)
 {
+	device.option_add("525hd", FLOPPY_525_HD);
 	device.option_add("525qd", FLOPPY_525_QD);
+	device.option_add("35hd", FLOPPY_35_HD);
+	device.option_add("35dd", FLOPPY_35_DD);
 }
 
 
@@ -293,10 +311,8 @@ void beta_disk_device::device_add_mconfig(machine_config &config)
 {
 	KR1818VG93(config, m_wd179x, 8_MHz_XTAL / 8);
 	m_wd179x->hld_wr_callback().set(FUNC(beta_disk_device::fdc_hld_w));
-	FLOPPY_CONNECTOR(config, m_floppy0, beta_disk_floppies, "525qd", beta_disk_device::floppy_formats).enable_sound(true);
-	FLOPPY_CONNECTOR(config, m_floppy1, beta_disk_floppies, "525qd", beta_disk_device::floppy_formats).enable_sound(true);
-	FLOPPY_CONNECTOR(config, m_floppy2, beta_disk_floppies, "525qd", beta_disk_device::floppy_formats).enable_sound(true);
-	FLOPPY_CONNECTOR(config, m_floppy3, beta_disk_floppies, "525qd", beta_disk_device::floppy_formats).enable_sound(true);
+	for (auto &floppy : m_floppy)
+		FLOPPY_CONNECTOR(config, floppy, beta_disk_floppies, "525qd", beta_disk_device::floppy_formats).enable_sound(true);
 }
 
 //-------------------------------------------------

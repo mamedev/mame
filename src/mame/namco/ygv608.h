@@ -5,8 +5,8 @@
  *    - Mark McDougall
  */
 
-#ifndef MAME_VIDEO_YGV608_H
-#define MAME_VIDEO_YGV608_H
+#ifndef MAME_NAMCO_YGV608_H
+#define MAME_NAMCO_YGV608_H
 
 #pragma once
 
@@ -23,7 +23,7 @@ public:
 	// construction/destruction
 	ygv608_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	void port_map(address_map &map);
+	void port_map(address_map &map) ATTR_COLD;
 
 	// ports section
 	uint8_t pattern_name_table_r();
@@ -89,21 +89,19 @@ public:
 
 	uint32_t update_screen(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-
 	auto vblank_callback() { return m_vblank_handler.bind(); }
-
 	auto raster_callback() { return m_raster_handler.bind(); }
 
-	void regs_map(address_map &map);
+	void regs_map(address_map &map) ATTR_COLD;
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 	virtual void device_post_load() override;
 
 	virtual space_config_vector memory_space_config() const override;
 
-	virtual uint32_t palette_entries() const override { return 256; }
+	virtual uint32_t palette_entries() const noexcept override { return 256; }
 
 	TIMER_CALLBACK_MEMBER(update_vblank_flag);
 	TIMER_CALLBACK_MEMBER(update_raster_flag);
@@ -132,7 +130,7 @@ private:
 	void register_state_save();
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_layer_roz(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, tilemap_t *source_tilemap);
-	void ygv608_draw_mosaic(bitmap_ind16 &bitmap, const rectangle &cliprect, int n);
+	void draw_mosaic(bitmap_ind16 &bitmap, const rectangle &cliprect, int n);
 
 	uint8_t m_namcond1_gfxbank;
 
@@ -155,8 +153,8 @@ private:
 	uint8_t m_pattern_name_table[4096];
 
 	union {
-		uint8_t           b[SPRITE_ATTR_TABLE_SIZE];
-		SPRITE_ATTR     s[MAX_SPRITES];
+		uint8_t b[SPRITE_ATTR_TABLE_SIZE];
+		SPRITE_ATTR s[MAX_SPRITES];
 	} m_sprite_attribute_table;
 
 	uint8_t m_scroll_data_table[2][256];
@@ -253,10 +251,10 @@ private:
 	uint8_t m_sprite_color_fetch;   /**< SPF: sprite color fetch mode */
 
 	// screen section
-	devcb_write_line            m_vblank_handler;
-	devcb_write_line            m_raster_handler;
-	emu_timer                   *m_vblank_timer;
-	emu_timer                   *m_raster_timer;
+	devcb_write_line m_vblank_handler;
+	devcb_write_line m_raster_handler;
+	emu_timer *m_vblank_timer;
+	emu_timer *m_raster_timer;
 
 	void screen_configure();        /**< Adjust screen parameters based off CRTC ones */
 	attotime raster_sync_offset();  /**< Adjust timing based off raster & CRTC parameters */
@@ -284,7 +282,7 @@ private:
 		int display_vsync = 0;      /**< VSW: vertical sync signal x 1 */
 		int border_width = 0;       /**< HBW: horizontal border size x 16 */
 		int border_height = 0;      /**< VBW: vertical border size x 8 */
-	}m_crtc;
+	} m_crtc;
 
 	// rotation, zoom shortcuts
 	uint32_t m_ax;              /**< AX */
@@ -306,11 +304,10 @@ private:
 	// for raw to ROZ conversion
 	uint32_t roz_convert_raw24(uint32_t *raw_reg, uint8_t offset, uint8_t data);
 	uint32_t roz_convert_raw16(uint16_t *raw_reg, uint8_t offset, uint8_t data);
-
 };
 
 // device type definition
 DECLARE_DEVICE_TYPE(YGV608, ygv608_device)
 
 
-#endif
+#endif // MAME_NAMCO_YGV608_H

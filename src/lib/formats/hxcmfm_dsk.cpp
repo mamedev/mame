@@ -6,6 +6,7 @@
 #include "ioprocs.h"
 
 #include <cstring>
+#include <tuple>
 
 
 #define MFM_FORMAT_HEADER   "HXCMFM"
@@ -40,22 +41,22 @@ mfm_format::mfm_format() : floppy_image_format_t()
 {
 }
 
-const char *mfm_format::name() const
+const char *mfm_format::name() const noexcept
 {
 	return "mfm";
 }
 
-const char *mfm_format::description() const
+const char *mfm_format::description() const noexcept
 {
 	return "HxCFloppyEmulator floppy disk image";
 }
 
-const char *mfm_format::extensions() const
+const char *mfm_format::extensions() const noexcept
 {
 	return "mfm";
 }
 
-bool mfm_format::supports_save() const
+bool mfm_format::supports_save() const noexcept
 {
 	return true;
 }
@@ -63,26 +64,28 @@ bool mfm_format::supports_save() const
 int mfm_format::identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants) const
 {
 	uint8_t header[7];
-
-	size_t actual;
-	io.read_at(0, &header, sizeof(header), actual);
-	if ( memcmp( header, MFM_FORMAT_HEADER, 6 ) ==0) {
+	auto const [err, actual] = read_at(io, 0, &header, sizeof(header)); // FIXME: does this really need to read 7 bytes?  only 6 are checked.  also check for premature EOF
+	if (err) {
+		return 0;
+	}
+	if (!memcmp(header, MFM_FORMAT_HEADER, 6)) {
 		return FIFID_SIGN;
 	}
 	return 0;
 }
 
-bool mfm_format::load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image) const
+bool mfm_format::load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image &image) const
 {
+	std::error_condition err;
 	size_t actual;
 	MFMIMG header;
 	MFMTRACKIMG trackdesc;
 
 	// read header
-	io.read_at(0, &header, sizeof(header), actual);
+	std::tie(err, actual) = read_at(io, 0, &header, sizeof(header)); // FIXME: check for errors and premature EOF
 
 	int drivecyl, driveheads;
-	image->get_maximal_geometry(drivecyl, driveheads);
+	image.get_maximal_geometry(drivecyl, driveheads);
 	bool skip_odd = (drivecyl < 50 && header.number_of_track >= 80);
 
 	int counter = 0;
@@ -91,12 +94,12 @@ bool mfm_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 		for(int side=0; side < header.number_of_side; side++) {
 			if (!skip_odd || track%2 == 0) {
 				// read location of
-				io.read_at((header.mfmtracklistoffset)+( counter *sizeof(trackdesc)), &trackdesc, sizeof(trackdesc), actual);
+				std::tie(err, actual) = read_at(io, header.mfmtracklistoffset + (counter * sizeof(trackdesc)), &trackdesc, sizeof(trackdesc)); // FIXME: check for errors and premature EOF
 
 				trackbuf.resize(trackdesc.mfmtracksize);
 
 				// actual data read
-				io.read_at(trackdesc.mfmtrackoffset, &trackbuf[0], trackdesc.mfmtracksize, actual);
+				std::tie(err, actual) = read_at(io, trackdesc.mfmtrackoffset, &trackbuf[0], trackdesc.mfmtracksize); // FIXME: check for errors and premature EOF
 
 				if (skip_odd) {
 					generate_track_from_bitstream(track/2, side, &trackbuf[0], trackdesc.mfmtracksize*8, image);
@@ -110,17 +113,16 @@ bool mfm_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 		}
 	}
 
-	image->set_variant(floppy_image::DSDD);
+	image.set_variant(floppy_image::DSDD);
 	return true;
 }
 
-bool mfm_format::save(util::random_read_write &io, const std::vector<uint32_t> &variants, floppy_image *image) const
+bool mfm_format::save(util::random_read_write &io, const std::vector<uint32_t> &variants, const floppy_image &image) const
 {
 	// TODO: HD support
-	size_t actual;
 	MFMIMG header;
 	int track_count, head_count;
-	image->get_actual_geometry(track_count, head_count);
+	image.get_actual_geometry(track_count, head_count);
 
 	memcpy(&header.headername, MFM_FORMAT_HEADER, 7);
 	header.number_of_track = track_count;
@@ -130,7 +132,7 @@ bool mfm_format::save(util::random_read_write &io, const std::vector<uint32_t> &
 	header.floppyiftype = 4;
 	header.mfmtracklistoffset = sizeof(MFMIMG);
 
-	io.write_at(0, &header, sizeof(MFMIMG), actual);
+	write_at(io, 0, &header, sizeof(MFMIMG)); // FIXME: check for errors
 
 	int tpos = sizeof(MFMIMG);
 	int dpos = tpos + track_count*head_count*sizeof(MFMTRACKIMG);
@@ -149,8 +151,8 @@ bool mfm_format::save(util::random_read_write &io, const std::vector<uint32_t> &
 			trackdesc.mfmtracksize = packed.size();
 			trackdesc.mfmtrackoffset = dpos;
 
-			io.write_at(tpos, &trackdesc, sizeof(MFMTRACKIMG), actual);
-			io.write_at(dpos, packed.data(), packed.size(), actual);
+			write_at(io, tpos, &trackdesc, sizeof(MFMTRACKIMG)); // FIXME: check for errors
+			write_at(io, dpos, packed.data(), packed.size()); // FIXME: check for errors
 
 			tpos += sizeof(MFMTRACKIMG);
 			dpos += packed.size();

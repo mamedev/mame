@@ -9,6 +9,9 @@
 #include "emu.h"
 #include "cpc_rom.h"
 
+#include <tuple>
+
+
 DEFINE_DEVICE_TYPE(CPC_ROM, cpc_rom_device, "cpc_rom", "CPC ROM Box")
 
 void cpc_exp_cards(device_slot_interface &device);
@@ -101,23 +104,18 @@ void cpc_rom_image_device::device_start()
 /*-------------------------------------------------
     DEVICE_IMAGE_LOAD( rom )
 -------------------------------------------------*/
-image_init_result cpc_rom_image_device::call_load()
+std::pair<std::error_condition, std::string> cpc_rom_image_device::call_load()
 {
-	device_image_interface* image = this;
-	uint64_t size = image->length();
+	uint64_t const total = length();
+	size_t const size = std::min<uint64_t>(total, 16384);
 
-	m_base = std::make_unique<uint8_t[]>(16384);
-	if(size <= 16384)
-	{
-		image->fread(m_base,size);
-	}
-	else
-	{
-		image->fseek(size-16384,SEEK_SET);
-		image->fread(m_base,16384);
-	}
+	std::error_condition err;
+	size_t actual;
+	std::tie(err, m_base, actual) = read_at(image_core_file(), total - size, size);
+	if (!err && (actual != size))
+		err = std::errc::io_error;
 
-	return image_init_result::PASS;
+	return std::make_pair(err, std::string());
 }
 
 

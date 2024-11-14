@@ -12,6 +12,9 @@
 #include "screen.h"
 #include "tilemap.h"
 
+
+namespace {
+
 class mgolf_state : public driver_device
 {
 public:
@@ -27,11 +30,11 @@ public:
 	void mgolf(machine_config &config);
 
 private:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
-	void cpu_map(address_map &map);
+	void cpu_map(address_map &map) ATTR_COLD;
 
 	void vram_w(offs_t offset, uint8_t data);
 	uint8_t wram_r(offs_t offset);
@@ -389,6 +392,8 @@ ROM_START( mgolf )
 	ROM_REGION( 0x0200, "proms", 0 )
 	ROM_LOAD( "33756-01.m7", 0x0000, 0x0200, CRC(4cec9bf3) SHA1(6dd49f045fb53ae9f412639117b107faa93dfd99) )
 ROM_END
+
+} // anonymous namespace
 
 
 GAME( 1978, mgolf, 0, mgolf, mgolf, mgolf_state, empty_init, ROT270, "Atari", "Mini Golf (Atari, prototype)", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )

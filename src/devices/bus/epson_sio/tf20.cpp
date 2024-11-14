@@ -41,7 +41,7 @@ void epson_tf20_device::cpu_io(address_map &map)
 	map.global_mask(0xff);
 	map(0xf0, 0xf3).rw(m_mpsc, FUNC(upd7201_device::ba_cd_r), FUNC(upd7201_device::ba_cd_w));
 	map(0xf6, 0xf6).r(FUNC(epson_tf20_device::rom_disable_r));
-	map(0xf7, 0xf7).portr("tf20_dip");
+	map(0xf7, 0xf7).portr(m_tf20_dip);
 	map(0xf8, 0xf8).rw(FUNC(epson_tf20_device::upd765_tc_r), FUNC(epson_tf20_device::fdc_control_w));
 	map(0xfa, 0xfb).m("5a", FUNC(upd765a_device::map));
 }
@@ -133,6 +133,7 @@ epson_tf20_device::epson_tf20_device(const machine_config &mconfig, const char *
 	m_mpsc(*this, "3a"),
 	m_sio_output(*this, "sio"),
 	m_fd(*this, "5a:%u", 0U),
+	m_tf20_dip(*this, "tf20_dip"),
 	m_timer_serial(nullptr), m_timer_tc(nullptr),
 	m_rxc(1), m_txda(0), m_dtra(0), m_pinc(0)
 {
@@ -262,7 +263,7 @@ void epson_tf20_device::fdc_control_w(uint8_t data)
 //  rxc_w - rx input
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( epson_tf20_device::rxc_w )
+void epson_tf20_device::rxc_w(int state)
 {
 	m_rxc = state;
 	m_sio_input->rx_w(m_txda && m_rxc);
@@ -272,7 +273,7 @@ WRITE_LINE_MEMBER( epson_tf20_device::rxc_w )
 //  pinc_w - pin input
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( epson_tf20_device::pinc_w )
+void epson_tf20_device::pinc_w(int state)
 {
 	m_pinc = state;
 	m_sio_input->pin_w(!m_dtra || m_pinc);
@@ -282,7 +283,7 @@ WRITE_LINE_MEMBER( epson_tf20_device::pinc_w )
 //  txda_w - rx output
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( epson_tf20_device::txda_w )
+void epson_tf20_device::txda_w(int state)
 {
 	m_txda = state;
 	m_sio_input->rx_w(m_txda && m_rxc);
@@ -292,7 +293,7 @@ WRITE_LINE_MEMBER( epson_tf20_device::txda_w )
 //  dtra_w - pin output
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( epson_tf20_device::dtra_w )
+void epson_tf20_device::dtra_w(int state)
 {
 	m_dtra = state;
 	m_sio_input->pin_w(!m_dtra || m_pinc);

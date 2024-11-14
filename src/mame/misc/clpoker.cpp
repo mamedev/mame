@@ -40,6 +40,8 @@ There also are unpopulated locations that might fit a YM3812 and YM3014.
 #include "tilemap.h"
 
 
+namespace {
+
 class clpoker_state : public driver_device
 {
 public:
@@ -55,7 +57,7 @@ public:
 	void clpoker(machine_config &config);
 
 protected:
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	void output_a_w(u8 data);
@@ -63,13 +65,13 @@ private:
 	void output_c_w(u8 data);
 
 	void videoram_w(offs_t offset, u8 data);
-	DECLARE_WRITE_LINE_MEMBER(vblank_w);
+	void vblank_w(int state);
 
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void io_map(address_map &map);
-	void prg_map(address_map &map);
-	void ramdac_map(address_map &map);
+	void io_map(address_map &map) ATTR_COLD;
+	void prg_map(address_map &map) ATTR_COLD;
+	void ramdac_map(address_map &map) ATTR_COLD;
 
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
@@ -136,7 +138,7 @@ static INPUT_PORTS_START( clpoker )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_GAMBLE_KEYIN )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT )
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("hopper", ticket_dispenser_device, line_r)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("hopper", FUNC(ticket_dispenser_device::line_r))
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK )
 	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -228,7 +230,7 @@ void clpoker_state::video_start()
 	save_item(NAME(m_nmi_enable));
 }
 
-WRITE_LINE_MEMBER(clpoker_state::vblank_w)
+void clpoker_state::vblank_w(int state)
 {
 	if (m_nmi_enable)
 		m_maincpu->set_input_line(INPUT_LINE_NMI, state);
@@ -242,20 +244,8 @@ u32 clpoker_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, co
 }
 
 
-static const gfx_layout gfx_layout =
-{
-	8,8,
-	RGN_FRAC(1,1),
-	8,
-	{ 0, 1, 2, 3, 4, 5, 6, 7 },
-	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
-	{ 0*64, 1*64, 2*64, 3*64, 4*64, 5*64, 6*64, 7*64 },
-	8*64,
-};
-
-
 static GFXDECODE_START( gfx_clpoker )
-	GFXDECODE_ENTRY( "gfx1", 0, gfx_layout,   0x0, 1 )
+	GFXDECODE_ENTRY( "gfx1", 0, gfx_8x8x8_raw,   0x0, 1 )
 GFXDECODE_END
 
 
@@ -278,7 +268,7 @@ void clpoker_state::clpoker(machine_config &config)
 	ppi_inputs.in_pb_callback().set_ioport("INB");
 	ppi_inputs.in_pc_callback().set_ioport("INC");
 
-	TICKET_DISPENSER(config, m_hopper, attotime::from_msec(60), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_LOW);
+	TICKET_DISPENSER(config, m_hopper, attotime::from_msec(60));
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60); // wrong
@@ -321,6 +311,8 @@ ROM_START( clpoker )
 	ROM_LOAD( "mach110-20jc.pl4",  0x00, 0x200,  NO_DUMP )
 	ROM_LOAD( "gal20v8a.pl5",      0x00, 0x157,  NO_DUMP )
 ROM_END
+
+} // anonymous namespace
 
 
 GAME( 1994, clpoker, 0, clpoker, clpoker, clpoker_state, empty_init, ROT0, "Chain Leisure", "Poker Genius", MACHINE_SUPPORTS_SAVE ) // Year taken from string in main CPU ROM

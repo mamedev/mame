@@ -30,12 +30,12 @@ public:
 	// configuration
 	void set_vector(uint8_t vector) { m_vector = vector; }
 
-	DECLARE_WRITE_LINE_MEMBER(int_w);
-	DECLARE_WRITE_LINE_MEMBER(mask_w);
+	void int_w(int state);
+	void mask_w(int state);
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 	// z80daisy_interface overrides
 	virtual int z80daisy_irq_state() override;

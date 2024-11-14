@@ -12,6 +12,9 @@
 
 #include "speaker.h"
 
+
+namespace {
+
 static INPUT_PORTS_START(qy70)
 	PORT_START("SWA")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Record")    PORT_CODE(KEYCODE_Z)
@@ -104,14 +107,13 @@ private:
 
 	u8 sw_sel;
 
-	void pa_w(u16 data) { if (data) sw_sel = data; }
+	void pa_w(u8 data) { if (data) sw_sel = data; }
 	u8 sw_in();
 	u16 adc_bkupbat_r() { return 0x2a0; }
-	void io_map(address_map &map);
-	void mem_map(address_map &map);
-	void lcd_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
+	void lcd_map(address_map &map) ATTR_COLD;
 	void lcd_palette(palette_device &palette) const;
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 };
 
 void qy70_state::machine_start()
@@ -127,16 +129,6 @@ u8 qy70_state::sw_in()
 	while (idx && sw_sel != (1 << idx))
 		idx--;
 	return m_switches[idx]->read();
-}
-
-void qy70_state::io_map(address_map &map)
-{
-	map(h8_device::PORT_A, h8_device::PORT_A).w(FUNC(qy70_state::pa_w));
-	// PORT_B bit 0 1MHz output for Mac serial, bit 1 Rec LED, bit 2 Play LED,
-	//        bit 3 lcdc reset, bit 4 GND, bit 5 subcpu SBSY, bit 6-7 subcpu
-	// ADC_0  Power battery voltage
-	// ADC_2  Host type select: 5V Mac, 3.33V PC-1, 1.66V PC-2, 0V MIDI
-	map(h8_device::ADC_4, h8_device::ADC_4).r(FUNC(qy70_state::adc_bkupbat_r));
 }
 
 void qy70_state::mem_map(address_map &map)
@@ -164,7 +156,12 @@ void qy70_state::qy70(machine_config &config)
 {
 	H83002(config, m_maincpu, 10_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &qy70_state::mem_map);
-	m_maincpu->set_addrmap(AS_IO, &qy70_state::io_map);
+	// ADC_0  Power battery voltage
+	// ADC_2  Host type select: 5V Mac, 3.33V PC-1, 1.66V PC-2, 0V MIDI
+	m_maincpu->read_adc<4>().set(FUNC(qy70_state::adc_bkupbat_r));
+	m_maincpu->write_porta().set(FUNC(qy70_state::pa_w));
+	// PORT_B bit 0 1MHz output for Mac serial, bit 1 Rec LED, bit 2 Play LED,
+	//        bit 3 lcdc reset, bit 4 GND, bit 5 subcpu SBSY, bit 6-7 subcpu
 
 	NVRAM(config, "userdata.nv", nvram_device::DEFAULT_NONE);
 	NVRAM(config, "workdata.nv", nvram_device::DEFAULT_NONE);
@@ -188,15 +185,15 @@ void qy70_state::qy70(machine_config &config)
 
 	auto &mdin_a(MIDI_PORT(config, "mdin_a"));
 	midiin_slot(mdin_a);
-	mdin_a.rxd_handler().set("maincpu:sci1", FUNC(h8_sci_device::rx_w));
+	mdin_a.rxd_handler().set(m_maincpu, FUNC(h83002_device::sci_rx_w<1>));
 
 	auto &mdin_b(MIDI_PORT(config, "mdin_b"));
 	midiin_slot(mdin_b);
-	mdin_b.rxd_handler().set("maincpu:sci0", FUNC(h8_sci_device::rx_w));
+	mdin_b.rxd_handler().set(m_maincpu, FUNC(h83002_device::sci_rx_w<0>));
 
 	auto &mdout(MIDI_PORT(config, "mdout_a"));
 	midiout_slot(mdout);
-	m_maincpu->subdevice<h8_sci_device>("sci1")->tx_handler().set(mdout, FUNC(midi_port_device::write_txd));
+	m_maincpu->write_sci_tx<0>().set(mdout, FUNC(midi_port_device::write_txd));
 }
 
 ROM_START(qy70)
@@ -207,5 +204,8 @@ ROM_START(qy70)
 	ROM_LOAD("t6963c_0101.bin", 0x000, 0x400, CRC(547d118b) SHA1(0dd3e3acd3d47e6ece644c98c390fc86587373e9))
 	// This t6963c_0101 internal CG ROM is similar to lm24014w_0101.bin which may be used as a replacement
 ROM_END
+
+} // anonymous namespace
+
 
 CONS(1997, qy70, 0, 0, qy70, qy70, qy70_state, empty_init, "Yamaha", "QY70 Music Sequencer", MACHINE_NOT_WORKING)

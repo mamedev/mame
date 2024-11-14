@@ -69,6 +69,8 @@ ToDo:
 #include "speaker.h"
 
 
+namespace {
+
 class iq151_state : public driver_device
 {
 public:
@@ -80,6 +82,7 @@ public:
 		, m_cassette(*this, "cassette")
 		, m_carts(*this, "slot%u", 1U)
 		, m_boot_bank(*this, "boot")
+		, m_keyboard(*this, "X%X", 0U)
 	{ }
 
 	void iq151(machine_config &config);
@@ -96,14 +99,14 @@ private:
 	void cartslot_w(offs_t offset, uint8_t data);
 	uint8_t cartslot_io_r(offs_t offset);
 	void cartslot_io_w(offs_t offset, uint8_t data);
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	INTERRUPT_GEN_MEMBER(iq151_vblank_interrupt);
 	TIMER_DEVICE_CALLBACK_MEMBER(cassette_timer);
-	void iq151_io(address_map &map);
-	void iq151_mem(address_map &map);
+	void iq151_io(address_map &map) ATTR_COLD;
+	void iq151_mem(address_map &map) ATTR_COLD;
 
 	required_device<i8080_cpu_device> m_maincpu;
 	required_device<pic8259_device> m_pic;
@@ -111,6 +114,7 @@ private:
 	required_device<cassette_image_device> m_cassette;
 	required_device_array<iq151cart_slot_device, 5> m_carts;
 	required_memory_bank m_boot_bank;
+	required_ioport_array<8> m_keyboard;
 
 	uint8_t m_vblank_irq_state;
 	uint8_t m_cassette_clk;
@@ -119,13 +123,11 @@ private:
 
 uint8_t iq151_state::keyboard_row_r()
 {
-	char kbdrow[6];
 	uint8_t data = 0xff;
 
 	for (int i = 0; i < 8; i++)
 	{
-		sprintf(kbdrow,"X%X",i);
-		data &= ioport(kbdrow)->read();
+		data &= m_keyboard[i]->read();
 	}
 
 	return data;
@@ -133,13 +135,11 @@ uint8_t iq151_state::keyboard_row_r()
 
 uint8_t iq151_state::keyboard_column_r()
 {
-	char kbdrow[6];
 	uint8_t data = 0x00;
 
 	for (int i = 0; i < 8; i++)
 	{
-		sprintf(kbdrow,"X%X",i);
-		if (ioport(kbdrow)->read() == 0xff)
+		if (m_keyboard[i]->read() == 0xff)
 			data |= (1 << i);
 	}
 
@@ -330,7 +330,7 @@ static INPUT_PORTS_START( iq151 )
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("FB") PORT_CODE(KEYCODE_RCONTROL)     // Function B
 
 	PORT_START("BREAK")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("BREAK") PORT_CODE(KEYCODE_ESC)   PORT_CHANGED_MEMBER(DEVICE_SELF, iq151_state, iq151_break, 0)  PORT_CHAR(UCHAR_MAMEKEY(ESC))
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("BREAK") PORT_CODE(KEYCODE_ESC)   PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(iq151_state::iq151_break), 0)  PORT_CHAR(UCHAR_MAMEKEY(ESC))
 INPUT_PORTS_END
 
 
@@ -483,6 +483,9 @@ ROM_START( iq151 )
 	ROM_SYSTEM_BIOS( 3, "cpmold", "CPM (old)" )
 	ROMX_LOAD( "iq151_monitor_cpm_old.rom", 0xf000, 0x1000, CRC(6743e1b7) SHA1(ae4f3b1ba2511a1f91c4e8afdfc0e5aeb0fb3a42), ROM_BIOS(3))
 ROM_END
+
+} // anonymous namespace
+
 
 /* Driver */
 

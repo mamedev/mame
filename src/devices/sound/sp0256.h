@@ -46,22 +46,22 @@ public:
 	auto standby_callback() { return m_sby_cb.bind(); }
 
 	void ald_w(uint8_t data);
-	DECLARE_READ_LINE_MEMBER(lrq_r);
-	DECLARE_READ_LINE_MEMBER(sby_r);
+	int lrq_r();
+	int sby_r();
 	uint16_t spb640_r(offs_t offset);
 	void spb640_w(offs_t offset, uint16_t data);
 
-	TIMER_CALLBACK_MEMBER(set_lrq_timer_proc);
 	void set_clock(int clock);
 	void bitrevbuff(uint8_t *buffer, unsigned int start, unsigned int length);
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// sound stream update overrides
 	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
+	TIMER_CALLBACK_MEMBER(delayed_stream_update) { m_stream->update(); }
 
 private:
 	struct lpc12_t
@@ -69,14 +69,14 @@ private:
 		int update(int num_samp, int16_t *out, uint32_t *optr);
 		void regdec();
 
-		int     rpt, cnt;       // Repeat counter, Period down-counter.
+		int       rpt, cnt;       // Repeat counter, Period down-counter.
 		uint32_t  per, rng;       // Period, Amplitude, Random Number Generator
-		int     amp;
+		int       amp;
 		int16_t   f_coef[6];      // F0 through F5.
 		int16_t   b_coef[6];      // B0 through B5.
 		int16_t   z_data[6][2];   // Time-delay data for the filter stages.
 		uint8_t   r[16];          // The encoded register set.
-		int     interp;
+		int       interp;
 
 	private:
 		static int16_t limit(int16_t s);
@@ -95,35 +95,34 @@ private:
 	}
 
 	required_region_ptr<uint8_t> m_rom; // 64K ROM.
-	sound_stream  *m_stream;          // MAME core sound stream
-	devcb_write_line m_drq_cb;       // Data request callback
-	devcb_write_line m_sby_cb;       // Standby callback
+	sound_stream *m_stream;           // MAME core sound stream
+	emu_timer *m_stream_timer;        // For forcing stream update when callbacks are used
+	devcb_write_line m_drq_cb;        // Data request callback
+	devcb_write_line m_sby_cb;        // Standby callback
 
 	int            m_sby_line;        // Standby line state
 	int            m_cur_len;         // Fullness of current sound buffer.
 
 	int            m_silent;          // Flag: SP0256 is silent.
 
-	std::unique_ptr<int16_t[]>    m_scratch;         // Scratch buffer for audio.
-	uint32_t         m_sc_head;         // Head pointer into scratch circular buf
-	uint32_t         m_sc_tail;         // Tail pointer into scratch circular buf
+	std::unique_ptr<int16_t[]> m_scratch; // Scratch buffer for audio.
+	uint32_t       m_sc_head;         // Head pointer into scratch circular buf
+	uint32_t       m_sc_tail;         // Tail pointer into scratch circular buf
 
-	lpc12_t m_filt;                   // 12-pole filter
+	lpc12_t        m_filt;            // 12-pole filter
 	int            m_lrq;             // Load ReQuest.  == 0 if we can accept a load
 	int            m_ald;             // Address LoaD.  < 0 if no command pending.
 	int            m_pc;              // Microcontroller's PC value.
 	int            m_stack;           // Microcontroller's PC stack.
 	int            m_fifo_sel;        // True when executing from FIFO.
 	int            m_halted;          // True when CPU is halted.
-	uint32_t         m_mode;            // Mode register.
-	uint32_t         m_page;            // Page set by SETPAGE
+	uint32_t       m_mode;            // Mode register.
+	uint32_t       m_page;            // Page set by SETPAGE
 
-	uint32_t         m_fifo_head;       // FIFO head pointer (where new data goes).
-	uint32_t         m_fifo_tail;       // FIFO tail pointer (where data comes from).
-	uint32_t         m_fifo_bitp;       // FIFO bit-pointer (for partial decles).
-	uint16_t         m_fifo[64];        // The 64-decle FIFO.
-
-	emu_timer *m_lrq_timer;
+	uint32_t       m_fifo_head;       // FIFO head pointer (where new data goes).
+	uint32_t       m_fifo_tail;       // FIFO tail pointer (where data comes from).
+	uint32_t       m_fifo_bitp;       // FIFO bit-pointer (for partial decles).
+	uint16_t       m_fifo[64];        // The 64-decle FIFO.
 };
 
 DECLARE_DEVICE_TYPE(SP0256, sp0256_device)

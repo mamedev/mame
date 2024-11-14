@@ -50,7 +50,7 @@ void sec_device::device_reset()
 	m_rxpos = 0;
 }
 
-WRITE_LINE_MEMBER(sec_device::cs_w)
+void sec_device::cs_w(int state)
 {
 	if (state)
 	{
@@ -72,7 +72,7 @@ WRITE_LINE_MEMBER(sec_device::cs_w)
 	}
 }
 
-WRITE_LINE_MEMBER(sec_device::data_w)
+void sec_device::data_w(int state)
 {
 	m_data = (uint8_t)state;
 }
@@ -82,10 +82,8 @@ int sec_device::data_r(void)
 	return m_rxdat;
 }
 
-WRITE_LINE_MEMBER(sec_device::clk_w)
+void sec_device::clk_w(int state)
 {
-	state = state ? 1 : 0;
-
 	if (m_clk ^ state)
 	{
 		if (!state)

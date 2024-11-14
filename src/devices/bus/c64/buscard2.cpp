@@ -10,6 +10,42 @@
 
 **********************************************************************/
 
+/*
+
+PCB Layout
+----------
+
+|------|             |-------------|
+|  CN1 |-------------|     CN2     |
+|                                  |-
+|     RIOT    SW1    LS245 LS245    |
+|                                   |
+|     PIA                           |CN3
+|                                   |
+|   LS164   PROM1           ROM     |
+|     LS164   PROM2                 |
+|   LS00    LS00    LS133          |-
+|     LS00    LS211                |
+|-------|   CN5        |-----------|
+        |     CN4      |
+        |--------------|
+
+Notes:
+    All IC's shown.
+
+    RIOT    - Rockwell R6532AP
+    PIA     - Motorola MC6821P
+    ROM     - Fujitsu MBM2764-25 8Kx8 EPROM (no label)
+    PROM1   - Signetics N82S129N 256x4 Bipolar PROM (no label)
+    PROM2   - Signetics N82S129N 256x4 Bipolar PROM (no label)
+    CN1     - 11x2 PCB edge, parallel printer
+    CN2     - 12x2 PCB edge, IEEE-488
+    CN3     - 22x2, cartridge port passthru
+    CN4     - 22x2 PCB edge, cartridge port
+    CN5     - 3 pin PCB header, clip to C64 R44 (_HIRAM)
+
+*/
+
 #include "emu.h"
 #include "buscard2.h"
 
@@ -30,7 +66,6 @@ ROM_START( buscard2 )
 	ROM_REGION( 0x2000, "rom", 0 )
 	ROM_LOAD( "v2.12.bin", 0x0000, 0x2000, CRC(1c9b2edb) SHA1(04f0a248370281fd42389928e32d11aba597cf01) )
 
-	// dumps coming soon
 	ROM_REGION( 0x200, "prom", 0 )
 	ROM_LOAD( "82s129.1", 0x000, 0x100, NO_DUMP )
 	ROM_LOAD( "82s129.2", 0x100, 0x100, NO_DUMP )
@@ -90,24 +125,14 @@ ioport_constructor c64_buscard2_device::device_input_ports() const
 
 
 //-------------------------------------------------
-//  Centronics interface
-//-------------------------------------------------
-
-WRITE_LINE_MEMBER( c64_buscard2_device::busy_w )
-{
-	m_busy = state;
-}
-
-
-//-------------------------------------------------
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
 void c64_buscard2_device::device_add_mconfig(machine_config &config)
 {
-	RIOT6532(config, m_riot, 0);
+	MOS6532(config, m_riot, 0);
 
-	PIA6821(config, m_pia, 0);
+	PIA6821(config, m_pia);
 
 	IEEE488(config, m_bus, 0);
 	ieee488_slot_device::add_cbm_defaults(config, nullptr);

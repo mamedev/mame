@@ -93,6 +93,7 @@
     while bit 7 says odd only.
 
 ******************************************************************************
+
     Special Chip 1 and 2 aka VLSI VL2001/2001A Pinout:
                                _______    _______
                              _|*      \__/       |_
@@ -146,6 +147,7 @@ The full silkscreen markings of SC2 (under the "Special Chip 2" sticker, if it i
 <VTi Logo> 242
           VL2001A
           5410-09958
+
 ******************************************************************************/
 
 #include "emu.h"
@@ -188,7 +190,7 @@ void williams2_state::video_start()
 	blitter_init(m_blitter_config, nullptr);
 
 	/* create the tilemap */
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(williams2_state::get_tile_info)), TILEMAP_SCAN_COLS,  24,16, 128,16);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(williams2_state::get_tile_info)), TILEMAP_SCAN_COLS, 24,16, 128,16);
 	m_bg_tilemap->set_scrolldx(2, 0);
 
 	state_save_register();
@@ -208,24 +210,23 @@ void williams2_state::video_start()
 
 uint32_t williams_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
+	// precompute the palette
 	rgb_t pens[16];
-
-	/* precompute the palette */
 	for (int x = 0; x < 16; x++)
 		pens[x] = m_palette->pen_color(m_paletteram[x]);
 
-	/* loop over rows */
+	// loop over rows
 	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
 		uint8_t const *const source = &m_videoram[y];
 		uint32_t *const dest = &bitmap.pix(y);
 
-		/* loop over columns */
+		// loop over columns
 		for (int x = cliprect.min_x & ~1; x <= cliprect.max_x; x += 2)
 		{
-			int const pix = source[(x/2) * 256];
-			dest[x+0] = pens[pix >> 4];
-			dest[x+1] = pens[pix & 0x0f];
+			uint8_t const pix = source[(x / 2) * 256];
+			dest[x + 0] = pens[pix >> 4];
+			dest[x + 1] = pens[pix & 0x0f];
 		}
 	}
 	return 0;
@@ -234,8 +235,8 @@ uint32_t williams_state::screen_update(screen_device &screen, bitmap_rgb32 &bitm
 
 uint32_t blaster_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	uint8_t *palette_0 = &m_videoram[0xbb00];
-	uint8_t *scanline_control = &m_videoram[0xbc00];
+	uint8_t const *const palette_0 = &m_videoram[0xbb00];
+	uint8_t const *const scanline_control = &m_videoram[0xbc00];
 	rgb_t pens[16];
 
 	/* precompute the palette */
@@ -249,7 +250,7 @@ uint32_t blaster_state::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 	/* loop over rows */
 	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
-		int erase_behind = m_video_control & scanline_control[y] & 2;
+		int const erase_behind = m_video_control & scanline_control[y] & 2;
 		uint8_t *const source = &m_videoram[y];
 		uint32_t *const dest = &bitmap.pix(y);
 
@@ -260,7 +261,7 @@ uint32_t blaster_state::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 		/* loop over columns */
 		for (int x = cliprect.min_x & ~1; x <= cliprect.max_x; x += 2)
 		{
-			int const pix = source[(x/2) * 256];
+			uint8_t const pix = source[(x/2) * 256];
 
 			/* clear behind us if requested */
 			if (erase_behind)
@@ -295,7 +296,7 @@ uint32_t williams2_state::screen_update(screen_device &screen, bitmap_rgb32 &bit
 		/* loop over columns */
 		for (int x = cliprect.min_x & ~1; x <= cliprect.max_x; x += 2)
 		{
-			int const pix = source[(x/2) * 256];
+			uint8_t const pix = source[(x/2) * 256];
 
 			if (pix & 0xf0)
 				dest[x+0] = pens[pix >> 4];
@@ -329,7 +330,7 @@ uint32_t mysticm_state::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 		/* loop over columns */
 		for (int x = cliprect.min_x & ~1; x <= cliprect.max_x; x += 2)
 		{
-			int const pix = source[(x/2) * 256];
+			uint8_t const pix = source[(x/2) * 256];
 
 			if (pix & 0xf0)
 				dest[x+0] = pens[pix >> 4];
@@ -461,14 +462,12 @@ rgb_t williams2_state::calc_col(uint16_t lo, uint16_t hi)
 
 void williams2_state::paletteram_w(offs_t offset, u8 data)
 {
-	uint16_t entry_lo, entry_hi;
-
 	/* set the new value */
 	m_paletteram[offset] = data;
 
 	/* pull the associated low/high bytes */
-	entry_lo = m_paletteram[offset & ~1];
-	entry_hi = m_paletteram[offset |  1];
+	uint16_t entry_lo = m_paletteram[offset & ~1];
+	uint16_t entry_hi = m_paletteram[offset |  1];
 
 	m_bg_tilemap->mark_all_dirty();
 
@@ -478,7 +477,7 @@ void williams2_state::paletteram_w(offs_t offset, u8 data)
 
 void williams2_state::rebuild_palette()
 {
-	for (offs_t i=0; i<2048; i++)
+	for (offs_t i = 0; i < 2048; i++)
 		paletteram_w(i, m_paletteram[i]);
 }
 
@@ -520,12 +519,12 @@ u8 williams2_state::video_counter_r()
 
 TILE_GET_INFO_MEMBER(williams2_state::get_tile_info)
 {
-	int mask = m_gfxdecode->gfx(0)->elements() - 1;
-	int data = m_tileram[tile_index];
-	int y = (tile_index >> 1) & 7;
+	int const mask = m_gfxdecode->gfx(0)->elements() - 1;
+	int const data = m_tileram[tile_index];
+	int const y = (tile_index >> 1) & 7;
 
 	/* On tshoot and inferno, IC79 is a 74LS157 selector jumpered to be enabled */
-	int color = y;
+	int const color = y;
 
 	tileinfo.set(0, data & mask, color, (data & ~mask) ? TILE_FLIPX : 0);
 }
@@ -533,10 +532,10 @@ TILE_GET_INFO_MEMBER(williams2_state::get_tile_info)
 
 int mysticm_state::color_decode(uint8_t base_col, int sig_J1, int y)
 {
-	int v = y << 6;
-	int sig_W11 = (v >> 11) & 1;
-	int sig_W12 = (v >> 12) & 1;
-	int sig_W13 = (v >> 13) & 1;
+	int const v = y << 6;
+	int const sig_W11 = (v >> 11) & 1;
+	int const sig_W12 = (v >> 12) & 1;
+	int const sig_W13 = (v >> 13) & 1;
 
 	// There are four "jumpers" in the schematics.
 	// J3 and J4 allow to turn off background tilemaps completely.
@@ -554,9 +553,9 @@ int mysticm_state::color_decode(uint8_t base_col, int sig_J1, int y)
 	// FIXME: Investigate further.
 
 	/* IC79 is a 74LS85 comparator that controls the low bit */
-	int a = 1 | ((base_col & 1) << 2) | ((base_col & 1) << 3);
-	int b = (sig_W12 << 0) | (sig_W13 << 1) | (0 << 2) | (sig_J1 << 3);
-	int color = (a > b) || ((a == b) && !sig_W11);
+	int const a = 1 | ((base_col & 1) << 2) | ((base_col & 1) << 3);
+	int const b = (sig_W12 << 0) | (sig_W13 << 1) | (0 << 2) | (sig_J1 << 3);
+	int const color = (a > b) || ((a == b) && !sig_W11);
 
 	// mysticm schematics show Page1 and Page2 crossed, i.e.
 	// Page1 -> B2 (IC80) and Page2 -> B1 (IC80)
@@ -569,10 +568,10 @@ int mysticm_state::color_decode(uint8_t base_col, int sig_J1, int y)
 
 TILE_GET_INFO_MEMBER(mysticm_state::get_tile_info)
 {
-	int color = color_decode(m_bg_color, 0, (tile_index << 4) & 0xff);
+	int const color = color_decode(m_bg_color, 0, (tile_index << 4) & 0xff);
 
-	int mask = m_gfxdecode->gfx(0)->elements() - 1;
-	int data = m_tileram[tile_index];
+	int const mask = m_gfxdecode->gfx(0)->elements() - 1;
+	int const data = m_tileram[tile_index];
 
 	//m_bg_tilemap->set_palette_offset((color & 0x3e) << 4);
 	//tileinfo.set(0, data & mask, color & 1, (data & ~mask) ? TILE_FLIPX : 0);
@@ -586,11 +585,11 @@ TILE_GET_INFO_MEMBER(mysticm_state::get_tile_info)
 
 TILE_GET_INFO_MEMBER(joust2_state::get_tile_info)
 {
-	int mask = m_gfxdecode->gfx(0)->elements() - 1;
-	int data = m_tileram[tile_index];
+	int const mask = m_gfxdecode->gfx(0)->elements() - 1;
+	int const data = m_tileram[tile_index];
 
 	/* IC79 is a 74LS157 selector jumpered to be disabled */
-	int color = 0;
+	int const color = 0;
 
 	tileinfo.set(0, data & mask, color, (data & ~mask) ? TILE_FLIPX : 0);
 }
@@ -711,7 +710,7 @@ void williams_state::blitter_w(address_space &space, offs_t offset, u8 data)
 	if (h == 0) h = 1;
 
 	/* do the actual blit */
-	int accesses = blitter_core(space, sstart, dstart, w, h, data);
+	int const accesses = blitter_core(space, sstart, dstart, w, h, data);
 
 	/* based on the number of memory accesses needed to do the blit, compute how long the blit will take */
 	int estimated_clocks_at_4MHz = 4;
@@ -739,7 +738,7 @@ void williams_state::blitter_w(address_space &space, offs_t offset, u8 data)
 
 void williams2_state::blit_window_enable_w(u8 data)
 {
-	m_blitter_window_enable = data & 0x01;
+	m_blitter_window_enable = BIT(data, 0);
 }
 
 
@@ -753,13 +752,13 @@ void williams2_state::blit_window_enable_w(u8 data)
 inline void williams_state::blit_pixel(address_space &space, int dstaddr, int srcdata, int controlbyte)
 {
 	/* always read from video RAM regardless of the bank setting */
-	int curpix = (dstaddr < 0xc000) ? m_videoram[dstaddr] : space.read_byte(dstaddr);   //current pixel values at dest
+	int curpix = (dstaddr < 0xc000) ? m_videoram[dstaddr] : space.read_byte(dstaddr); // current pixel values at dest
 
-	int solid = m_blitterram[1];
-	unsigned char keepmask = 0xff;          //what part of original dst byte should be kept, based on NO_EVEN and NO_ODD flags
+	int const solid = m_blitterram[1];
+	unsigned char keepmask = 0xff; // what part of original dst byte should be kept, based on NO_EVEN and NO_ODD flags
 
-	//even pixel (D7-D4)
-	if((controlbyte & WMS_BLITTER_CONTROLBYTE_FOREGROUND_ONLY) && !(srcdata & 0xf0))    //FG only and src even pixel=0
+	// even pixel (D7-D4)
+	if((controlbyte & WMS_BLITTER_CONTROLBYTE_FOREGROUND_ONLY) && !(srcdata & 0xf0)) // FG only and src even pixel=0
 	{
 		if(controlbyte & WMS_BLITTER_CONTROLBYTE_NO_EVEN)
 			keepmask &= 0x0f;
@@ -770,8 +769,8 @@ inline void williams_state::blit_pixel(address_space &space, int dstaddr, int sr
 			keepmask &= 0x0f;
 	}
 
-	//odd pixel (D3-D0)
-	if((controlbyte & WMS_BLITTER_CONTROLBYTE_FOREGROUND_ONLY) && !(srcdata & 0x0f))    //FG only and src odd pixel=0
+	// odd pixel (D3-D0)
+	if((controlbyte & WMS_BLITTER_CONTROLBYTE_FOREGROUND_ONLY) && !(srcdata & 0x0f)) // FG only and src odd pixel=0
 	{
 		if(controlbyte & WMS_BLITTER_CONTROLBYTE_NO_ODD)
 			keepmask &= 0xf0;
@@ -788,9 +787,9 @@ inline void williams_state::blit_pixel(address_space &space, int dstaddr, int sr
 	else
 		curpix |= (srcdata & ~keepmask);
 
-/* if the window is enabled, only blit to videoram below the clipping address */
-/* note that we have to allow blits to non-video RAM (e.g. tileram, Sinistar $DXXX SRAM) because those */
-/* are not blocked by the window enable */
+	/* if the window is enabled, only blit to videoram below the clipping address */
+	/* note that we have to allow blits to non-video RAM (e.g. tileram, Sinistar $DXXX SRAM) because those */
+	/* are not blocked by the window enable */
 	if (!m_blitter_window_enable || dstaddr < m_blitter_clip_address || dstaddr >= 0xc000)
 		space.write_byte(dstaddr, curpix);
 }
@@ -801,10 +800,10 @@ int williams_state::blitter_core(address_space &space, int sstart, int dstart, i
 	int accesses = 0;
 
 	/* compute how much to advance in the x and y loops */
-	int sxadv = (controlbyte & WMS_BLITTER_CONTROLBYTE_SRC_STRIDE_256) ? 0x100 : 1;
-	int syadv = (controlbyte & WMS_BLITTER_CONTROLBYTE_SRC_STRIDE_256) ? 1 : w;
-	int dxadv = (controlbyte & WMS_BLITTER_CONTROLBYTE_DST_STRIDE_256) ? 0x100 : 1;
-	int dyadv = (controlbyte & WMS_BLITTER_CONTROLBYTE_DST_STRIDE_256) ? 1 : w;
+	int const sxadv = (controlbyte & WMS_BLITTER_CONTROLBYTE_SRC_STRIDE_256) ? 0x100 : 1;
+	int const syadv = (controlbyte & WMS_BLITTER_CONTROLBYTE_SRC_STRIDE_256) ? 1 : w;
+	int const dxadv = (controlbyte & WMS_BLITTER_CONTROLBYTE_DST_STRIDE_256) ? 0x100 : 1;
+	int const dyadv = (controlbyte & WMS_BLITTER_CONTROLBYTE_DST_STRIDE_256) ? 1 : w;
 
 	int pixdata = 0;
 
@@ -817,12 +816,13 @@ int williams_state::blitter_core(address_space &space, int sstart, int dstart, i
 		/* loop over the width */
 		for (int x = 0; x < w; x++)
 		{
-			if (!(controlbyte & WMS_BLITTER_CONTROLBYTE_SHIFT)) //no shift
+			if (!(controlbyte & WMS_BLITTER_CONTROLBYTE_SHIFT)) // no shift
 			{
 				blit_pixel(space, dest, m_blitter_remap[space.read_byte(source)], controlbyte);
 			}
 			else
-			{   //shift one pixel right
+			{
+				// shift one pixel right
 				pixdata = (pixdata << 8) | m_blitter_remap[space.read_byte(source)];
 				blit_pixel(space, dest, (pixdata >> 4) & 0xff, controlbyte);
 			}

@@ -22,7 +22,7 @@
 #include "machine/z80scc.h"
 #include "machine/am79c90.h"
 #include "machine/timekpr.h"
-#include "machine/ncr5390.h"
+#include "machine/ncr53c90.h"
 
 // busses and connectors
 #include "machine/nscsi_bus.h"
@@ -31,8 +31,6 @@
 #include "bus/rs232/rs232.h"
 
 #include "debugger.h"
-
-#define LOG_GENERAL (1U << 0)
 
 #define VERBOSE 0
 #include "logmacro.h"
@@ -61,11 +59,11 @@ public:
 
 protected:
 	// driver_device overrides
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	// address maps
-	void cpu_map(address_map &map);
+	void cpu_map(address_map &map) ATTR_COLD;
 
 	u16 lance_r(offs_t offset, u16 mem_mask = 0xffff);
 	void lance_w(offs_t offset, u16 data, u16 mem_mask = 0xffff);

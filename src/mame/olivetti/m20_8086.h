@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Carl
-#ifndef MAME_MACHINE_M20_8086_H
-#define MAME_MACHINE_M20_8086_H
+#ifndef MAME_OLIVETTI_M20_8086_H
+#define MAME_OLIVETTI_M20_8086_H
 
 #include "cpu/i86/i86.h"
 #include "machine/pic8259.h"
@@ -23,20 +23,20 @@ public:
 
 	uint16_t z8000_io_r(offs_t offset, uint16_t mem_mask = ~0);
 	void z8000_io_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-	DECLARE_WRITE_LINE_MEMBER(vi_w);
-	DECLARE_WRITE_LINE_MEMBER(nvi_w);
+	void vi_w(int state);
+	void nvi_w(int state);
 	void handshake_w(offs_t offset, uint16_t data);
 
 	void halt() { m_8086->set_input_line(INPUT_LINE_HALT, ASSERT_LINE); }
 	bool halted() const { return m_8086_halt; }
 
-	void i86_io(address_map &map);
-	void i86_prog(address_map &map);
+	void i86_io(address_map &map) ATTR_COLD;
+	void i86_prog(address_map &map) ATTR_COLD;
 protected:
-	void device_start() override;
-	void device_reset() override;
-	virtual const tiny_rom_entry *device_rom_region() const override;
-	virtual void device_add_mconfig(machine_config &config) override;
+	void device_start() override ATTR_COLD;
+	void device_reset() override ATTR_COLD;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_8086;
@@ -51,4 +51,4 @@ private:
 
 DECLARE_DEVICE_TYPE(M20_8086, m20_8086_device)
 
-#endif // MAME_MACHINE_M20_8086_H
+#endif // MAME_OLIVETTI_M20_8086_H

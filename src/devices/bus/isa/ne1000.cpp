@@ -3,6 +3,8 @@
 #include "emu.h"
 #include "ne1000.h"
 
+#include "multibyte.h"
+
 
 DEFINE_DEVICE_TYPE(NE1000, ne1000_device, "ne1000", "NE1000 Network Adapter")
 
@@ -14,8 +16,8 @@ void ne1000_device::device_add_mconfig(machine_config &config)
 	m_dp8390->mem_write_callback().set(FUNC(ne1000_device::ne1000_mem_write));
 }
 
-ne1000_device::ne1000_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, NE1000, tag, owner, clock),
+ne1000_device::ne1000_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, NE1000, tag, owner, clock),
 	device_isa8_card_interface(mconfig, *this),
 	m_dp8390(*this, "dp8390d"),
 	m_irq(0)
@@ -23,10 +25,11 @@ ne1000_device::ne1000_device(const machine_config &mconfig, const char *tag, dev
 }
 
 void ne1000_device::device_start() {
-	char mac[7];
+	uint8_t mac[6];
 	uint32_t num = machine().rand();
 	memset(m_prom, 0x57, 16);
-	sprintf(mac+2, "\x1b%c%c%c", (num >> 16) & 0xff, (num >> 8) & 0xff, num & 0xff);
+	mac[2] = 0x1b;
+	put_u24be(mac+3, num);
 	mac[0] = 0; mac[1] = 0;  // avoid gcc warning
 	memcpy(m_prom, mac, 6);
 	m_dp8390->set_mac(mac);
@@ -35,7 +38,7 @@ void ne1000_device::device_start() {
 }
 
 void ne1000_device::device_reset() {
-	memcpy(m_prom, m_dp8390->get_mac(), 6);
+	memcpy(m_prom, &m_dp8390->get_mac()[0], 6);
 	m_irq = ioport("CONFIG")->read() & 3;
 }
 
@@ -73,7 +76,7 @@ void ne1000_device::ne1000_port_w(offs_t offset, uint8_t data) {
 	return;
 }
 
-WRITE_LINE_MEMBER(ne1000_device::ne1000_irq_w) {
+void ne1000_device::ne1000_irq_w(int state) {
 	switch(m_irq) {
 	case 0:
 		m_isa->irq2_w(state);

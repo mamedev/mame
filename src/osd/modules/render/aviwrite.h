@@ -6,12 +6,19 @@
 //
 //============================================================
 
+#ifndef MAME_RENDER_AVIWRITE_H
+#define MAME_RENDER_AVIWRITE_H
+
 #pragma once
 
-#ifndef __RENDER_AVIWRITE__
-#define __RENDER_AVIWRITE__
+// emu
+#include "attotime.h"
 
+// lib/util
 #include "aviio.h"
+
+#include <string_view>
+
 
 class running_machine;
 
@@ -21,7 +28,7 @@ public:
 	avi_write(running_machine& machine, uint32_t width, uint32_t height);
 	~avi_write();
 
-	void record(const char *name);
+	void record(std::string_view name);
 	void stop();
 	void audio_frame(const int16_t *buffer, int samples_this_frame);
 	void video_frame(bitmap_rgb32& snap);
@@ -30,7 +37,7 @@ public:
 	bool recording() const { return m_recording; }
 
 private:
-	void begin_avi_recording(const char *name);
+	void begin_avi_recording(std::string_view name);
 	void end_avi_recording();
 
 	running_machine&        m_machine;
@@ -47,4 +54,4 @@ private:
 	attotime                m_next_frame_time;
 };
 
-#endif // __RENDER_AVIWRITE__
+#endif // MAME_RENDER_AVIWRITE_H

@@ -43,7 +43,7 @@ void checkline(const char *_buf, bool verbose) {
             else
                 i++;
         }
-        glen = utf8proc_map(utf8, j, &g, UTF8PROC_CHARBOUND);
+        glen = utf8proc_map(utf8, (utf8proc_ssize_t)j, &g, UTF8PROC_CHARBOUND);
         if (glen == UTF8PROC_ERROR_INVALIDUTF8) {
             /* the test file contains surrogate codepoints, which are only for UTF-16 */
             printf("line %zd: ignoring invalid UTF-8 codepoints\n", lineno);
@@ -66,7 +66,7 @@ void checkline(const char *_buf, bool verbose) {
         utf8proc_bool expectbreak = false;
         do {
             utf8proc_int32_t codepoint;
-            i += utf8proc_iterate(src + i, si - i, &codepoint);
+            i += (size_t)utf8proc_iterate(src + i, (utf8proc_ssize_t)(si - i), &codepoint);
             check(codepoint >= 0, "invalid UTF-8 data");
             if (codepoint == 0x002F)
                 expectbreak = true;
@@ -110,6 +110,7 @@ int main(int argc, char **argv)
         utf8proc_uint8_t *g;
         glen = utf8proc_map(input, 6, &g, UTF8PROC_CHARBOUND);
         check(!strcmp((char*)g, (char*)output), "mishandled u+ffff and u+fffe grapheme breaks");
+        check(glen != 6, "mishandled u+ffff and u+fffe grapheme breaks");
         free(g);
     };
 
@@ -117,6 +118,13 @@ int main(int argc, char **argv)
     checkline("/ 1f1f8 1f1ea / 1f1f8 1f1ea /", true); /* Two swedish flags after each other */
     checkline("/ 1f926 1f3fc 200d 2642 fe0f /", true); /* facepalm + pale skin + zwj + male sign + FE0F */
     checkline("/ 1f468 1f3fb 200d 1f91d 200d 1f468 1f3fd /", true); /* man face + pale skin + zwj + hand holding + zwj + man face + dark skin */
+
+    /* more GB9c tests */
+    checkline("/ 0915 0300 094d 0300 0924 / 0915 /", true);
+    checkline("/ 0915 0300 094d 0300 094d 0924 / 0915 /", true);
+    checkline("/ 0915 0300 0300 / 0924 / 0915 /", true);
+    checkline("/ 0915 0300 094d 0300 / 0078 /", true);
+    checkline("/ 0300 094d 0300 / 0924 / 0915 /", true);
 
     check(utf8proc_grapheme_break(0x03b1, 0x03b2), "failed 03b1 / 03b2 test");
     check(!utf8proc_grapheme_break(0x03b1, 0x0302), "failed 03b1 0302 test");

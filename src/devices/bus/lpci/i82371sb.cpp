@@ -255,8 +255,7 @@ void i82371sb_device::device_start()
 	southbridge_device::device_start();
 	m_ide_io_ports_enabled = false;
 	spaceio.install_readwrite_handler(0x00b0, 0x00b3, read8sm_delegate(*this, FUNC(i82371sb_device::read_apmcapms)), write8sm_delegate(*this, FUNC(i82371sb_device::write_apmcapms)), 0xffff0000);
-	m_smi_callback.resolve_safe();
-	m_boot_state_hook.resolve_safe();
+
 	// setup save states
 	save_item(NAME(m_regs));
 }

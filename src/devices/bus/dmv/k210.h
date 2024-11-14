@@ -26,11 +26,11 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// optional information overrides
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 	// dmvcart_interface overrides
 	virtual void io_read(int ifsel, offs_t offset, uint8_t &data) override;
@@ -44,13 +44,13 @@ private:
 	void portb_w(uint8_t data);
 	void portc_w(uint8_t data);
 
-	DECLARE_WRITE_LINE_MEMBER(cent_ack_w);
-	DECLARE_WRITE_LINE_MEMBER(cent_busy_w);
-	DECLARE_WRITE_LINE_MEMBER(cent_slct_w);
-	DECLARE_WRITE_LINE_MEMBER(cent_pe_w);
-	DECLARE_WRITE_LINE_MEMBER(cent_fault_w);
-	DECLARE_WRITE_LINE_MEMBER(cent_autofd_w);
-	DECLARE_WRITE_LINE_MEMBER(cent_init_w);
+	void cent_ack_w(int state);
+	void cent_busy_w(int state);
+	void cent_slct_w(int state);
+	void cent_pe_w(int state);
+	void cent_fault_w(int state);
+	void cent_autofd_w(int state);
+	void cent_init_w(int state);
 
 	TIMER_CALLBACK_MEMBER(strobe_tick);
 

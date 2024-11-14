@@ -276,7 +276,6 @@ Note: Roms for Tempest Analog Vector-Generator PCB Assembly A037383-03 or A03738
 ***************************************************************************/
 
 #include "emu.h"
-#include "avgdvg.h"
 #include "mathbox.h"
 
 #include "cpu/m6502/m6502.h"
@@ -284,6 +283,7 @@ Note: Roms for Tempest Analog Vector-Generator PCB Assembly A037383-03 or A03738
 #include "machine/rescap.h"
 #include "machine/watchdog.h"
 #include "sound/pokey.h"
+#include "video/avgdvg.h"
 #include "video/vector.h"
 
 #include "screen.h"
@@ -322,9 +322,9 @@ public:
 
 	void tempest(machine_config &config);
 
-	DECLARE_CUSTOM_INPUT_MEMBER(tempest_knob_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(tempest_buttons_r);
-	DECLARE_READ_LINE_MEMBER(clock_r);
+	ioport_value tempest_knob_r();
+	ioport_value tempest_buttons_r();
+	int clock_r();
 
 protected:
 	void wdclr_w(uint8_t data);
@@ -339,8 +339,8 @@ protected:
 
 	uint8_t rom_ae1f_r();
 
-	virtual void machine_start() override;
-	void main_map(address_map &map);
+	virtual void machine_start() override ATTR_COLD;
+	void main_map(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<mathbox_device> m_mathbox;
@@ -385,18 +385,18 @@ void tempest_state::wdclr_w(uint8_t data)
  *
  *************************************/
 
-CUSTOM_INPUT_MEMBER(tempest_state::tempest_knob_r)
+ioport_value tempest_state::tempest_knob_r()
 {
 	return (m_player_select == 0) ? m_knob_p1->read() : m_knob_p2->read();
 }
 
-CUSTOM_INPUT_MEMBER(tempest_state::tempest_buttons_r)
+ioport_value tempest_state::tempest_buttons_r()
 {
 	return (m_player_select == 0) ? m_buttons_p1->read() : m_buttons_p2->read();
 }
 
 
-READ_LINE_MEMBER(tempest_state::clock_r)
+int tempest_state::clock_r()
 {
 	/* Emulate the 3kHz source on bit 7 (divide 1.5MHz by 512) */
 	return (m_maincpu->total_cycles() & 0x100) ? 1 : 0;
@@ -478,7 +478,7 @@ uint8_t tempest_state::rom_ae1f_r()
 {
 	// This is needed to ensure that the routine starting at ae1c passes checks and does not corrupt data;
 	// config.m_perfect_cpu_quantum = subtag("maincpu"); would be very taxing on this driver.
-	machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(100));
+	machine().scheduler().perfect_quantum(attotime::from_usec(100));
 	machine().scheduler().abort_timeslice();
 
 	return m_rom[0xae1f];
@@ -529,12 +529,12 @@ static INPUT_PORTS_START( tempest )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_NAME("Diagnostic Step")
 	/* bit 6 is the VG HALT bit. We set it to "low" */
 	/* per default (busy vector processor). */
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("avg", avg_device, done_r)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("avg", FUNC(avg_device::done_r))
 	/* bit 7 is tied to a 3kHz (?) clock */
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(tempest_state, clock_r)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(tempest_state::clock_r))
 
 	PORT_START("IN1_DSW0")
-	PORT_BIT( 0x0f, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(tempest_state, tempest_knob_r)
+	PORT_BIT( 0x0f, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(FUNC(tempest_state::tempest_knob_r))
 	/* The next one is reponsible for cocktail mode.
 	 * According to the documentation, this is not a switch, although
 	 * it may have been planned to put it on the Math Box PCB, D/E2 )
@@ -555,7 +555,7 @@ static INPUT_PORTS_START( tempest )
 	PORT_DIPNAME(  0x04, 0x04, "Rating" ) PORT_DIPLOCATION("DE2:2")
 	PORT_DIPSETTING(     0x04, "1, 3, 5, 7, 9" )
 	PORT_DIPSETTING(     0x00, "tied to high score" )
-	PORT_BIT(0x18, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(tempest_state, tempest_buttons_r)
+	PORT_BIT(0x18, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(FUNC(tempest_state::tempest_buttons_r))
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )

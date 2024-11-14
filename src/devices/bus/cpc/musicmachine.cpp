@@ -2,7 +2,7 @@
 // copyright-holders:Barry Rodewald
 /*
  * The Music Machine - MIDI and sampling expansion
- * by Ram Electronics
+ * by Ram Electronics Ltd
  */
 
 #include "emu.h"
@@ -16,7 +16,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-DEFINE_DEVICE_TYPE(CPC_MUSICMACHINE, cpc_musicmachine_device, "cpcmusic", "The Music Machine")
+DEFINE_DEVICE_TYPE(CPC_MUSICMACHINE, cpc_musicmachine_device, "cpcmusic", "The Music Machine (CPC)")
 
 
 void cpc_musicmachine_device::device_add_mconfig(machine_config &config)
@@ -116,7 +116,7 @@ void cpc_musicmachine_device::irqsel_w(uint8_t data)
 		m_irq_select = false;
 }
 
-WRITE_LINE_MEMBER(cpc_musicmachine_device::irq_w)
+void cpc_musicmachine_device::irq_w(int state)
 {
 	if(m_irq_select)
 		m_slot->nmi_w(state);

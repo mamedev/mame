@@ -6,12 +6,17 @@
 
 ********************************************************************************************/
 
-#ifndef MAME_INCLUDES_PC8801_H
-#define MAME_INCLUDES_PC8801_H
+#ifndef MAME_NEC_PC8801_H
+#define MAME_NEC_PC8801_H
 
 #pragma once
 
 #include "pc8001.h"
+
+#include "bus/centronics/ctronics.h"
+#include "bus/msx/ctrl/ctrl.h"
+#include "bus/pc8801/pc8801_31.h"
+#include "bus/pc8801/pc8801_exp.h"
 #include "cpu/z80/z80.h"
 #include "imagedev/cassette.h"
 #include "imagedev/floppy.h"
@@ -23,16 +28,14 @@
 #include "pc80s31k.h"
 #include "sound/beep.h"
 #include "sound/ymopn.h"
-#include "bus/centronics/ctronics.h"
-#include "bus/pc8801/pc8801_31.h"
-#include "bus/pc8801/pc8801_exp.h"
+
 #include "emupal.h"
 #include "screen.h"
 #include "softlist.h"
 #include "speaker.h"
 
+
 #define I8214_TAG       "i8214"
-#define UPD1990A_TAG    "upd1990a"
 
 class pc8801_state : public pc8001_base_state
 {
@@ -43,7 +46,6 @@ public:
 		, m_screen(*this, "screen")
 		, m_pc80s31(*this, "pc80s31")
 		, m_pic(*this, I8214_TAG)
-		, m_rtc(*this, UPD1990A_TAG)
 		, m_usart(*this, "usart")
 //      , m_cassette(*this, "cassette")
 		, m_beeper(*this, "beeper")
@@ -55,6 +57,7 @@ public:
 //      , m_cg_rom(*this, "cgrom")
 		, m_kanji_rom(*this, "kanji")
 		, m_kanji_lv2_rom(*this, "kanji_lv2")
+		, m_mouse_port(*this, "mouseport") // labelled "マウス" (mouse) - can't use "mouse" because of core -mouse option
 		, m_exp(*this, "exp")
 	{
 	}
@@ -62,9 +65,9 @@ public:
 	void pc8801(machine_config &config);
 
 protected:
-	virtual void video_start() override;
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void video_start() override ATTR_COLD;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	uint8_t mem_r(offs_t offset);
 	void mem_w(offs_t offset, uint8_t data);
@@ -73,20 +76,18 @@ protected:
 
 	virtual uint8_t dma_mem_r(offs_t offset) override;
 
-	virtual attotime mouse_limit_hz();
-
 	virtual uint8_t dictionary_rom_r(offs_t offset);
 	virtual bool dictionary_rom_enable();
 
 	virtual uint8_t cdbios_rom_r(offs_t offset);
 	virtual bool cdbios_rom_enable();
-	virtual void main_io(address_map &map);
+	virtual void main_io(address_map &map) ATTR_COLD;
 
 //  required_device<cpu_device> m_maincpu;
 	required_device<screen_device> m_screen;
 	required_device<pc80s31_device> m_pc80s31;
 	optional_device<i8214_device> m_pic;
-	required_device<upd1990a_device> m_rtc;
+//  required_device<upd1990a_device> m_rtc;
 	required_device<i8251_device> m_usart;
 //  required_device<cassette_image_device> m_cassette;
 	required_device<beep_device> m_beeper;
@@ -98,23 +99,15 @@ protected:
 //  required_region_ptr<u8> m_cg_rom;
 	required_region_ptr<u8> m_kanji_rom;
 	required_region_ptr<u8> m_kanji_lv2_rom;
+	required_device<msx_general_purpose_port_device> m_mouse_port;
 	required_device<pc8801_exp_slot_device> m_exp;
 
-	DECLARE_WRITE_LINE_MEMBER(int4_irq_w);
+	void int4_irq_w(int state);
 
-	struct mouse_t {
-		uint8_t phase = 0;
-		int8_t prev_dx = 0, prev_dy = 0;
-		uint8_t lx = 0, ly = 0;
-
-		attotime time = attotime::never;
-	};
-
-	mouse_t m_mouse;
 	uint8_t m_gfx_ctrl = 0;
 
 private:
-	void main_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
 
 	std::unique_ptr<uint8_t[]> m_work_ram;
 	std::unique_ptr<uint8_t[]> m_hi_work_ram;
@@ -183,9 +176,9 @@ private:
 	void alu_ctrl2_w(uint8_t data);
 	template <unsigned kanji_level> uint8_t kanji_r(offs_t offset);
 	template <unsigned kanji_level> void kanji_w(offs_t offset, uint8_t data);
-	void rtc_w(uint8_t data);
+//  void rtc_w(uint8_t data);
 
-	DECLARE_WRITE_LINE_MEMBER(txdata_callback);
+	void txdata_callback(int state);
 
 	// video section
 	void draw_bitmap(bitmap_rgb32 &bitmap, const rectangle &cliprect, palette_device *palette, std::function<u8(u32 bitmap_offset, int y, int x, int xi)> dot_func);
@@ -195,11 +188,11 @@ private:
 	bitmap_rgb32 m_text_bitmap;
 
 	// irq section
-	DECLARE_WRITE_LINE_MEMBER(rxrdy_irq_w);
-	DECLARE_WRITE_LINE_MEMBER(vrtc_irq_w);
+	void rxrdy_irq_w(int state);
+	void vrtc_irq_w(int state);
 	TIMER_DEVICE_CALLBACK_MEMBER(clock_irq_w);
 	IRQ_CALLBACK_MEMBER(int_ack_cb);
-	DECLARE_WRITE_LINE_MEMBER(irq_w);
+	void irq_w(int state);
 
 	struct {
 		u8 enable = 0, pending = 0;
@@ -235,9 +228,11 @@ public:
 	void pc8801mk2mr(machine_config &config);
 
 protected:
-	virtual void main_io(address_map &map) override;
+	virtual void main_io(address_map &map) override ATTR_COLD;
 
 	uint8_t opn_porta_r();
+	uint8_t opn_portb_r();
+	void opn_portb_w(uint8_t data);
 
 private:
 	optional_device<ym2203_device> m_opn;
@@ -255,15 +250,13 @@ public:
 	void pc8801fh(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void main_io(address_map &map) override;
-
-	virtual attotime mouse_limit_hz() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void main_io(address_map &map) override ATTR_COLD;
 
 private:
 	required_device<ym2608_device> m_opna;
-	void opna_map(address_map &map);
+	void opna_map(address_map &map) ATTR_COLD;
 
 	uint8_t cpuclock_r();
 	uint8_t baudrate_r();
@@ -284,10 +277,10 @@ public:
 	void pc8801ma(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
-	virtual void main_io(address_map &map) override;
+	virtual void main_io(address_map &map) override ATTR_COLD;
 
 	virtual uint8_t dictionary_rom_r(offs_t offset) override;
 	virtual bool dictionary_rom_enable() override;
@@ -313,10 +306,10 @@ public:
 	void pc8801mc(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
-	virtual void main_io(address_map &map) override;
+	virtual void main_io(address_map &map) override ATTR_COLD;
 
 private:
 	virtual uint8_t cdbios_rom_r(offs_t offset) override;
@@ -328,4 +321,4 @@ private:
 	bool m_cdrom_bank = true;
 };
 
-#endif // MAME_INCLUDES_PC8801_H
+#endif // MAME_NEC_PC8801_H

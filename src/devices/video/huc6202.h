@@ -37,13 +37,13 @@ public:
 	void io_write(offs_t offset, u8 data);
 	u16 next_pixel();
 	u16 time_until_next_event();
-	DECLARE_WRITE_LINE_MEMBER( vsync_changed );
-	DECLARE_WRITE_LINE_MEMBER( hsync_changed );
+	void vsync_changed(int state);
+	void hsync_changed(int state);
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 private:
 	/* callbacks */

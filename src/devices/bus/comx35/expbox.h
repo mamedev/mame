@@ -38,12 +38,12 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// optional information overrides
-	virtual const tiny_rom_entry *device_rom_region() const override;
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 	// device_comx_expansion_card_interface overrides
 	virtual int comx_ef4_r() override;
@@ -56,10 +56,10 @@ protected:
 	void set_irq() { m_slot->irq_w(m_irq[0] || m_irq[1] || m_irq[2] || m_irq[3]); }
 
 private:
-	DECLARE_WRITE_LINE_MEMBER( slot1_irq_w ) { m_irq[0] = state; set_irq(); }
-	DECLARE_WRITE_LINE_MEMBER( slot2_irq_w ) { m_irq[1] = state; set_irq(); }
-	DECLARE_WRITE_LINE_MEMBER( slot3_irq_w ) { m_irq[2] = state; set_irq(); }
-	DECLARE_WRITE_LINE_MEMBER( slot4_irq_w ) { m_irq[3] = state; set_irq(); }
+	void slot1_irq_w(int state) { m_irq[0] = state; set_irq(); }
+	void slot2_irq_w(int state) { m_irq[1] = state; set_irq(); }
+	void slot3_irq_w(int state) { m_irq[2] = state; set_irq(); }
+	void slot4_irq_w(int state) { m_irq[3] = state; set_irq(); }
 
 	required_memory_region m_rom;
 

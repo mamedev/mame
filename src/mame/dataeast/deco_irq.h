@@ -6,8 +6,8 @@
 
 ***************************************************************************/
 
-#ifndef MAME_MACHINE_DECO_IRQ_H
-#define MAME_MACHINE_DECO_IRQ_H
+#ifndef MAME_DATAEAST_DECO_IRQ_H
+#define MAME_DATAEAST_DECO_IRQ_H
 
 #pragma once
 
@@ -37,7 +37,7 @@ public:
 
 	TIMER_CALLBACK_MEMBER(scanline_callback);
 
-	void map(address_map &map);
+	void map(address_map &map) ATTR_COLD;
 
 	void control_w(u8 data);
 	u8 scanline_r();
@@ -48,14 +48,14 @@ public:
 
 	void raster_irq_ack();
 
-	DECLARE_WRITE_LINE_MEMBER(lightgun1_trigger_w);
-	DECLARE_WRITE_LINE_MEMBER(lightgun2_trigger_w);
-	DECLARE_WRITE_LINE_MEMBER(lightgun_irq_ack_w);
+	void lightgun1_trigger_w(int state);
+	void lightgun2_trigger_w(int state);
+	void lightgun_irq_ack_w(int state);
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 private:
 	required_device<screen_device> m_screen;
@@ -89,4 +89,4 @@ private:
 DECLARE_DEVICE_TYPE(DECO_IRQ, deco_irq_device)
 
 
-#endif // MAME_MACHINE_DECO_IRQ_H
+#endif // MAME_DATAEAST_DECO_IRQ_H

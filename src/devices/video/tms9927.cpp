@@ -7,7 +7,7 @@
 **********************************************************************/
 
 #include "emu.h"
-#include "video/tms9927.h"
+#include "tms9927.h"
 
 #include "screen.h"
 
@@ -83,10 +83,6 @@ void tms9927_device::device_start()
 {
 	assert(clock() > 0);
 	if (!(m_hpixels_per_column > 0)) fatalerror("TMS9927: number of pixels per column must be explicitly set using set_char_width()!\n");
-
-	// resolve callbacks
-	m_write_vsyn.resolve_safe();
-	m_write_hsyn.resolve();
 
 	// allocate timers
 	m_vsync_timer = timer_alloc(FUNC(tms9927_device::toggle_vsync), this);
@@ -351,12 +347,14 @@ void tms9927_device::recompute_parameters(bool postload)
 
 	attotime refresh = clocks_to_attotime(HCOUNT * m_total_vpix);
 
-	osd_printf_debug("TMS9927: Total = %dx%d, Visible = %dx%d, HSync = %d-%d, VSync = %d-%d, Skew=%d, Upscroll=%d, Period=%f Hz\n", m_total_hpix, m_total_vpix, m_visible_hpix, m_visible_vpix, m_hsyn_start, m_hsyn_end, m_vsyn_start, m_vsyn_end, SKEW_BITS, m_start_datarow, refresh.as_hz());
+	osd_printf_debug(
+			"TMS9927(%s): Total = %dx%d, Visible = %dx%d, HSync = %d-%d, VSync = %d-%d, Skew=%d, Upscroll=%d, Period=%f Hz\n",
+			tag(), m_total_hpix, m_total_vpix, m_visible_hpix, m_visible_vpix, m_hsyn_start, m_hsyn_end, m_vsyn_start, m_vsyn_end, SKEW_BITS, m_start_datarow, refresh.as_hz());
 
 	screen().configure(m_total_hpix, m_total_vpix, visarea, refresh.as_attoseconds());
 
 	m_hsyn = false;
-	if (!m_write_hsyn.isnull())
+	if (!m_write_hsyn.isunset())
 	{
 		m_write_hsyn(0);
 		m_hsync_timer->adjust(screen().time_until_pos(m_vsyn_start, m_hsyn_start));

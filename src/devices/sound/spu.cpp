@@ -11,8 +11,13 @@
 #include "emu.h"
 #include "spu.h"
 #include "spureverb.h"
+
 #include "cpu/psx/psx.h"
+
 #include "corestr.h"
+
+#include <algorithm>
+
 
 //
 //
@@ -360,24 +365,19 @@ struct spu_device::cache_pointer
 	signed short *ptr;
 	sample_cache *cache;
 
-	cache_pointer()
-		: ptr(nullptr),
-			cache(nullptr)
+	cache_pointer() : ptr(nullptr), cache(nullptr)
 	{
 	}
 
-	cache_pointer(const cache_pointer &other)
-		: ptr(nullptr),
-			cache(nullptr)
+	cache_pointer(const cache_pointer &other) : cache_pointer()
 	{
-		operator =(other);
+		operator=(other);
 	}
 
-	cache_pointer(signed short *_ptr, sample_cache *_cache)
-		: ptr(_ptr),
-			cache(_cache)
+	cache_pointer(signed short *_ptr, sample_cache *_cache) : ptr(_ptr), cache(_cache)
 	{
-		if (cache) cache->add_ref();
+		if (cache)
+			cache->add_ref();
 	}
 
 	~cache_pointer()
@@ -386,23 +386,20 @@ struct spu_device::cache_pointer
 	}
 
 	void reset();
-	cache_pointer &operator =(const cache_pointer &other);
+	cache_pointer &operator=(const cache_pointer &other);
 	bool update(spu_device *spu);
 
 	unsigned int get_address() const
 	{
 		if (cache)
-		{
 			return cache->get_sample_address(ptr);
-		} else
-		{
+		else
 			return -1;
-		}
 	}
 
 	operator bool() const { return cache!=nullptr; }
 
-	bool is_valid() const { return ((cache) && (cache->is_valid_pointer(ptr))); }
+	bool is_valid() const { return cache && cache->is_valid_pointer(ptr); }
 };
 
 //
@@ -411,35 +408,34 @@ struct spu_device::cache_pointer
 
 struct spu_device::voiceinfo
 {
-	cache_pointer play,loop;
-	sample_loop_cache *loop_cache;
-	unsigned int dptr,
-								lcptr;
+	cache_pointer play, loop;
+	sample_loop_cache *loop_cache = nullptr;
+	unsigned int dptr = 0, lcptr = 0;
 
-	int env_state;
-	float env_ar,
-				env_dr,
-				env_sr,
-				env_rr,
-				env_sl,
-				env_level,
-				env_delta,
+	int env_state = 0;
+	float env_ar = 0.0F,
+				env_dr = 0.0F,
+				env_sr = 0.0F,
+				env_rr = 0.0F,
+				env_sl = 0.0F,
+				env_level = 0.0F,
+				env_delta = 0.0F,
 
 				//>>
-				sweep_vol[2],
-				sweep_rate[2];
-	int vol[2];
+				sweep_vol[2] = { 0.0F, 0.0F },
+				sweep_rate[2] = { 0.0F, 0.0F };
+	int vol[2] = { 0, 0 };
 				//<<
 
-	unsigned int pitch,
-								samplestoend,
-								samplestoirq,
-								envsamples;
-	bool hitirq,
-				inloopcache,
-				forceloop,
-				_pad;
-	int64_t keyontime;
+	unsigned int pitch = 0,
+								samplestoend = 0,
+								samplestoirq = 0,
+								envsamples = 0;
+	bool hitirq = false,
+				inloopcache = false,
+				forceloop = false,
+				_pad = false;
+	int64_t keyontime = 0;
 };
 
 //
@@ -950,6 +946,7 @@ spu_device::spu_device(const machine_config &mconfig, const char *tag, device_t 
 spu_device::spu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, SPU, tag, owner, clock),
 	device_sound_interface(mconfig, *this),
+	m_stream_flags(STREAM_DEFAULT_FLAGS),
 	m_irq_handler(*this),
 	dirty_flags(-1),
 	status_enabled(false),
@@ -959,20 +956,21 @@ spu_device::spu_device(const machine_config &mconfig, const char *tag, device_t 
 {
 }
 
-//-------------------------------------------------
-//  static_set_irqf - configuration helper to set
-//  the IRQ callback
-//-------------------------------------------------
-
 void spu_device::device_start()
 {
-	m_irq_handler.resolve_safe();
+	spu_base_frequency_hz = clock() / 768.0f;
+	generate_linear_rate_table();
+	generate_pos_exp_rate_table();
+	generate_neg_exp_rate_table();
+	generate_decay_rate_table();
+	generate_linear_release_rate_table();
+	generate_exp_release_rate_table();
 
-	voice=new voiceinfo [24];
-	spu_ram=std::make_unique<unsigned char []>(spu_ram_size);
+	voice = new voiceinfo [24];
+	spu_ram = std::make_unique<unsigned char []>(spu_ram_size);
 
-	xa_buffer=new spu_stream_buffer(xa_sector_size,xa_buffer_sectors);
-	cdda_buffer=new spu_stream_buffer(cdda_sector_size,cdda_buffer_sectors);
+	xa_buffer = new spu_stream_buffer(xa_sector_size, xa_buffer_sectors);
+	cdda_buffer = new spu_stream_buffer(cdda_sector_size, cdda_buffer_sectors);
 
 	init_stream();
 
@@ -1035,7 +1033,7 @@ void spu_device::device_reset()
 
 	memset(spu_ram.get(),0,spu_ram_size);
 	memset(reg,0,0x200);
-	memset(voice,0,sizeof(voiceinfo)*24);
+	std::fill_n(voice, 24, voiceinfo());
 
 	spureg.status|=(1<<7)|(1<<10);
 
@@ -1085,7 +1083,7 @@ void spu_device::device_stop()
 	cache.reset();
 	delete xa_buffer;
 	delete cdda_buffer;
-	delete [] voice;
+	delete[] voice;
 }
 //
 //
@@ -1095,12 +1093,13 @@ void spu_device::init_stream()
 {
 	const unsigned int hz=44100;
 
-	m_stream = stream_alloc(0, 2, hz);
+	// TODO: Rewrite SPU stream update code to work such that Taiko no Tatsujin no longer needs synchronous streams
+	m_stream = stream_alloc(0, 2, hz, m_stream_flags);
 
 	rev=new reverb(hz);
 
 	cdda_freq=(unsigned int)((44100.0f/(float)hz)*4096.0f);
-	freq_multiplier=(float)spu_base_frequency_hz/(float)hz;
+	freq_multiplier=spu_base_frequency_hz/(float)hz;
 }
 
 //
@@ -2531,6 +2530,13 @@ void spu_device::update_reverb()
 {
 	if (dirty_flags&dirtyflag_reverb)
 	{
+		// TODO: Handle cases where reverb present can't be found better
+		// If a save state is loaded and has reverb values that don't match a preset
+		// then spu_reverb_cfg is never set so the reverb settings won't be the same as
+		// when the save state was created.
+		// This only becomes an issue when loading save states from the command line
+		// because if you load a save state from within MAME it will hold the last used
+		// spu_reverb_cfg and reuse that value.
 		cur_reverb_preset=find_reverb_preset((unsigned short *)&reg[0x1c0]);
 
 		if (cur_reverb_preset==nullptr)

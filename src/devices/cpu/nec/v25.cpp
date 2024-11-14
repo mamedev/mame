@@ -38,6 +38,11 @@
 #include "v25.h"
 #include "necdasm.h"
 
+#define LOG_BUSLOCK (1 << 1)
+//#define VERBOSE (...)
+
+#include "logmacro.h"
+
 typedef uint8_t BOOLEAN;
 typedef uint8_t BYTE;
 typedef uint16_t WORD;
@@ -57,10 +62,10 @@ v25_common_device::v25_common_device(const machine_config &mconfig, device_type 
 	, m_io_config("io", ENDIANNESS_LITTLE, is_16bit ? 16 : 8, 16, 0)
 	, m_internal_ram(*this, "internal_ram")
 	, m_PCK(8)
-	, m_pt_in(*this)
-	, m_p0_in(*this)
-	, m_p1_in(*this)
-	, m_p2_in(*this)
+	, m_pt_in(*this, 0xff)
+	, m_p0_in(*this, 0xff)
+	, m_p1_in(*this, 0xff)
+	, m_p2_in(*this, 0xff)
 	, m_p0_out(*this)
 	, m_p1_out(*this)
 	, m_p2_out(*this)
@@ -213,6 +218,14 @@ void v25_common_device::device_reset()
 	m_TM0 = m_MD0 = m_TM1 = m_MD1 = 0;
 	m_TMC0 = m_TMC1 = 0;
 
+	for (int i = 0; i < 2; i++)
+	{
+		m_scm[i] = 0;
+		m_scc[i] = 0;
+		m_brg[i] = 0;
+		m_sce[i] = 0;
+	}
+
 	m_RAMEN = 1;
 	m_TB = 20;
 	m_PCK = 8;
@@ -258,7 +271,7 @@ void v25_common_device::nec_interrupt(unsigned int_num, int /*INTSOURCES*/ sourc
 				logerror("%06x: BRKS executed with no decryption table\n",PC());
 			break;
 		case INT_IRQ:   /* get vector */
-			int_num = standard_irq_callback(0);
+			int_num = standard_irq_callback(0, PC());
 			break;
 		default:
 			break;
@@ -451,7 +464,10 @@ void v25_common_device::external_int()
 				m_IRQS = vector;
 				m_ISPR |= (1 << i);
 				if (m_bankswitch_irq & source)
+				{
+					debugger_exception_hook(vector);
 					nec_bankswitch(i);
+				}
 				else
 					nec_interrupt(vector, source);
 			}
@@ -610,6 +626,10 @@ void v25_common_device::device_start()
 	save_item(NAME(m_MD1));
 	save_item(NAME(m_TMC0));
 	save_item(NAME(m_TMC1));
+	save_item(NAME(m_scm));
+	save_item(NAME(m_scc));
+	save_item(NAME(m_brg));
+	save_item(NAME(m_sce));
 	save_item(NAME(m_RAMEN));
 	save_item(NAME(m_TB));
 	save_item(NAME(m_PCK));
@@ -627,17 +647,8 @@ void v25_common_device::device_start()
 		m_program->cache(m_cache16);
 		m_dr8 = [this](offs_t address) -> u8 { return m_cache16.read_byte(address); };
 	}
-	m_data = &space(AS_DATA);
+	space(AS_DATA).specific(m_data);
 	m_io = &space(AS_IO);
-
-	m_pt_in.resolve_safe(0xff);
-	m_p0_in.resolve_safe(0xff);
-	m_p1_in.resolve_safe(0xff);
-	m_p2_in.resolve_safe(0xff);
-
-	m_p0_out.resolve_safe();
-	m_p1_out.resolve_safe();
-	m_p2_out.resolve_safe();
 
 	state_add( V25_PC,  "PC", m_ip).formatstr("%04X");
 	state_add<uint16_t>( V25_PSW, "PSW", [this]() { return CompressFlags(); }, [this](uint16_t data) { ExpandFlags(data); });

@@ -43,8 +43,8 @@ public:
 	void dps1(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	void portb2_w(u8 data);
@@ -56,10 +56,10 @@ private:
 	void portbe_w(u8 data);
 	u8 portff_r();
 	void portff_w(u8 data);
-	DECLARE_WRITE_LINE_MEMBER(fdc_drq_w);
+	void fdc_drq_w(int state);
 
-	void io_map(address_map &map);
-	void mem_map(address_map &map);
+	void io_map(address_map &map) ATTR_COLD;
+	void mem_map(address_map &map) ATTR_COLD;
 
 	bool m_dma_dir = 0;
 	u16 m_dma_adr = 0U;
@@ -158,7 +158,7 @@ void dps1_state::portff_w(u8 data)
 }
 
 // do dma
-WRITE_LINE_MEMBER( dps1_state::fdc_drq_w )
+void dps1_state::fdc_drq_w(int state)
 {
 	if (state)
 	{

@@ -48,10 +48,11 @@
 
 #include "emu.h"
 #include "cpu/arm7/arm7.h"
-#include "cpu/arm7/arm7core.h"
 #include "emupal.h"
 #include "screen.h"
 
+
+namespace {
 
 class pgm3_state : public driver_device
 {
@@ -66,13 +67,13 @@ public:
 
 private:
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 	uint32_t screen_update_pgm3(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_WRITE_LINE_MEMBER(screen_vblank_pgm3);
+	void screen_vblank_pgm3(int state);
 	required_device<cpu_device> m_maincpu;
-	void pgm3_map(address_map &map);
+	void pgm3_map(address_map &map) ATTR_COLD;
 };
 
 void pgm3_state::pgm3_map(address_map &map)
@@ -88,7 +89,7 @@ uint32_t pgm3_state::screen_update_pgm3(screen_device &screen, bitmap_ind16 &bit
 	return 0;
 }
 
-WRITE_LINE_MEMBER(pgm3_state::screen_vblank_pgm3)
+void pgm3_state::screen_vblank_pgm3(int state)
 {
 }
 
@@ -169,6 +170,8 @@ ROM_END
 void pgm3_state::init_kov3hd()
 {
 }
+
+} // anonymous namespace
 
 
 // all dumped sets might be China region, unless region info comes from elsewhere

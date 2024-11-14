@@ -1,7 +1,7 @@
 // IFileExtractCallback.h
 
-#ifndef __I_FILE_EXTRACT_CALLBACK_H
-#define __I_FILE_EXTRACT_CALLBACK_H
+#ifndef ZIP7_INC_I_FILE_EXTRACT_CALLBACK_H
+#define ZIP7_INC_I_FILE_EXTRACT_CALLBACK_H
 
 #include "../../../Common/MyString.h"
 
@@ -9,6 +9,15 @@
 
 #include "LoadCodecs.h"
 #include "OpenArchive.h"
+
+Z7_PURE_INTERFACES_BEGIN
+
+#define Z7_IFACE_CONSTR_FOLDERARC_SUB(i, base, n) \
+  Z7_DECL_IFACE_7ZIP_SUB(i, base, 1, n) \
+  { Z7_IFACE_COM7_PURE(i) };
+
+#define Z7_IFACE_CONSTR_FOLDERARC(i, n) \
+        Z7_IFACE_CONSTR_FOLDERARC_SUB(i, IUnknown, n)
 
 namespace NOverwriteAnswer
 {
@@ -42,27 +51,21 @@ IID_IFolderArchiveExtractCallback is requested by:
  IFolderArchiveExtractCallback is used by Common/ArchiveExtractCallback.cpp
 */
 
-#define INTERFACE_IFolderArchiveExtractCallback(x) \
-  STDMETHOD(AskOverwrite)( \
+#define Z7_IFACEM_IFolderArchiveExtractCallback(x) \
+  x(AskOverwrite( \
       const wchar_t *existName, const FILETIME *existTime, const UInt64 *existSize, \
       const wchar_t *newName, const FILETIME *newTime, const UInt64 *newSize, \
-      Int32 *answer) x; \
-  STDMETHOD(PrepareOperation)(const wchar_t *name, Int32 isFolder, Int32 askExtractMode, const UInt64 *position) x; \
-  STDMETHOD(MessageError)(const wchar_t *message) x; \
-  STDMETHOD(SetOperationResult)(Int32 opRes, Int32 encrypted) x; \
+      Int32 *answer)) \
+  x(PrepareOperation(const wchar_t *name, Int32 isFolder, Int32 askExtractMode, const UInt64 *position)) \
+  x(MessageError(const wchar_t *message)) \
+  x(SetOperationResult(Int32 opRes, Int32 encrypted)) \
 
-DECL_INTERFACE_SUB(IFolderArchiveExtractCallback, IProgress, 0x01, 0x07)
-{
-  INTERFACE_IFolderArchiveExtractCallback(PURE)
-};
+Z7_IFACE_CONSTR_FOLDERARC_SUB(IFolderArchiveExtractCallback, IProgress, 0x07)
 
-#define INTERFACE_IFolderArchiveExtractCallback2(x) \
-  STDMETHOD(ReportExtractResult)(Int32 opRes, Int32 encrypted, const wchar_t *name) x; \
+#define Z7_IFACEM_IFolderArchiveExtractCallback2(x) \
+  x(ReportExtractResult(Int32 opRes, Int32 encrypted, const wchar_t *name)) \
 
-DECL_INTERFACE_SUB(IFolderArchiveExtractCallback2, IUnknown, 0x01, 0x08)
-{
-  INTERFACE_IFolderArchiveExtractCallback2(PURE)
-};
+Z7_IFACE_CONSTR_FOLDERARC(IFolderArchiveExtractCallback2, 0x08)
 
 /* ---------- IExtractCallbackUI ----------
 is implemented by
@@ -70,45 +73,40 @@ is implemented by
   FileManager/ExtractCallback.h     CExtractCallbackImp
 */
 
-#ifdef _NO_CRYPTO
-  #define INTERFACE_IExtractCallbackUI_Crypto(x)
+#ifdef Z7_NO_CRYPTO
+  #define Z7_IFACEM_IExtractCallbackUI_Crypto(px)
 #else
-  #define INTERFACE_IExtractCallbackUI_Crypto(x) \
-  virtual HRESULT SetPassword(const UString &password) x;
+  #define Z7_IFACEM_IExtractCallbackUI_Crypto(px) \
+  virtual HRESULT SetPassword(const UString &password) px
 #endif
 
-#define INTERFACE_IExtractCallbackUI(x) \
-  virtual HRESULT BeforeOpen(const wchar_t *name, bool testMode) x; \
-  virtual HRESULT OpenResult(const CCodecs *codecs, const CArchiveLink &arcLink, const wchar_t *name, HRESULT result) x; \
-  virtual HRESULT ThereAreNoFiles() x; \
-  virtual HRESULT ExtractResult(HRESULT result) x; \
-  INTERFACE_IExtractCallbackUI_Crypto(x)
+#define Z7_IFACEN_IExtractCallbackUI(px) \
+  virtual HRESULT BeforeOpen(const wchar_t *name, bool testMode) px \
+  virtual HRESULT OpenResult(const CCodecs *codecs, const CArchiveLink &arcLink, const wchar_t *name, HRESULT result) px \
+  virtual HRESULT ThereAreNoFiles() px \
+  virtual HRESULT ExtractResult(HRESULT result) px \
+  Z7_IFACEM_IExtractCallbackUI_Crypto(px)
 
-struct IExtractCallbackUI: IFolderArchiveExtractCallback
-{
-  INTERFACE_IExtractCallbackUI(PURE)
-};
+// IExtractCallbackUI - is non-COM interface
+// IFolderArchiveExtractCallback - is COM interface
+// Z7_IFACE_DECL_PURE_(IExtractCallbackUI, IFolderArchiveExtractCallback)
+Z7_IFACE_DECL_PURE(IExtractCallbackUI)
 
 
 
-#define INTERFACE_IGetProp(x) \
-  STDMETHOD(GetProp)(PROPID propID, PROPVARIANT *value) x; \
+#define Z7_IFACEM_IGetProp(x) \
+  x(GetProp(PROPID propID, PROPVARIANT *value)) \
 
-DECL_INTERFACE_SUB(IGetProp, IUnknown, 0x01, 0x20)
-{
-  INTERFACE_IGetProp(PURE)
-};
+Z7_IFACE_CONSTR_FOLDERARC(IGetProp, 0x20)
 
-#define INTERFACE_IFolderExtractToStreamCallback(x) \
-  STDMETHOD(UseExtractToStream)(Int32 *res) x; \
-  STDMETHOD(GetStream7)(const wchar_t *name, Int32 isDir, ISequentialOutStream **outStream, Int32 askExtractMode, IGetProp *getProp) x; \
-  STDMETHOD(PrepareOperation7)(Int32 askExtractMode) x; \
-  STDMETHOD(SetOperationResult7)(Int32 resultEOperationResult, Int32 encrypted) x; \
+#define Z7_IFACEM_IFolderExtractToStreamCallback(x) \
+  x(UseExtractToStream(Int32 *res)) \
+  x(GetStream7(const wchar_t *name, Int32 isDir, ISequentialOutStream **outStream, Int32 askExtractMode, IGetProp *getProp)) \
+  x(PrepareOperation7(Int32 askExtractMode)) \
+  x(SetOperationResult8(Int32 resultEOperationResult, Int32 encrypted, UInt64 size)) \
 
-DECL_INTERFACE_SUB(IFolderExtractToStreamCallback, IUnknown, 0x01, 0x30)
-{
-  INTERFACE_IFolderExtractToStreamCallback(PURE)
-};
+Z7_IFACE_CONSTR_FOLDERARC(IFolderExtractToStreamCallback, 0x31)
 
+Z7_PURE_INTERFACES_END
 
 #endif

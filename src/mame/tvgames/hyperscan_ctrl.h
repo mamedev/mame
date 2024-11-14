@@ -2,8 +2,8 @@
 // copyright-holders:Sandro Ronco
 
 
-#ifndef MAME_MACHINE_HYPERSCAN_CTRL_H
-#define MAME_MACHINE_HYPERSCAN_CTRL_H
+#ifndef MAME_TVGAMES_HYPERSCAN_CTRL_H
+#define MAME_TVGAMES_HYPERSCAN_CTRL_H
 
 #pragma once
 
@@ -15,11 +15,11 @@ public:
 	uint16_t read(offs_t offset);
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// optional information overrides
-	virtual ioport_constructor device_input_ports() const override;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 
 private:
 	required_ioport_array<4> m_inputs;
@@ -28,4 +28,4 @@ private:
 
 DECLARE_DEVICE_TYPE(HYPERSCAN_CTRL, hyperscan_ctrl_device)
 
-#endif // MAME_MACHINE_HYPERSCAN_CTRL_H
+#endif // MAME_TVGAMES_HYPERSCAN_CTRL_H

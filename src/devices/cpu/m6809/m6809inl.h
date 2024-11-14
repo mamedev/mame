@@ -2,8 +2,6 @@
 // copyright-holders:Nathan Woods
 /*********************************************************************
 
-    m6809inl.h
-
     Portable 6809 emulator - Inline functions for the purposes of
     optimization
 
@@ -90,6 +88,19 @@ inline ATTR_FORCE_INLINE uint8_t m6809_base_device::read_operand(int ordinal)
 		case ADDRESSING_MODE_IMMEDIATE:     return read_opcode_arg();
 		default:                            fatalerror("Unexpected");   return 0x00;
 	}
+}
+
+
+//-------------------------------------------------
+//  read_vector
+//-------------------------------------------------
+
+inline ATTR_FORCE_INLINE uint8_t m6809_base_device::read_vector(int ordinal)
+{
+	if(m_vector_read_func.isunset())
+		return read_memory(m_ea.w + ordinal);
+	else
+		return m_vector_read_func(m_ea.w + ordinal);
 }
 
 

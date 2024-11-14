@@ -26,6 +26,8 @@
 #include "akkaarrh.lh"
 
 
+namespace {
+
 class akkaarrh_state : public driver_device
 {
 public:
@@ -45,10 +47,10 @@ public:
 	void akkaarrh(machine_config &config);
 
 private:
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void main_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
 
 	TILE_GET_INFO_MEMBER(get_tile_info);
 
@@ -437,6 +439,7 @@ ROM_START( akkaarrh )
 	 ROM_LOAD( "akka_mo3.b11", 0x3000, 0x1000, CRC(adcf6a36) SHA1(0555a252ba39400d2c533add6ac492926674d6ad) )
 ROM_END
 
+} // anonymous namespace
 
 
 /*************************************

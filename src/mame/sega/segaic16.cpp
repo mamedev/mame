@@ -370,9 +370,6 @@ Quick review of the system16 hardware:
 
 
 
-
-
-
 //**************************************************************************
 //  PALETTE HELPERS
 //**************************************************************************
@@ -540,8 +537,6 @@ segaic16_video_device::segaic16_video_device(const machine_config &mconfig, cons
 	, m_pagelatch_cb(*this, DEVICE_SELF, FUNC(segaic16_video_device::tilemap_16b_fill_latch))
 	, m_gfxdecode(*this, finder_base::DUMMY_TAG)
 {
-	memset(m_rotate, 0, sizeof(m_rotate));
-	memset(m_bg_tilemap, 0, sizeof(m_bg_tilemap));
 }
 
 void segaic16_video_device::device_start()
@@ -590,7 +585,6 @@ void draw_virtual_tilemap(screen_device &screen, segaic16_video_device::tilemap_
 	int topmin = -1, topmax = -1, bottommin = -1, bottommax = -1;
 	rectangle pageclip;
 	int page;
-
 
 	if (info->flip)
 	{
@@ -1207,14 +1201,12 @@ void segaic16_video_device::tilemap_init(int which, int type, int colorbase, int
 	struct tilemap_info *info = &m_bg_tilemap[which];
 	tilemap_get_info_delegate get_text_info(*this);
 	tilemap_get_info_delegate get_tile_info(*this);
-	int pagenum;
-	int i;
 
 	/* reset the tilemap info */
-	memset(info, 0, sizeof(*info));
+	*info = tilemap_info();
 	info->index = which;
 	info->type = type;
-	for (i = 0; i < numbanks; i++)
+	for (int i = 0; i < numbanks; i++)
 		info->bank[i] = i;
 	info->banksize = 0x2000 / numbanks;
 	info->xoffs = xoffs;
@@ -1288,7 +1280,7 @@ void segaic16_video_device::tilemap_init(int which, int type, int colorbase, int
 	info->textmap->set_scrolldy(0, 0);
 
 	/* create the tilemaps for the tile pages */
-	for (pagenum = 0; pagenum < info->numpages; pagenum++)
+	for (int pagenum = 0; pagenum < info->numpages; pagenum++)
 	{
 		/* each page is 64x32 */
 		info->tilemaps[pagenum] = &machine().tilemap().create(*m_gfxdecode, get_tile_info, TILEMAP_SCAN_ROWS, 8,8, 64,32);
@@ -1381,7 +1373,6 @@ void segaic16_video_device::tilemap_set_bank(int which, int banknum, int offset)
 void segaic16_video_device::tilemap_set_flip(int which, int flip)
 {
 	struct tilemap_info *info = &m_bg_tilemap[which];
-	int pagenum;
 
 	flip = (flip != 0);
 	if (info->flip != flip)
@@ -1389,7 +1380,7 @@ void segaic16_video_device::tilemap_set_flip(int which, int flip)
 		screen().update_partial(screen().vpos());
 		info->flip = flip;
 		info->textmap->set_flip(flip ? (TILEMAP_FLIPX | TILEMAP_FLIPY) : 0);
-		for (pagenum = 0; pagenum < info->numpages; pagenum++)
+		for (int pagenum = 0; pagenum < info->numpages; pagenum++)
 			info->tilemaps[pagenum]->set_flip(flip ? (TILEMAP_FLIPX | TILEMAP_FLIPY) : 0);
 	}
 }
@@ -1473,10 +1464,6 @@ void segaic16_video_device::textram_w(offs_t offset, uint16_t data, uint16_t mem
 
 
 
-
-
-
-
 /*************************************
  *
  *  General rotation initialization
@@ -1488,7 +1475,7 @@ void segaic16_video_device::rotate_init(int which, int type, int colorbase)
 	struct rotate_info *info = &m_rotate[which];
 
 	/* reset the tilemap info */
-	memset(info, 0, sizeof(*info));
+	*info = rotate_info();
 	info->index = which;
 	info->type = type;
 	info->colorbase = colorbase;
@@ -1600,10 +1587,9 @@ uint16_t segaic16_video_device::rotate_control_r()
 	{
 		uint32_t *src = (uint32_t *)info->rotateram;
 		uint32_t *dst = (uint32_t *)info->buffer.get();
-		int i;
 
 		/* swap the halves of the rotation RAM */
-		for (i = 0; i < info->ramsize/4; i++)
+		for (int i = 0; i < info->ramsize/4; i++)
 		{
 			uint32_t temp = *src;
 			*src++ = *dst;

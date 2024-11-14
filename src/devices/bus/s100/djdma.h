@@ -30,19 +30,19 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// bus-level overrides;
 	virtual void s100_sout_w(offs_t offset, uint8_t data) override;
 
 	// optional information overrides
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 
 private:
-	void djdma_io(address_map &map);
-	void djdma_mem(address_map &map);
+	void djdma_io(address_map &map) ATTR_COLD;
+	void djdma_mem(address_map &map) ATTR_COLD;
 
 	void reset_int_w(u8 data);
 	u8 disk_di_r();

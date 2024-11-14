@@ -54,6 +54,8 @@ ICS8080
 #include "tk80.lh"
 
 
+namespace {
+
 class tk80_state : public driver_device
 {
 public:
@@ -71,7 +73,7 @@ public:
 	void tk85(machine_config &config);
 
 private:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 	uint8_t key_matrix_r();
 	uint8_t nd80z_key_r();
@@ -81,12 +83,12 @@ private:
 	uint8_t display_r(offs_t offset);
 	void display_w(offs_t offset, uint8_t data);
 
-	void ics8080_mem(address_map &map);
-	void mikrolab_io(address_map &map);
-	void nd80z_io(address_map &map);
-	void tk80_io(address_map &map);
-	void tk80_mem(address_map &map);
-	void tk85_mem(address_map &map);
+	void ics8080_mem(address_map &map) ATTR_COLD;
+	void mikrolab_io(address_map &map) ATTR_COLD;
+	void nd80z_io(address_map &map) ATTR_COLD;
+	void tk80_io(address_map &map) ATTR_COLD;
+	void tk80_mem(address_map &map) ATTR_COLD;
+	void tk85_mem(address_map &map) ATTR_COLD;
 
 	uint8_t m_term_data = 0U;
 	uint8_t m_keyb_press = 0U;
@@ -416,6 +418,8 @@ ROM_START( nd80z )
 	ROM_REGION( 0x0800, "maincpu", 0 )
 	ROM_LOAD( "ndf.bin",  0x0000, 0x0800, CRC(fe829f1d) SHA1(6fff31884b8d984076d4450ca3a3e48efadeb648))
 ROM_END
+
+} // anonymous namespace
 
 
 /* Driver */

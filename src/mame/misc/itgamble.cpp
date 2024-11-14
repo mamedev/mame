@@ -4,7 +4,7 @@
 
   Nazionale Elettronica + others (mostly Italian) Gambling games
   mostly based on H8/3048 + OKI 6295 or similar.
-.
+
   These all use MCUs with internal ROM for their programs,
   they can't be dumped easily, and thus we can't emulate
   them at the moment because there is nothing to emulate
@@ -124,6 +124,8 @@ Known games on this hardware revision are:
 #include "speaker.h"
 
 
+namespace {
+
 class itgamble_state : public driver_device
 {
 public:
@@ -139,15 +141,15 @@ public:
 private:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void itgamble_map(address_map &map);
+	void itgamble_map(address_map &map) ATTR_COLD;
 
 	// devices
 	required_device<cpu_device> m_maincpu;
 	required_device<palette_device> m_palette;
 
 	// driver_device overrides
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 };
 
 
@@ -664,6 +666,8 @@ ROM_START( mnumber )    /* clocks should be changed for this game */
 	ROM_REGION( 0x40000, "oki", 0 ) /* M6295 samples */
 	ROM_LOAD( "mysterynumber5.u6", 0x00000, 0x40000, CRC(80aba466) SHA1(e9bf7e1c3d1c6b1b0dba43dd79a71f89e63df814) )
 ROM_END
+
+} // anonymous namespace
 
 
 /*************************

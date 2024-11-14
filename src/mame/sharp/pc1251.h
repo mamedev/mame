@@ -8,8 +8,8 @@
  *
  ****************************************************************************/
 
-#ifndef MAME_INCLUDES_PC1251_H
-#define MAME_INCLUDES_PC1251_H
+#ifndef MAME_SHARP_PC1251_H
+#define MAME_SHARP_PC1251_H
 
 #include "pocketc.h"
 
@@ -31,20 +31,20 @@ public:
 	void pc1250(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void pc1250_mem(address_map &map);
-	void pc1251_mem(address_map &map);
-	void pc1255_mem(address_map &map);
-	void pc1260_mem(address_map &map);
-	void pc1261_mem(address_map &map);
+	void pc1250_mem(address_map &map) ATTR_COLD;
+	void pc1251_mem(address_map &map) ATTR_COLD;
+	void pc1255_mem(address_map &map) ATTR_COLD;
+	void pc1260_mem(address_map &map) ATTR_COLD;
+	void pc1261_mem(address_map &map) ATTR_COLD;
 
 	void out_b_w(uint8_t data);
 	void out_c_w(uint8_t data);
 
-	DECLARE_READ_LINE_MEMBER(reset_r);
+	int reset_r();
 	uint8_t in_a_r();
 	uint8_t in_b_r();
 	uint8_t lcd_read(offs_t offset);
@@ -77,7 +77,7 @@ public:
 	void pc1261(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 };
 
-#endif // MAME_INCLUDES_PC1251_H
+#endif // MAME_SHARP_PC1251_H

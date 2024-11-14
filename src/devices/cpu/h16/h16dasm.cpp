@@ -800,7 +800,7 @@ offs_t h16_disassembler::disassemble(std::ostream &stream, offs_t pc, const h16_
 			}
 			else
 			{
-				util::stream_format(stream, "S%s/%c.%c ", (xb1 & 0x30) == 0 ? "MOV" : "STR", "FB"[BIT(xb1, 6)], "BW"[BIT(op, 0)]);
+				util::stream_format(stream, "S%s/%c.%c ", (xb1 & 0x30) == 0 ? "STR" : "MOV", "FB"[BIT(xb1, 6)], "BW"[BIT(op, 0)]);
 				format_register_to_register(stream, xb2);
 				stream << ", ";
 				format_register(stream, 0, xb1 & 0x0f);

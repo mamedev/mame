@@ -10,7 +10,7 @@
 #include <stdio.h>
 
 struct TestSettings {
-  bool quiet;
+  bool verbose;
   bool validate;
 };
 
@@ -52,7 +52,7 @@ public:
       assembler.addDiagnosticOptions(asmjit::DiagnosticOptions::kValidateAssembler);
   }
 
-  ASMJIT_NOINLINE bool testInstruction(const char* expectedOpcode, const char* s, uint32_t err) noexcept {
+  ASMJIT_NOINLINE bool testValidInstruction(const char* s, const char* expectedOpcode, asmjit::Error err = asmjit::kErrorOk) noexcept {
     count++;
 
     if (err) {
@@ -73,8 +73,31 @@ public:
       return false;
     }
 
-    if (!settings.quiet)
+    if (settings.verbose)
       printf("  OK [%s] <- %s\n", encodedOpcode.data(), s);
+
+    passed++;
+    prepare();
+    return true;
+  }
+
+  ASMJIT_NOINLINE bool testInvalidInstruction(const char* s, asmjit::Error expectedError, asmjit::Error err) noexcept {
+    count++;
+
+    if (err == asmjit::kErrorOk) {
+      printf("  !! %s passed, but should have failed with <%s> error\n", s, asmjit::DebugUtils::errorAsString(expectedError));
+      prepare();
+      return false;
+    }
+
+    if (err != asmjit::kErrorOk) {
+      printf("  !! %s failed with <%s>, but should have failed with <%s>\n", s, asmjit::DebugUtils::errorAsString(err), asmjit::DebugUtils::errorAsString(expectedError));
+      prepare();
+      return false;
+    }
+
+    if (settings.verbose)
+      printf("  OK [%s] <- %s\n", asmjit::DebugUtils::errorAsString(err), s);
 
     passed++;
     prepare();

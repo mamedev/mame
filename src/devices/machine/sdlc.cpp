@@ -7,7 +7,6 @@
 #include <sstream>
 
 
-#define LOG_GENERAL     (1U << 0)
 #define LOG_RXBIT       (1U << 1)
 #define LOG_RXFLAG      (1U << 2)
 #define LOG_LINESTATE   (1U << 3)
@@ -35,6 +34,10 @@ device_sdlc_consumer_interface::device_sdlc_consumer_interface(machine_config co
 	m_in_frame(0U),
 	m_shift_register(0xffffU),
 	m_frame_check(0xffffU)
+{
+}
+
+device_sdlc_consumer_interface::~device_sdlc_consumer_interface()
 {
 }
 
@@ -140,7 +143,11 @@ sdlc_logger_device::sdlc_logger_device(machine_config const &mconfig, char const
 {
 }
 
-WRITE_LINE_MEMBER(sdlc_logger_device::clock_w)
+sdlc_logger_device::~sdlc_logger_device()
+{
+}
+
+void sdlc_logger_device::clock_w(int state)
 {
 	if (bool(state) != bool(m_current_clock))
 	{

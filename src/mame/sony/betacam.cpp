@@ -24,6 +24,9 @@
 #include "cpu/h8500/h8534.h"
 #include "machine/cxd1095.h"
 
+
+namespace {
+
 class betacam_state : public driver_device
 {
 public:
@@ -37,8 +40,8 @@ public:
 	void betacam(machine_config &config);
 
 private:
-	void system_mem_map(address_map &map);
-	void servo_mem_map(address_map &map);
+	void system_mem_map(address_map &map) ATTR_COLD;
+	void servo_mem_map(address_map &map) ATTR_COLD;
 
 	required_device<v25_device> m_systemcpu;
 	required_device<h8534_device> m_servocpu;
@@ -129,6 +132,9 @@ ROM_START(uvw1800)
 	ROM_REGION(0x40000, "servocpu", 0)
 	ROM_LOAD("75927098_uvw-1000_sv_v1.04_150c.ic212", 0x00000, 0x40000, CRC(b4cb9c02) SHA1(92ae5ce303b9f67977b960047bac7f6bb337b8c0))
 ROM_END
+
+} // anonymous namespace
+
 
 //   YEAR  NAME   PARENT/COMPAT MACHINE  INPUT    CLASS          INIT       COMPANY  FULLNAME                                                FLAGS
 SYST(199?, uvw1200,   0, 0,     betacam, betacam, betacam_state, empty_init, "Sony", "BETACAM-SP Videocassette Player UVW-1200 RGB",          MACHINE_IS_SKELETON)

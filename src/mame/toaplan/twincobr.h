@@ -4,8 +4,8 @@
         Twincobr/Flying Shark/Wardner  game hardware from 1986-1987
         -----------------------------------------------------------
 ****************************************************************************/
-#ifndef MAME_INCLUDES_TWINCOBR_H
-#define MAME_INCLUDES_TWINCOBR_H
+#ifndef MAME_TOAPLAN_TWINCOBR_H
+#define MAME_TOAPLAN_TWINCOBR_H
 
 #pragma once
 
@@ -40,12 +40,13 @@ public:
 	void twincobrw(machine_config &config);
 	void fsharkbt(machine_config &config);
 	void fshark(machine_config &config);
+	void fnshark(machine_config &config);
 
 	void init_twincobr();
 
 protected:
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 	optional_shared_ptr<u8> m_sharedram;
 	optional_device<buffered_spriteram8_device> m_spriteram8;
@@ -88,13 +89,13 @@ protected:
 	void twincobr_dsp_bio_w(u16 data);
 	u16 fsharkbt_dsp_r();
 	void fsharkbt_dsp_w(u16 data);
-	DECLARE_READ_LINE_MEMBER(twincobr_bio_r);
-	DECLARE_WRITE_LINE_MEMBER(int_enable_w);
-	DECLARE_WRITE_LINE_MEMBER(dsp_int_w);
-	DECLARE_WRITE_LINE_MEMBER(coin_counter_1_w);
-	DECLARE_WRITE_LINE_MEMBER(coin_counter_2_w);
-	DECLARE_WRITE_LINE_MEMBER(coin_lockout_1_w);
-	DECLARE_WRITE_LINE_MEMBER(coin_lockout_2_w);
+	int twincobr_bio_r();
+	void int_enable_w(int state);
+	void dsp_int_w(int state);
+	void coin_counter_1_w(int state);
+	void coin_counter_2_w(int state);
+	void coin_lockout_1_w(int state);
+	void coin_lockout_2_w(int state);
 	u8 twincobr_sharedram_r(offs_t offset);
 	void twincobr_sharedram_w(offs_t offset, u8 data);
 	void twincobr_txoffs_w(offs_t offset, u16 data, u16 mem_mask = ~0);
@@ -126,12 +127,12 @@ protected:
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	TILE_GET_INFO_MEMBER(get_tx_tile_info);
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	DECLARE_WRITE_LINE_MEMBER(twincobr_vblank_irq);
+	void twincobr_vblank_irq(int state);
 	void twincobr_create_tilemaps();
-	DECLARE_WRITE_LINE_MEMBER(display_on_w);
-	DECLARE_WRITE_LINE_MEMBER(flipscreen_w);
-	DECLARE_WRITE_LINE_MEMBER(bg_ram_bank_w);
-	DECLARE_WRITE_LINE_MEMBER(fg_rom_bank_w);
+	void display_on_w(int state);
+	void flipscreen_w(int state);
+	void bg_ram_bank_w(int state);
+	void fg_rom_bank_w(int state);
 	void log_vram();
 	void driver_savestate();
 	required_device<cpu_device> m_maincpu;
@@ -143,12 +144,13 @@ protected:
 	required_device<ls259_device> m_mainlatch;
 	required_device<ls259_device> m_coinlatch;
 
-	void dsp_io_map(address_map &map);
-	void dsp_program_map(address_map &map);
-	void fsharkbt_i8741_io_map(address_map &map);
-	void main_program_map(address_map &map);
-	void sound_io_map(address_map &map);
-	void sound_program_map(address_map &map);
+	void dsp_io_map(address_map &map) ATTR_COLD;
+	void dsp_program_map(address_map &map) ATTR_COLD;
+	void fnshark_sound_io_map(address_map &map) ATTR_COLD;
+	void fsharkbt_i8741_io_map(address_map &map) ATTR_COLD;
+	void main_program_map(address_map &map) ATTR_COLD;
+	void sound_io_map(address_map &map) ATTR_COLD;
+	void sound_program_map(address_map &map) ATTR_COLD;
 };
 
-#endif // MAME_INCLUDES_TWINCOBR_H
+#endif // MAME_TOAPLAN_TWINCOBR_H

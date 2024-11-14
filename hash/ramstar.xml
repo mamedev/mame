@@ -1,0 +1,180 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0-1.0
+
+It is unknown if more cartridges were sold (probably yes).
+
+Entries are sorted by description.
+-->
+
+<softwarelist name="ramstar" description="Ram Star multi-game cartridges">
+	<software name="amdream" supported="no">
+		<description>American Dream</description>
+		<year>1991?</year>
+		<publisher>Ram Star</publisher>
+		<part name="rom" interface="ramstar">
+			<feature name="u1" value="27C512"/>
+			<feature name="u2" value="X24C04"/>
+			<dataarea name="rom" size="0x10000">
+				<rom name="27c512.u1" size="0x10000" crc="84022997" sha1="f736db5a66193a36b1aaa8cbdca5e4a3521c2e86"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="barfever" supported="no">
+		<description>Bar Fever (set 1)</description>
+		<year>1991?</year>
+		<publisher>Ram Star</publisher>
+		<part name="rom" interface="ramstar">
+			<feature name="u1" value="27C512"/>
+			<feature name="u2" value="X24C04"/>
+			<dataarea name="rom" size="0x10000">
+				<rom name="27c512.u1" size="0x10000" crc="cb4d8ab0" sha1="b61fea3fe206538d8539d66306ef4e3d531c6767"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="barfevera" cloneof="barfever" supported="no"> <!-- TODO: verify parent / clone relationship -->
+		<description>Bar Fever (set 2)</description>
+		<year>1991?</year>
+		<publisher>Ram Star</publisher>
+		<part name="rom" interface="ramstar">
+			<feature name="u1" value="27C512"/>
+			<feature name="u2" value="X24C04"/>
+			<dataarea name="rom" size="0x10000">
+				<rom name="27c512.u1" size="0x10000" crc="6cce1582" sha1="35c31cc577e7efc95ca67c058e67e8c5b3e8a7ba"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bearctry" supported="no">
+		<description>Bear Country</description>
+		<year>1991?</year>
+		<publisher>Ram Star</publisher>
+		<part name="rom" interface="ramstar">
+			<feature name="u1" value="27C512"/>
+			<feature name="u2" value="X24C04"/>
+			<dataarea name="rom" size="0x10000">
+				<rom name="27c512.u1" size="0x10000" crc="959f14f0" sha1="05d3c5a7cf156efdada5ae48c8734fa753cdbe54"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gamerica" supported="no">
+		<description>Great America</description>
+		<year>1991?</year>
+		<publisher>Ram Star</publisher>
+		<part name="rom" interface="ramstar">
+			<feature name="u1" value="27C512"/>
+			<feature name="u2" value="X24C04"/>
+			<dataarea name="rom" size="0x10000">
+				<rom name="27c512.u1" size="0x10000" crc="0daea153" sha1="73b7cf77e7441135a95de00ca306c34fcfa160aa"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="irishl" supported="no">
+		<description>Irish Luck</description>
+		<year>1991?</year>
+		<publisher>Ram Star</publisher>
+		<part name="rom" interface="ramstar">
+			<feature name="u1" value="27C512"/>
+			<feature name="u2" value="X24C04"/>
+			<dataarea name="rom" size="0x10000">
+				<rom name="27c512.u1" size="0x10000" crc="1cabece9" sha1="f254f5603341e9b32075996c14900c8a4706886c"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="jokerpkr" supported="no">
+		<description>Joker Poker</description>
+		<year>1991?</year>
+		<publisher>Ram Star</publisher>
+		<part name="rom" interface="ramstar">
+			<feature name="u1" value="27C512"/>
+			<feature name="u2" value="X24C04"/>
+			<dataarea name="rom" size="0x10000">
+				<rom name="27c512.u1" size="0x10000" crc="5672dd49" sha1="2c7c3838518035bb66c28e843c3c97ff2864d09c"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="luckyc" supported="no">
+		<description>Lucky Critters</description>
+		<year>1991?</year>
+		<publisher>Ram Star</publisher>
+		<part name="rom" interface="ramstar">
+			<feature name="u1" value="27C512"/>
+			<feature name="u2" value="X24C04"/>
+			<dataarea name="rom" size="0x10000">
+				<rom name="27c512.u1" size="0x10000" crc="e7459b31" sha1="7dc375d2ebaacc737a87965860aa4903601cdc93"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lucky7" supported="no">
+		<description>Lucky Seven</description>
+		<year>1991?</year>
+		<publisher>Ram Star</publisher>
+		<part name="rom" interface="ramstar">
+			<feature name="u1" value="27C512"/>
+			<feature name="u2" value="X24C04"/>
+			<dataarea name="rom" size="0x10000">
+				<rom name="27c512.u1" size="0x10000" crc="ef43619d" sha1="b630c05e9bb45d3bd3d38a449ecca99eb3e754f9"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lucky7s" supported="no"> <!-- TODO: maybe related to the above entry? -->
+		<description>Lucky Sevens</description>
+		<year>1991?</year>
+		<publisher>Ram Star</publisher>
+		<part name="rom" interface="ramstar">
+			<feature name="u1" value="27C512"/>
+			<feature name="u2" value="X24C04"/>
+			<dataarea name="rom" size="0x10000">
+				<rom name="27c512.u1" size="0x10000" crc="73517705" sha1="f64ee18f90795de99dfc25fc568b1928c791209d"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="nevadacl" supported="no">
+		<description>Nevada Club</description>
+		<year>1991?</year>
+		<publisher>Ram Star</publisher>
+		<part name="rom" interface="ramstar">
+			<feature name="u1" value="27C512"/>
+			<feature name="u2" value="X24C04"/>
+			<dataarea name="rom" size="0x10000">
+				<rom name="27c512.u1" size="0x10000" crc="05784e10" sha1="fe851223fc73f11486468452d3dd7cb5b1c68255"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rainbowm" supported="no">
+		<description>Rainbow Magic</description>
+		<year>1991?</year>
+		<publisher>Ram Star</publisher>
+		<part name="rom" interface="ramstar">
+			<feature name="u1" value="27C512"/>
+			<feature name="u2" value="X24C04"/>
+			<dataarea name="rom" size="0x10000">
+				<rom name="27c512.u1" size="0x10000" crc="095f157d" sha1="757c322532c323a3c12495fb699489e28e7ad798"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="silversl" supported="no">
+		<description>Silver Slots</description>
+		<year>1991?</year>
+		<publisher>Ram Star</publisher>
+		<part name="rom" interface="ramstar">
+			<feature name="u1" value="27C512"/>
+			<feature name="u2" value="X24C04"/>
+			<dataarea name="rom" size="0x10000">
+				<rom name="27c512.u1" size="0x10000" crc="b4c4f38b" sha1="df27c86e19881e8616638828edb529f6aa4dcec2"/>
+			</dataarea>
+		</part>
+	</software>
+</softwarelist>

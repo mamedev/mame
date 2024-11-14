@@ -84,6 +84,9 @@ TODO
 
 #include "mekd2.lh"
 
+
+namespace {
+
 #define XTAL_MEKD2 1228800
 
 class mekd2_state : public driver_device
@@ -98,14 +101,15 @@ public:
 		, m_cass(*this, "cassette")
 		, m_trace_timer(*this, "trace_timer")
 		, m_digits(*this, "digit%u", 0U)
+		, m_keyboard(*this, "X%d", 0U)
 	{ }
 
 	void mekd2(machine_config &config);
 
 private:
-	DECLARE_READ_LINE_MEMBER(key40_r);
+	int key40_r();
 	uint8_t key_r();
-	DECLARE_WRITE_LINE_MEMBER(nmi_w);
+	void nmi_w(int state);
 	void digit_w(uint8_t data);
 	void segment_w(uint8_t data);
 	DECLARE_QUICKLOAD_LOAD_MEMBER(quickload_cb);
@@ -113,7 +117,7 @@ private:
 	TIMER_DEVICE_CALLBACK_MEMBER(kansas_r);
 	TIMER_DEVICE_CALLBACK_MEMBER(trace_timer);
 
-	void mem_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
 
 	uint8_t m_cass_data[4]{};
 	uint8_t m_segment = 0U;
@@ -121,7 +125,7 @@ private:
 	uint8_t m_keydata = 0U;
 	bool m_cassbit = 0;
 	bool m_cassold = 0;
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 	required_device<cpu_device> m_maincpu;
 	required_device<pia6821_device> m_pia_s;
 	required_device<pia6821_device> m_pia_u;
@@ -129,6 +133,7 @@ private:
 	required_device<cassette_image_device> m_cass;
 	required_device<timer_device> m_trace_timer;
 	output_finder<6> m_digits;
+	required_ioport_array<6> m_keyboard;
 };
 
 
@@ -206,7 +211,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(mekd2_state::trace_timer)
 }
 
 
-WRITE_LINE_MEMBER( mekd2_state::nmi_w )
+void mekd2_state::nmi_w(int state)
 {
 	if (state)
 		m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
@@ -222,14 +227,13 @@ WRITE_LINE_MEMBER( mekd2_state::nmi_w )
 
 ************************************************************/
 
-READ_LINE_MEMBER( mekd2_state::key40_r )
+int mekd2_state::key40_r()
 {
 	return BIT(m_keydata, 6);
 }
 
 uint8_t mekd2_state::key_r()
 {
-	char kbdrow[4];
 	uint8_t i;
 	m_keydata = 0xff;
 
@@ -237,8 +241,7 @@ uint8_t mekd2_state::key_r()
 	{
 		if (BIT(m_digit, i))
 		{
-			sprintf(kbdrow,"X%d",i);
-			m_keydata &= ioport(kbdrow)->read();
+			m_keydata &= m_keyboard[i]->read();
 		}
 	}
 
@@ -298,11 +301,12 @@ QUICKLOAD_LOAD_MEMBER(mekd2_state::quickload_cb)
 	uint16_t addr, size;
 	uint8_t ident, *RAM = memregion("maincpu")->base();
 
-	image.fread(buff, sizeof (buff));
-	if (memcmp(buff, magic, sizeof (buff)))
+	image.fread(buff, sizeof(buff));
+	if (memcmp(buff, magic, sizeof(buff)))
 	{
-		logerror("mekd2 rom load: magic '%s' not found\n", magic);
-		return image_init_result::FAIL;
+		return std::make_pair(
+				image_error::INVALIDIMAGE,
+				util::string_format("Magic '%s' not found", magic));
 	}
 	image.fread(&addr, 2);
 	addr = little_endianize_int16(addr);
@@ -313,7 +317,7 @@ QUICKLOAD_LOAD_MEMBER(mekd2_state::quickload_cb)
 	while (size-- > 0)
 		image.fread(&RAM[addr++], 1);
 
-	return image_init_result::PASS;
+	return std::make_pair(std::error_condition(), std::string());
 }
 
 TIMER_DEVICE_CALLBACK_MEMBER(mekd2_state::kansas_w)
@@ -372,7 +376,7 @@ void mekd2_state::mekd2(machine_config &config)
 	m_cass->add_route(ALL_OUTPUTS, "mono", 0.05);
 
 	/* Devices */
-	PIA6821(config, m_pia_s, 0);
+	PIA6821(config, m_pia_s);
 	m_pia_s->readpa_handler().set(FUNC(mekd2_state::key_r));
 	m_pia_s->readcb1_handler().set(FUNC(mekd2_state::key40_r));
 	m_pia_s->writepa_handler().set(FUNC(mekd2_state::segment_w));
@@ -381,7 +385,7 @@ void mekd2_state::mekd2(machine_config &config)
 	m_pia_s->irqa_handler().set_inputline("maincpu", INPUT_LINE_NMI);
 	m_pia_s->irqb_handler().set_inputline("maincpu", INPUT_LINE_NMI);
 
-	PIA6821(config, m_pia_u, 0);
+	PIA6821(config, m_pia_u);
 	m_pia_u->irqa_handler().set_inputline("maincpu", M6800_IRQ_LINE);
 	m_pia_u->irqb_handler().set_inputline("maincpu", M6800_IRQ_LINE);
 
@@ -411,6 +415,9 @@ ROM_START(mekd2)
 	ROM_REGION(0x0400,"maincpu",0)
 	ROM_LOAD("jbug.rom", 0x0000, 0x0400, CRC(5ed08792) SHA1(b06e74652a4c4e67c4a12ddc191ffb8c07f3332e) )
 ROM_END
+
+} // anonymous namespace
+
 
 /***************************************************************************
 

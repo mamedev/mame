@@ -12,7 +12,6 @@
 #pragma once
 
 #include "cpu/arm7/arm7.h"
-#include "cpu/arm7/arm7core.h"
 
 class sa1111_device : public device_t
 {
@@ -44,14 +43,14 @@ public:
 	auto l3_data_out() { return m_l3_data_out.bind(); }
 	auto i2s_out() { return m_i2s_out.bind(); }
 
-	DECLARE_WRITE_LINE_MEMBER(l3wd_in);
+	void l3wd_in(int state);
 
-	void map(address_map &map);
+	void map(address_map &map) ATTR_COLD;
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 	void set_irq_line(uint32_t line, int state);
 	void update_interrupts();

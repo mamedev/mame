@@ -12,8 +12,8 @@
 
 ****************************************************************************/
 
-#ifndef MAME_INCLUDES_REDALERT_H
-#define MAME_INCLUDES_REDALERT_H
+#ifndef MAME_IREM_REDALERT_H
+#define MAME_IREM_REDALERT_H
 
 #pragma once
 
@@ -73,13 +73,13 @@ private:
 	void demoneye_bitmap_layer_w(offs_t offset, uint8_t data);
 	void demoneye_bitmap_ypos_w(u8 data);
 
-	void redalert_main_map(address_map &map);
-	void ww3_main_map(address_map &map);
-	void panther_main_map(address_map &map);
-	void demoneye_main_map(address_map &map);
+	void redalert_main_map(address_map &map) ATTR_COLD;
+	void ww3_main_map(address_map &map) ATTR_COLD;
+	void panther_main_map(address_map &map) ATTR_COLD;
+	void demoneye_main_map(address_map &map) ATTR_COLD;
 
 	u8 m_demoneye_bitmap_reg[4];
 	u8 m_demoneye_bitmap_yoffs = 0;
 };
 
-#endif // MAME_INCLUDES_REDALERT_H
+#endif // MAME_IREM_REDALERT_H

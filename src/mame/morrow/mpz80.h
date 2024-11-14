@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Curt Coder
-#ifndef MAME_INCLUDES_MPZ80_H
-#define MAME_INCLUDES_MPZ80_H
+#ifndef MAME_MORROW_MPZ80_H
+#define MAME_MORROW_MPZ80_H
 
 #pragma once
 
@@ -40,8 +40,8 @@ public:
 	void mpz80(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -69,8 +69,8 @@ private:
 	void disp_col_w(uint8_t data);
 	void task_w(uint8_t data);
 	void mask_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER( s100_pint_w );
-	DECLARE_WRITE_LINE_MEMBER( s100_nmi_w );
+	void s100_pint_w(int state);
+	void s100_nmi_w(int state);
 
 	// memory state
 	uint32_t m_addr = 0;
@@ -96,8 +96,8 @@ private:
 	int m_trap_stop;
 	int m_trap_aux;
 	void init_mpz80();
-	void mpz80_io(address_map &map);
-	void mpz80_mem(address_map &map);
+	void mpz80_io(address_map &map) ATTR_COLD;
+	void mpz80_mem(address_map &map) ATTR_COLD;
 };
 
-#endif // MAME_INCLUDES_MPZ80_H
+#endif // MAME_MORROW_MPZ80_H

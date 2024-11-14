@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood
-#ifndef MAME_MACHINE_BFM_BDA_H
-#define MAME_MACHINE_BFM_BDA_H
+#ifndef MAME_BFM_BFM_BDA_H
+#define MAME_BFM_BFM_BDA_H
 
 #pragma once
 
@@ -29,17 +29,18 @@ public:
 	uint16_t set_display(uint16_t segin);
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 	virtual void device_post_load() override;
 
 private:
-	static const uint8_t AT_NORMAL  = 0x00;
-	static const uint8_t AT_FLASH   = 0x01;
-	static const uint8_t AT_BLANK   = 0x02;
-	static const uint8_t AT_FLASHED = 0x80;   // set when character should be blinked off
+	static constexpr uint8_t AT_NORMAL  = 0x00;
+	static constexpr uint8_t AT_FLASH   = 0x01;
+	static constexpr uint8_t AT_BLANK   = 0x02;
+	static constexpr uint8_t AT_FLASHED = 0x80;   // set when character should be blinked off
 
 	std::unique_ptr<output_finder<16> > m_outputs;
+	std::unique_ptr<output_finder<1> > m_brightness;
 	uint8_t m_port_val;
 
 	int m_cursor_pos = 0;
@@ -55,6 +56,7 @@ private:
 	int m_display_mode = 0;
 	int m_flash_rate = 0;
 	int m_flash_control = 0;
+	int m_duty;
 
 	uint8_t m_cursor = 0;
 	uint16_t m_chars[16]{};
@@ -65,4 +67,4 @@ private:
 
 DECLARE_DEVICE_TYPE(BFM_BDA, bfm_bda_device)
 
-#endif // MAME_MACHINE_BFM_BDA_H
+#endif // MAME_BFM_BFM_BDA_H

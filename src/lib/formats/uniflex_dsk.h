@@ -16,9 +16,9 @@ class uniflex_format : public wd177x_format
 public:
 	uniflex_format();
 
-	virtual const char *name() const override;
-	virtual const char *description() const override;
-	virtual const char *extensions() const override;
+	virtual const char *name() const noexcept override;
+	virtual const char *description() const noexcept override;
+	virtual const char *extensions() const noexcept override;
 	virtual int identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants) const override;
 	virtual int find_size(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants) const override;
 	void build_sector_description(const format &f, uint8_t *sectdata, desc_s *sectors, int track, int head) const override;

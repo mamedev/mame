@@ -12,11 +12,6 @@
 class artmagic_state : public driver_device
 {
 public:
-	enum
-	{
-		TIMER_IRQ_OFF
-	};
-
 	artmagic_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
@@ -36,7 +31,7 @@ public:
 	void artmagic(machine_config &config);
 	void shtstar(machine_config &config);
 	void stonebal(machine_config &config);
-	DECLARE_READ_LINE_MEMBER(prot_r);
+	int prot_r();
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -74,27 +69,28 @@ private:
 	void protection_bit_w(offs_t offset, uint16_t data);
 	uint16_t blitter_r();
 	void blitter_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-	DECLARE_WRITE_LINE_MEMBER(m68k_gen_int);
+	void m68k_gen_int(int state);
 	TMS340X0_TO_SHIFTREG_CB_MEMBER(to_shiftreg);
 	TMS340X0_FROM_SHIFTREG_CB_MEMBER(from_shiftreg);
 	TMS340X0_SCANLINE_RGB32_CB_MEMBER(scanline);
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 	void decrypt_cheesech();
 	void decrypt_ultennis();
 	void execute_blit();
 	void update_irq_state();
 	inline uint16_t *address_to_vram(offs_t *address);
 
-	void main_map(address_map &map);
-	void shtstar_guncpu_io_map(address_map &map);
-	void shtstar_guncpu_map(address_map &map);
-	void shtstar_map(address_map &map);
-	void shtstar_subcpu_map(address_map &map);
-	void stonebal_map(address_map &map);
-	void stonebal_tms_map(address_map &map);
-	void tms_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
+	void shtstar_guncpu_io_map(address_map &map) ATTR_COLD;
+	void shtstar_guncpu_map(address_map &map) ATTR_COLD;
+	void shtstar_map(address_map &map) ATTR_COLD;
+	void shtstar_subcpu_map(address_map &map) ATTR_COLD;
+	void shtstar_subcpu_vector_map(address_map &map) ATTR_COLD;
+	void stonebal_map(address_map &map) ATTR_COLD;
+	void stonebal_tms_map(address_map &map) ATTR_COLD;
+	void tms_map(address_map &map) ATTR_COLD;
 
 protected:
 	TIMER_CALLBACK_MEMBER(irq_off);

@@ -43,12 +43,12 @@ public:
 	uint8_t read();
 	void write(uint8_t data);
 
-	DECLARE_WRITE_LINE_MEMBER( te_w );
-	DECLARE_WRITE_LINE_MEMBER( pe_w );
+	void te_w(int state);
+	void pe_w(int state);
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 private:
 	devcb_read8  m_read;

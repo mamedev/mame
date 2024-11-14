@@ -71,10 +71,6 @@ void gigatron_cpu_device::device_start()
 	save_item(NAME(m_outx));
 	save_item(NAME(m_out));
 
-	m_outx_cb.resolve_safe();
-	m_out_cb.resolve_safe();
-	m_ir_cb.resolve_safe(0);
-
 	reset_cpu();
 }
 
@@ -347,7 +343,7 @@ gigatron_cpu_device::gigatron_cpu_device(const machine_config &mconfig, const ch
 	, m_data_config("data", ENDIANNESS_BIG, 8, 16, 0)
 	, m_outx_cb(*this)
 	, m_out_cb(*this)
-	, m_ir_cb(*this)
+	, m_ir_cb(*this, 0)
 {
 }
 

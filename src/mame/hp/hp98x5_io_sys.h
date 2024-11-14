@@ -8,8 +8,8 @@
 
 *********************************************************************/
 
-#ifndef MAME_MACHINE_HP98X5_IO_SYS_H
-#define MAME_MACHINE_HP98X5_IO_SYS_H
+#ifndef MAME_HP_HP98X5_IO_SYS_H
+#define MAME_HP_HP98X5_IO_SYS_H
 
 #pragma once
 
@@ -20,8 +20,8 @@ public:
 	hp98x5_io_sys_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	auto irl() { return m_irl_handler.bind(); }
 	auto irh() { return m_irh_handler.bind(); }
@@ -64,4 +64,4 @@ private:
 // device type definition
 DECLARE_DEVICE_TYPE(HP98X5_IO_SYS, hp98x5_io_sys_device)
 
-#endif // MAME_MACHINE_HP98X5_IO_SYS_H
+#endif // MAME_HP_HP98X5_IO_SYS_H

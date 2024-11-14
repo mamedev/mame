@@ -7,8 +7,8 @@
     Functions to emulate general the various Midway sound cards.
 
 ***************************************************************************/
-#ifndef MAME_AUDIO_MIDWAY_H
-#define MAME_AUDIO_MIDWAY_H
+#ifndef MAME_MIDWAY_MIDWAY_H
+#define MAME_MIDWAY_MIDWAY_H
 
 #pragma once
 
@@ -54,7 +54,7 @@ public:
 	// read/write
 	uint8_t read();
 	void write(offs_t offset, uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(reset_write);
+	void reset_write(int state);
 	uint8_t ioport_read(offs_t offset);
 	void ioport_write(offs_t offset, uint8_t data);
 
@@ -75,16 +75,16 @@ public:
 	void status_w(uint8_t data);
 	uint8_t data_r(offs_t offset);
 
-	void ssio_map(address_map &map);
-	static void ssio_input_ports(address_map &map, const char *ssio);
+	void ssio_map(address_map &map) ATTR_COLD;
+	static void ssio_input_ports(address_map &map, const char *ssio) ATTR_COLD;
 
 protected:
 	// device-level overrides
-	virtual const tiny_rom_entry *device_rom_region() const override;
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual ioport_constructor device_input_ports() const override;
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	TIMER_CALLBACK_MEMBER(synced_write);
 
@@ -136,14 +136,14 @@ public:
 	// read/write
 	uint8_t read();
 	void write(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(reset_write);
+	void reset_write(int state);
 
-	void soundsgood_map(address_map &map);
+	void soundsgood_map(address_map &map) ATTR_COLD;
 protected:
 	// device-level overrides
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	TIMER_CALLBACK_MEMBER(synced_write);
 
@@ -161,7 +161,7 @@ private:
 	// internal communications
 	void porta_w(uint8_t data);
 	void portb_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(irq_w);
+	void irq_w(int state);
 };
 
 
@@ -177,14 +177,14 @@ public:
 	// read/write
 	uint8_t read();
 	void write(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(reset_write);
+	void reset_write(int state);
 
-	void turbocs_map(address_map &map);
+	void turbocs_map(address_map &map) ATTR_COLD;
 protected:
 	// device-level overrides
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	TIMER_CALLBACK_MEMBER(synced_write);
 
@@ -202,7 +202,7 @@ private:
 	// internal communications
 	void porta_w(uint8_t data);
 	void portb_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(irq_w);
+	void irq_w(int state);
 };
 
-#endif // MAME_AUDIO_MIDWAY_H
+#endif // MAME_MIDWAY_MIDWAY_H

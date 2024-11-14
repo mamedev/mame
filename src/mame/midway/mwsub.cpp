@@ -18,6 +18,8 @@ TODO:
 #include "submar.lh"
 
 
+namespace {
+
 class submar_state : public driver_device
 {
 public:
@@ -33,7 +35,7 @@ public:
 	void submar(machine_config &config);
 
 private:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 	uint8_t submar_sensor0_r();
 	uint8_t submar_sensor1_r();
@@ -44,8 +46,8 @@ private:
 	void submar_led_w(offs_t offset, uint8_t data);
 	void submar_irq_clear_w(uint8_t data);
 
-	void submar_map(address_map &map);
-	void submar_portmap(address_map &map);
+	void submar_map(address_map &map) ATTR_COLD;
+	void submar_portmap(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	output_finder<8> m_motors;
@@ -251,6 +253,8 @@ ROM_START( submar )
 	ROM_LOAD( "sub.a1", 0x0000, 0x0800, CRC(bcef5db4) SHA1(8ae5099672fbdb7bcdc617e1f8cbc5435fbb738a) )
 	ROM_LOAD( "sub.a2", 0x0800, 0x0800, CRC(f5780dd0) SHA1(f775dd6f64a730a2fb6c9baf5787698434150bc5) )
 ROM_END
+
+} // anonymous namespace
 
 
 GAMEL( 1979, submar, 0, submar, submar, submar_state, empty_init, ROT0, "Midway", "Submarine (Midway)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL, layout_submar )

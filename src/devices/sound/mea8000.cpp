@@ -130,8 +130,6 @@ mea8000_device::mea8000_device(const machine_config &mconfig, const char *tag, d
 
 void mea8000_device::device_start()
 {
-	m_write_req.resolve_safe();
-
 	init_tables();
 
 	m_stream = stream_alloc(0, 1, clock() / 60);

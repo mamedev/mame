@@ -7,8 +7,8 @@
     Original driver by Norbert Kehrer (February 2004)
 
 ***************************************************************************/
-#ifndef MAME_INCLUDES_MADALIEN_H
-#define MAME_INCLUDES_MADALIEN_H
+#ifndef MAME_DATAEAST_MADALIEN_H
+#define MAME_DATAEAST_MADALIEN_H
 
 #pragma once
 
@@ -51,7 +51,7 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
 
 protected:
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	required_shared_ptr<uint8_t> m_videoram;
@@ -97,8 +97,8 @@ private:
 	required_device<palette_device> m_palette;
 	required_device<generic_latch_8_device> m_soundlatch;
 	required_device<generic_latch_8_device> m_soundlatch2;
-	void audio_map(address_map &map);
-	void main_map(address_map &map);
+	void audio_map(address_map &map) ATTR_COLD;
+	void main_map(address_map &map) ATTR_COLD;
 };
 
 /*----------- defined in audio/madalien.c -----------*/
@@ -109,4 +109,4 @@ DISCRETE_SOUND_EXTERN( madalien_discrete );
 #define MADALIEN_8910_PORTA         NODE_01
 #define MADALIEN_8910_PORTB         NODE_02
 
-#endif // MAME_INCLUDES_MADALIEN_H
+#endif // MAME_DATAEAST_MADALIEN_H

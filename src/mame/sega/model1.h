@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Olivier Galibert
-#ifndef MAME_INCLUDES_MODEL1_H
-#define MAME_INCLUDES_MODEL1_H
+#ifndef MAME_SEGA_MODEL1_H
+#define MAME_SEGA_MODEL1_H
 
 #pragma once
 
@@ -35,7 +35,7 @@ public:
 		, m_m1audio(*this, M1AUDIO_TAG)
 		, m_m1uart(*this, "m1uart")
 		, m_m1comm(*this, "m1comm")
-		, m_dsbz80(*this, DSBZ80_TAG)
+		, m_dsbz80(*this, "dsbz80")
 		, m_tgp_copro(*this, "tgp_copro")
 		, m_screen(*this, "screen")
 		, m_copro_fifo_in(*this, "copro_fifo_in")
@@ -96,8 +96,8 @@ public:
 
 private:
 	// Machine
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	void bank_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 
@@ -143,12 +143,12 @@ private:
 	void r360_w(uint8_t data);
 
 	// Rendering
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 	u16 model1_listctl_r(offs_t offset);
 	void model1_listctl_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 
 	uint32_t screen_update_model1(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	DECLARE_WRITE_LINE_MEMBER(screen_vblank_model1);
+	void screen_vblank_model1(int state);
 
 	struct lightparam_t
 	{
@@ -193,17 +193,17 @@ private:
 		lightparam_t lightparams[32];
 	};
 
-	void model1_io(address_map &map);
-	void model1_mem(address_map &map);
-	void model1_comm_mem(address_map &map);
+	void model1_io(address_map &map) ATTR_COLD;
+	void model1_mem(address_map &map) ATTR_COLD;
+	void model1_comm_mem(address_map &map) ATTR_COLD;
 
-	void copro_prog_map(address_map &map);
-	void copro_data_map(address_map &map);
-	void copro_external_map(address_map &map);
-	void copro_io_map(address_map &map);
-	void copro_rf_map(address_map &map);
+	void copro_prog_map(address_map &map) ATTR_COLD;
+	void copro_data_map(address_map &map) ATTR_COLD;
+	void copro_external_map(address_map &map) ATTR_COLD;
+	void copro_io_map(address_map &map) ATTR_COLD;
+	void copro_rf_map(address_map &map) ATTR_COLD;
 
-	void polhemus_map(address_map &map);
+	void polhemus_map(address_map &map) ATTR_COLD;
 
 	// Machine
 	void irq_raise(int level);
@@ -353,4 +353,4 @@ private:
 	void drive_board_w(uint8_t data);
 };
 
-#endif // MAME_INCLUDES_MODEL1_H
+#endif // MAME_SEGA_MODEL1_H

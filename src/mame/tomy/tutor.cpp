@@ -205,8 +205,8 @@ public:
 	void tutor(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	required_device<tms9995_device> m_maincpu;
@@ -235,12 +235,12 @@ private:
 	uint8_t tutor_highmem_r(offs_t offset);
 	TIMER_CALLBACK_MEMBER(tape_interrupt_handler);
 
-	DECLARE_WRITE_LINE_MEMBER(write_centronics_busy);
+	void write_centronics_busy(int state);
 	[[maybe_unused]] void test_w(offs_t offset, uint8_t data);
 
-	void pyuutajr_mem(address_map &map);
-	void tutor_io(address_map &map);
-	void tutor_memmap(address_map &map);
+	void pyuutajr_mem(address_map &map) ATTR_COLD;
+	void tutor_io(address_map &map) ATTR_COLD;
+	void tutor_memmap(address_map &map) ATTR_COLD;
 };
 
 
@@ -467,7 +467,7 @@ void tutor_state::tutor_cassette_w(offs_t offset, uint8_t data)
 	}
 }
 
-WRITE_LINE_MEMBER( tutor_state::write_centronics_busy )
+void tutor_state::write_centronics_busy(int state)
 {
 	m_centronics_busy = state;
 }
@@ -740,10 +740,10 @@ static INPUT_PORTS_START(pyuutajr)
 		PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_UNUSED)
 		PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Left") PORT_CODE(KEYCODE_COMMA)
 		PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Right") PORT_CODE(KEYCODE_STOP)
-		PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME(UTF8_LEFT) PORT_CODE(KEYCODE_LEFT)
-		PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME(UTF8_UP) PORT_CODE(KEYCODE_UP)
-		PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME(UTF8_DOWN) PORT_CODE(KEYCODE_DOWN)
-		PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME(UTF8_RIGHT) PORT_CODE(KEYCODE_RIGHT)
+		PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME(u8"\u2190") PORT_CODE(KEYCODE_LEFT)  // ←
+		PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME(u8"\u2191") PORT_CODE(KEYCODE_UP)    // ↑
+		PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME(u8"\u2193") PORT_CODE(KEYCODE_DOWN)  // ↓
+		PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME(u8"\u2192") PORT_CODE(KEYCODE_RIGHT) // →
 
 	PORT_START("LINE3")
 		PORT_BIT(0xff, IP_ACTIVE_HIGH, IPT_UNUSED)

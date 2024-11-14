@@ -78,16 +78,20 @@ PROM  : Type MB7051
 **************************************************************************/
 
 #include "emu.h"
-#include "machine/74259.h"
+
 #include "alpha8201.h"
+
+#include "machine/74259.h"
 #include "machine/watchdog.h"
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
 #include "video/resnet.h"
+
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
+namespace {
 
 class shougi_state : public driver_device
 {
@@ -97,13 +101,16 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_subcpu(*this, "sub"),
 		m_alpha_8201(*this, "alpha_8201"),
+		m_p1(*this, "P1"),
+		m_p2(*this, "P2"),
+		m_dsw(*this, "DSW"),
 		m_videoram(*this, "videoram")
 	{ }
 
 	void shougi(machine_config &config);
 
 private:
-	DECLARE_WRITE_LINE_MEMBER(nmi_enable_w);
+	void nmi_enable_w(int state);
 	uint8_t semaphore_r();
 
 	void shougi_palette(palette_device &palette) const;
@@ -111,15 +118,16 @@ private:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(vblank_nmi);
 
-	virtual void machine_start() override;
-	void main_map(address_map &map);
-	void readport_sub(address_map &map);
-	void sub_map(address_map &map);
+	virtual void machine_start() override ATTR_COLD;
+	void main_map(address_map &map) ATTR_COLD;
+	void readport_sub(address_map &map) ATTR_COLD;
+	void sub_map(address_map &map) ATTR_COLD;
 
 	// devices/pointers
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_subcpu;
 	required_device<alpha_8201_device> m_alpha_8201;
+	required_ioport m_p1, m_p2, m_dsw;
 
 	required_shared_ptr<uint8_t> m_videoram;
 
@@ -127,13 +135,8 @@ private:
 	int m_r = 0;
 };
 
-
 void shougi_state::machine_start()
 {
-	// zerofill
-	m_nmi_enabled = 0;
-	m_r = 0;
-
 	// register for savestates
 	save_item(NAME(m_nmi_enabled));
 	save_item(NAME(m_r));
@@ -234,7 +237,7 @@ uint32_t shougi_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 
 // maincpu side
 
-WRITE_LINE_MEMBER(shougi_state::nmi_enable_w)
+void shougi_state::nmi_enable_w(int state)
 {
 	m_nmi_enabled = state;
 
@@ -246,15 +249,24 @@ WRITE_LINE_MEMBER(shougi_state::nmi_enable_w)
 	}
 }
 
+INTERRUPT_GEN_MEMBER(shougi_state::vblank_nmi)
+{
+	if (m_nmi_enabled)
+	{
+		m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
+		m_subcpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
+	}
+}
+
 
 void shougi_state::main_map(address_map &map)
 {
 	map(0x0000, 0x3fff).rom();
 	map(0x4000, 0x43ff).ram(); /* 2114 x 2 (0x400 x 4bit each) */
 	map(0x4800, 0x480f).w("mainlatch", FUNC(ls259_device::write_a3));
-	map(0x4800, 0x4800).portr("DSW");
-	map(0x5000, 0x5000).portr("P1");
-	map(0x5800, 0x5800).portr("P2").w("watchdog", FUNC(watchdog_timer_device::reset_w)); /* game won't boot if watchdog doesn't work */
+	map(0x4800, 0x4800).portr(m_dsw);
+	map(0x5000, 0x5000).portr(m_p1);
+	map(0x5800, 0x5800).portr(m_p2).w("watchdog", FUNC(watchdog_timer_device::reset_w)); /* game won't boot if watchdog doesn't work */
 	map(0x6000, 0x6000).w("aysnd", FUNC(ay8910_device::address_w));
 	map(0x6800, 0x6800).w("aysnd", FUNC(ay8910_device::data_w));
 	map(0x7000, 0x73ff).rw(m_alpha_8201, FUNC(alpha_8201_device::ext_ram_r), FUNC(alpha_8201_device::ext_ram_w));
@@ -360,16 +372,6 @@ INPUT_PORTS_END
 
 ***************************************************************************/
 
-INTERRUPT_GEN_MEMBER(shougi_state::vblank_nmi)
-{
-	if (m_nmi_enabled)
-	{
-		m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
-		m_subcpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
-	}
-}
-
-
 void shougi_state::shougi(machine_config &config)
 {
 	/* basic machine hardware */
@@ -464,6 +466,8 @@ ROM_START( shougi2 )
 	ROM_REGION( 0x0020, "proms", 0 )
 	ROM_LOAD( "pr.2l",   0x0000, 0x0020, CRC(cd3559ff) SHA1(a1291b06a8a337943660b2ef62c94c49d58a6fb5) )
 ROM_END
+
+} // anonymous namespace
 
 
 /*    YEAR  NAME     PARENT  MACHINE  INPUT    STATE         INIT        MONITOR  COMPANY                              FULLNAME          FLAGS */

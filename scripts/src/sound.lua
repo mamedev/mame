@@ -112,7 +112,6 @@ if (SOUNDS["AC97"]~=null) then
 end
 
 
-
 ---------------------------------------------------
 -- Apple custom sound chips
 --@src/devices/sound/asc.h,SOUNDS["ASC"] = true
@@ -237,20 +236,6 @@ if (SOUNDS["ES1373"]~=null) then
 end
 
 ---------------------------------------------------
--- Data East custom sound chips
---@src/devices/sound/bsmt2000.h,SOUNDS["BSMT2000"] = true
----------------------------------------------------
-
-if (SOUNDS["BSMT2000"]~=null) then
-	files {
-		MAME_DIR .. "src/devices/sound/bsmt2000.cpp",
-		MAME_DIR .. "src/devices/sound/bsmt2000.h",
-	}
-end
-
-
-
----------------------------------------------------
 -- Ensoniq 5503 (Apple IIgs)
 --@src/devices/sound/es5503.h,SOUNDS["ES5503"] = true
 ---------------------------------------------------
@@ -261,7 +246,6 @@ if (SOUNDS["ES5503"]~=null) then
 		MAME_DIR .. "src/devices/sound/es5503.h",
 	}
 end
-
 
 
 ---------------------------------------------------
@@ -288,6 +272,20 @@ if (SOUNDS["ESQPUMP"]~=null) then
 		MAME_DIR .. "src/devices/sound/esqpump.h",
 	}
 end
+
+
+---------------------------------------------------
+-- Data East custom sound chips
+--@src/devices/sound/bsmt2000.h,SOUNDS["BSMT2000"] = true
+---------------------------------------------------
+
+if (SOUNDS["BSMT2000"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/sound/bsmt2000.cpp",
+		MAME_DIR .. "src/devices/sound/bsmt2000.h",
+	}
+end
+
 
 
 ---------------------------------------------------
@@ -552,6 +550,20 @@ end
 
 
 ---------------------------------------------------
+-- Micronas DAC 3550A Stereo Audio DAC
+--@src/devices/sound/dac3350a.h,SOUNDS["DAC3350A"] = true
+---------------------------------------------------
+
+if (SOUNDS["DAC3350A"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/sound/dac3350a.cpp",
+		MAME_DIR .. "src/devices/sound/dac3350a.h",
+	}
+end
+
+
+
+---------------------------------------------------
 -- MEA8000 Voice Synthesizer
 --@src/devices/sound/mea8000.h,SOUNDS["MEA8000"] = true
 ---------------------------------------------------
@@ -687,17 +699,32 @@ end
 
 
 ---------------------------------------------------
+-- IMA ADPCM sample player
+--@src/devices/sound/imaadpcm.h,SOUNDS["IMAADPCM"] = true
+---------------------------------------------------
+
+if (SOUNDS["IMAADPCM"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/sound/imaadpcm.cpp",
+		MAME_DIR .. "src/devices/sound/imaadpcm.h",
+	}
+end
+
+
+
+---------------------------------------------------
 -- OKI ADPCM sample players
 --@src/devices/sound/okim6258.h,SOUNDS["OKIM6258"] = true
 --@src/devices/sound/msm5205.h,SOUNDS["MSM5205"] = true
 --@src/devices/sound/msm5232.h,SOUNDS["MSM5232"] = true
 --@src/devices/sound/okim6376.h,SOUNDS["OKIM6376"] = true
 --@src/devices/sound/okim6295.h,SOUNDS["OKIM6295"] = true
+--@src/devices/sound/okim6588.h,SOUNDS["OKIM6588"] = true
 --@src/devices/sound/okim9810.h,SOUNDS["OKIM9810"] = true
 --@src/devices/sound/okiadpcm.h,SOUNDS["OKIADPCM"] = true
 ---------------------------------------------------
 
-if (SOUNDS["OKIM6258"]~=null or SOUNDS["OKIM6295"]~=null or SOUNDS["OKIM9810"]~=null or SOUNDS["I5000_SND"]~=null or SOUNDS["OKIADPCM"]~=null) then
+if (SOUNDS["OKIM6258"]~=null or SOUNDS["OKIM6295"]~=null or SOUNDS["OKIM6588"]~=null or SOUNDS["OKIM9810"]~=null or SOUNDS["I5000_SND"]~=null or SOUNDS["OKIADPCM"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/sound/okiadpcm.cpp",
 		MAME_DIR .. "src/devices/sound/okiadpcm.h",
@@ -736,6 +763,13 @@ if (SOUNDS["OKIM6258"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/sound/okim6258.cpp",
 		MAME_DIR .. "src/devices/sound/okim6258.h",
+	}
+end
+
+if (SOUNDS["OKIM6588"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/sound/okim6588.cpp",
+		MAME_DIR .. "src/devices/sound/okim6588.h",
 	}
 end
 
@@ -817,7 +851,6 @@ end
 ---------------------------------------------------
 -- Sega custom sound chips
 --@src/devices/sound/segapcm.h,SOUNDS["SEGAPCM"] = true
---@src/devices/sound/multipcm.h,SOUNDS["MULTIPCM"] = true
 --@src/devices/sound/scsp.h,SOUNDS["SCSP"] = true
 --@src/devices/sound/aica.h,SOUNDS["AICA"] = true
 ---------------------------------------------------
@@ -826,13 +859,6 @@ if (SOUNDS["SEGAPCM"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/sound/segapcm.cpp",
 		MAME_DIR .. "src/devices/sound/segapcm.h",
-	}
-end
-
-if (SOUNDS["MULTIPCM"]~=null) then
-	files {
-		MAME_DIR .. "src/devices/sound/multipcm.cpp",
-		MAME_DIR .. "src/devices/sound/multipcm.h",
 	}
 end
 
@@ -977,6 +1003,18 @@ if (SOUNDS["SP0250"]~=null) then
 end
 
 
+---------------------------------------------------
+-- ST-Techno custom sound chip
+--@src/devices/sound/stt_sa1.h,SOUNDS["STT_SA1"] = true
+---------------------------------------------------
+
+if (SOUNDS["STT_SA1"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/sound/stt_sa1.cpp",
+		MAME_DIR .. "src/devices/sound/stt_sa1.h",
+	}
+end
+
 
 ---------------------------------------------------
 -- S14001A speech synthesizer
@@ -1015,6 +1053,20 @@ if (SOUNDS["SN76496"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/sound/sn76496.cpp",
 		MAME_DIR .. "src/devices/sound/sn76496.h",
+	}
+end
+
+
+
+---------------------------------------------------
+-- Silicon Systems SSI-263A HLE
+--@src/devices/sound/ssi263hle.h,SOUNDS["SSI263HLE"] = true
+---------------------------------------------------
+
+if (SOUNDS["SSI263HLE"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/sound/ssi263hle.cpp",
+		MAME_DIR .. "src/devices/sound/ssi263hle.h",
 	}
 end
 
@@ -1130,11 +1182,12 @@ if (SOUNDS["VLM5030"]~=null) then
 end
 
 ---------------------------------------------------
--- Votrax speech synthesizer
---@src/devices/sound/votrax.h,SOUNDS["VOTRAX"] = true
+-- Votrax SC-01[-A] speech synthesizer
+--@src/devices/sound/votrax.h,SOUNDS["VOTRAX_SC01"] = true
+--@src/devices/sound/votrax.h,SOUNDS["VOTRAX_SC01A"] = true
 ---------------------------------------------------
 
-if (SOUNDS["VOTRAX"]~=null) then
+if (SOUNDS["VOTRAX_SC01"]~=null or SOUNDS["VOTRAX_SC01A"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/sound/votrax.cpp",
 		MAME_DIR .. "src/devices/sound/votrax.h",
@@ -1268,6 +1321,45 @@ if (SOUNDS["YMZ770"]~=null) then
 end
 
 ---------------------------------------------------
+-- Yamaha GEW series PCM
+--@src/devices/sound/gew7.h,SOUNDS["GEW7"] = true
+--@src/devices/sound/multipcm.h,SOUNDS["MULTIPCM"] = true
+---------------------------------------------------
+
+if (SOUNDS["GEW7"]~=null or SOUNDS["MULTIPCM"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/sound/gew.cpp",
+		MAME_DIR .. "src/devices/sound/gew.h",
+	}
+end
+
+if (SOUNDS["GEW7"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/sound/gew7.cpp",
+		MAME_DIR .. "src/devices/sound/gew7.h",
+	}
+end
+
+if (SOUNDS["MULTIPCM"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/sound/multipcm.cpp",
+		MAME_DIR .. "src/devices/sound/multipcm.h",
+	}
+end
+
+---------------------------------------------------
+-- MP3 AUDIO
+--@src/devices/sound/mp3_audio.h,SOUNDS["MP3_AUDIO"] = true
+---------------------------------------------------
+
+if (SOUNDS["MP3_AUDIO"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/sound/mp3_audio.cpp",
+		MAME_DIR .. "src/devices/sound/mp3_audio.h",
+	}
+end
+
+---------------------------------------------------
 -- MPEG AUDIO
 --@src/devices/sound/mpeg_audio.h,SOUNDS["MPEG_AUDIO"] = true
 ---------------------------------------------------
@@ -1375,18 +1467,6 @@ if (SOUNDS["MM5837"]~=null) then
 end
 
 ---------------------------------------------------
--- Intelligent Designs DAVE
---@src/devices/sound/dave.h,SOUNDS["DAVE"] = true
----------------------------------------------------
-
-if (SOUNDS["DAVE"]~=null) then
-	files {
-		MAME_DIR .. "src/devices/sound/dave.cpp",
-		MAME_DIR .. "src/devices/sound/dave.h",
-	}
-end
-
----------------------------------------------------
 -- Toshiba TA7630
 --@src/devices/sound/ta7630.h,SOUNDS["TA7630"] = true
 ---------------------------------------------------
@@ -1407,6 +1487,42 @@ if (SOUNDS["LC7535"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/sound/lc7535.cpp",
 		MAME_DIR .. "src/devices/sound/lc7535.h",
+	}
+end
+
+---------------------------------------------------
+-- Sanyo LC78836M
+--@src/devices/sound/lc78836m.h,SOUNDS["LC78836M"] = true
+---------------------------------------------------
+
+if (SOUNDS["LC78836M"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/sound/lc78836m.cpp",
+		MAME_DIR .. "src/devices/sound/lc78836m.h",
+	}
+end
+
+---------------------------------------------------
+-- Sanyo LC82310
+--@src/devices/sound/lc82310.h,SOUNDS["LC82310"] = true
+---------------------------------------------------
+
+if (SOUNDS["LC82310"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/sound/lc82310.cpp",
+		MAME_DIR .. "src/devices/sound/lc82310.h",
+	}
+end
+
+---------------------------------------------------
+-- NEC uPD933
+--@src/devices/sound/upd933.h,SOUNDS["UPD933"] = true
+---------------------------------------------------
+
+if (SOUNDS["UPD933"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/sound/upd933.cpp",
+		MAME_DIR .. "src/devices/sound/upd933.h",
 	}
 end
 
@@ -1460,13 +1576,25 @@ end
 
 ---------------------------------------------------
 --
---@src/devices/sound/swp30.h,SOUNDS["SWP30"] = true
+--@src/devices/sound/swx00.h,SOUNDS["SWX00"] = true
 ---------------------------------------------------
 
-if (SOUNDS["SWP30"]~=null) then
+if (SOUNDS["SWX00"]~=null) then
 	files {
-		MAME_DIR .. "src/devices/sound/swp30.cpp",
-		MAME_DIR .. "src/devices/sound/swp30.h",
+		MAME_DIR .. "src/devices/sound/swx00.cpp",
+		MAME_DIR .. "src/devices/sound/swx00.h",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/devices/sound/meg.h,SOUNDS["MEG"] = true
+---------------------------------------------------
+
+if (SOUNDS["MEG"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/sound/meg.cpp",
+		MAME_DIR .. "src/devices/sound/meg.h",
 	}
 end
 
@@ -1483,14 +1611,26 @@ if (SOUNDS["XT446"]~=null) then
 end
 
 ---------------------------------------------------
--- Roland sample players
---@src/devices/sound/rolandpcm.h,SOUNDS["ROLANDPCM"] = true
+-- Roland GP-based sample players
+--@src/devices/sound/roland_gp.h,SOUNDS["ROLANDGP"] = true
 ---------------------------------------------------
 
-if (SOUNDS["ROLANDPCM"]~=null) then
+if (SOUNDS["ROLANDGP"]~=null) then
 	files {
-		MAME_DIR .. "src/devices/sound/rolandpcm.cpp",
-		MAME_DIR .. "src/devices/sound/rolandpcm.h",
+		MAME_DIR .. "src/devices/sound/roland_gp.cpp",
+		MAME_DIR .. "src/devices/sound/roland_gp.h",
+	}
+end
+
+---------------------------------------------------
+-- Roland LP-based sample players
+--@src/devices/sound/roland_lp.h,SOUNDS["ROLANDLP"] = true
+---------------------------------------------------
+
+if (SOUNDS["ROLANDLP"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/sound/roland_lp.cpp",
+		MAME_DIR .. "src/devices/sound/roland_lp.h",
 	}
 end
 
@@ -1575,5 +1715,53 @@ if (SOUNDS["LYNX"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/sound/lynx.cpp",
 		MAME_DIR .. "src/devices/sound/lynx.h",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/devices/sound/nn71003f.h,SOUNDS["NN71003F"] = true
+---------------------------------------------------
+
+if (SOUNDS["NN71003F"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/sound/nn71003f.cpp",
+		MAME_DIR .. "src/devices/sound/nn71003f.h",
+	}
+end
+
+---------------------------------------------------
+-- AP2010
+--@src/devices/sound/ap2010pcm.h,SOUNDS["AP2010"] = true
+---------------------------------------------------
+
+if (SOUNDS["AP2010"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/sound/ap2010pcm.cpp",
+		MAME_DIR .. "src/devices/sound/ap2010pcm.h",
+	}
+end
+
+---------------------------------------------------
+-- Texas Instruments CF61909
+--@src/devices/sound/cf61909.h,SOUNDS["CF61909"] = true
+---------------------------------------------------
+
+if (SOUNDS["CF61909"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/sound/cf61909.cpp",
+		MAME_DIR .. "src/devices/sound/cf61909.h",
+	}
+end
+
+---------------------------------------------------
+-- NEC uPD65043GF-U01
+--@src/devices/sound/upd65043gfu01.h,SOUNDS["UPD65043GFU01"] = true
+---------------------------------------------------
+
+if (SOUNDS["UPD65043GFU01"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/sound/upd65043gfu01.cpp",
+		MAME_DIR .. "src/devices/sound/upd65043gfu01.h",
 	}
 end

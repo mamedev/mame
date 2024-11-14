@@ -11,8 +11,8 @@
 
 **********************************************************************/
 
-#ifndef MAME_VIDEO_WSWAN_H
-#define MAME_VIDEO_WSWAN_H
+#ifndef MAME_BANDAI_WSWAN_V_H
+#define MAME_BANDAI_WSWAN_V_H
 
 #pragma once
 
@@ -50,8 +50,8 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	void setup_palettes();
 	void draw_background();
@@ -62,7 +62,6 @@ protected:
 	void refresh_scanline();
 	TIMER_CALLBACK_MEMBER(scanline_interrupt);
 	void common_save();
-	u16 swap_bytes(u16 word);
 
 	bitmap_ind16 m_bitmap;
 	u8 m_layer_bg_enable;          // Background layer on/off
@@ -135,4 +134,4 @@ protected:
 DECLARE_DEVICE_TYPE(WSWAN_VIDEO, wswan_video_device)
 
 
-#endif // MAME_VIDEO_WSWAN_H
+#endif // MAME_BANDAI_WSWAN_V_H

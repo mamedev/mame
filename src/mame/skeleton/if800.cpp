@@ -15,6 +15,8 @@
 #include "screen.h"
 
 
+namespace {
+
 class if800_state : public driver_device
 {
 public:
@@ -31,14 +33,14 @@ private:
 	required_device<upd7220_device> m_hgdc;
 
 	required_shared_ptr<uint16_t> m_video_ram;
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 	required_device<cpu_device> m_maincpu;
 	required_device<palette_device> m_palette;
 	UPD7220_DISPLAY_PIXELS_MEMBER( hgdc_display_pixels );
-	void if800_io(address_map &map);
-	void if800_map(address_map &map);
-	void upd7220_map(address_map &map);
+	void if800_io(address_map &map) ATTR_COLD;
+	void if800_map(address_map &map) ATTR_COLD;
+	void upd7220_map(address_map &map) ATTR_COLD;
 };
 
 UPD7220_DISPLAY_PIXELS_MEMBER( if800_state::hgdc_display_pixels )
@@ -96,7 +98,7 @@ void if800_state::if800(machine_config &config)
 
 
 //  PIC8259(config, "pic8259", 0);
-	UPD7220(config, m_hgdc, 8000000/4);
+	UPD7220(config, m_hgdc, 8000000 / 2);
 	m_hgdc->set_addrmap(0, &if800_state::upd7220_map);
 	m_hgdc->set_display_pixels(FUNC(if800_state::hgdc_display_pixels));
 
@@ -118,6 +120,9 @@ ROM_START( if800 )
 	ROM_REGION16_LE( 0x2000, "ipl", ROMREGION_ERASEFF )
 	ROM_LOAD( "ipl.rom", 0x0000, 0x2000, CRC(36212491) SHA1(6eaa8885e2dccb6dd86def6c0c9be1870cee957f))
 ROM_END
+
+} // anonymous namespace
+
 
 /* Driver */
 

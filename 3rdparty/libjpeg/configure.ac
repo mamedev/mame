@@ -5,7 +5,7 @@
 # Configure script for IJG libjpeg
 #
 
-AC_INIT([libjpeg], [9.2.0])
+AC_INIT([libjpeg], [9.5.0])
 
 # Directory where autotools helper scripts lives.
 AC_CONFIG_AUX_DIR([.])
@@ -35,11 +35,11 @@ AM_MAINTAINER_MODE
 
 # Check for programs
 AC_PROG_CC
-AC_PROG_CC_STDC
 AC_PROG_CPP
 AC_PROG_INSTALL
 AC_PROG_MAKE_SET
 AC_PROG_LN_S
+AC_PROG_EGREP
 AM_PROG_AR
 
 # Check if LD supports linker scripts,
@@ -84,8 +84,8 @@ int testfunction (int arg1, int * arg2) /* check definitions */
 int test2function (void)	/* check void arg list */
 { return 0; }
 ]])],
-          [ijg_cv_have_prototypes=yes],
-          [ijg_cv_have_prototypes=no])])
+        [ijg_cv_have_prototypes=yes],
+        [ijg_cv_have_prototypes=no])])
 AC_MSG_RESULT([$ijg_cv_have_prototypes])
 if test $ijg_cv_have_prototypes = yes; then
   AC_DEFINE([HAVE_PROTOTYPES],[1],[Compiler supports function prototypes.])
@@ -106,7 +106,7 @@ AC_CHECK_HEADER([string.h], [],
 # See whether type size_t is defined in any ANSI-standard places;
 # if not, perhaps it is defined in <sys/types.h>.
 AC_MSG_CHECKING([for size_t])
-AC_TRY_COMPILE([
+AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[
 #ifdef HAVE_STDDEF_H
 #include <stddef.h>
 #endif
@@ -120,10 +120,9 @@ AC_TRY_COMPILE([
 #include <string.h>
 #endif
 typedef size_t my_size_t;
-],
-      [ my_size_t foovar; ],
-      [ijg_size_t_ok=yes],
-      [ijg_size_t_ok="not ANSI, perhaps it is in sys/types.h"])
+]], [[ my_size_t foovar; ]])],
+     [ijg_size_t_ok=yes],
+     [ijg_size_t_ok="not ANSI, perhaps it is in sys/types.h"])
 AC_MSG_RESULT([$ijg_size_t_ok])
 if test "$ijg_size_t_ok" != yes; then
   AC_CHECK_HEADER([sys/types.h],
@@ -142,21 +141,21 @@ fi
 
 # Check compiler characteristics
 AC_MSG_CHECKING([for type unsigned char])
-AC_TRY_COMPILE([], [ unsigned char un_char; ],
- [AC_MSG_RESULT(yes)
-  AC_DEFINE([HAVE_UNSIGNED_CHAR], [1],
-            [Compiler supports 'unsigned char'.])],
- [AC_MSG_RESULT(no)])
+AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[]], [[ unsigned char un_char; ]])],
+  [AC_MSG_RESULT(yes)
+   AC_DEFINE([HAVE_UNSIGNED_CHAR], [1],
+             [Compiler supports 'unsigned char'.])],
+  [AC_MSG_RESULT(no)])
 
 AC_MSG_CHECKING([for type unsigned short])
-AC_TRY_COMPILE([], [ unsigned short un_short; ],
+AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[]], [[ unsigned short un_short; ]])],
   [AC_MSG_RESULT(yes)
    AC_DEFINE([HAVE_UNSIGNED_SHORT], [1],
              [Compiler supports 'unsigned short'.])],
   [AC_MSG_RESULT(no)])
 
 AC_MSG_CHECKING([for type void])
-AC_TRY_COMPILE([
+AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[
 /* Caution: a C++ compiler will insist on valid prototypes */
 typedef void * void_ptr;	/* check void * */
 #ifdef HAVE_PROTOTYPES		/* check ptr to function returning void */
@@ -177,7 +176,7 @@ void test3function (arg1, arg2)
   arg1 = (void *) locptr;
   (*arg2) (1, 2);		/* check call of fcn returning void */
 }
-], [ ],
+]], [[ ]])],
         [AC_MSG_RESULT(yes)],
         [AC_MSG_RESULT(no)
          AC_DEFINE([void], [char],
@@ -188,41 +187,42 @@ AC_C_CONST
 # Check for non-broken inline under various spellings
 AC_MSG_CHECKING([for inline])
 ijg_cv_inline=""
-AC_TRY_COMPILE([], [} __inline__ int foo() { return 0; }
-int bar() { return foo();], ijg_cv_inline="__inline__",
-[AC_TRY_COMPILE(, [} __inline int foo() { return 0; }
-int bar() { return foo();], ijg_cv_inline="__inline",
-[AC_TRY_COMPILE(, [} inline int foo() { return 0; }
-int bar() { return foo();], ijg_cv_inline="inline")])])
+AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[]], [[} __inline__ int foo() { return 0; }
+int bar() { return foo();]])], ijg_cv_inline="__inline__",
+[AC_COMPILE_IFELSE([AC_LANG_PROGRAM(, [[} __inline int foo() { return 0; }
+int bar() { return foo();]])], ijg_cv_inline="__inline",
+[AC_COMPILE_IFELSE([AC_LANG_PROGRAM(, [[} inline int foo() { return 0; }
+int bar() { return foo();]])], ijg_cv_inline="inline")])])
 AC_MSG_RESULT($ijg_cv_inline)
 AC_DEFINE_UNQUOTED([INLINE], [$ijg_cv_inline],
                    [How to obtain function inlining.])
 
 # We cannot check for bogus warnings, but at least we can check for errors
 AC_MSG_CHECKING([for broken incomplete types])
-AC_TRY_COMPILE([ typedef struct undefined_structure * undef_struct_ptr; ],
-               [],
-               [AC_MSG_RESULT(ok)],
-               [AC_MSG_RESULT(broken)
-                AC_DEFINE([INCOMPLETE_TYPES_BROKEN], [1],
-                          [Compiler does not support pointers to unspecified
-                           structures.])])
+AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[
+typedef struct undefined_structure * undef_struct_ptr;
+]], [[]])],
+        [AC_MSG_RESULT(ok)],
+        [AC_MSG_RESULT(broken)
+         AC_DEFINE([INCOMPLETE_TYPES_BROKEN], [1],
+                   [Compiler does not support pointers to unspecified
+                    structures.])])
 
 # Test whether global names are unique to at least 15 chars
 AC_MSG_CHECKING([for short external names])
-AC_TRY_LINK([
+AC_LINK_IFELSE([AC_LANG_PROGRAM([[
 int possibly_duplicate_function () { return 0; }
 int possibly_dupli_function () { return 1; }
-], [],
-            [AC_MSG_RESULT(ok)],
-            [AC_MSG_RESULT(short)
-             AC_DEFINE([NEED_SHORT_EXTERNAL_NAMES], [1],
-                       [Linker requires that global names be unique in
-                        first 15 characters.])])
+]], [[]])],
+        [AC_MSG_RESULT(ok)],
+        [AC_MSG_RESULT(short)
+         AC_DEFINE([NEED_SHORT_EXTERNAL_NAMES], [1],
+                   [Linker requires that global names be unique in
+                    first 15 characters.])])
 
 # Run-time checks
 AC_MSG_CHECKING([to see if char is signed])
-AC_TRY_RUN([
+AC_RUN_IFELSE([AC_LANG_SOURCE([[
 #ifdef HAVE_STDLIB_H
 #include <stdlib.h>
 #endif
@@ -246,16 +246,16 @@ int is_char_signed (arg)
 char signed_char_check = (char) (-67);
 int main() {
   exit(is_char_signed((int) signed_char_check));
-}], [AC_MSG_RESULT(no)
-     AC_DEFINE([CHAR_IS_UNSIGNED], [1],
-               [Characters are unsigned])],
-               [AC_MSG_RESULT(yes)],
+}]])], [AC_MSG_RESULT(no)
+    AC_DEFINE([CHAR_IS_UNSIGNED], [1],
+              [Characters are unsigned])],
+              [AC_MSG_RESULT(yes)],
 [AC_MSG_WARN([Assuming that char is signed on target machine.
     If it is unsigned, this will be a little bit inefficient.])
 ])
 
 AC_MSG_CHECKING([to see if right shift is signed])
-AC_TRY_RUN([
+AC_RUN_IFELSE([AC_LANG_SOURCE([[
 #ifdef HAVE_STDLIB_H
 #include <stdlib.h>
 #endif
@@ -264,7 +264,7 @@ AC_TRY_RUN([
 int is_shifting_signed (long arg)
 #else
 int is_shifting_signed (arg)
-     long arg;
+    long arg;
 #endif
 /* See whether right-shift on a long is signed or not. */
 {
@@ -285,15 +285,15 @@ int is_shifting_signed (arg)
 }
 int main() {
   exit(is_shifting_signed(-0x7F7E80B1L));
-}],
-      [AC_MSG_RESULT(no)
-       AC_DEFINE([RIGHT_SHIFT_IS_UNSIGNED], [1],
-                 [Broken compiler shifts signed values as an unsigned shift.])],
-       [AC_MSG_RESULT(yes)],
-       [AC_MSG_RESULT(Assuming that right shift is signed on target machine.)])
+}]])],
+        [AC_MSG_RESULT(no)
+         AC_DEFINE([RIGHT_SHIFT_IS_UNSIGNED], [1],
+                   [Broken compiler shifts signed values as an unsigned shift.])],
+        [AC_MSG_RESULT(yes)],
+        [AC_MSG_RESULT(Assuming that right shift is signed on target machine.)])
 
 AC_MSG_CHECKING([to see if fopen accepts b spec])
-AC_TRY_RUN([
+AC_RUN_IFELSE([AC_LANG_SOURCE([[
 #ifdef HAVE_STDLIB_H
 #include <stdlib.h>
 #endif
@@ -302,16 +302,15 @@ int main() {
   if (fopen("conftestdata", "wb") != NULL)
     exit(0);
   exit(1);
-}],
-          [AC_MSG_RESULT(yes)],
-          [AC_MSG_RESULT(no)
-           AC_DEFINE([DONT_USE_B_MODE], [1],
-                     [Don't open files in binary mode.])],
-          [AC_MSG_RESULT(Assuming that it does.)])
+}]])],
+        [AC_MSG_RESULT(yes)],
+        [AC_MSG_RESULT(no)
+         AC_DEFINE([DONT_USE_B_MODE], [1],
+                   [Don't open files in binary mode.])],
+        [AC_MSG_RESULT(Assuming that it does.)])
 
 # Configure libtool
-AC_LIBTOOL_WIN32_DLL
-AC_PROG_LIBTOOL
+LT_INIT([win32-dll])
 
 # Select memory manager depending on user input.
 # If no "-enable-maxmem", use jmemnobs
@@ -333,23 +332,23 @@ if test "x$MAXMEM" != xno; then
   AC_DEFINE_UNQUOTED([DEFAULT_MAX_MEM], [${DEFAULTMAXMEM}],
                      [Maximum data space library will allocate.])
   AC_MSG_CHECKING([for 'tmpfile()'])
-  AC_TRY_LINK([#include <stdio.h>], [ FILE * tfile = tmpfile(); ],
-    [AC_MSG_RESULT(yes)
-    MEMORYMGR='jmemansi'],
-    [AC_MSG_RESULT(no)
-    dnl if tmpfile is not present, must use jmemname.
-    MEMORYMGR='jmemname'
+  AC_LINK_IFELSE([AC_LANG_PROGRAM([[#include <stdio.h>]], [[ FILE * tfile = tmpfile(); ]])],
+                 [AC_MSG_RESULT(yes)
+                 MEMORYMGR='jmemansi'],
+                 [AC_MSG_RESULT(no)
+                 dnl if tmpfile is not present, must use jmemname.
+                 MEMORYMGR='jmemname'
 
     # Test for the need to remove temporary files using a signal handler
     # (for cjpeg/djpeg)
     AC_DEFINE([NEED_SIGNAL_CATCHER], [1],
               [Need signal handler to clean up temporary files.])
     AC_MSG_CHECKING([for 'mktemp()'])
-    AC_TRY_LINK([], [ char fname[80]; mktemp(fname); ],
-                [AC_MSG_RESULT(yes)],
-                [AC_MSG_RESULT(no)
-                 AC_DEFINE([NO_MKTEMP], [1],
-                           [The mktemp() function is not available.])])])
+    AC_LINK_IFELSE([AC_LANG_PROGRAM([[]], [[ char fname[80]; mktemp(fname); ]])],
+                   [AC_MSG_RESULT(yes)],
+                   [AC_MSG_RESULT(no)
+                    AC_DEFINE([NO_MKTEMP], [1],
+                              [The mktemp() function is not available.])])])
 fi
 AC_SUBST([MEMORYMGR])
 
@@ -357,9 +356,10 @@ AC_SUBST([MEMORYMGR])
 AC_MSG_CHECKING([libjpeg version number])
 [major=`sed -ne 's/^#define JPEG_LIB_VERSION_MAJOR *\([0-9][0-9]*\).*$/\1/p' $srcdir/jpeglib.h`
 minor=`sed -ne 's/^#define JPEG_LIB_VERSION_MINOR *\([0-9][0-9]*\).*$/\1/p' $srcdir/jpeglib.h`]
-AC_SUBST([JPEG_LIB_VERSION],
-         [`expr $major + $minor`:0:$minor])
-AC_MSG_RESULT([$JPEG_LIB_VERSION])
+AC_SUBST([JPEG_LIB_VERSION], [`expr $major + $minor`:0:$minor])
+AC_SUBST([JPEG_LIB_VERSION_MAJOR], [$major])
+AC_SUBST([JPEG_LIB_VERSION_MINOR], [$minor])
+AC_MSG_RESULT([$major.$minor.0])
 
-AC_CONFIG_FILES([Makefile])
+AC_CONFIG_FILES([Makefile libjpeg.pc])
 AC_OUTPUT

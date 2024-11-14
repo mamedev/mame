@@ -79,7 +79,6 @@ void midi_keyboard_device::device_start()
 {
 	set_data_frame(1, 8, PARITY_NONE, STOP_BITS_1); //8N1?
 	set_tra_rate(clock());
-	m_out_tx_func.resolve_safe();
 	m_head = m_tail = 0;
 	m_keyboard_timer = timer_alloc(FUNC(midi_keyboard_device::scan_keyboard), this);
 	m_keyboard_timer->adjust(attotime::from_msec(10), 0, attotime::from_msec(10));

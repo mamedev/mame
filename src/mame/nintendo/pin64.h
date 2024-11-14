@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Ryan Holtz
-#ifndef MAME_VIDEO_PIN64_H
-#define MAME_VIDEO_PIN64_H
+#ifndef MAME_NINTENDO_PIN64_H
+#define MAME_NINTENDO_PIN64_H
 
 #pragma once
 
@@ -177,4 +177,4 @@ private:
 	static const uint8_t CAP_ID[8];
 };
 
-#endif // MAME_VIDEO_PIN64_H
+#endif // MAME_NINTENDO_PIN64_H

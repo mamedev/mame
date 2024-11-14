@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood
-#ifndef MAME_VIDEO_K054156_K054157_K056832_H
-#define MAME_VIDEO_K054156_K054157_K056832_H
+#ifndef MAME_KONAMI_K054156_K054157_K056832_H
+#define MAME_KONAMI_K054156_K054157_K056832_H
 
 #pragma once
 
@@ -105,7 +105,7 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 	virtual void device_post_load() override;
 
 private:
@@ -205,5 +205,5 @@ private:
 
 DECLARE_DEVICE_TYPE(K056832, k056832_device)
 
-#endif // MAME_VIDEO_K054156_K054157_K056832_H
+#endif // MAME_KONAMI_K054156_K054157_K056832_H
 

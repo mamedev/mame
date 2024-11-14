@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood
-#ifndef MAME_VIDEO_VS920A_H
-#define MAME_VIDEO_VS920A_H
+#ifndef MAME_VSYSTEM_VS920A_H
+#define MAME_VSYSTEM_VS920A_H
 
 #pragma once
 
@@ -24,8 +24,8 @@ public:
 	uint16_t vram_r(offs_t offset);
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 private:
 	TILE_GET_INFO_MEMBER(get_tile_info);
@@ -41,4 +41,4 @@ private:
 
 DECLARE_DEVICE_TYPE(VS920A, vs920a_text_tilemap_device)
 
-#endif // MAME_VIDEO_VS920A_H
+#endif // MAME_VSYSTEM_VS920A_H

@@ -28,18 +28,18 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// optional information overrides
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 
 	uint16_t vram_r(offs_t offset);
 	void vram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	uint16_t regs_r(offs_t offset, uint16_t mem_mask = ~0);
 	void regs_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-	DECLARE_WRITE_LINE_MEMBER(vblank_w);
+	void vblank_w(int state);
 
 	required_device<tms34010_device> m_cpu;
 	required_device<bt451_device> m_ramdac;
@@ -49,7 +49,7 @@ protected:
 	TMS340X0_FROM_SHIFTREG_CB_MEMBER(from_shiftreg);
 	TMS340X0_SCANLINE_RGB32_CB_MEMBER(scanline_update);
 
-	void main_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
 
 	std::vector<uint16_t> m_vram;
 	uint16_t m_flags;

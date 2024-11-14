@@ -74,20 +74,6 @@ zorro_bus_device_base::zorro_bus_device_base(const machine_config &mconfig, devi
 }
 
 //-------------------------------------------------
-//  device_resolve_objects - resolve objects that
-//  may be needed for other devices to set
-//  initial conditions at start time
-//-------------------------------------------------
-
-void zorro_bus_device_base::device_resolve_objects()
-{
-	// resolve callbacks
-	m_ovr_handler.resolve_safe();
-	m_int2_handler.resolve_safe();
-	m_int6_handler.resolve_safe();
-}
-
-//-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
 
@@ -96,9 +82,9 @@ void zorro_bus_device_base::device_start()
 }
 
 // from slot device
-WRITE_LINE_MEMBER( zorro_bus_device_base::ovr_w ) { m_ovr_handler(state); }
-WRITE_LINE_MEMBER( zorro_bus_device_base::int2_w ) { m_int2_handler(state); }
-WRITE_LINE_MEMBER( zorro_bus_device_base::int6_w ) { m_int6_handler(state); }
+void zorro_bus_device_base::ovr_w(int state) { m_ovr_handler(state); }
+void zorro_bus_device_base::int2_w(int state) { m_int2_handler(state); }
+void zorro_bus_device_base::int6_w(int state) { m_int6_handler(state); }
 
 
 //**************************************************************************
@@ -121,21 +107,6 @@ exp_slot_device::exp_slot_device(const machine_config &mconfig, device_type type
 	m_ipl_handler(*this),
 	m_dev(nullptr)
 {
-}
-
-//-------------------------------------------------
-//  device_resolve_objects - resolve objects that
-//  may be needed for other devices to set
-//  initial conditions at start time
-//-------------------------------------------------
-
-void exp_slot_device::device_resolve_objects()
-{
-	// call base device
-	zorro_bus_device_base::device_resolve_objects();
-
-	// resolve callbacks
-	m_ipl_handler.resolve_safe();
 }
 
 //-------------------------------------------------
@@ -196,7 +167,7 @@ zorro2_bus_device::zorro2_bus_device(const machine_config &mconfig, device_type 
 	m_eint4_handler(*this),
 	m_eint5_handler(*this),
 	m_eint7_handler(*this),
-	m_autoconfig_device(nullptr)
+	m_autoconfig_device(0)
 {
 }
 
@@ -206,25 +177,17 @@ zorro2_bus_device::zorro2_bus_device(const machine_config &mconfig, device_type 
 
 zorro2_bus_device::~zorro2_bus_device()
 {
-	m_dev.detach_all();
 }
 
 //-------------------------------------------------
-//  device_resolve_objects - resolve objects that
-//  may be needed for other devices to set
-//  initial conditions at start time
+//  device_start - device-specific start
 //-------------------------------------------------
 
-void zorro2_bus_device::device_resolve_objects()
+void zorro2_bus_device::device_start()
 {
-	// call base device
-	zorro_bus_device_base::device_resolve_objects();
+	zorro_bus_device_base::device_start();
 
-	// resolve callbacks
-	m_eint1_handler.resolve_safe();
-	m_eint4_handler.resolve_safe();
-	m_eint5_handler.resolve_safe();
-	m_eint7_handler.resolve_safe();
+	save_item(NAME(m_autoconfig_device));
 }
 
 //-------------------------------------------------
@@ -237,11 +200,11 @@ void zorro2_bus_device::device_reset()
 	zorro_bus_device_base::device_reset();
 
 	// initiate autoconfig
-	m_autoconfig_device = m_dev.first();
+	m_autoconfig_device = 0;
 
 	// if we have a device, start the autoconfig chain
-	if (m_autoconfig_device)
-		m_autoconfig_device->cfgin_w(0);
+	if (m_dev.size() > m_autoconfig_device)
+		m_dev[m_autoconfig_device].get().cfgin_w(0);
 }
 
 //-------------------------------------------------
@@ -258,34 +221,27 @@ void zorro2_bus_device::add_card(device_zorro_card_interface &card)
 				tag(), card.device().tag(), card.device().name());
 	}
 	card.set_zorro_bus(*this);
-	m_dev.append(*zorro2_card);
+	m_dev.emplace_back(*zorro2_card);
 }
 
 // from slot device
-WRITE_LINE_MEMBER( zorro2_bus_device::eint1_w ) { m_eint1_handler(state); }
-WRITE_LINE_MEMBER( zorro2_bus_device::eint4_w ) { m_eint4_handler(state); }
-WRITE_LINE_MEMBER( zorro2_bus_device::eint5_w ) { m_eint5_handler(state); }
-WRITE_LINE_MEMBER( zorro2_bus_device::eint7_w ) { m_eint7_handler(state); }
+void zorro2_bus_device::eint1_w(int state) { m_eint1_handler(state); }
+void zorro2_bus_device::eint4_w(int state) { m_eint4_handler(state); }
+void zorro2_bus_device::eint5_w(int state) { m_eint5_handler(state); }
+void zorro2_bus_device::eint7_w(int state) { m_eint7_handler(state); }
 
-WRITE_LINE_MEMBER( zorro2_bus_device::cfgout_w )
+void zorro2_bus_device::cfgout_w(int state)
 {
-	m_autoconfig_device = m_autoconfig_device->next();
-
 	// if there is still a device in the chain, tell it to configure itself
-	if (m_autoconfig_device)
-		m_autoconfig_device->cfgin_w(0);
+	if (m_dev.size() > ++m_autoconfig_device)
+		m_dev[m_autoconfig_device].get().cfgin_w(0);
 }
 
 // from host
 void zorro2_bus_device::fc_w(int code)
 {
-	device_zorro2_card_interface *entry = m_dev.first();
-
-	while (entry)
-	{
-		entry->fc_w(code);
-		entry = entry->next();
-	}
+	for (device_zorro2_card_interface &entry : m_dev)
+		entry.fc_w(code);
 }
 
 
@@ -321,7 +277,7 @@ void device_zorro_card_interface::fc_w(int code)
 {
 }
 
-WRITE_LINE_MEMBER( device_zorro_card_interface::cfgin_w )
+void device_zorro_card_interface::cfgin_w(int state)
 {
 }
 
@@ -375,7 +331,6 @@ void device_exp_card_interface::interface_pre_start()
 
 device_zorro2_card_interface::device_zorro2_card_interface(const machine_config &mconfig, device_t &device) :
 	device_zorro_card_interface(mconfig, device),
-	m_next(nullptr),
 	m_slot(nullptr)
 {
 }

@@ -17,6 +17,9 @@
 #include "machine/z80pio.h"
 #include "machine/z80sio.h"
 
+
+namespace {
+
 class emu2_state : public driver_device
 {
 public:
@@ -37,8 +40,8 @@ public:
 	void emu2(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	u8 main_paged_r(offs_t offset);
@@ -49,11 +52,11 @@ private:
 	void scan_select_w(u8 data);
 	u8 scan_buffer_r();
 
-	void mem_map(address_map &map);
-	void paged_mem_map(address_map &map);
-	void io_map(address_map &map);
-	void scanner_mem_map(address_map &map);
-	void scanner_io_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
+	void paged_mem_map(address_map &map) ATTR_COLD;
+	void io_map(address_map &map) ATTR_COLD;
+	void scanner_mem_map(address_map &map) ATTR_COLD;
+	void scanner_io_map(address_map &map) ATTR_COLD;
 
 	required_device<z80_device> m_maincpu;
 	required_device<address_map_bank_device> m_pages;
@@ -325,5 +328,8 @@ ROM_START(emu2)
 	ROM_LOAD("74s472.ic137", 0x000, 0x200, NO_DUMP)
 	ROM_LOAD("74s472.ic135", 0x200, 0x200, NO_DUMP)
 ROM_END
+
+} // anonymous namespace
+
 
 SYST(1984, emu2, 0, 0, emu2, emu2, emu2_state, empty_init, "E-mu Systems", "Emulator II", MACHINE_IS_SKELETON)

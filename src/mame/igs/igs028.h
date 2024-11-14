@@ -1,8 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood, ElSemi
 /* IGS 028 */
-#ifndef MAME_MACHINE_IGS028_H
-#define MAME_MACHINE_IGS028_H
+#ifndef MAME_IGS_IGS028_H
+#define MAME_IGS_IGS028_H
 
 #pragma once
 
@@ -17,8 +17,8 @@ public:
 	void IGS028_handle(void);
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	uint32_t olds_prot_addr(uint16_t addr);
 	uint32_t olds_read_reg(uint16_t addr);
@@ -29,4 +29,4 @@ protected:
 
 DECLARE_DEVICE_TYPE(IGS028, igs028_device)
 
-#endif // MAME_MACHINE_IGS028_H
+#endif // MAME_IGS_IGS028_H

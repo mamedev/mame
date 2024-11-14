@@ -15,6 +15,11 @@
 #include "romload.h"
 #include "screen.h"
 
+#include "util/unicode.h"
+
+#include <locale>
+#include <sstream>
+
 
 namespace ui {
 
@@ -44,7 +49,7 @@ void menu_device_config::populate_text(std::optional<text_layout> &layout, float
 	if (!layout || (layout->width() != width))
 	{
 		rgb_t const color = ui().colors().text_color();
-		layout.emplace(ui().create_layout(container(), width));
+		layout.emplace(create_layout(width));
 
 		machine_config &mconfig(const_cast<machine_config &>(machine().config()));
 		machine_config::token const tok(mconfig.begin_configuration(mconfig.root_device()));
@@ -52,6 +57,13 @@ void menu_device_config::populate_text(std::optional<text_layout> &layout, float
 		for (device_t &d : device_enumerator(*dev))
 			if (!d.configured())
 				d.config_complete();
+
+		// get decimal separator
+		std::string point;
+		{
+			wchar_t const s(std::use_facet<std::numpunct<wchar_t> >(std::locale()).decimal_point());
+			point = utf8_from_wstring(std::wstring_view(&s, 1));
+		}
 
 		layout->add_text(
 				util::string_format(
@@ -91,7 +103,7 @@ void menu_device_config::populate_text(std::optional<text_layout> &layout, float
 				if (d > 0)
 				{
 					size_t dpos = hz.length() - d;
-					hz.insert(dpos, ".");
+					hz.insert(dpos, point);
 					size_t last = hz.find_last_not_of('0');
 					hz = hz.substr(0, last + (last != dpos ? 1 : 0));
 				}
@@ -100,8 +112,8 @@ void menu_device_config::populate_text(std::optional<text_layout> &layout, float
 				layout->add_text(
 						util::string_format(
 							(count > 1)
-								? ((clock != 0) ? "  %1$d" UTF8_MULTIPLY "%2$s %3$s" UTF8_NBSP "%4$s\n" : "  %1$d" UTF8_MULTIPLY "%2$s\n")
-								: ((clock != 0) ? "  %2$s %3$s" UTF8_NBSP "%4$s\n" : "  %2$s\n"),
+								? ((clock != 0) ? u8"  %1$d×%2$s %3$s\u00a0%4$s\n" : u8"  %1$d×%2$s\n")
+								: ((clock != 0) ? u8"  %2$s %3$s\u00a0%4$s\n" : "  %2$s\n"),
 							count, name, hz,
 							(d == 9) ? _("GHz") : (d == 6) ? _("MHz") : (d == 3) ? _("kHz") : _("Hz")),
 						color);
@@ -127,7 +139,7 @@ void menu_device_config::populate_text(std::optional<text_layout> &layout, float
 					if (valid)
 					{
 						size_t dpos = hz.length() - 6;
-						hz.insert(dpos, ".");
+						hz.insert(dpos, point);
 						size_t last = hz.find_last_not_of('0');
 						hz = hz.substr(0, last + (last != dpos ? 1 : 0));
 					}
@@ -136,8 +148,8 @@ void menu_device_config::populate_text(std::optional<text_layout> &layout, float
 					layout->add_text(
 							util::string_format(
 								(screen.orientation() & ORIENTATION_SWAP_XY)
-									? _("  Screen '%1$s': %2$d \xC3\x97 %3$d (V) %4$s\xC2\xA0Hz\n")
-									: _("  Screen '%1$s': %2$d \xC3\x97 %3$d (H) %4$s\xC2\xA0Hz\n"),
+									? _(u8"  Screen '%1$s': %2$d × %3$d (V) %4$s\u00a0Hz\n")
+									: _(u8"  Screen '%1$s': %2$d × %3$d (H) %4$s\u00a0Hz\n"),
 								screen.tag(),
 								visarea.width(),
 								visarea.height(),
@@ -173,7 +185,7 @@ void menu_device_config::populate_text(std::optional<text_layout> &layout, float
 				if (d > 0)
 				{
 					size_t dpos = hz.length() - d;
-					hz.insert(dpos, ".");
+					hz.insert(dpos, point);
 					size_t last = hz.find_last_not_of('0');
 					hz = hz.substr(0, last + (last != dpos ? 1 : 0));
 				}
@@ -182,8 +194,8 @@ void menu_device_config::populate_text(std::optional<text_layout> &layout, float
 				layout->add_text(
 						util::string_format(
 							(count > 1)
-								? ((clock != 0) ? "  %1$d" UTF8_MULTIPLY "%2$s %3$s" UTF8_NBSP "%4$s\n" : "  %1$d" UTF8_MULTIPLY "%2$s\n")
-								: ((clock != 0) ? "  %2$s %3$s" UTF8_NBSP "%4$s\n" : "  %2$s\n"),
+								? ((clock != 0) ? u8"  %1$d×%2$s %3$s\u00a0%4$s\n" : u8"  %1$d×%2$s\n")
+								: ((clock != 0) ? u8"  %2$s %3$s\u00a0%4$s\n" : "  %2$s\n"),
 							count, sound.device().name(), hz,
 							(d == 9) ? _("GHz") : (d == 6) ? _("MHz") : (d == 3) ? _("kHz") : _("Hz")),
 						color);
@@ -224,11 +236,13 @@ void menu_device_config::populate_text(std::optional<text_layout> &layout, float
 
 		int input = 0, input_mj = 0, input_hana = 0, input_gamble = 0, input_analog = 0, input_adjust = 0;
 		int input_keypad = 0, input_keyboard = 0, dips = 0, confs = 0;
-		std::string errors;
 		std::ostringstream dips_opt, confs_opt;
 		ioport_list portlist;
-		for (device_t &iptdev : device_enumerator(*dev))
-			portlist.append(iptdev, errors);
+		{
+			std::ostringstream errors;
+			for (device_t &iptdev : device_enumerator(*dev))
+				portlist.append(iptdev, errors);
+		}
 
 		// check if the device adds inputs to the system
 		for (auto &port : portlist)
@@ -353,14 +367,8 @@ void menu_device_config::populate_text(std::optional<text_layout> &layout, float
 	width = layout->actual_width();
 }
 
-void menu_device_config::populate(float &customtop, float &custombottom)
+void menu_device_config::populate()
 {
-}
-
-void menu_device_config::handle(event const *ev)
-{
-	if (ev)
-		handle_key(ev->iptkey);
 }
 
 } // namespace ui

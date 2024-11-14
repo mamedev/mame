@@ -63,6 +63,9 @@ to be honored - the game writes the value to RAM but never reads it.
 #include "screen.h"
 #include "speaker.h"
 
+
+namespace {
+
 class hotblock_state : public driver_device
 {
 public:
@@ -94,12 +97,12 @@ private:
 	void eeprom_w(u8 data);
 	void port0_w(u8 data);
 
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void banked_video_map(address_map &map);
-	void hotblock_io(address_map &map);
-	void hotblock_map(address_map &map);
+	void banked_video_map(address_map &map) ATTR_COLD;
+	void hotblock_io(address_map &map) ATTR_COLD;
+	void hotblock_map(address_map &map) ATTR_COLD;
 };
 
 u8 hotblock_state::eeprom_r()
@@ -252,6 +255,9 @@ ROM_START( hotblockb )
 	ROM_LOAD( "palce16v8.2", 0x345, 0x117, NO_DUMP )
 	ROM_LOAD( "pld.3",       0x45c, 0x117, NO_DUMP ) // Type unknown, surface scratched out
 ROM_END
+
+} // anonymous namespace
+
 
 GAME( 1993, hotblock,         0, hotblock, hotblock, hotblock_state, empty_init, ROT0, "NIX?", "Hot Blocks - Tetrix II (set 1)", MACHINE_SUPPORTS_SAVE )
 GAME( 1993, hotblocka, hotblock, hotblock, hotblock, hotblock_state, empty_init, ROT0, "NIX?", "Hot Blocks - Tetrix II (set 2)", MACHINE_SUPPORTS_SAVE )

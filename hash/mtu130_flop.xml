@@ -1,0 +1,78 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0-1.0
+
+Floppies for the MTU-130.
+-->
+<softwarelist name="mtu130_flop" description="MTU-130 floppies">
+
+	<software name="demo">
+		<description>Demonstration disk</description>
+		<year>1982</year>
+		<publisher>Micro Technology Unlimited</publisher>
+		<part name="flop1" interface="floppy_8">
+			<dataarea name="flop" size="408600">
+				<rom name="Demonstration_Disk_1.5_1982_-_MTU-BASIC_Included.imd" size="408600" crc="55405b0a" sha1="a209f7cc77abf77d5fb1ecc6b36efd36dbc8b5fc"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="codos">
+		<description>CODOS 2.0</description>
+		<year>1982</year>
+		<publisher>Micro Technology Unlimited</publisher>
+		<part name="flop1" interface="floppy_8">
+			<dataarea name="flop" size="245655">
+				<rom name="Distribution_Disk_1.5_1982_-_CODOS_2.0.imd" size="245655" crc="5b628dce" sha1="d5d0a4a869c943f88d4f765a62e59e069f5dd8f2"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="basic10">
+		<description>BASIC 1.0 and extra libs</description>
+		<year>1982</year>
+		<publisher>Micro Technology Unlimited</publisher>
+		<part name="flop1" interface="floppy_8">
+			<dataarea name="flop" size="501930">
+				<rom name="Distribution_Disk_1.4_1982_-_BASIC_IGL_CIL_VGL_KGL_and_Diskex.imd" size="501930" crc="3b747614" sha1="b2a25bcc05cc789b7a506d1860815cf80ff1984e"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="basic15">
+		<description>BASIC 1.5</description>
+		<year>1982</year>
+		<publisher>Micro Technology Unlimited</publisher>
+		<part name="flop1" interface="floppy_8">
+			<dataarea name="flop" size="499125">
+				<rom name="Distribution_Disk_1.4_1982_-_CODOS_2.0__BASIC_1.5.imd" size="499125" crc="750d7783" sha1="d91f4d223774b76657b6df6cb026a56a0dc693d2"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="datamover">
+		<description>Datamover support disk</description>
+		<year>?</year>
+		<publisher>Micro Technology Unlimited</publisher>
+		<part name="flop1" interface="floppy_8">
+			<dataarea name="flop" size="223215">
+				<rom name="Distribution_Disk_1.7_-_MTU-140_Datamover.imd" size="223215" crc="81171694" sha1="919f32a3113090a2c8e6da6d8b44b51c6f8afa1a"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="multio">
+		<description>MultI-O support disk</description>
+		<year>1983</year>
+		<publisher>Micro Technology Unlimited</publisher>
+		<part name="flop1" interface="floppy_8">
+			<dataarea name="flop" size="358875">
+				<rom name="Distribution_Disk_1.1_-_1983_MULTI-O.imd" size="358875" crc="d506fd60" sha1="bea333b342ec97dca45fcd60b7bb0da7113b3703"/>
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>
+
+

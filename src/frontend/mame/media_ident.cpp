@@ -14,6 +14,7 @@
 #include "softlist_dev.h"
 
 #include "jedparse.h"
+#include "path.h"
 #include "unzip.h"
 
 

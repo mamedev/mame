@@ -6,7 +6,7 @@
 #include "emu.h"
 #include "isbc_208.h"
 
-#include "formats/pc_dsk.h"
+#include "formats/flopimg.h"
 
 
 DEFINE_DEVICE_TYPE(ISBC_208, isbc_208_device, "isbc_208", "ISBC 208 Flexible Disk Driver Controller")
@@ -52,17 +52,17 @@ void isbc_208_device::map(address_map &map)
 }
 
 
-WRITE_LINE_MEMBER(isbc_208_device::out_eop_w)
+void isbc_208_device::out_eop_w(int state)
 {
 	m_fdc->tc_w(state);
 }
 
-WRITE_LINE_MEMBER(isbc_208_device::irq_w)
+void isbc_208_device::irq_w(int state)
 {
 	m_out_irq_func(state);
 }
 
-WRITE_LINE_MEMBER(isbc_208_device::hreq_w)
+void isbc_208_device::hreq_w(int state)
 {
 	m_maincpu->set_input_line(INPUT_LINE_HALT, state ? ASSERT_LINE : CLEAR_LINE);
 	/* Assert HLDA */
@@ -121,6 +121,5 @@ void isbc_208_device::device_reset()
 void isbc_208_device::device_start()
 {
 	m_maincpu_mem = &m_maincpu->space(AS_PROGRAM);
-	m_out_irq_func.resolve_safe();
 }
 

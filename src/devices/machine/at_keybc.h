@@ -20,6 +20,8 @@
 class at_kbc_device_base : public device_t
 {
 public:
+	virtual ~at_kbc_device_base();
+
 	// outputs to host
 	auto hot_res() { return m_hot_res_cb.bind(); }
 	auto gate_a20() { return m_gate_a20_cb.bind(); }
@@ -36,16 +38,15 @@ public:
 	void command_w(uint8_t data);
 
 	// inputs from keyboard
-	DECLARE_WRITE_LINE_MEMBER(kbd_clk_w);
-	DECLARE_WRITE_LINE_MEMBER(kbd_data_w);
+	void kbd_clk_w(int state);
+	void kbd_data_w(int state);
 
 protected:
 	// trampoline constructor
 	at_kbc_device_base(machine_config const &mconfig, device_type type, char const *tag, device_t *owner, u32 clock);
 
 	// device_t implementation
-	virtual void device_resolve_objects() override;
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 	// host outputs - use 1 = asserted, 0 = deasserted
 	void set_hot_res(u8 state);
@@ -84,12 +85,13 @@ class at_keyboard_controller_device : public at_kbc_device_base
 public:
 	// standard constructor
 	at_keyboard_controller_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock);
+	virtual ~at_keyboard_controller_device();
 
 protected:
 	// device_t implementation
-	virtual tiny_rom_entry const *device_rom_region() const override;
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual ioport_constructor device_input_ports() const override;
+	virtual tiny_rom_entry const *device_rom_region() const override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 
 private:
 	// MCU I/O handlers
@@ -116,18 +118,18 @@ public:
 	virtual uint8_t status_r() override;
 
 	// inputs from aux
-	DECLARE_WRITE_LINE_MEMBER(aux_clk_w);
-	DECLARE_WRITE_LINE_MEMBER(aux_data_w);
+	void aux_clk_w(int state);
+	void aux_data_w(int state);
 
 	// standard constructor
 	ps2_keyboard_controller_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock);
+	virtual ~ps2_keyboard_controller_device();
 
 protected:
 	// device_t implementation
-	virtual tiny_rom_entry const *device_rom_region() const override;
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual void device_resolve_objects() override;
-	virtual void device_start() override;
+	virtual tiny_rom_entry const *device_rom_region() const override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual void device_start() override ATTR_COLD;
 
 private:
 	// host outputs - use 1 = asserted, 0 = deasserted

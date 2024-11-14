@@ -105,8 +105,8 @@ public:
 	void pipeline(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	void vram2_w(offs_t offset, u8 data);
@@ -128,9 +128,9 @@ private:
 	TIMER_CALLBACK_MEMBER(vidctrl_deferred_w);
 	TIMER_CALLBACK_MEMBER(protection_deferred_w);
 
-	void cpu0_mem(address_map &map);
-	void cpu1_mem(address_map &map);
-	void sound_port(address_map &map);
+	void cpu0_mem(address_map &map) ATTR_COLD;
+	void cpu1_mem(address_map &map) ATTR_COLD;
+	void sound_port(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device>         m_maincpu;
 	required_device<m68705r_device>     m_mcu;
@@ -236,7 +236,7 @@ TIMER_CALLBACK_MEMBER(pipeline_state::protection_deferred_w)
 void pipeline_state::protection_w(u8 data)
 {
 	machine().scheduler().synchronize(timer_expired_delegate(FUNC(pipeline_state::protection_deferred_w),this), data);
-	machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(100));
+	machine().scheduler().perfect_quantum(attotime::from_usec(100));
 }
 
 u8 pipeline_state::sound_data_r()

@@ -35,16 +35,16 @@ public:
 	er1400_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 
 	// line handlers
-	DECLARE_WRITE_LINE_MEMBER(data_w);
-	DECLARE_WRITE_LINE_MEMBER(c1_w);
-	DECLARE_WRITE_LINE_MEMBER(c2_w);
-	DECLARE_WRITE_LINE_MEMBER(c3_w);
-	DECLARE_WRITE_LINE_MEMBER(clock_w);
-	DECLARE_READ_LINE_MEMBER(data_r);
+	void data_w(int state);
+	void c1_w(int state);
+	void c2_w(int state);
+	void c3_w(int state);
+	void clock_w(int state);
+	int data_r();
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 	// device_nvram_interface overrides
 	virtual void nvram_default() override;

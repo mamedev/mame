@@ -95,6 +95,9 @@ Memory:         54x 64KBit RAM, 18 empty sockets, 9 bit and 4 bit wire straps
 #include "video/mc6845.h"
 #include "screen.h"
 
+
+namespace {
+
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
@@ -135,15 +138,15 @@ private:
 	uint8_t f9f78_r();
 	void f9f78_w(uint8_t data);
 	void f9f79_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(fdc_drq_w);
-	DECLARE_WRITE_LINE_MEMBER(fdc_intrq_w);
+	void fdc_drq_w(int state);
+	void fdc_intrq_w(int state);
 
-	void pg675_mem(address_map &map);
-	void pg685_mem(address_map &map);
-	void pg685oua12_mem(address_map &map);
+	void pg675_mem(address_map &map) ATTR_COLD;
+	void pg685_mem(address_map &map) ATTR_COLD;
+	void pg685oua12_mem(address_map &map) ATTR_COLD;
 
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 	required_device<cpu_device> m_maincpu;
 	optional_shared_ptr<uint8_t> m_vram;
 	optional_shared_ptr<uint16_t> m_vram16;
@@ -593,6 +596,9 @@ ROM_START( pg685oua12 )
 	ROM_REGION( 0x4000, "chargen", 0 )
 	ROM_LOAD( "pg685_oua12_s79200-g39_a901-01.bin", 0x0000, 0x4000, CRC(fa722110) SHA1(b57ee67a77ff45a2544a2ae5203bc2199adfe023))
 ROM_END
+
+} // anonymous namespace
+
 
 //**************************************************************************
 //  ROM DEFINITIONS

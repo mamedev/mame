@@ -174,64 +174,64 @@ constexpr uint8_t IFCMD_UNT        = 0x5f;  // Untalk
 DEFINE_DEVICE_TYPE(TMS9914, tms9914_device, "tms9914", "TMS9914 GPIB Controller")
 
 // Constructors
-tms9914_device::tms9914_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig , TMS9914 , tag , owner , clock),
-	  m_dio_read_func(*this),
-	  m_dio_write_func(*this),
-	  m_signal_wr_fns(*this),
-	  m_int_write_func(*this),
-	  m_accrq_write_func(*this),
-	  m_int_line{false},
-	  m_accrq_line{false},
-	  m_dio{0},
-	  m_signals{false},
-	  m_ext_signals{false},
-	  m_no_reflection{false},
-	  m_ext_state_change{false},
-	  m_reg_int0_status{0},
-	  m_reg_int0_mask{0},
-	  m_reg_int1_status{0},
-	  m_reg_int1_mask{0},
-	  m_reg_address{0},
-	  m_reg_serial_p{0},
-	  m_reg_2nd_serial_p{0},
-	  m_reg_parallel_p{0},
-	  m_reg_2nd_parallel_p{0},
-	  m_reg_di{0},
-	  m_reg_do{0},
-	  m_reg_ulpa{false},
-	  m_swrst{false},
-	  m_hdfa{false},
-	  m_hdfe{false},
-	  m_rtl{false},
-	  m_gts{false},
-	  m_rpp{false},
-	  m_sic{false},
-	  m_sre{false},
-	  m_dai{false},
-	  m_pts{false},
-	  m_stdl{false},
-	  m_shdw{false},
-	  m_vstdl{false},
-	  m_rsvd2{false},
-	  m_ah_state{FSM_AH_AIDS},
-	  m_ah_adhs{false},
-	  m_ah_anhs{false},
-	  m_ah_aehs{false},
-	  m_sh_state{FSM_SH_SIDS},
-	  m_sh_shfs{false},
-	  m_sh_vsts{false},
-	  m_t_state{FSM_T_TIDS},
-	  m_t_tpas{false},
-	  m_t_spms{false},
-	  m_t_eoi_state{FSM_T_ENIS},
-	  m_l_state{FSM_L_LIDS},
-	  m_l_lpas{false},
-	  m_sr_state{FSM_SR_NPRS},
-	  m_rl_state{FSM_RL_LOCS},
-	  m_pp_ppas{false},
-	  m_c_state{FSM_C_CIDS},
-	  m_next_eoi{false}
+tms9914_device::tms9914_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig , TMS9914 , tag , owner , clock),
+	m_dio_read_func(*this, 0xff),
+	m_dio_write_func(*this),
+	m_signal_wr_fns(*this),
+	m_int_write_func(*this),
+	m_accrq_write_func(*this),
+	m_int_line{false},
+	m_accrq_line{false},
+	m_dio{0},
+	m_signals{false},
+	m_ext_signals{false},
+	m_no_reflection{false},
+	m_ext_state_change{false},
+	m_reg_int0_status{0},
+	m_reg_int0_mask{0},
+	m_reg_int1_status{0},
+	m_reg_int1_mask{0},
+	m_reg_address{0},
+	m_reg_serial_p{0},
+	m_reg_2nd_serial_p{0},
+	m_reg_parallel_p{0},
+	m_reg_2nd_parallel_p{0},
+	m_reg_di{0},
+	m_reg_do{0},
+	m_reg_ulpa{false},
+	m_swrst{false},
+	m_hdfa{false},
+	m_hdfe{false},
+	m_rtl{false},
+	m_gts{false},
+	m_rpp{false},
+	m_sic{false},
+	m_sre{false},
+	m_dai{false},
+	m_pts{false},
+	m_stdl{false},
+	m_shdw{false},
+	m_vstdl{false},
+	m_rsvd2{false},
+	m_ah_state{FSM_AH_AIDS},
+	m_ah_adhs{false},
+	m_ah_anhs{false},
+	m_ah_aehs{false},
+	m_sh_state{FSM_SH_SIDS},
+	m_sh_shfs{false},
+	m_sh_vsts{false},
+	m_t_state{FSM_T_TIDS},
+	m_t_tpas{false},
+	m_t_spms{false},
+	m_t_eoi_state{FSM_T_ENIS},
+	m_l_state{FSM_L_LIDS},
+	m_l_lpas{false},
+	m_sr_state{FSM_SR_NPRS},
+	m_rl_state{FSM_RL_LOCS},
+	m_pp_ppas{false},
+	m_c_state{FSM_C_CIDS},
+	m_next_eoi{false}
 {
 	// Silence compiler complaints about unused variables
 	(void)REG_INT1_IFC_BIT;
@@ -239,32 +239,32 @@ tms9914_device::tms9914_device(const machine_config &mconfig, const char *tag, d
 }
 
 // Signal inputs
-WRITE_LINE_MEMBER(tms9914_device::eoi_w)
+void tms9914_device::eoi_w(int state)
 {
 	set_ext_signal(IEEE_488_EOI , state);
 }
 
-WRITE_LINE_MEMBER(tms9914_device::dav_w)
+void tms9914_device::dav_w(int state)
 {
 	set_ext_signal(IEEE_488_DAV , state);
 }
 
-WRITE_LINE_MEMBER(tms9914_device::nrfd_w)
+void tms9914_device::nrfd_w(int state)
 {
 	set_ext_signal(IEEE_488_NRFD , state);
 }
 
-WRITE_LINE_MEMBER(tms9914_device::ndac_w)
+void tms9914_device::ndac_w(int state)
 {
 	set_ext_signal(IEEE_488_NDAC , state);
 }
 
-WRITE_LINE_MEMBER(tms9914_device::ifc_w)
+void tms9914_device::ifc_w(int state)
 {
 	set_ext_signal(IEEE_488_IFC , state);
 }
 
-WRITE_LINE_MEMBER(tms9914_device::srq_w)
+void tms9914_device::srq_w(int state)
 {
 	bool prev_srq = get_signal(IEEE_488_SRQ);
 	set_ext_signal(IEEE_488_SRQ , state);
@@ -273,12 +273,12 @@ WRITE_LINE_MEMBER(tms9914_device::srq_w)
 	}
 }
 
-WRITE_LINE_MEMBER(tms9914_device::atn_w)
+void tms9914_device::atn_w(int state)
 {
 	set_ext_signal(IEEE_488_ATN , state);
 }
 
-WRITE_LINE_MEMBER(tms9914_device::ren_w)
+void tms9914_device::ren_w(int state)
 {
 	set_ext_signal(IEEE_488_REN , state);
 }
@@ -467,7 +467,7 @@ uint8_t tms9914_device::read(offs_t offset)
 	return res;
 }
 
-READ_LINE_MEMBER(tms9914_device::cont_r)
+int tms9914_device::cont_r()
 {
 	return m_c_state != FSM_C_CIDS && m_c_state != FSM_C_CADS;
 }
@@ -526,12 +526,6 @@ void tms9914_device::device_start()
 	save_item(NAME(m_c_state));
 	save_item(NAME(m_next_eoi));
 
-	m_dio_read_func.resolve_safe(0xff);
-	m_dio_write_func.resolve_safe();
-	m_signal_wr_fns.resolve_all_safe();
-	m_int_write_func.resolve_safe();
-	m_accrq_write_func.resolve_safe();
-
 	m_sh_dly_timer = timer_alloc(FUNC(tms9914_device::fsm_tick), this);
 	m_ah_dly_timer = timer_alloc(FUNC(tms9914_device::fsm_tick), this);
 	m_c_dly_timer = timer_alloc(FUNC(tms9914_device::fsm_tick), this);
@@ -549,44 +543,19 @@ void tms9914_device::device_reset()
 	m_sic = false;
 	m_sre = false;
 	m_dai = false;
-	m_pts = false;
-	m_stdl = false;
-	m_shdw = false;
-	m_vstdl = false;
-	m_int_line = false;
-	m_accrq_line = true;    // Ensure change is propagated
-	m_dio = 0;
-
-	m_reg_int0_status = 0;
-	m_reg_int0_mask = 0;
-	m_reg_int1_status = 0;
-	m_reg_int1_mask = 0;
-	m_reg_address = 0;
-	m_reg_serial_p = 0;
-	m_reg_2nd_serial_p = 0;
-	m_reg_parallel_p = 0;
-	m_reg_2nd_parallel_p = 0;
-	m_reg_di = 0;
-	m_reg_do = 0;
-	m_reg_ulpa = false;
-	m_swrst = false;
-	m_hdfa = false;
-	m_hdfe = false;
-	m_rtl = false;
-	m_gts = false;
-	m_rpp = false;
-	m_sic = false;
-	m_sre = false;
-	m_dai = false;
-	m_pts = false;
 	m_stdl = false;
 	m_shdw = false;
 	m_vstdl = false;
 	m_rsvd2 = false;
+	m_int_line = true;
+	m_accrq_line = true;    // Ensure change is propagated
 
-
-	std::fill(std::begin(m_ext_signals), std::end(m_ext_signals), false);
-	std::fill(std::begin(m_signals), std::end(m_signals), false);
+	m_reg_int0_status = 0;
+	m_reg_int1_status = 0;
+	m_reg_serial_p = 0;
+	m_reg_2nd_serial_p = 0;
+	m_reg_parallel_p = 0;
+	m_reg_2nd_parallel_p = 0;
 
 	do_swrst();
 	update_fsm();

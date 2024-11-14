@@ -91,8 +91,8 @@ pps4_device::pps4_device(const machine_config &mconfig, device_type type, const 
 	, m_program_config("program", ENDIANNESS_LITTLE, 8, 12)
 	, m_data_config("data", ENDIANNESS_LITTLE, 8, 12)  // 4bit RAM
 	, m_io_config("io", ENDIANNESS_LITTLE, 8, 8)  // 4bit IO
-	, m_dia_cb(*this)
-	, m_dib_cb(*this)
+	, m_dia_cb(*this, 0)
+	, m_dib_cb(*this, 0)
 	, m_do_cb(*this)
 	, m_wasldi(0)
 	, m_waslbl(0)
@@ -252,7 +252,7 @@ void pps4_device::iADC()
  */
 void pps4_device::iADSK()
 {
-	m_A = m_A + M() + m_C;   // This fixes the diagnostic test button, same as pinmame. It means ADSK and ADCSK are the same.
+	m_A = m_A + M();
 	//m_A += M();
 	m_C = (m_A > 15) ? 1 : 0;
 	m_Skip = m_C;
@@ -978,7 +978,7 @@ void pps4_device::iT()
  * @brief pps4_device::iTM Transfer and mark indirect
  * HEX   BINARY    CYCLES  MNEMONIC
  * ----------------------------------
- * 0xc0+ 11xx xxxx      2   TM x
+ * 0xd0+ 11x1 xxxx      2   TM x
  *       yyyy yyyy  from page 3
  *
  * Symbolic equation
@@ -1590,10 +1590,6 @@ void pps4_device::device_start()
 	state_add( STATE_GENFLAGS, "GENFLAGS", m_C).formatstr("%3s").noshow();
 
 	set_icountptr(m_icount);
-
-	m_dia_cb.resolve_safe(0);
-	m_dib_cb.resolve_safe(0);
-	m_do_cb.resolve_safe();
 }
 
 void pps4_2_device::device_start()

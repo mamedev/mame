@@ -5,8 +5,8 @@
     Lock-On hardware
 
 *************************************************************************/
-#ifndef MAME_INCLUDES_LOCKON_H
-#define MAME_INCLUDES_LOCKON_H
+#ifndef MAME_TATSUMI_LOCKON_H
+#define MAME_TATSUMI_LOCKON_H
 
 #pragma once
 
@@ -57,9 +57,9 @@ public:
 	void lockon(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	/* memory pointers */
@@ -142,7 +142,7 @@ private:
 	TILE_GET_INFO_MEMBER(get_lockon_tile_info);
 	void lockon_palette(palette_device &palette) const;
 	uint32_t screen_update_lockon(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_WRITE_LINE_MEMBER(screen_vblank_lockon);
+	void screen_vblank_lockon(int state);
 	TIMER_CALLBACK_MEMBER(cursor_callback);
 	TIMER_CALLBACK_MEMBER(bufend_callback);
 	void scene_draw();
@@ -150,12 +150,12 @@ private:
 	void objects_draw();
 	void rotate_draw( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	void hud_draw( bitmap_ind16 &bitmap, const rectangle &cliprect );
-	DECLARE_WRITE_LINE_MEMBER(ym2203_irq);
-	void ground_v30(address_map &map);
-	void main_v30(address_map &map);
-	void object_v30(address_map &map);
-	void sound_io(address_map &map);
-	void sound_prg(address_map &map);
+	void ym2203_irq(int state);
+	void ground_v30(address_map &map) ATTR_COLD;
+	void main_v30(address_map &map) ATTR_COLD;
+	void object_v30(address_map &map) ATTR_COLD;
+	void sound_io(address_map &map) ATTR_COLD;
+	void sound_prg(address_map &map) ATTR_COLD;
 };
 
-#endif // MAME_INCLUDES_LOCKON_H
+#endif // MAME_TATSUMI_LOCKON_H

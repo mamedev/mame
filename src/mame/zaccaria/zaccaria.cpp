@@ -137,12 +137,12 @@ uint8_t zaccaria_state::prot2_r(offs_t offset)
 }
 
 
-WRITE_LINE_MEMBER(zaccaria_state::coin_w)
+void zaccaria_state::coin_w(int state)
 {
 	machine().bookkeeping().coin_counter_w(0, state);
 }
 
-WRITE_LINE_MEMBER(zaccaria_state::nmi_mask_w)
+void zaccaria_state::nmi_mask_w(int state)
 {
 	m_nmi_mask = state;
 	if (!m_nmi_mask)
@@ -271,7 +271,7 @@ static INPUT_PORTS_START( monymony )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN3 )
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("audiopcb", zac1b11142_audio_device, acs_r)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("audiopcb", FUNC(zac1b11142_audio_device::acs_r))
 	// other bits come from a protection device
 INPUT_PORTS_END
 
@@ -327,7 +327,7 @@ static GFXDECODE_START( gfx_zaccaria )
 GFXDECODE_END
 
 
-WRITE_LINE_MEMBER(zaccaria_state::vblank_irq)
+void zaccaria_state::vblank_irq(int state)
 {
 	if (state && m_nmi_mask)
 		m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
@@ -337,7 +337,7 @@ WRITE_LINE_MEMBER(zaccaria_state::vblank_irq)
 void zaccaria_state::zaccaria(machine_config &config)
 {
 	// basic machine hardware
-	Z80(config, m_maincpu, XTAL(18'432'000)/6);   // verified on PCB
+	Z80(config, m_maincpu, 18.432_MHz_XTAL / 6);   // verified on PCB
 	m_maincpu->set_addrmap(AS_PROGRAM, &zaccaria_state::main_map);
 
 //  config.set_maximum_quantum(attotime::from_hz(1000000));
@@ -346,7 +346,7 @@ void zaccaria_state::zaccaria(machine_config &config)
 
 	ls259_device &mainlatch(LS259(config, "mainlatch")); // 3G on 1B1141 I/O (Z80) board
 	mainlatch.q_out_cb<0>().set(FUNC(zaccaria_state::flip_screen_x_w)); // VCMA
-	mainlatch.q_out_cb<1>().set(FUNC(zaccaria_state::flip_screen_y_w)); // HCMA
+	mainlatch.q_out_cb<1>().set(FUNC(zaccaria_state::flip_screen_y_set)); // HCMA
 	mainlatch.q_out_cb<2>().set("audiopcb", FUNC(zac1b11142_audio_device::ressound_w)); // RESSOUND
 	mainlatch.q_out_cb<6>().set(FUNC(zaccaria_state::coin_w)); // COUNT
 	mainlatch.q_out_cb<7>().set(FUNC(zaccaria_state::nmi_mask_w)); // INTST
@@ -359,10 +359,7 @@ void zaccaria_state::zaccaria(machine_config &config)
 
 	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60.57); // verified on PCB
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	screen.set_size(32*8, 32*8);
-	screen.set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
+	screen.set_raw(18.432_MHz_XTAL / 3, 384, 0, 256, 264, 16, 240); // verified from schematics
 	screen.set_screen_update(FUNC(zaccaria_state::screen_update));
 	screen.set_palette(m_palette);
 	screen.screen_vblank().set(FUNC(zaccaria_state::vblank_irq));

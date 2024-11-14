@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <!--
-license:CC0
+license:CC0-1.0
 
 The Following is known to exist but is undumped:
 info from http://www.tatungeinstein.co.uk/front/complete.htm
@@ -537,7 +537,7 @@ Xtal Systems (Xtal Research)
 	</software>
 
 	<software name="cchambera" cloneof="cchamber">
-		<description>Cursed Chambers &amp; ZRIM (Alt)</description>
+		<description>Cursed Chambers &amp; ZRIM (alt)</description>
 		<year>19??</year>
 		<publisher>Kuma Software</publisher>
 		<part name="flop1" interface="floppy_3">
@@ -581,7 +581,6 @@ Xtal Systems (Xtal Research)
 	</software>
 
 	<software name="druid" supported="no">
-		<!-- Does not work in MESS-->
 		<description>Druid</description>
 		<year>19??</year>
 		<publisher>Merlin Software</publisher>
@@ -935,7 +934,7 @@ Xtal Systems (Xtal Research)
 	</software>
 
 	<software name="mworkshpa" cloneof="mworkshp">
-		<description>Music Workshop (Alt)</description>
+		<description>Music Workshop (alt)</description>
 		<year>19??</year>
 		<publisher>Screensoft</publisher>
 		<part name="flop1" interface="floppy_3">
@@ -1243,7 +1242,7 @@ Xtal Systems (Xtal Research)
 	</software>
 
 	<software name="super6ta" cloneof="super6t">
-		<description>Super Six Game Pack (Tatung, Alt)</description>
+		<description>Super Six Game Pack (Tatung, alt)</description>
 		<year>198?</year>
 		<publisher>Tatung Einsoft</publisher>
 		<part name="flop1" interface="floppy_3">
@@ -1643,7 +1642,7 @@ Xtal Systems (Xtal Research)
 	</software>
 
 	<software name="gamecmp1">
-		<description>Game Compilation (Cracked)</description>
+		<description>Game Compilation (cracked)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_3">

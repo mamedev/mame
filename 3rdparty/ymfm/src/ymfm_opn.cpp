@@ -146,7 +146,10 @@ bool opn_registers_base<IsOpnA>::write(uint16_t index, uint8_t data, uint32_t &c
 	// borrow unused registers 0xb8-bf/0x1b8-bf as temporary holding locations
 	if ((index & 0xf0) == 0xa0)
 	{
-		uint32_t latchindex = 0xb8 | (bitfield(index, 3) << 2) | bitfield(index, 0, 2);
+		if (bitfield(index, 0, 2) == 3)
+			return false;
+
+		uint32_t latchindex = 0xb8 | bitfield(index, 3);
 		if (IsOpnA)
 			latchindex |= index & 0x100;
 
@@ -157,9 +160,16 @@ bool opn_registers_base<IsOpnA>::write(uint16_t index, uint8_t data, uint32_t &c
 		// writes to the lower half only commit if the latch is there
 		else if (bitfield(m_regdata[latchindex], 7))
 		{
+			m_regdata[index] = data;
 			m_regdata[index | 4] = m_regdata[latchindex] & 0x3f;
 			m_regdata[latchindex] = 0;
 		}
+		return false;
+	}
+	else if ((index & 0xf8) == 0xb8)
+	{
+		// registers 0xb8-0xbf are used internally
+		return false;
 	}
 
 	// everything else is normal
@@ -195,7 +205,12 @@ int32_t opn_registers_base<IsOpnA>::clock_noise_and_lfo()
 	if (!IsOpnA || !lfo_enable())
 	{
 		m_lfo_counter = 0;
-		m_lfo_am = 0;
+
+		// special case: if LFO is disabled on OPNA, it basically just keeps the counter
+		// at 0; since position 0 gives an AM value of 0x3f, it is important to reflect
+		// that here; for example, MegaDrive Venom plays some notes with LFO globally
+		// disabled but enabling LFO on the operators, and it expects this added attenutation
+		m_lfo_am = IsOpnA ? 0x3f : 0x00;
 		return 0;
 	}
 
@@ -417,10 +432,10 @@ std::string opn_registers_base<IsOpnA>::log_keyon(uint32_t choffs, uint32_t opof
 			ch_output_1(choffs) ? 'R' : '-');
 	if (op_ssg_eg_enable(opoffs))
 		end += sprintf(end, " ssg=%X", op_ssg_eg_mode(opoffs));
-	bool am = (lfo_enable() && op_lfo_am_enable(opoffs) && ch_lfo_am_sens(choffs) != 0);
+	bool am = (op_lfo_am_enable(opoffs) && ch_lfo_am_sens(choffs) != 0);
 	if (am)
 		end += sprintf(end, " am=%u", ch_lfo_am_sens(choffs));
-	bool pm = (lfo_enable() && ch_lfo_pm_sens(choffs) != 0);
+	bool pm = (ch_lfo_pm_sens(choffs) != 0);
 	if (pm)
 		end += sprintf(end, " pm=%u", ch_lfo_pm_sens(choffs));
 	if (am || pm)
@@ -1094,7 +1109,7 @@ uint8_t ym2608::read_status_hi()
 uint8_t ym2608::read_data_hi()
 {
 	uint8_t result = 0;
-	if (m_address < 0x10)
+	if ((m_address & 0xff) < 0x10)
 	{
 		// 00-0F: Read from ADPCM-B
 		result = m_adpcm_b.read(m_address & 0x0f);
@@ -2398,8 +2413,8 @@ void ym2612::generate(output_data *output, uint32_t numsamples)
 		// a better sound mixer than we usually have, so just average over the six
 		// channels; also apply a 64/65 factor to account for the discontinuity
 		// adjustment above
-		output->data[0] = (output->data[0] << 7) * 64 / (6 * 65);
-		output->data[1] = (output->data[1] << 7) * 64 / (6 * 65);
+		output->data[0] = (output->data[0] * 128) * 64 / (6 * 65);
+		output->data[1] = (output->data[1] * 128) * 64 / (6 * 65);
 	}
 }
 
@@ -2432,8 +2447,8 @@ void ym3438::generate(output_data *output, uint32_t numsamples)
 
 		// YM3438 doesn't have the same DAC discontinuity, though its output is
 		// multiplexed like the YM2612
-		output->data[0] = (output->data[0] << 7) / 6;
-		output->data[1] = (output->data[1] << 7) / 6;
+		output->data[0] = (output->data[0] * 128) / 6;
+		output->data[1] = (output->data[1] * 128) / 6;
 	}
 }
 

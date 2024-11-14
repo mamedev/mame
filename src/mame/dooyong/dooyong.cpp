@@ -75,7 +75,7 @@ are almost identical, except for much darker BG layer colors).
 ***************************************************************************/
 
 #include "emu.h"
-#include "dooyong_v.h"
+#include "dooyong_tilemap.h"
 
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
@@ -108,7 +108,7 @@ protected:
 	}
 
 	void sound_2151(machine_config &config, XTAL ymclk, XTAL okiclk);
-	void bluehawk_sound_map(address_map &map);
+	void bluehawk_sound_map(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
@@ -233,9 +233,9 @@ protected:
 
 	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, unsigned extensions = 0);
 
-	void bluehawk_map(address_map &map);
-	void flytiger_map(address_map &map);
-	void primella_map(address_map &map);
+	void bluehawk_map(address_map &map) ATTR_COLD;
+	void flytiger_map(address_map &map) ATTR_COLD;
+	void primella_map(address_map &map) ATTR_COLD;
 
 	std::unique_ptr<u8[]> m_paletteram_flytiger;
 	u8 m_sprites_disabled = 0;
@@ -298,12 +298,12 @@ protected:
 	template <typename T>
 	void sound_2203(machine_config &config, T ymclk);
 
-	void lastday_map(address_map &map);
-	void gulfstrm_map(address_map &map);
-	void pollux_map(address_map &map);
+	void lastday_map(address_map &map) ATTR_COLD;
+	void gulfstrm_map(address_map &map) ATTR_COLD;
+	void pollux_map(address_map &map) ATTR_COLD;
 
-	void lastday_sound_map(address_map &map);
-	void pollux_sound_map(address_map &map);
+	void lastday_sound_map(address_map &map) ATTR_COLD;
+	void pollux_sound_map(address_map &map) ATTR_COLD;
 };
 
 
@@ -364,8 +364,8 @@ protected:
 
 	void dooyong_68k(machine_config &config);
 
-	void rshark_map(address_map &map);
-	void superx_map(address_map &map);
+	void rshark_map(address_map &map) ATTR_COLD;
+	void superx_map(address_map &map) ATTR_COLD;
 };
 
 
@@ -398,7 +398,7 @@ protected:
 		color = 0;
 	}
 
-	void popbingo_map(address_map &map);
+	void popbingo_map(address_map &map) ATTR_COLD;
 
 private:
 	bitmap_ind16 m_bg_bitmap[2];
@@ -1367,17 +1367,6 @@ const gfx_layout spritelayout =
 	128*8
 };
 
-const gfx_layout rshark_spritelayout =
-{
-	16,16,
-	RGN_FRAC(1,1),
-	4,
-	{ STEP4(0,1) },
-	{ STEP8(0,4), STEP8(4*8*16,4) },
-	{ STEP16(0,4*8) },
-	128*8
-};
-
 GFXDECODE_START( gfx_lastday )
 	GFXDECODE_ENTRY( "tx",     0, lastday_charlayout, 0, 16+64 )
 	GFXDECODE_ENTRY( "sprite", 0, spritelayout,     256, 16+64 )
@@ -1409,18 +1398,18 @@ GFXDECODE_END
 
 GFXDECODE_START( gfx_rshark )
 	/* no chars */
-	GFXDECODE_ENTRY( "sprite", 0, rshark_spritelayout,  0, 16 )
-	GFXDECODE_ENTRY( "fg1",    0, spritelayout,       256, 16 )
-	GFXDECODE_ENTRY( "fg0",    0, spritelayout,       512, 16 )
-	GFXDECODE_ENTRY( "bg1",    0, spritelayout,       768, 16 )
-	GFXDECODE_ENTRY( "bg0",    0, spritelayout,      1024, 16 )
+	GFXDECODE_ENTRY( "sprite", 0, gfx_8x8x4_col_2x2_group_packed_msb,    0, 16 )
+	GFXDECODE_ENTRY( "fg1",    0, spritelayout,                        256, 16 )
+	GFXDECODE_ENTRY( "fg0",    0, spritelayout,                        512, 16 )
+	GFXDECODE_ENTRY( "bg1",    0, spritelayout,                        768, 16 )
+	GFXDECODE_ENTRY( "bg0",    0, spritelayout,                       1024, 16 )
 GFXDECODE_END
 
 GFXDECODE_START( gfx_popbingo )
 	/* no chars */
-	GFXDECODE_ENTRY( "sprite", 0, rshark_spritelayout,  0, 16 )
-	GFXDECODE_ENTRY( "bg0",    0, tilelayout,           0,  1 )
-	GFXDECODE_ENTRY( "bg1",    0, tilelayout,           0,  1 )
+	GFXDECODE_ENTRY( "sprite", 0, gfx_8x8x4_col_2x2_group_packed_msb, 0, 16 )
+	GFXDECODE_ENTRY( "bg0",    0, tilelayout,                         0,  1 )
+	GFXDECODE_ENTRY( "bg1",    0, tilelayout,                         0,  1 )
 
 GFXDECODE_END
 

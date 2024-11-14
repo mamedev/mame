@@ -1,13 +1,13 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood, Sylvain Glaize, Paul Priest, Olivier Galibert
-#ifndef MAME_INCLUDES_SUPRNOVA_H
-#define MAME_INCLUDES_SUPRNOVA_H
+#ifndef MAME_KANEKO_SUPRNOVA_H
+#define MAME_KANEKO_SUPRNOVA_H
 
 #pragma once
 
 #include "sknsspr.h"
 
-#include "cpu/sh/sh2.h"
+#include "cpu/sh/sh7604.h"
 #include "machine/timer.h"
 
 #include "emupal.h"
@@ -66,7 +66,7 @@ public:
 	void init_galpani4();
 	void init_ryouran();
 
-	template <int P> DECLARE_CUSTOM_INPUT_MEMBER(paddle_r);
+	template <int P> ioport_value paddle_r();
 
 private:
 	struct hit_t
@@ -84,7 +84,7 @@ private:
 		uint8_t disconnect = 0;
 	};
 
-	required_device<sh2_device> m_maincpu;
+	required_device<sh7604_device> m_maincpu;
 	required_device<sknsspr_device> m_spritegen;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
@@ -163,10 +163,10 @@ private:
 	uint32_t sengekis_speedup_r();
 	uint32_t sengekij_speedup_r();
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
-	virtual void video_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
+	virtual void video_reset() override ATTR_COLD;
 	DECLARE_MACHINE_RESET(sknsa);
 	DECLARE_MACHINE_RESET(sknsj);
 	DECLARE_MACHINE_RESET(sknsu);
@@ -176,7 +176,7 @@ private:
 	TILE_GET_INFO_MEMBER(get_tilemap_A_tile_info);
 	TILE_GET_INFO_MEMBER(get_tilemap_B_tile_info);
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	DECLARE_WRITE_LINE_MEMBER(screen_vblank);
+	void screen_vblank(int state);
 
 	TIMER_DEVICE_CALLBACK_MEMBER(interrupt_callback);
 	TIMER_DEVICE_CALLBACK_MEMBER(irq);
@@ -189,7 +189,7 @@ private:
 	void init_drc();
 	void set_drc_pcflush(uint32_t addr);
 
-	void skns_map(address_map &map);
+	void skns_map(address_map &map) ATTR_COLD;
 };
 
-#endif // MAME_INCLUDES_SUPRNOVA_H
+#endif // MAME_KANEKO_SUPRNOVA_H

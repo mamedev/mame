@@ -35,7 +35,7 @@
 #include "screen.h"
 #include "speaker.h"
 
-#include "formats/ap2_dsk.h"
+#include "utf8.h"
 
 
 namespace {
@@ -58,7 +58,6 @@ public:
 		m_video(*this, A2_VIDEO_TAG),
 		m_row(*this, "ROW%u", 0U),
 		m_kbspecial(*this, "keyb_special"),
-		m_sysconfig(*this, "a2_config"),
 		m_speaker(*this, A2_SPEAKER_TAG),
 		m_cassette(*this, A2_CASSETTE_TAG),
 		m_upperbank(*this, A2_UPPERBANK_TAG),
@@ -69,17 +68,16 @@ public:
 	void tk2000(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;
 	required_device<ram_device> m_ram;
 	required_device<screen_device> m_screen;
-	required_device<a2_video_device> m_video;
+	required_device<a2_video_device_composite> m_video;
 	required_ioport_array<8> m_row;
 	required_ioport m_kbspecial;
-	required_ioport m_sysconfig;
 	required_device<speaker_sound_device> m_speaker;
 	required_device<cassette_image_device> m_cassette;
 	required_device<address_map_bank_device> m_upperbank;
@@ -98,12 +96,10 @@ private:
 
 	TIMER_DEVICE_CALLBACK_MEMBER(apple2_interrupt);
 
-	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-
 	uint8_t ram_r(offs_t offset);
 	void ram_w(offs_t offset, uint8_t data);
 
-	DECLARE_WRITE_LINE_MEMBER(printer_busy_w);
+	void printer_busy_w(int state);
 	void kbout_w(uint8_t data);
 	uint8_t kbin_r();
 	uint8_t casout_r();
@@ -112,18 +108,18 @@ private:
 	void snd_w(uint8_t data);
 	uint8_t switches_r(offs_t offset);
 	uint8_t cassette_r();
-	DECLARE_WRITE_LINE_MEMBER(color_w);
-	DECLARE_WRITE_LINE_MEMBER(motor_a_w);
-	DECLARE_WRITE_LINE_MEMBER(motor_b_w);
-	DECLARE_WRITE_LINE_MEMBER(rom_ram_w);
-	DECLARE_WRITE_LINE_MEMBER(ctrl_key_w);
+	void color_w(int state);
+	void motor_a_w(int state);
+	void motor_b_w(int state);
+	void rom_ram_w(int state);
+	void ctrl_key_w(int state);
 	uint8_t c080_r(offs_t offset);
 	void c080_w(offs_t offset, uint8_t data);
 	uint8_t c100_r(offs_t offset);
 	void c100_w(offs_t offset, uint8_t data);
 
-	void apple2_map(address_map &map);
-	void inhbank_map(address_map &map);
+	void apple2_map(address_map &map) ATTR_COLD;
+	void inhbank_map(address_map &map) ATTR_COLD;
 
 	uint8_t read_floatingbus();
 };
@@ -151,10 +147,8 @@ void tk2000_state::machine_start()
 	save_item(NAME(m_ctrl_key));
 
 	// setup video pointers
-	m_video->m_ram_ptr = m_ram_ptr;
-	m_video->m_aux_ptr = m_ram_ptr;
-	m_video->m_char_ptr = nullptr;
-	m_video->m_char_size = 0;
+	m_video->set_ram_pointers(m_ram_ptr, m_ram_ptr);
+	m_video->set_char_pointer(nullptr, 0);  // no text modes on this machine
 }
 
 void tk2000_state::machine_reset()
@@ -172,25 +166,13 @@ TIMER_DEVICE_CALLBACK_MEMBER(tk2000_state::apple2_interrupt)
 
 	if((scanline % 8) == 0)
 		m_screen->update_partial(m_screen->vpos());
-
-	// update the video system's shadow copy of the system config at the end of the frame
-	if (scanline == 192)
-	{
-		m_video->m_sysconfig = m_sysconfig->read();
-	}
-}
-
-uint32_t tk2000_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
-{
-	m_video->hgr_update(screen, bitmap, cliprect, 0, 191);
-	return 0;
 }
 
 /***************************************************************************
     I/O
 ***************************************************************************/
 
-WRITE_LINE_MEMBER(tk2000_state::printer_busy_w)
+void tk2000_state::printer_busy_w(int state)
 {
 	m_printer_busy = state;
 }
@@ -261,26 +243,26 @@ uint8_t tk2000_state::cassette_r()
 	return (m_cassette->input() > 0.0 ? 0x80 : 0) | (read_floatingbus() & 0x7f);
 }
 
-WRITE_LINE_MEMBER(tk2000_state::color_w)
+void tk2000_state::color_w(int state)
 {
 	// 0 = color, 1 = black/white
 }
 
-WRITE_LINE_MEMBER(tk2000_state::motor_a_w)
+void tk2000_state::motor_a_w(int state)
 {
 }
 
-WRITE_LINE_MEMBER(tk2000_state::motor_b_w)
+void tk2000_state::motor_b_w(int state)
 {
 }
 
-WRITE_LINE_MEMBER(tk2000_state::rom_ram_w)
+void tk2000_state::rom_ram_w(int state)
 {
 	// 0 = ROM, 1 = RAM
 	m_upperbank->set_bank(state);
 }
 
-WRITE_LINE_MEMBER(tk2000_state::ctrl_key_w)
+void tk2000_state::ctrl_key_w(int state)
 {
 	m_ctrl_key = state;
 }
@@ -344,9 +326,9 @@ uint8_t tk2000_state::read_floatingbus()
 
 	// machine state switches
 	//
-	Hires    = 1; //m_video->m_hires ? 1 : 0;
-	Mixed    = 0; //m_video->m_mix ? 1 : 0;
-	Page2    = m_video->m_page2 ? 1 : 0;
+	Hires    = 1;
+	Mixed    = 0;
+	Page2 = m_video->get_page2() ? 1 : 0;
 	_80Store = 0;
 
 	// calculate video parameters according to display standard
@@ -571,13 +553,6 @@ static INPUT_PORTS_START( tk2000 )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNUSED)
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNUSED)
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED)
-
-	PORT_START("a2_config")
-	PORT_CONFNAME(0x03, 0x00, "Composite monitor type")
-	PORT_CONFSETTING(0x00, "Color")
-	PORT_CONFSETTING(0x01, "B&W")
-	PORT_CONFSETTING(0x02, "Green")
-	PORT_CONFSETTING(0x03, "Amber")
 INPUT_PORTS_END
 
 void tk2000_state::tk2000(machine_config &config)
@@ -589,14 +564,14 @@ void tk2000_state::tk2000(machine_config &config)
 	TIMER(config, "scantimer").configure_scanline(FUNC(tk2000_state::apple2_interrupt), "screen", 0, 1);
 	config.set_maximum_quantum(attotime::from_hz(60));
 
-	APPLE2_VIDEO(config, m_video, XTAL(14'318'181)).set_screen(m_screen);
+	APPLE2_VIDEO_COMPOSITE(config, m_video, XTAL(14'318'181)).set_screen(m_screen);
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
 	m_screen->set_size(280*2, 262);
 	m_screen->set_visarea(0, (280*2)-1,0,192-1);
-	m_screen->set_screen_update(FUNC(tk2000_state::screen_update));
+	m_screen->set_screen_update(m_video, NAME((&a2_video_device::screen_update<a2_video_device::model::II, false, false>)));
 	m_screen->set_palette(m_video);
 
 	/* sound hardware */

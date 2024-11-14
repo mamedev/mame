@@ -82,20 +82,20 @@ private:
 	void pia51_w(offs_t offset, u8 data);
 	u8 p51b_r();
 	void sol_w(u8 data);
-	DECLARE_WRITE_LINE_MEMBER(p50ca2_w);
-	DECLARE_WRITE_LINE_MEMBER(p51ca2_w);
+	void p50ca2_w(int state);
+	void p51ca2_w(int state);
 	void sw_w(u8 data);
 	void lamp_w(u8 data);
 	void p50a_w(u8 data);
 	void p50b_w(u8 data);
 	void p51a_w(u8 data);
 	void p51b_w(u8 data) { };  // volume control
-	void mem_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
 
 	u8 m_row = 0U;
 	u8 m_counter = 0U;
-	virtual void machine_reset() override;
-	virtual void machine_start() override;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void machine_start() override ATTR_COLD;
 	required_device<m6800_cpu_device> m_v1cpu;
 	required_device<pia6821_device> m_pia51;
 	required_device<beep_device> m_beep;
@@ -112,12 +112,12 @@ public:
 	void pent8085(machine_config &config);
 
 private:
-	DECLARE_WRITE_LINE_MEMBER(clock_w);
+	void clock_w(int state);
 	void disp_w(offs_t, u8);
-	void io_map(address_map &map);
-	void mem_map(address_map &map);
-	virtual void machine_reset() override;
-	virtual void machine_start() override;
+	void io_map(address_map &map) ATTR_COLD;
+	void mem_map(address_map &map) ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void machine_start() override ATTR_COLD;
 	required_device<i8085a_cpu_device> m_v2cpu;
 };
 
@@ -366,7 +366,7 @@ void pent6800_state::p50b_w(u8 data)
 }
 
 // round LEDs on score panel
-WRITE_LINE_MEMBER( pent6800_state::p50ca2_w )
+void pent6800_state::p50ca2_w(int state)
 {
 	if ((!state) && (m_row < 8))
 	{
@@ -387,7 +387,7 @@ void pent6800_state::p51a_w(u8 data)
 }
 
 // Sound on/off
-WRITE_LINE_MEMBER( pent6800_state::p51ca2_w )
+void pent6800_state::p51ca2_w(int state)
 {
 	m_beep->set_state(state);
 }
@@ -421,7 +421,7 @@ void pent8085_state::disp_w(offs_t offset, u8 data)
 	m_digits[offset+20] = patterns[BIT(~data, 4, 4)];
 }
 
-WRITE_LINE_MEMBER( pent8085_state::clock_w )
+void pent8085_state::clock_w(int state)
 {
 	if (state)
 		m_v2cpu->set_input_line(I8085_RST55_LINE, HOLD_LINE);
@@ -492,12 +492,12 @@ void pent6800_state::pent6800(machine_config &config)
 	BEEP(config, m_beep, 387).add_route(ALL_OUTPUTS, "mono", 0.50);
 
 	/* Devices */
-	pia6821_device &pia50(PIA6821(config, "pia50", 0));
+	pia6821_device &pia50(PIA6821(config, "pia50"));
 	pia50.writepa_handler().set(FUNC(pent6800_state::p50a_w));
 	pia50.writepb_handler().set(FUNC(pent6800_state::p50b_w));
 	pia50.ca2_handler().set(FUNC(pent6800_state::p50ca2_w));
 
-	PIA6821(config, m_pia51, 0);
+	PIA6821(config, m_pia51);
 	m_pia51->writepa_handler().set(FUNC(pent6800_state::p51a_w));
 	m_pia51->readpb_handler().set(FUNC(pent6800_state::p51b_r));
 	m_pia51->writepb_handler().set(FUNC(pent6800_state::p51b_w));
@@ -548,7 +548,16 @@ ROM_START(pentacup2)
 	// 2 undumped proms DMA-01, DMA-02
 ROM_END
 
-} // Anonymous namespace
+ROM_START(pentacupt)
+	ROM_REGION(0x10000, "v2cpu", 0)
+	ROM_LOAD("microt_1.bin", 0x0000, 0x0800, CRC(690646eb) SHA1(86253b61ac9554ee5bdcdf9c0a2302fc393b9ada))
+	ROM_LOAD("microt_2.bin", 0x0800, 0x0800, CRC(51d09098) SHA1(4efe3a05ad60f0fc52aa5402e660f34b99855b59))
+	ROM_LOAD("microt_3.bin", 0x1000, 0x0800, CRC(cefb0966) SHA1(836491745417fc0d5f88c01a9c69a5c322d194be))
+	ROM_LOAD("microt_4.bin", 0x1800, 0x0800, CRC(6f691929) SHA1(a18352312706e0f0af14a33fac31c3f5f7156ba8))
+ROM_END
+
+} // anonymous namespace
 
 GAME(1978,  pentacup,  0,         pent6800,  pent6800, pent6800_state, empty_init, ROT0, "Micropin", "Pentacup (rev. 1)", MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
 GAME(1980,  pentacup2, pentacup,  pent8085,  pent8085, pent8085_state, empty_init, ROT0, "Micropin", "Pentacup (rev. 2)", MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1980,  pentacupt, pentacup,  pent8085,  pent8085, pent8085_state, empty_init, ROT0, "Micropin", "Pentacup (rev. T)", MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )

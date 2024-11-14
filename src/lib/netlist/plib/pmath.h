@@ -9,6 +9,7 @@
 ///
 
 #include "pconfig.h"
+#include "pgsl.h"
 #include "ptypes.h"
 
 #include <algorithm>
@@ -271,8 +272,7 @@ namespace plib
 	/// FIXME: limited implementation
 	///
 	template <typename T1, typename T2>
-	static inline
-	auto pow(T1 v, T2 p) noexcept -> decltype(std::pow(v, p))
+	static inline auto pow(T1 v, T2 p) noexcept -> decltype(std::pow(v, p))
 	{
 		return std::pow(v, p);
 	}
@@ -283,60 +283,30 @@ namespace plib
 		return constants<FLOAT128>::one() / v;
 	}
 
-	static FLOAT128 abs(FLOAT128 v) noexcept
-	{
-		return fabsq(v);
-	}
+	static FLOAT128 abs(FLOAT128 v) noexcept { return fabsq(v); }
 
-	static FLOAT128 sqrt(FLOAT128 v) noexcept
-	{
-		return sqrtq(v);
-	}
+	static FLOAT128 sqrt(FLOAT128 v) noexcept { return sqrtq(v); }
 
 	static FLOAT128 hypot(FLOAT128 v1, FLOAT128 v2) noexcept
 	{
 		return hypotq(v1, v2);
 	}
 
-	static FLOAT128 exp(FLOAT128 v) noexcept
-	{
-		return expq(v);
-	}
+	static FLOAT128 exp(FLOAT128 v) noexcept { return expq(v); }
 
-	static FLOAT128 log(FLOAT128 v) noexcept
-	{
-		return logq(v);
-	}
+	static FLOAT128 log(FLOAT128 v) noexcept { return logq(v); }
 
-	static FLOAT128 tanh(FLOAT128 v) noexcept
-	{
-		return tanhq(v);
-	}
+	static FLOAT128 tanh(FLOAT128 v) noexcept { return tanhq(v); }
 
-	static FLOAT128 floor(FLOAT128 v) noexcept
-	{
-		return floorq(v);
-	}
+	static FLOAT128 floor(FLOAT128 v) noexcept { return floorq(v); }
 
-	static FLOAT128 log1p(FLOAT128 v) noexcept
-	{
-		return log1pq(v);
-	}
+	static FLOAT128 log1p(FLOAT128 v) noexcept { return log1pq(v); }
 
-	static FLOAT128 sin(FLOAT128 v) noexcept
-	{
-		return sinq(v);
-	}
+	static FLOAT128 sin(FLOAT128 v) noexcept { return sinq(v); }
 
-	static FLOAT128 cos(FLOAT128 v) noexcept
-	{
-		return cosq(v);
-	}
+	static FLOAT128 cos(FLOAT128 v) noexcept { return cosq(v); }
 
-	static FLOAT128 trunc(FLOAT128 v) noexcept
-	{
-		return truncq(v);
-	}
+	static FLOAT128 trunc(FLOAT128 v) noexcept { return truncq(v); }
 
 	template <typename T>
 	static FLOAT128 pow(FLOAT128 v, T p) noexcept
@@ -346,8 +316,8 @@ namespace plib
 
 	static FLOAT128 pow(FLOAT128 v, int p) noexcept
 	{
-		if (p==2)
-			return v*v;
+		if (p == 2)
+			return v * v;
 		else
 			return powq(v, static_cast<FLOAT128>(p));
 	}
@@ -364,7 +334,7 @@ namespace plib
 	constexpr bool is_pow2(T v) noexcept
 	{
 		static_assert(is_integral<T>::value, "is_pow2 needs integer arguments");
-		return !(v & (v-1));
+		return !(v & (v - 1));
 	}
 
 	/// \brief return absolute value of signed argument
@@ -373,9 +343,9 @@ namespace plib
 	/// \param  v argument
 	/// \return absolute value of argument
 	///
-	template<typename T>
-	constexpr
-	std::enable_if_t<plib::is_integral<T>::value && plib::is_signed<T>::value, T>
+	template <typename T>
+	constexpr std::enable_if_t<
+		plib::is_integral<T>::value && plib::is_signed<T>::value, T>
 	abs(T v) noexcept
 	{
 		return v < 0 ? -v : v;
@@ -387,9 +357,9 @@ namespace plib
 	/// \param  v argument
 	/// \return argument since it has no sign
 	///
-	template<typename T>
-	constexpr
-	std::enable_if_t<plib::is_integral<T>::value && plib::is_unsigned<T>::value, T>
+	template <typename T>
+	constexpr std::enable_if_t<
+		plib::is_integral<T>::value && plib::is_unsigned<T>::value, T>
 	abs(T v) noexcept
 	{
 		return v;
@@ -406,16 +376,14 @@ namespace plib
 	/// \param  n first argument
 	/// \return greatest common denominator of m and n
 	///
-	template<typename M, typename N>
+	template <typename M, typename N>
 	constexpr typename std::common_type<M, N>::type
-	gcd(M m, N n) noexcept //NOLINT(misc-no-recursion)
+	gcd(M m, N n) noexcept // NOLINT(misc-no-recursion)
 	{
 		static_assert(plib::is_integral<M>::value, "gcd: M must be an integer");
 		static_assert(plib::is_integral<N>::value, "gcd: N must be an integer");
 
-		return m == 0 ? plib::abs(n)
-			 : n == 0 ? plib::abs(m)
-			 : gcd(n, m % n);
+		return m == 0 ? plib::abs(n) : n == 0 ? plib::abs(m) : gcd(n, m % n);
 	}
 
 	/// \brief return least common multiple
@@ -429,24 +397,25 @@ namespace plib
 	/// \param  n first argument
 	/// \return least common multiple of m and n
 	///
-	template<typename M, typename N>
-	constexpr typename std::common_type<M, N>::type
-	lcm(M m, N n) noexcept
+	template <typename M, typename N>
+	constexpr typename std::common_type<M, N>::type lcm(M m, N n) noexcept
 	{
 		static_assert(plib::is_integral<M>::value, "lcm: M must be an integer");
 		static_assert(plib::is_integral<N>::value, "lcm: N must be an integer");
 
-		return (m != 0 && n != 0) ? (plib::abs(m) / gcd(m, n)) * plib::abs(n) : 0;
+		return (m != 0 && n != 0) ? (plib::abs(m) / gcd(m, n)) * plib::abs(n)
+								  : 0;
 	}
 
-	template<class T>
-	constexpr const T& clamp( const T& v, const T& low, const T& high)
+	template <class T>
+	constexpr const T &clamp(const T &v, const T &low, const T &high)
 	{
 		gsl_Expects(high >= low);
 		return (v < low) ? low : (high < v) ? high : v;
 	}
 
-	static_assert(noexcept(constants<double>::one()), "Not evaluated as constexpr");
+	static_assert(noexcept(constants<double>::one()),
+				  "Not evaluated as constexpr");
 
 } // namespace plib
 

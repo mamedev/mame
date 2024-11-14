@@ -53,8 +53,8 @@ public:
 	speaker_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 	virtual ~speaker_device();
 
-	// inline configuration helpers
-	speaker_device &set_position(double x, double y, double z) { m_x = x; m_y = y; m_z = z; return *this; }
+	// configuration helpers
+	speaker_device &set_position(double x, double y, double z);
 	speaker_device &front_center()      { set_position( 0.0,  0.0,  1.0); return *this; }
 	speaker_device &front_left()        { set_position(-0.2,  0.0,  1.0); return *this; }
 	speaker_device &front_floor()       { set_position( 0.0, -0.5,  1.0); return *this; }
@@ -71,15 +71,22 @@ public:
 	// internally for use by the sound system
 	void mix(stream_buffer::sample_t *leftmix, stream_buffer::sample_t *rightmix, attotime start, attotime end, int expected_samples, bool suppress);
 
+	// user panning configuration
+	void set_pan(float pan) { m_pan = std::clamp(pan, -1.0f, 1.0f); }
+	float pan() { return m_pan; }
+	float defpan() { return m_defpan; }
+
 protected:
 	// device-level overrides
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_stop() override ATTR_COLD;
 
-	// inline configuration state
+	// configuration state
 	double m_x;
 	double m_y;
 	double m_z;
+	float m_pan;
+	float m_defpan;
 
 	// internal state
 	static constexpr int BUCKETS_PER_SECOND = 10;

@@ -35,7 +35,7 @@
 
 #pragma once
 
-#include "imagedev/chd_cd.h"
+#include "imagedev/cdromimg.h"
 #include "sound/cdda.h"
 
 class cr511b_device : public device_t
@@ -55,14 +55,14 @@ public:
 	uint8_t read();
 	void write(uint8_t data);
 
-	DECLARE_WRITE_LINE_MEMBER( enable_w );
-	DECLARE_WRITE_LINE_MEMBER( cmd_w );
+	void enable_w(int state);
+	void cmd_w(int state);
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 private:
 	enum

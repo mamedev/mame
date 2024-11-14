@@ -61,11 +61,6 @@ crt9212_device::crt9212_device(const machine_config &mconfig, const char *tag, d
 
 void crt9212_device::device_start()
 {
-	// resolve callbacks
-	m_write_dout.resolve_safe();
-	m_write_rof.resolve_safe();
-	m_write_wof.resolve_safe();
-
 	// state saving
 	save_item(NAME(m_data));
 	save_item(NAME(m_clrcnt));

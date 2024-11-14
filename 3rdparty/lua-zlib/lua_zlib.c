@@ -353,8 +353,8 @@ static int lz_checksum(lua_State *L) {
 }
 
 static int lz_checksum_new(lua_State *L, checksum_t checksum, checksum_combine_t combine) {
-    lua_pushlightuserdata(L, checksum);
-    lua_pushlightuserdata(L, combine);
+    lua_pushlightuserdata(L, (void *)checksum);
+    lua_pushlightuserdata(L, (void *)combine);
     lua_pushnumber(L, checksum(0L, Z_NULL, 0));
     lua_pushnumber(L, 0);
     lua_pushcclosure(L, lz_checksum, 4);

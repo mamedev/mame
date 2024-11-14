@@ -65,9 +65,14 @@ end
 
 #include "emu.h"
 #include "cpu/arm7/arm7.h"
+#include "machine/nandflash.h"
 #include "machine/s3c2410.h"
-#include "machine/smartmed.h"
 #include "screen.h"
+
+#include <cstdarg>
+
+
+namespace {
 
 #define PALM_Z22_BATTERY_LEVEL  75
 
@@ -90,13 +95,13 @@ public:
 	void init_palmz22();
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;
 	required_device<s3c2410_device> m_s3c2410;
-	required_device<nand_device> m_nand;
+	required_device<samsung_k9f5608u0dj_device> m_nand;
 
 	uint32_t m_port[8];
 
@@ -110,7 +115,7 @@ private:
 	uint32_t s3c2410_core_pin_r(offs_t offset);
 	uint32_t s3c2410_adc_data_r(offs_t offset);
 
-	void map(address_map &map);
+	void map(address_map &map) ATTR_COLD;
 };
 
 
@@ -260,8 +265,6 @@ INPUT_CHANGED_MEMBER(palmz22_state::input_changed)
 
 void palmz22_state::machine_start()
 {
-	m_nand->set_data_ptr( memregion("nand")->base());
-
 	save_item(NAME(m_port));
 }
 
@@ -314,27 +317,26 @@ void palmz22_state::palmz22(machine_config &config)
 	m_s3c2410->nand_data_r_callback().set(FUNC(palmz22_state::s3c2410_nand_data_r));
 	m_s3c2410->nand_data_w_callback().set(FUNC(palmz22_state::s3c2410_nand_data_w));
 
-	NAND(config, m_nand, 0);
-	m_nand->set_nand_type(nand_device::chip::K9F5608U0D_J);
+	SAMSUNG_K9F5608U0DJ(config, m_nand, 0);
 	m_nand->rnb_wr_callback().set(m_s3c2410, FUNC(s3c2410_device::frnb_w));
 }
 
 static INPUT_PORTS_START( palmz22 )
 	PORT_START( "PENB" )
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Pen Button") PORT_CHANGED_MEMBER(DEVICE_SELF, palmz22_state, input_changed, 0) PORT_PLAYER(2)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Pen Button") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(palmz22_state::input_changed), 0) PORT_PLAYER(2)
 	PORT_START( "PENX" )
 	PORT_BIT( 0x3ff, 0x200, IPT_LIGHTGUN_X ) PORT_NAME("Pen X") PORT_SENSITIVITY(50) PORT_CROSSHAIR(X, 1, 0, 0) PORT_KEYDELTA(30) PORT_PLAYER(2)
 	PORT_START( "PENY" )
 	PORT_BIT( 0x3ff, 0x200, IPT_LIGHTGUN_Y ) PORT_NAME("Pen Y") PORT_SENSITIVITY(50) PORT_CROSSHAIR(Y, 1, 0, 0) PORT_KEYDELTA(30) PORT_PLAYER(2)
 	PORT_START( "PORT-F" )
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON5        ) PORT_CHANGED_MEMBER(DEVICE_SELF, palmz22_state, input_changed, 1) PORT_NAME("Power")
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2        ) PORT_CHANGED_MEMBER(DEVICE_SELF, palmz22_state, input_changed, 1) PORT_NAME("Contacts")
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON4        ) PORT_CHANGED_MEMBER(DEVICE_SELF, palmz22_state, input_changed, 1) PORT_NAME("Calendar")
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON1        ) PORT_CHANGED_MEMBER(DEVICE_SELF, palmz22_state, input_changed, 1) PORT_NAME("Center")
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_UP    ) PORT_CHANGED_MEMBER(DEVICE_SELF, palmz22_state, input_changed, 1)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN  ) PORT_CHANGED_MEMBER(DEVICE_SELF, palmz22_state, input_changed, 1)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT  ) PORT_CHANGED_MEMBER(DEVICE_SELF, palmz22_state, input_changed, 1)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_CHANGED_MEMBER(DEVICE_SELF, palmz22_state, input_changed, 1)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON5        ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(palmz22_state::input_changed), 1) PORT_NAME("Power")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2        ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(palmz22_state::input_changed), 1) PORT_NAME("Contacts")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON4        ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(palmz22_state::input_changed), 1) PORT_NAME("Calendar")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON1        ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(palmz22_state::input_changed), 1) PORT_NAME("Center")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_UP    ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(palmz22_state::input_changed), 1)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN  ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(palmz22_state::input_changed), 1)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT  ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(palmz22_state::input_changed), 1)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(palmz22_state::input_changed), 1)
 INPUT_PORTS_END
 
 /***************************************************************************
@@ -345,5 +347,8 @@ ROM_START( palmz22 )
 	ROM_REGION( 0x2100000, "nand", 0 )
 	ROM_LOAD( "palmz22.bin", 0, 0x2100000, CRC(6d0320b3) SHA1(99297975fdad44faf69cc6eaf0fa2560d5579a4d) )
 ROM_END
+
+} // anonymous namespace
+
 
 COMP( 2005, palmz22, 0, 0, palmz22, palmz22, palmz22_state, init_palmz22, "Palm", "Palm Z22", MACHINE_NO_SOUND)

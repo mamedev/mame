@@ -20,6 +20,9 @@
 #include "screen.h"
 #include "speaker.h"
 
+
+namespace {
+
 class elan_ep3a19a_state : public driver_device
 {
 public:
@@ -43,8 +46,8 @@ public:
 
 protected:
 	// driver_device overrides
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	required_device<elan_ep3a19asys_device> m_sys;
 	required_device<elan_eu3a05gpio_device> m_gpio;
@@ -61,10 +64,10 @@ private:
 	// for callback
 	uint8_t read_full_space(offs_t offset);
 
-	void elan_ep3a19a_bank_map(address_map &map);
-	void elan_ep3a19a_map(address_map &map);
+	void elan_ep3a19a_bank_map(address_map &map) ATTR_COLD;
+	void elan_ep3a19a_map(address_map &map) ATTR_COLD;
 
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 
 	required_shared_ptr<uint8_t> m_ram;
 	required_device<elan_eu3a05_sound_device> m_sound;
@@ -73,12 +76,12 @@ private:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 
-	//DECLARE_WRITE_LINE_MEMBER(sound_end0) { m_sys->generate_custom_interrupt(2); }
-	//DECLARE_WRITE_LINE_MEMBER(sound_end1) { m_sys->generate_custom_interrupt(3); }
-	//DECLARE_WRITE_LINE_MEMBER(sound_end2) { m_sys->generate_custom_interrupt(4); }
-	//DECLARE_WRITE_LINE_MEMBER(sound_end3) { m_sys->generate_custom_interrupt(5); }
-	//DECLARE_WRITE_LINE_MEMBER(sound_end4) { m_sys->generate_custom_interrupt(6); }
-	//DECLARE_WRITE_LINE_MEMBER(sound_end5) { m_sys->generate_custom_interrupt(7); }
+	//void sound_end0(int state) { m_sys->generate_custom_interrupt(2); }
+	//void sound_end1(int state) { m_sys->generate_custom_interrupt(3); }
+	//void sound_end2(int state) { m_sys->generate_custom_interrupt(4); }
+	//void sound_end3(int state) { m_sys->generate_custom_interrupt(5); }
+	//void sound_end4(int state) { m_sys->generate_custom_interrupt(6); }
+	//void sound_end5(int state) { m_sys->generate_custom_interrupt(7); }
 
 	uint8_t nmi_vector_r(offs_t offset)
 	{
@@ -279,7 +282,6 @@ void elan_ep3a19a_state::elan_ep3a19a(machine_config &config)
 	m_vid->set_entries(256);
 	m_vid->set_is_pvmilfin();
 	m_vid->set_use_spritepages();
-	m_vid->set_force_transpen_ff();
 	m_vid->set_force_basic_scroll();
 
 	/* sound hardware */
@@ -345,6 +347,9 @@ void elan_ep3a19a_state::init_tvbg()
 		ROM[i] = bitswap<8>(ROM[i], 6, 5, 7, 0, 2, 3, 1, 4);
 	}
 }
+
+} // anonymous namespace
+
 
 CONS( 2007, tvbg6a, 0, 0, elan_ep3a19a, tvbg_1button, elan_ep3a19a_state, init_tvbg, "NSI International / Mammoth Toys (Licensed by Hasbro)", "TV Board Games 6-in-1: Silly 6 Pins, Candy Land, Hungry Hungry Hippos, Match 'em, Mixin' Pics, Checkers", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // https://www.youtube.com/watch?v=zajzQo47YYA
 CONS( 2007, tvbg6b, 0, 0, elan_ep3a19a, tvbg_1button, elan_ep3a19a_state, init_tvbg, "NSI International / Mammoth Toys (Licensed by Hasbro)", "TV Board Games 6-in-1: Simon, Battleship, Mouse Trap, Checkers, Link-a-Line, Roll Over", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // https://www.youtube.com/watch?v=JbrR67kY8MI

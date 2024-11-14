@@ -5,8 +5,8 @@
 Crazy Ballooon
 
 *************************************************************************/
-#ifndef MAME_INCLUDES_CRBALOON_H
-#define MAME_INCLUDES_CRBALOON_H
+#ifndef MAME_TAITO_CRBALOON_H
+#define MAME_TAITO_CRBALOON_H
 
 #pragma once
 
@@ -34,11 +34,11 @@ public:
 	{ }
 
 	void crbaloon(machine_config &config);
-	DECLARE_CUSTOM_INPUT_MEMBER(pc3092_r);
+	ioport_value pc3092_r();
 
 protected:
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	required_shared_ptr<uint8_t> m_videoram;
@@ -62,7 +62,7 @@ private:
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	void crbaloon_palette(palette_device &palette) const;
 	uint32_t screen_update_crbaloon(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_WRITE_LINE_MEMBER(vbl_int_w);
+	void vbl_int_w(int state);
 	void crbaloon_audio_set_music_freq(uint8_t data);
 	void crbaloon_audio_set_music_enable(uint8_t data);
 	void crbaloon_audio_set_laugh_enable(uint8_t data);
@@ -76,8 +76,8 @@ private:
 	void crbaloon_audio_set_breath_enable(int enabled);
 	void crbaloon_audio_set_appear_enable(int enabled);
 	void crbaloon_audio(machine_config &config);
-	void main_io_map(address_map &map);
-	void main_map(address_map &map);
+	void main_io_map(address_map &map) ATTR_COLD;
+	void main_map(address_map &map) ATTR_COLD;
 };
 
-#endif // MAME_INCLUDES_CRBALOON_H
+#endif // MAME_TAITO_CRBALOON_H

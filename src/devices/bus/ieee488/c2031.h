@@ -34,13 +34,13 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// optional information overrides
-	virtual const tiny_rom_entry *device_rom_region() const override;
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual ioport_constructor device_input_ports() const override;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 
 	// device_ieee488_interface overrides
 	virtual void ieee488_atn(int state) override;
@@ -49,17 +49,17 @@ protected:
 private:
 	inline int get_device_number();
 
-	DECLARE_WRITE_LINE_MEMBER( via0_irq_w );
+	void via0_irq_w(int state);
 	uint8_t via0_pa_r();
 	void via0_pa_w(uint8_t data);
 	uint8_t via0_pb_r();
 	void via0_pb_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER( via1_irq_w );
+	void via1_irq_w(int state);
 	uint8_t via1_pb_r();
 	void via1_pb_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER( byte_w );
+	void byte_w(int state);
 
-	void c2031_mem(address_map &map);
+	void c2031_mem(address_map &map) ATTR_COLD;
 
 	static void floppy_formats(format_registration &fr);
 

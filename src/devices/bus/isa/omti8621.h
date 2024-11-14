@@ -16,8 +16,10 @@
 #pragma once
 
 #include "isa.h"
-#include "machine/upd765.h"
+
 #include "imagedev/floppy.h"
+#include "machine/upd765.h"
+
 
 /***************************************************************************
  FUNCTION PROTOTYPES
@@ -44,12 +46,12 @@ protected:
 			device_t *owner,
 			uint32_t clock);
 
-	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
-	virtual const tiny_rom_entry *device_rom_region() const override;
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual ioport_constructor device_input_ports() const override;
+	// device_t implementation
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 
 	virtual uint8_t dack_r(int line) override;
 	virtual void dack_w(int line, uint8_t data) override;
@@ -70,8 +72,8 @@ protected:
 	std::string cpu_context() const;
 
 private:
-	DECLARE_WRITE_LINE_MEMBER( fdc_irq_w );
-	DECLARE_WRITE_LINE_MEMBER( fdc_drq_w );
+	void fdc_irq_w(int state);
+	void fdc_drq_w(int state);
 	static void floppy_formats(format_registration &fr);
 
 	void fd_moten_w(uint8_t data);
@@ -79,7 +81,7 @@ private:
 	void fd_extra_w(uint8_t data);
 	uint8_t fd_disk_chg_r();
 
-	void fdc_map(address_map &map);
+	void fdc_map(address_map &map) ATTR_COLD;
 
 	uint16_t m_jumper;
 
@@ -164,8 +166,8 @@ public:
 	uint32_t get_sector(int32_t diskaddr, uint8_t *buffer, uint32_t length, uint8_t lun);
 
 protected:
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 };
 
 DECLARE_DEVICE_TYPE(ISA16_OMTI8621_APOLLO, omti8621_apollo_device)

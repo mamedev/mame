@@ -12,7 +12,6 @@
 #pragma once
 
 #include "isbx.h"
-#include "formats/cpis_dsk.h"
 #include "imagedev/floppy.h"
 #include "machine/upd765.h"
 
@@ -33,11 +32,11 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// optional information overrides
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 	// device_isbx_card_interface overrides
 	virtual uint8_t mcs0_r(offs_t offset) override;
@@ -48,13 +47,12 @@ protected:
 	virtual void opt1_w(int state) override;
 
 private:
-	DECLARE_WRITE_LINE_MEMBER( fdc_irq );
-	DECLARE_WRITE_LINE_MEMBER( fdc_drq );
+	void fdc_irq(int state);
+	void fdc_drq(int state);
 	static void floppy_formats(format_registration &fr);
 
 	required_device<i8272a_device> m_fdc;
-	required_device<floppy_connector> m_floppy0;
-	required_device<floppy_connector> m_floppy1;
+	required_device_array<floppy_connector, 2> m_floppy;
 };
 
 

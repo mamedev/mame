@@ -5,8 +5,8 @@
     Victory system
 
 ****************************************************************************/
-#ifndef MAME_INCLUDES_VICTORY_H
-#define MAME_INCLUDES_VICTORY_H
+#ifndef MAME_EXIDY_VICTORY_H
+#define MAME_EXIDY_VICTORY_H
 
 #pragma once
 
@@ -16,13 +16,13 @@
 
 #define VICTORY_MAIN_CPU_CLOCK      (XTAL(8'000'000) / 2)
 
-#define VICTORY_PIXEL_CLOCK             (XTAL(11'289'000) / 2)
-#define VICTORY_HTOTAL                  (0x150)
-#define VICTORY_HBEND                       (0x000)
-#define VICTORY_HBSTART                 (0x100)
-#define VICTORY_VTOTAL                  (0x118)
-#define VICTORY_VBEND                       (0x000)
-#define VICTORY_VBSTART                 (0x100)
+#define VICTORY_PIXEL_CLOCK         (XTAL(11'289'000) / 2)
+#define VICTORY_HTOTAL              (0x150)
+#define VICTORY_HBEND               (0x000)
+#define VICTORY_HBSTART             (0x100)
+#define VICTORY_VTOTAL              (0x118)
+#define VICTORY_VBEND               (0x000)
+#define VICTORY_VBSTART             (0x100)
 
 
 class victory_state : public driver_device
@@ -63,20 +63,20 @@ private:
 	void update_foreground();
 
 	virtual void machine_start() override { m_lamps.resolve(); }
-	virtual void video_start() override;
-	void main_io_map(address_map &map);
-	void main_map(address_map &map);
+	virtual void video_start() override ATTR_COLD;
+	void main_io_map(address_map &map) ATTR_COLD;
+	void main_map(address_map &map) ATTR_COLD;
 
 	/* microcode state */
 	struct micro_t
 	{
-		uint16_t    i;
-		uint16_t    pc;
-		uint8_t     r,g,b;
-		uint8_t     xp,yp;
-		uint8_t     cmd,cmdlo;
-		emu_timer * timer;
-		uint8_t     timer_active;
+		uint16_t    i = 0;
+		uint16_t    pc = 0;
+		uint8_t     r = 0, g = 0, b = 0;
+		uint8_t     xp = 0, yp = 0;
+		uint8_t     cmd = 0, cmdlo = 0;
+		emu_timer * timer = nullptr;
+		uint8_t     timer_active = 0;
 		attotime    endtime;
 
 		void count_states(int states);
@@ -107,7 +107,7 @@ private:
 	uint8_t m_scrolly = 0;
 	uint8_t m_video_control = 0;
 	micro_t m_micro;
-	emu_timer *m_bgcoll_irq_timer = nullptr;
+	emu_timer *m_bgcoll_irq_timer[128];
 };
 
-#endif // MAME_INCLUDES_VICTORY_H
+#endif // MAME_EXIDY_VICTORY_H

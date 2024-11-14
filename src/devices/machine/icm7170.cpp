@@ -83,9 +83,6 @@ icm7170_device::icm7170_device(const machine_config &mconfig, const char *tag, d
 
 void icm7170_device::device_start()
 {
-	// resolve callbacks
-	m_out_irq_cb.resolve_safe();
-
 	m_timer = timer_alloc(FUNC(icm7170_device::clock_tick), this);
 
 	// TODO: frequency should be based on input clock and divisor
@@ -260,8 +257,8 @@ void icm7170_device::nvram_default()
 
 bool icm7170_device::nvram_read(util::read_stream &file)
 {
-	size_t actual;
-	return !file.read(m_regs, 0x20, actual) && actual == 0x20;
+	auto const [err, actual] = util::read(file, m_regs, 0x20);
+	return !err && (actual == 0x20);
 }
 
 
@@ -272,8 +269,8 @@ bool icm7170_device::nvram_read(util::read_stream &file)
 
 bool icm7170_device::nvram_write(util::write_stream &file)
 {
-	size_t actual;
-	return !file.write(m_regs, 0x20, actual) && actual == 0x20;
+	auto const [err, actual] = util::write(file, m_regs, 0x20);
+	return !err;
 }
 
 // non-inherited device functions

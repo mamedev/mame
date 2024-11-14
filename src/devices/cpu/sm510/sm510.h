@@ -54,7 +54,7 @@ S8 60 |  *                                                         | 16 b16
       |____________________________________________________________/
 
          1   2   3   4   5   6   7   8   9  10  11  12  13  14  15
-         T  K1  K2  K3  K4  ACL BA  GND OSC OSC Vdd bt  R1  R2  bs   note: bt = beta symbol
+         T  K1  K2  K3  K4  ACL BA  GND OSC OSC Vdd β   R1  R2  bs
                                         out in
 */
 
@@ -64,8 +64,8 @@ public:
 	sm510_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 32768);
 
 protected:
-	void program_2_7k(address_map &map);
-	void data_96_32x4(address_map &map);
+	void program_2_7k(address_map &map) ATTR_COLD;
+	void data_96_32x4(address_map &map) ATTR_COLD;
 
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 	virtual void execute_one() override;

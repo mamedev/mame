@@ -6,8 +6,8 @@
  *  Created on: 10/07/2013
  */
 
-#ifndef MAME_MACHINE_DECOPINCPU_H
-#define MAME_MACHINE_DECOPINCPU_H
+#ifndef MAME_PINBALL_DECOPINCPU_H
+#define MAME_PINBALL_DECOPINCPU_H
 
 #pragma once
 
@@ -57,13 +57,13 @@ protected:
 	decocpu_type1_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
 
 	// overrides
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual void device_start() override;
-	virtual ioport_constructor device_input_ports() const override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual void device_start() override ATTR_COLD;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 
 	TIMER_CALLBACK_MEMBER(irq_trigger);
 
-	void decocpu1_map(address_map &map);
+	void decocpu1_map(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_cpu;
 	required_device<pia6821_device> m_pia21;
@@ -91,14 +91,14 @@ private:
 	devcb_write8 m_write_solenoid;
 	output_finder<86> m_io_outputs; // 22 solenoids + 64 lamps
 
-	DECLARE_WRITE_LINE_MEMBER(cpu_pia_irq);
-	DECLARE_WRITE_LINE_MEMBER(pia21_cb2_w) { }   // flipper enable
-	DECLARE_WRITE_LINE_MEMBER(pia24_ca2_w) { m_io_outputs[18] = state; }
-	DECLARE_WRITE_LINE_MEMBER(pia24_cb2_w) { m_io_outputs[20] = state; }
-	DECLARE_WRITE_LINE_MEMBER(pia2c_ca2_w) { m_io_outputs[21] = state; }
-	DECLARE_WRITE_LINE_MEMBER(pia2c_cb2_w) { m_io_outputs[17] = state; }
-	DECLARE_WRITE_LINE_MEMBER(pia30_ca2_w) { m_io_outputs[19] = state; }
-	DECLARE_WRITE_LINE_MEMBER(pia30_cb2_w) { m_io_outputs[16] = state; }
+	void cpu_pia_irq(int state);
+	void pia21_cb2_w(int state) { }   // flipper enable
+	void pia24_ca2_w(int state) { m_io_outputs[18] = state; }
+	void pia24_cb2_w(int state) { m_io_outputs[20] = state; }
+	void pia2c_ca2_w(int state) { m_io_outputs[21] = state; }
+	void pia2c_cb2_w(int state) { m_io_outputs[17] = state; }
+	void pia30_ca2_w(int state) { m_io_outputs[19] = state; }
+	void pia30_cb2_w(int state) { m_io_outputs[16] = state; }
 	void lamp0_w(u8 data);
 	void lamp1_w(u8 data);
 	u8 display_strobe_r();
@@ -127,13 +127,13 @@ public:
 
 	decocpu_type2_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
-	void decocpu2_map(address_map &map);
+	void decocpu2_map(address_map &map) ATTR_COLD;
 protected:
 	decocpu_type2_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
 
 	// overrides
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual void device_start() override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual void device_start() override ATTR_COLD;
 };
 
 class decocpu_type3_device : public decocpu_type2_device
@@ -152,7 +152,7 @@ protected:
 	decocpu_type3_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
 
 	// overrides
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 };
 
 class decocpu_type3b_device : public decocpu_type3_device
@@ -169,7 +169,7 @@ public:
 
 protected:
 	// overrides
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 };
 
 DECLARE_DEVICE_TYPE(DECOCPU1,  decocpu_type1_device)
@@ -177,4 +177,4 @@ DECLARE_DEVICE_TYPE(DECOCPU2,  decocpu_type2_device)
 DECLARE_DEVICE_TYPE(DECOCPU3,  decocpu_type3_device)
 DECLARE_DEVICE_TYPE(DECOCPU3B, decocpu_type3b_device)
 
-#endif // MAME_MACHINE_DECOPINCPU_H
+#endif // MAME_PINBALL_DECOPINCPU_H

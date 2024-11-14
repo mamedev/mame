@@ -23,7 +23,7 @@ ym3802_device::ym3802_device(const machine_config &mconfig, const char *tag, dev
 	, device_serial_interface(mconfig, *this)
 	, m_irq_handler(*this)
 	, m_txd_handler(*this)
-	, m_rxd_handler(*this)
+	, m_rxd_handler(*this, 0xff)
 	, m_reg(REG_MAX)
 	, m_wdr(0)
 	, m_irq_status(0)
@@ -35,9 +35,6 @@ ym3802_device::ym3802_device(const machine_config &mconfig, const char *tag, dev
 
 void ym3802_device::device_start()
 {
-	m_irq_handler.resolve_safe();
-	m_txd_handler.resolve_safe();
-	m_rxd_handler.resolve_safe(0xff);
 	m_midi_timer = timer_alloc(FUNC(ym3802_device::transmit_clk), this);
 	m_midi_counter_timer = timer_alloc(FUNC(ym3802_device::midi_clk), this);
 	save_item(NAME(m_reg));

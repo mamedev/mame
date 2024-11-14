@@ -1,8 +1,8 @@
 /** @file paqa_errs.c
-	@ingroup qa_src
-	@brief Self Testing Quality Assurance app for PortAudio
-	Do lots of bad things to test error reporting.
-	@author Phil Burk  http://www.softsynth.com
+    @ingroup qa_src
+    @brief Self Testing Quality Assurance app for PortAudio
+    Do lots of bad things to test error reporting.
+    @author Phil Burk  http://www.softsynth.com
     Pieter Suurmond adapted to V19 API.
 */
 /*
@@ -33,26 +33,31 @@
  */
 
 /*
- * The text above constitutes the entire PortAudio license; however, 
+ * The text above constitutes the entire PortAudio license; however,
  * the PortAudio community also makes the following non-binding requests:
  *
  * Any person wishing to distribute modifications to the Software is
  * requested to send the modifications to the original developer so that
- * they can be incorporated into the canonical version. It is also 
- * requested that these non-binding requests be included along with the 
+ * they can be incorporated into the canonical version. It is also
+ * requested that these non-binding requests be included along with the
  * license above.
  */
- 
+
+#include <stdint.h>
 #include <stdio.h>
+#include <stdlib.h> /* for EXIT_SUCCESS and EXIT_FAILURE */
 #include <math.h>
 
 #include "portaudio.h"
+#include "paqa_macros.h"
 
 /*--------- Definitions ---------*/
 #define MODE_INPUT        (0)
 #define MODE_OUTPUT       (1)
 #define FRAMES_PER_BUFFER (64)
 #define SAMPLE_RATE       (44100.0)
+
+PAQA_INSTANTIATE_GLOBALS
 
 typedef struct PaQaData
 {
@@ -63,38 +68,6 @@ typedef struct PaQaData
 }
 PaQaData;
 
-static int gNumPassed = 0; /* Two globals */
-static int gNumFailed = 0;
-
-/*------------------- Macros ------------------------------*/
-/* Print ERROR if it fails. Tally success or failure. Odd  */
-/* do-while wrapper seems to be needed for some compilers. */
-
-#define EXPECT(_exp) \
-    do \
-    { \
-        if ((_exp)) {\
-            gNumPassed++; \
-        } \
-        else { \
-            printf("\nERROR - 0x%x - %s for %s\n", result, Pa_GetErrorText(result), #_exp ); \
-            gNumFailed++; \
-            goto error; \
-        } \
-    } while(0)
-
-#define HOPEFOR(_exp) \
-    do \
-    { \
-        if ((_exp)) {\
-            gNumPassed++; \
-        } \
-        else { \
-            printf("\nERROR - 0x%x - %s for %s\n", result, Pa_GetErrorText(result), #_exp ); \
-            gNumFailed++; \
-        } \
-    } while(0)
-
 /*-------------------------------------------------------------------------*/
 /* This routine will be called by the PortAudio engine when audio is needed.
    It may be called at interrupt level on some machines so don't do anything
@@ -103,14 +76,14 @@ static int gNumFailed = 0;
 static int QaCallback( const void*                      inputBuffer,
                        void*                            outputBuffer,
                        unsigned long                    framesPerBuffer,
-			           const PaStreamCallbackTimeInfo*  timeInfo,
-			           PaStreamCallbackFlags            statusFlags,
+                       const PaStreamCallbackTimeInfo*  timeInfo,
+                       PaStreamCallbackFlags            statusFlags,
                        void*                            userData )
 {
     unsigned long   i;
     unsigned char*  out = (unsigned char *) outputBuffer;
     PaQaData*       data = (PaQaData *) userData;
-    
+
     (void)inputBuffer; /* Prevent "unused variable" warnings. */
 
     /* Zero out buffer so we don't hear terrible noise. */
@@ -174,7 +147,7 @@ static int TestBadOpens( void )
     PaStreamParameters  ipp, opp;
     const PaDeviceInfo* info = NULL;
 
-    
+
     /* Setup data for synthesis thread. */
     myData.framesLeft = (unsigned long) (SAMPLE_RATE * 100); /* 100 seconds */
     myData.numChannels = 1;
@@ -222,7 +195,7 @@ static int TestBadOpens( void )
         ipp.hostApiSpecificStreamInfo = opp.hostApiSpecificStreamInfo = NULL;
         ipp.sampleFormat              = opp.sampleFormat              = paFloat32;
         ipp.channelCount = 0;           ipp.device = Pa_GetDefaultInputDevice();
-        opp.channelCount = 0;           opp.device = paNoDevice;    /* And no output device, and no output channels. */   
+        opp.channelCount = 0;           opp.device = paNoDevice;    /* And no output device, and no output channels. */
         HOPEFOR(((result = Pa_OpenStream(&stream, &ipp, NULL,
                                          SAMPLE_RATE, FRAMES_PER_BUFFER,
                                          paClipOff, QaCallback, &myData )) == paInvalidChannelCount));
@@ -274,7 +247,7 @@ static int TestBadOpens( void )
         HOPEFOR(((result = Pa_OpenStream(&stream, NULL, &opp,
                                          1.0, FRAMES_PER_BUFFER, /* 1 cycle per second (1 Hz) is too low. */
                                          paClipOff, QaCallback, &myData )) == paInvalidSampleRate));
-        
+
         /*----------------------------- High sample rate: */
         ipp.hostApiSpecificStreamInfo = opp.hostApiSpecificStreamInfo = NULL;
         ipp.sampleFormat              = opp.sampleFormat              = paFloat32;
@@ -286,7 +259,7 @@ static int TestBadOpens( void )
 
         /*----------------------------- NULL callback: */
         /* NULL callback is valid in V19 -- it means use blocking read/write stream
-    
+
         ipp.hostApiSpecificStreamInfo = opp.hostApiSpecificStreamInfo = NULL;
         ipp.sampleFormat              = opp.sampleFormat              = paFloat32;
         ipp.channelCount = 0;           ipp.device = paNoDevice;
@@ -366,7 +339,7 @@ static int TestBadActions( void )
                                          SAMPLE_RATE, FRAMES_PER_BUFFER,
                                          paClipOff, QaCallback, &myData )) == paNoError));
     }
- 
+
     HOPEFOR(((deviceInfo = Pa_GetDeviceInfo(paNoDevice))    == NULL));
     HOPEFOR(((deviceInfo = Pa_GetDeviceInfo(87654))    == NULL));
     HOPEFOR(((result = Pa_StartStream(NULL))    == paBadStreamPtr));
@@ -392,12 +365,15 @@ int main(void);
 int main(void)
 {
     PaError result;
-    
-    EXPECT(((result = Pa_Initialize()) == paNoError));
+
+    printf("-----------------------------\n");
+    printf("paqa_errs - PortAudio QA test\n");
+    ASSERT_EQ(paNoError, (result = Pa_Initialize()));
     TestBadOpens();
     TestBadActions();
 error:
     Pa_Terminate();
-    printf("QA Report: %d passed, %d failed.\n", gNumPassed, gNumFailed);
-    return 0;
+
+    PAQA_PRINT_RESULT;
+    return PAQA_EXIT_RESULT;
 }

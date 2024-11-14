@@ -32,6 +32,9 @@
 #include "softlist_dev.h"
 #include "speaker.h"
 
+
+namespace {
+
 class spg110_game_state : public driver_device
 {
 public:
@@ -44,13 +47,13 @@ public:
 	void spg110_base(machine_config &config);
 	void spg110_spdmo(machine_config& config);
 
-	DECLARE_CUSTOM_INPUT_MEMBER(plunger_r);
+	ioport_value plunger_r();
 
 protected:
 	required_device<spg110_device> m_maincpu;
 	required_device<screen_device> m_screen;
 
-	virtual void mem_map(address_map &map);
+	virtual void mem_map(address_map &map) ATTR_COLD;
 };
 
 class spg110_sstarkar_game_state : public spg110_game_state
@@ -65,14 +68,14 @@ public:
 	void sstarkar(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	required_device<generic_slot_device> m_cart;
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load);
 	optional_memory_bank m_cartrom;
 
-	void mem_map_cart(address_map &map);
+	void mem_map_cart(address_map &map) ATTR_COLD;
 };
 
 /*************************
@@ -237,14 +240,14 @@ static INPUT_PORTS_START( jak_capb )
 	PORT_BIT( 0xffff, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("JOYY")
-	PORT_BIT( 0x03ff, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(spg110_game_state, plunger_r)
+	PORT_BIT( 0x03ff, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(FUNC(spg110_game_state::plunger_r))
 
 	PORT_START("JOYY_REAL")
 	PORT_BIT(0x00ff, 0x0000, IPT_PEDAL ) PORT_SENSITIVITY(100) PORT_KEYDELTA(100) PORT_MINMAX(0x00,0x00ff) PORT_NAME("Plunger")  PORT_CENTERDELTA(255)
 INPUT_PORTS_END
 
 
-CUSTOM_INPUT_MEMBER(spg110_game_state::plunger_r)
+ioport_value spg110_game_state::plunger_r()
 {
 	// this is only needed because our PORT_CENTERDELTA doesn't work if set > 255 (and is limited in the menu to that) such a value that doesn't center quickly enough for the plunger to be effective
 	return ioport("JOYY_REAL")->read()<<2;
@@ -560,12 +563,12 @@ void spg110_sstarkar_game_state::machine_start()
 
 DEVICE_IMAGE_LOAD_MEMBER(spg110_sstarkar_game_state::cart_load)
 {
-	uint32_t size = m_cart->common_get_size("rom");
+	uint32_t const size = m_cart->common_get_size("rom");
 
 	m_cart->rom_alloc(size, GENERIC_ROM16_WIDTH, ENDIANNESS_LITTLE);
 	m_cart->common_load_rom(m_cart->get_rom_base(), size, "rom");
 
-	return image_init_result::PASS;
+	return std::make_pair(std::error_condition(), std::string());
 }
 
 
@@ -625,6 +628,8 @@ ROM_START( sstarkar )
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
 	// no internal BIOS
 ROM_END
+
+} // anonymous namespace
 
 
 // JAKKS Pacific Inc TV games

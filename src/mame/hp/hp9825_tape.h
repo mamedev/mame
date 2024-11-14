@@ -8,8 +8,8 @@
 
 *********************************************************************/
 
-#ifndef MAME_MACHINE_HP9825_TAPE_H
-#define MAME_MACHINE_HP9825_TAPE_H
+#ifndef MAME_HP_HP9825_TAPE_H
+#define MAME_HP_HP9825_TAPE_H
 
 #pragma once
 
@@ -32,21 +32,21 @@ public:
 	auto led() { return m_led_handler.bind(); }
 	auto cart_in() { return m_cart_in_handler.bind(); }
 
-	DECLARE_WRITE_LINE_MEMBER(short_gap_w);
-	DECLARE_WRITE_LINE_MEMBER(long_gap_w);
+	void short_gap_w(int state);
+	void long_gap_w(int state);
 
-	DECLARE_WRITE_LINE_MEMBER(cart_out_w);
-	DECLARE_WRITE_LINE_MEMBER(hole_w);
-	DECLARE_WRITE_LINE_MEMBER(tacho_tick_w);
-	DECLARE_WRITE_LINE_MEMBER(motion_w);
-	DECLARE_WRITE_LINE_MEMBER(rd_bit_w);
-	DECLARE_READ_LINE_MEMBER(wr_bit_r);
+	void cart_out_w(int state);
+	void hole_w(int state);
+	void tacho_tick_w(int state);
+	void motion_w(int state);
+	void rd_bit_w(int state);
+	int wr_bit_r();
 
 protected:
 	// device-level overrides
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 private:
 	devcb_write_line m_flg_handler;
@@ -91,4 +91,4 @@ private:
 // device type definition
 DECLARE_DEVICE_TYPE(HP9825_TAPE, hp9825_tape_device)
 
-#endif // MAME_MACHINE_HP9825_TAPE_H
+#endif // MAME_HP_HP9825_TAPE_H

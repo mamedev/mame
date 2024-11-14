@@ -11,8 +11,8 @@
 #include "emu.h"
 #include "iwm.h"
 
-#define LOG_CONTROL (1 << 1U)
-#define LOG_MODE    (1 << 2U)
+#define LOG_CONTROL (1U << 1)
+#define LOG_MODE    (1U << 2)
 #define VERBOSE     0
 #include "logmacro.h"
 
@@ -237,6 +237,9 @@ u8 iwm_device::control(int offset, u8 data)
 		m_devsel = devsel;
 		m_devsel_cb(devsel);
 	}
+
+	if((m_control & 0xc0) == 0x40 && m_active == MODE_ACTIVE && m_rw == MODE_READ)
+		m_rsh = 0;
 
 	if(0) {
 		u8 s = m_control & 0xc0;

@@ -129,7 +129,7 @@ Configuration Settings
 |
 | **cubic_distortion** (*Cubic Distortion Amount*)
 |
-| 	This setting determines strength of the qubic distortion of the screen image.
+| 	This setting determines strength of the cubic distortion of the screen image.
 |
 |   Both distortion factors can be negative to compensate each other. e.g. distortion 0.5 and cubic_distortion -0.5
 |

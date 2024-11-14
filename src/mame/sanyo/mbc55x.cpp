@@ -152,17 +152,17 @@ void mbc55x_state::disk_select_w(uint8_t data)
 	m_printer->write_strobe(!BIT(data, 3));
 }
 
-WRITE_LINE_MEMBER(mbc55x_state::printer_busy_w)
+void mbc55x_state::printer_busy_w(int state)
 {
 	m_printer_status = (m_printer_status & 0xef) | (state ? 0x10 : 0x00);
 }
 
-WRITE_LINE_MEMBER(mbc55x_state::printer_paper_end_w)
+void mbc55x_state::printer_paper_end_w(int state)
 {
 	m_printer_status = (m_printer_status & 0xdf) | (state ? 0x20 : 0x00);
 }
 
-WRITE_LINE_MEMBER(mbc55x_state::printer_select_w)
+void mbc55x_state::printer_select_w(int state)
 {
 	m_printer_status = (m_printer_status & 0xbf) | (state ? 0x40 : 0x00);
 }

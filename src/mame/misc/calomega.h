@@ -1,8 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders: Roberto Fresca, Grull Osgo
 
-#ifndef MAME_INCLUDES_CALOMEGA_H
-#define MAME_INCLUDES_CALOMEGA_H
+#ifndef MAME_MISC_CALOMEGA_H
+#define MAME_MISC_CALOMEGA_H
 
 #pragma once
 
@@ -69,7 +69,7 @@ public:
 
 protected:
 	virtual void machine_start() override { m_lamps.resolve(); }
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	void calomega_videoram_w(offs_t offset, uint8_t data);
@@ -92,14 +92,14 @@ private:
 	void dummy_pia_w(uint8_t data);
 	uint8_t keyb_903_r();
 
-	DECLARE_WRITE_LINE_MEMBER(pia1_cb2_w);
-	DECLARE_WRITE_LINE_MEMBER(vblank0_w);
-	DECLARE_WRITE_LINE_MEMBER(vblank1_w);
-	DECLARE_WRITE_LINE_MEMBER(vblank2_w);
-	DECLARE_WRITE_LINE_MEMBER(dummy_pia_line_w);
-	DECLARE_WRITE_LINE_MEMBER(write_acia_clock);
-	DECLARE_WRITE_LINE_MEMBER(w_903kb_acia_clock);
-	DECLARE_WRITE_LINE_MEMBER(update_aciabaud_scale);
+	void pia1_cb2_w(int state);
+	void vblank0_w(int state);
+	void vblank1_w(int state);
+	void vblank2_w(int state);
+	void dummy_pia_line_w(int state);
+	void write_acia_clock(int state);
+	void w_903kb_acia_clock(int state);
+	void update_aciabaud_scale(int state);
 
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_0);
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_1);
@@ -110,12 +110,12 @@ private:
 	uint32_t screen_update_calomega(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void calomega_palette(palette_device &palette) const;
 
-	void sys903_map(address_map &map);
-	void s903mod_map(address_map &map);
-	void sys905_map(address_map &map);
-	void sys906_map(address_map &map);
-	void kstec_mem_map(address_map &map);
-	void kstec_io_map(address_map &map);
+	void sys903_map(address_map &map) ATTR_COLD;
+	void s903mod_map(address_map &map) ATTR_COLD;
+	void sys905_map(address_map &map) ATTR_COLD;
+	void sys906_map(address_map &map) ATTR_COLD;
+	void kstec_mem_map(address_map &map) ATTR_COLD;
+	void kstec_io_map(address_map &map) ATTR_COLD;
 
 	optional_device_array<pia6821_device, 2> m_pia;
 	required_device<m6502_device> m_maincpu;
@@ -161,4 +161,4 @@ private:
 	tilemap_t *m_bg_tilemap = nullptr;
 };
 
-#endif // MAME_INCLUDES_CALOMEGA_H
+#endif // MAME_MISC_CALOMEGA_H

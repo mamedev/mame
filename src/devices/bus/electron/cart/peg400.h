@@ -12,7 +12,6 @@
 #include "slot.h"
 #include "imagedev/floppy.h"
 #include "machine/wd_fdc.h"
-#include "formats/acorn_dsk.h"
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -28,10 +27,10 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 	// optional information overrides
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 	// electron_cart_interface overrides
 	virtual uint8_t read(offs_t offset, int infc, int infd, int romqa, int oe, int oe2) override;
@@ -40,7 +39,7 @@ protected:
 private:
 	void wd1770_control_w(uint8_t data);
 	static void floppy_formats(format_registration &fr);
-	DECLARE_WRITE_LINE_MEMBER(fdc_drq_w);
+	void fdc_drq_w(int state);
 
 	required_device<wd1770_device> m_fdc;
 	required_device<floppy_connector> m_floppy0;

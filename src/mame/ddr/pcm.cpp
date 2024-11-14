@@ -68,6 +68,8 @@ ToDo:
 #include "speaker.h"
 
 
+namespace {
+
 class pcm_state : public driver_device
 {
 public:
@@ -89,18 +91,18 @@ public:
 
 private:
 	u8 port85_r();
-	DECLARE_WRITE_LINE_MEMBER( port82_w );
-	void port85_w(u8);
-	void port94_w(u8);
+	void port82_w(int state);
+	void port85_w(u8 data);
+	void port94_w(u8 data);
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void io_map(address_map &map);
-	void mem_map(address_map &map);
+	void io_map(address_map &map) ATTR_COLD;
+	void mem_map(address_map &map) ATTR_COLD;
 
 	bool m_cone = 0;
 	u8 m_port85 = 0U;
-	void machine_start() override;
-	void machine_reset() override;
+	void machine_start() override ATTR_COLD;
+	void machine_reset() override ATTR_COLD;
 	required_device<z80_device> m_maincpu;
 	required_device<ram_device> m_ram;
 	required_device<z80pio_device> m_pio_s;
@@ -114,7 +116,7 @@ private:
 };
 
 
-WRITE_LINE_MEMBER( pcm_state::port82_w )
+void  pcm_state::port82_w(int state)
 {
 	if (state)
 	{
@@ -372,6 +374,9 @@ ROM_START( pcm )
 	ROM_REGION(0x0800, "chargen",0)
 	ROM_LOAD( "charrom.d113", 0x0000, 0x0800, CRC(5684b3c3) SHA1(418054aa70a0fd120611e32059eb2051d3b82b5a))
 ROM_END
+
+} // anonymous namespace
+
 
 /* Driver */
 

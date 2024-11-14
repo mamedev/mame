@@ -16,7 +16,6 @@
 #include "machine/input_merger.h"
 #include "machine/wd_fdc.h"
 #include "imagedev/floppy.h"
-#include "formats/acorn_dsk.h"
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -32,10 +31,10 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 	// optional information overrides
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 	// electron_cart_interface overrides
 	virtual uint8_t read(offs_t offset, int infc, int infd, int romqa, int oe, int oe2) override;

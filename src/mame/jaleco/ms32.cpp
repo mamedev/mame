@@ -482,7 +482,7 @@ Notes from Charles MacDonald
 
 /********** READ INPUTS **********/
 
-CUSTOM_INPUT_MEMBER(ms32_state::mahjong_ctrl_r)
+ioport_value ms32_state::mahjong_ctrl_r()
 {
 	u32 mj_input;
 
@@ -965,7 +965,7 @@ static INPUT_PORTS_START( ms32_mahjong )
 	PORT_INCLUDE( ms32 )
 
 	PORT_MODIFY("INPUTS")
-	PORT_BIT( 0x000000ff, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(ms32_state, mahjong_ctrl_r)    // here we read mahjong keys
+	PORT_BIT( 0x000000ff, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(FUNC(ms32_state::mahjong_ctrl_r))    // here we read mahjong keys
 	PORT_BIT( 0x0000ff00, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x00010000, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x00020000, IP_ACTIVE_LOW, IPT_COIN2 )
@@ -1652,22 +1652,22 @@ void ms32_base_state::irq_raise(int level, bool state)
 		m_maincpu->set_input_line(0, CLEAR_LINE);
 }
 
-WRITE_LINE_MEMBER(ms32_base_state::timer_irq_w)
+void ms32_base_state::timer_irq_w(int state)
 {
 	irq_raise(0, state);
 }
 
-WRITE_LINE_MEMBER(ms32_base_state::vblank_irq_w)
+void ms32_base_state::vblank_irq_w(int state)
 {
 	irq_raise(10, state);
 }
 
-WRITE_LINE_MEMBER(ms32_base_state::field_irq_w)
+void ms32_base_state::field_irq_w(int state)
 {
 	irq_raise(9, state);
 }
 
-WRITE_LINE_MEMBER(ms32_base_state::sound_reset_line_w)
+void ms32_base_state::sound_reset_line_w(int state)
 {
 	if (state)
 		m_audiocpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
@@ -1715,7 +1715,7 @@ void ms32_base_state::to_main_w(u8 data)
 }
 
 
-WRITE_LINE_MEMBER(ms32_base_state::sound_ack_w)
+void ms32_base_state::sound_ack_w(int state)
 {
 	// used by f1superb, is it the reason for sound dying?
 	if (state)

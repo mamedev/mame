@@ -6,11 +6,12 @@
  */
 
 #include "font_module.h"
-#include "modules/osdmodule.h"
 
 #ifdef SDLMAME_MACOSX
 
+#include "emucore.h"
 #include "fileio.h"
+#include "osdcore.h"
 
 #include <ApplicationServices/ApplicationServices.h>
 #include <CoreFoundation/CoreFoundation.h>
@@ -210,7 +211,7 @@ class font_osx : public osd_module, public font_module
 public:
 	font_osx() : osd_module(OSD_FONT_PROVIDER, "osx"), font_module() { }
 
-	virtual int init(const osd_options &options) override { return 0; }
+	virtual int init(osd_interface &osd, const osd_options &options) override { return 0; }
 	virtual osd_font::ptr font_alloc() override { return std::make_unique<osd_font_osx>(); }
 	virtual bool get_font_families(std::string const &font_path, std::vector<std::pair<std::string, std::string> > &result) override;
 

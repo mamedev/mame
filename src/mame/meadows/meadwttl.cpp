@@ -23,6 +23,9 @@
 #include "netlist/devices/net_lib.h"
 #include "video/fixfreq.h"
 
+
+namespace {
+
 // copied by Pong, not accurate for this driver!
 // start
 #define MASTER_CLOCK    7159000
@@ -56,14 +59,15 @@ private:
 	required_device<fixedfreq_device> m_video;
 
 	// driver_device overrides
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 };
 
 
 static NETLIST_START(meadows)
+{
 	SOLVER(Solver, 48000)
 //  PARAM(Solver.FREQ, 48000)
 	PARAM(Solver.ACCURACY, 1e-4) // works and is sufficient
@@ -73,7 +77,7 @@ static NETLIST_START(meadows)
 
 //  NETDEV_ANALOG_CALLBACK(sound_cb, sound, exidyttl_state, sound_cb, "")
 //  NETDEV_ANALOG_CALLBACK(video_cb, videomix, fixedfreq_device, update_vid, "fixfreq")
-NETLIST_END()
+}
 
 
 
@@ -161,9 +165,10 @@ ROM_START( mead4in1 )
 	ROM_LOAD( "hockey.b2",     0x0000, 0x0020, CRC(2dab2259) SHA1(1d20d6a3e3ee1719b7e9e92765aea3109be4e375) )
 ROM_END
 
+} // anonymous namespace
 
 
-GAME( 1976, bombaway,  0,        meadows,  0,  meadwttl_state, empty_init, ROT0, "Meadows",  "Bombs Away [TTL]", MACHINE_IS_SKELETON )
-GAME( 1976, ckidzo,    0,        meadows,  0,  meadwttl_state, empty_init, ROT0, "Meadows",  "Ckidzo [TTL]", MACHINE_IS_SKELETON )
-GAME( 1976, cgunship,  0,        meadows,  0,  meadwttl_state, empty_init, ROT0, "Meadows",  "Cobra Gunship [TTL]", MACHINE_IS_SKELETON )
-GAME( 1976, mead4in1,  0,        meadows,  0,  meadwttl_state, empty_init, ROT0, "Meadows",  "Meadows 4 in 1 [TTL]", MACHINE_IS_SKELETON )
+GAME( 1976, bombaway,  0,        meadows,  0,  meadwttl_state, empty_init, ROT0, "Meadows",  "Bombs Away", MACHINE_IS_SKELETON )
+GAME( 1976, ckidzo,    0,        meadows,  0,  meadwttl_state, empty_init, ROT0, "Meadows",  "Ckidzo", MACHINE_IS_SKELETON )
+GAME( 1976, cgunship,  0,        meadows,  0,  meadwttl_state, empty_init, ROT0, "Meadows",  "Cobra Gunship", MACHINE_IS_SKELETON )
+GAME( 1976, mead4in1,  0,        meadows,  0,  meadwttl_state, empty_init, ROT0, "Meadows",  "Meadows 4 in 1", MACHINE_IS_SKELETON )

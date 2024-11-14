@@ -203,7 +203,7 @@ u8 sega_315_5195_mapper_device::read(address_space &space, offs_t offset)
 
 		case 0x03:
 			// this returns data that the sound CPU writes
-			if (!m_mcu_int_callback.isnull() && !machine().side_effects_disabled())
+			if (!machine().side_effects_disabled())
 				m_mcu_int_callback(CLEAR_LINE);
 			return m_from_sound;
 
@@ -367,8 +367,7 @@ void sega_315_5195_mapper_device::fd1094_state_change(u8 state)
 TIMER_CALLBACK_MEMBER(sega_315_5195_mapper_device::write_to_sound)
 {
 	m_to_sound = param;
-	if (!m_pbf_callback.isnull())
-		m_pbf_callback(ASSERT_LINE);
+	m_pbf_callback(ASSERT_LINE);
 }
 
 
@@ -380,8 +379,7 @@ TIMER_CALLBACK_MEMBER(sega_315_5195_mapper_device::write_to_sound)
 TIMER_CALLBACK_MEMBER(sega_315_5195_mapper_device::write_from_sound)
 {
 	m_from_sound = param;
-	if (!m_mcu_int_callback.isnull())
-		m_mcu_int_callback(ASSERT_LINE);
+	m_mcu_int_callback(ASSERT_LINE);
 }
 
 
@@ -391,7 +389,7 @@ TIMER_CALLBACK_MEMBER(sega_315_5195_mapper_device::write_from_sound)
 
 u8 sega_315_5195_mapper_device::pread()
 {
-	if (!m_pbf_callback.isnull() && !machine().side_effects_disabled())
+	if (!machine().side_effects_disabled())
 		m_pbf_callback(CLEAR_LINE);
 	return m_to_sound;
 }
@@ -413,10 +411,8 @@ void sega_315_5195_mapper_device::pwrite(u8 data)
 
 void sega_315_5195_mapper_device::device_start()
 {
-	// bind our handlers
+	// bind delegates
 	m_mapper.resolve();
-	m_pbf_callback.resolve();
-	m_mcu_int_callback.resolve();
 
 	// if we are mapping an FD1089, tell all the banks
 	fd1089_base_device *fd1089 = dynamic_cast<fd1089_base_device *>(m_cpu.target());
@@ -465,10 +461,8 @@ void sega_315_5195_mapper_device::device_reset()
 
 	m_to_sound = 0;
 	m_from_sound = 0;
-	if (!m_pbf_callback.isnull())
-		m_pbf_callback(CLEAR_LINE);
-	if (!m_mcu_int_callback.isnull())
-		m_mcu_int_callback(CLEAR_LINE);
+	m_pbf_callback(CLEAR_LINE);
+	m_mcu_int_callback(CLEAR_LINE);
 }
 
 

@@ -1,8 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:Patrick Mackinlay
 
-#ifndef MAME_VIDEO_SGI_RE2_H
-#define MAME_VIDEO_SGI_RE2_H
+#ifndef MAME_SGI_SGI_RE2_H
+#define MAME_SGI_SGI_RE2_H
 
 #pragma once
 
@@ -20,8 +20,8 @@ public:
 	auto out_drq() { return m_drq_cb.bind(); }
 
 	// device_t overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, rectangle const &cliprect);
 
@@ -219,4 +219,4 @@ private:
 
 DECLARE_DEVICE_TYPE(SGI_RE2, sgi_re2_device)
 
-#endif // MAME_VIDEO_SGI_RE2_H
+#endif // MAME_SGI_SGI_RE2_H

@@ -294,6 +294,8 @@
 #include "notechan.lh"
 
 
+namespace {
+
 #define MASTER_CLOCK     XTAL(8'448'000)
 #define CPU_CLOCK        MASTER_CLOCK / 2    // guess... not verified
 #define SND_CLOCK        MASTER_CLOCK / 8    // guess... not verified
@@ -316,8 +318,8 @@ private:
 	void out_f9_w(uint8_t data);
 	void out_fa_w(uint8_t data);
 	void out_ff_w(uint8_t data);
-	void notechan_map(address_map &map);
-	void notechan_port_map(address_map &map);
+	void notechan_map(address_map &map) ATTR_COLD;
+	void notechan_port_map(address_map &map) ATTR_COLD;
 
 	virtual void machine_start() override { m_lamps.resolve(); }
 
@@ -511,7 +513,7 @@ void notechan_state::notechan(machine_config &config)
 	Z80(config, m_maincpu, CPU_CLOCK);  // unknown...
 	m_maincpu->set_addrmap(AS_PROGRAM, &notechan_state::notechan_map);
 	m_maincpu->set_addrmap(AS_IO, &notechan_state::notechan_port_map);
-	m_maincpu->set_periodic_int(FUNC(driver_device::irq0_line_hold), attotime::from_hz(60));
+	m_maincpu->set_periodic_int(FUNC(notechan_state::irq0_line_hold), attotime::from_hz(60));
 
 	/* NO VIDEO */
 
@@ -533,6 +535,8 @@ ROM_START( notechan )
 	ROM_REGION( 0x80000, "oki", 0 ) /* Audio ADPCM */
 	ROM_LOAD( "p-650_s1_ver1.00.ic21",  0x0000, 0x80000, CRC(1b8c835b) SHA1(73749c0077605f9ad56e9dd73b60ee04fe54eb73) )
 ROM_END
+
+} // anonymous namespace
 
 
 /*********************************************

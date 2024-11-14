@@ -8,8 +8,8 @@
 
 ***************************************************************************/
 
-#ifndef MAME_MACHINE_ATARIGEN_H
-#define MAME_MACHINE_ATARIGEN_H
+#ifndef MAME_ATARI_ATARIGEN_H
+#define MAME_ATARI_ATARIGEN_H
 
 #include "screen.h"
 
@@ -26,8 +26,8 @@ public:
 
 protected:
 	// users must call through to these
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	// video helpers
 	void halt_until_hblank_0(device_t &device, screen_device &screen);
@@ -94,4 +94,4 @@ protected:
 ***************************************************************************/
 
 
-#endif // MAME_MACHINE_ATARIGEN_H
+#endif // MAME_ATARI_ATARIGEN_H

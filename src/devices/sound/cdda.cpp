@@ -8,8 +8,8 @@
 #include "emu.h"
 #include "cdda.h"
 
-#define MAX_SECTORS ( 4 )
-
+static constexpr int MAX_SECTORS = 4;
+static constexpr int MAX_SCAN_SECTORS = 2;
 
 //-------------------------------------------------
 //  sound_stream_update - handle a stream update
@@ -18,8 +18,6 @@
 void cdda_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
 {
 	get_audio_data(outputs[0], outputs[1]);
-	m_audio_volume[0] = outputs[0].get(0);
-	m_audio_volume[1] = outputs[1].get(0);
 }
 
 //-------------------------------------------------
@@ -40,32 +38,26 @@ void cdda_device::device_start()
 	m_audio_length = 0;
 	m_audio_samples = 0;
 	m_audio_bptr = 0;
-	m_disc = nullptr;
+	m_sequence_counter = 0;
+	m_audio_scan = 0;
+	m_audio_scan_direction = 0;
 
-	save_item( NAME(m_audio_playing) );
-	save_item( NAME(m_audio_pause) );
-	save_item( NAME(m_audio_ended_normally) );
-	save_item( NAME(m_audio_lba) );
-	save_item( NAME(m_audio_length) );
-	save_pointer( NAME(m_audio_cache), cdrom_file::MAX_SECTOR_DATA * MAX_SECTORS );
-	save_item( NAME(m_audio_samples) );
-	save_item( NAME(m_audio_bptr) );
+	save_item(NAME(m_audio_playing));
+	save_item(NAME(m_audio_pause));
+	save_item(NAME(m_audio_ended_normally));
+	save_item(NAME(m_audio_lba));
+	save_item(NAME(m_audio_length));
+	save_pointer(NAME(m_audio_cache), cdrom_file::MAX_SECTOR_DATA * MAX_SECTORS);
+	save_item(NAME(m_audio_samples));
+	save_item(NAME(m_audio_bptr));
+	save_item(NAME(m_sequence_counter));
+	save_item(NAME(m_audio_scan));
+	save_item(NAME(m_audio_scan_direction));
 }
 
 
 /*-------------------------------------------------
-    cdda_set_cdrom - set the CD-ROM file for the
-    given CDDA stream
--------------------------------------------------*/
-
-void cdda_device::set_cdrom(void *file)
-{
-	m_disc = (cdrom_file *)file;
-}
-
-
-/*-------------------------------------------------
-    cdda_start_audio - begin playback of a Red
+    start_audio - begin playback of a Red
     Book audio track
 -------------------------------------------------*/
 
@@ -82,7 +74,7 @@ void cdda_device::start_audio(uint32_t startlba, uint32_t numblocks)
 
 
 /*-------------------------------------------------
-    cdda_stop_audio - stop playback of a Red Book
+    stop_audio - stop playback of a Red Book
     audio track
 -------------------------------------------------*/
 
@@ -95,7 +87,7 @@ void cdda_device::stop_audio()
 
 
 /*-------------------------------------------------
-    cdda_pause_audio - pause/unpause playback of
+    pause_audio - pause/unpause playback of
     a Red Book audio track
 -------------------------------------------------*/
 
@@ -105,9 +97,48 @@ void cdda_device::pause_audio(int pause)
 	m_audio_pause = pause;
 }
 
+/*-------------------------------------------------
+    scan_forward - begins an audible fast scan
+    in the forward direction
+-------------------------------------------------*/
+void cdda_device::scan_forward()
+{
+	m_audio_scan = true;
+	m_audio_scan_direction = true;
+}
 
 /*-------------------------------------------------
-    cdda_get_audio_lba - returns the current LBA
+    scan_reverse - begins an audible fast scan
+    in the backwards direction
+-------------------------------------------------*/
+void cdda_device::scan_reverse()
+{
+	m_audio_scan = true;
+	m_audio_scan_direction = false;
+}
+
+/*-------------------------------------------------
+    cancel_scan - stops scan mode and resumes
+    normal operation
+-------------------------------------------------*/
+void cdda_device::cancel_scan()
+{
+	m_audio_scan = false;
+}
+
+/*-------------------------------------------------
+    set_audio_lba - sets the current audio LBA
+    play position without changing any modes.
+-------------------------------------------------*/
+
+void cdda_device::set_audio_lba(uint32_t lba)
+{
+	m_stream->update();
+	m_audio_lba = lba;
+}
+
+/*-------------------------------------------------
+    get_audio_lba - returns the current LBA
     (physical sector) during Red Book playback
 -------------------------------------------------*/
 
@@ -117,9 +148,18 @@ uint32_t cdda_device::get_audio_lba()
 	return m_audio_lba - ((m_audio_samples + (cdrom_file::MAX_SECTOR_DATA / 4) - 1) / (cdrom_file::MAX_SECTOR_DATA / 4));
 }
 
+/*-------------------------------------------------
+    set_audio_length - sets the current audio LBA
+    play position without changing any modes.
+-------------------------------------------------*/
+
+void cdda_device::set_audio_length(uint32_t sectors)
+{
+	m_audio_length = sectors;
+}
 
 /*-------------------------------------------------
-    cdda_audio_active - returns Red Book audio
+    audio_active - returns Red Book audio
     playback status
 -------------------------------------------------*/
 
@@ -131,7 +171,7 @@ int cdda_device::audio_active()
 
 
 /*-------------------------------------------------
-    cdda_audio_paused - returns if Red Book
+    audio_paused - returns if Red Book
     playback is paused
 -------------------------------------------------*/
 
@@ -142,7 +182,7 @@ int cdda_device::audio_paused()
 
 
 /*-------------------------------------------------
-    cdda_audio_ended - returns if a Red Book
+    audio_ended - returns if a Red Book
     track reached it's natural end
 -------------------------------------------------*/
 
@@ -168,14 +208,17 @@ void cdda_device::get_audio_data(write_stream_view &bufL, write_stream_view &buf
 	{
 		/* if no file, audio not playing, audio paused, or out of disc data,
 		   just zero fill */
-		if (!m_disc || !m_audio_playing || m_audio_pause || (!m_audio_length && !m_audio_samples))
+		if (m_disc->sequence_counter() != m_sequence_counter || !m_disc->exists() || !m_audio_playing || m_audio_pause || (!m_audio_length && !m_audio_samples))
 		{
-			if( m_disc && m_audio_playing && !m_audio_pause && !m_audio_length )
+			if( m_audio_playing && !m_audio_pause && !m_audio_length )
 			{
 				m_audio_playing = false;
 				m_audio_ended_normally = true;
+				m_audio_end_cb(ASSERT_LINE);
 			}
 
+			m_sequence_counter = m_disc->sequence_counter();
+			m_audio_data[0] = m_audio_data[1] = 0;
 			bufL.fill(0, sampindex);
 			bufR.fill(0, sampindex);
 			return;
@@ -190,8 +233,12 @@ void cdda_device::get_audio_data(write_stream_view &bufL, write_stream_view &buf
 		for (i = 0; i < samples; i++)
 		{
 			/* CD-DA data on the disc is big-endian */
-			bufL.put_int(sampindex + i, s16(big_endianize_int16( audio_cache[ m_audio_bptr ] )), 32768); m_audio_bptr++;
-			bufR.put_int(sampindex + i, s16(big_endianize_int16( audio_cache[ m_audio_bptr ] )), 32768); m_audio_bptr++;
+			m_audio_data[0] = s16(big_endianize_int16( audio_cache[ m_audio_bptr ] ));
+			bufL.put_int(sampindex + i, m_audio_data[0], 32768);
+			m_audio_bptr++;
+			m_audio_data[1] = s16(big_endianize_int16( audio_cache[ m_audio_bptr ] ));
+			bufR.put_int(sampindex + i, m_audio_data[1], 32768);
+			m_audio_bptr++;
 		}
 
 		sampindex += samples;
@@ -207,9 +254,33 @@ void cdda_device::get_audio_data(write_stream_view &bufL, write_stream_view &buf
 
 			for (i = 0; i < sectors; i++)
 			{
-				m_disc->read_data(m_audio_lba, &m_audio_cache[cdrom_file::MAX_SECTOR_DATA*i], cdrom_file::CD_TRACK_AUDIO);
+				const auto adr_control = m_disc->get_adr_control(m_disc->get_track(m_audio_lba));
 
-				m_audio_lba++;
+				// Don't attempt to play data tracks
+				if (BIT(adr_control, 2))
+				{
+					std::fill_n(&m_audio_cache[cdrom_file::MAX_SECTOR_DATA * i], cdrom_file::MAX_SECTOR_DATA, 0);
+				}
+				else
+				{
+					m_disc->read_data(m_audio_lba, &m_audio_cache[cdrom_file::MAX_SECTOR_DATA * i], cdrom_file::CD_TRACK_AUDIO);
+				}
+
+				if (!m_audio_scan)
+				{
+					m_audio_lba++;
+				}
+				else
+				{
+					if (m_audio_scan_direction)
+					{
+						m_audio_lba += 2;
+					}
+					else
+					{
+						m_audio_lba -= 2;
+					}
+				}
 			}
 
 			m_audio_samples = (cdrom_file::MAX_SECTOR_DATA*sectors)/4;
@@ -222,13 +293,16 @@ void cdda_device::get_audio_data(write_stream_view &bufL, write_stream_view &buf
 }
 
 /*-------------------------------------------------
-    cdda_get_channel_volume - sets CD-DA volume level
-    for either speaker, used for volume control display
+    get_channel_sample - reads currently decoded
+    data sample on the stream.
+    Used by PC Engine CD class family for volume
+    metering on audio CD player.
 -------------------------------------------------*/
 
-int16_t cdda_device::get_channel_volume(int channel)
+int16_t cdda_device::get_channel_sample(int channel)
 {
-	return m_audio_volume[channel];
+	m_stream->update();
+	return m_audio_data[channel];
 }
 
 DEFINE_DEVICE_TYPE(CDDA, cdda_device, "cdda", "CD/DA")
@@ -236,7 +310,8 @@ DEFINE_DEVICE_TYPE(CDDA, cdda_device, "cdda", "CD/DA")
 cdda_device::cdda_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, CDDA, tag, owner, clock)
 	, device_sound_interface(mconfig, *this)
-	, m_disc(nullptr)
+	, m_disc(*this, finder_base::DUMMY_TAG)
 	, m_stream(nullptr)
+	, m_audio_end_cb(*this)
 {
 }

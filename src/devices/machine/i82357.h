@@ -15,23 +15,23 @@ class i82357_device : public device_t
 public:
 	i82357_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
-	auto out_rtc_cb() { return m_out_rtc.bind(); }
-	auto out_int_cb() { return subdevice<pic8259_device>("pic0")->out_int_callback(); }
+	auto out_rtc_address_cb() { return m_out_rtc_address.bind(); }
+	auto out_int_cb() { return m_pic[0].lookup()->out_int_callback(); }
 	auto out_nmi_cb() { return m_out_nmi.bind(); }
 	auto out_spkr_cb() { return m_out_spkr.bind(); }
 
 	u32 eisa_irq_ack() { return m_pic[0]->acknowledge(); }
 
-	DECLARE_WRITE_LINE_MEMBER(in_iochk);
-	DECLARE_WRITE_LINE_MEMBER(in_parity);
+	void in_iochk(int state);
+	void in_parity(int state);
 
-	void map(address_map &map);
+	void map(address_map &map) ATTR_COLD;
 
 protected:
 	// standard device_t overrides
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	void nmi_reg_w(u8 data);
 	void nmi_ext_w(u8 data);
@@ -45,7 +45,7 @@ private:
 	required_device_array<pit8254_device, 2> m_pit;
 	required_device_array<eisa_dma_device, 2> m_dma;
 
-	devcb_write8 m_out_rtc;
+	devcb_write8 m_out_rtc_address;
 	devcb_write_line m_out_nmi;
 	devcb_write_line m_out_spkr;
 

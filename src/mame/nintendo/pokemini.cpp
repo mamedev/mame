@@ -21,6 +21,8 @@ The LCD is likely to be a SSD1828 LCD.
 #include "speaker.h"
 
 
+namespace {
+
 class pokemini_state : public driver_device
 {
 public:
@@ -38,23 +40,23 @@ public:
 	void pokemini(machine_config &config);
 
 protected:
-	virtual void video_start() override;
-	virtual void machine_start() override;
+	virtual void video_start() override ATTR_COLD;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	struct PRC
 	{
-		uint8_t       colors_inverted = 0;
-		uint8_t       background_enabled = 0;
-		uint8_t       sprites_enabled = 0;
-		uint8_t       copy_enabled = 0;
-		uint8_t       map_size = 0;
-		uint8_t       map_size_x = 0;
-		uint8_t       frame_count = 0;
-		uint8_t       max_frame_count = 0;
-		uint32_t      bg_tiles = 0;
-		uint32_t      spr_tiles = 0;
-		uint8_t       count = 0;
+		uint8_t     colors_inverted = 0;
+		uint8_t     background_enabled = 0;
+		uint8_t     sprites_enabled = 0;
+		uint8_t     copy_enabled = 0;
+		uint8_t     map_size = 0;
+		uint8_t     map_size_x = 0;
+		uint8_t     frame_count = 0;
+		uint8_t     max_frame_count = 0;
+		uint32_t    bg_tiles = 0;
+		uint32_t    spr_tiles = 0;
+		uint8_t     count = 0;
 		emu_timer   *count_timer = nullptr;
 	};
 
@@ -91,7 +93,7 @@ private:
 	uint8_t rom_r(offs_t offset);
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load);
 
-	void pokemini_mem_map(address_map &map);
+	void pokemini_mem_map(address_map &map) ATTR_COLD;
 
 	void check_irqs();
 	void update_sound();
@@ -1499,22 +1501,16 @@ DEVICE_IMAGE_LOAD_MEMBER( pokemini_state::cart_load )
 
 	/* Verify that the image is big enough */
 	if (size <= 0x2100)
-	{
-		image.seterror(image_error::INVALIDIMAGE, "Invalid ROM image: ROM image is too small");
-		return image_init_result::FAIL;
-	}
+		return std::make_pair(image_error::INVALIDLENGTH, "ROM image is too small");
 
 	/* Verify that the image is not too big */
 	if (size > 0x1fffff)
-	{
-		image.seterror(image_error::INVALIDIMAGE, "Invalid ROM image: ROM image is too big");
-		return image_init_result::FAIL;
-	}
+		return std::make_pair(image_error::INVALIDLENGTH, "ROM image is too big");
 
 	m_cart->rom_alloc(size, GENERIC_ROM8_WIDTH, ENDIANNESS_LITTLE);
 	m_cart->common_load_rom(m_cart->get_rom_base(), size, "rom");
 
-	return image_init_result::PASS;
+	return std::make_pair(std::error_condition(), std::string());
 }
 
 
@@ -1655,8 +1651,8 @@ TIMER_CALLBACK_MEMBER(pokemini_state::prc_counter_callback)
 void pokemini_state::machine_start()
 {
 	/* Clear internal structures */
-	memset( &m_prc, 0, sizeof(m_prc) );
-	memset( &m_timers, 0, sizeof(m_timers) );
+	m_prc = PRC();
+	m_timers = TIMERS();
 	memset( m_pm_reg, 0, sizeof(m_pm_reg) );
 
 	/* Set up timers */
@@ -1732,6 +1728,8 @@ ROM_START( pokemini )
 	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD( "bios.min", 0x0000, 0x1000, CRC(aed3c14d) SHA1(daad4113713ed776fbd47727762bca81ba74915f) )
 ROM_END
+
+} // anonymous namespace
 
 
 CONS( 2001, pokemini, 0, 0, pokemini, pokemini, pokemini_state, empty_init, "Nintendo", "Pokemon Mini", MACHINE_NO_SOUND )

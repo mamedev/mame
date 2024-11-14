@@ -19,6 +19,8 @@ I've not had a chance to wire up the board yet, but it might be possible to writ
 #include "screen.h"
 
 
+namespace {
+
 class intrscti_state : public driver_device
 {
 public:
@@ -42,12 +44,12 @@ private:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 	uint32_t screen_update_intrscti(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void intrscti_io_map(address_map &map);
-	void intrscti_map(address_map &map);
-	void intrscti_sub_io_map(address_map &map);
-	void intrscti_sub_map(address_map &map);
+	void intrscti_io_map(address_map &map) ATTR_COLD;
+	void intrscti_map(address_map &map) ATTR_COLD;
+	void intrscti_sub_io_map(address_map &map) ATTR_COLD;
+	void intrscti_sub_map(address_map &map) ATTR_COLD;
 };
 
 void intrscti_state::video_start()
@@ -248,5 +250,8 @@ void intrscti_state::init_intrscti()
 		m_vram[i+0x400] = 0xff;
 	}
 }
+
+} // anonymous namespace
+
 
 GAME( 19??, intrscti, 0, intrscti, intrscti, intrscti_state, init_intrscti, ROT0, "<unknown>", "Intersecti", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND )

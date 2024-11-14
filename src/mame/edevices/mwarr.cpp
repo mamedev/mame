@@ -48,6 +48,9 @@ Notes:
 #include "speaker.h"
 #include "edevices.h"
 
+
+namespace {
+
 #define MASTER_CLOCK     XTAL(12'000'000)
 #define SOUND_CLOCK      XTAL(45'000'000)
 
@@ -77,15 +80,15 @@ private:
 
 	void oki1_bank_w(uint16_t data);
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 	uint32_t screen_update_mwarr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 	required_device<edevices_device> m_video;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
-	void mwarr_map(address_map &map);
-	void oki2_map(address_map &map);
+	void mwarr_map(address_map &map) ATTR_COLD;
+	void oki2_map(address_map &map) ATTR_COLD;
 };
 
 /*************************************
@@ -334,6 +337,7 @@ void mwarr_state::mwarr(machine_config &config)
 	m_video->set_spriteram_tag("spriteram");
 	m_video->set_gfxdecode_tag("gfxdecode");
 	m_video->set_palette_tag("palette");
+	m_video->set_spritexoffset(9);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -402,10 +406,13 @@ ROM_START( mwarr )
 	ROM_LOAD( "oki1",   0x000000, 0x80000, CRC(bcde2330) SHA1(452d871360fa907d2e4ebad93c3fba9a3fa32fa7) ) // no date
 ROM_END
 
+} // anonymous namespace
+
+
 /*************************************
  *
  *  Game driver(s)
  *
  *************************************/
 
-GAME( 199?, mwarr, 0, mwarr, mwarr, mwarr_state, empty_init, ROT0,  "Elettronica Video-Games S.R.L.", "Mighty Warriors (24/1)", MACHINE_SUPPORTS_SAVE )
+GAME( 199?, mwarr, 0, mwarr, mwarr, mwarr_state, empty_init, ROT0,  "Elettronica Video-Games", "Mighty Warriors (24/1)", MACHINE_SUPPORTS_SAVE )

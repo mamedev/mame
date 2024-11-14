@@ -126,9 +126,9 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
-	virtual void device_stop() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+	virtual void device_stop() override ATTR_COLD;
 	virtual void device_clock_changed() override;
 
 	virtual void update_irq() override;
@@ -244,27 +244,27 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
-	virtual void device_stop() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+	virtual void device_stop() override ATTR_COLD;
 
 	// optional information overrides
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual ioport_constructor device_input_ports() const override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 
 private:
-	DECLARE_WRITE_LINE_MEMBER(midi_txirq);
-	DECLARE_WRITE_LINE_MEMBER(midi_rxirq);
-	DECLARE_WRITE_LINE_MEMBER(wavetable_irq);
-	DECLARE_WRITE_LINE_MEMBER(volumeramp_irq);
-	DECLARE_WRITE_LINE_MEMBER(timer1_irq);
-	DECLARE_WRITE_LINE_MEMBER(timer2_irq);
-	DECLARE_WRITE_LINE_MEMBER(sb_irq);
-	DECLARE_WRITE_LINE_MEMBER(dma_irq);
-	DECLARE_WRITE_LINE_MEMBER(drq1_w);
-	DECLARE_WRITE_LINE_MEMBER(drq2_w);
-	DECLARE_WRITE_LINE_MEMBER(nmi_w);
-	DECLARE_WRITE_LINE_MEMBER(write_acia_clock);
+	void midi_txirq(int state);
+	void midi_rxirq(int state);
+	void wavetable_irq(int state);
+	void volumeramp_irq(int state);
+	void timer1_irq(int state);
+	void timer2_irq(int state);
+	void sb_irq(int state);
+	void dma_irq(int state);
+	void drq1_w(int state);
+	void drq2_w(int state);
+	void nmi_w(int state);
+	void write_acia_clock(int state);
 
 	required_device<gf1_device> m_gf1;
 

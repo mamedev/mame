@@ -45,6 +45,8 @@
 #include "emu.h"
 #include "sixword.h"
 
+#include "formats/swd_dsk.h"
+
 
 /***************************************************************************
     DEVICE DEFINITIONS
@@ -60,7 +62,7 @@ DEFINE_DEVICE_TYPE(SPECTRUM_SWIFTDISC2, spectrum_swiftdisc2_device, "spectrum_sw
 
 INPUT_PORTS_START(swiftdisc)
 	PORT_START("BUTTON")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_BUTTON1) PORT_NAME("Interrupt Button") PORT_CODE(KEYCODE_MINUS_PAD) PORT_CHANGED_MEMBER(DEVICE_SELF, spectrum_swiftdisc_device, nmi_button, 0)
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_BUTTON1) PORT_NAME("Interrupt Button") PORT_CODE(KEYCODE_MINUS_PAD) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(spectrum_swiftdisc_device::nmi_button), 0)
 
 	PORT_START("JOY")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT) PORT_8WAY
@@ -266,9 +268,9 @@ void spectrum_swiftdisc2_device::device_reset()
 //  IMPLEMENTATION (swiftdisc)
 //**************************************************************************
 
-READ_LINE_MEMBER(spectrum_swiftdisc_device::romcs)
+bool spectrum_swiftdisc_device::romcs()
 {
-	return m_romcs | m_exp->romcs();
+	return m_romcs || m_exp->romcs();
 }
 
 void spectrum_swiftdisc_device::post_opcode_fetch(offs_t offset)

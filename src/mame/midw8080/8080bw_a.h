@@ -5,8 +5,8 @@
     8080-based black and white sound hardware
 
 ****************************************************************************/
-#ifndef MAME_AUDIO_8080BW_H
-#define MAME_AUDIO_8080BW_H
+#ifndef MAME_MIDW8080_8080BW_A_H
+#define MAME_MIDW8080_8080BW_A_H
 
 #pragma once
 
@@ -26,9 +26,9 @@ public:
 	void sn76477_dis_w(u8 data);
 
 protected:
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual ioport_constructor device_input_ports() const override;
-	virtual void device_start() override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
+	virtual void device_start() override ATTR_COLD;
 
 private:
 	TIMER_DEVICE_CALLBACK_MEMBER(vco_voltage_timer);
@@ -42,4 +42,4 @@ private:
 
 DECLARE_DEVICE_TYPE(CANE_AUDIO, cane_audio_device)
 
-#endif // MAME_AUDIO_8080BW_H
+#endif // MAME_MIDW8080_8080BW_A_H

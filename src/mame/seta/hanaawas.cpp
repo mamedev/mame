@@ -56,9 +56,9 @@ public:
 	void hanaawas(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	required_shared_ptr<uint8_t> m_videoram;
@@ -86,8 +86,8 @@ private:
 	void palette(palette_device &palette) const;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void portb_w(uint8_t data);
-	void prg_map(address_map &map);
-	void io_map(address_map &map);
+	void prg_map(address_map &map) ATTR_COLD;
+	void io_map(address_map &map) ATTR_COLD;
 };
 
 uint8_t hanaawas_state::input_port_0_r()
@@ -424,4 +424,4 @@ ROM_END
 } // Anonymous namespace
 
 
-GAME( 1982, hanaawas, 0, hanaawas, hanaawas, hanaawas_state, empty_init, ROT0, "Seta Kikaku, Ltd.", "Hana Awase", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, hanaawas, 0, hanaawas, hanaawas, hanaawas_state, empty_init, ROT0, "Seta Kikaku", "Hana Awase", MACHINE_SUPPORTS_SAVE )

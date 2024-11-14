@@ -193,7 +193,7 @@ bool posix_directory::open_impl(std::string const &dirname)
 {
 	assert(!m_fd);
 
-	m_path = osd_subst_env(dirname);
+	m_path = dirname;
 	m_fd.reset(::opendir(m_path.c_str()));
 	return bool(m_fd);
 }

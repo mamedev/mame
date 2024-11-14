@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Nicola Salmoria
-#ifndef MAME_INCLUDES_NAMCOS86_H
-#define MAME_INCLUDES_NAMCOS86_H
+#ifndef MAME_NAMCO_NAMCOS86_H
+#define MAME_NAMCO_NAMCOS86_H
 
 #pragma once
 
@@ -41,8 +41,8 @@ public:
 	void init_namco86();
 
 protected:
-	virtual void machine_start() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	void bankswitch1_w(uint8_t data);
@@ -75,22 +75,22 @@ private:
 	void namcos86_palette(palette_device &palette);
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_WRITE_LINE_MEMBER(screen_vblank);
+	void screen_vblank(int state);
 	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void scroll_w(offs_t offset, int data, int layer);
 
-	void common_mcu_map(address_map &map);
-	void cpu1_map(address_map &map);
-	void genpeitd_cpu2_map(address_map &map);
-	void genpeitd_mcu_map(address_map &map);
-	void hopmappy_cpu2_map(address_map &map);
-	void hopmappy_mcu_map(address_map &map);
-	void roishtar_cpu2_map(address_map &map);
-	void roishtar_mcu_map(address_map &map);
-	void rthunder_cpu2_map(address_map &map);
-	void rthunder_mcu_map(address_map &map);
-	void wndrmomo_cpu2_map(address_map &map);
-	void wndrmomo_mcu_map(address_map &map);
+	void common_mcu_map(address_map &map) ATTR_COLD;
+	void cpu1_map(address_map &map) ATTR_COLD;
+	void genpeitd_cpu2_map(address_map &map) ATTR_COLD;
+	void genpeitd_mcu_map(address_map &map) ATTR_COLD;
+	void hopmappy_cpu2_map(address_map &map) ATTR_COLD;
+	void hopmappy_mcu_map(address_map &map) ATTR_COLD;
+	void roishtar_cpu2_map(address_map &map) ATTR_COLD;
+	void roishtar_mcu_map(address_map &map) ATTR_COLD;
+	void rthunder_cpu2_map(address_map &map) ATTR_COLD;
+	void rthunder_mcu_map(address_map &map) ATTR_COLD;
+	void wndrmomo_cpu2_map(address_map &map) ATTR_COLD;
+	void wndrmomo_mcu_map(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_cpu1;
 	required_device<cpu_device> m_cpu2;
@@ -120,4 +120,4 @@ private:
 	void set_scroll(int layer);
 };
 
-#endif // MAME_INCLUDES_NAMCOS86_H
+#endif // MAME_NAMCO_NAMCOS86_H

@@ -69,7 +69,7 @@ static const int m_cmd_fifo_length[256] =
 	-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, /* Ax */
 		4, -1,  4, -1,  4, -1,  4, -1,  4, -1, -1,  -1, -1, -1,  4, -1, /* Bx */
 		4, -1,  4, -1,  4, -1,  4, -1,  4, -1, -1,  -1, -1, -1,  4, -1, /* Cx */
-		1,  1, -1,  1, -1,  1,  1, -1,  1,  1,  1,  -1, -1, -1, -1, -1, /* Dx */
+		1,  1, -1,  1,  1,  1,  1, -1,  1,  1,  1,  -1, -1, -1, -1, -1, /* Dx */
 		2,  1,  2,  1,  2, -1, -1, -1,  1, -1, -1,  -1, -1, -1, -1, -1, /* Ex */
 	-1, -1,  1, -1, -1, -1, -1, -1,  1, -1, -1, -1,  1, -1, -1, -1  /* Fx */
 };
@@ -569,13 +569,16 @@ void sb_device::process_fifo(uint8_t cmd)
 						case 0x42: // set input sample rate
 							m_dsp.adc_freq = m_dsp.fifo[2] + (m_dsp.fifo[1] << 8);
 							break;
+						case 0xd4: // continue 8-bit dma
+							drq_w(1);
+							break;
 						case 0xd5: // pause 16-bit dma
 							m_timer->adjust(attotime::never, 0);
 							drq16_w(0);   // drop DRQ
 							m_dsp.dma_throttled = false;
 							m_dsp.dma_timer_started = false;
 							break;
-						case 0xd6: // resume 16-bit dma
+						case 0xd6: // continue 16-bit dma
 							logerror("SB: 16-bit dma resume\n");
 							break;
 						case 0xd9: // stop 16-bit autoinit
@@ -1816,5 +1819,23 @@ void sb_device::xmit_char(uint8_t data)
 			m_xmit_write = 0;
 		}
 		m_tx_waiting++;
+	}
+}
+
+void isa16_sblaster16_device::remap(int space_id, offs_t start, offs_t end)
+{
+	if (space_id == AS_IO)
+	{
+		ymf262_device &ymf262 = *subdevice<ymf262_device>("ymf262");
+		m_isa->install_device(0x0200, 0x0207, read8smo_delegate(*subdevice<pc_joy_device>("pc_joy"), FUNC(pc_joy_device::joy_port_r)), write8smo_delegate(*subdevice<pc_joy_device>("pc_joy"), FUNC(pc_joy_device::joy_port_w)));
+		m_isa->install_device(0x0226, 0x0227, read8sm_delegate(*this, FUNC(sb_device::dsp_reset_r)), write8sm_delegate(*this, FUNC(sb_device::dsp_reset_w)));
+		m_isa->install_device(0x022a, 0x022b, read8sm_delegate(*this, FUNC(sb_device::dsp_data_r)), write8sm_delegate(*this, FUNC(sb_device::dsp_data_w)));
+		m_isa->install_device(0x022c, 0x022d, read8sm_delegate(*this, FUNC(sb_device::dsp_wbuf_status_r)), write8sm_delegate(*this, FUNC(sb_device::dsp_cmd_w)));
+		m_isa->install_device(0x022e, 0x022f, read8sm_delegate(*this, FUNC(sb_device::dsp_rbuf_status_r)), write8sm_delegate(*this, FUNC(sb_device::dsp_rbuf_status_w)));
+		m_isa->install_device(0x0224, 0x0225, read8sm_delegate(*this, FUNC(sb16_device::mixer_r)), write8sm_delegate(*this, FUNC(sb16_device::mixer_w)));
+		m_isa->install_device(0x0330, 0x0331, read8sm_delegate(*this, FUNC(sb16_device::mpu401_r)), write8sm_delegate(*this, FUNC(sb16_device::mpu401_w)));
+		m_isa->install_device(0x0388, 0x038b, read8sm_delegate(ymf262, FUNC(ymf262_device::read)), write8sm_delegate(ymf262, FUNC(ymf262_device::write)));
+		m_isa->install_device(0x0220, 0x0223, read8sm_delegate(ymf262, FUNC(ymf262_device::read)), write8sm_delegate(ymf262, FUNC(ymf262_device::write)));
+		m_isa->install_device(0x0228, 0x0229, read8sm_delegate(ymf262, FUNC(ymf262_device::read)), write8sm_delegate(ymf262, FUNC(ymf262_device::write)));
 	}
 }

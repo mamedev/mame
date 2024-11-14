@@ -58,6 +58,7 @@
 
 // processors
 #include "cpu/m68000/m68000.h"
+#include "cpu/m68000/m68020.h"
 #include "cpu/m6805/m68705.h"
 
 // devices
@@ -76,11 +77,13 @@
 #include "screen.h"
 #include "video/bt47x.h"
 
-#define LOG_GENERAL (1U << 0)
 #define LOG_MCU     (1U << 1)
 
 //#define VERBOSE (LOG_GENERAL|LOG_MCU)
 #include "logmacro.h"
+
+
+namespace {
 
 class ncd68k_state : public driver_device
 {
@@ -101,7 +104,7 @@ public:
 	}
 
 protected:
-	virtual void machine_reset() override;
+	virtual void machine_reset() override ATTR_COLD;
 	void common(machine_config &config);
 
 	u8 mcu_r();
@@ -143,7 +146,7 @@ public:
 	void initialise();
 
 private:
-	void map(address_map &map);
+	void map(address_map &map) ATTR_COLD;
 
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, rectangle const &cliprect);
 
@@ -166,7 +169,7 @@ public:
 	void initialise();
 
 private:
-	void map(address_map &map);
+	void map(address_map &map) ATTR_COLD;
 
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, rectangle const &cliprect);
 
@@ -191,7 +194,7 @@ public:
 	void initialise();
 
 private:
-	void map(address_map &map);
+	void map(address_map &map) ATTR_COLD;
 
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, rectangle const &cliprect);
 
@@ -661,12 +664,23 @@ INPUT_PORTS_END
 
 ROM_START(ncd16)
 	ROM_REGION16_BE(0xc0000, "maincpu", 0)
-	ROM_LOAD16_BYTE("b0e.u3",  0x000000, 0x020000, CRC(8996f939) SHA1(8d6c5649fa927ee16b8632c2f2949997014346d0))
-	ROM_LOAD16_BYTE("b0o.u14", 0x000001, 0x020000, CRC(3143e82c) SHA1(37b917304705a450b3272945d4cff851afb97dbe))
-	ROM_LOAD16_BYTE("b1e.u2",  0x040000, 0x020000, CRC(82712624) SHA1(7e2ff025bf4e9638bdd58b99dc4dabd86c0d21ee))
-	ROM_LOAD16_BYTE("b1o.u13", 0x040001, 0x020000, CRC(432aaa02) SHA1(960291a9b692449e4e787b88528c83a37b3562f2))
-	ROM_LOAD16_BYTE("b2e.u1",  0x080000, 0x020000, CRC(290116df) SHA1(1042764eb5f308046c0f019f31df457d360c9db1))
-	ROM_LOAD16_BYTE("b2o.u12", 0x080001, 0x020000, CRC(2b364281) SHA1(63c2b3093eee6d40f405ead911843ebeb5193b7a))
+	ROM_DEFAULT_BIOS("v23l")
+
+	ROM_SYSTEM_BIOS(0, "v210",  "V2.1.0") // Server 2.1.0 03/05/90  Boot Prom V2.1.0
+	ROMX_LOAD("v210_b0e.u3",  0x000000, 0x020000, CRC(0e8cec37) SHA1(6561de99d44710e5fd6d969e7e2191456e258df4), ROM_SKIP(1) | ROM_BIOS(0))
+	ROMX_LOAD("v210_b0o.u14", 0x000001, 0x020000, CRC(8bdf2843) SHA1(0d907006e9643fb00f36cf14ac24bf11118b62c1), ROM_SKIP(1) | ROM_BIOS(0))
+	ROMX_LOAD("v210_b1e.u2",  0x040000, 0x020000, CRC(72c78a46) SHA1(1fd0bc4b7d2dc9d354c6181daf1a7d209172728b), ROM_SKIP(1) | ROM_BIOS(0))
+	ROMX_LOAD("v210_b1o.u13", 0x040001, 0x020000, CRC(595fdbf6) SHA1(5c6427db3e47809a1ed20cf5c91b0f60ae3f8803), ROM_SKIP(1) | ROM_BIOS(0))
+	ROMX_LOAD("v210_b2e.u1",  0x080000, 0x020000, CRC(6bf7594a) SHA1(4c0a6664cde0617c65074d898ba0bcbfe79e1cf8), ROM_SKIP(1) | ROM_BIOS(0))
+	ROMX_LOAD("v210_b2o.u12", 0x080001, 0x020000, CRC(8232774b) SHA1(6ea26e964fcea1c0386f8a02d84a0e9bbdded78f), ROM_SKIP(1) | ROM_BIOS(0))
+
+	ROM_SYSTEM_BIOS(1, "v23l",  "V2.3.L") // NCD16 Xremote server 2.3.L beta 02/11/91  Boot Monitor V2.2.2
+	ROMX_LOAD("ncd_16_xr__v23l_b0e.u3",  0x000000, 0x020000, CRC(8996f939) SHA1(8d6c5649fa927ee16b8632c2f2949997014346d0), ROM_SKIP(1) | ROM_BIOS(1))
+	ROMX_LOAD("ncd_16_xr__v23l_b0o.u14", 0x000001, 0x020000, CRC(3143e82c) SHA1(37b917304705a450b3272945d4cff851afb97dbe), ROM_SKIP(1) | ROM_BIOS(1))
+	ROMX_LOAD("ncd_16_xr__v23l_b1e.u2",  0x040000, 0x020000, CRC(82712624) SHA1(7e2ff025bf4e9638bdd58b99dc4dabd86c0d21ee), ROM_SKIP(1) | ROM_BIOS(1))
+	ROMX_LOAD("ncd_16_xr__v23l_b1o.u13", 0x040001, 0x020000, CRC(432aaa02) SHA1(960291a9b692449e4e787b88528c83a37b3562f2), ROM_SKIP(1) | ROM_BIOS(1))
+	ROMX_LOAD("ncd_16_xr__v23l_b2e.u1",  0x080000, 0x020000, CRC(290116df) SHA1(1042764eb5f308046c0f019f31df457d360c9db1), ROM_SKIP(1) | ROM_BIOS(1))
+	ROMX_LOAD("ncd_16_xr__v23l_b2o.u12", 0x080001, 0x020000, CRC(2b364281) SHA1(63c2b3093eee6d40f405ead911843ebeb5193b7a), ROM_SKIP(1) | ROM_BIOS(1))
 
 	ROM_REGION16_LE(0x80, "eeprom", 0)
 	ROM_LOAD("93c46_0000a76f002b.u17", 0x00, 0x80, CRC(656c8444) SHA1(162a71e2d91a104f4251beb17a4a53f24d1e5e03))
@@ -677,12 +691,17 @@ ROM_END
 
 ROM_START(ncd17c)
 	ROM_REGION32_BE(0xc0000, "maincpu", 0)
-	ROM_LOAD16_BYTE("ncd17c_v2.2.1_b0e.u3",  0x000000, 0x020000, CRC(c47648af) SHA1(563e17ea8f5c9d418fd81f1e797a226937c0e187))
-	ROM_LOAD16_BYTE("ncd17c_v2.2.1_b0o.u14", 0x000001, 0x020000, CRC(b6a8c3ca) SHA1(f02e33d88861ebcb402fb554719c1cb072a5fd14))
-	ROM_LOAD16_BYTE("ncd17c_v2.2.1_b1e.u2",  0x040000, 0x020000, CRC(25500987) SHA1(cebdf07c69f1c783a67b92d6efdfdd7067dc910f))
-	ROM_LOAD16_BYTE("ncd17c_v2.2.1_b1o.u13", 0x040001, 0x020000, CRC(a5d5ab8a) SHA1(51ddb7020abd5f83224bff48eab254375e9d27f9))
-	ROM_LOAD16_BYTE("ncd17c_v2.2.1_b2e.u1",  0x080000, 0x020000, CRC(390dac65) SHA1(3f9c886433dff87847135b8f3d8e8ead75d3abf3))
-	ROM_LOAD16_BYTE("ncd17c_v2.2.1_b2o.u12", 0x080001, 0x020000, CRC(2e5ebfaa) SHA1(d222c6cc743046a1c1dec1829c24fa918a54849d))
+	ROM_DEFAULT_BIOS("221")
+	ROM_SYSTEM_BIOS(0, "210", "Boot Prom v2.1.0")
+	ROMX_LOAD("ncd17c_v2.1.0_b0e.u3",  0x000000, 0x008000, CRC(00d11b19) SHA1(1039b8a44c045c51ef70e3494c59be0e9f0a1922), ROM_SKIP(1) | ROM_BIOS(0))
+	ROMX_LOAD("ncd17c_v2.1.0_b0o.u14", 0x000001, 0x008000, CRC(1e0a8644) SHA1(cf9661ced32df1285682566041ffaaf794ca005f), ROM_SKIP(1) | ROM_BIOS(0))
+	ROM_SYSTEM_BIOS(1, "221", "Boot Prom v2.2.1")
+	ROMX_LOAD("ncd17c_v2.2.1_b0e.u3",  0x000000, 0x020000, CRC(c47648af) SHA1(563e17ea8f5c9d418fd81f1e797a226937c0e187), ROM_SKIP(1) | ROM_BIOS(1))
+	ROMX_LOAD("ncd17c_v2.2.1_b0o.u14", 0x000001, 0x020000, CRC(b6a8c3ca) SHA1(f02e33d88861ebcb402fb554719c1cb072a5fd14), ROM_SKIP(1) | ROM_BIOS(1))
+	ROMX_LOAD("ncd17c_v2.2.1_b1e.u2",  0x040000, 0x020000, CRC(25500987) SHA1(cebdf07c69f1c783a67b92d6efdfdd7067dc910f), ROM_SKIP(1) | ROM_BIOS(1))
+	ROMX_LOAD("ncd17c_v2.2.1_b1o.u13", 0x040001, 0x020000, CRC(a5d5ab8a) SHA1(51ddb7020abd5f83224bff48eab254375e9d27f9), ROM_SKIP(1) | ROM_BIOS(1))
+	ROMX_LOAD("ncd17c_v2.2.1_b2e.u1",  0x080000, 0x020000, CRC(390dac65) SHA1(3f9c886433dff87847135b8f3d8e8ead75d3abf3), ROM_SKIP(1) | ROM_BIOS(1))
+	ROMX_LOAD("ncd17c_v2.2.1_b2o.u12", 0x080001, 0x020000, CRC(2e5ebfaa) SHA1(d222c6cc743046a1c1dec1829c24fa918a54849d), ROM_SKIP(1) | ROM_BIOS(1))
 
 	ROM_REGION16_LE(0x80, "eeprom", 0)
 	ROM_LOAD("93c46_0000a7103f0f.u17", 0x00, 0x80, CRC(f7515683) SHA1(3c5796d4fc1e18db8d12b5a4758f083f9dac3f36))
@@ -702,6 +721,9 @@ ROM_START(ncd19)
 	ROM_REGION(0x800, "mcu", 0)
 	ROM_LOAD("ncd4200005.u18", 0x000, 0x800, CRC(075c3746) SHA1(6954cfab5141138df975f1b15d2c8e08d4d203c1))
 ROM_END
+
+} // anonymous namespace
+
 
 //   YEAR  NAME    PARENT  COMPAT  MACHINE    INPUT   CLASS         INIT        COMPANY                      FULLNAME   FLAGS
 COMP(1989, ncd16,  0,      0,      configure, ncd68k, ncd16_state,  initialise, "Network Computing Devices", "NCD 16",  MACHINE_NOT_WORKING|MACHINE_NO_SOUND)

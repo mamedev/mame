@@ -13,7 +13,7 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "machine/tc009xlvc.h"
+#include "tc009xlvc.h"
 
 #include "emupal.h"
 #include "screen.h"
@@ -102,7 +102,7 @@ void tc0090lvc_device::cpu_map(address_map &map)
 void tc0090lvc_device::vram_map(address_map &map)
 {
 	map(0x010000, 0x01ffff).readonly().share("vram");
-	// note, the way tiles are addressed suggests that 0x0000-0x3fff of this might be usable,
+	// NOTE: the way tiles are addressed suggests that 0x0000-0x3fff of this might be usable,
 	//       but we don't map it anywhere, so the first tiles are always blank at the moment.
 	map(0x014000, 0x01ffff).lw8(NAME([this] (offs_t offset, u8 data) { vram_w(offset + 0x4000, data); }));
 	map(0x040000, 0x05ffff).ram().share("bitmap_ram");
@@ -165,8 +165,7 @@ TILE_GET_INFO_MEMBER(tc0090lvc_device::get_tile_info)
 			| ((attr & 0x03) << 8)
 			| ((tilebank((attr & 0xc) >> 2)) << 10);
 
-	if (!m_tile_cb.isnull())
-		m_tile_cb(code);
+	m_tile_cb(code);
 
 	tileinfo.set(0,
 			code,
@@ -218,7 +217,7 @@ void tc0090lvc_device::device_start()
 
 	space(AS_DATA).specific(m_vram_space);
 
-	m_tile_cb.resolve();
+	m_tile_cb.resolve_safe();
 
 	std::fill_n(&m_vram[0], m_vram.bytes(), 0);
 	std::fill_n(&m_bitmap_ram[0], m_bitmap_ram.bytes(), 0);
@@ -310,13 +309,10 @@ void tc0090lvc_device::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap,
 		int fx = m_sprram_buffer[count + 3] & 0x1;
 		int fy = m_sprram_buffer[count + 3] & 0x2;
 
-		if (!m_tile_cb.isnull())
-		{
-			// each sprite is 4 8x8 tile group, actually tile number for each tile is << 2 of real address
-			code <<= 2;
-			m_tile_cb(code);
-			code >>= 2;
-		}
+		// each sprite is 4 8x8 tile group, actually tile number for each tile is << 2 of real address
+		code <<= 2;
+		m_tile_cb(code);
+		code >>= 2;
 
 		if (global_flip())
 		{

@@ -43,6 +43,9 @@
 #include "netlist/devices/net_lib.h"
 #include "video/fixfreq.h"
 
+
+namespace {
+
 // copied from Pong, not accurate for this driver!
 // start
 #define MASTER_CLOCK    7159000
@@ -76,14 +79,15 @@ private:
 	required_device<fixedfreq_device> m_video;
 
 	// driver_device overrides
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 };
 
 
 static NETLIST_START(ramtek)
+{
 	SOLVER(Solver, 48000)
 //  PARAM(Solver.FREQ, 48000)
 	PARAM(Solver.ACCURACY, 1e-4) // works and is sufficient
@@ -93,7 +97,7 @@ static NETLIST_START(ramtek)
 
 //  NETDEV_ANALOG_CALLBACK(sound_cb, sound, exidyttl_state, sound_cb, "")
 //  NETDEV_ANALOG_CALLBACK(video_cb, videomix, fixedfreq_device, update_vid, "fixfreq")
-NETLIST_END()
+}
 
 
 
@@ -240,10 +244,13 @@ ROM_START( trivia )
 	ROM_LOAD( "550548.e3",      0x0000, 0x0020, CRC(2b7c6a5e) SHA1(943cc3901c651bfe5bf11a40c27801952731b6de) )
 ROM_END
 
-GAME( 1973, vollyrmt,  0, ramtek, 0, ramtek_state, empty_init, ROT0, "Ramtek", "Volly (Ramtek) [TTL]",    MACHINE_IS_SKELETON )
-GAME( 1973, hockyrmt,  0, ramtek, 0, ramtek_state, empty_init, ROT0, "Ramtek", "Hockey (Ramtek) [TTL]",   MACHINE_IS_SKELETON )
-GAME( 1973, soccrrmt,  0, ramtek, 0, ramtek_state, empty_init, ROT0, "Ramtek", "Soccer (Ramtek) [TTL]",   MACHINE_IS_SKELETON )
-GAME( 1974, wipeormt,  0, ramtek, 0, ramtek_state, empty_init, ROT0, "Ramtek", "Wipeout (Ramtek) [TTL]",  MACHINE_IS_SKELETON )
-GAME( 1974, cleanswp,  0, ramtek, 0, ramtek_state, empty_init, ROT0, "Ramtek", "Clean Sweep [TTL]",       MACHINE_IS_SKELETON )
-GAME( 1974, bballrmt,  0, ramtek, 0, ramtek_state, empty_init, ROT0, "Ramtek", "Baseball (Ramtek) [TTL]", MACHINE_IS_SKELETON )
-GAME( 1975, trivia,    0, ramtek, 0, ramtek_state, empty_init, ROT0, "Ramtek", "Trivia (Rev B) [TTL]",    MACHINE_IS_SKELETON )
+} // anonymous namespace
+
+
+GAME( 1973, vollyrmt,  0, ramtek, 0, ramtek_state, empty_init, ROT0, "Ramtek", "Volly (Ramtek)",    MACHINE_IS_SKELETON )
+GAME( 1973, hockyrmt,  0, ramtek, 0, ramtek_state, empty_init, ROT0, "Ramtek", "Hockey (Ramtek)",   MACHINE_IS_SKELETON )
+GAME( 1973, soccrrmt,  0, ramtek, 0, ramtek_state, empty_init, ROT0, "Ramtek", "Soccer (Ramtek)",   MACHINE_IS_SKELETON )
+GAME( 1974, wipeormt,  0, ramtek, 0, ramtek_state, empty_init, ROT0, "Ramtek", "Wipeout (Ramtek)",  MACHINE_IS_SKELETON )
+GAME( 1974, cleanswp,  0, ramtek, 0, ramtek_state, empty_init, ROT0, "Ramtek", "Clean Sweep",       MACHINE_IS_SKELETON )
+GAME( 1974, bballrmt,  0, ramtek, 0, ramtek_state, empty_init, ROT0, "Ramtek", "Baseball (Ramtek)", MACHINE_IS_SKELETON )
+GAME( 1975, trivia,    0, ramtek, 0, ramtek_state, empty_init, ROT0, "Ramtek", "Trivia (Rev B)",    MACHINE_IS_SKELETON )

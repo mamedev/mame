@@ -14,11 +14,6 @@
     - Sample Rate is unverified
 
 *************************************************************************************/
-static inline s32 sign_ext(s32 val, s32 bit)
-{
-	bit = 32 - bit;
-	return ((s32)(val << bit)) >> bit;
-}
 
 //Correct table thanks to Evoga
 //they left a ulaw<->linear conversion tool inside the roms
@@ -139,8 +134,6 @@ vr0sound_device::vr0sound_device(const machine_config &mconfig, const char *tag,
 
 void vr0sound_device::device_start()
 {
-	m_irq_cb.resolve_safe();
-
 	// Find our direct access
 	space(AS_TEXTURE).cache(m_texcache);
 	space(AS_FRAME).cache(m_fbcache);
@@ -462,7 +455,7 @@ void vr0sound_device::channel_t::write(offs_t offset, u16 data, u16 mem_mask)
 		case 0x06/2:
 			LD = data & 0x1000;
 			EnvStage = (data & 0x0f00) >> 8;
-			EnvVol = sign_ext((EnvVol & 0x00ffff) | ((data << 16) & 0xff0000), 24);
+			EnvVol = util::sext((EnvVol & 0x00ffff) | ((data << 16) & 0xff0000), 24);
 			break;
 		case 0x08/2:
 			dSAddr = data & 0xffff;
@@ -494,8 +487,8 @@ void vr0sound_device::channel_t::write(offs_t offset, u16 data, u16 mem_mask)
 		case 0x1e/2:
 			EnvTarget[((offset - (0x1c/2)) * 2) + 0] = (data & 0x007f);
 			EnvTarget[((offset - (0x1c/2)) * 2) + 1] = ((data & 0x7f00) >> 8);
-			EnvRate[((offset - (0x1c/2)) * 2) + 0] = sign_ext((EnvRate[((offset - (0x1c/2)) * 2) + 0] & 0xffff) | ((data & 0x0080) << 9), 17);
-			EnvRate[((offset - (0x1c/2)) * 2) + 1] = sign_ext((EnvRate[((offset - (0x1c/2)) * 2) + 1] & 0xffff) | ((data & 0x8000) << 1), 17);
+			EnvRate[((offset - (0x1c/2)) * 2) + 0] = util::sext((EnvRate[((offset - (0x1c/2)) * 2) + 0] & 0xffff) | ((data & 0x0080) << 9), 17);
+			EnvRate[((offset - (0x1c/2)) * 2) + 1] = util::sext((EnvRate[((offset - (0x1c/2)) * 2) + 1] & 0xffff) | ((data & 0x8000) << 1), 17);
 			break;
 	}
 }

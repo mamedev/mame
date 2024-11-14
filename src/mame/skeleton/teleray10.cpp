@@ -17,6 +17,9 @@
 #include "screen.h"
 #include "speaker.h"
 
+
+namespace {
+
 class teleray10_state : public driver_device
 {
 public:
@@ -40,12 +43,12 @@ public:
 
 	void teleray10(machine_config &config);
 
-	DECLARE_WRITE_LINE_MEMBER(key_interrupt_w);
-	DECLARE_READ_LINE_MEMBER(timer_expired_r);
+	void key_interrupt_w(int state);
+	int timer_expired_r();
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -54,16 +57,16 @@ private:
 	TIMER_CALLBACK_MEMBER(bell_toggle);
 	void bell_update();
 
-	DECLARE_WRITE_LINE_MEMBER(wide_mode_w);
-	DECLARE_WRITE_LINE_MEMBER(bell_off_w);
-	DECLARE_WRITE_LINE_MEMBER(reset_timer_w);
+	void wide_mode_w(int state);
+	void bell_off_w(int state);
+	void reset_timer_w(int state);
 
 	void scratchpad_w(offs_t offset, u8 data);
 	u8 serial_io_r(offs_t offset);
 	void serial_io_w(offs_t offset, u8 data);
 	u8 kb_r(offs_t offset);
 
-	void mem_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<input_merger_device> m_mainirq;
@@ -176,16 +179,16 @@ u32 teleray10_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, 
 }
 
 
-WRITE_LINE_MEMBER(teleray10_state::key_interrupt_w)
+void teleray10_state::key_interrupt_w(int state)
 {
 	m_maincpu->set_input_line(m6502_device::NMI_LINE, state ? CLEAR_LINE : ASSERT_LINE);
 }
 
-WRITE_LINE_MEMBER(teleray10_state::wide_mode_w)
+void teleray10_state::wide_mode_w(int state)
 {
 }
 
-WRITE_LINE_MEMBER(teleray10_state::bell_off_w)
+void teleray10_state::bell_off_w(int state)
 {
 	if (state)
 	{
@@ -196,7 +199,7 @@ WRITE_LINE_MEMBER(teleray10_state::bell_off_w)
 		bell_update();
 }
 
-WRITE_LINE_MEMBER(teleray10_state::reset_timer_w)
+void teleray10_state::reset_timer_w(int state)
 {
 	if (!state)
 	{
@@ -205,7 +208,7 @@ WRITE_LINE_MEMBER(teleray10_state::reset_timer_w)
 	}
 }
 
-READ_LINE_MEMBER(teleray10_state::timer_expired_r)
+int teleray10_state::timer_expired_r()
 {
 	return m_timer_expired;
 }
@@ -393,7 +396,7 @@ static INPUT_PORTS_START(teleray10)
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_TOGGLE PORT_NAME("Local")
 
 	PORT_START("KINT")
-	PORT_BIT(1, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Interrupt") PORT_WRITE_LINE_MEMBER(teleray10_state, key_interrupt_w)
+	PORT_BIT(1, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Interrupt") PORT_WRITE_LINE_MEMBER(FUNC(teleray10_state::key_interrupt_w))
 
 	PORT_START("SW1A")
 	PORT_DIPNAME(0x01, 0x00, "Xmit ETX") PORT_DIPLOCATION("7A:3")
@@ -410,7 +413,7 @@ static INPUT_PORTS_START(teleray10)
 	PORT_DIPSETTING(0x00, "Even")
 	PORT_DIPSETTING(0x10, "Odd")
 	PORT_DIPSETTING(0x30, "None/High")
-	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_READ_LINE_MEMBER(teleray10_state, timer_expired_r)
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_READ_LINE_MEMBER(FUNC(teleray10_state::timer_expired_r))
 	PORT_DIPNAME(0x80, 0x00, "Stop Bits") PORT_DIPLOCATION("6A:7")
 	PORT_DIPSETTING(0x00, "1")
 	PORT_DIPSETTING(0x80, "2")
@@ -523,6 +526,8 @@ ROM_START(teleray10)
 	ROM_REGION(0x800, "chargen", 0)
 	ROM_LOAD("ka53895.7n", 0x000, 0x800, CRC(437cf3cc) SHA1(4da7eea06b6b5f6c0a3d995b727d6f8d14bb8b30))
 ROM_END
+
+} // anonymous namespace
 
 
 COMP(1978, teleray10, 0, 0, teleray10, teleray10, teleray10_state, empty_init, "Research Inc.", "Teleray Model 10", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS)

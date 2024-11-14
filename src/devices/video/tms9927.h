@@ -41,9 +41,9 @@ protected:
 	tms9927_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_stop() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_stop() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 	virtual void device_clock_changed() override;
 	virtual void device_post_load() override;
 
@@ -51,12 +51,6 @@ protected:
 	TIMER_CALLBACK_MEMBER(toggle_hsync);
 
 private:
-	enum
-	{
-		TIMER_VSYNC,
-		TIMER_HSYNC
-	};
-
 	void recompute_parameters(bool postload);
 	void generic_access(offs_t offset);
 

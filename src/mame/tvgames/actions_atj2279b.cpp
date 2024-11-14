@@ -32,6 +32,8 @@
 #include "screen.h"
 
 
+namespace {
+
 class actions_atj2279b_state : public driver_device
 {
 public:
@@ -43,13 +45,13 @@ public:
 	void actions_atj2279b(machine_config &config);
 
 private:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 
-	void atj2279b_map(address_map &map);
+	void atj2279b_map(address_map &map) ATTR_COLD;
 
 	required_device<arm7_cpu_device> m_maincpu;
 };
@@ -97,6 +99,8 @@ ROM_START( rbitgen )
 	// TC58NVG2S3?A00  (there is a yellow stripe on the label before A00 obscuring the text)
 	ROM_LOAD16_WORD_SWAP( "nand.bin", 0x000000, 0x21000000, CRC(92576add) SHA1(1fe61ef1d2dd24e5b5d48c477846ef0c83ec6568) )
 ROM_END
+
+} // anonymous namespace
 
 
 //    year, name,         parent,  compat, machine,      input,        class,              init,       company,  fullname,                             flags

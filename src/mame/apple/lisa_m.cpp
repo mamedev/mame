@@ -601,7 +601,7 @@ void lisa_state::COPS_via_out_a(uint8_t data)
 	m_COPS_command = data;
 }
 
-WRITE_LINE_MEMBER(lisa_state::COPS_via_out_ca2)
+void lisa_state::COPS_via_out_ca2(int state)
 {
 	m_hold_COPS_data = state;
 
@@ -650,7 +650,7 @@ void lisa_state::COPS_via_out_b(uint8_t data)
 	}
 }
 
-WRITE_LINE_MEMBER(lisa_state::COPS_via_out_cb2)
+void lisa_state::COPS_via_out_cb2(int state)
 {
 	m_speaker->level_w(state);
 }
@@ -754,7 +754,7 @@ DIRECT_UPDATE_HANDLER (lisa_OPbaseoverride)
 
 	}
 
-	if (BIT(m_maincpu->get_fc(), 2))
+	if (m_maincpu->supervisor_mode())
 	{
 		/* supervisor mode -> force register file 0 */
 		the_seg = 0;
@@ -959,10 +959,12 @@ void lisa_state::machine_reset()
 	COPS_via_out_ca2(0);    /* VIA core forgets to do so */
 
 	/* initialize floppy */
+	#if 0
 	if (m_features.floppy_hardware == sony_lisa2)
 	{
 		sony_set_enable_lines(m_fdc, 1);   /* on lisa2, drive unit 1 is always selected (?) */
 	}
+	#endif
 }
 
 INTERRUPT_GEN_MEMBER(lisa_state::lisa_interrupt)
@@ -1083,6 +1085,7 @@ void lisa_state::lisa_fdc_ttl_glue_access(offs_t offset)
 		/* enable/disable the motor on Lisa 1 */
 		/* can disable the motor on Lisa 2/10, too (although it is not useful) */
 		/* On lisa 2, commands the loading of the speed register on lisalite board */
+		#if 0
 		if (m_features.floppy_hardware == sony_lisa2)
 		{
 			int oldMT1 = m_MT1;
@@ -1095,6 +1098,7 @@ void lisa_state::lisa_fdc_ttl_glue_access(offs_t offset)
 				sony_set_speed(((256-m_PWM_floppy_motor_speed) * 1.3) + 237);
 			}
 		}
+		#endif
 		/*else
 		    m_MT1 = offset & 1;*/
 		break;
@@ -1107,9 +1111,10 @@ void lisa_state::lisa_fdc_ttl_glue_access(offs_t offset)
 		if (m_features.floppy_hardware == twiggy)
 			twiggy_set_head_line(offset & 1);
 		else
-#endif
+
 		if (m_features.floppy_hardware == sony_lisa210)
 			sony_set_sel_line(m_fdc, offset & 1);
+#endif
 		break;
 	case 6:
 		m_DISK_DIAG = offset & 1;
@@ -1168,9 +1173,9 @@ void lisa_state::lisa_fdc_io_w(offs_t offset, uint8_t data)
 		if (m_features.floppy_hardware == twiggy)
 			twiggy_set_speed((256-data) * 1.3 /* ??? */ + 237 /* ??? */);
 		else
-#endif
 		if (m_features.floppy_hardware == sony_lisa210)
 			sony_set_speed(((256-data) * 1.3) + 237);
+#endif
 		break;
 
 	case 3: /* not used */
@@ -1222,7 +1227,7 @@ uint16_t lisa_state::lisa_r(offs_t offset, uint16_t mem_mask)
 		}
 	}
 
-	if (BIT(m_maincpu->get_fc(), 2))
+	if (m_maincpu->supervisor_mode())
 		/* supervisor mode -> force register file 0 */
 		the_seg = 0;
 
@@ -1428,7 +1433,7 @@ void lisa_state::lisa_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 		}
 	}
 
-	if (BIT(m_maincpu->get_fc(), 2))
+	if (m_maincpu->supervisor_mode())
 		/* supervisor mode -> force register file 0 */
 		the_seg = 0;
 
@@ -1564,18 +1569,18 @@ void lisa_state::cpu_board_control_access(offs_t offset)
 	m_latch->write_bit(offset >> 1, offset & 1);
 }
 
-WRITE_LINE_MEMBER(lisa_state::diag1_w)
+void lisa_state::diag1_w(int state)
 {
 	// Set/reset DIAG1
 }
 
-WRITE_LINE_MEMBER(lisa_state::diag2_w)
+void lisa_state::diag2_w(int state)
 {
 	// Set/reset DIAG2
 	m_diag2 = state;
 }
 
-WRITE_LINE_MEMBER(lisa_state::seg1_w)
+void lisa_state::seg1_w(int state)
 {
 	// Set/reset SEG1 Context Selection bit
 	//logerror("seg bit 0 %s\n", state ? "set" : "clear");
@@ -1585,7 +1590,7 @@ WRITE_LINE_MEMBER(lisa_state::seg1_w)
 		m_seg &= ~1;
 }
 
-WRITE_LINE_MEMBER(lisa_state::seg2_w)
+void lisa_state::seg2_w(int state)
 {
 	// Set/reset SEG2 Context Selection bit
 	//logerror("seg bit 1 %s\n", state ? "set" : "clear");
@@ -1595,14 +1600,14 @@ WRITE_LINE_MEMBER(lisa_state::seg2_w)
 		m_seg &= ~2;
 }
 
-WRITE_LINE_MEMBER(lisa_state::setup_w)
+void lisa_state::setup_w(int state)
 {
 	// Reset/set SETUP register
 	logerror("setup %s %s\n", state ? "UNSET" : "SET", machine().describe_context());
 	m_setup = !state;
 }
 
-WRITE_LINE_MEMBER(lisa_state::vtmsk_w)
+void lisa_state::vtmsk_w(int state)
 {
 	// Enable/disable Vertical Retrace Interrupt
 	logerror("%s retrace %s\n", state ? "enable" : "disable", machine().describe_context());
@@ -1611,12 +1616,12 @@ WRITE_LINE_MEMBER(lisa_state::vtmsk_w)
 		set_VTIR(2);
 }
 
-WRITE_LINE_MEMBER(lisa_state::sfmsk_w)
+void lisa_state::sfmsk_w(int state)
 {
 	// Enable/disable Soft Error Detect
 }
 
-WRITE_LINE_MEMBER(lisa_state::hdmsk_w)
+void lisa_state::hdmsk_w(int state)
 {
 	// Enable/disable Hard Error Detect
 	m_test_parity = state;

@@ -2,16 +2,14 @@
 // copyright-holders:Pierpaolo Prazzoli, Tomasz Slanina, Angelo Salese
 /*
 
-    D-DAY   (c)Jaleco 1984
+D-DAY   (c)Jaleco 1984
 
-    driver by Pierpaolo Prazzoli, Tomasz Slanina and Angelo Salese
-
-    TODO:
-    - text colors most likely are hardwired but iirc hi score text has a different color? Needs a reference shot;
-    - unused upper sprite color bank;
-    - improve sound comms, sometimes BGM becomes silent;
-    - hookup proper i8257 device;
-    - identify & dump MCU;
+TODO:
+- text colors most likely are hardwired but iirc hi score text has a different color?
+  Needs a reference shot;
+- unused upper sprite color bank;
+- improve sound comms, sometimes BGM becomes silent;
+- identify & dump MCU;
 
 -------------------------------------------------------
 Is it 1984 or 1987 game ?
@@ -57,18 +55,20 @@ $842f = lives
     18 |
     19 /
 
-
 */
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "machine/gen_latch.h"
+#include "machine/i8257.h"
 #include "sound/ay8910.h"
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 #include "tilemap.h"
 
+
+namespace {
 
 class ddayjlc_state : public driver_device
 {
@@ -83,16 +83,21 @@ public:
 		m_audiocpu(*this, "audiocpu"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
-		m_soundlatch(*this, "soundlatch")
+		m_soundlatch(*this, "soundlatch"),
+		m_dma(*this, "dma")
 	{ }
 
 	void ddayjlc(machine_config &config);
 
 	void init_ddayjlc();
-	DECLARE_CUSTOM_INPUT_MEMBER(prot_r);
+	ioport_value prot_r();
+
+protected:
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
-
 	void prot_w(offs_t offset, uint8_t data);
 	void char_bank_w(uint8_t data);
 	void bgvram_w(offs_t offset, uint8_t data);
@@ -104,19 +109,13 @@ private:
 	void bg2_w(uint8_t data);
 	void sound_w(uint8_t data);
 	void flip_screen_w(uint8_t data);
-	void i8257_CH0_w(offs_t offset, uint8_t data);
-	void i8257_LMSR_w(address_space &space, uint8_t data);
 	TILE_GET_INFO_MEMBER(get_tile_info_bg);
 	TILE_GET_INFO_MEMBER(get_tile_info_fg);
 	void ddayjlc_palette(palette_device &palette) const;
 	uint32_t screen_update_ddayjlc(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
-	void main_map(address_map &map);
-	void sound_map(address_map &map);
-
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	void vblank_irq(int state);
+	void main_map(address_map &map) ATTR_COLD;
+	void sound_map(address_map &map) ATTR_COLD;
 
 	/* memory pointers */
 	required_shared_ptr<uint8_t> m_mainram;
@@ -133,8 +132,6 @@ private:
 	/* misc */
 	bool       m_sound_nmi_enable = false;
 	bool       m_main_nmi_enable = false;
-	int32_t    m_e00x_l[4]{};
-	int32_t    m_e00x_d[4][2]{};
 	uint8_t    m_prot_addr = 0;
 
 	/* devices */
@@ -143,17 +140,25 @@ private:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 	required_device<generic_latch_8_device> m_soundlatch;
+	required_device<i8257_device> m_dma;
+
+	uint8_t dma_mem_r(offs_t offset);
+	void dma_mem_w(offs_t offset, u8 data);
+	void hrq_w(int state);
+	u8 dma_r();
+	void dma_w(u8 data);
+	u8 m_dma_latch = 0;
 
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_foreground(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
+
 
 /********************************
  *
  * Video section
  *
  *******************************/
-
 
 TILE_GET_INFO_MEMBER(ddayjlc_state::get_tile_info_bg)
 {
@@ -281,7 +286,7 @@ static const uint8_t prot_data[0x10] =
 	0x03, 0x01, 0x00, 0x03
 };
 
-CUSTOM_INPUT_MEMBER(ddayjlc_state::prot_r)
+ioport_value ddayjlc_state::prot_r()
 {
 	return prot_data[m_prot_addr];
 }
@@ -359,35 +364,6 @@ void ddayjlc_state::flip_screen_w(uint8_t data)
 	flip_screen_set(data & 1);
 }
 
-void ddayjlc_state::i8257_CH0_w(offs_t offset, uint8_t data)
-{
-	m_e00x_d[offset][m_e00x_l[offset]] = data;
-	m_e00x_l[offset] ^= 1;
-}
-
-void ddayjlc_state::i8257_LMSR_w(address_space &space, uint8_t data)
-{
-	if (!data)
-	{
-		int32_t src = m_e00x_d[0][1] * 256 + m_e00x_d[0][0];
-		int32_t dst = m_e00x_d[2][1] * 256 + m_e00x_d[2][0];
-		int32_t size = (m_e00x_d[1][1] * 256 + m_e00x_d[1][0]) & 0x3ff;
-		int32_t i;
-
-		size++; //??
-
-		for(i = 0; i < size; i++)
-			space.write_byte(dst++, space.read_byte(src++));
-
-		m_e00x_l[0] = 0;
-		m_e00x_l[1] = 0;
-		m_e00x_l[2] = 0;
-		m_e00x_l[3] = 0;
-	}
-}
-
-
-
 void ddayjlc_state::main_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
@@ -396,13 +372,16 @@ void ddayjlc_state::main_map(address_map &map)
 	map(0x9400, 0x97ff).ram().w(FUNC(ddayjlc_state::vram_w)).share("videoram");
 	map(0x9800, 0x9fff).ram().w(FUNC(ddayjlc_state::bgvram_w)).share("bgram"); /* 9800-981f - videoregs */
 	map(0xa000, 0xdfff).bankr("bank1").nopw();
-	map(0xe000, 0xe003).w(FUNC(ddayjlc_state::i8257_CH0_w));
-	map(0xe008, 0xe008).nopw(); // i8257 control byte
+	map(0xe000, 0xe008).rw(m_dma, FUNC(i8257_device::read), FUNC(i8257_device::write));
 	map(0xf000, 0xf000).w(FUNC(ddayjlc_state::sound_w));
 	map(0xf100, 0xf100).nopw(); // sound related (f/f irq trigger?)
 	map(0xf080, 0xf080).portr("P2").w(FUNC(ddayjlc_state::char_bank_w));
 	map(0xf081, 0xf081).w(FUNC(ddayjlc_state::flip_screen_w));
-	map(0xf083, 0xf083).w(FUNC(ddayjlc_state::i8257_LMSR_w));
+	// fn originally marked "LMSR"
+	map(0xf083, 0xf083).lw8(NAME([this] (u8 data) {
+		m_dma->dreq1_w(BIT(data, 0));
+		m_dma->dreq0_w(BIT(data, 0));
+	}));
 	map(0xf084, 0xf084).w(FUNC(ddayjlc_state::bg0_w));
 	map(0xf085, 0xf085).w(FUNC(ddayjlc_state::bg1_w));
 	map(0xf086, 0xf086).w(FUNC(ddayjlc_state::bg2_w));
@@ -454,7 +433,7 @@ static INPUT_PORTS_START( ddayjlc )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_COIN1 )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_COIN2 )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_SERVICE1 )
-	PORT_BIT( 0x60, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(ddayjlc_state, prot_r)
+	PORT_BIT( 0x60, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(FUNC(ddayjlc_state::prot_r))
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
 	PORT_START("DSW1")
@@ -525,7 +504,7 @@ static GFXDECODE_START( gfx_ddayjlc )
 	GFXDECODE_ENTRY( "gfx3", 0, charlayout,     0x100, 16 )
 GFXDECODE_END
 
-WRITE_LINE_MEMBER(ddayjlc_state::vblank_irq)
+void ddayjlc_state::vblank_irq(int state)
 {
 	if (state && m_main_nmi_enable)
 		m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
@@ -542,30 +521,15 @@ void ddayjlc_state::machine_start()
 	save_item(NAME(m_sound_nmi_enable));
 	save_item(NAME(m_main_nmi_enable));
 	save_item(NAME(m_prot_addr));
-
-	save_item(NAME(m_e00x_l));
-	save_item(NAME(m_e00x_d[0]));
-	save_item(NAME(m_e00x_d[1]));
-	save_item(NAME(m_e00x_d[2]));
-	save_item(NAME(m_e00x_d[3]));
 }
 
 void ddayjlc_state::machine_reset()
 {
-	int i;
-
 	m_char_bank = 0;
 	m_bgadr = 0;
 	m_sound_nmi_enable = false;
 	m_main_nmi_enable = false;
 	m_prot_addr = 0;
-
-	for (i = 0; i < 4; i++)
-	{
-		m_e00x_l[i] = 0;
-		m_e00x_d[i][0] = 0;
-		m_e00x_d[i][1] = 0;
-	}
 }
 
 void ddayjlc_state::ddayjlc_palette(palette_device &palette) const
@@ -600,6 +564,38 @@ void ddayjlc_state::ddayjlc_palette(palette_device &palette) const
 	palette.set_pen_color(0x203, rgb_t(0xff, 0xff, 0xff));
 }
 
+uint8_t ddayjlc_state::dma_mem_r(offs_t offset)
+{
+	address_space &program = m_maincpu->space(AS_PROGRAM);
+
+	return program.read_byte(offset);
+}
+
+void ddayjlc_state::dma_mem_w(offs_t offset, u8 data)
+{
+	address_space &program = m_maincpu->space(AS_PROGRAM);
+
+	program.write_byte(offset, data);
+}
+
+void ddayjlc_state::hrq_w(int state)
+{
+	m_maincpu->set_input_line(Z80_INPUT_LINE_BUSRQ, state);
+
+	// TODO: why we need this?
+	m_dma->hlda_w(state);
+}
+
+u8 ddayjlc_state::dma_r()
+{
+	return m_dma_latch;
+}
+
+void ddayjlc_state::dma_w(u8 data)
+{
+	m_dma_latch = data;
+}
+
 void ddayjlc_state::ddayjlc(machine_config &config)
 {
 	/* basic machine hardware */
@@ -610,6 +606,14 @@ void ddayjlc_state::ddayjlc(machine_config &config)
 	m_audiocpu->set_addrmap(AS_PROGRAM, &ddayjlc_state::sound_map);
 
 	config.set_maximum_quantum(attotime::from_hz(6000));
+
+	I8257(config, m_dma, 12000000/3);
+	m_dma->out_hrq_cb().set(FUNC(ddayjlc_state::hrq_w));
+	m_dma->in_memr_cb().set(FUNC(ddayjlc_state::dma_mem_r));
+	m_dma->out_memw_cb().set(FUNC(ddayjlc_state::dma_mem_w));
+	m_dma->in_ior_cb<1>().set(FUNC(ddayjlc_state::dma_r));
+	m_dma->out_iow_cb<0>().set(FUNC(ddayjlc_state::dma_w));
+	m_dma->set_reverse_rw_mode(true);
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -719,60 +723,24 @@ ROM_END
 
 void ddayjlc_state::init_ddayjlc()
 {
-#define repack(n)\
-		dst[newadr+0+n] = src[oldaddr+0+n];\
-		dst[newadr+1+n] = src[oldaddr+1+n];\
-		dst[newadr+2+n] = src[oldaddr+2+n];\
-		dst[newadr+3+n] = src[oldaddr+3+n];\
-		dst[newadr+4+n] = src[oldaddr+4+n];\
-		dst[newadr+5+n] = src[oldaddr+5+n];\
-		dst[newadr+6+n] = src[oldaddr+6+n];\
-		dst[newadr+7+n] = src[oldaddr+7+n];\
-		dst[newadr+8+n] = src[oldaddr+0+0x2000+n];\
-		dst[newadr+9+n] = src[oldaddr+1+0x2000+n];\
-		dst[newadr+10+n] = src[oldaddr+2+0x2000+n];\
-		dst[newadr+11+n] = src[oldaddr+3+0x2000+n];\
-		dst[newadr+12+n] = src[oldaddr+4+0x2000+n];\
-		dst[newadr+13+n] = src[oldaddr+5+0x2000+n];\
-		dst[newadr+14+n] = src[oldaddr+6+0x2000+n];\
-		dst[newadr+15+n] = src[oldaddr+7+0x2000+n];\
-		dst[newadr+16+n] = src[oldaddr+0+8+n];\
-		dst[newadr+17+n] = src[oldaddr+1+8+n];\
-		dst[newadr+18+n] = src[oldaddr+2+8+n];\
-		dst[newadr+19+n] = src[oldaddr+3+8+n];\
-		dst[newadr+20+n] = src[oldaddr+4+8+n];\
-		dst[newadr+21+n] = src[oldaddr+5+8+n];\
-		dst[newadr+22+n] = src[oldaddr+6+8+n];\
-		dst[newadr+23+n] = src[oldaddr+7+8+n];\
-		dst[newadr+24+n] = src[oldaddr+0+0x2008+n];\
-		dst[newadr+25+n] = src[oldaddr+1+0x2008+n];\
-		dst[newadr+26+n] = src[oldaddr+2+0x2008+n];\
-		dst[newadr+27+n] = src[oldaddr+3+0x2008+n];\
-		dst[newadr+28+n] = src[oldaddr+4+0x2008+n];\
-		dst[newadr+29+n] = src[oldaddr+5+0x2008+n];\
-		dst[newadr+30+n] = src[oldaddr+6+0x2008+n];\
-		dst[newadr+31+n] = src[oldaddr+7+0x2008+n];
+	std::vector<uint8_t> temp(0x10000);
+	uint8_t *src = &temp[0];
+	uint8_t *dst = memregion("gfx1")->base();
+	uint32_t length = memregion("gfx1")->bytes();
+	memcpy(src, dst, length);
 
+	for (uint32_t oldaddr = 0; oldaddr < length; oldaddr++)
 	{
-		std::vector<uint8_t> temp(0x10000);
-		uint8_t *src = &temp[0];
-		uint8_t *dst = memregion("gfx1")->base();
-		uint32_t length = memregion("gfx1")->bytes();
-		memcpy(src, dst, length);
-		uint32_t newadr = 0;
-		uint32_t oldaddr = 0;
-		for (uint32_t j = 0; j < length / 2; j += 32)
-		{
-			repack(0);
-			repack(0x4000)
-			newadr += 32;
-			oldaddr += 16;
-		}
+		uint32_t newadr = (oldaddr & 0x4007) | (oldaddr >> 10 & 0x8) | (oldaddr << 1 & 0x3ff0);
+		dst[newadr] = src[oldaddr];
 	}
 
 	membank("bank1")->configure_entries(0, 3, memregion("user1")->base(), 0x4000);
 	membank("bank1")->set_entry(0);
 }
+
+} // anonymous namespace
+
 
 GAME( 1984, ddayjlc,  0,       ddayjlc, ddayjlc, ddayjlc_state, init_ddayjlc, ROT90, "Jaleco", "D-Day (Jaleco set 1)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1984, ddayjlca, ddayjlc, ddayjlc, ddayjlc, ddayjlc_state, init_ddayjlc, ROT90, "Jaleco", "D-Day (Jaleco set 2)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

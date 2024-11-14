@@ -380,12 +380,12 @@ void fm77_state::init_en_w(address_space &space, uint8_t data)
  *  Main CPU: I/O ports 0xfd18 - 0xfd1f
  *  Floppy Disk Controller (MB8877A)
  */
-WRITE_LINE_MEMBER(fm7_state::fdc_intrq_w)
+void fm7_state::fdc_intrq_w(int state)
 {
 	m_fdc_irq_flag = state;
 }
 
-WRITE_LINE_MEMBER(fm7_state::fdc_drq_w)
+void fm7_state::fdc_drq_w(int state)
 {
 	m_fdc_drq_flag = state;
 }
@@ -710,22 +710,22 @@ void fm77_state::av_key_encoder_w(offs_t offset, uint8_t data)
 	}
 }
 
-WRITE_LINE_MEMBER(fm7_state::write_centronics_busy)
+void fm7_state::write_centronics_busy(int state)
 {
 	m_centronics_busy = state;
 }
 
-WRITE_LINE_MEMBER(fm7_state::write_centronics_fault)
+void fm7_state::write_centronics_fault(int state)
 {
 	m_centronics_fault = state;
 }
 
-WRITE_LINE_MEMBER(fm7_state::write_centronics_ack)
+void fm7_state::write_centronics_ack(int state)
 {
 	m_centronics_ack = state;
 }
 
-WRITE_LINE_MEMBER(fm7_state::write_centronics_perror)
+void fm7_state::write_centronics_perror(int state)
 {
 	m_centronics_perror = state;
 }
@@ -1237,7 +1237,7 @@ IRQ_CALLBACK_MEMBER(fm7_state::sub_irq_ack)
 	return -1;
 }
 
-WRITE_LINE_MEMBER(fm77_state::av_fmirq)
+void fm77_state::av_fmirq(int state)
 {
 	if(state == 1)
 	{
@@ -2293,13 +2293,13 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT  CLASS       INIT      COMPANY    FULLNAME         FLAGS */
-COMP( 1981, fm8,      0,      0,      fm8,      fm8,   fm7_state,  init_fm7, "Fujitsu", "FM-8",          0)
-COMP( 1982, fm7,      0,      0,      fm7,      fm7,   fm7_state,  init_fm7, "Fujitsu", "FM-7",          0)
-COMP( 1984, fmnew7,   fm7,    0,      fm7,      fm7,   fm7_state,  init_fm7, "Fujitsu", "FM-NEW7",       0)
-COMP( 1985, fm77av,   fm7,    0,      fm77av,   fm7,   fm77_state, init_fm7, "Fujitsu", "FM-77AV",       MACHINE_IMPERFECT_GRAPHICS)
-COMP( 1985, fm7740sx, fm7,    0,      fm77av,   fm7,   fm77_state, init_fm7, "Fujitsu", "FM-77AV40SX",   MACHINE_NOT_WORKING)
+/*    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT  CLASS       INIT      COMPANY    FULLNAME       FLAGS */
+COMP( 1981, fm8,      0,      0,      fm8,      fm8,   fm7_state,  init_fm7, "Fujitsu", "FM-8",        0)
+COMP( 1982, fm7,      0,      0,      fm7,      fm7,   fm7_state,  init_fm7, "Fujitsu", "FM-7",        0)
+COMP( 1984, fmnew7,   fm7,    0,      fm7,      fm7,   fm7_state,  init_fm7, "Fujitsu", "FM-NEW7",     0)
+COMP( 1985, fm77av,   fm7,    0,      fm77av,   fm7,   fm77_state, init_fm7, "Fujitsu", "FM-77AV",     MACHINE_IMPERFECT_GRAPHICS)
+COMP( 1985, fm7740sx, fm7,    0,      fm77av,   fm7,   fm77_state, init_fm7, "Fujitsu", "FM-77AV40SX", MACHINE_NOT_WORKING)
 
 // These may be separated into a separate driver, depending on how different they are to the FM-8/FM-7
-COMP( 1982, fm11,     0,      0,      fm11,     fm7,   fm11_state, init_fm7, "Fujitsu", "FM-11 EX",      MACHINE_NOT_WORKING)
-COMP( 1982, fm16beta, 0,      0,      fm16beta, fm7,   fm7_state,  init_fm7, "Fujitsu", "FM-16\xCE\xB2", MACHINE_NOT_WORKING)
+COMP( 1982, fm11,     0,      0,      fm11,     fm7,   fm11_state, init_fm7, "Fujitsu", "FM-11 EX",    MACHINE_NOT_WORKING)
+COMP( 1982, fm16beta, 0,      0,      fm16beta, fm7,   fm7_state,  init_fm7, "Fujitsu", u8"FM-16β",    MACHINE_NOT_WORKING)

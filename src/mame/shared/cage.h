@@ -6,8 +6,8 @@
 
 ****************************************************************************/
 
-#ifndef MAME_AUDIO_CAGE_H
-#define MAME_AUDIO_CAGE_H
+#ifndef MAME_SHARED_CAGE_H
+#define MAME_SHARED_CAGE_H
 
 #pragma once
 
@@ -42,13 +42,13 @@ public:
 
 	TIMER_CALLBACK_MEMBER( cage_deferred_w );
 
-	void cage_map(address_map &map);
+	void cage_map(address_map &map) ATTR_COLD;
 protected:
 	atari_cage_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 	TIMER_DEVICE_CALLBACK_MEMBER( dma_timer_callback );
 	TIMER_DEVICE_CALLBACK_MEMBER( cage_timer_callback );
@@ -113,14 +113,14 @@ public:
 	// construction/destruction
 	atari_cage_seattle_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	void cage_map_seattle(address_map &map);
+	void cage_map_seattle(address_map &map) ATTR_COLD;
 protected:
 	// optional information overrides
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 };
 
 // device type definition
 DECLARE_DEVICE_TYPE(ATARI_CAGE_SEATTLE, atari_cage_seattle_device)
 
-#endif // MAME_AUDIO_CAGE_H
+#endif // MAME_SHARED_CAGE_H

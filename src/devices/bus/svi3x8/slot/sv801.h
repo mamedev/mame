@@ -32,15 +32,15 @@ public:
 	virtual void iorq_w(offs_t offset, uint8_t data) override;
 
 protected:
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 private:
 	void motor_w(uint8_t data);
 
-	DECLARE_WRITE_LINE_MEMBER( intrq_w );
-	DECLARE_WRITE_LINE_MEMBER( drq_w );
+	void intrq_w(int state);
+	void drq_w(int state);
 
 	static void floppy_formats(format_registration &fr);
 

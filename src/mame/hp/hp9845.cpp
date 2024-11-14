@@ -227,7 +227,7 @@ static INPUT_PORTS_START(hp9845_base)
 	// row = [0..7]
 	PORT_START("KEY0")
 	PORT_BIT(BIT_MASK(0)  , IP_ACTIVE_HIGH , IPT_UNUSED)    // N/U
-	PORT_BIT(BIT_MASK(1)  , IP_ACTIVE_HIGH , IPT_KEYBOARD)  PORT_TOGGLE PORT_NAME("Prt all") PORT_CHANGED_MEMBER(DEVICE_SELF, hp9845_base_state, togglekey_changed, 1) // Print All
+	PORT_BIT(BIT_MASK(1)  , IP_ACTIVE_HIGH , IPT_KEYBOARD)  PORT_TOGGLE PORT_NAME("Prt all") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(hp9845_base_state::togglekey_changed), 1) // Print All
 	PORT_BIT(BIT_MASK(2)  , IP_ACTIVE_HIGH , IPT_KEYBOARD)  PORT_CODE(KEYCODE_PLUS_PAD) PORT_CHAR(UCHAR_MAMEKEY(PLUS_PAD))                           // KP +
 	PORT_BIT(BIT_MASK(3)  , IP_ACTIVE_HIGH , IPT_KEYBOARD)  PORT_CODE(KEYCODE_COMMA_PAD) PORT_CHAR(UCHAR_MAMEKEY(COMMA_PAD))                         // KP ,
 	PORT_BIT(BIT_MASK(4)  , IP_ACTIVE_HIGH , IPT_KEYBOARD)  PORT_CODE(KEYCODE_DEL_PAD) PORT_CHAR(UCHAR_MAMEKEY(DEL_PAD))                             // KP .
@@ -243,7 +243,7 @@ static INPUT_PORTS_START(hp9845_base)
 	PORT_BIT(BIT_MASK(14)  , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_X)     PORT_CHAR('x') PORT_CHAR('X')  // X
 	PORT_BIT(BIT_MASK(15)  , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_LSHIFT)    PORT_CHAR(UCHAR_SHIFT_1)   // Shift
 	PORT_BIT(BIT_MASK(16)  , IP_ACTIVE_HIGH , IPT_UNUSED)   // N/U
-	PORT_BIT(BIT_MASK(17)  , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_TOGGLE PORT_NAME("Auto st") PORT_CHANGED_MEMBER(DEVICE_SELF, hp9845_base_state, togglekey_changed, 2) // Auto Start
+	PORT_BIT(BIT_MASK(17)  , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_TOGGLE PORT_NAME("Auto st") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(hp9845_base_state::togglekey_changed), 2) // Auto Start
 	PORT_BIT(BIT_MASK(18)  , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_MINUS_PAD) PORT_CHAR(UCHAR_MAMEKEY(MINUS_PAD)) // KP -
 	PORT_BIT(BIT_MASK(19)  , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_3_PAD) PORT_CHAR(UCHAR_MAMEKEY(3_PAD))         // KP 3
 	PORT_BIT(BIT_MASK(20)  , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_2_PAD) PORT_CHAR(UCHAR_MAMEKEY(2_PAD))         // KP 2
@@ -362,7 +362,7 @@ static INPUT_PORTS_START(hp9845_base)
 	PORT_BIT(BIT_MASK(31)  , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_1)     PORT_CHAR('1') PORT_CHAR('!')  // 1
 
 	PORT_START("SHIFTLOCK");
-	PORT_BIT(BIT_MASK(0)  , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_CAPSLOCK) PORT_TOGGLE PORT_NAME("Shift lock") PORT_CHANGED_MEMBER(DEVICE_SELF, hp9845_base_state, togglekey_changed, 0) // Shift lock
+	PORT_BIT(BIT_MASK(0)  , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_CAPSLOCK) PORT_TOGGLE PORT_NAME("Shift lock") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(hp9845_base_state::togglekey_changed), 0) // Shift lock
 
 INPUT_PORTS_END
 
@@ -715,7 +715,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(hp9845_base_state::beeper_off)
 	m_beeper->set_state(0);
 }
 
-WRITE_LINE_MEMBER(hp9845_base_state::prt_irl_w)
+void hp9845_base_state::prt_irl_w(int state)
 {
 	m_prt_irl = state;
 	update_kb_prt_irq();
@@ -762,15 +762,15 @@ public:
 private:
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	virtual uint16_t graphic_r(offs_t offset) override;
 	virtual void graphic_w(offs_t offset, uint16_t data) override;
 
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline_timer);
 
-	DECLARE_WRITE_LINE_MEMBER(vblank_w);
+	void vblank_w(int state);
 
 	void set_graphic_mode(bool graphic);
 	void set_video_mar(uint16_t mar);
@@ -929,7 +929,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(hp9845b_state::scanline_timer)
 	}
 }
 
-WRITE_LINE_MEMBER(hp9845b_state::vblank_w)
+void hp9845b_state::vblank_w(int state)
 {
 	// VBlank signal is fed into HALT flag of PPU
 	m_ppu->halt_w(state);
@@ -1290,12 +1290,12 @@ class hp9845ct_base_state : public hp9845_base_state
 public:
 	hp9845ct_base_state(const machine_config &mconfig, device_type type, const char *tag);
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	DECLARE_WRITE_LINE_MEMBER(vblank_w);
+	void vblank_w(int state);
 	DECLARE_INPUT_CHANGED_MEMBER(softkey_changed);
 
 protected:
@@ -1380,14 +1380,14 @@ protected:
 static INPUT_PORTS_START(hp9845ct)
 	PORT_INCLUDE(hp9845_base)
 	PORT_START("SOFTKEYS")
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Softkey0") PORT_CHANGED_MEMBER(DEVICE_SELF, hp9845ct_base_state, softkey_changed, 0)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Softkey1") PORT_CHANGED_MEMBER(DEVICE_SELF, hp9845ct_base_state, softkey_changed, 0)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Softkey2") PORT_CHANGED_MEMBER(DEVICE_SELF, hp9845ct_base_state, softkey_changed, 0)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Softkey3") PORT_CHANGED_MEMBER(DEVICE_SELF, hp9845ct_base_state, softkey_changed, 0)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Softkey4") PORT_CHANGED_MEMBER(DEVICE_SELF, hp9845ct_base_state, softkey_changed, 0)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Softkey5") PORT_CHANGED_MEMBER(DEVICE_SELF, hp9845ct_base_state, softkey_changed, 0)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Softkey6") PORT_CHANGED_MEMBER(DEVICE_SELF, hp9845ct_base_state, softkey_changed, 0)
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Softkey7") PORT_CHANGED_MEMBER(DEVICE_SELF, hp9845ct_base_state, softkey_changed, 0)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Softkey0") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(hp9845ct_base_state::softkey_changed), 0)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Softkey1") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(hp9845ct_base_state::softkey_changed), 0)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Softkey2") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(hp9845ct_base_state::softkey_changed), 0)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Softkey3") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(hp9845ct_base_state::softkey_changed), 0)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Softkey4") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(hp9845ct_base_state::softkey_changed), 0)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Softkey5") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(hp9845ct_base_state::softkey_changed), 0)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Softkey6") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(hp9845ct_base_state::softkey_changed), 0)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Softkey7") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(hp9845ct_base_state::softkey_changed), 0)
 
 	PORT_START("LIGHTPENX")
 	PORT_BIT( 0x3ff, 0x000, IPT_LIGHTGUN_X ) PORT_SENSITIVITY(20) PORT_MINMAX(0, VIDEO_TOT_HPIXELS - 1) PORT_CROSSHAIR(X, 1.0, 0.0, 0)
@@ -1402,14 +1402,14 @@ INPUT_PORTS_END
 static INPUT_PORTS_START(hp9845ct_de)
 	PORT_INCLUDE(hp9845_base_de)
 	PORT_START("SOFTKEYS")
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Softkey0") PORT_CHANGED_MEMBER(DEVICE_SELF, hp9845ct_base_state, softkey_changed, 0)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Softkey1") PORT_CHANGED_MEMBER(DEVICE_SELF, hp9845ct_base_state, softkey_changed, 0)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Softkey2") PORT_CHANGED_MEMBER(DEVICE_SELF, hp9845ct_base_state, softkey_changed, 0)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Softkey3") PORT_CHANGED_MEMBER(DEVICE_SELF, hp9845ct_base_state, softkey_changed, 0)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Softkey4") PORT_CHANGED_MEMBER(DEVICE_SELF, hp9845ct_base_state, softkey_changed, 0)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Softkey5") PORT_CHANGED_MEMBER(DEVICE_SELF, hp9845ct_base_state, softkey_changed, 0)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Softkey6") PORT_CHANGED_MEMBER(DEVICE_SELF, hp9845ct_base_state, softkey_changed, 0)
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Softkey7") PORT_CHANGED_MEMBER(DEVICE_SELF, hp9845ct_base_state, softkey_changed, 0)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Softkey0") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(hp9845ct_base_state::softkey_changed), 0)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Softkey1") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(hp9845ct_base_state::softkey_changed), 0)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Softkey2") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(hp9845ct_base_state::softkey_changed), 0)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Softkey3") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(hp9845ct_base_state::softkey_changed), 0)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Softkey4") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(hp9845ct_base_state::softkey_changed), 0)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Softkey5") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(hp9845ct_base_state::softkey_changed), 0)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Softkey6") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(hp9845ct_base_state::softkey_changed), 0)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Softkey7") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(hp9845ct_base_state::softkey_changed), 0)
 
 	PORT_START("LIGHTPENX")
 	PORT_BIT( 0x3ff, 0x000, IPT_LIGHTGUN_X ) PORT_SENSITIVITY(20) PORT_MINMAX(0, VIDEO_TOT_HPIXELS - 1) PORT_CROSSHAIR(X, 1.0, 0.0, 0)
@@ -1485,7 +1485,7 @@ uint32_t hp9845ct_base_state::screen_update(screen_device &screen, bitmap_rgb32 
 	return 0;
 }
 
-WRITE_LINE_MEMBER(hp9845ct_base_state::vblank_w)
+void hp9845ct_base_state::vblank_w(int state)
 {
 	// VBlank signal is fed into HALT flag of PPU
 	m_ppu->halt_w(state);
@@ -1990,8 +1990,8 @@ public:
 	void hp9845c(machine_config &config);
 
 private:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	virtual uint16_t graphic_r(offs_t offset) override;
 	virtual void graphic_w(offs_t offset, uint16_t data) override;
@@ -2706,8 +2706,8 @@ public:
 	void hp9845t(machine_config &config);
 
 private:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	virtual uint16_t graphic_r(offs_t offset) override;
 	virtual void graphic_w(offs_t offset, uint16_t data) override;
@@ -3768,7 +3768,7 @@ void hp9845t_state::hp9845t(machine_config &config)
 	SOFTWARE_LIST(config, "optrom_list").set_original("hp9845b_rom");
 }
 
-	ROM_START( hp9845a )
+ROM_START( hp9845a )
 	ROM_REGION( 0200000, "lpu", ROMREGION_16BIT | ROMREGION_BE )
 	ROM_LOAD( "09845-65544-65547-03-system_lpu.bin", 0000000, 0200000, CRC(47beb87f) SHA1(456caefacafcf19435e1e7e68b1c1e4010841664) )
 

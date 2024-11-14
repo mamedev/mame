@@ -64,24 +64,24 @@ public:
 	nes_datach_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	virtual ~nes_datach_slot_device();
 
-	// image-level overrides
-	virtual image_init_result call_load() override;
+	// device_image_interface implementation
+	virtual std::pair<std::error_condition, std::string> call_load() override;
 
 	virtual bool is_reset_on_load() const noexcept override { return true; }
 	virtual const char *image_interface() const noexcept override { return "datach_cart"; }
 	virtual const char *file_extensions() const noexcept override { return "nes,bin"; }
 
-	// slot interface overrides
+	// device_slot_interface implementation
 	virtual std::string get_default_card_software(get_default_card_software_hook &hook) const override;
 
 	uint8_t read(offs_t offset);
 	void write_prg_bank(uint8_t bank) { if (m_cart) m_cart->write_prg_bank(bank); }
 
 protected:
-	// device-level overrides
-	virtual void device_start() override;
+	// device_t implementation
+	virtual void device_start() override ATTR_COLD;
 
-	datach_cart_interface*      m_cart;
+	datach_cart_interface *m_cart;
 };
 
 // device type definition
@@ -102,16 +102,15 @@ public:
 	// construction/destruction
 	nes_datach_rom_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// optional information overrides
-	virtual const tiny_rom_entry *device_rom_region() const override;
-	virtual uint8_t* get_cart_base();
+	virtual uint8_t *get_cart_base();
 
 protected:
 	nes_datach_rom_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
-	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	// device_t implementation
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 };
 
 // ======================> nes_datach_24c01_device
@@ -123,8 +122,8 @@ public:
 	nes_datach_24c01_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
-	// optional information overrides
-	virtual void device_add_mconfig(machine_config &config) override;
+	// device_t implementation
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 };
 
 // device type definition
@@ -153,9 +152,9 @@ public:
 	virtual void pcb_reset() override;
 
 protected:
-	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_add_mconfig(machine_config &config) override;
+	// device_t implementation
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 	TIMER_CALLBACK_MEMBER(irq_timer_tick);
 	TIMER_CALLBACK_MEMBER(serial_tick);

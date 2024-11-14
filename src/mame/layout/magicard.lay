@@ -1,0 +1,196 @@
+<?xml version="1.0"?>
+<!--
+license:CC0-1.0
+copyright-holders: Roberto Fresca
+**************************************************
+
+  Magic Card (impera).
+  Realistic clickable buttons-lamps.
+
+**************************************************
+-->
+<mamelayout version="2">
+	<element name="hold1" defstate="0">
+		<rect state="1">
+			<color red="1.0" green="0.0" blue="0.0" />
+		</rect>
+		<rect state="0">
+			<color red="0.3" green="0.0" blue="0.0" />
+		</rect>
+		<text string="HOLD 1">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0" y="0.2" width="1" height="0.6" />
+		</text>
+	</element>
+
+	<element name="hold2" defstate="0">
+		<rect state="1">
+			<color red="1.0" green="0.0" blue="0.0" />
+		</rect>
+		<rect state="0">
+			<color red="0.3" green="0.0" blue="0.0" />
+		</rect>
+		<text string="HOLD 2">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0" y="0.1" width="1" height="0.4" />
+		</text>
+		<text string="LOW">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0" y="0.5" width="1" height="0.4" />
+		</text>
+	</element>
+
+	<element name="hold3" defstate="0">
+		<rect state="1">
+			<color red="1.0" green="0.0" blue="0.0" />
+		</rect>
+		<rect state="0">
+			<color red="0.3" green="0.0" blue="0.0" />
+		</rect>
+		<text string="HOLD 3">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0" y="0.2" width="1" height="0.6" />
+		</text>
+	</element>
+
+	<element name="hold4" defstate="0">
+		<rect state="1">
+			<color red="1.0" green="0.0" blue="0.0" />
+		</rect>
+		<rect state="0">
+			<color red="0.3" green="0.0" blue="0.0" />
+		</rect>
+		<text string="HOLD 4">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0" y="0.1" width="1" height="0.4" />
+		</text>
+		<text string="HIGH">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0" y="0.5" width="1" height="0.4" />
+		</text>
+	</element>
+
+	<element name="hold5" defstate="0">
+		<rect state="1">
+			<color red="1.0" green="0.0" blue="0.0" />
+		</rect>
+		<rect state="0">
+			<color red="0.3" green="0.0" blue="0.0" />
+		</rect>
+		<text string="HOLD 5">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0" y="0.1" width="1" height="0.4" />
+		</text>
+		<text string="HALF">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0" y="0.5" width="1" height="0.4" />
+		</text>
+	</element>
+
+	<element name="cancel" defstate="0">
+		<rect state="1">
+			<color red="0.0" green="1.0" blue="0.0" />
+		</rect>
+		<rect state="0">
+			<color red="0.0" green="0.25" blue="0.0" />
+		</rect>
+		<text string="CANCEL">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0" y="0.1" width="1" height="0.4" />
+		</text>
+		<text string="BET">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0" y="0.5" width="1" height="0.4" />
+		</text>
+	</element>
+
+	<element name="start" defstate="0">
+		<rect state="1">
+			<color red="0.0" green="1.0" blue="0.0" />
+		</rect>
+		<rect state="0">
+			<color red="0.0" green="0.25" blue="0.0" />
+		</rect>
+		<text string="START">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0" y="0.2" width="1" height="0.6" />
+		</text>
+	</element>
+
+
+	<element name="hold_b" defstate="0">
+		<rect state="1">
+			<color red="0.7" green="0.0" blue="0.0" />
+		</rect>
+		<rect state="0">
+			<color red="0.2" green="0.0" blue="0.0" />
+		</rect>
+	</element>
+
+	<element name="start_b" defstate="0">
+		<rect state="1">
+			<color red="0.0" green="0.7" blue="0.0" />
+		</rect>
+		<rect state="0">
+			<color red="0.0" green="0.15" blue="0.0" />
+		</rect>
+	</element>
+
+
+	<view name="Button Lamps">
+
+		<screen index="0">
+			<bounds left="0" top="0" right="4" bottom="3" />
+		</screen>
+
+		<element name="lamp1" ref="hold_b" inputtag="IN0" inputmask="0x02">
+			<bounds x="0.10" y="3.13" width="0.55" height="0.24" />
+		</element>
+		<element name="lamp1" ref="hold1" inputtag="IN0" inputmask="0x02">
+			<bounds x="0.12" y="3.15" width="0.51" height="0.20" />
+		</element>
+
+		<element name="lamp2" ref="hold_b" inputtag="IN1" inputmask="0x01">
+			<bounds x="0.75" y="3.13" width="0.55" height="0.24" />
+		</element>
+		<element name="lamp2" ref="hold2" inputtag="IN1" inputmask="0x01">
+			<bounds x="0.77" y="3.15" width="0.51" height="0.20" />
+		</element>
+
+		<element name="lamp3" ref="hold_b" inputtag="IN1" inputmask="0x02">
+			<bounds x="1.40" y="3.13" width="0.55" height="0.24" />
+		</element>
+		<element name="lamp3" ref="hold3" inputtag="IN1" inputmask="0x02">
+			<bounds x="1.42" y="3.15" width="0.51" height="0.20" />
+		</element>
+
+		<element name="lamp4" ref="hold_b" inputtag="IN0" inputmask="0x80">
+			<bounds x="2.05" y="3.13" width="0.55" height="0.24" />
+		</element>
+		<element name="lamp4" ref="hold4" inputtag="IN0" inputmask="0x80">
+			<bounds x="2.07" y="3.15" width="0.51" height="0.20" />
+		</element>
+
+		<element name="lamp5" ref="hold_b" inputtag="IN0" inputmask="0x10">
+			<bounds x="2.70" y="3.13" width="0.55" height="0.24" />
+		</element>
+		<element name="lamp5" ref="hold5" inputtag="IN0" inputmask="0x10">
+			<bounds x="2.72" y="3.15" width="0.51" height="0.20" />
+		</element>
+
+		<element name="lamp6" ref="start_b" inputtag="IN0" inputmask="0x04">
+			<bounds x="3.35" y="3.02" width="0.55" height="0.24" />
+		</element>
+		<element name="lamp6" ref="cancel" inputtag="IN0" inputmask="0x04">
+			<bounds x="3.37" y="3.04" width="0.51" height="0.20" />
+		</element>
+
+		<element name="lamp7" ref="start_b" inputtag="IN0" inputmask="0x08">
+			<bounds x="3.35" y="3.28" width="0.55" height="0.24" />
+		</element>
+		<element name="lamp7" ref="start" inputtag="IN0" inputmask="0x08">
+			<bounds x="3.37" y="3.30" width="0.51" height="0.20" />
+		</element>
+
+	</view>
+</mamelayout>

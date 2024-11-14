@@ -193,11 +193,6 @@ void kcexp_slot_device::device_validity_check(validity_checker &valid) const
 void kcexp_slot_device::device_start()
 {
 	m_cart = get_card_device();
-
-	// resolve callbacks
-	m_out_irq_cb.resolve_safe();
-	m_out_nmi_cb.resolve_safe();
-	m_out_halt_cb.resolve_safe();
 }
 
 
@@ -270,7 +265,7 @@ void kcexp_slot_device::io_write(offs_t offset, uint8_t data)
    MEI line write
 -------------------------------------------------*/
 
-WRITE_LINE_MEMBER( kcexp_slot_device::mei_w )
+void kcexp_slot_device::mei_w(int state)
 {
 	LOG("KCEXP: %s MEI line\n", state != CLEAR_LINE ? "ASSERT": "CLEAR");
 
@@ -282,7 +277,7 @@ WRITE_LINE_MEMBER( kcexp_slot_device::mei_w )
    MEO line write
 -------------------------------------------------*/
 
-WRITE_LINE_MEMBER( kcexp_slot_device::meo_w )
+void kcexp_slot_device::meo_w(int state)
 {
 	LOG("KCEXP: %s MEO line\n", state != CLEAR_LINE ? "ASSERT": "CLEAR");
 
@@ -316,15 +311,14 @@ kccart_slot_device::~kccart_slot_device()
     call load
 -------------------------------------------------*/
 
-image_init_result kccart_slot_device::call_load()
+std::pair<std::error_condition, std::string> kccart_slot_device::call_load()
 {
 	if (m_cart)
 	{
-		offs_t read_length;
-		uint8_t *cart_base = m_cart->get_cart_base();
-
-		if (cart_base != nullptr)
+		uint8_t *const cart_base = m_cart->get_cart_base();
+		if (cart_base)
 		{
+			offs_t read_length;
 			if (!loaded_through_softlist())
 			{
 				read_length = length();
@@ -337,10 +331,10 @@ image_init_result kccart_slot_device::call_load()
 			}
 		}
 		else
-			return image_init_result::FAIL;
+			return std::make_pair(image_error::INTERNAL, std::string());
 	}
 
-	return image_init_result::PASS;
+	return std::make_pair(std::error_condition(), std::string());
 }
 
 /*-------------------------------------------------

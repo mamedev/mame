@@ -1,6 +1,6 @@
 /*
- * Copyright 2010-2021 Branimir Karadzic. All rights reserved.
- * License: https://github.com/bkaradzic/bx#license-bsd-2-clause
+ * Copyright 2010-2022 Branimir Karadzic. All rights reserved.
+ * License: https://github.com/bkaradzic/bx/blob/master/LICENSE
  */
 
 #ifndef BX_PLATFORM_H_HEADER_GUARD
@@ -16,7 +16,7 @@
 #define BX_COMPILER_GCC            0
 #define BX_COMPILER_MSVC           0
 
-// Endianess
+// Endianness
 #define BX_CPU_ENDIAN_BIG    0
 #define BX_CPU_ENDIAN_LITTLE 0
 
@@ -37,13 +37,15 @@
 #define BX_CRT_MSVC   0
 #define BX_CRT_NEWLIB 0
 
-#ifndef BX_CRT_MUSL
-#	define BX_CRT_MUSL 0
-#endif // BX_CRT_MUSL
-
 #ifndef BX_CRT_NONE
 #	define BX_CRT_NONE 0
 #endif // BX_CRT_NONE
+
+// Language standard version
+#define BX_LANGUAGE_CPP14 201402L
+#define BX_LANGUAGE_CPP17 201703L
+#define BX_LANGUAGE_CPP20 202002L
+#define BX_LANGUAGE_CPP23 202207L
 
 // Platform
 #define BX_PLATFORM_ANDROID    0
@@ -253,7 +255,6 @@
 	&& !BX_CRT_LIBCXX \
 	&& !BX_CRT_MINGW  \
 	&& !BX_CRT_MSVC   \
-	&& !BX_CRT_MUSL   \
 	&& !BX_CRT_NEWLIB
 #		undef  BX_CRT_NONE
 #		define BX_CRT_NONE 1
@@ -342,7 +343,9 @@
 		BX_STRINGIZE(__clang_minor__) "." \
 		BX_STRINGIZE(__clang_patchlevel__)
 #elif BX_COMPILER_MSVC
-#	if BX_COMPILER_MSVC >= 1920 // Visual Studio 2019
+#	if BX_COMPILER_MSVC >= 1930 // Visual Studio 2022
+#		define BX_COMPILER_NAME "MSVC 17.0"
+#	elif BX_COMPILER_MSVC >= 1920 // Visual Studio 2019
 #		define BX_COMPILER_NAME "MSVC 16.0"
 #	elif BX_COMPILER_MSVC >= 1910 // Visual Studio 2017
 #		define BX_COMPILER_NAME "MSVC 15.0"
@@ -429,8 +432,6 @@
 #	define BX_CRT_NAME "Clang C Library"
 #elif BX_CRT_NEWLIB
 #	define BX_CRT_NAME "Newlib"
-#elif BX_CRT_MUSL
-#	define BX_CRT_NAME "musl libc"
 #elif BX_CRT_NONE
 #	define BX_CRT_NAME "None"
 #else
@@ -443,17 +444,15 @@
 #	define BX_ARCH_NAME "64-bit"
 #endif // BX_ARCH_
 
-#if BX_COMPILER_MSVC
-#	define BX_CPP_NAME "C++MsvcUnknown"
-#elif defined(__cplusplus)
-#	if __cplusplus < 201103L
-#		error "Pre-C++11 compiler is not supported!"
-#	elif __cplusplus < 201402L
-#		define BX_CPP_NAME "C++11"
-#	elif __cplusplus < 201703L
+#if defined(__cplusplus)
+#	if   __cplusplus < BX_LANGUAGE_CPP14
+#		error "C++14 standard support is required to build."
+#	elif __cplusplus < BX_LANGUAGE_CPP17
 #		define BX_CPP_NAME "C++14"
-#	elif __cplusplus < 201704L
+#	elif __cplusplus < BX_LANGUAGE_CPP20
 #		define BX_CPP_NAME "C++17"
+#	elif __cplusplus < BX_LANGUAGE_CPP23
+#		define BX_CPP_NAME "C++20"
 #	else
 // See: https://gist.github.com/bkaradzic/2e39896bc7d8c34e042b#orthodox-c
 #		define BX_CPP_NAME "C++WayTooModern"

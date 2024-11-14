@@ -220,14 +220,14 @@ INPUT_PORTS_START(zorba_keyboard)
 	PORT_DIPSETTING(    0x01, "6 (Normal)" )
 	PORT_DIPSETTING(    0x00, "7 (Dump Tables)" )
 	PORT_DIPNAME( 0x08, 0x08, "Key Repeat" )            PORT_DIPLOCATION("DIP:4")
+	PORT_DIPSETTING(    0x00, DEF_STR(Off) )
 	PORT_DIPSETTING(    0x08, DEF_STR(On) )
-	PORT_DIPSETTING(    0x00, DEF_STR(Off) )
 	PORT_DIPNAME( 0x10, 0x10, "Baud Rate" )             PORT_DIPLOCATION("DIP:5")
-	PORT_DIPSETTING(    0x10, "1200" )
 	PORT_DIPSETTING(    0x00, "300" )
+	PORT_DIPSETTING(    0x10, "1200" )
 	PORT_DIPNAME( 0x20, 0x20, "Key Click" )             PORT_DIPLOCATION("DIP:6")
-	PORT_DIPSETTING(    0x20, DEF_STR(On) )
 	PORT_DIPSETTING(    0x00, DEF_STR(Off) )
+	PORT_DIPSETTING(    0x20, DEF_STR(On) )
 	PORT_DIPNAME( 0x40, 0x40, "Synchronous Output" )    PORT_DIPLOCATION("DIP:7")
 	PORT_DIPSETTING(    0x40, DEF_STR(Off) )
 	PORT_DIPSETTING(    0x00, DEF_STR(On) )
@@ -265,7 +265,7 @@ zorba_keyboard_device::zorba_keyboard_device(
 }
 
 
-WRITE_LINE_MEMBER(zorba_keyboard_device::txd_w)
+void zorba_keyboard_device::txd_w(int state)
 {
 	m_txd_high = CLEAR_LINE != state;
 }
@@ -301,7 +301,6 @@ void zorba_keyboard_device::mcu_pc_w(u8 data)
 
 void zorba_keyboard_device::device_start()
 {
-	m_rxd_cb.resolve_safe();
 	m_led_key_caps_lock.resolve();
 	m_led_key_shift_lock.resolve();
 

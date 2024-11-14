@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:ElSemi
+// copyright-holders:ElSemi, Angelo Salese
 /*****************************************************************************************
         VRENDER ZERO
         VIDEO EMULATION By ElSemi
@@ -125,8 +125,6 @@ void vr0video_device::flip_count_w(offs_t offset, uint16_t data, uint16_t mem_ma
 
 void vr0video_device::device_start()
 {
-	m_idleskip_cb.resolve_safe();
-
 	save_item(NAME(m_InternalPalette));
 	save_item(NAME(m_LastPalUpdate));
 
@@ -160,6 +158,9 @@ void vr0video_device::device_start()
 	save_item(NAME(m_render_reset));
 	save_item(NAME(m_render_start));
 	save_item(NAME(m_dither_mode));
+	save_item(NAME(m_flip_sync));
+
+	m_pipeline_timer = timer_alloc(FUNC(vr0video_device::pipeline_cb), this);
 }
 
 void vr0video_device::set_areas(uint16_t *textureram, uint16_t *frameram)
@@ -179,6 +180,8 @@ void vr0video_device::device_reset()
 	m_LastPalUpdate = 0xffffffff;
 
 	m_DisplayDest = m_DrawDest = m_frameram;
+	// 1100 objects per second at ~80 MHz
+	m_pipeline_timer->adjust(attotime::from_hz(this->clock() /1100), 0, attotime::from_hz(this->clock() / 1100));
 }
 
 /*****************************************************************************
@@ -521,7 +524,7 @@ int vr0video_device::vrender0_ProcessPacket(uint32_t PacketPtr)
 	if (Packet0 & 0x81) //Sync or ASync flip
 	{
 		m_LastPalUpdate = 0xffffffff;    //Force update palette next frame
-		return 1;
+		return Packet0 & 0x81;
 	}
 
 	if (Packet0 & 0x200)
@@ -667,6 +670,47 @@ int vr0video_device::vrender0_ProcessPacket(uint32_t PacketPtr)
 	return 0;
 }
 
+TIMER_CALLBACK_MEMBER(vr0video_device::pipeline_cb)
+{
+	if (m_render_start == false)
+		return;
+
+	// bail out if we encountered a flip sync command
+	// pipeline waits until it receives a vblank signal
+	if (m_flip_sync == true)
+		return;
+
+	if ((m_queue_rear & 0x7ff) == (m_queue_front & 0x7ff))
+		return;
+
+	int DoFlip = vrender0_ProcessPacket(m_queue_rear * 32);
+	m_queue_rear ++;
+	m_queue_rear &= 0x7ff;
+	if (DoFlip & 0x01)
+		m_flip_sync = true;
+
+	if (DoFlip & 0x80)
+	{
+		uint32_t B0 = 0x000000;
+		uint32_t B1 = (m_bank1_select == true ? 0x400000 : 0x100000)/2;
+		uint16_t *Front, *Back;
+
+		if (m_display_bank & 1)
+		{
+			Front = (m_frameram + B1);
+			Back  = (m_frameram + B0);
+		}
+		else
+		{
+			Front = (m_frameram + B0);
+			Back  = (m_frameram + B1);
+		}
+
+		m_DrawDest = ((m_draw_select == true) ? Back : Front);
+	}
+
+}
+
 void vr0video_device::execute_flipping()
 {
 	if (m_render_start == false)
@@ -675,7 +719,6 @@ void vr0video_device::execute_flipping()
 	uint32_t B0 = 0x000000;
 	uint32_t B1 = (m_bank1_select == true ? 0x400000 : 0x100000)/2;
 	uint16_t *Front, *Back;
-	int DoFlip = 0;
 
 	if (m_display_bank & 1)
 	{
@@ -691,22 +734,11 @@ void vr0video_device::execute_flipping()
 	m_DrawDest = ((m_draw_select == true) ? Front : Back);
 	m_DisplayDest = Front;
 
-	while ((m_queue_rear & 0x7ff) != (m_queue_front & 0x7ff))
+	m_flip_sync = false;
+	if (m_flip_count)
 	{
-		DoFlip = vrender0_ProcessPacket(m_queue_rear * 32);
-		m_queue_rear ++;
-		m_queue_rear &= 0x7ff;
-		if (DoFlip)
-			break;
-	}
-
-	if (DoFlip)
-	{
-		if (m_flip_count)
-		{
-			m_flip_count--;
-			m_display_bank ^= 1;
-		}
+		m_flip_count--;
+		m_display_bank ^= 1;
 	}
 }
 

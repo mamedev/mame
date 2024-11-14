@@ -57,6 +57,8 @@ For Model III:
 #include "emu.h"
 #include "trs80.h"
 
+#include "trs80_quik.h"
+
 #include "bus/centronics/ctronics.h"
 #include "machine/input_merger.h"
 #include "machine/i8251.h"
@@ -65,6 +67,11 @@ For Model III:
 
 #include "emupal.h"
 #include "softlist_dev.h"
+
+#include "utf8.h"
+
+
+namespace {
 
 class meritum_state : public trs80_state
 {
@@ -85,10 +92,10 @@ private:
 	u32 screen_update_meritum1(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	u32 screen_update_meritum2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void mem_map(address_map &map);
-	void io_map(address_map &map);
-	void mem_map2(address_map &map);
-	void io_map2(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
+	void io_map(address_map &map) ATTR_COLD;
+	void mem_map2(address_map &map) ATTR_COLD;
+	void io_map2(address_map &map) ATTR_COLD;
 	void mainppi_portb_w(u8);
 	void mainppi_portc_w(u8);
 
@@ -223,7 +230,7 @@ static INPUT_PORTS_START( meritum )
 	PORT_BIT(0xFC, 0x00, IPT_UNUSED)
 
 	PORT_START("NMI")
-	PORT_BIT(0x01, 0x01, IPT_KEYBOARD) PORT_NAME("NMI") PORT_CODE(KEYCODE_F1) PORT_WRITE_LINE_DEVICE_MEMBER("nmigate", input_merger_device, in_w<1>)
+	PORT_BIT(0x01, 0x01, IPT_KEYBOARD) PORT_NAME("NMI") PORT_CODE(KEYCODE_F1) PORT_WRITE_LINE_DEVICE_MEMBER("nmigate", FUNC(input_merger_device::in_w<1>))
 INPUT_PORTS_END
 
 u32 meritum_state::screen_update_meritum1(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -392,9 +399,7 @@ void meritum_state::meritum1(machine_config &config)
 	m_cassette->set_default_state(CASSETTE_PLAY);
 	m_cassette->add_route(ALL_OUTPUTS, "mono", 0.05);
 
-	quickload_image_device &quickload(QUICKLOAD(config, "quickload", "cmd", attotime::from_seconds(1)));
-	quickload.set_load_callback(FUNC(meritum_state::quickload_cb));
-	quickload.set_interface("trs80_quik");
+	TRS80_QUICKLOAD(config, "quickload", m_maincpu, attotime::from_seconds(1));
 	SOFTWARE_LIST(config, "quik_list").set_original("trs80_quik").set_filter("M1");
 }
 
@@ -466,6 +471,8 @@ ROM_START( meritum_net )
 	ROM_REGION(0x1000, "chargen", ROMREGION_INVERT)
 	ROM_LOAD( "char.ic72", 0x0000, 0x1000, CRC(2c09a5a7) SHA1(146891b3ddfc2de95e6a5371536394a657880054))
 ROM_END
+
+} // anonymous namespace
 
 
 //    YEAR  NAME         PARENT    COMPAT    MACHINE   INPUT      CLASS          INIT             COMPANY              FULLNAME                FLAGS

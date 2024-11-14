@@ -68,8 +68,7 @@ void sp0250_device::device_start()
 
 	// if a DRQ callback is offered, run a timer at the frame rate
 	// to ensure the DRQ gets picked up in a timely manner
-	m_drq.resolve_safe();
-	if (!m_drq.isnull())
+	if (!m_drq.isunset())
 	{
 		m_drq(ASSERT_LINE);
 		attotime period = attotime::from_hz(frame_rate);
@@ -108,11 +107,6 @@ void sp0250_device::device_start()
 void sp0250_device::device_reset()
 {
 	load_values();
-}
-
-TIMER_CALLBACK_MEMBER(sp0250_device::delayed_stream_update)
-{
-	m_stream->update();
 }
 
 static uint16_t sp0250_ga(uint8_t v)
@@ -182,7 +176,7 @@ void sp0250_device::write(uint8_t data)
 }
 
 
-uint8_t sp0250_device::drq_r()
+int sp0250_device::drq_r()
 {
 	m_stream->update();
 	return (m_fifo_pos == 15) ? CLEAR_LINE : ASSERT_LINE;

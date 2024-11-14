@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <!--
-license:CC0
+license:CC0-1.0
 -->
 <softwarelist name="vic1001_flop" description="Commodore VIC-1001 / VIC-20 diskettes">
 
@@ -34,7 +34,7 @@ license:CC0
 	</software>
 
 	<software name="vicfilea" cloneof="vicfile">
-		<description>VicFile (Alt)</description>
+		<description>VicFile (alt)</description>
 		<year>1981</year>
 		<publisher>Commodore</publisher>
 		<info name="serial" value="VIC-3304" />

@@ -94,8 +94,8 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(main_nmi);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	TIMER_CALLBACK_MEMBER(irq_timer);
 
@@ -109,17 +109,17 @@ private:
 	u8 dips_r();
 	u8 switch_r();
 	void switch_w(u8 data);
-	DECLARE_WRITE_LINE_MEMBER(pia22_ca2_w) { m_io_outputs[20] = state; } //ST5
-	DECLARE_WRITE_LINE_MEMBER(pia22_cb2_w) { } //ST-solenoids enable
-	DECLARE_WRITE_LINE_MEMBER(pia24_ca2_w) { m_io_outputs[17] = state; } //ST2
-	DECLARE_WRITE_LINE_MEMBER(pia24_cb2_w) { m_io_outputs[16] = state; } //ST1
-	DECLARE_WRITE_LINE_MEMBER(pia28_ca2_w) { } //diag leds enable
-	DECLARE_WRITE_LINE_MEMBER(pia28_cb2_w) { m_io_outputs[21] = state; } //ST6
-	DECLARE_WRITE_LINE_MEMBER(pia30_ca2_w) { m_io_outputs[19] = state; } //ST4
-	DECLARE_WRITE_LINE_MEMBER(pia30_cb2_w) { m_io_outputs[18] = state; } //ST3
-	DECLARE_WRITE_LINE_MEMBER(pia_irq);
+	void pia22_ca2_w(int state) { m_io_outputs[20] = state; } //ST5
+	void pia22_cb2_w(int state) { } //ST-solenoids enable
+	void pia24_ca2_w(int state) { m_io_outputs[17] = state; } //ST2
+	void pia24_cb2_w(int state) { m_io_outputs[16] = state; } //ST1
+	void pia28_ca2_w(int state) { } //diag leds enable
+	void pia28_cb2_w(int state) { m_io_outputs[21] = state; } //ST6
+	void pia30_ca2_w(int state) { m_io_outputs[19] = state; } //ST4
+	void pia30_cb2_w(int state) { m_io_outputs[18] = state; } //ST3
+	void pia_irq(int state);
 
-	void main_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
 
 	u8 m_strobe = 0;
 	u8 m_row = 0;
@@ -229,7 +229,7 @@ static INPUT_PORTS_START( s6 )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_RALT) PORT_NAME("INP59")
 
 	PORT_START("DIAGS")
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("Main Diag") PORT_CODE(KEYCODE_0_PAD) PORT_CHANGED_MEMBER(DEVICE_SELF, s6_state, main_nmi, 1)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("Main Diag") PORT_CODE(KEYCODE_0_PAD) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(s6_state::main_nmi), 1)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("Advance") PORT_CODE(KEYCODE_1_PAD)
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("Manual/Auto") PORT_CODE(KEYCODE_2_PAD) PORT_TOGGLE
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Enter") PORT_CODE(KEYCODE_ENTER_PAD)
@@ -415,7 +415,7 @@ void s6_state::switch_w(u8 data)
 	m_row = data;
 }
 
-WRITE_LINE_MEMBER( s6_state::pia_irq )
+void s6_state::pia_irq(int state)
 {
 	if(state == CLEAR_LINE)
 	{
@@ -484,7 +484,7 @@ void s6_state::s6(machine_config &config)
 	genpin_audio(config);
 
 	/* Devices */
-	PIA6821(config, m_pia22, 0);
+	PIA6821(config, m_pia22);
 	m_pia22->writepa_handler().set(FUNC(s6_state::sol0_w));
 	m_pia22->writepb_handler().set(FUNC(s6_state::sol1_w));
 	m_pia22->ca2_handler().set(FUNC(s6_state::pia22_ca2_w));
@@ -492,7 +492,7 @@ void s6_state::s6(machine_config &config)
 	m_pia22->irqa_handler().set(FUNC(s6_state::pia_irq));
 	m_pia22->irqb_handler().set(FUNC(s6_state::pia_irq));
 
-	PIA6821(config, m_pia24, 0);
+	PIA6821(config, m_pia24);
 	m_pia24->writepa_handler().set(FUNC(s6_state::lamp0_w));
 	m_pia24->writepb_handler().set(FUNC(s6_state::lamp1_w));
 	m_pia24->ca2_handler().set(FUNC(s6_state::pia24_ca2_w));
@@ -500,7 +500,7 @@ void s6_state::s6(machine_config &config)
 	m_pia24->irqa_handler().set(FUNC(s6_state::pia_irq));
 	m_pia24->irqb_handler().set(FUNC(s6_state::pia_irq));
 
-	PIA6821(config, m_pia28, 0);
+	PIA6821(config, m_pia28);
 	m_pia28->readpa_handler().set(FUNC(s6_state::dips_r));
 	m_pia28->set_port_a_input_overrides_output_mask(0xff);
 	m_pia28->writepa_handler().set(FUNC(s6_state::dig0_w));
@@ -510,7 +510,7 @@ void s6_state::s6(machine_config &config)
 	m_pia28->irqa_handler().set(FUNC(s6_state::pia_irq));
 	m_pia28->irqb_handler().set(FUNC(s6_state::pia_irq));
 
-	PIA6821(config, m_pia30, 0);
+	PIA6821(config, m_pia30);
 	m_pia30->readpa_handler().set(FUNC(s6_state::switch_r));
 	m_pia30->set_port_a_input_overrides_output_mask(0xff);
 	m_pia30->writepb_handler().set(FUNC(s6_state::switch_w));

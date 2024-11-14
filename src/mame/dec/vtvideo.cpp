@@ -76,7 +76,7 @@ DEFINE_DEVICE_TYPE(RAINBOW_VIDEO, rainbow_video_device, "rainbow_video", "Rainbo
 vt100_video_device::vt100_video_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_video_interface(mconfig, *this)
-	, m_read_ram(*this)
+	, m_read_ram(*this, 0)
 	, m_write_vert_freq_intr(*this)
 	, m_write_lba3_lba4(*this)
 	, m_write_lba7(*this)
@@ -104,12 +104,6 @@ rainbow_video_device::rainbow_video_device(const machine_config &mconfig, const 
 
 void vt100_video_device::device_start()
 {
-	/* resolve callbacks */
-	m_read_ram.resolve_safe(0);
-	m_write_vert_freq_intr.resolve_safe();
-	m_write_lba3_lba4.resolve();
-	m_write_lba7.resolve_safe();
-
 	// LBA7 is scan line frequency update
 	m_lba7_change_timer = timer_alloc(FUNC(vt100_video_device::lba7_change), this);
 	m_lba7_change_timer->adjust(clocks_to_attotime(765), 0, clocks_to_attotime(765));
@@ -229,7 +223,7 @@ void vt100_video_device::recompute_parameters()
 		LOG("(RECOMPUTE) * LINEDOUBLER *\n");
 }
 
-READ_LINE_MEMBER(vt100_video_device::lba7_r)
+int vt100_video_device::lba7_r()
 {
 	return m_lba7;
 }
@@ -874,7 +868,7 @@ TIMER_CALLBACK_MEMBER(vt100_video_device::lba7_change)
 	m_lba7 = (m_lba7) ? 0 : 1;
 	m_write_lba7(m_lba7);
 
-	if (!m_write_lba3_lba4.isnull())
+	if (!m_write_lba3_lba4.isunset())
 	{
 		// The first of every eight low periods of LBA 3 is twice as long
 		m_write_lba3_lba4(2);

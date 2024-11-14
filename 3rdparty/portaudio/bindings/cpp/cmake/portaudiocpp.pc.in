@@ -1,0 +1,12 @@
+prefix=@PC_PREFIX@
+exec_prefix=${prefix}
+libdir=${prefix}/lib
+includedir=${prefix}/include
+
+Name: PortAudioCpp
+Description: Portable audio I/O C++ bindings
+Version: 12
+Requires: portaudio-2.0
+
+Libs: -L${libdir} -lportaudiocpp
+Cflags: -I${includedir}

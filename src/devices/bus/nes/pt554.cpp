@@ -17,12 +17,11 @@
 
 
 #ifdef NES_PCB_DEBUG
-#define VERBOSE 1
+#define VERBOSE (LOG_GENERAL)
 #else
-#define VERBOSE 0
+#define VERBOSE (0)
 #endif
-
-#define LOG_MMC(x) do { if (VERBOSE) logerror x; } while (0)
+#include "logmacro.h"
 
 
 //-------------------------------------------------
@@ -58,7 +57,7 @@ nes_bandai_pt554_device::nes_bandai_pt554_device(const machine_config &mconfig, 
 
 void nes_bandai_pt554_device::write_m(offs_t offset, u8 data)
 {
-	LOG_MMC(("Bandai PT-554 Sound write, data: %02x\n", data));
+	LOG("Bandai PT-554 Sound write, data: %02x\n", data);
 
 	// the actual chip starts speech synthesis when SYNC is held low >18µs
 	if (!BIT(data, 6))

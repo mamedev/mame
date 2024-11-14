@@ -37,6 +37,8 @@ ToDo:
 #include "cpu/m6809/m6809.h"
 #include "machine/nvram.h"
 
+#include "speaker.h"
+
 namespace {
 
 class wpc_dcs_state : public driver_device
@@ -78,10 +80,10 @@ private:
 	uint8_t switches_r();
 	void switches_w(uint8_t data);
 
-	DECLARE_WRITE_LINE_MEMBER(scanline_irq);
+	void scanline_irq(int state);
 	TIMER_DEVICE_CALLBACK_MEMBER(zc_timer);
 
-	void wpc_dcs_map(address_map &map);
+	void wpc_dcs_map(address_map &map) ATTR_COLD;
 
 	// devices
 	required_device<cpu_device> m_maincpu;
@@ -94,7 +96,7 @@ private:
 	required_ioport_array<8> m_io_keyboard;
 
 	// driver_device overrides
-	virtual void machine_reset() override;
+	virtual void machine_reset() override ATTR_COLD;
 
 	uint8_t m_firq_src = 0U, m_zc = 0U, m_row = 0U;
 	uint16_t m_rtc_base_day = 0U;
@@ -224,7 +226,7 @@ void wpc_dcs_state::watchdog_w(uint8_t data)
 	m_maincpu->set_input_line(0, CLEAR_LINE);
 }
 
-WRITE_LINE_MEMBER(wpc_dcs_state::scanline_irq)
+void wpc_dcs_state::scanline_irq(int state)
 {
 	m_firq_src = 0x00;
 	m_maincpu->set_input_line(1, state);
@@ -472,7 +474,12 @@ void wpc_dcs_state::wpc_dcs(machine_config &config)
 	WPC_DMD(config, "dmd", 0).scanline_callback().set(FUNC(wpc_dcs_state::scanline_irq));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
+
+	SPEAKER(config, "mono").front_center();
+
 	DCS_AUDIO_8K(config, m_dcs, 0);
+	m_dcs->set_maincpu_tag(m_maincpu);
+	m_dcs->add_route(0, "mono", 1.0);
 }
 
 /*----------------------

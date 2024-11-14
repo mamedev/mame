@@ -2,7 +2,7 @@
 // copyright-holders:Olivier Galibert
 /*********************************************************************
 
-    formats/apollo_dsk.c
+    formats/apollo_dsk.cpp
 
     apollo format
 
@@ -17,17 +17,17 @@ apollo_format::apollo_format() : upd765_format(formats)
 {
 }
 
-const char *apollo_format::name() const
+const char *apollo_format::name() const noexcept
 {
 	return "apollo";
 }
 
-const char *apollo_format::description() const
+const char *apollo_format::description() const noexcept
 {
 	return "APOLLO disk image";
 }
 
-const char *apollo_format::extensions() const
+const char *apollo_format::extensions() const noexcept
 {
 	return "afd";
 }

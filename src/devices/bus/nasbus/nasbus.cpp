@@ -70,7 +70,6 @@ nasbus_device::nasbus_device(const machine_config &mconfig, const char *tag, dev
 
 nasbus_device::~nasbus_device()
 {
-	m_dev.detach_all();
 }
 
 //-------------------------------------------------
@@ -79,8 +78,6 @@ nasbus_device::~nasbus_device()
 
 void nasbus_device::device_start()
 {
-	// resolve callbacks
-	m_ram_disable_handler.resolve_safe();
 }
 
 //-------------------------------------------------
@@ -98,11 +95,11 @@ void nasbus_device::device_reset()
 void nasbus_device::add_card(device_nasbus_card_interface &card)
 {
 	card.set_nasbus_device(*this);
-	m_dev.append(card);
+	m_dev.emplace_back(card);
 }
 
 // callbacks from slot device to the host
-WRITE_LINE_MEMBER( nasbus_device::ram_disable_w ) { m_ram_disable_handler(state); }
+void nasbus_device::ram_disable_w(int state) { m_ram_disable_handler(state); }
 
 
 //**************************************************************************
@@ -115,8 +112,7 @@ WRITE_LINE_MEMBER( nasbus_device::ram_disable_w ) { m_ram_disable_handler(state)
 
 device_nasbus_card_interface::device_nasbus_card_interface(const machine_config &mconfig, device_t &device) :
 	device_interface(device, "nasbus"),
-	m_nasbus(nullptr),
-	m_next(nullptr)
+	m_nasbus(nullptr)
 {
 }
 

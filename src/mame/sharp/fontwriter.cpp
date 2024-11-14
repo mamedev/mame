@@ -27,6 +27,9 @@
 #include "screen.h"
 #include "speaker.h"
 
+
+namespace {
+
 class fontwriter_state : public driver_device
 {
 public:
@@ -39,8 +42,8 @@ public:
 	void fw600(machine_config &config);
 
 private:
-	virtual void machine_reset() override;
-	virtual void machine_start() override;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void machine_start() override ATTR_COLD;
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
@@ -54,14 +57,14 @@ private:
 		m_vbl2 ^= 0x88;
 		return m_vbl;
 	}
-	void main_map(address_map &map);
-	void fw600_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
+	void fw600_map(address_map &map) ATTR_COLD;
 
 	// devices
 	required_device<m37720s1_device> m_maincpu;
 
 	// driver_device overrides
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 	uint8_t m_vbl = 0, m_vbl2 = 0;
 };
 
@@ -154,6 +157,9 @@ ROM_START(fw700ger)
 
 	ROM_REGION(0x800, "at28c16", ROMREGION_ERASE00)         /* AT28C16 parallel EPROM */
 ROM_END
+
+} // anonymous namespace
+
 
 SYST( 1994, fw600,    0, 0, fw600, fontwriter, fontwriter_state, empty_init, "Sharp", "FontWriter FW-600", MACHINE_NOT_WORKING|MACHINE_NO_SOUND )
 SYST( 1994, fw700ger, 0, 0, fontwriter, fontwriter, fontwriter_state, empty_init, "Sharp", "FontWriter FW-700 (German)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND )

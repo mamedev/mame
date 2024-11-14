@@ -43,7 +43,7 @@ DEFINE_DEVICE_TYPE(C64_PARTNER, c64_partner_cartridge_device, "c64_partner", "C6
 //  INPUT_PORTS( c64_partner )
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( c64_partner_cartridge_device::nmi_w )
+void c64_partner_cartridge_device::nmi_w(int state)
 {
 	if (!state && !m_a6 && !m_nmi)
 	{
@@ -54,7 +54,7 @@ WRITE_LINE_MEMBER( c64_partner_cartridge_device::nmi_w )
 
 static INPUT_PORTS_START( c64_partner )
 	PORT_START("NMI")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Menu") PORT_CODE(KEYCODE_F11) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, c64_partner_cartridge_device, nmi_w)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Menu") PORT_CODE(KEYCODE_F11) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, FUNC(c64_partner_cartridge_device::nmi_w))
 INPUT_PORTS_END
 
 

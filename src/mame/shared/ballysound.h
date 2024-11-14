@@ -58,9 +58,9 @@ public:
 
 	// read/write
 	void sound_select(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(sound_int);
+	void sound_int(int state);
 
-	void as2888_map(address_map &map);
+	void as2888_map(address_map &map) ATTR_COLD;
 
 protected:
 	bally_as2888_device(
@@ -77,8 +77,8 @@ protected:
 	{ }
 
 	// device-level overrides
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual void device_start() override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual void device_start() override ATTR_COLD;
 
 private:
 	uint8_t m_sound_select = 0;
@@ -115,9 +115,9 @@ public:
 	// read/write
 	DECLARE_INPUT_CHANGED_MEMBER(sw1);
 	void sound_select(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(sound_int);
+	void sound_int(int state);
 
-	void as3022_map(address_map &map);
+	void as3022_map(address_map &map) ATTR_COLD;
 
 protected:
 	bally_as3022_device(
@@ -137,9 +137,9 @@ protected:
 	{ }
 
 	// device-level overrides
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual void device_start() override;
-	virtual ioport_constructor device_input_ports() const override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual void device_start() override ATTR_COLD;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 
 	// devices
 	// The schematics list an optional 555, but it never seemed to be used
@@ -164,8 +164,8 @@ private:
 	TIMER_CALLBACK_MEMBER(sound_int_sync);
 	uint8_t pia_porta_r();
 	void pia_porta_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(pia_cb2_w);
-	DECLARE_WRITE_LINE_MEMBER(pia_irq_w);
+	void pia_cb2_w(int state);
+	void pia_irq_w(int state);
 	uint8_t ay_io_r();
 
 	void update_ay_bus();
@@ -184,11 +184,11 @@ public:
 		bally_as3022_device(mconfig, BALLY_SOUNDS_PLUS, tag, owner, clock)
 	{ }
 
-	void sounds_plus_map(address_map &map);
+	void sounds_plus_map(address_map &map) ATTR_COLD;
 
 protected:
 	// device-level overrides
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 private:
 	// internal communications
@@ -212,9 +212,9 @@ public:
 	// read/write
 	DECLARE_INPUT_CHANGED_MEMBER(sw1);
 	void sound_select(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(sound_int);
+	void sound_int(int state);
 
-	void cheap_squeak_map(address_map &map);
+	void cheap_squeak_map(address_map &map) ATTR_COLD;
 
 protected:
 	bally_cheap_squeak_device(
@@ -225,9 +225,9 @@ protected:
 			uint32_t clock);
 
 	// device-level overrides
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual void device_start() override;
-	virtual ioport_constructor device_input_ports() const override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual void device_start() override ATTR_COLD;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 
 	// devices
 	required_device<m6803_cpu_device> m_cpu;
@@ -267,9 +267,9 @@ public:
 	// read/write
 	DECLARE_INPUT_CHANGED_MEMBER(sw1);
 	void sound_select(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(sound_int);
+	void sound_int(int state);
 
-	void squawk_n_talk_map(address_map &map);
+	void squawk_n_talk_map(address_map &map) ATTR_COLD;
 
 protected:
 	bally_squawk_n_talk_device(
@@ -280,9 +280,9 @@ protected:
 			uint32_t clock);
 
 	// device-level overrides
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual void device_start() override;
-	virtual ioport_constructor device_input_ports() const override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual void device_start() override ATTR_COLD;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 
 	// devices
 	required_device<m6802_cpu_device> m_cpu;
@@ -302,7 +302,7 @@ private:
 	TIMER_CALLBACK_MEMBER(sound_select_sync);
 	TIMER_CALLBACK_MEMBER(sound_int_sync);
 	void pia1_portb_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(pia_irq_w);
+	void pia_irq_w(int state);
 };
 
 
@@ -317,8 +317,8 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual void device_start() override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual void device_start() override ATTR_COLD;
 
 	uint8_t pia2_porta_r();
 
@@ -332,7 +332,7 @@ private:
 
 	void pia2_porta_w(uint8_t data);
 	void pia2_portb_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(pia2_cb2_w);
+	void pia2_cb2_w(int state);
 	uint8_t ay_io_r();
 
 	void update_ay_bus();

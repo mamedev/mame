@@ -44,7 +44,7 @@ void tranz330_state::tranz330_io(address_map &map)
 	map(0x30, 0x3f).rw(m_rtc,  FUNC(msm6242_device::read),    FUNC(msm6242_device::write));
 }
 
-static void construct_ioport_tranz330(device_t &owner, ioport_list &portlist, std::string &errorbuf)
+static void construct_ioport_tranz330(device_t &owner, ioport_list &portlist, std::ostream &errorbuf)
 {
 	ioport_configurer configurer(owner, portlist, errorbuf);
 
@@ -195,4 +195,4 @@ ROM_END
 
 
 //    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS           INIT        COMPANY      FULLNAME        FLAGS
-COMP( 1985, tranz330, 0,      0,      tranz330, tranz330, tranz330_state, empty_init, "VeriFone",  "Tranz 330",    MACHINE_CLICKABLE_ARTWORK )
+COMP( 1985, tranz330, 0,      0,      tranz330, tranz330, tranz330_state, empty_init, "VeriFone",  "Tranz 330",    0 )

@@ -24,6 +24,8 @@
 #include "tilemap.h"
 
 
+namespace {
+
 class wink_state : public driver_device
 {
 public:
@@ -53,11 +55,11 @@ private:
 	bool m_nmi_enable = false;
 
 	void bgram_w(offs_t offset, uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(nmi_clock_w);
-	DECLARE_WRITE_LINE_MEMBER(nmi_enable_w);
-	DECLARE_WRITE_LINE_MEMBER(player_mux_w);
-	DECLARE_WRITE_LINE_MEMBER(tile_banking_w);
-	template<int Player> DECLARE_WRITE_LINE_MEMBER(coin_counter_w);
+	void nmi_clock_w(int state);
+	void nmi_enable_w(int state);
+	void player_mux_w(int state);
+	void tile_banking_w(int state);
+	template<int Player> void coin_counter_w(int state);
 	uint8_t analog_port_r();
 	uint8_t player_inputs_r();
 	void sound_irq_w(uint8_t data);
@@ -67,17 +69,17 @@ private:
 
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 	uint32_t screen_update_wink(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	INTERRUPT_GEN_MEMBER(wink_sound);
-	void wink_io(address_map &map);
-	void wink_map(address_map &map);
-	void wink_sound_io(address_map &map);
-	void wink_sound_map(address_map &map);
+	void wink_io(address_map &map) ATTR_COLD;
+	void wink_map(address_map &map) ATTR_COLD;
+	void wink_sound_io(address_map &map) ATTR_COLD;
+	void wink_sound_map(address_map &map) ATTR_COLD;
 };
 
 
@@ -113,33 +115,33 @@ void wink_state::bgram_w(offs_t offset, uint8_t data)
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE_LINE_MEMBER(wink_state::nmi_clock_w)
+void wink_state::nmi_clock_w(int state)
 {
 	if (state && m_nmi_enable)
 		m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 }
 
-WRITE_LINE_MEMBER(wink_state::nmi_enable_w)
+void wink_state::nmi_enable_w(int state)
 {
 	m_nmi_enable = state;
 	if (!m_nmi_enable)
 		m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 }
 
-WRITE_LINE_MEMBER(wink_state::player_mux_w)
+void wink_state::player_mux_w(int state)
 {
 	//player_mux = state;
 	//no mux / cocktail mode in the real pcb? strange...
 }
 
-WRITE_LINE_MEMBER(wink_state::tile_banking_w)
+void wink_state::tile_banking_w(int state)
 {
 	m_tile_bank = state;
 	m_bg_tilemap->mark_all_dirty();
 }
 
 template<int Player>
-WRITE_LINE_MEMBER(wink_state::coin_counter_w)
+void wink_state::coin_counter_w(int state)
 {
 	machine().bookkeeping().coin_counter_w(Player, state);
 }
@@ -482,5 +484,8 @@ void wink_state::init_wink()
 		ROM[i] += bitswap<8>(i & 0xff, 7,5,3,1,6,4,2,0);
 }
 
-GAME( 1985, wink,  0,    wink, wink, wink_state, init_wink, ROT0, "Midcoin", "Wink (set 1)", MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE )
-GAME( 1985, winka, wink, wink, wink, wink_state, init_wink, ROT0, "Midcoin", "Wink (set 2)", MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE )
+} // anonymous namespace
+
+
+GAME( 1985, wink,  0,    wink, wink, wink_state, init_wink, ROT0, "Midcoin", "Wink (set 1)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE )
+GAME( 1985, winka, wink, wink, wink, wink_state, init_wink, ROT0, "Midcoin", "Wink (set 2)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE )

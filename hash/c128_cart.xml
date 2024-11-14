@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <!--
-license:CC0
+license:CC0-1.0
 -->
 <softwarelist name="c128_cart" description="Commodore 128 cartridges">
 <!--
@@ -190,7 +190,7 @@ Missing dumps:
 		</part>
 	</software>
 
-	<software name="vwrit128">
+	<software name="vwrit128" supported="no">
 		<description>VizaWrite 128</description>
 		<year>1985</year>
 		<publisher>Viza</publisher>

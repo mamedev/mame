@@ -17,6 +17,9 @@
 #include "machine/i8251.h"
 #include "machine/pit8253.h"
 
+
+namespace {
+
 class juno6_state : public driver_device
 {
 public:
@@ -32,7 +35,7 @@ public:
 	void juno6(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	u8 keyboard_r();
@@ -40,7 +43,7 @@ private:
 	void db_w(u8 data);
 	void p2_w(u8 data);
 
-	void ext_map(address_map &map);
+	void ext_map(address_map &map) ATTR_COLD;
 
 	required_device<mcs48_cpu_device> m_maincpu;
 	required_device_array<pit8253_device, 2> m_pit;
@@ -125,5 +128,8 @@ ROM_START(juno6)
 	ROM_REGION(0x800, "maincpu", 0)
 	ROM_LOAD("upd8049c-238.ic56", 0x000, 0x800, CRC(18fa7cc5) SHA1(eebda5bbe6c3153a5549de1853e69da403811df3))
 ROM_END
+
+} // anonymous namespace
+
 
 SYST(1982, juno6, 0, 0, juno6, juno6, juno6_state, empty_init, "Roland", "Juno-6 (JU-6) Polyphonic Synthesizer", MACHINE_IS_SKELETON)

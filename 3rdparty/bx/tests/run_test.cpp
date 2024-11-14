@@ -1,6 +1,6 @@
 /*
- * Copyright 2010-2021 Branimir Karadzic. All rights reserved.
- * License: https://github.com/bkaradzic/bx#license-bsd-2-clause
+ * Copyright 2010-2022 Branimir Karadzic. All rights reserved.
+ * License: https://github.com/bkaradzic/bx/blob/master/LICENSE
  */
 
 #define CATCH_CONFIG_RUNNER
@@ -17,5 +17,15 @@ int runAllTests(int _argc, const char* _argv[])
 		", Time: " __TIME__
 		", C++: " BX_CPP_NAME
 		);
-	return Catch::Session().run(_argc, _argv);
+
+	using namespace Catch;
+
+	Session session;
+
+	ConfigData config;
+	config.defaultColourMode = BX_PLATFORM_EMSCRIPTEN ? ColourMode::None : ColourMode::PlatformDefault;
+
+	session.useConfigData(config);
+
+	return session.run(_argc, _argv);
 }

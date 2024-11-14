@@ -33,6 +33,9 @@ ToDo:
 #include "machine/i8279.h"
 #include "sdk86.lh"
 
+
+namespace {
+
 class sdk86_state : public driver_device
 {
 public:
@@ -56,11 +59,11 @@ private:
 	void digit_w(u8 data);
 	u8 kbd_r();
 
-	void io_map(address_map &map);
-	void mem_map(address_map &map);
+	void io_map(address_map &map) ATTR_COLD;
+	void mem_map(address_map &map) ATTR_COLD;
 
 	u8 m_digit = 0U;
-	void machine_start() override;
+	void machine_start() override ATTR_COLD;
 	required_device<cpu_device> m_maincpu;
 	required_device<i8251_device> m_uart;
 	required_device<i8279_device> m_kdc;
@@ -117,8 +120,8 @@ static INPUT_PORTS_START( sdk86 )
 	PORT_BIT(0xC0, IP_ACTIVE_LOW, IPT_UNUSED)
 
 	PORT_START("X3")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("INTR") PORT_CODE(KEYCODE_ESC) PORT_CHANGED_MEMBER(DEVICE_SELF, sdk86_state, nmi_button, 0) PORT_CHAR('I')
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Systm Reset") PORT_CODE(KEYCODE_F3) PORT_CHANGED_MEMBER(DEVICE_SELF, sdk86_state, reset_button, 0) PORT_CHAR('N')
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("INTR") PORT_CODE(KEYCODE_ESC) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(sdk86_state::nmi_button), 0) PORT_CHAR('I')
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Systm Reset") PORT_CODE(KEYCODE_F3) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(sdk86_state::reset_button), 0) PORT_CHAR('N')
 INPUT_PORTS_END
 
 INPUT_CHANGED_MEMBER(sdk86_state::nmi_button)
@@ -248,6 +251,9 @@ ROM_START( sdk86 )
 	ROM_LOAD( "0037_101994-001.a26", 0x0800, 0x0400, CRC(d6f33d30) SHA1(41e794bf202266fa57516403e6a80ebbf6c95fdc)) /* Label: "iD3625A 0037 // 8142 // 101994-001" */
 	ROM_LOAD( "0038_101995-001.a29", 0x0C00, 0x0400, CRC(3d2c18bc) SHA1(5e1935cd07fef26b2cf3d8fa7612fe0d8e678c06)) /* Label: "iD3625A 0038 // 8142 // 101995-001" */
 ROM_END
+
+} // anonymous namespace
+
 
 /* Driver */
 

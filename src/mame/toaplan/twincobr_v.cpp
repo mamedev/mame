@@ -114,23 +114,23 @@ void twincobr_state::video_start()
     Video I/O interface
 ***************************************************************************/
 
-WRITE_LINE_MEMBER(twincobr_state::display_on_w)
+void twincobr_state::display_on_w(int state)
 {
 	m_display_on = state;
 }
 
-WRITE_LINE_MEMBER(twincobr_state::flipscreen_w)
+void twincobr_state::flipscreen_w(int state)
 {
 	machine().tilemap().set_flip_all((state ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0));
 }
 
-WRITE_LINE_MEMBER(twincobr_state::bg_ram_bank_w)
+void twincobr_state::bg_ram_bank_w(int state)
 {
 	m_bg_ram_bank = state ? 0x1000 : 0x0000;
 	m_bg_tilemap->mark_all_dirty();
 }
 
-WRITE_LINE_MEMBER(twincobr_state::fg_rom_bank_w)
+void twincobr_state::fg_rom_bank_w(int state)
 {
 	m_fg_rom_bank = state ? 0x1000 : 0x0000;
 	m_fg_tilemap->mark_all_dirty();

@@ -5,8 +5,8 @@
     Sega 16-bit sprite hardware
 
 ***************************************************************************/
-#ifndef MAME_VIDEO_SEGA16SP_H
-#define MAME_VIDEO_SEGA16SP_H
+#ifndef MAME_SEGA_SEGA16SP_H
+#define MAME_SEGA_SEGA16SP_H
 
 #pragma once
 
@@ -64,11 +64,11 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 	// internal state
-	bool                        m_flip;                 // screen flip?
-	uint8_t                       m_bank[16];             // banking redirection
+	bool m_flip;                 // screen flip?
+	uint8_t m_bank[16];          // banking redirection
 	int m_xoffs = 0;
 	int m_yoffs = 0;
 	int m_xoffs_flipped = 0;
@@ -233,4 +233,4 @@ DECLARE_DEVICE_TYPE(SEGA_XBOARD_SPRITES,    sega_xboard_sprite_device)
 DECLARE_DEVICE_TYPE(SEGA_YBOARD_SPRITES,    sega_yboard_sprite_device)
 
 
-#endif // MAME_VIDEO_SEGA16SP_H
+#endif // MAME_SEGA_SEGA16SP_H

@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood
-#ifndef MAME_INCLUDES_XAVIX_2000_H
-#define MAME_INCLUDES_XAVIX_2000_H
+#ifndef MAME_TVGAMES_XAVIX_2000_H
+#define MAME_TVGAMES_XAVIX_2000_H
 
 #include "xavix.h"
 
@@ -24,4 +24,4 @@ private:
 	uint8_t sdb_anport3_r() { return m_mouse1y->read()^0x7f; }
 };
 
-#endif // MAME_INCLUDES_XAVIX_2000_H
+#endif // MAME_TVGAMES_XAVIX_2000_H

@@ -7,17 +7,17 @@
 namespace NCompress {
 namespace NBcj {
 
-STDMETHODIMP CCoder::Init()
+Z7_COM7F_IMF(CCoder2::Init())
 {
-  _bufferPos = 0;
-  x86_Convert_Init(_prevMask);
+  _pc = 0;
+  _state = Z7_BRANCH_CONV_ST_X86_STATE_INIT_VAL;
   return S_OK;
 }
 
-STDMETHODIMP_(UInt32) CCoder::Filter(Byte *data, UInt32 size)
+Z7_COM7F_IMF2(UInt32, CCoder2::Filter(Byte *data, UInt32 size))
 {
-  UInt32 processed = (UInt32)::x86_Convert(data, size, _bufferPos, &_prevMask, _encode);
-  _bufferPos += processed;
+  const UInt32 processed = (UInt32)(size_t)(_convFunc(data, size, _pc, &_state) - data);
+  _pc += processed;
   return processed;
 }
 

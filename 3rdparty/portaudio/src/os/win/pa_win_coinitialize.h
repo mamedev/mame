@@ -23,13 +23,13 @@
  */
 
 /*
- * The text above constitutes the entire PortAudio license; however, 
+ * The text above constitutes the entire PortAudio license; however,
  * the PortAudio community also makes the following non-binding requests:
  *
  * Any person wishing to distribute modifications to the Software is
  * requested to send the modifications to the original developer so that
- * they can be incorporated into the canonical version. It is also 
- * requested that these non-binding requests be included along with the 
+ * they can be incorporated into the canonical version. It is also
+ * requested that these non-binding requests be included along with the
  * license above.
  */
 
@@ -50,12 +50,12 @@ extern "C"
 
 /**
  @brief Data type used to hold the result of an attempt to initialize COM
-    using PaWinUtil_CoInitialize. Must be retained between a call to 
+    using PaWinUtil_CoInitialize. Must be retained between a call to
     PaWinUtil_CoInitialize and a matching call to PaWinUtil_CoUninitialize.
 */
 typedef struct PaWinUtilComInitializationResult{
     int state;
-    int initializingThreadId;
+    DWORD initializingThreadId;
 } PaWinUtilComInitializationResult;
 
 
@@ -64,9 +64,9 @@ typedef struct PaWinUtilComInitializationResult{
 
  @param hostApiType the host API type id of the caller. Used for error reporting.
 
- @param comInitializationResult An output parameter. The value pointed to by 
-        this parameter stores information required by PaWinUtil_CoUninitialize 
-        to correctly uninitialize COM. The value should be retained and later 
+ @param comInitializationResult An output parameter. The value pointed to by
+        this parameter stores information required by PaWinUtil_CoUninitialize
+        to correctly uninitialize COM. The value should be retained and later
         passed to PaWinUtil_CoUninitialize.
 
  If PaWinUtil_CoInitialize returns paNoError, the caller must later call
@@ -76,7 +76,7 @@ PaError PaWinUtil_CoInitialize( PaHostApiTypeId hostApiType, PaWinUtilComInitial
 
 
 /**
- @brief Uninitialize the Microsoft COM subsystem on the current thread using 
+ @brief Uninitialize the Microsoft COM subsystem on the current thread using
  the result of a previous call to PaWinUtil_CoInitialize. Must be called on the same
  thread as PaWinUtil_CoInitialize.
 

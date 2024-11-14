@@ -13,8 +13,12 @@ TODO:
 ***************************************************************************/
 
 #include "emu.h"
-#include "asterix.h"
+
+#include "k053251.h"
+#include "k054156_k054157_k056832.h"
+#include "k053244_k053245.h"
 #include "konamipt.h"
+#include "konami_helper.h"
 
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
@@ -26,18 +30,169 @@ TODO:
 #include "speaker.h"
 
 
-#if 0
-uint16_t asterix_state::control2_r()
+namespace {
+
+class asterix_state : public driver_device
 {
-	return m_cur_control2;
+public:
+	asterix_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_audiocpu(*this, "audiocpu"),
+		m_k056832(*this, "k056832"),
+		m_k053244(*this, "k053244"),
+		m_k053251(*this, "k053251")
+	{ }
+
+	void asterix(machine_config &config);
+
+private:
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+
+	void main_map(address_map &map) ATTR_COLD;
+	void sound_map(address_map &map) ATTR_COLD;
+
+	void control2_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void sound_arm_nmi_w(uint8_t data);
+	void z80_nmi_w(int state);
+	void sound_irq_w(uint16_t data);
+	void protection_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void asterix_spritebank_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint32_t screen_update_asterix(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	INTERRUPT_GEN_MEMBER(asterix_interrupt);
+	K05324X_CB_MEMBER(sprite_callback);
+	K056832_CB_MEMBER(tile_callback);
+	void reset_spritebank();
+
+	/* video-related */
+	int         m_sprite_colorbase = 0;
+	int         m_layer_colorbase[4]{};
+	int         m_layerpri[3]{};
+	uint16_t    m_spritebank = 0U;
+	int         m_tilebanks[4]{};
+	int         m_spritebanks[4]{};
+
+	/* misc */
+	uint16_t    m_prot[2]{};
+	emu_timer  *m_nmi_blocked = nullptr;
+
+	/* devices */
+	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_audiocpu;
+	required_device<k056832_device> m_k056832;
+	required_device<k05324x_device> m_k053244;
+	required_device<k053251_device> m_k053251;
+};
+
+
+void asterix_state::reset_spritebank()
+{
+	m_k053244->bankselect(m_spritebank & 7);
+	m_spritebanks[0] = (m_spritebank << 12) & 0x7000;
+	m_spritebanks[1] = (m_spritebank <<  9) & 0x7000;
+	m_spritebanks[2] = (m_spritebank <<  6) & 0x7000;
+	m_spritebanks[3] = (m_spritebank <<  3) & 0x7000;
 }
-#endif
+
+void asterix_state::asterix_spritebank_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+{
+	COMBINE_DATA(&m_spritebank);
+	reset_spritebank();
+}
+
+K05324X_CB_MEMBER(asterix_state::sprite_callback)
+{
+	int pri = (*color & 0x00e0) >> 2;
+	if (pri <= m_layerpri[2])
+		*priority = 0;
+	else if (pri > m_layerpri[2] && pri <= m_layerpri[1])
+		*priority = 0xf0;
+	else if (pri > m_layerpri[1] && pri <= m_layerpri[0])
+		*priority = 0xf0 | 0xcc;
+	else
+		*priority = 0xf0 | 0xcc | 0xaa;
+	*color = m_sprite_colorbase | (*color & 0x001f);
+	*code = (*code & 0xfff) | m_spritebanks[(*code >> 12) & 3];
+}
+
+
+K056832_CB_MEMBER(asterix_state::tile_callback)
+{
+	*flags = *code & 0x1000 ? TILE_FLIPX : 0;
+	*color = (m_layer_colorbase[layer] + ((*code & 0xe000) >> 13)) & 0x7f;
+	*code = (*code & 0x03ff) | m_tilebanks[(*code >> 10) & 3];
+}
+
+uint32_t asterix_state::screen_update_asterix(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	static const int K053251_CI[4] = { k053251_device::CI0, k053251_device::CI2, k053251_device::CI3, k053251_device::CI4 };
+	int layer[3], plane, new_colorbase;
+
+	/* Layer offsets are different if horizontally flipped */
+	if (m_k056832->read_register(0x0) & 0x10)
+	{
+		m_k056832->set_layer_offs(0, 89 - 176, 0);
+		m_k056832->set_layer_offs(1, 91 - 176, 0);
+		m_k056832->set_layer_offs(2, 89 - 176, 0);
+		m_k056832->set_layer_offs(3, 95 - 176, 0);
+	}
+	else
+	{
+		m_k056832->set_layer_offs(0, 89, 0);
+		m_k056832->set_layer_offs(1, 91, 0);
+		m_k056832->set_layer_offs(2, 89, 0);
+		m_k056832->set_layer_offs(3, 95, 0);
+	}
+
+
+	m_tilebanks[0] = (m_k056832->get_lookup(0) << 10);
+	m_tilebanks[1] = (m_k056832->get_lookup(1) << 10);
+	m_tilebanks[2] = (m_k056832->get_lookup(2) << 10);
+	m_tilebanks[3] = (m_k056832->get_lookup(3) << 10);
+
+	// update color info and refresh tilemaps
+	m_sprite_colorbase = m_k053251->get_palette_index(k053251_device::CI1);
+
+	for (plane = 0; plane < 4; plane++)
+	{
+		new_colorbase = m_k053251->get_palette_index(K053251_CI[plane]);
+		if (m_layer_colorbase[plane] != new_colorbase)
+		{
+			m_layer_colorbase[plane] = new_colorbase;
+			m_k056832->mark_plane_dirty(plane);
+		}
+	}
+
+	layer[0] = 0;
+	m_layerpri[0] = m_k053251->get_priority(k053251_device::CI0);
+	layer[1] = 1;
+	m_layerpri[1] = m_k053251->get_priority(k053251_device::CI2);
+	layer[2] = 3;
+	m_layerpri[2] = m_k053251->get_priority(k053251_device::CI4);
+
+	konami_sortlayers3(layer, m_layerpri);
+
+	screen.priority().fill(0, cliprect);
+	bitmap.fill(0, cliprect);
+
+	m_k056832->tilemap_draw(screen, bitmap, cliprect, layer[0], K056832_DRAW_FLAG_MIRROR, 1);
+	m_k056832->tilemap_draw(screen, bitmap, cliprect, layer[1], K056832_DRAW_FLAG_MIRROR, 2);
+	m_k056832->tilemap_draw(screen, bitmap, cliprect, layer[2], K056832_DRAW_FLAG_MIRROR, 4);
+
+/* this isn't supported anymore and it is unsure if still needed; keeping here for reference
+    pdrawgfx_shadow_lowpri = 1; fix shadows in front of feet */
+	m_k053244->sprites_draw(bitmap, cliprect, screen.priority());
+
+	m_k056832->tilemap_draw(screen, bitmap, cliprect, 2, K056832_DRAW_FLAG_MIRROR, 0);
+	return 0;
+}
+
 
 void asterix_state::control2_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		m_cur_control2 = data;
 		/* bit 0 is data */
 		/* bit 1 is cs (active low) */
 		/* bit 2 is clock (active high) */
@@ -65,16 +220,17 @@ INTERRUPT_GEN_MEMBER(asterix_state::asterix_interrupt)
 	device.execute().set_input_line(5, HOLD_LINE); /* ??? All irqs have the same vector, and the mask used is 0 or 7 */
 }
 
-TIMER_CALLBACK_MEMBER(asterix_state::audio_nmi)
-{
-	m_audiocpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
-}
-
 void asterix_state::sound_arm_nmi_w(uint8_t data)
 {
+	// see notes in simpsons driver
 	m_audiocpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
-	if (!m_audio_nmi_timer->remaining().is_never())
-		m_audio_nmi_timer->adjust(attotime::from_usec(5));
+	m_nmi_blocked->adjust(m_audiocpu->cycles_to_attotime(4));
+}
+
+void asterix_state::z80_nmi_w(int state)
+{
+	if (state && !m_nmi_blocked->enabled())
+		m_audiocpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 }
 
 void asterix_state::sound_irq_w(uint16_t data)
@@ -85,45 +241,6 @@ void asterix_state::sound_irq_w(uint16_t data)
 // Check the routine at 7f30 in the ead version.
 // You're not supposed to laugh.
 // This emulation is grossly overkill but hey, I'm having fun.
-#if 0
-void asterix_state::protection_w(offs_t offset, uint16_t data, uint16_t mem_mask)
-{
-	COMBINE_DATA(m_prot + offset);
-
-	if (offset == 1)
-	{
-		uint32_t cmd = (m_prot[0] << 16) | m_prot[1];
-		switch (cmd >> 24)
-		{
-		case 0x64:
-			{
-			uint32_t param1 = (read_word(cmd & 0xffffff) << 16) | read_word((cmd & 0xffffff) + 2);
-			uint32_t param2 = (read_word((cmd & 0xffffff) + 4) << 16) | read_word((cmd & 0xffffff) + 6);
-
-			switch (param1 >> 24)
-			{
-				case 0x22:
-				{
-					int size = param2 >> 24;
-					param1 &= 0xffffff;
-					param2 &= 0xffffff;
-					while(size >= 0)
-					{
-						write_word(param2, read_word(param1));
-						param1 += 2;
-						param2 += 2;
-						size--;
-					}
-				break;
-				}
-			}
-			break;
-			}
-		}
-	}
-}
-#endif
-
 void asterix_state::protection_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(m_prot + offset);
@@ -209,23 +326,21 @@ static INPUT_PORTS_START( asterix )
 
 	PORT_START("IN1")
 	KONAMI16_LSB(2, IPT_UNKNOWN, IPT_START2)
-	PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_er5911_device, do_read)
-	PORT_BIT( 0x0200, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_er5911_device, ready_read)
+	PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", FUNC(eeprom_serial_er5911_device::do_read))
+	PORT_BIT( 0x0200, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", FUNC(eeprom_serial_er5911_device::ready_read))
 	PORT_SERVICE_NO_TOGGLE(0x0400, IP_ACTIVE_LOW )
 	PORT_BIT( 0xf800, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
 	PORT_START( "EEPROMOUT" )
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_er5911_device, di_write)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_er5911_device, cs_write)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_er5911_device, clk_write)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", FUNC(eeprom_serial_er5911_device::di_write))
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", FUNC(eeprom_serial_er5911_device::cs_write))
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", FUNC(eeprom_serial_er5911_device::clk_write))
 INPUT_PORTS_END
 
 
 void asterix_state::machine_start()
 {
-	save_item(NAME(m_cur_control2));
 	save_item(NAME(m_prot));
-
 	save_item(NAME(m_sprite_colorbase));
 	save_item(NAME(m_spritebank));
 	save_item(NAME(m_layerpri));
@@ -233,12 +348,11 @@ void asterix_state::machine_start()
 	save_item(NAME(m_tilebanks));
 	save_item(NAME(m_spritebanks));
 
-	m_audio_nmi_timer = timer_alloc(FUNC(asterix_state::audio_nmi), this);
+	m_nmi_blocked = timer_alloc(timer_expired_delegate());
 }
 
 void asterix_state::machine_reset()
 {
-	m_cur_control2 = 0;
 	m_prot[0] = 0;
 	m_prot[1] = 0;
 
@@ -254,6 +368,10 @@ void asterix_state::machine_reset()
 		m_tilebanks[i] = 0;
 		m_spritebanks[i] = 0;
 	}
+
+	// Z80 _NMI goes low at same time as reset
+	m_audiocpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
+	m_audiocpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
 }
 
 void asterix_state::asterix(machine_config &config)
@@ -300,6 +418,7 @@ void asterix_state::asterix(machine_config &config)
 	k053260_device &k053260(K053260(config, "k053260", XTAL(32'000'000)/8)); // 4MHz
 	k053260.add_route(0, "lspeaker", 0.75);
 	k053260.add_route(1, "rspeaker", 0.75);
+	k053260.sh1_cb().set(FUNC(asterix_state::z80_nmi_w));
 }
 
 
@@ -428,18 +547,11 @@ ROM_START( asterixj )
 	ROM_LOAD( "asterixj.nv", 0x0000, 0x0080, CRC(84229f2c) SHA1(34c7491c731fbf741dfd53bfc559d91201ccfb03) )
 ROM_END
 
-
-void asterix_state::init_asterix()
-{
-#if 0
-	*(uint16_t *)(memregion("maincpu")->base() + 0x07f34) = 0x602a;
-	*(uint16_t *)(memregion("maincpu")->base() + 0x00008) = 0x0400;
-#endif
-}
+} // anonymous namespace
 
 
-GAME( 1992, asterix,    0,       asterix, asterix, asterix_state, init_asterix, ROT0, "Konami", "Asterix (ver EAD)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1992, asterixeac, asterix, asterix, asterix, asterix_state, init_asterix, ROT0, "Konami", "Asterix (ver EAC)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1992, asterixeaa, asterix, asterix, asterix, asterix_state, init_asterix, ROT0, "Konami", "Asterix (ver EAA)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1992, asterixaad, asterix, asterix, asterix, asterix_state, init_asterix, ROT0, "Konami", "Asterix (ver AAD)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1992, asterixj,   asterix, asterix, asterix, asterix_state, init_asterix, ROT0, "Konami", "Asterix (ver JAD)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1992, asterix,    0,       asterix, asterix, asterix_state, empty_init, ROT0, "Konami", "Asterix (ver EAD)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1992, asterixeac, asterix, asterix, asterix, asterix_state, empty_init, ROT0, "Konami", "Asterix (ver EAC)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1992, asterixeaa, asterix, asterix, asterix, asterix_state, empty_init, ROT0, "Konami", "Asterix (ver EAA)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1992, asterixaad, asterix, asterix, asterix, asterix_state, empty_init, ROT0, "Konami", "Asterix (ver AAD)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1992, asterixj,   asterix, asterix, asterix, asterix_state, empty_init, ROT0, "Konami", "Asterix (ver JAD)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )

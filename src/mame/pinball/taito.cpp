@@ -76,8 +76,8 @@ protected:
 	void mr_common();
 	void ms_common();
 	void taito_ay_audio(machine_config &config);
-	void audio_map(address_map &map);
-	void audio_map2(address_map &map);
+	void audio_map(address_map &map) ATTR_COLD;
+	void audio_map2(address_map &map) ATTR_COLD;
 	u8 pia_pb_r();
 	u8 m_sndcmd = 0x3eU;
 	required_device<m6802_cpu_device> m_audiocpu;
@@ -103,16 +103,16 @@ public:
 	void shock(machine_config &config);
 
 private:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 	u8 io_r(offs_t offset);
 	void io_w(offs_t offset, u8 data);
 	void pia_pb_w(u8 data);
-	DECLARE_WRITE_LINE_MEMBER(pia_cb2_w);
-	DECLARE_WRITE_LINE_MEMBER(votrax_request);
-	void shock_main_map(address_map &map);
-	void shock_audio_map(address_map &map);
-	void main_map(address_map &map);
+	void pia_cb2_w(int state);
+	void votrax_request(int state);
+	void shock_main_map(address_map &map) ATTR_COLD;
+	void shock_audio_map(address_map &map) ATTR_COLD;
+	void main_map(address_map &map) ATTR_COLD;
 
 	u8 m_votrax_cmd = 0U;
 	u8 m_io[32]{};
@@ -132,10 +132,10 @@ public:
 	void taitoz(machine_config &config);
 
 private:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	void mrblkz80_mem_map(address_map &map);
-	void mrblkz80_io_map(address_map &map);
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	void mrblkz80_mem_map(address_map &map) ATTR_COLD;
+	void mrblkz80_io_map(address_map &map) ATTR_COLD;
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_z);
 	void z80_col_w(u8);
 	void z80_disp_w(u8);
@@ -383,7 +383,7 @@ void taito_8080::io_w(offs_t offset, u8 data)
 		m_samples->start(0, 5); // outhole
 }
 
-WRITE_LINE_MEMBER( taito_8080::pia_cb2_w )
+void taito_8080::pia_cb2_w(int state)
 {
 	if (state)
 	{
@@ -405,7 +405,7 @@ void taito_8080::pia_pb_w(u8 data)
 		m_votrax_cmd = 0x3e; // stop the rattling
 }
 
-WRITE_LINE_MEMBER( taito_8080::votrax_request )
+void taito_8080::votrax_request(int state)
 {
 	m_pia->ca1_w(state);
 }
@@ -564,7 +564,7 @@ void taito_8080::taito4(machine_config &config)
 	taito(config);
 
 	SPEAKER(config, "voxsnd").front_center();
-	VOTRAX_SC01(config, m_votrax, 720000); // guess
+	VOTRAX_SC01A(config, m_votrax, 720000); // guess
 	m_votrax->ar_callback().set(FUNC(taito_8080::votrax_request));
 	m_votrax->add_route(ALL_OUTPUTS, "voxsnd", 2.0);
 

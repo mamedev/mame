@@ -63,16 +63,22 @@ Notes:
                 V100.U7  - ST M27C801 8MBit DIP32 EPROM; Audio Samples?
 
     TODO:
-     - Game speed seems to be completely wrong, timers and player movement too fast?
+     - blitter timing is guessed, definitely expect non-instant transfers otherwise game is too fast
+
+    The EEPROM protection method is the same as in the subsino2.cpp games.
 
 *********************************************************************************************************************/
 
 #include "emu.h"
+#include "subsino_io.h"
 #include "cpu/h8/h83048.h"
+#include "machine/ds2430a.h"
 #include "machine/nvram.h"
 #include "video/ramdac.h"
 #include "emupal.h"
 #include "screen.h"
+
+#define DEBUG_GFX 0
 
 
 namespace {
@@ -80,21 +86,20 @@ namespace {
 class lastfght_state : public driver_device
 {
 public:
-	lastfght_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	lastfght_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this,"maincpu"),
+		m_eeprom(*this, "eeprom"),
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette")
-		{ }
+	{ }
 
 	void lastfght(machine_config &config);
 
-	void init_lastfght();
-
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	/* memory */
@@ -108,17 +113,15 @@ private:
 	void sd_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	void blit_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	void dest_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-	uint16_t c00000_r();
-	uint16_t c00002_r();
-	uint16_t c00004_r();
-	uint16_t c00006_r();
-	void c00006_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint8_t c00000_r();
+	uint8_t c00002_r();
+	void c00007_w(uint8_t data);
 	uint16_t sound_r();
 	void sound_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void lastfght_map(address_map &map);
-	void ramdac_map(address_map &map);
+	void lastfght_map(address_map &map) ATTR_COLD;
+	void ramdac_map(address_map &map) ATTR_COLD;
 
 	/* video-related */
 	bitmap_ind16 m_bitmap[2];
@@ -136,18 +139,20 @@ private:
 	int m_y = 0;
 	int m_w = 0;
 	int m_h = 0;
-#ifdef MAME_DEBUG
+#if DEBUG_GFX
 	unsigned m_base = 0;
 	int m_view_roms = 0;
 #endif
 
-	/* misc */
-	uint16_t m_c00006 = 0;
-
 	/* devices */
 	required_device<cpu_device> m_maincpu;
+	required_device<ds2430a_device> m_eeprom;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
+
+	bool m_blitter_busy = false;
+	emu_timer *m_blitter_end_timer = nullptr;
+	TIMER_CALLBACK_MEMBER(blitter_end_cb);
 };
 
 
@@ -157,19 +162,19 @@ private:
 
 void lastfght_state::video_start()
 {
-	int i;
-	for (i = 0; i < 2; i++)
+	for (int i = 0; i < 2; i++)
 		m_screen->register_screen_bitmap(m_bitmap[i]);
 
 	save_item(NAME(m_bitmap[0]));
 	save_item(NAME(m_bitmap[1]));
+
+	m_blitter_end_timer = timer_alloc(FUNC(lastfght_state::blitter_end_cb), this);
 }
 
 
 uint32_t lastfght_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-#ifdef MAME_DEBUG
-#if 1
+#if DEBUG_GFX
 	// gfx roms viewer (toggle with enter, use pgup/down to browse)
 	uint8_t const *const gfxdata = memregion("gfx1")->base();
 
@@ -195,7 +200,6 @@ uint32_t lastfght_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 		popmessage("%x", m_base);
 		return 0;
 	}
-#endif
 #endif
 
 	copybitmap(bitmap, m_bitmap[m_dest ^ 1], 0, 0, 0, 0, cliprect);
@@ -347,9 +351,19 @@ void lastfght_state::blit_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 					dest.pix(m_y + y, m_x + x) = data;
 			}
 		}
+		m_blitter_busy = true;
+		// num pixels x2 seems to match a reasonable timer countdown during gameplay.
+		// notice that the other two bits (bit 6 and bit 5 in $c00007) are all
+		// busy checks, implying multiple stall checks (drawing? vblank?).
+		m_blitter_end_timer->adjust(m_maincpu->cycles_to_attotime(m_w * m_h * 2));
 	}
 	if (ACCESSING_BITS_0_7)
 		logerror("%06x: 600007.b = %02x\n", m_maincpu->pc(), data);
+}
+
+TIMER_CALLBACK_MEMBER(lastfght_state::blitter_end_cb)
+{
+	m_blitter_busy = false;
 }
 
 // toggle framebuffer
@@ -359,39 +373,22 @@ void lastfght_state::dest_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 		m_dest ^= 1;
 }
 
-uint16_t lastfght_state::c00000_r()
+uint8_t lastfght_state::c00000_r()
 {
-	// high byte:
 	// bit 7 = blitter busy
 	// bit 6 = blitter?
-	return 0x4000;
-
+	return 0x40 | m_blitter_busy << 7;
 }
 
-uint16_t lastfght_state::c00002_r()
+uint8_t lastfght_state::c00002_r()
 {
-	// high byte:
 	// mask 0x1c: from sound?
-	return (machine().rand() & 0x1c00) | ioport("IN0")->read();
+	return (machine().rand() & 0x1c) | 0x03;
 }
 
-uint16_t lastfght_state::c00004_r()
+void lastfght_state::c00007_w(uint8_t data)
 {
-	return ioport("IN1")->read();
-}
-
-uint16_t lastfght_state::c00006_r()
-{
-	// low byte:
-	// bit 7 = protection?
-	// bit 5 = blitter?
-	return ioport("IN2")->read();
-}
-
-void lastfght_state::c00006_w(offs_t offset, uint16_t data, uint16_t mem_mask)
-{
-	COMBINE_DATA(&m_c00006);
-	//  popmessage("%04x", m_c00006);
+	m_eeprom->data_w(!BIT(data, 6));
 }
 
 uint16_t lastfght_state::sound_r()
@@ -417,8 +414,8 @@ void lastfght_state::lastfght_map(address_map &map)
 {
 	map.global_mask(0xffffff);
 
-	map(0x000000, 0x07ffff).rom().region("maincpu", 0);
-	map(0x080000, 0x0fffff).rom().region("maincpu", 0);
+	map(0x000000, 0x007fff).rom();
+	map(0x080000, 0x0fffff).rom();
 
 	map(0x200000, 0x20ffff).ram().share("nvram"); // battery
 
@@ -439,10 +436,7 @@ void lastfght_state::lastfght_map(address_map &map)
 
 	map(0x800014, 0x800015).w(FUNC(lastfght_state::dest_w));
 
-	map(0xc00000, 0xc00001).r(FUNC(lastfght_state::c00000_r));
-	map(0xc00002, 0xc00003).r(FUNC(lastfght_state::c00002_r));
-	map(0xc00004, 0xc00005).r(FUNC(lastfght_state::c00004_r));
-	map(0xc00006, 0xc00007).rw(FUNC(lastfght_state::c00006_r), FUNC(lastfght_state::c00006_w));
+	map(0xc00000, 0xc0001f).rw("io", FUNC(ss9802_device::read), FUNC(ss9802_device::write));
 }
 
 void lastfght_state::ramdac_map(address_map &map)
@@ -455,62 +449,50 @@ void lastfght_state::ramdac_map(address_map &map)
 ***************************************************************************/
 
 static INPUT_PORTS_START( lastfght )
-	PORT_START("IN0")   /* IN0 - c00002&3 */
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_SERVICE1       )
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_UNKNOWN        )
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_OTHER          ) PORT_NAME("Reset") PORT_CODE(KEYCODE_F1)
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_UNKNOWN        )
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_UNKNOWN        )
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_UNKNOWN        )
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_SERVICE        )
-	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN        )
+	PORT_START("IN0")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE1       )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN        )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER          ) PORT_NAME("Reset") PORT_CODE(KEYCODE_F1)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN        )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN        )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN        )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE        )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN        )
 
-	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_UNKNOWN        )
-	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_UNKNOWN        )
-	PORT_BIT( 0x0400, IP_ACTIVE_HIGH,IPT_CUSTOM        )
-	PORT_BIT( 0x0800, IP_ACTIVE_HIGH,IPT_CUSTOM        )
-	PORT_BIT( 0x1000, IP_ACTIVE_HIGH,IPT_CUSTOM        )
-	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_UNKNOWN        )
-	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN        )
-	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN        )
+	PORT_START("IN1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT  )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT  ) PORT_PLAYER(2)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(2)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN        )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN        )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1          )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN2          )
 
-	PORT_START("IN1")   /* IN1 - c00004&5 */
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON1        )
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_BUTTON2        )
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_UNKNOWN        )
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_JOYSTICK_UP    )
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_UNKNOWN        )
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_START1         )
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNKNOWN        )
-	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN  )
+	PORT_START("IN2")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1        )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2        )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN        )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_UP    )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN        )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START1         )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN        )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN  )
 
-	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT  )
-	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT )
-	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT  ) PORT_PLAYER(2)
-	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(2)
-	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_UNKNOWN        )
-	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_UNKNOWN        )
-	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_COIN1          )
-	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_COIN2          )
+	PORT_START("IN3")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1        ) PORT_PLAYER(2)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2        ) PORT_PLAYER(2)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN        )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_UP    ) PORT_PLAYER(2)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN        )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START2         )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN        )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN  ) PORT_PLAYER(2)
 
-	PORT_START("IN2")   /* IN2 - c00006&7 */
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_UNKNOWN        )
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_UNKNOWN        )
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_UNKNOWN        )
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_UNKNOWN        )
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_UNKNOWN        )
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_UNKNOWN        )
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNKNOWN        )
-	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN        )
-
-	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_BUTTON1        ) PORT_PLAYER(2)
-	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_BUTTON2        ) PORT_PLAYER(2)
-	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_UNKNOWN        )
-	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_JOYSTICK_UP    ) PORT_PLAYER(2)
-	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_UNKNOWN        )
-	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_START2         )
-	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN        )
-	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN  ) PORT_PLAYER(2)
+	PORT_START("PROT")
+	PORT_BIT( 0x005f, IP_ACTIVE_HIGH, IPT_UNUSED        ) // outputs
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_UNKNOWN        ) // blitter?
+	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_CUSTOM        ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", FUNC(ds2430a_device::data_r))
 INPUT_PORTS_END
 
 
@@ -534,7 +516,6 @@ void lastfght_state::machine_start()
 	save_item(NAME(m_y));
 	save_item(NAME(m_w));
 	save_item(NAME(m_h));
-	save_item(NAME(m_c00006));
 }
 
 void lastfght_state::machine_reset()
@@ -553,7 +534,6 @@ void lastfght_state::machine_reset()
 	m_y = 0;
 	m_w = 0;
 	m_h = 0;
-	m_c00006 = 0;
 }
 
 void lastfght_state::lastfght(machine_config &config)
@@ -561,9 +541,20 @@ void lastfght_state::lastfght(machine_config &config)
 	/* basic machine hardware */
 	H83044(config, m_maincpu, 32000000/2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &lastfght_state::lastfght_map);
-	m_maincpu->set_vblank_int("screen", FUNC(lastfght_state::irq0_line_hold));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
+
+	ss9802_device &io(SS9802(config, "io"));
+	io.in_port_callback<0>().set(FUNC(lastfght_state::c00000_r));
+	io.in_port_callback<2>().set(FUNC(lastfght_state::c00002_r));
+	io.in_port_callback<3>().set_ioport("IN0");
+	io.in_port_callback<4>().set_ioport("IN1");
+	io.in_port_callback<5>().set_ioport("IN2");
+	io.in_port_callback<6>().set_ioport("IN3");
+	io.in_port_callback<7>().set_ioport("PROT");
+	io.out_port_callback<7>().set(FUNC(lastfght_state::c00007_w));
+
+	DS2430A(config, m_eeprom).set_timing_scale(0.32);
 
 	/* video hardware */
 	PALETTE(config, m_palette).set_entries(256);
@@ -575,8 +566,10 @@ void lastfght_state::lastfght(machine_config &config)
 	m_screen->set_size(512, 256);
 	m_screen->set_visarea(0, 512-1, 0, 256-16-1);
 	m_screen->set_refresh_hz(60);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500));
 	m_screen->set_screen_update(FUNC(lastfght_state::screen_update));
 	m_screen->set_palette(m_palette);
+	m_screen->screen_vblank().set_inputline(m_maincpu, 0);
 }
 
 
@@ -585,31 +578,24 @@ void lastfght_state::lastfght(machine_config &config)
 ***************************************************************************/
 
 ROM_START( lastfght )
-	ROM_REGION( 0x100000, "maincpu", 0 )        // H8/3044 program
-	ROM_LOAD( "v106.u16", 0x000000, 0x080000, CRC(7aec89f4) SHA1(7cff00844ad82a0f8d19b1bd07ba3a2bced69d66) )
+	ROM_REGION( 0x100000, "maincpu", 0 ) // H8/3044 program
+	ROM_LOAD( "ss9689_6433044a22f.u12", 0x000000, 0x008000, CRC(ece09075) SHA1(a8bc3aa44f30a6f919f4151c6093fb52e5da2f40) )
+	ROM_LOAD( "v106.u16",               0x080000, 0x080000, CRC(7aec89f4) SHA1(7cff00844ad82a0f8d19b1bd07ba3a2bced69d66) )
 
-	ROM_REGION( 0x800000, "gfx1", 0 )       // Blitter data
+	ROM_REGION( 0x800000, "gfx1", 0 ) // Blitter data
 	ROM_LOAD( "1.b1", 0x000000, 0x200000, CRC(6c438136) SHA1(138934e948bbd6bd80f354f037badedef6cd8cb1) )
 	ROM_LOAD( "2.b2", 0x200000, 0x200000, CRC(9710bcff) SHA1(0291385489a065ed895c99ae7197fdeac0a0e2a0) )
 	ROM_LOAD( "3.b3", 0x400000, 0x200000, CRC(4236c79a) SHA1(94f093d12c096d38d1e7278796f6d58e4ba14e2e) )
 	ROM_LOAD( "4.b4", 0x600000, 0x200000, CRC(68153b0f) SHA1(46ddf37d5885f411e0e6de9c7e8969ba3a00f17f) )
 
-	ROM_REGION( 0x100000, "samples", 0 )    // Samples
+	ROM_REGION( 0x100000, "samples", 0 ) // Samples
 	ROM_LOAD( "v100.u7", 0x000000, 0x100000, CRC(c134378c) SHA1(999c75f3a7890421cfd904a926ca377ee43a6825) )
+
+	ROM_REGION( 0x28, "eeprom", 0 )
+	ROM_LOAD( "ds2430a.q3", 0x00, 0x28, CRC(af461d83) SHA1(bb8d25e9bb60e00e460e4b7e1855c735becaaa6d) )
 ROM_END
 
-void lastfght_state::init_lastfght()
-{
-	uint16_t *rom = (uint16_t*)memregion("maincpu")->base();
-
-	// pass initial check (protection ? hw?)
-	rom[0x00354 / 2] = 0x403e;
-
-	// rts -> rte
-	rom[0x01b86 / 2] = 0x5670;
-}
-
-} // Anonymous namespace
+} // anonymous namespace
 
 
-GAME( 2000, lastfght, 0, lastfght, lastfght, lastfght_state, init_lastfght, ROT0, "Subsino", "Last Fighting", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 2000, lastfght, 0, lastfght, lastfght, lastfght_state, empty_init, ROT0, "Subsino", "Last Fighting", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IMPERFECT_TIMING | MACHINE_SUPPORTS_SAVE )

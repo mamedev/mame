@@ -55,14 +55,14 @@ public:
 	void kpontoon(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	tilemap_t *m_ttl_tilemap;
 
-	void main_map(address_map &map);
-	void sound_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
+	void sound_map(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu, m_audiocpu;
 	required_memory_bank m_mainbank;
@@ -94,12 +94,12 @@ private:
 	void snd_bnk_w(u8 data);
 
 	TILE_GET_INFO_MEMBER(ttl_get_tile_info);
-	DECLARE_WRITE_LINE_MEMBER(k054539_nmi_gen);
+	void k054539_nmi_gen(int state);
 
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(ccu_scanline);
-	WRITE_LINE_MEMBER(vbl_ack_w) { m_maincpu->set_input_line(0, CLEAR_LINE); }
-	WRITE_LINE_MEMBER(nmi_ack_w) { m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE); }
+	void vbl_ack_w(int state) { m_maincpu->set_input_line(0, CLEAR_LINE); }
+	void nmi_ack_w(int state) { m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE); }
 
 	u8 m_control;
 	u8 m_charrom_bank;
@@ -215,7 +215,7 @@ void kpontoon_state::snd_to_main_w(offs_t offset, u8 data)
 	}
 }
 
-WRITE_LINE_MEMBER(kpontoon_state::k054539_nmi_gen)
+void kpontoon_state::k054539_nmi_gen(int state)
 {
 	// Trigger an /NMI on the rising edge
 	if (!m_sound_nmi_clk && state)

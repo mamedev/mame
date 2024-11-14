@@ -6,8 +6,8 @@
 
 ***************************************************************************/
 
-#ifndef MAME_INCLUDES_FCRASH_H
-#define MAME_INCLUDES_FCRASH_H
+#ifndef MAME_CAPCOM_FCRASH_H
+#define MAME_CAPCOM_FCRASH_H
 
 #pragma once
 
@@ -55,8 +55,8 @@ protected:
 
 	void fcrash_soundlatch_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	void fcrash_snd_bankswitch_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(m5205_int1);
-	DECLARE_WRITE_LINE_MEMBER(m5205_int2);
+	void m5205_int1(int state);
+	void m5205_int2(int state);
 	void fcrash_msm5205_0_data_w(uint8_t data);
 	void fcrash_msm5205_1_data_w(uint8_t data);
 	void cawingbl_soundlatch_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
@@ -77,19 +77,19 @@ protected:
 	void fcrash_render_high_layer(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int layer);
 	virtual void fcrash_build_palette();
 
-	void fcrash_map(address_map &map);
-	void mtwinsb_map(address_map &map);
-	void sf2m1_map(address_map &map);
-	void sgyxz_map(address_map &map);
-	void wofabl_map(address_map &map);
-	void wofr1bl_map(address_map &map);
-	void varthb_map(address_map &map);
+	void fcrash_map(address_map &map) ATTR_COLD;
+	void mtwinsb_map(address_map &map) ATTR_COLD;
+	void sf2m1_map(address_map &map) ATTR_COLD;
+	void sgyxz_map(address_map &map) ATTR_COLD;
+	void wofabl_map(address_map &map) ATTR_COLD;
+	void wofr1bl_map(address_map &map) ATTR_COLD;
+	void varthb_map(address_map &map) ATTR_COLD;
 
-	void fcrash_sound_map(address_map &map);
-	void ffightblb_sound_map(address_map &map);
-	void ffightblb_oki_map(address_map &map);
-	void kodb_sound_map(address_map &map);
-	void sgyxz_sound_map(address_map &map);
+	void fcrash_sound_map(address_map &map) ATTR_COLD;
+	void ffightblb_sound_map(address_map &map) ATTR_COLD;
+	void ffightblb_oki_map(address_map &map) ATTR_COLD;
+	void kodb_sound_map(address_map &map) ATTR_COLD;
+	void sgyxz_sound_map(address_map &map) ATTR_COLD;
 
 	/* sound hw */
 	int m_sample_buffer1 = 0;
@@ -128,4 +128,4 @@ private:
 	void fcrash_build_palette() override;
 };
 
-#endif // MAME_INCLUDES_FCRASH_H
+#endif // MAME_CAPCOM_FCRASH_H

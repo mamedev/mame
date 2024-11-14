@@ -4,7 +4,7 @@
 // Menu controller, stores / increments menu position etc. used on handhelds that typically have BL on the boot screen (BaoBaoLong?)
 
 #include "emu.h"
-#include "machine/bl_handhelds_menucontrol.h"
+#include "bl_handhelds_menucontrol.h"
 
 DEFINE_DEVICE_TYPE(BL_HANDHELDS_MENUCONTROL, bl_handhelds_menucontrol_device, "blhandheldmenu", "BaoBaoLong Handhelds Menu Controller")
 
@@ -14,12 +14,12 @@ bl_handhelds_menucontrol_device::bl_handhelds_menucontrol_device(const machine_c
 {
 }
 
-READ_LINE_MEMBER(bl_handhelds_menucontrol_device::status_r)
+int bl_handhelds_menucontrol_device::status_r()
 {
 	return m_clockstate;
 }
 
-READ_LINE_MEMBER(bl_handhelds_menucontrol_device::data_r)
+int bl_handhelds_menucontrol_device::data_r()
 {
 	return m_responsebit;
 }
@@ -156,7 +156,7 @@ void bl_handhelds_menucontrol_device::handle_command()
 	}
 }
 
-WRITE_LINE_MEMBER(bl_handhelds_menucontrol_device::clock_w)
+void bl_handhelds_menucontrol_device::clock_w(int state)
 {
 	if (state)
 	{
@@ -178,12 +178,12 @@ WRITE_LINE_MEMBER(bl_handhelds_menucontrol_device::clock_w)
 	}
 }
 
-WRITE_LINE_MEMBER(bl_handhelds_menucontrol_device::data_w)
+void bl_handhelds_menucontrol_device::data_w(int state)
 {
 	m_commandbit = state;
 }
 
-WRITE_LINE_MEMBER(bl_handhelds_menucontrol_device::reset_w)
+void bl_handhelds_menucontrol_device::reset_w(int state)
 {
 	m_datashifterpos = 0;
 }

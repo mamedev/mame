@@ -3,8 +3,8 @@
 //*************************************
 // iteagle fpga device
 //*************************************
-#ifndef MAME_MACHINE_ITEAGLE_FPGA_H
-#define MAME_MACHINE_ITEAGLE_FPGA_H
+#ifndef MAME_ITECH_ITEAGLE_FPGA_H
+#define MAME_ITECH_ITEAGLE_FPGA_H
 
 #include "machine/pci.h"
 #include "machine/nvram.h"
@@ -27,6 +27,7 @@ public:
 	std::string get_tx_str(int channel) { return m_serial_tx[channel]; }
 	void clear_tx_str(int channel) { m_serial_tx[channel].clear(); }
 	bool check_interrupt() { return (m_rr_regs[0][3] != 0); }
+
 private:
 	uint8_t m_rr_regs[2][16];
 	uint8_t m_wr_regs[2][16];
@@ -51,7 +52,7 @@ public:
 	template <typename T> void set_irq_info(T &&tag, const int irq_num, int serial_num)
 	{ m_cpu.set_tag(std::forward<T>(tag)); m_irq_num = irq_num; m_serial_irq_num = serial_num; }
 
-	DECLARE_WRITE_LINE_MEMBER(vblank_update);
+	void vblank_update(int state);
 	void serial_rx_w(uint8_t data);
 
 	enum { IO_SYSTEM, IO_IN1, IO_SW5, IO_NUM };
@@ -62,9 +63,9 @@ public:
 	auto guny_callback() { return m_guny_cb.bind(); }
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 	TIMER_CALLBACK_MEMBER(assert_vblank_irq);
 
@@ -80,7 +81,7 @@ private:
 	devcb_read16 m_gunx_cb;
 	devcb_read16 m_guny_cb;
 
-	emu_timer *     m_timer;
+	emu_timer *m_timer;
 	int m_irq_num;
 	int m_serial_irq_num;
 
@@ -104,9 +105,9 @@ private:
 	void update_sequence(uint32_t data);
 	void update_sequence_eg1(uint32_t data);
 
-	void rtc_map(address_map &map);
-	void fpga_map(address_map &map);
-	void ram_map(address_map &map);
+	void rtc_map(address_map &map) ATTR_COLD;
+	void fpga_map(address_map &map) ATTR_COLD;
+	void ram_map(address_map &map) ATTR_COLD;
 
 	uint32_t fpga_r(offs_t offset, uint32_t mem_mask = ~0);
 	void fpga_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
@@ -118,7 +119,7 @@ private:
 	uint32_t e1_ram_r(offs_t offset, uint32_t mem_mask = ~0);
 	void e1_ram_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 
-	DECLARE_WRITE_LINE_MEMBER(serial_interrupt);
+	void serial_interrupt(int state);
 };
 
 class iteagle_eeprom_device : public pci_device {
@@ -131,9 +132,9 @@ public:
 	void set_info(int sw_version, int hw_version) {m_sw_version=sw_version; m_hw_version=hw_version;}
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 private:
 	address_space *m_memory_space = nullptr;
@@ -142,7 +143,7 @@ private:
 
 	std::array<uint16_t, 0x40> m_iteagle_default_eeprom;
 
-	void eeprom_map(address_map &map);
+	void eeprom_map(address_map &map) ATTR_COLD;
 	uint32_t eeprom_r(offs_t offset, uint32_t mem_mask = ~0);
 	void eeprom_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 
@@ -155,9 +156,9 @@ public:
 	iteagle_periph_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 private:
 	optional_device<nvram_device> m_rtc;
@@ -165,15 +166,14 @@ private:
 	uint32_t m_ctrl_regs[0xd0/4];
 	uint8_t m_rtc_regs[0x100];
 
-	void ctrl_map(address_map &map);
+	void ctrl_map(address_map &map) ATTR_COLD;
 
 	uint32_t ctrl_r(offs_t offset, uint32_t mem_mask = ~0);
 	void ctrl_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
-
 };
 
 DECLARE_DEVICE_TYPE(ITEAGLE_FPGA, iteagle_fpga_device)
 DECLARE_DEVICE_TYPE(ITEAGLE_EEPROM, iteagle_eeprom_device)
 DECLARE_DEVICE_TYPE(ITEAGLE_PERIPH, iteagle_periph_device)
 
-#endif // MAME_MACHINE_ITEAGLE_FPGA_H
+#endif // MAME_ITECH_ITEAGLE_FPGA_H

@@ -42,9 +42,9 @@ public:
 protected:
 	a2bus_midi_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual void device_start() override;
-	virtual void device_reset() override;
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 	virtual uint8_t read_c0nx(uint8_t offset) override;
 	virtual void write_c0nx(uint8_t offset, uint8_t data) override;
@@ -53,9 +53,9 @@ protected:
 	required_device<acia6850_device> m_acia;
 
 private:
-	DECLARE_WRITE_LINE_MEMBER( acia_irq_w );
-	DECLARE_WRITE_LINE_MEMBER( ptm_irq_w );
-	DECLARE_WRITE_LINE_MEMBER( write_acia_clock );
+	void acia_irq_w(int state);
+	void ptm_irq_w(int state);
+	void write_acia_clock(int state);
 
 	bool m_acia_irq, m_ptm_irq;
 };
@@ -149,7 +149,7 @@ void a2bus_midi_device::write_c0nx(uint8_t offset, uint8_t data)
 	}
 }
 
-WRITE_LINE_MEMBER( a2bus_midi_device::acia_irq_w )
+void a2bus_midi_device::acia_irq_w(int state)
 {
 	m_acia_irq = state ? true : false;
 
@@ -163,7 +163,7 @@ WRITE_LINE_MEMBER( a2bus_midi_device::acia_irq_w )
 	}
 }
 
-WRITE_LINE_MEMBER( a2bus_midi_device::ptm_irq_w )
+void a2bus_midi_device::ptm_irq_w(int state)
 {
 	m_acia_irq = state ? true : false;
 
@@ -177,7 +177,7 @@ WRITE_LINE_MEMBER( a2bus_midi_device::ptm_irq_w )
 	}
 }
 
-WRITE_LINE_MEMBER( a2bus_midi_device::write_acia_clock )
+void a2bus_midi_device::write_acia_clock(int state)
 {
 	m_acia->write_txc(state);
 	m_acia->write_rxc(state);

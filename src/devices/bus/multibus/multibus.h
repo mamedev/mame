@@ -87,9 +87,15 @@ public:
 	template <unsigned I> auto int_callback() { return m_int_cb[I].bind(); }
 	template <unsigned I> void int_w(int state) { m_int_cb[I](state); }
 
+	// XACK/
+	auto xack_cb() { return m_xack_cb.bind(); }
+
+	// Set XACK/ signal (this is meant for "device_multibus_interface" devices)
+	void xack_w(int state) { m_xack_cb(state); }
+
 protected:
 	// device_t overrides
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 	// device_memory_interface overrides
 	virtual space_config_vector memory_space_config() const override;
@@ -99,6 +105,7 @@ private:
 	address_space_config const m_pio_config;
 
 	devcb_write_line::array<8> m_int_cb;
+	devcb_write_line m_xack_cb;
 };
 
 class multibus_slot_device
@@ -120,8 +127,8 @@ public:
 	}
 
 protected:
-	virtual void device_start() override;
-	virtual void device_resolve_objects() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_resolve_objects() override ATTR_COLD;
 
 private:
 	required_device<multibus_device> m_bus;
@@ -138,6 +145,8 @@ protected:
 
 	template <unsigned I> void int_w(int state) { m_bus->int_w<I>(state); }
 	void int_w(unsigned number, int state);
+
+	void xack_w(int state) { m_bus->xack_w(state); }
 
 	multibus_device *m_bus;
 };

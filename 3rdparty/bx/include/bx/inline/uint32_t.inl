@@ -1,6 +1,6 @@
 /*
- * Copyright 2010-2021 Branimir Karadzic. All rights reserved.
- * License: https://github.com/bkaradzic/bx#license-bsd-2-clause
+ * Copyright 2010-2022 Branimir Karadzic. All rights reserved.
+ * License: https://github.com/bkaradzic/bx/blob/master/LICENSE
  */
 
 // Copyright 2006 Mike Acton <macton@gmail.com>
@@ -336,7 +336,7 @@ namespace bx
 	}
 
 	template<>
-	inline BX_CONSTEXPR_FUNC uint32_t uint32_cntbits(uint64_t _val)
+	inline BX_CONSTEXPR_FUNC uint32_t uint32_cntbits(unsigned long long _val)
 	{
 #if BX_COMPILER_GCC || BX_COMPILER_CLANG
 		return __builtin_popcountll(_val);
@@ -344,10 +344,16 @@ namespace bx
 		const uint32_t lo = uint32_t(_val&UINT32_MAX);
 		const uint32_t hi = uint32_t(_val>>32);
 
-		const uint32_t total = uint32_cntbits(lo)
-							 + uint32_cntbits(hi);
-		return total;
+		return uint32_cntbits(lo)
+			+  uint32_cntbits(hi)
+			;
 #endif // BX_COMPILER_*
+	}
+
+	template<>
+	inline BX_CONSTEXPR_FUNC uint32_t uint32_cntbits(unsigned long _val)
+	{
+		return uint32_cntbits<unsigned long long>(_val);
 	}
 
 	template<> inline BX_CONSTEXPR_FUNC uint32_t uint32_cntbits(uint8_t  _val) { return uint32_cntbits<uint32_t>(_val); }
@@ -381,7 +387,7 @@ namespace bx
 	}
 
 	template<>
-	inline BX_CONSTEXPR_FUNC uint32_t uint32_cntlz(uint64_t _val)
+	inline BX_CONSTEXPR_FUNC uint32_t uint32_cntlz(unsigned long long _val)
 	{
 #if BX_COMPILER_GCC || BX_COMPILER_CLANG
 		return 0 == _val ? 64 : __builtin_clzll(_val);
@@ -391,6 +397,12 @@ namespace bx
 			 : uint32_cntlz(uint32_t(_val) ) + 32
 			 ;
 #endif // BX_COMPILER_*
+	}
+
+	template<>
+	inline BX_CONSTEXPR_FUNC uint32_t uint32_cntlz(unsigned long _val)
+	{
+		return uint32_cntlz<unsigned long long>(_val);
 	}
 
 	template<> inline BX_CONSTEXPR_FUNC uint32_t uint32_cntlz(uint8_t  _val) { return uint32_cntlz<uint32_t>(_val)-24; }
@@ -416,7 +428,7 @@ namespace bx
 	}
 
 	template<>
-	inline BX_CONSTEXPR_FUNC uint32_t uint32_cnttz(uint64_t _val)
+	inline BX_CONSTEXPR_FUNC uint32_t uint32_cnttz(unsigned long long _val)
 	{
 #if BX_COMPILER_GCC || BX_COMPILER_CLANG
 		return 0 == _val ? 64 : __builtin_ctzll(_val);
@@ -426,6 +438,12 @@ namespace bx
 			: uint32_cnttz(uint32_t(_val>>32) ) + 32
 			;
 #endif // BX_COMPILER_*
+	}
+
+	template<>
+	inline BX_CONSTEXPR_FUNC uint32_t uint32_cnttz(unsigned long _val)
+	{
+		return uint32_cnttz<unsigned long long>(_val);
 	}
 
 	template<> inline BX_CONSTEXPR_FUNC uint32_t uint32_cnttz(uint8_t  _val) { return bx::min(8u,  uint32_cnttz<uint32_t>(_val) ); }
@@ -687,66 +705,67 @@ namespace bx
 		return result;
 	}
 
-	template <typename Ty>
-	inline bool isAligned(Ty _a, int32_t _align)
+	template<typename Ty>
+	inline BX_CONSTEXPR_FUNC bool isAligned(Ty _a, int32_t _align)
 	{
 		const Ty mask = Ty(_align - 1);
 		return 0 == (_a & mask);
 	}
 
-	template <typename Ty>
-	inline bool isAligned(const Ty* _ptr, int32_t _align)
+	template<typename Ty>
+	inline BX_CONSTEXPR_FUNC bool isAligned(Ty* _ptr, int32_t _align)
 	{
 		union { const void* ptr; uintptr_t addr; } un = { _ptr };
 		return isAligned(un.addr, _align);
 	}
 
-	template <typename Ty>
-	inline bool isAligned(Ty* _ptr, int32_t _align)
+	template<typename Ty>
+	inline BX_CONSTEXPR_FUNC bool isAligned(const Ty* _ptr, int32_t _align)
 	{
-		return isAligned( (const void*)_ptr, _align);
+		union { const void* ptr; uintptr_t addr; } un = { _ptr };
+		return isAligned(un.addr, _align);
 	}
 
-	template <typename Ty>
-	inline Ty alignDown(Ty _a, int32_t _align)
+	template<typename Ty>
+	inline BX_CONSTEXPR_FUNC  Ty alignDown(Ty _a, int32_t _align)
 	{
 		const Ty mask = Ty(_align - 1);
 		return Ty(_a & ~mask);
 	}
 
-	template <typename Ty>
-	inline Ty* alignDown(Ty* _ptr, int32_t _align)
+	template<typename Ty>
+	inline BX_CONSTEXPR_FUNC Ty* alignDown(Ty* _ptr, int32_t _align)
 	{
 		union { Ty* ptr; uintptr_t addr; } un = { _ptr };
 		un.addr = alignDown(un.addr, _align);
 		return un.ptr;
 	}
 
-	template <typename Ty>
-	inline const Ty* alignDown(const Ty* _ptr, int32_t _align)
+	template<typename Ty>
+	inline BX_CONSTEXPR_FUNC const Ty* alignDown(const Ty* _ptr, int32_t _align)
 	{
 		union { const Ty* ptr; uintptr_t addr; } un = { _ptr };
 		un.addr = alignDown(un.addr, _align);
 		return un.ptr;
 	}
 
-	template <typename Ty>
-	inline Ty alignUp(Ty _a, int32_t _align)
+	template<typename Ty>
+	inline BX_CONSTEXPR_FUNC Ty alignUp(Ty _a, int32_t _align)
 	{
 		const Ty mask = Ty(_align - 1);
 		return Ty( (_a + mask) & ~mask);
 	}
 
-	template <typename Ty>
-	inline Ty* alignUp(Ty* _ptr, int32_t _align)
+	template<typename Ty>
+	inline BX_CONSTEXPR_FUNC Ty* alignUp(Ty* _ptr, int32_t _align)
 	{
 		union { Ty* ptr; uintptr_t addr; } un = { _ptr };
 		un.addr = alignUp(un.addr, _align);
 		return un.ptr;
 	}
 
-	template <typename Ty>
-	inline const Ty* alignUp(const Ty* _ptr, int32_t _align)
+	template<typename Ty>
+	inline BX_CONSTEXPR_FUNC const Ty* alignUp(const Ty* _ptr, int32_t _align)
 	{
 		union { const Ty* ptr; uintptr_t addr; } un = { _ptr };
 		un.addr = alignUp(un.addr, _align);

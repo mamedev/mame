@@ -140,6 +140,9 @@ RAM4 is HMC HM6264LP-70
 #include "screen.h"
 #include "speaker.h"
 
+
+namespace {
+
 class gstream_state : public driver_device
 {
 public:
@@ -161,9 +164,9 @@ public:
 	void init_gstream();
 	void init_x2222();
 
-	DECLARE_READ_LINE_MEMBER(mirror_service_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(gstream_mirror_r);
-	DECLARE_READ_LINE_MEMBER(x2222_toggle_r);
+	int mirror_service_r();
+	ioport_value gstream_mirror_r();
+	int x2222_toggle_r();
 
 private:
 	/* devices */
@@ -193,9 +196,9 @@ private:
 	uint32_t gstream_speedup_r();
 	uint32_t x2222_speedup_r();
 	uint32_t x2222_speedup2_r();
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void draw_bg(bitmap_rgb32 &bitmap, const rectangle &cliprect, int map, uint32_t* ram);
 	void drawgfx_transpen_x2222(bitmap_rgb32 &dest, const rectangle &cliprect, gfx_element *gfx,gfx_element *gfx2,
@@ -206,20 +209,20 @@ private:
 
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
-	void gstream_32bit_map(address_map &map);
-	void gstream_io(address_map &map);
-	void x2222_32bit_map(address_map &map);
-	void x2222_io(address_map &map);
+	void gstream_32bit_map(address_map &map) ATTR_COLD;
+	void gstream_io(address_map &map) ATTR_COLD;
+	void x2222_32bit_map(address_map &map) ATTR_COLD;
+	void x2222_io(address_map &map) ATTR_COLD;
 };
 
-READ_LINE_MEMBER(gstream_state::x2222_toggle_r) // or the game hangs when starting, might be a status flag for the sound?
+int gstream_state::x2222_toggle_r() // or the game hangs when starting, might be a status flag for the sound?
 {
 	m_toggle ^= 0xffff;
 	return m_toggle;
 }
 
 
-READ_LINE_MEMBER(gstream_state::mirror_service_r)
+int gstream_state::mirror_service_r()
 {
 	int result;
 
@@ -229,7 +232,7 @@ READ_LINE_MEMBER(gstream_state::mirror_service_r)
 	return ~result;
 }
 
-CUSTOM_INPUT_MEMBER(gstream_state::gstream_mirror_r)
+ioport_value gstream_state::gstream_mirror_r()
 {
 	int result;
 
@@ -427,10 +430,10 @@ static INPUT_PORTS_START( gstream )
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_SERVICE2 )
 	PORT_BIT( 0x7000, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(gstream_state, mirror_service_r)
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(gstream_state::mirror_service_r))
 
 	PORT_START("IN2")
-	PORT_BIT( 0x004f, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(gstream_state, gstream_mirror_r)
+	PORT_BIT( 0x004f, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(FUNC(gstream_state::gstream_mirror_r))
 	PORT_BIT( 0xffb0, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
@@ -522,7 +525,7 @@ static INPUT_PORTS_START( x2222 )
 	PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(gstream_state, x2222_toggle_r)
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(gstream_state::x2222_toggle_r))
 INPUT_PORTS_END
 
 
@@ -583,141 +586,136 @@ void gstream_state::drawgfx_transpen_x2222(bitmap_rgb32 &dest, const rectangle &
 	const pen_t *rgb = m_palette->pens(); // 16 bit BGR
 
 	// render
+	auto profile = g_profiler.start(PROFILER_DRAWGFX);
 
-	do {
-		g_profiler.start(PROFILER_DRAWGFX);
-		do {
-			int32_t destendx, destendy;
-			int32_t srcx, srcy;
-			int32_t dy;
+	int32_t destendx, destendy;
+	int32_t srcx, srcy;
+	int32_t dy;
 
-			assert(dest.valid());
-			assert(gfx != nullptr);
-			assert(dest.cliprect().contains(cliprect));
-			assert(code < gfx->elements());
+	assert(dest.valid());
+	assert(gfx != nullptr);
+	assert(dest.cliprect().contains(cliprect));
+	assert(code < gfx->elements());
 
-			/* ignore empty/invalid cliprects */
-			if (cliprect.empty())
-				break;
+	/* ignore empty/invalid cliprects */
+	if (cliprect.empty())
+		return;
 
-			/* compute final pixel in X and exit if we are entirely clipped */
-			destendx = destx + gfx->width() - 1;
-			if (destx > cliprect.max_x || destendx < cliprect.min_x)
-				break;
+	/* compute final pixel in X and exit if we are entirely clipped */
+	destendx = destx + gfx->width() - 1;
+	if (destx > cliprect.max_x || destendx < cliprect.min_x)
+		return;
 
-			/* apply left clip */
-			srcx = 0;
-			if (destx < cliprect.min_x)
+	/* apply left clip */
+	srcx = 0;
+	if (destx < cliprect.min_x)
+	{
+		srcx = cliprect.min_x - destx;
+		destx = cliprect.min_x;
+	}
+
+	/* apply right clip */
+	if (destendx > cliprect.max_x)
+		destendx = cliprect.max_x;
+
+	/* compute final pixel in Y and exit if we are entirely clipped */
+	destendy = desty + gfx->height() - 1;
+	if (desty > cliprect.max_y || destendy < cliprect.min_y)
+		return;
+
+	/* apply top clip */
+	srcy = 0;
+	if (desty < cliprect.min_y)
+	{
+		srcy = cliprect.min_y - desty;
+		desty = cliprect.min_y;
+	}
+
+	/* apply bottom clip */
+	if (destendy > cliprect.max_y)
+		destendy = cliprect.max_y;
+
+	/* apply X flipping */
+	if (flipx)
+		srcx = gfx->width() - 1 - srcx;
+
+	/* apply Y flipping */
+	dy = gfx->rowbytes();
+	if (flipy)
+	{
+		srcy = gfx->height() - 1 - srcy;
+		dy = -dy;
+	}
+
+	/* fetch the source data */
+	const uint8_t *srcdata = gfx->get_data(code);
+	const uint8_t *srcdata2 = gfx2->get_data(code);
+
+	/* compute how many blocks of 4 pixels we have */
+	uint32_t leftovers = (destendx + 1 - destx);
+
+	/* adjust srcdata to point to the first source pixel of the row */
+	srcdata += srcy * gfx->rowbytes() + srcx;
+	srcdata2 += srcy * gfx->rowbytes() + srcx;
+
+	/* non-flipped 16bpp case */
+	if (!flipx)
+	{
+		/* iterate over pixels in Y */
+		for (int32_t cury = desty; cury <= destendy; cury++)
+		{
+			uint32_t *destptr = &dest.pix(cury, destx);
+			const uint8_t *srcptr = srcdata;
+			const uint8_t *srcptr2 = srcdata2;
+			srcdata += dy;
+			srcdata2 += dy;
+
+			/* iterate over leftover pixels */
+			for (int32_t curx = 0; curx < leftovers; curx++)
 			{
-				srcx = cliprect.min_x - destx;
-				destx = cliprect.min_x;
+				uint32_t srcdata = (srcptr[0]);
+				uint32_t srcdata2 = (srcptr2[0]);
+
+				uint16_t full = (srcdata | (srcdata2 << 8));
+				if (full != 0)
+					destptr[0] = rgb[full];
+
+				srcptr++;
+				srcptr2++;
+				destptr++;
 			}
+		}
+	}
 
-			/* apply right clip */
-			if (destendx > cliprect.max_x)
-				destendx = cliprect.max_x;
+	/* flipped 16bpp case */
+	else
+	{
+		/* iterate over pixels in Y */
+		for (int32_t cury = desty; cury <= destendy; cury++)
+		{
+			uint32_t *destptr = &dest.pix(cury, destx);
+			const uint8_t *srcptr = srcdata;
+			const uint8_t *srcptr2 = srcdata2;
 
-			/* compute final pixel in Y and exit if we are entirely clipped */
-			destendy = desty + gfx->height() - 1;
-			if (desty > cliprect.max_y || destendy < cliprect.min_y)
-				break;
+			srcdata += dy;
+			srcdata2 += dy;
 
-			/* apply top clip */
-			srcy = 0;
-			if (desty < cliprect.min_y)
+			/* iterate over leftover pixels */
+			for (int32_t curx = 0; curx < leftovers; curx++)
 			{
-				srcy = cliprect.min_y - desty;
-				desty = cliprect.min_y;
+				uint32_t srcdata = (srcptr[0]);
+				uint32_t srcdata2 = (srcptr2[0]);
+
+				uint16_t full = (srcdata | (srcdata2 << 8));
+				if (full != 0)
+					destptr[0] = rgb[full];
+
+				srcptr--;
+				srcptr2--;
+				destptr++;
 			}
-
-			/* apply bottom clip */
-			if (destendy > cliprect.max_y)
-				destendy = cliprect.max_y;
-
-			/* apply X flipping */
-			if (flipx)
-				srcx = gfx->width() - 1 - srcx;
-
-			/* apply Y flipping */
-			dy = gfx->rowbytes();
-			if (flipy)
-			{
-				srcy = gfx->height() - 1 - srcy;
-				dy = -dy;
-			}
-
-			/* fetch the source data */
-			const uint8_t *srcdata = gfx->get_data(code);
-			const uint8_t *srcdata2 = gfx2->get_data(code);
-
-			/* compute how many blocks of 4 pixels we have */
-			uint32_t leftovers = (destendx + 1 - destx);
-
-			/* adjust srcdata to point to the first source pixel of the row */
-			srcdata += srcy * gfx->rowbytes() + srcx;
-			srcdata2 += srcy * gfx->rowbytes() + srcx;
-
-			/* non-flipped 16bpp case */
-			if (!flipx)
-			{
-				/* iterate over pixels in Y */
-				for (int32_t cury = desty; cury <= destendy; cury++)
-				{
-					uint32_t *destptr = &dest.pix(cury, destx);
-					const uint8_t *srcptr = srcdata;
-					const uint8_t *srcptr2 = srcdata2;
-					srcdata += dy;
-					srcdata2 += dy;
-
-					/* iterate over leftover pixels */
-					for (int32_t curx = 0; curx < leftovers; curx++)
-					{
-						uint32_t srcdata = (srcptr[0]);
-						uint32_t srcdata2 = (srcptr2[0]);
-
-						uint16_t full = (srcdata | (srcdata2 << 8));
-						if (full != 0)
-							destptr[0] = rgb[full];
-
-						srcptr++;
-						srcptr2++;
-						destptr++;
-					}
-				}
-			}
-
-			/* flipped 16bpp case */
-			else
-			{
-				/* iterate over pixels in Y */
-				for (int32_t cury = desty; cury <= destendy; cury++)
-				{
-					uint32_t *destptr = &dest.pix(cury, destx);
-					const uint8_t *srcptr = srcdata;
-					const uint8_t *srcptr2 = srcdata2;
-
-					srcdata += dy;
-					srcdata2 += dy;
-
-					/* iterate over leftover pixels */
-					for (int32_t curx = 0; curx < leftovers; curx++)
-					{
-						uint32_t srcdata = (srcptr[0]);
-						uint32_t srcdata2 = (srcptr2[0]);
-
-						uint16_t full = (srcdata | (srcdata2 << 8));
-						if (full != 0)
-							destptr[0] = rgb[full];
-
-						srcptr--;
-						srcptr2--;
-						destptr++;
-					}
-				}
-			}
-		} while (0);
-		g_profiler.stop();
-	} while (0);
+		}
+	}
 }
 
 void gstream_state::draw_bg(bitmap_rgb32 &bitmap, const rectangle &cliprect, int map, uint32_t* ram )
@@ -1129,6 +1127,8 @@ void gstream_state::init_x2222()
 
 	m_xoffset = 0;
 }
+
+} // anonymous namespace
 
 
 GAME( 2002, gstream, 0,     gstream, gstream, gstream_state, init_gstream, ROT270, "Oriental Soft Japan",    "G-Stream G2020",            MACHINE_SUPPORTS_SAVE )

@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Nicola Salmoria
-#ifndef MAME_INCLUDES_BAGMAN_H
-#define MAME_INCLUDES_BAGMAN_H
+#ifndef MAME_VALADON_BAGMAN_H
+#define MAME_VALADON_BAGMAN_H
 
 #pragma once
 
@@ -36,37 +36,35 @@ public:
 
 protected:
 	// common
-	DECLARE_WRITE_LINE_MEMBER(coin_counter_w);
-	DECLARE_WRITE_LINE_MEMBER(irq_mask_w);
+	void coin_counter_w(int state);
+	void irq_mask_w(int state);
 	void videoram_w(offs_t offset, uint8_t data);
 	void colorram_w(offs_t offset, uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(flipscreen_x_w);
-	DECLARE_WRITE_LINE_MEMBER(flipscreen_y_w);
-	DECLARE_WRITE_LINE_MEMBER(video_enable_w);
+	void video_enable_w(int state);
 
 	// bagman
 	void ls259_w(offs_t offset, uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(tmsprom_bit_w);
-	DECLARE_WRITE_LINE_MEMBER(tmsprom_csq0_w);
-	DECLARE_WRITE_LINE_MEMBER(tmsprom_csq1_w);
+	void tmsprom_bit_w(int state);
+	void tmsprom_csq0_w(int state);
+	void tmsprom_csq1_w(int state);
 	void pal16r6_w(offs_t offset, uint8_t data);
 	uint8_t pal16r6_r();
 
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 	void bagman_palette(palette_device &palette) const;
 
-	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
+	void vblank_irq(int state);
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void update_pal();
 	void bagman_base(machine_config &config);
-	void main_map(address_map &map);
-	void main_portmap(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
+	void main_portmap(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<ls259_device> m_mainlatch;
@@ -110,8 +108,8 @@ private:
 	uint8_t aysnd_r();
 	void aysnd_w(offs_t offset, uint8_t data);
 
-	void pickin_map(address_map &map);
-	void pickin_portmap(address_map &map);
+	void pickin_map(address_map &map) ATTR_COLD;
+	void pickin_portmap(address_map &map) ATTR_COLD;
 
 	required_device_array<ay8910_device, 2> m_aysnd;
 };
@@ -127,10 +125,10 @@ public:
 		m_old_val{ 0, 0 }
 	{ }
 
-	template <unsigned N> DECLARE_CUSTOM_INPUT_MEMBER(dial_input_r);
+	template <unsigned N> ioport_value dial_input_r();
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	required_ioport_array<2> m_dial;
@@ -159,4 +157,4 @@ private:
 #define VBEND               (0x10)
 #define VBSTART             (0xf0)
 
-#endif // MAME_INCLUDES_BAGMAN_H
+#endif // MAME_VALADON_BAGMAN_H

@@ -131,7 +131,7 @@ rplist
 **rplist [<CPU>]**
 
 List current registerpoints, along with their indices and conditions,
-and any associated actions actions.  If no **<CPU>** is specified,
+and any associated actions.  If no **<CPU>** is specified,
 registerpoints for all CPUs in the system will be listed; if a **<CPU>**
 is specified, only registerpoints for that CPU will be listed.  The
 **<CPU>** can be specified by tag or by debugger CPU number (see

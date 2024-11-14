@@ -23,9 +23,9 @@ public:
 	// Construction
 	hp_dc100_tape_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// device_image_interface overrides
-	virtual image_init_result call_load() override;
-	virtual image_init_result call_create(int format_type, util::option_resolution *format_options) override;
+	// device_image_interface implementation
+	virtual std::pair<std::error_condition, std::string> call_load() override;
+	virtual std::pair<std::error_condition, std::string> call_create(int format_type, util::option_resolution *format_options) override;
 	virtual void call_unload() override;
 	virtual std::string call_display() override;
 	virtual const char *file_extensions() const noexcept override;
@@ -100,9 +100,9 @@ public:
 	auto wr_bit() { return m_wr_bit_handler.bind(); }
 
 protected:
-	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	// device_t implementation
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	TIMER_CALLBACK_MEMBER(bit_timer_tick);
 	TIMER_CALLBACK_MEMBER(tacho_timer_tick);
@@ -157,7 +157,7 @@ private:
 	bool m_image_dirty;
 
 	void clear_state();
-	image_init_result internal_load(bool is_create);
+	std::pair<std::error_condition, std::string> internal_load(bool is_create);
 	void set_tape_present(bool present);
 	double compute_set_point(tape_speed_t speed , bool fwd) const;
 	void start_tape();

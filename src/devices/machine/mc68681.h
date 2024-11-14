@@ -19,8 +19,8 @@ public:
 	duart_channel(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// device_serial overrides
 	virtual void rcv_complete() override;    // Rx completed receiving byte
@@ -71,10 +71,10 @@ private:
 	int m_ch;
 
 	/* Transmitter */
-	uint8_t tx_enabled;
-	uint8_t tx_data;
-	uint8_t tx_ready;
+	uint8_t m_tx_data;
+	bool m_tx_data_in_buffer;
 	bool m_tx_break;
+	uint8_t m_bits_transmitted;
 
 	/* Rx/Tx clocking */
 	uint8_t m_rx_prescaler , m_tx_prescaler;
@@ -107,8 +107,8 @@ public:
 	virtual uint8_t read(offs_t offset);
 	virtual void write(offs_t offset, uint8_t data);
 
-	DECLARE_WRITE_LINE_MEMBER(rx_a_w) { m_chanA->device_serial_interface::rx_w((uint8_t)state); }
-	DECLARE_WRITE_LINE_MEMBER(rx_b_w) { m_chanB->device_serial_interface::rx_w((uint8_t)state); }
+	void rx_a_w(int state) { m_chanA->device_serial_interface::rx_w((uint8_t)state); }
+	void rx_b_w(int state) { m_chanB->device_serial_interface::rx_w((uint8_t)state); }
 
 	auto irq_cb() { return write_irq.bind(); }
 	auto a_tx_cb() { return write_a_tx.bind(); }
@@ -117,13 +117,13 @@ public:
 	auto outport_cb() { return write_outport.bind(); }
 
 	// new-style push handlers for input port bits
-	DECLARE_WRITE_LINE_MEMBER(ip0_w);
-	DECLARE_WRITE_LINE_MEMBER(ip1_w);
-	DECLARE_WRITE_LINE_MEMBER(ip2_w);
-	DECLARE_WRITE_LINE_MEMBER(ip3_w);
-	DECLARE_WRITE_LINE_MEMBER(ip4_w);
-	DECLARE_WRITE_LINE_MEMBER(ip5_w);
-	DECLARE_WRITE_LINE_MEMBER(ip6_w);
+	void ip0_w(int state);
+	void ip1_w(int state);
+	void ip2_w(int state);
+	void ip3_w(int state);
+	void ip4_w(int state);
+	void ip5_w(int state);
+	void ip6_w(int state);
 
 	bool irq_pending() const { return (ISR & IMR) != 0; }
 
@@ -131,9 +131,9 @@ protected:
 	duart_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 	devcb_write_line write_irq, write_a_tx, write_b_tx, write_c_tx, write_d_tx;
 	devcb_read8 read_inport;
@@ -211,8 +211,8 @@ public:
 	uint8_t get_irq_vector();
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 	virtual void update_interrupts() override;
 	mc68681_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
@@ -230,14 +230,14 @@ public:
 	auto c_tx_cb() { return write_c_tx.bind(); }
 	auto d_tx_cb() { return write_d_tx.bind(); }
 
-	DECLARE_WRITE_LINE_MEMBER(rx_c_w) { m_chanC->device_serial_interface::rx_w((uint8_t)state); }
-	DECLARE_WRITE_LINE_MEMBER(rx_d_w) { m_chanD->device_serial_interface::rx_w((uint8_t)state); }
+	void rx_c_w(int state) { m_chanC->device_serial_interface::rx_w((uint8_t)state); }
+	void rx_d_w(int state) { m_chanD->device_serial_interface::rx_w((uint8_t)state); }
 
 	virtual uint8_t read(offs_t offset) override;
 	virtual void write(offs_t offset, uint8_t data) override;
 
 protected:
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 private:
 };
@@ -251,7 +251,7 @@ public:
 	virtual void write(offs_t offset, uint8_t data) override;
 
 protected:
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 	mc68340_duart_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 private:
@@ -267,8 +267,8 @@ public:
 	virtual void write(offs_t offset, uint8_t data) override;
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 private:
 	virtual int calc_baud(int ch, bool rx, uint8_t data) override;

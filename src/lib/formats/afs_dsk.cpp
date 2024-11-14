@@ -15,17 +15,17 @@ afs_format::afs_format() : wd177x_format(formats)
 {
 }
 
-const char *afs_format::name() const
+const char *afs_format::name() const noexcept
 {
 	return "afs";
 }
 
-const char *afs_format::description() const
+const char *afs_format::description() const noexcept
 {
 	return "Acorn FileStore disk image";
 }
 
-const char *afs_format::extensions() const
+const char *afs_format::extensions() const noexcept
 {
 	return "adl,img";
 }

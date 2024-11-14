@@ -16,7 +16,7 @@
 #include "cpu/m6502/m6502.h"
 #include "cpu/m6502/m6504.h"
 #include "machine/6522via.h"
-#include "machine/mos6530n.h"
+#include "machine/mos6530.h"
 
 
 
@@ -40,21 +40,21 @@ public:
 	void riot1_pb_w(uint8_t data);
 	void via_pb_w(uint8_t data);
 
-	void c8050_fdc_mem(address_map &map);
-	void c8050_main_mem(address_map &map);
-	void c8250lp_fdc_mem(address_map &map);
-	void sfd1001_fdc_mem(address_map &map);
+	void c8050_fdc_mem(address_map &map) ATTR_COLD;
+	void c8050_main_mem(address_map &map) ATTR_COLD;
+	void c8250lp_fdc_mem(address_map &map) ATTR_COLD;
+	void sfd1001_fdc_mem(address_map &map) ATTR_COLD;
 protected:
 	c8050_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// optional information overrides
-	virtual const tiny_rom_entry *device_rom_region() const override;
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual ioport_constructor device_input_ports() const override;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 
 	// device_ieee488_interface overrides
 	virtual void ieee488_atn(int state) override;
@@ -65,9 +65,9 @@ protected:
 
 	required_device<m6502_device> m_maincpu;
 	required_device<m6504_device> m_fdccpu;
-	required_device<mos6532_new_device> m_riot0;
-	required_device<mos6532_new_device> m_riot1;
-	required_device<mos6530_new_device> m_miot;
+	required_device<mos6532_device> m_riot0;
+	required_device<mos6532_device> m_riot1;
+	required_device<mos6530_device> m_miot;
 	required_device<via6522_device> m_via;
 	required_device<floppy_connector> m_floppy0;
 	optional_device<floppy_connector> m_floppy1;
@@ -96,7 +96,7 @@ public:
 
 protected:
 	// optional information overrides
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 private:
 	static void floppy_formats(format_registration &fr);
@@ -113,8 +113,8 @@ public:
 
 protected:
 	// optional information overrides
-	virtual const tiny_rom_entry *device_rom_region() const override;
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 private:
 	static void floppy_formats(format_registration &fr);
@@ -131,8 +131,8 @@ public:
 
 protected:
 	// optional information overrides
-	virtual const tiny_rom_entry *device_rom_region() const override;
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 private:
 	static void floppy_formats(format_registration &fr);

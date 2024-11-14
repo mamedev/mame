@@ -30,10 +30,10 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual ioport_constructor device_input_ports() const override;
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 private:
 	required_device<i8251_device> m_uart;
@@ -45,16 +45,16 @@ private:
 	required_ioport m_jumper_input;
 	required_ioport m_loopback_en;
 
-	DECLARE_WRITE_LINE_MEMBER(bit_rate_clock);
-	DECLARE_WRITE_LINE_MEMBER(slow_clock);
-	DECLARE_WRITE_LINE_MEMBER(txd_w);
-	DECLARE_WRITE_LINE_MEMBER(dtr_w);
-	DECLARE_WRITE_LINE_MEMBER(rts_w);
-	DECLARE_WRITE_LINE_MEMBER(txrdy_w);
-	DECLARE_WRITE_LINE_MEMBER(rxrdy_w);
-	DECLARE_WRITE_LINE_MEMBER(rxd_w);
-	DECLARE_WRITE_LINE_MEMBER(dsr_w);
-	DECLARE_WRITE_LINE_MEMBER(cts_w);
+	void bit_rate_clock(int state);
+	void slow_clock(int state);
+	void txd_w(int state);
+	void dtr_w(int state);
+	void rts_w(int state);
+	void txrdy_w(int state);
+	void rxrdy_w(int state);
+	void rxd_w(int state);
+	void dsr_w(int state);
+	void cts_w(int state);
 
 	// State of initialization FSM
 	// State U11A-Q U11B-Q

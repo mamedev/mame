@@ -112,16 +112,10 @@ mac_keyboard_port_device::~mac_keyboard_port_device()
 {
 }
 
-WRITE_LINE_MEMBER(mac_keyboard_port_device::data_w)
+void mac_keyboard_port_device::data_w(int state)
 {
 	if (m_peripheral)
 		m_peripheral->data_w(state);
-}
-
-void mac_keyboard_port_device::device_resolve_objects()
-{
-	m_clock_cb.resolve_safe();
-	m_data_cb.resolve_safe();
 }
 
 void mac_keyboard_port_device::device_start()
@@ -171,6 +165,7 @@ void mac_keyboard_devices(device_slot_interface &device)
 	device.option_add("gb",    MACKBD_M0110B);
 	device.option_add("fr",    MACKBD_M0110F);
 	device.option_add("it",    MACKBD_M0110T);
+	device.option_add("jp",    MACKBD_M0110J);
 
 	device.option_add("pad",   MACKBD_M0120);
 	device.option_add("eupad", MACKBD_M0120P);

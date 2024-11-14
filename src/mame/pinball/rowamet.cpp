@@ -53,14 +53,14 @@ private:
 	void mute_w(u8 data);
 	u8 io_r(offs_t offset);
 	void io_w(offs_t offset, u8 data);
-	void main_mem_map(address_map &map);
-	void audio_mem_map(address_map &map);
-	void audio_io_map(address_map &map);
+	void main_mem_map(address_map &map) ATTR_COLD;
+	void audio_mem_map(address_map &map) ATTR_COLD;
+	void audio_io_map(address_map &map) ATTR_COLD;
 
 	u8 m_sndcmd = 0xffU;
 	u8 m_io[32]{};
-	virtual void machine_reset() override;
-	virtual void machine_start() override;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void machine_start() override ATTR_COLD;
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	output_finder<32> m_digits;

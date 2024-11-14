@@ -37,7 +37,7 @@ std::unique_ptr<util::disasm_interface> tms57002_device::create_disassembler()
 	return std::make_unique<tms57002_disassembler>();
 }
 
-WRITE_LINE_MEMBER(tms57002_device::pload_w)
+void tms57002_device::pload_w(int state)
 {
 	u8 olds = sti;
 	if (state)
@@ -56,7 +56,7 @@ WRITE_LINE_MEMBER(tms57002_device::pload_w)
 	}
 }
 
-WRITE_LINE_MEMBER(tms57002_device::cload_w)
+void tms57002_device::cload_w(int state)
 {
 	u8 olds = sti;
 	if (state)
@@ -185,7 +185,7 @@ u8 tms57002_device::data_r()
 	return res;
 }
 
-READ_LINE_MEMBER(tms57002_device::dready_r)
+int tms57002_device::dready_r()
 {
 	return sti & S_HOST ? 0 : 1;
 }
@@ -195,7 +195,7 @@ void tms57002_device::update_dready()
 	m_dready_callback(sti & S_HOST ? 0 : 1);
 }
 
-READ_LINE_MEMBER(tms57002_device::pc0_r)
+int tms57002_device::pc0_r()
 {
 	return pc == 0 ? 0 : 1;
 }
@@ -205,7 +205,7 @@ void tms57002_device::update_pc0()
 	m_pc0_callback(pc == 0 ? 0 : 1);
 }
 
-READ_LINE_MEMBER(tms57002_device::empty_r)
+int tms57002_device::empty_r()
 {
 	return (update_counter_head == update_counter_tail);
 }
@@ -215,7 +215,7 @@ void tms57002_device::update_empty()
 	m_empty_callback(update_counter_head == update_counter_tail);
 }
 
-WRITE_LINE_MEMBER(tms57002_device::sync_w)
+void tms57002_device::sync_w(int state)
 {
 	if (sti & (IN_PLOAD /*| IN_CLOAD*/))
 		return;
@@ -939,13 +939,6 @@ void tms57002_device::sound_stream_update(sound_stream &stream, std::vector<read
 	sync_w(1);
 }
 
-void tms57002_device::device_resolve_objects()
-{
-	m_dready_callback.resolve_safe();
-	m_pc0_callback.resolve_safe();
-	m_empty_callback.resolve_safe();
-}
-
 void tms57002_device::device_start()
 {
 	sti = S_IDLE;
@@ -1028,11 +1021,6 @@ u32 tms57002_device::execute_min_cycles() const noexcept
 u32 tms57002_device::execute_max_cycles() const noexcept
 {
 	return 3;
-}
-
-u32 tms57002_device::execute_input_lines() const noexcept
-{
-	return 0;
 }
 
 device_memory_interface::space_config_vector tms57002_device::memory_space_config() const

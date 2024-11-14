@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Jonathan Gevaryahu
-#ifndef MAME_AUDIO_SOCRATES_H
-#define MAME_AUDIO_SOCRATES_H
+#ifndef MAME_VTECH_SOCRATES_A_H
+#define MAME_VTECH_SOCRATES_A_H
 
 #pragma once
 
@@ -19,7 +19,7 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 	// sound stream update overrides
 	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
@@ -41,4 +41,4 @@ private:
 DECLARE_DEVICE_TYPE(SOCRATES_SOUND, socrates_snd_device)
 
 
-#endif // MAME_AUDIO_SOCRATES_H
+#endif // MAME_VTECH_SOCRATES_A_H

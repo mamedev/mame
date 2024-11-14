@@ -1,7 +1,7 @@
 /** @file paex_wmme_surround.c
-	@ingroup examples_src
-	@brief Use WMME-specific channelMask to request 5.1 surround sound output.
-	@author Ross Bencina <rossb@audiomulch.com>
+    @ingroup examples_src
+    @brief Use WMME-specific channelMask to request 5.1 surround sound output.
+    @author Ross Bencina <rossb@audiomulch.com>
 */
 /*
  * $Id: $
@@ -31,13 +31,13 @@
  */
 
 /*
- * The text above constitutes the entire PortAudio license; however, 
+ * The text above constitutes the entire PortAudio license; however,
  * the PortAudio community also makes the following non-binding requests:
  *
  * Any person wishing to distribute modifications to the Software is
  * requested to send the modifications to the original developer so that
- * they can be incorporated into the canonical version. It is also 
- * requested that these non-binding requests be included along with the 
+ * they can be incorporated into the canonical version. It is also
+ * requested that these non-binding requests be included along with the
  * license above.
  */
 
@@ -67,9 +67,9 @@
 typedef struct
 {
     float sine[TABLE_SIZE];
-	int phase;
-	int currentChannel;
-	int cycleCount;
+    int phase;
+    int currentChannel;
+    int cycleCount;
 }
 paTestData;
 
@@ -90,31 +90,31 @@ static int patestCallback( const void *inputBuffer, void *outputBuffer,
     (void) timeInfo; /* Prevent unused variable warnings. */
     (void) statusFlags;
     (void) inputBuffer;
-    
+
     for( i=0; i<framesPerBuffer; i++ )
     {
-		for( j = 0; j < CHANNEL_COUNT; ++j ){
-			if( j == data->currentChannel && data->cycleCount < 4410 ){
-				*out++ = data->sine[data->phase];
-				data->phase += 1 + j;	// play each channel at a different pitch so they can be distinguished
-				if( data->phase >= TABLE_SIZE ){
-					data->phase -= TABLE_SIZE;
-				}
-			}else{
-				*out++ = 0;
-			}
-		}
-    
-		data->cycleCount++;
-		if( data->cycleCount > 44100 ){
-			data->cycleCount = 0;
+        for( j = 0; j < CHANNEL_COUNT; ++j ){
+            if( j == data->currentChannel && data->cycleCount < 4410 ){
+                *out++ = data->sine[data->phase];
+                data->phase += 1 + j;    // play each channel at a different pitch so they can be distinguished
+                if( data->phase >= TABLE_SIZE ){
+                    data->phase -= TABLE_SIZE;
+                }
+            }else{
+                *out++ = 0;
+            }
+        }
 
-			++data->currentChannel;
-			if( data->currentChannel >= CHANNEL_COUNT )
-				data->currentChannel -= CHANNEL_COUNT;
-		}
-	}
-    
+        data->cycleCount++;
+        if( data->cycleCount > 44100 ){
+            data->cycleCount = 0;
+
+            ++data->currentChannel;
+            if( data->currentChannel >= CHANNEL_COUNT )
+                data->currentChannel -= CHANNEL_COUNT;
+        }
+    }
+
     return paContinue;
 }
 
@@ -134,12 +134,12 @@ int main(int argc, char* argv[])
     err = Pa_Initialize();
     if( err != paNoError ) goto error;
 
-	deviceIndex = Pa_GetHostApiInfo( Pa_HostApiTypeIdToHostApiIndex( paMME ) )->defaultOutputDevice;
-	if( argc == 2 ){
-		sscanf( argv[1], "%d", &deviceIndex );
-	}
+    deviceIndex = Pa_GetHostApiInfo( Pa_HostApiTypeIdToHostApiIndex( paMME ) )->defaultOutputDevice;
+    if( argc == 2 ){
+        sscanf( argv[1], "%d", &deviceIndex );
+    }
 
-	printf( "using device id %d (%s)\n", deviceIndex, Pa_GetDeviceInfo(deviceIndex)->name );
+    printf( "using device id %d (%s)\n", deviceIndex, Pa_GetDeviceInfo(deviceIndex)->name );
 
     /* initialise sinusoidal wavetable */
     for( i=0; i<TABLE_SIZE; i++ )
@@ -147,9 +147,9 @@ int main(int argc, char* argv[])
         data.sine[i] = (float) sin( ((double)i/(double)TABLE_SIZE) * M_PI * 2. );
     }
 
-	data.phase = 0;
-	data.currentChannel = 0;
-	data.cycleCount = 0;
+    data.phase = 0;
+    data.currentChannel = 0;
+    data.cycleCount = 0;
 
     outputParameters.device = deviceIndex;
     outputParameters.channelCount = CHANNEL_COUNT;
@@ -161,18 +161,18 @@ int main(int argc, char* argv[])
        output. But if you want to be sure which channel mask PortAudio will use
        then you should supply one */
     wmmeStreamInfo.size = sizeof(PaWinMmeStreamInfo);
-    wmmeStreamInfo.hostApiType = paMME; 
+    wmmeStreamInfo.hostApiType = paMME;
     wmmeStreamInfo.version = 1;
     wmmeStreamInfo.flags = paWinMmeUseChannelMask;
     wmmeStreamInfo.channelMask = PAWIN_SPEAKER_5POINT1; /* request 5.1 output format */
     outputParameters.hostApiSpecificStreamInfo = &wmmeStreamInfo;
 
 
-	if( Pa_IsFormatSupported( 0, &outputParameters, SAMPLE_RATE ) == paFormatIsSupported  ){
-		printf( "Pa_IsFormatSupported reports device will support %d channels.\n", CHANNEL_COUNT );
-	}else{
-		printf( "Pa_IsFormatSupported reports device will not support %d channels.\n", CHANNEL_COUNT );
-	}
+    if( Pa_IsFormatSupported( 0, &outputParameters, SAMPLE_RATE ) == paFormatIsSupported  ){
+        printf( "Pa_IsFormatSupported reports device will support %d channels.\n", CHANNEL_COUNT );
+    }else{
+        printf( "Pa_IsFormatSupported reports device will not support %d channels.\n", CHANNEL_COUNT );
+    }
 
     err = Pa_OpenStream(
               &stream,
@@ -199,13 +199,12 @@ int main(int argc, char* argv[])
 
     Pa_Terminate();
     printf("Test finished.\n");
-    
+
     return err;
 error:
     Pa_Terminate();
-    fprintf( stderr, "An error occured while using the portaudio stream\n" );
+    fprintf( stderr, "An error occurred while using the portaudio stream\n" );
     fprintf( stderr, "Error number: %d\n", err );
     fprintf( stderr, "Error message: %s\n", Pa_GetErrorText( err ) );
     return err;
 }
-

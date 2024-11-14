@@ -36,17 +36,17 @@ class mockingboard_d_device : public device_t, public device_rs232_port_interfac
 public:
 	mockingboard_d_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual DECLARE_WRITE_LINE_MEMBER( input_txd ) override;
+	virtual void input_txd(int state) override;
 
 	required_device<m6803_cpu_device> m_cpu;
 	required_device<ay8913_device> m_ay1;
 	required_device<ay8913_device> m_ay2;
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 
 private:
 	u8 p2_r() { return m_rx_state<<3; };
@@ -56,7 +56,7 @@ private:
 
 	void c000_w(u8 data) { m_c000_latch = data; };
 
-	void m6803_mem(address_map &map);
+	void m6803_mem(address_map &map) ATTR_COLD;
 	int m_rx_state;
 	u8 m_c000_latch;
 };
@@ -110,7 +110,7 @@ void mockingboard_d_device::m6803_mem(address_map &map)
 	map(0xf800, 0xffff).rom().region("mbcpu", 0);
 }
 
-WRITE_LINE_MEMBER(mockingboard_d_device::input_txd)
+void mockingboard_d_device::input_txd(int state)
 {
 	m_rx_state = (state & 1);
 }

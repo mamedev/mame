@@ -56,20 +56,20 @@ public:
 	auto q3_callback() { return m_q3_func.bind(); }
 	auto q4_callback() { return m_q4_func.bind(); }
 
-	DECLARE_WRITE_LINE_MEMBER( clear_w );
-	DECLARE_WRITE_LINE_MEMBER( d1_w );
-	DECLARE_WRITE_LINE_MEMBER( d2_w );
-	DECLARE_WRITE_LINE_MEMBER( d3_w );
-	DECLARE_WRITE_LINE_MEMBER( d4_w );
-	DECLARE_WRITE_LINE_MEMBER( clock_w );
+	void clear_w(int state);
+	void d1_w(int state);
+	void d2_w(int state);
+	void d3_w(int state);
+	void d4_w(int state);
+	void clock_w(int state);
 
 	uint8_t q_w();
 
 protected:
 	ttl741745_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	virtual void init();
 	virtual void tick();
@@ -101,11 +101,11 @@ public:
 	auto q5_cb() { return m_q5_func.bind(); }
 	auto q6_cb() { return m_q6_func.bind(); }
 
-	DECLARE_WRITE_LINE_MEMBER( d5_w );
-	DECLARE_WRITE_LINE_MEMBER( d6_w );
+	void d5_w(int state);
+	void d6_w(int state);
 
 protected:
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 	virtual void init() override;
 	virtual void tick() override;
@@ -132,7 +132,7 @@ public:
 	auto not_q4_cb() { return m_not_q4_func.bind(); }
 
 protected:
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 	virtual void tick() override;
 

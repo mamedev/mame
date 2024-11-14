@@ -2,9 +2,10 @@
 // copyright-holders:Angelo Salese
 
 #include "emu.h"
-#include "machine/m6m80011ap.h"
+#include "m6m80011ap.h"
 
-
+#define VERBOSE (LOG_GENERAL)
+#include "logmacro.h"
 
 //**************************************************************************
 //  GLOBAL VARIABLES
@@ -78,8 +79,8 @@ void m6m80011ap_device::nvram_default()
 
 bool m6m80011ap_device::nvram_read(util::read_stream &file)
 {
-	size_t actual;
-	return !file.read(m_eeprom_data, 0x100, actual) && actual == 0x100;
+	auto const [err, actual] = read(file, m_eeprom_data, 0x100);
+	return !err && (actual == 0x100);
 }
 
 
@@ -90,8 +91,8 @@ bool m6m80011ap_device::nvram_read(util::read_stream &file)
 
 bool m6m80011ap_device::nvram_write(util::write_stream &file)
 {
-	size_t actual;
-	return !file.write(m_eeprom_data, 0x100, actual) && actual == 0x100;
+	auto const [err, actual] = write(file, m_eeprom_data, 0x100);
+	return !err;
 }
 
 //**************************************************************************
@@ -99,17 +100,17 @@ bool m6m80011ap_device::nvram_write(util::write_stream &file)
 //**************************************************************************
 
 
-READ_LINE_MEMBER( m6m80011ap_device::read_bit )
+int m6m80011ap_device::read_bit()
 {
 	return m_read_latch;
 }
 
-READ_LINE_MEMBER( m6m80011ap_device::ready_line )
+int m6m80011ap_device::ready_line()
 {
 	return 1; // TODO
 }
 
-WRITE_LINE_MEMBER( m6m80011ap_device::set_cs_line )
+void m6m80011ap_device::set_cs_line(int state)
 {
 	m_reset_line = state;
 
@@ -122,12 +123,12 @@ WRITE_LINE_MEMBER( m6m80011ap_device::set_cs_line )
 }
 
 
-WRITE_LINE_MEMBER( m6m80011ap_device::write_bit )
+void m6m80011ap_device::write_bit(int state)
 {
 	m_latch = state;
 }
 
-WRITE_LINE_MEMBER( m6m80011ap_device::set_clock_line )
+void m6m80011ap_device::set_clock_line(int state)
 {
 	if (m_reset_line == CLEAR_LINE)
 	{
@@ -150,7 +151,7 @@ WRITE_LINE_MEMBER( m6m80011ap_device::set_clock_line )
 							case 0x15: m_eeprom_state = EEPROM_READ; break;
 							case 0x95: m_eeprom_state = EEPROM_STATUS_OUTPUT; break;
 							default:
-								printf("Write M6M80011 unknown %02x cmd\n",m_current_cmd );
+								LOG("Write M6M80011 unknown %02x cmd\n",m_current_cmd );
 								break;
 						}
 					}
@@ -168,7 +169,7 @@ WRITE_LINE_MEMBER( m6m80011ap_device::set_clock_line )
 					if(m_cmd_stream_pos>=8)
 					{
 						m_read_latch = (m_eeprom_data[m_current_addr] >> (23-m_cmd_stream_pos)) & 1;
-						//printf("%d %04x <- %04x %d\n",m_read_latch,m_eeprom_data[m_current_addr],m_current_addr,m_cmd_stream_pos-8);
+						//LOG("%d %04x <- %04x %d\n",m_read_latch,m_eeprom_data[m_current_addr],m_current_addr,m_cmd_stream_pos-8);
 					}
 
 					if(m_cmd_stream_pos==24)
@@ -192,7 +193,7 @@ WRITE_LINE_MEMBER( m6m80011ap_device::set_clock_line )
 						if(m_eeprom_we)
 							m_eeprom_data[m_current_addr] = (m_current_cmd >> 8) & 0xffff;
 
-						//printf("%04x %04x -> %04x\n",m_eeprom_data[m_current_addr],m_current_addr,m_current_cmd >> 8);
+						//LOG("%04x %04x -> %04x\n",m_eeprom_data[m_current_addr],m_current_addr,m_current_cmd >> 8);
 
 						m_eeprom_state = EEPROM_GET_CMD;
 						m_cmd_stream_pos = 0;
@@ -219,7 +220,7 @@ WRITE_LINE_MEMBER( m6m80011ap_device::set_clock_line )
 
 					if (m_cmd_stream_pos==8)
 					{
-						printf("Status output\n");
+						LOG("Status output\n");
 						m_eeprom_state = EEPROM_GET_CMD;
 						m_cmd_stream_pos = 0;
 					}

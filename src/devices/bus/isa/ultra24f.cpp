@@ -11,7 +11,7 @@
 
 #include "bus/nscsi/devices.h"
 #include "cpu/m68000/m68000.h"
-#include "machine/ncr5390.h"
+#include "machine/ncr53c90.h"
 #include "machine/nscsi_bus.h"
 
 DEFINE_DEVICE_TYPE(ULTRA24F, ultra24f_device, "ultra24f", "Ultra-24F SCSI Host Adapter")

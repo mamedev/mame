@@ -6,6 +6,9 @@
 #include "cpu/i8085/i8085.h"
 #include "cpu/i86/i186.h"
 
+
+namespace {
+
 class bingo_state : public driver_device
 {
 public:
@@ -15,14 +18,14 @@ public:
 	{ }
 
 	void bingo(machine_config &config);
-	void bingo_map(address_map &map);
+	void bingo_map(address_map &map) ATTR_COLD;
 protected:
 
 	// devices
 	required_device<cpu_device> m_maincpu;
 
 	// driver_device overrides
-	virtual void machine_reset() override;
+	virtual void machine_reset() override ATTR_COLD;
 public:
 	void init_bingo();
 };
@@ -62,14 +65,14 @@ public:
 	{ }
 
 	void seeben(machine_config &config);
-	void seeben_map(address_map &map);
+	void seeben_map(address_map &map) ATTR_COLD;
 protected:
 
 	// devices
 	required_device<cpu_device> m_maincpu;
 
 	// driver_device overrides
-	virtual void machine_reset() override;
+	virtual void machine_reset() override ATTR_COLD;
 public:
 	void init_seeben();
 };
@@ -106,14 +109,14 @@ public:
 	{ }
 
 	void splin(machine_config &config);
-	void splin_map(address_map &map);
+	void splin_map(address_map &map) ATTR_COLD;
 protected:
 
 	// devices
 	required_device<cpu_device> m_maincpu;
 
 	// driver_device overrides
-	virtual void machine_reset() override;
+	virtual void machine_reset() override ATTR_COLD;
 public:
 	void init_splin();
 };
@@ -317,6 +320,8 @@ ROM_START(tripjok)
 	ROM_LOAD( "13006-1", 0x8000, 0x8000, CRC(5682ac90) SHA1(c9fa13c56e9178eb861991fcad6b09fd27cca3cb))
 	ROM_LOAD( "13006-2", 0x0000, 0x4000, CRC(c7104e8f) SHA1(a3737f70cb9c97df24b5da915ef53b6d30f2470d))
 ROM_END
+
+} // anonymous namespace
 
 
 GAME(1980,  cntinntl,   0,        bingo,  bingo,  bingo_state,  init_bingo,  ROT0, "Bally",            "Continental (Bingo)",                      MACHINE_IS_SKELETON_MECHANICAL)

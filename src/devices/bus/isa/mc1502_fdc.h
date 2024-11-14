@@ -38,14 +38,14 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 	// optional information overrides
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 
 private:
-	DECLARE_WRITE_LINE_MEMBER(mc1502_fdc_irq_drq);
+	void mc1502_fdc_irq_drq(int state);
 
 	required_device<fd1793_device> m_fdc;
 	int motor_on;

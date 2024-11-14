@@ -18,6 +18,8 @@
 #include "screen.h"
 #include "speaker.h"
 
+namespace {
+
 class korg_ds8_state : public driver_device
 {
 public:
@@ -36,7 +38,7 @@ public:
 	void korg707(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	HD44780_PIXEL_UPDATE(lcd_pixel_update);
@@ -50,7 +52,7 @@ private:
 	void line_mute_w(u8 data);
 	void led_data_w(offs_t offset, u8 data);
 
-	void mem_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
 
 	void palette_init_ds8(palette_device &palette);
 
@@ -227,7 +229,7 @@ void korg_ds8_state::ds8(machine_config &config)
 
 	PALETTE(config, "palette", FUNC(korg_ds8_state::palette_init_ds8), 2);
 
-	hd44780_device &lcdc(HD44780(config, "lcdc", 0));
+	hd44780_device &lcdc(HD44780(config, "lcdc", 270'000)); // TODO: clock not measured, datasheet typical clock used
 	lcdc.set_lcd_size(2, 40);
 	lcdc.set_pixel_update_cb(FUNC(korg_ds8_state::lcd_pixel_update));
 
@@ -261,6 +263,9 @@ ROM_START(korg707)
 	ROM_REGION(0x8000, "program", 0)
 	ROM_LOAD("870904.ic7", 0x0000, 0x8000, CRC(3eb80aae) SHA1(8574f48c9a1724c483ac8ee7c82ea46d1f583d6d)) // 27C256
 ROM_END
+
+} // anonymous namespace
+
 
 SYST(1986, ds8,     0, 0, ds8,     ds8, korg_ds8_state, empty_init, "Korg", "DS-8 Digital Synthesizer",    MACHINE_IS_SKELETON)
 SYST(1987, korg707, 0, 0, korg707, ds8, korg_ds8_state, empty_init, "Korg", "707 Performing Synthesizer", MACHINE_IS_SKELETON)

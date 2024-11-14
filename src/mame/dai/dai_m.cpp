@@ -14,10 +14,11 @@
 #include "emu.h"
 #include "dai.h"
 
-#define DEBUG_DAI_PORTS 0
+#define LOG_PORTS (1U << 1)
 
-#define LOG_DAI_PORT_R(_port, _data, _comment) do { if (DEBUG_DAI_PORTS) logerror ("DAI port read : %04x, Data: %02x (%s)\n", _port, _data, _comment); } while (0)
-#define LOG_DAI_PORT_W(_port, _data, _comment) do { if (DEBUG_DAI_PORTS) logerror ("DAI port write: %04x, Data: %02x (%s)\n", _port, _data, _comment); } while (0)
+#define VERBOSE (0)
+#include "logmacro.h"
+
 
 TIMER_DEVICE_CALLBACK_MEMBER(dai_state::tms_timer)
 {
@@ -135,7 +136,7 @@ uint8_t dai_state::io_discrete_devices_r(offs_t offset)
 		break;
 
 	default:
-		LOG_DAI_PORT_R (offset, data, "discrete devices - unmapped");
+		LOGMASKED(LOG_PORTS, "DAI port read : %04x, Data: %02x (discrete devices - unmapped)\n", offset, data);
 		break;
 	}
 	return data;
@@ -146,14 +147,14 @@ void dai_state::io_discrete_devices_w(offs_t offset, uint8_t data)
 	switch(offset & 0x000f) {
 	case 0x04:
 		m_sound->set_volume(offset, data);
-		LOG_DAI_PORT_W (offset, data&0x0f, "discrete devices - osc. 0 volume");
-		LOG_DAI_PORT_W (offset, BIT(data, 4, 4), "discrete devices - osc. 1 volume");
+		LOGMASKED(LOG_PORTS, "DAI port write: %04x, Data: %02x (discrete devices - osc. 0 volume)\n", offset, data & 0x0f);
+		LOGMASKED(LOG_PORTS, "DAI port write: %04x, Data: %02x (discrete devices - osc. 1 volume)\n", offset, BIT(data, 4, 4));
 		break;
 
 	case 0x05:
 		m_sound->set_volume(offset, data);
-		LOG_DAI_PORT_W (offset, data&0x0f, "discrete devices - osc. 2 volume");
-		LOG_DAI_PORT_W (offset, BIT(data, 4, 4), "discrete devices - noise volume");
+		LOGMASKED(LOG_PORTS, "DAI port write: %04x, Data: %02x (discrete devices - osc. 2 volume)\n", offset, data & 0x0f);
+		LOGMASKED(LOG_PORTS, "DAI port write: %04x, Data: %02x (discrete devices - noise volume)\n", offset, BIT(data, 4, 4));
 		break;
 
 	case 0x06:
@@ -164,15 +165,15 @@ void dai_state::io_discrete_devices_w(offs_t offset, uint8_t data)
 		m_cassette->change_state(m_cassette_motor[0]?CASSETTE_MOTOR_DISABLED:CASSETTE_MOTOR_ENABLED, CASSETTE_MASK_MOTOR);
 		m_cassette->output(BIT(data, 0) ? -1.0 : 1.0);
 		membank("bank2")->set_entry(BIT(data, 6, 2));
-		LOG_DAI_PORT_W (offset, BIT(data, 1, 2), "discrete devices - paddle select");
-		LOG_DAI_PORT_W (offset, BIT(data, 3), "discrete devices - paddle enable");
-		LOG_DAI_PORT_W (offset, BIT(data, 4), "discrete devices - cassette motor 1");
-		LOG_DAI_PORT_W (offset, BIT(data, 5), "discrete devices - cassette motor 2");
-		LOG_DAI_PORT_W (offset, BIT(data, 6, 2), "discrete devices - ROM bank");
+		LOGMASKED(LOG_PORTS, "DAI port write: %04x, Data: %02x (discrete devices - paddle select)\n", offset, BIT(data, 1, 2));
+		LOGMASKED(LOG_PORTS, "DAI port write: %04x, Data: %02x (discrete devices - paddle enable)\n", offset, BIT(data, 3));
+		LOGMASKED(LOG_PORTS, "DAI port write: %04x, Data: %02x (discrete devices - cassette motor 1)\n", offset, BIT(data, 4));
+		LOGMASKED(LOG_PORTS, "DAI port write: %04x, Data: %02x (discrete devices - cassette motor 2)\n", offset, BIT(data, 5));
+		LOGMASKED(LOG_PORTS, "DAI port write: %04x, Data: %02x (discrete devices - ROM bank)\n", offset, BIT(data, 6, 2));
 		break;
 
 	default:
-		LOG_DAI_PORT_W (offset, data, "discrete devices - unmapped");
+		LOGMASKED(LOG_PORTS, "DAI port write: %04x, Data: %02x (discrete devices - unmapped)\n", offset, data);
 		break;
 	}
 }
@@ -210,5 +211,5 @@ uint8_t dai_state::amd9511_r()
 
 void dai_state::amd9511_w(offs_t offset, uint8_t data)
 {
-	logerror ("Writing to AMD9511 math chip, %04x, %02x\n", offset, data);
+	logerror("Writing to AMD9511 math chip, %04x, %02x\n", offset, data);
 }

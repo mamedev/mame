@@ -104,11 +104,15 @@ bml3bus_device::bml3bus_device(const machine_config &mconfig, const char *tag, d
 
 bml3bus_device::bml3bus_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, type, tag, owner, clock),
-	m_space(*this, finder_base::DUMMY_TAG, -1, 8),
 	m_out_nmi_cb(*this),
 	m_out_irq_cb(*this),
 	m_out_firq_cb(*this)
 {
+	// clear slots
+	for (auto & elem : m_device_list)
+	{
+		elem = nullptr;
+	}
 }
 
 //-------------------------------------------------
@@ -117,16 +121,6 @@ bml3bus_device::bml3bus_device(const machine_config &mconfig, device_type type, 
 
 void bml3bus_device::device_start()
 {
-	// resolve callbacks
-	m_out_nmi_cb.resolve_safe();
-	m_out_irq_cb.resolve_safe();
-	m_out_firq_cb.resolve_safe();
-
-	// clear slots
-	for (auto & elem : m_device_list)
-	{
-		elem = nullptr;
-	}
 }
 
 //-------------------------------------------------
@@ -152,6 +146,24 @@ void bml3bus_device::add_bml3bus_card(int slot, device_bml3bus_card_interface &c
 	m_device_list[slot] = &card;
 }
 
+void bml3bus_device::map_exrom(address_space_installer &space)
+{
+	for (auto & elem : m_device_list)
+	{
+		if (elem != nullptr)
+			elem->map_exrom(space);
+	}
+}
+
+void bml3bus_device::map_io(address_space_installer &space)
+{
+	for (auto & elem : m_device_list)
+	{
+		if (elem != nullptr)
+			elem->map_io(space);
+	}
+}
+
 void bml3bus_device::set_nmi_line(int state)
 {
 	m_out_nmi_cb(state);
@@ -168,9 +180,9 @@ void bml3bus_device::set_firq_line(int state)
 }
 
 // interrupt request from bml3bus card
-WRITE_LINE_MEMBER( bml3bus_device::nmi_w ) { m_out_nmi_cb(state); }
-WRITE_LINE_MEMBER( bml3bus_device::irq_w ) { m_out_irq_cb(state); }
-WRITE_LINE_MEMBER( bml3bus_device::firq_w ) { m_out_firq_cb(state); }
+void bml3bus_device::nmi_w(int state) { m_out_nmi_cb(state); }
+void bml3bus_device::irq_w(int state) { m_out_irq_cb(state); }
+void bml3bus_device::firq_w(int state) { m_out_firq_cb(state); }
 
 //**************************************************************************
 //  DEVICE CONFIG BML3BUS CARD INTERFACE

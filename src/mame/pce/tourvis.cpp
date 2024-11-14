@@ -210,35 +210,34 @@ private:
 	void tourvision_i8155_a_w(uint8_t data);
 	void tourvision_i8155_b_w(uint8_t data);
 	void tourvision_i8155_c_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(tourvision_timer_out);
+	void tourvision_timer_out(int state);
 
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load);
 
-	void pce_io(address_map &map);
-	void pce_mem(address_map &map);
-	void tourvision_8085_map(address_map &map);
+	void pce_io(address_map &map) ATTR_COLD;
+	void pce_mem(address_map &map) ATTR_COLD;
+	void tourvision_8085_map(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_subcpu;
 	required_device<generic_slot_device> m_cart;
 	uint32_t  m_rom_size = 0;
 };
 
-DEVICE_IMAGE_LOAD_MEMBER( tourvision_state::cart_load )
+DEVICE_IMAGE_LOAD_MEMBER(tourvision_state::cart_load)
 {
 	m_rom_size = m_cart->common_get_size("rom");
 	m_cart->rom_alloc(m_rom_size, GENERIC_ROM8_WIDTH, ENDIANNESS_LITTLE);
 	m_cart->common_load_rom(m_cart->get_rom_base(), m_rom_size, "rom");
 
-	uint8_t* rgn = memregion("maincpu")->base();
-	uint8_t* base = m_cart->get_rom_base();
+	uint8_t *rgn = memregion("maincpu")->base();
+	uint8_t *base = m_cart->get_rom_base();
 
 	if (m_rom_size == 0x0c0000)
 	{
 		memcpy(rgn+0x000000, base+0x000000, 0x0c0000 );
 		memcpy(rgn+0x0c0000, base+0x080000, 0x040000 );
 	}
-	else
-	if (m_rom_size == 0x060000)
+	else if (m_rom_size == 0x060000)
 	{
 		memcpy(rgn+0x000000, base+0x000000, 0x040000 );
 		memcpy(rgn+0x040000, base+0x000000, 0x040000 );
@@ -249,8 +248,8 @@ DEVICE_IMAGE_LOAD_MEMBER( tourvision_state::cart_load )
 	}
 	else
 	{
-		for (int i=0;i<0x100000;i+=m_rom_size)
-			memcpy(rgn+i, base+0x000000, m_rom_size );
+		for (int i=0; i<0x100000; i+=m_rom_size)
+			memcpy(rgn+i, base+0x000000, m_rom_size);
 	}
 
 #if 0
@@ -265,7 +264,7 @@ DEVICE_IMAGE_LOAD_MEMBER( tourvision_state::cart_load )
 	}
 #endif
 
-	return image_init_result::PASS;
+	return std::make_pair(std::error_condition(), std::string());
 }
 
 // Note from system11: This system actually supports 2 players
@@ -386,7 +385,7 @@ void tourvision_state::tourvision_i8155_c_w(uint8_t data)
 	//logerror("i8155 Port C: %02X\n", data);
 }
 
-WRITE_LINE_MEMBER(tourvision_state::tourvision_timer_out)
+void tourvision_state::tourvision_timer_out(int state)
 {
 	m_subcpu->set_input_line(I8085_RST55_LINE, state ? CLEAR_LINE : ASSERT_LINE );
 	//logerror("Timer out %d\n", state);

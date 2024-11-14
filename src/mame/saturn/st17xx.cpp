@@ -37,10 +37,11 @@
 
 #include "emu.h"
 #include "cpu/arm7/arm7.h"
-#include "cpu/arm7/arm7core.h"
 #include "emupal.h"
 #include "screen.h"
 
+
+namespace {
 
 #define SCREEN_TAG "screen"
 
@@ -53,11 +54,11 @@ public:
 	void st17xx(machine_config &config);
 
 private:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	void cpu_map(address_map &map);
+	void cpu_map(address_map &map) ATTR_COLD;
 };
 
 /* Memory Maps */
@@ -178,6 +179,9 @@ ROM_START( st1714 )
 	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD32_DWORD( "st1714.bin", 0x000000, 0x200000, CRC(08fc0a1b) SHA1(74dfd5595e1ab45fb9aff50a6c365fd9c9b33c33) )
 ROM_END
+
+} // anonymous namespace
+
 
 /* System Drivers */
 

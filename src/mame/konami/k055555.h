@@ -1,8 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood
 /* */
-#ifndef MAME_MACHINE_K055555_H
-#define MAME_MACHINE_K055555_H
+#ifndef MAME_KONAMI_K055555_H
+#define MAME_KONAMI_K055555_H
 
 #pragma once
 
@@ -89,8 +89,8 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 private:
 	uint8_t   m_regs[128];
@@ -99,4 +99,4 @@ private:
 DECLARE_DEVICE_TYPE(K055555, k055555_device)
 
 
-#endif // MAME_MACHINE_K055555_H
+#endif // MAME_KONAMI_K055555_H

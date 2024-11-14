@@ -29,7 +29,7 @@ public:
 private:
 	HD44780_PIXEL_UPDATE(pixel_update);
 
-	void mem_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
 
 	required_device<pic17c4x_device> m_maincpu;
 	required_device<pic17c4x_device> m_slavecpu;
@@ -73,7 +73,7 @@ void airbase99_state::airbase99(machine_config &config)
 
 	PALETTE(config, "palette", palette_device::MONOCHROME_INVERTED);
 
-	hd44780_device &lcdc(HD44780(config, "lcdc", 0));
+	hd44780_device &lcdc(HD44780(config, "lcdc", 270'000)); // TODO: clock not measured, datasheet typical clock used
 	lcdc.set_lcd_size(2, 20);
 	lcdc.set_pixel_update_cb(FUNC(airbase99_state::pixel_update));
 }

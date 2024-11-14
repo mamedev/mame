@@ -40,13 +40,12 @@ public:
 
 	void a_w(u8 data);
 
-	DECLARE_WRITE_LINE_MEMBER( rbi_w ) { m_rbi = state; }
-	DECLARE_READ_LINE_MEMBER( rbo_r ) { return m_rbo; }
+	void rbi_w(int state) { m_rbi = state; }
+	int rbo_r() { return m_rbo; }
 
 protected:
-	// device-level overrides
-	virtual void device_resolve_objects() override;
-	virtual void device_start() override;
+	// device_t implementation
+	virtual void device_start() override ATTR_COLD;
 
 	void update();
 

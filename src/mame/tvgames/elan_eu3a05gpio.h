@@ -1,8 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood
 
-#ifndef MAME_MACHINE_ELAN_EU3A05GPIO_H
-#define MAME_MACHINE_ELAN_EU3A05GPIO_H
+#ifndef MAME_TVGAMES_ELAN_EU3A05GPIO_H
+#define MAME_TVGAMES_ELAN_EU3A05GPIO_H
 
 
 class elan_eu3a05gpio_device : public device_t
@@ -24,8 +24,8 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 private:
 	devcb_write8 m_write_0_callback;
@@ -46,4 +46,4 @@ private:
 
 DECLARE_DEVICE_TYPE(ELAN_EU3A05_GPIO, elan_eu3a05gpio_device)
 
-#endif // MAME_MACHINE_RAD_EU3A05GPIO_H
+#endif // MAME_TVGAMES_RAD_EU3A05GPIO_H

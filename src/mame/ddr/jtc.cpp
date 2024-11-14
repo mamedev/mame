@@ -28,6 +28,10 @@ To Do:
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
+#include "utf8.h"
+
+
+namespace {
 
 #define UB8830D_TAG     "ub8830d"
 #define CENTRONICS_TAG  "centronics"
@@ -51,13 +55,13 @@ public:
 	void jtc(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 	void p2_w(u8 data);
 	u8 p3_r();
 	void p3_w(u8 data);
 	DECLARE_QUICKLOAD_LOAD_MEMBER(quickload_cb);
 	int m_centronics_busy = 0;
-	DECLARE_WRITE_LINE_MEMBER(write_centronics_busy);
+	void write_centronics_busy(int state);
 	required_device<z8_device> m_maincpu;
 	required_device<ram_device> m_ram;
 	required_device<cassette_image_device> m_cassette;
@@ -67,7 +71,7 @@ protected:
 
 private:
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void jtc_mem(address_map &map);
+	void jtc_mem(address_map &map) ATTR_COLD;
 };
 
 class jtces88_state : public jtc_state
@@ -85,7 +89,7 @@ public:
 	void jtces23(machine_config &config);
 private:
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void jtc_es23_mem(address_map &map);
+	void jtc_es23_mem(address_map &map) ATTR_COLD;
 };
 
 
@@ -101,7 +105,7 @@ public:
 	{ }
 	void jtces40(machine_config &config);
 private:
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	u8 videoram_r(offs_t offset);
 	void videoram_w(offs_t offset, u8 data);
@@ -112,7 +116,7 @@ private:
 	memory_share_creator<uint8_t> m_color_ram_r;
 	memory_share_creator<uint8_t> m_color_ram_g;
 	memory_share_creator<uint8_t> m_color_ram_b;
-	void jtc_es40_mem(address_map &map);
+	void jtc_es40_mem(address_map &map) ATTR_COLD;
 	void es40_palette(palette_device &palette) const;
 };
 
@@ -139,7 +143,7 @@ void jtc_state::p2_w(u8 data)
 	m_centronics->write_strobe(BIT(data, 5));
 }
 
-DECLARE_WRITE_LINE_MEMBER( jtc_state::write_centronics_busy )
+void jtc_state::write_centronics_busy(int state)
 {
 	m_centronics_busy = state;
 }
@@ -588,88 +592,58 @@ INPUT_PORTS_END
 QUICKLOAD_LOAD_MEMBER(jtc_state::quickload_cb)
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
-	u16 i, quick_addr, quick_length;
+	u16 quick_addr;
 	std::vector<u8> quick_data;
-	image_init_result result = image_init_result::FAIL;
 
-	quick_length = image.length();
+	int quick_length = image.length();
 	if (image.is_filetype("jtc"))
 	{
 		if (quick_length < 0x0088)
-		{
-			image.seterror(image_error::INVALIDIMAGE, "File too short");
-			image.message(" File too short");
-		}
-		else
-		if (quick_length > 0x8000)
-		{
-			image.seterror(image_error::INVALIDIMAGE, "File too long");
-			image.message(" File too long");
-		}
-		else
-		{
-			quick_data.resize(quick_length+1);
-			u16 read_ = image.fread(&quick_data[0], quick_length);
-			if (read_ != quick_length)
-			{
-				image.seterror(image_error::INVALIDIMAGE, "Cannot read the file");
-				image.message(" Cannot read the file");
-			}
-			else
-			{
-				quick_addr = quick_data[0x12] * 256 + quick_data[0x11];
-				quick_length = quick_data[0x14] * 256 + quick_data[0x13] - quick_addr + 0x81;
-				if (image.length() != quick_length)
-				{
-					image.seterror(image_error::INVALIDIMAGE, "Invalid file header");
-					image.message(" Invalid file header");
-				}
-				else
-				{
-					for (i = 0x80; i < image.length(); i++)
-						space.write_byte(quick_addr+i-0x80, quick_data[i]);
+			return std::make_pair(image_error::INVALIDLENGTH, "File too short");
+		else if (quick_length > 0x8000)
+			return std::make_pair(image_error::INVALIDLENGTH, "File too long");
 
-					/* display a message about the loaded quickload */
-					image.message(" Quickload: size=%04X : loaded at %04X",quick_length,quick_addr);
+		quick_data.resize(quick_length+1);
+		int const read_ = image.fread(&quick_data[0], quick_length);
+		if (read_ != quick_length)
+			return std::make_pair(image_error::UNSPECIFIED, "Cannot read the file");
 
-					result = image_init_result::PASS;
-				}
-			}
-		}
+		quick_addr = quick_data[0x12] * 256 + quick_data[0x11];
+		quick_length = quick_data[0x14] * 256 + quick_data[0x13] - quick_addr + 0x81;
+		if (image.length() != quick_length)
+			return std::make_pair(image_error::INVALIDIMAGE, "Invalid file header");
+
+		for (int i = 0x80; i < image.length(); i++)
+			space.write_byte(quick_addr+i-0x80, quick_data[i]);
+
+		// display a message about the loaded quickload
+		image.message(" Quickload: size=%04X : loaded at %04X",quick_length,quick_addr);
+
+		return std::make_pair(std::error_condition(), std::string());
 	}
-	else
-	if (image.is_filetype("bin"))
+	else if (image.is_filetype("bin"))
 	{
 		quick_addr = 0xe000;
 		if (quick_length > 0x8000)
-		{
-			image.seterror(image_error::INVALIDIMAGE, "File too long");
-			image.message(" File too long");
-		}
-		else
-		{
-			quick_data.resize(quick_length+1);
-			u16 read_ = image.fread( &quick_data[0], quick_length);
-			if (read_ != quick_length)
-			{
-				image.seterror(image_error::INVALIDIMAGE, "Cannot read the file");
-				image.message(" Cannot read the file");
-			}
-			else
-			{
-				for (i = 0; i < image.length(); i++)
-					space.write_byte(quick_addr+i, quick_data[i]);
+			return std::make_pair(image_error::INVALIDLENGTH, "File too long");
 
-				/* display a message about the loaded quickload */
-				image.message(" Quickload: size=%04X : loaded at %04X",quick_length,quick_addr);
+		quick_data.resize(quick_length+1);
+		u16 read_ = image.fread( &quick_data[0], quick_length);
+		if (read_ != quick_length)
+			return std::make_pair(image_error::UNSPECIFIED, "Cannot read the file");
 
-				result = image_init_result::PASS;
-				m_maincpu->set_pc(quick_addr);
-			}
-		}
+		for (int i = 0; i < image.length(); i++)
+			space.write_byte(quick_addr+i, quick_data[i]);
+
+		// display a message about the loaded quickload
+		image.message(" Quickload: size=%04X : loaded at %04X",quick_length,quick_addr);
+
+		m_maincpu->set_pc(quick_addr);
+
+		return std::make_pair(std::error_condition(), std::string());
 	}
 
-	return result;
+	return std::make_pair(image_error::UNSUPPORTED, std::string());
 }
 
 
@@ -913,6 +887,9 @@ ROM_START( jtces40 )
 	ROM_LOAD( "u883rom.bin", 0x0000, 0x0800, CRC(2453c8c1) SHA1(816f5d08f8064b69b1779eb6661fde091aa58ba8) )
 	ROM_LOAD( "es40_0800.bin", 0x0800, 0x1800, CRC(770c87ce) SHA1(1a5227ba15917f2a572cb6c27642c456f5b32b90) )
 ROM_END
+
+} // anonymous namespace
+
 
 /* System Drivers */
 

@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <!--
-license:CC0
+license:CC0-1.0
 
     Needed to be dump:
     IBM PCjr club disk library (only an extracted collection exist)
@@ -13,6 +13,9 @@ license:CC0
 		<description>PC DOS 2.1</description>
 		<year>1983</year>
 		<publisher>IBM</publisher>
+		<notes><![CDATA[
+Boot OK
+]]></notes>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="184320">
 				<rom name="disk1.img" size="184320" crc="6a568d95" sha1="db165cb9bf2b2abbf5fa826dfe3a8f9819ce7ea5"/>
@@ -30,6 +33,9 @@ license:CC0
 		<description>Wordstar for PCjr (Release 1.00)</description>
 		<year>1987</year>
 		<publisher>Micropro International</publisher>
+		<notes><![CDATA[
+Boot OK
+]]></notes>
 		<info name="usage" value="boot from PC DOS 2.1 and then load wordstar" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="368640">
@@ -48,10 +54,14 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="explore">
+	<software name="explore" supported="no">
 		<description>Exploring The IBM PCjr</description>
 		<year>1983</year>
 		<publisher>IBM</publisher>
+		<notes><![CDATA[
+Black screen or awfully slow in loading
+Fills error.log with [sn76496] bit 7 clear writes
+]]></notes>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="163840">
 				<rom name="exploring the ibm pcjr.img" size="163840" crc="409ff73f" sha1="453ae5f3fa7781ece7d421dd973ce54204b9c99d"/>
@@ -59,10 +69,14 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="sampler">
+	<software name="sampler" supported="no">
 		<description>IBM PCjr Sampler</description>
 		<year>198?</year>
 		<publisher>IBM</publisher>
+		<notes><![CDATA[
+Boot OK
+Randomly crashes when entering or exiting menu items, particularly reproducible for recipe box
+]]></notes>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="368640">
 				<rom name="ibm pcjr sampler.img" size="368640" crc="c36607b3" sha1="a1d99d975aaed9746056fa1c06563cf08d1a8bc5"/>
@@ -74,6 +88,7 @@ license:CC0
 		<description>ProComm (Version 2.4.3)</description>
 		<year>1988</year>
 		<publisher>Datastorm Technologies, Inc.</publisher>
+		<!-- TODO: it actually requires a floppy or HDD install -->
 		<info name="usage" value="boot from PC DOS 2.1 and then load, using: prcmpgm" />
 		<!-- marked as bad since source is questionable, needs a redump -->
 		<part name="flop1" interface="floppy_5_25">
@@ -87,6 +102,9 @@ license:CC0
 		<description>Turbo Pascal 3.02A</description>
 		<year>1985</year>
 		<publisher>Borland Inc.</publisher>
+		<notes><![CDATA[
+Boot OK
+]]></notes>
 		<info name="usage" value="boot from PC DOS 2.1 and then load, using: nu" />
 		<!-- marked as bad since source is questionable, needs a redump -->
 		<part name="flop1" interface="floppy_5_25">
@@ -96,10 +114,14 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="zbasic4">
+	<software name="zbasic4" supported="partial">
 		<description>ZBasic 4.02</description>
 		<year>1987</year>
 		<publisher>Zedcor, Inc.</publisher>
+		<notes><![CDATA[
+Boot OK
+Initial welcome screens from both zbasic.com or zdemo.com has wrong text pitch or alignment
+]]></notes>
 		<info name="usage" value="boot from PC DOS 2.1 and then load, using: zbasic" />
 		<!-- marked as bad since source is questionable, needs a redump -->
 		<part name="flop1" interface="floppy_5_25">
@@ -110,10 +132,15 @@ license:CC0
 	</software>
 
 	<!-- Games -->
-	<software name="kingqst">
+	<software name="kingqst" supported="no">
 		<description>King's Quest</description>
 		<year>1984</year>
 		<publisher>Sierra</publisher>
+		<notes><![CDATA[
+Boot OK
+Very slow loading times, can crash
+Doesn't seem to have a way to reload game once player game overs
+]]></notes>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="368640">
 				<rom name="king's quest.img" size="368640" crc="524c1991" sha1="f6159d955959bf421774ed85df09b50026fa5a81"/>
@@ -121,10 +148,15 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="tdown">
+	<software name="tdown" supported="no">
 		<description>Touchdown Football</description>
 		<year>1984</year>
 		<publisher>Imagic</publisher>
+		<notes><![CDATA[
+Boot OK
+Doesn't seem to have a way to recalibrate joysticks, both players defaults going bottom-right when idle
+Has voice sample pitch issues
+]]></notes>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="327680">
 				<rom name="touchdown football.img" size="327680" crc="0fbaedb6" sha1="c42650559b2b4eb4b789fd2fa22bc5c8c0589e45"/>

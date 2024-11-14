@@ -241,6 +241,8 @@
 #include "speaker.h"
 
 
+namespace {
+
 #define MASTER_CLOCK    XTAL(8'000'000)   /* from CPU Board */
 #define SECONDARY_CLOCK XTAL(6'000'000)   /* from GFX Board */
 
@@ -266,13 +268,13 @@ private:
 	static constexpr int MOVIECRD_DUART2_IRQ = M68K_IRQ_4;
 
 	uint8_t unk_r();
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 	void palette_init(palette_device &palette);
 	uint32_t screen_update_goldngam(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void cpu_space_map(address_map &map);
+	void cpu_space_map(address_map &map) ATTR_COLD;
 
-	void moviecrd_map(address_map &map);
-	void swisspkr_map(address_map &map);
+	void moviecrd_map(address_map &map) ATTR_COLD;
+	void swisspkr_map(address_map &map) ATTR_COLD;
 
 	required_shared_ptr<uint16_t> m_videoram;
 	required_device<cpu_device> m_maincpu;
@@ -669,6 +671,8 @@ ROM_START( moviecrd )
 	ROM_LOAD16_BYTE( "v1.2_hi.gfx", 0x00000, 0x10000, CRC(0b62d1a8) SHA1(4156379cc000cbea997b1c21cebea9021fa697b2) )
 	ROM_LOAD16_BYTE( "v1.2_lo.gfx", 0x00001, 0x10000, CRC(70e8e9d5) SHA1(c026493b4bd302d389219ba564aafa42fca86491) )
 ROM_END
+
+} // anonymous namespace
 
 
 /*************************

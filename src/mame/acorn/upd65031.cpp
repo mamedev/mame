@@ -268,7 +268,7 @@ inline void upd65031_device::set_mode(int mode)
 upd65031_device::upd65031_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, UPD65031, tag, owner, clock),
 	device_serial_interface(mconfig, *this),
-	m_read_kb(*this),
+	m_read_kb(*this, 0),
 	m_write_int(*this),
 	m_write_nmi(*this),
 	m_write_spkr(*this),
@@ -290,16 +290,6 @@ upd65031_device::upd65031_device(const machine_config &mconfig, const char *tag,
 
 void upd65031_device::device_start()
 {
-	// resolve callbacks
-	m_read_kb.resolve_safe(0);
-	m_write_int.resolve_safe();
-	m_write_nmi.resolve_safe();
-	m_write_spkr.resolve_safe();
-	m_write_txd.resolve_safe();
-	m_write_rts.resolve_safe();
-	m_write_dtr.resolve_safe();
-	m_write_vpp.resolve_safe();
-
 	// bind delegates
 	m_screen_update_cb.resolve();
 	m_out_mem_cb.resolve();
@@ -763,7 +753,7 @@ void upd65031_device::rcv_complete()
 	update_uart_interrupt();
 }
 
-WRITE_LINE_MEMBER( upd65031_device::cts_w )
+void upd65031_device::cts_w(int state)
 {
 	if (state == BIT(m_uit, 0))
 	{
@@ -776,7 +766,7 @@ WRITE_LINE_MEMBER( upd65031_device::cts_w )
 	}
 }
 
-WRITE_LINE_MEMBER( upd65031_device::dcd_w )
+void upd65031_device::dcd_w(int state)
 {
 	if (state == BIT(m_uit, 1))
 	{
@@ -793,7 +783,7 @@ WRITE_LINE_MEMBER( upd65031_device::dcd_w )
 //  flp line
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( upd65031_device::flp_w )
+void upd65031_device::flp_w(int state)
 {
 	if (!(m_sta & STA_FLAPOPEN) && state)
 	{
@@ -813,7 +803,7 @@ WRITE_LINE_MEMBER( upd65031_device::flp_w )
 //  battery low line
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( upd65031_device::btl_w )
+void upd65031_device::btl_w(int state)
 {
 	if (state)
 		m_sta |= STA_BTL;

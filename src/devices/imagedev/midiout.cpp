@@ -9,8 +9,10 @@
 *********************************************************************/
 
 #include "emu.h"
-#include "osdepend.h"
 #include "midiout.h"
+
+#include "osdepend.h"
+
 
 /***************************************************************************
     IMPLEMENTATION
@@ -23,10 +25,14 @@ DEFINE_DEVICE_TYPE(MIDIOUT, midiout_device, "midiout", "MIDI Out image device")
 -------------------------------------------------*/
 
 midiout_device::midiout_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, MIDIOUT, tag, owner, clock),
-		device_image_interface(mconfig, *this),
-		device_serial_interface(mconfig, *this),
-		m_midi()
+	: device_t(mconfig, MIDIOUT, tag, owner, clock)
+	, device_image_interface(mconfig, *this)
+	, device_serial_interface(mconfig, *this)
+	, m_midi()
+{
+}
+
+midiout_device::~midiout_device()
 {
 }
 
@@ -51,17 +57,15 @@ void midiout_device::device_reset()
     call_load
 -------------------------------------------------*/
 
-image_init_result midiout_device::call_load()
+std::pair<std::error_condition, std::string> midiout_device::call_load()
 {
-	m_midi = machine().osd().create_midi_device();
-
-	if (!m_midi->open_output(filename()))
+	m_midi = machine().osd().create_midi_output(filename());
+	if (!m_midi)
 	{
-		m_midi.reset();
-		return image_init_result::FAIL;
+		return std::make_pair(image_error::UNSPECIFIED, std::string());
 	}
 
-	return image_init_result::PASS;
+	return std::make_pair(std::error_condition(), std::string());
 }
 
 /*-------------------------------------------------
@@ -70,11 +74,7 @@ image_init_result midiout_device::call_load()
 
 void midiout_device::call_unload()
 {
-	if (m_midi)
-	{
-		m_midi->close();
-		m_midi.reset();
-	}
+	m_midi.reset();
 }
 
 void midiout_device::rcv_complete()    // Rx completed receiving byte

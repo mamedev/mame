@@ -5,8 +5,8 @@
     Gaelco 3D serial hardware
 
 ***************************************************************************/
-#ifndef MAME_MACHINE_GAELCO3D_H
-#define MAME_MACHINE_GAELCO3D_H
+#ifndef MAME_GAELCO_GAELCO3D_M_H
+#define MAME_GAELCO_GAELCO3D_M_H
 
 #pragma once
 
@@ -30,9 +30,9 @@ public:
 	uint8_t status_r();
 	void data_w(uint8_t data);
 	uint8_t data_r();
-	DECLARE_WRITE_LINE_MEMBER(rts_w);
+	void rts_w(int state);
 	/* Set to 1 during transmit, 0 for receive */
-	DECLARE_WRITE_LINE_MEMBER(tr_w);
+	void tr_w(int state);
 
 
 	/* Big questions marks, related to serial i/o */
@@ -40,17 +40,17 @@ public:
 	/* Not used in surfplnt, but in radikalb
 	 * Set at beginning of transfer sub, cleared at end
 	 */
-	DECLARE_WRITE_LINE_MEMBER(unknown_w);
+	void unknown_w(int state);
 
 
 	/* only used in radikalb, set at beginning of receive isr, cleared at end */
-	DECLARE_WRITE_LINE_MEMBER(irq_enable);
+	void irq_enable(int state);
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_stop() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_stop() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 private:
 	struct buf_t
@@ -105,4 +105,4 @@ private:
 
 DECLARE_DEVICE_TYPE(GAELCO_SERIAL, gaelco_serial_device)
 
-#endif // MAME_MACHINE_GAELCO3D_H
+#endif // MAME_GAELCO_GAELCO3D_M_H

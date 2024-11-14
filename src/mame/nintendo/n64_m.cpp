@@ -13,6 +13,9 @@
 #include "debugger.h"
 #include "screen.h"
 
+#include <algorithm>
+
+
 // device type definition
 DEFINE_DEVICE_TYPE(N64PERIPH, n64_periphs, "n64_periphs", "N64 Peripheral Chips")
 
@@ -167,7 +170,7 @@ void n64_periphs::device_reset()
 	field = 0;
 
 	ai_timer->adjust(attotime::never);
-	memset(ai_fifo, 0, sizeof(ai_fifo));
+	std::fill(std::begin(ai_fifo), std::end(ai_fifo), AUDIO_DMA());
 	ai_fifo_wpos = 0;
 	ai_fifo_rpos = 0;
 	ai_fifo_num = 0;
@@ -964,17 +967,15 @@ void n64_periphs::dp_reg_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 				m_n64->rdp()->set_status(status & ~DP_STATUS_START_VALID);
 				m_n64->rdp()->set_current(m_n64->rdp()->get_start());
 				m_n64->rdp()->set_end(data & ~7);
-				g_profiler.start(PROFILER_USER1);
+				auto profile = g_profiler.start(PROFILER_USER1);
 				m_n64->rdp()->process_command_list();
-				g_profiler.stop();
 				break;
 			}
 			else
 			{
 				m_n64->rdp()->set_end(data & ~7);
-				g_profiler.start(PROFILER_USER1);
+				auto profile = g_profiler.start(PROFILER_USER1);
 				m_n64->rdp()->process_command_list();
-				g_profiler.stop();
 				break;
 			}
 

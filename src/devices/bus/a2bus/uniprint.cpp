@@ -25,18 +25,18 @@ public:
 
 protected:
 	// device_t implementation
-	virtual tiny_rom_entry const *device_rom_region() const override;
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual ioport_constructor device_input_ports() const override;
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual tiny_rom_entry const *device_rom_region() const override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// timer handlers
 	TIMER_CALLBACK_MEMBER(update_strobe);
 
 private:
 	// printer status inputs
-	DECLARE_WRITE_LINE_MEMBER(ack_w);
+	void ack_w(int state);
 
 	required_device<centronics_device>      m_printer_conn;
 	required_device<output_latch_device>    m_printer_out;
@@ -209,7 +209,7 @@ void a2bus_uniprint_device::device_reset()
 //  printer status inputs
 //----------------------------------------------
 
-WRITE_LINE_MEMBER(a2bus_uniprint_device::ack_w)
+void a2bus_uniprint_device::ack_w(int state)
 {
 	if (bool(state) != bool(m_ack_in))
 	{

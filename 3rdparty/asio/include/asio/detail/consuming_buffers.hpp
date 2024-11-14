@@ -2,7 +2,7 @@
 // detail/consuming_buffers.hpp
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //
-// Copyright (c) 2003-2021 Christopher M. Kohlhoff (chris at kohlhoff dot com)
+// Copyright (c) 2003-2024 Christopher M. Kohlhoff (chris at kohlhoff dot com)
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -20,6 +20,7 @@
 #include "asio/buffer.hpp"
 #include "asio/detail/buffer_sequence_adapter.hpp"
 #include "asio/detail/limits.hpp"
+#include "asio/registered_buffer.hpp"
 
 #include "asio/detail/push_options.hpp"
 
@@ -34,20 +35,16 @@ struct prepared_buffers_max
 };
 
 template <typename Elem, std::size_t N>
-struct prepared_buffers_max<boost::array<Elem, N> >
+struct prepared_buffers_max<boost::array<Elem, N>>
 {
   enum { value = N };
 };
-
-#if defined(ASIO_HAS_STD_ARRAY)
 
 template <typename Elem, std::size_t N>
-struct prepared_buffers_max<std::array<Elem, N> >
+struct prepared_buffers_max<std::array<Elem, N>>
 {
   enum { value = N };
 };
-
-#endif // defined(ASIO_HAS_STD_ARRAY)
 
 // A buffer sequence used to represent a subsequence of the buffers.
 template <typename Buffer, std::size_t MaxBuffers>
@@ -269,6 +266,42 @@ public:
 
 #endif // !defined(ASIO_NO_DEPRECATED)
 
+template <>
+class consuming_buffers<mutable_buffer,
+    mutable_registered_buffer, const mutable_buffer*>
+  : public consuming_single_buffer<mutable_registered_buffer>
+{
+public:
+  explicit consuming_buffers(const mutable_registered_buffer& buffer)
+    : consuming_single_buffer<mutable_registered_buffer>(buffer)
+  {
+  }
+};
+
+template <>
+class consuming_buffers<const_buffer,
+    mutable_registered_buffer, const mutable_buffer*>
+  : public consuming_single_buffer<mutable_registered_buffer>
+{
+public:
+  explicit consuming_buffers(const mutable_registered_buffer& buffer)
+    : consuming_single_buffer<mutable_registered_buffer>(buffer)
+  {
+  }
+};
+
+template <>
+class consuming_buffers<const_buffer,
+    const_registered_buffer, const const_buffer*>
+  : public consuming_single_buffer<const_registered_buffer>
+{
+public:
+  explicit consuming_buffers(const const_registered_buffer& buffer)
+    : consuming_single_buffer<const_registered_buffer>(buffer)
+  {
+  }
+};
+
 template <typename Buffer, typename Elem>
 class consuming_buffers<Buffer, boost::array<Elem, 2>,
     typename boost::array<Elem, 2>::const_iterator>
@@ -319,8 +352,6 @@ private:
   std::size_t total_consumed_;
 };
 
-#if defined(ASIO_HAS_STD_ARRAY)
-
 template <typename Buffer, typename Elem>
 class consuming_buffers<Buffer, std::array<Elem, 2>,
     typename std::array<Elem, 2>::const_iterator>
@@ -370,8 +401,6 @@ private:
   std::array<Elem, 2> buffers_;
   std::size_t total_consumed_;
 };
-
-#endif // defined(ASIO_HAS_STD_ARRAY)
 
 // Specialisation for null_buffers to ensure that the null_buffers type is
 // always passed through to the underlying read or write operation.

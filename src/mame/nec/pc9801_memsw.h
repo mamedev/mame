@@ -6,8 +6,8 @@ Template for skeleton device
 
 ***************************************************************************/
 
-#ifndef MAME_MACHINE_PC9801_MEMSW_H
-#define MAME_MACHINE_PC9801_MEMSW_H
+#ifndef MAME_NEC_PC9801_MEMSW_H
+#define MAME_NEC_PC9801_MEMSW_H
 
 #pragma once
 
@@ -38,8 +38,8 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 	virtual void nvram_default() override;
 	virtual bool nvram_read(util::read_stream &file) override;
 	virtual bool nvram_write(util::write_stream &file) override;
@@ -53,4 +53,4 @@ private:
 // device type definition
 DECLARE_DEVICE_TYPE(PC9801_MEMSW, pc9801_memsw_device)
 
-#endif // MAME_MACHINE_PC9801_MEMSW_H
+#endif // MAME_NEC_PC9801_MEMSW_H

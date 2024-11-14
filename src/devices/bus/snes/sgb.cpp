@@ -15,6 +15,9 @@
 #include "emu.h"
 #include "sgb.h"
 
+#include "bus/gameboy/carts.h"
+
+
 //-------------------------------------------------
 //  sns_rom_sgb_device - constructor
 //-------------------------------------------------
@@ -23,13 +26,15 @@ DEFINE_DEVICE_TYPE(SNS_LOROM_SUPERGB,  sns_rom_sgb1_device, "sns_rom_sgb",  "SNE
 DEFINE_DEVICE_TYPE(SNS_LOROM_SUPERGB2, sns_rom_sgb2_device, "sns_rom_sgb2", "SNES Super Game Boy 2 Cart")
 
 
-sns_rom_sgb_device::sns_rom_sgb_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
-	: sns_rom_device(mconfig, type, tag, owner, clock),
+sns_rom_sgb_device::sns_rom_sgb_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+	sns_rom_device(mconfig, type, tag, owner, clock),
 	m_sgb_cpu(*this, "sgb_cpu"),
 	m_sgb_apu(*this, "sgb_apu"),
 	m_sgb_ppu(*this, "sgb_ppu"),
 	m_cartslot(*this, "gb_slot"),
-	m_region_bios(*this, "sgb_cpu"),
+	m_region_bootstrap(*this, "sgb_cpu"),
+	m_view_bootstrap(*this, "sgb_boot"),
+	m_bootstrap_installed(false),
 	m_sgb_ly(0),
 	m_sgb_row(0),
 	m_vram(0),
@@ -40,8 +45,7 @@ sns_rom_sgb_device::sns_rom_sgb_device(const machine_config &mconfig, device_typ
 	m_joy4(0),
 	m_vram_offs(0),
 	m_lcd_row(0),
-	m_packetsize(0),
-	m_bios_disabled(false)
+	m_packetsize(0)
 {
 }
 
@@ -60,10 +64,19 @@ sns_rom_sgb2_device::sns_rom_sgb2_device(const machine_config& mconfig, const ch
 
 void sns_rom_sgb_device::device_start()
 {
+	m_bootstrap_installed = false;
 }
 
 void sns_rom_sgb_device::device_reset()
 {
+	// need to install the bootstrap view over the top of the cartridge, which installs *after* start
+	if (!m_bootstrap_installed)
+	{
+		m_sgb_cpu->space(AS_PROGRAM).install_view(0x0000, 0x00ff, m_view_bootstrap);
+		m_view_bootstrap[0].install_rom(0x0000, 0x00ff, &m_region_bootstrap[0]);
+		m_bootstrap_installed = true;
+	}
+	m_view_bootstrap.select(0);
 }
 
 
@@ -73,40 +86,6 @@ void sns_rom_sgb_device::device_reset()
 //-------------------------------------------------
 //  ADDRESS_MAP( supergb_map )
 //-------------------------------------------------
-
-uint8_t sns_rom_sgb_device::gb_cart_r(offs_t offset)
-{
-	if (offset < 0x100 && !m_bios_disabled)
-	{
-		return m_region_bios->base()[offset];
-	}
-	return m_cartslot->read_rom(offset);
-}
-
-void sns_rom_sgb_device::gb_bank_w(offs_t offset, uint8_t data)
-{
-	m_cartslot->write_bank(offset, data);
-}
-
-uint8_t sns_rom_sgb_device::gb_ram_r(offs_t offset)
-{
-	return m_cartslot->read_ram(offset);
-}
-
-void sns_rom_sgb_device::gb_ram_w(offs_t offset, uint8_t data)
-{
-	m_cartslot->write_ram(offset, data);
-}
-
-uint8_t sns_rom_sgb_device::gb_echo_r(offs_t offset)
-{
-	return m_sgb_cpu->space(AS_PROGRAM).read_byte(0xc000 + offset);
-}
-
-void sns_rom_sgb_device::gb_echo_w(offs_t offset, uint8_t data)
-{
-	return m_sgb_cpu->space(AS_PROGRAM).write_byte(0xc000 + offset, data);
-}
 
 uint8_t sns_rom_sgb_device::gb_io_r(offs_t offset)
 {
@@ -132,32 +111,24 @@ void sns_rom_sgb_device::gb_ie_w(offs_t offset, uint8_t data)
 void sns_rom_sgb_device::supergb_map(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x0000, 0x7fff).rw(FUNC(sns_rom_sgb_device::gb_cart_r), FUNC(sns_rom_sgb_device::gb_bank_w));
-	map(0x8000, 0x9fff).rw("sgb_ppu", FUNC(sgb_ppu_device::vram_r), FUNC(sgb_ppu_device::vram_w));  /* 8k VRAM */
-	map(0xa000, 0xbfff).rw(FUNC(sns_rom_sgb_device::gb_ram_r), FUNC(sns_rom_sgb_device::gb_ram_w));   /* 8k switched RAM bank (cartridge) */
-	map(0xc000, 0xdfff).ram();                              /* 8k low RAM */
-	map(0xe000, 0xfdff).rw(FUNC(sns_rom_sgb_device::gb_echo_r), FUNC(sns_rom_sgb_device::gb_echo_w));
-	map(0xfe00, 0xfeff).rw("sgb_ppu", FUNC(sgb_ppu_device::oam_r), FUNC(sgb_ppu_device::oam_w));    /* OAM RAM */
-	map(0xff00, 0xff0f).rw(FUNC(sns_rom_sgb_device::gb_io_r), FUNC(sns_rom_sgb_device::gb_io_w));      /* I/O */
-	map(0xff10, 0xff26).rw("sgb_apu", FUNC(gameboy_sound_device::sound_r), FUNC(gameboy_sound_device::sound_w));      /* sound registers */
-	map(0xff27, 0xff2f).noprw();                     /* unused */
-	map(0xff30, 0xff3f).rw("sgb_apu", FUNC(gameboy_sound_device::wave_r), FUNC(gameboy_sound_device::wave_w));        /* Wave RAM */
-	map(0xff40, 0xff7f).rw("sgb_ppu", FUNC(sgb_ppu_device::video_r), FUNC(sgb_ppu_device::video_w)); /* also disable bios?? */        /* Video controller & BIOS flip-flop */
-	map(0xff80, 0xfffe).ram();                     /* High RAM */
-	map(0xffff, 0xffff).rw(FUNC(sns_rom_sgb_device::gb_ie_r), FUNC(sns_rom_sgb_device::gb_ie_w));        /* Interrupt enable register */
+	// cartridge ROM and memory controller goes here
+	map(0x8000, 0x9fff).rw(m_sgb_ppu, FUNC(sgb_ppu_device::vram_r), FUNC(sgb_ppu_device::vram_w));      // 8k VRAM
+	// cartridge RAM and/or I/O goes here
+	map(0xc000, 0xdfff).mirror(0x2000).ram();                                                           // 8k low RAM
+	map(0xfe00, 0xfeff).rw(m_sgb_ppu, FUNC(sgb_ppu_device::oam_r), FUNC(sgb_ppu_device::oam_w));        // OAM RAM
+	map(0xff00, 0xff0f).rw(FUNC(sns_rom_sgb_device::gb_io_r), FUNC(sns_rom_sgb_device::gb_io_w));       // I/O
+	map(0xff10, 0xff26).rw(m_sgb_apu, FUNC(gameboy_sound_device::sound_r), FUNC(gameboy_sound_device::sound_w));      /* sound registers */
+	map(0xff27, 0xff2f).noprw();                                                                        // unused
+	map(0xff30, 0xff3f).rw(m_sgb_apu, FUNC(gameboy_sound_device::wave_r), FUNC(gameboy_sound_device::wave_w));        /* Wave RAM */
+	map(0xff40, 0xff7f).rw(m_sgb_ppu, FUNC(sgb_ppu_device::video_r), FUNC(sgb_ppu_device::video_w));    // also disable bios??
+	map(0xff80, 0xfffe).ram();                                                                          // High RAM
+	map(0xffff, 0xffff).rw(FUNC(sns_rom_sgb_device::gb_ie_r), FUNC(sns_rom_sgb_device::gb_ie_w));       // Interrupt enable register
 }
 
 
 
 void sns_rom_sgb_device::gb_timer_callback(uint8_t data)
 {
-}
-
-
-static void supergb_cart(device_slot_interface &device)
-{
-	device.option_add_internal("rom",  GB_STD_ROM);
-	device.option_add_internal("rom_mbc1",  GB_ROM_MBC1);
 }
 
 
@@ -172,7 +143,8 @@ void sns_rom_sgb1_device::device_add_mconfig(machine_config &config)
 
 	DMG_APU(config, m_sgb_apu, 4295454);
 
-	GB_CART_SLOT(config, m_cartslot, supergb_cart, nullptr);
+	GB_CART_SLOT(config, m_cartslot, gameboy_cartridges, nullptr);
+	m_cartslot->set_space(m_sgb_cpu, AS_PROGRAM);
 }
 
 
@@ -199,7 +171,8 @@ void sns_rom_sgb2_device::device_add_mconfig(machine_config &config)
 
 	DMG_APU(config, m_sgb_apu, XTAL(4'194'304));
 
-	GB_CART_SLOT(config, m_cartslot, supergb_cart, nullptr);
+	GB_CART_SLOT(config, m_cartslot, gameboy_cartridges, nullptr);
+	m_cartslot->set_space(m_sgb_cpu, AS_PROGRAM);
 }
 
 
@@ -355,5 +328,4 @@ void sns_rom_sgb_device::chip_write(offs_t offset, uint8_t data)
 		m_joy4 = data;
 		return;
 	}
-
 }

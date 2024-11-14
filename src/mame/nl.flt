@@ -4,13 +4,14 @@
 
 atari/flyball.cpp
 capcom/1942.cpp
-cinemat/cinemat.cpp
+cinematronics/cinemat.cpp
 exidy/carpolo.cpp
 exidy/starfire.cpp
 irem/m62.cpp
 jpm/jpmsru.cpp
 midway/sspeedr.cpp
 misc/cocoloco.cpp
+mr/dribling.cpp
 nintendo/mario.cpp
 nintendo/popeye.cpp
 ramtek/starcrus.cpp
@@ -22,14 +23,20 @@ sega/zaxxon.cpp
 skeleton/hazeltin.cpp
 skeleton/palestra.cpp
 skeleton/testpat.cpp
-univers/cheekyms.cpp
+universal/cheekyms.cpp
 vtech/gamemachine.cpp
 zaccaria/zaccaria.cpp
 
+// from handheld/hh_pic16.cpp
++sfxphasor
+
+// from handheld/hh_tms1k.cpp
++bship
+
 // from midw8080/mw8080bw.cpp
++280zzzap
 +gunfight
 +gunfighto
-+280zzzap
 +lagunar
 
 // from sega/vicdual.cpp
@@ -37,9 +44,9 @@ zaccaria/zaccaria.cpp
 +brdrline
 +brdrlinet
 +brdrlins
++frogs
 +starrkr
 +tranqgun
-+frogs
 
 // extra parents to allow validation to pass
 +afighter
@@ -61,7 +68,7 @@ atari/pong.cpp
 // Skeletons                 //
 ///////////////////////////////
 
-alliedl/aleisttl.cpp
+alliedleisure/aleisttl.cpp
 exidy/exidyttl.cpp
 meadows/meadows.cpp
 misc/a1supply.cpp

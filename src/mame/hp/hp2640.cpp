@@ -189,8 +189,8 @@ protected:
 		CHARGEN_E = 0x10
 	};
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	IRQ_CALLBACK_MEMBER(irq_callback);
 
@@ -214,17 +214,17 @@ protected:
 
 	uint8_t async_status_r();
 	void async_control_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(async_dav_w);
-	DECLARE_WRITE_LINE_MEMBER(async_txd_w);
+	void async_dav_w(int state);
+	void async_txd_w(int state);
 
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_beep_exp);
 
-	DECLARE_WRITE_LINE_MEMBER(tape_irq_w);
+	void tape_irq_w(int state);
 
 	uint8_t poll_r();
 
-	void cpu_mem_map(address_map &map);
-	void cpu_io_map(address_map &map);
+	void cpu_mem_map(address_map &map) ATTR_COLD;
+	void cpu_io_map(address_map &map) ATTR_COLD;
 
 	required_device<i8080a_cpu_device> m_cpu;
 	required_device<timer_device> m_timer_10ms;
@@ -566,12 +566,12 @@ void hp2640_base_state::async_control_w(uint8_t data)
 	update_async_control(data);
 }
 
-WRITE_LINE_MEMBER(hp2640_base_state::async_dav_w)
+void hp2640_base_state::async_dav_w(int state)
 {
 	update_async_irq();
 }
 
-WRITE_LINE_MEMBER(hp2640_base_state::async_txd_w)
+void hp2640_base_state::async_txd_w(int state)
 {
 	m_rs232->write_txd(!BIT(m_async_control , 6) && m_uart->so_r());
 }
@@ -581,7 +581,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(hp2640_base_state::timer_beep_exp)
 	m_beep->set_state(0);
 }
 
-WRITE_LINE_MEMBER(hp2640_base_state::tape_irq_w)
+void hp2640_base_state::tape_irq_w(int state)
 {
 	m_tape_irq = state;
 	update_irq();
@@ -1159,7 +1159,7 @@ public:
 	void hp2641(machine_config &config);
 
 protected:
-	void cpu_mem_map(address_map &map);
+	void cpu_mem_map(address_map &map) ATTR_COLD;
 };
 
 hp2641_state::hp2641_state(const machine_config &mconfig, device_type type, const char *tag)

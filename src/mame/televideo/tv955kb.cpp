@@ -32,12 +32,6 @@ tv955kb_device::tv955kb_device(const machine_config &mconfig, const char *tag, d
 {
 }
 
-void tv955kb_device::device_resolve_objects()
-{
-	m_txd_cb.resolve_safe();
-	m_reset_cb.resolve_safe();
-}
-
 void tv955kb_device::device_start()
 {
 	m_bell_timer = timer_alloc(FUNC(tv955kb_device::bell_q8), this);
@@ -68,7 +62,7 @@ void tv955kb_device::bell_reset()
 	m_bell_timer->enable(false);
 }
 
-WRITE_LINE_MEMBER(tv955kb_device::write_rxd)
+void tv955kb_device::write_rxd(int state)
 {
 	m_mcu->set_input_line(MCS48_INPUT_IRQ, state ? CLEAR_LINE : ASSERT_LINE);
 }
@@ -86,7 +80,7 @@ u8 tv955kb_device::keys_r()
 	return result;
 }
 
-WRITE_LINE_MEMBER(tv955kb_device::bell_w)
+void tv955kb_device::bell_w(int state)
 {
 	if (state && m_bell_timer->enabled())
 		bell_reset();
@@ -98,12 +92,12 @@ WRITE_LINE_MEMBER(tv955kb_device::bell_w)
 	}
 }
 
-WRITE_LINE_MEMBER(tv955kb_device::txd_w)
+void tv955kb_device::txd_w(int state)
 {
 	m_txd_cb(state);
 }
 
-WRITE_LINE_MEMBER(tv955kb_device::reset_w)
+void tv955kb_device::reset_w(int state)
 {
 	m_mcu->set_input_line(INPUT_LINE_RESET, state ? CLEAR_LINE : ASSERT_LINE);
 	if (!state)
@@ -291,13 +285,13 @@ static INPUT_PORTS_START(tv955kb)
 
 	PORT_START("SHIFT")
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Shift") PORT_CHAR(UCHAR_SHIFT_1) PORT_CODE(KEYCODE_LSHIFT) PORT_CODE(KEYCODE_RSHIFT)
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Ctrl") PORT_CHAR(UCHAR_SHIFT_2) PORT_CODE(KEYCODE_LCONTROL) PORT_WRITE_LINE_DEVICE_MEMBER("resetctl", input_merger_device, in_w<0>)
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Ctrl") PORT_CHAR(UCHAR_SHIFT_2) PORT_CODE(KEYCODE_LCONTROL) PORT_WRITE_LINE_DEVICE_MEMBER("resetctl", FUNC(input_merger_device::in_w<0>))
 	PORT_BIT(0xcf, IP_ACTIVE_LOW, IPT_UNUSED)
 
 	PORT_START("FUNCT")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Alpha Lock") PORT_CHAR(UCHAR_MAMEKEY(CAPSLOCK)) PORT_CODE(KEYCODE_CAPSLOCK) PORT_TOGGLE
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Funct") PORT_CHAR(UCHAR_MAMEKEY(LALT)) PORT_CODE(KEYCODE_LALT)
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Reset") PORT_WRITE_LINE_DEVICE_MEMBER("resetctl", input_merger_device, in_w<1>)
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Reset") PORT_WRITE_LINE_DEVICE_MEMBER("resetctl", FUNC(input_merger_device::in_w<1>))
 INPUT_PORTS_END
 
 ioport_constructor tv955kb_device::device_input_ports() const

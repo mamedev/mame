@@ -1,7 +1,7 @@
 /** @file patest_buffer.c
-	@ingroup test_src
-	@brief Test opening streams with different buffer sizes.
-	@author Phil Burk  http://www.softsynth.com
+    @ingroup test_src
+    @brief Test opening streams with different buffer sizes.
+    @author Phil Burk  http://www.softsynth.com
 */
 /*
  * $Id$
@@ -31,13 +31,13 @@
  */
 
 /*
- * The text above constitutes the entire PortAudio license; however, 
+ * The text above constitutes the entire PortAudio license; however,
  * the PortAudio community also makes the following non-binding requests:
  *
  * Any person wishing to distribute modifications to the Software is
  * requested to send the modifications to the original developer so that
- * they can be incorporated into the canonical version. It is also 
- * requested that these non-binding requests be included along with the 
+ * they can be incorporated into the canonical version. It is also
+ * requested that these non-binding requests be included along with the
  * license above.
  */
 
@@ -128,10 +128,10 @@ int main(int argc, char **args)
     PaError err;
     printf("Test opening streams with different buffer sizes\n");
     if( argc > 1 ) {
-       device=atoi( args[1] );
-       printf("Using device number %d.\n\n", device );
+        device=atoi( args[1] );
+        printf("Using device number %d.\n\n", device );
     } else {
-       printf("Using default device.\n\n" );
+        printf("Using default device.\n\n" );
     }
 
     for (i = 0 ; i < BUFFER_TABLE; i++)
@@ -162,15 +162,15 @@ PaError TestOnce( int buffersize, PaDeviceIndex device )
     data.sampsToGo = totalSamps =  NUM_SECONDS * SAMPLE_RATE; /* Play for a few seconds. */
     err = Pa_Initialize();
     if( err != paNoError ) goto error;
-    
+
     if( device == -1 )
         outputParameters.device = Pa_GetDefaultOutputDevice(); /* default output device */
     else
         outputParameters.device = device ;
 
     if (outputParameters.device == paNoDevice) {
-      fprintf(stderr,"Error: No default output device.\n");
-      goto error;
+        fprintf(stderr,"Error: No default output device.\n");
+        goto error;
     }
 
     outputParameters.channelCount = 2;                      /* stereo output */
@@ -198,7 +198,7 @@ PaError TestOnce( int buffersize, PaDeviceIndex device )
     return paNoError;
 error:
     Pa_Terminate();
-    fprintf( stderr, "An error occured while using the portaudio stream\n" );
+    fprintf( stderr, "An error occurred while using the portaudio stream\n" );
     fprintf( stderr, "Error number: %d\n", err );
     fprintf( stderr, "Error message: %s\n", Pa_GetErrorText( err ) );
     fprintf( stderr, "Host Error message: %s\n", Pa_GetLastHostErrorInfo()->errorText );

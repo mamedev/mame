@@ -74,7 +74,7 @@ bool ppc_device::frontend::describe(opcode_desc &desc, const opcode_desc *prev)
 	int regnum;
 
 	// compute the physical PC
-	if (!m_ppc.memory_translate(AS_PROGRAM, TRANSLATE_FETCH, desc.physpc))
+	if (m_ppc.ppccom_translate_address_internal(TR_FETCH, false, desc.physpc) > 1)
 	{
 		// uh-oh: a page fault; leave the description empty and just if this is the first instruction, leave it empty and
 		// mark as needing to validate; otherwise, just end the sequence here
@@ -289,8 +289,12 @@ bool ppc_device::frontend::describe(opcode_desc &desc, const opcode_desc *prev)
 
 		case 0x2e:  // LMW
 			GPR_USED_OR_ZERO(desc, G_RA(op));
+
 			for (regnum = G_RD(op); regnum < 32; regnum++)
-				GPR_MODIFIED(desc, regnum);
+			{
+				if (regnum != G_RA(op) || ((m_ppc.m_cap & PPCCAP_4XX) && regnum == 31))
+					GPR_MODIFIED(desc, regnum);
+			}
 			desc.flags |= OPFLAG_READS_MEMORY;
 			desc.cycles = 32 - G_RD(op);
 			return true;

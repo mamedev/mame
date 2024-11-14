@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Curt Coder
-#ifndef MAME_INCLUDES_PROF80_H
-#define MAME_INCLUDES_PROF80_H
+#ifndef MAME_CONITEC_PROF80_H
+#define MAME_CONITEC_PROF80_H
 
 #pragma once
 
@@ -53,7 +53,7 @@ public:
 	void prof80(machine_config &config);
 
 private:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 	TIMER_CALLBACK_MEMBER(motor_off);
 
@@ -78,12 +78,12 @@ private:
 
 	void motor(int mon);
 
-	DECLARE_WRITE_LINE_MEMBER(ready_w);
-	DECLARE_WRITE_LINE_MEMBER(inuse_w);
-	DECLARE_WRITE_LINE_MEMBER(motor_w);
-	DECLARE_WRITE_LINE_MEMBER(select_w);
-	DECLARE_WRITE_LINE_MEMBER(mini_w);
-	DECLARE_WRITE_LINE_MEMBER(mstop_w);
+	void ready_w(int state);
+	void inuse_w(int state);
+	void motor_w(int state);
+	void select_w(int state);
+	void mini_w(int state);
+	void mstop_w(int state);
 
 	// floppy state
 	int m_motor = 0;
@@ -93,9 +93,9 @@ private:
 	// timers
 	emu_timer   *m_floppy_motor_off_timer = nullptr;
 
-	void prof80_io(address_map &map);
-	void prof80_mem(address_map &map);
-	void prof80_mmu(address_map &map);
+	void prof80_io(address_map &map) ATTR_COLD;
+	void prof80_mem(address_map &map) ATTR_COLD;
+	void prof80_mmu(address_map &map) ATTR_COLD;
 };
 
-#endif
+#endif // MAME_CONITEC_PROF80_H

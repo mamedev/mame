@@ -55,16 +55,13 @@
 #include "screen.h"
 #include "tilemap.h"
 
+#define LOG_AUDIO (1U << 1)
+
+#define VERBOSE (LOG_AUDIO)
+#include "logmacro.h"
+
 
 namespace {
-
-
-//**************************************************************************
-//  CONSTANTS / MACROS
-//**************************************************************************
-
-#define LOG_AUDIO 1
-
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -93,7 +90,7 @@ public:
 	void mmagic(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -106,8 +103,8 @@ private:
 	required_device<samples_device> m_samples;
 	required_region_ptr<uint8_t> m_tile_colors;
 
-	void mem_map(address_map& map);
-	void io_map(address_map& map);
+	void mem_map(address_map &map) ATTR_COLD;
+	void io_map(address_map &map) ATTR_COLD;
 
 	uint8_t paddle_r();
 	uint8_t buttons_r();
@@ -316,8 +313,7 @@ static constexpr const char* const sample_names[] =
 
 void mmagic_state::audio_w(uint8_t data)
 {
-	if (LOG_AUDIO)
-		logerror("audio_w: %02x\n", data);
+	LOGMASKED(LOG_AUDIO, "audio_w: %02x\n", data);
 
 	data ^= 0xff;
 	if (data != m_audio)

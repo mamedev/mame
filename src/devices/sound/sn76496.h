@@ -24,14 +24,14 @@ public:
 	auto ready_cb() { return m_ready_handler.bind(); }
 	void stereo_w(u8 data);
 	void write(u8 data);
-	DECLARE_READ_LINE_MEMBER( ready_r ) { return m_ready_state ? 1 : 0; }
+	int ready_r() { return m_ready_state ? 1 : 0; }
 
 protected:
 	sn76496_base_device(const machine_config &mconfig, device_type type, const char *tag,
 			int feedbackmask, int noisetap1, int noisetap2, bool negate, bool stereo, int clockdivider,
 			bool ncr, bool sega, device_t *owner, uint32_t clock);
 
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 	virtual void device_clock_changed() override;
 	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
 

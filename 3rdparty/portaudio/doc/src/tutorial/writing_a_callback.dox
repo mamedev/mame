@@ -10,7 +10,7 @@ The next task is to write your own "callback" function. The "callback" is a func
 Before we begin, it's important to realize that the callback is a delicate place. This is because some systems perform the callback in a special thread, or interrupt handler, and it is rarely treated the same as the rest of your code.
 For most modern systems, you won't be able to cause crashes by making disallowed calls in the callback, but if you want your code to produce glitch-free audio, you will have to make sure you avoid function calls that may take an unbounded amount of time
 to execute. Exactly what these are depend on your platform but almost certainly include the following:  memory allocation/deallocation, I/O (including file I/O as well as console I/O, such as printf()), context switching (such as exec() or
-yield()), mutex operations, or anything else that might rely on the OS. If you think short critical sections are safe please go read about priority inversion. Windows amd Mac OS schedulers have no real-time safe priority inversion prevention. Other platforms require special mutex flags. In addition, it is not safe to call any PortAudio API functions in the callback except as explicitly permitted in the documentation.
+yield()), mutex operations, or anything else that might rely on the OS. If you think short critical sections are safe please go read about priority inversion. Windows and Mac OS schedulers have no real-time safe priority inversion prevention. Other platforms require special mutex flags. In addition, it is not safe to call any PortAudio API functions in the callback except as explicitly permitted in the documentation.
 
 
 Your callback function must return an int and accept the exact parameters specified in this typedef:

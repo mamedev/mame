@@ -33,6 +33,8 @@
 #include "logmacro.h"
 
 
+namespace {
+
 class generalplus_gpl_unknown_state : public driver_device
 {
 public:
@@ -51,8 +53,8 @@ public:
 	void generalplus_gpl_unknown(machine_config &config);
 
 private:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
@@ -117,7 +119,7 @@ private:
 	uint16_t m_3005;
 	uint16_t m_3050;
 
-	void map(address_map &map);
+	void map(address_map &map) ATTR_COLD;
 };
 
 uint32_t generalplus_gpl_unknown_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -617,6 +619,8 @@ ROM_START( taturtf )
 	ROM_REGION16_BE( 0x800000, "spi", ROMREGION_ERASEFF )
 	ROM_LOAD16_WORD_SWAP( "tinyarcadeturtlefighter_25q32bst16_684016.bin", 0x000000, 0x400000, CRC(8e046f2d) SHA1(e48492cf953f22a47fa2b88a8f96a1e459b8c487) )
 ROM_END
+
+} // anonymous namespace
 
 
 // The 'Micro Arcade' units are credit card sized handheld devices

@@ -4,7 +4,7 @@
 
 #include "OutStreamWithCRC.h"
 
-STDMETHODIMP COutStreamWithCRC::Write(const void *data, UInt32 size, UInt32 *processedSize)
+Z7_COM7F_IMF(COutStreamWithCRC::Write(const void *data, UInt32 size, UInt32 *processedSize))
 {
   HRESULT result = S_OK;
   if (_stream)
@@ -12,7 +12,7 @@ STDMETHODIMP COutStreamWithCRC::Write(const void *data, UInt32 size, UInt32 *pro
   if (_calculate)
     _crc = CrcUpdate(_crc, data, size);
   _size += size;
-  if (processedSize != NULL)
+  if (processedSize)
     *processedSize = size;
   return result;
 }

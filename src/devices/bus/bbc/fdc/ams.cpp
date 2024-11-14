@@ -6,9 +6,10 @@
 
 **********************************************************************/
 
-
 #include "emu.h"
 #include "ams.h"
+
+#include "formats/acorn_dsk.h"
 
 
 //**************************************************************************
@@ -55,8 +56,8 @@ void bbc_ams3_device::device_add_mconfig(machine_config &config)
 	m_fdc->hdl_wr_callback().set(FUNC(bbc_ams3_device::motor_w));
 	m_fdc->opt_wr_callback().set(FUNC(bbc_ams3_device::side_w));
 	// Hitachi HFD 305S
-	FLOPPY_CONNECTOR(config, m_floppy[0], "3dsdd", FLOPPY_3_DSDD, true, bbc_ams3_device::floppy_formats).enable_sound(true);
-	FLOPPY_CONNECTOR(config, m_floppy[1], "3dsdd", FLOPPY_3_DSDD, false, bbc_ams3_device::floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, m_floppy[0], "3dssd", FLOPPY_3_DSSD, true, bbc_ams3_device::floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, m_floppy[1], "3dssd", FLOPPY_3_DSSD, false, bbc_ams3_device::floppy_formats).enable_sound(true);
 }
 
 
@@ -122,14 +123,14 @@ void bbc_ams3_device::write(offs_t offset, uint8_t data)
 	}
 }
 
-WRITE_LINE_MEMBER(bbc_ams3_device::motor_w)
+void bbc_ams3_device::motor_w(int state)
 {
 	if (m_floppy[0]->get_device()) m_floppy[0]->get_device()->mon_w(!state);
 	if (m_floppy[1]->get_device()) m_floppy[1]->get_device()->mon_w(!state);
 	m_fdc->ready_w(!state);
 }
 
-WRITE_LINE_MEMBER(bbc_ams3_device::side_w)
+void bbc_ams3_device::side_w(int state)
 {
 	if (m_floppy[0]->get_device()) m_floppy[0]->get_device()->ss_w(state);
 	if (m_floppy[1]->get_device()) m_floppy[1]->get_device()->ss_w(state);

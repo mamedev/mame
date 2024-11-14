@@ -21,6 +21,9 @@ No Namco custom chips
 #include "cpu/m6809/m6809.h"
 #include "sound/okim6295.h"
 
+
+namespace {
+
 class namcos1b_state : public driver_device
 {
 public:
@@ -34,10 +37,10 @@ public:
 private:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void main_prg_map(address_map &map);
-	void sub_prg_map(address_map &map);
+	void main_prg_map(address_map &map) ATTR_COLD;
+	void sub_prg_map(address_map &map) ATTR_COLD;
 
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 };
 
 uint32_t namcos1b_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -143,6 +146,8 @@ ROM_START( tankfrceb ) // ROMs dumped from 2 different PCBs, marked KMW-2801/03/
 	ROM_REGION( 0x100000, "sprite", 0 )
 	ROM_LOAD( "tk_r5-uj24.uj24",  0x00000, 0x40000, CRC(7e8e7852) SHA1(7a85d8b0bb3cb0366455b7f105b8f97bca045094) ) // identical to obj0 + obj1
 ROM_END
+
+} // anonymous namespace
 
 
 GAME( 199?, tankfrceb, tankfrce, namcos1b, namcos1b, namcos1b_state, empty_init, ROT0, "bootleg", "Tank Force (bootleg)", MACHINE_IS_SKELETON )

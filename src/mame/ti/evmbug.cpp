@@ -32,6 +32,8 @@ http://www.stuartconner.me.uk/tms9995_breadboard/tms9995_breadboard.htm
 #include "machine/terminal.h"
 
 
+namespace {
+
 class evmbug_state : public driver_device
 {
 public:
@@ -49,12 +51,12 @@ private:
 	void rs232_w(offs_t offset, uint8_t data);
 	void kbd_put(u8 data);
 
-	void io_map(address_map &map);
-	void evmbug_mem(address_map &map);
-	void tms9995bb_mem(address_map &map);
+	void io_map(address_map &map) ATTR_COLD;
+	void evmbug_mem(address_map &map) ATTR_COLD;
+	void tms9995bb_mem(address_map &map) ATTR_COLD;
 
-	virtual void machine_reset() override;
-	virtual void machine_start() override;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void machine_start() override ATTR_COLD;
 	uint8_t m_term_data = 0U;
 	uint8_t m_term_out = 0U;
 	bool m_rin = 0;
@@ -190,6 +192,9 @@ ROM_START( tms9995bb )
 	ROM_SYSTEM_BIOS( 6, "test3", "Test EPROM 3")
 	ROMX_LOAD( "test3.bin",    0x0000, 0x8000, CRC(a28579eb) SHA1(477f853970f132592714bcdd048ec932e96c8593), ROM_BIOS(6) )
 ROM_END
+
+} // anonymous namespace
+
 
 /* Driver */
 

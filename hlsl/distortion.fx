@@ -152,7 +152,7 @@ float GetSpotAddend(float2 coord, float amount)
 	float2 spotOffset = float2(-0.25f, 0.25f);
 
 	// normalized screen canvas ratio
-	float2 CanvasRatio = SwapXY 
+	float2 CanvasRatio = SwapXY
 		? float2(1.0f, QuadDims.x / QuadDims.y)
 		: float2(1.0f, QuadDims.y / QuadDims.x);
 
@@ -284,13 +284,11 @@ float4 ps_main(PS_INPUT Input) : COLOR
 	if (BaseCoord.x < 0.0f - TexelDims.x || BaseCoord.y < 0.0f - TexelDims.y ||
 		BaseCoord.x > 1.0f + TexelDims.x || BaseCoord.y > 1.0f + TexelDims.y)
 	{
-		// we don't use the clip function, because we don't clear the render target before
-		return float4(0.0f, 0.0f, 0.0f, 1.0f);
+		return float4(0, 0, 0, 1);
 	}
 
 	// Color
 	float4 BaseColor = tex2D(DiffuseSampler, BaseCoord);
-	BaseColor.a = 1.0f;
 
 	// Vignetting Simulation
 	float2 VignetteCoord = QuadCoord;

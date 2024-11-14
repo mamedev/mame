@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Ryan Holtz
-#ifndef MAME_MACHINE_NL_TANK_H
-#define MAME_MACHINE_NL_TANK_H
+#ifndef MAME_ATARI_NL_TANK_H
+#define MAME_ATARI_NL_TANK_H
 
 #pragma once
 
@@ -9,4 +9,4 @@
 
 NETLIST_EXTERNAL(tank)
 
-#endif // MAME_MACHINE_NL_TANK_H
+#endif // MAME_ATARI_NL_TANK_H

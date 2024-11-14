@@ -24,7 +24,8 @@ public:
 		NOTCH,
 		PEAK,
 		LOWSHELF,
-		HIGHSHELF
+		HIGHSHELF,
+		RAWPARAMS
 	};
 
 	struct biquad_params
@@ -44,7 +45,12 @@ public:
 	void modify(biquad_type type, double fc, double q, double gain);
 	void modify(biquad_params p);
 
-	// helper setup functions to create common filters representable by biquad filters:
+	// set up the filter with raw biquad coefficients
+	filter_biquad_device& setup_raw(double a1, double a2, double b0, double b1, double b2);
+	void modify_raw(double a1, double a2, double b0, double b1, double b2);
+
+	// Helper setup functions to create common filters representable by biquad filters:
+	// (and, as needed, modify/update/recalc helpers)
 
 	// Sallen-Key low-pass
 	filter_biquad_device& opamp_sk_lowpass_setup(double r1, double r2, double r3, double r4, double c1, double c2);
@@ -76,7 +82,7 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 	// sound stream update overrides
 	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;

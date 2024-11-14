@@ -25,12 +25,12 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// optional information overrides
-	virtual ioport_constructor device_input_ports() const override;
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 	virtual void io_read(int ifsel, offs_t offset, uint8_t &data) override;
 	virtual void io_write(int ifsel, offs_t offset, uint8_t data) override;
@@ -38,7 +38,7 @@ protected:
 	void update_int();
 
 private:
-	DECLARE_WRITE_LINE_MEMBER(rtc_irq_w);
+	void rtc_irq_w(int state);
 
 	required_device<mm58167_device> m_rtc;
 	required_ioport m_dsw;

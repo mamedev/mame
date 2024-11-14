@@ -5,8 +5,8 @@
     Sega System 32/Multi 32 hardware
 
 ***************************************************************************/
-#ifndef MAME_INCLUDES_SEGAS32_H
-#define MAME_INCLUDES_SEGAS32_H
+#ifndef MAME_SEGA_SEGAS32_H
+#define MAME_SEGA_SEGAS32_H
 
 #pragma once
 
@@ -16,8 +16,6 @@
 #include "emupal.h"
 #include "screen.h"
 #include "tilemap.h"
-
-
 
 
 class segas32_state : public device_t
@@ -56,7 +54,7 @@ public:
 	uint32_t screen_update_multi32_left(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_multi32_right(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	DECLARE_WRITE_LINE_MEMBER(ym3438_irq_handler);
+	void ym3438_irq_handler(int state);
 	TIMER_DEVICE_CALLBACK_MEMBER(signal_v60_irq_callback);
 	INTERRUPT_GEN_MEMBER(start_of_vblank_int);
 
@@ -64,7 +62,7 @@ public:
 	void misc_output_1_w(uint8_t data);
 	void sw2_output_0_w(uint8_t data);
 	void sw2_output_1_w(uint8_t data);
-	template<int Which> DECLARE_WRITE_LINE_MEMBER(display_enable_w);
+	template<int Which> void display_enable_w(int state);
 	void tilebank_external_w(uint8_t data);
 
 protected:
@@ -186,26 +184,26 @@ protected:
 	void darkedge_fd1149_vblank();
 	void f1lap_fd1149_vblank();
 
-	void ga2_main_map(address_map &map);
-	void multi32_6player_map(address_map &map);
-	void multi32_map(address_map &map);
-	void multi32_sound_map(address_map &map);
-	void multi32_sound_portmap(address_map &map);
-	void multipcm_map(address_map &map);
-	void rf5c68_map(address_map &map);
-	void system32_4player_map(address_map &map);
-	void system32_analog_map(address_map &map);
-	void system32_cd_map(address_map &map);
-	void system32_map(address_map &map);
-	void system32_sound_map(address_map &map);
-	void system32_sound_portmap(address_map &map);
-	void upd7725_data_map(address_map &map);
-	void upd7725_prg_map(address_map &map);
-	void v25_map(address_map &map);
+	void ga2_main_map(address_map &map) ATTR_COLD;
+	void multi32_6player_map(address_map &map) ATTR_COLD;
+	void multi32_map(address_map &map) ATTR_COLD;
+	void multi32_sound_map(address_map &map) ATTR_COLD;
+	void multi32_sound_portmap(address_map &map) ATTR_COLD;
+	void multipcm_map(address_map &map) ATTR_COLD;
+	void rf5c68_map(address_map &map) ATTR_COLD;
+	void system32_4player_map(address_map &map) ATTR_COLD;
+	void system32_analog_map(address_map &map) ATTR_COLD;
+	void system32_cd_map(address_map &map) ATTR_COLD;
+	void system32_map(address_map &map) ATTR_COLD;
+	void system32_sound_map(address_map &map) ATTR_COLD;
+	void system32_sound_portmap(address_map &map) ATTR_COLD;
+	void upd7725_data_map(address_map &map) ATTR_COLD;
+	void upd7725_prg_map(address_map &map) ATTR_COLD;
+	void v25_map(address_map &map) ATTR_COLD;
 
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	required_shared_ptr<uint8_t> m_z80_shared_ram;
 	optional_shared_ptr<uint16_t> m_system32_workram;
@@ -285,7 +283,7 @@ public:
 protected:
 	segas32_analog_state(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 };
 
 class segas32_trackball_state : public segas32_state
@@ -293,9 +291,9 @@ class segas32_trackball_state : public segas32_state
 public:
 	segas32_trackball_state(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	void system32_trackball_map(address_map &map);
+	void system32_trackball_map(address_map &map) ATTR_COLD;
 protected:
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 };
 
 class segas32_4player_state : public segas32_state
@@ -306,7 +304,7 @@ public:
 protected:
 	segas32_4player_state(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 };
 
 class segas32_v25_state : public segas32_4player_state
@@ -318,8 +316,8 @@ public:
 	static const uint8_t ga2_opcode_table[256];
 
 protected:
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual void device_start() override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual void device_start() override ATTR_COLD;
 
 private:
 	void decrypt_protrom();
@@ -331,7 +329,7 @@ public:
 	segas32_upd7725_state(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 };
 
 class segas32_cd_state : public segas32_state
@@ -341,13 +339,13 @@ public:
 
 	void lamps1_w(uint8_t data);
 	void lamps2_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(scsi_irq_w);
-	DECLARE_WRITE_LINE_MEMBER(scsi_drq_w);
+	void scsi_irq_w(int state);
+	void scsi_drq_w(int state);
 
 	static void cdrom_config(device_t *device);
 protected:
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual void device_start() override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual void device_start() override ATTR_COLD;
 
 private:
 	output_finder<16> m_lamps;
@@ -361,7 +359,7 @@ public:
 protected:
 	sega_multi32_state(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 };
 
 class sega_multi32_analog_state : public sega_multi32_state
@@ -373,10 +371,10 @@ public:
 	ioport_value in3_analog_read();
 	void analog_bank_w(uint8_t data);
 
-	void multi32_analog_map(address_map &map);
+	void multi32_analog_map(address_map &map) ATTR_COLD;
 protected:
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual void device_start() override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual void device_start() override ATTR_COLD;
 
 private:
 	optional_ioport_array<8> m_analog_ports;
@@ -389,9 +387,9 @@ public:
 	sega_multi32_6player_state(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 };
 
 DECLARE_DEVICE_TYPE(SEGA_S32_PCB, segas32_state)
 
-#endif // MAME_INCLUDES_SEGAS32_H
+#endif // MAME_SEGA_SEGAS32_H

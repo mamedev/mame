@@ -28,6 +28,8 @@
 #include "alinvade.lh"
 
 
+namespace {
+
 class alinvade_state : public driver_device
 {
 public:
@@ -48,12 +50,12 @@ private:
 	void vblank_irq(int state);
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	void alinvade_map(address_map &map);
+	void alinvade_map(address_map &map) ATTR_COLD;
 
 	uint8_t m_irqmask = 0;
 	uint8_t m_irqff = 0;
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 	required_device<cpu_device> m_maincpu;
 	required_shared_ptr<uint8_t> m_videoram;
 	required_device<discrete_device> m_discrete;
@@ -239,6 +241,8 @@ ROM_START( alinvade )
 	ROM_FILL( 0x00, 0x0f, 0xea )
 	ROM_FILL( 0x0f, 0x01, 0x60 )    // rts for whole area, interrupt code jumps to various addresses here, check note on top.
 ROM_END
+
+} // anonymous namespace
 
 
 GAMEL( 198?, alinvade, 0, alinvade, alinvade, alinvade_state, empty_init, ROT90, "Forbes?", "Alien Invaders", MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_alinvade )

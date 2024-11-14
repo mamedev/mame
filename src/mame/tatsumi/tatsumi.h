@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Bryan McPhail, Angelo Salese
-#ifndef MAME_INCLUDES_TATSUMI_H
-#define MAME_INCLUDES_TATSUMI_H
+#ifndef MAME_TATSUMI_TATSUMI_H
+#define MAME_TATSUMI_TATSUMI_H
 
 #pragma once
 
@@ -112,12 +112,12 @@ private:
 	DECLARE_MACHINE_RESET(apache3);
 	DECLARE_VIDEO_START(apache3);
 	uint32_t screen_update_apache3(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	DECLARE_WRITE_LINE_MEMBER(apache3_68000_reset);
+	void apache3_68000_reset(int state);
 
-	void apache3_68000_map(address_map &map);
-	void apache3_v20_map(address_map &map);
-	void apache3_v30_map(address_map &map);
-	void apache3_z80_map(address_map &map);
+	void apache3_68000_map(address_map &map) ATTR_COLD;
+	void apache3_v20_map(address_map &map) ATTR_COLD;
+	void apache3_v30_map(address_map &map) ATTR_COLD;
+	void apache3_z80_map(address_map &map) ATTR_COLD;
 
 	void draw_sky(bitmap_rgb32 &bitmap, const rectangle &cliprect, int palette_base, int start_offset);
 	void draw_ground(bitmap_rgb32 &dst, const rectangle &cliprect);
@@ -168,11 +168,11 @@ private:
 	DECLARE_VIDEO_START(roundup5);
 	uint32_t screen_update_roundup5(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	void roundup5_68000_map(address_map &map);
-	void roundup5_v30_map(address_map &map);
-	void roundup5_z80_map(address_map &map);
+	void roundup5_68000_map(address_map &map) ATTR_COLD;
+	void roundup5_v30_map(address_map &map) ATTR_COLD;
+	void roundup5_z80_map(address_map &map) ATTR_COLD;
 
-//  virtual void machine_reset() override;
+//  virtual void machine_reset() override ATTR_COLD;
 
 	void draw_road(bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void draw_landscape(bitmap_rgb32 &bitmap, const rectangle &cliprect, uint8_t type);
@@ -209,7 +209,7 @@ public:
 	void init_cyclwarr();
 
 protected:
-	virtual void machine_reset() override;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	uint16_t cyclwarr_sprite_r(offs_t offset);
@@ -231,10 +231,10 @@ private:
 	DECLARE_VIDEO_START(bigfight);
 	uint32_t screen_update_cyclwarr(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	void common_map(address_map &map);
-	void master_map(address_map &map);
-	void slave_map(address_map &map);
-	void sound_map(address_map &map);
+	void common_map(address_map &map) ATTR_COLD;
+	void master_map(address_map &map) ATTR_COLD;
+	void slave_map(address_map &map) ATTR_COLD;
+	void sound_map(address_map &map) ATTR_COLD;
 
 	required_device<generic_latch_8_device> m_soundlatch;
 
@@ -262,4 +262,4 @@ private:
 	void apply_highlight_bitmap(bitmap_rgb32 &bitmap, const rectangle &cliprect, bitmap_ind8 &highlight_bitmap);
 };
 
-#endif // MAME_INCLUDES_TATSUMI_H
+#endif // MAME_TATSUMI_TATSUMI_H

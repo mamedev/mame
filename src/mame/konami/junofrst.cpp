@@ -116,8 +116,8 @@ public:
 	void junofrst(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	void blitter_w(offs_t offset, uint8_t data);
@@ -128,11 +128,11 @@ private:
 	uint8_t portA_r();
 	void portB_w(uint8_t data);
 
-	DECLARE_WRITE_LINE_MEMBER(_30hz_irq);
-	void audio_map(address_map &map);
-	void main_map(address_map &map);
-	void mcu_io_map(address_map &map);
-	void mcu_map(address_map &map);
+	void _30hz_irq(int state);
+	void audio_map(address_map &map) ATTR_COLD;
+	void main_map(address_map &map) ATTR_COLD;
+	void mcu_io_map(address_map &map) ATTR_COLD;
+	void mcu_map(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_audiocpu;
 	required_device<i8039_device> m_i8039;
@@ -393,7 +393,7 @@ void junofrst_state::machine_reset()
 	m_irq_toggle = 0;
 }
 
-WRITE_LINE_MEMBER(junofrst_state::_30hz_irq)
+void junofrst_state::_30hz_irq(int state)
 {
 	/* flip flops cause the interrupt to be signalled every other frame */
 	if (state)

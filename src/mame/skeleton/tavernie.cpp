@@ -6,7 +6,7 @@ Tavernier CPU09 and IVG09 (Realisez votre ordinateur individuel)
 
 2013-12-08 Skeleton driver.
 
-This system was described in a French computer magazine "Micro-Informatique".
+This system was described in a French magazine "Le Haut-Parleur".
 
 CPU09 includes 6809, 6821, 6840, 6850, cassette, rs232
 IVG09 includes 6845, another 6821, beeper
@@ -91,7 +91,7 @@ protected:
 	void pa_w(u8 data);
 	void pb_w(u8 data);
 	TIMER_DEVICE_CALLBACK_MEMBER(kansas_r);
-	void cpu09_mem(address_map &map);
+	void cpu09_mem(address_map &map) ATTR_COLD;
 	u8 m_pa = 0U;
 	bool m_cassold = false;
 	required_device<cpu_device> m_maincpu;
@@ -101,8 +101,8 @@ protected:
 	required_device<ptm6840_device> m_ptm;
 
 private:
-	virtual void machine_reset() override;
-	virtual void machine_start() override;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void machine_start() override ATTR_COLD;
 };
 
 class ivg09_state : public cpu09_state
@@ -122,10 +122,10 @@ public:
 	void ivg09(machine_config &config);
 
 private:
-	virtual void machine_reset() override;
-	virtual void machine_start() override;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void machine_start() override ATTR_COLD;
 	void ivg09_palette(palette_device &palette) const;
-	void ivg09_mem(address_map &map);
+	void ivg09_mem(address_map &map) ATTR_COLD;
 	void pa_ivg_w(u8 data);
 	u8 pb_ivg_r();
 	void vram_w(offs_t offset, u8 data);
@@ -404,7 +404,7 @@ void cpu09_state::cpu09(machine_config &config)
 	m_cass->add_route(ALL_OUTPUTS, "mono", 0.05);
 	TIMER(config, "kansas_r").configure_periodic(FUNC(cpu09_state::kansas_r), attotime::from_hz(19200));
 
-	PIA6821(config, m_pia0, 0);
+	PIA6821(config, m_pia0);
 	m_pia0->readpa_handler().set(FUNC(cpu09_state::pa_r));
 	m_pia0->ca1_w(0);
 	m_pia0->writepa_handler().set(FUNC(cpu09_state::pa_w));
@@ -459,7 +459,7 @@ void ivg09_state::ivg09(machine_config &config)
 	m_crtc->set_char_width(8);
 	m_crtc->set_update_row_callback(FUNC(ivg09_state::crtc_update_row));
 
-	PIA6821(config, m_pia1, 0);
+	PIA6821(config, m_pia1);
 	m_pia1->readpb_handler().set(FUNC(ivg09_state::pb_ivg_r));
 	m_pia1->writepa_handler().set(FUNC(ivg09_state::pa_ivg_w));
 	m_pia1->cb2_handler().set(m_beep, FUNC(beep_device::set_state));

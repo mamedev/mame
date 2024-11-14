@@ -1,5 +1,5 @@
-#ifndef MAME_AUDIO_POLEPOS_H
-#define MAME_AUDIO_POLEPOS_H
+#ifndef MAME_NAMCO_POLEPOS_A_H
+#define MAME_NAMCO_POLEPOS_A_H
 
 #pragma once
 
@@ -15,14 +15,14 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// sound stream update overrides
 	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
 
 public:
-	DECLARE_WRITE_LINE_MEMBER(clson_w);
+	void clson_w(int state);
 	void polepos_engine_sound_lsb_w(uint8_t data);
 	void polepos_engine_sound_msb_w(uint8_t data);
 
@@ -54,4 +54,4 @@ DECLARE_DEVICE_TYPE(POLEPOS_SOUND, polepos_sound_device)
 
 DISCRETE_SOUND_EXTERN( polepos_discrete );
 
-#endif // MAME_AUDIO_POLEPOS_H
+#endif // MAME_NAMCO_POLEPOS_A_H

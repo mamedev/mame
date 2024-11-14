@@ -13,17 +13,22 @@
 #pragma once
 
 
-#include "emucore.h"
-#include "osdcore.h"
-#include "../frontend/mame/ui/menuitem.h"
+#include "emufwd.h"
 
+#include "bitmap.h"
+#include "interface/midiport.h"
+
+#include <cstdint>
 #include <memory>
 #include <string>
+#include <string_view>
 #include <vector>
 
 
 // forward references
-class input_type_entry;     // FIXME: including emu.h does not work because emu.h includes osdepend.h
+class input_type_entry;
+namespace osd { class midi_input_port; class midi_output_port; }
+namespace ui { class menu_item; }
 
 
 //============================================================
@@ -63,7 +68,8 @@ public:
 	// general overridables
 	virtual void init(running_machine &machine) = 0;
 	virtual void update(bool skip_redraw) = 0;
-	virtual void input_update() = 0;
+	virtual void input_update(bool relative_reset) = 0;
+	virtual void check_osd_inputs() = 0;
 	virtual void set_verbose(bool print_verbose) = 0;
 
 	// debugger overridables
@@ -89,8 +95,10 @@ public:
 	// command option overrides
 	virtual bool execute_command(const char *command) = 0;
 
-	// midi interface
-	virtual std::unique_ptr<osd_midi_device> create_midi_device() = 0;
+	// MIDI interface
+	virtual std::unique_ptr<osd::midi_input_port> create_midi_input(std::string_view name) = 0;
+	virtual std::unique_ptr<osd::midi_output_port> create_midi_output(std::string_view name) = 0;
+	virtual std::vector<osd::midi_port_info> list_midi_ports() = 0;
 
 protected:
 	virtual ~osd_interface() { }

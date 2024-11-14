@@ -165,15 +165,11 @@ Notes:
 - The fg tilemap is a 1bpp layer which selects the second palette bank when
   active, so it could be used for some cool effects. Gladiator just sets the
   whole palette to white so we can just treat it as a monochromatic layer.
-- Tilemap Y scroll is not implemented because the game doesn't use it so I
-  can't verify it's right.
-- gladiatr and clones start with one credit due to the way MAME initialises
-  memory and the dodgy code the bootleg MCUs use to synchronise with the host
-  CPUs.  On an F3 reset they randomly start with one credit or no credits.
-- gladiatr and clones don't show player inputs in service mode.
 
 TODO:
 -----
+- Tilemap Y scroll is not implemented because the game doesn't use it so I
+  can't verify it's right.
 - gladiatr_irq_patch_w, which triggers irq on the second CPU, is a kludge. It
   shouldn't work that way, that address should actually reset the second CPU
   (but the main CPU never asserts the line). The schematics are too fuzzy to
@@ -184,8 +180,10 @@ TODO:
 - YM2203 some sound effects just don't sound correct
 - Audio Filter Switch not hooked up (might solve YM2203 mixing issue)
 - Ports 60,61,80,81 not fully understood yet...
-- Three 8741 dumps come from an unprotected bootleg, we need dumps from
-  original boards.
+- Three gladiatr 8741 dumps come from an unprotected bootleg, we need dumps
+  from original boards.
+- 2 of the bootleg gladiatr 8741 dumps are suspected to be bad, see rom patch
+  at driver init.
 
 ***************************************************************************/
 
@@ -202,11 +200,13 @@ TODO:
 #include "screen.h"
 #include "speaker.h"
 
+#include <algorithm>
 
-MACHINE_RESET_MEMBER(gladiatr_state,gladiator)
+
+void gladiatr_state::machine_reset()
 {
 	// 6809 bank memory set
-	membank("bank2")->set_entry(0);
+	m_adpcmbank->set_entry(0);
 	m_audiocpu->reset();
 }
 
@@ -221,7 +221,7 @@ void gladiatr_state::gladiator_int_control_w(u8 data)
 }
 
 /* YM2203 IRQ */
-WRITE_LINE_MEMBER(gladiatr_state_base::ym_irq)
+void gladiatr_state_base::ym_irq(int state)
 {
 	/* NMI IRQ is not used by gladiator sound program */
 	m_subcpu->set_input_line(INPUT_LINE_NMI, state ? ASSERT_LINE : CLEAR_LINE);
@@ -231,21 +231,21 @@ WRITE_LINE_MEMBER(gladiatr_state_base::ym_irq)
 void gladiatr_state::gladiator_adpcm_w(u8 data)
 {
 	// bit 6 = bank offset
-	membank("bank2")->set_entry((data & 0x40) ? 1 : 0);
+	m_adpcmbank->set_entry(BIT(data, 6));
 
-	m_msm->data_w(data);        // bit 0..3
+	m_msm->data_w(data);            // bit 0..3
 	m_msm->reset_w(BIT(data, 5));   // bit 5
-	m_msm->vclk_w (BIT(data, 4));   // bit 4
+	m_msm->vclk_w(BIT(data, 4));    // bit 4
 }
 
 void ppking_state::ppking_adpcm_w(u8 data)
 {
 	// bit 6 = bank offset
-	//membank("bank2")->set_entry((data & 0x40) ? 1 : 0);
+	//m_adpcmbank->set_entry(BIT(data, 6));
 
-	m_msm->data_w(data);        // bit 0..3
+	m_msm->data_w(data);            // bit 0..3
 	m_msm->reset_w(BIT(data, 5));   // bit 5
-	m_msm->vclk_w (BIT(data, 4));   // bit 4
+	m_msm->vclk_w(BIT(data, 4));    // bit 4
 }
 
 void ppking_state::cpu2_irq_ack_w(u8 data)
@@ -265,11 +265,6 @@ u8 gladiatr_state_base::adpcm_command_r()
 	return m_soundlatch->read();
 }
 
-WRITE_LINE_MEMBER(gladiatr_state_base::flipscreen_w)
-{
-	flip_screen_set(state);
-}
-
 #if 1
 /* !!!!! patch to IRQ timing for 2nd CPU !!!!! */
 void gladiatr_state::gladiatr_irq_patch_w(u8 data)
@@ -279,7 +274,7 @@ void gladiatr_state::gladiatr_irq_patch_w(u8 data)
 #endif
 
 
-WRITE_LINE_MEMBER(gladiatr_state::tclk_w)
+void gladiatr_state::tclk_w(int state)
 {
 	m_tclk_val = state != 0;
 }
@@ -307,13 +302,13 @@ void gladiatr_state::ccpu_p2_w(u8 data)
 	machine().bookkeeping().coin_counter_w(1, !BIT(data, 7));
 }
 
-READ_LINE_MEMBER(gladiatr_state::tclk_r)
+int gladiatr_state::tclk_r()
 {
 	// fed to t0 on comms MCUs
 	return m_tclk_val ? 1 : 0;
 }
 
-READ_LINE_MEMBER(gladiatr_state::ucpu_t1_r)
+int gladiatr_state::ucpu_t1_r()
 {
 	// connected to p1 on other MCU
 	return BIT(m_csnd_p1, 1);
@@ -321,9 +316,9 @@ READ_LINE_MEMBER(gladiatr_state::ucpu_t1_r)
 
 u8 gladiatr_state::ucpu_p1_r()
 {
-	 // p10 connected to corresponding line on other MCU
-	 // p11 connected to t1 on other MCU
-	 // other lines floating
+	// p10 connected to corresponding line on other MCU
+	// p11 connected to t1 on other MCU
+	// other lines floating
 	return m_csnd_p1 |= 0xfe;
 }
 
@@ -332,7 +327,7 @@ void gladiatr_state::ucpu_p1_w(u8 data)
 	m_ucpu_p1 = data;
 }
 
-READ_LINE_MEMBER(gladiatr_state::csnd_t1_r)
+int gladiatr_state::csnd_t1_r()
 {
 	// connected to p1 on other MCU
 	return BIT(m_ucpu_p1, 1);
@@ -340,9 +335,9 @@ READ_LINE_MEMBER(gladiatr_state::csnd_t1_r)
 
 u8 gladiatr_state::csnd_p1_r()
 {
-	 // p10 connected to corresponding line on other MCU
-	 // p11 connected to t1 on other MCU
-	 // other lines floating
+	// p10 connected to corresponding line on other MCU
+	// p11 connected to t1 on other MCU
+	// other lines floating
 	return m_ucpu_p1 |= 0xfe;
 }
 
@@ -403,10 +398,9 @@ u8 ppking_state::ppking_f1_r()
 
 inline bool ppking_state::mcu_parity_check()
 {
-	int i;
 	u8 res = 0;
 
-	for(i=0;i<8;i++)
+	for(int i=0;i<8;i++)
 	{
 		if(m_mcu[0].rxd & (1 << i))
 			res++;
@@ -608,7 +602,7 @@ void ppking_state::ppking_qxcomu_w(u8 data)
 	// ...
 }
 
-MACHINE_RESET_MEMBER(ppking_state, ppking)
+void ppking_state::machine_reset()
 {
 	// yes, it expects to read DSW1 without sending commands first ...
 	m_mcu[0].rxd = (ioport("DSW1")->read() & 0x1f) << 2;
@@ -619,12 +613,13 @@ MACHINE_RESET_MEMBER(ppking_state, ppking)
 void ppking_state::ppking_cpu1_map(address_map &map)
 {
 	map(0x0000, 0xbfff).rom();
-	map(0xc000, 0xcbff).ram().share("spriteram");
+	map(0xc000, 0xcbff).ram().share(m_spriteram);
 	map(0xcc00, 0xcfff).w(FUNC(ppking_state::ppking_video_registers_w));
-	map(0xd000, 0xd7ff).ram().w(FUNC(ppking_state::paletteram_w)).share("paletteram");
-	map(0xd800, 0xdfff).ram().w(FUNC(ppking_state::videoram_w)).share("videoram");
-	map(0xe000, 0xe7ff).ram().w(FUNC(ppking_state::colorram_w)).share("colorram");
-	map(0xe800, 0xefff).ram().w(FUNC(ppking_state::textram_w)).share("textram");
+	map(0xd000, 0xd3ff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
+	map(0xd400, 0xd7ff).ram().w(m_palette, FUNC(palette_device::write8_ext)).share("palette_ext");
+	map(0xd800, 0xdfff).ram().w(FUNC(ppking_state::videoram_w)).share(m_videoram);
+	map(0xe000, 0xe7ff).ram().w(FUNC(ppking_state::colorram_w)).share(m_colorram);
+	map(0xe800, 0xefff).ram().w(FUNC(ppking_state::textram_w)).share(m_textram);
 	map(0xf000, 0xf7ff).ram().share("nvram"); /* battery backed RAM */
 }
 
@@ -662,13 +657,14 @@ void ppking_state::ppking_cpu2_io(address_map &map)
 void gladiatr_state::gladiatr_cpu1_map(address_map &map)
 {
 	map(0x0000, 0x5fff).rom();
-	map(0x6000, 0xbfff).bankr("bank1");
-	map(0xc000, 0xcbff).ram().share("spriteram");
+	map(0x6000, 0xbfff).bankr(m_mainbank);
+	map(0xc000, 0xcbff).ram().share(m_spriteram);
 	map(0xcc00, 0xcfff).w(FUNC(gladiatr_state::gladiatr_video_registers_w));
-	map(0xd000, 0xd7ff).ram().w(FUNC(gladiatr_state::paletteram_w)).share("paletteram");
-	map(0xd800, 0xdfff).ram().w(FUNC(gladiatr_state::videoram_w)).share("videoram");
-	map(0xe000, 0xe7ff).ram().w(FUNC(gladiatr_state::colorram_w)).share("colorram");
-	map(0xe800, 0xefff).ram().w(FUNC(gladiatr_state::textram_w)).share("textram");
+	map(0xd000, 0xd3ff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
+	map(0xd400, 0xd7ff).ram().w(m_palette, FUNC(palette_device::write8_ext)).share("palette_ext");
+	map(0xd800, 0xdfff).ram().w(FUNC(gladiatr_state::videoram_w)).share(m_videoram);
+	map(0xe000, 0xe7ff).ram().w(FUNC(gladiatr_state::colorram_w)).share(m_colorram);
+	map(0xe800, 0xefff).ram().w(FUNC(gladiatr_state::textram_w)).share(m_textram);
 	map(0xf000, 0xf7ff).ram().share("nvram"); /* battery backed RAM */
 }
 
@@ -682,7 +678,7 @@ void gladiatr_state::gladiatr_cpu3_map(address_map &map)
 {
 	map(0x1000, 0x1fff).w(FUNC(gladiatr_state::gladiator_adpcm_w));
 	map(0x2000, 0x2fff).r(FUNC(gladiatr_state::adpcm_command_r));
-	map(0x4000, 0xffff).bankr("bank2").nopw();
+	map(0x4000, 0xffff).bankr(m_adpcmbank).nopw();
 }
 
 
@@ -699,7 +695,7 @@ void gladiatr_state::gladiatr_cpu2_io(address_map &map)
 	map.global_mask(0xff);
 	map(0x00, 0x01).rw("ymsnd", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
 	map(0x20, 0x21).rw(m_csnd, FUNC(upi41_cpu_device::upi41_master_r), FUNC(upi41_cpu_device::upi41_master_w));
-	map(0x40, 0x40).noprw(); // WRITE(sub_irq_ack_w)
+	map(0x40, 0x40).noprw(); // .w(FUNC(gladiatr_state::sub_irq_ack_w));
 	map(0x60, 0x61).rw(m_cctl, FUNC(upi41_cpu_device::upi41_master_r), FUNC(upi41_cpu_device::upi41_master_w));
 	map(0x80, 0x81).rw(m_ccpu, FUNC(upi41_cpu_device::upi41_master_r), FUNC(upi41_cpu_device::upi41_master_w));
 	map(0xa0, 0xa7).w("filtlatch", FUNC(ls259_device::write_d0));
@@ -862,8 +858,8 @@ static INPUT_PORTS_START( gladiatr )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )  PORT_8WAY
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )    PORT_8WAY
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )  PORT_8WAY
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 )                                   PORT_CHANGED_MEMBER(DEVICE_SELF, gladiatr_state, p1_s1, 0)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 )                                   PORT_CHANGED_MEMBER(DEVICE_SELF, gladiatr_state, p1_s2, 0)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 )                                   PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(gladiatr_state::p1_s1), 0)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 )                                   PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(gladiatr_state::p1_s2), 0)
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START2 )
 
@@ -872,8 +868,8 @@ static INPUT_PORTS_START( gladiatr )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )  PORT_8WAY   PORT_COCKTAIL
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )    PORT_8WAY   PORT_COCKTAIL
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )  PORT_8WAY   PORT_COCKTAIL
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 )                    PORT_COCKTAIL  PORT_CHANGED_MEMBER(DEVICE_SELF, gladiatr_state, p2_s1, 0)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 )                    PORT_COCKTAIL  PORT_CHANGED_MEMBER(DEVICE_SELF, gladiatr_state, p2_s2, 0)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 )                    PORT_COCKTAIL  PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(gladiatr_state::p2_s1), 0)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 )                    PORT_COCKTAIL  PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(gladiatr_state::p2_s2), 0)
 	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )                                     // coin counter outputs
 
 	PORT_START("IN2")   // cctl p1
@@ -882,8 +878,8 @@ static INPUT_PORTS_START( gladiatr )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON3 )                    PORT_COCKTAIL
 
 	PORT_START("COINS") // ccpu test, cctl test
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
@@ -915,15 +911,15 @@ static const gfx_layout spritelayout  =
 };
 
 static GFXDECODE_START( gfx_ppking )
-	GFXDECODE_ENTRY( "gfx1", 0, gfx_8x8x1,  0, 1 )
-	GFXDECODE_ENTRY( "gfx2", 0, tilelayout, 0, 32 )
-	GFXDECODE_ENTRY( "gfx3", 0, spritelayout, 0x100, 32 )
+	GFXDECODE_ENTRY( "tx_tiles", 0, gfx_8x8x1,  0, 1 )
+	GFXDECODE_ENTRY( "bg_tiles", 0, tilelayout, 0, 32 )
+	GFXDECODE_ENTRY( "sprites",  0, spritelayout, 0x100, 32 )
 GFXDECODE_END
 
 static GFXDECODE_START( gfx_gladiatr )
-	GFXDECODE_ENTRY( "gfx1", 0, gfx_8x8x1,    0x200, 1 )
-	GFXDECODE_ENTRY( "gfx2", 0, tilelayout,   0x000, 32 )
-	GFXDECODE_ENTRY( "gfx3", 0, spritelayout, 0x100, 32 )
+	GFXDECODE_ENTRY( "tx_tiles", 0, gfx_8x8x1,    0x200, 1 )
+	GFXDECODE_ENTRY( "bg_tiles", 0, tilelayout,   0x000, 32 )
+	GFXDECODE_ENTRY( "sprites",  0, spritelayout, 0x100, 32 )
 GFXDECODE_END
 
 
@@ -946,17 +942,16 @@ void ppking_state::ppking(machine_config &config)
 
 	config.set_maximum_quantum(attotime::from_hz(6000));
 
-	MCFG_MACHINE_RESET_OVERRIDE(ppking_state, ppking)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	ls259_device &mainlatch(LS259(config, "mainlatch")); // 5L on main board
 	mainlatch.q_out_cb<0>().set(FUNC(ppking_state::spritebuffer_w));
-//  mainlatch.q_out_cb<1>().set(FUNC(gladiatr_state::spritebank_w));
-//  mainlatch.q_out_cb<2>().set_membank("bank1");
+//  mainlatch.q_out_cb<1>().set(FUNC(ppking_state::spritebank_w));
+//  mainlatch.q_out_cb<2>().set_membank(m_mainbank);
 //  mainlatch.q_out_cb<3>().set(FUNC(ppking_state::nmi_mask_w));
 //  mainlatch.q_out_cb<4>().set("sub", INPUT_LINE_RESET); // shadowed by aforementioned hack
 //  Q6 used
-	mainlatch.q_out_cb<7>().set(FUNC(ppking_state::flipscreen_w));
+	mainlatch.q_out_cb<7>().set(FUNC(ppking_state::flip_screen_set));
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -969,9 +964,7 @@ void ppking_state::ppking(machine_config &config)
 	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_ppking);
-	PALETTE(config, m_palette).set_entries(1024);
-
-	MCFG_VIDEO_START_OVERRIDE(ppking_state, ppking)
+	PALETTE(config, m_palette).set_format(palette_device::xBGRBBBBGGGGRRRR_bit0, 1024);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -980,7 +973,7 @@ void ppking_state::ppking(machine_config &config)
 	GENERIC_LATCH_8(config, m_soundlatch2);
 
 	ym2203_device &ymsnd(YM2203(config, "ymsnd", 12_MHz_XTAL/8)); /* verified on pcb */
-	ymsnd.irq_handler().set(FUNC(gladiatr_state_base::ym_irq));
+	ymsnd.irq_handler().set(FUNC(ppking_state::ym_irq));
 	ymsnd.port_a_read_callback().set(FUNC(ppking_state::ppking_f1_r));
 	ymsnd.port_b_read_callback().set_ioport("DSW3");
 	ymsnd.add_route(0, "mono", 0.60);
@@ -1008,15 +1001,14 @@ void gladiatr_state::gladiatr(machine_config &config)
 	MC6809(config, m_audiocpu, 12_MHz_XTAL/4);  /* verified on pcb */
 	m_audiocpu->set_addrmap(AS_PROGRAM, &gladiatr_state::gladiatr_cpu3_map);
 
-	MCFG_MACHINE_RESET_OVERRIDE(gladiatr_state,gladiator)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0); // NEC uPD449 CMOS SRAM
 
 	ls259_device &mainlatch(LS259(config, "mainlatch")); // 5L on main board
 	mainlatch.q_out_cb<0>().set(FUNC(gladiatr_state::spritebuffer_w));
 	mainlatch.q_out_cb<1>().set(FUNC(gladiatr_state::spritebank_w));
-	mainlatch.q_out_cb<2>().set_membank("bank1");
+	mainlatch.q_out_cb<2>().set_membank(m_mainbank);
 	mainlatch.q_out_cb<4>().set_inputline("sub", INPUT_LINE_RESET); // shadowed by aforementioned hack
-	mainlatch.q_out_cb<7>().set(FUNC(gladiatr_state::flipscreen_w));
+	mainlatch.q_out_cb<7>().set(FUNC(gladiatr_state::flip_screen_set));
 
 	I8741A(config, m_cctl, 12_MHz_XTAL/2); /* verified on pcb */
 	m_cctl->t0_in_cb().set_ioport("COINS").bit(3);
@@ -1061,9 +1053,7 @@ void gladiatr_state::gladiatr(machine_config &config)
 	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_gladiatr);
-	PALETTE(config, m_palette).set_entries(1024);
-
-	MCFG_VIDEO_START_OVERRIDE(gladiatr_state,gladiatr)
+	PALETTE(config, m_palette).set_format(palette_device::xBGRBBBBGGGGRRRR_bit0, 1024);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -1071,7 +1061,7 @@ void gladiatr_state::gladiatr(machine_config &config)
 	GENERIC_LATCH_8(config, m_soundlatch);
 
 	ym2203_device &ymsnd(YM2203(config, "ymsnd", 12_MHz_XTAL/8)); /* verified on pcb */
-	ymsnd.irq_handler().set(FUNC(gladiatr_state_base::ym_irq));
+	ymsnd.irq_handler().set(FUNC(gladiatr_state::ym_irq));
 	ymsnd.port_b_read_callback().set_ioport("DSW3");
 	ymsnd.port_a_write_callback().set(FUNC(gladiatr_state::gladiator_int_control_w));
 	ymsnd.add_route(0, "mono", 0.60);
@@ -1123,16 +1113,16 @@ ROM_START( ppking )
 	ROM_LOAD( "q0_18.5m",       0x0e000, 0x2000, CRC(89ba64f8) SHA1(fa01316ea744b4277ee64d5f14cb6d7e3a949f2b) )
 	ROM_RELOAD(                 0x0c000, 0x2000 )
 
-	ROM_REGION( 0x02000, "gfx1", 0 )
+	ROM_REGION( 0x02000, "tx_tiles", 0 )
 	ROM_LOAD( "q0_15.1r",       0x00000, 0x2000, CRC(fbd33219) SHA1(78b9bb327ededaa818d26c41c5e8fd1c041ef142) )
 
-	ROM_REGION( 0x8000, "gfx2", 0 )
+	ROM_REGION( 0x8000, "bg_tiles", 0 )
 	ROM_LOAD( "q0_12.1j",       0x00000, 0x2000, CRC(b1a44482) SHA1(84cc40976aa9b015a9f970a878bbde753651b3ba) ) /* plane 3 */
 	/* space to unpack plane 3 */
 	ROM_LOAD( "q0_13.1k",       0x04000, 0x2000, CRC(468f35e6) SHA1(8e28481910663fe525cefd4ad406468b7736900e) ) /* planes 1,2 */
 	ROM_LOAD( "q0_14.1m",       0x06000, 0x2000, CRC(eed04a7f) SHA1(d139920889653c33ded38a85510789380dd0aa9e) ) /* planes 1,2 */
 
-	ROM_REGION( 0x10000, "gfx3", 0 )
+	ROM_REGION( 0x10000, "sprites", 0 )
 	ROM_LOAD( "q0_6.k1",        0x00000, 0x2000, CRC(bb3d666c) SHA1(a689c7a1e75b916d69f396db7c4688ac355c2aff) ) /* plane 3 */
 	ROM_LOAD( "q0_7.l1",        0x02000, 0x2000, CRC(16a2550e) SHA1(adb54b70a6db660b5f29ad66da02afd8e99884bb) ) /* plane 3 */
 	/* space to unpack plane 3 */
@@ -1167,16 +1157,16 @@ ROM_START( gladiatr )
 	ROM_LOAD( "qb0_18",         0x18000, 0x4000, CRC(e9591260) SHA1(e427aa10c683fbeb98171f6d1820781d21075a24) )
 	ROM_CONTINUE(               0x24000, 0x4000 )
 
-	ROM_REGION( 0x02000, "gfx1", 0 )
+	ROM_REGION( 0x02000, "tx_tiles", 0 )
 	ROM_LOAD( "qc0_15",         0x00000, 0x2000, CRC(a7efa340) SHA1(f87e061b8e4d8cd0834fab301779a8493549419b) ) /* (monochrome) */
 
-	ROM_REGION( 0x20000, "gfx2", 0 )    /* tiles */
+	ROM_REGION( 0x20000, "bg_tiles", 0 )    /* tiles */
 	ROM_LOAD( "qb0_12",         0x00000, 0x8000, CRC(0585d9ac) SHA1(e3cb07e9dc5ec2fcfa0c90294d32f0b751f67752) ) /* plane 3 */
 	/* space to unpack plane 3 */
 	ROM_LOAD( "qb0_13",         0x10000, 0x8000, CRC(a6bb797b) SHA1(852e9993270e5557c1a0350007d0beaec5ca6286) ) /* planes 1,2 */
 	ROM_LOAD( "qb0_14",         0x18000, 0x8000, CRC(85b71211) SHA1(81545cd168da4a707e263fdf0ee9902e3a13ba93) ) /* planes 1,2 */
 
-	ROM_REGION( 0x30000, "gfx3", 0 )    /* sprites */
+	ROM_REGION( 0x30000, "sprites", 0 )    /* sprites */
 	ROM_LOAD( "qc1_6",          0x00000, 0x4000, CRC(651e6e44) SHA1(78ce576e6c29e43d590c42f0d4926cff82fd0268) ) /* plane 3 */
 	ROM_LOAD( "qc2_7",          0x04000, 0x8000, CRC(c992c4f7) SHA1(3263973474af07c8b93c4ec97924568848cb7201) ) /* plane 3 */
 	/* space to unpack plane 3 */
@@ -1222,16 +1212,16 @@ ROM_START( ogonsiro )
 	ROM_LOAD( "qb0_18",         0x18000, 0x4000, CRC(e9591260) SHA1(e427aa10c683fbeb98171f6d1820781d21075a24) )
 	ROM_CONTINUE(               0x24000, 0x4000 )
 
-	ROM_REGION( 0x02000, "gfx1", 0 )
+	ROM_REGION( 0x02000, "tx_tiles", 0 )
 	ROM_LOAD( "qb0_15",         0x00000, 0x2000, CRC(5e1332b8) SHA1(fab6e2c7ea9bc94c1245bf759b4004a70c57d666) ) /* (monochrome) */
 
-	ROM_REGION( 0x20000, "gfx2", 0 )    /* tiles */
+	ROM_REGION( 0x20000, "bg_tiles", 0 )    /* tiles */
 	ROM_LOAD( "qb0_12",         0x00000, 0x8000, CRC(0585d9ac) SHA1(e3cb07e9dc5ec2fcfa0c90294d32f0b751f67752) ) /* plane 3 */
 	/* space to unpack plane 3 */
 	ROM_LOAD( "qb0_13",         0x10000, 0x8000, CRC(a6bb797b) SHA1(852e9993270e5557c1a0350007d0beaec5ca6286) ) /* planes 1,2 */
 	ROM_LOAD( "qb0_14",         0x18000, 0x8000, CRC(85b71211) SHA1(81545cd168da4a707e263fdf0ee9902e3a13ba93) ) /* planes 1,2 */
 
-	ROM_REGION( 0x30000, "gfx3", 0 )    /* sprites */
+	ROM_REGION( 0x30000, "sprites", 0 )    /* sprites */
 	ROM_LOAD( "qb0_6",          0x00000, 0x4000, CRC(1a2bc769) SHA1(498861f4d0cffeaff90609c8000c921a114756b6) ) /* plane 3 */
 	ROM_LOAD( "qb0_7",          0x04000, 0x8000, CRC(4b677bd9) SHA1(3314ef58ff5307faf0ecd8f99950d43d571c91a6) ) /* plane 3 */
 	/* space to unpack plane 3 */
@@ -1277,16 +1267,16 @@ ROM_START( greatgur )
 	ROM_LOAD( "qb0_18",         0x18000, 0x4000, CRC(e9591260) SHA1(e427aa10c683fbeb98171f6d1820781d21075a24) )
 	ROM_CONTINUE(               0x24000, 0x4000 )
 
-	ROM_REGION( 0x02000, "gfx1", 0 )
+	ROM_REGION( 0x02000, "tx_tiles", 0 )
 	ROM_LOAD( "qb0_15",         0x00000, 0x2000, CRC(5e1332b8) SHA1(fab6e2c7ea9bc94c1245bf759b4004a70c57d666) ) /* (monochrome) */
 
-	ROM_REGION( 0x20000, "gfx2", 0 )    /* tiles */
+	ROM_REGION( 0x20000, "bg_tiles", 0 )    /* tiles */
 	ROM_LOAD( "qb0_12",         0x00000, 0x8000, CRC(0585d9ac) SHA1(e3cb07e9dc5ec2fcfa0c90294d32f0b751f67752) ) /* plane 3 */
 	/* space to unpack plane 3 */
 	ROM_LOAD( "qb0_13",         0x10000, 0x8000, CRC(a6bb797b) SHA1(852e9993270e5557c1a0350007d0beaec5ca6286) ) /* planes 1,2 */
 	ROM_LOAD( "qb0_14",         0x18000, 0x8000, CRC(85b71211) SHA1(81545cd168da4a707e263fdf0ee9902e3a13ba93) ) /* planes 1,2 */
 
-	ROM_REGION( 0x30000, "gfx3", 0 )    /* sprites */
+	ROM_REGION( 0x30000, "sprites", 0 )    /* sprites */
 	ROM_LOAD( "qc0_06.bin",     0x00000, 0x4000, CRC(96b20201) SHA1(212270d3ba72974f22e96744c752860cc5ffba5b) ) /* plane 3 */
 	ROM_LOAD( "qc0_07.bin",     0x04000, 0x8000, CRC(9e89fa8f) SHA1(b133ae2ac62f43a7a51fa0d1a023a4f95fef2996) ) /* plane 3 */
 	/* space to unpack plane 3 */
@@ -1300,10 +1290,10 @@ ROM_START( greatgur )
 	ROM_LOAD( "q4.5s",          0x00020, 0x0020, CRC(e325808e) SHA1(5fd92ad4eff24f6ccf2df19d268a6cafba72202e) )
 
 	ROM_REGION( 0x0400, "cctl", 0 ) /* I/O MCU */
-	ROM_LOAD( "gladcctl.1",     0x00000, 0x0400, CRC(b30d225f) SHA1(f383286530975c440589c276aa8c46fdfe5292b6) )
+	ROM_LOAD( "gladcctl.1",     0x00000, 0x0400, CRC(b30d225f) SHA1(f383286530975c440589c276aa8c46fdfe5292b6) BAD_DUMP )
 
 	ROM_REGION( 0x0400, "ccpu", 0 ) /* I/O MCU */
-	ROM_LOAD( "gladccpu.2",     0x00000, 0x0400, CRC(1d02cd5f) SHA1(f7242039788c66a1d91b01852d7d447330b847c4) )
+	ROM_LOAD( "gladccpu.2",     0x00000, 0x0400, CRC(1d02cd5f) SHA1(f7242039788c66a1d91b01852d7d447330b847c4) BAD_DUMP )
 
 	ROM_REGION( 0x0400, "ucpu", 0 ) /* comms MCU */
 	ROM_LOAD( "gladucpu.17",    0x00000, 0x0400, CRC(3c5ca4c6) SHA1(0d8c2e1c2142ada11e30cfb9a48663386fee9cb8) )
@@ -1314,11 +1304,11 @@ ROM_END
 
 ROM_START( gcastle )
 	ROM_REGION( 0x1c000, "maincpu", 0 )
-	ROM_LOAD( "gc0_5",          0x00000, 0x4000, BAD_DUMP CRC(25b19efb) SHA1(c41344278f6c7f3d6527aced3e459ed1ba86dea5) ) // not dumped, placeholder taken from ogonsiro
-	ROM_LOAD( "gc0_4",          0x04000, 0x2000, BAD_DUMP CRC(347ec794) SHA1(51100f9fef2e96f00e94fce709eed6583b01a2eb) ) // "
-	ROM_LOAD( "gc0_1",          0x10000, 0x2000, BAD_DUMP CRC(040c9839) SHA1(8c0d9a246847461a59eb5e6a53a94218e701d6c3) ) // "
+	ROM_LOAD( "gc0_5",          0x00000, 0x4000, CRC(25b19efb) SHA1(c41344278f6c7f3d6527aced3e459ed1ba86dea5) BAD_DUMP ) // not dumped, placeholder taken from ogonsiro
+	ROM_LOAD( "gc0_4",          0x04000, 0x2000, CRC(347ec794) SHA1(51100f9fef2e96f00e94fce709eed6583b01a2eb) BAD_DUMP ) // "
+	ROM_LOAD( "gc0_1",          0x10000, 0x2000, CRC(040c9839) SHA1(8c0d9a246847461a59eb5e6a53a94218e701d6c3) BAD_DUMP ) // "
 	ROM_CONTINUE(               0x16000, 0x2000 )
-	ROM_LOAD( "gc0_3",          0x12000, 0x4000, BAD_DUMP CRC(d6a342e7) SHA1(96274ae3bda4679108a25fcc514b625552abda30) ) // "
+	ROM_LOAD( "gc0_3",          0x12000, 0x4000, CRC(d6a342e7) SHA1(96274ae3bda4679108a25fcc514b625552abda30) BAD_DUMP ) // "
 	ROM_CONTINUE(               0x18000, 0x4000 )
 
 	ROM_REGION( 0x10000, "sub", 0 ) /* Code for the 2nd CPU */
@@ -1332,16 +1322,16 @@ ROM_START( gcastle )
 	ROM_LOAD( "qb0_18",         0x18000, 0x4000, CRC(e9591260) SHA1(e427aa10c683fbeb98171f6d1820781d21075a24) )
 	ROM_CONTINUE(               0x24000, 0x4000 )
 
-	ROM_REGION( 0x02000, "gfx1", 0 )
+	ROM_REGION( 0x02000, "tx_tiles", 0 )
 	ROM_LOAD( "qb0_15",         0x00000, 0x2000, CRC(5e1332b8) SHA1(fab6e2c7ea9bc94c1245bf759b4004a70c57d666) ) /* (monochrome) */
 
-	ROM_REGION( 0x20000, "gfx2", 0 )    /* tiles */
+	ROM_REGION( 0x20000, "bg_tiles", 0 )    /* tiles */
 	ROM_LOAD( "qb0_12",         0x00000, 0x8000, CRC(0585d9ac) SHA1(e3cb07e9dc5ec2fcfa0c90294d32f0b751f67752) ) /* plane 3 */
 	/* space to unpack plane 3 */
 	ROM_LOAD( "qb0_13",         0x10000, 0x8000, CRC(a6bb797b) SHA1(852e9993270e5557c1a0350007d0beaec5ca6286) ) /* planes 1,2 */
 	ROM_LOAD( "qb0_14",         0x18000, 0x8000, CRC(85b71211) SHA1(81545cd168da4a707e263fdf0ee9902e3a13ba93) ) /* planes 1,2 */
 
-	ROM_REGION( 0x30000, "gfx3", 0 )    /* sprites */
+	ROM_REGION( 0x30000, "sprites", 0 )    /* sprites */
 	ROM_LOAD( "gc1_6",          0x00000, 0x4000, CRC(94f49be2) SHA1(adc9f38469d32eee5906b37289245df062b134b4) ) /* plane 3 */
 	ROM_LOAD( "gc2_7",          0x04000, 0x8000, CRC(bb2cb454) SHA1(3cac1716a5c90953117deadcc3eba02000cda7c0) ) /* plane 3 */
 	/* space to unpack plane 3 */
@@ -1368,19 +1358,10 @@ ROM_START( gcastle )
 ROM_END
 
 
-void gladiatr_state::swap_block(u8 *src1, u8 *src2, int len)
-{
-	for (int i = 0; i < len; i++)
-	{
-		using std::swap;
-		swap(src1[i], src2[i]);
-	}
-}
-
 void gladiatr_state::init_gladiatr()
 {
-	u8 *rom = memregion("gfx2")->base();
 	// unpack 3bpp graphics
+	u8 *rom = memregion("bg_tiles")->base();
 	for (int j = 3; j >= 0; j--)
 	{
 		for (int i = 0; i < 0x2000; i++)
@@ -1390,11 +1371,10 @@ void gladiatr_state::init_gladiatr()
 		}
 	}
 	// sort data
-	swap_block(rom + 0x14000, rom + 0x18000, 0x4000);
+	std::swap_ranges(rom + 0x14000, rom + 0x18000, rom + 0x18000);
 
-
-	rom = memregion("gfx3")->base();
 	// unpack 3bpp graphics
+	rom = memregion("sprites")->base();
 	for (int j = 5; j >= 0; j--)
 	{
 		for (int i = 0; i < 0x2000; i++)
@@ -1404,16 +1384,23 @@ void gladiatr_state::init_gladiatr()
 		}
 	}
 	// sort data
-	swap_block(rom + 0x1a000, rom + 0x1c000, 0x2000);
-	swap_block(rom + 0x22000, rom + 0x28000, 0x2000);
-	swap_block(rom + 0x26000, rom + 0x2c000, 0x2000);
-	swap_block(rom + 0x24000, rom + 0x28000, 0x4000);
+	std::swap_ranges(rom + 0x1a000, rom + 0x1c000, rom + 0x1c000);
+	std::swap_ranges(rom + 0x22000, rom + 0x24000, rom + 0x28000);
+	std::swap_ranges(rom + 0x26000, rom + 0x28000, rom + 0x2c000);
+	std::swap_ranges(rom + 0x24000, rom + 0x28000, rom + 0x28000);
 
-	membank("bank1")->configure_entries(0, 2, memregion("maincpu")->base() + 0x10000, 0x6000);
-	membank("bank2")->configure_entries(0, 2, memregion("audiocpu")->base() + 0x10000, 0xc000);
+	// 2 of the bootleg MCU ROM dumps are suspected to be bad, this patch changes
+	// the 1st byte from 0x26 to 0x22. The init routine makes more sense with it
+	// and becomes identical to the bootleg ucpu/csnd init routine. Without it,
+	// the game starts with 1 credit inserted.
+	*memregion("cctl")->base() = 0x22;
+	*memregion("ccpu")->base() = 0x22;
 
-	/* make sure bank is valid in cpu-reset */
-	membank("bank2")->set_entry(0);
+	m_mainbank->configure_entries(0, 2, memregion("maincpu")->base() + 0x10000, 0x6000);
+	m_adpcmbank->configure_entries(0, 2, memregion("audiocpu")->base() + 0x10000, 0xc000);
+
+	// make sure bank is valid in cpu-reset
+	m_adpcmbank->set_entry(0);
 
 	m_tclk_val = false;
 	m_cctl_p1 = 0xff;
@@ -1431,15 +1418,15 @@ void gladiatr_state::init_gladiatr()
 
 void ppking_state::init_ppking()
 {
-	u8 *rom = memregion("gfx2")->base();
 	// unpack 3bpp graphics
+	u8 *rom = memregion("bg_tiles")->base();
 	for (int i = 0; i < 0x2000; i++)
 	{
 		rom[i+0x2000] = rom[i] >> 4;
 	}
 
-	rom = memregion("gfx3")->base();
 	// unpack 3bpp graphics
+	rom = memregion("sprites")->base();
 	for (int j = 1; j >= 0; j--)
 	{
 		for (int i = 0; i < 0x2000; i++)
@@ -1449,9 +1436,8 @@ void ppking_state::init_ppking()
 		}
 	}
 
-	rom = memregion("sub")->base();
-
 	// patch audio CPU crash + ROM checksums
+	rom = memregion("sub")->base();
 	rom[0x1b9] = 0x00;
 	rom[0x1ba] = 0x00;
 	rom[0x1bb] = 0x00;
@@ -1468,5 +1454,5 @@ void ppking_state::init_ppking()
 GAME( 1985, ppking,   0,        ppking,   ppking,   ppking_state,   init_ppking,   ROT90, "Taito America Corporation",           "Ping-Pong King",                                MACHINE_IMPERFECT_SOUND | MACHINE_NO_COCKTAIL | MACHINE_NODEVICE_LAN )
 GAME( 1986, gladiatr, 0,        gladiatr, gladiatr, gladiatr_state, init_gladiatr, ROT0,  "Allumer / Taito America Corporation", "Gladiator (US)",                                MACHINE_SUPPORTS_SAVE )
 GAME( 1986, ogonsiro, gladiatr, gladiatr, gladiatr, gladiatr_state, init_gladiatr, ROT0,  "Allumer / Taito Corporation",         "Ougon no Shiro (Japan)",                        MACHINE_SUPPORTS_SAVE )
-GAME( 1986, greatgur, gladiatr, greatgur, gladiatr, gladiatr_state, init_gladiatr, ROT0,  "Allumer / Taito Corporation",         "Great Gurianos (Japan?)",                       MACHINE_SUPPORTS_SAVE )
+GAME( 1986, greatgur, gladiatr, greatgur, gladiatr, gladiatr_state, init_gladiatr, ROT0,  "Allumer / Taito Corporation",         "Great Gurianos (bootleg?)",                     MACHINE_SUPPORTS_SAVE )
 GAME( 1986, gcastle,  gladiatr, gladiatr, gladiatr, gladiatr_state, init_gladiatr, ROT0,  "Allumer / Taito Corporation",         "Golden Castle (prototype?)",                    MACHINE_SUPPORTS_SAVE ) // incomplete dump

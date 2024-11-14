@@ -19,12 +19,11 @@ public:
 	// construction/destruction
 	bitbanger_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// image-level overrides
-	virtual image_init_result call_load() override;
-	virtual image_init_result call_create(int format_type, util::option_resolution *format_options) override;
+	// device_image_interface implementation
+	virtual std::pair<std::error_condition, std::string> call_load() override;
+	virtual std::pair<std::error_condition, std::string> call_create(int format_type, util::option_resolution *format_options) override;
 	virtual void call_unload() override;
 
-	// image device
 	virtual bool is_readable()  const noexcept override { return true; }
 	virtual bool is_writeable() const noexcept override { return !m_is_readonly; }
 	virtual bool is_creatable() const noexcept override { return !m_is_readonly; }
@@ -40,7 +39,7 @@ public:
 
 protected:
 	// device_t implementation
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 	// device_image_interface implementation
 	virtual software_list_loader const &get_software_list_loader() const override;

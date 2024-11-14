@@ -36,7 +36,7 @@ protected:
 	virtual void device_start() override ATTR_COLD;
 
 	// device_zorro2_card_interface overrides
-	virtual DECLARE_WRITE_LINE_MEMBER( cfgin_w ) override;
+	virtual void cfgin_w(int state) override;
 
 	// amiga_autoconfig overrides
 	virtual void autoconfig_base_address(offs_t address) override;

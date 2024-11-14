@@ -29,14 +29,14 @@ public:
 	uint8_t read(offs_t address);
 	void write(offs_t address, uint8_t data);
 
-	DECLARE_WRITE_LINE_MEMBER(write_wdi); // watchdog disabled if wdi pin is left floating
+	void write_wdi(int state); // watchdog disabled if wdi pin is left floating
 
 protected:
 	bq4847_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock = 32768);
 
 	// device_t
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 	virtual void device_clock_changed() override;
 
 	// device_nvram_interface

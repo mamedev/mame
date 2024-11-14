@@ -19,7 +19,7 @@
   272736-002  i960 Rx I/O Microprocessor Developer's Manual (April 1997)
   273353-001  Intel 80303 I/O Processor Developer's Manual (May 2000)
 */
-
+// TODO: make this table more legible?
 const i960_disassembler::mnemonic_t i960_disassembler::mnemonic[256] = {
 	{ "?", 0, 0 }, { "?", 0, 0 }, { "?", 0, 0 }, { "?", 0, 0 }, { "?", 0, 0 }, { "?", 0, 0 }, { "?", 0, 0 }, { "?", 0, 0 }, // 00
 	{ "b", 1, 1 }, { "call", 1, 1 }, { "ret", 1, 0 }, { "bal", 1, 1 }, { "?", 0, 0 }, { "?", 0, 0 }, { "?", 0, 0 }, { "?", 0, 0 },
@@ -52,7 +52,7 @@ const i960_disassembler::mnemonic_t i960_disassembler::mnemonic[256] = {
 	{ "ldl", 3, 2 }, { "?", 0, 0 }, { "stl", 3, -2 }, { "?", 0, 0 }, { "?", 0, 0 }, { "?", 0, 0 }, { "?", 0, 0 }, { "?", 0, 0 },
 
 	{ "ldt", 3, 2 }, { "?", 0, 0 }, { "stt", 3, -2 }, { "?", 0, 0 }, { "?", 0, 0 }, { "?", 0, 0 }, { "?", 0, 0 }, { "?", 0, 0 }, // a0
-	{ "?", 0, 0 }, { "?", 0, 0 }, { "?", 0, 0 }, { "?", 0, 0 }, { "dcinva", 3, 1 }, { "?", 0, 0 }, { "?", 0, 0 }, { "?", 0, 0 },
+	{ "?", 0, 0 }, { "?", 0, 0 }, { "?", 0, 0 }, { "?", 0, 0 }, { "?", 0, 0 }, { "dcinva", 3, 1 }, { "?", 0, 0 }, { "?", 0, 0 },
 
 	{ "ldq", 3, 2 }, { "?", 0, 0 }, { "stq", 3, -2 }, { "?", 0, 0 }, { "?", 0, 0 }, { "?", 0, 0 }, { "?", 0, 0 }, { "?", 0, 0 }, // b0
 	{ "?", 0, 0 }, { "?", 0, 0 }, { "?", 0, 0 }, { "?", 0, 0 }, { "?", 0, 0 }, { "?", 0, 0 }, { "?", 0, 0 }, { "?", 0, 0 },
@@ -216,7 +216,7 @@ offs_t i960_disassembler::dis_decode_ctrl(std::ostream &stream, u32 iCode, u32 i
 		util::stream_format(stream, "%s", mnemonic[op].mnem);
 		break;
 	case 1: // 1 operand
-		util::stream_format(stream, "%-8s%08lx", mnemonic[op].mnem, ((((s32)disp) << 8) >> 8) + (ip));
+		util::stream_format(stream, "%-8s%08lx", mnemonic[op].mnem, util::sext(disp, 24) + (ip));
 		break;
 	default:
 		return dis_decode_invalid(stream, iCode);
@@ -250,7 +250,7 @@ offs_t i960_disassembler::dis_decode_cobr(std::ostream &stream, u32 iCode, u32 i
 		else op1 = util::string_format("%s", regnames[src1]);
 		if (s2) op2 = util::string_format("sf%d", src2);
 		else op2 = util::string_format("%s", regnames[src2]);
-		op3 = util::string_format("0x%lx", ((((s32)disp) << 19) >> 19) + (ip));
+		op3 = util::string_format("0x%lx", util::sext(disp, 13) + (ip));
 
 		util::stream_format(stream, "%-8s%s,%s,%s", mnemonic[op].mnem, op1, op2, op3);
 		break;

@@ -51,6 +51,8 @@
 #include "speaker.h"
 
 
+namespace {
+
 class scyclone_state : public driver_device
 {
 public:
@@ -66,7 +68,7 @@ public:
 
 	void scyclone(machine_config &config);
 
-	DECLARE_READ_LINE_MEMBER(collision_r);
+	int collision_r();
 
 private:
 	void vidctrl_w(uint8_t data);
@@ -92,14 +94,14 @@ private:
 	INTERRUPT_GEN_MEMBER(irq);
 
 
-	void scyclone_iomap(address_map &map);
-	void scyclone_map(address_map &map);
-	void scyclone_sub_iomap(address_map &map);
-	void scyclone_sub_map(address_map &map);
+	void scyclone_iomap(address_map &map) ATTR_COLD;
+	void scyclone_map(address_map &map) ATTR_COLD;
+	void scyclone_sub_iomap(address_map &map) ATTR_COLD;
+	void scyclone_sub_map(address_map &map) ATTR_COLD;
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -352,7 +354,7 @@ void scyclone_state::scyclone_sub_iomap(address_map &map)
 // appears to be when a white bitmap pixel (col 0x7) collides with a large sprite?
 // if you simply set it to 1 and shoot in the left corner, the game gets stuck
 // but if you have it set to 0 there are no collisions with large objects
-READ_LINE_MEMBER(scyclone_state::collision_r)
+int scyclone_state::collision_r()
 {
 	return m_hascollided;
 }
@@ -370,7 +372,7 @@ static INPUT_PORTS_START( scyclone )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_2WAY
 
 	PORT_START("IN1")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(scyclone_state, collision_r) // hw collision?
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(scyclone_state::collision_r)) // hw collision?
 	// maybe these 4 are the 4xdsw bank?
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNKNOWN )
@@ -684,5 +686,8 @@ ROM_START( scyclone )
 	ROM_LOAD( "de16.4a.82s123", 0x0000, 0x0020, CRC(5178e9c5) SHA1(dd2f81894069282f37feae21c5cfacf50f77dcd5) )
 	ROM_LOAD( "de17.2e.82s123", 0x0020, 0x0020, CRC(3c8572e4) SHA1(c908c4ed99828fff576c3d0963cd8b99edeb993b) )
 ROM_END
+
+} // anonymous namespace
+
 
 GAME( 1980, scyclone,  0,    scyclone, scyclone, scyclone_state, empty_init, ROT270, "Taito Corporation", "Space Cyclone", MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

@@ -16,7 +16,7 @@
 #include "bus/ieee488/ieee488.h"
 #include "cpu/m6502/m6502.h"
 #include "machine/6522via.h"
-#include "machine/mos6530n.h"
+#include "machine/mos6530.h"
 #include "machine/6850acia.h"
 
 
@@ -36,22 +36,22 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// optional information overrides
-	virtual const tiny_rom_entry *device_rom_region() const override;
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;
 	required_device<via6522_device> m_via;
-	required_device<mos6532_new_device> m_riot;
+	required_device<mos6532_device> m_riot;
 	required_device<acia6850_device> m_acia;
 	required_device<ieee488_device> m_ieee;
 	required_device<rs232_port_device> m_rs232;
 
-	void interpod_mem(address_map &map);
+	void interpod_mem(address_map &map) ATTR_COLD;
 };
 
 

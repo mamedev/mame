@@ -119,7 +119,7 @@ Taito Custom:
   TC0540OBN
   TC0360PRI
 
-ST TimeKeeper Ram MK48T08B-10 - Lithuim Batery backed RAM chip
+ST TimeKeeper Ram MK48T08B-10 - Lithium Battery backed RAM chip
 MB8421-90LP - Dual Port SRAM
 ADC0809CNN - 8-bit Microprocessor Compatible A/D Converter
              With 8-Channel Multiplexer
@@ -450,8 +450,8 @@ void slapshot_state::slapshot(machine_config &config)
 	MK48T08(config, "mk48t08", 0);
 
 	TC0140SYT(config, m_tc0140syt, 0);
-	m_tc0140syt->set_master_tag(m_maincpu);
-	m_tc0140syt->set_slave_tag("audiocpu");
+	m_tc0140syt->nmi_callback().set_inputline("audiocpu", INPUT_LINE_NMI);
+	m_tc0140syt->reset_callback().set_inputline("audiocpu", INPUT_LINE_RESET);
 }
 
 void slapshot_state::opwolf3(machine_config &config)
@@ -516,8 +516,8 @@ void slapshot_state::opwolf3(machine_config &config)
 	MK48T08(config, "mk48t08", 0);
 
 	TC0140SYT(config, m_tc0140syt, 0);
-	m_tc0140syt->set_master_tag(m_maincpu);
-	m_tc0140syt->set_slave_tag("audiocpu");
+	m_tc0140syt->nmi_callback().set_inputline("audiocpu", INPUT_LINE_NMI);
+	m_tc0140syt->reset_callback().set_inputline("audiocpu", INPUT_LINE_RESET);
 }
 
 
@@ -616,6 +616,14 @@ ROM_START( opwolf3 )
 	ROM_LOAD( "d74_01.37", 0x000000, 0x200000, CRC(115313e0) SHA1(51a69e7a26960b1328ccefeaec0fb26bdccc39f2) )
 
 	/* no Delta-T samples */
+
+	ROM_REGION( 0xc00, "plds", ROMREGION_ERASE00 )
+	ROM_LOAD( "d74-08",    0x000, 0x117, NO_DUMP ) // type unknown
+	ROM_LOAD( "d74-09.8",  0x200, 0x117, CRC(f1bf65c3) SHA1(c42f8f115cef9e5bbc608177b26d52c92e65c653) ) // PALCE16V8Q-15PC4
+	ROM_LOAD( "d74-10.40", 0x400, 0x157, CRC(c9ce583a) SHA1(372ba0f04c66e713c25eadb5029fb48a86e0bd52) ) // PALCE20V8Q-15PC4
+	ROM_LOAD( "d74-11",    0x600, 0x117, NO_DUMP ) // type unknown
+	ROM_LOAD( "d74-12.1",  0x800, 0x157, CRC(6965e38a) SHA1(9df15de347b7960cfdddb15dbd936df8e139f437) ) // PALCE20V8Q-15PC4
+	ROM_LOAD( "d74-13.2",  0xa00, 0x157, CRC(c52df77c) SHA1(7acc4e24d2841191800f63bb96a568d8aa0d874e) ) // PALCE20V8Q-15PC4
 ROM_END
 
 ROM_START( opwolf3u )
@@ -643,6 +651,14 @@ ROM_START( opwolf3u )
 	ROM_LOAD( "d74_01.37", 0x000000, 0x200000, CRC(115313e0) SHA1(51a69e7a26960b1328ccefeaec0fb26bdccc39f2) )
 
 	/* no Delta-T samples */
+
+	ROM_REGION( 0xc00, "plds", ROMREGION_ERASE00 )
+	ROM_LOAD( "d74-08",    0x000, 0x117, NO_DUMP ) // type unknown
+	ROM_LOAD( "d74-09.8",  0x200, 0x117, CRC(f1bf65c3) SHA1(c42f8f115cef9e5bbc608177b26d52c92e65c653) ) // PALCE16V8Q-15PC4
+	ROM_LOAD( "d74-10.40", 0x400, 0x157, CRC(c9ce583a) SHA1(372ba0f04c66e713c25eadb5029fb48a86e0bd52) ) // PALCE20V8Q-15PC4
+	ROM_LOAD( "d74-11",    0x600, 0x117, NO_DUMP ) // type unknown
+	ROM_LOAD( "d74-12.1",  0x800, 0x157, CRC(6965e38a) SHA1(9df15de347b7960cfdddb15dbd936df8e139f437) ) // PALCE20V8Q-15PC4
+	ROM_LOAD( "d74-13.2",  0xa00, 0x157, CRC(c52df77c) SHA1(7acc4e24d2841191800f63bb96a568d8aa0d874e) ) // PALCE20V8Q-15PC4
 ROM_END
 
 ROM_START( opwolf3j )
@@ -670,6 +686,14 @@ ROM_START( opwolf3j )
 	ROM_LOAD( "d74_01.37", 0x000000, 0x200000, CRC(115313e0) SHA1(51a69e7a26960b1328ccefeaec0fb26bdccc39f2) )
 
 	/* no Delta-T samples */
+
+	ROM_REGION( 0xc00, "plds", ROMREGION_ERASE00 )
+	ROM_LOAD( "d74-08",    0x000, 0x117, NO_DUMP ) // type unknown
+	ROM_LOAD( "d74-09.8",  0x200, 0x117, CRC(f1bf65c3) SHA1(c42f8f115cef9e5bbc608177b26d52c92e65c653) ) // PALCE16V8Q-15PC4
+	ROM_LOAD( "d74-10.40", 0x400, 0x157, CRC(c9ce583a) SHA1(372ba0f04c66e713c25eadb5029fb48a86e0bd52) ) // PALCE20V8Q-15PC4
+	ROM_LOAD( "d74-11",    0x600, 0x117, NO_DUMP ) // type unknown
+	ROM_LOAD( "d74-12.1",  0x800, 0x157, CRC(6965e38a) SHA1(9df15de347b7960cfdddb15dbd936df8e139f437) ) // PALCE20V8Q-15PC4
+	ROM_LOAD( "d74-13.2",  0xa00, 0x157, CRC(c52df77c) SHA1(7acc4e24d2841191800f63bb96a568d8aa0d874e) ) // PALCE20V8Q-15PC4
 ROM_END
 
 

@@ -523,7 +523,7 @@ void pcw16_state::pcw16_keyboard_control_w(uint8_t data)
 }
 
 
-WRITE_LINE_MEMBER(pcw16_state::pcw16_keyboard_callback)
+void pcw16_state::pcw16_keyboard_callback(int state)
 {
 	if(!state)
 		return;
@@ -891,7 +891,7 @@ void pcw16_state::pcw16_system_control_w(uint8_t data)
 	}
 }
 
-WRITE_LINE_MEMBER( pcw16_state::fdc_interrupt )
+void pcw16_state::fdc_interrupt(int state)
 {
 	/* IRQ6 */
 	/* bit 6 of PCW16 system status indicates floppy ints */
@@ -904,7 +904,7 @@ WRITE_LINE_MEMBER( pcw16_state::fdc_interrupt )
 }
 
 
-WRITE_LINE_MEMBER(pcw16_state::pcw16_com_interrupt_1)
+void pcw16_state::pcw16_com_interrupt_1(int state)
 {
 	m_system_status &= ~(1 << 4);
 
@@ -916,7 +916,7 @@ WRITE_LINE_MEMBER(pcw16_state::pcw16_com_interrupt_1)
 }
 
 
-WRITE_LINE_MEMBER(pcw16_state::pcw16_com_interrupt_2)
+void pcw16_state::pcw16_com_interrupt_2(int state)
 {
 	m_system_status &= ~(1 << 3);
 
@@ -997,7 +997,7 @@ static INPUT_PORTS_START(pcw16)
 	/* vblank */
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_VBLANK("screen")
 	/* power switch - default is on */
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE) PORT_NAME("Power Switch/Suspend") PORT_WRITE_LINE_DEVICE_MEMBER("ns16550_2", ins8250_uart_device, ri_w) PORT_TOGGLE
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE) PORT_NAME("Power Switch/Suspend") PORT_WRITE_LINE_DEVICE_MEMBER("ns16550_2", FUNC(ins8250_uart_device::ri_w)) PORT_TOGGLE
 INPUT_PORTS_END
 
 static void pcw16_com(device_slot_interface &device)

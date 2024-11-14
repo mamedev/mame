@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
-// copyright-holders:Roberto Fresca, Peter Ferrie
-#ifndef MAME_INCLUDES_FUNWORLD_H
-#define MAME_INCLUDES_FUNWORLD_H
+// copyright-holders:Roberto Fresca, Grull Osgo, Peter Ferrie
+#ifndef MAME_FUNWORLD_FUNWORLD_H
+#define MAME_FUNWORLD_FUNWORLD_H
 
 #pragma once
 
@@ -54,12 +54,12 @@ protected:
 	void funworld_lamp_b_w(uint8_t data);
 
 	virtual void machine_start() override { m_lamps.resolve(); }
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 	void funworld_palette(palette_device &palette) const;
 	uint32_t screen_update_funworld(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 
-	void magicrd2_map(address_map &map);
+	void magicrd2_map(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -68,18 +68,18 @@ protected:
 private:
 	uint8_t questions_r(offs_t offset);
 	void question_bank_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(pia1_ca2_w);
+	void pia1_ca2_w(int state);
 	uint8_t funquiz_ay8910_a_r();
 	uint8_t funquiz_ay8910_b_r();
 
-	void clubcard_map(address_map &map);
-	void cuoreuno_map(address_map &map);
-	void funquiz_map(address_map &map);
-	void funworld_map(address_map &map);
-	void fw_brick_map(address_map &map);
-	void gratispk_map(address_map &map);
-	void saloon_map(address_map &map);
-	void witchryl_map(address_map &map);
+	void clubcard_map(address_map &map) ATTR_COLD;
+	void cuoreuno_map(address_map &map) ATTR_COLD;
+	void funquiz_map(address_map &map) ATTR_COLD;
+	void funworld_map(address_map &map) ATTR_COLD;
+	void fw_brick_map(address_map &map) ATTR_COLD;
+	void gratispk_map(address_map &map) ATTR_COLD;
+	void saloon_map(address_map &map) ATTR_COLD;
+	void witchryl_map(address_map &map) ATTR_COLD;
 
 	required_shared_ptr<uint8_t> m_videoram;
 	required_shared_ptr<uint8_t> m_colorram;
@@ -100,7 +100,7 @@ public:
 	void init_magicd2c();
 
 protected:
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 };
 
 
@@ -112,11 +112,11 @@ public:
 	void lunapark(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
-	void lunapark_map(address_map &map);
+	void lunapark_map(address_map &map) ATTR_COLD;
 };
 
 
@@ -132,12 +132,12 @@ public:
 	void init_rcdinch();
 
 protected:
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	uint8_t chinatow_r_32f0(offs_t offset);
 
-	void chinatow_map(address_map &map);
+	void chinatow_map(address_map &map) ATTR_COLD;
 };
 
 
@@ -149,15 +149,15 @@ public:
 
 	void multiwin(machine_config& config);
 
-	void driver_init() override;
+	void driver_init();
 
 protected:
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	uint8_t multiwin_opcode_r(offs_t offset);
 
-	void multiwin_opcodes_map(address_map& map);
+	void multiwin_opcodes_map(address_map &map) ATTR_COLD;
 };
 
 class royalcrdf_state : public funworld_state
@@ -167,13 +167,13 @@ public:
 
 	void royalcrdf(machine_config& config);
 
-	void driver_init() override;
+	void driver_init();
 
 private:
 	uint8_t royalcrdf_opcode_r(offs_t offset);
 
-	void royalcrdf_map(address_map& map);
-	void royalcrdf_opcodes_map(address_map& map);
+	void royalcrdf_map(address_map &map) ATTR_COLD;
+	void royalcrdf_opcodes_map(address_map &map) ATTR_COLD;
 };
 
 class intergames_state : public funworld_state
@@ -188,9 +188,13 @@ public:
 
 	void intrgmes(machine_config &config);
 
+	void init_novop_a();
+	void init_novop_b();
+	void init_intgms();
+
 protected:
-	virtual void driver_init() override;
-	virtual void machine_reset() override;
+
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	uint8_t crtc_or_psg_r(offs_t offset);
@@ -198,7 +202,7 @@ private:
 	uint8_t prot_r(offs_t offset);
 	void prot_w(offs_t offset, uint8_t data);
 
-	void intergames_map(address_map &map);
+	void intergames_map(address_map &map) ATTR_COLD;
 
 	required_device<mc6845_device> m_crtc;
 	required_device<ay8910_device> m_ay8910;
@@ -206,4 +210,4 @@ private:
 	bool m_crtc_selected;
 };
 
-#endif // MAME_INCLUDES_FUNWORLD_H
+#endif // MAME_FUNWORLD_FUNWORLD_H

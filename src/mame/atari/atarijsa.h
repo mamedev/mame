@@ -8,8 +8,8 @@
 
 ***************************************************************************/
 
-#ifndef MAME_AUDIO_ATARI_JSA_H
-#define MAME_AUDIO_ATARI_JSA_H
+#ifndef MAME_ATARI_ATARI_JSA_H
+#define MAME_ATARI_ATARI_JSA_H
 
 #pragma once
 
@@ -36,10 +36,10 @@ DECLARE_DEVICE_TYPE(ATARI_JSA_IIIS, atari_jsa_iiis_device)
 //**************************************************************************
 
 #define PORT_ATARI_JSA_SOUND_TO_MAIN_READY(_tag) \
-	PORT_READ_LINE_DEVICE_MEMBER(_tag, atari_jsa_base_device, sound_to_main_ready)
+	PORT_READ_LINE_DEVICE_MEMBER(_tag, FUNC(atari_jsa_base_device::sound_to_main_ready))
 
 #define PORT_ATARI_JSA_MAIN_TO_SOUND_READY(_tag) \
-	PORT_READ_LINE_DEVICE_MEMBER(_tag, atari_jsa_base_device, main_to_sound_ready)
+	PORT_READ_LINE_DEVICE_MEMBER(_tag, FUNC(atari_jsa_base_device::main_to_sound_ready))
 
 
 
@@ -64,8 +64,8 @@ public:
 
 	// getters
 	m6502_device &soundcpu() const { return *m_jsacpu; }
-	DECLARE_READ_LINE_MEMBER(main_to_sound_ready) { return m_soundcomm->main_to_sound_ready(); }
-	DECLARE_READ_LINE_MEMBER(sound_to_main_ready) { return m_soundcomm->sound_to_main_ready(); }
+	int main_to_sound_ready() { return m_soundcomm->main_to_sound_ready(); }
+	int sound_to_main_ready() { return m_soundcomm->sound_to_main_ready(); }
 
 	// main cpu accessors
 	void main_command_w(uint8_t data);
@@ -74,21 +74,21 @@ public:
 
 	// read/write handlers
 	void ym2151_port_w(uint8_t data);
-	DECLARE_READ_LINE_MEMBER(main_test_read_line);
+	int main_test_read_line();
 
 	// I/O lines
-	DECLARE_WRITE_LINE_MEMBER(main_int_write_line);
+	void main_int_write_line(int state);
 
 	// 6502 interrupt handlers
 	INTERRUPT_GEN_MEMBER(sound_irq_gen);
 	void sound_irq_ack_w(u8 data = 0);
 	u8 sound_irq_ack_r();
-	DECLARE_WRITE_LINE_MEMBER(ym2151_irq_gen);
+	void ym2151_irq_gen(int state);
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// internal helpers
 	virtual void update_all_volumes() = 0;
@@ -137,8 +137,8 @@ public:
 
 protected:
 	// device level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// internal helpers
 	virtual void update_all_volumes() override;
@@ -179,13 +179,13 @@ public:
 	uint8_t pokey_r(offs_t offset);
 	void pokey_w(offs_t offset, uint8_t data);
 
-	void atarijsa1_map(address_map &map);
+	void atarijsa1_map(address_map &map) ATTR_COLD;
 protected:
 	// device level overrides
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual ioport_constructor device_input_ports() const override;
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// internal helpers
 	virtual void update_all_volumes() override;
@@ -212,11 +212,11 @@ public:
 	// read/write handlers
 	uint8_t rdio_r();
 
-	void atarijsa2_map(address_map &map);
+	void atarijsa2_map(address_map &map) ATTR_COLD;
 protected:
 	// device level overrides
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual ioport_constructor device_input_ports() const override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 
 	required_ioport m_jsaii;
 };
@@ -230,8 +230,8 @@ public:
 	// construction/destruction
 	atari_jsa_iii_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	void atarijsa3_map(address_map &map);
-	void jsa3_oki1_map(address_map &map);
+	void atarijsa3_map(address_map &map) ATTR_COLD;
+	void jsa3_oki1_map(address_map &map) ATTR_COLD;
 protected:
 	// derived construction/destruction
 	atari_jsa_iii_device(const machine_config &mconfig, device_type devtype, const char *tag, device_t *owner, uint32_t clock, int channels);
@@ -242,8 +242,8 @@ public:
 
 protected:
 	// device level overrides
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual ioport_constructor device_input_ports() const override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 
 	required_ioport m_jsaiii;
 };
@@ -257,11 +257,11 @@ public:
 	// construction/destruction
 	atari_jsa_iiis_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	void jsa3_oki2_map(address_map &map);
+	void jsa3_oki2_map(address_map &map) ATTR_COLD;
 protected:
 	// device level overrides
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 };
 
 
-#endif // MAME_AUDIO_ATARI_JSA_H
+#endif // MAME_ATARI_ATARI_JSA_H

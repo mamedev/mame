@@ -70,10 +70,10 @@ public:
 	u16 ctrl_r(offs_t offset);
 	void ctrl_w(offs_t offset, u16 data, u16 mem_mask);
 
-	void sound_map(address_map &map);
+	void sound_map(address_map &map) ATTR_COLD;
 protected:
 	// device-level overrides
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 	virtual void device_post_load() override;
 	virtual void device_clock_changed() override;
 

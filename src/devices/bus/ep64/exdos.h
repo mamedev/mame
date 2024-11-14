@@ -12,7 +12,6 @@
 #pragma once
 
 #include "exp.h"
-#include "formats/ep64_dsk.h"
 #include "imagedev/floppy.h"
 #include "machine/wd_fdc.h"
 
@@ -36,22 +35,19 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// optional information overrides
-	virtual const tiny_rom_entry *device_rom_region() const override;
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 private:
 	static void floppy_formats(format_registration &fr);
 
 	required_device<wd1770_device> m_fdc;
-	required_device<floppy_connector> m_floppy0;
-	required_device<floppy_connector> m_floppy1;
-	required_device<floppy_connector> m_floppy2;
-	required_device<floppy_connector> m_floppy3;
-	floppy_image_device *m_floppy;
+	required_device_array<floppy_connector, 4> m_floppy;
+	floppy_image_device *m_selected_floppy;
 	required_memory_region m_rom;
 };
 

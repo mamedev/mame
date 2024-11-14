@@ -22,9 +22,9 @@ class aha174x_device : public device_t, public device_isa16_card_interface
 protected:
 	aha174x_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
 
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
-	void hpc_map(address_map &map);
+	void hpc_map(address_map &map) ATTR_COLD;
 	void scsic_config(device_t *device);
 
 	required_device<hpc46003_device> m_hpc;
@@ -41,8 +41,8 @@ public:
 	static constexpr feature_type unemulated_features() { return feature::DISK; }
 
 protected:
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 };
 
 class aha1742a_device : public aha174x_device
@@ -53,8 +53,8 @@ public:
 	static constexpr feature_type unemulated_features() { return feature::DISK; }
 
 protected:
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 
 	required_device<upd765_family_device> m_fdc;
 };

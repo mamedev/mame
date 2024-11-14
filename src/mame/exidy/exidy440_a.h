@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Aaron Giles
-#ifndef MAME_AUDIO_EXIDY440_H
-#define MAME_AUDIO_EXIDY440_H
+#ifndef MAME_EXIDY_EXIDY440_A_H
+#define MAME_EXIDY_EXIDY440_A_H
 
 #pragma once
 
@@ -19,20 +19,20 @@ public:
 	void exidy440_sound_command(uint8_t param);
 	uint8_t exidy440_sound_command_ack();
 
-	DECLARE_WRITE_LINE_MEMBER(sound_interrupt_w);
-	DECLARE_WRITE_LINE_MEMBER(sound_reset_w);
+	void sound_interrupt_w(int state);
+	void sound_reset_w(int state);
 
 protected:
 	// device-level overrides
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual void device_start() override;
-	virtual void device_stop() override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_stop() override ATTR_COLD;
 
 	// sound stream update overrides
 	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
 
 private:
-	void exidy440_audio_map(address_map &map);
+	void exidy440_audio_map(address_map &map) ATTR_COLD;
 
 	/* channel_data structure holds info about each 6844 DMA channel */
 	struct m6844_channel_data
@@ -45,7 +45,6 @@ private:
 		int start_counter;
 	};
 
-
 	/* channel_data structure holds info about each active sound channel */
 	struct sound_channel_data
 	{
@@ -53,7 +52,6 @@ private:
 		int offset;
 		int remaining;
 	};
-
 
 	/* sound_cache_entry structure contains info on each decoded sample */
 	struct sound_cache_entry
@@ -73,7 +71,6 @@ private:
 	uint8_t m_sound_command_ack;
 
 	uint8_t m_sound_banks[4];
-	//uint8_t m_m6844_data[0x20];
 	uint8_t m_sound_volume[0x10];
 	std::vector<int32_t> m_mixer_buffer_left;
 	std::vector<int32_t> m_mixer_buffer_right;
@@ -121,4 +118,4 @@ private:
 DECLARE_DEVICE_TYPE(EXIDY440, exidy440_sound_device)
 
 
-#endif // MAME_AUDIO_EXIDY440_H
+#endif // MAME_EXIDY_EXIDY440_A_H

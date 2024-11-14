@@ -30,170 +30,178 @@
 
     preliminary list of XaviX software based on various sources (some likely still missing)
 
-     year       name                                                                                            PCB ID      ROM width       TSOP pads   ROM size        SEEPROM             die markings            extra components / notes
+    not dumped:
 
-    2011        anpan-man kazoku de ikunou mat DX/JoyPalette/Japan                                              -           -               -           -               -                   -                       -
-    2009        anpan-man pyon-pyon ikunou mat/JoyPalette/Japan                                                 -           -               -           -               -                   -                       -
-    2008        kyuukyoku! kinniku grand slam! SASUKE kanzen seiha/EPOCH/Japan                                  -           -               -           -               -                   -                       -
-    2007        Tokyo Friend park? perfect! mezase! grand slam!/EPOCH/Japan                                     -           -               -           -               -                   -                       -
-    2006    1   Let's TV Play series "Kamen Rider Kabuto" /EPOCH/Japan                                          -           -               -           -               -                   -                       -
-            2   Let's TV Play series "Bo-kenger" /EPOCH/Japan                                                   -           -               -           -               -                   -                       -
-            3   Challenge Ai-chan! Exciting Ping-pong /TAKARATOMY/Japan                                         -           -               -           -               -                   -                       dumped
-            4   Sasuke & Sportsman Tournament /BANDAI/Japan                                                     -           -               -           -               -                   -                       -
-            5   Hyper resque, I am a resque team /BANDAI/Japan                                                  -           -               -           -               -                   -                       -
-            6   Let's TV Play series "Ultraman" /BANDAI/Japan                                                   -           -               -           -               -                   -                       -
-            7   Let's TV Play Classic series "Namco Nostalgia 1" /BANDAI/Japan                                  CGSJ        x8              48          1M              24LC04                                      dumped non destructively
-            8   Let's TV Play Classic series "Namco Nostalgia 2" /BANDAI/Japan                                  CGSJ        x8              48          1M              24LC04              SSD 98 PL7351-181       dumped
-            9   Let's TV Play Classic series "Taito Nostalgia 1" /BANDAI/Japan                                  CGSJ        x8              48          2M              24LC04                                      flash, dumped non destructively
-            10  Let's TV Play Classic series "Taito Nostalgia 2" /BANDAI/Japan                                  CGSJ        x8              48          2M              24LC04                                      flash, dumped non destructively
-            11  Let's play and study! Doraemon Hiragana book /BANDAI/Japan                                      -           -               -           -               -                   -                       -
-            12  Scan card! Exciting Stage Soccer. /EPOCH/Japan                                                  -           -               -           -               -                   -                       -
-            13  Hello Kitty Super TV computer /EPOCH/Japan                                                      -           -               -           -               -                   -                       -
-            14  Doraemon Super TV computer /EPOCH/Japan                                                         -           -               -           -               -                   -                       -
-    2005    1   Let's TV Play series "Dragon Ball Z" /BANDAI/Japan                                              -           -               -           -               -                   -                       -
-            2   Let's TV Play series "Purikyua" /BANDAI/Japan                                                   -           -               -           -               -                   -                       -
-            3   Idaten Jump /TOMY/Japan                                                                         -           -               -           -               -                   -                       -
-            4   Tokyo Friend Park 2 Special /EPOCH/Japan                                                        -           -               -           -               -                   -                       -
-            5   Masked Rider HIBIKI /BANDAI/Japan                                                               -           -               -           -               -                   -                       -
-            6   Magic Ranger Battle /BANDAI/Japan                                                               -           -               -           -               -                   -                       dumped
-            7   Accessory cartridge for Super TV computer "ECC Junior"/EPOCH/Japan                              -           -               -           -               -                   -                       -
-            8   Wild Adventure Mini Golf Game /Hasbro/USA                                                       MGFA        x8              48          4M              24C04               SSD 98 PL7351-181       dumped
-            9   MX DIRT REBEL Game /Hasbro/USA                                                                  MTXA        x8              48          8M              24C04               SSD 2000 NEC 85605-621  dumped
-            10  Dokodemo Doraemon Japan Travel Game DX /EPOCH/Japan                                             -           -               -           -               -                   -                       -
-            11  Tomas Plarail /TOMY/Japan                                                                       -           -               -           -               -                   -                       -  dumped?
-            12  Thomas TV Personal Computer /EPOCH/Japan                                                        -           -               -           -               -                   -                       -
-            13  STAR WARS Light Saber Battle /TOMY/Japan                                                        -           -               -           -               -                   -                       -
-            14  Jala Jaland /atlus/Japan                                                                        -           -               -           -               -                   -                       -        (is this the arcade release of Jara-Ja Land /TAKARA/Japan below?, Atlas are an arcade distributor and arcade version is confirmed)
-            15  Star Wars Lightsaber Battle Game /Hasbro/USA                                                    SWSA        x8              48          8M              24C02               SSD 2000 NEC 85605-621  dumped
-            16  Gururin World /EPOCH/Japan                                                                      -           x8              -           -               -                   SSD 98 PL7351-181       dumped
-            17  Toinohgi Onmyo-daisenki /BANDAI/Japan                                                           -           -               -           -               -                   -                       -
-    2004    1   Accessory cartridge for Super TV computer "Double mouse party"/EPOCH/Japan                      -           -               -           -               -                   -                       -
-            2   Printer for TV computer /EPOCH/Japan                                                            -           -               -           -               -                   -                       -
-            3   Virtual punching battle of "One Piece" /BANDAI/Japan                                            -           -               -           -               -                   -                       dumped
-            4   Accessory cartridge for Super TV computer "Doraemon"/EPOCH/Japan                                -           -               -           -               -                   -                       -
-            5   Accessory cartridge for Super TV computer "Hamutaro"/EPOCH/Japan                                -           -               -           -               -                   -                       -
-            6   Super TV computer /EPOCH/Japan                                                                  -           -               -           -               -                   -                       -
-            7   Super Dash ball /EPOCH/Japan                                                                    -           x8              -           -               -                   SSD 2000 NEC 85605-621  dumped
-            8   Exciting sports Tennis X Fitness /EPOCH/Japan                                                   -           -               -           -               -                   -                       -
-            9   Accessory memory mascot for TV mail Pc mail cot 2 characters (Putchi, Petchi) /EPOCH/Japan      -           -               -           -               -                   -                       -
-            10  Accessory memory mascot for TV mail Pc mail cot 2 characters (Charuru, Kurau) /EPOCH/Japan      -           -               -           -               -                   -                       -
-            11  The Lord of the Rings Warrior of Middle Earth /Hasbro/USA                                       LORA        x8              48          8M              24C02               SSD 2000 NEC 85605-621  dumped
-            12  Beyblade Arcade Challenge 5-in-1 /Hasbro/USA                                                    -           -               -           -               -                   -                       have
-            13  All star Festival Quize /EPOCH/Japan                                                            -           -               -           -               -                   -                       -
-            14  e-kara mix /TAKARA/Japan                                                                        -           -               -           -               -                   -                       -
-            15  Jumping Popira /TAKARA/Japan                                                                    -           -               -           -               -                   -                       -
-            16  Tour around Japan. I'm a Prarail motorman /TOMY/Japan                                           -           -               -           -               -                   -                       dumped
-            17  TV mail PC "Mercot /EPOCH/Japan                                                                 -           -               -           -               -                   -                       -
-            18  Play TV Monster Truck /RADICA/USA                                                               74026       x8              48          4M              none                SSD 98 PL7351-181       dumped
-            19  Play TV Madden Football /RADICA/USA                                                             74021       x8              48          4M              none                SSD 98 PL7351-181       dumped
-            20  Play TV SSX Snowboarder (and Snowboarder white?) /RADICA/USA                                    74023                       none                                                                    dumped
-            21  Disney Princess "Kira-Kira magical lesson" /TOMY/Japan                                          -           -               -           -               -                   -                       -
-            22  Mermaid Melody "pichi-pichi Pitch" e-pitch microcomputer pure starter set /TAKARA/Japan         -           -               -           -               -                   -                       dumped (same as e-kara Japan)
-            23  Hello Kitty TV computer /EPOCH/Japan                                                            -           -               -           -               -                   -                       -
-            24  Gan-Gan Revoultion /TAKARA/Japan                                                                -           -               -           -               -                   -                       -
-    2003    1   Tokyo Friend Park II /EPOCH/Japan                                                               -           -               -           -               -                   -                       -
-            2   TV mah-jongg /EPOCH/Japan                                                                       -           -               -           -               -                   -                       -
-            3   e-kara Web /TAKARA/Japan                                                                       (e-kara web unit is a PC attachment, e-kara web carts can have songs flashed into them)
-            4   Doraemon TV computer /EPOCH/Japan                                                               -           -               -           -               -                   -                       -
-            5   Exciting stadium DX, Hansin Tigers version /EPOCH/Japan                                         -           -               -           -               -                   -                       -
-            6   Dragon Quest /SQUARE ENIX/Japan                                                                 -           -               -           8M              -                   SSD 2000?               dumped
-            7   Croquette! Win a medal! /EPOCH/Japan                                                            -           -               -           -               -                   -                       -
-            8   Taiko Popira /TAKARA/Japan                                                                      -           -               -           -               -                   -                       dumped
-            9   Together Minimoni, Dancing' Stage! plus /EPOCH/Japan                                            -           -               -           -               -                   -                       -
-            10  Evio /TOMY/Japan                                                                                -           -               -           -               -                   -                       dumped (some carts not dumped tho)
-            11  Together Minimoni,Jumping Party! /EPOCH/Japan                                                   -           -               -           -               -                   -                       -
-            12  Hamutaro TV computer /EPOCH/Japan                                                               -           -               -           -               -                   -                       -
-            13  Jara-Ja Land /TAKARA/Japan                                                                      -           -               -           -               -                   -                       dumped       (is this the home release of Jala Jaland /atlus/Japan above?)
-            14  Tomika, Draiving by Car navigation system /TOMY/Japan                                           -           -               -           -               -                   -                       dumped
-            15  PLAY TV Rescue Heroes /RADICA/USA                                                               73036       x8              48          2M              none                SSD 98 PL7351-181       dumped
-            16  PLAY TV Huntin' 2 /RADICA/USA                                                                   73030       x8              none                        none                SSD 98 PL7351-181       dumped
-            17  Let's play Ping-pong. Exciting pingpong2 /EPOCH/Japan                                           -           -               -           -               -                   -                       -
-            18  Cartridge for Slot machine TV "King of wild animal" /TAKARA/Japan                               -           -               -           -               -                   -                       *** maybe dumped?  ** Is this one dumped, or the Jr version below**
-            19  ChyoroQ "Burning up Racer /TAKARA/Japan                                                         -           -               -           -               -                   -                       -
-            20  Super shot! Exciting golf /EPOCH/Japan                                                          -           -               -           -               -                   -                       -
-            21  PichiPichi Pitchi /TAKARA/Japan                                                                 -           -               -           -               -                   -                       dumped (same as e-kara Japan)
-            22  Dual Station /TAKARA/Japan                                                                      -           -               -           -               -                   -                       -
-            23  Gei-Geki GoGo! Shooting /TAKARA/Japan                                                           -           -               -           -               -                   -                       dumped
-            24  Let's fish a big one. Exciting fishing! /EPOCH/Japan                                            -           -               -           -               -                   -                       -
-            25  Champion Pinball /TOMY/Japan                                                                    -           -               -           -               -                   -                       dumped
-            26  Excite Fishing DX                                                                               EF2J        x8              48          4M              24C08               SSD 98 PL7351-181       dumped
-    2002    1   Accessory cartridge for Slot machine "Gin-gin maru TV" /TAKARA/Japan                            -           -               -           -               -                   -                       dumped
-            2   Wildest computer robot "Daigander" (Korean version) /TAKARA/Korea                               -           -               -           -               -                   -                       -
-            3   Hamutaro's circus /EPOCH/Japan                                                                  -           -               -           -               -                   -                       -
-            4   Doraemon Wakuwaku Kuukihou /EPOCH/Japan                                                         -           x8              -           -               -                   -                       dumped
-            5   Strike! Exciting bowling /EPOCH/Japan                                                           -           -               -           -               -                   -                       dumped
-            6   e-kara /Hasbro/Spain                                                                            -           -               -           -               -                   -                       dumped (has 3 Spanish songs)
-            7   Starter set for e-kara H.S," Morning sisters" /TAKARA/Japan                                     -           -               -           -               -                   -                       -
-            8   e-kara H.S.(headphones set) /TAKARA/Japan                                                       -           -               -           -               -                   -                       -
-            9   Accessory cartridge for Slot machine TV," Aladdin TV" /TAKARA/Japan                             -           -               -           -               -                   -                       dumped (cart)
-            10  Accessory cartridge for Slot machine TV "Businessman Kintaro/TAKARA/Japan                       -           -               -           -               -                   -                       dumped (cart)
-            11  Poko-poko Hammers /TAKARA/Japan                                                                 -           -               -           -               -                   -                       -
-            12  e-kara N Angel blue special set /TAKARA/Japan                                                   -           -               -           -               -                   -                       -
-            13  Together Minimoni,Dancing Stage! /EPOCH/Japan                                                   -           -               -           -               -                   -                       -
-            14  King of shooting /TOMY/Japan                                                                    -           -               -           -               -                   -                       -
-            15  Knock them out! Exciting boxing /EPOCH/Japan                                                    -           -               -           -               -                   -                       dumped
-            16  Popira2 /TAKARA/Japan                                                                           -           -               -           -               -                   -                       dumped
-            17  Zuba-Zuba Blade /TAKARA/Japan                                                                   -           -               -           -               -                   -                       -
-            18  Starter set for e-kara N "Morning sisters" /TAKARA/Japan                                        -           -               -           -               -                   -                       -
-            19  e-kara /Hasbro/England                                                                          -           -               -           -               -                   -                       dumped? (if same as one of the 'US' sets?)
-            20  e-kara /Takara USA/USA                                                                          -           -               -           -               -                   -                       dumped? (or #10 below, this might be ekaraa set with improved text)
-            21  PLAY TV Soccer /RADICA/USA                                                                      76088500    x8              none                        none                SSD 98 PA7351-107       dumped
-            22  PLAY TV Jr. Construction /RADICA/USA                                                            -           -               -           -               -                   -                       -
-            23  PLAY TV Boxing /RADICA/Japan                                                                    72039       x8              48          2M              none                SSD 98 PA7351-107       dumped
-            24  PLAY TV Baseball 2 /RADICA/USA                                                                  72042       x8              48          2M              none                SSD 98 PL7351-181       dumped
-            25  Barbie Dance Party /RADICA/USA,EU                                                               -           x8              none        -               -                   -                       dumped
-            26  Compete! Exciting stadium DX /EPOCH/Japan                                                       -           -               -           -               -                   -                       dumped
-            27  e-kara N /EPOCH/Japan                                                                           -           -               -           -               -                   -                       -
-            28  Who's the ace? Excite Tennis /EPOCH/Japan                                                       -           -               -           -               -                   -                       -
-            29  Wildest computer robot, "Daigander" /TAKARA/Japan                                               -           -               -           -               -                   -                       -
-            30  Cartridge for Slot machine TV "King of wild animal Jr." /TAKARA/Japan                           -           -               -           -               -                   -                       *** maybe dumped? ** Is this one dumped, or the non-Jr version above**
-            31  Gachinko Contest! Slot machine TV /DCT/Japan                                                    -           -               -           -               -                   -                       dumped
-            32  Beyblade Ultimate shooter /TAKARA/Japan                                                         -           -               -           -               -                   -                       -
-    2001    1   Ping-pong(Chinese version) /Tenpon/China                                                        -           -               -           -               -                   -                       -
-            2   TV hockey /TOMY/Japan                                                                           -           -               -           -               -                   -                       -
-            3   e-kara Morning sisters /TAKARA/Japan                                                            -           -               -           -               -                   -                       -
-            4   e-kara Duet microphone plus /TAKARA/Japan                                                       -           -               -           -               -                   -                       -
-            5   e-kara plus /TAKARA/Japan                                                                       -           -               -           -               -                   -                       -
-            6   Hamutaro, Dancing', Running /EPOCH/Japan                                                        -           -               -           -               -                   -                       -
-            7   Gin-gin Snowboarders /TAKARA/Japan                                                              -           -               -           -               -                   -                       -
-            8   Shoot! Exciting striker /EPOCH/Japan                                                            -           -               -           -               -                   -                       -
-            9   e-kara US version /TAKARA USA, Hasbro/USA,EU                                                    71076       x8              none        1M                                  SSD 98 PA7351-107       this one or #20 above?  dumped
-            10  Popira Korea version /SONOKONG/Korea                                                            -           -               -           -               -                   -                       -
-            11  I singer: e-kara Korean version /SONOKONG/Korea                                                 -           -               -           -               -                   -                       -
-            12  Ms.Comett, Lovely baton /TAKARA/Japan<                                                          -           -               -           -               -                   -                       -
-            13  Dance Dance revolution family mat /KONAMI,KONAMI Sports/Japan                                   -           -               -           -               -                   -                       dumped
-            14  PLAY TV Card Night /RADICA/USA                                                                  71063       x8              40          1M              none                SSD 98 PA7351-107       dumped
-            15  PLAY TV Bass Fishin' /RADICA/USA                                                                71008       x8              40          1M              none                SSD 98 PA7351-107       dumped
-            16  PLAY TV Snowboarder (blue) /RADICA/USA                                                          71023       x8              40          1M              none                SSD 98 PL7351-181       dumped
-            17  Bistro Kids /SEGA Toys/Japan                                                                    -           -               -           -               -                   -                       -
-            18  Let's construct the town! /TAKARA/Japan                                                         -           -               -           -               -                   -                       -
-            19  Let's fish black bass! Exciting Fishing /EPOCH/Japan                                            -           -               -           -               -                   -                       -
-            20  Baseball Korean version /SONOKONG/Korea                                                         -           -               -           -               -                   -                       -
-            21  Ping-pong Korean version /SONOKONG/Korea                                                        -           -               -           -               -                   -                       dumped ('Reeal Ping Pong')
-            22  e-kara Hello Kitty /TAKARA/Japan                                                                -           -               -           -               -                   -                       -
-            23  Special box "Morning sisters" /TAKARA/Japan                                                     -           -               -           -               -                   -                       -
-            24  Gan-Gan Adventure /TAKARA/Japan                                                                 -           -               -           -               -                   -                       -
-            25  e-kara wireless unit /TAKARA/Japan                                                              -           -               -           -               -                   -                       -
-            26  Webdiver Gradion /TAKARA/Japan                                                                  -           -               -           -               -                   -                       -
-            27  black bass tsurouze! Excite Fishing/EPOCH/Japan                                                 -           -               -           -               -                   -                       -
-            28  Hamu-chan's Daishuugou dance surunoda! hasirunoda!/EPOCH/Japan                                  -           -               -           -               -                   -                       -
-    2000    1   Popira /TAKARA/Japan                                                                            -           -               -           -               -                   -                       dumped
-            2   e-kara Duet microphone /TAKARA/Japan                                                            -           -               -           -               -                   -                       -
-            3   e-kara /TAKARA/Japan                                                                            -           -               -           -               -                   -                       dumped
-            4   Let's play ping-pong. Exciting ping-pong /EPOCH/Japan                                           -           -               -           -               -                   -                       dumped
-            5   PLAY TV Huntin' Buckmasters /RADICA/USA                                                         8074        x8              none                        none                SSD 98 PA7351-107       dumped
-            6   PLAY TV Ping Pong /RADICA/USA,HK,EU                                                             8028        x8              48          1M              none                SSD 97 PA7270-107       dumped
-            7   PLAY TV OPUS /RADICA/USA,EU                                                                     -           -               -           -               -                   -                       dumped (US version, PAL version appears to use different ROM)
-            8   PLAY TV Baseball 2 /EPOCH/Japan, HK                                                             -           -               -           -               -                   -                       -
-            9   Let's hit a homerun! Exciting baseball /EPOCH/Japan                                             -           -               -           -               -                                           -
-                Play TV Baseball /RADICA/USA,EU                                                                 8017        x8              none                        none                SSD 98 PA7351-107       dumped
-    1999    1   ABC Jungle Fun Hippo /Vteck/HK, USA, France                                                     -           -               -           -               -                   -                       -
-    Unknown 1   PLAY TV Football /RADICA/USA                                                                    74021       x8              48          4M              none                SSD 98 PL7351-181       dumped
-                XaviXTennis                                                                                     SGM6446     x16             48          8M              24C08               SSD 2002 NEC 85054-611  dumped
-                XaviXBowling                                                                                    SGM644C     x16             48                                                                      dumped
+    year        name                                                                                            PCB ID      ROM width       TSOP pads   ROM size        SEEPROM             die markings            extra components / notes
+
+    2011      anpan-man kazoku de ikunou mat DX /JoyPalette/Japan                                             -           -               -           -               -                   -                       -
+    2009      anpan-man pyon-pyon ikunou mat /JoyPalette/Japan                                                -           -               -           -               -                   -                       -
+    2006      Hello Kitty カードでおままごと　あいうおえ図鑑 / エポック社 / 日本       Hello Kitty Play House with Cards Aiuoe Illustrated Book / Epochsha / Japan
+              ドラえもん 体感タケコプター! 空とぶ大冒険 / エポック社 / 日本      Doraemon Experience Takecopter! Great Flying Adventure / Epoch Publishing / Japan
+              スーパーテレビパソコンLink / エポック社 / 日本   Super TV PC Link / Epoch / Japan
+              Let's!TVプレイ ふしぎ星のふたご姫Gyu! ドレスチェンジでキュートにダンス / バンダイ / 日本   Let's!TV Play Gyu, the Twin Princess of the Mysterious Planet! Dance cutely with a dress change / Bandai / Japan
+              Let's!TVプレイ 体感キャストオフ 仮面ライダーカブト クロックアップ＆ライダーキック / バンダイ / 日本  Let's!TV Play Experience Cast Off Kamen Rider Kabuto Clock Up & Rider Kick / Bandai / Japan
+              Let's!TVプレイ なりきり体感 ボウケンジャー 走れ！撃て！ミッションスタート！！ / バンダイ / 日本   Let's! TV Play Narikiri Experience Boukenger Run! Shoot! Mission starts! ! / Bandai / Japan
+              テレビであそぼう！まなぼう！超能力あいうえお図鑑 / エポック社 / 日本   Let's play on TV! Learn! Superpower Aiueo Illustrated Book / Epochsha / Japan
+              Let's!TVプレイ なりきりファイト ウルトラマン 撃て！必殺光線！！ / タカラトミー / 日本   Let's!TV Play Narikiri Fight Ultraman Shoot! Deadly ray! ! / Takara Tomy / Japan
+    2005      どこでもドラえもん 日本旅行ゲームDX体感！どこドラグランプリ！ / エポック社 / 日本          Doraemon anywhere - Japan travel game DX experience! Where is the Dragon Grand Prix! / Epoch / Japan
+              Let's!TVプレイ ふたりはプリキュアMaxHeart マットでダンス MaxHeartにおどっちゃおう / バンダイ / 日本         Let's!TV Play Futari wa PreCure MaxHeart Dance on the mat Let's go to MaxHeart / Bandai / Japan
+              Let's!TVプレイ 魔法戦隊マジレンジャー マジマットでダンス＆バトル / バンダイ / 日本        Let's!TV Play Mahou Sentai Magiranger Dance & Battle at Magimat / Bandai / Japan
+              Let's!TVプレイ 音撃バトル！仮面ライダー響鬼 決めろ！一気火勢の型 / バンダイ / 日本        Let's!TV Play Ongeki Battle! Kamen Rider Hibiki Decide! Ichikkasei no Kata / Bandai / Japan
+              Jala Jaland /atlus/Japan (arcade version)                                                       -           -               -           -               -                   -                       -
+    2004      Printer for TV computer /EPOCH/Japan                                                            -           -               -           -               -                   -                       -
+              Accessory memory mascot for TV mail Pc mail cot 2 characters (Putchi, Petchi) /EPOCH/Japan      -           -               -           -               -                   -                       -
+              Accessory memory mascot for TV mail Pc mail cot 2 characters (Charuru, Kurau) /EPOCH/Japan      -           -               -           -               -                   -                       -
+              TV mail PC "Mercot /EPOCH/Japan                                                                 -           -               -           -               -                   -                       -
+              Wildest computer robot "Daigander" (Korean version) /TAKARA/Korea                               -           -               -           -               -                   -                       -
+    2003      Hello Kitty TV computer /EPOCH/Japan                                                            -           -               -           -               -                   -                       -
+    2001      Ping-pong(Chinese version) /Tenpon/China                                                        -           -               -           -               -                   -                       -
+              Popira Korea version /SONOKONG/Korea                                                            -           -               -           -               -                   -                       -
+              I singer: e-kara Korean version /SONOKONG/Korea                                                 -           -               -           -               -                   -                       -
+              Baseball Korean version /SONOKONG/Korea                                                         -           -               -           -               -                   -                       -
+    1999      ABC Jungle Fun Hippo /VTech/HK, USA, France                                                     -           -               -           -               -                   -                       -
+
+    not dumped: no TSOP pads
+    2003      Beyblade Arcade Challenge 5-in-1 /Hasbro/USA                                                    -           -               -           -               -                   -                       have
+    2002      Excite Striker (UK)
+    2001      Webdiver Gradion /TAKARA/Japan                                                                  -           -               -           -               -                   -                       -
+    2000      connecTV OPUS /RADICA EU (different ROM to US?)
 
 
-    TODO: put into above table (XaviXPORT cartridges)
+    not dumped: xavix2.cpp
+
+    2008      究極! 筋肉スタジアム! サスケ完全制覇   kyuukyoku! kinniku grand slam! SASUKE kanzen seiha /EPOCH/Japan                                 -           -               -           -               -                   -                       -
+    2006      Let's!TVプレイ　ドラゴンボールＺ　バトル体感かめはめ波２～オッスおめぇ悟空 天下一武道会～ / バンダイ / 日本         Let's!TV Play Dragon Ball Z Battle Experience Kamehameha 2 ~Ossu Ome Goku Tenkaichi Budokai~ / Bandai / Japan
+    2006      SASUKE サスケ＆筋肉バトル!!スポーツマンNO.1決定戦 / エポック社 / 日本   SASUKE Sasuke & Muscle Battle!! Sportsman No. 1 Decisive Battle / Epoch Publishing / Japan
+    2005      Let's!TVプレイ ドラゴンボ－ルＺ バトル体感かめはめ波～ おめぇとフュージョン / バンダイ / 日本          Let's!TV Play Dragon Ball Z Battle Experience Kamehameha ~ Ometo Fusion / Bandai / Japan
+
+    dumped: either here, xavix_2000.cpp, or xavix_2002.cpp
+			  Let's construct the town! /TAKARA/Japan                                                         -           -               -           -               -                   -                       -
+			  TV hockey /TOMY/Japan                                                                           -           -               -           -               -                   -                       -
+			  Zuba-Zuba Blade /TAKARA/Japan                                                                   -           -               -           -               -                   -                       -
+              テレビで遊び隊　韋駄天翔 激走 韋駄天バトル / トミー / 日本          Playing with TV Idaten Sho Gekisou Idaten Battle / Tommy / Japan
+              Beyblade Ultimate shooter /TAKARA/Japan                                                         -           -               -           -               -                   -                       -
+              東京フレンドパーク2スペシャル / エポック社 / 日本          Tokyo Friend Park 2 Special / Epochsha / Japan
+              Let's!TVプレイ ケロロ軍曹 ケロロ小隊大パニック！ドタバタ大決戦であります / バンダイ / 日本   Let's!TV Play Keroro Sergeant Keroro Platoon Panic! It’s a big slapstick battle / Bandai / Japan
+              スーパーテレビパソコン別売カートリッジ ペットケータイLink / エポック社 / 日本      Super TV PC Optional Cartridge Pet Mobile Link / Epochsha / Japan
+              Challenge Ai-chan! Exciting Ping-pong /TAKARATOMY/Japan                                         -           -               -           -               -                   -                       dumped
+              TV de  Asobitai Hyper Rescue - Boku wa Kyuujotai /BANDAI/Japan                                  -           -               -           -               -                   -                       -
+              Tokyo Friend Park II Perfect! Mezase! Grand Slam!! /EPOCH/Japan                                 -           -               -           -               -                   -                       -
+              Scan card! Exciting Stage Soccer. /EPOCH/Japan                                                  -           -               -           -               -                   -                       -
+              Hello Kitty Super TV computer /EPOCH/Japan                                                      -           -               -           -               -                   -                       -
+              Doraemon Super TV computer /EPOCH/Japan                                                         -           -               -           -               -                   -                       -
+              Let's TV Play series "Ultraman" /BANDAI/Japan                                                   -           -               -           -               -                   -                       -
+              Let's TV Play Classic series "Namco Nostalgia 1" /BANDAI/Japan                                  CGSJ        x8              48          1M              24LC04                                      dumped non destructively
+              Let's TV Play Classic series "Namco Nostalgia 2" /BANDAI/Japan                                  CGSJ        x8              48          1M              24LC04              SSD 98 PL7351-181       dumped
+              Let's TV Play Classic series "Taito Nostalgia 1" /BANDAI/Japan                                  CGSJ        x8              48          2M              24LC04                                      flash, dumped non destructively
+              Let's TV Play Classic series "Taito Nostalgia 2" /BANDAI/Japan                                  CGSJ        x8              48          2M              24LC04                                      flash, dumped non destructively
+              Magic Ranger Battle /BANDAI/Japan                                                               -           -               -           -               -                   -                       dumped
+              Accessory cartridge for Super TV computer "Double mouse party" /EPOCH/Japan                     -           -               -           -               -                   -                       -
+              Accessory cartridge for Super TV computer "ECC Junior" /EPOCH/Japan                             -           -               -           -               -                   -                       -
+              Wild Adventure Mini Golf Game /Hasbro/USA                                                       MGFA        x8              48          4M              24C04               SSD 98 PL7351-181       dumped
+              MX DIRT REBEL Game /Hasbro/USA                                                                  MTXA        x8              48          8M              24C04               SSD 2000 NEC 85605-621  dumped
+              Tomas Plarail /TOMY/Japan                                                                       -           -               -           -               -                   -                       -  dumped?
+              Thomas TV Personal Computer /EPOCH/Japan                                                        -           -               -           -               -                   -                       -
+              STAR WARS Light Saber Battle /TOMY/Japan                                                        -           -               -           -               -                   -                       -
+              Star Wars Lightsaber Battle Game /Hasbro/USA                                                    SWSA        x8              48          8M              24C02               SSD 2000 NEC 85605-621  dumped
+              Gururin World /EPOCH/Japan                                                                      -           x8              -           -               -                   SSD 98 PL7351-181       dumped
+              Toinohgi Onmyo-daisenki /BANDAI/Japan                                                           -           -               -           -               -                   -                       -
+              Virtual punching battle of "One Piece" /BANDAI/Japan                                            -           -               -           -               -                   -                       dumped
+              Accessory cartridge for Super TV computer "Doraemon" /EPOCH/Japan                               -           -               -           -               -                   -                       -
+              Accessory cartridge for Super TV computer "Hamutaro" /EPOCH/Japan                               -           -               -           -               -                   -                       -
+              Super TV computer /EPOCH/Japan                                                                  -           -               -           -               -                   -                       -
+              Super Dash ball /EPOCH/Japan                                                                    -           x8              -           -               -                   SSD 2000 NEC 85605-621  dumped
+              Exciting sports Tennis X Fitness /EPOCH/Japan                                                   -           -               -           -               -                   -                       -
+              The Lord of the Rings Warrior of Middle Earth /Hasbro/USA                                       LORA        x8              48          8M              24C02               SSD 2000 NEC 85605-621  dumped
+              All star Festival Quize /EPOCH/Japan                                                            -           -               -           -               -                   -                       -
+              e-kara mix /TAKARA/Japan                                                                        -           -               -           -               -                   -                       -
+              Jumping Popira /TAKARA/Japan                                                                    -           -               -           -               -                   -                       -
+              Tour around Japan. I'm a Prarail motorman /TOMY/Japan                                           -           -               -           -               -                   -                       dumped
+              Play TV Monster Truck /RADICA/USA                                                               74026       x8              48          4M              none                SSD 98 PL7351-181       dumped
+              Play TV Madden Football /RADICA/USA                                                             74021       x8              48          4M              none                SSD 98 PL7351-181       dumped
+              Play TV SSX Snowboarder (and Snowboarder white?) /RADICA/USA                                    74023                       none                                                                    dumped
+              Disney Princess "Kira-Kira magical lesson" /TOMY/Japan                                          -           -               -           -               -                   -                       -
+              Gan-Gan Revoultion /TAKARA/Japan                                                                -           -               -           -               -                   -                       -
+              Tokyo Friend Park II /EPOCH/Japan                                                               -           -               -           -               -                   -                       -
+              TV mah-jongg /EPOCH/Japan                                                                       -           -               -           -               -                   -                       -
+              e-kara Web /TAKARA/Japan                                                                        (e-kara web unit is a PC attachment, e-kara web carts can have songs flashed into them)
+              Doraemon TV computer /EPOCH/Japan                                                               -           -               -           -               -                   -                       -
+              Exciting stadium DX, Hansin Tigers version /EPOCH/Japan                                         -           -               -           -               -                   -                       -
+              Dragon Quest /SQUARE ENIX/Japan                                                                 -           -               -           8M              -                   SSD 2000?               dumped
+              Croquette! Win a medal! /EPOCH/Japan                                                            -           -               -           -               -                   -                       -
+              Taiko Popira /TAKARA/Japan                                                                      -           -               -           -               -                   -                       dumped
+              Together Minimoni, Dancing' Stage! plus /EPOCH/Japan                                            -           -               -           -               -                   -                       -
+              Evio /TOMY/Japan                                                                                -           -               -           -               -                   -                       dumped (some carts not dumped tho)
+              Together Minimoni,Jumping Party! /EPOCH/Japan                                                   -           -               -           -               -                   -                       -
+              Hamutaro TV computer /EPOCH/Japan                                                               -           -               -           -               -                   -                       -
+              Jyarajyaland /TAKARA/Japan                                                                      -           -               -           -               -                   -                       dumped       (is this the home release of Jala Jaland /atlus/Japan above?)
+              Tomika, Draiving by Car navigation system /TOMY/Japan                                           -           -               -           -               -                   -                       dumped
+              PLAY TV Rescue Heroes /RADICA/USA                                                               73036       x8              48          2M              none                SSD 98 PL7351-181       dumped
+              PLAY TV Huntin' 2 /RADICA/USA                                                                   73030       x8              none                        none                SSD 98 PL7351-181       dumped
+              Let's play Ping-pong. Exciting pingpong2 /EPOCH/Japan                                           -           -               -           -               -                   -                       -
+              Cartridge for Slot machine TV "King of wild animal" /TAKARA/Japan                               -           -               -           -               -                   -                       *** maybe dumped?  ** Is this one dumped, or the Jr version below**
+              ChyoroQ "Burning up Racer /TAKARA/Japan                                                         -           -               -           -               -                   -                       -
+              Super shot! Exciting golf /EPOCH/Japan                                                          -           -               -           -               -                   -                       -
+              PichiPichi Pitchi /TAKARA/Japan                                                                 -           -               -           -               -                   -                       dumped (same as e-kara Japan)
+              Dual Station /TAKARA/Japan                                                                      -           -               -           -               -                   -                       -
+              Gei-Geki GoGo! Shooting /TAKARA/Japan                                                           -           -               -           -               -                   -                       dumped
+              Let's fish a big one. Exciting fishing! DX /EPOCH/Japan                                         EF2J        x8              48          4M              24C08               SSD 98 PL7351-181       dumped
+              Champion Pinball /TOMY/Japan                                                                    -           -               -           -               -                   -                       dumped
+              Accessory cartridge for Slot machine "Gin-gin maru TV" /TAKARA/Japan                            -           -               -           -               -                   -                       dumped
+              Hamutaro's circus /EPOCH/Japan                                                                  -           -               -           -               -                   -                       -
+              Doraemon Wakuwaku Kuukihou /EPOCH/Japan                                                         -           x8              -           -               -                   -                       dumped
+              Strike! Exciting bowling /EPOCH/Japan                                                           -           -               -           -               -                   -                       dumped
+              e-kara /Hasbro/Spain                                                                            -           -               -           -               -                   -                       dumped (has 3 Spanish songs)
+              Accessory cartridge for Slot machine TV "Aladdin TV" /TAKARA/Japan                              -           -               -           -               -                   -                       dumped (cart)
+              Accessory cartridge for Slot machine TV "Businessman Kintaro /TAKARA/Japan                      -           -               -           -               -                   -                       dumped (cart)
+              Poko-poko Hammers /TAKARA/Japan                                                                 -           -               -           -               -                   -                       -
+              Together Minimoni,Dancing Stage! /EPOCH/Japan                                                   -           -               -           -               -                   -                       -
+              King of shooting /TOMY/Japan                                                                    -           -               -           -               -                   -                       -
+              Knock them out! Exciting boxing /EPOCH/Japan                                                    -           -               -           -               -                   -                       dumped
+              Popira2 /TAKARA/Japan                                                                           -           -               -           -               -                   -                       dumped
+              PLAY TV Soccer /RADICA/USA                                                                      76088500    x8              none                        none                SSD 98 PA7351-107       dumped
+              PLAY TV Jr. Construction /RADICA/USA                                                            -           -               -           -               -                   -                       -
+              PLAY TV Boxing /RADICA/Japan                                                                    72039       x8              48          2M              none                SSD 98 PA7351-107       dumped
+              PLAY TV Baseball 2 /RADICA/USA                                                                  72042       x8              48          2M              none                SSD 98 PL7351-181       dumped
+              Barbie Dance Party /RADICA/USA,EU                                                               -           x8              none        -               -                   -                       dumped
+              Compete! Exciting stadium DX /EPOCH/Japan                                                       -           -               -           -               -                   -                       dumped
+              Who's the ace? Excite Tennis /EPOCH/Japan                                                       -           -               -           -               -                   -                       -
+              Wildest computer robot, "Daigander" /TAKARA/Japan                                               -           -               -           -               -                   -                       -
+              Cartridge for Slot machine TV "King of wild animal Jr." /TAKARA/Japan                           -           -               -           -               -                   -                       *** maybe dumped? ** Is this one dumped, or the non-Jr version above**
+              Gachinko Contest! Slot machine TV /DCT/Japan                                                    -           -               -           -               -                   -                       dumped
+              Hamutaro, Dancing', Running /EPOCH/Japan                                                        -           -               -           -               -                   -                       -
+              Gin-gin Snowboarders /TAKARA/Japan                                                              -           -               -           -               -                   -                       -
+                * one version of Gin-Gin boarders also had no pads, the content has been confirmed as identical
+              Shoot! Exciting striker /EPOCH/Japan                                                            -           -               -           -               -                   -                       -
+              e-kara US version /TAKARA USA, Hasbro/USA,EU                                                    71076       x8              none        1M                                  SSD 98 PA7351-107       this one or #20 above?  dumped
+              Ms.Comett, Lovely baton /TAKARA/Japan<                                                          -           -               -           -               -                   -                       -
+              Dance Dance revolution family mat /KONAMI,KONAMI Sports/Japan                                   -           -               -           -               -                   -                       dumped
+              PLAY TV Card Night /RADICA/USA                                                                  71063       x8              40          1M              none                SSD 98 PA7351-107       dumped
+              PLAY TV Bass Fishin' /RADICA/USA                                                                71008       x8              40          1M              none                SSD 98 PA7351-107       dumped
+              PLAY TV Snowboarder (blue) /RADICA/USA                                                          71023       x8              40          1M              none                SSD 98 PL7351-181       dumped
+              Bistro Kids /SEGA Toys/Japan                                                                    -           -               -           -               -                   -                       -
+              Gan-Gan Adventure /TAKARA/Japan                                                                 -           -               -           -               -                   -                       -
+              Hamu-chan's Daishuugou dance surunoda! hasirunoda! /EPOCH/Japan                                 -           -               -           -               -                   -                       -
+              Popira /TAKARA/Japan                                                                            -           -               -           -               -                   -                       dumped
+              e-kara /TAKARA/Japan                                                                            -           -               -           -               -                   -                       dumped
+              Let's play ping-pong. Exciting ping-pong /EPOCH/Japan                                           -           -               -           -               -                   -                       dumped
+              Ping-pong Korean version /SONOKONG/Korea                                                        -           -               -           -               -                   -                       dumped ('Reeal Ping Pong')
+              PLAY TV Huntin' Buckmasters /RADICA/USA                                                         8074        x8              none                        none                SSD 98 PA7351-107       dumped
+              PLAY TV Ping Pong /RADICA/USA,HK,EU                                                             8028        x8              48          1M              none                SSD 97 PA7270-107       dumped
+              PLAY TV OPUS /RADICA/USA                                                                        -           -               -           -               -                   -                       dumped (US version, PAL version appears to use different ROM)
+              PLAY TV Baseball 2 /EPOCH/Japan, HK                                                             -           -               -           -               -                   -                       -
+              Play TV Baseball /RADICA/USA,EU                                                                 8017        x8              none                        none                SSD 98 PA7351-107       dumped
+              PLAY TV Football /RADICA/USA                                                                    74021       x8              48          4M              none                SSD 98 PL7351-181       dumped
+              Let's fish black bass! Exciting Fishing /EPOCH/Japan                                            -           -               -           -               -                   -                       -
+              black bass tsurouze! Excite Fishing /EPOCH/Japan *same as above?                                -           -               -           -               -                   -                       -
+              Let's hit a homerun! Exciting Stadium /EPOCH/Japan                                              -           -               -           -               -                                           -
+              XaviXTennis                                                                                     SGM6446     x16             48          8M              24C08               SSD 2002 NEC 85054-611  dumped
+              XaviXBowling                                                                                    SGM644C     x16             48                                                                      dumped
+
+    dumped: see xavix2.cpp
+    2006      Let's!TVプレイ　ＮＡＲＵＴＯ－ナルト－ 忍者体感～だってばよ～ / バンダイ / 日本            Let's!TV Play NARUTO Ninja Experience ~Dattebayo~ / Bandai / Japan
+
+
 
     XaviX Tennis and XaviX Baseball are the simplest: just the CPU, x16 ROM and 24C08 SEEPROM.  Bowling and Boxing also have 4 IR LEDs and a 32x32 sensor.
     XaviX Fishing has ROM, 24C08 and a 24-pin daughterboard with a Nordic nRF24E1 2.4GHz 8051-based SoC.
@@ -326,10 +334,10 @@ void xavix_state::xavix_lowbus_map(address_map &map)
 	map(0x6ffb, 0x6ffb).ram().w(FUNC(xavix_state::dispctrl_posirq_y_w)).share("posirq_y"); // increases / decreases when you jump in snowboard (snowboard, used to blank ground)
 
 	// Lightgun / pen 1 control
-	// map(0x6ffc, 0x6fff)
+	map(0x6ffc, 0x6fff).r(FUNC(xavix_state::lightgun_r));
 
-	// Sound RAM
-	// map(0x7400, 0x757f)
+	// Sound RAM (tested by Gun Gun Revolution, games don't write here, so it's probably just RAM the sound hardware makes use of directly when mixing)
+	map(0x7400, 0x757f).ram();
 
 	// Sound Control
 	map(0x75f0, 0x75f1).rw(FUNC(xavix_state::sound_startstop_r), FUNC(xavix_state::sound_startstop_w)); // r/w tested read/written 8 times in a row
@@ -540,12 +548,93 @@ static INPUT_PORTS_START( xavix_i2c )
 	PORT_INCLUDE(xavix)
 
 	PORT_MODIFY("IN1")
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("i2cmem", i2cmem_device, read_sda)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("i2cmem", FUNC(i2cmem_device::read_sda))
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( epo_mj )
+	PORT_INCLUDE(xavix)
 
+	// there are not 15 buttons, there are 7 plus the dial, this is for figuring out the inputs
+	PORT_MODIFY("IN0")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Back")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Select") // forward through menus
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON3 )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON4 )
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON5 )
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON6 )
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON7 )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_BUTTON8 )
 
+	PORT_MODIFY("IN1")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON9 )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("i2cmem", FUNC(i2cmem_device::read_sda))
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON10 )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON11 )
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON12 )
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON13 )
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON14 )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_BUTTON15 )
 
+	PORT_START("DIAL")
+	PORT_BIT( 0xff, 0x00, IPT_AD_STICK_X ) PORT_SENSITIVITY(16) PORT_KEYDELTA(16) PORT_REVERSE PORT_PLAYER(1)
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( epo_mms )
+	PORT_INCLUDE(xavix_i2c)
+
+	PORT_MODIFY("IN0")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Pad 1 - Pink")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Pad 2 - Orange")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("Pad 3 - Purple")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_NAME("Pad 4 - Green")
+
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( ban_krrj )
+	PORT_INCLUDE(xavix)
+
+	PORT_MODIFY("IN0")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Pad 1 - X")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Pad 2 - Left / Red")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("Pad 3 - Right / Green")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_NAME("Pad 4 - O")
+
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( tak_hamr )
+	PORT_INCLUDE(xavix_i2c)
+
+	PORT_MODIFY("IN0")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(1) PORT_NAME("Player 1 - Green (Left)")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(1) PORT_NAME("Player 1 - Yellow (Middle)")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_PLAYER(1) PORT_NAME("Player 1 - Red (Right)")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(2) PORT_NAME("Player 2 - Green (Left)")
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(2) PORT_NAME("Player 2 - Yellow (Middle)")
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_PLAYER(2) PORT_NAME("Player 2 - Red (Right)")
+
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( tomshoot )
+	PORT_INCLUDE(xavix_i2c)
+
+	PORT_MODIFY("IN0")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(1)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(2)
+
+	PORT_START("GUN1_0")
+	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_X ) PORT_CROSSHAIR(X, 1.0, 0.0, 0) PORT_SENSITIVITY(35) PORT_KEYDELTA(15) PORT_PLAYER(1)
+
+	PORT_START("GUN1_1")
+	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_Y ) PORT_CROSSHAIR(Y, 1.0, 0.0, 0) PORT_SENSITIVITY(35) PORT_KEYDELTA(15) PORT_PLAYER(1)
+
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( gungunrv )
+	PORT_INCLUDE(xavix_i2c)
+
+	PORT_MODIFY("IN1")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN ) // needed to boot
+INPUT_PORTS_END
 
 static INPUT_PORTS_START( tomcpin )
 	PORT_INCLUDE(xavix_i2c)
@@ -563,6 +652,60 @@ static INPUT_PORTS_START( tomcpin )
 	PORT_MODIFY("IN1")
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_POWER_OFF ) PORT_NAME("Power Switch") // pressing this will turn the game off.
 INPUT_PORTS_END
+
+
+static INPUT_PORTS_START( tomplc )
+	PORT_INCLUDE(xavix_i2c)
+
+	PORT_MODIFY("IN0")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_NAME("Doors / Right")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("Wipers / Back")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Headlights / Left")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Horn / Select")
+
+	// this is the up/down handle on the left (pull towards player to increase power)
+	PORT_BIT( 0x30, 0x00, IPT_POSITIONAL_V ) PORT_POSITIONS(3) PORT_SENSITIVITY(10) PORT_KEYDELTA(1) PORT_CENTERDELTA(0) PORT_FULL_TURN_COUNT(3) PORT_NAME("Power")
+
+	PORT_MODIFY("IN1")
+	// this is the rotary lever (move anti-clockwise to the right to apply brakes)
+	PORT_BIT( 0x03, 0x00, IPT_POSITIONAL ) PORT_POSITIONS(3) PORT_SENSITIVITY(10) PORT_KEYDELTA(1) PORT_CENTERDELTA(0) PORT_FULL_TURN_COUNT(3) PORT_NAME("Brake")
+
+	// are you expected to say something when this is held? game makes a crackle and doesn't act like you said anything
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_NAME("Speak")
+
+	PORT_MODIFY("AN0")
+	// all bits in this port seem to be the microphone input, the game just needs to register a large enough value when the button is pressed
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_BUTTON6 ) PORT_NAME("Microphone In")
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( tomthr )
+	PORT_INCLUDE(xavix)
+
+	PORT_MODIFY("IN0")
+	// not an actual joystick, this is a forward / backwards level, and a digital wheel
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_NAME("Move Forwards")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_NAME("Move Backwards")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_NAME("Steer Left") // steering is digital?
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_NAME("Steer Right")
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Horn / Select")
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Ignition Key")
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("Map")
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_NAME("Wipers")
+
+	PORT_MODIFY("IN1")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_NAME("Headlights")
+
+	PORT_MODIFY("AN0")
+	// all bits in this port seem to be the microphone input, the game just needs to register a large enough value when the button is pressed
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_BUTTON6 ) PORT_NAME("Microphone In")
+
+	PORT_MODIFY("AN5")
+	// read during attract demo
+
+	PORT_MODIFY("AN7")
+	// battery status?
+INPUT_PORTS_END
+
 
 static INPUT_PORTS_START( ltv_tam )
 	PORT_INCLUDE(xavix_i2c)
@@ -584,16 +727,45 @@ static INPUT_PORTS_START( ltv_tam )
 INPUT_PORTS_END
 
 
+static INPUT_PORTS_START( tom_tvho )
+	PORT_INCLUDE(xavix)
+
+	PORT_MODIFY("MOUSE0X")
+	PORT_BIT( 0xff, 0x00, IPT_AD_STICK_X ) PORT_SENSITIVITY(7) PORT_KEYDELTA(35) PORT_REVERSE PORT_PLAYER(1)
+	PORT_MODIFY("MOUSE0Y")
+	PORT_BIT( 0xff, 0x00, IPT_AD_STICK_Y ) PORT_SENSITIVITY(7) PORT_KEYDELTA(35) PORT_PLAYER(1)
+	PORT_MODIFY("MOUSE1X")
+	PORT_BIT( 0xff, 0x00, IPT_AD_STICK_X ) PORT_SENSITIVITY(7) PORT_KEYDELTA(35) PORT_REVERSE PORT_PLAYER(2)
+	PORT_MODIFY("MOUSE1Y")
+	PORT_BIT( 0xff, 0x00, IPT_AD_STICK_Y ) PORT_SENSITIVITY(7) PORT_KEYDELTA(35) PORT_PLAYER(2)
+
+	PORT_MODIFY("IN0")
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(2)
+
+	PORT_MODIFY("IN1")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(1)
+INPUT_PORTS_END
+
 // left + right drums together = select / forward (needed on initial screen).  left drum = left in menus   right drum  = right in menus
 // analog reading depends heavily on timers, they're too fast right now so drum hits are too hard and register multiple times
 static INPUT_PORTS_START( taikodp )
 	PORT_INCLUDE(xavix_an)
 
 	PORT_MODIFY("AN0") // 00  (read by one type of function, handled in timer interrupt at 0x1d92 in RAM)
+#if 0 // should be more correct, but causes multiple hits to register
 	PORT_BIT( 0xff, 0x00, IPT_PEDAL ) PORT_SENSITIVITY(100) PORT_KEYDELTA(20)
+#else
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_IMPULSE(1)
+	PORT_BIT( 0x7f, IP_ACTIVE_HIGH, IPT_UNUSED )
+#endif
 
 	PORT_MODIFY("AN1") // 01  (read by identical function to 00 but with different addresses, handled in timer interrupt at 0x1dbd in RAM)
+#if 0 // should be more correct, but causes multiple hits to register
 	PORT_BIT( 0xff, 0x00, IPT_PEDAL2 ) PORT_SENSITIVITY(100) PORT_KEYDELTA(20)
+#else
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_IMPULSE(1)
+	PORT_BIT( 0x7f, IP_ACTIVE_HIGH, IPT_UNUSED )
+#endif
 
 	PORT_MODIFY("AN5") // 11  (read by different function, handled in timer interrupt at 0x1de8) (battery status related?)
 	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNUSED )
@@ -612,7 +784,7 @@ static INPUT_PORTS_START( taikodp )
 	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_MODIFY("IN1")
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("i2cmem", i2cmem_device, read_sda)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("i2cmem", FUNC(i2cmem_device::read_sda))
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( jpopira )
@@ -625,7 +797,7 @@ static INPUT_PORTS_START( jpopira )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_NAME("Pad 4")
 
 	PORT_MODIFY("IN1")
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("i2cmem", i2cmem_device, read_sda)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("i2cmem", FUNC(i2cmem_device::read_sda))
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_POWER_OFF ) PORT_NAME("Power Switch") // pressing this will turn the game off.
 INPUT_PORTS_END
 
@@ -644,7 +816,7 @@ INPUT_PORTS_END
 
 */
 
-READ_LINE_MEMBER( xavix_mtrk_state::mtrk_wheel_r )
+int xavix_mtrk_state::mtrk_wheel_r()
 {
 	return m_wheel->read_direction();
 }
@@ -659,7 +831,7 @@ static INPUT_PORTS_START( rad_mtrk )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("Throttle Low")
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Reverse / Back")
 
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM )  PORT_READ_LINE_MEMBER(xavix_mtrk_state, mtrk_wheel_r)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM )  PORT_READ_LINE_MEMBER(FUNC(xavix_mtrk_state::mtrk_wheel_r))
 
 	PORT_MODIFY("IN1")
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Horn")
@@ -685,6 +857,13 @@ static INPUT_PORTS_START( rad_opus )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON6 ) PORT_NAME("Pause") // PI05
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_NAME("Menu Select") // PI06
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_START1 ) PORT_NAME("Start / Bomb") // PI07
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( rad_opusp )
+	PORT_INCLUDE(rad_opus)
+
+	PORT_MODIFY("REGION") // PAL/NTSC flag
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_CUSTOM )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( rad_hnt )
@@ -776,8 +955,8 @@ static INPUT_PORTS_START( ekara )
 	PORT_INCLUDE(xavix)
 
 	PORT_MODIFY("IN1")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(xavix_ekara_state, ekara_multi0_r)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(xavix_ekara_state, ekara_multi1_r)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(xavix_ekara_state::ekara_multi0_r))
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(xavix_ekara_state::ekara_multi1_r))
 
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_POWER_OFF ) PORT_NAME("Power Switch") // pressing this will turn the game off.
 
@@ -797,6 +976,41 @@ static INPUT_PORTS_START( ekara )
 	PORT_BIT( 0x3c, IP_ACTIVE_HIGH, IPT_UNUSED )
 	// no 40/80 due to multiplexer code
 INPUT_PORTS_END
+
+static INPUT_PORTS_START( hikara )
+	PORT_INCLUDE(xavix)
+
+	PORT_MODIFY("IN0")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(xavix_hikara_state::ekara_multi0_r))
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(xavix_hikara_state::ekara_multi1_r))
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(xavix_hikara_state::ekara_multi2_r))
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(xavix_hikara_state::ekara_multi3_r))
+
+	PORT_START("EXTRA0")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Select")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_NAME("Key Down")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_NAME("Key Up")
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON10 ) PORT_NAME("Brightness Up")
+
+	PORT_START("EXTRA1")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_NAME("BGM Down")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON9 ) PORT_NAME("Brightness Down")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON6 ) PORT_NAME("BGM Up")
+
+	PORT_START("EXTRA2")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Cancel")
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON8 ) PORT_NAME("Tempo Up")
+
+	PORT_START("EXTRA3")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON7 ) PORT_NAME("Tempo Down")
+INPUT_PORTS_END
+
 
 static INPUT_PORTS_START( ddrfammt )
 	PORT_INCLUDE(xavix)
@@ -857,7 +1071,7 @@ static INPUT_PORTS_START( popira2 ) // player 2 buttons have heavy latency, prob
 
 	PORT_MODIFY("IN1")
 	PORT_BIT( 0x07, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(xavix_popira2_cart_state, i2c_r)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(xavix_popira2_cart_state::i2c_r))
 	PORT_BIT( 0x30, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_POWER_OFF ) PORT_NAME("Power Switch") // pressing this will turn the game off.
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED )
@@ -980,6 +1194,23 @@ static INPUT_PORTS_START( tak_geig )
 
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( tak_comt )
+	PORT_INCLUDE(xavix)
+
+	PORT_MODIFY("IN1")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN ) // needed to boot, might read inputs through this bit
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_POWER_OFF ) PORT_NAME("Power Switch") // pressing this will turn the game off.
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( tak_gin )
+	PORT_INCLUDE(xavix)
+
+	PORT_MODIFY("IN0")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT )
+INPUT_PORTS_END
 
 static INPUT_PORTS_START( rad_bb )
 	PORT_INCLUDE(xavix)
@@ -1133,6 +1364,34 @@ static INPUT_PORTS_START( epo_efdx )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( epo_tfp2 )
+	PORT_INCLUDE(xavix_i2c)
+
+	PORT_MODIFY("IN0")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Player 1 Left / Red") PORT_PLAYER(1)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Player 1 Right / Blue") PORT_PLAYER(1)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START1 ) PORT_NAME("Player 1 Start / Orange")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Player 2 Left / Green") PORT_PLAYER(2)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Player 2 Right / Pink") PORT_PLAYER(2)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_START2 ) PORT_NAME("Player 2 Start / Blue")
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( epo_tp2p )
+	PORT_INCLUDE(xavix)
+
+	PORT_MODIFY("IN0")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Player 1 Left") PORT_PLAYER(1)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Player 1 Right") PORT_PLAYER(1)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START1 ) PORT_NAME("Player 1 Start")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Player 2 Left") PORT_PLAYER(2)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Player 2 Right") PORT_PLAYER(2)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_START2 ) PORT_NAME("Player 2 Start")
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( tvpc_tom )
+	PORT_INCLUDE(xavix_i2c)
+INPUT_PORTS_END
+
 static INPUT_PORTS_START( has_wamg )
 	PORT_INCLUDE(xavix)
 
@@ -1148,6 +1407,16 @@ static INPUT_PORTS_START( evio )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON1 )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON2 )
+
+	PORT_MODIFY("IN1")
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(xavix_evio_cart_state::i2c_r))
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_POWER_OFF ) PORT_NAME("Power Switch") // pressing this will turn the game off.
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( daig )
+	PORT_INCLUDE(xavix)
+
+	PORT_MODIFY("IN0")
 
 	PORT_MODIFY("IN1")
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_POWER_OFF ) PORT_NAME("Power Switch") // pressing this will turn the game off.
@@ -1168,7 +1437,7 @@ static INPUT_PORTS_START( gcslottv ) // TODO: proper button names
 	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("Bet from credits") // not sure, decreases your credits if you have any
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_GAMBLE_BET ) // inserting a medal bets automatically, use this to bet from current credits
 
 	PORT_MODIFY("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) // insert medal / coin (there is a physical coin slot on toy for the medals) auto bets if bet possible, otherwise adds to credits
@@ -1248,9 +1517,64 @@ static INPUT_PORTS_START( jarajal )
 	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
-
 INPUT_PORTS_END
 
+
+static INPUT_PORTS_START( tcarnavi )
+	PORT_INCLUDE(xavix)
+
+	PORT_MODIFY("IN0")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Accelerate")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Brake")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("Siren / Transform?") // turns you into a police car?
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_NAME("Reverse")
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_NAME("Key")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON10 ) PORT_NAME("Dashboard Power?") PORT_TOGGLE
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_NAME("Steer Left") // steering is digital?
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_NAME("Steer Right")
+
+	PORT_MODIFY("IN1")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON8 ) PORT_NAME("Lights")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON7 ) PORT_NAME("Horn")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON6 ) PORT_NAME("Wipers")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON9 ) PORT_NAME("Menu")
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_POWER_OFF ) PORT_NAME("Power Switch") // pressing this will turn the game off.
+INPUT_PORTS_END
+
+
+static INPUT_PORTS_START( epo_quiz )
+	PORT_INCLUDE(xavix)
+
+	PORT_MODIFY("IN0")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(1) PORT_NAME("P1 A / 1 / Red / Down")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(1) PORT_NAME("P1 B / 2 / Blue / Select")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_PLAYER(1) PORT_NAME("P1 C / 3 / Yellow / Left")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_PLAYER(1) PORT_NAME("P1 D / 4 / Green / Right")
+
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(2) PORT_NAME("P2 A / 1 / Red / Down")
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(2) PORT_NAME("P2 B / 2 / Blue / Select")
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_PLAYER(2) PORT_NAME("P2 C / 3 / Yellow / Left")
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_PLAYER(2) PORT_NAME("P2 D / 4 / Green / Right")
+
+	PORT_MODIFY("IN1")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(3) PORT_NAME("P3 A / 1 / Red / Down")
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(3) PORT_NAME("P3 B / 2 / Blue / Select")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_PLAYER(3) PORT_NAME("P3 C / 3 / Yellow / Left")
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_PLAYER(3) PORT_NAME("P3 D / 4 / Green / Right")
+
+	PORT_MODIFY("AN0")
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(4) PORT_NAME("P4 A / 1 / Red / Down")
+	PORT_MODIFY("AN6")
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(4) PORT_NAME("P4 B / 2 / Blue / Select")
+	PORT_MODIFY("AN1")
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_PLAYER(4) PORT_NAME("P4 C / 3 / Yellow / Left")
+	PORT_MODIFY("AN4")
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_PLAYER(4) PORT_NAME("P4 D / 4 / Green / Right")
+
+	//PORT_MODIFY("AN7")
+	//PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_BUTTON8 ) // battery status
+
+INPUT_PORTS_END
 
 /* correct, 4bpp gfxs */
 static const gfx_layout char16layout =
@@ -1293,16 +1617,20 @@ static GFXDECODE_START( gfx_xavix )
 	GFXDECODE_ENTRY( "bios", 0, char16layout8bpp, 0, 1 )
 GFXDECODE_END
 
-
-void xavix_state::xavix(machine_config &config)
+void xavix_state::set_xavix_cpumaps(machine_config &config)
 {
-	/* basic machine hardware */
-	XAVIX(config, m_maincpu, MAIN_CLOCK);
 	m_maincpu->set_addrmap(AS_PROGRAM, &xavix_state::xavix_map);
 	m_maincpu->set_addrmap(5, &xavix_state::xavix_lowbus_map);
 	m_maincpu->set_addrmap(6, &xavix_state::xavix_extbus_map);
 	m_maincpu->set_vblank_int("screen", FUNC(xavix_state::interrupt));
 	m_maincpu->set_vector_callback(FUNC(xavix_state::get_vectors));
+}
+
+void xavix_state::xavix(machine_config &config)
+{
+	/* basic machine hardware */
+	XAVIX(config, m_maincpu, MAIN_CLOCK);
+	set_xavix_cpumaps(config);
 
 	TIMER(config, "scantimer").configure_scanline(FUNC(xavix_state::scanline_cb), "screen", 0, 1);
 
@@ -1368,6 +1696,28 @@ void xavix_i2c_state::xavix_i2c_24c02(machine_config &config)
 	I2C_24C02(config, "i2cmem", 0);
 }
 
+void xavix_i2c_state::xavix_i2c_24c02_43mhz(machine_config &config)
+{
+	xavix_i2c_24c02(config);
+
+	// tomplc crashes when you start the game at regular clock speeds
+	// this could indicate that it's actually one of the newer chips
+	// even if extra opcodes are not being used.
+	m_maincpu->set_clock(MAIN_CLOCK * 2);
+}
+
+void xavix_state::xavix_43mhz(machine_config &config)
+{
+	xavix(config);
+
+	// tomthr crashes when you start the game at regular clock speeds
+	// this could indicate that it's actually one of the newer chips
+	// even if extra opcodes are not being used.
+	m_maincpu->set_clock(MAIN_CLOCK * 2);
+}
+
+
+
 void xavix_i2c_state::xavix_i2c_24lc04(machine_config &config)
 {
 	xavix(config);
@@ -1385,12 +1735,38 @@ void xavix_i2c_ltv_tam_state::xavix_i2c_24lc04_tam(machine_config &config)
 	m_anport->read_3_callback().set(FUNC(xavix_i2c_ltv_tam_state::tam_anport3_r));
 }
 
+
+void xavix_tom_tvho_state::xavix_tom_tvho(machine_config &config)
+{
+	xavix(config);
+
+	m_anport->read_0_callback().set(FUNC(xavix_tom_tvho_state::tvho_anport0_r));
+	m_anport->read_1_callback().set(FUNC(xavix_tom_tvho_state::tvho_anport1_r));
+	m_anport->read_2_callback().set(FUNC(xavix_tom_tvho_state::tvho_anport2_r));
+	m_anport->read_3_callback().set(FUNC(xavix_tom_tvho_state::tvho_anport3_r));
+}
+
+void xavix_i2c_mj_state::xavix_i2c_24lc02_mj(machine_config &config)
+{
+	xavix_i2c_24c02(config);
+
+	m_anport->read_0_callback().set(FUNC(xavix_i2c_mj_state::mj_anport0_r));
+}
+
 void xavix_i2c_state::xavix_i2c_24c08(machine_config &config)
 {
 	xavix(config);
 
 	I2C_24C08(config, "i2cmem", 0);
 }
+
+void xavix_i2c_state::xavix_i2c_24c16(machine_config& config)
+{
+	xavix(config);
+
+	I2C_24C16(config, "i2cmem", 0);
+}
+
 
 void xavix_state::xavixp(machine_config &config)
 {
@@ -1451,8 +1827,7 @@ void xavix_i2c_cart_state::xavix_i2c_taiko(machine_config &config)
 
 	I2C_24C02(config, "i2cmem", 0); // 24LC02
 
-	SOFTWARE_LIST(config, "cart_list_japan_d").set_original("ekara_japan_d");
-	SOFTWARE_LIST(config, "cart_list_japan_sp").set_original("ekara_japan_sp");
+	SOFTWARE_LIST(config, "cart_list").set_original("ekara_cart").set_filter("TAIKO");
 }
 
 void xavix_i2c_cart_state::xavix_i2c_jpopira(machine_config &config)
@@ -1463,8 +1838,7 @@ void xavix_i2c_cart_state::xavix_i2c_jpopira(machine_config &config)
 
 	I2C_24C02(config, "i2cmem", 0); // 24LC02
 
-	SOFTWARE_LIST(config, "cart_list_jpopira_jp").set_original("jpopira_jp"); // NOTE, these are for Jumping Popira only, they don't work with the karaoke or regular popira units
-	SOFTWARE_LIST(config, "cart_list_japan_sp").set_original("ekara_japan_sp");
+	SOFTWARE_LIST(config, "cart_list").set_original("ekara_cart").set_filter("JPOPIRA");
 }
 
 void xavix_cart_state::xavix_cart_evio(machine_config &config)
@@ -1473,6 +1847,14 @@ void xavix_cart_state::xavix_cart_evio(machine_config &config)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
 	SOFTWARE_LIST(config, "cart_list_evio").set_original("evio");
+}
+
+void xavix_cart_state::xavix_cart_daig(machine_config &config)
+{
+	xavix_cart(config);
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
+
+	SOFTWARE_LIST(config, "cart_list_daig").set_original("takara_daigunder_dx_cart");
 }
 
 void xavix_cart_gcslottv_state::xavix_cart_gcslottv(machine_config &config)
@@ -1489,21 +1871,61 @@ void xavix_cart_state::xavix_cart_ekara(machine_config &config)
 	xavix_cart(config);
 
 	/* software lists */
-	SOFTWARE_LIST(config, "cart_list_us").set_original("ekara_us");
-	SOFTWARE_LIST(config, "cart_list_pal").set_original("ekara_pal");
-	SOFTWARE_LIST(config, "cart_list_japan").set_original("ekara_japan");
-	SOFTWARE_LIST(config, "cart_list_japan_g").set_original("ekara_japan_g");
-	SOFTWARE_LIST(config, "cart_list_japan_p").set_original("ekara_japan_p");
-	SOFTWARE_LIST(config, "cart_list_japan_s").set_original("ekara_japan_s");
-	SOFTWARE_LIST(config, "cart_list_japan_m").set_original("ekara_japan_m");
-	SOFTWARE_LIST(config, "cart_list_japan_d").set_original("ekara_japan_d");
-	SOFTWARE_LIST(config, "cart_list_japan_en").set_original("ekara_japan_en");
-	SOFTWARE_LIST(config, "cart_list_japan_sp").set_original("ekara_japan_sp");
-	SOFTWARE_LIST(config, "cart_list_japan_web").set_original("ekara_japan_web");
-	SOFTWARE_LIST(config, "cart_list_japan_a").set_original("ekara_japan_a");
-	SOFTWARE_LIST(config, "cart_list_japan_gk").set_original("ekara_japan_gk");
-	SOFTWARE_LIST(config, "cart_list_japan_bh").set_original("ekara_japan_bh");
-	SOFTWARE_LIST(config, "cart_list_japan_ac").set_original("ekara_japan_ac");
+	SOFTWARE_LIST(config, "cart_list").set_original("ekara_cart").set_filter("EKARA");
+}
+
+void xavix_hikara_state::machine_reset()
+{
+	xavix_ekara_state::machine_reset();
+
+	if (!memregion("cartslot:cart:rom"))
+		return;
+
+	// rather crude hack to patch a failing check found in the cartridge ROMS
+	// TODO: remove this!
+	u8* ROM = memregion("cartslot:cart:rom")->base();
+	size_t len = memregion("cartslot:cart:rom")->bytes();
+
+	int foundcount = 0;
+	int firstfound = 0;
+	for (int i = 0; i < len - 7; i++)
+	{
+		int matchcount = 0;
+
+		for (int j = 0; j < 5; j++)
+		{
+			constexpr u8 searchfor[5] = { 0x29, 0x80, 0xd0, 0x14, 0xad };
+
+			if (ROM[i + j] == searchfor[j])
+				matchcount++;
+		}
+
+		if (matchcount == 5)
+		{
+			if (foundcount == 0)
+				firstfound = i;
+			foundcount++;
+		}
+	}
+
+	if ((foundcount == 3) || (foundcount == 1))
+	{
+		ROM[firstfound + 2] = 0xf0;
+		ROM[firstfound + 7] = 0xd0;
+	}
+}
+
+void xavix_hikara_state::xavix_cart_hikara(machine_config &config)
+{
+	xavix_cart(config);
+
+	// The songs seem too slow at regular clock.  It is speculated that the later
+	// CPU types run at ~43Mhz, so maybe this is really a XaviX 2000/2003 type chip
+	// with a higher clock, even if no extra opcodes are used.
+	m_maincpu->set_clock(MAIN_CLOCK * 2);
+
+	/* software lists */
+	SOFTWARE_LIST(config, "cart_list").set_original("hikara");
 }
 
 void xavix_cart_state::xavix_cart_popira(machine_config &config)
@@ -1515,10 +1937,7 @@ void xavix_cart_state::xavix_cart_popira(machine_config &config)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
 	/* software lists */
-	SOFTWARE_LIST(config, "cart_list_japan_g").set_original("ekara_japan_g");
-	SOFTWARE_LIST(config, "cart_list_japan_p").set_original("ekara_japan_p");
-	SOFTWARE_LIST(config, "cart_list_japan_d").set_original("ekara_japan_d");
-	SOFTWARE_LIST(config, "cart_list_japan_sp").set_original("ekara_japan_sp");
+	SOFTWARE_LIST(config, "cart_list").set_original("ekara_cart").set_filter("POPIRA");
 }
 
 // see code at 028060, using table from 00eb6d for conversion
@@ -1563,8 +1982,7 @@ void xavix_cart_state::xavix_cart_ddrfammt(machine_config &config)
 	xavix_cart(config);
 
 	/* software lists */
-	SOFTWARE_LIST(config, "cart_list_japan_p").set_original("ekara_japan_p");
-	//SOFTWARE_LIST(config, "cart_list_japan_sp").set_original("ekara_japan_sp"); // not for this system, but unlike other carts, actually tells you this if inserted rather than crashing the system
+	SOFTWARE_LIST(config, "cart_list").set_original("ekara_cart").set_filter("FAMMAT");
 }
 
 
@@ -1623,7 +2041,17 @@ ROM_END
 
 ROM_START( rad_opus )
 	ROM_REGION(0x100000, "bios", ROMREGION_ERASE00)
-	ROM_LOAD("opus.bin", 0x000000, 0x100000, CRC(509df402) SHA1(c5b863670eac8498ddda9dfde91387634cf7aa9f) )
+	ROM_LOAD("opus.bin", 0x000000, 0x100000, CRC(f84c11c5) SHA1(6e34129d0ca9c52b7c342fc94860629d81705523) )
+ROM_END
+
+ROM_START( rad_opusp )
+	ROM_REGION(0x100000, "bios", ROMREGION_ERASE00)
+	ROM_LOAD("opus.bin", 0x000000, 0x100000, CRC(f84c11c5) SHA1(6e34129d0ca9c52b7c342fc94860629d81705523) )
+ROM_END
+
+ROM_START( rad_opusa )
+	ROM_REGION(0x100000, "bios", ROMREGION_ERASE00)
+	ROM_LOAD("opus_alt.bin", 0x000000, 0x100000, CRC(509df402) SHA1(c5b863670eac8498ddda9dfde91387634cf7aa9f) )
 ROM_END
 
 ROM_START( rad_hnt )
@@ -1718,6 +2146,11 @@ ROM_START( rad_fb )
 	ROM_LOAD("rfootball.bin", 0x000000, 0x400000, CRC(025e0cb4) SHA1(60ce363de236d5119d078e346ad5d2ae50dbc7e1) )
 ROM_END
 
+ROM_START( epo_fish )
+	ROM_REGION(0x200000, "bios", ROMREGION_ERASE00)
+	ROM_LOAD("fish.bin", 0x000000, 0x200000, CRC(72392caf) SHA1(16a65c79ff7e3b5f5f514a024bd652412ed38b74) )
+ROM_END
+
 ROM_START( epo_efdx )
 	ROM_REGION(0x400000, "bios", ROMREGION_ERASE00)
 	ROM_LOAD("excitefishing.bin", 0x000000, 0x400000, CRC(9c85b261) SHA1(6a363faed2ec89c5176e46554a98ca1e20132579) )
@@ -1728,9 +2161,24 @@ ROM_START( epo_esdx )
 	ROM_LOAD("baseballdx.bin", 0x000000, 0x400000, CRC(fe2e832e) SHA1(e6343f5e5f52316538d918d0d67c15764aa40f65) )
 ROM_END
 
+ROM_START( epo_stad )
+	ROM_REGION(0x200000, "bios", ROMREGION_ERASE00)
+	ROM_LOAD("excitestadium.bin", 0x000000, 0x200000, CRC(b58035b9) SHA1(1382a9e42ff932e7ec2186b210917bcf5c571b86) )
+ROM_END
+
+ROM_START( epo_esht ) // ESTJ-MAIN REV:0 PCB
+	ROM_REGION(0x400000, "bios", ROMREGION_ERASE00)
+	ROM_LOAD("tigers.u3", 0x000000, 0x400000, CRC(51a17ef3) SHA1(864190e91775716218be3ac0699570844d67d3e7) )
+ROM_END
+
 ROM_START( epo_epp )
 	ROM_REGION(0x100000, "bios", ROMREGION_ERASE00)
 	ROM_LOAD("excitepingpong.bin", 0x000000, 0x100000, CRC(1fdb9cbd) SHA1(8ed0c1f6d2708ab6e79f0b9553e587c6446e8338) )
+ROM_END
+
+ROM_START( epo_epps )
+	ROM_REGION(0x100000, "bios", ROMREGION_ERASE00)
+	ROM_LOAD("excitepingpong_special.bin", 0x000000, 0x100000, CRC(d59c4b44) SHA1(5a48b9046a1d1beb10972fc1d41d6d63fe829465) )
 ROM_END
 
 ROM_START( epo_eppk )
@@ -1738,9 +2186,19 @@ ROM_START( epo_eppk )
 	ROM_LOAD("sonokongpingpong.bin", 0x000000, 0x100000, CRC(ea81ced6) SHA1(ef8961d3670148501a478c17cd09f5088e32ad41) )
 ROM_END
 
+ROM_START( epo_epp2 )
+	ROM_REGION(0x200000, "bios", ROMREGION_ERASE00)
+	ROM_LOAD("excitepingpong2.u3", 0x000000, 0x200000, CRC(4b70012a) SHA1(4dd80472067027be5a416ec953f4ed6e7df5fc25) )
+ROM_END
+
 ROM_START( epo_epp3 )
 	ROM_REGION(0x200000, "bios", ROMREGION_ERASE00)
 	ROM_LOAD("excitepingpong3.bin", 0x000000, 0x200000, CRC(a2ee8bff) SHA1(6e16dbaac9680e1f311c08e3f573d0cf8708b446))
+ROM_END
+
+ROM_START( epo_mj ) // MARJ MAIN-11A
+	ROM_REGION(0x200000, "bios", ROMREGION_ERASE00)
+	ROM_LOAD("marj.u4", 0x000000, 0x200000, CRC(4e496424) SHA1(9661130ad8315082bd211b3817e5830b576907a8) )
 ROM_END
 
 ROM_START( rad_socr )
@@ -1749,10 +2207,28 @@ ROM_START( rad_socr )
 	ROM_LOAD("soccer.u4", 0x400000, 0x200000, CRC(e0e2c488) SHA1(907511d945dec51782af268a94b372dfeb7517c5) )
 ROM_END
 
+ROM_START( epo_strk )
+	ROM_REGION(0x800000, "bios", ROMREGION_ERASE00)
+	ROM_LOAD("excitestriker.u5", 0x000000, 0x100000, CRC(fa3f95fd) SHA1(d3bc7f2f321b81a7783887b29218bf711c0d5518) )
+	ROM_LOAD("excitestriker.u4", 0x400000, 0x200000, CRC(0f37ca15) SHA1(b35aaf7f5adddba57c898538f157146bb4d1f9b4) )
+ROM_END
+
+ROM_START( epo_strkp )
+	ROM_REGION(0x800000, "bios", ROMREGION_ERASE00)
+	ROM_LOAD("excitestriker_uk.u5", 0x000000, 0x100000, CRC(201e150e) SHA1(f11405a4b7349e4bdfeb04110b1b6f67e0b63f64) )
+	ROM_LOAD("excitestriker_uk.u4", 0x400000, 0x200000, CRC(efd648aa) SHA1(59358b9a9df27dadc33ed4c3da9083f739b68340) )
+ROM_END
+
 ROM_START( rad_jcon )
 	ROM_REGION(0x800000, "bios", ROMREGION_ERASE00)
 	ROM_LOAD("jrconstr_u5.bin", 0x000000, 0x200000, CRC(306699d2) SHA1(121b04bb598d4531db53e497be9270449bb8ffe4) )
 	ROM_LOAD("jrconstr_u4.bin", 0x400000, 0x100000, CRC(4cfb6193) SHA1(0f56dfc91db3cc066836daf37ff46f9ff5ec5f94) )
+ROM_END
+
+ROM_START( tak_town )
+	ROM_REGION(0x800000, "bios", ROMREGION_ERASE00)
+	ROM_LOAD("rom.u5", 0x000000, 0x200000, CRC(46587e78) SHA1(f163492139087f7aaeea6448b652f58afcb4dd5c) )
+	ROM_LOAD("rom.u4", 0x400000, 0x100000, CRC(642e7e6a) SHA1(d8ff88ad20a60d2eb702dd353f307aa3fcfbbdd5) )
 ROM_END
 
 ROM_START( epo_guru )
@@ -1780,15 +2256,54 @@ ROM_START( ltv_tam )
 	ROM_LOAD("letstvtamagotchi.bin", 0x000000, 0x400000, CRC(e3723272) SHA1(e72e128a7a24afb96baafe5f13e13a0d74db4033) )
 ROM_END
 
+ROM_START( epo_crok )
+	ROM_REGION( 0x400000, "bios", ROMREGION_ERASE00)
+	ROM_LOAD("sgm3244.u2", 0x000000, 0x400000, CRC(a801779b) SHA1(e6e4235dc7c7db3073737b10ba4bc5b00deca2c3) )
+ROM_END
+
+ROM_START( epo_mms )
+	ROM_REGION( 0x400000, "bios", ROMREGION_ERASE00)
+	ROM_LOAD("mmnj-main-4.u4", 0x000000, 0x400000, CRC(22f14ca2) SHA1(122e735eb7c54a22de16f65cd43d2cae788e0102) )
+ROM_END
+
+ROM_START( tak_zuba ) // CHBJ MAIN REV:01
+	ROM_REGION( 0x400000, "bios", ROMREGION_ERASE00)
+	ROM_LOAD("chbj.u2", 0x000000, 0x400000, CRC(6d60c8d2) SHA1(ba687fc95503223dd484ed9533dcb097ecfea00d) )
+ROM_END
+
+ROM_START( epo_mmsp )
+	ROM_REGION( 0x400000, "bios", ROMREGION_ERASE00)
+	ROM_LOAD("mm1j main-00.u1", 0x000000, 0x400000, CRC(65b40a27) SHA1(8f88973122277fe8f31bacb3a070609fde062946) )
+ROM_END
+
+ROM_START( ban_krrj ) // KRRJ MAIN PCB 01
+	ROM_REGION( 0x400000, "bios", ROMREGION_ERASE00)
+	ROM_LOAD("krrj.u2", 0x000000, 0x400000, CRC(16f0fe78) SHA1(2b18cf6336e5adc64d4db0914788c159e60d91a2) )
+ROM_END
 
 ROM_START( tak_geig )
 	ROM_REGION(0x400000, "bios", ROMREGION_ERASE00)
 	ROM_LOAD("geigeki.bin", 0x000000, 0x400000, CRC(bd0c3576) SHA1(06f614dbec0225ce4ed866b98450912986d72faf) )
 ROM_END
 
+ROM_START( tom_tvho ) // ET105 REV 0.0
+	ROM_REGION(0x200000, "bios", ROMREGION_ERASE00)
+	ROM_LOAD("tvhockey.u4", 0x000000, 0x200000, CRC(9cd72ae2) SHA1(0530851123b607ddb85f9513405ce97c493f5fd6) )
+ROM_END
+
+ROM_START( tak_comt )
+	ROM_REGION(0x200000, "bios", ROMREGION_ERASE00)
+	ROM_LOAD("comet.u3", 0x000000, 0x200000, CRC(407c5566) SHA1(41d73c34af8cc3d07a34fcac0bc1856442c94200) )
+ROM_END
+
 ROM_START( jarajal )
 	ROM_REGION(0x200000, "bios", ROMREGION_ERASE00)
 	ROM_LOAD("takaraslots.bin", 0x000000, 0x200000, CRC(afae0b72) SHA1(b1c5d80a8dc8466982efd79d54cd82a58f0ff997) )
+ROM_END
+
+ROM_START( tomshoot )
+	ROM_REGION(0x200000, "bios", ROMREGION_ERASE00)
+	ROM_LOAD("airgun.u4", 0x000000, 0x200000, CRC(3e4f7b65) SHA1(4e1660d4952c498e250526c2c3f027253e1fcbe1) )
 ROM_END
 
 ROM_START( tcarnavi )
@@ -1806,7 +2321,35 @@ ROM_START( tomplc )
 	ROM_LOAD("imaplayrailconductor.bin", 0x000000, 0x400000, CRC(b775d0ed) SHA1(33142509b11bbe45b0b9222232033dd64ef01ff2) )
 ROM_END
 
+ROM_START( tomthr ) // THRJ MAIN PCB   REV 0.6
+	ROM_REGION(0x400000, "bios", ROMREGION_ERASE00)
+	ROM_LOAD("thrj.u4", 0x000000, 0x400000, CRC(a7e8dc74) SHA1(676b2a905b757356c6c1dfe3f10148484caa44c5) )
+ROM_END
 
+ROM_START( gungunad )
+	ROM_REGION(0x200000, "bios", ROMREGION_ERASE00)
+	// some lines were swapped going into the die, but it is unclear if they're swapped back inside it
+	ROM_LOAD("gga.bin", 0x000000, 0x40000, CRC(5252b6bb) SHA1(8a9f920e4bccabbd337f37a838af574e2b16746f) )
+	ROM_CONTINUE(0x080000,0x040000)
+	ROM_CONTINUE(0x040000,0x040000)
+	ROM_CONTINUE(0x0c0000,0x040000)
+
+	ROM_CONTINUE(0x100000,0x040000)
+	ROM_CONTINUE(0x180000,0x040000)
+	ROM_CONTINUE(0x140000,0x040000)
+	ROM_CONTINUE(0x1c0000,0x040000)
+ROM_END
+
+
+ROM_START( gungunrv )
+	ROM_REGION(0x400000, "bios", ROMREGION_ERASE00)
+	ROM_LOAD("gungunrevolution.u1", 0x000000, 0x400000, CRC(4e34f624) SHA1(7acdd0991df78ecffd156381817ed4f85f6aef09) )
+ROM_END
+
+ROM_START( bistro )
+	ROM_REGION(0x200000, "bios", ROMREGION_ERASE00)
+	ROM_LOAD("bistro.u2", 0x000000, 0x200000, CRC(40865e05) SHA1(597a615c61f29c6f6e7ce997a229175cb151242f) )
+ROM_END
 
 /*
     The e-kara cartridges require the BIOS rom to map into 2nd external bus space as they fetch palette data from
@@ -1863,6 +2406,14 @@ ROM_START( ekaramix )
 	ROM_RELOAD(0x000000, 0x200000)
 ROM_END
 
+ROM_START( hikara )
+	ROM_REGION( 0x800000, "bios", ROMREGION_ERASE00 )
+	ROM_LOAD( "hikara.u3", 0x000000, 0x100000, CRC(6b91102a) SHA1(684dcfeaa8ac2888da2055617603494ce5fed93c) )
+	ROM_RELOAD(0x600000, 0x100000)
+	ROM_FILL(0xed19, 1, 0xf0) // temp, bypass unknown boot check
+	ROM_FILL(0xed1e, 1, 0xd0)
+ROM_END
+
 ROM_START( ddrfammt )
 	ROM_REGION( 0x800000, "bios", ROMREGION_ERASE00 )
 	ROM_LOAD( "ekara_ddr_ha010_81947.bin", 0x600000, 0x200000, CRC(737d5d1a) SHA1(a1043047056dd27bca69767ee2044461ec549465) )
@@ -1902,13 +2453,82 @@ ROM_START( evio )
 	ROM_RELOAD(0x000000, 0x200000)
 ROM_END
 
+// 爆闘宣言ダイガンダー
+ROM_START( tak_daig )
+	ROM_REGION( 0x800000, "bios", ROMREGION_ERASE00 )
+	ROM_LOAD( "robottransformer_unit.bin", 0x600000, 0x200000, CRC(02deddaa) SHA1(7d7b54684f8b0b92daf02738560779c7df627b91) )
+	ROM_RELOAD(0x000000, 0x200000)
+ROM_END
 
+// ASKJ MAIN-09 PCB
+ROM_START( epo_quiz )
+	ROM_REGION( 0x800000, "bios", ROMREGION_ERASE00 )
+	ROM_LOAD( "quizmaster.u1", 0x000000, 0x400000, CRC(e91868b8) SHA1(0128603d755731dafe328b142292dc6e5fe00d78) )
+ROM_END
+
+
+// ガチンコ勝負！ パチスロTV
 ROM_START( gcslottv )
 	ROM_REGION( 0x800000, "bios", ROMREGION_ERASE00 )
 	ROM_LOAD( "sammyslotunit.bin", 0x000000, 0x200000, CRC(2ba6f3ab) SHA1(1c7fc0c85d817db1550d40c0258f424770e0bd81) )
 ROM_END
 
+ROM_START( epo_tfp2 )
+	ROM_REGION( 0x400000, "bios", ROMREGION_ERASE00 )
+	ROM_LOAD( "funpark2.u1", 0x000000, 0x400000, CRC(97ad5183) SHA1(77310b42d0a015838a1cef4eb5e74cc8335284d1) )
+ROM_END
 
+ROM_START( epo_tp2s ) // TF2J MAIN_01 REV:05
+	ROM_REGION( 0x400000, "bios", ROMREGION_ERASE00 )
+	ROM_LOAD( "tf2j.u3", 0x000000, 0x400000, CRC(db2f124c) SHA1(fd60d4560ed53c63f95cf70a7d1ef13d1ecd1f42) )
+ROM_END
+
+ROM_START( epo_tp2p ) // TF3J MAIN PCB 01
+	ROM_REGION( 0x800000, "bios", ROMREGION_ERASE00 )
+	ROM_LOAD( "grandslam.u3", 0x000000, 0x800000, CRC(d458ee01) SHA1(dd1a85d822121c46f89ca013fa56c482ab411c6e) )
+ROM_END
+
+ROM_START( epo_tenn )
+	ROM_REGION(0x800000, "bios", ROMREGION_ERASE00)
+	ROM_LOAD( "excitetennis.u4", 0x000000, 0x100000, CRC(10b0e1dd) SHA1(ba438201434f2b51792b119a3e3d07cc3e53b89a) )
+	ROM_LOAD( "excitetennis.u2", 0x400000, 0x200000, CRC(6c2cdc90) SHA1(3c5b391e5e7b4a9a73038ef619df564143724437) )
+ROM_END
+
+ROM_START( epo_hamd )
+	ROM_REGION(0x800000, "bios", ROMREGION_ERASE00)
+	ROM_LOAD( "hamster.u2", 0x000000, 0x100000, CRC(6c2d9d98) SHA1(89a8e6d236ea3dadb882e3ecf12e41bd50222710) )
+	ROM_LOAD( "hamster.u3", 0x400000, 0x200000, CRC(e437c8d0) SHA1(f57c54a73ed38826f4b98610a0aa1f15cf95614d) )
+ROM_END
+
+ROM_START( tvpc_tom )
+	ROM_REGION(0x400000, "bios", ROMREGION_ERASE00 )
+	ROM_LOAD( "tvpc_thomas.u1", 0x000000, 0x400000, CRC(507f334e) SHA1(d66efd13f166fcd2a66133dc981c8a67b2a26d5f) )
+ROM_END
+
+ROM_START( tvpc_dor )
+	ROM_REGION(0x400000, "bios", ROMREGION_ERASE00 )
+	ROM_LOAD( "tvpc_doreamon.u3", 0x000000, 0x400000, CRC(6f2edbb2) SHA1(98fa86f85e00aa40e7a585ff0bc930cb5ca88362) )
+ROM_END
+
+ROM_START( tvpc_ham )
+	ROM_REGION(0x400000, "bios", ROMREGION_ERASE00 )
+	ROM_LOAD( "hpcj.u3", 0x000000, 0x400000, CRC(76e8c854) SHA1(5998c03292a16107d0d7ae00f77677582680f323) )
+ROM_END
+
+ROM_START( tak_gin )
+	ROM_REGION(0x200000, "bios", ROMREGION_ERASE00 )
+	ROM_LOAD( "snowboard.bin", 0x000000, 0x200000, CRC(79fdeae3) SHA1(ab08790e95cdccf3541ecbddb87ebf0dedb3718b) )
+ROM_END
+
+ROM_START( tak_hamr ) // HAMJ MAIN on PCB
+	ROM_REGION(0x400000, "bios", ROMREGION_ERASE00 )
+	ROM_LOAD( "hamj.u4", 0x000000, 0x400000, CRC(2f4f5270) SHA1(dfb75f0d20247cf1c886840149c7cf91780ae1b9) )
+ROM_END
+
+ROM_START( tak_beyb )
+	ROM_REGION(0x200000, "bios", ROMREGION_ERASE00 )
+	ROM_LOAD( "beyblade.u2", 0x000000, 0x200000, CRC(bcf6b3a7) SHA1(1c80f1241138b9d7816f1e5285ff8f3c61739c95) )
+ROM_END
 
 
 /* XaviX hardware titles (1st Generation)
@@ -1917,25 +2537,33 @@ ROM_END
     SSD 98 PL7351-181
     SSD 98 PA7351-107
     SSD 97 PA7270-107
-    type CPUS
+    type CPUs
 
     only new opcodes are callf and retf?
 
 */
 
+// Let's!TVプレイCLASSIC タイトーノスタルジア1
 CONS( 2006, taitons1,  0,          0,  xavix_i2c_24lc04, nostalgia,xavix_i2c_state,      init_xavix,    "Bandai / SSD Company LTD / Taito",             "Let's! TV Play Classic - Taito Nostalgia 1 (Japan)", MACHINE_IMPERFECT_SOUND )
 
+// Let's!TVプレイCLASSIC タイトーノスタルジア2
 CONS( 2006, taitons2,  0,          0,  xavix_i2c_24lc04, nostalgia,xavix_i2c_state,      init_xavix,    "Bandai / SSD Company LTD / Taito",             "Let's! TV Play Classic - Taito Nostalgia 2 (Japan)", MACHINE_IMPERFECT_SOUND )
 
+// Let's!TVプレイCLASSIC ナムコノスタルジア1
 CONS( 2006, namcons1,  0,          0,  xavix_i2c_24lc04, nostalgia,xavix_i2c_state,      init_xavix,    "Bandai / SSD Company LTD / Namco",             "Let's! TV Play Classic - Namco Nostalgia 1 (Japan)", MACHINE_IMPERFECT_SOUND )
 
+// Let's!TVプレイCLASSIC ナムコノスタルジア2
 CONS( 2006, namcons2,  0,          0,  xavix_i2c_24lc04, nostalgia,xavix_i2c_state,      init_xavix,    "Bandai / SSD Company LTD / Namco",             "Let's! TV Play Classic - Namco Nostalgia 2 (Japan)", MACHINE_IMPERFECT_SOUND )
 
 CONS( 2000, rad_ping,  0,          0,  xavix,            rad_ping, xavix_state,          init_xavix,    "Radica / SSD Company LTD / Simmer Technology", "Play TV Ping Pong (NTSC)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND ) // "Simmer Technology" is also known as "Hummer Technology Co., Ltd"
 CONS( 2000, rad_pingp, rad_ping,   0,  xavixp,           rad_pingp,xavix_state,          init_xavix,    "Radica / SSD Company LTD / Simmer Technology", "ConnecTV Table Tennis (PAL)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
+// this set reads the region byte and will show either 'RADICA: Play TV Opus' or 'RADICA: ConnecTV Opus' as the title
 CONS( 2000, rad_opus,  0,          0,  xavix_nv,         rad_opus, xavix_state,          init_xavix,    "Radica / SSD Company LTD",                     "Play TV Opus (NTSC)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // there is a missing 'TV Static' noise effect when menus appear (box shows 'Play TV' ingame just shows 'Radica:Plug & Play')
-// ConnecTV Opus is a different ROM in this case? Game doesn't read from PAL/NTSC flag? (verify it isn't detecting PAL in some other way) ( https://www.youtube.com/watch?v=Ub9tstLEj_0 )
+CONS( 2000, rad_opusp, rad_opus,   0,  xavixp_nv,        rad_opusp,xavix_state,          init_xavix,    "Radica / SSD Company LTD",                     "ConnecTV Opus (PAL)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+// the set below does NOT read the PAL/NTSC flag, and will only display 'RADICA: Plug & Play Opus' as the title
+// older release, or region where the Play TV / ConnecTV trademarks weren't used?
+CONS( 2000, rad_opusa, rad_opus,   0,  xavixp_nv,        rad_opus, xavix_state,          init_xavix,    "Radica / SSD Company LTD",                     "Plug & Play Opus (NTSC)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 
 CONS( 2000, rad_hnt,   0,          0,  xavix_nv,         rad_hnt,  xavix_state,          init_xavix,    "Radica / SSD Company LTD",                     "Play TV Buckmasters Huntin' (NTSC)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // need to map gun (box shows 'Play TV' ingame just shows 'Plug & Play')
 
@@ -1952,8 +2580,6 @@ CONS( 200?, rad_crdnp, rad_crdn,   0,  xavixp,           rad_crdnp,xavix_state, 
 
 CONS( 2000, rad_bb,    0,          0,  xavix,            rad_bb,   xavix_state,          init_xavix,    "Radica / SSD Company LTD",                     "Play TV Baseball (NTSC)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // Play TV branding used on box, not ingame
 
-CONS( 2002, rad_bb2,   0,          0,  xavix,            rad_bb2,  xavix_state,          init_xavix,    "Radica / SSD Company LTD",                     "Play TV Baseball 2 (NTSC)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // contains string "Radica RBB2 V1.0"
-
 CONS( 2001, rad_bass,  0,          0,  xavix,            rad_bass, xavix_state,          init_xavix,    "Radica / SSD Company LTD",                     "Play TV Bass Fishin' (NTSC)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 CONS( 2001, rad_bassp, rad_bass,   0,  xavixp,           rad_bassp,xavix_state,          init_xavix,    "Radica / SSD Company LTD",                     "ConnecTV Bass Fishin' (PAL)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
@@ -1961,14 +2587,14 @@ CONS( 2001, rad_bassp, rad_bass,   0,  xavixp,           rad_bassp,xavix_state, 
 CONS( 2001, rad_snow,  0,          0,  xavix_nv,         rad_snow, xavix_state,          init_xavix,    "Radica / SSD Company LTD",                     "Play TV Snowboarder (Blue) (NTSC)", MACHINE_IMPERFECT_SOUND )
 CONS( 2001, rad_snowp, rad_snow,   0,  xavixp_nv,        rad_snowp,xavix_state,          init_xavix,    "Radica / SSD Company LTD",                     "ConnecTV Snowboarder (Blue) (PAL)", MACHINE_IMPERFECT_SOUND )
 
-CONS( 2003, rad_madf,  0,          0,  xavix_madfb,      rad_fb,   xavix_madfb_state,    init_xavix,    "Radica / Electronics Arts / SSD Company LTD",  "EA Sports Madden Football (NTSC)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND ) // no Play TV branding, USA only release?
+CONS( 2003, rad_madf,  0,          0,  xavix_madfb,      rad_fb,   xavix_madfb_state,    init_xavix,    "Radica / Electronic Arts / SSD Company LTD",  "EA Sports Madden Football (NTSC)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND ) // no Play TV branding, USA only release?
 
 CONS( 200?, rad_fb,    0,          0,  xavix_madfb,      rad_fb,   xavix_madfb_state,    init_xavix,    "Radica / SSD Company LTD",                     "Play TV Football (NTSC)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND ) // USA only release? doesn't change logo for PAL.
 
 CONS( 200?, rad_rh,    0,          0,  xavix,            rad_rh,   xavix_state,          init_xavix,    "Radica / Fisher-Price / SSD Company LTD",      "Play TV Rescue Heroes (NTSC)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
-CONS( 2004, rad_ssx,   0,          0,  xavix,            rad_snow, xavix_state,          init_xavix,    "Radica / Electronics Arts / SSD Company LTD",  "Play TV SSX Snowboarder (NTSC)", MACHINE_IMPERFECT_SOUND )
-CONS( 2004, rad_ssxp,  rad_ssx,    0,  xavixp,           rad_snowp,xavix_state,          init_xavix,    "Radica / Electronics Arts / SSD Company LTD",  "ConnecTV SSX Snowboarder (PAL)", MACHINE_IMPERFECT_SOUND )
+CONS( 2004, rad_ssx,   0,          0,  xavix,            rad_snow, xavix_state,          init_xavix,    "Radica / Electronic Arts / SSD Company LTD",  "Play TV SSX Snowboarder (NTSC)", MACHINE_IMPERFECT_SOUND )
+CONS( 2004, rad_ssxp,  rad_ssx,    0,  xavixp,           rad_snowp,xavix_state,          init_xavix,    "Radica / Electronic Arts / SSD Company LTD",  "ConnecTV SSX Snowboarder (PAL)", MACHINE_IMPERFECT_SOUND )
 
 // basically a reissue of SSX but without the license
 CONS( 2006, rad_sbw,   0,          0,  xavix,            rad_snow, xavix_state,          init_xavix,    "Radica / SSD Company LTD",                     "Play TV Snowboarder (White) (NTSC)", MACHINE_IMPERFECT_SOUND )
@@ -1976,41 +2602,133 @@ CONS( 2006, rad_sbw,   0,          0,  xavix,            rad_snow, xavix_state, 
 
 CONS( 2002, rad_bdp,   0,          0,  xavix,            rad_bdp,  xavix_state,          init_xavix,    "Radica / Mattel / SSD Company LTD",            "Barbie Dance Party", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 
-CONS( 2002, rad_socr,  0,          0,  xavix,            epo_epp,  xavix_state,          init_xavix,    "Radica / Epoch / SSD Company LTD",             "Play TV Soccer", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+// ゴール決めるぜ！ エキサイトストライカー
+CONS( 2001, epo_strk,  0,          0,  xavix,            epo_epp,  xavix_state,          init_xavix,    "Epoch / SSD Company LTD",                      "Goal Kimeruze! Excite Striker (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+CONS( 2002, epo_strkp, epo_strk,   0,  xavixp,           epo_epp,  xavix_state,          init_xavix,    "Epoch / SSD Company LTD",                      "Let's Play Excite Striker (UK)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+CONS( 2002, rad_socr,  epo_strk,   0,  xavix,            epo_epp,  xavix_state,          init_xavix,    "Radica / Epoch / SSD Company LTD",             "Play TV Soccer", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
-CONS( 2002, rad_jcon,  0,          0,  xavix,            rad_jcon, xavix_state,          init_xavix,    "Radica / Takara / SSD Company LTD",            "Play TV Jr. Construction", MACHINE_IMPERFECT_SOUND )
+// まちをつくろう 工事のくるま５     
+CONS( 2001, tak_town,  0,          0,  xavix,            rad_jcon, xavix_state,          init_xavix,    "Takara / SSD Company LTD",                     "Machi o Tsukurou: Kouji no Kuruma 5 (Japan)", MACHINE_IMPERFECT_SOUND )
+// this is roughly based on tak_town above
+CONS( 2002, rad_jcon,  tak_town,   0,  xavix,            rad_jcon, xavix_state,          init_xavix,    "Radica / Takara / SSD Company LTD",            "Play TV Jr. Construction", MACHINE_IMPERFECT_SOUND )
 
-CONS( 2002, epo_esdx,  0,          0,  xavix,            epo_epp,  xavix_state,          init_xavix,    "Epoch / SSD Company LTD",                      "Excite Stadium DX (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+// ホームラン打とうぜ! エキサイトスタジアム
+CONS( 2000, epo_stad,  0,          0,  xavix,            epo_epp,  xavix_state,          init_xavix,    "Epoch / SSD Company LTD",                      "Home Run Datouze! Excite Stadium (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+// this seems to be based off the epo_stad code, but heavily modified
+CONS( 2002, rad_bb2,   0,          0,  xavix,            rad_bb2,  xavix_state,          init_xavix,    "Radica / SSD Company LTD",                     "Play TV Baseball 2 (NTSC)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // contains string "Radica RBB2 V1.0"
 
-CONS( 2000, epo_epp,   0,          0,  xavix,            epo_epp,  xavix_state,          init_xavix,    "Epoch / SSD Company LTD",                      "Excite Ping Pong (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+// 勝負しようぜ！ エキサイトスタジアムDX
+CONS( 2002, epo_esdx,  0,          0,  xavix,            epo_epp,  xavix_state,          init_xavix,    "Epoch / SSD Company LTD",                      "Shoubu Shiyouze! Excite Stadium DX (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+
+// 阪神タイガース エキサイトスタジアムＤＸ
+CONS( 2003, epo_esht,  0,          0,  xavix_nv,         epo_epp,  xavix_state,          init_xavix,    "Epoch / SSD Company LTD",                      "Hanshin Tigers Excite Stadium DX (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+
+// interrupt issues after the title screen cause it to hang
+// エースきめるぜ！エキサイトテニス
+CONS( 2002, epo_tenn,  0,          0,  xavix,            epo_epp,  xavix_state,          init_xavix,    "Epoch / SSD Company LTD",                      "Ace Kimeruze! Excite Tennis (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+
+// ハムちゃんず大集合 ダンスするのだ！走るのだ！
+CONS( 2001, epo_hamd,  0,          0,  xavix,            xavix,    xavix_state,          init_xavix,    "Epoch / SSD Company LTD",                      "Ham-chans Dai Shuugou Dance Surunoda! Hashirunoda! (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+
+// 卓球やろうぜ！ エキサイトピンポン
+CONS( 2000, epo_epp,   0,          0,  xavix,            epo_epp,  xavix_state,          init_xavix,    "Epoch / SSD Company LTD",                      "Takkyuu Yarouze! Excite Ping Pong (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 CONS( 2000, epo_eppk,  epo_epp,    0,  xavix,            epo_epp,  xavix_state,          init_xavix,    "Epoch / SSD Company LTD / Sonokong",           "Real Ping Pong (Korea)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
-// Excite Ping Pong 2 is from 2003
+// しゃもじdeピンポン
+// This special version of Excite Ping Pong was a competition prize, not a retail product.  The competition was sponsored by ミツカン (Mizkan)
+CONS( 2001, epo_epps,  0,          0,  xavix,            epo_epp,  xavix_state,          init_xavix,    "Epoch / Mizkan / SSD Company LTD",             "Shamoji de Ping Pong (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
-CONS( 2006, epo_epp3,   0,          0,  xavix,            epo_epp,  xavix_state,          init_xavix,    "Epoch / SSD Company LTD",                     "Challenge Ai-chan! Excite Ping Pong (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+// 卓球やろうぜ！ エキサイトピンポン2
+CONS( 2003, epo_epp2,   0,         0,  xavix,            epo_epp,  xavix_state,          init_xavix,    "Epoch / SSD Company LTD",                      "Takkyuu Yarouze! Excite Ping Pong 2 (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
-CONS( 200?, epo_efdx,  0,          0,  xavix_i2c_24c08,  epo_efdx, xavix_i2c_state,      init_epo_efdx, "Epoch / SSD Company LTD",                      "Excite Fishing DX (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+// 愛ちゃんに挑戦！エキサイトピンポン
+CONS( 2006, epo_epp3,   0,         0,  xavix,            epo_epp,  xavix_state,          init_xavix,    "Epoch / SSD Company LTD",                      "Ai-chan ni Chousen! Excite Ping Pong (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
-CONS( 2005, epo_guru,  0,          0,  xavix_guru,       epo_guru,    xavix_guru_state,          init_xavix,    "Epoch / SSD Company LTD",                      "Gururin World (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+// TV麻雀 昇段対局～4人打ち
+CONS( 2003, epo_mj,     0,         0,  xavix_i2c_24lc02_mj,  epo_mj,   xavix_i2c_mj_state,   init_xavix,    "Epoch / SSD Company LTD",                      "TV Mahjong Shoudan Taikyoku - 4-nin Uchi (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
+// ブラックバス釣ろうぜ！ エキサイトフィッシング
+CONS( 2001, epo_fish,  0,          0,  xavix,            xavix,    xavix_state,          init_xavix,    "Epoch / SSD Company LTD",                      "Black Bass Tsurouze! Excite Fishing (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+
+// 大モノ釣ろうぜ！ エキサイトフィッシングＤＸ
+CONS( 2003, epo_efdx,  0,          0,  xavix_i2c_24c08,  epo_efdx, xavix_i2c_state,      init_xavix,    "Epoch / SSD Company LTD",                      "Dai Mono Tsurouze! Excite Fishing DX (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+
+// ぐるりんワールド
+CONS( 2005, epo_guru,  0,          0,  xavix_guru,       epo_guru, xavix_guru_state,     init_xavix,    "Epoch / SSD Company LTD",                      "Gururin World (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+
+// ドラえもん こえでドカン！わくわくくうきほう！！
 CONS( 2002, epo_dmon, 0,           0,  xavix_i2c_24c02,  xavix_i2c,xavix_i2c_state,      init_xavix,    "Epoch / SSD Company LTD",                      "Doraemon Wakuwaku Kuukihou (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND ) // full / proper title?
 
-CONS( 200?, has_wamg,  0,          0,  xavix,            has_wamg, xavix_state,          init_xavix,    "Hasbro / Milton Bradley / SSD Company LTD",    "TV Wild Adventure Mini Golf (NTSC)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+// コロッケ！いただ禁貨！バンカーバトル!!
+CONS( 2003, epo_crok,  0,          0,  xavix_i2c_24lc04, xavix_i2c,xavix_i2c_state,      init_xavix,    "Epoch / SSD Company LTD",                      "Croket! Itada Kinka! Banker Battle!! (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
+// ミニモニ。ステージ！ダンスだぴょん！
+CONS( 2002, epo_mms,   0,          0,  xavix_i2c_24c02,  epo_mms,  xavix_i2c_state,      init_xavix,    "Epoch / SSD Company LTD",                      "mini-moni Stage! Dance Dapyon! (Japan)",  MACHINE_IMPERFECT_SOUND )
+
+// ズバズバブレード
+CONS( 2002, tak_zuba,  0,          0,  xavix_i2c_24c02,  xavix_i2c,xavix_i2c_state,      init_xavix,    "Takara / SSD Company LTD",                     "Zuba Zuba Blade (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+
+// ミニモニ。ステージ！ダンスだぴょん！ぷらすっ
+CONS( 2003, epo_mmsp,  0,          0,  xavix_i2c_24c02,  epo_mms,  xavix_i2c_state,      init_xavix,    "Epoch / SSD Company LTD",                      "mini-moni Stage! Dance Dapyon! Plus (Japan)",  MACHINE_IMPERFECT_SOUND )
+
+// Let's!TVプレイ ケロロ軍曹 ケロロ小隊大パニック！ドタバタ大決戦であります
+CONS( 2006, ban_krrj,  0,          0,  xavix,            ban_krrj, xavix_state,          init_xavix,    "Bandai / SSD Company LTD",                      "Let's! TV Play Keroro Shoutai Dai Panic! Dotabata Daikessen de Arimasu (Japan)",  MACHINE_IMPERFECT_SOUND )
+
+// オールスター感謝祭　超豪華！クイズ決定版～赤坂５丁目体感スタジオ～
+CONS( 2004, epo_quiz,  0,          0,  xavix,            epo_quiz, xavix_state,          init_xavix,    "Epoch / SSD Company LTD",                      "All-Star Kansha-sai Chou Gouka! Quiz Kettieban: Akasaka 5-choume Taikan Studio (Japan)", MACHINE_IMPERFECT_SOUND )
+
+CONS( 2005, has_wamg,  0,          0,  xavix,            has_wamg, xavix_state,          init_xavix,    "Hasbro / Milton Bradley / SSD Company LTD",    "TV Wild Adventure Mini Golf (NTSC)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+
+// GEIGEKI ゴーゴーシューティング
 CONS( 2002, tak_geig,  0,          0,  xavix_nv,         tak_geig, xavix_state,          init_xavix,    "Takara / SSD Company LTD",                     "Geigeki Go Go Shooting (Japan)", MACHINE_IMPERFECT_SOUND )
 
+// TVホッケー
+// playable but could do with better deadzome handling on the controls at least, and for some reason auto-center heads to the bottom left corner in breakout mode?
+CONS( 2001, tom_tvho,  0,          0,  xavix_tom_tvho,   tom_tvho, xavix_tom_tvho_state, init_xavix,    "Tomy / SSD Company LTD",                       "TV Hockey (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+
+// コメットさん☆ラブリンバトン
+CONS( 2001, tak_comt,  0,          0,  xavix_nv,         tak_comt,  xavix_state,          init_xavix,    "Takara / SSD Company LTD",                     "Comet-san Lovelin Baton (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+
+// 爆進スノボ ギンギンボーダーズ
+CONS( 2001, tak_gin,   0,          0,  xavix,            tak_gin,  xavix_state,          init_xavix,    "Takara / SSD Company LTD",                     "Bakushin Sno-Bo - Gingin Boarders (Japan)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_COLORS )
+
+// ぽこぽこハンマーズ
+CONS( 2002, tak_hamr,  0,          0,  xavix_i2c_24c02,  tak_hamr, xavix_i2c_state,      init_xavix,    "Takara / SSD Company LTD",                     "Poko Poko Hammers (Japan)", MACHINE_IMPERFECT_SOUND )
+
+//ベイブレード　アルティメットシューター
+CONS( 2002, tak_beyb,  0,          0,  xavix,            xavix,    xavix_state,          init_xavix,    "Takara / SSD Company LTD",                     "Beyblade Ultimate Shooter (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+
 // was also distributed by Atlus as an arcade cabinet in 2005, ROM almost certainly different (this one will auto-power off after inactivity, an arcade wouldn't do that)
-CONS( 2003, jarajal,   0,          0,  xavix_nv,         jarajal,  xavix_state,          init_xavix,    "Takara / SSD Company LTD",                     "Jara-Ja Land (Japan, home version)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+// ジャラジャランド
+CONS( 2003, jarajal,   0,          0,  xavix_nv,         jarajal,  xavix_state,          init_xavix,    "Takara / SSD Company LTD",                     "Jyarajyaland (Japan, PlugIt! version)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
-CONS( 2003, tcarnavi,  0,          0,  xavix_nv,         jarajal,  xavix_state,          init_xavix,    "Tomy / SSD Company LTD",                       "Tomica Carnavi Drive (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+// 近代撃ちまくりバラエティ 射的王(シャテキング)
+CONS( 2002, tomshoot, 0,           0,  xavix_i2c_24c02,  tomshoot,xavix_i2c_tomshoot_state,  init_xavix,    "Tomy / SSD Company LTD",                   "Kindai Uchimakuri Variety Shateking (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
-CONS( 2003, tomcpin,   0,          0,  xavix_i2c_24c08,  tomcpin,  xavix_i2c_state,          init_xavix,    "Tomy / SSD Company LTD",                       "Champiyon Pinball (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+// トミカ カーナビドライブ / トミー
+CONS( 2003, tcarnavi,  0,          0,  xavix_nv,         tcarnavi, xavix_state,          init_xavix,    "Tomy / SSD Company LTD",                       "Tomica Carnavi Drive (Japan)", MACHINE_IMPERFECT_SOUND )
 
-CONS( 2004, tomplc,   0,          0,  xavix_i2c_24c02,  tomcpin,  xavix_i2c_state,          init_xavix,    "Tomy / SSD Company LTD",                       "Nihon Isshuu - Boku wa Plarail Untenshi (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+// ちゃんぴよんピンボール
+CONS( 2003, tomcpin,   0,          0,  xavix_i2c_24c08,  tomcpin,  xavix_i2c_state,      init_xavix,    "Tomy / SSD Company LTD",                       "Champiyon Pinball (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+
+// 日本一周 僕はプラレール運転士
+CONS( 2004, tomplc,    0,          0,  xavix_i2c_24c02_43mhz,tomplc,xavix_i2c_state,     init_xavix,    "Tomy / SSD Company LTD",                       "Nihon Isshuu - Boku wa Plarail Untenshi (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+
+// テレビで遊び隊 ハイパーレスキュー ぼくは救助隊！
+// the demos in attract mode end instantly as if a button was being held, but not sure where it's read
+CONS( 2006, tomthr,    0,          0,  xavix_43mhz,      tomthr,   xavix_state,          init_xavix,    "Takara Tomy / SSD Company LTD",                "Asobitai Hyper Rescue - Boku wa Kyuujotai! (Japan)", MACHINE_IMPERFECT_SOUND )
+
+// ガンガンアドベンチャー
+CONS( 2001, gungunad,  0,          0,  xavix_nv,         xavix,    xavix_state,          init_xavix,    "Takara / SSD Company LTD",                     "Gun Gun Adventure (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+
+// ガンガンレボリューション
+CONS( 2004, gungunrv,  0,          0,  xavix_i2c_24lc04, gungunrv, xavix_i2c_state,      init_xavix,    "Takara / SSD Company LTD",                     "Gun Gun Revolution (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+
+// ビストロキッズ ぼくもわたしもコックさん！
+CONS( 2001, bistro,    0,          0,  xavix,            xavix,    xavix_state,          init_xavix,    "Sega Toys / SSD Company LTD",                  "Bistro Kids: Boku mo Watashi mo Kok-san! (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
 
 /* Music titles: Emulation note:
-   SEEPROM write appears to work (save NVRAM file looks valid) but game fails to read it back properly, fails backup data checksum, and blanks it again.
    Timers might not be 100%, PAL stuff uses different ways to do timing.
 */
 CONS( 2000, ekara,    0,           0,  xavix_cart_ekara, ekara,    xavix_ekara_state,    init_xavix,    "Takara / SSD Company LTD / Hasbro",            "e-kara (US?, NTSC, set 1)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND /*| MACHINE_IS_BIOS_ROOT*/ ) // shows "Please insert a cartridge before turn it on" without cart
@@ -2027,20 +2745,49 @@ CONS( 2003, epitch,   0,           0,  xavix_cart_ekara, ekara,    xavix_ekara_s
 // e-kara mix was another unit that allowed you to connect to a PC, unlike e-kara web it also functions as a regular device
 CONS( 200?, ekaramix, 0,           0,  xavix_cart_ekara, ekara,    xavix_ekara_state,    init_xavix,    "Takara / SSD Company LTD",                     "e-kara Mix (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND /*| MACHINE_IS_BIOS_ROOT*/ )
 
-
+// ダンスダンスレボリューション　ふぁみマット
 CONS( 2001, ddrfammt, 0,           0,  xavix_cart_ddrfammt,ddrfammt, xavix_cart_state,   init_xavix,    "Takara / Konami / SSD Company LTD",            "Dance Dance Revolution Family Mat (Japan)", MACHINE_IMPERFECT_SOUND/*|MACHINE_IS_BIOS_ROOT*/ )
 
+// ポピラ
 CONS( 2000, popira,   0,           0,  xavix_cart_popira,popira,   xavix_cart_state,     init_xavix,    "Takara / SSD Company LTD",                     "Popira (Japan)", MACHINE_IMPERFECT_SOUND/*|MACHINE_IS_BIOS_ROOT*/ ) // The original Popira is a single yellow unit
+// a Korean version exists from Sonokong brand, with different songs
 
+// ポピラ2
 CONS( 2002, popira2,  0,           0,  xavix_cart_popira2,popira2,  xavix_popira2_cart_state, init_xavix,    "Takara / SSD Company LTD",                 "Popira 2 (Japan)", MACHINE_IMPERFECT_SOUND/*|MACHINE_IS_BIOS_ROOT*/ ) // Popira 2 is a set of 2 blue & green linked units (2nd unit is just a controller, no CPU or TV out)
 
-CONS( 2003, taikodp,  0,           0,  xavix_i2c_taiko,  taikodp,  xavix_i2c_cart_state, init_xavix,    "Takara / SSD Company LTD",                     "Taiko De Popira (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND /*|MACHINE_IS_BIOS_ROOT*/ ) // inputs? are the drums analog?
+// たいこでポピラ
+CONS( 2003, taikodp,  0,           0,  xavix_i2c_taiko,  taikodp,  xavix_i2c_cart_state, init_xavix,    "Takara / SSD Company LTD",                     "Taiko de Popira (Japan)", MACHINE_IMPERFECT_SOUND /*|MACHINE_IS_BIOS_ROOT*/ ) // inputs? are the drums analog?
 
+// ジャンピンポピラ
 CONS( 2004, jpopira,  0,           0,  xavix_i2c_jpopira,jpopira,  xavix_i2c_cart_state, init_xavix,    "Takara / SSD Company LTD",                     "Jumping Popira (Japan)", MACHINE_IMPERFECT_SOUND /*|MACHINE_IS_BIOS_ROOT*/ )
 
-CONS( 2003, evio,     0,           0,  xavix_cart_evio,  evio,     xavix_cart_state,     init_xavix,    "Tomy / SSD Company LTD",                       "Evio (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND /*|MACHINE_IS_BIOS_ROOT*/ ) // inputs? it's a violin controller
+// evio
+CONS( 2003, evio,     0,           0,  xavix_cart_evio,  evio,     xavix_evio_cart_state,init_xavix,    "Tomy / SSD Company LTD",                       "Evio (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND /*|MACHINE_IS_BIOS_ROOT*/ ) // inputs? it's a violin controller
 
-CONS( 2002, gcslottv, 0,           0,  xavix_cart_gcslottv,  gcslottv,     xavix_cart_gcslottv_state,     init_xavix,    "Takara / Sammy / DCT / SSD Company LTD",       "Gachinko Contest! Slot machine TV (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND /*|MACHINE_IS_BIOS_ROOT*/ )
+
+// 2 ROM expansion cartridges were available for this, in the form of other robots (the heads acts as cartridges) see takara_daigunder_dx_cart.xml
+// a number of other robots were also available, but those act as controllers and don't plug into the ROM slot (presumably the signal sent is used to determine the character)
+CONS( 2002, tak_daig, 0,           0,  xavix_cart_daig,  daig,     xavix_daig_cart_state,init_xavix,    "Takara / SSD Company LTD",                     "Bakutou Sengen Daigunder DX (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND /*|MACHINE_IS_BIOS_ROOT*/ ) // inputs? maybe IO interrupt?
+
+CONS( 2002, gcslottv, 0,           0,  xavix_cart_gcslottv,  gcslottv,     xavix_cart_gcslottv_state,     init_xavix,    "Takara / Sammy / DCT / SSD Company LTD",       "Gachinko Shoubu! PachisloTV (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND /*|MACHINE_IS_BIOS_ROOT*/ )
 
 // Let’s!TVプレイ 超にんきスポット!ころがしほーだい たまごっちりぞーと   (Let's! TV Play Chou Ninki Spot! Korogashi-Houdai Tamagotchi Resort) (only on the Japanese list? http://test.shinsedai.co.jp/english/products/Applied/list.html )   This also allows you to use an IR reciever to import a Tamagotchi from compatible games
 CONS( 2006, ltv_tam,  0,           0,  xavix_i2c_24lc04_tam,  ltv_tam,xavix_i2c_ltv_tam_state,      init_xavix,    "Bandai / SSD Company LTD",                      "Let's! TV Play Chou Ninki Spot! Korogashi-Houdai Tamagotchi Resort (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+
+CONS( 2008, hikara,   0,           0,  xavix_cart_hikara, hikara,    xavix_hikara_state,    init_xavix,    "Takara Tomy / SSD Company LTD",            "Hi-kara (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND /*| MACHINE_IS_BIOS_ROOT*/ )
+
+// 東京フレンドパーク2
+CONS( 2003, epo_tfp2,  0,          0,  xavix_i2c_24c08,  epo_tfp2, xavix_i2c_state, init_xavix, "Epoch / SSD Company LTD", "Tokyo Friend Park 2 (Japan)", MACHINE_IMPERFECT_SOUND) // uses in24lc08b
+
+// 東京フレンドパーク2スペシャル
+CONS( 2005, epo_tp2s,  0,          0,  xavix,            epo_tp2p, xavix_state,     init_xavix, "Epoch / SSD Company LTD", "Tokyo Friend Park II Special! (Japan)", MACHINE_IMPERFECT_SOUND)
+
+// 東京フレンドパークⅡ パーフェクト!めざせ!グランドスラム‼︎
+CONS( 2007, epo_tp2p,  0,          0,  xavix,            epo_tp2p, xavix_state,     init_xavix, "Epoch / SSD Company LTD", "Tokyo Friend Park II Perfect! Mezase! Grand Slam!! (Japan)", MACHINE_IMPERFECT_SOUND)
+
+// きかんしゃトーマス テレビパソコン
+CONS( 2005, tvpc_tom,  0,          0,  xavix_i2c_24c16,  tvpc_tom, xavix_i2c_state, init_xavix, "Epoch / SSD Company LTD", "TV-PC Thomas & Friends (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
+// ドラえもん テレビパソコン
+CONS( 2003, tvpc_dor,  0,          0,  xavix_i2c_24c16,  tvpc_tom, xavix_i2c_state, init_xavix, "Epoch / SSD Company LTD", "TV-PC Doraemon (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
+// とっとこハム太郎 テレビパソコン
+CONS( 2003, tvpc_ham,  0,          0,  xavix_i2c_24c16,  tvpc_tom, xavix_i2c_state, init_xavix, "Epoch / SSD Company LTD", "TV-PC Tottoko Hamutaro (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)

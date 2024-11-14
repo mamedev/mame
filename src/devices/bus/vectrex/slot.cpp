@@ -44,11 +44,11 @@ device_vectrex_cart_interface::~device_vectrex_cart_interface()
 //  rom_alloc - alloc the space for the cart
 //-------------------------------------------------
 
-void device_vectrex_cart_interface::rom_alloc(uint32_t size, const char *tag)
+void device_vectrex_cart_interface::rom_alloc(uint32_t size)
 {
 	if (m_rom == nullptr)
 	{
-		m_rom = device().machine().memory().region_alloc(std::string(tag).append(VECSLOT_ROM_REGION_TAG).c_str(), size, 1, ENDIANNESS_LITTLE)->base();
+		m_rom = device().machine().memory().region_alloc(device().subtag("^cart:rom"), size, 1, ENDIANNESS_LITTLE)->base();
 		m_rom_size = size;
 	}
 }
@@ -136,21 +136,17 @@ static const char *vectrex_get_slot(int type)
  call load
  -------------------------------------------------*/
 
-image_init_result vectrex_cart_slot_device::call_load()
+std::pair<std::error_condition, std::string> vectrex_cart_slot_device::call_load()
 {
 	if (m_cart)
 	{
-		uint32_t size = !loaded_through_softlist() ? length() : get_software_region_length("rom");
-		uint8_t *ROM;
+		uint32_t const size = !loaded_through_softlist() ? length() : get_software_region_length("rom");
 
 		if (size > 0x10000)
-		{
-			seterror(image_error::INVALIDIMAGE, "Unsupported cartridge size");
-			return image_init_result::FAIL;
-		}
+			return std::make_pair(image_error::INVALIDLENGTH, "Unsupported cartridge size (must be no larger than 64K)");
 
-		m_cart->rom_alloc((size < 0x1000) ? 0x1000 : size, tag());
-		ROM = m_cart->get_rom_base();
+		m_cart->rom_alloc((size < 0x1000) ? 0x1000 : size);
+		uint8_t *const ROM = m_cart->get_rom_base();
 
 		if (!loaded_through_softlist())
 			fread(ROM, size);
@@ -159,10 +155,7 @@ image_init_result vectrex_cart_slot_device::call_load()
 
 		// Verify the file is accepted by the Vectrex bios
 		if (memcmp(ROM, "g GCE", 5))
-		{
-			seterror(image_error::INVALIDIMAGE, "Invalid image");
-			return image_init_result::FAIL;
-		}
+			return std::make_pair(image_error::INVALIDIMAGE, "Invalid Vectrex ROM");
 
 		// determine type
 		m_type = VECTREX_STD;
@@ -182,11 +175,9 @@ image_init_result vectrex_cart_slot_device::call_load()
 
 		if (!memcmp(ROM + 0x11, "3D MINE STORM", 13))
 			m_vec3d = VEC3D_MINEST;
-
-		return image_init_result::PASS;
 	}
 
-	return image_init_result::PASS;
+	return std::make_pair(std::error_condition(), std::string());
 }
 
 
@@ -203,8 +194,7 @@ std::string vectrex_cart_slot_device::get_default_card_software(get_default_card
 		std::uint64_t size;
 		hook.image_file()->length(size);
 		std::vector<uint8_t> rom(size);
-		std::size_t actual;
-		hook.image_file()->read(&rom[0], size, actual);
+		read(*hook.image_file(), &rom[0], size);
 
 		int type = VECTREX_STD;
 		if (!memcmp(&rom[0x06], "SRAM", 4)) // FIXME: bounds check!

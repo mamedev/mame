@@ -21,10 +21,10 @@ public:
 	auto &set_pulse_width(attotime pw) { assert(!pw.is_never()); m_pw = pw; reinit(); return *this; }
 	auto &set_duty_cycle(double duty) { assert(duty >= 0.0 && duty <= 1.0); m_duty = duty; m_pw = attotime::never; reinit(); return *this; }
 
-	DECLARE_READ_LINE_MEMBER(signal_r) { return m_signal; }
+	int signal_r() { return m_signal; }
 
 protected:
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override { output(); }
 	virtual void device_clock_changed() override { reinit(); }
 

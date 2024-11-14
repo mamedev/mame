@@ -15,6 +15,9 @@
 
 #include "screen.h"
 
+#define VERBOSE (0)
+#include "logmacro.h"
+
 
 namespace {
 
@@ -62,21 +65,6 @@ namespace {
 
 #define DISPSTAT_SET(val)       HWLO_SET(0x004, val)
 #define DISPSTAT_RESET(val)     HWLO_RESET(0x004, val)
-
-#define VERBOSE_LEVEL   (0)
-
-inline void ATTR_PRINTF(3,4) verboselog(device_t &device, int n_level, const char *s_fmt, ...)
-{
-	if (VERBOSE_LEVEL >= n_level)
-	{
-		va_list v;
-		char buf[32768];
-		va_start(v, s_fmt);
-		vsprintf(buf, s_fmt, v);
-		va_end(v);
-		device.logerror("%08x: %s", device.machine().describe_context(), buf);
-	}
-}
 
 class object
 {
@@ -130,7 +118,7 @@ public:
 		height = size_table[shape][size][1];
 
 		if (shape == 4)
-			verboselog(m_device, 0, "WARNING: attempted to draw an object of invalid shape\n");
+			m_device.logerror("WARNING: attempted to draw an object of invalid shape\n");
 	}
 
 private:
@@ -162,7 +150,7 @@ inline uint8_t gba_lcd_device::bg_video_mode()
 
 	if (mode > 5)
 	{
-		verboselog(*this, 0, "WARNING: attempted to set invalid BG video mode %d\n", mode);
+		logerror("WARNING: attempted to set invalid BG video mode %d\n", mode);
 		return 0;
 	}
 
@@ -1581,10 +1569,10 @@ uint32_t gba_lcd_device::video_r(offs_t offset, uint32_t mem_mask)
 		throw emu_fatalerror("gba_lcd_device::video_r: Not enough register names in gba_lcd_device");
 
 	if (ACCESSING_BITS_0_15)
-		verboselog(*this, 2, "GBA I/O Read: %s = %04x\n", reg_names[offset * 2], retval & 0x0000ffff);
+		LOG("%s: GBA I/O Read: %s = %04x\n", machine().describe_context(), reg_names[offset * 2], retval & 0x0000ffff);
 
 	if (ACCESSING_BITS_16_31)
-		verboselog(*this, 2, "GBA I/O Read: %s = %04x\n", reg_names[offset * 2 + 1], (retval & 0xffff0000) >> 16);
+		LOG("%s: GBA I/O Read: %s = %04x\n", machine().describe_context(), reg_names[offset * 2 + 1], (retval & 0xffff0000) >> 16);
 
 	return retval;
 }
@@ -1597,10 +1585,10 @@ void gba_lcd_device::video_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 		throw emu_fatalerror("gba_lcd_device::video_w: Not enough register names in gba_lcd_device");
 
 	if (ACCESSING_BITS_0_15)
-		verboselog(*this, 2, "GBA I/O Write: %s = %04x\n", reg_names[offset * 2], data & 0x0000ffff);
+		LOG("%s: GBA I/O Write: %s = %04x\n", machine().describe_context(), reg_names[offset * 2], data & 0x0000ffff);
 
 	if (ACCESSING_BITS_16_31)
-		verboselog(*this, 2, "GBA I/O Write: %s = %04x\n", reg_names[offset * 2 + 1], (data & 0xffff0000) >> 16);
+		LOG("%s: GBA I/O Write: %s = %04x\n", machine().describe_context(), reg_names[offset * 2 + 1], (data & 0xffff0000) >> 16);
 
 	switch (offset)
 	{
@@ -1666,16 +1654,11 @@ TIMER_CALLBACK_MEMBER(gba_lcd_device::perform_hbl)
 	if (scanline < 160)
 	{
 		draw_scanline(scanline);
-
-		if (!m_dma_hblank_cb.isnull())
-			m_dma_hblank_cb(ASSERT_LINE);
+		m_dma_hblank_cb(ASSERT_LINE);
 	}
 
 	if (is_set(dispstat::hblank_irq_en))
-	{
-		if (!m_int_hblank_cb.isnull())
-			m_int_hblank_cb(ASSERT_LINE);
-	}
+		m_int_hblank_cb(ASSERT_LINE);
 
 	set(dispstat::hblank);
 
@@ -1698,13 +1681,9 @@ TIMER_CALLBACK_MEMBER(gba_lcd_device::perform_scan)
 		if (scanline == 160)
 		{
 			if (is_set(dispstat::vblank_irq_en))
-			{
-				if (!m_int_vblank_cb.isnull())
-					m_int_vblank_cb(ASSERT_LINE);
-			}
+				m_int_vblank_cb(ASSERT_LINE);
 
-			if (!m_dma_vblank_cb.isnull())
-				m_dma_vblank_cb(ASSERT_LINE);
+			m_dma_vblank_cb(ASSERT_LINE);
 		}
 	}
 	else
@@ -1718,10 +1697,7 @@ TIMER_CALLBACK_MEMBER(gba_lcd_device::perform_scan)
 		set(dispstat::vcount);
 
 		if (is_set(dispstat::vcount_irq_en))
-		{
-			if (!m_int_vcount_cb.isnull())
-				m_int_vcount_cb(ASSERT_LINE);
-		}
+			m_int_vcount_cb(ASSERT_LINE);
 	}
 
 	m_hbl_timer->adjust(screen().time_until_pos(scanline, 240));
@@ -1751,13 +1727,6 @@ uint32_t gba_lcd_device::screen_update(screen_device &screen, bitmap_ind16 &bitm
 
 void gba_lcd_device::device_start()
 {
-	/* resolve callbacks */
-	m_int_hblank_cb.resolve();
-	m_int_vblank_cb.resolve();
-	m_int_vcount_cb.resolve();
-	m_dma_hblank_cb.resolve();
-	m_dma_vblank_cb.resolve();
-
 	m_pram = make_unique_clear<uint32_t[]>(0x400 / 4);
 	m_vram = make_unique_clear<uint32_t[]>(0x18000 / 4);
 	m_oam = make_unique_clear<uint32_t[]>(0x400 / 4);

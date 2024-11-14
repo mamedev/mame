@@ -52,8 +52,8 @@ public:
 	void psrockman(machine_config &config);
 
 private:
-	void io_map(address_map &map);
-	void prg_map(address_map &map);
+	void io_map(address_map &map) ATTR_COLD;
+	void prg_map(address_map &map) ATTR_COLD;
 };
 
 

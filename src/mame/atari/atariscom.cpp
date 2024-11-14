@@ -52,9 +52,6 @@ atari_sound_comm_device::atari_sound_comm_device(const machine_config &mconfig, 
 
 void atari_sound_comm_device::device_start()
 {
-	// resolve callbacks
-	m_main_int_cb.resolve_safe();
-
 	// register for save states
 	save_item(NAME(m_main_to_sound_ready));
 	save_item(NAME(m_sound_to_main_ready));
@@ -171,7 +168,7 @@ TIMER_CALLBACK_MEMBER(atari_sound_comm_device::delayed_sound_reset)
 
 	// allocate a high frequency timer until a response is generated
 	// the main CPU is *very* sensistive to the timing of the response
-	machine().scheduler().boost_interleave(SOUND_TIMER_RATE, SOUND_TIMER_BOOST);
+	machine().scheduler().add_quantum(SOUND_TIMER_RATE, SOUND_TIMER_BOOST);
 }
 
 
@@ -193,7 +190,7 @@ TIMER_CALLBACK_MEMBER(atari_sound_comm_device::delayed_sound_write)
 
 	// allocate a high frequency timer until a response is generated
 	// the main CPU is *very* sensistive to the timing of the response
-	machine().scheduler().boost_interleave(SOUND_TIMER_RATE, SOUND_TIMER_BOOST);
+	machine().scheduler().add_quantum(SOUND_TIMER_RATE, SOUND_TIMER_BOOST);
 }
 
 

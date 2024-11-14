@@ -140,7 +140,8 @@ void _1943_state::c804_w(u8 data)
 	/* bits 2, 3 and 4 select the ROM bank */
 	m_mainbank->set_entry((data & 0x1c) >> 2);
 
-	/* bit 5 resets the sound CPU - we ignore it */
+	/* bit 5 resets the sound CPU */
+	m_audiocpu->set_input_line(INPUT_LINE_RESET, (data & 0x20) ? ASSERT_LINE : CLEAR_LINE);
 
 	/* bit 6 flips screen */
 	flip_screen_set(data & 0x40);

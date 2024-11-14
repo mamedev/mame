@@ -249,10 +249,6 @@ void hp2640_tape_device::device_add_mconfig(machine_config &config)
 
 void hp2640_tape_device::device_start()
 {
-	m_irq_handler.resolve_safe();
-	m_led0_handler.resolve_safe();
-	m_led1_handler.resolve_safe();
-
 	m_gap_timer = timer_alloc(FUNC(hp2640_tape_device::gap_timer_tick), this);
 	m_cell_timer = timer_alloc(FUNC(hp2640_tape_device::cell_timer_tick), this);
 

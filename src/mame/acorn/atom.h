@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Nathan Woods
-#ifndef MAME_INCLUDES_ATOM_H
-#define MAME_INCLUDES_ATOM_H
+#ifndef MAME_ACORN_ATOM_H
+#define MAME_ACORN_ATOM_H
 
 #pragma once
 
@@ -37,9 +37,6 @@
 #define BASERAM_TAG     "baseram"
 
 
-#define X1  XTAL(3'579'545)    // MC6847 Clock
-#define X2  XTAL(4'000'000)           // CPU Clock - a divider reduces it to 1MHz
-
 class atom_state : public driver_device
 {
 public:
@@ -49,6 +46,7 @@ public:
 		, m_vdg(*this, MC6847_TAG)
 		, m_cassette(*this, "cassette")
 		, m_fdc(*this, I8271_TAG)
+		, m_floppies(*this, I8271_TAG ":%u", 0U)
 		, m_centronics(*this, CENTRONICS_TAG)
 		, m_speaker(*this, "speaker")
 		, m_cart(*this, "cartslot")
@@ -68,6 +66,7 @@ protected:
 	required_device<mc6847_base_device> m_vdg;
 	required_device<cassette_image_device> m_cassette;
 	optional_device<i8271_device> m_fdc;
+	optional_device_array<floppy_connector, 2> m_floppies;
 	required_device<centronics_device> m_centronics;
 	required_device<speaker_sound_device> m_speaker;
 	optional_device<generic_slot_device> m_cart;
@@ -76,16 +75,16 @@ protected:
 	required_device<i8255_device> m_ppi;
 	required_device<via6522_device> m_via;
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	void ppi_pa_w(uint8_t data);
 	uint8_t ppi_pb_r();
 	uint8_t ppi_pc_r();
 	void ppi_pc_w(uint8_t data);
 	uint8_t vdg_videoram_r(offs_t offset);
-	DECLARE_WRITE_LINE_MEMBER( atom_8271_interrupt_callback );
-	DECLARE_WRITE_LINE_MEMBER( motor_w );
+	void atom_8271_interrupt_callback(int state);
+	void motor_w(int state);
 
 	/* keyboard state */
 	u8 m_keylatch = 0U;
@@ -98,14 +97,14 @@ protected:
 	/* devices */
 	bool m_previous_i8271_int_state = false;
 	static void floppy_formats(format_registration &fr);
-	DECLARE_WRITE_LINE_MEMBER(cassette_output_tick);
+	void cassette_output_tick(int state);
 
-	image_init_result load_cart(device_image_interface &image, generic_slot_device &slot);
+	std::pair<std::error_condition, std::string> load_cart(device_image_interface &image, generic_slot_device &slot);
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load) { return load_cart(image, *m_cart); }
 	DECLARE_QUICKLOAD_LOAD_MEMBER(quickload_cb);
-	void atom_mem(address_map &map);
-	void atombb_mem(address_map &map);
-	void prophet_mem(address_map &map);
+	void atom_mem(address_map &map) ATTR_COLD;
+	void atombb_mem(address_map &map) ATTR_COLD;
+	void prophet_mem(address_map &map) ATTR_COLD;
 };
 
 class atomeb_state : public atom_state
@@ -122,8 +121,8 @@ public:
 	void atomeb(machine_config &config);
 
 private:
-	void machine_start() override;
-	void machine_reset() override;
+	void machine_start() override ATTR_COLD;
+	void machine_reset() override ATTR_COLD;
 
 	uint8_t eprom_r();
 	void eprom_w(uint8_t data);
@@ -140,7 +139,7 @@ private:
 	template<int I> DECLARE_DEVICE_IMAGE_LOAD_MEMBER(ext_load) { return load_cart(image, *m_ext[I]); }
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(e0_load) { return load_cart(image, *m_e0); }
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(e1_load) { return load_cart(image, *m_e1); }
-	void atomeb_mem(address_map &map);
+	void atomeb_mem(address_map &map) ATTR_COLD;
 };
 
-#endif // MAME_INCLUDES_ATOM_H
+#endif // MAME_ACORN_ATOM_H

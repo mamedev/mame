@@ -64,25 +64,25 @@ void carpolo_state::ttl74148_3s_cb(uint8_t data)
 
 
 /* the outputs of the flip-flops are connected to the priority encoder */
-WRITE_LINE_MEMBER(carpolo_state::ttl7474_2s_1_q_cb)
+void carpolo_state::ttl7474_2s_1_q_cb(int state)
 {
 	m_ttl74148_3s->input_line_w(COIN1_PRIORITY_LINE, state);
 	m_ttl74148_3s->update();
 }
 
-WRITE_LINE_MEMBER(carpolo_state::ttl7474_2s_2_q_cb)
+void carpolo_state::ttl7474_2s_2_q_cb(int state)
 {
 	m_ttl74148_3s->input_line_w(COIN2_PRIORITY_LINE, state);
 	m_ttl74148_3s->update();
 }
 
-WRITE_LINE_MEMBER(carpolo_state::ttl7474_2u_1_q_cb)
+void carpolo_state::ttl7474_2u_1_q_cb(int state)
 {
 	m_ttl74148_3s->input_line_w(COIN3_PRIORITY_LINE, state);
 	m_ttl74148_3s->update();
 }
 
-WRITE_LINE_MEMBER(carpolo_state::ttl7474_2u_2_q_cb)
+void carpolo_state::ttl7474_2u_2_q_cb(int state)
 {
 	m_ttl74148_3s->input_line_w(COIN4_PRIORITY_LINE, state);
 	m_ttl74148_3s->update();
@@ -260,22 +260,22 @@ void carpolo_state::timer_tick()
 
 // FIXME: Remove trampolines
 
-WRITE_LINE_MEMBER(carpolo_state::coin1_interrupt_clear_w)
+void carpolo_state::coin1_interrupt_clear_w(int state)
 {
 	m_ttl7474_2s_1->clear_w(state);
 }
 
-WRITE_LINE_MEMBER(carpolo_state::coin2_interrupt_clear_w)
+void carpolo_state::coin2_interrupt_clear_w(int state)
 {
 	m_ttl7474_2s_2->clear_w(state);
 }
 
-WRITE_LINE_MEMBER(carpolo_state::coin3_interrupt_clear_w)
+void carpolo_state::coin3_interrupt_clear_w(int state)
 {
 	m_ttl7474_2u_1->clear_w(state);
 }
 
-WRITE_LINE_MEMBER(carpolo_state::coin4_interrupt_clear_w)
+void carpolo_state::coin4_interrupt_clear_w(int state)
 {
 	m_ttl7474_2u_2->clear_w(state);
 }
@@ -323,12 +323,12 @@ void carpolo_state::timer_interrupt_clear_w(uint8_t data)
  *
  *************************************/
 
-WRITE_LINE_MEMBER( carpolo_state::ls153_za_w )
+void carpolo_state::ls153_za_w(int state)
 {
 	m_ls153_za = state;
 }
 
-WRITE_LINE_MEMBER( carpolo_state::ls153_zb_w )
+void carpolo_state::ls153_zb_w(int state)
 {
 	m_ls153_zb = state;
 }
@@ -446,7 +446,6 @@ void carpolo_state::machine_reset()
 
 	m_ttl7474_2u_2->d_w     (1);
 	m_ttl7474_2u_2->preset_w(1);
-
 
 	/* set up the steering handling flip-flops */
 	m_ttl7474_1f_1->d_w     (1);

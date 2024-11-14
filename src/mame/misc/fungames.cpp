@@ -53,9 +53,9 @@ public:
 
 protected:
 	// driver_device overrides
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	// devices
@@ -65,6 +65,7 @@ private:
 
 
 static NETLIST_START(fungames)
+{
 	SOLVER(Solver, 48000)
 //  PARAM(Solver.FREQ, 48000)
 	PARAM(Solver.ACCURACY, 1e-4) // works and is sufficient
@@ -74,7 +75,7 @@ static NETLIST_START(fungames)
 
 //  NETDEV_ANALOG_CALLBACK(sound_cb, sound, exidyttl_state, sound_cb, "")
 //  NETDEV_ANALOG_CALLBACK(video_cb, videomix, fixedfreq_device, update_vid, "fixfreq")
-NETLIST_END()
+}
 
 
 
@@ -190,8 +191,8 @@ ROM_END
 } // Anonymous namespace
 
 
-GAME( 1975, biplane, 0, fungames, 0, fungames_state, empty_init, ROT0, "Fun Games", "Biplane [TTL]", MACHINE_IS_SKELETON )
-//GAME( 1975, skywar, biplane, 0, fungames, 0, fungames_state, empty_init, ROT0, "Mirco Games", "Sky War [TTL]", MACHINE_IS_SKELETON )
-GAME( 1976, biplane4, 0, fungames, 0, fungames_state, empty_init, ROT0, "Fun Games", "Biplane 4 [TTL]", MACHINE_IS_SKELETON )
-GAME( 1975, take5, 0, fungames, 0, fungames_state, empty_init, ROT0, "Fun Games", "Take 5 [TTL]", MACHINE_IS_SKELETON )
-//GAME( 1975, tankers, 0, fungames, 0, fungames_state, empty_init, ROT0, "Fun Games", "Tankers [TTL]", MACHINE_IS_SKELETON )
+GAME( 1975, biplane, 0, fungames, 0, fungames_state, empty_init, ROT0, "Fun Games", "Biplane", MACHINE_IS_SKELETON )
+//GAME( 1975, skywar, biplane, 0, fungames, 0, fungames_state, empty_init, ROT0, "Mirco Games", "Sky War", MACHINE_IS_SKELETON )
+GAME( 1976, biplane4, 0, fungames, 0, fungames_state, empty_init, ROT0, "Fun Games", "Biplane 4", MACHINE_IS_SKELETON )
+GAME( 1975, take5, 0, fungames, 0, fungames_state, empty_init, ROT0, "Fun Games", "Take 5", MACHINE_IS_SKELETON )
+//GAME( 1975, tankers, 0, fungames, 0, fungames_state, empty_init, ROT0, "Fun Games", "Tankers", MACHINE_IS_SKELETON )

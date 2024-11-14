@@ -82,7 +82,7 @@ JSON Number 类型表示所有数值。然而，C++ 需要使用更专门的类�
 ~~~~~~~~~~cpp
 assert(document["i"].IsNumber());
 
-// 在此情况下，IsUint()/IsInt64()/IsUInt64() 也会返回 true
+// 在此情况下，IsUint()/IsInt64()/IsUint64() 也会返回 true
 assert(document["i"].IsInt());          
 printf("i = %d\n", document["i"].GetInt());
 // 另一种用法： (int)document["i"]
@@ -250,7 +250,7 @@ string(const char* s, size_t count);
 
 ~~~~~~~~~~cpp
 if (document["hello"] == document["n"]) /*...*/;    // 比较两个值
-if (document["hello"] == "world") /*...*/;          // 与字符串家面量作比较
+if (document["hello"] == "world") /*...*/;          // 与字符串字面量作比较
 if (document["i"] != 123) /*...*/;                  // 与整数作比较
 if (document["pi"] != 3.14) /*...*/;                // 与 double 作比较
 ~~~~~~~~~~
@@ -292,9 +292,9 @@ Value o(kObjectType);
 Value a(kArrayType);
 ~~~~~~~~~~
 
-## 转移语意（Move Semantics） {#MoveSemantics}
+## 转移语义（Move Semantics） {#MoveSemantics}
 
-在设计 RapidJSON 时有一个非常特别的决定，就是 Value 赋值并不是把来源 Value 复制至目的 Value，而是把把来源 Value 转移（move）至目的 Value。例如：
+在设计 RapidJSON 时有一个非常特别的决定，就是 Value 赋值并不是把来源 Value 复制至目的 Value，而是把来源 Value 转移（move）至目的 Value。例如：
 
 ~~~~~~~~~~cpp
 Value a(123);
@@ -302,13 +302,13 @@ Value b(456);
 b = a;         // a 变成 Null，b 变成数字 123。
 ~~~~~~~~~~
 
-![使用移动语意赋值。](diagram/move1.png)
+![使用移动语义赋值。](diagram/move1.png)
 
-为什么？此语意有何优点？
+为什么？此语义有何优点？
 
 最简单的答案就是性能。对于固定大小的 JSON 类型（Number、True、False、Null），复制它们是简单快捷。然而，对于可变大小的 JSON 类型（String、Array、Object），复制它们会产生大量开销，而且这些开销常常不被察觉。尤其是当我们需要创建临时 Object，把它复制至另一变量，然后再析构它。
 
-例如，若使用正常 * 复制 * 语意：
+例如，若使用正常 * 复制 * 语义：
 
 ~~~~~~~~~~cpp
 Value o(kObjectType);
@@ -321,15 +321,15 @@ Value o(kObjectType);
 }
 ~~~~~~~~~~
 
-![复制语意产生大量的复制操作。](diagram/move2.png)
+![复制语义产生大量的复制操作。](diagram/move2.png)
 
 那个 `o` Object 需要分配一个和 contacts 相同大小的缓冲区，对 conacts 做深度复制，并最终要析构 contacts。这样会产生大量无必要的内存分配／释放，以及内存复制。
 
 有一些方案可避免实质地复制这些数据，例如引用计数（reference counting）、垃圾回收（garbage collection, GC）。
 
-为了使 RapidJSON 简单及快速，我们选择了对赋值采用 * 转移 * 语意。这方法与 `std::auto_ptr` 相似，都是在赋值时转移拥有权。转移快得多简单得多，只需要析构原来的 Value，把来源 `memcpy()` 至目标，最后把来源设置为 Null 类型。
+为了使 RapidJSON 简单及快速，我们选择了对赋值采用 * 转移 * 语义。这方法与 `std::auto_ptr` 相似，都是在赋值时转移拥有权。转移快得多简单得多，只需要析构原来的 Value，把来源 `memcpy()` 至目标，最后把来源设置为 Null 类型。
 
-因此，使用转移语意后，上面的例子变成：
+因此，使用转移语义后，上面的例子变成：
 
 ~~~~~~~~~~cpp
 Value o(kObjectType);
@@ -341,11 +341,11 @@ Value o(kObjectType);
 }
 ~~~~~~~~~~
 
-![转移语意不需复制。](diagram/move3.png)
+![转移语义不需复制。](diagram/move3.png)
 
-在 C++11 中这称为转移赋值操作（move assignment operator）。由于 RapidJSON 支持 C++03，它在赋值操作采用转移语意，其它修改形函数如 `AddMember()`, `PushBack()` 也采用转移语意。
+在 C++11 中这称为转移赋值操作（move assignment operator）。由于 RapidJSON 支持 C++03，它在赋值操作采用转移语义，其它修改型函数如 `AddMember()`, `PushBack()` 也采用转移语义。
 
-### 转移语意及临时值 {#TemporaryValues}
+### 转移语义及临时值 {#TemporaryValues}
 
 有时候，我们想直接构造一个 Value 并传递给一个“转移”函数（如 `PushBack()`、`AddMember()`）。由于临时对象是不能转换为正常的 Value 引用，我们加入了一个方便的 `Move()` 函数：
 
@@ -383,11 +383,12 @@ memset(buffer, 0, sizeof(buffer));
 
 另外，上面的 `SetString()` 需要长度参数。这个 API 能处理含有空字符的字符串。另一个 `SetString()` 重载函数没有长度参数，它假设输入是空字符结尾的，并会调用类似 `strlen()` 的函数去获取长度。
 
-最后，对于字符串字面量或有安全生命周期的字符串，可以使用 const-string 版本的 `SetString()`，它没有 allocator 参数。对于字符串家面量（或字符数组常量），只需简单地传递字面量，又安全又高效：
+最后，对于字符串字面量或有安全生命周期的字符串，可以使用 const-string 版本的 `SetString()`，它没有
+allocator 参数。对于字符串字面量（或字符数组常量），只需简单地传递字面量，又安全又高效：
 
 ~~~~~~~~~~cpp
 Value s;
-s.SetString("rapidjson");    // 可包含空字符，长度在编译萁推导
+s.SetString("rapidjson");    // 可包含空字符，长度在编译期推导
 s = "rapidjson";             // 上行的缩写
 ~~~~~~~~~~
 
@@ -446,7 +447,7 @@ contact.PushBack(val, document.GetAllocator());
 ~~~~~~~~~~
 
 ## 修改 Object {#ModifyObject}
-Object 是键值对的集合。每个键必须为 String。要修改 Object，方法是增加或移除成员。以下的 API 用来增加城员：
+Object 是键值对的集合。每个键必须为 String。要修改 Object，方法是增加或移除成员。以下的 API 用来增加成员：
 
 * `Value& AddMember(Value&, Value&, Allocator& allocator)`
 * `Value& AddMember(StringRefType, Value&, Allocator&)`

@@ -85,14 +85,6 @@ z180asci_channel_base::z180asci_channel_base(const machine_config &mconfig, devi
 }
 
 
-void z180asci_channel_base::device_resolve_objects()
-{
-	// resolve callbacks
-	m_txa_handler.resolve_safe();
-	m_rts_handler.resolve_safe();
-	m_cka_handler.resolve_safe();
-}
-
 void z180asci_channel_base::device_start()
 {
 	save_item(NAME(m_asci_cntla));
@@ -220,7 +212,7 @@ uint8_t z180asci_channel_base::cntla_r()
 
 uint8_t z180asci_channel_base::cntlb_r()
 {
-	uint8_t data = (m_asci_cntlb & 0x0d) | (m_cts << 5);
+	uint8_t data = (m_asci_cntlb & 0xdf) | (m_cts << 5);
 	LOG("Z180 CNTLB%d rd $%02x\n", m_id, data);
 	return data;
 }
@@ -341,29 +333,29 @@ void z180asci_channel_base::astch_w(uint8_t data)
 	device_clock_changed();
 }
 
-DECLARE_WRITE_LINE_MEMBER( z180asci_channel_base::cts_wr )
+void z180asci_channel_base::cts_wr(int state)
 {
 	if (m_id)
 	{
 		// For channel 1, CTS can be disabled
-		if ((m_asci_stat && Z180_STAT1_CTS1E) == 0) return;
+		if ((m_asci_stat & Z180_STAT1_CTS1E) == 0) return;
 	}
 	else
 	{
 		// For channel 0, high resets TDRE
-		if (m_ext && state && (m_asci_ext && Z180_ASEXT_CTS0) == 0)
+		if (m_ext && state && (m_asci_ext & Z180_ASEXT_CTS0) == 0)
 			m_asci_stat |= Z180_STAT_TDRE;
 	}
 	m_cts = state;
 }
 
-DECLARE_WRITE_LINE_MEMBER( z180asci_channel_base::dcd_wr )
+void z180asci_channel_base::dcd_wr(int state)
 {
 	if (m_id)
 		return;
 
 	// In extended mode, DCD autoenables RX if configured
-	if (m_ext && (m_asci_ext && Z180_ASEXT_DCD0) == 0)
+	if (m_ext && (m_asci_ext & Z180_ASEXT_DCD0) == 0)
 	{
 		m_rx_enabled = state ? false : true;
 		if (state)
@@ -375,15 +367,15 @@ DECLARE_WRITE_LINE_MEMBER( z180asci_channel_base::dcd_wr )
 		m_irq = 1;
 }
 
-DECLARE_WRITE_LINE_MEMBER( z180asci_channel_base::rxa_wr )
+void z180asci_channel_base::rxa_wr(int state)
 {
 	m_rxa = state;
 }
 
-DECLARE_WRITE_LINE_MEMBER( z180asci_channel_base::cka_wr )
+void z180asci_channel_base::cka_wr(int state)
 {
 	// For channel 1, CKA can be disabled
-	if (m_id && (m_asci_cntla && Z180_CNTLA1_CKA1D)) return;
+	if (m_id && (m_asci_cntla & Z180_CNTLA1_CKA1D)) return;
 
 	if(state != m_clock_state)
 	{
@@ -471,31 +463,31 @@ void z180asci_channel_base::transmit_edge()
 void z180asci_channel_base::update_received()
 {
 	uint8_t rx_error = 0;
-	int stop_bits = (m_asci_cntla & Z180_CNTLA_MODE_STOPB) ? 2 : 1;
+	int data_bits = (m_asci_cntla & Z180_CNTLA_MODE_DATA) ? 8 : 7;
 	if (m_rsr == 0) // Break detect
 	{
 		m_asci_ext |= Z180_ASEXT_BRK_DET;
 	}
-	uint8_t stop_val = (m_asci_cntla & Z180_CNTLA_MODE_STOPB) ? 3: 1;
-	if ((m_rsr & stop_val) != stop_val)
+	if (m_rxa == 0)
 		rx_error |= Z180_STAT_FE;
 
 	if (m_asci_cntlb & Z180_CNTLB_MP)
 	{
-		m_asci_cntla |= ((m_rsr >> stop_bits) & 1) ? Z180_CNTLA_MPBR_EFR : 0;
+		m_asci_cntla |= ((m_rsr >> data_bits) & 1) ? Z180_CNTLA_MPBR_EFR : 0;
 	}
 	else if (m_asci_cntla & Z180_CNTLA_MODE_PARITY)
 	{
 		uint8_t parity = 0;
-		for (int i = 0; i < ((m_asci_cntla & Z180_CNTLA_MODE_DATA) ? 8 : 7); i++)
+		for (int i = 0; i < data_bits; i++)
 			parity ^= BIT(m_rsr, i);
 		if (m_asci_cntlb & Z180_CNTLB_PEO) parity ^= 1; // odd parity
-		if (((m_rsr >> stop_bits) & 1) != parity)
+		if (((m_rsr >> data_bits) & 1) != parity)
 			rx_error |= Z180_STAT_PE;
 	}
 	// Skip only if MPE mode active and MPB is 0
 	if (!((m_asci_cntla & Z180_CNTLA_MPE) && ((m_asci_cntla & Z180_CNTLA_MPBR_EFR) == 0)))
 	{
+		LOG("%s: %X received%s%s\n", machine().time().to_string(), m_rsr, (rx_error & Z180_STAT_FE) ? " (framing error)" : "", (rx_error & Z180_STAT_PE) ? " (bad parity)" : "");
 		set_fifo_data(m_rsr, rx_error);
 	}
 }

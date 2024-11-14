@@ -105,20 +105,20 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(reset_button);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	void round_leds_w(offs_t offset, u8 data);
 	u8 keyboard_r();
 	u8 port13_r();
-	DECLARE_READ_LINE_MEMBER(si);
-	DECLARE_WRITE_LINE_MEMBER(so);
+	int si();
+	void so(int state);
 	TIMER_DEVICE_CALLBACK_MEMBER(kansas_r);
-	DECLARE_WRITE_LINE_MEMBER(kansas_w);
+	void kansas_w(int state);
 
-	void io_map(address_map &map);
-	void mem_map(address_map &map);
+	void io_map(address_map &map) ATTR_COLD;
+	void mem_map(address_map &map) ATTR_COLD;
 
 	u8 m_cass_data[4]{};
 	bool m_cassinbit = 0, m_cassoutbit = 0, m_cassold = 0;
@@ -176,17 +176,17 @@ u8 mmd1_state::port13_r()
 	return data;
 }
 
-READ_LINE_MEMBER( mmd1_state::si )
+int mmd1_state::si()
 {
 	return m_cassinbit;
 }
 
-WRITE_LINE_MEMBER( mmd1_state::so )
+void mmd1_state::so(int state)
 {
 	m_cassoutbit = state;
 }
 
-WRITE_LINE_MEMBER( mmd1_state::kansas_w )
+void mmd1_state::kansas_w(int state)
 {
 	if ((m_cass->get_state() & CASSETTE_MASK_UISTATE) == CASSETTE_RECORD)
 	{
@@ -279,7 +279,7 @@ static INPUT_PORTS_START( mmd1 )
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("B") PORT_CODE(KEYCODE_B)
 
 	PORT_START("LINE3")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("R") PORT_CODE(KEYCODE_R) PORT_CODE(KEYCODE_LALT) PORT_CHANGED_MEMBER(DEVICE_SELF, mmd1_state, reset_button, 0)
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("R") PORT_CODE(KEYCODE_R) PORT_CODE(KEYCODE_LALT) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(mmd1_state::reset_button), 0)
 INPUT_PORTS_END
 
 INPUT_CHANGED_MEMBER(mmd1_state::reset_button)

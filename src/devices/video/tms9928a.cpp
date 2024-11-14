@@ -213,8 +213,7 @@ void tms9928a_device::check_interrupt()
 	if (b != m_INT)
 	{
 		m_INT = b;
-		if ( !m_out_int_line_cb.isnull() )
-			m_out_int_line_cb( m_INT );
+		m_out_int_line_cb(m_INT);
 	}
 }
 
@@ -725,9 +724,6 @@ void tms9928a_device::device_start()
 	m_top_border = m_50hz ? VERT_DISPLAY_START_PAL : VERT_DISPLAY_START_NTSC;
 	m_vertical_size = m_50hz ? TOTAL_VERT_PAL : TOTAL_VERT_NTSC;
 
-	m_out_int_line_cb.resolve();
-	m_out_gromclk_cb.resolve();
-
 	// Video RAM is allocated as an own address space
 	m_vram_space = &space(AS_DATA);
 
@@ -790,6 +786,6 @@ void tms9928a_device::device_reset()
 	m_line_timer->adjust( screen().time_until_pos( 0, HORZ_DISPLAY_START ) );
 
 	// TODO: Check clock freq settings in all drivers
-	if (!m_out_gromclk_cb.isnull() && m_99)
+	if (!m_out_gromclk_cb.isunset() && m_99)
 		m_gromclk_timer->adjust(attotime::zero, 0, clocks_to_attotime(24));
 }

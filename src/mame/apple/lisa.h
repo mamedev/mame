@@ -8,8 +8,8 @@
  *
  ****************************************************************************/
 
-#ifndef MAME_INCLUDES_LISA_H
-#define MAME_INCLUDES_LISA_H
+#ifndef MAME_APPLE_LISA_H
+#define MAME_APPLE_LISA_H
 
 #include "cpu/m6502/m6504.h"
 #include "cpu/m68000/m68000.h"
@@ -17,12 +17,14 @@
 #include "machine/6522via.h"
 #include "machine/6522via.h"
 #include "machine/8530scc.h"
-#include "machine/applefdc.h"
+#include "machine/applefdintf.h"
+#include "machine/iwm.h"
 #include "machine/nvram.h"
-#include "machine/sonydriv.h"
 #include "sound/spkrdev.h"
 #include "emupal.h"
 #include "screen.h"
+
+#include "formats/ap_dsk35.h"
 
 /* lisa MMU segment regs */
 struct real_mmu_entry
@@ -107,6 +109,7 @@ public:
 		m_via0(*this, "via6522_0"),
 		m_via1(*this, "via6522_1"),
 		m_fdc(*this, "fdc"),
+		m_floppy(*this, "fdc:%d", 0U),
 		m_scc(*this, "scc"),
 		m_speaker(*this, "speaker"),
 		m_nvram(*this, "nvram"),
@@ -139,7 +142,8 @@ private:
 	required_device<m68000_base_device> m_maincpu;
 	required_device<via6522_device> m_via0;
 	required_device<via6522_device> m_via1;
-	optional_device<applefdc_base_device> m_fdc;
+	required_device<applefdintf_device> m_fdc;
+	required_device_array<floppy_connector, 2> m_floppy;
 	required_device<scc8530_legacy_device> m_scc;
 	required_device<speaker_sound_device> m_speaker;
 	required_device<nvram_device> m_nvram;
@@ -211,18 +215,18 @@ private:
 	void lisa_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	uint16_t lisa_IO_r(offs_t offset, uint16_t mem_mask = ~0);
 	void lisa_IO_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-	DECLARE_WRITE_LINE_MEMBER(diag1_w);
-	DECLARE_WRITE_LINE_MEMBER(diag2_w);
-	DECLARE_WRITE_LINE_MEMBER(seg1_w);
-	DECLARE_WRITE_LINE_MEMBER(seg2_w);
-	DECLARE_WRITE_LINE_MEMBER(setup_w);
-	DECLARE_WRITE_LINE_MEMBER(vtmsk_w);
-	DECLARE_WRITE_LINE_MEMBER(sfmsk_w);
-	DECLARE_WRITE_LINE_MEMBER(hdmsk_w);
+	void diag1_w(int state);
+	void diag2_w(int state);
+	void seg1_w(int state);
+	void seg2_w(int state);
+	void setup_w(int state);
+	void vtmsk_w(int state);
+	void sfmsk_w(int state);
+	void hdmsk_w(int state);
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 	void nvram_init(nvram_device &nvram, void *data, size_t size);
 	uint32_t screen_update_lisa(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(lisa_interrupt);
@@ -230,9 +234,9 @@ private:
 	TIMER_CALLBACK_MEMBER(read_COPS_command);
 	TIMER_CALLBACK_MEMBER(set_COPS_ready);
 	void COPS_via_out_a(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(COPS_via_out_ca2);
+	void COPS_via_out_ca2(int state);
 	void COPS_via_out_b(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(COPS_via_out_cb2);
+	void COPS_via_out_cb2(int state);
 
 	void field_interrupts();
 	void set_parity_error_pending(int value);
@@ -247,9 +251,9 @@ private:
 	void scan_keyboard();
 	void unplug_keyboard();
 	void plug_keyboard();
-	void lisa210_fdc_map(address_map &map);
-	void lisa_fdc_map(address_map &map);
-	void lisa_map(address_map &map);
+	void lisa210_fdc_map(address_map &map) ATTR_COLD;
+	void lisa_fdc_map(address_map &map) ATTR_COLD;
+	void lisa_map(address_map &map) ATTR_COLD;
 };
 
-#endif // MAME_INCLUDES_LISA_H
+#endif // MAME_APPLE_LISA_H

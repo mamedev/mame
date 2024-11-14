@@ -23,25 +23,25 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// optional information overrides
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual ioport_constructor device_input_ports() const override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 
 	// kcexp_interface overrides
 	virtual void read(offs_t offset, uint8_t &data) override;
 	virtual void write(offs_t offset, uint8_t data) override;
 	virtual void io_read(offs_t offset, uint8_t &data) override;
 	virtual void io_write(offs_t offset, uint8_t data) override;
-	virtual DECLARE_WRITE_LINE_MEMBER( mei_w ) override;
+	virtual void mei_w(int state) override;
 
 private:
 	// interface callbacks
-	DECLARE_WRITE_LINE_MEMBER( out_irq_w );
-	DECLARE_WRITE_LINE_MEMBER( out_nmi_w );
-	DECLARE_WRITE_LINE_MEMBER( out_halt_w );
+	void out_irq_w(int state);
+	void out_nmi_w(int state);
+	void out_halt_w(int state);
 
 	kcexp_slot_device *m_slot;
 

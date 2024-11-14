@@ -26,13 +26,13 @@ public:
 	virtual ~hp82937_io_card_device();
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// device-level overrides
-	virtual ioport_constructor device_input_ports() const override;
-	virtual const tiny_rom_entry *device_rom_region() const override;
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 	virtual void install_read_write_handlers(address_space& space , uint16_t base_addr) override;
 
@@ -51,17 +51,17 @@ private:
 	uint8_t m_latch;    // U3
 	bool m_updating;
 
-	DECLARE_WRITE_LINE_MEMBER(reset_w);
-	DECLARE_READ_LINE_MEMBER(t0_r);
+	void reset_w(int state);
+	int t0_r();
 	uint8_t p1_r();
 	void p1_w(uint8_t data);
 	uint8_t dio_r();
 	void dio_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(ieee488_ctrl_w);
+	void ieee488_ctrl_w(int state);
 	uint8_t switch_r();
 	void latch_w(uint8_t data);
 
-	void cpu_io_map(address_map &map);
+	void cpu_io_map(address_map &map) ATTR_COLD;
 
 	void update_data_out();
 	void update_signals();

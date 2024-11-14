@@ -6,8 +6,8 @@
     Midway 8080-based black and white hardware
 
 ****************************************************************************/
-#ifndef MAME_INCLUDES_MW8080BW_H
-#define MAME_INCLUDES_MW8080BW_H
+#ifndef MAME_MIDW8080_MW8080BW_H
+#define MAME_MIDW8080_MW8080BW_H
 
 #pragma once
 
@@ -56,7 +56,6 @@ public:
 	{ }
 
 	void blueshrk(machine_config &config);
-	void bowler(machine_config &config);
 	void checkmat(machine_config &config);
 	void dogpatch(machine_config &config);
 	void invad2ct(machine_config &config);
@@ -68,20 +67,20 @@ public:
 
 	DECLARE_INPUT_CHANGED_MEMBER(direct_coin_count);
 
-	DECLARE_CUSTOM_INPUT_MEMBER(tornbase_hit_left_input_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(tornbase_hit_right_input_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(tornbase_pitch_left_input_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(tornbase_pitch_right_input_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(tornbase_score_input_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(blueshrk_coin_input_r);
+	ioport_value tornbase_hit_left_input_r();
+	ioport_value tornbase_hit_right_input_r();
+	ioport_value tornbase_pitch_left_input_r();
+	ioport_value tornbase_pitch_right_input_r();
+	ioport_value tornbase_score_input_r();
+	ioport_value blueshrk_coin_input_r();
 
 	IRQ_CALLBACK_MEMBER(interrupt_vector);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
-	DECLARE_WRITE_LINE_MEMBER(int_enable_w);
+	void int_enable_w(int state);
 
 	u8 mw8080bw_shift_result_rev_r();
 
@@ -112,25 +111,16 @@ private:
 	void maze_coin_counter_w(uint8_t data);
 	void maze_io_w(offs_t offset, uint8_t data);
 	void checkmat_io_w(offs_t offset, uint8_t data);
-	uint8_t bowler_shift_result_r();
-	void bowler_lights_1_w(uint8_t data);
-	void bowler_lights_2_w(uint8_t data);
-	void bowler_audio_2_w(uint8_t data);
-	void bowler_audio_3_w(uint8_t data);
-	void bowler_audio_4_w(uint8_t data);
-	void bowler_audio_5_w(uint8_t data);
-	void bowler_audio_6_w(uint8_t data);
 	DECLARE_MACHINE_START(maze);
 	DECLARE_MACHINE_START(phantom2);
 	uint32_t screen_update_phantom2(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	DECLARE_WRITE_LINE_MEMBER(screen_vblank_phantom2);
+	void screen_vblank_phantom2(int state);
 	TIMER_CALLBACK_MEMBER(maze_tone_timing_timer_callback);
 	TIMER_CALLBACK_MEMBER(interrupt_trigger);
 	void tornbase_audio_w(uint8_t data);
 	void checkmat_audio_w(uint8_t data);
 	void shuffle_audio_1_w(uint8_t data);
 	void shuffle_audio_2_w(uint8_t data);
-	void bowler_audio_1_w(uint8_t data);
 	void blueshrk_audio_w(uint8_t data);
 	void maze_update_discrete();
 	void maze_write_discrete(uint8_t maze_tone_timing_state);
@@ -139,22 +129,20 @@ private:
 	uint8_t tornbase_get_cabinet_type();
 
 	void blueshrk_audio(machine_config &config);
-	void bowler_audio(machine_config &config);
 	void checkmat_audio(machine_config &config);
 	void maze_audio(machine_config &config);
 	void shuffle_audio(machine_config &config);
 	void tornbase_audio(machine_config &config);
 
-	void blueshrk_io_map(address_map &map);
-	void bowler_io_map(address_map &map);
-	void checkmat_io_map(address_map &map);
-	void dogpatch_io_map(address_map &map);
-	void invad2ct_io_map(address_map &map);
-	void main_map(address_map &map);
-	void maze_io_map(address_map &map);
-	void phantom2_io_map(address_map &map);
-	void shuffle_io_map(address_map &map);
-	void tornbase_io_map(address_map &map);
+	void blueshrk_io_map(address_map &map) ATTR_COLD;
+	void checkmat_io_map(address_map &map) ATTR_COLD;
+	void dogpatch_io_map(address_map &map) ATTR_COLD;
+	void invad2ct_io_map(address_map &map) ATTR_COLD;
+	void main_map(address_map &map) ATTR_COLD;
+	void maze_io_map(address_map &map) ATTR_COLD;
+	void phantom2_io_map(address_map &map) ATTR_COLD;
+	void shuffle_io_map(address_map &map) ATTR_COLD;
+	void tornbase_io_map(address_map &map) ATTR_COLD;
 };
 
 
@@ -177,16 +165,16 @@ public:
 
 	void seawolf(machine_config &config);
 
-	DECLARE_CUSTOM_INPUT_MEMBER(erase_input_r);
+	ioport_value erase_input_r();
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	void explosion_lamp_w(u8 data);
 	void periscope_lamp_w(u8 data);
 
-	void io_map(address_map &map);
+	void io_map(address_map &map) ATTR_COLD;
 
 	required_ioport m_erase_sw;
 	required_ioport m_erase_dip;
@@ -211,7 +199,7 @@ public:
 private:
 	void io_w(offs_t offset, u8 data);
 
-	void io_map(address_map &map);
+	void io_map(address_map &map) ATTR_COLD;
 
 	required_device<gunfight_audio_device> m_soundboard;
 };
@@ -230,15 +218,15 @@ public:
 	void m4(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	u8 reversible_shift_result_r();
 	void reversible_shift_count_w(u8 data);
 
-	void boothill_io_map(address_map &map);
-	void gmissile_io_map(address_map &map);
-	void m4_io_map(address_map &map);
+	void boothill_io_map(address_map &map) ATTR_COLD;
+	void gmissile_io_map(address_map &map) ATTR_COLD;
+	void m4_io_map(address_map &map) ATTR_COLD;
 
 	u8 m_rev_shift_res = 0;
 };
@@ -262,14 +250,14 @@ public:
 
 	void desertgu(machine_config &config);
 
-	DECLARE_CUSTOM_INPUT_MEMBER(gun_input_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(dip_sw_0_1_r);
+	ioport_value gun_input_r();
+	ioport_value dip_sw_0_1_r();
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
-	void io_map(address_map &map);
+	void io_map(address_map &map) ATTR_COLD;
 
 	required_ioport_array<2> m_gun_port;
 	required_ioport_array<2> m_dip_sw_0_1;
@@ -294,11 +282,11 @@ public:
 
 	void dplay(machine_config &config);
 
-	DECLARE_CUSTOM_INPUT_MEMBER(dplay_pitch_left_input_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(dplay_pitch_right_input_r);
+	ioport_value dplay_pitch_left_input_r();
+	ioport_value dplay_pitch_right_input_r();
 
 private:
-	void io_map(address_map &map);
+	void io_map(address_map &map) ATTR_COLD;
 
 	required_ioport m_l_pitch;
 	required_ioport m_r_pitch;
@@ -318,14 +306,14 @@ public:
 	void clowns(machine_config &config);
 	void spacwalk(machine_config &config);
 
-	DECLARE_CUSTOM_INPUT_MEMBER(controller_r);
+	ioport_value controller_r();
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
-	void clowns_io_map(address_map &map);
-	void spacwalk_io_map(address_map &map);
+	void clowns_io_map(address_map &map) ATTR_COLD;
+	void spacwalk_io_map(address_map &map) ATTR_COLD;
 
 	required_ioport_array<2> m_controllers;
 	u8 m_controller_select = 0;
@@ -344,14 +332,14 @@ public:
 	void spcenctr(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	void io_w(offs_t offset, u8 data);
 
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, rectangle const &cliprect);
 
-	void io_map(address_map &map);
+	void io_map(address_map &map) ATTR_COLD;
 
 	required_device<spcenctr_audio_device> m_soundboard;
 	u8 m_trench_width = 0;
@@ -378,7 +366,7 @@ protected:
 	void zzzap_common(machine_config &config);
 
 private:
-	void io_map(address_map &map);
+	void io_map(address_map &map) ATTR_COLD;
 };
 
 
@@ -400,14 +388,14 @@ public:
 
 	void invaders(machine_config &config);
 
-	DECLARE_CUSTOM_INPUT_MEMBER(invaders_sw6_sw7_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(invaders_sw5_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(invaders_in0_control_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(invaders_in1_control_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(invaders_in2_control_r);
+	ioport_value invaders_sw6_sw7_r();
+	ioport_value invaders_sw5_r();
+	ioport_value invaders_in0_control_r();
+	ioport_value invaders_in1_control_r();
+	ioport_value invaders_in2_control_r();
 
 protected:
-	void machine_start() override;
+	void machine_start() override ATTR_COLD;
 
 	bool is_cabinet_cocktail();
 
@@ -419,7 +407,65 @@ protected:
 	uint8_t m_flip_screen = 0;
 
 private:
-	void io_map(address_map &map);
+	void io_map(address_map &map) ATTR_COLD;
+};
+
+class bowler_state : public mw8080bw_state
+{
+public:
+	bowler_state(machine_config const &mconfig, device_type type, char const *tag) :
+		mw8080bw_state(mconfig, type, tag),
+		m_200_left_light(*this, "200_LEFT_LIGHT"),
+		m_200_right_light(*this, "200_RIGHT_LIGHT"),
+		m_400_left_light(*this, "400_LEFT_LIGHT"),
+		m_400_right_light(*this, "400_RIGHT_LIGHT"),
+		m_500_left_light(*this, "500_LEFT_LIGHT"),
+		m_500_right_light(*this, "500_RIGHT_LIGHT"),
+		m_700_light(*this, "700_LIGHT"),
+		m_x_left_light(*this, "X_LEFT_LIGHT"),
+		m_x_right_light(*this, "X_RIGHT_LIGHT"),
+		m_regulation_game_light(*this, "REGULATION_GAME_LIGHT"),
+		m_flash_game_light(*this, "FLASH_GAME_LIGHT"),
+		m_straight_ball_light(*this, "STRAIGHT_BALL_LIGHT"),
+		m_hook_ball_light(*this, "HOOK_BALL_LIGHT"),
+		m_select_game_light(*this, "SELECT_GAME_LIGHT")
+	{
+	}
+
+	void bowler(machine_config &config);
+
+protected:
+	virtual void machine_start() override ATTR_COLD;
+
+private:
+	output_finder<> m_200_left_light;
+	output_finder<> m_200_right_light;
+	output_finder<> m_400_left_light;
+	output_finder<> m_400_right_light;
+	output_finder<> m_500_left_light;
+	output_finder<> m_500_right_light;
+	output_finder<> m_700_light;
+	output_finder<> m_x_left_light;
+	output_finder<> m_x_right_light;
+	output_finder<> m_regulation_game_light;
+	output_finder<> m_flash_game_light;
+	output_finder<> m_straight_ball_light;
+	output_finder<> m_hook_ball_light;
+	output_finder<> m_select_game_light;
+
+	uint8_t shift_result_r();
+	void lights_1_w(uint8_t data);
+	void lights_2_w(uint8_t data);
+	void audio_1_w(uint8_t data);
+	void audio_2_w(uint8_t data);
+	void audio_3_w(uint8_t data);
+	void audio_4_w(uint8_t data);
+	void audio_5_w(uint8_t data);
+	void audio_6_w(uint8_t data);
+
+	void audio(machine_config &config);
+
+	void io_map(address_map &map) ATTR_COLD;
 };
 
 
@@ -452,4 +498,4 @@ private:
 
 extern const internal_layout layout_invaders;
 
-#endif // MAME_INCLUDES_MW8080BW_H
+#endif // MAME_MIDW8080_MW8080BW_H

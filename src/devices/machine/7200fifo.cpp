@@ -11,7 +11,7 @@
 **********************************************************************/
 
 #include "emu.h"
-#include "machine/7200fifo.h"
+#include "7200fifo.h"
 
 
 DEFINE_DEVICE_TYPE(IDT7200, idt7200_device, "idt7200", "IDT7200 FIFO (256x9)")
@@ -22,13 +22,13 @@ DEFINE_DEVICE_TYPE(IDT7202, idt7202_device, "idt7202", "IDT7202 FIFO (1024x9)")
 //  fifo7200_device - constructor
 //-------------------------------------------------
 
-fifo7200_device::fifo7200_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, int size)
-	: device_t(mconfig, type, tag, owner, (uint32_t)0),
-		m_ram_size(size),
-		m_read_ptr(0), m_write_ptr(0), m_ef(0), m_ff(0), m_hf(0),
-		m_ef_handler(*this),
-		m_ff_handler(*this),
-		m_hf_handler(*this)
+fifo7200_device::fifo7200_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, int size) :
+	device_t(mconfig, type, tag, owner, (uint32_t)0),
+	m_ram_size(size),
+	m_read_ptr(0), m_write_ptr(0), m_ef(0), m_ff(0), m_hf(0),
+	m_ef_handler(*this),
+	m_ff_handler(*this),
+	m_hf_handler(*this)
 {
 }
 
@@ -37,8 +37,8 @@ fifo7200_device::fifo7200_device(const machine_config &mconfig, device_type type
 //  idt7200_device - constructor
 //-------------------------------------------------
 
-idt7200_device::idt7200_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	 : fifo7200_device(mconfig, IDT7200, tag, owner, 0x100)
+idt7200_device::idt7200_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	 fifo7200_device(mconfig, IDT7200, tag, owner, 0x100)
 {
 }
 
@@ -47,8 +47,8 @@ idt7200_device::idt7200_device(const machine_config &mconfig, const char *tag, d
 //  idt7201_device - constructor
 //-------------------------------------------------
 
-idt7201_device::idt7201_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	 : fifo7200_device(mconfig, IDT7201, tag, owner, 0x200)
+idt7201_device::idt7201_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	 fifo7200_device(mconfig, IDT7201, tag, owner, 0x200)
 {
 }
 
@@ -57,8 +57,8 @@ idt7201_device::idt7201_device(const machine_config &mconfig, const char *tag, d
 //  idt7202_device - constructor
 //-------------------------------------------------
 
-idt7202_device::idt7202_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	 : fifo7200_device(mconfig, IDT7202, tag, owner, 0x400)
+idt7202_device::idt7202_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	 fifo7200_device(mconfig, IDT7202, tag, owner, 0x400)
 {
 }
 
@@ -71,11 +71,6 @@ void fifo7200_device::device_start()
 {
 	assert(m_ram_size > 1 && ~m_ram_size & 1);
 	m_buffer.resize(m_ram_size);
-
-	// resolve callbacks
-	m_ef_handler.resolve_safe();
-	m_ff_handler.resolve_safe();
-	m_hf_handler.resolve_safe();
 
 	// state save
 	save_item(NAME(m_buffer));

@@ -1,8 +1,8 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
-<!-- license:CC0 -->
+<!-- license:CC0-1.0 -->
 
-<softwarelist name="leapster_explorer_cart" description="LeapFrog Leapster Explorer Cartridges">
+<softwarelist name="leapster_explorer_cart" description="LeapFrog Leapster Explorer cartridges">
 
 	<software name="tblt" supported="no">
 		<description>TinkerBell and the Lost Treasure (USA)</description>

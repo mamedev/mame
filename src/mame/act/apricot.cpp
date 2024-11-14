@@ -36,6 +36,9 @@
 #include "speaker.h"
 
 
+namespace {
+
+
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
@@ -56,8 +59,7 @@ public:
 		m_rs232(*this, "rs232"),
 		m_centronics(*this, "centronics"),
 		m_fdc(*this, "ic68"),
-		m_floppy0(*this, "ic68:0"),
-		m_floppy1(*this, "ic68:1"),
+		m_floppy(*this, "ic68:%u", 0U),
 		m_palette(*this, "palette"),
 		m_exp(*this, "exp"),
 		m_screen_buffer(*this, "screen_buffer"),
@@ -75,30 +77,30 @@ public:
 private:
 	static void floppy_formats(format_registration &fr);
 
-	DECLARE_WRITE_LINE_MEMBER(i8086_lock_w);
+	void i8086_lock_w(int state);
 	void i8089_ca1_w(uint8_t data);
 	void i8089_ca2_w(uint8_t data);
 	void i8255_portb_w(uint8_t data);
 	uint8_t i8255_portc_r();
 	void i8255_portc_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(fdc_intrq_w);
+	void fdc_intrq_w(int state);
 	uint8_t sio_da_r();
 	uint8_t sio_ca_r();
 	uint8_t sio_db_r();
 	uint8_t sio_cb_r();
 
-	DECLARE_WRITE_LINE_MEMBER(write_centronics_fault);
-	DECLARE_WRITE_LINE_MEMBER(write_centronics_perror);
+	void write_centronics_fault(int state);
+	void write_centronics_perror(int state);
 
-	DECLARE_WRITE_LINE_MEMBER(apricot_hd6845_de) { m_display_enabled = state; };
+	void apricot_hd6845_de(int state) { m_display_enabled = state; };
 
 	MC6845_UPDATE_ROW(crtc_update_row);
 	uint32_t screen_update_apricot(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	void apricot_io(address_map &map);
-	void apricot_mem(address_map &map);
+	void apricot_io(address_map &map) ATTR_COLD;
+	void apricot_mem(address_map &map) ATTR_COLD;
 
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 	required_device<i8086_cpu_device> m_cpu;
 	required_device<i8089_device> m_iop;
@@ -111,8 +113,7 @@ private:
 	required_device<rs232_port_device> m_rs232;
 	required_device<centronics_device> m_centronics;
 	required_device<wd2797_device> m_fdc;
-	required_device<floppy_connector> m_floppy0;
-	required_device<floppy_connector> m_floppy1;
+	required_device_array<floppy_connector, 2> m_floppy;
 	required_device<palette_device> m_palette;
 	required_device<apricot_expansion_bus_device> m_exp;
 	required_shared_ptr<uint16_t> m_screen_buffer;
@@ -147,14 +148,14 @@ void apricot_state::i8089_ca2_w(uint8_t data)
 	m_iop->ca_w(0);
 }
 
-WRITE_LINE_MEMBER( apricot_state::write_centronics_fault )
+void apricot_state::write_centronics_fault(int state)
 {
 	m_centronics_fault = state;
 	m_sio->syncb_w(state);
 	m_ppi->pc2_w(state);
 }
 
-WRITE_LINE_MEMBER( apricot_state::write_centronics_perror )
+void apricot_state::write_centronics_perror(int state)
 {
 	m_centronics_perror = state;
 }
@@ -173,22 +174,26 @@ uint8_t apricot_state::i8255_portc_r()
 
 void apricot_state::i8255_portb_w(uint8_t data)
 {
-	// bit 0, crt reset
-	// bit 1, not connected
+	// 7-------  centronics transceiver direction (0 = output)
+	// -6------  disk select
+	// --5-----  enable disk select
+	// ---4----  video mode
+	// ----3---  display enabled
+	// -----2--  head load
+	// ------1-  not used
+	// -------0  crtc reset
 
 	m_display_on = BIT(data, 3);
 	m_video_mode = BIT(data, 4);
 
 	floppy_image_device *floppy = nullptr;
 
-	// bit 5, enable disk select
-	// bit 6, disk select
 	if (!BIT(data, 5))
-		floppy = BIT(data, 6) ? m_floppy1->get_device() : m_floppy0->get_device();
+		floppy = m_floppy[BIT(data, 6)]->get_device();
 
 	m_fdc->set_floppy(floppy);
 
-	// bit 2, head load (motor on is wired to be active once a disk has been inserted)
+	// motor on is wired to be active once a disk has been inserted
 	// we just let the motor run all the time for now
 	if (floppy)
 		floppy->mon_w(0);
@@ -196,8 +201,6 @@ void apricot_state::i8255_portb_w(uint8_t data)
 	// switch video modes
 	m_crtc->set_unscaled_clock(15_MHz_XTAL / (m_video_mode ? 10 : 16));
 	m_crtc->set_hpixels_per_column(m_video_mode ? 10 : 16);
-
-	// PB7 Centronics transceiver direction. 0 = output, 1 = input
 }
 
 void apricot_state::i8255_portc_w(uint8_t data)
@@ -244,7 +247,7 @@ uint8_t apricot_state::sio_db_r()
 //  FLOPPY
 //**************************************************************************
 
-WRITE_LINE_MEMBER( apricot_state::fdc_intrq_w )
+void apricot_state::fdc_intrq_w(int state)
 {
 	m_pic->ir4_w(state);
 	m_iop->ext1_w(state);
@@ -253,7 +256,6 @@ WRITE_LINE_MEMBER( apricot_state::fdc_intrq_w )
 void apricot_state::floppy_formats(format_registration &fr)
 {
 	fr.add_mfm_containers();
-
 	fr.add(FLOPPY_APRIDISK_FORMAT);
 }
 
@@ -322,7 +324,7 @@ void apricot_state::machine_start()
 	membank("ram")->set_base(m_ram->pointer());
 }
 
-WRITE_LINE_MEMBER( apricot_state::i8086_lock_w )
+void apricot_state::i8086_lock_w(int state)
 {
 	m_bus_locked = state;
 }
@@ -385,9 +387,7 @@ void apricot_state::apricot(machine_config &config)
 	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_color(rgb_t::green());
-	screen.set_size(800, 400);
-	screen.set_visarea(0, 800-1, 0, 400-1);
-	screen.set_refresh_hz(72);
+	screen.set_raw(15_MHz_XTAL, 950, 0, 800, 426, 0, 400); // should be interlace
 	screen.set_screen_update(FUNC(apricot_state::screen_update_apricot));
 
 	PALETTE(config, m_palette, palette_device::MONOCHROME_HIGHLIGHT);
@@ -470,8 +470,8 @@ void apricot_state::apricot(machine_config &config)
 	WD2797(config, m_fdc, 4_MHz_XTAL / 2);
 	m_fdc->intrq_wr_callback().set(FUNC(apricot_state::fdc_intrq_w));
 	m_fdc->drq_wr_callback().set(m_iop, FUNC(i8089_device::drq1_w));
-	FLOPPY_CONNECTOR(config, "ic68:0", apricot_floppies, "d32w", apricot_state::floppy_formats);
-	FLOPPY_CONNECTOR(config, "ic68:1", apricot_floppies, "d32w", apricot_state::floppy_formats);
+	FLOPPY_CONNECTOR(config, m_floppy[0], apricot_floppies, "d32w", apricot_state::floppy_formats);
+	FLOPPY_CONNECTOR(config, m_floppy[1], apricot_floppies, "d32w", apricot_state::floppy_formats);
 
 	SOFTWARE_LIST(config, "flop_list").set_original("apricot_flop");
 
@@ -510,8 +510,11 @@ ROM_START( apricotxi )
 ROM_END
 
 
+} // anonymous namespace
+
+
 //**************************************************************************
-//  GAME DRIVERS
+//  SYSTEM DRIVERS
 //**************************************************************************
 
 //    YEAR  NAME       PARENT   COMPAT  MACHINE    INPUT  CLASS          INIT        COMPANY  FULLNAME      FLAGS

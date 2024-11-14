@@ -116,16 +116,16 @@
 #include "emu.h"
 #include "pgram.h"
 
-#define LOG_WARN       (1U<<1)
-#define LOG_WP         (1U<<2)
-#define LOG_DSR        (1U<<3)
-#define LOG_RAM        (1U<<4)
-#define LOG_GRAM       (1U<<5)
-#define LOG_GRAMADDR   (1U<<6)
-#define LOG_CRU        (1U<<7)
-#define LOG_BANK       (1U<<8)
+#define LOG_WARN       (1U << 1)
+#define LOG_WP         (1U << 2)
+#define LOG_DSR        (1U << 3)
+#define LOG_RAM        (1U << 4)
+#define LOG_GRAM       (1U << 5)
+#define LOG_GRAMADDR   (1U << 6)
+#define LOG_CRU        (1U << 7)
+#define LOG_BANK       (1U << 8)
 
-#define VERBOSE ( LOG_GENERAL | LOG_WARN )
+#define VERBOSE (LOG_GENERAL | LOG_WARN)
 
 #include "logmacro.h"
 
@@ -541,12 +541,12 @@ INPUT_PORTS_START( pgram_switches )
 		PORT_CONFSETTING(0x01, "PGRAM+ 192K")
 
 	PORT_START( "SW2" )
-	PORT_DIPNAME( 0x01, 0x01, "Activate switch" ) PORT_CHANGED_MEMBER(DEVICE_SELF, pgram_device, sw2_changed, 0)
+	PORT_DIPNAME( 0x01, 0x01, "Activate switch" ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(pgram_device::sw2_changed), 0)
 		PORT_DIPSETTING(0x00, DEF_STR( Off ))
 		PORT_DIPSETTING(0x01, DEF_STR( On ))
 
 	PORT_START( "SW1" )
-	PORT_DIPNAME( 0x07, 0x00, "CRU base" ) PORT_CHANGED_MEMBER(DEVICE_SELF, pgram_device, sw1_changed, 0)
+	PORT_DIPNAME( 0x07, 0x00, "CRU base" ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(pgram_device::sw1_changed), 0)
 		PORT_DIPSETTING( 0x00, "1000")
 		PORT_DIPSETTING( 0x02, "1200")
 		PORT_DIPSETTING( 0x03, "1300")

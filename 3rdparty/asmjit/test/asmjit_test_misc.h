@@ -170,7 +170,7 @@ static void generateSseAlphaBlend(asmjit::BaseEmitter& emitter, bool emitPrologE
 
     if (emitPrologEpilog) {
       FuncDetail func;
-      func.init(FuncSignatureT<void, void*, const void*, size_t>(CallConvId::kHost), cc.environment());
+      func.init(FuncSignature::build<void, void*, const void*, size_t>(), cc.environment());
 
       FuncFrame frame;
       frame.init(func);
@@ -202,7 +202,7 @@ static void generateSseAlphaBlend(asmjit::BaseEmitter& emitter, bool emitPrologE
 
     if (emitPrologEpilog) {
       FuncDetail func;
-      func.init(FuncSignatureT<void, void*, const void*, size_t>(CallConvId::kHost), cc.environment());
+      func.init(FuncSignature::build<void, void*, const void*, size_t>(), cc.environment());
 
       FuncFrame frame;
       frame.init(func);
@@ -242,7 +242,7 @@ static void generateSseAlphaBlend(asmjit::BaseEmitter& emitter, bool emitPrologE
     Xmm v6 = cc.newXmm("v6");
     Xmm v7 = cc.newXmm("v7");
 
-    FuncNode* funcNode = cc.addFunc(FuncSignatureT<void, void*, const void*, size_t>(CallConvId::kHost));
+    FuncNode* funcNode = cc.addFunc(FuncSignature::build<void, void*, const void*, size_t>());
     funcNode->setArg(0, dst);
     funcNode->setArg(1, src);
     funcNode->setArg(2, i);

@@ -78,19 +78,19 @@ hp_dc100_tape_device::hp_dc100_tape_device(const machine_config &mconfig, const 
 	, m_tacho_tick_handler(*this)
 	, m_motion_handler(*this)
 	, m_rd_bit_handler(*this)
-	, m_wr_bit_handler(*this)
+	, m_wr_bit_handler(*this, 0)
 	, m_unit_name()
 	, m_image()
 	, m_image_dirty(false)
 {
 }
 
-image_init_result hp_dc100_tape_device::call_load()
+std::pair<std::error_condition, std::string> hp_dc100_tape_device::call_load()
 {
 	return internal_load(false);
 }
 
-image_init_result hp_dc100_tape_device::call_create(int format_type, util::option_resolution *format_options)
+std::pair<std::error_condition, std::string> hp_dc100_tape_device::call_create(int format_type, util::option_resolution *format_options)
 {
 	return internal_load(true);
 }
@@ -457,13 +457,6 @@ void hp_dc100_tape_device::time_to_next_gap(hti_format_t::tape_pos_t min_gap_siz
 
 void hp_dc100_tape_device::device_start()
 {
-	m_cart_out_handler.resolve_safe();
-	m_hole_handler.resolve_safe();
-	m_tacho_tick_handler.resolve_safe();
-	m_motion_handler.resolve_safe();
-	m_rd_bit_handler.resolve_safe();
-	m_wr_bit_handler.resolve_safe(0);
-
 	save_item(NAME(m_acceleration));
 	save_item(NAME(m_slow_set_point));
 	save_item(NAME(m_fast_set_point));
@@ -596,7 +589,7 @@ void hp_dc100_tape_device::clear_state()
 	set_tape_present(is_loaded());
 }
 
-image_init_result hp_dc100_tape_device::internal_load(bool is_create)
+std::pair<std::error_condition, std::string> hp_dc100_tape_device::internal_load(bool is_create)
 {
 	LOG("load %d\n", is_create);
 
@@ -607,9 +600,8 @@ image_init_result hp_dc100_tape_device::internal_load(bool is_create)
 		auto io = util::random_read_write_fill(image_core_file(), 0);
 		if (!io) {
 			LOG("out of memory\n");
-			seterror(std::errc::not_enough_memory, nullptr);
 			set_tape_present(false);
-			return image_init_result::FAIL;
+			return std::make_pair(std::errc::not_enough_memory, std::string());
 		}
 		m_image.clear_tape();
 		m_image.save_tape(*io);
@@ -617,15 +609,14 @@ image_init_result hp_dc100_tape_device::internal_load(bool is_create)
 		auto io = util::random_read_fill(image_core_file(), 0);
 		if (!io) {
 			LOG("out of memory\n");
-			seterror(std::errc::not_enough_memory, nullptr);
 			set_tape_present(false);
-			return image_init_result::FAIL;
+			return std::make_pair(std::errc::not_enough_memory, std::string());
 		}
 		if (!m_image.load_tape(*io)) {
 			LOG("load failed\n");
-			seterror(image_error::INVALIDIMAGE, "Wrong format");
+			//seterror(image_error::INVALIDIMAGE, "Wrong format");
 			set_tape_present(false);
-			return image_init_result::FAIL;
+			return std::make_pair(image_error::INVALIDIMAGE, std::string());
 		}
 	}
 	LOG("load OK\n");
@@ -633,7 +624,7 @@ image_init_result hp_dc100_tape_device::internal_load(bool is_create)
 	m_image_dirty = false;
 
 	set_tape_present(true);
-	return image_init_result::PASS;
+	return std::make_pair(std::error_condition(), std::string());
 }
 
 void hp_dc100_tape_device::set_tape_present(bool present)

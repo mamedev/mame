@@ -35,7 +35,7 @@ public:
 	void an1x(machine_config &config);
 
 private:
-	void mem_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
 
 	required_device<h83002_device> m_maincpu;
 	required_device<cpu_device> m_pks;
@@ -58,7 +58,7 @@ void an1x_state::an1x(machine_config &config)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0); // 2x HM628128BLFP-8 + CR2450 battery
 
-	HD63705(config, m_pks, 8_MHz_XTAL).set_disable(); // HD63B05V0E65F
+	HD6305V0(config, m_pks, 8_MHz_XTAL).set_disable(); // HD63B05V0E65F
 
 	MULCD(config, "lcd"); // LC7985ND (back-lit)
 

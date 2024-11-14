@@ -504,11 +504,11 @@ void device_gba_cart_interface::rom_alloc(uint32_t size, const char *tag)
 	{
 		if (size < 0x4000000)
 		// we always alloc 32MB of rom region!
-			m_rom = (uint32_t *)device().machine().memory().region_alloc(std::string(tag).append(GBASLOT_ROM_REGION_TAG).c_str(), 0x2000000, 4, ENDIANNESS_LITTLE)->base();
+			m_rom = (uint32_t *)device().machine().memory().region_alloc(std::string(tag).append(GBASLOT_ROM_REGION_TAG), 0x2000000, 4, ENDIANNESS_LITTLE)->base();
 		else
 		{
-			m_rom = (uint32_t *)device().machine().memory().region_alloc(std::string(tag).append(GBASLOT_ROM_REGION_TAG).c_str(), 0x4000000, 4, ENDIANNESS_LITTLE)->base();
-			m_romhlp = (uint32_t *)device().machine().memory().region_alloc(std::string(tag).append(GBAHELP_ROM_REGION_TAG).c_str(), 0x2000000, 4, ENDIANNESS_LITTLE)->base();
+			m_rom = (uint32_t *)device().machine().memory().region_alloc(std::string(tag).append(GBASLOT_ROM_REGION_TAG), 0x4000000, 4, ENDIANNESS_LITTLE)->base();
+			m_romhlp = (uint32_t *)device().machine().memory().region_alloc(std::string(tag).append(GBAHELP_ROM_REGION_TAG), 0x2000000, 4, ENDIANNESS_LITTLE)->base();
 		}
 		m_rom_size = size;
 	}
@@ -617,20 +617,16 @@ static const char *gba_get_slot(int type)
  call load
  -------------------------------------------------*/
 
-image_init_result gba_cart_slot_device::call_load()
+std::pair<std::error_condition, std::string> gba_cart_slot_device::call_load()
 {
 	if (m_cart)
 	{
-		uint8_t *ROM;
-		uint32_t size = loaded_through_softlist() ? get_software_region_length("rom") : length();
-		if (size > 0x4000000)
-		{
-			seterror(image_error::INVALIDIMAGE, "Attempted loading a cart larger than 64MB");
-			return image_init_result::FAIL;
-		}
+		uint32_t const size = loaded_through_softlist() ? get_software_region_length("rom") : length();
+		if (size > 0x400'0000)
+			return std::make_pair(image_error::INVALIDLENGTH, "Cartridges larger than 64MB are not supported");
 
 		m_cart->rom_alloc(size, tag());
-		ROM = (uint8_t *)m_cart->get_rom_base();
+		uint8_t *const ROM = (uint8_t *)m_cart->get_rom_base();
 
 		if (!loaded_through_softlist())
 		{
@@ -670,9 +666,9 @@ image_init_result gba_cart_slot_device::call_load()
 				memcpy(ROM + 0x1000000, ROM, 0x1000000);
 				break;
 		}
-		if (size == 0x4000000)
+		if (size == 0x400'0000)
 		{
-			memcpy((uint8_t *)m_cart->get_romhlp_base(), ROM, 0x2000000);
+			memcpy(m_cart->get_romhlp_base(), ROM, 0x2000000);
 			for (uint32_t i = 0; i < 16; i++)
 			{
 				memcpy((uint8_t *)m_cart->get_romhlp_base() + i * 0x1000, ROM + 0x200, 0x1000);
@@ -682,11 +678,9 @@ image_init_result gba_cart_slot_device::call_load()
 
 		if (m_cart->get_nvram_size())
 			battery_load(m_cart->get_nvram_base(), m_cart->get_nvram_size(), 0x00);
-
-		return image_init_result::PASS;
 	}
 
-	return image_init_result::PASS;
+	return std::make_pair(std::error_condition(), std::string());
 }
 
 
@@ -887,8 +881,7 @@ std::string gba_cart_slot_device::get_default_card_software(get_default_card_sof
 		hook.image_file()->length(len); // FIXME: check error return, guard against excessively large files
 		std::vector<uint8_t> rom(len);
 
-		size_t actual;
-		hook.image_file()->read(&rom[0], len, actual); // FIXME: check error return or read returning short
+		read(*hook.image_file(), &rom[0], len); // FIXME: check error return or read returning short
 
 		int const type = get_cart_type(&rom[0], len);
 		char const *const slot_string = gba_get_slot(type);

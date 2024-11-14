@@ -104,7 +104,7 @@ void williams_cvsd_sound_device::write(u16 data)
 //  reset_write - write to the reset line
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER(williams_cvsd_sound_device::reset_write)
+void williams_cvsd_sound_device::reset_write(int state)
 {
 	// going high halts the CPU
 	if (state)
@@ -188,7 +188,7 @@ void williams_cvsd_sound_device::device_add_mconfig(machine_config &config)
 	MC6809E(config, m_cpu, CVSD_MASTER_CLOCK / 4);
 	m_cpu->set_addrmap(AS_PROGRAM, &williams_cvsd_sound_device::williams_cvsd_map);
 
-	PIA6821(config, m_pia, 0);
+	PIA6821(config, m_pia);
 	m_pia->writepa_handler().set("dac", FUNC(dac_byte_interface::data_w));
 	m_pia->writepb_handler().set(FUNC(williams_cvsd_sound_device::talkback_w));
 	m_pia->ca2_handler().set(m_ym2151, FUNC(ym2151_device::reset_w));
@@ -199,7 +199,7 @@ void williams_cvsd_sound_device::device_add_mconfig(machine_config &config)
 	m_ym2151->irq_handler().set(m_pia, FUNC(pia6821_device::ca1_w)).invert(); // IRQ is not true state
 	m_ym2151->add_route(ALL_OUTPUTS, *this, 0.10);
 
-	MC1408(config, "dac", 0).add_route(ALL_OUTPUTS, *this, 0.25);
+	MC1408(config, "dac").add_route(ALL_OUTPUTS, *this, 0.25);
 
 	HC55516(config, m_hc55516, 0);
 	m_hc55516->add_route(ALL_OUTPUTS, *this, 0.60);
@@ -314,7 +314,7 @@ void williams_narc_sound_device::write(u16 data)
 //  reset_write - write to the reset line
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER(williams_narc_sound_device::reset_write)
+void williams_narc_sound_device::reset_write(int state)
 {
 	// going high halts the CPU
 	if (state)
@@ -654,7 +654,7 @@ void williams_adpcm_sound_device::write(u16 data)
 //  reset_write - write to the reset line
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER(williams_adpcm_sound_device::reset_write)
+void williams_adpcm_sound_device::reset_write(int state)
 {
 	// going high halts the CPU
 	if (state)
@@ -674,7 +674,7 @@ WRITE_LINE_MEMBER(williams_adpcm_sound_device::reset_write)
 //  irq_read - read the sound IRQ state
 //-------------------------------------------------
 
-READ_LINE_MEMBER(williams_adpcm_sound_device::irq_read)
+int williams_adpcm_sound_device::irq_read()
 {
 	return m_sound_int_state;
 }
@@ -841,7 +841,7 @@ TIMER_CALLBACK_MEMBER(williams_adpcm_sound_device::sync_command)
 	{
 		m_cpu->set_input_line(M6809_IRQ_LINE, ASSERT_LINE);
 		m_sound_int_state = 1;
-		machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(100));
+		machine().scheduler().perfect_quantum(attotime::from_usec(100));
 	}
 }
 
@@ -901,9 +901,9 @@ void williams_s4_sound_device::device_add_mconfig(machine_config &config)
 	M6808(config, m_cpu, 3580000);
 	m_cpu->set_addrmap(AS_PROGRAM, &williams_s4_sound_device::williams_s4_map);
 
-	MC1408(config, "dac", 0).add_route(ALL_OUTPUTS, *this, 0.5);
+	MC1408(config, "dac").add_route(ALL_OUTPUTS, *this, 0.5);
 
-	PIA6821(config, m_pia, 0);
+	PIA6821(config, m_pia);
 	m_pia->writepa_handler().set("dac", FUNC(dac_byte_interface::data_w));
 	m_pia->irqa_handler().set_inputline(m_cpu, M6808_IRQ_LINE);
 	m_pia->irqb_handler().set_inputline(m_cpu, M6808_IRQ_LINE);
@@ -933,7 +933,7 @@ INPUT_PORTS_START( williams_s4 )
 	PORT_DIPNAME( 0x40, 0x00, "Sounds" )
 	PORT_DIPSETTING(    0x00, "Set 1" )
 	PORT_DIPSETTING(    0x40, "Set 2" )
-	PORT_BIT( 0x100, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("Audio Diag") PORT_CODE(KEYCODE_9_PAD) PORT_CHANGED_MEMBER(DEVICE_SELF, williams_s4_sound_device, audio_nmi, 1)
+	PORT_BIT( 0x100, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("Audio Diag") PORT_CODE(KEYCODE_9_PAD) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(williams_s4_sound_device::audio_nmi), 1)
 INPUT_PORTS_END
 
 INPUT_CHANGED_MEMBER( williams_s4_sound_device::audio_nmi )
@@ -1013,11 +1013,11 @@ void williams_s6_sound_device::device_add_mconfig(machine_config &config)
 	M6802(config, m_cpu, 3580000);
 	m_cpu->set_addrmap(AS_PROGRAM, &williams_s6_sound_device::williams_s6_map);
 
-	MC1408(config, "dac", 0).add_route(ALL_OUTPUTS, *this, 0.5);
+	MC1408(config, "dac").add_route(ALL_OUTPUTS, *this, 0.5);
 
 	HC55516(config, m_hc, 0).add_route(ALL_OUTPUTS, *this, 1.00);
 
-	PIA6821(config, m_pia, 0);
+	PIA6821(config, m_pia);
 	m_pia->writepa_handler().set("dac", FUNC(dac_byte_interface::data_w));
 	m_pia->writepb_handler().set(FUNC(williams_s6_sound_device::pb_w));
 	m_pia->ca2_handler().set(m_hc, FUNC(hc55516_device::digit_w));
@@ -1053,7 +1053,7 @@ INPUT_PORTS_START( williams_s6 )
 	PORT_DIPNAME( 0x40, 0x40, "Sounds" )
 	PORT_DIPSETTING(    0x00, "Tones" )
 	PORT_DIPSETTING(    0x40, "Synth" )
-	PORT_BIT( 0x100, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("Audio Diag") PORT_CODE(KEYCODE_9_PAD) PORT_CHANGED_MEMBER(DEVICE_SELF, williams_s6_sound_device, audio_nmi, 1)
+	PORT_BIT( 0x100, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("Audio Diag") PORT_CODE(KEYCODE_9_PAD) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(williams_s6_sound_device::audio_nmi), 1)
 INPUT_PORTS_END
 
 INPUT_CHANGED_MEMBER( williams_s6_sound_device::audio_nmi )
@@ -1101,7 +1101,7 @@ void williams_s9_sound_device::write(u8 data)
 //-------------------------------------------------
 //  strobe - tell PIA to process the input
 //-------------------------------------------------
-WRITE_LINE_MEMBER(williams_s9_sound_device::strobe)
+void williams_s9_sound_device::strobe(int state)
 {
 	m_pia->ca1_w(state);
 }
@@ -1124,11 +1124,11 @@ void williams_s9_sound_device::device_add_mconfig(machine_config &config)
 	M6802(config, m_cpu, XTAL(4'000'000));
 	m_cpu->set_addrmap(AS_PROGRAM, &williams_s9_sound_device::williams_s9_map);
 
-	MC1408(config, "dac", 0).add_route(ALL_OUTPUTS, *this, 0.5);
+	MC1408(config, "dac").add_route(ALL_OUTPUTS, *this, 0.5);
 
 	HC55516(config, m_hc, 0).add_route(ALL_OUTPUTS, *this, 1.00);
 
-	PIA6821(config, m_pia, 0);
+	PIA6821(config, m_pia);
 	m_pia->set_port_a_input_overrides_output_mask(0xff);
 	m_pia->writepb_handler().set("dac", FUNC(dac_byte_interface::data_w));
 	m_pia->ca2_handler().set(m_hc, FUNC(hc55516_device::clock_w));
@@ -1157,7 +1157,7 @@ void williams_s9_sound_device::device_reset()
 
 INPUT_PORTS_START( williams_s9 )
 	PORT_START("S9")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("Audio Diag") PORT_CODE(KEYCODE_9_PAD) PORT_CHANGED_MEMBER(DEVICE_SELF, williams_s9_sound_device, audio_nmi, 1)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("Audio Diag") PORT_CODE(KEYCODE_9_PAD) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(williams_s9_sound_device::audio_nmi), 1)
 INPUT_PORTS_END
 
 INPUT_CHANGED_MEMBER( williams_s9_sound_device::audio_nmi )
@@ -1205,7 +1205,7 @@ void williams_s11_sound_device::write(u8 data)
 //-------------------------------------------------
 //  strobe - tell PIA to process the input
 //-------------------------------------------------
-WRITE_LINE_MEMBER(williams_s11_sound_device::strobe)
+void williams_s11_sound_device::strobe(int state)
 {
 	m_pia->ca1_w(state);
 }
@@ -1239,11 +1239,11 @@ void williams_s11_sound_device::device_add_mconfig(machine_config &config)
 	M6802(config, m_cpu, XTAL(4'000'000));
 	m_cpu->set_addrmap(AS_PROGRAM, &williams_s11_sound_device::williams_s11_map);
 
-	MC1408(config, "dac", 0).add_route(ALL_OUTPUTS, *this, 0.5);
+	MC1408(config, "dac").add_route(ALL_OUTPUTS, *this, 0.5);
 
 	HC55516(config, m_hc, 0).add_route(ALL_OUTPUTS, *this, 1.00);
 
-	PIA6821(config, m_pia, 0);
+	PIA6821(config, m_pia);
 	m_pia->set_port_a_input_overrides_output_mask(0xff);
 	m_pia->writepb_handler().set("dac", FUNC(dac_byte_interface::data_w));
 	m_pia->ca2_handler().set(m_hc, FUNC(hc55516_device::clock_w));
@@ -1279,7 +1279,7 @@ void williams_s11_sound_device::device_reset()
 
 INPUT_PORTS_START( williams_s11 )
 	PORT_START("S11")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("Audio Diag") PORT_CODE(KEYCODE_9_PAD) PORT_CHANGED_MEMBER(DEVICE_SELF, williams_s11_sound_device, audio_nmi, 1)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("Audio Diag") PORT_CODE(KEYCODE_9_PAD) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(williams_s11_sound_device::audio_nmi), 1)
 INPUT_PORTS_END
 
 INPUT_CHANGED_MEMBER( williams_s11_sound_device::audio_nmi )

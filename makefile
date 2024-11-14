@@ -20,6 +20,7 @@
 # TARGET = mame
 # SUBTARGET = tiny
 # TOOLS = 1
+# EMULATOR = 1
 # TESTS = 1
 # BENCHMARKS = 1
 # OSD = sdl
@@ -37,6 +38,7 @@
 # USE_PCAP = 1
 # USE_QTDEBUG = 1
 # NO_X11 = 1
+# USE_WAYLAND = 1
 # NO_USE_XINPUT = 1
 # NO_USE_XINPUT_WII_LIGHTGUN_HACK = 1
 # FORCE_DRC_C_BACKEND = 1
@@ -65,13 +67,13 @@
 # USE_SYSTEM_LIB_ASIO = 1
 # USE_SYSTEM_LIB_EXPAT = 1
 # USE_SYSTEM_LIB_ZLIB = 1
+# USE_SYSTEM_LIB_ZSTD = 1
 # USE_SYSTEM_LIB_JPEG = 1
 # USE_SYSTEM_LIB_FLAC = 1
 # USE_SYSTEM_LIB_LUA = 1
 # USE_SYSTEM_LIB_SQLITE3 = 1
 # USE_SYSTEM_LIB_PORTMIDI = 1
 # USE_SYSTEM_LIB_PORTAUDIO = 1
-# USE_BUNDLED_LIB_SDL2 = 1
 # USE_SYSTEM_LIB_UTF8PROC = 1
 # USE_SYSTEM_LIB_GLM = 1
 # USE_SYSTEM_LIB_RAPIDJSON = 1
@@ -104,7 +106,9 @@
 
 # QT_HOME = /usr/lib64/qt48/
 
-# SOURCES = src/mame/drivers/asteroid.cpp,src/mame/audio/llander.cpp
+# SOURCES = src/mame/atari/asteroid.cpp,src/mame/cinematronics/cchasm.cpp
+
+# SOURCEFILTER = mydrivers.flt
 
 # FORCE_VERSION_COMPILE = 1
 
@@ -235,7 +239,7 @@ endif
 
 #-------------------------------------------------
 # specify core target: mame, ldplayer
-# specify subtarget: mame, arcade, mess, tiny, etc.
+# specify subtarget: mame, tiny, etc.
 # build scripts will be run from
 # scripts/target/$(TARGET)/$(SUBTARGET).lua
 #-------------------------------------------------
@@ -510,6 +514,10 @@ ifdef USE_SYSTEM_LIB_ZLIB
 PARAMS += --with-system-zlib='$(USE_SYSTEM_LIB_ZLIB)'
 endif
 
+ifdef USE_SYSTEM_LIB_ZSTD
+PARAMS += --with-system-zstd='$(USE_SYSTEM_LIB_ZSTD)'
+endif
+
 ifdef USE_SYSTEM_LIB_JPEG
 PARAMS += --with-system-jpeg='$(USE_SYSTEM_LIB_JPEG)'
 endif
@@ -548,14 +556,6 @@ endif
 
 ifdef USE_SYSTEM_LIB_PUGIXML
 PARAMS += --with-system-pugixml='$(USE_SYSTEM_LIB_PUGIXML)'
-endif
-
-# reverse logic for this one
-
-ifdef USE_BUNDLED_LIB_SDL2
-ifneq '$(USE_BUNDLED_LIB_SDL2)' '0'
-PARAMS += --with-bundled-sdl2
-endif
 endif
 
 #-------------------------------------------------
@@ -648,6 +648,14 @@ endif
 ifdef TOOLS
 ifneq '$(TOOLS)' '0'
 PARAMS += --with-tools
+endif
+endif
+
+ifndef EMULATOR
+PARAMS += --with-emulator
+else
+ifeq '$(EMULATOR)' '1'
+PARAMS += --with-emulator
 endif
 endif
 
@@ -799,6 +807,10 @@ ifdef MESA_INSTALL_ROOT
 PARAMS += --MESA_INSTALL_ROOT='$(MESA_INSTALL_ROOT)'
 endif
 
+ifdef USE_WAYLAND
+PARAMS += --USE_WAYLAND='$(USE_WAYLAND)'
+endif
+
 ifdef NO_X11
 PARAMS += --NO_X11='$(NO_X11)'
 endif
@@ -875,6 +887,10 @@ ifdef SOURCES
 PARAMS += --SOURCES='$(SOURCES)'
 endif
 
+ifdef SOURCEFILTER
+PARAMS += --SOURCEFILTER='$(SOURCEFILTER)'
+endif
+
 ifdef FORCE_VERSION_COMPILE
 PARAMS += --FORCE_VERSION_COMPILE='$(FORCE_VERSION_COMPILE)'
 endif
@@ -930,12 +946,16 @@ SCRIPTS = scripts/genie.lua \
 	$(wildcard src/osd/$(OSD)/$(OSD).mak) \
 	$(wildcard src/$(TARGET)/$(SUBTARGET_FULL).mak)
 
+ifdef SOURCEFILTER
+SCRIPTS += $(SOURCEFILTER)
+else
 ifndef SOURCES
 ifdef PROJECT
 SCRIPTS += projects/$(PROJECT)/scripts/target/$(TARGET)/$(SUBTARGET_FULL).lua
 else
 # A filter file can be used as an alternative
 #SCRIPTS += scripts/target/$(TARGET)/$(SUBTARGET_FULL).lua
+endif
 endif
 endif
 
@@ -981,8 +1001,6 @@ SRC = src
 # all 3rd party sources are under the 3rdparty/ directory
 3RDPARTY = 3rdparty
 ifeq ($(SUBTARGET_FULL),mame)
-PROJECT_NAME := $(SUBTARGET_FULL)
-else ifeq ($(SUBTARGET_FULL),mess)
 PROJECT_NAME := $(SUBTARGET_FULL)
 else
 PROJECT_NAME := $(TARGET)$(SUBTARGET_FULL)
@@ -1159,7 +1177,7 @@ endif
 
 .PHONY: vs2019_clang
 vs2019_clang: generate
-	$(SILENT) $(GENIE) $(PARAMS) $(TARGET_PARAMS) --vs=clangcl --NO_USE_PORTAUDIO=1 vs2019
+	$(SILENT) $(GENIE) $(PARAMS) $(TARGET_PARAMS) --vs=clangcl vs2019
 ifdef MSBUILD
 	$(SILENT) msbuild.exe $(PROJECTDIR_WIN)/vs2019-clang/$(PROJECT_NAME).sln $(MSBUILD_PARAMS)
 endif
@@ -1177,23 +1195,28 @@ endif
 
 .PHONY: android-ndk
 android-ndk:
-ifndef ANDROID_NDK_LLVM
-	$(error ANDROID_NDK_LLVM is not set)
+ifndef ANDROID_NDK_HOME
+	$(error ANDROID_NDK_HOME is not set)
 endif
-ifndef ANDROID_NDK_ROOT
-	$(error ANDROID_NDK_ROOT is not set)
+ifndef SDL_INSTALL_ROOT
+	$(error SDL_INSTALL_ROOT is not set)
 endif
-	$(eval CLANG_VERSION := $(shell $(ANDROID_NDK_LLVM)/bin/clang -dumpversion 2> /dev/null))
+ifeq ($(OS),windows)
+	$(eval CLANG_VERSION := $(shell $(ANDROID_NDK_HOME)/toolchains/llvm/prebuilt/windows-x86_64/bin/clang -dumpversion 2> /dev/null))
+else ifeq ($(OS),linux)
+	$(eval CLANG_VERSION := $(shell $(ANDROID_NDK_HOME)/toolchains/llvm/prebuilt/linux-x86_64/bin/clang -dumpversion 2> /dev/null))
+else ifeq ($(OS),macosx)
+	$(eval CLANG_VERSION := $(shell $(ANDROID_NDK_HOME)/toolchains/llvm/prebuilt/darwin-x86_64/bin/clang -dumpversion 2> /dev/null))
+else
+	$(error Unsupported Android build platform)
+endif
 
 #-------------------------------------------------
 # android-arm
 #-------------------------------------------------
 
 $(PROJECTDIR_SDL)/$(MAKETYPE)-android-arm/Makefile: makefile $(SCRIPTS) $(GENIE)
-ifndef ANDROID_NDK_ARM
-	$(error ANDROID_NDK_ARM is not set)
-endif
-	$(SILENT) $(GENIE) $(PARAMS) --gcc=android-arm --gcc_version=$(CLANG_VERSION) --osd=sdl --targetos=android --PLATFORM=arm --NO_USE_MIDI=1 --NO_OPENGL=1 --USE_QTDEBUG=0 --NO_X11=1 --USE_TAPTUN=0 --USE_PCAP=0 --NOASM=1 $(MAKETYPE)
+	$(SILENT) $(GENIE) $(PARAMS) --gcc=android-arm --gcc_version=$(CLANG_VERSION) --osd=sdl --targetos=android --PLATFORM=arm --NOASM=1 $(MAKETYPE)
 
 .PHONY: android-arm
 android-arm: android-ndk generate $(PROJECTDIR_SDL)/$(MAKETYPE)-android-arm/Makefile
@@ -1205,10 +1228,7 @@ android-arm: android-ndk generate $(PROJECTDIR_SDL)/$(MAKETYPE)-android-arm/Make
 #-------------------------------------------------
 
 $(PROJECTDIR_SDL)/$(MAKETYPE)-android-arm64/Makefile: makefile $(SCRIPTS) $(GENIE)
-ifndef ANDROID_NDK_ARM64
-	$(error ANDROID_NDK_ARM64 is not set)
-endif
-	$(SILENT) $(GENIE) $(PARAMS) --gcc=android-arm64 --gcc_version=$(CLANG_VERSION) --osd=sdl --targetos=android --PLATFORM=arm64 --NO_USE_MIDI=1 --NO_OPENGL=1 --USE_QTDEBUG=0 --NO_X11=1 --USE_TAPTUN=0 --USE_PCAP=0 --NOASM=1 $(MAKETYPE)
+	$(SILENT) $(GENIE) $(PARAMS) --gcc=android-arm64 --gcc_version=$(CLANG_VERSION) --osd=sdl --targetos=android --PLATFORM=arm64 --NOASM=1 $(MAKETYPE)
 
 .PHONY: android-arm64
 android-arm64: android-ndk generate $(PROJECTDIR_SDL)/$(MAKETYPE)-android-arm64/Makefile
@@ -1220,10 +1240,7 @@ android-arm64: android-ndk generate $(PROJECTDIR_SDL)/$(MAKETYPE)-android-arm64/
 #-------------------------------------------------
 
 $(PROJECTDIR_SDL)/$(MAKETYPE)-android-x86/Makefile: makefile $(SCRIPTS) $(GENIE)
-ifndef ANDROID_NDK_X86
-	$(error ANDROID_NDK_X86 is not set)
-endif
-	$(SILENT) $(GENIE) $(PARAMS) --gcc=android-x86 --gcc_version=$(CLANG_VERSION) --osd=sdl --targetos=android --PLATFORM=x86 --NO_USE_MIDI=1 --NO_OPENGL=1 --USE_QTDEBUG=0 --NO_X11=1 --USE_TAPTUN=0 --USE_PCAP=0 $(MAKETYPE)
+	$(SILENT) $(GENIE) $(PARAMS) --gcc=android-x86 --gcc_version=$(CLANG_VERSION) --osd=sdl --targetos=android --PLATFORM=x86 $(MAKETYPE)
 
 .PHONY: android-x86
 android-x86: android-ndk generate $(PROJECTDIR_SDL)/$(MAKETYPE)-android-x86/Makefile
@@ -1235,10 +1252,7 @@ android-x86: android-ndk generate $(PROJECTDIR_SDL)/$(MAKETYPE)-android-x86/Make
 #-------------------------------------------------
 
 $(PROJECTDIR_SDL)/$(MAKETYPE)-android-x64/Makefile: makefile $(SCRIPTS) $(GENIE)
-ifndef ANDROID_NDK_X64
-	$(error ANDROID_NDK_X64 is not set)
-endif
-	$(SILENT) $(GENIE) $(PARAMS) --gcc=android-x64 --gcc_version=$(CLANG_VERSION) --osd=sdl --targetos=android --PLATFORM=x64 --NO_USE_MIDI=1 --NO_OPENGL=1 --USE_QTDEBUG=0 --NO_X11=1 --USE_TAPTUN=0 --USE_PCAP=0 $(MAKETYPE)
+	$(SILENT) $(GENIE) $(PARAMS) --gcc=android-x64 --gcc_version=$(CLANG_VERSION) --osd=sdl --targetos=android --PLATFORM=x64 $(MAKETYPE)
 
 .PHONY: android-x64
 android-x64: android-ndk generate $(PROJECTDIR_SDL)/$(MAKETYPE)-android-x64/Makefile
@@ -1472,6 +1486,11 @@ openbsd_x64: generate $(PROJECTDIR)/$(MAKETYPE)-openbsd/Makefile
 	$(SILENT) $(MAKE) -C $(PROJECTDIR)/$(MAKETYPE)-openbsd config=$(CONFIG)64 precompile
 	$(SILENT) $(MAKE) -C $(PROJECTDIR)/$(MAKETYPE)-openbsd config=$(CONFIG)64
 
+.PHONY: openbsd_arm64
+openbsd_arm64: generate $(PROJECTDIR)/$(MAKETYPE)-openbsd/Makefile
+	$(SILENT) $(MAKE) -C $(PROJECTDIR)/$(MAKETYPE)-openbsd config=$(CONFIG)64 precompile
+	$(SILENT) $(MAKE) -C $(PROJECTDIR)/$(MAKETYPE)-openbsd config=$(CONFIG)64
+
 .PHONY: openbsd
 openbsd: openbsd_x86
 
@@ -1479,6 +1498,28 @@ openbsd: openbsd_x86
 openbsd_x86: generate $(PROJECTDIR)/$(MAKETYPE)-openbsd/Makefile
 	$(SILENT) $(MAKE) -C $(PROJECTDIR)/$(MAKETYPE)-openbsd config=$(CONFIG)32 precompile
 	$(SILENT) $(MAKE) -C $(PROJECTDIR)/$(MAKETYPE)-openbsd config=$(CONFIG)32
+
+#-------------------------------------------------
+# gmake-openbsd-clang
+#-------------------------------------------------
+
+$(PROJECTDIR)/$(MAKETYPE)-openbsd-clang/Makefile: makefile $(SCRIPTS) $(GENIE)
+	$(SILENT) $(GENIE) $(PARAMS) $(TARGET_PARAMS) --gcc=openbsd-clang --gcc_version=$(CLANG_VERSION) $(MAKETYPE)
+
+.PHONY: openbsd_x64_clang
+openbsd_x64_clang: generate $(PROJECTDIR)/$(MAKETYPE)-openbsd-clang/Makefile
+	$(SILENT) $(MAKE) -C $(PROJECTDIR)/$(MAKETYPE)-openbsd-clang config=$(CONFIG)64 precompile
+	$(SILENT) $(MAKE) -C $(PROJECTDIR)/$(MAKETYPE)-openbsd-clang config=$(CONFIG)64
+
+.PHONY: openbsd_arm64_clang
+openbsd_arm64_clang: generate $(PROJECTDIR)/$(MAKETYPE)-openbsd-clang/Makefile
+	$(SILENT) $(MAKE) -C $(PROJECTDIR)/$(MAKETYPE)-openbsd-clang config=$(CONFIG)64 precompile
+	$(SILENT) $(MAKE) -C $(PROJECTDIR)/$(MAKETYPE)-openbsd-clang config=$(CONFIG)64
+
+.PHONY: openbsd_x86_clang
+openbsd_x86_clang: generate $(PROJECTDIR)/$(MAKETYPE)-openbsd-clang/Makefile
+	$(SILENT) $(MAKE) -C $(PROJECTDIR)/$(MAKETYPE)-openbsd-clang config=$(CONFIG)32 precompile
+	$(SILENT) $(MAKE) -C $(PROJECTDIR)/$(MAKETYPE)-openbsd-clang config=$(CONFIG)32
 
 #-------------------------------------------------
 # Clean/bootstrap
@@ -1524,12 +1565,7 @@ generate: \
 		$(GEN_FOLDERS) \
 		$(GENDIR)/version.cpp \
 		$(patsubst %.po,%.mo,$(call rwildcard, language/, *.po)) \
-		$(patsubst $(SRC)/%.lay,$(GENDIR)/%.lh,$(LAYOUTS)) \
-		$(GENDIR)/includes/SDL2
-
-$(GENDIR)/includes/SDL2:
-	-$(call MKDIR,$@)
-	-$(call COPY,3rdparty/SDL2/include,$(GENDIR)/includes/SDL2)
+		$(patsubst $(SRC)/%.lay,$(GENDIR)/%.lh,$(LAYOUTS))
 
 ifneq ($(NEW_GIT_VERSION),$(OLD_GIT_VERSION))
 stale:
@@ -1542,7 +1578,7 @@ endif
 
 ifeq (posix,$(SHELLTYPE))
 $(GENDIR)/version.cpp: makefile $(GENDIR)/git_desc | $(GEN_FOLDERS)
-	@echo '#define BARE_BUILD_VERSION "0.244"' > $@
+	@echo '#define BARE_BUILD_VERSION "0.271"' > $@
 	@echo '#define BARE_VCS_REVISION "$(NEW_GIT_VERSION)"' >> $@
 	@echo 'extern const char bare_build_version[];' >> $@
 	@echo 'extern const char bare_vcs_revision[];' >> $@
@@ -1552,7 +1588,7 @@ $(GENDIR)/version.cpp: makefile $(GENDIR)/git_desc | $(GEN_FOLDERS)
 	@echo 'const char build_version[] = BARE_BUILD_VERSION " (" BARE_VCS_REVISION ")";' >> $@
 else
 $(GENDIR)/version.cpp: makefile $(GENDIR)/git_desc | $(GEN_FOLDERS)
-	@echo #define BARE_BUILD_VERSION "0.244" > $@
+	@echo #define BARE_BUILD_VERSION "0.271" > $@
 	@echo #define BARE_VCS_REVISION "$(NEW_GIT_VERSION)" >> $@
 	@echo extern const char bare_build_version[]; >> $@
 	@echo extern const char bare_vcs_revision[]; >> $@
@@ -1595,18 +1631,18 @@ tests: $(REGTESTS)
 cleansrc:
 	@echo Cleaning up tabs/spaces/end of lines....
 ifeq (posix,$(SHELLTYPE))
-	$(SILENT) find src \( \
+	$(SILENT)- find src \( \
 		-name \*.c -o -name \*.cpp -o \
 		-name \*.h -o -name \*.hpp -o -name \*.hxx -o \
 		-name \*.ipp -o \
 		-name \*.mm -o \
 		-name \*.lay -o \
 		-name \*.lst \
-		\) -exec ./srcclean {} \; >&2
-	$(SILENT) find hash    \( -name \*.hsi -o -name \*.xml  \) -exec ./srcclean {} \; >&2
-	$(SILENT) find bgfx    \( -name \*.json                 \) -exec ./srcclean {} \; >&2
-	$(SILENT) find plugins \( -name \*.lua -o -name \*.json \) -exec ./srcclean {} \; >&2
-	$(SILENT) find scripts \( -name \*.lua                  \) -exec ./srcclean {} \; >&2
+		\) -print0 | xargs -0 -n 20 ./srcclean >&2
+	$(SILENT)- find hash    \( -name \*.hsi -o -name \*.xml  \) -print0 | xargs -0 -n 20 ./srcclean >&2
+	$(SILENT)- find bgfx    \( -name \*.json                 \) -print0 | xargs -0 -n 20 ./srcclean >&2
+	$(SILENT)- find plugins \( -name \*.lua -o -name \*.json \) -print0 | xargs -0 -n 20 ./srcclean >&2
+	$(SILENT)- find scripts \( -name \*.lua                  \) -print0 | xargs -0 -n 20 ./srcclean >&2
 else
 	$(shell for /r src     %%i in (*.c, *.cpp, *.h, *.hpp, *.hxx, *.ipp, *.mm, *.lay, *.lst) do srcclean %%i >&2 )
 	$(shell for /r hash    %%i in (*.hsi, *.xml)  do srcclean %%i >&2 )

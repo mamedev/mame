@@ -2,8 +2,6 @@
 // copyright-holders:Aaron Giles
 /*************************************************************************
 
-    laserdsc.h
-
     Core laserdisc player implementation.
 
 *************************************************************************/
@@ -15,8 +13,9 @@
 
 #include "emupal.h"
 #include "screen.h"
-#include "vbiparse.h"
+
 #include "avhuff.h"
+#include "vbiparse.h"
 
 #include <algorithm>
 #include <system_error>
@@ -98,7 +97,7 @@ protected:
 
 public:
 	// delegates
-	typedef device_delegate<chd_file *(void)> get_disc_delegate;
+	typedef device_delegate<chd_file * ()> get_disc_delegate;
 	typedef device_delegate<void (int samplerate, int samples, const int16_t *ch0, const int16_t *ch1)> audio_delegate;
 
 	laserdisc_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
@@ -208,9 +207,9 @@ protected:
 	virtual void player_overlay(bitmap_yuy16 &bitmap) = 0;
 
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_stop() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_stop() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 	virtual void device_validity_check(validity_checker &valid) const override;
 
 	// device_sound_interface overrides
@@ -221,7 +220,7 @@ protected:
 	// subclass helpers
 	void set_audio_squelch(bool squelchleft, bool squelchright) { m_stream->update(); m_audiosquelch = (squelchleft ? 1 : 0) | (squelchright ? 2 : 0); }
 	void set_video_squelch(bool squelch) { m_videosquelch = squelch; }
-	void set_slider_speed(int32_t tracks_per_vsync);
+	void set_slider_speed(const double tracks_per_vsync);
 	void advance_slider(int32_t numtracks);
 	slider_position get_slider_position();
 	int32_t generic_update(const vbi_metadata &vbi, int fieldnum, const attotime &curtime, player_state_info &curstate);
@@ -304,7 +303,7 @@ private:
 
 	// audio data
 	sound_stream *      m_stream;
-	std::vector<int16_t>       m_audiobuffer[2];       // buffer for audio samples
+	std::vector<int16_t> m_audiobuffer[2];      // buffer for audio samples
 	uint32_t            m_audiobufsize;         // size of buffer
 	uint32_t            m_audiobufin;           // input index
 	uint32_t            m_audiobufout;          // output index
@@ -334,6 +333,25 @@ typedef device_interface_enumerator<laserdisc_device> laserdisc_device_enumerato
 //**************************************************************************
 //  INLINE FUNCTIONS
 //**************************************************************************
+
+// ======================> parallel_laserdisc_device
+
+class parallel_laserdisc_device : public laserdisc_device
+{
+public:
+
+	virtual void data_w(u8 data) = 0;
+	virtual u8 data_r() = 0;
+	virtual void enter_w(int state) {}
+	virtual int data_available_r() { return CLEAR_LINE; }
+	virtual int status_strobe_r() { return CLEAR_LINE; }
+	virtual int ready_r() { return ASSERT_LINE; }
+
+protected:
+	parallel_laserdisc_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock = 0);
+
+	virtual void player_overlay(bitmap_yuy16 &bitmap) override { }
+};
 
 //-------------------------------------------------
 //  is_start_of_frame - return true if this is

@@ -150,8 +150,6 @@ void i8244_device::i8244_palette(palette_device &palette) const
 
 void i8244_device::device_start()
 {
-	m_irq_func.resolve_safe();
-
 	// allocate timers
 	m_vblank_timer = timer_alloc(FUNC(i8244_device::vblank_start), this);
 	m_vblank_timer->adjust(screen().time_until_pos(m_vblank_start, m_hblank_start - 1), 0, screen().frame_period());
@@ -162,12 +160,24 @@ void i8244_device::device_start()
 	// allocate a stream
 	m_stream = stream_alloc(0, 1, clock());
 
-	// register our state
+	// zerofill
 	memset(m_vdc.reg, 0, 0x100);
-	save_pointer(NAME(m_vdc.reg), 0x100);
-
 	memset(m_collision_map, 0, sizeof(m_collision_map));
 	memset(m_priority_map, 0, sizeof(m_priority_map));
+
+	m_x_beam_pos = 0;
+	m_y_beam_pos = 0;
+	m_control_status = 0;
+	m_collision_status = 0;
+	m_sh_written = false;
+	m_sh_pending = false;
+	m_sh_prescaler = 0;
+	m_sh_count = 0;
+	m_sh_output = 0;
+	m_sh_duty = 0;
+
+	// register our state
+	save_pointer(NAME(m_vdc.reg), 0x100);
 	save_item(NAME(m_collision_map));
 	save_item(NAME(m_priority_map));
 
@@ -438,6 +448,7 @@ void i8244_device::write_cx(int x, bool cx)
 			if (colx & m_vdc.s.collision)
 				m_collision_status |= 0x40;
 		}
+
 		// check if an already drawn object would collide with us
 		if (m_vdc.s.collision & 0x40)
 		{
@@ -543,7 +554,7 @@ void i8244_device::draw_grid(int scanline, bitmap_ind16 &bitmap, const rectangle
 }
 
 
-void i8244_device::char_pixel(u8 index, int x, int y, u8 pixel, u16 color, bitmap_ind16 &bitmap, const rectangle &cliprect)
+void i8244_device::major_pixel(u8 index, int x, int y, u8 pixel, u16 color, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	for (int px = x; px < x + 2; px++)
 	{
@@ -604,7 +615,7 @@ void i8244_device::draw_major(int scanline, bitmap_ind16 &bitmap, const rectangl
 
 				u16 color = 8 + ((m_vdc.s.quad[i].single[j].color >> 1) & 0x07);
 				for (int cx = 0; cx < 8; cx++, x += 2)
-					char_pixel(4 * j + 16 * i + 0x40, x, scanline, BIT(m_charset[offset & 0x1ff], cx ^ 7), color, bitmap, cliprect);
+					major_pixel(4 * j + 16 * i + 0x40, x, scanline, BIT(m_charset[offset & 0x1ff], cx ^ 7), color, bitmap, cliprect);
 			}
 		}
 	}
@@ -626,7 +637,7 @@ void i8244_device::draw_major(int scanline, bitmap_ind16 &bitmap, const rectangl
 			int x = (m_vdc.s.foreground[i].x + 5) * 2;
 			u16 color = 8 + ((m_vdc.s.foreground[i].color >> 1) & 0x07);
 			for (int cx = 0; cx < 8; cx++, x += 2)
-				char_pixel(4 * i + 0x10, x, scanline, BIT(m_charset[offset & 0x1ff], cx ^ 7), color, bitmap, cliprect);
+				major_pixel(4 * i + 0x10, x, scanline, BIT(m_charset[offset & 0x1ff], cx ^ 7), color, bitmap, cliprect);
 		}
 	}
 }

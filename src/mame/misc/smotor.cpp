@@ -133,6 +133,9 @@
 #include "speaker.h"
 #include "tilemap.h"
 
+
+namespace {
+
 #define FIRST_CLOCK     XTAL(5'000'000)
 #define SECOND_CLOCK    XTAL(20'000'000)
 #define CPU_CLOCK       (FIRST_CLOCK)       // verified 5 MHz.
@@ -155,8 +158,8 @@ public:
 	void smotor(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -178,8 +181,8 @@ private:
 
 	void smotor_palette(palette_device &palette) const;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void smotor_cpu_map(address_map &map);
-	void smotor_cpu_io(address_map &map);
+	void smotor_cpu_map(address_map &map) ATTR_COLD;
+	void smotor_cpu_io(address_map &map) ATTR_COLD;
 };
 
 
@@ -527,6 +530,8 @@ ROM_START( smotor )
 	ROM_LOAD( "2_gal16v8.k3", 0x0000, 0x0117, NO_DUMP )  // device is dead
 	ROM_LOAD( "3_gal16v8.l2", 0x0000, 0x0117, NO_DUMP )  // device is dead
 ROM_END
+
+} // anonymous namespace
 
 
 /*********************************************

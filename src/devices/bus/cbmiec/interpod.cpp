@@ -111,8 +111,8 @@ const tiny_rom_entry *cbm_interpod_device::device_rom_region() const
 
 void cbm_interpod_device::interpod_mem(address_map &map)
 {
-	map(0x0000, 0x007f).mirror(0x3b80).m(m_riot, FUNC(mos6532_new_device::ram_map));
-	map(0x0400, 0x041f).mirror(0x3be0).m(m_riot, FUNC(mos6532_new_device::io_map));
+	map(0x0000, 0x007f).mirror(0x3b80).m(m_riot, FUNC(mos6532_device::ram_map));
+	map(0x0400, 0x041f).mirror(0x3be0).m(m_riot, FUNC(mos6532_device::io_map));
 	map(0x2000, 0x2001).mirror(0x9ffe).rw(m_acia, FUNC(acia6850_device::read), FUNC(acia6850_device::write));
 	map(0x4000, 0x47ff).mirror(0xb800).rom().region(R6502_TAG, 0);
 	map(0x8000, 0x800f).mirror(0x5ff0).m(m_via, FUNC(via6522_device::map));
@@ -130,7 +130,7 @@ void cbm_interpod_device::device_add_mconfig(machine_config &config)
 
 	MOS6522(config, m_via, 1000000);
 
-	MOS6532_NEW(config, m_riot, 1000000);
+	MOS6532(config, m_riot, 1000000);
 
 	ACIA6850(config, m_acia, 0);
 

@@ -1490,7 +1490,7 @@
 		<rect state="0">
 			<color red="0.00" green="0.25" blue="0.25"/>
 		</rect>
-		<text string="&#xA3;1">
+		<text string="£1">
 			<color red="0.0" green="0.0" blue="0.0"/>
 			<bounds x="0.05" y="0.05" width="0.90" height="0.90"/>
 		</text>
@@ -2620,7 +2620,16 @@
 		<repeat count="16">
 			<param name="i" start="0" increment="1"/>
 			<param name="x" start="194" increment="17"/>
+			<element name="vfdblank~i~" ref="vfd0">
+				<animate name="vfdduty0"/>
+				<color state="31" red="0.00" green="1.00" blue="1.00" alpha="0.0"/>
+				<color state="0" red="0.00" green="1.00" blue="1.00" alpha="1.0"/>
+				<bounds x="~x~" y="434" width="17" height="31"/>
+			</element>
 			<element name="vfd~i~" ref="vfd0">
+				<animate name="vfdduty0"/>
+				<color state="0" red="0.00" green="1.00" blue="1.00" alpha="0.0"/>
+				<color state="31" red="0.00" green="1.00" blue="1.00" alpha="1.0"/>
 				<bounds x="~x~" y="434" width="17" height="31"/>
 			</element>
 		</repeat>

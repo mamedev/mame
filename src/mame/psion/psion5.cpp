@@ -18,34 +18,36 @@
 
 #include "psion5.h"
 
-#define LOG_UNKNOWNS        (1 << 0)
-#define LOG_IRQ             (1 << 1)
-#define LOG_DISPLAY         (1 << 2)
-#define LOG_DRAM_READS      (1 << 3)
-#define LOG_LCD_READS       (1 << 4)
-#define LOG_POWER_READS     (1 << 5)
-#define LOG_EOI_READS       (1 << 6)
-#define LOG_INT_READS       (1 << 7)
-#define LOG_CODEC_READS     (1 << 8)
-#define LOG_SSP_READS       (1 << 9)
-#define LOG_TIMER_READS     (1 << 10)
-#define LOG_BUZZER_READS    (1 << 11)
-#define LOG_RTC_READS       (1 << 12)
-#define LOG_GPIO_READS      (1 << 13)
-#define LOG_KBD_READS       (1 << 14)
-#define LOG_DRAM_WRITES     (1 << 15)
-#define LOG_LCD_WRITES      (1 << 16)
-#define LOG_POWER_WRITES    (1 << 17)
-#define LOG_EOI_WRITES      (1 << 18)
-#define LOG_INT_WRITES      (1 << 19)
-#define LOG_CODEC_WRITES    (1 << 20)
-#define LOG_SSP_WRITES      (1 << 21)
-#define LOG_TIMER_WRITES    (1 << 22)
-#define LOG_BUZZER_WRITES   (1 << 23)
-#define LOG_RTC_WRITES      (1 << 24)
-#define LOG_GPIO_WRITES     (1 << 25)
-#define LOG_PIN_WRITES      (1 << 26)
-#define LOG_KBD_WRITES      (1 << 27)
+#include "utf8.h"
+
+#define LOG_UNKNOWNS        (1U << 1)
+#define LOG_IRQ             (1U << 2)
+#define LOG_DISPLAY         (1U << 3)
+#define LOG_DRAM_READS      (1U << 4)
+#define LOG_LCD_READS       (1U << 5)
+#define LOG_POWER_READS     (1U << 6)
+#define LOG_EOI_READS       (1U << 7)
+#define LOG_INT_READS       (1U << 8)
+#define LOG_CODEC_READS     (1U << 9)
+#define LOG_SSP_READS       (1U << 10)
+#define LOG_TIMER_READS     (1U << 11)
+#define LOG_BUZZER_READS    (1U << 12)
+#define LOG_RTC_READS       (1U << 13)
+#define LOG_GPIO_READS      (1U << 14)
+#define LOG_KBD_READS       (1U << 15)
+#define LOG_DRAM_WRITES     (1U << 16)
+#define LOG_LCD_WRITES      (1U << 17)
+#define LOG_POWER_WRITES    (1U << 18)
+#define LOG_EOI_WRITES      (1U << 19)
+#define LOG_INT_WRITES      (1U << 20)
+#define LOG_CODEC_WRITES    (1U << 21)
+#define LOG_SSP_WRITES      (1U << 22)
+#define LOG_TIMER_WRITES    (1U << 23)
+#define LOG_BUZZER_WRITES   (1U << 24)
+#define LOG_RTC_WRITES      (1U << 25)
+#define LOG_GPIO_WRITES     (1U << 26)
+#define LOG_PIN_WRITES      (1U << 27)
+#define LOG_KBD_WRITES      (1U << 28)
 
 #define LOG_WRITES          (LOG_DRAM_WRITES | LOG_LCD_WRITES | LOG_POWER_WRITES | LOG_EOI_WRITES | LOG_INT_WRITES | LOG_CODEC_WRITES \
 							| LOG_SSP_WRITES | LOG_TIMER_WRITES | LOG_BUZZER_WRITES | LOG_RTC_WRITES | LOG_GPIO_WRITES | LOG_PIN_WRITES | LOG_KBD_WRITES)
@@ -123,8 +125,8 @@ void psion5mx_state::check_interrupts()
 	{
 		m_maincpu->resume(SUSPEND_REASON_HALT);
 	}
-	m_maincpu->set_input_line(ARM7_FIRQ_LINE, m_pending_ints & m_int_mask & IRQ_FIQ_MASK ? ASSERT_LINE : CLEAR_LINE);
-	m_maincpu->set_input_line(ARM7_IRQ_LINE, m_pending_ints & m_int_mask & IRQ_IRQ_MASK ? ASSERT_LINE : CLEAR_LINE);
+	m_maincpu->set_input_line(arm7_cpu_device::ARM7_FIRQ_LINE, m_pending_ints & m_int_mask & IRQ_FIQ_MASK ? ASSERT_LINE : CLEAR_LINE);
+	m_maincpu->set_input_line(arm7_cpu_device::ARM7_IRQ_LINE, m_pending_ints & m_int_mask & IRQ_IRQ_MASK ? ASSERT_LINE : CLEAR_LINE);
 }
 
 TIMER_CALLBACK_MEMBER(psion5mx_state::update_timer1)
@@ -852,7 +854,7 @@ INPUT_PORTS_START( psion5mx )
 	PORT_BIT(0x0ff, 125, IPT_LIGHTGUN_Y) PORT_CROSSHAIR(Y, 1.0, 0.0, 0) PORT_MINMAX(5,244) PORT_SENSITIVITY(25) PORT_KEYDELTA(13)
 
 	PORT_START("TOUCH")
-	PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_BUTTON1) PORT_NAME("Touch") PORT_CHANGED_MEMBER(DEVICE_SELF, psion5mx_state, touch_down, 0)
+	PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_BUTTON1) PORT_NAME("Touch") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(psion5mx_state::touch_down), 0)
 	PORT_BIT(0xfffe, IP_ACTIVE_HIGH, IPT_UNUSED)
 
 	PORT_START("COL0")

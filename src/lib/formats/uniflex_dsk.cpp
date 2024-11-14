@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:68bit
 /*
- * uniflex_dsk.c  -  UniFLEX compatible disk images
+ * uniflex_dsk.cpp  -  UniFLEX compatible disk images
  *
  * The UniFLEX floppy disk format is distinctily different to the FLEX format,
  * the sector size is 512 byte sectors versus 256 byte sectors and the format
@@ -13,23 +13,24 @@
 #include "imageutl.h"
 
 #include "ioprocs.h"
+#include "multibyte.h"
 
 
 uniflex_format::uniflex_format() : wd177x_format(formats)
 {
 }
 
-const char *uniflex_format::name() const
+const char *uniflex_format::name() const noexcept
 {
 	return "uniflex";
 }
 
-const char *uniflex_format::description() const
+const char *uniflex_format::description() const noexcept
 {
 	return "UniFLEX compatible disk image";
 }
 
-const char *uniflex_format::extensions() const
+const char *uniflex_format::extensions() const noexcept
 {
 	return "dsk";
 }
@@ -52,23 +53,24 @@ int uniflex_format::find_size(util::random_read &io, uint32_t form_factor, const
 
 	// Look at the SIR sector, the second sector.
 	uint8_t sir[192];
-	size_t actual;
-	io.read_at(1 * 512, sir, sizeof(sir), actual);
+	auto const [err, actual] = read_at(io, 1 * 512, sir, sizeof(sir)); // FIXME: check for premature EOF
+	if (err)
+		return -1;
 
-	uint16_t fdn_block_count = pick_integer_be(sir, 0x10, 2);
-	uint32_t last_block_number = pick_integer_be(sir, 0x12, 3);
-	uint32_t free_block_count = pick_integer_be(sir, 0x15, 3);
-	uint16_t fdn_free_count = pick_integer_be(sir, 0x15, 2);
+	uint16_t fdn_block_count = get_u16be(&sir[0x10]);
+	uint32_t last_block_number = get_u24be(&sir[0x12]);
+	uint32_t free_block_count = get_u24be(&sir[0x15]);
+	uint16_t fdn_free_count = get_u16be(&sir[0x15]); // FIXME: offset should be different from previous?
 
-	uint16_t volume_number = pick_integer_be(sir, 0x36, 2);
+	uint16_t volume_number = get_u16be(&sir[0x36]);
 	uint8_t disk_density = sir[0x3a];
 	uint8_t disk_side_info = sir[0x3b];
 
-	uint32_t volbc_start_addr = pick_integer_be(sir, 0x3c, 3);
-	uint16_t swap_size = pick_integer_be(sir, 0x3f, 2);
+	uint32_t volbc_start_addr = get_u24be(&sir[0x3c]);
+	uint16_t swap_size = get_u16be(&sir[0x3f]);
 
 	LOG_FORMATS("UniFLEX floppy dsk size %d\n", (uint32_t)size);
-	LOG_FORMATS(" time = %u %u\n", (uint32_t) pick_integer_be(sir, 0x08, 4), (uint32_t) pick_integer_be(sir, 0x0c, 4));
+	LOG_FORMATS(" time = %u %u\n", get_u32be(&sir[0x08]), get_u32be(&sir[0x0c]));
 	LOG_FORMATS(" fdn_block_count: %d\n", fdn_block_count);
 
 	LOG_FORMATS(" file system name: ");
@@ -90,7 +92,7 @@ int uniflex_format::find_size(util::random_read &io, uint32_t form_factor, const
 	LOG_FORMATS(" swap_size: %d\n", swap_size);
 
 	// The first eight bytes appear to be zeros.
-	if (pick_integer_be(sir, 0x00, 8) != 0)
+	if (get_u64be(&sir[0x00]) != 0)
 		return -1;
 
 	for(int i=0; formats[i].form_factor; i++) {

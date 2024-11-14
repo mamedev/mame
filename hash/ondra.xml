@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <!--
-license:CC0
+license:CC0-1.0
 
 These tapes only work on ondrav. Load the tape and press Enter. Tape will load and then the program will run by itself.
 If asked for numbers, press letters: Q = 1, W = 2, E = 3, etc.

@@ -1,11 +1,11 @@
 // license:BSD-3-Clause
 // copyright-holders:Luca Elia
-#ifndef MAME_INCLUDES_REALBRK_H
-#define MAME_INCLUDES_REALBRK_H
+#ifndef MAME_DYNAX_REALBRK_H
+#define MAME_DYNAX_REALBRK_H
 
 #pragma once
 
-#include "machine/tmp68301.h"
+#include "cpu/m68000/tmp68301.h"
 #include "emupal.h"
 #include "screen.h"
 #include "tilemap.h"
@@ -37,7 +37,7 @@ public:
 	void pkgnshdx(machine_config &config);
 
 protected:
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	required_device<tmp68301_device> m_maincpu;
@@ -86,12 +86,12 @@ private:
 	u32 screen_update_dai2kaku(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	template <bool Rotatable> void draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect, bitmap_ind8 &priority);
 
-	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
-	void base_mem(address_map &map);
-	void dai2kaku_mem(address_map &map);
-	void pkgnsh_mem(address_map &map);
-	void pkgnshdx_mem(address_map &map);
-	void realbrk_mem(address_map &map);
+	void vblank_irq(int state);
+	void base_mem(address_map &map) ATTR_COLD;
+	void dai2kaku_mem(address_map &map) ATTR_COLD;
+	void pkgnsh_mem(address_map &map) ATTR_COLD;
+	void pkgnshdx_mem(address_map &map) ATTR_COLD;
+	void realbrk_mem(address_map &map) ATTR_COLD;
 };
 
-#endif // MAME_INCLUDES_REALBRK_H
+#endif // MAME_DYNAX_REALBRK_H

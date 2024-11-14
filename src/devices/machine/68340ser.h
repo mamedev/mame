@@ -17,11 +17,11 @@ public:
 	mc68340_serial_module_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	// device-level overrides
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 	virtual uint8_t read(offs_t offset) override;
 	virtual void write(offs_t offset, uint8_t data) override;
-	DECLARE_WRITE_LINE_MEMBER(irq_w);
+	void irq_w(int state);
 
 	uint8_t irq_level() const { return irq_pending() ? (m_ilr & REG_ILR_MASK) : 0; }
 	uint8_t irq_vector() const { return m_ivr; }

@@ -43,18 +43,18 @@ public:
 	void set_data_width(uint8_t data_width) { m_data_width = data_width; }
 
 	// input lines
-	DECLARE_WRITE_LINE_MEMBER( ca_w );
-	DECLARE_WRITE_LINE_MEMBER( sel_w ) { m_sel = state; }
-	DECLARE_WRITE_LINE_MEMBER( drq1_w );
-	DECLARE_WRITE_LINE_MEMBER( drq2_w );
-	DECLARE_WRITE_LINE_MEMBER( ext1_w );
-	DECLARE_WRITE_LINE_MEMBER( ext2_w );
+	void ca_w(int state);
+	void sel_w(int state) { m_sel = state; }
+	void drq1_w(int state);
+	void drq2_w(int state);
+	void ext1_w(int state);
+	void ext2_w(int state);
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 	virtual void device_config_complete() override;
-	virtual void device_reset() override;
+	virtual void device_reset() override ATTR_COLD;
 
 	// device_execute_interface overrides
 	virtual void execute_run() override;
@@ -74,7 +74,7 @@ protected:
 	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
 
 	// optional information overrides
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 private:
 	bool sysbus_width() const { return BIT(m_sysbus, 0); }
@@ -82,8 +82,8 @@ private:
 	bool request_grant() const { return BIT(m_soc, 1); }
 
 	// internal communication
-	DECLARE_WRITE_LINE_MEMBER( ch1_sintr_w ) { m_write_sintr1(state); }
-	DECLARE_WRITE_LINE_MEMBER( ch2_sintr_w ) { m_write_sintr2(state); }
+	void ch1_sintr_w(int state) { m_write_sintr1(state); }
+	void ch2_sintr_w(int state) { m_write_sintr2(state); }
 
 	uint8_t read_byte(bool space, offs_t address);
 	uint16_t read_word(bool space, offs_t address);

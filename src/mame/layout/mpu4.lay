@@ -1,10 +1,15 @@
 <?xml version="1.0"?>
 <!--
-license:CC0
+license:CC0-1.0
 -->
 <mamelayout version="2">
 	<element name="digit">
 		<led7seg>
+			<color red="1.0" green="0.0" blue="0.0" />
+		</led7seg>
+	</element>
+	<element name="digitinv">
+		<led7seg invert="1">
 			<color red="1.0" green="0.0" blue="0.0" />
 		</led7seg>
 	</element>
@@ -292,6 +297,12 @@ license:CC0
 		<repeat count="16">
 			<param name="n" start="15" increment="-1" />
 			<param name="x" start="0" increment="9" />
+			<element name="vfdblank~n~" ref="vfd0" state="0">
+				<animate name="vfdduty0" />
+				<color state="31" red="0.00" green="0.6" blue="1.00" alpha="0.0" />
+				<color state="0" red="0.00" green="0.6" blue="1.00" alpha="1.0" />
+				<bounds x="~x~" y="0" width="9" height="17" />
+			</element>
 			<element name="vfd~n~" ref="vfd0" state="0">
 				<animate name="vfdduty0" />
 				<color state="0" red="0.00" green="0.6" blue="1.00" alpha="0.0" />
@@ -351,13 +362,22 @@ license:CC0
 			</repeat>
 		</repeat>
 
-		<repeat count="8">
+		<repeat count="16">
 			<param name="n" start="0" increment="1" />
 			<param name="x" start="300" increment="8" />
 			<element name="digit~n~" ref="digit" state="0">
 				<bounds x="~x~" y="280" width="8" height="10" />
 			</element>
 		</repeat>
+
+		<repeat count="16">
+			<param name="n" start="0" increment="1" />
+			<param name="x" start="300" increment="8" />
+			<element name="digit~n~" ref="digitinv" state="0">
+				<bounds x="~x~" y="295" width="8" height="10" />
+			</element>
+		</repeat>
+
 		<group ref="vfd">
 			<bounds x="17" y="280" width="112" height="24" />
 		</group>

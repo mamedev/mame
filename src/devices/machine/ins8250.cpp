@@ -95,7 +95,7 @@ History:
 **********************************************************************/
 
 #include "emu.h"
-#include "machine/ins8250.h"
+#include "ins8250.h"
 
 #include <algorithm>
 
@@ -179,7 +179,7 @@ static constexpr u8 INS8250_LCR_2STOP_BITS = 0x04;
 //static constexpr u8 INS8250_LCR_PEN = 0x08;
 //static constexpr u8 INS8250_LCR_EVEN_PAR = 0x10;
 //static constexpr u8 INS8250_LCR_PARITY = 0x20;
-//static constexpr u8 INS8250_LCR_BREAK = 0x40;
+static constexpr u8 INS8250_LCR_BREAK = 0x40;
 static constexpr u8 INS8250_LCR_DLAB = 0x80;
 
 /* ints will continue to be set for as long as there are ints pending */
@@ -241,7 +241,7 @@ void ins8250_uart_device::clear_int(int flag)
 	update_interrupt();
 }
 
-READ_LINE_MEMBER(ins8250_uart_device::intrpt_r)
+int ins8250_uart_device::intrpt_r()
 {
 	return !BIT(m_regs.iir, 0);
 }
@@ -299,9 +299,11 @@ void ins8250_uart_device::ins8250_w(offs_t offset, u8 data)
 			set_fcr(data);
 			break;
 		case 3:
+			{
+			bool break_state_changed = bool((m_regs.lcr ^ data) & INS8250_LCR_BREAK);
+
 			m_regs.lcr = data;
 
-			{
 			int data_bit_count = (m_regs.lcr & INS8250_LCR_BITCOUNT_MASK) + 5;
 			parity_t parity;
 			stop_bits_t stop_bits;
@@ -336,6 +338,19 @@ void ins8250_uart_device::ins8250_w(offs_t offset, u8 data)
 			else
 				stop_bits = STOP_BITS_2;
 
+			if (break_state_changed)
+			{
+				int new_out_val = (m_regs.lcr & INS8250_LCR_BREAK) ? 0 : m_txd;
+
+				if (m_regs.mcr & INS8250_MCR_LOOPBACK)
+				{
+					device_serial_interface::rx_w(new_out_val);
+				}
+				else
+				{
+					m_out_tx_cb(new_out_val);
+				}
+			}
 			set_data_frame(1, data_bit_count, parity, stop_bits);
 			}
 			break;
@@ -349,7 +364,10 @@ void ins8250_uart_device::ins8250_w(offs_t offset, u8 data)
 				if (m_regs.mcr & INS8250_MCR_LOOPBACK)
 				{
 					m_out_tx_cb(1);
-					device_serial_interface::rx_w(m_txd);
+					if ((m_regs.lcr & INS8250_LCR_BREAK) == 0)
+					{
+						device_serial_interface::rx_w(m_txd);
+					}
 					m_out_dtr_cb(1);
 					m_out_rts_cb(1);
 					m_out_out1_cb(1);
@@ -357,7 +375,10 @@ void ins8250_uart_device::ins8250_w(offs_t offset, u8 data)
 				}
 				else
 				{
-					m_out_tx_cb(m_txd);
+					if ((m_regs.lcr & INS8250_LCR_BREAK) == 0)
+					{
+						m_out_tx_cb(m_txd);
+					}
 					device_serial_interface::rx_w(m_rxd);
 					m_out_dtr_cb((m_regs.mcr & INS8250_MCR_DTR) ? 0 : 1);
 					m_out_rts_cb((m_regs.mcr & INS8250_MCR_RTS) ? 0 : 1);
@@ -390,13 +411,16 @@ void ins8250_uart_device::ins8250_w(offs_t offset, u8 data)
 			 */
 			m_regs.msr = (m_regs.msr & 0xf0) | (data & 0x0f);
 
-			if ( m_regs.msr & 0x0f )
+			if (m_regs.msr & 0x0f)
 				trigger_int(COM_INT_PENDING_MODEM_STATUS_REGISTER);
 			else
 				clear_int(COM_INT_PENDING_MODEM_STATUS_REGISTER);
 			break;
 		case 7:
-			m_regs.scr = data;
+			if (m_device_type >= dev_type::INS8250A)
+			{
+				m_regs.scr = data;
+			}
 			break;
 	}
 }
@@ -469,7 +493,10 @@ u8 ins8250_uart_device::ins8250_r(offs_t offset)
 			}
 			break;
 		case 7:
-			data = m_regs.scr;
+			if (m_device_type >= dev_type::INS8250A)
+			{
+				data = m_regs.scr;
+			}
 			break;
 	}
 	return data;
@@ -568,6 +595,13 @@ void ins8250_uart_device::tra_complete()
 void ins8250_uart_device::tra_callback()
 {
 	m_txd = transmit_register_get_data_bit();
+
+	if (m_regs.lcr & INS8250_LCR_BREAK)
+	{
+		// in break mode, don't change transmitted bit
+		return;
+	}
+
 	if (m_regs.mcr & INS8250_MCR_LOOPBACK)
 	{
 		device_serial_interface::rx_w(m_txd);
@@ -585,7 +619,7 @@ void ins8250_uart_device::update_msr()
 
 	if (m_regs.mcr & INS8250_MCR_LOOPBACK)
 	{
-		data = (((m_regs.mcr & (INS8250_MCR_OUT1|INS8250_MCR_OUT2)) << 4) | \
+		data = (((m_regs.mcr & (INS8250_MCR_OUT1|INS8250_MCR_OUT2)) << 4) |
 			((m_regs.mcr & INS8250_MCR_DTR) << 5) | ((m_regs.mcr & INS8250_MCR_RTS) << 3));
 		change = (m_regs.msr ^ data) >> 4;
 		if(!(m_regs.msr & 0x40) && (data & 0x40))
@@ -603,31 +637,31 @@ void ins8250_uart_device::update_msr()
 		trigger_int(COM_INT_PENDING_MODEM_STATUS_REGISTER);
 }
 
-WRITE_LINE_MEMBER(ins8250_uart_device::dcd_w)
+void ins8250_uart_device::dcd_w(int state)
 {
 	m_dcd = state;
 	update_msr();
 }
 
-WRITE_LINE_MEMBER(ins8250_uart_device::dsr_w)
+void ins8250_uart_device::dsr_w(int state)
 {
 	m_dsr = state;
 	update_msr();
 }
 
-WRITE_LINE_MEMBER(ins8250_uart_device::ri_w)
+void ins8250_uart_device::ri_w(int state)
 {
 	m_ri = state;
 	update_msr();
 }
 
-WRITE_LINE_MEMBER(ins8250_uart_device::cts_w)
+void ins8250_uart_device::cts_w(int state)
 {
 	m_cts = state;
 	update_msr();
 }
 
-WRITE_LINE_MEMBER(ins8250_uart_device::rx_w)
+void ins8250_uart_device::rx_w(int state)
 {
 	m_rxd = state;
 
@@ -637,12 +671,6 @@ WRITE_LINE_MEMBER(ins8250_uart_device::rx_w)
 
 void ins8250_uart_device::device_start()
 {
-	m_out_tx_cb.resolve_safe();
-	m_out_dtr_cb.resolve_safe();
-	m_out_rts_cb.resolve_safe();
-	m_out_int_cb.resolve_safe();
-	m_out_out1_cb.resolve_safe();
-	m_out_out2_cb.resolve_safe();
 	set_tra_rate(0);
 	set_rcv_rate(0);
 

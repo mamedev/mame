@@ -1,13 +1,12 @@
 /*
- * Copyright 2011-2021 Branimir Karadzic. All rights reserved.
- * License: https://github.com/bkaradzic/bgfx#license-bsd-2-clause
+ * Copyright 2011-2022 Branimir Karadzic. All rights reserved.
+ * License: https://github.com/bkaradzic/bgfx/blob/master/LICENSE
  */
 
 #include "bgfx.cpp"
 #include "debug_renderdoc.cpp"
 #include "dxgi.cpp"
 #include "glcontext_egl.cpp"
-#include "glcontext_glx.cpp"
 #include "glcontext_wgl.cpp"
 #include "glcontext_html5.cpp"
 #include "nvapi.cpp"

@@ -23,6 +23,9 @@
 #include "emupal.h"
 #include "screen.h"
 
+
+namespace {
+
 class adacp150_state : public driver_device
 {
 public:
@@ -39,7 +42,7 @@ public:
 	void adacp150(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	HD44780_PIXEL_UPDATE(pixel_update);
@@ -49,10 +52,10 @@ private:
 	void bcp_ram_w(offs_t offset, u8 data);
 	void output_control_w(u8 data);
 
-	void z80_mem_map(address_map &map);
-	void z80_io_map(address_map &map);
-	void bcp_prog_map(address_map &map);
-	void bcp_data_map(address_map &map);
+	void z80_mem_map(address_map &map) ATTR_COLD;
+	void z80_io_map(address_map &map) ATTR_COLD;
+	void bcp_prog_map(address_map &map) ATTR_COLD;
+	void bcp_data_map(address_map &map) ATTR_COLD;
 
 	required_device<z80_device> m_maincpu;
 	required_device<dp8344_device> m_bcp;
@@ -213,7 +216,7 @@ void adacp150_state::adacp150(machine_config &config)
 	screen.set_visarea(0, 16*6-1, 0, 16-1);
 	screen.set_palette("palette");
 
-	HD44780(config, m_lcdc);
+	HD44780(config, m_lcdc, 270'000); // TODO: clock not measured, datasheet typical clock used
 	m_lcdc->set_lcd_size(2, 20);
 	m_lcdc->set_pixel_update_cb(FUNC(adacp150_state::pixel_update));
 
@@ -225,5 +228,8 @@ ROM_START(adacp150p)
 	ROM_LOAD("pa_2436__rev-4.52.u11", 0x0000, 0x8000, CRC(a381674c) SHA1(1d3cb4ca3ead40da67a353efe7553ea953fa929d)) // Intel D27C256
 	ROM_LOAD("pa_2437__rev-4.52.u22", 0x8000, 0x4000, CRC(eb468ad0) SHA1(881a90a6aa89d7e289d7adbec46d007a8cfa5351)) // Intel D27C128
 ROM_END
+
+} // anonymous namespace
+
 
 SYST(1989, adacp150p, 0, 0, adacp150, adacp150, adacp150_state, empty_init, "Adacom", "CP-150 Plus", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW)

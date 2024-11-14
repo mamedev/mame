@@ -21,6 +21,8 @@
 
 #include "divtlb.h"
 
+#include <algorithm>
+
 
 /***************************************************************************
     CONSTANTS
@@ -214,6 +216,9 @@ public:
 	void set_bus_frequency(uint32_t bus_frequency) { c_bus_frequency = bus_frequency; }
 	void set_bus_frequency(const XTAL &xtal) { set_bus_frequency(xtal.value()); }
 
+	void set_serial_clock(uint32_t serial_clock) { c_serial_clock = serial_clock; }
+	void set_serial_clock(const XTAL &xtal) { set_serial_clock(xtal.value()); }
+
 	void ppc_set_dcstore_callback(write32sm_delegate callback);
 
 	void ppcdrc_set_options(uint32_t options);
@@ -247,20 +252,19 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
-	virtual void device_stop() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+	virtual void device_stop() override ATTR_COLD;
 
 	// device_execute_interface overrides
 	virtual uint32_t execute_min_cycles() const noexcept override { return 1; }
 	virtual uint32_t execute_max_cycles() const noexcept override { return 40; }
-	virtual uint32_t execute_input_lines() const noexcept override { return 1; }
 	virtual void execute_run() override;
 	virtual void execute_set_input(int inputnum, int state) override;
 
 	// device_memory_interface overrides
 	virtual space_config_vector memory_space_config() const override;
-	virtual bool memory_translate(int spacenum, int intention, offs_t &address) override;
+	virtual bool memory_translate(int spacenum, int intention, offs_t &address, address_space *&target_space) override;
 
 	// device_state_interface overrides
 	virtual void state_export(const device_state_entry &entry) override;
@@ -297,6 +301,7 @@ protected:
 	memory_access<32, 2, 0, ENDIANNESS_BIG>::cache m_cache32;
 	memory_access<32, 3, 0, ENDIANNESS_BIG>::cache m_cache64;
 	uint32_t c_bus_frequency;
+	uint32_t c_serial_clock;
 
 	struct internal_ppc_state
 	{
@@ -465,22 +470,30 @@ protected:
 
 	/* architectural distinctions */
 	powerpc_flavor  m_flavor;
-	uint32_t          m_cap;
-	uint8_t           m_cache_line_size;
-	uint32_t          m_tb_divisor;
+	uint32_t        m_cap;
+	uint8_t         m_cache_line_size;
+	uint32_t        m_tb_divisor;
 
 	/* PowerPC 4xx-specific state */
 	/* PowerPC 4XX-specific serial port state */
 	struct ppc4xx_spu_state
 	{
-		ppc4xx_spu_state(device_t &owner) : tx_cb(owner) { }
+		ppc4xx_spu_state(device_t &owner) : timer(nullptr), tx_cb(owner) { }
 
-		uint8_t           regs[9];
-		uint8_t           txbuf;
-		uint8_t           rxbuf;
+		void clear()
+		{
+			std::fill(std::begin(regs), std::end(regs), 0);
+			txbuf = rxbuf = 0;
+			std::fill(std::begin(rxbuffer), std::end(rxbuffer), 0);
+			rxin = rxout = 0;
+		}
+
+		uint8_t         regs[9];
+		uint8_t         txbuf;
+		uint8_t         rxbuf;
 		emu_timer *     timer;
-		uint8_t           rxbuffer[256];
-		uint32_t          rxin, rxout;
+		uint8_t         rxbuffer[256];
+		uint32_t        rxin, rxout;
 		write8smo_delegate tx_cb;
 	};
 
@@ -488,8 +501,8 @@ protected:
 	emu_timer *     m_fit_timer;
 	emu_timer *     m_pit_timer;
 	emu_timer *     m_wdog_timer;
-	uint32_t          m_pit_reload;
-	uint32_t          m_irqstate;
+	uint32_t        m_pit_reload;
+	uint32_t        m_irqstate;
 	emu_timer *     m_buffered_dma_timer[4];
 	int             m_buffered_dma_rate[4];
 
@@ -499,9 +512,11 @@ protected:
 
 	uint32_t          m_system_clock;
 	uint32_t          m_cpu_clock;
+	uint32_t          m_serial_clock;
 	uint64_t          m_tb_zero_cycles;
 	uint64_t          m_dec_zero_cycles;
 	emu_timer *     m_decrementer_int_timer;
+
 
 	read32sm_delegate  m_dcr_read_func;
 	write32sm_delegate m_dcr_write_func;
@@ -629,7 +644,7 @@ protected:
 	void set_timebase(uint64_t newtb);
 	uint32_t get_decrementer();
 	void set_decrementer(uint32_t newdec);
-	uint32_t ppccom_translate_address_internal(int intention, offs_t &address);
+	uint32_t ppccom_translate_address_internal(int intention, bool debug, offs_t &address);
 	void ppc4xx_set_irq_line(uint32_t bitmask, int state);
 	int ppc4xx_get_irq_line(uint32_t bitmask);
 	void ppc4xx_dma_update_irq_states();
@@ -687,9 +702,6 @@ private:
 //{
 //public:
 //  ppc403_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-//
-//protected:
-//  virtual uint32_t execute_input_lines() const noexcept { return 8; }
 //};
 //
 //
@@ -697,9 +709,6 @@ private:
 //{
 //public:
 //  ppc405_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-//
-//protected:
-//  virtual uint32_t execute_input_lines() const noexcept { return 8; }
 //};
 
 
@@ -751,6 +760,17 @@ public:
 	ppc604_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
+class ppc740_device : public ppc_device
+{
+public:
+	ppc740_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+};
+
+class ppc750_device : public ppc_device
+{
+public:
+	ppc750_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+};
 
 class ppc4xx_device : public ppc_device
 {
@@ -766,11 +786,10 @@ public:
 	uint8_t ppc4xx_spu_r(offs_t offset);
 	void ppc4xx_spu_w(offs_t offset, uint8_t data);
 
-	void internal_ppc4xx(address_map &map);
+	void internal_ppc4xx(address_map &map) ATTR_COLD;
 protected:
 	ppc4xx_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, powerpc_flavor flavor, uint32_t cap, uint32_t tb_divisor);
 
-	virtual uint32_t execute_input_lines() const noexcept override { return 5; }
 	virtual void execute_set_input(int inputnum, int state) override;
 };
 
@@ -806,5 +825,7 @@ DECLARE_DEVICE_TYPE(MPC8240,   mpc8240_device)
 DECLARE_DEVICE_TYPE(PPC403GA,  ppc403ga_device)
 DECLARE_DEVICE_TYPE(PPC403GCX, ppc403gcx_device)
 DECLARE_DEVICE_TYPE(PPC405GP,  ppc405gp_device)
+DECLARE_DEVICE_TYPE(PPC740,    ppc740_device)
+DECLARE_DEVICE_TYPE(PPC750,    ppc750_device)
 
 #endif  // MAME_CPU_POWERPC_PPC_H

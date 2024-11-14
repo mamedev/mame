@@ -46,15 +46,15 @@ public:
 	auto d_cb() { return m_read_d.bind(); }
 
 	// optional information overrides
-	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 
-	DECLARE_WRITE_LINE_MEMBER( crs_w );
-	DECLARE_WRITE_LINE_MEMBER( dew_w );
-	DECLARE_WRITE_LINE_MEMBER( lose_w );
-	DECLARE_READ_LINE_MEMBER( tlc_r );
+	void crs_w(int state);
+	void dew_w(int state);
+	void lose_w(int state);
+	int tlc_r();
 	void write(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER( f1_w );
-	DECLARE_WRITE_LINE_MEMBER( tr6_w );
+	void f1_w(int state);
+	void tr6_w(int state);
 	int get_rgb();
 
 	// NOTE: the following are provided for convenience only, SAA5050 is not a display controller
@@ -66,8 +66,8 @@ protected:
 	saa5050_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 private:
 	enum
@@ -158,7 +158,7 @@ public:
 	saa5051_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// optional information overrides
-	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 };
 
 
@@ -171,7 +171,7 @@ public:
 	saa5052_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// optional information overrides
-	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 };
 
 
@@ -184,7 +184,7 @@ public:
 	saa5053_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// optional information overrides
-	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 };
 
 
@@ -197,7 +197,7 @@ public:
 	saa5054_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// optional information overrides
-	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 };
 
 
@@ -210,7 +210,7 @@ public:
 	saa5055_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// optional information overrides
-	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 };
 
 
@@ -223,7 +223,7 @@ public:
 	saa5056_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// optional information overrides
-	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 };
 
 
@@ -236,7 +236,7 @@ public:
 	saa5057_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// optional information overrides
-	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 };
 
 

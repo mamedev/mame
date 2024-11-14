@@ -668,7 +668,7 @@ INTERRUPT_GEN_MEMBER(arcadia_state::video_line)
 		draw_sprites();
 }
 
-READ_LINE_MEMBER(arcadia_state::vsync_r)
+int arcadia_state::vsync_r()
 {
 	return m_line >= 216 ? ASSERT_LINE : CLEAR_LINE;
 }

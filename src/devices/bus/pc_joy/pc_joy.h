@@ -56,7 +56,7 @@ class pc_basic_joy_device : public device_t,
 {
 public:
 	pc_basic_joy_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
-	virtual ioport_constructor device_input_ports() const override;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 
 	virtual uint8_t x1(int delta) override { return (m_x1->read() > delta); }
 	virtual uint8_t x2(int delta) override { return (m_x2->read() > delta); }
@@ -65,10 +65,13 @@ public:
 	virtual uint8_t btn() override { return m_btn->read(); }
 
 protected:
+	pc_basic_joy_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock = 0);
+
 	virtual void device_start() override { }
 
-private:
 	required_ioport m_btn;
+
+private:
 	required_ioport m_x1;
 	required_ioport m_y1;
 	required_ioport m_x2;

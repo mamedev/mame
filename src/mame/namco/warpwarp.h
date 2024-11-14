@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Chris Hardy
-#ifndef MAME_INCLUDES_WARPWARP_H
-#define MAME_INCLUDES_WARPWARP_H
+#ifndef MAME_NAMCO_WARPWARP_H
+#define MAME_NAMCO_WARPWARP_H
 
 #pragma once
 
@@ -91,14 +91,13 @@ private:
 	//geebee and navarone
 	uint8_t geebee_in_r(offs_t offset);
 	void geebee_out6_w(offs_t offset, uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(counter_w);
-	DECLARE_WRITE_LINE_MEMBER(lock_out_w);
-	DECLARE_WRITE_LINE_MEMBER(geebee_bgw_w);
-	DECLARE_WRITE_LINE_MEMBER(ball_on_w);
-	DECLARE_WRITE_LINE_MEMBER(inv_w);
+	void counter_w(int state);
+	void lock_out_w(int state);
+	void geebee_bgw_w(int state);
+	void ball_on_w(int state);
 	void geebee_videoram_w(offs_t offset, uint8_t data);
 
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 	DECLARE_MACHINE_RESET(kaitei);
 
 	DECLARE_VIDEO_START(geebee);
@@ -118,12 +117,12 @@ private:
 	inline void plot(bitmap_ind16 &bitmap, const rectangle &cliprect, int x, int y, pen_t pen);
 	void draw_ball(bitmap_ind16 &bitmap, const rectangle &cliprect,pen_t pen);
 
-	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
+	void vblank_irq(int state);
 
-	void bombbee_map(address_map &map);
-	void geebee_map(address_map &map);
-	void geebee_port_map(address_map &map);
-	void warpwarp_map(address_map &map);
+	void bombbee_map(address_map &map) ATTR_COLD;
+	void geebee_map(address_map &map) ATTR_COLD;
+	void geebee_port_map(address_map &map) ATTR_COLD;
+	void warpwarp_map(address_map &map) ATTR_COLD;
 };
 
-#endif // MAME_INCLUDES_WARPWARP_H
+#endif // MAME_NAMCO_WARPWARP_H

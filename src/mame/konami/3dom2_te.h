@@ -5,8 +5,8 @@
     3DO M2 BDA Triangle Engine
 
 ***************************************************************************/
-#ifndef MAME_VIDEO_3DOM2_TE_H
-#define MAME_VIDEO_3DOM2_TE_H
+#ifndef MAME_KONAMI_3DOM2_TE_H
+#define MAME_KONAMI_3DOM2_TE_H
 
 #pragma once
 
@@ -46,8 +46,8 @@ public:
 	};
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	TIMER_CALLBACK_MEMBER(command_done);
 
@@ -415,4 +415,4 @@ private:
 
 DECLARE_DEVICE_TYPE(M2_TE, m2_te_device)
 
-#endif // MAME_VIDEO_3DOM2_TE_H
+#endif // MAME_KONAMI_3DOM2_TE_H

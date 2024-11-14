@@ -134,7 +134,7 @@ void irem_m37b_audio_device::analog_w(uint8_t data)
  *
  *************************************/
 
-READ_LINE_MEMBER(irem_m37b_audio_device::sound_status_r)
+int irem_m37b_audio_device::sound_status_r()
 {
 	// communication handshake between host and sound CPU
 	// at least Panther uses it, unconfirmed for Red Alert and Demoneye-X

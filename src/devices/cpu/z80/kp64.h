@@ -32,14 +32,13 @@ public:
 	void control_w(u8 data);
 
 	// input line interface
-	DECLARE_WRITE_LINE_MEMBER(xclk_w);
-	DECLARE_WRITE_LINE_MEMBER(gate_w);
+	void xclk_w(int state);
+	void gate_w(int state);
 
 protected:
-	// device-level overrides
-	virtual void device_resolve_objects() override;
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	// device_t implementation
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 private:
 	// timer callbacks

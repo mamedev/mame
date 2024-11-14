@@ -17,14 +17,14 @@
 #include "emu.h"
 #include "waixing.h"
 
+#define LOG_HIFREQ (1U << 1)
 
 #ifdef NES_PCB_DEBUG
-#define VERBOSE 1
+#define VERBOSE (LOG_GENERAL)
 #else
-#define VERBOSE 0
+#define VERBOSE (0)
 #endif
-
-#define LOG_MMC(x) do { if (VERBOSE) logerror x; } while (0)
+#include "logmacro.h"
 
 
 //-------------------------------------------------
@@ -314,7 +314,7 @@ void nes_waixing_fs304_device::pcb_reset()
 
  iNES: mapper 74
 
- In MESS: Supported
+ In MAME: Supported
 
  -------------------------------------------------*/
 
@@ -334,7 +334,7 @@ void nes_waixing_a_device::set_mirror(uint8_t nt)
 			set_nt_mirroring(PPU_MIRROR_HIGH);
 			break;
 		default:
-			LOG_MMC(("Mapper set NT to invalid value %02x", nt));
+			LOG("Mapper set NT to invalid value %02x", nt);
 			break;
 	}
 }
@@ -355,7 +355,7 @@ void nes_waixing_a1_device::chr_cb(int start, int bank, int source)
 
 void nes_waixing_a_device::waixing_write(offs_t offset, uint8_t data)
 {
-	LOG_MMC(("waixing_write, offset: %04x, data: %02x\n", offset, data));
+	LOG("waixing_write, offset: %04x, data: %02x\n", offset, data);
 
 	switch (offset & 0x6001)
 	{
@@ -374,7 +374,7 @@ void nes_waixing_a_device::waixing_write(offs_t offset, uint8_t data)
 
 uint8_t nes_waixing_a_device::read_l(offs_t offset)
 {
-	LOG_MMC(("waixing read_l, offset: %04x\n", offset));
+	LOG("waixing read_l, offset: %04x\n", offset);
 	offset += 0x100;
 	if (offset >= 0x1000 && offset < 0x1400)
 		return mapper_ram[offset & 0x3ff];
@@ -384,7 +384,7 @@ uint8_t nes_waixing_a_device::read_l(offs_t offset)
 
 void nes_waixing_a_device::write_l(offs_t offset, uint8_t data)
 {
-	LOG_MMC(("waixing write_l, offset: %04x, data: %02x\n", offset, data));
+	LOG("waixing write_l, offset: %04x, data: %02x\n", offset, data);
 	offset += 0x100;
 	if (offset >= 0x1000 && offset < 0x1400)
 		mapper_ram[offset & 0x3ff] = data;
@@ -403,7 +403,7 @@ void nes_waixing_a_device::write_l(offs_t offset, uint8_t data)
 
  iNES: mapper 191
 
- In MESS: Supported.
+ In MAME: Supported.
 
  -------------------------------------------------*/
 
@@ -425,7 +425,7 @@ void nes_waixing_b_device::chr_cb(int start, int bank, int source)
 
  iNES: mapper 192
 
- In MESS: Supported.
+ In MAME: Supported.
 
  -------------------------------------------------*/
 
@@ -447,7 +447,7 @@ void nes_waixing_c_device::chr_cb(int start, int bank, int source)
 
  iNES: mapper 194
 
- In MESS: Supported.
+ In MAME: Supported.
 
  -------------------------------------------------*/
 
@@ -470,7 +470,7 @@ void nes_waixing_d_device::chr_cb(int start, int bank, int source)
 
  iNES: mapper 195
 
- In MESS: Supported.
+ In MAME: Supported.
 
  -------------------------------------------------*/
 
@@ -502,7 +502,7 @@ void nes_waixing_e_device::chr_cb(int start, int bank, int source)
 
 u8 nes_waixing_f_device::read_l(offs_t offset)
 {
-// LOG_MMC(("waixing_f read_l, offset: %04x\n", offset));
+	LOGMASKED(LOG_HIFREQ, "waixing_f read_l, offset: %04x\n", offset);
 
 	offset += 0x100;
 	if (!m_prgram.empty() && offset >= 0x1000)
@@ -513,7 +513,7 @@ u8 nes_waixing_f_device::read_l(offs_t offset)
 
 void nes_waixing_f_device::write_l(offs_t offset, u8 data)
 {
-// LOG_MMC(("waixing_f write_l, offset: %04x, data: %02x\n", offset, data));
+	LOGMASKED(LOG_HIFREQ, "waixing_f write_l, offset: %04x, data: %02x\n", offset, data);
 
 	offset += 0x100;
 	if (!m_prgram.empty() && offset >= 0x1000)
@@ -536,7 +536,7 @@ void nes_waixing_f1_device::set_chr(u8 chr, int chr_base, int chr_mask)
 
  iNES: mapper 199
 
- In MESS: Supported.
+ In MAME: Supported.
 
  -------------------------------------------------*/
 
@@ -563,7 +563,7 @@ void nes_waixing_g_device::set_chr(uint8_t chr, int chr_base, int chr_mask)
 void nes_waixing_g_device::write_h(offs_t offset, uint8_t data)
 {
 	uint8_t cmd;
-	LOG_MMC(("waixing_g write_h, offset: %04x, data: %02x\n", offset, data));
+	LOG("waixing_g write_h, offset: %04x, data: %02x\n", offset, data);
 
 	switch (offset & 0x6001)
 	{
@@ -613,7 +613,7 @@ void nes_waixing_g_device::write_h(offs_t offset, uint8_t data)
 
  iNES: mapper 245
 
- In MESS: Supported.
+ In MAME: Supported.
 
  -------------------------------------------------*/
 
@@ -626,7 +626,7 @@ void nes_waixing_h_device::chr_cb(int start, int bank, int source)
 void nes_waixing_h_device::write_h(offs_t offset, uint8_t data)
 {
 	uint8_t cmd;
-	LOG_MMC(("waixing_h write_h, offset: %04x, data: %02x\n", offset, data));
+	LOG("waixing_h write_h, offset: %04x, data: %02x\n", offset, data);
 
 	switch (offset & 0x6001)
 	{
@@ -668,7 +668,7 @@ void nes_waixing_h_device::write_h(offs_t offset, uint8_t data)
 void nes_waixing_h1_device::write_h(offs_t offset, uint8_t data)
 {
 	uint8_t cmd;
-	LOG_MMC(("waixing_h1 write_h, offset: %04x, data: %02x\n", offset, data));
+	LOG("waixing_h1 write_h, offset: %04x, data: %02x\n", offset, data);
 
 	switch (offset & 0x6001)
 	{
@@ -712,7 +712,7 @@ void nes_waixing_h1_device::write_h(offs_t offset, uint8_t data)
 
  MMC3 clone.
 
- In MESS: Preliminary support.
+ In MAME: Preliminary support.
 
  -------------------------------------------------*/
 
@@ -729,7 +729,7 @@ void nes_waixing_j_device::set_prg( int prg_base, int prg_mask )
 void nes_waixing_j_device::write_h(offs_t offset, uint8_t data)
 {
 	uint8_t cmd;
-	LOG_MMC(("waixing_f write_h, offset: %04x, data: %02x\n", offset, data));
+	LOG("waixing_f write_h, offset: %04x, data: %02x\n", offset, data);
 
 	switch (offset & 0x6001)
 	{
@@ -812,7 +812,7 @@ u8 nes_waixing_sh2_device::chr_r(offs_t offset)
 
  iNES: mapper 249
 
- In MESS: Partially Supported.
+ In MAME: Partially Supported.
 
  -------------------------------------------------*/
 
@@ -834,7 +834,7 @@ void nes_waixing_sec_device::chr_cb(int start, int bank, int source)
 
 void nes_waixing_sec_device::write_l(offs_t offset, uint8_t data)
 {
-	LOG_MMC(("waixing_sec write_l, offset: %04x, data: %02x\n", offset, data));
+	LOG("waixing_sec write_l, offset: %04x, data: %02x\n", offset, data);
 	offset += 0x100;
 
 	if (offset == 0x1000)
@@ -854,7 +854,7 @@ void nes_waixing_sec_device::write_l(offs_t offset, uint8_t data)
 
  iNES: mapper 178
 
- In MESS: Supported.
+ In MAME: Supported.
 
  Implementations wildly vary between emulators, but
  Cah4e3's implementation boots up both the games and
@@ -866,7 +866,7 @@ void nes_waixing_sec_device::write_l(offs_t offset, uint8_t data)
 
 void nes_waixing_sgzlz_device::write_l(offs_t offset, uint8_t data)
 {
-	LOG_MMC(("waixing_sgzlz write_l, offset: %04x, data: %02x\n", offset, data));
+	LOG("waixing_sgzlz write_l, offset: %04x, data: %02x\n", offset, data);
 	if (offset >= 0x700 && offset <= 0xEFF)
 	{
 		m_reg[offset & 0x03] = data;
@@ -925,14 +925,14 @@ void nes_waixing_sgzlz_device::write_l(offs_t offset, uint8_t data)
 
  iNES: mapper 164
 
- In MESS: Supported.
+ In MAME: Supported.
 
  -------------------------------------------------*/
 
 void nes_waixing_ffv_device::write_l(offs_t offset, uint8_t data)
 {
 	uint8_t helper;
-	LOG_MMC(("waixing_ffv write_l, offset: %04x, data: %02x\n", offset, data));
+	LOG("waixing_ffv write_l, offset: %04x, data: %02x\n", offset, data);
 	offset += 0x100; /* the checks work better on addresses */
 
 	if ((offset & 0x1200) == 0x1000)
@@ -974,13 +974,13 @@ void nes_waixing_ffv_device::write_l(offs_t offset, uint8_t data)
 
  iNES: mapper 242
 
- In MESS: Supported.
+ In MAME: Supported.
 
  -------------------------------------------------*/
 
 void nes_waixing_wxzs_device::write_h(offs_t offset, uint8_t data)
 {
-	LOG_MMC(("waixing_zs write_h, offset: %04x, data: %02x\n", offset, data));
+	LOG("waixing_zs write_h, offset: %04x, data: %02x\n", offset, data);
 
 	prg32(offset >> 3);
 
@@ -1004,13 +1004,13 @@ void nes_waixing_wxzs_device::write_h(offs_t offset, uint8_t data)
 
  iNES: mapper 242
 
- In MESS: Supported.
+ In MAME: Supported.
 
  -------------------------------------------------*/
 
 void nes_waixing_dq8_device::write_h(offs_t offset, uint8_t data)
 {
-	LOG_MMC(("waixing_dq8 write_h, offset: %04x, data: %02x\n", offset, data));
+	LOG("waixing_dq8 write_h, offset: %04x, data: %02x\n", offset, data);
 
 	prg32(offset >> 3);
 }
@@ -1037,7 +1037,7 @@ void nes_waixing_wxzs2_device::write_h(offs_t offset, uint8_t data)
 	uint8_t flip = BIT(data, 7);
 	uint8_t helper = data << 1;
 
-	LOG_MMC(("waixing_wxzs2 write_h, offset: %04x, data: %02x\n", offset, data));
+	LOG("waixing_wxzs2 write_h, offset: %04x, data: %02x\n", offset, data);
 
 	set_nt_mirroring(BIT(data, 6) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
 
@@ -1081,13 +1081,13 @@ void nes_waixing_wxzs2_device::write_h(offs_t offset, uint8_t data)
 
  iNES: mapper 162? (only found in UNIF format)
 
- In MESS: Supported.
+ In MAME: Supported.
 
  -------------------------------------------------*/
 
 void nes_waixing_fs304_device::write_l(offs_t offset, uint8_t data)
 {
-	LOG_MMC(("fs304 write_l, offset: %04x, data: %02x\n", offset, data));
+	LOG("fs304 write_l, offset: %04x, data: %02x\n", offset, data);
 
 	offset += 0x100;
 	if (offset >= 0x1000)

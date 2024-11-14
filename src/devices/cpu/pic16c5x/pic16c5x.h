@@ -1,15 +1,13 @@
 // license:BSD-3-Clause
 // copyright-holders:Tony La Porta
-	/**************************************************************************\
-	*                      Microchip PIC16C5x Emulator                         *
-	*                                                                          *
-	*                    Copyright Tony La Porta                               *
-	*                 Originally written for the MAME project.                 *
-	*                                                                          *
-	*                                                                          *
-	*      Addressing architecture is based on the Harvard addressing scheme.  *
-	*                                                                          *
-	\**************************************************************************/
+/*
+
+  Microchip PIC16C5x Emulator
+
+  Copyright Tony La Porta
+  Originally written for the MAME project.
+
+*/
 
 #ifndef MAME_CPU_PIC16C5X_PIC16C5X_H
 #define MAME_CPU_PIC16C5X_PIC16C5X_H
@@ -26,15 +24,6 @@ enum
 #define PIC16C5x_T0CKI PIC16C5x_RTCC
 
 
-// i/o ports
-enum
-{
-	PIC16C5x_PORTA = 0,
-	PIC16C5x_PORTB,
-	PIC16C5x_PORTC,
-	PIC16C5x_PORTD
-};
-
 DECLARE_DEVICE_TYPE(PIC16C54, pic16c54_device)
 DECLARE_DEVICE_TYPE(PIC16C55, pic16c55_device)
 DECLARE_DEVICE_TYPE(PIC16C56, pic16c56_device)
@@ -42,47 +31,63 @@ DECLARE_DEVICE_TYPE(PIC16C57, pic16c57_device)
 DECLARE_DEVICE_TYPE(PIC16C58, pic16c58_device)
 
 DECLARE_DEVICE_TYPE(PIC1650,  pic1650_device)
+DECLARE_DEVICE_TYPE(PIC1654S, pic1654s_device)
 DECLARE_DEVICE_TYPE(PIC1655,  pic1655_device)
 
 
 class pic16c5x_device : public cpu_device
 {
+	// i/o ports
+	enum
+	{
+		PORTA = 0,
+		PORTB,
+		PORTC,
+		PORTD
+	};
+
 public:
 	// port a, 4 or 8 bits, 2-way
-	auto read_a() { return m_read_a.bind(); }
-	auto write_a() { return m_write_a.bind(); }
+	auto read_a() { return m_read_port[PORTA].bind(); }
+	auto write_a() { return m_write_port[PORTA].bind(); }
 
 	// port b, 8 bits, 2-way
-	auto read_b() { return m_read_b.bind(); }
-	auto write_b() { return m_write_b.bind(); }
+	auto read_b() { return m_read_port[PORTB].bind(); }
+	auto write_b() { return m_write_port[PORTB].bind(); }
 
 	// port c, 8 bits, 2-way
-	auto read_c() { return m_read_c.bind(); }
-	auto write_c() { return m_write_c.bind(); }
+	auto read_c() { return m_read_port[PORTC].bind(); }
+	auto write_c() { return m_write_port[PORTC].bind(); }
 
 	// port d, 8 bits, 2-way
-	auto read_d() { return m_read_d.bind(); }
-	auto write_d() { return m_write_d.bind(); }
+	auto read_d() { return m_read_port[PORTD].bind(); }
+	auto write_d() { return m_write_port[PORTD].bind(); }
 
 	/****************************************************************************
 	 *  Function to configure the CONFIG register. This is actually hard-wired
 	 *  during ROM programming, so should be called in the driver INIT, with
 	 *  the value if known (available in HEX dumps of the ROM).
 	 */
-	void set_config(uint16_t data);
+	void set_config(u16 data);
 
-	void ram_5(address_map &map);
-	void ram_7(address_map &map);
-	void rom_10(address_map &map);
-	void rom_11(address_map &map);
-	void rom_9(address_map &map);
+	void core_regs(address_map &map, u8 mirror = 0) ATTR_COLD;
+	void ram_5_2ports(address_map &map) ATTR_COLD;
+	void ram_5_3ports(address_map &map) ATTR_COLD;
+	void ram_1655_3ports(address_map &map) ATTR_COLD;
+	void ram_5_4ports(address_map &map) ATTR_COLD;
+	void ram_7_2ports(address_map &map) ATTR_COLD;
+	void ram_7_3ports(address_map &map) ATTR_COLD;
+	void rom_10(address_map &map) ATTR_COLD;
+	void rom_11(address_map &map) ATTR_COLD;
+	void rom_9(address_map &map) ATTR_COLD;
+
 protected:
 	// construction/destruction
-	pic16c5x_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int program_width, int data_width, int picmodel);
+	pic16c5x_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, int program_width, int data_width, int picmodel, address_map_constructor data_map);
 
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// device_execute_interface overrides
 	/**************************************************************************
@@ -92,11 +97,10 @@ protected:
 	 *  times. (Each instruction cycle passes through 4 machine states). This
 	 *  is handled by the cpu execution engine.
 	 */
-	virtual uint64_t execute_clocks_to_cycles(uint64_t clocks) const noexcept override { return (clocks + 4 - 1) / 4; }
-	virtual uint64_t execute_cycles_to_clocks(uint64_t cycles) const noexcept override { return (cycles * 4); }
-	virtual uint32_t execute_min_cycles() const noexcept override { return 1; }
-	virtual uint32_t execute_max_cycles() const noexcept override { return 2; }
-	virtual uint32_t execute_input_lines() const noexcept override { return 1; }
+	virtual u64 execute_clocks_to_cycles(u64 clocks) const noexcept override { return (clocks + 4 - 1) / 4; }
+	virtual u64 execute_cycles_to_clocks(u64 cycles) const noexcept override { return (cycles * 4); }
+	virtual u32 execute_min_cycles() const noexcept override { return 1; }
+	virtual u32 execute_max_cycles() const noexcept override { return 2; }
 	virtual bool execute_input_edge_triggered(int inputnum) const noexcept override { return inputnum == PIC16C5x_RTCC; }
 	virtual void execute_run() override;
 	virtual void execute_set_input(int line, int state) override;
@@ -117,69 +121,87 @@ private:
 	address_space_config m_data_config;
 
 	/******************** CPU Internal Registers *******************/
-	uint16_t  m_PC;
-	uint16_t  m_PREVPC;     /* previous program counter */
-	uint8_t   m_W;
-	uint8_t   m_OPTION;
-	uint16_t  m_CONFIG;
-	uint8_t   m_ALU;
-	uint16_t  m_WDT;
-	uint8_t   m_TRISA;
-	uint8_t   m_TRISB;
-	uint8_t   m_TRISC;
-	uint16_t  m_STACK[2];
-	uint16_t  m_prescaler;  /* Note: this is really an 8-bit register */
-	PAIR    m_opcode;
-	uint8_t   *m_internalram;
+	u16       m_PC;
+	u16       m_PREVPC;     // previous program counter
+	u8        m_W;
+	u8        m_OPTION;
+	u16       m_CONFIG;
+	u8        m_ALU;
+	u16       m_WDT;
+	u8        m_TMR0;
+	u8        m_STATUS;
+	u8        m_FSR;
+	u8        m_port_data[4];
+	u8        m_port_tris[3];
+	u16       m_STACK[2];
+	u16       m_prescaler;  // Note: this is really an 8-bit register
+	PAIR16    m_opcode;
 
-	int     m_icount;
-	int     m_reset_vector;
-	int     m_picmodel;
-	int     m_delay_timer;
-	uint16_t  m_temp_config;
-	int     m_rtcc;
-	bool    m_count_pending;
-	int8_t    m_old_data;
-	uint8_t   m_picRAMmask;
-	int     m_inst_cycles;
+	int       m_icount;
+	int       m_picmodel;
+	int       m_data_width;
+	int       m_program_width;
+	int       m_delay_timer;
+	u16       m_temp_config;
+	int       m_rtcc;
+	u8        m_count_cycles;
+	u8        m_data_mask;
+	u16       m_program_mask;
+	u8        m_status_mask;
+	u8        m_inst_cycles;
 
 	memory_access<11, 1, -1, ENDIANNESS_LITTLE>::cache m_program;
 	memory_access< 7, 0,  0, ENDIANNESS_LITTLE>::specific m_data;
 
 	// i/o handlers
-	devcb_read8 m_read_a;
-	devcb_read8 m_read_b;
-	devcb_read8 m_read_c;
-	devcb_read8 m_read_d;
-	devcb_write8 m_write_a;
-	devcb_write8 m_write_b;
-	devcb_write8 m_write_c;
-	devcb_write8 m_write_d;
+	devcb_read8::array<4> m_read_port;
+	devcb_write8::array<4> m_write_port;
 
 	// For debugger
 	int m_debugger_temp;
 
-	/* opcode table entry */
+	// opcode table entry
 	typedef void (pic16c5x_device::*pic16c5x_ophandler)();
 	struct pic16c5x_opcode
 	{
-		uint8_t   cycles;
+		u8 cycles;
 		pic16c5x_ophandler function;
 	};
 	static const pic16c5x_opcode s_opcode_main[256];
 	static const pic16c5x_opcode s_opcode_00x[16];
 
-	void update_internalram_ptr();
-	void CALCULATE_Z_FLAG();
-	void CALCULATE_ADD_CARRY();
-	void CALCULATE_ADD_DIGITCARRY();
-	void CALCULATE_SUB_CARRY();
-	void CALCULATE_SUB_DIGITCARRY();
-	uint16_t POP_STACK();
-	void PUSH_STACK(uint16_t data);
-	uint8_t GET_REGFILE(offs_t addr);
-	void STORE_REGFILE(offs_t addr, uint8_t data);
-	void STORE_RESULT(offs_t addr, uint8_t data);
+	void calc_zero_flag();
+	void calc_add_flags(u8 augend);
+	void calc_sub_flags(u8 minuend);
+	u16 pop_stack();
+	void push_stack(u16 data);
+	void set_pc(u16 addr);
+	u8 get_regfile(u8 addr);
+	void store_regfile(u8 addr, u8 data);
+	void store_result(u8 addr, u8 data);
+
+	u8 tmr0_r();
+	void tmr0_w(u8 data);
+	u8 pcl_r();
+	void pcl_w(u8 data);
+	u8 status_r();
+	void status_w(u8 data);
+	u8 fsr_r();
+	void fsr_w(u8 data);
+	u8 porta_r();
+	void porta_w(u8 data);
+	u8 portb_r();
+	void portb_w(u8 data);
+	u8 portc_r();
+	void portc_w(u8 data);
+	u8 portd_r();
+	void portd_w(u8 data);
+
+	void reset_regs();
+	void watchdog_reset();
+	void update_watchdog(int counts);
+	void update_timer(int counts);
+
 	void illegal();
 	void addwf();
 	void andwf();
@@ -214,10 +236,6 @@ private:
 	void tris();
 	void xorlw();
 	void xorwf();
-	void pic16c5x_reset_regs();
-	void pic16c5x_soft_reset();
-	void pic16c5x_update_watchdog(int counts);
-	void pic16c5x_update_timer(int counts);
 };
 
 
@@ -225,7 +243,7 @@ class pic16c54_device : public pic16c5x_device
 {
 public:
 	// construction/destruction
-	pic16c54_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	pic16c54_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 };
 
 
@@ -233,7 +251,7 @@ class pic16c55_device : public pic16c5x_device
 {
 public:
 	// construction/destruction
-	pic16c55_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	pic16c55_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 };
 
 
@@ -241,7 +259,7 @@ class pic16c56_device : public pic16c5x_device
 {
 public:
 	// construction/destruction
-	pic16c56_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	pic16c56_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 };
 
 
@@ -249,7 +267,7 @@ class pic16c57_device : public pic16c5x_device
 {
 public:
 	// construction/destruction
-	pic16c57_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	pic16c57_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 };
 
 
@@ -257,7 +275,7 @@ class pic16c58_device : public pic16c5x_device
 {
 public:
 	// construction/destruction
-	pic16c58_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	pic16c58_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 };
 
 
@@ -265,15 +283,26 @@ class pic1650_device : public pic16c5x_device
 {
 public:
 	// construction/destruction
-	pic1650_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	pic1650_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 };
 
+class pic1654s_device : public pic16c5x_device
+{
+public:
+	// construction/destruction
+	pic1654s_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+
+protected:
+	// 1654S has a /8 clock divider instead of the typical /4
+	virtual u64 execute_clocks_to_cycles(u64 clocks) const noexcept override { return (clocks + 8 - 1) / 8; }
+	virtual u64 execute_cycles_to_clocks(u64 cycles) const noexcept override { return (cycles * 8); }
+};
 
 class pic1655_device : public pic16c5x_device
 {
 public:
 	// construction/destruction
-	pic1655_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	pic1655_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 };
 
 #endif  // MAME_CPU_PIC16C5X_PIC16C5X_H

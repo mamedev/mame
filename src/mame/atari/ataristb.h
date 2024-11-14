@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Curt Coder, Olivier Galibert
-#ifndef MAME_MACHINE_ATARISTB_H
-#define MAME_MACHINE_ATARISTB_H
+#ifndef MAME_ATARI_ATARISTB_H
+#define MAME_ATARI_ATARISTB_H
 
 #pragma once
 
@@ -47,9 +47,8 @@ public:
 	void ctrl_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
 protected:
-	virtual void device_resolve_objects() override;
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 private:
 	void blitter_source();
@@ -87,4 +86,4 @@ private:
 // device type declaration
 DECLARE_DEVICE_TYPE(ST_BLITTER, st_blitter_device)
 
-#endif // MAME_MACHINE_ATARISTB_H
+#endif // MAME_ATARI_ATARISTB_H

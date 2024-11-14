@@ -117,18 +117,18 @@ const hcd62121_disassembler::dasm hcd62121_disassembler::ops[256] =
 	{ "callnc",  ARG_A16,    ARG_NONE }, { "callnz",  ARG_A16,    ARG_NONE },
 
 	/* 0xb0 */
-	{ "unB0?",   ARG_NONE,   ARG_NONE }, { "unB1?",   ARG_I8,     ARG_NONE },
-	{ "unB2?",   ARG_NONE,   ARG_NONE }, { "unB3?",   ARG_I8,     ARG_NONE },
-	{ "out",     ARG_KHI,    ARG_REG  }, { "out",     ARG_KHI,    ARG_I8   },
-	{ "out",     ARG_KLO,    ARG_REG  }, { "out",     ARG_KLO,    ARG_I8   },
-	{ "unB8?",   ARG_NONE,   ARG_NONE }, { "unB9?",   ARG_I8,     ARG_NONE },
-	{ "unBA?",   ARG_NONE,   ARG_NONE }, { "jmpcl",   ARG_A16,    ARG_NONE },
-	{ "unBC?",   ARG_I8,     ARG_NONE }, { "unBD?",   ARG_NONE,   ARG_NONE },
-	{ "unBE?",   ARG_NONE,   ARG_NONE }, { "jmpncl",  ARG_A16,    ARG_NONE },
+	{ "unB0?",   ARG_I8,     ARG_NONE }, { "unB1?",     ARG_I8,     ARG_NONE },
+	{ "unB2?",   ARG_I8,     ARG_NONE }, { "timer_set", ARG_I8,     ARG_NONE },
+	{ "out",     ARG_KHI,    ARG_REG  }, { "out",       ARG_KHI,    ARG_I8   },
+	{ "out",     ARG_KLO,    ARG_REG  }, { "out",       ARG_KLO,    ARG_I8   },
+	{ "unB8?",   ARG_NONE,   ARG_NONE }, { "unB9?",     ARG_I8,     ARG_NONE },
+	{ "unBA?",   ARG_NONE,   ARG_NONE }, { "jmpcl",     ARG_A16,    ARG_NONE },
+	{ "unBC?",   ARG_I8,     ARG_NONE }, { "unBD?",     ARG_NONE,   ARG_NONE },
+	{ "unBE?",   ARG_NONE,   ARG_NONE }, { "jmpncl",    ARG_A16,    ARG_NONE },
 
 	/* 0xc0 */
 	{ "movb",    ARG_REG,    ARG_I8   }, { "movw",    ARG_REG,    ARG_I16  },
-	{ "movq",    ARG_REG,    ARG_I64  }, { "movt",    ARG_REG,    ARG_I80  },
+	{ "movq",    ARG_REG,    ARG_I8   }, { "movt",    ARG_REG,    ARG_I8   },
 	{ "movb",    ARG_ILR,    ARG_ILR  }, { "movw",    ARG_ILR,    ARG_ILR  },
 	{ "movq",    ARG_ILR,    ARG_ILR  }, { "movt",    ARG_ILR,    ARG_ILR  },
 	{ "unC8?",   ARG_NONE,   ARG_NONE }, { "unC9?",   ARG_NONE,   ARG_NONE },
@@ -149,7 +149,7 @@ const hcd62121_disassembler::dasm hcd62121_disassembler::ops[256] =
 	/* 0xe0 */
 	{ "in0",     ARG_REG,    ARG_NONE }, { "movb",    ARG_REG,    ARG_OPT  },
 	{ "in",      ARG_REG,    ARG_KI   }, { "movb",    ARG_REG,    ARG_DSZ  },
-	{ "movb",    ARG_REG,    ARG_F    }, { "unE5?",   ARG_I8,     ARG_NONE },
+	{ "movb",    ARG_REG,    ARG_F    }, { "movb",    ARG_REG,    ARG_TIME },
 	{ "movb",    ARG_REG,    ARG_PORT }, { "unE7?",   ARG_I8,     ARG_NONE },
 	{ "movw",    ARG_REG,    ARG_LAR  }, { "movw?",   ARG_REG,    ARG_LAR  },
 	{ "movw",    ARG_REG,    ARG_PC   }, { "movw",    ARG_REG,    ARG_SP   },
@@ -157,14 +157,14 @@ const hcd62121_disassembler::dasm hcd62121_disassembler::ops[256] =
 	{ "movb",    ARG_REG,    ARG_CS   }, { "movb",    ARG_REG,    ARG_SS   },
 
 	/* 0xf0 */
-	{ "movb",    ARG_OPT,    ARG_REG  }, { "unF1?",   ARG_I8,     ARG_NONE },
-	{ "movb",    ARG_PORT,   ARG_REG  }, { "unF3?",   ARG_I8,     ARG_NONE },
-	{ "unF4?",   ARG_I8,     ARG_NONE }, { "unF5?",   ARG_I8,     ARG_NONE },
-	{ "unF6?",   ARG_I8,     ARG_NONE }, { "unF7?",   ARG_I8,     ARG_NONE },
-	{ "unF8?",   ARG_NONE,   ARG_NONE }, { "unF9?",   ARG_NONE,   ARG_NONE },
-	{ "unFA?",   ARG_NONE,   ARG_NONE }, { "unFb?",   ARG_NONE,   ARG_NONE },
-	{ "unFC?",   ARG_NONE,   ARG_NONE }, { "unFD?",   ARG_NONE,   ARG_NONE },
-	{ "unFE?",   ARG_NONE,   ARG_NONE }, { "nop",     ARG_NONE,   ARG_NONE }
+	{ "movb",       ARG_OPT,    ARG_REG  }, { "unF1?",          ARG_I8,     ARG_NONE },
+	{ "movb",       ARG_PORT,   ARG_REG  }, { "unF3?",          ARG_I8,     ARG_NONE },
+	{ "unF4?",      ARG_I8,     ARG_NONE }, { "unF5?",          ARG_I8,     ARG_NONE },
+	{ "unF6?",      ARG_I8,     ARG_NONE }, { "timer_ctrl",     ARG_I8,     ARG_NONE },
+	{ "unF8?",      ARG_NONE,   ARG_NONE }, { "unF9?",          ARG_NONE,   ARG_NONE },
+	{ "unFA?",      ARG_NONE,   ARG_NONE }, { "unFb?",          ARG_NONE,   ARG_NONE },
+	{ "unFC?",      ARG_NONE,   ARG_NONE }, { "timer_wait_low", ARG_NONE,   ARG_NONE },
+	{ "timer_wait", ARG_NONE,   ARG_NONE }, { "nop",            ARG_NONE,   ARG_NONE }
 };
 
 u32 hcd62121_disassembler::opcode_alignment() const
@@ -186,9 +186,9 @@ offs_t hcd62121_disassembler::disassemble(std::ostream &stream, offs_t pc, const
 
 	/* Special cases for shift and rotate instructions */
 	if (inst->arg2 == ARG_S4 || inst->arg2 == ARG_S8)
-		util::stream_format(stream, "%c%c%c%c    ", inst->str[0], inst->str[1], (opcodes.r8(pc) & 0x80) ? 'r' : 'l', inst->str[3]);
+		util::stream_format(stream, "%c%c%c%c        ", inst->str[0], inst->str[1], (opcodes.r8(pc) & 0x80) ? 'r' : 'l', inst->str[3]);
 	else
-		util::stream_format(stream, "%-8s", inst->str);
+		util::stream_format(stream, "%-12s", inst->str);
 
 	switch(inst->arg1)
 	{
@@ -318,8 +318,8 @@ offs_t hcd62121_disassembler::disassemble(std::ostream &stream, offs_t pc, const
 	case ARG_PORT:
 		util::stream_format(stream, "PORT");
 		break;
-	case ARG_TIM:
-		util::stream_format(stream, "TIM?");
+	case ARG_TIME:
+		util::stream_format(stream, "TIME");
 		break;
 	case ARG_KLO:
 		util::stream_format(stream, "KOL");
@@ -408,8 +408,8 @@ offs_t hcd62121_disassembler::disassemble(std::ostream &stream, offs_t pc, const
 	case ARG_PORT:
 		util::stream_format(stream, ",PORT");
 		break;
-	case ARG_TIM:
-		util::stream_format(stream, ",TIM?");
+	case ARG_TIME:
+		util::stream_format(stream, ",TIME");
 		break;
 	case ARG_KI:
 		util::stream_format(stream, ",KI");

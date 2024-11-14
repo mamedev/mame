@@ -69,10 +69,6 @@ bbc_internal_slot_device::bbc_internal_slot_device(const machine_config &mconfig
 void bbc_internal_slot_device::device_start()
 {
 	m_card = get_card_device();
-
-	// resolve callbacks
-	m_irq_handler.resolve_safe();
-	m_nmi_handler.resolve_safe();
 }
 
 
@@ -146,7 +142,7 @@ void bbc_internal_slot_device::latch_fe60_w(uint8_t data)
 		m_card->latch_fe60_w(data);
 }
 
-WRITE_LINE_MEMBER(bbc_internal_slot_device::irq6502_w)
+void bbc_internal_slot_device::irq6502_w(int state)
 {
 	if (m_card)
 		m_card->irq6502_w(state);

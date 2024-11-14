@@ -58,6 +58,12 @@
 			//
 			// NOTE: Some names correspond to special values that will be automatically filled by the BGFX
 			//       code if they are used by the shader. These names are:
+			//           "u_view_dims"
+			//              The dimensions of the viewport.
+			//              Valid values: xy
+			//           "u_inv_view_dims"
+			//              The reciprocal of u_view_dims.
+			//              Valid values: xy
 			//           "u_screen_dims"
 			//              The dimensions of the first texture input if present, otherwise the dimensions of the output window.
 			//              Valid values: xy
@@ -95,6 +101,7 @@
 			//            "mat3": 9 floats
 			//            "mat4": 16 floats
 			"values": [ 1.0 ]
-		}
+		},
+		{ "name": "u_inv_view_dims", "type": "vec4", "values": [ 1.0, 1.0, 0.0, 0.0 ] }
 	]
 }

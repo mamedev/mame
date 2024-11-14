@@ -62,19 +62,19 @@ protected:
 	MC6845_UPDATE_ROW( cga_gfx_2bpp_update_row );
 	MC6845_UPDATE_ROW( cga_gfx_1bpp_update_row );
 
-	DECLARE_WRITE_LINE_MEMBER( hsync_changed );
-	DECLARE_WRITE_LINE_MEMBER( vsync_changed );
+	void hsync_changed(int state);
+	void vsync_changed(int state);
 
 	required_device<palette_device> m_palette;
 	required_device<mc6845_device> m_mc6845;
 
 	// device-level overrides
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 	// optional information overrides
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual const tiny_rom_entry *device_rom_region() const override;
-	virtual ioport_constructor device_input_ports() const override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 
 	required_ioport m_cga_config;
 
@@ -114,8 +114,8 @@ protected:
 	uint8_t pc200_cga_r(offs_t offset);
 
 	// device-level overrides
-	virtual const tiny_rom_entry *device_rom_region() const override;
-	virtual void device_start() override;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
+	virtual void device_start() override ATTR_COLD;
 
 	uint8_t m_port8;
 	uint8_t m_portd;

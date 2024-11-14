@@ -16,7 +16,6 @@
 #include "emu.h"
 #include "wtl3132.h"
 
-#define LOG_GENERAL (1U << 0)
 #define LOG_REGS    (1U << 1)
 #define LOG_IO      (1U << 2)
 #define LOG_BYPASS  (1U << 3)
@@ -42,11 +41,6 @@ wtl3132_device::wtl3132_device(machine_config const &mconfig, char const *tag, d
 
 void wtl3132_device::device_start()
 {
-	m_fpcn_cb.resolve_safe();
-	m_fpex_cb.resolve_safe();
-	m_zero_cb.resolve_safe();
-	m_port_x_cb.resolve_safe();
-
 	save_item(NAME(m_fpcn_state));
 	save_item(NAME(m_fpex_state));
 	save_item(NAME(m_zero_state));
@@ -342,8 +336,8 @@ void wtl3132_device::stage3(unsigned const index)
 			if ((m_mode & MODE_RTN) && OPF(code, ENCN) == 1)
 				m_cr = f32_lt(m_aa_in[1], i32_to_f32(-4194304)) || f32_lt(i32_to_f32(4194304), m_aa_in[1]);
 
-			m_a_out.v = (f32_to_i32(m_aa_in[1], (m_mode & MODE_RTN) ?
-				softfloat_round_near_even : softfloat_round_min, false) << 8) >> 8;
+			m_a_out.v = util::sext(f32_to_i32(m_aa_in[1], (m_mode & MODE_RTN) ?
+				softfloat_round_near_even : softfloat_round_min, false), 24);
 			LOG("slot %d stage 3 fix %f == 0x%08x\n", index, u2f(m_aa_in[1].v), m_a_out.v);
 			break;
 		case MF_FLUT:

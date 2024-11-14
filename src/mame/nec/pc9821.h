@@ -6,8 +6,8 @@
  *
  ******************************************/
 
-#ifndef MAME_INCLUDES_PC9821_H
-#define MAME_INCLUDES_PC9821_H
+#ifndef MAME_NEC_PC9821_H
+#define MAME_NEC_PC9821_H
 
 #pragma once
 
@@ -19,24 +19,27 @@ public:
 	pc9821_state(const machine_config &mconfig, device_type type, const char *tag)
 		: pc9801bx_state(mconfig, type, tag)
 		, m_ext_gvram(*this, "ext_gvram")
+		, m_pegc_mmio_view(*this, "pegc_mmio_view")
 	{
 	}
 
 	void pc9821(machine_config &config);
 
 protected:
-	void pc9821_io(address_map &map);
-	void pc9821_map(address_map &map);
+	void pc9821_io(address_map &map) ATTR_COLD;
+	void pc9821_map(address_map &map) ATTR_COLD;
 
 	DECLARE_MACHINE_START(pc9821);
 	DECLARE_MACHINE_RESET(pc9821);
+
+	virtual uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect) override;
+
 private:
 	required_shared_ptr<uint32_t> m_ext_gvram;
+	memory_view m_pegc_mmio_view;
 
 	uint16_t pc9821_grcg_gvram_r(offs_t offset, uint16_t mem_mask = ~0);
 	void pc9821_grcg_gvram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-	uint16_t pc9821_grcg_gvram0_r(offs_t offset, uint16_t mem_mask = ~0);
-	void pc9821_grcg_gvram0_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	void pc9821_video_ff_w(offs_t offset, uint8_t data);
 	uint8_t pc9821_a0_r(offs_t offset);
 	void pc9821_a0_w(offs_t offset, uint8_t data);
@@ -44,6 +47,7 @@ private:
 	void window_bank_w(offs_t offset, uint8_t data);
 	uint8_t ext2_video_ff_r();
 	void ext2_video_ff_w(uint8_t data);
+	void pc9821_mode_ff_w(u8 data);
 
 	uint8_t m_pc9821_window_bank = 0;
 	uint8_t m_ext2_ff = 0;
@@ -52,11 +56,13 @@ private:
 		uint8_t pal_entry = 0;
 		uint8_t r[0x100]{}, g[0x100]{}, b[0x100]{};
 		uint16_t bank[2]{};
-	}m_analog256;
+		bool packed_mode = false;
+	}m_pegc;
 
 	void pc9821_egc_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	void pegc_mmio_map(address_map &map);
 
-	UPD7220_DISPLAY_PIXELS_MEMBER( pegc_display_pixels );
+//  UPD7220_DISPLAY_PIXELS_MEMBER( pegc_display_pixels );
 };
 
 // MATE A
@@ -73,7 +79,7 @@ public:
 	void pc9821ap2(machine_config &config);
 
 protected:
-	void pc9821as_io(address_map &map);
+	void pc9821as_io(address_map &map) ATTR_COLD;
 
 private:
 	DECLARE_MACHINE_START(pc9821ap2);
@@ -101,8 +107,8 @@ public:
 	void pc9821cx3(machine_config &config);
 
 protected:
-	void pc9821cx3_map(address_map &map);
-	void pc9821cx3_io(address_map &map);
+	void pc9821cx3_map(address_map &map) ATTR_COLD;
+	void pc9821cx3_io(address_map &map) ATTR_COLD;
 
 private:
 	void remote_addr_w(offs_t offset, u8 data);
@@ -190,4 +196,4 @@ public:
 };
 
 
-#endif // MAME_INCLUDES_PC9821_H
+#endif // MAME_NEC_PC9821_H

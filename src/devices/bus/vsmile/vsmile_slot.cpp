@@ -44,12 +44,12 @@ device_vsmile_cart_interface::~device_vsmile_cart_interface()
 //  rom_alloc - alloc the space for the cart
 //-------------------------------------------------
 
-void device_vsmile_cart_interface::rom_alloc(uint32_t size, const char *tag)
+void device_vsmile_cart_interface::rom_alloc(uint32_t size)
 {
 	if (m_rom == nullptr)
 	{
 		// We always alloc 8MB of ROM region
-		m_rom = (uint16_t *)device().machine().memory().region_alloc(std::string(tag).append(VSMILE_SLOT_ROM_REGION_TAG).c_str(), size, 2, ENDIANNESS_BIG)->base();
+		m_rom = (uint16_t *)device().machine().memory().region_alloc(device().subtag("^cart:rom"), size, 2, ENDIANNESS_BIG)->base();
 		m_rom_size = size;
 	}
 }
@@ -132,19 +132,16 @@ static int vsmile_get_pcb_id(const char *slot)
  call load
  -------------------------------------------------*/
 
-image_init_result vsmile_cart_slot_device::call_load()
+std::pair<std::error_condition, std::string> vsmile_cart_slot_device::call_load()
 {
 	if (m_cart)
 	{
-		uint32_t size = loaded_through_softlist() ? get_software_region_length("rom") : length();
-		if (size > 0x1000000)
-		{
-			seterror(image_error::INVALIDIMAGE, "Attempted loading a cart larger than 16MB");
-			return image_init_result::FAIL;
-		}
+		uint32_t const size = loaded_through_softlist() ? get_software_region_length("rom") : length();
+		if (size > 0x100'0000)
+			return std::make_pair(image_error::INVALIDLENGTH, "Cartridges larger than 16MB are not supported");
 
-		m_cart->rom_alloc(size, tag());
-		uint8_t *rom = (uint8_t *)m_cart->get_rom_base();
+		m_cart->rom_alloc(size);
+		uint8_t *const rom = (uint8_t *)m_cart->get_rom_base();
 
 		if (!loaded_through_softlist())
 		{
@@ -160,23 +157,17 @@ image_init_result vsmile_cart_slot_device::call_load()
 			if (pcb_name)
 				m_type = vsmile_get_pcb_id(pcb_name);
 
-			osd_printf_info("V.Smile: Detected (XML) %s\n", pcb_name ? pcb_name : "NONE");
+			osd_printf_verbose("V.Smile: Detected (XML) %s\n", pcb_name ? pcb_name : "NONE");
 		}
 
 		if (m_type == VSMILE_NVRAM)
-		{
-			m_cart->nvram_alloc(0x200000);
-		}
+			m_cart->nvram_alloc(0x20'0000);
 
 		if (m_cart->get_nvram_size())
-		{
 			battery_load(m_cart->get_nvram_base(), m_cart->get_nvram_size(), 0x00);
-		}
-
-		return image_init_result::PASS;
 	}
 
-	return image_init_result::PASS;
+	return std::make_pair(std::error_condition(), std::string());
 }
 
 

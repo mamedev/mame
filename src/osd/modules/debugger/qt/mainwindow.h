@@ -3,6 +3,8 @@
 #ifndef MAME_DEBUGGER_QT_MAINWINDOW_H
 #define MAME_DEBUGGER_QT_MAINWINDOW_H
 
+#pragma once
+
 #include "debuggerview.h"
 #include "windowqt.h"
 
@@ -12,8 +14,10 @@
 #include <QtWidgets/QVBoxLayout>
 #include <QtWidgets/QComboBox>
 
-#include <vector>
+#include <deque>
 
+
+namespace osd::debugger::qt {
 
 class DasmDockWidget;
 class ProcessorDockWidget;
@@ -27,18 +31,21 @@ class MainWindow : public WindowQt
 	Q_OBJECT
 
 public:
-	MainWindow(running_machine &machine, QWidget *parent = nullptr);
+	MainWindow(DebuggerQt &debugger, QWidget *parent = nullptr);
 	virtual ~MainWindow();
 
 	void setProcessor(device_t *processor);
 
+	virtual void restoreConfiguration(util::xml::data_node const &node) override;
 
 protected:
+	virtual void saveConfigurationToNode(util::xml::data_node &node) override;
+
 	// Used to intercept the user clicking 'X' in the upper corner
-	void closeEvent(QCloseEvent *event);
+	virtual void closeEvent(QCloseEvent *event) override;
 
 	// Used to intercept the user hitting the up arrow in the input widget
-	bool eventFilter(QObject *obj, QEvent *event);
+	virtual bool eventFilter(QObject *obj, QEvent *event) override;
 
 private slots:
 	void toggleBreakpointAtCursor(bool changedTo);
@@ -47,18 +54,21 @@ private slots:
 	void rightBarChanged(QAction *changedTo);
 
 	void executeCommandSlot();
+	void commandEditedSlot(QString const &text);
 
 	void mountImage(bool changedTo);
 	void unmountImage(bool changedTo);
 
 	void dasmViewUpdated();
 
-	// Closing the main window actually exits the program
-	void debugActClose();
-
+	// Closing the main window hides the debugger and runs the emulated system
+	virtual void debugActClose() override;
+	virtual void debuggerExit() override;
 
 private:
 	void createImagesMenu();
+
+	void executeCommand(bool withClear);
 
 	// Widgets and docks
 	QLineEdit *m_inputEdit;
@@ -72,10 +82,9 @@ private:
 	QAction *m_runToCursorAct;
 
 	// Terminal history
-	int m_historyIndex;
-	std::vector<QString> m_inputHistory;
-	void addToHistory(const QString& command);
-	void executeCommand(bool withClear);
+	CommandHistory m_inputHistory;
+
+	bool m_exiting;
 };
 
 
@@ -149,30 +158,6 @@ private:
 	DebuggerView *m_processorView;
 };
 
-
-//=========================================================================
-//  A way to store the configuration of a window long enough to read/write.
-//=========================================================================
-class MainWindowQtConfig : public WindowQtConfig
-{
-public:
-	MainWindowQtConfig() :
-		WindowQtConfig(WIN_TYPE_MAIN),
-		m_rightBar(0),
-		m_windowState()
-	{}
-
-	~MainWindowQtConfig() {}
-
-	// Settings
-	int m_rightBar;
-	QByteArray m_windowState;
-
-	void buildFromQWidget(QWidget *widget);
-	void applyToQWidget(QWidget *widget);
-	void addToXmlDataNode(util::xml::data_node &node) const;
-	void recoverFromXmlNode(util::xml::data_node const &node);
-};
-
+} // namespace osd::debugger::qt
 
 #endif // MAME_DEBUGGER_QT_MAINWINDOW_H

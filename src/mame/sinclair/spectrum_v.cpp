@@ -31,7 +31,7 @@ TIMER_CALLBACK_MEMBER(spectrum_state::finish_screen_update)
 	    https://github.com/mamedev/mame/pull/9670#issuecomment-1118576555
 	    https://github.com/mamedev/mame/pull/9750
 	*/
-	m_screen->update_now();
+	if (started()) m_screen->update_now();
 	m_finish_screen_update_timer->adjust(m_screen->time_until_pos(m_screen->visible_area().bottom(), m_screen->visible_area().right() + 1));
 }
 
@@ -116,7 +116,8 @@ u32 spectrum_state::screen_update_spectrum(screen_device &screen, bitmap_ind16 &
 {
 	rectangle scr = get_screen_area();
 	rectangle vis = screen.visible_area();
-	if (vis != scr) {
+	if (vis != scr)
+	{
 		rectangle bsides[4] = {
 			rectangle(vis.left(),      vis.right(),    vis.top(),        scr.top() - 1),
 			rectangle(vis.left(),      scr.left() - 1, scr.top(),        scr.bottom()),
@@ -171,13 +172,12 @@ px: | 0 | 1 | 2 | 3 |*4*| 5 | 6 | 7 |*0*| 1 | 2 | 3 | 4 | 5 | 6 | 7 |
 TODO Curren implementation only tracks char switch position. In order to track both (char and attr) we need to share
      some state between screen->update() events.
 */
-void spectrum_state::spectrum_update_screen(screen_device &screen_d, bitmap_ind16 &bitmap, const rectangle &screen)
+void spectrum_state::spectrum_update_screen(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	u8 *attrs_location = m_screen_location + 0x1800;
-	bool invert_attrs = u64(screen_d.frame_number() / m_frame_invert_count) & 1;
-	for (u16 vpos = screen.top(); vpos <= screen.bottom(); vpos++)
+	bool invert_attrs = u64(screen.frame_number() / m_frame_invert_count) & 1;
+	for (u16 vpos = cliprect.top(); vpos <= cliprect.bottom(); vpos++)
 	{
-		u16 hpos = screen.left();
+		u16 hpos = cliprect.left();
 		u16 x = hpos - get_screen_area().left();
 		bool chunk_right = x & 8;
 		if (x % 8 <= (chunk_right ? 0 : 4))
@@ -195,10 +195,10 @@ void spectrum_state::spectrum_update_screen(screen_device &screen_d, bitmap_ind1
 		}
 		u16 y = vpos - get_screen_area().top();
 		u8 *scr = &m_screen_location[((y & 7) << 8) | ((y & 0x38) << 2) | ((y & 0xc0) << 5) | (x >> 3)];
-		u8 *attr = &attrs_location[((y & 0xf8) << 2) | (x >> 3)];
+		u8 *attr = &m_screen_location[0x1800 + (((y & 0xf8) << 2) | (x >> 3))];
 		u16 *pix = &(bitmap.pix(vpos, hpos));
 
-		while ((hpos + (chunk_right ? 0 : 4)) <= screen.right())
+		while ((hpos + (chunk_right ? 0 : 4)) <= cliprect.right())
 		{
 			u16 ink = ((*attr >> 3) & 0x08) | (*attr & 0x07);
 			u16 pap = (*attr >> 3) & 0x0f;

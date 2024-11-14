@@ -42,12 +42,12 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// optional information overrides
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 
 	// device_isa8_card_interface
 	virtual uint8_t dack_r(int line) override;
@@ -55,19 +55,19 @@ protected:
 	virtual void dack_line_w(int line, int state) override;
 
 private:
-	DECLARE_WRITE_LINE_MEMBER( irq5_w );
-	DECLARE_WRITE_LINE_MEMBER( drq3_w );
-	DECLARE_WRITE_LINE_MEMBER( mr_w );
+	void irq5_w(int state);
+	void drq3_w(int state);
+	void mr_w(int state);
 	uint8_t rd322_r();
 	uint8_t ram_r(offs_t offset);
 	void ram_w(offs_t offset, uint8_t data);
-	DECLARE_READ_LINE_MEMBER( wd1015_t1_r );
+	int wd1015_t1_r();
 	uint8_t wd1015_p1_r();
 	void wd1015_p1_w(uint8_t data);
 	uint8_t wd1015_p2_r();
 	void wd1015_p2_w(uint8_t data);
 
-	void wd1015_io(address_map &map);
+	void wd1015_io(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<wd11c00_17_device> m_host;

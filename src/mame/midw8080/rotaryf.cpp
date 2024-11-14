@@ -26,6 +26,8 @@ driver by Barry Rodewald
 #include "speaker.h"
 
 
+namespace {
+
 class rotaryf_state : public driver_device
 {
 public:
@@ -55,13 +57,13 @@ private:
 	bool m_flipscreen = 0;
 	uint8_t m_last = 0U;
 
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	TIMER_DEVICE_CALLBACK_MEMBER(rotaryf_interrupt);
-	void rotaryf_io_map(address_map &map);
-	void rotaryf_map(address_map &map);
+	void rotaryf_io_map(address_map &map) ATTR_COLD;
+	void rotaryf_map(address_map &map) ATTR_COLD;
 };
 
 
@@ -311,6 +313,8 @@ ROM_START( rotaryf )
 	ROM_LOAD( "krf-5.bin", 0x1000, 0x0400, CRC(ae233f07) SHA1(a7bbd2ee4477ee041d170e2fc4e94c99c3b564fc) )
 	ROM_LOAD( "krf-6.bin", 0x1400, 0x0400, CRC(e28b3713) SHA1(428f73891125f80c722357f1029b18fa9416bcfd) )
 ROM_END
+
+} // anonymous namespace
 
 
 GAME( 1979, rotaryf, 0, rotaryf, rotaryf, rotaryf_state, empty_init, ROT270, "Kasco", "Rotary Fighter", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

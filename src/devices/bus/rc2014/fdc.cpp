@@ -11,8 +11,6 @@
 
 #include "machine/upd765.h"
 #include "imagedev/floppy.h"
-#include "formats/imd_dsk.h"
-#include "formats/pc_dsk.h"
 
 namespace {
 
@@ -29,10 +27,10 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual ioport_constructor device_input_ports() const override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 private:
 	void control_w(offs_t offset, uint8_t data);
 
@@ -91,21 +89,14 @@ static void rc2014_floppies(device_slot_interface &device)
 	device.option_add("35hd", FLOPPY_35_HD);
 }
 
-static void rc2014_floppy_formats(format_registration &fr)
-{
-	fr.add_mfm_containers();
-	fr.add(FLOPPY_IMD_FORMAT);
-	fr.add(FLOPPY_PC_FORMAT);
-}
-
 void rc2014_fdc9266_device::device_add_mconfig(machine_config &config)
 {
 	// FDC9266
 	UPD765A(config, m_fdc, XTAL(8'000'000), true, true);
 
 	// floppy drives
-	FLOPPY_CONNECTOR(config, m_floppy[0], rc2014_floppies, "35hd", rc2014_floppy_formats);
-	FLOPPY_CONNECTOR(config, m_floppy[1], rc2014_floppies, "35hd", rc2014_floppy_formats);
+	FLOPPY_CONNECTOR(config, m_floppy[0], rc2014_floppies, "35hd", floppy_image_device::default_pc_floppy_formats);
+	FLOPPY_CONNECTOR(config, m_floppy[1], rc2014_floppies, "35hd", floppy_image_device::default_pc_floppy_formats);
 }
 
 static INPUT_PORTS_START( rc2014_fdc9266_jumpers )
@@ -155,10 +146,10 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual ioport_constructor device_input_ports() const override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 
 	// DACK confirmation is same as pulsing TC
 	uint8_t dack_r(address_space &space, offs_t) { m_fdc->tc_w(true);  m_fdc->tc_w(false); return space.unmap(); }
@@ -202,8 +193,8 @@ void rc2014_wd37c65_device::device_add_mconfig(machine_config &config)
 	WD37C65C(config, m_fdc, 16_MHz_XTAL);
 
 	// floppy drives
-	FLOPPY_CONNECTOR(config, m_floppy[0], rc2014_floppies, "35hd", rc2014_floppy_formats);
-	FLOPPY_CONNECTOR(config, m_floppy[1], rc2014_floppies, "35hd", rc2014_floppy_formats);
+	FLOPPY_CONNECTOR(config, m_floppy[0], rc2014_floppies, "35hd", floppy_image_device::default_pc_floppy_formats);
+	FLOPPY_CONNECTOR(config, m_floppy[1], rc2014_floppies, "35hd", floppy_image_device::default_pc_floppy_formats);
 }
 
 static INPUT_PORTS_START( rc2014_wd37c65_jumpers )

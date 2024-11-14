@@ -199,12 +199,12 @@ MAIN BOARD:
 #define VLM_CLOCK             XTAL(3'579'545)
 
 
-WRITE_LINE_MEMBER(trackfld_state::coin_counter_1_w)
+void trackfld_state::coin_counter_1_w(int state)
 {
 	machine().bookkeeping().coin_counter_w(0, state);
 }
 
-WRITE_LINE_MEMBER(trackfld_state::coin_counter_2_w)
+void trackfld_state::coin_counter_2_w(int state)
 {
 	machine().bookkeeping().coin_counter_w(1, state);
 }
@@ -221,7 +221,7 @@ void trackfld_state::questions_bank_w(uint8_t data)
 	}
 }
 
-WRITE_LINE_MEMBER(trackfld_state::irq_mask_w)
+void trackfld_state::irq_mask_w(int state)
 {
 	m_irq_mask = state;
 	if (!m_irq_mask)
@@ -251,7 +251,7 @@ void trackfld_state::main_map(address_map &map)
 	map(0x6000, 0xffff).rom();
 }
 
-WRITE_LINE_MEMBER(trackfld_state::nmi_mask_w)
+void trackfld_state::nmi_mask_w(int state)
 {
 	m_nmi_mask = state;
 	if (!m_nmi_mask)
@@ -871,13 +871,13 @@ MACHINE_RESET_MEMBER(trackfld_state,trackfld)
 	m_old_gfx_bank = 0;
 }
 
-WRITE_LINE_MEMBER(trackfld_state::vblank_irq)
+void trackfld_state::vblank_irq(int state)
 {
 	if (state && m_irq_mask)
 		m_maincpu->set_input_line(0, ASSERT_LINE);
 }
 
-WRITE_LINE_MEMBER(trackfld_state::vblank_nmi)
+void trackfld_state::vblank_nmi(int state)
 {
 	if (state && m_nmi_mask)
 		m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
@@ -896,7 +896,7 @@ void trackfld_state::trackfld(machine_config &config)
 	MCFG_MACHINE_RESET_OVERRIDE(trackfld_state,trackfld)
 
 	LS259(config, m_mainlatch); // 1D
-	m_mainlatch->q_out_cb<0>().set(FUNC(trackfld_state::flipscreen_w)); // FLIP
+	m_mainlatch->q_out_cb<0>().set(FUNC(trackfld_state::flip_screen_set)); // FLIP
 	m_mainlatch->q_out_cb<1>().set("trackfld_audio", FUNC(trackfld_audio_device::sh_irqtrigger_w)); // 26 = SOUND ON
 	m_mainlatch->q_out_cb<2>().set_nop(); // 25 = MUT?
 	m_mainlatch->q_out_cb<3>().set(FUNC(trackfld_state::coin_counter_1_w)); // 24 = OUT1
@@ -968,7 +968,7 @@ void trackfld_state::yieartf(machine_config &config)
 	MCFG_MACHINE_RESET_OVERRIDE(trackfld_state,trackfld)
 
 	ls259_device &mainlatch(LS259(config, "mainlatch")); // 1D
-	mainlatch.q_out_cb<0>().set(FUNC(trackfld_state::flipscreen_w));
+	mainlatch.q_out_cb<0>().set(FUNC(trackfld_state::flip_screen_set));
 	mainlatch.q_out_cb<1>().set("trackfld_audio", FUNC(trackfld_audio_device::sh_irqtrigger_w));
 	mainlatch.q_out_cb<2>().set(FUNC(trackfld_state::nmi_mask_w));
 	mainlatch.q_out_cb<3>().set(FUNC(trackfld_state::coin_counter_1_w));
@@ -1266,6 +1266,37 @@ ROM_START( hyprolym ) /* GX361 */
 	ROM_LOAD( "c9_d15.bin",   0x0000, 0x2000, CRC(f546a56b) SHA1(caee3d8546eb7a75ce2a578c6a1a630246aec6b8) ) /* 361-d15.c09 */
 ROM_END
 
+ROM_START( hyprolyma ) /* original GX361 PCB with NSM sticker, but may be an unofficial bug fix. Fixes 'HEIGHT' spelling plus some small changes to some data tables */
+	ROM_REGION( 0x10000, "maincpu", 0 )     /* 64k for code + 64k for decrypted opcodes */
+	ROM_LOAD( "361-d01.a01",       0x6000, 0x2000, CRC(82257fb7) SHA1(4a5038292e582d5c3b5f2d82b01c57ccb24f3095) )
+	ROM_LOAD( "361-d02.a02",       0x8000, 0x2000, CRC(15b83099) SHA1(79827590d74f20c9a95723e06b05af2b15c34f5f) )
+	ROM_LOAD( "epr-hyper-red.a03", 0xa000, 0x2000, CRC(546cf295) SHA1(c8ae73240cfb92c8ed787dabff09e478ea547eca) ) // EPR-ハイパー-赤 with EPR- printed and the rest hand written
+	ROM_LOAD( "361-d04.a04",       0xc000, 0x2000, CRC(d099b1e8) SHA1(0472991ad6caef41ec6b8ec8bf3d9d07584a57cc) )
+	ROM_LOAD( "361-d05.a05",       0xe000, 0x2000, CRC(974ff815) SHA1(11512df2008a79ba44bbb84bd70885f187113211) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_LOAD( "c2_d13.bin",   0x0000, 0x2000, CRC(95bf79b6) SHA1(ea9135acd7ad162c19c5cdde356e69792d61b675) ) /* 361-d13.c03 */
+
+	ROM_REGION( 0x8000, "gfx1", 0 )
+	ROM_LOAD( "c11_d06.bin",  0x0000, 0x2000, CRC(82e2185a) SHA1(1da9ea20e7af0b49c62fb39834a7ec686491af04) ) /* 361-d06.c11 */
+	ROM_LOAD( "c12_d07.bin",  0x2000, 0x2000, CRC(800ff1f1) SHA1(33d73b18903e3e6bfb30f1a06db4b8105d4040d8) ) /* 361-d07.c12 */
+	ROM_LOAD( "c13_d08.bin",  0x4000, 0x2000, CRC(d9faf183) SHA1(4448b6242790783d37acf50704d597af5878c2ab) ) /* 361-d08.c13 */
+	ROM_LOAD( "c14_d09.bin",  0x6000, 0x2000, CRC(5886c802) SHA1(884a12a8f63600da4f23b29be6dbaacef37add20) ) /* 361-d09.c14 */
+
+	ROM_REGION( 0x6000, "gfx2", 0 )
+	ROM_LOAD( "361-d12.h16", 0x0000, 0x2000, CRC(768bb63d) SHA1(effc46615c389245e5a4aac18292e1d764ff0e46) )
+	ROM_LOAD( "361-d11.h15", 0x2000, 0x2000, CRC(3af0e2a8) SHA1(450f35fd7e45ecc88ee80bf57499b2e9f06f6487) )
+	ROM_LOAD( "h14_e10.bin",  0x4000, 0x2000, CRC(c2166a5c) SHA1(5ba25900e653ce4edcf35f1fbce758a327a715ce) ) /* 361-d10.h14 */
+
+	ROM_REGION( 0x0220, "proms", 0 ) /* Prom names = 361-b16.f01 / 361-b17.b16 / 361-b18.e15 */
+	ROM_LOAD( "361b16.f1",    0x0000, 0x0020, CRC(d55f30b5) SHA1(4d6a851f4886778307f75771645078b97ad55f5f) ) /* palette */
+	ROM_LOAD( "361b17.b16",   0x0020, 0x0100, CRC(d2ba4d32) SHA1(894b5cedf01ba9225a0d6215291857e455b84903) ) /* sprite lookup table */
+	ROM_LOAD( "361b18.e15",   0x0120, 0x0100, CRC(053e5861) SHA1(6740a62cf7b6938a4f936a2fed429704612060a5) ) /* char lookup table */
+
+	ROM_REGION( 0x2000, "vlm", 0 ) /* 8k for the VLM5030 data */
+	ROM_LOAD( "c9_d15.bin",   0x0000, 0x2000, CRC(f546a56b) SHA1(caee3d8546eb7a75ce2a578c6a1a630246aec6b8) ) /* 361-d15.c09 */
+ROM_END
+
 // main program code on this set is IDENTICAL to the original hyprolym
 // audio hardware is changed significantly
 ROM_START( hyprolymb )
@@ -1369,7 +1400,7 @@ ROM_START( hipoly )
 	ROM_REGION( 0x10000, "maincpu", 0 )     /* 64k for code + 64k for decrypted opcodes */
 	ROM_LOAD( "2.1a",        0x6000, 0x2000, CRC(82257fb7) SHA1(4a5038292e582d5c3b5f2d82b01c57ccb24f3095) )  // only one byte of difference with hyprolymba
 	ROM_LOAD( "2.2a",        0x8000, 0x2000, CRC(15b83099) SHA1(79827590d74f20c9a95723e06b05af2b15c34f5f) )  // ok
-	ROM_LOAD( "2.4a",        0xa000, 0x2000, BAD_DUMP CRC(93a32a97) SHA1(4fbb2fcdf9bc7a3d273dbc27b8157f163ff9bf11) )  // too different... maybe a bad dump?
+	ROM_LOAD( "2.4a",        0xa000, 0x2000, CRC(2d6fc308) SHA1(1ff95384670e40d560703f2238998a8e154aa4cf) )  // ok
 	ROM_LOAD( "2.5a",        0xc000, 0x2000, CRC(d099b1e8) SHA1(0472991ad6caef41ec6b8ec8bf3d9d07584a57cc) )  // ok
 	ROM_LOAD( "2.7a",        0xe000, 0x2000, CRC(974ff815) SHA1(11512df2008a79ba44bbb84bd70885f187113211) )  // ok
 
@@ -1379,14 +1410,14 @@ ROM_START( hipoly )
 
 	/* These ROM's are located on the Sound Board */
 	ROM_REGION( 0x10000, "adpcm", 0 )   /*  64k for the 6802 which plays ADPCM samples */
-	ROM_LOAD( "1.11d",       0x8000, 0x2000, CRC(102d3a78) SHA1(0587e87c579f6d333fb1793d20eb7a3c769fbd11) )
+	ROM_LOAD( "1.11d",       0x8000, 0x2000, CRC(a4cddeb8) SHA1(057981ad3b04239662bb19342e9ec14b0dab2351) )
 	ROM_LOAD( "1.10d",       0xa000, 0x2000, CRC(e9919365) SHA1(bd11d6e3ee2c6e698159c2768e315389d666107f) )
 	ROM_LOAD( "1.11c",       0xc000, 0x2000, CRC(c3ec42e1) SHA1(048a95726c4f031552e629c3788952c1bc5e7251) )
 	ROM_LOAD( "1.10c",       0xe000, 0x2000, CRC(76998389) SHA1(499189b0e20296af88712199b93b958655083608) )
 
 	/* These ROM's are located on the CPU/Video Board */
 	ROM_REGION( 0x8000, "gfx1", 0 )
-	ROM_LOAD( "2.18a",       0x0000, 0x2000, CRC(8d28864f) SHA1(b6827592095543c92384a7e8b817a741d249cff8) )
+	ROM_LOAD( "2.18a",       0x0000, 0x2000, CRC(82e2185a) SHA1(1da9ea20e7af0b49c62fb39834a7ec686491af04) )
 	ROM_LOAD( "2.19a",       0x2000, 0x2000, CRC(800ff1f1) SHA1(33d73b18903e3e6bfb30f1a06db4b8105d4040d8) )
 	ROM_LOAD( "2.21a",       0x4000, 0x2000, CRC(d9faf183) SHA1(4448b6242790783d37acf50704d597af5878c2ab) )
 	ROM_LOAD( "2.22a",       0x6000, 0x2000, CRC(5886c802) SHA1(884a12a8f63600da4f23b29be6dbaacef37add20) )
@@ -1692,9 +1723,10 @@ GAME( 1983, trackfld,   0,        trackfld,  trackfld, trackfld_state, init_trac
 GAME( 1983, trackfldc,  trackfld, trackfld,  trackfld, trackfld_state, init_trackfld,   ROT0,  "Konami (Centuri license)",             "Track & Field (Centuri)",              MACHINE_SUPPORTS_SAVE )
 GAME( 1983, trackfldu,  trackfld, trackfldu, trackfld, trackfld_state, init_trackfld,   ROT0,  "Konami (Centuri license)",             "Track & Field (Centuri, unencrypted)", MACHINE_SUPPORTS_SAVE )
 GAME( 1983, hyprolym,   trackfld, trackfld,  trackfld, trackfld_state, init_trackfld,   ROT0,  "Konami",                               "Hyper Olympic",                        MACHINE_SUPPORTS_SAVE )
+GAME( 1983, hyprolyma,  trackfld, trackfld,  trackfld, trackfld_state, init_trackfld,   ROT0,  "Konami",                               "Hyper Olympic (bugfixed)",             MACHINE_SUPPORTS_SAVE )
 GAME( 1983, hyprolymb,  trackfld, hyprolyb,  trackfld, trackfld_state, init_trackfld,   ROT0,  "bootleg",                              "Hyper Olympic (bootleg, set 1)",       MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1983, hyprolymba, trackfld, hyprolyb,  trackfld, trackfld_state, init_trackfld,   ROT0,  "bootleg",                              "Hyper Olympic (bootleg, set 2)",       MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1983, hipoly,     trackfld, hyprolyb,  trackfld, trackfld_state, init_trackfld,   ROT0,  "bootleg",                              "Hipoly (bootleg of Hyper Olympic)",    MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1983, hipoly,     trackfld, hyprolyb,  trackfld, trackfld_state, init_trackfld,   ROT0,  "bootleg",                              "Hipoly (bootleg of Hyper Olympic)",    MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1996, atlantol,   trackfld, atlantol,  atlantol, trackfld_state, init_atlantol,   ROT0,  "bootleg",                              "Atlant Olimpic (Italian bootleg)",     MACHINE_SUPPORTS_SAVE )
 GAME( 1982, trackfldnz, trackfld, trackfld,  trackfld, trackfld_state, init_trackfldnz, ROT0,  "bootleg? (Goldberg Enterprizes Inc.)", "Track & Field (NZ bootleg?)",          MACHINE_SUPPORTS_SAVE ) // bootleg of the Centuri version
 

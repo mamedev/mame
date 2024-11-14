@@ -74,6 +74,8 @@ Stephh's notes (based on the game Z80 code and some tests) :
 #include "roul.lh"
 
 
+namespace {
+
 class roul_state : public driver_device
 {
 public:
@@ -89,7 +91,7 @@ public:
 
 protected:
 	virtual void machine_start() override { m_lamps.resolve(); }
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	uint8_t blitter_status_r();
@@ -100,10 +102,10 @@ private:
 	void roul_palette(palette_device &palette) const;
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void roul_cpu_io_map(address_map &map);
-	void roul_map(address_map &map);
-	void sound_cpu_io_map(address_map &map);
-	void sound_map(address_map &map);
+	void roul_cpu_io_map(address_map &map) ATTR_COLD;
+	void roul_map(address_map &map) ATTR_COLD;
+	void sound_cpu_io_map(address_map &map) ATTR_COLD;
+	void sound_map(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_soundcpu;
@@ -355,5 +357,8 @@ ROM_START(roul)
 	ROM_LOAD( "roul.u53",   0x0000, 0x0020, CRC(1965dfaa) SHA1(114eccd3e478902ac7dbb10b9425784231ff581e) )
 	ROM_LOAD( "roul.u38",   0x0020, 0x0020, CRC(23ae22c1) SHA1(bf0383462976ec6341ffa8a173264ce820bc654a) )
 ROM_END
+
+} // anonymous namespace
+
 
 GAMEL( 1990, roul, 0, roul, roul, roul_state, empty_init, ROT0, "bootleg", "Super Lucky Roulette", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_roul )

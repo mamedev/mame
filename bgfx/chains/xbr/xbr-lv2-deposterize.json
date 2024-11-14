@@ -15,7 +15,6 @@
 	"passes": [
 		{
 			"effect": "misc/deposterize-pass0",
-			"applytint": true,
 			"name": "Deposterize, Pass 0",
 			"input": [
 				{ "sampler": "decal", "texture": "screen" }

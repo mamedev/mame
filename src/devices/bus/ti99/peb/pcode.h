@@ -33,23 +33,23 @@ public:
 	void cruwrite(offs_t offset, uint8_t data) override;
 	void setaddress_dbin(offs_t offset, int state) override;
 
-	DECLARE_WRITE_LINE_MEMBER(clock_in) override;
+	void clock_in(int state) override;
 
 	DECLARE_INPUT_CHANGED_MEMBER( switch_changed );
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 	virtual void device_config_complete() override;
-	virtual const tiny_rom_entry *device_rom_region() const override;
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual ioport_constructor device_input_ports() const override;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 
 private:
-	DECLARE_WRITE_LINE_MEMBER(ready_line);
+	void ready_line(int state);
 
-	DECLARE_WRITE_LINE_MEMBER(pcpage_w);
-	DECLARE_WRITE_LINE_MEMBER(ekrpg_w);
+	void pcpage_w(int state);
+	void ekrpg_w(int state);
 
 	void debugger_read(offs_t addr, uint8_t& value);
 

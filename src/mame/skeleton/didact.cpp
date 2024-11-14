@@ -63,10 +63,10 @@
 //  MACROS / CONSTANTS
 //**************************************************************************
 
-#define LOG_SETUP    (1U <<  1)
-#define LOG_READ     (1U <<  2)
-#define LOG_DISPLAY  (1U <<  3)
-#define LOG_KEYBOARD (1U <<  4)
+#define LOG_SETUP    (1U << 1)
+#define LOG_READ     (1U << 2)
+#define LOG_DISPLAY  (1U << 3)
+#define LOG_KEYBOARD (1U << 4)
 
 //#define VERBOSE (LOG_KEYBOARD)
 //#define LOG_OUTPUT_FUNC printf
@@ -82,6 +82,9 @@
 #else
 #define FUNCNAME __PRETTY_FUNCTION__
 #endif
+
+
+namespace {
 
 #define PIA1_TAG "pia1"
 #define PIA2_TAG "pia2"
@@ -174,12 +177,12 @@ protected:
 	void pia2_kbA_w(uint8_t data);
 	uint8_t pia2_kbB_r();
 	void pia2_kbB_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER( pia2_ca2_w );
+	void pia2_ca2_w(int state);
 
-	virtual void machine_reset() override;
-	virtual void machine_start() override;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void machine_start() override ATTR_COLD;
 
-	void md6802_map(address_map &map);
+	void md6802_map(address_map &map) ATTR_COLD;
 
 private:
 	required_device<m6802_cpu_device> m_maincpu;
@@ -248,7 +251,7 @@ void  md6802_state::pia2_kbB_w(uint8_t data)
 	m_segments = bitswap<8>(data, 0, 4, 5, 3, 2, 1, 7, 6);
 }
 
-WRITE_LINE_MEMBER( md6802_state::pia2_ca2_w )
+void md6802_state::pia2_ca2_w(int state)
 {
 	LOGKBD("--->%s(%02x) LED is connected through resisitor to +5v so logical 0 will lit it\n", FUNCNAME, state);
 	m_led = state ? 0 :1;
@@ -351,13 +354,13 @@ class mp68a_state : public didact_state
 	void pia2_kbA_w(uint8_t data);
 	uint8_t pia2_kbB_r();
 	void pia2_kbB_w(uint8_t data);
-	DECLARE_READ_LINE_MEMBER( pia2_cb1_r );
+	int pia2_cb1_r();
 	template <unsigned N> void digit_w(uint8_t data) { m_7segs[N] = data; }
 
-	virtual void machine_reset() override;
-	virtual void machine_start() override;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void machine_start() override ATTR_COLD;
 	void mp68a(machine_config &config);
-	void mp68a_map(address_map &map);
+	void mp68a_map(address_map &map) ATTR_COLD;
 protected:
 	required_device<pia6820_device> m_pia1;
 	required_device<pia6820_device> m_pia2;
@@ -450,7 +453,7 @@ void mp68a_state::pia2_kbB_w(uint8_t data)
 	m_cass->output(BIT(data, 4) ? -1.0 : +1.0);
 }
 
-READ_LINE_MEMBER( mp68a_state::pia2_cb1_r )
+int mp68a_state::pia2_cb1_r()
 {
 	for (unsigned i = 0U; 4U > i; ++i)
 		m_lines[i] = m_io_lines[i]->read();
@@ -547,15 +550,15 @@ class modulab_state : public didact_state
 
 	output_finder<6> m_7segs;
 
-	virtual void machine_reset() override;
-	virtual void machine_start() override;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void machine_start() override ATTR_COLD;
 	void modulab(machine_config &config);
 protected:
 	uint8_t io_r(offs_t offset);
 	void io_w(offs_t offset, u8 data);
-	DECLARE_WRITE_LINE_MEMBER( da_w );
+	void da_w(int state);
 private:
-	void modulab_map(address_map &map);
+	void modulab_map(address_map &map) ATTR_COLD;
 	// Offsets for display and keyboard i/o
 	enum
 	{
@@ -579,7 +582,7 @@ private:
 	uint8_t m_da;
 };
 
-WRITE_LINE_MEMBER( modulab_state::da_w )
+void modulab_state::da_w(int state)
 {
 	LOG("--->%s()\n", FUNCNAME);
 	m_da = state == CLEAR_LINE ? 0 : 1; // Capture data available signal
@@ -691,7 +694,7 @@ static INPUT_PORTS_START( modulab )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("C/B") PORT_CODE(KEYCODE_X) PORT_CHAR('X')
 
 	PORT_START("LINE4") /* Special KEY ROW for reset key */
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Reset") PORT_CODE(KEYCODE_F12) PORT_CHANGED_MEMBER(DEVICE_SELF, modulab_state, trigger_reset, 0)
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Reset") PORT_CODE(KEYCODE_F12) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(modulab_state::trigger_reset), 0)
 	PORT_BIT(0xfb, 0x00, IPT_UNUSED )
 INPUT_PORTS_END
 
@@ -725,8 +728,8 @@ static INPUT_PORTS_START( md6802 )
 	PORT_BIT(0xf0, 0x00, IPT_UNUSED )
 
 	PORT_START("LINE4") /* Special KEY ROW for reset and Shift/'*' keys */
-	PORT_BIT(0x08, 0x00, IPT_KEYBOARD) PORT_NAME("*") PORT_CODE(KEYCODE_LSHIFT) PORT_CODE(KEYCODE_RSHIFT) PORT_CHAR('*') PORT_CHANGED_MEMBER(DEVICE_SELF, md6802_state, trigger_shift, 0)
-	PORT_BIT(0x04, 0x00, IPT_KEYBOARD) PORT_NAME("Reset") PORT_CODE(KEYCODE_F12) PORT_CHANGED_MEMBER(DEVICE_SELF, md6802_state, trigger_reset, 0)
+	PORT_BIT(0x08, 0x00, IPT_KEYBOARD) PORT_NAME("*") PORT_CODE(KEYCODE_LSHIFT) PORT_CODE(KEYCODE_RSHIFT) PORT_CHAR('*') PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(md6802_state::trigger_shift), 0)
+	PORT_BIT(0x04, 0x00, IPT_KEYBOARD) PORT_NAME("Reset") PORT_CODE(KEYCODE_F12) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(md6802_state::trigger_reset), 0)
 	PORT_BIT(0xf3, 0x00, IPT_UNUSED )
 INPUT_PORTS_END
 
@@ -760,9 +763,9 @@ static INPUT_PORTS_START( mp68a )
 	PORT_BIT(0xf0, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("LINE4") /* Special KEY ROW for reset and Shift/'*' keys, they are hard wired */
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("*") PORT_CODE(KEYCODE_LSHIFT) PORT_CODE(KEYCODE_RSHIFT) PORT_CHAR('*') PORT_CHANGED_MEMBER(DEVICE_SELF, mp68a_state, trigger_shift, 0)
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("*") PORT_CODE(KEYCODE_LSHIFT) PORT_CODE(KEYCODE_RSHIFT) PORT_CHAR('*') PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(mp68a_state::trigger_shift), 0)
 	//PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Reset") PORT_CODE(KEYCODE_F12)
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Reset") PORT_CODE(KEYCODE_F12) PORT_CHANGED_MEMBER(DEVICE_SELF, mp68a_state, trigger_reset, 0)
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Reset") PORT_CODE(KEYCODE_F12) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(mp68a_state::trigger_reset), 0)
 	PORT_BIT(0xf3, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
@@ -813,10 +816,10 @@ void md6802_state::md6802(machine_config &config)
 	/* Devices */
 	TTL74145(config, m_tb16_74145, 0);
 	/* PIA #1 0xA000-0xA003 - used differently by laborations and loaded software */
-	PIA6821(config, m_pia1, 0);
+	PIA6821(config, m_pia1);
 
 	/* PIA #2 Keyboard & Display 0xC000-0xC003 */
-	PIA6821(config, m_pia2, 0);
+	PIA6821(config, m_pia2);
 	/* --PIA init----------------------- */
 	/* 0xE007 0xC002 (DDR B)     = 0xFF - Port B all outputs and set to 0 (zero) */
 	/* 0xE00B 0xC000 (DDR A)     = 0x70 - Port A three outputs and set to 0 (zero) */
@@ -922,6 +925,9 @@ ROM_START( mp68a ) // ROM image from http://elektronikforumet.com/forum/viewtopi
 	ROM_LOAD( "didacta.bin", 0x0800, 0x0200, CRC(aa05e1ce) SHA1(9ce8223efd274045b43ceca3529e037e16e99fdf) )
 	ROM_LOAD( "didactb.bin", 0x0a00, 0x0200, CRC(592898dc) SHA1(2962f4817712cae97f3ab37b088fc73e66535ff8) )
 ROM_END
+
+} // anonymous namespace
+
 
 //    YEAR  NAME    PARENT  COMPAT   MACHINE  INPUT    CLASS          INIT        COMPANY               FULLNAME           FLAGS
 COMP( 1979, mp68a,   0,      0,      mp68a,   mp68a,   mp68a_state,   empty_init, "Didact AB",          "mp68a",           MACHINE_NO_SOUND_HW )

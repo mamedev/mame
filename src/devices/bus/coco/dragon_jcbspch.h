@@ -24,11 +24,11 @@ public:
 	dragon_jcbspch_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 	// optional information overrides
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 protected:
 	// device-level overrides
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 	virtual u8 *get_cart_base() override;
 	virtual memory_region *get_cart_memregion() override;
 
@@ -37,8 +37,8 @@ protected:
 	virtual void scs_write(offs_t offset, u8 data) override;
 
 private:
-	DECLARE_WRITE_LINE_MEMBER(pia_cb2_w);
-	DECLARE_WRITE_LINE_MEMBER(nmi_w);
+	void pia_cb2_w(int state);
+	void nmi_w(int state);
 
 	required_memory_region m_eprom;
 	required_device<pia6821_device> m_pia;

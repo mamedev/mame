@@ -17,15 +17,15 @@ TODO:
 #define VERBOSE 0
 #define LOG(x) do { if (VERBOSE) logerror x; } while (0)
 
-#define K007420_SPRITERAM_SIZE 0x200
+static constexpr uint32_t K007420_SPRITERAM_SIZE = 0x200;
 
 DEFINE_DEVICE_TYPE(K007420, k007420_device, "k007420", "K007420 Sprite Generator")
 
 k007420_device::k007420_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, K007420, tag, owner, clock)
+	, device_gfx_interface(mconfig, *this)
 	, m_ram(nullptr)
-	, m_flipscreen(0)
-	, m_palette(*this, finder_base::DUMMY_TAG)
+	, m_flipscreen(false)
 	, m_banklimit(0)
 	, m_callback(*this)
 	//, m_regs[8]
@@ -44,8 +44,8 @@ void k007420_device::device_start()
 	m_ram = make_unique_clear<uint8_t[]>(0x200);
 
 	save_pointer(NAME(m_ram), 0x200);
-	save_item(NAME(m_flipscreen));   // current one uses 7342 one
-	save_item(NAME(m_regs)); // current one uses 7342 ones
+	save_item(NAME(m_flipscreen));  // current one uses 7342 one
+	save_item(NAME(m_regs));        // current one uses 7342 ones
 }
 
 //-------------------------------------------------
@@ -54,10 +54,8 @@ void k007420_device::device_start()
 
 void k007420_device::device_reset()
 {
-	int i;
-
-	m_flipscreen = 0;
-	for (i = 0; i < 8; i++)
+	m_flipscreen = false;
+	for (int i = 0; i < 8; i++)
 		m_regs[i] = 0;
 }
 
@@ -95,36 +93,35 @@ void k007420_device::write(offs_t offset, uint8_t data)
  *   7  | xxxxxxxx | unused
  */
 
-void k007420_device::sprites_draw( bitmap_ind16 &bitmap, const rectangle &cliprect, gfx_element *gfx )
+void k007420_device::sprites_draw(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	int offs;
-	int codemask = m_banklimit;
-	int bankmask = ~m_banklimit;
+	const uint32_t codemask = m_banklimit;
+	const uint32_t bankmask = ~m_banklimit;
 
-	for (offs = K007420_SPRITERAM_SIZE - 8; offs >= 0; offs -= 8)
+	for (int offs = K007420_SPRITERAM_SIZE - 8; offs >= 0; offs -= 8)
 	{
-		int ox, oy, code, color, flipx, flipy, zoom, w, h, x, y, bank;
 		static const int xoffset[4] = { 0, 1, 4, 5 };
 		static const int yoffset[4] = { 0, 2, 8, 10 };
 
-		code = m_ram[offs + 1];
-		color = m_ram[offs + 2];
-		ox = m_ram[offs + 3] - ((m_ram[offs + 4] & 0x80) << 1);
-		oy = 256 - m_ram[offs + 0];
-		flipx = m_ram[offs + 4] & 0x04;
-		flipy = m_ram[offs + 4] & 0x08;
+		uint32_t code = m_ram[offs + 1];
+		uint32_t color = m_ram[offs + 2];
+		int32_t ox = m_ram[offs + 3] - ((m_ram[offs + 4] & 0x80) << 1);
+		int32_t oy = 256 - m_ram[offs + 0];
+		bool flipx = m_ram[offs + 4] & 0x04;
+		bool flipy = m_ram[offs + 4] & 0x08;
 
-		m_callback(&code, &color);
+		m_callback(code, color);
 
-		bank = code & bankmask;
+		const uint32_t bank = code & bankmask;
 		code &= codemask;
 
 		/* 0x080 = normal scale, 0x040 = double size, 0x100 half size */
-		zoom = m_ram[offs + 5] | ((m_ram[offs + 4] & 0x03) << 8);
+		uint32_t zoom = m_ram[offs + 5] | ((m_ram[offs + 4] & 0x03) << 8);
 		if (!zoom)
 			continue;
 		zoom = 0x10000 * 128 / zoom;
 
+		uint8_t w, h;
 		switch (m_ram[offs + 4] & 0x70)
 		{
 			case 0x30: w = h = 1; break;
@@ -146,17 +143,15 @@ void k007420_device::sprites_draw( bitmap_ind16 &bitmap, const rectangle &clipre
 
 		if (zoom == 0x10000)
 		{
-			int sx, sy;
-
-			for (y = 0; y < h; y++)
+			for (int y = 0; y < h; y++)
 			{
-				sy = oy + 8 * y;
+				const int sy = oy + 8 * y;
 
-				for (x = 0; x < w; x++)
+				for (int x = 0; x < w; x++)
 				{
-					int c = code;
+					uint32_t c = code;
 
-					sx = ox + 8 * x;
+					const int sx = ox + 8 * x;
 					if (flipx)
 						c += xoffset[(w - 1 - x)];
 					else
@@ -172,14 +167,14 @@ void k007420_device::sprites_draw( bitmap_ind16 &bitmap, const rectangle &clipre
 					else
 						c += bank;
 
-					gfx->transpen(bitmap,cliprect,
+					gfx(0)->transpen(bitmap,cliprect,
 						c,
 						color,
 						flipx,flipy,
 						sx,sy,0);
 
 					if (m_regs[2] & 0x80)
-						gfx->transpen(bitmap,cliprect,
+						gfx(0)->transpen(bitmap,cliprect,
 							c,
 							color,
 							flipx,flipy,
@@ -189,18 +184,17 @@ void k007420_device::sprites_draw( bitmap_ind16 &bitmap, const rectangle &clipre
 		}
 		else
 		{
-			int sx, sy, zw, zh;
-			for (y = 0; y < h; y++)
+			for (int y = 0; y < h; y++)
 			{
-				sy = oy + ((zoom * y + (1 << 12)) >> 13);
-				zh = (oy + ((zoom * (y + 1) + (1 << 12)) >> 13)) - sy;
+				const int sy = oy + ((zoom * y + (1 << 12)) >> 13);
+				const int zh = (oy + ((zoom * (y + 1) + (1 << 12)) >> 13)) - sy;
 
-				for (x = 0; x < w; x++)
+				for (int x = 0; x < w; x++)
 				{
-					int c = code;
+					uint32_t c = code;
 
-					sx = ox + ((zoom * x + (1<<12)) >> 13);
-					zw = (ox + ((zoom * (x + 1) + (1 << 12)) >> 13)) - sx;
+					const int sx = ox + ((zoom * x + (1<<12)) >> 13);
+					const int zw = (ox + ((zoom * (x + 1) + (1 << 12)) >> 13)) - sx;
 					if (flipx)
 						c += xoffset[(w - 1 - x)];
 					else
@@ -216,7 +210,7 @@ void k007420_device::sprites_draw( bitmap_ind16 &bitmap, const rectangle &clipre
 					else
 						c += bank;
 
-					gfx->zoom_transpen(bitmap,cliprect,
+					gfx(0)->zoom_transpen(bitmap,cliprect,
 						c,
 						color,
 						flipx,flipy,
@@ -224,7 +218,7 @@ void k007420_device::sprites_draw( bitmap_ind16 &bitmap, const rectangle &clipre
 						(zw << 16) / 8,(zh << 16) / 8,0);
 
 					if (m_regs[2] & 0x80)
-						gfx->zoom_transpen(bitmap,cliprect,
+						gfx(0)->zoom_transpen(bitmap,cliprect,
 							c,
 							color,
 							flipx,flipy,

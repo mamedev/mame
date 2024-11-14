@@ -17,3 +17,5 @@ EXPORTS
 
   SetLargePageMode PRIVATE
   SetCaseSensitive PRIVATE
+
+  GetModuleProp PRIVATE

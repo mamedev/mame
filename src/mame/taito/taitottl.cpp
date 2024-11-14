@@ -69,6 +69,9 @@
 #include "netlist/devices/net_lib.h"
 #include "video/fixfreq.h"
 
+
+namespace {
+
 // copied by Pong, not accurate for this driver!
 // start
 #define MASTER_CLOCK    7159000
@@ -102,14 +105,15 @@ private:
 	required_device<fixedfreq_device> m_video;
 
 	// driver_device overrides
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 };
 
 
 static NETLIST_START(taitottl)
+{
 	SOLVER(Solver, 48000)
 //  PARAM(Solver.FREQ, 48000)
 	PARAM(Solver.ACCURACY, 1e-4) // works and is sufficient
@@ -119,7 +123,7 @@ static NETLIST_START(taitottl)
 
 	//  NETDEV_ANALOG_CALLBACK(sound_cb, sound, exidyttl_state, sound_cb, "")
 	//  NETDEV_ANALOG_CALLBACK(video_cb, videomix, fixedfreq_device, update_vid, "fixfreq")
-NETLIST_END()
+}
 
 
 
@@ -434,13 +438,15 @@ ROM_START( srdchamp )
 	ROM_LOAD( "cs222_mr38.11j",    0x000, 0x100, CRC(fb775d23) SHA1(8dd3fca4d08c235c0999bd3623127331eed004d9) )
 ROM_END
 
+} // anonymous namespace
 
-GAME( 1977, fisco400, 0, taitottl, 0, taitottl_state, empty_init, ROT0, "Taito", "Cisco/Fisco 400 [TTL]",    MACHINE_IS_SKELETON )
-GAME( 1977, gunman,   0, taitottl, 0, taitottl_state, empty_init, ROT0, "Taito", "Gunman [TTL]",             MACHINE_IS_SKELETON )
-GAME( 1977, missilex, 0, taitottl, 0, taitottl_state, empty_init, ROT0, "Taito", "Missile-X [TTL]",          MACHINE_IS_SKELETON )
-GAME( 1977, ttblock,  0, taitottl, 0, taitottl_state, empty_init, ROT0, "Taito", "T.T Block [TTL]",          MACHINE_IS_SKELETON )
-GAME( 1978, ttsracec, 0, taitottl, 0, taitottl_state, empty_init, ROT0, "Taito", "T.T. Speed Race CL [TTL]", MACHINE_IS_SKELETON )
-GAME( 1979, zzblock,  0, taitottl, 0, taitottl_state, empty_init, ROT0, "Taito", "Zun Zun Block [TTL]",      MACHINE_IS_SKELETON )
+
+GAME( 1977, fisco400, 0, taitottl, 0, taitottl_state, empty_init, ROT0, "Taito", "Cisco/Fisco 400",    MACHINE_IS_SKELETON )
+GAME( 1977, gunman,   0, taitottl, 0, taitottl_state, empty_init, ROT0, "Taito", "Gunman",             MACHINE_IS_SKELETON )
+GAME( 1977, missilex, 0, taitottl, 0, taitottl_state, empty_init, ROT0, "Taito", "Missile-X",          MACHINE_IS_SKELETON )
+GAME( 1977, ttblock,  0, taitottl, 0, taitottl_state, empty_init, ROT0, "Taito", "T.T Block",          MACHINE_IS_SKELETON )
+GAME( 1978, ttsracec, 0, taitottl, 0, taitottl_state, empty_init, ROT0, "Taito", "T.T. Speed Race CL", MACHINE_IS_SKELETON )
+GAME( 1979, zzblock,  0, taitottl, 0, taitottl_state, empty_init, ROT0, "Taito", "Zun Zun Block",      MACHINE_IS_SKELETON )
 
 // Not from Taito
-GAME( 1978, srdchamp, 0, taitottl, 0, taitottl_state, empty_init, ROT0, "Model Racing", "Super Road Champions [TTL]", MACHINE_IS_SKELETON )
+GAME( 1978, srdchamp, 0, taitottl, 0, taitottl_state, empty_init, ROT0, "Model Racing", "Super Road Champions", MACHINE_IS_SKELETON )

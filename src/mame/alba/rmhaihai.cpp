@@ -40,6 +40,8 @@ TODO:
 #include "tilemap.h"
 
 
+namespace {
+
 class rmhaihai_state : public driver_device
 {
 public:
@@ -64,14 +66,14 @@ protected:
 	void ctrl_w(uint8_t data);
 	void adpcm_w(uint8_t data);
 
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 
-	void rmhaihai_io_map(address_map &map);
-	void rmhaihai_map(address_map &map);
+	void rmhaihai_io_map(address_map &map) ATTR_COLD;
+	void rmhaihai_map(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<msm5205_device> m_msm;
@@ -107,14 +109,14 @@ public:
 	void themj(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	required_memory_bank_array<2> m_cpubank;
 
-	void themj_io_map(address_map &map);
-	void themj_map(address_map &map);
+	void themj_io_map(address_map &map) ATTR_COLD;
+	void themj_map(address_map &map) ATTR_COLD;
 	void themj_rombank_w(uint8_t data);
 };
 
@@ -780,10 +782,12 @@ void rmhaihai_state::init_rmhaihai()
 	}
 }
 
+} // anonymous namespace
+
 
 GAME( 1985, rmhaihai,  0,        rmhaihai, rmhaihai, rmhaihai_state, init_rmhaihai, ROT0, "Alba",  "Real Mahjong Haihai (Japan, newer)", MACHINE_SUPPORTS_SAVE ) // writes Homedata in NVRAM
 GAME( 1985, rmhaihai2, rmhaihai, rmhaihai, rmhaihai, rmhaihai_state, init_rmhaihai, ROT0, "Alba",  "Real Mahjong Haihai (Japan, older)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, rmhaihib,  rmhaihai, rmhaihai, rmhaihib, rmhaihai_state, init_rmhaihai, ROT0, "Alba",  "Real Mahjong Haihai [BET] (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, rmhaihib,  rmhaihai, rmhaihai, rmhaihib, rmhaihai_state, init_rmhaihai, ROT0, "Alba",  "Real Mahjong Haihai (Japan, medal)", MACHINE_SUPPORTS_SAVE )
 GAME( 1986, rmhaijin,  0,        rmhaihai, rmhaihai, rmhaihai_state, init_rmhaihai, ROT0, "Alba",  "Real Mahjong Haihai Jinji Idou Hen (Japan)", MACHINE_SUPPORTS_SAVE )
 GAME( 1986, rmhaisei,  0,        rmhaisei, rmhaihai, rmhaisei_state, init_rmhaihai, ROT0, "Visco", "Real Mahjong Haihai Seichouhen (Japan)", MACHINE_SUPPORTS_SAVE )
 GAME( 1987, themj,     0,        themj,    rmhaihai, themj_state,    init_rmhaihai, ROT0, "Visco", "The Mah-jong (Japan, set 1)", MACHINE_SUPPORTS_SAVE )

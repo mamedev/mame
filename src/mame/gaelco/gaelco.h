@@ -57,10 +57,10 @@ private:
 	/* video-related */
 	tilemap_t      *m_tilemap[2]{};
 
-	DECLARE_WRITE_LINE_MEMBER(coin1_lockout_w);
-	DECLARE_WRITE_LINE_MEMBER(coin2_lockout_w);
-	DECLARE_WRITE_LINE_MEMBER(coin1_counter_w);
-	DECLARE_WRITE_LINE_MEMBER(coin2_counter_w);
+	void coin1_lockout_w(int state);
+	void coin2_lockout_w(int state);
+	void coin1_counter_w(int state);
+	void coin2_counter_w(int state);
 	void oki_bankswitch_w(uint8_t data);
 	void vram_encrypted_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	void encrypted_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
@@ -69,7 +69,7 @@ private:
 
 	template<int Layer> TILE_GET_INFO_MEMBER(get_tile_info);
 
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 	DECLARE_VIDEO_START(bigkarnk);
 	DECLARE_VIDEO_START(maniacsq);
 	DECLARE_VIDEO_START(squash);
@@ -79,12 +79,12 @@ private:
 	uint32_t screen_update_thoop(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect );
 
-	void bigkarnk_map(address_map &map);
-	void bigkarnk_snd_map(address_map &map);
-	void maniacsq_map(address_map &map);
-	void oki_map(address_map &map);
-	void squash_map(address_map &map);
-	void thoop_map(address_map &map);
+	void bigkarnk_map(address_map &map) ATTR_COLD;
+	void bigkarnk_snd_map(address_map &map) ATTR_COLD;
+	void maniacsq_map(address_map &map) ATTR_COLD;
+	void oki_map(address_map &map) ATTR_COLD;
+	void squash_map(address_map &map) ATTR_COLD;
+	void thoop_map(address_map &map) ATTR_COLD;
 
 	/* per-game configuration */
 	uint8_t m_sprite_palette_force_high = 0;

@@ -39,6 +39,8 @@ ToDo:
 #include "formats/a5105_dsk.h"
 
 
+namespace {
+
 class a5105_state : public driver_device
 {
 public:
@@ -50,10 +52,7 @@ public:
 		, m_cass(*this, "cassette")
 		, m_beep(*this, "beeper")
 		, m_fdc(*this, "upd765a")
-		, m_floppy0(*this, "upd765a:0")
-		, m_floppy1(*this, "upd765a:1")
-		, m_floppy2(*this, "upd765a:2")
-		, m_floppy3(*this, "upd765a:3")
+		, m_floppy(*this, "upd765a:%u", 0U)
 		, m_video_ram(*this, "video_ram")
 		, m_ram(*this, RAM_TAG)
 		, m_gfxdecode(*this, "gfxdecode")
@@ -63,8 +62,8 @@ public:
 	void a5105(machine_config &config);
 
 protected:
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	uint8_t a5105_memsel_r();
@@ -82,9 +81,9 @@ private:
 	UPD7220_DISPLAY_PIXELS_MEMBER( hgdc_display_pixels );
 	UPD7220_DRAW_TEXT_LINE_MEMBER( hgdc_draw_text );
 
-	void a5105_io(address_map &map);
-	void a5105_mem(address_map &map);
-	void upd7220_map(address_map &map);
+	void a5105_io(address_map &map) ATTR_COLD;
+	void a5105_mem(address_map &map) ATTR_COLD;
+	void upd7220_map(address_map &map) ATTR_COLD;
 
 	uint8_t *m_ram_base = 0;
 	uint8_t *m_rom_base = 0;
@@ -99,10 +98,7 @@ private:
 	required_device<cassette_image_device> m_cass;
 	required_device<beep_device> m_beep;
 	required_device<upd765a_device> m_fdc;
-	required_device<floppy_connector> m_floppy0;
-	required_device<floppy_connector> m_floppy1;
-	required_device<floppy_connector> m_floppy2;
-	required_device<floppy_connector> m_floppy3;
+	required_device_array<floppy_connector, 4> m_floppy;
 	required_shared_ptr<uint16_t> m_video_ram;
 	required_device<ram_device> m_ram;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -368,10 +364,8 @@ void a5105_state::a5105_memsel_w(uint8_t data)
 
 void a5105_state::a5105_upd765_w(uint8_t data)
 {
-	m_floppy0->get_device()->mon_w(!BIT(data,0));
-	m_floppy1->get_device()->mon_w(!BIT(data,1));
-	m_floppy2->get_device()->mon_w(!BIT(data,2));
-	m_floppy3->get_device()->mon_w(!BIT(data,3));
+	for (int n = 0; n < 4; n++)
+		m_floppy[n]->get_device()->mon_w(!BIT(data,n));
 
 	m_fdc->tc_w(BIT(data, 4));
 }
@@ -401,31 +395,31 @@ void a5105_state::a5105_io(address_map &map)
 /* Input ports */
 static INPUT_PORTS_START( a5105 )
 	PORT_START("KEY0")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("0 =") PORT_CODE(KEYCODE_0) PORT_CHAR('0') PORT_CHAR('=')
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("1 !") PORT_CODE(KEYCODE_1) PORT_CHAR('1') PORT_CHAR('!')
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("2 \"") PORT_CODE(KEYCODE_2) PORT_CHAR('2') PORT_CHAR('\"')
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("3 \\") PORT_CODE(KEYCODE_3) PORT_CHAR('3') PORT_CHAR('\\')
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("4 $") PORT_CODE(KEYCODE_4) PORT_CHAR('4') PORT_CHAR('$')
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("5 %") PORT_CODE(KEYCODE_5) PORT_CHAR('5') PORT_CHAR('%')
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("6 &") PORT_CODE(KEYCODE_6) PORT_CHAR('6') PORT_CHAR('&')
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("7 /") PORT_CODE(KEYCODE_7) PORT_CHAR('7') PORT_CHAR('/')
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_0) PORT_CHAR('0') PORT_CHAR('=')
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_1) PORT_CHAR('1') PORT_CHAR('!')
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_2) PORT_CHAR('2') PORT_CHAR('\"')
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_3) PORT_CHAR('3') PORT_CHAR('\\')
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_4) PORT_CHAR('4') PORT_CHAR('$')
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_5) PORT_CHAR('5') PORT_CHAR('%')
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_6) PORT_CHAR('6') PORT_CHAR('&')
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_7) PORT_CHAR('7') PORT_CHAR('/')
 
 	PORT_START("KEY1")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("8 (") PORT_CODE(KEYCODE_8) PORT_CHAR('8') PORT_CHAR('(')
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("9 )") PORT_CODE(KEYCODE_9) PORT_CHAR('9') PORT_CHAR(')')
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("< >") PORT_CODE(KEYCODE_COLON) PORT_CHAR('<') PORT_CHAR('>')
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("+ *") PORT_CODE(KEYCODE_EQUALS) PORT_CHAR('+') PORT_CHAR('*')
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("\xc3\xb6 \xc3\x96") PORT_CODE(KEYCODE_OPENBRACE) PORT_CHAR(0x00f6) PORT_CHAR(0x00d6)
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("\xc3\xa4 \xc3\x84") PORT_CODE(KEYCODE_CLOSEBRACE) PORT_CHAR(0x00e4) PORT_CHAR(0x00c4)
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("\xc3\xbc \xc3\x9c") PORT_CODE(KEYCODE_QUOTE) PORT_CHAR(0x00fc) PORT_CHAR(0x00dc)
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("# ^") PORT_CODE(KEYCODE_BACKSLASH) PORT_CHAR('#') PORT_CHAR('^')
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_8) PORT_CHAR('8') PORT_CHAR('(')
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_9) PORT_CHAR('9') PORT_CHAR(')')
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_COLON) PORT_CHAR('<') PORT_CHAR('>')
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_EQUALS) PORT_CHAR('+') PORT_CHAR('*')
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_OPENBRACE) PORT_CHAR(U'ö') PORT_CHAR(U'Ö')
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_CLOSEBRACE) PORT_CHAR(U'ä') PORT_CHAR(U'Ä')
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_QUOTE) PORT_CHAR(U'ü') PORT_CHAR(U'Ü')
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_BACKSLASH) PORT_CHAR('#') PORT_CHAR('^')
 
 	PORT_START("KEY2")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("' `") PORT_CODE(KEYCODE_TILDE) PORT_CHAR('\'') PORT_CHAR('`')
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("? beta") PORT_CODE(KEYCODE_SLASH) PORT_CHAR('?')
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME(", ;") PORT_CODE(KEYCODE_COMMA) PORT_CHAR(',') PORT_CHAR(';')
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME(". :") PORT_CODE(KEYCODE_STOP) PORT_CHAR('.') PORT_CHAR(':')
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("- _") PORT_CODE(KEYCODE_MINUS) PORT_CHAR('-') PORT_CHAR('_')
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_TILDE) PORT_CHAR('\'') PORT_CHAR('`')
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_SLASH) PORT_CHAR('?') PORT_CHAR(U'ß')
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_COMMA) PORT_CHAR(',') PORT_CHAR(';')
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_STOP) PORT_CHAR('.') PORT_CHAR(':')
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_MINUS) PORT_CHAR('-') PORT_CHAR('_')
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_UNUSED) // appears to do nothing
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("A") PORT_CODE(KEYCODE_A) PORT_CHAR('a') PORT_CHAR('A')
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("B") PORT_CODE(KEYCODE_B) PORT_CHAR('b') PORT_CHAR('B')
@@ -651,6 +645,9 @@ ROM_START( a5105 )
 	ROM_LOAD( "k5651_40.rom", 0x0000, 0x2000, CRC(f4ad4739) SHA1(9a7bbe6f0d180dd513c7854f441cee986c8d9765))
 	ROM_LOAD( "k5651_60.rom", 0x2000, 0x2000, CRC(c77dde3f) SHA1(7c16226be6c4c71013e8008fba9d2e9c5640b6a7))
 ROM_END
+
+} // anonymous namespace
+
 
 /* Driver */
 

@@ -119,6 +119,13 @@ namespace netlist::analog
 			m_N.set_go_gt_I(a21, a22, rhs2);
 		}
 
+		void set_mat(const std::array<std::array<nl_fptype,3>,2> &a) const noexcept
+		{
+			//                 GO,      GT,       I
+			m_P.set_go_gt_I(a[0][1], a[0][0], a[0][2]);
+			m_N.set_go_gt_I(a[1][0], a[1][1], a[1][2]);
+		}
+
 		void clear_mat() const noexcept
 		{
 			const auto z = nlconst::zero();
@@ -305,7 +312,7 @@ namespace netlist::analog
 		NETLIB_IS_TIMESTEP(true)
 		NETLIB_TIMESTEPI()
 		{
-			if (ts_type == time_step_type::FORWARD)
+			if (ts_type == detail::time_step_type::FORWARD)
 			{
 				// G, Ieq
 				const auto      res(m_cap.time_step(m_C(), deltaV(), step));
@@ -577,7 +584,7 @@ namespace netlist::analog
 
 		NETLIB_TIMESTEPI()
 		{
-			if (ts_type == time_step_type::FORWARD)
+			if (ts_type == detail::time_step_type::FORWARD)
 			{
 				m_t += step;
 				m_funcparam[0] = m_t;
@@ -630,7 +637,7 @@ namespace netlist::analog
 		NETLIB_IS_TIMESTEP(!m_func().empty())
 		NETLIB_TIMESTEPI()
 		{
-			if (ts_type == time_step_type::FORWARD)
+			if (ts_type == detail::time_step_type::FORWARD)
 			{
 				m_t += step;
 				m_funcparam[0] = m_t;

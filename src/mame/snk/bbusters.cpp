@@ -140,8 +140,8 @@ public:
 	void bbusters(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -170,9 +170,9 @@ private:
 	template<int Layer> void pf_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	void coin_counter_w(uint8_t data);
 
-	void bbusters_map(address_map &map);
-	void sound_map(address_map &map);
-	void sound_portmap(address_map &map);
+	void bbusters_map(address_map &map) ATTR_COLD;
+	void sound_map(address_map &map) ATTR_COLD;
+	void sound_portmap(address_map &map) ATTR_COLD;
 
 	uint16_t eprom_r(offs_t offset);
 	void three_gun_output_w(uint16_t data);
@@ -463,21 +463,10 @@ INPUT_PORTS_END
 
 /******************************************************************************/
 
-static const gfx_layout tilelayout =
-{
-	16,16,  /* 16*16 sprites */
-	RGN_FRAC(1,1),
-	4,  /* 4 bits per pixel */
-	{ STEP4(0,1) },
-	{ STEP8(0,4), STEP8(4*8*16,4) },
-	{ STEP16(0,4*8) },
-	128*8
-};
-
 static GFXDECODE_START( gfx_bbusters )
-	GFXDECODE_ENTRY( "tx_tiles", 0, gfx_8x8x4_packed_msb,     0, 16 )
-	GFXDECODE_ENTRY( "gfx4", 0, tilelayout,   768, 16 )
-	GFXDECODE_ENTRY( "gfx5", 0, tilelayout,  1024+256, 16 )
+	GFXDECODE_ENTRY( "tx_tiles", 0, gfx_8x8x4_packed_msb,                      0, 16 )
+	GFXDECODE_ENTRY( "gfx4", 0,     gfx_8x8x4_col_2x2_group_packed_msb,      768, 16 )
+	GFXDECODE_ENTRY( "gfx5", 0,     gfx_8x8x4_col_2x2_group_packed_msb, 1024+256, 16 )
 GFXDECODE_END
 
 /******************************************************************************/

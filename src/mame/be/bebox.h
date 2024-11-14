@@ -8,8 +8,8 @@
  *
  ****************************************************************************/
 
-#ifndef MAME_INCLUDES_BEBOX_H
-#define MAME_INCLUDES_BEBOX_H
+#ifndef MAME_BE_BEBOX_H
+#define MAME_BE_BEBOX_H
 
 #include "cpu/powerpc/ppc.h"
 
@@ -56,8 +56,8 @@ public:
 	int m_dma_channel = 0; // TODO: move to private once possible
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	required_device_array<ppc_device, 2> m_ppc;
@@ -76,15 +76,15 @@ private:
 	uint16_t m_dma_offset[2][4]{};
 	uint8_t m_at_pages[0x10]{};
 	uint32_t m_scsi53c810_data[0x100 / 4]{};
-	DECLARE_WRITE_LINE_MEMBER(bebox_pic8259_master_set_int_line);
-	DECLARE_WRITE_LINE_MEMBER(bebox_pic8259_slave_set_int_line);
-	DECLARE_WRITE_LINE_MEMBER(bebox_dma_hrq_changed);
-	DECLARE_WRITE_LINE_MEMBER(bebox_dma8237_out_eop);
-	DECLARE_WRITE_LINE_MEMBER(pc_dack0_w);
-	DECLARE_WRITE_LINE_MEMBER(pc_dack1_w);
-	DECLARE_WRITE_LINE_MEMBER(pc_dack2_w);
-	DECLARE_WRITE_LINE_MEMBER(pc_dack3_w);
-	DECLARE_WRITE_LINE_MEMBER(bebox_timer0_w);
+	void bebox_pic8259_master_set_int_line(int state);
+	void bebox_pic8259_slave_set_int_line(int state);
+	void bebox_dma_hrq_changed(int state);
+	void bebox_dma8237_out_eop(int state);
+	void pc_dack0_w(int state);
+	void pc_dack1_w(int state);
+	void pc_dack2_w(int state);
+	void pc_dack3_w(int state);
+	void bebox_timer0_w(int state);
 	uint64_t bebox_cpu0_imask_r();
 	uint64_t bebox_cpu1_imask_r();
 	uint64_t bebox_interrupt_sources_r();
@@ -110,11 +110,11 @@ private:
 	void scsi53c810_w(offs_t offset, uint64_t data, uint64_t mem_mask = ~0);
 	uint64_t bb_slave_64be_r(offs_t offset, uint64_t mem_mask = ~0);
 
-	DECLARE_WRITE_LINE_MEMBER(bebox_ide_interrupt);
+	void bebox_ide_interrupt(int state);
 
-	DECLARE_WRITE_LINE_MEMBER(bebox_keyboard_interrupt);
+	void bebox_keyboard_interrupt(int state);
 
-	DECLARE_WRITE_LINE_MEMBER( fdc_interrupt );
+	void fdc_interrupt(int state);
 
 	uint32_t scsi_fetch(uint32_t dsp);
 	void scsi_irq_callback(int state);
@@ -128,12 +128,12 @@ private:
 
 	pci_connector_device & add_pci_slot(machine_config &config, const char *tag, size_t index, const char *default_tag);
 
-	void main_mem(address_map &map);
-	void slave_mem(address_map &map);
+	void main_mem(address_map &map) ATTR_COLD;
+	void slave_mem(address_map &map) ATTR_COLD;
 
 	[[maybe_unused]] uint32_t scsi53c810_pci_read(int function, int offset, uint32_t mem_mask);
 	[[maybe_unused]] void scsi53c810_pci_write(int function, int offset, uint32_t data, uint32_t mem_mask);
 };
 
 
-#endif // MAME_INCLUDES_BEBOX_H
+#endif // MAME_BE_BEBOX_H

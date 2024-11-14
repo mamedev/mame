@@ -1,4 +1,4 @@
-// license:CC0
+// license:CC0-1.0
 // copyright-holders:Aaron Giles
 
 //
@@ -27,6 +27,7 @@
 //
 
 NETLIST_START(segaspeech)
+{
 
 	SOLVER(Solver, 1000)
 	PARAM(Solver.DYNAMIC_TS, 1)
@@ -116,4 +117,4 @@ NETLIST_START(segaspeech)
 	// at the driver level.
 	//
 
-NETLIST_END()
+}

@@ -64,19 +64,6 @@ sa16_device::sa16_device(const machine_config &mconfig, const char *tag, device_
 
 
 //-------------------------------------------------
-//  device_resolve_objects - resolve objects that
-//  may be needed for other devices to set
-//  initial conditions at start time
-//-------------------------------------------------
-
-void sa16_base_device::device_resolve_objects()
-{
-	m_int_callback.resolve_safe();
-	m_sh_callback.resolve_safe();
-}
-
-
-//-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
 

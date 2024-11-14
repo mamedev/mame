@@ -4,9 +4,10 @@
 brk_16_imp
 	// The 6502 bug when a nmi occurs in a brk is reproduced (case !irq_taken && nmi_pending)
 	if(irq_taken) {
-		read_pc_noinc();
+		read_pc();
 	} else {
 		read_pc();
+		PC++;
 	}
 	write(SP, PC >> 8);
 	dec_SP();
@@ -15,15 +16,15 @@ brk_16_imp
 	write(SP, irq_taken ? P & ~F_B : P);
 	dec_SP();
 	if(nmi_pending) {
+		standard_irq_callback(NMI_LINE, PC);
 		PC = read_arg(0xfff7);
 		PC = set_h(PC, read_arg(0xfff6));
 		nmi_pending = false;
-		standard_irq_callback(NMI_LINE);
 	} else {
+		if(irq_taken)
+			standard_irq_callback(IRQ_LINE, PC);
 		PC = read_arg(0xfff3);
 		PC = set_h(PC, read_arg(0xfff2));
-		if(irq_taken)
-			standard_irq_callback(IRQ_LINE);
 	}
 	irq_taken = false;
 	P |= F_I; // Do *not* move after the prefetch
@@ -36,41 +37,48 @@ ill_non
 
 u0B_zpg
 	TMP2 = read_pc();
+	PC++;
 	if(DECO16_VERBOSE)
 		logerror("%s: OP0B %02x (%04x)\n", tag(), NPC, TMP2);
 	prefetch();
 
 u13_zpg
 	TMP2 = read_pc();
+	PC++;
 	if(DECO16_VERBOSE)
 		logerror("%s: OP13 %02x (%04x)\n", tag(), NPC, TMP2);
 	prefetch();
 
 u23_zpg
 	TMP2 = read_pc();
+	PC++;
 	if(DECO16_VERBOSE)
 		logerror("%s: OP23 %02x (%04x)\n", tag(), NPC, TMP2);
 	prefetch();
 
 u3F_zpg
 	TMP2 = read_pc();
+	PC++;
 	if(DECO16_VERBOSE)
 		logerror("%s: OPBB %02x (%04x)\n", tag(), NPC, TMP2);
 	prefetch();
 
 u4B_zpg
 	TMP2 = read_pc();
+	PC++;
 	A = io->read_byte(1);
 	prefetch();
 
 u87_zpg
 	TMP2 = read_pc();
+	PC++;
 	if(DECO16_VERBOSE)
 		logerror("%s: OP87 %02x (%04x)\n", tag(), NPC, TMP2);
 	prefetch();
 
 u8F_zpg
 	TMP2 = read_pc();
+	PC++;
 	if(DECO16_VERBOSE)
 		logerror("%s: OP8F (BANK) %02x (%04x)\n", tag(), NPC, TMP2);
 	io->write_byte(0, TMP2);
@@ -78,18 +86,21 @@ u8F_zpg
 
 uA3_zpg
 	TMP2 = read_pc();
+	PC++;
 	if(DECO16_VERBOSE)
 		logerror("%s: OPA3 %02x (%04x)\n", tag(), NPC, TMP2);
 	prefetch();
 
 uBB_zpg
 	TMP2 = read_pc();
+	PC++;
 	if(DECO16_VERBOSE)
 		logerror("%s: OPBB %02x (%04x)\n", tag(), NPC, TMP2);
 	prefetch();
 
 vbl_zpg
 	TMP2 = read_pc();
+	PC++;
 	A = io->read_byte(0);
 	//if(DECO16_VERBOSE)
 	//  logerror("%s: VBL %02x (%04x)\n", tag(), NPC, TMP2);
@@ -97,7 +108,8 @@ vbl_zpg
 
 #   exceptions
 reset_16
-	P |= F_I; PC = read_arg(0xfff1);
+	P |= F_I;
+	PC = read_arg(0xfff1);
 	PC = set_h(PC, read_arg(0xfff0));
 	prefetch();
 	inst_state = -1;

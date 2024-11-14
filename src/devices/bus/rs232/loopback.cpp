@@ -4,7 +4,7 @@
 #include "emu.h"
 #include "loopback.h"
 
-DEFINE_DEVICE_TYPE(RS232_LOOPBACK, rs232_loopback_device, "rs232_loopback", "RS232 Loopback")
+DEFINE_DEVICE_TYPE(RS232_LOOPBACK, rs232_loopback_device, "rs232_loopback", "RS-232 Loopback")
 
 rs232_loopback_device::rs232_loopback_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, RS232_LOOPBACK, tag, owner, clock)
@@ -16,7 +16,7 @@ void rs232_loopback_device::device_start()
 {
 }
 
-WRITE_LINE_MEMBER( rs232_loopback_device::input_txd )
+void rs232_loopback_device::input_txd(int state)
 {
 	if (started())
 	{
@@ -24,7 +24,7 @@ WRITE_LINE_MEMBER( rs232_loopback_device::input_txd )
 	}
 }
 
-WRITE_LINE_MEMBER( rs232_loopback_device::input_rts )
+void rs232_loopback_device::input_rts(int state)
 {
 	if (started())
 	{
@@ -34,7 +34,7 @@ WRITE_LINE_MEMBER( rs232_loopback_device::input_rts )
 	}
 }
 
-WRITE_LINE_MEMBER( rs232_loopback_device::input_dtr )
+void rs232_loopback_device::input_dtr(int state)
 {
 	if (started())
 	{
@@ -43,7 +43,7 @@ WRITE_LINE_MEMBER( rs232_loopback_device::input_dtr )
 	}
 }
 
-DEFINE_DEVICE_TYPE(DEC_RS232_LOOPBACK, dec_rs232_loopback_device, "dec_rs232_loopback", "RS232 Loopback (DEC 12-15336-00)")
+DEFINE_DEVICE_TYPE(DEC_RS232_LOOPBACK, dec_rs232_loopback_device, "dec_rs232_loopback", "RS-232 Loopback (DEC 12-15336-00)")
 
 dec_rs232_loopback_device::dec_rs232_loopback_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, DEC_RS232_LOOPBACK, tag, owner, clock)
@@ -55,7 +55,7 @@ void dec_rs232_loopback_device::device_start()
 {
 }
 
-WRITE_LINE_MEMBER( dec_rs232_loopback_device::input_txd )
+void dec_rs232_loopback_device::input_txd(int state)
 {
 	// Pin 2 (Transmitted Data) connected to Pin 3 (Received Data) and Pin 15 (Transmission Clock)
 	if (started())
@@ -65,7 +65,7 @@ WRITE_LINE_MEMBER( dec_rs232_loopback_device::input_txd )
 	}
 }
 
-WRITE_LINE_MEMBER( dec_rs232_loopback_device::input_rts )
+void dec_rs232_loopback_device::input_rts(int state)
 {
 	// Pin 4 (Request to Send) connected to Pin 5 (Clear to Send) and Pin 8 (Carrier Detect)
 	if (started())
@@ -75,7 +75,7 @@ WRITE_LINE_MEMBER( dec_rs232_loopback_device::input_rts )
 	}
 }
 
-WRITE_LINE_MEMBER( dec_rs232_loopback_device::input_dtr )
+void dec_rs232_loopback_device::input_dtr(int state)
 {
 	// Pin 20 (Data Terminal Ready) connected to Pin 6 (Data Set Ready) and 22 (Ring Indicator)
 	if (started())
@@ -85,7 +85,7 @@ WRITE_LINE_MEMBER( dec_rs232_loopback_device::input_dtr )
 	}
 }
 
-WRITE_LINE_MEMBER( dec_rs232_loopback_device::input_spds )
+void dec_rs232_loopback_device::input_spds(int state)
 {
 	// Pin 19 (Speed Select) connected to Pin 12 (Speed Indicator) and 17 (Receive Clock)
 	if (started())

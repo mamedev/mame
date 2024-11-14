@@ -13,7 +13,6 @@
 #include "isa.h"
 #include "imagedev/floppy.h"
 #include "machine/wd_fdc.h"
-#include "formats/imd_dsk.h"
 
 class isa8_myb3k_fdc471x_device_base :
 	public device_t,
@@ -23,11 +22,11 @@ protected:
 	isa8_myb3k_fdc471x_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	// device-level overrides
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual void device_start() override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override { }
 
-	void map(address_map &map);
+	void map(address_map &map) ATTR_COLD;
 
 	virtual uint8_t dack_r(int line) override;
 	virtual void dack_w(int line, uint8_t data) override;
@@ -38,8 +37,8 @@ protected:
 	virtual uint8_t myb3k_fdc_status();
 	virtual void myb3k_fdc_command(uint8_t data);
 
-	DECLARE_WRITE_LINE_MEMBER( irq_w );
-	DECLARE_WRITE_LINE_MEMBER( drq_w );
+	void irq_w(int state);
+	void drq_w(int state);
 
 	required_device<wd_fdc_device_base> m_fdc;
 	optional_device_array<floppy_connector, 4> m_floppy_connectors;
@@ -74,7 +73,7 @@ protected:
 	isa8_myb3k_fdc4710_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	// device-level overrides
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 };
 
 class isa8_myb3k_fdc4711_device : public isa8_myb3k_fdc471x_device_base
@@ -88,7 +87,7 @@ protected:
 	isa8_myb3k_fdc4711_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	// device-level overrides
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 };
 
 class isa8_myb3k_fdc4712_device : public isa8_myb3k_fdc471x_device_base
@@ -102,7 +101,7 @@ protected:
 	isa8_myb3k_fdc4712_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	// device-level overrides
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 	virtual void myb3k_fdc_command(uint8_t data) override;
 	virtual uint8_t myb3k_fdc_status() override;

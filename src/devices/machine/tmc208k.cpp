@@ -69,10 +69,6 @@ void tmc208_base_device<RegType, OutType>::device_start()
 	save_item(NAME(m_clk_r));
 	save_item(NAME(m_rnd_in));
 	save_item(NAME(m_rnd));
-
-	m_msp.resolve_safe();
-	m_lsp.resolve_safe();
-	m_r.resolve_safe();
 }
 
 template <typename RegType, typename OutType>

@@ -30,6 +30,8 @@
 #include "screen.h"
 
 
+namespace {
+
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
@@ -53,8 +55,8 @@ public:
 	void informer_207_100(machine_config &config);
 
 protected:
-	void machine_start() override;
-	void machine_reset() override;
+	void machine_start() override ATTR_COLD;
+	void machine_reset() override ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -67,7 +69,7 @@ private:
 	required_shared_ptr<uint8_t> m_ram;
 	required_region_ptr<uint8_t> m_chargen;
 
-	void mem_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
 
 	MC6845_ON_UPDATE_ADDR_CHANGED(crtc_addr);
 	MC6845_UPDATE_ROW(crtc_update_row);
@@ -211,6 +213,8 @@ ROM_START( in207100 )
 	// 79496  REV 1.01  12-29-83
 	ROM_LOAD("79496.bin", 0x0000, 0x1000, CRC(930ac23a) SHA1(74e6bf81b60e3504cb2b9f14a33e7c3e367dc825))
 ROM_END
+
+} // anonymous namespace
 
 
 //**************************************************************************

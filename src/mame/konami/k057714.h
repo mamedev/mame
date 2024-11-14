@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Ville Linde
-#ifndef MAME_MACHINE_K057714_H
-#define MAME_MACHINE_K057714_H
+#ifndef MAME_KONAMI_K057714_H
+#define MAME_KONAMI_K057714_H
 
 #pragma once
 
@@ -22,6 +22,8 @@ public:
 	void write(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 	void fifo_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 
+	void vblank_w(int state);
+
 	struct framebuffer
 	{
 		uint32_t base;
@@ -33,9 +35,9 @@ public:
 	};
 
 protected:
-	virtual void device_start() override;
-	virtual void device_stop() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_stop() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 private:
 	enum {
@@ -87,10 +89,12 @@ private:
 
 	uint32_t m_pixclock;
 
+	uint16_t m_irqctrl;
+
 	devcb_write_line m_irq;
 };
 
 DECLARE_DEVICE_TYPE(K057714, k057714_device)
 
 
-#endif // MAME_MACHINE_K057714_H
+#endif // MAME_KONAMI_K057714_H

@@ -117,7 +117,7 @@ void cpc_hd20_device::hdc_w(offs_t offset, uint8_t data)
 	}
 }
 
-WRITE_LINE_MEMBER(cpc_hd20_device::irq_w)
+void cpc_hd20_device::irq_w(int state)
 {
 //  if(state)
 //      m_hdc->set_ready();

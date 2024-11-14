@@ -39,6 +39,8 @@ Other input will either result in '!' message, or halt.
 #include "machine/terminal.h"
 
 
+namespace {
+
 class sacstate_state : public driver_device
 {
 public:
@@ -51,15 +53,15 @@ public:
 	void sacstate(machine_config &config);
 
 private:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 	u8 port00_r();
 	u8 port01_r();
 	u8 port04_r();
 	void port08_w(u8 data);
 	void kbd_put(u8 data);
-	void sacstate_io(address_map &map);
-	void sacstate_mem(address_map &map);
+	void sacstate_io(address_map &map) ATTR_COLD;
+	void sacstate_mem(address_map &map) ATTR_COLD;
 
 	u8 m_term_data = 0U;
 	u8 m_val = 0U;
@@ -165,6 +167,9 @@ ROM_START( sacstate )
 	ROM_LOAD( "sacst7.bin", 0x0100, 0x0100, CRC(33971d8b) SHA1(9e0bbeef6a6a15107f270e8b285300284ee7f63f))
 	ROM_LOAD( "sacst8.bin", 0x0000, 0x0100, CRC(931252ef) SHA1(e06ea6947f432f0a4ce944de74978d929920fb53))
 ROM_END
+
+} // anonymous namespace
+
 
 /* Driver */
 

@@ -16,7 +16,7 @@ public:
 	void vram_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 	uint16_t ctrl_r(address_space &space, offs_t offset, uint16_t mem_mask = ~0);
 	void ctrl_w(offs_t offset, u16 data, u16 mem_mask = ~0);
-	DECLARE_WRITE_LINE_MEMBER(vblank_w);
+	void vblank_w(int state);
 
 	void set_fb_width(int width) { m_fb_width = width; }
 	void set_fb_height(int height) { m_fb_height = height; }
@@ -48,8 +48,8 @@ protected:
 	devcb_write8 m_int_write_func;
 	TIMER_CALLBACK_MEMBER(blink_callback);
 
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	void execute_rule(const bool src, const int rule, bool &dst) const;
 	void update_int();

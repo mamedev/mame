@@ -24,14 +24,13 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
-	virtual void device_stop() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+	virtual void device_stop() override ATTR_COLD;
 
 	// device_execute_interface overrides
 	virtual uint32_t execute_min_cycles() const noexcept override;
 	virtual uint32_t execute_max_cycles() const noexcept override;
-	//virtual uint32_t execute_input_lines() const noexcept override;
 	virtual void execute_run() override;
 	//virtual void execute_set_input(int inputnum, int state) override;
 
@@ -79,15 +78,6 @@ protected:
 
 	// rom regions
 	memory_region *m_table;
-
-#if 0
-	// Callbacks and set methods
-	write_line_delegate m_xxx_cb; // Called when xxx happens in CPU
-	void call_xxx_cb(int state){ if (!m_xxx.cb.isnull()) (m_xxx_cb)(state);
-public:
-	void set_xxx_callback( write_line_delegate callback ){ m_xxx_cb = callback; }
-	void set_line_yyy(int state){ m_yyy = state; }
-#endif
 };
 
 // device type definition

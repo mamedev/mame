@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Ariane Fugmann
-#ifndef MAME_MACHINE_M1COMM_H
-#define MAME_MACHINE_M1COMM_H
+#ifndef MAME_SEGA_M1COMM_H
+#define MAME_SEGA_M1COMM_H
 
 #pragma once
 
@@ -41,18 +41,18 @@ public:
 	// IRQ logic - 5 = VINT, 7 = DLC
 	void check_vint_irq();
 
-	void m1comm_io(address_map &map);
-	void m1comm_mem(address_map &map);
+	void m1comm_io(address_map &map) ATTR_COLD;
+	void m1comm_mem(address_map &map) ATTR_COLD;
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 	virtual void device_reset_after_children() override;
 
-	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 
 	// optional information overrides
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 private:
 	required_device<z80_device> m_cpu;
@@ -60,10 +60,10 @@ private:
 	required_device<mb89374_device> m_dlc;
 
 	// MB89374 handler
-	DECLARE_WRITE_LINE_MEMBER(dlc_int7_w);
+	void dlc_int7_w(int state);
 
 	// MB89237A handler
-	DECLARE_WRITE_LINE_MEMBER(dma_hreq_w);
+	void dma_hreq_w(int state);
 	uint8_t dma_mem_r(offs_t offset);
 	void dma_mem_w(offs_t offset, uint8_t data);
 
@@ -109,4 +109,4 @@ private:
 // device type definition
 DECLARE_DEVICE_TYPE(M1COMM, m1comm_device)
 
-#endif  // MAME_MACHINE_M1COMM_H
+#endif  // MAME_SEGA_M1COMM_H

@@ -1,18 +1,21 @@
 // license:BSD-3-Clause
 // copyright-holders:Patrick Mackinlay
 
-#ifndef MAME_VIDEO_SGI_GR1_H
-#define MAME_VIDEO_SGI_GR1_H
+#ifndef MAME_SGI_SGI_GR1_H
+#define MAME_SGI_SGI_GR1_H
 
 #pragma once
 
-#include "machine/bankdev.h"
-#include "screen.h"
 #include "sgi_ge5.h"
 #include "sgi_re2.h"
 #include "sgi_xmap2.h"
+
+#include "machine/bankdev.h"
 #include "video/bt45x.h"
 #include "video/bt431.h"
+
+#include "screen.h"
+
 
 class sgi_gr1_device : public device_t
 {
@@ -22,25 +25,25 @@ public:
 	static constexpr feature_type imperfect_features() { return feature::GRAPHICS; }
 
 	// configuration
-	auto out_vblank() { return subdevice<screen_device>("screen")->screen_vblank(); }
-	auto out_int() { return subdevice<sgi_ge5_device>("ge5")->out_int(); }
+	auto out_vblank() { return m_screen.lookup()->screen_vblank(); }
+	auto out_int() { return m_ge.lookup()->out_int(); }
 	auto out_int_fifo() { return m_int_fifo_cb.bind(); }
 
-	u32 dma_r() { return subdevice<sgi_ge5_device>("ge5")->buffer_r(0); }
+	u32 dma_r() { return m_ge.lookup()->buffer_r(0); }
 	void dma_w(u32 data) { fifo_w(0, data, 0xffffffffU); }
 
 	void reset_w(int state);
 
-	void map(address_map &map);
+	void map(address_map &map) ATTR_COLD;
 
 protected:
-	void map_bank(address_map& map);
+	void map_bank(address_map &map) ATTR_COLD;
 
 	// device_t overrides
-	virtual ioport_constructor device_input_ports() const override;
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// display registers
 	u8 dr0_r();
@@ -137,4 +140,4 @@ private:
 
 DECLARE_DEVICE_TYPE(SGI_GR1, sgi_gr1_device)
 
-#endif // MAME_VIDEO_SGI_GR1_H
+#endif // MAME_SGI_SGI_GR1_H

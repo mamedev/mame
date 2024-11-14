@@ -99,6 +99,8 @@ ToDo
 #include "mmd2.lh"
 
 
+namespace {
+
 class mmd2_state : public driver_device
 {
 public:
@@ -122,8 +124,8 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(reset_button);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	void round_leds_w(offs_t, u8);
@@ -136,8 +138,8 @@ private:
 	void digit_w(u8 data);
 	void status_callback(u8 data);
 
-	void io_map(address_map &map);
-	void mem_map(address_map &map);
+	void io_map(address_map &map) ATTR_COLD;
+	void mem_map(address_map &map) ATTR_COLD;
 	void reset_banks();
 
 	u8 m_digit = 0U;
@@ -234,7 +236,7 @@ static INPUT_PORTS_START( mmd2 )
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("STORE") PORT_CODE(KEYCODE_ENTER)
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("PREV") PORT_CODE(KEYCODE_DOWN)
 	PORT_START("RESET")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("RESET") PORT_CODE(KEYCODE_LALT) PORT_CHANGED_MEMBER(DEVICE_SELF, mmd2_state, reset_button, 0)
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("RESET") PORT_CODE(KEYCODE_LALT) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(mmd2_state::reset_button), 0)
 INPUT_PORTS_END
 
 INPUT_CHANGED_MEMBER(mmd2_state::reset_button)
@@ -395,6 +397,9 @@ ROM_START( mmd2 )
 	ROM_LOAD( "mmd2350.bin", 0x1000, 0x0800, CRC(359f577c) SHA1(9405ca0c1977721e4540a4017907c06dab08d398))
 	ROM_LOAD( "mmd2360.bin", 0x1800, 0x0800, CRC(967e69b8) SHA1(c21ec8bef955806a2c6e1b1c8e9068662fb88038))
 ROM_END
+
+} // anonymous namespace
+
 
 /* Driver */
 

@@ -58,6 +58,8 @@
 #include "tilemap.h"
 
 
+namespace {
+
 class mole_state : public driver_device
 {
 public:
@@ -86,11 +88,11 @@ private:
 	void mole_flipscreen_w(uint8_t data);
 	uint8_t mole_protection_r(offs_t offset);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 	uint32_t screen_update_mole(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void mole_map(address_map &map);
+	void mole_map(address_map &map) ATTR_COLD;
 };
 
 
@@ -370,6 +372,8 @@ ROM_START( mole ) // ALL ROMS ARE 2732
 	ROM_LOAD( "mda.5a", 0x4000, 0x1000, CRC(41ae1842) SHA1(afc169c3245b0946ef81e65d0b755d498ee71667) )
 	ROM_LOAD( "mba.8a", 0x5000, 0x1000, CRC(50c43fc9) SHA1(af478f3d89cd6c87f32dcdda7fabce25738c340b) )
 ROM_END
+
+} // anonymous namespace
 
 
 /*************************************

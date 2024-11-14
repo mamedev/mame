@@ -56,7 +56,7 @@
 ****************************************************************************/
 
 #include "emu.h"
-#include "machine/f4702.h"
+#include "f4702.h"
 
 
 //**************************************************************************
@@ -78,7 +78,7 @@ DEFINE_DEVICE_TYPE(F4702, f4702_device, "f4702", "Fairchild 4702B Bit Rate Gener
 f4702_device::f4702_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, F4702, tag, owner, clock)
 	, device_execute_interface(mconfig, *this)
-	, m_s_callback(*this)
+	, m_s_callback(*this, 15)
 	, m_z_callback(*this)
 	, m_main_counter(0)
 	, m_div_200_50(0)
@@ -89,20 +89,6 @@ f4702_device::f4702_device(const machine_config &mconfig, const char *tag, devic
 	, m_s(0)
 	, m_icount(0)
 {
-}
-
-
-//-------------------------------------------------
-//  device_resolve_objects - resolve objects that
-//  may be needed for other devices to set
-//  initial conditions at start time
-//-------------------------------------------------
-
-void f4702_device::device_resolve_objects()
-{
-	// resolve callbacks
-	m_s_callback.resolve_safe(15);
-	m_z_callback.resolve_safe();
 }
 
 
@@ -149,7 +135,7 @@ void f4702_device::reset_counters()
 //  im_w - set external rate input
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER(f4702_device::im_w)
+void f4702_device::im_w(int state)
 {
 	m_im = state;
 }

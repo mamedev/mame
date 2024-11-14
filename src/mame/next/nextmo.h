@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Olivier Galibert
-#ifndef MAME_MACHINE_NEXTMO_H
-#define MAME_MACHINE_NEXTMO_H
+#ifndef MAME_NEXT_NEXTMO_H
+#define MAME_NEXT_NEXTMO_H
 
 #pragma once
 
@@ -14,7 +14,7 @@ public:
 	auto irq_wr_callback() { return irq_cb.bind(); }
 	auto drq_wr_callback() { return drq_cb.bind(); }
 
-	void map(address_map &map);
+	void map(address_map &map) ATTR_COLD;
 
 	uint8_t r4_r();
 	void r4_w(uint8_t data);
@@ -39,8 +39,8 @@ public:
 	void dma_w(uint8_t data);
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 private:
 	uint8_t sector[0x510];
@@ -55,4 +55,4 @@ private:
 
 DECLARE_DEVICE_TYPE(NEXTMO, nextmo_device)
 
-#endif // MAME_MACHINE_NEXTMO_H
+#endif // MAME_NEXT_NEXTMO_H

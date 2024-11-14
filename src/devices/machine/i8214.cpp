@@ -135,10 +135,6 @@ i8214_device::i8214_device(const machine_config &mconfig, const char *tag, devic
 
 void i8214_device::device_start()
 {
-	// resolve callbacks
-	m_write_int.resolve_safe();
-	m_write_enlg.resolve_safe();
-
 	m_int_dis = 0;
 	m_etlg = 1;
 

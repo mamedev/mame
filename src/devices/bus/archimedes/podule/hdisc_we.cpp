@@ -33,14 +33,14 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 	// optional information overrides
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 
 	// device_archimedes_podule_interface overrides
-	virtual void ioc_map(address_map &map) override;
+	virtual void ioc_map(address_map &map) override ATTR_COLD;
 
 private:
 	required_memory_region m_podule_rom;
@@ -106,7 +106,7 @@ arc_hdisc_we_device::arc_hdisc_we_device(const machine_config &mconfig, const ch
 
 void arc_hdisc_we_device::device_start()
 {
-	u8 *rom = m_podule_rom->base();
+	u8 *const rom = m_podule_rom->base();
 
 	for (int i = 0x0000; i < 0x8000; i++)
 	{

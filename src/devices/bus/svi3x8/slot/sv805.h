@@ -32,11 +32,11 @@ public:
 	virtual void iorq_w(offs_t offset, uint8_t data) override;
 
 protected:
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual void device_start() override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual void device_start() override ATTR_COLD;
 
 private:
-	DECLARE_WRITE_LINE_MEMBER( uart_intr_w );
+	void uart_intr_w(int state);
 
 	required_device<ins8250_device> m_uart;
 	required_device<rs232_port_device> m_rs232;

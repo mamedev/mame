@@ -196,7 +196,7 @@ private:
 	// Notes whether the halting callbacks were triggered
 	bool m_empty_triggered, m_full_triggered;
 
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 	TIMER_CALLBACK_MEMBER(sync_empty);
 	TIMER_CALLBACK_MEMBER(sync_full);

@@ -7,6 +7,7 @@
 
 #include "isa.h"
 #include "video/crtc_ega.h"
+#include "screen.h"
 #include "emupal.h"
 
 //**************************************************************************
@@ -39,21 +40,21 @@ protected:
 	isa8_ega_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// optional information overrides
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual const tiny_rom_entry *device_rom_region() const override;
-	virtual ioport_constructor device_input_ports() const override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 
 	uint8_t alu_op( uint8_t data, uint8_t latch_data );
 
 private:
-	DECLARE_WRITE_LINE_MEMBER(de_changed);
-	DECLARE_WRITE_LINE_MEMBER(hsync_changed);
-	DECLARE_WRITE_LINE_MEMBER(vsync_changed);
-	DECLARE_WRITE_LINE_MEMBER(vblank_changed);
+	void de_changed(int state);
+	void hsync_changed(int state);
+	void vsync_changed(int state);
+	void vblank_changed(int state);
 
 	CRTC_EGA_PIXEL_UPDATE(ega_update_row);
 
@@ -107,6 +108,7 @@ public:
 	uint8_t   m_irq;
 	int     m_video_mode;
 	required_device<palette_device> m_palette;
+	required_device<screen_device> m_screen;
 };
 
 

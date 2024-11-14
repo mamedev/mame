@@ -30,7 +30,6 @@
     ROM 1.25 doesn't support mouse, setup mode, pixel data upload and autowrap.
 
     Missing/incorrect emulation:
-        Bidirectional keyboard interface (to drive LEDs and speaker).
         8035.
         EAROM.
         1.25 only -- clksync() is dummied out -- causes watchdog resets.
@@ -51,6 +50,7 @@
 #include "machine/com8116.h"
 #include "machine/er2055.h"
 #include "machine/i8243.h"
+#include "machine/keytronic_l2207.h"
 #include "machine/mc6854.h"
 #include "machine/ram.h"
 #include "sound/ay8910.h"
@@ -68,7 +68,6 @@
 #define ACIA2_TAG "acia2"
 #define ACIA3_TAG "acia3"
 #define RS232_H_TAG "rs232host"
-#define RS232_K_TAG "rs232kbd"
 #define RS232_D_TAG "rs232debug"
 #define RS232_M_TAG "rs232mouse"
 #define ADLC_TAG "adlc"
@@ -77,9 +76,8 @@
 #define EAROM_TAG "earom"
 
 
-//#define LOG_GENERAL (1U <<  0) //defined in logmacro.h already
-#define LOG_PIA       (1U <<  1)
-#define LOG_DEBUG     (1U <<  2)
+#define LOG_PIA       (1U << 1)
+#define LOG_DEBUG     (1U << 2)
 
 //#define VERBOSE (LOG_DEBUG)
 //#define LOG_OUTPUT_FUNC osd_printf_info
@@ -110,16 +108,15 @@ public:
 		, m_earom(*this, EAROM_TAG)
 		, m_centronics(*this, "centronics")
 		, m_screen(*this, "screen")
+		, m_videoram(*this, "videoram")
 	{ }
-
-	static constexpr feature_type imperfect_features() { return feature::KEYBOARD; }
 
 	void bitgrpha(machine_config &config);
 	void bitgrphb(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	uint8_t pia_r(offs_t offset);
 	void pia_w(offs_t offset, uint8_t data);
@@ -127,21 +124,21 @@ protected:
 	uint8_t pia_pb_r();
 	void pia_pa_w(uint8_t data);
 	void pia_pb_w(uint8_t data);
-	DECLARE_READ_LINE_MEMBER(pia_ca1_r);
-	DECLARE_WRITE_LINE_MEMBER(pia_cb2_w);
+	int pia_ca1_r();
+	void pia_cb2_w(int state);
 
 	void baud_write(uint16_t data);
-	DECLARE_WRITE_LINE_MEMBER(com8116_a_fr_w);
-	DECLARE_WRITE_LINE_MEMBER(com8116_a_ft_w);
-	DECLARE_WRITE_LINE_MEMBER(com8116_b_fr_w);
-	DECLARE_WRITE_LINE_MEMBER(com8116_b_ft_w);
+	void com8116_a_fr_w(int state);
+	void com8116_a_ft_w(int state);
+	void com8116_b_fr_w(int state);
+	void com8116_b_ft_w(int state);
 
 	uint8_t adlc_r(offs_t offset);
 	void adlc_w(offs_t offset, uint8_t data);
 
 	void earom_write(uint8_t data);
 	void misccr_write(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(system_clock_write);
+	void system_clock_write(int state);
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
@@ -152,9 +149,9 @@ protected:
 	void bg_motherboard(machine_config &config);
 	[[maybe_unused]] void bg_ppu(machine_config &config);
 
-	void bitgrapha_mem(address_map &map);
-	void bitgraphb_mem(address_map &map);
-	void ppu_io(address_map &map);
+	void bitgrapha_mem(address_map &map) ATTR_COLD;
+	void bitgraphb_mem(address_map &map) ATTR_COLD;
+	void ppu_io(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<ram_device> m_ram;
@@ -170,8 +167,8 @@ protected:
 	required_device<er2055_device> m_earom;
 	optional_device<centronics_device> m_centronics;
 	required_device<screen_device> m_screen;
+	required_shared_ptr<uint16_t> m_videoram;
 
-	uint8_t *m_videoram = nullptr;
 	uint8_t m_misccr = 0;
 	uint8_t m_pia_a = 0;
 	uint8_t m_pia_b = 0;
@@ -193,7 +190,7 @@ void bitgraph_state::bitgrapha_mem(address_map &map)
 	map(0x010020, 0x010027).rw(FUNC(bitgraph_state::adlc_r), FUNC(bitgraph_state::adlc_w)).umask16(0xff00);
 	map(0x010028, 0x01002f).rw(FUNC(bitgraph_state::pia_r), FUNC(bitgraph_state::pia_w)).umask16(0xff00);    // EAROM, PSG
 	map(0x010030, 0x010031).w(FUNC(bitgraph_state::baud_write));
-	map(0x3e0000, 0x3fffff).ram();
+	map(0x3e0000, 0x3fffff).ram().share("videoram");
 }
 
 void bitgraph_state::bitgraphb_mem(address_map &map)
@@ -212,20 +209,12 @@ void bitgraph_state::bitgraphb_mem(address_map &map)
 	map(0x010030, 0x010031).w(FUNC(bitgraph_state::baud_write));
 //  map(0x010030, 0x010037).r(FUNC(bitgraph_state::ppu_read)).umask16(0x00ff);
 	map(0x010038, 0x01003f).w(FUNC(bitgraph_state::ppu_write)).umask16(0x00ff);
-	map(0x380000, 0x3fffff).ram();
+	map(0x380000, 0x3dffff).ram();
+	map(0x3e0000, 0x3fffff).ram().share("videoram");
 }
 
 static INPUT_PORTS_START(bitgraph)
 INPUT_PORTS_END
-
-static DEVICE_INPUT_DEFAULTS_START( kbd_rs232_defaults )
-	DEVICE_INPUT_DEFAULTS( "RS232_TXBAUD", 0xff, RS232_BAUD_300 )
-	DEVICE_INPUT_DEFAULTS( "RS232_RXBAUD", 0xff, RS232_BAUD_300 )
-	DEVICE_INPUT_DEFAULTS( "RS232_DATABITS", 0xff, RS232_DATABITS_8 )
-	DEVICE_INPUT_DEFAULTS( "RS232_PARITY", 0xff, RS232_PARITY_NONE )
-	DEVICE_INPUT_DEFAULTS( "RS232_STOPBITS", 0xff, RS232_STOPBITS_1 )
-	DEVICE_INPUT_DEFAULTS( "FLOW_CONTROL", 0x01, 0x01 )
-DEVICE_INPUT_DEFAULTS_END
 
 
 uint8_t bitgraph_state::pia_r(offs_t offset)
@@ -240,12 +229,12 @@ void bitgraph_state::pia_w(offs_t offset, uint8_t data)
 	return m_pia->write(3 - offset, data);
 }
 
-READ_LINE_MEMBER(bitgraph_state::pia_ca1_r)
+int bitgraph_state::pia_ca1_r()
 {
 	return m_screen->frame_number() & 1;
 }
 
-WRITE_LINE_MEMBER(bitgraph_state::pia_cb2_w)
+void bitgraph_state::pia_cb2_w(int state)
 {
 	// no-op to shut up verbose log
 }
@@ -322,7 +311,7 @@ void bitgraph_state::misccr_write(uint8_t data)
 	m_misccr = data;
 }
 
-WRITE_LINE_MEMBER(bitgraph_state::system_clock_write)
+void bitgraph_state::system_clock_write(int state)
 {
 	if (!BIT(m_pia_b, 6))
 	{
@@ -350,25 +339,25 @@ void bitgraph_state::baud_write(uint16_t data)
 	m_dbrga->str_w((data >> 12) & 15);  // 0 HOST
 }
 
-WRITE_LINE_MEMBER(bitgraph_state::com8116_a_fr_w)
+void bitgraph_state::com8116_a_fr_w(int state)
 {
 	m_acia0->write_txc(state);
 	m_acia0->write_rxc(state);
 }
 
-WRITE_LINE_MEMBER(bitgraph_state::com8116_a_ft_w)
+void bitgraph_state::com8116_a_ft_w(int state)
 {
 	m_acia1->write_txc(state);
 	m_acia1->write_rxc(state);
 }
 
-WRITE_LINE_MEMBER(bitgraph_state::com8116_b_fr_w)
+void bitgraph_state::com8116_b_fr_w(int state)
 {
 	m_acia2->write_txc(state);
 	m_acia2->write_rxc(state);
 }
 
-WRITE_LINE_MEMBER(bitgraph_state::com8116_b_ft_w)
+void bitgraph_state::com8116_b_ft_w(int state)
 {
 	if (m_acia3.found())
 	{
@@ -395,16 +384,10 @@ uint32_t bitgraph_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 	{
 		uint16_t *p = &bitmap.pix(y);
 
-		for (int x = 0; x < 1024 / 8; x += 2)
+		for (int x = 0; x < 1024 / 16; x++)
 		{
-			uint8_t gfx = m_videoram[(x + 1) | (y << 7)];
-			for (int i = 7; i >= 0; i--)
-			{
-				*p++ = BIT(gfx, i);
-			}
-
-			gfx = m_videoram[x | (y << 7)];
-			for (int i = 7; i >= 0; i--)
+			uint16_t gfx = m_videoram[x | (y << 6)];
+			for (int i = 15; i >= 0; i--)
 			{
 				*p++ = BIT(gfx, i);
 			}
@@ -471,7 +454,6 @@ template <unsigned Offset> void bitgraph_state::ppu_i8243_w(uint8_t data)
 
 void bitgraph_state::machine_start()
 {
-	m_videoram = (uint8_t *)m_maincpu->space(AS_PROGRAM).get_write_ptr(0x3e0000);
 }
 
 void bitgraph_state::machine_reset()
@@ -507,15 +489,10 @@ void bitgraph_state::bg_motherboard(machine_config &config)
 	rs232h.cts_handler().set(m_acia0, FUNC(acia6850_device::write_cts));
 
 	ACIA6850(config, m_acia1, 0);
-	m_acia1->txd_handler().set(RS232_K_TAG, FUNC(rs232_port_device::write_txd));
-	m_acia1->rts_handler().set(RS232_K_TAG, FUNC(rs232_port_device::write_rts));
+	m_acia1->txd_handler().set("keyboard", FUNC(keytronic_l2207_device::ser_in_w));
 	m_acia1->irq_handler().set_inputline(m_maincpu, M68K_IRQ_1);
 
-	rs232_port_device &rs232k(RS232_PORT(config, RS232_K_TAG, default_rs232_devices, "keyboard"));
-	rs232k.rxd_handler().set(m_acia1, FUNC(acia6850_device::write_rxd));
-	rs232k.dcd_handler().set(m_acia1, FUNC(acia6850_device::write_dcd));
-	rs232k.cts_handler().set(m_acia1, FUNC(acia6850_device::write_cts));
-	rs232k.set_option_device_input_defaults("keyboard", DEVICE_INPUT_DEFAULTS_NAME(kbd_rs232_defaults));
+	KEYTRONIC_L2207(config, "keyboard").ser_out_callback().set(m_acia1, FUNC(acia6850_device::write_rxd));
 
 	ACIA6850(config, m_acia2, 0);
 	m_acia2->txd_handler().set(RS232_D_TAG, FUNC(rs232_port_device::write_txd));
@@ -535,7 +512,7 @@ void bitgraph_state::bg_motherboard(machine_config &config)
 	m_dbrgb->fr_handler().set(FUNC(bitgraph_state::com8116_b_fr_w));
 	m_dbrgb->ft_handler().set(FUNC(bitgraph_state::com8116_b_ft_w));
 
-	PIA6821(config, m_pia, 0);
+	PIA6821(config, m_pia);
 	m_pia->readca1_handler().set(FUNC(bitgraph_state::pia_ca1_r));
 	m_pia->cb2_handler().set(FUNC(bitgraph_state::pia_cb2_w));
 	m_pia->readpa_handler().set(FUNC(bitgraph_state::pia_pa_r));

@@ -61,7 +61,7 @@ TODO:
 
 
 // configurable logging
-#define LOG_AYOUTS (1U <<  1)
+#define LOG_AYOUTS (1U << 1)
 
 //#define VERBOSE (LOG_GENERAL | LOG_AYOUTS)
 
@@ -90,9 +90,9 @@ public:
 	void chanbara(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	template <uint8_t Which> void videoram_w(offs_t offset, uint8_t data);
@@ -104,7 +104,7 @@ private:
 	void palette(palette_device &palette) const;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void prg_map(address_map &map);
+	void prg_map(address_map &map) ATTR_COLD;
 
 	// memory pointers
 	required_shared_ptr_array<uint8_t, 2> m_videoram;
@@ -485,4 +485,4 @@ void chanbara_state::init_chanbara()
 } // Anonymous namespace
 
 
-GAME( 1985, chanbara, 0, chanbara, chanbara, chanbara_state, init_chanbara, ROT270, "Data East", "Chanbara", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
+GAME( 1985, chanbara, 0, chanbara, chanbara, chanbara_state, init_chanbara, ROT270, "Data East Corporation", "Chanbara (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL ) // title & flyer suggests "Chan Bara" but it's actually チャンバラ

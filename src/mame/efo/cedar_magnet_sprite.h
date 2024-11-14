@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood
-#ifndef MAME_MACHINE_CEDAR_MAGNET_SPRITE_H
-#define MAME_MACHINE_CEDAR_MAGNET_SPRITE_H
+#ifndef MAME_EFO_CEDAR_MAGNET_SPRITE_H
+#define MAME_EFO_CEDAR_MAGNET_SPRITE_H
 
 #pragma once
 
@@ -32,13 +32,13 @@ public:
 
 	u32 draw(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int palbase);
 
-	void cedar_magnet_sprite_io(address_map &map);
-	void cedar_magnet_sprite_map(address_map &map);
-	void cedar_magnet_sprite_sub_ram_map(address_map &map);
+	void cedar_magnet_sprite_io(address_map &map) ATTR_COLD;
+	void cedar_magnet_sprite_map(address_map &map) ATTR_COLD;
+	void cedar_magnet_sprite_sub_ram_map(address_map &map) ATTR_COLD;
 protected:
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 private:
 	void do_blit();
@@ -77,4 +77,4 @@ private:
 	required_device_array<z80pio_device, 3> m_pio;
 };
 
-#endif // MAME_MACHINE_CEDAR_MAGNET_SPRITE_H
+#endif // MAME_EFO_CEDAR_MAGNET_SPRITE_H

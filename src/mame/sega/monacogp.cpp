@@ -116,6 +116,9 @@
 #include "netlist/devices/net_lib.h"
 #include "video/fixfreq.h"
 
+
+namespace {
+
 // copied by Pong, not accurate for this driver!
 // start
 #define MASTER_CLOCK    7159000
@@ -149,14 +152,15 @@ private:
 	required_device<fixedfreq_device> m_video;
 
 	// driver_device overrides
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 };
 
 
 static NETLIST_START(monacogp)
+{
 	SOLVER(Solver, 48000)
 //  PARAM(Solver.FREQ, 48000)
 	PARAM(Solver.ACCURACY, 1e-4) // works and is sufficient
@@ -166,7 +170,7 @@ static NETLIST_START(monacogp)
 
 //  NETDEV_ANALOG_CALLBACK(sound_cb, sound, exidyttl_state, sound_cb, "")
 //  NETDEV_ANALOG_CALLBACK(video_cb, videomix, fixedfreq_device, update_vid, "fixfreq")
-NETLIST_END()
+}
 
 
 
@@ -265,7 +269,8 @@ ROM_START( monacogpa )
 	ROM_LOAD( "prm40.ic21",      0x0000, 0x0020, CRC(87d12d57) SHA1(54682ce464449a3084cba29a82ff80288c87ad36) )
 ROM_END
 
+} // anonymous namespace
 
 
-GAME( 1980, monacogp,  0,         monacogp, 0, monacogp_state, empty_init, ROT0, "Sega", "Monaco GP (set 1) [TTL]", MACHINE_IS_SKELETON )
-GAME( 1980, monacogpa, monacogp,  monacogp, 0, monacogp_state, empty_init, ROT0, "Sega", "Monaco GP (set 2) [TTL]", MACHINE_IS_SKELETON )
+GAME( 1980, monacogp,  0,         monacogp, 0, monacogp_state, empty_init, ROT0, "Sega", "Monaco GP (set 1)", MACHINE_IS_SKELETON )
+GAME( 1980, monacogpa, monacogp,  monacogp, 0, monacogp_state, empty_init, ROT0, "Sega", "Monaco GP (set 2)", MACHINE_IS_SKELETON )

@@ -46,6 +46,18 @@ DEFINE_DEVICE_TYPE(PCE220SERIAL, pce220_serial_device, "pce220_serial", "Sharp P
 pce220_serial_device::pce220_serial_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, PCE220SERIAL, tag, owner, clock)
 	, device_image_interface(mconfig, *this)
+	, m_send_timer(nullptr)
+	, m_receive_timer(nullptr)
+	, m_state(0)
+	, m_bytes_count(0)
+	, m_current_byte(0)
+	, m_enabled(0)
+	, m_busy(0)
+	, m_dout(0)
+	, m_xout(0)
+	, m_xin(0)
+	, m_din(0)
+	, m_ack(0)
 {
 }
 
@@ -217,7 +229,7 @@ TIMER_CALLBACK_MEMBER(pce220_serial_device::receive_tick)
     DEVICE_IMAGE_LOAD( pce220_serial )
 -------------------------------------------------*/
 
-image_init_result pce220_serial_device::call_load()
+std::pair<std::error_condition, std::string> pce220_serial_device::call_load()
 {
 	m_state = SIO_WAIT;
 	m_bytes_count = 0;
@@ -226,21 +238,21 @@ image_init_result pce220_serial_device::call_load()
 	//read the first byte
 	fread(&m_current_byte, 1);
 
-	return image_init_result::PASS;
+	return std::make_pair(std::error_condition(), std::string());
 }
 
 /*-------------------------------------------------
     DEVICE_IMAGE_CREATE( pce220_serial )
 -------------------------------------------------*/
 
-image_init_result pce220_serial_device::call_create(int format_type, util::option_resolution *format_options)
+std::pair<std::error_condition, std::string> pce220_serial_device::call_create(int format_type, util::option_resolution *format_options)
 {
 	m_state = SIO_WAIT;
 	m_bytes_count = 0;
 	m_current_byte = 0;
 	m_receive_timer->adjust(attotime::from_hz(SIO_BAUD_RATE), 0, attotime::from_hz(SIO_BAUD_RATE));
 
-	return image_init_result::PASS;
+	return std::make_pair(std::error_condition(), std::string());
 }
 
 

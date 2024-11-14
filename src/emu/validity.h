@@ -51,7 +51,7 @@ public:
 
 protected:
 	// osd_output interface
-	virtual void output_callback(osd_output_channel channel, const util::format_argument_pack<std::ostream> &args) override;
+	virtual void output_callback(osd_output_channel channel, const util::format_argument_pack<char> &args) override;
 
 private:
 	// internal map types
@@ -109,6 +109,7 @@ private:
 	int_map                 m_region_map;
 	string_set              m_ioport_set;
 	string_set              m_already_checked;
+	string_set              m_slotcard_set;
 	bool                    m_checking_card;
 	bool const              m_quick;
 };

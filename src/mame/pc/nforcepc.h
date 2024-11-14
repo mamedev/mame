@@ -15,9 +15,6 @@
 #include "machine/pci.h"
 #include "machine/upd765.h"
 
-#include "formats/naslite_dsk.h"
-#include "formats/pc_dsk.h"
-
 
 // NVIDIA Corporation nForce CPU bridge
 
@@ -38,19 +35,19 @@ public:
 	void set_ram_size(uint32_t size) { ram_size = size; }
 	address_space *get_cpu_space(int spacenum) { return &cpu->space(spacenum); }
 
-	void bios_map(address_map &map);
+	void bios_map(address_map &map) ATTR_COLD;
 	void aperture_map(address_map &map) {}
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	virtual void reset_all_mappings() override;
 
 	virtual void map_extra(uint64_t memory_window_start, uint64_t memory_window_end, uint64_t memory_offset, address_space *memory_space,
 		uint64_t io_window_start, uint64_t io_window_end, uint64_t io_offset, address_space *io_space) override;
 
-	virtual void config_map(address_map &map) override;
+	virtual void config_map(address_map &map) override ATTR_COLD;
 
 private:
 	required_device<device_memory_interface> cpu;
@@ -76,13 +73,13 @@ public:
 	void set_ram_size(int ram_size);
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	virtual void map_extra(uint64_t memory_window_start, uint64_t memory_window_end, uint64_t memory_offset, address_space *memory_space,
 		uint64_t io_window_start, uint64_t io_window_end, uint64_t io_offset, address_space *io_space) override;
 
-	virtual void config_map(address_map &map) override;
+	virtual void config_map(address_map &map) override ATTR_COLD;
 
 private:
 	int ddr_ram_size = 0;
@@ -103,8 +100,8 @@ public:
 	uint8_t *get_buffer() { return buffer; }
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 private:
 	uint8_t buffer[0xff]{};
@@ -122,8 +119,8 @@ public:
 	virtual int execute_command(int command, int rw, int data) override;
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 private:
 	const uint8_t *buffer  = nullptr;
@@ -143,7 +140,7 @@ public:
 	uint8_t *get_buffer() { return buffer; }
 
 protected:
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 private:
 	uint8_t buffer[0xff]{};
@@ -159,7 +156,7 @@ public:
 	uint8_t *get_buffer() { return buffer; }
 
 protected:
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 private:
 	uint8_t buffer[0xff]{};
@@ -175,7 +172,7 @@ public:
 	uint8_t *get_buffer() { return buffer; }
 
 protected:
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 private:
 	uint8_t buffer[0xff]{};
@@ -190,8 +187,9 @@ class it8703f_device : public device_t, public lpcbus_device_interface
 public:
 	it8703f_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	virtual void map_extra(address_space *memory_space, address_space *io_space) override;
-	virtual void set_host(int index, lpcbus_host_interface *host) override;
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void set_host(int device_index, lpcbus_host_interface *host) override;
+	virtual uint32_t dma_transfer(int channel, dma_operation operation, dma_size size, uint32_t data) override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 	auto pin_reset() { return pin_reset_callback.bind(); }
 	auto pin_gatea20() { return pin_gatea20_callback.bind(); }
@@ -202,41 +200,41 @@ public:
 	auto ndtr2() { return m_ndtr2_callback.bind(); }
 	auto nrts2() { return m_nrts2_callback.bind(); }
 
-	void map_lpt(address_map& map);
-	void map_serial1(address_map& map);
-	void map_serial2(address_map& map);
-	void map_keyboard(address_map &map);
+	void map_lpt(address_map &map) ATTR_COLD;
+	void map_serial1(address_map &map) ATTR_COLD;
+	void map_serial2(address_map &map) ATTR_COLD;
+	void map_keyboard(address_map &map) ATTR_COLD;
 
 	// floppy disk controller
-	DECLARE_WRITE_LINE_MEMBER(irq_floppy_w);
-	DECLARE_WRITE_LINE_MEMBER(drq_floppy_w);
+	void irq_floppy_w(int state);
+	void drq_floppy_w(int state);
 	// parallel port
-	DECLARE_WRITE_LINE_MEMBER(irq_parallel_w);
-	DECLARE_WRITE_LINE_MEMBER(drq_parallel_w);
+	void irq_parallel_w(int state);
+	void drq_parallel_w(int state);
 	// uarts
-	DECLARE_WRITE_LINE_MEMBER(irq_serial1_w);
-	DECLARE_WRITE_LINE_MEMBER(txd_serial1_w);
-	DECLARE_WRITE_LINE_MEMBER(dtr_serial1_w);
-	DECLARE_WRITE_LINE_MEMBER(rts_serial1_w);
-	DECLARE_WRITE_LINE_MEMBER(irq_serial2_w);
-	DECLARE_WRITE_LINE_MEMBER(txd_serial2_w);
-	DECLARE_WRITE_LINE_MEMBER(dtr_serial2_w);
-	DECLARE_WRITE_LINE_MEMBER(rts_serial2_w);
+	void irq_serial1_w(int state);
+	void txd_serial1_w(int state);
+	void dtr_serial1_w(int state);
+	void rts_serial1_w(int state);
+	void irq_serial2_w(int state);
+	void txd_serial2_w(int state);
+	void dtr_serial2_w(int state);
+	void rts_serial2_w(int state);
 	// uarts
-	DECLARE_WRITE_LINE_MEMBER(rxd1_w);
-	DECLARE_WRITE_LINE_MEMBER(ndcd1_w);
-	DECLARE_WRITE_LINE_MEMBER(ndsr1_w);
-	DECLARE_WRITE_LINE_MEMBER(nri1_w);
-	DECLARE_WRITE_LINE_MEMBER(ncts1_w);
-	DECLARE_WRITE_LINE_MEMBER(rxd2_w);
-	DECLARE_WRITE_LINE_MEMBER(ndcd2_w);
-	DECLARE_WRITE_LINE_MEMBER(ndsr2_w);
-	DECLARE_WRITE_LINE_MEMBER(nri2_w);
-	DECLARE_WRITE_LINE_MEMBER(ncts2_w);
+	void rxd1_w(int state);
+	void ndcd1_w(int state);
+	void ndsr1_w(int state);
+	void nri1_w(int state);
+	void ncts1_w(int state);
+	void rxd2_w(int state);
+	void ndcd2_w(int state);
+	void ndsr2_w(int state);
+	void nri2_w(int state);
+	void ncts2_w(int state);
 	// keyboard
-	DECLARE_WRITE_LINE_MEMBER(irq_keyboard_w);
-	DECLARE_WRITE_LINE_MEMBER(kbdp21_gp25_gatea20_w);
-	DECLARE_WRITE_LINE_MEMBER(kbdp20_gp20_reset_w);
+	void irq_keyboard_w(int state);
+	void kbdp21_gp25_gatea20_w(int state);
+	void kbdp20_gp20_reset_w(int state);
 
 	uint8_t read_it8703f(offs_t offset);
 	void write_it8703f(offs_t offset, uint8_t data);
@@ -255,7 +253,7 @@ public:
 	void keybc_command_w(uint8_t data);
 
 protected:
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 private:
 	enum OperatingMode
@@ -304,8 +302,8 @@ private:
 	address_space *memspace = nullptr;
 	address_space *iospace = nullptr;
 
-	void internal_memory_map(address_map &map);
-	void internal_io_map(address_map &map);
+	void internal_memory_map(address_map &map) ATTR_COLD;
+	void internal_io_map(address_map &map) ATTR_COLD;
 	uint16_t get_base_address(int logical, int index);
 	void map_fdc_addresses();
 	void map_lpt_addresses();
@@ -326,6 +324,7 @@ private:
 	uint16_t read_serial1_configuration_register(int index) { return configuration_registers[LogicalDevice::Serial1][index]; }
 	uint16_t read_serial2_configuration_register(int index) { return configuration_registers[LogicalDevice::Serial2][index]; }
 	uint16_t read_keyboard_configuration_register(int index) { return configuration_registers[LogicalDevice::Keyboard][index]; }
+	void assign_dma_channels();
 };
 
 DECLARE_DEVICE_TYPE(IT8703F, it8703f_device)

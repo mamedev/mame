@@ -106,18 +106,18 @@ ROM_END
 class mitsumi_keyboard_base : public device_t, public device_amiga_keyboard_interface
 {
 public:
-	virtual WRITE_LINE_MEMBER(kdat_w) override
+	virtual void kdat_w(int state) override
 	{
 		m_kdat_in = state ? 0x01U : 0x00U;
 		m_mcu->pa_w(m_meta->read());
 	}
 
-	READ_LINE_MEMBER(kdat_r)
+	int kdat_r()
 	{
 		return m_kdat_in ^ 0x01U;
 	}
 
-	CUSTOM_INPUT_MEMBER(cols_r)
+	ioport_value cols_r()
 	{
 		ioport_value result(0xffU);
 		for (unsigned i = 0U; m_rows.size() > i; ++i)
@@ -128,7 +128,7 @@ public:
 		return (result >> 2) ^ 0x3fU;
 	}
 
-	READ_LINE_MEMBER(reset_r)
+	int reset_r()
 	{
 		return m_ctrl_a_a;
 	}
@@ -230,7 +230,7 @@ protected:
 	}
 
 private:
-	WRITE_LINE_MEMBER(pd7_w)
+	void pd7_w(int state)
 	{
 		if (bool(state) != bool(m_pd7))
 		{
@@ -366,7 +366,7 @@ protected:
 	}
 
 private:
-	WRITE_LINE_MEMBER(reset_trigger)
+	void reset_trigger(int state)
 	{
 		if (bool(state) != bool(m_reset_trigger))
 		{
@@ -414,27 +414,27 @@ protected:
 
 INPUT_PORTS_START(fullsize_cols)
 	PORT_START("COLS")
-	PORT_BIT(0xfc, IP_ACTIVE_LOW, IPT_CUSTOM) PORT_CUSTOM_MEMBER(mitsumi_keyboard_base, cols_r)
+	PORT_BIT(0xfc, IP_ACTIVE_LOW, IPT_CUSTOM) PORT_CUSTOM_MEMBER(FUNC(mitsumi_keyboard_base::cols_r))
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_UNUSED)
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_CUSTOM) PORT_READ_LINE_MEMBER(mitsumi_keyboard_base, kdat_r)
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_CUSTOM) PORT_READ_LINE_MEMBER(FUNC(mitsumi_keyboard_base::kdat_r))
 INPUT_PORTS_END
 
 INPUT_PORTS_START(compact_cols)
 	PORT_START("COLS")
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_CUSTOM) PORT_READ_LINE_MEMBER(mitsumi_keyboard_base, reset_r)
-	PORT_BIT(0x7c, IP_ACTIVE_LOW, IPT_CUSTOM) PORT_CUSTOM_MEMBER(mitsumi_keyboard_base, cols_r)
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_CUSTOM) PORT_READ_LINE_MEMBER(FUNC(mitsumi_keyboard_base::reset_r))
+	PORT_BIT(0x7c, IP_ACTIVE_LOW, IPT_CUSTOM) PORT_CUSTOM_MEMBER(FUNC(mitsumi_keyboard_base::cols_r))
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_UNUSED)
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_CUSTOM) PORT_READ_LINE_MEMBER(mitsumi_keyboard_base, kdat_r)
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_CUSTOM) PORT_READ_LINE_MEMBER(FUNC(mitsumi_keyboard_base::kdat_r))
 INPUT_PORTS_END
 
 INPUT_PORTS_START(mitsumi_meta)
 	PORT_START("META")
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_UNUSED)
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_LWIN)        PORT_CHAR(UCHAR_MAMEKEY(LWIN))       PORT_NAME("Left Amiga")   PORT_CHANGED_MEMBER(DEVICE_SELF, mitsumi_keyboard_base, check_ctrl_a_a, 0)
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_LWIN)        PORT_CHAR(UCHAR_MAMEKEY(LWIN))       PORT_NAME("Left Amiga")   PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(mitsumi_keyboard_base::check_ctrl_a_a), 0)
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_LALT)        PORT_CHAR(UCHAR_MAMEKEY(LALT))       PORT_NAME("Left Alt")
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_LSHIFT)      PORT_CHAR(UCHAR_SHIFT_1)             PORT_NAME("Left Shift")
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_LCONTROL)    PORT_CHAR(UCHAR_MAMEKEY(LCONTROL))   PORT_NAME("Ctrl")         PORT_CHANGED_MEMBER(DEVICE_SELF, mitsumi_keyboard_base, check_ctrl_a_a, 0)
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_RWIN)        PORT_CHAR(UCHAR_MAMEKEY(RWIN))       PORT_NAME("Right Amiga")  PORT_CHANGED_MEMBER(DEVICE_SELF, mitsumi_keyboard_base, check_ctrl_a_a, 0)
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_LCONTROL)    PORT_CHAR(UCHAR_MAMEKEY(LCONTROL))   PORT_NAME("Ctrl")         PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(mitsumi_keyboard_base::check_ctrl_a_a), 0)
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_RWIN)        PORT_CHAR(UCHAR_MAMEKEY(RWIN))       PORT_NAME("Right Amiga")  PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(mitsumi_keyboard_base::check_ctrl_a_a), 0)
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_RALT)        PORT_CHAR(UCHAR_SHIFT_2)             PORT_NAME("Right Alt")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_RSHIFT)      PORT_CHAR(UCHAR_MAMEKEY(RSHIFT))     PORT_NAME("Right Shift")
 INPUT_PORTS_END

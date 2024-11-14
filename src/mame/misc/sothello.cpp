@@ -63,8 +63,8 @@ public:
 	void sothello(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	void bank_w(uint8_t data);
@@ -78,13 +78,13 @@ private:
 	void soundcpu_int_clear_w(uint8_t data);
 	void subcpu_status_w(uint8_t data);
 	void msm_cfg_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(adpcm_int_w);
+	void adpcm_int_w(int state);
 
-	void maincpu_io_map(address_map &map);
-	void maincpu_mem_map(address_map &map);
-	void soundcpu_io_map(address_map &map);
-	void soundcpu_mem_map(address_map &map);
-	void subcpu_mem_map(address_map &map);
+	void maincpu_io_map(address_map &map) ATTR_COLD;
+	void maincpu_mem_map(address_map &map) ATTR_COLD;
+	void soundcpu_io_map(address_map &map) ATTR_COLD;
+	void soundcpu_mem_map(address_map &map) ATTR_COLD;
+	void subcpu_mem_map(address_map &map) ATTR_COLD;
 
 	int m_subcpu_status;
 	int m_soundcpu_busy;
@@ -185,7 +185,7 @@ void sothello_state::maincpu_io_map(address_map &map)
 
 // sound Z80
 
-WRITE_LINE_MEMBER(sothello_state::adpcm_int_w)
+void sothello_state::adpcm_int_w(int state)
 {
 	// only 4 bits are used
 	m_msm->data_w(m_msm_data & 0x0f);

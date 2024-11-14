@@ -1,8 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood
 
-#ifndef MAME_MACHINE_VT1682_TIMER_H
-#define MAME_MACHINE_VT1682_TIMER_H
+#ifndef MAME_NINTENDO_VT1682_TIMER_H
+#define MAME_NINTENDO_VT1682_TIMER_H
 
 #pragma once
 
@@ -35,9 +35,9 @@ public:
 	void change_clock();
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 private:
 	bool m_is_sound_timer;
@@ -54,4 +54,4 @@ private:
 	devcb_write_line m_irq_cb;
 };
 
-#endif // MAME_MACHINE_VT1682_TIMER_H
+#endif // MAME_NINTENDO_VT1682_TIMER_H

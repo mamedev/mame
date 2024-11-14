@@ -8,8 +8,8 @@
 
 *********************************************************************/
 
-#ifndef MAME_MACHINE_VINO_H
-#define MAME_MACHINE_VINO_H
+#ifndef MAME_SGI_VINO_H
+#define MAME_SGI_VINO_H
 
 #pragma once
 
@@ -34,9 +34,9 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 private:
 	enum channel_num_t : uint32_t
@@ -252,4 +252,4 @@ private:
 
 DECLARE_DEVICE_TYPE(VINO, vino_device)
 
-#endif // MAME_MACHINE_VINO_H
+#endif // MAME_SGI_VINO_H

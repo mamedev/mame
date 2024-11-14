@@ -12,9 +12,9 @@
 #include "emu.h"
 #include "ibm21s850.h"
 
-#define LOG_READS       (1 << 1)
-#define LOG_WRITES      (1 << 2)
-#define LOG_UNKNOWNS    (1 << 3)
+#define LOG_READS       (1U << 1)
+#define LOG_WRITES      (1U << 2)
+#define LOG_UNKNOWNS    (1U << 3)
 #define LOG_ALL         (LOG_READS | LOG_WRITES | LOG_UNKNOWNS)
 
 #define VERBOSE         (LOG_ALL)
@@ -44,8 +44,6 @@ void ibm21s85x_base_device::device_start()
 	save_item(NAME(m_regs));
 
 	m_reset_timer = timer_alloc(FUNC(ibm21s85x_base_device::reset_tick), this);
-
-	m_reset_cb.resolve_safe();
 }
 
 void ibm21s85x_base_device::device_reset()

@@ -18,8 +18,8 @@ public:
 	a78_versaboard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// reading and writing
 	virtual uint8_t read_40xx(offs_t offset) override;
@@ -60,7 +60,7 @@ public:
 	virtual void write_04xx(offs_t offset, uint8_t data) override { if (offset >= 0x50 && offset < 0x60) m_pokey450->write(offset & 0x0f, data); }
 
 protected:
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 	required_device<pokey_device> m_pokey450;
 };

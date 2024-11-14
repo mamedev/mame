@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Nicola Salmoria
-#ifndef MAME_MACHINE_NAMCOIO_H
-#define MAME_MACHINE_NAMCOIO_H
+#ifndef MAME_NAMCO_NAMCOIO_H
+#define MAME_NAMCO_NAMCOIO_H
 
 
 /***************************************************************************
@@ -17,8 +17,8 @@ public:
 	uint8_t read(offs_t offset);
 	void write(offs_t offset, uint8_t data);
 
-	WRITE_LINE_MEMBER( set_reset_line );
-	READ_LINE_MEMBER( read_reset_line );
+	void set_reset_line(int state);
+	int read_reset_line();
 
 	virtual void customio_run() = 0;
 
@@ -26,8 +26,8 @@ protected:
 	namcoio_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int device_type);
 
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	enum {
 			TYPE_NAMCO56XX,
@@ -60,7 +60,7 @@ class namco56xx_device : public namcoio_device
 public:
 	namco56xx_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 
 	virtual void customio_run() override;
 };
@@ -70,7 +70,7 @@ class namco58xx_device : public namcoio_device
 public:
 	namco58xx_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 
 	virtual void customio_run() override;
 };
@@ -80,7 +80,7 @@ class namco59xx_device : public namcoio_device
 public:
 	namco59xx_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 
 	virtual void customio_run() override;
 };
@@ -89,4 +89,4 @@ DECLARE_DEVICE_TYPE(NAMCO_56XX, namco56xx_device)
 DECLARE_DEVICE_TYPE(NAMCO_58XX, namco58xx_device)
 DECLARE_DEVICE_TYPE(NAMCO_59XX, namco59xx_device)
 
-#endif // MAME_MACHINE_NAMCOIO_H
+#endif // MAME_NAMCO_NAMCOIO_H

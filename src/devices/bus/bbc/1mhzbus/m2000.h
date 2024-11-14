@@ -33,10 +33,10 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 	// optional information overrides
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 	virtual uint8_t fred_r(offs_t offset) override;
 	virtual void fred_w(offs_t offset, uint8_t data) override;
@@ -44,7 +44,7 @@ protected:
 	virtual void jim_w(offs_t offset, uint8_t data) override;
 
 private:
-	DECLARE_WRITE_LINE_MEMBER(write_acia_clock);
+	void write_acia_clock(int state);
 
 	required_device<bbc_1mhzbus_slot_device> m_1mhzbus;
 	required_device<acia6850_device> m_acia1;

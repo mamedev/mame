@@ -7,6 +7,8 @@
 #include "spg2xx.h"
 
 
+namespace {
+
 class zon32bit_state : public spg2xx_game_state
 {
 public:
@@ -18,11 +20,11 @@ public:
 	void zon32bit(machine_config& config);
 	void zon32bit_bat(machine_config& config);
 
-	void mem_map_zon32bit(address_map &map);
+	void mem_map_zon32bit(address_map &map) ATTR_COLD;
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 	virtual void device_post_load() override;
 
 	uint16_t z32_rom_r(offs_t offset);
@@ -71,7 +73,7 @@ public:
 protected:
 	virtual void porta_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0) override;
 
-	virtual void machine_reset() override;
+	virtual void machine_reset() override ATTR_COLD;
 };
 
 class oplayer_100in1_state : public mywicodx_state
@@ -102,7 +104,7 @@ public:
 	void init_m521neo();
 
 protected:
-	virtual void machine_reset() override;
+	virtual void machine_reset() override ATTR_COLD;
 
 	virtual uint16_t porta_r() override;
 	virtual uint16_t portb_r() override;
@@ -1035,6 +1037,7 @@ void denver_200in1_state::init_m521neo()
 	rom[0x43c30 + (0x6000000 / 2)] = 0xf165; // boot main bank
 }
 
+} // anonymous namespace
 
 
 // Box advertises this as '40 Games Included' but the cartridge, which was glued directly to the PCB, not removable, is a 41-in-1.  Maybe some versions exist with a 40 game selection.

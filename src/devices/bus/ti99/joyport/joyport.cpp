@@ -87,19 +87,18 @@ void joyport_device::pulse_clock()
     Propagate the interrupt to the defined target. Only used for the handset
     at the prototype 99/4.
 */
-WRITE_LINE_MEMBER( joyport_device::set_interrupt )
+void joyport_device::set_interrupt(int state)
 {
 	m_interrupt(state);
 }
 
 void joyport_device::device_start()
 {
-	m_interrupt.resolve();
 }
 
 void joyport_device::device_config_complete()
 {
-	m_connected = dynamic_cast<device_ti99_joyport_interface*>(subdevices().first());
+	m_connected = get_card_device();
 }
 
 /*****************************************************************************/

@@ -6,6 +6,8 @@
 
 #pragma once
 
+#include "dinetwork.h"
+
 class dp83932c_device
 	: public device_t
 	, public device_network_interface
@@ -18,14 +20,14 @@ public:
 	auto out_int_cb() { return m_out_int.bind(); }
 
 	// external interface
-	void map(address_map &map);
+	void map(address_map &map) ATTR_COLD;
 	u16 reg_r(offs_t offset) { return m_reg[offset]; }
 	void reg_w(offs_t offset, u16 data);
 
 protected:
 	// device_t overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// device_network_interface overrides
 	virtual void send_complete_cb(int result) override;

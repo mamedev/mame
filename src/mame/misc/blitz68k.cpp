@@ -65,8 +65,8 @@ To Do:
 #include "speaker.h"
 
 // configurable logging
-#define LOG_MCU     (1U <<  1)
-#define LOG_BLITTER (1U <<  2)
+#define LOG_MCU     (1U << 1)
+#define LOG_BLITTER (1U << 2)
 
 //#define VERBOSE (LOG_GENERAL | LOG_MCU | LOG_BLITTER)
 
@@ -210,25 +210,25 @@ private:
 	void show_leds123();
 	void show_leds12();
 	void crtc_lpen_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-	DECLARE_WRITE_LINE_MEMBER(crtc_vsync_irq1);
-	DECLARE_WRITE_LINE_MEMBER(crtc_vsync_irq3);
-	DECLARE_WRITE_LINE_MEMBER(crtc_vsync_irq5);
+	void crtc_vsync_irq1(int state);
+	void crtc_vsync_irq3(int state);
+	void crtc_vsync_irq5(int state);
 	DECLARE_VIDEO_START(blitz68k);
 	DECLARE_VIDEO_START(blitz68k_addr_factor1);
 	uint32_t screen_update_blitz68k(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_blitz68k_noblit(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(steaser_mcu_sim);
 	MC6845_ON_UPDATE_ADDR_CHANGED(crtc_addr);
-	void bankrob_map(address_map &map);
-	void bankroba_map(address_map &map);
-	void cjffruit_map(address_map &map);
-	void deucesw2_map(address_map &map);
-	void dualgame_map(address_map &map);
-	void hermit_map(address_map &map);
-	void ilpag_map(address_map &map);
-	void maxidbl_map(address_map &map);
-	void ramdac_map(address_map &map);
-	void steaser_map(address_map &map);
+	void bankrob_map(address_map &map) ATTR_COLD;
+	void bankroba_map(address_map &map) ATTR_COLD;
+	void cjffruit_map(address_map &map) ATTR_COLD;
+	void deucesw2_map(address_map &map) ATTR_COLD;
+	void dualgame_map(address_map &map) ATTR_COLD;
+	void hermit_map(address_map &map) ATTR_COLD;
+	void ilpag_map(address_map &map) ATTR_COLD;
+	void maxidbl_map(address_map &map) ATTR_COLD;
+	void ramdac_map(address_map &map) ATTR_COLD;
+	void steaser_map(address_map &map) ATTR_COLD;
 
 	optional_shared_ptr<uint16_t> m_nvram;
 	std::unique_ptr<uint8_t[]> m_blit_buffer;
@@ -1766,17 +1766,17 @@ INPUT_PORTS_END
 
 // R6845AP used for video sync signals only
 
-WRITE_LINE_MEMBER(blitz68k_state::crtc_vsync_irq1)
+void blitz68k_state::crtc_vsync_irq1(int state)
 {
 	m_maincpu->set_input_line(1, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
-WRITE_LINE_MEMBER(blitz68k_state::crtc_vsync_irq3)
+void blitz68k_state::crtc_vsync_irq3(int state)
 {
 	m_maincpu->set_input_line(3, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
-WRITE_LINE_MEMBER(blitz68k_state::crtc_vsync_irq5)
+void blitz68k_state::crtc_vsync_irq5(int state)
 {
 	m_maincpu->set_input_line(5, state ? ASSERT_LINE : CLEAR_LINE);
 }

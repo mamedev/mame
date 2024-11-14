@@ -1,20 +1,15 @@
 // license:BSD-3-Clause
 // copyright-holders:Bryan McPhail,Ernesto Corvi,Andrew Prime,Zsolt Vasvari
 // thanks-to:Fuzz
-#ifndef MAME_VIDEO_NEOGEO_SPR_H
-#define MAME_VIDEO_NEOGEO_SPR_H
+#ifndef MAME_NEOGEO_NEOGEO_SPR_H
+#define MAME_NEOGEO_NEOGEO_SPR_H
 
 #pragma once
 
 // todo, move these back, currently the sprite code needs some of the values tho
-#define NEOGEO_MASTER_CLOCK                     (24000000)
-#define NEOGEO_MAIN_CPU_CLOCK                   (NEOGEO_MASTER_CLOCK / 2)
-#define NEOGEO_AUDIO_CPU_CLOCK                  (NEOGEO_MASTER_CLOCK / 6)
-#define NEOGEO_YM2610_CLOCK                     (NEOGEO_MASTER_CLOCK / 3)
-#define NEOGEO_PIXEL_CLOCK                      (NEOGEO_MASTER_CLOCK / 4)
 #define NEOGEO_HTOTAL                           (0x180)
-#define NEOGEO_HBEND                            (0x01e) /* this should really be 29.5 */
-#define NEOGEO_HBSTART                          (0x15e) /* this should really be 349.5 */
+#define NEOGEO_HBEND                            (0x01c) // verified from https://wiki.neogeodev.org/index.php?title=Display_timing
+#define NEOGEO_HBSTART                          (0x15c)
 #define NEOGEO_VTOTAL                           (0x108)
 #define NEOGEO_VBEND                            (0x010)
 #define NEOGEO_VBSTART                          (0x0f0)
@@ -83,8 +78,8 @@ protected:
 			device_t *owner,
 			uint32_t clock);
 
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 	uint32_t get_region_mask(uint8_t* rgn, uint32_t rgn_size);
 	uint8_t* m_region_sprites = nullptr; uint32_t m_region_sprites_size = 0;
 	uint8_t* m_region_fixed = nullptr; uint32_t m_region_fixed_size = 0;
@@ -137,10 +132,10 @@ public:
 	virtual void set_sprite_region(uint8_t* region_sprites, uint32_t region_sprites_size) override;
 
 	protected:
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 };
 
 DECLARE_DEVICE_TYPE(NEOGEO_SPRITE_MIDAS, neosprite_midas_device)
 
-#endif // MAME_VIDEO_NEOGEO_SPR_H
+#endif // MAME_NEOGEO_NEOGEO_SPR_H

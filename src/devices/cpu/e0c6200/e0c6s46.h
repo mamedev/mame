@@ -69,17 +69,16 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// device_execute_interface overrides
-	virtual u32 execute_input_lines() const noexcept override { return 8; }
 	virtual void execute_set_input(int line, int state) override;
 	virtual void execute_one() override;
 	virtual bool check_interrupt() override;
 
-	void e0c6s46_data(address_map &map);
-	void e0c6s46_program(address_map &map);
+	void e0c6s46_data(address_map &map) ATTR_COLD;
+	void e0c6s46_program(address_map &map) ATTR_COLD;
 
 private:
 	required_shared_ptr<u8> m_vram1;

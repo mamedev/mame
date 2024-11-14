@@ -12,11 +12,15 @@
 
 #include "cpu/h8/h83002.h"
 #include "sound/multipcm.h"
-#include "video/lc7985.h"
 #include "bus/midi/midi.h"
+
+#include "mu5lcd.h"
 
 #include "screen.h"
 #include "speaker.h"
+
+
+namespace {
 
 class mu5_state : public driver_device
 {
@@ -27,36 +31,31 @@ public:
 		m_ymw258(*this, "ymw258"),
 		m_lcd(*this, "lcd"),
 		m_key(*this, "S%c", 'A'),
-		m_outputs(*this, "%x.%x.%x.%x", 0U, 0U, 0U, 0U),
 		m_matrixsel(0)
 	{ }
 
 	void mu5(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	required_device<h83002_device> m_maincpu;
 	required_device<multipcm_device> m_ymw258;
-	required_device<lc7985_device> m_lcd;
+	required_device<mu5lcd_device> m_lcd;
 	required_ioport_array<6> m_key;
-	output_finder<2, 8, 8, 5> m_outputs;
 
-	void mu5_map(address_map &map);
-	void mu5_io_map(address_map &map);
-	void ymw258_map(address_map &map);
+	void mu5_map(address_map &map) ATTR_COLD;
+	void ymw258_map(address_map &map) ATTR_COLD;
 
 	u8 m_lcd_ctrl = 0U;
 	u8 m_lcd_data = 0U;
 
-	void lcd_ctrl_w(u16 data);
-	u16 lcd_ctrl_r();
-	void lcd_data_w(u16 data);
-	u16 lcd_data_r();
-
-	DECLARE_WRITE_LINE_MEMBER(render_w);
+	void lcd_ctrl_w(u8 data);
+	u8 lcd_ctrl_r();
+	void lcd_data_w(u8 data);
+	u8 lcd_data_r();
 
 	u8 m_matrixsel;
 	u8 matrix_r();
@@ -69,18 +68,6 @@ void mu5_state::mu5_map(address_map &map)
 	map(0x400000, 0x400007).rw(m_ymw258, FUNC(multipcm_device::read), FUNC(multipcm_device::write)).umask16(0xffff);
 }
 
-void mu5_state::mu5_io_map(address_map &map)
-{
-	map(h8_device::PORT_4, h8_device::PORT_4).lr8(NAME([this]() -> u8 { return m_matrixsel; }));
-	map(h8_device::PORT_4, h8_device::PORT_4).lw8(NAME([this](u8 data) { m_matrixsel = data; }));
-	map(h8_device::PORT_6, h8_device::PORT_6).rw(FUNC(mu5_state::lcd_ctrl_r), FUNC(mu5_state::lcd_ctrl_w));
-	map(h8_device::PORT_7, h8_device::PORT_7).r(FUNC(mu5_state::matrix_r));
-	map(h8_device::PORT_A, h8_device::PORT_A).nopr();
-	map(h8_device::PORT_B, h8_device::PORT_B).rw(FUNC(mu5_state::lcd_data_r), FUNC(mu5_state::lcd_data_w));
-
-	map(h8_device::ADC_7, h8_device::ADC_7).lr8(NAME([]() -> u8 { return 0xff; })); // battery level
-}
-
 void mu5_state::ymw258_map(address_map &map)
 {
 	map(0x000000, 0x1fffff).rom();
@@ -88,8 +75,6 @@ void mu5_state::ymw258_map(address_map &map)
 
 void mu5_state::machine_start()
 {
-	m_outputs.resolve();
-
 	save_item(NAME(m_lcd_ctrl));
 	save_item(NAME(m_lcd_data));
 	save_item(NAME(m_matrixsel));
@@ -113,7 +98,7 @@ u8 mu5_state::matrix_r()
 	return data;
 }
 
-void mu5_state::lcd_ctrl_w(u16 data)
+void mu5_state::lcd_ctrl_w(u8 data)
 {
 	// bit 2 = rs
 	// bit 1 = r/w
@@ -139,34 +124,19 @@ void mu5_state::lcd_ctrl_w(u16 data)
 	}
 }
 
-u16 mu5_state::lcd_ctrl_r()
+u8 mu5_state::lcd_ctrl_r()
 {
 	return m_lcd_ctrl;
 }
 
-void mu5_state::lcd_data_w(u16 data)
+void mu5_state::lcd_data_w(u8 data)
 {
 	m_lcd_data = data;
 }
 
-u16 mu5_state::lcd_data_r()
+u8 mu5_state::lcd_data_r()
 {
 	return m_lcd_data;
-}
-
-WRITE_LINE_MEMBER(mu5_state::render_w)
-{
-	if(!state)
-		return;
-
-	const u8 *render = m_lcd->render();
-	for(int y=0; y != 2; y++)
-		for(int x=0; x != 8; x++)
-			for(int yy=0; yy != 8; yy++) {
-				u8 v = render[8 * y + 16 * x + yy];
-				for(int xx=0; xx != 5; xx++)
-					m_outputs[y][x][yy][xx] = (v >> xx) & 1;
-			}
 }
 
 static INPUT_PORTS_START(mu5)
@@ -222,7 +192,17 @@ void mu5_state::mu5(machine_config &config)
 	/* basic machine hardware */
 	H83002(config, m_maincpu, 10_MHz_XTAL); // clock verified by schematics
 	m_maincpu->set_addrmap(AS_PROGRAM, &mu5_state::mu5_map);
-	m_maincpu->set_addrmap(AS_IO, &mu5_state::mu5_io_map);
+	m_maincpu->read_adc<7>().set_constant(0x3ff); // battery level
+	m_maincpu->read_port4().set([this]() -> u8 { return m_matrixsel; });
+	m_maincpu->write_port4().set([this](u8 data) { m_matrixsel = data; });
+	m_maincpu->read_port6().set(FUNC(mu5_state::lcd_ctrl_r));
+	m_maincpu->write_port6().set(FUNC(mu5_state::lcd_ctrl_w));
+	m_maincpu->read_port7().set(FUNC(mu5_state::matrix_r));
+	m_maincpu->read_porta().set_constant(0);
+	m_maincpu->read_portb().set(FUNC(mu5_state::lcd_data_r));
+	m_maincpu->write_portb().set(FUNC(mu5_state::lcd_data_w));
+
+	MU5LCD(config, m_lcd);
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
@@ -232,19 +212,10 @@ void mu5_state::mu5(machine_config &config)
 	m_ymw258->add_route(0, "lspeaker", 1.0);
 	m_ymw258->add_route(1, "rspeaker", 1.0);
 
-	LC7985(config, m_lcd);
-
-	MIDI_PORT(config, "mdin", midiin_slot, "midiin").rxd_handler().set("maincpu:sci1", FUNC(h8_sci_device::rx_w));
+	MIDI_PORT(config, "mdin", midiin_slot, "midiin").rxd_handler().set(m_maincpu, FUNC(h83002_device::sci_rx_w<1>));
 
 	auto &mdout(MIDI_PORT(config, "mdout", midiout_slot, "midiout"));
-	m_maincpu->subdevice<h8_sci_device>("sci1")->tx_handler().set(mdout, FUNC(midi_port_device::write_txd));
-
-	auto &screen = SCREEN(config, "screen", SCREEN_TYPE_SVG);
-	screen.set_refresh_hz(60);
-	screen.set_size(800, 435);
-	screen.set_visarea_full();
-	screen.screen_vblank().set(FUNC(mu5_state::render_w));
-
+	m_maincpu->write_sci_tx<0>().set(mdout, FUNC(midi_port_device::write_txd));
 }
 
 ROM_START( mu5 )
@@ -254,8 +225,9 @@ ROM_START( mu5 )
 	ROM_REGION(0x200000, "ymw258", 0)
 	ROM_LOAD("yamaha_mu5_waverom_xp50280-801.bin", 0x000000, 0x200000, CRC(e0913030) SHA1(369f8df4942b6717c142ca8c4913e556dafae187))
 
-	ROM_REGION(261774, "screen", 0)
-	ROM_LOAD("mu5lcd.svg", 0, 261774, CRC(3cccbb88) SHA1(3db0b16f27b501ff8d8ac3fb631dd315571230d3))
 ROM_END
+
+} // anonymous namespace
+
 
 CONS(1994, mu5, 0, 0, mu5, mu5, mu5_state, empty_init, "Yamaha", "MU-5", MACHINE_NOT_WORKING )

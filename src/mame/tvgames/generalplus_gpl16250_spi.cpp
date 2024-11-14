@@ -1,21 +1,18 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood
 /*
-    GPL16250 / GPAC800 / GMC384 / GCM420 related support
+     GPL16250* games using SPI Flash + RAM configuration
 
-    GPL16250 is the GeneralPlus / SunPlus part number
-    GPAC800 is the JAKKS Pacific codename
-    GMC384 / GCM420 is what is printed on the die
-
-    ----
-
-    GPL16250 games using SPI Flash + RAM configuration
+     *part number could be different for these, they've only
+      been seen as globtops
 */
 
 #include "emu.h"
 #include "generalplus_gpl16250.h"
 #include "softlist_dev.h"
 
+
+namespace {
 
 class generalplus_gpspispi_game_state : public gcm394_game_state
 {
@@ -30,8 +27,8 @@ public:
 	void init_spi();
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 };
@@ -106,12 +103,12 @@ void generalplus_gpspispi_game_state::generalplus_gpspispi(machine_config &confi
 
 DEVICE_IMAGE_LOAD_MEMBER(generalplus_gpspispi_bkrankp_game_state::cart_load)
 {
-	uint32_t size = m_cart->common_get_size("rom");
+	uint32_t const size = m_cart->common_get_size("rom");
 
 	m_cart->rom_alloc(size, GENERIC_ROM16_WIDTH, ENDIANNESS_LITTLE);
 	m_cart->common_load_rom(m_cart->get_rom_base(), size, "rom");
 
-	return image_init_result::PASS;
+	return std::make_pair(std::error_condition(), std::string());
 }
 
 void generalplus_gpspispi_bkrankp_game_state::generalplus_gpspispi_bkrankp(machine_config &config)
@@ -133,6 +130,22 @@ ROM_START( bkrankp )
 
 	ROM_REGION(0x400000, "maincpu", ROMREGION_ERASE00)
 	ROM_LOAD16_WORD_SWAP( "unit_mx25l3206e_c22016.bin", 0x0000, 0x400000, CRC(7efad116) SHA1(427d707e97586ae6ab5fe08f29ca450ddc7ad36e) )
+ROM_END
+
+ROM_START( prailpls )
+	ROM_REGION16_BE( 0x40000, "maincpu:internal", ROMREGION_ERASE00 )
+	//ROM_LOAD16_WORD_SWAP( "internal.rom", 0x00000, 0x40000, NO_DUMP ) // used as bootstrap only (if it exists at all)
+
+	ROM_REGION(0x2000000, "maincpu", ROMREGION_ERASE00)
+	ROM_LOAD16_WORD_SWAP( "mx25l25635f.u9", 0x0000, 0x2000000, CRC(17faefb0) SHA1(1d31c5aa1a37882f74c08414f69c4285149352b7) )
+ROM_END
+
+ROM_START( anpanbd )
+	ROM_REGION16_BE( 0x40000, "maincpu:internal", ROMREGION_ERASE00 )
+	//ROM_LOAD16_WORD_SWAP( "internal.rom", 0x00000, 0x40000, NO_DUMP ) // used as bootstrap only (if it exists at all)
+
+	ROM_REGION(0x1000000, "maincpu", ROMREGION_ERASE00)
+	ROM_LOAD16_WORD_SWAP( "mx25l12835f.u2", 0x0000, 0x1000000, CRC(c4be09d7) SHA1(c9098d0c1c9db649a010f67469f500b69407372f) )
 ROM_END
 
 
@@ -182,5 +195,12 @@ void generalplus_gpspispi_game_state::init_spi()
 	internal[0x7fff] = vectorbase + 0x1e;
 }
 
+} // anonymous namespace
 
-CONS(200?, bkrankp, 0, 0, generalplus_gpspispi_bkrankp, gcm394, generalplus_gpspispi_bkrankp_game_state , init_spi, "Bandai", "Karaoke Ranking Party (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
+// ぼくはプラレール運転士 新幹線で行こう！プラス  (I am a Plarail driver Let's go by Shinkansen! Plus)
+CONS(2015, prailpls, 0, 0, generalplus_gpspispi,         gcm394, generalplus_gpspispi_game_state,         init_spi, "Takara Tomy", "Boku wa Plarail Untenshi Shinkansen de Ikou! Plus (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND) // has built-in screen, but can be connected to a TV
+
+// this is a half-head shaped unit, SHP13017-R1 main PCB  -  アンパンマン レッツゴー！育脳ドライブ きみものれるよ！アンパンマンごう「それいけ！アンパンマン」
+CONS(2014, anpanbd,  0, 0, generalplus_gpspispi,         gcm394, generalplus_gpspispi_game_state,         init_spi, "JoyPalette", "Anpanman: Let's Go! Ikunou Drive (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
+
+CONS(2015, bkrankp,  0, 0, generalplus_gpspispi_bkrankp, gcm394, generalplus_gpspispi_bkrankp_game_state, init_spi, "Bandai", "Karaoke Ranking Party (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)

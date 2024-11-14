@@ -16,6 +16,7 @@
 
 #include <list>
 #include <string>
+#include <string_view>
 #include <utility>
 
 
@@ -245,7 +246,7 @@ private:
 /* ----- miscellaneous interfaces ----- */
 
 /* normalize a string into something that can be written to an XML file */
-const char *normalize_string(const char *string);
+std::string normalize_string(std::string_view string);
 
 } // namespace util::xml
 

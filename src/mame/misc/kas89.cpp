@@ -201,6 +201,8 @@
 #include "kas89.lh"
 
 
+namespace {
+
 #define MASTER_CLOCK        XTAL(21'477'272)
 #define VDP_MEM             0x40000
 
@@ -225,8 +227,8 @@ public:
 	void init_kas89();
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	void mux_w(uint8_t data);
@@ -238,10 +240,10 @@ private:
 	void led_mux_select_w(uint8_t data);
 	TIMER_DEVICE_CALLBACK_MEMBER(nmi_cb);
 	TIMER_DEVICE_CALLBACK_MEMBER(sound_nmi_cb);
-	void audio_io(address_map &map);
-	void audio_map(address_map &map);
-	void kas89_io(address_map &map);
-	void kas89_map(address_map &map);
+	void audio_io(address_map &map) ATTR_COLD;
+	void audio_map(address_map &map) ATTR_COLD;
+	void kas89_io(address_map &map) ATTR_COLD;
+	void kas89_map(address_map &map) ATTR_COLD;
 
 	uint8_t m_mux_data;
 	uint8_t m_main_nmi_enable;
@@ -837,6 +839,8 @@ void kas89_state::init_kas89()
 		mem[bitswap<16>(i, 15, 14, 5, 6, 3, 0, 12, 1, 9, 13, 4, 7, 10, 8, 2, 11)] = buf[i];
 	}
 }
+
+} // anonymous namespace
 
 
 /**************************************

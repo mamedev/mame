@@ -21,16 +21,18 @@
 ***************************************************************************/
 
 #include "emu.h"
+#include "k054156_k054157_k056832.h"
+#include "k055555.h"
+#include "konami_helper.h"
+
 #include "cpu/m68000/m68000.h"
 #include "machine/eepromser.h"
 #include "machine/gen_latch.h"
 #include "machine/nvram.h"
-#include "machine/timer.h"
 #include "machine/ticket.h"
+#include "machine/timer.h"
 #include "sound/ymz280b.h"
-#include "k054156_k054157_k056832.h"
-#include "k055555.h"
-#include "konami_helper.h"
+
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
@@ -59,11 +61,11 @@ public:
 	void gs662(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
-	void common_main(address_map &map);
+	void common_main(address_map &map) ATTR_COLD;
 
 	uint16_t vrom_r(offs_t offset)
 	{
@@ -136,11 +138,11 @@ private:
 		return m_k056832->rom_word_r(offset);
 	}
 
-	void kzaurus_main(address_map &map);
-	void koropens_main(address_map &map);
-	void pwrchanc_main(address_map &map);
-	void spcpokan_main(address_map &map);
-	void gs662_main(address_map &map);
+	void kzaurus_main(address_map &map) ATTR_COLD;
+	void koropens_main(address_map &map) ATTR_COLD;
+	void pwrchanc_main(address_map &map) ATTR_COLD;
+	void spcpokan_main(address_map &map) ATTR_COLD;
+	void gs662_main(address_map &map) ATTR_COLD;
 
 	static constexpr int NUM_LAYERS = 4;
 
@@ -158,12 +160,12 @@ public:
 	void slot(machine_config &config);
 
 protected:
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 
 	virtual void tilemap_draw(screen_device& screen, bitmap_rgb32& bitmap, const rectangle& cliprect, int layer, int i) override;
 
 private:
-	void slot_main(address_map &map);
+	void slot_main(address_map &map) ATTR_COLD;
 };
 
 void konmedal68k_state::video_start()
@@ -363,14 +365,14 @@ static INPUT_PORTS_START( kzaurus )
 	PORT_BIT( 0xff1f, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("IN1")
-	PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("hopper", hopper_device, line_r)
+	PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("hopper", FUNC(hopper_device::line_r))
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_COIN3 )    // medal
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0xf0ff, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("OUT")
-	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("hopper", hopper_device, motor_w)
+	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("hopper", FUNC(hopper_device::motor_w))
 
 	PORT_START("DSW")
 	PORT_DIPNAME( 0x07, 0x07, "Coin Slot 1" )   PORT_DIPLOCATION("SW1:1,2,3")
@@ -454,6 +456,18 @@ static INPUT_PORTS_START( spcpokan )
 	PORT_DIPSETTING(    0x1000, "30 sec" )
 	PORT_DIPSETTING(    0x2000, "24 sec" )
 	PORT_DIPSETTING(    0x3000, "18 sec" )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( pikkaric )
+	PORT_INCLUDE( kzaurus )
+
+	PORT_MODIFY("DSW")
+	PORT_DIPNAME( 0x1000, 0x1000, "Chance Game" )      PORT_DIPLOCATION("SW2:5")
+	PORT_DIPSETTING(      0x1000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x2000, 0x2000, "Play Timer" )       PORT_DIPLOCATION("SW2:6")
+	PORT_DIPSETTING(      0x0000, "15" )
+	PORT_DIPSETTING(      0x2000, "20" )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( crossmg2 )
@@ -556,7 +570,7 @@ static INPUT_PORTS_START( crossmg2 )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 
 	PORT_START("OUT")
-	//PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("hopper", hopper_device, motor_w)
+	//PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("hopper", FUNC(hopper_device::motor_w))
 
 	PORT_START("DSW")
 	PORT_DIPNAME( 0x0001, 0x0000, "DSW" )
@@ -628,7 +642,7 @@ void konmedal68k_state::kzaurus(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &konmedal68k_state::kzaurus_main);
 	TIMER(config, "scantimer").configure_scanline(FUNC(konmedal68k_state::scanline), "screen", 0, 1);
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
-	HOPPER(config, "hopper", attotime::from_msec(100), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH);
+	HOPPER(config, "hopper", attotime::from_msec(100));
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
@@ -829,6 +843,20 @@ ROM_START( ggoemon )
 	ROM_LOAD( "747-a02-4f.bin", 0x080000, 0x080000, CRC(4a8d6bcc) SHA1(91b0e8a29423de306e3e0f6ac113cc4a69b05249) )
 ROM_END
 
+ROM_START( pikkaric )
+	ROM_REGION( 0x80000, "maincpu", 0 )
+	ROM_LOAD16_WORD_SWAP( "952-b05.bin",  0x000000, 0x080000, CRC(f07dd20e) SHA1(aec7b1d1971f9463f07bf503c867c7c67d7ee426) )
+
+	ROM_REGION( 0x100000, "k056832", 0 )
+	ROM_LOAD( "952-a06.bin",  0x000000, 0x080000, CRC(d82cd5e2) SHA1(ad14ad993f32a7657bcc82e1551b8ffdba1e4d76) )
+	ROM_LOAD( "952-a07.bin",  0x080000, 0x080000, CRC(25c800ff) SHA1(485e76e59d16725b4585b11e1cf4c64d35ee9c2b) )
+
+	ROM_REGION( 0x100000, "ymz", 0 )
+	ROM_LOAD( "952-a01.bin",  0x000000, 0x080000, CRC(976d34e5) SHA1(cb5757adcba452b44ebf0ae61a14b1c9040e496f) )
+	ROM_LOAD( "952-a02.bin",  0x080000, 0x080000, CRC(4a203be8) SHA1(3f9df850616297d6e7102ca55a44d765193602bc) )
+
+ROM_END
+
 // GS562 PCB with no K056766 color DAC and no IC 20D 8Kbyte SRAM
 // at 1st boot press Service1 to initialise NVRAM
 ROM_START( crossmg2 )
@@ -866,6 +894,7 @@ GAME( 1998, kattobas, 0, koropens, kattobas, konmedal68k_state, empty_init, ROT0
 GAME( 1999, pwrchanc, 0, pwrchanc, kzaurus,  konmedal68k_state, empty_init, ROT0, "Konami", "Powerful Chance", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1999, ymcapsul, 0, kzaurus,  kzaurus,  konmedal68k_state, empty_init, ROT0, "Konami", "Yu-Gi-Oh Monster Capsule", MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1999, spcpokan, 0, spcpokan, spcpokan, konmedal68k_state, empty_init, ROT0, "Konami", "Space Pokan", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS)
+GAME( 2000, pikkaric, 0, kzaurus,  pikkaric, konmedal68k_state, empty_init, ROT0, "Konami", "Pikkari Chance", MACHINE_IMPERFECT_GRAPHICS)
 
 // Higher resolution display.  These are Pachinko / Pachislot machines, will require simulation of mechanical parts / ball sensors.
 GAME( 1996, crossmg2,  0, slot,     crossmg2, konmedal68k_slot_state, empty_init, ROT0, "Konami", "Cross Magic Mark 2", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_MECHANICAL )

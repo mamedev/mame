@@ -22,16 +22,16 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(mouse_x_changed);
 	DECLARE_INPUT_CHANGED_MEMBER(mouse_y_changed);
 
-	void map(address_map &map);
+	void map(address_map &map) ATTR_COLD;
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 	// optional information overrides
-	virtual ioport_constructor device_input_ports() const override;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 
 	uint8_t ppi_a_r();
 	uint8_t ppi_c_r();

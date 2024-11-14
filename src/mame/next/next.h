@@ -2,20 +2,21 @@
 // copyright-holders:Olivier Galibert
 #pragma once
 
-#ifndef MAME_INCLUDES_NEXT_H
-#define MAME_INCLUDES_NEXT_H
+#ifndef MAME_NEXT_NEXT_H
+#define MAME_NEXT_NEXT_H
 
-#include "cpu/m68000/m68000.h"
+#include "cpu/m68000/m68030.h"
+#include "cpu/m68000/m68040.h"
 #include "imagedev/floppy.h"
 #include "machine/nscsi_bus.h"
 #include "machine/mccs1850.h"
 #include "machine/8530scc.h"
 #include "nextkbd.h"
 #include "machine/upd765.h"
-#include "machine/ncr5390.h"
+#include "machine/ncr53c90.h"
 #include "machine/mb8795.h"
 #include "nextmo.h"
-#include "imagedev/chd_cd.h"
+#include "imagedev/cdromimg.h"
 #include "imagedev/harddriv.h"
 
 class next_state : public driver_device
@@ -28,7 +29,7 @@ public:
 			scc(*this, "scc"),
 			keyboard(*this, "keyboard"),
 			scsibus(*this, "scsibus"),
-			scsi(*this, "scsibus:7:ncr5390"),
+			scsi(*this, "scsibus:7:ncr53c90"),
 			net(*this, "net"),
 			mo(*this, "mo"),
 			fdc(*this, "fdc"),
@@ -67,14 +68,14 @@ private:
 	required_device<scc8530_legacy_device> scc;
 	required_device<nextkbd_device> keyboard;
 	required_device<nscsi_bus_device> scsibus;
-	required_device<ncr5390_device> scsi;
+	required_device<ncr53c90_device> scsi;
 	required_device<mb8795_device> net;
 	optional_device<nextmo_device> mo; // cube only
 	optional_device<n82077aa_device> fdc; // 040 only
 	optional_device<floppy_connector> floppy0; // 040 only
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
@@ -124,39 +125,39 @@ private:
 
 	uint32_t eventc_latch = 0;
 
-	DECLARE_WRITE_LINE_MEMBER(scc_irq);
-	DECLARE_WRITE_LINE_MEMBER(keyboard_irq);
-	DECLARE_WRITE_LINE_MEMBER(power_irq);
-	DECLARE_WRITE_LINE_MEMBER(nmi_irq);
+	void scc_irq(int state);
+	void keyboard_irq(int state);
+	void power_irq(int state);
+	void nmi_irq(int state);
 
-	DECLARE_WRITE_LINE_MEMBER(scsi_irq);
-	DECLARE_WRITE_LINE_MEMBER(scsi_drq);
+	void scsi_irq(int state);
+	void scsi_drq(int state);
 
-	DECLARE_WRITE_LINE_MEMBER(fdc_irq);
-	DECLARE_WRITE_LINE_MEMBER(fdc_drq);
+	void fdc_irq(int state);
+	void fdc_drq(int state);
 
-	DECLARE_WRITE_LINE_MEMBER(net_tx_irq);
-	DECLARE_WRITE_LINE_MEMBER(net_rx_irq);
-	DECLARE_WRITE_LINE_MEMBER(net_tx_drq);
-	DECLARE_WRITE_LINE_MEMBER(net_rx_drq);
+	void net_tx_irq(int state);
+	void net_rx_irq(int state);
+	void net_tx_drq(int state);
+	void net_rx_drq(int state);
 
-	DECLARE_WRITE_LINE_MEMBER(mo_irq);
-	DECLARE_WRITE_LINE_MEMBER(mo_drq);
+	void mo_irq(int state);
+	void mo_drq(int state);
 
-	DECLARE_WRITE_LINE_MEMBER(vblank_w);
+	void vblank_w(int state);
 
-	void ncr5390(device_t *device);
-	void next_0b_m_mem(address_map &map);
-	void next_0b_m_mo_mem(address_map &map);
-	void next_0b_m_nofdc_mem(address_map &map);
-	void next_0c_c_mem(address_map &map);
-	void next_0c_m_mem(address_map &map);
-	void next_0c_c_mo_mem(address_map &map);
-	void next_0c_m_mo_mem(address_map &map);
-	void next_2c_c_mem(address_map &map);
-	void next_fdc_mem(address_map &map);
-	void next_mo_mem(address_map &map);
-	void next_mem(address_map &map);
+	void ncr53c90(device_t *device);
+	void next_0b_m_mem(address_map &map) ATTR_COLD;
+	void next_0b_m_mo_mem(address_map &map) ATTR_COLD;
+	void next_0b_m_nofdc_mem(address_map &map) ATTR_COLD;
+	void next_0c_c_mem(address_map &map) ATTR_COLD;
+	void next_0c_m_mem(address_map &map) ATTR_COLD;
+	void next_0c_c_mo_mem(address_map &map) ATTR_COLD;
+	void next_0c_m_mo_mem(address_map &map) ATTR_COLD;
+	void next_2c_c_mem(address_map &map) ATTR_COLD;
+	void next_fdc_mem(address_map &map) ATTR_COLD;
+	void next_mo_mem(address_map &map) ATTR_COLD;
+	void next_mem(address_map &map) ATTR_COLD;
 
 	struct dma_slot {
 		uint32_t start = 0;
@@ -208,7 +209,7 @@ private:
 
 	void irq_set(int id, bool raise);
 	void irq_check();
-	const char *dma_name(int slot);
+	std::string dma_name(int slot);
 	void dma_do_ctrl_w(int slot, uint8_t data);
 	void dma_drq_w(int slot, bool state);
 	void dma_read(int slot, uint8_t &val, bool &eof, bool &err);
@@ -218,4 +219,4 @@ private:
 	void dma_end(int slot);
 };
 
-#endif
+#endif // MAME_NEXT_NEXT_H

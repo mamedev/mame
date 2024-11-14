@@ -106,7 +106,7 @@ IRQ_CALLBACK_MEMBER(scramble_state::scramble_sh_irq_callback)
 	return 0xff;
 }
 
-WRITE_LINE_MEMBER(scramble_state::scramble_sh_7474_q_callback)
+void scramble_state::scramble_sh_7474_q_callback(int state)
 {
 	/* the Q bar is connected to the Z80's INT line.  But since INT is complemented, */
 	/* we need to complement Q bar */

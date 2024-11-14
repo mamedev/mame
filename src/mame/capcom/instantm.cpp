@@ -30,6 +30,9 @@ At the moment it simply outputs all the speech strings, one after the other, the
 #include "sound/dac.h"
 #include "speaker.h"
 
+
+namespace {
+
 class instantm_state : public driver_device
 {
 public:
@@ -43,16 +46,16 @@ public:
 private:
 	u8 port01_r();
 	void port01_w(u8 data);
-	DECLARE_WRITE_LINE_MEMBER(clock_w);
+	void clock_w(int state);
 
-	void main_map(address_map &map);
-	void sub_io(address_map &map);
-	void sub_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
+	void sub_io(address_map &map) ATTR_COLD;
+	void sub_map(address_map &map) ATTR_COLD;
 
 	u8 m_port01 = 0;
 	bool m_clock_en = false;
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 	required_device<cpu_device> m_maincpu;
 };
 
@@ -73,7 +76,7 @@ void instantm_state::port01_w(u8 data)
 }
 
 // clock out the speech bytes
-WRITE_LINE_MEMBER( instantm_state::clock_w )
+void instantm_state::clock_w(int state)
 {
 	if (m_clock_en)
 		m_port01 ^= 0x80;
@@ -152,6 +155,8 @@ ROM_START( instantm )
 	ROM_REGION( 0x10000, "subcpu", 0 )
 	ROM_LOAD( "speechus10.u20", 0x00000, 0x10000, CRC(1797bcee) SHA1(c6fb7fbe8592dfae3ba44b49b5ce447206515b77) )
 ROM_END
+
+} // anonymous namespace
 
 
 GAME( 199?, instantm, 0, instantm, instantm, instantm_state, empty_init, ROT0, "Capcom / Polaroid", "Polaroid Instant Memories", MACHINE_IS_SKELETON_MECHANICAL )

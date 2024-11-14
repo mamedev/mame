@@ -16,6 +16,9 @@
 #include "emupal.h"
 #include "screen.h"
 
+
+namespace {
+
 #define MASTER_CLOCK XTAL(12'096'000)
 
 /*************************************
@@ -41,10 +44,10 @@ public:
 	void boxer(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
-	void boxer_map(address_map &map);
+	void boxer_map(address_map &map) ATTR_COLD;
 
 	uint8_t input_r(offs_t offset);
 	uint8_t misc_r(offs_t offset);
@@ -525,6 +528,8 @@ ROM_START( boxer )
 	ROM_REGION( 0x0100, "proms", 0 ) /* sync prom */
 	ROM_LOAD( "9402.m3", 0x0000, 0x0100, CRC(00e224a0) SHA1(1a384ef488791c62566c91b18d6a1fb4a5def2ba) )
 ROM_END
+
+} // anonymous namespace
 
 
 /*************************************

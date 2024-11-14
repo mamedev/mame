@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:ElSemi
+// copyright-holders:ElSemi, Angelo Salese
 #ifndef MAME_VIDEO_VRENDER0_H
 #define MAME_VIDEO_VRENDER0_H
 
@@ -17,7 +17,7 @@ public:
 	vr0video_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	void set_areas(uint16_t *textureram, uint16_t *frameram);
-	void regs_map(address_map &map);
+	void regs_map(address_map &map) ATTR_COLD;
 	void execute_flipping();
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	auto idleskip_cb() { return m_idleskip_cb.bind(); }
@@ -27,8 +27,8 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 private:
 	int vrender0_ProcessPacket(uint32_t PacketPtr);
@@ -93,6 +93,10 @@ private:
 
 	uint16_t *m_DrawDest;       //!< frameram pointer to draw buffer area
 	uint16_t *m_DisplayDest;    //!< frameram pointer to display buffer area
+	bool m_flip_sync = false;
+
+	emu_timer *m_pipeline_timer;
+	TIMER_CALLBACK_MEMBER(pipeline_cb);
 };
 
 DECLARE_DEVICE_TYPE(VIDEO_VRENDER0, vr0video_device)

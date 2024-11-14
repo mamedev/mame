@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Curt Coder
-#ifndef MAME_INCLUDES_TMC1800_H
-#define MAME_INCLUDES_TMC1800_H
+#ifndef MAME_TELERCAS_TMC1800_H
+#define MAME_TELERCAS_TMC1800_H
 
 #pragma once
 
@@ -57,19 +57,19 @@ public:
 	void keylatch_w(uint8_t data);
 	uint8_t dispon_r();
 	void dispoff_w(uint8_t data);
-	DECLARE_READ_LINE_MEMBER( clear_r );
-	DECLARE_READ_LINE_MEMBER( ef2_r );
-	DECLARE_READ_LINE_MEMBER( ef3_r );
-	DECLARE_WRITE_LINE_MEMBER( q_w );
+	int clear_r();
+	int ef2_r();
+	int ef3_r();
+	void q_w(int state);
 
 	void tmc1800(machine_config &config);
 	void tmc1800_video(machine_config &config);
-	void tmc1800_io_map(address_map &map);
-	void tmc1800_map(address_map &map);
+	void tmc1800_io_map(address_map &map) ATTR_COLD;
+	void tmc1800_map(address_map &map) ATTR_COLD;
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	required_device<cdp1861_device> m_vdc;
 	/* keyboard state */
@@ -87,19 +87,19 @@ public:
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	void keylatch_w(uint8_t data);
-	DECLARE_READ_LINE_MEMBER( clear_r );
-	DECLARE_READ_LINE_MEMBER( ef2_r );
-	DECLARE_READ_LINE_MEMBER( ef3_r );
-	DECLARE_WRITE_LINE_MEMBER( q_w );
+	int clear_r();
+	int ef2_r();
+	int ef3_r();
+	void q_w(int state);
 
 	void osc1000b(machine_config &config);
 	void osc1000b_video(machine_config &config);
-	void osc1000b_io_map(address_map &map);
-	void osc1000b_map(address_map &map);
+	void osc1000b_io_map(address_map &map) ATTR_COLD;
+	void osc1000b_map(address_map &map) ATTR_COLD;
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	/* keyboard state */
 	int m_keylatch = 0;
@@ -118,26 +118,26 @@ public:
 
 	void keylatch_w(uint8_t data);
 	void bankswitch_w(uint8_t data);
-	DECLARE_READ_LINE_MEMBER( clear_r );
-	DECLARE_READ_LINE_MEMBER( ef2_r );
-	DECLARE_READ_LINE_MEMBER( ef3_r );
-	DECLARE_WRITE_LINE_MEMBER( q_w );
+	int clear_r();
+	int ef2_r();
+	int ef3_r();
+	void q_w(int state);
 	void dma_w(offs_t offset, uint8_t data);
-	DECLARE_READ_LINE_MEMBER( rdata_r );
-	DECLARE_READ_LINE_MEMBER( bdata_r );
-	DECLARE_READ_LINE_MEMBER( gdata_r );
+	int rdata_r();
+	int bdata_r();
+	int gdata_r();
 	DECLARE_INPUT_CHANGED_MEMBER( run_pressed );
 
 	void bankswitch();
 
 	void tmc2000(machine_config &config);
 	void tmc2000_video(machine_config &config);
-	void tmc2000_io_map(address_map &map);
-	void tmc2000_map(address_map &map);
+	void tmc2000_io_map(address_map &map) ATTR_COLD;
+	void tmc2000_map(address_map &map) ATTR_COLD;
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	required_device<cdp1864_device> m_cti;
 	memory_share_creator<uint8_t> m_colorram;
@@ -169,21 +169,21 @@ public:
 
 	void keylatch_w(uint8_t data);
 	void bankswitch_w(uint8_t data);
-	DECLARE_READ_LINE_MEMBER( clear_r );
-	DECLARE_READ_LINE_MEMBER( ef2_r );
-	DECLARE_READ_LINE_MEMBER( ef3_r );
-	DECLARE_WRITE_LINE_MEMBER( q_w );
+	int clear_r();
+	int ef2_r();
+	int ef3_r();
+	void q_w(int state);
 	DECLARE_INPUT_CHANGED_MEMBER( run_pressed );
 	DECLARE_INPUT_CHANGED_MEMBER( monitor_pressed );
 
 	void nano(machine_config &config);
 	void nano_video(machine_config &config);
-	void nano_io_map(address_map &map);
-	void nano_map(address_map &map);
+	void nano_io_map(address_map &map) ATTR_COLD;
+	void nano_map(address_map &map) ATTR_COLD;
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	TIMER_CALLBACK_MEMBER(assert_ef4);
 
@@ -199,4 +199,4 @@ protected:
 	int m_keylatch = 0;
 };
 
-#endif
+#endif // MAME_TELERCAS_TMC1800_H

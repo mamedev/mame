@@ -66,7 +66,7 @@ public:
 	IRQ_CALLBACK_MEMBER(inta_cb);
 
 protected:
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 };
 
 DEFINE_DEVICE_TYPE(XEN_DAISY, xen_daisy_device, "xen_daisy", "Apricot XEN daisy chain abstraction")
@@ -127,8 +127,8 @@ public:
 	void apxen(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	required_device<i80286_cpu_device> m_maincpu;
@@ -145,14 +145,14 @@ private:
 	required_device_array<floppy_connector, 2> m_floppy;
 	required_device<apricot_video_slot_device> m_video;
 
-	void mem_map_base(address_map &map);
-	void mem_map(address_map &map);
-	void io_map_base(address_map &map);
-	void io_map(address_map &map);
+	void mem_map_base(address_map &map) ATTR_COLD;
+	void mem_map(address_map &map) ATTR_COLD;
+	void io_map_base(address_map &map) ATTR_COLD;
+	void io_map(address_map &map) ATTR_COLD;
 
 	static void floppy_formats(format_registration &fr);
 
-	DECLARE_WRITE_LINE_MEMBER(apvid_w);
+	void apvid_w(int state);
 
 	uint16_t mem_r(offs_t offset, uint16_t mem_mask);
 	void mem_w(offs_t offset, uint16_t data, uint16_t mem_mask);
@@ -247,7 +247,7 @@ static void apricot_floppies(device_slot_interface &device)
 //  VIDEO EMULATION
 //**************************************************************************
 
-WRITE_LINE_MEMBER( apxen_state::apvid_w )
+void apxen_state::apvid_w(int state)
 {
 	m_apvid = bool(state);
 }

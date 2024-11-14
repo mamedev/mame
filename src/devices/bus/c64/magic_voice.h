@@ -33,11 +33,11 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// optional information overrides
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 	// device_c64_expansion_card_interface overrides
 	virtual uint8_t c64_cd_r(offs_t offset, uint8_t data, int sphi2, int ba, int roml, int romh, int io1, int io2) override;
@@ -47,17 +47,17 @@ protected:
 private:
 	offs_t get_offset(offs_t offset);
 
-	DECLARE_WRITE_LINE_MEMBER( tpi_irq_w );
+	void tpi_irq_w(int state);
 	uint8_t tpi_pa_r();
 	void tpi_pa_w(uint8_t data);
 	uint8_t tpi_pb_r();
 	void tpi_pb_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER( tpi_ca_w );
-	DECLARE_WRITE_LINE_MEMBER( tpi_cb_w );
+	void tpi_ca_w(int state);
+	void tpi_cb_w(int state);
 
-	DECLARE_WRITE_LINE_MEMBER( phi2_w );
-	DECLARE_WRITE_LINE_MEMBER( dtrd_w );
-	DECLARE_WRITE_LINE_MEMBER( apd_w );
+	void phi2_w(int state);
+	void dtrd_w(int state);
+	void apd_w(int state);
 
 	required_device<t6721a_device> m_vslsi;
 	required_device<tpi6525_device> m_tpi;

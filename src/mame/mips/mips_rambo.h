@@ -1,8 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:Patrick Mackinlay
 
-#ifndef MAME_MACHINE_MIPS_RAMBO_H
-#define MAME_MACHINE_MIPS_RAMBO_H
+#ifndef MAME_MIPS_MIPS_RAMBO_H
+#define MAME_MIPS_MIPS_RAMBO_H
 
 #pragma once
 
@@ -25,15 +25,15 @@ public:
 	template <unsigned Channel> auto dma_w() { return m_channel[Channel].write_cb.bind(); }
 
 	// input lines
-	template <unsigned Channel> DECLARE_WRITE_LINE_MEMBER(drq_w);
+	template <unsigned Channel> void drq_w(int state);
 
-	void map(address_map &map);
+	void map(address_map &map) ATTR_COLD;
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 protected:
 	// device_t overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	template <unsigned Channel> u32 load_address_r() { return m_channel[Channel].load_address; }
 	template <unsigned Channel> u32 diag_r() { return 0; }
@@ -144,4 +144,4 @@ private:
 
 DECLARE_DEVICE_TYPE(MIPS_RAMBO, mips_rambo_device)
 
-#endif // MAME_MACHINE_MIPS_RAMBO_H
+#endif // MAME_MIPS_MIPS_RAMBO_H

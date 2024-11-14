@@ -45,9 +45,9 @@ namespace
 		}
 
 		// optional information overrides
-		virtual void device_add_mconfig(machine_config &config) override;
+		virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
-		WRITE_LINE_MEMBER(uart_irq_w)
+		void uart_irq_w(int state)
 		{
 			set_line_value(line::CART, state != 0);
 		}
@@ -61,7 +61,7 @@ namespace
 					write8sm_delegate(*m_uart, FUNC(mos6551_device::write)));
 		}
 
-		virtual const tiny_rom_entry *device_rom_region() const override;
+		virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 
 		// CoCo cartridge level overrides
 		virtual u8 *get_cart_base() override

@@ -7,7 +7,7 @@
 #pragma once
 
 #include "cdrom.h"
-#include "imagedev/chd_cd.h"
+#include "imagedev/cdromimg.h"
 #include "machine/timer.h"
 #include "sound/cdda.h"
 
@@ -29,16 +29,16 @@ public:
 	void set_tray_close();
 
 protected:
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual void device_start() override;
-	virtual void device_reset() override;
-	virtual void device_stop() override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+	virtual void device_stop() override ATTR_COLD;
 	virtual space_config_vector memory_space_config() const override;
 
 private:
 	const address_space_config      m_space_config;
 
-	void io_regs(address_map &map);
+	void io_regs(address_map &map) ATTR_COLD;
 
 	TIMER_DEVICE_CALLBACK_MEMBER( stv_sector_cb );
 	TIMER_DEVICE_CALLBACK_MEMBER( stv_sh1_sim );
@@ -119,7 +119,7 @@ private:
 	};
 
 	int get_track_index(uint32_t fad);
-	int sega_cdrom_get_adr_control(cdrom_file *file, int track);
+	int sega_cdrom_get_adr_control(int track);
 	void cr_standard_return(uint16_t cur_status);
 	void mpeg_standard_return(uint16_t cur_status);
 	void cd_free_block(blockT *blktofree);
@@ -138,8 +138,6 @@ private:
 	blockT *cd_alloc_block(uint8_t *blknum);
 	partitionT *cd_filterdata(filterT *flt, int trktype, uint8_t *p_ok);
 	partitionT *cd_read_filtered_sector(int32_t fad, uint8_t *p_ok);
-
-	cdrom_file *cdrom;// = (cdrom_file *)nullptr;
 
 	// local variables
 	partitionT partitions[MAX_FILTERS];

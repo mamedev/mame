@@ -1,0 +1,81 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0-1.0
+-->
+
+<softwarelist name="sprachmg" description="Gerät 32620 (Sprach/Morsegenerator) Speech Modules">
+
+	<!-- Recreated from samples -->
+	<software name="english">
+		<description>English (Polish speaker)</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="rom" interface="sprachmg">
+			<dataarea name="pcb1" size="0xc000">
+				<rom name="32620_en-1.bin" offset="0x0000" size="0x2000" crc="f99a4f83" sha1="eed383b51ea5408905335f2ce9376bf828c4fd2e" status="baddump" />
+				<rom name="32620_en-2.bin" offset="0x2000" size="0x2000" crc="1be4c666" sha1="f3d8ab6e3782c2434f8312b252589ef066918e1d" status="baddump" />
+				<rom name="32620_en-3.bin" offset="0x4000" size="0x2000" crc="10e8e115" sha1="2721da167265b6c5aa49f33b6ea0d9f01c5350c5" status="baddump" />
+				<rom name="32620_en-4.bin" offset="0x6000" size="0x2000" crc="69ae7f4b" sha1="f582c487336ac94cbcc531435d0bad536426ce2c" status="baddump" />
+				<rom name="32620_en-5.bin" offset="0x8000" size="0x2000" crc="ac76f264" sha1="f01b026c3c8bab1d1aa8c15bce9c0883da5a2c27" status="baddump" />
+				<rom name="32620_en-6.bin" offset="0xa000" size="0x2000" crc="fbb240c9" sha1="1386529ce06836db5eb273cf0434cb2eeff165aa" status="baddump" />
+			</dataarea>
+			<dataarea name="pcb2" size="0xc000">
+				<rom name="32620_en-7.bin" offset="0x0000" size="0x2000" crc="0ad5e9e3" sha1="c27a45e2fdc9d5da91cb263d3157f51376155824" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="german">
+		<description>German</description>
+		<year>1984</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="rom" interface="sprachmg">
+			<dataarea name="pcb1" size="0xc000">
+				<rom name="2620_8401-1.bin" offset="0x0000" size="0x2000" crc="05f58420" sha1="d7a81e337b1f97b861d1f39569d8b236266d1335" />
+				<rom name="2620_8401-2.bin" offset="0x2000" size="0x2000" crc="df8b0bb9" sha1="fe69b905819f95bfd17fdf41f8a1a68e0848c624" />
+				<rom name="2620_8401-3.bin" offset="0x4000" size="0x2000" crc="13554a48" sha1="04dec28efac7b974787db0d7b05df6cf364d9bb4" />
+				<rom name="2620_8401-4.bin" offset="0x6000" size="0x2000" crc="a41bc709" sha1="c054653c41ae1c3b0fd07cba07c5a8566ff63a7c" />
+				<rom name="2620_8401-5.bin" offset="0x8000" size="0x2000" crc="739c3547" sha1="5fcaab9ede8c9366f689ceeb763c862d2110d3c9" />
+				<rom name="2620_8401-6.bin" offset="0xa000" size="0x2000" crc="549b5994" sha1="6ab046dd14e12237615a90cac9cadd09cddd0f24" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="germano">
+		<description>German (older)</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="rom" interface="sprachmg">
+			<dataarea name="pcb1" size="0xc000">
+				<rom name="2620_de-1.bin" offset="0x0000" size="0x2000" crc="2e475ce7" sha1="efd3da128f515e479547c9e4f4bb107dde8ea52d" />
+				<rom name="2620_de-2.bin" offset="0x2000" size="0x2000" crc="675ea7c8" sha1="a74cd99f8be98b85d356ae0c3c5c794d740a7445" />
+				<rom name="2620_de-3.bin" offset="0x4000" size="0x2000" crc="9d474786" sha1="f05e232c04de34aceaa63fe26a2d5dfb4c5a163a" />
+				<rom name="2620_de-4.bin" offset="0x6000" size="0x2000" crc="7f02ff72" sha1="e4d7db906a08d89602fd093b7a037a270e567536" />
+				<rom name="2620_de-5.bin" offset="0x8000" size="0x2000" crc="f20c8633" sha1="eebd61bab47d54e7688cdac287ceb1a110d46af7" />
+				<rom name="2620_de-6.bin" offset="0xa000" size="0x2000" crc="69a2d785" sha1="2c547b583dcc16208f0422e121cd482c3356528d" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spanish">
+		<description>Spanish</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="rom" interface="sprachmg">
+			<dataarea name="pcb1" size="0xc000">
+				<rom name="32620_es-1.bin" offset="0x0000" size="0x2000" crc="7357485a" sha1="ad001a9c147398a0908db4369283f5c82a28c4fb" />
+				<rom name="32620_es-2.bin" offset="0x2000" size="0x2000" crc="8eeb0e9b" sha1="ce3df4f47e942c7bdd277d5a619780f16be6ea00" />
+				<rom name="32620_es-3.bin" offset="0x4000" size="0x2000" crc="4210c86f" sha1="5714cf7fd4885dad29f7d9532434a7d547a6bebe" />
+				<rom name="32620_es-4.bin" offset="0x6000" size="0x2000" crc="e456d024" sha1="5cff9e63c3af02afcb4b63acf296138b6691638f" />
+				<rom name="32620_es-5.bin" offset="0x8000" size="0x2000" crc="580f8199" sha1="59296f6546fd54a0570bcf3390e35d457531a5f9" />
+				<rom name="32620_es-6.bin" offset="0xa000" size="0x2000" crc="37d2094b" sha1="2e956644509005c31bcd8da26088d062b2e70354" />
+			</dataarea>
+			<dataarea name="pcb2" size="0xc000">
+				<rom name="32620_es-7.bin" offset="0x0000" size="0x2000" crc="303bc783" sha1="7e97a241cf8af252ef5dfa7175008a78fac89739" />
+				<rom name="32620_es-8.bin" offset="0x2000" size="0x2000" crc="0718aa10" sha1="d2bf479a32e7dd6d7b421d87380b684f7b495899" />
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>

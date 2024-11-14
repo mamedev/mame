@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Nicola Salmoria
-#ifndef MAME_VIDEO_TC0110PCR_H
-#define MAME_VIDEO_TC0110PCR_H
+#ifndef MAME_TAITO_TC0110PCR_H
+#define MAME_TAITO_TC0110PCR_H
 
 #pragma once
 
@@ -21,12 +21,12 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 	virtual void device_post_load() override;
 
 	// device_palette_interface overrides
-	virtual u32 palette_entries() const override { return TC0110PCR_RAM_SIZE; }
+	virtual u32 palette_entries() const noexcept override { return TC0110PCR_RAM_SIZE; }
 
 private:
 	static const unsigned TC0110PCR_RAM_SIZE = 0x2000 / 2;
@@ -38,4 +38,4 @@ private:
 
 DECLARE_DEVICE_TYPE(TC0110PCR, tc0110pcr_device)
 
-#endif // MAME_VIDEO_TC0110PCR_H
+#endif // MAME_TAITO_TC0110PCR_H

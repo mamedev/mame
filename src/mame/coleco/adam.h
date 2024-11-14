@@ -2,8 +2,8 @@
 // copyright-holders:Curt Coder
 #pragma once
 
-#ifndef MAME_INCLUDES_ADAM_H
-#define MAME_INCLUDES_ADAM_H
+#ifndef MAME_COLECO_ADAM_H
+#define MAME_COLECO_ADAM_H
 
 #include "bus/adam/exp.h"
 #include "bus/adamnet/adamnet.h"
@@ -65,8 +65,8 @@ private:
 	required_memory_region m_boot_rom;
 	required_memory_region m_os7_rom;
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	uint8_t mreq_r(offs_t offset);
 	void mreq_w(offs_t offset, uint8_t data);
@@ -85,12 +85,12 @@ private:
 	void m6801_p3_w(uint8_t data);
 	void m6801_p4_w(uint8_t data);
 
-	DECLARE_WRITE_LINE_MEMBER( vdc_int_w );
+	void vdc_int_w(int state);
 
-	DECLARE_WRITE_LINE_MEMBER( os3_w );
+	void os3_w(int state);
 
-	DECLARE_WRITE_LINE_MEMBER( joy1_irq_w );
-	DECLARE_WRITE_LINE_MEMBER( joy2_irq_w );
+	void joy1_irq_w(int state);
+	void joy2_irq_w(int state);
 
 	// memory state
 	uint8_t m_mioc;
@@ -111,9 +111,8 @@ private:
 
 	// video state
 	int m_vdp_nmi = 0;
-	void adam_io(address_map &map);
-	void adam_mem(address_map &map);
-	void m6801_mem(address_map &map);
+	void adam_io(address_map &map) ATTR_COLD;
+	void adam_mem(address_map &map) ATTR_COLD;
 };
 
-#endif
+#endif // MAME_COLECO_ADAM_H

@@ -5,8 +5,8 @@
     Cheap Squeak Deluxe / Artificial Artist Sound Board
 
 ***************************************************************************/
-#ifndef MAME_AUDIO_CSD_H
-#define MAME_AUDIO_CSD_H
+#ifndef MAME_MIDWAY_CSD_H
+#define MAME_MIDWAY_CSD_H
 
 #pragma once
 
@@ -34,16 +34,16 @@ public:
 	// read/write
 	u8 stat_r();
 	void sr_w(u8 data);
-	DECLARE_WRITE_LINE_MEMBER(sirq_w);
-	DECLARE_WRITE_LINE_MEMBER(reset_w);
+	void sirq_w(int state);
+	void reset_w(int state);
 
-	void csdeluxe_map(address_map &map);
+	void csdeluxe_map(address_map &map) ATTR_COLD;
 
 protected:
 	// device-level overrides
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual const tiny_rom_entry *device_rom_region() const override;
-	virtual void device_start() override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
+	virtual void device_start() override ATTR_COLD;
 
 	TIMER_CALLBACK_MEMBER(sync_pia);
 
@@ -61,10 +61,10 @@ private:
 	// internal communications
 	void porta_w(uint8_t data);
 	void portb_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(irq_w);
+	void irq_w(int state);
 };
 
 // device type definition
 DECLARE_DEVICE_TYPE(MIDWAY_CHEAP_SQUEAK_DELUXE, midway_cheap_squeak_deluxe_device)
 
-#endif // MAME_AUDIO_CSD_H
+#endif // MAME_MIDWAY_CSD_H

@@ -29,10 +29,10 @@ public:
 
 	void set_video_irq_spidman(bool is_spiderman) { m_is_spiderman = is_spiderman; }
 
-	void map_video(address_map &map);
+	void map_video(address_map &map) ATTR_COLD;
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	DECLARE_WRITE_LINE_MEMBER(vblank);
+	void vblank(int state);
 
 	void spg110_201c_w(uint16_t data);
 	void spg110_2020_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
@@ -88,10 +88,10 @@ public:
 	auto write_video_irq_callback() { return m_video_irq_cb.bind(); }
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 	virtual space_config_vector memory_space_config() const override;
 

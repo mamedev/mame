@@ -16,14 +16,14 @@ class fga002_device :  public device_t
 	uint8_t read(offs_t offset);
 
 	void lirq_w(int status, int vector, int control, int state);
-	DECLARE_WRITE_LINE_MEMBER( lirq0_w );
-	DECLARE_WRITE_LINE_MEMBER( lirq1_w );
-	DECLARE_WRITE_LINE_MEMBER( lirq2_w );
-	DECLARE_WRITE_LINE_MEMBER( lirq3_w );
-	DECLARE_WRITE_LINE_MEMBER( lirq4_w );
-	DECLARE_WRITE_LINE_MEMBER( lirq5_w );
-	DECLARE_WRITE_LINE_MEMBER( lirq6_w );
-	DECLARE_WRITE_LINE_MEMBER( lirq7_w );
+	void lirq0_w(int state);
+	void lirq1_w(int state);
+	void lirq2_w(int state);
+	void lirq3_w(int state);
+	void lirq4_w(int state);
+	void lirq5_w(int state);
+	void lirq6_w(int state);
+	void lirq7_w(int state);
 
 	u16 iack();
 	int acknowledge();
@@ -49,8 +49,8 @@ class fga002_device :  public device_t
 	fga002_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 #if 0
 	// device_z80daisy_interface overrides
 	virtual int z80daisy_irq_state() override;

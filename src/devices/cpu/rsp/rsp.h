@@ -87,7 +87,6 @@ public:
 	rsp_device(const machine_config &mconfig, const char *_tag, device_t *_owner, uint32_t _clock);
 	virtual ~rsp_device() override;
 
-	void resolve_cb();
 	auto dp_reg_r() { return m_dp_reg_r_func.bind(); }
 	auto dp_reg_w() { return m_dp_reg_w_func.bind(); }
 	auto sp_reg_r() { return m_sp_reg_r_func.bind(); }
@@ -96,14 +95,13 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
-	virtual void device_stop() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+	virtual void device_stop() override ATTR_COLD;
 
 	// device_execute_interface overrides
 	virtual uint32_t execute_min_cycles() const noexcept override { return 1; }
 	virtual uint32_t execute_max_cycles() const noexcept override { return 1; }
-	virtual uint32_t execute_input_lines() const noexcept override { return 1; }
 	virtual void execute_run() override;
 	virtual void execute_set_input(int inputnum, int state) override { }
 

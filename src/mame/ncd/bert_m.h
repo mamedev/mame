@@ -1,8 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:Patrick Mackinlay
 
-#ifndef MAME_MACHINE_BERT_H
-#define MAME_MACHINE_BERT_H
+#ifndef MAME_NCD_BERT_M_H
+#define MAME_NCD_BERT_M_H
 
 #pragma once
 
@@ -14,12 +14,12 @@ public:
 
 	bert_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
-	void map(address_map &map);
+	void map(address_map &map) ATTR_COLD;
 	void set_qlc_mode(bool state);
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	u16 read(offs_t offset);
 	void write(offs_t offset, u16 data, u16 mem_mask);
@@ -37,4 +37,4 @@ private:
 
 DECLARE_DEVICE_TYPE(BERT, bert_device)
 
-#endif // MAME_MACHINE_BERT_H
+#endif // MAME_NCD_BERT_M_H

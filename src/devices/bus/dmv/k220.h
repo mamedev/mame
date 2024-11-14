@@ -26,13 +26,13 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// optional information overrides
-	virtual const tiny_rom_entry *device_rom_region() const override;
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual ioport_constructor device_input_ports() const override;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 
 	// dmvcart_interface overrides
 	virtual bool read(offs_t offset, uint8_t &data) override;
@@ -41,9 +41,9 @@ protected:
 private:
 	void porta_w(uint8_t data);
 	void portc_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(write_out0);
-	DECLARE_WRITE_LINE_MEMBER(write_out1);
-	DECLARE_WRITE_LINE_MEMBER(write_out2);
+	void write_out0(int state);
+	void write_out1(int state);
+	void write_out2(int state);
 
 	required_device<pit8253_device> m_pit;
 	required_device<i8255_device> m_ppi;

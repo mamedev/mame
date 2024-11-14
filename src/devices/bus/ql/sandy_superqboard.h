@@ -13,7 +13,6 @@
 
 #include "exp.h"
 #include "bus/centronics/ctronics.h"
-#include "formats/ql_dsk.h"
 #include "imagedev/floppy.h"
 #include "machine/wd_fdc.h"
 
@@ -38,19 +37,19 @@ protected:
 	sandy_superqboard_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int ram_size);
 
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// optional information overrides
-	virtual const tiny_rom_entry *device_rom_region() const override;
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 	// device_ql_expansion_card_interface overrides
 	virtual uint8_t read(offs_t offset, uint8_t data) override;
 	virtual void write(offs_t offset, uint8_t data) override;
 
 private:
-	WRITE_LINE_MEMBER( busy_w );
+	void busy_w(int state);
 
 	static void floppy_formats(format_registration &fr);
 
@@ -69,8 +68,7 @@ private:
 	void check_interrupt();
 
 	required_device<wd1772_device> m_fdc;
-	required_device<floppy_connector> m_floppy0;
-	required_device<floppy_connector> m_floppy1;
+	required_device_array<floppy_connector, 2> m_floppy;
 	required_device<centronics_device> m_centronics;
 	required_device<output_latch_device> m_latch;
 	required_memory_region m_rom;
@@ -104,7 +102,7 @@ public:
 	sandy_superqmouse_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// optional information overrides
-	virtual ioport_constructor device_input_ports() const override;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 };
 
 
@@ -117,7 +115,7 @@ public:
 	sandy_superqmouse_512k_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// optional information overrides
-	virtual ioport_constructor device_input_ports() const override;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 };
 
 

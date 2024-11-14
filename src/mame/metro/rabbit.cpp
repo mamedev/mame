@@ -80,7 +80,7 @@ Custom: Imagetek I5000 (2ch video & 2ch sound)
 */
 
 #include "emu.h"
-#include "cpu/m68000/m68000.h"
+#include "cpu/m68000/m68020.h"
 #include "machine/eepromser.h"
 #include "sound/i5000.h"
 #include "emupal.h"
@@ -89,14 +89,11 @@ Custom: Imagetek I5000 (2ch video & 2ch sound)
 #include "tilemap.h"
 
 
+namespace {
+
 class rabbit_state : public driver_device
 {
 public:
-	enum
-	{
-		TIMER_BLIT_DONE
-	};
-
 	rabbit_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
@@ -117,8 +114,8 @@ public:
 	void rabbit(machine_config &config);
 
 private:
-	virtual void machine_start() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 	TIMER_CALLBACK_MEMBER(blit_done);
 
@@ -135,7 +132,7 @@ private:
 	void blitter_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 	void eeprom_write(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 
-	void rabbit_map(address_map &map);
+	void rabbit_map(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
@@ -743,7 +740,7 @@ void rabbit_state::rabbit_map(address_map &map)
 
 static INPUT_PORTS_START( rabbit )
 	PORT_START("INPUTS")
-	PORT_BIT( 0x00000001, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read) // as per code at 4d932
+	PORT_BIT( 0x00000001, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", FUNC(eeprom_serial_93cxx_device::do_read)) // as per code at 4d932
 	PORT_BIT( 0x00000002, IP_ACTIVE_LOW, IPT_UNKNOWN ) // unlabeled in input test
 	PORT_BIT( 0x00000004, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x00000008, IP_ACTIVE_LOW, IPT_START2 )
@@ -1088,6 +1085,9 @@ ROM_START( rabbitjt )
 	ROM_REGION( 0x0800, "plds", 0 )
 	ROM_LOAD( "epm7032.u1",   0x0000, 0x0798, CRC(bb1c930e) SHA1(7513ed6a0d797276dab1e3446fe346a9c340e69d) ) // unprotected
 ROM_END
+
+} // anonymous namespace
+
 
 GAME( 1997, rabbit,   0,      rabbit,  rabbit, rabbit_state, empty_init, ROT0, "Aorn / Electronic Arts", "Rabbit (Asia 3/6)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // For use in Japan notice, English text, (C) 1997
 GAME( 1996, rabbita,  rabbit, rabbit,  rabbit, rabbit_state, empty_init, ROT0, "Aorn / Electronic Arts", "Rabbit (Asia 1/28?)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // For use in Japan notice, English text, (C) 1996

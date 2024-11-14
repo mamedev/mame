@@ -34,7 +34,7 @@ protected:
 
 	// device-level overrides
 	virtual void device_start() override ATTR_COLD;
-	virtual void device_reset() override;
+	virtual void device_reset() override ATTR_COLD;
 
 	// optional information overrides
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
@@ -60,10 +60,10 @@ protected:
 private:
 	uint8_t dmac_scsi_r(offs_t offset);
 	void dmac_scsi_w(offs_t offset, uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER( dmac_int_w );
-	DECLARE_WRITE_LINE_MEMBER( dmac_cfgout_w ) { cfgout_w(state); }
-	DECLARE_WRITE_LINE_MEMBER( scsi_irq_w );
-	DECLARE_WRITE_LINE_MEMBER( scsi_drq_w );
+	void dmac_int_w(int state);
+	void dmac_cfgout_w(int state) { cfgout_w(state); }
+	void scsi_irq_w(int state);
+	void scsi_drq_w(int state);
 
 	static void scsi_devices(device_slot_interface &device) ATTR_COLD;
 	void wd33c93(device_t *device);
@@ -80,7 +80,7 @@ public:
 protected:
 	// device-level overrides
 	virtual void device_start() override ATTR_COLD;
-	virtual void device_reset() override;
+	virtual void device_reset() override ATTR_COLD;
 
 	// optional information overrides
 	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
@@ -91,7 +91,7 @@ protected:
 	virtual void int6_w(int state) override { m_slot->int6_w(state); }
 
 	// input from slot
-	virtual DECLARE_WRITE_LINE_MEMBER( cfgin_w ) override;
+	virtual void cfgin_w(int state) override;
 
 private:
 	required_ioport m_dips;
@@ -111,7 +111,7 @@ public:
 protected:
 	// device-level overrides
 	virtual void device_start() override ATTR_COLD;
-	virtual void device_reset() override;
+	virtual void device_reset() override ATTR_COLD;
 
 	// optional information overrides
 	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
@@ -122,7 +122,7 @@ protected:
 	virtual void int6_w(int state) override { m_slot->int6_w(state); }
 
 	// input from slot
-	virtual DECLARE_WRITE_LINE_MEMBER( cfgin_w ) override;
+	virtual void cfgin_w(int state) override;
 
 private:
 	required_ioport m_jp1;

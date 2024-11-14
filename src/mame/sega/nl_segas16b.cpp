@@ -1,10 +1,11 @@
-// license:CC0
+// license:CC0-1.0
 // copyright-holders:Couriersud
 #include "netlist/devices/net_lib.h"
 
 //NL_CONTAINS segas16b_audio
 
 NETLIST_START(segas16b_audio)
+{
 	SOLVER(Solver, 48000)
 	//PARAM(Solver.DYNAMIC_TS, 1)
 
@@ -166,5 +167,5 @@ NETLIST_START(segas16b_audio)
 
 	NET_C(GND, XC20.13, XC20.12, D20.13, D20.12, D20.2, D20.3)
 	NET_C(GND, XC20.14, D20.14, D20.1)
-NETLIST_END()
+}
 

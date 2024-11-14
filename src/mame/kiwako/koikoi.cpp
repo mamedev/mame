@@ -47,6 +47,9 @@ to prevent disabling inputs.
 #include "speaker.h"
 #include "tilemap.h"
 
+
+namespace {
+
 #define KOIKOI_CRYSTAL 15468000
 
 static constexpr int input_tab[] = { 0x22, 0x64, 0x44, 0x68, 0x30, 0x50, 0x70, 0x48, 0x28, 0x21, 0x41, 0x82, 0x81, 0x42 };
@@ -81,15 +84,15 @@ private:
 	uint8_t input_r();
 	void unknown_w(uint8_t data);
 	TILE_GET_INFO_MEMBER(get_tile_info);
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 	void koikoi_palette(palette_device &palette) const;
 	uint32_t screen_update_koikoi(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
-	void koikoi_io_map(address_map &map);
-	void koikoi_map(address_map &map);
+	void koikoi_io_map(address_map &map) ATTR_COLD;
+	void koikoi_map(address_map &map) ATTR_COLD;
 };
 
 
@@ -431,6 +434,9 @@ ROM_START( koikoi )
 	ROM_LOAD( "pal16r8a_brown.ic11",   0x0600, 0x0104, CRC(fff46363) SHA1(97f673c862e9d5b12cac283000a779c465c76828) )
 	ROM_LOAD( "pal16r8a_red.ic10",     0x0800, 0x0104, CRC(027ad661) SHA1(fa5aafe6deb3a9865498152b92dd3776ea10a51d) )
 ROM_END
+
+} // anonymous namespace
+
 
 /*************************************
  *

@@ -23,6 +23,8 @@ DECLARE_DEVICE_TYPE(PSX_RCNT, psxrcnt_device)
 #define PSX_RC_REPEAT ( 0x40 )
 #define PSX_RC_CLC ( 0x100 )
 #define PSX_RC_DIV ( 0x200 )
+#define PSX_RC_REACHEDTARGET ( 0x800 )
+#define PSX_RC_REACHEDFFFF ( 0x1000 )
 
 class psxrcnt_device : public device_t
 {
@@ -38,8 +40,8 @@ public:
 	uint32_t read(offs_t offset, uint32_t mem_mask = ~0);
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 	virtual void device_post_load() override;
 
 	TIMER_CALLBACK_MEMBER( timer_update );

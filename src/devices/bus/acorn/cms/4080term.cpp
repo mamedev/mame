@@ -169,7 +169,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(cms_4080term_device::update_scanline)
 	m_ef9345->update_scanline((uint16_t)param);
 }
 
-WRITE_LINE_MEMBER(cms_4080term_device::bus_irq_w)
+void cms_4080term_device::bus_irq_w(int state)
 {
 	m_bus->irq_w(state);
 }

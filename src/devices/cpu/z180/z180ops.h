@@ -14,8 +14,15 @@
 #define LEAVE_HALT() {                                          \
 	if( m_HALT )                                                  \
 	{                                                           \
+		if( m_HALT == 2 )                                        \
+		{                                                       \
+			_PC += 2;                                           \
+		}                                                       \
+		else                                                    \
+		{                                                       \
+			_PC++;                                              \
+		}                                                       \
 		m_HALT = 0;                                               \
-		_PC++;                                                  \
 	}                                                           \
 }
 
@@ -177,7 +184,8 @@ uint32_t z180_device::ARG16()
 	}                                                           \
 	else                                                        \
 	{                                                           \
-		_PC += 2;                                             \
+		(void)ARG();                                            \
+		_PC++;                                                \
 	}
 
 /***************************************************************
@@ -193,13 +201,14 @@ uint32_t z180_device::ARG16()
  * JR_COND
  ***************************************************************/
 #define JR_COND(cond,opcode)                                    \
+{                                                               \
+	int8_t arg = (int8_t)ARG(); /* ARG() also increments _PC */   \
 	if( cond )                                                  \
 	{                                                           \
-		int8_t arg = (int8_t)ARG(); /* ARG() also increments _PC */ \
 		_PC += arg;           /* so don't do _PC += ARG() */  \
 		CC(ex,opcode);                                          \
 	}                                                           \
-	else _PC++;
+}
 /***************************************************************
  * CALL
  ***************************************************************/
@@ -221,7 +230,8 @@ uint32_t z180_device::ARG16()
 	}                                                           \
 	else                                                        \
 	{                                                           \
-		_PC+=2;                                               \
+		(void)ARG();                                            \
+		_PC++;                                                \
 	}
 
 /***************************************************************
@@ -952,6 +962,7 @@ uint8_t z180_device::SET(uint8_t bit, uint8_t value)
  * OTDMR
  ***************************************************************/
 #define SLP {                                                   \
+	_PC -= 2;                                                      \
 	m_icount = 0;                                           \
 	m_HALT = 2;                                                 \
 }

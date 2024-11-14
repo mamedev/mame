@@ -2,7 +2,7 @@
 // copyright-holders:Olivier Galibert
 /*********************************************************************
 
-    formats/dsk_dsk.c
+    formats/dsk_dsk.cpp
 
     DSK disk images
 
@@ -13,11 +13,16 @@
 #include "imageutl.h"
 
 #include "ioprocs.h"
+#include "multibyte.h"
+
+#include "osdcore.h" // osd_printf_*
 
 #include <cstring>
 
 #define MV_CPC      "MV - CPC"
 #define EXTENDED    "EXTENDED"
+
+#define SPOT_DUPLICATES 0
 
 struct dskdsk_tag
 {
@@ -99,10 +104,10 @@ static floperr_t get_offset(floppy_image_legacy *floppy, int head, int track, in
 		get_tag(floppy)->sector_size = (1<<(track_info[0x014]+7));
 		offs = track_offset + 0x100 +sector * get_tag(floppy)->sector_size;
 	} else {
-		get_tag(floppy)->sector_size = track_info[0x18 + (sector<<3) + 6] + (track_info[0x18+(sector<<3) + 7]<<8);
+		get_tag(floppy)->sector_size = get_u16le(&track_info[0x18 + (sector<<3) + 6]);
 		offs = track_offset + 0x100;
 		for (i=0;i<sector;i++) {
-			offs += track_info[0x18 + (i<<3) + 6] + (track_info[0x18+(i<<3) + 7]<<8);
+			offs += get_u16le(&track_info[0x18 + (i<<3) + 6]);
 		}
 	}
 
@@ -220,13 +225,14 @@ FLOPPY_CONSTRUCT( dsk_dsk_construct )
 	}
 
 	floppy_image_read(floppy, header, 0, 0x100);
-#ifdef SPOT_DUPLICATES
-	// this allow to spot .dsk files with same data and different headers, making easier to debug softlists.
-	uint32_t temp_size = floppy_image_size(floppy);
-	uint8_t tmp_copy[temp_size - 0x100];
-	floppy_image_read(floppy,tmp_copy,0x100,temp_size - 0x100);
-	printf("CRC16: %d\n", ccitt_crc16(0xffff, tmp_copy, temp_size - 0x100));
-#endif
+	if(SPOT_DUPLICATES)
+	{
+		// this allow to spot .dsk files with same data and different headers, making easier to debug softlists.
+		uint32_t temp_size = floppy_image_size(floppy);
+		auto tmp_copy = std::make_unique<uint8_t[]>(temp_size - 0x100);
+		floppy_image_read(floppy,tmp_copy.get(),0x100,temp_size - 0x100);
+		printf("CRC16: %d\n", ccitt_crc16(0xffff, tmp_copy.get(), temp_size - 0x100));
+	}
 
 	tag = (struct dskdsk_tag *) floppy_create_tag(floppy, sizeof(struct dskdsk_tag));
 	if (!tag)
@@ -246,7 +252,7 @@ FLOPPY_CONSTRUCT( dsk_dsk_construct )
 		for (i=0; i<tag->tracks * tag->heads; i++)
 		{
 			tag->track_offsets[cnt] = tmp;
-			tmp += pick_integer_le(header, 0x32, 2);
+			tmp += get_u16le(&header[0x32]);
 			cnt += skip;
 		}
 	} else  {
@@ -282,22 +288,22 @@ dsk_format::dsk_format() : floppy_image_format_t()
 {
 }
 
-const char *dsk_format::name() const
+const char *dsk_format::name() const noexcept
 {
 	return "dsk";
 }
 
-const char *dsk_format::description() const
+const char *dsk_format::description() const noexcept
 {
 	return "CPC DSK Format";
 }
 
-const char *dsk_format::extensions() const
+const char *dsk_format::extensions() const noexcept
 {
 	return "dsk";
 }
 
-bool dsk_format::supports_save() const
+bool dsk_format::supports_save() const noexcept
 {
 	return false;
 }
@@ -305,13 +311,14 @@ bool dsk_format::supports_save() const
 int dsk_format::identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants) const
 {
 	uint8_t header[16];
-
-	size_t actual;
-	io.read_at(0, &header, sizeof(header), actual);
-	if ( memcmp( header, DSK_FORMAT_HEADER, 8 ) ==0) {
+	auto const [err, actual] = read_at(io, 0, &header, sizeof(header));
+	if (err) {
+		return 0;
+	}
+	if ((8 <= actual) && !memcmp(header, DSK_FORMAT_HEADER, 8)) {
 		return FIFID_SIGN;
 	}
-	if ( memcmp( header, EXT_FORMAT_HEADER, 16 ) ==0) {
+	if ((16 <= actual) && !memcmp(header, EXT_FORMAT_HEADER, 16)) {
 		return FIFID_SIGN;
 	}
 	return 0;
@@ -348,10 +355,8 @@ struct sector_header
 
 #pragma pack()
 
-bool dsk_format::load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image) const
+bool dsk_format::load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image &image) const
 {
-	size_t actual;
-
 	uint8_t header[0x100];
 	bool extendformat = false;
 
@@ -359,7 +364,7 @@ bool dsk_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 	if (io.length(image_size))
 		return false;
 
-	io.read_at(0, &header, sizeof(header), actual);
+	read_at(io, 0, &header, sizeof(header)); // FIXME: check for errors and premature EOF
 	if ( memcmp( header, EXT_FORMAT_HEADER, 16 ) ==0) {
 		extendformat = true;
 	}
@@ -372,7 +377,7 @@ bool dsk_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 	int tracks  = header[0x30];
 
 	int img_tracks, img_heads;
-	image->get_maximal_geometry(img_tracks, img_heads);
+	image.get_maximal_geometry(img_tracks, img_heads);
 	if (tracks > img_tracks)
 	{
 		if (tracks - img_tracks > DUMP_THRESHOLD)
@@ -398,7 +403,7 @@ bool dsk_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 		for (int i=0; i<tracks * heads; i++)
 		{
 			track_offsets[cnt] = tmp;
-			tmp += pick_integer_le(header, 0x32, 2);
+			tmp += get_u16le(&header[0x32]);
 			cnt += skip;
 		}
 	} else  {
@@ -420,13 +425,12 @@ bool dsk_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 		}
 	}
 
-	int counter = 0;
 	for(int track=0; track < tracks; track++) {
 		for(int side=0; side < std::min(heads, img_heads); side++) {
 			if(track_offsets[(track<<1)+side] >= image_size)
 				continue;
 			track_header tr;
-			io.read_at(track_offsets[(track<<1)+side], &tr, sizeof(tr), actual);
+			read_at(io, track_offsets[(track<<1)+side], &tr, sizeof(tr)); // FIXME: check for errors and premature EOF
 
 			// skip if there are no sectors in this track
 			if (tr.number_of_sector == 0)
@@ -436,7 +440,7 @@ bool dsk_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 			int first_sector_code = -1;
 			for(int j=0;j<tr.number_of_sector;j++) {
 				sector_header sector;
-				io.read_at(track_offsets[(track<<1)+side]+sizeof(tr)+(sizeof(sector)*j), &sector, sizeof(sector), actual);
+				read_at(io, track_offsets[(track<<1)+side]+sizeof(tr)+(sizeof(sector)*j), &sector, sizeof(sector)); // FIXME: check for errors and premature EOF
 
 				if (j == 0)
 					first_sector_code = sector.sector_size_code;
@@ -455,7 +459,7 @@ bool dsk_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 
 			for(int j=0;j<tr.number_of_sector;j++) {
 				sector_header sector;
-				io.read_at(track_offsets[(track<<1)+side]+sizeof(tr)+(sizeof(sector)*j), &sector, sizeof(sector), actual);
+				read_at(io, track_offsets[(track<<1)+side]+sizeof(tr)+(sizeof(sector)*j), &sector, sizeof(sector)); // FIXME: check for errors and premature EOF
 
 				sects[j].track       = sector.track;
 				sects[j].head        = sector.side;
@@ -478,7 +482,7 @@ bool dsk_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 
 				if(!(sector.fdc_status_reg1 & 0x04)) {
 					sects[j].data = sect_data + sdatapos;
-					io.read_at(pos, sects[j].data, sects[j].actual_size, actual);
+					read_at(io, pos, sects[j].data, sects[j].actual_size); // FIXME: check for errors and premature EOF
 					sdatapos += sects[j].actual_size;
 
 				} else
@@ -491,7 +495,6 @@ bool dsk_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 			}
 			// larger cell count (was 100000) to allow for slightly out of spec images (theatre europe on einstein)
 			build_pc_track_mfm(track, side, image, 105000, tr.number_of_sector, sects, tr.gap3_length);
-			counter++;
 		}
 	}
 	return true;

@@ -523,4 +523,92 @@ _count_leading_ones_64(uint64_t value)
 }
 #endif
 
+
+/*-------------------------------------------------
+    rotl_32 - circularly shift a 32-bit value left
+    by the specified number of bits (modulo 32)
+-------------------------------------------------*/
+
+#define rotl_32 _rotl_32
+inline uint32_t ATTR_CONST ATTR_FORCE_INLINE
+_rotl_32(uint32_t val, int shift)
+{
+	uint32_t result;
+	__asm__ (
+		" roll %[shift], %[value] ;"
+		: [result] "=rm" (result)                   // result can be in register or memory
+		: [value]  "%0" (val)                       // 'value' is updated with result
+		, [shift]  "Ic" (uint8_t(unsigned(shift)))  // 'shift' must be constant in 0-31 range or in cl
+		: "cc"                                      // clobbers condition codes
+	);
+	return result;
+}
+
+
+/*-------------------------------------------------
+    rotr_32 - circularly shift a 32-bit value right
+    by the specified number of bits (modulo 32)
+-------------------------------------------------*/
+
+#define rotr_32 _rotr_32
+inline uint32_t ATTR_CONST ATTR_FORCE_INLINE
+rotr_32(uint32_t val, int shift)
+{
+	uint32_t result;
+	__asm__ (
+		" rorl %[shift], %[value] ;"
+		: [result] "=rm" (result)                   // result can be in register or memory
+		: [value]  "%0" (val)                       // 'value' is updated with result
+		, [shift]  "Ic" (uint8_t(unsigned(shift)))  // 'shift' must be constant in 0-31 range or in cl
+		: "cc"                                      // clobbers condition codes
+	);
+	return result;
+}
+
+
+/*-------------------------------------------------
+    rotl_64 - circularly shift a 64-bit value left
+    by the specified number of bits (modulo 64)
+-------------------------------------------------*/
+
+#ifdef __x86_64__
+#define rotl_64 _rotl_64
+inline uint64_t ATTR_CONST ATTR_FORCE_INLINE
+_rotl_64(uint64_t val, int shift)
+{
+	uint64_t result;
+	__asm__ (
+		" rolq %[shift], %[value] ;"
+		: [result] "=rm" (result)                   // result can be in register or memory
+		: [value]  "%0" (val)                       // 'value' is updated with result
+		, [shift]  "Jc" (uint8_t(unsigned(shift)))  // 'shift' must be constant in 0-63 range or in cl
+		: "cc"                                      // clobbers condition codes
+	);
+	return result;
+}
+#endif
+
+
+/*-------------------------------------------------
+    rotr_64 - circularly shift a 64-bit value right
+    by the specified number of bits (modulo 64)
+-------------------------------------------------*/
+
+#ifdef __x86_64__
+#define rotr_64 _rotr_64
+inline uint64_t ATTR_CONST ATTR_FORCE_INLINE
+rotr_64(uint64_t val, int shift)
+{
+	uint64_t result;
+	__asm__ (
+		" rorq %[shift], %[value] ;"
+		: [result] "=rm" (result)                   // result can be in register or memory
+		: [value]  "%0" (val)                       // 'value' is updated with result
+		, [shift]  "Jc" (uint8_t(unsigned(shift)))  // 'shift' must be constant in 0-63 range or in cl
+		: "cc"                                      // clobbers condition codes
+	);
+	return result;
+}
+#endif
+
 #endif // MAME_OSD_EIGCCX86_H

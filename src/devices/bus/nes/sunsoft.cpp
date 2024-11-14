@@ -27,14 +27,14 @@
 #include "sound/ay8910.h"
 #include "speaker.h"
 
+#define LOG_UNHANDLED (1U << 1)
 
 #ifdef NES_PCB_DEBUG
-#define VERBOSE 1
+#define VERBOSE (LOG_UNHANDLED | LOG_GENERAL)
 #else
-#define VERBOSE 0
+#define VERBOSE (LOG_UNHANDLED)
 #endif
-
-#define LOG_MMC(x) do { if (VERBOSE) logerror x; } while (0)
+#include "logmacro.h"
 
 
 //-------------------------------------------------
@@ -191,7 +191,7 @@ void nes_sunsoft_fme7_device::pcb_reset()
 
 void nes_sunsoft_1_device::write_m(offs_t offset, uint8_t data)
 {
-	LOG_MMC(("Sunsoft 1 write_m, offset: %04x, data: %02x\n", offset, data));
+	LOG("Sunsoft 1 write_m, offset: %04x, data: %02x\n", offset, data);
 
 	if (m_vrom_chunks)
 	{
@@ -218,7 +218,7 @@ void nes_sunsoft_1_device::write_m(offs_t offset, uint8_t data)
 void nes_sunsoft_2_device::write_h(offs_t offset, uint8_t data)
 {
 	uint8_t helper = (data & 0x07) | ((data & 0x80) ? 0x08 : 0x00);
-	LOG_MMC(("Sunsoft 2 write_h, offset: %04x, data: %02x\n", offset, data));
+	LOG("Sunsoft 2 write_h, offset: %04x, data: %02x\n", offset, data);
 
 	// this pcb is subject to bus conflict
 	data = account_bus_conflict(offset, data);
@@ -253,7 +253,7 @@ TIMER_CALLBACK_MEMBER(nes_sunsoft_3_device::irq_timer_tick)
 
 void nes_sunsoft_3_device::write_h(offs_t offset, uint8_t data)
 {
-	LOG_MMC(("Sunsoft 3 write_h, offset %04x, data: %02x\n", offset, data));
+	LOG("Sunsoft 3 write_h, offset %04x, data: %02x\n", offset, data);
 
 	switch (offset & 0x7800)
 	{
@@ -328,7 +328,7 @@ void nes_sunsoft_4_device::sun4_mirror()
 
 void nes_sunsoft_4_device::sun4_write(offs_t offset, u8 data)
 {
-	LOG_MMC(("Sunsoft 4 write_h, offset %04x, data: %02x\n", offset, data));
+	LOG("Sunsoft 4 write_h, offset %04x, data: %02x\n", offset, data);
 
 	switch (offset & 0x7000)
 	{
@@ -353,7 +353,7 @@ void nes_sunsoft_4_device::sun4_write(offs_t offset, u8 data)
 
 void nes_sunsoft_4_device::write_m(offs_t offset, u8 data)
 {
-	LOG_MMC(("Sunsoft 4 write_m, offset: %04x, data: %02x\n", offset, data));
+	LOG("Sunsoft 4 write_m, offset: %04x, data: %02x\n", offset, data);
 
 	if (m_wram_enable)
 		device_nes_cart_interface::write_m(offset, data);
@@ -361,7 +361,7 @@ void nes_sunsoft_4_device::write_m(offs_t offset, u8 data)
 
 u8 nes_sunsoft_4_device::read_m(offs_t offset)
 {
-	LOG_MMC(("Sunsoft 4 read_m, offset: %04x\n", offset));
+	LOG("Sunsoft 4 read_m, offset: %04x\n", offset);
 
 	if (m_wram_enable)
 		return device_nes_cart_interface::read_m(offset);
@@ -393,7 +393,7 @@ TIMER_CALLBACK_MEMBER(nes_sunsoft_fme7_device::irq_timer_tick)
 
 void nes_sunsoft_fme7_device::fme7_write(offs_t offset, uint8_t data)
 {
-	LOG_MMC(("fme7_write, offset %04x, data: %02x\n", offset, data));
+	LOG("fme7_write, offset %04x, data: %02x\n", offset, data);
 
 	switch (offset & 0x6000)
 	{
@@ -443,7 +443,7 @@ void nes_sunsoft_fme7_device::fme7_write(offs_t offset, uint8_t data)
 			break;
 
 		default:
-			logerror("Sunsoft FME7 write_h uncaught %04x value: %02x\n", offset + 0x8000, data);
+			LOGMASKED(LOG_UNHANDLED, "Sunsoft FME7 write_h uncaught %04x value: %02x\n", offset + 0x8000, data);
 			break;
 	}
 }
@@ -451,7 +451,7 @@ void nes_sunsoft_fme7_device::fme7_write(offs_t offset, uint8_t data)
 void nes_sunsoft_fme7_device::write_m(offs_t offset, uint8_t data)
 {
 	uint8_t bank = m_wram_bank & 0x3f;
-	LOG_MMC(("Sunsoft FME7 write_m, offset: %04x, data: %02x\n", offset, data));
+	LOG("Sunsoft FME7 write_m, offset: %04x, data: %02x\n", offset, data);
 
 	if (!(m_wram_bank & 0x40))  // is PRG ROM, no write
 		return;
@@ -467,7 +467,7 @@ void nes_sunsoft_fme7_device::write_m(offs_t offset, uint8_t data)
 uint8_t nes_sunsoft_fme7_device::read_m(offs_t offset)
 {
 	uint8_t bank = m_wram_bank & 0x3f;
-	LOG_MMC(("Sunsoft FME7 read_m, offset: %04x\n", offset));
+	LOG("Sunsoft FME7 read_m, offset: %04x\n", offset);
 
 	if (!(m_wram_bank & 0x40))  // is PRG ROM
 		return m_prg[((bank * 0x2000) + offset) & (m_prg_size - 1)];
@@ -495,7 +495,7 @@ uint8_t nes_sunsoft_fme7_device::read_m(offs_t offset)
 
 void nes_sunsoft_5_device::write_h(offs_t offset, uint8_t data)
 {
-	LOG_MMC(("sunsoft 5 write_h, offset %04x, data: %02x\n", offset, data));
+	LOG("sunsoft 5 write_h, offset %04x, data: %02x\n", offset, data);
 
 	switch (offset & 0x6000)
 	{

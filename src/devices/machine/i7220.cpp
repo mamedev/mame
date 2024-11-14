@@ -29,9 +29,8 @@
 #include "i7220.h"
 
 
-//#define LOG_GENERAL (1U <<  0) //defined in logmacro.h already
-#define LOG_REGISTER  (1U <<  1)
-#define LOG_DEBUG     (1U <<  2)
+#define LOG_REGISTER  (1U << 1)
+#define LOG_DEBUG     (1U << 2)
 
 //#define VERBOSE (LOG_DEBUG)
 //#define LOG_OUTPUT_FUNC printf
@@ -75,10 +74,6 @@ i7220_device::i7220_device(const machine_config &mconfig, const char *tag, devic
 
 void i7220_device::device_start()
 {
-	// resolve callbacks
-	intrq_cb.resolve_safe();
-	drq_cb.resolve_safe();
-
 	m_bi.tm = timer_alloc(FUNC(i7220_device::general_continue), this);
 
 	// register for state saving
@@ -108,13 +103,13 @@ void i7220_device::device_reset()
 	memset(&m_regs, 0, sizeof(m_regs));
 }
 
-image_init_result i7220_device::call_load()
+std::pair<std::error_condition, std::string> i7220_device::call_load()
 {
 	if (length() != (m_data_size * I7110_MBM_SIZE))
 	{
-		return image_init_result::FAIL;
+		return std::make_pair(image_error::INVALIDLENGTH, std::string());
 	}
-	return image_init_result::PASS;
+	return std::make_pair(std::error_condition(), std::string());
 }
 
 

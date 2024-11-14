@@ -13,19 +13,8 @@
 #include "emu.h"
 #include "namco_c123tmap.h"
 
-static const gfx_layout layout =
-{
-	8,8,
-	RGN_FRAC(1,1),
-	8,
-	{ STEP8(0,1) },
-	{ STEP8(0,8) },
-	{ STEP8(0,8*8) },
-	8*8*8
-};
-
 GFXDECODE_START( namco_c123tmap_device::gfxinfo )
-	GFXDECODE_DEVICE( DEVICE_SELF, 0, layout, 0, 32 )
+	GFXDECODE_DEVICE( DEVICE_SELF, 0, gfx_8x8x8_raw, 0, 32 )
 GFXDECODE_END
 
 DEFINE_DEVICE_TYPE(NAMCO_C123TMAP, namco_c123tmap_device, "namco_c123tmap", "Namco C123 (4x + 2x Tilemaps)")
@@ -43,7 +32,7 @@ namco_c123tmap_device::namco_c123tmap_device(const machine_config &mconfig, cons
 
 void namco_c123tmap_device::device_start()
 {
-	int size = m_tmap3_half_height ? 0x8000 : 0x10000;
+	const int size = m_tmap3_half_height ? 0x8000 : 0x10000;
 	m_tilemapinfo.videoram = std::make_unique<uint16_t[]>(size);
 
 	/* four scrolling tilemaps */
@@ -73,7 +62,7 @@ void namco_c123tmap_device::device_start()
 		if (i < 4)
 		{
 			static const int adj[4] = { 4,2,1,0 };
-			int dx = 44 + adj[i];
+			const int dx = 44 + adj[i];
 			m_tilemapinfo.tmap[i]->set_scrolldx(m_xoffs - dx, m_xoffs + 288 + dx);
 			m_tilemapinfo.tmap[i]->set_scrolldy(m_yoffs - 24, m_yoffs + 224 + 24);
 		}
@@ -97,14 +86,14 @@ void namco_c123tmap_device::mark_all_dirty(void)
 	{
 		m_tilemapinfo.tmap[i]->mark_all_dirty();
 	}
-} /* namco_tilemap_invalidate */
+} /* mark_all_dirty */
 
 template<int Offset>
 TILE_GET_INFO_MEMBER(namco_c123tmap_device::get_tile_info)
 {
 	const uint16_t *vram = &m_tilemapinfo.videoram[Offset];
 	int tile, mask;
-	m_tilemapinfo.cb(vram[tile_index], &tile, &mask);
+	m_tilemapinfo.cb(vram[tile_index], tile, mask);
 	tileinfo.mask_data = m_mask + mask * 8;
 	tileinfo.set(0, tile, 0, 0);
 } /* get_tile_info */
@@ -113,8 +102,9 @@ void namco_c123tmap_device::init_scroll(int flip) // 8 bit control with external
 {
 	for (int i = 0; i < 4; i++)
 	{
-		int scrollx = ((m_tilemapinfo.control[(i<<2)|0] & 0xff) << 8) | (m_tilemapinfo.control[(i<<2)|1] & 0xff);
-		int scrolly = ((m_tilemapinfo.control[(i<<2)|2] & 0xff) << 8) | (m_tilemapinfo.control[(i<<2)|3] & 0xff);
+		const int offs = i << 2;
+		int scrollx = ((m_tilemapinfo.control[offs | 0] & 0xff) << 8) | (m_tilemapinfo.control[offs | 1] & 0xff);
+		int scrolly = ((m_tilemapinfo.control[offs | 2] & 0xff) << 8) | (m_tilemapinfo.control[offs | 3] & 0xff);
 		if (flip)
 		{
 			scrollx = -scrollx;
@@ -139,7 +129,7 @@ void namco_c123tmap_device::draw(screen_device &screen, bitmap_ind16 &bitmap, co
 
 void namco_c123tmap_device::set_tilemap_videoram(int offset, uint16_t newword)
 {
-	int size = (m_tmap3_half_height ? 0x7000 : 0x8000) / 2;
+	const int size = (m_tmap3_half_height ? 0x7000 : 0x8000) / 2;
 	m_tilemapinfo.videoram[offset] = newword;
 	if (offset < size)
 	{
@@ -147,7 +137,7 @@ void namco_c123tmap_device::set_tilemap_videoram(int offset, uint16_t newword)
 	}
 	else if (((offset & 0x7ff / 2) >= 0x10 / 2) && ((offset & 0x7ff / 2) < 0x7f0 / 2))
 	{
-		int tile = (offset & 0x7ff / 2) - (0x10 / 2);
+		const int tile = (offset & 0x7ff / 2) - (0x10 / 2);
 		m_tilemapinfo.tmap[((offset >> 10) & 1) + 4]->mark_tile_dirty(tile);
 	}
 } /* set_tilemap_videoram */
@@ -167,7 +157,7 @@ uint16_t namco_c123tmap_device::videoram16_r(offs_t offset)
 
 void namco_c123tmap_device::control16_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
-	uint16_t old = m_tilemapinfo.control[offset];
+	const uint16_t old = m_tilemapinfo.control[offset];
 	data = COMBINE_DATA(&m_tilemapinfo.control[offset]);
 	if (old == data)
 		return;
@@ -180,24 +170,23 @@ void namco_c123tmap_device::control16_w(offs_t offset, uint16_t data, uint16_t m
 	{
 		m_tilemapinfo.tmap[offset & 7]->set_palette_offset(((data & 7) << 8) + m_color_base);
 	}
-	else if ((offset < 0x20 / 2) && (offset & 1))
+	else if ((offset < 0x20 / 2) && BIT(offset, 0))
 	{
 		if (offset == 0x02 / 2)
 		{
 			/* all planes are flipped X+Y from D15 of this word */
-			int attrs = (data & 0x8000) ? (TILEMAP_FLIPX | TILEMAP_FLIPY) : 0;
-			int i;
-			for (i = 0; i <= 5; i++)
+			const int attrs = BIT(data, 15) ? (TILEMAP_FLIPX | TILEMAP_FLIPY) : 0;
+			for (int i = 0; i <= 5; i++)
 			{
 				m_tilemapinfo.tmap[i]->set_flip(attrs);
 			}
 		}
 		data &= 0x1ff;
-		if (m_tilemapinfo.control[0x02 / 2] & 0x8000)
+		if (BIT(m_tilemapinfo.control[0x02 / 2], 15))
 		{
 			data = -data;
 		}
-		if (offset & 2)
+		if (BIT(offset, 1))
 			m_tilemapinfo.tmap[offset >> 2]->set_scrolly(0, data);
 		else
 			m_tilemapinfo.tmap[offset >> 2]->set_scrollx(0, data);
@@ -214,7 +203,7 @@ uint16_t namco_c123tmap_device::control16_r(offs_t offset)
 void namco_c123tmap_device::videoram8_w(offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	uint16_t newword = m_tilemapinfo.videoram[offset >> 1];
-	if (offset & 1)
+	if (BIT(offset, 0))
 		newword = (newword & ~mem_mask) | (data & mem_mask);
 	else
 		newword = (newword & ~(mem_mask << 8)) | ((data & mem_mask) << 8);
@@ -224,7 +213,7 @@ void namco_c123tmap_device::videoram8_w(offs_t offset, uint8_t data, uint8_t mem
 
 uint8_t namco_c123tmap_device::videoram8_r(offs_t offset)
 {
-	return m_tilemapinfo.videoram[offset >> 1] >> ((~offset & 1) << 3);
+	return m_tilemapinfo.videoram[offset >> 1] >> (BIT(~offset, 0) << 3);
 }
 
 void namco_c123tmap_device::control8_w(offs_t offset, uint8_t data)

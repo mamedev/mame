@@ -31,6 +31,8 @@
 #include "dc5.h"
 #include "machine/wd_fdc.h"
 #include "imagedev/floppy.h"
+#include "formats/cp68_dsk.h"
+#include "formats/fdos_dsk.h"
 #include "formats/flex_dsk.h"
 #include "formats/os9_dsk.h"
 #include "formats/uniflex_dsk.h"
@@ -42,10 +44,7 @@ public:
 		: device_t(mconfig, SS50_DC5, tag, owner, clock)
 		, ss50_card_interface(mconfig, *this)
 		, m_fdc(*this, "fdc")
-		, m_floppy0(*this, "fdc:0")
-		, m_floppy1(*this, "fdc:1")
-		, m_floppy2(*this, "fdc:2")
-		, m_floppy3(*this, "fdc:3")
+		, m_floppy(*this, "fdc:%u", 0U)
 		, m_interrupt_select(*this, "INTERRUPT_SELECT")
 		, m_address_mode(*this, "ADDRESS_MODE")
 		, m_two_control_regs(*this, "TWO_CONTROL_REGS")
@@ -63,18 +62,18 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(expected_clock_change);
 
 protected:
-	virtual ioport_constructor device_input_ports() const override;
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	virtual uint8_t register_read(offs_t offset) override;
 	virtual void register_write(offs_t offset, uint8_t data) override;
 
 private:
-	DECLARE_WRITE_LINE_MEMBER( fdc_intrq_w );
-	DECLARE_WRITE_LINE_MEMBER( fdc_drq_w );
-	DECLARE_WRITE_LINE_MEMBER( fdc_sso_w );
+	void fdc_intrq_w(int state);
+	void fdc_drq_w(int state);
+	void fdc_sso_w(int state);
 
 	static void floppy_formats(format_registration &fr);
 	uint8_t m_fdc_status;              // for floppy controller
@@ -96,10 +95,7 @@ private:
 	uint8_t validate_fdc_sector_size(uint8_t cmd);
 
 	required_device<wd2797_device> m_fdc;
-	required_device<floppy_connector> m_floppy0;
-	required_device<floppy_connector> m_floppy1;
-	required_device<floppy_connector> m_floppy2;
-	required_device<floppy_connector> m_floppy3;
+	required_device_array<floppy_connector, 4> m_floppy;
 	required_ioport m_interrupt_select;
 	required_ioport m_address_mode;
 	required_ioport m_two_control_regs;
@@ -136,7 +132,7 @@ static INPUT_PORTS_START( dc5 )
 	// generally needs the 'ready' line forced and Flex9 can use the index
 	// pulse detection to determine if disks are present.
 	PORT_START("FORCE_READY")
-	PORT_CONFNAME(0x1, 0, "Force ready") PORT_CHANGED_MEMBER(DEVICE_SELF, ss50_dc5_device, force_ready_change, 0)
+	PORT_CONFNAME(0x1, 0, "Force ready") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(ss50_dc5_device::force_ready_change), 0)
 	PORT_CONFSETTING(0, DEF_STR(No))
 	PORT_CONFSETTING(1, DEF_STR(Yes))
 
@@ -152,7 +148,7 @@ static INPUT_PORTS_START( dc5 )
 	// 3.5" HD  -  2.0MHz
 	// 8" 360rpm  -  2.4MHz
 	PORT_START("EXPECTED_CLOCK")
-	PORT_CONFNAME(0xf, 0, "FDC expected clock rate") PORT_CHANGED_MEMBER(DEVICE_SELF, ss50_dc5_device, expected_clock_change, 0)
+	PORT_CONFNAME(0xf, 0, "FDC expected clock rate") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(ss50_dc5_device::expected_clock_change), 0)
 	PORT_CONFSETTING(0, "-")
 	PORT_CONFSETTING(12, "1.0 MHz")
 	PORT_CONFSETTING(10, "1.2 MHz")
@@ -165,7 +161,7 @@ static INPUT_PORTS_START( dc5 )
 	// drive selection. These drivers need to be corrected, but this
 	// option helps identify this issue and work around it.
 	PORT_START("CTRL_REG_BIT7_SIDE_SELECT")
-	PORT_CONFNAME(0x1, 0, "Control register bit 7") PORT_CHANGED_MEMBER(DEVICE_SELF, ss50_dc5_device, ctrl_reg_bit7_side_select_change, 0)
+	PORT_CONFNAME(0x1, 0, "Control register bit 7") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(ss50_dc5_device::ctrl_reg_bit7_side_select_change), 0)
 	PORT_CONFSETTING(0, "Inhibits drive selection")
 	PORT_CONFSETTING(1, "Erroneous side select")
 
@@ -240,6 +236,8 @@ void ss50_dc5_device::floppy_formats(format_registration &fr)
 {
 	fr.add_mfm_containers();
 	fr.add(FLOPPY_FLEX_FORMAT);
+	fr.add(FLOPPY_CP68_FORMAT);
+	fr.add(FLOPPY_FDOS_FORMAT);
 	fr.add(FLOPPY_OS9_FORMAT);
 	fr.add(FLOPPY_UNIFLEX_FORMAT);
 }
@@ -264,10 +262,8 @@ static void flex_floppies(device_slot_interface &device)
 void ss50_dc5_device::device_add_mconfig(machine_config &config)
 {
 	WD2797(config, m_fdc, 12_MHz_XTAL / 12); // divider is selectable
-	FLOPPY_CONNECTOR(config, "fdc:0", flex_floppies, "sssd35", ss50_dc5_device::floppy_formats).enable_sound(true);
-	FLOPPY_CONNECTOR(config, "fdc:1", flex_floppies, "sssd35", ss50_dc5_device::floppy_formats).enable_sound(true);
-	FLOPPY_CONNECTOR(config, "fdc:2", flex_floppies, "sssd35", ss50_dc5_device::floppy_formats).enable_sound(true);
-	FLOPPY_CONNECTOR(config, "fdc:3", flex_floppies, "sssd35", ss50_dc5_device::floppy_formats).enable_sound(true);
+	for (auto &floppy : m_floppy)
+		FLOPPY_CONNECTOR(config, floppy, flex_floppies, "sssd35", ss50_dc5_device::floppy_formats).enable_sound(true);
 
 	m_fdc->intrq_wr_callback().set(FUNC(ss50_dc5_device::fdc_intrq_w));
 	m_fdc->drq_wr_callback().set(FUNC(ss50_dc5_device::fdc_drq_w));
@@ -499,7 +495,7 @@ uint8_t ss50_dc5_device::validate_fdc_sector_size(uint8_t cmd)
 	return cmd;
 }
 
-WRITE_LINE_MEMBER( ss50_dc5_device::fdc_intrq_w )
+void ss50_dc5_device::fdc_intrq_w(int state)
 {
 	if (state)
 		m_fdc_status |= 0x40;
@@ -514,7 +510,7 @@ WRITE_LINE_MEMBER( ss50_dc5_device::fdc_intrq_w )
 		write_firq(state);
 }
 
-WRITE_LINE_MEMBER( ss50_dc5_device::fdc_drq_w )
+void ss50_dc5_device::fdc_drq_w(int state)
 {
 	if (state)
 		m_fdc_status |= 0x80;
@@ -522,7 +518,7 @@ WRITE_LINE_MEMBER( ss50_dc5_device::fdc_drq_w )
 		m_fdc_status &= 0x7f;
 }
 
-WRITE_LINE_MEMBER( ss50_dc5_device::fdc_sso_w )
+void ss50_dc5_device::fdc_sso_w(int state)
 {
 	// The DC4 and DC5 invert the SSO output and wire it to the DDEN input
 	// to allow selection of single or double density.
@@ -601,10 +597,12 @@ void ss50_dc5_device::control_register_update()
 	// The floppy drives do not gate the motor based on the select input,
 	// so the motors run, or not, irrespective of the drive selection.
 	uint8_t motor = m_motor_timer_out ? CLEAR_LINE : ASSERT_LINE;
-	m_floppy0->get_device()->mon_w(motor);
-	m_floppy1->get_device()->mon_w(motor);
-	m_floppy2->get_device()->mon_w(motor);
-	m_floppy3->get_device()->mon_w(motor);
+	for (auto &floppy : m_floppy)
+	{
+		floppy_image_device *fd = floppy->get_device();
+		if (fd)
+			fd->mon_w(motor);
+	}
 
 	// The DC2, DC3, DC4, DC5 have a drive inhibit feature controlled by
 	// bit 7, and the drives are de-selected if the motor timer has timed
@@ -618,13 +616,7 @@ void ss50_dc5_device::control_register_update()
 	floppy_image_device *floppy = nullptr;
 
 	if ((bit7_side_select || !inhibit) && m_motor_timer_out)
-	{
-		uint8_t drive = m_control_register & 3;
-		if (drive == 0) floppy = m_floppy0->get_device();
-		if (drive == 1) floppy = m_floppy1->get_device();
-		if (drive == 2) floppy = m_floppy2->get_device();
-		if (drive == 3) floppy = m_floppy3->get_device();
-	}
+		floppy = m_floppy[m_control_register & 3]->get_device();
 
 	if (floppy != m_fdc_selected_floppy)
 	{

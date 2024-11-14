@@ -1,14 +1,14 @@
 // license:BSD-3-Clause
 // copyright-holders:Derrick Renaud
+
 /*************************************************************************
 
-    audio\videopin.c
+    atari\videopin_a.cpp
 
 *************************************************************************/
 #include "emu.h"
-#include "videopin.h"
-#include "sound/discrete.h"
 
+#include "videopin_a.h"
 
 /************************************************************************/
 /* videopin Sound System Analog emulation                               */
@@ -22,7 +22,7 @@
 
 DISCRETE_SOUND_START(videopin_discrete)
 /************************************************/
-	/* videopin  Effects Relataive Gain Table       */
+	/* videopin  Effects Relative Gain Table       */
 	/*                                              */
 	/* Effect  V-ampIn  Gain ratio        Relative  */
 	/* Vol0     3.8     10/(10+50)         1000.0   */
@@ -83,11 +83,11 @@ DISCRETE_SOUND_START(videopin_discrete)
 
 	/************************************************/
 	/* Bell is Hsync/16 with an R/C decay amplitude */
-	/* the 1uF cap is rapidally charged when BELL   */
-	/* is enabled, then dischaged through the 1M    */
+	/* the 1uF cap is rapidly charged when BELL     */
+	/* is enabled, then discharged through the 1M   */
 	/* resistor when disabled.                      */
 	/* We use 180 phase because of inverter Q17,    */
-	/* but it rally has no effect on sound.         */
+	/* but it really has no effect on sound.        */
 	/************************************************/
 	DISCRETE_RCDISC2(NODE_30, VIDEOPIN_BELL_EN, 740.2, 1, 0, 1e6, 1e-6)
 	DISCRETE_SQUAREWFIX(VIDEOPIN_BELL_SND, VIDEOPIN_BELL_EN, 15750.0/16.0, NODE_30, 50.0, 0, 180.0)

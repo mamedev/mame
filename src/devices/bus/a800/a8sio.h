@@ -62,23 +62,23 @@ public:
 
 	device_a8sio_card_interface *get_a8sio_card();
 
-	DECLARE_WRITE_LINE_MEMBER( clock_in_w );  // pin 1
-	DECLARE_WRITE_LINE_MEMBER( clock_out_w ); // pin 2
-	DECLARE_WRITE_LINE_MEMBER( data_in_w );   // pin 3
-	DECLARE_WRITE_LINE_MEMBER( data_out_w );  // pin 5
-	DECLARE_WRITE_LINE_MEMBER( command_w );   // pin 7
-	DECLARE_WRITE_LINE_MEMBER( motor_w );     // pin 8
-	DECLARE_WRITE_LINE_MEMBER( proceed_w );   // pin 9
-	void audio_in_w(uint8_t data);            // pin 11
-	DECLARE_WRITE_LINE_MEMBER( interrupt_w ); // pin 13
+	void clock_in_w(int state);    // pin 1
+	void clock_out_w(int state);   // pin 2
+	void data_in_w(int state);     // pin 3
+	void data_out_w(int state);    // pin 5
+	void command_w(int state);     // pin 7
+	void motor_w(int state);       // pin 8
+	void proceed_w(int state);     // pin 9
+	void audio_in_w(uint8_t data); // pin 11
+	void interrupt_w(int state);   // pin 13
 
 protected:
 	a8sio_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	// device-level overrides
-	virtual void device_resolve_objects() override;
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_resolve_objects() override ATTR_COLD;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	devcb_write_line    m_out_clock_in_cb; // pin 1
 	devcb_write_line    m_out_data_in_cb; // pin 3
@@ -102,11 +102,11 @@ public:
 
 	void set_a8sio_device(a8sio_device *sio);
 
-	virtual DECLARE_WRITE_LINE_MEMBER( clock_out_w );
-	virtual DECLARE_WRITE_LINE_MEMBER( data_out_w );
-	virtual DECLARE_WRITE_LINE_MEMBER( command_w );
-	virtual DECLARE_WRITE_LINE_MEMBER( motor_w );
-	virtual DECLARE_WRITE_LINE_MEMBER( ready_w );
+	virtual void clock_out_w(int state);
+	virtual void data_out_w(int state);
+	virtual void command_w(int state);
+	virtual void motor_w(int state);
+	virtual void ready_w(int state);
 
 public:
 	device_a8sio_card_interface(const machine_config &mconfig, device_t &device);

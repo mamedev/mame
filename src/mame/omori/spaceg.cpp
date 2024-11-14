@@ -173,6 +173,8 @@ Notes:
 #include "speaker.h"
 
 
+namespace {
+
 /*************************************
  *
  *  Driver data
@@ -226,7 +228,7 @@ private:
 	void spaceg_palette(palette_device &palette) const;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void spaceg_map(address_map &map);
+	void spaceg_map(address_map &map) ATTR_COLD;
 };
 
 void spaceg_state::driver_start()
@@ -575,6 +577,8 @@ ROM_START( spaceg )
 	ROM_LOAD( "74s288.6a", 0x0000, 0x0020, CRC(ae1f4acd) SHA1(1d502b61db73cf6a4ac3d235455a5c464f12652a) )
 	ROM_LOAD( "74s288.6b", 0x0020, 0x0020, CRC(ae1f4acd) SHA1(1d502b61db73cf6a4ac3d235455a5c464f12652a) )
 ROM_END
+
+} // anonymous namespace
 
 
 /*************************************

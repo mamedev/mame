@@ -6,8 +6,8 @@
 
 ***************************************************************************/
 
-#ifndef MAME_MACHINE_HDS200_KBD_H
-#define MAME_MACHINE_HDS200_KBD_H
+#ifndef MAME_HDS_HDS200_KBD_H
+#define MAME_HDS_HDS200_KBD_H
 
 #pragma once
 
@@ -38,10 +38,10 @@ public:
 
 protected:
 	// device_t overrides
-	virtual ioport_constructor device_input_ports() const override;
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// device_buffered_serial_interface overrides
 	virtual void tra_callback() override;
@@ -63,4 +63,4 @@ private:
 // device type definition
 DECLARE_DEVICE_TYPE(HDS200_KBD_HLE, hds200_kbd_hle_device)
 
-#endif // MAME_MACHINE_HDS200_KBD_H
+#endif // MAME_HDS_HDS200_KBD_H

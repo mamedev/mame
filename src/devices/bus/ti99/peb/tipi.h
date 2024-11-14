@@ -19,6 +19,7 @@
 #include "client_ws.hpp"
 
 #include <queue>
+#include <mutex>
 
 namespace bus::ti99::peb {
 
@@ -37,8 +38,8 @@ public:
 	void cruwrite(offs_t offset, uint8_t data) override;
 
 private:
-	void device_start() override;
-	void device_reset() override;
+	void device_start() override ATTR_COLD;
+	void device_reset() override ATTR_COLD;
 	void device_stop() override;
 	ioport_constructor device_input_ports() const override;
 	const tiny_rom_entry *device_rom_region() const override;
@@ -51,12 +52,13 @@ private:
 	void websocket_incoming(std::shared_ptr<webpp::ws_client::Message> message);
 	void websocket_error(const std::error_code& code);
 	void websocket_closed(int i, const std::string& msg);
+	void websocket_debug(const char* msg, int i);
+
 	TIMER_CALLBACK_MEMBER(open_websocket);
 
 	void send(const char* message);
 	void send(u8* message, int len);
-	void process_message();
-	void set_td(u8 data);
+	u8 get_rd();
 	void set_tc(u8 data);
 
 	required_device<tipi_attached_device> m_rpi;
@@ -80,9 +82,12 @@ private:
 	int m_attempts;
 	bool m_connected;
 	bool m_rpiconn;
+	int m_pausetime;
 
 	// Incoming queue
 	std::queue<u8> m_indqueue;
+	std::mutex m_mutex;
+	bool m_pending_read;
 
 	// Computer interface
 	u8 m_tc;
@@ -114,7 +119,7 @@ public:
 protected:
 	void device_start() override { }
 	void call_unload() override;
-	image_init_result call_load() override;
+	std::pair<std::error_condition, std::string> call_load() override;
 };
 
 

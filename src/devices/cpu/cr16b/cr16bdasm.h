@@ -40,8 +40,7 @@ protected:
 	void format_disp16(std::ostream &stream, u16 disp);
 	void format_disp18(std::ostream &stream, u32 disp);
 	void format_abs18(std::ostream &stream, u32 addr);
-	void format_pc_disp5(std::ostream &stream, offs_t pc, u8 disp);
-	void format_pc_disp9(std::ostream &stream, offs_t pc, u16 disp);
+	void format_pc(std::ostream &stream, offs_t pc);
 	void format_pc_disp17(std::ostream &stream, offs_t pc, u32 disp);
 	void format_pc_disp21(std::ostream &stream, offs_t pc, u32 disp);
 	void format_excp_vector(std::ostream &stream, u8 vec);

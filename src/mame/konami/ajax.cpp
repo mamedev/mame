@@ -15,7 +15,6 @@
 #include "emu.h"
 
 #include "konamipt.h"
-#include "k051316.h"
 #include "k051960.h"
 #include "k052109.h"
 #include "konami_helper.h"
@@ -27,13 +26,14 @@
 #include "machine/watchdog.h"
 #include "sound/k007232.h"
 #include "sound/ymopm.h"
+#include "video/k051316.h"
 
 #include "emupal.h"
 #include "speaker.h"
 
 
 // configurable logging
-#define LOG_LS138     (1U <<  1)
+#define LOG_LS138     (1U << 1)
 
 //#define VERBOSE (LOG_GENERAL | LOG_LS138)
 
@@ -70,8 +70,8 @@ public:
 	void ajax(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	// devices
@@ -114,13 +114,11 @@ private:
 	K052109_CB_MEMBER(tile_callback);
 	K051960_CB_MEMBER(sprite_callback);
 
-	void main_map(address_map &map);
-	void sound_map(address_map &map);
-	void sub_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
+	void sound_map(address_map &map) ATTR_COLD;
+	void sub_map(address_map &map) ATTR_COLD;
 };
 
-
-// video
 
 /***************************************************************************
 
@@ -207,8 +205,6 @@ uint32_t ajax_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, 
 	return 0;
 }
 
-
-// machine
 
 /*  main_bankswitch_w:
     Handled by the LS273 Octal +ve edge trigger D-type Flip-flop with Reset at H11:
@@ -554,7 +550,7 @@ void ajax_state::volume_callback1(uint8_t data)
 void ajax_state::ajax(machine_config &config)
 {
 	// basic machine hardware
-	KONAMI(config, m_maincpu, XTAL(24'000'000) / 2 / 4);    // 052001 12/4 MHz
+	KONAMI(config, m_maincpu, XTAL(24'000'000) / 2);    // 052001 12/4 MHz
 	m_maincpu->set_addrmap(AS_PROGRAM, &ajax_state::main_map);
 
 	HD6309E(config, m_subcpu, 3000000); // ?

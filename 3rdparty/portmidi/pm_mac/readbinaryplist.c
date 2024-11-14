@@ -156,7 +156,7 @@ static void *allocate(size_t size)
     return result;
 }
 
-void bplist_free_data()
+void bplist_free_data(void)
 {
     while (block_list) {
         void *next = *(void **)block_list;

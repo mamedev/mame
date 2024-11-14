@@ -42,7 +42,6 @@ namespace netlist
 		void net_c();
 		void frontier();
 		void device(const pstring &dev_type);
-		void netdev_netlist_end();
 		void net_model();
 		void net_sub_model();
 		void net_include();
@@ -61,6 +60,8 @@ namespace netlist
 
 		token_id_t m_tok_paren_left;
 		token_id_t m_tok_paren_right;
+		token_id_t m_tok_brace_left;
+		token_id_t m_tok_brace_right;
 		token_id_t m_tok_comma;
 		token_id_t m_tok_static;
 		token_id_t m_tok_ALIAS;
@@ -73,7 +74,6 @@ namespace netlist
 		token_id_t m_tok_NET_MODEL;
 		token_id_t m_tok_NET_REGISTER_DEV;
 		token_id_t m_tok_NETLIST_START;
-		token_id_t m_tok_NETLIST_END;
 		token_id_t m_tok_NETLIST_EXTERNAL;
 		token_id_t m_tok_SUBMODEL;
 		token_id_t m_tok_INCLUDE;
@@ -81,8 +81,7 @@ namespace netlist
 		token_id_t m_tok_LOCAL_SOURCE;
 		token_id_t m_tok_LOCAL_LIB_ENTRY;
 		token_id_t m_tok_EXTERNAL_LIB_ENTRY;
-		token_id_t m_tok_TRUTHTABLE_START;
-		token_id_t m_tok_TRUTHTABLE_END;
+		token_id_t m_tok_TRUTH_TABLE;
 		token_id_t m_tok_TRUTHTABLE_ENTRY;
 		token_id_t m_tok_TT_HEAD;
 		token_id_t m_tok_TT_LINE;

@@ -202,13 +202,15 @@ spv_result_t ValidateBinaryUsingContextAndValidationState(
                  /* diagnostic = */ nullptr);
 
   // Parse the module and perform inline validation checks. These checks do
-  // not require the the knowledge of the whole module.
+  // not require the knowledge of the whole module.
   if (auto error = spvBinaryParse(&context, vstate, words, num_words,
                                   /*parsed_header =*/nullptr,
                                   ProcessInstruction, pDiagnostic)) {
     return error;
   }
 
+  bool has_mask_task_nv = false;
+  bool has_mask_task_ext = false;
   std::vector<Instruction*> visited_entry_points;
   for (auto& instruction : vstate->ordered_instructions()) {
     {
@@ -219,9 +221,7 @@ spv_result_t ValidateBinaryUsingContextAndValidationState(
       if (inst->opcode() == SpvOpEntryPoint) {
         const auto entry_point = inst->GetOperandAs<uint32_t>(1);
         const auto execution_model = inst->GetOperandAs<SpvExecutionModel>(0);
-        const char* str = reinterpret_cast<const char*>(
-            inst->words().data() + inst->operand(2).offset);
-        const std::string desc_name(str);
+        const std::string desc_name = inst->GetOperandAs<std::string>(2);
 
         ValidationState_t::EntryPointDescription desc;
         desc.name = desc_name;
@@ -237,9 +237,8 @@ spv_result_t ValidateBinaryUsingContextAndValidationState(
           for (const Instruction* check_inst : visited_entry_points) {
             const auto check_execution_model =
                 check_inst->GetOperandAs<SpvExecutionModel>(0);
-            const char* check_str = reinterpret_cast<const char*>(
-                check_inst->words().data() + inst->operand(2).offset);
-            const std::string check_name(check_str);
+            const std::string check_name =
+                check_inst->GetOperandAs<std::string>(2);
 
             if (desc_name == check_name &&
                 execution_model == check_execution_model) {
@@ -250,6 +249,11 @@ spv_result_t ValidateBinaryUsingContextAndValidationState(
           }
         }
         visited_entry_points.push_back(inst);
+
+        has_mask_task_nv |= (execution_model == SpvExecutionModelTaskNV ||
+                             execution_model == SpvExecutionModelMeshNV);
+        has_mask_task_ext |= (execution_model == SpvExecutionModelTaskEXT ||
+                              execution_model == SpvExecutionModelMeshEXT);
       }
       if (inst->opcode() == SpvOpFunctionCall) {
         if (!vstate->in_function_body()) {
@@ -295,6 +299,17 @@ spv_result_t ValidateBinaryUsingContextAndValidationState(
   if (vstate->in_function_body())
     return vstate->diag(SPV_ERROR_INVALID_LAYOUT, nullptr)
            << "Missing OpFunctionEnd at end of module.";
+
+  if (vstate->HasCapability(SpvCapabilityBindlessTextureNV) &&
+      !vstate->has_samplerimage_variable_address_mode_specified())
+    return vstate->diag(SPV_ERROR_INVALID_LAYOUT, nullptr)
+           << "Missing required OpSamplerImageAddressingModeNV instruction.";
+
+  if (has_mask_task_ext && has_mask_task_nv)
+    return vstate->diag(SPV_ERROR_INVALID_LAYOUT, nullptr)
+           << vstate->VkErrorID(7102)
+           << "Module can't mix MeshEXT/TaskEXT with MeshNV/TaskNV Execution "
+              "Model.";
 
   // Catch undefined forward references before performing further checks.
   if (auto error = ValidateForwardDecls(*vstate)) return error;
@@ -348,10 +363,13 @@ spv_result_t ValidateBinaryUsingContextAndValidationState(
     if (auto error = NonUniformPass(*vstate, &instruction)) return error;
 
     if (auto error = LiteralsPass(*vstate, &instruction)) return error;
+    if (auto error = RayQueryPass(*vstate, &instruction)) return error;
+    if (auto error = RayTracingPass(*vstate, &instruction)) return error;
+    if (auto error = MeshShadingPass(*vstate, &instruction)) return error;
   }
 
   // Validate the preconditions involving adjacent instructions. e.g. SpvOpPhi
-  // must only be preceeded by SpvOpLabel, SpvOpPhi, or SpvOpLine.
+  // must only be preceded by SpvOpLabel, SpvOpPhi, or SpvOpLine.
   if (auto error = ValidateAdjacency(*vstate)) return error;
 
   if (auto error = ValidateEntryPoints(*vstate)) return error;

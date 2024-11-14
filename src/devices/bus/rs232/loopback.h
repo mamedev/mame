@@ -13,12 +13,12 @@ class rs232_loopback_device : public device_t, public device_rs232_port_interfac
 public:
 	rs232_loopback_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual WRITE_LINE_MEMBER( input_txd ) override;
-	virtual WRITE_LINE_MEMBER( input_rts ) override;
-	virtual WRITE_LINE_MEMBER( input_dtr ) override;
+	virtual void input_txd(int state) override;
+	virtual void input_rts(int state) override;
+	virtual void input_dtr(int state) override;
 
 protected:
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 };
 
 class dec_rs232_loopback_device : public device_t, public device_rs232_port_interface
@@ -26,13 +26,13 @@ class dec_rs232_loopback_device : public device_t, public device_rs232_port_inte
 public:
 	dec_rs232_loopback_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual WRITE_LINE_MEMBER( input_txd ) override;
-	virtual WRITE_LINE_MEMBER( input_rts ) override;
-	virtual WRITE_LINE_MEMBER( input_dtr ) override;
-	virtual WRITE_LINE_MEMBER( input_spds ) override;
+	virtual void input_txd(int state) override;
+	virtual void input_rts(int state) override;
+	virtual void input_dtr(int state) override;
+	virtual void input_spds(int state) override;
 
 protected:
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 };
 
 DECLARE_DEVICE_TYPE(RS232_LOOPBACK, rs232_loopback_device)

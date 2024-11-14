@@ -16,6 +16,8 @@
 #include "screen.h"
 
 
+namespace {
+
 #define MAX_POINTS 2048
 
 class galaxygame_state : public driver_device
@@ -56,13 +58,13 @@ private:
 	uint16_t y_r();
 	void y_w(uint16_t data);
 	void clk_w(uint16_t data);
-	virtual void machine_reset() override;
+	virtual void machine_reset() override ATTR_COLD;
 	uint32_t screen_update_galaxygame(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(galaxygame_irq);
 	uint8_t galaxygame_irq_callback(offs_t offset);
 	required_device<t11_device> m_maincpu;
 	required_device<palette_device> m_palette;
-	void galaxygame_map(address_map &map);
+	void galaxygame_map(address_map &map) ATTR_COLD;
 };
 
 /*************************************
@@ -464,5 +466,8 @@ void galaxygame_state::init_galaxygame()
 	main.write_word(6, 000167); /* JMP 0500*/
 	main.write_word(8, 000500 - 10);
 }
+
+} // anonymous namespace
+
 
 GAME(1971, galgame, 0, galaxygame, galaxygame, galaxygame_state, init_galaxygame, ROT270, "Computer Recreations, Inc", "Galaxy Game", MACHINE_NO_SOUND_HW )

@@ -107,7 +107,7 @@ ioport_constructor namcoio_gearbox_device::device_input_ports() const
 
 //static const ioport_value gearbox_table[] = { 0x0f, 0x0a, 0x09, 0x0e, 0x0d, 0x06, 0x05 };
 
-CUSTOM_INPUT_MEMBER( namcoio_gearbox_device::in_r )
+ioport_value namcoio_gearbox_device::in_r()
 {
 	if(ioport("CONFIG")->read() & 1)
 		return ioport("GEARBOX")->read() & 0xf;
@@ -129,7 +129,7 @@ CUSTOM_INPUT_MEMBER( namcoio_gearbox_device::in_r )
 	return 0xf; // return neutral while changing gear
 }
 
-READ_LINE_MEMBER( namcoio_gearbox_device::clutch_r )
+int namcoio_gearbox_device::clutch_r()
 {
 	return ioport("CLUTCH")->read() & 1;
 }

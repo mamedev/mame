@@ -4,7 +4,7 @@
 
   This is a simplified version of the zexall driver, merely as an example for a standalone
   emulator build. Video terminal and user interface is removed. For full notes and proper
-  emulation driver, see src/drivers/zexall.cpp.
+  emulation driver, see src/mame/homebrew/zexall.cpp.
 
 ******************************************************************************/
 
@@ -16,8 +16,8 @@
 class zexall_state : public driver_device
 {
 public:
-	zexall_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	zexall_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_main_ram(*this, "main_ram")
 	{
@@ -30,8 +30,9 @@ public:
 	void output_req_w(uint8_t data);
 	void output_data_w(uint8_t data);
 
-	void z80_mem(address_map &map);
+	void z80_mem(address_map &map) ATTR_COLD;
 	void zexall(machine_config &config);
+
 private:
 	required_device<cpu_device> m_maincpu;
 	required_shared_ptr<uint8_t> m_main_ram;
@@ -41,7 +42,7 @@ private:
 	uint8_t m_out_ack; // byte written to 0xFFFC
 	std::string terminate_string;
 
-	virtual void machine_reset() override;
+	virtual void machine_reset() override ATTR_COLD;
 };
 
 

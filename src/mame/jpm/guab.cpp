@@ -36,11 +36,10 @@
 
 #include "emu.h"
 
-#include "bacta_datalogger.h"
-
 #include "cpu/m68000/m68000.h"
 #include "formats/guab_dsk.h"
 #include "imagedev/floppy.h"
+#include "machine/bacta_datalogger.h"
 #include "machine/6840ptm.h"
 #include "machine/6850acia.h"
 #include "machine/clock.h"
@@ -57,6 +56,8 @@
 
 #include "guab.lh"
 
+
+namespace {
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -81,7 +82,7 @@ public:
 	void guab(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	EF9369_COLOR_UPDATE(ef9369_color_update);
@@ -103,7 +104,7 @@ private:
 
 	static void floppy_formats(format_registration &fr);
 
-	void guab_map(address_map &map);
+	void guab_map(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<tms34061_device> m_tms34061;
@@ -557,6 +558,8 @@ ROM_START( tenup )
 	ROM_LOAD16_BYTE( "tu-13.bin", 0x10000, 0x8000, CRC(d19e2bf7) SHA1(76a9cbd4f604ad39eb0e319a9a6d5a6739b0ed8c) )
 	ROM_LOAD16_BYTE( "tu-14.bin", 0x10001, 0x8000, CRC(fd8a0c3c) SHA1(f87289ce6f0d2bc9b7d3a0b6deff38ba3aadf391) )
 ROM_END
+
+} // anonymous namespace
 
 
 //**************************************************************************

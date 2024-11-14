@@ -6,9 +6,6 @@
 //
 //============================================================
 
-#include "emu.h"
-#include <string>
-
 #include "suppressorreader.h"
 
 #include "suppressor.h"
@@ -24,7 +21,7 @@ const suppressor_reader::string_to_enum suppressor_reader::COMBINE_NAMES[suppres
 	{ "or",  bgfx_suppressor::combine_mode::COMBINE_OR }
 };
 
-bgfx_suppressor* suppressor_reader::read_from_value(const Value& value, std::string prefix, std::map<std::string, bgfx_slider*>& sliders)
+bgfx_suppressor* suppressor_reader::read_from_value(const Value& value, const std::string &prefix, std::map<std::string, bgfx_slider*>& sliders)
 {
 	if (!validate_parameters(value, prefix))
 	{
@@ -61,7 +58,7 @@ bgfx_suppressor* suppressor_reader::read_from_value(const Value& value, std::str
 	if (slider_count > 1)
 	{
 		get_values(value, prefix, "value", values, slider_count);
-		if (!READER_CHECK(slider_count == value["value"].GetArray().Size(), (prefix + "Expected " + std::to_string(slider_count) + " values, got " + std::to_string(value["value"].GetArray().Size()) + "\n").c_str())) return nullptr;
+		if (!READER_CHECK(slider_count == value["value"].GetArray().Size(), "%sExpected %d values, got %u\n", prefix, slider_count, value["value"].GetArray().Size())) return nullptr;
 		for (int index = 1; index < slider_count; index++)
 		{
 			check_sliders.push_back(sliders[name + std::to_string(index)]);
@@ -72,26 +69,25 @@ bgfx_suppressor* suppressor_reader::read_from_value(const Value& value, std::str
 		values[0] = get_int(value, "value", 0);
 	}
 
-	return new bgfx_suppressor(check_sliders, condition, mode, values);
+	return new bgfx_suppressor(std::move(check_sliders), condition, mode, values);
 }
 
-bool suppressor_reader::validate_parameters(const Value& value, std::string prefix)
+bool suppressor_reader::validate_parameters(const Value& value, const std::string &prefix)
 {
-	if (!READER_CHECK(value["type"].IsString(), (prefix + "Value 'type' must be a string\n").c_str())) return false;
-	if (!READER_CHECK(value.HasMember("name"), (prefix + "Must have string value 'name'\n").c_str())) return false;
-	if (!READER_CHECK(value["name"].IsString(), (prefix + "Value 'name' must be a string\n").c_str())) return false;
-	if (!READER_CHECK(value.HasMember("value"), (prefix + "Must have numeric or array value 'value'\n").c_str())) return false;
-	if (!READER_CHECK(value["value"].IsNumber() || value["value"].IsArray(), (prefix + "Value 'value' must be a number or array the size of the corresponding slider type\n").c_str())) return false;
+	if (!READER_CHECK(value["type"].IsString(), "%sValue 'type' must be a string\n", prefix)) return false;
+	if (!READER_CHECK(value.HasMember("name"), "%sMust have string value 'name'\n", prefix)) return false;
+	if (!READER_CHECK(value["name"].IsString(), "%sValue 'name' must be a string\n", prefix)) return false;
+	if (!READER_CHECK(value.HasMember("value"), "%sMust have numeric or array value 'value'\n", prefix)) return false;
+	if (!READER_CHECK(value["value"].IsNumber() || value["value"].IsArray(), "%sValue 'value' must be a number or array the size of the corresponding slider type\n", prefix)) return false;
 	return true;
 }
 
 bool suppressor_reader::get_values(const Value& value, std::string prefix, std::string name, int* values, const int count)
 {
-	const char* name_str = name.c_str();
-	const Value& value_array = value[name_str];
+	const Value& value_array = value[name.c_str()];
 	for (uint32_t i = 0; i < value_array.Size() && i < count; i++)
 	{
-		if (!READER_CHECK(value_array[i].IsInt(), (prefix + "value[" + std::to_string(i) + "] must be an integer\n").c_str())) return false;
+		if (!READER_CHECK(value_array[i].IsInt(), "%svalue[%u] must be an integer\n", prefix, i)) return false;
 		values[i] = value_array[i].GetInt();
 	}
 	return true;

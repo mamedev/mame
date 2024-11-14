@@ -2,7 +2,7 @@
 // copyright-holders:Curt Coder
 /*********************************************************************
 
-    formats/abc1600_dsk.c
+    formats/abc1600_dsk.cpp
 
     Luxor ABC 1600 disk image formats
 
@@ -14,17 +14,17 @@ abc1600_format::abc1600_format() : wd177x_format(formats)
 {
 }
 
-const char *abc1600_format::name() const
+const char *abc1600_format::name() const noexcept
 {
 	return "abc1600";
 }
 
-const char *abc1600_format::description() const
+const char *abc1600_format::description() const noexcept
 {
 	return "Luxor ABC 1600 disk image";
 }
 
-const char *abc1600_format::extensions() const
+const char *abc1600_format::extensions() const noexcept
 {
 	return "img";
 }

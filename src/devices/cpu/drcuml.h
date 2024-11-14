@@ -192,7 +192,7 @@ public:
 	{
 		log_vprintf(util::make_format_argument_pack(std::forward<Format>(fmt), std::forward<Params>(args)...));
 	}
-	void log_vprintf(util::format_argument_pack<std::ostream> const &args);
+	void log_vprintf(util::format_argument_pack<char> const &args);
 	void log_flush() { if (logging()) m_umllog->flush(); }
 	bool logging_native() const { return m_beintf->logging(); }
 

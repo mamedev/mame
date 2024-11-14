@@ -6,8 +6,8 @@
  *
  ****************************************************************************/
 
-#ifndef MAME_INCLUDES_SPEC128_H
-#define MAME_INCLUDES_SPEC128_H
+#ifndef MAME_SINCLAIR_SPEC128_H
+#define MAME_SINCLAIR_SPEC128_H
 
 #pragma once
 
@@ -29,9 +29,9 @@ protected:
 	memory_bank_array_creator<1> m_bank_rom;
 	memory_bank_array_creator<4> m_bank_ram;
 
-	virtual void video_start() override;
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void video_start() override ATTR_COLD;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	virtual void spectrum_128_update_memory() override;
 	virtual rectangle get_screen_area() override;
@@ -52,9 +52,9 @@ private:
 	virtual uint8_t spectrum_port_r(offs_t offset) override;
 	//uint8_t spectrum_128_ula_r();
 
-	void spectrum_128_io(address_map &map);
-	void spectrum_128_mem(address_map &map);
-	void spectrum_128_fetch(address_map &map);
+	void spectrum_128_io(address_map &map) ATTR_COLD;
+	void spectrum_128_mem(address_map &map) ATTR_COLD;
+	void spectrum_128_fetch(address_map &map) ATTR_COLD;
 };
 
 #define X1_128_AMSTRAD  35'469'000       // Main clock (Amstrad 128K model, +2A?)
@@ -65,4 +65,4 @@ private:
 #define SPEC128_RETRACE_CYCLES  52
 #define SPEC128_CYCLES_PER_LINE 228
 
-#endif // MAME_INCLUDES_SPEC128_H
+#endif // MAME_SINCLAIR_SPEC128_H

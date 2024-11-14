@@ -6,8 +6,8 @@
 
 ***************************************************************************/
 
-#ifndef MAME_INCLUDES_CPS1_H
-#define MAME_INCLUDES_CPS1_H
+#ifndef MAME_CAPCOM_CPS1_H
+#define MAME_CAPCOM_CPS1_H
 
 #pragma once
 
@@ -146,6 +146,7 @@ public:
 	void sf2cems6(machine_config &config);
 	void sf2m10(machine_config &config);
 	void varthb2(machine_config &config);
+	void varthb3(machine_config &config);
 
 	void init_cps1();
 	void init_sf2ee();
@@ -214,29 +215,30 @@ protected:
 	TILE_GET_INFO_MEMBER(get_tile0_info);
 	TILE_GET_INFO_MEMBER(get_tile1_info);
 	TILE_GET_INFO_MEMBER(get_tile2_info);
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 
 	INTERRUPT_GEN_MEMBER(cps1_interrupt);
 	TIMER_DEVICE_CALLBACK_MEMBER(ganbare_interrupt);
 
 	virtual void render_layers(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_cps1(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_WRITE_LINE_MEMBER(screen_vblank_cps1);
+	void screen_vblank_cps1(int state);
 
 	void kabuki_setup(void (*decode)(uint8_t *src, uint8_t *dst));
 
 	/* maps */
-	void cpu_space_map(address_map &map);
-	void main_map(address_map &map);
-	void forgottn_map(address_map &map);
-	void qsound_main_map(address_map &map);
-	void qsound_decrypted_opcodes_map(address_map &map);
-	void sub_map(address_map &map);
-	void qsound_sub_map(address_map &map);
-	void sf2m3_map(address_map &map);
-	void sf2cems6_map(address_map &map);
-	void sf2m10_map(address_map &map);
-	void varthb2_map(address_map &map);
+	void cpu_space_map(address_map &map) ATTR_COLD;
+	void main_map(address_map &map) ATTR_COLD;
+	void forgottn_map(address_map &map) ATTR_COLD;
+	void qsound_main_map(address_map &map) ATTR_COLD;
+	void qsound_decrypted_opcodes_map(address_map &map) ATTR_COLD;
+	void sub_map(address_map &map) ATTR_COLD;
+	void qsound_sub_map(address_map &map) ATTR_COLD;
+	void sf2m3_map(address_map &map) ATTR_COLD;
+	void sf2cems6_map(address_map &map) ATTR_COLD;
+	void sf2m10_map(address_map &map) ATTR_COLD;
+	void varthb2_map(address_map &map) ATTR_COLD;
+	void varthb3_map(address_map &map) ATTR_COLD;
 
 	// game-specific
 	uint16_t m_sf2ceblp_prot = 0;
@@ -331,4 +333,4 @@ INPUT_PORTS_EXTERN( varth );
 INPUT_PORTS_EXTERN( captcomm );
 INPUT_PORTS_EXTERN( wof );
 
-#endif // MAME_INCLUDES_CPS1_H
+#endif // MAME_CAPCOM_CPS1_H

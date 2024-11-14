@@ -26,6 +26,9 @@
 #include "machine/z80pio.h"
 #include "machine/z80sio.h"
 
+
+namespace {
+
 class aid80f_state : public driver_device
 {
 public:
@@ -40,16 +43,16 @@ public:
 	void aid80f(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	u8 ram_r(offs_t offset);
 	void ram_w(offs_t offset, u8 data);
 	u8 monitor_r(offs_t offset);
 
-	void mem_map(address_map &map);
-	void io_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
+	void io_map(address_map &map) ATTR_COLD;
 
 	required_device<z80_device> m_maincpu;
 	required_device<ram_device> m_ram;
@@ -138,5 +141,8 @@ ROM_START(aid80f)
 	ROM_LOAD("ddt4.u51", 0x0c00, 0x0400, CRC(c78e34c2) SHA1(5f3a4631d0b806a077b817f566ebbddd77ad7ba5))
 	// U52 socket is empty
 ROM_END
+
+} // anonymous namespace
+
 
 COMP(1978, aid80f, 0, 0, aid80f, aid80f, aid80f_state, empty_init, "Mostek", "AID-80F Development System", MACHINE_IS_SKELETON)

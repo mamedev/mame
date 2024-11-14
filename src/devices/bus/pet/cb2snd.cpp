@@ -55,7 +55,7 @@ void pet_userport_cb2_sound_device::device_start()
 {
 }
 
-DECLARE_WRITE_LINE_MEMBER( pet_userport_cb2_sound_device::input_m )
+void pet_userport_cb2_sound_device::input_m(int state)
 {
 	m_dac->write(state);
 }

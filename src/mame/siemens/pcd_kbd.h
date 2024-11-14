@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Carl
-#ifndef MAME_INCLUDES_PCD_KBD_H
-#define MAME_INCLUDES_PCD_KBD_H
+#ifndef MAME_SIEMENS_PCD_KBD_H
+#define MAME_SIEMENS_PCD_KBD_H
 
 #pragma once
 
@@ -13,15 +13,15 @@ public:
 
 	auto out_tx_handler() { return m_out_tx_handler.bind(); }
 
-	DECLARE_WRITE_LINE_MEMBER( t0_w );
+	void t0_w(int state);
 
-	void pcd_keyboard_map(address_map &map);
+	void pcd_keyboard_map(address_map &map) ATTR_COLD;
 protected:
-	virtual const tiny_rom_entry *device_rom_region() const override;
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual ioport_constructor device_input_ports() const override;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 
-	void device_start() override;
+	void device_start() override ATTR_COLD;
 
 private:
 	required_ioport_array<17> m_rows;
@@ -32,9 +32,9 @@ private:
 	uint8_t bus_r();
 	uint8_t p1_r();
 	void p1_w(uint8_t data);
-	DECLARE_READ_LINE_MEMBER( t0_r );
+	int t0_r();
 };
 
 DECLARE_DEVICE_TYPE(PCD_KEYBOARD, pcd_keyboard_device)
 
-#endif // MAME_INCLUDES_PCD_KBD_H
+#endif // MAME_SIEMENS_PCD_KBD_H

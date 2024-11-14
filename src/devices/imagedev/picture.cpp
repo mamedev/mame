@@ -42,33 +42,37 @@ void picture_image_device::device_start()
 {
 }
 
-image_init_result picture_image_device::call_load()
+std::pair<std::error_condition, std::string> picture_image_device::call_load()
 {
 	switch (render_detect_image(image_core_file()))
 	{
 	case RENDUTIL_IMGFORMAT_PNG:
 		render_load_png(m_picture, image_core_file());
+		if (!m_picture.valid())
+			return std::make_pair(image_error::INVALIDIMAGE, "Invalid or unsupported PNG file");
 		break;
 
 	case RENDUTIL_IMGFORMAT_JPEG:
 		render_load_jpeg(m_picture, image_core_file());
+		if (!m_picture.valid())
+			return std::make_pair(image_error::INVALIDIMAGE, "Invalid or unsupported JPEG file");
 		break;
 
 	case RENDUTIL_IMGFORMAT_MSDIB:
 		render_load_msdib(m_picture, image_core_file());
+		if (!m_picture.valid())
+			return std::make_pair(image_error::INVALIDIMAGE, "Invalid or unsupported Microsoft DIB (BMP) file");
 		break;
 
 	default:
 		m_picture.reset();
+		return std::make_pair(image_error::INVALIDIMAGE, "Unsupported image file format");
 	}
 
-	return m_picture.valid() ? image_init_result::PASS : image_init_result::FAIL;
+	return std::make_pair(std::error_condition(), std::string());
 }
 
 void picture_image_device::call_unload()
 {
-	if (m_picture.valid())
-	{
-		m_picture.reset();
-	}
+	m_picture.reset();
 }

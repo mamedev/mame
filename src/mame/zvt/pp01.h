@@ -6,8 +6,8 @@
  *
  ****************************************************************************/
 
-#ifndef MAME_INCLUDES_PP01_H
-#define MAME_INCLUDES_PP01_H
+#ifndef MAME_ZVT_PP01_H
+#define MAME_ZVT_PP01_H
 
 #pragma once
 
@@ -41,8 +41,8 @@ public:
 	void pp01(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	uint8_t m_video_scroll = 0;
@@ -64,7 +64,7 @@ private:
 	TIMER_DEVICE_CALLBACK_MEMBER(kansas_r);
 	void pp01_palette(palette_device &palette) const;
 	uint32_t screen_update_pp01(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_WRITE_LINE_MEMBER(z2_w);
+	void z2_w(int state);
 	uint8_t ppi1_porta_r();
 	void ppi1_porta_w(uint8_t data);
 	uint8_t ppi1_portb_r();
@@ -73,8 +73,8 @@ private:
 	uint8_t ppi1_portc_r();
 	void video_w(uint8_t block,uint16_t offset,uint8_t data,uint8_t part);
 	void set_memory(uint8_t block, uint8_t data);
-	void io_map(address_map &map);
-	void mem_map(address_map &map);
+	void io_map(address_map &map) ATTR_COLD;
+	void mem_map(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<pit8253_device> m_pit;
@@ -88,4 +88,4 @@ private:
 	required_ioport_array<17> m_io_keyboard;
 };
 
-#endif // MAME_INCLUDES_PP01_H
+#endif // MAME_ZVT_PP01_H

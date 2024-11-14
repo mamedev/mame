@@ -1,12 +1,12 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood
-#ifndef MAME_INCLUDES_BFM_SC5_H
-#define MAME_INCLUDES_BFM_SC5_H
+#ifndef MAME_BFM_BFM_SC5_H
+#define MAME_BFM_BFM_SC5_H
 
 #pragma once
 
 #include "bfm_sc4.h"
-#include "cpu/m68000/m68000.h"
+#include "cpu/m68000/mcf5206e.h"
 
 class bfm_sc5_state : public bfm_sc45_state
 {
@@ -21,7 +21,7 @@ public:
 	void bfm_sc5(machine_config &config);
 
 protected:
-	void sc5_map(address_map &map);
+	void sc5_map(address_map &map) ATTR_COLD;
 
 	required_device<m68000_base_device> m_maincpu;
 
@@ -33,12 +33,12 @@ protected:
 	void sc5_mux1_w(offs_t offset, uint8_t data);
 	void sc5_mux2_w(offs_t offset, uint8_t data);
 
-	DECLARE_WRITE_LINE_MEMBER(bfm_sc5_duart_irq_handler);
-	DECLARE_WRITE_LINE_MEMBER(bfm_sc5_duart_txa);
+	void bfm_sc5_duart_irq_handler(int state);
+	void bfm_sc5_duart_txa(int state);
 	uint8_t bfm_sc5_duart_input_r();
 	void bfm_sc5_duart_output_w(uint8_t data);
 };
 
 INPUT_PORTS_EXTERN( bfm_sc5 );
 
-#endif // MAME_INCLUDES_BFM_SC5_H
+#endif // MAME_BFM_BFM_SC5_H

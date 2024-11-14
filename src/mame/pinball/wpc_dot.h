@@ -12,8 +12,6 @@
 
 #pragma once
 
-#include "dcs.h"
-
 #include "cpu/m6809/m6809.h"
 #include "wpcsnd.h"
 #include "wpc.h"
@@ -36,19 +34,19 @@ public:
 
 protected:
 	// driver_device overrides
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
-	void wpc_dot_map(address_map &map);
+	void wpc_dot_map(address_map &map) ATTR_COLD;
 
 	TIMER_CALLBACK_MEMBER(vblank_tick);
 	TIMER_CALLBACK_MEMBER(trigger_irq);
 
 	uint8_t ram_r(offs_t offset);
 	void ram_w(offs_t offset, uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(snd_reply_w);
-	DECLARE_WRITE_LINE_MEMBER(irq_w);
-	DECLARE_WRITE_LINE_MEMBER(firq_w);
+	void snd_reply_w(int state);
+	void irq_w(int state);
+	void firq_w(int state);
 	void rombank_w(uint8_t data);
 	void dmdbank_w(offs_t offset, uint8_t data);
 
@@ -83,7 +81,7 @@ public:
 	void wpc_flip1(machine_config &config);
 
 protected:
-	void wpc_flip1_map(address_map &map);
+	void wpc_flip1_map(address_map &map) ATTR_COLD;
 };
 
 class wpc_flip2_state : public wpc_flip1_state
@@ -97,7 +95,7 @@ public:
 	void wpc_flip2(machine_config &config);
 
 protected:
-	void wpc_flip2_map(address_map &map);
+	void wpc_flip2_map(address_map &map) ATTR_COLD;
 };
 
 #endif // MAME_PINBALL_WPC_DOT_H

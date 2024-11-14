@@ -38,11 +38,13 @@ ToDo:
 *********************************************************************************************************/
 
 #include "emu.h"
+
 #include "genpin.h"
 
 #include "cpu/z80/z80.h"
 #include "machine/i8279.h"
 #include "sound/ay8910.h"
+
 #include "speaker.h"
 
 #include "peyper.lh"
@@ -61,7 +63,7 @@ public:
 		, m_io_outputs(*this, "out%d", 0U)
 		{ }
 
-	template <int Mask> DECLARE_CUSTOM_INPUT_MEMBER(wolfman_replay_hs_r);
+	template <int Mask> ioport_value wolfman_replay_hs_r();
 	void init_0() { m_game = 0; }
 	void init_1() { m_game = 1; }
 	void init_2() { m_game = 2; }
@@ -70,9 +72,11 @@ public:
 	void peyper(machine_config &config);
 	void petaco(machine_config &config);
 
+protected:
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+
 private:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
 	u8 sw_r();
 	void col_w(u8 data);
 	void disp_w(u8 data);
@@ -84,10 +88,10 @@ private:
 	void p2a_w(u8 data) { for (u8 i = 0; i < 8; i++) m_io_outputs[56U+i] = BIT(data, i); }
 	void p2b_w(u8 data) { for (u8 i = 0; i < 8; i++) m_io_outputs[64U+i] = BIT(data, i); }
 
-	void io_map(address_map &map);
-	void mem_map(address_map &map);
-	void petaco_map(address_map &map);
-	void petaco_io_map(address_map &map);
+	void io_map(address_map &map) ATTR_COLD;
+	void mem_map(address_map &map) ATTR_COLD;
+	void petaco_map(address_map &map) ATTR_COLD;
+	void petaco_io_map(address_map &map) ATTR_COLD;
 
 	void petaco_sol0(u8 data) {}
 	void petaco_sol1(u8 data) {}
@@ -209,7 +213,7 @@ void peyper_state::sol_w(u8 data)
 
 
 template <int Mask>
-CUSTOM_INPUT_MEMBER(peyper_state::wolfman_replay_hs_r)
+ioport_value peyper_state::wolfman_replay_hs_r()
 {
 	switch (Mask)
 	{
@@ -556,14 +560,14 @@ static INPUT_PORTS_START( wolfman )
 	PORT_DIPSETTING(    0x20, "01" )
 //  PORT_DIPNAME( 0x18, 0x00, DEF_STR( Coinage ) )          // Partidas/Moneda - code at 0x0a69 - tables at 0x0b30 (4 * 3) - credits BCD stored at 0x6151
 //  PORT_DIPNAME( 0x04, 0x00, "Balls" )                     // Bolas/Partida - code at 0x0a5c - stored at 0x60bd
-	PORT_BIT( 0x03, 0x00, IPT_CUSTOM) PORT_CUSTOM_MEMBER(peyper_state, wolfman_replay_hs_r<0x03>)
+	PORT_BIT( 0x03, 0x00, IPT_CUSTOM) PORT_CUSTOM_MEMBER(FUNC(peyper_state::wolfman_replay_hs_r<0x03>))
 
 	/* DSW1 : port 0x24 - DSW1-1 is bit 7 ... DSW1-8 is bit 0 */
 	PORT_START("DSW1")
 	PORT_DIPNAME( 0x80, 0x00, "Adjust Replay" )             // Premios por Puntuacion - code at 0x0aa3 - stored at 0x60c4 and 0x60cc (0x00 NO / 0x05 YES)
 	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( Yes ) )
-	PORT_BIT( 0x40, 0x00, IPT_CUSTOM) PORT_CUSTOM_MEMBER(peyper_state, wolfman_replay_hs_r<0x40>)
+	PORT_BIT( 0x40, 0x00, IPT_CUSTOM) PORT_CUSTOM_MEMBER(FUNC(peyper_state::wolfman_replay_hs_r<0x40>))
 	PORT_DIPNAME( 0x20, 0x00, "Clear RAM on Reset" )        // Borrador RAM - code at 0x0ace - range 0x6141..0x616f - 0x616d = 0x5a and 0x616e = 0xa5
 	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( Yes ) )
@@ -731,6 +735,12 @@ ROM_START(odin)
 	ROM_LOAD("odin_b.bin", 0x2000, 0x2000, CRC(46744695) SHA1(fdbd8a93b3e4a9697e77e7d381759829b86fe28b))
 ROM_END
 
+ROM_START(odinp) // uses a slower IRQ clock (~440 Hz), as opposed to regular Peyper / Sonic machines, which run @ ~1600 Hz
+	ROM_REGION(0x6000, "maincpu", ROMREGION_ERASEFF)
+	ROM_LOAD("cd1", 0x0000, 0x2000, CRC(f8747b2e) SHA1(8dfbef08bb0df0d1e5c11b88d29cd9c61b72bec9))
+	ROM_LOAD("cd2", 0x2000, 0x2000, CRC(c2dbe5b5) SHA1(c6b34334a55471f0550d84376f260fde9048cd31))
+ROM_END
+
 /*-------------------------------------------------------------------
 / Odin De Luxe (1985)
 /-------------------------------------------------------------------*/
@@ -851,10 +861,11 @@ ROM_START(petaco)
 ROM_END
 
 
-} // Anonymous namespace
+} // anonymous namespace
 
 GAME( 1984, petaco,   0,        petaco,   odin_dlx, peyper_state, init_1,     ROT0, "Juegos Populares", "Petaco",             MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
 GAME( 1985, odin,     0,        peyper,   odin_dlx, peyper_state, init_1,     ROT0, "Peyper",     "Odin",                     MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME( 1985, odinp,    odin,     peyper,   odin_dlx, peyper_state, init_1,     ROT0, "Peyper",     "Odin (prototype)",         MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
 GAME( 1985, odin_dlx, 0,        peyper,   odin_dlx, peyper_state, init_1,     ROT0, "Sonic",      "Odin De Luxe",             MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
 GAME( 1986, solarwap, 0,        peyper,   solarwap, peyper_state, init_0,     ROT0, "Sonic",      "Solar Wars (Sonic)",       MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
 GAME( 1986, gamatros, 0,        peyper,   solarwap, peyper_state, init_0,     ROT0, "Sonic",      "Gamatron (Sonic)",         MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )

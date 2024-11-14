@@ -31,6 +31,9 @@ Some interesting notes from the dumper:
 #include "screen.h"
 #include "speaker.h"
 
+
+namespace {
+
 class dkmb_state : public driver_device
 {
 public:
@@ -46,7 +49,7 @@ public:
 	u64 unk_20c0010_r();
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -54,7 +57,7 @@ private:
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	void main_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
 };
 
 
@@ -154,5 +157,8 @@ ROM_START( dkmb )
 	*/
 	ROM_LOAD("12c508.u12", 0x000, 0x09db, BAD_DUMP CRC(3adb3e33) SHA1(36a96886d83b64633eea83e57bdfa8a20c6d4f6a) )
 ROM_END
+
+} // anonymous namespace
+
 
 GAME( 2003, dkmb, 0, dkmb, dkmb, dkmb_state, empty_init, ROT270, "Namco / Nintendo / Cosmodog", "Donkey Kong / Donkey Kong Jr / Mario Bros", MACHINE_IS_SKELETON )

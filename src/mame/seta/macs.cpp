@@ -64,6 +64,9 @@ KISEKAE -- info
 #include "bus/generic/carts.h"
 #include "speaker.h"
 
+
+namespace {
+
 class macs_state : public driver_device
 {
 public:
@@ -86,8 +89,8 @@ public:
 	void init_macs2();
 
 protected:
-	void machine_reset() override;
-	void machine_start() override;
+	void machine_reset() override ATTR_COLD;
+	void machine_start() override ATTR_COLD;
 
 private:
 	uint8_t m_mux_data = 0;
@@ -110,8 +113,8 @@ private:
 	required_memory_bank_array<2> m_rombank;
 	required_memory_bank_array<2> m_rambank;
 
-	void macs_io(address_map &map);
-	void macs_mem(address_map &map);
+	void macs_io(address_map &map) ATTR_COLD;
+	void macs_mem(address_map &map) ATTR_COLD;
 };
 
 
@@ -785,6 +788,8 @@ void macs_state::init_kisekaem()
 	m_maincpu->set_game_flag((10 | 0x180));
 	m_rev = 1;
 }
+
+} // anonymous namespace
 
 
 GAME( 1995, macsbios, 0,        macs, macs_m,   macs_state, init_macs,     ROT0, "I'Max",            "Multi Amenity Cassette System BIOS",   MACHINE_IS_BIOS_ROOT | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )

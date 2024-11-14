@@ -1,8 +1,8 @@
-// LzmaAlone.cpp
+  // LzmaAlone.cpp
 
 #include "StdAfx.h"
 
-#include <stdio.h>
+// #include <stdio.h>
 
 #if (defined(_WIN32) || defined(OS2) || defined(MSDOS)) && !defined(UNDER_CE)
 #include <fcntl.h>
@@ -12,16 +12,17 @@
 #define MY_SET_BINARY_MODE(file)
 #endif
 
-#include "../../../Common/MyWindows.h"
-#include "../../../Common/MyInitGuid.h"
-
+#include "../../../../C/CpuArch.h"
 #include "../../../../C/7zVersion.h"
 #include "../../../../C/Alloc.h"
 #include "../../../../C/Lzma86.h"
 
+#include "../../../Common/MyWindows.h"
+#include "../../../Common/MyInitGuid.h"
+
 #include "../../../Windows/NtCheck.h"
 
-#ifndef _7ZIP_ST
+#ifndef Z7_ST
 #include "../../../Windows/System.h"
 #endif
 
@@ -39,14 +40,18 @@
 #include "../../UI/Console/BenchCon.h"
 #include "../../UI/Console/ConsoleClose.h"
 
+extern
+bool g_LargePagesMode;
+bool g_LargePagesMode = false;
+
 using namespace NCommandLineParser;
 
 static const unsigned kDictSizeLog = 24;
 
-static const char *kCopyrightString = "\nLZMA " MY_VERSION_COPYRIGHT_DATE "\n\n";
+#define kCopyrightString "\nLZMA " MY_VERSION_CPU " : " MY_COPYRIGHT_DATE "\n\n"
 
-static const char *kHelpString =
-    "Usage:  LZMA <command> [inputFile] [outputFile] [<switches>...]\n"
+static const char * const kHelpString =
+    "Usage:  lzma <command> [inputFile] [outputFile] [<switches>...]\n"
     "\n"
     "<command>\n"
     "  e : Encode file\n"
@@ -67,9 +72,9 @@ static const char *kHelpString =
     "  -so    : write data to stdout\n";
 
 
-static const char *kCantAllocate = "Can not allocate memory";
-static const char *kReadError = "Read error";
-static const char *kWriteError = "Write error";
+static const char * const kCantAllocate = "Cannot allocate memory";
+static const char * const kReadError = "Read error";
+static const char * const kWriteError = "Write error";
 
 
 namespace NKey {
@@ -95,27 +100,50 @@ enum Enum
 };
 }
 
+#define SWFRM_3(t, mu, mi) t, mu, mi, NULL
+
+#define SWFRM_1(t) SWFRM_3(t, false, 0)
+#define SWFRM_SIMPLE SWFRM_1(NSwitchType::kSimple)
+#define SWFRM_STRING SWFRM_1(NSwitchType::kString)
+
+#define SWFRM_STRING_SINGL(mi) SWFRM_3(NSwitchType::kString, false, mi)
+
 static const CSwitchForm kSwitchForms[] =
 {
-  { "?",  NSwitchType::kSimple, false },
-  { "H",  NSwitchType::kSimple, false },
-  { "MM", NSwitchType::kString, false, 1 },
-  { "X", NSwitchType::kString, false, 1 },
-  { "A", NSwitchType::kString, false, 1 },
-  { "D", NSwitchType::kString, false, 1 },
-  { "FB", NSwitchType::kString, false, 1 },
-  { "MC", NSwitchType::kString, false, 1 },
-  { "LC", NSwitchType::kString, false, 1 },
-  { "LP", NSwitchType::kString, false, 1 },
-  { "PB", NSwitchType::kString, false, 1 },
-  { "MF", NSwitchType::kString, false, 1 },
-  { "MT", NSwitchType::kString, false, 0 },
-  { "EOS", NSwitchType::kSimple, false },
-  { "SI",  NSwitchType::kSimple, false },
-  { "SO",  NSwitchType::kSimple, false },
+  { "?",  SWFRM_SIMPLE },
+  { "H",  SWFRM_SIMPLE },
+  { "MM", SWFRM_STRING_SINGL(1) },
+  { "X", SWFRM_STRING_SINGL(1) },
+  { "A", SWFRM_STRING_SINGL(1) },
+  { "D", SWFRM_STRING_SINGL(1) },
+  { "FB", SWFRM_STRING_SINGL(1) },
+  { "MC", SWFRM_STRING_SINGL(1) },
+  { "LC", SWFRM_STRING_SINGL(1) },
+  { "LP", SWFRM_STRING_SINGL(1) },
+  { "PB", SWFRM_STRING_SINGL(1) },
+  { "MF", SWFRM_STRING_SINGL(1) },
+  { "MT", SWFRM_STRING },
+  { "EOS", SWFRM_SIMPLE },
+  { "SI",  SWFRM_SIMPLE },
+  { "SO",  SWFRM_SIMPLE },
   { "F86",  NSwitchType::kChar, false, 0, "+" }
 };
 
+
+static void Convert_UString_to_AString(const UString &s, AString &temp)
+{
+  int codePage = CP_OEMCP;
+  /*
+  int g_CodePage = -1;
+  int codePage = g_CodePage;
+  if (codePage == -1)
+    codePage = CP_OEMCP;
+  if (codePage == CP_UTF8)
+    ConvertUnicodeToUTF8(s, temp);
+  else
+  */
+    UnicodeStringToMultiByte2(temp, s, (UINT)codePage);
+}
 
 static void PrintErr(const char *s)
 {
@@ -135,10 +163,12 @@ static void PrintError(const char *s)
   PrintErr_LF(s);
 }
 
-static void PrintError2(const char *s1, const wchar_t *s2)
+static void PrintError2(const char *s1, const UString &s2)
 {
   PrintError(s1);
-  PrintErr_LF(GetOemString(s2));
+  AString a;
+  Convert_UString_to_AString(s2, a);
+  PrintErr_LF(a);
 }
 
 static void PrintError_int(const char *s, int code)
@@ -190,25 +220,22 @@ static void PrintHelp()
   Print(kHelpString);
 }
 
-class CProgressPrint:
-  public ICompressProgressInfo,
-  public CMyUnknownImp
-{
+
+Z7_CLASS_IMP_COM_1(
+  CProgressPrint,
+  ICompressProgressInfo
+)
   UInt64 _size1;
   UInt64 _size2;
 public:
   CProgressPrint(): _size1(0), _size2(0) {}
 
   void ClosePrint();
-
-  MY_UNKNOWN_IMP1(ICompressProgressInfo)
-
-  STDMETHOD(SetRatioInfo)(const UInt64 *inSize, const UInt64 *outSize);
 };
 
 #define BACK_STR \
 "\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b"
-static const char *kBackSpaces =
+static const char * const kBackSpaces =
 BACK_STR
 "                                                                "
 BACK_STR;
@@ -219,7 +246,7 @@ void CProgressPrint::ClosePrint()
   Print(kBackSpaces);
 }
 
-STDMETHODIMP CProgressPrint::SetRatioInfo(const UInt64 *inSize, const UInt64 *outSize)
+Z7_COM7F_IMF(CProgressPrint::SetRatioInfo(const UInt64 *inSize, const UInt64 *outSize))
 {
   if (NConsoleClose::TestBreakSignal())
     return E_ABORT;
@@ -243,6 +270,7 @@ STDMETHODIMP CProgressPrint::SetRatioInfo(const UInt64 *inSize, const UInt64 *ou
 }
 
 
+Z7_ATTR_NORETURN
 static void IncorrectCommand()
 {
   throw "Incorrect command";
@@ -286,19 +314,21 @@ static int Error_HRESULT(const char *s, HRESULT res)
   else
   {
     char temp[32];
-    ConvertUInt32ToHex(res, temp);
+    ConvertUInt32ToHex((UInt32)res, temp);
     PrintErr("Error code = 0x");
     PrintErr_LF(temp);
   }
   return 1;
 }
 
+#if defined(_UNICODE) && !defined(_WIN64) && !defined(UNDER_CE)
 #define NT_CHECK_FAIL_ACTION PrintError("Unsupported Windows version"); return 1;
+#endif
 
 static void AddProp(CObjectVector<CProperty> &props2, const char *name, const wchar_t *val)
 {
   CProperty &prop = props2.AddNew();
-  prop.Name.SetFromAscii(name);
+  prop.Name = name;
   prop.Value = val;
 }
 
@@ -322,10 +352,10 @@ static int main2(int numArgs, const char *args[])
   for (int i = 1; i < numArgs; i++)
     commandStrings.Add(MultiByteToUnicodeString(args[i]));
   
-  CParser parser(ARRAY_SIZE(kSwitchForms));
+  CParser parser;
   try
   {
-    if (!parser.ParseStrings(kSwitchForms, commandStrings))
+    if (!parser.ParseStrings(kSwitchForms, Z7_ARRAY_SIZE(kSwitchForms), commandStrings))
     {
       PrintError2(parser.ErrorMessage, parser.ErrorLine);
       return 1;
@@ -376,13 +406,13 @@ static int main2(int numArgs, const char *args[])
     AddProp(props2, "x", s);
   }
   
-  UString mf = L"BT4";
+  UString mf ("BT4");
   if (parser[NKey::kMatchFinder].ThereIs)
     mf = parser[NKey::kMatchFinder].PostStrings[0];
 
   UInt32 numThreads = (UInt32)(Int32)-1;
 
-  #ifndef _7ZIP_ST
+  #ifndef Z7_ST
   
   if (parser[NKey::kMultiThread].ThereIs)
   {
@@ -453,7 +483,7 @@ static int main2(int numArgs, const char *args[])
     inStream = inStreamSpec;
     if (!inStreamSpec->Open(us2fs(inputName)))
     {
-      PrintError2("can not open input file", inputName);
+      PrintError2("Cannot open input file", inputName);
       return 1;
     }
   }
@@ -473,7 +503,7 @@ static int main2(int numArgs, const char *args[])
     outStream = outStreamSpec;
     if (!outStreamSpec->Create(us2fs(outputName), true))
     {
-      PrintError2("can not open output file", outputName);
+      PrintError2("Cannot open output file", outputName);
       return 1;
     }
   }
@@ -483,8 +513,8 @@ static int main2(int numArgs, const char *args[])
   
   if (inStreamSpec)
   {
-    if (!inStreamSpec->File.GetLength(fileSize))
-      throw "Can not get file length";
+    if (!inStreamSpec->GetLength(fileSize))
+      throw "Cannot get file length";
     fileSizeDefined = true;
     if (!stdOutMode)
       Print_Size("Input size:  ", fileSize);
@@ -511,7 +541,7 @@ static int main2(int numArgs, const char *args[])
        You can use xz format instead, if you want to use filters */
 
     if (parser[NKey::kEOS].ThereIs || stdInMode)
-      throw "Can not use stdin in this mode";
+      throw "Cannot use stdin in this mode";
 
     size_t inSize = (size_t)fileSize;
 
@@ -528,7 +558,7 @@ static int main2(int numArgs, const char *args[])
     }
     
     if (ReadStream_FAIL(inStream, inBuffer, inSize) != S_OK)
-      throw "Can not read";
+      throw "Cannot read";
 
     Byte *outBuffer = NULL;
     size_t outSize;
@@ -644,7 +674,7 @@ static int main2(int numArgs, const char *args[])
       NCoderPropID::kMatchFinderCycles,
     };
 
-    const unsigned kNumPropsMax = ARRAY_SIZE(propIDs);
+    const unsigned kNumPropsMax = Z7_ARRAY_SIZE(propIDs);
 
     PROPVARIANT props[kNumPropsMax];
     for (int p = 0; p < 6; p++)
@@ -725,7 +755,7 @@ static int main2(int numArgs, const char *args[])
       throw "SetDecoderProperties error";
     
     UInt64 unpackSize = 0;
-    for (int i = 0; i < 8; i++)
+    for (unsigned i = 0; i < 8; i++)
       unpackSize |= ((UInt64)header[kPropertiesSize + i]) << (8 * i);
 
     bool unpackSizeDefined = (unpackSize != (UInt64)(Int64)-1);
@@ -760,7 +790,7 @@ static int main2(int numArgs, const char *args[])
   return 0;
 }
 
-int MY_CDECL main(int numArgs, const char *args[])
+int Z7_CDECL main(int numArgs, const char *args[])
 {
   NConsoleClose::CCtrlHandlerSetter ctrlHandlerSetter;
 

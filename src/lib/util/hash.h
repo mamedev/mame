@@ -34,6 +34,7 @@
 
 
 namespace util {
+
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
@@ -68,25 +69,25 @@ public:
 
 	// operators
 	hash_collection &operator=(const hash_collection &src);
-	bool operator==(const hash_collection &rhs) const;
-	bool operator!=(const hash_collection &rhs) const { return !(*this == rhs); }
+	bool operator==(const hash_collection &rhs) const noexcept;
+	bool operator!=(const hash_collection &rhs) const noexcept { return !(*this == rhs); }
 
 	// getters
-	bool flag(char flag) const { return (m_flags.find_first_of(flag) != std::string::npos); }
+	bool flag(char flag) const noexcept { return (m_flags.find_first_of(flag) != std::string::npos); }
 	std::string hash_types() const;
 
 	// hash manipulators
-	void reset();
-	bool add_from_string(char type, std::string_view string);
-	bool remove(char type);
+	void reset() noexcept;
+	bool add_from_string(char type, std::string_view string) noexcept;
+	bool remove(char type) noexcept;
 
 	// CRC-specific helpers
-	bool crc(uint32_t &result) const { result = m_crc32; return m_has_crc32; }
-	void add_crc(uint32_t crc) { m_crc32 = crc; m_has_crc32 = true; }
+	bool crc(uint32_t &result) const noexcept { result = m_crc32; return m_has_crc32; }
+	void add_crc(uint32_t crc) noexcept { m_crc32 = crc; m_has_crc32 = true; }
 
 	// SHA1-specific helpers
-	bool sha1(sha1_t &result) const { result = m_sha1; return m_has_sha1; }
-	void add_sha1(sha1_t sha1) { m_has_sha1 = true; m_sha1 = sha1; }
+	bool sha1(sha1_t &result) const noexcept { result = m_sha1; return m_has_sha1; }
+	void add_sha1(sha1_t sha1) noexcept { m_has_sha1 = true; m_sha1 = sha1; }
 
 	// string conversion
 	std::string internal_string() const;

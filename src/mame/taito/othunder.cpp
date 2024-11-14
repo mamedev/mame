@@ -308,13 +308,13 @@ void othunder_state::irq_ack_w(offs_t offset, u16 data)
 	}
 }
 
-WRITE_LINE_MEMBER( othunder_state::vblank_w )
+void othunder_state::vblank_w(int state)
 {
 	if (state)
 		m_maincpu->set_input_line(5, ASSERT_LINE);
 }
 
-WRITE_LINE_MEMBER( othunder_state::adc_eoc_w )
+void othunder_state::adc_eoc_w(int state)
 {
 	if (state)
 		m_maincpu->set_input_line(6, ASSERT_LINE);
@@ -342,15 +342,15 @@ void othunder_state::eeprom_w(u8 data)
                 x0000000    eeprom out data  */
 
 	/* Recoil Piston Motor Status */
-	output().set_value("Player1_Recoil_Piston", data & 0x1 );
-	output().set_value("Player2_Recoil_Piston", (data & 0x2) >>1 );
+	m_recoil_piston[0] = BIT(data, 0);
+	m_recoil_piston[1] = BIT(data, 1);
 
 	if (data & 4)
 		popmessage("OBPRI SET!");
 
-	m_eeprom->di_write((data & 0x40) >> 6);
-	m_eeprom->clk_write((data & 0x20) ? ASSERT_LINE : CLEAR_LINE);
-	m_eeprom->cs_write((data & 0x10) ? ASSERT_LINE : CLEAR_LINE);
+	m_eeprom->di_write(BIT(data, 6));
+	m_eeprom->clk_write(BIT(data, 5));
+	m_eeprom->cs_write(BIT(data, 4));
 }
 
 void othunder_state::coins_w(u8 data)
@@ -383,20 +383,20 @@ void othunder_state::tc0310fam_w(offs_t offset, u8 data)
 	   because we are using the AY-3-8910 emulation. */
 	volr = (m_pan[0] + m_pan[2]) * 100 / (2 * 0x1f);
 	voll = (m_pan[1] + m_pan[3]) * 100 / (2 * 0x1f);
-	m_2610_0l->flt_volume_set_volume(voll / 100.0);
-	m_2610_0r->flt_volume_set_volume(volr / 100.0);
+	m_2610_0l->set_gain(voll / 100.0);
+	m_2610_0r->set_gain(volr / 100.0);
 
 	/* CH1 */
 	volr = m_pan[0] * 100 / 0x1f;
 	voll = m_pan[1] * 100 / 0x1f;
-	m_2610_1l->flt_volume_set_volume(voll / 100.0);
-	m_2610_1r->flt_volume_set_volume(volr / 100.0);
+	m_2610_1l->set_gain(voll / 100.0);
+	m_2610_1r->set_gain(volr / 100.0);
 
 	/* CH2 */
 	volr = m_pan[2] * 100 / 0x1f;
 	voll = m_pan[3] * 100 / 0x1f;
-	m_2610_2l->flt_volume_set_volume(voll / 100.0);
-	m_2610_2r->flt_volume_set_volume(volr / 100.0);
+	m_2610_2l->set_gain(voll / 100.0);
+	m_2610_2r->set_gain(volr / 100.0);
 }
 
 
@@ -525,23 +525,28 @@ static INPUT_PORTS_START( othunder )
 	PORT_CONFSETTING(    0x00, DEF_STR( Low ) )
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( othundrj )
+static INPUT_PORTS_START( othunderj )
 	PORT_INCLUDE( othunder )
 
 	PORT_MODIFY( "DSWA" )
 	TAITO_COINAGE_JAPAN_OLD
+
+	PORT_MODIFY( "DSWB" )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Language ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( English ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Japanese ) )
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( othundu )
-	PORT_INCLUDE( othundrj )
+static INPUT_PORTS_START( othunderu )
+	PORT_INCLUDE( othunder )
+
+	PORT_MODIFY( "DSWA" )
+	TAITO_COINAGE_JAPAN_OLD
 
 	PORT_MODIFY( "DSWB" )
 	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Continue_Price ) )        /* see notes */
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x40, "Same as Start" )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Language ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( English ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Japanese ) )
 INPUT_PORTS_END
 
 
@@ -572,6 +577,8 @@ GFXDECODE_END
 
 void othunder_state::machine_start()
 {
+	m_recoil_piston.resolve();
+
 	m_z80bank->configure_entries(0, 4, memregion("audiocpu")->base(), 0x4000);
 
 	save_item(NAME(m_pan));
@@ -606,10 +613,7 @@ void othunder_state::othunder(machine_config &config)
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	screen.set_size(40*8, 32*8);
-	screen.set_visarea(0*8, 40*8-1, 2*8, 32*8-1);
+	screen.set_raw(XTAL(26'686'000) / 4, 424, 0, 320, 262, 16, 256); // same as taito_z.cpp
 	screen.set_screen_update(FUNC(othunder_state::screen_update));
 	screen.set_palette(m_tc0110pcr);
 	screen.screen_vblank().set(FUNC(othunder_state::vblank_w));
@@ -642,8 +646,8 @@ void othunder_state::othunder(machine_config &config)
 	FILTER_VOLUME(config, "2610.2r").add_route(ALL_OUTPUTS, "speaker", 1.0);
 
 	TC0140SYT(config, m_tc0140syt, 0);
-	m_tc0140syt->set_master_tag(m_maincpu);
-	m_tc0140syt->set_slave_tag(m_audiocpu);
+	m_tc0140syt->nmi_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
+	m_tc0140syt->reset_callback().set_inputline(m_audiocpu, INPUT_LINE_RESET);
 }
 
 
@@ -765,7 +769,7 @@ ROM_START( othunderu )
 	ROM_LOAD16_WORD( "93c46_eeprom-othunder.ic86", 0x0000, 0x0080, CRC(3729b844) SHA1(f6bb41d293d1e47214f8b2d147991404f3278ebf) )
 ROM_END
 
-ROM_START( othunderuo )
+ROM_START( othunderua )
 	ROM_REGION( 0x80000, "maincpu", 0 ) /* 512K for 68000 code */
 	ROM_LOAD16_BYTE( "b67-20.ic63",   0x00000, 0x20000, CRC(21439ea2) SHA1(d5b5a194e9698cf43513c0d56146772e8132ab07) )
 	ROM_LOAD16_BYTE( "b67-22.ic64",   0x00001, 0x20000, CRC(0f99ad3c) SHA1(dd6c9e822470ca867ec01e642443a871e879bae5) )
@@ -879,9 +883,9 @@ ROM_START( othunderjsc ) // SC stands for Shopping Center. It was put in a small
 	ROM_LOAD16_WORD( "93c46_eeprom-othunder.ic86", 0x0000, 0x0080, CRC(3729b844) SHA1(f6bb41d293d1e47214f8b2d147991404f3278ebf) )
 ROM_END
 
-GAME( 1988, othunder,    0,        othunder, othunder, othunder_state, empty_init, ORIENTATION_FLIP_X, "Taito Corporation Japan",   "Operation Thunderbolt (World, rev 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, othundero,   othunder, othunder, othunder, othunder_state, empty_init, ORIENTATION_FLIP_X, "Taito Corporation Japan",   "Operation Thunderbolt (World)",        MACHINE_SUPPORTS_SAVE )
-GAME( 1988, othunderu,   othunder, othunder, othundu,  othunder_state, empty_init, ORIENTATION_FLIP_X, "Taito America Corporation", "Operation Thunderbolt (US, rev 1)",    MACHINE_SUPPORTS_SAVE )
-GAME( 1988, othunderuo,  othunder, othunder, othundu,  othunder_state, empty_init, ORIENTATION_FLIP_X, "Taito America Corporation", "Operation Thunderbolt (US)",           MACHINE_SUPPORTS_SAVE )
-GAME( 1988, othunderj,   othunder, othunder, othundrj, othunder_state, empty_init, ORIENTATION_FLIP_X, "Taito Corporation",         "Operation Thunderbolt (Japan)",        MACHINE_SUPPORTS_SAVE )
-GAME( 1988, othunderjsc, othunder, othunder, othundrj, othunder_state, empty_init, ORIENTATION_FLIP_X, "Taito Corporation",         "Operation Thunderbolt (Japan, SC)",    MACHINE_SUPPORTS_SAVE )
+GAME( 1988, othunder,    0,        othunder, othunder,  othunder_state, empty_init, ORIENTATION_FLIP_X, "Taito Corporation Japan",   "Operation Thunderbolt (World, rev 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, othundero,   othunder, othunder, othunder,  othunder_state, empty_init, ORIENTATION_FLIP_X, "Taito Corporation Japan",   "Operation Thunderbolt (World)",        MACHINE_SUPPORTS_SAVE )
+GAME( 1988, othunderu,   othunder, othunder, othunderu, othunder_state, empty_init, ORIENTATION_FLIP_X, "Taito America Corporation", "Operation Thunderbolt (US, rev 1)",    MACHINE_SUPPORTS_SAVE )
+GAME( 1988, othunderua,  othunder, othunder, othunderu, othunder_state, empty_init, ORIENTATION_FLIP_X, "Taito America Corporation", "Operation Thunderbolt (US)",           MACHINE_SUPPORTS_SAVE )
+GAME( 1988, othunderj,   othunder, othunder, othunderj, othunder_state, empty_init, ORIENTATION_FLIP_X, "Taito Corporation",         "Operation Thunderbolt (Japan)",        MACHINE_SUPPORTS_SAVE )
+GAME( 1988, othunderjsc, othunder, othunder, othunderj, othunder_state, empty_init, ORIENTATION_FLIP_X, "Taito Corporation",         "Operation Thunderbolt (Japan, SC)",    MACHINE_SUPPORTS_SAVE )

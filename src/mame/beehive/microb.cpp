@@ -50,10 +50,10 @@ public:
 	void microb(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
-	DECLARE_WRITE_LINE_MEMBER(dmac_hrq_w);
+	void dmac_hrq_w(int state);
 	u8 dmac_mem_r(offs_t offset);
 	void dmac_mem_w(offs_t offset, u8 data);
 	I8275_DRAW_CHARACTER_MEMBER(draw_character);
@@ -61,8 +61,8 @@ private:
 	u8 ppi2_pa_r();
 	void ppi2_pc_w(u8 data);
 
-	void microb_io(address_map &map);
-	void microb_mem(address_map &map);
+	void microb_io(address_map &map) ATTR_COLD;
+	void microb_mem(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<i8257_device> m_dmac;
@@ -75,7 +75,7 @@ private:
 	u8 m_keyline = 0U;
 };
 
-WRITE_LINE_MEMBER(microb_state::dmac_hrq_w)
+void microb_state::dmac_hrq_w(int state)
 {
 	m_maincpu->set_input_line(INPUT_LINE_HALT, state ? ASSERT_LINE : CLEAR_LINE);
 	m_dmac->hlda_w(state);
@@ -257,7 +257,7 @@ static INPUT_PORTS_START( microb )
 		PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("RShift") PORT_CODE(KEYCODE_RSHIFT)
 		PORT_BIT(0x83, IP_ACTIVE_LOW, IPT_UNUSED)
 
-		// assumed to be dipswitches, purpose unknown, see code from 12D
+	// assumed to be dipswitches, purpose unknown, see code from 12D
 	PORT_START("DIPS")
 	PORT_DIPNAME( 0x01, 0x01, "Switch A") PORT_DIPLOCATION("SW1:1")
 	PORT_DIPSETTING(    0x01, DEF_STR(Off))
@@ -280,12 +280,14 @@ void microb_state::machine_start()
 
 I8275_DRAW_CHARACTER_MEMBER(microb_state::draw_character)
 {
-	u8 dots = lten ? 0xff : (vsp || linecount == 9) ? 0 : m_p_chargen[(charcode << 4) | linecount];
-	if (rvv)
+	using namespace i8275_attributes;
+
+	u8 dots = BIT(attrcode, LTEN) ? 0xff : (BIT(attrcode, VSP) || linecount == 9) ? 0 : m_p_chargen[(charcode << 4) | linecount];
+	if (BIT(attrcode, RVV))
 		dots ^= 0xff;
 
 	// HLGT is active on status line
-	rgb_t const fg = hlgt ? rgb_t(0xc0, 0xc0, 0xc0) : rgb_t::white();
+	rgb_t const fg = BIT(attrcode, HLGT) ? rgb_t(0xc0, 0xc0, 0xc0) : rgb_t::white();
 
 	u32 *pix = &bitmap.pix(y, x);
 	for (int i = 0; i < 8; i++)
@@ -386,5 +388,5 @@ ROM_END
 
 } // Anonymous namespace
 
-//    YEAR  NAME    PARENT  COMPAT  MACHINE INPU    CLASS         INIT        COMPANY                  FULLNAME                               FLAGS
+//    YEAR  NAME    PARENT  COMPAT  MACHINE INPUT   CLASS         INIT        COMPANY                  FULLNAME                               FLAGS
 COMP( 1982, dm3270, 0,      0,      microb, microb, microb_state, empty_init, "Beehive International", "DM3270 Control Unit Display Station", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

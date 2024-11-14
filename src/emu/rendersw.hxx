@@ -14,6 +14,7 @@
 #include "video/rgbutil.h"
 #include "render.h"
 
+#include <array>
 
 template <typename PixelType, int SrcShiftR, int SrcShiftG, int SrcShiftB, int DstShiftR, int DstShiftG, int DstShiftB, bool NoDestRead = false, bool BilinearFilter = false>
 class software_renderer
@@ -29,10 +30,15 @@ private:
 	};
 
 	// internal helpers
+	template <int... Values>
+	static auto make_cosine_table(std::integer_sequence<int, Values...>)
+	{
+		return std::array<u32, sizeof...(Values)>{ u32((1.0 / cos(atan(double(Values) / double(sizeof...(Values) - 1)))) * 0x10000000 + 0.5)... };
+	}
 	static constexpr bool is_opaque(float alpha) { return (alpha >= (NoDestRead ? 0.5f : 1.0f)); }
 	static constexpr bool is_transparent(float alpha) { return (alpha < (NoDestRead ? 0.5f : 0.0001f)); }
-	static inline rgb_t apply_intensity(int intensity, rgb_t color) { return color.scale8(intensity); }
-	static inline float round_nearest(float f) { return floor(f + 0.5f); }
+	static rgb_t apply_intensity(int intensity, rgb_t color) { return color.scale8(intensity); }
+	static float round_nearest(float f) { return floor(f + 0.5f); }
 
 	// destination pixels are written based on the values of the template parameters
 	static constexpr PixelType dest_assemble_rgb(u32 r, u32 g, u32 b) { return (r << DstShiftR) | (g << DstShiftG) | (b << DstShiftB); }
@@ -153,7 +159,10 @@ private:
 		}
 		else
 		{
-			u16 const *const texbase = reinterpret_cast<u16 const *>(texture.base) + (curv >> 16) * texture.rowpixels + (curu >> 16);
+			s32 u = std::clamp<s32>(curu >> 16, 0, texture.width - 1);
+			s32 v = std::clamp<s32>(curv >> 16, 0, texture.height - 1);
+
+			u16 const *const texbase = reinterpret_cast<u16 const *>(texture.base) + v * texture.rowpixels + u;
 			return palbase[texbase[0]];
 		}
 	}
@@ -185,7 +194,10 @@ private:
 		}
 		else
 		{
-			u16 const *const texbase = reinterpret_cast<u16 const *>(texture.base) + (curv >> 16) * texture.rowpixels + (curu >> 16);
+			s32 u = std::clamp<s32>(curu >> 16, 0, texture.width - 1);
+			s32 v = std::clamp<s32>(curv >> 16, 0, texture.height - 1);
+
+			u16 const *const texbase = reinterpret_cast<u16 const *>(texture.base) + v * texture.rowpixels + u;
 			return palbase[texbase[0]];
 		}
 	}
@@ -247,8 +259,11 @@ private:
 		}
 		else
 		{
-			const u16 *texbase = reinterpret_cast<const u16 *>(texture.base) + (curv >> 16) * texture.rowpixels + (curu >> 17) * 2;
-			return (texbase[(curu >> 16) & 1] >> 8) | ((texbase[0] & 0xff) << 8) | ((texbase[1] & 0xff) << 16);
+			s32 u = std::clamp<s32>(curu >> 16, 0, texture.width - 1);
+			s32 v = std::clamp<s32>(curv >> 16, 0, texture.height - 1);
+
+			const u16 *texbase = reinterpret_cast<const u16 *>(texture.base) + v * texture.rowpixels + (u >> 1) * 2;
+			return (texbase[u & 1] >> 8) | ((texbase[0] & 0xff) << 8) | ((texbase[1] & 0xff) << 16);
 		}
 	}
 
@@ -417,8 +432,8 @@ private:
 
 	static void draw_line(render_primitive const &prim, PixelType *dstdata, s32 width, s32 height, u32 pitch)
 	{
-		// internal tables
-		static u32 s_cosine_table[2049];
+		// internal cosine table generated at compile time
+		static auto const s_cosine_table = make_cosine_table(std::make_integer_sequence<int, 2049>());
 
 		// compute the start/end coordinates
 		int x1 = int(prim.bounds.x0 * 65536.0f);
@@ -431,11 +446,6 @@ private:
 
 		if (PRIMFLAG_GET_ANTIALIAS(prim.flags))
 		{
-			// build up the cosine table if we haven't yet
-			if (s_cosine_table[0] == 0)
-				for (int entry = 0; entry <= 2048; entry++)
-					s_cosine_table[entry] = int(double(1.0 / cos(atan(double(entry) / 2048.0))) * 0x10000000 + 0.5);
-
 			int beam = prim.width * 65536.0f;
 			if (beam < 0x00010000)
 				beam = 0x00010000;

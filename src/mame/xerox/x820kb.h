@@ -6,8 +6,8 @@
 
 *********************************************************************/
 
-#ifndef MAME_MACHINE_X820KB_H
-#define MAME_MACHINE_X820KB_H
+#ifndef MAME_XEROX_X820KB_H
+#define MAME_XEROX_X820KB_H
 
 #pragma once
 
@@ -32,14 +32,14 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 	virtual void device_reset_after_children() override;
 
 	// optional information overrides
-	virtual const tiny_rom_entry *device_rom_region() const override;
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual ioport_constructor device_input_ports() const override;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 
 private:
 	required_device<i8048_device> m_maincpu;
@@ -53,8 +53,8 @@ private:
 	uint8_t kb_p1_r();
 	void kb_p1_w(uint8_t data);
 	uint8_t kb_p2_r();
-	DECLARE_READ_LINE_MEMBER( kb_t0_r );
-	DECLARE_READ_LINE_MEMBER( kb_t1_r );
+	int kb_t0_r();
+	int kb_t1_r();
 	void kb_bus_w(uint8_t data);
 };
 
@@ -63,4 +63,4 @@ private:
 DECLARE_DEVICE_TYPE(XEROX_820_KEYBOARD, xerox_820_keyboard_device)
 
 
-#endif // MAME_MACHINE_X820KB_H
+#endif // MAME_XEROX_X820KB_H

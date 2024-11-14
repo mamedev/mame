@@ -21,16 +21,16 @@ public:
 	auto out_J() { return m_out_J_cb.bind(); }
 
 	// port 2 input lines
-	DECLARE_WRITE_LINE_MEMBER(in_E); // C̅L̅E̅A̅R̅
-	DECLARE_WRITE_LINE_MEMBER(in_F); // Data Direction
-	DECLARE_WRITE_LINE_MEMBER(in_G); // IN0
+	void in_E(int state); // C̅L̅E̅A̅R̅
+	void in_F(int state); // Data Direction
+	void in_G(int state); // IN0
 
 	// indirect register access
 	template <u8 Port> u8 reg_r()           { return reg_r(Port - 1); }
 	template <u8 Port> void reg_w(u8 data)  { reg_w(Port - 1, data); }
 
 	// direct register access
-	template <u8 Port> void zbus_map(address_map &map);
+	template <u8 Port> void zbus_map(address_map &map) ATTR_COLD;
 	template <u8 Port> u8 zbus_reg_r(offs_t offset)            { m_port[Port - 1].reg_state = 1; m_port[Port - 1].reg_pointer = offset & 0xf; return reg_r(Port - 1); }
 	template <u8 Port> void zbus_reg_w(offs_t offset, u8 data) { m_port[Port - 1].reg_state = 1; m_port[Port - 1].reg_pointer = offset & 0xf; reg_w(Port - 1, data); }
 
@@ -40,8 +40,8 @@ public:
 
 protected:
 	// standard device_interface overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// primary device read/write handlers
 	u8 reg_r(u8 const port);

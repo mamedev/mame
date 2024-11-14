@@ -1,7 +1,7 @@
 // DefaultName.h
 
-#ifndef __DEFAULT_NAME_H
-#define __DEFAULT_NAME_H
+#ifndef ZIP7_INC_DEFAULT_NAME_H
+#define ZIP7_INC_DEFAULT_NAME_H
 
 #include "../../../Common/MyString.h"
 

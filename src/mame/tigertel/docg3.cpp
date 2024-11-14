@@ -11,6 +11,8 @@
 #include "emu.h"
 #include "docg3.h"
 
+#include <cstdarg>
+
 #define VERBOSE_LEVEL ( 0 )
 
 static inline void ATTR_PRINTF(3,4) verboselog( device_t &device, int n_level, const char *s_fmt, ... )
@@ -821,11 +823,18 @@ void diskonchip_g3_device::nvram_default()
 
 bool diskonchip_g3_device::nvram_read(util::read_stream &file)
 {
+	std::error_condition err;
 	size_t actual;
-	bool result = !file.read(m_data[0].get(), m_data_size[0], actual) && actual == m_data_size[0];
-	result = result && !file.read(m_data[1].get(), m_data_size[1], actual) && actual == m_data_size[1];
-	result = result && !file.read(m_data[2].get(), m_data_size[2], actual) && actual == m_data_size[2];
-	return result;
+	std::tie(err, actual) = read(file, m_data[0].get(), m_data_size[0]);
+	if (err || (actual != m_data_size[0]))
+		return false;
+	std::tie(err, actual) = read(file, m_data[1].get(), m_data_size[1]);
+	if (err || (actual != m_data_size[1]))
+		return false;
+	std::tie(err, actual) = read(file, m_data[2].get(), m_data_size[2]);
+	if (err || (actual != m_data_size[2]))
+		return false;
+	return true;
 }
 
 //-------------------------------------------------
@@ -835,9 +844,12 @@ bool diskonchip_g3_device::nvram_read(util::read_stream &file)
 
 bool diskonchip_g3_device::nvram_write(util::write_stream &file)
 {
+	std::error_condition err;
 	size_t actual;
-	bool result = !file.write(m_data[0].get(), m_data_size[0], actual) && actual == m_data_size[0];
-	result = result && !file.write(m_data[1].get(), m_data_size[1], actual) && actual == m_data_size[1];
-	result = result && !file.write(m_data[2].get(), m_data_size[2], actual) && actual == m_data_size[2];
-	return result;
+	std::tie(err, actual) = write(file, m_data[0].get(), m_data_size[0]);
+	if (!err)
+		std::tie(err, actual) = write(file, m_data[1].get(), m_data_size[1]);
+	if (!err)
+		std::tie(err, actual) = write(file, m_data[2].get(), m_data_size[2]);
+	return !err;
 }

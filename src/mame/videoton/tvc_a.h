@@ -6,8 +6,8 @@
  *
  ****************************************************************************/
 
-#ifndef MAME_AUDIO_TVC_H
-#define MAME_AUDIO_TVC_H
+#ifndef MAME_VIDEOTON_TVC_A_H
+#define MAME_VIDEOTON_TVC_A_H
 
 #pragma once
 
@@ -31,8 +31,8 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
 
 	TIMER_CALLBACK_MEMBER(trigger_int);
@@ -52,4 +52,4 @@ private:
 // device type definition
 DECLARE_DEVICE_TYPE(TVC_SOUND, tvc_sound_device)
 
-#endif // MAME_AUDIO_TVC_H
+#endif // MAME_VIDEOTON_TVC_A_H

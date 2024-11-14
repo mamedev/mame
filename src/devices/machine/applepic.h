@@ -33,16 +33,15 @@ public:
 	void host_w(offs_t offset, u8 data);
 
 	// peripheral device requests
-	DECLARE_WRITE_LINE_MEMBER(pint_w);
-	DECLARE_WRITE_LINE_MEMBER(reqa_w);
-	DECLARE_WRITE_LINE_MEMBER(reqb_w);
+	void pint_w(int state);
+	void reqa_w(int state);
+	void reqb_w(int state);
 
 protected:
-	// device-level overrides
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual void device_resolve_objects() override;
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	// device_t implementation
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 private:
 	static const std::string_view s_interrupt_names[8];
@@ -52,12 +51,14 @@ private:
 		u8 control;
 		u16 map;
 		u16 tc;
+		bool req;
 	};
 
 	u8 timer_r(offs_t offset);
 	void timer_w(offs_t offset, u8 data);
 	u16 get_timer_count() const;
 	TIMER_CALLBACK_MEMBER(timer1_callback);
+	TIMER_CALLBACK_MEMBER(dma_timer_callback);
 	u8 dma_channel_r(offs_t offset);
 	void dma_channel_w(offs_t offset, u8 data);
 	u8 scc_control_r();
@@ -77,7 +78,7 @@ private:
 	u8 device_reg_r(offs_t offset);
 	void device_reg_w(offs_t offset, u8 data);
 
-	void internal_map(address_map &map);
+	void internal_map(address_map &map) ATTR_COLD;
 
 	// internal CPU
 	required_device<r65c02_device> m_iopcpu;
@@ -90,7 +91,7 @@ private:
 	devcb_write_line::array<2> m_gpout_callback;
 
 	// internal state
-	emu_timer *m_timer1;
+	emu_timer *m_timer1, *m_dma_timer;
 	attotime m_timer_last_expired;
 	u16 m_ram_address;
 	u8 m_status_reg;

@@ -1,8 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood
 
-#ifndef MAME_MACHINE_XAVIX2002_IO_H
-#define MAME_MACHINE_XAVIX2002_IO_H
+#ifndef MAME_TVGAMES_XAVIX2002_IO_H
+#define MAME_TVGAMES_XAVIX2002_IO_H
 
 
 class xavix2002_io_device : public device_t
@@ -28,8 +28,8 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 private:
 	devcb_read8 m_in0_cb;
@@ -46,4 +46,4 @@ private:
 
 DECLARE_DEVICE_TYPE(XAVIX2002IO, xavix2002_io_device)
 
-#endif // MAME_MACHINE_XAVIX2002_IO_H
+#endif // MAME_TVGAMES_XAVIX2002_IO_H

@@ -116,14 +116,14 @@ public:
 	void pca020(machine_config &config);  // DMD controller
 
 private:
-	void main_map(address_map &map);
-	void pca002_map(address_map &map);
-	void pca003_map(address_map &map);
-	void pca008_map(address_map &map);
-	void pca020_io_map(address_map &map);
-	void pca020_mem_map(address_map &map);
-	void machine_start() override;
-	void machine_reset() override;
+	void main_map(address_map &map) ATTR_COLD;
+	void pca002_map(address_map &map) ATTR_COLD;
+	void pca003_map(address_map &map) ATTR_COLD;
+	void pca008_map(address_map &map) ATTR_COLD;
+	void pca020_io_map(address_map &map) ATTR_COLD;
+	void pca020_mem_map(address_map &map) ATTR_COLD;
+	void machine_start() override ATTR_COLD;
+	void machine_reset() override ATTR_COLD;
 	void display_w(offs_t, u8);
 	void ppi0_pa_w(u8 data) { for (u8 i = 0; i < 8; i++) m_io_outputs[i] = BIT(data, i); }
 	void ppi0_pb_w(u8 data) { for (u8 i = 0; i < 8; i++) m_io_outputs[8U+i] = BIT(data, i); }

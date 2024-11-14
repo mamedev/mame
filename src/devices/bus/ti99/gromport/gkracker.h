@@ -21,25 +21,23 @@ public:
 	void write(offs_t offset, uint8_t data) override;
 	void crureadz(offs_t offset, uint8_t *value) override;
 	void cruwrite(offs_t offset, uint8_t data) override;
-	DECLARE_WRITE_LINE_MEMBER(romgq_line) override;
+	void romgq_line(int state) override;
 
 	void set_gromlines(line_state mline, line_state moline, line_state gsq) override;
-	DECLARE_WRITE_LINE_MEMBER(gclock_in) override;
+	void gclock_in(int state) override;
 
-	void insert(int index, ti99_cartridge_device* cart) override;
-	void remove(int index) override;
 	DECLARE_INPUT_CHANGED_MEMBER( gk_changed );
 
 	// We may have a cartridge plugged into the GK
 	bool is_grom_idle() override;
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 	virtual const tiny_rom_entry* device_rom_region() const override;
-	virtual ioport_constructor device_input_ports() const override;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 
 	// device_nvram_interface
 	virtual void nvram_default() override;
@@ -57,7 +55,7 @@ private:
 
 	bool    m_waddr_LSB;
 
-	ti99_cartridge_device *m_cartridge;     // guest cartridge
+	required_device<ti99_cartridge_device> m_cartridge;
 
 	// Just for proper initialization
 	void gk_install_menu(const char* menutext, int len, int ptr, int next, int start);

@@ -5,8 +5,8 @@
     Taito Grand Champ hardware
 
 *************************************************************************/
-#ifndef MAME_INCLUDES_GRCHAMP_H
-#define MAME_INCLUDES_GRCHAMP_H
+#ifndef MAME_TAITO_GRCHAMP_H
+#define MAME_TAITO_GRCHAMP_H
 
 #pragma once
 
@@ -37,15 +37,16 @@ public:
 		m_leftram(*this, "leftram"),
 		m_rightram(*this, "rightram"),
 		m_centerram(*this, "centerram"),
-		m_digits(*this, "digit%u", 0U)
+		m_digits(*this, "digit%u", 0U),
+		m_led0(*this, "led0")
 	{ }
 
 	void grchamp(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	void cpu0_outputs_w(offs_t offset, uint8_t data);
@@ -85,11 +86,11 @@ private:
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void draw_objects(int y, uint8_t *objdata);
-	void main_map(address_map &map);
-	void main_portmap(address_map &map);
-	void sound_map(address_map &map);
-	void sub_map(address_map &map);
-	void sub_portmap(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
+	void main_portmap(address_map &map) ATTR_COLD;
+	void sound_map(address_map &map) ATTR_COLD;
+	void sub_map(address_map &map) ATTR_COLD;
+	void sub_portmap(address_map &map) ATTR_COLD;
 
 	uint8_t       m_cpu0_out[16]{};
 	uint8_t       m_cpu1_out[16]{};
@@ -130,6 +131,7 @@ private:
 	required_shared_ptr<uint8_t> m_rightram;
 	required_shared_ptr<uint8_t> m_centerram;
 	output_finder<8> m_digits;
+	output_finder<> m_led0;
 };
 
 /* Discrete Sound Input Nodes */
@@ -147,4 +149,4 @@ private:
 
 DISCRETE_SOUND_EXTERN( grchamp_discrete );
 
-#endif // MAME_INCLUDES_GRCHAMP_H
+#endif // MAME_TAITO_GRCHAMP_H

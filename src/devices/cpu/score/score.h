@@ -37,13 +37,12 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// device_execute_interface overrides
 	virtual uint32_t execute_min_cycles() const noexcept override { return 1; }
 	virtual uint32_t execute_max_cycles() const noexcept override { return 1; }
-	virtual uint32_t execute_input_lines() const noexcept override { return 64; }
 	virtual void execute_run() override;
 	virtual void execute_set_input(int inputnum, int state) override;
 
@@ -60,7 +59,6 @@ private:
 	// helpers
 	bool check_condition_branch(uint8_t bc);
 	bool check_condition(uint8_t bc);
-	int32_t sign_extend(uint32_t data, uint8_t len);
 	uint32_t fetch();
 	uint8_t read_byte(offs_t offset);
 	uint16_t read_word(offs_t offset);

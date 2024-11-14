@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Aaron Giles
+// copyright-holders:Olivier Galibert
 /*********************************************************
 
     Konami 054539 (TOP) PCM Sound Chip
@@ -25,7 +25,6 @@ k054539_device::k054539_device(const machine_config &mconfig, const char *tag, d
 	, flags(0)
 	, reverb_pos(0)
 	, cur_ptr(0)
-	, cur_limit(0)
 	, rom_addr(0)
 	, stream(nullptr)
 	, m_timer(nullptr)
@@ -104,36 +103,14 @@ void k054539_device::keyoff(int channel)
 		regs[0x22c] &= ~(1 << channel);
 }
 
-void k054539_device::advance_filter(int channel, int val)
-{
-	auto &hist = filter_hist[channel];
-	hist[0] = hist[1];
-	hist[1] = hist[2];
-	hist[2] = hist[3];
-	hist[3] = ((float) val) / 32768.0f;
-}
-
-float k054539_device::calculate_filter(int channel, float t)
-{
-	// Cubic hermite interpolation
-	// t is domain [0,1]
-
-	auto &hist = filter_hist[channel];
-	const float a = (-hist[0] / 2.0f) + (3.0f * hist[1] / 2.0f) - (3.0f * hist[2] / 2.0f) + (hist[3] / 2.0f);
-	const float b = hist[0] - (5.0f * hist[1] / 2.0f) + (2.0f * hist[2]) - (hist[3] / 2.0f);
-	const float c = (-hist[0] / 2.0f) + (hist[2] / 2.0f);
-	return (t * t * t * a) + (t * t * b) + (t * c) + hist[1];
-}
-
 void k054539_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
 {
-#define VOL_CAP 1.80
+	static constexpr double VOL_CAP = 1.80;
 
 	static const int16_t dpcm[16] = {
 		0 * 0x100,   1 * 0x100,   2 * 0x100,   4 * 0x100,  8 * 0x100, 16 * 0x100, 32 * 0x100, 64 * 0x100,
 		0 * 0x100, -64 * 0x100, -32 * 0x100, -16 * 0x100, -8 * 0x100, -4 * 0x100, -2 * 0x100, -1 * 0x100
 	};
-
 
 	int16_t *rbase = (int16_t *)&ram[0];
 
@@ -153,7 +130,7 @@ void k054539_device::sound_stream_update(sound_stream &stream, std::vector<read_
 		rbase[reverb_pos] = 0;
 
 		for(int ch=0; ch<8; ch++)
-			if(regs[0x22c] & (1<<ch)) {
+			if(BIT(regs[0x22c], ch)) {
 				unsigned char *base1 = regs + 0x20*ch;
 				unsigned char *base2 = regs + 0x200 + 0x2*ch;
 				channel *chan = channels + ch;
@@ -216,8 +193,6 @@ void k054539_device::sound_stream_update(sound_stream &stream, std::vector<read_
 					cur_pval = chan->pval;
 				}
 
-				float filter_frac = 0;
-
 				switch(base2[0] & 0xc) {
 				case 0x0: { // 8bit pcm
 					cur_pfrac += delta;
@@ -231,17 +206,12 @@ void k054539_device::sound_stream_update(sound_stream &stream, std::vector<read_
 							cur_pos = (base1[0x08] | (base1[0x09] << 8) | (base1[0x0a] << 16));
 							cur_val = (int16_t)(read_byte(cur_pos) << 8);
 						}
-
 						if(cur_val == (int16_t)0x8000) {
 							keyoff(ch);
 							cur_val = 0;
 							break;
 						}
-
-						advance_filter(ch, cur_val);
 					}
-
-					filter_frac = (float)(cur_pfrac & 0xffff) / 65536.0f;
 					break;
 				}
 
@@ -259,17 +229,12 @@ void k054539_device::sound_stream_update(sound_stream &stream, std::vector<read_
 							cur_pos = (base1[0x08] | (base1[0x09] << 8) | (base1[0x0a] << 16));
 							cur_val = (int16_t)(read_byte(cur_pos) | read_byte(cur_pos+1)<<8);
 						}
-
 						if(cur_val == (int16_t)0x8000) {
 							keyoff(ch);
 							cur_val = 0;
 							break;
 						}
-
-						advance_filter(ch, cur_val);
 					}
-
-					filter_frac = (float)(cur_pfrac & 0xffff) / 65536.0f;
 					break;
 				}
 
@@ -306,11 +271,7 @@ void k054539_device::sound_stream_update(sound_stream &stream, std::vector<read_
 							cur_val = -32768;
 						else if(cur_val > 32767)
 							cur_val = 32767;
-
-						advance_filter(ch, cur_val);
 					}
-
-					filter_frac = (float)(cur_pfrac & 0xffff) / 65536.0f;
 
 					cur_pfrac >>= 1;
 					if(cur_pos & 1)
@@ -322,12 +283,9 @@ void k054539_device::sound_stream_update(sound_stream &stream, std::vector<read_
 					LOG("Unknown sample type %x for channel %d\n", base2[0] & 0xc, ch);
 					break;
 				}
-
-				const float filter_val = calculate_filter(ch, filter_frac);
-
-				lval += filter_val * lvol;
-				rval += filter_val * rvol;
-				rbase[(rdelta + reverb_pos) & 0x1fff] += int16_t(filter_val*rbvol);
+				lval += cur_val * lvol;
+				rval += cur_val * rvol;
+				rbase[(rdelta + reverb_pos) & 0x1fff] += int16_t(cur_val*rbvol);
 
 				chan->pos = cur_pos;
 				chan->pfrac = cur_pfrac;
@@ -339,13 +297,10 @@ void k054539_device::sound_stream_update(sound_stream &stream, std::vector<read_
 					base1[0x0d] = cur_pos>> 8 & 0xff;
 					base1[0x0e] = cur_pos>>16 & 0xff;
 				}
-			} else {
-				// Fill the interpolation vectors with silence when channel is disabled
-				advance_filter(ch, 0);
 			}
 		reverb_pos = (reverb_pos + 1) & 0x1fff;
-		outputs[0].put(sample, lval);
-		outputs[1].put(sample, rval);
+		outputs[0].put_int(sample, lval, 32768);
+		outputs[1].put_int(sample, rval, 32768);
 	}
 }
 
@@ -360,14 +315,13 @@ void k054539_device::init_chip()
 {
 	memset(regs, 0, sizeof(regs));
 	memset(posreg_latch, 0, sizeof(posreg_latch)); //*
-	memset(filter_hist, 0, sizeof(filter_hist));
 	flags |= UPDATE_AT_KEYON; //* make it default until proven otherwise
 
-	ram = std::make_unique<uint8_t []>(0x4000);
+	ram = std::make_unique<uint8_t []>(0x8000);
 
 	reverb_pos = 0;
 	cur_ptr = 0;
-	memset(&ram[0], 0, 0x4000);
+	memset(&ram[0], 0, 0x8000);
 
 	stream = stream_alloc(0, 2, clock() / 384);
 
@@ -378,12 +332,10 @@ void k054539_device::init_chip()
 	save_item(NAME(flags));
 
 	save_item(NAME(regs));
-	save_pointer(NAME(ram), 0x4000);
+	save_pointer(NAME(ram), 0x8000);
 	save_item(NAME(reverb_pos));
 	save_item(NAME(cur_ptr));
-	save_item(NAME(cur_limit));
 	save_item(NAME(rom_addr));
-	save_item(NAME(filter_hist));
 
 	save_item(NAME(m_timer_state));
 }
@@ -479,16 +431,15 @@ void k054539_device::write(offs_t offset, u8 data)
 		break;
 
 		case 0x22d:
-			if(rom_addr == 0x80)
-				ram[cur_ptr] = data;
-			cur_ptr++;
-			if(cur_ptr == cur_limit)
-				cur_ptr = 0;
+			if(rom_addr == 0x80) {
+				offs_t const addr = (cur_ptr & 0x3fff) | ((cur_ptr & 0x10000) >> 2);
+				ram[addr] = data;
+			}
+			cur_ptr = (cur_ptr + 1) & 0x1ffff;
 		break;
 
 		case 0x22e:
 			rom_addr = data;
-			cur_limit = rom_addr == 0x80 ? 0x4000 : 0x20000;
 			cur_ptr = 0;
 		break;
 
@@ -523,7 +474,6 @@ void k054539_device::write(offs_t offset, u8 data)
 
 void k054539_device::device_post_load()
 {
-	cur_limit = rom_addr == 0x80 ? 0x4000 : 0x20000;
 }
 
 u8 k054539_device::read(offs_t offset)
@@ -531,13 +481,10 @@ u8 k054539_device::read(offs_t offset)
 	switch(offset) {
 	case 0x22d:
 		if(regs[0x22f] & 0x10) {
-			uint8_t res = (rom_addr == 0x80) ? ram[cur_ptr] : read_byte((0x20000*rom_addr)+cur_ptr);
-			if (!machine().side_effects_disabled())
-			{
-				cur_ptr++;
-				if(cur_ptr == cur_limit)
-					cur_ptr = 0;
-			}
+			offs_t const addr = (cur_ptr & 0x3fff) | ((cur_ptr & 0x10000) >> 2);
+			uint8_t res = (rom_addr == 0x80) ? ram[addr] : read_byte((0x20000*rom_addr) + cur_ptr);
+			if(!machine().side_effects_disabled())
+				cur_ptr = (cur_ptr + 1) & 0x1ffff;
 			return res;
 		} else
 			return 0;
@@ -554,8 +501,7 @@ void k054539_device::device_start()
 {
 	m_timer = timer_alloc(FUNC(k054539_device::call_timer_handler), this);
 
-	// resolve / bind callbacks
-	m_timer_handler.resolve_safe();
+	// resolve delegates
 	m_apan_cb.resolve();
 
 	for (auto & elem : gain)
@@ -597,17 +543,17 @@ void k054539_device::device_reset()
 {
 	regs[0x22c] = 0;
 	regs[0x22f] = 0;
-	memset(&ram[0], 0, 0x4000);
+	memset(&ram[0], 0, 0x8000);
 	m_timer->enable(false);
 }
 
 
 //-------------------------------------------------
-//  rom_bank_updated - the rom bank has changed
+//  rom_bank_pre_change - refresh the stream if the
+//  ROM banking changes
 //-------------------------------------------------
 
-void k054539_device::rom_bank_updated()
+void k054539_device::rom_bank_pre_change()
 {
 	stream->update();
 }
-

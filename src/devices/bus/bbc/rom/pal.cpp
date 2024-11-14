@@ -34,6 +34,12 @@
     Not a PALPROM carrier board but a larger ROM carrier containing 4x32K
     and TTL circuits to enable and page each ROM into 16K banks.
 
+  Acornsoft Trilogy Emulator (PAL20R4)
+    An unreleased product that combines the View family of ROMs into a
+    single banked 64K ROM, using a PAL to perform 16K bank switches upon
+    reads from the last 4 bytes of ROM space &BFFC to &BFFF. Only known
+    example loaned by Stuart Swales.
+
 ***************************************************************************/
 
 #include "emu.h"
@@ -53,6 +59,7 @@ DEFINE_DEVICE_TYPE(BBC_PALTED, bbc_palted_device, "bbc_palted", "Watford Electro
 DEFINE_DEVICE_TYPE(BBC_PALABEP, bbc_palabep_device, "bbc_palabep", "P.R.E.S. 32K ROM Carrier (ABE+)")
 DEFINE_DEVICE_TYPE(BBC_PALABE, bbc_palabe_device, "bbc_palabe", "P.R.E.S. 32K ROM Carrier (ABE)")
 DEFINE_DEVICE_TYPE(BBC_PALMO2, bbc_palmo2_device, "bbc_palmo2", "Instant Mini Office 2 ROM Carrier")
+DEFINE_DEVICE_TYPE(BBC_TRILOGY, bbc_trilogy_device, "bbc_trilogy", "Acornsoft Trilogy Emulator")
 
 
 //**************************************************************************
@@ -112,6 +119,11 @@ bbc_palabe_device::bbc_palabe_device(const machine_config &mconfig, const char *
 
 bbc_palmo2_device::bbc_palmo2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: bbc_pal_device(mconfig, BBC_PALMO2, tag, owner, clock)
+{
+}
+
+bbc_trilogy_device::bbc_trilogy_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: bbc_pal_device(mconfig, BBC_TRILOGY, tag, owner, clock)
 {
 }
 
@@ -309,4 +321,18 @@ uint8_t bbc_palmo2_device::read(offs_t offset)
 	}
 
 	return get_rom_base()[(offset & 0x3fff) | (m_bank << 13)];
+}
+
+uint8_t bbc_trilogy_device::read(offs_t offset)
+{
+	if (!machine().side_effects_disabled())
+	{
+		/* switching zones for Acornsoft Trilogy Emulator */
+		switch (offset & 0x3ff8)
+		{
+		case 0x3ff8: m_bank = offset & 0x03; break;
+		}
+	}
+
+	return get_rom_base()[(offset & 0x3fff) | (m_bank << 14)];
 }

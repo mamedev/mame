@@ -2,7 +2,7 @@
 // copyright-holders:R. Belmont
 /*****************************************************************************
  *
- *   sh4->h
+ *   sh4.h
  *   Portable Hitachi SH-4 (SH7750 family) emulator interface
  *
  *   By R. Belmont, based on sh2.c by Juergen Buchmueller, Mariusz Wojcieszek,
@@ -168,10 +168,10 @@ public:
 
 	void set_mmu_hacktype(int hacktype) { m_mmuhack = hacktype; }
 
-	TIMER_CALLBACK_MEMBER( sh4_refresh_timer_callback );
-	TIMER_CALLBACK_MEMBER( sh4_rtc_timer_callback );
-	TIMER_CALLBACK_MEMBER( sh4_timer_callback );
-	TIMER_CALLBACK_MEMBER( sh4_dmac_callback );
+	TIMER_CALLBACK_MEMBER(sh4_refresh_timer_callback);
+	TIMER_CALLBACK_MEMBER(sh4_rtc_timer_callback);
+	TIMER_CALLBACK_MEMBER(sh4_timer_callback);
+	TIMER_CALLBACK_MEMBER(sh4_dmac_callback);
 
 	virtual void set_frt_input(int state) override;
 	void sh4_set_irln_input(int value);
@@ -257,13 +257,12 @@ protected:
 	sh34_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, endianness_t endianness, address_map_constructor internal);
 
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// device_execute_interface overrides
 	virtual uint32_t execute_min_cycles() const noexcept override { return 1; }
 	virtual uint32_t execute_max_cycles() const noexcept override { return 4; }
-	virtual uint32_t execute_input_lines() const noexcept override { return 5; }
 	virtual void execute_run() override;
 	virtual void execute_set_input(int inputnum, int state) override;
 	virtual bool execute_input_edge_triggered(int inputnum) const noexcept override { return inputnum == INPUT_LINE_NMI; }
@@ -387,13 +386,11 @@ protected:
 
 	inline void sh4_check_pending_irq(const char *message) // look for highest priority active exception and handle it
 	{
-		int a,irq,z;
-
 		m_willjump = 0; // for the DRC
 
-		irq = 0;
-		z = -1;
-		for (a=0;a <= SH4_INTC_ROVI;a++)
+		int irq = 0;
+		int z = -1;
+		for (int a = 0; a <= SH4_INTC_ROVI; a++)
 		{
 			if (m_exception_requesting[a])
 			{
@@ -493,12 +490,13 @@ protected:
 	uint32_t sh4_handle_dmaor_addr_r(uint32_t mem_mask) { return m_SH4_DMAOR; }
 
 	// memory handlers
-	virtual uint8_t RB(offs_t A) override;
-	virtual uint16_t RW(offs_t A) override;
-	virtual uint32_t RL(offs_t A) override;
-	virtual void WB(offs_t A, uint8_t V) override;
-	virtual void WW(offs_t A, uint16_t V) override;
-	virtual void WL(offs_t A, uint32_t V) override;
+	virtual uint8_t read_byte(offs_t offset) override;
+	virtual uint16_t read_word(offs_t offset) override;
+	virtual uint32_t read_long(offs_t offset) override;
+	virtual uint16_t decrypted_read_word(offs_t offset) override;
+	virtual void write_byte(offs_t offset, uint8_t data) override;
+	virtual void write_word(offs_t offset, uint16_t data) override;
+	virtual void write_long(offs_t offset, uint32_t data) override;
 
 	// regular handlers for opcodes which need to differ on sh3/4 due to different interrupt / exception handling and register banking
 	virtual void LDCSR(const uint16_t opcode) override;
@@ -687,12 +685,12 @@ public:
 	void sh3_internal_high_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 	uint32_t sh3_internal_high_r(offs_t offset, uint32_t mem_mask = ~0);
 
-	void sh3_internal_map(address_map &map);
+	void sh3_internal_map(address_map &map) ATTR_COLD;
 protected:
 	// construction/destruction
 	sh3_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, endianness_t endianness);
 
-	virtual void device_reset() override;
+	virtual void device_reset() override ATTR_COLD;
 };
 
 
@@ -715,13 +713,13 @@ public:
 	virtual uint32_t sh4_getsqremap(uint32_t address) override;
 	sh4_utlb m_utlb[64];
 
-	void sh4_internal_map(address_map &map);
+	void sh4_internal_map(address_map &map) ATTR_COLD;
 protected:
 	// construction/destruction
 	sh4_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, endianness_t endianness);
 
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 };
 
 

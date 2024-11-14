@@ -22,6 +22,8 @@
 #include "pc1500.lh"
 
 
+namespace {
+
 class pc1500_state : public driver_device
 {
 public:
@@ -52,8 +54,8 @@ public:
 	void pc1500(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	required_device<lh5801_cpu_device> m_maincpu;
@@ -89,8 +91,8 @@ private:
 
 	uint8_t pc1500_kb_r();
 	void pc1500_palette(palette_device &palette) const;
-	void pc1500_mem(address_map &map);
-	void pc1500_mem_io(address_map &map);
+	void pc1500_mem(address_map &map) ATTR_COLD;
+	void pc1500_mem_io(address_map &map) ATTR_COLD;
 };
 
 void pc1500_state::pc1500_mem(address_map &map)
@@ -355,6 +357,9 @@ ROM_START( pc1500 )
 	ROM_REGION( 0x2000, "ce150", ROMREGION_ERASEFF )
 	ROM_LOAD( "ce-150.rom", 0x0000, 0x2000, CRC(8fa1df6d) SHA1(a3aa02a641a46c27c0d4c0dc025b0dbe9b5b79c8))
 ROM_END
+
+} // anonymous namespace
+
 
 //    YEAR  NAME    PARENT  COMPAT  MACHINE INPUT   CLASS         INIT        COMPANY  FULLNAME                FLAGS
 COMP( 198?, pc1500, 0,      0,      pc1500, pc1500, pc1500_state, empty_init, "Sharp", "Pocket Computer 1500", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

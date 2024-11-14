@@ -14,17 +14,17 @@ _2d_format::_2d_format() : wd177x_format(formats)
 {
 }
 
-const char *_2d_format::name() const
+const char *_2d_format::name() const noexcept
 {
 	return "2d";
 }
 
-const char *_2d_format::description() const
+const char *_2d_format::description() const noexcept
 {
 	return "2D disk image";
 }
 
-const char *_2d_format::extensions() const
+const char *_2d_format::extensions() const noexcept
 {
 	return "2d";
 }

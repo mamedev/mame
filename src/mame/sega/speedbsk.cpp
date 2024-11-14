@@ -102,6 +102,7 @@ public:
 		m_ppi(*this, "ppi%u", 0U),
 		m_lcd(*this, "lcd"),
 		m_lamp_pwm(*this, "lamp_pwm%u", 0),
+		m_soundbank(*this, "soundbank"),
 		m_lamps(*this, "hole_%u", 1U),
 		m_start_lamp(*this, "start_lamp")
 	{ }
@@ -109,7 +110,7 @@ public:
 	void speedbsk(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -117,13 +118,15 @@ private:
 	required_device<hd44780_device> m_lcd;
 	required_device_array<pwm_display_device, 6> m_lamp_pwm;
 
+	required_memory_bank m_soundbank;
+
 	output_finder<24> m_lamps;
 	output_finder<> m_start_lamp;
 
-	void main_map(address_map &map);
-	void audio_map(address_map &map);
-	void audio_io_map(address_map &map);
-	void pcm_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
+	void audio_map(address_map &map) ATTR_COLD;
+	void audio_io_map(address_map &map) ATTR_COLD;
+	void pcm_map(address_map &map) ATTR_COLD;
 
 	void lcd_palette(palette_device &palette) const;
 	HD44780_PIXEL_UPDATE(lcd_pixel_update);
@@ -134,6 +137,7 @@ private:
 	void solenoid2_w(uint8_t data);
 	void ppi1_porta_w(uint8_t data);
 	void ppi1_portc_w(uint8_t data);
+	void soundbank_w(uint8_t data);
 };
 
 
@@ -159,7 +163,7 @@ void speedbsk_state::main_map(address_map &map)
 void speedbsk_state::audio_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom().region("audiocpu", 0);
-	map(0x8000, 0xbfff).rom().region("audiocpu", 0x80000); // banked rom?
+	map(0x8000, 0x9fff).bankr(m_soundbank);
 	map(0xc000, 0xdfff).m("rfsnd", FUNC(rf5c164_device::rf5c164_map));
 	map(0xe000, 0xffff).ram();
 }
@@ -170,9 +174,9 @@ void speedbsk_state::audio_io_map(address_map &map)
 	map(0x01, 0x01).nopw();
 	map(0x02, 0x03).rw("tmp82c51", FUNC(i8251_device::read), FUNC(i8251_device::write));
 	map(0x10, 0x13).nopw(); // misc. outputs
-	map(0x20, 0x20).lr8(NAME([]() -> uint8_t { return 0x01; })); // some kind of serial read
+	map(0x20, 0x20).lr8(NAME([]() -> uint8_t { return 0x01; })); // ready for more outputs?
 	map(0x21, 0x23).nopw();
-	map(0x30, 0x30).nopw(); // bankswitch?
+	map(0x30, 0x30).w(FUNC(speedbsk_state::soundbank_w));
 	map(0x40, 0x41).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write));
 	map(0x50, 0x50).rw("adc", FUNC(msm6253_device::d0_r), FUNC(msm6253_device::select_w));
 }
@@ -199,9 +203,9 @@ static INPUT_PORTS_START( speedbsk )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE1 )
 
 	PORT_START("service_panel")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_1_PAD) PORT_NAME("Service A \xe2\x86\x91 INC") PORT_WRITE_LINE_DEVICE_MEMBER("upd4701_0", upd4701_device, right_w)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_2_PAD) PORT_NAME("Service B \xe2\x86\x93 DEC") PORT_WRITE_LINE_DEVICE_MEMBER("upd4701_0", upd4701_device, left_w)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_3_PAD) PORT_NAME("Service C \xe2\x86\xb2 ENT") PORT_WRITE_LINE_DEVICE_MEMBER("upd4701_1", upd4701_device, right_w)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_1_PAD) PORT_NAME("Service A \xe2\x86\x91 INC") PORT_WRITE_LINE_DEVICE_MEMBER("upd4701_0", FUNC(upd4701_device::right_w))
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_2_PAD) PORT_NAME("Service B \xe2\x86\x93 DEC") PORT_WRITE_LINE_DEVICE_MEMBER("upd4701_0", FUNC(upd4701_device::left_w))
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_3_PAD) PORT_NAME("Service C \xe2\x86\xb2 ENT") PORT_WRITE_LINE_DEVICE_MEMBER("upd4701_1", FUNC(upd4701_device::right_w))
 
 	PORT_START("unk")
 	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(50) PORT_KEYDELTA(1) PORT_CODE_DEC(KEYCODE_PGDN) PORT_CODE_INC(KEYCODE_PGUP)
@@ -353,11 +357,19 @@ void speedbsk_state::ppi1_portc_w(uint8_t data)
 	m_lcd->e_w(BIT(data, 2));
 }
 
+void speedbsk_state::soundbank_w(uint8_t data)
+{
+	m_soundbank->set_entry(data);
+}
+
 void speedbsk_state::machine_start()
 {
 	// resolve outputs
 	m_lamps.resolve();
 	m_start_lamp.resolve();
+
+	m_soundbank->configure_entries(0, 0x100, memregion("audiocpu")->base(), 0x2000);
+	m_soundbank->set_entry(0);
 }
 
 
@@ -440,7 +452,7 @@ void speedbsk_state::speedbsk(machine_config &config)
 
 	PALETTE(config, "palette", FUNC(speedbsk_state::lcd_palette), 3);
 
-	HD44780(config, m_lcd, 0);
+	HD44780(config, m_lcd, 270'000); // TODO: clock not measured, datasheet typical clock used
 	m_lcd->set_lcd_size(2, 20);
 	m_lcd->set_pixel_update_cb(FUNC(speedbsk_state::lcd_pixel_update));
 

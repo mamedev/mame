@@ -6,8 +6,8 @@
 
 **********************************************************************/
 
-#ifndef MAME_MACHINE_PC1512KB_H
-#define MAME_MACHINE_PC1512KB_H
+#ifndef MAME_AMSTRAD_PC1512KB_H
+#define MAME_AMSTRAD_PC1512KB_H
 
 #pragma once
 
@@ -39,20 +39,20 @@ public:
 	auto clock_wr_callback() { return m_write_clock.bind(); }
 	auto data_wr_callback() { return m_write_data.bind(); }
 
-	DECLARE_WRITE_LINE_MEMBER( data_w );
-	DECLARE_WRITE_LINE_MEMBER( clock_w );
-	DECLARE_WRITE_LINE_MEMBER( m1_w );
-	DECLARE_WRITE_LINE_MEMBER( m2_w );
+	void data_w(int state);
+	void clock_w(int state);
+	void m1_w(int state);
+	void m2_w(int state);
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// optional information overrides
-	virtual const tiny_rom_entry *device_rom_region() const override;
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual ioport_constructor device_input_ports() const override;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 
 	TIMER_CALLBACK_MEMBER(reset_timer_tick);
 
@@ -85,8 +85,8 @@ private:
 	void kb_p1_w(uint8_t data);
 	uint8_t kb_p2_r();
 	void kb_p2_w(uint8_t data);
-	DECLARE_READ_LINE_MEMBER( kb_t0_r );
-	DECLARE_READ_LINE_MEMBER( kb_t1_r );
+	int kb_t0_r();
+	int kb_t1_r();
 };
 
 
@@ -94,4 +94,4 @@ private:
 DECLARE_DEVICE_TYPE(PC1512_KEYBOARD, pc1512_keyboard_device)
 
 
-#endif // MAME_MACHINE_PC1512KB_H
+#endif // MAME_AMSTRAD_PC1512KB_H

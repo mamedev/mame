@@ -12,6 +12,9 @@
 #include "mb63h149.h"
 #include "machine/nvram.h"
 
+
+namespace {
+
 class roland_d50_state : public driver_device
 {
 public:
@@ -26,9 +29,9 @@ public:
 	void d550(machine_config &config);
 
 private:
-	void d50_mem_map(address_map &map);
-	void d550_mem_map(address_map &map);
-	void eram_map(address_map &map);
+	void d50_mem_map(address_map &map) ATTR_COLD;
+	void d550_mem_map(address_map &map) ATTR_COLD;
+	void eram_map(address_map &map) ATTR_COLD;
 
 	required_device<upd78312_device> m_maincpu;
 	required_device<address_map_bank_device> m_eram;
@@ -119,7 +122,7 @@ ROM_START(d50) // Newer PCB with silkscreen "Roland || D-50, D-550 || MAIN BOARD
 	// missing 2.00
 
 	ROM_REGION(0x2000, "maincpu", 0)
-	ROM_LOAD("d78312g-022_15179266.ic25", 0x0000, 0x2000, NO_DUMP) // 8-digit Roland part number not printed on IC
+	ROM_LOAD("d78312g-022_15179266.ic25", 0x0000, 0x2000, CRC(9564903f) SHA1(f68ed97a06764ee000fe6e9d7b39017165f0efc4)) // 8-digit Roland part number not printed on IC
 	ROM_COPY("progrom", 0x0000, 0x0000, 0x2000)
 
 	ROM_REGION(0x80000, "pcm", 0)
@@ -164,6 +167,9 @@ ROM_START(d550) // Newer PCB with silkscreen "Roland || D-50, D-550 || MAIN BOAR
 	ROM_LOAD("roland__r15179858_8801ebi__tc534000p-7477.ic30", 0x00000, 0x80000, CRC(e2aed2d9) SHA1(e9f5b38b9b5fce04beb4cf871401e821a42edacb)) // A+B "Roland || R15179858 8801EBI || TC534000P-7477" 512KiB Mask ROM @ ic30
 	// ic29 is empty on boards with tc534000-sized Mask ROMs
 ROM_END
+
+} // anonymous namespace
+
 
 SYST(1987, d50,  0,   0, d50,  d50, roland_d50_state, empty_init, "Roland", "D-50 Linear Synthesizer (Ver. 2.xx)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
 SYST(1987, d50o, d50, 0, d50,  d50, roland_d50_state, empty_init, "Roland", "D-50 Linear Synthesizer (Ver. 1.xx)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)

@@ -25,6 +25,8 @@
 #include "imagedev/floppy.h"
 
 
+namespace {
+
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
@@ -46,15 +48,15 @@ public:
 		void mdisk(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	TIMER_CALLBACK_MEMBER(rom_timer_callback);
-	DECLARE_WRITE_LINE_MEMBER(uart1_rxrdy_w);
-	DECLARE_WRITE_LINE_MEMBER(uart1_txrdy_w);
-	DECLARE_WRITE_LINE_MEMBER(fdc_irq_w);
-	DECLARE_WRITE_LINE_MEMBER(fdc_motor_w);
+	void uart1_rxrdy_w(int state);
+	void uart1_txrdy_w(int state);
+	void fdc_irq_w(int state);
+	void fdc_motor_w(int state);
 	void fdc_side_w(uint8_t data);
 
 	void update_irq(uint8_t vector);
@@ -64,8 +66,8 @@ private:
 	required_device<i8271_device> m_fdc;
 	required_device_array<floppy_connector, 2> m_floppy;
 
-	void mdisk_mem(address_map &map);
-	void mdisk_io(address_map &map);
+	void mdisk_mem(address_map &map) ATTR_COLD;
+	void mdisk_io(address_map &map) ATTR_COLD;
 
 	emu_timer *m_rom_timer;
 
@@ -110,7 +112,7 @@ INPUT_PORTS_END
 //  FLOPPY
 //**************************************************************************
 
-WRITE_LINE_MEMBER(mdisk_state::fdc_motor_w)
+void mdisk_state::fdc_motor_w(int state)
 {
 	if (m_floppy[0]->get_device()) m_floppy[0]->get_device()->mon_w(!state);
 	if (m_floppy[1]->get_device()) m_floppy[1]->get_device()->mon_w(!state);
@@ -168,19 +170,19 @@ void mdisk_state::update_irq(uint8_t vector)
 		m_cpu->set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE);
 }
 
-WRITE_LINE_MEMBER(mdisk_state::fdc_irq_w)
+void mdisk_state::fdc_irq_w(int state)
 {
 	m_fdc_irq = state;
 	update_irq(0x00);
 }
 
-WRITE_LINE_MEMBER(mdisk_state::uart1_rxrdy_w)
+void mdisk_state::uart1_rxrdy_w(int state)
 {
 	m_uart1_rxrdy = state;
 	update_irq(0x18);
 }
 
-WRITE_LINE_MEMBER(mdisk_state::uart1_txrdy_w)
+void mdisk_state::uart1_txrdy_w(int state)
 {
 	m_uart1_txrdy = state;
 	update_irq(0x1c);
@@ -260,6 +262,8 @@ ROM_START( fl100 )
 	ROM_REGION(0x2000, "firmware", 0)
 	ROM_LOAD("fl100.bin", 0x0000, 0x2000, CRC(68800982) SHA1(501c8877a18cef091476b780de605b2bea3853fb))
 ROM_END
+
+} // anonymous namespace
 
 
 //**************************************************************************

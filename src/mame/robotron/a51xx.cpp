@@ -18,6 +18,8 @@
 #include "screen.h"
 
 
+namespace {
+
 class a51xx_state : public driver_device
 {
 public:
@@ -30,17 +32,17 @@ public:
 	void a5120(machine_config &config);
 
 private:
-	virtual void machine_reset() override;
-	virtual void machine_start() override;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void machine_start() override ATTR_COLD;
 	DECLARE_MACHINE_RESET(a5130);
 	DECLARE_VIDEO_START(a5130);
 	uint32_t screen_update_a5120(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_a5130(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
-	void a5120_io(address_map &map);
-	void a5120_mem(address_map &map);
-	void a5130_io(address_map &map);
-	void a5130_mem(address_map &map);
+	void a5120_io(address_map &map) ATTR_COLD;
+	void a5120_mem(address_map &map) ATTR_COLD;
+	void a5130_io(address_map &map) ATTR_COLD;
+	void a5130_mem(address_map &map) ATTR_COLD;
 };
 
 
@@ -185,6 +187,9 @@ ROM_START( a5130 )
 	ROM_LOAD( "bab47_1_lat.bin", 0x0000, 0x0400, CRC(93220886) SHA1(a5a1ab4e2e06eabc58c84991caa6a1cf55f1462d))
 	ROM_LOAD( "bab46_2_lat.bin", 0x0400, 0x0400, CRC(7a578ec8) SHA1(d17d3f1c182c23e9e9fd4dd56f3ac3de4c18fb1a))
 ROM_END
+
+} // anonymous namespace
+
 
 /* Driver */
 

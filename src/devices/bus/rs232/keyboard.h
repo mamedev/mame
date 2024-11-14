@@ -16,16 +16,16 @@ class serial_keyboard_device
 public:
 	serial_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual ioport_constructor device_input_ports() const override;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 
-	virtual DECLARE_WRITE_LINE_MEMBER( input_txd ) override;
+	virtual void input_txd(int state) override;
 
-	DECLARE_WRITE_LINE_MEMBER(update_serial);
+	void update_serial(int state);
 
 protected:
 	serial_keyboard_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual void device_reset() override;
+	virtual void device_reset() override ATTR_COLD;
 	virtual void tra_callback() override;
 	virtual void send_key(uint8_t code) override;
 

@@ -117,7 +117,7 @@ const char *const s_hdc_command_names[] =
 
 ROM_START( hdc )
 	ROM_REGION(0x02000,"hdc", 0)
-	// Bios taken from WD1002A-WX1
+	// BIOS taken from WD1002A-WX1
 	ROM_LOAD("wdbios.rom",  0x00000, 0x02000, CRC(8e9e2bd4) SHA1(601d7ceab282394ebab50763c267e915a6a2166a)) /* WDC IDE Superbios 2.0 (06/28/89) Expansion Rom C8000-C9FFF  */
 ROM_END
 
@@ -196,8 +196,6 @@ void xt_hdc_device::device_start()
 {
 	m_buffer = std::make_unique<uint8_t[]>(256*512);   // maximum possible transfer
 	m_timer = timer_alloc(FUNC(xt_hdc_device::process_command), this);
-	m_irq_handler.resolve_safe();
-	m_drq_handler.resolve_safe();
 }
 
 void xt_hdc_device::device_reset()
@@ -227,7 +225,7 @@ void xt_hdc_device::device_reset()
 	m_error = 0;
 }
 
-hard_disk_file *xt_hdc_device::pc_hdc_file(int id)
+harddisk_image_device *xt_hdc_device::pc_hdc_file(int id)
 {
 	harddisk_image_device *img = nullptr;
 	switch (id)
@@ -245,7 +243,7 @@ hard_disk_file *xt_hdc_device::pc_hdc_file(int id)
 	if (!img->exists())
 		return nullptr;
 
-	return img->get_hard_disk_file();
+	return img;
 }
 
 void xt_hdc_device::pc_hdc_result(bool set_error_info)
@@ -291,7 +289,7 @@ bool xt_hdc_device::no_dma()
 
 int xt_hdc_device::get_lbasector()
 {
-	hard_disk_file *file = pc_hdc_file(m_drv);
+	harddisk_image_device *file = pc_hdc_file(m_drv);
 	const auto &info = file->get_info();
 
 	int lbasector = m_cylinder[m_drv];
@@ -314,7 +312,7 @@ int xt_hdc_device::get_lbasector()
 
 int xt_hdc_device::dack_r()
 {
-	hard_disk_file *file = pc_hdc_file(m_drv);
+	harddisk_image_device *file = pc_hdc_file(m_drv);
 	if (!file)
 		return 0;
 	const auto &info = file->get_info();
@@ -387,7 +385,7 @@ int xt_hdc_device::dack_rs()
 
 void xt_hdc_device::dack_w(int data)
 {
-	hard_disk_file *file = pc_hdc_file(m_drv);
+	harddisk_image_device *file = pc_hdc_file(m_drv);
 	if (!file)
 		return;
 	const auto &info = file->get_info();
@@ -455,7 +453,7 @@ void xt_hdc_device::execute_read()
 	if (m_sector_cnt[m_drv] == 0)
 		size = 256 * 512;
 
-	hard_disk_file *disk = pc_hdc_file(m_drv);
+	harddisk_image_device *disk = pc_hdc_file(m_drv);
 	if (!disk)
 		return;
 
@@ -504,7 +502,7 @@ void xt_hdc_device::execute_write()
 	if (m_sector_cnt[m_drv] == 0)
 		size = 256 * 512;
 
-	hard_disk_file *disk = pc_hdc_file(m_drv);
+	harddisk_image_device *disk = pc_hdc_file(m_drv);
 	if (!disk)
 		return;
 
@@ -1076,7 +1074,7 @@ uint8_t isa8_hdc_device::pc_hdc_dipswitch_r()
 	return m_dip;
 }
 
-WRITE_LINE_MEMBER(isa8_hdc_device::irq_w)
+void isa8_hdc_device::irq_w(int state)
 {
 	if (BIT(m_dip, 6))
 		m_isa->irq5_w(state);
@@ -1084,7 +1082,7 @@ WRITE_LINE_MEMBER(isa8_hdc_device::irq_w)
 		m_isa->irq2_w(state);
 }
 
-WRITE_LINE_MEMBER(isa8_hdc_device::drq_w)
+void isa8_hdc_device::drq_w(int state)
 {
 	m_isa->drq3_w(state);
 }

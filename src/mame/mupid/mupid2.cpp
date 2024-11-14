@@ -23,6 +23,8 @@
 #include "emupal.h"
 
 
+namespace {
+
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
@@ -44,7 +46,7 @@ public:
 	void c2a2(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	TIMER_DEVICE_CALLBACK_MEMBER(nmi);
@@ -65,9 +67,9 @@ private:
 	required_memory_bank m_rambank;
 	required_device<palette_device> m_palette;
 
-	void maincpu_mem(address_map &map);
-	void maincpu_io(address_map &map);
-	void kbdcpu_mem(address_map &map);
+	void maincpu_mem(address_map &map) ATTR_COLD;
+	void maincpu_io(address_map &map) ATTR_COLD;
+	void kbdcpu_mem(address_map &map) ATTR_COLD;
 
 	std::unique_ptr<std::array<uint8_t, 3>[]> m_color_ram;
 	bool m_nmi_enabled;
@@ -286,6 +288,8 @@ ROM_START( ptc100 )
 	ROM_LOAD("kbc.bin", 0x000, 0x400, CRC(72502f02) SHA1(4adb5c55691e1c53a3364d97e64d194be4886b52))
 	ROM_CONTINUE(0x000, 0x400)
 ROM_END
+
+} // anonymous namespace
 
 
 //**************************************************************************

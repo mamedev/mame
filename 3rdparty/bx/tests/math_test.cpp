@@ -1,6 +1,6 @@
 /*
- * Copyright 2010-2021 Branimir Karadzic. All rights reserved.
- * License: https://github.com/bkaradzic/bx#license-bsd-2-clause
+ * Copyright 2010-2022 Branimir Karadzic. All rights reserved.
+ * License: https://github.com/bkaradzic/bx/blob/master/LICENSE
  */
 
 #include "test.h"
@@ -8,6 +8,8 @@
 #include <bx/file.h>
 
 #include <math.h>
+#include <stdint.h> // intXX_t
+#include <limits.h> // UCHAR_*
 
 #if !BX_COMPILER_MSVC || BX_COMPILER_MSVC >= 1800
 TEST_CASE("isFinite, isInfinite, isNan", "")
@@ -63,6 +65,7 @@ TEST_CASE("log2", "")
 TEST_CASE("libm", "")
 {
 	bx::WriterI* writer = bx::getNullOut();
+	bx::Error err;
 
 	REQUIRE(1389.0f == bx::abs(-1389.0f) );
 	REQUIRE(1389.0f == bx::abs( 1389.0f) );
@@ -70,7 +73,6 @@ TEST_CASE("libm", "")
 	REQUIRE(   0.0f == bx::abs( 0.0f) );
 
 	REQUIRE(389.0f == bx::mod(1389.0f, 1000.0f) );
-	REQUIRE(bx::isNan(bx::mod(0.0f, 0.0f) ) );
 
 	REQUIRE( 13.0f == bx::floor( 13.89f) );
 	REQUIRE(-14.0f == bx::floor(-13.89f) );
@@ -79,17 +81,15 @@ TEST_CASE("libm", "")
 
 	REQUIRE( 13.0f == bx::trunc( 13.89f) );
 	REQUIRE(-13.0f == bx::trunc(-13.89f) );
-	REQUIRE(bx::equal( 0.89f, bx::fract( 13.89f), 0.000001f) );
-	REQUIRE(bx::equal(-0.89f, bx::fract(-13.89f), 0.000001f) );
-
-	bx::Error err;
+	REQUIRE(bx::isEqual( 0.89f, bx::fract( 13.89f), 0.000001f) );
+	REQUIRE(bx::isEqual(-0.89f, bx::fract(-13.89f), 0.000001f) );
 
 	for (int32_t yy = -10; yy < 10; ++yy)
 	{
 		for (float xx = -100.0f; xx < 100.0f; xx += 0.1f)
 		{
 			bx::write(writer, &err, "ldexp(%f, %d) == %f (expected: %f)\n", xx, yy, bx::ldexp(xx, yy), ::ldexpf(xx, yy) );
-			REQUIRE(bx::equal(bx::ldexp(xx, yy), ::ldexpf(xx, yy), 0.00001f) );
+			REQUIRE(bx::isEqual(bx::ldexp(xx, yy), ::ldexpf(xx, yy), 0.00001f) );
 		}
 	}
 
@@ -97,85 +97,116 @@ TEST_CASE("libm", "")
 	{
 		bx::write(writer, &err, "exp(%f) == %f (expected: %f)\n", xx, bx::exp(xx), ::expf(xx) );
 		REQUIRE(err.isOk() );
-		REQUIRE(bx::equal(bx::exp(xx), ::expf(xx), 0.00001f) );
+		REQUIRE(bx::isEqual(bx::exp(xx), ::expf(xx), 0.00001f) );
 	}
 
 	for (float xx = 0.0f; xx < 100.0f; xx += 0.1f)
 	{
 		bx::write(writer, &err, "rsqrt(%f) == %f (expected: %f)\n", xx, bx::rsqrt(xx), 1.0f/::sqrtf(xx) );
 		REQUIRE(err.isOk() );
-		REQUIRE(bx::equal(bx::rsqrt(xx), 1.0f/::sqrtf(xx), 0.00001f) );
+		REQUIRE(bx::isEqual(bx::rsqrt(xx), 1.0f/::sqrtf(xx), 0.00001f) );
+	}
+
+	for (float xx = 0.0f; xx < 1000000.0f; xx += 1000.f)
+	{
+		bx::write(writer, &err, "sqrt(%f) == %f (expected: %f)\n", xx, bx::sqrt(xx), ::sqrtf(xx) );
+		REQUIRE(err.isOk() );
+		REQUIRE(bx::isEqual(bx::sqrt(xx), ::sqrtf(xx), 0.00001f) );
 	}
 
 	for (float xx = 0.0f; xx < 100.0f; xx += 0.1f)
 	{
 		bx::write(writer, &err, "sqrt(%f) == %f (expected: %f)\n", xx, bx::sqrt(xx), ::sqrtf(xx) );
 		REQUIRE(err.isOk() );
-		REQUIRE(bx::equal(bx::sqrt(xx), ::sqrtf(xx), 0.00001f) );
+		REQUIRE(bx::isEqual(bx::sqrt(xx), ::sqrtf(xx), 0.00001f) );
 	}
 
 	for (float xx = -100.0f; xx < 100.0f; xx += 0.1f)
 	{
 		bx::write(writer, &err, "pow(1.389f, %f) == %f (expected: %f)\n", xx, bx::pow(1.389f, xx), ::powf(1.389f, xx) );
 		REQUIRE(err.isOk() );
-		REQUIRE(bx::equal(bx::pow(1.389f, xx), ::powf(1.389f, xx), 0.00001f) );
+		REQUIRE(bx::isEqual(bx::pow(1.389f, xx), ::powf(1.389f, xx), 0.00001f) );
 	}
 
 	for (float xx = -1.0f; xx < 1.0f; xx += 0.001f)
 	{
 		bx::write(writer, &err, "asin(%f) == %f (expected: %f)\n", xx, bx::asin(xx), ::asinf(xx) );
 		REQUIRE(err.isOk() );
-		REQUIRE(bx::equal(bx::asin(xx), ::asinf(xx), 0.0001f) );
+		REQUIRE(bx::isEqual(bx::asin(xx), ::asinf(xx), 0.0001f) );
 	}
 
 	for (float xx = -100.0f; xx < 100.0f; xx += 0.1f)
 	{
 		bx::write(writer, &err, "sin(%f) == %f (expected: %f)\n", xx, bx::sin(xx), ::sinf(xx) );
 		REQUIRE(err.isOk() );
-		REQUIRE(bx::equal(bx::sin(xx), ::sinf(xx), 0.00001f) );
+		REQUIRE(bx::isEqual(bx::sin(xx), ::sinf(xx), 0.00001f) );
+	}
+
+	for (float xx = -bx::kPi2; xx < bx::kPi2; xx += 0.0001f)
+	{
+		bx::write(writer, &err, "sin(%f) == %f (expected: %f)\n", xx, bx::sin(xx), ::sinf(xx) );
+		REQUIRE(err.isOk() );
+		REQUIRE(bx::isEqual(bx::sin(xx), ::sinf(xx), 0.00001f) );
 	}
 
 	for (float xx = -1.0f; xx < 1.0f; xx += 0.1f)
 	{
 		bx::write(writer, &err, "sinh(%f) == %f (expected: %f)\n", xx, bx::sinh(xx), ::sinhf(xx) );
 		REQUIRE(err.isOk() );
-		REQUIRE(bx::equal(bx::sinh(xx), ::sinhf(xx), 0.00001f) );
+		REQUIRE(bx::isEqual(bx::sinh(xx), ::sinhf(xx), 0.00001f) );
 	}
 
 	for (float xx = -1.0f; xx < 1.0f; xx += 0.001f)
 	{
 		bx::write(writer, &err, "acos(%f) == %f (expected: %f\n)", xx, bx::acos(xx), ::acosf(xx) );
 		REQUIRE(err.isOk() );
-		REQUIRE(bx::equal(bx::acos(xx), ::acosf(xx), 0.0001f) );
+		REQUIRE(bx::isEqual(bx::acos(xx), ::acosf(xx), 0.0001f) );
 	}
 
 	for (float xx = -100.0f; xx < 100.0f; xx += 0.1f)
 	{
 		bx::write(writer, &err, "cos(%f) == %f (expected: %f)\n", xx, bx::cos(xx), ::cosf(xx) );
 		REQUIRE(err.isOk() );
-		REQUIRE(bx::equal(bx::cos(xx), ::cosf(xx), 0.00001f) );
+		REQUIRE(bx::isEqual(bx::cos(xx), ::cosf(xx), 0.00001f) );
+	}
+
+	for (float xx = -bx::kPi2; xx < bx::kPi2; xx += 0.0001f)
+	{
+		bx::write(writer, &err, "cos(%f) == %f (expected: %f)\n", xx, bx::cos(xx), ::cosf(xx) );
+		REQUIRE(err.isOk() );
+		REQUIRE(bx::isEqual(bx::cos(xx), ::cosf(xx), 0.00001f) );
 	}
 
 	for (float xx = -100.0f; xx < 100.0f; xx += 0.1f)
 	{
 		bx::write(writer, &err, "tan(%f) == %f (expected: %f)\n", xx, bx::tan(xx), ::tanf(xx) );
 		REQUIRE(err.isOk() );
-		REQUIRE(bx::equal(bx::tan(xx), ::tanf(xx), 0.001f) );
+		REQUIRE(bx::isEqual(bx::tan(xx), ::tanf(xx), 0.001f) );
 	}
 
 	for (float xx = -1.0f; xx < 1.0f; xx += 0.1f)
 	{
 		bx::write(writer, &err, "tanh(%f) == %f (expected: %f\n", xx, bx::tanh(xx), ::tanhf(xx) );
 		REQUIRE(err.isOk() );
-		REQUIRE(bx::equal(bx::tanh(xx), ::tanhf(xx), 0.00001f) );
+		REQUIRE(bx::isEqual(bx::tanh(xx), ::tanhf(xx), 0.00001f) );
 	}
 
 	for (float xx = -100.0f; xx < 100.0f; xx += 0.1f)
 	{
 		bx::write(writer, &err, "atan(%f) == %f (expected: %f)\n", xx, bx::atan(xx), ::atanf(xx) );
 		REQUIRE(err.isOk() );
-		REQUIRE(bx::equal(bx::atan(xx), ::atanf(xx), 0.00001f) );
+		REQUIRE(bx::isEqual(bx::atan(xx), ::atanf(xx), 0.00001f) );
 	}
+}
+
+TEST_CASE("atan2", "")
+{
+	bx::WriterI* writer = bx::getNullOut();
+	bx::Error err;
+
+	REQUIRE(bx::isEqual(bx::atan2(0.0f,  0.0f), ::atan2f(0.0f,  0.0f), 0.00001f) );
+	REQUIRE(bx::isEqual(bx::atan2(0.0f,  1.0f), ::atan2f(0.0f,  1.0f), 0.00001f) );
+	REQUIRE(bx::isEqual(bx::atan2(0.0f, -1.0f), ::atan2f(0.0f, -1.0f), 0.00001f) );
 
 	for (float yy = -100.0f; yy < 100.0f; yy += 0.1f)
 	{
@@ -183,11 +214,16 @@ TEST_CASE("libm", "")
 		{
 			bx::write(writer, &err, "atan2(%f, %f) == %f (expected: %f)\n", yy, xx, bx::atan2(yy, xx), ::atan2f(yy, xx) );
 			REQUIRE(err.isOk() );
-			REQUIRE(bx::equal(bx::atan2(yy, xx), ::atan2f(yy, xx), 0.00001f) );
+			REQUIRE(bx::isEqual(bx::atan2(yy, xx), ::atan2f(yy, xx), 0.00001f) );
 		}
 	}
+}
 
-	REQUIRE(bx::equal(bx::atan2(0.0f, 0.0f), ::atan2f(0.0f, 0.0f), 0.00001f) );
+TEST_CASE("sign", "")
+{
+	REQUIRE(-1 == bx::sign(-0.1389f) );
+	REQUIRE( 0 == bx::sign( 0.0000f) );
+	REQUIRE( 1 == bx::sign( 0.1389f) );
 }
 
 TEST_CASE("ToBits", "")
@@ -205,7 +241,7 @@ TEST_CASE("lerp", "")
 
 void mtxCheck(const float* _a, const float* _b)
 {
-	if (!bx::equal(_a, _b, 16, 0.01f) )
+	if (!bx::isEqual(_a, _b, 16, 0.01f) )
 	{
 		DBG("\n"
 			"A:\n"
@@ -228,7 +264,7 @@ void mtxCheck(const float* _a, const float* _b)
 			, _b[12], _b[13], _b[14], _b[15]
 			);
 
-		CHECK(false);
+		REQUIRE(false);
 	}
 }
 
@@ -238,7 +274,13 @@ TEST_CASE("quaternion", "")
 	float mtx[16];
 
 	bx::Quaternion quat = bx::init::Identity;
-	bx::mtxQuat(mtxQ, quat);
+	bx::Quaternion q2 = bx::init::None;
+
+	bx::Vec3 axis = bx::init::None;
+	bx::Vec3 euler = bx::init::None;
+	float angle;
+
+	bx::mtxFromQuaternion(mtxQ, quat);
 	bx::mtxIdentity(mtx);
 	mtxCheck(mtxQ, mtx);
 
@@ -246,27 +288,87 @@ TEST_CASE("quaternion", "")
 	float ay = bx::kPi/13.0f;
 	float az = bx::kPi/7.0f;
 
-	quat = bx::rotateX(ax);
-	bx::mtxQuat(mtxQ, quat);
-	bx::mtxRotateX(mtx, ax);
-	mtxCheck(mtxQ, mtx);
+	{ // x
+		quat = bx::rotateX(ax);
+		bx::mtxFromQuaternion(mtxQ, quat);
+		bx::mtxRotateX(mtx, ax);
+		mtxCheck(mtxQ, mtx);
 
-	bx::Vec3 euler = bx::toEuler(quat);
-	CHECK(bx::equal(euler.x, ax, 0.001f) );
+		bx::toAxisAngle(axis, angle, quat);
+		REQUIRE(bx::isEqual(axis, bx::Vec3{1.0f, 0.0f, 0.0f}, 0.01f) );
+		REQUIRE(bx::isEqual(angle, ax, 0.01f) );
 
-	quat = bx::rotateY(ay);
-	bx::mtxQuat(mtxQ, quat);
-	bx::mtxRotateY(mtx, ay);
-	mtxCheck(mtxQ, mtx);
+		euler = bx::toEuler(quat);
+		REQUIRE(bx::isEqual(euler.x, ax, 0.001f) );
+		q2 = bx::fromEuler(euler);
+		REQUIRE(bx::isEqual(quat, q2, 0.001f) );
+	}
 
-	euler = bx::toEuler(quat);
-	CHECK(bx::equal(euler.y, ay, 0.001f) );
+	{ // y
+		quat = bx::rotateY(ay);
+		bx::mtxFromQuaternion(mtxQ, quat);
+		bx::mtxRotateY(mtx, ay);
+		mtxCheck(mtxQ, mtx);
 
-	quat = bx::rotateZ(az);
-	bx::mtxQuat(mtxQ, quat);
-	bx::mtxRotateZ(mtx, az);
-	mtxCheck(mtxQ, mtx);
+		bx::toAxisAngle(axis, angle, quat);
+		REQUIRE(bx::isEqual(axis, bx::Vec3{0.0f, 1.0f, 0.0f}, 0.01f) );
+		REQUIRE(bx::isEqual(angle, ay, 0.01f) );
+		euler = bx::toEuler(quat);
+		REQUIRE(bx::isEqual(euler.y, ay, 0.001f) );
+		q2 = bx::fromEuler(euler);
+		REQUIRE(bx::isEqual(quat, q2, 0.001f) );
 
-	euler = bx::toEuler(quat);
-	CHECK(bx::equal(euler.z, az, 0.001f) );
+	}
+
+	{ // z
+		quat = bx::rotateZ(az);
+		bx::mtxFromQuaternion(mtxQ, quat);
+		bx::mtxRotateZ(mtx, az);
+		mtxCheck(mtxQ, mtx);
+
+		bx::toAxisAngle(axis, angle, quat);
+		REQUIRE(bx::isEqual(axis, bx::Vec3{0.0f, 0.0f, 1.0f}, 0.01f) );
+		REQUIRE(bx::isEqual(angle, az, 0.01f) );
+
+		euler = bx::toEuler(quat);
+		REQUIRE(bx::isEqual(euler.z, az, 0.001f) );
+		q2 = bx::fromEuler(euler);
+		REQUIRE(bx::isEqual(quat, q2, 0.001f) );
+	}
+}
+
+TEST_CASE("limits", "")
+{
+	STATIC_REQUIRE(bx::LimitsT<int8_t>::min == INT8_MIN);
+	STATIC_REQUIRE(bx::LimitsT<int8_t>::max == INT8_MAX);
+
+	STATIC_REQUIRE(bx::LimitsT<signed char>::min == CHAR_MIN);
+	STATIC_REQUIRE(bx::LimitsT<signed char>::max == CHAR_MAX);
+
+	STATIC_REQUIRE(bx::LimitsT<unsigned char>::min == 0);
+	STATIC_REQUIRE(bx::LimitsT<unsigned char>::max == UCHAR_MAX);
+
+	STATIC_REQUIRE(bx::LimitsT<int16_t>::min == INT16_MIN);
+	STATIC_REQUIRE(bx::LimitsT<int16_t>::max == INT16_MAX);
+
+	STATIC_REQUIRE(bx::LimitsT<uint16_t>::min == 0);
+	STATIC_REQUIRE(bx::LimitsT<uint16_t>::max == UINT16_MAX);
+
+	STATIC_REQUIRE(bx::LimitsT<int32_t>::min == INT32_MIN);
+	STATIC_REQUIRE(bx::LimitsT<int32_t>::max == INT32_MAX);
+
+	STATIC_REQUIRE(bx::LimitsT<uint32_t>::min == 0);
+	STATIC_REQUIRE(bx::LimitsT<uint32_t>::max == UINT32_MAX);
+
+	STATIC_REQUIRE(bx::LimitsT<int64_t>::min == INT64_MIN);
+	STATIC_REQUIRE(bx::LimitsT<int64_t>::max == INT64_MAX);
+
+	STATIC_REQUIRE(bx::LimitsT<uint64_t>::min == 0);
+	STATIC_REQUIRE(bx::LimitsT<uint64_t>::max == UINT64_MAX);
+
+	STATIC_REQUIRE(bx::LimitsT<float>::min == std::numeric_limits<float>::lowest() );
+	STATIC_REQUIRE(bx::LimitsT<float>::max == std::numeric_limits<float>::max() );
+
+	STATIC_REQUIRE(bx::LimitsT<double>::min == std::numeric_limits<double>::lowest() );
+	STATIC_REQUIRE(bx::LimitsT<double>::max == std::numeric_limits<double>::max() );
 }

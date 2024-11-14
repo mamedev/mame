@@ -52,9 +52,8 @@
 #include "softlist.h"
 
 
-//#define LOG_GENERAL (1U <<  0) //defined in logmacro.h already
-#define LOG_KEYBOARD  (1U <<  1)
-#define LOG_DEBUG     (1U <<  2)
+#define LOG_KEYBOARD  (1U << 1)
+#define LOG_DEBUG     (1U << 2)
 
 //#define VERBOSE (LOG_DEBUG)
 //#define LOG_OUTPUT_FUNC osd_printf_info
@@ -82,7 +81,7 @@ public:
 	void init_tosh1000();
 
 protected:
-	virtual void machine_reset() override;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	void romdos_bank_w(uint8_t data);
@@ -91,9 +90,9 @@ private:
 	uint8_t bram_r(offs_t offset);
 
 	static void cfg_fdc_35(device_t *device);
-	void tosh1000_io(address_map &map);
-	void tosh1000_map(address_map &map);
-	void tosh1000_romdos(address_map &map);
+	void tosh1000_io(address_map &map) ATTR_COLD;
+	void tosh1000_map(address_map &map) ATTR_COLD;
+	void tosh1000_romdos(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<address_map_bank_device> m_bankdev;

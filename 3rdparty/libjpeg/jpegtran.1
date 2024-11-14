@@ -1,4 +1,4 @@
-.TH JPEGTRAN 1 "20 September 2015"
+.TH JPEGTRAN 1 "28 August 2019"
 .SH NAME
 jpegtran \- lossless transformation of JPEG files
 .SH SYNOPSIS
@@ -169,11 +169,19 @@ region dimensions to keep the lower right crop corner unchanged.  (Thus, the
 output image covers at least the requested region, but may cover more.)
 The adjustment of the region dimensions may be optionally disabled by
 attaching an 'f' character ("force") to the width or height number.
-
+.PP
 The image can be losslessly cropped by giving the switch:
 .TP
 .B \-crop WxH+X+Y
 Crop to a rectangular subarea of width W, height H starting at point X,Y.
+.PP
+Crop extension: The width or height parameters can be made larger than the
+source image.  In this case the extra area is filled in with zero (neutral
+gray).  A larger width parameter has two more options:  Attaching an 'f'
+character ("flatten") to the width number will fill in the extra area with
+the DC of the adjacent block, instead of gray out.  Attaching an 'r'
+character ("reflect") to the width number will fill in the extra area with
+repeated reflections of the source region, instead of gray out.
 .PP
 A complementary lossless-wipe option is provided to discard (gray out) data
 inside a given image region while losslessly preserving what is outside:
@@ -181,6 +189,23 @@ inside a given image region while losslessly preserving what is outside:
 .B \-wipe WxH+X+Y
 Wipe (gray out) a rectangular subarea of width W, height H starting at point
 X,Y.
+.PP
+Attaching an 'f' character ("flatten") to the width number will fill the
+region with the average of adjacent blocks, instead of gray out.  In case
+the wipe region and outside area form two horizontally adjacent rectangles,
+attaching an 'r' character ("reflect") to the width number will fill the
+region with repeated reflections of the outside area, instead of gray out.
+.PP
+Another option is lossless-drop, which replaces data at a given image
+position by another image:
+.TP
+.B \-drop +X+Y filename
+Drop another image
+.PP
+Both source images must have the same subsampling values.  It is best if
+they also have the same quantization, otherwise quantization adaption occurs.
+The trim option can be used with the drop option to requantize the drop file
+to the source file.
 .PP
 Other not-strictly-lossless transformation switches are:
 .TP

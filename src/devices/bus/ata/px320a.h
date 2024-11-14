@@ -16,9 +16,9 @@ public:
 	static constexpr feature_type unemulated_features() { return feature::DISK; }
 
 protected:
-	virtual void device_start() override;
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 
 	virtual u16 read_dma() override;
 	virtual u16 read_cs0(offs_t offset, u16 mem_mask = 0xffff) override;
@@ -26,13 +26,13 @@ protected:
 	virtual void write_dma(u16 data) override;
 	virtual void write_cs0(offs_t offset, u16 data, u16 mem_mask = 0xffff) override;
 	virtual void write_cs1(offs_t offset, u16 data, u16 mem_mask = 0xffff) override;
-	virtual DECLARE_WRITE_LINE_MEMBER(write_dmack) override;
-	virtual DECLARE_WRITE_LINE_MEMBER(write_csel) override;
-	virtual DECLARE_WRITE_LINE_MEMBER(write_dasp) override;
-	virtual DECLARE_WRITE_LINE_MEMBER(write_pdiag) override;
+	virtual void write_dmack(int state) override;
+	virtual void write_csel(int state) override;
+	virtual void write_dasp(int state) override;
+	virtual void write_pdiag(int state) override;
 
 private:
-	void frcpu_map(address_map &map);
+	void frcpu_map(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_frcpu;
 };

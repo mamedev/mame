@@ -44,6 +44,8 @@ Cassette (nascom2):
 #include "softlist_dev.h"
 #include "screen.h"
 
+#include <tuple>
+
 
 namespace {
 
@@ -76,15 +78,15 @@ protected:
 	required_device<cpu_device> m_maincpu;
 	required_device<ram_device> m_ram;
 
-	virtual void machine_reset() override;
+	virtual void machine_reset() override ATTR_COLD;
 
 	uint8_t nascom1_port_00_r();
 	void nascom1_port_00_w(uint8_t data);
 	uint8_t nascom1_port_01_r();
 	void nascom1_port_01_w(uint8_t data);
 	uint8_t nascom1_port_02_r();
-	DECLARE_READ_LINE_MEMBER(hd6402_si);
-	DECLARE_WRITE_LINE_MEMBER(hd6402_so);
+	int hd6402_si();
+	void hd6402_so(int state);
 
 	void screen_update(bitmap_ind16 &bitmap, const rectangle &cliprect, int char_height);
 
@@ -116,10 +118,10 @@ public:
 	uint32_t screen_update_nascom(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 private:
-	void nascom1_io(address_map &map);
-	void nascom1_mem(address_map &map);
+	void nascom1_io(address_map &map) ATTR_COLD;
+	void nascom1_mem(address_map &map) ATTR_COLD;
 	TIMER_DEVICE_CALLBACK_MEMBER(nascom1_kansas_r);
-	DECLARE_WRITE_LINE_MEMBER(nascom1_kansas_w);
+	void nascom1_kansas_w(int state);
 	u16 m_cass_cnt[2];
 };
 
@@ -143,22 +145,22 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(cass_speed);
 
 protected:
-	virtual void machine_reset() override;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	TIMER_DEVICE_CALLBACK_MEMBER(nascom2_kansas_r);
-	DECLARE_WRITE_LINE_MEMBER(nascom2_kansas_w);
-	DECLARE_WRITE_LINE_MEMBER(ram_disable_w);
-	DECLARE_WRITE_LINE_MEMBER(ram_disable_cpm_w);
+	void nascom2_kansas_w(int state);
+	void ram_disable_w(int state);
+	void ram_disable_cpm_w(int state);
 	uint32_t screen_update_nascom(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	image_init_result load_cart(device_image_interface &image, generic_slot_device *slot, int slot_id);
+	std::pair<std::error_condition, std::string> load_cart(device_image_interface &image, generic_slot_device *slot, int slot_id);
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(socket1_load) { return load_cart(image, m_socket1, 1); }
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(socket2_load) { return load_cart(image, m_socket2, 2); }
 
-	void nascom2_io(address_map &map);
-	void nascom2_mem(address_map &map);
-	void nascom2c_mem(address_map &map);
+	void nascom2_io(address_map &map) ATTR_COLD;
+	void nascom2_mem(address_map &map) ATTR_COLD;
+	void nascom2c_mem(address_map &map) ATTR_COLD;
 
 	required_device<clock_device> m_clock;
 	required_device<nasbus_device> m_nasbus;
@@ -227,17 +229,17 @@ uint8_t nascom_state::nascom1_port_02_r()
 	return data;
 }
 
-READ_LINE_MEMBER( nascom_state::hd6402_si )
+int nascom_state::hd6402_si()
 {
 	return m_cassinbit;
 }
 
-WRITE_LINE_MEMBER( nascom_state::hd6402_so )
+void nascom_state::hd6402_so(int state)
 {
 	m_cassoutbit = state;
 }
 
-WRITE_LINE_MEMBER( nascom1_state::nascom1_kansas_w )
+void nascom1_state::nascom1_kansas_w(int state)
 {
 	// incoming 3906.25Hz
 	if (state)
@@ -272,7 +274,7 @@ TIMER_DEVICE_CALLBACK_MEMBER( nascom1_state::nascom1_kansas_r )
 	}
 }
 
-WRITE_LINE_MEMBER( nascom2_state::nascom2_kansas_w )
+void nascom2_state::nascom2_kansas_w(int state)
 {
 	// incoming @19230Hz
 	u8 twobit = m_cass_data[3] & 3;
@@ -319,12 +321,19 @@ TIMER_DEVICE_CALLBACK_MEMBER( nascom2_state::nascom2_kansas_r )
 template<int Dest>
 SNAPSHOT_LOAD_MEMBER(nascom_state::snapshot_cb)
 {
-	uint8_t line[29];
+	util::random_read &file = image.image_core_file();
+	std::error_condition err;
 
-	while (image.fread(&line, sizeof(line)) == sizeof(line))
+	while (true)
 	{
-		unsigned int addr, b[8], dummy;
+		size_t actual;
 
+		uint8_t line[29];
+		std::tie(err, actual) = read(file, &line, sizeof(line));
+		if (err || (sizeof(line) != actual))
+			break;
+
+		unsigned int addr, b[8];
 		if (sscanf((char *)line, "%4x %x %x %x %x %x %x %x %x",
 			&addr, &b[0], &b[1], &b[2], &b[3], &b[4], &b[5], &b[6], &b[7]) == 9)
 		{
@@ -343,17 +352,19 @@ SNAPSHOT_LOAD_MEMBER(nascom_state::snapshot_cb)
 		}
 		else
 		{
-			image.seterror(image_error::INVALIDIMAGE, "Unsupported file format");
-			return image_init_result::FAIL;
+			return std::make_pair(image_error::INVALIDIMAGE, "Unsupported file format");
 		}
-		dummy = 0x00;
-		while (!image.image_feof() && dummy != 0x0a && dummy != 0x1f)
+		int dummy = 0x00;
+		do
 		{
-			image.fread(&dummy, 1);
+			std::tie(err, actual) = read(file, &dummy, 1);
+			if (err || (actual != 1))
+				return std::make_pair(err, std::string());
 		}
+		while (dummy != 0x0a && dummy != 0x1f);
 	}
 
-	return image_init_result::PASS;
+	return std::make_pair(err, std::string());
 }
 
 
@@ -361,19 +372,22 @@ SNAPSHOT_LOAD_MEMBER(nascom_state::snapshot_cb)
 //  SOCKETS
 //**************************************************************************
 
-image_init_result nascom2_state::load_cart(device_image_interface &image, generic_slot_device *slot, int slot_id)
+std::pair<std::error_condition, std::string> nascom2_state::load_cart(
+		device_image_interface &image,
+		generic_slot_device *slot,
+		int slot_id)
 {
-	// loading directly from file
 	if (!image.loaded_through_softlist())
 	{
+		// loading directly from file
 		if (slot->length() > 0x1000)
-		{
-			image.seterror(image_error::INVALIDIMAGE, "Unsupported file size");
-			return image_init_result::FAIL;
-		}
+			return std::make_pair(image_error::INVALIDLENGTH, "Unsupported image file size (must be no more than 4K)");
 
 		slot->rom_alloc(slot->length(), GENERIC_ROM8_WIDTH, ENDIANNESS_LITTLE);
-		slot->fread(slot->get_rom_base(), slot->length());
+
+		auto const [err, actual] = read(slot->image_core_file(), slot->get_rom_base(), slot->length());
+		if (err || actual != slot->length())
+			return std::make_pair(err ? err : std::errc::io_error, std::string());
 
 		// we just assume that socket1 should be loaded to 0xc000 and socket2 to 0xd000
 		switch (slot_id)
@@ -386,13 +400,12 @@ image_init_result nascom2_state::load_cart(device_image_interface &image, generi
 			break;
 		}
 	}
-
-	// loading from software list. this supports multiple regions to load to
 	else
 	{
-		uint8_t *region_b000 = image.get_software_region("b000");
-		uint8_t *region_c000 = image.get_software_region("c000");
-		uint8_t *region_d000 = image.get_software_region("d000");
+		// loading from software list. this supports multiple regions to load to
+		uint8_t *const region_b000 = image.get_software_region("b000");
+		uint8_t *const region_c000 = image.get_software_region("c000");
+		uint8_t *const region_d000 = image.get_software_region("d000");
 
 		if (region_b000 != nullptr)
 		{
@@ -413,7 +426,7 @@ image_init_result nascom2_state::load_cart(device_image_interface &image, generi
 		}
 	}
 
-	return image_init_result::PASS;
+	return std::make_pair(std::error_condition(), std::string());
 }
 
 
@@ -463,7 +476,7 @@ void nascom_state::init_nascom()
 
 // since we don't know for which regions we should disable ram, we just let other devices
 // overwrite the region they need, and re-install our ram when they are disabled
-WRITE_LINE_MEMBER( nascom2_state::ram_disable_w )
+void nascom2_state::ram_disable_w(int state)
 {
 	if (state)
 	{
@@ -478,7 +491,7 @@ void nascom2_state::init_nascom2c()
 	m_maincpu->space(AS_PROGRAM).install_ram(0x0000, 0x0000 + m_ram->size() - 1, m_ram->pointer());
 }
 
-WRITE_LINE_MEMBER( nascom2_state::ram_disable_cpm_w )
+void nascom2_state::ram_disable_cpm_w(int state)
 {
 	if (state)
 	{
@@ -690,7 +703,7 @@ static INPUT_PORTS_START( nascom2 )
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD)                            PORT_CODE(KEYCODE_BACKSPACE)  PORT_CHAR(']') PORT_CHAR('_')
 
 	PORT_START("DSW0")
-	PORT_DIPNAME(0x01, 0x00, "Cassette Baud Rate") PORT_CHANGED_MEMBER(DEVICE_SELF, nascom2_state, cass_speed, 0)
+	PORT_DIPNAME(0x01, 0x00, "Cassette Baud Rate") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(nascom2_state::cass_speed), 0)
 	PORT_DIPSETTING(0x00, "300")
 	PORT_DIPSETTING(0x01, "1200")
 

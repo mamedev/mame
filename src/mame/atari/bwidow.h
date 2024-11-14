@@ -1,10 +1,10 @@
 // license:BSD-3-Clause
 // copyright-holders:Brad Oliver, Bernd Wiebelt, Allard van der Bas
 
-#ifndef MAME_INCLUDES_BWIDOW_H
-#define MAME_INCLUDES_BWIDOW_H
+#ifndef MAME_ATARI_BWIDOW_H
+#define MAME_ATARI_BWIDOW_H
 
-#include "avgdvg.h"
+#include "video/avgdvg.h"
 #include "machine/er2055.h"
 
 #define MASTER_CLOCK (XTAL(12'096'000))
@@ -34,7 +34,7 @@ public:
 	void bwidow_audio(machine_config &config);
 	void gravitar_audio(machine_config &config);
 
-	DECLARE_READ_LINE_MEMBER(clock_r);
+	int clock_r();
 
 protected:
 	uint8_t spacduel_IN3_r(offs_t offset);
@@ -46,12 +46,12 @@ protected:
 	void earom_write(offs_t offset, uint8_t data);
 	void earom_control_w(uint8_t data);
 
-	void bwidow_map(address_map &map);
-	void bwidowp_map(address_map &map);
-	void spacduel_map(address_map &map);
+	void bwidow_map(address_map &map) ATTR_COLD;
+	void bwidowp_map(address_map &map) ATTR_COLD;
+	void spacduel_map(address_map &map) ATTR_COLD;
 
 	virtual void machine_start() override { m_leds.resolve(); }
-	virtual void machine_reset() override;
+	virtual void machine_reset() override ATTR_COLD;
 
 	int m_lastdata = 0;
 	required_device<cpu_device> m_maincpu;
@@ -64,4 +64,4 @@ protected:
 	output_finder<2> m_leds;
 };
 
-#endif // MAME_INCLUDES_BWIDOW_H
+#endif // MAME_ATARI_BWIDOW_H

@@ -2,7 +2,7 @@
 // copyright-holders:Olivier Galibert
 /***************************************************************************
 
-    m65sc02.c
+    m65sc02.cpp
 
     Rockwell-class 65c02 with internal static registers, making clock stoppable?
 

@@ -22,7 +22,7 @@ public:
 	gcm394_base_video_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	DECLARE_WRITE_LINE_MEMBER(vblank);
+	void vblank(int state);
 
 	auto space_read_callback() { return m_space_read_cb.bind(); }
 
@@ -35,6 +35,7 @@ public:
 	void set_alt_tile_addressing(int alt_tile_addressing) { m_alt_tile_addressing = alt_tile_addressing; }
 	void set_alt_extrasprite(int alt_extrasprite_hack) { m_alt_extrasprite_hack = alt_extrasprite_hack; }
 	void set_legacy_video_mode() { m_use_legacy_mode = true; }
+	void set_disallow_resolution_control() { m_disallow_resolution_control = true; }
 
 	void set_video_spaces(address_space& cpuspace, address_space& cs_space, int csbase) { m_cpuspace = &cpuspace; m_cs_space = &cs_space; m_csbase = csbase; }
 
@@ -145,8 +146,8 @@ protected:
 	inline void check_video_irq();
 
 
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	required_device<unsp_device> m_cpu;
 	required_device<screen_device> m_screen;
@@ -233,6 +234,7 @@ protected:
 	int m_alt_extrasprite_hack;
 	int m_alt_tile_addressing;
 	bool m_use_legacy_mode; // could be related to the 'unused' bits in the palete bank select being set, but uncertain
+	bool m_disallow_resolution_control;
 
 	required_device<spg_renderer_device> m_renderer;
 

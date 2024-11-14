@@ -15,7 +15,6 @@
 #include "bus/acorn/bus.h"
 #include "imagedev/floppy.h"
 #include "machine/i8271.h"
-#include "formats/acorn_dsk.h"
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -33,16 +32,16 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 	// optional information overrides
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 
 private:
-	DECLARE_WRITE_LINE_MEMBER(fdc_intrq_w);
-	DECLARE_WRITE_LINE_MEMBER(motor_w);
-	DECLARE_WRITE_LINE_MEMBER(side_w);
+	void fdc_intrq_w(int state);
+	void motor_w(int state);
+	void side_w(int state);
 
 	required_memory_region m_dos_rom;
 	required_device<i8271_device> m_fdc;

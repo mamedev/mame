@@ -65,12 +65,15 @@ List of signals on pin headers (from CompuTime manual):
 ****************************************************************************/
 
 #include "emu.h"
+
+#include "bus/rs232/rs232.h"
+//#include "bus/s100/s100.h"
 #include "cpu/z80/z80.h"
 #include "machine/i8251.h"
 #include "machine/pit8253.h"
-#include "bus/rs232/rs232.h"
-//#include "bus/s100/s100.h"
 
+
+namespace {
 
 class qtsbc_state : public driver_device
 {
@@ -86,23 +89,25 @@ public:
 		, m_cpu_speed(*this, "SPEED")
 		, m_eprom(*this, "maincpu")
 		, m_p_ram(*this, "ram")
-		, m_rts(true)
-		, m_dtr(true)
 	{ }
 
 	void qtsbc(machine_config &config);
-	void io_map(address_map &map);
-	void mem_map(address_map &map);
+
+protected:
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+
 private:
 	u8 memory_r(offs_t offset);
 	void memory_w(offs_t offset, u8 data);
 	u8 io_r(offs_t offset);
 	void io_w(offs_t offset, u8 data);
-	DECLARE_WRITE_LINE_MEMBER(rts_loopback_w);
-	DECLARE_WRITE_LINE_MEMBER(dtr_loopback_w);
+	void rts_loopback_w(int state);
+	void dtr_loopback_w(int state);
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	void io_map(address_map &map) ATTR_COLD;
+	void mem_map(address_map &map) ATTR_COLD;
+
 	required_device<cpu_device> m_maincpu;
 	required_device<pit8253_device> m_pit;
 	required_device<i8251_device> m_usart;
@@ -113,8 +118,8 @@ private:
 	required_region_ptr<u8> m_eprom;
 	required_shared_ptr<u8> m_p_ram;
 	bool m_power_on = false;
-	bool m_rts;
-	bool m_dtr;
+	s32 m_rts = 1;
+	s32 m_dtr = 1;
 };
 
 
@@ -199,7 +204,6 @@ u8 qtsbc_state::io_r(offs_t offset)
 			return 0x00;
 
 		// Ports 08, 10 and 80 also used for read access
-
 		return 0xff;
 	}
 }
@@ -232,25 +236,24 @@ void qtsbc_state::io_w(offs_t offset, u8 data)
 	else
 	{
 		// TODO: S-100 bus (no address mirroring)
-
 		logerror("Output %02X to %04X\n", data, offset);
 	}
 }
 
-WRITE_LINE_MEMBER(qtsbc_state::rts_loopback_w)
+void qtsbc_state::rts_loopback_w(int state)
 {
 	// Filtered through this routine to avoid infinite loops
-	if (state != bool(m_rts))
+	if (state != m_rts)
 	{
 		m_rts = state;
 		m_rs232->write_rts(m_rts);
 	}
 }
 
-WRITE_LINE_MEMBER(qtsbc_state::dtr_loopback_w)
+void qtsbc_state::dtr_loopback_w(int state)
 {
 	// Filtered through this routine to avoid infinite loops
-	if (state != bool(m_dtr))
+	if (state != m_dtr)
 	{
 		m_dtr = state;
 		m_rs232->write_dtr(m_dtr);
@@ -501,6 +504,7 @@ void qtsbc_state::machine_start()
 
 	save_item(NAME(m_power_on));
 	save_item(NAME(m_rts));
+	save_item(NAME(m_dtr));
 }
 
 void qtsbc_state::machine_reset()
@@ -548,6 +552,9 @@ ROM_START( qtsbc )
 	ROM_REGION( 0x0800, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD( "qtsbc.u23", 0x0000, 0x0800, CRC(823fd942) SHA1(64c4f74dd069ae4d43d301f5e279185f32a1efa0))
 ROM_END
+
+} // anonymous namespace
+
 
 /* Driver */
 

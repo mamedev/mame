@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Ivan Vangelista, Robbbert
+// copyright-holders:Robbbert
 /***********************************************************************************************************************
 PINBALL
 IDSA pinballs
@@ -59,7 +59,7 @@ public:
 	void idsa(machine_config &config);
 
 private:
-	DECLARE_WRITE_LINE_MEMBER(clock_w);
+	void clock_w(int state);
 	uint8_t portb0_r(offs_t offset);
 	void port80_w(uint8_t data);
 	void port90_w(uint8_t data);
@@ -76,10 +76,10 @@ private:
 	void ay2_a_w(uint8_t data);
 	void ay2_b_w(uint8_t data);
 
-	void maincpu_io_map(address_map &map);
-	void maincpu_map(address_map &map);
+	void maincpu_io_map(address_map &map) ATTR_COLD;
+	void maincpu_map(address_map &map) ATTR_COLD;
 
-	virtual void machine_reset() override;
+	virtual void machine_reset() override ATTR_COLD;
 
 	uint16_t m_irqcnt = 0U;
 	uint8_t m_ppi_data = 0U;
@@ -320,7 +320,7 @@ void idsa_state::ay2_b_w(uint8_t data)
 	//logerror("%s: AY2 port B = %02X\n", machine().describe_context(), data);
 }
 
-WRITE_LINE_MEMBER( idsa_state::clock_w )
+void idsa_state::clock_w(int state)
 {
 	if (state)
 	{

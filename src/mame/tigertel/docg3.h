@@ -8,8 +8,8 @@
 
 */
 
-#ifndef MAME_MACHINE_DOCG3_H
-#define MAME_MACHINE_DOCG3_H
+#ifndef MAME_TIGERTEL_DOCG3_H
+#define MAME_TIGERTEL_DOCG3_H
 
 #pragma once
 
@@ -24,8 +24,8 @@ public:
 	void set_size(int _size) { m_size = _size; }
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// device_nvram_interface overrides
 	virtual void nvram_default() override;
@@ -97,4 +97,4 @@ private:
 // device type definition
 DECLARE_DEVICE_TYPE(DISKONCHIP_G3, diskonchip_g3_device)
 
-#endif // MAME_MACHINE_DOCG3_H
+#endif // MAME_TIGERTEL_DOCG3_H

@@ -21,6 +21,8 @@
 
 #include "util/unicode.h"
 
+#include "osdepend.h"
+
 #include <cmath>
 #include <vector>
 
@@ -56,9 +58,87 @@ public:
 		if (!is_relevant())
 			return cancel(uistate);
 
+		// let the OSD do its thing
+		mui.machine().osd().check_osd_inputs();
+
 		// always mark the bitmap dirty if not paused
 		if (!m_machine.paused())
 			m_bitmap_dirty = true;
+
+		// handle pointer events to show hover info
+		ui_event event;
+		while (m_machine.ui_input().pop_event(&event))
+		{
+			switch (event.event_type)
+			{
+			case ui_event::type::POINTER_UPDATE:
+				{
+					// ignore pointer input in windows other than the one that displays the UI
+					render_target &target(m_machine.render().ui_target());
+					if (&target != event.target)
+						break;
+
+					// don't change if the current pointer has buttons pressed and this one doesn't
+					if (event.pointer_id == m_current_pointer)
+					{
+						assert(m_pointer_type == event.pointer_type);
+						m_pointer_buttons = event.pointer_buttons;
+						m_pointer_inside = target.map_point_container(
+								event.pointer_x,
+								event.pointer_y,
+								container,
+								m_pointer_x,
+								m_pointer_y);
+					}
+					else if ((0 > m_current_pointer) || (!m_pointer_buttons && (!m_pointer_inside || event.pointer_buttons)))
+					{
+						float x, y;
+						bool const inside(target.map_point_container(event.pointer_x, event.pointer_y, container, x, y));
+						if ((0 > m_current_pointer) || event.pointer_buttons || (!m_pointer_inside && inside))
+						{
+							m_current_pointer = event.pointer_id;
+							m_pointer_type = event.pointer_type;
+							m_pointer_buttons = event.pointer_buttons;
+							m_pointer_x = x;
+							m_pointer_y = y;
+							m_pointer_inside = inside;
+						}
+					}
+				}
+				break;
+
+			case ui_event::type::POINTER_LEAVE:
+			case ui_event::type::POINTER_ABORT:
+				{
+					// if this was our pointer, we've lost it
+					render_target &target(m_machine.render().ui_target());
+					if ((&target == event.target) && (event.pointer_id == m_current_pointer))
+					{
+						// keep the pointer position and type so we can show touch locations after release
+						m_current_pointer = -1;
+						m_pointer_buttons = 0U;
+						m_pointer_inside = target.map_point_container(
+								event.pointer_x,
+								event.pointer_y,
+								container,
+								m_pointer_x,
+								m_pointer_y);
+					}
+				}
+				break;
+
+			// ignore anything that isn't pointer-related
+			default:
+				break;
+			}
+		}
+
+		// always draw non-touch pointer
+		mame_ui_manager::display_pointer pointers[1]{ { m_machine.render().ui_target(), m_pointer_type, m_pointer_x, m_pointer_y } };
+		if (m_pointer_inside && (0 <= m_current_pointer) && (ui_event::pointer::TOUCH != m_pointer_type))
+			mui.set_pointers(std::begin(pointers), std::end(pointers));
+		else
+			mui.set_pointers(std::begin(pointers), std::begin(pointers));
 
 		// try to display the selected view
 		while (true)
@@ -514,6 +594,13 @@ private:
 		if (input.pressed(IPT_UI_SELECT))
 		{
 			m_mode = view((int(m_mode) + 1) % 3);
+			if (0 > m_current_pointer)
+			{
+				m_pointer_type = ui_event::pointer::UNKNOWN;
+				m_pointer_x = -1.0F;
+				m_pointer_x = -1.0F;
+				m_pointer_inside = false;
+			}
 			m_bitmap_dirty = true;
 		}
 
@@ -527,7 +614,7 @@ private:
 		}
 
 		// cancel or graphics viewer dismisses the viewer
-		if (input.pressed(IPT_UI_CANCEL) || input.pressed(IPT_UI_SHOW_GFX))
+		if (input.pressed(IPT_UI_BACK) || input.pressed(IPT_UI_SHOW_GFX))
 			return cancel(uistate);
 
 		return uistate;
@@ -537,8 +624,15 @@ private:
 	{
 		if (!uistate)
 			m_machine.resume();
+		m_machine.ui_input().reset();
+		m_current_pointer = -1;
+		m_pointer_type = ui_event::pointer::UNKNOWN;
+		m_pointer_buttons = 0U;
+		m_pointer_x = -1.0F;
+		m_pointer_y = -1.0F;
+		m_pointer_inside = false;
 		m_bitmap_dirty = true;
-		return UI_HANDLER_CANCEL;
+		return mame_ui_manager::HANDLER_CANCEL;
 	}
 
 	uint32_t handle_palette(mame_ui_manager &mui, render_container &container, bool uistate);
@@ -589,19 +683,23 @@ private:
 
 	bool map_mouse(render_container &container, render_bounds const &clip, float &x, float &y) const
 	{
-		int32_t target_x, target_y;
-		bool button;
-		render_target *const target = m_machine.ui_input().find_mouse(&target_x, &target_y, &button);
-		if (!target)
+		if (((0 > m_current_pointer) && (m_pointer_type != ui_event::pointer::TOUCH)) || !m_pointer_inside)
 			return false;
-		else if (!target->map_point_container(target_x, target_y, container, x, y))
-			return false;
-		else
-			return clip.includes(x, y);
+
+		x = m_pointer_x;
+		y = m_pointer_y;
+		return clip.includes(x, y);
 	}
 
 	running_machine &m_machine;
 	view m_mode = view::PALETTE;
+
+	s32 m_current_pointer = -1;
+	ui_event::pointer m_pointer_type = ui_event::pointer::UNKNOWN;
+	u32 m_pointer_buttons = 0U;
+	float m_pointer_x = -1.0F;
+	float m_pointer_y = -1.0F;
+	bool m_pointer_inside = false;
 
 	bitmap_rgb32 m_bitmap;
 	render_texture *m_texture = nullptr;
@@ -955,6 +1053,11 @@ uint32_t gfx_viewer::handle_palette(mame_ui_manager &mui, render_container &cont
 						index,
 						col.a(), col.r(), col.g(), col.b());
 			}
+
+			// keep touch pointer displayed after release so they know what it's pointing at
+			mame_ui_manager::display_pointer pointers[1]{ { m_machine.render().ui_target(), m_pointer_type, m_pointer_x, m_pointer_y } };
+			if (ui_event::pointer::TOUCH == m_pointer_type)
+				mui.set_pointers(std::begin(pointers), std::end(pointers));
 		}
 	}
 
@@ -1002,8 +1105,7 @@ uint32_t gfx_viewer::handle_palette(mame_ui_manager &mui, render_container &cont
 				container.add_point(0.5f * (x0 + cellboxbounds.x0), y0 + 0.5f * cellheight, UI_LINE_WIDTH, rgb_t::white(), PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
 
 			// draw the row header
-			char buffer[10];
-			sprintf(buffer, "%5X", index);
+			auto buffer = util::string_format("%5X", index);
 			for (int x = 4; x >= 0; x--)
 			{
 				x0 -= ui_font->char_width(chheight, aspect, buffer[x]);
@@ -1158,6 +1260,11 @@ uint32_t gfx_viewer::handle_gfxset(mame_ui_manager &mui, render_container &conta
 					code, set.m_color,
 					xpixel, ypixel,
 					gfx.colorbase() + (set.m_color * gfx.granularity()) + pixdata);
+
+			// keep touch pointer displayed after release so they know what it's pointing at
+			mame_ui_manager::display_pointer pointers[1]{ { m_machine.render().ui_target(), m_pointer_type, m_pointer_x, m_pointer_y } };
+			if (ui_event::pointer::TOUCH == m_pointer_type)
+				mui.set_pointers(std::begin(pointers), std::end(pointers));
 		}
 	}
 	if (!found_pixel)
@@ -1208,8 +1315,7 @@ uint32_t gfx_viewer::handle_gfxset(mame_ui_manager &mui, render_container &conta
 				container.add_point(0.5f * (x0 + boxbounds.x0 + 6.0f * chwidth), y0 + 0.5f * cellheight, UI_LINE_WIDTH, rgb_t::white(), PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
 
 			// draw the row header
-			char buffer[10];
-			sprintf(buffer, "%5X", set.m_offset + (y * xcells));
+			auto buffer = util::string_format("%5X", set.m_offset + (y * xcells));
 			for (int x = 4; x >= 0; x--)
 			{
 				x0 -= ui_font->char_width(chheight, aspect, buffer[x]);
@@ -1327,6 +1433,11 @@ uint32_t gfx_viewer::handle_tilemap(mame_ui_manager &mui, render_container &cont
 				_("gfxview", " (%1$u %2$u) = GFX%3$u #%4$X:%5$X"),
 				col * tilemap.tilewidth(), row * tilemap.tileheight(),
 				gfxnum, code, color);
+
+		// keep touch pointer displayed after release so they know what it's pointing at
+		mame_ui_manager::display_pointer pointers[1]{ { m_machine.render().ui_target(), m_pointer_type, m_pointer_x, m_pointer_y } };
+		if (ui_event::pointer::TOUCH == m_pointer_type)
+			mui.set_pointers(std::begin(pointers), std::end(pointers));
 	}
 	else
 	{

@@ -12,11 +12,6 @@ output_latch_device::output_latch_device(const machine_config &mconfig, const ch
 {
 }
 
-void output_latch_device::device_resolve_objects()
-{
-	m_bit_handlers.resolve_all_safe();
-}
-
 void output_latch_device::device_start()
 {
 	save_item(NAME(m_bits));
@@ -30,8 +25,7 @@ void output_latch_device::write(uint8_t data)
 		if (bit != m_bits[i])
 		{
 			m_bits[i] = bit;
-			if (!m_bit_handlers[i].isnull())
-				m_bit_handlers[i](bit);
+			m_bit_handlers[i](bit);
 		}
 	}
 }

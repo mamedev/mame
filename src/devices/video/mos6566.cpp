@@ -634,12 +634,6 @@ void mos6566_device::device_start()
 	// set our instruction counter
 	set_icountptr(m_icount);
 
-	// resolve callbacks
-	m_write_irq.resolve_safe();
-	m_write_ba.resolve_safe();
-	m_write_aec.resolve_safe();
-	m_write_k.resolve_safe();
-
 	screen().register_screen_bitmap(m_bitmap);
 
 	for (int i = 0; i < 256; i++)
@@ -2780,7 +2774,7 @@ void mos6566_device::write(offs_t offset, uint8_t data)
 //  lp_w - light pen strobe
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( mos6566_device::lp_w )
+void mos6566_device::lp_w(int state)
 {
 	if (m_lp && !state && !(m_reg[REGISTER_IRQ] & IRQ_LP))
 	{

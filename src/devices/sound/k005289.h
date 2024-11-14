@@ -23,7 +23,7 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 	// sound stream update overrides
 	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
@@ -34,6 +34,8 @@ private:
 
 	struct voice_t
 	{
+		voice_t() { reset(); }
+
 		void reset()
 		{
 			counter = 0;
@@ -43,11 +45,11 @@ private:
 			volume = 0;
 		}
 
-		s16 counter = 0;
-		u16 frequency = 0;
-		u16 pitch = 0;
-		u16 waveform = 0;
-		u8 volume = 0;
+		s16 counter;
+		u16 frequency;
+		u16 pitch;
+		u16 waveform;
+		u8 volume;
 	};
 	voice_t m_voice[2];
 };

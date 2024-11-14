@@ -72,7 +72,7 @@ U089 MAX232 Dual EIA Driver/Receiver
 *******************************************************************************************/
 
 #include "emu.h"
-#include "cpu/sh/sh2.h"
+#include "cpu/sh/sh7604.h"
 #include "seibuspi_m.h"
 #include "sound/okim6295.h"
 #include "machine/eepromser.h"
@@ -83,6 +83,8 @@ U089 MAX232 Dual EIA Driver/Receiver
 #include "screen.h"
 #include "speaker.h"
 
+
+namespace {
 
 class feversoc_state : public driver_device
 {
@@ -111,11 +113,11 @@ private:
 	uint16_t in_r(offs_t offset);
 	void output_w(uint16_t data);
 	void output2_w(uint16_t data);
-	void feversoc_map(address_map &map);
+	void feversoc_map(address_map &map) ATTR_COLD;
 	uint32_t screen_update_feversoc(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_WRITE_LINE_MEMBER(feversoc_irq);
+	void feversoc_irq(int state);
 	void feversoc_irq_ack(uint16_t data);
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 	required_shared_ptr<uint32_t> m_mainram1;
 	required_shared_ptr<uint32_t> m_mainram2;
@@ -124,7 +126,7 @@ private:
 	required_ioport_array<2> m_in;
 	output_finder<7> m_lamps;
 
-	required_device<sh2_device> m_maincpu;
+	required_device<sh7604_device> m_maincpu;
 	required_device<okim6295_device> m_oki;
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
 	required_device<jrc6355e_device> m_rtc;
@@ -248,9 +250,9 @@ static INPUT_PORTS_START( feversoc )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_SERVICE )
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_GAMBLE_KEYIN ) PORT_NAME("Key In (Service)")
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("hopper", ticket_dispenser_device, line_r)
-	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
-	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("rtc", rtc4543_device, data_r)
+	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("hopper", FUNC(ticket_dispenser_device::line_r))
+	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", FUNC(eeprom_serial_93cxx_device::do_read))
+	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("rtc", FUNC(rtc4543_device::data_r))
 	PORT_DIPNAME( 0x0100, 0x0100, DEF_STR( Service_Mode ) ) PORT_DIPLOCATION( "DIP1:1" )
 	PORT_DIPSETTING(    0x0100, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
@@ -276,7 +278,7 @@ static INPUT_PORTS_START( feversoc )
 	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
-WRITE_LINE_MEMBER(feversoc_state::feversoc_irq)
+void feversoc_state::feversoc_irq(int state)
 {
 	if (state)
 		m_maincpu->set_input_line(8, ASSERT_LINE);
@@ -295,7 +297,7 @@ void feversoc_state::machine_start()
 void feversoc_state::feversoc(machine_config &config)
 {
 	/* basic machine hardware */
-	SH2(config, m_maincpu, MASTER_CLOCK);
+	SH7604(config, m_maincpu, MASTER_CLOCK);
 	m_maincpu->set_addrmap(AS_PROGRAM, &feversoc_state::feversoc_map);
 
 	/* video hardware */
@@ -321,7 +323,7 @@ void feversoc_state::feversoc(machine_config &config)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	TICKET_DISPENSER(config, m_hopper, attotime::from_msec(60), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH);
+	TICKET_DISPENSER(config, m_hopper, attotime::from_msec(60));
 }
 
 /***************************************************************************
@@ -359,5 +361,8 @@ void feversoc_state::init_feversoc()
 	m_maincpu->sh2drc_add_fastram(0x02034000, 0x0203dfff, 0, &m_mainram2[0]);
 	m_maincpu->sh2drc_add_fastram(0x0203e000, 0x0203ffff, 0, &m_spriteram[0]);
 }
+
+} // anonymous namespace
+
 
 GAME( 2004, feversoc, 0, feversoc, feversoc, feversoc_state, init_feversoc, ROT0, "Seibu Kaihatsu", "Fever Soccer", 0 )

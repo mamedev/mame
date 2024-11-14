@@ -4,6 +4,8 @@
 
 #include "DLL.h"
 
+#ifdef _WIN32
+
 #ifndef _UNICODE
 extern bool g_IsNT;
 #endif
@@ -15,11 +17,11 @@ namespace NDLL {
 
 bool CLibrary::Free() throw()
 {
-  if (_module == 0)
+  if (_module == NULL)
     return true;
   if (!::FreeLibrary(_module))
     return false;
-  _module = 0;
+  _module = NULL;
   return true;
 }
 
@@ -88,7 +90,7 @@ bool MyGetModuleFileName(FString &path)
   return false;
 }
 
-#ifndef _SFX
+#ifndef Z7_SFX
 
 FString GetModuleDirPrefix()
 {
@@ -97,14 +99,81 @@ FString GetModuleDirPrefix()
   {
     int pos = s.ReverseFind_PathSepar();
     if (pos >= 0)
-    {
-      s.DeleteFrom(pos + 1);
-      return s;
-    }
+      s.DeleteFrom((unsigned)(pos + 1));
   }
-  return FTEXT(".") FSTRING_PATH_SEPARATOR;
+  if (s.IsEmpty())
+    s = "." STRING_PATH_SEPARATOR;
+  return s;
 }
 
 #endif
 
 }}
+
+#else // _WIN32
+
+#include <dlfcn.h>
+#include <stdlib.h>
+#include "../Common/Common.h"
+
+// FARPROC
+void *GetProcAddress(HMODULE module, LPCSTR procName)
+{
+  void *ptr = NULL;
+  if (module)
+    ptr = dlsym(module, procName);
+  return ptr;
+}
+
+namespace NWindows {
+namespace NDLL {
+
+bool CLibrary::Free() throw()
+{
+  if (!_module)
+    return true;
+  const int ret = dlclose(_module);
+  if (ret != 0)
+    return false;
+  _module = NULL;
+  return true;
+}
+
+bool CLibrary::Load(CFSTR path) throw()
+{
+  if (!Free())
+    return false;
+
+  int options = 0;
+
+  #ifdef RTLD_LOCAL
+    options |= RTLD_LOCAL;
+  #endif
+
+  #ifdef RTLD_NOW
+    options |= RTLD_NOW;
+  #endif
+
+  #ifdef RTLD_GROUP
+    #if ! (defined(hpux) || defined(__hpux))
+      options |= RTLD_GROUP; // mainly for solaris but not for HPUX
+    #endif
+  #endif
+  
+  _module = dlopen(path, options);
+  return (_module != NULL);
+}
+
+/*
+// FARPROC
+void * CLibrary::GetProc(LPCSTR procName) const
+{
+  // return My_GetProcAddress(_module, procName);
+  return local_GetProcAddress(_module, procName);
+  // return NULL;
+}
+*/
+
+}}
+
+#endif

@@ -8,7 +8,7 @@
   using a Super Shanghai board and comparisons with the old protection
   simulations.
 
-  The Deco 104 emulation is handled through deco104.c
+  The Deco 104 emulation is handled through deco104.cpp
 
   The Deco 146 and 104 chips act as I/O chips and as protection devices
   by using 2 banks of 0x80 words of RAM built into the chips.
@@ -1305,11 +1305,11 @@ u8 deco_146_base_device::soundlatch_r()
 	return m_soundlatch;
 }
 
-deco_146_base_device::deco_146_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
-	: device_t(mconfig, type, tag, owner, clock),
-	m_port_a_r(*this),
-	m_port_b_r(*this),
-	m_port_c_r(*this),
+deco_146_base_device::deco_146_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock) :
+	device_t(mconfig, type, tag, owner, clock),
+	m_port_a_r(*this, 0xffff),
+	m_port_b_r(*this, 0xffff),
+	m_port_c_r(*this, 0xffff),
 	m_soundlatch_irq_cb(*this)
 {
 	m_external_addrswap[0] = 0;
@@ -1333,12 +1333,6 @@ void deco_146_base_device::device_start()
 		std::fill_n(&m_rambank[bank][0], 0x80, 0xffff);
 		save_pointer(NAME(m_rambank[bank]), 0x80, bank);
 	}
-
-	// bind our handler
-	m_port_a_r.resolve_safe(0xffff);
-	m_port_b_r.resolve_safe(0xffff);
-	m_port_c_r.resolve_safe(0xffff);
-	m_soundlatch_irq_cb.resolve_safe();
 
 	save_item(NAME(m_xor));
 	save_item(NAME(m_nand));

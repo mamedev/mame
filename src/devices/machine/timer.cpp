@@ -9,7 +9,7 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "machine/timer.h"
+#include "timer.h"
 
 
 /***************************************************************************
@@ -33,18 +33,18 @@ DEFINE_DEVICE_TYPE(TIMER, timer_device, "timer", "Timer")
 //  timer_device - constructor
 //-------------------------------------------------
 
-timer_device::timer_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: device_t(mconfig, TIMER, tag, owner, clock),
-		m_type(TIMER_TYPE_GENERIC),
-		m_callback(*this),
-		m_start_delay(attotime::zero),
-		m_period(attotime::zero),
-		m_param(0),
-		m_screen(*this, finder_base::DUMMY_TAG),
-		m_first_vpos(0),
-		m_increment(0),
-		m_timer(nullptr),
-		m_first_time(true)
+timer_device::timer_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
+	device_t(mconfig, TIMER, tag, owner, clock),
+	m_type(TIMER_TYPE_GENERIC),
+	m_callback(*this),
+	m_start_delay(attotime::zero),
+	m_period(attotime::zero),
+	m_param(0),
+	m_screen(*this, finder_base::DUMMY_TAG),
+	m_first_vpos(0),
+	m_increment(0),
+	m_timer(nullptr),
+	m_first_time(true)
 {
 }
 

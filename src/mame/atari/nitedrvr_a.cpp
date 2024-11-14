@@ -1,13 +1,14 @@
 // license:BSD-3-Clause
 // copyright-holders:Derrick Renaud
+
 /*************************************************************************
 
     audio\nitedrvr.cpp
 
 *************************************************************************/
 #include "emu.h"
-#include "nitedrvr.h"
-#include "sound/discrete.h"
+
+#include "nitedrvr_a.h"
 
 
 // Discrete Sound Emulation

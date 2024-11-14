@@ -25,10 +25,10 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
-	DECLARE_WRITE_LINE_MEMBER( clk_w ) { m_bus->clk_w(state); }
+	void clk_w(int state) { m_bus->clk_w(state); }
 };
 
 single_clock_device::single_clock_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
@@ -64,13 +64,13 @@ protected:
 	dual_clock_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
 
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual ioport_constructor device_input_ports() const override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 
-	virtual DECLARE_WRITE_LINE_MEMBER( clk_w ) = 0;
-	virtual DECLARE_WRITE_LINE_MEMBER( clk2_w ) = 0;
+	virtual void clk_w(int state) = 0;
+	virtual void clk2_w(int state) = 0;
 
 	// base-class members
 	required_device<clock_device> m_clock_1;
@@ -170,11 +170,11 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_reset() override;
+	virtual void device_reset() override ATTR_COLD;
 
 	// base-class overrides
-	DECLARE_WRITE_LINE_MEMBER( clk_w ) override { m_bus->clk_w(state); }
-	DECLARE_WRITE_LINE_MEMBER( clk2_w ) override { m_bus->clk2_w(state); }
+	void clk_w(int state) override { m_bus->clk_w(state); }
+	void clk2_w(int state) override { m_bus->clk2_w(state); }
 };
 
 dual_clock_device::dual_clock_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
@@ -201,11 +201,11 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_reset() override;
+	virtual void device_reset() override ATTR_COLD;
 
 	// base-class overrides
-	DECLARE_WRITE_LINE_MEMBER( clk_w ) override { m_bus->clk_w(state); }
-	DECLARE_WRITE_LINE_MEMBER( clk2_w ) override { }
+	void clk_w(int state) override { m_bus->clk_w(state); }
+	void clk2_w(int state) override { }
 };
 
 dual_clock_device_40pin::dual_clock_device_40pin(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)

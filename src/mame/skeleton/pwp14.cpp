@@ -32,6 +32,8 @@
 #include "screen.h"
 
 
+namespace {
+
 class pwp14_state : public driver_device
 {
 public:
@@ -54,12 +56,12 @@ public:
 	void pwp14(machine_config &config);
 
 private:
-	virtual void machine_reset() override;
-	virtual void machine_start() override;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void machine_start() override ATTR_COLD;
 	uint32_t screen_update_pwp14(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void pwp14_io(address_map &map);
-	void pwp14_mem(address_map &map);
+	void pwp14_io(address_map &map) ATTR_COLD;
+	void pwp14_mem(address_map &map) ATTR_COLD;
 	void bankswitch_w(offs_t offset, uint8_t data);
 	void set_bank();
 	u8 typewriter_r(offs_t offset);
@@ -252,6 +254,9 @@ ROM_START( pwp14 )
 	ROM_REGION(0x2000, "chargen",0)
 	ROM_LOAD( "750504.bin", 0x0000, 0x2000, CRC(b9062df6) SHA1(e79044765093b1d1954254d4a839a9e443d624d6))
 ROM_END
+
+} // anonymous namespace
+
 
 /* Driver */
 

@@ -18,7 +18,6 @@ elan_eu3a05vid_device::elan_eu3a05vid_device(const machine_config &mconfig, cons
 	m_vrambase(0x600),
 	m_spritebase(0x3e00),
 	m_use_spritepages(false),
-	m_force_transpen_ff(false),
 	m_force_basic_scroll(false)
 {
 }
@@ -44,7 +43,7 @@ void elan_eu3a05vid_device::map(address_map &map)
 	map(0x0d, 0x0e).rw(FUNC(elan_eu3a05vid_device::splitpos_r), FUNC(elan_eu3a05vid_device::splitpos_w));
 	map(0x0f, 0x16).rw(FUNC(elan_eu3a05vid_device::tile_scroll_r), FUNC(elan_eu3a05vid_device::tile_scroll_w));
 	map(0x17, 0x17).ram(); // unknown
-	map(0x18, 0x18).ram(); // unknown
+	map(0x18, 0x18).rw(FUNC(elan_eu3a05vid_device::transpen_r), FUNC(elan_eu3a05vid_device::transpen_w));
 	// no other writes seen
 }
 
@@ -202,18 +201,6 @@ void elan_eu3a05vid_device::draw_sprites(screen_device &screen, bitmap_ind16 &bi
 		if (colour & 0x80)
 			colour = 0;
 
-		int transpen = 0;
-
-		 /* HACK - how is this calculated
-		   phoenix and the game select need it like this
-		   it isn't a simple case of unk2 being transpen either because Qix has some elements set to 0x07
-		   where the transpen needs to be 0x00 and Space Invaders has it set to 0x04
-		   it could be a global register rather than something in the spritelist?
-		*/
-		if (((attr == 0xff) && (unk2 == 0xff)) || m_force_transpen_ff)
-			transpen = 0xff;
-
-
 		if (!(flags & 0x80))
 			continue;
 
@@ -279,7 +266,7 @@ void elan_eu3a05vid_device::draw_sprites(screen_device &screen, bitmap_ind16 &bi
 
 				uint8_t pix = fullbankspace.read_byte(realaddr);
 
-				if (pix != transpen)
+				if (pix != m_transpen)
 				{
 					if (flags & 0x04) // flipx
 					{
@@ -617,6 +604,18 @@ uint32_t elan_eu3a05vid_device::screen_update(screen_device &screen, bitmap_ind1
 	draw_tilemaps(screen,bitmap,cliprect,1); // 'high priority'
 
 	return 0;
+}
+
+uint8_t elan_eu3a05vid_device::transpen_r()
+{
+	logerror("%s: transpen_r (Transparency Pen)\n", machine().describe_context());
+	return m_transpen;
+}
+
+void elan_eu3a05vid_device::transpen_w(uint8_t data)
+{
+	logerror("%s: transpen_w (Transparency Pen) %02x\n", machine().describe_context(), data);
+	m_transpen = data;
 }
 
 // Tile bases

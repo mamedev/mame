@@ -164,20 +164,19 @@ ROM_END
 //-------------------------------------------------
 //  qs1000_device - constructor
 //-------------------------------------------------
-qs1000_device::qs1000_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, QS1000, tag, owner, clock),
-		device_sound_interface(mconfig, *this),
-		device_rom_interface(mconfig, *this),
-		m_external_rom(false),
-		m_in_p1_cb(*this),
-		m_in_p2_cb(*this),
-		m_in_p3_cb(*this),
-		m_out_p1_cb(*this),
-		m_out_p2_cb(*this),
-		m_out_p3_cb(*this),
-		//m_serial_w_cb(*this),
-		m_stream(nullptr),
-		m_cpu(*this, "cpu")
+qs1000_device::qs1000_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, QS1000, tag, owner, clock),
+	device_sound_interface(mconfig, *this),
+	device_rom_interface(mconfig, *this),
+	m_external_rom(false),
+	m_in_p1_cb(*this, 0),
+	m_in_p2_cb(*this, 0),
+	m_in_p3_cb(*this, 0),
+	m_out_p1_cb(*this),
+	m_out_p2_cb(*this),
+	m_out_p3_cb(*this),
+	m_stream(nullptr),
+	m_cpu(*this, "cpu")
 {
 }
 
@@ -207,15 +206,15 @@ void qs1000_device::device_add_mconfig(machine_config &config)
 	m_cpu->port_out_cb<2>().set(FUNC(qs1000_device::p2_w));
 	m_cpu->port_in_cb<3>().set(FUNC(qs1000_device::p3_r));
 	m_cpu->port_out_cb<3>().set(FUNC(qs1000_device::p3_w));
-	m_cpu->serial_rx_cb().set(FUNC(qs1000_device::data_to_i8052));
 }
 
 
 //-------------------------------------------------
-//  rom_bank_updated - the rom bank has changed
+//  rom_bank_pre_change - refresh the stream if the
+//  ROM banking changes
 //-------------------------------------------------
 
-void qs1000_device::rom_bank_updated()
+void qs1000_device::rom_bank_pre_change()
 {
 	m_stream->update();
 }
@@ -231,18 +230,6 @@ void qs1000_device::device_start()
 	// gives reasonable results
 	m_stream = stream_alloc(0, 2, clock() / 32);
 
-	// Resolve CPU port callbacks
-	m_in_p1_cb.resolve_safe(0);
-	m_in_p2_cb.resolve_safe(0);
-	m_in_p3_cb.resolve_safe(0);
-
-	m_out_p1_cb.resolve_safe();
-	m_out_p2_cb.resolve_safe();
-	m_out_p3_cb.resolve_safe();
-
-	//m_serial_w_cb.resolve_safe();
-
-	save_item(NAME(m_serial_data_in));
 	save_item(NAME(m_wave_regs));
 
 	for (int i = 0; i < QS1000_CHANNELS; i++)
@@ -267,35 +254,12 @@ void qs1000_device::device_start()
 
 
 //-------------------------------------------------
-//  serial_in - send data to the chip
-//-------------------------------------------------
-void qs1000_device::serial_in(uint8_t data)
-{
-	m_serial_data_in = data;
-
-	// Signal to the CPU that data is available
-	m_cpu->set_input_line(MCS51_RX_LINE, ASSERT_LINE);
-	m_cpu->set_input_line(MCS51_RX_LINE, CLEAR_LINE);
-}
-
-
-//-------------------------------------------------
 //  set_irq - interrupt the internal CPU
 //-------------------------------------------------
 void qs1000_device::set_irq(int state)
 {
 	// Signal to the CPU that data is available
 	m_cpu->set_input_line(MCS51_INT1_LINE, state ? ASSERT_LINE : CLEAR_LINE);
-}
-
-
-//-------------------------------------------------
-//  data_to_i8052 - called by the 8052 core to
-//  receive serial data
-//-------------------------------------------------
-uint8_t qs1000_device::data_to_i8052()
-{
-	return m_serial_data_in;
 }
 
 

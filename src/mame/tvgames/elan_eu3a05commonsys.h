@@ -1,8 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood
 
-#ifndef MAME_MACHINE_ELAN_EU3A05COMMONSYS_H
-#define MAME_MACHINE_ELAN_EU3A05COMMONSYS_H
+#ifndef MAME_TVGAMES_ELAN_EU3A05COMMONSYS_H
+#define MAME_TVGAMES_ELAN_EU3A05COMMONSYS_H
 
 #include "cpu/m6502/m6502.h"
 #include "machine/bankdev.h"
@@ -20,7 +20,7 @@ public:
 
 	void generate_custom_interrupt(int level);
 
-	virtual void map(address_map& map);
+	virtual void map(address_map &map) ATTR_COLD;
 
 	uint8_t nmi_vector_r(offs_t offset);
 	uint8_t irq_vector_r(offs_t offset);
@@ -29,8 +29,8 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	TIMER_CALLBACK_MEMBER(unknown_timer_tick);
 
@@ -70,4 +70,4 @@ private:
 
 DECLARE_DEVICE_TYPE(ELAN_EU3A05_COMMONSYS, elan_eu3a05commonsys_device)
 
-#endif // MAME_MACHINE_ELAN_EU3A05COMMONSYS_H
+#endif // MAME_TVGAMES_ELAN_EU3A05COMMONSYS_H

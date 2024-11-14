@@ -92,9 +92,6 @@ device_memory_interface::space_config_vector cesblit_device::memory_space_config
 
 void cesblit_device::device_start()
 {
-	// resolve callbacks
-	m_blit_irq_cb.resolve();
-
 	// default to rom reading from a region
 	m_space = &space(AS_PROGRAM);
 	memory_region *region = memregion(tag());
@@ -146,13 +143,13 @@ void cesblit_device::regs_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 //      case 0x00/2:    // bit 15: FPGA programming serial in (lsb first)
 
 		case 0x10/2:
-			if (!m_blit_irq_cb.isnull() && !BIT(olddata, 3) && BIT(newdata, 3))
+			if (!BIT(olddata, 3) && BIT(newdata, 3))
 				m_blit_irq_cb(CLEAR_LINE);
 			break;
 
 		case 0x0e/2:
 			do_blit();
-			if (!m_blit_irq_cb.isnull() && BIT(m_regs[0x10/2], 3))
+			if (BIT(m_regs[0x10/2], 3))
 				m_blit_irq_cb(ASSERT_LINE);
 			break;
 	}

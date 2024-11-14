@@ -9,6 +9,8 @@
 #include "emu.h"
 #include "trs80m2kb.h"
 
+#include "utf8.h"
+
 
 
 //**************************************************************************
@@ -228,8 +230,6 @@ trs80m2_keyboard_device::trs80m2_keyboard_device(const machine_config &mconfig, 
 void trs80m2_keyboard_device::device_start()
 {
 	m_leds.resolve();
-	// resolve callbacks
-	m_write_clock.resolve_safe();
 
 	// state saving
 	save_item(NAME(m_busy));
@@ -252,7 +252,7 @@ void trs80m2_keyboard_device::device_reset()
 //  busy_w -
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( trs80m2_keyboard_device::busy_w )
+void trs80m2_keyboard_device::busy_w(int state)
 {
 	m_busy = state;
 }
@@ -262,7 +262,7 @@ WRITE_LINE_MEMBER( trs80m2_keyboard_device::busy_w )
 //  data_r -
 //-------------------------------------------------
 
-READ_LINE_MEMBER( trs80m2_keyboard_device::data_r )
+int trs80m2_keyboard_device::data_r()
 {
 	return m_data;
 }
@@ -271,7 +271,7 @@ READ_LINE_MEMBER( trs80m2_keyboard_device::data_r )
 //  kb_t1_r -
 //-------------------------------------------------
 
-READ_LINE_MEMBER( trs80m2_keyboard_device::kb_t1_r )
+int trs80m2_keyboard_device::kb_t1_r()
 {
 	return m_busy;
 }

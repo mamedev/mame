@@ -8,8 +8,8 @@
 
 ***************************************************************************/
 
-#ifndef MAME_MACHINE_315_5649_H
-#define MAME_MACHINE_315_5649_H
+#ifndef MAME_SEGA_315_5649_H
+#define MAME_SEGA_315_5649_H
 
 #pragma once
 
@@ -56,8 +56,8 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 private:
 	// callbacks
@@ -77,4 +77,4 @@ private:
 // device type definition
 DECLARE_DEVICE_TYPE(SEGA_315_5649, sega_315_5649_device)
 
-#endif // MAME_MACHINE_315_5649_H
+#endif // MAME_SEGA_315_5649_H

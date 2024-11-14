@@ -37,11 +37,11 @@ public:
 protected:
 	a2bus_ssc_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual void device_start() override;
-	virtual void device_reset() override;
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual const tiny_rom_entry *device_rom_region() const override;
-	virtual ioport_constructor device_input_ports() const override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 
 	virtual uint8_t read_c0nx(uint8_t offset) override;
 	virtual void write_c0nx(uint8_t offset, uint8_t data) override;
@@ -56,7 +56,7 @@ protected:
 	required_region_ptr<uint8_t> m_rom;
 
 private:
-	DECLARE_WRITE_LINE_MEMBER( acia_irq_w );
+	void acia_irq_w(int state);
 };
 
 class apricorn_ssi_device : public a2bus_ssc_device
@@ -66,9 +66,9 @@ public:
 	apricorn_ssi_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
-	virtual void device_start() override;
-	virtual const tiny_rom_entry *device_rom_region() const override;
-	virtual ioport_constructor device_input_ports() const override;
+	virtual void device_start() override ATTR_COLD;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 
 	virtual void write_c0nx(uint8_t offset, uint8_t data) override;
 	virtual uint8_t read_cnxx(uint8_t offset) override;
@@ -143,7 +143,7 @@ static INPUT_PORTS_START( ssc )
 	PORT_DIPNAME( 0x02, 0x02, "End of Line" ) PORT_DIPLOCATION("SW2:5")
 	PORT_DIPSETTING(    0x00, "Add LF after CR")
 	PORT_DIPSETTING(    0x02, "Don't add LF after CR")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("rs232", rs232_port_device, cts_r)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("rs232", FUNC(rs232_port_device::cts_r))
 
 	PORT_START("DSWX") // Non-memory-mapped DIP switches
 	PORT_DIPNAME( 0x04, 0x04, "Interrupts" ) PORT_DIPLOCATION("SW2:6")
@@ -238,7 +238,7 @@ static INPUT_PORTS_START( ssi )
 	PORT_DIPNAME( 0x02, 0x00, "MSB Output" ) PORT_DIPLOCATION("SW2:5") PORT_CONDITION("DSW1", 0x100, EQUALS, 0x100)
 	PORT_DIPSETTING(    0x02, "Clear 8th Bit" )
 	PORT_DIPSETTING(    0x00, "Pass 8th Bit" )
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("rs232", rs232_port_device, cts_r) // TBD: implemented on SSI or not?
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("rs232", FUNC(rs232_port_device::cts_r)) // TBD: implemented on SSI or not?
 
 	PORT_START("DSWX")
 	PORT_DIPNAME( 0x04, 0x04, "Interrupts" ) PORT_DIPLOCATION("SW2:6")
@@ -419,7 +419,7 @@ void apricorn_ssi_device::write_c0nx(uint8_t offset, uint8_t data)
 		m_alt_bank = true;
 }
 
-WRITE_LINE_MEMBER( a2bus_ssc_device::acia_irq_w )
+void a2bus_ssc_device::acia_irq_w(int state)
 {
 	if (machine().ioport().safe_to_read())
 	{

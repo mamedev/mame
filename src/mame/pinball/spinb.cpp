@@ -113,8 +113,8 @@ public:
 	void init_3() { m_game = 3; }
 
 private:
-	virtual void machine_reset() override;
-	virtual void machine_start() override;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void machine_start() override ATTR_COLD;
 	void p1_w(u8 data);
 	u8 p3_r();
 	void p3_w(u8 data);
@@ -151,18 +151,18 @@ private:
 	void disp_w(offs_t, u8 data);
 	void update_sound_a();
 	void update_sound_m();
-	DECLARE_WRITE_LINE_MEMBER(ic5a_w);
-	DECLARE_WRITE_LINE_MEMBER(ic5m_w);
+	void ic5a_w(int state);
+	void ic5m_w(int state);
 	void spinb_palette(palette_device &palette) const;
 
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void dmd_io(address_map &map);
-	void dmd_mem(address_map &map);
-	void audio_map(address_map &map);
-	void spinb_map(address_map &map);
-	void music_map(address_map &map);
-	void vrnwrld_map(address_map &map);
+	void dmd_io(address_map &map) ATTR_COLD;
+	void dmd_mem(address_map &map) ATTR_COLD;
+	void audio_map(address_map &map) ATTR_COLD;
+	void spinb_map(address_map &map) ATTR_COLD;
+	void music_map(address_map &map) ATTR_COLD;
+	void vrnwrld_map(address_map &map) ATTR_COLD;
 
 	bool m_pc0a = false;
 	bool m_pc0m = false;
@@ -800,14 +800,14 @@ void spinb_state::update_sound_m()
 		m_ic14m->ba_w(0);
 }
 
-WRITE_LINE_MEMBER( spinb_state::ic5a_w )
+void spinb_state::ic5a_w(int state)
 {
 	m_pc0a = state;
 	m_ic5a->d_w(state);
 	m_ic14a->select_w(state);
 }
 
-WRITE_LINE_MEMBER( spinb_state::ic5m_w )
+void spinb_state::ic5m_w(int state)
 {
 	m_pc0m = state;
 	m_ic5m->d_w(state);

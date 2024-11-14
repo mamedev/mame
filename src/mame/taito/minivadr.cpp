@@ -5,7 +5,7 @@
 Mini Vaders (Space Invaders's mini game)
 (c)1990 Taito Corporation
 
-Driver by Takahiro Nogi (nogi@kt.rim.or.jp) 1999/12/19 -
+Driver by Takahiro Nogi 1999/12/19 -
 
 This is a test board sold together with the cabinet (as required by law in
 Japan). It has no sound.
@@ -39,6 +39,8 @@ Notes: (all ICs shown)
 #include "screen.h"
 
 
+namespace {
+
 class minivadr_state : public driver_device
 {
 public:
@@ -54,7 +56,7 @@ private:
 	required_shared_ptr<uint8_t> m_videoram;
 	uint32_t screen_update_minivadr(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
-	void minivadr_map(address_map &map);
+	void minivadr_map(address_map &map) ATTR_COLD;
 };
 
 /*************************************
@@ -135,6 +137,8 @@ ROM_START( minivadr )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "d26-01.ic7", 0x0000, 0x2000, CRC(a96c823d) SHA1(aa9969ff80e94b0fff0f3530863f6b300510162e) )
 ROM_END
+
+} // anonymous namespace
 
 
 GAME( 1990, minivadr, 0, minivadr, minivadr, minivadr_state, empty_init, ROT0, "Taito Corporation", "Mini Vaders", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )

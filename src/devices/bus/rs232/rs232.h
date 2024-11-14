@@ -31,10 +31,11 @@
 #define RS232_BAUD_2000 (0x13)
 #define RS232_BAUD_3600 (0x14)
 #define RS232_BAUD_7200 (0x15)
+#define RS232_BAUD_111900 (0x16)
 
 #define PORT_RS232_BAUD(_tag, _default_baud, _description, _class, _write_line) \
 	PORT_START(_tag) \
-	PORT_CONFNAME(0xff, _default_baud, _description) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, _class, _write_line) \
+	PORT_CONFNAME(0xff, _default_baud, _description) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, FUNC(_class::_write_line)) \
 	PORT_CONFSETTING( RS232_BAUD_50, "50") \
 	PORT_CONFSETTING( RS232_BAUD_75, "75") \
 	PORT_CONFSETTING( RS232_BAUD_110, "110") \
@@ -56,6 +57,7 @@
 	PORT_CONFSETTING( RS232_BAUD_28800, "28800") \
 	PORT_CONFSETTING( RS232_BAUD_38400, "38400") \
 	PORT_CONFSETTING( RS232_BAUD_57600, "57600") \
+	PORT_CONFSETTING( RS232_BAUD_111900, "111900") \
 	PORT_CONFSETTING( RS232_BAUD_115200, "115200")
 
 #define RS232_DATABITS_5 (0x00)
@@ -65,7 +67,7 @@
 
 #define PORT_RS232_DATABITS(_tag, _default_databits, _description, _class, _write_line) \
 	PORT_START(_tag) \
-	PORT_CONFNAME(0xff, _default_databits, _description) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, _class, _write_line) \
+	PORT_CONFNAME(0xff, _default_databits, _description) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, FUNC(_class::_write_line)) \
 	PORT_CONFSETTING( RS232_DATABITS_5, "5") \
 	PORT_CONFSETTING( RS232_DATABITS_6, "6") \
 	PORT_CONFSETTING( RS232_DATABITS_7, "7") \
@@ -79,7 +81,7 @@
 
 #define PORT_RS232_PARITY(_tag, _default_parity, _description, _class, _write_line) \
 	PORT_START(_tag) \
-	PORT_CONFNAME(0xff, _default_parity, "Parity") PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, _class, _write_line) \
+	PORT_CONFNAME(0xff, _default_parity, "Parity") PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, FUNC(_class::_write_line)) \
 	PORT_CONFSETTING( RS232_PARITY_NONE, "None") \
 	PORT_CONFSETTING( RS232_PARITY_ODD, "Odd") \
 	PORT_CONFSETTING( RS232_PARITY_EVEN, "Even") \
@@ -93,7 +95,7 @@
 
 #define PORT_RS232_STOPBITS(_tag, _default_stopbits, _description, _class, _write_line) \
 	PORT_START(_tag) \
-	PORT_CONFNAME(0xff, 0x01, _description) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, _class, _write_line) \
+	PORT_CONFNAME(0xff, 0x01, _description) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, FUNC(_class::_write_line)) \
 	PORT_CONFSETTING( RS232_STOPBITS_0, "0") \
 	PORT_CONFSETTING( RS232_STOPBITS_1, "1") \
 	PORT_CONFSETTING( RS232_STOPBITS_1_5, "1.5") \
@@ -115,7 +117,7 @@ public:
 		set_default_option(dflt);
 		set_fixed(false);
 	}
-	rs232_port_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	rs232_port_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 	virtual ~rs232_port_device();
 
 	// static configuration helpers
@@ -128,27 +130,27 @@ public:
 	auto rxc_handler() { return m_rxc_handler.bind(); }
 	auto txc_handler() { return m_txc_handler.bind(); }
 
-	DECLARE_WRITE_LINE_MEMBER( write_txd );                 // DB25 pin  2  V.24 circuit 103   Transmitted data
-	DECLARE_WRITE_LINE_MEMBER( write_dtr );                 // DB25 pin 20  V.24 circuit 108/2 Data terminal ready
-	DECLARE_WRITE_LINE_MEMBER( write_rts );                 // DB25 pin  4  V.24 circuit 105   Request to send
-	DECLARE_WRITE_LINE_MEMBER( write_etc );                 // DB25 pin 24  V.24 circuit 113   Transmitter signal element timing (DTE)
-	DECLARE_WRITE_LINE_MEMBER( write_spds );                // DB25 pin 23  V.24 circuit 111   Data signal rate selector (DTE)
+	void write_txd(int state);        // DB25 pin  2  V.24 circuit 103   Transmitted data
+	void write_dtr(int state);        // DB25 pin 20  V.24 circuit 108/2 Data terminal ready
+	void write_rts(int state);        // DB25 pin  4  V.24 circuit 105   Request to send
+	void write_etc(int state);        // DB25 pin 24  V.24 circuit 113   Transmitter signal element timing (DTE)
+	void write_spds(int state);       // DB25 pin 23  V.24 circuit 111   Data signal rate selector (DTE)
 
-	DECLARE_READ_LINE_MEMBER( rxd_r ) { return m_rxd; }     // DB25 pin  3  V.24 circuit 104   Received data
-	DECLARE_READ_LINE_MEMBER( dcd_r ) { return m_dcd; }     // DB25 pin  8  V.24 circuit 109   Data channel received line signal detector
-	DECLARE_READ_LINE_MEMBER( dsr_r ) { return m_dsr; }     // DB25 pin  6  V.24 circuit 107   Data set ready
-	DECLARE_READ_LINE_MEMBER( ri_r )  { return m_ri; }      // DB25 pin 22  V.24 circuit 125   Calling indicator
-	DECLARE_READ_LINE_MEMBER( si_r )  { return m_si; }      //              V.24 circuit 112   Data signal rate selector (DCE)
-	DECLARE_READ_LINE_MEMBER( cts_r ) { return m_cts; }     // DB25 pin  5  V.24 circuit 106   Ready for sending
-	DECLARE_READ_LINE_MEMBER( rxc_r ) { return m_dce_rxc; } // DB25 pin 17  V.24 circuit 115   Receiver signal element timing (DCE)
-	DECLARE_READ_LINE_MEMBER( txc_r ) { return m_dce_txc; } // DB25 pin 15  V.24 circuit 114   Transmitter signal element timing (DCE)
+	int rxd_r() { return m_rxd; }     // DB25 pin  3  V.24 circuit 104   Received data
+	int dcd_r() { return m_dcd; }     // DB25 pin  8  V.24 circuit 109   Data channel received line signal detector
+	int dsr_r() { return m_dsr; }     // DB25 pin  6  V.24 circuit 107   Data set ready
+	int ri_r()  { return m_ri; }      // DB25 pin 22  V.24 circuit 125   Calling indicator
+	int si_r()  { return m_si; }      //              V.24 circuit 112   Data signal rate selector (DCE)
+	int cts_r() { return m_cts; }     // DB25 pin  5  V.24 circuit 106   Ready for sending
+	int rxc_r() { return m_dce_rxc; } // DB25 pin 17  V.24 circuit 115   Receiver signal element timing (DCE)
+	int txc_r() { return m_dce_txc; } // DB25 pin 15  V.24 circuit 114   Transmitter signal element timing (DCE)
 
 protected:
 	rs232_port_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual void device_resolve_objects() override;
-	virtual void device_reset() override;
-	virtual void device_start() override;
+	virtual void device_resolve_objects() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+	virtual void device_start() override ATTR_COLD;
 	virtual void device_config_complete() override;
 
 	int m_rxd;
@@ -180,20 +182,20 @@ class device_rs232_port_interface : public device_interface
 public:
 	virtual ~device_rs232_port_interface();
 
-	virtual DECLARE_WRITE_LINE_MEMBER( input_txd ) { }
-	virtual DECLARE_WRITE_LINE_MEMBER( input_dtr ) { }
-	virtual DECLARE_WRITE_LINE_MEMBER( input_rts ) { }
-	virtual DECLARE_WRITE_LINE_MEMBER( input_etc ) { }
-	virtual DECLARE_WRITE_LINE_MEMBER( input_spds ) { }
+	virtual void input_txd(int state) { }
+	virtual void input_dtr(int state) { }
+	virtual void input_rts(int state) { }
+	virtual void input_etc(int state) { }
+	virtual void input_spds(int state) { }
 
-	DECLARE_WRITE_LINE_MEMBER( output_rxd ) { m_port->m_rxd = state; m_port->m_rxd_handler(state); }
-	DECLARE_WRITE_LINE_MEMBER( output_dcd ) { m_port->m_dcd = state; m_port->m_dcd_handler(state); }
-	DECLARE_WRITE_LINE_MEMBER( output_dsr ) { m_port->m_dsr = state; m_port->m_dsr_handler(state); }
-	DECLARE_WRITE_LINE_MEMBER( output_ri )  { m_port->m_ri = state; m_port->m_ri_handler(state); }
-	DECLARE_WRITE_LINE_MEMBER( output_si )  { m_port->m_si = state; m_port->m_si_handler(state); }
-	DECLARE_WRITE_LINE_MEMBER( output_cts ) { m_port->m_cts = state; m_port->m_cts_handler(state); }
-	DECLARE_WRITE_LINE_MEMBER( output_rxc ) { m_port->m_dce_rxc = state; m_port->m_rxc_handler(state); }
-	DECLARE_WRITE_LINE_MEMBER( output_txc ) { m_port->m_dce_txc = state; m_port->m_txc_handler(state); }
+	void output_rxd(int state) { m_port->m_rxd = state; m_port->m_rxd_handler(state); }
+	void output_dcd(int state) { m_port->m_dcd = state; m_port->m_dcd_handler(state); }
+	void output_dsr(int state) { m_port->m_dsr = state; m_port->m_dsr_handler(state); }
+	void output_ri(int state)  { m_port->m_ri = state; m_port->m_ri_handler(state); }
+	void output_si(int state)  { m_port->m_si = state; m_port->m_si_handler(state); }
+	void output_cts(int state) { m_port->m_cts = state; m_port->m_cts_handler(state); }
+	void output_rxc(int state) { m_port->m_dce_rxc = state; m_port->m_rxc_handler(state); }
+	void output_txc(int state) { m_port->m_dce_txc = state; m_port->m_txc_handler(state); }
 
 protected:
 	device_rs232_port_interface(const machine_config &mconfig, device_t &device);
@@ -226,7 +228,8 @@ protected:
 			1800,
 			2000,
 			3600,
-			7200
+			7200,
+			111900
 		};
 
 		return values[baud];
@@ -277,7 +280,7 @@ template <uint32_t FIFO_LENGTH>
 class buffered_rs232_device : public device_t, public device_buffered_serial_interface<FIFO_LENGTH>, public device_rs232_port_interface
 {
 public:
-	virtual DECLARE_WRITE_LINE_MEMBER( input_txd ) override
+	virtual void input_txd(int state) override
 	{
 		device_buffered_serial_interface<FIFO_LENGTH>::rx_w(state);
 	}

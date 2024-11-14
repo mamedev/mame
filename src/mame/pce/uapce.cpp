@@ -123,6 +123,8 @@ Alien Crush & Pac_Land: dumps made from PC-Engine dumps of JP versions
 #include "speaker.h"
 
 
+namespace {
+
 class uapce_state : public pce_common_state
 {
 public:
@@ -138,12 +140,12 @@ private:
 	uint8_t jamma_if_control_latch_r();
 	uint8_t jamma_if_read_dsw(offs_t offset);
 	virtual uint8_t joy_read() override;
-	virtual void machine_reset() override;
+	virtual void machine_reset() override ATTR_COLD;
 	required_device<discrete_device> m_discrete;
 
-	void pce_io(address_map &map);
-	void pce_mem(address_map &map);
-	void z80_map(address_map &map);
+	void pce_io(address_map &map) ATTR_COLD;
+	void pce_mem(address_map &map) ATTR_COLD;
+	void z80_map(address_map &map) ATTR_COLD;
 };
 
 #define UAPCE_SOUND_EN  NODE_10
@@ -393,6 +395,9 @@ ROM_START(paclandp)
 	ROM_REGION( 0x800, "sub", 0 )
 	ROM_LOAD( "u1.bin", 0x0000, 0x800, CRC(f5e538a9) SHA1(19ac9525c9ad6bea1789cc9e63cdb7fe949867d9) )
 ROM_END
+
+} // anonymous namespace
+
 
 GAME( 1989, blazlaz, 0, uapce, uapce, uapce_state, init_pce_common, ROT0, "Hudson Soft", "Blazing Lazers (United Amusements PC Engine)",                         MACHINE_IMPERFECT_SOUND )
 GAME( 1989, keith,   0, uapce, uapce, uapce_state, init_pce_common, ROT0, "Hudson Soft", "Keith Courage In Alpha Zones (United Amusements PC Engine)",           MACHINE_IMPERFECT_SOUND )

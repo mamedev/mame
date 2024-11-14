@@ -14,7 +14,6 @@
 #include "acorn_memc.h"
 
 #include "debug/debugcon.h"
-#include "debug/debugcmd.h"
 #include "debugger.h"
 
 #include <functional>
@@ -51,10 +50,10 @@ device_memory_interface::space_config_vector acorn_memc_device::memory_space_con
 	};
 }
 
-void acorn_memc_device::memc_map_debug_commands(const std::vector<std::string> &params)
+void acorn_memc_device::memc_map_debug_commands(const std::vector<std::string_view> &params)
 {
 	uint64_t offset;
-	if (params.size() != 1 || !machine().debugger().commands().validate_number_parameter(params[0], offset))
+	if (params.size() != 1 || !machine().debugger().console().validate_number_parameter(params[0], offset))
 		return;
 
 	// figure out the page number and offset in the page
@@ -69,12 +68,6 @@ void acorn_memc_device::memc_map_debug_commands(const std::vector<std::string> &
 		machine().debugger().console().printf("unmapped\n");
 	else
 		machine().debugger().console().printf("0x%08lx (PPL %x)\n", 0x02000000 | ((m_pages[page] * pagesize) + poffs), m_pages_ppl[page]);
-}
-
-void acorn_memc_device::device_resolve_objects()
-{
-	m_abort_w.resolve_safe();
-	m_sirq_w.resolve_safe();
 }
 
 void acorn_memc_device::device_start()
@@ -404,20 +397,20 @@ void acorn_memc_device::do_sound_dma()
 	}
 }
 
-WRITE_LINE_MEMBER(acorn_memc_device::spvmd_w)
+void acorn_memc_device::spvmd_w(int state)
 {
 	m_spvmd = state;
 	m_abort_w(CLEAR_LINE);
 }
 
-WRITE_LINE_MEMBER(acorn_memc_device::sndrq_w)
+void acorn_memc_device::sndrq_w(int state)
 {
 	if (state && m_sound_dma_on)
 		do_sound_dma();
 }
 
 
-WRITE_LINE_MEMBER(acorn_memc_device::vidrq_w)
+void acorn_memc_device::vidrq_w(int state)
 {
 	if (state && m_video_dma_on)
 		do_video_dma();

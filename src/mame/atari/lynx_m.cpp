@@ -1320,7 +1320,7 @@ TIM_BORROWOUT   EQU %00000001
 
 void lynx_state::timer_init(int which)
 {
-	memset(&m_timer[which], 0, sizeof(LYNX_TIMER));
+	m_timer[which] = LYNX_TIMER();
 	m_timer[which].timer = timer_alloc(FUNC(lynx_state::timer_shot), this);
 
 	save_item(NAME(m_timer[which].bakup), which);
@@ -1557,7 +1557,7 @@ void lynx_state::update_screen_timing()
 
 void lynx_state::uart_reset()
 {
-	memset(&m_uart, 0, sizeof(m_uart));
+	m_uart = UART();
 }
 
 TIMER_CALLBACK_MEMBER(lynx_state::uart_loopback_timer)
@@ -1879,8 +1879,8 @@ void lynx_state::machine_reset()
 	m_maincpu->set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
 	m_maincpu->set_input_line(M65SC02_IRQ_LINE, CLEAR_LINE);
 
-	memset(&m_suzy, 0, sizeof(m_suzy));
-	memset(&m_mikey, 0, sizeof(m_mikey));
+	m_suzy = SUZY();
+	m_mikey = MIKEY();
 
 	m_suzy.data[0x88]  = 0x01;
 	m_suzy.data[0x90]  = 0x00;
@@ -2001,15 +2001,12 @@ void lynx_state::machine_start()
 
 ****************************************/
 
-image_verify_result lynx_state::verify_cart(char *header, int kind)
+std::pair<std::error_condition, std::string> lynx_state::verify_cart(const char *header, int kind)
 {
 	if (kind)
 	{
 		if (strncmp("BS93", &header[6], 4))
-		{
-			logerror("This is not a valid Lynx image\n");
-			return image_verify_result::FAIL;
-		}
+			return std::make_pair(image_error::INVALIDIMAGE, "This is not a valid Lynx image");
 	}
 	else
 	{
@@ -2017,16 +2014,18 @@ image_verify_result lynx_state::verify_cart(char *header, int kind)
 		{
 			if (!strncmp("BS93", &header[6], 4))
 			{
-				logerror("This image is probably a Quickload image with .lnx extension\n");
-				logerror("Try to load it with -quickload\n");
+				// FIXME: multi-line message may not be displayed correctly
+				return std::make_pair(
+						image_error::INVALIDIMAGE,
+						"This image is probably a Quickload image with .lnx extension\n"
+						"Try to load it with -quickload");
 			}
 			else
-				logerror("This is not a valid Lynx image\n");
-			return image_verify_result::FAIL;
+				return std::make_pair(image_error::INVALIDIMAGE, "This is not a valid Lynx image");
 		}
 	}
 
-	return image_verify_result::PASS;
+	return std::make_pair(std::error_condition(), std::string());
 }
 
 DEVICE_IMAGE_LOAD_MEMBER(lynx_state::cart_load)
@@ -2052,8 +2051,9 @@ DEVICE_IMAGE_LOAD_MEMBER(lynx_state::cart_load)
 			image.fread(header, 0x40);
 
 			// Check the image
-			if (verify_cart((char*)header, LYNX_CART) != image_verify_result::PASS)
-				return image_init_result::FAIL;
+			auto err = verify_cart((const char*)header, LYNX_CART);
+			if (err.first)
+				return err;
 
 			/* 2008-10 FP: According to Handy source these should be page_size_bank0. Are we using
 			 it correctly in MAME? Moreover, the next two values should be page_size_bank1. We should
@@ -2118,5 +2118,5 @@ DEVICE_IMAGE_LOAD_MEMBER(lynx_state::cart_load)
 
 	}
 
-	return image_init_result::PASS;
+	return std::make_pair(std::error_condition(), std::string());
 }

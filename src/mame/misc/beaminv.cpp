@@ -64,6 +64,8 @@ Stephh's notes (based on the games Z80 code and some tests) :
 #include "beaminv.lh"
 
 
+namespace {
+
 class beaminv_state : public driver_device
 {
 public:
@@ -88,17 +90,17 @@ public:
 	uint8_t v128_r();
 	void controller_select_w(uint8_t data);
 	uint8_t controller_r();
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 	uint32_t screen_update_beaminv(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(interrupt_callback);
 	void create_interrupt_timer();
 	void start_interrupt_timer();
 	void beaminv(machine_config &config);
 	void ctainv(machine_config &config);
-	void main_io_map(address_map &map);
-	void main_map(address_map &map);
-	void ctainv_map(address_map &map);
+	void main_io_map(address_map &map) ATTR_COLD;
+	void main_map(address_map &map) ATTR_COLD;
+	void ctainv_map(address_map &map) ATTR_COLD;
 };
 
 
@@ -449,6 +451,7 @@ ROM_START( ctainv )
 	ROM_LOAD( "6.bin", 0x1800, 0x0400, CRC(06dcb63c) SHA1(4d5260b3785e2c215dd0b3c9f8457cf4a557a452) )
 ROM_END
 
+} // anonymous namespace
 
 
 /*************************************

@@ -91,11 +91,11 @@ public:
 protected:
 	a2bus_timemasterho_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual void device_start() override;
-	virtual void device_reset() override;
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual const tiny_rom_entry *device_rom_region() const override;
-	virtual ioport_constructor device_input_ports() const override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 
 	// overrides of standard a2bus slot functions
 	virtual uint8_t read_c0nx(uint8_t offset) override;
@@ -112,8 +112,8 @@ private:
 	void update_irqs();
 	void pia_out_a(uint8_t data);
 	void pia_out_b(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(pia_irqa_w);
-	DECLARE_WRITE_LINE_MEMBER(pia_irqb_w);
+	void pia_irqa_w(int state);
+	void pia_irqb_w(int state);
 
 	bool m_irqa = false, m_irqb = false;
 	bool m_started = false;
@@ -297,13 +297,13 @@ void a2bus_timemasterho_device::update_irqs()
 	}
 }
 
-WRITE_LINE_MEMBER(a2bus_timemasterho_device::pia_irqa_w)
+void a2bus_timemasterho_device::pia_irqa_w(int state)
 {
 	m_irqa = state;
 	update_irqs();
 }
 
-WRITE_LINE_MEMBER(a2bus_timemasterho_device::pia_irqb_w)
+void a2bus_timemasterho_device::pia_irqb_w(int state)
 {
 	m_irqb = state;
 	update_irqs();

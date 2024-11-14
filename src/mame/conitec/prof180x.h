@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Curt Coder
-#ifndef MAME_INCLUDES_PROF180X_H
-#define MAME_INCLUDES_PROF180X_H
+#ifndef MAME_CONITEC_PROF180X_H
+#define MAME_CONITEC_PROF180X_H
 
 #pragma once
 
@@ -28,8 +28,8 @@ public:
 private:
 	required_device<centronics_device> m_centronics;
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	uint8_t read(offs_t offset);
 	void write(offs_t offset, uint8_t data);
@@ -38,14 +38,14 @@ private:
 	uint8_t status1_r();
 	uint8_t status_r(offs_t offset);
 
-	DECLARE_WRITE_LINE_MEMBER(c0_flag_w);
-	DECLARE_WRITE_LINE_MEMBER(c1_flag_w);
-	DECLARE_WRITE_LINE_MEMBER(c2_flag_w);
-	DECLARE_WRITE_LINE_MEMBER(mini_flag_w);
-	DECLARE_WRITE_LINE_MEMBER(mm0_flag_w);
-	DECLARE_WRITE_LINE_MEMBER(rtc_ce_w);
-	DECLARE_WRITE_LINE_MEMBER(peps_flag_w);
-	DECLARE_WRITE_LINE_MEMBER(mm1_flag_w);
+	void c0_flag_w(int state);
+	void c1_flag_w(int state);
+	void c2_flag_w(int state);
+	void mini_flag_w(int state);
+	void mm0_flag_w(int state);
+	void rtc_ce_w(int state);
+	void peps_flag_w(int state);
+	void mm1_flag_w(int state);
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
@@ -54,8 +54,8 @@ private:
 	int m_c2 = 0;
 	int m_mm0 = 0;
 	int m_mm1 = 0;
-	void prof180x_io(address_map &map);
-	void prof180x_mem(address_map &map);
+	void prof180x_io(address_map &map) ATTR_COLD;
+	void prof180x_mem(address_map &map) ATTR_COLD;
 };
 
-#endif // MAME_INCLUDES_PROF180X_H
+#endif // MAME_CONITEC_PROF180X_H

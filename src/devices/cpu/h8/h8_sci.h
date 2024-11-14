@@ -14,42 +14,46 @@
 
 #pragma once
 
-#include "h8.h"
 #include "h8_intc.h"
+
+class h8_device;
 
 class h8_sci_device : public device_t {
 public:
-	h8_sci_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	h8_sci_device(const machine_config &mconfig, const char *tag, device_t *owner, const char *intc, int eri, int rxi, int txi, int tei)
+	h8_sci_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	template<typename T, typename U> h8_sci_device(const machine_config &mconfig, const char *tag, device_t *owner, int id, T &&cpu, U &&intc, int eri, int rxi, int txi, int tei)
 		: h8_sci_device(mconfig, tag, owner, 0)
 	{
-		set_info(intc, eri, rxi, txi, tei);
+		m_cpu.set_tag(std::forward<T>(cpu));
+		m_intc.set_tag(std::forward<U>(intc));
+		m_id = id;
+		m_eri_int = eri;
+		m_rxi_int = rxi;
+		m_txi_int = txi;
+		m_tei_int = tei;
 	}
 
-	void set_info(const char *intc, int eri, int rxi, int txi, int tei);
-	void set_external_clock_period(const attotime &_period);
+	void do_set_external_clock_period(const attotime &_period);
 
-	void smr_w(uint8_t data);
-	uint8_t smr_r();
-	void brr_w(uint8_t data);
-	uint8_t brr_r();
-	void scr_w(uint8_t data);
-	uint8_t scr_r();
-	void tdr_w(uint8_t data);
-	uint8_t tdr_r();
-	void ssr_w(uint8_t data);
-	uint8_t ssr_r();
-	uint8_t rdr_r();
-	void scmr_w(uint8_t data);
-	uint8_t scmr_r();
+	void smr_w(u8 data);
+	u8 smr_r();
+	void brr_w(u8 data);
+	u8 brr_r();
+	void scr_w(u8 data);
+	u8 scr_r();
+	void tdr_w(u8 data);
+	u8 tdr_r();
+	void ssr_w(u8 data);
+	u8 ssr_r();
+	u8 rdr_r();
+	void scmr_w(u8 data);
+	u8 scmr_r();
 
-	DECLARE_WRITE_LINE_MEMBER(rx_w);
-	DECLARE_WRITE_LINE_MEMBER(clk_w);
+	void do_rx_w(int state);
+	void do_clk_w(int state);
 
-	auto tx_handler() { return tx_cb.bind(); }
-	auto clk_handler() { return clk_cb.bind(); }
-
-	uint64_t internal_update(uint64_t current_time);
+	u64 internal_update(u64 current_time);
+	void notify_standby(int state);
 
 protected:
 	enum {
@@ -64,13 +68,13 @@ protected:
 	};
 
 	enum {
-		CLKM_INTERNAL_ASYNC,
-		CLKM_INTERNAL_ASYNC_OUT,
-		CLKM_EXTERNAL_ASYNC,
-		CLKM_EXTERNAL_RATE_ASYNC,
-		CLKM_INTERNAL_SYNC_OUT,
-		CLKM_EXTERNAL_SYNC,
-		CLKM_EXTERNAL_RATE_SYNC
+		INTERNAL_ASYNC,
+		INTERNAL_ASYNC_OUT,
+		EXTERNAL_ASYNC,
+		EXTERNAL_RATE_ASYNC,
+		INTERNAL_SYNC_OUT,
+		EXTERNAL_SYNC,
+		EXTERNAL_RATE_SYNC
 	};
 
 	enum {
@@ -102,39 +106,46 @@ protected:
 		SSR_MPBT = 0x01
 	};
 
-	required_device<h8_device> cpu;
-	devcb_write_line tx_cb, clk_cb;
-	h8_intc_device *intc;
-	const char *intc_tag;
-	attotime external_clock_period, cur_sync_time;
-	double external_to_internal_ratio, internal_to_external_ratio;
-	emu_timer *sync_timer;
+	required_device<h8_device> m_cpu;
+	required_device<h8_intc_device> m_intc;
+	attotime m_external_clock_period;
+	double m_external_to_internal_ratio, m_internal_to_external_ratio;
+	emu_timer *m_sync_timer;
 
-	int eri_int, rxi_int, txi_int, tei_int;
+	int m_id, m_eri_int, m_rxi_int, m_txi_int, m_tei_int;
 
-	int tx_state, rx_state, tx_bit, rx_bit, clock_state, clock_mode, tx_parity, rx_parity, ext_clock_counter;
-	bool clock_value, ext_clock_value, rx_value;
+	int m_tx_state, m_rx_state, m_tx_bit, m_rx_bit, m_clock_state, m_tx_parity, m_rx_parity, m_tx_clock_counter, m_rx_clock_counter;
+	u32 m_clock_mode;
+	bool m_ext_clock_value, m_rx_value;
 
-	uint8_t rdr, tdr, smr, scr, ssr, brr, rsr, tsr;
-	uint64_t clock_base, divider;
+	u8 m_rdr, m_tdr, m_smr, m_scr, m_ssr, m_ssr_read, m_brr, m_rsr, m_tsr;
+	u64 m_clock_event, m_clock_step, m_divider;
 
-	std::string last_clock_message;
+	std::string m_last_clock_message;
 
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	void device_start() override ATTR_COLD;
+	void device_reset() override ATTR_COLD;
 
 	TIMER_CALLBACK_MEMBER(sync_tick);
 
 	void clock_start(int mode);
 	void clock_stop(int mode);
 	void clock_update();
+
 	void tx_start();
-	void tx_dropped_edge();
+	void tx_async_tick();
+	void tx_async_step();
+	void tx_sync_tick();
+	void tx_sync_step();
+
 	void rx_start();
 	void rx_done();
-	void rx_raised_edge();
+	void rx_async_tick();
+	void rx_async_step();
+	void rx_sync_tick();
+	void rx_sync_step();
 
-	bool is_sync_start() const;
+	void sync_rx_start();
 	bool has_recv_error() const;
 };
 

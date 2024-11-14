@@ -21,8 +21,6 @@ ttl7404_device::ttl7404_device(const machine_config &mconfig, const char *tag, d
 
 void ttl7404_device::device_start()
 {
-	m_y_func.resolve_all_safe();
-
 	save_item(NAME(m_a));
 	save_item(NAME(m_y));
 }
@@ -66,16 +64,16 @@ uint8_t ttl7404_device::y_r(uint8_t line)
 }
 
 
-WRITE_LINE_MEMBER( ttl7404_device::a1_w ) { a_w(0, state); }
-WRITE_LINE_MEMBER( ttl7404_device::a2_w ) { a_w(1, state); }
-WRITE_LINE_MEMBER( ttl7404_device::a3_w ) { a_w(2, state); }
-WRITE_LINE_MEMBER( ttl7404_device::a4_w ) { a_w(3, state); }
-WRITE_LINE_MEMBER( ttl7404_device::a5_w ) { a_w(4, state); }
-WRITE_LINE_MEMBER( ttl7404_device::a6_w ) { a_w(5, state); }
+void ttl7404_device::a1_w(int state) { a_w(0, state); }
+void ttl7404_device::a2_w(int state) { a_w(1, state); }
+void ttl7404_device::a3_w(int state) { a_w(2, state); }
+void ttl7404_device::a4_w(int state) { a_w(3, state); }
+void ttl7404_device::a5_w(int state) { a_w(4, state); }
+void ttl7404_device::a6_w(int state) { a_w(5, state); }
 
-READ_LINE_MEMBER( ttl7404_device::y1_r ) { return y_r(0); }
-READ_LINE_MEMBER( ttl7404_device::y2_r ) { return y_r(1); }
-READ_LINE_MEMBER( ttl7404_device::y3_r ) { return y_r(2); }
-READ_LINE_MEMBER( ttl7404_device::y4_r ) { return y_r(3); }
-READ_LINE_MEMBER( ttl7404_device::y5_r ) { return y_r(4); }
-READ_LINE_MEMBER( ttl7404_device::y6_r ) { return y_r(5); }
+int ttl7404_device::y1_r() { return y_r(0); }
+int ttl7404_device::y2_r() { return y_r(1); }
+int ttl7404_device::y3_r() { return y_r(2); }
+int ttl7404_device::y4_r() { return y_r(3); }
+int ttl7404_device::y5_r() { return y_r(4); }
+int ttl7404_device::y6_r() { return y_r(5); }

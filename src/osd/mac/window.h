@@ -8,11 +8,13 @@
 //
 //============================================================
 
-#ifndef __MACWINDOW__
-#define __MACWINDOW__
+#ifndef MAME_OSD_MAC_WINDOW_H
+#define MAME_OSD_MAC_WINDOW_H
+
+#pragma once
 
 #include "osdmac.h"
-#include "video.h"
+#include "osdsync.h"
 
 #include "modules/osdwindow.h"
 
@@ -33,7 +35,7 @@ typedef uintptr_t HashT;
 class mac_window_info : public osd_window_t<void *>
 {
 public:
-	mac_window_info(running_machine &a_machine, int index, std::shared_ptr<osd_monitor_info> a_monitor,
+	mac_window_info(running_machine &a_machine, render_module &renderprovider, int index, std::shared_ptr<osd_monitor_info> a_monitor,
 			const osd_window_config *config);
 
 	~mac_window_info();
@@ -90,25 +92,4 @@ private:
 	void measure_fps(int update);
 };
 
-struct osd_draw_callbacks
-{
-	osd_renderer *(*create)(osd_window *window);
-};
-
-//============================================================
-//  PROTOTYPES
-//============================================================
-
-//============================================================
-// PROTOTYPES - drawogl.c
-//============================================================
-
-int drawogl_init(running_machine &machine, osd_draw_callbacks *callbacks);
-
-//============================================================
-// PROTOTYPES - drawbgfx.c
-//============================================================
-
-int drawbgfx_init(running_machine &machine, osd_draw_callbacks *callbacks);
-
-#endif /* __MACWINDOW__ */
+#endif // MAME_OSD_MAC_WINDOW_H

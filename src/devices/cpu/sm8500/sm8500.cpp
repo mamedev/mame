@@ -108,9 +108,6 @@ void sm8500_cpu_device::device_start()
 {
 	m_program = &space(AS_PROGRAM);
 
-	m_dma_func.resolve_safe();
-	m_timer_func.resolve_safe();
-
 	save_item(NAME(m_PC));
 	save_item(NAME(m_IE0));
 	save_item(NAME(m_IE1));

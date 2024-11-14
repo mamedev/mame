@@ -30,6 +30,9 @@
 #include "machine/input_merger.h"
 #include "machine/i8251.h"
 
+
+namespace {
+
 class mk1forth_state : public driver_device
 {
 public:
@@ -41,9 +44,9 @@ public:
 	void mk1forth(machine_config &config);
 
 private:
-	void ucode_map(address_map &map);
-	void data_map(address_map &map);
-	void stack_map(address_map &map);
+	void ucode_map(address_map &map) ATTR_COLD;
+	void data_map(address_map &map) ATTR_COLD;
+	void stack_map(address_map &map) ATTR_COLD;
 };
 
 void mk1forth_state::ucode_map(address_map &map)
@@ -97,5 +100,8 @@ ROM_START(mk1forth)
 	ROM_REGION(0x2000, "forth", 0)
 	ROM_LOAD("forth.bin", 0x0000, 0x2000, CRC(8b2863fa) SHA1(cc1d0662f10cf767f3f2581270ca2b4711121ffc))
 ROM_END
+
+} // anonymous namespace
+
 
 COMP(2003, mk1forth, 0, 0, mk1forth, 0, mk1forth_state, empty_init, "Andrew Holme", "Mark 1 FORTH Computer", MACHINE_NO_SOUND_HW | MACHINE_SUPPORTS_SAVE)

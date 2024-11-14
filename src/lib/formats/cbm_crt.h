@@ -12,9 +12,11 @@
 
 #pragma once
 
-#include "formats/imageutl.h"
-
 #include "utilfwd.h"
+
+#include <cstddef>
+#include <cstdint>
+#include <string>
 
 
 //**************************************************************************

@@ -17,6 +17,7 @@ protected:
 	virtual u32 opcode_alignment() const override;
 	virtual offs_t disassemble(std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params) override;
 
+	virtual offs_t dasm_jxif(std::ostream &stream, u16 inst, u16 dest, offs_t pc, const v620_disassembler::data_buffer &opcodes) const;
 	virtual offs_t dasm_004xxx(std::ostream &stream, u16 inst, offs_t pc, const data_buffer &opcodes) const;
 	virtual offs_t dasm_misc(std::ostream &stream, u16 inst, offs_t pc, const data_buffer &opcodes) const;
 	virtual offs_t dasm_io(std::ostream &stream, u16 inst, offs_t pc, const data_buffer &opcodes) const;
@@ -26,7 +27,19 @@ protected:
 	void format_address(std::ostream &stream, u16 addr) const;
 };
 
-class v75_disassembler : public v620_disassembler
+class v620f_disassembler : public v620_disassembler
+{
+public:
+	// construction/destruction
+	v620f_disassembler();
+
+protected:
+	virtual offs_t dasm_jxif(std::ostream &stream, u16 inst, u16 dest, offs_t pc, const v620_disassembler::data_buffer &opcodes) const override;
+	virtual offs_t dasm_misc(std::ostream &stream, u16 inst, offs_t pc, const data_buffer &opcodes) const override;
+	virtual offs_t dasm_io(std::ostream &stream, u16 inst, offs_t pc, const data_buffer &opcodes) const override;
+};
+
+class v75_disassembler : public v620f_disassembler
 {
 public:
 	// construction/destruction

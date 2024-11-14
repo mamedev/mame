@@ -76,6 +76,7 @@ ROMS: All ROM labels say only "PROM" and a number.
       11, 12, 13 type 2732
 
 */
+
 #include "emu.h"
 
 #include "cpu/z80/z80.h"
@@ -107,7 +108,10 @@ public:
 
 	void pturn(machine_config &config);
 
-	void init_pturn();
+protected:
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -130,37 +134,28 @@ private:
 	bool m_nmi_sub = false;
 
 	void videoram_w(offs_t offset, uint8_t data);
-	[[maybe_unused]] uint8_t protection_r();
-	[[maybe_unused]] uint8_t protection2_r();
-	DECLARE_WRITE_LINE_MEMBER(nmi_main_enable_w);
+	void nmi_main_enable_w(int state);
 	void nmi_sub_enable_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(coin_counter_1_w);
-	DECLARE_WRITE_LINE_MEMBER(coin_counter_2_w);
+	void coin_counter_1_w(int state);
+	void coin_counter_2_w(int state);
 	void bgcolor_w(uint8_t data);
 	void bg_scrollx_w(uint8_t data);
 	void fgpalette_w(uint8_t data);
 	void bg_scrolly_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(fgbank_w);
-	DECLARE_WRITE_LINE_MEMBER(bgbank_w);
-	DECLARE_WRITE_LINE_MEMBER(flip_w);
+	void fgbank_w(int state);
+	void bgbank_w(int state);
 	uint8_t custom_r(offs_t offset);
 
 	TILE_GET_INFO_MEMBER(get_tile_info);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
-
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	INTERRUPT_GEN_MEMBER(sub_intgen);
 	INTERRUPT_GEN_MEMBER(main_intgen);
-	void main_map(address_map &map);
-	void sub_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
+	void sub_map(address_map &map) ATTR_COLD;
 };
-
-
 
 
 static const uint8_t tile_lookup[0x10]=
@@ -179,7 +174,6 @@ TILE_GET_INFO_MEMBER(pturn_state::get_tile_info)
 
 	tileinfo.set(0,tileno,m_fgpalette,0);
 }
-
 
 
 TILE_GET_INFO_MEMBER(pturn_state::get_bg_tile_info)
@@ -219,7 +213,6 @@ uint32_t pturn_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 		int flipx=m_spriteram[offs+1]&0x40;
 		int flipy=m_spriteram[offs+1]&0x80;
 
-
 		if (flip_screen_x())
 		{
 			sx = 224 - sx;
@@ -235,24 +228,14 @@ uint32_t pturn_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 		if(sx|sy)
 		{
 			m_gfxdecode->gfx(2)->transpen(bitmap,cliprect,
-			m_spriteram[offs+1] & 0x3f ,
-			(m_spriteram[offs+2] & 0x1f),
+			m_spriteram[offs+1] & 0x3f,
+			m_spriteram[offs+2] & 0x1f,
 			flipx, flipy,
 			sx,sy,0);
 		}
 	}
 	m_fgmap->draw(screen, bitmap, cliprect, 0,0);
 	return 0;
-}
-
-uint8_t pturn_state::protection_r()
-{
-	return 0x66;
-}
-
-uint8_t pturn_state::protection2_r()
-{
-	return 0xfe;
 }
 
 void pturn_state::videoram_w(offs_t offset, uint8_t data)
@@ -262,7 +245,7 @@ void pturn_state::videoram_w(offs_t offset, uint8_t data)
 }
 
 
-WRITE_LINE_MEMBER(pturn_state::nmi_main_enable_w)
+void pturn_state::nmi_main_enable_w(int state)
 {
 	m_nmi_main = state;
 	if (!m_nmi_main)
@@ -276,12 +259,12 @@ void pturn_state::nmi_sub_enable_w(uint8_t data)
 		m_audiocpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 }
 
-WRITE_LINE_MEMBER(pturn_state::coin_counter_1_w)
+void pturn_state::coin_counter_1_w(int state)
 {
 	machine().bookkeeping().coin_counter_w(0, state);
 }
 
-WRITE_LINE_MEMBER(pturn_state::coin_counter_2_w)
+void pturn_state::coin_counter_2_w(int state)
 {
 	machine().bookkeeping().coin_counter_w(1, state);
 }
@@ -309,21 +292,16 @@ void pturn_state::bg_scrolly_w(uint8_t data)
 	m_bgmap->set_scrollx(0, data);
 }
 
-WRITE_LINE_MEMBER(pturn_state::fgbank_w)
+void pturn_state::fgbank_w(int state)
 {
 	m_fgbank = state;
 	m_fgmap->mark_all_dirty();
 }
 
-WRITE_LINE_MEMBER(pturn_state::bgbank_w)
+void pturn_state::bgbank_w(int state)
 {
 	m_bgbank = state;
 	m_bgmap->mark_all_dirty();
-}
-
-WRITE_LINE_MEMBER(pturn_state::flip_w)
-{
-	flip_screen_set(state);
 }
 
 
@@ -334,19 +312,20 @@ uint8_t pturn_state::custom_r(offs_t offset)
 	switch(addr)
 	{
 		case 0xc803:
-			// pc=4a4,4a7 : dummy read?
+			// pc=4a4,4a7: dummy read?
 			return 0x00;
 
-		case 0xCA73:
-			// pc=0x0123 , bit6 must be 0
-			// pc=0x0545 , +40 must be 0xfe (check at 0577)
+		case 0xca00:
+			// pc=0x0131 for protect reset?
+			return 0x00;
+
+		case 0xca73:
+			// pc=0x0123, bit6 must be 0
+			// pc=0x0545, +40 must be 0xfe (check at 0577)
 			return 0xbe;
 
-		//case 0xca00:
-		//  return 0x00; // pc=0x0131 for protect reset?
-
 		case 0xca74:
-			// pc=0x04db ,must be 66 (check at 016A)
+			// pc=0x04db, must be 66 (check at 016A)
 			return 0x66;
 	}
 	return 0x00;
@@ -378,7 +357,6 @@ void pturn_state::main_map(address_map &map)
 	map(0xf806, 0xf806).nopr(); /* Protection related, ((val&3)==2) -> jump to 0 */
 
 	map(0xfc00, 0xfc07).w("mainlatch", FUNC(ls259_device::write_d0));
-
 }
 
 void pturn_state::sub_map(address_map &map)
@@ -534,7 +512,7 @@ void pturn_state::pturn(machine_config &config)
 	m_audiocpu->set_periodic_int(FUNC(pturn_state::sub_intgen), attotime::from_hz(3*60));
 
 	ls259_device &mainlatch(LS259(config, "mainlatch"));
-	mainlatch.q_out_cb<0>().set(FUNC(pturn_state::flip_w));
+	mainlatch.q_out_cb<0>().set(FUNC(pturn_state::flip_screen_set));
 	mainlatch.q_out_cb<1>().set(FUNC(pturn_state::nmi_main_enable_w));
 	mainlatch.q_out_cb<2>().set(FUNC(pturn_state::coin_counter_1_w));
 	mainlatch.q_out_cb<3>().set(FUNC(pturn_state::coin_counter_2_w));
@@ -597,18 +575,9 @@ ROM_START( pturn )
 
 	ROM_REGION( 0x2000, "user1", 0 )
 	ROM_LOAD( "prom10.16d", 0x0000,0x2000, CRC(a96e3c95) SHA1(a3b1c1723fcda80c11d9858819659e5e9dfe5dd3))
-
 ROM_END
 
 
-void pturn_state::init_pturn()
-{
-	/*
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0xc0dd, 0xc0dd, read8_delegate(FUNC(pturn_state::protection_r), this));
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0xc0db, 0xc0db, read8_delegate(FUNC(pturn_state::protection2_r), this));
-	*/
-}
-
 } // anonymous namespace
 
-GAME( 1984, pturn,  0, pturn,  pturn, pturn_state, init_pturn, ROT90, "Jaleco", "Parallel Turn",  MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )
+GAME( 1984, pturn,  0, pturn,  pturn, pturn_state, empty_init, ROT90, "Jaleco", "Parallel Turn",  MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )

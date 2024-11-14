@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Vas Crabb, Sergey Svishchev
-#ifndef MAME_MACHINE_GRIDKEYB_H
-#define MAME_MACHINE_GRIDKEYB_H
+#ifndef MAME_GRIDCOMP_GRIDKEYB_H
+#define MAME_GRIDCOMP_GRIDKEYB_H
 
 #pragma once
 
@@ -46,7 +46,7 @@ public:
 		m_keyboard_cb.set(std::forward<T>(args)...);
 	}
 
-	virtual ioport_constructor device_input_ports() const override;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 
 protected:
 	grid_keyboard_device(
@@ -55,8 +55,8 @@ protected:
 			char const *tag,
 			device_t *owner,
 			u32 clock);
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 	virtual void key_make(u8 row, u8 column) override;
 	virtual void key_repeat(u8 row, u8 column) override;
 	virtual void send_key(u16 code);
@@ -77,4 +77,4 @@ private:
 	output_delegate m_keyboard_cb;
 };
 
-#endif // MAME_MACHINE_GRIDKEYB_H
+#endif // MAME_GRIDCOMP_GRIDKEYB_H

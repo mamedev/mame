@@ -14,17 +14,17 @@ ms0515_format::ms0515_format() : wd177x_format(formats)
 {
 }
 
-const char *ms0515_format::name() const
+const char *ms0515_format::name() const noexcept
 {
 	return "ms0515";
 }
 
-const char *ms0515_format::description() const
+const char *ms0515_format::description() const noexcept
 {
 	return "MS 0515 disk image";
 }
 
-const char *ms0515_format::extensions() const
+const char *ms0515_format::extensions() const noexcept
 {
 	return "img";
 }

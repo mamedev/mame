@@ -97,17 +97,17 @@ void bagman_state::ls259_w(offs_t offset, uint8_t data)
 		m_tmslatch->write_bit(offset, data & 1);
 }
 
-WRITE_LINE_MEMBER(bagman_state::tmsprom_bit_w)
+void bagman_state::tmsprom_bit_w(int state)
 {
 	m_tmsprom->bit_w(7 - ((m_tmslatch->q0_r()<<2) | (m_tmslatch->q1_r()<<1) | (m_tmslatch->q2_r()<<0)));
 }
 
-WRITE_LINE_MEMBER(bagman_state::tmsprom_csq0_w)
+void bagman_state::tmsprom_csq0_w(int state)
 {
 	m_tmsprom->rom_csq_w(0, state);
 }
 
-WRITE_LINE_MEMBER(bagman_state::tmsprom_csq1_w)
+void bagman_state::tmsprom_csq1_w(int state)
 {
 	// HACK: Schematics suggest that this LS259 does in fact respond to the master
 	// reset signal, which would pull /OE active low on both 2732s at once. How
@@ -116,12 +116,12 @@ WRITE_LINE_MEMBER(bagman_state::tmsprom_csq1_w)
 		m_tmsprom->rom_csq_w(1, state);
 }
 
-WRITE_LINE_MEMBER(bagman_state::coin_counter_w)
+void bagman_state::coin_counter_w(int state)
 {
 	machine().bookkeeping().coin_counter_w(0, state);
 }
 
-WRITE_LINE_MEMBER(bagman_state::irq_mask_w)
+void bagman_state::irq_mask_w(int state)
 {
 	m_irq_mask = state;
 	if (!state)
@@ -237,9 +237,9 @@ static INPUT_PORTS_START( bagman )
 	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Bonus_Life ) )       PORT_DIPLOCATION("SW1:7")
 	PORT_DIPSETTING(    0x40, "30000" )
 	PORT_DIPSETTING(    0x00, "40000" )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Cabinet ) ) // Cabinet type set through edge connector, not dip switch (verified on real PCB)
-	PORT_DIPSETTING(    0x80, DEF_STR( Upright ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Cocktail ) )
+	PORT_CONFNAME(0x80, 0x80, DEF_STR( Cabinet ) ) // Cabinet type set through edge connector, not dip switch (verified on real PCB)
+	PORT_CONFSETTING(   0x80, DEF_STR( Upright ) )
+	PORT_CONFSETTING(   0x00, DEF_STR( Cocktail ) )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( bagmans )
@@ -364,7 +364,7 @@ static INPUT_PORTS_START( squaitsa )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_2WAY
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_2WAY
-	PORT_BIT( 0x60, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(squaitsa_state, dial_input_r<0>)
+	PORT_BIT( 0x60, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(FUNC(squaitsa_state::dial_input_r<0>))
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 )
 
 	PORT_START("P2")
@@ -373,7 +373,7 @@ static INPUT_PORTS_START( squaitsa )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_2WAY PORT_COCKTAIL
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_2WAY PORT_COCKTAIL
-	PORT_BIT( 0x60, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(squaitsa_state, dial_input_r<1>)
+	PORT_BIT( 0x60, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(FUNC(squaitsa_state::dial_input_r<1>))
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL
 
 	PORT_START("DSW")
@@ -447,7 +447,7 @@ GFXDECODE_END
 
 /* squaitsa doesn't map the dial directly, instead it polls the results of the dial through an external circuitry.
    I don't know if the following is correct, there can possibly be multiple solutions for the same problem. */
-template <unsigned N> CUSTOM_INPUT_MEMBER(squaitsa_state::dial_input_r)
+template <unsigned N> ioport_value squaitsa_state::dial_input_r()
 {
 	uint8_t const dial_val = m_dial[N]->read();
 
@@ -465,7 +465,7 @@ template <unsigned N> CUSTOM_INPUT_MEMBER(squaitsa_state::dial_input_r)
 	return m_res[N];
 }
 
-WRITE_LINE_MEMBER(bagman_state::vblank_irq)
+void bagman_state::vblank_irq(int state)
 {
 	if (state && m_irq_mask)
 		m_maincpu->set_input_line(0, ASSERT_LINE);
@@ -479,8 +479,8 @@ void bagman_state::bagman_base(machine_config &config)
 
 	LS259(config, m_mainlatch); // 8H
 	m_mainlatch->q_out_cb<0>().set(FUNC(bagman_state::irq_mask_w));
-	m_mainlatch->q_out_cb<1>().set(FUNC(bagman_state::flipscreen_x_w));
-	m_mainlatch->q_out_cb<2>().set(FUNC(bagman_state::flipscreen_y_w));
+	m_mainlatch->q_out_cb<1>().set(FUNC(bagman_state::flip_screen_x_set));
+	m_mainlatch->q_out_cb<2>().set(FUNC(bagman_state::flip_screen_y_set));
 	// video enable register not available on earlier hardware revision(s)
 	// Bagman is supposed to have glitches during screen transitions
 	m_mainlatch->q_out_cb<4>().set(FUNC(bagman_state::coin_counter_w));
@@ -558,8 +558,8 @@ void pickin_state::pickin(machine_config &config)
 
 	LS259(config, m_mainlatch);
 	m_mainlatch->q_out_cb<0>().set(FUNC(pickin_state::irq_mask_w));
-	m_mainlatch->q_out_cb<1>().set(FUNC(pickin_state::flipscreen_x_w));
-	m_mainlatch->q_out_cb<2>().set(FUNC(pickin_state::flipscreen_y_w));
+	m_mainlatch->q_out_cb<1>().set(FUNC(pickin_state::flip_screen_x_set));
+	m_mainlatch->q_out_cb<2>().set(FUNC(pickin_state::flip_screen_y_set));
 	m_mainlatch->q_out_cb<3>().set(FUNC(pickin_state::video_enable_w));
 	m_mainlatch->q_out_cb<4>().set(FUNC(pickin_state::coin_counter_w));
 	m_mainlatch->q_out_cb<5>().set_nop(); // ????
@@ -620,8 +620,8 @@ void pickin_state::botanic(machine_config &config)
 
 	LS259(config, m_mainlatch);
 	m_mainlatch->q_out_cb<0>().set(FUNC(pickin_state::irq_mask_w));
-	m_mainlatch->q_out_cb<1>().set(FUNC(pickin_state::flipscreen_x_w));
-	m_mainlatch->q_out_cb<2>().set(FUNC(pickin_state::flipscreen_y_w));
+	m_mainlatch->q_out_cb<1>().set(FUNC(pickin_state::flip_screen_x_set));
+	m_mainlatch->q_out_cb<2>().set(FUNC(pickin_state::flip_screen_y_set));
 	m_mainlatch->q_out_cb<3>().set(FUNC(pickin_state::video_enable_w));
 	m_mainlatch->q_out_cb<4>().set(FUNC(pickin_state::coin_counter_w));
 	m_mainlatch->q_out_cb<5>().set_nop();    // ????
@@ -775,8 +775,6 @@ ROM_START( bagnardi ) // 1983
 
 	ROM_REGION (0x104, "plds", 0)
 	ROM_LOAD( "lebag_itisa_pal16r6cn.p6", 0x000, 0x104, CRC(13f14bbf) SHA1(b8c4ddf61609465f3a3699dd42796f15a7b17979) )
-
-
 ROM_END
 
 ROM_START( bagnardio ) // 1982, based on bagnard set with mods for license text
@@ -873,7 +871,7 @@ ROM_START( bagmans4 )
 	ROM_LOAD( "bagman_a1_9t.9t", 0x1000, 0x1000, CRC(b2120edd) SHA1(52b89dbcc749b084331fa82b13d0876e911fce52) )
 ROM_END
 
-ROM_START( bagmans3 ) // not compatible with the PAL16R6 emulator in ../mame/machine/bagman.cpp??
+ROM_START( bagmans3 ) // not compatible with the PAL16R6 emulator in bagman_m.cpp??
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "bagman_a2_9e.9e", 0x0000, 0x1000, CRC(5f04d805) SHA1(84bcdfd25634879438429d2b41c491e092388add) )
 	ROM_LOAD( "bagman_a3_9f.9f", 0x1000, 0x1000, CRC(136a78aa) SHA1(14e6a556e00b6ebe718f2fe119b372dc7bfa78d9) )

@@ -1,7 +1,7 @@
 /** @file paex_sine.c
-	@ingroup examples_src
-	@brief Play a sine wave for several seconds.
-	@author Ross Bencina <rossb@audiomulch.com>
+    @ingroup examples_src
+    @brief Play a sine wave for several seconds.
+    @author Ross Bencina <rossb@audiomulch.com>
     @author Phil Burk <philburk@softsynth.com>
 */
 /*
@@ -32,13 +32,13 @@
  */
 
 /*
- * The text above constitutes the entire PortAudio license; however, 
+ * The text above constitutes the entire PortAudio license; however,
  * the PortAudio community also makes the following non-binding requests:
  *
  * Any person wishing to distribute modifications to the Software is
  * requested to send the modifications to the original developer so that
- * they can be incorporated into the canonical version. It is also 
- * requested that these non-binding requests be included along with the 
+ * they can be incorporated into the canonical version. It is also
+ * requested that these non-binding requests be included along with the
  * license above.
  */
 #include <stdio.h>
@@ -80,7 +80,7 @@ static int patestCallback( const void *inputBuffer, void *outputBuffer,
     (void) timeInfo; /* Prevent unused variable warnings. */
     (void) statusFlags;
     (void) inputBuffer;
-    
+
     for( i=0; i<framesPerBuffer; i++ )
     {
         *out++ = data->sine[data->left_phase];  /* left */
@@ -90,7 +90,7 @@ static int patestCallback( const void *inputBuffer, void *outputBuffer,
         data->right_phase += 3; /* higher pitch so we can distinguish left and right. */
         if( data->right_phase >= TABLE_SIZE ) data->right_phase -= TABLE_SIZE;
     }
-    
+
     return paContinue;
 }
 
@@ -99,8 +99,8 @@ static int patestCallback( const void *inputBuffer, void *outputBuffer,
  */
 static void StreamFinished( void* userData )
 {
-   paTestData *data = (paTestData *) userData;
-   printf( "Stream Completed: %s\n", data->message );
+    paTestData *data = (paTestData *) userData;
+    printf( "Stream Completed: %s\n", data->message );
 }
 
 /*******************************************************************/
@@ -121,14 +121,14 @@ int main(void)
         data.sine[i] = (float) sin( ((double)i/(double)TABLE_SIZE) * M_PI * 2. );
     }
     data.left_phase = data.right_phase = 0;
-    
+
     err = Pa_Initialize();
     if( err != paNoError ) goto error;
 
     outputParameters.device = Pa_GetDefaultOutputDevice(); /* default output device */
     if (outputParameters.device == paNoDevice) {
-      fprintf(stderr,"Error: No default output device.\n");
-      goto error;
+        fprintf(stderr,"Error: No default output device.\n");
+        goto error;
     }
     outputParameters.channelCount = 2;       /* stereo output */
     outputParameters.sampleFormat = paFloat32; /* 32 bit floating point output */
@@ -164,11 +164,11 @@ int main(void)
 
     Pa_Terminate();
     printf("Test finished.\n");
-    
+
     return err;
 error:
     Pa_Terminate();
-    fprintf( stderr, "An error occured while using the portaudio stream\n" );
+    fprintf( stderr, "An error occurred while using the portaudio stream\n" );
     fprintf( stderr, "Error number: %d\n", err );
     fprintf( stderr, "Error message: %s\n", Pa_GetErrorText( err ) );
     return err;

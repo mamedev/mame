@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Aaron Giles
-#ifndef MAME_AUDIO_SEGAG80V_H
-#define MAME_AUDIO_SEGAG80V_H
+#ifndef MAME_SEGA_SEGAG80_H
+#define MAME_SEGA_SEGAG80_H
 
 #pragma once
 
@@ -21,8 +21,8 @@ public:
 protected:
 	segag80_audio_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u8 lomask, u8 himask, bool haspsg, netlist_ptr netlist, double output_scale);
 
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual void device_start() override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual void device_start() override ATTR_COLD;
 
 	optional_device_array<netlist_mame_logic_input_device, 8> m_lo_input;
 	optional_device_array<netlist_mame_logic_input_device, 8> m_hi_input;
@@ -70,4 +70,4 @@ DECLARE_DEVICE_TYPE(ZEKTOR_AUDIO, zektor_audio_device)
 DECLARE_DEVICE_TYPE(SPACE_FURY_AUDIO, spacfury_audio_device)
 DECLARE_DEVICE_TYPE(ASTRO_BLASTER_AUDIO, astrob_audio_device)
 
-#endif // MAME_AUDIO_SEGAG80V_H
+#endif // MAME_SEGA_SEGAG80_H

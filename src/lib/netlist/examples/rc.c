@@ -6,6 +6,7 @@
 #include "netlist/devices/net_lib.h"
 
 NETLIST_START(rc)
+{
 
 	/*
 	 * delay circuit
@@ -28,4 +29,4 @@ NETLIST_START(rc)
 
 	LOG(tt, C1.1)
 
-NETLIST_END()
+}

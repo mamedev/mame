@@ -308,7 +308,7 @@ float3 GetNoiseFactor(float3 n, float random)
 
 float4 ps_main(PS_INPUT Input) : COLOR
 {
-	float3 texel = tex2D(DiffuseSampler, Input.TexCoord).rgb;
+	float4 texel = tex2D(DiffuseSampler, Input.TexCoord);
 
 	float3 texelA = tex2D(BloomSamplerA, Input.BloomCoord.xy).rgb;
 	float3 texelB = tex2D(BloomSamplerB, Input.BloomCoord.xy).rgb;
@@ -346,7 +346,7 @@ float4 ps_main(PS_INPUT Input) : COLOR
 	{
 		float3 bloom = float3(0.0f, 0.0f, 0.0f);
 
-		texel *= Level0Weight;
+		texel.rgb *= Level0Weight;
 
 		if (!VectorScreen)
 		{
@@ -381,7 +381,7 @@ float4 ps_main(PS_INPUT Input) : COLOR
 
 		bloom *= BloomScale;
 
-		float3 bloomOverdrive = max(0.0f, texel + bloom - 1.0f) * BloomOverdrive;
+		float3 bloomOverdrive = max(0.0f, texel.rgb + bloom - 1.0f) * BloomOverdrive;
 
 		bloom.r += bloomOverdrive.g * 0.5f;
 		bloom.r += bloomOverdrive.b * 0.5f;
@@ -393,20 +393,20 @@ float4 ps_main(PS_INPUT Input) : COLOR
 		float2 NoiseCoord = Input.TexCoord;
 		float3 NoiseFactor = GetNoiseFactor(bloom, random(NoiseCoord));
 
-		blend = texel + bloom * NoiseFactor;
+		blend = texel.rgb + bloom * NoiseFactor;
 	}
 
 	// darken
 	else
 	{
-		texelA = min(texel, texelA);
-		texelB = min(texel, texelB);
-		texelC = min(texel, texelC);
-		texelD = min(texel, texelD);
-		texelE = min(texel, texelE);
-		texelF = min(texel, texelF);
-		texelG = min(texel, texelG);
-		texelH = min(texel, texelH);
+		texelA = min(texel.rgb, texelA);
+		texelB = min(texel.rgb, texelB);
+		texelC = min(texel.rgb, texelC);
+		texelD = min(texel.rgb, texelD);
+		texelE = min(texel.rgb, texelE);
+		texelF = min(texel.rgb, texelF);
+		texelG = min(texel.rgb, texelG);
+		texelH = min(texel.rgb, texelH);
 
 		blend = texel * Level0Weight;
 		blend = lerp(blend, texelA, Level1Weight * BloomScale);

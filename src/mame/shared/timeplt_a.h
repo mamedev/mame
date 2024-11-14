@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Nicola Salmoria
-#ifndef MAME_AUDIO_TIMEPLT_H
-#define MAME_AUDIO_TIMEPLT_H
+#ifndef MAME_SHARED_TIMEPLT_A_H
+#define MAME_SHARED_TIMEPLT_A_H
 
 #pragma once
 
@@ -16,20 +16,20 @@ public:
 	timeplt_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 14'318'181);
 
 	void sound_data_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(sh_irqtrigger_w);
-	DECLARE_WRITE_LINE_MEMBER(mute_w);
+	void sh_irqtrigger_w(int state);
+	void mute_w(int state);
 
 protected:
 	timeplt_audio_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	// device-level overrides
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual void device_start() override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual void device_start() override ATTR_COLD;
 
 	void filter_w(offs_t offset, uint8_t data);
 	uint8_t portB_r();
 
-	void timeplt_sound_map(address_map &map);
+	void timeplt_sound_map(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_soundcpu;
 
@@ -51,12 +51,12 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
-	void locomotn_sound_map(address_map &map);
+	void locomotn_sound_map(address_map &map) ATTR_COLD;
 };
 
 DECLARE_DEVICE_TYPE(TIMEPLT_AUDIO, timeplt_audio_device)
 DECLARE_DEVICE_TYPE(LOCOMOTN_AUDIO, locomotn_audio_device)
 
-#endif // MAME_AUDIO_TIMEPLT_H
+#endif // MAME_SHARED_TIMEPLT_A_H

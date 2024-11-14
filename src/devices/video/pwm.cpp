@@ -36,7 +36,7 @@ TODO:
 */
 
 #include "emu.h"
-#include "video/pwm.h"
+#include "pwm.h"
 
 #include <algorithm>
 
@@ -76,11 +76,7 @@ pwm_display_device::pwm_display_device(const machine_config &mconfig, const char
 void pwm_display_device::device_start()
 {
 	// resolve handlers
-	m_external_output = !m_output_x_cb.isnull() || !m_output_a_cb.isnull() || !m_output_multi_cb.isnull() || !m_output_digit_cb.isnull();
-	m_output_x_cb.resolve_safe();
-	m_output_a_cb.resolve_safe();
-	m_output_multi_cb.resolve_safe();
-	m_output_digit_cb.resolve_safe();
+	m_external_output = !m_output_x_cb.isunset() || !m_output_a_cb.isunset() || !m_output_multi_cb.isunset() || !m_output_digit_cb.isunset();
 
 	if (!m_external_output)
 	{
@@ -278,11 +274,11 @@ void pwm_display_device::sync()
 {
 	const attotime now = machine().time();
 	const attotime last = m_sync_time;
-	m_sync_time = now;
 
 	if (last >= now)
 		return;
 
+	m_sync_time = now;
 	const attotime diff = now - last;
 	u64 sel = m_rowsel;
 

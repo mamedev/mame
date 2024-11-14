@@ -36,6 +36,9 @@ TODO:
 #include "screen.h"
 #include "speaker.h"
 
+
+namespace {
+
 class destiny_state : public driver_device
 {
 public:
@@ -64,12 +67,12 @@ private:
 	void bank_select_w(uint8_t data);
 	void sound_w(offs_t offset, uint8_t data);
 
-	void main_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
 protected:
 	// driver_device overrides
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 public:
 	uint32_t screen_update_destiny(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
@@ -243,10 +246,10 @@ static INPUT_PORTS_START( destiny )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, destiny_state, coin_inserted, 0)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(destiny_state::coin_inserted), 0)
 
 	PORT_START("SERVICE")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_CHANGED_MEMBER(DEVICE_SELF, destiny_state, coin_inserted, 1)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(destiny_state::coin_inserted), 1)
 INPUT_PORTS_END
 
 
@@ -317,5 +320,8 @@ ROM_START( destiny )
 	ROM_LOAD( "ag10.16a",  0x14000, 0x2000, CRC(c498754a) SHA1(90e215e8e41d32237d1f4b074d93e20eade92e4e) )
 	ROM_LOAD( "ag11.18a",  0x16000, 0x2000, CRC(5f7bf9f9) SHA1(281f89c0bccfcc2bdc1d4d0a5b9cc9a8ab2e7869) )
 ROM_END
+
+} // anonymous namespace
+
 
 GAME( 1983, destiny, 0, destiny,  destiny, destiny_state, empty_init, ROT0, "Data East Corporation", "Destiny - The Fortuneteller (USA)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS|MACHINE_NODEVICE_PRINTER )

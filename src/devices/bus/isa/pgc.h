@@ -30,18 +30,18 @@ protected:
 	isa8_pgc_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// optional information overrides
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual const tiny_rom_entry *device_rom_region() const override;
-	virtual ioport_constructor device_input_ports() const override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 
 private:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
+	void vblank_irq(int state);
 	IRQ_CALLBACK_MEMBER(irq_callback);
 
 	void vram_w(offs_t offset, uint8_t data);
@@ -54,8 +54,8 @@ private:
 
 	void reset_common();
 
-	void pgc_io(address_map &map);
-	void pgc_map(address_map &map);
+	void pgc_io(address_map &map) ATTR_COLD;
+	void pgc_map(address_map &map) ATTR_COLD;
 
 	required_device<i8088_cpu_device> m_cpu;
 	required_device<screen_device> m_screen;

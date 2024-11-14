@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:windyfairy
-#ifndef MAME_MACHINE_K573KARA_H
-#define MAME_MACHINE_K573KARA_H
+#ifndef MAME_KONAMI_K573KARA_H
+#define MAME_KONAMI_K573KARA_H
 
 #pragma once
 
@@ -13,13 +13,13 @@ class k573kara_device : public device_t
 public:
 	k573kara_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	void amap(address_map &map);
+	void amap(address_map &map) ATTR_COLD;
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
-	virtual const tiny_rom_entry *device_rom_region() const override;
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 private:
 	uint16_t uart_r(offs_t offset);
@@ -46,4 +46,4 @@ private:
 
 DECLARE_DEVICE_TYPE(KONAMI_573_KARAOKE_IO_BOARD, k573kara_device)
 
-#endif // MAME_MACHINE_K573KARA_H
+#endif // MAME_KONAMI_K573KARA_H

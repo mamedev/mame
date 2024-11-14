@@ -8,61 +8,76 @@
 //
 //============================================================
 
+#ifndef MAME_RENDER_SDLGLCONTEXT_H
+#define MAME_RENDER_SDLGLCONTEXT_H
+
 #pragma once
 
-#ifndef __SDL_GL_CONTEXT__
-#define __SDL_GL_CONTEXT__
+#include "modules/opengl/osd_opengl.h"
+
+#include "strformat.h"
 
 #include <SDL2/SDL.h>
-#include "modules/opengl/osd_opengl.h"
+
+#include <string>
+
 
 class sdl_gl_context : public osd_gl_context
 {
 public:
-	sdl_gl_context(SDL_Window *window) : osd_gl_context(), m_context(0), m_window(window)
+	sdl_gl_context(SDL_Window *window) : m_context(0), m_window(window)
 	{
-		m_error[0] = 0;
 		m_context = SDL_GL_CreateContext(window);
-		if  (!m_context)
+		if (!m_context)
 		{
-			snprintf(m_error,255, "OpenGL not supported on this driver: %s", SDL_GetError());
+			try { m_error = util::string_format("OpenGL not supported on this driver: %s", SDL_GetError()); }
+			catch (...) { m_error.clear(); }
 		}
 	}
+
 	virtual ~sdl_gl_context()
 	{
-		SDL_GL_DeleteContext(m_context);
+		if (m_context)
+			SDL_GL_DeleteContext(m_context);
 	}
-	virtual void MakeCurrent() override
+
+	virtual explicit operator bool() const override
+	{
+		return bool(m_context);
+	}
+
+	virtual void make_current() override
 	{
 		SDL_GL_MakeCurrent(m_window, m_context);
 	}
 
-	virtual int SetSwapInterval(const int swap) override
+	virtual bool set_swap_interval(const int swap) override
 	{
-		return SDL_GL_SetSwapInterval(swap);
+		return 0 == SDL_GL_SetSwapInterval(swap);
 	}
 
-	virtual const char *LastErrorMsg() override
+	virtual const char *last_error_message() override
 	{
-		if (m_error[0] == 0)
-			return nullptr;
+		if (!m_error.empty())
+			return m_error.c_str();
 		else
-			return m_error;
+			return nullptr;
 	}
-	virtual void *getProcAddress(const char *proc) override
+
+	virtual void *get_proc_address(const char *proc) override
 	{
 		return SDL_GL_GetProcAddress(proc);
 	}
 
-	virtual void SwapBuffer() override
+	virtual void swap_buffer() override
 	{
 		SDL_GL_SwapWindow(m_window);
 	}
 
 private:
 	SDL_GLContext m_context;
-	SDL_Window *m_window;
-	char m_error[256];
+	SDL_Window *const m_window;
+	std::string m_error;
 };
 
-#endif // __SDL_GL_CONTEXT__
+#endif // MAME_RENDER_SDLGLCONTEXT_H

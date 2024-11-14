@@ -13,7 +13,6 @@
 
 #include "adamnet.h"
 #include "cpu/m6800/m6801.h"
-#include "formats/adam_cas.h"
 #include "imagedev/cassette.h"
 
 
@@ -33,22 +32,20 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 	// optional information overrides
-	virtual const tiny_rom_entry *device_rom_region() const override;
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 	// device_adamnet_card_interface overrides
 	virtual void adamnet_reset_w(int state) override;
 
 private:
 	required_device<m6801_cpu_device> m_maincpu;
-	required_device<cassette_image_device> m_ddp0;
-	required_device<cassette_image_device> m_ddp1;
+	required_device_array<cassette_image_device, 2> m_ddp;
 
-	int m_wr0;
-	int m_wr1;
+	uint8_t m_wr;
 	int m_track;
 
 	void p1_w(uint8_t data);
@@ -56,7 +53,7 @@ private:
 	void p2_w(uint8_t data);
 	uint8_t p4_r();
 
-	void adam_ddp_mem(address_map &map);
+	void adam_ddp_mem(address_map &map) ATTR_COLD;
 };
 
 

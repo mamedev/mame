@@ -16,6 +16,9 @@ TODO:
 #include "m62.h"
 #include "iremipt.h"
 
+
+namespace {
+
 class m62_bkungfu_state : public m62_state
 {
 public:
@@ -29,8 +32,8 @@ public:
 	void bkungfu(machine_config& config);
 
 private:
-	void mem_map(address_map& map);
-	void io_map(address_map& map);
+	void mem_map(address_map &map) ATTR_COLD;
+	void io_map(address_map &map) ATTR_COLD;
 
 	uint8_t bkungfu_blitter_r(offs_t offset);
 	void bkungfu_blitter_w(offs_t offset, uint8_t data);
@@ -277,6 +280,7 @@ ROM_START( bkungfu )
 	ROM_LOAD( "km-b.6f", 0x0000, 0x0100, CRC(82c20d12) SHA1(268903f7d9be58a70d030b02bf31a2d6b5b6e249) )
 ROM_END
 
+} // anonymous namespace
 
 
 /*******************************************************************************

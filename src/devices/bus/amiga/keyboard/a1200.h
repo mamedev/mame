@@ -27,7 +27,7 @@ public:
 	a1200_kbd_device(machine_config const &mconfig, char const *tag, device_t *owner, uint32_t clock);
 
 	// from host
-	virtual DECLARE_WRITE_LINE_MEMBER(kdat_w) override;
+	virtual void kdat_w(int state) override;
 
 	DECLARE_INPUT_CHANGED_MEMBER(layout_changed);
 
@@ -37,13 +37,13 @@ protected:
 	void mpu_porta_w(offs_t offset, u8 data, u8 mem_mask = ~0);
 	void mpu_portb_w(offs_t offset, u8 data, u8 mem_mask = ~0);
 	void mpu_portc_w(offs_t offset, u8 data, u8 mem_mask = ~0);
-	DECLARE_WRITE_LINE_MEMBER(mpu_tcmp);
+	void mpu_tcmp(int state);
 
-	virtual tiny_rom_entry const *device_rom_region() const override;
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual ioport_constructor device_input_ports() const override;
+	virtual tiny_rom_entry const *device_rom_region() const override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset_after_children() override;
 
 private:

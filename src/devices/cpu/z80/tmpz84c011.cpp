@@ -41,11 +41,11 @@ tmpz84c011_device::tmpz84c011_device(const machine_config &mconfig, const char *
 	m_outportsc(*this),
 	m_outportsd(*this),
 	m_outportse(*this),
-	m_inportsa(*this),
-	m_inportsb(*this),
-	m_inportsc(*this),
-	m_inportsd(*this),
-	m_inportse(*this),
+	m_inportsa(*this, 0),
+	m_inportsb(*this, 0),
+	m_inportsc(*this, 0),
+	m_inportsd(*this, 0),
+	m_inportse(*this, 0),
 	m_zc0_cb(*this),
 	m_zc1_cb(*this),
 	m_zc2_cb(*this)
@@ -68,23 +68,6 @@ device_memory_interface::space_config_vector tmpz84c011_device::memory_space_con
 void tmpz84c011_device::device_start()
 {
 	z80_device::device_start();
-
-	// resolve callbacks
-	m_outportsa.resolve_safe();
-	m_outportsb.resolve_safe();
-	m_outportsc.resolve_safe();
-	m_outportsd.resolve_safe();
-	m_outportse.resolve_safe();
-
-	m_inportsa.resolve_safe(0);
-	m_inportsb.resolve_safe(0);
-	m_inportsc.resolve_safe(0);
-	m_inportsd.resolve_safe(0);
-	m_inportse.resolve_safe(0);
-
-	m_zc0_cb.resolve_safe();
-	m_zc1_cb.resolve_safe();
-	m_zc2_cb.resolve_safe();
 
 	// register for save states
 	save_item(NAME(m_pio_dir[0]));

@@ -15,7 +15,7 @@
  * Olivier Tristan for feedback and testing
  * Glenn Zelniker and Z-Systems engineering for sponsoring the Blocking I/O
  * interface.
- * 
+ *
  *
  * Based on the Open Source API proposed by Ross Bencina
  * Copyright (c) 1999-2002 Ross Bencina, Phil Burk
@@ -41,13 +41,13 @@
  */
 
 /*
- * The text above constitutes the entire PortAudio license; however, 
+ * The text above constitutes the entire PortAudio license; however,
  * the PortAudio community also makes the following non-binding requests:
  *
  * Any person wishing to distribute modifications to the Software is
  * requested to send the modifications to the original developer so that
- * they can be incorporated into the canonical version. It is also 
- * requested that these non-binding requests be included along with the 
+ * they can be incorporated into the canonical version. It is also
+ * requested that these non-binding requests be included along with the
  * license above.
  */
 
@@ -73,7 +73,7 @@
 #define MAX(a, b)  (((a)<(b))?(b):(a))
 #endif
 
-#define ERR(mac_error) PaMacCore_SetError(mac_error, __LINE__, 1 ) 
+#define ERR(mac_error) PaMacCore_SetError(mac_error, __LINE__, 1 )
 #define WARNING(mac_error) PaMacCore_SetError(mac_error, __LINE__, 0 )
 
 
@@ -81,7 +81,7 @@
 #define INPUT_ELEMENT  (1)
 #define OUTPUT_ELEMENT (0)
 
-/* Normal level of debugging: fine for most apps that don't mind the occational warning being printf'ed */
+/* Normal level of debugging: fine for most apps that don't mind the occasional warning being printf'ed */
 /*
  */
 #define MAC_CORE_DEBUG
@@ -91,7 +91,7 @@
 # define DBUG(MSG)
 #endif
 
-/* Verbose Debugging: useful for developement */
+/* Verbose Debugging: useful for development */
 /*
 #define MAC_CORE_VERBOSE_DEBUG
 */
@@ -111,9 +111,61 @@
 # define VVDBUG(MSG)
 #endif
 
+OSStatus PaMacCore_AudioHardwareGetProperty(
+    AudioHardwarePropertyID inPropertyID,
+    UInt32*                 ioPropertyDataSize,
+    void*                   outPropertyData );
 
+OSStatus PaMacCore_AudioHardwareGetPropertySize(
+    AudioHardwarePropertyID inPropertyID,
+    UInt32*                 outSize );
 
+OSStatus PaMacCore_AudioDeviceGetProperty(
+    AudioDeviceID         inDevice,
+    UInt32                inChannel,
+    Boolean               isInput,
+    AudioDevicePropertyID inPropertyID,
+    UInt32*               ioPropertyDataSize,
+    void*                 outPropertyData );
 
+OSStatus PaMacCore_AudioDeviceSetProperty(
+    AudioDeviceID         inDevice,
+    const AudioTimeStamp* inWhen,
+    UInt32                inChannel,
+    Boolean               isInput,
+    AudioDevicePropertyID inPropertyID,
+    UInt32                inPropertyDataSize,
+    const void*           inPropertyData );
+
+OSStatus PaMacCore_AudioDeviceGetPropertySize(
+    AudioDeviceID         inDevice,
+    UInt32                inChannel,
+    Boolean               isInput,
+    AudioDevicePropertyID inPropertyID,
+    UInt32*               outSize );
+
+OSStatus PaMacCore_AudioDeviceAddPropertyListener(
+    AudioDeviceID                   inDevice,
+    UInt32                          inChannel,
+    Boolean                         isInput,
+    AudioDevicePropertyID           inPropertyID,
+    AudioObjectPropertyListenerProc inProc,
+    void*                           inClientData );
+
+OSStatus PaMacCore_AudioDeviceRemovePropertyListener(
+    AudioDeviceID                   inDevice,
+    UInt32                          inChannel,
+    Boolean                         isInput,
+    AudioDevicePropertyID           inPropertyID,
+    AudioObjectPropertyListenerProc inProc,
+    void*                           inClientData );
+
+OSStatus PaMacCore_AudioStreamGetProperty(
+    AudioStreamID         inStream,
+    UInt32                inChannel,
+    AudioDevicePropertyID inPropertyID,
+    UInt32*               ioPropertyDataSize,
+    void*                 outPropertyData );
 
 #define UNIX_ERR(err) PaMacCore_SetUnixError( err, __LINE__ )
 
@@ -138,31 +190,30 @@ PaError PaMacCore_SetError(OSStatus error, int line, int isError);
  *
  */
 long computeRingBufferSize( const PaStreamParameters *inputParameters,
-                                   const PaStreamParameters *outputParameters,
-                                   long inputFramesPerBuffer,
-                                   long outputFramesPerBuffer,
-                                   double sampleRate );
+                            const PaStreamParameters *outputParameters,
+                            long inputFramesPerBuffer,
+                            long outputFramesPerBuffer,
+                            double sampleRate );
 
 OSStatus propertyProc(
-    AudioDeviceID inDevice, 
-    UInt32 inChannel, 
-    Boolean isInput, 
-    AudioDevicePropertyID inPropertyID, 
-    void* inClientData );
+        AudioObjectID inObjectID,
+        UInt32 inNumberAddresses,
+        const AudioObjectPropertyAddress* inAddresses,
+        void* inClientData );
 
-/* sets the value of the given property and waits for the change to 
+/* sets the value of the given property and waits for the change to
    be acknowledged, and returns the final value, which is not guaranteed
    by this function to be the same as the desired value. Obviously, this
    function can only be used for data whose input and output are the
    same size and format, and their size and format are known in advance.*/
 PaError AudioDeviceSetPropertyNowAndWaitForChange(
-    AudioDeviceID inDevice,
-    UInt32 inChannel, 
-    Boolean isInput, 
-    AudioDevicePropertyID inPropertyID,
-    UInt32 inPropertyDataSize, 
-    const void *inPropertyData,
-    void *outPropertyData );
+        AudioDeviceID inDevice,
+        UInt32 inChannel,
+        Boolean isInput,
+        AudioDevicePropertyID inPropertyID,
+        UInt32 inPropertyDataSize,
+        const void *inPropertyData,
+        void *outPropertyData );
 
 /*
  * Sets the sample rate the HAL device.
@@ -183,12 +234,12 @@ PaError setBestSampleRateForDevice( const AudioDeviceID device,
    is available, it uses the smallest available size.
    actualFramesPerBuffer will be set to the actual value on successful return.
    OK to pass NULL to actualFramesPerBuffer.
-   The logic is very simmilar too setBestSampleRate only failure here is
+   The logic is very similar too setBestSampleRate only failure here is
    not usually catastrophic.
 */
 PaError setBestFramesPerBuffer( const AudioDeviceID device,
                                 const bool isOutput,
-                                UInt32 requestedFramesPerBuffer, 
+                                UInt32 requestedFramesPerBuffer,
                                 UInt32 *actualFramesPerBuffer );
 
 
@@ -199,16 +250,15 @@ PaError setBestFramesPerBuffer( const AudioDeviceID device,
  *********************/
 
 OSStatus xrunCallback(
-    AudioDeviceID inDevice, 
-    UInt32 inChannel, 
-    Boolean isInput, 
-    AudioDevicePropertyID inPropertyID, 
-    void* inClientData ) ;
+        AudioObjectID inObjectID,
+        UInt32 inNumberAddresses,
+        const AudioObjectPropertyAddress* inAddresses,
+        void * inClientData );
 
 /** returns zero on success or a unix style error code. */
-int initializeXRunListenerList();
+int initializeXRunListenerList( void );
 /** returns zero on success or a unix style error code. */
-int destroyXRunListenerList();
+int destroyXRunListenerList( void );
 
 /**Returns the list, so that it can be passed to CorAudio.*/
 void *addToXRunListenerList( void *stream );

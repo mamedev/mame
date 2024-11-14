@@ -43,7 +43,7 @@ public:
 	// construction/destruction
 	c1571_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_WRITE_LINE_MEMBER( via0_irq_w );
+	void via0_irq_w(int state);
 	uint8_t via0_pa_r();
 	void via0_pa_w(uint8_t data);
 	uint8_t via0_pb_r();
@@ -51,35 +51,35 @@ public:
 
 	uint8_t via1_r(offs_t offset);
 	void via1_w(offs_t offset, uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER( via1_irq_w );
+	void via1_irq_w(int state);
 	uint8_t via1_pb_r();
 	void via1_pb_w(uint8_t data);
 
-	DECLARE_WRITE_LINE_MEMBER( cia_irq_w );
-	DECLARE_WRITE_LINE_MEMBER( cia_pc_w );
-	DECLARE_WRITE_LINE_MEMBER( cia_cnt_w );
-	DECLARE_WRITE_LINE_MEMBER( cia_sp_w );
+	void cia_irq_w(int state);
+	void cia_pc_w(int state);
+	void cia_cnt_w(int state);
+	void cia_sp_w(int state);
 	uint8_t cia_pb_r();
 	void cia_pb_w(uint8_t data);
 
-	DECLARE_WRITE_LINE_MEMBER( byte_w );
+	void byte_w(int state);
 
 	static void floppy_formats(format_registration &fr);
 
 	void wpt_callback(floppy_image_device *floppy, int state);
 
-	void c1571_mem(address_map &map);
+	void c1571_mem(address_map &map) ATTR_COLD;
 protected:
 	c1571_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// optional information overrides
-	virtual const tiny_rom_entry *device_rom_region() const override;
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual ioport_constructor device_input_ports() const override;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 
 	// device_cbm_iec_interface overrides
 	virtual void cbm_iec_srq(int state) override;
@@ -138,8 +138,8 @@ public:
 
 protected:
 	// optional information overrides
-	virtual const tiny_rom_entry *device_rom_region() const override;
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 };
 
 
@@ -153,8 +153,8 @@ public:
 
 protected:
 	// optional information overrides
-	virtual const tiny_rom_entry *device_rom_region() const override;
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 private:
 	void via0_pa_w(uint8_t data);
@@ -172,15 +172,15 @@ public:
 
 protected:
 	// optional information overrides
-	virtual const tiny_rom_entry *device_rom_region() const override;
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 private:
 	uint8_t cia_pa_r();
 	void cia_pa_w(uint8_t data);
 	void cia_pb_w(uint8_t data);
 
-	void mini_chief_mem(address_map &map);
+	void mini_chief_mem(address_map &map) ATTR_COLD;
 };
 
 

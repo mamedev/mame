@@ -32,11 +32,11 @@ public:
 	virtual void iorq_w(offs_t offset, uint8_t data) override;
 
 protected:
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual void device_start() override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual void device_start() override ATTR_COLD;
 
 private:
-	DECLARE_WRITE_LINE_MEMBER( busy_w );
+	void busy_w(int state);
 
 	required_device<centronics_device> m_centronics;
 	required_device<output_latch_device> m_cent_data_out;

@@ -30,15 +30,21 @@
 ****************************************************************************/
 
 #include "emu.h"
+
 #include "cpu/z80/z80.h"
 #include "machine/nvram.h"
 #include "machine/rp5c15.h"
 #include "sound/spkrdev.h"
 #include "video/hd44780.h"
+
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
+#include "utf8.h"
+
+
+namespace {
 
 class lcmate2_state : public driver_device
 {
@@ -55,7 +61,7 @@ public:
 	void lcmate2(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -68,8 +74,8 @@ private:
 	void speaker_w(u8 data);
 	void bankswitch_w(u8 data);
 	void lcmate2_palette(palette_device &palette) const;
-	void io_map(address_map &map);
-	void mem_map(address_map &map);
+	void io_map(address_map &map) ATTR_COLD;
+	void mem_map(address_map &map) ATTR_COLD;
 };
 
 void lcmate2_state::speaker_w(u8 data)
@@ -249,7 +255,7 @@ void lcmate2_state::lcmate2(machine_config &config)
 	PALETTE(config, "palette", FUNC(lcmate2_state::lcmate2_palette), 2);
 	GFXDECODE(config, "gfxdecode", "palette", gfx_lcmate2);
 
-	HD44780(config, m_lcdc, 0);
+	HD44780(config, m_lcdc, 270'000); // TODO: clock not measured, datasheet typical clock used
 	m_lcdc->set_lcd_size(2, 20);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
@@ -268,6 +274,9 @@ ROM_START( lcmate2 )
 	ROM_LOAD( "u2.bin",  0x00000, 0x08000, CRC(521931b9) SHA1(743a6e2928c4365fbf5ed9a173e2c1bfe695850f) )
 	ROM_LOAD( "u3.bin",  0x20000, 0x20000, CRC(84fe767a) SHA1(8dd306f203e1220f0eab1a284be3095e2642c5b6) ) // spell library
 ROM_END
+
+} // anonymous namespace
+
 
 /* Driver */
 

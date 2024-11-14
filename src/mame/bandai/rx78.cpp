@@ -4,8 +4,6 @@
 
 Gundam RX-78 (c) 1983 Bandai
 
-Driver by Angelo Salese & Robbbert.
-
 TODO:
 - implement printer;
 - Implement 2nd cart slot
@@ -76,6 +74,9 @@ BTANB:
 #include "softlist_dev.h"
 #include "speaker.h"
 
+
+namespace {
+
 class rx78_state : public driver_device
 {
 public:
@@ -110,10 +111,10 @@ private:
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( cart_load );
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	virtual void machine_reset() override;
-	virtual void machine_start() override;
-	void rx78_io(address_map &map);
-	void rx78_mem(address_map &map);
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void machine_start() override ATTR_COLD;
+	void rx78_io(address_map &map) ATTR_COLD;
+	void rx78_mem(address_map &map) ATTR_COLD;
 
 	u8 m_vram_read_bank = 0U;
 	u8 m_vram_write_bank = 0U;
@@ -458,7 +459,7 @@ void rx78_state::machine_start()
 	save_pointer(NAME(m_vram), 0xc000);
 	save_item(NAME(m_vram_read_bank));
 	save_item(NAME(m_vram_write_bank));
-	save_pointer(NAME(m_pal_reg), 7);
+	save_item(NAME(m_pal_reg));
 	save_item(NAME(m_pri_mask));
 	save_item(NAME(m_key_mux));
 	save_item(NAME(m_background));
@@ -488,15 +489,12 @@ DEVICE_IMAGE_LOAD_MEMBER( rx78_state::cart_load )
 	u32 size = m_cart->common_get_size("rom");
 
 	if (size != 0x2000 && size != 0x4000 && size != 0x8000)
-	{
-		image.seterror(image_error::INVALIDIMAGE, "Unsupported cartridge size");
-		return image_init_result::FAIL;
-	}
+		return std::make_pair(image_error::INVALIDLENGTH, "Unsupported cartridge size (must be 8K, 16K or 32K)");
 
 	m_cart->rom_alloc(size, GENERIC_ROM8_WIDTH, ENDIANNESS_LITTLE);
 	m_cart->common_load_rom(m_cart->get_rom_base(), size, "rom");
 
-	return image_init_result::PASS;
+	return std::make_pair(std::error_condition(), std::string());
 }
 
 /* F4 Character Displayer */
@@ -569,6 +567,9 @@ void rx78_state::init_rx78()
 	if (ram_size == 0x4000)
 		prg.unmap_readwrite(0x6000, 0xafff);
 }
+
+} // anonymous namespace
+
 
 /* Driver */
 

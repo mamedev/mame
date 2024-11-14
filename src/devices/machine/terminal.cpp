@@ -1,7 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:Miodrag Milanovic
 #include "emu.h"
-#include "machine/terminal.h"
+#include "terminal.h"
+
 #include "screen.h"
 #include "speaker.h"
 
@@ -347,7 +348,7 @@ void generic_terminal_device::device_start()
 {
 	m_buffer = std::make_unique<uint8_t []>(m_width * m_height);
 	m_bell_timer = timer_alloc(FUNC(generic_terminal_device::bell_off), this);
-	m_keyboard_cb.resolve();
+	m_keyboard_cb.resolve_safe();
 	save_pointer(NAME(m_buffer), m_width * m_height);
 	save_item(NAME(m_x_pos));
 	save_item(NAME(m_framecnt));

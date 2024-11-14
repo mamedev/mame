@@ -40,11 +40,6 @@ void i8271_device::set_select_lines_connected(bool _select)
 
 void i8271_device::device_start()
 {
-	intrq_cb.resolve_safe();
-	drq_cb.resolve_safe();
-	hdl_cb.resolve_safe();
-	opt_cb.resolve_safe();
-
 	for(int i=0; i != 2; i++) {
 		char name[2];
 		flopi[i].tm = timer_alloc(FUNC(i8271_device::floppy_tick), this);

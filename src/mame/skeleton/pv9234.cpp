@@ -26,6 +26,8 @@ be found!
 #include "screen.h"
 
 
+namespace {
+
 class pv9234_state : public driver_device
 {
 public:
@@ -45,10 +47,10 @@ private:
 
 	uint32_t screen_update_pv9234(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void pv9234_map(address_map &map);
+	void pv9234_map(address_map &map) ATTR_COLD;
 
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 	required_shared_ptr<uint32_t> m_p_ram;
 	required_device<cpu_device> m_maincpu;
@@ -175,6 +177,9 @@ ROM_START( pv9234 )
 	ROM_LOAD16_BYTE( "u17.bin", 0x40000, 0x20000, CRC(cac03650) SHA1(edd8aec6fed886d47de39ed4e127de0a93250a45))
 	ROM_LOAD16_BYTE( "u16.bin", 0x40001, 0x20000, CRC(bd07d545) SHA1(90a63af4ee82b0f7d0ed5f0e09569377f22dd98c))
 ROM_END
+
+} // anonymous namespace
+
 
 /* Driver */
 

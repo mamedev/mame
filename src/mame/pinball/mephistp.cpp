@@ -63,18 +63,18 @@ private:
 	u8 ay8910_inputs_r();
 	void sound_rombank_w(u8 data);
 
-	void mephisto_8051_io(address_map &map);
-	void mephisto_8051_map(address_map &map);
-	void mephisto_map(address_map &map);
-	void sport2k_map(address_map &map);
-	void sport2k_8051_io(address_map &map);
+	void mephisto_8051_io(address_map &map) ATTR_COLD;
+	void mephisto_8051_map(address_map &map) ATTR_COLD;
+	void mephisto_map(address_map &map) ATTR_COLD;
+	void sport2k_map(address_map &map) ATTR_COLD;
+	void sport2k_8051_io(address_map &map) ATTR_COLD;
 
 	u8 m_ay8910_data = 0U;
 	bool m_ay8910_bdir = false;
 	bool m_ay8910_bc1 = false;
 	void ay8910_update();
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 	required_device<cpu_device> m_maincpu;
 	required_device<ay8910_device> m_aysnd;
 	required_memory_bank m_soundbank;
@@ -235,7 +235,6 @@ void mephisto_state::mephisto(machine_config &config)
 	soundcpu.port_in_cb<1>().set(FUNC(mephisto_state::ay8910_read));
 	soundcpu.port_out_cb<1>().set(FUNC(mephisto_state::ay8910_write));
 	soundcpu.port_out_cb<3>().set(FUNC(mephisto_state::t0_t1_w));
-	soundcpu.serial_rx_cb().set_constant(0); // from MUART
 
 	/* Sound */
 	genpin_audio(config);

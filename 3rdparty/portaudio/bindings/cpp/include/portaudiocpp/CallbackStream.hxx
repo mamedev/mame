@@ -14,23 +14,23 @@ namespace portaudio
 {
 
 
-	//////
-	/// @brief Base class for all Streams which use a callback-based mechanism.
-	//////
-	class CallbackStream : public Stream
-	{
-	protected:
-		CallbackStream();
-		virtual ~CallbackStream();
+    //////
+    /// @brief Base class for all Streams which use a callback-based mechanism.
+    //////
+    class CallbackStream : public Stream
+    {
+    protected:
+        CallbackStream();
+        virtual ~CallbackStream();
 
-	public:
-		// stream info (time-varying)
-		double cpuLoad() const;
+    public:
+        // stream info (time-varying)
+        double cpuLoad() const;
 
-	private:
-		CallbackStream(const CallbackStream &); // non-copyable
-		CallbackStream &operator=(const CallbackStream &); // non-copyable
-	};
+    private:
+        CallbackStream(const CallbackStream &); // non-copyable
+        CallbackStream &operator=(const CallbackStream &); // non-copyable
+    };
 
 
 } // namespace portaudio

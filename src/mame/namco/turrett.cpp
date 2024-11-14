@@ -11,7 +11,7 @@
 #include "emu.h"
 #include "turrett.h"
 
-#include "bus/ata/idehd.h"
+#include "bus/ata/hdd.h"
 
 
 /*************************************
@@ -120,24 +120,24 @@ static INPUT_PORTS_START( turrett )
 	PORT_BIT( 0x3f, 0x00, IPT_AD_STICK_X ) PORT_MINMAX(0x20,0x1f) PORT_SENSITIVITY(60) PORT_KEYDELTA(2)
 
 	PORT_START("PORT.CX")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )    PORT_CHANGED_MEMBER(DEVICE_SELF, turrett_state, ipt_change, 0x00000100)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE1 )   PORT_CHANGED_MEMBER(DEVICE_SELF, turrett_state, ipt_change, 0x00000200)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BILL1 )      PORT_CHANGED_MEMBER(DEVICE_SELF, turrett_state, ipt_change, 0x00000400)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE )    PORT_CHANGED_MEMBER(DEVICE_SELF, turrett_state, ipt_change, 0x00000800)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN1 )      PORT_CHANGED_MEMBER(DEVICE_SELF, turrett_state, ipt_change, 0x00001000)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN2 )      PORT_CHANGED_MEMBER(DEVICE_SELF, turrett_state, ipt_change, 0x00002000)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START1 )     PORT_CHANGED_MEMBER(DEVICE_SELF, turrett_state, ipt_change, 0x00004000)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )    PORT_CHANGED_MEMBER(DEVICE_SELF, turrett_state, ipt_change, 0x00008000)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )    PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(turrett_state::ipt_change), 0x00000100)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE1 )   PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(turrett_state::ipt_change), 0x00000200)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BILL1 )      PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(turrett_state::ipt_change), 0x00000400)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE )    PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(turrett_state::ipt_change), 0x00000800)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN1 )      PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(turrett_state::ipt_change), 0x00001000)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN2 )      PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(turrett_state::ipt_change), 0x00002000)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START1 )     PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(turrett_state::ipt_change), 0x00004000)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )    PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(turrett_state::ipt_change), 0x00008000)
 
 	PORT_START("PORT.DX")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )    PORT_CHANGED_MEMBER(DEVICE_SELF, turrett_state, ipt_change, 0x00010000)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON1 )    PORT_CHANGED_MEMBER(DEVICE_SELF, turrett_state, ipt_change, 0x00020000)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON2 )    PORT_CHANGED_MEMBER(DEVICE_SELF, turrett_state, ipt_change, 0x00040000)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )    PORT_CHANGED_MEMBER(DEVICE_SELF, turrett_state, ipt_change, 0x00080000)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )    PORT_CHANGED_MEMBER(DEVICE_SELF, turrett_state, ipt_change, 0x00100000)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )    PORT_CHANGED_MEMBER(DEVICE_SELF, turrett_state, ipt_change, 0x00200000)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )    PORT_CHANGED_MEMBER(DEVICE_SELF, turrett_state, ipt_change, 0x00400000)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )    PORT_CHANGED_MEMBER(DEVICE_SELF, turrett_state, ipt_change, 0x00800000)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )    PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(turrett_state::ipt_change), 0x00010000)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON1 )    PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(turrett_state::ipt_change), 0x00020000)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON2 )    PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(turrett_state::ipt_change), 0x00040000)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )    PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(turrett_state::ipt_change), 0x00080000)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )    PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(turrett_state::ipt_change), 0x00100000)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )    PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(turrett_state::ipt_change), 0x00200000)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )    PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(turrett_state::ipt_change), 0x00400000)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )    PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(turrett_state::ipt_change), 0x00800000)
 
 	PORT_START("PORT.EX")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("Floor mat")
@@ -157,13 +157,13 @@ INPUT_PORTS_END
  *
  *************************************/
 
-READ_LINE_MEMBER( turrett_state::sbrc2_r )
+int turrett_state::sbrc2_r()
 {
 	return m_screen->vblank();
 }
 
 
-READ_LINE_MEMBER( turrett_state::sbrc3_r )
+int turrett_state::sbrc3_r()
 {
 	return m_dma_idle;
 }
@@ -331,7 +331,7 @@ public:
 		if (m_device_head & IDE_DEVICE_HEAD_L)
 			return (((m_device_head & IDE_DEVICE_HEAD_HS) << 24) | (m_cylinder_high << 16) | (m_cylinder_low << 8) | m_sector_number) - 63;
 
-		return ata_mass_storage_device::lba_address();
+		return ide_hdd_device::lba_address();
 	}
 };
 
@@ -396,7 +396,7 @@ ROM_START( turrett )
 	ROM_LOAD32_BYTE( "turret.u8",  0x000002, 0x080000, CRC(ddff4898) SHA1(a8f859a0dcab8ec83fbfe255d58b3e644933b923) )
 	ROM_LOAD32_BYTE( "turret.u7",  0x000003, 0x080000, CRC(fa8b5a5a) SHA1(658e9eeadc9c70185973470565d562c76f4fcdd7) )
 
-	DISK_REGION( "ata:0:hdd:image" )
+	DISK_REGION( "ata:0:hdd" )
 	/// According to http://personal.inet.fi/cool/lwgt/myoldvdr/V40ProductManual.pdf
 	/// The drive should have CYLS:38869, HEADS:16, SECS:63, Total Units:39,179,952
 	/// We are missing 13482 sectors and we have to adjust the LBA by 63 sectors for

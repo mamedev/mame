@@ -23,6 +23,7 @@
 #include "emu.h"
 #include "konami_helper.h"
 #include "cpu/m68000/m68000.h"
+#include "cpu/m68000/m68020.h"
 #include "machine/k053252.h"
 #include "machine/timer.h"
 #include "k053246_k053247_k055673.h"
@@ -61,7 +62,7 @@ public:
 
 protected:
 	virtual void machine_reset() override { m_irq_mask = 0; };
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -85,14 +86,14 @@ private:
 	uint8_t m_irq_mask = 0;
 
 	uint32_t screen_update_kongambl(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	WRITE_LINE_MEMBER(vblank_irq_ack_w);
-	WRITE_LINE_MEMBER(hblank_irq_ack_w);
+	void vblank_irq_ack_w(int state);
+	void hblank_irq_ack_w(int state);
 	TIMER_DEVICE_CALLBACK_MEMBER(kongambl_vblank);
 	K056832_CB_MEMBER(tile_callback);
 	K053246_CB_MEMBER(sprite_callback);
 
-	void kongamaud_map(address_map &map);
-	void kongambl_map(address_map &map);
+	void kongamaud_map(address_map &map) ATTR_COLD;
+	void kongambl_map(address_map &map) ATTR_COLD;
 };
 
 
@@ -298,7 +299,7 @@ static INPUT_PORTS_START( kongambl )
 	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", FUNC(eeprom_serial_93cxx_device::do_read))
 	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
@@ -587,9 +588,9 @@ static INPUT_PORTS_START( kongambl )
 	PORT_DIPSETTING(    0x80000000, DEF_STR( On ) )
 
 	PORT_START( "EEPROMOUT" )
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, di_write)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, clk_write)
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, cs_write)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", FUNC(eeprom_serial_93cxx_device::di_write))
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", FUNC(eeprom_serial_93cxx_device::clk_write))
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", FUNC(eeprom_serial_93cxx_device::cs_write))
 INPUT_PORTS_END
 
 
@@ -619,12 +620,12 @@ static GFXDECODE_START( gfx_tasman )
 GFXDECODE_END
 
 
-WRITE_LINE_MEMBER(kongambl_state::vblank_irq_ack_w)
+void kongambl_state::vblank_irq_ack_w(int state)
 {
 	m_maincpu->set_input_line(1, CLEAR_LINE);
 }
 
-WRITE_LINE_MEMBER(kongambl_state::hblank_irq_ack_w)
+void kongambl_state::hblank_irq_ack_w(int state)
 {
 	m_maincpu->set_input_line(2, CLEAR_LINE);
 }

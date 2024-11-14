@@ -1,7 +1,7 @@
 // Windows/Control/Trackbar.h
 
-#ifndef __WINDOWS_CONTROL_TRACKBAR_H
-#define __WINDOWS_CONTROL_TRACKBAR_H
+#ifndef ZIP7_INC_WINDOWS_CONTROL_TRACKBAR_H
+#define ZIP7_INC_WINDOWS_CONTROL_TRACKBAR_H
 
 #include "../Window.h"
 

@@ -28,7 +28,7 @@ public:
 	virtual ~beckerport_device();
 
 	// optional information overrides
-	virtual ioport_constructor device_input_ports() const override;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 
 	virtual void device_start(void) override;
 	virtual void device_stop(void) override;

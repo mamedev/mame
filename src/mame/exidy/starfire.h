@@ -5,8 +5,8 @@
     Star Fire/Fire One system
 
 ***************************************************************************/
-#ifndef MAME_INCLUDES_STARFIRE_H
-#define MAME_INCLUDES_STARFIRE_H
+#ifndef MAME_EXIDY_STARFIRE_H
+#define MAME_EXIDY_STARFIRE_H
 
 #pragma once
 
@@ -45,10 +45,10 @@ public:
 	{ }
 
 protected:
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 
 	void base_config(machine_config &config);
-	void main_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<screen_device> m_screen;
@@ -57,10 +57,10 @@ protected:
 	required_ioport m_dsw;
 	required_ioport m_system;
 
-	uint8_t m_vidctrl;
-	uint8_t m_vidctrl1;
-	uint8_t m_color;
-	uint16_t m_colors[STARFIRE_NUM_PENS];
+	uint8_t m_vidctrl = 0;
+	uint8_t m_vidctrl1 = 0;
+	uint8_t m_color = 0;
+	uint16_t m_colors[STARFIRE_NUM_PENS] = { };
 
 	emu_timer* m_scanline_timer;
 	bitmap_rgb32 m_screen_bitmap;
@@ -103,8 +103,8 @@ public:
 	void starfire(machine_config &config);
 
 private:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	required_device<dac_word_interface> m_dac;
 
@@ -122,8 +122,8 @@ private:
 	NETDEV_ANALOG_CALLBACK_MEMBER(laseron1_cb);
 	NETDEV_ANALOG_CALLBACK_MEMBER(sound_out_cb);
 
-	uint8_t m_sound_tie_on;
-	uint8_t m_sound_laser_on;
+	uint8_t m_sound_tie_on = 0;
+	uint8_t m_sound_laser_on = 0;
 
 	required_device<netlist_mame_logic_input_device> m_sound_size;
 	required_device<netlist_mame_logic_input_device> m_sound_explosion;
@@ -163,15 +163,15 @@ public:
 	void fireone(machine_config &config);
 
 private:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	required_device<pit8253_device> m_pit;
 	required_ioport_array<2> m_controls;
 
-	DECLARE_WRITE_LINE_MEMBER(music_a_out_cb);
-	DECLARE_WRITE_LINE_MEMBER(music_b_out_cb);
-	DECLARE_WRITE_LINE_MEMBER(music_c_out_cb);
+	void music_a_out_cb(int state);
+	void music_b_out_cb(int state);
+	void music_c_out_cb(int state);
 
 	virtual uint8_t input_r(offs_t offset) override;
 	virtual void sound_w(offs_t offset, uint8_t data) override;
@@ -199,4 +199,4 @@ private:
 	required_device<netlist_mame_logic_input_device> m_music_c;
 };
 
-#endif // MAME_INCLUDES_STARFIRE_H
+#endif // MAME_EXIDY_STARFIRE_H

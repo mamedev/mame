@@ -668,6 +668,7 @@ public:
 		, m_output(*this, "output")
 		, m_io_in0(*this, "IN0")
 		, m_io_in1(*this, "IN1")
+		, m_dsw(*this, "DSW%c", 'A')
 		, m_cps2_dial_type(0)
 		, m_ecofghtr_dial_direction0(0)
 		, m_ecofghtr_dial_direction1(0)
@@ -695,7 +696,6 @@ private:
 	void gigaman2_gfx_reorder();
 	void cps2_eeprom_port_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	uint16_t cps2_qsound_volume_r();
-	uint16_t kludge_r();
 	uint16_t joy_or_paddle_r();
 	uint16_t joy_or_paddle_ecofghtr_r();
 	TIMER_DEVICE_CALLBACK_MEMBER(cps2_interrupt);
@@ -718,13 +718,13 @@ private:
 	uint32_t screen_update_cps2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	DECLARE_MACHINE_START(cps2);
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 
-	void cps2_map(address_map &map);
-	void cps2_comm_map(address_map &map);
-	void dead_cps2_map(address_map &map);
-	void dead_cps2_comm_map(address_map &map);
-	void decrypted_opcodes_map(address_map &map);
+	void cps2_map(address_map &map) ATTR_COLD;
+	void cps2_comm_map(address_map &map) ATTR_COLD;
+	void dead_cps2_map(address_map &map) ATTR_COLD;
+	void dead_cps2_comm_map(address_map &map) ATTR_COLD;
+	void decrypted_opcodes_map(address_map &map) ATTR_COLD;
 
 	void init_cps2_video();
 	void init_cps2crypt();
@@ -741,6 +741,7 @@ private:
 
 	optional_ioport m_io_in0;
 	optional_ioport m_io_in1;
+	optional_ioport_array<3> m_dsw;
 
 	std::unique_ptr<uint16_t[]> m_cps2_buffered_obj;
 	std::unique_ptr<uint16_t[]> m_gigaman2_dummyqsound_ram;
@@ -1314,11 +1315,6 @@ uint16_t cps2_state::cps2_qsound_volume_r()
  *
  *************************************/
 
-uint16_t cps2_state::kludge_r()
-{
-	return 0xffff;
-}
-
 uint16_t cps2_state::joy_or_paddle_r()
 {
 	if (m_readpaddle != 0)
@@ -1417,7 +1413,7 @@ void cps2_state::cps2_map(address_map &map)
 	map(0x804030, 0x804031).r(FUNC(cps2_state::cps2_qsound_volume_r));                                                                // Master volume. Also when bit 14=0 addon memory is present, when bit 15=0 network adapter present.
 	map(0x804040, 0x804041).w(FUNC(cps2_state::cps2_eeprom_port_w));                                                                  // EEPROM
 	map(0x8040a0, 0x8040a1).nopw();                                                                                                   // Unknown (reset once on startup)
-	map(0x8040b0, 0x8040b3).r(FUNC(cps2_state::kludge_r));                                                                            // Unknown (xmcotaj hangs if this is 0)
+	map(0x8040b0, 0x8040b2).lr8(NAME([this](offs_t offset) { return m_dsw[offset]->read(); }));                                       // DIP switches (only present on development hardware)
 	map(0x8040e0, 0x8040e1).w(FUNC(cps2_state::cps2_objram_bank_w));                                                                  // bit 0 = Object ram bank swap
 	map(0x804100, 0x80413f).w(FUNC(cps2_state::cps1_cps_a_w)).share("cps_a_regs");                                                    // CPS-A custom
 	map(0x804140, 0x80417f).rw(FUNC(cps2_state::cps1_cps_b_r), FUNC(cps2_state::cps1_cps_b_w));                                       // CPS-B custom
@@ -1456,7 +1452,7 @@ void cps2_state::dead_cps2_map(address_map &map)
 	map(0x804030, 0x804031).r(FUNC(cps2_state::cps2_qsound_volume_r));                                                                // Master volume. Also when bit 14=0 addon memory is present, when bit 15=0 network adapter present.
 	map(0x804040, 0x804041).w(FUNC(cps2_state::cps2_eeprom_port_w));                                                                  // EEPROM
 	map(0x8040a0, 0x8040a1).nopw();                                                                                                   // Unknown (reset once on startup)
-	map(0x8040b0, 0x8040b3).r(FUNC(cps2_state::kludge_r));                                                                            // Unknown (xmcotaj hangs if this is 0)
+	map(0x8040b0, 0x8040b2).lr8(NAME([this](offs_t offset) { return m_dsw[offset]->read(); }));                                       // DIP switches (only present on development hardware)
 	map(0x8040e0, 0x8040e1).w(FUNC(cps2_state::cps2_objram_bank_w));                                                                  // bit 0 = Object ram bank swap
 	map(0x804100, 0x80413f).w(FUNC(cps2_state::cps1_cps_a_w)).share("cps_a_regs");                                                    // CPS-A custom
 	map(0x804140, 0x80417f).rw(FUNC(cps2_state::cps1_cps_b_r), FUNC(cps2_state::cps1_cps_b_w));                                       // CPS-B custom
@@ -1521,7 +1517,7 @@ static INPUT_PORTS_START( cps2_4p4b )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(4)
 
 	PORT_START("IN2")      // (0x20)
-	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
+	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", FUNC(eeprom_serial_93cxx_device::do_read))
 	PORT_SERVICE_NO_TOGGLE( 0x0002, IP_ACTIVE_LOW )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x00f8, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -1535,14 +1531,101 @@ static INPUT_PORTS_START( cps2_4p4b )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_COIN4 )
 
 	PORT_START( "EEPROMOUT" )
-	PORT_BIT( 0x1000, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, di_write)
-	PORT_BIT( 0x2000, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, clk_write)
-	PORT_BIT( 0x4000, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, cs_write)
+	PORT_BIT( 0x1000, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", FUNC(eeprom_serial_93cxx_device::di_write))
+	PORT_BIT( 0x2000, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", FUNC(eeprom_serial_93cxx_device::clk_write))
+	PORT_BIT( 0x4000, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", FUNC(eeprom_serial_93cxx_device::cs_write))
 
 	// Fake inputs for digital volume buttons
 	PORT_START( "DIGITALVOL" )
 	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_VOLUME_DOWN )
 	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_VOLUME_UP )
+
+	// Machine configuration for dev hardware with DIPs
+	PORT_START( "HW_TYPE" )
+	PORT_CONFNAME( 0x01, 0x00, "Hardware" )
+	PORT_CONFSETTING(    0x00, "Production" )
+	PORT_CONFSETTING(    0x01, "Development (Enable Debug DIPs)" )
+
+	PORT_START("DSWA")
+	PORT_DIPNAME( 0x01, 0x01, "1-1" ) PORT_DIPLOCATION("SW1:1") PORT_CONDITION("HW_TYPE", 0x01, EQUALS, 0x01)
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, "1-2" ) PORT_DIPLOCATION("SW1:2") PORT_CONDITION("HW_TYPE", 0x01, EQUALS, 0x01)
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, "1-3" ) PORT_DIPLOCATION("SW1:3") PORT_CONDITION("HW_TYPE", 0x01, EQUALS, 0x01)
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, "1-4" ) PORT_DIPLOCATION("SW1:4") PORT_CONDITION("HW_TYPE", 0x01, EQUALS, 0x01)
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, "1-5" ) PORT_DIPLOCATION("SW1:5") PORT_CONDITION("HW_TYPE", 0x01, EQUALS, 0x01)
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, "1-6" ) PORT_DIPLOCATION("SW1:6") PORT_CONDITION("HW_TYPE", 0x01, EQUALS, 0x01)
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, "1-7" ) PORT_DIPLOCATION("SW1:7") PORT_CONDITION("HW_TYPE", 0x01, EQUALS, 0x01)
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, "1-8" ) PORT_DIPLOCATION("SW1:8") PORT_CONDITION("HW_TYPE", 0x01, EQUALS, 0x01)
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_CONDITION("HW_TYPE", 0x01, EQUALS, 0x00)
+
+	PORT_START("DSWB")
+	PORT_DIPNAME( 0x01, 0x01, "2-1" ) PORT_DIPLOCATION("SW2:1") PORT_CONDITION("HW_TYPE", 0x01, EQUALS, 0x01)
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, "2-2" ) PORT_DIPLOCATION("SW2:2") PORT_CONDITION("HW_TYPE", 0x01, EQUALS, 0x01)
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, "2-3" ) PORT_DIPLOCATION("SW2:3") PORT_CONDITION("HW_TYPE", 0x01, EQUALS, 0x01)
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, "2-4" ) PORT_DIPLOCATION("SW2:4") PORT_CONDITION("HW_TYPE", 0x01, EQUALS, 0x01)
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, "2-5" ) PORT_DIPLOCATION("SW2:5") PORT_CONDITION("HW_TYPE", 0x01, EQUALS, 0x01)
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, "2-6" ) PORT_DIPLOCATION("SW2:6") PORT_CONDITION("HW_TYPE", 0x01, EQUALS, 0x01)
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, "2-7" ) PORT_DIPLOCATION("SW2:7") PORT_CONDITION("HW_TYPE", 0x01, EQUALS, 0x01)
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, "2-8" ) PORT_DIPLOCATION("SW2:8") PORT_CONDITION("HW_TYPE", 0x01, EQUALS, 0x01)
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_CONDITION("HW_TYPE", 0x01, EQUALS, 0x00)
+
+	PORT_START("DSWC")
+	PORT_DIPNAME( 0x01, 0x01, "3-1" ) PORT_DIPLOCATION("SW3:1") PORT_CONDITION("HW_TYPE", 0x01, EQUALS, 0x01)
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, "3-2" ) PORT_DIPLOCATION("SW3:2") PORT_CONDITION("HW_TYPE", 0x01, EQUALS, 0x01)
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, "3-3" ) PORT_DIPLOCATION("SW3:3") PORT_CONDITION("HW_TYPE", 0x01, EQUALS, 0x01)
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, "3-4" ) PORT_DIPLOCATION("SW3:4") PORT_CONDITION("HW_TYPE", 0x01, EQUALS, 0x01)
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, "3-5" ) PORT_DIPLOCATION("SW3:5") PORT_CONDITION("HW_TYPE", 0x01, EQUALS, 0x01)
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, "3-6" ) PORT_DIPLOCATION("SW3:6") PORT_CONDITION("HW_TYPE", 0x01, EQUALS, 0x01)
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, "3-7" ) PORT_DIPLOCATION("SW3:7") PORT_CONDITION("HW_TYPE", 0x01, EQUALS, 0x01)
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, "3-8" ) PORT_DIPLOCATION("SW3:8") PORT_CONDITION("HW_TYPE", 0x01, EQUALS, 0x01)
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_CONDITION("HW_TYPE", 0x01, EQUALS, 0x00)
 INPUT_PORTS_END
 
 // 4 players and 3 buttons
@@ -1796,7 +1879,7 @@ void cps2_state::cps2(machine_config &config)
 	M68000(config, m_maincpu, XTAL(16'000'000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &cps2_state::cps2_map);
 	m_maincpu->set_addrmap(AS_OPCODES, &cps2_state::decrypted_opcodes_map);
-	m_maincpu->disable_interrupt_mixer();
+	m_maincpu->set_interrupt_mixer(false);
 
 	TIMER(config, "scantimer").configure_scanline(FUNC(cps2_state::cps2_interrupt), "screen", 0, 1);
 
@@ -4645,6 +4728,35 @@ ROM_START( hsf2j )
 ROM_END
 
 ROM_START( hsf2j1 )
+	ROM_REGION( CODE_SIZE, "maincpu", 0 ) // 68000 code
+	ROM_LOAD16_WORD_SWAP( "hs2j.03a", 0x000000, 0x80000, CRC(76c7d980) SHA1(792e798833eac653e8e464122c76fd53aace3cea) )
+	ROM_LOAD16_WORD_SWAP( "hs2j.04a", 0x080000, 0x80000, CRC(3d1f5d9b) SHA1(2a9703ac4e5f7e1b3486d453d3a75aae106a7443) )
+	ROM_LOAD16_WORD_SWAP( "hs2.05",   0x100000, 0x80000, CRC(dde34a35) SHA1(f5be2d2916db6e86e0886d61d55bddf138273ebc) )
+	ROM_LOAD16_WORD_SWAP( "hs2.06",   0x180000, 0x80000, CRC(f4e56dda) SHA1(c6490707c2a416ab88612c2d73abbe5853d8cb92) )
+	ROM_LOAD16_WORD_SWAP( "hs2.07",   0x200000, 0x80000, CRC(ee4420fc) SHA1(06cf76660b0c794d2460c52d9fe8334fff51e9de) )
+	ROM_LOAD16_WORD_SWAP( "hs2.08",   0x280000, 0x80000, CRC(c9441533) SHA1(bf178fac1f060fcce3ff9118333c8517dadc9429) )
+	ROM_LOAD16_WORD_SWAP( "hs2.09",   0x300000, 0x80000, CRC(3fc638a8) SHA1(2a42877b26c8abc437da46225701f0bba6e40058) )
+	ROM_LOAD16_WORD_SWAP( "hs2.10",   0x380000, 0x80000, CRC(20d0f9e4) SHA1(80a5eeef9472e327b0d4ee26434bad109a9434ea) )
+
+	ROM_REGION( 0x2000000, "gfx", 0 )
+	ROM_LOAD64_WORD( "hs2.13m",   0x0000000, 0x800000, CRC(a6ecab17) SHA1(6749a4c8dc81f4b10f910c31c82cf6674e2a44eb) )
+	ROM_LOAD64_WORD( "hs2.15m",   0x0000002, 0x800000, CRC(10a0ae4d) SHA1(701b4900fbc8bef20efa1a706891c8df4bf14641) )
+	ROM_LOAD64_WORD( "hs2.17m",   0x0000004, 0x800000, CRC(adfa7726) SHA1(8d36ec125a8c91abfe5213893d794f8bc11c8acd) )
+	ROM_LOAD64_WORD( "hs2.19m",   0x0000006, 0x800000, CRC(bb3ae322) SHA1(ecd289d7a0fe365fdd7c5527cb17796002beb553) )
+
+	ROM_REGION( QSOUND_SIZE, "audiocpu", 0 ) // 64k for the audio CPU (+banks)
+	ROM_LOAD( "hs2.01",   0x00000, 0x08000, CRC(c1a13786) SHA1(c7392c7efb15ea4042e75bd9007e974293d8935d) )
+	ROM_CONTINUE(         0x10000, 0x18000 )
+	ROM_LOAD( "hs2.02",   0x28000, 0x20000, CRC(2d8794aa) SHA1(c634affdc2568020cce6af97b4fa79925d9943f3) )
+
+	ROM_REGION( 0x800000, "qsound", 0 ) // QSound samples
+	ROM_LOAD16_WORD_SWAP( "hs2.11m",   0x000000, 0x800000, CRC(0e15c359) SHA1(176108b0d76d821a849324680aba0cd04b5016c1) )
+
+	ROM_REGION( 0x20, "key", 0 )
+	ROM_LOAD( "hsf2j.key",    0x000000, 0x000014, CRC(19455a93) SHA1(925cee29b37cb7a4048383ac715ad96f83280d37) )
+ROM_END
+
+ROM_START( hsf2j2 )
 	ROM_REGION( CODE_SIZE, "maincpu", 0 ) // 68000 code
 	ROM_LOAD16_WORD_SWAP( "hs2j.03",  0x000000, 0x80000, CRC(00738f73) SHA1(99947a621f21a88dc4c425d9bfbc30b3c5f76ecd) )
 	ROM_LOAD16_WORD_SWAP( "hs2j.04",  0x080000, 0x80000, CRC(40072c4a) SHA1(85b95bd3c907b4276a31777e092b8c40d3763257) )
@@ -10412,6 +10524,39 @@ ROM_END
 
 ROM_START( xmvsfj )
 	ROM_REGION( CODE_SIZE, "maincpu", 0 ) // 68000 code
+	ROM_LOAD16_WORD_SWAP( "xvsj.03m", 0x000000, 0x80000, CRC(e2944372) SHA1(5ad99eb3f1fa1266a7310e8a39f4cb86105e8d5e) )
+	ROM_LOAD16_WORD_SWAP( "xvsj.04m", 0x080000, 0x80000, CRC(c20B8524) SHA1(1297332c94f4cad725c83a453baa63c1fa25d854) )
+	ROM_LOAD16_WORD_SWAP( "xvs.05a",  0x100000, 0x80000, CRC(7db6025d) SHA1(2d74f48f83f45359bfaca28ab686625766af12ee) )
+	ROM_LOAD16_WORD_SWAP( "xvs.06a",  0x180000, 0x80000, CRC(e8e2c75c) SHA1(929408cb5d98e95cec75ea58e4701b0cbdbcd016) )
+	ROM_LOAD16_WORD_SWAP( "xvs.07",   0x200000, 0x80000, CRC(08f0abed) SHA1(ef16c376232dba63b0b9bc3aa0640f9001ccb68a) )
+	ROM_LOAD16_WORD_SWAP( "xvs.08",   0x280000, 0x80000, CRC(81929675) SHA1(19cf7afbc1daaefec40195e40ba74970f3906a1c) )
+	ROM_LOAD16_WORD_SWAP( "xvs.09",   0x300000, 0x80000, CRC(9641f36b) SHA1(dcba3482d1ba37ccfb30d402793ee063c6621aed) )
+
+	ROM_REGION( 0x2000000, "gfx", 0 )
+	ROM_LOAD64_WORD( "xvs.13m",   0x0000000, 0x400000, CRC(f6684efd) SHA1(c0a2f3a9e82ab8b084a500aec71ac633e947328c) )
+	ROM_LOAD64_WORD( "xvs.15m",   0x0000002, 0x400000, CRC(29109221) SHA1(898b8f678fd03c462ce0d8eb7fb3441ef601085b) )
+	ROM_LOAD64_WORD( "xvs.17m",   0x0000004, 0x400000, CRC(92db3474) SHA1(7b6f4c8ebfdac167b25f35029068b6253c141fe6) )
+	ROM_LOAD64_WORD( "xvs.19m",   0x0000006, 0x400000, CRC(3733473c) SHA1(6579da7145c95b3ad00844a5fc8c2e22c23365e2) )
+	ROM_LOAD64_WORD( "xvs.14m",   0x1000000, 0x400000, CRC(bcac2e41) SHA1(838ff24f7e8543a787a55a5d592c9517ce3b8b93) )
+	ROM_LOAD64_WORD( "xvs.16m",   0x1000002, 0x400000, CRC(ea04a272) SHA1(cd7c79037b5b4a39bef5156433e984dc4dc2c081) )
+	ROM_LOAD64_WORD( "xvs.18m",   0x1000004, 0x400000, CRC(b0def86a) SHA1(da3a6705ea7050fc5c2c10d33400ed67be9f455d) )
+	ROM_LOAD64_WORD( "xvs.20m",   0x1000006, 0x400000, CRC(4b40ff9f) SHA1(9a981d442132efff09a27408d74646ba357c7357) )
+
+	ROM_REGION( QSOUND_SIZE, "audiocpu", 0 ) // 64k for the audio CPU (+banks)
+	ROM_LOAD( "xvs.01",   0x00000, 0x08000, CRC(3999e93a) SHA1(fefcff8a9a5c83df7655a16187cf9ba3e7efbb25) )
+	ROM_CONTINUE(         0x10000, 0x18000 )
+	ROM_LOAD( "xvs.02",   0x28000, 0x20000, CRC(101bdee9) SHA1(75920e88bf46fcd33a7957777a1d799818ffb0d6) )
+
+	ROM_REGION( 0x400000, "qsound", 0 ) // QSound samples
+	ROM_LOAD16_WORD_SWAP( "xvs.11m",   0x000000, 0x200000, CRC(9cadcdbc) SHA1(64d3bd53b04daec84c9af4aa3ff010867b3d306d) )
+	ROM_LOAD16_WORD_SWAP( "xvs.12m",   0x200000, 0x200000, CRC(7b11e460) SHA1(a581c84acaaf0ce056841c15a6f36889e88be68d) )
+
+	ROM_REGION( 0x20, "key", 0 )
+	ROM_LOAD( "xmvsfj.key",   0x000000, 0x000014, CRC(87576cda) SHA1(65905400f4462c175baa93b43e015e8596def31b) )
+ROM_END
+
+ROM_START( xmvsfjr1 )
+	ROM_REGION( CODE_SIZE, "maincpu", 0 ) // 68000 code
 	ROM_LOAD16_WORD_SWAP( "xvsj.03k", 0x000000, 0x80000, CRC(2a167526) SHA1(779d1be2149b1feb2c5f710ed70b162e11bd0de4) )
 	ROM_LOAD16_WORD_SWAP( "xvsj.04k", 0x080000, 0x80000, CRC(d993436b) SHA1(b3279f4fe3728700adf086bf27133c5a74c6302c) )
 	ROM_LOAD16_WORD_SWAP( "xvs.05a",  0x100000, 0x80000, CRC(7db6025d) SHA1(2d74f48f83f45359bfaca28ab686625766af12ee) )
@@ -10443,7 +10588,7 @@ ROM_START( xmvsfj )
 	ROM_LOAD( "xmvsfj.key",   0x000000, 0x000014, CRC(87576cda) SHA1(65905400f4462c175baa93b43e015e8596def31b) )
 ROM_END
 
-ROM_START( xmvsfjr1 )
+ROM_START( xmvsfjr2 )
 	ROM_REGION( CODE_SIZE, "maincpu", 0 ) // 68000 code
 	ROM_LOAD16_WORD_SWAP( "xvsj.03i", 0x000000, 0x80000, CRC(ef24da96) SHA1(8f4a2a626a059bcf36048770153a9ffc85bba304) )
 	ROM_LOAD16_WORD_SWAP( "xvsj.04i", 0x080000, 0x80000, CRC(70a59b35) SHA1(786d9b243373024735848f785503c6aa883b1c2f) )
@@ -10476,7 +10621,7 @@ ROM_START( xmvsfjr1 )
 	ROM_LOAD( "xmvsfj.key",   0x000000, 0x000014, CRC(87576cda) SHA1(65905400f4462c175baa93b43e015e8596def31b) )
 ROM_END
 
-ROM_START( xmvsfjr2 )
+ROM_START( xmvsfjr3 )
 	ROM_REGION( CODE_SIZE, "maincpu", 0 ) // 68000 code
 	ROM_LOAD16_WORD_SWAP( "xvsj.03d", 0x000000, 0x80000, CRC(beb81de9) SHA1(fce0d43b193a521d026be6508a91be6e2d03f480) )
 	ROM_LOAD16_WORD_SWAP( "xvsj.04d", 0x080000, 0x80000, CRC(23d11271) SHA1(45e4ac52001f0c2b6cd6e07413b5e503c2b90329) )
@@ -10509,7 +10654,7 @@ ROM_START( xmvsfjr2 )
 	ROM_LOAD( "xmvsfj.key",   0x000000, 0x000014, CRC(87576cda) SHA1(65905400f4462c175baa93b43e015e8596def31b) )
 ROM_END
 
-ROM_START( xmvsfjr3 )
+ROM_START( xmvsfjr4 )
 	ROM_REGION( CODE_SIZE, "maincpu", 0 ) // 68000 code
 	ROM_LOAD16_WORD_SWAP( "xvsj.03c", 0x000000, 0x80000, CRC(180656a1) SHA1(aec2dfcfe8bcab03a48f749977e6f08fc21558bc) )
 	ROM_LOAD16_WORD_SWAP( "xvsj.04c", 0x080000, 0x80000, CRC(5832811c) SHA1(e900b343241310d4dd1b45f42573e1e90f2dcbda) )
@@ -12456,8 +12601,8 @@ GAME( 1993, ecofghtru1, ecofghtr, cps2,     ecofghtr,  cps2_state, init_ecofghtr
 GAME( 1993, uecology,   ecofghtr, cps2,     ecofghtr,  cps2_state, init_ecofghtr, ROT0,   "Capcom", "Ultimate Ecology (Japan 931203)",                                               MACHINE_SUPPORTS_SAVE )
 GAME( 1993, ecofghtra,  ecofghtr, cps2,     ecofghtr,  cps2_state, init_ecofghtr, ROT0,   "Capcom", "Eco Fighters (Asia 931203)",                                                    MACHINE_SUPPORTS_SAVE )
 GAME( 1993, ecofghtrh,  ecofghtr, cps2,     ecofghtr,  cps2_state, init_ecofghtr, ROT0,   "Capcom", "Eco Fighters (Hispanic 931203)",                                                MACHINE_SUPPORTS_SAVE )
-GAME( 1993, ddtod,      0,        cps2,     cps2_4p4b, cps2_state, init_cps2,     ROT0,   "Capcom", "Dungeons & Dragons: Tower of Doom (Euro 940412)",                               MACHINE_SUPPORTS_SAVE )
-GAME( 1993, ddtodr1,    ddtod,    cps2,     cps2_4p4b, cps2_state, init_cps2,     ROT0,   "Capcom", "Dungeons & Dragons: Tower of Doom (Euro 940113)",                               MACHINE_SUPPORTS_SAVE )
+GAME( 1993, ddtod,      0,        cps2,     cps2_4p4b, cps2_state, init_cps2,     ROT0,   "Capcom", "Dungeons & Dragons: Tower of Doom (Europe 940412)",                             MACHINE_SUPPORTS_SAVE )
+GAME( 1993, ddtodr1,    ddtod,    cps2,     cps2_4p4b, cps2_state, init_cps2,     ROT0,   "Capcom", "Dungeons & Dragons: Tower of Doom (Europe 940113)",                             MACHINE_SUPPORTS_SAVE )
 GAME( 1993, ddtodu,     ddtod,    cps2,     cps2_4p4b, cps2_state, init_cps2,     ROT0,   "Capcom", "Dungeons & Dragons: Tower of Doom (USA 940125)",                                MACHINE_SUPPORTS_SAVE )
 GAME( 1993, ddtodur1,   ddtod,    cps2,     cps2_4p4b, cps2_state, init_cps2,     ROT0,   "Capcom", "Dungeons & Dragons: Tower of Doom (USA 940113)",                                MACHINE_SUPPORTS_SAVE )
 GAME( 1993, ddtodj,     ddtod,    cps2,     cps2_4p4b, cps2_state, init_cps2,     ROT0,   "Capcom", "Dungeons & Dragons: Tower of Doom (Japan 940412)",                              MACHINE_SUPPORTS_SAVE )
@@ -12476,12 +12621,12 @@ GAME( 1994, ssf2tur1,   ssf2t,    cps2,     cps2_2p6b, cps2_state, init_cps2,   
 GAME( 1994, ssf2xj,     ssf2t,    cps2,     cps2_2p6b, cps2_state, init_cps2,     ROT0,   "Capcom", "Super Street Fighter II X: Grand Master Challenge (Japan 940311)",              MACHINE_SUPPORTS_SAVE )
 GAME( 1994, ssf2xjr1,   ssf2t,    cps2,     cps2_2p6b, cps2_state, init_cps2,     ROT0,   "Capcom", "Super Street Fighter II X: Grand Master Challenge (Japan 940223)",              MACHINE_SUPPORTS_SAVE )
 GAME( 1994, ssf2xjr1r,  ssf2t,    cps2,     cps2_2p6b, cps2_state, init_cps2,     ROT0,   "Capcom", "Super Street Fighter II X: Grand Master Challenge (Japan 940223 rent version)", MACHINE_SUPPORTS_SAVE )
-GAME( 1994, avsp,       0,        cps2,     cps2_3p3b, cps2_state, init_cps2,     ROT0,   "Capcom", "Alien vs. Predator (Euro 940520)",                                              MACHINE_SUPPORTS_SAVE )
+GAME( 1994, avsp,       0,        cps2,     cps2_3p3b, cps2_state, init_cps2,     ROT0,   "Capcom", "Alien vs. Predator (Europe 940520)",                                            MACHINE_SUPPORTS_SAVE )
 GAME( 1994, avspu,      avsp,     cps2,     cps2_3p3b, cps2_state, init_cps2,     ROT0,   "Capcom", "Alien vs. Predator (USA 940520)",                                               MACHINE_SUPPORTS_SAVE )
 GAME( 1994, avspj,      avsp,     cps2,     cps2_3p3b, cps2_state, init_cps2,     ROT0,   "Capcom", "Alien vs. Predator (Japan 940520)",                                             MACHINE_SUPPORTS_SAVE )
 GAME( 1994, avspa,      avsp,     cps2,     cps2_3p3b, cps2_state, init_cps2,     ROT0,   "Capcom", "Alien vs. Predator (Asia 940520)",                                              MACHINE_SUPPORTS_SAVE )
 GAME( 1994, avsph,      avsp,     cps2,     cps2_3p3b, cps2_state, init_cps2,     ROT0,   "Capcom", "Alien vs. Predator (Hispanic 940520)",                                          MACHINE_SUPPORTS_SAVE )
-GAME( 1994, dstlk,      0,        cps2,     cps2_2p6b, cps2_state, init_cps2,     ROT0,   "Capcom", "Darkstalkers: The Night Warriors (Euro 940705)",                                MACHINE_SUPPORTS_SAVE )
+GAME( 1994, dstlk,      0,        cps2,     cps2_2p6b, cps2_state, init_cps2,     ROT0,   "Capcom", "Darkstalkers: The Night Warriors (Europe 940705)",                              MACHINE_SUPPORTS_SAVE )
 GAME( 1994, dstlku,     dstlk,    cps2,     cps2_2p6b, cps2_state, init_cps2,     ROT0,   "Capcom", "Darkstalkers: The Night Warriors (USA 940818)",                                 MACHINE_SUPPORTS_SAVE )
 GAME( 1994, dstlkur1,   dstlk,    cps2,     cps2_2p6b, cps2_state, init_cps2,     ROT0,   "Capcom", "Darkstalkers: The Night Warriors (USA 940705)",                                 MACHINE_SUPPORTS_SAVE )
 GAME( 1994, dstlka,     dstlk,    cps2,     cps2_2p6b, cps2_state, init_cps2,     ROT0,   "Capcom", "Darkstalkers: The Night Warriors (Asia 940705)",                                MACHINE_SUPPORTS_SAVE )
@@ -12489,14 +12634,14 @@ GAME( 1994, dstlkh,     dstlk,    cps2,     cps2_2p6b, cps2_state, init_cps2,   
 GAME( 1994, vampj,      dstlk,    cps2,     cps2_2p6b, cps2_state, init_cps2,     ROT0,   "Capcom", "Vampire: The Night Warriors (Japan 940705)",                                    MACHINE_SUPPORTS_SAVE ) // Partial update set? Only rom 04 is "B" revision
 GAME( 1994, vampja,     dstlk,    cps2,     cps2_2p6b, cps2_state, init_cps2,     ROT0,   "Capcom", "Vampire: The Night Warriors (Japan 940705 alt)",                                MACHINE_SUPPORTS_SAVE )
 GAME( 1994, vampjr1,    dstlk,    cps2,     cps2_2p6b, cps2_state, init_cps2,     ROT0,   "Capcom", "Vampire: The Night Warriors (Japan 940630)",                                    MACHINE_SUPPORTS_SAVE )
-GAME( 1994, ringdest,   0,        cps2,     cps2_2p6b, cps2_state, init_cps2,     ROT0,   "Capcom", "Ring of Destruction: Slammasters II (Euro 940902)",                             MACHINE_SUPPORTS_SAVE )
+GAME( 1994, ringdest,   0,        cps2,     cps2_2p6b, cps2_state, init_cps2,     ROT0,   "Capcom", "Ring of Destruction: Slammasters II (Europe 940902)",                           MACHINE_SUPPORTS_SAVE )
 GAME( 1994, ringdesta,  ringdest, cps2,     cps2_2p6b, cps2_state, init_cps2,     ROT0,   "Capcom", "Ring of Destruction: Slammasters II (Asia 940831)",                             MACHINE_SUPPORTS_SAVE )
 GAME( 1994, ringdesth,  ringdest, cps2,     cps2_2p6b, cps2_state, init_cps2,     ROT0,   "Capcom", "Ring of Destruction: Slammasters II (Hispanic 940902)",                         MACHINE_SUPPORTS_SAVE )
 GAME( 1994, ringdestb,  ringdest, cps2,     cps2_2p6b, cps2_state, init_cps2,     ROT0,   "Capcom", "Ring of Destruction: Slammasters II (Brazil 940902)",                           MACHINE_SUPPORTS_SAVE )
 GAME( 1994, smbomb,     ringdest, cps2,     cps2_2p6b, cps2_state, init_cps2,     ROT0,   "Capcom", "Super Muscle Bomber: The International Blowout (Japan 940831)",                 MACHINE_SUPPORTS_SAVE )
 GAME( 1994, smbombr1,   ringdest, cps2,     cps2_2p6b, cps2_state, init_cps2,     ROT0,   "Capcom", "Super Muscle Bomber: The International Blowout (Japan 940808)",                 MACHINE_SUPPORTS_SAVE )
-GAME( 1994, armwar,     0,        cps2,     cps2_3p3b, cps2_state, init_cps2,     ROT0,   "Capcom", "Armored Warriors (Euro 941024)",                                                MACHINE_SUPPORTS_SAVE )
-GAME( 1994, armwarr1,   armwar,   cps2,     cps2_3p3b, cps2_state, init_cps2,     ROT0,   "Capcom", "Armored Warriors (Euro 941011)",                                                MACHINE_SUPPORTS_SAVE )
+GAME( 1994, armwar,     0,        cps2,     cps2_3p3b, cps2_state, init_cps2,     ROT0,   "Capcom", "Armored Warriors (Europe 941024)",                                              MACHINE_SUPPORTS_SAVE )
+GAME( 1994, armwarr1,   armwar,   cps2,     cps2_3p3b, cps2_state, init_cps2,     ROT0,   "Capcom", "Armored Warriors (Europe 941011)",                                              MACHINE_SUPPORTS_SAVE )
 GAME( 1994, armwaru,    armwar,   cps2,     cps2_3p3b, cps2_state, init_cps2,     ROT0,   "Capcom", "Armored Warriors (USA 941024)",                                                 MACHINE_SUPPORTS_SAVE )
 GAME( 1994, armwaru1,   armwar,   cps2,     cps2_3p3b, cps2_state, init_cps2,     ROT0,   "Capcom", "Armored Warriors (USA 940920)",                                                 MACHINE_SUPPORTS_SAVE )
 GAME( 1994, armwarb,    armwar,   cps2,     cps2_3p3b, cps2_state, init_cps2,     ROT0,   "Capcom", "Armored Warriors (Brazil 941024)",                                              MACHINE_SUPPORTS_SAVE )
@@ -12504,8 +12649,8 @@ GAME( 1994, pgear,      armwar,   cps2,     cps2_3p3b, cps2_state, init_cps2,   
 GAME( 1994, pgearr1,    armwar,   cps2,     cps2_3p3b, cps2_state, init_cps2,     ROT0,   "Capcom", "Powered Gear: Strategic Variant Armor Equipment (Japan 940916)",                MACHINE_SUPPORTS_SAVE )
 GAME( 1994, armwara,    armwar,   cps2,     cps2_3p3b, cps2_state, init_cps2,     ROT0,   "Capcom", "Armored Warriors (Asia 941024)",                                                MACHINE_SUPPORTS_SAVE )
 GAME( 1994, armwarar1,  armwar,   cps2,     cps2_3p3b, cps2_state, init_cps2,     ROT0,   "Capcom", "Armored Warriors (Asia 940920)",                                                MACHINE_SUPPORTS_SAVE )
-GAME( 1994, xmcota,     0,        cps2,     cps2_2p6b, cps2_state, init_cps2,     ROT0,   "Capcom", "X-Men: Children of the Atom (Euro 950331)",                                     MACHINE_SUPPORTS_SAVE )
-GAME( 1994, xmcotar1,   xmcota,   cps2,     cps2_2p6b, cps2_state, init_cps2,     ROT0,   "Capcom", "X-Men: Children of the Atom (Euro 950105)",                                     MACHINE_SUPPORTS_SAVE )
+GAME( 1994, xmcota,     0,        cps2,     cps2_2p6b, cps2_state, init_cps2,     ROT0,   "Capcom", "X-Men: Children of the Atom (Europe 950331)",                                   MACHINE_SUPPORTS_SAVE )
+GAME( 1994, xmcotar1,   xmcota,   cps2,     cps2_2p6b, cps2_state, init_cps2,     ROT0,   "Capcom", "X-Men: Children of the Atom (Europe 950105)",                                   MACHINE_SUPPORTS_SAVE )
 GAME( 1994, xmcotau,    xmcota,   cps2,     cps2_2p6b, cps2_state, init_cps2,     ROT0,   "Capcom", "X-Men: Children of the Atom (USA 950105)",                                      MACHINE_SUPPORTS_SAVE )
 GAME( 1994, xmcotab,    xmcota,   cps2,     cps2_2p6b, cps2_state, init_cps2,     ROT0,   "Capcom", "X-Men: Children of the Atom (Brazil 950331)",                                   MACHINE_SUPPORTS_SAVE )
 GAME( 1994, xmcotah,    xmcota,   cps2,     cps2_2p6b, cps2_state, init_cps2,     ROT0,   "Capcom", "X-Men: Children of the Atom (Hispanic 950331)",                                 MACHINE_SUPPORTS_SAVE )
@@ -12518,7 +12663,7 @@ GAME( 1994, xmcotajr,   xmcota,   cps2,     cps2_2p6b, cps2_state, init_cps2,   
 GAME( 1994, xmcotaa,    xmcota,   cps2,     cps2_2p6b, cps2_state, init_cps2,     ROT0,   "Capcom", "X-Men: Children of the Atom (Asia 950105)",                                     MACHINE_SUPPORTS_SAVE )
 GAME( 1994, xmcotaar1,  xmcota,   cps2,     cps2_2p6b, cps2_state, init_cps2,     ROT0,   "Capcom", "X-Men: Children of the Atom (Asia 941219)",                                     MACHINE_SUPPORTS_SAVE )
 GAME( 1994, xmcotaar2,  xmcota,   cps2,     cps2_2p6b, cps2_state, init_cps2,     ROT0,   "Capcom", "X-Men: Children of the Atom (Asia 941217)",                                     MACHINE_SUPPORTS_SAVE )
-GAME( 1995, nwarr,      0,        cps2,     cps2_2p6b, cps2_state, init_cps2,     ROT0,   "Capcom", "Night Warriors: Darkstalkers' Revenge (Euro 950316)",                           MACHINE_SUPPORTS_SAVE )
+GAME( 1995, nwarr,      0,        cps2,     cps2_2p6b, cps2_state, init_cps2,     ROT0,   "Capcom", "Night Warriors: Darkstalkers' Revenge (Europe 950316)",                         MACHINE_SUPPORTS_SAVE )
 GAME( 1995, nwarru,     nwarr,    cps2,     cps2_2p6b, cps2_state, init_cps2,     ROT0,   "Capcom", "Night Warriors: Darkstalkers' Revenge (USA 950406)",                            MACHINE_SUPPORTS_SAVE )
 GAME( 1995, nwarrh,     nwarr,    cps2,     cps2_2p6b, cps2_state, init_cps2,     ROT0,   "Capcom", "Night Warriors: Darkstalkers' Revenge (Hispanic 950403)",                       MACHINE_SUPPORTS_SAVE )
 GAME( 1995, nwarrb,     nwarr,    cps2,     cps2_2p6b, cps2_state, init_cps2,     ROT0,   "Capcom", "Night Warriors: Darkstalkers' Revenge (Brazil 950403)",                         MACHINE_SUPPORTS_SAVE )
@@ -12527,13 +12672,13 @@ GAME( 1995, vhuntj,     nwarr,    cps2,     cps2_2p6b, cps2_state, init_cps2,   
 GAME( 1995, vhuntjr1s,  nwarr,    cps2,     cps2_2p6b, cps2_state, init_cps2,     ROT0,   "Capcom", "Vampire Hunter: Darkstalkers' Revenge (Japan 950307 stop version)",             MACHINE_SUPPORTS_SAVE )
 GAME( 1995, vhuntjr1,   nwarr,    cps2,     cps2_2p6b, cps2_state, init_cps2,     ROT0,   "Capcom", "Vampire Hunter: Darkstalkers' Revenge (Japan 950307)",                          MACHINE_SUPPORTS_SAVE )
 GAME( 1995, vhuntjr2,   nwarr,    cps2,     cps2_2p6b, cps2_state, init_cps2,     ROT0,   "Capcom", "Vampire Hunter: Darkstalkers' Revenge (Japan 950302)",                          MACHINE_SUPPORTS_SAVE )
-GAME( 1995, cybots,     0,        cps2,     cybots,    cps2_state, init_cps2,     ROT0,   "Capcom", "Cyberbots: Fullmetal Madness (Euro 950424)",                                    MACHINE_SUPPORTS_SAVE )
+GAME( 1995, cybots,     0,        cps2,     cybots,    cps2_state, init_cps2,     ROT0,   "Capcom", "Cyberbots: Fullmetal Madness (Europe 950424)",                                  MACHINE_SUPPORTS_SAVE )
 GAME( 1995, cybotsu,    cybots,   cps2,     cybots,    cps2_state, init_cps2,     ROT0,   "Capcom", "Cyberbots: Fullmetal Madness (USA 950424)",                                     MACHINE_SUPPORTS_SAVE )
 GAME( 1995, cybotsj,    cybots,   cps2,     cybots,    cps2_state, init_cps2,     ROT0,   "Capcom", "Cyberbots: Fullmetal Madness (Japan 950420)",                                   MACHINE_SUPPORTS_SAVE )
-GAME( 1995, sfa,        0,        cps2,     cps2_2p6b, cps2_state, init_cps2,     ROT0,   "Capcom", "Street Fighter Alpha: Warriors' Dreams (Euro 950727)",                          MACHINE_SUPPORTS_SAVE )
-GAME( 1995, sfar1,      sfa,      cps2,     cps2_2p6b, cps2_state, init_cps2,     ROT0,   "Capcom", "Street Fighter Alpha: Warriors' Dreams (Euro 950718)",                          MACHINE_SUPPORTS_SAVE )
-GAME( 1995, sfar2,      sfa,      cps2,     cps2_2p6b, cps2_state, init_cps2,     ROT0,   "Capcom", "Street Fighter Alpha: Warriors' Dreams (Euro 950627)",                          MACHINE_SUPPORTS_SAVE )
-GAME( 1995, sfar3,      sfa,      cps2,     cps2_2p6b, cps2_state, init_cps2,     ROT0,   "Capcom", "Street Fighter Alpha: Warriors' Dreams (Euro 950605)",                          MACHINE_SUPPORTS_SAVE )
+GAME( 1995, sfa,        0,        cps2,     cps2_2p6b, cps2_state, init_cps2,     ROT0,   "Capcom", "Street Fighter Alpha: Warriors' Dreams (Europe 950727)",                        MACHINE_SUPPORTS_SAVE )
+GAME( 1995, sfar1,      sfa,      cps2,     cps2_2p6b, cps2_state, init_cps2,     ROT0,   "Capcom", "Street Fighter Alpha: Warriors' Dreams (Europe 950718)",                        MACHINE_SUPPORTS_SAVE )
+GAME( 1995, sfar2,      sfa,      cps2,     cps2_2p6b, cps2_state, init_cps2,     ROT0,   "Capcom", "Street Fighter Alpha: Warriors' Dreams (Europe 950627)",                        MACHINE_SUPPORTS_SAVE )
+GAME( 1995, sfar3,      sfa,      cps2,     cps2_2p6b, cps2_state, init_cps2,     ROT0,   "Capcom", "Street Fighter Alpha: Warriors' Dreams (Europe 950605)",                        MACHINE_SUPPORTS_SAVE )
 GAME( 1995, sfau,       sfa,      cps2,     cps2_2p6b, cps2_state, init_cps2,     ROT0,   "Capcom", "Street Fighter Alpha: Warriors' Dreams (USA 950627)",                           MACHINE_SUPPORTS_SAVE )
 GAME( 1995, sfza,       sfa,      cps2,     cps2_2p6b, cps2_state, init_cps2,     ROT0,   "Capcom", "Street Fighter Zero (Asia 950627)",                                             MACHINE_SUPPORTS_SAVE )
 GAME( 1995, sfzar1,     sfa,      cps2,     cps2_2p6b, cps2_state, init_cps2,     ROT0,   "Capcom", "Street Fighter Zero (Asia 950605)",                                             MACHINE_SUPPORTS_SAVE )
@@ -12548,7 +12693,7 @@ GAME( 1995, mmancp2u,   megaman,  cps2,     cps2_2p3b, cps2_state, init_cps2,   
 GAME( 1995, mmancp2ur1, megaman,  cps2,     cps2_2p3b, cps2_state, init_cps2,     ROT0,   "Capcom", "Mega Man: The Power Battle (CPS2, USA 950926, SAMPLE Version)",                 MACHINE_SUPPORTS_SAVE )
 GAME( 1995, mmancp2ur2, megaman,  cps2,     cps2_2p3b, cps2_state, init_cps2,     ROT0,   "Capcom", "Mega Man: The Power Battle (CPS2, USA 950925, SAMPLE Version)",                 MACHINE_SUPPORTS_SAVE )
 GAME( 1995, rmancp2j,   megaman,  cps2,     cps2_2p3b, cps2_state, init_cps2,     ROT0,   "Capcom", "Rockman: The Power Battle (CPS2, Japan 950922)",                                MACHINE_SUPPORTS_SAVE )
-GAME( 1995, msh,        0,        cps2,     cps2_2p6b, cps2_state, init_cps2,     ROT0,   "Capcom", "Marvel Super Heroes (Euro 951024)",                                             MACHINE_SUPPORTS_SAVE )
+GAME( 1995, msh,        0,        cps2,     cps2_2p6b, cps2_state, init_cps2,     ROT0,   "Capcom", "Marvel Super Heroes (Europe 951024)",                                           MACHINE_SUPPORTS_SAVE )
 GAME( 1995, mshu,       msh,      cps2,     cps2_2p6b, cps2_state, init_cps2,     ROT0,   "Capcom", "Marvel Super Heroes (USA 951024)",                                              MACHINE_SUPPORTS_SAVE )
 GAME( 1995, mshj,       msh,      cps2,     cps2_2p6b, cps2_state, init_cps2,     ROT0,   "Capcom", "Marvel Super Heroes (Japan 951117)",                                            MACHINE_SUPPORTS_SAVE )
 GAME( 1995, mshjr1,     msh,      cps2,     cps2_2p6b, cps2_state, init_cps2,     ROT0,   "Capcom", "Marvel Super Heroes (Japan 951024)",                                            MACHINE_SUPPORTS_SAVE )
@@ -12556,7 +12701,7 @@ GAME( 1995, msha,       msh,      cps2,     cps2_2p6b, cps2_state, init_cps2,   
 GAME( 1995, mshh,       msh,      cps2,     cps2_2p6b, cps2_state, init_cps2,     ROT0,   "Capcom", "Marvel Super Heroes (Hispanic 951117)",                                         MACHINE_SUPPORTS_SAVE )
 GAME( 1995, mshb,       msh,      cps2,     cps2_2p6b, cps2_state, init_cps2,     ROT0,   "Capcom", "Marvel Super Heroes (Brazil 951117)",                                           MACHINE_SUPPORTS_SAVE )
 GAME( 1995, mshbr1,     msh,      cps2,     cps2_2p6b, cps2_state, init_cps2,     ROT0,   "Capcom", "Marvel Super Heroes (Brazil 951024)",                                           MACHINE_SUPPORTS_SAVE )
-GAME( 1996, 19xx,       0,        cps2,     cps2_2p2b, cps2_state, init_cps2,     ROT270, "Capcom", "19XX: The War Against Destiny (Euro 960104)",                                   MACHINE_SUPPORTS_SAVE )
+GAME( 1996, 19xx,       0,        cps2,     cps2_2p2b, cps2_state, init_cps2,     ROT270, "Capcom", "19XX: The War Against Destiny (Europe 960104)",                                 MACHINE_SUPPORTS_SAVE )
 GAME( 1996, 19xxu,      19xx,     cps2,     cps2_2p2b, cps2_state, init_cps2,     ROT270, "Capcom", "19XX: The War Against Destiny (USA 951207)",                                    MACHINE_SUPPORTS_SAVE )
 GAME( 1996, 19xxa,      19xx,     cps2,     cps2_2p2b, cps2_state, init_cps2,     ROT270, "Capcom", "19XX: The War Against Destiny (Asia 960104)",                                   MACHINE_SUPPORTS_SAVE )
 GAME( 1996, 19xxar1,    19xx,     cps2,     cps2_2p2b, cps2_state, init_cps2,     ROT270, "Capcom", "19XX: The War Against Destiny (Asia 951207)",                                   MACHINE_SUPPORTS_SAVE )
@@ -12565,10 +12710,10 @@ GAME( 1996, 19xxjr1,    19xx,     cps2,     cps2_2p2b, cps2_state, init_cps2,   
 GAME( 1996, 19xxjr2,    19xx,     cps2,     cps2_2p2b, cps2_state, init_cps2,     ROT270, "Capcom", "19XX: The War Against Destiny (Japan 951207)",                                  MACHINE_SUPPORTS_SAVE )
 GAME( 1996, 19xxh,      19xx,     cps2,     cps2_2p2b, cps2_state, init_cps2,     ROT270, "Capcom", "19XX: The War Against Destiny (Hispanic 951218)",                               MACHINE_SUPPORTS_SAVE )
 GAME( 1996, 19xxb,      19xx,     cps2,     cps2_2p2b, cps2_state, init_cps2,     ROT270, "Capcom", "19XX: The War Against Destiny (Brazil 951218)",                                 MACHINE_SUPPORTS_SAVE )
-GAME( 1996, ddsom,      0,        cps2,     cps2_4p4b, cps2_state, init_cps2,     ROT0,   "Capcom", "Dungeons & Dragons: Shadow over Mystara (Euro 960619)",                         MACHINE_SUPPORTS_SAVE )
-GAME( 1996, ddsomr1,    ddsom,    cps2,     cps2_4p4b, cps2_state, init_cps2,     ROT0,   "Capcom", "Dungeons & Dragons: Shadow over Mystara (Euro 960223)",                         MACHINE_SUPPORTS_SAVE )
-GAME( 1996, ddsomr2,    ddsom,    cps2,     cps2_4p4b, cps2_state, init_cps2,     ROT0,   "Capcom", "Dungeons & Dragons: Shadow over Mystara (Euro 960209)",                         MACHINE_SUPPORTS_SAVE )
-GAME( 1996, ddsomr3,    ddsom,    cps2,     cps2_4p4b, cps2_state, init_cps2,     ROT0,   "Capcom", "Dungeons & Dragons: Shadow over Mystara (Euro 960208)",                         MACHINE_SUPPORTS_SAVE )
+GAME( 1996, ddsom,      0,        cps2,     cps2_4p4b, cps2_state, init_cps2,     ROT0,   "Capcom", "Dungeons & Dragons: Shadow over Mystara (Europe 960619)",                       MACHINE_SUPPORTS_SAVE )
+GAME( 1996, ddsomr1,    ddsom,    cps2,     cps2_4p4b, cps2_state, init_cps2,     ROT0,   "Capcom", "Dungeons & Dragons: Shadow over Mystara (Europe 960223)",                       MACHINE_SUPPORTS_SAVE )
+GAME( 1996, ddsomr2,    ddsom,    cps2,     cps2_4p4b, cps2_state, init_cps2,     ROT0,   "Capcom", "Dungeons & Dragons: Shadow over Mystara (Europe 960209)",                       MACHINE_SUPPORTS_SAVE )
+GAME( 1996, ddsomr3,    ddsom,    cps2,     cps2_4p4b, cps2_state, init_cps2,     ROT0,   "Capcom", "Dungeons & Dragons: Shadow over Mystara (Europe 960208)",                       MACHINE_SUPPORTS_SAVE )
 GAME( 1996, ddsomu,     ddsom,    cps2,     cps2_4p4b, cps2_state, init_cps2,     ROT0,   "Capcom", "Dungeons & Dragons: Shadow over Mystara (USA 960619)",                          MACHINE_SUPPORTS_SAVE )
 GAME( 1996, ddsomur1,   ddsom,    cps2,     cps2_4p4b, cps2_state, init_cps2,     ROT0,   "Capcom", "Dungeons & Dragons: Shadow over Mystara (USA 960209)",                          MACHINE_SUPPORTS_SAVE )
 GAME( 1996, ddsomj,     ddsom,    cps2,     cps2_4p4b, cps2_state, init_cps2,     ROT0,   "Capcom", "Dungeons & Dragons: Shadow over Mystara (Japan 960619)",                        MACHINE_SUPPORTS_SAVE )
@@ -12578,7 +12723,7 @@ GAME( 1996, ddsoma,     ddsom,    cps2,     cps2_4p4b, cps2_state, init_cps2,   
 GAME( 1996, ddsomar1,   ddsom,    cps2,     cps2_4p4b, cps2_state, init_cps2,     ROT0,   "Capcom", "Dungeons & Dragons: Shadow over Mystara (Asia 960208)",                         MACHINE_SUPPORTS_SAVE )
 GAME( 1996, ddsomh,     ddsom,    cps2,     cps2_4p4b, cps2_state, init_cps2,     ROT0,   "Capcom", "Dungeons & Dragons: Shadow over Mystara (Hispanic 960223)",                     MACHINE_SUPPORTS_SAVE )
 GAME( 1996, ddsomb,     ddsom,    cps2,     cps2_4p4b, cps2_state, init_cps2,     ROT0,   "Capcom", "Dungeons & Dragons: Shadow over Mystara (Brazil 960223)",                       MACHINE_SUPPORTS_SAVE )
-GAME( 1996, sfa2,       0,        cps2,     cps2_2p6b, cps2_state, init_cps2,     ROT0,   "Capcom", "Street Fighter Alpha 2 (Euro 960229)",                                          MACHINE_SUPPORTS_SAVE )
+GAME( 1996, sfa2,       0,        cps2,     cps2_2p6b, cps2_state, init_cps2,     ROT0,   "Capcom", "Street Fighter Alpha 2 (Europe 960229)",                                        MACHINE_SUPPORTS_SAVE )
 GAME( 1996, sfa2u,      sfa2,     cps2,     cps2_2p6b, cps2_state, init_cps2,     ROT0,   "Capcom", "Street Fighter Alpha 2 (USA 960430)",                                           MACHINE_SUPPORTS_SAVE )
 GAME( 1996, sfa2ur1,    sfa2,     cps2,     cps2_2p6b, cps2_state, init_cps2,     ROT0,   "Capcom", "Street Fighter Alpha 2 (USA 960306)",                                           MACHINE_SUPPORTS_SAVE )
 GAME( 1996, sfz2j,      sfa2,     cps2,     cps2_2p6b, cps2_state, init_cps2,     ROT0,   "Capcom", "Street Fighter Zero 2 (Japan 960430)",                                          MACHINE_SUPPORTS_SAVE )
@@ -12593,7 +12738,7 @@ GAME( 1996, sfz2alr1,   sfz2al,   cps2,     cps2_2p6b, cps2_state, init_cps2,   
 GAME( 1996, sfz2alj,    sfz2al,   cps2,     cps2_2p6b, cps2_state, init_cps2,     ROT0,   "Capcom", "Street Fighter Zero 2 Alpha (Japan 960805)",                                    MACHINE_SUPPORTS_SAVE )
 GAME( 1996, sfz2alh,    sfz2al,   cps2,     cps2_2p6b, cps2_state, init_cps2,     ROT0,   "Capcom", "Street Fighter Zero 2 Alpha (Hispanic 960813)",                                 MACHINE_SUPPORTS_SAVE )
 GAME( 1996, sfz2alb,    sfz2al,   cps2,     cps2_2p6b, cps2_state, init_cps2,     ROT0,   "Capcom", "Street Fighter Zero 2 Alpha (Brazil 960813)",                                   MACHINE_SUPPORTS_SAVE )
-GAME( 1996, spf2t,      0,        cps2,     cps2_2p2b, cps2_state, init_cps2,     ROT0,   "Capcom", "Super Puzzle Fighter II Turbo (Euro 960529)",                                   MACHINE_SUPPORTS_SAVE )
+GAME( 1996, spf2t,      0,        cps2,     cps2_2p2b, cps2_state, init_cps2,     ROT0,   "Capcom", "Super Puzzle Fighter II Turbo (Europe 960529)",                                 MACHINE_SUPPORTS_SAVE )
 GAME( 1996, spf2tu,     spf2t,    cps2,     cps2_2p2b, cps2_state, init_cps2,     ROT0,   "Capcom", "Super Puzzle Fighter II Turbo (USA 960620)",                                    MACHINE_SUPPORTS_SAVE )
 GAME( 1996, spf2xj,     spf2t,    cps2,     cps2_2p2b, cps2_state, init_cps2,     ROT0,   "Capcom", "Super Puzzle Fighter II X (Japan 960531)",                                      MACHINE_SUPPORTS_SAVE )
 GAME( 1996, spf2ta,     spf2t,    cps2,     cps2_2p2b, cps2_state, init_cps2,     ROT0,   "Capcom", "Super Puzzle Fighter II Turbo (Asia 960529)",                                   MACHINE_SUPPORTS_SAVE )
@@ -12602,32 +12747,33 @@ GAME( 1996, megaman2,   0,        cps2,     cps2_2p3b, cps2_state, init_cps2,   
 GAME( 1996, megaman2a,  megaman2, cps2,     cps2_2p3b, cps2_state, init_cps2,     ROT0,   "Capcom", "Mega Man 2: The Power Fighters (Asia 960708)",                                  MACHINE_SUPPORTS_SAVE )
 GAME( 1996, rockman2j,  megaman2, cps2,     cps2_2p3b, cps2_state, init_cps2,     ROT0,   "Capcom", "Rockman 2: The Power Fighters (Japan 960708)",                                  MACHINE_SUPPORTS_SAVE )
 GAME( 1996, megaman2h,  megaman2, cps2,     cps2_2p3b, cps2_state, init_cps2,     ROT0,   "Capcom", "Mega Man 2: The Power Fighters (Hispanic 960712)",                              MACHINE_SUPPORTS_SAVE )
-GAME( 1996, qndream,    0,        cps2,     qndream,   cps2_state, init_cps2,     ROT0,   "Capcom", "Quiz Nanairo Dreams: Nijiirochou no Kiseki (Japan 96086)",                      MACHINE_SUPPORTS_SAVE )
-GAME( 1996, xmvsf,      0,        cps2,     cps2_2p6b, cps2_state, init_cps2,     ROT0,   "Capcom", "X-Men Vs. Street Fighter (Euro 961004)",                                        MACHINE_SUPPORTS_SAVE )
-GAME( 1996, xmvsfr1,    xmvsf,    cps2,     cps2_2p6b, cps2_state, init_cps2,     ROT0,   "Capcom", "X-Men Vs. Street Fighter (Euro 960910)",                                        MACHINE_SUPPORTS_SAVE )
+GAME( 1996, qndream,    0,        cps2,     qndream,   cps2_state, init_cps2,     ROT0,   "Capcom", "Quiz Nanairo Dreams: Nijiirochou no Kiseki (Japan 960826)",                     MACHINE_SUPPORTS_SAVE )
+GAME( 1996, xmvsf,      0,        cps2,     cps2_2p6b, cps2_state, init_cps2,     ROT0,   "Capcom", "X-Men Vs. Street Fighter (Europe 961004)",                                      MACHINE_SUPPORTS_SAVE )
+GAME( 1996, xmvsfr1,    xmvsf,    cps2,     cps2_2p6b, cps2_state, init_cps2,     ROT0,   "Capcom", "X-Men Vs. Street Fighter (Europe 960910)",                                      MACHINE_SUPPORTS_SAVE )
 GAME( 1996, xmvsfu,     xmvsf,    cps2,     cps2_2p6b, cps2_state, init_cps2,     ROT0,   "Capcom", "X-Men Vs. Street Fighter (USA 961023)",                                         MACHINE_SUPPORTS_SAVE )
 GAME( 1996, xmvsfur1,   xmvsf,    cps2,     cps2_2p6b, cps2_state, init_cps2,     ROT0,   "Capcom", "X-Men Vs. Street Fighter (USA 961004)",                                         MACHINE_SUPPORTS_SAVE )
 GAME( 1996, xmvsfur2,   xmvsf,    cps2,     cps2_2p6b, cps2_state, init_cps2,     ROT0,   "Capcom", "X-Men Vs. Street Fighter (USA 960910)",                                         MACHINE_SUPPORTS_SAVE )
-GAME( 1996, xmvsfj,     xmvsf,    cps2,     cps2_2p6b, cps2_state, init_cps2,     ROT0,   "Capcom", "X-Men Vs. Street Fighter (Japan 961023)",                                       MACHINE_SUPPORTS_SAVE )
-GAME( 1996, xmvsfjr1,   xmvsf,    cps2,     cps2_2p6b, cps2_state, init_cps2,     ROT0,   "Capcom", "X-Men Vs. Street Fighter (Japan 961004)",                                       MACHINE_SUPPORTS_SAVE )
-GAME( 1996, xmvsfjr2,   xmvsf,    cps2,     cps2_2p6b, cps2_state, init_cps2,     ROT0,   "Capcom", "X-Men Vs. Street Fighter (Japan 960910)",                                       MACHINE_SUPPORTS_SAVE )
-GAME( 1996, xmvsfjr3,   xmvsf,    cps2,     cps2_2p6b, cps2_state, init_cps2,     ROT0,   "Capcom", "X-Men Vs. Street Fighter (Japan 960909)",                                       MACHINE_SUPPORTS_SAVE )
+GAME( 1996, xmvsfj,     xmvsf,    cps2,     cps2_2p6b, cps2_state, init_cps2,     ROT0,   "Capcom", "X-Men Vs. Street Fighter (Japan 970113)",                                       MACHINE_SUPPORTS_SAVE )
+GAME( 1996, xmvsfjr1,   xmvsf,    cps2,     cps2_2p6b, cps2_state, init_cps2,     ROT0,   "Capcom", "X-Men Vs. Street Fighter (Japan 961023)",                                       MACHINE_SUPPORTS_SAVE )
+GAME( 1996, xmvsfjr2,   xmvsf,    cps2,     cps2_2p6b, cps2_state, init_cps2,     ROT0,   "Capcom", "X-Men Vs. Street Fighter (Japan 961004)",                                       MACHINE_SUPPORTS_SAVE )
+GAME( 1996, xmvsfjr3,   xmvsf,    cps2,     cps2_2p6b, cps2_state, init_cps2,     ROT0,   "Capcom", "X-Men Vs. Street Fighter (Japan 960910)",                                       MACHINE_SUPPORTS_SAVE )
+GAME( 1996, xmvsfjr4,   xmvsf,    cps2,     cps2_2p6b, cps2_state, init_cps2,     ROT0,   "Capcom", "X-Men Vs. Street Fighter (Japan 960909)",                                       MACHINE_SUPPORTS_SAVE )
 GAME( 1996, xmvsfa,     xmvsf,    cps2,     cps2_2p6b, cps2_state, init_cps2,     ROT0,   "Capcom", "X-Men Vs. Street Fighter (Asia 961023)",                                        MACHINE_SUPPORTS_SAVE )
 GAME( 1996, xmvsfar1,   xmvsf,    cps2,     cps2_2p6b, cps2_state, init_cps2,     ROT0,   "Capcom", "X-Men Vs. Street Fighter (Asia 961004)",                                        MACHINE_SUPPORTS_SAVE )
 GAME( 1996, xmvsfar2,   xmvsf,    cps2,     cps2_2p6b, cps2_state, init_cps2,     ROT0,   "Capcom", "X-Men Vs. Street Fighter (Asia 960919)",                                        MACHINE_SUPPORTS_SAVE )
 GAME( 1996, xmvsfar3,   xmvsf,    cps2,     cps2_2p6b, cps2_state, init_cps2,     ROT0,   "Capcom", "X-Men Vs. Street Fighter (Asia 960910)",                                        MACHINE_SUPPORTS_SAVE )
 GAME( 1996, xmvsfh,     xmvsf,    cps2,     cps2_2p6b, cps2_state, init_cps2,     ROT0,   "Capcom", "X-Men Vs. Street Fighter (Hispanic 961004)",                                    MACHINE_SUPPORTS_SAVE )
 GAME( 1996, xmvsfb,     xmvsf,    cps2,     cps2_2p6b, cps2_state, init_cps2,     ROT0,   "Capcom", "X-Men Vs. Street Fighter (Brazil 961023)",                                      MACHINE_SUPPORTS_SAVE )
-GAME( 1997, batcir,     0,        cps2,     cps2_4p2b, cps2_state, init_cps2,     ROT0,   "Capcom", "Battle Circuit (Euro 970319)",                                                  MACHINE_SUPPORTS_SAVE )
+GAME( 1997, batcir,     0,        cps2,     cps2_4p2b, cps2_state, init_cps2,     ROT0,   "Capcom", "Battle Circuit (Europe 970319)",                                                MACHINE_SUPPORTS_SAVE )
 GAME( 1997, batcira,    batcir,   cps2,     cps2_4p2b, cps2_state, init_cps2,     ROT0,   "Capcom", "Battle Circuit (Asia 970319)",                                                  MACHINE_SUPPORTS_SAVE )
 GAME( 1997, batcirj,    batcir,   cps2,     cps2_4p2b, cps2_state, init_cps2,     ROT0,   "Capcom", "Battle Circuit (Japan 970319)",                                                 MACHINE_SUPPORTS_SAVE )
-GAME( 1997, vsav,       0,        cps2,     cps2_2p6b, cps2_state, init_cps2,     ROT0,   "Capcom", "Vampire Savior: The Lord of Vampire (Euro 970519)",                             MACHINE_SUPPORTS_SAVE )
+GAME( 1997, vsav,       0,        cps2,     cps2_2p6b, cps2_state, init_cps2,     ROT0,   "Capcom", "Vampire Savior: The Lord of Vampire (Europe 970519)",                           MACHINE_SUPPORTS_SAVE )
 GAME( 1997, vsavu,      vsav,     cps2,     cps2_2p6b, cps2_state, init_cps2,     ROT0,   "Capcom", "Vampire Savior: The Lord of Vampire (USA 970519)",                              MACHINE_SUPPORTS_SAVE )
 GAME( 1997, vsavj,      vsav,     cps2,     cps2_2p6b, cps2_state, init_cps2,     ROT0,   "Capcom", "Vampire Savior: The Lord of Vampire (Japan 970519)",                            MACHINE_SUPPORTS_SAVE )
 GAME( 1997, vsava,      vsav,     cps2,     cps2_2p6b, cps2_state, init_cps2,     ROT0,   "Capcom", "Vampire Savior: The Lord of Vampire (Asia 970519)",                             MACHINE_SUPPORTS_SAVE )
 GAME( 1997, vsavh,      vsav,     cps2,     cps2_2p6b, cps2_state, init_cps2,     ROT0,   "Capcom", "Vampire Savior: The Lord of Vampire (Hispanic 970519)",                         MACHINE_SUPPORTS_SAVE )
 GAME( 1997, vsavb,      vsav,     cps2,     cps2_2p6b, cps2_state, init_cps2,     ROT0,   "Capcom", "Vampire Savior: The Lord of Vampire (Brazil 970519)",                           MACHINE_SUPPORTS_SAVE )
-GAME( 1997, mshvsf,     0,        cps2,     cps2_2p6b, cps2_state, init_cps2,     ROT0,   "Capcom", "Marvel Super Heroes Vs. Street Fighter (Euro 970625)",                          MACHINE_SUPPORTS_SAVE )
+GAME( 1997, mshvsf,     0,        cps2,     cps2_2p6b, cps2_state, init_cps2,     ROT0,   "Capcom", "Marvel Super Heroes Vs. Street Fighter (Europe 970625)",                        MACHINE_SUPPORTS_SAVE )
 GAME( 1997, mshvsfu,    mshvsf,   cps2,     cps2_2p6b, cps2_state, init_cps2,     ROT0,   "Capcom", "Marvel Super Heroes Vs. Street Fighter (USA 970827)",                           MACHINE_SUPPORTS_SAVE )
 GAME( 1997, mshvsfu1,   mshvsf,   cps2,     cps2_2p6b, cps2_state, init_cps2,     ROT0,   "Capcom", "Marvel Super Heroes Vs. Street Fighter (USA 970625)",                           MACHINE_SUPPORTS_SAVE )
 GAME( 1997, mshvsfj,    mshvsf,   cps2,     cps2_2p6b, cps2_state, init_cps2,     ROT0,   "Capcom", "Marvel Super Heroes Vs. Street Fighter (Japan 970707)",                         MACHINE_SUPPORTS_SAVE )
@@ -12638,21 +12784,21 @@ GAME( 1997, mshvsfa,    mshvsf,   cps2,     cps2_2p6b, cps2_state, init_cps2,   
 GAME( 1997, mshvsfa1,   mshvsf,   cps2,     cps2_2p6b, cps2_state, init_cps2,     ROT0,   "Capcom", "Marvel Super Heroes Vs. Street Fighter (Asia 970620)",                          MACHINE_SUPPORTS_SAVE )
 GAME( 1997, mshvsfb,    mshvsf,   cps2,     cps2_2p6b, cps2_state, init_cps2,     ROT0,   "Capcom", "Marvel Super Heroes Vs. Street Fighter (Brazil 970827)",                        MACHINE_SUPPORTS_SAVE )
 GAME( 1997, mshvsfb1,   mshvsf,   cps2,     cps2_2p6b, cps2_state, init_cps2,     ROT0,   "Capcom", "Marvel Super Heroes Vs. Street Fighter (Brazil 970625)",                        MACHINE_SUPPORTS_SAVE )
-GAME( 1997, csclub,     0,        cps2,     cps2_2p3b, cps2_state, init_cps2,     ROT0,   "Capcom", "Capcom Sports Club (Euro 971017)",                                              MACHINE_SUPPORTS_SAVE )
-GAME( 1997, csclub1,    csclub,   cps2,     cps2_2p3b, cps2_state, init_cps2,     ROT0,   "Capcom", "Capcom Sports Club (Euro 970722)",                                              MACHINE_SUPPORTS_SAVE )
+GAME( 1997, csclub,     0,        cps2,     cps2_2p3b, cps2_state, init_cps2,     ROT0,   "Capcom", "Capcom Sports Club (Europe 971017)",                                            MACHINE_SUPPORTS_SAVE )
+GAME( 1997, csclub1,    csclub,   cps2,     cps2_2p3b, cps2_state, init_cps2,     ROT0,   "Capcom", "Capcom Sports Club (Europe 970722)",                                            MACHINE_SUPPORTS_SAVE )
 GAME( 1997, cscluba,    csclub,   cps2,     cps2_2p3b, cps2_state, init_cps2,     ROT0,   "Capcom", "Capcom Sports Club (Asia 970722)",                                              MACHINE_SUPPORTS_SAVE )
 GAME( 1997, csclubj,    csclub,   cps2,     cps2_2p3b, cps2_state, init_cps2,     ROT0,   "Capcom", "Capcom Sports Club (Japan 970722)",                                             MACHINE_SUPPORTS_SAVE )
 GAME( 1997, csclubjy,   csclub,   cps2,     cps2_2p3b, cps2_state, init_cps2,     ROT0,   "Capcom", "Capcom Sports Club (Japan 970722, yellow case)",                                MACHINE_SUPPORTS_SAVE )
 GAME( 1997, csclubh,    csclub,   cps2,     cps2_2p3b, cps2_state, init_cps2,     ROT0,   "Capcom", "Capcom Sports Club (Hispanic 970722)",                                          MACHINE_SUPPORTS_SAVE )
-GAME( 1997, sgemf,      0,        cps2,     cps2_2p3b, cps2_state, init_cps2,     ROT0,   "Capcom", "Super Gem Fighter Mini Mix (USA 970904)",                                       MACHINE_SUPPORTS_SAVE )
+GAME( 1997, sgemf,      0,        cps2,     cps2_2p3b, cps2_state, init_cps2,     ROT0,   "Capcom", "Super Gem Fighter: Mini Mix (USA 970904)",                                      MACHINE_SUPPORTS_SAVE )
 GAME( 1997, pfghtj,     sgemf,    cps2,     cps2_2p3b, cps2_state, init_cps2,     ROT0,   "Capcom", "Pocket Fighter (Japan 970904)",                                                 MACHINE_SUPPORTS_SAVE )
 GAME( 1997, sgemfa,     sgemf,    cps2,     cps2_2p3b, cps2_state, init_cps2,     ROT0,   "Capcom", "Super Gem Fighter: Mini Mix (Asia 970904)",                                     MACHINE_SUPPORTS_SAVE )
 GAME( 1997, sgemfh,     sgemf,    cps2,     cps2_2p3b, cps2_state, init_cps2,     ROT0,   "Capcom", "Super Gem Fighter: Mini Mix (Hispanic 970904)",                                 MACHINE_SUPPORTS_SAVE )
 GAME( 1997, vhunt2,     0,        cps2,     cps2_2p6b, cps2_state, init_cps2,     ROT0,   "Capcom", "Vampire Hunter 2: Darkstalkers Revenge (Japan 970929)",                         MACHINE_SUPPORTS_SAVE )
 GAME( 1997, vhunt2r1,   vhunt2,   cps2,     cps2_2p6b, cps2_state, init_cps2,     ROT0,   "Capcom", "Vampire Hunter 2: Darkstalkers Revenge (Japan 970913)",                         MACHINE_SUPPORTS_SAVE )
 GAME( 1997, vsav2,      0,        cps2,     cps2_2p6b, cps2_state, init_cps2,     ROT0,   "Capcom", "Vampire Savior 2: The Lord of Vampire (Japan 970913)",                          MACHINE_SUPPORTS_SAVE )
-GAME( 1998, mvsc,       0,        cps2,     cps2_2p6b, cps2_state, init_cps2,     ROT0,   "Capcom", "Marvel Vs. Capcom: Clash of Super Heroes (Euro 980123)",                        MACHINE_SUPPORTS_SAVE )
-GAME( 1998, mvscr1,     mvsc,     cps2,     cps2_2p6b, cps2_state, init_cps2,     ROT0,   "Capcom", "Marvel Vs. Capcom: Clash of Super Heroes (Euro 980112)",                        MACHINE_SUPPORTS_SAVE )
+GAME( 1998, mvsc,       0,        cps2,     cps2_2p6b, cps2_state, init_cps2,     ROT0,   "Capcom", "Marvel Vs. Capcom: Clash of Super Heroes (Europe 980123)",                      MACHINE_SUPPORTS_SAVE )
+GAME( 1998, mvscr1,     mvsc,     cps2,     cps2_2p6b, cps2_state, init_cps2,     ROT0,   "Capcom", "Marvel Vs. Capcom: Clash of Super Heroes (Europe 980112)",                      MACHINE_SUPPORTS_SAVE )
 GAME( 1998, mvscu,      mvsc,     cps2,     cps2_2p6b, cps2_state, init_cps2,     ROT0,   "Capcom", "Marvel Vs. Capcom: Clash of Super Heroes (USA 980123)",                         MACHINE_SUPPORTS_SAVE )
 GAME( 1998, mvscur1,    mvsc,     cps2,     cps2_2p6b, cps2_state, init_cps2,     ROT0,   "Capcom", "Marvel Vs. Capcom: Clash of Super Heroes (USA 971222)",                         MACHINE_SUPPORTS_SAVE )
 GAME( 1998, mvscj,      mvsc,     cps2,     cps2_2p6b, cps2_state, init_cps2,     ROT0,   "Capcom", "Marvel Vs. Capcom: Clash of Super Heroes (Japan 980123)",                       MACHINE_SUPPORTS_SAVE )
@@ -12662,7 +12808,7 @@ GAME( 1998, mvsca,      mvsc,     cps2,     cps2_2p6b, cps2_state, init_cps2,   
 GAME( 1998, mvscar1,    mvsc,     cps2,     cps2_2p6b, cps2_state, init_cps2,     ROT0,   "Capcom", "Marvel Vs. Capcom: Clash of Super Heroes (Asia 980112)",                        MACHINE_SUPPORTS_SAVE )
 GAME( 1998, mvsch,      mvsc,     cps2,     cps2_2p6b, cps2_state, init_cps2,     ROT0,   "Capcom", "Marvel Vs. Capcom: Clash of Super Heroes (Hispanic 980123)",                    MACHINE_SUPPORTS_SAVE )
 GAME( 1998, mvscb,      mvsc,     cps2,     cps2_2p6b, cps2_state, init_cps2,     ROT0,   "Capcom", "Marvel Vs. Capcom: Clash of Super Heroes (Brazil 980123)",                      MACHINE_SUPPORTS_SAVE )
-GAME( 1998, sfa3,       0,        cps2,     cps2_2p6b, cps2_state, init_cps2,     ROT0,   "Capcom", "Street Fighter Alpha 3 (Euro 980904)",                                          MACHINE_SUPPORTS_SAVE )
+GAME( 1998, sfa3,       0,        cps2,     cps2_2p6b, cps2_state, init_cps2,     ROT0,   "Capcom", "Street Fighter Alpha 3 (Europe 980904)",                                        MACHINE_SUPPORTS_SAVE )
 GAME( 1998, sfa3u,      sfa3,     cps2,     cps2_2p6b, cps2_state, init_cps2,     ROT0,   "Capcom", "Street Fighter Alpha 3 (USA 980904)",                                           MACHINE_SUPPORTS_SAVE )
 GAME( 1998, sfa3ur1,    sfa3,     cps2,     cps2_2p6b, cps2_state, init_cps2,     ROT0,   "Capcom", "Street Fighter Alpha 3 (USA 980629)",                                           MACHINE_SUPPORTS_SAVE )
 GAME( 1998, sfa3us,     sfa3,     cps2,     cps2_2p6b, cps2_state, init_cps2,     ROT0,   "Capcom", "Street Fighter Alpha 3 (USA 980616, SAMPLE Version)",                           MACHINE_SUPPORTS_SAVE )
@@ -12678,7 +12824,8 @@ GAME( 1999, jyangoku,   0,        cps2,     cps2_1p2b, cps2_state, init_cps2,   
 GAME( 2004, hsf2,       0,        cps2,     cps2_2p6b, cps2_state, init_cps2,     ROT0,   "Capcom", "Hyper Street Fighter II: The Anniversary Edition (USA 040202)",                 MACHINE_SUPPORTS_SAVE )
 GAME( 2004, hsf2a,      hsf2,     cps2,     cps2_2p6b, cps2_state, init_cps2,     ROT0,   "Capcom", "Hyper Street Fighter II: The Anniversary Edition (Asia 040202)",                MACHINE_SUPPORTS_SAVE )
 GAME( 2004, hsf2j,      hsf2,     cps2,     cps2_2p6b, cps2_state, init_cps2,     ROT0,   "Capcom", "Hyper Street Fighter II: The Anniversary Edition (Japan 040202)",               MACHINE_SUPPORTS_SAVE )
-GAME( 2004, hsf2j1,     hsf2,     cps2,     cps2_2p6b, cps2_state, init_cps2,     ROT0,   "Capcom", "Hyper Street Fighter II: The Anniversary Edition (Japan 031222)",               MACHINE_SUPPORTS_SAVE )
+GAME( 2004, hsf2j1,     hsf2,     cps2,     cps2_2p6b, cps2_state, init_cps2,     ROT0,   "Capcom", "Hyper Street Fighter II: The Anniversary Edition (Japan 040123)",               MACHINE_SUPPORTS_SAVE )
+GAME( 2004, hsf2j2,     hsf2,     cps2,     cps2_2p6b, cps2_state, init_cps2,     ROT0,   "Capcom", "Hyper Street Fighter II: The Anniversary Edition (Japan 031222)",               MACHINE_SUPPORTS_SAVE )
 
 // Games released on CPS-2 hardware by Takumi
 
@@ -12693,22 +12840,22 @@ GAME( 2000, mmatrixj,   mmatrix,  cps2, cps2_2p1b, cps2_state, init_cps2,     RO
 
 // Games released on CPS-2 hardware by Mitchell
 
-GAME( 2000, mpang,      0,        cps2, cps2_2p1b, cps2_state, init_cps2,     ROT0,   "Mitchell (Capcom license)", "Mighty! Pang (Euro 001010)",           MACHINE_SUPPORTS_SAVE )
-GAME( 2000, mpangr1,    mpang,    cps2, cps2_2p1b, cps2_state, init_cps2,     ROT0,   "Mitchell (Capcom license)", "Mighty! Pang (Euro 000925)",           MACHINE_SUPPORTS_SAVE )
+GAME( 2000, mpang,      0,        cps2, cps2_2p1b, cps2_state, init_cps2,     ROT0,   "Mitchell (Capcom license)", "Mighty! Pang (Europe 001010)",         MACHINE_SUPPORTS_SAVE )
+GAME( 2000, mpangr1,    mpang,    cps2, cps2_2p1b, cps2_state, init_cps2,     ROT0,   "Mitchell (Capcom license)", "Mighty! Pang (Europe 000925)",         MACHINE_SUPPORTS_SAVE )
 GAME( 2000, mpangu,     mpang,    cps2, cps2_2p1b, cps2_state, init_cps2,     ROT0,   "Mitchell (Capcom license)", "Mighty! Pang (USA 001010)",            MACHINE_SUPPORTS_SAVE )
 GAME( 2000, mpangj,     mpang,    cps2, cps2_2p1b, cps2_state, init_cps2,     ROT0,   "Mitchell (Capcom license)", "Mighty! Pang (Japan 001011)",          MACHINE_SUPPORTS_SAVE )
 GAME( 2000, mpanga,     mpang,    cps2, cps2_2p1b, cps2_state, init_cps2,     ROT0,   "Mitchell (Capcom license)", "Mighty! Pang (Asia 001010)",           MACHINE_SUPPORTS_SAVE )
-GAME( 2001, pzloop2,    0,        cps2, pzloop2,   cps2_state, init_pzloop2,  ROT0,   "Mitchell (Capcom license)", "Puzz Loop 2 (Euro 010302)",            MACHINE_SUPPORTS_SAVE )
+GAME( 2001, pzloop2,    0,        cps2, pzloop2,   cps2_state, init_pzloop2,  ROT0,   "Mitchell (Capcom license)", "Puzz Loop 2 (Europe 010302)",          MACHINE_SUPPORTS_SAVE )
 GAME( 2001, pzloop2j,   pzloop2,  cps2, pzloop2,   cps2_state, init_pzloop2,  ROT0,   "Mitchell (Capcom license)", "Puzz Loop 2 (Japan 010226)",           MACHINE_SUPPORTS_SAVE )
 GAME( 2001, pzloop2jr1, pzloop2,  cps2, pzloop2,   cps2_state, init_pzloop2,  ROT0,   "Mitchell (Capcom license)", "Puzz Loop 2 (Japan 010205)",           MACHINE_SUPPORTS_SAVE )
 GAME( 2001, choko,      0,        cps2, choko,     cps2_state, init_cps2,     ROT0,   "Mitchell (Capcom license)", "Janpai Puzzle Choukou (Japan 010820)", MACHINE_SUPPORTS_SAVE )
 
 // Games released on CPS-2 hardware by Eighting/Raizing
 
-GAME( 2000, dimahoo,    0,        cps2, cps2_2p3b, cps2_state, init_cps2,     ROT270, "Eighting / Raizing (Capcom license)", "Dimahoo (Euro 000121)",                 MACHINE_SUPPORTS_SAVE )
+GAME( 2000, dimahoo,    0,        cps2, cps2_2p3b, cps2_state, init_cps2,     ROT270, "Eighting / Raizing (Capcom license)", "Dimahoo (Europe 000121)",               MACHINE_SUPPORTS_SAVE )
 GAME( 2000, dimahoou,   dimahoo,  cps2, cps2_2p3b, cps2_state, init_cps2,     ROT270, "Eighting / Raizing (Capcom license)", "Dimahoo (USA 000121)",                  MACHINE_SUPPORTS_SAVE )
 GAME( 2000, gmahou,     dimahoo,  cps2, cps2_2p3b, cps2_state, init_cps2,     ROT270, "Eighting / Raizing (Capcom license)", "Great Mahou Daisakusen (Japan 000121)", MACHINE_SUPPORTS_SAVE )
-GAME( 2000, 1944,       0,        cps2, cps2_2p2b, cps2_state, init_cps2,     ROT0,   "Eighting / Raizing (Capcom license)", "1944: The Loop Master (Euro 000620)",   MACHINE_SUPPORTS_SAVE )
+GAME( 2000, 1944,       0,        cps2, cps2_2p2b, cps2_state, init_cps2,     ROT0,   "Eighting / Raizing (Capcom license)", "1944: The Loop Master (Europe 000620)", MACHINE_SUPPORTS_SAVE )
 GAME( 2000, 1944j,      1944,     cps2, cps2_2p2b, cps2_state, init_cps2,     ROT0,   "Eighting / Raizing (Capcom license)", "1944: The Loop Master (Japan 000620)",  MACHINE_SUPPORTS_SAVE )
 GAME( 2000, 1944u,      1944,     cps2, cps2_2p2b, cps2_state, init_cps2,     ROT0,   "Eighting / Raizing (Capcom license)", "1944: The Loop Master (USA 000620)",    MACHINE_SUPPORTS_SAVE )
 
@@ -12721,22 +12868,22 @@ GAME( 2001, progeara,   progear,  cps2, cps2_2p3b, cps2_state, init_cps2,     RO
 
 // Phoenix bootleg sets
 
-GAME( 1993, ddtodd,     ddtod,    dead_cps2,     cps2_4p4b, cps2_state, init_cps2,     ROT0,   "bootleg", "Dungeons & Dragons: Tower of Doom (Euro 940412 Phoenix Edition) (bootleg)",                  MACHINE_SUPPORTS_SAVE )
+GAME( 1993, ddtodd,     ddtod,    dead_cps2,     cps2_4p4b, cps2_state, init_cps2,     ROT0,   "bootleg", "Dungeons & Dragons: Tower of Doom (Europe 940412 Phoenix Edition) (bootleg)",                MACHINE_SUPPORTS_SAVE )
 GAME( 1993, ecofghtrd,  ecofghtr, dead_cps2,     ecofghtr,  cps2_state, init_ecofghtr, ROT0,   "bootleg", "Eco Fighters (World 931203 Phoenix Edition) (bootleg)",                                      MACHINE_SUPPORTS_SAVE )
 GAME( 1993, ssf2ud,     ssf2,     dead_cps2,     cps2_2p6b, cps2_state, init_cps2,     ROT0,   "bootleg", "Super Street Fighter II: The New Challengers (USA 930911 Phoenix Edition) (bootleg)",        MACHINE_SUPPORTS_SAVE )
 GAME( 1993, ssf2tbd,    ssf2,     dead_cps2comm, cps2_2p6b, cps2_state, init_cps2,     ROT0,   "bootleg", "Super Street Fighter II: The Tournament Battle (World 931119 Phoenix Edition) (bootleg)",    MACHINE_SUPPORTS_SAVE )
-GAME( 1994, armwar1d,   armwar,   dead_cps2,     cps2_3p3b, cps2_state, init_cps2,     ROT0,   "bootleg", "Armored Warriors (Euro 941011 Phoenix Edition) (bootleg)",                                   MACHINE_SUPPORTS_SAVE )
-GAME( 1994, avspd,      avsp,     dead_cps2,     cps2_3p3b, cps2_state, init_cps2,     ROT0,   "bootleg", "Alien vs. Predator (Euro 940520 Phoenix Edition) (bootleg)",                                 MACHINE_SUPPORTS_SAVE )
+GAME( 1994, armwar1d,   armwar,   dead_cps2,     cps2_3p3b, cps2_state, init_cps2,     ROT0,   "bootleg", "Armored Warriors (Europe 941011 Phoenix Edition) (bootleg)",                                 MACHINE_SUPPORTS_SAVE )
+GAME( 1994, avspd,      avsp,     dead_cps2,     cps2_3p3b, cps2_state, init_cps2,     ROT0,   "bootleg", "Alien vs. Predator (Europe 940520 Phoenix Edition) (bootleg)",                               MACHINE_SUPPORTS_SAVE )
 GAME( 1994, dstlku1d,   dstlk,    dead_cps2,     cps2_2p6b, cps2_state, init_cps2,     ROT0,   "bootleg", "Darkstalkers: The Night Warriors (USA 940705 Phoenix Edition) (bootleg)",                    MACHINE_SUPPORTS_SAVE )
-GAME( 1994, ringdstd,   ringdest, dead_cps2,     cps2_2p6b, cps2_state, init_cps2,     ROT0,   "bootleg", "Ring of Destruction: Slammasters II (Euro 940902 Phoenix Edition) (bootleg)",                MACHINE_SUPPORTS_SAVE )
+GAME( 1994, ringdstd,   ringdest, dead_cps2,     cps2_2p6b, cps2_state, init_cps2,     ROT0,   "bootleg", "Ring of Destruction: Slammasters II (Europe 940902 Phoenix Edition) (bootleg)",              MACHINE_SUPPORTS_SAVE )
 GAME( 1994, ssf2tad,    ssf2t,    dead_cps2,     cps2_2p6b, cps2_state, init_cps2,     ROT0,   "bootleg", "Super Street Fighter II Turbo (Asia 940223 Phoenix Edition) (bootleg)",                      MACHINE_SUPPORTS_SAVE )
 GAME( 1994, ssf2xjr1d,  ssf2t,    dead_cps2,     cps2_2p6b, cps2_state, init_cps2,     ROT0,   "bootleg", "Super Street Fighter II X: Grand Master Challenge (Japan 940223 Phoenix Edition) (bootleg)", MACHINE_SUPPORTS_SAVE )
-GAME( 1994, xmcotar1d,  xmcota,   dead_cps2,     cps2_2p6b, cps2_state, init_cps2,     ROT0,   "bootleg", "X-Men: Children of the Atom (Euro 950105 Phoenix Edition) (bootleg)",                        MACHINE_SUPPORTS_SAVE )
-GAME( 1995, mshud,      msh,      dead_cps2,     cps2_2p6b, cps2_state, init_cps2,     ROT0,   "bootleg", "Marvel Super Heroes (US 951024 Phoenix Edition) (bootleg)",                                  MACHINE_SUPPORTS_SAVE )
+GAME( 1994, xmcotar1d,  xmcota,   dead_cps2,     cps2_2p6b, cps2_state, init_cps2,     ROT0,   "bootleg", "X-Men: Children of the Atom (Europe 950105 Phoenix Edition) (bootleg)",                      MACHINE_SUPPORTS_SAVE )
+GAME( 1995, mshud,      msh,      dead_cps2,     cps2_2p6b, cps2_state, init_cps2,     ROT0,   "bootleg", "Marvel Super Heroes (USA 951024 Phoenix Edition) (bootleg)",                                 MACHINE_SUPPORTS_SAVE )
 GAME( 1995, cybotsud,   cybots,   dead_cps2,     cybots,    cps2_state, init_cps2,     ROT0,   "bootleg", "Cyberbots: Fullmetal Madness (USA 950424 Phoenix Edition) (bootleg)",                        MACHINE_SUPPORTS_SAVE )
 GAME( 1995, cybotsjd,   cybots,   dead_cps2,     cybots,    cps2_state, init_cps2,     ROT0,   "bootleg", "Cyberbots: Fullmetal Madness (Japan 950424) (decrypted bootleg)",                            MACHINE_SUPPORTS_SAVE )
 GAME( 1995, nwarrud,    nwarr,    dead_cps2,     cps2_2p6b, cps2_state, init_cps2,     ROT0,   "bootleg", "Night Warriors: Darkstalkers' Revenge (USA 950406 Phoenix Edition) (bootleg)",               MACHINE_SUPPORTS_SAVE )
-GAME( 1995, sfad,       sfa,      dead_cps2,     cps2_2p6b, cps2_state, init_cps2,     ROT0,   "bootleg", "Street Fighter Alpha: Warriors' Dreams (Euro 950727 Phoenix Edition) (bootleg)",             MACHINE_SUPPORTS_SAVE )
+GAME( 1995, sfad,       sfa,      dead_cps2,     cps2_2p6b, cps2_state, init_cps2,     ROT0,   "bootleg", "Street Fighter Alpha: Warriors' Dreams (Europe 950727 Phoenix Edition) (bootleg)",           MACHINE_SUPPORTS_SAVE )
 GAME( 1996, 19xxd,      19xx,     dead_cps2,     cps2_2p2b, cps2_state, init_cps2,     ROT270, "bootleg", "19XX: The War Against Destiny (USA 951207 Phoenix Edition) (bootleg)",                       MACHINE_SUPPORTS_SAVE )
 GAME( 1996, ddsomud,    ddsom,    dead_cps2,     cps2_4p4b, cps2_state, init_cps2,     ROT0,   "bootleg", "Dungeons & Dragons: Shadow over Mystara (USA 960619 Phoenix Edition) (bootleg)",             MACHINE_SUPPORTS_SAVE )
 GAME( 1996, gigaman2,   megaman2, gigaman2,      cps2_2p3b, cps2_state, init_gigaman2, ROT0,   "bootleg", "Giga Man 2: The Power Fighters (bootleg of Mega Man 2: The Power Fighters)",                 MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE ) // Different layer offsets and sound system
@@ -12747,11 +12894,11 @@ GAME( 1996, spf2td,     spf2t,    dead_cps2,     cps2_2p2b, cps2_state, init_cps
 GAME( 1996, spf2xjd,    spf2t,    dead_cps2,     cps2_2p2b, cps2_state, init_cps2,     ROT0,   "bootleg", "Super Puzzle Fighter II X (Japan 960531 Phoenix Edition) (bootleg)",                         MACHINE_SUPPORTS_SAVE )
 GAME( 1996, sfz2ald,    sfz2al,   dead_cps2,     cps2_2p6b, cps2_state, init_cps2,     ROT0,   "bootleg", "Street Fighter Zero 2 Alpha (Asia 960826 Phoenix Edition) (bootleg)",                        MACHINE_SUPPORTS_SAVE )
 GAME( 1996, xmvsfu1d,   xmvsf,    dead_cps2,     cps2_2p6b, cps2_state, init_cps2,     ROT0,   "bootleg", "X-Men Vs. Street Fighter (USA 961004 Phoenix Edition) (bootleg)",                            MACHINE_SUPPORTS_SAVE )
-GAME( 1997, batcird,    batcir,   dead_cps2,     cps2_4p2b, cps2_state, init_cps2,     ROT0,   "bootleg", "Battle Circuit (Euro 970319 Phoenix Edition) (bootleg)",                                     MACHINE_SUPPORTS_SAVE )
-GAME( 1997, csclub1d,   csclub,   dead_cps2,     cps2_2p3b, cps2_state, init_cps2,     ROT0,   "bootleg", "Capcom Sports Club (Euro 970722 Phoenix Edition) (bootleg)",                                 MACHINE_SUPPORTS_SAVE )
+GAME( 1997, batcird,    batcir,   dead_cps2,     cps2_4p2b, cps2_state, init_cps2,     ROT0,   "bootleg", "Battle Circuit (Europe 970319 Phoenix Edition) (bootleg)",                                   MACHINE_SUPPORTS_SAVE )
+GAME( 1997, csclub1d,   csclub,   dead_cps2,     cps2_2p3b, cps2_state, init_cps2,     ROT0,   "bootleg", "Capcom Sports Club (Europe 970722 Phoenix Edition) (bootleg)",                               MACHINE_SUPPORTS_SAVE )
 GAME( 1997, mshvsfu1d,  mshvsf,   dead_cps2,     cps2_2p6b, cps2_state, init_cps2,     ROT0,   "bootleg", "Marvel Super Heroes Vs. Street Fighter (USA 970625 Phoenix Edition) (bootleg)",              MACHINE_SUPPORTS_SAVE )
-GAME( 1997, sgemfd,     sgemf,    dead_cps2,     cps2_2p3b, cps2_state, init_cps2,     ROT0,   "bootleg", "Super Gem Fighter Mini Mix (USA 970904 Phoenix Edition) (bootleg)",                          MACHINE_SUPPORTS_SAVE )
-GAME( 1997, vsavd,      vsav,     dead_cps2,     cps2_2p6b, cps2_state, init_cps2,     ROT0,   "bootleg", "Vampire Savior: The Lord of Vampire (Euro 970519 Phoenix Edition) (bootleg)",                MACHINE_SUPPORTS_SAVE )
+GAME( 1997, sgemfd,     sgemf,    dead_cps2,     cps2_2p3b, cps2_state, init_cps2,     ROT0,   "bootleg", "Super Gem Fighter: Mini Mix (USA 970904 Phoenix Edition) (bootleg)",                         MACHINE_SUPPORTS_SAVE )
+GAME( 1997, vsavd,      vsav,     dead_cps2,     cps2_2p6b, cps2_state, init_cps2,     ROT0,   "bootleg", "Vampire Savior: The Lord of Vampire (Europe 970519 Phoenix Edition) (bootleg)",              MACHINE_SUPPORTS_SAVE )
 GAME( 1997, vhunt2d,    vhunt2,   dead_cps2,     cps2_2p6b, cps2_state, init_cps2,     ROT0,   "bootleg", "Vampire Hunter 2: Darkstalkers Revenge (Japan 970913 Phoenix Edition) (bootleg)",            MACHINE_SUPPORTS_SAVE )
 GAME( 1997, vsav2d,     vsav2,    dead_cps2,     cps2_2p6b, cps2_state, init_cps2,     ROT0,   "bootleg", "Vampire Savior 2: The Lord of Vampire (Japan 970913 Phoenix Edition) (bootleg)",             MACHINE_SUPPORTS_SAVE )
 GAME( 1998, mvscud,     mvsc,     dead_cps2,     cps2_2p6b, cps2_state, init_cps2,     ROT0,   "bootleg", "Marvel Vs. Capcom: Clash of Super Heroes (USA 980123 Phoenix Edition) (bootleg)",            MACHINE_SUPPORTS_SAVE )

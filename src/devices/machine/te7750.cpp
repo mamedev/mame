@@ -170,7 +170,7 @@
 **********************************************************************/
 
 #include "emu.h"
-#include "machine/te7750.h"
+#include "te7750.h"
 
 //**************************************************************************
 //  GLOBAL VARIABLES
@@ -190,9 +190,9 @@ DEFINE_DEVICE_TYPE(TE7752, te7752_device, "te7752", "TE7752 Super I/O Expander")
 
 te7750_device::te7750_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, type, tag, owner, clock)
-	, m_input_cb(*this)
+	, m_input_cb(*this, 0xff)
 	, m_output_cb(*this)
-	, m_ios_cb(*this)
+	, m_ios_cb(*this, 0) // assume soft mode unless specified
 {
 	std::fill(std::begin(m_data_dir), std::end(m_data_dir), 0xff);
 }
@@ -226,13 +226,6 @@ te7752_device::te7752_device(const machine_config &mconfig, const char *tag, dev
 
 void te7750_device::device_start()
 {
-	// resolve port callbacks
-	m_input_cb.resolve_all_safe(0xff);
-	m_output_cb.resolve_all_safe();
-
-	// resolve IOS (assume soft mode unless specified)
-	m_ios_cb.resolve_safe(0);
-
 	// save state
 	save_item(NAME(m_data_latch));
 	save_item(NAME(m_data_dir));

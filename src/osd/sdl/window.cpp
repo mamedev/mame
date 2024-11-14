@@ -8,41 +8,37 @@
 //
 //============================================================
 
-#ifdef SDLMAME_WIN32
-#include <windows.h>
-#endif
-
-// standard SDL headers
-#include <SDL2/SDL.h>
-#include <SDL2/SDL_syswm.h>
-
-// standard C headers
-#include <cmath>
-#ifndef _MSC_VER
-#include <unistd.h>
-#endif
-#include <list>
-#include <memory>
-
 // MAME headers
-
 #include "emu.h"
 #include "emuopts.h"
 #include "render.h"
 #include "screen.h"
+#include "uiinput.h"
 #include "ui/uimain.h"
 
 // OSD headers
-
-#include "window.h"
-#include "osdsdl.h"
-#include "modules/render/drawbgfx.h"
-#include "modules/render/drawsdl.h"
-#include "modules/render/draw13.h"
 #include "modules/monitor/monitor_common.h"
-#if (USE_OPENGL)
-#include "modules/render/drawogl.h"
+#include "osdsdl.h"
+#include "window.h"
+
+// standard SDL headers
+#include <SDL2/SDL_syswm.h>
+
+// standard C headers
+#include <algorithm>
+#include <cassert>
+#include <cmath>
+#include <list>
+#include <memory>
+
+#ifndef _MSC_VER
+#include <unistd.h>
 #endif
+
+#ifdef SDLMAME_WIN32
+#include <windows.h>
+#endif
+
 
 //============================================================
 //  PARAMETERS
@@ -68,19 +64,6 @@
 
 #define SDL_VERSION_EQUALS(v1, vnum2) (SDL_VERSIONNUM(v1.major, v1.minor, v1.patch) == vnum2)
 
-class SDL_DM_Wrapper
-{
-public:
-	SDL_DisplayMode mode;
-};
-
-// debugger
-//static int in_background;
-
-
-//============================================================
-//  PROTOTYPES
-//============================================================
 
 
 //============================================================
@@ -92,60 +75,10 @@ bool sdl_osd_interface::window_init()
 {
 	osd_printf_verbose("Enter sdlwindow_init\n");
 
-	// initialize the renderer
-	const int fallbacks[VIDEO_MODE_COUNT] = {
-		-1,                     // NONE -> no fallback
-		-1,                     // No GDI on Linux
-#if defined(USE_OPENGL) && USE_OPENGL
-		VIDEO_MODE_OPENGL,      // BGFX -> OpenGL
-		-1,                     // OpenGL -> no fallback
-#else
-		VIDEO_MODE_SDL2ACCEL,   // BGFX -> SDL2Accel
-#endif
-		-1,                     // SDL2ACCEL -> no fallback
-		-1,                     // No D3D on Linux
-		-1,                     // SOFT -> no fallback
-	};
-
-	int current_mode = video_config.mode;
-	while (current_mode != VIDEO_MODE_NONE)
-	{
-		bool error = false;
-		switch(current_mode)
-		{
-			case VIDEO_MODE_BGFX:
-				error = renderer_bgfx::init(machine());
-				break;
-#if defined(USE_OPENGL) && USE_OPENGL
-			case VIDEO_MODE_OPENGL:
-				renderer_ogl::init(machine());
-				break;
-#endif
-			case VIDEO_MODE_SDL2ACCEL:
-				renderer_sdl2::init(machine());
-				break;
-			case VIDEO_MODE_SOFT:
-				renderer_sdl1::init(machine());
-				break;
-			default:
-				fatalerror("Unknown video mode.");
-				break;
-		}
-		if (error)
-		{
-			current_mode = fallbacks[current_mode];
-		}
-		else
-		{
-			break;
-		}
-	}
-	video_config.mode = current_mode;
-
-	/* We may want to set a number of the hints SDL2 provides.
-	 * The code below will document which hints were set.
-	 */
-	const char * hints[] = { SDL_HINT_FRAMEBUFFER_ACCELERATION,
+	// We may want to set a number of the hints SDL2 provides.
+	// The code below will document which hints were set.
+	char const *const hints[] = {
+			SDL_HINT_FRAMEBUFFER_ACCELERATION,
 			SDL_HINT_RENDER_DRIVER, SDL_HINT_RENDER_OPENGL_SHADERS,
 			SDL_HINT_RENDER_SCALE_QUALITY,
 			SDL_HINT_RENDER_VSYNC,
@@ -156,25 +89,20 @@ bool sdl_osd_interface::window_init()
 			SDL_HINT_XINPUT_ENABLED, SDL_HINT_GAMECONTROLLERCONFIG,
 			SDL_HINT_JOYSTICK_ALLOW_BACKGROUND_EVENTS, SDL_HINT_ALLOW_TOPMOST,
 			SDL_HINT_TIMER_RESOLUTION,
-#if SDL_VERSION_ATLEAST(2, 0, 2)
 			SDL_HINT_RENDER_DIRECT3D_THREADSAFE, SDL_HINT_VIDEO_ALLOW_SCREENSAVER,
 			SDL_HINT_ACCELEROMETER_AS_JOYSTICK, SDL_HINT_MAC_CTRL_CLICK_EMULATE_RIGHT_CLICK,
 			SDL_HINT_VIDEO_WIN_D3DCOMPILER, SDL_HINT_VIDEO_WINDOW_SHARE_PIXEL_FORMAT,
 			SDL_HINT_VIDEO_MAC_FULLSCREEN_SPACES, SDL_HINT_MOUSE_RELATIVE_MODE_WARP,
-#endif
-#if SDL_VERSION_ATLEAST(2, 0, 3)
 			SDL_HINT_RENDER_DIRECT3D11_DEBUG, SDL_HINT_VIDEO_HIGHDPI_DISABLED,
 			SDL_HINT_WINRT_PRIVACY_POLICY_URL, SDL_HINT_WINRT_PRIVACY_POLICY_LABEL,
 			SDL_HINT_WINRT_HANDLE_BACK_BUTTON,
-#endif
-			nullptr
-	};
+			};
 
 	osd_printf_verbose("\nHints:\n");
-	for (int i = 0; hints[i] != nullptr; i++)
+	for (auto const hintname : hints)
 	{
-		char const *const hint(SDL_GetHint(hints[i]));
-		osd_printf_verbose("\t%-40s %s\n", hints[i], hint ? hint : "(NULL)");
+		char const *const hintvalue(SDL_GetHint(hintname));
+		osd_printf_verbose("\t%-40s %s\n", hintname, hintvalue ? hintvalue : "(NULL)");
 	}
 
 	// set up the window list
@@ -182,30 +110,6 @@ bool sdl_osd_interface::window_init()
 	return true;
 }
 
-
-void sdl_osd_interface::update_slider_list()
-{
-	for (auto window : osd_common_t::s_window_list)
-	{
-		// check if any window has dirty sliders
-		if (window->renderer().sliders_dirty())
-		{
-			build_slider_list();
-			return;
-		}
-	}
-}
-
-void sdl_osd_interface::build_slider_list()
-{
-	m_sliders.clear();
-
-	for (auto window : osd_common_t::s_window_list)
-	{
-		std::vector<ui::menu_item> window_sliders = window->renderer().get_slider_list();
-		m_sliders.insert(m_sliders.end(), window_sliders.begin(), window_sliders.end());
-	}
-}
 
 //============================================================
 //  sdlwindow_exit
@@ -217,33 +121,14 @@ void sdl_osd_interface::window_exit()
 	osd_printf_verbose("Enter sdlwindow_exit\n");
 
 	// free all the windows
+	m_focus_window = nullptr;
 	while (!osd_common_t::s_window_list.empty())
 	{
-		auto window = osd_common_t::s_window_list.front();
-
-		// Part of destroy removes the window from the list
+		auto window = std::move(osd_common_t::s_window_list.back());
+		s_window_list.pop_back();
 		window->destroy();
 	}
 
-	switch (video_config.mode)
-	{
-		case VIDEO_MODE_SDL2ACCEL:
-			renderer_sdl1::exit();
-			break;
-		case VIDEO_MODE_SOFT:
-			renderer_sdl1::exit();
-			break;
-		case VIDEO_MODE_BGFX:
-			renderer_bgfx::exit();
-			break;
-#if (USE_OPENGL)
-		case VIDEO_MODE_OPENGL:
-			renderer_ogl::exit();
-			break;
-#endif
-		default:
-			break;
-	}
 	osd_printf_verbose("Leave sdlwindow_exit\n");
 }
 
@@ -328,8 +213,6 @@ void sdl_window_info::toggle_full_screen()
 		m_windowed_dim = get_size();
 	}
 
-	// reset UI to main menu
-	machine().ui().menu_reset();
 	// kill off the drawers
 	renderer_reset();
 	bool is_osx = false;
@@ -339,16 +222,13 @@ void sdl_window_info::toggle_full_screen()
 #endif
 	if (fullscreen() && (video_config.switchres || is_osx))
 	{
-		SDL_SetWindowFullscreen(platform_window(), 0);    // Try to set mode
-		SDL_SetWindowDisplayMode(platform_window(), &m_original_mode->mode);    // Try to set mode
-		SDL_SetWindowFullscreen(platform_window(), SDL_WINDOW_FULLSCREEN);    // Try to set mode
+		SDL_SetWindowFullscreen(platform_window(), 0);
+		SDL_SetWindowDisplayMode(platform_window(), &m_original_mode);
+		SDL_SetWindowFullscreen(platform_window(), SDL_WINDOW_FULLSCREEN);
 	}
 	SDL_DestroyWindow(platform_window());
 	set_platform_window(nullptr);
-
 	downcast<sdl_osd_interface &>(machine().osd()).release_keys();
-
-	set_renderer(osd_renderer::make_for_type(video_config.mode, shared_from_this()));
 
 	// toggle the window mode
 	set_fullscreen(!fullscreen());
@@ -360,7 +240,7 @@ void sdl_window_info::modify_prescale(int dir)
 {
 	int new_prescale = prescale();
 
-	if (dir > 0 && prescale() < 3)
+	if (dir > 0 && prescale() < 20)
 		new_prescale = prescale() + 1;
 	if (dir < 0 && prescale() > 1)
 		new_prescale = prescale() - 1;
@@ -377,11 +257,11 @@ void sdl_window_info::modify_prescale(int dir)
 		}
 		else
 		{
-			notify_changed();
 			m_prescale = new_prescale;
+			notify_changed();
 		}
-		machine().ui().popup_time(1, "Prescale %d", prescale());
 	}
+	machine().ui().popup_time(1, "Prescale %d", prescale());
 }
 
 //============================================================
@@ -428,6 +308,293 @@ int sdl_window_info::xy_to_render_target(int x, int y, int *xt, int *yt)
 	return renderer().xy_to_render_target(x, y, xt, yt);
 }
 
+void sdl_window_info::mouse_entered(unsigned device)
+{
+	m_mouse_inside = true;
+}
+
+void sdl_window_info::mouse_left(unsigned device)
+{
+	m_mouse_inside = false;
+
+	auto info(std::lower_bound(m_active_pointers.begin(), m_active_pointers.end(), SDL_FingerID(-1), &sdl_pointer_info::compare));
+	if ((m_active_pointers.end() == info) || (info->finger != SDL_FingerID(-1)))
+		return;
+
+	// leaving implicitly releases buttons, so check hold/drag if necessary
+	if (BIT(info->buttons, 0))
+	{
+		assert(0 <= info->clickcnt);
+
+		auto const now(std::chrono::steady_clock::now());
+		auto const exp(std::chrono::milliseconds(250) + info->pressed);
+		int const dx(info->x - info->pressedx);
+		int const dy(info->y - info->pressedy);
+		int const distance((dx * dx) + (dy * dy));
+		if ((exp < now) || (CLICK_DISTANCE < distance))
+			info->clickcnt = -info->clickcnt;
+	}
+
+	// push to UI manager
+	machine().ui_input().push_pointer_leave(
+			target(),
+			osd::ui_event_handler::pointer::MOUSE,
+			info->index,
+			device,
+			info->x, info->y,
+			info->buttons, info->clickcnt);
+
+	// dump pointer data
+	m_pointer_mask &= ~(decltype(m_pointer_mask)(1) << info->index);
+	if (info->index < m_next_pointer)
+		m_next_pointer = info->index;
+	m_active_pointers.erase(info);
+}
+
+void sdl_window_info::mouse_down(unsigned device, int x, int y, unsigned button)
+{
+	if (!m_mouse_inside)
+		return;
+
+	auto const info(map_pointer(SDL_FingerID(-1), device));
+	if (m_active_pointers.end() == info)
+		return;
+
+	if ((x == info->x) && (y == info->y) && BIT(info->buttons, button))
+		return;
+
+	// detect multi-click actions
+	if (0 == button)
+	{
+		info->primary_down(
+				x,
+				y,
+				std::chrono::milliseconds(250),
+				CLICK_DISTANCE,
+				false,
+				m_ptrdev_info);
+	}
+
+	// update info and push to UI manager
+	auto const pressed(decltype(info->buttons)(1) << button);
+	info->x = x;
+	info->y = y;
+	info->buttons |= pressed;
+	machine().ui_input().push_pointer_update(
+			target(),
+			osd::ui_event_handler::pointer::MOUSE,
+			info->index,
+			device,
+			x, y,
+			info->buttons, pressed, 0, info->clickcnt);
+}
+
+void sdl_window_info::mouse_up(unsigned device, int x, int y, unsigned button)
+{
+	if (!m_mouse_inside)
+		return;
+
+	auto const info(map_pointer(SDL_FingerID(-1), device));
+	if (m_active_pointers.end() == info)
+		return;
+
+	if ((x == info->x) && (y == info->y) && !BIT(info->buttons, button))
+		return;
+
+	// detect multi-click actions
+	if (0 == button)
+	{
+		info->check_primary_hold_drag(
+				x,
+				y,
+				std::chrono::milliseconds(250),
+				CLICK_DISTANCE);
+	}
+
+	// update info and push to UI manager
+	auto const released(decltype(info->buttons)(1) << button);
+	info->x = x;
+	info->y = y;
+	info->buttons &= ~released;
+	machine().ui_input().push_pointer_update(
+			target(),
+			osd::ui_event_handler::pointer::MOUSE,
+			info->index,
+			device,
+			x, y,
+			info->buttons, 0, released, info->clickcnt);
+}
+
+void sdl_window_info::mouse_moved(unsigned device, int x, int y)
+{
+	if (!m_mouse_inside)
+		return;
+
+	auto const info(map_pointer(SDL_FingerID(-1), device));
+	if (m_active_pointers.end() == info)
+		return;
+
+	// detect multi-click actions
+	if (BIT(info->buttons, 0))
+	{
+		info->check_primary_hold_drag(
+				x,
+				y,
+				std::chrono::milliseconds(250),
+				CLICK_DISTANCE);
+	}
+
+	// update info and push to UI manager
+	info->x = x;
+	info->y = y;
+	machine().ui_input().push_pointer_update(
+			target(),
+			osd::ui_event_handler::pointer::MOUSE,
+			info->index,
+			device,
+			x, y,
+			info->buttons, 0, 0, info->clickcnt);
+}
+
+void sdl_window_info::mouse_wheel(unsigned device, int y)
+{
+	if (!m_mouse_inside)
+		return;
+
+	auto const info(map_pointer(SDL_FingerID(-1), device));
+	if (m_active_pointers.end() == info)
+		return;
+
+	// push to UI manager
+	machine().ui_input().push_mouse_wheel_event(target(), info->x, info->y, y, 3);
+}
+
+void sdl_window_info::finger_down(SDL_FingerID finger, unsigned device, int x, int y)
+{
+	auto const info(map_pointer(finger, device));
+	if (m_active_pointers.end() == info)
+		return;
+
+	assert(!info->buttons);
+
+	// detect multi-click actions
+	info->primary_down(
+			x,
+			y,
+			std::chrono::milliseconds(250),
+			TAP_DISTANCE,
+			true,
+			m_ptrdev_info);
+
+	// update info and push to UI manager
+	info->x = x;
+	info->y = y;
+	info->buttons = 1;
+	machine().ui_input().push_pointer_update(
+			target(),
+			osd::ui_event_handler::pointer::TOUCH,
+			info->index,
+			device,
+			x, y,
+			1, 1, 0, info->clickcnt);
+}
+
+void sdl_window_info::finger_up(SDL_FingerID finger, unsigned device, int x, int y)
+{
+	auto info(std::lower_bound(m_active_pointers.begin(), m_active_pointers.end(), finger, &sdl_pointer_info::compare));
+	if ((m_active_pointers.end() == info) || (info->finger != finger))
+		return;
+
+	assert(1 == info->buttons);
+
+	// check for conversion to a (multi-)click-and-hold/drag
+	info->check_primary_hold_drag(
+			x,
+			y,
+			std::chrono::milliseconds(250),
+			TAP_DISTANCE);
+
+	// need to remember touches to recognise multi-tap gestures
+	if (0 < info->clickcnt)
+	{
+		auto const now(std::chrono::steady_clock::now());
+		auto const time = std::chrono::milliseconds(250);
+		if ((time + info->pressed) >= now)
+		{
+			try
+			{
+				unsigned i(0);
+				if (m_ptrdev_info.size() > device)
+					i = m_ptrdev_info[device].clear_expired_touches(now, time);
+				else
+					m_ptrdev_info.resize(device + 1);
+
+				if (std::size(m_ptrdev_info[device].touches) > i)
+				{
+					m_ptrdev_info[device].touches[i].when = info->pressed;
+					m_ptrdev_info[device].touches[i].x = info->pressedx;
+					m_ptrdev_info[device].touches[i].y = info->pressedy;
+					m_ptrdev_info[device].touches[i].cnt = info->clickcnt;
+				}
+			}
+			catch (std::bad_alloc const &)
+			{
+				osd_printf_error("win_window_info: error allocating pointer data\n");
+			}
+		}
+	}
+
+	// push to UI manager
+	machine().ui_input().push_pointer_update(
+			target(),
+			osd::ui_event_handler::pointer::TOUCH,
+			info->index,
+			device,
+			x, y,
+			0, 0, 1, info->clickcnt);
+	machine().ui_input().push_pointer_leave(
+			target(),
+			osd::ui_event_handler::pointer::TOUCH,
+			info->index,
+			device,
+			x, y,
+			0, info->clickcnt);
+
+	// dump pointer data
+	m_pointer_mask &= ~(decltype(m_pointer_mask)(1) << info->index);
+	if (info->index < m_next_pointer)
+		m_next_pointer = info->index;
+	m_active_pointers.erase(info);
+}
+
+void sdl_window_info::finger_moved(SDL_FingerID finger, unsigned device, int x, int y)
+{
+	auto info(std::lower_bound(m_active_pointers.begin(), m_active_pointers.end(), finger, &sdl_pointer_info::compare));
+	if ((m_active_pointers.end() == info) || (info->finger != finger))
+
+	assert(1 == info->buttons);
+
+	if ((x != info->x) || (y != info->y))
+	{
+		info->check_primary_hold_drag(
+				x,
+				y,
+				std::chrono::milliseconds(250),
+				TAP_DISTANCE);
+
+		// update info and push to UI manager
+		info->x = x;
+		info->y = y;
+		machine().ui_input().push_pointer_update(
+				target(),
+				osd::ui_event_handler::pointer::TOUCH,
+				info->index,
+				device,
+				x, y,
+				1, 0, 0, info->clickcnt);
+	}
+}
+
 //============================================================
 //  sdlwindow_video_window_create
 //  (main thread)
@@ -440,8 +607,6 @@ int sdl_window_info::window_init()
 	m_startmaximized = downcast<sdl_options &>(machine().options()).maximize();
 
 	create_target();
-
-	set_renderer(osd_renderer::make_for_type(video_config.mode, static_cast<osd_window*>(this)->shared_from_this()));
 
 	int result = complete_create();
 
@@ -469,13 +634,14 @@ void sdl_window_info::complete_destroy()
 
 	if (fullscreen() && video_config.switchres)
 	{
-		SDL_SetWindowFullscreen(platform_window(), 0);    // Try to set mode
-		SDL_SetWindowDisplayMode(platform_window(), &m_original_mode->mode);    // Try to set mode
-		SDL_SetWindowFullscreen(platform_window(), SDL_WINDOW_FULLSCREEN);    // Try to set mode
+		SDL_SetWindowFullscreen(platform_window(), 0);
+		SDL_SetWindowDisplayMode(platform_window(), &m_original_mode);
+		SDL_SetWindowFullscreen(platform_window(), SDL_WINDOW_FULLSCREEN);
 	}
 
+	renderer_reset();
 	SDL_DestroyWindow(platform_window());
-	// release all keys ...
+	set_platform_window(nullptr);
 	downcast<sdl_osd_interface &>(machine().osd()).release_keys();
 }
 
@@ -675,36 +841,20 @@ int sdl_window_info::complete_create()
 	 *
 	 */
 	osd_printf_verbose("Enter sdl_info::create\n");
-	if (renderer().has_flags(osd_renderer::FLAG_NEEDS_OPENGL) && !video_config.novideo)
+	if (renderer_sdl_needs_opengl())
 	{
 		SDL_GL_SetAttribute( SDL_GL_DOUBLEBUFFER, 1 );
 		m_extra_flags = SDL_WINDOW_OPENGL;
 	}
 	else
-		m_extra_flags = 0;
-
-	// We need to workaround an issue in SDL 2.0.4 for OS X where setting the
-	// relative mode on the mouse in fullscreen mode makes mouse events stop
-	// It is fixed in the latest revisions so we'll assume it'll be fixed
-	// in the next public SDL release as well
-#if defined(SDLMAME_MACOSX) && SDL_VERSION_ATLEAST(2, 0, 2) // SDL_HINT_MOUSE_RELATIVE_MODE_WARP is introduced in 2.0.2
-	SDL_version linked;
-	SDL_GetVersion(&linked);
-	int revision = SDL_GetRevisionNumber();
-
-	// If we're running the exact version of SDL 2.0.4 (revision 10001) from the
-	// SDL web site, we need to work around this issue and send the warp mode hint
-	if (SDL_VERSION_EQUALS(linked, SDL_VERSIONNUM(2, 0, 4)) && revision == 10001)
 	{
-		osd_printf_verbose("Using warp mode for relative mouse in OS X SDL 2.0.4\n");
-		SDL_SetHint(SDL_HINT_MOUSE_RELATIVE_MODE_WARP, "1");
+		m_extra_flags = 0;
 	}
-#endif
 
 	// create the SDL window
 	// soft driver also used | SDL_WINDOW_INPUT_GRABBED | SDL_WINDOW_MOUSE_FOCUS
 	m_extra_flags |= (fullscreen() ?
-			SDL_WINDOW_BORDERLESS | SDL_WINDOW_INPUT_FOCUS | SDL_WINDOW_FULLSCREEN : SDL_WINDOW_RESIZABLE);
+			SDL_WINDOW_INPUT_FOCUS | SDL_WINDOW_FULLSCREEN : SDL_WINDOW_RESIZABLE);
 
 #if defined(SDLMAME_WIN32)
 	SDL_SetHint(SDL_HINT_VIDEO_MINIMIZE_ON_FOCUS_LOSS, "0");
@@ -780,7 +930,7 @@ int sdl_window_info::complete_create()
 
 	if  (sdlwindow == nullptr )
 	{
-		if (renderer().has_flags(osd_renderer::FLAG_NEEDS_OPENGL))
+		if (renderer_sdl_needs_opengl())
 			osd_printf_error("OpenGL not supported on this driver: %s\n", SDL_GetError());
 		else
 			osd_printf_error("Window creation failed: %s\n", SDL_GetError());
@@ -788,13 +938,14 @@ int sdl_window_info::complete_create()
 	}
 
 	set_platform_window(sdlwindow);
+	renderer_create();
 
 	if (fullscreen() && video_config.switchres)
 	{
 		SDL_DisplayMode mode;
 		//SDL_GetCurrentDisplayMode(window().monitor()->handle, &mode);
 		SDL_GetWindowDisplayMode(platform_window(), &mode);
-		m_original_mode->mode = mode;
+		m_original_mode = mode;
 		mode.w = temp.width();
 		mode.h = temp.height();
 		if (m_win_config.refresh)
@@ -825,24 +976,6 @@ int sdl_window_info::complete_create()
 	if (fullscreen())
 		SDL_SetWindowGrab(platform_window(), SDL_TRUE);
 #endif
-
-	// set main window
-	if (index() > 0)
-	{
-		for (auto w : osd_common_t::s_window_list)
-		{
-			if (w->index() == 0)
-			{
-				set_main_window(std::dynamic_pointer_cast<osd_window>(w));
-				break;
-			}
-		}
-	}
-	else
-	{
-		// We must be the main window
-		set_main_window(shared_from_this());
-	}
 
 	// update monitor resolution after mode change to ensure proper pixel aspect
 	monitor()->refresh();
@@ -1149,16 +1282,63 @@ osd_dim sdl_window_info::get_max_bounds(int constrain)
 	return maximum.dim();
 }
 
+
+std::vector<sdl_window_info::sdl_pointer_info>::iterator sdl_window_info::map_pointer(SDL_FingerID finger, unsigned device)
+{
+	auto found(std::lower_bound(m_active_pointers.begin(), m_active_pointers.end(), finger, &sdl_pointer_info::compare));
+	if ((m_active_pointers.end() != found) && (found->finger == finger))
+		return found;
+
+	if ((sizeof(m_next_pointer) * 8) <= m_next_pointer)
+	{
+		assert(~decltype(m_pointer_mask)(0) == m_pointer_mask);
+		osd_printf_warning("sdl_window_info: exceeded maximum number of active pointers\n");
+		return m_active_pointers.end();
+	}
+	assert(!BIT(m_pointer_mask, m_next_pointer));
+
+	try
+	{
+		found = m_active_pointers.emplace(
+				found,
+				sdl_pointer_info(finger, m_next_pointer, device));
+		m_pointer_mask |= decltype(m_pointer_mask)(1) << m_next_pointer;
+		do
+		{
+			++m_next_pointer;
+		}
+		while (((sizeof(m_next_pointer) * 8) > m_next_pointer) && BIT(m_pointer_mask, m_next_pointer));
+
+		return found;
+	}
+	catch (std::bad_alloc const &)
+	{
+		osd_printf_error("sdl_window_info: error allocating pointer data\n");
+		return m_active_pointers.end();
+	}
+}
+
+
+inline sdl_window_info::sdl_pointer_info::sdl_pointer_info(SDL_FingerID f, unsigned i, unsigned d)
+	: pointer_info(i, d)
+	, finger(f)
+{
+}
+
+
+
+
 //============================================================
 //  construction and destruction
 //============================================================
 
 sdl_window_info::sdl_window_info(
 		running_machine &a_machine,
+		render_module &renderprovider,
 		int index,
-		std::shared_ptr<osd_monitor_info> a_monitor,
+		const std::shared_ptr<osd_monitor_info> &a_monitor,
 		const osd_window_config *config)
-	: osd_window_t(a_machine, index, std::move(a_monitor), *config)
+	: osd_window_t(a_machine, renderprovider, index, std::move(a_monitor), *config)
 	, m_startmaximized(0)
 	// Following three are used by input code to defer resizes
 	, m_minimum_dim(0, 0)
@@ -1167,13 +1347,18 @@ sdl_window_info::sdl_window_info(
 	, m_extra_flags(0)
 	, m_mouse_captured(false)
 	, m_mouse_hidden(false)
+	, m_pointer_mask(0)
+	, m_next_pointer(0)
+	, m_mouse_inside(false)
 {
 	//FIXME: these should be per_window in config-> or even better a bit set
 	m_fullscreen = !video_config.windowed;
 	m_prescale = video_config.prescale;
 
 	m_windowed_dim = osd_dim(config->width, config->height);
-	m_original_mode = std::make_unique<SDL_DM_Wrapper>();
+
+	m_ptrdev_info.reserve(1);
+	m_active_pointers.reserve(16);
 }
 
 sdl_window_info::~sdl_window_info()

@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <!--
-license:CC0
+license:CC0-1.0
 -->
 <softwarelist name="pet_rom" description="Commodore PET Function ROMs">
 
@@ -216,7 +216,7 @@ license:CC0
 	</software>
 
 	<software name="petbasc2">
-		<description>Basic Erweiterung 1 (Ger)</description>
+		<description>Basic Erweiterung 1 (Germany)</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 

@@ -134,6 +134,9 @@ Status: Just a closet skeleton
 #include "machine/z80pio.h"
 //#include "bus/rs232/rs232.h"
 
+
+namespace {
+
 class junior80_state : public driver_device
 {
 public:
@@ -155,13 +158,13 @@ public:
 	void junior80(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 
-	void mem_map(address_map &map);
-	void io_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
+	void io_map(address_map &map) ATTR_COLD;
 
 	void drive_w(offs_t offset, u8 data);
 
@@ -295,6 +298,9 @@ ROM_START(junior80)
 	ROM_REGION(0x0800, "maincpu",0)
 	ROM_LOAD( "junior80_seria_321-ok.ic46", 0x0000, 0x0800, CRC(07f09842) SHA1(c7591a1006ae59d6353859ca401c57ff6eb1d4ff) )
 ROM_END
+
+} // anonymous namespace
+
 
 //    YEAR  NAME        PARENT    COMPAT    MACHINE     INPUT        CLASS           INIT            COMPANY          FULLNAME            FLAGS
 COMP( 1988, junior80,   0,        0,        junior80,   junior80,    junior80_state, empty_init,     "<unknown>",     "Junior 80",        MACHINE_IS_SKELETON )

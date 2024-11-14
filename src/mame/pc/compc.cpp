@@ -39,6 +39,8 @@ Options: 8087 FPU
 #include "softlist_dev.h"
 
 
+namespace {
+
 class compc_state : public driver_device
 {
 public:
@@ -53,7 +55,7 @@ public:
 	required_device<pc_noppi_mb_device> m_mb;
 	required_ioport m_dsw0;
 
-	void machine_reset() override;
+	void machine_reset() override ATTR_COLD;
 
 	u8 pioiii_portc_r();
 	void pioiii_portc_w(u8 data);
@@ -62,9 +64,9 @@ public:
 	void compc(machine_config &config);
 	void pc10iii(machine_config &config);
 	void compc1(machine_config &config);
-	void compc_io(address_map &map);
-	void compc_map(address_map &map);
-	void compciii_io(address_map &map);
+	void compc_io(address_map &map) ATTR_COLD;
+	void compc_map(address_map &map) ATTR_COLD;
+	void compciii_io(address_map &map) ATTR_COLD;
 private:
 	u8 m_dips = 0;
 };
@@ -282,6 +284,9 @@ ROM_START( compc1 )
 	ROM_REGION(0x8000, "gfx1", 0)
 	ROM_LOAD("pc1_char.bin", 0x0000, 0x4000, CRC(ee6c27f0) SHA1(e769cc3a49a1d708bd74eb4ac85bb6ea67220d38))
 ROM_END
+
+} // anonymous namespace
+
 
 //    YEAR  NAME     PARENT   COMPAT  MACHINE  INPUT     CLASS        INIT        COMPANY                        FULLNAME               FLAGS
 COMP( 1984, compc10, ibm5150, 0,      compc,   compc,    compc_state, empty_init, "Commodore Business Machines", "Commodore PC 10",     MACHINE_NOT_WORKING )

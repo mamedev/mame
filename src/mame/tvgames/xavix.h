@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood
-#ifndef MAME_INCLUDES_XAVIX_H
-#define MAME_INCLUDES_XAVIX_H
+#ifndef MAME_TVGAMES_XAVIX_H
+#define MAME_TVGAMES_XAVIX_H
 
 #include "cpu/m6502/xavix.h"
 #include "cpu/m6502/xavix2000.h"
@@ -44,8 +44,8 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// sound stream update overrides
 	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
@@ -85,6 +85,7 @@ public:
 		m_mouse0y(*this, "MOUSE0Y"),
 		m_mouse1x(*this, "MOUSE1X"),
 		m_mouse1y(*this, "MOUSE1Y"),
+		m_lightgun(*this, "GUN1_%u", 0U),
 		m_maincpu(*this, "maincpu"),
 		m_nvram(*this, "nvram"),
 		m_screen(*this, "screen"),
@@ -127,12 +128,16 @@ public:
 
 	void xavix2002(machine_config &config);
 
+	void xavix_43mhz(machine_config &config);
+
 	void init_xavix();
 
-	DECLARE_WRITE_LINE_MEMBER(ioevent_trg01);
-	DECLARE_WRITE_LINE_MEMBER(ioevent_trg02);
-	DECLARE_WRITE_LINE_MEMBER(ioevent_trg04);
-	DECLARE_WRITE_LINE_MEMBER(ioevent_trg08);
+	void ioevent_trg01(int state);
+	void ioevent_trg02(int state);
+	void ioevent_trg04(int state);
+	void ioevent_trg08(int state);
+
+	virtual void xavix_interrupt_extra() { }
 
 	int m_rgnlen = 0;
 	uint8_t* m_rgn = nullptr;
@@ -184,11 +189,17 @@ public:
 	}
 
 protected:
+	// driver_device overrides
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	virtual uint8_t read_io0(uint8_t direction);
 	virtual uint8_t read_io1(uint8_t direction);
 	virtual void write_io0(uint8_t data, uint8_t direction);
 	virtual void write_io1(uint8_t data, uint8_t direction);
+
+	void set_xavix_cpumaps(machine_config &config);
+
 	required_ioport m_in0;
 	required_ioport m_in1;
 	required_ioport_array<8> m_an_in;
@@ -196,31 +207,31 @@ protected:
 	optional_ioport m_mouse0y;
 	optional_ioport m_mouse1x;
 	optional_ioport m_mouse1y;
+	optional_ioport_array<2> m_lightgun;
 	required_device<xavix_device> m_maincpu;
 	optional_device<nvram_device> m_nvram;
 	required_device<screen_device> m_screen;
 	required_device<address_map_bank_device> m_lowbus;
 	address_space* m_cpuspace = nullptr;
 
+	bool m_disable_timer_irq_hack = false; // hack for epo_mini which floods timer IRQs to the point it won't do anything else
+
 private:
 
 	// screen updates
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	void xavix_map(address_map &map);
+	void xavix_map(address_map &map) ATTR_COLD;
 
-	void xavix_lowbus_map(address_map &map);
-	void xavix_extbus_map(address_map &map);
-	void superxavix_lowbus_map(address_map &map);
+	void xavix_lowbus_map(address_map &map) ATTR_COLD;
+	void xavix_extbus_map(address_map &map) ATTR_COLD;
+	void superxavix_lowbus_map(address_map &map) ATTR_COLD;
 
 	INTERRUPT_GEN_MEMBER(interrupt);
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline_cb);
 
-	// driver_device overrides
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
 
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 
 	void debug_mem_w(offs_t offset, uint8_t data)
 	{
@@ -416,6 +427,8 @@ private:
 
 	uint8_t pal_ntsc_r();
 
+	virtual uint8_t lightgun_r(offs_t offset) { logerror("%s: unhandled lightgun_r %d\n", machine().describe_context(), offset); return 0xff;  }
+
 	uint8_t xavix_memoryemu_txarray_r(offs_t offset);
 	void xavix_memoryemu_txarray_w(offs_t offset, uint8_t data);
 	uint8_t m_txarray[3]{};
@@ -601,20 +614,19 @@ private:
 	uint8_t guru_anport2_r() { uint8_t ret = m_mouse1x->read()-0x10; return ret; }
 };
 
-
 class xavix_i2c_state : public xavix_state
 {
 public:
 	xavix_i2c_state(const machine_config &mconfig, device_type type, const char *tag)
 		: xavix_state(mconfig, type, tag),
-		m_i2cmem(*this, "i2cmem"),
-		hackaddress1(-1),
-		hackaddress2(-1)
+		m_i2cmem(*this, "i2cmem")
 	{ }
 
 	void xavix_i2c_24lc04(machine_config &config);
 	void xavix_i2c_24c02(machine_config &config);
+	void xavix_i2c_24c02_43mhz(machine_config &config);
 	void xavix_i2c_24c08(machine_config &config);
+	void xavix_i2c_24c16(machine_config &config);
 
 	void xavix2000_i2c_24c08(machine_config &config);
 	void xavix2000_i2c_24c04(machine_config &config);
@@ -624,21 +636,99 @@ public:
 	void xavix2002_i2c_24c04(machine_config &config);
 	void xavix2002_i2c_mrangbat(machine_config& config);
 
-	void init_epo_efdx()
-	{
-		init_xavix();
-		hackaddress1 = 0x958a;
-		hackaddress2 = 0x8524;
-	}
-
 protected:
 	virtual void write_io1(uint8_t data, uint8_t direction) override;
 
 	required_device<i2cmem_device> m_i2cmem;
+};
+
+class xavix_i2c_mj_state : public xavix_i2c_state
+{
+public:
+	xavix_i2c_mj_state(const machine_config &mconfig, device_type type, const char *tag)
+		: xavix_i2c_state(mconfig, type, tag)
+		, m_dial(*this, "DIAL")
+	{ }
+
+	void xavix_i2c_24lc02_mj(machine_config &config);
+
+protected:
+	virtual void write_io1(uint8_t data, uint8_t direction) override;
+
+	uint8_t mj_anport0_r() { return m_dial->read()^0x7f; }
+
+	required_ioport m_dial;
+};
+
+class xavix_epo_hamc_state : public xavix_state
+{
+public:
+	xavix_epo_hamc_state(const machine_config &mconfig, device_type type, const char *tag)
+		: xavix_state(mconfig, type, tag)
+	{ }
+
+	int camera_r() { return machine().rand(); }
+
+protected:
+};
+
+
+class xavix_i2c_lotr_state : public xavix_i2c_state
+{
+public:
+	xavix_i2c_lotr_state(const machine_config &mconfig, device_type type, const char *tag)
+		: xavix_i2c_state(mconfig, type, tag)
+	{ }
+
+	int camera_r();
+
+	void init_epo_mini();
+
+protected:
+	//virtual void write_io1(uint8_t data, uint8_t direction) override;
+};
+
+class xavix_duelmast_state : public xavix_i2c_state
+{
+public:
+	xavix_duelmast_state(const machine_config &mconfig, device_type type, const char *tag)
+		: xavix_i2c_state(mconfig, type, tag)
+	{ }
+
+protected:
+	virtual uint8_t read_io1(uint8_t direction) override;
+};
+
+class xavix_i2c_tomshoot_state : public xavix_i2c_state
+{
+public:
+	xavix_i2c_tomshoot_state(const machine_config& mconfig, device_type type, const char* tag)
+		: xavix_i2c_state(mconfig, type, tag)
+	{ }
+
+	void xavix_interrupt_extra() override
+	{
+		ioevent_trg01(1); // causes reads from the lightgun 1 port
+		//ioevent_trg02(1); // causes reads from the lightgun 2 port
+	}
+
 
 private:
-	int hackaddress1;
-	int hackaddress2;
+	virtual uint8_t lightgun_r(offs_t offset) override
+	{
+		uint16_t ret = m_lightgun[offset>>1]->read();
+
+		if (offset & 1)
+			ret >>= 8;
+		else
+			ret &= 0xff;
+
+		if (offset == 0)
+			ret += 0x20;
+
+		return ret;
+	}
+
 };
 
 class xavix_i2c_ltv_tam_state : public xavix_i2c_state
@@ -660,22 +750,23 @@ private:
 	uint8_t tam_anport3_r() { return m_mouse1y->read()^0x7f; }
 };
 
-
-
-class xavix_i2c_lotr_state : public xavix_i2c_state
+class xavix_tom_tvho_state : public xavix_state
 {
 public:
-	xavix_i2c_lotr_state(const machine_config &mconfig, device_type type, const char *tag)
-		: xavix_i2c_state(mconfig, type, tag)
+	xavix_tom_tvho_state(const machine_config &mconfig, device_type type, const char *tag)
+		: xavix_state(mconfig, type, tag)
 	{ }
 
-	DECLARE_READ_LINE_MEMBER(camera_r);
+	void xavix_tom_tvho(machine_config &config);
 
-protected:
-	//virtual void write_io1(uint8_t data, uint8_t direction) override;
+private:
+
+private:
+	uint8_t tvho_anport0_r() { return m_mouse0x->read()^0x7f; }
+	uint8_t tvho_anport1_r() { return m_mouse0y->read()^0x7f; }
+	uint8_t tvho_anport2_r() { return m_mouse1x->read()^0x7f; }
+	uint8_t tvho_anport3_r() { return m_mouse1y->read()^0x7f; }
 };
-
-
 
 
 class xavix_mtrk_state : public xavix_state
@@ -689,7 +780,7 @@ public:
 	void xavix_mtrk(machine_config &config);
 	void xavix_mtrkp(machine_config &config);
 
-	DECLARE_READ_LINE_MEMBER( mtrk_wheel_r );
+	int mtrk_wheel_r();
 
 protected:
 	required_device<xavix_mtrk_wheel_device> m_wheel;
@@ -725,6 +816,7 @@ public:
 	void xavix_cart_popira(machine_config &config);
 	void xavix_cart_ddrfammt(machine_config &config);
 	void xavix_cart_evio(machine_config &config);
+	void xavix_cart_daig(machine_config &config);
 
 protected:
 
@@ -933,7 +1025,7 @@ public:
 
 	void xavix_cart_popira2(machine_config &config);
 
-	DECLARE_READ_LINE_MEMBER(i2c_r);
+	int i2c_r();
 
 protected:
 	virtual void write_io1(uint8_t data, uint8_t direction) override;
@@ -945,6 +1037,28 @@ private:
 	required_ioport m_p2;
 };
 
+class xavix_evio_cart_state : public xavix_cart_state
+{
+public:
+	xavix_evio_cart_state(const machine_config &mconfig, device_type type, const char *tag)
+		: xavix_cart_state(mconfig,type,tag)
+	{ }
+
+	int i2c_r();
+
+protected:
+	virtual void write_io1(uint8_t data, uint8_t direction) override;
+};
+
+class xavix_daig_cart_state : public xavix_cart_state
+{
+public:
+	xavix_daig_cart_state(const machine_config &mconfig, device_type type, const char *tag)
+		: xavix_cart_state(mconfig,type,tag)
+	{ }
+
+protected:
+};
 
 class xavix_ekara_state : public xavix_cart_state
 {
@@ -957,10 +1071,8 @@ public:
 		m_extraiowrite(0)
 	{ }
 
-	DECLARE_READ_LINE_MEMBER(ekara_multi0_r);
-	DECLARE_READ_LINE_MEMBER(ekara_multi1_r);
-
-//  void xavix_ekara(machine_config &config);
+	virtual int ekara_multi0_r();
+	virtual int ekara_multi1_r();
 
 protected:
 
@@ -974,5 +1086,29 @@ protected:
 	uint8_t m_extraiowrite;
 };
 
+class xavix_hikara_state : public xavix_ekara_state
+{
+public:
+	xavix_hikara_state(const machine_config &mconfig, device_type type, const char *tag)
+		: xavix_ekara_state(mconfig, type, tag),
+		m_extra2(*this, "EXTRA2"),
+		m_extra3(*this, "EXTRA3")
+	{ }
 
-#endif // MAME_INCLUDES_XAVIX_H
+	void xavix_cart_hikara(machine_config &config);
+
+	virtual int ekara_multi0_r() override;
+	virtual int ekara_multi1_r() override;
+	int ekara_multi2_r();
+	int ekara_multi3_r();
+
+protected:
+	virtual void machine_reset() override ATTR_COLD;
+
+	required_ioport m_extra2;
+	required_ioport m_extra3;
+
+};
+
+
+#endif // MAME_TVGAMES_XAVIX_H

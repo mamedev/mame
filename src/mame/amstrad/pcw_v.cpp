@@ -12,8 +12,8 @@
 #include "pcw.h"
 #include "machine/ram.h"
 
-#define LOG_PALETTE  (1U <<  1) // LOGs what palette is choosen
-#define LOG_VOFF     (1U <<  2) // LOGs when video is OFF
+#define LOG_PALETTE  (1U << 1) // LOGs what palette is choosen
+#define LOG_VOFF     (1U << 2) // LOGs when video is OFF
 
 //#define VERBOSE (LOG_PALETTE)
 //#define LOG_OUTPUT_FUNC printf

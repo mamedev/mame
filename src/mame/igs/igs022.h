@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood, ElSemi
-#ifndef MAME_MACHINE_IGS022_H
-#define MAME_MACHINE_IGS022_H
+#ifndef MAME_IGS_IGS022_H
+#define MAME_IGS_IGS022_H
 
 #pragma once
 
@@ -13,8 +13,8 @@ public:
 	void handle_command();
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 private:
 	static constexpr u16 NUM_REGS = 0x300, STACK_SIZE = 0x100;
@@ -40,4 +40,4 @@ private:
 
 DECLARE_DEVICE_TYPE(IGS022, igs022_device)
 
-#endif // MAME_MACHINE_IGS022_H
+#endif // MAME_IGS_IGS022_H

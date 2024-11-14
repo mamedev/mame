@@ -37,6 +37,8 @@
 #include "speaker.h"
 
 
+namespace {
+
 //**************************************************************************
 //  CONSTANTS
 //**************************************************************************
@@ -85,9 +87,9 @@ public:
 	void samcoupe(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -183,10 +185,10 @@ private:
 	uint8_t mem_block_d_r(offs_t offset);
 	void mem_block_d_w(offs_t offset, uint8_t data);
 
-	void mem_map_base(address_map &map);
-	void mem_map(address_map &map);
-	void io_map_base(address_map &map);
-	void io_map(address_map &map);
+	void mem_map_base(address_map &map) ATTR_COLD;
+	void mem_map(address_map &map) ATTR_COLD;
+	void io_map_base(address_map &map) ATTR_COLD;
+	void io_map(address_map &map) ATTR_COLD;
 
 	int m_pages; // total internal memory pages (16 or 32)
 };
@@ -978,10 +980,12 @@ ROM_START( samcoupe )
 	ROMX_LOAD( "atom.z5",   0x0000, 0x8000, CRC(dec75f58) SHA1(cd342579f066c0863e4f769c2e6757085e21b0a1), ROM_BIOS(14) )
 ROM_END
 
+} // anonymous namespace
+
 
 /***************************************************************************
     GAME DRIVERS
 ***************************************************************************/
 
 //    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS           INIT        COMPANY                        FULLNAME     FLAGS
-COMP( 1989, samcoupe, 0,      0,      samcoupe, samcoupe, samcoupe_state, empty_init, "Miles Gordon Technology plc", "SAM Coupe", MACHINE_SUPPORTS_SAVE )
+COMP( 1989, samcoupe, 0,      0,      samcoupe, samcoupe, samcoupe_state, empty_init, "Miles Gordon Technology plc", u8"SAM Coupé", MACHINE_SUPPORTS_SAVE )

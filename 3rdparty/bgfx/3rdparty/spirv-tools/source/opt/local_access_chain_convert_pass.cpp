@@ -19,6 +19,7 @@
 #include "ir_builder.h"
 #include "ir_context.h"
 #include "iterator.h"
+#include "source/util/string_utils.h"
 
 namespace spvtools {
 namespace opt {
@@ -27,8 +28,6 @@ namespace {
 
 const uint32_t kStoreValIdInIdx = 1;
 const uint32_t kAccessChainPtrIdInIdx = 0;
-const uint32_t kConstantValueInIdx = 0;
-const uint32_t kTypeIntWidthInIdx = 0;
 
 }  // anonymous namespace
 
@@ -66,7 +65,19 @@ void LocalAccessChainConvertPass::AppendConstantOperands(
   ptrInst->ForEachInId([&iidIdx, &in_opnds, this](const uint32_t* iid) {
     if (iidIdx > 0) {
       const Instruction* cInst = get_def_use_mgr()->GetDef(*iid);
-      uint32_t val = cInst->GetSingleWordInOperand(kConstantValueInIdx);
+      const auto* constant_value =
+          context()->get_constant_mgr()->GetConstantFromInst(cInst);
+      assert(constant_value != nullptr &&
+             "Expecting the index to be a constant.");
+
+      // We take the sign extended value because OpAccessChain interprets the
+      // index as signed.
+      int64_t long_value = constant_value->GetSignExtendedValue();
+      assert(long_value <= UINT32_MAX && long_value >= 0 &&
+             "The index value is too large for a composite insert or extract "
+             "instruction.");
+
+      uint32_t val = static_cast<uint32_t>(long_value);
       in_opnds->push_back(
           {spv_operand_type_t::SPV_OPERAND_TYPE_LITERAL_INTEGER, {val}});
     }
@@ -168,13 +179,18 @@ bool LocalAccessChainConvertPass::GenAccessChainStoreReplacement(
   return true;
 }
 
-bool LocalAccessChainConvertPass::IsConstantIndexAccessChain(
+bool LocalAccessChainConvertPass::Is32BitConstantIndexAccessChain(
     const Instruction* acp) const {
   uint32_t inIdx = 0;
   return acp->WhileEachInId([&inIdx, this](const uint32_t* tid) {
     if (inIdx > 0) {
       Instruction* opInst = get_def_use_mgr()->GetDef(*tid);
       if (opInst->opcode() != SpvOpConstant) return false;
+      const auto* index =
+          context()->get_constant_mgr()->GetConstantFromInst(opInst);
+      int64_t index_value = index->GetSignExtendedValue();
+      if (index_value > UINT32_MAX) return false;
+      if (index_value < 0) return false;
     }
     ++inIdx;
     return true;
@@ -223,14 +239,21 @@ void LocalAccessChainConvertPass::FindTargetVars(Function* func) {
           }
           // Rule out variables with nested access chains
           // TODO(): Convert nested access chains
-          if (IsNonPtrAccessChain(op) && ptrInst->GetSingleWordInOperand(
+          bool is_non_ptr_access_chain = IsNonPtrAccessChain(op);
+          if (is_non_ptr_access_chain && ptrInst->GetSingleWordInOperand(
                                              kAccessChainPtrIdInIdx) != varId) {
             seen_non_target_vars_.insert(varId);
             seen_target_vars_.erase(varId);
             break;
           }
           // Rule out variables accessed with non-constant indices
-          if (!IsConstantIndexAccessChain(ptrInst)) {
+          if (!Is32BitConstantIndexAccessChain(ptrInst)) {
+            seen_non_target_vars_.insert(varId);
+            seen_target_vars_.erase(varId);
+            break;
+          }
+
+          if (is_non_ptr_access_chain && AnyIndexIsOutOfBounds(ptrInst)) {
             seen_non_target_vars_.insert(varId);
             seen_target_vars_.erase(varId);
             break;
@@ -328,8 +351,7 @@ bool LocalAccessChainConvertPass::AllExtensionsSupported() const {
     return false;
   // If any extension not in allowlist, return false
   for (auto& ei : get_module()->extensions()) {
-    const char* extName =
-        reinterpret_cast<const char*>(&ei.GetInOperand(0).words[0]);
+    const std::string extName = ei.GetInOperand(0).AsString();
     if (extensions_allowlist_.find(extName) == extensions_allowlist_.end())
       return false;
   }
@@ -339,11 +361,9 @@ bool LocalAccessChainConvertPass::AllExtensionsSupported() const {
   for (auto& inst : context()->module()->ext_inst_imports()) {
     assert(inst.opcode() == SpvOpExtInstImport &&
            "Expecting an import of an extension's instruction set.");
-    const char* extension_name =
-        reinterpret_cast<const char*>(&inst.GetInOperand(0).words[0]);
-    if (0 == std::strncmp(extension_name, "NonSemantic.", 12) &&
-        0 != std::strncmp(extension_name, "NonSemantic.Shader.DebugInfo.100",
-                          32)) {
+    const std::string extension_name = inst.GetInOperand(0).AsString();
+    if (spvtools::utils::starts_with(extension_name, "NonSemantic.") &&
+        extension_name != "NonSemantic.Shader.DebugInfo.100") {
       return false;
     }
   }
@@ -351,12 +371,6 @@ bool LocalAccessChainConvertPass::AllExtensionsSupported() const {
 }
 
 Pass::Status LocalAccessChainConvertPass::ProcessImpl() {
-  // If non-32-bit integer type in module, terminate processing
-  // TODO(): Handle non-32-bit integer constants in access chains
-  for (const Instruction& inst : get_module()->types_values())
-    if (inst.opcode() == SpvOpTypeInt &&
-        inst.GetSingleWordInOperand(kTypeIntWidthInIdx) != 32)
-      return Status::SuccessWithoutChange;
   // Do not process if module contains OpGroupDecorate. Additional
   // support required in KillNamesAndDecorates().
   // TODO(greg-lunarg): Add support for OpGroupDecorate
@@ -436,7 +450,46 @@ void LocalAccessChainConvertPass::InitExtensions() {
       "SPV_KHR_integer_dot_product",
       "SPV_EXT_shader_image_int64",
       "SPV_KHR_non_semantic_info",
+      "SPV_KHR_uniform_group_instructions",
+      "SPV_KHR_fragment_shader_barycentric",
   });
+}
+
+bool LocalAccessChainConvertPass::AnyIndexIsOutOfBounds(
+    const Instruction* access_chain_inst) {
+  assert(IsNonPtrAccessChain(access_chain_inst->opcode()));
+
+  analysis::TypeManager* type_mgr = context()->get_type_mgr();
+  analysis::ConstantManager* const_mgr = context()->get_constant_mgr();
+  auto constants = const_mgr->GetOperandConstants(access_chain_inst);
+  uint32_t base_pointer_id = access_chain_inst->GetSingleWordInOperand(0);
+  Instruction* base_pointer = get_def_use_mgr()->GetDef(base_pointer_id);
+  const analysis::Pointer* base_pointer_type =
+      type_mgr->GetType(base_pointer->type_id())->AsPointer();
+  assert(base_pointer_type != nullptr &&
+         "The base of the access chain is not a pointer.");
+  const analysis::Type* current_type = base_pointer_type->pointee_type();
+  for (uint32_t i = 1; i < access_chain_inst->NumInOperands(); ++i) {
+    if (IsIndexOutOfBounds(constants[i], current_type)) {
+      return true;
+    }
+
+    uint32_t index =
+        (constants[i]
+             ? static_cast<uint32_t>(constants[i]->GetZeroExtendedValue())
+             : 0);
+    current_type = type_mgr->GetMemberType(current_type, {index});
+  }
+
+  return false;
+}
+
+bool LocalAccessChainConvertPass::IsIndexOutOfBounds(
+    const analysis::Constant* index, const analysis::Type* type) const {
+  if (index == nullptr) {
+    return false;
+  }
+  return index->GetZeroExtendedValue() >= type->NumberOfComponents();
 }
 
 }  // namespace opt

@@ -74,8 +74,8 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(main_nmi);
 
 private:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	void dig0_w(u8 data);
 	void dig1_w(u8 data);
@@ -93,16 +93,16 @@ private:
 	bool m_data_ok = false;
 	u8 m_lamp_data = 0;
 	bool m_irq_in_progress = false;
-	DECLARE_WRITE_LINE_MEMBER(pia22_ca2_w) { m_io_outputs[20] = state; } //ST5
-	DECLARE_WRITE_LINE_MEMBER(pia22_cb2_w) { } //ST-solenoids enable
-	DECLARE_WRITE_LINE_MEMBER(pia24_ca2_w) { m_io_outputs[17] = state; } //ST2
-	DECLARE_WRITE_LINE_MEMBER(pia24_cb2_w) { m_io_outputs[16] = state; } //ST1
-	DECLARE_WRITE_LINE_MEMBER(pia28_ca2_w) { } //diag leds enable
-	DECLARE_WRITE_LINE_MEMBER(pia28_cb2_w) { m_io_outputs[21] = state; } //ST6
-	DECLARE_WRITE_LINE_MEMBER(pia30_ca2_w) { m_io_outputs[19] = state; } //ST4
-	DECLARE_WRITE_LINE_MEMBER(pia30_cb2_w) { m_io_outputs[18] = state; } //ST3
-	DECLARE_WRITE_LINE_MEMBER(irq_w);
-	void main_map(address_map &map);
+	void pia22_ca2_w(int state) { m_io_outputs[20] = state; } //ST5
+	void pia22_cb2_w(int state) { } //ST-solenoids enable
+	void pia24_ca2_w(int state) { m_io_outputs[17] = state; } //ST2
+	void pia24_cb2_w(int state) { m_io_outputs[16] = state; } //ST1
+	void pia28_ca2_w(int state) { } //diag leds enable
+	void pia28_cb2_w(int state) { m_io_outputs[21] = state; } //ST6
+	void pia30_ca2_w(int state) { m_io_outputs[19] = state; } //ST4
+	void pia30_cb2_w(int state) { m_io_outputs[18] = state; } //ST3
+	void irq_w(int state);
+	void main_map(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<input_merger_device> m_mainirq;
@@ -196,7 +196,7 @@ static INPUT_PORTS_START( s4 )
 	PORT_START("X7")  // not used
 
 	PORT_START("DIAGS")
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("Main Diag") PORT_CODE(KEYCODE_0_PAD) PORT_CHANGED_MEMBER(DEVICE_SELF, s4_state, main_nmi, 1)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("Main Diag") PORT_CODE(KEYCODE_0_PAD) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(s4_state::main_nmi), 1)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("Advance") PORT_CODE(KEYCODE_1_PAD)
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("Manual/Auto") PORT_CODE(KEYCODE_2_PAD)
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Enter") PORT_CODE(KEYCODE_ENTER_PAD)
@@ -419,7 +419,7 @@ void s4_state::switch_w(u8 data)
 	m_row = data;
 }
 
-WRITE_LINE_MEMBER( s4_state::irq_w )
+void s4_state::irq_w(int state)
 {
 	m_irq_in_progress = state;
 	m_maincpu->set_input_line(M6802_IRQ_LINE, state ? ASSERT_LINE : CLEAR_LINE);
@@ -438,7 +438,7 @@ void s4_state::s4(machine_config &config)
 	genpin_audio(config);
 
 	// Devices
-	PIA6821(config, m_pia22, 0);
+	PIA6821(config, m_pia22);
 	m_pia22->writepa_handler().set(FUNC(s4_state::sol0_w));
 	m_pia22->writepb_handler().set(FUNC(s4_state::sol1_w));
 	m_pia22->ca2_handler().set(FUNC(s4_state::pia22_ca2_w));
@@ -446,7 +446,7 @@ void s4_state::s4(machine_config &config)
 	m_pia22->irqa_handler().set(m_mainirq, FUNC(input_merger_device::in_w<1>));
 	m_pia22->irqb_handler().set(m_mainirq, FUNC(input_merger_device::in_w<2>));
 
-	PIA6821(config, m_pia24, 0);
+	PIA6821(config, m_pia24);
 	m_pia24->writepa_handler().set(FUNC(s4_state::lamp0_w));
 	m_pia24->writepb_handler().set(FUNC(s4_state::lamp1_w));
 	m_pia24->ca2_handler().set(FUNC(s4_state::pia24_ca2_w));
@@ -454,7 +454,7 @@ void s4_state::s4(machine_config &config)
 	m_pia24->irqa_handler().set(m_mainirq, FUNC(input_merger_device::in_w<3>));
 	m_pia24->irqb_handler().set(m_mainirq, FUNC(input_merger_device::in_w<4>));
 
-	PIA6821(config, m_pia28, 0);
+	PIA6821(config, m_pia28);
 	m_pia28->readpa_handler().set(FUNC(s4_state::dips_r));
 	m_pia28->set_port_a_input_overrides_output_mask(0xff);
 	m_pia28->readca1_handler().set_ioport("DIAGS").bit(2); // advance button
@@ -466,7 +466,7 @@ void s4_state::s4(machine_config &config)
 	m_pia28->irqa_handler().set(m_mainirq, FUNC(input_merger_device::in_w<5>));
 	m_pia28->irqb_handler().set(m_mainirq, FUNC(input_merger_device::in_w<6>));
 
-	PIA6821(config, m_pia30, 0);
+	PIA6821(config, m_pia30);
 	m_pia30->readpa_handler().set(FUNC(s4_state::switch_r));
 	m_pia30->set_port_a_input_overrides_output_mask(0xff);
 	m_pia30->writepb_handler().set(FUNC(s4_state::switch_w));

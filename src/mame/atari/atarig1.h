@@ -45,7 +45,7 @@ public:
 	void init_pitfightb();
 
 protected:
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	optional_device<atari_slapstic_device> m_slapstic;
@@ -80,7 +80,7 @@ private:
 	TILE_GET_INFO_MEMBER(get_alpha_tile_info);
 	TILE_GET_INFO_MEMBER(get_playfield_tile_info);
 	uint32_t screen_update_atarig1(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void main_map(address_map &map);
-	void pitfight_map(address_map &map);
-	void hydra_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
+	void pitfight_map(address_map &map) ATTR_COLD;
+	void hydra_map(address_map &map) ATTR_COLD;
 };

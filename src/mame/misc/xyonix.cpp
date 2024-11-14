@@ -34,7 +34,7 @@ TODO:
 
 
 // configurable logging
-#define LOG_IO (1U <<  1)
+#define LOG_IO (1U << 1)
 
 //#define VERBOSE (LOG_GENERAL | LOG_IO)
 
@@ -63,9 +63,9 @@ public:
 	void xyonix(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -87,7 +87,7 @@ private:
 	uint8_t m_prev_coin;
 	bool m_nmi_mask;
 
-	DECLARE_WRITE_LINE_MEMBER(nmiclk_w);
+	void nmiclk_w(int state);
 	void irqack_w(uint8_t data);
 	void nmiack_w(uint8_t data);
 	uint8_t io_r();
@@ -99,8 +99,8 @@ private:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void handle_coins(int coin);
-	void main_map(address_map &map);
-	void port_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
+	void port_map(address_map &map) ATTR_COLD;
 
 	[[maybe_unused]] MC6845_UPDATE_ROW(crtc_update_row);
 };
@@ -124,7 +124,7 @@ void xyonix_state::irqack_w(uint8_t data)
 	m_maincpu->set_input_line(0, CLEAR_LINE);
 }
 
-WRITE_LINE_MEMBER(xyonix_state::nmiclk_w)
+void xyonix_state::nmiclk_w(int state)
 {
 	if (state && m_nmi_mask)
 		m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);

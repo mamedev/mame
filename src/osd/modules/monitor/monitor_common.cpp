@@ -5,11 +5,14 @@
 *
 */
 
-#include "emu.h"
-#include <algorithm>
-
 #include "monitor_common.h"
+
+#include "modules/lib/osdobj_common.h"
 #include "modules/osdwindow.h"
+
+#include "osdcore.h"
+
+#include <algorithm>
 
 std::shared_ptr<osd_monitor_info> monitor_module_base::pick_monitor(osd_options& options, int index)
 {
@@ -93,7 +96,7 @@ float monitor_module_base::get_aspect(const char* defdata, const char* data, int
 	return float(num) / float(den);
 }
 
-int monitor_module_base::init(const osd_options& options)
+int monitor_module_base::init(osd_interface &osd, const osd_options &options)
 {
 	if (!m_initialized)
 	{

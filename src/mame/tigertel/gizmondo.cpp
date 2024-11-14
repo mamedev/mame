@@ -37,8 +37,7 @@ SYSINTR_GPS      = INT_EINT3, INT_EINT8_23 (EINT18)
 #include "screen.h"
 
 
-#define VERBOSE_LEVEL ( 0 )
-
+namespace {
 
 #define BITS(x,m,n) (((x)>>(n))&(((uint32_t)1<<((m)-(n)+1))-1))
 
@@ -61,31 +60,18 @@ public:
 private:
 	uint32_t m_port[9];
 	required_device<s3c2440_device> m_s3c2440;
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	inline void verboselog(int n_level, const char *s_fmt, ...) ATTR_PRINTF(3,4);
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 	required_device<cpu_device> m_maincpu;
 	required_device<gf4500_device> m_gf4500;
 	uint32_t s3c2440_gpio_port_r(offs_t offset);
 	void s3c2440_gpio_port_w(offs_t offset, uint32_t data);
 
 	bitmap_rgb32 m_bitmap;
-	void gizmondo_map(address_map &map);
+	void gizmondo_map(address_map &map) ATTR_COLD;
 };
 
 
-inline void gizmondo_state::verboselog( int n_level, const char *s_fmt, ...)
-{
-	if (VERBOSE_LEVEL >= n_level)
-	{
-		va_list v;
-		char buf[32768];
-		va_start( v, s_fmt);
-		vsprintf( buf, s_fmt, v);
-		va_end( v);
-		logerror( "%s: %s", machine().describe_context( ), buf);
-	}
-}
 /*******************************************************************************
     ...
 *******************************************************************************/
@@ -220,27 +206,27 @@ void gizmondo_state::gizmondo(machine_config &config)
 
 static INPUT_PORTS_START( gizmondo )
 	PORT_START( "PORTF-01" )
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_CHANGED_MEMBER(DEVICE_SELF, gizmondo_state, port_changed, 0) PORT_NAME("STOP") PORT_PLAYER(1)
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_CHANGED_MEMBER(DEVICE_SELF, gizmondo_state, port_changed, 0) PORT_PLAYER(1)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(gizmondo_state::port_changed), 0) PORT_NAME("STOP") PORT_PLAYER(1)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(gizmondo_state::port_changed), 0) PORT_PLAYER(1)
 	PORT_START( "PORTF-02" )
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON8 ) PORT_CHANGED_MEMBER(DEVICE_SELF, gizmondo_state, port_changed, 0) PORT_NAME("F2") PORT_PLAYER(1) PORT_CODE(KEYCODE_F2)
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_CHANGED_MEMBER(DEVICE_SELF, gizmondo_state, port_changed, 0) PORT_NAME("FORWARD") PORT_PLAYER(1)
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_CHANGED_MEMBER(DEVICE_SELF, gizmondo_state, port_changed, 0) PORT_PLAYER(1)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON8 ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(gizmondo_state::port_changed), 0) PORT_NAME("F2") PORT_PLAYER(1) PORT_CODE(KEYCODE_F2)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(gizmondo_state::port_changed), 0) PORT_NAME("FORWARD") PORT_PLAYER(1)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(gizmondo_state::port_changed), 0) PORT_PLAYER(1)
 	PORT_START( "PORTF-04" )
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON9 ) PORT_CHANGED_MEMBER(DEVICE_SELF, gizmondo_state, port_changed, 0) PORT_NAME("F3") PORT_PLAYER(1) PORT_CODE(KEYCODE_F3)
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, gizmondo_state, port_changed, 0) PORT_NAME("PLAY") PORT_PLAYER(1)
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_CHANGED_MEMBER(DEVICE_SELF, gizmondo_state, port_changed, 0) PORT_PLAYER(1)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON9 ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(gizmondo_state::port_changed), 0) PORT_NAME("F3") PORT_PLAYER(1) PORT_CODE(KEYCODE_F3)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(gizmondo_state::port_changed), 0) PORT_NAME("PLAY") PORT_PLAYER(1)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(gizmondo_state::port_changed), 0) PORT_PLAYER(1)
 	PORT_START( "PORTF-08" )
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON10 ) PORT_CHANGED_MEMBER(DEVICE_SELF, gizmondo_state, port_changed, 0) PORT_NAME("F4") PORT_PLAYER(1) PORT_CODE(KEYCODE_F4)
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_CHANGED_MEMBER(DEVICE_SELF, gizmondo_state, port_changed, 0) PORT_NAME("REWIND") PORT_PLAYER(1)
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_CHANGED_MEMBER(DEVICE_SELF, gizmondo_state, port_changed, 0) PORT_PLAYER(1)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON10 ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(gizmondo_state::port_changed), 0) PORT_NAME("F4") PORT_PLAYER(1) PORT_CODE(KEYCODE_F4)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(gizmondo_state::port_changed), 0) PORT_NAME("REWIND") PORT_PLAYER(1)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(gizmondo_state::port_changed), 0) PORT_PLAYER(1)
 	PORT_START( "PORTF-10" )
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_CHANGED_MEMBER(DEVICE_SELF, gizmondo_state, port_changed, 0) PORT_NAME("L") PORT_PLAYER(1) PORT_CODE(KEYCODE_L)
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON6 ) PORT_CHANGED_MEMBER(DEVICE_SELF, gizmondo_state, port_changed, 0) PORT_NAME("R") PORT_PLAYER(1) PORT_CODE(KEYCODE_R)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(gizmondo_state::port_changed), 0) PORT_NAME("L") PORT_PLAYER(1) PORT_CODE(KEYCODE_L)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON6 ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(gizmondo_state::port_changed), 0) PORT_NAME("R") PORT_PLAYER(1) PORT_CODE(KEYCODE_R)
 	PORT_START( "PORTF" )
-	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_BUTTON11 ) PORT_CHANGED_MEMBER(DEVICE_SELF, gizmondo_state, port_changed, 0) PORT_NAME("F5") PORT_PLAYER(1) PORT_CODE(KEYCODE_F5)
+	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_BUTTON11 ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(gizmondo_state::port_changed), 0) PORT_NAME("F5") PORT_PLAYER(1) PORT_CODE(KEYCODE_F5)
 	PORT_START( "PORTG" )
-	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_BUTTON7 ) PORT_CHANGED_MEMBER(DEVICE_SELF, gizmondo_state, port_changed, 0) PORT_NAME("F1") PORT_PLAYER(1) PORT_CODE(KEYCODE_F1)
+	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_BUTTON7 ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(gizmondo_state::port_changed), 0) PORT_NAME("F1") PORT_PLAYER(1) PORT_CODE(KEYCODE_F1)
 INPUT_PORTS_END
 
 /*******************************************************************************
@@ -252,5 +238,8 @@ ROM_START( gizmondo )
 	ROM_SYSTEM_BIOS( 0, "fboot", "fboot" )
 	ROMX_LOAD( "fboot.bin", 0, 0x800, CRC(28887c29) SHA1(e625caaa63b9db74cb6d7499dce12ac758c5fe76), ROM_BIOS(0) )
 ROM_END
+
+} // anonymous namespace
+
 
 CONS(2005, gizmondo, 0, 0, gizmondo, gizmondo, gizmondo_state, init_gizmondo, "Tiger Telematics", "Gizmondo", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)

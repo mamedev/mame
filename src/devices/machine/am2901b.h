@@ -41,17 +41,17 @@ public:
 	void d_w(uint8_t data);
 	void i_w(uint16_t data);
 
-	DECLARE_WRITE_LINE_MEMBER(q0_w);
-	DECLARE_WRITE_LINE_MEMBER(q3_w);
-	DECLARE_WRITE_LINE_MEMBER(ram0_w);
-	DECLARE_WRITE_LINE_MEMBER(ram3_w);
-	DECLARE_WRITE_LINE_MEMBER(ci_w);
-	DECLARE_WRITE_LINE_MEMBER(cp_w);
+	void q0_w(int state);
+	void q3_w(int state);
+	void ram0_w(int state);
+	void ram3_w(int state);
+	void ci_w(int state);
+	void cp_w(int state);
 
 private:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	void execute();
 	void disassemble();

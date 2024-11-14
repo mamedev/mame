@@ -30,11 +30,11 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// device_colecovision_expansion_card_interface overrides
-	virtual uint8_t bd_r(offs_t offset, uint8_t data, int _8000, int _a000, int _c000, int _e000) override;
+	virtual uint8_t read(offs_t offset, int _8000, int _a000, int _c000, int _e000) override;
 
 private:
 	uint32_t m_current_offset;

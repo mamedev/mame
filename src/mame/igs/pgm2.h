@@ -1,30 +1,24 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood
-#ifndef MAME_INCLUDES_PGM2_H
-#define MAME_INCLUDES_PGM2_H
+#ifndef MAME_IGS_PGM2_H
+#define MAME_IGS_PGM2_H
 
 #pragma once
 
-#include "cpu/arm7/arm7.h"
-#include "cpu/arm7/arm7core.h"
-#include "sound/ymz770.h"
 #include "igs036crypt.h"
-#include "screen.h"
-#include "speaker.h"
+#include "pgm2_memcard.h"
+
+#include "cpu/arm7/arm7.h"
+#include "machine/atmel_arm_aic.h"
 #include "machine/nvram.h"
 #include "machine/timer.h"
-#include "machine/atmel_arm_aic.h"
-#include "pgm2_memcard.h"
+#include "sound/ymz770.h"
+
 #include "emupal.h"
+#include "screen.h"
+#include "speaker.h"
 #include "tilemap.h"
 
-struct kov3_module_key
-{
-	u8 key[8];
-	u8 sum[8];
-	u32 addr_xor; // 22bit
-	u16 data_xor;
-};
 
 class pgm2_state : public driver_device
 {
@@ -56,25 +50,41 @@ public:
 		m_mainrom(*this, "mainrom")
 	{ }
 
-	void init_kov2nl();
-	void init_orleg2();
-	void init_ddpdojt();
-	void init_kov3();
-	void init_kov3_104();
-	void init_kov3_102();
-	void init_kov3_101();
-	void init_kov3_100();
-	void init_kof98umh();
+	void init_kov2nl() ATTR_COLD;
+	void init_orleg2() ATTR_COLD;
+	void init_ddpdojt() ATTR_COLD;
+	void init_kov3() ATTR_COLD;
+	void init_kov3_104() ATTR_COLD;
+	void init_kov3_102() ATTR_COLD;
+	void init_kov3_101() ATTR_COLD;
+	void init_kov3_100() ATTR_COLD;
+	void init_kof98umh() ATTR_COLD;
+	void init_bubucar() ATTR_COLD;
 
-	void pgm2_ramrom(machine_config &config);
-	void pgm2_lores(machine_config &config);
-	void pgm2(machine_config &config);
-	void pgm2_hires(machine_config &config);
-	void pgm2_map(address_map &map);
-	void pgm2_module_rom_map(address_map &map);
-	void pgm2_ram_rom_map(address_map &map);
-	void pgm2_rom_map(address_map &map);
+	void pgm2_ramrom(machine_config &config) ATTR_COLD;
+	void pgm2_lores(machine_config &config) ATTR_COLD;
+	void pgm2(machine_config &config) ATTR_COLD;
+	void pgm2_hires(machine_config &config) ATTR_COLD;
+	void pgm2_map(address_map &map) ATTR_COLD;
+	void pgm2_module_rom_map(address_map &map) ATTR_COLD;
+	void pgm2_ram_rom_map(address_map &map) ATTR_COLD;
+	void pgm2_rom_map(address_map &map) ATTR_COLD;
+
+protected:
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
+	virtual void device_post_load() override ATTR_COLD;
+
 private:
+	struct kov3_module_key
+	{
+		u8 key[8];
+		u8 sum[8];
+		u32 addr_xor; // 22bit
+		u16 data_xor;
+	};
+
 	u32 unk_startup_r();
 	u32 rtc_r();
 	u32 mcu_r(offs_t offset);
@@ -108,17 +118,12 @@ private:
 	void encryption_do_w(u32 data);
 	void sprite_encryption_w(offs_t offset, u32 data, u32 mem_mask = ~0);
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
-	virtual void device_post_load() override;
-
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	DECLARE_WRITE_LINE_MEMBER(screen_vblank);
-	DECLARE_WRITE_LINE_MEMBER(irq);
+	void screen_vblank(int state);
+	void irq(int state);
 
 	TIMER_DEVICE_CALLBACK_MEMBER(mcu_interrupt);
 
@@ -194,4 +199,4 @@ private:
 	required_memory_region m_mainrom;
 };
 
-#endif
+#endif // MAME_IGS_PGM2_H

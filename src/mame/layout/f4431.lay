@@ -1,0 +1,85 @@
+<?xml version="1.0"?>
+<!--
+license:CC0-1.0
+copyright-holders: Dirk Best
+
+Facit 4431 layout
+-->
+
+<mamelayout version="2">
+
+	<element name="led" defstate="0">
+		<disk state="0">
+			<color red="0" green="0.2" blue="0" />
+		</disk>
+		<disk state="1">
+			<color red="0" green="0.8" blue="0" />
+		</disk>
+	</element>
+
+	<element name="text_KEYBOARD"><text string="KEYBOARD"><color red="0.80" green="0.80" blue="0.80" /></text></element>
+
+	<element name="text_ONLINE"><text string="ON LINE"><color red="0.80" green="0.80" blue="0.80" /></text></element>
+	<element name="text_LOCAL"><text string="LOCAL"><color red="0.80" green="0.80" blue="0.80" /></text></element>
+	<element name="text_KBDLOCKED"><text string="KBD LOCKED"><color red="0.80" green="0.80" blue="0.80" /></text></element>
+	<element name="text_L1"><text string="L1"><color red="0.80" green="0.80" blue="0.80" /></text></element>
+	<element name="text_L2"><text string="L2"><color red="0.80" green="0.80" blue="0.80" /></text></element>
+	<element name="text_L3"><text string="L3"><color red="0.80" green="0.80" blue="0.80" /></text></element>
+	<element name="text_L4"><text string="L4"><color red="0.80" green="0.80" blue="0.80" /></text></element>
+
+	<view name="Keyboard LEDs">
+		<bounds x="0" y="0" width="800" height="640" />
+
+		<screen index="0">
+			<bounds left="0" top="0" right="800" bottom="600" />
+		</screen>
+
+		<element ref="text_KEYBOARD">
+			<bounds left="10" top="610" right="100" bottom="630" />
+		</element>
+
+		<element name="key_led6" ref="led">
+			<bounds x="140" y="605" width="10" height="10" />
+		</element>
+		<element ref="text_ONLINE">
+			<bounds x="120" y="620" width="50" height="15" />
+		</element>
+		<element name="key_led5" ref="led">
+			<bounds x="200" y="605" width="10" height="10" />
+		</element>
+		<element ref="text_LOCAL">
+			<bounds x="180" y="620" width="50" height="15" />
+		</element>
+		<element name="key_led4" ref="led">
+			<bounds x="260" y="605" width="10" height="10" />
+		</element>
+		<element ref="text_KBDLOCKED">
+			<bounds x="235" y="620" width="60" height="15" />
+		</element>
+		<element name="key_led3" ref="led">
+			<bounds x="320" y="605" width="10" height="10" />
+		</element>
+		<element ref="text_L1">
+			<bounds x="300" y="620" width="50" height="15" />
+		</element>
+		<element name="key_led2" ref="led">
+			<bounds x="380" y="605" width="10" height="10" />
+		</element>
+		<element ref="text_L2">
+			<bounds x="360" y="620" width="50" height="15" />
+		</element>
+		<element name="key_led1" ref="led">
+			<bounds x="440" y="605" width="10" height="10" />
+		</element>
+		<element ref="text_L3">
+			<bounds x="420" y="620" width="50" height="15" />
+		</element>
+		<element name="key_led0" ref="led">
+			<bounds x="500" y="605" width="10" height="10" />
+		</element>
+		<element ref="text_L4">
+			<bounds x="480" y="620" width="50" height="15" />
+		</element>
+	</view>
+
+</mamelayout>

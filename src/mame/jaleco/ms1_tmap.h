@@ -8,11 +8,12 @@
     and mahjong games from the same period.
 
 ***************************************************************************/
-#ifndef MAME_VIDEO_MS1_TMAP_H
-#define MAME_VIDEO_MS1_TMAP_H
+#ifndef MAME_JALECO_MS1_TMAP_H
+#define MAME_JALECO_MS1_TMAP_H
 
 #pragma once
 
+#include "screen.h"
 #include "tilemap.h"
 
 
@@ -41,6 +42,7 @@ public:
 	void set_16x16_scroll_factor(int scroll_factor) { m_16x16_scroll_factor = scroll_factor; }
 	void set_bits_per_color_code(int bits) { m_bits_per_color_code = bits; }
 	void set_colorbase(uint16_t colorbase) { m_colorbase = colorbase; }
+	template <typename T> void set_screen_tag(T &&tag) { m_screen.set_tag(std::forward<T>(tag)); }
 
 	// memory handlers
 	void write(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
@@ -55,13 +57,14 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 	virtual void device_post_load() override;
 
 private:
 	// shared memory finder
 	required_shared_ptr<uint16_t> m_scrollram;
+	optional_device<screen_device> m_screen;
 
 	// configuration
 	int m_8x8_scroll_factor;
@@ -90,4 +93,4 @@ private:
 // device type definition
 DECLARE_DEVICE_TYPE(MEGASYS1_TILEMAP, megasys1_tilemap_device)
 
-#endif  // MAME_VIDEO_MS1_TMAP_H
+#endif  // MAME_JALECO_MS1_TMAP_H

@@ -7,13 +7,17 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "machine/at.h"
+#include "at.h"
+
 #include "cpu/i86/i286.h"
 #include "cpu/i386/i386.h"
+
 #include "softlist_dev.h"
 #include "speaker.h"
 
-#define LOG_PORT80  0
+#define LOG_PORT80  (1U << 1)
+#define VERBOSE (0)
+#include "logmacro.h"
 
 DEFINE_DEVICE_TYPE(AT_MB, at_mb_device, "at_mb", "PC/AT Motherboard")
 
@@ -41,8 +45,9 @@ void at_mb_device::device_reset()
 
 void at_mb_device::device_start()
 {
+	// FIXME: this is gross and should be done in machine configuration
 	if(!strncmp(m_maincpu->shortname(), "i80286", 6))
-		downcast<i80286_cpu_device *>(m_maincpu.target())->set_a20_callback(i80286_cpu_device::a20_cb(&at_mb_device::a20_286, this));
+		downcast<i80286_cpu_device *>(m_maincpu.target())->set_a20_callback(*this, FUNC(at_mb_device::a20_286));
 }
 
 void at_mb_device::at_softlists(machine_config &config)
@@ -129,6 +134,7 @@ void at_mb_device::device_add_mconfig(machine_config &config)
 	m_isabus->drq6_callback().set(m_dma8237_2, FUNC(am9517a_device::dreq2_w));
 	m_isabus->drq7_callback().set(m_dma8237_2, FUNC(am9517a_device::dreq3_w));
 	m_isabus->iochck_callback().set(FUNC(at_mb_device::iochck_w));
+	m_isabus->iochrdy_callback().set_inputline(m_maincpu, INPUT_LINE_HALT);
 
 	MC146818(config, m_mc146818, 32.768_kHz_XTAL);
 	m_mc146818->irq().set(m_pic8259_slave, FUNC(pic8259_device::ir0_w));
@@ -153,7 +159,8 @@ void at_mb_device::map(address_map &map)
 	map(0x0061, 0x0061).rw(FUNC(at_mb_device::portb_r), FUNC(at_mb_device::portb_w));
 	map(0x0060, 0x0060).rw("keybc", FUNC(at_keyboard_controller_device::data_r), FUNC(at_keyboard_controller_device::data_w));
 	map(0x0064, 0x0064).rw("keybc", FUNC(at_keyboard_controller_device::status_r), FUNC(at_keyboard_controller_device::command_w));
-	map(0x0070, 0x007f).r("rtc", FUNC(mc146818_device::read)).umask16(0xffff).w(FUNC(at_mb_device::write_rtc)).umask16(0xffff);
+	map(0x0070, 0x007f).w(FUNC(at_mb_device::rtcas_nmi_w)).umask16(0x00ff);
+	map(0x0070, 0x007f).rw(m_mc146818, FUNC(mc146818_device::data_r), FUNC(mc146818_device::data_w)).umask16(0xff00);
 	map(0x0080, 0x009f).rw(FUNC(at_mb_device::page8_r), FUNC(at_mb_device::page8_w)).umask16(0xffff);
 	map(0x00a0, 0x00bf).rw("pic8259_slave", FUNC(pic8259_device::read), FUNC(pic8259_device::write)).umask16(0xffff);
 	map(0x00c0, 0x00df).rw("dma8237_2", FUNC(am9517a_device::read), FUNC(am9517a_device::write)).umask16(0x00ff);
@@ -192,7 +199,7 @@ void at_mb_device::speaker_set_spkrdata(uint8_t data)
  *
  *************************************************************/
 
-WRITE_LINE_MEMBER( at_mb_device::pit8254_out2_changed )
+void at_mb_device::pit8254_out2_changed(int state)
 {
 	m_pit_out2 = state ? 1 : 0;
 	m_speaker->level_w(m_at_spkrdata & m_pit_out2);
@@ -232,10 +239,9 @@ void at_mb_device::page8_w(offs_t offset, uint8_t data)
 {
 	m_at_pages[offset % 0x10] = data;
 
-	if (LOG_PORT80 && (offset == 0))
+	if (offset == 0)
 	{
-		logerror(" at_page8_w(): Port 80h <== 0x%02x (PC=0x%08x)\n", data,
-							(unsigned) m_maincpu->pc());
+		LOGMASKED(LOG_PORT80, " at_page8_w(): Port 80h <== 0x%02x (PC=0x%08x)\n", data, m_maincpu->pc());
 	}
 
 	switch(offset % 8)
@@ -256,7 +262,7 @@ void at_mb_device::page8_w(offs_t offset, uint8_t data)
 }
 
 
-WRITE_LINE_MEMBER( at_mb_device::dma_hrq_changed )
+void at_mb_device::dma_hrq_changed(int state)
 {
 	m_maincpu->set_input_line(INPUT_LINE_HALT, state ? ASSERT_LINE : CLEAR_LINE);
 
@@ -330,14 +336,14 @@ void at_mb_device::dma8237_5_dack_w(uint8_t data) { m_isabus->dack16_w(5, m_dma_
 void at_mb_device::dma8237_6_dack_w(uint8_t data) { m_isabus->dack16_w(6, m_dma_high_byte | data); }
 void at_mb_device::dma8237_7_dack_w(uint8_t data) { m_isabus->dack16_w(7, m_dma_high_byte | data); }
 
-WRITE_LINE_MEMBER( at_mb_device::dma8237_out_eop )
+void at_mb_device::dma8237_out_eop(int state)
 {
 	m_cur_eop = state == ASSERT_LINE;
 	if(m_dma_channel != -1)
 		m_isabus->eop_w(m_dma_channel, m_cur_eop ? ASSERT_LINE : CLEAR_LINE );
 }
 
-WRITE_LINE_MEMBER( at_mb_device::dma8237_2_out_eop )
+void at_mb_device::dma8237_2_out_eop(int state)
 {
 	m_cur_eop2 = state == ASSERT_LINE;
 	if(m_dma_channel != -1)
@@ -358,17 +364,12 @@ void at_mb_device::set_dma_channel(int channel, int state)
 	}
 }
 
-void at_mb_device::write_rtc(offs_t offset, uint8_t data)
+void at_mb_device::rtcas_nmi_w(uint8_t data)
 {
-	if (offset==0) {
-		m_nmi_enabled = BIT(data,7);
-		if (!m_nmi_enabled)
-			m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
-		m_mc146818->write(0,data);
-	}
-	else {
-		m_mc146818->write(offset,data);
-	}
+	m_nmi_enabled = BIT(data,7);
+	if (!m_nmi_enabled)
+		m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
+	m_mc146818->address_w(data);
 }
 
 uint32_t at_mb_device::a20_286(bool state)
@@ -376,22 +377,22 @@ uint32_t at_mb_device::a20_286(bool state)
 	return (state ? 0xffffff : 0xefffff);
 }
 
-WRITE_LINE_MEMBER( at_mb_device::shutdown )
+void at_mb_device::shutdown(int state)
 {
 	if(state)
 		m_maincpu->reset();
 }
-WRITE_LINE_MEMBER( at_mb_device::dack0_w ) { set_dma_channel(0, state); }
-WRITE_LINE_MEMBER( at_mb_device::dack1_w ) { set_dma_channel(1, state); }
-WRITE_LINE_MEMBER( at_mb_device::dack2_w ) { set_dma_channel(2, state); }
-WRITE_LINE_MEMBER( at_mb_device::dack3_w ) { set_dma_channel(3, state); }
-WRITE_LINE_MEMBER( at_mb_device::dack4_w ) { m_dma8237_1->hack_w(state ? 0 : 1); } // it's inverted
-WRITE_LINE_MEMBER( at_mb_device::dack5_w ) { set_dma_channel(5, state); }
-WRITE_LINE_MEMBER( at_mb_device::dack6_w ) { set_dma_channel(6, state); }
-WRITE_LINE_MEMBER( at_mb_device::dack7_w ) { set_dma_channel(7, state); }
+void at_mb_device::dack0_w(int state) { set_dma_channel(0, state); }
+void at_mb_device::dack1_w(int state) { set_dma_channel(1, state); }
+void at_mb_device::dack2_w(int state) { set_dma_channel(2, state); }
+void at_mb_device::dack3_w(int state) { set_dma_channel(3, state); }
+void at_mb_device::dack4_w(int state) { m_dma8237_1->hack_w(state ? 0 : 1); } // it's inverted
+void at_mb_device::dack5_w(int state) { set_dma_channel(5, state); }
+void at_mb_device::dack6_w(int state) { set_dma_channel(6, state); }
+void at_mb_device::dack7_w(int state) { set_dma_channel(7, state); }
 
-WRITE_LINE_MEMBER( at_mb_device::kbd_clk_w ) { m_keybc->kbd_clk_w(state); }
-WRITE_LINE_MEMBER( at_mb_device::kbd_data_w ) { m_keybc->kbd_data_w(state); }
+void at_mb_device::kbd_clk_w(int state) { m_keybc->kbd_clk_w(state); }
+void at_mb_device::kbd_data_w(int state) { m_keybc->kbd_data_w(state); }
 
 uint8_t at_mb_device::portb_r()
 {
@@ -419,7 +420,7 @@ void at_mb_device::portb_w(uint8_t data)
 		m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 }
 
-WRITE_LINE_MEMBER( at_mb_device::iochck_w )
+void at_mb_device::iochck_w(int state)
 {
 	if (!state && m_nmi_enabled && !m_channel_check)
 		m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);

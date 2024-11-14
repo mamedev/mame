@@ -15,6 +15,7 @@
 #define FAST_CLOCK  (1)
 
 NETLIST_START(pong)
+{
 
 	SOLVER(Solver, 5000)
 	PARAM(Solver.PARALLEL, 0) // Don't do parallel solvers
@@ -582,4 +583,4 @@ NETLIST_START(pong)
 	NET_C(VCC, high.VCC, low.VCC, antenna.VCC)
 	NET_C(GND, high.GND, low.GND, antenna.GND)
 
-NETLIST_END()
+}

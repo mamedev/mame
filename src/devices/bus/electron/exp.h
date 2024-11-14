@@ -120,12 +120,12 @@ public:
 	uint8_t expbus_r(offs_t offset);
 	void expbus_w(offs_t offset, uint8_t data);
 
-	DECLARE_WRITE_LINE_MEMBER( irq_w ) { m_irq_handler(state); }
-	DECLARE_WRITE_LINE_MEMBER( nmi_w ) { m_nmi_handler(state); }
+	void irq_w(int state) { m_irq_handler(state); }
+	void nmi_w(int state) { m_nmi_handler(state); }
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 	device_electron_expansion_interface *m_card;
 

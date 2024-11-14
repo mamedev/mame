@@ -116,6 +116,7 @@
 			//            "mat3": 9 floats
 			//            "mat4": 16 floats
 			"values": [ 1.0 ]
-		}
+		},
+		{ "name": "u_inv_view_dims", "type": "vec4", "values": [ 1.0, 1.0, 0.0, 0.0 ] }
 	]
 }

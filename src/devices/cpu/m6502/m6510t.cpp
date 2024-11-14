@@ -2,7 +2,7 @@
 // copyright-holders:Olivier Galibert
 /***************************************************************************
 
-    m6510t.c
+    m6510t.cpp
 
     6510 with the full 8 i/o pins at the expense of the NMI and RDY lines.
 

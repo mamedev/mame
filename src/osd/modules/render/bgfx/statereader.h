@@ -7,16 +7,18 @@
 //
 //================================================================
 
+#ifndef MAME_RENDER_BGFX_STATEREADER_H
+#define MAME_RENDER_BGFX_STATEREADER_H
+
 #pragma once
 
-#ifndef DRAWBGFX_STATE_READER
-#define DRAWBGFX_STATE_READER
+#include "util/strformat.h"
 
 #include <rapidjson/document.h>
 
+#include <cstdint>
 #include <string>
 
-#include "osdcore.h"
 
 using namespace rapidjson;
 
@@ -45,22 +47,22 @@ protected:
 	static uint64_t get_param_from_string(std::string value, const string_to_enum* enums, const int count);
 
 protected:
-	static bool READER_CHECK(bool condition, const char* format, ...)
+	template <typename Format, typename... Params>
+	static bool READER_CHECK(bool condition, Format &&fmt, Params &&... args)
 	{
-		if (!condition)
-		{
-			va_list ap;
-			va_start(ap, format);
-			char buf[2048];
-			vsnprintf(buf, 2048, format, ap);
-			osd_printf_error("Error: %s\n", buf);
-			va_end(ap);
-		}
-		return condition;
+		return V_READER_CHECK(condition, util::make_format_argument_pack(std::forward<Format>(fmt), std::forward<Params>(args)...));
+	}
+
+	template <typename Format, typename... Params>
+	static bool READER_WARN(bool condition, Format &&fmt, Params &&... args)
+	{
+		return V_READER_WARN(condition, util::make_format_argument_pack(std::forward<Format>(fmt), std::forward<Params>(args)...));
 	}
 
 private:
+	static bool V_READER_CHECK(bool condition, const util::format_argument_pack<char> &args);
+	static bool V_READER_WARN(bool condition, const util::format_argument_pack<char> &args);
 	static void get_vec_values(const Value& value_array, float* data, const unsigned int count);
 };
 
-#endif // DRAWBGFX_STATE_READER
+#endif // MAME_RENDER_BGFX_STATEREADER_H

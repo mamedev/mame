@@ -30,6 +30,9 @@
 #include "emupal.h"
 #include "screen.h"
 
+
+namespace {
+
 class tk635_state : public driver_device
 {
 public:
@@ -45,16 +48,16 @@ public:
 	void tk635(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;
 	required_shared_ptr<u8> m_ram;
 	required_shared_ptr<u8> m_charram;
 
-	void mem_map(address_map &map);
-	void io_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
+	void io_map(address_map &map) ATTR_COLD;
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void vblank_w(int state);
@@ -208,5 +211,8 @@ ROM_START( tk635 )
 	ROM_REGION(0x40000, "maincpu", 0)
 	ROM_LOAD("fw_v0_23.bin", 0x00000, 0x40000, CRC(bec6fdae) SHA1(37dc46f6b761d874bd1627a1137bc4082e364698))
 ROM_END
+
+} // anonymous namespace
+
 
 COMP( 199?, tk635, 0, 0, tk635, tk635, tk635_state, empty_init, "Termtek", "TK-635", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )

@@ -116,11 +116,11 @@ device_intv_cart_interface::~device_intv_cart_interface()
 //  rom_alloc - alloc the space for the cart
 //-------------------------------------------------
 
-void device_intv_cart_interface::rom_alloc(uint32_t size, const char *tag)
+void device_intv_cart_interface::rom_alloc(uint32_t size)
 {
 	if (m_rom == nullptr)
 	{
-		m_rom = device().machine().memory().region_alloc(std::string(tag).append(INTVSLOT_ROM_REGION_TAG).c_str(), size, 1, ENDIANNESS_LITTLE)->base();
+		m_rom = device().machine().memory().region_alloc(device().subtag("^cart:rom"), size, 1, ENDIANNESS_LITTLE)->base();
 		memset(m_rom, 0xff, size);
 		m_rom_size = size;
 	}
@@ -222,7 +222,7 @@ static const char *intv_get_slot(int type)
  call load
  -------------------------------------------------*/
 
-image_init_result intv_cart_slot_device::load_fullpath()
+std::error_condition intv_cart_slot_device::load_fullpath()
 {
 	uint8_t temp;
 	uint8_t num_segments;
@@ -243,15 +243,15 @@ image_init_result intv_cart_slot_device::load_fullpath()
 		// header
 		fread(&temp, 1);
 		if (temp != 0xa8)
-			return image_init_result::FAIL;
+			return image_error::INVALIDIMAGE;
 
 		fread(&num_segments, 1);
 
 		fread(&temp, 1);
 		if (temp != (num_segments ^ 0xff))
-			return image_init_result::FAIL;
+			return image_error::INVALIDIMAGE;
 
-		m_cart->rom_alloc(0x20000, tag());
+		m_cart->rom_alloc(0x20000);
 		ROM = (uint8_t *)m_cart->get_rom_base();
 
 		for (int i = 0; i < num_segments; i++)
@@ -281,7 +281,7 @@ image_init_result intv_cart_slot_device::load_fullpath()
 		{
 			fread(&temp, 1);
 		}
-		return image_init_result::PASS;
+		return std::error_condition();
 	}
 	/* otherwise, we load it as a .bin file, using extrainfo from intv.hsi in place of .cfg */
 	else
@@ -300,7 +300,7 @@ image_init_result intv_cart_slot_device::load_fullpath()
 		int mapper, rom[5], ram, extra;
 		std::string extrainfo;
 
-		m_cart->rom_alloc(0x20000, tag());
+		m_cart->rom_alloc(0x20000);
 		ROM = (uint8_t *)m_cart->get_rom_base();
 
 		if (!hashfile_extrainfo(*this, extrainfo))
@@ -372,16 +372,16 @@ image_init_result intv_cart_slot_device::load_fullpath()
 			}
 		}
 
-		return image_init_result::PASS;
+		return std::error_condition();
 	}
 }
 
-image_init_result intv_cart_slot_device::call_load()
+std::pair<std::error_condition, std::string> intv_cart_slot_device::call_load()
 {
 	if (m_cart)
 	{
 		if (!loaded_through_softlist())
-			return load_fullpath();
+			return std::make_pair(load_fullpath(), std::string());
 		else
 		{
 			uint16_t offset[] = { 0x400, 0x2000, 0x4000, 0x4800, 0x5000, 0x6000, 0x7000, 0x8000, 0x8800, 0x9000, 0xa000, 0xb000, 0xc000, 0xd000, 0xe000, 0xf000};
@@ -401,7 +401,7 @@ image_init_result intv_cart_slot_device::call_load()
 			uint16_t address;
 			uint8_t *ROM, *region;
 
-			m_cart->rom_alloc(extra_bank ? 0x22000 : 0x20000, tag());
+			m_cart->rom_alloc(extra_bank ? 0x22000 : 0x20000);
 			ROM = m_cart->get_rom_base();
 
 			for (int i = 0; i < 16; i++)
@@ -424,11 +424,11 @@ image_init_result intv_cart_slot_device::call_load()
 				m_cart->ram_alloc(get_software_region_length("ram"));
 
 			//printf("Type: %s\n", intv_get_slot(m_type));
-			return image_init_result::PASS;
+			return std::make_pair(std::error_condition(), std::string());
 		}
 	}
 
-	return image_init_result::PASS;
+	return std::make_pair(std::error_condition(), std::string());
 }
 
 
@@ -444,8 +444,7 @@ std::string intv_cart_slot_device::get_default_card_software(get_default_card_so
 		hook.image_file()->length(len); // FIXME: check error return, guard against excessively large files
 		std::vector<uint8_t> rom(len);
 
-		size_t actual;
-		hook.image_file()->read(&rom[0], len, actual); // FIXME: check error return or read returning short
+		read(*hook.image_file(), &rom[0], len); // FIXME: check error return or read returning short
 
 		int type = INTV_STD;
 		if (rom[0] == 0xa8 && (rom[1] == (rom[2] ^ 0xff)))

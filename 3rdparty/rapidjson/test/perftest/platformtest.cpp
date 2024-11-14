@@ -1,6 +1,6 @@
 // Tencent is pleased to support the open source community by making RapidJSON available.
 // 
-// Copyright (C) 2015 THL A29 Limited, a Tencent company, and Milo Yip. All rights reserved.
+// Copyright (C) 2015 THL A29 Limited, a Tencent company, and Milo Yip.
 //
 // Licensed under the MIT License (the "License"); you may not use this file except
 // in compliance with the License. You may obtain a copy of the License at
@@ -76,7 +76,7 @@ TEST_F(Platform, strlen) {
 
 TEST_F(Platform, memcmp) {
     for (int i = 0; i < kTrialCount; i++) {
-        EXPECT_EQ(0, memcmp(temp_, json_, length_));
+        EXPECT_EQ(0u, memcmp(temp_, json_, length_));
     }
 }
 

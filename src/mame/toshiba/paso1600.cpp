@@ -19,6 +19,8 @@
 #include "screen.h"
 
 
+namespace {
+
 class paso1600_state : public driver_device
 {
 public:
@@ -51,15 +53,15 @@ private:
 	void pc_dma_write_byte(offs_t offset, uint8_t data);
 	uint32_t screen_update_paso1600(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void paso1600_io(address_map &map);
-	void paso1600_map(address_map &map);
+	void paso1600_io(address_map &map) ATTR_COLD;
+	void paso1600_map(address_map &map) ATTR_COLD;
 
 	uint8_t m_crtc_vreg[0x100]{}, m_crtc_index = 0;
 	struct {
 		uint8_t portb = 0;
 	} m_keyb;
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 	required_device<cpu_device> m_maincpu;
 	required_device<pic8259_device> m_pic;
 	required_device<am9517a_device> m_dma;
@@ -332,12 +334,13 @@ ROM_START( paso1600 )
 	ROM_REGION(0x2000,"pcg", ROMREGION_ERASE00)
 
 	ROM_REGION( 0x800, "chargen", ROMREGION_ERASEFF )
-	ROM_LOAD( "font.rom", 0x0000, 0x0800, BAD_DUMP CRC(a91c45a9) SHA1(a472adf791b9bac3dfa6437662e1a9e94a88b412)) //stolen from pasopia7
+	ROM_LOAD( "5t_2716.bin", 0x0000, 0x0800, BAD_DUMP CRC(b5693720) SHA1(d25327dfaa40b0f4144698e3bad43125fd8e46d0)) //stolen from pasopia - label and location unknown
 
 	ROM_REGION16_LE( 0x20000, "kanji", ROMREGION_ERASEFF )
 	ROM_LOAD( "kanji.rom", 0x0000, 0x20000, NO_DUMP)
-
 ROM_END
+
+} // anonymous namespace
 
 
 //    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS           INIT        COMPANY    FULLNAME        FLAGS

@@ -5,8 +5,8 @@
     Luxor ABC 1600 Mover emulation
 
 **********************************************************************/
-#ifndef MAME_VIDEO_ABC1600_H
-#define MAME_VIDEO_ABC1600_H
+#ifndef MAME_LUXOR_ABC1600_V_H
+#define MAME_LUXOR_ABC1600_V_H
 
 #pragma once
 
@@ -35,19 +35,19 @@ public:
 	// construction/destruction
 	abc1600_mover_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual void vram_map(address_map &map);
-	virtual void crtc_map(address_map &map);
-	virtual void iowr0_map(address_map &map);
-	virtual void iowr1_map(address_map &map);
-	virtual void iowr2_map(address_map &map);
+	virtual void vram_map(address_map &map) ATTR_COLD;
+	virtual void crtc_map(address_map &map) ATTR_COLD;
+	virtual void iowr0_map(address_map &map) ATTR_COLD;
+	virtual void iowr1_map(address_map &map) ATTR_COLD;
+	virtual void iowr2_map(address_map &map) ATTR_COLD;
 
-	void mover_map(address_map &map);
+	void mover_map(address_map &map) ATTR_COLD;
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
-	virtual const tiny_rom_entry *device_rom_region() const override;
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 	// device_memory_interface overrides
 	virtual space_config_vector memory_space_config() const override;
@@ -143,4 +143,4 @@ DECLARE_DEVICE_TYPE(ABC1600_MOVER, abc1600_mover_device)
 
 
 
-#endif // MAME_VIDEO_ABC1600_H
+#endif // MAME_LUXOR_ABC1600_V_H

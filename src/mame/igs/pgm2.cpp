@@ -680,11 +680,11 @@ static INPUT_PORTS_START( pgm2 )
 INPUT_PORTS_END
 
 
-WRITE_LINE_MEMBER(pgm2_state::irq)
+void pgm2_state::irq(int state)
 {
 //  logerror("irq\n");
-	if (state == ASSERT_LINE) m_maincpu->set_input_line(ARM7_IRQ_LINE, ASSERT_LINE);
-	else m_maincpu->set_input_line(ARM7_IRQ_LINE, CLEAR_LINE);
+	if (state == ASSERT_LINE) m_maincpu->set_input_line(arm7_cpu_device::ARM7_IRQ_LINE, ASSERT_LINE);
+	else m_maincpu->set_input_line(arm7_cpu_device::ARM7_IRQ_LINE, CLEAR_LINE);
 }
 
 void pgm2_state::machine_start()
@@ -750,7 +750,7 @@ GFXDECODE_END
 
 void pgm2_state::pgm2(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	IGS036(config, m_maincpu, 100000000); // Unknown clock / divider
 	m_maincpu->set_addrmap(AS_PROGRAM, &pgm2_state::pgm2_rom_map);
 
@@ -758,7 +758,7 @@ void pgm2_state::pgm2(machine_config &config)
 
 	ARM_AIC(config, m_arm_aic, 0).irq_callback().set(FUNC(pgm2_state::irq));
 
-	/* video hardware */
+	// video hardware
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh(HZ_TO_ATTOSECONDS(59.08)); // 59.08Hz, 264 total lines @ 15.59KHz
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
@@ -1193,6 +1193,38 @@ ROM_START( kof98umh )
 	KOF98UMH_VIDEO_SOUND_ROMS
 ROM_END
 
+// Single board game (PCB-0779-00-JG)
+ROM_START( bubucar )
+	ROM_REGION( 0x04000, "maincpu", 0 )
+	ROM_LOAD( "bu_bu_car-en_b5_internal_rom.u12", 0x0000000, 0x0004000, NO_DUMP )
+
+	ROM_REGION32_LE( 0x1000000, "mainrom", 0 )
+	ROM_LOAD( "bubu-car-s1c0en_ev29lv160ab.u23",  0x0000000, 0x0200000, CRC(4c5009ef) SHA1(5b0c96d7bd1243523eb3670b7545cc7455b2d668) )
+
+	ROM_REGION( 0x0200000, "tiles", ROMREGION_ERASE00 )
+	ROM_LOAD( "jg_text.u31",                      0x0000000, 0x0200000, CRC(aa6e8317) SHA1(b982873d0e2faefb89d263f945a5a3ba5f4efcd4) ) // EN29LV160AB-70TCP
+
+	ROM_REGION( 0x2000000, "bgtile", ROMREGION_ERASE00 )
+	// BGL/BGH unpopulated (no background tilemap)
+
+	ROM_REGION( 0x2000000, "sprites_mask", 0 )
+	ROM_LOAD32_WORD( "jg_map_bml.u38",            0x0000000, 0x1000000, CRC(c8c9fa6f) SHA1(22bf354f2ace9d3f05835525f24cc578feff6453) ) // K8Q2815UQB
+	ROM_LOAD32_WORD( "jg_map_bmh.u37",            0x0000002, 0x1000000, CRC(f9ba71fd) SHA1(79dc5ca48d1ba069b702a3854a28836040e981d0) ) // K8Q2815UQB
+
+	ROM_REGION( 0x2000000, "sprites_colour", 0 )
+	ROM_LOAD32_WORD( "jg_cg_cgl.u19",             0x0000000, 0x1000000, CRC(1d7ab9b2) SHA1(322d458f550ebe72b569efe1691aa8902de7a6d4) ) // K8Q2815UQB
+	ROM_LOAD32_WORD( "jg_cg_cgh.u20",             0x0000002, 0x1000000, CRC(2edeb815) SHA1(c9595108691586dfbb0b30bff9535f13e4c3afb3) ) // K8Q2815UQB
+
+	ROM_REGION( 0x1000000, "ymz774", ROMREGION_ERASEFF ) // YMZ774
+	ROM_LOAD16_WORD_SWAP( "jg_wave.u18",          0x0000000, 0x1000000, CRC(8ba99c0c) SHA1(5a7cccfae47eee5c9ea4c172f5126d514156f771) ) // K8Q2815UQB
+
+	ROM_REGION( 0x10000, "sram", 0 )
+	ROM_LOAD( "bubucar_en_sram",                  0x0000000, 0x0010000, NO_DUMP )
+
+	ROM_REGION( 0x603, "cpld", 0 )
+	ROM_LOAD( "xilinx_xc2c32a-vqg44.u14",         0x0000000, 0x0000603, CRC(bf461ea6) SHA1(26c434f189a3730a07cec3ebd9a05d0d0d5e4a55) )
+ROM_END
+
 static void iga_u16_decode(u16 *rom, int len, int ixor)
 {
 	int i;
@@ -1249,10 +1281,10 @@ static void sprite_colour_decode(u16* rom, int len)
 
 	for (i = 0; i < len / 2; i++)
 	{
-		rom[i] = bitswap<16>(rom[i], 15, 14, /* unused - 6bpp */
+		rom[i] = bitswap<16>(rom[i], 15, 14, // unused - 6bpp
 								   13, 12, 11,
 								   5, 4, 3,
-								   7, 6, /* unused - 6bpp */
+								   7, 6, // unused - 6bpp
 								   10, 9, 8,
 								   2, 1, 0  );
 	}
@@ -1412,10 +1444,6 @@ void pgm2_state::init_ddpdojt()
 }
 
 // currently we don't know how to derive address/data xor values from real keys, so we need both
-static const kov3_module_key kov3_104_key = { { 0x40,0xac,0x30,0x00,0x47,0x49,0x00,0x00 } ,{ 0xeb,0x7d,0x8d,0x90,0x2c,0xf4,0x09,0x82 }, 0x18ec71, 0xb89d }; // fake zero-key
-static const kov3_module_key kov3_102_key = { { 0x49,0xac,0xb0,0xec,0x47,0x49,0x95,0x38 } ,{ 0x09,0xbd,0xf1,0x31,0xe6,0xf0,0x65,0x2b }, 0x021d37, 0x81d0 };
-static const kov3_module_key kov3_101_key = { { 0xc1,0x2c,0xc1,0xe5,0x3c,0xc1,0x59,0x9e } ,{ 0xf2,0xb2,0xf0,0x89,0x37,0xf2,0xc7,0x0b }, 0, 0xffff }; // real xor values is unknown
-static const kov3_module_key kov3_100_key = { { 0x40,0xac,0x30,0x00,0x47,0x49,0x00,0x00 } ,{ 0x96,0xf0,0x91,0xe1,0xb3,0xf1,0xef,0x90 }, 0x3e8aa8, 0xc530 }; // fake zero-key
 
 void pgm2_state::init_kov3()
 {
@@ -1440,24 +1468,40 @@ void pgm2_state::decrypt_kov3_module(u32 addrxor, u16 dataxor)
 
 void pgm2_state::init_kov3_104()
 {
+	static const kov3_module_key kov3_104_key = {
+			{ 0x40,0xac,0x30,0x00,0x47,0x49,0x00,0x00 },
+			{ 0xeb,0x7d,0x8d,0x90,0x2c,0xf4,0x09,0x82 },
+			0x18ec71, 0xb89d }; // fake zero-key
 	module_key = &kov3_104_key;
 	init_kov3();
 }
 
 void pgm2_state::init_kov3_102()
 {
+	static const kov3_module_key kov3_102_key = {
+			{ 0x49,0xac,0xb0,0xec,0x47,0x49,0x95,0x38 },
+			{ 0x09,0xbd,0xf1,0x31,0xe6,0xf0,0x65,0x2b },
+			0x021d37, 0x81d0 };
 	module_key = &kov3_102_key;
 	init_kov3();
 }
 
 void pgm2_state::init_kov3_101()
 {
+	static const kov3_module_key kov3_101_key = {
+			{ 0xc1,0x2c,0xc1,0xe5,0x3c,0xc1,0x59,0x9e },
+			{ 0xf2,0xb2,0xf0,0x89,0x37,0xf2,0xc7,0x0b },
+			0, 0xffff }; // real xor values is unknown
 	module_key = &kov3_101_key;
 	init_kov3();
 }
 
 void pgm2_state::init_kov3_100()
 {
+	static const kov3_module_key kov3_100_key = {
+			{ 0x40,0xac,0x30,0x00,0x47,0x49,0x00,0x00 },
+			{ 0x96,0xf0,0x91,0xe1,0xb3,0xf1,0xef,0x90 },
+			0x3e8aa8, 0xc530 }; // fake zero-key
 	module_key = &kov3_100_key;
 	init_kov3();
 }
@@ -1468,25 +1512,31 @@ void pgm2_state::init_kof98umh()
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x20000060, 0x20000063, read32smo_delegate(*this, FUNC(pgm2_state::kof98umh_speedup_r)));
 }
 
+void pgm2_state::init_bubucar()
+{
+	common_encryption_init();
+	// m_maincpu->space(AS_PROGRAM).install_read_handler(0x20020114, 0x20020117, read32smo_delegate(*this, FUNC(pgm2_state::bubucar_speedup_r))); TODO: once this is fully dumped and decrypted
+}
 
 
 
 
-/* PGM2 */
+
+// PGM2
 
 //华通电子/Huatong Electronics (distributor of orleg2, kov2nl in china) = 华通科技/Huatong Technology (distributor of kov3 in china),
 //Same company but they changed name.
 
 // Oriental Legend 2 - should be a V102 and V100 too
-//西游释厄传2/Xīyóu shì è chuán 2 (China; Simplified Chinese)
+//西游释厄传2/Xīyóu shì è zhuàn 2 (China; Simplified Chinese)
 //西遊釋厄傳2/Saiyū Shakuyakuden 2 (Japan; Traditional Chinese - Taiwan(undumped) too?)
-GAME( 2007, orleg2,       0,      pgm2,        pgm2, pgm2_state, init_orleg2,   ROT0, "IGS", "Oriental Legend 2 (V104, Oversea)", MACHINE_SUPPORTS_SAVE ) /* Overseas sets of OL2 do not use the card reader */
+GAME( 2007, orleg2,       0,      pgm2,        pgm2, pgm2_state, init_orleg2,   ROT0, "IGS", "Oriental Legend 2 (V104, Oversea)", MACHINE_SUPPORTS_SAVE ) // Overseas sets of OL2 do not use the card reader
 GAME( 2007, orleg2_103,   orleg2, pgm2,        pgm2, pgm2_state, init_orleg2,   ROT0, "IGS", "Oriental Legend 2 (V103, Oversea)", MACHINE_SUPPORTS_SAVE )
 GAME( 2007, orleg2_101,   orleg2, pgm2,        pgm2, pgm2_state, init_orleg2,   ROT0, "IGS", "Oriental Legend 2 (V101, Oversea)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 2007, orleg2_104cn, orleg2, pgm2,        pgm2, pgm2_state, init_orleg2,   ROT0, "IGS (Huatong license)", "Xiyou Shi E Chuan 2 (V104, China)", MACHINE_SUPPORTS_SAVE )
-GAME( 2007, orleg2_103cn, orleg2, pgm2,        pgm2, pgm2_state, init_orleg2,   ROT0, "IGS (Huatong license)", "Xiyou Shi E Chuan 2 (V103, China)", MACHINE_SUPPORTS_SAVE )
-GAME( 2007, orleg2_101cn, orleg2, pgm2,        pgm2, pgm2_state, init_orleg2,   ROT0, "IGS (Huatong license)", "Xiyou Shi E Chuan 2 (V101, China)", MACHINE_SUPPORTS_SAVE )
+GAME( 2007, orleg2_104cn, orleg2, pgm2,        pgm2, pgm2_state, init_orleg2,   ROT0, "IGS (Huatong license)", "Xiyou Shi E Zhuan 2 (V104, China)", MACHINE_SUPPORTS_SAVE )
+GAME( 2007, orleg2_103cn, orleg2, pgm2,        pgm2, pgm2_state, init_orleg2,   ROT0, "IGS (Huatong license)", "Xiyou Shi E Zhuan 2 (V103, China)", MACHINE_SUPPORTS_SAVE )
+GAME( 2007, orleg2_101cn, orleg2, pgm2,        pgm2, pgm2_state, init_orleg2,   ROT0, "IGS (Huatong license)", "Xiyou Shi E Zhuan 2 (V101, China)", MACHINE_SUPPORTS_SAVE )
 
 GAME( 2007, orleg2_104jp, orleg2, pgm2,        pgm2, pgm2_state, init_orleg2,   ROT0, "IGS (Alta license)", "Saiyuu Shakuyakuden 2 (V104, Japan)", MACHINE_SUPPORTS_SAVE )
 GAME( 2007, orleg2_103jp, orleg2, pgm2,        pgm2, pgm2_state, init_orleg2,   ROT0, "IGS (Alta license)", "Saiyuu Shakuyakuden 2 (V103, Japan)", MACHINE_SUPPORTS_SAVE )
@@ -1517,6 +1567,8 @@ GAME( 2011, kov3_100,     kov3,   pgm2_hires,  pgm2, pgm2_state, init_kov3_100, 
 
 // King of Fighters '98: Ultimate Match Hero
 GAME( 2009, kof98umh,     0,      pgm2_lores,  pgm2, pgm2_state, init_kof98umh, ROT0, "IGS / SNK Playmore / New Channel", "The King of Fighters '98: Ultimate Match HERO (China, V100, 09-08-23)", MACHINE_SUPPORTS_SAVE )
+
+GAME( 2009, bubucar,      0,      pgm2,        pgm2, pgm2_state, init_bubucar,  ROT0, "IGS", "Bu Bu Car (English)", MACHINE_IS_SKELETON ) // Only the program ROM is dumped
 
 // ジグソーワールドアリーナ/Jigsaw World Arena
 

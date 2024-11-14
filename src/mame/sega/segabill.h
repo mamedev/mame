@@ -6,8 +6,8 @@
 
 ***************************************************************************/
 
-#ifndef MAME_MACHINE_SEGABILL_H
-#define MAME_MACHINE_SEGABILL_H
+#ifndef MAME_SEGA_SEGABILL_H
+#define MAME_SEGA_SEGABILL_H
 
 #pragma once
 
@@ -24,18 +24,18 @@ public:
 	// construction/destruction
 	sega_billboard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	void mem_map(address_map &map);
-	void io_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
+	void io_map(address_map &map) ATTR_COLD;
 
 	void write(uint8_t data);
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
-	virtual const tiny_rom_entry *device_rom_region() const override;
-	virtual ioport_constructor device_input_ports() const override;
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_billcpu;
@@ -55,4 +55,4 @@ private:
 // device type definition
 DECLARE_DEVICE_TYPE(SEGA_BILLBOARD, sega_billboard_device)
 
-#endif // MAME_MACHINE_SEGABILL_H
+#endif // MAME_SEGA_SEGABILL_H

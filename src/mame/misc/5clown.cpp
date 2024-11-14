@@ -465,6 +465,8 @@
 #include "speaker.h"
 
 
+namespace {
+
 #define MASTER_CLOCK    XTAL(10'000'000)
 
 
@@ -488,7 +490,7 @@ public:
 	void init_fclown();
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -521,8 +523,8 @@ private:
 	MC6845_UPDATE_ROW(update_row);
 	void _5clown_palette(palette_device &palette) const;
 
-	void fcaudio_map(address_map &map);
-	void fclown_map(address_map &map);
+	void fcaudio_map(address_map &map) ATTR_COLD;
+	void fclown_map(address_map &map) ATTR_COLD;
 };
 
 void _5clown_state::machine_start()
@@ -1028,12 +1030,12 @@ void _5clown_state::fclown(machine_config &config)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	pia6821_device &pia0(PIA6821(config, "pia0", 0));
+	pia6821_device &pia0(PIA6821(config, "pia0"));
 	pia0.readpa_handler().set(FUNC(_5clown_state::mux_port_r));
 	pia0.readpb_handler().set(FUNC(_5clown_state::pia0_b_r));
 	pia0.writepb_handler().set(FUNC(_5clown_state::counters_w));
 
-	pia6821_device &pia1(PIA6821(config, "pia1", 0));
+	pia6821_device &pia1(PIA6821(config, "pia1"));
 	pia1.readpa_handler().set_ioport("SW4");
 	pia1.readpb_handler().set(FUNC(_5clown_state::pia1_b_r));
 	pia1.writepa_handler().set(FUNC(_5clown_state::trigsnd_w));
@@ -1214,6 +1216,8 @@ void _5clown_state::init_fclown()
 		}
 	}
 }
+
+} // anonymous namespace
 
 
 /*************************

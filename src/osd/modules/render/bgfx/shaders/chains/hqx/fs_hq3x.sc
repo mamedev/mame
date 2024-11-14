@@ -60,8 +60,8 @@ void main()
 
 	vec2 index;
 	index.x = dot(pattern[0], vec3( 1.0,  2.0,   4.0)) +
-	          dot(pattern[1], vec3( 8.0,  0.0,  16.0)) +
-	          dot(pattern[2], vec3(32.0, 64.0, 128.0));
+			  dot(pattern[1], vec3( 8.0,  0.0,  16.0)) +
+			  dot(pattern[2], vec3(32.0, 64.0, 128.0));
 	index.y = dot(cross, vec4(1.0, 2.0, 4.0, 8.0)) * SCALE * SCALE + dot(floor(fp * vec2(SCALE, SCALE)), vec2(1.0, SCALE));
 
 	vec2 step = vec2(1.0, 1.0) / vec2(256.0, 16.0 * (SCALE * SCALE));

@@ -30,17 +30,17 @@ public:
 	uint8_t z80_ram_r(offs_t offset) { return m_ram->read(offset); }
 	void z80_ram_w(offs_t offset, uint8_t data) { m_ram->write(offset,data); }
 
-	DECLARE_WRITE_LINE_MEMBER(port1_irq) { m_isa->irq4_w(state); }
-	DECLARE_WRITE_LINE_MEMBER(port2_irq) { m_isa->irq3_w(state); }
-	DECLARE_WRITE_LINE_MEMBER(lpt_irq);
+	void port1_irq(int state) { m_isa->irq4_w(state); }
+	void port2_irq(int state) { m_isa->irq3_w(state); }
+	void lpt_irq(int state);
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// optional information overrides
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual ioport_constructor device_input_ports() const override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 
 
 private:
@@ -56,8 +56,8 @@ private:
 	required_ioport m_h2;
 	required_device<ram_device> m_ram;
 
-	void z80_program_map(address_map &map);
-	void z80_io_map(address_map &map);
+	void z80_program_map(address_map &map) ATTR_COLD;
+	void z80_io_map(address_map &map) ATTR_COLD;
 
 	bool m_devices_installed;
 };

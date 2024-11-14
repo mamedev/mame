@@ -26,6 +26,8 @@
 #include "screen.h"
 
 
+namespace {
+
 class rd100_state : public driver_device
 {
 public:
@@ -39,18 +41,18 @@ public:
 	void rd100(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	HD44780_PIXEL_UPDATE(pixel_update);
 
 	uint8_t keys_r();
 	void key_scan_w(uint8_t data);
-	DECLARE_READ_LINE_MEMBER( shift_r );
-	DECLARE_READ_LINE_MEMBER( ctrl_r );
+	int shift_r();
+	int ctrl_r();
 
-	void mem_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	required_ioport_array<9> m_keys;
@@ -95,7 +97,7 @@ void rd100_state::key_scan_w(uint8_t data)
 	m_key_scan = data;
 }
 
-READ_LINE_MEMBER(rd100_state::shift_r)
+int rd100_state::shift_r()
 {
 	if (m_shift)
 	{
@@ -108,7 +110,7 @@ READ_LINE_MEMBER(rd100_state::shift_r)
 	return ky;
 }
 
-READ_LINE_MEMBER(rd100_state::ctrl_r)
+int rd100_state::ctrl_r()
 {
 	if (m_ctrl)
 	{
@@ -262,7 +264,7 @@ void rd100_state::rd100(machine_config &config)
 	screen.set_visarea(0, 16*6-1, 0, 16-1);
 	screen.set_palette("palette");
 
-	hd44780_device &hd44780(HD44780(config, "hd44780"));
+	hd44780_device &hd44780(HD44780(config, "hd44780", 270'000)); // TODO: clock not measured, datasheet typical clock used
 	hd44780.set_lcd_size(2, 16);
 	hd44780.set_pixel_update_cb(FUNC(rd100_state::pixel_update));
 
@@ -279,6 +281,9 @@ ROM_START( rd100 )
 	ROM_REGION( 0x8000, "roms", 0 )
 	ROM_LOAD( "pak3-01.bin",  0x0000, 0x8000, CRC(cf5bbf01) SHA1(0673f4048d700b84c30781af23fbeabe0b994306) )
 ROM_END
+
+} // anonymous namespace
+
 
 /* Driver */
 

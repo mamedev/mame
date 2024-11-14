@@ -69,16 +69,17 @@ void mos6551_device::device_add_mconfig(machine_config &config)
 	m_internal_clock->signal_handler().set(FUNC(mos6551_device::internal_clock));
 }
 
+void mos6551_device::map(address_map &map)
+{
+	map(0, 0).rw(FUNC(mos6551_device::read_rdr), FUNC(mos6551_device::write_tdr));
+	map(1, 1).rw(FUNC(mos6551_device::read_status), FUNC(mos6551_device::write_reset));
+	map(2, 2).rw(FUNC(mos6551_device::read_command), FUNC(mos6551_device::write_command));
+	map(3, 3).rw(FUNC(mos6551_device::read_control), FUNC(mos6551_device::write_control));
+}
+
 
 void mos6551_device::device_start()
 {
-	// resolve callbacks
-	m_irq_handler.resolve_safe();
-	m_txd_handler.resolve_safe();
-	m_rxc_handler.resolve_safe();
-	m_rts_handler.resolve_safe();
-	m_dtr_handler.resolve_safe();
-
 	// state saving
 	save_item(NAME(m_control));
 	save_item(NAME(m_command));
@@ -351,12 +352,22 @@ void mos6551_device::write_command(uint8_t data)
 
 	// bit 1
 	m_rx_irq_enable = !((m_command >> 1) & 1) && !m_dtr;
+	if (!m_rx_irq_enable && (m_irq_state & IRQ_RDRF))
+	{
+		m_irq_state &= ~IRQ_RDRF;
+		update_irq();
+	}
 
 	// bits 2-3
 	int transmitter_control = (m_command >> 2) & 3;
 	m_tx_irq_enable = transmitter_controls[transmitter_control][0] && !m_dtr;
 	m_tx_enable = transmitter_controls[transmitter_control][1];
 	m_brk = transmitter_controls[transmitter_control][2];
+	if (!m_tx_irq_enable && (m_irq_state & IRQ_TDRE))
+	{
+		m_irq_state &= ~IRQ_TDRE;
+		update_irq();
+	}
 
 	// bit 4
 	m_echo_mode = (m_command >> 4) & 1;
@@ -449,7 +460,7 @@ void mos6551_device::set_xtal(uint32_t xtal)
 	}
 }
 
-WRITE_LINE_MEMBER( mos6551_device::internal_clock )
+void mos6551_device::internal_clock(int state)
 {
 	if (m_tx_internal_clock)
 	{
@@ -457,7 +468,7 @@ WRITE_LINE_MEMBER( mos6551_device::internal_clock )
 	}
 }
 
-WRITE_LINE_MEMBER(mos6551_device::write_xtal1)
+void mos6551_device::write_xtal1(int state)
 {
 	if (!m_tx_internal_clock)
 	{
@@ -465,12 +476,12 @@ WRITE_LINE_MEMBER(mos6551_device::write_xtal1)
 	}
 }
 
-WRITE_LINE_MEMBER( mos6551_device::write_rxd )
+void mos6551_device::write_rxd(int state)
 {
 	m_rxd = state;
 }
 
-WRITE_LINE_MEMBER( mos6551_device::write_rxc )
+void mos6551_device::write_rxc(int state)
 {
 	if (!m_rx_internal_clock)
 	{
@@ -478,13 +489,13 @@ WRITE_LINE_MEMBER( mos6551_device::write_rxc )
 	}
 }
 
-WRITE_LINE_MEMBER( mos6551_device::write_cts )
+void mos6551_device::write_cts(int state)
 {
 	if (m_cts != state)
 	{
 		m_cts = state;
 
-		if (m_cts)
+		if (m_cts && started())
 		{
 			if (m_tx_output == OUTPUT_TXD)
 			{
@@ -495,7 +506,7 @@ WRITE_LINE_MEMBER( mos6551_device::write_cts )
 	}
 }
 
-WRITE_LINE_MEMBER( mos6551_device::write_dsr )
+void mos6551_device::write_dsr(int state)
 {
 	if (m_dsr != state)
 	{
@@ -503,7 +514,7 @@ WRITE_LINE_MEMBER( mos6551_device::write_dsr )
 	}
 }
 
-WRITE_LINE_MEMBER( mos6551_device::write_dcd )
+void mos6551_device::write_dcd(int state)
 {
 	if (m_dcd != state)
 	{
@@ -511,7 +522,7 @@ WRITE_LINE_MEMBER( mos6551_device::write_dcd )
 	}
 }
 
-WRITE_LINE_MEMBER(mos6551_device::receiver_clock)
+void mos6551_device::receiver_clock(int state)
 {
 	if (m_rx_clock != state)
 	{
@@ -663,7 +674,7 @@ WRITE_LINE_MEMBER(mos6551_device::receiver_clock)
 	}
 }
 
-WRITE_LINE_MEMBER(mos6551_device::transmitter_clock)
+void mos6551_device::transmitter_clock(int state)
 {
 	if (m_rx_internal_clock)
 	{

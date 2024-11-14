@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Aaron Giles
-#ifndef MAME_AUDIO_VICDUAL_H
-#define MAME_AUDIO_VICDUAL_H
+#ifndef MAME_SEGA_VICDUAL_A_H
+#define MAME_SEGA_VICDUAL_A_H
 
 #pragma once
 
@@ -14,8 +14,8 @@ class vicdual_audio_device_base : public device_t, public device_mixer_interface
 protected:
 	vicdual_audio_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u8 inputs_mask, void (*netlist)(netlist::nlparse_t &), double output_scale);
 
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual void device_start() override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual void device_start() override ATTR_COLD;
 
 public:
 	void write(u8 data);
@@ -46,4 +46,4 @@ public:
 DECLARE_DEVICE_TYPE(BORDERLINE_AUDIO, borderline_audio_device)
 DECLARE_DEVICE_TYPE(FROGS_AUDIO, frogs_audio_device)
 
-#endif // MAME_AUDIO_VICDUAL_H
+#endif // MAME_SEGA_VICDUAL_A_H

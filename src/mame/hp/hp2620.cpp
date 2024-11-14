@@ -18,6 +18,9 @@ Skeleton driver for HP-2620 series display terminals.
 #include "screen.h"
 #include "speaker.h"
 
+
+namespace {
+
 class hp2620_state : public driver_device
 {
 public:
@@ -36,8 +39,8 @@ public:
 	void hp2622(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	u8 nvram_r(offs_t offset);
@@ -51,11 +54,11 @@ private:
 
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	DECLARE_WRITE_LINE_MEMBER(nlrc_w);
-	DECLARE_WRITE_LINE_MEMBER(bell_w);
+	void nlrc_w(int state);
+	void bell_w(int state);
 
-	void io_map(address_map &map);
-	void mem_map(address_map &map);
+	void io_map(address_map &map) ATTR_COLD;
+	void mem_map(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<input_merger_device> m_nmigate;
@@ -136,7 +139,7 @@ void hp2620_state::ennmi_w(offs_t offset, u8 data)
 	m_nmigate->in_w<0>(BIT(offset, 0));
 }
 
-WRITE_LINE_MEMBER(hp2620_state::nlrc_w)
+void hp2620_state::nlrc_w(int state)
 {
 	// clock input for LS175 at U59
 	if (state)
@@ -145,7 +148,7 @@ WRITE_LINE_MEMBER(hp2620_state::nlrc_w)
 	// TODO: shift keyboard response into m_key_status
 }
 
-WRITE_LINE_MEMBER(hp2620_state::bell_w)
+void hp2620_state::bell_w(int state)
 {
 	m_bell->level_w(state);
 }
@@ -241,5 +244,8 @@ ROM_START( hp2622a )
 	ROM_REGION(0x2000, "chargen", 0)
 	ROM_LOAD( "1818-1489.xu311", 0x0000, 0x2000, CRC(9879b153) SHA1(fc1705d6de38eb6d3a67f1ae439e359e5124d028) )
 ROM_END
+
+} // anonymous namespace
+
 
 COMP(1982, hp2622a, 0, 0, hp2622, hp2622, hp2620_state, empty_init, "HP", "HP-2622A", MACHINE_NOT_WORKING)

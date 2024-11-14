@@ -2,7 +2,7 @@
 // copyright-holders:MetalliC
 /*********************************************************************
 
-    formats/fl1_dsk.c
+    formats/fl1_dsk.cpp
 
     FloppyOne DOS disk images
 
@@ -14,17 +14,17 @@ fl1_format::fl1_format() : wd177x_format(formats)
 {
 }
 
-const char *fl1_format::name() const
+const char *fl1_format::name() const noexcept
 {
 	return "fl1";
 }
 
-const char *fl1_format::description() const
+const char *fl1_format::description() const noexcept
 {
 	return "FloppyOne floppy disk image";
 }
 
-const char *fl1_format::extensions() const
+const char *fl1_format::extensions() const noexcept
 {
 	return "fl1";
 }

@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Nicola Salmoria
-#ifndef MAME_INCLUDES_ZACCARIA_H
-#define MAME_INCLUDES_ZACCARIA_H
+#ifndef MAME_ZACCARIA_ZACCARIA_H
+#define MAME_ZACCARIA_ZACCARIA_H
 
 #pragma once
 
@@ -28,28 +28,29 @@ public:
 	void zaccaria(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	uint8_t dsw_r();
 	uint8_t prot1_r(offs_t offset);
 	uint8_t prot2_r(offs_t offset);
-	DECLARE_WRITE_LINE_MEMBER(coin_w);
-	DECLARE_WRITE_LINE_MEMBER(nmi_mask_w);
+	void coin_w(int state);
+	void nmi_mask_w(int state);
 	void videoram_w(offs_t offset, uint8_t data);
 	void attributes_w(offs_t offset, uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(flip_screen_x_w);
-	DECLARE_WRITE_LINE_MEMBER(flip_screen_y_w);
+	uint8_t read_attr(offs_t offset, int which);
+	void update_colscroll();
+	void flip_screen_x_w(int state);
 	void dsw_sel_w(uint8_t data);
 	TILE_GET_INFO_MEMBER(get_tile_info);
 	void palette(palette_device &palette) const;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
+	void vblank_irq(int state);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, uint8_t *spriteram, int color, int section);
 
-	void main_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device>                 m_maincpu;
 	required_device<gfxdecode_device>           m_gfxdecode;
@@ -68,4 +69,4 @@ private:
 	uint8_t m_nmi_mask = 0;
 };
 
-#endif // MAME_INCLUDES_ZACCARIA_H
+#endif // MAME_ZACCARIA_ZACCARIA_H

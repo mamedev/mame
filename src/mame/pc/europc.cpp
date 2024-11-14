@@ -40,6 +40,65 @@
 #include "machine/ram.h"
 #include "softlist_dev.h"
 
+
+class europc_fdc_device : public isa8_fdc_device
+{
+public:
+	europc_fdc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+protected:
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual void device_start() override ATTR_COLD;
+
+private:
+	void map(address_map &map) ATTR_COLD;
+};
+
+DEFINE_DEVICE_TYPE(EUROPC_FDC, europc_fdc_device, "europc_fdc", "EURO PC FDC hookup")
+
+europc_fdc_device::europc_fdc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: isa8_fdc_device(mconfig, EUROPC_FDC, tag, owner, clock)
+{
+}
+
+static void pc_dd_floppies(device_slot_interface &device)
+{
+	device.option_add("525dd", FLOPPY_525_DD);
+	device.option_add("35dd", FLOPPY_35_DD);
+}
+
+void europc_fdc_device::device_add_mconfig(machine_config &config)
+{
+	WD37C65C(config, m_fdc, 16_MHz_XTAL);
+	m_fdc->intrq_wr_callback().set(FUNC(europc_fdc_device::irq_w));
+	m_fdc->drq_wr_callback().set(FUNC(europc_fdc_device::drq_w));
+	// single built-in 3.5" 720K drive, connector for optional external 3.5" or 5.25" drive
+	FLOPPY_CONNECTOR(config, "fdc:0", pc_dd_floppies, "35dd", isa8_fdc_device::floppy_formats).set_fixed(true);
+	FLOPPY_CONNECTOR(config, "fdc:1", pc_dd_floppies, nullptr, isa8_fdc_device::floppy_formats);
+}
+
+void europc_fdc_device::device_start()
+{
+	set_isa_device();
+	m_isa->install_device(0x03f0, 0x03f7, *this, &europc_fdc_device::map);
+	m_isa->set_dma_channel(2, this, true);
+}
+
+void europc_fdc_device::map(address_map &map)
+{
+	map(2, 2).w(m_fdc, FUNC(wd37c65c_device::dor_w));
+	map(4, 5).m(m_fdc, FUNC(wd37c65c_device::map));
+	// TODO: DCR also decoded by JIM/BIGJIM
+}
+
+static void europc_fdc(device_slot_interface &device)
+{
+	device.option_add("fdc", EUROPC_FDC);
+}
+
+
+namespace {
+
 class europc_pc_state : public driver_device
 {
 public:
@@ -65,7 +124,7 @@ private:
 	required_device<m3002_device> m_rtc;
 
 	uint8_t europc_portc_r();
-	DECLARE_WRITE_LINE_MEMBER(reset_in_w);
+	void reset_in_w(int state);
 
 	void europc_jim_w(offs_t offset, uint8_t data);
 	uint8_t europc_jim_r(offs_t offset);
@@ -75,8 +134,8 @@ private:
 	uint8_t m_jim_state;
 	isa8_aga_device::mode_t m_jim_mode{};
 
-	void europc_io(address_map &map);
-	void europc_map(address_map &map);
+	void europc_io(address_map &map) ATTR_COLD;
+	void europc_map(address_map &map) ATTR_COLD;
 };
 
 /*
@@ -280,7 +339,7 @@ uint8_t europc_pc_state::europc_portc_r()
 	return data;
 }
 
-WRITE_LINE_MEMBER(europc_pc_state::reset_in_w)
+void europc_pc_state::reset_in_w(int state)
 {
 	m_maincpu->set_input_line(INPUT_LINE_RESET, state ? CLEAR_LINE : ASSERT_LINE);
 	if (!state)
@@ -357,60 +416,6 @@ void europc_pc_state::europc_io(address_map &map)
 	map(0x02e0, 0x02e0).r(FUNC(europc_pc_state::europc_jim2_r));
 }
 
-class europc_fdc_device : public isa8_fdc_device
-{
-public:
-	europc_fdc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-
-protected:
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual void device_start() override;
-
-private:
-	void map(address_map &map);
-};
-
-DEFINE_DEVICE_TYPE(EUROPC_FDC, europc_fdc_device, "europc_fdc", "EURO PC FDC hookup")
-
-europc_fdc_device::europc_fdc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: isa8_fdc_device(mconfig, EUROPC_FDC, tag, owner, clock)
-{
-}
-
-static void pc_dd_floppies(device_slot_interface &device)
-{
-	device.option_add("525dd", FLOPPY_525_DD);
-	device.option_add("35dd", FLOPPY_35_DD);
-}
-
-void europc_fdc_device::device_add_mconfig(machine_config &config)
-{
-	WD37C65C(config, m_fdc, 16_MHz_XTAL);
-	m_fdc->intrq_wr_callback().set(FUNC(europc_fdc_device::irq_w));
-	m_fdc->drq_wr_callback().set(FUNC(europc_fdc_device::drq_w));
-	// single built-in 3.5" 720K drive, connector for optional external 3.5" or 5.25" drive
-	FLOPPY_CONNECTOR(config, "fdc:0", pc_dd_floppies, "35dd", isa8_fdc_device::floppy_formats).set_fixed(true);
-	FLOPPY_CONNECTOR(config, "fdc:1", pc_dd_floppies, nullptr, isa8_fdc_device::floppy_formats);
-}
-
-void europc_fdc_device::device_start()
-{
-	set_isa_device();
-	m_isa->install_device(0x03f0, 0x03f7, *this, &europc_fdc_device::map);
-	m_isa->set_dma_channel(2, this, true);
-}
-
-void europc_fdc_device::map(address_map &map)
-{
-	map(2, 2).w(m_fdc, FUNC(wd37c65c_device::dor_w));
-	map(4, 5).m(m_fdc, FUNC(wd37c65c_device::map));
-	// TODO: DCR also decoded by JIM/BIGJIM
-}
-
-static void europc_fdc(device_slot_interface &device)
-{
-	device.option_add("fdc", EUROPC_FDC);
-}
 
 //Euro PC
 void europc_pc_state::europc(machine_config &config)
@@ -514,6 +519,9 @@ ROM_START( euroxt )
 
 	// BIOS ROM versions 1.02, 1.04 and 1.05 were accompanied by identical char ROM versions 50146, which in turn match the one used in /bus/isa/aga.cpp
 ROM_END
+
+} // anonymous namespace
+
 
 //    YEAR  NAME     PARENT  COMPAT   MACHINE  INPUT   CLASS            INIT         COMPANY              FULLNAME      FLAGS
 COMP( 1988, europc,  0,      ibm5150, europc,  europc, europc_pc_state, init_europc, "Schneider Rdf. AG", "EURO PC",    MACHINE_NOT_WORKING)

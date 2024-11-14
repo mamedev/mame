@@ -98,7 +98,7 @@ private:
 	uint32_t screen_update_dadandrn(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_martchmp(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(ddd_interrupt);
-	DECLARE_WRITE_LINE_MEMBER(k054539_nmi_gen);
+	void k054539_nmi_gen(int state);
 	TIMER_DEVICE_CALLBACK_MEMBER(mystwarr_interrupt);
 	TIMER_DEVICE_CALLBACK_MEMBER(metamrph_interrupt);
 	TIMER_DEVICE_CALLBACK_MEMBER(mchamp_interrupt);
@@ -110,14 +110,14 @@ private:
 	K055673_CB_MEMBER(gaiapols_sprite_callback);
 	K055673_CB_MEMBER(martchmp_sprite_callback);
 	void decode_tiles();
-	void dadandrn_map(address_map &map);
-	void gaiapols_map(address_map &map);
-	void martchmp_map(address_map &map);
-	void martchmp_sound_map(address_map &map);
-	void metamrph_map(address_map &map);
-	void mystwarr_map(address_map &map);
-	void mystwarr_sound_map(address_map &map);
-	void oki_map(address_map &map); // for viostormabbl
-	void viostorm_map(address_map &map);
-	void viostormbl_map(address_map &map);
+	void dadandrn_map(address_map &map) ATTR_COLD;
+	void gaiapols_map(address_map &map) ATTR_COLD;
+	void martchmp_map(address_map &map) ATTR_COLD;
+	void martchmp_sound_map(address_map &map) ATTR_COLD;
+	void metamrph_map(address_map &map) ATTR_COLD;
+	void mystwarr_map(address_map &map) ATTR_COLD;
+	void mystwarr_sound_map(address_map &map) ATTR_COLD;
+	void oki_map(address_map &map) ATTR_COLD; // for viostormabbl
+	void viostorm_map(address_map &map) ATTR_COLD;
+	void viostormbl_map(address_map &map) ATTR_COLD;
 };

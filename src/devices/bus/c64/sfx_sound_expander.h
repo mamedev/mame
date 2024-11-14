@@ -31,12 +31,12 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// optional information overrides
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual ioport_constructor device_input_ports() const override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 
 	// device_c64_expansion_card_interface overrides
 	virtual uint8_t c64_cd_r(offs_t offset, uint8_t data, int sphi2, int ba, int roml, int romh, int io1, int io2) override;
@@ -45,7 +45,7 @@ protected:
 	virtual int c64_exrom_r(offs_t offset, int sphi2, int ba, int rw) override;
 
 private:
-	DECLARE_WRITE_LINE_MEMBER( opl_irq_w );
+	void opl_irq_w(int state);
 
 	required_device<ym3526_device> m_opl;
 	required_device<c64_expansion_slot_device> m_exp;

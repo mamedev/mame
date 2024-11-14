@@ -9,8 +9,8 @@
 
 #include <algorithm>
 
-#define LOG_BASE (1 << 1U)
-#define LOG_IPL (1 << 2U)
+#define LOG_BASE (1U << 1)
+#define LOG_IPL (1U << 2)
 #define VERBOSE (LOG_BASE)
 #include "logmacro.h"
 
@@ -127,16 +127,16 @@ uint8_t m68340_cpu_device::int_ack(offs_t offset)
 
 /* 68340 specifics - MOVE */
 
-uint32_t m68340_cpu_device::m68340_internal_base_r(offs_t offset, uint32_t mem_mask)
+uint16_t m68340_cpu_device::m68340_internal_base_r(offs_t offset, uint16_t mem_mask)
 {
 	if (!machine().side_effects_disabled())
-		LOGMASKED(LOG_BASE, "%08x m68340_internal_base_r %08x, (%08x)\n", m_ppc, offset*4,mem_mask);
-	return m_m68340_base;
+		LOGMASKED(LOG_BASE, "%08x m68340_internal_base_r %08x, (%08x)\n", m_ppc, offset*2,mem_mask);
+	return ((!BIT(offset, 0) ? (m_m68340_base >> 16): m_m68340_base)) & 0xffff;
 }
 
-void m68340_cpu_device::m68340_internal_base_w(offs_t offset, uint32_t data, uint32_t mem_mask)
+void m68340_cpu_device::m68340_internal_base_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
-	LOGMASKED(LOG_BASE, "%08x m68340_internal_base_w %08x, %08x (%08x)\n", m_ppc, offset*4,data,mem_mask);
+	LOGMASKED(LOG_BASE, "%08x m68340_internal_base_w %08x, %08x (%08x)\n", m_ppc, offset*2,data,mem_mask);
 
 	// other conditions?
 	if (m_dfc==0x7)
@@ -153,8 +153,16 @@ void m68340_cpu_device::m68340_internal_base_w(offs_t offset, uint32_t data, uin
 
 		}
 
-		COMBINE_DATA(&m_m68340_base);
-		LOGMASKED(LOG_BASE, "%08x m68340_internal_base_w %08x, %08x (%08x) (m_m68340_base write)\n", pc(), offset*4,data,mem_mask);
+		uint32_t data32 = data;
+		uint32_t mem_mask32 = mem_mask;
+		if (!BIT(offset,0))
+		{
+			data32 <<= 16;
+			mem_mask32 <<= 16;
+		}
+
+		m_m68340_base = (m_m68340_base & ~mem_mask32) | (data32 & mem_mask32);
+		LOGMASKED(LOG_BASE, "%08x m68340_internal_base_w %08x, %08x (%08x) (m_m68340_base write)\n", pc(), offset*2,data,mem_mask);
 
 		// map new modules
 		if (m_m68340_base & 1)
@@ -168,8 +176,8 @@ void m68340_cpu_device::m68340_internal_base_w(offs_t offset, uint32_t data, uin
 					read8sm_delegate(*this, FUNC(m68340_cpu_device::m68340_internal_sim_ports_r)),
 					write8sm_delegate(*this, FUNC(m68340_cpu_device::m68340_internal_sim_ports_w)),0xffffffff);
 			m_internal->install_readwrite_handler(base + 0x040, base + 0x05f,
-					read32s_delegate(*this, FUNC(m68340_cpu_device::m68340_internal_sim_cs_r)),
-					write32s_delegate(*this, FUNC(m68340_cpu_device::m68340_internal_sim_cs_w)));
+					read16s_delegate(*this, FUNC(m68340_cpu_device::m68340_internal_sim_cs_r)),
+					write16s_delegate(*this, FUNC(m68340_cpu_device::m68340_internal_sim_cs_w)));
 			m_internal->install_readwrite_handler(base + 0x600, base + 0x63f,
 					read16s_delegate(*m_timer[0], FUNC(mc68340_timer_module_device::read)),
 					write16s_delegate(*m_timer[0], FUNC(mc68340_timer_module_device::write)),0xffffffff);
@@ -180,13 +188,13 @@ void m68340_cpu_device::m68340_internal_base_w(offs_t offset, uint32_t data, uin
 					read8sm_delegate(*m_serial, FUNC(mc68340_serial_module_device::read)),
 					write8sm_delegate(*m_serial, FUNC(mc68340_serial_module_device::write)),0xffffffff);
 			m_internal->install_readwrite_handler(base + 0x780, base + 0x7bf,
-					read32s_delegate(*this, FUNC(m68340_cpu_device::m68340_internal_dma_r)),
-					write32s_delegate(*this, FUNC(m68340_cpu_device::m68340_internal_dma_w)));
+					read16s_delegate(*this, FUNC(m68340_cpu_device::m68340_internal_dma_r)),
+					write16s_delegate(*this, FUNC(m68340_cpu_device::m68340_internal_dma_w)));
 		}
 	}
 	else
 	{
-		LOGMASKED(LOG_BASE, "%08x m68340_internal_base_w %08x, %04x (%04x) (should fall through?)\n", pc(), offset*4,data,mem_mask);
+		LOGMASKED(LOG_BASE, "%08x m68340_internal_base_w %08x, %04x (%04x) (should fall through?)\n", pc(), offset*2,data,mem_mask);
 	}
 }
 
@@ -214,16 +222,16 @@ void m68340_cpu_device::device_add_mconfig(machine_config &config)
 //**************************************************************************
 
 m68340_cpu_device::m68340_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: fscpu32_device(mconfig, tag, owner, clock, M68340, 32,32, address_map_constructor(FUNC(m68340_cpu_device::m68340_internal_map), this))
+	: fscpu32_device(mconfig, tag, owner, clock, M68340, address_map_constructor(FUNC(m68340_cpu_device::m68340_internal_map), this))
 	, m_serial(*this, "serial")
 	, m_timer(*this, "timer%u", 1U)
 	, m_clock_mode(0)
 	, m_crystal(0)
 	, m_extal(0)
 	, m_pa_out_cb(*this)
-	, m_pa_in_cb(*this)
+	, m_pa_in_cb(*this, 0)
 	, m_pb_out_cb(*this)
-	, m_pb_in_cb(*this)
+	, m_pb_in_cb(*this, 0)
 {
 	m_m68340SIM = nullptr;
 	m_m68340DMA = nullptr;
@@ -239,7 +247,7 @@ void m68340_cpu_device::device_reset()
 
 // Some hardwares pulls this low when resetting peripherals, most just ties this line to GND or VCC
 // TODO: Support Limp mode and external clock with no PLL
-WRITE_LINE_MEMBER( m68340_cpu_device::set_modck )
+void m68340_cpu_device::set_modck(int state)
 {
 	m_modck = state;
 	m_clock_mode &= ~(m68340_sim::CLOCK_MODCK | m68340_sim::CLOCK_PLL);
@@ -263,11 +271,23 @@ void m68340_cpu_device::device_start()
 	m_internal = &space(AS_PROGRAM);
 }
 
-void m68340_cpu_device::m68k_reset_peripherals()
+
+void m68340_cpu_device::device_config_complete()
 {
-	m_m68340SIM->module_reset();
-	m_m68340DMA->module_reset();
-	m_serial->module_reset();
-	m_timer[0]->module_reset();
-	m_timer[1]->module_reset();
+	fscpu32_device::device_config_complete();
+
+	reset_cb().append(*this, FUNC(m68340_cpu_device::reset_peripherals));
+}
+
+
+void m68340_cpu_device::reset_peripherals(int state)
+{
+	if (state)
+	{
+		m_m68340SIM->module_reset();
+		m_m68340DMA->module_reset();
+		m_serial->module_reset();
+		m_timer[0]->module_reset();
+		m_timer[1]->module_reset();
+	}
 }

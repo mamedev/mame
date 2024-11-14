@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Manuel Abadia, Ernesto Corvi, Nicola Salmoria
-#ifndef MAME_INCLUDES_GAPLUS_H
-#define MAME_INCLUDES_GAPLUS_H
+#ifndef MAME_NAMCO_GAPLUS_H
+#define MAME_NAMCO_GAPLUS_H
 
 #pragma once
 
@@ -20,12 +20,6 @@ public:
 	struct star {
 		float x = 0, y = 0;
 		int col = 0, set = 0;
-	};
-
-	enum
-	{
-		TIMER_NAMCOIO0_RUN,
-		TIMER_NAMCOIO1_RUN
 	};
 
 	gaplus_base_state(const machine_config &mconfig, device_type type, const char *tag, const char *namco56xx_tag, const char *namco58xx_tag)
@@ -63,27 +57,27 @@ public:
 	TILEMAP_MAPPER_MEMBER(tilemap_scan);
 	TILE_GET_INFO_MEMBER(get_tile_info);
 
-	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
+	void vblank_irq(int state);
 	TIMER_CALLBACK_MEMBER(namcoio0_run);
 	TIMER_CALLBACK_MEMBER(namcoio1_run);
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_WRITE_LINE_MEMBER(screen_vblank);
+	void screen_vblank(int state);
 	void starfield_init();
 	void starfield_render(bitmap_ind16 &bitmap);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect ) const;
 
 	void gaplus_base(machine_config &config);
-	void cpu1_map(address_map &map);
-	void cpu2_map(address_map &map);
-	void cpu3_map(address_map &map);
+	void cpu1_map(address_map &map) ATTR_COLD;
+	void cpu2_map(address_map &map) ATTR_COLD;
+	void cpu3_map(address_map &map) ATTR_COLD;
 
-	virtual void driver_init() override;
+	void driver_init();
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_subcpu;
@@ -137,7 +131,7 @@ public:
 	void gapluso(machine_config &config);
 
 protected:
-	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
+	void vblank_irq(int state);
 };
 
 class gaplus_state : public gaplus_base_state {
@@ -151,7 +145,7 @@ public:
 	void gaplus(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 	void out_lamps0(uint8_t data);
 	void out_lamps1(uint8_t data);
@@ -159,4 +153,4 @@ protected:
 	output_finder<2> m_lamps;
 };
 
-#endif // MAME_INCLUDES_GAPLUS_H
+#endif // MAME_NAMCO_GAPLUS_H

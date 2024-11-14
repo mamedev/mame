@@ -1,6 +1,6 @@
 /*
- * Copyright 2011-2021 Branimir Karadzic. All rights reserved.
- * License: https://github.com/bkaradzic/bgfx#license-bsd-2-clause
+ * Copyright 2011-2022 Branimir Karadzic. All rights reserved.
+ * License: https://github.com/bkaradzic/bgfx/blob/master/LICENSE
  */
 
 #include <algorithm>
@@ -16,6 +16,7 @@ namespace stl = tinystl;
 
 #include <meshoptimizer/src/meshoptimizer.h>
 
+#define CGLTF_VALIDATE_ENABLE_ASSERTS BX_CONFIG_DEBUG
 #define CGLTF_IMPLEMENTATION
 #include <cgltf/cgltf.h>
 
@@ -47,15 +48,14 @@ namespace stl = tinystl;
 #endif // 0
 
 #include <bx/bx.h>
-#include <bx/debug.h>
+#include <bx/bounds.h>
 #include <bx/commandline.h>
-#include <bx/timer.h>
-#include <bx/hash.h>
-#include <bx/uint32_t.h>
-#include <bx/math.h>
+#include <bx/debug.h>
 #include <bx/file.h>
-
-#include "bounds.h"
+#include <bx/hash.h>
+#include <bx/math.h>
+#include <bx/timer.h>
+#include <bx/uint32_t.h>
 
 typedef stl::vector<bx::Vec3> Vec3Array;
 
@@ -120,7 +120,7 @@ static bx::Vec3 s_axisVectors[6] =
 
 struct CoordinateSystem
 {
-	bx::Handness::Enum m_handness;
+	bx::Handedness::Enum m_handedness;
 	Axis::Enum         m_up;
 	Axis::Enum         m_forward;
 };
@@ -133,10 +133,10 @@ struct CoordinateSystemMapping
 
 static const CoordinateSystemMapping s_coordinateSystemMappings[] =
 {
-	{ "lh-up+y", { bx::Handness::Left,  Axis::PositiveY, Axis::PositiveZ } },
-	{ "lh-up+z", { bx::Handness::Left,  Axis::PositiveZ, Axis::PositiveY } },
-	{ "rh-up+y", { bx::Handness::Right, Axis::PositiveY, Axis::PositiveZ } },
-	{ "rh-up+z", { bx::Handness::Right, Axis::PositiveZ, Axis::PositiveY } },
+	{ "lh-up+y", { bx::Handedness::Left,  Axis::PositiveY, Axis::PositiveZ } },
+	{ "lh-up+z", { bx::Handedness::Left,  Axis::PositiveZ, Axis::PositiveY } },
+	{ "rh-up+y", { bx::Handedness::Right, Axis::PositiveY, Axis::PositiveZ } },
+	{ "rh-up+z", { bx::Handedness::Right, Axis::PositiveZ, Axis::PositiveY } },
 };
 
 struct Mesh
@@ -166,7 +166,13 @@ void optimizeVertexCache(uint16_t* _indices, uint32_t _numIndices, uint32_t _num
 	delete[] newIndexList;
 }
 
-uint32_t optimizeVertexFetch(uint16_t* _indices, uint32_t _numIndices, uint8_t* _vertexData, uint32_t _numVertices, uint16_t _stride)
+uint32_t optimizeVertexFetch(
+	  uint16_t* _indices
+	, uint32_t _numIndices
+	, uint8_t* _vertexData
+	, uint32_t _numVertices
+	, uint16_t _stride
+	)
 {
 	unsigned char* newVertices = (unsigned char*)malloc(_numVertices * _stride );
 	size_t vertexCount = meshopt_optimizeVertexFetch(newVertices, _indices, _numIndices, _vertexData, _numVertices, _stride);
@@ -176,35 +182,53 @@ uint32_t optimizeVertexFetch(uint16_t* _indices, uint32_t _numIndices, uint8_t* 
 	return uint32_t(vertexCount);
 }
 
-void writeCompressedIndices(bx::WriterI* _writer, const uint16_t* _indices, uint32_t _numIndices, uint32_t _numVertices)
+void writeCompressedIndices(
+	  bx::WriterI* _writer
+	, const uint16_t* _indices
+	, uint32_t _numIndices
+	, uint32_t _numVertices
+	, bx::Error* _err
+	)
 {
 	size_t maxSize = meshopt_encodeIndexBufferBound(_numIndices, _numVertices);
 	unsigned char* compressedIndices = (unsigned char*)malloc(maxSize);
+
 	size_t compressedSize = meshopt_encodeIndexBuffer(compressedIndices, maxSize, _indices, _numIndices);
+
 	bx::printf("Indices uncompressed: %10d, compressed: %10d, ratio: %0.2f%%\n"
 		, _numIndices*2
 		, (uint32_t)compressedSize
 		, 100.0f - float(compressedSize ) / float(_numIndices*2)*100.0f
 		);
 
-	bx::write(_writer, (uint32_t)compressedSize);
-	bx::write(_writer, compressedIndices, (uint32_t)compressedSize );
+	bx::write(_writer, (uint32_t)compressedSize, _err);
+	bx::write(_writer, compressedIndices, (uint32_t)compressedSize, _err);
+
 	free(compressedIndices);
 }
 
-void writeCompressedVertices(bx::WriterI* _writer,  const uint8_t* _vertices, uint32_t _numVertices, uint16_t _stride)
+void writeCompressedVertices(
+	  bx::WriterI* _writer
+	, const uint8_t* _vertices
+	, uint32_t _numVertices
+	, uint16_t _stride
+	, bx::Error* _err
+	)
 {
 	size_t maxSize = meshopt_encodeVertexBufferBound(_numVertices, _stride);
 	unsigned char* compressedVertices = (unsigned char*)malloc(maxSize);
+
 	size_t compressedSize = meshopt_encodeVertexBuffer(compressedVertices, maxSize, _vertices, _numVertices, _stride);
+
 	bx::printf("Vertices uncompressed: %10d, compressed: %10d, ratio: %0.2f%%\n"
 		, _numVertices * _stride
 		, (uint32_t)compressedSize
 		, 100.0f - float(compressedSize) / float(_numVertices * _stride)*100.0f
 		);
 
-	bx::write(_writer, (uint32_t)compressedSize);
-	bx::write(_writer, compressedVertices, (uint32_t)compressedSize );
+	bx::write(_writer, (uint32_t)compressedSize, _err);
+	bx::write(_writer, compressedVertices, (uint32_t)compressedSize, _err);
+
 	free(compressedVertices);
 }
 
@@ -305,30 +329,36 @@ void calcTangents(void* _vertices, uint16_t _numVertices, bgfx::VertexLayout _la
 	delete [] tangents;
 }
 
-void write(bx::WriterI* _writer, const void* _vertices, uint32_t _numVertices, uint32_t _stride)
+void write(
+	  bx::WriterI* _writer
+	, const void* _vertices
+	, uint32_t _numVertices
+	, uint32_t _stride
+	, bx::Error* _err
+	)
 {
-	Sphere maxSphere;
-	calcMaxBoundingSphere(maxSphere, _vertices, _numVertices, _stride);
+	bx::Sphere maxSphere;
+	bx::calcMaxBoundingSphere(maxSphere, _vertices, _numVertices, _stride);
 
-	Sphere minSphere;
-	calcMinBoundingSphere(minSphere, _vertices, _numVertices, _stride);
+	bx::Sphere minSphere;
+	bx::calcMinBoundingSphere(minSphere, _vertices, _numVertices, _stride);
 
 	if (minSphere.radius > maxSphere.radius)
 	{
-		bx::write(_writer, maxSphere);
+		bx::write(_writer, maxSphere, _err);
 	}
 	else
 	{
-		bx::write(_writer, minSphere);
+		bx::write(_writer, minSphere, _err);
 	}
 
-	Aabb aabb;
-	toAabb(aabb, _vertices, _numVertices, _stride);
-	bx::write(_writer, aabb);
+	bx::Aabb aabb;
+	bx::toAabb(aabb, _vertices, _numVertices, _stride);
+	bx::write(_writer, aabb, _err);
 
-	Obb obb;
-	calcObb(obb, _vertices, _numVertices, _stride, s_obbSteps);
-	bx::write(_writer, obb);
+	bx::Obb obb;
+	bx::calcObb(obb, _vertices, _numVertices, _stride, s_obbSteps);
+	bx::write(_writer, obb, _err);
 }
 
 void write(
@@ -341,6 +371,7 @@ void write(
 	, bool _compress
 	, const stl::string& _material
 	, const PrimitiveArray& _primitives
+	, bx::Error* _err
 	)
 {
 	using namespace bx;
@@ -350,54 +381,58 @@ void write(
 
 	if (_compress)
 	{
-		write(_writer, kChunkVertexBufferCompressed);
-		write(_writer, _vertices, _numVertices, stride);
+		write(_writer, kChunkVertexBufferCompressed, _err);
+		write(_writer, _vertices, _numVertices, stride, _err);
 
 		write(_writer, _layout);
 
-		write(_writer, uint16_t(_numVertices) );
-		writeCompressedVertices(_writer, _vertices, _numVertices, uint16_t(stride) );
+		write(_writer, uint16_t(_numVertices), _err);
+		writeCompressedVertices(_writer, _vertices, _numVertices, uint16_t(stride), _err);
 	}
 	else
 	{
-		write(_writer, kChunkVertexBuffer);
-		write(_writer, _vertices, _numVertices, stride);
+		write(_writer, kChunkVertexBuffer, _err);
+		write(_writer, _vertices, _numVertices, stride, _err);
 
-		write(_writer, _layout);
+		write(_writer, _layout, _err);
 
-		write(_writer, uint16_t(_numVertices) );
-		write(_writer, _vertices, _numVertices*stride);
+		write(_writer, uint16_t(_numVertices), _err);
+		write(_writer, _vertices, _numVertices*stride, _err);
 	}
 
 	if (_compress)
 	{
-		write(_writer, kChunkIndexBufferCompressed);
-		write(_writer, _numIndices);
-		writeCompressedIndices(_writer, _indices, _numIndices, _numVertices);
+		write(_writer, kChunkIndexBufferCompressed, _err);
+		write(_writer, _numIndices, _err);
+
+		writeCompressedIndices(_writer, _indices, _numIndices, _numVertices, _err);
 	}
 	else
 	{
-		write(_writer, kChunkIndexBuffer);
-		write(_writer, _numIndices);
-		write(_writer, _indices, _numIndices*2);
+		write(_writer, kChunkIndexBuffer, _err);
+		write(_writer, _numIndices, _err);
+		write(_writer, _indices, _numIndices*2, _err);
 	}
 
-	write(_writer, kChunkPrimitive);
+	write(_writer, kChunkPrimitive, _err);
+
 	uint16_t nameLen = uint16_t(_material.size() );
-	write(_writer, nameLen);
-	write(_writer, _material.c_str(), nameLen);
-	write(_writer, uint16_t(_primitives.size() ) );
+	write(_writer, nameLen, _err);
+
+	write(_writer, _material.c_str(), nameLen, _err);
+	write(_writer, uint16_t(_primitives.size() ), _err);
+
 	for (PrimitiveArray::const_iterator primIt = _primitives.begin(); primIt != _primitives.end(); ++primIt)
 	{
 		const Primitive& prim = *primIt;
 		nameLen = uint16_t(prim.m_name.size() );
-		write(_writer, nameLen);
-		write(_writer, prim.m_name.c_str(), nameLen);
-		write(_writer, prim.m_startIndex);
-		write(_writer, prim.m_numIndices);
-		write(_writer, prim.m_startVertex);
-		write(_writer, prim.m_numVertices);
-		write(_writer, &_vertices[prim.m_startVertex*stride], prim.m_numVertices, stride);
+		write(_writer, nameLen, _err);
+		write(_writer, prim.m_name.c_str(), nameLen, _err);
+		write(_writer, prim.m_startIndex, _err);
+		write(_writer, prim.m_numIndices, _err);
+		write(_writer, prim.m_startVertex, _err);
+		write(_writer, prim.m_numVertices, _err);
+		write(_writer, &_vertices[prim.m_startVertex*stride], prim.m_numVertices, stride, _err);
 	}
 }
 
@@ -424,7 +459,7 @@ void mtxCoordinateTransform(float* _result, const CoordinateSystem& _cs)
 	bx::Vec3 forward = s_axisVectors[_cs.m_forward];
 	bx::Vec3 right   = cross(forward,up);
 
-	if (_cs.m_handness == bx::Handness::Left)
+	if (_cs.m_handedness == bx::Handedness::Left)
 	{
 		right = bx::mul(right, -1.0f);
 	}
@@ -470,7 +505,7 @@ void parseObj(char* _data, uint32_t _size, Mesh* _mesh, bool _hasBc)
 	//   https://en.wikipedia.org/wiki/Wavefront_.obj_file
 
 	// Coordinate system is right-handed, but up/forward is not defined, but +Y Up, +Z Forward seems to be a common default
-	_mesh->m_coordinateSystem.m_handness = bx::Handness::Right;
+	_mesh->m_coordinateSystem.m_handedness = bx::Handedness::Right;
 	_mesh->m_coordinateSystem.m_up = Axis::PositiveY;
 	_mesh->m_coordinateSystem.m_forward = Axis::PositiveZ;
 
@@ -847,7 +882,7 @@ void parseGltf(char* _data, uint32_t _size, Mesh* _mesh, bool _hasBc, const bx::
 	// - Gltf 2.0 specification
 	//  https://github.com/KhronosGroup/glTF/tree/master/specification/2.0
 
-	_mesh->m_coordinateSystem.m_handness = bx::Handness::Right;
+	_mesh->m_coordinateSystem.m_handedness = bx::Handedness::Right;
 	_mesh->m_coordinateSystem.m_forward  = Axis::PositiveZ;
 	_mesh->m_coordinateSystem.m_up       = Axis::PositiveY;
 
@@ -896,8 +931,8 @@ void help(const char* _error = NULL)
 
 	bx::printf(
 		  "geometryc, bgfx geometry compiler tool, version %d.%d.%d.\n"
-		  "Copyright 2011-2021 Branimir Karadzic. All rights reserved.\n"
-		  "License: https://github.com/bkaradzic/bgfx#license-bsd-2-clause\n\n"
+		  "Copyright 2011-2022 Branimir Karadzic. All rights reserved.\n"
+		  "License: https://github.com/bkaradzic/bgfx/blob/master/LICENSE\n\n"
 		, BGFX_GEOMETRYC_VERSION_MAJOR
 		, BGFX_GEOMETRYC_VERSION_MINOR
 		, BGFX_API_VERSION
@@ -913,26 +948,27 @@ void help(const char* _error = NULL)
 
 		  "\n"
 		  "Options:\n"
-		  "  -h, --help               Help.\n"
-		  "  -v, --version            Version information only.\n"
-		  "  -f <file path>           Input file path.\n"
-		  "  -o <file path>           Output file path.\n"
+		  "  -h, --help               Display this help and exit.\n"
+		  "  -v, --version            Output version information and exit.\n"
+		  "  -f <file path>           Input's file path.\n"
+		  "  -o <file path>           Output's file path.\n"
 		  "  -s, --scale <num>        Scale factor.\n"
 		  "      --ccw                Front face is counter-clockwise winding order.\n"
 		  "      --flipv              Flip texture coordinate V.\n"
 		  "      --obb <num>          Number of steps for calculating oriented bounding box.\n"
-		  "           Default value is 17. Less steps less precise OBB is.\n"
-		  "           More steps slower calculation.\n"
+		  "           Defaults to 17.\n"
+		  "           Less steps = less precise OBB.\n"
+		  "           More steps = slower calculation.\n"
 		  "      --packnormal <num>   Normal packing.\n"
-		  "           0 - unpacked 12 bytes (default).\n"
+		  "           0 - unpacked 12 bytes. (default)\n"
 		  "           1 - packed 4 bytes.\n"
 		  "      --packuv <num>       Texture coordinate packing.\n"
-		  "           0 - unpacked 8 bytes (default).\n"
+		  "           0 - unpacked 8 bytes. (default)\n"
 		  "           1 - packed 4 bytes.\n"
-		  "      --tangent            Calculate tangent vectors (packing mode is the same as normal).\n"
-		  "      --barycentric        Adds barycentric vertex attribute (packed in bgfx::Attrib::Color1).\n"
+		  "      --tangent            Calculate tangent vectors. (packing mode is the same as normal)\n"
+		  "      --barycentric        Adds barycentric vertex attribute. (Packed in bgfx::Attrib::Color1)\n"
 		  "  -c, --compress           Compress indices.\n"
-		  "      --[l/r]h-up+[y/z]	  Coordinate system. Default is '--lh-up+y' Left-Handed +Y is up.\n"
+		  "      --[l/r]h-up+[y/z]	  Coordinate system. Defaults to '--lh-up+y' — Left-Handed +Y is up.\n"
 
 		  "\n"
 		  "For additional information, see https://github.com/bkaradzic/bgfx\n"
@@ -1001,7 +1037,7 @@ int main(int _argc, const char* _argv[])
 	bool hasBc = cmdLine.hasArg("barycentric");
 
 	CoordinateSystem outputCoordinateSystem;
-	outputCoordinateSystem.m_handness = bx::Handness::Left;
+	outputCoordinateSystem.m_handedness = bx::Handedness::Left;
 	outputCoordinateSystem.m_forward = Axis::PositiveZ;
 	outputCoordinateSystem.m_up = Axis::PositiveY;
 	for (uint32_t ii = 0; ii < BX_COUNTOF(s_coordinateSystemMappings); ++ii)
@@ -1024,7 +1060,7 @@ int main(int _argc, const char* _argv[])
 
 	uint32_t size = (uint32_t)bx::getSize(&fr);
 	char* data = new char[size+1];
-	size = bx::read(&fr, data, size);
+	size = bx::read(&fr, data, size, bx::ErrorAssert{});
 	data[size] = '\0';
 	bx::close(&fr);
 
@@ -1226,18 +1262,22 @@ int main(int _argc, const char* _argv[])
 	sentinelGroup.m_numTriangles = UINT32_MAX;
 	mesh.m_groups.push_back(sentinelGroup);
 
+	bx::Error err;
+
 	uint32_t ii = 0;
 	for (GroupArray::const_iterator groupIt = mesh.m_groups.begin(); groupIt != mesh.m_groups.end(); ++groupIt, ++ii)
 	{
-		bool sentinel = groupIt->m_startTriangle == 0 && groupIt->m_numTriangles == UINT32_MAX;
+		const bool sentinel = groupIt->m_startTriangle == 0 && groupIt->m_numTriangles == UINT32_MAX;
+
 		for (uint32_t tri = groupIt->m_startTriangle, end = tri + groupIt->m_numTriangles; tri < end; ++tri)
 		{
 			if (0 != bx::strCmp(material.c_str(), groupIt->m_material.c_str() )
-			|| sentinel
+			||  sentinel
 			||  65533 <= numVertices)
 			{
 				prim.m_numVertices = numVertices - prim.m_startVertex;
 				prim.m_numIndices  = numIndices  - prim.m_startIndex;
+
 				if (0 < prim.m_numVertices)
 				{
 					primitives.push_back(prim);
@@ -1249,27 +1289,31 @@ int main(int _argc, const char* _argv[])
 				}
 
 				triReorderElapsed -= bx::getHPCounter();
+
 				for (PrimitiveArray::const_iterator primIt = primitives.begin(); primIt != primitives.end(); ++primIt)
 				{
 					const Primitive& prim1 = *primIt;
 					optimizeVertexCache(indexData + prim1.m_startIndex, prim1.m_numIndices, numVertices);
 				}
+
 				numVertices = optimizeVertexFetch(indexData, numIndices, vertexData, numVertices, uint16_t(stride) );
 
 				triReorderElapsed += bx::getHPCounter();
 
-				if ( numVertices > 0 && numIndices > 0 )
+				if (0 < numVertices
+				&&  0 < numIndices)
 				{
 					write(&writer
-						  , vertexData
-						  , numVertices
-						  , layout
-						  , indexData
-						  , numIndices
-						  , compress
-						  , material
-						  , primitives
-						  );
+						, vertexData
+						, numVertices
+						, layout
+						, indexData
+						, numIndices
+						, compress
+						, material
+						, primitives
+						, &err
+						);
 				}
 				primitives.clear();
 
@@ -1289,7 +1333,9 @@ int main(int _argc, const char* _argv[])
 				material = groupIt->m_material;
 
 				if (sentinel)
+				{
 					break;
+				}
 			}
 
 			TriIndices& triangle = mesh.m_triangles[tri];

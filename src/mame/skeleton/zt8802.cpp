@@ -17,6 +17,9 @@ Other: A 3.6volt battery, a tiny crystal, a red LED, and about 2 dozen jumpers.
 #include "cpu/nec/v5x.h"
 #include "machine/ds1302.h"
 
+
+namespace {
+
 class zt8802_state : public driver_device
 {
 public:
@@ -34,8 +37,8 @@ private:
 	u8 rtc_r();
 	void rtc_w(u8 data);
 
-	void mem_map(address_map &map);
-	void io_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
+	void io_map(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	required_shared_ptr<u8> m_pia;
@@ -96,5 +99,8 @@ ROM_START( zt8802 )
 	ROM_REGION( 0x80000, "roms", 0 )
 	ROM_LOAD( "c103207-218 a.rom", 0x00000, 0x80000, CRC(fc1c6e99) SHA1(cfbb2f0c9927bac5abc85c12d2b82f7da46cab03) )
 ROM_END
+
+} // anonymous namespace
+
 
 COMP( 1994, zt8802, 0, 0, zt8802, zt8802, zt8802_state, empty_init, "Ziatech", "ZT-8802 SBC", MACHINE_IS_SKELETON )

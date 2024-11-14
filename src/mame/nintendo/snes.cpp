@@ -99,15 +99,15 @@ private:
 	virtual void write_joy_latch(uint8_t data) override;
 	virtual void wrio_write(uint8_t data) override;
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 	int m_type = 0;
 	required_device<snes_control_port_device> m_ctrl1;
 	required_device<snes_control_port_device> m_ctrl2;
 	optional_device<sns_cart_slot_device> m_cartslot;
 
-	void snes_map(address_map &map);
-	void spc_map(address_map &map);
+	void snes_map(address_map &map) ATTR_COLD;
+	void spc_map(address_map &map) ATTR_COLD;
 };
 
 
@@ -1294,7 +1294,7 @@ void snes_console_state::machine_start()
 				break;
 			case SNES_SOULBLAD:
 				// reads from xxx0-xxx3in range [80-bf] return a fixed sequence of 4bits; reads in range [c0-ff] return open bus
-				m_maincpu->space(AS_PROGRAM).install_read_handler(0x808000, 0x808003, 0, 0x3f7ff0, 0, read8sm_delegate(*m_cartslot, FUNC(base_sns_cart_slot_device::chip_read)));
+				m_maincpu->space(AS_PROGRAM).install_read_handler(0x808000, 0x808003, 0, 0x3f7ffc, 0, read8sm_delegate(*m_cartslot, FUNC(base_sns_cart_slot_device::chip_read)));
 				m_maincpu->space(AS_PROGRAM).install_read_handler(0xc00000, 0xffffff, read8smo_delegate(*this, FUNC(snes_console_state::snes_open_bus_r)));
 				break;
 			case SNES_BUGS:

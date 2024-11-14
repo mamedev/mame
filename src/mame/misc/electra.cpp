@@ -27,6 +27,9 @@ Wings / Wings Cocktail (1976)             EG-1040            YES
 #include "netlist/devices/net_lib.h"
 #include "video/fixfreq.h"
 
+
+namespace {
+
 // copied by Pong, not accurate for this driver!
 // start
 #define MASTER_CLOCK    7159000
@@ -60,14 +63,15 @@ private:
 	required_device<fixedfreq_device> m_video;
 
 	// driver_device overrides
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 };
 
 
 static NETLIST_START(electra)
+{
 	SOLVER(Solver, 48000)
 //  PARAM(Solver.FREQ, 48000)
 	PARAM(Solver.ACCURACY, 1e-4) // works and is sufficient
@@ -77,7 +81,7 @@ static NETLIST_START(electra)
 
 //  NETDEV_ANALOG_CALLBACK(sound_cb, sound, exidyttl_state, sound_cb, "")
 //  NETDEV_ANALOG_CALLBACK(video_cb, videomix, fixedfreq_device, update_vid, "fixfreq")
-NETLIST_END()
+}
 
 
 
@@ -138,6 +142,8 @@ ROM_START( flyingf )
 	ROM_LOAD( "prom.1d", 0x0300, 0x0020, CRC(4fabe931) SHA1(ac3c2a59dce080460b4a9230f5d36d2b2627f729) )
 ROM_END
 
+} // anonymous namespace
 
-GAME( 1975, avenger, 0, electra, 0, electra_state, empty_init, ROT0, "Electra", "Avenger [TTL]",         MACHINE_IS_SKELETON )
-GAME( 1976, flyingf, 0, electra, 0, electra_state, empty_init, ROT0, "Electra", "Flying Fortress [TTL]", MACHINE_IS_SKELETON )
+
+GAME( 1975, avenger, 0, electra, 0, electra_state, empty_init, ROT0, "Electra", "Avenger",         MACHINE_IS_SKELETON )
+GAME( 1976, flyingf, 0, electra, 0, electra_state, empty_init, ROT0, "Electra", "Flying Fortress", MACHINE_IS_SKELETON )

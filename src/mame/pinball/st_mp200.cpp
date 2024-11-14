@@ -75,7 +75,6 @@ public:
 		: genpin_class(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_s14001a(*this, "speech")
-		, m_speech(*this, "speech")
 		, m_pia_u10(*this, "pia_u10")
 		, m_pia_u11(*this, "pia_u11")
 		, m_io_test(*this, "TEST")
@@ -105,8 +104,8 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(self_test);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	u8 u10_a_r();
@@ -116,14 +115,13 @@ private:
 	u8 u11_a_r();
 	void u11_a_w(u8 data);
 	void u11_b_w(u8 data);
-	u8 speech_r(offs_t offset);
-	DECLARE_WRITE_LINE_MEMBER(u10_ca2_w);
-	DECLARE_WRITE_LINE_MEMBER(u10_cb2_w);
-	DECLARE_WRITE_LINE_MEMBER(u11_ca2_w);
-	DECLARE_WRITE_LINE_MEMBER(u11_cb2_w);
+	void u10_ca2_w(int state);
+	void u10_cb2_w(int state);
+	void u11_ca2_w(int state);
+	void u11_cb2_w(int state);
 
-	void mem_map(address_map &map);
-	void sam4_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
+	void sam4_map(address_map &map) ATTR_COLD;
 
 	u8 m_u10a = 0U;
 	u8 m_u10b = 0U;
@@ -140,7 +138,6 @@ private:
 	u8 m_last_solenoid = 31U;
 	required_device<m6800_cpu_device> m_maincpu;
 	optional_device<s14001a_device> m_s14001a;
-	optional_region_ptr<u8> m_speech;
 	required_device<pia6821_device> m_pia_u10;
 	required_device<pia6821_device> m_pia_u11;
 	required_ioport m_io_test;
@@ -189,8 +186,8 @@ void st_mp200_state::sam4_map(address_map &map)
 
 static INPUT_PORTS_START( mp200 )
 	PORT_START("TEST")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_0_PAD) PORT_NAME("Self Test") PORT_IMPULSE(1) PORT_CHANGED_MEMBER(DEVICE_SELF, st_mp200_state, self_test, 0)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_1_PAD) PORT_NAME("Activity") PORT_IMPULSE(1) PORT_CHANGED_MEMBER(DEVICE_SELF, st_mp200_state, activity_test, 0)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_0_PAD) PORT_NAME("Self Test") PORT_IMPULSE(1) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(st_mp200_state::self_test), 0)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_1_PAD) PORT_NAME("Activity") PORT_IMPULSE(1) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(st_mp200_state::activity_test), 0)
 
 	PORT_START("DSW0")
 	PORT_DIPNAME( 0x1f, 0x02, "Coin Slot 2")
@@ -390,14 +387,14 @@ INPUT_CHANGED_MEMBER( st_mp200_state::self_test )
 	m_pia_u10->ca1_w(newval);
 }
 
-WRITE_LINE_MEMBER( st_mp200_state::u10_ca2_w )
+void st_mp200_state::u10_ca2_w(int state)
 {
 	m_u10_ca2 = state;
 	if (!state)
 		m_counter = 0;
 }
 
-WRITE_LINE_MEMBER( st_mp200_state::u10_cb2_w )
+void st_mp200_state::u10_cb2_w(int state)
 {
 	m_u10_cb2 = state;
 	if (state)
@@ -412,7 +409,7 @@ WRITE_LINE_MEMBER( st_mp200_state::u10_cb2_w )
 	}
 }
 
-WRITE_LINE_MEMBER( st_mp200_state::u11_ca2_w )
+void st_mp200_state::u11_ca2_w(int state)
 {
 	m_io_leds[0] = state ? 0 : 1;
 
@@ -426,17 +423,15 @@ WRITE_LINE_MEMBER( st_mp200_state::u11_ca2_w )
 		}
 		else if (BIT(m_u10a, 6))
 		{
-			m_s14001a->force_update();
 			m_s14001a->set_output_gain(0, ((m_u10a >> 3 & 0xf) + 1) / 16.0);
 
 			u8 clock_divisor = 16 - (m_u10a & 0x07);
-
-			m_s14001a->set_clock(S14001_CLOCK / clock_divisor / 8);
+			m_s14001a->set_unscaled_clock(S14001_CLOCK / clock_divisor / 8);
 		}
 	}
 }
 
-WRITE_LINE_MEMBER( st_mp200_state::u11_cb2_w )
+void st_mp200_state::u11_cb2_w(int state)
 {
 	m_u11_cb2 = state;
 }
@@ -570,11 +565,6 @@ void st_mp200_state::u11_b_w(u8 data)
 	m_last_solenoid = data;
 }
 
-u8 st_mp200_state::speech_r(offs_t offset)
-{
-	return m_speech[offset];
-}
-
 void st_mp200_state::machine_start()
 {
 	genpin_class::machine_start();
@@ -644,7 +634,7 @@ void st_mp200_state::st_mp200(machine_config &config)
 	genpin_audio(config);
 
 	/* Devices */
-	PIA6821(config, m_pia_u10, 0);
+	PIA6821(config, m_pia_u10);
 	m_pia_u10->readpa_handler().set(FUNC(st_mp200_state::u10_a_r));
 	m_pia_u10->writepa_handler().set(FUNC(st_mp200_state::u10_a_w));
 	m_pia_u10->readpb_handler().set(FUNC(st_mp200_state::u10_b_r));
@@ -657,7 +647,7 @@ void st_mp200_state::st_mp200(machine_config &config)
 	clock_device &u10_clock(CLOCK(config, "u10_clock", 120)); // crosspoint detector
 	u10_clock.signal_handler().set(m_pia_u10, FUNC(pia6821_device::cb1_w));
 
-	PIA6821(config, m_pia_u11, 0);
+	PIA6821(config, m_pia_u11);
 	m_pia_u11->readpa_handler().set(FUNC(st_mp200_state::u11_a_r));
 	m_pia_u11->writepa_handler().set(FUNC(st_mp200_state::u11_a_w));
 	m_pia_u11->writepb_handler().set(FUNC(st_mp200_state::u11_b_w));
@@ -677,7 +667,6 @@ void st_mp200_state::st_mp201(machine_config &config)
 	st_mp200(config);
 	SPEAKER(config, "mono").front_center();
 	S14001A(config, m_s14001a, S14001_CLOCK).add_route(ALL_OUTPUTS, "mono", 1.00);
-	m_s14001a->ext_read().set(FUNC(st_mp200_state::speech_r));
 }
 
 void st_mp200_state::st_sam4(machine_config &config)
@@ -685,13 +674,13 @@ void st_mp200_state::st_sam4(machine_config &config)
 	st_mp200(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &st_mp200_state::sam4_map);
 	config.device_remove("nvram");
-	PIA6821(config, "sam4_pia0", 0);
-	PIA6821(config, "sam4_pia1", 0);
-	PIA6821(config, "sam4_pia2", 0);
-	pia6821_device &pia3(PIA6821(config, "sam4_pia3", 0));
+	PIA6821(config, "sam4_pia0");
+	PIA6821(config, "sam4_pia1");
+	PIA6821(config, "sam4_pia2");
+	pia6821_device &pia3(PIA6821(config, "sam4_pia3"));
 	pia3.writepa_handler().set_nop();
 	pia3.writepb_handler().set_nop();
-	PIA6821(config, "sam4_pia4", 0);
+	PIA6821(config, "sam4_pia4");
 }
 
 /* ========== ALTERNATE ROMS =======================================================================

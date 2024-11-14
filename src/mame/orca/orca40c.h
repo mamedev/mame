@@ -7,8 +7,8 @@
 
 ***************************************************************************/
 
-#ifndef MAME_VIDEO_ORCA40C_H
-#define MAME_VIDEO_ORCA40C_H
+#ifndef MAME_ORCA_ORCA40C_H
+#define MAME_ORCA_ORCA40C_H
 
 #pragma once
 
@@ -39,9 +39,9 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 	virtual void device_config_complete() override;
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 private:
 	// shared memory finders
@@ -76,4 +76,4 @@ private:
 // device type definition
 DECLARE_DEVICE_TYPE(ORCA_OVG_40C, orca_ovg_40c_device)
 
-#endif  // MAME_VIDEO_ORCA40C_H
+#endif  // MAME_ORCA_ORCA40C_H

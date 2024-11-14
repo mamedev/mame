@@ -5,14 +5,14 @@ OBJS = \
   $(WIN_OBJS) \
   $(WIN_CTRL_OBJS) \
   $(7ZIP_COMMON_OBJS) \
-  $(AR_OBJS) \
-  $(AR_COMMON_OBJS) \
   $(UI_COMMON_OBJS) \
   $(AGENT_OBJS) \
   $(CONSOLE_OBJS) \
   $(EXPLORER_OBJS) \
   $(FM_OBJS) \
   $(GUI_OBJS) \
+  $(AR_COMMON_OBJS) \
+  $(AR_OBJS) \
   $(7Z_OBJS) \
   $(CAB_OBJS) \
   $(CHM_OBJS) \

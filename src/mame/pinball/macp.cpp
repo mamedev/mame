@@ -52,14 +52,14 @@ public:
 
 	void mac16k(machine_config &config);
 	void mac32k(machine_config &config);
-	void mem16k_map(address_map &map);
-	void io16k_map(address_map &map);
-	void mem32k_map(address_map &map);
-	void io32k_map(address_map &map);
+	void mem16k_map(address_map &map) ATTR_COLD;
+	void io16k_map(address_map &map) ATTR_COLD;
+	void mem32k_map(address_map &map) ATTR_COLD;
+	void io32k_map(address_map &map) ATTR_COLD;
 
 private:
-	DECLARE_WRITE_LINE_MEMBER(clock_tick);
-	DECLARE_WRITE_LINE_MEMBER(irq_w);
+	void clock_tick(int state);
+	void irq_w(int state);
 	void scanlines_w(u8);
 	void digit_w(u8);
 	void ay0_a_w(u8);
@@ -73,8 +73,8 @@ private:
 	u8 m_ay1_b = 0U;
 	u8 m_ay1_a = 0U;
 	u8 m_relay_ctrl = 0U;
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 	required_device<z80_device> m_maincpu;
 	required_device_array<ay8910_device, 2> m_ay8910;
 	required_ioport_array<8> m_io_keyboard;
@@ -298,12 +298,12 @@ u8 macp_state::ay1_b_r()
 	return 0x7f | (m_relay_ctrl ? 0 : 0x80);  // Temporary for testing
 }
 
-WRITE_LINE_MEMBER( macp_state::irq_w )
+void macp_state::irq_w(int state)
 {
 	m_maincpu->set_input_line(INPUT_LINE_IRQ0, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
-WRITE_LINE_MEMBER( macp_state::clock_tick )
+void macp_state::clock_tick(int state)
 {
 	if (state)
 	{

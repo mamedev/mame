@@ -62,14 +62,14 @@ public:
 	auto in_handler() { return m_in_handler.bind(); }
 
 	// called from keyboard
-	DECLARE_WRITE_LINE_MEMBER( in_w ) { m_in_handler(state); }
+	void in_w(int state) { m_in_handler(state); }
 
 	// called from host
-	DECLARE_WRITE_LINE_MEMBER( out_w );
+	void out_w(int state);
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 private:
 	device_apricot_keyboard_interface *m_kbd;

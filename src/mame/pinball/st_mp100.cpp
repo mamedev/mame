@@ -58,8 +58,8 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(self_test);
 
 protected:
-	virtual void machine_reset() override;
-	virtual void machine_start() override;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	u8 u10_a_r();
@@ -69,11 +69,11 @@ private:
 	u8 u11_a_r();
 	void u11_a_w(u8 data);
 	void u11_b_w(u8 data);
-	DECLARE_WRITE_LINE_MEMBER(u10_ca2_w);
-	DECLARE_WRITE_LINE_MEMBER(u10_cb2_w);
-	DECLARE_WRITE_LINE_MEMBER(u11_ca2_w);
-	DECLARE_WRITE_LINE_MEMBER(u11_cb2_w);
-	void mem_map(address_map &map);
+	void u10_ca2_w(int state);
+	void u10_cb2_w(int state);
+	void u11_ca2_w(int state);
+	void u11_cb2_w(int state);
+	void mem_map(address_map &map) ATTR_COLD;
 
 	u8 m_u10a = 0U;
 	u8 m_u10b = 0U;
@@ -121,8 +121,8 @@ void st_mp100_state::mem_map(address_map &map)
 
 static INPUT_PORTS_START( mp100 )
 	PORT_START("TEST")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_0_PAD) PORT_NAME("Self Test") PORT_IMPULSE(1) PORT_CHANGED_MEMBER(DEVICE_SELF, st_mp100_state, self_test, 0)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_1_PAD) PORT_NAME("Activity") PORT_IMPULSE(1) PORT_CHANGED_MEMBER(DEVICE_SELF, st_mp100_state, activity_test, 0)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_0_PAD) PORT_NAME("Self Test") PORT_IMPULSE(1) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(st_mp100_state::self_test), 0)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_1_PAD) PORT_NAME("Activity") PORT_IMPULSE(1) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(st_mp100_state::activity_test), 0)
 
 	PORT_START("DSW0")
 	PORT_DIPNAME( 0x1f, 0x02, "Coin Slot 2")
@@ -314,8 +314,8 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( mp200 )
 	PORT_START("TEST")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_0_PAD) PORT_NAME("Self Test") PORT_IMPULSE(1) PORT_CHANGED_MEMBER(DEVICE_SELF, st_mp100_state, self_test, 0)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_1_PAD) PORT_NAME("Activity") PORT_IMPULSE(1) PORT_CHANGED_MEMBER(DEVICE_SELF, st_mp100_state, activity_test, 0)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_0_PAD) PORT_NAME("Self Test") PORT_IMPULSE(1) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(st_mp100_state::self_test), 0)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_1_PAD) PORT_NAME("Activity") PORT_IMPULSE(1) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(st_mp100_state::activity_test), 0)
 
 	PORT_START("DSW0")
 	PORT_DIPNAME( 0x1f, 0x02, "Coin Slot 2")
@@ -516,26 +516,26 @@ INPUT_CHANGED_MEMBER( st_mp100_state::self_test )
 	m_pia_u10->ca1_w(newval);
 }
 
-WRITE_LINE_MEMBER( st_mp100_state::u10_ca2_w )
+void st_mp100_state::u10_ca2_w(int state)
 {
 	m_u10_ca2 = state;
 	if (!state)
 		m_counter = 0;
 }
 
-WRITE_LINE_MEMBER( st_mp100_state::u10_cb2_w )
+void st_mp100_state::u10_cb2_w(int state)
 {
 	m_u10_cb2 = state;
 	if (state)
 		m_stored_lamp = m_u10a;
 }
 
-WRITE_LINE_MEMBER( st_mp100_state::u11_ca2_w )
+void st_mp100_state::u11_ca2_w(int state)
 {
 	m_io_leds[0] = state ? 0 : 1;
 }
 
-WRITE_LINE_MEMBER( st_mp100_state::u11_cb2_w )
+void st_mp100_state::u11_cb2_w(int state)
 {
 	m_u11_cb2 = state;
 }
@@ -767,7 +767,7 @@ void st_mp100_state::st_mp100(machine_config &config)
 	genpin_audio(config);
 
 	/* Devices */
-	PIA6821(config, m_pia_u10, 0);
+	PIA6821(config, m_pia_u10);
 	m_pia_u10->readpa_handler().set(FUNC(st_mp100_state::u10_a_r));
 	m_pia_u10->writepa_handler().set(FUNC(st_mp100_state::u10_a_w));
 	m_pia_u10->readpb_handler().set(FUNC(st_mp100_state::u10_b_r));
@@ -780,7 +780,7 @@ void st_mp100_state::st_mp100(machine_config &config)
 	clock_device &u10_clock(CLOCK(config, "u10_clock", 120)); // crosspoint detector
 	u10_clock.signal_handler().set(m_pia_u10, FUNC(pia6821_device::cb1_w));
 
-	PIA6821(config, m_pia_u11, 0);
+	PIA6821(config, m_pia_u11);
 	m_pia_u11->readpa_handler().set(FUNC(st_mp100_state::u11_a_r));
 	m_pia_u11->writepa_handler().set(FUNC(st_mp100_state::u11_a_w));
 	m_pia_u11->writepb_handler().set(FUNC(st_mp100_state::u11_b_w));

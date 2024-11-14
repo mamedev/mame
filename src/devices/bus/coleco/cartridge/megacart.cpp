@@ -62,15 +62,17 @@ void colecovision_megacart_cartridge_device::device_reset()
 //  read - cartridge data read
 //-------------------------------------------------
 
-uint8_t colecovision_megacart_cartridge_device::bd_r(offs_t offset, uint8_t data, int _8000, int _a000, int _c000, int _e000)
+uint8_t colecovision_megacart_cartridge_device::read(offs_t offset, int _8000, int _a000, int _c000, int _e000)
 {
+	uint8_t data = 0xff;
+
 	if (!_8000 || !_a000 || !_c000 || !_e000)
 	{
 		if (m_bankcount > 2)
 		{
 			// offset as passed to us is a delta from address 0x8000.
 
-			if (offset >= 0x7FC0)
+			if (offset >= 0x7fc0)
 			{
 				// Reads within the final 64 bytes select which megacart bank is active.
 				m_activebank = offset & (m_bankcount - 1);

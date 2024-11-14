@@ -17,7 +17,6 @@
 #include "emu.h"
 
 #include "konamipt.h"
-#include "k051316.h"
 #include "k051960.h"
 #include "k052109.h"
 #include "konami_helper.h"
@@ -27,6 +26,7 @@
 #include "machine/gen_latch.h"
 #include "machine/watchdog.h"
 #include "sound/k007232.h"
+#include "video/k051316.h"
 
 #include "emupal.h"
 #include "screen.h"
@@ -53,8 +53,8 @@ public:
 	void bottom9(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	// misc
@@ -93,12 +93,10 @@ private:
 	K051316_CB_MEMBER(zoom_callback);
 	K052109_CB_MEMBER(tile_callback);
 	K051960_CB_MEMBER(sprite_callback);
-	void audio_map(address_map &map);
-	void main_map(address_map &map);
+	void audio_map(address_map &map) ATTR_COLD;
+	void main_map(address_map &map) ATTR_COLD;
 };
 
-
-// video
 
 /***************************************************************************
 
@@ -143,7 +141,6 @@ K051316_CB_MEMBER(bottom9_state::zoom_callback)
 {
 	enum { zoom_colorbase = 768 / 16 };
 
-	*flags = (*color & 0x40) ? TILE_FLIPX : 0;
 	*code |= ((*color & 0x03) << 8);
 	*color = zoom_colorbase + ((*color & 0x3c) >> 2);
 }
@@ -173,8 +170,6 @@ uint32_t bottom9_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 	return 0;
 }
 
-
-// machine
 
 uint8_t bottom9_state::k052109_051960_r(offs_t offset)
 {

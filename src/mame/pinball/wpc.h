@@ -6,8 +6,8 @@
  *  Created on: 7/10/2013
  */
 
-#ifndef MAME_MACHINE_WPC_H
-#define MAME_MACHINE_WPC_H
+#ifndef MAME_PINBALL_WPC_H
+#define MAME_PINBALL_WPC_H
 
 #pragma once
 
@@ -105,8 +105,8 @@ public:
 
 protected:
 	// overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	TIMER_CALLBACK_MEMBER(zerocross_set);
 
@@ -142,4 +142,4 @@ private:
 
 DECLARE_DEVICE_TYPE(WPCASIC, wpc_device)
 
-#endif // MAME_MACHINE_WPC_H
+#endif // MAME_PINBALL_WPC_H

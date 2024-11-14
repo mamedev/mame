@@ -101,6 +101,8 @@ Note
 #include "tilemap.h"
 
 
+namespace {
+
 class spool99_state : public driver_device
 {
 public:
@@ -121,7 +123,7 @@ public:
 	void init_spool99();
 
 protected:
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -145,8 +147,8 @@ private:
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TILE_GET_INFO_MEMBER(get_tile_info);
-	void spool99_map(address_map &map);
-	void vcarn_map(address_map &map);
+	void spool99_map(address_map &map) ATTR_COLD;
+	void vcarn_map(address_map &map) ATTR_COLD;
 };
 
 TILE_GET_INFO_MEMBER(spool99_state::get_tile_info)
@@ -473,6 +475,7 @@ void spool99_state::init_spool99()
 	memcpy(m_main, ROM, 0x100);
 }
 
+} // anonymous namespace
 
 
 GAME( 1998, spool99,    0,        spool99,    spool99, spool99_state, init_spool99, ROT0, "Electronic Projects", "Super Pool 99 (Version 0.36)", MACHINE_SUPPORTS_SAVE )

@@ -2,8 +2,8 @@
 // copyright-holders:Curt Coder
 #pragma once
 
-#ifndef MAME_INCLUDES_TMC600_H
-#define MAME_INCLUDES_TMC600_H
+#ifndef MAME_TELERCAS_TMC600_H
+#define MAME_TELERCAS_TMC600_H
 
 #include "cpu/cosmac/cosmac.h"
 #include "imagedev/cassette.h"
@@ -14,6 +14,7 @@
 #include "machine/ram.h"
 #include "machine/timer.h"
 #include "sound/cdp1869.h"
+#include "softlist_dev.h"
 #include "speaker.h"
 
 #define SCREEN_TAG          "screen"
@@ -63,20 +64,20 @@ private:
 	required_ioport m_run;
 	required_ioport_array<8> m_key_row;
 
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 
 	uint8_t  rtc_r();
 	void printer_w(uint8_t data);
 	void vismac_register_w(uint8_t data);
 	void vismac_data_w(uint8_t data);
 	void page_ram_w(offs_t offset, uint8_t data);
-	DECLARE_READ_LINE_MEMBER( clear_r );
-	DECLARE_READ_LINE_MEMBER( ef2_r );
-	DECLARE_READ_LINE_MEMBER( ef3_r );
-	DECLARE_WRITE_LINE_MEMBER( q_w );
+	int clear_r();
+	int ef2_r();
+	int ef3_r();
+	void q_w(int state);
 	void sc_w(uint8_t data);
 	void out3_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER( prd_w );
+	void prd_w(int state);
 
 	uint8_t get_color(uint16_t pma);
 
@@ -92,9 +93,11 @@ private:
 	CDP1869_CHAR_RAM_READ_MEMBER(tmc600_char_ram_r);
 	CDP1869_PCB_READ_MEMBER(tmc600_pcb_r);
 
-	void cdp1869_page_ram(address_map &map);
-	void tmc600_io_map(address_map &map);
-	void tmc600_map(address_map &map);
+	void cdp1869_page_ram(address_map &map) ATTR_COLD;
+	void tmc600_io_map(address_map &map) ATTR_COLD;
+	void tmc600_map(address_map &map) ATTR_COLD;
+
+	DECLARE_QUICKLOAD_LOAD_MEMBER(quickload_cb);
 };
 
-#endif
+#endif // MAME_TELERCAS_TMC600_H
