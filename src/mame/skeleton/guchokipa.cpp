@@ -21,9 +21,11 @@ The riser board has a pair of HM4334 1K*4 static RAMs and a quad 2-input NAND ga
 
 TODO:
 - sound
-- colors
 - is visible area correct?
-- remaining dips
+- remaining DIPs
+
+BTANB:
+- colors are horrible but match available screenshot
 */
 
 
@@ -93,7 +95,7 @@ TILE_GET_INFO_MEMBER(guchokipa_state::get_fg_tile_info)
 {
 	int code = m_fgram[tile_index];
 
-	if (code == 0x00) code = 0x3ff; // why? is this another 'big sprite' thing?
+	if (code == 0x00) code = 0x2ff; // why? is this another 'big sprite' thing?
 
 	tileinfo.set(1, code, 0, 0);
 }
@@ -219,12 +221,12 @@ GFXDECODE_END
 
 void guchokipa_state::guchokipa(machine_config &config)
 {
-	Z80(config, m_maincpu, 18.432_MHz_XTAL / 6); // 3.07 Mhz
+	Z80(config, m_maincpu, 18.432_MHz_XTAL / 6); // 3.07 MHz
 	m_maincpu->set_addrmap(AS_PROGRAM, &guchokipa_state::main_program_map);
 	m_maincpu->set_addrmap(AS_IO, &guchokipa_state::main_io_map);
 	m_maincpu->set_vblank_int("screen", FUNC(guchokipa_state::irq0_line_hold));
 
-	Z80(config, m_audiocpu, 18.432_MHz_XTAL / 12); // 1.53 Mhz
+	Z80(config, m_audiocpu, 18.432_MHz_XTAL / 12); // 1.53 MHz
 	m_audiocpu->set_addrmap(AS_PROGRAM, &guchokipa_state::sound_program_map);
 	m_audiocpu->set_addrmap(AS_IO, &guchokipa_state::sound_io_map);
 
@@ -258,12 +260,12 @@ ROM_START( guchokip )
 	ROM_LOAD( "4209.bg11", 0x000, 0x800, CRC(44b2b7d1) SHA1(672931ff572ac6361b493dc9a49f6146bdc26b78) )
 
 	ROM_REGION( 0x8000, "tiles", 0 )
-	ROM_LOAD( "4201.b1", 0x0000, 0x1000, CRC(838726ab) SHA1(5bcfb3c6badc8f7b7bea17a228137e4bff39a0e5) )
-	ROM_LOAD( "4205.b2", 0x1000, 0x1000, CRC(58efc253) SHA1(b3344df68c665da996f3332f43030a664931db80) )
+	ROM_LOAD( "4203.r1", 0x0000, 0x1000, CRC(8769aad5) SHA1(71f3d22e8e0006ba89329ac4a48f09e11ab67875) )
+	ROM_LOAD( "4207.r2", 0x1000, 0x1000, CRC(9b78e95e) SHA1(2f3fdcc3bb92b2eb3a967de39ffe4eee74cac8e0) )
 	ROM_LOAD( "4202.g1", 0x2000, 0x1000, CRC(a45d5258) SHA1(9080c51b2dc5d6bc4d01cc29deed0e2a5ea78dbd) )
 	ROM_LOAD( "4206.g2", 0x3000, 0x1000, CRC(e18d50f7) SHA1(c922a019c13c904701abe5a9e42be955d80a7ecb) )
-	ROM_LOAD( "4203.r1", 0x4000, 0x1000, CRC(8769aad5) SHA1(71f3d22e8e0006ba89329ac4a48f09e11ab67875) )
-	ROM_LOAD( "4207.r2", 0x5000, 0x1000, CRC(9b78e95e) SHA1(2f3fdcc3bb92b2eb3a967de39ffe4eee74cac8e0) )
+	ROM_LOAD( "4201.b1", 0x4000, 0x1000, CRC(838726ab) SHA1(5bcfb3c6badc8f7b7bea17a228137e4bff39a0e5) )
+	ROM_LOAD( "4205.b2", 0x5000, 0x1000, CRC(58efc253) SHA1(b3344df68c665da996f3332f43030a664931db80) )
 	ROM_LOAD( "4204.t1", 0x6000, 0x1000, CRC(da77a765) SHA1(e8626548909b5e735cdb603964324482848ce476) )
 	ROM_LOAD( "4208.t2", 0x7000, 0x1000, CRC(be97d733) SHA1(ff3b199c8d1203d9d6c0060f217bbd7de32a8152) )
 ROM_END
