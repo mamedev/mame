@@ -199,7 +199,6 @@ private:
 	TILE_GET_INFO_MEMBER(toproller_get_bg_tile_info);
 
 	tilemap_t *m_bg_tilemap = nullptr;
-	uint8_t m_rombank = 0;
 };
 
 class yamato_state : public cclimber_state
