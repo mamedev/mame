@@ -1205,6 +1205,10 @@ ROM_START( z90 )
 	ROM_MTR90_444_84(4)
 
 	ROM_MMS_444_84A(5)
+
+	ROM_SIGMA_V_1_3(6)
+
+	ROM_SIGMA_V_1_2(7)
 ROM_END
 
 } // anonymous namespace
