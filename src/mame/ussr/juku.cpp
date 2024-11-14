@@ -5,7 +5,7 @@
     Juku E5101/E5104
 
     Hardware:
-    - КР580ВМ80A (called КР580ИК80A until 1986)
+    - КР580ВМ80A (=КР580ИК80A)
     - КР580ИР82
     - КР580ВА86 x3
     - КР580ВА87 x3
@@ -13,23 +13,28 @@
     - КР580ВК38
     - КР580ВН59
     - КР580ВВ51A x2
-    - КР580ВВ55A x2
+    - КР580ВВ55A x2 (=КР580ИК55)
     - КР1818ВГ93 (on all E5104 production models)
 
     Note:
-    - In the monitor, enter A to start BASIC and T to boot from disk/network
+    - In the monitor, enter A or B to start BASIC/Assembler
+      and T to boot from tape/disk/network
 
     TODO:
     - Work out how the floppy interface really works?
-    - Tape? (split up to E5101 test batch as tape only?)
+    - Figure out missing bits in PIO0 port B
+    - Tape? (split up to E5101 batch as tape only?)
+    - И41 (=Multibus-1) compatibility?
     - Network?
     - Ramdisk?
+    - Memory extensions?
     - Mouse!
 
 ***************************************************************************/
 
 #include "emu.h"
 #include "cpu/i8085/i8085.h"
+#include "imagedev/floppy.h"
 #include "machine/74148.h"
 #include "machine/bankdev.h"
 #include "machine/i8251.h"
@@ -37,22 +42,34 @@
 #include "machine/pic8259.h"
 #include "machine/pit8253.h"
 #include "machine/wd_fdc.h"
-#include "imagedev/floppy.h"
-#include "formats/juku_dsk.h"
-#include "softlist_dev.h"
-#include "screen.h"
 #include "sound/spkrdev.h"
+#include "screen.h"
+#include "softlist_dev.h"
 #include "speaker.h"
+#include "formats/juku_dsk.h"
 
-#include "osdcore.h" // osd_printf_*
+//#define VERBOSE 1
+//#define LOG_OUTPUT_FUNC osd_printf_info
 
-namespace {
+#include "logmacro.h"
 
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
 
 namespace {
+
+static constexpr int DEFAULT_WIDTH = 320;
+static constexpr int DEFAULT_HEIGHT = 240;
+static constexpr int VERT_FRONT_PORCH = 25;
+static constexpr int VERT_BACK_PORCH = 1+72-VERT_FRONT_PORCH;
+static constexpr int HORIZ_FRONT_PORCH = 8*8;
+static constexpr int HORIZ_BACK_PORCH = 24*8-HORIZ_FRONT_PORCH;
+
+static constexpr int HORIZ_PERIOD = DEFAULT_WIDTH+HORIZ_FRONT_PORCH+HORIZ_BACK_PORCH;
+static constexpr int VERT_PERIOD = DEFAULT_HEIGHT+VERT_FRONT_PORCH+VERT_BACK_PORCH;
+
+static constexpr double SPEAKER_LEVELS[3] = {0, 0.5, 1};
 
 class juku_state : public driver_device
 {
@@ -102,29 +119,23 @@ private:
 	void pio0_porta_w(uint8_t data);
 	uint8_t pio0_portb_r();
 	void pio0_portc_w(uint8_t data);
-	uint8_t m_prev_porta;
-	uint8_t m_prev_portc;
 
-	int m_screen_x;
-	int m_screen_y;
-	void screen_cmd_a_w(uint8_t data);
-	void screen_data_a_w(uint8_t data);
-	void screen_cmd_b_w(uint8_t data);
-	void screen_data_b_w(uint8_t data);
-	void screen_scan_sequence(int pos, uint8_t data);
-	void screen_mode(int x, int y);
-	int m_screen_cur_seq[5];
-	static constexpr int screen_320_240_seq[5] = { 0x24, 0x8, 0x72, 0x0, 0x25 };
-	static constexpr int screen_384_200_seq[5] = { 0x16, 0x4, 0x12, 0x1, 0x45 };
-	static constexpr int screen_400_192_seq[5] = { 0x14, 0x3, 0x1a, 0x1, 0x45 };
-	static constexpr int screen_256_192_seq[5] = { 0x32, 0x12, 0x20, 0x1, 0x49 };
-	static constexpr const int *screen_mode_sequences[4] = { screen_320_240_seq, screen_384_200_seq, screen_400_192_seq, screen_256_192_seq };
+	int m_width, m_height, m_hbporch, m_vbporch;
+	void screen_width(uint8_t data);
+	void screen_hblank_period(uint8_t data);
+	void screen_hfporch(uint8_t data);
+	void screen_height(uint8_t data);
+	void screen_vblank_period(uint8_t data);
+	void screen_vfporch(uint8_t data);
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	bool m_beep_state;
-	DECLARE_WRITE_LINE_MEMBER(speaker_w);
-	void update_speaker();
-	static constexpr double speaker_levels[3] = { 0, 0.67, 1 };
+	// helpers to coordinate screen mode switching
+	int m_height_lsb, m_vblank_period_lsb;
+	int m_monitor_bits, m_empty_screen_on_update;
+	void adjust_monitor_params(uint8_t monitor_bits);
+
+	bool m_beep_state, m_beep_level;
+	void speaker_w(int state);
 
 	static void floppy_formats(format_registration &fr);
 	void fdc_drq_w(int state);
@@ -166,20 +177,26 @@ void juku_state::bank_map(address_map &map)
 
 void juku_state::io_map(address_map &map)
 {
-	map(0x00, 0x03).rw(m_pic, FUNC(pic8259_device::read), FUNC(pic8259_device::write));
+	map(0x00, 0x01).rw(m_pic, FUNC(pic8259_device::read), FUNC(pic8259_device::write));
 	map(0x04, 0x07).rw(m_pio[0], FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0x08, 0x0b).rw(m_sio[0], FUNC(i8251_device::read), FUNC(i8251_device::write));
 	map(0x0c, 0x0f).rw(m_pio[1], FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0x10, 0x13).rw(m_pit[0], FUNC(pit8253_device::read), FUNC(pit8253_device::write));
 	map(0x14, 0x17).rw(m_pit[1], FUNC(pit8253_device::read), FUNC(pit8253_device::write));
+	// write functions for sceen timer config to adjust emulated display
+	map(0x10, 0x10).w(FUNC(juku_state::screen_width));
+	map(0x14, 0x14).w(FUNC(juku_state::screen_height));
+	map(0x11, 0x11).w(FUNC(juku_state::screen_hblank_period));
+	map(0x12, 0x12).w(FUNC(juku_state::screen_hfporch));
+	map(0x15, 0x15).w(FUNC(juku_state::screen_vblank_period));
+	map(0x16, 0x16).w(FUNC(juku_state::screen_vfporch));
 	map(0x18, 0x1b).rw(m_pit[2], FUNC(pit8253_device::read), FUNC(pit8253_device::write));
 	map(0x1c, 0x1f).rw(m_fdc, FUNC(kr1818vg93_device::read), FUNC(kr1818vg93_device::write));
+	// functions for floppy drive operation fixes
 	map(0x1c, 0x1c).w(FUNC(juku_state::fdc_cmd_w));
 	map(0x1f, 0x1f).rw(FUNC(juku_state::fdc_data_r), FUNC(juku_state::fdc_data_w));
-	map(0x11,0x11).w(FUNC(juku_state::screen_cmd_a_w));
-	map(0x12,0x12).w(FUNC(juku_state::screen_data_a_w));
-	map(0x15,0x15).w(FUNC(juku_state::screen_cmd_b_w));
-	map(0x16,0x16).w(FUNC(juku_state::screen_data_b_w));
+	// mapping for cassette version (E5101?)
+	// map(0x1c, 0x1d).rw(m_sio[1], FUNC(i8251_device::read), FUNC(i8251_device::write));
 }
 
 
@@ -194,7 +211,7 @@ static INPUT_PORTS_START( juku )
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_N) PORT_CHAR('n') PORT_CHAR('N')// n N
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_UNUSED)
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_Y) PORT_CHAR('y') PORT_CHAR('Y') // y Y
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_6) PORT_CHAR('6') PORT_CHAR('&') // 6 &
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_6) PORT_CODE(KEYCODE_6_PAD) PORT_CHAR('6') PORT_CHAR('&') // 6 &
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_H) PORT_CHAR('h') PORT_CHAR('H') // h H
 	PORT_BIT(0xc0, IP_ACTIVE_LOW, IPT_UNUSED)
 
@@ -203,7 +220,7 @@ static INPUT_PORTS_START( juku )
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_X) PORT_CHAR('x') PORT_CHAR('X') // x X
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_UNUSED)
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_W) PORT_CHAR('w') PORT_CHAR('W') // w W
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_2) PORT_CHAR('2') PORT_CHAR('"') // 2 "
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_2) PORT_CODE(KEYCODE_2_PAD) PORT_CHAR('2') PORT_CHAR('"') // 2 "
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_S) PORT_CHAR('s') PORT_CHAR('S') // s S
 	PORT_BIT(0xc0, IP_ACTIVE_LOW, IPT_UNUSED)
 
@@ -212,7 +229,7 @@ static INPUT_PORTS_START( juku )
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_V) PORT_CHAR('v') PORT_CHAR('V') // v V
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_UNUSED)
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_R) PORT_CHAR('r') PORT_CHAR('R') // r R
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_4) PORT_CHAR('4') PORT_CHAR('$') // 4 $
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_4) PORT_CODE(KEYCODE_4_PAD) PORT_CHAR('4') PORT_CHAR('$') // 4 $
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_F) PORT_CHAR('f') PORT_CHAR('F') // f F
 	PORT_BIT(0xc0, IP_ACTIVE_LOW, IPT_UNUSED)
 
@@ -230,7 +247,7 @@ static INPUT_PORTS_START( juku )
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_B) PORT_CHAR('b') PORT_CHAR('B') // b B
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_UNUSED)
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_T) PORT_CHAR('t') PORT_CHAR('T') // t T
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_5) PORT_CHAR('5') PORT_CHAR('%') // 5 %
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_5) PORT_CODE(KEYCODE_5_PAD) PORT_CHAR('5') PORT_CHAR('%') // 5 %
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_G) PORT_CHAR('g') PORT_CHAR('G') // g G
 	PORT_BIT(0xc0, IP_ACTIVE_LOW, IPT_UNUSED)
 
@@ -239,7 +256,7 @@ static INPUT_PORTS_START( juku )
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_Z) PORT_CHAR('z') PORT_CHAR('Z') // z Z
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_UNUSED)
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_Q) PORT_CHAR('q') PORT_CHAR('Q') // q Q
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_1) PORT_CHAR('1') PORT_CHAR('!') // 1 !
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_1) PORT_CODE(KEYCODE_1_PAD) PORT_CHAR('1') PORT_CHAR('!') // 1 !
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_A) PORT_CHAR('a') PORT_CHAR('A') // a A
 	PORT_BIT(0xc0, IP_ACTIVE_LOW, IPT_UNUSED)
 
@@ -248,7 +265,7 @@ static INPUT_PORTS_START( juku )
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_C) PORT_CHAR('c') PORT_CHAR('C') PORT_CHAR(3) // c C
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_UNUSED)
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_E) PORT_CHAR('e') PORT_CHAR('E') // e E
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_3) PORT_CHAR('3') PORT_CHAR('#') // 3 #
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_3) PORT_CODE(KEYCODE_3_PAD) PORT_CHAR('3') PORT_CHAR('#') // 3 #
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_D) PORT_CHAR('d') PORT_CHAR('D') // d D
 	PORT_BIT(0xc0, IP_ACTIVE_LOW, IPT_UNUSED)
 
@@ -257,7 +274,7 @@ static INPUT_PORTS_START( juku )
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_M) PORT_CHAR('m') PORT_CHAR('M') // m M
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_UNUSED)
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_U) PORT_CHAR('u') PORT_CHAR('U') // u U
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_7) PORT_CHAR('7') PORT_CHAR(39) // 7 '
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_7) PORT_CODE(KEYCODE_7_PAD) PORT_CHAR('7') PORT_CHAR(39) // 7 '
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_J) PORT_CHAR('j') PORT_CHAR('J') // j J
 	PORT_BIT(0xc0, IP_ACTIVE_LOW, IPT_UNUSED)
 
@@ -265,17 +282,17 @@ static INPUT_PORTS_START( juku )
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_UNUSED)
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_UNUSED)
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_DEL) PORT_NAME("DEL")
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_CLOSEBRACE) PORT_CHAR(']') // ] õ
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_BACKSPACE) PORT_NAME("ERASE") // ERASE
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_ENTER) PORT_CHAR(13)
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_PGDN) PORT_CHAR(']') // ] õ
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_INSERT) PORT_NAME("ERASE") // ERASE
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_ENTER) PORT_CODE(KEYCODE_ENTER_PAD) PORT_CHAR(13) PORT_NAME("RETURN")
 	PORT_BIT(0xc0, IP_ACTIVE_LOW, IPT_UNUSED)
 
 	PORT_START("COL.9")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_UNUSED)
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_UNUSED)
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_DOWN) PORT_CHAR(UCHAR_MAMEKEY(DOWN))
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_OPENBRACE) PORT_CHAR('[') // [ ö
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_BACKSLASH) PORT_NAME("Ä  Ü") // Ä Ü
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_END) PORT_CHAR('[') // [ ö
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_PGUP) PORT_NAME("Ä  Ü") // Ä Ü
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_UNUSED)
 	PORT_BIT(0xc0, IP_ACTIVE_LOW, IPT_UNUSED)
 
@@ -283,18 +300,18 @@ static INPUT_PORTS_START( juku )
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_UNUSED)
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_UNUSED)
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_UP) PORT_CHAR(UCHAR_MAMEKEY(UP))
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_F9) PORT_NAME("õ  Õ") // õ Õ
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_F10) PORT_NAME("ö  Õ") // ö Õ
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_F11) PORT_CHAR(':') PORT_CHAR('*') // : *
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_CLOSEBRACE) PORT_NAME("õ  Õ") // õ Õ
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_HOME) PORT_NAME("Ö  Õ") // Ö Õ
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_BACKSLASH) PORT_CODE(KEYCODE_ASTERISK) PORT_CHAR(':') PORT_CHAR('*') // : *
 	PORT_BIT(0xc0, IP_ACTIVE_LOW, IPT_UNUSED)
 
 	PORT_START("COL.11")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_UNUSED)
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_F12) PORT_CHAR(';') PORT_CHAR('+') // ; +
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_EQUALS) PORT_CODE(KEYCODE_PLUS_PAD) PORT_CHAR(';') PORT_CHAR('+') // ; +
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_SPACE) PORT_CHAR(32)
-	// Picture of machine shows "\ ^" here. You can use Ü to represent ^ in BASIC.
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_EQUALS) PORT_CHAR('\\') PORT_CHAR('^') PORT_NAME("ü  Ü") // ü Ü
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_MINUS) PORT_CHAR('-') PORT_CHAR('=') // - =
+	// Picture of machine shows "\ ^" here. You can use Ü to represent ^ in BASIC or switch to ASCII font in EKDOS to make ^ show as expected.
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_OPENBRACE) PORT_CHAR('\\') PORT_CHAR('^') PORT_NAME("ü  Ü") // ü Ü
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_MINUS) PORT_CODE(KEYCODE_MINUS_PAD) PORT_CHAR('-') PORT_CHAR('=') // - =
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_QUOTE) PORT_NAME("ä  Ä") // ä Ä
 	PORT_BIT(0xc0, IP_ACTIVE_LOW, IPT_UNUSED)
 
@@ -303,25 +320,25 @@ static INPUT_PORTS_START( juku )
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_SLASH) PORT_CHAR('/') PORT_CHAR('?') // / ?
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_RIGHT) PORT_CHAR(UCHAR_MAMEKEY(RIGHT))
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_P) PORT_CHAR('p') PORT_CHAR('P') // p P
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_0) PORT_CHAR('0') PORT_CHAR('_') // 0 _
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_0) PORT_CODE(KEYCODE_0_PAD) PORT_CHAR('0') PORT_CHAR('_') // 0 _
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_COLON) PORT_NAME("ö  Ö") // ö Ö
 	PORT_BIT(0xc0, IP_ACTIVE_LOW, IPT_UNUSED)
 
 	PORT_START("COL.13")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_UNUSED)
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_STOP) PORT_CHAR('.') PORT_CHAR('>') // . >
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_LEFT) PORT_CHAR(UCHAR_MAMEKEY(LEFT),8)
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_LEFT) PORT_CODE(KEYCODE_BACKSPACE) PORT_CHAR(UCHAR_MAMEKEY(LEFT),8)
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_O) PORT_CHAR('o') PORT_CHAR('O') // o O
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_9) PORT_CHAR('9') PORT_CHAR(')') // 9 )
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_9) PORT_CODE(KEYCODE_9_PAD) PORT_CHAR('9') PORT_CHAR(')') // 9 )
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_L) PORT_CHAR('l') PORT_CHAR('L') // l L
 	PORT_BIT(0xc0, IP_ACTIVE_LOW, IPT_UNUSED)
 
 	PORT_START("COL.14")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_F8) PORT_CHAR(UCHAR_MAMEKEY(F8))
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_COMMA) PORT_CHAR(',') PORT_CHAR('<') // , <
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_TILDE) PORT_NAME("LAT RUS") // LAT/RUS
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_F8) PORT_CODE(KEYCODE_SLASH_PAD) PORT_CHAR(UCHAR_MAMEKEY(F8)) // "7-8-9-F8" on numpad (popular gaming controls)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_COMMA) PORT_CODE(KEYCODE_DEL_PAD) PORT_CHAR(',') PORT_CHAR('<') // , <
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_TILDE) PORT_CODE(KEYCODE_BACKSLASH2) PORT_NAME("LAT RUS") // LAT/RUS
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_I) PORT_CHAR('i') PORT_CHAR('I') // i I
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_8) PORT_CHAR('8') PORT_CHAR('(') // 8 (
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_8) PORT_CODE(KEYCODE_8_PAD) PORT_CHAR('8') PORT_CHAR('(') // 8 (
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_K) PORT_CHAR('k') PORT_CHAR('K') // k K
 	PORT_BIT(0xc0, IP_ACTIVE_LOW, IPT_UNUSED)
 
@@ -330,8 +347,8 @@ static INPUT_PORTS_START( juku )
 	PORT_BIT(0xff, IP_ACTIVE_LOW, IPT_UNUSED)
 
 	PORT_START("SPECIAL")
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_LSHIFT) PORT_CHAR(UCHAR_SHIFT_1)
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_LCONTROL) PORT_CHAR(UCHAR_SHIFT_2)
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_LSHIFT) PORT_CODE(KEYCODE_RSHIFT) PORT_CHAR(UCHAR_SHIFT_1)
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_LCONTROL) PORT_CODE(KEYCODE_RCONTROL) PORT_CHAR(UCHAR_SHIFT_2)
 INPUT_PORTS_END
 
 
@@ -339,59 +356,110 @@ INPUT_PORTS_END
 //  VIDEO
 //**************************************************************************
 
-void juku_state::screen_cmd_a_w(uint8_t data) { m_pit[0]->write(0x11, data); screen_scan_sequence(0, data); }
-void juku_state::screen_data_a_w(uint8_t data) { m_pit[0]->write(0x12, data); screen_scan_sequence(1, data); }
-void juku_state::screen_cmd_b_w(uint8_t data) { m_pit[1]->write(0x15, data); m_screen_cur_seq[2] == -1 ? screen_scan_sequence(2, data) : screen_scan_sequence(3, data); }
-void juku_state::screen_data_b_w(uint8_t data) { m_pit[1]->write(0x16, data); screen_scan_sequence(4, data); }
-
-void juku_state::screen_scan_sequence(int pos, uint8_t data)
+inline uint16_t bcd_value(uint16_t val) 
 {
-	m_screen_cur_seq[pos] = (int)data;
-
-	for (int i=0; i<3; i++)
-		if (memcmp(screen_mode_sequences[i], m_screen_cur_seq, pos*sizeof(int)) == 0) {
-			if (pos == 4)
-				switch (i) {
-				case 0:
-					screen_mode(320, 240);
-					break;
-				case 1:
-					screen_mode(384, 200);
-					break;
-				case 2:
-					screen_mode(400, 192);
-					break;
-				case 3:
-					screen_mode(256, 192);
-					break;
-				}
-			else return;
-		}
-
-	for (int i=0; i<5; i++)
-		m_screen_cur_seq[i]=-1;
+	return
+		((val>>12) & 0xF) *  1000 +
+		((val>> 8) & 0xF) *   100 +
+		((val>> 4) & 0xF) *    10 +
+		( val      & 0xF);
 }
 
-void juku_state::screen_mode(int x, int y)
+void juku_state::screen_width(uint8_t data)
 {
-	if (m_screen_x == x && m_screen_y == y)
-		return;
+	m_pit[0]->write(0x10, data);
+	m_screen->set_size(bcd_value(data)*8, m_screen->height());
+	adjust_monitor_params(0b0000'0001);
+}
 
-	m_screen_x = x, m_screen_y = y;
-	rectangle v = m_screen->visible_area();
-	v.max_x = x - 1;
-	v.max_y = y - 1;
+void juku_state::screen_height(uint8_t data)
+{
+	m_pit[1]->write(0x14, data);
 
-	m_screen->configure(x, y, v, m_screen->frame_period().attoseconds());
+	if (m_height_lsb == -1) {
+		m_height_lsb = (int)data;
+	} else {
+		m_screen->set_size(m_screen->width(), ((uint16_t)data << 8) + (uint8_t)m_height_lsb);
+		m_height_lsb = -1;
+		adjust_monitor_params(0b0000'1000);
+	}
+}
+
+void juku_state::screen_hblank_period(uint8_t data)
+{
+	m_pit[0]->write(0x11, data);
+	m_width = m_screen->width()-bcd_value(data)*8;
+	adjust_monitor_params(0b0000'0010);
+}
+
+void juku_state::screen_vblank_period(uint8_t data)
+{
+	m_pit[1]->write(0x15, data);
+	
+	if (m_vblank_period_lsb == -1) {
+		m_vblank_period_lsb = (int)data;
+	} else {
+		m_height = m_screen->height()-bcd_value(((uint16_t)data<<8) + (uint8_t)m_vblank_period_lsb) - 1;
+		m_vblank_period_lsb = -1;
+		adjust_monitor_params(0b0001'0000);
+	}
+}
+
+void juku_state::screen_hfporch(uint8_t data)
+{
+	m_pit[0]->write(0x12, data);
+	m_hbporch = m_screen->width()-m_width-bcd_value(data)*8;
+	adjust_monitor_params(0b0000'0100);
+}
+
+void juku_state::screen_vfporch(uint8_t data)
+{
+	m_pit[1]->write(0x16, data);
+	m_vbporch = m_screen->height()-m_height-bcd_value(data);
+	adjust_monitor_params(0b0010'0000);
+}
+
+/*
+ * In changing screen resolution mimic a real monitor and allow tweaking
+ * individual parameters without immediately changing the visible area
+ */
+void juku_state::adjust_monitor_params(uint8_t monitor_bits)
+{
+	// --5-----  ver front fporch
+	// ---4----  ver blank period
+	// ----3---  screen height
+	// -----2--  hor front porch
+	// ------1-  hor blank period
+	// -------0  screen width
+
+	m_monitor_bits |= monitor_bits;
+
+	// mostly to make screen positioning tools behave decently
+	m_empty_screen_on_update = 2;
+
+	// don't adjust monitor params unless all six screen params in ports 10h-12h and 14h-16h are set
+	// horizontal/vertical rates in 10h and 14h are set in BIOS and not changed in normal video mode switching
+	// expect changing params in order AND vertical front porch in 16h as the final step
+	if (monitor_bits == 0b0010'0000 && m_monitor_bits == 0b0011'1111) {
+		m_screen->set_visarea(m_hbporch, m_hbporch+m_width-1, m_vbporch, m_vbporch+m_height-1);
+		m_monitor_bits = 0b000'01001;
+	}
 }
 
 uint32_t juku_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
-{
-	for (int y = 0; y < m_screen_y; y++)
-	{
-		uint32_t *dest = &bitmap.pix(y);
-		for (int x = 0; x < m_screen_x; x++)
-			*dest++ = BIT(m_ram[0xd800 + (y * (m_screen_x / 8) + x / 8)], 7 - (x % 8)) ? rgb_t::white() : rgb_t::black();
+{	      
+	int y_max = m_vbporch < 0 ? m_height + m_vbporch : m_vbporch+m_height > m_screen->height() ? m_screen->height() : m_height;
+	int x_max = m_hbporch < 0 ? m_width + m_hbporch : m_hbporch+m_width > m_screen->width() ? m_screen->width() : m_width;
+	
+	if (m_empty_screen_on_update) {
+		m_empty_screen_on_update--;
+		bitmap.fill(0);
+	}
+
+	for (int y = 0; y < y_max; y++) {
+		uint32_t *dest = &bitmap.pix(std::max(y+m_vbporch, 0)) + std::max(m_hbporch, 0);
+		for (int x = 0; x < x_max; x++)
+			*dest++ = BIT(m_ram[0xd800 + (y * (m_width / 8) + x / 8)], 7 - (x % 8)) ? rgb_t::white() : rgb_t::black();
 	}
 
 	return 0;
@@ -423,17 +491,14 @@ void juku_state::fdc_drq_w(int state)
 
 void juku_state::fdc_cmd_w(uint8_t data)
 {
-	if (m_fdc_cur_cmd != data)
-		m_fdc_cur_cmd = data;
-
+	m_fdc_cur_cmd = data;
 	m_fdc->cmd_w(data);
 }
 
 uint8_t juku_state::fdc_data_r()
 {
 	// on read commands (100xxxxx, 11000xxx, 11100xxx) and fdc reports busy
-	if ( ((m_fdc_cur_cmd >> 5) == 0x4 || (m_fdc_cur_cmd >> 5) == 0x6 || (m_fdc_cur_cmd >> 3) == 0x1c) && m_fdc->drq_r() == 0 && (m_fdc->status_r() & 0x1) == 0x1 )
-	{
+	if ( ((m_fdc_cur_cmd >> 5) == 0x4 || (m_fdc_cur_cmd >> 5) == 0x6 || (m_fdc_cur_cmd >> 3) == 0x1c) && m_fdc->drq_r() == 0 && (m_fdc->status_r() & 0x1) == 0x1 ) {
 		// cpu tries to read data without drq active. halt it and reset the
 		// pc back to the beginning of the instruction
 		m_maincpu->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
@@ -448,8 +513,7 @@ uint8_t juku_state::fdc_data_r()
 void juku_state::fdc_data_w(uint8_t data)
 {
 	// on write commands (101xxxxx, 11110xxx) and fdc reports busy
-	if ( ((m_fdc_cur_cmd >> 5) == 0x5 || (m_fdc_cur_cmd >> 3) == 0x1e) && m_fdc->drq_r() == 0 && (m_fdc->status_r() & 0x1) == 0x1 )
-	{
+	if ( ((m_fdc_cur_cmd >> 5) == 0x5 || (m_fdc_cur_cmd >> 3) == 0x1e) && m_fdc->drq_r() == 0 && (m_fdc->status_r() & 0x1) == 0x1 )	{
 		// cpu tries to write data without drq, halt it and reset pc
 		m_maincpu->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
 		m_maincpu->set_state_int(i8080a_cpu_device::I8085_PC, m_maincpu->pc() - 2);
@@ -464,17 +528,10 @@ void juku_state::fdc_data_w(uint8_t data)
 //  SOUND
 //**************************************************************************
 
-void juku_state::update_speaker()
+void juku_state::speaker_w(int state)
 {
-	m_speaker->level_w(m_beep_state << BIT(m_prev_porta, 4));
+	m_speaker->level_w((m_beep_state = state) << m_beep_level);
 }
-
-WRITE_LINE_MEMBER(juku_state::speaker_w)
-{
-	m_beep_state = state;
-	update_speaker();
-}
-
 
 //**************************************************************************
 //  MACHINE EMULATION
@@ -491,27 +548,24 @@ void juku_state::pio0_porta_w(uint8_t data)
 	for (int i = 0; i < 6; i++)
 		m_key_encoder->input_line_w(i, BIT(m_keys[data & 0x0f]->read(), i));
 
+	if (m_beep_level != BIT(data, 4))
+		m_speaker->level_w(m_beep_state << (m_beep_level = BIT(data, 4)));
+
 	m_key_encoder->update();
-
-	if (BIT(data, 4) != BIT(m_prev_porta, 4))
-		update_speaker();
-
-	if (m_prev_porta != data)
-		m_prev_porta = data;
 }
 
 uint8_t juku_state::pio0_portb_r()
 {
 	// 7-------  ctrl
 	// -6------  shift
-	// --54----  not used
+	// --54----  not used (reported 10 on E5104)
 	// ----321-  keyboard data
 	// -------0  key pressed
 
 	uint8_t data = 0;
 
 	data |= m_key_special->read();
-	data |= 0x30;
+	data |= 0b10'0000;
 	data |= m_key_encoder->output_r() << 1;
 	data |= m_key_encoder->output_valid_r();
 
@@ -523,29 +577,22 @@ void juku_state::pio0_portc_w(uint8_t data)
 	// 7-------  (cas?) pof
 	// -6------  (cas?) stop / floppy side select
 	// --5-----  (cas?) rn / floppy drive select
-	// ---4----  (cas?) ff / floppy?
-	// ----3---  (cas?) play
-	// -----2--  (cas?) rec / floppy?
-	// ------10  memory mode
-
-	for (int i = 2; i < 8; i++)
-		if (BIT(data, i) !=  BIT(m_prev_portc, i))
-			osd_printf_verbose("pio0: c%d = %d\n", i, BIT(data, i));
+	// ---4----  (cas?) ff / floppy density (sd = 1, dd = 0)
+	// ----3---  (cas?) play / floppy size (8" = 1, 5.25" = 0)
+	// -----2--  (cas?) rec / floppy motor (on = 1, off = 0)
+	// --s----10  memory mode
 
 	floppy_image_device *floppy = m_floppy[BIT(data, 5)]->get_device();
 	m_fdc->set_floppy(floppy);
+	m_fdc->dden_w(BIT(data,4));
+	// TODO: 8" floppy select
 
-	if (floppy)
-	{
-		// the motor is always running for now
-		floppy->mon_w(0);
+	if (floppy) {
+		floppy->mon_w(!BIT(data,2));
 		floppy->ss_w(BIT(data, 6));
 	}
 
 	m_bank->set_bank(data & 0x03);
-
-	if (m_prev_portc != data)
-		m_prev_portc = data;
 }
 
 void juku_state::machine_start()
@@ -560,26 +607,32 @@ void juku_state::machine_start()
 
 	// register for save states
 	save_pointer(NAME(m_ram), 0x10000);
-	save_item(NAME(m_prev_portc));
-	save_item(NAME(m_prev_porta));
 	save_item(NAME(m_beep_state));
+	save_item(NAME(m_beep_level));
 	save_item(NAME(m_fdc_cur_cmd));
-	save_item(NAME(m_screen_cur_seq));
-	save_item(NAME(m_screen_x));
-	save_item(NAME(m_screen_y));
+	save_item(NAME(m_width));
+	save_item(NAME(m_height));
+	save_item(NAME(m_hbporch));
+	save_item(NAME(m_vbporch));
+	save_item(NAME(m_height_lsb));
+	save_item(NAME(m_vblank_period_lsb));
+	save_item(NAME(m_monitor_bits));
+	save_item(NAME(m_empty_screen_on_update));
 }
 
 void juku_state::machine_reset()
 {
 	m_bank->set_bank(0);
 	m_key_encoder->enable_input_w(0);
-	m_prev_portc = 0;
-	m_prev_porta = 0;
 	m_beep_state = 0;
+	m_beep_level = 0;
 	m_fdc_cur_cmd = 0;
-	m_screen_x = 320, m_screen_y = 240;
-	for (int i=0; i<5; i++)
-		m_screen_cur_seq[i]=-1;
+	m_width = DEFAULT_WIDTH, m_height = DEFAULT_HEIGHT;
+	m_hbporch = HORIZ_BACK_PORCH, m_vbporch = VERT_BACK_PORCH;
+	m_height_lsb = -1;
+	m_vblank_period_lsb = -1;
+	m_monitor_bits = 0U;
+	m_empty_screen_on_update = 0;
 }
 
 
@@ -589,8 +642,8 @@ void juku_state::machine_reset()
 
 void juku_state::juku(machine_config &config)
 {
-	// КР580ВМ80A @ 2 MHz
-	I8080A(config, m_maincpu, 2000000);
+	// КР580ВМ80A @ 2 MHz (=KP580ИK80А)
+	I8080A(config, m_maincpu, 20_MHz_XTAL/10);
 	m_maincpu->set_addrmap(AS_PROGRAM, &juku_state::mem_map);
 	m_maincpu->set_addrmap(AS_IO, &juku_state::io_map);
 	m_maincpu->in_inta_func().set("pic", FUNC(pic8259_device::acknowledge));
@@ -605,48 +658,46 @@ void juku_state::juku(machine_config &config)
 	PIC8259(config, m_pic, 0);
 	m_pic->out_int_callback().set_inputline(m_maincpu, 0);
 
-	// КР580ВИ53 (#1)
+	// КР580ВИ53 #1
 	PIT8253(config, m_pit[0], 0);
-	m_pit[0]->set_clk<0>(16_MHz_XTAL/16);
-	m_pit[0]->set_clk<1>(16_MHz_XTAL/16);
+	m_pit[0]->set_clk<0>(16_MHz_XTAL/16); // РК171 16000kHz variations on board
+	m_pit[0]->set_clk<1>(16_MHz_XTAL/16); // РК170ББ-14ГC 16000kHz in specs
 	m_pit[0]->set_clk<2>(16_MHz_XTAL/16);
-
 	m_pit[0]->out_handler<0>().set(m_pit[1], FUNC(pit8253_device::write_clk0));
 	m_pit[0]->out_handler<0>().append(m_pit[0], FUNC(pit8253_device::write_gate1));
 	m_pit[0]->out_handler<0>().append(m_pit[0], FUNC(pit8253_device::write_gate2));
+	//m_pit[0]->out_handler<1>().set(, ); // HOR RTR
+	//m_pit[0]->out_handler<1>().append(, ); // HOR RTR
 
-	// КР580ВИ53 (#2)
+	// КР580ВИ53 #2
 	PIT8253(config, m_pit[1], 0);
-
 	m_pit[0]->out_handler<2>().set(m_pit[1], FUNC(pit8253_device::write_clk1)); // H SYNC DSL
 	m_pit[0]->out_handler<2>().append(m_pit[1], FUNC(pit8253_device::write_clk2));
-
 	m_pit[1]->out_handler<0>().append(m_pit[1], FUNC(pit8253_device::write_gate1));
 	m_pit[1]->out_handler<0>().append(m_pit[1], FUNC(pit8253_device::write_gate2));
-
-	m_pit[1]->out_handler<1>().set(m_pic, FUNC(pic8259_device::ir5_w)); // VERT RTR
-
-	//m_pit[1]->out_handler<2>().append(m_pit[1], FUNC(pit8253_device::write_clk1)); // VERT SYNC BEL
+	m_pit[1]->out_handler<1>().set(m_pic, FUNC(pic8259_device::ir5_w)); // VER RTR / FRAME INT
+	
+	//m_pit[1]->out_handler<2>().append(m_pit[1], FUNC(pit8253_device::write_clk1)); // VERT SYNC DSL
 	//m_pit[1]->out_handler<2>().append(m_pit[1], FUNC(pit8253_device::write_clk2));
 
-	// КР580ВИ53 (#3)
+	// КР580ВИ53 #3
 	PIT8253(config, m_pit[2], 0);
 
-	m_pit[2]->set_clk<0>(16_MHz_XTAL/13);
-	m_pit[2]->set_clk<1>(16_MHz_XTAL/8);
-	m_pit[2]->set_clk<2>(16_MHz_XTAL/13);
+	m_pit[2]->set_clk<0>(16_MHz_XTAL/13); // 1.23 MHz
+	m_pit[2]->set_clk<1>(16_MHz_XTAL/8); // 2 MHz
+	m_pit[2]->set_clk<2>(16_MHz_XTAL/13); // 1.23 MHz
 
 	//m_pit[1]->out_handler<0>().append(...); // BAUD RATE
 	m_pit[2]->out_handler<1>().append(FUNC(juku_state::speaker_w)); // SOUND
 	//m_pit[1]->out_handler<2>().append(...); // SYNC BAUD RATE
 
-	// КР580ВВ55A
+	// КР580ВВ55A #1 (=КР580ИК55)
 	I8255A(config, m_pio[0]);
 	m_pio[0]->out_pa_callback().set(FUNC(juku_state::pio0_porta_w));
 	m_pio[0]->in_pb_callback().set(FUNC(juku_state::pio0_portb_r));
 	m_pio[0]->out_pc_callback().set(FUNC(juku_state::pio0_portc_w));
 
-	// КР580ВВ55A
+	// КР580ВВ55A #2
 	I8255A(config, m_pio[1]);
 
 	// КР580ВВ51A
@@ -659,23 +710,20 @@ void juku_state::juku(machine_config &config)
 	m_sio[1]->rxrdy_handler().set("pic", FUNC(pic8259_device::ir0_w));
 	m_sio[1]->txrdy_handler().set("pic", FUNC(pic8259_device::ir1_w));
 
-	// Электроника МС 6105.4 (60 Hz)
+	// Электроника МС 6105.1 "Колокольчик" (DEC VR201 analog)
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_refresh_hz(60);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); // not accurate
-	m_screen_x = 320, m_screen_y = 240;
-	m_screen->set_size(m_screen_x, m_screen_y);
-	m_screen->set_visarea(0, m_screen_x-1, 0, m_screen_y-1);
+	m_screen->set_raw(16_MHz_XTAL/16, HORIZ_PERIOD/8, HORIZ_BACK_PORCH, HORIZ_BACK_PORCH+DEFAULT_WIDTH, VERT_PERIOD, VERT_BACK_PORCH, VERT_BACK_PORCH+DEFAULT_HEIGHT);
+	m_screen->set_size(HORIZ_PERIOD, VERT_PERIOD);
 	m_screen->set_screen_update(FUNC(juku_state::screen_update));
 
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 1);
-	m_speaker->set_levels(3, speaker_levels);
+	m_speaker->set_levels(3, SPEAKER_LEVELS);
 
 	TTL74148(config, m_key_encoder, 0);
 
-	// КР1818ВГ93
-	KR1818VG93(config, m_fdc, 1_MHz_XTAL);
+	// КР1818ВГ93 (for E6502 disk drive)
+	KR1818VG93(config, m_fdc, 16_MHz_XTAL/16);
 	m_fdc->drq_wr_callback().set(FUNC(juku_state::fdc_drq_w));
 	FLOPPY_CONNECTOR(config, "fdc:0", juku_floppies, "525qd", juku_state::floppy_formats);
 	FLOPPY_CONNECTOR(config, "fdc:1", juku_floppies, "525qd", juku_state::floppy_formats);
@@ -689,24 +737,51 @@ void juku_state::juku(machine_config &config)
 //**************************************************************************
 
 ROM_START( juku )
-	ROM_DEFAULT_BIOS("3.43m")
-	ROM_SYSTEM_BIOS(0, "3.43m", "RomBios 3.43m")
-
+	ROM_DEFAULT_BIOS("3.43m_37")
 	ROM_REGION(0x4000, "maincpu", 0)
-	// This is RomBios 3.43m from widespread Baltijets E5104 batch with
-	// identification: "EktaSoft '88  Serial #0037"
-	ROMX_LOAD("jukurom0.bin", 0x0000, 0x2000, CRC(b26f5080) SHA1(db8bab6ff7143be890d6aaa25d10386dfdac3fc7), ROM_BIOS(0))
-	ROMX_LOAD("jukurom1.bin", 0x2000, 0x2000, CRC(b184e253) SHA1(d169acde61f643d7d0780cca0eeaf33ebdf75b92), ROM_BIOS(0))
+
+	// Monitor 3.3 with Bootstrap 3.3, FDC 1791 from early 1985 prototype
+	// Does not seem to be compatible with JBASIC extension cartridge
+	ROM_SYSTEM_BIOS(0, "jmon3.3", "Monitor/Bootstrap 3.3 \\w JBASIC")
+	ROMX_LOAD("jmon33.bin", 0x0000, 0x4000, CRC(ed22c287) SHA1(76407d99bf83035ef526d980c9468cb04972608c), ROM_BIOS(0))
+
+	// RomBios 3.42 with Janet 1.2/Bootstrap 4.1, screen 53x24, FDC 1791/2 from Juss prototype (E5103?)
+	// Id: "EktaSoft '88  Serial #0024"
+	ROM_SYSTEM_BIOS(1, "3.42_24", "Disk/Net \\w JUSS keyb (3.42 #0024)")
+	ROMX_LOAD("ekta24.bin", 0x0000, 0x4000, CRC(6ce7ee3b) SHA1(a7185d747c94cd519868692ed3d10fade90dd6d5), ROM_BIOS(1))
+
+	// RomBios 2.43m with TapeBios/Bootstrap 4.1, screen 53x24 (true E5101?)
+	// Id: "EktaSoft '88  Serial #0032"
+	ROM_SYSTEM_BIOS(2, "2.43m_32", "Tape/Disk (2.43m #0032)")
+	ROMX_LOAD("ekta32.bin", 0x0000, 0x4000, CRC(72c0da53) SHA1(57311d53f6fe1e87e0755990f400253caccd4795), ROM_BIOS(2))
+
+	// RomBios 3.43m with Janet 1.2/Bootstrap 4.1, screen 53x24 from Juss prototype (E5103?)
+	// Id: "EktaSoft '88  Serial #0035"
+	ROM_SYSTEM_BIOS(3, "3.43m_35", "Disk/Net \\w JUSS keyb (3.43m #0035)")
+	ROMX_LOAD("ekta35.bin", 0x0000, 0x4000, CRC(85a017bc) SHA1(7aa03497d88cfab9315aa3987765bc06ecb70013), ROM_BIOS(3))
+
+	// RomBios 3.43m with Janet 1.2/Bootstrap 4.1 from widespread Baltijets batch (E5104)
+	// Id: "EktaSoft '88  Serial #0037"
+	ROM_SYSTEM_BIOS(4, "3.43m_37", "Disk/Net (3.43m #0037)")
+	ROMX_LOAD("ekta37.bin", 0x0000, 0x4000, CRC(2c1c9cad) SHA1(29366d74c0e27129f2484a973f7a6de659b90cf4), ROM_BIOS(4))
+
+	// RomBios 2.43m with TapeBios/Bootstrap 4.1, screen 53x24, modified for IBM AT keyboard (homebrew)
+	// Id: "EktaSoft '90  Serial #0043"
+	ROM_SYSTEM_BIOS(5, "2.43m_43", "Tape/Disk \\w AT keyb (2.43m #0043)")
+	ROMX_LOAD("ekta43.bin", 0x0000, 0x4000, CRC(05678f9f) SHA1(a7419bfd8249871cc7dbf5c6ea85022d6963fc9a), ROM_BIOS(5))
 
 	ROM_REGION(0x8000, "extension", 0)
-	// This is EKTA JBASIC cartridge from 1990, probably version 1.1
-	// from 14.09.1987, there is also version with HEX$ directive
-	// publised for running from EKDOS. E5101 test batch probably had
-	// JBASIC onboard with earlier RomBios 2.4/3.4 from 6.12.1987.
-	ROMX_LOAD("bas0.bin", 0x0000, 0x0800, CRC(c03996cd) SHA1(3c45537c2a1879998e5315b79eb44dcf7c007d69), ROM_BIOS(0))
-	ROMX_LOAD("bas1.bin", 0x0800, 0x0800, CRC(d8016869) SHA1(baef9e9c55171a9192bc13d48e3b45394c7780d9), ROM_BIOS(0))
-	ROMX_LOAD("bas2.bin", 0x1000, 0x0800, CRC(9a958621) SHA1(08baca27e1ccdb0a441706df267c1f82b82d56ab), ROM_BIOS(0))
-	ROMX_LOAD("bas3.bin", 0x1800, 0x0800, CRC(d4ffbf67) SHA1(bced7ff2420f630dbd4cd1c0c83481ed874869f1), ROM_BIOS(0))
+
+	// EKTA JBASIC cartridge (buggy) seems similar to v1.1 from 14.09.1987.
+	// There is also a version with additional HEX$ directive for EKDOS.
+	// Initial E5101 had JBASIC onboard with early RomBios/Monitor versions.
+	ROMX_LOAD("jbasic11.bin", 0x0000, 0x2000, CRC(bdc471ca) SHA1(3d96ba589aa21d44412efb099a144fbe23a2f52f), ROM_BIOS(1))
+	ROMX_LOAD("jbasic11.bin", 0x0000, 0x2000, CRC(bdc471ca) SHA1(3d96ba589aa21d44412efb099a144fbe23a2f52f), ROM_BIOS(2))
+	ROMX_LOAD("jbasic11.bin", 0x0000, 0x2000, CRC(bdc471ca) SHA1(3d96ba589aa21d44412efb099a144fbe23a2f52f), ROM_BIOS(3))
+	ROMX_LOAD("jbasic11.bin", 0x0000, 0x2000, CRC(bdc471ca) SHA1(3d96ba589aa21d44412efb099a144fbe23a2f52f), ROM_BIOS(4))
+	ROMX_LOAD("jbasic11.bin", 0x0000, 0x2000, CRC(bdc471ca) SHA1(3d96ba589aa21d44412efb099a144fbe23a2f52f), ROM_BIOS(5))
+
+
 ROM_END
 
 } // Anonymous namespace
@@ -717,4 +792,4 @@ ROM_END
 //**************************************************************************
 
 //    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  CLASS       INIT        COMPANY  FULLNAME      FLAGS
-COMP( 1988, juku, 0,      0,      juku,    juku,  juku_state, empty_init, "EKTA",  "Juku E5101", MACHINE_SUPPORTS_SAVE)
+COMP( 1988, juku, 0,      0,      juku,    juku,  juku_state, empty_init, "EKTA",  "Juku E5104", MACHINE_SUPPORTS_SAVE)
