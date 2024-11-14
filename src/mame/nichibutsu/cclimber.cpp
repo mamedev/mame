@@ -12,6 +12,17 @@ different as well.
 Swimmer is similar but also different (e.g. it has two CPUs and two 8910,
 graphics are 3bpp instead of 2)
 
+TODO:
+- verify timings of sound/music on Swimmer
+- add tms5110 support to bagmanf
+- yamato bg gradient color decode & table selection
+- toprollr Coin_B 2C_1C doesn't work right, is it a BTANB?
+
+-------------------------------------------------------------------
+
+Crazy Climber memory map (preliminary)
+as described by Lionel Theunissen (lionelth@ozemail.com.au)
+
 0000h-4fffh ;20k program ROMs. ROM11=0000h
                                ROM10=1000h
                                ROM09=2000h
@@ -114,51 +125,35 @@ I/O 9  ;AY-3-8910 Data Write Reg.
 I/O C  ;AY-3-8910 Data Read Reg.
         Port A of the 8910 selects the digital sample to play
 
-Changes:
-25 Jan 98 LBO
-        * Added support for the real Swimmer bigsprite ROMs, courtesy of Gary Walton.
-        * Increased the IRQs for the Swimmer audio CPU to 4 to make it more "jaunty".
-          Not sure if this is accurate, but it should be closer.
-3 Mar 98 LBO
-        * Added alternate version of Swimmer.
-
-TODO:
-        * Verify timings of sound/music on Swimmer.
-        * Add tms5110 support to bagmanf
-
-
 -------------------------------------------------------------------
 
-    T.S. 17.12.2005:
+T.S. 17.12.2005:
 
-    Yamato:
-    -------
-     Added temporary bg gradient (bad colors/offset).
+Yamato:
+-------
+ Added temporary bg gradient (bad colors/offset).
 
-     Gradient table are stored in two(?) ROMs.
-     Each table is 256 bytes long: 128 for normal
-     and 128 bytes for flipped screen.
-     Color format is unknown - probably direct RGB
-     mapping of 8 or 16 (both roms) bits. Also table
-     selection source is unknown.
+ Gradient table are stored in two(?) ROMs.
+ Each table is 256 bytes long: 128 for normal
+ and 128 bytes for flipped screen.
+ Color format is unknown - probably direct RGB
+ mapping of 8 or 16 (both roms) bits. Also table
+ selection source is unknown.
 
-     At the title screen, it's a solid dark-cyan.
-     During gameplay, the sky is a cyan gradient, and
-     the sea is a dark blue gradient. When the player
-     ship explodes, the sky and sea briefly turn to a
-     lighter cyan gradient, followed by cyan-pink for
-     the sky, and purple-red for the sea.
-
-     TODO:
-      - bg gradient color decode & table selection
+ At the title screen, it's a solid dark-cyan.
+ During gameplay, the sky is a cyan gradient, and
+ the sea is a dark blue gradient. When the player
+ ship explodes, the sky and sea briefly turn to a
+ lighter cyan gradient, followed by cyan-pink for
+ the sky, and purple-red for the sea.
 
 
-    Top Roller:
-    ----------
-     It's made by the same developers as Yamato (apparently
-     Falcon) and probably uses the same encrypted SEGA cpu.
+Top Roller:
+----------
+ It's made by the same developers as Yamato (apparently
+ Falcon) and probably uses the same encrypted SEGA cpu.
 
-     lives - $6155
+ lives - $6155
 
 -------------------------------------------------------------------
 
@@ -223,10 +218,7 @@ Notes:
      D2125 - 1kx1 SRAM
       7603 - Harris M3-7603 32 bytes x8-bit bipolar PROM
 
-----
-
-2008-07
-Dip location verified from manual for: cclimber, guzzler, swimmer
+-------------------------------------------------------------------
 
  Cannon Ball
  -----------
