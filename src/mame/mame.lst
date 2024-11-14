@@ -23643,9 +23643,6 @@ galpani2t                       // (c) 1993 Kaneko
 gp2quiz                         // (c) 1993 Kaneko
 gp2se                           // (c) 1994 Kaneko
 
-@source:juku/juku.cpp
-juku                            // (c) 1988 EKTA
-
 @source:kaneko/galpani3.cpp
 galpani3                        // (c) 1995 Kaneko (World)
 galpani3hk                      // (c) 1995 Kaneko (Hong Kong)
@@ -42435,9 +42432,6 @@ jade                            //
 @source:skeleton/jonos.cpp
 jonos                           //
 
-@source:skeleton/juku.cpp
-juku                            //
-
 @source:skeleton/junior80.cpp
 junior80                        //
 
@@ -46295,6 +46289,9 @@ irisha                          //
 @source:ussr/istrebiteli.cpp
 istreb                          //
 motogonki                       //
+
+@source:ussr/juku.cpp
+juku                            // (c) 1988 EKTA
 
 @source:ussr/krokha.cpp
 krokha                          // 1990 SKB Kontur, USSR
