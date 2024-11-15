@@ -63,6 +63,14 @@ public:
 	int m_cr_direction; // direction of carriage
 	int m_xpos;
 	int m_ypos;
+public:
+
+	template <typename F>
+		std::enable_if_t<screen_update_rgb32_delegate::supports_callback<F>::value> set_screen_update(F &&callback, const char *name)
+		{
+				m_screen_update_rgb32.set(std::forward<F>(callback), name);
+		}
+
 
 protected:
 	bitmap_printer_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
@@ -78,6 +86,8 @@ private:
 	required_device<screen_device> m_screen;
 	required_device<stepper_device> m_pf_stepper;
 	required_device<stepper_device> m_cr_stepper;
+
+	screen_update_rgb32_delegate m_screen_update_rgb32; // screen update callback
 
 	required_ioport m_top_margin_ioport;
 	required_ioport m_bottom_margin_ioport;
@@ -117,6 +127,14 @@ private:
 	void draw7seg(u8 data, bool is_digit, int x0, int y0, int width, int height, int thick, bitmap_rgb32 &bitmap, u32 color, u32 erasecolor);
 	void draw_number(int number, int x, int y, bitmap_rgb32& bitmap);
 	void draw_inch_marks(bitmap_rgb32& bitmap);
+
+	double lastmovecrtime = -1.0;
+	int lastmovecrpos = 0;
+	double lastmovecrspeed = 0;
+
+public:
+	void trackcrpos();
+	double calccrpos(); // calculate interim positions in between discrete cr stepper steps
 };
 
 DECLARE_DEVICE_TYPE(BITMAP_PRINTER, bitmap_printer_device)

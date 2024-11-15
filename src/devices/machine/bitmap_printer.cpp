@@ -84,6 +84,7 @@ bitmap_printer_device::bitmap_printer_device(const machine_config &mconfig, devi
 	m_screen(*this, "screen"),
 	m_pf_stepper(*this, "pf_stepper"),
 	m_cr_stepper(*this, "cr_stepper"),
+	m_screen_update_rgb32(*this),
 	m_top_margin_ioport(*this, "TOPMARGIN"),
 	m_bottom_margin_ioport(*this, "BOTTOMMARGIN"),
 	m_draw_marks_ioport(*this, "DRAWMARKS"),
@@ -151,6 +152,8 @@ void bitmap_printer_device::device_start()
 	save_item(NAME(m_vdpi));
 	save_item(NAME(m_clear_pos));
 	save_item(NAME(m_newpage_flag));
+
+	m_screen_update_rgb32.resolve();  // screen.cpp has it inside device_resolve_objects  MUST have this or segfault
 }
 
 void bitmap_printer_device::device_reset_after_children()
@@ -192,7 +195,7 @@ uint32_t bitmap_printer_device::screen_update_bitmap(screen_device &screen,
 	draw_printhead(bitmap, std::max(m_xpos, 0) , bitmap.height() - m_distfrombottom);
 
 	draw_inch_marks(bitmap);
-
+	if (!m_screen_update_rgb32.isnull()) m_screen_update_rgb32(screen, bitmap, cliprect);
 	return 0;
 }
 
@@ -461,7 +464,38 @@ void bitmap_printer_device::update_cr_stepper(int pattern)
 		else if (delta < 0) {m_cr_direction = -1;}
 	}
 	m_xpos = m_cr_stepper->get_absolute_position() * m_cr_stepper_ratio0 / m_cr_stepper_ratio1;
+
+	trackcrpos();
 }
+
+
+void bitmap_printer_device::trackcrpos()
+{
+	int pos = m_xpos;
+	if (lastmovecrpos != pos)
+	{
+		double dist = pos - lastmovecrpos;
+		double currenttime = machine().time().as_double();
+		double elapsed = currenttime - lastmovecrtime;
+		if (elapsed < .00001) elapsed = .00001;  // avoid divide by zero
+		double speed = dist / elapsed;
+
+		lastmovecrpos = pos;
+		lastmovecrtime = machine().time().as_double();
+		lastmovecrspeed = speed;
+	}
+}
+
+double bitmap_printer_device::calccrpos()
+{
+	double calcpos;
+	if ((machine().time().as_double() - lastmovecrtime) < .1)
+		calcpos = lastmovecrpos + (machine().time().as_double() - lastmovecrtime) * lastmovecrspeed;
+	else
+		calcpos = m_xpos;
+	return calcpos;
+}
+
 
 void bitmap_printer_device::update_pf_stepper(int pattern)
 {

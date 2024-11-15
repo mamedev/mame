@@ -637,6 +637,13 @@ void pcw_state::pcw_printer_fire_pins(uint16_t pins)
 	int x,line;
 	int32_t feed = (m_paper_feed / 2);
 
+	for (int i = 0; i < 9; i++)
+	{
+		if ((pins & (1<<(i))) == 0)
+			m_bitmap_printer->pix(m_bitmap_printer->m_ypos + i * 2, // * 1 for no interleave at 72 vdpi
+			m_bitmap_printer->calccrpos())  = 0x000000;
+	}
+
 	for(x=feed+PCW_PRINTER_HEIGHT-16;x<feed+PCW_PRINTER_HEIGHT-7;x++)
 	{
 		line = x % PCW_PRINTER_HEIGHT;
@@ -644,6 +651,8 @@ void pcw_state::pcw_printer_fire_pins(uint16_t pins)
 			m_prn_output->pix(line, m_printer_headpos) = (uint16_t)(pins & 0x01);
 		pins >>= 1;
 	}
+
+
 //  if(m_printer_headpos < PCW_PRINTER_WIDTH)
 //      m_printer_headpos++;
 }
@@ -724,6 +733,11 @@ TIMER_CALLBACK_MEMBER(pcw_state::pcw_stepper_callback)
 			m_printer_headpos = PCW_PRINTER_WIDTH;
 		m_head_motor_state &= 0x03;
 		m_printer_p2 |= 0x10;
+
+		u8 crdata = BIT(m_printer_shift_output, 4, 4);
+		u8 crswap = bitswap<4>(crdata, 0, 2, 1, 3);
+		m_bitmap_printer->update_cr_stepper(crswap);
+
 	}
 	if((m_printer_p2 & 0x20) == 0)  // line feed motor active
 	{
@@ -744,6 +758,10 @@ TIMER_CALLBACK_MEMBER(pcw_state::pcw_stepper_callback)
 		}
 		m_linefeed_motor_state &= 0x03;
 		m_printer_p2 |= 0x20;
+
+		u8 pfdata = BIT(m_printer_shift_output, 0, 4);
+		u8 pfswap = bitswap<4>(pfdata, 3, 1, 2, 0);
+		m_bitmap_printer->update_pf_stepper(pfswap);
 	}
 }
 
@@ -784,7 +802,7 @@ void pcw_state::mcu_printer_p2_w(uint8_t data)
 
 	// handle shift/store
 	m_printer_serial = data & 0x04;  // data
-	if((data & 0x02) != 0)  // clock
+	if (!BIT(m_printer_p2_prev, 1) && BIT(data, 1))  // only update when clock goes positive
 	{
 		m_printer_shift <<= 1;
 		if(m_printer_serial == 0)
@@ -818,10 +836,13 @@ int pcw_state::mcu_printer_t1_r()
 // Print head location (0 if at left margin, otherwise 1)
 int pcw_state::mcu_printer_t0_r()
 {
-	if(m_printer_headpos == 0)
-		return 0;
-	else
-		return 1;
+	return !(m_bitmap_printer->m_xpos < 10);
+/*
+    if(m_printer_headpos == 0)
+        return 0;
+    else
+        return 1;
+*/
 }
 
 /*
@@ -1079,7 +1100,7 @@ static INPUT_PORTS_START(pcw)
 
 	PORT_START("LINE1")     /* 0x03ff1 */
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Exit") PORT_CODE(KEYCODE_PGDN)       PORT_CHAR(UCHAR_MAMEKEY(F10))
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Ptr") //PORT_CODE(KEYCODE_END)     PORT_CHAR(UCHAR_MAMEKEY(PRTSCR))
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Ptr") PORT_CODE(KEYCODE_BACKSLASH)     PORT_CHAR(UCHAR_MAMEKEY(PRTSCR))
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Cut") PORT_CODE(KEYCODE_SLASH_PAD)   PORT_CHAR(UCHAR_MAMEKEY(F11))
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Copy") PORT_CODE(KEYCODE_ASTERISK)   PORT_CHAR(UCHAR_MAMEKEY(F12))
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_8_PAD)                        PORT_CHAR(UCHAR_MAMEKEY(8_PAD))
@@ -1295,6 +1316,13 @@ void pcw_state::pcw(machine_config &config)
 	RAM(config, m_ram).set_default_size("256K");
 
 	TIMER(config, "pcw_timer", 0).configure_periodic(FUNC(pcw_state::pcw_timer_interrupt), attotime::from_hz(300));
+
+	#define PAPER_WIDTH  (8.5 * 120)
+	#define PAPER_HEIGHT (11 * 144)
+
+	BITMAP_PRINTER(config, m_bitmap_printer, PAPER_WIDTH, PAPER_HEIGHT, 120, 144);  // values approximate
+	m_bitmap_printer->set_pf_stepper_ratio(1, 6);
+	m_bitmap_printer->set_cr_stepper_ratio(1, 1);
 }
 
 void pcw_state::pcw8256(machine_config &config)

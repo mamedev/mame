@@ -13,6 +13,7 @@
 #include "cpu/mcs48/mcs48.h"
 #include "imagedev/floppy.h"
 #include "machine/upd765.h"
+#include "machine/bitmap_printer.h"
 #include "machine/ram.h"
 #include "machine/timer.h"
 #include "sound/beep.h"
@@ -49,6 +50,7 @@ public:
 		, m_rdbanks(*this, "bank%u", 1U)
 		, m_wrbanks(*this, "bank%u", 5U)
 		, m_iptlines(*this, "LINE%u", 0U)
+		, m_bitmap_printer(*this, "bitmap_printer")
 	{ }
 
 	void pcw(machine_config &config);
@@ -155,6 +157,7 @@ private:
 	required_device<palette_device> m_ppalette;
 	required_memory_bank_array<4> m_rdbanks, m_wrbanks;
 	required_ioport_array<16> m_iptlines;
+	optional_device<bitmap_printer_device> m_bitmap_printer;
 
 	inline void pcw_plot_pixel(bitmap_ind16 &bitmap, int x, int y, uint32_t color);
 	void pcw_update_interrupt_counter();
