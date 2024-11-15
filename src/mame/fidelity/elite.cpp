@@ -368,9 +368,7 @@ void elite_state::eag2100_map(address_map &map)
     Input Ports
 *******************************************************************************/
 
-static INPUT_PORTS_START( eas )
-	PORT_INCLUDE( fidel_clockdiv_4 )
-
+static INPUT_PORTS_START( eas_base )
 	PORT_START("IN.0")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_G) PORT_NAME("Game Control")
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_SPACE) PORT_NAME("Speaker")
@@ -385,6 +383,11 @@ static INPUT_PORTS_START( eas )
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_M) PORT_NAME("DM")
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_DEL) PORT_CODE(KEYCODE_BACKSPACE) PORT_NAME("CL")
 	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_V) PORT_NAME("RV")
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( eas )
+	PORT_INCLUDE( eas_base )
+	PORT_INCLUDE( fidel_clockdiv_2 ) // default for 3MHz
 
 	PORT_START("CPU")
 	PORT_CONFNAME( 0x03, 0x00, "CPU Frequency" ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(elite_state::change_cpu_freq), 0) // factory set
@@ -394,9 +397,10 @@ static INPUT_PORTS_START( eas )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( ewc )
-	PORT_INCLUDE( eas )
+	PORT_INCLUDE( eas_base )
+	PORT_INCLUDE( fidel_clockdiv_4 ) // default for >3MHz
 
-	PORT_MODIFY("CPU") // default to 3.57MHz
+	PORT_START("CPU")
 	PORT_CONFNAME( 0x03, 0x01, "CPU Frequency" ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(elite_state::change_cpu_freq), 0) // factory set
 	PORT_CONFSETTING(    0x00, "3MHz (EAS)" )
 	PORT_CONFSETTING(    0x01, "3.57MHz (EWC)" )
@@ -404,9 +408,10 @@ static INPUT_PORTS_START( ewc )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( easc )
-	PORT_INCLUDE( eas )
+	PORT_INCLUDE( eas_base )
+	PORT_INCLUDE( fidel_clockdiv_4 ) // default for >3MHz
 
-	PORT_MODIFY("CPU") // default to 4MHz
+	PORT_START("CPU")
 	PORT_CONFNAME( 0x03, 0x02, "CPU Frequency" ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(elite_state::change_cpu_freq), 0) // factory set
 	PORT_CONFSETTING(    0x00, "3MHz (EAS)" )
 	PORT_CONFSETTING(    0x01, "3.57MHz (EWC)" )
@@ -421,7 +426,7 @@ static INPUT_PORTS_START( pc )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( easx )
-	PORT_INCLUDE( eas )
+	PORT_INCLUDE( easc )
 
 	PORT_MODIFY("CPU") // 5MHz
 	PORT_BIT(0x03, IP_ACTIVE_HIGH, IPT_UNUSED)
@@ -529,8 +534,8 @@ void elite_state::easx(machine_config &config)
 	irq_clock.signal_handler().set_inputline(m_maincpu, M6502_IRQ_LINE);
 
 	config.device_remove("nvram");
-	NVRAM(config, "nvram.ic8", nvram_device::DEFAULT_ALL_0);
-	NVRAM(config, "nvram.ic6", nvram_device::DEFAULT_ALL_0);
+	NVRAM(config, "nvram.ic8", nvram_device::DEFAULT_ALL_1);
+	NVRAM(config, "nvram.ic6", nvram_device::DEFAULT_ALL_1);
 }
 
 void elite_state::eag(machine_config &config)
