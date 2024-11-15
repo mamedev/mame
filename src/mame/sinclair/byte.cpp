@@ -4,7 +4,7 @@
     PEVM Byte
 
 Refs:
-    https://web.archive.org/web/20241003085933/https://zxbyte.ru/
+    https://web.archive.org/web/20241003085933/https://zxbyte.ru/index_en.htm
 
 TODO:
 - Sound / KR580VI53 == i8253
@@ -17,15 +17,18 @@ TODO:
 
 #include "spectrum.h"
 
+#include "machine/pit8253.h"
+
 namespace {
 
 class byte_state : public spectrum_state
 {
 public:
 	byte_state(const machine_config &mconfig, device_type type, const char *tag)
-        : spectrum_state(mconfig, type, tag)
-        , m_io_comp(*this, "COMP")
-    { }
+		: spectrum_state(mconfig, type, tag)
+		, m_pit(*this, "pit")
+		, m_io_comp(*this, "COMP")
+	{ }
 
 	void byte(machine_config &config);
 
@@ -38,7 +41,9 @@ protected:
 	virtual u8 spectrum_rom_r(offs_t offset) override;
 
 private:
-    required_ioport m_io_comp;
+	required_device<pit8253_device> m_pit;
+
+	required_ioport m_io_comp;
 
 	bool m_1f_gate;
 };
@@ -62,11 +67,8 @@ u8 byte_state::spectrum_rom_r(offs_t offset)
 void byte_state::map_io(address_map &map)
 {
 	spectrum_state::spectrum_clone_io(map);
-	map(0x0004, 0x0004).mirror(0xff8a).unmapw(); // #8e - ch0
-	map(0x0024, 0x0024).mirror(0xff8a).unmapw(); // #ae - ch1
-	map(0x0044, 0x0044).mirror(0xff8a).unmapw(); // #ce - ch2
-	map(0x0064, 0x0064).mirror(0xff8a).unmapw(); // #ee - ctrl
-
+	// #8e-ch0, #ae-ch1, #ce-ch2, #ee-ctrl
+	map(0x0004, 0x0004).select(0xffea).lw8(NAME([this](offs_t offset, u8 data) { m_pit->write(BIT(offset, 5, 2), data); } ));
 	map(0x0015, 0x0015).mirror(0xff8a).lr8(NAME([this]() { m_1f_gate = true; return 0xff; })); // #1f
 }
 
@@ -81,7 +83,7 @@ INPUT_PORTS_END
 
 void byte_state::machine_start()
 {
-    spectrum_state::machine_start();
+	spectrum_state::machine_start();
 
 	// Save
 	save_item(NAME(m_1f_gate));
@@ -89,7 +91,7 @@ void byte_state::machine_start()
 
 void byte_state::machine_reset()
 {
-    spectrum_state::machine_reset();
+	spectrum_state::machine_reset();
 
 	m_1f_gate = false;
 }
@@ -97,7 +99,15 @@ void byte_state::machine_reset()
 
 void byte_state::byte(machine_config &config)
 {
-    spectrum_state::spectrum_clone(config);
+	spectrum_state::spectrum_clone(config);
+
+	PIT8253(config, m_pit, 0); // КР580ВИ53
+	m_pit->set_clk<0>(20_MHz_XTAL / 10);
+	m_pit->out_handler<0>().set([this](int state) { m_speaker->level_w(state); });
+	m_pit->set_clk<1>(20_MHz_XTAL / 10);
+	m_pit->out_handler<1>().set([this](int state) { m_speaker->level_w(state); });
+	m_pit->set_clk<2>((20_MHz_XTAL / 10));
+	m_pit->out_handler<2>().set([this](int state) { m_speaker->level_w(state); });
 
 	m_maincpu->set_io_map(&byte_state::map_io);
 	m_exp->fb_r_handler().set([]() { return 0xff; });
@@ -114,13 +124,13 @@ ROM_START(byte)
 	ROMX_LOAD("dd72.bin", 0x0000, 0x2000, CRC(2464d537) SHA1(e8b4a468e6f254f090fc5b2c59ea573c2a4f0455), ROM_BIOS(1))
 	ROMX_LOAD("dd73.bin", 0x2000, 0x2000, CRC(bd430288) SHA1(b4c67a6213b1ecfa37cc476bc483e8a8deef6149), ROM_BIOS(1))
 
-    ROM_REGION(0x800, "dd71", ROMREGION_ERASEFF)
+	ROM_REGION(0x800, "dd71", ROMREGION_ERASEFF)
 	ROM_LOAD("dd71_rt7.bin", 0x000, 0x800, CRC(c91b07c2) SHA1(2365d45b028b1e91dffb5bcdc87bd26ca9a7c26f))
 
-    ROM_REGION(0x200, "dd66", ROMREGION_ERASEFF)
+	ROM_REGION(0x200, "dd66", ROMREGION_ERASEFF)
 	ROM_LOAD("dd66_rt5.bin", 0x000, 0x200, CRC(f8f9766a) SHA1(3f5345763a30e5370199c454301de655e7f1a1da))
 
-    ROM_REGION(0x600, "tbd", ROMREGION_ERASEFF)
+	ROM_REGION(0x600, "tbd", ROMREGION_ERASEFF)
 	ROM_LOAD("dd10_rt5.reva.bin", 0x000, 0x200, CRC(aae13e3e) SHA1(46f0ca97ceee0c591277aaac8b0cecc445927690)) // SN 1..7599 - 1989..1990
 	ROM_LOAD("dd10_rt5.revb.bin", 0x200, 0x200, CRC(b649b5d1) SHA1(2d067962b08aee8cdf1bc4f5ce337815dd9d6c66)) // SN 7600..  - 1991..1996
 	ROM_LOAD("dd11_rt5.bin", 0x400, 0x200, CRC(0f32b304) SHA1(d7adf9861c332510ff3682a1b06e6d9898343b6d))
