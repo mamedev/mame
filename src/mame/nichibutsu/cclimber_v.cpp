@@ -165,9 +165,10 @@ void swimmer_state::swimmer_palette(palette_device &palette) const
 	// side panel backgrond pen
 #if 0
 	// values calculated from the resistors don't seem to match the real board
-	palette.set_pen_color(m_sidepen, rgb_t(0x24, 0x5d, 0x4e));
+	palette.set_pen_color(0x120, rgb_t(0x24, 0x5d, 0x4e));
+#else
+	palette.set_pen_color(0x120, rgb_t(0x20, 0x98, 0x79));
 #endif
-	palette.set_pen_color(m_sidepen, rgb_t(0x20, 0x98, 0x79));
 }
 
 
@@ -286,20 +287,20 @@ void swimmer_state::set_background_pen()
 
 	// red component
 	bit0 = 0;
-	bit1 = (*m_swimmer_background_color >> 6) & 0x01;
-	bit2 = (*m_swimmer_background_color >> 7) & 0x01;
+	bit1 = (*m_bgcolor >> 6) & 0x01;
+	bit2 = (*m_bgcolor >> 7) & 0x01;
 	int const r = 0x20 * bit0 + 0x40 * bit1 + 0x80 * bit2;
 
 	// green component
-	bit0 = (*m_swimmer_background_color >> 3) & 0x01;
-	bit1 = (*m_swimmer_background_color >> 4) & 0x01;
-	bit2 = (*m_swimmer_background_color >> 5) & 0x01;
+	bit0 = (*m_bgcolor >> 3) & 0x01;
+	bit1 = (*m_bgcolor >> 4) & 0x01;
+	bit2 = (*m_bgcolor >> 5) & 0x01;
 	int const g = 0x20 * bit0 + 0x40 * bit1 + 0x80 * bit2;
 
 	// blue component
-	bit0 = (*m_swimmer_background_color >> 0) & 0x01;
-	bit1 = (*m_swimmer_background_color >> 1) & 0x01;
-	bit2 = (*m_swimmer_background_color >> 2) & 0x01;
+	bit0 = (*m_bgcolor >> 0) & 0x01;
+	bit1 = (*m_bgcolor >> 1) & 0x01;
+	bit2 = (*m_bgcolor >> 2) & 0x01;
 	int const b = 0x20 * bit0 + 0x40 * bit1 + 0x80 * bit2;
 
 	m_palette->set_pen_color(0, rgb_t(r, g, b));
@@ -310,31 +311,7 @@ void cclimber_state::cclimber_colorram_w(offs_t offset, uint8_t data)
 {
 	// A5 is not connected, there is only 0x200 bytes of RAM
 	m_colorram[offset & ~0x20] = data;
-	m_colorram[offset |  0x20] = data;
-}
-
-
-void cclimber_state::flip_screen_x_w(int state)
-{
-	m_flip_x = state;
-}
-
-
-void cclimber_state::flip_screen_y_w(int state)
-{
-	m_flip_y = state;
-}
-
-
-void swimmer_state::sidebg_enable_w(int state)
-{
-	m_side_background_enabled = state;
-}
-
-
-void swimmer_state::palette_bank_w(int state)
-{
-	m_palettebank = state;
+	m_colorram[offset | 0x20] = data;
 }
 
 
@@ -412,8 +389,8 @@ TILE_GET_INFO_MEMBER(toprollr_state::toprollr_get_bs_tile_info)
 
 TILE_GET_INFO_MEMBER(toprollr_state::toproller_get_bg_tile_info)
 {
-	const int code = ((m_toprollr_bg_coloram[tile_index] & 0x40) << 2) | m_toprollr_bg_videoram[tile_index];
-	const int color = m_toprollr_bg_coloram[tile_index] & 0x0f;
+	const int code = ((m_bg_coloram[tile_index] & 0x40) << 2) | m_bg_videoram[tile_index];
+	const int color = m_bg_coloram[tile_index] & 0x0f;
 
 	tileinfo.set(3, code, color, TILE_FLIPX);
 }
@@ -455,7 +432,7 @@ void swimmer_state::video_start()
 
 	save_item(NAME(m_flip_x));
 	save_item(NAME(m_flip_y));
-	save_item(NAME(m_side_background_enabled));
+	save_item(NAME(m_sidebg_enabled));
 	save_item(NAME(m_palettebank));
 }
 
@@ -725,32 +702,35 @@ uint32_t yamato_state::screen_update_yamato(screen_device &screen, bitmap_rgb32 
 
 uint32_t swimmer_state::screen_update_swimmer(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	if (m_swimmer_background_color)
+	if (m_bgcolor)
 		set_background_pen();
 
-	if (m_side_background_enabled)
+	// fill side panel background
+	if (m_sidebg_enabled)
 	{
+		const uint8_t split_pos = 0x18 * 8;
+
 		if (m_flip_x)
 		{
-			rectangle split_rect_left(0, 0xff - SWIMMER_BG_SPLIT, 0, 0xff);
-			rectangle split_rect_right(0x100 - SWIMMER_BG_SPLIT, 0xff, 0, 0xff);
+			rectangle split_rect_left(0, 0xff - split_pos, 0, 0xff);
+			rectangle split_rect_right(0x100 - split_pos, 0xff, 0, 0xff);
 
 			split_rect_left &= cliprect;
-			bitmap.fill(m_sidepen, split_rect_left);
+			bitmap.fill(0x120, split_rect_left);
 
 			split_rect_right &= cliprect;
 			bitmap.fill(0, split_rect_right);
 		}
 		else
 		{
-			rectangle split_rect_left(0, SWIMMER_BG_SPLIT - 1, 0, 0xff);
-			rectangle split_rect_right(SWIMMER_BG_SPLIT, 0xff, 0, 0xff);
+			rectangle split_rect_left(0, split_pos - 1, 0, 0xff);
+			rectangle split_rect_right(split_pos, 0xff, 0, 0xff);
 
 			split_rect_left &= cliprect;
 			bitmap.fill(0, split_rect_left);
 
 			split_rect_right &= cliprect;
-			bitmap.fill(m_sidepen, split_rect_right);
+			bitmap.fill(0x120, split_rect_right);
 		}
 	}
 	else
@@ -784,7 +764,7 @@ uint32_t toprollr_state::screen_update_toprollr(screen_device &screen, bitmap_in
 
 	bitmap.fill(0, cliprect);
 
-	m_bg_tilemap->set_scrollx(0, m_toprollr_bg_videoram[0]);
+	m_bg_tilemap->set_scrollx(0, m_bg_videoram[0]);
 	m_bg_tilemap->set_flip((m_flip_x ? TILEMAP_FLIPX : 0) | (m_flip_y ? TILEMAP_FLIPY : 0));
 	m_bg_tilemap->mark_all_dirty();
 	m_bg_tilemap->draw(screen, bitmap, scroll_area_clip, 0, 0);

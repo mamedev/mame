@@ -148,15 +148,15 @@ port B: bit 0 NMI enable
 
 Notes:
 ------
-- Alpine Sky uses the feature where write to d50e-d50f can be processed by a PAL and
+- Alpine Ski uses the feature where write to d50e-d50f can be processed by a PAL and
   answer read back from d40b.
 
 Kickstart Wheelie King :
-- additional ram @ $d800-$dfff (scroll ram  + ??)
+- additional ram @ $d800-$dfff (scroll ram + ??)
 - color bank @ $d000-$d001
 - taitosj_scroll @ $d002-$d007
 - strange controls :
-     - 'revolve type' - 3 pos switch (gears) +  button/pedal (accel)
+     - 'revolve type' - 3 pos switch (gears) + button/pedal (accel)
      - two buttons for gear change, auto acceleration
 
 TODO:

@@ -12,15 +12,14 @@ void cclimber_state::cclimber_decode(const uint8_t convtable[8][16])
 
 	for (int A = 0x0000;A < 0x6000;A++)
 	{
-		int i,j;
 		uint8_t src = rom[A];
 
 		// pick the translation table from bit 0 of the address
 		// and from bits 1 7 of the source data
-		i = (A & 1) | (src & 0x02) | ((src & 0x80) >> 5);
+		int i = (A & 1) | (src & 0x02) | ((src & 0x80) >> 5);
 
 		// pick the offset in the table from bits 0 2 4 6 of the source data
-		j = (src & 0x01) | ((src & 0x04) >> 1) | ((src & 0x10) >> 2) | ((src & 0x40) >> 3);
+		int j = (src & 0x01) | ((src & 0x04) >> 1) | ((src & 0x10) >> 2) | ((src & 0x40) >> 3);
 
 		// decode the opcodes
 		m_decrypted_opcodes[A] = (src & 0xaa) | convtable[i][j];

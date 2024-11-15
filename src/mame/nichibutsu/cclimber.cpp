@@ -1662,7 +1662,6 @@ void swimmer_state::swimmer(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_swimmer);
 
 	PALETTE(config, m_palette, FUNC(swimmer_state::swimmer_palette), 32*8+4*8+1);
-	set_sidepen(0x120);
 
 	// audio hardware
 	SPEAKER(config, "speaker").front_center();
@@ -1684,7 +1683,12 @@ void swimmer_state::au(machine_config &config)
 {
 	swimmer(config);
 
+	// basic machine hardware
 	m_maincpu->set_addrmap(AS_PROGRAM, &swimmer_state::au_map);
+
+	// no custom bgcolor or palette bank
+	m_mainlatch->q_out_cb<3>().set_nop();
+	m_mainlatch->q_out_cb<4>().set_nop();
 
 	m_audiocpu->remove_periodic_int();
 	m_screen->screen_vblank().append_inputline(m_audiocpu, INPUT_LINE_NMI);
@@ -1693,10 +1697,10 @@ void swimmer_state::au(machine_config &config)
 	subdevice<ay8910_device>("ay1")->set_clock(18.432_MHz_XTAL / 12);
 	subdevice<ay8910_device>("ay2")->set_clock(18.432_MHz_XTAL / 12);
 
+	// video hardware
 	m_gfxdecode->set_info(gfx_au);
 
 	PALETTE(config.replace(), m_palette).set_format(palette_device::xBGR_333_nibble, 64).set_endianness(ENDIANNESS_BIG);
-	set_sidepen(0);
 }
 
 
