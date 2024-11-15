@@ -8519,7 +8519,7 @@ Unsupported [Menacer] peripheral
 			<feature name="batt?" value="(Lithium Cell)"/>
 			<dataarea name="rom" width="16" endianness="big" size="655360">
 				<rom name="mpr-13430-t.ic1" size="131072" crc="9a6d1110" sha1="acadd3cf6c1eb346db4f9746134fb8a957e3b147" offset="0x000000"/>
-				<rom name="mpr-13431-h.ic2" size="131072" crc="793fd7a3" sha1="5a4425727463992fabd0ff3422d1894aaf686b5f" offset="0x080000"/>
+				<rom name="mpr-13431-h.ic2" size="524288" crc="793fd7a3" sha1="5a4425727463992fabd0ff3422d1894aaf686b5f" offset="0x080000"/>
 				<rom size="393216" offset="0x020000" loadflag="continue"/>
 			</dataarea>
 			<dataarea name="sram" size="16384">
