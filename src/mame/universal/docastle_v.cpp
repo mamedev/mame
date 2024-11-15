@@ -64,13 +64,13 @@ void docastle_state::docastle_palette(palette_device &palette) const
 	}
 }
 
-void docastle_state::docastle_videoram_w(offs_t offset, uint8_t data)
+void docastle_state::videoram_w(offs_t offset, uint8_t data)
 {
 	m_videoram[offset] = data;
 	m_do_tilemap->mark_tile_dirty(offset);
 }
 
-void docastle_state::docastle_colorram_w(offs_t offset, uint8_t data)
+void docastle_state::colorram_w(offs_t offset, uint8_t data)
 {
 	m_colorram[offset] = data;
 	m_do_tilemap->mark_tile_dirty(offset);
@@ -107,7 +107,7 @@ TILE_GET_INFO_MEMBER(docastle_state::get_tile_info)
 	tileinfo.set(0, code, color, 0);
 }
 
-void docastle_state::video_start_common( uint32_t tile_transmask )
+void docastle_state::video_start_common(uint32_t tile_transmask)
 {
 	m_do_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(docastle_state::get_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 	m_do_tilemap->set_scrolldy(-32, -32);
@@ -124,7 +124,7 @@ VIDEO_START_MEMBER(docastle_state,dorunrun)
 	video_start_common(0xff00);
 }
 
-void docastle_state::draw_sprites( screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect )
+void docastle_state::draw_sprites(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	screen.priority().fill(1);
 
@@ -193,7 +193,7 @@ void docastle_state::draw_sprites( screen_device &screen, bitmap_rgb32 &bitmap, 
 			flipy = !flipy;
 		}
 
-		/* first draw the sprite, visible */
+		// first draw the sprite, visible
 		m_gfxdecode->gfx(1)->prio_transmask(bitmap,cliprect,
 				code,
 				color,
@@ -202,7 +202,7 @@ void docastle_state::draw_sprites( screen_device &screen, bitmap_rgb32 &bitmap, 
 				screen.priority(),
 				0x00,0x80ff);
 
-		/* then draw the mask, behind the background but obscuring following sprites */
+		// then draw the mask, behind the background but obscuring following sprites
 		m_gfxdecode->gfx(1)->prio_transmask(bitmap,cliprect,
 				code,
 				color,
