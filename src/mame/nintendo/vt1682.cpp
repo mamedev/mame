@@ -5498,6 +5498,18 @@ uint8_t vt_vt1682_state::soundcpu_irq_vector_hack_r(offs_t offset)
 	}
 	else
 	{
+		// In the debugger we just want to see the vector table as it is
+		// and not the fake overlay.
+		//
+		// The overlay does not exist in hardware, the VT168 makes no
+		// external access to the soundcpu_irq_vector_hack_r address
+		// for anything other than Ext IRQ 0 and instead simply fetches
+		// from the address associated with the IRQ source (see table
+		// above)
+		//
+		// We do not want to hide the Ext IRQ 0 vector to the debugger
+		// when other IRQs are active, so we just return the ROM content
+		// here
 		return m_sound_share[0x0ffe + offset];
 	}
 }
