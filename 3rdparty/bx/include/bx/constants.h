@@ -84,7 +84,7 @@ namespace bx
 	constexpr float    kFloatLargest   = 3.402823466e+38f;
 
 	///
-	extern const float kFloatInfinity;
+//	constexpr float    kFloatInfinity;
 
 	///
 	constexpr uint8_t  kDoubleSignNumBits     = 1;
@@ -104,8 +104,8 @@ namespace bx
 	/// Largest representable double-precision floating-point number.
 	constexpr double   kDoubleLargest  = 1.7976931348623158e+308;
 
-	///
-	extern const double kDoubleInfinity;
+	//
+//	constexpr double   kDoubleInfinity;
 
 } // namespace bx
 

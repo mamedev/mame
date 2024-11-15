@@ -108,19 +108,19 @@ namespace bx
 
 	/// Reinterprets the bit pattern of _a as uint32_t.
 	///
-	BX_CONST_FUNC uint32_t floatToBits(float _a);
+	BX_CONSTEXPR_FUNC uint32_t floatToBits(float _a);
 
 	/// Reinterprets the bit pattern of _a as float.
 	///
-	BX_CONST_FUNC float bitsToFloat(uint32_t _a);
+	BX_CONSTEXPR_FUNC float bitsToFloat(uint32_t _a);
 
 	/// Reinterprets the bit pattern of _a as uint64_t.
 	///
-	BX_CONST_FUNC uint64_t doubleToBits(double _a);
+	BX_CONSTEXPR_FUNC uint64_t doubleToBits(double _a);
 
 	/// Reinterprets the bit pattern of _a as double.
 	///
-	BX_CONST_FUNC double bitsToDouble(uint64_t _a);
+	BX_CONSTEXPR_FUNC double bitsToDouble(uint64_t _a);
 
 	/// Returns sortable floating point value.
 	///

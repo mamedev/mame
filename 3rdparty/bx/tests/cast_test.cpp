@@ -5,7 +5,6 @@
 
 #include "test.h"
 #include <bx/bx.h>
-#include <string.h>
 
 TEST_CASE("Bit cast", "[cast]")
 {

@@ -176,4 +176,7 @@ namespace bx
 		return to;
 	}
 
+	constexpr float  kFloatInfinity  = bitCast<float>(kFloatExponentMask);
+	constexpr double kDoubleInfinity = bitCast<double>(kDoubleExponentMask);
+
 } // namespace bx

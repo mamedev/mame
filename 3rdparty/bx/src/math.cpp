@@ -10,9 +10,6 @@
 
 namespace bx
 {
-	const float  kFloatInfinity  = bitsToFloat(kFloatExponentMask);
-	const double kDoubleInfinity = bitsToDouble(kDoubleExponentMask);
-
 	namespace
 	{
 		constexpr float kSinC2  = -0.16666667163372039794921875f;

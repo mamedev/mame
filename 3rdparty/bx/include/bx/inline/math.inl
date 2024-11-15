@@ -24,28 +24,24 @@ namespace bx
 		return _rad * 180.0f / kPi;
 	}
 
-	inline BX_CONST_FUNC uint32_t floatToBits(float _a)
+	inline BX_CONSTEXPR_FUNC uint32_t floatToBits(float _a)
 	{
-		union { float f; uint32_t ui; } u = { _a };
-		return u.ui;
+		return bitCast<uint32_t>(_a);
 	}
 
-	inline BX_CONST_FUNC float bitsToFloat(uint32_t _a)
+	inline BX_CONSTEXPR_FUNC float bitsToFloat(uint32_t _a)
 	{
-		union { uint32_t ui; float f; } u = { _a };
-		return u.f;
+		return bitCast<float>(_a);
 	}
 
-	inline BX_CONST_FUNC uint64_t doubleToBits(double _a)
+	inline BX_CONSTEXPR_FUNC uint64_t doubleToBits(double _a)
 	{
-		union { double f; uint64_t ui; } u = { _a };
-		return u.ui;
+		return bitCast<uint64_t>(_a);
 	}
 
-	inline BX_CONST_FUNC double bitsToDouble(uint64_t _a)
+	inline BX_CONSTEXPR_FUNC double bitsToDouble(uint64_t _a)
 	{
-		union { uint64_t ui; double f; } u = { _a };
-		return u.f;
+		return bitCast<double>(_a);
 	}
 
 	inline BX_CONST_FUNC uint32_t floatFlip(uint32_t _value)
