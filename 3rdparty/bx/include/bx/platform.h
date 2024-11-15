@@ -342,18 +342,6 @@
 #		define BX_COMPILER_NAME "MSVC 17.0"
 #	elif BX_COMPILER_MSVC >= 1920 // Visual Studio 2019
 #		define BX_COMPILER_NAME "MSVC 16.0"
-#	elif BX_COMPILER_MSVC >= 1910 // Visual Studio 2017
-#		define BX_COMPILER_NAME "MSVC 15.0"
-#	elif BX_COMPILER_MSVC >= 1900 // Visual Studio 2015
-#		define BX_COMPILER_NAME "MSVC 14.0"
-#	elif BX_COMPILER_MSVC >= 1800 // Visual Studio 2013
-#		define BX_COMPILER_NAME "MSVC 12.0"
-#	elif BX_COMPILER_MSVC >= 1700 // Visual Studio 2012
-#		define BX_COMPILER_NAME "MSVC 11.0"
-#	elif BX_COMPILER_MSVC >= 1600 // Visual Studio 2010
-#		define BX_COMPILER_NAME "MSVC 10.0"
-#	elif BX_COMPILER_MSVC >= 1500 // Visual Studio 2008
-#		define BX_COMPILER_NAME "MSVC 9.0"
 #	else
 #		define BX_COMPILER_NAME "MSVC"
 #	endif //
@@ -479,6 +467,12 @@ static_assert(!BX_COMPILER_CLANG || BX_COMPILER_CLANG >= 110000, "\n\n"
 static_assert(!BX_COMPILER_GCC || BX_COMPILER_GCC >= 80400, "\n\n"
 	"\t** IMPORTANT! **\n\n"
 	"\tMinimum supported GCC version is 8.4 (March 4, 2020).\n"
+	"\t\n");
+
+// https://learn.microsoft.com/en-us/visualstudio/releases/2019/history
+static_assert(!BX_COMPILER_MSVC || BX_COMPILER_MSVC >= 1927, "\n\n"
+	"\t** IMPORTANT! **\n\n"
+	"\tMinimum supported MSVC 19.27 / Visual Studio 2019 version 16.7 (August 5, 2020).\n"
 	"\t\n");
 
 static_assert(!BX_CPU_ENDIAN_BIG, "\n\n"

@@ -223,7 +223,7 @@ namespace bx
 	/// Performs `static_cast` of value `_from`, and in debug build runtime verifies/asserts
 	/// that the value didn't change.
 	template<typename Ty, typename FromT>
-	constexpr Ty narrowCast(const FromT& _from, Location _location = Location::current() );
+	Ty narrowCast(const FromT& _from, Location _location = Location::current() );
 
 	/// Copy memory block.
 	///
