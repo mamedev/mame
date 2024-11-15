@@ -129,6 +129,7 @@ public:
 
 	[[maybe_unused]] void vt_vt1682(machine_config& config);
 	void regular_init();
+	void ignore_bk_paldepth_init();
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -5067,6 +5068,13 @@ void vt_vt1682_state::draw_layer(int which, int opaque, const rectangle& cliprec
 					// Dingle Hunt and Ocean Fantasy in cmpmx10 turn this on
 					// but priority data and palette data are stored as normal
 					// resulting in broken palettes and priority if we use it
+					//
+					// Alien Attack in njp60in1 / pgs268 / unk1682 also sets
+					// this and expects it to be ignored
+					//
+					// The broken priorities in Table Tennis for exsprt48 / itvg48
+					// are unrelated (bit isn't set) but as they work in
+					// xing48 could be just a bug in those versions
 					// 
 					// does it really work on hardware? we disable it entirely
 					// in those sets for now
@@ -6338,6 +6346,13 @@ void vt_vt1682_state::regular_init()
 	m_bank->configure_entry(0, memregion("mainrom")->base() + 0x0000000);
 }
 
+void vt_vt1682_state::ignore_bk_paldepth_init()
+{
+	regular_init();
+	m_allow_bk_paldepth_mode = false;
+}
+
+
 void vt1682_mx10_state::mx10_init()
 {
 	m_bank->configure_entry(0, memregion("mainrom")->base() + 0x0000000);
@@ -6377,7 +6392,7 @@ void intec_interact_state::banked_init()
 
 void vt1682_lxts3_state::unk1682_init()
 {
-	regular_init();
+	ignore_bk_paldepth_init();
 
 	uint8_t* ROM = memregion("mainrom")->base();
 	// this jumps to a function on startup that has a bunch of jumps / accesses to the 3xxx region, which is internal ROM
@@ -6389,7 +6404,7 @@ void vt1682_lxts3_state::unk1682_init()
 
 void vt1682_lxts3_state::njp60in1_init()
 {
-	regular_init();
+	ignore_bk_paldepth_init();
 
 	uint8_t* ROM = memregion("mainrom")->base();
 	// first jsr in the code is for some port based security(?) check, might be SEEPROM
@@ -6400,7 +6415,7 @@ void vt1682_lxts3_state::njp60in1_init()
 
 void vt1682_lxts3_state::pgs268_init()
 {
-	regular_init();
+	ignore_bk_paldepth_init();
 
 	uint8_t* ROM = memregion("mainrom")->base();
 	// patch out the first JSR again
