@@ -131,19 +131,19 @@ VIDEO_START_MEMBER(m72_state,dbreedm72)
 	m_bg_tilemap->set_transmask(2,0x0001,0xfffe); // for score bar
 }
 
-VIDEO_START_MEMBER(m72_state,imgfight)
+VIDEO_START_MEMBER(m72_mcu_state,imgfight)
 {
 	VIDEO_START_CALL_MEMBER(m72);
 	m_bg_tilemap->set_transmask(2,0xff00,0x00ff); // for RAM/ROM & Japan message
 }
 
-VIDEO_START_MEMBER(m72_state,mrheli)
+VIDEO_START_MEMBER(m72_mcu_state,mrheli)
 {
 	VIDEO_START_CALL_MEMBER(m72);
 	m_bg_tilemap->set_transmask(2,0x00ff,0xff00); // for Japan message
 }
 
-VIDEO_START_MEMBER(m72_state,nspiritj)
+VIDEO_START_MEMBER(m72_mcu_state,nspiritj)
 {
 	VIDEO_START_CALL_MEMBER(m72);
 	m_bg_tilemap->set_transmask(2,0x001f,0xffe0); // for Japan message
@@ -180,19 +180,19 @@ VIDEO_START_MEMBER(m72_state,xmultipl)
 
 /* Major Title has a larger background RAM, and rowscroll */
 // the Air Duel conversion on the same PCB does not, is it jumper selectable, or a register, or a different RAM chip?
-TILEMAP_MAPPER_MEMBER(m72_state::m82_scan_rows)
+TILEMAP_MAPPER_MEMBER(m82_state::m82_scan_rows)
 {
 	/* logical (col,row) -> memory offset */
 	return row*256 + col;
 }
 
-VIDEO_START_MEMBER(m72_state,m82)
+void m82_state::video_start()
 {
-	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(m72_state::rtype2_get_tile_info<0>)), TILEMAP_SCAN_ROWS, 8,8, 64,64);
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(m72_state::rtype2_get_tile_info<1>)), TILEMAP_SCAN_ROWS, 8,8, 64,64);
+	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(m82_state::rtype2_get_tile_info<0>)), TILEMAP_SCAN_ROWS, 8,8, 64,64);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(m82_state::rtype2_get_tile_info<1>)), TILEMAP_SCAN_ROWS, 8,8, 64,64);
 	// The tilemap can be 256x64, but seems to be used at 128x64 (scroll wraparound).
 	// The layout ramains 256x64, the right half is just not displayed.
-	m_bg_tilemap_large = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(m72_state::rtype2_get_tile_info<1>)), tilemap_mapper_delegate(*this, FUNC(m72_state::m82_scan_rows)), 8,8, 128,64);
+	m_bg_tilemap_large = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(m82_state::rtype2_get_tile_info<1>)), tilemap_mapper_delegate(*this, FUNC(m82_state::m82_scan_rows)), 8,8, 128,64);
 
 	m_fg_tilemap->set_transmask(0,0xffff,0x0001);
 	m_fg_tilemap->set_transmask(1,0x00ff,0xff01);
@@ -262,7 +262,7 @@ VIDEO_START_MEMBER(m72_state,hharryu)
 
 // M85
 
-VIDEO_START_MEMBER(m72_state,poundfor)
+void poundfor_state::video_start()
 {
 	VIDEO_START_CALL_MEMBER(rtype2);
 
@@ -290,11 +290,16 @@ void m72_state::videoram2_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	COMBINE_DATA(&m_videoram[1][offset]);
 	m_bg_tilemap->mark_tile_dirty(offset/2);
+}
+
+void m82_state::videoram2_m82_w(offs_t offset, u16 data, u16 mem_mask)
+{
+	COMBINE_DATA(&m_videoram[1][offset]);
+	m_bg_tilemap->mark_tile_dirty(offset/2);
 
 	// m82 has selectable tilemap size
 	if (m_bg_tilemap_large)
 		m_bg_tilemap_large->mark_tile_dirty(offset/2);
-
 }
 
 void m72_state::irq_line_w(u16 data)
@@ -321,14 +326,14 @@ void m72_state::port02_w(u8 data)
 	if (data & 0xe0) logerror("write %02x to port 02\n",data);
 
 	/* bits 0/1 are coin counters */
-	machine().bookkeeping().coin_counter_w(0,data & 0x01);
-	machine().bookkeeping().coin_counter_w(1,data & 0x02);
+	machine().bookkeeping().coin_counter_w(0, BIT(data, 0));
+	machine().bookkeeping().coin_counter_w(1, BIT(data, 1));
 
 	/* bit 2 is flip screen (handled both by software and hardware) */
-	flip_screen_set(((data & 0x04) >> 2) ^ ((~m_io_dsw->read() >> 8) & 1));
+	flip_screen_set(BIT(data, 2) ^ ((~m_io_dsw->read() >> 8) & 1));
 
 	/* bit 3 is display disable */
-	m_video_off = data & 0x08;
+	m_video_off = BIT(data, 3);
 
 	/* bit 4 resets sound CPU (active low) */
 	if (data & 0x10)
@@ -344,19 +349,19 @@ void m72_state::rtype2_port02_w(u8 data)
 	if (data & 0xe0) logerror("write %02x to port 02\n",data);
 
 	/* bits 0/1 are coin counters */
-	machine().bookkeeping().coin_counter_w(0,data & 0x01);
-	machine().bookkeeping().coin_counter_w(1,data & 0x02);
+	machine().bookkeeping().coin_counter_w(0, BIT(data, 0));
+	machine().bookkeeping().coin_counter_w(1, BIT(data, 1));
 
 	/* bit 2 is flip screen (handled both by software and hardware) */
-	flip_screen_set(((data & 0x04) >> 2) ^ ((~m_io_dsw->read() >> 8) & 1));
+	flip_screen_set(BIT(data, 2) ^ ((~m_io_dsw->read() >> 8) & 1));
 
 	/* bit 3 is display disable */
-	m_video_off = data & 0x08;
+	m_video_off = BIT(data, 3);
 
 	/* other bits unknown */
 }
 
-void m72_state::poundfor_port02_w(u8 data)
+void poundfor_state::poundfor_port02_w(u8 data)
 {
 	// bit 5 resets both uPD4701A?
 	m_upd4701[0]->resetx_w(BIT(data, 5));
@@ -370,17 +375,17 @@ void m72_state::poundfor_port02_w(u8 data)
 
 
 /* the following is mostly a kludge. This register seems to be used for something else */
-void m72_state::m82_gfx_ctrl_w(offs_t offset, u16 data, u16 mem_mask)
+void m82_state::m82_gfx_ctrl_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	if (ACCESSING_BITS_8_15)
 	{
-		if (data & 0xff00) m_m82_rowscroll = 1;
-		else m_m82_rowscroll = 0;
+		if (data & 0xff00) m_m82_rowscroll = true;
+		else m_m82_rowscroll = false;
 	}
 	// printf("m82_gfx_ctrl_w %04x\n", data);
 }
 
-void m72_state::m82_tm_ctrl_w(offs_t offset, u16 data, u16 mem_mask)
+void m82_state::m82_tm_ctrl_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	COMBINE_DATA(&m_m82_tmcontrol);
 	// printf("tmcontrol %04x\n", m_m82_tmcontrol);
@@ -442,21 +447,19 @@ void m72_state::draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect)
 	}
 }
 
-void m72_state::majtitle_draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect)
+void m82_state::majtitle_draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect)
 {
-	u16 *spriteram16_2 = m_spriteram2;
-
 	for (int offs = 0; offs < m_spriteram2.length(); offs += 4)
 	{
-		const int code = spriteram16_2[offs+1];
-		const u32 color = spriteram16_2[offs+2] & 0x0f;
-		int sx = -256+(spriteram16_2[offs+3] & 0x3ff);
-		int sy = 384-(spriteram16_2[offs+0] & 0x1ff);
-		int flipx = spriteram16_2[offs+2] & 0x0800;
-		int flipy = spriteram16_2[offs+2] & 0x0400;
+		const int code = m_spriteram2[offs+1];
+		const u32 color = m_spriteram2[offs+2] & 0x0f;
+		int sx = -256+(m_spriteram2[offs+3] & 0x3ff);
+		int sy = 384-(m_spriteram2[offs+0] & 0x1ff);
+		int flipx = m_spriteram2[offs+2] & 0x0800;
+		int flipy = m_spriteram2[offs+2] & 0x0400;
 
-		const int w = 1;// << ((spriteram16_2[offs+2] & 0xc000) >> 14);
-		const int h = 1 << ((spriteram16_2[offs+2] & 0x3000) >> 12);
+		const int w = 1;// << ((m_spriteram2[offs+2] & 0xc000) >> 14);
+		const int h = 1 << ((m_spriteram2[offs+2] & 0x3000) >> 12);
 		sy -= 16 * h;
 
 		if (flip_screen())
@@ -522,7 +525,7 @@ u32 m72_state::screen_update_m81(screen_device &screen, bitmap_ind16 &bitmap, co
 }
 
 
-u32 m72_state::screen_update_m82(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+u32 m82_state::screen_update_m82(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	tilemap_t* tm;
 

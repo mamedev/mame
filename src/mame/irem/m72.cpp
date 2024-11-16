@@ -215,6 +215,12 @@ void m72_state::machine_start()
 	m_scanline_timer = timer_alloc(FUNC(m72_state::scanline_interrupt), this);
 }
 
+void m72_mcu_state::machine_start()
+{
+	m72_state::machine_start();
+	save_item(NAME(m_mcu_sample_addr));
+}
+
 MACHINE_START_MEMBER(m72_state,kengo)
 {
 	m_scanline_timer = timer_alloc(FUNC(m72_state::kengo_scanline_interrupt), this);
@@ -228,7 +234,6 @@ TIMER_CALLBACK_MEMBER(m72_state::synch_callback)
 
 void m72_state::machine_reset()
 {
-	m_mcu_sample_addr = 0;
 	//m_mcu_snd_cmd_latch = 0;
 
 	m_scanline_timer->adjust(m_screen->time_until_pos(0));
@@ -237,6 +242,12 @@ void m72_state::machine_reset()
 	// Hold sound CPU in reset if main CPU has to upload the program into RAM
 	if (m_soundram.found())
 		m_soundcpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
+}
+
+void m72_mcu_state::machine_reset()
+{
+	m_mcu_sample_addr = 0;
+	m72_state::machine_reset();
 }
 
 MACHINE_RESET_MEMBER(m72_state,kengo)
@@ -311,7 +322,7 @@ The protection device does
 
 ***************************************************************************/
 
-TIMER_CALLBACK_MEMBER(m72_state::delayed_ram16_w)
+TIMER_CALLBACK_MEMBER(m72_mcu_state::delayed_ram16_w)
 {
 	const u16 val = param & 0xffff;
 	const u16 offset = (param >> 16) & 0x07ff;
@@ -321,7 +332,7 @@ TIMER_CALLBACK_MEMBER(m72_state::delayed_ram16_w)
 	m_dpram->left_w(offset, val, mem_mask);
 }
 
-TIMER_CALLBACK_MEMBER(m72_state::delayed_ram8_w)
+TIMER_CALLBACK_MEMBER(m72_mcu_state::delayed_ram8_w)
 {
 	const u8 val = param & 0xff;
 	const u16 offset = (param >> 9) & 0x07ff;
@@ -333,22 +344,22 @@ TIMER_CALLBACK_MEMBER(m72_state::delayed_ram8_w)
 }
 
 
-void m72_state::main_mcu_w(offs_t offset, u16 data, u16 mem_mask)
+void m72_mcu_state::main_mcu_w(offs_t offset, u16 data, u16 mem_mask)
 {
-	machine().scheduler().synchronize(timer_expired_delegate(FUNC(m72_state::delayed_ram16_w), this), offset << 16 | data | (mem_mask & 0x0180) << 20);
+	machine().scheduler().synchronize(timer_expired_delegate(FUNC(m72_mcu_state::delayed_ram16_w), this), offset << 16 | data | (mem_mask & 0x0180) << 20);
 }
 
-void m72_state::mcu_data_w(offs_t offset, u8 data)
+void m72_mcu_state::mcu_data_w(offs_t offset, u8 data)
 {
-	machine().scheduler().synchronize(timer_expired_delegate(FUNC(m72_state::delayed_ram8_w), this), offset << 8 | u32(data));
+	machine().scheduler().synchronize(timer_expired_delegate(FUNC(m72_mcu_state::delayed_ram8_w), this), offset << 8 | u32(data));
 }
 
-u8 m72_state::mcu_data_r(offs_t offset)
+u8 m72_mcu_state::mcu_data_r(offs_t offset)
 {
 	return (m_dpram->right_r(offset >> 1) >> (BIT(offset, 0) ? 8 : 0)) & 0xff;
 }
 
-u8 m72_state::mcu_sample_r()
+u8 m72_mcu_state::mcu_sample_r()
 {
 	const u8 sample = m_samples_region[m_mcu_sample_addr];
 	if (!machine().side_effects_disabled())
@@ -356,24 +367,22 @@ u8 m72_state::mcu_sample_r()
 	return sample;
 }
 
-void m72_state::mcu_low_w(u8 data)
+void m72_mcu_state::mcu_low_w(u8 data)
 {
 	m_mcu_sample_addr = (m_mcu_sample_addr & 0xffe000) | (data<<5);
 	logerror("low: %02x %08x\n", data, m_mcu_sample_addr);
 }
 
-void m72_state::mcu_high_w(u8 data)
+void m72_mcu_state::mcu_high_w(u8 data)
 {
 	m_mcu_sample_addr = (m_mcu_sample_addr & 0x1fff) | (data<<(8+5));
 	logerror("high: %02x %08x\n", data, m_mcu_sample_addr);
 }
 
-void m72_state::init_m72_8751()
-{
-	save_item(NAME(m_mcu_sample_addr));
-
-	/* lohtb2 */
 #if 0
+void m72_mcu_state::init_m72_8751()
+{
+	/* lohtb2 */
 	/* running the mcu at twice the speed, the following
 	 * timeouts have to be modified.
 	 * At normal speed, the timing heavily depends on opcode
@@ -393,8 +402,8 @@ void m72_state::init_m72_8751()
 		rom[0x12d+29] += 2; printf("29: %d\n", rom[0x12d+29]);
 		rom[0x12d+32] += 16; printf("32: %d\n", rom[0x12d+32]);
 	}
-#endif
 }
+#endif
 
 
 /***************************************************************************
@@ -438,7 +447,7 @@ int m72_state::find_sample(int num)
 
 INTERRUPT_GEN_MEMBER(m72_state::fake_nmi)
 {
-	int sample = m_audio->sample_r();
+	const u8 sample = m_audio->sample_r();
 	if (sample)
 		m_audio->sample_w(sample);
 }
@@ -554,7 +563,10 @@ void m72_state::copy_le(u16 *dest, const u8 *src, u8 bytes)
 u16 m72_state::protection_r(offs_t offset, u16 mem_mask)
 {
 	if (ACCESSING_BITS_8_15)
-		copy_le(m_protection_ram.get(),m_protection_code,CODE_LEN);
+	{
+		if (!machine().side_effects_disabled())
+			copy_le(m_protection_ram.get(),m_protection_code,CODE_LEN);
+	}
 	return m_protection_ram[0xffa/2+offset];
 }
 
@@ -597,7 +609,6 @@ void m72_state::init_dkgenm72()
 	install_protection_handler(dkgenm72_code,dkgenm72_crc);
 	m_maincpu->space(AS_IO).install_write_handler(0xc0, 0xc1, write16s_delegate(*this, FUNC(m72_state::dkgenm72_sample_trigger_w)));
 }
-
 
 template<unsigned N>
 u16 m72_state::palette_r(offs_t offset)
@@ -655,10 +666,10 @@ void m72_state::soundram_w(offs_t offset, u8 data)
 void m72_state::m72_cpu1_common_map(address_map &map)
 {
 	map(0xc0000, 0xc03ff).ram().share("spriteram");
-	map(0xc8000, 0xc8bff).rw(FUNC(m72_state::palette_r<0>), FUNC(m72_state::palette_w<0>)).share("paletteram1");
-	map(0xcc000, 0xccbff).rw(FUNC(m72_state::palette_r<1>), FUNC(m72_state::palette_w<1>)).share("paletteram2");
-	map(0xd0000, 0xd3fff).ram().w(FUNC(m72_state::videoram1_w)).share("videoram1");
-	map(0xd8000, 0xdbfff).ram().w(FUNC(m72_state::videoram2_w)).share("videoram2");
+	map(0xc8000, 0xc8bff).rw(FUNC(m72_state::palette_r<0>), FUNC(m72_state::palette_w<0>)).share(m_paletteram[0]);
+	map(0xcc000, 0xccbff).rw(FUNC(m72_state::palette_r<1>), FUNC(m72_state::palette_w<1>)).share(m_paletteram[1]);
+	map(0xd0000, 0xd3fff).ram().w(FUNC(m72_state::videoram1_w)).share(m_videoram[0]);
+	map(0xd8000, 0xdbfff).ram().w(FUNC(m72_state::videoram2_w)).share(m_videoram[1]);
 	map(0xe0000, 0xeffff).rw(FUNC(m72_state::soundram_r), FUNC(m72_state::soundram_w));
 	map(0xffff0, 0xfffff).rom();
 }
@@ -677,18 +688,18 @@ void m72_state::rtype_map(address_map &map)
 	map(0x40000, 0x43fff).ram();    /* work RAM */
 }
 
-void m72_state::m72_protected_map(address_map &map)
+void m72_mcu_state::m72_protected_map(address_map &map)
 {
 	m72_map(map);
-	map(0xb0000, 0xb0fff).r(m_dpram, FUNC(mb8421_mb8431_16_device::left_r)).w(FUNC(m72_state::main_mcu_w));
+	map(0xb0000, 0xb0fff).r(m_dpram, FUNC(mb8421_mb8431_16_device::left_r)).w(FUNC(m72_mcu_state::main_mcu_w));
 }
 
-void m72_state::xmultiplm72_map(address_map &map)
+void m72_mcu_state::xmultiplm72_map(address_map &map)
 {
 	m72_cpu1_common_map(map);
 	map(0x00000, 0x7ffff).rom();
 	map(0x80000, 0x83fff).ram();    /* work RAM */
-	map(0xb0000, 0xb0fff).r(m_dpram, FUNC(mb8421_mb8431_16_device::left_r)).w(FUNC(m72_state::main_mcu_w));
+	map(0xb0000, 0xb0fff).r(m_dpram, FUNC(mb8421_mb8431_16_device::left_r)).w(FUNC(m72_mcu_state::main_mcu_w));
 }
 
 void m72_state::dbreedwm72_map(address_map &map)
@@ -698,12 +709,12 @@ void m72_state::dbreedwm72_map(address_map &map)
 	map(0x90000, 0x93fff).ram();    /* work RAM */
 }
 
-void m72_state::dbreedm72_map(address_map &map)
+void m72_mcu_state::dbreedm72_map(address_map &map)
 {
 	m72_cpu1_common_map(map);
 	map(0x00000, 0x7ffff).rom();
 	map(0x90000, 0x93fff).ram();    /* work RAM */
-	map(0xb0000, 0xb0fff).r(m_dpram, FUNC(mb8421_mb8431_16_device::left_r)).w(FUNC(m72_state::main_mcu_w));
+	map(0xb0000, 0xb0fff).r(m_dpram, FUNC(mb8421_mb8431_16_device::left_r)).w(FUNC(m72_mcu_state::main_mcu_w));
 }
 
 void m72_state::m81_cpu1_common_map(address_map &map)
@@ -711,10 +722,10 @@ void m72_state::m81_cpu1_common_map(address_map &map)
 	map(0x00000, 0x7ffff).rom();
 	map(0xb0ffe, 0xb0fff).nopw(); /* leftover from protection?? */
 	map(0xc0000, 0xc03ff).ram().share("spriteram");
-	map(0xc8000, 0xc8bff).rw(FUNC(m72_state::palette_r<0>), FUNC(m72_state::palette_w<0>)).share("paletteram1");
-	map(0xcc000, 0xccbff).rw(FUNC(m72_state::palette_r<1>), FUNC(m72_state::palette_w<1>)).share("paletteram2");
-	map(0xd0000, 0xd3fff).ram().w(FUNC(m72_state::videoram1_w)).share("videoram1");
-	map(0xd8000, 0xdbfff).ram().w(FUNC(m72_state::videoram2_w)).share("videoram2");
+	map(0xc8000, 0xc8bff).rw(FUNC(m72_state::palette_r<0>), FUNC(m72_state::palette_w<0>)).share(m_paletteram[0]);
+	map(0xcc000, 0xccbff).rw(FUNC(m72_state::palette_r<1>), FUNC(m72_state::palette_w<1>)).share(m_paletteram[1]);
+	map(0xd0000, 0xd3fff).ram().w(FUNC(m72_state::videoram1_w)).share(m_videoram[0]);
+	map(0xd8000, 0xdbfff).ram().w(FUNC(m72_state::videoram2_w)).share(m_videoram[1]);
 	map(0xffff0, 0xfffff).rom();
 }
 
@@ -751,45 +762,45 @@ void m72_state::m84_cpu1_common_map(address_map &map)
 void m72_state::rtype2_map(address_map &map)
 {
 	m84_cpu1_common_map(map);
-	map(0xd0000, 0xd3fff).ram().w(FUNC(m72_state::videoram1_w)).share("videoram1");
-	map(0xd4000, 0xd7fff).ram().w(FUNC(m72_state::videoram2_w)).share("videoram2");
-	map(0xc8000, 0xc8bff).rw(FUNC(m72_state::palette_r<0>), FUNC(m72_state::palette_w<0>)).share("paletteram1");
-	map(0xd8000, 0xd8bff).rw(FUNC(m72_state::palette_r<1>), FUNC(m72_state::palette_w<1>)).share("paletteram2");
+	map(0xd0000, 0xd3fff).ram().w(FUNC(m72_state::videoram1_w)).share(m_videoram[0]);
+	map(0xd4000, 0xd7fff).ram().w(FUNC(m72_state::videoram2_w)).share(m_videoram[1]);
+	map(0xc8000, 0xc8bff).rw(FUNC(m72_state::palette_r<0>), FUNC(m72_state::palette_w<0>)).share(m_paletteram[0]);
+	map(0xd8000, 0xd8bff).rw(FUNC(m72_state::palette_r<1>), FUNC(m72_state::palette_w<1>)).share(m_paletteram[1]);
 }
 
 void m72_state::hharryu_map(address_map &map)
 {
 	m84_cpu1_common_map(map);
-	map(0xd0000, 0xd3fff).ram().w(FUNC(m72_state::videoram1_w)).share("videoram1");
-	map(0xd4000, 0xd7fff).ram().w(FUNC(m72_state::videoram2_w)).share("videoram2");
-	map(0xa0000, 0xa0bff).rw(FUNC(m72_state::palette_r<0>), FUNC(m72_state::palette_w<0>)).share("paletteram1");
-	map(0xa8000, 0xa8bff).rw(FUNC(m72_state::palette_r<1>), FUNC(m72_state::palette_w<1>)).share("paletteram2");
+	map(0xd0000, 0xd3fff).ram().w(FUNC(m72_state::videoram1_w)).share(m_videoram[0]);
+	map(0xd4000, 0xd7fff).ram().w(FUNC(m72_state::videoram2_w)).share(m_videoram[1]);
+	map(0xa0000, 0xa0bff).rw(FUNC(m72_state::palette_r<0>), FUNC(m72_state::palette_w<0>)).share(m_paletteram[0]);
+	map(0xa8000, 0xa8bff).rw(FUNC(m72_state::palette_r<1>), FUNC(m72_state::palette_w<1>)).share(m_paletteram[1]);
 }
 
 void m72_state::kengo_map(address_map &map)
 {
 	m84_cpu1_common_map(map);
-	map(0x80000, 0x83fff).ram().w(FUNC(m72_state::videoram1_w)).share("videoram1");
-	map(0x84000, 0x87fff).ram().w(FUNC(m72_state::videoram2_w)).share("videoram2");
-	map(0xa0000, 0xa0bff).rw(FUNC(m72_state::palette_r<0>), FUNC(m72_state::palette_w<0>)).share("paletteram1");
-	map(0xa8000, 0xa8bff).rw(FUNC(m72_state::palette_r<1>), FUNC(m72_state::palette_w<1>)).share("paletteram2");
+	map(0x80000, 0x83fff).ram().w(FUNC(m72_state::videoram1_w)).share(m_videoram[0]);
+	map(0x84000, 0x87fff).ram().w(FUNC(m72_state::videoram2_w)).share(m_videoram[1]);
+	map(0xa0000, 0xa0bff).rw(FUNC(m72_state::palette_r<0>), FUNC(m72_state::palette_w<0>)).share(m_paletteram[0]);
+	map(0xa8000, 0xa8bff).rw(FUNC(m72_state::palette_r<1>), FUNC(m72_state::palette_w<1>)).share(m_paletteram[1]);
 }
 
 
-void m72_state::m82_map(address_map &map)
+void m82_state::m82_map(address_map &map)
 {
 	map(0x00000, 0x7ffff).rom();
-	map(0xa0000, 0xa03ff).ram().share("majtitle_rowscr");
-	map(0xa4000, 0xa4bff).rw(FUNC(m72_state::palette_r<1>), FUNC(m72_state::palette_w<1>)).share("paletteram2");
-	map(0xac000, 0xaffff).ram().w(FUNC(m72_state::videoram1_w)).share("videoram1");
-	map(0xb0000, 0xbffff).ram().w(FUNC(m72_state::videoram2_w)).share("videoram2");  /* larger than the other games */
+	map(0xa0000, 0xa03ff).ram().share(m_m82_rowscrollram);
+	map(0xa4000, 0xa4bff).rw(FUNC(m82_state::palette_r<1>), FUNC(m82_state::palette_w<1>)).share(m_paletteram[1]);
+	map(0xac000, 0xaffff).ram().w(FUNC(m82_state::videoram1_w)).share(m_videoram[0]);
+	map(0xb0000, 0xbffff).ram().w(FUNC(m82_state::videoram2_m82_w)).share(m_videoram[1]);  /* larger than the other games */
 	map(0xc0000, 0xc03ff).ram().share("spriteram");
-	map(0xc8000, 0xc83ff).ram().share("spriteram2");
-	map(0xcc000, 0xccbff).rw(FUNC(m72_state::palette_r<0>), FUNC(m72_state::palette_w<0>)).share("paletteram1");
+	map(0xc8000, 0xc83ff).ram().share(m_spriteram2);
+	map(0xcc000, 0xccbff).rw(FUNC(m82_state::palette_r<0>), FUNC(m82_state::palette_w<0>)).share(m_paletteram[0]);
 	map(0xd0000, 0xd3fff).ram();   /* work RAM */
-	map(0xe0000, 0xe0001).w(FUNC(m72_state::irq_line_w));
+	map(0xe0000, 0xe0001).w(FUNC(m82_state::irq_line_w));
 	map(0xe4000, 0xe4001).nopw(); /* playfield enable? 1 during screen transitions, 0 otherwise */
-	map(0xec000, 0xec000).w(FUNC(m72_state::dmaon_w));
+	map(0xec000, 0xec000).w(FUNC(m82_state::dmaon_w));
 	map(0xffff0, 0xfffff).rom();
 }
 
@@ -799,10 +810,10 @@ void m72_state::lohtb_map(address_map &map) // all to be checked
 	map(0x80000, 0x803ff).ram().share("spriteram");
 	map(0xa0000, 0xa3fff).ram();    /* work RAM */
 	map(0xaa800, 0xaafff).ram();
-	map(0xc8000, 0xc8bff).rw(FUNC(m72_state::palette_r<0>), FUNC(m72_state::palette_w<0>)).share("paletteram1");
-	map(0xcc000, 0xccbff).rw(FUNC(m72_state::palette_r<1>), FUNC(m72_state::palette_w<1>)).share("paletteram2");
-	map(0xd0000, 0xd3fff).ram().w(FUNC(m72_state::videoram1_w)).share("videoram1");
-	map(0xd8000, 0xdbfff).ram().w(FUNC(m72_state::videoram2_w)).share("videoram2");
+	map(0xc8000, 0xc8bff).rw(FUNC(m72_state::palette_r<0>), FUNC(m72_state::palette_w<0>)).share(m_paletteram[0]);
+	map(0xcc000, 0xccbff).rw(FUNC(m72_state::palette_r<1>), FUNC(m72_state::palette_w<1>)).share(m_paletteram[1]);
+	map(0xd0000, 0xd3fff).ram().w(FUNC(m72_state::videoram1_w)).share(m_videoram[0]);
+	map(0xd8000, 0xdbfff).ram().w(FUNC(m72_state::videoram2_w)).share(m_videoram[1]);
 	map(0xffff0, 0xfffff).rom();
 }
 
@@ -823,13 +834,13 @@ void m72_state::m72_portmap(address_map &map)
 /*  { 0xc0, 0xc0      trigger sample, filled by init_ function */
 }
 
-void m72_state::m72_protected_portmap(address_map &map)
+void m72_mcu_state::m72_protected_portmap(address_map &map)
 {
 	m72_portmap(map);
 	map(0xc0, 0xc0).w("soundlatch2", FUNC(generic_latch_8_device::write));
 }
 
-void m72_state::m72_airduel_portmap(address_map &map)
+void m72_mcu_state::m72_airduel_portmap(address_map &map)
 {
 	m72_portmap(map);
 	map(0xc0, 0xc0).w("mculatch", FUNC(generic_latch_8_device::write));
@@ -849,7 +860,7 @@ void m72_state::m84_portmap(address_map &map)
 	map(0x86, 0x87).w(FUNC(m72_state::scrollx_w<1>));
 }
 
-void m72_state::m84_v33_portmap(address_map &map)
+void m72_state::m84_v35_portmap(address_map &map)
 {
 	map(0x00, 0x01).portr("IN0");
 	map(0x02, 0x03).portr("IN1");
@@ -864,37 +875,37 @@ void m72_state::m84_v33_portmap(address_map &map)
 }
 
 
-void m72_state::poundfor_portmap(address_map &map)
+void poundfor_state::poundfor_portmap(address_map &map)
 {
 	map(0x02, 0x03).portr("IN1");
 	map(0x04, 0x05).portr("DSW");
-	map(0x08, 0x0f).r("upd4701l", FUNC(upd4701_device::read_xy)).umask16(0x00ff);
-	map(0x08, 0x0f).r("upd4701h", FUNC(upd4701_device::read_xy)).umask16(0xff00);
+	map(0x08, 0x0f).r(m_upd4701[0], FUNC(upd4701_device::read_xy)).umask16(0x00ff);
+	map(0x08, 0x0f).r(m_upd4701[1], FUNC(upd4701_device::read_xy)).umask16(0xff00);
 	map(0x00, 0x00).w("soundlatch", FUNC(generic_latch_8_device::write));
-	map(0x02, 0x02).w(FUNC(m72_state::poundfor_port02_w));
+	map(0x02, 0x02).w(FUNC(poundfor_state::poundfor_port02_w));
 	map(0x40, 0x43).rw(m_upd71059c, FUNC(pic8259_device::read), FUNC(pic8259_device::write)).umask16(0x00ff);
-	map(0x80, 0x81).w(FUNC(m72_state::scrolly_w<0>));
-	map(0x82, 0x83).w(FUNC(m72_state::scrollx_w<0>));
-	map(0x84, 0x85).w(FUNC(m72_state::scrolly_w<1>));
-	map(0x86, 0x87).w(FUNC(m72_state::scrollx_w<1>));
+	map(0x80, 0x81).w(FUNC(poundfor_state::scrolly_w<0>));
+	map(0x82, 0x83).w(FUNC(poundfor_state::scrollx_w<0>));
+	map(0x84, 0x85).w(FUNC(poundfor_state::scrolly_w<1>));
+	map(0x86, 0x87).w(FUNC(poundfor_state::scrollx_w<1>));
 }
 
-void m72_state::m82_portmap(address_map &map)
+void m82_state::m82_portmap(address_map &map)
 {
 	map(0x00, 0x01).portr("IN0");
 	map(0x02, 0x03).portr("IN1");
 	map(0x04, 0x05).portr("DSW");
 	map(0x00, 0x00).w("soundlatch", FUNC(generic_latch_8_device::write));
-	map(0x02, 0x02).w(FUNC(m72_state::rtype2_port02_w));
+	map(0x02, 0x02).w(FUNC(m82_state::rtype2_port02_w));
 	map(0x40, 0x43).rw(m_upd71059c, FUNC(pic8259_device::read), FUNC(pic8259_device::write)).umask16(0x00ff);
-	map(0x80, 0x81).w(FUNC(m72_state::scrolly_w<0>));
-	map(0x82, 0x83).w(FUNC(m72_state::scrollx_w<0>));
-	map(0x84, 0x85).w(FUNC(m72_state::scrolly_w<1>));
-	map(0x86, 0x87).w(FUNC(m72_state::scrollx_w<1>));
+	map(0x80, 0x81).w(FUNC(m82_state::scrolly_w<0>));
+	map(0x82, 0x83).w(FUNC(m82_state::scrollx_w<0>));
+	map(0x84, 0x85).w(FUNC(m82_state::scrolly_w<1>));
+	map(0x86, 0x87).w(FUNC(m82_state::scrollx_w<1>));
 
 	// these ports control the tilemap sizes, rowscroll etc. that m82 has, exact bit usage not known (maybe one for each layer?)
-	map(0x8c, 0x8d).w(FUNC(m72_state::m82_tm_ctrl_w));
-	map(0x8e, 0x8f).w(FUNC(m72_state::m82_gfx_ctrl_w));
+	map(0x8c, 0x8d).w(FUNC(m82_state::m82_tm_ctrl_w));
+	map(0x8e, 0x8f).w(FUNC(m82_state::m82_gfx_ctrl_w));
 }
 
 void m72_state::m81_portmap(address_map &map)
@@ -930,7 +941,7 @@ void m72_state::lohtb_portmap(address_map &map)
 
 void m72_state::sound_ram_map(address_map &map)
 {
-	map(0x0000, 0xffff).ram().share("soundram");
+	map(0x0000, 0xffff).ram().share(m_soundram);
 }
 
 void m72_state::sound_rom_map(address_map &map)
@@ -955,7 +966,7 @@ void m72_state::sound_portmap(address_map &map)
 	map(0x84, 0x84).r(m_audio, FUNC(m72_audio_device::sample_r));
 }
 
-void m72_state::sound_protected_portmap(address_map &map)
+void m72_mcu_state::sound_protected_portmap(address_map &map)
 {
 	rtype_sound_portmap(map);
 	map.global_mask(0xff);
@@ -975,7 +986,7 @@ void m72_state::rtype2_sound_portmap(address_map &map)
 //  map(0x87, 0x87).nopw();    /* ??? */
 }
 
-void m72_state::poundfor_sound_portmap(address_map &map)
+void poundfor_state::poundfor_sound_portmap(address_map &map)
 {
 	map.global_mask(0xff);
 	map(0x10, 0x13).w(m_audio, FUNC(m72_audio_device::poundfor_sample_addr_w));
@@ -983,19 +994,19 @@ void m72_state::poundfor_sound_portmap(address_map &map)
 	map(0x42, 0x42).rw("soundlatch", FUNC(generic_latch_8_device::read), FUNC(generic_latch_8_device::acknowledge_w));
 }
 
-void m72_state::i80c31_mem_map(address_map &map)
+void m72_mcu_state::i80c31_mem_map(address_map &map)
 {
 	map(0x0000, 0x1fff).rom().region("mcu", 0);
 }
 
-void m72_state::mcu_io_map(address_map &map)
+void m72_mcu_state::mcu_io_map(address_map &map)
 {
 	/* External access */
-	map(0x0000, 0x0000).rw(FUNC(m72_state::mcu_sample_r), FUNC(m72_state::mcu_low_w));
-	map(0x0001, 0x0001).w(FUNC(m72_state::mcu_high_w));
+	map(0x0000, 0x0000).rw(FUNC(m72_mcu_state::mcu_sample_r), FUNC(m72_mcu_state::mcu_low_w));
+	map(0x0001, 0x0001).w(FUNC(m72_mcu_state::mcu_high_w));
 	map(0x0002, 0x0002).rw("mculatch", FUNC(generic_latch_8_device::read), FUNC(generic_latch_8_device::acknowledge_w));
 	/* shared at b0000 - b0fff on the main cpu */
-	map(0xc000, 0xcfff).rw(FUNC(m72_state::mcu_data_r), FUNC(m72_state::mcu_data_w));
+	map(0xc000, 0xcfff).rw(FUNC(m72_mcu_state::mcu_data_r), FUNC(m72_mcu_state::mcu_data_w));
 }
 
 #define COIN_MODE_1 \
@@ -1693,19 +1704,19 @@ static const gfx_layout spritelayout =
 
 static GFXDECODE_START( gfx_m72 )
 	GFXDECODE_ENTRY( "sprites", 0, spritelayout,    0, 16 )
-	GFXDECODE_ENTRY( "gfx2", 0, tilelayout,    256, 16 )
-	GFXDECODE_ENTRY( "gfx3", 0, tilelayout,    256, 16 )
+	GFXDECODE_ENTRY( "tiles0",  0, tilelayout,    256, 16 )
+	GFXDECODE_ENTRY( "tiles1",  0, tilelayout,    256, 16 )
 GFXDECODE_END
 
 static GFXDECODE_START( gfx_rtype2 )
-	GFXDECODE_ENTRY( "sprites", 0, spritelayout,     0, 16 )
-	GFXDECODE_ENTRY( "gfx2", 0, tilelayout,     256, 16 )
+	GFXDECODE_ENTRY( "sprites", 0, spritelayout,    0, 16 )
+	GFXDECODE_ENTRY( "tiles0",  0, tilelayout,    256, 16 )
 GFXDECODE_END
 
 static GFXDECODE_START( gfx_majtitle )
-	GFXDECODE_ENTRY( "sprites", 0, spritelayout,     0, 16 )
-	GFXDECODE_ENTRY( "gfx2", 0, tilelayout,     256, 16 )
-	GFXDECODE_ENTRY( "sprites2", 0, spritelayout,     0, 16 )
+	GFXDECODE_ENTRY( "sprites",  0, spritelayout,   0, 16 )
+	GFXDECODE_ENTRY( "tiles0",   0, tilelayout,   256, 16 )
+	GFXDECODE_ENTRY( "sprites2", 0, spritelayout,   0, 16 )
 GFXDECODE_END
 
 
@@ -1730,7 +1741,7 @@ void m72_state::m72_audio_chips(machine_config &config)
 	ymsnd.irq_handler().set("soundirq", FUNC(rst_neg_buffer_device::rst28_w));
 	ymsnd.add_route(ALL_OUTPUTS, "speaker", 0.33);
 
-	DAC_8BIT_R2R(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.33); // unknown DAC
+	DAC_8BIT_R2R(config, m_dac, 0).add_route(ALL_OUTPUTS, "speaker", 0.33); // unknown DAC
 }
 
 void m72_state::m72_base(machine_config &config)
@@ -1772,13 +1783,13 @@ void m72_state::m72(machine_config &config)
 	/* IRQs are generated by main Z80 and YM2151 */
 }
 
-void m72_state::m72_8751(machine_config &config)
+void m72_mcu_state::m72_8751(machine_config &config)
 {
 	m72_base(config);
-	m_maincpu->set_addrmap(AS_PROGRAM, &m72_state::m72_protected_map);
-	m_maincpu->set_addrmap(AS_IO, &m72_state::m72_protected_portmap);
+	m_maincpu->set_addrmap(AS_PROGRAM, &m72_mcu_state::m72_protected_map);
+	m_maincpu->set_addrmap(AS_IO, &m72_mcu_state::m72_protected_portmap);
 
-	m_soundcpu->set_addrmap(AS_IO, &m72_state::sound_protected_portmap);
+	m_soundcpu->set_addrmap(AS_IO, &m72_mcu_state::sound_protected_portmap);
 
 	MB8421_MB8431_16BIT(config, m_dpram);
 	//m_dpram->intl_callback().set(m_upd71059c, FUNC(pic8259_device::ir3_w)); // not actually used?
@@ -1791,27 +1802,27 @@ void m72_state::m72_8751(machine_config &config)
 	GENERIC_LATCH_8(config, "soundlatch2").data_pending_callback().set_inputline(m_soundcpu, INPUT_LINE_NMI);
 
 	i8751_device &mcu(I8751(config, m_mcu, XTAL(8'000'000))); /* Uses its own XTAL */
-	mcu.set_addrmap(AS_IO, &m72_state::mcu_io_map);
+	mcu.set_addrmap(AS_IO, &m72_mcu_state::mcu_io_map);
 	mcu.port_out_cb<1>().set(m_dac, FUNC(dac_byte_interface::write));
 }
 
-void m72_state::m72_airduel(machine_config &config)
+void m72_mcu_state::m72_airduel(machine_config &config)
 {
 	m72_8751(config);
-	m_maincpu->set_addrmap(AS_IO, &m72_state::m72_airduel_portmap);
+	m_maincpu->set_addrmap(AS_IO, &m72_mcu_state::m72_airduel_portmap);
 }
 
-void m72_state::imgfightjb(machine_config &config)
+void m72_mcu_state::imgfightjb(machine_config &config)
 {
 	m72_8751(config);
 	i80c31_device &mcu(I80C31(config.replace(), m_mcu, XTAL(32'000'000) / 4));
-	mcu.set_addrmap(AS_PROGRAM, &m72_state::i80c31_mem_map);
-	mcu.set_addrmap(AS_IO, &m72_state::mcu_io_map);
+	mcu.set_addrmap(AS_PROGRAM, &m72_mcu_state::i80c31_mem_map);
+	mcu.set_addrmap(AS_IO, &m72_mcu_state::mcu_io_map);
 	mcu.port_out_cb<1>().set(m_dac, FUNC(dac_byte_interface::write));
 
 	// TODO: uses 6116 type RAM instead of MB8421 and MB8431
 
-	MCFG_VIDEO_START_OVERRIDE(m72_state, imgfight)
+	MCFG_VIDEO_START_OVERRIDE(m72_mcu_state, imgfight)
 }
 
 void m72_state::rtype(machine_config &config)
@@ -1824,13 +1835,13 @@ void m72_state::rtype(machine_config &config)
 	config.device_remove("dac");
 }
 
-void m72_state::m72_xmultipl(machine_config &config)
+void m72_mcu_state::m72_xmultipl(machine_config &config)
 {
 	m72_8751(config);
-	m_maincpu->set_addrmap(AS_PROGRAM, &m72_state::xmultiplm72_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &m72_mcu_state::xmultiplm72_map);
 
 	/* Sample rate verified (Gallop : https://youtu.be/aozd0dbPzOw) */
-	m_soundcpu->set_periodic_int(FUNC(m72_state::nmi_line_pulse), attotime::from_hz(MASTER_CLOCK/8/512));
+	m_soundcpu->set_periodic_int(FUNC(m72_mcu_state::nmi_line_pulse), attotime::from_hz(MASTER_CLOCK/8/512));
 	/* IRQs are generated by main Z80 and YM2151 */
 }
 
@@ -1846,16 +1857,16 @@ void m72_state::m72_dbreedw(machine_config &config)
 	MCFG_VIDEO_START_OVERRIDE(m72_state,dbreedm72)
 }
 
-void m72_state::m72_dbreed(machine_config &config)
+void m72_mcu_state::m72_dbreed(machine_config &config)
 {
 	m72_8751(config);
-	m_maincpu->set_addrmap(AS_PROGRAM, &m72_state::dbreedm72_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &m72_mcu_state::dbreedm72_map);
 
 	/* Sample rate verified (Gallop : https://youtu.be/aozd0dbPzOw) */
-	m_soundcpu->set_periodic_int(FUNC(m72_state::nmi_line_pulse), attotime::from_hz(MASTER_CLOCK/8/512));
+	m_soundcpu->set_periodic_int(FUNC(m72_mcu_state::nmi_line_pulse), attotime::from_hz(MASTER_CLOCK/8/512));
 	/* IRQs are generated by main Z80 and YM2151 */
 
-	MCFG_VIDEO_START_OVERRIDE(m72_state,dbreedm72)
+	MCFG_VIDEO_START_OVERRIDE(m72_mcu_state,dbreedm72)
 }
 
 
@@ -1946,7 +1957,7 @@ void m72_state::cosmccop(machine_config &config)
 	/* basic machine hardware */
 	V35(config, m_maincpu, MASTER_CLOCK/2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &m72_state::kengo_map);
-	m_maincpu->set_addrmap(AS_IO, &m72_state::m84_v33_portmap);
+	m_maincpu->set_addrmap(AS_IO, &m72_state::m84_v35_portmap);
 
 	Z80(config, m_soundcpu, SOUND_CLOCK);
 	m_soundcpu->set_addrmap(AS_PROGRAM, &m72_state::sound_rom_map);
@@ -1981,22 +1992,22 @@ void m72_state::kengo(machine_config &config)
 	subdevice<v35_device>("maincpu")->set_decryption_table(gunforce_decryption_table);
 }
 
-void m72_state::imgfight(machine_config &config)
+void m72_mcu_state::imgfight(machine_config &config)
 {
 	m72_8751(config);
-	MCFG_VIDEO_START_OVERRIDE(m72_state,imgfight)
+	MCFG_VIDEO_START_OVERRIDE(m72_mcu_state,imgfight)
 }
 
-void m72_state::nspiritj(machine_config &config)
+void m72_mcu_state::nspiritj(machine_config &config)
 {
 	m72_8751(config);
-	MCFG_VIDEO_START_OVERRIDE(m72_state,nspiritj)
+	MCFG_VIDEO_START_OVERRIDE(m72_mcu_state,nspiritj)
 }
 
-void m72_state::mrheli(machine_config &config)
+void m72_mcu_state::mrheli(machine_config &config)
 {
 	m72_8751(config);
-	MCFG_VIDEO_START_OVERRIDE(m72_state,mrheli)
+	MCFG_VIDEO_START_OVERRIDE(m72_mcu_state,mrheli)
 }
 
 /****************************************** M82 ***********************************************/
@@ -2007,18 +2018,18 @@ M82-A-A as the top board
 M82-B-A and as the bottom board
 
 */
-void m72_state::m82(machine_config &config)
+void m82_state::m82(machine_config &config)
 {
 	/* basic machine hardware */
 	V30(config, m_maincpu, MASTER_CLOCK/2/2);   /* 16 MHz external freq (8MHz internal) */
-	m_maincpu->set_addrmap(AS_PROGRAM, &m72_state::m82_map);
-	m_maincpu->set_addrmap(AS_IO, &m72_state::m82_portmap);
+	m_maincpu->set_addrmap(AS_PROGRAM, &m82_state::m82_map);
+	m_maincpu->set_addrmap(AS_IO, &m82_state::m82_portmap);
 	m_maincpu->set_irq_acknowledge_callback("upd71059c", FUNC(pic8259_device::inta_cb));
 
 	Z80(config, m_soundcpu, SOUND_CLOCK);
-	m_soundcpu->set_addrmap(AS_PROGRAM, &m72_state::sound_rom_map);
-	m_soundcpu->set_addrmap(AS_IO, &m72_state::rtype2_sound_portmap);
-	m_soundcpu->set_periodic_int(FUNC(m72_state::nmi_line_pulse), attotime::from_hz(MASTER_CLOCK/8/512)); /* verified (https://youtu.be/lLQDPe-8Ha0) */
+	m_soundcpu->set_addrmap(AS_PROGRAM, &m82_state::sound_rom_map);
+	m_soundcpu->set_addrmap(AS_IO, &m82_state::rtype2_sound_portmap);
+	m_soundcpu->set_periodic_int(FUNC(m82_state::nmi_line_pulse), attotime::from_hz(MASTER_CLOCK/8/512)); /* verified (https://youtu.be/lLQDPe-8Ha0) */
 								/* IRQs are generated by main Z80 and YM2151 */
 
 	PIC8259(config, m_upd71059c, 0);
@@ -2032,10 +2043,8 @@ void m72_state::m82(machine_config &config)
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_raw(MASTER_CLOCK/4, 512, 64, 448, 284, 0, 256);
-	m_screen->set_screen_update(FUNC(m72_state::screen_update_m82));
+	m_screen->set_screen_update(FUNC(m82_state::screen_update_m82));
 	m_screen->set_palette(m_palette);
-
-	MCFG_VIDEO_START_OVERRIDE(m72_state,m82)
 
 	m72_audio_chips(config);
 }
@@ -2045,18 +2054,18 @@ void m72_state::m82(machine_config &config)
   M85-A-B / M85-B
 */
 
-void m72_state::poundfor(machine_config &config)
+void poundfor_state::poundfor(machine_config &config)
 {
 	/* basic machine hardware */
 	V30(config, m_maincpu, MASTER_CLOCK/2/2);   /* 16 MHz external freq (8MHz internal) */
-	m_maincpu->set_addrmap(AS_PROGRAM, &m72_state::rtype2_map);
-	m_maincpu->set_addrmap(AS_IO, &m72_state::poundfor_portmap);
+	m_maincpu->set_addrmap(AS_PROGRAM, &poundfor_state::rtype2_map);
+	m_maincpu->set_addrmap(AS_IO, &poundfor_state::poundfor_portmap);
 	m_maincpu->set_irq_acknowledge_callback("upd71059c", FUNC(pic8259_device::inta_cb));
 
 	Z80(config, m_soundcpu, SOUND_CLOCK);
-	m_soundcpu->set_addrmap(AS_PROGRAM, &m72_state::sound_rom_map);
-	m_soundcpu->set_addrmap(AS_IO, &m72_state::poundfor_sound_portmap);
-	m_soundcpu->set_periodic_int(FUNC(m72_state::fake_nmi), attotime::from_hz(MASTER_CLOCK/8/512));   /* clocked by V1? (Vigilante) */
+	m_soundcpu->set_addrmap(AS_PROGRAM, &poundfor_state::sound_rom_map);
+	m_soundcpu->set_addrmap(AS_IO, &poundfor_state::poundfor_sound_portmap);
+	m_soundcpu->set_periodic_int(FUNC(poundfor_state::fake_nmi), attotime::from_hz(MASTER_CLOCK/8/512));   /* clocked by V1? (Vigilante) */
 								/* IRQs are generated by main Z80 and YM2151 */
 
 	PIC8259(config, m_upd71059c, 0);
@@ -2078,10 +2087,8 @@ void m72_state::poundfor(machine_config &config)
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_raw(MASTER_CLOCK/4, 512, 64, 448, 284, 0, 256);
-	m_screen->set_screen_update(FUNC(m72_state::screen_update));
+	m_screen->set_screen_update(FUNC(poundfor_state::screen_update));
 	m_screen->set_palette(m_palette);
-
-	MCFG_VIDEO_START_OVERRIDE(m72_state,poundfor)
 
 	m72_audio_chips(config);
 }
@@ -2146,13 +2153,13 @@ ROM_START( rtype )
 	ROM_LOAD( "rt_r-31.3l", 0x70000, 0x08000, CRC(8558355d) SHA1(b5467d1f22f6e5f90c5d8a8ac2d55974f287d589) )
 	ROM_RELOAD(             0x78000, 0x08000 )
 
-	ROM_REGION( 0x20000, "gfx2", 0 ) // Roms located on the M72-B-D rom board
+	ROM_REGION( 0x20000, "tiles0", 0 ) // Roms located on the M72-B-D rom board
 	ROM_LOAD( "rt_b-a0.ic20", 0x00000, 0x08000, CRC(4e212fb0) SHA1(687061ecade2ebd0bd1343c9c4a831791853f79c) )    // tiles #1
 	ROM_LOAD( "rt_b-a1.ic22", 0x08000, 0x08000, CRC(8a65bdff) SHA1(130bf6af521f13247a739a95eab4bdaa24b2ac10) )
 	ROM_LOAD( "rt_b-a2.ic20", 0x10000, 0x08000, CRC(5a4ae5b9) SHA1(95c3b64f50e6f673b2bf9b40642c152da5009d25) )
 	ROM_LOAD( "rt_b-a3.ic23", 0x18000, 0x08000, CRC(73327606) SHA1(9529ecdedd30e2a0400fb1083117992cc18b5158) )
 
-	ROM_REGION( 0x20000, "gfx3", 0 ) // Roms located on the M72-B-D rom board
+	ROM_REGION( 0x20000, "tiles1", 0 ) // Roms located on the M72-B-D rom board
 	ROM_LOAD( "rt_b-b0.ic26", 0x00000, 0x08000, CRC(a7b17491) SHA1(5b390770e56ba2d35e108534d7eda8dca996fdf7) )    // tiles #2
 	ROM_LOAD( "rt_b-b1.ic27", 0x08000, 0x08000, CRC(b9709686) SHA1(700905a3e9661e0874939f54da2909e1396ce596) )
 	ROM_LOAD( "rt_b-b2.ic25", 0x10000, 0x08000, CRC(433b229a) SHA1(14222eaa3e67e5a7f80eafcf22bac4eb2d485a9a) )
@@ -2191,13 +2198,13 @@ ROM_START( rtypej )
 	ROM_LOAD( "rt_r-31.3l", 0x70000, 0x08000, CRC(8558355d) SHA1(b5467d1f22f6e5f90c5d8a8ac2d55974f287d589) )
 	ROM_RELOAD(             0x78000, 0x08000 )
 
-	ROM_REGION( 0x20000, "gfx2", 0 ) // Roms located on the M72-B-D rom board
+	ROM_REGION( 0x20000, "tiles0", 0 ) // Roms located on the M72-B-D rom board
 	ROM_LOAD( "rt_b-a0.ic20", 0x00000, 0x08000, CRC(4e212fb0) SHA1(687061ecade2ebd0bd1343c9c4a831791853f79c) )    // tiles #1
 	ROM_LOAD( "rt_b-a1.ic22", 0x08000, 0x08000, CRC(8a65bdff) SHA1(130bf6af521f13247a739a95eab4bdaa24b2ac10) )
 	ROM_LOAD( "rt_b-a2.ic20", 0x10000, 0x08000, CRC(5a4ae5b9) SHA1(95c3b64f50e6f673b2bf9b40642c152da5009d25) )
 	ROM_LOAD( "rt_b-a3.ic23", 0x18000, 0x08000, CRC(73327606) SHA1(9529ecdedd30e2a0400fb1083117992cc18b5158) )
 
-	ROM_REGION( 0x20000, "gfx3", 0 ) // Roms located on the M72-B-D rom board
+	ROM_REGION( 0x20000, "tiles1", 0 ) // Roms located on the M72-B-D rom board
 	ROM_LOAD( "rt_b-b0.ic26", 0x00000, 0x08000, CRC(a7b17491) SHA1(5b390770e56ba2d35e108534d7eda8dca996fdf7) )    // tiles #2
 	ROM_LOAD( "rt_b-b1.ic27", 0x08000, 0x08000, CRC(b9709686) SHA1(700905a3e9661e0874939f54da2909e1396ce596) )
 	ROM_LOAD( "rt_b-b2.ic25", 0x10000, 0x08000, CRC(433b229a) SHA1(14222eaa3e67e5a7f80eafcf22bac4eb2d485a9a) )
@@ -2236,13 +2243,13 @@ ROM_START( rtypejp )
 	ROM_LOAD( "rt_r-31.3l", 0x70000, 0x08000, CRC(8558355d) SHA1(b5467d1f22f6e5f90c5d8a8ac2d55974f287d589) )
 	ROM_RELOAD(             0x78000, 0x08000 )
 
-	ROM_REGION( 0x20000, "gfx2", 0 ) // Roms located on the M72-B-D rom board
+	ROM_REGION( 0x20000, "tiles0", 0 ) // Roms located on the M72-B-D rom board
 	ROM_LOAD( "rt_b-a0.ic20", 0x00000, 0x08000, CRC(4e212fb0) SHA1(687061ecade2ebd0bd1343c9c4a831791853f79c) )    // tiles #1
 	ROM_LOAD( "rt_b-a1.ic22", 0x08000, 0x08000, CRC(8a65bdff) SHA1(130bf6af521f13247a739a95eab4bdaa24b2ac10) )
 	ROM_LOAD( "rt_b-a2.ic20", 0x10000, 0x08000, CRC(5a4ae5b9) SHA1(95c3b64f50e6f673b2bf9b40642c152da5009d25) )
 	ROM_LOAD( "rt_b-a3.ic23", 0x18000, 0x08000, CRC(73327606) SHA1(9529ecdedd30e2a0400fb1083117992cc18b5158) )
 
-	ROM_REGION( 0x20000, "gfx3", 0 ) // Roms located on the M72-B-D rom board
+	ROM_REGION( 0x20000, "tiles1", 0 ) // Roms located on the M72-B-D rom board
 	ROM_LOAD( "rt_b-b0.ic26", 0x00000, 0x08000, CRC(a7b17491) SHA1(5b390770e56ba2d35e108534d7eda8dca996fdf7) )    // tiles #2
 	ROM_LOAD( "rt_b-b1.ic27", 0x08000, 0x08000, CRC(b9709686) SHA1(700905a3e9661e0874939f54da2909e1396ce596) )
 	ROM_LOAD( "rt_b-b2.ic25", 0x10000, 0x08000, CRC(433b229a) SHA1(14222eaa3e67e5a7f80eafcf22bac4eb2d485a9a) )
@@ -2281,13 +2288,13 @@ ROM_START( rtypeu )
 	ROM_LOAD( "rt_r-31.3l", 0x70000, 0x08000, CRC(8558355d) SHA1(b5467d1f22f6e5f90c5d8a8ac2d55974f287d589) )
 	ROM_RELOAD(             0x78000, 0x08000 )
 
-	ROM_REGION( 0x20000, "gfx2", 0 ) // Roms located on the M72-B-D rom board
+	ROM_REGION( 0x20000, "tiles0", 0 ) // Roms located on the M72-B-D rom board
 	ROM_LOAD( "rt_b-a0.ic20", 0x00000, 0x08000, CRC(4e212fb0) SHA1(687061ecade2ebd0bd1343c9c4a831791853f79c) )    // tiles #1
 	ROM_LOAD( "rt_b-a1.ic22", 0x08000, 0x08000, CRC(8a65bdff) SHA1(130bf6af521f13247a739a95eab4bdaa24b2ac10) )
 	ROM_LOAD( "rt_b-a2.ic20", 0x10000, 0x08000, CRC(5a4ae5b9) SHA1(95c3b64f50e6f673b2bf9b40642c152da5009d25) )
 	ROM_LOAD( "rt_b-a3.ic23", 0x18000, 0x08000, CRC(73327606) SHA1(9529ecdedd30e2a0400fb1083117992cc18b5158) )
 
-	ROM_REGION( 0x20000, "gfx3", 0 ) // Roms located on the M72-B-D rom board
+	ROM_REGION( 0x20000, "tiles1", 0 ) // Roms located on the M72-B-D rom board
 	ROM_LOAD( "rt_b-b0.ic26", 0x00000, 0x08000, CRC(a7b17491) SHA1(5b390770e56ba2d35e108534d7eda8dca996fdf7) )    // tiles #2
 	ROM_LOAD( "rt_b-b1.ic27", 0x08000, 0x08000, CRC(b9709686) SHA1(700905a3e9661e0874939f54da2909e1396ce596) )
 	ROM_LOAD( "rt_b-b2.ic25", 0x10000, 0x08000, CRC(433b229a) SHA1(14222eaa3e67e5a7f80eafcf22bac4eb2d485a9a) )
@@ -2326,13 +2333,13 @@ ROM_START( rtypeb )
 	ROM_LOAD( "rt_r-31.3l", 0x70000, 0x08000, CRC(8558355d) SHA1(b5467d1f22f6e5f90c5d8a8ac2d55974f287d589) )
 	ROM_RELOAD(             0x78000, 0x08000 )
 
-	ROM_REGION( 0x20000, "gfx2", 0 ) // Roms located on the M72-B-D rom board
+	ROM_REGION( 0x20000, "tiles0", 0 ) // Roms located on the M72-B-D rom board
 	ROM_LOAD( "rt_b-a0.ic20", 0x00000, 0x08000, CRC(4e212fb0) SHA1(687061ecade2ebd0bd1343c9c4a831791853f79c) )    // tiles #1
 	ROM_LOAD( "rt_b-a1.ic22", 0x08000, 0x08000, CRC(8a65bdff) SHA1(130bf6af521f13247a739a95eab4bdaa24b2ac10) )
 	ROM_LOAD( "rt_b-a2.ic20", 0x10000, 0x08000, CRC(5a4ae5b9) SHA1(95c3b64f50e6f673b2bf9b40642c152da5009d25) )
 	ROM_LOAD( "rt_b-a3.ic23", 0x18000, 0x08000, CRC(73327606) SHA1(9529ecdedd30e2a0400fb1083117992cc18b5158) )
 
-	ROM_REGION( 0x20000, "gfx3", 0 ) // Roms located on the M72-B-D rom board
+	ROM_REGION( 0x20000, "tiles1", 0 ) // Roms located on the M72-B-D rom board
 	ROM_LOAD( "rt_b-b0.ic26", 0x00000, 0x08000, CRC(a7b17491) SHA1(5b390770e56ba2d35e108534d7eda8dca996fdf7) )    // tiles #2
 	ROM_LOAD( "rt_b-b1.ic27", 0x08000, 0x08000, CRC(b9709686) SHA1(700905a3e9661e0874939f54da2909e1396ce596) )
 	ROM_LOAD( "rt_b-b2.ic25", 0x10000, 0x08000, CRC(433b229a) SHA1(14222eaa3e67e5a7f80eafcf22bac4eb2d485a9a) )
@@ -2364,13 +2371,13 @@ ROM_START( bchopper )
 	ROM_LOAD( "mh_c-30-a.ic47", 0x60000, 0x10000, CRC(11f6c56b) SHA1(39a2a674698b044c84fea65ae41a9e003a50b639) )
 	ROM_LOAD( "mh_c-31-b.ic46", 0x70000, 0x10000, CRC(23134ec5) SHA1(43453f8a13b51310e04729dc828d391ca9c04da2) )
 
-	ROM_REGION( 0x040000, "gfx2", 0 )
+	ROM_REGION( 0x040000, "tiles0", 0 )
 	ROM_LOAD( "mh_b-a0-b.ic21", 0x00000, 0x10000, CRC(e46ed7bf) SHA1(75abb5f40629f7c40a610a44e068b6c4e3a5126e) )  // tiles #1
 	ROM_LOAD( "mh_b-a1-b.ic22", 0x10000, 0x10000, CRC(590605ff) SHA1(fbb5c0cebd28b08d4ce39db4055d6343620e0f1c) )
 	ROM_LOAD( "mh_b-a2-b.ic20", 0x20000, 0x10000, CRC(f8158226) SHA1(bb3a8686cd89bb8265b6b9e03682cc0bf6533793) )
 	ROM_LOAD( "mh_b-a3-b.ic23", 0x30000, 0x10000, CRC(0f07b9b7) SHA1(63dbec17097f07eb39299372b736fbbc1b11b65e) )
 
-	ROM_REGION( 0x040000, "gfx3", 0 )
+	ROM_REGION( 0x040000, "tiles1", 0 )
 	ROM_LOAD( "mh_b-b0-.ic26", 0x00000, 0x10000, CRC(b5b95776) SHA1(4685b56071b916ce712c45f24da8068dd7e40ed1) )  // tiles #2
 	ROM_LOAD( "mh_b-b1-.ic27", 0x10000, 0x10000, CRC(74ca16ee) SHA1(7984bc9a0b46e1b4a8ecac7528d57606305aad73) )
 	ROM_LOAD( "mh_b-b2-.ic25", 0x20000, 0x10000, CRC(b82cca04) SHA1(c12b95be311205181b01d15021bcf9f01ed3e0a3) )
@@ -2409,13 +2416,13 @@ ROM_START( mrheli )
 	ROM_LOAD( "mh_c-20.ic49", 0x40000, 0x20000, CRC(eae0de74) SHA1(3a2469c0eeb18131f989807afb50228f57ccea30) )
 	ROM_LOAD( "mh_c-30.ic47", 0x60000, 0x20000, CRC(01d5052f) SHA1(5d5e70913bb7af48193c70209595f27a64fa6cac) )
 
-	ROM_REGION( 0x040000, "gfx2", 0 )
+	ROM_REGION( 0x040000, "tiles0", 0 )
 	ROM_LOAD( "mh_b-a0.ic21", 0x00000, 0x10000, CRC(6a0db256) SHA1(fa3a2dc03da5bbe06a9c9b3d4ed4fddb47c469ac) )  // tiles #1
 	ROM_LOAD( "mh_b-a1.ic22", 0x10000, 0x10000, CRC(14ec9795) SHA1(4842e076115efe9daf00dab8f61516d28c19baae) )
 	ROM_LOAD( "mh_b-a2.ic20", 0x20000, 0x10000, CRC(dfcb510e) SHA1(2387cde4ec0bae176486e1f7541103fd557fe255) )
 	ROM_LOAD( "mh_b-a3.ic23", 0x30000, 0x10000, CRC(957e329b) SHA1(9d48a0b84915e1cef0b0311a3581991dc83ee199) )
 
-	ROM_REGION( 0x040000, "gfx3", 0 )
+	ROM_REGION( 0x040000, "tiles1", 0 )
 	ROM_LOAD( "mh_b-b0-.ic26", 0x00000, 0x10000, CRC(b5b95776) SHA1(4685b56071b916ce712c45f24da8068dd7e40ed1) )  // tiles #2
 	ROM_LOAD( "mh_b-b1-.ic27", 0x10000, 0x10000, CRC(74ca16ee) SHA1(7984bc9a0b46e1b4a8ecac7528d57606305aad73) )
 	ROM_LOAD( "mh_b-b2-.ic25", 0x20000, 0x10000, CRC(b82cca04) SHA1(c12b95be311205181b01d15021bcf9f01ed3e0a3) )
@@ -2581,13 +2588,13 @@ ROM_START( nspirit )
 	ROM_LOAD( "nin-r20.ic49",  0x40000, 0x20000, CRC(ef3617d3) SHA1(16c175cf45559aacdea6e4002dd8a87f16817cfb) )
 	ROM_LOAD( "nin-r30.ic47",  0x60000, 0x20000, CRC(175d2a24) SHA1(d1887efd4d8e74c38c53dbbc541ca8d17f29eb59) )
 
-	ROM_REGION( 0x040000, "gfx2", 0 )
+	ROM_REGION( 0x040000, "tiles0", 0 )
 	ROM_LOAD( "nin_b-a0.ic21", 0x00000, 0x10000, CRC(63f8f658) SHA1(82c02d0f7a2d95dfd8d300c46312d511524775ce) )  // tiles #1
 	ROM_LOAD( "nin_b-a1.ic22", 0x10000, 0x10000, CRC(75eb8306) SHA1(2abc359a0bb2863759a68ed60e730761b9751829) )
 	ROM_LOAD( "nin_b-a2.ic20", 0x20000, 0x10000, CRC(df532172) SHA1(58b5a79a57e71405b3e1abd41d54cf6a4d12873a) )
 	ROM_LOAD( "nin_b-a3.ic23", 0x30000, 0x10000, CRC(4dedd64c) SHA1(8a5c73a024d95e6fe3ab70daafcd5b235418ad36) )
 
-	ROM_REGION( 0x040000, "gfx3", 0 )
+	ROM_REGION( 0x040000, "tiles1", 0 )
 	ROM_LOAD( "b0.ic26",       0x00000, 0x10000, CRC(1b0e08a6) SHA1(892686594970c264babbe8673c258929a5e480f6) )  // tiles #2
 	ROM_LOAD( "b1.ic27",       0x10000, 0x10000, CRC(728727f0) SHA1(2f594c77a847ebee71c9da8a644f83ea2a1313d7) )
 	ROM_LOAD( "b2.ic25",       0x20000, 0x10000, CRC(f87efd75) SHA1(16474c7ab57b4fbb5cb50799ea6a2326c66706b5) )
@@ -2628,13 +2635,13 @@ ROM_START( nspiritj )
 	ROM_LOAD( "nin-r20.ic49",  0x40000, 0x20000, CRC(ef3617d3) SHA1(16c175cf45559aacdea6e4002dd8a87f16817cfb) )
 	ROM_LOAD( "nin-r30.ic47",  0x60000, 0x20000, CRC(175d2a24) SHA1(d1887efd4d8e74c38c53dbbc541ca8d17f29eb59) )
 
-	ROM_REGION( 0x040000, "gfx2", 0 )
+	ROM_REGION( 0x040000, "tiles0", 0 )
 	ROM_LOAD( "nin_b-a0.ic21", 0x00000, 0x10000, CRC(63f8f658) SHA1(82c02d0f7a2d95dfd8d300c46312d511524775ce) )  // tiles #1
 	ROM_LOAD( "nin_b-a1.ic22", 0x10000, 0x10000, CRC(75eb8306) SHA1(2abc359a0bb2863759a68ed60e730761b9751829) )
 	ROM_LOAD( "nin_b-a2.ic20", 0x20000, 0x10000, CRC(df532172) SHA1(58b5a79a57e71405b3e1abd41d54cf6a4d12873a) )
 	ROM_LOAD( "nin_b-a3.ic23", 0x30000, 0x10000, CRC(4dedd64c) SHA1(8a5c73a024d95e6fe3ab70daafcd5b235418ad36) )
 
-	ROM_REGION( 0x040000, "gfx3", 0 )
+	ROM_REGION( 0x040000, "tiles1", 0 )
 	ROM_LOAD( "b0.ic26",       0x00000, 0x10000, CRC(1b0e08a6) SHA1(892686594970c264babbe8673c258929a5e480f6) )  // tiles #2
 	ROM_LOAD( "b1.ic27",       0x10000, 0x10000, CRC(728727f0) SHA1(2f594c77a847ebee71c9da8a644f83ea2a1313d7) )
 	ROM_LOAD( "b2.ic25",       0x20000, 0x10000, CRC(f87efd75) SHA1(16474c7ab57b4fbb5cb50799ea6a2326c66706b5) )
@@ -2672,13 +2679,13 @@ ROM_START( imgfight )
 	ROM_LOAD( "if-c-20.ic49", 0x40000, 0x20000, CRC(aef33cba) SHA1(2d8a8458207d0c790c81b1285366463c8540d190) )
 	ROM_LOAD( "if-c-30.ic47", 0x60000, 0x20000, CRC(1f98e695) SHA1(5fddcfb17523f8e96f4b85f0cb15d837b81f2bd4) )
 
-	ROM_REGION( 0x040000, "gfx2", 0 )
+	ROM_REGION( 0x040000, "tiles0", 0 )
 	ROM_LOAD( "if_b-a0.ic21", 0x00000, 0x10000, CRC(34ee2d77) SHA1(38826e0318aa8da893fa4c93f217288c015df606) )  // tiles #1
 	ROM_LOAD( "if_b-a1.ic22", 0x10000, 0x10000, CRC(6bd2845b) SHA1(149cf14f919590da88b9a8e254690da010709862) )
 	ROM_LOAD( "if_b-a2.ic20", 0x20000, 0x10000, CRC(090d50e5) SHA1(4f2a7c76320b3f8dafae90a246187e034fe7562b) )
 	ROM_LOAD( "if_b-a3.ic23", 0x30000, 0x10000, CRC(3a8e3083) SHA1(8a75d556790b6bea41ead1a5f95589dd293bdf4e) )
 
-	ROM_REGION( 0x040000, "gfx3", 0 )
+	ROM_REGION( 0x040000, "tiles1", 0 )
 	ROM_LOAD( "if_b-b0.ic26", 0x00000, 0x10000, CRC(b425c829) SHA1(0ccd487dba00bb7cb0ff5d1c67f8fee3e68df5d8) )  // tiles #2
 	ROM_LOAD( "if_b-b1.ic27", 0x10000, 0x10000, CRC(e9bfe23e) SHA1(f97a68dbdce7e06d07faab19acf7625cdc8eeaa8) )
 	ROM_LOAD( "if_b-b2.ic25", 0x20000, 0x10000, CRC(256e50f2) SHA1(9e9fda4f1f1449548942c0da4478f61fe0d263d1) )
@@ -2716,13 +2723,13 @@ ROM_START( imgfightj )
 	ROM_LOAD( "if-c-20.ic49", 0x40000, 0x20000, CRC(aef33cba) SHA1(2d8a8458207d0c790c81b1285366463c8540d190) )
 	ROM_LOAD( "if-c-30.ic47", 0x60000, 0x20000, CRC(1f98e695) SHA1(5fddcfb17523f8e96f4b85f0cb15d837b81f2bd4) )
 
-	ROM_REGION( 0x040000, "gfx2", 0 )
+	ROM_REGION( 0x040000, "tiles0", 0 )
 	ROM_LOAD( "if_b-a0.ic21", 0x00000, 0x10000, CRC(34ee2d77) SHA1(38826e0318aa8da893fa4c93f217288c015df606) )  // tiles #1
 	ROM_LOAD( "if_b-a1.ic22", 0x10000, 0x10000, CRC(6bd2845b) SHA1(149cf14f919590da88b9a8e254690da010709862) )
 	ROM_LOAD( "if_b-a2.ic20", 0x20000, 0x10000, CRC(090d50e5) SHA1(4f2a7c76320b3f8dafae90a246187e034fe7562b) )
 	ROM_LOAD( "if_b-a3.ic23", 0x30000, 0x10000, CRC(3a8e3083) SHA1(8a75d556790b6bea41ead1a5f95589dd293bdf4e) )
 
-	ROM_REGION( 0x040000, "gfx3", 0 )
+	ROM_REGION( 0x040000, "tiles1", 0 )
 	ROM_LOAD( "if_b-b0.ic26", 0x00000, 0x10000, CRC(b425c829) SHA1(0ccd487dba00bb7cb0ff5d1c67f8fee3e68df5d8) )  // tiles #2
 	ROM_LOAD( "if_b-b1.ic27", 0x10000, 0x10000, CRC(e9bfe23e) SHA1(f97a68dbdce7e06d07faab19acf7625cdc8eeaa8) )
 	ROM_LOAD( "if_b-b2.ic25", 0x20000, 0x10000, CRC(256e50f2) SHA1(9e9fda4f1f1449548942c0da4478f61fe0d263d1) )
@@ -2768,13 +2775,13 @@ ROM_START( imgfightjb ) // identical to imgfightj content-wise, it's a 4 PCB sta
 	ROM_LOAD( "ic113.9h", 0x60000, 0x10000, CRC(27caec8e) SHA1(cc1943ba9548715425e799f418750cd70c3f88da) )
 	ROM_LOAD( "ic114.9j", 0x70000, 0x10000, CRC(1933eb65) SHA1(4c24cfd059c11875f53b57cc020fbdbac903bd4a) )
 
-	ROM_REGION( 0x040000, "gfx2", 0 ) // identical
+	ROM_REGION( 0x040000, "tiles0", 0 ) // identical
 	ROM_LOAD( "ic30.3d",  0x00000, 0x10000, CRC(34ee2d77) SHA1(38826e0318aa8da893fa4c93f217288c015df606) )  // tiles #1
 	ROM_LOAD( "ic31.3e",  0x10000, 0x10000, CRC(6bd2845b) SHA1(149cf14f919590da88b9a8e254690da010709862) )
 	ROM_LOAD( "ic29.3c",  0x20000, 0x10000, CRC(090d50e5) SHA1(4f2a7c76320b3f8dafae90a246187e034fe7562b) )
 	ROM_LOAD( "ic32.3f",  0x30000, 0x10000, CRC(3a8e3083) SHA1(8a75d556790b6bea41ead1a5f95589dd293bdf4e) )
 
-	ROM_REGION( 0x040000, "gfx3", 0 ) // identical
+	ROM_REGION( 0x040000, "tiles1", 0 ) // identical
 	ROM_LOAD( "ic35.3k",  0x00000, 0x10000, CRC(b425c829) SHA1(0ccd487dba00bb7cb0ff5d1c67f8fee3e68df5d8) )  // tiles #2
 	ROM_LOAD( "ic36.3l",  0x10000, 0x10000, CRC(e9bfe23e) SHA1(f97a68dbdce7e06d07faab19acf7625cdc8eeaa8) )
 	ROM_LOAD( "ic34.3j",  0x20000, 0x10000, CRC(256e50f2) SHA1(9e9fda4f1f1449548942c0da4478f61fe0d263d1) )
@@ -2804,13 +2811,13 @@ ROM_START( loht )
 	ROM_LOAD( "tom_m49.ic49", 0x40000, 0x20000, CRC(a41d3bfd) SHA1(536fb7c0321dbbc1a8b73e9647fba9c53a253fcc) )
 	ROM_LOAD( "tom_m47.ic47", 0x60000, 0x20000, CRC(9d81a25b) SHA1(a354537c2fbba85f06485aa8487d7583a7133357) )
 
-	ROM_REGION( 0x040000, "gfx2", 0 )
+	ROM_REGION( 0x040000, "tiles0", 0 )
 	ROM_LOAD( "tom_m21.ic21", 0x00000, 0x10000, CRC(3ca3e771) SHA1(be052e01c5429ee89057c9d408794f2c7744047c) )  // tiles #1
 	ROM_LOAD( "tom_m22.ic22", 0x10000, 0x10000, CRC(7a05ee2f) SHA1(7d1ca5db9a5a85610129e3bc6c640ade036fe7f9) )
 	ROM_LOAD( "tom_m20.ic20", 0x20000, 0x10000, CRC(79aa2335) SHA1(6b70c79d800a7b755aa7c9a368c4ea74029aaa1e) )
 	ROM_LOAD( "tom_m23.ic23", 0x30000, 0x10000, CRC(789e8b24) SHA1(e957cd25c3c155ca295ab1aea03d610f91562cfb) )
 
-	ROM_REGION( 0x040000, "gfx3", 0 )
+	ROM_REGION( 0x040000, "tiles1", 0 )
 	ROM_LOAD( "tom_m26.ic26", 0x00000, 0x10000, CRC(44626bf6) SHA1(571ef74d42d30a272ff0fb33f830652b4a4bad29) )  // tiles #2
 	ROM_LOAD( "tom_m27.ic27", 0x10000, 0x10000, CRC(464952cf) SHA1(6b99360b6ba1ed5a72c257f51291f9f7a1ddf363) )
 	ROM_LOAD( "tom_m25.ic25", 0x20000, 0x10000, CRC(3db9b2c7) SHA1(02a318ffc459c494b7f40827eff5f89b41ac0426) )
@@ -2907,13 +2914,13 @@ ROM_START( lohtj )
 	ROM_LOAD( "r220.ic49",    0x40000, 0x20000, CRC(a41d3bfd) SHA1(536fb7c0321dbbc1a8b73e9647fba9c53a253fcc) )
 	ROM_LOAD( "r230.ic47",    0x60000, 0x20000, CRC(9d81a25b) SHA1(a354537c2fbba85f06485aa8487d7583a7133357) )
 
-	ROM_REGION( 0x040000, "gfx2", 0 ) // same data as loht above, just mask ROMs without labels
+	ROM_REGION( 0x040000, "tiles0", 0 ) // same data as loht above, just mask ROMs without labels
 	ROM_LOAD( "r2a0.a0.ic21", 0x00000, 0x10000, CRC(3ca3e771) SHA1(be052e01c5429ee89057c9d408794f2c7744047c) )  // tiles #1
 	ROM_LOAD( "r2a1.a1.ic22", 0x10000, 0x10000, CRC(7a05ee2f) SHA1(7d1ca5db9a5a85610129e3bc6c640ade036fe7f9) )
 	ROM_LOAD( "r2a2.a2.ic20", 0x20000, 0x10000, CRC(79aa2335) SHA1(6b70c79d800a7b755aa7c9a368c4ea74029aaa1e) )
 	ROM_LOAD( "r2a3.a3.ic23", 0x30000, 0x10000, CRC(789e8b24) SHA1(e957cd25c3c155ca295ab1aea03d610f91562cfb) )
 
-	ROM_REGION( 0x040000, "gfx3", 0 ) // same data as loht above, just mask ROMs without labels
+	ROM_REGION( 0x040000, "tiles1", 0 ) // same data as loht above, just mask ROMs without labels
 	ROM_LOAD( "078.b0.ic26",  0x00000, 0x10000, CRC(44626bf6) SHA1(571ef74d42d30a272ff0fb33f830652b4a4bad29) )  // tiles #2
 	ROM_LOAD( "079.b1.ic27",  0x10000, 0x10000, CRC(464952cf) SHA1(6b99360b6ba1ed5a72c257f51291f9f7a1ddf363) )
 	ROM_LOAD( "080.b2.ic25",  0x20000, 0x10000, CRC(3db9b2c7) SHA1(02a318ffc459c494b7f40827eff5f89b41ac0426) )
@@ -2962,13 +2969,13 @@ ROM_START( lohtb )
 	ROM_LOAD( "lohtb20.17",  0x50000, 0x10000, CRC(464d8579) SHA1(b5981f4865ee5439f0e330091927e6d97d29933f) )
 	ROM_LOAD( "lohtb21.18",  0x70000, 0x10000, CRC(a73568c7) SHA1(8fe1867256708cc1ed76d1bed5566b1852b47c40) )
 
-	ROM_REGION( 0x040000, "gfx2", ROMREGION_INVERT )  // tiles #1
+	ROM_REGION( 0x040000, "tiles0", ROMREGION_INVERT )  // tiles #1
 	ROM_LOAD( "lohtb13.10",  0x00000, 0x10000, CRC(359f17d4) SHA1(2875ba48395e7faa1a58404475be936dcca45ed1) )
 	ROM_LOAD( "lohtb11.08",  0x10000, 0x10000, CRC(73391e8a) SHA1(53ca89b8a10895f817ecdb9fa5eef462edb94ae6) )
 	ROM_LOAD( "lohtb09.06",  0x20000, 0x10000, CRC(7096d390) SHA1(f4a16bf8aef7a1a65619ab022cbdb67d2f191888) )
 	ROM_LOAD( "lohtb07.04",  0x30000, 0x10000, CRC(71a27b81) SHA1(d8fe72d15bbcd5b170d1123d8f4c58874cefdca3) )
 
-	ROM_REGION( 0x040000, "gfx3", ROMREGION_INVERT )  // tiles #2
+	ROM_REGION( 0x040000, "tiles1", ROMREGION_INVERT )  // tiles #2
 	ROM_LOAD( "lohtb12.09",  0x00000, 0x10000, CRC(4d5e9b53) SHA1(3e3977bab7a66ed0171afcd555d181960e338749) )
 	ROM_LOAD( "lohtb10.07",  0x10000, 0x10000, CRC(4f75a26a) SHA1(79c09a1ad3a6f9cfbd07cb527bbd89d2478ce582) )
 	ROM_LOAD( "lohtb08.05",  0x20000, 0x10000, CRC(34854262) SHA1(37436c12579fb41d22a1596b495f065959c14a26) )
@@ -3009,13 +3016,13 @@ ROM_START( lohtb2 ) // program ROMs identical to lohtj content-wise, just half s
 	ROM_LOAD( "loht-a6.bin",   0x60000, 0x10000, CRC(763fa4ec) SHA1(2d72b1b41f24ae299fde23869942c0b6bbb82363) ) // == r230 1/2
 	ROM_LOAD( "loht-a7.bin",   0x70000, 0x10000, CRC(a73568c7) SHA1(8fe1867256708cc1ed76d1bed5566b1852b47c40) ) // == r230 1/2
 
-	ROM_REGION( 0x040000, "gfx2", 0 ) // same data as loht/lohtj above
+	ROM_REGION( 0x040000, "tiles0", 0 ) // same data as loht/lohtj above
 	ROM_LOAD( "loht-a19.bin",  0x00000, 0x10000, CRC(3ca3e771) SHA1(be052e01c5429ee89057c9d408794f2c7744047c) )  // tiles #1
 	ROM_LOAD( "loht-a20.bin",  0x10000, 0x10000, CRC(7a05ee2f) SHA1(7d1ca5db9a5a85610129e3bc6c640ade036fe7f9) )
 	ROM_LOAD( "loht-a18.bin",  0x20000, 0x10000, CRC(79aa2335) SHA1(6b70c79d800a7b755aa7c9a368c4ea74029aaa1e) )
 	ROM_LOAD( "loht-a21.bin",  0x30000, 0x10000, CRC(789e8b24) SHA1(e957cd25c3c155ca295ab1aea03d610f91562cfb) )
 
-	ROM_REGION( 0x040000, "gfx3", 0 ) // same data as loht/lohtj above
+	ROM_REGION( 0x040000, "tiles1", 0 ) // same data as loht/lohtj above
 	ROM_LOAD( "loht-a24.bin",  0x00000, 0x10000, CRC(44626bf6) SHA1(571ef74d42d30a272ff0fb33f830652b4a4bad29) )  // tiles #2
 	ROM_LOAD( "loht-a25.bin",  0x10000, 0x10000, CRC(464952cf) SHA1(6b99360b6ba1ed5a72c257f51291f9f7a1ddf363) )
 	ROM_LOAD( "loht-a23.bin",  0x20000, 0x10000, CRC(3db9b2c7) SHA1(02a318ffc459c494b7f40827eff5f89b41ac0426) )
@@ -3052,13 +3059,13 @@ ROM_START( lohtb3 ) // extremely similar to the original. Copyright changed to 1
 	ROM_LOAD( "i-13.13", 0x60000, 0x10000, CRC(763fa4ec) SHA1(2d72b1b41f24ae299fde23869942c0b6bbb82363) ) // == tom_m47.ic47 1/2
 	ROM_LOAD( "i-12.12", 0x70000, 0x10000, CRC(a73568c7) SHA1(8fe1867256708cc1ed76d1bed5566b1852b47c40) ) // == tom_m47.ic47 1/2
 
-	ROM_REGION( 0x040000, "gfx2", 0 ) // same data as loht/lohtj above
+	ROM_REGION( 0x040000, "tiles0", 0 ) // same data as loht/lohtj above
 	ROM_LOAD( "i-20.20",  0x00000, 0x10000, CRC(3ca3e771) SHA1(be052e01c5429ee89057c9d408794f2c7744047c) )  // tiles #1
 	ROM_LOAD( "r-21.21",  0x10000, 0x10000, CRC(7a05ee2f) SHA1(7d1ca5db9a5a85610129e3bc6c640ade036fe7f9) )
 	ROM_LOAD( "i-19.19",  0x20000, 0x10000, CRC(79aa2335) SHA1(6b70c79d800a7b755aa7c9a368c4ea74029aaa1e) )
 	ROM_LOAD( "i-22.22",  0x30000, 0x10000, CRC(789e8b24) SHA1(e957cd25c3c155ca295ab1aea03d610f91562cfb) )
 
-	ROM_REGION( 0x040000, "gfx3", 0 ) // 99.99% same data as loht/lohtj above - one byte difference in i-23.23
+	ROM_REGION( 0x040000, "tiles1", 0 ) // 99.99% same data as loht/lohtj above - one byte difference in i-23.23
 	ROM_LOAD( "r-25.25",  0x00000, 0x10000, CRC(44626bf6) SHA1(571ef74d42d30a272ff0fb33f830652b4a4bad29) )  // tiles #2
 	ROM_LOAD( "r-26.26",  0x10000, 0x10000, CRC(464952cf) SHA1(6b99360b6ba1ed5a72c257f51291f9f7a1ddf363) )
 	ROM_LOAD( "r-24.24",  0x20000, 0x10000, CRC(3db9b2c7) SHA1(02a318ffc459c494b7f40827eff5f89b41ac0426) )
@@ -3315,13 +3322,13 @@ ROM_START( loht_ms ) // really similar to lohtb, even if it runs on 'Modular Har
 	ROM_LOAD( "5_lg_506.ic21",  0x50000, 0x10000, CRC(464d8579) SHA1(b5981f4865ee5439f0e330091927e6d97d29933f) )
 	ROM_LOAD( "5_lg_508.ic27",  0x70000, 0x10000, CRC(a73568c7) SHA1(8fe1867256708cc1ed76d1bed5566b1852b47c40) )
 
-	ROM_REGION( 0x040000, "gfx2", ROMREGION_INVERT ) // tiles #1
+	ROM_REGION( 0x040000, "tiles0", ROMREGION_INVERT ) // tiles #1
 	ROM_LOAD( "8_lg_801.ic15",  0x00000, 0x10000, CRC(359f17d4) SHA1(2875ba48395e7faa1a58404475be936dcca45ed1) )
 	ROM_LOAD( "8_lg_803.ic22",  0x10000, 0x10000, CRC(73391e8a) SHA1(53ca89b8a10895f817ecdb9fa5eef462edb94ae6) )
 	ROM_LOAD( "8_lg_805.ic30",  0x20000, 0x10000, CRC(7096d390) SHA1(f4a16bf8aef7a1a65619ab022cbdb67d2f191888) )
 	ROM_LOAD( "8_lg_807.ic37",  0x30000, 0x10000, CRC(1c113901) SHA1(3d4ce2ac6cdad0e1b0a21ffb062f9c92700adcf4) )
 
-	ROM_REGION( 0x040000, "gfx3", ROMREGION_INVERT ) // tiles #2
+	ROM_REGION( 0x040000, "tiles1", ROMREGION_INVERT ) // tiles #2
 	ROM_LOAD( "8_lg_802.ic14",  0x00000, 0x10000, CRC(4d5e9b53) SHA1(3e3977bab7a66ed0171afcd555d181960e338749) )
 	ROM_LOAD( "8_lg_804.ic21",  0x10000, 0x10000, CRC(4f75a26a) SHA1(79c09a1ad3a6f9cfbd07cb527bbd89d2478ce582) )
 	ROM_LOAD( "8_lg_806.ic29",  0x20000, 0x10000, CRC(34854262) SHA1(37436c12579fb41d22a1596b495f065959c14a26) )
@@ -3374,13 +3381,13 @@ ROM_START( xmultiplm72 )
 	ROM_LOAD( "t50.30.ic47", 0xc0000, 0x20000, CRC(e322543e) SHA1(b4c3a7f202d81485d5f0a7b7668ee89fc1edb215) )
 	ROM_LOAD( "t51.31.ic46", 0xe0000, 0x20000, CRC(229bf7b1) SHA1(ae42c7efbb6278dd3fa56842361138391f2d49ca) )
 
-	ROM_REGION( 0x080000, "gfx2", 0 ) // mask ROMs
+	ROM_REGION( 0x080000, "tiles0", 0 ) // mask ROMs
 	ROM_LOAD( "t53.a0.ic21", 0x00000, 0x20000, CRC(1a082494) SHA1(63a3a84a262833d2cafab41e35df8f10a5e317b1) )  // tiles #1
 	ROM_LOAD( "t54.a1.ic22", 0x20000, 0x20000, CRC(076c16c5) SHA1(4be858806b916953d59aceee550e721eaf3996a6) )
 	ROM_LOAD( "t55.a2.ic20", 0x40000, 0x20000, CRC(25d877a5) SHA1(48c948bf714c432f534c098123c8f50d5561756f) )
 	ROM_LOAD( "t56.a3.ic23", 0x60000, 0x20000, CRC(5b1213f5) SHA1(87782aa0bd04d4378c4ba78b63028ae2709da2f1) )
 
-	ROM_REGION( 0x080000, "gfx3", 0 ) // mask ROMs
+	ROM_REGION( 0x080000, "tiles1", 0 ) // mask ROMs
 	ROM_LOAD( "t57.b0.ic26", 0x00000, 0x20000, CRC(0a84e0c7) SHA1(67ad181a7d2c431cb4bf45955e09754549a03576) )  // tiles #2
 	ROM_LOAD( "t58.b1.ic27", 0x20000, 0x20000, CRC(a874121d) SHA1(1351d5901d55059c6472a4588a2e560396903861) )
 	ROM_LOAD( "t59.b2.ic25", 0x40000, 0x20000, CRC(69deb990) SHA1(1eed3183efbe576376661b45152a0a21240ecfc8) )
@@ -3418,13 +3425,13 @@ ROM_START( dbreedm72 )
 	ROM_LOAD( "db_k802m.20.ic49", 0x40000, 0x20000, CRC(055b4c59) SHA1(71315dd7476612f138cb64b905648791d44eb7da) )
 	ROM_LOAD( "db_k803m.30.ic47", 0x60000, 0x20000, CRC(8ed63922) SHA1(51daa8a23e637f6b4394598ff4a1d26f65b59c8b) )
 
-	ROM_REGION( 0x080000, "gfx2", 0 ) // same roms are duplicated at a0-a3 and b0-b3, confirmed
+	ROM_REGION( 0x080000, "tiles0", 0 ) // same roms are duplicated at a0-a3 and b0-b3, confirmed
 	ROM_LOAD( "db_k804m.a0.ic21", 0x00000, 0x20000, CRC(4c83e92e) SHA1(6dade027435c48ab48bd4516d16a9961d4dd6fad) )   // tiles #1
 	ROM_LOAD( "db_k805m.a1.ic22", 0x20000, 0x20000, CRC(835ef268) SHA1(89d0bb15201440dffad3ef745970f95505d7ab03) )
 	ROM_LOAD( "db_k806m.a2.ic20", 0x40000, 0x20000, CRC(5117f114) SHA1(a401a3e638209b32d4101a5c2e2a8b4612eaa21b) )
 	ROM_LOAD( "db_k807m.a3.ic23", 0x60000, 0x20000, CRC(8eb0c978) SHA1(7fc55bbe4d0923db88492bb7160a89de34e11cd6) )
 
-	ROM_REGION( 0x080000, "gfx3", 0 ) // mask ROMs
+	ROM_REGION( 0x080000, "tiles1", 0 ) // mask ROMs
 	ROM_LOAD( "db_k804m.b0.ic26", 0x00000, 0x20000, CRC(4c83e92e) SHA1(6dade027435c48ab48bd4516d16a9961d4dd6fad) )   // tiles #2
 	ROM_LOAD( "db_k805m.b1.ic27", 0x20000, 0x20000, CRC(835ef268) SHA1(89d0bb15201440dffad3ef745970f95505d7ab03) )
 	ROM_LOAD( "db_k806m.b2.ic25", 0x40000, 0x20000, CRC(5117f114) SHA1(a401a3e638209b32d4101a5c2e2a8b4612eaa21b) )
@@ -3461,13 +3468,13 @@ ROM_START( dbreedjm72 )
 	ROM_LOAD( "db_k802m.20.ic49", 0x40000, 0x20000, CRC(055b4c59) SHA1(71315dd7476612f138cb64b905648791d44eb7da) )
 	ROM_LOAD( "db_k803m.30.ic47", 0x60000, 0x20000, CRC(8ed63922) SHA1(51daa8a23e637f6b4394598ff4a1d26f65b59c8b) )
 
-	ROM_REGION( 0x080000, "gfx2", 0 ) // same roms are duplicated at a0-a3 and b0-b3, confirmed
+	ROM_REGION( 0x080000, "tiles0", 0 ) // same roms are duplicated at a0-a3 and b0-b3, confirmed
 	ROM_LOAD( "db_k804m.a0.ic21", 0x00000, 0x20000, CRC(4c83e92e) SHA1(6dade027435c48ab48bd4516d16a9961d4dd6fad) )   // tiles #1
 	ROM_LOAD( "db_k805m.a1.ic22", 0x20000, 0x20000, CRC(835ef268) SHA1(89d0bb15201440dffad3ef745970f95505d7ab03) )
 	ROM_LOAD( "db_k806m.a2.ic20", 0x40000, 0x20000, CRC(5117f114) SHA1(a401a3e638209b32d4101a5c2e2a8b4612eaa21b) )
 	ROM_LOAD( "db_k807m.a3.ic23", 0x60000, 0x20000, CRC(8eb0c978) SHA1(7fc55bbe4d0923db88492bb7160a89de34e11cd6) )
 
-	ROM_REGION( 0x080000, "gfx3", 0 ) // mask ROMs
+	ROM_REGION( 0x080000, "tiles1", 0 ) // mask ROMs
 	ROM_LOAD( "db_k804m.b0.ic26", 0x00000, 0x20000, CRC(4c83e92e) SHA1(6dade027435c48ab48bd4516d16a9961d4dd6fad) )   // tiles #2
 	ROM_LOAD( "db_k805m.b1.ic27", 0x20000, 0x20000, CRC(835ef268) SHA1(89d0bb15201440dffad3ef745970f95505d7ab03) )
 	ROM_LOAD( "db_k806m.b2.ic25", 0x40000, 0x20000, CRC(5117f114) SHA1(a401a3e638209b32d4101a5c2e2a8b4612eaa21b) )
@@ -3505,13 +3512,13 @@ ROM_START( dkgensanm72 )
 	ROM_LOAD( "hh_20.ic49",    0x40000, 0x20000, CRC(bb0d6ad4) SHA1(4ab617fadfc32efad90ed7f0555513f167b0c43a) )
 	ROM_LOAD( "hh_30.ic47",    0x60000, 0x20000, CRC(4351044e) SHA1(0d3ce3f4f1473fd997e70de91e7b5b5a5ec60ad4) )
 
-	ROM_REGION( 0x040000, "gfx2", 0 )
+	ROM_REGION( 0x040000, "tiles0", 0 )
 	ROM_LOAD( "ge72b-a0.ic21", 0x00000, 0x10000, CRC(f5f56b2a) SHA1(4ef6602052fa70e765d6d7747e672b7108b44f59) )  // tiles #1
 	ROM_LOAD( "ge72-a1.ic22",  0x10000, 0x10000, CRC(d194ea08) SHA1(0270897049cd256472df42f3dda856ee707535cd) )
 	ROM_LOAD( "ge72-a2.ic20",  0x20000, 0x10000, CRC(2b06bcc3) SHA1(36378a4a69f3c3da96d2dc8df48916af8de50009) )
 	ROM_LOAD( "ge72-a3.ic23",  0x30000, 0x10000, CRC(94b96bfa) SHA1(33c1e9045e7a984097f3fe4954b20d954cffbafa) )
 
-	ROM_REGION( 0x040000, "gfx3", 0 )
+	ROM_REGION( 0x040000, "tiles1", 0 )
 	ROM_LOAD( "ge72-b0.ic26",  0x00000, 0x10000, CRC(208796b3) SHA1(38b90732c8d5c77ee84053364a8a7e3daaaabe66) )  // tiles #2
 	ROM_LOAD( "ge72-b1.ic27",  0x10000, 0x10000, CRC(b4a7f490) SHA1(851b40650fc8920b49f43f9cc6f19e845a25e945) )
 	ROM_LOAD( "ge72b-b2.ic25", 0x20000, 0x10000, CRC(34fe8f7f) SHA1(fbf8839b26be55ad83ad4db538ba3e196c1ab945) )
@@ -3560,13 +3567,13 @@ ROM_START( airduelm72 )
 	ROM_LOAD( "ad-20.ic49", 0x40000, 0x20000, CRC(d392aef2) SHA1(0f639a07066cadddc3884eb490885a8745571567) )
 	ROM_LOAD( "ad-30.ic47", 0x60000, 0x20000, CRC(923240c3) SHA1(f587a83329087a715a3e42110f74f104e8c8ef1f) )
 
-	ROM_REGION( 0x080000, "gfx2", 0 ) // mask ROMs
+	ROM_REGION( 0x080000, "tiles0", 0 ) // mask ROMs
 	ROM_LOAD( "ad-a0.ic21", 0x00000, 0x20000, CRC(ce134b47) SHA1(841358cc222c81b8a91edc262f355310d50b4dbb) )  // tiles #1
 	ROM_LOAD( "ad-a1.ic22", 0x20000, 0x20000, CRC(097fd853) SHA1(8e08f4f4a747c899bb8e21b347635e26af9edc2d) )
 	ROM_LOAD( "ad-a2.ic20", 0x40000, 0x20000, CRC(6a94c1b9) SHA1(55174acbac54236e5fc1b80d120cd6da9fe5524c) )
 	ROM_LOAD( "ad-a3.ic23", 0x60000, 0x20000, CRC(6637c349) SHA1(27cb7c89ab73292b43f8ae3c0d803a01ef3d3936) )
 
-	ROM_REGION( 0x080000, "gfx3", 0 ) // mask ROMs
+	ROM_REGION( 0x080000, "tiles1", 0 ) // mask ROMs
 	ROM_LOAD( "ad-b0.ic26", 0x00000, 0x20000, CRC(ce134b47) SHA1(841358cc222c81b8a91edc262f355310d50b4dbb) )  // tiles #2
 	ROM_LOAD( "ad-b1.ic27", 0x20000, 0x20000, CRC(097fd853) SHA1(8e08f4f4a747c899bb8e21b347635e26af9edc2d) )
 	ROM_LOAD( "ad-b2.ic25", 0x40000, 0x20000, CRC(6a94c1b9) SHA1(55174acbac54236e5fc1b80d120cd6da9fe5524c) )
@@ -3604,13 +3611,13 @@ ROM_START( airdueljm72 )
 	ROM_LOAD( "ad-20.ic49", 0x40000, 0x20000, CRC(d392aef2) SHA1(0f639a07066cadddc3884eb490885a8745571567) )
 	ROM_LOAD( "ad-30.ic47", 0x60000, 0x20000, CRC(923240c3) SHA1(f587a83329087a715a3e42110f74f104e8c8ef1f) )
 
-	ROM_REGION( 0x080000, "gfx2", 0 ) // mask ROMs
+	ROM_REGION( 0x080000, "tiles0", 0 ) // mask ROMs
 	ROM_LOAD( "ad-a0.ic21", 0x00000, 0x20000, CRC(ce134b47) SHA1(841358cc222c81b8a91edc262f355310d50b4dbb) )  // tiles #1
 	ROM_LOAD( "ad-a1.ic22", 0x20000, 0x20000, CRC(097fd853) SHA1(8e08f4f4a747c899bb8e21b347635e26af9edc2d) )
 	ROM_LOAD( "ad-a2.ic20", 0x40000, 0x20000, CRC(6a94c1b9) SHA1(55174acbac54236e5fc1b80d120cd6da9fe5524c) )
 	ROM_LOAD( "ad-a3.ic23", 0x60000, 0x20000, CRC(6637c349) SHA1(27cb7c89ab73292b43f8ae3c0d803a01ef3d3936) )
 
-	ROM_REGION( 0x080000, "gfx3", 0 ) // mask ROMs
+	ROM_REGION( 0x080000, "tiles1", 0 ) // mask ROMs
 	ROM_LOAD( "ad-b0.ic26", 0x00000, 0x20000, CRC(ce134b47) SHA1(841358cc222c81b8a91edc262f355310d50b4dbb) )  // tiles #2
 	ROM_LOAD( "ad-b1.ic27", 0x20000, 0x20000, CRC(097fd853) SHA1(8e08f4f4a747c899bb8e21b347635e26af9edc2d) )
 	ROM_LOAD( "ad-b2.ic25", 0x40000, 0x20000, CRC(6a94c1b9) SHA1(55174acbac54236e5fc1b80d120cd6da9fe5524c) )
@@ -3648,13 +3655,13 @@ ROM_START( gallopm72 )
 	ROM_LOAD( "cc_c-20.ic49", 0x40000, 0x20000, CRC(9421489e) SHA1(e43d042bf8b4ebed93558d74ec479ec60a01ca5c) )   // == cc-b-n2.ic32
 	ROM_LOAD( "cc_c-30.ic47", 0x60000, 0x20000, CRC(920ec735) SHA1(2d0949b43dddce7317c45910d6e4868ddf010806) )   // == cc-b-n3.ic22
 
-	ROM_REGION( 0x040000, "gfx2", 0 )  // tiles #1 - same data as the cosmccop/gallop sets split between the 2 tile banks
+	ROM_REGION( 0x040000, "tiles0", 0 )  // tiles #1 - same data as the cosmccop/gallop sets split between the 2 tile banks
 	ROM_LOAD( "cc_b-a0.ic21", 0x00000, 0x10000, CRC(a33472bd) SHA1(962047fe3dd1fb996285ecef615a8ebdb529adef) )   // == cc-d-g00.ic51 [1/2]
 	ROM_LOAD( "cc_b-a1.ic22", 0x10000, 0x10000, CRC(118b1f2d) SHA1(7413ccc67a8aa9dae156e6ee122b1ca5beeb9a76) )   // == cc-d-g10.ic57 [1/2]
 	ROM_LOAD( "cc_b-a2.ic20", 0x20000, 0x10000, CRC(83cebf48) SHA1(12847827ecbf6b493eb9dbddd0a469729d87a451) )   // == cc-d-g20.ic66 [1/2]
 	ROM_LOAD( "cc_b-a3.ic23", 0x30000, 0x10000, CRC(572903fc) SHA1(03305301bcf939e97044e746594736b1ca1d7c0a) )   // == cc-d-g30.ic64 [1/2]
 
-	ROM_REGION( 0x040000, "gfx3", 0 )  // tiles #2 - same data as the cosmccop/gallop sets split between the 2 tile banks
+	ROM_REGION( 0x040000, "tiles1", 0 )  // tiles #2 - same data as the cosmccop/gallop sets split between the 2 tile banks
 	ROM_LOAD( "cc_b-b0.ic26", 0x00000, 0x10000, CRC(0df5b439) SHA1(0775cf92139a111542c8b5f940da0f7f43020982) )   // == cc-d-g00.ic51 [2/2]
 	ROM_LOAD( "cc_b-b1.ic27", 0x10000, 0x10000, CRC(010b778f) SHA1(cc5bfeb0fbe0ed2fe513458c5785ec0ce5b02f53) )   // == cc-d-g10.ic57 [2/2]
 	ROM_LOAD( "cc_b-b2.ic25", 0x20000, 0x10000, CRC(bda9f6fb) SHA1(a6b655ae5bff0568c1fb56ee8a3874fc6524052c) )   // == cc-d-g20.ic66 [2/2]
@@ -3700,13 +3707,13 @@ ROM_START( xmultipl )
 	ROM_LOAD( "t50.30.ic14", 0xc0000, 0x20000, CRC(e322543e) SHA1(b4c3a7f202d81485d5f0a7b7668ee89fc1edb215) )
 	ROM_LOAD( "t51.31.ic13", 0xe0000, 0x20000, CRC(229bf7b1) SHA1(ae42c7efbb6278dd3fa56842361138391f2d49ca) )
 
-	ROM_REGION( 0x080000, "gfx2", 0 ) // mask ROMs
+	ROM_REGION( 0x080000, "tiles0", 0 ) // mask ROMs
 	ROM_LOAD( "t53.a0.ic50", 0x00000, 0x20000, CRC(1a082494) SHA1(63a3a84a262833d2cafab41e35df8f10a5e317b1) )  // tiles #1
 	ROM_LOAD( "t54.a1.ic49", 0x20000, 0x20000, CRC(076c16c5) SHA1(4be858806b916953d59aceee550e721eaf3996a6) )
 	ROM_LOAD( "t55.a2.ic51", 0x40000, 0x20000, CRC(25d877a5) SHA1(48c948bf714c432f534c098123c8f50d5561756f) )
 	ROM_LOAD( "t56.a3.ic52", 0x60000, 0x20000, CRC(5b1213f5) SHA1(87782aa0bd04d4378c4ba78b63028ae2709da2f1) )
 
-	ROM_REGION( 0x080000, "gfx3", 0 ) // mask ROMs
+	ROM_REGION( 0x080000, "tiles1", 0 ) // mask ROMs
 	// b0-b3 are populated, Jumper J3 on the M81-B-B board is set to 'W' meaning use the ROMs from the b0-b3 positions
 	ROM_LOAD( "t57.b0.ic47", 0x00000, 0x20000, CRC(0a84e0c7) SHA1(67ad181a7d2c431cb4bf45955e09754549a03576) )  // tiles #2
 	ROM_LOAD( "t58.b1.ic48", 0x20000, 0x20000, CRC(a874121d) SHA1(1351d5901d55059c6472a4588a2e560396903861) )
@@ -3746,13 +3753,13 @@ ROM_START( hharry ) // where you see gen=81= actual label reads GEN(81)
 	ROM_LOAD( "gen=m81=_20.ic12", 0x40000, 0x20000, CRC(bb0d6ad4) SHA1(4ab617fadfc32efad90ed7f0555513f167b0c43a) )
 	ROM_LOAD( "gen=m81=_30.ic14", 0x60000, 0x20000, CRC(4351044e) SHA1(0d3ce3f4f1473fd997e70de91e7b5b5a5ec60ad4) )
 
-	ROM_REGION( 0x080000, "gfx2", ROMREGION_ERASEFF ) // tiles - located on M81-B-B daughterboard
+	ROM_REGION( 0x080000, "tiles0", ROMREGION_ERASEFF ) // tiles - located on M81-B-B daughterboard
 	ROM_LOAD( "gen=m81=_a0.ic50", 0x00000, 0x20000, CRC(c577ba5f) SHA1(c882e58cf64deca8eee6f14f3df43ecc932488fc) ) // mask ROMs with no labels
 	ROM_LOAD( "gen=m81=_a1.ic49", 0x20000, 0x20000, CRC(429d12ab) SHA1(ccba25eab981fc4e664f76e06a2964066f2ae2e8) )
 	ROM_LOAD( "gen=m81=_a2.ic51", 0x40000, 0x20000, CRC(b5b163b0) SHA1(82a708fea4953a7c4dcd1d4a1b07f302221ba30b) )
 	ROM_LOAD( "gen=m81=_a3.ic52", 0x60000, 0x20000, CRC(8ef566a1) SHA1(3afb020a7317efe89c18b2a7773894ce28499d49) )
 
-	ROM_REGION( 0x080000, "gfx3", ROMREGION_ERASEFF )
+	ROM_REGION( 0x080000, "tiles1", ROMREGION_ERASEFF )
 	// b0-b3 are unpopulated, Jumper J3 on the M81-B-B board is set to 'S' meaning use the ROMs from the a0-a3 positions
 
 	ROM_REGION( 0x20000, "samples", 0 ) // samples
@@ -3788,13 +3795,13 @@ ROM_START( dbreed )
 	ROM_LOAD( "db_k802m.20.ic12", 0x40000, 0x20000, CRC(055b4c59) SHA1(71315dd7476612f138cb64b905648791d44eb7da) )
 	ROM_LOAD( "db_k803m.30.ic14", 0x60000, 0x20000, CRC(8ed63922) SHA1(51daa8a23e637f6b4394598ff4a1d26f65b59c8b) )
 
-	ROM_REGION( 0x080000, "gfx2", ROMREGION_ERASEFF ) // mask ROMs
+	ROM_REGION( 0x080000, "tiles0", ROMREGION_ERASEFF ) // mask ROMs
 	ROM_LOAD( "db_k804m.a0.ic50", 0x00000, 0x20000, CRC(4c83e92e) SHA1(6dade027435c48ab48bd4516d16a9961d4dd6fad) )   // tiles
 	ROM_LOAD( "db_k805m.a1.ic49", 0x20000, 0x20000, CRC(835ef268) SHA1(89d0bb15201440dffad3ef745970f95505d7ab03) )
 	ROM_LOAD( "db_k806m.a2.ic51", 0x40000, 0x20000, CRC(5117f114) SHA1(a401a3e638209b32d4101a5c2e2a8b4612eaa21b) )
 	ROM_LOAD( "db_k807m.a3.ic52", 0x60000, 0x20000, CRC(8eb0c978) SHA1(7fc55bbe4d0923db88492bb7160a89de34e11cd6) )
 
-	ROM_REGION( 0x080000, "gfx3", ROMREGION_ERASEFF )
+	ROM_REGION( 0x080000, "tiles1", ROMREGION_ERASEFF )
 	// b0-b3 are unpopulated, Jumper J3 on the M81-B-B board is set to 'S' meaning use the ROMs from the a0-a3 positions
 
 	ROM_REGION( 0x20000, "samples", 0 )
@@ -3834,7 +3841,7 @@ ROM_START( majtitle )
 	ROM_LOAD( "mt_n2.ic46",   0x80000, 0x40000, CRC(4f5d665b) SHA1(f539d0f5c738ffabfac16121706abe3bb3b2a1fa) )
 	ROM_LOAD( "mt_n3.ic36",   0xc0000, 0x40000, CRC(83571549) SHA1(ce0b89aa4b3e3e1cf6ec6136f956577267cdd9d3) )
 
-	ROM_REGION( 0x080000, "gfx2", 0 ) // mask ROMs
+	ROM_REGION( 0x080000, "tiles0", 0 ) // mask ROMs
 	ROM_LOAD( "mt_c0.ic49",   0x00000, 0x20000, CRC(780e7a02) SHA1(9776ecb8b5d86636061f8360464001a63bec0842) )  // tiles
 	ROM_LOAD( "mt_c1.ic48",   0x20000, 0x20000, CRC(45ad1381) SHA1(de281398dcd1c547bde9fa86f8ca409dd8d4aa6c) )
 	ROM_LOAD( "mt_c2.ic57",   0x40000, 0x20000, CRC(5df5856d) SHA1(f16163f672de6701b411315c9956ddb74c8464ce) )
@@ -3878,7 +3885,7 @@ ROM_START( majtitlej )
 	ROM_LOAD( "mt_n2.ic46",   0x80000, 0x40000, CRC(4f5d665b) SHA1(f539d0f5c738ffabfac16121706abe3bb3b2a1fa) )
 	ROM_LOAD( "mt_n3.ic36",   0xc0000, 0x40000, CRC(83571549) SHA1(ce0b89aa4b3e3e1cf6ec6136f956577267cdd9d3) )
 
-	ROM_REGION( 0x080000, "gfx2", 0 ) // mask ROMs
+	ROM_REGION( 0x080000, "tiles0", 0 ) // mask ROMs
 	ROM_LOAD( "mt_c0.ic49",   0x00000, 0x20000, CRC(780e7a02) SHA1(9776ecb8b5d86636061f8360464001a63bec0842) )  // tiles
 	ROM_LOAD( "mt_c1.ic48",   0x20000, 0x20000, CRC(45ad1381) SHA1(de281398dcd1c547bde9fa86f8ca409dd8d4aa6c) )
 	ROM_LOAD( "mt_c2.ic57",   0x40000, 0x20000, CRC(5df5856d) SHA1(f16163f672de6701b411315c9956ddb74c8464ce) )
@@ -3923,7 +3930,7 @@ ROM_START( airduel )
 	ROM_LOAD( "ad_=m82=_b-n2-d.ic46", 0x40000, 0x20000, CRC(d392aef2) SHA1(0f639a07066cadddc3884eb490885a8745571567) )
 	ROM_LOAD( "ad_=m82=_b-n3-d.ic36", 0x60000, 0x20000, CRC(923240c3) SHA1(f587a83329087a715a3e42110f74f104e8c8ef1f) )
 
-	ROM_REGION( 0x080000, "gfx2", 0 )
+	ROM_REGION( 0x080000, "tiles0", 0 )
 	ROM_LOAD( "ad_=m82=_a-c0-d.ic49", 0x00000, 0x20000, CRC(ce134b47) SHA1(841358cc222c81b8a91edc262f355310d50b4dbb) )  // tiles
 	ROM_LOAD( "ad_=m82=_a-c1-d.ic48", 0x20000, 0x20000, CRC(097fd853) SHA1(8e08f4f4a747c899bb8e21b347635e26af9edc2d) )
 	ROM_LOAD( "ad_=m82=_a-c2-d.ic57", 0x40000, 0x20000, CRC(6a94c1b9) SHA1(55174acbac54236e5fc1b80d120cd6da9fe5524c) )
@@ -3962,7 +3969,7 @@ ROM_START( airduelu )
 	ROM_LOAD( "r10-obj2.ic46", 0x40000, 0x20000, CRC(d392aef2) SHA1(0f639a07066cadddc3884eb490885a8745571567) )
 	ROM_LOAD( "r10-obj3.ic36", 0x60000, 0x20000, CRC(923240c3) SHA1(f587a83329087a715a3e42110f74f104e8c8ef1f) )
 
-	ROM_REGION( 0x080000, "gfx2", 0 ) // same data as airduel
+	ROM_REGION( 0x080000, "tiles0", 0 ) // same data as airduel
 	ROM_LOAD( "r10-chr0.ic49", 0x00000, 0x20000, CRC(ce134b47) SHA1(841358cc222c81b8a91edc262f355310d50b4dbb) )  // tiles
 	ROM_LOAD( "r10-chr1.ic48", 0x20000, 0x20000, CRC(097fd853) SHA1(8e08f4f4a747c899bb8e21b347635e26af9edc2d) )
 	ROM_LOAD( "r10-chr2.ic57", 0x40000, 0x20000, CRC(6a94c1b9) SHA1(55174acbac54236e5fc1b80d120cd6da9fe5524c) )
@@ -4002,7 +4009,7 @@ ROM_START( rtypem82b )
 	ROM_LOAD( "rt_n2.ic46", 0x40000, 0x20000, CRC(6310dd0e) SHA1(4e4a50ef64cdfddea10d415a4b2d2490c1364074) )
 	ROM_LOAD( "rt_n3.ic36", 0x60000, 0x20000, CRC(dd9674fb) SHA1(925bbd64015ec9109a74ce80747bea2bfdb0cde6) )
 
-	ROM_REGION( 0x100000, "gfx2", 0 )
+	ROM_REGION( 0x100000, "tiles0", 0 )
 	ROM_LOAD( "rt_c0.ic38", 0x00000, 0x40000, CRC(c2511272) SHA1(138dd131f827215f13ba0761cacc0f383b5e5a48) )  // tiles
 	ROM_LOAD( "rt_c1.ic39", 0x40000, 0x40000, CRC(6da33dae) SHA1(2b5f686c5c8e45a896ab115818066d03af767cb5) )
 	ROM_LOAD( "rt_c2.ic40", 0x80000, 0x40000, CRC(29322d6e) SHA1(b553d46f1270dcc4754800e65c21b5e418994fcd) )
@@ -4036,7 +4043,7 @@ ROM_START( rtype2m82b )
 	ROM_LOAD( "rt2_n2.ic46", 0x40000, 0x20000, CRC(ec3a0450) SHA1(632bdd397f1bc67f6970faf7d09ab8d911e105fe) )
 	ROM_LOAD( "rt2_n3.ic36", 0x60000, 0x20000, CRC(db6176fc) SHA1(1eaf72af0322490c98461aded202288e387caac1) )
 
-	ROM_REGION( 0x100000, "gfx2", 0 )
+	ROM_REGION( 0x100000, "tiles0", 0 )
 	ROM_LOAD( "rt2_c0.ic38", 0x00000, 0x40000, CRC(f5bad5f2) SHA1(dc86b93f62e8947e3551f07e393e740e5dc43f5e) )  // tiles
 	ROM_LOAD( "rt2_c1.ic39", 0x40000, 0x40000, CRC(71451778) SHA1(52ca7aa8522b988a19556313041450c767dad054) )
 	ROM_LOAD( "rt2_c2.ic40", 0x80000, 0x40000, CRC(c6b0c352) SHA1(eec4fa88c27815960106881e7ccb23e62556bf1c) )
@@ -4071,7 +4078,7 @@ ROM_START( dkgensanm82 )
 	ROM_LOAD( "gen_=m72=_c-h0-b.ic46", 0x40000, 0x20000, CRC(bb0d6ad4) SHA1(4ab617fadfc32efad90ed7f0555513f167b0c43a) )
 	ROM_LOAD( "gen_=m72=_c-h3-b.ic36", 0x60000, 0x20000, CRC(4351044e) SHA1(0d3ce3f4f1473fd997e70de91e7b5b5a5ec60ad4) )
 
-	ROM_REGION( 0x080000, "gfx2", 0 )
+	ROM_REGION( 0x080000, "tiles0", 0 )
 	ROM_LOAD( "gen_=m81=_a-l0-a.ic49", 0x00000, 0x20000, CRC(c577ba5f) SHA1(c882e58cf64deca8eee6f14f3df43ecc932488fc) )  // tiles
 	ROM_LOAD( "gen_=m81=_a-l1-a.ic48", 0x20000, 0x20000, CRC(429d12ab) SHA1(ccba25eab981fc4e664f76e06a2964066f2ae2e8) )
 	ROM_LOAD( "gen_=m81=_a-h0-a.ic57", 0x40000, 0x20000, CRC(b5b163b0) SHA1(82a708fea4953a7c4dcd1d4a1b07f302221ba30b) )
@@ -4116,7 +4123,7 @@ ROM_START( rtype2 )
 	ROM_LOAD( "rt2_b-n2.ic32", 0x40000, 0x20000, CRC(ec3a0450) SHA1(632bdd397f1bc67f6970faf7d09ab8d911e105fe) )
 	ROM_LOAD( "rt2_b-n3.ic22", 0x60000, 0x20000, CRC(db6176fc) SHA1(1eaf72af0322490c98461aded202288e387caac1) )
 
-	ROM_REGION( 0x100000, "gfx2", 0 ) // tiles - located on M84-A-A mainboard
+	ROM_REGION( 0x100000, "tiles0", 0 ) // tiles - located on M84-A-A mainboard
 	ROM_LOAD( "rt2_a-g00.ic50", 0x00000, 0x20000, CRC(f3f8736e) SHA1(37872b30459ad05b2981d4ac84983f3b52d0d2d6) )  // mask ROMs with no labels
 	ROM_LOAD( "rt2_a-g01.ic51", 0x20000, 0x20000, CRC(b4c543af) SHA1(56042eba711160fc701021c8787414dcaddcdecb) )
 	ROM_LOAD( "rt2_a-g10.ic56", 0x40000, 0x20000, CRC(4cb80d66) SHA1(31c5496c14b277e428a2f22195fe1742d6a577d4) )
@@ -4158,7 +4165,7 @@ ROM_START( rtype2j )
 	ROM_LOAD( "rt2_b-n2.ic32", 0x40000, 0x20000, CRC(ec3a0450) SHA1(632bdd397f1bc67f6970faf7d09ab8d911e105fe) )
 	ROM_LOAD( "rt2_b-n3.ic22", 0x60000, 0x20000, CRC(db6176fc) SHA1(1eaf72af0322490c98461aded202288e387caac1) )
 
-	ROM_REGION( 0x100000, "gfx2", 0 ) // tiles - located on M84-A-A mainboard
+	ROM_REGION( 0x100000, "tiles0", 0 ) // tiles - located on M84-A-A mainboard
 	ROM_LOAD( "rt2_a-g00.ic50", 0x00000, 0x20000, CRC(f3f8736e) SHA1(37872b30459ad05b2981d4ac84983f3b52d0d2d6) )  // mask ROMs with no labels
 	ROM_LOAD( "rt2_a-g01.ic51", 0x20000, 0x20000, CRC(b4c543af) SHA1(56042eba711160fc701021c8787414dcaddcdecb) )
 	ROM_LOAD( "rt2_a-g10.ic56", 0x40000, 0x20000, CRC(4cb80d66) SHA1(31c5496c14b277e428a2f22195fe1742d6a577d4) )
@@ -4200,7 +4207,7 @@ ROM_START( rtype2jc )
 	ROM_LOAD( "rt2_b-n2.ic32", 0x40000, 0x20000, CRC(ec3a0450) SHA1(632bdd397f1bc67f6970faf7d09ab8d911e105fe) )
 	ROM_LOAD( "rt2_b-n3.ic22", 0x60000, 0x20000, CRC(db6176fc) SHA1(1eaf72af0322490c98461aded202288e387caac1) )
 
-	ROM_REGION( 0x100000, "gfx2", 0 ) // tiles - located on M84-A-A mainboard
+	ROM_REGION( 0x100000, "tiles0", 0 ) // tiles - located on M84-A-A mainboard
 	ROM_LOAD( "rt2_a-g00.ic50", 0x00000, 0x20000, CRC(f3f8736e) SHA1(37872b30459ad05b2981d4ac84983f3b52d0d2d6) )  // mask ROMs with no labels
 	ROM_LOAD( "rt2_a-g01.ic51", 0x20000, 0x20000, CRC(b4c543af) SHA1(56042eba711160fc701021c8787414dcaddcdecb) )
 	ROM_LOAD( "rt2_a-g10.ic56", 0x40000, 0x20000, CRC(4cb80d66) SHA1(31c5496c14b277e428a2f22195fe1742d6a577d4) )
@@ -4243,7 +4250,7 @@ ROM_START( hharryu ) // where you see gen=84= actual label reads GEN(84)
 	ROM_LOAD( "hh_n2.ic35", 0x40000, 0x20000, CRC(bb0d6ad4) SHA1(4ab617fadfc32efad90ed7f0555513f167b0c43a) )
 	ROM_LOAD( "hh_n3.ic36", 0x60000, 0x20000, CRC(4351044e) SHA1(0d3ce3f4f1473fd997e70de91e7b5b5a5ec60ad4) )
 
-	ROM_REGION( 0x080000, "gfx2", 0 )  // tiles
+	ROM_REGION( 0x080000, "tiles0", 0 )  // tiles
 	ROM_LOAD( "hh_a0.ic51", 0x00000, 0x20000, CRC(c577ba5f) SHA1(c882e58cf64deca8eee6f14f3df43ecc932488fc) )  // mask ROMs with no labels
 	ROM_LOAD( "hh_a1.ic57", 0x20000, 0x20000, CRC(429d12ab) SHA1(ccba25eab981fc4e664f76e06a2964066f2ae2e8) )
 	ROM_LOAD( "hh_a2.ic66", 0x40000, 0x20000, CRC(b5b163b0) SHA1(82a708fea4953a7c4dcd1d4a1b07f302221ba30b) )
@@ -4281,7 +4288,7 @@ ROM_START( dkgensan ) // where you see gen=84= actual label reads GEN(84)
 	ROM_LOAD( "hh_n2.ic35", 0x40000, 0x20000, CRC(bb0d6ad4) SHA1(4ab617fadfc32efad90ed7f0555513f167b0c43a) )
 	ROM_LOAD( "hh_n3.ic36", 0x60000, 0x20000, CRC(4351044e) SHA1(0d3ce3f4f1473fd997e70de91e7b5b5a5ec60ad4) )
 
-	ROM_REGION( 0x080000, "gfx2", 0 )  // tiles
+	ROM_REGION( 0x080000, "tiles0", 0 )  // tiles
 	ROM_LOAD( "hh_a0.ic51", 0x00000, 0x20000, CRC(c577ba5f) SHA1(c882e58cf64deca8eee6f14f3df43ecc932488fc) )  // mask ROMs with no labels
 	ROM_LOAD( "hh_a1.ic57", 0x20000, 0x20000, CRC(429d12ab) SHA1(ccba25eab981fc4e664f76e06a2964066f2ae2e8) )
 	ROM_LOAD( "hh_a2.ic66", 0x40000, 0x20000, CRC(b5b163b0) SHA1(82a708fea4953a7c4dcd1d4a1b07f302221ba30b) )
@@ -4319,7 +4326,7 @@ ROM_START( hharryb )
 	ROM_LOAD( "14-c-27c010a.bin",    0x40000, 0x20000, CRC(bb0d6ad4) SHA1(4ab617fadfc32efad90ed7f0555513f167b0c43a) )
 	ROM_LOAD( "15-c-27c010a.bin",    0x60000, 0x20000, CRC(4351044e) SHA1(0d3ce3f4f1473fd997e70de91e7b5b5a5ec60ad4) )
 
-	ROM_REGION( 0x080000, "gfx2", 0 )
+	ROM_REGION( 0x080000, "tiles0", 0 )
 	ROM_LOAD( "13-b-27c010a.bin",   0x00000, 0x20000, CRC(c577ba5f) SHA1(c882e58cf64deca8eee6f14f3df43ecc932488fc) ) // Same data as other M84 Hammerin' Harry sets
 	ROM_LOAD( "11-b-27c010a.bin",   0x20000, 0x20000, CRC(429d12ab) SHA1(ccba25eab981fc4e664f76e06a2964066f2ae2e8) )
 	ROM_LOAD( "9-b-27c010a.bin",    0x40000, 0x20000, CRC(b5b163b0) SHA1(82a708fea4953a7c4dcd1d4a1b07f302221ba30b) )
@@ -4359,7 +4366,7 @@ ROM_START( hharryb2 ) // 2-PCB set marked TON/A and TON/B (same as the lohtb set
 	ROM_LOAD( "ic4",  0x60000, 0x10000, CRC(2be70871) SHA1(2f3ba46cad67916d1067522fd1779119b71246c9) )
 	ROM_LOAD( "ic33", 0x70000, 0x10000, CRC(eb0ae4a1) SHA1(66da41ad424498c3f58865dbc1de2256a45fd05a) )
 
-	ROM_REGION( 0x080000, "gfx2", 0 ) // on bottom PCB
+	ROM_REGION( 0x080000, "tiles0", 0 ) // on bottom PCB
 	ROM_LOAD( "8.ic139",  0x00000, 0x10000, CRC(208796b3) SHA1(38b90732c8d5c77ee84053364a8a7e3daaaabe66) )
 	ROM_LOAD( "7.ic140",  0x10000, 0x10000, CRC(f5f56b2a) SHA1(4ef6602052fa70e765d6d7747e672b7108b44f59) )
 	ROM_LOAD( "10.ic137", 0x20000, 0x10000, CRC(b4a7f490) SHA1(851b40650fc8920b49f43f9cc6f19e845a25e945) )
@@ -4388,7 +4395,7 @@ ROM_START( cosmccop )
 	ROM_LOAD( "cc_b-n2-.ic32", 0x40000, 0x20000, CRC(9421489e) SHA1(e43d042bf8b4ebed93558d74ec479ec60a01ca5c) )   // == cc-c-20.ic49
 	ROM_LOAD( "cc_b-n3-.ic22", 0x60000, 0x20000, CRC(920ec735) SHA1(2d0949b43dddce7317c45910d6e4868ddf010806) )   // == cc-c-30.ic47
 
-	ROM_REGION( 0x080000, "gfx2", 0 )  // tiles - same data, different format as the gallopa set
+	ROM_REGION( 0x080000, "tiles0", 0 )  // tiles - same data, different format as the gallopa set
 	ROM_LOAD( "cc_d-g00-.ic51", 0x00000, 0x20000, CRC(e7f3d772) SHA1(c7f0bc42e8dde7bae334c7974c3d0ddba3856144) )   // == cc-b-a0.ic21 + cc-b-b0.ic26
 	ROM_LOAD( "cc_d-g10-.ic57", 0x20000, 0x20000, CRC(418b4e4c) SHA1(1191f12741ee7a360240f706534c9c83be8d5c2d) )   // == cc-b-a1.ic22 + cc-b-b1.ic27
 	ROM_LOAD( "cc_d-g20-.ic66", 0x40000, 0x20000, CRC(a4b558eb) SHA1(0babf725de0065dbeca73fa170bd33565305d129) )   // == cc-b-a2.ic20 + cc-b-b2.ic25
@@ -4425,7 +4432,7 @@ ROM_START( gallop )
 	ROM_LOAD( "cc_b-n2-.ic32", 0x40000, 0x20000, CRC(9421489e) SHA1(e43d042bf8b4ebed93558d74ec479ec60a01ca5c) )   // == cc-c-20.ic49
 	ROM_LOAD( "cc_b-n3-.ic22", 0x60000, 0x20000, CRC(920ec735) SHA1(2d0949b43dddce7317c45910d6e4868ddf010806) )   // == cc-c-30.ic47
 
-	ROM_REGION( 0x080000, "gfx2", 0 )  // tiles - same data, different format as the gallopa set
+	ROM_REGION( 0x080000, "tiles0", 0 )  // tiles - same data, different format as the gallopa set
 	ROM_LOAD( "cc_d-g00-.ic51", 0x00000, 0x20000, CRC(e7f3d772) SHA1(c7f0bc42e8dde7bae334c7974c3d0ddba3856144) )   // == cc-b-a0.ic21 + cc-b-b0.ic26
 	ROM_LOAD( "cc_d-g10-.ic57", 0x20000, 0x20000, CRC(418b4e4c) SHA1(1191f12741ee7a360240f706534c9c83be8d5c2d) )   // == cc-b-a1.ic22 + cc-b-b1.ic27
 	ROM_LOAD( "cc_d-g20-.ic66", 0x40000, 0x20000, CRC(a4b558eb) SHA1(0babf725de0065dbeca73fa170bd33565305d129) )   // == cc-b-a2.ic20 + cc-b-b2.ic25
@@ -4462,7 +4469,7 @@ ROM_START( ltswords )
 	ROM_LOAD( "ken_m32.ic32",  0x40000, 0x20000, CRC(30a844c4) SHA1(72b2caba3ee7a229ca56f004516dea8d3f0a7ba6) )
 	ROM_LOAD( "ken_m22.ic22",  0x60000, 0x20000, CRC(a00dac85) SHA1(0c1ed852795046926f62843f6b256cbeecf9ebcf) )
 
-	ROM_REGION( 0x080000, "gfx2", 0 ) // mask ROMs
+	ROM_REGION( 0x080000, "tiles0", 0 ) // mask ROMs
 	ROM_LOAD( "ken_m51.ic51",  0x00000, 0x20000, CRC(1646cf4f) SHA1(d240cb2bad3e766128e8e40aa7b1bf4f3b9a5559) )  // tiles
 	ROM_LOAD( "ken_m57.ic57",  0x20000, 0x20000, CRC(a9f88d90) SHA1(c8d4a96fe55fed4b7499550f3c74b03d10306757) )
 	ROM_LOAD( "ken_m66.ic66",  0x40000, 0x20000, CRC(e9d17645) SHA1(fbe18d6691686a1c458d4a91169c9850698b5ca7) )
@@ -4498,7 +4505,7 @@ ROM_START( kengo )
 	ROM_LOAD( "ken_m32.ic32",  0x40000, 0x20000, CRC(30a844c4) SHA1(72b2caba3ee7a229ca56f004516dea8d3f0a7ba6) )
 	ROM_LOAD( "ken_m22.ic22",  0x60000, 0x20000, CRC(a00dac85) SHA1(0c1ed852795046926f62843f6b256cbeecf9ebcf) )
 
-	ROM_REGION( 0x080000, "gfx2", 0 ) // mask ROMs
+	ROM_REGION( 0x080000, "tiles0", 0 ) // mask ROMs
 	ROM_LOAD( "ken_m51.ic51",  0x00000, 0x20000, CRC(1646cf4f) SHA1(d240cb2bad3e766128e8e40aa7b1bf4f3b9a5559) )  // tiles
 	ROM_LOAD( "ken_m57.ic57",  0x20000, 0x20000, CRC(a9f88d90) SHA1(c8d4a96fe55fed4b7499550f3c74b03d10306757) )
 	ROM_LOAD( "ken_m66.ic66",  0x40000, 0x20000, CRC(e9d17645) SHA1(fbe18d6691686a1c458d4a91169c9850698b5ca7) )
@@ -4534,7 +4541,7 @@ ROM_START( kengoj )
 	ROM_LOAD( "ken_m32.ic32",  0x40000, 0x20000, CRC(30a844c4) SHA1(72b2caba3ee7a229ca56f004516dea8d3f0a7ba6) )
 	ROM_LOAD( "ken_m22.ic22",  0x60000, 0x20000, CRC(a00dac85) SHA1(0c1ed852795046926f62843f6b256cbeecf9ebcf) )
 
-	ROM_REGION( 0x080000, "gfx2", 0 ) // mask ROMs
+	ROM_REGION( 0x080000, "tiles0", 0 ) // mask ROMs
 	ROM_LOAD( "ken_m51.ic51",  0x00000, 0x20000, CRC(1646cf4f) SHA1(d240cb2bad3e766128e8e40aa7b1bf4f3b9a5559) )  // tiles
 	ROM_LOAD( "ken_m57.ic57",  0x20000, 0x20000, CRC(a9f88d90) SHA1(c8d4a96fe55fed4b7499550f3c74b03d10306757) )
 	ROM_LOAD( "ken_m66.ic66",  0x40000, 0x20000, CRC(e9d17645) SHA1(fbe18d6691686a1c458d4a91169c9850698b5ca7) )
@@ -4577,7 +4584,7 @@ ROM_START( poundfor )
 	ROM_LOAD( "ppb-n2.ic35", 0x80000, 0x40000, CRC(318c0b5f) SHA1(1d4cd17dc2f8fc4e523eaf679f21d83e1bfade4e) )
 	ROM_LOAD( "ppb-n3.ic10", 0xc0000, 0x40000, CRC(93dc9490) SHA1(3df4d57a7bf19443f5aa6a416bcee968f81d9059) )
 
-	ROM_REGION( 0x080000, "gfx2", 0 ) // Located on M85-A-B CPU/Sound board
+	ROM_REGION( 0x080000, "tiles0", 0 ) // Located on M85-A-B CPU/Sound board
 	ROM_LOAD( "ppa-g00.ic19", 0x00000, 0x20000, CRC(8a88a174) SHA1(d360b9014aec31960538ee488894496248a820dc) )  // tiles
 	ROM_LOAD( "ppa-g10.ic11", 0x20000, 0x20000, CRC(e48a66ac) SHA1(49b33db6a922d6f1d1417e28714a67431b7c0217) )
 	ROM_LOAD( "ppa-g20.ic18", 0x40000, 0x20000, CRC(12b93e79) SHA1(f3d2b76a30874827c8998c1d13a55a3990b699b7) )
@@ -4614,7 +4621,7 @@ ROM_START( poundforj )
 	ROM_LOAD( "ppb-n2.ic35", 0x80000, 0x40000, CRC(318c0b5f) SHA1(1d4cd17dc2f8fc4e523eaf679f21d83e1bfade4e) )
 	ROM_LOAD( "ppb-n3.ic10", 0xc0000, 0x40000, CRC(93dc9490) SHA1(3df4d57a7bf19443f5aa6a416bcee968f81d9059) )
 
-	ROM_REGION( 0x080000, "gfx2", 0 ) // Located on M85-A-B CPU/Sound board
+	ROM_REGION( 0x080000, "tiles0", 0 ) // Located on M85-A-B CPU/Sound board
 	ROM_LOAD( "ppa-g00.ic19", 0x00000, 0x20000, CRC(8a88a174) SHA1(d360b9014aec31960538ee488894496248a820dc) )  // tiles
 	ROM_LOAD( "ppa-g10.ic11", 0x20000, 0x20000, CRC(e48a66ac) SHA1(49b33db6a922d6f1d1417e28714a67431b7c0217) )
 	ROM_LOAD( "ppa-g20.ic18", 0x40000, 0x20000, CRC(12b93e79) SHA1(f3d2b76a30874827c8998c1d13a55a3990b699b7) )
@@ -4651,7 +4658,7 @@ ROM_START( poundforu )
 	ROM_LOAD( "ppb-n2.ic35", 0x80000, 0x40000, CRC(318c0b5f) SHA1(1d4cd17dc2f8fc4e523eaf679f21d83e1bfade4e) )
 	ROM_LOAD( "ppb-n3.ic10", 0xc0000, 0x40000, CRC(93dc9490) SHA1(3df4d57a7bf19443f5aa6a416bcee968f81d9059) )
 
-	ROM_REGION( 0x080000, "gfx2", 0 ) // Located on M85-A-B CPU/Sound board
+	ROM_REGION( 0x080000, "tiles0", 0 ) // Located on M85-A-B CPU/Sound board
 	ROM_LOAD( "ppa-g00.ic19", 0x00000, 0x20000, CRC(8a88a174) SHA1(d360b9014aec31960538ee488894496248a820dc) )  // tiles
 	ROM_LOAD( "ppa-g10.ic11", 0x20000, 0x20000, CRC(e48a66ac) SHA1(49b33db6a922d6f1d1417e28714a67431b7c0217) )
 	ROM_LOAD( "ppa-g20.ic18", 0x40000, 0x20000, CRC(12b93e79) SHA1(f3d2b76a30874827c8998c1d13a55a3990b699b7) )
@@ -4675,78 +4682,78 @@ ROM_END
 // Simulation code is used for the few remaining games without a corresponding MCU dump.  See notes next to the sets
 
 /* M72 */
-GAME( 1987, rtype,       0,        rtype,        rtype,        m72_state, empty_init,      ROT0,   "Irem", "R-Type (World)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1987, rtypej,      rtype,    rtype,        rtype,        m72_state, empty_init,      ROT0,   "Irem", "R-Type (Japan)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1987, rtypejp,     rtype,    rtype,        rtypep,       m72_state, empty_init,      ROT0,   "Irem", "R-Type (Japan prototype)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1987, rtypeu,      rtype,    rtype,        rtype,        m72_state, empty_init,      ROT0,   "Irem (Nintendo of America license)", "R-Type (US)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1987, rtypeb,      rtype,    rtype,        rtype,        m72_state, empty_init,      ROT0,   "bootleg", "R-Type (World bootleg)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1987, rtype,       0,        rtype,        rtype,        m72_state,      empty_init,      ROT0,   "Irem", "R-Type (World)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1987, rtypej,      rtype,    rtype,        rtype,        m72_state,      empty_init,      ROT0,   "Irem", "R-Type (Japan)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1987, rtypejp,     rtype,    rtype,        rtypep,       m72_state,      empty_init,      ROT0,   "Irem", "R-Type (Japan prototype)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1987, rtypeu,      rtype,    rtype,        rtype,        m72_state,      empty_init,      ROT0,   "Irem (Nintendo of America license)", "R-Type (US)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1987, rtypeb,      rtype,    rtype,        rtype,        m72_state,      empty_init,      ROT0,   "bootleg", "R-Type (World bootleg)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 
-GAME( 1987, bchopper,    0,        mrheli,       bchopper,     m72_state, init_m72_8751,   ROT0,   "Irem", "Battle Chopper (World)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1987, mrheli,      bchopper, mrheli,       bchopper,     m72_state, init_m72_8751,   ROT0,   "Irem", "Mr. HELI no Daibouken (Japan)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1987, bchopper,    0,        mrheli,       bchopper,     m72_mcu_state,  empty_init,      ROT0,   "Irem", "Battle Chopper (World)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1987, mrheli,      bchopper, mrheli,       bchopper,     m72_mcu_state,  empty_init,      ROT0,   "Irem", "Mr. HELI no Daibouken (Japan)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 
-GAME( 1988, nspirit,     0,        m72,          nspirit,      m72_state, init_nspirit,    ROT0,   "Irem", "Ninja Spirit (World)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // missing i8751 MCU code
-GAME( 1988, nspiritj,    nspirit,  nspiritj,     nspirit,      m72_state, init_m72_8751,   ROT0,   "Irem", "Saigo no Nindou (Japan)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1988, nspirit,     0,        m72,          nspirit,      m72_state,      init_nspirit,    ROT0,   "Irem", "Ninja Spirit (World)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // missing i8751 MCU code
+GAME( 1988, nspiritj,    nspirit,  nspiritj,     nspirit,      m72_mcu_state,  empty_init,      ROT0,   "Irem", "Saigo no Nindou (Japan)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 
-GAME( 1988, imgfight,    0,        imgfight,     imgfight,     m72_state, init_m72_8751,   ROT270, "Irem", "Image Fight (World)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, imgfightj,   imgfight, imgfight,     imgfight,     m72_state, init_m72_8751,   ROT270, "Irem", "Image Fight (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, imgfightjb,  imgfight, imgfightjb,   imgfight,     m72_state, init_m72_8751,   ROT270, "Irem", "Image Fight (Japan, bootleg)", MACHINE_SUPPORTS_SAVE ) // uses an 80c31 MCU
+GAME( 1988, imgfight,    0,        imgfight,     imgfight,     m72_mcu_state,  empty_init,      ROT270, "Irem", "Image Fight (World)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, imgfightj,   imgfight, imgfight,     imgfight,     m72_mcu_state,  empty_init,      ROT270, "Irem", "Image Fight (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, imgfightjb,  imgfight, imgfightjb,   imgfight,     m72_mcu_state,  empty_init,      ROT270, "Irem", "Image Fight (Japan, bootleg)", MACHINE_SUPPORTS_SAVE ) // uses an 80c31 MCU
 
-GAME( 1989, loht,        0,        m72_8751,     loht,         m72_state, init_m72_8751,   ROT0,   "Irem", "Legend of Hero Tonma (World)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1989, lohtj,       loht,     m72_8751,     loht,         m72_state, init_m72_8751,   ROT0,   "Irem", "Legend of Hero Tonma (Japan)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1989, lohtb2,      loht,     m72_8751,     loht,         m72_state, init_m72_8751,   ROT0,   "bootleg", "Legend of Hero Tonma (Japan, bootleg with i8751)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // works like above, mcu code is the same as the real code, probably just an alt revision on a bootleg board
-GAME( 1997, lohtb3,      loht,     m72_8751,     loht,         m72_state, init_m72_8751,   ROT0,   "bootleg", "Legend of Hero Tonma (World, bootleg with i8751)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1989, loht,        0,        m72_8751,     loht,         m72_mcu_state,  empty_init,      ROT0,   "Irem", "Legend of Hero Tonma (World)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1989, lohtj,       loht,     m72_8751,     loht,         m72_mcu_state,  empty_init,      ROT0,   "Irem", "Legend of Hero Tonma (Japan)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1989, lohtb2,      loht,     m72_8751,     loht,         m72_mcu_state,  empty_init,      ROT0,   "bootleg", "Legend of Hero Tonma (Japan, bootleg with i8751)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // works like above, mcu code is the same as the real code, probably just an alt revision on a bootleg board
+GAME( 1997, lohtb3,      loht,     m72_8751,     loht,         m72_mcu_state,  empty_init,      ROT0,   "bootleg", "Legend of Hero Tonma (World, bootleg with i8751)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 
-GAME( 1989, xmultiplm72, xmultipl, m72_xmultipl, xmultipl,     m72_state, init_m72_8751,   ROT0,   "Irem", "X Multiply (Japan, M72 hardware)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1989, xmultiplm72, xmultipl, m72_xmultipl, xmultipl,     m72_mcu_state,  empty_init,      ROT0,   "Irem", "X Multiply (Japan, M72 hardware)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 
-GAME( 1989, dbreedm72,   dbreed,   m72_dbreedw,  dbreed,       m72_state, init_dbreedm72,  ROT0,   "Irem", "Dragon Breed (World, M72 hardware)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // missing i8751 MCU code
-GAME( 1989, dbreedjm72,  dbreed,   m72_dbreed,   dbreed,       m72_state, init_m72_8751,   ROT0,   "Irem", "Dragon Breed (Japan, M72 hardware)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1989, dbreedm72,   dbreed,   m72_dbreedw,  dbreed,       m72_state,      init_dbreedm72,  ROT0,   "Irem", "Dragon Breed (World, M72 hardware)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // missing i8751 MCU code
+GAME( 1989, dbreedjm72,  dbreed,   m72_dbreed,   dbreed,       m72_mcu_state,  empty_init,      ROT0,   "Irem", "Dragon Breed (Japan, M72 hardware)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 
-GAME( 1991, gallopm72,   cosmccop, m72_airduel,  gallop,       m72_state, init_m72_8751,   ROT0,   "Irem", "Gallop - Armed Police Unit (Japan, M72 hardware)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1991, gallopm72,   cosmccop, m72_airduel,  gallop,       m72_mcu_state,  empty_init,      ROT0,   "Irem", "Gallop - Armed Police Unit (Japan, M72 hardware)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 
-GAME( 1990, airduelm72,  airduel,  m72_airduel,  airduel,      m72_state, init_m72_8751,   ROT270, "Irem", "Air Duel (World, M72 hardware)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, airdueljm72, airduel,  m72_airduel,  airduel,      m72_state, init_m72_8751,   ROT270, "Irem", "Air Duel (Japan, M72 hardware)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, airduelm72,  airduel,  m72_airduel,  airduel,      m72_mcu_state,  empty_init,      ROT270, "Irem", "Air Duel (World, M72 hardware)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, airdueljm72, airduel,  m72_airduel,  airduel,      m72_mcu_state,  empty_init,      ROT270, "Irem", "Air Duel (Japan, M72 hardware)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1990, dkgensanm72, hharry,   m72,          hharry,       m72_state, init_dkgenm72,   ROT0,   "Irem", "Daiku no Gensan (Japan, M72 hardware)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // missing i8751 MCU code
+GAME( 1990, dkgensanm72, hharry,   m72,          hharry,       m72_state,      init_dkgenm72,   ROT0,   "Irem", "Daiku no Gensan (Japan, M72 hardware)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // missing i8751 MCU code
 
 /* M81 */
-GAME( 1989, xmultipl,    0,        m81_xmultipl, m81_xmultipl, m72_state, empty_init,      ROT0,   "Irem", "X Multiply (World, M81 hardware)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1989, dbreed,      0,        m81_dbreed,   m81_dbreed,   m72_state, empty_init,      ROT0,   "Irem", "Dragon Breed (World, M81 hardware)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1990, hharry,      0,        m81_hharry,   m81_hharry,   m72_state, empty_init,      ROT0,   "Irem", "Hammerin' Harry (World, M81 hardware)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1989, xmultipl,    0,        m81_xmultipl, m81_xmultipl, m72_state,      empty_init,      ROT0,   "Irem", "X Multiply (World, M81 hardware)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1989, dbreed,      0,        m81_dbreed,   m81_dbreed,   m72_state,      empty_init,      ROT0,   "Irem", "Dragon Breed (World, M81 hardware)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1990, hharry,      0,        m81_hharry,   m81_hharry,   m72_state,      empty_init,      ROT0,   "Irem", "Hammerin' Harry (World, M81 hardware)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 
 /* M82 */
-GAME( 1990, majtitle,    0,        m82,          rtype2,       m72_state, empty_init,      ROT0,   "Irem", "Major Title (World)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // M82-A-A + M82-B-A
-GAME( 1990, majtitlej,   majtitle, m82,          rtype2,       m72_state, empty_init,      ROT0,   "Irem", "Major Title (Japan)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // ^
+GAME( 1990, majtitle,    0,        m82,          rtype2,       m82_state,      empty_init,      ROT0,   "Irem", "Major Title (World)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // M82-A-A + M82-B-A
+GAME( 1990, majtitlej,   majtitle, m82,          rtype2,       m82_state,      empty_init,      ROT0,   "Irem", "Major Title (Japan)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // ^
 
-GAME( 1990, airduel,     0,        m82,          airduel,      m72_state, empty_init,      ROT270, "Irem", "Air Duel (World, M82 hardware)", MACHINE_SUPPORTS_SAVE ) // Major Title conversion
-GAME( 1990, airduelu,    airduel,  m82,          airduel,      m72_state, empty_init,      ROT270, "Irem America", "Air Duel (US location test, M82 hardware)", MACHINE_SUPPORTS_SAVE ) // ^
+GAME( 1990, airduel,     0,        m82,          airduel,      m82_state,      empty_init,      ROT270, "Irem", "Air Duel (World, M82 hardware)", MACHINE_SUPPORTS_SAVE ) // Major Title conversion
+GAME( 1990, airduelu,    airduel,  m82,          airduel,      m82_state,      empty_init,      ROT270, "Irem America", "Air Duel (US location test, M82 hardware)", MACHINE_SUPPORTS_SAVE ) // ^
 
-GAME( 1990, dkgensanm82, hharry,   hharryu,      hharry,       m72_state, empty_init,      ROT0,   "Irem", "Daiku no Gensan (Japan, M82 hardware)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // ^
+GAME( 1990, dkgensanm82, hharry,   hharryu,      hharry,       m72_state,      empty_init,      ROT0,   "Irem", "Daiku no Gensan (Japan, M82 hardware)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // ^
 
-GAME( 2009, rtypem82b,   rtype,    m82,          rtype,        m72_state, empty_init,      ROT0,   "bootleg", "R-Type (Japan, bootleg M82 conversion)", MACHINE_NOT_WORKING | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // unofficial conversion of Major Title, extensive wiremods, made in 2009 by Paul Swan
-GAME( 1997, rtype2m82b,  rtype2,   m82,          rtype2,       m72_state, empty_init,      ROT0,   "bootleg", "R-Type II (Japan, bootleg M82 conversion)", MACHINE_NOT_WORKING | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // made in 1997 by Chris Hardy
+GAME( 2009, rtypem82b,   rtype,    m82,          rtype,        m82_state,      empty_init,      ROT0,   "bootleg", "R-Type (Japan, bootleg M82 conversion)", MACHINE_NOT_WORKING | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // unofficial conversion of Major Title, extensive wiremods, made in 2009 by Paul Swan
+GAME( 1997, rtype2m82b,  rtype2,   m82,          rtype2,       m82_state,      empty_init,      ROT0,   "bootleg", "R-Type II (Japan, bootleg M82 conversion)", MACHINE_NOT_WORKING | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // made in 1997 by Chris Hardy
 
 /* M84 */
-GAME( 1990, hharryu,     hharry,   hharryu,      hharry,       m72_state, empty_init,      ROT0,   "Irem America", "Hammerin' Harry (US, M84 hardware)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1990, dkgensan,    hharry,   hharryu,      hharry,       m72_state, empty_init,      ROT0,   "Irem", "Daiku no Gensan (Japan, M84 hardware)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1990, hharryb,     hharry,   hharryu,      hharry,       m72_state, empty_init,      ROT0,   "bootleg", "Hammerin' Harry (World, M84 hardware bootleg)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1990, hharryu,     hharry,   hharryu,      hharry,       m72_state,      empty_init,      ROT0,   "Irem America", "Hammerin' Harry (US, M84 hardware)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1990, dkgensan,    hharry,   hharryu,      hharry,       m72_state,      empty_init,      ROT0,   "Irem", "Daiku no Gensan (Japan, M84 hardware)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1990, hharryb,     hharry,   hharryu,      hharry,       m72_state,      empty_init,      ROT0,   "bootleg", "Hammerin' Harry (World, M84 hardware bootleg)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 
-GAME( 1989, rtype2,      0,        rtype2,       rtype2,       m72_state, empty_init,      ROT0,   "Irem", "R-Type II (World)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1989, rtype2j,     rtype2,   rtype2,       rtype2,       m72_state, empty_init,      ROT0,   "Irem", "R-Type II (Japan)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1989, rtype2jc,    rtype2,   rtype2,       rtype2,       m72_state, empty_init,      ROT0,   "Irem", "R-Type II (Japan, revision C)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1989, rtype2,      0,        rtype2,       rtype2,       m72_state,      empty_init,      ROT0,   "Irem", "R-Type II (World)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1989, rtype2j,     rtype2,   rtype2,       rtype2,       m72_state,      empty_init,      ROT0,   "Irem", "R-Type II (Japan)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1989, rtype2jc,    rtype2,   rtype2,       rtype2,       m72_state,      empty_init,      ROT0,   "Irem", "R-Type II (Japan, revision C)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 
-GAME( 1991, cosmccop,    0,        cosmccop,     gallop,       m72_state, empty_init,      ROT0,   "Irem", "Cosmic Cop (World)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1991, gallop,      cosmccop, cosmccop,     gallop,       m72_state, empty_init,      ROT0,   "Irem", "Gallop - Armed Police Unit (Japan, M84 hardware)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1991, cosmccop,    0,        cosmccop,     gallop,       m72_state,      empty_init,      ROT0,   "Irem", "Cosmic Cop (World)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1991, gallop,      cosmccop, cosmccop,     gallop,       m72_state,      empty_init,      ROT0,   "Irem", "Gallop - Armed Police Unit (Japan, M84 hardware)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 
-GAME( 1991, ltswords,    0,        kengo,        kengo,        m72_state, empty_init,      ROT0,   "Irem", "Lightning Swords (World)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1991, kengo,       ltswords, kengo,        kengo,        m72_state, empty_init,      ROT0,   "Irem", "Ken-Go (World)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1991, kengoj,      ltswords, kengo,        kengo,        m72_state, empty_init,      ROT0,   "Irem", "Ken-Go (Japan)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // has 'for use in Japan' message, above set doesn't
+GAME( 1991, ltswords,    0,        kengo,        kengo,        m72_state,      empty_init,      ROT0,   "Irem", "Lightning Swords (World)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1991, kengo,       ltswords, kengo,        kengo,        m72_state,      empty_init,      ROT0,   "Irem", "Ken-Go (World)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1991, kengoj,      ltswords, kengo,        kengo,        m72_state,      empty_init,      ROT0,   "Irem", "Ken-Go (Japan)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // has 'for use in Japan' message, above set doesn't
 
 /* M85 */
-GAME( 1990, poundfor,    0,        poundfor,     poundfor,     m72_state, empty_init,      ROT270, "Irem", "Pound for Pound (World)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )      // M85-A-B / M85-B
-GAME( 1990, poundforj,   poundfor, poundfor,     poundfor,     m72_state, empty_init,      ROT270, "Irem", "Pound for Pound (Japan)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )      // ^
-GAME( 1990, poundforu,   poundfor, poundfor,     poundfor,     m72_state, empty_init,      ROT270, "Irem America", "Pound for Pound (US)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // ^
+GAME( 1990, poundfor,    0,        poundfor,     poundfor,     poundfor_state, empty_init,      ROT270, "Irem", "Pound for Pound (World)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )      // M85-A-B / M85-B
+GAME( 1990, poundforj,   poundfor, poundfor,     poundfor,     poundfor_state, empty_init,      ROT270, "Irem", "Pound for Pound (Japan)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )      // ^
+GAME( 1990, poundforu,   poundfor, poundfor,     poundfor,     poundfor_state, empty_init,      ROT270, "Irem America", "Pound for Pound (US)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // ^
 
 /* bootlegs, unique hw */
-GAME( 1989, lohtb,       loht,     lohtb,        loht,         m72_state, empty_init,      ROT0,   "bootleg (Playmark)", "Legend of Hero Tonma (Playmark unprotected bootleg)", MACHINE_NOT_WORKING | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1989, loht_ms,     loht,     lohtb,        loht,         m72_state, empty_init,      ROT0,   "bootleg (Gaelco / Ervisa)", "Legend of Hero Tonma (Gaelco bootleg, Modular System)", MACHINE_NOT_WORKING | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1990, hharryb2,    hharry,   hharryu,      hharry,       m72_state, empty_init,      ROT0,   "bootleg (Playmark)", "Hammerin' Harry (Playmark bootleg)", MACHINE_NOT_WORKING | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1989, lohtb,       loht,     lohtb,        loht,         m72_state,      empty_init,      ROT0,   "bootleg (Playmark)", "Legend of Hero Tonma (Playmark unprotected bootleg)", MACHINE_NOT_WORKING | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1989, loht_ms,     loht,     lohtb,        loht,         m72_state,      empty_init,      ROT0,   "bootleg (Gaelco / Ervisa)", "Legend of Hero Tonma (Gaelco bootleg, Modular System)", MACHINE_NOT_WORKING | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1990, hharryb2,    hharry,   hharryu,      hharry,       m72_state,      empty_init,      ROT0,   "bootleg (Playmark)", "Hammerin' Harry (Playmark bootleg)", MACHINE_NOT_WORKING | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
