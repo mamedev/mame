@@ -32,12 +32,10 @@
 // | Correct char. generator              | * | * | N | N |
 // | 5.25 floppy drives                   |   | 1 | 2 | 2 |
 // | RS232 interface                      | * |   |   |   |
+// | Expansion cards (hp98628, hp98629)   | * | * | * | * |
 //
 // What's not in for 9836A/C models:
 // - Correct character generator
-//
-// What's not in for all the models:
-// - Expansion cards
 //
 // Main references:
 // - Olivier De Smet's standalone emulator:
@@ -50,6 +48,7 @@
 #include "hp98x6_optrom.h"
 #include "hp98x6_upi.h"
 
+#include "bus/hp_dio/hp_dio.h"
 #include "bus/ieee488/ieee488.h"
 #include "bus/rs232/rs232.h"
 #include "cpu/m68000/m68000.h"
@@ -138,6 +137,7 @@ protected:
 		, m_screen(*this, "screen")
 		, m_upi(*this, "upi")
 		, m_hpib(*this, "hpib")
+		, m_dio_bus(*this, "diobus")
 		, m_chargen(*this, "chargen")
 		, m_rom_drawers(*this, "drawer%u", 0U)
 	{
@@ -160,6 +160,7 @@ protected:
 	required_device<screen_device> m_screen;
 	required_device<hp98x6_upi_device> m_upi;
 	required_device<tms9914_device> m_hpib;
+	required_device<bus::hp_dio::dio16_device> m_dio_bus;
 
 	// Character generator
 	required_region_ptr<uint8_t> m_chargen;
@@ -212,7 +213,6 @@ void hp98x6_base_state::hp98x6_base(machine_config &config, unsigned dot_clock, 
 	m_crtc->set_show_border_area(false);
 
 	HP98X6_UPI(config, m_upi, HPIB_CLOCK);
-	m_upi->irq1_write_cb().set_inputline(m_cpu, M68K_IRQ_1);
 	m_upi->irq7_write_cb().set(FUNC(hp98x6_base_state::upi_irq7_w));
 
 	TMS9914(config, m_hpib, HPIB_CLOCK);
@@ -246,6 +246,21 @@ void hp98x6_base_state::hp98x6_base(machine_config &config, unsigned dot_clock, 
 	}
 
 	SOFTWARE_LIST(config, "optrom_list").set_original("hp98x6_rom");
+
+	DIO16(config, m_dio_bus, 0);
+	m_dio_bus->set_program_space(m_cpu, AS_PROGRAM);
+	m_cpu->reset_cb().append(m_dio_bus, FUNC(bus::hp_dio::dio16_device::reset_in));
+	m_dio_bus->irq1_out_cb().set_inputline(m_cpu, M68K_IRQ_1);
+	m_dio_bus->irq2_out_cb().set_inputline(m_cpu, M68K_IRQ_2);
+	m_dio_bus->irq3_out_cb().set_inputline(m_cpu, M68K_IRQ_3);
+	m_dio_bus->irq4_out_cb().set_inputline(m_cpu, M68K_IRQ_4);
+	m_dio_bus->irq5_out_cb().set_inputline(m_cpu, M68K_IRQ_5);
+	m_dio_bus->irq6_out_cb().set_inputline(m_cpu, M68K_IRQ_6);
+	m_dio_bus->irq7_out_cb().set_inputline(m_cpu, M68K_IRQ_7);
+	m_upi->irq1_write_cb().set(m_dio_bus, FUNC(bus::hp_dio::dio16_device::irq1_in));
+
+	DIO16_SLOT(config, "slot0", 0, "diobus", dio16_hp98x6_cards, nullptr, false);
+	DIO16_SLOT(config, "slot1", 0, "diobus", dio16_hp98x6_cards, nullptr, false);
 }
 
 void hp98x6_base_state::cpu_mem_map(address_map &map)
@@ -292,13 +307,13 @@ void hp98x6_base_state::cpu_reset_w(int state)
 void hp98x6_base_state::hpib_irq_w(int state)
 {
 	m_hpib_irq = bool(state);
-	m_cpu->set_input_line(M68K_IRQ_3, state);
+	m_dio_bus->irq3_in(state);
 }
 
 void hp98x6_base_state::upi_irq7_w(int state)
 {
 	m_upi_irq7 = bool(state);
-	m_cpu->set_input_line(M68K_IRQ_7, state);
+	m_dio_bus->irq7_in(state);
 }
 
 // +--------------+
@@ -541,7 +556,7 @@ void hp9816_state::uart_reset()
 
 void hp9816_state::uart_update_irq()
 {
-	m_cpu->set_input_line(M68K_IRQ_4, m_uart_irq && m_uart_int_en);
+	m_dio_bus->irq4_in(m_uart_irq && m_uart_int_en);
 }
 
 uint8_t hp9816_state::uart_r(offs_t offset)
@@ -1147,7 +1162,7 @@ void hp9826_36_state::fdc_irq_w(int state)
 {
 	LOG_FDC("fdc IRQ %d\n", state);
 	m_fdc_irq = bool(state);
-	m_cpu->set_input_line(M68K_IRQ_2, state);
+	m_dio_bus->irq2_in(state);
 }
 
 void hp9826_36_state::fdc_drq_w(int state)

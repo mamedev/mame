@@ -16,6 +16,7 @@
 #include "hp98603b.h"
 #include "hp98620.h"
 #include "hp98624.h"
+#include "hp98628_9.h"
 #include "hp98643.h"
 #include "hp98644.h"
 #include "human_interface.h"
@@ -159,30 +160,28 @@ void dio16_device::set_irq(unsigned index, unsigned int level, int state)
 	else
 		m_irq[level] &= ~(1 << index);
 
-	if (m_bus_index != index) {
-		switch (level) {
-		case 0:
-			m_irq1_out_cb(state);
-			break;
-		case 1:
-			m_irq2_out_cb(state);
-			break;
-		case 2:
-			m_irq3_out_cb(state);
-			break;
-		case 3:
-			m_irq4_out_cb(state);
-			break;
-		case 4:
-			m_irq5_out_cb(state);
-			break;
-		case 5:
-			m_irq6_out_cb(state);
-			break;
-		case 6:
-			m_irq7_out_cb(state);
-			break;
-		}
+	switch (level) {
+	case 0:
+		m_irq1_out_cb(irq1_out());
+		break;
+	case 1:
+		m_irq2_out_cb(irq2_out());
+		break;
+	case 2:
+		m_irq3_out_cb(irq3_out());
+		break;
+	case 3:
+		m_irq4_out_cb(irq4_out());
+		break;
+	case 4:
+		m_irq5_out_cb(irq5_out());
+		break;
+	case 5:
+		m_irq6_out_cb(irq6_out());
+		break;
+	case 6:
+		m_irq7_out_cb(irq7_out());
+		break;
 	}
 }
 
@@ -355,6 +354,12 @@ void dio16_cards(device_slot_interface & device)
 	device.option_add("98643", HPDIO_98643);
 	device.option_add("98644", HPDIO_98644);
 	device.option_add("human_interface", HPDIO_HUMAN_INTERFACE);
+}
+
+void dio16_hp98x6_cards(device_slot_interface &device)
+{
+	device.option_add("98628", HPDIO_98628);
+	device.option_add("98629", HPDIO_98629);
 }
 
 void dio32_cards(device_slot_interface & device)
