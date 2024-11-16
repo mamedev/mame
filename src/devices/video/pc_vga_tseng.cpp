@@ -22,13 +22,18 @@
 
 DEFINE_DEVICE_TYPE(TSENG_VGA,  tseng_vga_device,  "tseng_vga",  "Tseng Labs ET4000AX VGA i/f")
 
-tseng_vga_device::tseng_vga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: svga_device(mconfig, TSENG_VGA, tag, owner, clock)
+tseng_vga_device::tseng_vga_device(const machine_config &mconfig, const char *tag, device_type type, device_t *owner, uint32_t clock)
+	: svga_device(mconfig, type, tag, owner, clock)
 {
 	m_main_if_space_config = address_space_config("io_regs", ENDIANNESS_LITTLE, 8, 4, 0, address_map_constructor(FUNC(tseng_vga_device::io_3bx_3dx_map), this));
 	m_crtc_space_config = address_space_config("crtc_regs", ENDIANNESS_LITTLE, 8, 8, 0, address_map_constructor(FUNC(tseng_vga_device::crtc_map), this));
 	m_seq_space_config = address_space_config("sequencer_regs", ENDIANNESS_LITTLE, 8, 8, 0, address_map_constructor(FUNC(tseng_vga_device::sequencer_map), this));
 	m_atc_space_config = address_space_config("attribute_regs", ENDIANNESS_LITTLE, 8, 8, 0, address_map_constructor(FUNC(tseng_vga_device::attribute_map), this));
+}
+
+tseng_vga_device::tseng_vga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: tseng_vga_device(mconfig, tag, TSENG_VGA, owner, clock)
+{
 }
 
 void tseng_vga_device::device_start()
@@ -120,7 +125,23 @@ void tseng_vga_device::crtc_map(address_map &map)
 //  map(0x30, 0x30) System Segment Map Comparator
 //  map(0x31, 0x31) General Purpose (& Clock Select 3/4)
 //  map(0x32, 0x32) RAS/CAS Configuration (RCCONF)
-//  map(0x33, 0x33) Extended Start Address
+	/*
+	 * ---- xx-- Cursor address bits 16-17
+	 * ---- --xx Start address bits 16-17
+	 */
+//  Extended Start Address
+	map(0x33, 0x33).lrw8(
+		NAME([this] (offs_t offset) {
+			return et4k.crtc_ext_start;
+		}),
+		NAME([this] (offs_t offset, u8 data) {
+			et4k.crtc_ext_start = data;
+			vga.crtc.start_addr_latch &= ~0x30000;
+			vga.crtc.start_addr_latch |= ((data & 0x3) << 16);
+			vga.crtc.cursor_addr &= ~0x30000;
+			vga.crtc.cursor_addr |= ((data & 0xc) << 14);
+		})
+	);
 	// Auxiliary Control
 	map(0x34, 0x34).lrw8(
 		NAME([this] (offs_t offset) {
@@ -272,5 +293,15 @@ void tseng_vga_device::mem_w(offs_t offset, uint8_t data)
 	}
 	else
 		vga_device::mem_w(offset,data);
+}
+
+uint32_t tseng_vga_device::latch_start_addr()
+{
+	// TODO: condition for this (SDD scroll/buffer tests)
+	if(svga.rgb8_en)
+	{
+		return vga.crtc.start_addr_latch << 2;
+	}
+	return vga.crtc.start_addr_latch;
 }
 

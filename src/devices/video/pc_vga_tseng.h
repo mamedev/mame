@@ -23,6 +23,8 @@ public:
 	virtual void mem_w(offs_t offset, uint8_t data) override;
 
 protected:
+	tseng_vga_device(const machine_config &mconfig, const char *tag, device_type type, device_t *owner, uint32_t clock);
+
 	virtual void device_start() override ATTR_COLD;
 
 	virtual void io_3bx_3dx_map(address_map &map) override ATTR_COLD;
@@ -37,6 +39,8 @@ protected:
 	virtual void attribute_map(address_map &map) override ATTR_COLD;
 
 	virtual void recompute_params() override;
+
+	virtual uint32_t latch_start_addr() override;
 private:
 	struct
 	{
@@ -48,11 +52,13 @@ private:
 		bool ext_reg_ena;
 		uint8_t misc1;
 		uint8_t misc2;
+		uint8_t crtc_ext_start;
 	}et4k;
 };
 
 
 // device type definition
 DECLARE_DEVICE_TYPE(TSENG_VGA, tseng_vga_device)
+//DECLARE_DEVICE_TYPE(ET4KW32I_VGA, et4kw32i_vga_device)
 
 #endif // MAME_VIDEO_PC_VGA_TSENG_H
