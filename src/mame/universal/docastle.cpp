@@ -1,6 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:Brad Oliver
-/***************************************************************************
+/*******************************************************************************
 
 Mr. Do's Castle memory map (preliminary)
 
@@ -150,8 +150,7 @@ TODO:
   CURSOR pin. The cursor is configured at scanline 0, and causes the games to
   update the next video frame during active display. What is the culprit here?
   For now, it's simply hooked up to vsync.
-- bad communication in idsoccer
-- adpcm status in idsoccer
+- correct adpcm status in idsoccer
 - real values for the adpcm interface in idsoccer
 - bad adpcm sound in attract mode for idsoccer clones (once you get them to boot up)
 - idsoccer clones lock up MAME after writing junk to CRTC. Workaround:
@@ -162,32 +161,508 @@ TODO:
   This 0x1120 is a return address written to the stack after communicating with
   the subcpu. Maybe protection. See MT05419.
 
-***************************************************************************/
+*******************************************************************************/
 
 #include "emu.h"
-#include "docastle.h"
 
 #include "cpu/z80/z80.h"
+#include "machine/tms1024.h"
 #include "machine/input_merger.h"
 #include "machine/watchdog.h"
+#include "sound/msm5205.h"
+#include "sound/sn76496.h"
+#include "video/mc6845.h"
 
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
+#include "tilemap.h"
+
+#define LOG_MAINSUB (1U << 1)
+
+#define VERBOSE (0)
+#include "logmacro.h"
 
 
-/* Read/Write Handlers */
+namespace {
+
+class docastle_state : public driver_device
+{
+public:
+	docastle_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_subcpu(*this, "subcpu"),
+		m_spritecpu(*this, "spritecpu"),
+		m_crtc(*this, "crtc"),
+		m_sn(*this, "sn%u", 1U),
+		m_inp(*this, "inp%u", 1),
+		m_videoram(*this, "videoram"),
+		m_colorram(*this, "colorram"),
+		m_spriteram(*this, "spriteram"),
+		m_gfxdecode(*this, "gfxdecode"),
+		m_palette(*this, "palette")
+	{ }
+
+	void dorunrun(machine_config &config);
+	void docastle(machine_config &config);
+
+protected:
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
+
+	// devices
+	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_subcpu;
+	required_device<cpu_device> m_spritecpu;
+	required_device<hd6845s_device> m_crtc;
+	required_device_array<sn76489a_device, 4> m_sn;
+	required_device_array<tms1025_device, 2> m_inp;
+
+	// memory pointers
+	required_shared_ptr<uint8_t> m_videoram;
+	required_shared_ptr<uint8_t> m_colorram;
+	required_shared_ptr<uint8_t> m_spriteram;
+
+	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<palette_device> m_palette;
+
+	// misc
+	uint8_t m_prev_ma6 = 0;
+	uint8_t m_shared_latch = 0;
+	bool m_maincpu_wait = false;
+
+	tilemap_t *m_do_tilemap = nullptr;
+
+	void main_map(address_map &map) ATTR_COLD;
+	void main_io(address_map &map) ATTR_COLD;
+	void sub_map(address_map &map) ATTR_COLD;
+	void sprite_map(address_map &map) ATTR_COLD;
+	void dorunrun_map(address_map &map) ATTR_COLD;
+	void dorunrun_sub_map(address_map &map) ATTR_COLD;
+
+	void docastle_tint(int state);
+	uint8_t main_from_sub_r(offs_t offset);
+	void main_to_sub_w(offs_t offset, uint8_t data);
+	uint8_t sub_from_main_r(offs_t offset);
+	void sub_to_main_w(offs_t offset, uint8_t data);
+	void subcpu_nmi_w(uint8_t data);
+	void videoram_w(offs_t offset, uint8_t data);
+	void colorram_w(offs_t offset, uint8_t data);
+	uint8_t inputs_flipscreen_r(offs_t offset);
+	void flipscreen_w(offs_t offset, uint8_t data);
+
+	TILE_GET_INFO_MEMBER(get_tile_info);
+	void palette(palette_device &palette) const;
+	DECLARE_VIDEO_START(dorunrun);
+	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	void draw_sprites(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+};
+
+class idsoccer_state : public docastle_state
+{
+public:
+	idsoccer_state(const machine_config &mconfig, device_type type, const char *tag) :
+		docastle_state(mconfig, type, tag),
+		m_msm(*this, "msm")
+	{ }
+
+	void idsoccer(machine_config &config);
+
+protected:
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+
+private:
+	required_device<msm5205_device> m_msm;
+
+	int m_adpcm_pos = 0;
+	int m_adpcm_idle = 0;
+	int m_adpcm_data = 0;
+	int m_adpcm_status = 0;
+
+	void idsoccer_map(address_map &map) ATTR_COLD;
+
+	uint8_t adpcm_status_r();
+	void adpcm_w(uint8_t data);
+	void adpcm_int(int state);
+};
+
+
+
+/*******************************************************************************
+    Initialization
+*******************************************************************************/
+
+void docastle_state::machine_start()
+{
+	save_item(NAME(m_prev_ma6));
+	save_item(NAME(m_shared_latch));
+	save_item(NAME(m_maincpu_wait));
+}
+
+void idsoccer_state::machine_start()
+{
+	docastle_state::machine_start();
+
+	save_item(NAME(m_adpcm_pos));
+	save_item(NAME(m_adpcm_data));
+	save_item(NAME(m_adpcm_idle));
+	save_item(NAME(m_adpcm_status));
+}
+
+void docastle_state::machine_reset()
+{
+	m_prev_ma6 = 0;
+	m_maincpu_wait = false;
+
+	for (int i = 0; i < 2; i++)
+	{
+		m_inp[i]->write_ms(0); // pin 5 tied low
+		//m_inp[i]->write_ce(1); // pin 4 tied high
+	}
+
+	inputs_flipscreen_r(0); // cleared with LS273
+}
+
+void idsoccer_state::machine_reset()
+{
+	docastle_state::machine_reset();
+
+	m_prev_ma6 = 0;
+
+	m_adpcm_pos = 0;
+	m_adpcm_idle = 0;
+	m_adpcm_data = -1;
+	m_adpcm_status = 0;
+}
+
+
+
+/*******************************************************************************
+    Video hardware
+*******************************************************************************/
+
+void docastle_state::video_start()
+{
+	m_do_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(docastle_state::get_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_do_tilemap->set_scrolldy(-32, -32);
+	m_do_tilemap->set_transmask(0, 0x00ff, 0);
+}
+
+VIDEO_START_MEMBER(docastle_state,dorunrun)
+{
+	video_start();
+	m_do_tilemap->set_transmask(0, 0xff00, 0);
+}
+
+TILE_GET_INFO_MEMBER(docastle_state::get_tile_info)
+{
+	int code = m_videoram[tile_index] + 8 * (m_colorram[tile_index] & 0x20);
+	int color = m_colorram[tile_index] & 0x1f;
+
+	tileinfo.set(0, code, color, 0);
+}
+
+static GFXDECODE_START( gfx_docastle )
+	GFXDECODE_ENTRY( "gfx1", 0, gfx_8x8x4_packed_msb,   0, 64 )
+	GFXDECODE_ENTRY( "gfx2", 0, gfx_16x16x4_packed_msb, 0, 32*2 )
+GFXDECODE_END
+
+
+/*******************************************************************************
+
+  Convert the color PROMs into a more useable format.
+
+  Mr. Do's Castle / Wild Ride / Run Run have a 256 bytes palette PROM which
+  is connected to the RGB output this way:
+
+  bit 7 -- 200 ohm resistor  -- RED
+        -- 390 ohm resistor  -- RED
+        -- 820 ohm resistor  -- RED
+        -- 200 ohm resistor  -- GREEN
+        -- 390 ohm resistor  -- GREEN
+        -- 820 ohm resistor  -- GREEN
+        -- 200 ohm resistor  -- BLUE
+  bit 0 -- 390 ohm resistor  -- BLUE
+
+*******************************************************************************/
+
+void docastle_state::palette(palette_device &palette) const
+{
+	uint8_t const *const color_prom = memregion("proms")->base();
+
+	for (int i = 0; i < 256; i++)
+	{
+		int bit0, bit1, bit2;
+
+		// red component
+		bit0 = BIT(color_prom[i], 5);
+		bit1 = BIT(color_prom[i], 6);
+		bit2 = BIT(color_prom[i], 7);
+		int const r = 0x23 * bit0 + 0x4b * bit1 + 0x91 * bit2;
+
+		// green component
+		bit0 = BIT(color_prom[i], 2);
+		bit1 = BIT(color_prom[i], 3);
+		bit2 = BIT(color_prom[i], 4);
+		int const g = 0x23 * bit0 + 0x4b * bit1 + 0x91 * bit2;
+
+		// blue component
+		bit0 = 0;
+		bit1 = BIT(color_prom[i], 0);
+		bit2 = BIT(color_prom[i], 1);
+		int const b = 0x23 * bit0 + 0x4b * bit1 + 0x91 * bit2;
+
+		/* because the graphics are decoded as 4bpp with the top bit used for transparency
+		   or priority, we create matching 3bpp sets of palette entries, which effectively
+		   ignores the value of the top bit */
+		palette.set_pen_color(((i & 0xf8) << 1) | 0x00 | (i & 0x07), rgb_t(r, g, b));
+		palette.set_pen_color(((i & 0xf8) << 1) | 0x08 | (i & 0x07), rgb_t(r, g, b));
+	}
+}
+
+
+void docastle_state::videoram_w(offs_t offset, uint8_t data)
+{
+	m_videoram[offset] = data;
+	m_do_tilemap->mark_tile_dirty(offset);
+}
+
+void docastle_state::colorram_w(offs_t offset, uint8_t data)
+{
+	m_colorram[offset] = data;
+	m_do_tilemap->mark_tile_dirty(offset);
+}
+
+uint8_t docastle_state::inputs_flipscreen_r(offs_t offset)
+{
+	uint8_t data = 0xff;
+
+	if (!machine().side_effects_disabled())
+	{
+		// inputs pass through LS244 non-inverting buffer
+		data = (m_inp[1]->read_h() << 4) | m_inp[0]->read_h();
+
+		// LS273 latches address bits on rising edge of address decode
+		flipscreen_w(offset, 0);
+		m_inp[0]->write_s(offset & 7);
+		m_inp[1]->write_s(offset & 7);
+	}
+
+	return data;
+}
+
+void docastle_state::flipscreen_w(offs_t offset, uint8_t data)
+{
+	flip_screen_set(BIT(offset, 7));
+}
+
+
+void docastle_state::draw_sprites(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+{
+	screen.priority().fill(1);
+
+	for (int offs = m_spriteram.bytes() - 4; offs >= 0; offs -= 4)
+	{
+		int sx, sy, flipx, flipy, code, color;
+
+		if (m_gfxdecode->gfx(1)->elements() > 256)
+		{
+			/* spriteram
+
+			indoor soccer appears to have a slightly different spriteram
+			format to the other games, allowing a larger number of sprite
+			tiles
+
+			yyyy yyyy  xxxx xxxx  TX-T pppp  tttt tttt
+
+			y = ypos
+			x = xpos
+			X = x-flip
+			T = extra tile number bits
+			p = palette
+			t = tile number
+
+			*/
+
+			code = m_spriteram[offs + 3];
+			color = m_spriteram[offs + 2] & 0x0f;
+			sx = ((m_spriteram[offs + 1] + 8) & 0xff) - 8;
+			sy = m_spriteram[offs] - 32;
+			flipx = m_spriteram[offs + 2] & 0x40;
+			flipy = 0;
+			if (m_spriteram[offs + 2] & 0x10) code += 0x100;
+			if (m_spriteram[offs + 2] & 0x80) code += 0x200;
+		}
+		else
+		{
+			/* spriteram
+
+			this is the standard spriteram layout, used by most games
+
+			yyyy yyyy  xxxx xxxx  YX-p pppp  tttt tttt
+
+			y = ypos
+			x = xpos
+			X = x-flip
+			Y = y-flip
+			p = palette
+			t = tile number
+
+			*/
+
+			code = m_spriteram[offs + 3];
+			color = m_spriteram[offs + 2] & 0x1f;
+			sx = ((m_spriteram[offs + 1] + 8) & 0xff) - 8;
+			sy = m_spriteram[offs] - 32;
+			flipx = m_spriteram[offs + 2] & 0x40;
+			flipy = m_spriteram[offs + 2] & 0x80;
+		}
+
+		if (flip_screen())
+		{
+			sx = 240 - sx;
+			sy = 176 - sy;
+			flipx = !flipx;
+			flipy = !flipy;
+		}
+
+		// first draw the sprite, visible
+		m_gfxdecode->gfx(1)->prio_transmask(bitmap,cliprect,
+				code,
+				color,
+				flipx,flipy,
+				sx,sy,
+				screen.priority(),
+				0x00, 0x80ff);
+
+		// then draw the mask, behind the background but obscuring following sprites
+		m_gfxdecode->gfx(1)->prio_transmask(bitmap,cliprect,
+				code,
+				color,
+				flipx,flipy,
+				sx,sy,
+				screen.priority(),
+				0x02, 0x7fff);
+	}
+}
+
+uint32_t docastle_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+{
+	m_do_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
+	draw_sprites(screen, bitmap, cliprect);
+	m_do_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_LAYER0, 0);
+	return 0;
+}
+
+
+
+/*******************************************************************************
+    Read/Write Handlers
+*******************************************************************************/
+
 void docastle_state::docastle_tint(int state)
 {
 	if (state)
 	{
-		int ma6 = m_crtc->get_ma() & 0x40;
-		if (ma6 && !m_prev_ma6) // MA6 rising edge
-			m_subcpu->set_input_line(0, HOLD_LINE);
+		int ma6 = BIT(m_crtc->get_ma(), 6);
+
+		// trigger interrupt on MA6 rising edge
+		if (ma6 && !m_prev_ma6)
+			m_subcpu->set_input_line(0, HOLD_LINE); // auto ack
+
 		m_prev_ma6 = ma6;
 	}
 }
 
-void docastle_state::idsoccer_adpcm_int(int state)
+
+/*
+
+Communication between the two CPUs happens through a single bidirectional latch.
+Whenever maincpu reads or writes it, its WAIT input is asserted. It is implicitly
+cleared by subcpu, when it accesses the latch. This enforces synchronization
+between the two CPUs.
+
+It is initiated by maincpu triggering an NMI on subcpu. During this process,
+timing needs to be cycle-accurate, both CPUs do LDIR opcodes in lockstep.
+
+*/
+
+uint8_t docastle_state::main_from_sub_r(offs_t offset)
+{
+	if (!machine().side_effects_disabled())
+	{
+		m_maincpu_wait = !m_maincpu_wait;
+
+		if (m_maincpu_wait)
+		{
+			// steal 1 cycle ahead of WAIT to avoid race condition
+			m_maincpu->adjust_icount(-1);
+
+			machine().scheduler().perfect_quantum(attotime::from_usec(100));
+			m_maincpu->set_input_line(Z80_INPUT_LINE_WAIT, ASSERT_LINE);
+
+			// retry access after subcpu writes the latch and clears WAIT
+			m_maincpu->retry_access();
+		}
+		else
+		{
+			LOGMASKED(LOG_MAINSUB, "%dR%02X%c", offset, m_shared_latch, (offset == 8) ? '\n' : ' ');
+
+			// give back stolen cycle
+			m_maincpu->adjust_icount(1);
+		}
+	}
+
+	return m_shared_latch;
+}
+
+void docastle_state::main_to_sub_w(offs_t offset, uint8_t data)
+{
+	LOGMASKED(LOG_MAINSUB, "%dW%02X ", offset, data);
+
+	m_shared_latch = data;
+	machine().scheduler().perfect_quantum(attotime::from_usec(100));
+	m_maincpu->set_input_line(Z80_INPUT_LINE_WAIT, ASSERT_LINE);
+}
+
+uint8_t docastle_state::sub_from_main_r(offs_t offset)
+{
+	if (!machine().side_effects_disabled())
+	{
+		LOGMASKED(LOG_MAINSUB, "%dr%02X%c", offset, m_shared_latch, (offset == 8) ? '\n' : ' ');
+		m_maincpu->set_input_line(Z80_INPUT_LINE_WAIT, CLEAR_LINE);
+	}
+
+	return m_shared_latch;
+}
+
+void docastle_state::sub_to_main_w(offs_t offset, uint8_t data)
+{
+	LOGMASKED(LOG_MAINSUB, "%dw%02X ", offset, data);
+
+	m_shared_latch = data;
+	m_maincpu->set_input_line(Z80_INPUT_LINE_WAIT, CLEAR_LINE);
+}
+
+
+void docastle_state::subcpu_nmi_w(uint8_t data)
+{
+	LOGMASKED(LOG_MAINSUB, "%s trigger subcpu NMI\n", machine().describe_context());
+
+	machine().scheduler().perfect_quantum(attotime::from_usec(100));
+	m_subcpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
+}
+
+
+
+/*******************************************************************************
+    Indoor Soccer ADPCM
+*******************************************************************************/
+
+void idsoccer_state::adpcm_int(int state)
 {
 	if (m_adpcm_pos >= memregion("adpcm")->bytes())
 	{
@@ -206,14 +681,14 @@ void docastle_state::idsoccer_adpcm_int(int state)
 	}
 }
 
-uint8_t docastle_state::idsoccer_adpcm_status_r()
+uint8_t idsoccer_state::adpcm_status_r()
 {
 	// this is wrong, but the samples work anyway!!
 	m_adpcm_status ^= 0x80;
 	return m_adpcm_status;
 }
 
-void docastle_state::idsoccer_adpcm_w(uint8_t data)
+void idsoccer_state::adpcm_w(uint8_t data)
 {
 	if (data & 0x80)
 	{
@@ -228,20 +703,32 @@ void docastle_state::idsoccer_adpcm_w(uint8_t data)
 	}
 }
 
-/* Memory Maps */
-void docastle_state::docastle_map(address_map &map)
+
+
+/*******************************************************************************
+    Memory Maps
+*******************************************************************************/
+
+void docastle_state::main_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0x97ff).ram();
-	map(0x9800, 0x99ff).ram().share("spriteram");
+	map(0x9800, 0x99ff).writeonly().share(m_spriteram);
 	map(0xa000, 0xa7ff).rw(FUNC(docastle_state::main_from_sub_r), FUNC(docastle_state::main_to_sub_w));
 	map(0xa800, 0xa800).w("watchdog", FUNC(watchdog_timer_device::reset_w));
-	map(0xb000, 0xb3ff).mirror(0x0800).ram().w(FUNC(docastle_state::videoram_w)).share("videoram");
-	map(0xb400, 0xb7ff).mirror(0x0800).ram().w(FUNC(docastle_state::colorram_w)).share("colorram");
+	map(0xb000, 0xb3ff).mirror(0x0800).ram().w(FUNC(docastle_state::videoram_w)).share(m_videoram);
+	map(0xb400, 0xb7ff).mirror(0x0800).ram().w(FUNC(docastle_state::colorram_w)).share(m_colorram);
 	map(0xe000, 0xe000).w(FUNC(docastle_state::subcpu_nmi_w));
 }
 
-void docastle_state::docastle_map2(address_map &map)
+void docastle_state::main_io(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x00).w(m_crtc, FUNC(mc6845_device::address_w));
+	map(0x02, 0x02).w(m_crtc, FUNC(mc6845_device::register_w));
+}
+
+void docastle_state::sub_map(address_map &map)
 {
 	map(0x0000, 0x3fff).rom();
 	map(0x8000, 0x87ff).ram();
@@ -253,7 +740,7 @@ void docastle_state::docastle_map2(address_map &map)
 	map(0xec00, 0xec00).w(m_sn[3], FUNC(sn76489a_device::write));
 }
 
-void docastle_state::docastle_map3(address_map &map)
+void docastle_state::sprite_map(address_map &map)
 {
 	map(0x0000, 0x00ff).rom();
 	map(0x4000, 0x47ff).ram();
@@ -261,28 +748,21 @@ void docastle_state::docastle_map3(address_map &map)
 	map(0xc000, 0xc7ff).noprw(); // sprite chip?
 }
 
-void docastle_state::docastle_io_map(address_map &map)
-{
-	map.global_mask(0xff);
-	map(0x00, 0x00).w(m_crtc, FUNC(mc6845_device::address_w));
-	map(0x02, 0x02).w(m_crtc, FUNC(mc6845_device::register_w));
-}
-
 
 void docastle_state::dorunrun_map(address_map &map)
 {
 	map(0x0000, 0x1fff).rom();
 	map(0x2000, 0x37ff).ram();
-	map(0x3800, 0x39ff).ram().share("spriteram");
+	map(0x3800, 0x39ff).writeonly().share(m_spriteram);
 	map(0x4000, 0x9fff).rom();
 	map(0xa000, 0xa7ff).rw(FUNC(docastle_state::main_from_sub_r), FUNC(docastle_state::main_to_sub_w));
 	map(0xa800, 0xa800).w("watchdog", FUNC(watchdog_timer_device::reset_w));
-	map(0xb000, 0xb3ff).ram().w(FUNC(docastle_state::videoram_w)).share("videoram");
-	map(0xb400, 0xb7ff).ram().w(FUNC(docastle_state::colorram_w)).share("colorram");
+	map(0xb000, 0xb3ff).ram().w(FUNC(docastle_state::videoram_w)).share(m_videoram);
+	map(0xb400, 0xb7ff).ram().w(FUNC(docastle_state::colorram_w)).share(m_colorram);
 	map(0xb800, 0xb800).w(FUNC(docastle_state::subcpu_nmi_w));
 }
 
-void docastle_state::dorunrun_map2(address_map &map)
+void docastle_state::dorunrun_sub_map(address_map &map)
 {
 	map(0x0000, 0x3fff).rom();
 	map(0x8000, 0x87ff).ram();
@@ -295,21 +775,25 @@ void docastle_state::dorunrun_map2(address_map &map)
 }
 
 
-void docastle_state::idsoccer_map(address_map &map)
+void idsoccer_state::idsoccer_map(address_map &map)
 {
 	map(0x0000, 0x3fff).rom();
 	map(0x4000, 0x57ff).ram();
-	map(0x5800, 0x59ff).ram().share("spriteram");
+	map(0x5800, 0x59ff).writeonly().share(m_spriteram);
 	map(0x6000, 0x9fff).rom();
-	map(0xa000, 0xa7ff).rw(FUNC(docastle_state::main_from_sub_r), FUNC(docastle_state::main_to_sub_w));
+	map(0xa000, 0xa7ff).rw(FUNC(idsoccer_state::main_from_sub_r), FUNC(idsoccer_state::main_to_sub_w));
 	map(0xa800, 0xa800).w("watchdog", FUNC(watchdog_timer_device::reset_w));
-	map(0xb000, 0xb3ff).mirror(0x0800).ram().w(FUNC(docastle_state::videoram_w)).share("videoram");
-	map(0xb400, 0xb7ff).mirror(0x0800).ram().w(FUNC(docastle_state::colorram_w)).share("colorram");
-	map(0xc000, 0xc000).rw(FUNC(docastle_state::idsoccer_adpcm_status_r), FUNC(docastle_state::idsoccer_adpcm_w));
-	map(0xe000, 0xe000).w(FUNC(docastle_state::subcpu_nmi_w));
+	map(0xb000, 0xb3ff).mirror(0x0800).ram().w(FUNC(idsoccer_state::videoram_w)).share(m_videoram);
+	map(0xb400, 0xb7ff).mirror(0x0800).ram().w(FUNC(idsoccer_state::colorram_w)).share(m_colorram);
+	map(0xc000, 0xc000).rw(FUNC(idsoccer_state::adpcm_status_r), FUNC(idsoccer_state::adpcm_w));
+	map(0xe000, 0xe000).w(FUNC(idsoccer_state::subcpu_nmi_w));
 }
 
-/* Input Ports */
+
+
+/*******************************************************************************
+    Input Ports
+*******************************************************************************/
 
 static INPUT_PORTS_START( docastle )
 	PORT_START("JOYS")
@@ -380,7 +864,7 @@ static INPUT_PORTS_START( docastle )
 	PORT_DIPSETTING(    0x0c, DEF_STR( 1C_4C ) )
 	PORT_DIPSETTING(    0x0b, DEF_STR( 1C_5C ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Free_Play ) )
-	/* 0x01, 0x02, 0x03, 0x04, 0x05 all give 1 Coin/1 Credit */
+	// 0x01, 0x02, 0x03, 0x04, 0x05 all give 1 Coin/1 Credit
 	PORT_DIPNAME( 0xf0, 0xf0, DEF_STR( Coin_A ) ) PORT_DIPLOCATION("SWB:4,3,2,1")
 	PORT_DIPSETTING(    0x60, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( 3C_1C ) )
@@ -393,7 +877,7 @@ static INPUT_PORTS_START( docastle )
 	PORT_DIPSETTING(    0xc0, DEF_STR( 1C_4C ) )
 	PORT_DIPSETTING(    0xb0, DEF_STR( 1C_5C ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Free_Play ) )
-	/* 0x10, 0x20, 0x30, 0x40, 0x50 all give 1 Coin/1 Credit */
+	// 0x10, 0x20, 0x30, 0x40, 0x50 all give 1 Coin/1 Credit
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( dorunrun )
@@ -491,6 +975,16 @@ static INPUT_PORTS_START( idsoccer )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICKLEFT_LEFT ) PORT_8WAY PORT_PLAYER(2)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICKLEFT_DOWN ) PORT_8WAY PORT_PLAYER(2)
 
+	PORT_START("JOYS2")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICKRIGHT_RIGHT ) PORT_8WAY
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICKRIGHT_UP ) PORT_8WAY
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICKRIGHT_LEFT ) PORT_8WAY
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICKRIGHT_DOWN ) PORT_8WAY
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICKRIGHT_RIGHT ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICKRIGHT_UP ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICKRIGHT_LEFT ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICKRIGHT_DOWN ) PORT_8WAY PORT_PLAYER(2)
+
 	PORT_MODIFY("DSW1")
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("SW1:7,8")
 	PORT_DIPSETTING(    0x03, DEF_STR( Easy ) )
@@ -514,69 +1008,26 @@ static INPUT_PORTS_START( idsoccer )
 	PORT_DIPSETTING(    0x80, "2:30" )
 	PORT_DIPSETTING(    0x40, "2:00" )
 	PORT_DIPSETTING(    0x00, "1:00" )
-
-	PORT_START("JOYS_RIGHT")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICKRIGHT_RIGHT ) PORT_8WAY
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICKRIGHT_UP ) PORT_8WAY
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICKRIGHT_LEFT ) PORT_8WAY
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICKRIGHT_DOWN ) PORT_8WAY
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICKRIGHT_RIGHT ) PORT_8WAY PORT_PLAYER(2)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICKRIGHT_UP ) PORT_8WAY PORT_PLAYER(2)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICKRIGHT_LEFT ) PORT_8WAY PORT_PLAYER(2)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICKRIGHT_DOWN ) PORT_8WAY PORT_PLAYER(2)
 INPUT_PORTS_END
 
-/* Graphics Decode Information */
-
-static GFXDECODE_START( gfx_docastle )
-	GFXDECODE_ENTRY( "gfx1", 0, gfx_8x8x4_packed_msb,   0, 64 )
-	GFXDECODE_ENTRY( "gfx2", 0, gfx_16x16x4_packed_msb, 0, 32*2 )
-GFXDECODE_END
 
 
-/* Machine Drivers */
-
-void docastle_state::machine_reset()
-{
-	m_prev_ma6 = 0;
-	m_adpcm_pos = m_adpcm_idle = 0;
-	m_adpcm_data = -1;
-	m_adpcm_status = 0;
-	m_maincpu_wait = false;
-
-	for (int i = 0; i < 2; i++)
-	{
-		m_inp[i]->write_ms(0); // pin 5 tied low
-		//m_inp[i]->write_ce(1); // pin 4 tied high
-		m_inp[i]->write_s(0); // cleared with LS273
-	}
-	flip_screen_set(0); // cleared with LS273
-}
-
-void docastle_state::machine_start()
-{
-	save_item(NAME(m_prev_ma6));
-	save_item(NAME(m_adpcm_pos));
-	save_item(NAME(m_adpcm_data));
-	save_item(NAME(m_adpcm_idle));
-	save_item(NAME(m_adpcm_status));
-
-	save_item(NAME(m_shared_latch));
-	save_item(NAME(m_maincpu_wait));
-}
+/*******************************************************************************
+    Machine Configs
+*******************************************************************************/
 
 void docastle_state::docastle(machine_config &config)
 {
-	/* basic machine hardware */
-	Z80(config, m_maincpu, XTAL(4'000'000));
-	m_maincpu->set_addrmap(AS_PROGRAM, &docastle_state::docastle_map);
-	m_maincpu->set_addrmap(AS_IO, &docastle_state::docastle_io_map);
+	// basic machine hardware
+	Z80(config, m_maincpu, 4_MHz_XTAL);
+	m_maincpu->set_addrmap(AS_PROGRAM, &docastle_state::main_map);
+	m_maincpu->set_addrmap(AS_IO, &docastle_state::main_io);
 
-	Z80(config, m_subcpu, XTAL(4'000'000));
-	m_subcpu->set_addrmap(AS_PROGRAM, &docastle_state::docastle_map2);
+	Z80(config, m_subcpu, 4_MHz_XTAL);
+	m_subcpu->set_addrmap(AS_PROGRAM, &docastle_state::sub_map);
 
-	Z80(config, m_spritecpu, XTAL(4'000'000));
-	m_spritecpu->set_addrmap(AS_PROGRAM, &docastle_state::docastle_map3);
+	Z80(config, m_spritecpu, 4_MHz_XTAL);
+	m_spritecpu->set_addrmap(AS_PROGRAM, &docastle_state::sprite_map);
 
 	TMS1025(config, m_inp[0]);
 	m_inp[0]->read_port1_callback().set_ioport("DSW2");
@@ -594,30 +1045,29 @@ void docastle_state::docastle(machine_config &config)
 
 	WATCHDOG_TIMER(config, "watchdog");
 
-	/* video hardware */
-	HD6845S(config, m_crtc, XTAL(9'828'000) / 16);
-	/*
-	The games program the CRTC for a width of 32 characters (256 pixels).
-	However, the DE output from the CRTC is first ANDed with the NAND of
-	MA1 through MA4, and then delayed by 8 pixel clocks; this effectively
-	blanks the first 8 pixels and last 8 pixels of each line.
-	*/
+	// video hardware
+	HD6845S(config, m_crtc, 9.828_MHz_XTAL / 16);
 	m_crtc->set_screen("screen");
-	m_crtc->set_show_border_area(false);
-	m_crtc->set_visarea_adjust(8,-8,0,0);
 	m_crtc->set_char_width(8);
 	m_crtc->out_vsync_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 	m_crtc->out_vsync_callback().append_inputline(m_spritecpu, INPUT_LINE_NMI);
 	m_crtc->out_hsync_callback().set(FUNC(docastle_state::docastle_tint));
 
+	// The games program the CRTC for a width of 32 characters (256 pixels).
+	// However, the DE output from the CRTC is first ANDed with the NAND of
+	// MA1 through MA4, and then delayed by 8 pixel clocks; this effectively
+	// blanks the first 8 pixels and last 8 pixels of each line.
+	m_crtc->set_show_border_area(false);
+	m_crtc->set_visarea_adjust(8,-8,0,0);
+
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_raw(XTAL(9'828'000)/2, 0x138, 8, 0x100-8, 0x108, 0, 0xc0); // from CRTC
-	screen.set_screen_update(FUNC(docastle_state::screen_update_docastle));
+	screen.set_raw(9.828_MHz_XTAL/2, 0x138, 8, 0x100-8, 0x108, 0, 0xc0); // from CRTC
+	screen.set_screen_update(FUNC(docastle_state::screen_update));
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_docastle);
-	PALETTE(config, m_palette, FUNC(docastle_state::docastle_palette), 512);
+	PALETTE(config, m_palette, FUNC(docastle_state::palette), 512);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
 	SN76489A(config, m_sn[0], 4_MHz_XTAL).add_route(ALL_OUTPUTS, "mono", 0.25);
@@ -638,35 +1088,39 @@ void docastle_state::dorunrun(machine_config &config)
 {
 	docastle(config);
 
-	/* basic machine hardware */
+	// basic machine hardware
 	m_maincpu->set_addrmap(AS_PROGRAM, &docastle_state::dorunrun_map);
-	m_subcpu->set_addrmap(AS_PROGRAM, &docastle_state::dorunrun_map2);
+	m_subcpu->set_addrmap(AS_PROGRAM, &docastle_state::dorunrun_sub_map);
 
-	/* video hardware */
+	// video hardware
 	MCFG_VIDEO_START_OVERRIDE(docastle_state,dorunrun)
 }
 
-void docastle_state::idsoccer(machine_config &config)
+void idsoccer_state::idsoccer(machine_config &config)
 {
 	docastle(config);
 
-	/* basic machine hardware */
-	m_maincpu->set_addrmap(AS_PROGRAM, &docastle_state::idsoccer_map);
+	// basic machine hardware
+	m_maincpu->set_addrmap(AS_PROGRAM, &idsoccer_state::idsoccer_map);
 
-	m_inp[0]->read_port4_callback().set_ioport("JOYS_RIGHT");
-	m_inp[1]->read_port4_callback().set_ioport("JOYS_RIGHT").rshift(4);
+	m_inp[0]->read_port4_callback().set_ioport("JOYS2");
+	m_inp[1]->read_port4_callback().set_ioport("JOYS2").rshift(4);
 
-	/* video hardware */
-	MCFG_VIDEO_START_OVERRIDE(docastle_state,dorunrun)
+	// video hardware
+	MCFG_VIDEO_START_OVERRIDE(idsoccer_state,dorunrun)
 
-	/* sound hardware */
-	MSM5205(config, m_msm, XTAL(384'000)); // Crystal verified on American Soccer board.
-	m_msm->vck_legacy_callback().set(FUNC(docastle_state::idsoccer_adpcm_int)); // interrupt function
+	// sound hardware
+	MSM5205(config, m_msm, 384_kHz_XTAL); // Crystal verified on American Soccer board.
+	m_msm->vck_legacy_callback().set(FUNC(idsoccer_state::adpcm_int)); // interrupt function
 	m_msm->set_prescaler_selector(msm5205_device::S64_4B); // 6 kHz ???
 	m_msm->add_route(ALL_OUTPUTS, "mono", 0.40);
 }
 
-/* ROMs */
+
+
+/*******************************************************************************
+    ROMs
+*******************************************************************************/
 
 ROM_START( docastle )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -722,10 +1176,10 @@ ROM_END
 
 ROM_START( docastleo )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "c1.bin",     0x0000, 0x2000, CRC(c9ce96ab) SHA1(3166aef4556ce334ecef27dceb285f51de371c35) )
-	ROM_LOAD( "c2.bin",     0x2000, 0x2000, CRC(42b28369) SHA1(8c9a618984db52cdc4ec3a6bcfa7659866d2709c) )
-	ROM_LOAD( "c3.bin",     0x4000, 0x2000, CRC(c8c13124) SHA1(2cfc15b232744b40350c174b0d89677495c077eb) )
-	ROM_LOAD( "c4.bin",     0x6000, 0x2000, CRC(7ca78471) SHA1(2804f9be825973e69bc35aa703145b3ef22a5ecd) )
+	ROM_LOAD( "c1.bin",       0x0000, 0x2000, CRC(c9ce96ab) SHA1(3166aef4556ce334ecef27dceb285f51de371c35) )
+	ROM_LOAD( "c2.bin",       0x2000, 0x2000, CRC(42b28369) SHA1(8c9a618984db52cdc4ec3a6bcfa7659866d2709c) )
+	ROM_LOAD( "c3.bin",       0x4000, 0x2000, CRC(c8c13124) SHA1(2cfc15b232744b40350c174b0d89677495c077eb) )
+	ROM_LOAD( "c4.bin",       0x6000, 0x2000, CRC(7ca78471) SHA1(2804f9be825973e69bc35aa703145b3ef22a5ecd) )
 
 	ROM_REGION( 0x10000, "subcpu", 0 )
 	ROM_LOAD( "dorev10.bin",  0x0000, 0x4000, CRC(4b1925e3) SHA1(1b229dd73eede3853d23576dfe397a4d2d952991) )
@@ -743,7 +1197,7 @@ ROM_START( docastleo )
 	ROM_LOAD( "dorev9.bin",   0x6000, 0x2000, CRC(893fc004) SHA1(15559d11cc14341d2fec190d12205a649bdd484f) )
 
 	ROM_REGION( 0x0200, "proms", 0 )
-	/* which prom? this set has the same gfx as douni so i'm using that prom */
+	// which prom? this set has the same gfx as douni so i'm using that prom
 //  ROM_LOAD( "09c.bin",      0x0000, 0x0200, CRC(066f52bc) SHA1(99f4f2d0181bcaf389c16f127cc3e632d62ee417) ) // color prom
 	ROM_LOAD( "dorevc9.bin",  0x0000, 0x0200, CRC(96624ebe) SHA1(74ff21dc85dcb013c941ec6c06cafdb5bcc16960) ) // color prom
 ROM_END
@@ -835,19 +1289,19 @@ ROM_START( runrun )
 	ROM_LOAD( "electric_4.bin",   0x6000, 0x2000, CRC(a63d0b89) SHA1(d2ab3b76149e6620f1eb93a051c802b208b8d6dc) )
 
 	ROM_REGION( 0x10000, "subcpu", 0 )
-	ROM_LOAD( "electric_10.bin",   0x0000, 0x4000, CRC(6dac2fa3) SHA1(cd583f379f01788ce20f611f17689105d32ef97a) )
+	ROM_LOAD( "electric_10.bin",  0x0000, 0x4000, CRC(6dac2fa3) SHA1(cd583f379f01788ce20f611f17689105d32ef97a) )
 
 	ROM_REGION( 0x10000, "spritecpu", 0 )
-	ROM_LOAD( "bprom2.bin",   0x0000, 0x0200, BAD_DUMP CRC(2747ca77) SHA1(abc0ca05925974c4b852827605ee2f1caefb8524) ) // not dumped for this set
+	ROM_LOAD( "bprom2.bin",       0x0000, 0x0200, BAD_DUMP CRC(2747ca77) SHA1(abc0ca05925974c4b852827605ee2f1caefb8524) ) // not dumped for this set
 
 	ROM_REGION( 0x4000, "gfx1", 0 )
 	ROM_LOAD( "electric_5.bin",   0x0000, 0x4000, CRC(e20795b7) SHA1(ae4366d2c45580f3e60ae36f81a5fc912d1eb899) )
 
 	ROM_REGION( 0x8000, "gfx2", 0 )
-	ROM_LOAD( "electric_6.bin",      0x0000, 0x2000, CRC(4bb231a0) SHA1(350423a1e602e23b229095021942d4b14a4736a7) )
-	ROM_LOAD( "electric_7.bin",      0x2000, 0x2000, CRC(0c08508a) SHA1(1e235a0f44207c53af2c8da631e5a8e08b231258) )
-	ROM_LOAD( "electric_8.bin",      0x4000, 0x2000, CRC(79287039) SHA1(e2e3c056f35a22e48115557e10fcd172ad2f91f1) )
-	ROM_LOAD( "electric_9.bin",      0x6000, 0x2000, CRC(523aa999) SHA1(1d4aa0af79a2ed7b935d4ce92d978bf738f08eb3) )
+	ROM_LOAD( "electric_6.bin",   0x0000, 0x2000, CRC(4bb231a0) SHA1(350423a1e602e23b229095021942d4b14a4736a7) )
+	ROM_LOAD( "electric_7.bin",   0x2000, 0x2000, CRC(0c08508a) SHA1(1e235a0f44207c53af2c8da631e5a8e08b231258) )
+	ROM_LOAD( "electric_8.bin",   0x4000, 0x2000, CRC(79287039) SHA1(e2e3c056f35a22e48115557e10fcd172ad2f91f1) )
+	ROM_LOAD( "electric_9.bin",   0x6000, 0x2000, CRC(523aa999) SHA1(1d4aa0af79a2ed7b935d4ce92d978bf738f08eb3) )
 
 	ROM_REGION( 0x0100, "proms", 0 )
 	ROM_LOAD( "dorunrun.clr", 0x0000, 0x0100, BAD_DUMP CRC(d5bab5d5) SHA1(7a465fe30b6008793d33f6e07086c89111e1e407) ) // not dumped for this set
@@ -1011,87 +1465,87 @@ ROM_END
 
 ROM_START( idsoccer )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "id01",           0x0000, 0x2000, CRC(f1c3bf09) SHA1(446d373671f122d8131d2ec2d80c2110ec68a19b) )
-	ROM_LOAD( "id02",           0x2000, 0x2000, CRC(184e6af0) SHA1(1664ca6fa0efae8496d051ac5f19596239e7cbcb) )
-	ROM_LOAD( "id03",           0x6000, 0x2000, CRC(22524661) SHA1(363528a1135d11ead03c76064042a72e0ac93533) )
-	ROM_LOAD( "id04",           0x8000, 0x2000, CRC(e8cd95fd) SHA1(2e272c154bd5dd2dca58d3fe12c6ba5e01a62477) )
+	ROM_LOAD( "id01",         0x0000, 0x2000, CRC(f1c3bf09) SHA1(446d373671f122d8131d2ec2d80c2110ec68a19b) )
+	ROM_LOAD( "id02",         0x2000, 0x2000, CRC(184e6af0) SHA1(1664ca6fa0efae8496d051ac5f19596239e7cbcb) )
+	ROM_LOAD( "id03",         0x6000, 0x2000, CRC(22524661) SHA1(363528a1135d11ead03c76064042a72e0ac93533) )
+	ROM_LOAD( "id04",         0x8000, 0x2000, CRC(e8cd95fd) SHA1(2e272c154bd5dd2dca58d3fe12c6ba5e01a62477) )
 
 	ROM_REGION( 0x10000, "subcpu", 0 )
-	ROM_LOAD( "id10",           0x0000, 0x4000, CRC(6c8b2037) SHA1(718d680186623d5af23ed272f04e726fbb17f078) )
+	ROM_LOAD( "id10",         0x0000, 0x4000, CRC(6c8b2037) SHA1(718d680186623d5af23ed272f04e726fbb17f078) )
 
 	ROM_REGION( 0x10000, "spritecpu", 0 )
-	ROM_LOAD( "id_8p",          0x0000, 0x0200, CRC(2747ca77) SHA1(abc0ca05925974c4b852827605ee2f1caefb8524) )
+	ROM_LOAD( "id_8p",        0x0000, 0x0200, CRC(2747ca77) SHA1(abc0ca05925974c4b852827605ee2f1caefb8524) )
 
 	ROM_REGION( 0x8000, "gfx1", 0 )
-	ROM_LOAD( "id05",          0x0000, 0x4000, CRC(a57c7a11) SHA1(9faebad0050da05101811427f350e163a7811396) )
+	ROM_LOAD( "id05",         0x0000, 0x4000, CRC(a57c7a11) SHA1(9faebad0050da05101811427f350e163a7811396) )
 
 	ROM_REGION( 0x20000, "gfx2", 0 )
-	ROM_LOAD( "id06",           0x00000, 0x8000, CRC(b42a6f4a) SHA1(ddce4438b3649610bd3703cbd7592aaa9a3eda0e) )
-	ROM_LOAD( "id07",           0x08000, 0x8000, CRC(fa2b1c77) SHA1(0d8e9db065c76621deb58575f01c6ec5ee6cf6b0) )
-	ROM_LOAD( "id08",           0x10000, 0x8000, CRC(5e97eab9) SHA1(40d261a0255c594353816c18aa6c0c245aeb68a8) )
-	ROM_LOAD( "id09",           0x18000, 0x8000, CRC(a2a69223) SHA1(6bd9b76e0119643450c9f64c80b52e9056da82d6) )
+	ROM_LOAD( "id06",         0x00000, 0x8000, CRC(b42a6f4a) SHA1(ddce4438b3649610bd3703cbd7592aaa9a3eda0e) )
+	ROM_LOAD( "id07",         0x08000, 0x8000, CRC(fa2b1c77) SHA1(0d8e9db065c76621deb58575f01c6ec5ee6cf6b0) )
+	ROM_LOAD( "id08",         0x10000, 0x8000, CRC(5e97eab9) SHA1(40d261a0255c594353816c18aa6c0c245aeb68a8) )
+	ROM_LOAD( "id09",         0x18000, 0x8000, CRC(a2a69223) SHA1(6bd9b76e0119643450c9f64c80b52e9056da82d6) )
 
 	ROM_REGION( 0x10000, "adpcm", 0 )
-	ROM_LOAD( "is1",            0x0000, 0x4000, CRC(9eb76196) SHA1(c15331dd8c3efaa83a95245210d05eaaa64b3161) )
-	ROM_LOAD( "is3",            0x8000, 0x4000, CRC(27bebba3) SHA1(cf752b22603c1e2a0b33958481c652d6d56ebf68) )
-	ROM_LOAD( "is4",            0xc000, 0x4000, CRC(dd5ffaa2) SHA1(4bc4330a54ca93448a8fe05207d3fb1a3a9872e1) )
+	ROM_LOAD( "is1",          0x0000, 0x4000, CRC(9eb76196) SHA1(c15331dd8c3efaa83a95245210d05eaaa64b3161) )
+	ROM_LOAD( "is3",          0x8000, 0x4000, CRC(27bebba3) SHA1(cf752b22603c1e2a0b33958481c652d6d56ebf68) )
+	ROM_LOAD( "is4",          0xc000, 0x4000, CRC(dd5ffaa2) SHA1(4bc4330a54ca93448a8fe05207d3fb1a3a9872e1) )
 
 	ROM_REGION( 0x0200, "proms", 0 )
-	ROM_LOAD( "id_3d.clr",   0x0000, 0x0200, CRC(a433ff62) SHA1(db9afe5fc917d25aafa21576cb1cecec7481d4cb) )
+	ROM_LOAD( "id_3d.clr",    0x0000, 0x0200, CRC(a433ff62) SHA1(db9afe5fc917d25aafa21576cb1cecec7481d4cb) )
 ROM_END
 
 ROM_START( idsoccera )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "indoor.e10",           0x0000, 0x2000, CRC(ed086bd1) SHA1(e1351fe53779c73a8631d4c33fa9508ddac8b4c1) )
-	ROM_LOAD( "indoor.f10",           0x2000, 0x2000, CRC(54e5c6fc) SHA1(2c5a1e7bb9c8d5877eb99e8d20498986b85a8af4) )
-	ROM_LOAD( "indoor.h10",           0x6000, 0x2000, CRC(f0ca1ac8) SHA1(fa5724ba8ab0ff82a1ef22ddd56e57b4c2b6ab74) )
+	ROM_LOAD( "indoor.e10",   0x0000, 0x2000, CRC(ed086bd1) SHA1(e1351fe53779c73a8631d4c33fa9508ddac8b4c1) )
+	ROM_LOAD( "indoor.f10",   0x2000, 0x2000, CRC(54e5c6fc) SHA1(2c5a1e7bb9c8d5877eb99e8d20498986b85a8af4) )
+	ROM_LOAD( "indoor.h10",   0x6000, 0x2000, CRC(f0ca1ac8) SHA1(fa5724ba8ab0ff82a1ef22ddd56e57b4c2b6ab74) )
 
 	ROM_REGION( 0x10000, "subcpu", 0 )
-	ROM_LOAD( "indoor.e2",           0x0000, 0x4000, CRC(c4bacc14) SHA1(d457a24b084726fe6b2f97a1be44e67c0a61a97b) ) // different
+	ROM_LOAD( "indoor.e2",    0x0000, 0x4000, CRC(c4bacc14) SHA1(d457a24b084726fe6b2f97a1be44e67c0a61a97b) ) // different
 
 	ROM_REGION( 0x10000, "spritecpu", 0 )
-	ROM_LOAD( "indoor.p8",          0x0000, 0x0200, CRC(2747ca77) SHA1(abc0ca05925974c4b852827605ee2f1caefb8524) )
+	ROM_LOAD( "indoor.p8",    0x0000, 0x0200, CRC(2747ca77) SHA1(abc0ca05925974c4b852827605ee2f1caefb8524) )
 
 	ROM_REGION( 0x8000, "gfx1", 0 )
-	ROM_LOAD( "indoor.e6",          0x0000, 0x4000, CRC(a57c7a11) SHA1(9faebad0050da05101811427f350e163a7811396) )
+	ROM_LOAD( "indoor.e6",    0x0000, 0x4000, CRC(a57c7a11) SHA1(9faebad0050da05101811427f350e163a7811396) )
 
 	// some graphic / sound ROMs also differ on this set - verify them
 	// the sound ROM causes bad sound, but the implementation is hacked
 	ROM_REGION( 0x20000, "gfx2", 0 )
-	ROM_LOAD( "indoor.p3",           0x00000, 0x8000, CRC(b42a6f4a) SHA1(ddce4438b3649610bd3703cbd7592aaa9a3eda0e) )
-	ROM_LOAD( "indoor.n3",           0x08000, 0x8000, CRC(fa2b1c77) SHA1(0d8e9db065c76621deb58575f01c6ec5ee6cf6b0) )
-	ROM_LOAD( "indoor.l3",           0x10000, 0x8000, CRC(2663405c) SHA1(16c054c5c16ace80941523a64654afa3a77d7611) ) // different
-	ROM_LOAD( "indoor.k3",           0x18000, 0x8000, CRC(a2a69223) SHA1(6bd9b76e0119643450c9f64c80b52e9056da82d6) )
+	ROM_LOAD( "indoor.p3",    0x00000, 0x8000, CRC(b42a6f4a) SHA1(ddce4438b3649610bd3703cbd7592aaa9a3eda0e) )
+	ROM_LOAD( "indoor.n3",    0x08000, 0x8000, CRC(fa2b1c77) SHA1(0d8e9db065c76621deb58575f01c6ec5ee6cf6b0) )
+	ROM_LOAD( "indoor.l3",    0x10000, 0x8000, CRC(2663405c) SHA1(16c054c5c16ace80941523a64654afa3a77d7611) ) // different
+	ROM_LOAD( "indoor.k3",    0x18000, 0x8000, CRC(a2a69223) SHA1(6bd9b76e0119643450c9f64c80b52e9056da82d6) )
 
 	ROM_REGION( 0x10000, "adpcm", 0 )
-	ROM_LOAD( "indoor.ic1",            0x0000, 0x4000, CRC(3bb65dc7) SHA1(499151903b3da9fa2455b3d2c04863b3e33e853d) ) // different (causes bad sound in attract, but isn't a bad dump since it has been confirmed on multiple boards)
-	ROM_LOAD( "indoor.ic3",            0x8000, 0x4000, CRC(27bebba3) SHA1(cf752b22603c1e2a0b33958481c652d6d56ebf68) )
-	ROM_LOAD( "indoor.ic4",            0xc000, 0x4000, CRC(dd5ffaa2) SHA1(4bc4330a54ca93448a8fe05207d3fb1a3a9872e1) )
+	ROM_LOAD( "indoor.ic1",   0x0000, 0x4000, CRC(3bb65dc7) SHA1(499151903b3da9fa2455b3d2c04863b3e33e853d) ) // different (causes bad sound in attract, but isn't a bad dump since it has been confirmed on multiple boards)
+	ROM_LOAD( "indoor.ic3",   0x8000, 0x4000, CRC(27bebba3) SHA1(cf752b22603c1e2a0b33958481c652d6d56ebf68) )
+	ROM_LOAD( "indoor.ic4",   0xc000, 0x4000, CRC(dd5ffaa2) SHA1(4bc4330a54ca93448a8fe05207d3fb1a3a9872e1) )
 
 	ROM_REGION( 0x0200, "proms", 0 )
-	ROM_LOAD( "indoor.d3",   0x0000, 0x0200, CRC(d9b2550c) SHA1(074253b1ede42a743f1a8858756640693126209f) ) // different
+	ROM_LOAD( "indoor.d3",    0x0000, 0x0200, CRC(d9b2550c) SHA1(074253b1ede42a743f1a8858756640693126209f) ) // different
 ROM_END
 
 ROM_START( idsoccert ) // UNIVERSAL 8461-A (with TECFRI SA logo) + UNIVERSAL 8461-SUB-1 PCBs. Uses a SY6845BA with a 10MHz XTAL instead.
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "1.e10", 0x0000, 0x2000, CRC(1fa5ad7d) SHA1(f9d8dd0c8300085e84472014f8573cad637dbea2) )
-	ROM_LOAD( "2.f10", 0x2000, 0x2000, CRC(68b9764b) SHA1(73811d71aef4c43ea99a8a578b38e7836d377536) )
-	ROM_LOAD( "3.h10", 0x6000, 0x2000, CRC(5baabe1f) SHA1(12afaeac45ce03499614708edd171f20f3b4a73d) )
+	ROM_LOAD( "1.e10",        0x0000, 0x2000, CRC(1fa5ad7d) SHA1(f9d8dd0c8300085e84472014f8573cad637dbea2) )
+	ROM_LOAD( "2.f10",        0x2000, 0x2000, CRC(68b9764b) SHA1(73811d71aef4c43ea99a8a578b38e7836d377536) )
+	ROM_LOAD( "3.h10",        0x6000, 0x2000, CRC(5baabe1f) SHA1(12afaeac45ce03499614708edd171f20f3b4a73d) )
 
 	ROM_REGION( 0x10000, "subcpu", 0 )
-	ROM_LOAD( "9.e2", 0x0000, 0x4000, CRC(c4bacc14) SHA1(d457a24b084726fe6b2f97a1be44e67c0a61a97b) )
+	ROM_LOAD( "9.e2",         0x0000, 0x4000, CRC(c4bacc14) SHA1(d457a24b084726fe6b2f97a1be44e67c0a61a97b) )
 
 	ROM_REGION( 0x10000, "spritecpu", 0 )
-	ROM_LOAD( "82s147.p8", 0x0000, 0x0200, CRC(2747ca77) SHA1(abc0ca05925974c4b852827605ee2f1caefb8524) )
+	ROM_LOAD( "82s147.p8",    0x0000, 0x0200, CRC(2747ca77) SHA1(abc0ca05925974c4b852827605ee2f1caefb8524) )
 
 	ROM_REGION( 0x8000, "gfx1", 0 )
-	ROM_LOAD( "4.e6", 0x0000, 0x4000, CRC(a57c7a11) SHA1(9faebad0050da05101811427f350e163a7811396) )
+	ROM_LOAD( "4.e6",         0x0000, 0x4000, CRC(a57c7a11) SHA1(9faebad0050da05101811427f350e163a7811396) )
 
 	ROM_REGION( 0x20000, "gfx2", 0 )
-	ROM_LOAD( "8.p3", 0x00000, 0x8000, CRC(b42a6f4a) SHA1(ddce4438b3649610bd3703cbd7592aaa9a3eda0e) )
-	ROM_LOAD( "7.n3", 0x08000, 0x8000, CRC(fa2b1c77) SHA1(0d8e9db065c76621deb58575f01c6ec5ee6cf6b0) )
-	ROM_LOAD( "6.l3", 0x10000, 0x8000, CRC(2663405c) SHA1(16c054c5c16ace80941523a64654afa3a77d7611) )
-	ROM_LOAD( "5.k3", 0x18000, 0x8000, CRC(a2a69223) SHA1(6bd9b76e0119643450c9f64c80b52e9056da82d6) )
+	ROM_LOAD( "8.p3",         0x00000, 0x8000, CRC(b42a6f4a) SHA1(ddce4438b3649610bd3703cbd7592aaa9a3eda0e) )
+	ROM_LOAD( "7.n3",         0x08000, 0x8000, CRC(fa2b1c77) SHA1(0d8e9db065c76621deb58575f01c6ec5ee6cf6b0) )
+	ROM_LOAD( "6.l3",         0x10000, 0x8000, CRC(2663405c) SHA1(16c054c5c16ace80941523a64654afa3a77d7611) )
+	ROM_LOAD( "5.k3",         0x18000, 0x8000, CRC(a2a69223) SHA1(6bd9b76e0119643450c9f64c80b52e9056da82d6) )
 
 	ROM_REGION( 0x10000, "adpcm", 0 )
 	ROM_LOAD( "10_sub-1.ic1", 0x0000, 0x4000, CRC(3bb65dc7) SHA1(499151903b3da9fa2455b3d2c04863b3e33e853d) )
@@ -1100,7 +1554,7 @@ ROM_START( idsoccert ) // UNIVERSAL 8461-A (with TECFRI SA logo) + UNIVERSAL 846
 	ROM_LOAD( "12_sub-1.ic4", 0xc000, 0x4000, CRC(3bb65dc7) SHA1(499151903b3da9fa2455b3d2c04863b3e33e853d) ) // same as ic1, verified. Really strange. Manufacturing error?
 
 	ROM_REGION( 0x0200, "proms", 0 )
-	ROM_LOAD( "4_82s147.d3", 0x0000, 0x0200, CRC(d9b2550c) SHA1(074253b1ede42a743f1a8858756640693126209f) )
+	ROM_LOAD( "4_82s147.d3",  0x0000, 0x0200, CRC(d9b2550c) SHA1(074253b1ede42a743f1a8858756640693126209f) )
 ROM_END
 
 /*
@@ -1111,53 +1565,61 @@ ROM_END
 */
 
 ROM_START( asoccer )
-	ROM_REGION( 0x10000, "maincpu", 0 ) /* These roms are located on the 8461-A board. */
+	ROM_REGION( 0x10000, "maincpu", 0 ) // These roms are located on the 8461-A board.
 	ROM_LOAD( "as1.e10",   0x00000, 0x2000, CRC(e9d61bbf) SHA1(8f9b3a6fd99f136698035263a20f39c3174b70cf) )
 	ROM_LOAD( "as2.f10",   0x02000, 0x2000, CRC(62b2e4c8) SHA1(4270148652b18006c7df1f612f9b19f06e5400de) )
 	ROM_LOAD( "as3.h10",   0x06000, 0x2000, CRC(25bbd0d8) SHA1(fa7fb4b78e5ac4200ff5f57f94794632af450ce0) )
 	ROM_LOAD( "as4.k10",   0x08000, 0x2000, CRC(8d8bdc08) SHA1(75da310576047102af45c3a5f7d20893ef260d40) )
 
-	ROM_REGION( 0x10000, "subcpu", 0 ) /* These roms are located on the 8461-A board. */
+	ROM_REGION( 0x10000, "subcpu", 0 ) // These roms are located on the 8461-A board.
 	ROM_LOAD( "as0.e2",    0x00000, 0x4000, CRC(05d613bf) SHA1(ab822fc532fc7f1122b5ff0385b268513e7e193e) )
 
-	ROM_REGION( 0x10000, "spritecpu", 0 ) /* These roms are located on the 8461-A board. */
-	ROM_LOAD( "200b.p8",   0x00000, 0x0200, CRC(2747ca77) SHA1(abc0ca05925974c4b852827605ee2f1caefb8524) ) /* 82S147 PROM */
+	ROM_REGION( 0x10000, "spritecpu", 0 ) // These roms are located on the 8461-A board.
+	ROM_LOAD( "200b.p8",   0x00000, 0x0200, CRC(2747ca77) SHA1(abc0ca05925974c4b852827605ee2f1caefb8524) ) // 82S147 PROM
 
-	ROM_REGION( 0x8000, "gfx1", 0 ) /* These roms are located on the 8461-A board. */
+	ROM_REGION( 0x8000, "gfx1", 0 ) // These roms are located on the 8461-A board.
 	ROM_LOAD( "as5-2.e6",  0x00000, 0x4000, CRC(430295c4) SHA1(b1f4d9ab3ec0c969da4db51f476c47e87d48b879) )
 
-	ROM_REGION( 0x20000, "gfx2", 0 ) /* These roms are located on the 8461-A board. */
+	ROM_REGION( 0x20000, "gfx2", 0 ) // These roms are located on the 8461-A board.
 	ROM_LOAD( "as6.p3-2",  0x00000, 0x8000, CRC(ae577023) SHA1(61e8f441eca1ff64760bae8139c8fa378ff5fbd2) )
 	ROM_LOAD( "as7.n3-2",  0x08000, 0x8000, CRC(a20ddd9b) SHA1(530e5371b7f52031e555c98d1ff70c7beba94d4a) )
 	ROM_LOAD( "as8.l3-2",  0x10000, 0x8000, CRC(dafad065) SHA1(a491680b642bd1ea4936f914297e61d4e3ccad88) )
 	ROM_LOAD( "as9.j3-2",  0x18000, 0x8000, CRC(3a2ae776) SHA1(d9682abd30f64c51498c678257797d125b1c6a43) )
 
-	ROM_REGION( 0x10000, "adpcm", 0 ) /* These roms are located on the 8461-SUB board. */
+	ROM_REGION( 0x10000, "adpcm", 0 ) // These roms are located on the 8461-SUB board.
 	ROM_LOAD( "1.ic1",     0x00000, 0x4000, CRC(3bb65dc7) SHA1(499151903b3da9fa2455b3d2c04863b3e33e853d) )
-	/* Verified on board that IC2 is not populated. */
+	// Verified on board that IC2 is not populated.
 	ROM_LOAD( "3.ic3",     0x08000, 0x4000, CRC(27bebba3) SHA1(cf752b22603c1e2a0b33958481c652d6d56ebf68) )
 	ROM_LOAD( "4.ic4",     0x0c000, 0x4000, CRC(dd5ffaa2) SHA1(4bc4330a54ca93448a8fe05207d3fb1a3a9872e1) )
 
-	ROM_REGION( 0x0200, "proms", 0 ) /* These roms are located on the 8461-A board. */
-	ROM_LOAD( "3-2d.d3-2", 0x00000, 0x0200, CRC(a433ff62) SHA1(db9afe5fc917d25aafa21576cb1cecec7481d4cb) ) /* 82S147 PROM */
+	ROM_REGION( 0x0200, "proms", 0 ) // These roms are located on the 8461-A board.
+	ROM_LOAD( "3-2d.d3-2", 0x00000, 0x0200, CRC(a433ff62) SHA1(db9afe5fc917d25aafa21576cb1cecec7481d4cb) ) // 82S147 PROM
 ROM_END
 
-/* Game Drivers */
+} // anonymous namespace
 
-GAME( 1983, docastle,   0,        docastle, docastle, docastle_state, empty_init, ROT270, "Universal", "Mr. Do's Castle (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, docastle2,  docastle, docastle, docastle, docastle_state, empty_init, ROT270, "Universal", "Mr. Do's Castle (set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, docastleo,  docastle, docastle, docastle, docastle_state, empty_init, ROT270, "Universal", "Mr. Do's Castle (older)", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, douni,      docastle, docastle, docastle, docastle_state, empty_init, ROT270, "Universal", "Mr. Do vs. Unicorns", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, dorunrun,   0,        dorunrun, dorunrun, docastle_state, empty_init, ROT0,   "Universal", "Do! Run Run (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, dorunrun2,  dorunrun, dorunrun, dorunrun, docastle_state, empty_init, ROT0,   "Universal", "Do! Run Run (set 2)", MACHINE_SUPPORTS_SAVE )
+
+
+/*******************************************************************************
+    Game Drivers
+*******************************************************************************/
+
+//    YEAR  NAME        PARENT    MACHINE   INPUT     CLASS           INIT        SCREEN  COMPANY      FULLNAME                                     FLAGS
+GAME( 1983, docastle,   0,        docastle, docastle, docastle_state, empty_init, ROT270, "Universal", "Mr. Do's Castle (set 1)",                   MACHINE_SUPPORTS_SAVE )
+GAME( 1983, docastle2,  docastle, docastle, docastle, docastle_state, empty_init, ROT270, "Universal", "Mr. Do's Castle (set 2)",                   MACHINE_SUPPORTS_SAVE )
+GAME( 1983, docastleo,  docastle, docastle, docastle, docastle_state, empty_init, ROT270, "Universal", "Mr. Do's Castle (older)",                   MACHINE_SUPPORTS_SAVE )
+GAME( 1983, douni,      docastle, docastle, docastle, docastle_state, empty_init, ROT270, "Universal", "Mr. Do vs. Unicorns",                       MACHINE_SUPPORTS_SAVE )
+GAME( 1984, dorunrun,   0,        dorunrun, dorunrun, docastle_state, empty_init, ROT0,   "Universal", "Do! Run Run (set 1)",                       MACHINE_SUPPORTS_SAVE )
+GAME( 1984, dorunrun2,  dorunrun, dorunrun, dorunrun, docastle_state, empty_init, ROT0,   "Universal", "Do! Run Run (set 2)",                       MACHINE_SUPPORTS_SAVE )
 GAME( 1984, dorunrunc,  dorunrun, docastle, dorunrun, docastle_state, empty_init, ROT0,   "Universal", "Do! Run Run (Do's Castle hardware, set 1)", MACHINE_SUPPORTS_SAVE )
 GAME( 1984, dorunrunca, dorunrun, docastle, dorunrun, docastle_state, empty_init, ROT0,   "Universal", "Do! Run Run (Do's Castle hardware, set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, runrun,     dorunrun, docastle, runrun,   docastle_state, empty_init, ROT0,   "bootleg",   "Run Run (Do! Run Run bootleg)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, spiero,     dorunrun, dorunrun, dorunrun, docastle_state, empty_init, ROT0,   "Universal", "Super Pierrot (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, dowild,     0,        dorunrun, dowild,   docastle_state, empty_init, ROT0,   "Universal", "Mr. Do's Wild Ride", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, jjack,      0,        dorunrun, jjack,    docastle_state, empty_init, ROT270, "Universal", "Jumping Jack", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, kickridr,   0,        dorunrun, kickridr, docastle_state, empty_init, ROT0,   "Universal", "Kick Rider", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, idsoccer,   0,        idsoccer, idsoccer, docastle_state, empty_init, ROT0,   "Universal", "Indoor Soccer (set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
-GAME( 1985, idsoccera,  idsoccer, idsoccer, idsoccer, docastle_state, empty_init, ROT0,   "Universal", "Indoor Soccer (set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) // see MT05419
-GAME( 1985, idsoccert,  idsoccer, idsoccer, idsoccer, docastle_state, empty_init, ROT0,   "Universal (Tecfri license)", "Indoor Soccer (Tecfri license PCB)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) // see MT05419
-GAME( 1987, asoccer,    idsoccer, idsoccer, idsoccer, docastle_state, empty_init, ROT0,   "Universal", "American Soccer", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) // see MT05419
+GAME( 1984, runrun,     dorunrun, docastle, runrun,   docastle_state, empty_init, ROT0,   "bootleg",   "Run Run (Do! Run Run bootleg)",             MACHINE_SUPPORTS_SAVE )
+GAME( 1987, spiero,     dorunrun, dorunrun, dorunrun, docastle_state, empty_init, ROT0,   "Universal", "Super Pierrot (Japan)",                     MACHINE_SUPPORTS_SAVE )
+GAME( 1984, dowild,     0,        dorunrun, dowild,   docastle_state, empty_init, ROT0,   "Universal", "Mr. Do's Wild Ride",                        MACHINE_SUPPORTS_SAVE )
+GAME( 1984, jjack,      0,        dorunrun, jjack,    docastle_state, empty_init, ROT270, "Universal", "Jumping Jack",                              MACHINE_SUPPORTS_SAVE )
+GAME( 1984, kickridr,   0,        dorunrun, kickridr, docastle_state, empty_init, ROT0,   "Universal", "Kick Rider",                                MACHINE_SUPPORTS_SAVE )
+
+GAME( 1985, idsoccer,   0,        idsoccer, idsoccer, idsoccer_state, empty_init, ROT0,   "Universal", "Indoor Soccer (set 1)",                     MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
+GAME( 1985, idsoccera,  idsoccer, idsoccer, idsoccer, idsoccer_state, empty_init, ROT0,   "Universal", "Indoor Soccer (set 2)",                     MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) // see MT05419
+GAME( 1985, idsoccert,  idsoccer, idsoccer, idsoccer, idsoccer_state, empty_init, ROT0,   "Universal (Tecfri license)", "Indoor Soccer (Tecfri license PCB)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) // see MT05419
+GAME( 1987, asoccer,    idsoccer, idsoccer, idsoccer, idsoccer_state, empty_init, ROT0,   "Universal", "American Soccer",                           MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) // see MT05419
