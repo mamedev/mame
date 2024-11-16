@@ -220,6 +220,7 @@ void tseng_vga_device::crtc_map(address_map &map)
 		})
 	);
 	// Horizontal overflow
+	// NOTE: undocumented in ET4000AX
 	map(0x3f, 0x3f).lrw8(
 		NAME([this] (offs_t offset) {
 			return et4k.horz_overflow;
@@ -227,6 +228,7 @@ void tseng_vga_device::crtc_map(address_map &map)
 		NAME([this] (offs_t offset, u8 data) {
 			et4k.horz_overflow = data;
 			vga.crtc.horz_total = (vga.crtc.horz_total & 0xff) | ((data & 1) << 8);
+			vga.crtc.offset = (vga.crtc.offset & 0x00ff) | ((data & 0x80) << 1);
 			recompute_params();
 		})
 	);
