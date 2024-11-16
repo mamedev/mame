@@ -16,22 +16,22 @@
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-// ======================> isa8_vga_device
+// ======================> isa16_vga_device
 
-class isa8_svga_et4k_device :
+class isa16_svga_et4k_device :
 		public device_t,
-		public device_isa8_card_interface
+		public device_isa16_card_interface
 {
 public:
 	// construction/destruction
-	isa8_svga_et4k_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	isa16_svga_et4k_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	uint8_t input_port_0_r();
 
 	virtual void remap(int space_id, offs_t start, offs_t end) override;
 
 protected:
-	isa8_svga_et4k_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	isa16_svga_et4k_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	// device-level overrides
 	virtual void device_start() override ATTR_COLD;
@@ -50,11 +50,11 @@ private:
 	required_device<tseng_vga_device> m_vga;
 };
 
-class isa8_svga_et4k_kasan16_device :
-		public isa8_svga_et4k_device
+class isa16_svga_et4k_kasan16_device :
+		public isa16_svga_et4k_device
 {
 public:
-	isa8_svga_et4k_kasan16_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	isa16_svga_et4k_kasan16_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
 	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
@@ -64,7 +64,7 @@ private:
 };
 
 // device type definition
-DECLARE_DEVICE_TYPE(ISA8_SVGA_ET4K,         isa8_svga_et4k_device)
-DECLARE_DEVICE_TYPE(ISA8_SVGA_ET4K_KASAN16, isa8_svga_et4k_kasan16_device)
+DECLARE_DEVICE_TYPE(ISA16_SVGA_ET4K,         isa16_svga_et4k_device)
+DECLARE_DEVICE_TYPE(ISA16_SVGA_ET4K_KASAN16, isa16_svga_et4k_kasan16_device)
 
 #endif // MAME_BUS_ISA_SVGA_TSENG_H

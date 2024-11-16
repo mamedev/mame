@@ -178,26 +178,7 @@ void tseng_vga_device::attribute_map(address_map &map)
 		NAME([this] (offs_t offset) { return et4k.misc1; }),
 		NAME([this] (offs_t offset, u8 data) {
 			et4k.misc1 = data;
-			// TODO: this should be taken into account for recompute_params
-			#if 0
-			svga.rgb8_en = 0;
-			svga.rgb15_en = 0;
-			svga.rgb16_en = 0;
-			svga.rgb32_en = 0;
-			switch(et4k.misc1 & 0x30)
-			{
-				case 0:
-					// normal power-up mode
-					break;
-				case 0x10:
-					svga.rgb8_en = 1;
-					break;
-				case 0x20:
-				case 0x30:
-					popmessage("Tseng 15/16 bit HiColor mode, contact MAMEdev");
-					break;
-			}
-			#endif
+			recompute_params();
 		})
 	);
 	// Miscellaneous 2
@@ -245,6 +226,7 @@ void tseng_vga_device::recompute_params()
 			xtal = 38000000;
 			break;
 	}
+	// TODO: also read et4k.misc1?
 	switch(et4k.dac_ctrl & 0xe0)
 	{
 		case 0xa0:
