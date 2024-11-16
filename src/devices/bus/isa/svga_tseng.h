@@ -79,7 +79,7 @@ protected:
 	void io_isa_map(address_map &map) ATTR_COLD;
 
 private:
-	required_device<tseng_vga_device> m_vga;
+	required_device<et4kw32i_vga_device> m_vga;
 };
 
 

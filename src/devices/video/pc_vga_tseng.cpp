@@ -20,7 +20,8 @@
 // TODO: refactor this macro
 #define GRAPHIC_MODE (vga.gc.alpha_dis) /* else text mode */
 
-DEFINE_DEVICE_TYPE(TSENG_VGA,  tseng_vga_device,  "tseng_vga",  "Tseng Labs ET4000AX VGA i/f")
+DEFINE_DEVICE_TYPE(TSENG_VGA,  tseng_vga_device,        "tseng_vga",  "Tseng Labs ET4000AX VGA i/f")
+DEFINE_DEVICE_TYPE(ET4KW32I_VGA,  et4kw32i_vga_device,  "et4kw32i_vga",  "Tseng Labs ET4000/W32i TC6167HF VGA i/f")
 
 tseng_vga_device::tseng_vga_device(const machine_config &mconfig, const char *tag, device_type type, device_t *owner, uint32_t clock)
 	: svga_device(mconfig, type, tag, owner, clock)
@@ -49,6 +50,12 @@ void tseng_vga_device::device_start()
 	save_item(NAME(et4k.ext_reg_ena));
 	save_item(NAME(et4k.misc1));
 	save_item(NAME(et4k.misc2));
+	save_item(NAME(et4k.rcconf));
+	save_item(NAME(et4k.vsconf1));
+	save_item(NAME(et4k.vsconf2));
+	save_item(NAME(et4k.crtc_reg31));
+	save_item(NAME(et4k.crtc_ext_start));
+	save_item(NAME(et4k.crtc_overflow_high));
 }
 
 void tseng_vga_device::io_3bx_3dx_map(address_map &map)
@@ -118,13 +125,29 @@ u8 tseng_vga_device::ramdac_hidden_windex_r(offs_t offset)
 	return vga_device::ramdac_write_index_r(offset);
 }
 
-// NOTE: the mapping notes comes from ET4000/W32i manual, unconfirmed if they are identical
 void tseng_vga_device::crtc_map(address_map &map)
 {
 	svga_device::crtc_map(map);
 //  map(0x30, 0x30) System Segment Map Comparator
-//  map(0x31, 0x31) General Purpose (& Clock Select 3/4)
-//  map(0x32, 0x32) RAS/CAS Configuration (RCCONF)
+//  General Purpose (& Clock Select 3/4)
+	map(0x31, 0x31).lrw8(
+		NAME([this] (offs_t offset) {
+			return et4k.crtc_reg31;
+		}),
+		NAME([this] (offs_t offset, u8 data) {
+			et4k.crtc_reg31 = data;
+			// TODO: recompute_params
+		})
+	);
+//  RAS/CAS Configuration (RCCONF)
+	map(0x32, 0x32).lrw8(
+		NAME([this] (offs_t offset) {
+			return et4k.rcconf;
+		}),
+		NAME([this] (offs_t offset, u8 data) {
+			et4k.rcconf = data;
+		})
+	);
 	/*
 	 * ---- xx-- Cursor address bits 16-17
 	 * ---- --xx Start address bits 16-17
@@ -152,11 +175,43 @@ void tseng_vga_device::crtc_map(address_map &map)
 			recompute_params();
 		})
 	);
-//  map(0x35, 0x35) Overflow High
-//  map(0x36, 0x36) Video System Configuration 1 (VSCONF1)
+//  Overflow High
+	map(0x35, 0x35).lrw8(
+		NAME([this] (offs_t offset) {
+			return et4k.crtc_overflow_high;
+		}),
+		NAME([this] (offs_t offset, u8 data) {
+			et4k.crtc_overflow_high = data;
+			vga.crtc.vert_blank_start = (vga.crtc.vert_blank_start & 0x03ff) | ((BIT(data, 0) << 10));
+			vga.crtc.vert_total = (vga.crtc.vert_total & 0x03ff) | ((BIT(data, 1) << 10));
+			vga.crtc.vert_disp_end = (vga.crtc.vert_total & 0x03ff) | ((BIT(data, 2) << 10));
+			// TODO: vertical sync start -> retrace?
+			vga.crtc.vert_retrace_start = (vga.crtc.vert_retrace_start & 0x03ff) | ((BIT(data, 3) << 10));
+			vga.crtc.line_compare = (vga.crtc.line_compare & 0x03ff) | ((BIT(data, 4) << 10));
+			// TODO: bit 5: external sync reset (genlock)
+			// TODO: bit 6 Alternate RMW control
+			// TODO: bit 7 vertical interlace mode
+		})
+	);
+	//  Video System Configuration 1 (VSCONF1)
+	map(0x36, 0x36).lrw8(
+		NAME([this] (offs_t offset) {
+			return et4k.vsconf1;
+		}),
+		NAME([this] (offs_t offset, u8 data) {
+			et4k.vsconf1 = data;
+		})
+	);
 	// Video System Configuration 2 (VSCONF2)
-	// NOTE: reads memory installed from here
-	map(0x37, 0x37).ram();
+	map(0x37, 0x37).lrw8(
+		NAME([this] (offs_t offset) {
+			// NOTE: reads memory installed from here and rcconf
+			return et4k.vsconf2;
+		}),
+		NAME([this] (offs_t offset, u8 data) {
+			et4k.vsconf2 = data;
+		})
+	);
 	// Horizontal overflow
 	map(0x3f, 0x3f).lrw8(
 		NAME([this] (offs_t offset) {
@@ -278,7 +333,7 @@ uint8_t tseng_vga_device::mem_r(offs_t offset)
 	if(svga.rgb8_en || svga.rgb15_en || svga.rgb16_en || svga.rgb24_en)
 	{
 		offset &= 0xffff;
-		return vga.memory[(offset+svga.bank_r*0x10000)];
+		return svga_device::mem_linear_r(offset + svga.bank_r * 0x10000);
 	}
 
 	return vga_device::mem_r(offset);
@@ -289,10 +344,11 @@ void tseng_vga_device::mem_w(offs_t offset, uint8_t data)
 	if(svga.rgb8_en || svga.rgb15_en || svga.rgb16_en || svga.rgb24_en)
 	{
 		offset &= 0xffff;
-		vga.memory[(offset+svga.bank_w*0x10000)] = data;
+		svga_device::mem_linear_w(offset + svga.bank_w * 0x10000, data);
+		return;
 	}
-	else
-		vga_device::mem_w(offset,data);
+
+	vga_device::mem_w(offset,data);
 }
 
 uint32_t tseng_vga_device::latch_start_addr()
@@ -303,5 +359,69 @@ uint32_t tseng_vga_device::latch_start_addr()
 		return vga.crtc.start_addr_latch << 2;
 	}
 	return vga.crtc.start_addr_latch;
+}
+
+/**************************************
+ *
+ * ET4000W32/i overrides
+ *
+ *************************************/
+
+et4kw32i_vga_device::et4kw32i_vga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: tseng_vga_device(mconfig, tag, ET4KW32I_VGA, owner, clock)
+{
+}
+
+void et4kw32i_vga_device::crtc_map(address_map &map)
+{
+	tseng_vga_device::crtc_map(map);
+	/*
+	 * xxxx ---- Cursor address bits 16-19
+	 * ---- xxxx Start address bits 16-19
+	 */
+//  Extended Start Address
+	map(0x33, 0x33).lrw8(
+		NAME([this] (offs_t offset) {
+			return et4k.crtc_ext_start;
+		}),
+		NAME([this] (offs_t offset, u8 data) {
+			et4k.crtc_ext_start = data;
+			vga.crtc.start_addr_latch &= ~0xf0000;
+			vga.crtc.start_addr_latch |= ((data & 0xf) << 16);
+			vga.crtc.cursor_addr &= ~0xf0000;
+			vga.crtc.cursor_addr |= ((data & 0xf0) << 12);
+		})
+	);
+}
+
+void et4kw32i_vga_device::io_3cx_map(address_map &map)
+{
+	tseng_vga_device::io_3cx_map(map);
+	map(0x0b, 0x0b).lrw8(
+		NAME([this] (offs_t offset) {
+			u8 res = (svga.bank_w & 0x30) >> 4;
+			res   |= (svga.bank_r & 0x30);
+			return res;
+		}),
+		NAME([this] (offs_t offset, u8 data) {
+			svga.bank_w &= 0x0f;
+			svga.bank_w |= (data & 0x3) << 4;
+			svga.bank_r &= 0x0f;
+			svga.bank_r |= (data & 0x30);
+		})
+	);
+	map(0x0d, 0x0d).lrw8(
+		NAME([this] (offs_t offset) {
+			u8 res = svga.bank_w & 0xf;
+			res   |= (svga.bank_r & 0xf) << 4;
+			return res;
+		}),
+		NAME([this] (offs_t offset, u8 data) {
+			svga.bank_w &= 0x30;
+			svga.bank_w |= (data & 0xf);
+			svga.bank_r &= 0x30;
+			svga.bank_r |= (data & 0xf0) >> 4;
+		})
+	);
 }
 

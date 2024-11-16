@@ -58,7 +58,7 @@ void isa16_svga_et4k_device::device_add_mconfig(machine_config &config)
 
 	TSENG_VGA(config, m_vga, 0);
 	m_vga->set_screen("screen");
-	m_vga->set_vram_size(0x100000);
+	m_vga->set_vram_size(1*1024*1024);
 }
 
 //**************************************************************************
@@ -178,10 +178,10 @@ void isa16_svga_et4k_w32i_device::device_add_mconfig(machine_config &config)
 	screen.set_raw(25.175_MHz_XTAL, 800, 0, 640, 524, 0, 480);
 	screen.set_screen_update(m_vga, FUNC(tseng_vga_device::screen_update));
 
-	// TODO: bump me up
-	TSENG_VGA(config, m_vga, 0);
+	ET4KW32I_VGA(config, m_vga, 0);
 	m_vga->set_screen("screen");
-	m_vga->set_vram_size(0x400000);
+    // 1MB default, 4MB max
+	m_vga->set_vram_size(1*1024*1024);
 }
 
 void isa16_svga_et4k_w32i_device::device_start()
